@@ -1,20 +1,20 @@
 <template>
-  <view class="page-container bg-[#f8fafc] min-h-screen pb-30px">
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
     <NavBar title="up-notify 消息通知" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
-    <view class="p-16px">
+    <view class="p-[16px]">
       <view class="demo-block">
         <text class="demo-label">基础用法</text>
         <view class="flex-row items-center">
           <up-button type="primary" text="主要通知" size="mini" @click="showNotify('primary')"></up-button>
-          <view class="w-10px"></view>
+          <view class="w-[10px]"></view>
           <up-button type="success" text="成功通知" size="mini" @click="showNotify('success')"></up-button>
         </view>
       </view>
-      <view class="demo-block mt-12px">
+      <view class="demo-block mt-[12px]">
         <text class="demo-label">其他类型</text>
         <view class="flex-row items-center">
           <up-button type="warning" text="警告通知" size="mini" @click="showNotify('warning')"></up-button>
-          <view class="w-10px"></view>
+          <view class="w-[10px]"></view>
           <up-button type="error" text="错误通知" size="mini" @click="showNotify('error')"></up-button>
         </view>
       </view>

@@ -1,16 +1,16 @@
 <template>
   <view
-    class="rounded-16px p-20px m-16px border-width-1px border-style-solid"
+    class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid"
     :style="{
       backgroundColor: 'var(--card-bg, #ffffff)',
       borderColor: 'var(--border-color, #edf2f7)'
     }"
   >
     <!-- 标题区域 -->
-    <view class="flex flex-row items-center mb-16px">
-      <view class="w-4px h-16px bg-[#3182ce] rounded-2px mr-8px" />
+    <view class="flex flex-row items-center mb-[16px]">
+      <view class="w-[4px] h-[16px] bg-[#3182ce] rounded-[2px] mr-[8px]" />
       <slot name="title">
-        <text class="text-16px font-bold" :style="{ color: 'var(--text-color, #2d3748)' }">{{ title }}</text>
+        <text class="text-[16px] font-bold" :style="{ color: 'var(--text-color, #2d3748)' }">{{ title }}</text>
       </slot>
     </view>
 

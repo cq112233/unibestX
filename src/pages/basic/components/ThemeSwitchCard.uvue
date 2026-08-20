@@ -1,23 +1,23 @@
 <template>
   <Card :title="themeTitle">
     <!-- 预览区域 -->
-    <view class="rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-[#e2e8f0] items-center">
-      <text class="text-12px text-[#94a3b8] mb-8px">{{ themePreview }}</text>
+    <view class="rounded-[12px] p-[16px] mb-[16px] border-[1px] border-solid border-[#e2e8f0] items-center">
+      <text class="text-[12px] text-[#94a3b8] mb-[8px]">{{ themePreview }}</text>
 
       <view
-        class="mt-10px mx-auto w-200px h-44px rounded-8px flex flex-row items-center justify-center"
+        class="mt-[10px] mx-auto w-[200px] h-[44px] rounded-[8px] flex flex-row items-center justify-center"
         :style="{ backgroundColor: currentTheme }"
       >
-        <text class="text-[#ffffff] text-14px">{{ themeButton }}</text>
+        <text class="text-[#ffffff] text-[14px]">{{ themeButton }}</text>
       </view>
     </view>
 
     <!-- 颜色选择区 -->
-    <view class="flex-row justify-between py-10px">
+    <view class="flex-row justify-between py-[10px]">
       <view
         v-for="(item, index) in colorOptions"
         :key="index"
-        class="w-40px h-40px rounded-20px items-center justify-center"
+        class="w-[40px] h-[40px] rounded-[20px] items-center justify-center"
         :style="{
           backgroundColor: item,
           borderWidth: currentTheme == item ? '3px' : '0px',
@@ -28,7 +28,7 @@
       >
         <text
           v-if="currentTheme == item"
-          class="text-16px text-white font-bold"
+          class="text-[16px] text-white font-bold"
         >
           ✓
         </text>
@@ -36,10 +36,10 @@
     </view>
 
     <!-- 外观模式：跟随系统 / 浅色 / 深色 -->
-    <view class="flex-row justify-between items-center mt-10px pt-10px">
-      <text class="text-14px text-[#2d3748]">{{ themeModeLabel }}</text>
+    <view class="flex-row justify-between items-center mt-[10px] pt-[10px]">
+      <text class="text-[14px] text-[#2d3748]">{{ themeModeLabel }}</text>
       <view
-        class="flex-row rounded-8px overflow-hidden"
+        class="flex-row rounded-[8px] overflow-hidden"
         :style="{
           borderWidth: '1px',
           borderStyle: 'solid',
@@ -49,14 +49,14 @@
         <view
           v-for="(item, index) in themeModeOptions"
           :key="index"
-          class="px-14px py-8px"
+          class="px-[14px] py-[8px]"
           :style="{
             backgroundColor: appStore.state.themeMode == item.value ? appStore.state.theme : 'transparent'
           }"
           @click="changeThemeMode(item.value)"
         >
           <text
-            class="text-12px"
+            class="text-[12px]"
             :style="{
               color: appStore.state.themeMode == item.value ? '#ffffff' : 'var(--text-secondary, #64748b)'
             }"

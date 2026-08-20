@@ -1,0 +1,58 @@
+import Card from '../../basic/components/Card.uvue';
+import { ref } from 'vue';
+import { toast, toastSuccess } from '@/src/utils/toast';
+const __sfc__ = defineComponent({
+    __name: 'ToastCard',
+    setup(__props) {
+        const __ins = getCurrentInstance()!;
+        const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+        const _cache = __ins.renderCache;
+        const customMsg = ref<string>('来自 Function 功能页的 Toast 消息！');
+        function showCustomToast() {
+            if (customMsg.value.trim() == '') {
+                toast('请输入提示内容');
+                return;
+            }
+            toast(customMsg.value);
+        }
+        function showSuccessToast() {
+            toastSuccess('Function 页面全局 Toast 触发成功！');
+        }
+        return (): any | null => {
+            return _cV(unref(Card), _uM({ title: "全局 Toast 提示调用" }), _uM({
+                default: withSlotCtx((): any[] => [
+                    _cE("view", _uM({ class: "wtu-mnbm96-0 wtu-1bq9shh-1 wtu-13ryylq-2 wtu-33hvuz-3 wtu-4tuys3-4 wtu-8r66y1-5" }), [
+                        _cE("text", _uM({ class: "wtu-3i3gs6-6 wtu-1pd9yl-7 wtu-aahijk-8" }), " 演示从功能页调用 App.ku.uvue 全局挂载的 <up-toast ref=\"uToastRef\" />，支持自定义消息、类型与轻提示反馈。 ")
+                    ]),
+                    _cE("view", _uM({ class: "wtu-4tpahe-9" }), [
+                        _cE("text", _uM({ class: "wtu-3i3gs6-6 wtu-b5uul9-a wtu-9szial-b" }), "自定义 Toast 内容"),
+                        _cE("input", _uM({
+                            modelValue: customMsg.value,
+                            onInput: ($event: UniInputEvent) => { (customMsg).value = $event.detail.value; },
+                            placeholder: "请输入要提示的文字内容",
+                            class: "wtu-16m9tth-c wtu-19clxu8-d wtu-6x9tj9-e wtu-y4lian-f wtu-33hvuz-3 wtu-4tuys3-4 wtu-f8q5hx-g wtu-1l8aqp8-h wtu-12c53hp-i"
+                        }), null, 40 /* PROPS, NEED_HYDRATION */, ["modelValue", "onInput"])
+                    ]),
+                    _cE("view", _uM({ class: "wtu-1yca3x4-j wtu-clldfh-k" }), [
+                        _cE("view", _uM({
+                            class: "wtu-bte5oa-l wtu-nw1q8k-m wtu-zsktp1-n wtu-13pz9mv-o wtu-1b6qia0-p wtu-1yca3x4-j wtu-clldfh-k wtu-xpmuf1-q wtu-164irp9-r",
+                            onClick: showCustomToast
+                        }), [
+                            _cE("text", _uM({ class: "wtu-pubmk8-s wtu-1tbrxcb-t wtu-bj9ji2-u" }), "弹出自定义 Toast")
+                        ]),
+                        _cE("view", _uM({
+                            class: "wtu-bte5oa-l wtu-zhey3t-v wtu-13pz9mv-o wtu-1b6qia0-p wtu-1yca3x4-j wtu-clldfh-k wtu-xpmuf1-q wtu-164irp9-r",
+                            onClick: showSuccessToast
+                        }), [
+                            _cE("text", _uM({ class: "wtu-pubmk8-s wtu-1tbrxcb-t wtu-bj9ji2-u" }), "弹出成功 Toast")
+                        ])
+                    ])
+                ]),
+                _: 1 /* STABLE */
+            }));
+        };
+    }
+});
+export default __sfc__;
+const GenSrcPagesFunctionComponentsToastCardStyles = [_uM([["wtu-mnbm96-0", _pS(_uM([["borderTopLeftRadius", 12], ["borderTopRightRadius", 12], ["borderBottomRightRadius", 12], ["borderBottomLeftRadius", 12]]))], ["wtu-1bq9shh-1", _pS(_uM([["paddingTop", 16], ["paddingRight", 16], ["paddingBottom", 16], ["paddingLeft", 16]]))], ["wtu-13ryylq-2", _pS(_uM([["marginBottom", 16]]))], ["wtu-33hvuz-3", _pS(_uM([["--tw-border-style", "solid"], ["borderTopStyle", "var(--tw-border-style)"], ["borderRightStyle", "var(--tw-border-style)"], ["borderBottomStyle", "var(--tw-border-style)"], ["borderLeftStyle", "var(--tw-border-style)"], ["borderTopWidth", 1], ["borderRightWidth", 1], ["borderBottomWidth", 1], ["borderLeftWidth", 1]]))], ["wtu-4tuys3-4", _pS(_uM([["--tw-border-style", "solid"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"]]))], ["wtu-8r66y1-5", _pS(_uM([["borderTopColor", "#e2e8f0"], ["borderRightColor", "#e2e8f0"], ["borderBottomColor", "#e2e8f0"], ["borderLeftColor", "#e2e8f0"]]))], ["wtu-3i3gs6-6", _pS(_uM([["fontSize", 12]]))], ["wtu-1pd9yl-7", _pS(_uM([["color", "#64748b"]]))], ["wtu-aahijk-8", _pS(_uM([["--tw-leading", "20px"], ["lineHeight", "20px"]]))], ["wtu-4tpahe-9", _pS(_uM([["marginBottom", 12]]))], ["wtu-b5uul9-a", _pS(_uM([["color", "#94a3b8"]]))], ["wtu-9szial-b", _pS(_uM([["marginBottom", 6]]))], ["wtu-16m9tth-c", _pS(_uM([["height", 38]]))], ["wtu-19clxu8-d", _pS(_uM([["backgroundColor", "#ffffff"]]))], ["wtu-6x9tj9-e", _pS(_uM([["borderTopLeftRadius", 6], ["borderTopRightRadius", 6], ["borderBottomRightRadius", 6], ["borderBottomLeftRadius", 6]]))], ["wtu-y4lian-f", _pS(_uM([["paddingLeft", 12], ["paddingRight", 12]]))], ["wtu-f8q5hx-g", _pS(_uM([["borderTopColor", "#cbd5e1"], ["borderRightColor", "#cbd5e1"], ["borderBottomColor", "#cbd5e1"], ["borderLeftColor", "#cbd5e1"]]))], ["wtu-1l8aqp8-h", _pS(_uM([["fontSize", 14]]))], ["wtu-12c53hp-i", _pS(_uM([["color", "#334155"]]))], ["wtu-1yca3x4-j", _pS(_uM([["display", "flex"]]))], ["wtu-clldfh-k", _pS(_uM([["flexDirection", "row"]]))], ["wtu-bte5oa-l", _pS(_uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]]))], ["wtu-nw1q8k-m", _pS(_uM([["marginRight", 10]]))], ["wtu-zsktp1-n", _pS(_uM([["backgroundColor", "#3b82f6"]]))], ["wtu-13pz9mv-o", _pS(_uM([["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["wtu-1b6qia0-p", _pS(_uM([["height", 40]]))], ["wtu-xpmuf1-q", _pS(_uM([["alignItems", "center"]]))], ["wtu-164irp9-r", _pS(_uM([["justifyContent", "center"]]))], ["wtu-pubmk8-s", _pS(_uM([["color", "#ffffff"]]))], ["wtu-1tbrxcb-t", _pS(_uM([["fontSize", 13]]))], ["wtu-bj9ji2-u", _pS(_uM([["--tw-font-weight", "var(--font-weight-bold, 700)"], ["fontWeight", 700]]))], ["wtu-zhey3t-v", _pS(_uM([["backgroundColor", "#10b981"]]))]])];
+//# sourceMappingURL=ToastCard.uvue.map

@@ -1,116 +1,119 @@
 <template>
   <Card title="Lodash 工具库 (iRainna-lodash)">
     <!-- 1. 数组处理演示 (chunk, uniq, shuffle) -->
-    <view class="rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-[#e2e8f0]">
-      <text class="text-13px font-bold text-[#1e293b] mb-8px">1. 数组切片去重与随机打乱 (chunk, uniq, shuffle)</text>
+    <view class="rounded-[12px] p-[16px] mb-[16px] border-[1px] border-solid border-[#e2e8f0]">
+      <text class="text-[13px] font-bold text-[#1e293b] mb-[8px]">1. 数组切片去重与随机打乱 (chunk, uniq, shuffle)</text>
 
-      <view class="mb-8px">
-        <text class="text-12px text-[#64748b]">原始数组 (带重复元素):</text>
-        <text class="result-text text-13px font-medium text-[#334155] mt-2px" style="font-family: monospace;">
+      <view class="mb-[8px]">
+        <text class="text-[12px] text-[#64748b]">原始数组 (带重复元素):</text>
+        <text class="result-text text-[13px] font-medium text-[#334155] mt-[2px]" style="font-family: monospace;">
           {{ JSON.stringify(rawArray) }}
         </text>
       </view>
 
-      <view class="mb-8px">
-        <text class="text-12px text-[#64748b]">_.uniq 去重结果:</text>
-        <text class="result-text text-13px font-bold text-[#059669] mt-2px" style="font-family: monospace;">
+      <view class="mb-[8px]">
+        <text class="text-[12px] text-[#64748b]">_.uniq 去重结果:</text>
+        <text class="result-text text-[13px] font-bold text-[#059669] mt-[2px]" style="font-family: monospace;">
           {{ JSON.stringify(uniqArray) }}
         </text>
       </view>
 
-      <view class="mb-12px">
-        <text class="text-12px text-[#64748b]">_.chunk 切片结果 (每组 3 个):</text>
-        <text class="result-text text-12px font-medium text-[#3b82f6] mt-2px" style="font-family: monospace;">
+      <view class="mb-[12px]">
+        <text class="text-[12px] text-[#64748b]">_.chunk 切片结果 (每组 3 个):</text>
+        <text class="result-text text-[12px] font-medium text-[#3b82f6] mt-[2px]" style="font-family: monospace;">
           {{ chunkedArray }}
         </text>
       </view>
 
-      <view class="w-full h-36px rounded-8px bg-[#f1f5f9] flex flex-row items-center justify-center" @click="handleShuffle">
-        <text class="text-13px font-bold text-[#475569]">点击使用 _.shuffle 打乱数组</text>
+      <view class="w-full h-[36px] rounded-[8px] bg-[#f1f5f9] flex flex-row items-center justify-center" @click="handleShuffle">
+        <text class="text-[13px] font-bold text-[#475569]">点击使用 _.shuffle 打乱数组</text>
       </view>
     </view>
 
     <!-- 2. 对象深拷贝与安全取值 (get, cloneDeep) -->
-    <view class="rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-[#e2e8f0]">
-      <text class="text-13px font-bold text-[#1e293b] mb-8px">2. 对象深拷贝与安全取值 (get, cloneDeep)</text>
+    <view class="rounded-[12px] p-[16px] mb-[16px] border-[1px] border-solid border-[#e2e8f0]">
+      <text class="text-[13px] font-bold text-[#1e293b] mb-[8px]">2. 对象深拷贝与安全取值 (get, cloneDeep)</text>
 
-      <view class="mb-8px">
-        <text class="text-12px text-[#64748b]">_.get(obj, 'user.info.name', '未找到'):</text>
-        <text class="result-text text-13px font-bold text-[#3b82f6] mt-2px" style="font-family: monospace;">
+      <view class="mb-[8px]">
+        <text class="text-[12px] text-[#64748b]">_.get(obj, 'user.info.name', '未找到'):</text>
+        <text class="result-text text-[13px] font-bold text-[#3b82f6] mt-[2px]" style="font-family: monospace;">
           "{{ getNameResult }}"
         </text>
       </view>
 
-      <view class="mb-8px">
-        <text class="text-12px text-[#64748b]">_.get(obj, 'user.invalid.path', '安全兜底值'):</text>
-        <text class="result-text text-13px font-bold text-[#d97706] mt-2px" style="font-family: monospace;">
+      <view class="mb-[8px]">
+        <text class="text-[12px] text-[#64748b]">_.get(obj, 'user.invalid.path', '安全兜底值'):</text>
+        <text class="result-text text-[13px] font-bold text-[#d97706] mt-[2px]" style="font-family: monospace;">
           "{{ getFallbackResult }}"
         </text>
       </view>
 
-      <view class="border-top-width-1px border-top-style-solid border-top-color-[#e2e8f0] pt-8px mt-8px mb-8px">
-        <text class="text-12px text-[#64748b] mb-4px">深拷贝防污染对比 (点击修改深拷贝副本的值):</text>
-        <view class="flex-row justify-between mb-4px">
-          <text class="text-12px text-[#475569]">原对象 age:</text>
-          <text class="text-12px font-bold text-[#334155]">{{ rawObjAge }}</text>
+      <view class="h-[1px] bg-[#e2e8f0] my-[10px]" />
+
+      <view class="mb-[8px]">
+        <text class="text-[12px] text-[#64748b] mb-[4px]">深拷贝防污染对比 (点击修改深拷贝副本的值):</text>
+        <view class="flex-row justify-between mb-[4px]">
+          <text class="text-[12px] text-[#475569]">原对象 age:</text>
+          <text class="text-[12px] font-bold text-[#334155]">{{ rawObjAge }}</text>
         </view>
-        <view class="flex-row justify-between mb-8px">
-          <text class="text-12px text-[#475569]">副本对象 age:</text>
-          <text class="text-12px font-bold text-[#ec4899]">{{ clonedObjAge }}</text>
+        <view class="flex-row justify-between mb-[8px]">
+          <text class="text-[12px] text-[#475569]">副本对象 age:</text>
+          <text class="text-[12px] font-bold text-[#ec4899]">{{ clonedObjAge }}</text>
         </view>
-        <view class="w-full h-36px rounded-8px bg-[#fce7f3] flex flex-row items-center justify-center" @click="mutateClonedObj">
-          <text class="text-13px font-bold text-[#be185d]">修改副本 age (+1)</text>
+        <view class="w-full h-[36px] rounded-[8px] bg-[#fce7f3] flex flex-row items-center justify-center" @click="mutateClonedObj">
+          <text class="text-[13px] font-bold text-[#be185d]">修改副本 age (+1)</text>
         </view>
       </view>
     </view>
 
     <!-- 3. 字符串与格式化 (camelCase, kebabCase, capitalize) -->
-    <view class="rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-[#e2e8f0]">
-      <text class="text-13px font-bold text-[#1e293b] mb-8px">3. 字符串修饰与格式化 (camelCase, kebabCase)</text>
+    <view class="rounded-[12px] p-[16px] mb-[16px] border-[1px] border-solid border-[#e2e8f0]">
+      <text class="text-[13px] font-bold text-[#1e293b] mb-[8px]">3. 字符串修饰与格式化 (camelCase, kebabCase)</text>
 
-      <view class="mb-12px">
-        <text class="text-12px text-[#64748b] mb-4px">输入文本:</text>
-        <input v-model="inputText" class="w-full h-36px px-12px rounded-6px border-width-1px border-style-solid border-color-[#cbd5e1] text-13px text-[#1e293b]" placeholder="请输入待转换文本" />
+      <view class="mb-[12px]">
+        <text class="text-[12px] text-[#64748b] mb-[4px]">输入文本:</text>
+        <input v-model="inputText" class="w-full h-[36px] px-[12px] rounded-[6px] border-[1px] border-solid border-[#cbd5e1] text-[13px] text-[#1e293b]" placeholder="请输入待转换文本" />
       </view>
 
-      <view class="mb-8px">
-        <text class="text-12px text-[#64748b]">_.camelCase (驼峰):</text>
-        <text class="result-text text-13px font-bold text-[#8b5cf6] mt-2px" style="font-family: monospace;">{{ camelCaseResult }}</text>
+      <view class="mb-[8px]">
+        <text class="text-[12px] text-[#64748b]">_.camelCase (驼峰):</text>
+        <text class="result-text text-[13px] font-bold text-[#8b5cf6] mt-[2px]" style="font-family: monospace;">{{ camelCaseResult }}</text>
       </view>
 
-      <view class="mb-8px">
-        <text class="text-12px text-[#64748b]">_.kebabCase (短横线):</text>
-        <text class="result-text text-13px font-bold text-[#06b6d4] mt-2px" style="font-family: monospace;">{{ kebabCaseResult }}</text>
+      <view class="mb-[8px]">
+        <text class="text-[12px] text-[#64748b]">_.kebabCase (短横线):</text>
+        <text class="result-text text-[13px] font-bold text-[#06b6d4] mt-[2px]" style="font-family: monospace;">{{ kebabCaseResult }}</text>
       </view>
 
-      <view class="mb-6px">
-        <text class="text-12px text-[#64748b]">_.capitalize (首字母大写):</text>
-        <text class="result-text text-13px font-bold text-[#10b981] mt-2px" style="font-family: monospace;">{{ capitalizeResult }}</text>
+      <view class="mb-[6px]">
+        <text class="text-[12px] text-[#64748b]">_.capitalize (首字母大写):</text>
+        <text class="result-text text-[13px] font-bold text-[#10b981] mt-[2px]" style="font-family: monospace;">{{ capitalizeResult }}</text>
       </view>
     </view>
 
     <!-- 4. 函数防抖与常用工具 (debounce, random) -->
-    <view class="rounded-12px p-16px border-width-1px border-style-solid border-color-[#e2e8f0]">
-      <text class="text-13px font-bold text-[#1e293b] mb-8px">4. 防抖函数与随机数 (debounce, random)</text>
+    <view class="rounded-[12px] p-[16px] border-[1px] border-solid border-[#e2e8f0]">
+      <text class="text-[13px] font-bold text-[#1e293b] mb-[8px]">4. 防抖函数与随机数 (debounce, random)</text>
 
-      <view class="flex-row items-center justify-between mb-12px">
+      <view class="flex-row items-center justify-between mb-[12px]">
         <view class="flex-col">
-          <text class="text-12px text-[#64748b]">防抖点击触发次数 (400ms):</text>
-          <text class="text-12px text-[#94a3b8]">连击时仅在停止 400ms 后加 1</text>
+          <text class="text-[12px] text-[#64748b]">防抖点击触发次数 (400ms):</text>
+          <text class="text-[12px] text-[#94a3b8]">连击时仅在停止 400ms 后加 1</text>
         </view>
-        <text class="text-20px font-bold text-[#f59e0b]">{{ debouncedCount }}</text>
+        <text class="text-[20px] font-bold text-[#f59e0b]">{{ debouncedCount }}</text>
       </view>
 
-      <view class="w-full h-36px rounded-8px bg-[#fef3c7] flex flex-row items-center justify-center mb-12px" @click="handleDebounceClick">
-        <text class="text-13px font-bold text-[#b45309]">快速连击测试防抖</text>
+      <view class="w-full h-[36px] rounded-[8px] bg-[#fef3c7] flex flex-row items-center justify-center mb-[12px]" @click="handleDebounceClick">
+        <text class="text-[13px] font-bold text-[#b45309]">快速连击测试防抖</text>
       </view>
 
-      <view class="border-top-width-1px border-top-style-solid border-top-color-[#e2e8f0] pt-8px flex-row items-center justify-between">
-        <text class="text-12px text-[#64748b]">_.random(1, 100) 随机数:</text>
+      <view class="h-[1px] bg-[#e2e8f0] my-[10px]" />
+      <view class="flex-row items-center justify-between">
+        <text class="text-[12px] text-[#64748b]">_.random(1, 100) 随机数:</text>
         <view class="flex-row items-center">
-          <text class="text-14px font-bold text-[#6366f1] mr-12px">{{ randomValue }}</text>
-          <view class="px-8px py-4px rounded-4px bg-[#e0e7ff]" @click="generateRandom">
-            <text class="text-11px font-bold text-[#4338ca]">重新生成</text>
+          <text class="text-[14px] font-bold text-[#6366f1] mr-[12px]">{{ randomValue }}</text>
+          <view class="px-[8px] py-[4px] rounded-[4px] bg-[#e0e7ff]" @click="generateRandom">
+            <text class="text-[11px] font-bold text-[#4338ca]">重新生成</text>
           </view>
         </view>
       </view>

@@ -4,7 +4,7 @@ layout: home
 hero:
   name: "unibestX"
   text: "最好的 uni-app X 开发框架"
-  tagline: uni-app X + Vue3 + UTS + Vite5 + UnoCSS + uview-ultra
+  tagline: uni-app X + Vue3 + UTS + Vite5 + Tailwind CSS + uview-ultra
   image:
     src: https://uniappx.oss-cn-beijing.aliyuncs.com/logo.png
     alt: unibestX Logo
@@ -23,7 +23,7 @@ features:
   - title: 基于 UTS 的原生渲染
     details: 基于 UTS 语言开发，编译为原生 Kotlin (Android) 和 Swift (iOS)，性能远超传统的 WebView 混合方案，体验媲美原生 App。
   - title: 极致的开发体验
-    details: 采用 Vue 3 组合式 API、Vite 5 极速构建以及 UnoCSS 原子化引擎，为您带来现代化的前端开发工作流。
+    details: 采用 Vue 3 组合式 API、Vite 5 极速构建以及 Tailwind CSS 原子化引擎，为您带来现代化的前端开发工作流。
   - title: 深度重构的 uview-ultra
     details: 专为 uni-app X 打造，我们深度重构并修复了原版组件中由于原生平台限制导致的大量兼容性问题，如 up-sticky、up-box 等。
   - title: 丰富的内置功能

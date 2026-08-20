@@ -1,23 +1,23 @@
 <template>
-  <view class="page-container bg-[#f8fafc] min-h-screen pb-30px">
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
     <NavBar title="up-number-box 步进器" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
-    <view class="p-16px">
+    <view class="p-[16px]">
       <view class="demo-block">
         <text class="demo-label">基础用法</text>
         <up-number-box v-model="numberValue1"></up-number-box>
       </view>
 
-      <view class="demo-block mt-12px">
+      <view class="demo-block mt-[12px]">
         <text class="demo-label">指定步长</text>
         <up-number-box v-model="numberValue2" :step="2"></up-number-box>
       </view>
 
-      <view class="demo-block mt-12px">
+      <view class="demo-block mt-[12px]">
         <text class="demo-label">限制最大/最小值</text>
         <up-number-box v-model="numberValue3" :min="5" :max="10"></up-number-box>
       </view>
 
-      <view class="demo-block mt-12px">
+      <view class="demo-block mt-[12px]">
         <text class="demo-label">禁用状态</text>
         <up-number-box v-model="numberValue4" :disabled="true"></up-number-box>
       </view>

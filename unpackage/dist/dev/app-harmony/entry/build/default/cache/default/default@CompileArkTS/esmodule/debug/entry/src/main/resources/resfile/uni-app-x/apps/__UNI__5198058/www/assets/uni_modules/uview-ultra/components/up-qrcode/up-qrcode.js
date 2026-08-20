@@ -1,0 +1,426 @@
+import { _ as __easycom_1$1 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-loading-icon/up-loading-icon&";
+import { r as resolveEasycom } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/App.ku&";
+import { c as createQrCells, g as getQrRenderCountWithQuietZone } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-qrcode/qrcode&";
+import { _ as _export_sfc } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper&";
+const { defineComponent: _defineComponent } = globalThis.Vue;
+const { ref, computed, watch, onMounted, getCurrentInstance, nextTick } = globalThis.Vue;
+const _sfc_main = /* @__PURE__ */ _defineComponent({
+  ...{
+    name: "up-qrcode"
+  },
+  __name: "up-qrcode",
+  props: {
+    cid: {
+      type: String,
+      default: ""
+    },
+    size: {
+      type: [Number, String],
+      default: 200
+    },
+    unit: {
+      type: String,
+      default: "px"
+    },
+    show: {
+      type: Boolean,
+      default: true
+    },
+    val: {
+      type: String,
+      default: ""
+    },
+    background: {
+      type: String,
+      default: "#ffffff"
+    },
+    foreground: {
+      type: String,
+      default: "#000000"
+    },
+    pdground: {
+      type: String,
+      default: "#000000"
+    },
+    icon: {
+      type: String,
+      default: ""
+    },
+    iconSize: {
+      type: [Number, String],
+      default: 40
+    },
+    lv: {
+      type: [Number, String],
+      default: 3
+    },
+    quietZone: {
+      type: [Number, String],
+      default: 0
+    },
+    onval: {
+      type: Boolean,
+      default: true
+    },
+    loadMake: {
+      type: Boolean,
+      default: true
+    },
+    usingComponents: {
+      type: Boolean,
+      default: true
+    },
+    showLoading: {
+      type: Boolean,
+      default: true
+    },
+    loadingText: {
+      type: String,
+      default: "生成中"
+    },
+    allowPreview: {
+      type: Boolean,
+      default: false
+    },
+    useRootHeightAndWidth: {
+      type: Boolean,
+      default: false
+    }
+  },
+  emits: ["result", "longpressCallback", "preview", "error"],
+  setup(__props, _a) {
+    var __expose = _a.expose, __emit = _a.emit;
+    let qrcodeCounter = 0;
+    function makeId(prefix) {
+      return prefix + Date.now().toString() + "_" + (++qrcodeCounter).toString();
+    }
+    function isEmpty(value = null) {
+      if (value == null) {
+        return true;
+      }
+      const text = value.toString();
+      return text.length == 0 || text == "undefined" || text == "null" || text == "{}" || text == "[]";
+    }
+    function getPixelRatio() {
+      const info = uni.getSystemInfoSync();
+      if (info.pixelRatio > 0) {
+        return info.pixelRatio;
+      }
+      return 1;
+    }
+    const props = __props;
+    const emit = __emit;
+    const instance = getCurrentInstance();
+    const cells = ref([]);
+    const loading = ref(false);
+    const result = ref("");
+    const error = ref("");
+    const canvasId = ref(props.cid != "" ? props.cid : makeId("up-qrcode-canvas-"));
+    let canvasContext = null;
+    let ctx = null;
+    const sizeLocal = computed(() => {
+      return parseFloat(props.size.toString());
+    });
+    const rootStyle = computed(() => {
+      return new UTSJSONObject({
+        width: props.useRootHeightAndWidth ? "100%" : sizeLocal.value.toString() + props.unit,
+        height: props.useRootHeightAndWidth ? "100%" : sizeLocal.value.toString() + props.unit
+      });
+    });
+    const matrixStyle = computed(() => {
+      return new UTSJSONObject({
+        width: sizeLocal.value.toString() + props.unit,
+        height: sizeLocal.value.toString() + props.unit,
+        backgroundColor: props.background
+      });
+    });
+    const iconStyle = computed(() => {
+      const iSize = parseFloat(props.iconSize.toString());
+      const sz = iSize.toString() + props.unit;
+      return new UTSJSONObject({
+        width: sz,
+        height: sz,
+        left: ((sizeLocal.value - iSize) / 2).toString() + props.unit,
+        top: ((sizeLocal.value - iSize) / 2).toString() + props.unit
+      });
+    });
+    const canvasStyle = computed(() => {
+      return new UTSJSONObject({
+        width: sizeLocal.value.toString() + props.unit,
+        height: sizeLocal.value.toString() + props.unit
+      });
+    });
+    function initCanvas() {
+      return new Promise((resolve, reject) => {
+        if (canvasContext != null && ctx != null) {
+          resolve();
+          return null;
+        }
+        uni.createCanvasContextAsync({
+          id: canvasId.value,
+          component: instance === null || instance === void 0 ? null : instance.proxy,
+          success: (context) => {
+            canvasContext = context;
+            const c2d = context.getContext("2d");
+            if (c2d == null) {
+              reject(new Error("Canvas context is not ready"));
+              return null;
+            }
+            const canvas = c2d.canvas;
+            const pixelRatio = getPixelRatio();
+            canvas.width = sizeLocal.value * pixelRatio;
+            canvas.height = sizeLocal.value * pixelRatio;
+            c2d.scale(pixelRatio, pixelRatio);
+            ctx = c2d;
+            resolve();
+          },
+          fail: (err) => {
+            reject(err);
+          }
+        });
+      });
+    }
+    function drawQrToCanvas() {
+      if (ctx == null)
+        return null;
+      const drawSize = sizeLocal.value;
+      ctx.clearRect(0, 0, drawSize, drawSize);
+      ctx.fillStyle = props.background;
+      ctx.fillRect(0, 0, drawSize, drawSize);
+      const count = getQrRenderCountWithQuietZone(props.val, parseFloat(props.lv.toString()), parseFloat(props.quietZone.toString()));
+      for (let i = 0; i < cells.value.length; i++) {
+        const cell = cells.value[i];
+        if (!cell.getBoolean("dark", false)) {
+          continue;
+        }
+        const color = cell.getString("color", props.foreground);
+        const row = Math.floor(i / count);
+        const col = i % count;
+        const left = Math.floor(col * drawSize / count);
+        const top_1 = Math.floor(row * drawSize / count);
+        const right = Math.ceil((col + 1) * drawSize / count);
+        const bottom = Math.ceil((row + 1) * drawSize / count);
+        ctx.fillStyle = color;
+        ctx.fillRect(left, top_1, right - left, bottom - top_1);
+      }
+      ctx.draw();
+    }
+    function renderCanvas() {
+      if (error.value.length > 0 || cells.value.length == 0) {
+        return Promise.resolve();
+      }
+      return initCanvas().then(() => {
+        drawQrToCanvas();
+      });
+    }
+    function makeCode() {
+      if (isEmpty(props.val)) {
+        error.value = "二维码内容不能为空";
+        cells.value = [];
+        emit("error", new UTSJSONObject({ message: error.value }));
+        return null;
+      }
+      try {
+        loading.value = true;
+        error.value = "";
+        cells.value = createQrCells(props.val, props.foreground, props.background, props.pdground, parseInt(props.lv.toString()), parseInt(props.quietZone.toString()));
+        result.value = props.val;
+        loading.value = false;
+        nextTick(() => {
+          renderCanvas();
+        });
+        emit("result", result.value);
+      } catch (err) {
+        loading.value = false;
+        let msg = "";
+        if (err != null && typeof err == "object") {
+          const errObj = err;
+          if (errObj["message"] != null) {
+            msg = errObj["message"].toString();
+          }
+        }
+        if (msg == "") {
+          msg = `${err}`;
+        }
+        error.value = msg;
+        cells.value = [];
+        emit("error", new UTSJSONObject({ message: error.value }));
+      }
+    }
+    function preview(e) {
+      emit("preview", new UTSJSONObject({
+        url: result.value
+      }), e);
+    }
+    function emitTempFileSuccess(options, path) {
+      const success = options["success"];
+      if (success != null) {
+        success(new UTSJSONObject({
+          tempFilePath: path
+        }));
+      }
+      const complete = options["complete"];
+      if (complete != null) {
+        complete(new UTSJSONObject({
+          tempFilePath: path
+        }));
+      }
+    }
+    function emitTempFileFail(options, message) {
+      const payload = new UTSJSONObject({
+        errMsg: message
+      });
+      const fail = options["fail"];
+      if (fail != null) {
+        fail(payload);
+      }
+      const complete = options["complete"];
+      if (complete != null) {
+        complete(payload);
+      }
+    }
+    function exportImage(options) {
+      renderCanvas().then(() => {
+        if (canvasContext == null) {
+          emitTempFileFail(options, "Canvas is not ready");
+          return null;
+        }
+        const path = canvasContext.toDataURL("image/png", 1);
+        emitTempFileSuccess(options, path);
+      }).catch((err = null) => {
+        const message = err == null ? "Canvas init failed" : err.toString();
+        emitTempFileFail(options, message);
+      });
+    }
+    function toTempFilePath(options) {
+      if (error.value.length > 0 || cells.value.length == 0) {
+        emitTempFileFail(options, "up-qrcode content is not ready");
+        return null;
+      }
+      exportImage(options);
+    }
+    function longpress() {
+      toTempFilePath(new UTSJSONObject({
+        success: (res) => {
+          emit("longpressCallback", res["tempFilePath"]);
+        },
+        fail: (_) => {
+          emit("longpressCallback", result.value);
+        }
+      }));
+    }
+    watch(() => {
+      return props.val;
+    }, () => {
+      if (props.onval) {
+        makeCode();
+      }
+    });
+    watch(() => {
+      return [props.size, props.background, props.foreground, props.pdground];
+    }, () => {
+      makeCode();
+    });
+    onMounted(() => {
+      if (props.loadMake) {
+        makeCode();
+      }
+    });
+    __expose({
+      makeCode,
+      toTempFilePath
+    });
+    const __returned__ = { get qrcodeCounter() {
+      return qrcodeCounter;
+    }, set qrcodeCounter(v) {
+      qrcodeCounter = v;
+    }, makeId, isEmpty, getPixelRatio, props, emit, instance, cells, loading, result, error, canvasId, get canvasContext() {
+      return canvasContext;
+    }, set canvasContext(v = null) {
+      canvasContext = v;
+    }, get ctx() {
+      return ctx;
+    }, set ctx(v = null) {
+      ctx = v;
+    }, sizeLocal, rootStyle, matrixStyle, iconStyle, canvasStyle, initCanvas, drawQrToCanvas, renderCanvas, makeCode, preview, emitTempFileSuccess, emitTempFileFail, exportImage, toTempFilePath, longpress };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
+  }
+});
+const _style_0 = {"up-qrcode":{"":{"display":"flex","position":"relative"}},"up-qrcode__matrix":{"":{"position":"relative","overflow":"hidden"}},"up-qrcode__canvas":{"":{"position":"absolute","left":0,"top":0}},"up-qrcode__icon":{"":{"position":"absolute","borderTopLeftRadius":4,"borderTopRightRadius":4,"borderBottomRightRadius":4,"borderBottomLeftRadius":4,"backgroundColor":"#ffffff"}},"up-qrcode__loading":{"":{"position":"absolute","left":0,"right":0,"top":0,"bottom":0,"display":"flex","alignItems":"center","justifyContent":"center","backgroundColor":"rgba(255,255,255,0.8)"}},"up-qrcode__error":{"":{"display":"flex","alignItems":"center","justifyContent":"center","backgroundColor":"#f8f8f8"}},"up-qrcode__error-text":{"":{"color":"#fa3534","fontSize":14}},"flex":{"":{"display":"flex"}},"relative":{"":{"position":"relative"}}};
+const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
+const { toDisplayString: _toDisplayString, createElementVNode: _createElementVNode, normalizeStyle: _normalizeStyle, openBlock: _openBlock, createElementBlock: _createElementBlock, createCommentVNode: _createCommentVNode, resolveComponent: _resolveComponent, createVNode: _createVNode } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  const _component_up_loading_icon = resolveEasycom(__resolveDynamicComponent("up-loading-icon"), __easycom_1$1);
+  return _openBlock(), _createElementBlock(
+    "view",
+    {
+      class: "up-qrcode",
+      style: _normalizeStyle($setup.rootStyle),
+      onLongpress: $setup.longpress,
+      onClick: $setup.preview
+    },
+    [
+      $setup.error.length > 0 ? (_openBlock(), _createElementBlock(
+        "view",
+        {
+          key: 0,
+          class: "up-qrcode__error",
+          style: _normalizeStyle($setup.matrixStyle)
+        },
+        [
+          _createElementVNode(
+            "text",
+            { class: "up-qrcode__error-text" },
+            _toDisplayString($setup.error),
+            1
+            /* TEXT */
+          )
+        ],
+        4
+        /* STYLE */
+      )) : (_openBlock(), _createElementBlock(
+        "view",
+        {
+          key: 1,
+          class: "up-qrcode__matrix",
+          style: _normalizeStyle($setup.matrixStyle)
+        },
+        [
+          _createElementVNode("canvas", {
+            class: "up-qrcode__canvas",
+            id: $setup.canvasId,
+            "canvas-id": $setup.canvasId,
+            style: _normalizeStyle($setup.canvasStyle)
+          }, null, 12, ["id", "canvas-id"]),
+          $props.icon.length > 0 ? (_openBlock(), _createElementBlock("image", {
+            key: 0,
+            class: "up-qrcode__icon",
+            src: $props.icon,
+            mode: "aspectFill",
+            style: _normalizeStyle($setup.iconStyle)
+          }, null, 12, ["src"])) : _createCommentVNode("v-if", true),
+          $props.showLoading && $setup.loading ? (_openBlock(), _createElementBlock("view", {
+            key: 1,
+            class: "up-qrcode__loading"
+          }, [
+            _createVNode(_component_up_loading_icon, {
+              vertical: "",
+              text: $props.loadingText,
+              textSize: "14px"
+            }, null, 8, ["text"])
+          ])) : _createCommentVNode("v-if", true)
+        ],
+        4
+        /* STYLE */
+      ))
+    ],
+    36
+    /* STYLE, NEED_HYDRATION */
+  );
+}
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-qrcode/up-qrcode.uvue"]]);
+export {
+  __easycom_1 as _
+};
+//# sourceMappingURL=up-qrcode.js.map

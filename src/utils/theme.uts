@@ -145,6 +145,12 @@ export function applyNavbarTheme(isDark: boolean): void {
       for (let i = 0; i < btns.length; i++) {
         const btn = btns[i] as HTMLElement;
         btn.style.color = tokens.navText;
+        // H5 返回按钮是 SVG 图标，color 不生效，需修改内部 path 的 fill 属性
+        const paths = btn.querySelectorAll('svg path');
+        for (let j = 0; j < paths.length; j++) {
+          const path = paths[j] as Element;
+          path.setAttribute('fill', tokens.navText);
+        }
       }
     });
   }

@@ -1,73 +1,74 @@
 <template>
   <Card title="时间日期操作 (lime-dayuts)">
     <!-- 实时时间与自定义格式化展示 -->
-    <view class="rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-[#e2e8f0]">
-      <text class="text-13px font-bold text-[#1e293b] mb-8px">实时高精度时钟 (更新于每一百毫秒)</text>
-      <text class="text-24px font-bold text-[var(--theme-color,#37c2bc)] mb-6px" style="font-family: monospace;">
+    <view class="rounded-[12px] p-[16px] mb-[16px] border-[1px] border-solid border-[#e2e8f0]">
+      <text class="text-[13px] font-bold text-[#1e293b] mb-[8px]">实时高精度时钟 (更新于每一百毫秒)</text>
+      <text class="text-[24px] font-bold text-[var(--theme-color,#37c2bc)] mb-[6px]" style="font-family: monospace;">
         {{ currentFullTime }}
       </text>
-      <text class="text-12px text-[#94a3b8]">
+      <text class="text-[12px] text-[#94a3b8]">
         格式模板: YYYY-MM-DD HH:mm:ss.SSS dddd
       </text>
     </view>
 
     <!-- 日期加减偏移计算 -->
-    <view class="rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-[#e2e8f0]">
-      <text class="text-13px font-bold text-[#1e293b] mb-12px">日期偏移操作</text>
+    <view class="rounded-[12px] p-[16px] mb-[16px] border-[1px] border-solid border-[#e2e8f0]">
+      <text class="text-[13px] font-bold text-[#1e293b] mb-[12px]">日期偏移操作</text>
 
-      <view class="flex-row items-center justify-between mb-12px">
-        <text class="text-14px text-[#64748b]">当前偏移天数:</text>
-        <text class="text-16px font-bold text-[#334155]">{{ offsetDays > 0 ? '+' : '' }}{{ offsetDays }} 天</text>
+      <view class="flex-row items-center justify-between mb-[12px]">
+        <text class="text-[14px] text-[#64748b]">当前偏移天数:</text>
+        <text class="text-[16px] font-bold text-[#334155]">{{ offsetDays > 0 ? '+' : '' }}{{ offsetDays }} 天</text>
       </view>
 
-      <view class="flex-row justify-between mb-12px">
-        <view class="flex-1 mr-8px">
-          <view class="w-full h-36px rounded-8px bg-[#e0edff] flex flex-row items-center justify-center" @click="adjustOffset(-7)">
-            <text class="text-[#3b82f6] text-12px font-bold">-7 天</text>
+      <view class="flex-row justify-between mb-[12px]">
+        <view class="flex-1 mr-[8px]">
+          <view class="w-full h-[36px] rounded-[8px] bg-[#e0edff] flex flex-row items-center justify-center" @click="adjustOffset(-7)">
+            <text class="text-[#3b82f6] text-[12px] font-bold">-7 天</text>
           </view>
         </view>
-        <view class="flex-1 mr-8px">
-          <view class="w-full h-36px rounded-8px bg-[#e0edff] flex flex-row items-center justify-center" @click="adjustOffset(-1)">
-            <text class="text-[#3b82f6] text-12px font-bold">-1 天</text>
+        <view class="flex-1 mr-[8px]">
+          <view class="w-full h-[36px] rounded-[8px] bg-[#e0edff] flex flex-row items-center justify-center" @click="adjustOffset(-1)">
+            <text class="text-[#3b82f6] text-[12px] font-bold">-1 天</text>
           </view>
         </view>
-        <view class="flex-1 mr-8px">
-          <view class="w-full h-36px rounded-8px bg-[#e0edff] flex flex-row items-center justify-center" @click="adjustOffset(1)">
-            <text class="text-[#3b82f6] text-12px font-bold">+1 天</text>
+        <view class="flex-1 mr-[8px]">
+          <view class="w-full h-[36px] rounded-[8px] bg-[#e0edff] flex flex-row items-center justify-center" @click="adjustOffset(1)">
+            <text class="text-[#3b82f6] text-[12px] font-bold">+1 天</text>
           </view>
         </view>
         <view class="flex-1">
-          <view class="w-full h-36px rounded-8px bg-[#e0edff] flex flex-row items-center justify-center" @click="adjustOffset(7)">
-            <text class="text-[#3b82f6] text-12px font-bold">+7 天</text>
+          <view class="w-full h-[36px] rounded-[8px] bg-[#e0edff] flex flex-row items-center justify-center" @click="adjustOffset(7)">
+            <text class="text-[#3b82f6] text-[12px] font-bold">+7 天</text>
           </view>
         </view>
       </view>
 
-      <view class="border-top-width-1px border-top-style-solid border-top-color-[#e2e8f0] pt-8px mt-8px">
-        <text class="text-12px text-[#94a3b8] mb-4px">计算得到的目标时间:</text>
-        <text class="text-14px font-bold text-[#334155]">{{ targetOffsetTime }}</text>
+      <view class="h-[1px] bg-[#e2e8f0] my-[10px]" />
+      <view>
+        <text class="text-[12px] text-[#94a3b8] mb-[4px]">计算得到的目标时间:</text>
+        <text class="text-[14px] font-bold text-[#334155]">{{ targetOffsetTime }}</text>
       </view>
     </view>
 
     <!-- 快捷日期边界与比较计算 -->
-    <view class="rounded-12px p-16px border-width-1px border-style-solid border-color-[#e2e8f0]">
-      <text class="text-13px font-bold text-[#1e293b] mb-12px">常用日期边界与区间计算</text>
+    <view class="rounded-[12px] p-[16px] border-[1px] border-solid border-[#e2e8f0]">
+      <text class="text-[13px] font-bold text-[#1e293b] mb-[12px]">常用日期边界与区间计算</text>
 
-      <view class="flex-row justify-between mb-8px">
-        <text class="text-14px text-[#64748b]">本月第一天</text>
-        <text class="text-14px font-medium text-[#334155]">{{ startOfMonth }}</text>
+      <view class="flex-row justify-between mb-[8px]">
+        <text class="text-[14px] text-[#64748b]">本月第一天</text>
+        <text class="text-[14px] font-medium text-[#334155]">{{ startOfMonth }}</text>
       </view>
-      <view class="flex-row justify-between mb-8px">
-        <text class="text-14px text-[#64748b]">本月最后一天</text>
-        <text class="text-14px font-medium text-[#334155]">{{ endOfMonth }}</text>
+      <view class="flex-row justify-between mb-[8px]">
+        <text class="text-[14px] text-[#64748b]">本月最后一天</text>
+        <text class="text-[14px] font-medium text-[#334155]">{{ endOfMonth }}</text>
       </view>
-      <view class="flex-row justify-between mb-8px">
-        <text class="text-14px text-[#64748b]">今年天数</text>
-        <text class="text-14px font-medium text-[#334155]">{{ isLeapYear ? '366天 (闰年)' : '365天 (平年)' }}</text>
+      <view class="flex-row justify-between mb-[8px]">
+        <text class="text-[14px] text-[#64748b]">今年天数</text>
+        <text class="text-[14px] font-medium text-[#334155]">{{ isLeapYear ? '366天 (闰年)' : '365天 (平年)' }}</text>
       </view>
       <view class="flex-row justify-between">
-        <text class="text-14px text-[#64748b]">距离今年底倒计时</text>
-        <text class="text-14px font-bold text-[#f43f5e]">{{ daysToYearEnd }} 天</text>
+        <text class="text-[14px] text-[#64748b]">距离今年底倒计时</text>
+        <text class="text-[14px] font-bold text-[#f43f5e]">{{ daysToYearEnd }} 天</text>
       </view>
     </view>
   </Card>

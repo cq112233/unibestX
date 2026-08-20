@@ -81,38 +81,5 @@ export default defineConfig({
     autoRootPlugin(), // 自动给页面套上 App.ku.uvue 根包裹组件
     uni(),
     ...weappTailwindcssPlugins
-    // unovite({
-    //   blocklist: ['table', 'grid', 'block', 'inline', 'inline-block', 'break-all', 'break-words', 'break-normal'],
-    //   rules: [
-    //     [
-    //       'p-safe',
-    //       {
-    //         padding:
-    //           'env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)'
-    //       }
-    //     ],
-    //     ['pt-safe', { 'padding-top': 'env(safe-area-inset-top)' }],
-    //     ['pb-safe', { 'padding-bottom': 'env(safe-area-inset-bottom)' }],
-    //     // uni-app X 不支持 start/end 简写，必须用 flex-start/flex-end
-    //     ['justify-start', { 'justify-content': 'flex-start' }],
-    //     ['justify-end', { 'justify-content': 'flex-end' }],
-    //     ['self-start', { 'align-self': 'flex-start' }],
-    //     ['self-end', { 'align-self': 'flex-end' }],
-    //     ['items-start', { 'align-items': 'flex-start' }],
-    //     ['items-end', { 'align-items': 'flex-end' }]
-    //   ],
-    //   shortcuts: {},
-    //   theme: {
-    //     colors: {
-    //       /** 主题色，用法如: text-primary */
-    //       primary: 'var(--theme-color,#0957DE)'
-    //     },
-    //     fontSize: {
-    //       /** 提供更小号的字体，用法如：text-2xs */
-    //       '2xs': ['20rpx', '28rpx'],
-    //       '3xs': ['18rpx', '26rpx']
-    //     }
-    //   }
-    // })
   ]
 });

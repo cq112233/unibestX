@@ -1,35 +1,35 @@
 <template>
   <Card title="全局 Toast 提示调用">
     <!-- 说明区域 -->
-    <view class="rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-[#e2e8f0]">
-      <text class="text-12px text-[#64748b] leading-20px">
+    <view class="rounded-[12px] p-[16px] mb-[16px] border-[1px] border-solid border-[#e2e8f0]">
+      <text class="text-[12px] text-[#64748b] leading-[20px]">
         演示从功能页调用 App.ku.uvue 全局挂载的 &lt;up-toast ref="uToastRef" /&gt;，支持自定义消息、类型与轻提示反馈。
       </text>
     </view>
 
     <!-- 自定义输入内容 -->
-    <view class="mb-12px">
-      <text class="text-12px text-[#94a3b8] mb-6px">自定义 Toast 内容</text>
+    <view class="mb-[12px]">
+      <text class="text-[12px] text-[#94a3b8] mb-[6px]">自定义 Toast 内容</text>
       <input
         v-model="customMsg"
         placeholder="请输入要提示的文字内容"
-        class="h-38px bg-white rounded-6px px-12px border-width-1px border-style-solid border-color-[#cbd5e1] text-14px text-[#334155]"
+        class="h-[38px] bg-white rounded-[6px] px-[12px] border-[1px] border-solid border-[#cbd5e1] text-[14px] text-[#334155]"
       />
     </view>
 
     <!-- 按钮操作组 -->
     <view class="flex flex-row">
       <view
-        class="flex-1 mr-10px bg-[#3b82f6] rounded-8px h-40px flex flex-row items-center justify-center"
+        class="flex-1 mr-[10px] bg-[#3b82f6] rounded-[8px] h-[40px] flex flex-row items-center justify-center"
         @click="showCustomToast"
       >
-        <text class="text-[#ffffff] text-13px font-bold">弹出自定义 Toast</text>
+        <text class="text-[#ffffff] text-[13px] font-bold">弹出自定义 Toast</text>
       </view>
       <view
-        class="flex-1 bg-[#10b981] rounded-8px h-40px flex flex-row items-center justify-center"
+        class="flex-1 bg-[#10b981] rounded-[8px] h-[40px] flex flex-row items-center justify-center"
         @click="showSuccessToast"
       >
-        <text class="text-[#ffffff] text-13px font-bold">弹出成功 Toast</text>
+        <text class="text-[#ffffff] text-[13px] font-bold">弹出成功 Toast</text>
       </view>
     </view>
   </Card>

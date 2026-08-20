@@ -1,20 +1,20 @@
 <template>
-  <view class="page-container bg-[#f8fafc] min-h-screen pb-30px">
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
     <NavBar title="up-toast 消息提示" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
-    <view class="p-16px">
+    <view class="p-[16px]">
       <view class="demo-block">
         <text class="demo-label">基础用法</text>
         <view class="flex-row items-center">
           <up-button type="primary" text="成功提示" size="mini" @click="showToast('success')"></up-button>
-          <view class="w-10px"></view>
+          <view class="w-[10px]"></view>
           <up-button type="error" text="错误提示" size="mini" @click="showToast('error')"></up-button>
         </view>
       </view>
-      <view class="demo-block mt-12px">
+      <view class="demo-block mt-[12px]">
         <text class="demo-label">更多类型</text>
         <view class="flex-row items-center">
           <up-button type="warning" text="警告提示" size="mini" @click="showToast('warning')"></up-button>
-          <view class="w-10px"></view>
+          <view class="w-[10px]"></view>
           <up-button type="default" text="默认提示" size="mini" @click="showToast('default')"></up-button>
         </view>
       </view>

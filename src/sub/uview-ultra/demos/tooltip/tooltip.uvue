@@ -1,35 +1,35 @@
 <template>
-  <view class="page-container bg-[#f8fafc] min-h-screen pb-30px">
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
     <NavBar title="up-tooltip 长按提示" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
-    <view class="p-16px">
+    <view class="p-[16px]">
       <!-- 基础用法 -->
       <view class="demo-block">
         <text class="demo-label">基础用法</text>
         <view class="flex flex-row items-center flex-wrap">
-          <view class="mr-12px mb-8px">
+          <view class="mr-[12px] mb-[8px]">
             <up-tooltip text="长按此处复制文本" direction="top"></up-tooltip>
           </view>
-          <view class="mb-8px">
+          <view class="mb-[8px]">
             <up-tooltip text="长按显示操作" direction="top" :show-copy="false" :buttons="tooltipButtons" @click="handleBtnClick"></up-tooltip>
           </view>
         </view>
       </view>
 
       <!-- 弹出方向 -->
-      <view class="demo-block mt-12px">
+      <view class="demo-block mt-[12px]">
         <text class="demo-label">弹出方向</text>
         <view class="flex flex-row items-center flex-wrap">
-          <view class="mr-16px mb-8px">
+          <view class="mr-[16px] mb-[8px]">
             <up-tooltip text="长按文本，上方提示" direction="top"></up-tooltip>
           </view>
-          <view class="mb-8px">
+          <view class="mb-[8px]">
             <up-tooltip text="长按文本，下方提示" direction="bottom"></up-tooltip>
           </view>
         </view>
       </view>
 
       <!-- 高亮选中文本背景色 -->
-      <view class="demo-block mt-12px">
+      <view class="demo-block mt-[12px]">
         <text class="demo-label">高亮选中文本背景色</text>
         <view class="flex flex-row items-center">
           <up-tooltip text="长按文本，显示背景色" bg-color="#d1fae5" direction="top"></up-tooltip>
@@ -37,7 +37,7 @@
       </view>
 
       <!-- 扩展按钮 -->
-      <view class="demo-block mt-12px">
+      <view class="demo-block mt-[12px]">
         <text class="demo-label">扩展按钮</text>
         <view class="flex flex-row items-center">
           <up-tooltip text="显示多个扩展按钮" :show-copy="true" :buttons="multiButtons" @click="handleBtnClick"></up-tooltip>
@@ -45,10 +45,10 @@
       </view>
 
       <!-- 自定义触发器 (Slot) -->
-      <view class="demo-block mt-12px">
+      <view class="demo-block mt-[12px]">
         <text class="demo-label">自定义触发器 (Slot)</text>
         <view class="flex flex-row items-center">
-          <view class="mr-16px">
+          <view class="mr-[16px]">
             <up-tooltip :show-copy="false" :buttons="['设置', '赞']" direction="top" @click="handleBtnClick">
               <up-button type="primary" size="small" text="点击/长按触发"></up-button>
             </up-tooltip>

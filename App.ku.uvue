@@ -1,6 +1,6 @@
 <template>
   <!-- 应用全局骨架与皮肤容器，通过 CSS 变量绑定响应式主题色 / 暗黑模式 -->
-  <view class="root-container flex flex-col flex-1" style="flex: 1;" :style="themeStyle">
+  <view class="root-container flex flex-col flex-1" style="flex: 1;" :class="{ dark: appStore.state.isDark }" :style="themeStyle">
     <!-- 页面内容滚动容器 -->
     <scroll-view direction="vertical" class="flex-1" style="flex: 1;">
       <slot></slot>
@@ -97,8 +97,8 @@ onShow(() => {
 });
 
 // 主题模式 / 系统深浅色变化时，当前页面不切换也实时同步导航栏
-watch(() => appStore.state.isDark, () => {
-  applyNavbarTheme(appStore.state.isDark);
+watch((): boolean => appStore.state.isDark, (newVal: boolean, oldVal: boolean) => {
+  applyNavbarTheme(newVal);
 });
 </script>
 

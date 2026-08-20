@@ -1,43 +1,46 @@
 <template>
   <Card :title="langTitle">
     <!-- 当前语言预览 -->
-    <view class="rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-[#e2e8f0]">
-      <text class="text-12px text-[#94a3b8] mb-6px">{{ langPreview }}</text>
+    <view class="rounded-[12px] p-[16px] mb-[16px] border-[1px] border-solid border-[#e2e8f0]">
+      <text class="text-[12px] text-[#94a3b8] mb-[6px]">{{ langPreview }}</text>
 
-      <text class="text-16px font-bold text-[#1e293b]">
+      <text class="text-[16px] font-bold text-[#1e293b]">
         {{ welcomeText }}
       </text>
 
-      <text class="text-14px text-[#475569] mt-8px">
+      <text class="text-[14px] text-[#475569] mt-[8px]">
         {{ helloText }}
       </text>
 
       <!-- 组件库多语言同步预览 -->
-      <view class="mt-12px pt-12px border-top-width-1px border-top-style-solid border-top-color-[#f1f5f9]">
-        <text class="text-12px text-[#94a3b8] mb-6px">{{ uviewPreview }}</text>
+      <view class="h-[1px] bg-[#f1f5f9] my-[12px]" />
+      <view>
+        <text class="text-[12px] text-[#94a3b8] mb-[6px]">{{ uviewPreview }}</text>
         <view class="flex-row items-center flex-wrap">
-          <text class="text-13px text-[#2563eb] bg-[#eff6ff] px-8px py-4px rounded-4px font-medium mr-8px mb-4px">{{ uViewChooseDates }}</text>
-          <text class="text-13px text-[#059669] bg-[#ecfdf5] px-8px py-4px rounded-4px font-medium mr-8px mb-4px">{{ uViewConfirm }}</text>
-          <text class="text-13px text-[#d97706] bg-[#fffbe2] px-8px py-4px rounded-4px font-medium mb-4px">{{ uViewStart }} / {{ uViewEnd }}</text>
+          <text class="text-[13px] text-[#2563eb] bg-[#eff6ff] px-[8px] py-[4px] rounded-[4px] font-medium mr-[8px] mb-[4px]">{{ uViewChooseDates }}</text>
+          <text class="text-[13px] text-[#059669] bg-[#ecfdf5] px-[8px] py-[4px] rounded-[4px] font-medium mr-[8px] mb-[4px]">{{ uViewConfirm }}</text>
+          <text class="text-[13px] text-[#d97706] bg-[#fffbe2] px-[8px] py-[4px] rounded-[4px] font-medium mb-[4px]">{{ uViewStart }} / {{ uViewEnd }}</text>
         </view>
       </view>
     </view>
 
     <!-- 选项列表 -->
     <!-- 简体中文 -->
-    <view class="flex-row items-center justify-between py-12px border-bottom-width-1px border-bottom-style-solid border-bottom-color-[#f1f5f9]" @click="switchLanguage('zh-CN')">
+    <view class="flex-row items-center justify-between py-[12px]" @click="switchLanguage('zh-CN')">
       <view class="flex-row items-center">
-        <text class="text-15px text-[#334155] font-medium">简体中文</text>
+        <text class="text-[15px] text-[#334155] font-medium">简体中文</text>
       </view>
       <view class="flex-row items-center">
         <uni-icons v-if="isZhCN" type="checkmarkempty" size="20" style="color: #3b82f6;" />
       </view>
     </view>
 
+    <view class="h-[1px] bg-[#f1f5f9]" />
+
     <!-- English -->
-    <view class="flex-row items-center justify-between py-12px" @click="switchLanguage('en-US')">
+    <view class="flex-row items-center justify-between py-[12px]" @click="switchLanguage('en-US')">
       <view class="flex-row items-center">
-        <text class="text-15px text-[#334155] font-medium">English</text>
+        <text class="text-[15px] text-[#334155] font-medium">English</text>
       </view>
       <view class="flex-row items-center">
         <uni-icons v-if="isEnUS" type="checkmarkempty" size="20" style="color: #3b82f6;" />
@@ -75,22 +78,22 @@ const isEnUS = computed((): boolean => {
 });
 
 const uViewChooseDates = computed((): string => {
-  const dummy = currentLocale.value;
+  const _dummy = currentLocale.value;
   return uViewT('up.calendar.chooseDates', {} as UTSJSONObject);
 });
 
 const uViewConfirm = computed((): string => {
-  const dummy = currentLocale.value;
+  const _dummy = currentLocale.value;
   return uViewT('up.common.confirm', {} as UTSJSONObject);
 });
 
 const uViewStart = computed((): string => {
-  const dummy = currentLocale.value;
+  const _dummy = currentLocale.value;
   return uViewT('up.common.start', {} as UTSJSONObject);
 });
 
 const uViewEnd = computed((): string => {
-  const dummy = currentLocale.value;
+  const _dummy = currentLocale.value;
   return uViewT('up.common.end', {} as UTSJSONObject);
 });
 

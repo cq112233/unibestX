@@ -1,0 +1,47 @@
+<template>
+  <Card title="weapp-tailwindcss Demo">
+    <view class="flex-col mb-[16px]">
+      <text class="text-[13px] text-[#64748b] leading-[18px] mb-[12px]">
+        项目已接入 Tailwind CSS v4 + weapp-tailwindcss，支持方括号任意值（如 text-[14px]、mt-[12px]）、dark:
+        暗黑变体与多端平台变体，一套类名全端生效，写法与 Web 端完全一致。
+      </text>
+
+      <!-- 特性标签 -->
+      <view class="flex-row items-center flex-wrap">
+        <view class="mr-[6px] mb-[4px] px-[10px] py-[3px] rounded-[20px] bg-[#e0edff] border-[1px] border-solid border-[#bfdbfe]">
+          <text class="text-[11px] text-[#2563eb] font-medium">Tailwind CSS v4</text>
+        </view>
+        <view class="mr-[6px] mb-[4px] px-[10px] py-[3px] rounded-[20px] bg-[#d1fae5] border-[1px] border-solid border-[#a7f3d0]">
+          <text class="text-[11px] text-[#059669] font-medium">方括号任意值</text>
+        </view>
+        <view class="mb-[4px] px-[10px] py-[3px] rounded-[20px] bg-[#fef3c7] border-[1px] border-solid border-[#fde68a]">
+          <text class="text-[11px] text-[#d97706] font-medium">dark: 暗黑变体</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 进入演示页面按钮 -->
+    <view
+      class="w-full h-[44px] rounded-[8px] bg-[#3b82f6] flex flex-row items-center justify-center"
+      @click="navigateToDemo"
+    >
+      <text class="text-[#ffffff] text-[14px] font-bold">进入 weapp-tailwindcss 示例</text>
+    </view>
+  </Card>
+</template>
+
+<script setup lang="uts">
+import Card from './Card.uvue';
+
+function navigateToDemo() {
+  uni.navigateTo({
+    url: '/src/sub/tailwindcss/tailwindcss',
+    fail: (err) => {
+      console.error('navigateToDemo fail:', err);
+    }
+  });
+}
+</script>
+
+<style>
+</style>

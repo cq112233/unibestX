@@ -1,7 +1,7 @@
 <template>
-  <view class="page-container bg-[#f8fafc] min-h-screen pb-30px">
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
     <NavBar title="Steps 步骤条" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
-    <view class="p-16px">
+    <view class="p-[16px]">
       <view class="demo-block">
         <text class="demo-label">基础步骤条</text>
         <up-steps :current="currentStep">
@@ -10,12 +10,12 @@
           <up-steps-item title="运输中" desc="11:40"></up-steps-item>
           <up-steps-item title="已签收" desc="14:20"></up-steps-item>
         </up-steps>
-        <view class="mt-12px flex-row justify-center">
+        <view class="mt-[12px] flex-row justify-center">
           <up-button size="small" type="primary" text="下一步" @click="nextStep"></up-button>
         </view>
       </view>
 
-      <view class="demo-block mt-12px">
+      <view class="demo-block mt-[12px]">
         <text class="demo-label">圆点模式 (dot)</text>
         <up-steps :current="1" :dot="true">
           <up-steps-item title="已下单" desc="10:30"></up-steps-item>
@@ -24,7 +24,7 @@
         </up-steps>
       </view>
 
-      <view class="demo-block mt-12px">
+      <view class="demo-block mt-[12px]">
         <text class="demo-label">自定义颜色与错误状态</text>
         <up-steps :current="1" active-color="#19be6b">
           <up-steps-item title="已下单" desc="10:30"></up-steps-item>
@@ -33,7 +33,7 @@
         </up-steps>
       </view>
 
-      <view class="demo-block mt-12px">
+      <view class="demo-block mt-[12px]">
         <text class="demo-label">垂直方向</text>
         <up-steps :current="1" direction="column">
           <up-steps-item title="已下单" desc="买家已提交订单 10:30"></up-steps-item>

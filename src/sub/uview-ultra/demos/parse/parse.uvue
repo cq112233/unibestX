@@ -1,16 +1,16 @@
 <template>
-  <view class="page-container bg-[#f8fafc] min-h-screen pb-30px">
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
     <NavBar title="Parse 富文本解析" :auto-back="true" />
-    <view class="p-16px">
+    <view class="p-[16px]">
       <view class="demo-block">
         <text class="demo-label">基础用法</text>
         <up-parse :content="content1"></up-parse>
       </view>
-      <view class="demo-block mt-12px">
+      <view class="demo-block mt-[12px]">
         <text class="demo-label">长按可复制 (selectable)</text>
         <up-parse :content="content2" :selectable="true"></up-parse>
       </view>
-      <view class="demo-block mt-12px">
+      <view class="demo-block mt-[12px]">
         <text class="demo-label">自定义样式 (tagStyle)</text>
         <up-parse :content="content3" :tag-style="tagStyle"></up-parse>
       </view>

@@ -1,0 +1,489 @@
+Ôr@Ÿªassertions¤code´customTransformCache¬dependencies¢id¤meta±moduleSideEffects¬originalCode±originalSourcemap«resolvedIds®sourcemapChainµsyntheticNamedExportsµtransformDependencies®transformFiles¨cacheAstÔrAÚ"import { _ as __easycom_0 } from "../up-column-notice/up-column-notice.js";
+import { r as resolveEasycom } from "../../../../App.ku.js";
+import { _ as __easycom_1$1 } from "../up-row-notice/up-row-notice.js";
+import { b as addStyle, d as deepMerge } from "../../libs/function/index.js";
+import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
+const { defineComponent: _defineComponent } = globalThis.Vue;
+const { ref, computed } = globalThis.Vue;
+const _sfc_main = /* @__PURE__ */ _defineComponent({
+  ...{
+    name: "up-notice-bar"
+  },
+  __name: "up-notice-bar",
+  props: {
+    text: {
+      type: [Array, String],
+      default: () => {
+        return [];
+      }
+    },
+    direction: {
+      type: String,
+      default: "row"
+    },
+    step: {
+      type: Boolean,
+      default: false
+    },
+    icon: {
+      type: String,
+      default: "volume"
+    },
+    mode: {
+      type: String,
+      default: ""
+    },
+    color: {
+      type: String,
+      default: "#f9ae3d"
+    },
+    bgColor: {
+      type: String,
+      default: "#fdf6ec"
+    },
+    speed: {
+      type: [String, Number],
+      default: 80
+    },
+    fontSize: {
+      type: [String, Number],
+      default: 14
+    },
+    duration: {
+      type: [String, Number],
+      default: 2e3
+    },
+    disableTouch: {
+      type: Boolean,
+      default: true
+    },
+    url: {
+      type: String,
+      default: ""
+    },
+    linkType: {
+      type: String,
+      default: "navigateTo"
+    },
+    customStyle: {
+      type: Object,
+      default: () => {
+        return new UTSJSONObject({});
+      }
+    }
+  },
+  emits: ["click", "close"],
+  setup(__props, _a) {
+    var __expose = _a.expose, __emit = _a.emit;
+    __expose();
+    const props = __props;
+    const emit = __emit;
+    const show = ref(true);
+    const noticeBarStyle = computed(() => {
+      const base = new UTSJSONObject({
+        backgroundColor: props.bgColor
+      });
+      const custom = addStyle(props.customStyle);
+      return deepMerge(base, custom);
+    });
+    function click(index) {
+      emit("click", index);
+      if (props.url != "" && props.linkType != "") {
+        if (props.linkType == "navigateTo") {
+          uni.navigateTo({ url: props.url });
+        } else if (props.linkType == "redirectTo") {
+          uni.redirectTo({ url: props.url });
+        } else if (props.linkType == "switchTab") {
+          uni.switchTab({ url: props.url });
+        } else if (props.linkType == "reLaunch") {
+          uni.reLaunch({ url: props.url });
+        }
+      }
+    }
+    function close() {
+      show.value = false;
+      emit("close");
+    }
+    const __returned__ = { props, emit, show, noticeBarStyle, click, close };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
+  }
+});
+const _style_0 = {"u-empty":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-empty__wrap":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__scroll-view-wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__scroll-view":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__nav":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__nav__line":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-empty":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-empty__wrap":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__scroll-view-wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__scroll-view":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__nav":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__nav__line":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-notice-bar":{"":{"paddingTop":9,"paddingRight":12,"paddingBottom":9,"paddingLeft":12}},"flex":{"":{"display":"flex"}}};
+const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
+const { resolveComponent: _resolveComponent, openBlock: _openBlock, createBlock: _createBlock, createCommentVNode: _createCommentVNode, normalizeStyle: _normalizeStyle, createElementBlock: _createElementBlock } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  const _component_up_column_notice = resolveEasycom(__resolveDynamicComponent("up-column-notice"), __easycom_0);
+  const _component_up_row_notice = resolveEasycom(__resolveDynamicComponent("up-row-notice"), __easycom_1$1);
+  return $setup.show ? (_openBlock(), _createElementBlock(
+    "view",
+    {
+      key: 0,
+      class: "up-notice-bar",
+      style: _normalizeStyle($setup.noticeBarStyle)
+    },
+    [
+      $props.direction == "column" || $props.direction == "row" && $props.step ? (_openBlock(), _createBlock(_component_up_column_notice, {
+        key: 0,
+        color: $props.color,
+        bgColor: $props.bgColor,
+        text: $props.text,
+        mode: $props.mode,
+        step: $props.step,
+        icon: $props.icon,
+        "disable-touch": $props.disableTouch,
+        fontSize: $props.fontSize,
+        duration: $props.duration,
+        onClose: $setup.close,
+        onClick: $setup.click
+      }, null, 8, ["color", "bgColor", "text", "mode", "step", "icon", "disable-touch", "fontSize", "duration"])) : (_openBlock(), _createBlock(_component_up_row_notice, {
+        key: 1,
+        color: $props.color,
+        bgColor: $props.bgColor,
+        text: $props.text,
+        mode: $props.mode,
+        fontSize: $props.fontSize,
+        speed: $props.speed,
+        url: $props.url,
+        linkType: $props.linkType,
+        icon: $props.icon,
+        onClose: $setup.close,
+        onClick: $setup.click
+      }, null, 8, ["color", "bgColor", "text", "mode", "fontSize", "speed", "url", "linkType", "icon"]))
+    ],
+    4
+    /* STYLE */
+  )) : _createCommentVNode("v-if", true);
+}
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-notice-bar/up-notice-bar.uvue"]]);
+export {
+  __easycom_1 as _
+};
+//# sourceMappingURL=up-notice-bar.js.map
+Â•ÙŞ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-column-notice/up-column-notice.jsÙ /Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/App.ku.jsÙØ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-row-notice/up-row-notice.jsÙÅ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/index.jsÙ²/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper.jsÙØ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-notice-bar/up-notice-bar.jsÔrB›ªmoduleName±isLocalDependency¯isNodeEntryFile§pkgPath±belongProjectPath§pkgNameªpkgVersion±dependencyPkgInfo°belongModulePath¨commonjs¯hostModulesInfo¥entryÃÂÙR/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entryÙL/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony¥entry¥1.0.0Ô  ÙR/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entryÔrC’¯hasNamedExportsªisCommonJSÃÂ‘ÔrD’²hostDependencyName®hostModuleNameÙP../../../../../uni_modules/uview-ultra/components/up-notice-bar/up-notice-bar.js¥entryÃÚ"import { _ as __easycom_0 } from "../up-column-notice/up-column-notice.js";
+import { r as resolveEasycom } from "../../../../App.ku.js";
+import { _ as __easycom_1$1 } from "../up-row-notice/up-row-notice.js";
+import { b as addStyle, d as deepMerge } from "../../libs/function/index.js";
+import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
+const { defineComponent: _defineComponent } = globalThis.Vue;
+const { ref, computed } = globalThis.Vue;
+const _sfc_main = /* @__PURE__ */ _defineComponent({
+  ...{
+    name: "up-notice-bar"
+  },
+  __name: "up-notice-bar",
+  props: {
+    text: {
+      type: [Array, String],
+      default: () => {
+        return [];
+      }
+    },
+    direction: {
+      type: String,
+      default: "row"
+    },
+    step: {
+      type: Boolean,
+      default: false
+    },
+    icon: {
+      type: String,
+      default: "volume"
+    },
+    mode: {
+      type: String,
+      default: ""
+    },
+    color: {
+      type: String,
+      default: "#f9ae3d"
+    },
+    bgColor: {
+      type: String,
+      default: "#fdf6ec"
+    },
+    speed: {
+      type: [String, Number],
+      default: 80
+    },
+    fontSize: {
+      type: [String, Number],
+      default: 14
+    },
+    duration: {
+      type: [String, Number],
+      default: 2e3
+    },
+    disableTouch: {
+      type: Boolean,
+      default: true
+    },
+    url: {
+      type: String,
+      default: ""
+    },
+    linkType: {
+      type: String,
+      default: "navigateTo"
+    },
+    customStyle: {
+      type: Object,
+      default: () => {
+        return new UTSJSONObject({});
+      }
+    }
+  },
+  emits: ["click", "close"],
+  setup(__props, _a) {
+    var __expose = _a.expose, __emit = _a.emit;
+    __expose();
+    const props = __props;
+    const emit = __emit;
+    const show = ref(true);
+    const noticeBarStyle = computed(() => {
+      const base = new UTSJSONObject({
+        backgroundColor: props.bgColor
+      });
+      const custom = addStyle(props.customStyle);
+      return deepMerge(base, custom);
+    });
+    function click(index) {
+      emit("click", index);
+      if (props.url != "" && props.linkType != "") {
+        if (props.linkType == "navigateTo") {
+          uni.navigateTo({ url: props.url });
+        } else if (props.linkType == "redirectTo") {
+          uni.redirectTo({ url: props.url });
+        } else if (props.linkType == "switchTab") {
+          uni.switchTab({ url: props.url });
+        } else if (props.linkType == "reLaunch") {
+          uni.reLaunch({ url: props.url });
+        }
+      }
+    }
+    function close() {
+      show.value = false;
+      emit("close");
+    }
+    const __returned__ = { props, emit, show, noticeBarStyle, click, close };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
+  }
+});
+const _style_0 = {"u-empty":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-empty__wrap":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__scroll-view-wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__scroll-view":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__nav":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__nav__line":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-empty":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-empty__wrap":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__scroll-view-wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__scroll-view":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__nav":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__nav__line":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-notice-bar":{"":{"paddingTop":9,"paddingRight":12,"paddingBottom":9,"paddingLeft":12}},"flex":{"":{"display":"flex"}}};
+const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
+const { resolveComponent: _resolveComponent, openBlock: _openBlock, createBlock: _createBlock, createCommentVNode: _createCommentVNode, normalizeStyle: _normalizeStyle, createElementBlock: _createElementBlock } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  const _component_up_column_notice = resolveEasycom(__resolveDynamicComponent("up-column-notice"), __easycom_0);
+  const _component_up_row_notice = resolveEasycom(__resolveDynamicComponent("up-row-notice"), __easycom_1$1);
+  return $setup.show ? (_openBlock(), _createElementBlock(
+    "view",
+    {
+      key: 0,
+      class: "up-notice-bar",
+      style: _normalizeStyle($setup.noticeBarStyle)
+    },
+    [
+      $props.direction == "column" || $props.direction == "row" && $props.step ? (_openBlock(), _createBlock(_component_up_column_notice, {
+        key: 0,
+        color: $props.color,
+        bgColor: $props.bgColor,
+        text: $props.text,
+        mode: $props.mode,
+        step: $props.step,
+        icon: $props.icon,
+        "disable-touch": $props.disableTouch,
+        fontSize: $props.fontSize,
+        duration: $props.duration,
+        onClose: $setup.close,
+        onClick: $setup.click
+      }, null, 8, ["color", "bgColor", "text", "mode", "step", "icon", "disable-touch", "fontSize", "duration"])) : (_openBlock(), _createBlock(_component_up_row_notice, {
+        key: 1,
+        color: $props.color,
+        bgColor: $props.bgColor,
+        text: $props.text,
+        mode: $props.mode,
+        fontSize: $props.fontSize,
+        speed: $props.speed,
+        url: $props.url,
+        linkType: $props.linkType,
+        icon: $props.icon,
+        onClose: $setup.close,
+        onClick: $setup.click
+      }, null, 8, ["color", "bgColor", "text", "mode", "fontSize", "speed", "url", "linkType", "icon"]))
+    ],
+    4
+    /* STYLE */
+  )) : _createCommentVNode("v-if", true);
+}
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-notice-bar/up-notice-bar.uvue"]]);
+export {
+  __easycom_1 as _
+};
+//# sourceMappingURL=up-notice-bar.js.map
+ÔrE•§version¨mappings¥names§sources®sourcesContentÜ £‘”    ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”  	 ‘”  
+ ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”    ‘”  ! ‘”  " ‘”  # ‘”  $ ‘”  % ‘”  & ‘”  ' ‘”  ( ‘”  ) ‘”  * ‘”  + ‘”  , ‘”  - ‘”  . ‘”  / ‘”  0 ‘”  1 ‘”  2 ‘”  3 ‘”  4 ‘”  5 ‘”  6 ‘”  7 ‘”  8 ‘”  9 ‘”  : ‘”  ; ‘”  < ‘”  = ‘”  > ‘”  ? ‘”  Ì@ ‘”  ÌA ‘”  ÌB ‘”  ÌC ‘”  ÌD ‘”  ÌE ‘”  ÌF ‘”  ÌG ‘”  ÌH ‘”  ÌI ‘”  ÌJ ‘”  ÌK ‘”  ÌL ‘”  ÌM ‘”  ÌN ‘”  ÌO ‘”  ÌP ‘”  ÌQ ‘”  ÌR ‘”  ÌS ‘”  ÌT ‘”  ÌU ‘”  ÌV ‘”  ÌW ‘”  ÌX ‘”  ÌY ‘”  ÌZ ‘”  Ì[ ‘”  Ì\ ‘”  Ì] ‘”  Ì^ ‘”  Ì_ ‘”  Ì` ‘”  Ìa ‘”  Ìb ‘”  Ìc ‘”  Ìd ‘”  Ìe ‘”  Ìf ‘”  Ìg ‘”  Ìh ‘”  Ìi ‘”  Ìj ‘”  Ìk ‘”  Ìl ‘”  Ìm ‘”  Ìn ‘”  Ìo ‘”  Ìp ‘”  Ìq ‘”  Ìr ‘”  Ìs ‘”  Ìt ‘”  Ìu ‘”  Ìv ‘”  Ìw ‘”  Ìx ‘”  Ìy ‘”  Ìz ‘”  Ì{ ‘”  Ì| ‘”  Ì} ‘”  Ì~ ‘”  Ì ‘”  Ì€ ‘”  Ì ‘”  Ì‚ ‘”  Ìƒ ‘”  Ì„ ‘”  Ì… ‘”  Ì† ‘”  Ì‡ ‘”  Ìˆ ‘”  Ì‰ ‘”  ÌŠ ‘”  Ì‹ ‘”  ÌŒ ‘”  Ì ‘”  Ì ‘”  Ì ‘”  Ì ‘”  Ì‘ ‘”  Ì’ ‘”  Ì“ ‘”  Ì” ‘”  Ì• ‘”  Ì– ‘”  Ì— ‘”  Ì˜ ‘”  Ì™ ‘”  Ìš ‘”  Ì› ‘”  Ìœ ‘”  Ì ‘”  Ì ‘”  ÌŸ ‘”  Ì  ‘”  Ì¡ ‘ÙØ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-notice-bar/up-notice-bar.js‘Ú"import { _ as __easycom_0 } from "../up-column-notice/up-column-notice.js";
+import { r as resolveEasycom } from "../../../../App.ku.js";
+import { _ as __easycom_1$1 } from "../up-row-notice/up-row-notice.js";
+import { b as addStyle, d as deepMerge } from "../../libs/function/index.js";
+import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
+const { defineComponent: _defineComponent } = globalThis.Vue;
+const { ref, computed } = globalThis.Vue;
+const _sfc_main = /* @__PURE__ */ _defineComponent({
+  ...{
+    name: "up-notice-bar"
+  },
+  __name: "up-notice-bar",
+  props: {
+    text: {
+      type: [Array, String],
+      default: () => {
+        return [];
+      }
+    },
+    direction: {
+      type: String,
+      default: "row"
+    },
+    step: {
+      type: Boolean,
+      default: false
+    },
+    icon: {
+      type: String,
+      default: "volume"
+    },
+    mode: {
+      type: String,
+      default: ""
+    },
+    color: {
+      type: String,
+      default: "#f9ae3d"
+    },
+    bgColor: {
+      type: String,
+      default: "#fdf6ec"
+    },
+    speed: {
+      type: [String, Number],
+      default: 80
+    },
+    fontSize: {
+      type: [String, Number],
+      default: 14
+    },
+    duration: {
+      type: [String, Number],
+      default: 2e3
+    },
+    disableTouch: {
+      type: Boolean,
+      default: true
+    },
+    url: {
+      type: String,
+      default: ""
+    },
+    linkType: {
+      type: String,
+      default: "navigateTo"
+    },
+    customStyle: {
+      type: Object,
+      default: () => {
+        return new UTSJSONObject({});
+      }
+    }
+  },
+  emits: ["click", "close"],
+  setup(__props, _a) {
+    var __expose = _a.expose, __emit = _a.emit;
+    __expose();
+    const props = __props;
+    const emit = __emit;
+    const show = ref(true);
+    const noticeBarStyle = computed(() => {
+      const base = new UTSJSONObject({
+        backgroundColor: props.bgColor
+      });
+      const custom = addStyle(props.customStyle);
+      return deepMerge(base, custom);
+    });
+    function click(index) {
+      emit("click", index);
+      if (props.url != "" && props.linkType != "") {
+        if (props.linkType == "navigateTo") {
+          uni.navigateTo({ url: props.url });
+        } else if (props.linkType == "redirectTo") {
+          uni.redirectTo({ url: props.url });
+        } else if (props.linkType == "switchTab") {
+          uni.switchTab({ url: props.url });
+        } else if (props.linkType == "reLaunch") {
+          uni.reLaunch({ url: props.url });
+        }
+      }
+    }
+    function close() {
+      show.value = false;
+      emit("close");
+    }
+    const __returned__ = { props, emit, show, noticeBarStyle, click, close };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
+  }
+});
+const _style_0 = {"u-empty":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-empty__wrap":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__scroll-view-wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__scroll-view":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__nav":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__nav__line":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-empty":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-empty__wrap":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__scroll-view-wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__scroll-view":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__nav":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__nav__line":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-notice-bar":{"":{"paddingTop":9,"paddingRight":12,"paddingBottom":9,"paddingLeft":12}},"flex":{"":{"display":"flex"}}};
+const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
+const { resolveComponent: _resolveComponent, openBlock: _openBlock, createBlock: _createBlock, createCommentVNode: _createCommentVNode, normalizeStyle: _normalizeStyle, createElementBlock: _createElementBlock } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  const _component_up_column_notice = resolveEasycom(__resolveDynamicComponent("up-column-notice"), __easycom_0);
+  const _component_up_row_notice = resolveEasycom(__resolveDynamicComponent("up-row-notice"), __easycom_1$1);
+  return $setup.show ? (_openBlock(), _createElementBlock(
+    "view",
+    {
+      key: 0,
+      class: "up-notice-bar",
+      style: _normalizeStyle($setup.noticeBarStyle)
+    },
+    [
+      $props.direction == "column" || $props.direction == "row" && $props.step ? (_openBlock(), _createBlock(_component_up_column_notice, {
+        key: 0,
+        color: $props.color,
+        bgColor: $props.bgColor,
+        text: $props.text,
+        mode: $props.mode,
+        step: $props.step,
+        icon: $props.icon,
+        "disable-touch": $props.disableTouch,
+        fontSize: $props.fontSize,
+        duration: $props.duration,
+        onClose: $setup.close,
+        onClick: $setup.click
+      }, null, 8, ["color", "bgColor", "text", "mode", "step", "icon", "disable-touch", "fontSize", "duration"])) : (_openBlock(), _createBlock(_component_up_row_notice, {
+        key: 1,
+        color: $props.color,
+        bgColor: $props.bgColor,
+        text: $props.text,
+        mode: $props.mode,
+        fontSize: $props.fontSize,
+        speed: $props.speed,
+        url: $props.url,
+        linkType: $props.linkType,
+        icon: $props.icon,
+        onClose: $setup.close,
+        onClick: $setup.click
+      }, null, 8, ["color", "bgColor", "text", "mode", "fontSize", "speed", "url", "linkType", "icon"]))
+    ],
+    4
+    /* STYLE */
+  )) : _createCommentVNode("v-if", true);
+}
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-notice-bar/up-notice-bar.uvue"]]);
+export {
+  __easycom_1 as _
+};
+//# sourceMappingURL=up-notice-bar.js.map
+ÔrF•µ../../../../App.ku.jsÙ!../up-row-notice/up-row-notice.jsÙ'../up-column-notice/up-column-notice.js¼../../libs/function/index.jsÙ'../../../../plugin-vue-export-helper.jsÔrG—ªassertions¨external¢id¤meta±moduleSideEffectsªresolvedByµsyntheticNamedExportsAÂÙ /Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/App.ku.jsAÃªoh-resolveÂGAÂÙØ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-row-notice/up-row-notice.jsAÃªoh-resolveÂGAÂÙŞ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-column-notice/up-column-notice.jsAÃªoh-resolveÂGAÂÙÅ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/index.jsAÃªoh-resolveÂGAÂÙ²/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper.jsAÃªoh-resolveÂ‘ÔrH’§missing¦pluginÃ¦genAbcÂÔ  ÔrI”²dynamicImportCache¹exportAllDeclarationCache»exportNamedDeclarationCache«importCache‘ÔrJ–¤type¥start£end«declarationªspecifiers¦source¶ExportNamedDeclarationÍÙÍ÷À‘ÔrK•¤type¥start£end¥local¨exported¯ExportSpecifierÍäÍôÔrL”¤type¥start£end¤nameªIdentifierÍäÍï«__easycom_1LªIdentifierÍóÍô¡_À•ÔrM•¤type¥start£endªspecifiers¦source±ImportDeclaration ÌK‘ÔrN•¤type¥start£end¨imported¥local¯ImportSpecifier	LªIdentifier	
+¡_LªIdentifier«__easycom_0ÔrO•¤type¥start£end¥value£raw§Literal!ÌJÙ'../up-column-notice/up-column-notice.jsÙ)"../up-column-notice/up-column-notice.js"M±ImportDeclarationÌLÌˆ‘N¯ImportSpecifierÌUÌhLªIdentifierÌUÌV¡rLªIdentifierÌZÌh®resolveEasycomO§LiteralÌpÌ‡µ../../../../App.ku.js·"../../../../App.ku.js"M±ImportDeclarationÌ‰ÌĞ‘N¯ImportSpecifierÌ’Ì¤LªIdentifierÌ’Ì“¡_LªIdentifierÌ—Ì¤­__easycom_1$1O§LiteralÌ¬ÌÏÙ!../up-row-notice/up-row-notice.jsÙ#"../up-row-notice/up-row-notice.js"M±ImportDeclarationÌÑÍ’N¯ImportSpecifierÌÚÌçLªIdentifierÌÚÌÛ¡bLªIdentifierÌßÌç¨addStyleN¯ImportSpecifierÌéÌ÷LªIdentifierÌéÌê¡dLªIdentifierÌîÌ÷©deepMergeO§LiteralÌÿÍ¼../../libs/function/index.js¾"../../libs/function/index.js"M±ImportDeclarationÍÍj‘N¯ImportSpecifierÍ(Í8LªIdentifierÍ(Í)¡_LªIdentifierÍ-Í8«_export_sfcO§LiteralÍ@ÍiÙ'../../../../plugin-vue-export-helper.jsÙ)"../../../../plugin-vue-export-helper.js"

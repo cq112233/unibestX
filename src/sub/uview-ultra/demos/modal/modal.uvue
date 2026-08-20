@@ -1,22 +1,22 @@
 <template>
-  <view class="page-container bg-[#f8fafc] min-h-screen pb-30px">
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
     <NavBar title="up-modal 模态框" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
-    <view class="p-16px">
+    <view class="p-[16px]">
       <view class="demo-block">
         <text class="demo-label">基础用法</text>
         <view class="flex-row items-center">
           <up-button type="primary" text="弹窗提示" size="mini" @click="showModal"></up-button>
-          <view class="w-10px"></view>
+          <view class="w-[10px]"></view>
           <up-button type="warning" text="确认弹窗" size="mini" @click="showConfirmModal"></up-button>
         </view>
       </view>
-      <view class="demo-block mt-12px">
+      <view class="demo-block mt-[12px]">
         <text class="demo-label">无标题弹窗</text>
         <view class="flex-row items-center">
           <up-button type="success" text="无标题" size="mini" @click="showNoTitleModal"></up-button>
         </view>
       </view>
-      <view class="demo-block mt-12px">
+      <view class="demo-block mt-[12px]">
         <text class="demo-label">长内容弹窗</text>
         <view class="flex-row items-center">
           <up-button type="error" text="长内容" size="mini" @click="showLongModal"></up-button>

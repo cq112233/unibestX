@@ -1,0 +1,21 @@
+// 本文件为自动构建生成
+export {
+  ClipBoardErrorCode,
+  IClipBoardError,
+  SetClipboardData,
+  SetClipboardDataSuccess,
+  SetClipboardDataSuccessCallback,
+  SetClipboardDataFail,
+  SetClipboardDataFailCallback,
+  SetClipboardDataComplete,
+  SetClipboardDataCompleteCallback,
+  SetClipboardDataOptions,
+  GetClipboardData,
+  GetClipboardDataSuccess,
+  GetClipboardDataSuccessCallback,
+  GetClipboardDataFail,
+  GetClipboardDataFailCallback,
+  GetClipboardDataComplete,
+  GetClipboardDataCompleteCallback,
+  GetClipboardDataOptions,
+} from './interface'

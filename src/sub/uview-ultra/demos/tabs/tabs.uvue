@@ -1,7 +1,7 @@
 <template>
-  <view class="page-container bg-[#f8fafc] min-h-screen pb-30px">
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
     <NavBar title="Tabs 标签页" :auto-back="true" />
-    <view class="p-16px">
+    <view class="p-[16px]">
       <!-- 1. 超长横向滚动标签栏 -->
       <view class="demo-block">
         <text class="demo-label">超长横向滚动标签 (14项)</text>
@@ -10,26 +10,26 @@
           :list="longList"
           @change="onLongChange"
         ></up-tabs>
-        <view class="content-box mt-10px">
+        <view class="content-box mt-[10px]">
           <text class="content-text">当前选中：{{ longList[currentLong].name }} (第 {{ currentLong + 1 }} 项)</text>
         </view>
       </view>
 
       <!-- 2. 基础用法与内容联动 -->
-      <view class="demo-block mt-12px">
+      <view class="demo-block mt-[12px]">
         <text class="demo-label">基础用法与内容联动</text>
         <up-tabs
           v-model:current="currentBase"
           :list="baseList"
           @change="onBaseChange"
         ></up-tabs>
-        <view class="content-box mt-10px">
+        <view class="content-box mt-[10px]">
           <text class="content-text">正在浏览：{{ baseList[currentBase].name }} 分类内容</text>
         </view>
       </view>
 
       <!-- 3. 带角标 / 红点提示 -->
-      <view class="demo-block mt-12px">
+      <view class="demo-block mt-[12px]">
         <text class="demo-label">带角标与红点提示</text>
         <up-tabs
           v-model:current="currentBadge"
@@ -38,7 +38,7 @@
       </view>
 
       <!-- 4. 禁用特定标签 -->
-      <view class="demo-block mt-12px">
+      <view class="demo-block mt-[12px]">
         <text class="demo-label">禁用特定标签项</text>
         <up-tabs
           v-model:current="currentDisabled"
@@ -47,7 +47,7 @@
       </view>
 
       <!-- 5. 自定义滑块与选中样式 -->
-      <view class="demo-block mt-12px">
+      <view class="demo-block mt-[12px]">
         <text class="demo-label">自定义滑块与高亮样式</text>
         <up-tabs
           v-model:current="currentCustom"
@@ -61,7 +61,7 @@
       </view>
 
       <!-- 6. 等分布局（不可滚动） -->
-      <view class="demo-block mt-12px">
+      <view class="demo-block mt-[12px]">
         <text class="demo-label">等分布局 (不可滚动: scrollable=false)</text>
         <up-tabs
           v-model:current="currentEqual"

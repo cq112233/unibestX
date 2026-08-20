@@ -1,0 +1,792 @@
+Ôr@Ÿªassertions¤code´customTransformCache¬dependencies¢id¤meta±moduleSideEffects¬originalCode±originalSourcemap«resolvedIds®sourcemapChainµsyntheticNamedExportsµtransformDependencies®transformFiles¨cacheAstÔrAÚ."import { UTSObject, UTS, defineAsyncApi, UTSHarmony } from "@dcloudio/uni-app-framework";
+import promptAction from "@ohos.promptAction";
+import userAuth from "@ohos.userIAM.userAuth";
+class StartSoterAuthenticationSuccess extends UTSObject {
+    constructor() {
+        super(...arguments);
+        this.resultJSON = null;
+        this.resultJSONSignature = null;
+    }
+}
+class StartSoterAuthenticationOptions extends UTSObject {
+    constructor() {
+        super(...arguments);
+        this.challenge = null;
+        this.authContent = null;
+        this.success = null;
+        this.fail = null;
+        this.complete = null;
+    }
+}
+class CheckIsSupportSoterAuthenticationSuccess extends UTSObject {
+}
+class CheckIsSupportSoterAuthenticationOptions extends UTSObject {
+    constructor() {
+        super(...arguments);
+        this.success = null;
+        this.fail = null;
+        this.complete = null;
+    }
+}
+class CheckIsSoterEnrolledInDeviceSuccess extends UTSObject {
+}
+class CheckIsSoterEnrolledInDeviceOptions extends UTSObject {
+    constructor() {
+        super(...arguments);
+        this.success = null;
+        this.fail = null;
+        this.complete = null;
+    }
+}
+const API_START_SOTER_AUTHENTICATION = 'startSoterAuthentication';
+const StartSoterAuthenticationApiOptions = {
+    formatArgs: new Map([
+        [
+            'requestAuthModes',
+            (value) => {
+                if (!value.includes('fingerPrint') && !value.includes('facial')) {
+                    return 'requestAuthModes å¡«å†™é”™è¯¯';
+                }
+                return undefined;
+            }
+        ]
+    ])
+};
+const StartSoterAuthenticationApiProtocols = new Map([
+    [
+        'requestAuthModes',
+        {
+            type: 'array',
+            required: true
+        }
+    ],
+    [
+        'challenge',
+        {
+            type: 'string',
+            required: true
+        }
+    ],
+    [
+        'authContent',
+        {
+            type: 'string'
+        }
+    ]
+]);
+const API_CHECK_IS_SOTER_ENROLLED_IN_DEVICE = 'checkIsSoterEnrolledInDevice';
+const checkAuthModes = [
+    'fingerPrint',
+    'facial',
+    'speech'
+];
+const CheckIsSoterEnrolledInDeviceApiOptions = {
+    formatArgs: new Map([
+        [
+            'checkAuthMode',
+            (value) => {
+                if (!checkAuthModes.includes(value)) {
+                    return 'checkAuthMode å¡«å†™é”™è¯¯';
+                }
+                return undefined;
+            }
+        ]
+    ])
+};
+const CheckIsSoterEnrolledInDeviceProtocols = new Map([
+    [
+        'checkAuthMode',
+        {
+            type: 'string'
+        }
+    ]
+]);
+const API_CHECK_IS_SUPPORT_SOTER_AUTHENTICATION = 'checkIsSupportSoterAuthentication';
+const AuthenticationUniErrors = new Map([
+    [
+        61001,
+        'permission denied'
+    ],
+    [
+        61002,
+        'biometric authentication is unavailable'
+    ],
+    [
+        61003,
+        'invalid parameter'
+    ],
+    [
+        61004,
+        'unknown error'
+    ],
+    [
+        61005,
+        'user cancelled'
+    ],
+    [
+        61006,
+        'authentication failed'
+    ],
+    [
+        61007,
+        'biometric service locked or busy'
+    ],
+    [
+        61008,
+        'biometric info not enrolled'
+    ],
+    [
+        61009,
+        'screen lock credential expired'
+    ],
+    [
+        71001,
+        'android activity is unavailable'
+    ],
+    [
+        71002,
+        'android secure lock screen is disabled'
+    ],
+    [
+        71003,
+        'android system version does not support the requested biometric mode'
+    ],
+    [
+        81001,
+        'ios authentication context is invalid'
+    ],
+    [
+        51001,
+        'harmony biometric authentication timed out'
+    ],
+    [
+        51002,
+        'harmony authentication switched to system widget flow'
+    ]
+]);
+function getAuthenticationErrorMessage(errCode) {
+    return UTS.mapGet(AuthenticationUniErrors, errCode) ?? '';
+}
+function getErrorCode(code) {
+    switch (code) {
+        case 201:
+            return 61001;
+        case 401:
+            return 61003;
+        case userAuth.UserAuthResultCode.FAIL:
+            return 61006;
+        case userAuth.UserAuthResultCode.GENERAL_ERROR:
+            return 61004;
+        case userAuth.UserAuthResultCode.CANCELED:
+            return 61005;
+        case userAuth.UserAuthResultCode.TIMEOUT:
+            return 51001;
+        case userAuth.UserAuthResultCode.TYPE_NOT_SUPPORT:
+            return 61002;
+        case userAuth.UserAuthResultCode.TRUST_LEVEL_NOT_SUPPORT:
+            return 61002;
+        case userAuth.UserAuthResultCode.BUSY:
+            return 61007;
+        case userAuth.UserAuthResultCode.LOCKED:
+            return 61007;
+        case userAuth.UserAuthResultCode.NOT_ENROLLED:
+            return 61008;
+        case userAuth.UserAuthResultCode.CANCELED_FROM_WIDGET:
+            return 51002;
+        case 12500013:
+            return 61009;
+        default:
+            return 61004;
+    }
+}
+function getRejectMessage(apiName, errCode) {
+    return apiName + ':fail ' + getAuthenticationErrorMessage(errCode);
+}
+function rejectExecutor(executor, apiName, nativeCode) {
+    const errCode = getErrorCode(nativeCode);
+    executor.reject(getRejectMessage(apiName, errCode), {
+        errCode
+    });
+}
+function toUint8Arr(str) {
+    const buffer = [];
+    for (let i of str) {
+        const _code = i.charCodeAt(0);
+        if (_code < 0x80) {
+            buffer.push(_code);
+        }
+        else if (_code < 0x800) {
+            buffer.push(0xc0 + (_code >> 6));
+            buffer.push(0x80 + (_code & 0x3f));
+        }
+        else if (_code < 0x10000) {
+            buffer.push(0xe0 + (_code >> 12));
+            buffer.push(0x80 + (_code >> 6 & 0x3f));
+            buffer.push(0x80 + (_code & 0x3f));
+        }
+    }
+    return Uint8Array.from(buffer);
+}
+const startSoterAuthentication = defineAsyncApi(API_START_SOTER_AUTHENTICATION, (args, executor) => {
+    const authType = [];
+    args.requestAuthModes.forEach((item) => {
+        if (item == 'fingerPrint') {
+            authType.push(userAuth.UserAuthType.FINGERPRINT);
+        }
+        else if (item == 'facial') {
+            authType.push(userAuth.UserAuthType.FACE);
+        }
+    });
+    const challengeArr = toUint8Arr(args.challenge ?? '');
+    const authContent = args.authContent ?? '';
+    try {
+        const auth = userAuth.getUserAuthInstance({
+            challenge: challengeArr,
+            authType,
+            authTrustLevel: userAuth.AuthTrustLevel.ATL1
+        }, {
+            title: authContent
+        });
+        auth.on("result", {
+            onResult: (result) => {
+                if (result.result == userAuth.UserAuthResultCode.SUCCESS) {
+                    executor.resolve({
+                        errCode: 0,
+                        authMode: result.authType == userAuth.UserAuthType.FINGERPRINT ? 'fingerPrint' : 'facial'
+                    });
+                }
+                else {
+                    rejectExecutor(executor, 'startSoterAuthentication', result.result);
+                }
+            }
+        });
+        if (authContent.length > 0) {
+            promptAction.showToast({
+                message: authContent
+            });
+        }
+        auth.start();
+    }
+    catch (error) {
+        const code = error.code;
+        rejectExecutor(executor, 'startSoterAuthentication', code);
+    }
+}, StartSoterAuthenticationApiProtocols, StartSoterAuthenticationApiOptions);
+function fingerPrintAvailable() {
+    try {
+        userAuth.getAvailableStatus(userAuth.UserAuthType.FINGERPRINT, userAuth.AuthTrustLevel.ATL1);
+        return true;
+    }
+    catch (error) {
+        if ([
+            userAuth.UserAuthResultCode.NOT_ENROLLED,
+            userAuth.UserAuthResultCode.PIN_EXPIRED
+        ].includes(error.code)) {
+            return true;
+        }
+        return false;
+    }
+}
+function faceAvailable() {
+    try {
+        userAuth.getAvailableStatus(userAuth.UserAuthType.FACE, userAuth.AuthTrustLevel.ATL1);
+        return true;
+    }
+    catch (error) {
+        if ([
+            userAuth.UserAuthResultCode.NOT_ENROLLED,
+            userAuth.UserAuthResultCode.PIN_EXPIRED
+        ].includes(error.code)) {
+            return true;
+        }
+        return false;
+    }
+}
+const PERMISSIONS = [
+    'ohos.permission.ACCESS_BIOMETRIC'
+];
+const checkIsSupportSoterAuthentication = defineAsyncApi(API_CHECK_IS_SUPPORT_SOTER_AUTHENTICATION, (args, executor) => {
+    UTSHarmony.requestSystemPermission(PERMISSIONS, (allRight) => {
+        if (allRight) {
+            try {
+                const supportMode = [];
+                if (fingerPrintAvailable())
+                    supportMode.push('fingerPrint');
+                if (faceAvailable())
+                    supportMode.push('facial');
+                executor.resolve({
+                    supportMode,
+                    errMsg: ''
+                });
+            }
+            catch (error) {
+                const code = error.code;
+                rejectExecutor(executor, 'checkIsSupportSoterAuthentication', code);
+            }
+        }
+        else {
+            rejectExecutor(executor, 'checkIsSupportSoterAuthentication', 201);
+        }
+    }, () => {
+        rejectExecutor(executor, 'checkIsSupportSoterAuthentication', 201);
+    });
+});
+function getFingerPrintEnrolledState() {
+    userAuth.getEnrolledState(userAuth.UserAuthType.FINGERPRINT);
+    return true;
+}
+function getFaceEnrolledState() {
+    userAuth.getEnrolledState(userAuth.UserAuthType.FACE);
+    return true;
+}
+function harmonyCheckIsSoterEnrolledInDevice(checkAuthMode) {
+    if (checkAuthMode == 'fingerPrint') {
+        return getFingerPrintEnrolledState();
+    }
+    else if (checkAuthMode == 'facial') {
+        return getFaceEnrolledState();
+    }
+    return false;
+}
+const checkIsSoterEnrolledInDevice = defineAsyncApi(API_CHECK_IS_SOTER_ENROLLED_IN_DEVICE, (args, executor) => {
+    UTSHarmony.requestSystemPermission(PERMISSIONS, (allRight) => {
+        if (allRight) {
+            try {
+                const isEnrolled = harmonyCheckIsSoterEnrolledInDevice(args.checkAuthMode);
+                executor.resolve({
+                    isEnrolled,
+                    errMsg: ''
+                });
+            }
+            catch (error) {
+                const code = error.code;
+                rejectExecutor(executor, 'checkIsSoterEnrolledInDevice', code);
+            }
+        }
+        else {
+            rejectExecutor(executor, 'checkIsSoterEnrolledInDevice', 201);
+        }
+    }, () => {
+        rejectExecutor(executor, 'checkIsSoterEnrolledInDevice', 201);
+    });
+}, CheckIsSoterEnrolledInDeviceProtocols, CheckIsSoterEnrolledInDeviceApiOptions);
+export { CheckIsSoterEnrolledInDeviceOptions as CheckIsSoterEnrolledInDeviceOptions, CheckIsSoterEnrolledInDeviceSuccess as CheckIsSoterEnrolledInDeviceSuccess, CheckIsSupportSoterAuthenticationOptions as CheckIsSupportSoterAuthenticationOptions, CheckIsSupportSoterAuthenticationSuccess as CheckIsSupportSoterAuthenticationSuccess, StartSoterAuthenticationOptions as StartSoterAuthenticationOptions, StartSoterAuthenticationSuccess as StartSoterAuthenticationSuccess };
+export { startSoterAuthentication as startSoterAuthentication };
+export { checkIsSupportSoterAuthentication as checkIsSupportSoterAuthentication };
+export { checkIsSoterEnrolledInDevice as checkIsSoterEnrolledInDevice };
+//# sourceMappingURL=index.js.mapÂ“Ùî/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/framework/index.etsÙo hvigor_ignore__Applications_DevEco-Studio.app_Contents_sdk_default_openharmony_ets_api_@ohos.promptAction.d.tsÙs hvigor_ignore__Applications_DevEco-Studio.app_Contents_sdk_default_openharmony_ets_api_@ohos.userIAM.userAuth.d.tsÚ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/modules/uni_modules/uni-authentication/utssdk/app-harmony/index.etsÔrB˜±isLocalDependency¯isNodeEntryFile§pkgPath§pkgNameªpkgVersion±belongProjectPath±dependencyPkgInfo¬shouldEmitJsÂÂÙâ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/modules¹@dcloudio/uni-app-modules¥1.0.0ÙL/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmonyÔrC’§pkgNameªpkgVersion¹@dcloudio/uni-app-modules¥1.0.0ÃÃÚCimport { BusinessError } from '@kit.BasicServicesKit';
+import { UTSObject, IUniError, ApiOptions, ProtocolOptions, UTS, ApiExecutor, ApiError, defineAsyncApi, UTSHarmony } from "@dcloudio/uni-app-framework";
+import { promptAction } from '@kit.ArkUI';
+import { userAuth } from '@kit.UserAuthenticationKit';
+type StartSoterAuthentication = (options: StartSoterAuthenticationOptions) => void;
+type SoterAuthMode = 'fingerPrint' | 'facial' | 'speech';
+class StartSoterAuthenticationSuccess extends UTSObject {
+    errCode!: number;
+    authMode!: SoterAuthMode;
+    resultJSON: string | null = null;
+    resultJSONSignature: string | null = null;
+    errMsg!: string;
+}
+type StartSoterAuthenticationSuccessCallback = (result: StartSoterAuthenticationSuccess) => void;
+interface IStartSoterAuthenticationFail extends IUniError {
+}
+type StartSoterAuthenticationFail = IStartSoterAuthenticationFail;
+type StartSoterAuthenticationFailCallback = (result: StartSoterAuthenticationFail) => void;
+type StartSoterAuthenticationComplete = StartSoterAuthenticationSuccess | StartSoterAuthenticationFail;
+type StartSoterAuthenticationCompleteCallback = (result: StartSoterAuthenticationComplete) => void;
+class StartSoterAuthenticationOptions extends UTSObject {
+    requestAuthModes!: SoterAuthMode[];
+    challenge: string | null = null;
+    authContent: string | null = null;
+    success: StartSoterAuthenticationSuccessCallback | null = null;
+    fail: StartSoterAuthenticationFailCallback | null = null;
+    complete: StartSoterAuthenticationCompleteCallback | null = null;
+}
+type CheckIsSupportSoterAuthentication = (options: CheckIsSupportSoterAuthenticationOptions) => void;
+class CheckIsSupportSoterAuthenticationSuccess extends UTSObject {
+    supportMode!: SoterAuthMode[];
+    errMsg!: string;
+}
+type CheckIsSupportSoterAuthenticationSuccessCallback = (result: CheckIsSupportSoterAuthenticationSuccess) => void;
+interface ICheckIsSupportSoterAuthenticationFail extends IUniError {
+}
+type CheckIsSupportSoterAuthenticationFail = ICheckIsSupportSoterAuthenticationFail;
+type CheckIsSupportSoterAuthenticationFailCallback = (result: CheckIsSupportSoterAuthenticationFail) => void;
+type CheckIsSupportSoterAuthenticationComplete = CheckIsSupportSoterAuthenticationSuccess | CheckIsSupportSoterAuthenticationFail;
+type CheckIsSupportSoterAuthenticationCompleteCallback = (result: CheckIsSupportSoterAuthenticationComplete) => void;
+class CheckIsSupportSoterAuthenticationOptions extends UTSObject {
+    success: CheckIsSupportSoterAuthenticationSuccessCallback | null = null;
+    fail: CheckIsSupportSoterAuthenticationFailCallback | null = null;
+    complete: CheckIsSupportSoterAuthenticationCompleteCallback | null = null;
+}
+type CheckIsSoterEnrolledInDevice = (options: CheckIsSoterEnrolledInDeviceOptions) => void;
+class CheckIsSoterEnrolledInDeviceSuccess extends UTSObject {
+    isEnrolled!: boolean;
+    errMsg!: string;
+}
+type CheckIsSoterEnrolledInDeviceSuccessCallback = (result: CheckIsSoterEnrolledInDeviceSuccess) => void;
+interface ICheckIsSoterEnrolledInDeviceFail extends IUniError {
+}
+type CheckIsSoterEnrolledInDeviceFail = ICheckIsSoterEnrolledInDeviceFail;
+type CheckIsSoterEnrolledInDeviceFailCallback = (result: CheckIsSoterEnrolledInDeviceFail) => void;
+type CheckIsSoterEnrolledInDeviceComplete = CheckIsSoterEnrolledInDeviceSuccess | CheckIsSoterEnrolledInDeviceFail;
+type CheckIsSoterEnrolledInDeviceCompleteCallback = (result: CheckIsSoterEnrolledInDeviceComplete) => void;
+class CheckIsSoterEnrolledInDeviceOptions extends UTSObject {
+    checkAuthMode!: SoterAuthMode;
+    success: CheckIsSoterEnrolledInDeviceSuccessCallback | null = null;
+    fail: CheckIsSoterEnrolledInDeviceFailCallback | null = null;
+    complete: CheckIsSoterEnrolledInDeviceCompleteCallback | null = null;
+}
+const API_START_SOTER_AUTHENTICATION = 'startSoterAuthentication';
+const StartSoterAuthenticationApiOptions: ApiOptions<StartSoterAuthenticationOptions> = {
+    formatArgs: new Map<string, ((value: string) => string | undefined)>([
+        [
+            'requestAuthModes',
+            (value: string)=>{
+                if (!value.includes('fingerPrint') && !value.includes('facial')) {
+                    return 'requestAuthModes å¡«å†™é”™è¯¯';
+                }
+                return undefined;
+            }
+        ]
+    ])
+};
+const StartSoterAuthenticationApiProtocols = new Map<string, ProtocolOptions>([
+    [
+        'requestAuthModes',
+        {
+            type: 'array',
+            required: true
+        }
+    ],
+    [
+        'challenge',
+        {
+            type: 'string',
+            required: true
+        }
+    ],
+    [
+        'authContent',
+        {
+            type: 'string'
+        }
+    ]
+]);
+const API_CHECK_IS_SOTER_ENROLLED_IN_DEVICE = 'checkIsSoterEnrolledInDevice';
+const checkAuthModes: SoterAuthMode[] = [
+    'fingerPrint',
+    'facial',
+    'speech'
+];
+const CheckIsSoterEnrolledInDeviceApiOptions: ApiOptions<CheckIsSoterEnrolledInDeviceOptions> = {
+    formatArgs: new Map<string, ((value: string) => string | undefined)>([
+        [
+            'checkAuthMode',
+            (value: string)=>{
+                if (!checkAuthModes.includes(value as SoterAuthMode)) {
+                    return 'checkAuthMode å¡«å†™é”™è¯¯';
+                }
+                return undefined;
+            }
+        ]
+    ])
+};
+const CheckIsSoterEnrolledInDeviceProtocols = new Map<string, ProtocolOptions>([
+    [
+        'checkAuthMode',
+        {
+            type: 'string'
+        }
+    ]
+]);
+const API_CHECK_IS_SUPPORT_SOTER_AUTHENTICATION = 'checkIsSupportSoterAuthentication';
+const AuthenticationUniErrors: Map<number, string> = new Map([
+    [
+        61001,
+        'permission denied'
+    ],
+    [
+        61002,
+        'biometric authentication is unavailable'
+    ],
+    [
+        61003,
+        'invalid parameter'
+    ],
+    [
+        61004,
+        'unknown error'
+    ],
+    [
+        61005,
+        'user cancelled'
+    ],
+    [
+        61006,
+        'authentication failed'
+    ],
+    [
+        61007,
+        'biometric service locked or busy'
+    ],
+    [
+        61008,
+        'biometric info not enrolled'
+    ],
+    [
+        61009,
+        'screen lock credential expired'
+    ],
+    [
+        71001,
+        'android activity is unavailable'
+    ],
+    [
+        71002,
+        'android secure lock screen is disabled'
+    ],
+    [
+        71003,
+        'android system version does not support the requested biometric mode'
+    ],
+    [
+        81001,
+        'ios authentication context is invalid'
+    ],
+    [
+        51001,
+        'harmony biometric authentication timed out'
+    ],
+    [
+        51002,
+        'harmony authentication switched to system widget flow'
+    ]
+]);
+function getAuthenticationErrorMessage(errCode: number): string {
+    return UTS.mapGet(AuthenticationUniErrors, errCode) ?? '';
+}
+function getErrorCode(code: number): number {
+    switch(code){
+        case 201:
+            return 61001;
+        case 401:
+            return 61003;
+        case userAuth.UserAuthResultCode.FAIL:
+            return 61006;
+        case userAuth.UserAuthResultCode.GENERAL_ERROR:
+            return 61004;
+        case userAuth.UserAuthResultCode.CANCELED:
+            return 61005;
+        case userAuth.UserAuthResultCode.TIMEOUT:
+            return 51001;
+        case userAuth.UserAuthResultCode.TYPE_NOT_SUPPORT:
+            return 61002;
+        case userAuth.UserAuthResultCode.TRUST_LEVEL_NOT_SUPPORT:
+            return 61002;
+        case userAuth.UserAuthResultCode.BUSY:
+            return 61007;
+        case userAuth.UserAuthResultCode.LOCKED:
+            return 61007;
+        case userAuth.UserAuthResultCode.NOT_ENROLLED:
+            return 61008;
+        case userAuth.UserAuthResultCode.CANCELED_FROM_WIDGET:
+            return 51002;
+        case 12500013:
+            return 61009;
+        default:
+            return 61004;
+    }
+}
+function getRejectMessage(apiName: string, errCode: number): string {
+    return apiName + ':fail ' + getAuthenticationErrorMessage(errCode);
+}
+function rejectExecutor<T>(executor: ApiExecutor<T>, apiName: string, nativeCode: number): void {
+    const errCode = getErrorCode(nativeCode);
+    executor.reject(getRejectMessage(apiName, errCode), {
+        errCode
+    } as ApiError);
+}
+function toUint8Arr(str: string): Uint8Array {
+    const buffer: number[] = [];
+    for (let i of str){
+        const _code: number = i.charCodeAt(0);
+        if (_code < 0x80) {
+            buffer.push(_code);
+        } else if (_code < 0x800) {
+            buffer.push(0xc0 + (_code >> 6));
+            buffer.push(0x80 + (_code & 0x3f));
+        } else if (_code < 0x10000) {
+            buffer.push(0xe0 + (_code >> 12));
+            buffer.push(0x80 + (_code >> 6 & 0x3f));
+            buffer.push(0x80 + (_code & 0x3f));
+        }
+    }
+    return Uint8Array.from(buffer);
+}
+const startSoterAuthentication: StartSoterAuthentication = defineAsyncApi<StartSoterAuthenticationOptions, StartSoterAuthenticationSuccess>(API_START_SOTER_AUTHENTICATION, (args: StartSoterAuthenticationOptions, executor: ApiExecutor<StartSoterAuthenticationSuccess>)=>{
+    const authType: userAuth.UserAuthType[] = [];
+    args.requestAuthModes.forEach((item)=>{
+        if (item == 'fingerPrint') {
+            authType.push(userAuth.UserAuthType.FINGERPRINT);
+        } else if (item == 'facial') {
+            authType.push(userAuth.UserAuthType.FACE);
+        }
+    });
+    const challengeArr = toUint8Arr(args.challenge ?? '');
+    const authContent = args.authContent ?? '';
+    try {
+        const auth = userAuth.getUserAuthInstance({
+            challenge: challengeArr,
+            authType,
+            authTrustLevel: userAuth.AuthTrustLevel.ATL1
+        } as userAuth.AuthParam, {
+            title: authContent
+        } as userAuth.WidgetParam);
+        auth.on("result", {
+            onResult: (result: userAuth.UserAuthResult)=>{
+                if (result.result == userAuth.UserAuthResultCode.SUCCESS) {
+                    executor.resolve({
+                        errCode: 0,
+                        authMode: result.authType == userAuth.UserAuthType.FINGERPRINT ? 'fingerPrint' : 'facial'
+                    } as StartSoterAuthenticationSuccess);
+                } else {
+                    rejectExecutor(executor, 'startSoterAuthentication', result.result);
+                }
+            }
+        } as userAuth.IAuthCallback);
+        if (authContent.length > 0) {
+            promptAction.showToast({
+                message: authContent
+            } as promptAction.ShowToastOptions);
+        }
+        auth.start();
+    } catch (error) {
+        const code = (error as BusinessError).code;
+        rejectExecutor(executor, 'startSoterAuthentication', code);
+    }
+}, StartSoterAuthenticationApiProtocols, StartSoterAuthenticationApiOptions) as StartSoterAuthentication;
+function fingerPrintAvailable(): boolean {
+    try {
+        userAuth.getAvailableStatus(userAuth.UserAuthType.FINGERPRINT, userAuth.AuthTrustLevel.ATL1);
+        return true;
+    } catch (error) {
+        if ([
+            userAuth.UserAuthResultCode.NOT_ENROLLED,
+            userAuth.UserAuthResultCode.PIN_EXPIRED
+        ].includes((error as BusinessError).code)) {
+            return true;
+        }
+        return false;
+    }
+}
+function faceAvailable(): boolean {
+    try {
+        userAuth.getAvailableStatus(userAuth.UserAuthType.FACE, userAuth.AuthTrustLevel.ATL1);
+        return true;
+    } catch (error) {
+        if ([
+            userAuth.UserAuthResultCode.NOT_ENROLLED,
+            userAuth.UserAuthResultCode.PIN_EXPIRED
+        ].includes((error as BusinessError).code)) {
+            return true;
+        }
+        return false;
+    }
+}
+const PERMISSIONS = [
+    'ohos.permission.ACCESS_BIOMETRIC'
+];
+const checkIsSupportSoterAuthentication: CheckIsSupportSoterAuthentication = defineAsyncApi<CheckIsSupportSoterAuthenticationOptions, CheckIsSupportSoterAuthenticationSuccess>(API_CHECK_IS_SUPPORT_SOTER_AUTHENTICATION, (args: CheckIsSupportSoterAuthenticationOptions, executor: ApiExecutor<CheckIsSupportSoterAuthenticationSuccess>)=>{
+    UTSHarmony.requestSystemPermission(PERMISSIONS, (allRight: boolean)=>{
+        if (allRight) {
+            try {
+                const supportMode: SoterAuthMode[] = [];
+                if (fingerPrintAvailable()) supportMode.push('fingerPrint');
+                if (faceAvailable()) supportMode.push('facial');
+                executor.resolve({
+                    supportMode,
+                    errMsg: ''
+                } as CheckIsSupportSoterAuthenticationSuccess);
+            } catch (error) {
+                const code = (error as BusinessError).code;
+                rejectExecutor(executor, 'checkIsSupportSoterAuthentication', code);
+            }
+        } else {
+            rejectExecutor(executor, 'checkIsSupportSoterAuthentication', 201);
+        }
+    }, ()=>{
+        rejectExecutor(executor, 'checkIsSupportSoterAuthentication', 201);
+    });
+}) as CheckIsSupportSoterAuthentication;
+function getFingerPrintEnrolledState(): boolean {
+    userAuth.getEnrolledState(userAuth.UserAuthType.FINGERPRINT);
+    return true;
+}
+function getFaceEnrolledState(): boolean {
+    userAuth.getEnrolledState(userAuth.UserAuthType.FACE);
+    return true;
+}
+function harmonyCheckIsSoterEnrolledInDevice(checkAuthMode: SoterAuthMode): boolean {
+    if (checkAuthMode == 'fingerPrint') {
+        return getFingerPrintEnrolledState();
+    } else if (checkAuthMode == 'facial') {
+        return getFaceEnrolledState();
+    }
+    return false;
+}
+const checkIsSoterEnrolledInDevice: CheckIsSoterEnrolledInDevice = defineAsyncApi<CheckIsSoterEnrolledInDeviceOptions, CheckIsSoterEnrolledInDeviceSuccess>(API_CHECK_IS_SOTER_ENROLLED_IN_DEVICE, (args: CheckIsSoterEnrolledInDeviceOptions, executor: ApiExecutor<CheckIsSoterEnrolledInDeviceSuccess>)=>{
+    UTSHarmony.requestSystemPermission(PERMISSIONS, (allRight: boolean)=>{
+        if (allRight) {
+            try {
+                const isEnrolled = harmonyCheckIsSoterEnrolledInDevice(args.checkAuthMode);
+                executor.resolve({
+                    isEnrolled,
+                    errMsg: ''
+                } as CheckIsSoterEnrolledInDeviceSuccess);
+            } catch (error) {
+                const code = (error as BusinessError).code;
+                rejectExecutor(executor, 'checkIsSoterEnrolledInDevice', code);
+            }
+        } else {
+            rejectExecutor(executor, 'checkIsSoterEnrolledInDevice', 201);
+        }
+    }, ()=>{
+        rejectExecutor(executor, 'checkIsSoterEnrolledInDevice', 201);
+    });
+}, CheckIsSoterEnrolledInDeviceProtocols, CheckIsSoterEnrolledInDeviceApiOptions) as CheckIsSoterEnrolledInDevice;
+export { CheckIsSoterEnrolledInDevice as CheckIsSoterEnrolledInDevice, CheckIsSoterEnrolledInDeviceComplete as CheckIsSoterEnrolledInDeviceComplete, CheckIsSoterEnrolledInDeviceCompleteCallback as CheckIsSoterEnrolledInDeviceCompleteCallback, CheckIsSoterEnrolledInDeviceFail as CheckIsSoterEnrolledInDeviceFail, CheckIsSoterEnrolledInDeviceFailCallback as CheckIsSoterEnrolledInDeviceFailCallback, CheckIsSoterEnrolledInDeviceOptions as CheckIsSoterEnrolledInDeviceOptions, CheckIsSoterEnrolledInDeviceSuccess as CheckIsSoterEnrolledInDeviceSuccess, CheckIsSoterEnrolledInDeviceSuccessCallback as CheckIsSoterEnrolledInDeviceSuccessCallback, CheckIsSupportSoterAuthentication as CheckIsSupportSoterAuthentication, CheckIsSupportSoterAuthenticationComplete as CheckIsSupportSoterAuthenticationComplete, CheckIsSupportSoterAuthenticationCompleteCallback as CheckIsSupportSoterAuthenticationCompleteCallback, CheckIsSupportSoterAuthenticationFail as CheckIsSupportSoterAuthenticationFail, CheckIsSupportSoterAuthenticationFailCallback as CheckIsSupportSoterAuthenticationFailCallback, CheckIsSupportSoterAuthenticationOptions as CheckIsSupportSoterAuthenticationOptions, CheckIsSupportSoterAuthenticationSuccess as CheckIsSupportSoterAuthenticationSuccess, CheckIsSupportSoterAuthenticationSuccessCallback as CheckIsSupportSoterAuthenticationSuccessCallback, SoterAuthMode as SoterAuthMode, StartSoterAuthentication as StartSoterAuthentication, StartSoterAuthenticationComplete as StartSoterAuthenticationComplete, StartSoterAuthenticationCompleteCallback as StartSoterAuthenticationCompleteCallback, StartSoterAuthenticationFail as StartSoterAuthenticationFail, StartSoterAuthenticationFailCallback as StartSoterAuthenticationFailCallback, StartSoterAuthenticationOptions as StartSoterAuthenticationOptions, StartSoterAuthenticationSuccess as StartSoterAuthenticationSuccess, StartSoterAuthenticationSuccessCallback as StartSoterAuthenticationSuccessCallback };
+export { ICheckIsSoterEnrolledInDeviceFail as ICheckIsSoterEnrolledInDeviceFail, ICheckIsSupportSoterAuthenticationFail as ICheckIsSupportSoterAuthenticationFail, IStartSoterAuthenticationFail as IStartSoterAuthenticationFail };
+export { startSoterAuthentication as startSoterAuthentication };
+export { checkIsSupportSoterAuthentication as checkIsSupportSoterAuthentication };
+export { checkIsSoterEnrolledInDevice as checkIsSoterEnrolledInDevice };
+ÀÔrD“²@ohos.promptAction¶@ohos.userIAM.userAuth»@dcloudio/uni-app-frameworkÔrE—ªassertions¨external¢id¤meta±moduleSideEffectsªresolvedByµsyntheticNamedExportsAÃÙo hvigor_ignore__Applications_DevEco-Studio.app_Contents_sdk_default_openharmony_ets_api_@ohos.promptAction.d.tsAÃªoh-resolveÂEAÃÙs hvigor_ignore__Applications_DevEco-Studio.app_Contents_sdk_default_openharmony_ets_api_@ohos.userIAM.userAuth.d.tsAÃªoh-resolveÂEAÂÙî/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/framework/index.etsAÃªoh-resolveÂ“ÔrF–§version¤fileªsourceRoot§sources¥names¨mappings¨index.js ‘©index.etsÜx”   ” ”	 	” ” <” ?” ÌX”' Ìf”) Ìh”3 Ìr”5 Ìt”; Ìz”ÌX Ì—”ÌY Ì˜–”   ” 	” ” ”- )”. *–”   ” 	” ” ”- 5”. 6•”   ” ”% &”. .”7 7‘”  •” 	” 	” 	 ” 	$” 	%•” 
+”  
+”# 
+)”' 
+-”( 
+.’”  ” ‘” •”   ” ”% &”. .”7 7‘”  •” ” ” ” #” $•” ” ” !” %”  &•” ” ” >” ÌB” ÌC•” ” ” 8” <” =•” ” ” Ì@” ÌD” ÌE’”  ” ‘” •”   ” ”. /”7 7”Ì@ Ì@‘”  •”  ( ” (”. (/”7 (7”Ì@ (Ì@‘” ( •” )” )” )ÌG” )ÌK” )ÌL•” *” *” *ÌA” *ÌE” *ÌF•” +” +” +ÌI” +ÌM” +ÌN’” , ” ,‘” ,•”  . ” .”) .*”2 .2”; .;‘” 1•”  9 ” 9”) 9*”2 92”; 9;‘” 9 •” ;” ;” ;ÌB” ;ÌF” ;ÌG•” <” <” <<” <Ì@” <ÌA•” =” =” =ÌD” =ÌH” =ÌI’” > ” >‘” >–”  ? ” ?”$ ?$”' ?'”ÌA ?ÌA”ÌB ?ÌB””  Ì@ ” Ì@”( Ì@(”+ Ì@ÌX–” ÌA” ÌA” ÌA” ÌA” ÌA” ÌAÌI‘” ÌB’” ÌC” ÌC•” ÌD” ÌD” ÌD” ÌD” ÌDÜ ” ÌE” ÌE” ÌE” ÌE” ÌE”# ÌE#”$ ÌE$”1 ÌE1”2 ÌE2”6 ÌE6”7 ÌE7”< ÌE<”= ÌE=”ÌE ÌEÌE”ÌF ÌEÌF”ÌN ÌEÌN”ÌO ÌEÌO”ÌQ ÌEÌQ”” ÌF” ÌF”2 ÌF2”3 ÌF3‘” ÌG”” ÌH” ÌH”  ÌH ”! ÌH!’” ÌI” ÌI‘”	 ÌJ	’” ÌK” ÌK’” ÌL” ÌL—”  ÌM ” ÌM”* ÌM*”- ÌM-”1 ÌM1”4 ÌM4”5 ÌMÌN‘” ÌN’” ÌO” ÌO‘” ÌP”” ÌQ” ÌQ” ÌQ” ÌQ”” ÌR” ÌR” ÌR” ÌR‘”	 ÌS	‘” ÌT‘” ÌU’” ÌV” ÌV‘” ÌW”” ÌX” ÌX” ÌX” ÌX”” ÌY” ÌY” ÌY” ÌY‘”	 ÌZ	‘” Ì[‘” Ì\’” Ì]” Ì]‘” Ì^”” Ì_” Ì_” Ì_” Ì_‘”	 Ì`	‘” Ìa“” Ìb” Ìb” Ìb–”  Ìc ” Ìc”+ Ìc+”. Ìc.”ÌL ÌcÌL”ÌM ÌcÌM””  Ìd ” Ìd” Ìd” Ìd(’” Ìe” Ìe’” Ìf” Ìf’” Ìg” Ìg’” Ìh” Ìh””  Ìi ” Ìi”, Ìi,”/ ÌiÌ`–” Ìj” Ìj” Ìj” Ìj” Ìj” ÌjÌI‘” Ìk’” Ìl” Ìl•” Ìm” Ìm” Ìm” Ìm” Ìmš” Ìn” Ìn” Ìn”# Ìn#”$ Ìn$”, Ìn,”- Ìn-”2 ÌnÌC”3 ÌnÌD”5 ÌnÌF”” Ìo” Ìo”/ Ìo/”0 Ìo0‘” Ìp”” Ìq” Ìq”  Ìq ”! Ìq!’” Ìr” Ìr‘”	 Ìs	’” Ìt” Ìt’” Ìu” Ìu—”  Ìv ” Ìv”+ Ìv+”. Ìv.”2 Ìv2”5 Ìv5”6 ÌvÌO‘” Ìw’” Ìx” Ìx‘” Ìy”” Ìz” Ìz” Ìz” Ìz‘”	 Ì{	‘” Ì|“” Ì}” Ì}” Ì}–”  Ì~ ” Ì~”/ Ì~/”2 Ì~2”ÌU Ì~ÌU”ÌV Ì~ÌV—”  Ì ” Ì” Ì”  Ì5”$ Ì9”' Ì<”( Ì=‘” Ì€’” Ì” Ì’” Ì‚” Ì‚‘” Ìƒ‘” Ì„’” Ì…” Ì…’” Ì†”1 Ì†1‘” Ì‡‘” Ìˆ’” Ì‰” Ì‰’” ÌŠ” ÌŠ‘” Ì‹‘” ÌŒ’” Ì” Ì’” Ì” Ì‘” Ì‘” Ì’” Ì‘” Ì‘’” Ì’” Ì’‘” Ì“‘” Ì”’” Ì•” Ì•’” Ì–” Ì–‘” Ì—‘” Ì˜’” Ì™” Ì™’” Ìš”* Ìš*‘” Ì›‘” Ìœ’” Ì” Ì’” Ì”% Ì%‘” ÌŸ‘” Ì ’” Ì¡” Ì¡’” Ì¢”( Ì¢(‘” Ì£‘” Ì¤’” Ì¥” Ì¥’” Ì¦”) Ì¦)‘” Ì§‘” Ì¨’” Ì©” Ì©’” Ìª”0 Ìª0‘” Ì«‘” Ì¬’” Ì­” Ì­’” Ì®”ÌN Ì®ÌN‘” Ì¯‘” Ì°’” Ì±” Ì±’” Ì²”/ Ì²/‘” Ì³‘” Ì´’” Ìµ” Ìµ’” Ì¶”4 Ì¶4‘” Ì·‘” Ì¸’” Ì¹” Ì¹’” Ìº”? Ìº?‘” Ì»“” Ì¼” Ì¼” Ì¼•”  Ì½ ”	 Ì½	”& Ì½&”' Ì½'”. Ì½6” Ì¾” Ì¾” Ì¾” Ì¾” Ì¾” Ì¾”- Ì¾-”/ Ì¾/”6 Ì¾6”7 Ì¾7”; Ì¾;”= Ì¾=”> Ì¾>’”  Ì¿ ” Ì¿•”  ÌÀ ”	 ÌÀ	” ÌÀ” ÌÀ” ÌÀ"”” ÌÁ” ÌÁ” ÌÁ” ÌÁ“” ÌÂ” ÌÂ” ÌÂ”” ÌÃ” ÌÃ” ÌÃ” ÌÃ“” ÌÄ” ÌÄ” ÌÄ”” ÌÅ” ÌÅ” ÌÅ” ÌÅ—” ÌÆ” ÌÆ” ÌÆ” ÌÆ”( ÌÆ(”) ÌÆ)”- ÌÆ-”” ÌÇ” ÌÇ” ÌÇ” ÌÇ—” ÌÈ” ÌÈ” ÌÈ” ÌÈ”( ÌÈ(”) ÌÈ)”6 ÌÈ6”” ÌÉ” ÌÉ” ÌÉ” ÌÉ—” ÌÊ” ÌÊ” ÌÊ” ÌÊ”( ÌÊ(”) ÌÊ)”1 ÌÊ1”” ÌË” ÌË” ÌË” ÌË—” ÌÌ” ÌÌ” ÌÌ” ÌÌ”( ÌÌ(”) ÌÌ)”0 ÌÌ0”” ÌÍ” ÌÍ” ÌÍ” ÌÍ—” ÌÎ” ÌÎ” ÌÎ” ÌÎ”( ÌÎ(”) ÌÎ)”9 ÌÎ9”” ÌÏ” ÌÏ” ÌÏ” ÌÏ—” ÌĞ” ÌĞ” ÌĞ” ÌĞ”( ÌĞ(”) ÌĞ)”Ì@ ÌĞÌ@”” ÌÑ” ÌÑ” ÌÑ” ÌÑ—” ÌÒ” ÌÒ” ÌÒ” ÌÒ”( ÌÒ(”) ÌÒ)”- ÌÒ-”” ÌÓ” ÌÓ” ÌÓ” ÌÓ—” ÌÔ” ÌÔ” ÌÔ” ÌÔ”( ÌÔ(”) ÌÔ)”/ ÌÔ/”” ÌÕ” ÌÕ” ÌÕ” ÌÕ—” ÌÖ” ÌÖ” ÌÖ” ÌÖ”( ÌÖ(”) ÌÖ)”5 ÌÖ5”” Ì×” Ì×” Ì×” Ì×—” ÌØ” ÌØ” ÌØ” ÌØ”( ÌØ(”) ÌØ)”= ÌØ=”” ÌÙ” ÌÙ” ÌÙ” ÌÙ“” ÌÚ” ÌÚ” ÌÚ”” ÌÛ” ÌÛ” ÌÛ” ÌÛ‘” ÌÜ”” Ìİ” Ìİ” Ìİ” Ìİ‘” ÌŞ’”  Ìß ” Ìß—”  Ìà ”	 Ìà	” Ìà” Ìà”! Ìà)”# Ìà+”* Ìà:›” Ìá” Ìá” Ìá” Ìá” Ìá”  Ìá ”= Ìá=”> Ìá>”ÌE ÌáÌE”ÌF ÌáÌF”ÌG ÌáÌG’”  Ìâ ” Ìâ™”  Ìã ”	 Ìã	” Ìã” Ìã”  Ìã3”" Ìã5”) ÌãÌD”+ ÌãÌF”5 ÌãÌX™” Ìä”
+ Ìä
+” Ìä” Ìä”  Ìä ”! Ìä!”+ Ìä+”, Ìä,”- Ìä-œ” Ìå” Ìå” Ìå” Ìå” Ìå”$ Ìå$”% Ìå%”, Ìå,”. Ìå.”5 Ìå5”6 Ìå6”8 Ìå8’” Ìæ” Ìæ“” Ìç” Ìç” Ìç’”  Ìè ” Ìè•”  Ìé ”	 Ìé	” Ìé” Ìé” Ìé–” Ìê”
+ Ìê
+” Ìê” Ìê” Ìê” Ìê —” Ìë”	 Ìë	” Ìë” Ìë” Ìë” Ìë” Ìë›” Ìì” Ìì” Ìì” Ìì” Ìì” Ìì ”" Ìì*”# Ìì+”$ Ìì,”% Ìì-”& Ìì.–” Ìí” Ìí” Ìí” Ìí” Ìí” Ìí˜” Ìî” Ìî” Ìî” Ìî” Ìî” Ìî” Ìî” Ìî‘”	 Ìï	–” Ìï” Ìï” Ìï” Ìï” Ìï ”  Ìï"” Ìğ” Ìğ” Ìğ” Ìğ” Ìğ” Ìğ” Ìğ”  Ìğ ”% Ìğ%”) Ìğ)”* Ìğ*”+ Ìğ+”, Ìğ,”- Ìğ-” Ìñ” Ìñ” Ìñ” Ìñ” Ìñ” Ìñ” Ìñ”  Ìñ ”% Ìñ%”( Ìñ(”, Ìñ,”- Ìñ-”. Ìñ.”/ Ìñ/‘”	 Ìò	–” Ìò” Ìò” Ìò” Ìò”  Ìò"”" Ìò$” Ìó” Ìó” Ìó” Ìó” Ìó” Ìó” Ìó”  Ìó ”% Ìó%”) Ìó)”+ Ìó+”, Ìó,”- Ìó-”. Ìó.Ü ” Ìô” Ìô” Ìô” Ìô” Ìô” Ìô” Ìô”  Ìô ”% Ìô%”) Ìô)”* Ìô*”- Ìô-”1 Ìô1”2 Ìô2”3 Ìô3”4 Ìô4” Ìõ” Ìõ” Ìõ” Ìõ” Ìõ” Ìõ” Ìõ”  Ìõ ”% Ìõ%”( Ìõ(”, Ìõ,”- Ìõ-”. Ìõ.”/ Ìõ/‘”	 Ìö	‘” Ì÷™” Ìø” Ìø” Ìø” Ìø” Ìø” Ìø”! Ìø!”" Ìø"”# Ìø#’”  Ìù ” Ìù”  Ìú ” Ìú” Ìú”! Ìú;”/ ÌúÌI”0 ÌúÌŒ”ÌN ÌúÌª”ÌP ÌúÌ¬”ÌQ ÌúÌ­”ÌU ÌúÌÒ”ÌW ÌúÌÔ”Ì_ ÌúÍ
+”Ìa ÌúÍ”Ìc ÌúÍ–” Ìû”
+ Ìû
+” Ìû” Ìû.” Ìû0” Ìû1›” Ìü” Ìü”	 Ìü	” Ìü” Ìü”! Ìü!”" Ìü"”# Ìü#”' Ìü'”) Ìü(”+ Ìü*–” Ìı” Ìı” Ìı” Ìı”! Ìı!”# Ìı#œ” Ìş” Ìş” Ìş” Ìş” Ìş”" Ìş"”# Ìş#”/ Ìş/”0 Ìş0”; Ìş;”< Ìş<”= Ìş=‘”	 Ìÿ	–” Ìÿ” Ìÿ” Ìÿ” Ìÿ”! Ìÿ#”# Ìÿ%œ” Í ” Í ” Í ” Í ” Í ”" Í "”# Í #”/ Í /”0 Í 0”4 Í 4”5 Í 5”6 Í 6‘”	 Í	”” Í” Í” Í” Í” Í”
+ Í
+” Í” Í”# Í#”$ Í$”( Í(”) Í)”2 Í2”6 Í6”8 Í8”9 Í9”: Í:š” Í”
+ Í
+” Í” Í” Í” Í”( Í(”, Í,”. Í.”/ Í/’” Í” Í˜” Í” Í” Í” Í” Í” Í”1 Í1”2 Í2”” Í” Í” Í”# Í#’” Í” Í˜” Í	” Í	” Í	”$ Í	$”% Í	%”3 Í	3”4 Í	4”8 Í	8’”	 Í
+” Í
+!”” Í” Í” Í” Í“”	 Í!”
+ Í"” Í#—” Í” Í” Í” Í” Í” Í” Í—” Í” Í” Í” Í” Í6” Í7”! Í9œ” Í” Í” Í” Í”! Í!”% Í%”- Í-”. Í.”Ì@ ÍÌ@”ÌA ÍÌA”ÌH ÍÌH”ÌJ ÍÌJ•” Í” Í” Í”$ Í$”% Í%”” Í” Í”! Í!”" Í"Ü ” Í”  Í ”" Í"”( Í(”) Í)”1 Í1”5 Í5”= Í=”> Í>”ÌJ ÍÌJ”ÌK ÍÌK”ÌV ÍÌV”ÌW ÍÌW”ÌX ÍÌX”ÌY ÍÌY”Ìf ÍÌf”Ìg ÍÌg”Ìh ÍÌh”Ìi ÍÌi”Ìq ÍÌq“” Í8” Í9” Í:‘” Í‘” Íœ” Í”" Í"”# Í#”+ Í+”- Í-”ÌG ÍÌG”ÌI ÍÌI”ÌO ÍÌO”ÌP ÍÌP”ÌV ÍÌV”ÌW ÍÌW”ÌX ÍÌX‘” Í’” Í” Í“”	 Í#”
+ Í$” Í%˜” Í” Í” Í” Í” Í”! Í!”" Í"”$ Í$•” Í” Í” Í”" Í"”# Í#”” Í” Í” Í”$ Í$“” Í.” Í/” Í0‘”	 Í	–” Í” Í” Í” Í” Í” Í‘” Í”” Í” Í” Í” Í˜” Í ” Í ” Í ” Í ” Í -” Í .” Í 2”  Í 3š” Í!” Í!” Í!” Í!”! Í!!”; Í!;”= Í!=”ÌA Í!ÌA”ÌB Í!ÌB”ÌC Í!ÌC‘” Í"˜”  Í# ” Í#” Í#”' Í#'”) Í#)”ÌK Í#ÌK”ÌL Í#Ìh”ÌM Í#Ìi“”  Í$ ”	 Í$	” Í$’” Í%” Í%Ü ” Í&” Í&” Í&”# Í&#”$ Í&$”, Í&,”- Í&-”9 Í&9”: Í&:”ÌE Í&ÌE”ÌG Í&ÌG”ÌO Í&ÌO”ÌP Í&ÌP”Ì^ Í&Ì^”Ì_ Í&Ì_”Ìc Í&Ìc”Ìd Í&Ìd”Ìe Í&Ìe”” Í'” Í'” Í'” Í'‘” Í(”” Í(” Í(” Í(” Í(’” Í)” Í)–” Í*” Í*” Í*”' Í*'”( Í*(”4 Í*4–” Í+” Í+” Í+”' Í+'”( Í+(”3 Í+3™”	 Í,	”
+ Í,
+” Í,” Í,” Í,+” Í,,” Í,0” Í,1”  Í,3”” Í-” Í-” Í-” Í-‘”	 Í.	”” Í/” Í/” Í/” Í/‘” Í0’”  Í1 ” Í1“”  Í2 ”	 Í2	” Í2’” Í3” Í3Ü ” Í4” Í4” Í4”# Í4#”$ Í4$”, Í4,”- Í4-”9 Í49”: Í4:”> Í4>”Ì@ Í4Ì@”ÌH Í4ÌH”ÌI Í4ÌI”ÌW Í4ÌW”ÌX Í4ÌX”Ì\ Í4Ì\”Ì] Í4Ì]”Ì^ Í4Ì^”” Í5” Í5” Í5” Í5‘” Í6”” Í6” Í6” Í6” Í6’” Í7” Í7–” Í8” Í8” Í8”' Í8'”( Í8(”4 Í84–” Í9” Í9” Í9”' Í9'”( Í9(”3 Í93™”	 Í:	”
+ Í:
+” Í:” Í:” Í:+” Í:,” Í:0” Í:1”  Í:3”” Í;” Í;” Í;” Í;‘”	 Í<	”” Í=” Í=” Í=” Í=‘” Í>’”  Í? ” Í?””  Í@ ” Í@” Í@” Í@’” ÍA”& ÍA&’” ÍB” ÍB”  ÍC ” ÍC”' ÍC'”* ÍCÌM”8 ÍCÌ[”9 ÍCÌ°”Ìb ÍCÌÙ”Ìd ÍCÌÛ”Ìe ÍCÌÜ”Ìi ÍCÍ
+”Ìk ÍCÍ”Ìs ÍCÍK”Ìu ÍCÍL”Ìw ÍCÍN›” ÍD” ÍD” ÍD”& ÍD&”' ÍD'”2 ÍD2”4 ÍD4”5 ÍD5”= ÍDÌF”? ÍDÌG”ÌA ÍDÌI”” ÍE” ÍE” ÍE” ÍE’” ÍF” ÍF–” ÍG” ÍG”! ÍG!”$ ÍG5”& ÍG7”' ÍG8”” ÍH” ÍH”( ÍH(”* ÍH*˜” ÍH,” ÍH7”  ÍH8”$ ÍH<”% ÍH=”2 ÍHÌJ”3 ÍHÌK”4 ÍHÌL”” ÍI” ÍI”! ÍI!”# ÍI#˜” ÍI%” ÍI0”  ÍI1”$ ÍI5”% ÍI6”- ÍI>”. ÍI?”/ ÍIÌ@•” ÍJ” ÍJ” ÍJ”  ÍJ ”! ÍJ!’” ÍK” ÍK”” ÍL” ÍL” ÍL” ÍL“” ÍM=” ÍM>” ÍM?‘” ÍN”” ÍN” ÍN” ÍN” ÍN˜” ÍO” ÍO” ÍO” ÍO”" ÍO5”# ÍO6”' ÍO:”( ÍO;š” ÍP” ÍP” ÍP”' ÍP'”) ÍP)”ÌL ÍPÌL”ÌN ÍPÌN”ÌR ÍPÌR”ÌS ÍPÌS”ÌT ÍPÌT‘” ÍQ‘”	 ÍR	‘” ÍRš” ÍS” ÍS” ÍS”# ÍS#”% ÍS%”ÌH ÍSÌH”ÌJ ÍSÌJ”ÌM ÍSÌM”ÌN ÍSÌN”ÌO ÍSÌO‘”	 ÍT	•” ÍU” ÍU” ÍU”
+ ÍU	” ÍUš” ÍV” ÍV” ÍV” ÍV”! ÍV!”ÌD ÍVÌD”ÌF ÍVÌF”ÌI ÍVÌI”ÌJ ÍVÌJ”ÌK ÍVÌK”” ÍW” ÍW” ÍW” ÍW””  ÍX ” ÍX” ÍX'” ÍX(“”  ÍY ”	 ÍY	”$ ÍY$œ” ÍZ” ÍZ” ÍZ” ÍZ” ÍZ”& ÍZ&”' ÍZ'”3 ÍZ3”4 ÍZ4”? ÍZ?”Ì@ ÍZÌ@”ÌA ÍZÌA”” Í[” Í[” Í[” Í[’”  Í\ ” Í\“”  Í] ”	 Í]	” Í]œ” Í^” Í^” Í^” Í^” Í^”& Í^&”' Í^'”3 Í^3”4 Í^4”8 Í^8”9 Í^9”: Í^:”” Í_” Í_” Í_” Í_’”  Í` ” Í`•”  Ía ”	 Ía	”, Ía,”- Ía-”: ÍaÌI–” Íb” Íb” Íb” Íb”& Íb&”( Íb(•” Íc” Íc”* Íc*”, Íc,”- Íc-‘” Íd–”	 Íd” Íd” Íd” Íd ”& Íd(”( Íd*•” Íe” Íe”# Íe#”% Íe%”& Íe&‘” Íf”” Íg” Íg” Íg” Íg’”  Íh ” Íh”  Íi ” Íi”" Íi"”% ÍiÌC”3 ÍiÌQ”4 ÍiÌœ”ÌY ÍiÌÁ”Ì[ ÍiÌÃ”Ì\ ÍiÌÄ”Ì` ÍiÌí”Ìb ÍiÌï”Ìj ÍiÍ)”Ìl ÍiÍ*”Ìn ÍiÍ,›” Íj” Íj” Íj”& Íj&”' Íj'”2 Íj2”4 Íj4”5 Íj5”= ÍjÌF”? ÍjÌG”ÌA ÍjÌI”” Ík” Ík” Ík” Ík’” Íl” Íl›” Ím” Ím”  Ím ”# Ím#”ÌF ÍmÌF”ÌG ÍmÌG”ÌK ÍmÌK”ÌL ÍmÌL”ÌY ÍmÌY”ÌZ ÍmÌZ”Ì[ ÍmÌ[•” Ín” Ín” Ín”  Ín ”! Ín!’” Ío” Ío”” Íp” Íp” Íp” Íp“” Íq8” Íq9” Íq:‘” Ír”” Ír” Ír” Ír” Ír˜” Ís” Ís” Ís” Ís”" Ís5”# Ís6”' Ís:”( Ís;š” Ít” Ít” Ít”' Ít'”) Ít)”ÌG ÍtÌG”ÌI ÍtÌI”ÌM ÍtÌM”ÌN ÍtÌN”ÌO ÍtÌO‘” Íu‘”	 Ív	‘” Ívš” Íw” Íw” Íw”# Íw#”% Íw%”ÌC ÍwÌC”ÌE ÍwÌE”ÌH ÍwÌH”ÌI ÍwÌI”ÌJ ÍwÌJ‘”	 Íx	•” Íy” Íy” Íy”
+ Íy	” Íyš” Íz” Íz” Íz” Íz”! Íz!”? Íz?”ÌA ÍzÌA”ÌD ÍzÌD”ÌE ÍzÌE”ÌF ÍzÌF”” Í{” Í{” Í{” Í{˜”  Í| ” Í|” Í|”( Í|(”* Í|*”ÌP Í|ÌP”ÌQ Í|Ìq”ÌR Í|ÌrÜ ”  Í} ” Í}”	 Í}Í”, Í}Í²”0 Í}Í¶”ÌS Í}ÍÙ”ÌU Í}ÍÛ”Ìx Í}Íş”Ì| Í}Í”ÌŸ Í}Í%”Ì¡ Í}Í;”ÌÉ Í}Íc”ÌÍ Í}Íg”Ìõ Í}Í”Ì÷ Í}Í‘”Í Í}Í¹”Í# Í}Í½”ÍK Í}Íå”ÍM Í}ÍË”Íl Í}Íê”Íp Í}Íî”Í Í}Í”Í‘ Í}Í”Í° Í}Í.”Í´ Í}Í2”ÍÓ Í}ÍQ”ÍÕ Í}Í§”ÍÖ Í}Í¨˜”  Í ” Í”	 Í	”! Í!”% Í%”= Í=”? Í?”Ì@ ÍÌ@˜”  Í€ ” Í€”	 Í€	”* Í€*”. Í€.”ÌO Í€ÌO”ÌQ Í€ÌQ”ÌR Í€ÌR˜”  Í ” Í”	 Í	”% Í%”) Í)”ÌE ÍÌE”ÌG ÍÌG”ÌH ÍÌHÔrG–§version¤file§sources®sourcesContent¥names¨mappingsÀ‘À‘ÀÜy‘”    ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”  	 ‘”  
+ ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”    ‘”  ! ‘”  " ‘”  # ‘”  $ ‘”  % ‘”  & ‘”  ' ‘”  ( ‘”  ) ‘”  * ‘”  + ‘”  , ‘”  - ‘”  . ‘”  / ‘”  0 ‘”  1 ‘”  2 ‘”  3 ‘”  4 ‘”  5 ‘”  6 ‘”  7 ‘”  8 ‘”  9 ‘”  : ‘”  ; ‘”  < ‘”  = ‘”  > ‘”  ? ‘”  Ì@ ‘”  ÌA ‘”  ÌB ‘”  ÌC ‘”  ÌD ‘”  ÌE ‘”  ÌF ‘”  ÌG ‘”  ÌH ‘”  ÌI ‘”  ÌJ ‘”  ÌK ‘”  ÌL ‘”  ÌM ‘”  ÌN ‘”  ÌO ‘”  ÌP ‘”  ÌQ ‘”  ÌR ‘”  ÌS ‘”  ÌT ‘”  ÌU ‘”  ÌV ‘”  ÌW ‘”  ÌX ‘”  ÌY ‘”  ÌZ ‘”  Ì[ ‘”  Ì\ ‘”  Ì] ‘”  Ì^ ‘”  Ì_ ‘”  Ì` ‘”  Ìa ‘”  Ìb ‘”  Ìc ‘”  Ìd ‘”  Ìe ‘”  Ìf ‘”  Ìg ‘”  Ìh ‘”  Ìi ‘”  Ìj ‘”  Ìk ‘”  Ìl ‘”  Ìm ‘”  Ìn ‘”  Ìo ‘”  Ìp ‘”  Ìq ‘”  Ìr ‘”  Ìs ‘”  Ìt ‘”  Ìu ‘”  Ìv ‘”  Ìw ‘”  Ìx ‘”  Ìy ‘”  Ìz ‘”  Ì{ ‘”  Ì| ‘”  Ì} ‘”  Ì~ ‘”  Ì ‘”  Ì€ ‘”  Ì ‘”  Ì‚ ‘”  Ìƒ ‘”  Ì„ ‘”  Ì… ‘”  Ì† ‘”  Ì‡ ‘”  Ìˆ ‘”  Ì‰ ‘”  ÌŠ ‘”  Ì‹ ‘”  ÌŒ ‘”  Ì ‘”  Ì ‘”  Ì ‘”  Ì ‘”  Ì‘ ‘”  Ì’ ‘”  Ì“ ‘”  Ì” ‘”  Ì• ‘”  Ì– ‘”  Ì— ‘”  Ì˜ ‘”  Ì™ ‘”  Ìš ‘”  Ì› ‘”  Ìœ ‘”  Ì ‘”  Ì ‘”  ÌŸ ‘”  Ì  ‘”  Ì¡ ‘”  Ì¢ ‘”  Ì£ ‘”  Ì¤ ‘”  Ì¥ ‘”  Ì¦ ‘”  Ì§ ‘”  Ì¨ ‘”  Ì© ‘”  Ìª ‘”  Ì« ‘”  Ì¬ ‘”  Ì­ ‘”  Ì® ‘”  Ì¯ ‘”  Ì° ‘”  Ì± ‘”  Ì² ‘”  Ì³ ‘”  Ì´ ‘”  Ìµ ‘”  Ì¶ ‘”  Ì· ‘”  Ì¸ ‘”  Ì¹ ‘”  Ìº ‘”  Ì» ‘”  Ì¼ ‘”  Ì½ ‘”  Ì¾ ‘”  Ì¿ ‘”  ÌÀ ‘”  ÌÁ ‘”  ÌÂ ‘”  ÌÃ ‘”  ÌÄ ‘”  ÌÅ ‘”  ÌÆ ‘”  ÌÇ ‘”  ÌÈ ‘”  ÌÉ ‘”  ÌÊ ‘”  ÌË ‘”  ÌÌ ‘”  ÌÍ ‘”  ÌÎ ‘”  ÌÏ ‘”  ÌĞ ‘”  ÌÑ ‘”  ÌÒ ‘”  ÌÓ ‘”  ÌÔ ‘”  ÌÕ ‘”  ÌÖ ‘”  Ì× ‘”  ÌØ ‘”  ÌÙ ‘”  ÌÚ ‘”  ÌÛ ‘”  ÌÜ ‘”  Ìİ ‘”  ÌŞ ‘”  Ìß ‘”  Ìà ‘”  Ìá ‘”  Ìâ ‘”  Ìã ‘”  Ìä ‘”  Ìå ‘”  Ìæ ‘”  Ìç ‘”  Ìè ‘”  Ìé ‘”  Ìê ‘”  Ìë ‘”  Ìì ‘”  Ìí ‘”  Ìî ‘”  Ìï ‘”  Ìğ ‘”  Ìñ ‘”  Ìò ‘”  Ìó ‘”  Ìô ‘”  Ìõ ‘”  Ìö ‘”  Ì÷ ‘”  Ìø ‘”  Ìù ‘”  Ìú ‘”  Ìû ‘”  Ìü ‘”  Ìı ‘”  Ìş ‘”  Ìÿ ‘”  Í  ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í	 ‘”  Í
+ ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í  ‘”  Í! ‘”  Í" ‘”  Í# ‘”  Í$ ‘”  Í% ‘”  Í& ‘”  Í' ‘”  Í( ‘”  Í) ‘”  Í* ‘”  Í+ ‘”  Í, ‘”  Í- ‘”  Í. ‘”  Í/ ‘”  Í0 ‘”  Í1 ‘”  Í2 ‘”  Í3 ‘”  Í4 ‘”  Í5 ‘”  Í6 ‘”  Í7 ‘”  Í8 ‘”  Í9 ‘”  Í: ‘”  Í; ‘”  Í< ‘”  Í= ‘”  Í> ‘”  Í? ‘”  Í@ ‘”  ÍA ‘”  ÍB ‘”  ÍC ‘”  ÍD ‘”  ÍE ‘”  ÍF ‘”  ÍG ‘”  ÍH ‘”  ÍI ‘”  ÍJ ‘”  ÍK ‘”  ÍL ‘”  ÍM ‘”  ÍN ‘”  ÍO ‘”  ÍP ‘”  ÍQ ‘”  ÍR ‘”  ÍS ‘”  ÍT ‘”  ÍU ‘”  ÍV ‘”  ÍW ‘”  ÍX ‘”  ÍY ‘”  ÍZ ‘”  Í[ ‘”  Í\ ‘”  Í] ‘”  Í^ ‘”  Í_ ‘”  Í` ‘”  Ía ‘”  Íb ‘”  Íc ‘”  Íd ‘”  Íe ‘”  Íf ‘”  Íg ‘”  Íh ‘”  Íi ‘”  Íj ‘”  Ík ‘”  Íl ‘”  Ím ‘”  Ín ‘”  Ío ‘”  Íp ‘”  Íq ‘”  Ír ‘”  Ís ‘”  Ít ‘”  Íu ‘”  Ív ‘”  Íw ‘”  Íx ÔrH’§missing¦pluginÃ¦genAbcÂÔ  ÔrI”²dynamicImportCache¹exportAllDeclarationCache»exportNamedDeclarationCache«importCache”ÔrJ–¤type¥start£end«declarationªspecifiers¦source¶ExportNamedDeclarationÍ+9Í-À–ÔrK•¤type¥start£end¥local¨exported¯ExportSpecifierÍ+BÍ+ŒÔrL”¤type¥start£end¤nameªIdentifierÍ+BÍ+eÙ#CheckIsSoterEnrolledInDeviceOptionsLªIdentifierÍ+iÍ+ŒÙ#CheckIsSoterEnrolledInDeviceOptionsK¯ExportSpecifierÍ+Í+ØLªIdentifierÍ+Í+±Ù#CheckIsSoterEnrolledInDeviceSuccessLªIdentifierÍ+µÍ+ØÙ#CheckIsSoterEnrolledInDeviceSuccessK¯ExportSpecifierÍ+ÚÍ,.LªIdentifierÍ+ÚÍ,Ù(CheckIsSupportSoterAuthenticationOptionsLªIdentifierÍ,Í,.Ù(CheckIsSupportSoterAuthenticationOptionsK¯ExportSpecifierÍ,0Í,„LªIdentifierÍ,0Í,XÙ(CheckIsSupportSoterAuthenticationSuccessLªIdentifierÍ,\Í,„Ù(CheckIsSupportSoterAuthenticationSuccessK¯ExportSpecifierÍ,†Í,ÈLªIdentifierÍ,†Í,¥¿StartSoterAuthenticationOptionsLªIdentifierÍ,©Í,È¿StartSoterAuthenticationOptionsK¯ExportSpecifierÍ,ÊÍ-LªIdentifierÍ,ÊÍ,é¿StartSoterAuthenticationSuccessLªIdentifierÍ,íÍ-¿StartSoterAuthenticationSuccessÀJ¶ExportNamedDeclarationÍ-Í-QÀ‘K¯ExportSpecifierÍ-Í-NLªIdentifierÍ-Í-2¸startSoterAuthenticationLªIdentifierÍ-6Í-N¸startSoterAuthenticationÀJ¶ExportNamedDeclarationÍ-SÍ-¥À‘K¯ExportSpecifierÍ-\Í-¢LªIdentifierÍ-\Í-}Ù!checkIsSupportSoterAuthenticationLªIdentifierÍ-Í-¢Ù!checkIsSupportSoterAuthenticationÀJ¶ExportNamedDeclarationÍ-§Í-ïÀ‘K¯ExportSpecifierÍ-°Í-ìLªIdentifierÍ-°Í-Ì¼checkIsSoterEnrolledInDeviceLªIdentifierÍ-ĞÍ-ì¼checkIsSoterEnrolledInDeviceÀ“ÔrM•¤type¥start£endªspecifiers¦source±ImportDeclaration ÌY”ÔrN•¤type¥start£end¨imported¥local¯ImportSpecifier	LªIdentifier	©UTSObjectLªIdentifier	©UTSObjectN¯ImportSpecifierLªIdentifier£UTSLªIdentifier£UTSN¯ImportSpecifier'LªIdentifier'®defineAsyncApiLªIdentifier'®defineAsyncApiN¯ImportSpecifier)3LªIdentifier)3ªUTSHarmonyLªIdentifier)3ªUTSHarmonyÔrO•¤type¥start£end¥value£raw§Literal;ÌX»@dcloudio/uni-app-framework½"@dcloudio/uni-app-framework"M±ImportDeclarationÌ[Ì‰‘ÔrP”¤type¥start£end¥local¶ImportDefaultSpecifierÌbÌnLªIdentifierÌbÌn¬promptActionO§LiteralÌtÌˆ²@ohos.promptAction´"@ohos.promptAction"M±ImportDeclarationÌ‹Ì¹‘P¶ImportDefaultSpecifierÌ’ÌšLªIdentifierÌ’Ìš¨userAuthO§LiteralÌ Ì¸¶@ohos.userIAM.userAuth¸"@ohos.userIAM.userAuth"

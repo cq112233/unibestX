@@ -1,0 +1,52 @@
+// 本文件为自动构建生成
+import {
+  GetUniverifyManager as GetUniverifyManagerOrigin,
+  GetUniVerifyManager as GetUniVerifyManagerOrigin,
+  UniVerifyManager as UniVerifyManagerOrigin,
+  UniVerifyManager as UniVerifyManagerOrigin,
+  UniverifyManager as UniverifyManagerOrigin,
+  UniVerifyManagerPreLoginOptions as UniVerifyManagerPreLoginOptionsOrigin,
+  UniVerifyManagerLoginOptions as UniVerifyManagerLoginOptionsOrigin,
+  UniVerifyManagerCustomLoginOptions as UniVerifyManagerCustomLoginOptionsOrigin,
+  UniVerifyManagerLoginStyle as UniVerifyManagerLoginStyleOrigin,
+  UniVerifyManagerPreLoginSuccess as UniVerifyManagerPreLoginSuccessOrigin,
+  UniVerifyManagerPreLoginSuccessCallback as UniVerifyManagerPreLoginSuccessCallbackOrigin,
+  UniVerifyManagerPreLoginFail as UniVerifyManagerPreLoginFailOrigin,
+  UniVerifyManagerPreLoginFailCallback as UniVerifyManagerPreLoginFailCallbackOrigin,
+  UniVerifyManagerPreLoginComplete as UniVerifyManagerPreLoginCompleteOrigin,
+  UniVerifyManagerPreLoginCompleteCallback as UniVerifyManagerPreLoginCompleteCallbackOrigin,
+  UniVerifyManagerLoginSuccess as UniVerifyManagerLoginSuccessOrigin,
+  UniVerifyManagerLoginSuccessCallback as UniVerifyManagerLoginSuccessCallbackOrigin,
+  UniVerifyManagerLoginFail as UniVerifyManagerLoginFailOrigin,
+  UniVerifyManagerLoginFailCallback as UniVerifyManagerLoginFailCallbackOrigin,
+  UniVerifyManagerLoginComplete as UniVerifyManagerLoginCompleteOrigin,
+  UniVerifyManagerLoginCompleteCallback as UniVerifyManagerLoginCompleteCallbackOrigin,
+  UniVerifyManagerErrorCode as UniVerifyManagerErrorCodeOrigin,
+  Uni as UniOrigin
+} from './interface'
+
+declare global {
+  type GetUniverifyManager = GetUniverifyManagerOrigin
+  type GetUniVerifyManager = GetUniVerifyManagerOrigin
+  type UniVerifyManager = UniVerifyManagerOrigin
+  type UniVerifyManager = UniVerifyManagerOrigin
+  type UniverifyManager = UniverifyManagerOrigin
+  type UniVerifyManagerPreLoginOptions = UniVerifyManagerPreLoginOptionsOrigin
+  type UniVerifyManagerLoginOptions = UniVerifyManagerLoginOptionsOrigin
+  type UniVerifyManagerCustomLoginOptions = UniVerifyManagerCustomLoginOptionsOrigin
+  type UniVerifyManagerLoginStyle = UniVerifyManagerLoginStyleOrigin
+  type UniVerifyManagerPreLoginSuccess = UniVerifyManagerPreLoginSuccessOrigin
+  type UniVerifyManagerPreLoginSuccessCallback = UniVerifyManagerPreLoginSuccessCallbackOrigin
+  type UniVerifyManagerPreLoginFail = UniVerifyManagerPreLoginFailOrigin
+  type UniVerifyManagerPreLoginFailCallback = UniVerifyManagerPreLoginFailCallbackOrigin
+  type UniVerifyManagerPreLoginComplete = UniVerifyManagerPreLoginCompleteOrigin
+  type UniVerifyManagerPreLoginCompleteCallback = UniVerifyManagerPreLoginCompleteCallbackOrigin
+  type UniVerifyManagerLoginSuccess = UniVerifyManagerLoginSuccessOrigin
+  type UniVerifyManagerLoginSuccessCallback = UniVerifyManagerLoginSuccessCallbackOrigin
+  type UniVerifyManagerLoginFail = UniVerifyManagerLoginFailOrigin
+  type UniVerifyManagerLoginFailCallback = UniVerifyManagerLoginFailCallbackOrigin
+  type UniVerifyManagerLoginComplete = UniVerifyManagerLoginCompleteOrigin
+  type UniVerifyManagerLoginCompleteCallback = UniVerifyManagerLoginCompleteCallbackOrigin
+  type UniVerifyManagerErrorCode = UniVerifyManagerErrorCodeOrigin
+  interface Uni extends UniOrigin { }
+}

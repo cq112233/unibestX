@@ -1,20 +1,20 @@
 <template>
-  <view class="page-container bg-[#f8fafc] min-h-screen pb-30px">
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
     <NavBar title="Album 相册" :auto-back="true" />
-    <view class="p-16px">
+    <view class="p-[16px]">
       <view class="demo-block">
         <text class="demo-label">基础用法</text>
         <up-album :urls="['https://cdn.uviewui.com/uview/album/1.jpg', 'https://cdn.uviewui.com/uview/album/2.jpg']"></up-album>
       </view>
-      <view class="demo-block mt-12px">
+      <view class="demo-block mt-[12px]">
         <text class="demo-label">单图模式</text>
         <up-album :urls="['https://cdn.uviewui.com/uview/album/1.jpg']"></up-album>
       </view>
-      <view class="demo-block mt-12px">
+      <view class="demo-block mt-[12px]">
         <text class="demo-label">指定列数 (4列)</text>
         <up-album :urls="albumUrls" max-count="8" :row-count="4"></up-album>
       </view>
-      <view class="demo-block mt-12px">
+      <view class="demo-block mt-[12px]">
         <text class="demo-label">自定义圆角与间隔</text>
         <up-album :urls="albumUrls" radius="8" space="10"></up-album>
       </view>

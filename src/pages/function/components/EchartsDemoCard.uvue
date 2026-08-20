@@ -1,31 +1,31 @@
 <template>
   <Card :title="echartTitle">
-    <view class="w-full h-280px mt-10px">
+    <view class="w-full h-[280px] mt-[10px]">
       <e-chart ref="echartRef" height="280px" class="w-full h-full" @ready="initEchart" />
     </view>
-    <view class="flex-row justify-between mt-15px">
-      <view class="flex-1 mr-8px">
+    <view class="flex-row justify-between mt-[15px]">
+      <view class="flex-1 mr-[8px]">
         <view
-          class="w-full h-36px rounded-8px flex flex-row items-center justify-center"
+          class="w-full h-[36px] rounded-[8px] flex flex-row items-center justify-center"
           :class="currentType !== 'line' ? 'bg-[#e0edff]' : 'bg-[#3b82f6]'"
           @click="changeToLine"
         >
           <text
-            class="text-12px font-bold"
+            class="text-[12px] font-bold"
             :class="currentType !== 'line' ? 'text-[#3b82f6]' : 'text-[#ffffff]'"
           >
             {{ echartLineText }}
           </text>
         </view>
       </view>
-      <view class="flex-1 mr-8px">
+      <view class="flex-1 mr-[8px]">
         <view
-          class="w-full h-36px rounded-8px flex flex-row items-center justify-center"
+          class="w-full h-[36px] rounded-[8px] flex flex-row items-center justify-center"
           :class="currentType !== 'bar' ? 'bg-[#d1fae5]' : 'bg-[#10b981]'"
           @click="changeToBar"
         >
           <text
-            class="text-12px font-bold"
+            class="text-[12px] font-bold"
             :class="currentType !== 'bar' ? 'text-[#10b981]' : 'text-[#ffffff]'"
           >
             {{ echartBarText }}
@@ -34,12 +34,12 @@
       </view>
       <view class="flex-1">
         <view
-          class="w-full h-36px rounded-8px flex flex-row items-center justify-center"
+          class="w-full h-[36px] rounded-[8px] flex flex-row items-center justify-center"
           :class="currentType !== 'pie' ? 'bg-[#fef3c7]' : 'bg-[#f59e0b]'"
           @click="changeToPie"
         >
           <text
-            class="text-12px font-bold"
+            class="text-[12px] font-bold"
             :class="currentType !== 'pie' ? 'text-[#f59e0b]' : 'text-[#ffffff]'"
           >
             {{ echartPieText }}

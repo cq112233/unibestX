@@ -1,0 +1,47 @@
+import Card from './Card.uvue';
+const __sfc__ = defineComponent({
+    __name: 'TailwindcssDemoCard',
+    setup(__props) {
+        const __ins = getCurrentInstance()!;
+        const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+        const _cache = __ins.renderCache;
+        function navigateToDemo() {
+            uni.navigateTo({
+                url: '/src/sub/tailwindcss/tailwindcss',
+                fail: (err) => {
+                    console.error('navigateToDemo fail:', err, " at src/pages/basic/components/TailwindcssDemoCard.uvue:40");
+                }
+            });
+        }
+        return (): any | null => {
+            return _cV(unref(Card), _uM({ title: "weapp-tailwindcss Demo" }), _uM({
+                default: withSlotCtx((): any[] => [
+                    _cE("view", _uM({ class: "wtu-10fxz8g-0 wtu-n07vof-1" }), [
+                        _cE("text", _uM({ class: "wtu-1swt5i6-2 wtu-7ut3h6-3 wtu-v1603q-4 wtu-1k2vr17-5" }), " 项目已接入 Tailwind CSS v4 + weapp-tailwindcss，支持方括号任意值（如 text-[14px]、mt-[12px]）、dark: 暗黑变体与多端平台变体，一套类名全端生效，写法与 Web 端完全一致。 "),
+                        _cE("view", _uM({ class: "wtu-1ue8wuu-6 wtu-ugr1m2-7 wtu-8yh2zy-8" }), [
+                            _cE("view", _uM({ class: "wtu-3xj2e-9 wtu-1s0c5bc-a wtu-1qnaxng-b wtu-1smlacz-c wtu-s74oky-d wtu-rwf26b-e wtu-6u6y64-f wtu-1rjkyp8-g wtu-9gow7j-h" }), [
+                                _cE("text", _uM({ class: "wtu-9ng6ts-i wtu-155roug-j wtu-p1t5tf-k" }), "Tailwind CSS v4")
+                            ]),
+                            _cE("view", _uM({ class: "wtu-3xj2e-9 wtu-1s0c5bc-a wtu-1qnaxng-b wtu-1smlacz-c wtu-s74oky-d wtu-1796l3j-l wtu-6u6y64-f wtu-1rjkyp8-g wtu-173g5br-m" }), [
+                                _cE("text", _uM({ class: "wtu-9ng6ts-i wtu-itbynk-n wtu-p1t5tf-k" }), "方括号任意值")
+                            ]),
+                            _cE("view", _uM({ class: "wtu-1s0c5bc-a wtu-1qnaxng-b wtu-1smlacz-c wtu-s74oky-d wtu-1v1k4mz-o wtu-6u6y64-f wtu-1rjkyp8-g wtu-h6hcp8-p" }), [
+                                _cE("text", _uM({ class: "wtu-9ng6ts-i wtu-1cm941u-q wtu-p1t5tf-k" }), "dark: 暗黑变体")
+                            ])
+                        ])
+                    ]),
+                    _cE("view", _uM({
+                        class: "wtu-1bmc39l-r wtu-1tf82vj-s wtu-12wk9v6-t wtu-13en0gu-u wtu-vx8l1f-v wtu-1ue8wuu-6 wtu-ugr1m2-7 wtu-xicm2m-w",
+                        onClick: navigateToDemo
+                    }), [
+                        _cE("text", _uM({ class: "wtu-jq9nhf-x wtu-kasb8h-y wtu-1w3ascn-z" }), "进入 weapp-tailwindcss 示例")
+                    ])
+                ]),
+                _: 1 /* STABLE */
+            }));
+        };
+    }
+});
+export default __sfc__;
+const GenSrcPagesBasicComponentsTailwindcssDemoCardStyles = [_uM([["wtu-10fxz8g-0", _pS(_uM([["flexDirection", "column"]]))], ["wtu-n07vof-1", _pS(_uM([["marginBottom", 16]]))], ["wtu-1swt5i6-2", _pS(_uM([["fontSize", 13]]))], ["wtu-7ut3h6-3", _pS(_uM([["color", "#64748b"]]))], ["wtu-v1603q-4", _pS(_uM([["--tw-leading", "18px"], ["lineHeight", "18px"]]))], ["wtu-1k2vr17-5", _pS(_uM([["marginBottom", 12]]))], ["wtu-1ue8wuu-6", _pS(_uM([["flexDirection", "row"]]))], ["wtu-ugr1m2-7", _pS(_uM([["alignItems", "center"]]))], ["wtu-8yh2zy-8", _pS(_uM([["flexWrap", "wrap"]]))], ["wtu-3xj2e-9", _pS(_uM([["marginRight", 6]]))], ["wtu-1s0c5bc-a", _pS(_uM([["marginBottom", 4]]))], ["wtu-1qnaxng-b", _pS(_uM([["paddingLeft", 10], ["paddingRight", 10]]))], ["wtu-1smlacz-c", _pS(_uM([["paddingTop", 3], ["paddingBottom", 3]]))], ["wtu-s74oky-d", _pS(_uM([["borderTopLeftRadius", 20], ["borderTopRightRadius", 20], ["borderBottomRightRadius", 20], ["borderBottomLeftRadius", 20]]))], ["wtu-rwf26b-e", _pS(_uM([["backgroundColor", "#e0edff"]]))], ["wtu-6u6y64-f", _pS(_uM([["--tw-border-style", "solid"], ["borderTopStyle", "var(--tw-border-style)"], ["borderRightStyle", "var(--tw-border-style)"], ["borderBottomStyle", "var(--tw-border-style)"], ["borderLeftStyle", "var(--tw-border-style)"], ["borderTopWidth", 1], ["borderRightWidth", 1], ["borderBottomWidth", 1], ["borderLeftWidth", 1]]))], ["wtu-1rjkyp8-g", _pS(_uM([["--tw-border-style", "solid"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"]]))], ["wtu-9gow7j-h", _pS(_uM([["borderTopColor", "#bfdbfe"], ["borderRightColor", "#bfdbfe"], ["borderBottomColor", "#bfdbfe"], ["borderLeftColor", "#bfdbfe"]]))], ["wtu-9ng6ts-i", _pS(_uM([["fontSize", 11]]))], ["wtu-155roug-j", _pS(_uM([["color", "#2563eb"]]))], ["wtu-p1t5tf-k", _pS(_uM([["--tw-font-weight", "var(--font-weight-medium, 500)"], ["fontWeight", 500]]))], ["wtu-1796l3j-l", _pS(_uM([["backgroundColor", "#d1fae5"]]))], ["wtu-173g5br-m", _pS(_uM([["borderTopColor", "#a7f3d0"], ["borderRightColor", "#a7f3d0"], ["borderBottomColor", "#a7f3d0"], ["borderLeftColor", "#a7f3d0"]]))], ["wtu-itbynk-n", _pS(_uM([["color", "#059669"]]))], ["wtu-1v1k4mz-o", _pS(_uM([["backgroundColor", "#fef3c7"]]))], ["wtu-h6hcp8-p", _pS(_uM([["borderTopColor", "#fde68a"], ["borderRightColor", "#fde68a"], ["borderBottomColor", "#fde68a"], ["borderLeftColor", "#fde68a"]]))], ["wtu-1cm941u-q", _pS(_uM([["color", "#d97706"]]))], ["wtu-1bmc39l-r", _pS(_uM([["width", "100%"]]))], ["wtu-1tf82vj-s", _pS(_uM([["height", 44]]))], ["wtu-12wk9v6-t", _pS(_uM([["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["wtu-13en0gu-u", _pS(_uM([["backgroundColor", "#3b82f6"]]))], ["wtu-vx8l1f-v", _pS(_uM([["display", "flex"]]))], ["wtu-xicm2m-w", _pS(_uM([["justifyContent", "center"]]))], ["wtu-jq9nhf-x", _pS(_uM([["color", "#ffffff"]]))], ["wtu-kasb8h-y", _pS(_uM([["fontSize", 14]]))], ["wtu-1w3ascn-z", _pS(_uM([["--tw-font-weight", "var(--font-weight-bold, 700)"], ["fontWeight", 700]]))]])];
+//# sourceMappingURL=TailwindcssDemoCard.uvue.map

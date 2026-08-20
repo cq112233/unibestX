@@ -1,0 +1,207 @@
+import { C as Card } from "./Card.js";
+import "../../../store/index.js";
+import { $ as $t } from "../../../utils/i18n.js";
+import { u as useAppStore } from "../../../store/app.js";
+import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
+const { defineComponent: _defineComponent } = globalThis.Vue;
+const { computed } = globalThis.Vue;
+class ThemeModeOption extends UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          value: { type: String, optional: false },
+          label: { type: String, optional: false }
+        };
+      },
+      name: "ThemeModeOption"
+    };
+  }
+  constructor(options, metadata = ThemeModeOption.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.value = this.__props__.value;
+    this.label = this.__props__.label;
+    delete this.__props__;
+  }
+}
+const _sfc_main = /* @__PURE__ */ _defineComponent({
+  __name: "ThemeSwitchCard",
+  setup(__props, _a) {
+    var __expose = _a.expose;
+    __expose();
+    const appStore = useAppStore();
+    const themeTitle = computed(() => {
+      return $t("basic.themeTitle");
+    });
+    const themePreview = computed(() => {
+      return $t("basic.themePreview");
+    });
+    const themeButton = computed(() => {
+      return $t("basic.themeButton");
+    });
+    const themeModeLabel = computed(() => {
+      return $t("basic.themeModeTitle");
+    });
+    const themeModeOptions = computed(() => {
+      return [
+        new ThemeModeOption({ value: "auto", label: $t("basic.themeModeAuto") }),
+        new ThemeModeOption({ value: "light", label: $t("basic.themeModeLight") }),
+        new ThemeModeOption({ value: "dark", label: $t("basic.themeModeDark") })
+      ];
+    });
+    const currentTheme = computed(() => {
+      return appStore.state.theme;
+    });
+    const colorOptions = [
+      "#37c2bc",
+      "#0957DE",
+      "#10b981",
+      "#f43f5e",
+      "#f97316"
+    ];
+    function changeTheme(color) {
+      appStore.setTheme(color);
+      uni.showToast({
+        title: $t("basic.themeSuccess"),
+        icon: "none",
+        duration: 1500
+      });
+    }
+    function changeThemeMode(value) {
+      appStore.setThemeMode(value);
+      uni.showToast({
+        title: $t("basic.themeModeSuccess"),
+        icon: "none",
+        duration: 1500
+      });
+    }
+    const __returned__ = { appStore, themeTitle, themePreview, themeButton, themeModeLabel, themeModeOptions, currentTheme, colorOptions, changeTheme, changeThemeMode, get Card() {
+      return Card;
+    } };
+    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+    return __returned__;
+  }
+});
+const _style_0 = {"wtu-4hrp8k-0":{"":{"borderTopLeftRadius":12,"borderTopRightRadius":12,"borderBottomRightRadius":12,"borderBottomLeftRadius":12}},"wtu-fhrzwj-1":{"":{"paddingTop":16,"paddingRight":16,"paddingBottom":16,"paddingLeft":16}},"wtu-mqajtg-2":{"":{"marginBottom":16}},"wtu-bkb5z9-3":{"":{"--tw-border-style":"solid","borderTopStyle":"var(--tw-border-style)","borderRightStyle":"var(--tw-border-style)","borderBottomStyle":"var(--tw-border-style)","borderLeftStyle":"var(--tw-border-style)","borderTopWidth":1,"borderRightWidth":1,"borderBottomWidth":1,"borderLeftWidth":1}},"wtu-qepy49-4":{"":{"--tw-border-style":"solid","borderTopStyle":"solid","borderRightStyle":"solid","borderBottomStyle":"solid","borderLeftStyle":"solid"}},"wtu-1jfhtyf-5":{"":{"borderTopColor":"#e2e8f0","borderRightColor":"#e2e8f0","borderBottomColor":"#e2e8f0","borderLeftColor":"#e2e8f0"}},"wtu-1vbahwj-6":{"":{"alignItems":"center"}},"wtu-1guata8-7":{"":{"fontSize":12}},"wtu-i5demr-8":{"":{"color":"#94a3b8"}},"wtu-1yn2e0l-9":{"":{"marginBottom":8}},"wtu-15u6clw-a":{"":{"marginTop":10}},"wtu-7gvrw-b":{"":{"marginLeft":"auto","marginRight":"auto"}},"wtu-3m5zaz-c":{"":{"width":200}},"wtu-s0orfi-d":{"":{"height":44}},"wtu-1likcy9-e":{"":{"borderTopLeftRadius":8,"borderTopRightRadius":8,"borderBottomRightRadius":8,"borderBottomLeftRadius":8}},"wtu-27v8zu-f":{"":{"display":"flex"}},"wtu-1q091sr-g":{"":{"flexDirection":"row"}},"wtu-1r3uoj-h":{"":{"justifyContent":"center"}},"wtu-g3vc06-i":{"":{"color":"#ffffff"}},"wtu-1d27acy-j":{"":{"fontSize":14}},"wtu-1o0f0um-k":{"":{"justifyContent":"space-between"}},"wtu-1cu5goa-l":{"":{"paddingTop":10,"paddingBottom":10}},"wtu-6fkyl1-m":{"":{"width":40}},"wtu-12mu282-n":{"":{"height":40}},"wtu-ww7gtr-o":{"":{"borderTopLeftRadius":20,"borderTopRightRadius":20,"borderBottomRightRadius":20,"borderBottomLeftRadius":20}},"wtu-127on44-p":{"":{"fontSize":16}},"wtu-19gexn6-q":{"":{"color":"#ffffff"}},"wtu-1x7cgzs-r":{"":{"--tw-font-weight":"var(--font-weight-bold, 700)","fontWeight":700}},"wtu-15ctu2r-s":{"":{"paddingTop":10}},"wtu-1s8d77i-t":{"":{"color":"#2d3748"}},"wtu-1gk50cy-u":{"":{"overflow":"hidden"}},"wtu-1p9z6y3-v":{"":{"paddingLeft":14,"paddingRight":14}},"wtu-1cuonmx-w":{"":{"paddingTop":8,"paddingBottom":8}},"flex":{"":{"display":"flex"}}};
+const { toDisplayString: _toDisplayString, createElementVNode: _createElementVNode, normalizeStyle: _normalizeStyle, renderList: _renderList, Fragment: _Fragment, openBlock: _openBlock, createElementBlock: _createElementBlock, createCommentVNode: _createCommentVNode, withCtx: _withCtx, createBlock: _createBlock } = globalThis.Vue;
+function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  return _openBlock(), _createBlock($setup["Card"], { title: $setup.themeTitle }, {
+    default: _withCtx(() => [
+      _createElementVNode("view", { class: "wtu-4hrp8k-0 wtu-fhrzwj-1 wtu-mqajtg-2 wtu-bkb5z9-3 wtu-qepy49-4 wtu-1jfhtyf-5 wtu-1vbahwj-6" }, [
+        _createElementVNode(
+          "text",
+          { class: "wtu-1guata8-7 wtu-i5demr-8 wtu-1yn2e0l-9" },
+          _toDisplayString($setup.themePreview),
+          1
+          /* TEXT */
+        ),
+        _createElementVNode(
+          "view",
+          {
+            class: "wtu-15u6clw-a wtu-7gvrw-b wtu-3m5zaz-c wtu-s0orfi-d wtu-1likcy9-e wtu-27v8zu-f wtu-1q091sr-g wtu-1vbahwj-6 wtu-1r3uoj-h",
+            style: _normalizeStyle({ backgroundColor: $setup.currentTheme })
+          },
+          [
+            _createElementVNode(
+              "text",
+              { class: "wtu-g3vc06-i wtu-1d27acy-j" },
+              _toDisplayString($setup.themeButton),
+              1
+              /* TEXT */
+            )
+          ],
+          4
+          /* STYLE */
+        )
+      ]),
+      _createElementVNode("view", { class: "wtu-1q091sr-g wtu-1o0f0um-k wtu-1cu5goa-l" }, [
+        (_openBlock(), _createElementBlock(
+          _Fragment,
+          null,
+          _renderList($setup.colorOptions, (item, index) => {
+            return _createElementVNode("view", {
+              key: index,
+              class: "wtu-6fkyl1-m wtu-12mu282-n wtu-ww7gtr-o wtu-1vbahwj-6 wtu-1r3uoj-h",
+              style: _normalizeStyle({
+                backgroundColor: item,
+                borderWidth: $setup.currentTheme == item ? "3px" : "0px",
+                borderStyle: "solid",
+                borderColor: "#1e293b"
+              }),
+              onClick: ($event) => $setup.changeTheme(item)
+            }, [
+              $setup.currentTheme == item ? (_openBlock(), _createElementBlock("text", {
+                key: 0,
+                class: "wtu-127on44-p wtu-19gexn6-q wtu-1x7cgzs-r"
+              }, " ✓ ")) : _createCommentVNode("v-if", true)
+            ], 12, ["onClick"]);
+          }),
+          64
+          /* STABLE_FRAGMENT */
+        ))
+      ]),
+      _createElementVNode("view", { class: "wtu-1q091sr-g wtu-1o0f0um-k wtu-1vbahwj-6 wtu-15u6clw-a wtu-15ctu2r-s" }, [
+        _createElementVNode(
+          "text",
+          { class: "wtu-1d27acy-j wtu-1s8d77i-t" },
+          _toDisplayString($setup.themeModeLabel),
+          1
+          /* TEXT */
+        ),
+        _createElementVNode(
+          "view",
+          {
+            class: "wtu-1q091sr-g wtu-1likcy9-e wtu-1gk50cy-u",
+            style: _normalizeStyle({
+              borderWidth: "1px",
+              borderStyle: "solid",
+              borderColor: "var(--border-color, #e2e8f0)"
+            })
+          },
+          [
+            (_openBlock(true), _createElementBlock(
+              _Fragment,
+              null,
+              _renderList($setup.themeModeOptions, (item, index) => {
+                return _openBlock(), _createElementBlock("view", {
+                  key: index,
+                  class: "wtu-1p9z6y3-v wtu-1cuonmx-w",
+                  style: _normalizeStyle({
+                    backgroundColor: $setup.appStore.state.themeMode == item.value ? $setup.appStore.state.theme : "transparent"
+                  }),
+                  onClick: ($event) => $setup.changeThemeMode(item.value)
+                }, [
+                  _createElementVNode(
+                    "text",
+                    {
+                      class: "wtu-1guata8-7",
+                      style: _normalizeStyle({
+                        color: $setup.appStore.state.themeMode == item.value ? "#ffffff" : "var(--text-secondary, #64748b)"
+                      })
+                    },
+                    _toDisplayString(item.label),
+                    5
+                    /* TEXT, STYLE */
+                  )
+                ], 12, ["onClick"]);
+              }),
+              128
+              /* KEYED_FRAGMENT */
+            ))
+          ],
+          4
+          /* STYLE */
+        )
+      ])
+    ]),
+    _: 1
+    /* STABLE */
+  }, 8, ["title"]);
+}
+const ThemeSwitchCard = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/pages/basic/components/ThemeSwitchCard.uvue"]]);
+export {
+  ThemeSwitchCard as T
+};
+//# sourceMappingURL=ThemeSwitchCard.js.map

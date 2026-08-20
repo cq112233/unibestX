@@ -4,17 +4,17 @@
     <NavBar title="分页加载 (z-paging-x)" :show-back="true" />
 
     <!-- 顶部过滤 Tabs (移到 z-paging-x 外部) -->
-    <view class="bg-white py-12px px-16px border-bottom-width-1px border-bottom-style-solid border-bottom-color-[#f1f5f9]">
-      <view class="flex-row bg-[#f1f5f9] rounded-12px p-4px">
+    <view class="bg-white py-[12px] px-[16px] border-b-[1px] border-bottom-style-solid border-bottom-color-[#f1f5f9]">
+      <view class="flex-row bg-[#f1f5f9] rounded-[12px] p-[4px]">
         <view
           v-for="(tab, index) in tabList"
           :key="index"
-          class="flex-1 items-center justify-center py-8px rounded-8px"
+          class="flex-1 items-center justify-center py-[8px] rounded-[8px]"
           :style="{ backgroundColor: tabIndex === index ? '#ffffff' : 'transparent' }"
           @click="tabChange(index)"
         >
           <text
-            class="text-13px font-bold"
+            class="text-[13px] font-bold"
             :style="{ color: tabIndex === index ? 'var(--theme-color, #37c2bc)' : '#64748b' }"
           >
             {{ tab }}
@@ -34,23 +34,23 @@
     >
       <!-- 列表数据 -->
       <list-item v-for="item in dataList" :key="item.id">
-        <view class="mx-16px my-8px p-16px bg-white rounded-12px border-width-1px border-style-solid border-color-[#edf2f7] shadow-sm">
+        <view class="mx-[16px] my-[8px] p-[16px] bg-white rounded-[12px] border-[1px] border-solid border-[#edf2f7] shadow-sm">
           <!-- 头部信息 -->
-          <view class="flex-row justify-between items-center mb-8px">
+          <view class="flex-row justify-between items-center mb-[8px]">
             <view :style="{ backgroundColor: item.tagBgColor, padding: '2px 8px', borderRadius: '6px' }">
               <text :style="{ color: item.tagColor, fontSize: '10px', fontWeight: 'bold' }">{{ item.tag }}</text>
             </view>
-            <text class="text-12px text-[#94a3b8]">#{{ item.id }}</text>
+            <text class="text-[12px] text-[#94a3b8]">#{{ item.id }}</text>
           </view>
 
           <!-- 标题 & 摘要 -->
-          <text class="text-15px font-bold text-[#1e293b] mb-6px">{{ item.title }}</text>
-          <text class="text-13px text-[#64748b] leading-18px mb-12px">{{ item.summary }}</text>
+          <text class="text-[15px] font-bold text-[#1e293b] mb-[6px]">{{ item.title }}</text>
+          <text class="text-[13px] text-[#64748b] leading-[18px] mb-[12px]">{{ item.summary }}</text>
 
           <!-- 底部栏 -->
-          <view class="flex-row justify-between items-center border-top-width-1px border-top-style-solid border-top-color-[#f8fafc] pt-8px">
-            <text class="text-12px text-[#475569] font-medium">{{ item.author }}</text>
-            <text class="text-11px text-[#94a3b8]">{{ item.createTime }}</text>
+          <view class="flex-row justify-between items-center border-t-[1px] border-top-style-solid border-top-color-[#f8fafc] pt-[8px]">
+            <text class="text-[12px] text-[#475569] font-medium">{{ item.author }}</text>
+            <text class="text-[11px] text-[#94a3b8]">{{ item.createTime }}</text>
           </view>
         </view>
       </list-item>

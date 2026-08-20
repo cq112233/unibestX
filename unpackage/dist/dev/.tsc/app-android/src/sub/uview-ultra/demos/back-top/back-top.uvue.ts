@@ -1,0 +1,92 @@
+import _easycom_NavBar from '@/src/components/NavBar/NavBar.uvue'
+import _easycom_up_back_top from '@/uni_modules/uview-ultra/components/up-back-top/up-back-top.uvue'
+import AppKu from '@/App.ku.uvue'
+import LayoutComponent from '@/src/layouts/default.uvue'
+import { ref } from 'vue';
+
+
+const __sfc__ = defineComponent({
+  __name: 'back-top',
+  setup(__props) {
+const __ins = getCurrentInstance()!;
+const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+const _cache = __ins.renderCache;
+
+const currentScrollTop = ref(0);
+const scrollTop = ref(0);
+const windowHeight = ref(uni.getWindowInfo().windowHeight);
+
+function handleScroll(e: UniScrollEvent) {
+  currentScrollTop.value = e.detail.scrollTop;
+  scrollTop.value = e.detail.scrollTop;
+}
+
+function scrollToTop() {
+  scrollTop.value = 0;
+  currentScrollTop.value = 0;
+}
+
+return (): any | null => {
+
+const _component_NavBar = resolveEasyComponent("NavBar",_easycom_NavBar)
+const _component_up_back_top = resolveEasyComponent("up-back-top",_easycom_up_back_top)
+
+  return _cV(unref(AppKu), null, _uM({
+    default: withSlotCtx((): any[] => [
+      _cV(unref(LayoutComponent), _uM({
+        "navigation-bar-title-text": 'Back Top 返回顶部',
+        "navigation-style": 'custom'
+      }), _uM({
+        default: withSlotCtx((): any[] => [
+          _cE("view", _uM({
+            class: "page-container bg-_b_hf8fafc_B flex flex-col",
+            style: _nS(_uM({ height: `${windowHeight.value}px` }))
+          }), [
+            _cV(_component_NavBar, _uM({
+              title: "Back Top 返回顶部",
+              "auto-back": true
+            })),
+            _cE("scroll-view", _uM({
+              class: "flex-1 p-_b16px_B",
+              direction: "vertical",
+              "scroll-top": scrollTop.value,
+              onScroll: handleScroll
+            }), [
+              _cE("view", _uM({ class: "bg-white rounded-_b8px_B p-_b12px_B mb-_b12px_B shadow-xs" }), [
+                _cE("view", _uM({ class: "flex-row items-center mb-_b10px_B" }), [
+                  _cE("view", _uM({ class: "w-_b3px_B h-_b14px_B bg-_b_h2979ff_B mr-_b6px_B rounded-_b2px_B" })),
+                  _cE("text", _uM({ class: "text-_b14px_B font-bold text-_b_h1e293b_B" }), "返回顶部说明")
+                ]),
+                _cE("text", _uM({ class: "text-_b13px_B text-_b_h64748b_B leading-_b20px_B" }), " 请向下滑动页面（超过 100px），右下角会自动浮现返回顶部按钮，点击后平滑一键置顶。 "),
+                _cE("text", _uM({ class: "text-_b12px_B text-_b_h2563eb_B mt-_b6px_B" }), "当前 实时高度: " + _tD(currentScrollTop.value) + "px", 1 /* TEXT */)
+              ]),
+              _cE(Fragment, null, RenderHelpers.renderList(20, (i, __key, __index, _cached): any => {
+                return _cE("view", _uM({
+                  key: i,
+                  class: "bg-white rounded-_b8px_B p-_b12px_B mt-_b10px_B shadow-xs"
+                }), [
+                  _cE("text", _uM({ class: "text-_b14px_B font-bold text-_b_h334155_B" }), "长列表测试卡片 #" + _tD(i), 1 /* TEXT */),
+                  _cE("text", _uM({ class: "text-_b12px_B text-_b_h94a3b8_B mt-_b4px_B" }), "向下滚动触发右下角返回顶部悬浮图标...")
+                ])
+              }), 64 /* STABLE_FRAGMENT */)
+            ], 40 /* PROPS, NEED_HYDRATION */, ["scroll-top"]),
+            _cV(_component_up_back_top, _uM({
+              "scroll-top": currentScrollTop.value,
+              top: 100,
+              bottom: 80,
+              right: 20,
+              onClick: scrollToTop
+            }), null, 8 /* PROPS */, ["scroll-top"])
+          ], 4 /* STYLE */)
+        ]),
+        _: 1 /* STABLE */
+      }))
+    ]),
+    _: 1 /* STABLE */
+  }))
+}
+}
+
+})
+export default __sfc__
+const GenSrcSubUviewUltraDemosBackTopBackTopStyles = [_uM([["page-container", _pS(_uM([["display", "flex"], ["flexDirection", "column"]]))]])]

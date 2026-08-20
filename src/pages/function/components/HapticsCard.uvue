@@ -1,19 +1,19 @@
 <template>
   <Card title="触感与工具">
-    <view class="rounded-12px p-16px mb-16px border-width-1px border-style-solid border-color-[#e2e8f0]">
-      <text class="text-12px text-[#94a3b8] mb-8px">剪贴板测试文本</text>
+    <view class="rounded-[12px] p-[16px] mb-[16px] border-[1px] border-solid border-[#e2e8f0]">
+      <text class="text-[12px] text-[#94a3b8] mb-[8px]">剪贴板测试文本</text>
       <input
         v-model="copyText"
         placeholder="请输入要复制的文本"
-        class="h-38px bg-white rounded-6px px-12px border-width-1px border-style-solid border-color-[#cbd5e1] text-14px text-[#334155] mb-12px"
+        class="h-[38px] bg-white rounded-[6px] px-[12px] border-[1px] border-solid border-[#cbd5e1] text-[14px] text-[#334155] mb-[12px]"
       />
-      <view class="w-full h-38px rounded-8px bg-[#10b981] flex flex-row items-center justify-center" @click="handleCopy">
-        <text class="text-[#ffffff] text-14px font-bold">复制测试文本</text>
+      <view class="w-full h-[38px] rounded-[8px] bg-[#10b981] flex flex-row items-center justify-center" @click="handleCopy">
+        <text class="text-[#ffffff] text-[14px] font-bold">复制测试文本</text>
       </view>
     </view>
 
-    <view class="w-full h-44px rounded-8px bg-[#f59e0b] flex flex-row items-center justify-center" @click="triggerVibration">
-      <text class="text-[#ffffff] text-14px font-bold">短震动反馈</text>
+    <view class="w-full h-[44px] rounded-[8px] bg-[#f59e0b] flex flex-row items-center justify-center" @click="triggerVibration">
+      <text class="text-[#ffffff] text-[14px] font-bold">短震动反馈</text>
     </view>
   </Card>
 </template>

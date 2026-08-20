@@ -1,7 +1,7 @@
 <template>
-  <view class="page-container bg-[#f8fafc] min-h-screen pb-30px">
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
     <NavBar title="Tabbar 底部导航" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff" />
-    <view class="p-16px">
+    <view class="p-[16px]">
       <view class="demo-block">
         <text class="demo-label">基础用法</text>
         <up-tabbar :value="value1" :fixed="false" :safe-area-inset-bottom="false" @change="change1">
@@ -12,7 +12,7 @@
         </up-tabbar>
       </view>
 
-      <view class="demo-block mt-12px">
+      <view class="demo-block mt-[12px]">
         <text class="demo-label">徽标提示与小红点</text>
         <up-tabbar :value="value2" :fixed="false" :safe-area-inset-bottom="false" @change="change2">
           <up-tabbar-item text="首页" icon="home" badge="5"></up-tabbar-item>
@@ -21,7 +21,7 @@
         </up-tabbar>
       </view>
 
-      <view class="demo-block mt-12px">
+      <view class="demo-block mt-[12px]">
         <text class="demo-label">自定义颜色</text>
         <up-tabbar :value="value3" :fixed="false" :safe-area-inset-bottom="false" active-color="#fa3534" inactive-color="#909399" @change="change3">
           <up-tabbar-item text="发现" icon="search"></up-tabbar-item>

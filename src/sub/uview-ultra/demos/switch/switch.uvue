@@ -1,40 +1,40 @@
 <template>
-  <view class="page-container bg-[#f8fafc] min-h-screen pb-30px">
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
     <NavBar title="up-switch 开关" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
-    <view class="p-16px">
+    <view class="p-[16px]">
       <view class="demo-block">
         <text class="demo-label">基础用法</text>
         <view class="flex-row items-center">
           <up-switch v-model="switchValue1"></up-switch>
-          <text class="text-14px ml-10px">{{ switchValue1 ? '已开启' : '已关闭' }}</text>
+          <text class="text-[14px] ml-[10px]">{{ switchValue1 ? '已开启' : '已关闭' }}</text>
         </view>
       </view>
 
-      <view class="demo-block mt-12px">
+      <view class="demo-block mt-[12px]">
         <text class="demo-label">禁用状态</text>
         <view class="flex-row items-center">
           <up-switch v-model="switchValue2" :disabled="true"></up-switch>
         </view>
       </view>
 
-      <view class="demo-block mt-12px">
+      <view class="demo-block mt-[12px]">
         <text class="demo-label">加载状态</text>
         <view class="flex-row items-center">
           <up-switch v-model="switchValue3" loading></up-switch>
         </view>
       </view>
 
-      <view class="demo-block mt-12px">
+      <view class="demo-block mt-[12px]">
         <text class="demo-label">自定义颜色</text>
         <view class="flex-row items-center">
           <up-switch v-model="switchValue4" active-color="#fa3534" inactive-color="#f56c6c"></up-switch>
         </view>
       </view>
 
-      <view class="demo-block mt-12px">
+      <view class="demo-block mt-[12px]">
         <text class="demo-label">不同尺寸</text>
         <view class="flex-row items-center">
-          <up-switch v-model="switchValue5" size="20" class="mr-10px"></up-switch>
+          <up-switch v-model="switchValue5" size="20" class="mr-[10px]"></up-switch>
           <up-switch v-model="switchValue5" size="28"></up-switch>
         </view>
       </view>

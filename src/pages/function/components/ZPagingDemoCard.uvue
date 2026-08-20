@@ -1,43 +1,43 @@
 <template>
   <Card title="数据分页列表 (z-paging-x)">
-    <view class="flex-col mb-12px">
-      <text class="text-13px text-[#64748b] leading-18px mb-8px">
+    <view class="flex-col mb-[12px]">
+      <text class="text-[13px] text-[#64748b] leading-[18px] mb-[8px]">
         在卡片中直接体验实时分页，支持触底加载、下拉刷新以及各种状态切换。
       </text>
 
       <!-- 快捷操作栏 -->
-      <view class="flex-row mb-12px">
-        <view class="flex-1 mr-8px">
+      <view class="flex-row mb-[12px]">
+        <view class="flex-1 mr-[8px]">
           <view
-            class="w-full h-36px rounded-8px bg-[#fee2e2] flex flex-row items-center justify-center"
+            class="w-full h-[36px] rounded-[8px] bg-[#fee2e2] flex flex-row items-center justify-center"
             @click="triggerError"
           >
-            <text class="text-[#dc2626] text-12px font-bold">模拟加载错误</text>
+            <text class="text-[#dc2626] text-[12px] font-bold">模拟加载错误</text>
           </view>
         </view>
         <view class="flex-1">
           <view
-            class="w-full h-36px rounded-8px bg-[#fef3c7] flex flex-row items-center justify-center"
+            class="w-full h-[36px] rounded-[8px] bg-[#fef3c7] flex flex-row items-center justify-center"
             @click="triggerClear"
           >
-            <text class="text-[#d97706] text-12px font-bold">清空数据</text>
+            <text class="text-[#d97706] text-[12px] font-bold">清空数据</text>
           </view>
         </view>
       </view>
     </view>
 
     <!-- 顶部 Tab 过滤 (移到 z-paging-x 外部) -->
-    <view class="bg-white py-8px px-12px border-width-1px border-style-solid border-color-[#edf2f7] border-bottom-width-0px" style="border-top-left-radius: 12px; border-top-right-radius: 12px;">
-      <view class="flex-row bg-[#f1f5f9] rounded-8px p-2px">
+    <view class="bg-white py-[8px] px-[12px] border-[1px] border-solid border-[#edf2f7] border-b-0" style="border-top-left-radius: 12px; border-top-right-radius: 12px;">
+      <view class="flex-row bg-[#f1f5f9] rounded-[8px] p-[2px]">
         <view
           v-for="(tab, index) in tabList"
           :key="index"
-          class="flex-1 items-center justify-center py-6px rounded-6px"
+          class="flex-1 items-center justify-center py-[6px] rounded-[6px]"
           :style="{ backgroundColor: tabIndex === index ? '#ffffff' : 'transparent' }"
           @click="tabChange(index)"
         >
           <text
-            class="text-12px font-bold"
+            class="text-[12px] font-bold"
             :style="{ color: tabIndex === index ? 'var(--theme-color, #37c2bc)' : '#64748b' }"
           >
             {{ tab }}
@@ -58,15 +58,15 @@
     >
       <!-- 列表数据项 (在 scroll-view 模式下必须使用 view 标签) -->
       <view v-for="item in dataList" :key="item.id">
-        <view class="mx-12px my-8px p-12px bg-white rounded-8px border-width-1px border-style-solid border-color-[#edf2f7]">
-          <view class="flex-row justify-between items-center mb-6px">
+        <view class="mx-[12px] my-[8px] p-[12px] bg-white rounded-[8px] border-[1px] border-solid border-[#edf2f7]">
+          <view class="flex-row justify-between items-center mb-[6px]">
             <view :style="{ backgroundColor: item.tagBgColor, padding: '1px 6px', borderRadius: '4px' }">
               <text :style="{ color: item.tagColor, fontSize: '9px', fontWeight: 'bold' }">{{ item.tag }}</text>
             </view>
-            <text class="text-11px text-[#94a3b8]">#{{ item.id }}</text>
+            <text class="text-[11px] text-[#94a3b8]">#{{ item.id }}</text>
           </view>
-          <text class="text-14px font-bold text-[#1e293b] mb-4px">{{ item.title }}</text>
-          <text class="text-12px text-[#64748b] leading-16px">{{ item.summary }}</text>
+          <text class="text-[14px] font-bold text-[#1e293b] mb-[4px]">{{ item.title }}</text>
+          <text class="text-[12px] text-[#64748b] leading-[16px]">{{ item.summary }}</text>
         </view>
       </view>
     </z-paging-x>

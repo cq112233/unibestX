@@ -1,16 +1,16 @@
 <template>
-  <view class="page-container bg-[#f8fafc] min-h-screen pb-30px">
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
     <NavBar title="Navbar 导航栏" :auto-back="true" />
-    <view class="p-16px">
+    <view class="p-[16px]">
       <view class="demo-block">
         <text class="demo-label">基础用法</text>
-        <view class="overflow-hidden rounded-md border-width-1px border-color-[#eee] border-solid">
+        <view class="overflow-hidden rounded-md border-[1px] border-[#eee] border-solid">
           <up-navbar title="自定义标题" :safe-area-inset-top="false" :fixed="false" left-text="返回" bg-color="#f8fafc"></up-navbar>
         </view>
       </view>
-      <view class="demo-block mt-12px">
+      <view class="demo-block mt-[12px]">
         <text class="demo-label">自定义插槽</text>
-        <view class="overflow-hidden rounded-md border-width-1px border-color-[#eee] border-solid">
+        <view class="overflow-hidden rounded-md border-[1px] border-[#eee] border-solid">
           <up-navbar :safe-area-inset-top="false" :fixed="false" left-text="返回" right-text="设置" bg-color="#f8fafc">
             <template #center>
               <view style="flex-direction: row; align-items: center; justify-content: center; background-color: #f3f4f6; border-radius: 15px; padding: 0 10px; height: 30px; width: 100px;">

@@ -46,7 +46,7 @@
 > 本项目内置的 **`z-paging-x`** 分页组件（如 [z-paging-x.uvue](file:///Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/z-paging-x/components/z-paging-x/z-paging-x.uvue)）已由作者进行了**深度定制修改与修复**，专门用于兼容 `uni-app X` 各端平台（特别针对 Android 原生嵌套手势协商、`type="nested"` 架构支持以及各端 CSS 解析限制等进行了优化）。
 > **提示**：请勿直接从官方插件市场重新下载覆盖。若从官方重新下载安装，可能会导致多端兼容性与手势机制失效，届时请务必重新测试与调试！
 
-`unibestX` —— 最好的 `uni-app X` 开发模板，由 `uni-app X` + `Vue3` + `UTS` + `Vite5` + `UnoCSS` + `uview-ultra` + `z-paging-x` 构成，使用了下一代 uni-app 原生开发技术栈，通过 `HBuilderX` 运行 `Android`、`iOS`、`鸿蒙`、`H5` 和 `小程序` 等多端平台。
+`unibestX` —— 最好的 `uni-app X` 开发模板，由 `uni-app X` + `Vue3` + `UTS` + `Vite5` + `Tailwind CSS` + `uview-ultra` + `z-paging-x` 构成，使用了下一代 uni-app 原生开发技术栈，通过 `HBuilderX` 运行 `Android`、`iOS`、`鸿蒙`、`H5` 和 `小程序` 等多端平台。
 
 👉 **在线 H5 演示体验**：[https://cq112233.github.io/unibestX/](https://cq112233.github.io/unibestX/)
 
@@ -62,7 +62,7 @@
 
 如果项目对您有帮助，请帮忙点个 **Star ⭐** 或 **赞 👍** 支持一下！您的鼓励是作者持续优化与维护的动力！
 
-`unibestX` 内置了 `自定义 TabBar`、`Layout 布局`、`请求封装`、`请求拦截`、`登录拦截`、`路由守卫`、`UnoCSS`、`i18n 多语言`、`Pinia 状态管理`、`主题切换` 等基础功能，提供了 `代码提示`、`自动格式化`、`统一配置` 等辅助功能，让你编写 `uni-app X` 拥有 `best` 体验。
+`unibestX` 内置了 `自定义 TabBar`、`Layout 布局`、`请求封装`、`请求拦截`、`登录拦截`、`路由守卫`、`Tailwind CSS`、`i18n 多语言`、`Pinia 状态管理`、`主题切换` 等基础功能，提供了 `代码提示`、`自动格式化`、`统一配置` 等辅助功能，让你编写 `uni-app X` 拥有 `best` 体验。
 
 ![](https://raw.githubusercontent.com/andreasbm/readme/master/screenshots/lines/rainbow.png)
 
@@ -219,7 +219,7 @@ pnpm build:h5
 
 - 🚀 **uni-app X (VDOM & Vapor 全面兼容)** — 默认启用传统 VDOM 模式，同时完美兼容 Vapor 蒸汽模式（无虚拟 DOM 高性能原生渲染）自由切换
 - 💪 **Vue3 + Vite5** — 最新前端技术栈，开发体验极佳
-- 🎨 **UnoCSS** — 原子化 CSS 引擎，高效编写样式
+- 🎨 **Tailwind CSS** — 原子化 CSS 引擎（v4 + weapp-tailwindcss），高效编写样式
 - 📦 **uview-ultra** — 专为 uni-app X 打造的 UI 组件库（内置深度修复版，已全面兼容 VDOM 与 Vapor 模式，常用基础功能完备，基本够用；后续不再单独维护与定制）
 - 📜 **z-paging-x** — 强大的分页列表组件（本项目已对 [z-paging-x.uvue](file:///Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/z-paging-x/components/z-paging-x/z-paging-x.uvue) 底层 Android 嵌套手势协商、Flex 布局及 `type="nested"` 架构进行了深度兼容修改与适配）
 - 🔧 **Pinia 持久化** — 状态管理 + 本地持久化，开箱即用
@@ -302,7 +302,7 @@ unibestX/
 │   │   ├── app.uts           #   应用全局状态（主题、语言等）
 │   │   ├── token.uts         #   Token 鉴权状态（单/双 Token 自动续期）
 │   │   └── user.uts          #   当前登录用户信息
-│   ├── style/                # 全局样式（UnoCSS、变量等）
+│   ├── style/                # 全局样式（Tailwind、变量等）
 │   ├── sub/                  # 应用分包页面（按需加载）
 │   │   ├── auth/             #   登录、注册、找回密码
 │   │   ├── paging/           #   z-paging-x 分页列表各种场景演示
@@ -332,13 +332,13 @@ unibestX/
 │   ├── lime-signature/       #   手写签名板组件
 │   ├── e-chart/              #   ECharts 图表适配组件
 │   └── ...                   #   其他官方/三方 uni_modules
-├── js_sdk/                   # JS / UTS SDK 资源（a-hua-unocss 等）
+├── js_sdk/                   # JS / UTS SDK 资源
 ├── docs/                     # VitePress 项目文档源码
 ├── App.ku.uvue               # 全局根包裹组件（动态主题注入、全局 Toast 容器）
 ├── main.uts                  # 应用主入口文件
 ├── pages.json                # ⚠️ 自动生成的页面路由表（编译产物，构建时自动覆盖，请勿手动编辑）
 ├── manifest.json             # 应用配置清单（多端 AppID、权限、原生模块配置）
-├── vite.config.ts            # Vite 构建配置（UnoCSS 规则与自定义插件）
+├── vite.config.ts            # Vite 构建配置（Tailwind/weapp-tailwindcss 与自定义插件）
 ├── uni.scss                  # 全局 SCSS 变量与主题注入
 └── tsconfig.json             # TypeScript / UTS 编译配置文件
 ```
@@ -500,7 +500,7 @@ uni-app x 推出了新一代的 **蒸汽模式（Vapor）**。新版渲染引擎
 | 语言      | UTS                   | uni-app Type Script，编译为原生 Kotlin/Swift |
 | 前端框架    | Vue 3                 | Composition API                        |
 | 构建工具    | Vite 5                | 极速开发体验                                 |
-| CSS 引擎  | UnoCSS                | 原子化 CSS，自定义规则                          |
+| CSS 引擎  | Tailwind CSS           | v4 + weapp-tailwindcss，方括号任意值语法          |
 | UI 组件库  | uview-ultra           | uni-app X 专用 UI 库（内置深度修复版，全面兼容 VDOM/Vapor 模式，基础功能完备基本够用；后续不再维护定制） |
 | 分页组件    | z-paging-x            | 强大的下拉刷新 + 分页加载                         |
 | 状态管理    | x-pinia-s (Pinia)     | uni-app X 版 Pinia                      |

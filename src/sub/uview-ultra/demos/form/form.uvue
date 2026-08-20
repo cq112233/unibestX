@@ -1,8 +1,8 @@
 <template>
-  <view class="page-container bg-[#f8fafc] min-h-screen pb-30px">
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
     <NavBar title="Form 表单" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
 
-    <view class="p-16px">
+    <view class="p-[16px]">
       <view class="demo-block">
         <text class="demo-label">基础表单示例</text>
         <up-form
@@ -71,9 +71,9 @@
           <up-form-item label="水果最爱" prop="fruit" :border-bottom="true">
             <up-radio-group v-model="formModel.fruit" placement="row">
               <up-radio name="apple" label="苹果"></up-radio>
-              <view class="w-10px"></view>
+              <view class="w-[10px]"></view>
               <up-radio name="banana" label="香蕉"></up-radio>
-              <view class="w-10px"></view>
+              <view class="w-[10px]"></view>
               <up-radio name="orange" label="橘子"></up-radio>
             </up-radio-group>
           </up-form-item>
@@ -81,9 +81,9 @@
           <up-form-item label="兴趣爱好" prop="hobbies" :border-bottom="true">
             <up-checkbox-group v-model="formModel.hobbies" placement="row">
               <up-checkbox name="reading" label="阅读"></up-checkbox>
-              <view class="w-10px"></view>
+              <view class="w-[10px]"></view>
               <up-checkbox name="sports" label="运动"></up-checkbox>
-              <view class="w-10px"></view>
+              <view class="w-[10px]"></view>
               <up-checkbox name="music" label="音乐"></up-checkbox>
             </up-checkbox-group>
           </up-form-item>
@@ -134,11 +134,11 @@
         </up-form>
       </view>
 
-      <view class="mt-20px flex-row justify-between">
-        <view class="flex-1 mr-10px">
+      <view class="mt-[20px] flex-row justify-between">
+        <view class="flex-1 mr-[10px]">
           <up-button type="primary" text="提交表单" @click="submitForm"></up-button>
         </view>
-        <view class="flex-1 ml-10px">
+        <view class="flex-1 ml-[10px]">
           <up-button type="info" text="重置表单" @click="resetForm"></up-button>
         </view>
       </view>

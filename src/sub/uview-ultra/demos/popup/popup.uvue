@@ -1,22 +1,22 @@
 <template>
-  <view class="page-container bg-[#f8fafc] min-h-screen pb-30px">
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
     <NavBar title="up-popup 弹出层" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
-    <view class="p-16px">
+    <view class="p-[16px]">
       <view class="demo-block">
         <text class="demo-label">基础用法</text>
         <view class="flex-row items-center">
           <up-button type="primary" text="顶部弹出" size="mini" @click="openPopup('top')"></up-button>
-          <view class="w-10px"></view>
+          <view class="w-[10px]"></view>
           <up-button type="primary" text="底部弹出" size="mini" @click="openPopup('bottom')"></up-button>
         </view>
       </view>
-      <view class="demo-block mt-12px">
+      <view class="demo-block mt-[12px]">
         <text class="demo-label">更多方向弹出</text>
         <view class="flex-row items-center">
           <up-button type="success" text="左侧弹出" size="mini" @click="openPopup('left')"></up-button>
-          <view class="w-10px"></view>
+          <view class="w-[10px]"></view>
           <up-button type="success" text="右侧弹出" size="mini" @click="openPopup('right')"></up-button>
-          <view class="w-10px"></view>
+          <view class="w-[10px]"></view>
           <up-button type="success" text="居中弹出" size="mini" @click="openPopup('center')"></up-button>
         </view>
       </view>
@@ -28,8 +28,8 @@
       :round="10"
       @close="onPopupClose"
     >
-      <view class="p-30px items-center">
-        <text class="text-16px text-[#303133]">{{ popupMode }} 弹出层内容</text>
+      <view class="p-[30px] items-center">
+        <text class="text-[16px] text-[#303133]">{{ popupMode }} 弹出层内容</text>
       </view>
     </up-popup>
   </view>

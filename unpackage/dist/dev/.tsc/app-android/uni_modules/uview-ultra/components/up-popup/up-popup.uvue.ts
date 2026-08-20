@@ -1,0 +1,275 @@
+import _easycom_up_overlay from '@/uni_modules/uview-ultra/components/up-overlay/up-overlay.uvue'
+import _easycom_up_status_bar from '@/uni_modules/uview-ultra/components/up-status-bar/up-status-bar.uvue'
+import _easycom_up_icon from '@/uni_modules/uview-ultra/components/up-icon/up-icon.uvue'
+import _easycom_up_safe_bottom from '@/uni_modules/uview-ultra/components/up-safe-bottom/up-safe-bottom.uvue'
+import _easycom_up_transition from '@/uni_modules/uview-ultra/components/up-transition/up-transition.uvue'
+import { computed, ref } from 'vue'
+import defProps from './popup'
+import { addUnit, addStyle, deepMerge } from '../../libs/function/index'
+
+
+const __sfc__ = defineComponent({
+  __name: 'up-popup',
+name: 'up-popup',
+  props: {
+  show: {
+    type: Boolean,
+    default: false
+  },
+  overlay: {
+    type: Boolean,
+    default: true
+  },
+  mode: {
+    type: String,
+    default: 'bottom'
+  },
+  duration: {
+    type: [String, Number],
+    default: 300
+  },
+  closeable: {
+    type: Boolean,
+    default: false
+  },
+  overlayStyle: {
+    type: [Object, String],
+    default: () => ({})
+  },
+  closeOnClickOverlay: {
+    type: Boolean,
+    default: true
+  },
+  zIndex: {
+    type: [String, Number],
+    default: 10075
+  },
+  safeAreaInsetBottom: {
+    type: Boolean,
+    default: true
+  },
+  safeAreaInsetTop: {
+    type: Boolean,
+    default: false
+  },
+  closeIconPos: {
+    type: String,
+    default: 'top-right'
+  },
+  round: {
+    type: [Boolean, String, Number],
+    default: 0
+  },
+  zoom: {
+    type: Boolean,
+    default: true
+  },
+  bgColor: {
+    type: String,
+    default: ''
+  },
+  overlayOpacity: {
+    type: [Number, String],
+    default: 0.5
+  },
+  pageInline: {
+    type: Boolean,
+    default: false
+  },
+  customClass: {
+    type: String,
+    default: ''
+  },
+  customStyle: {
+    type: Object,
+    default: () => ({})
+  }
+},
+  emits: ['open', 'close', 'click', 'update:show'],
+  setup(__props) {
+const __ins = getCurrentInstance()!;
+const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+const _cache = __ins.renderCache;
+
+
+
+const props = __props
+
+function emit(event: string, ...do_not_transform_spread: Array<any | null>) {
+__ins.emit(event, ...do_not_transform_spread)
+}
+
+const overlayDuration = computed<number>(() => {
+  return parseInt(props.duration.toString()) + 50
+})
+
+const position = computed<string>(() => {
+  if (props.mode === 'center') {
+    return props.zoom ? 'fade-zoom' : 'fade'
+  }
+  if (props.mode === 'left') {
+    return 'slide-left'
+  }
+  if (props.mode === 'right') {
+    return 'slide-right'
+  }
+  if (props.mode === 'bottom') {
+    return 'slide-up'
+  }
+  if (props.mode === 'top') {
+    return 'slide-down'
+  }
+  return ''
+})
+
+const transitionStyle = computed<UTSJSONObject>(() => {
+  const style = { __$originalPosition: new UTSSourceMapPosition("style", "uni_modules/uview-ultra/components/up-popup/up-popup.uvue", 158, 9), 
+    display: 'flex',
+  } as UTSJSONObject
+  if (!props.pageInline) {
+    style['zIndex'] = parseInt(props.zIndex.toString()) + 1
+    style['position'] = 'fixed'
+  }
+  style[props.mode] = 0
+  if (props.mode === 'left' || props.mode === 'right') {
+    return deepMerge(style, {
+      bottom: 0,
+      top: 0,
+    }) as UTSJSONObject
+  } else if (props.mode === 'top' || props.mode === 'bottom') {
+    return deepMerge(style, {
+      left: 0,
+      right: 0,
+    }) as UTSJSONObject
+  } else if (props.mode === 'center') {
+    return deepMerge(style, {
+      alignItems: 'center',
+      'justify-content': 'center',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0
+    }) as UTSJSONObject
+  }
+  return style
+})
+
+const contentStyle = computed<UTSJSONObject>(() => {
+  const style = { __$originalPosition: new UTSSourceMapPosition("style", "uni_modules/uview-ultra/components/up-popup/up-popup.uvue", 190, 9), } as UTSJSONObject
+  if (props.mode !== 'center') {
+    style['flex'] = 1
+  }
+  if (props.bgColor != '') {
+    style['backgroundColor'] = props.bgColor
+  }
+  if (props.round.toString() != '' && props.round != false) {
+    const value = addUnit(props.round)
+    if (props.mode === 'top') {
+      style['borderBottomLeftRadius'] = value
+      style['borderBottomRightRadius'] = value
+    } else if (props.mode === 'bottom') {
+      style['borderTopLeftRadius'] = value
+      style['borderTopRightRadius'] = value
+    } else if (props.mode === 'center') {
+      style['borderRadius'] = value
+    }
+  }
+  return deepMerge(style, addStyle(props.customStyle)) as UTSJSONObject
+})
+
+function noop() {}
+
+function overlayClick(): void {
+  if (props.closeOnClickOverlay) {
+    emit('update:show', false)
+    emit('close')
+  }
+}
+
+function close(): void {
+  emit('update:show', false)
+  emit('close')
+}
+
+function afterEnter(): void {
+  emit('open')
+}
+
+function clickHandler(): void {
+  if (props.mode === 'center') {
+    overlayClick()
+  }
+  emit('click')
+}
+
+return (): any | null => {
+
+const _component_up_overlay = resolveEasyComponent("up-overlay",_easycom_up_overlay)
+const _component_up_status_bar = resolveEasyComponent("up-status-bar",_easycom_up_status_bar)
+const _component_up_icon = resolveEasyComponent("up-icon",_easycom_up_icon)
+const _component_up_safe_bottom = resolveEasyComponent("up-safe-bottom",_easycom_up_safe_bottom)
+const _component_up_transition = resolveEasyComponent("up-transition",_easycom_up_transition)
+
+  return _cE("view", _uM({
+    class: _nC(["up-popup", [_ctx.customClass]])
+  }), [
+    isTrue(_ctx.overlay && !_ctx.pageInline)
+      ? _cV(_component_up_overlay, _uM({
+          key: 0,
+          show: _ctx.show && !_ctx.pageInline,
+          onClick: overlayClick,
+          zIndex: _ctx.zIndex,
+          duration: overlayDuration.value,
+          customStyle: _ctx.overlayStyle,
+          opacity: _ctx.overlayOpacity
+        }), null, 8 /* PROPS */, ["show", "zIndex", "duration", "customStyle", "opacity"])
+      : _cC("v-if", true),
+    _cV(_component_up_transition, _uM({
+      show: _ctx.pageInline ? true : _ctx.show,
+      customStyle: transitionStyle.value,
+      mode: _ctx.pageInline ? 'none' : position.value,
+      duration: _ctx.duration,
+      onAfterEnter: afterEnter,
+      onClick: clickHandler
+    }), _uM({
+      default: withSlotCtx((): any[] => [
+        _cE("view", _uM({
+          class: "up-popup__content",
+          style: _nS([contentStyle.value]),
+          onClick: withModifiers(noop, ["stop"])
+        }), [
+          isTrue(_ctx.safeAreaInsetTop)
+            ? _cV(_component_up_status_bar, _uM({ key: 0 }))
+            : _cC("v-if", true),
+          renderSlot(_ctx.$slots, "default"),
+          isTrue(_ctx.closeable)
+            ? _cE("view", _uM({
+                key: 1,
+                onClick: withModifiers(close, ["stop"]),
+                class: _nC(["up-popup__content__close", ['up-popup__content__close--' + _ctx.closeIconPos]]),
+                "hover-class": "up-popup__content__close--hover",
+                "hover-stay-time": "150"
+              }), [
+                _cV(_component_up_icon, _uM({
+                  name: "close",
+                  color: "#909399",
+                  size: "18",
+                  bold: ""
+                }))
+              ], 2 /* CLASS */)
+            : _cC("v-if", true),
+          isTrue(_ctx.safeAreaInsetBottom)
+            ? _cV(_component_up_safe_bottom, _uM({ key: 2 }))
+            : _cC("v-if", true)
+        ], 4 /* STYLE */)
+      ]),
+      _: 3 /* FORWARDED */
+    }), 8 /* PROPS */, ["show", "customStyle", "mode", "duration"])
+  ], 2 /* CLASS */)
+}
+}
+
+})
+export default __sfc__
+export type UpPopupComponentPublicInstance = InstanceType<typeof __sfc__>;
+const GenUniModulesUviewUltraComponentsUpPopupUpPopupStyles = [_uM([["u-empty", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-empty__wrap", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__scroll-view-wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__scroll-view", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__nav", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["u-tabs__wrapper__nav__line", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-empty", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-empty__wrap", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__scroll-view-wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__scroll-view", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__nav", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-tabs__wrapper__nav__line", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["flexShrink", 0], ["flexGrow", 0], ["flexBasis", "auto"], ["alignItems", "stretch"], ["alignContent", "flex-start"]]))], ["up-popup", _pS(_uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]]))], ["up-popup__content", _pS(_uM([["backgroundColor", "#ffffff"], ["position", "relative"]]))], ["up-popup__content--round-top", _pS(_uM([["borderTopLeftRadius", 0], ["borderTopRightRadius", 0], ["borderBottomLeftRadius", 10], ["borderBottomRightRadius", 10]]))], ["up-popup__content--round-left", _pS(_uM([["borderTopLeftRadius", 0], ["borderTopRightRadius", 10], ["borderBottomLeftRadius", 0], ["borderBottomRightRadius", 10]]))], ["up-popup__content--round-right", _pS(_uM([["borderTopLeftRadius", 10], ["borderTopRightRadius", 0], ["borderBottomLeftRadius", 10], ["borderBottomRightRadius", 0]]))], ["up-popup__content--round-bottom", _pS(_uM([["borderTopLeftRadius", 10], ["borderTopRightRadius", 10], ["borderBottomLeftRadius", 0], ["borderBottomRightRadius", 0]]))], ["up-popup__content--round-center", _pS(_uM([["borderTopLeftRadius", 10], ["borderTopRightRadius", 10], ["borderBottomLeftRadius", 10], ["borderBottomRightRadius", 10]]))], ["up-popup__content__close", _pS(_uM([["position", "absolute"]]))], ["up-popup__content__close--hover", _pS(_uM([["opacity", 0.4]]))], ["up-popup__content__close--top-left", _pS(_uM([["top", 15], ["left", 15]]))], ["up-popup__content__close--top-right", _pS(_uM([["top", 15], ["right", 15]]))], ["up-popup__content__close--bottom-left", _pS(_uM([["bottom", 15], ["left", 15]]))], ["up-popup__content__close--bottom-right", _pS(_uM([["right", 15], ["bottom", 15]]))]])]

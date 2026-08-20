@@ -1,0 +1,748 @@
+Ôr@Ÿªassertions¤code´customTransformCache¬dependencies¢id¤meta±moduleSideEffects¬originalCode±originalSourcemap«resolvedIds®sourcemapChainµsyntheticNamedExportsµtransformDependencies®transformFiles¨cacheAstÔrAÚ'€import { getAbilityContext, getEntryAbility, getWindowStage } from './App';
+import OHWindow from '@ohos.window';
+import { TEMPLATE_PAGE_NAME } from './components/Page';
+import { UniPageManagerImpl } from './dom/UniPageManager';
+import { UniCallbackWrapper } from './dom/UniCallbackWrapper';
+import { TinyEmitter } from 'tiny-emitter';
+import { clearSafeAreaInsetsChange, formatFontFaceSrc, getCurrentPages, getResourceStr, readTextSync, registerFont } from './helper';
+import { initPages } from './libs/uni-app-x-framework-dev';
+import { getPrivacyAgree, setPrivacyAgree, getAppTheme, getUserAgent } from './UTSHarmony';
+import { GlobalDocument } from './dom/GlobalDocument';
+import { clearApp, genApp } from './UniApp';
+import errorManager from "@ohos.app.ability.errorManager";
+let mainApp = null;
+function getMainApp() {
+    return mainApp;
+}
+export function getManifest(appID) {
+    const manifestPath = getResourceStr('/manifest.json', true, appID);
+    const manifestContent = readTextSync(manifestPath);
+    return JSON.parse(manifestContent);
+}
+export class UniNativeAppImpl {
+    constructor(id, config) {
+        /**
+         * @internal
+         */
+        this.context = null;
+        /**
+         * @internal
+         */
+        this.router = new NavPathStack();
+        /**
+         * @internal
+         */
+        this.userAgent = {
+            value: '',
+            concatenate: true,
+            fullUserAgent: getUserAgent(),
+        };
+        this.appTheme = getAppTheme();
+        this.pageManager = new UniPageManagerImpl();
+        /**
+         * @internal
+         */
+        this._emitter = new TinyEmitter();
+        this.appStartDuration = 0;
+        this.globalDocument = new GlobalDocument();
+        this.appScheme = '';
+        this.windowStageEventType = OHWindow.WindowStageEventType.SHOWN;
+        if (mainApp) {
+            throw new Error('app already opened');
+        }
+        mainApp = this;
+        this.appid = id;
+        this.isMain = config?.isMain ?? false;
+        if (config?.wantUri) {
+            this.appScheme = config.wantUri;
+        }
+        if (!this.isMain) {
+            this.animationType = config?.animationType ?? 'slide-in-right';
+            this.animationDuration = config?.animationDuration ?? 300;
+        }
+        const windowStage = getWindowStage();
+        if (!windowStage) {
+            mainApp = null;
+            throw new Error('windowStage is required');
+        }
+        this.windowStage = windowStage;
+        // TODO æ ¡éªŒ manifest
+        this.manifest = getManifest(id);
+        // TODO initUserAgentOnce
+        const initWindow = (err, window) => {
+            this.window = window;
+            // å¯ç”¨æ²‰æµ¸å¼ï¼Œä»¥ä¿éšœåç»­éƒ¨åˆ†å®‰å…¨åŒºç›¸å…³æµ‹é‡æ­£å¸¸
+            window.setWindowLayoutFullScreen(true);
+            window.on('keyboardHeightChange', size => {
+                // TODO
+                // appLifeCycle.emit('keyboardHeightChange', size)
+            });
+            windowStage.on('windowStageEvent', (type) => {
+                if (this.windowStageEventType === type) {
+                    return;
+                }
+                switch (type) {
+                    case OHWindow.WindowStageEventType.SHOWN:
+                        this.windowStageEventType = type;
+                        this._emitter.emit('onShow');
+                        this._emitter.emit('onNewIntent', {
+                            appScheme: this.appScheme,
+                            appLink: this.appScheme
+                        });
+                        break;
+                    case OHWindow.WindowStageEventType.HIDDEN:
+                        this.windowStageEventType = type;
+                        this._emitter.emit('onHide');
+                        break;
+                    default:
+                        break;
+                }
+            });
+            window.loadContentByName(TEMPLATE_PAGE_NAME, async (err) => {
+                if (err.code) {
+                    console.error('loadContent error:', err);
+                    return;
+                }
+                if (!this.isMain) {
+                    // è®¾ç½®ä¸ºé€æ˜èƒŒæ™¯ï¼Œä»¥ä¾¿åç»­å­çª—å£åŠ¨ç”»ä¸ä¸»çª—å£äº¤äº’
+                    window.setWindowBackgroundColor('#00000000');
+                }
+                this.context = window.getUIContext();
+                this.context.getFont().registerFont({
+                    familyName: 'uni-icon',
+                    familySrc: { "id": 0, "type": 30000, params: ['uni-app-x/uni-icon.ttf'], "bundleName": "com.bigScreen.qizhi", "moduleName": "entry" }
+                });
+                const base = `../../resources/resfile/uni-app-x/apps/${id}/www/import`;
+                initPages();
+                try {
+                    const entryAbility = getEntryAbility();
+                    await entryAbility.onImport?.(`${base}/app-config`);
+                    await entryAbility.onImport?.(`${base}/app-service`);
+                    // TODO ç§»é™¤å…¨å±€ document
+                    globalThis.document = this.globalDocument;
+                    // TODO ç§»å‡ºå…¨å±€ __mount__
+                    const mount = globalThis.__mount__;
+                    genApp();
+                    mount();
+                }
+                catch (e) {
+                    // TODO æš‚æ—¶ä¸ä½¿ç”¨ tag
+                    console.error(e);
+                }
+                if (config?.isMain) {
+                    let errorCallback = {
+                        onUnhandledException: (errMsg) => {
+                            // ignore
+                        },
+                        onException: (errorObj) => {
+                            // TODO æš‚æ—¶ä¸ä½¿ç”¨ tag
+                            console.error(errorObj);
+                        }
+                    };
+                    errorManager.on('error', errorCallback);
+                    this.appStartDuration = Date.now() - getEntryAbility().startTime;
+                }
+                window.showWindow();
+            });
+        };
+        if (config?.isMain) {
+            windowStage.getMainWindow(initWindow);
+        }
+        else {
+            windowStage.createSubWindow(`uni-mp-${id}`, initWindow);
+        }
+        this.initPrivacyAuthorization();
+    }
+    onEvent(event) {
+        throw new Error('Method not implemented.');
+    }
+    addEventListener(event, callback) {
+        const callbackWrapper = new UniCallbackWrapper(callback);
+        this._emitter.on(event, callback);
+        return callbackWrapper;
+    }
+    removeEventListener(event, callbackWrapper) {
+        const callback = callbackWrapper.callback;
+        this._emitter.off(event, callback);
+    }
+    addKeyEventListener(event, callback) {
+        this._emitter.on(event, (event) => {
+            const pages = getCurrentPages();
+            const currentPage = pages[pages.length - 1];
+            const currentNativePage = currentPage && currentPage.getNativePage();
+            if (currentNativePage && currentNativePage.fullscreenElement != null) {
+                currentPage.getNativePage().exitFullscreen();
+            }
+            else {
+                callback(event);
+            }
+        });
+    }
+    quit() {
+        // æ¸…ç†é€»è¾‘ï¼Œé™¤äº‹ä»¶å¤–åŸºæœ¬è‡ªä¸Šè€Œä¸‹ app -> framework -> core
+        clearSafeAreaInsetsChange();
+        this._emitter.emit('onExit');
+        this._emitter.off('onShow');
+        this._emitter.off('onHide');
+        this._emitter.off('onExit');
+        this._emitter.off('onThemeChange');
+        this._emitter.off('onError');
+        this._emitter.off('onBackButton');
+        try {
+            this.windowStage.off('windowStageEvent');
+        }
+        catch (e) {
+            // ignore error
+        }
+        try {
+            this.window.off('keyboardHeightChange');
+        }
+        catch (e) {
+            // ignore error
+        }
+        this.globalDocument.dispose();
+        globalThis.document = undefined;
+        clearApp();
+        mainApp = null;
+        if (this.isMain) {
+            getAbilityContext().terminateSelf();
+        }
+        else {
+            this.window.destroyWindow();
+        }
+    }
+    getAppStartDuration() {
+        return this.appStartDuration;
+    }
+    loadFontFace(options) {
+        registerFont(formatFontFaceSrc(options.source), options, this.context);
+    }
+    getRedirectInfo() {
+        // TODO implement
+        return new Map();
+    }
+    connectResizeObserver(observerId, callback) {
+        throw new Error('Method not implemented.');
+    }
+    observeResizeObserver(observerId, pageId, elemId) {
+        throw new Error('Method not implemented.');
+    }
+    unobserveResizeObserver(observerId, pageId, elemId) {
+        throw new Error('Method not implemented.');
+    }
+    disconnectResizeObserver(observerId) {
+        throw new Error('Method not implemented.');
+    }
+    getLaunchOptionsSync() {
+        return {
+            appScheme: this.appScheme,
+            appLink: this.appScheme,
+        };
+    }
+    getAndroidApplication() {
+        throw new Error('Method not implemented.');
+    }
+    initPrivacyAuthorization() {
+        if (getPrivacyAgree()) {
+            return;
+        }
+        let appHarmony = this.manifest['app-harmony'];
+        if (appHarmony) {
+            let privacyValue = appHarmony['initPrivacyAuthorization'];
+            if (privacyValue && privacyValue == 'agree') {
+                setPrivacyAgree(true);
+            }
+            else {
+                setPrivacyAgree(false);
+            }
+        }
+    }
+}
+export function openUniApp(appID, config) {
+    const app = new UniNativeAppImpl(appID, config);
+    return app;
+}
+export function closeUniApp() {
+    if (mainApp) {
+        mainApp.quit();
+    }
+}
+export function getUniApp() {
+    return getMainApp();
+}
+//# sourceMappingURL=UniNativeApp.js.mapÂœÙê/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/runtime/App.etsÙi hvigor_ignore__Applications_DevEco-Studio.app_Contents_sdk_default_openharmony_ets_api_@ohos.window.d.tsÙö/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/runtime/components/Page.etsÙù/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/runtime/dom/UniPageManager.etsÙü/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/runtime/dom/UniCallbackWrapper.tsÙ¸/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/tiny-emitter@2bbuysb+ygqpdccpkrwbr7yfkdtt9ybgnmj+zggaoy8=/oh_modules/tiny-emitter/index.jsÙó/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/runtime/helper/index.etsÚ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/runtime/libs/uni-app-x-framework-dev.jsÙ÷/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/runtime/UTSHarmony/index.etsÙù/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/runtime/dom/GlobalDocument.etsÙí/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/runtime/UniApp.etsÙ{ hvigor_ignore__Applications_DevEco-Studio.app_Contents_sdk_default_openharmony_ets_api_@ohos.app.ability.errorManager.d.tsÙó/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/runtime/UniNativeApp.etsÔrB˜±isLocalDependency¯isNodeEntryFile§pkgPath§pkgNameªpkgVersion±belongProjectPath±dependencyPkgInfo¬shouldEmitJsÂÂÙâ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/runtime½@dcloudio/uni-runtime-harmony¥1.0.0ÙL/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmonyÔrC’§pkgNameªpkgVersion½@dcloudio/uni-runtime-harmony¥1.0.0ÃÃÚ'Qimport { getAbilityContext, getEntryAbility, getWindowStage } from './App'
+import { Manifest } from './manifest'
+import OHWindow from '@ohos.window'
+import { TEMPLATE_PAGE_NAME } from './components/Page'
+import {
+  NativeLoadFontFaceOptions,
+  UniKeyEvent,
+  UniNativeApp as IUniNativeApp,
+} from '@dcloudio/uni-app-x/types/native'
+import { UniPageManagerImpl } from './dom/UniPageManager'
+import { UniCallbackWrapper } from './dom/UniCallbackWrapper'
+import { TinyEmitter } from 'tiny-emitter'
+import {
+  clearSafeAreaInsetsChange,
+  formatFontFaceSrc,
+  getCurrentPages,
+  getResourceStr,
+  readTextSync,
+  registerFont
+} from './helper'
+import { initPages } from './libs/uni-app-x-framework-dev'
+import { UniPageImpl } from '@dcloudio/uni-runtime-harmony/UniPage'
+import { getPrivacyAgree, setPrivacyAgree, getAppTheme, getUserAgent } from './UTSHarmony'
+import { GlobalDocument } from './dom/GlobalDocument'
+import { clearApp, genApp } from './UniApp'
+import { BusinessError } from '@kit.BasicServicesKit'
+import { errorManager } from '@kit.AbilityKit'
+
+let mainApp: UniNativeAppImpl | null = null
+
+function getMainApp() {
+  return mainApp
+}
+
+export type AnimationType = 'slide-in-right' | 'slide-in-left' | 'slide-in-top' | 'slide-in-bottom' | 'fade-in' | 'none'
+
+interface IOpenUniAppConfig {
+  /**
+   * @internal
+   */
+  isMain?: boolean
+  animationType?: AnimationType
+  animationDuration?: number
+  wantUri?: string
+}
+
+export function getManifest(appID?: string): Manifest {
+  const manifestPath = getResourceStr('/manifest.json', true, appID) as string
+  const manifestContent = readTextSync(manifestPath)
+  return JSON.parse(manifestContent)
+}
+
+interface IUserAgent {
+  value: string
+  concatenate: boolean
+  fullUserAgent: string
+}
+
+interface LaunchOptions {
+  appScheme: string
+  appLink: string
+}
+
+export class UniNativeAppImpl implements IUniNativeApp {
+  appid: string
+  /**
+   * @internal
+   */
+  manifest: Manifest
+  /**
+   * @internal
+   */
+  window!: OHWindow.Window
+  /**
+   * @internal
+   */
+  context: UIContext | null = null
+  /**
+   * @internal
+   */
+  router = new NavPathStack()
+  /**
+   * @internal
+   */
+  public userAgent: IUserAgent = {
+    value: '',
+    concatenate: true,
+    fullUserAgent: getUserAgent(),
+  }
+  appTheme: string = getAppTheme()
+  pageManager: UniPageManagerImpl = new UniPageManagerImpl()
+  /**
+   * @internal
+   */
+  _emitter = new TinyEmitter()
+  private appStartDuration = 0
+  private globalDocument = new GlobalDocument()
+  private windowStage: OHWindow.WindowStage
+  private isMain: boolean
+  appScheme: string = ''
+  /**
+   * @internal
+   */
+  animationType?: AnimationType
+  /**
+   * @internal
+   */
+  animationDuration?: number
+  private windowStageEventType: OHWindow.WindowStageEventType = OHWindow.WindowStageEventType.SHOWN
+
+  constructor(id: string, config?: IOpenUniAppConfig) {
+    if (mainApp) {
+      throw new Error('app already opened')
+    }
+    mainApp = this
+    this.appid = id
+    this.isMain = config?.isMain ?? false
+    if (config?.wantUri) {
+      this.appScheme = config.wantUri
+    }
+    if (!this.isMain) {
+      this.animationType = config?.animationType ?? 'slide-in-right'
+      this.animationDuration = config?.animationDuration ?? 300
+    }
+    const windowStage = getWindowStage()
+    if (!windowStage) {
+      mainApp = null
+      throw new Error('windowStage is required')
+    }
+    this.windowStage = windowStage
+    // TODO æ ¡éªŒ manifest
+    this.manifest = getManifest(id)
+    // TODO initUserAgentOnce
+    const initWindow = (err: BusinessError, window: OHWindow.Window) => {
+      this.window = window
+      // å¯ç”¨æ²‰æµ¸å¼ï¼Œä»¥ä¿éšœåç»­éƒ¨åˆ†å®‰å…¨åŒºç›¸å…³æµ‹é‡æ­£å¸¸
+      window.setWindowLayoutFullScreen(true)
+      window.on('keyboardHeightChange', size => {
+        // TODO
+        // appLifeCycle.emit('keyboardHeightChange', size)
+      })
+      windowStage.on('windowStageEvent', (type: OHWindow.WindowStageEventType) => {
+        if (this.windowStageEventType === type) {
+          return
+        }
+        switch (type) {
+          case OHWindow.WindowStageEventType.SHOWN:
+            this.windowStageEventType = type
+            this._emitter.emit('onShow')
+            this._emitter.emit('onNewIntent', {
+              appScheme: this.appScheme,
+              appLink: this.appScheme
+            } as LaunchOptions)
+            break
+          case OHWindow.WindowStageEventType.HIDDEN:
+            this.windowStageEventType = type
+            this._emitter.emit('onHide')
+            break
+          default:
+            break
+        }
+      })
+      window.loadContentByName(TEMPLATE_PAGE_NAME, async err => {
+        if (err.code) {
+          console.error('loadContent error:', err)
+          return
+        }
+        if (!this.isMain) {
+          // è®¾ç½®ä¸ºé€æ˜èƒŒæ™¯ï¼Œä»¥ä¾¿åç»­å­çª—å£åŠ¨ç”»ä¸ä¸»çª—å£äº¤äº’
+          window.setWindowBackgroundColor('#00000000')
+        }
+        this.context = window.getUIContext()
+        this.context.getFont().registerFont({
+          familyName: 'uni-icon',
+          familySrc: $rawfile('uni-app-x/uni-icon.ttf')
+        })
+        const base = `../../resources/resfile/uni-app-x/apps/${id}/www/import`
+        initPages()
+        try {
+          const entryAbility = getEntryAbility()
+          await entryAbility!.onImport?.(`${base}/app-config`)
+          await entryAbility!.onImport?.(`${base}/app-service`)
+          // TODO ç§»é™¤å…¨å±€ document
+          globalThis.document = this.globalDocument
+          // TODO ç§»å‡ºå…¨å±€ __mount__
+          const mount = globalThis.__mount__ as () => void
+          genApp()
+          mount()
+        } catch (e) {
+          // TODO æš‚æ—¶ä¸ä½¿ç”¨ tag
+          console.error(e)
+        }
+        if (config?.isMain) {
+          let errorCallback: errorManager.ErrorObserver = {
+            onUnhandledException: (errMsg) => {
+              // ignore
+            },
+            onException: (errorObj) => {
+              // TODO æš‚æ—¶ä¸ä½¿ç”¨ tag
+              console.error(errorObj as Object as string)
+            }
+          }
+          errorManager.on('error', errorCallback)
+          this.appStartDuration = Date.now() - getEntryAbility().startTime
+        }
+        window.showWindow()
+      })
+    }
+    if (config?.isMain) {
+      windowStage.getMainWindow(initWindow)
+    } else {
+      windowStage.createSubWindow(`uni-mp-${id}`, initWindow)
+    }
+
+    this.initPrivacyAuthorization()
+  }
+
+  onEvent(event: string): void {
+    throw new Error('Method not implemented.')
+  }
+
+  addEventListener<T>(event: 'onShow' | 'onHide' | 'onExit' | 'onThemeChange' | 'onError' | 'onNewIntent',
+    callback: (event: T) => void): UniCallbackWrapper {
+    const callbackWrapper = new UniCallbackWrapper(callback)
+    this._emitter.on(event, callback)
+    return callbackWrapper
+  }
+
+  removeEventListener(event: string, callbackWrapper: UniCallbackWrapper): void {
+    const callback = callbackWrapper.callback
+    this._emitter.off(event, callback)
+  }
+
+  addKeyEventListener(event: 'onBackButton', callback: (event: UniKeyEvent) => boolean): void {
+    this._emitter.on(event, (event: UniKeyEvent) => {
+      const pages = getCurrentPages() as UniPageImpl[]
+      const currentPage = pages[pages.length - 1]
+      const currentNativePage = currentPage && currentPage.getNativePage()
+      if (currentNativePage && currentNativePage.fullscreenElement != null) {
+        currentPage.getNativePage().exitFullscreen()
+      } else {
+        callback(event)
+      }
+    })
+  }
+
+  quit(): void {
+    // æ¸…ç†é€»è¾‘ï¼Œé™¤äº‹ä»¶å¤–åŸºæœ¬è‡ªä¸Šè€Œä¸‹ app -> framework -> core
+    clearSafeAreaInsetsChange()
+    this._emitter.emit('onExit')
+    this._emitter.off('onShow')
+    this._emitter.off('onHide')
+    this._emitter.off('onExit')
+    this._emitter.off('onThemeChange')
+    this._emitter.off('onError')
+    this._emitter.off('onBackButton')
+    try {
+      this.windowStage.off('windowStageEvent')
+    } catch (e) {
+      // ignore error
+    }
+    try {
+      this.window.off('keyboardHeightChange')
+    } catch (e) {
+      // ignore error
+    }
+    this.globalDocument.dispose()
+    globalThis.document = undefined
+    clearApp()
+    mainApp = null
+    if (this.isMain) {
+      getAbilityContext()!.terminateSelf()
+    } else {
+      this.window.destroyWindow()
+    }
+  }
+
+  getAppStartDuration(): number {
+    return this.appStartDuration
+  }
+
+  loadFontFace(options: NativeLoadFontFaceOptions): void {
+    registerFont(formatFontFaceSrc(options.source), options, this.context)
+  }
+
+  getRedirectInfo(): Map<string, Object> {
+    // TODO implement
+    return new Map()
+  }
+
+  connectResizeObserver(observerId: string, callback?: ((res: Object) => void) | undefined): void {
+    throw new Error('Method not implemented.')
+  }
+
+  observeResizeObserver(observerId: string, pageId: string, elemId: string): void {
+    throw new Error('Method not implemented.')
+  }
+
+  unobserveResizeObserver(observerId: string, pageId: string, elemId: string): void {
+    throw new Error('Method not implemented.')
+  }
+
+  disconnectResizeObserver(observerId: string): void {
+    throw new Error('Method not implemented.')
+  }
+
+  getLaunchOptionsSync(): LaunchOptions {
+    return {
+      appScheme: this.appScheme,
+      appLink: this.appScheme,
+    }
+  }
+
+  getAndroidApplication(): Object {
+    throw new Error('Method not implemented.')
+  }
+
+  private initPrivacyAuthorization() {
+    if (getPrivacyAgree()) {
+      return
+    }
+
+    let appHarmony: object | null = (this.manifest as object)['app-harmony']
+    if (appHarmony) {
+      let privacyValue: string | null = appHarmony['initPrivacyAuthorization']
+      if (privacyValue && privacyValue == 'agree') {
+        setPrivacyAgree(true)
+      } else {
+        setPrivacyAgree(false)
+      }
+    }
+  }
+}
+
+export function openUniApp(appID: string, config?: IOpenUniAppConfig) {
+  const app = new UniNativeAppImpl(appID, config)
+  return app
+}
+
+export function closeUniApp() {
+  if (mainApp) {
+    mainApp.quit()
+  }
+}
+
+export function getUniApp(): UniNativeAppImpl | null {
+  return getMainApp()
+}
+ÀÔrDœ¬@ohos.window¾@ohos.app.ability.errorManager¥./App´./dom/UniPageManager¸./dom/UniCallbackWrapper±./components/Page¨./helper¬./UTSHarmony¨./UniApp´./dom/GlobalDocument¬tiny-emitter¾./libs/uni-app-x-framework-devÔrE—ªassertions¨external¢id¤meta±moduleSideEffectsªresolvedByµsyntheticNamedExportsAÃÙi hvigor_ignore__Applications_DevEco-Studio.app_Contents_sdk_default_openharmony_ets_api_@ohos.window.d.tsAÃªoh-resolveÂEAÃÙ{ hvigor_ignore__Applications_DevEco-Studio.app_Contents_sdk_default_openharmony_ets_api_@ohos.app.ability.errorManager.d.tsAÃªoh-resolveÂEAÂÙê/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/runtime/App.etsAÃªoh-resolveÂEAÂÙù/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/runtime/dom/UniPageManager.etsAÃªoh-resolveÂEAÂÙü/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/runtime/dom/UniCallbackWrapper.tsAÃªoh-resolveÂEAÂÙö/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/runtime/components/Page.etsAÃªoh-resolveÂEAÂÙó/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/runtime/helper/index.etsAÃªoh-resolveÂEAÂÙ÷/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/runtime/UTSHarmony/index.etsAÃªoh-resolveÂEAÂÙí/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/runtime/UniApp.etsAÃªoh-resolveÂEAÂÙù/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/runtime/dom/GlobalDocument.etsAÃªoh-resolveÂEAÂÙ¸/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/tiny-emitter@2bbuysb+ygqpdccpkrwbr7yfkdtt9ybgnmj+zggaoy8=/oh_modules/tiny-emitter/index.jsAÃªoh-resolveÂEAÂÚ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/runtime/libs/uni-app-x-framework-dev.jsAÃªoh-resolveÂ“ÔrF–§version¤fileªsourceRoot§sources¥names¨mappings¯UniNativeApp.js ‘°UniNativeApp.etsÜœ”    ”  ”	  	”  ”  ”+  +”-  -”;  ;”=  =”ÌC  ÌC”ÌJ  ÌJ”ÌK  ÌJ–”   ” ” ” ”# #”$ #˜”   ” ”	 	” ” ”# #”6 6”7 6˜”  	 ” 	”	 		” 	” 	”# 	#”9 	9”: 	9˜”  
+ ” 
+”	 
+	” 
+” 
+”# 
+#”= 
+=”> 
+=˜”   ” ”	 	” ” ” ”* *”+ *Ü ”   ” ”	 ”" ”$ ”5 ”7 ”ÌF ”ÌH ”ÌV ”ÌX ”Ìd ”Ìf ”Ìr ”Ìt ”Ìz ”Ì„ ”Ì… ˜”   ” ”	 	” ” ” ”: :”; :”   ” ”	 	” ” ”) )”+ +”6 6”8 8”ÌD ÌD”ÌF ÌF”ÌL ÌL”ÌZ ÌZ”Ì[ ÌZ˜”   ” ”	 	” ” ” ”5 5”6 5š”   ” ”	 	” ” ” ” ”! !”+ +”, +–”   ” 	” ” ”9 .”: .–”   ” ” ” '” +” +“”   ”	 	” ”” ” 	” ” ’”    ”  –”  . ” .” .” .” .”! .*” /”
+ /” /” /”' /%”( /&”8 /6”: /8”> /<”Ì@ />”ÌE /ÌC”ÌF /ÌN”ÌG /ÌN™” 0”
+ 0” 0” 0”( 0&”) 0'”5 03”6 04”7 04™” 1” 1	” 1” 1” 1” 1”% 1#”& 1$”' 1$’”  2 ” 2””  ? ” ?” ?” ?•” Ìn” Ìn” Ìn” Ìn” Ìn4‘” ÌI‘” ÌK•” ÌL” ÌL	” ÌL” ÌL"” ÌL"‘” ÌM‘” ÌO—” ÌP” ÌP” ÌP” ÌP”& ÌP”( ÌP”) ÌP‘” ÌQ‘” ÌS“” ÌT	” ÌT” ÌT!”” ÌU” ÌU	” ÌU” ÌU”” ÌV” ÌV” ÌV” ÌV•” ÌW” ÌW” ÌW”' ÌW”) ÌW!’”	 ÌX”
+ ÌX–” ÌY” ÌY
+” ÌY”# ÌY ”% ÌY"”& ÌY"—” ÌZ” ÌZ” ÌZ$” ÌZ(”1 ÌZ:”3 ÌZ<”4 ÌZ<‘” Ì[‘” Ì]—” Ì^” Ì^
+” Ì^” Ì^”' Ì^”) Ì^”* Ì^•” Ì_
+” Ì_”  Ì_”! Ì_”" Ì_—” Ì`
+” Ì`” Ì`”" Ì`”0 Ì`-”2 Ì`/”3 Ì`/•” Ìc” Ìc” Ìc” Ìc” Ìc™” Ìl
+”! Ìl”$ ÌlÌ@”, ÌlÌH”- ÌlÌI”ÌA ÌlÌ]”ÌB ÌlÌ^”ÌG ÌlÌc”ÌH ÌlÌc”” Ìo” Ìo” Ìo” Ìo˜” Ìp” Ìp” Ìp” Ìp” Ìp”0 Ìp*”1 Ìp+”2 Ìp+‘”	 Ìq•” Ìr” Ìr” Ìr” Ìr” Ìr—” Ìs” Ìs” Ìs	” Ìs” Ìs” Ìs” Ìs›” Ìt” Ìt” Ìt	” Ìt” Ìt” Ìt” Ìt”$ Ìt ”( Ìt$”- Ìt)”. Ìt)–” Ìu” Ìu” Ìu” Ìu” Ìu” Ìu™” Ìv” Ìv
+” Ìv” Ìv” Ìv”# Ìv”$ Ìv”+ Ìv%”, Ìv%‘”	 Ìw—” Ìx” Ìx” Ìx	” Ìx” Ìx” Ìx” Ìx›” Ìy” Ìy
+” Ìy” Ìy”! Ìy”' Ìy!”) Ìy#”6 Ìy0”: Ìy4”ÌJ ÌyÌD”ÌK ÌyÌD›” Ìz” Ìz
+” Ìz”" Ìz”% Ìz”+ Ìz%”- Ìz'”> Ìz8”ÌB Ìz<”ÌE Ìz?”ÌF Ìz?‘”	 Ì{—” Ì|” Ì|
+” Ì|” Ì|”* Ì|&”, Ì|(”- Ì|(•” Ì}” Ì}” Ì}	” Ì}” Ì}•” Ì~” Ì~” Ì~” Ì~” Ì~˜” Ì” Ì” Ì” Ì” Ì”5 Ì/”6 Ì0”7 Ì0‘”	 Ì€—” Ì” Ì” Ì	” Ì” Ì”& Ì"”' Ì"’” Ì‚” Ì‚š” Ìƒ” Ìƒ” Ìƒ	” Ìƒ” Ìƒ”# Ìƒ”$ Ìƒ ”& Ìƒ"”' Ìƒ#”( Ìƒ#’” Ì„”! Ì„š” Ì…” Ì…
+” Ì…” Ì…” Ì…” Ì…*”! Ì…,”' Ì…ÌC”) Ì…ÌE”+ Ì…ÌG—” Ì†” Ì†
+” Ì†” Ì†” Ì†”  Ì†”! Ì†’” Ì‡”% Ì‡˜” Ìˆ” Ìˆ” Ìˆ”, Ìˆ&”- Ìˆ'”1 Ìˆ+”2 Ìˆ,”3 Ìˆ,š” Ì‰” Ì‰” Ì‰” Ì‰” Ì‰”, Ì‰&”. Ì‰(”2 Ì‰,”3 Ì‰-”5 Ì‰/’” ÌŠ” ÌŠ’” Ì‹”ÌB Ì‹:”” ÌŒ” ÌŒ” ÌŒ” ÌŒ›” Ì” Ì” Ì” Ì” Ì”- Ì'”/ Ì)”0 Ì*”4 ÌÌM”6 ÌÌO”8 ÌÌQ˜” Ì” Ì” Ì” Ì”- Ì%”2 Ì*”6 Ì.”8 Ì0’” Ì
+” Ì‘” Ì	”” Ì‘” Ì‘” Ì‘” Ì‘—” Ì’
+” Ì’”! Ì’”" Ì’”6 Ì’,”7 Ì’-”< Ì’2—” Ì“” Ì“” Ì“”1 Ì“%”4 Ì“(”8 Ì“,”9 Ì“,š” Ì”” Ì”” Ì””% Ì””& Ì””* Ì””+ Ì””3 Ì”'”4 Ì”(”5 Ì”(™” Ì•” Ì•” Ì•”% Ì•”& Ì•”* Ì•”+ Ì•”8 Ì•,”: Ì•.–” Ì–”% Ì–”' Ì–”+ Ì–”, Ì–”5 Ì–'–” Ì—”# Ì—”% Ì—”) Ì—”* Ì—”3 Ì—%“” Ì˜” Ì˜” Ì˜’” Ì™” Ì™—” Ìš
+” Ìš”! Ìš”" Ìš”6 Ìš,”7 Ìš-”= Ìš3—” Ì›” Ì›” Ì›”1 Ì›%”4 Ì›(”8 Ì›,”9 Ì›,š” Ìœ” Ìœ” Ìœ”% Ìœ”& Ìœ”* Ìœ”+ Ìœ”3 Ìœ'”4 Ìœ(”5 Ìœ(’” Ì” Ì‘” Ì
+’” ÌŸ” ÌŸ‘” Ì 	”” Ì¡” Ì¡” Ì¡” Ì¡œ” Ì¢” Ì¢” Ì¢”$ Ì¢”% Ì¢”7 Ì¢1”9 Ì¢3”> Ì¢8”Ì@ Ì¢9”ÌC Ì¢<”ÌE Ì¢=”ÌG Ì¢?–” Ì£” Ì£” Ì£” Ì£” Ì£” Ì£š” Ì¤
+” Ì¤” Ì¤”! Ì¤”" Ì¤”6 Ì¤,”8 Ì¤.”; Ì¤1”< Ì¤2”= Ì¤2’” Ì¥
+” Ì¥‘” Ì¦	—” Ì§” Ì§” Ì§” Ì§” Ì§”  Ì§”" Ì§’” Ì¨
+”. Ì¨$˜” Ì©
+” Ì©” Ì©”3 Ì©)”4 Ì©*”? Ì©5”Ì@ Ì©6”ÌA Ì©6‘” Ìª	š” Ì«” Ì«” Ì«” Ì«” Ì«”% Ì«”& Ì«”2 Ì«*”4 Ì«,”5 Ì«,š” Ì¬” Ì¬” Ì¬” Ì¬” Ì¬”$ Ì¬”& Ì¬”' Ì¬”3 Ì¬+”4 Ì¬,”” Ì­
+” Ì­”  Ì­”* Ì­ •” Ì®
+” Ì®”ÌB Ì®”ÌZ Ì®6”Ì™ Ì®7“” Ì¯	” Ì¯
+” Ì¯
+˜” Ì°” Ì°” Ì°” Ì°”ÌG Ì°?”ÌI Ì°ÌA”ÌV Ì°ÌN”ÌW Ì°ÌN”” Ì±” Ì±” Ì±” Ì±’” Ì²” Ì²—” Ì³
+” Ì³”& Ì³”) Ì³”8 Ì³.”: Ì³0”; Ì³0œ” Ì´
+” Ì´”& Ì´”' Ì´”/ Ì´&”1 Ì´(”2 Ì´)”5 Ì´,”9 Ì´0”ÌF Ì´=”ÌG Ì´>”ÌH Ì´>œ” Ìµ
+” Ìµ”& Ìµ”' Ìµ”/ Ìµ&”1 Ìµ(”2 Ìµ)”5 Ìµ,”9 Ìµ0”ÌG Ìµ>”ÌH Ìµ?”ÌI Ìµ?’” Ì¶
+”) Ì¶™” Ì·
+” Ì·” Ì·”' Ì·”* Ì· ”. Ì·$”/ Ì·%”= Ì·3”> Ì·3’” Ì¸
+”* Ì¸ ˜” Ì¹
+” Ì¹” Ì¹”" Ì¹”, Ì¹"”- Ì¹#”6 Ì¹:”7 Ì¹:”” Ìº
+” Ìº” Ìº” Ìº”” Ì»
+” Ì»” Ì»” Ì»‘” Ì¼	”” Ì¼
+” Ì¼” Ì¼” Ì¼’” Ì½
+”% Ì½˜” Ì¾
+” Ì¾” Ì¾”! Ì¾”" Ì¾”# Ì¾”$ Ì¾”% Ì¾‘” Ì¿	–” ÌÀ” ÌÀ” ÌÀ” ÌÀ”" ÌÀ”$ ÌÀ”” ÌÁ
+” ÌÁ”% ÌÁ”( ÌÁ:—” ÌÂ”, ÌÂ ”. ÌÂ"”/ ÌÂ#”5 ÌÂ)”7 ÌÂ+”9 ÌÂ-’” ÌÃ”% ÌÃ’” ÌÄ” ÌÄ—” ÌÅ”# ÌÅ”% ÌÅ”& ÌÅ”. ÌÅ"”0 ÌÅ$”2 ÌÅ&’” ÌÆ”- ÌÆ˜” ÌÇ”# ÌÇ”$ ÌÇ”) ÌÇ”* ÌÇ”2 ÌÇ8”3 ÌÇ9”4 ÌÇ9’” ÌÈ” ÌÈ’” ÌÉ” ÌÉš” ÌÊ
+”  ÌÊ”! ÌÊ”# ÌÊ”$ ÌÊ”+ ÌÊ!”- ÌÊ#”: ÌÊ0”; ÌÊ1”< ÌÊ1Ÿ” ÌË
+” ÌË” ÌË”) ÌË”, ÌË"”0 ÌË&”1 ÌË'”4 ÌË*”6 ÌË,”9 ÌË/”ÌH ÌË>”ÌJ ÌËÌ@”ÌK ÌËÌA”ÌT ÌËÌJ”ÌU ÌËÌJ‘” ÌÌ	–” ÌÍ” ÌÍ” ÌÍ”! ÌÍ”# ÌÍ”$ ÌÍ”” ÌÎ” ÌÎ” ÌÎ” ÌÎ“” ÌÏ”	 ÌÏ”
+ ÌÏ–” ÌĞ” ÌĞ” ÌĞ” ÌĞ” ÌĞ” ÌĞ˜” ÌÑ” ÌÑ” ÌÑ”% ÌÑ”& ÌÑ ”0 ÌÑ*”1 ÌÑ+”2 ÌÑ+‘”	 ÌÒ‘” ÌÒœ” ÌÓ” ÌÓ” ÌÓ”' ÌÓ!”( ÌÓ"”2 ÌÓ,”4 ÌÓ.”6 ÌÓ0”8 ÌÓ2”ÌB ÌÓ<”ÌC ÌÓ=”ÌD ÌÓ=‘”	 ÌÔ–” ÌÖ” ÌÖ” ÌÖ	”% ÌÖ!”' ÌÖ#”( ÌÖ#’” Ì×” Ì×”” ÌÙ” ÌÙ	” ÌÙ
+” ÌÙ˜” ÌÚ” ÌÚ
+” ÌÚ” ÌÚ” ÌÚ”1 ÌÚ-”2 ÌÚ.”3 ÌÚ.’” ÌÛ” ÌÛ–” Ìİ” Ìİ” Ìİ” ÌİÌi” ÌŞ”$ ÌŞ š” Ìß” Ìß
+” Ìß”  Ìß”$ Ìß ”6 Ìß2”7 Ìß3”? Ìß;”Ì@ Ìß<”ÌA Ìß<œ” Ìà” Ìà” Ìà	” Ìà” Ìà” Ìà” Ìà” Ìà”  Ìà”( Ìà$”) Ìà%”* Ìà%”” Ìá” Ìá” Ìá” Ìá’” Ìâ” Ìâ–” Ìä” Ìä” Ìä” Ìä#” Ìä%”. ÌäÌH˜” Ìå” Ìå
+” Ìå” Ìå”( Ìå$”) Ìå%”1 Ìå-”2 Ìå-œ” Ìæ” Ìæ” Ìæ	” Ìæ” Ìæ” Ìæ” Ìæ” Ìæ”! Ìæ”) Ìæ%”* Ìæ&”+ Ìæ&’” Ìç” Ìç–” Ìé” Ìé” Ìé” Ìé+” Ìé-”' ÌéÌV” Ìê” Ìê” Ìê	” Ìê” Ìê” Ìê” Ìê” Ìê”  Ìê”! Ìê”& Ìê/”( Ìê1”* Ìê3—” Ìë” Ìë” Ìë” Ìë”) Ìë#”+ Ìë6”, Ìë6” Ìì” Ìì” Ìì”  Ìì”% Ìì”& Ìì ”+ Ìì%”, Ìì&”2 Ìì,”5 Ìì/”6 Ìì0”7 Ìì1”8 Ìì1›” Ìí” Ìí”# Ìí”& Ìí ”1 Ìí+”5 Ìí/”Ì@ Ìí:”ÌA Ìí;”ÌN ÌíÌH”ÌP ÌíÌJ”ÌQ ÌíÌJš” Ìî” Ìî
+”! Ìî”% Ìî”6 Ìî0”7 Ìî1”ÌH ÌîÌB”ÌL ÌîÌF”ÌP ÌîÌJ”ÌR ÌîÌL™” Ìï” Ìï” Ìï”) Ìï!”+ Ìï#”, Ìï$”: Ìï2”< Ìï4”= Ìï4‘” Ìğ‘” Ìğ–” Ìñ” Ìñ” Ìñ” Ìñ” Ìñ”  Ìñ‘” Ìò”” Ìó”	 Ìó”
+ Ìó” Ìó’” Ìô” Ìô’” Ìö” Ìö’” Ì÷”3 Ì÷/”” Ìø”! Ìø”# Ìø”$ Ìøš” Ìù” Ìù” Ìù	” Ìù” Ìù” Ìù” Ìù”# Ìù”$ Ìù ”% Ìù š” Ìú” Ìú” Ìú	” Ìú” Ìú” Ìú” Ìú”" Ìú”# Ìú”$ Ìúš” Ìû” Ìû” Ìû	” Ìû” Ìû” Ìû” Ìû”" Ìû”# Ìû”$ Ìûš” Ìü” Ìü” Ìü	” Ìü” Ìü” Ìü” Ìü”" Ìü”# Ìü”$ Ìüš” Ìı” Ìı” Ìı	” Ìı” Ìı” Ìı” Ìı”) Ìı%”* Ìı&”+ Ìı&š” Ìş” Ìş” Ìş	” Ìş” Ìş” Ìş” Ìş”# Ìş”$ Ìş ”% Ìş š” Ìÿ” Ìÿ” Ìÿ	” Ìÿ” Ìÿ” Ìÿ” Ìÿ”( Ìÿ$”) Ìÿ%”* Ìÿ%’” Í ” Í š” Í” Í
+” Í” Í” Í”  Í”! Í”3 Í-”4 Í.”5 Í.‘”	 Í”” Í” Í” Í” Í’” Í” Í‘”	 Í’” Í” Íš” Í” Í
+” Í” Í” Í” Í” Í”2 Í,”3 Í-”4 Í-‘”	 Í”” Í” Í” Í” Í’” Í” Í‘”	 Í	˜” Í
+” Í
+” Í
+	” Í
+” Í
+”# Í
+”% Í
+!”& Í
+!—” Í” Í” Í” Í” Í”' Í#”( Í#”” Í” Í” Í” Í•” Í” Í” Í” Í” Í–” Í” Í” Í” Í” Í” Í—” Í” Í” Í”  Í”- Í(”/ Í*”0 Í*‘”	 Í‘” Í˜” Í” Í
+” Í” Í” Í”% Í”' Í!”( Í!‘”	 Í’” Í” Í’” Í” Í–” Í” Í” Í” Í”$ Í ”% Í ’” Í” Í”” Í” Í” Í” Í1Ü ” Í” Í” Í”& Í"”' Í#”. Í*”/ Í+”5 Í1”6 Í2”8 Í4”? Í;”ÌA Í=”ÌE ÍÌA”ÌF ÍÌB”ÌM ÍÌI”ÌN ÍÌJ”ÌO ÍÌJ’” Í” Í’” Í” Í’” Í” Í–” Í” Í” Í” Í” Í” Í’” Í ” Í –” Í"” Í"” Í"”$ Í"*”& Í",”. Í"ÌZ˜” Í#” Í#
+” Í#” Í#” Í#”1 Í#-”2 Í#.”3 Í#.’” Í$” Í$˜” Í&” Í&” Í&”$ Í&*”& Í&,”, Í&:”. Í&<”4 Í&ÌJ˜” Í'” Í'
+” Í'” Í'” Í'”1 Í'-”2 Í'.”3 Í'.’” Í(” Í(˜” Í*” Í*” Í*”& Í*,”( Í*.”. Í*<”0 Í*>”6 Í*ÌL˜” Í+” Í+
+” Í+” Í+” Í+”1 Í+-”2 Í+.”3 Í+.’” Í,” Í,”” Í.” Í.” Í.”' Í.-˜” Í/” Í/
+” Í/” Í/” Í/”1 Í/-”2 Í/.”3 Í/.’” Í0” Í0’” Í2” Í2’” Í3” Í3–” Í4” Í4” Í4” Í4” Í4”% Í4–” Í5” Í5” Í5” Í5” Í5”# Í5’”	 Í6”
+ Í6’” Í7” Í7’” Í9” Í9˜” Í:” Í:
+” Í:” Í:” Í:”1 Í:-”2 Í:.”3 Í:.’” Í;” Í;’” Í=
+” Í="•” Í>” Í>” Í>” Í>” Í>’” Í?” Í?‘”	 Í@›” ÍB” ÍB” ÍB” ÍB%” ÍB)” ÍB*”& ÍB=”' ÍB>”4 ÍBÌK”5 ÍBÌL”6 ÍBÌL”” ÍC” ÍC” ÍC” ÍC™” ÍD” ÍD
+” ÍD” ÍD(”) ÍD2”* ÍD3”ÌD ÍDÌM”ÌE ÍDÌN”ÌF ÍDÌN˜” ÍE” ÍE
+” ÍE”  ÍE”, ÍE&”0 ÍE*”7 ÍE1”9 ÍE3–” ÍF” ÍF”  ÍF”$ ÍF”% ÍF”& ÍF‘” ÍG‘” ÍG–” ÍH” ÍH”  ÍH”% ÍH”& ÍH”' ÍH‘” ÍI‘”	 ÍJ’” ÍK” ÍK‘” ÍL˜”  ÍN ” ÍN” ÍN” ÍN” ÍN”  ÍN(”" ÍN*”( ÍNÌDœ” ÍO”
+ ÍO” ÍO” ÍO” ÍO”$ ÍO"”% ÍO#”* ÍO(”, ÍO*”2 ÍO0”3 ÍO1”4 ÍO1”” ÍP” ÍP	” ÍP” ÍP’”  ÍQ ” ÍQ””  ÍS ” ÍS” ÍS” ÍS”” ÍT” ÍT” ÍT” ÍT–” ÍU” ÍU” ÍU” ÍU” ÍU” ÍU‘” ÍV’”  ÍW ” ÍW””  ÍY ” ÍY” ÍY” ÍY•” ÍZ” ÍZ	” ÍZ” ÍZ” ÍZ’”  Í[ ” Í[ÔrG–§version¤file§sources®sourcesContent¥names¨mappingsÀ‘À‘ÀÜ‘”    ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”  	 ‘”  
+ ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”    ‘”  ! ‘”  " ‘”  # ‘”  $ ‘”  % ‘”  & ‘”  ' ‘”  ( ‘”  ) ‘”  * ‘”  + ‘”  , ‘”  - ‘”  . ‘”  / ‘”  0 ‘”  1 ‘”  2 ‘”  3 ‘”  4 ‘”  5 ‘”  6 ‘”  7 ‘”  8 ‘”  9 ‘”  : ‘”  ; ‘”  < ‘”  = ‘”  > ‘”  ? ‘”  Ì@ ‘”  ÌA ‘”  ÌB ‘”  ÌC ‘”  ÌD ‘”  ÌE ‘”  ÌF ‘”  ÌG ‘”  ÌH ‘”  ÌI ‘”  ÌJ ‘”  ÌK ‘”  ÌL ‘”  ÌM ‘”  ÌN ‘”  ÌO ‘”  ÌP ‘”  ÌQ ‘”  ÌR ‘”  ÌS ‘”  ÌT ‘”  ÌU ‘”  ÌV ‘”  ÌW ‘”  ÌX ‘”  ÌY ‘”  ÌZ ‘”  Ì[ ‘”  Ì\ ‘”  Ì] ‘”  Ì^ ‘”  Ì_ ‘”  Ì` ‘”  Ìa ‘”  Ìb ‘”  Ìc ‘”  Ìd ‘”  Ìe ‘”  Ìf ‘”  Ìg ‘”  Ìh ‘”  Ìi ‘”  Ìj ‘”  Ìk ‘”  Ìl ‘”  Ìm ‘”  Ìn ‘”  Ìo ‘”  Ìp ‘”  Ìq ‘”  Ìr ‘”  Ìs ‘”  Ìt ‘”  Ìu ‘”  Ìv ‘”  Ìw ‘”  Ìx ‘”  Ìy ‘”  Ìz ‘”  Ì{ ‘”  Ì| ‘”  Ì} ‘”  Ì~ ‘”  Ì ‘”  Ì€ ‘”  Ì ‘”  Ì‚ ‘”  Ìƒ ‘”  Ì„ ‘”  Ì… ‘”  Ì† ‘”  Ì‡ ‘”  Ìˆ ‘”  Ì‰ ‘”  ÌŠ ‘”  Ì‹ ‘”  ÌŒ ‘”  Ì ‘”  Ì ‘”  Ì ‘”  Ì ‘”  Ì‘ ‘”  Ì’ ‘”  Ì“ ‘”  Ì” ‘”  Ì• ‘”  Ì– ‘”  Ì— ‘”  Ì˜ ‘”  Ì™ ‘”  Ìš ‘”  Ì› ‘”  Ìœ ‘”  Ì ‘”  Ì ‘”  ÌŸ ‘”  Ì  ‘”  Ì¡ ‘”  Ì¢ ‘”  Ì£ ‘”  Ì¤ ‘”  Ì¥ ‘”  Ì¦ ‘”  Ì§ ‘”  Ì¨ ‘”  Ì© ‘”  Ìª ‘”  Ì« ‘”  Ì¬ ‘”  Ì­ ‘”  Ì® ‘”  Ì¯ ‘”  Ì° ‘”  Ì± ‘”  Ì² ‘”  Ì³ ‘”  Ì´ ‘”  Ìµ ‘”  Ì¶ ‘”  Ì· ‘”  Ì¸ ‘”  Ì¹ ‘”  Ìº ‘”  Ì» ‘”  Ì¼ ‘”  Ì½ ‘”  Ì¾ ‘”  Ì¿ ‘”  ÌÀ ‘”  ÌÁ ‘”  ÌÂ ‘”  ÌÃ ‘”  ÌÄ ‘”  ÌÅ ‘”  ÌÆ ‘”  ÌÇ ‘”  ÌÈ ‘”  ÌÉ ‘”  ÌÊ ‘”  ÌË ‘”  ÌÌ ‘”  ÌÍ ‘”  ÌÎ ‘”  ÌÏ ‘”  ÌĞ ‘”  ÌÑ ‘”  ÌÒ ‘”  ÌÓ ‘”  ÌÔ ‘”  ÌÕ ‘”  ÌÖ ‘”  Ì× ‘”  ÌØ ‘”  ÌÙ ‘”  ÌÚ ‘”  ÌÛ ‘”  ÌÜ ‘”  Ìİ ‘”  ÌŞ ‘”  Ìß ‘”  Ìà ‘”  Ìá ‘”  Ìâ ‘”  Ìã ‘”  Ìä ‘”  Ìå ‘”  Ìæ ‘”  Ìç ‘”  Ìè ‘”  Ìé ‘”  Ìê ‘”  Ìë ‘”  Ìì ‘”  Ìí ‘”  Ìî ‘”  Ìï ‘”  Ìğ ‘”  Ìñ ‘”  Ìò ‘”  Ìó ‘”  Ìô ‘”  Ìõ ‘”  Ìö ‘”  Ì÷ ‘”  Ìø ‘”  Ìù ‘”  Ìú ‘”  Ìû ‘”  Ìü ‘”  Ìı ‘”  Ìş ‘”  Ìÿ ‘”  Í  ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í	 ‘”  Í
+ ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ÔrH’§missing¦pluginÃ¦genAbcÂÔ  ÔrI”²dynamicImportCache¹exportAllDeclarationCache»exportNamedDeclarationCache«importCache•ÔrJ–¤type¥start£end«declarationªspecifiers¦source¶ExportNamedDeclarationÍ^Í0ÔrK™¤type¥start£end¢idªexpression©generator¥async¦params¤body³FunctionDeclarationÍeÍ0ÔrL”¤type¥start£end¤nameªIdentifierÍnÍy«getManifestÂÂÂ‘LªIdentifierÍzÍ¥appIDÔrM”¤type¥start£end¤body®BlockStatementÍÍ0“ÔrN•¤type¥start£end¬declarations¤kind³VariableDeclarationÍˆÍË‘ÔrO•¤type¥start£end¢id¤init²VariableDeclaratorÍÍÊLªIdentifierÍÍš¬manifestPathÔrP–¤type¥start£end¦callee©arguments¨optional®CallExpressionÍÍÊLªIdentifierÍÍ«®getResourceStr“ÔrQ•¤type¥start£end¥value£raw§LiteralÍ¬Í¼®/manifest.json°'/manifest.json'Q§LiteralÍ¾ÍÂÃ¤trueLªIdentifierÍÄÍÉ¥appIDÂ¥constN³VariableDeclarationÍÑÍ‘O²VariableDeclaratorÍ×ÍLªIdentifierÍ×Íæ¯manifestContentP®CallExpressionÍéÍLªIdentifierÍéÍõ¬readTextSync‘LªIdentifierÍöÍ¬manifestPathÂ¥constÔrR”¤type¥start£end¨argument¯ReturnStatementÍ
+Í-P®CallExpressionÍÍ,ÔrS—¤type¥start£end¦object¨property¨computed¨optional°MemberExpressionÍÍLªIdentifierÍÍ¤JSONLªIdentifierÍÍ¥parseÂÂ‘LªIdentifierÍÍ+¯manifestContentÂÀJ¶ExportNamedDeclarationÍ2Í%«ÔrT–¤type¥start£end¢idªsuperClass¤body°ClassDeclarationÍ9Í%«LªIdentifierÍ?ÍO°UniNativeAppImplÀM©ClassBodyÍPÍ%«Ü ÔrU˜¤type¥start£end¦static¨computed£key¤kind¥value°MethodDefinitionÍWÍ“ÂÂLªIdentifierÍWÍb«constructor«constructorK²FunctionExpressionÍbÍ“ÀÂÂÂ’LªIdentifierÍcÍe¢idLªIdentifierÍgÍm¦configM®BlockStatementÍoÍ“Ü ÔrV”¤type¥start£endªexpression³ExpressionStatementÍªÍ¾ÔrW–¤type¥start£end¨operator¤left¥right´AssignmentExpressionÍªÍ½¡=S°MemberExpressionÍªÍ¶ÔrX“¤type¥start£end®ThisExpressionÍªÍ®LªIdentifierÍ¯Í¶§contextÂÂQ§LiteralÍ¹Í½À¤nullV³ExpressionStatementÍøÍW´AssignmentExpressionÍøÍ¡=S°MemberExpressionÍøÍX®ThisExpressionÍøÍüLªIdentifierÍıÍ¦routerÂÂÔrY•¤type¥start£end¦callee©arguments­NewExpressionÍÍLªIdentifierÍ
+Í¬NavPathStackV³ExpressionStatementÍSÍÕW´AssignmentExpressionÍSÍÔ¡=S°MemberExpressionÍSÍaX®ThisExpressionÍSÍWLªIdentifierÍXÍa©userAgentÂÂÔrZ”¤type¥start£endªproperties°ObjectExpressionÍdÍÔ“Ôr[™¤type¥start£end¦method©shorthand¨computed£key¥value¤kind¨PropertyÍsÍ|ÂÂÂLªIdentifierÍsÍx¥valueQ§LiteralÍzÍ| ¢''¤init[¨PropertyÍ‹ÍœÂÂÂLªIdentifierÍ‹Í–«concatenateQ§LiteralÍ˜ÍœÃ¤true¤init[¨PropertyÍ«ÍÈÂÂÂLªIdentifierÍ«Í¸­fullUserAgentP®CallExpressionÍºÍÈLªIdentifierÍºÍÆ¬getUserAgentÂ¤initV³ExpressionStatementÍßÍıW´AssignmentExpressionÍßÍü¡=S°MemberExpressionÍßÍìX®ThisExpressionÍßÍãLªIdentifierÍäÍì¨appThemeÂÂP®CallExpressionÍïÍüLªIdentifierÍïÍú«getAppThemeÂV³ExpressionStatementÍÍ3W´AssignmentExpressionÍÍ2¡=S°MemberExpressionÍÍX®ThisExpressionÍÍLªIdentifierÍÍ«pageManagerÂÂY­NewExpressionÍÍ2LªIdentifierÍÍ0²UniPageManagerImplV³ExpressionStatementÍmÍW´AssignmentExpressionÍmÍ¡=S°MemberExpressionÍmÍzX®ThisExpressionÍmÍqLªIdentifierÍrÍz¨_emitterÂÂY­NewExpressionÍ}ÍLªIdentifierÍÍŒ«TinyEmitterV³ExpressionStatementÍ™Í³W´AssignmentExpressionÍ™Í²¡=S°MemberExpressionÍ™Í®X®ThisExpressionÍ™ÍLªIdentifierÍÍ®°appStartDurationÂÂQ§LiteralÍ±Í² ¡0V³ExpressionStatementÍ½ÍèW´AssignmentExpressionÍ½Íç¡=S°MemberExpressionÍ½ÍĞX®ThisExpressionÍ½ÍÁLªIdentifierÍÂÍĞ®globalDocumentÂÂY­NewExpressionÍÓÍçLªIdentifierÍ×Íå®GlobalDocumentV³ExpressionStatementÍòÍW´AssignmentExpressionÍòÍ¡=S°MemberExpressionÍòÍ X®ThisExpressionÍòÍöLªIdentifierÍ÷Í ©appSchemeÂÂQ§LiteralÍÍ ¢''V³ExpressionStatementÍÍPW´AssignmentExpressionÍÍO¡=S°MemberExpressionÍÍ)X®ThisExpressionÍÍLªIdentifierÍÍ)´windowStageEventTypeÂÂS°MemberExpressionÍ,ÍOS°MemberExpressionÍ,ÍILªIdentifierÍ,Í4¨OHWindowLªIdentifierÍ5ÍI´WindowStageEventTypeÂÂLªIdentifierÍJÍO¥SHOWNÂÂÔr\–¤type¥start£end¤testªconsequent©alternate«IfStatementÍZÍ§LªIdentifierÍ^Íe§mainAppM®BlockStatementÍgÍ§‘R®ThrowStatementÍvÍœY­NewExpressionÍ|Í›LªIdentifierÍ€Í…¥Error‘Q§LiteralÍ†Íš²app already opened´'app already opened'ÀV³ExpressionStatementÍ±ÍÀW´AssignmentExpressionÍ±Í¿¡=LªIdentifierÍ±Í¸§mainAppX®ThisExpressionÍ»Í¿V³ExpressionStatementÍÊÍÚW´AssignmentExpressionÍÊÍÙ¡=S°MemberExpressionÍÊÍÔX®ThisExpressionÍÊÍÎLªIdentifierÍÏÍÔ¥appidÂÂLªIdentifierÍ×ÍÙ¢idV³ExpressionStatementÍäÍ
+W´AssignmentExpressionÍäÍ	¡=S°MemberExpressionÍäÍïX®ThisExpressionÍäÍèLªIdentifierÍéÍï¦isMainÂÂÔr]–¤type¥start£end¤left¨operator¥right±LogicalExpressionÍòÍ	V¯ChainExpressionÍòÍ S°MemberExpressionÍòÍ LªIdentifierÍòÍø¦configLªIdentifierÍúÍ ¦isMainÂÃ¢??Q§LiteralÍÍ	Â¥false\«IfStatementÍÍcV¯ChainExpressionÍÍ'S°MemberExpressionÍÍ'LªIdentifierÍÍ¦configLªIdentifierÍ Í'§wantUriÂÃM®BlockStatementÍ)Íc‘V³ExpressionStatementÍ8ÍXW´AssignmentExpressionÍ8ÍW¡=S°MemberExpressionÍ8ÍFX®ThisExpressionÍ8Í<LªIdentifierÍ=ÍF©appSchemeÂÂS°MemberExpressionÍIÍWLªIdentifierÍIÍO¦configLªIdentifierÍPÍW§wantUriÂÂÀ\«IfStatementÍmÍ	 Ôr^–¤type¥start£end¨operator¦prefix¨argument¯UnaryExpressionÍqÍ}¡!ÃS°MemberExpressionÍrÍ}X®ThisExpressionÍrÍvLªIdentifierÍwÍ}¦isMainÂÂM®BlockStatementÍÍ	 ’V³ExpressionStatementÍÍÍW´AssignmentExpressionÍÍÌ¡=S°MemberExpressionÍÍ X®ThisExpressionÍÍ’LªIdentifierÍ“Í ­animationTypeÂÂ]±LogicalExpressionÍ£ÍÌV¯ChainExpressionÍ£Í¸S°MemberExpressionÍ£Í¸LªIdentifierÍ£Í©¦configLªIdentifierÍ«Í¸­animationTypeÂÃ¢??Q§LiteralÍ¼ÍÌ®slide-in-right°'slide-in-right'V³ExpressionStatementÍÛÍ	W´AssignmentExpressionÍÛÍ	¡=S°MemberExpressionÍÛÍñX®ThisExpressionÍÛÍßLªIdentifierÍàÍñ±animationDurationÂÂ]±LogicalExpressionÍôÍ	V¯ChainExpressionÍôÍ	S°MemberExpressionÍôÍ	LªIdentifierÍôÍú¦configLªIdentifierÍüÍ	±animationDurationÂÃ¢??Q§LiteralÍ	Í	Í,£300ÀN³VariableDeclarationÍ	*Í	O‘O²VariableDeclaratorÍ	0Í	NLªIdentifierÍ	0Í	;«windowStageP®CallExpressionÍ	>Í	NLªIdentifierÍ	>Í	L®getWindowStageÂ¥const\«IfStatementÍ	YÍ	Í^¯UnaryExpressionÍ	]Í	i¡!ÃLªIdentifierÍ	^Í	i«windowStageM®BlockStatementÍ	kÍ	Í’V³ExpressionStatementÍ	zÍ	‰W´AssignmentExpressionÍ	zÍ	ˆ¡=LªIdentifierÍ	zÍ	§mainAppQ§LiteralÍ	„Í	ˆÀ¤nullR®ThrowStatementÍ	—Í	ÂY­NewExpressionÍ	Í	ÁLªIdentifierÍ	¡Í	¦¥Error‘Q§LiteralÍ	§Í	À·windowStage is required¹'windowStage is required'ÀV³ExpressionStatementÍ	×Í	öW´AssignmentExpressionÍ	×Í	õ¡=S°MemberExpressionÍ	×Í	çX®ThisExpressionÍ	×Í	ÛLªIdentifierÍ	ÜÍ	ç«windowStageÂÂLªIdentifierÍ	êÍ	õ«windowStageV³ExpressionStatementÍ
+Í
+=W´AssignmentExpressionÍ
+Í
+<¡=S°MemberExpressionÍ
+Í
+*X®ThisExpressionÍ
+Í
+!LªIdentifierÍ
+"Í
+*¨manifestÂÂP®CallExpressionÍ
+-Í
+<LªIdentifierÍ
+-Í
+8«getManifest‘LªIdentifierÍ
+9Í
+;¢idÂN³VariableDeclarationÍ
+jÍ£‘O²VariableDeclaratorÍ
+pÍ¢LªIdentifierÍ
+pÍ
+zªinitWindowK·ArrowFunctionExpressionÍ
+}Í¢ÀÂÂÂ’LªIdentifierÍ
+~Í
+£errLªIdentifierÍ
+ƒÍ
+‰¦windowM®BlockStatementÍ
+Í¢•V³ExpressionStatementÍ
+Í
+²W´AssignmentExpressionÍ
+Í
+±¡=S°MemberExpressionÍ
+Í
+¨X®ThisExpressionÍ
+Í
+¡LªIdentifierÍ
+¢Í
+¨¦windowÂÂLªIdentifierÍ
+«Í
+±¦windowV³ExpressionStatementÍ
+çÍP®CallExpressionÍ
+çÍS°MemberExpressionÍ
+çÍLªIdentifierÍ
+çÍ
+í¦windowLªIdentifierÍ
+îÍ¹setWindowLayoutFullScreenÂÂ‘Q§LiteralÍÍÃ¤trueÂV³ExpressionStatementÍÍµP®CallExpressionÍÍ´S°MemberExpressionÍÍ%LªIdentifierÍÍ"¦windowLªIdentifierÍ#Í%¢onÂÂ’Q§LiteralÍ&Í<´keyboardHeightChange¶'keyboardHeightChange'K·ArrowFunctionExpressionÍ>Í³ÀÂÂÂ‘LªIdentifierÍ>ÍB¤sizeM®BlockStatementÍFÍ³ÂV³ExpressionStatementÍÃÍIP®CallExpressionÍÃÍHS°MemberExpressionÍÃÍÑLªIdentifierÍÃÍÎ«windowStageLªIdentifierÍÏÍÑ¢onÂÂ’Q§LiteralÍÒÍä°windowStageEvent²'windowStageEvent'K·ArrowFunctionExpressionÍæÍGÀÂÂÂ‘LªIdentifierÍçÍë¤typeM®BlockStatementÍğÍG’\«IfStatementÍÍ\]°BinaryExpressionÍÍ)S°MemberExpressionÍÍ X®ThisExpressionÍÍLªIdentifierÍÍ ´windowStageEventTypeÂÂ£===LªIdentifierÍ%Í)¤typeM®BlockStatementÍ+Í\‘R¯ReturnStatementÍBÍIÀÀÔr_•¤type¥start£end¬discriminant¥cases¯SwitchStatementÍnÍ8LªIdentifierÍvÍz¤type“Ôr`•¤type¥start£endªconsequent¤testªSwitchCaseÍ“Í”V³ExpressionStatementÍÖÍ÷W´AssignmentExpressionÍÖÍö¡=S°MemberExpressionÍÖÍïX®ThisExpressionÍÖÍÚLªIdentifierÍÛÍï´windowStageEventTypeÂÂLªIdentifierÍòÍö¤typeV³ExpressionStatementÍÍ.P®CallExpressionÍÍ-S°MemberExpressionÍÍ#S°MemberExpressionÍÍX®ThisExpressionÍÍLªIdentifierÍÍ¨_emitterÂÂLªIdentifierÍÍ#¤emitÂÂ‘Q§LiteralÍ$Í,¦onShow¨'onShow'ÂV³ExpressionStatementÍHÍõP®CallExpressionÍHÍôS°MemberExpressionÍHÍZS°MemberExpressionÍHÍUX®ThisExpressionÍHÍLLªIdentifierÍMÍU¨_emitterÂÂLªIdentifierÍVÍZ¤emitÂÂ’Q§LiteralÍ[Íh«onNewIntent­'onNewIntent'Z°ObjectExpressionÍjÍó’[¨PropertyÍ‰Í¢ÂÂÂLªIdentifierÍ‰Í’©appSchemeS°MemberExpressionÍ”Í¢X®ThisExpressionÍ”Í˜LªIdentifierÍ™Í¢©appSchemeÂÂ¤init[¨PropertyÍÁÍØÂÂÂLªIdentifierÍÁÍÈ§appLinkS°MemberExpressionÍÊÍØX®ThisExpressionÍÊÍÎLªIdentifierÍÏÍØ©appSchemeÂÂ¤initÂÔra”¤type¥start£end¥label®BreakStatementÍÍÀS°MemberExpressionÍ˜Í»S°MemberExpressionÍ˜ÍµLªIdentifierÍ˜Í ¨OHWindowLªIdentifierÍ¡Íµ´WindowStageEventTypeÂÂLªIdentifierÍ¶Í»¥SHOWNÂÂ`ªSwitchCaseÍ+Íç“V³ExpressionStatementÍoÍW´AssignmentExpressionÍoÍ¡=S°MemberExpressionÍoÍˆX®ThisExpressionÍoÍsLªIdentifierÍtÍˆ´windowStageEventTypeÂÂLªIdentifierÍ‹Í¤typeV³ExpressionStatementÍªÍÇP®CallExpressionÍªÍÆS°MemberExpressionÍªÍ¼S°MemberExpressionÍªÍ·X®ThisExpressionÍªÍ®LªIdentifierÍ¯Í·¨_emitterÂÂLªIdentifierÍ¸Í¼¤emitÂÂ‘Q§LiteralÍ½ÍÅ¦onHide¨'onHide'Âa®BreakStatementÍáÍçÀS°MemberExpressionÍ0ÍTS°MemberExpressionÍ0ÍMLªIdentifierÍ0Í8¨OHWindowLªIdentifierÍ9ÍM´WindowStageEventTypeÂÂLªIdentifierÍNÍT¦HIDDENÂÂ`ªSwitchCaseÍıÍ%‘a®BreakStatementÍÍ%ÀÀÂV³ExpressionStatementÍWÍ—P®CallExpressionÍWÍ–S°MemberExpressionÍWÍoLªIdentifierÍWÍ]¦windowLªIdentifierÍ^Ío±loadContentByNameÂÂ’LªIdentifierÍpÍ‚²TEMPLATE_PAGE_NAMEK·ArrowFunctionExpressionÍ„Í•ÀÂÂÃ‘LªIdentifierÍ‹Í£errM®BlockStatementÍ“Í•™\«IfStatementÍ¦Í$S°MemberExpressionÍªÍ²LªIdentifierÍªÍ­£errLªIdentifierÍ®Í²¤codeÂÂM®BlockStatementÍ´Í$’V³ExpressionStatementÍËÍôP®CallExpressionÍËÍóS°MemberExpressionÍËÍØLªIdentifierÍËÍÒ§consoleLªIdentifierÍÓÍØ¥errorÂÂ’Q§LiteralÍÙÍí²loadContent error:´'loadContent error:'LªIdentifierÍïÍò£errÂR¯ReturnStatementÍ
+ÍÀÀ\«IfStatementÍ6ÍÏ^¯UnaryExpressionÍ:ÍF¡!ÃS°MemberExpressionÍ;ÍFX®ThisExpressionÍ;Í?LªIdentifierÍ@ÍF¦isMainÂÂM®BlockStatementÍHÍÏ‘V³ExpressionStatementÍÍ¼P®CallExpressionÍÍ»S°MemberExpressionÍÍ®LªIdentifierÍÍ•¦windowLªIdentifierÍ–Í®¸setWindowBackgroundColorÂÂ‘Q§LiteralÍ¯Íº©#00000000«'#00000000'ÂÀV³ExpressionStatementÍáÍW´AssignmentExpressionÍáÍ¡=S°MemberExpressionÍáÍíX®ThisExpressionÍáÍåLªIdentifierÍæÍí§contextÂÂP®CallExpressionÍğÍS°MemberExpressionÍğÍLªIdentifierÍğÍö¦windowLªIdentifierÍ÷Í¬getUIContextÂÂÂV³ExpressionStatementÍÍP®CallExpressionÍÍS°MemberExpressionÍÍ;P®CallExpressionÍÍ.S°MemberExpressionÍÍ,S°MemberExpressionÍÍ$X®ThisExpressionÍÍLªIdentifierÍÍ$§contextÂÂLªIdentifierÍ%Í,§getFontÂÂÂLªIdentifierÍ/Í;¬registerFontÂÂ‘Z°ObjectExpressionÍ<Í’[¨PropertyÍSÍiÂÂÂLªIdentifierÍSÍ]ªfamilyNameQ§LiteralÍ_Íi¨uni-iconª'uni-icon'¤init[¨PropertyÍ€ÍÂÂÂLªIdentifierÍ€Í‰©familySrcZ°ObjectExpressionÍ‹Í•[¨PropertyÍÍ”ÂÂÂQ§LiteralÍÍ‘¢id¤"id"Q§LiteralÍ“Í” ¡0¤init[¨PropertyÍ–Í£ÂÂÂQ§LiteralÍ–Íœ¤type¦"type"Q§LiteralÍÍ£Íu0¥30000¤init[¨PropertyÍ¥ÍÇÂÂÂLªIdentifierÍ¥Í«¦paramsÔrb”¤type¥start£end¨elements¯ArrayExpressionÍ­ÍÇ‘Q§LiteralÍ®ÍÆ¶uni-app-x/uni-icon.ttf¸'uni-app-x/uni-icon.ttf'¤init[¨PropertyÍÉÍìÂÂÂQ§LiteralÍÉÍÕªbundleName¬"bundleName"Q§LiteralÍ×Íì³com.bigScreen.qizhiµ"com.bigScreen.qizhi"¤init[¨PropertyÍîÍÂÂÂQ§LiteralÍîÍúªmoduleName¬"moduleName"Q§LiteralÍüÍ¥entry§"entry"¤init¤initÂN³VariableDeclarationÍ,Ís‘O²VariableDeclaratorÍ2ÍrLªIdentifierÍ2Í6¤baseÔrc•¤type¥start£end«expressions¦quasis¯TemplateLiteralÍ9Ír‘LªIdentifierÍcÍe¢id’Ôrd•¤type¥start£end¥value¤tail¯TemplateElementÍ:ÍaÔre’£raw¦cookedÙ'../../resources/resfile/uni-app-x/apps/Ù'../../resources/resfile/uni-app-x/apps/Âd¯TemplateElementÍfÍqe«/www/import«/www/importÃ¥constV³ExpressionStatementÍ…Í‘P®CallExpressionÍ…ÍLªIdentifierÍ…Í©initPagesÂÔrf–¤type¥start£end¥block§handler©finalizer¬TryStatementÍ£ÍM®BlockStatementÍ§Íš—N³VariableDeclarationÍ¾Íå‘O²VariableDeclaratorÍÄÍäLªIdentifierÍÄÍĞ¬entryAbilityP®CallExpressionÍÓÍäLªIdentifierÍÓÍâ¯getEntryAbilityÂ¥constV³ExpressionStatementÍûÍ/R¯AwaitExpressionÍûÍ.V¯ChainExpressionÍÍ.P®CallExpressionÍÍ.S°MemberExpressionÍÍLªIdentifierÍÍ¬entryAbilityLªIdentifierÍÍ¨onImportÂÂ‘c¯TemplateLiteralÍÍ-‘LªIdentifierÍÍ ¤base’d¯TemplateElementÍÍe  Âd¯TemplateElementÍ!Í,e«/app-config«/app-configÃÃV³ExpressionStatementÍEÍzR¯AwaitExpressionÍEÍyV¯ChainExpressionÍKÍyP®CallExpressionÍKÍyS°MemberExpressionÍKÍ`LªIdentifierÍKÍW¬entryAbilityLªIdentifierÍXÍ`¨onImportÂÂ‘c¯TemplateLiteralÍcÍx‘LªIdentifierÍfÍj¤base’d¯TemplateElementÍdÍde  Âd¯TemplateElementÍkÍwe¬/app-service¬/app-serviceÃÃV³ExpressionStatementÍ»ÍåW´AssignmentExpressionÍ»Íä¡=S°MemberExpressionÍ»ÍÎLªIdentifierÍ»ÍÅªglobalThisLªIdentifierÍÆÍÎ¨documentÂÂS°MemberExpressionÍÑÍäX®ThisExpressionÍÑÍÕLªIdentifierÍÖÍä®globalDocumentÂÂN³VariableDeclarationÍ'ÍJ‘O²VariableDeclaratorÍ-ÍILªIdentifierÍ-Í2¥mountS°MemberExpressionÍ5ÍILªIdentifierÍ5Í?ªglobalThisLªIdentifierÍ@ÍI©__mount__ÂÂ¥constV³ExpressionStatementÍ`ÍiP®CallExpressionÍ`ÍhLªIdentifierÍ`Íf¦genAppÂV³ExpressionStatementÍÍ‡P®CallExpressionÍÍ†LªIdentifierÍÍ„¥mountÂÔrg•¤type¥start£end¥param¤body«CatchClauseÍ¬ÍLªIdentifierÍ³Í´¡eM®BlockStatementÍ¶Í‘V³ExpressionStatementÍôÍP®CallExpressionÍôÍS°MemberExpressionÍôÍLªIdentifierÍôÍû§consoleLªIdentifierÍüÍ¥errorÂÂ‘LªIdentifierÍÍ¡eÂÀ\«IfStatementÍ*Í`V¯ChainExpressionÍ.Í<S°MemberExpressionÍ.Í<LªIdentifierÍ.Í4¦configLªIdentifierÍ6Í<¦isMainÂÃM®BlockStatementÍ>Í`“N³VariableDeclarationÍUÍ¸‘O²VariableDeclaratorÍYÍ·LªIdentifierÍYÍf­errorCallbackZ°ObjectExpressionÍiÍ·’[¨PropertyÍ„ÍéÂÂÂLªIdentifierÍ„Í˜´onUnhandledExceptionK·ArrowFunctionExpressionÍšÍéÀÂÂÂ‘LªIdentifierÍ›Í¡¦errMsgM®BlockStatementÍ¦Íé¤init[¨PropertyÍÍ ÂÂÂLªIdentifierÍÍ«onExceptionK·ArrowFunctionExpressionÍÍ ÀÂÂÂ‘LªIdentifierÍÍ¨errorObjM®BlockStatementÍÍ ‘V³ExpressionStatementÍmÍ…P®CallExpressionÍmÍ„S°MemberExpressionÍmÍzLªIdentifierÍmÍt§consoleLªIdentifierÍuÍz¥errorÂÂ‘LªIdentifierÍ{Íƒ¨errorObjÂ¤init£letV³ExpressionStatementÍÎÍöP®CallExpressionÍÎÍõS°MemberExpressionÍÎÍİLªIdentifierÍÎÍÚ¬errorManagerLªIdentifierÍÛÍİ¢onÂÂ’Q§LiteralÍŞÍå¥error§'error'LªIdentifierÍçÍô­errorCallbackÂV³ExpressionStatementÍÍMW´AssignmentExpressionÍÍL¡=S°MemberExpressionÍÍ!X®ThisExpressionÍÍLªIdentifierÍÍ!°appStartDurationÂÂ]°BinaryExpressionÍ$ÍLP®CallExpressionÍ$Í.S°MemberExpressionÍ$Í,LªIdentifierÍ$Í(¤DateLªIdentifierÍ)Í,£nowÂÂÂ¡-S°MemberExpressionÍ1ÍLP®CallExpressionÍ1ÍBLªIdentifierÍ1Í@¯getEntryAbilityÂLªIdentifierÍCÍL©startTimeÂÂÀV³ExpressionStatementÍrÍ†P®CallExpressionÍrÍ…S°MemberExpressionÍrÍƒLªIdentifierÍrÍx¦windowLªIdentifierÍyÍƒªshowWindowÂÂÂÂ¥const\«IfStatementÍ­ÍbV¯ChainExpressionÍ±Í¿S°MemberExpressionÍ±Í¿LªIdentifierÍ±Í·¦configLªIdentifierÍ¹Í¿¦isMainÂÃM®BlockStatementÍÁÍ‘V³ExpressionStatementÍĞÍöP®CallExpressionÍĞÍõS°MemberExpressionÍĞÍéLªIdentifierÍĞÍÛ«windowStageLªIdentifierÍÜÍé­getMainWindowÂÂ‘LªIdentifierÍêÍôªinitWindowÂM®BlockStatementÍÍb‘V³ExpressionStatementÍÍWP®CallExpressionÍÍVS°MemberExpressionÍÍ:LªIdentifierÍÍ*«windowStageLªIdentifierÍ+Í:¯createSubWindowÂÂ’c¯TemplateLiteralÍ;ÍI‘LªIdentifierÍEÍG¢id’d¯TemplateElementÍ<ÍCe§uni-mp-§uni-mp-Âd¯TemplateElementÍHÍHe  ÃLªIdentifierÍKÍUªinitWindowÂV³ExpressionStatementÍlÍŒP®CallExpressionÍlÍ‹S°MemberExpressionÍlÍ‰X®ThisExpressionÍlÍpLªIdentifierÍqÍ‰¸initPrivacyAuthorizationÂÂÂU°MethodDefinitionÍ™ÍåÂÂLªIdentifierÍ™Í §onEvent¦methodK²FunctionExpressionÍ ÍåÀÂÂÂ‘LªIdentifierÍ¡Í¦¥eventM®BlockStatementÍ¨Íå‘R®ThrowStatementÍ³ÍŞY­NewExpressionÍ¹ÍİLªIdentifierÍ½ÍÂ¥Error‘Q§LiteralÍÃÍÜ·Method not implemented.¹'Method not implemented.'U°MethodDefinitionÍëÍ¥ÂÂLªIdentifierÍëÍû°addEventListener¦methodK²FunctionExpressionÍûÍ¥ÀÂÂÂ’LªIdentifierÍüÍ¥eventLªIdentifierÍÍ¨callbackM®BlockStatementÍÍ¥“N³VariableDeclarationÍÍQ‘O²VariableDeclaratorÍÍPLªIdentifierÍÍ-¯callbackWrapperY­NewExpressionÍ0ÍPLªIdentifierÍ4ÍF²UniCallbackWrapper‘LªIdentifierÍGÍO¨callback¥constV³ExpressionStatementÍ[Í}P®CallExpressionÍ[Í|S°MemberExpressionÍ[ÍkS°MemberExpressionÍ[ÍhX®ThisExpressionÍ[Í_LªIdentifierÍ`Íh¨_emitterÂÂLªIdentifierÍiÍk¢onÂÂ’LªIdentifierÍlÍq¥eventLªIdentifierÍsÍ{¨callbackÂR¯ReturnStatementÍ‡ÍLªIdentifierÍÍ¯callbackWrapperU°MethodDefinitionÍ«Í@ÂÂLªIdentifierÍ«Í¾³removeEventListener¦methodK²FunctionExpressionÍ¾Í@ÀÂÂÂ’LªIdentifierÍ¿ÍÄ¥eventLªIdentifierÍÆÍÕ¯callbackWrapperM®BlockStatementÍ×Í@’N³VariableDeclarationÍâÍ‘O²VariableDeclaratorÍèÍLªIdentifierÍèÍğ¨callbackS°MemberExpressionÍóÍLªIdentifierÍóÍ¯callbackWrapperLªIdentifierÍÍ¨callbackÂÂ¥constV³ExpressionStatementÍÍ9P®CallExpressionÍÍ8S°MemberExpressionÍÍ'S°MemberExpressionÍÍ#X®ThisExpressionÍÍLªIdentifierÍÍ#¨_emitterÂÂLªIdentifierÍ$Í'£offÂÂ’LªIdentifierÍ(Í-¥eventLªIdentifierÍ/Í7¨callbackÂU°MethodDefinitionÍFÍQÂÂLªIdentifierÍFÍY³addKeyEventListener¦methodK²FunctionExpressionÍYÍQÀÂÂÂ’LªIdentifierÍZÍ_¥eventLªIdentifierÍaÍi¨callbackM®BlockStatementÍkÍQ‘V³ExpressionStatementÍvÍJP®CallExpressionÍvÍIS°MemberExpressionÍvÍ†S°MemberExpressionÍvÍƒX®ThisExpressionÍvÍzLªIdentifierÍ{Íƒ¨_emitterÂÂLªIdentifierÍ„Í†¢onÂÂ’LªIdentifierÍ‡ÍŒ¥eventK·ArrowFunctionExpressionÍÍHÀÂÂÂ‘LªIdentifierÍÍ”¥eventM®BlockStatementÍ™ÍH”N³VariableDeclarationÍ¨ÍÈ‘O²VariableDeclaratorÍ®ÍÇLªIdentifierÍ®Í³¥pagesP®CallExpressionÍ¶ÍÇLªIdentifierÍ¶ÍÅ¯getCurrentPagesÂ¥constN³VariableDeclarationÍÖÍ‘O²VariableDeclaratorÍÜÍLªIdentifierÍÜÍç«currentPageS°MemberExpressionÍêÍLªIdentifierÍêÍï¥pages]°BinaryExpressionÍğÍ S°MemberExpressionÍğÍüLªIdentifierÍğÍõ¥pagesLªIdentifierÍöÍü¦lengthÂÂ¡-Q§LiteralÍÿÍ ¡1ÃÂ¥constN³VariableDeclarationÍÍU‘O²VariableDeclaratorÍÍTLªIdentifierÍÍ'±currentNativePage]±LogicalExpressionÍ*ÍTLªIdentifierÍ*Í5«currentPage¢&&P®CallExpressionÍ9ÍTS°MemberExpressionÍ9ÍRLªIdentifierÍ9ÍD«currentPageLªIdentifierÍEÍR­getNativePageÂÂÂ¥const\«IfStatementÍcÍ=]±LogicalExpressionÍgÍ§LªIdentifierÍgÍx±currentNativePage¢&&]°BinaryExpressionÍ|Í§S°MemberExpressionÍ|ÍŸLªIdentifierÍ|Í±currentNativePageLªIdentifierÍÍŸ±fullscreenElementÂÂ¢!=Q§LiteralÍ£Í§À¤nullM®BlockStatementÍ©Íø‘V³ExpressionStatementÍ¼ÍéP®CallExpressionÍ¼ÍèS°MemberExpressionÍ¼ÍæP®CallExpressionÍ¼Í×S°MemberExpressionÍ¼ÍÕLªIdentifierÍ¼ÍÇ«currentPageLªIdentifierÍÈÍÕ­getNativePageÂÂÂLªIdentifierÍØÍæ®exitFullscreenÂÂÂM®BlockStatementÍÍ=‘V³ExpressionStatementÍÍ.P®CallExpressionÍÍ-LªIdentifierÍÍ&¨callback‘LªIdentifierÍ'Í,¥eventÂÂU°MethodDefinitionÍWÍ ÂÂLªIdentifierÍWÍ[¤quit¦methodK²FunctionExpressionÍ[Í ÀÂÂÂM®BlockStatementÍ^Í ŸV³ExpressionStatementÍÍºP®CallExpressionÍÍ¹LªIdentifierÍÍ·¹clearSafeAreaInsetsChangeÂV³ExpressionStatementÍÄÍáP®CallExpressionÍÄÍàS°MemberExpressionÍÄÍÖS°MemberExpressionÍÄÍÑX®ThisExpressionÍÄÍÈLªIdentifierÍÉÍÑ¨_emitterÂÂLªIdentifierÍÒÍÖ¤emitÂÂ‘Q§LiteralÍ×Íß¦onExit¨'onExit'ÂV³ExpressionStatementÍëÍP®CallExpressionÍëÍS°MemberExpressionÍëÍüS°MemberExpressionÍëÍøX®ThisExpressionÍëÍïLªIdentifierÍğÍø¨_emitterÂÂLªIdentifierÍùÍü£offÂÂ‘Q§LiteralÍıÍ¦onShow¨'onShow'ÂV³ExpressionStatementÍÍ-P®CallExpressionÍÍ,S°MemberExpressionÍÍ"S°MemberExpressionÍÍX®ThisExpressionÍÍLªIdentifierÍÍ¨_emitterÂÂLªIdentifierÍÍ"£offÂÂ‘Q§LiteralÍ#Í+¦onHide¨'onHide'ÂV³ExpressionStatementÍ7ÍSP®CallExpressionÍ7ÍRS°MemberExpressionÍ7ÍHS°MemberExpressionÍ7ÍDX®ThisExpressionÍ7Í;LªIdentifierÍ<ÍD¨_emitterÂÂLªIdentifierÍEÍH£offÂÂ‘Q§LiteralÍIÍQ¦onExit¨'onExit'ÂV³ExpressionStatementÍ]Í€P®CallExpressionÍ]ÍS°MemberExpressionÍ]ÍnS°MemberExpressionÍ]ÍjX®ThisExpressionÍ]ÍaLªIdentifierÍbÍj¨_emitterÂÂLªIdentifierÍkÍn£offÂÂ‘Q§LiteralÍoÍ~­onThemeChange¯'onThemeChange'ÂV³ExpressionStatementÍŠÍ§P®CallExpressionÍŠÍ¦S°MemberExpressionÍŠÍ›S°MemberExpressionÍŠÍ—X®ThisExpressionÍŠÍLªIdentifierÍÍ—¨_emitterÂÂLªIdentifierÍ˜Í›£offÂÂ‘Q§LiteralÍœÍ¥§onError©'onError'ÂV³ExpressionStatementÍ±ÍÓP®CallExpressionÍ±ÍÒS°MemberExpressionÍ±ÍÂS°MemberExpressionÍ±Í¾X®ThisExpressionÍ±ÍµLªIdentifierÍ¶Í¾¨_emitterÂÂLªIdentifierÍ¿ÍÂ£offÂÂ‘Q§LiteralÍÃÍÑ¬onBackButton®'onBackButton'Âf¬TryStatementÍİÍaM®BlockStatementÍáÍ$‘V³ExpressionStatementÍğÍP®CallExpressionÍğÍS°MemberExpressionÍğÍS°MemberExpressionÍğÍ X®ThisExpressionÍğÍôLªIdentifierÍõÍ «windowStageÂÂLªIdentifierÍÍ£offÂÂ‘Q§LiteralÍÍ°windowStageEvent²'windowStageEvent'Âg«CatchClauseÍ.ÍaLªIdentifierÍ5Í6¡eM®BlockStatementÍ8ÍaÀf¬TryStatementÍkÍîM®BlockStatementÍoÍ±‘V³ExpressionStatementÍ~Í¦P®CallExpressionÍ~Í¥S°MemberExpressionÍ~ÍS°MemberExpressionÍ~Í‰X®ThisExpressionÍ~Í‚LªIdentifierÍƒÍ‰¦windowÂÂLªIdentifierÍŠÍ£offÂÂ‘Q§LiteralÍÍ¤´keyboardHeightChange¶'keyboardHeightChange'Âg«CatchClauseÍ»ÍîLªIdentifierÍÂÍÃ¡eM®BlockStatementÍÅÍîÀV³ExpressionStatementÍøÍP®CallExpressionÍøÍS°MemberExpressionÍøÍS°MemberExpressionÍøÍX®ThisExpressionÍøÍüLªIdentifierÍıÍ®globalDocumentÂÂLªIdentifierÍÍ§disposeÂÂÂV³ExpressionStatementÍ Í@W´AssignmentExpressionÍ Í?¡=S°MemberExpressionÍ Í3LªIdentifierÍ Í*ªglobalThisLªIdentifierÍ+Í3¨documentÂÂLªIdentifierÍ6Í?©undefinedV³ExpressionStatementÍJÍUP®CallExpressionÍJÍTLªIdentifierÍJÍR¨clearAppÂV³ExpressionStatementÍ_ÍnW´AssignmentExpressionÍ_Ím¡=LªIdentifierÍ_Íf§mainAppQ§LiteralÍiÍmÀ¤null\«IfStatementÍxÍ S°MemberExpressionÍ|Í‡X®ThisExpressionÍ|Í€LªIdentifierÍÍ‡¦isMainÂÂM®BlockStatementÍ‰ÍÇ‘V³ExpressionStatementÍ˜Í¼P®CallExpressionÍ˜Í»S°MemberExpressionÍ˜Í¹P®CallExpressionÍ˜Í«LªIdentifierÍ˜Í©±getAbilityContextÂLªIdentifierÍ¬Í¹­terminateSelfÂÂÂM®BlockStatementÍÖÍ ‘V³ExpressionStatementÍåÍ P®CallExpressionÍåÍ  S°MemberExpressionÍåÍşS°MemberExpressionÍåÍğX®ThisExpressionÍåÍéLªIdentifierÍêÍğ¦windowÂÂLªIdentifierÍñÍş­destroyWindowÂÂÂU°MethodDefinitionÍ Í ^ÂÂLªIdentifierÍ Í ,³getAppStartDuration¦methodK²FunctionExpressionÍ ,Í ^ÀÂÂÂM®BlockStatementÍ /Í ^‘R¯ReturnStatementÍ :Í WS°MemberExpressionÍ AÍ VX®ThisExpressionÍ AÍ ELªIdentifierÍ FÍ V°appStartDurationÂÂU°MethodDefinitionÍ dÍ ÓÂÂLªIdentifierÍ dÍ p¬loadFontFace¦methodK²FunctionExpressionÍ pÍ ÓÀÂÂÂ‘LªIdentifierÍ qÍ x§optionsM®BlockStatementÍ zÍ Ó‘V³ExpressionStatementÍ …Í ÌP®CallExpressionÍ …Í ËLªIdentifierÍ …Í ‘¬registerFont“P®CallExpressionÍ ’Í ³LªIdentifierÍ ’Í £±formatFontFaceSrc‘S°MemberExpressionÍ ¤Í ²LªIdentifierÍ ¤Í «§optionsLªIdentifierÍ ¬Í ²¦sourceÂÂÂLªIdentifierÍ µÍ ¼§optionsS°MemberExpressionÍ ¾Í ÊX®ThisExpressionÍ ¾Í ÂLªIdentifierÍ ÃÍ Ê§contextÂÂÂU°MethodDefinitionÍ ÙÍ!)ÂÂLªIdentifierÍ ÙÍ è¯getRedirectInfo¦methodK²FunctionExpressionÍ èÍ!)ÀÂÂÂM®BlockStatementÍ ëÍ!)‘R¯ReturnStatementÍ!Í!"Y­NewExpressionÍ!Í!!LªIdentifierÍ!Í!£MapU°MethodDefinitionÍ!/Í!˜ÂÂLªIdentifierÍ!/Í!DµconnectResizeObserver¦methodK²FunctionExpressionÍ!DÍ!˜ÀÂÂÂ’LªIdentifierÍ!EÍ!OªobserverIdLªIdentifierÍ!QÍ!Y¨callbackM®BlockStatementÍ![Í!˜‘R®ThrowStatementÍ!fÍ!‘Y­NewExpressionÍ!lÍ!LªIdentifierÍ!pÍ!u¥Error‘Q§LiteralÍ!vÍ!·Method not implemented.¹'Method not implemented.'U°MethodDefinitionÍ!Í"ÂÂLªIdentifierÍ!Í!³µobserveResizeObserver¦methodK²FunctionExpressionÍ!³Í"ÀÂÂÂ“LªIdentifierÍ!´Í!¾ªobserverIdLªIdentifierÍ!ÀÍ!Æ¦pageIdLªIdentifierÍ!ÈÍ!Î¦elemIdM®BlockStatementÍ!ĞÍ"‘R®ThrowStatementÍ!ÛÍ"Y­NewExpressionÍ!áÍ"LªIdentifierÍ!åÍ!ê¥Error‘Q§LiteralÍ!ëÍ"·Method not implemented.¹'Method not implemented.'U°MethodDefinitionÍ"Í"„ÂÂLªIdentifierÍ"Í"*·unobserveResizeObserver¦methodK²FunctionExpressionÍ"*Í"„ÀÂÂÂ“LªIdentifierÍ"+Í"5ªobserverIdLªIdentifierÍ"7Í"=¦pageIdLªIdentifierÍ"?Í"E¦elemIdM®BlockStatementÍ"GÍ"„‘R®ThrowStatementÍ"RÍ"}Y­NewExpressionÍ"XÍ"|LªIdentifierÍ"\Í"a¥Error‘Q§LiteralÍ"bÍ"{·Method not implemented.¹'Method not implemented.'U°MethodDefinitionÍ"ŠÍ"ìÂÂLªIdentifierÍ"ŠÍ"¢¸disconnectResizeObserver¦methodK²FunctionExpressionÍ"¢Í"ìÀÂÂÂ‘LªIdentifierÍ"£Í"­ªobserverIdM®BlockStatementÍ"¯Í"ì‘R®ThrowStatementÍ"ºÍ"åY­NewExpressionÍ"ÀÍ"äLªIdentifierÍ"ÄÍ"É¥Error‘Q§LiteralÍ"ÊÍ"ã·Method not implemented.¹'Method not implemented.'U°MethodDefinitionÍ"òÍ#}ÂÂLªIdentifierÍ"òÍ#´getLaunchOptionsSync¦methodK²FunctionExpressionÍ#Í#}ÀÂÂÂM®BlockStatementÍ#	Í#}‘R¯ReturnStatementÍ#Í#vZ°ObjectExpressionÍ#Í#u’[¨PropertyÍ#*Í#CÂÂÂLªIdentifierÍ#*Í#3©appSchemeS°MemberExpressionÍ#5Í#CX®ThisExpressionÍ#5Í#9LªIdentifierÍ#:Í#C©appSchemeÂÂ¤init[¨PropertyÍ#RÍ#iÂÂÂLªIdentifierÍ#RÍ#Y§appLinkS°MemberExpressionÍ#[Í#iX®ThisExpressionÍ#[Í#_LªIdentifierÍ#`Í#i©appSchemeÂÂ¤initU°MethodDefinitionÍ#ƒÍ#ØÂÂLªIdentifierÍ#ƒÍ#˜µgetAndroidApplication¦methodK²FunctionExpressionÍ#˜Í#ØÀÂÂÂM®BlockStatementÍ#›Í#Ø‘R®ThrowStatementÍ#¦Í#ÑY­NewExpressionÍ#¬Í#ĞLªIdentifierÍ#°Í#µ¥Error‘Q§LiteralÍ#¶Í#Ï·Method not implemented.¹'Method not implemented.'U°MethodDefinitionÍ#ŞÍ%¨ÂÂLªIdentifierÍ#ŞÍ#ö¸initPrivacyAuthorization¦methodK²FunctionExpressionÍ#öÍ%¨ÀÂÂÂM®BlockStatementÍ#ùÍ%¨“\«IfStatementÍ$Í$<P®CallExpressionÍ$Í$LªIdentifierÍ$Í$¯getPrivacyAgreeÂM®BlockStatementÍ$Í$<‘R¯ReturnStatementÍ$*Í$1ÀÀN³VariableDeclarationÍ$FÍ$t‘O²VariableDeclaratorÍ$JÍ$sLªIdentifierÍ$JÍ$TªappHarmonyS°MemberExpressionÍ$WÍ$sS°MemberExpressionÍ$WÍ$dX®ThisExpressionÍ$WÍ$[LªIdentifierÍ$\Í$d¨manifestÂÂQ§LiteralÍ$eÍ$r«app-harmony­'app-harmony'ÃÂ£let\«IfStatementÍ$~Í%¡LªIdentifierÍ$‚Í$ŒªappHarmonyM®BlockStatementÍ$Í%¡’N³VariableDeclarationÍ$Í$×‘O²VariableDeclaratorÍ$¡Í$ÖLªIdentifierÍ$¡Í$­¬privacyValueS°MemberExpressionÍ$°Í$ÖLªIdentifierÍ$°Í$ºªappHarmonyQ§LiteralÍ$»Í$Õ¸initPrivacyAuthorizationº'initPrivacyAuthorization'ÃÂ£let\«IfStatementÍ$åÍ%–]±LogicalExpressionÍ$éÍ%LªIdentifierÍ$éÍ$õ¬privacyValue¢&&]°BinaryExpressionÍ$ùÍ%LªIdentifierÍ$ùÍ%¬privacyValue¢==Q§LiteralÍ%	Í%¥agree§'agree'M®BlockStatementÍ%Í%J‘V³ExpressionStatementÍ%%Í%;P®CallExpressionÍ%%Í%:LªIdentifierÍ%%Í%4¯setPrivacyAgree‘Q§LiteralÍ%5Í%9Ã¤trueÂM®BlockStatementÍ%]Í%–‘V³ExpressionStatementÍ%pÍ%‡P®CallExpressionÍ%pÍ%†LªIdentifierÍ%pÍ%¯setPrivacyAgree‘Q§LiteralÍ%€Í%…Â¥falseÂÀÀJ¶ExportNamedDeclarationÍ%­Í&"K³FunctionDeclarationÍ%´Í&"LªIdentifierÍ%½Í%ÇªopenUniAppÂÂÂ’LªIdentifierÍ%ÈÍ%Í¥appIDLªIdentifierÍ%ÏÍ%Õ¦configM®BlockStatementÍ%×Í&"’N³VariableDeclarationÍ%ŞÍ&‘O²VariableDeclaratorÍ%äÍ&LªIdentifierÍ%äÍ%ç£appY­NewExpressionÍ%êÍ&LªIdentifierÍ%îÍ%ş°UniNativeAppImpl’LªIdentifierÍ%ÿÍ&¥appIDLªIdentifierÍ&Í&¦config¥constR¯ReturnStatementÍ&Í&LªIdentifierÍ&Í&£appÀJ¶ExportNamedDeclarationÍ&$Í&zK³FunctionDeclarationÍ&+Í&zLªIdentifierÍ&4Í&?«closeUniAppÂÂÂM®BlockStatementÍ&BÍ&z‘\«IfStatementÍ&IÍ&wLªIdentifierÍ&MÍ&T§mainAppM®BlockStatementÍ&VÍ&w‘V³ExpressionStatementÍ&aÍ&pP®CallExpressionÍ&aÍ&oS°MemberExpressionÍ&aÍ&mLªIdentifierÍ&aÍ&h§mainAppLªIdentifierÍ&iÍ&m¤quitÂÂÂÀÀJ¶ExportNamedDeclarationÍ&|Í&¶K³FunctionDeclarationÍ&ƒÍ&¶LªIdentifierÍ&ŒÍ&•©getUniAppÂÂÂM®BlockStatementÍ&˜Í&¶‘R¯ReturnStatementÍ&ŸÍ&³P®CallExpressionÍ&¦Í&²LªIdentifierÍ&¦Í&°ªgetMainAppÂÀœÔrh•¤type¥start£endªspecifiers¦source±ImportDeclaration ÌK“Ôri•¤type¥start£end¨imported¥local¯ImportSpecifier	LªIdentifier	±getAbilityContextLªIdentifier	±getAbilityContexti¯ImportSpecifier+LªIdentifier+¯getEntryAbilityLªIdentifier+¯getEntryAbilityi¯ImportSpecifier-;LªIdentifier-;®getWindowStageLªIdentifier-;®getWindowStageQ§LiteralÌCÌJ¥./App§'./App'h±ImportDeclarationÌMÌq‘Ôrj”¤type¥start£end¥local¶ImportDefaultSpecifierÌTÌ\LªIdentifierÌTÌ\¨OHWindowQ§LiteralÌbÌp¬@ohos.window®'@ohos.window'h±ImportDeclarationÌsÌª‘i¯ImportSpecifierÌ|ÌLªIdentifierÌ|Ì²TEMPLATE_PAGE_NAMELªIdentifierÌ|Ì²TEMPLATE_PAGE_NAMEQ§LiteralÌ–Ì©±./components/Page³'./components/Page'h±ImportDeclarationÌ¬Ìæ‘i¯ImportSpecifierÌµÌÇLªIdentifierÌµÌÇ²UniPageManagerImplLªIdentifierÌµÌÇ²UniPageManagerImplQ§LiteralÌÏÌå´./dom/UniPageManager¶'./dom/UniPageManager'h±ImportDeclarationÌèÍ&‘i¯ImportSpecifierÌñÍLªIdentifierÌñÍ²UniCallbackWrapperLªIdentifierÌñÍ²UniCallbackWrapperQ§LiteralÍÍ%¸./dom/UniCallbackWrapperº'./dom/UniCallbackWrapper'h±ImportDeclarationÍ(ÍS‘i¯ImportSpecifierÍ1Í<LªIdentifierÍ1Í<«TinyEmitterLªIdentifierÍ1Í<«TinyEmitterQ§LiteralÍDÍR¬tiny-emitter®'tiny-emitter'h±ImportDeclarationÍUÍÚ–i¯ImportSpecifierÍ^ÍwLªIdentifierÍ^Íw¹clearSafeAreaInsetsChangeLªIdentifierÍ^Íw¹clearSafeAreaInsetsChangei¯ImportSpecifierÍyÍŠLªIdentifierÍyÍŠ±formatFontFaceSrcLªIdentifierÍyÍŠ±formatFontFaceSrci¯ImportSpecifierÍŒÍ›LªIdentifierÍŒÍ›¯getCurrentPagesLªIdentifierÍŒÍ›¯getCurrentPagesi¯ImportSpecifierÍÍ«LªIdentifierÍÍ«®getResourceStrLªIdentifierÍÍ«®getResourceStri¯ImportSpecifierÍ­Í¹LªIdentifierÍ­Í¹¬readTextSyncLªIdentifierÍ­Í¹¬readTextSynci¯ImportSpecifierÍ»ÍÇLªIdentifierÍ»ÍÇ¬registerFontLªIdentifierÍ»ÍÇ¬registerFontQ§LiteralÍÏÍÙ¨./helperª'./helper'h±ImportDeclarationÍÜÍ‘i¯ImportSpecifierÍåÍîLªIdentifierÍåÍî©initPagesLªIdentifierÍåÍî©initPagesQ§LiteralÍöÍ¾./libs/uni-app-x-framework-devÙ './libs/uni-app-x-framework-dev'h±ImportDeclarationÍÍt”i¯ImportSpecifierÍ"Í1LªIdentifierÍ"Í1¯getPrivacyAgreeLªIdentifierÍ"Í1¯getPrivacyAgreei¯ImportSpecifierÍ3ÍBLªIdentifierÍ3ÍB¯setPrivacyAgreeLªIdentifierÍ3ÍB¯setPrivacyAgreei¯ImportSpecifierÍDÍOLªIdentifierÍDÍO«getAppThemeLªIdentifierÍDÍO«getAppThemei¯ImportSpecifierÍQÍ]LªIdentifierÍQÍ]¬getUserAgentLªIdentifierÍQÍ]¬getUserAgentQ§LiteralÍeÍs¬./UTSHarmony®'./UTSHarmony'h±ImportDeclarationÍvÍ¬‘i¯ImportSpecifierÍÍLªIdentifierÍÍ®GlobalDocumentLªIdentifierÍÍ®GlobalDocumentQ§LiteralÍ•Í«´./dom/GlobalDocument¶'./dom/GlobalDocument'h±ImportDeclarationÍ®ÍÚ’i¯ImportSpecifierÍ·Í¿LªIdentifierÍ·Í¿¨clearAppLªIdentifierÍ·Í¿¨clearAppi¯ImportSpecifierÍÁÍÇLªIdentifierÍÁÍÇ¦genAppLªIdentifierÍÁÍÇ¦genAppQ§LiteralÍÏÍÙ¨./UniAppª'./UniApp'h±ImportDeclarationÍÜÍ‘j¶ImportDefaultSpecifierÍãÍïLªIdentifierÍãÍï¬errorManagerQ§LiteralÍõÍ¾@ohos.app.ability.errorManagerÙ "@ohos.app.ability.errorManager"

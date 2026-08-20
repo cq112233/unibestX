@@ -1,0 +1,1392 @@
+Ôr@Ÿªassertions¤code´customTransformCache¬dependencies¢id¤meta±moduleSideEffects¬originalCode±originalSourcemap«resolvedIds®sourcemapChainµsyntheticNamedExportsµtransformDependencies®transformFiles¨cacheAstÔrAÚX}import audio from "@ohos.multimedia.audio";
+import { buildVideo } from "./builder";
+import fs from '@ohos.file.fs';
+import { getCurrentMP, getRealPath } from "@dcloudio/uni-app-framework";
+import media from "@ohos.multimedia.media";
+import { UTSObject, UTSHarmony, uni, UTSJSONObject, UniViewElementImpl, defineSyncApi, getCurrentPages, UTS } from "@dcloudio/uni-app-framework";
+class Danmu extends UTSObject {
+    constructor() {
+        super(...arguments);
+        this.text = null;
+        this.color = null;
+        this.time = null;
+    }
+}
+class RequestFullScreenOptions extends UTSObject {
+    constructor() {
+        super(...arguments);
+        this.direction = null;
+    }
+}
+class UniVideoTimeUpdateEventDetail extends UTSObject {
+}
+class UniVideoFullScreenChangeEventDetail extends UTSObject {
+}
+class UniVideoProgressEventDetail extends UTSObject {
+}
+class UniVideoFullScreenClickEventDetail extends UTSObject {
+}
+class UniVideoControlsToggleEventDetail extends UTSObject {
+}
+UTSHarmony.onAppAbilityWindowStageCreate((window) => {
+    setTimeout(async () => {
+        const mainWindow = await window.getMainWindow();
+        mainWindow.getUIContext().getFont().registerFont({
+            familyName: 'uni-video-icon',
+            familySrc: { "id": 0, "type": 30000, params: ['uni-video/uni-video-icon.ttf'], "bundleName": "com.bigScreen.qizhi", "moduleName": "entry" }
+        });
+    }, 40);
+});
+const formatVideoOptions = (options) => {
+    if (typeof options.src === 'string') {
+        options.src = getRealPath(options.src);
+        if (options.src?.startsWith('/')) {
+            options.src = 'file://' + options.src;
+        }
+    }
+    return options;
+};
+class BindVideoController {
+    constructor() {
+        this.videoElement = null;
+        this.controller = new VideoController();
+    }
+    setVideoElement(videoElement) {
+        this.videoElement = videoElement;
+    }
+    play() {
+        this.controller.start();
+    }
+    pause() {
+        this.controller.pause();
+    }
+    stop() {
+        this.seek(0);
+        this.pause();
+    }
+    reset() {
+        this.controller.reset();
+    }
+    seek(position) {
+        this.controller.setCurrentTime(position, SeekMode.Accurate);
+    }
+    requestFullscreen(options = null) {
+        this.videoElement?.requestFullScreen(options);
+    }
+    exitFullscreen() {
+        this.videoElement?.exitFullScreen();
+    }
+    dispose() {
+        this.videoElement = null;
+    }
+}
+class Video {
+    constructor(element, params) {
+        this.harmonyBuilderNode = null;
+        this._currentMP = getCurrentMP();
+        this.pendingPlayAfterPrepared = false;
+        this.prepared = false;
+        this.readyToSetNextSrc = true;
+        this.srcQueue = [];
+        this.originalSrc = '';
+        this.fullscreenOrientation = null;
+        this.fullscreenOrientationRequestId = 0;
+        this.fullscreening = false;
+        this.windowStatusChange = () => {
+            uni.$emit(`__UNIVIDEO_ON_WINDOW_STATUS_CHANGE_${this.params?.eventSeed}`);
+        };
+        const videoEvent = {};
+        let triggerPlayEvent = true;
+        videoEvent.onTimeUpdate = (event) => {
+            uni.$emit(`__UNIVIDEO_ON_TIME_UPDATE_${params.eventSeed}`, event.time);
+        };
+        videoEvent.onPlay = () => {
+            triggerPlayEvent ? uni.$emit(`__UNIVIDEO_ON_PLAY_${params.eventSeed}`) : triggerPlayEvent = true;
+        };
+        videoEvent.onPause = () => {
+            if (this.fullscreening) {
+                triggerPlayEvent = false;
+                this.fullscreening = false;
+                this.play();
+            }
+            else {
+                uni.$emit(`__UNIVIDEO_ON_PAUSE_${params.eventSeed}`);
+            }
+        };
+        videoEvent.onError = () => {
+            this.readyToSetNextSrc = true;
+            this.flushSrcQueue();
+            uni.$emit(`__UNIVIDEO_ON_ERROR_${params.eventSeed}`);
+        };
+        videoEvent.onEnded = () => {
+            uni.$emit(`__UNIVIDEO_ON_ENDED_${params.eventSeed}`);
+        };
+        videoEvent.onPrepared = (event) => {
+            this.prepared = true;
+            this.readyToSetNextSrc = true;
+            this.flushSrcQueue();
+            uni.$emit(`__UNIVIDEO_ON_PREPARED_${params.eventSeed}`, event.duration);
+            if (this.pendingPlayAfterPrepared) {
+                this.pendingPlayAfterPrepared = false;
+                this.play();
+            }
+        };
+        params.event = videoEvent;
+        const bindVideoController = new BindVideoController();
+        const videoElement = element.parentElement?.parentElement;
+        if (videoElement) {
+            videoElement.setVideo(this);
+            bindVideoController.setVideoElement(videoElement);
+        }
+        this.bindVideoController = bindVideoController;
+        params.options.controller = bindVideoController.controller;
+        if (params.objectFit) {
+            params.objectFit = this.getObjectFit(params.objectFit);
+        }
+        this.params = params;
+        if (typeof this.params.options.src === 'string') {
+            this.originalSrc = this.params.options.src;
+        }
+        formatVideoOptions(this.params.options);
+        this.updateFullscreenOrientation();
+        this.params.volumeOptions = {
+            show: false
+        };
+        element.bindHarmonyWrappedBuilder(wrapBuilder(buildVideo), this.params);
+        element.bindHarmonyController(this.bindVideoController);
+        if (typeof element['getHarmonyComponentContent'] === 'function') {
+            this.harmonyBuilderNode = element.getHarmonyComponentContent();
+        }
+        else {
+            this.harmonyBuilderNode = element.getHarmonyBuilderNode();
+        }
+        this._currentMP.window?.on('windowStatusChange', this.windowStatusChange);
+    }
+    updateParams() {
+        formatVideoOptions(this.params.options);
+        this.harmonyBuilderNode?.update(this.params);
+    }
+    getObjectFit(objectFit) {
+        switch (objectFit) {
+            case 'contain':
+                return ImageFit.Contain;
+            case 'fill':
+                return ImageFit.Fill;
+            case 'cover':
+                return ImageFit.Cover;
+            default:
+                return ImageFit.Contain;
+        }
+    }
+    formatPlaybackRate(rate) {
+        const validValues = [
+            0.75,
+            1.0,
+            1.25,
+            1.75,
+            2.0
+        ];
+        let closest = validValues[0];
+        let closestDiff = Math.abs(rate - closest);
+        for (let i = 1; i < validValues.length; i++) {
+            let diff = Math.abs(rate - validValues[i]);
+            if (diff < closestDiff) {
+                closest = validValues[i];
+                closestDiff = diff;
+            }
+        }
+        return closest;
+    }
+    flushSrcQueue() {
+        if (this.srcQueue.length > 0) {
+            const src = this.srcQueue[this.srcQueue.length - 1];
+            this.srcQueue.length = 0;
+            this.src = src;
+        }
+    }
+    resetVideoState() {
+        this.pendingPlayAfterPrepared = false;
+        this.readyToSetNextSrc = true;
+        this.srcQueue = [];
+        this.params.volumeOptions.show = false;
+    }
+    async updateFullscreenOrientation() {
+        const src = this.params.options.src;
+        const requestId = ++this.fullscreenOrientationRequestId;
+        this.fullscreenOrientation = null;
+        if (typeof src !== 'string' || src.length === 0)
+            return;
+        const isNetworkUrl = src.startsWith('http://') || src.startsWith('https://') || src.startsWith('rtmp://') || src.startsWith('rtsp://');
+        try {
+            const avMetadataExtractor = await media.createAVMetadataExtractor();
+            let metadata = null;
+            try {
+                if (isNetworkUrl) {
+                    avMetadataExtractor.setUrlSource(src);
+                    metadata = await avMetadataExtractor.fetchMetadata();
+                }
+                else {
+                    const file = await fs.open(src, fs.OpenMode.READ_ONLY);
+                    try {
+                        const fileSize = (await fs.stat(file.fd)).size;
+                        avMetadataExtractor.dataSrc = {
+                            fileSize,
+                            callback: (buffer, length, pos = null) => {
+                                return fs.readSync(file.fd, buffer, {
+                                    offset: pos,
+                                    length
+                                });
+                            }
+                        };
+                        metadata = await avMetadataExtractor.fetchMetadata();
+                    }
+                    finally {
+                        await fs.close(file);
+                    }
+                }
+            }
+            finally {
+                await avMetadataExtractor.release();
+            }
+            if (requestId !== this.fullscreenOrientationRequestId || src !== this.params.options.src || metadata == null)
+                return;
+            let width = Number(metadata.videoWidth);
+            let height = Number(metadata.videoHeight);
+            const orientation = metadata.videoOrientation != null ? Number(metadata.videoOrientation) : 0;
+            if (orientation === 90 || orientation === 270) {
+                const originWidth = width;
+                width = height;
+                height = originWidth;
+            }
+            if (width > 0 && height > 0) {
+                this.fullscreenOrientation = width <= height ? 'portrait' : 'landscape';
+            }
+        }
+        catch (error) { }
+    }
+    setSrc(src) {
+        if (!this.readyToSetNextSrc) {
+            this.srcQueue.push(src);
+            return;
+        }
+        this.originalSrc = this.params.options.src = src;
+        this.prepared = false;
+        this.pendingPlayAfterPrepared = false;
+        this.readyToSetNextSrc = false;
+        this.updateParams();
+        this.updateFullscreenOrientation();
+    }
+    dispose() {
+        this.fullscreenOrientationRequestId++;
+        this.fullscreenOrientation = null;
+        this.bindVideoController?.dispose();
+        this.bindVideoController = undefined;
+        this.harmonyBuilderNode?.dispose();
+        this.harmonyBuilderNode = null;
+        if (this.params.event) {
+            this.params.event.onTimeUpdate = undefined;
+            this.params.event.onPlay = undefined;
+            this.params.event.onPause = undefined;
+            this.params.event.onError = undefined;
+            this.params.event.onEnded = undefined;
+            this.params.event.onPrepared = undefined;
+            this.params.event = undefined;
+        }
+        this._currentMP.window?.off('windowStatusChange', this.windowStatusChange);
+    }
+    destroy() {
+        this.dispose();
+    }
+    set src(src) {
+        if (src === this.originalSrc) {
+            this.resetVideoState();
+            this.params.options.src = '';
+            this.fullscreenOrientationRequestId++;
+            this.fullscreenOrientation = null;
+            this.updateParams();
+            setTimeout(() => {
+                this.setSrc(src);
+            }, 100);
+            return;
+        }
+        this.setSrc(src);
+    }
+    set poster(poster) {
+        this.params.options.previewUri = poster;
+        this.updateParams();
+    }
+    set objectFit(objectFit) {
+        this.params.objectFit = this.getObjectFit(objectFit);
+        this.updateParams();
+    }
+    set autoplay(autoplay) {
+        this.params.autoplay = autoplay;
+        this.updateParams();
+    }
+    set loop(loop) {
+        this.params.loop = loop;
+        this.updateParams();
+    }
+    set playbackRate(playbackRate) {
+        this.params.options.currentProgressRate = this.formatPlaybackRate(typeof playbackRate === 'number' ? playbackRate : parseFloat(playbackRate));
+        this.updateParams();
+    }
+    set muted(muted) {
+        this.params.muted = muted;
+        this.updateParams();
+    }
+    set controls(controls) {
+        this.params.controls = controls;
+        this.updateParams();
+    }
+    displayTheFirstFrame() {
+        this.bindVideoController?.controller.setCurrentTime(1, SeekMode.PreviousKeyframe);
+    }
+    play() {
+        if (!this.prepared) {
+            this.pendingPlayAfterPrepared = true;
+            return;
+        }
+        this.bindVideoController?.play();
+    }
+    pause() {
+        this.pendingPlayAfterPrepared = false;
+        this.bindVideoController?.pause();
+    }
+    stop() {
+        this.resetVideoState();
+        this.bindVideoController?.stop();
+    }
+    reset() {
+        this.resetVideoState();
+        this.bindVideoController?.reset();
+    }
+    seek(time) {
+        this.bindVideoController?.seek(time);
+    }
+    requestFullscreen(options = null) {
+        this.bindVideoController?.requestFullscreen(options);
+    }
+    getFullscreenOrientation() {
+        return this.fullscreenOrientation;
+    }
+    exitFullscreen() {
+        this.bindVideoController?.exitFullscreen();
+    }
+    sendDanmu(danmu) {
+        uni.$emit(`__UNIVIDEO_SEND_DANMU_${this.params.eventSeed}`, new UTSJSONObject(new UTSJSONObject({
+            text: danmu.text,
+            color: danmu.color,
+            time: danmu.time
+        })));
+    }
+    setVolume(options) {
+        if (this.params.volumeOptions == null) {
+            this.params.volumeOptions = {
+                show: false
+            };
+        }
+        if (options.show != null) {
+            this.params.volumeOptions.show = options.show;
+        }
+        if (options.volumeLevel != null) {
+            this.params.volumeOptions.volumeLevel = options.volumeLevel;
+        }
+        this.params.volumeOptions.positionX = options.positionX;
+        this.params.volumeOptions.positionY = options.positionY;
+        this.updateParams();
+    }
+}
+class UniVideoElement extends UniViewElementImpl {
+    constructor() {
+        super(...arguments);
+        this.tagName = 'VIDEO';
+        this.nodeName = 'VIDEO';
+        this.video = null;
+        this.lastNavigationStyle = '';
+    }
+    dispose() {
+        this.video?.dispose();
+        this.video = null;
+        super.dispose();
+    }
+    getHarmonyController() {
+        const videoNativeElement = this.firstChild?.firstChild;
+        if (videoNativeElement) {
+            return videoNativeElement.getHarmonyController().controller;
+        }
+        return null;
+    }
+    setVideo(video) {
+        this.video = video;
+    }
+    getVideo() {
+        return this.video;
+    }
+    play() {
+        this.video?.play();
+    }
+    pause() {
+        this.video?.pause();
+    }
+    seek(position) {
+        this.video?.seek(position);
+    }
+    stop() {
+        this.video?.stop();
+    }
+    sendDanmu(danmu) {
+        this.video?.sendDanmu(danmu);
+    }
+    playbackRate(rate) {
+        this.video && (this.video.playbackRate = rate);
+    }
+    requestFullScreen(options = null) {
+        let requestFullscreenOptions = options ?? {};
+        switch (options?.direction) {
+            case 0:
+                requestFullscreenOptions.orientation = 'portrait';
+                break;
+            case 90:
+                requestFullscreenOptions.orientation = 'landscape-primary';
+                break;
+            case -90:
+                requestFullscreenOptions.orientation = 'landscape-secondary';
+                break;
+            default:
+                const orientation = this.video?.getFullscreenOrientation();
+                if (orientation != null) {
+                    requestFullscreenOptions.orientation = orientation;
+                }
+                break;
+        }
+        this.requestFullscreen(requestFullscreenOptions);
+    }
+    exitFullScreen() {
+        this.page.exitFullscreen();
+    }
+    requestFullscreen(options = null) {
+        const nativePage = this.uniPage.getNativePage();
+        if (this.uniPage.fullscreenElement) {
+            options?.fail?.();
+            this.callFullscreenerrorCallbacks('The current page already has a fullscreen element.');
+            return;
+        }
+        if (this.isFullscreen)
+            return;
+        this.isFullscreen = true;
+        this.video && (this.video.fullscreening = true);
+        this.lastNavigationStyle = this.uniPage.getPageStyle().get('navigationStyle') ?? '';
+        this.resolveIsFullscreenFrameNode(options).then(() => {
+            nativePage.fullscreenElement = this;
+            this.uniPage.setPageStyle(new UTSJSONObject(new UTSJSONObject({
+                navigationStyle: 'custom'
+            })));
+            this.checkPosition(true);
+            options?.success?.();
+            this.callFullscreenchangeCallbacks();
+        }).catch(() => {
+            nativePage.setPageOrientation(this.uniPage.getPageStyle().toMap());
+            this.requestFullscreenError();
+            this.uniPage.setPageStyle(new UTSJSONObject(new UTSJSONObject({
+                navigationStyle: this.lastNavigationStyle
+            })));
+            this.video && (this.video.fullscreening = false);
+            options?.fail?.();
+            this.callFullscreenerrorCallbacks();
+        });
+        options?.complete?.();
+    }
+    _exitFullscreen() {
+        if (!this.isFullscreen) {
+            return;
+        }
+        this.isFullscreen = false;
+        this.video && (this.video.fullscreening = true);
+        this.page?.setPageStyle(new UTSJSONObject(new UTSJSONObject({
+            navigationStyle: this.lastNavigationStyle
+        })));
+        this.exitFullscreenResetStyle();
+        this.callFullscreenchangeCallbacks();
+    }
+}
+const createVideoContext = defineSyncApi('createVideoContext', (videoId, component = null) => {
+    let videoElement = null;
+    if (component == null) {
+        const pages = getCurrentPages();
+        if (pages.length > 0) {
+            const page = pages[pages.length - 1];
+            if (!page) {
+                UTS.console.error(`getCurrentPages is empty`);
+                return null;
+            }
+            videoElement = page.vm.$el?.parentElement?.querySelector('#' + videoId);
+            if (videoElement == null) {
+                const dialogPages = page.getDialogPages();
+                if (dialogPages.length > 0) {
+                    const topDialogPage = dialogPages[dialogPages.length - 1];
+                    if (!topDialogPage) {
+                        UTS.console.error(`getDialogPages is empty`);
+                        return null;
+                    }
+                    videoElement = topDialogPage.vm.$el?.parentElement?.querySelector('#' + videoId);
+                }
+            }
+        }
+    }
+    else {
+        videoElement = component.$el?.parentElement?.querySelector('#' + videoId);
+    }
+    if (videoElement == null)
+        return null;
+    return new VideoContextImpl(videoElement.getVideo());
+});
+class VideoContextImpl {
+    constructor(video = null) {
+        this.video = null;
+        this.video = video;
+    }
+    play() {
+        this.video?.play();
+    }
+    pause() {
+        this.video?.pause();
+    }
+    seek(position) {
+        this.video?.seek(position);
+    }
+    stop() {
+        this.video?.stop();
+    }
+    sendDanmu(danmu) {
+        this.video?.sendDanmu(danmu);
+    }
+    playbackRate(rate) {
+        this.video && (this.video.playbackRate = rate);
+    }
+    requestFullScreen(options = null) {
+        this.video?.requestFullscreen(options);
+    }
+    exitFullScreen() {
+        this.video?.exitFullscreen();
+    }
+}
+class AudioManager {
+    constructor(mediaVolumeChange) {
+        this.offVolumeChange = () => { };
+        this.currentVolume = 0;
+        this.maxVolume = 1;
+        this.minVolume = 0;
+        const VolumeMEDIA = audio.AudioVolumeType.MEDIA;
+        let audioManager = audio.getAudioManager();
+        let audioVolumeManager = audioManager.getVolumeManager();
+        const volumeChange = (volumeEvent) => {
+            if (volumeEvent.volumeType === VolumeMEDIA) {
+                mediaVolumeChange(volumeEvent.volume);
+            }
+        };
+        audioVolumeManager.on('volumeChange', volumeChange);
+        const audioVolumeGroupManager = audioVolumeManager.getVolumeGroupManagerSync(audio.DEFAULT_VOLUME_GROUP_ID);
+        this.currentVolume = audioVolumeGroupManager.getVolumeSync(VolumeMEDIA);
+        this.minVolume = audioVolumeGroupManager.getMinVolumeSync(VolumeMEDIA);
+        this.maxVolume = audioVolumeGroupManager.getMaxVolumeSync(VolumeMEDIA);
+        this.offVolumeChange = () => {
+            audioVolumeManager.off('volumeChange', volumeChange);
+        };
+    }
+}
+class Brightness {
+    constructor() {
+        const currentMP = getCurrentMP();
+        this.window = currentMP.window;
+    }
+    getBrightness() {
+        const brightness = this.window?.getWindowProperties().brightness ?? 0;
+        return brightness === -1 ? 0.3 : brightness;
+    }
+    setBrightness(brightness) {
+        if (this.window) {
+            return this.window.setWindowBrightness(brightness);
+        }
+        else {
+            return Promise.reject('window is not defined');
+        }
+    }
+}
+export { Danmu as Danmu, RequestFullScreenOptions as RequestFullScreenOptions };
+export { UniVideoTimeUpdateEventDetail as UniVideoTimeUpdateEventDetail, UniVideoFullScreenChangeEventDetail as UniVideoFullScreenChangeEventDetail, UniVideoProgressEventDetail as UniVideoProgressEventDetail, UniVideoFullScreenClickEventDetail as UniVideoFullScreenClickEventDetail, UniVideoControlsToggleEventDetail as UniVideoControlsToggleEventDetail, UniVideoTimeUpdateEventDetail as VideoTimeUpdateEventDetail, UniVideoFullScreenChangeEventDetail as VideoFullScreenChangeEventDetail, UniVideoProgressEventDetail as VideoProgressEventDetail, UniVideoFullScreenClickEventDetail as VideoFullScreenClickEventDetail, UniVideoControlsToggleEventDetail as VideoControlsToggleEventDetail };
+export { Video as Video };
+export { UniVideoElement as UniVideoElement };
+export { createVideoContext as createVideoContext };
+export { AudioManager as AudioManager };
+export { Brightness as Brightness };
+//# sourceMappingURL=index.js.mapÂ•Ùs hvigor_ignore__Applications_DevEco-Studio.app_Contents_sdk_default_openharmony_ets_api_@ohos.multimedia.audio.d.tsÚ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/modules/uni_modules/uni-video/utssdk/app-harmony/builder.etsÙj hvigor_ignore__Applications_DevEco-Studio.app_Contents_sdk_default_openharmony_ets_api_@ohos.file.fs.d.tsÙî/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/framework/index.etsÙs hvigor_ignore__Applications_DevEco-Studio.app_Contents_sdk_default_openharmony_ets_api_@ohos.multimedia.media.d.tsÚ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/modules/uni_modules/uni-video/utssdk/app-harmony/index.etsÔrB˜±isLocalDependency¯isNodeEntryFile§pkgPath§pkgNameªpkgVersion±belongProjectPath±dependencyPkgInfo¬shouldEmitJsÂÂÙâ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/modules¹@dcloudio/uni-app-modules¥1.0.0ÙL/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmonyÔrC’§pkgNameªpkgVersion¹@dcloudio/uni-app-modules¥1.0.0ÃÃÚmDimport OHWindow from '@ohos.window';
+import { audio } from '@kit.AudioKit';
+import { buildVideo, AVVolumePanelOptions } from "./builder";
+import { font } from '@kit.ArkUI';
+import fs, { ReadOptions } from '@ohos.file.fs';
+import { getCurrentMP, getRealPath } from "@dcloudio/uni-app-framework";
+import { media } from '@kit.MediaKit';
+import { string, ComponentPublicInstance, UTSObject, UniElement, IUniError, UTSHarmony, onError, UniNativeViewElement, uni, UTSJSONObject, UniViewElementImpl, defineSyncApi, getCurrentPages, UniPage, UTS } from "@dcloudio/uni-app-framework";
+type CreateVideoContext = (videoId: string.VideoIdString, component?: ComponentPublicInstance | null) => VideoContext | null;
+class Danmu extends UTSObject {
+    text: string | null = null;
+    color: string | null = null;
+    time: number | null = null;
+}
+class RequestFullScreenOptions extends UTSObject {
+    direction: 0 | 90 | -90 | null = null;
+}
+interface VideoContext {
+    play(): void;
+    pause(): void;
+    seek(position: number): void;
+    stop(): void;
+    sendDanmu(danmu: Danmu): void;
+    playbackRate(rate: number): void;
+    requestFullScreen(direction?: RequestFullScreenOptions | null): void;
+    exitFullScreen(): void;
+}
+interface UniVideoEvent {
+    bubbles: boolean;
+    cancelable: boolean;
+    type: string;
+    target?: UniElement | null;
+    currentTarget?: UniElement | null;
+    timeStamp: number;
+    stopPropagation(): void;
+    preventDefault(): void;
+}
+interface UniVideoTimeUpdateEvent extends UniVideoEvent {
+    readonly detail: UniVideoTimeUpdateEventDetail;
+}
+class UniVideoTimeUpdateEventDetail extends UTSObject {
+    currentTime!: number;
+    duration!: number;
+}
+interface UniVideoFullScreenChangeEvent extends UniVideoEvent {
+    readonly detail: UniVideoFullScreenChangeEventDetail;
+}
+type UniVideoFullScreenDirection = 'vertical' | 'horizontal';
+class UniVideoFullScreenChangeEventDetail extends UTSObject {
+    fullScreen!: boolean;
+    direction!: UniVideoFullScreenDirection;
+}
+interface UniVideoErrorEvent extends UniVideoEvent {
+    readonly detail: VideoError;
+}
+type VideoErrorCode = 100001 | 200001 | 300001;
+interface VideoError extends IUniError {
+    errCode: VideoErrorCode;
+}
+interface UniVideoProgressEvent extends UniVideoEvent {
+    readonly detail: UniVideoProgressEventDetail;
+}
+class UniVideoProgressEventDetail extends UTSObject {
+    buffered!: number;
+}
+interface UniVideoFullScreenClickEvent extends UniVideoEvent {
+    readonly detail: UniVideoFullScreenClickEventDetail;
+}
+class UniVideoFullScreenClickEventDetail extends UTSObject {
+    screenX!: number;
+    screenY!: number;
+    screenWidth!: number;
+    screenHeight!: number;
+}
+interface UniVideoControlsToggleEvent extends UniVideoEvent {
+    readonly detail: UniVideoControlsToggleEventDetail;
+}
+class UniVideoControlsToggleEventDetail extends UTSObject {
+    show!: boolean;
+}
+UTSHarmony.onAppAbilityWindowStageCreate((window)=>{
+    setTimeout(async (): Promise<void> =>{
+        const mainWindow = await window.getMainWindow();
+        mainWindow.getUIContext().getFont().registerFont({
+            familyName: 'uni-video-icon',
+            familySrc: $rawfile('uni-video/uni-video-icon.ttf')
+        } as font.FontOptions);
+    }, 40);
+});
+export { AVVolumePanelOptions as AVVolumePanelOptions };
+interface BuilderVideoOptions extends VideoOptions {
+}
+interface VideoEvent {
+    onPlay?: () => void;
+    onPause?: () => void;
+    onEnded?: () => void;
+    onStop?: () => void;
+    onError?: () => void;
+    onPrepared?: (event: OnPreparedEvent) => void;
+    onSeeking?: (event: OnSeekingEvent) => void;
+    onSeeked?: (event: OnSeekedEvent) => void;
+    onTimeUpdate?: (event: OnUpdateEvent) => void;
+    onFullscreenChange?: (event: OnFullscreenChange) => void;
+}
+type ObjectFit = 'contain' | 'fill' | 'cover';
+interface BuilderVideoParams {
+    options: BuilderVideoOptions;
+    event?: VideoEvent;
+    objectFit?: ObjectFit | ImageFit;
+    muted?: boolean;
+    autoplay?: boolean;
+    loop?: boolean;
+    controls?: boolean;
+    eventSeed: number;
+    volumeOptions?: AVVolumePanelOptions;
+}
+interface OnPreparedEvent {
+    duration: number;
+}
+interface OnSeekingEvent {
+    time: number;
+}
+interface OnSeekedEvent {
+    time: number;
+}
+interface OnUpdateEvent {
+    time: number;
+}
+interface OnFullscreenChange {
+    fullscreen: boolean;
+}
+const formatVideoOptions = (options: VideoOptions): VideoOptions =>{
+    if (typeof options.src === 'string') {
+        options.src = getRealPath(options.src) as string;
+        if (options.src?.startsWith('/')) {
+            options.src = 'file://' + options.src;
+        }
+    }
+    return options;
+};
+class BindVideoController {
+    private videoElement: UniVideoElement | null = null;
+    controller: VideoController = new VideoController();
+    setVideoElement(videoElement: UniVideoElement) {
+        this.videoElement = videoElement;
+    }
+    play() {
+        this.controller.start();
+    }
+    pause() {
+        this.controller.pause();
+    }
+    stop() {
+        this.seek(0);
+        this.pause();
+    }
+    reset() {
+        this.controller.reset();
+    }
+    seek(position: number) {
+        this.controller.setCurrentTime(position, SeekMode.Accurate);
+    }
+    requestFullscreen(options: RequestFullScreenOptions | null = null) {
+        this.videoElement?.requestFullScreen(options);
+    }
+    exitFullscreen() {
+        this.videoElement?.exitFullScreen();
+    }
+    dispose() {
+        this.videoElement = null;
+    }
+}
+class Video {
+    private bindVideoController?: BindVideoController;
+    private harmonyBuilderNode: ComponentContent | null = null;
+    private params: BuilderVideoParams;
+    private _currentMP = getCurrentMP();
+    private pendingPlayAfterPrepared = false;
+    private prepared = false;
+    private readyToSetNextSrc = true;
+    private srcQueue: string[] = [];
+    private originalSrc: string = '';
+    private fullscreenOrientation: string | null = null;
+    private fullscreenOrientationRequestId = 0;
+    fullscreening: boolean = false;
+    constructor(element: UniNativeViewElement, params: BuilderVideoParams){
+        const videoEvent: VideoEvent = {};
+        let triggerPlayEvent = true;
+        videoEvent.onTimeUpdate = (event)=>{
+            uni.$emit(`__UNIVIDEO_ON_TIME_UPDATE_${params.eventSeed}`, event.time);
+        };
+        videoEvent.onPlay = ()=>{
+            triggerPlayEvent ? uni.$emit(`__UNIVIDEO_ON_PLAY_${params.eventSeed}`) : triggerPlayEvent = true;
+        };
+        videoEvent.onPause = ()=>{
+            if (this.fullscreening) {
+                triggerPlayEvent = false;
+                this.fullscreening = false;
+                this.play();
+            } else {
+                uni.$emit(`__UNIVIDEO_ON_PAUSE_${params.eventSeed}`);
+            }
+        };
+        videoEvent.onError = ()=>{
+            this.readyToSetNextSrc = true;
+            this.flushSrcQueue();
+            uni.$emit(`__UNIVIDEO_ON_ERROR_${params.eventSeed}`);
+        };
+        videoEvent.onEnded = ()=>{
+            uni.$emit(`__UNIVIDEO_ON_ENDED_${params.eventSeed}`);
+        };
+        videoEvent.onPrepared = (event)=>{
+            this.prepared = true;
+            this.readyToSetNextSrc = true;
+            this.flushSrcQueue();
+            uni.$emit(`__UNIVIDEO_ON_PREPARED_${params.eventSeed}`, event.duration);
+            if (this.pendingPlayAfterPrepared) {
+                this.pendingPlayAfterPrepared = false;
+                this.play();
+            }
+        };
+        params.event = videoEvent;
+        const bindVideoController = new BindVideoController();
+        const videoElement = element.parentElement?.parentElement;
+        if (videoElement) {
+            (videoElement as Object as UniVideoElement).setVideo(this);
+            bindVideoController.setVideoElement((videoElement as Object as UniVideoElement));
+        }
+        this.bindVideoController = bindVideoController;
+        params.options.controller = bindVideoController.controller;
+        if (params.objectFit) {
+            params.objectFit = this.getObjectFit(params.objectFit as ObjectFit);
+        }
+        this.params = params;
+        if (typeof this.params.options.src === 'string') {
+            this.originalSrc = this.params.options.src;
+        }
+        formatVideoOptions(this.params.options);
+        this.updateFullscreenOrientation();
+        this.params.volumeOptions = {
+            show: false
+        } as AVVolumePanelOptions;
+        element.bindHarmonyWrappedBuilder(wrapBuilder<[BuilderVideoParams]>(buildVideo), this.params);
+        element.bindHarmonyController(this.bindVideoController);
+        if (typeof element['getHarmonyComponentContent'] === 'function') {
+            this.harmonyBuilderNode = (element as ESObject).getHarmonyComponentContent() as ComponentContent;
+        } else {
+            this.harmonyBuilderNode = element.getHarmonyBuilderNode();
+        }
+        this._currentMP.window?.on('windowStatusChange', this.windowStatusChange);
+    }
+    private windowStatusChange = ()=>{
+        uni.$emit(`__UNIVIDEO_ON_WINDOW_STATUS_CHANGE_${this.params?.eventSeed}`);
+    };
+    private updateParams() {
+        formatVideoOptions(this.params.options);
+        this.harmonyBuilderNode?.update(this.params);
+    }
+    private getObjectFit(objectFit: ObjectFit): ImageFit {
+        switch(objectFit){
+            case 'contain':
+                return ImageFit.Contain;
+            case 'fill':
+                return ImageFit.Fill;
+            case 'cover':
+                return ImageFit.Cover;
+            default:
+                return ImageFit.Contain;
+        }
+    }
+    private formatPlaybackRate(rate: number): number {
+        const validValues = [
+            0.75,
+            1.0,
+            1.25,
+            1.75,
+            2.0
+        ];
+        let closest = validValues[0];
+        let closestDiff = Math.abs(rate - closest);
+        for(let i = 1; i < validValues.length; i++){
+            let diff = Math.abs(rate - validValues[i]);
+            if (diff < closestDiff) {
+                closest = validValues[i];
+                closestDiff = diff;
+            }
+        }
+        return closest;
+    }
+    private flushSrcQueue() {
+        if (this.srcQueue.length > 0) {
+            const src = this.srcQueue[this.srcQueue.length - 1];
+            this.srcQueue.length = 0;
+            this.src = src;
+        }
+    }
+    private resetVideoState() {
+        this.pendingPlayAfterPrepared = false;
+        this.readyToSetNextSrc = true;
+        this.srcQueue = [];
+        this.params.volumeOptions!.show = false;
+    }
+    private async updateFullscreenOrientation(): Promise<void> {
+        const src = this.params.options.src;
+        const requestId = ++this.fullscreenOrientationRequestId;
+        this.fullscreenOrientation = null;
+        if (typeof src !== 'string' || src.length === 0) return;
+        const isNetworkUrl = src.startsWith('http://') || src.startsWith('https://') || src.startsWith('rtmp://') || src.startsWith('rtsp://');
+        try {
+            const avMetadataExtractor = await media.createAVMetadataExtractor();
+            let metadata: media.AVMetadata | null = null;
+            try {
+                if (isNetworkUrl) {
+                    avMetadataExtractor.setUrlSource(src);
+                    metadata = await avMetadataExtractor.fetchMetadata();
+                } else {
+                    const file = await fs.open(src, fs.OpenMode.READ_ONLY);
+                    try {
+                        const fileSize = (await fs.stat(file.fd)).size;
+                        avMetadataExtractor.dataSrc = {
+                            fileSize,
+                            callback: (buffer: ArrayBuffer, length: number, pos: number | null = null): number =>{
+                                return fs.readSync(file.fd, buffer, {
+                                    offset: pos,
+                                    length
+                                } as ReadOptions);
+                            }
+                        };
+                        metadata = await avMetadataExtractor.fetchMetadata();
+                    } finally {
+                        await fs.close(file);
+                    }
+                }
+            } finally {
+                await avMetadataExtractor.release();
+            }
+            if (requestId !== this.fullscreenOrientationRequestId || src !== this.params.options.src || metadata == null) return;
+            let width = Number(metadata.videoWidth);
+            let height = Number(metadata.videoHeight);
+            const orientation = metadata.videoOrientation != null ? Number(metadata.videoOrientation) : 0;
+            if (orientation === 90 || orientation === 270) {
+                const originWidth = width;
+                width = height;
+                height = originWidth;
+            }
+            if (width > 0 && height > 0) {
+                this.fullscreenOrientation = width <= height ? 'portrait' : 'landscape';
+            }
+        } catch (error) {}
+    }
+    private setSrc(src: string) {
+        if (!this.readyToSetNextSrc) {
+            this.srcQueue.push(src);
+            return;
+        }
+        this.originalSrc = this.params.options.src = src;
+        this.prepared = false;
+        this.pendingPlayAfterPrepared = false;
+        this.readyToSetNextSrc = false;
+        this.updateParams();
+        this.updateFullscreenOrientation();
+    }
+    dispose() {
+        this.fullscreenOrientationRequestId++;
+        this.fullscreenOrientation = null;
+        this.bindVideoController?.dispose();
+        this.bindVideoController = undefined;
+        this.harmonyBuilderNode?.dispose();
+        this.harmonyBuilderNode = null;
+        if (this.params.event) {
+            this.params.event.onTimeUpdate = undefined;
+            this.params.event.onPlay = undefined;
+            this.params.event.onPause = undefined;
+            this.params.event.onError = undefined;
+            this.params.event.onEnded = undefined;
+            this.params.event.onPrepared = undefined;
+            this.params.event = undefined;
+        }
+        this._currentMP.window?.off('windowStatusChange', this.windowStatusChange);
+    }
+    destroy() {
+        this.dispose();
+    }
+    set src(src: string) {
+        if (src === this.originalSrc) {
+            this.resetVideoState();
+            this.params.options.src = '';
+            this.fullscreenOrientationRequestId++;
+            this.fullscreenOrientation = null;
+            this.updateParams();
+            setTimeout(()=>{
+                this.setSrc(src);
+            }, 100);
+            return;
+        }
+        this.setSrc(src);
+    }
+    set poster(poster: string) {
+        this.params.options.previewUri = poster;
+        this.updateParams();
+    }
+    set objectFit(objectFit: ObjectFit) {
+        this.params.objectFit = this.getObjectFit(objectFit);
+        this.updateParams();
+    }
+    set autoplay(autoplay: boolean) {
+        this.params.autoplay = autoplay;
+        this.updateParams();
+    }
+    set loop(loop: boolean) {
+        this.params.loop = loop;
+        this.updateParams();
+    }
+    set playbackRate(playbackRate: string | number) {
+        this.params.options.currentProgressRate = this.formatPlaybackRate(typeof playbackRate === 'number' ? playbackRate : parseFloat(playbackRate));
+        this.updateParams();
+    }
+    set muted(muted: boolean) {
+        this.params.muted = muted;
+        this.updateParams();
+    }
+    set controls(controls: boolean) {
+        this.params.controls = controls;
+        this.updateParams();
+    }
+    displayTheFirstFrame() {
+        this.bindVideoController?.controller.setCurrentTime(1, SeekMode.PreviousKeyframe);
+    }
+    play() {
+        if (!this.prepared) {
+            this.pendingPlayAfterPrepared = true;
+            return;
+        }
+        this.bindVideoController?.play();
+    }
+    pause() {
+        this.pendingPlayAfterPrepared = false;
+        this.bindVideoController?.pause();
+    }
+    stop() {
+        this.resetVideoState();
+        this.bindVideoController?.stop();
+    }
+    reset() {
+        this.resetVideoState();
+        this.bindVideoController?.reset();
+    }
+    seek(time: number) {
+        this.bindVideoController?.seek(time);
+    }
+    requestFullscreen(options: RequestFullScreenOptions | null = null) {
+        this.bindVideoController?.requestFullscreen(options);
+    }
+    getFullscreenOrientation(): string | null {
+        return this.fullscreenOrientation;
+    }
+    exitFullscreen() {
+        this.bindVideoController?.exitFullscreen();
+    }
+    sendDanmu(danmu: Danmu) {
+        uni.$emit(`__UNIVIDEO_SEND_DANMU_${this.params.eventSeed}`, new UTSJSONObject(new UTSJSONObject({
+            text: danmu.text,
+            color: danmu.color,
+            time: danmu.time
+        })));
+    }
+    setVolume(options: AVVolumePanelOptions) {
+        if (this.params.volumeOptions == null) {
+            this.params.volumeOptions = {
+                show: false
+            };
+        }
+        if (options.show != null) {
+            this.params.volumeOptions.show = options.show;
+        }
+        if (options.volumeLevel != null) {
+            this.params.volumeOptions.volumeLevel = options.volumeLevel;
+        }
+        this.params.volumeOptions.positionX = options.positionX;
+        this.params.volumeOptions.positionY = options.positionY;
+        this.updateParams();
+    }
+}
+interface IUniVideoElement extends UniElement {
+    play(): void;
+    pause(): void;
+    seek(position: number): void;
+    stop(): void;
+    sendDanmu(danmu: Danmu): void;
+    playbackRate(rate: number): void;
+    requestFullScreen(options?: RequestFullScreenOptions | null): void;
+    exitFullScreen(): void;
+}
+class UniVideoElement extends UniViewElementImpl implements IUniVideoElement {
+    tagName: string = 'VIDEO';
+    nodeName: string = 'VIDEO';
+    private video: Video | null = null;
+    private lastNavigationStyle: string = '';
+    dispose() {
+        this.video?.dispose();
+        this.video = null;
+        super.dispose();
+    }
+    getHarmonyController(): VideoController | null {
+        const videoNativeElement = this.firstChild?.firstChild as UniNativeViewElement;
+        if (videoNativeElement) {
+            return (videoNativeElement.getHarmonyController<BindVideoController>() as BindVideoController).controller;
+        }
+        return null;
+    }
+    setVideo(video: Video) {
+        this.video = video;
+    }
+    getVideo(): Video | null {
+        return this.video;
+    }
+    play() {
+        this.video?.play();
+    }
+    pause() {
+        this.video?.pause();
+    }
+    seek(position: number) {
+        this.video?.seek(position);
+    }
+    stop() {
+        this.video?.stop();
+    }
+    sendDanmu(danmu: Danmu) {
+        this.video?.sendDanmu(danmu);
+    }
+    playbackRate(rate: number) {
+        this.video && (this.video.playbackRate = rate);
+    }
+    requestFullScreen(options: ESObject | null = null) {
+        let requestFullscreenOptions: ESObject = options ?? {};
+        switch(options?.direction){
+            case 0:
+                requestFullscreenOptions.orientation = 'portrait';
+                break;
+            case 90:
+                requestFullscreenOptions.orientation = 'landscape-primary';
+                break;
+            case -90:
+                requestFullscreenOptions.orientation = 'landscape-secondary';
+                break;
+            default:
+                const orientation = this.video?.getFullscreenOrientation();
+                if (orientation != null) {
+                    requestFullscreenOptions.orientation = orientation;
+                }
+                break;
+        }
+        this.requestFullscreen(requestFullscreenOptions);
+    }
+    exitFullScreen() {
+        this.page.exitFullscreen();
+    }
+    requestFullscreen(options: ESObject | undefined | null = null): void {
+        const nativePage: ESObject = (this.uniPage as ESObject).getNativePage();
+        if (this.uniPage.fullscreenElement) {
+            options?.fail?.();
+            this.callFullscreenerrorCallbacks('The current page already has a fullscreen element.');
+            return;
+        }
+        if (this.isFullscreen) return;
+        this.isFullscreen = true;
+        this.video && (this.video.fullscreening = true);
+        this.lastNavigationStyle = this.uniPage.getPageStyle().get('navigationStyle') ?? '';
+        this.resolveIsFullscreenFrameNode(options).then(()=>{
+            nativePage.fullscreenElement = this;
+            this.uniPage.setPageStyle(new UTSJSONObject(new UTSJSONObject({
+                navigationStyle: 'custom'
+            })));
+            this.checkPosition(true);
+            options?.success?.();
+            this.callFullscreenchangeCallbacks();
+        }).catch(()=>{
+            nativePage.setPageOrientation(this.uniPage.getPageStyle().toMap());
+            this.requestFullscreenError();
+            this.uniPage.setPageStyle(new UTSJSONObject(new UTSJSONObject({
+                navigationStyle: this.lastNavigationStyle
+            })));
+            this.video && (this.video.fullscreening = false);
+            options?.fail?.();
+            this.callFullscreenerrorCallbacks();
+        });
+        options?.complete?.();
+    }
+    _exitFullscreen() {
+        if (!this.isFullscreen) {
+            return;
+        }
+        this.isFullscreen = false;
+        this.video && (this.video.fullscreening = true);
+        this.page?.setPageStyle(new UTSJSONObject(new UTSJSONObject({
+            navigationStyle: this.lastNavigationStyle
+        })));
+        this.exitFullscreenResetStyle();
+        this.callFullscreenchangeCallbacks();
+    }
+}
+const createVideoContext: CreateVideoContext = defineSyncApi<VideoContext | null>('createVideoContext', (videoId: string, component: ComponentPublicInstance | null = null): VideoContextImpl | null =>{
+    let videoElement: UniVideoElement | null | undefined = null;
+    if (component == null) {
+        const pages = getCurrentPages() as UniPage[];
+        if (pages.length > 0) {
+            const page = pages[pages.length - 1];
+            if (!page) {
+                UTS.console.error(`getCurrentPages is empty`);
+                return null;
+            }
+            videoElement = ((page.vm as ESObject).$el as UniElement)?.parentElement?.querySelector('#' + videoId) as (UniVideoElement | null);
+            if (videoElement == null) {
+                const dialogPages = page.getDialogPages() as UniPage[];
+                if (dialogPages.length > 0) {
+                    const topDialogPage = dialogPages[dialogPages.length - 1];
+                    if (!topDialogPage) {
+                        UTS.console.error(`getDialogPages is empty`);
+                        return null;
+                    }
+                    videoElement = ((topDialogPage.vm as ESObject).$el as UniElement)?.parentElement?.querySelector('#' + videoId) as (UniVideoElement | null);
+                }
+            }
+        }
+    } else {
+        videoElement = (component.$el as UniElement)?.parentElement?.querySelector('#' + videoId) as (UniVideoElement | null);
+    }
+    if (videoElement == null) return null;
+    return new VideoContextImpl(videoElement.getVideo());
+}) as CreateVideoContext;
+class VideoContextImpl implements VideoContext {
+    private video?: Video | null = null;
+    constructor(video: Video | null = null){
+        this.video = video;
+    }
+    play() {
+        this.video?.play();
+    }
+    pause() {
+        this.video?.pause();
+    }
+    seek(position: number) {
+        this.video?.seek(position);
+    }
+    stop() {
+        this.video?.stop();
+    }
+    sendDanmu(danmu: Danmu) {
+        this.video?.sendDanmu(danmu);
+    }
+    playbackRate(rate: number) {
+        this.video && (this.video.playbackRate = rate);
+    }
+    requestFullScreen(options: RequestFullScreenOptions | null = null) {
+        this.video?.requestFullscreen(options);
+    }
+    exitFullScreen() {
+        this.video?.exitFullscreen();
+    }
+}
+class AudioManager {
+    offVolumeChange: () => void = ()=>{};
+    currentVolume: number = 0;
+    maxVolume: number = 1;
+    minVolume: number = 0;
+    constructor(mediaVolumeChange: (volume: number) => void){
+        const VolumeMEDIA = audio.AudioVolumeType.MEDIA;
+        let audioManager = audio.getAudioManager();
+        let audioVolumeManager: audio.AudioVolumeManager = audioManager.getVolumeManager();
+        const volumeChange = (volumeEvent: audio.VolumeEvent)=>{
+            if (volumeEvent.volumeType === VolumeMEDIA) {
+                mediaVolumeChange(volumeEvent.volume);
+            }
+        };
+        audioVolumeManager.on('volumeChange', volumeChange);
+        const audioVolumeGroupManager = audioVolumeManager.getVolumeGroupManagerSync(audio.DEFAULT_VOLUME_GROUP_ID);
+        this.currentVolume = audioVolumeGroupManager.getVolumeSync(VolumeMEDIA);
+        this.minVolume = audioVolumeGroupManager.getMinVolumeSync(VolumeMEDIA);
+        this.maxVolume = audioVolumeGroupManager.getMaxVolumeSync(VolumeMEDIA);
+        this.offVolumeChange = ()=>{
+            audioVolumeManager.off('volumeChange', volumeChange);
+        };
+    }
+}
+class Brightness {
+    private window?: OHWindow.Window;
+    constructor(){
+        const currentMP = getCurrentMP();
+        this.window = currentMP.window;
+    }
+    getBrightness(): number {
+        const brightness = this.window?.getWindowProperties().brightness ?? 0;
+        return brightness === -1 ? 0.3 : brightness;
+    }
+    setBrightness(brightness: number): Promise<void> {
+        if (this.window) {
+            return this.window.setWindowBrightness(brightness);
+        } else {
+            return Promise.reject('window is not defined');
+        }
+    }
+}
+export { VideoContext as VideoContext, Danmu as Danmu, RequestFullScreenOptions as RequestFullScreenOptions, CreateVideoContext as CreateVideoContext, UniVideoFullScreenDirection as UniVideoFullScreenDirection, VideoError as VideoError, VideoErrorCode as VideoErrorCode, UniVideoEvent as UniVideoEvent };
+export { UniVideoTimeUpdateEvent as UniVideoTimeUpdateEvent, UniVideoTimeUpdateEventDetail as UniVideoTimeUpdateEventDetail, UniVideoFullScreenChangeEvent as UniVideoFullScreenChangeEvent, UniVideoFullScreenChangeEventDetail as UniVideoFullScreenChangeEventDetail, UniVideoErrorEvent as UniVideoErrorEvent, UniVideoProgressEvent as UniVideoProgressEvent, UniVideoProgressEventDetail as UniVideoProgressEventDetail, UniVideoFullScreenClickEvent as UniVideoFullScreenClickEvent, UniVideoFullScreenClickEventDetail as UniVideoFullScreenClickEventDetail, UniVideoControlsToggleEvent as UniVideoControlsToggleEvent, UniVideoControlsToggleEventDetail as UniVideoControlsToggleEventDetail, UniVideoTimeUpdateEvent as VideoTimeUpdateEvent, UniVideoTimeUpdateEventDetail as VideoTimeUpdateEventDetail, UniVideoFullScreenChangeEvent as VideoFullScreenChangeEvent, UniVideoFullScreenChangeEventDetail as VideoFullScreenChangeEventDetail, UniVideoErrorEvent as VideoErrorEvent, UniVideoProgressEvent as VideoProgressEvent, UniVideoProgressEventDetail as VideoProgressEventDetail, UniVideoFullScreenClickEvent as VideoFullScreenClickEvent, UniVideoFullScreenClickEventDetail as VideoFullScreenClickEventDetail, UniVideoControlsToggleEvent as VideoControlsToggleEvent, UniVideoControlsToggleEventDetail as VideoControlsToggleEventDetail };
+export { BuilderVideoOptions as BuilderVideoOptions };
+export { VideoEvent as VideoEvent };
+export { ObjectFit as ObjectFit };
+export { BuilderVideoParams as BuilderVideoParams };
+export { OnPreparedEvent as OnPreparedEvent };
+export { OnSeekingEvent as OnSeekingEvent };
+export { OnSeekedEvent as OnSeekedEvent };
+export { OnUpdateEvent as OnUpdateEvent };
+export { OnFullscreenChange as OnFullscreenChange };
+export { Video as Video };
+export { UniVideoElement as UniVideoElement };
+export { createVideoContext as createVideoContext };
+export { AudioManager as AudioManager };
+export { Brightness as Brightness };
+ÀÔrD•¶@ohos.multimedia.audio­@ohos.file.fs¶@ohos.multimedia.media©./builder»@dcloudio/uni-app-frameworkÔrE—ªassertions¨external¢id¤meta±moduleSideEffectsªresolvedByµsyntheticNamedExportsAÃÙs hvigor_ignore__Applications_DevEco-Studio.app_Contents_sdk_default_openharmony_ets_api_@ohos.multimedia.audio.d.tsAÃªoh-resolveÂEAÃÙj hvigor_ignore__Applications_DevEco-Studio.app_Contents_sdk_default_openharmony_ets_api_@ohos.file.fs.d.tsAÃªoh-resolveÂEAÃÙs hvigor_ignore__Applications_DevEco-Studio.app_Contents_sdk_default_openharmony_ets_api_@ohos.multimedia.media.d.tsAÃªoh-resolveÂEAÂÚ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/modules/uni_modules/uni-video/utssdk/app-harmony/builder.etsAÃªoh-resolveÂEAÂÙî/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/framework/index.etsAÃªoh-resolveÂ“ÔrF–§version¤fileªsourceRoot§sources¥names¨mappings¨index.js ‘©index.etsÜn–”   ” 	” ” ”* %”+ &˜”   ” ”	 	” ” +” 1”& <”' =–”   ” ”	 ”  ” /” 0š”   ” ”	 	” ” ”" "”$ $”* *”ÌG ÌG”ÌH ÌH–”   ” 	” ” ”* %”+ &Ü ”   ” ”	 *” 3” ÌL” ÌV”  Ìw”# Ìz”% Ì|”2 Ì‰”4 Ì‹”ÌF Ì”ÌH ÌŸ”ÌU Ì¬”ÌW Ì®”Ìf Ì½”Ìh ÌÈ”Ìk ÌË”Ìm ÌÍ”Ìs ÌÓ”Ì Ìğ”Ì‘ Ìñ•”  	 ” 	” 	” 	” 	‘” 	 •” 
+” 
+” 
+” 
+” 
+•” ” 	” ” ”  •” ” ” ” ” ’”  ” ‘” •”   ” ” ”' '”0 0‘”  •” ” ” %” )” *’”  ” ‘” •”  ( ” (”# ($”, (,”5 (5‘” +•”  0 ” 0”) 0*”2 02”; 0;‘” 3•”  > ” >”! >"”* >*”3 >3‘” Ì@•”  ÌD ” ÌD”( ÌD)”1 ÌD1”: ÌD:‘” ÌI•”  ÌM ” ÌM”' ÌM(”0 ÌM0”9 ÌM9‘” ÌO™”  ÌP ”
+ ÌP
+” ÌP”( ÌP(”) ÌP)”* ÌP*”0 ÌP0”2 ÌP1”4 ÌP3–” ÌQ” ÌQ” ÌQ” ÌQ” ÌQ'” ÌQ)š” ÌR” ÌR” ÌR” ÌR”! ÌR!”' ÌR'”( ÌR(”5 ÌR5”7 ÌR7”8 ÌR8›” ÌS” ÌS” ÌS” ÌS”! ÌS!”" ÌS"”) ÌS)”+ ÌS+”, ÌS,”8 ÌS8”9 ÌS9”” ÌT” ÌT” ÌT”( ÌT(•” ÌU” ÌU”: ÌU ”ÌX ÌU>”Ì— ÌU?“”	 ÌV”
+ ÌV” ÌV–” ÌW” ÌW” ÌW”	 ÌW	”
+ ÌW
+” ÌW””  ÌX ” ÌX” ÌX” ÌX˜”  Ìƒ ” Ìƒ” Ìƒ” Ìƒ” Ìƒ”# Ìƒ1”% ÌƒÌA”' ÌƒÌC™” Ì„” Ì„” Ì„” Ì„” Ì„” Ì„” Ì„”' Ì„'”) Ì„)œ” Ì…” Ì…” Ì…” Ì…” Ì…”! Ì…!”" Ì…"”) Ì…)”* Ì…*”- Ì…-”. Ì…8”/ Ì…9›” Ì†” Ì†” Ì†” Ì†” Ì†” Ì†”# Ì†#”$ Ì†$”' Ì†'”( Ì†(”* Ì†*›” Ì‡” Ì‡” Ì‡” Ì‡” Ì‡”# Ì‡#”& Ì‡&”- Ì‡-”. Ì‡.”1 Ì‡1”2 Ì‡2‘”	 Ìˆ	‘” Ì‰”” ÌŠ” ÌŠ” ÌŠ” ÌŠ“”  Ì‹ ” Ì‹” Ì‹“”  ÌŒ ” ÌŒ” ÌŒ‘” ÌŒ •” Ì” Ì” Ì3”  Ì7”! Ì8—” Ì” Ì” Ì"” Ì&”- Ì5”/ Ì7”0 Ì8’” Ì« ” Ì«”” Ì” Ì” Ì”  Ì1—” Ì” Ì” Ì” Ì” Ì”( Ì(”) Ì)’” Ì‘” Ì‘’” Ì’” Ì’˜” Ì“” Ì“” Ì“” Ì“” Ì“” Ì“” Ì“”  Ì“ ’” Ì”” Ì”’” Ì•”	 Ì•	˜” Ì–” Ì–” Ì–” Ì–” Ì–” Ì–” Ì–”  Ì– ’” Ì—” Ì—’” Ì˜” Ì˜˜” Ì™” Ì™” Ì™” Ì™” Ì™” Ì™” Ì™” Ì™–” Ìš” Ìš” Ìš” Ìš” Ìš” Ìš’” Ì›” Ì›’” Ìœ”	 Ìœ	˜” Ì” Ì” Ì” Ì” Ì” Ì” Ì”  Ì ’” Ì” Ì”” ÌŸ” ÌŸ”	 ÌŸ	” ÌŸ” Ì ” Ì ” Ì ” Ì ” Ì ”& Ì &”' Ì '”/ Ì /”1 Ì 1”9 Ì 9”: Ì :”ÌB Ì ÌB”ÌC Ì ÌC”ÌD Ì ÌD’” Ì¡” Ì¡•” Ì¢” Ì¢” Ì¢”  Ì¢ÌA”$ Ì¢ÌEš” Ì£” Ì£” Ì£” Ì£” Ì£”, Ì£,”- Ì£-”4 Ì£4”5 Ì£5”6 Ì£6’” Ì¤” Ì¤’” Ì¥” Ì¥˜” Ì¦” Ì¦” Ì¦” Ì¦” Ì¦”) Ì¦)”+ Ì¦+”, Ì¦,’” Ì§” Ì§’” Ì¨” Ì¨—” Ì©” Ì©” Ì©” Ì©” Ì©”  Ì© ”! Ì©!’” Ìª” Ìª‘” Ì«“”  Ì¬ ” Ì¬” Ì¬•” Ì¹” Ì¹” Ì¹-” Ì¹/” Ì¹ÌI•” Ì®” Ì®”" Ì®:”& Ì®>”' Ì®?–” Ì°” Ì°” Ì°”& Ì°%”( Ì°'”) Ì°(•” Ì±”% Ì±$”( Ì±'”- Ì±,”. Ì±-•” Ì²” Ì²” Ì²” Ì²” Ì²•” Ì³” Ì³”! Ì³ ”% Ì³$”& Ì³%•” Ì´” Ì´” Ì´!” Ì´#” Ì´$•” Ìµ” Ìµ” Ìµ"” Ìµ$” Ìµ%•” Ì¶”" Ì¶!”% Ì¶3”) Ì¶7”* Ì¶8•” Ì·”+ Ì·*”. Ì·-”/ Ì·.”0 Ì·/•” Ì¸” Ì¸” Ì¸”" Ì¸"”# Ì¸#•” Ìû” Ìû”" Ìû!”% Ìû#”' Ìû%” Ìü” Ìü” Ìü” Ìü” Ìü”< Ìü8”Ì@ Ìü<”ÌA Ìü=”ÌG ÌüÌC”ÌI ÌüÌE”ÌR ÌüÌN”ÌT ÌüÌP”ÌU ÌüÌQ”ÌV ÌüÌR“” Ìı”	 Ìı”
+ Ìı–” Ìº” Ìº” Ìº” Ìº'” Ìº)” Ìº*–” Ì»” Ì»” Ì»” Ì»”# Ì»#”$ Ì»$™” Ì¼” Ì¼” Ì¼” Ì¼”" Ì¼"”# Ì¼#”( Ì¼(”* Ì¼)”, Ì¼+Ü ” Ì½” Ì½” Ì½” Ì½” Ì½”3 Ì½3”9 Ì½9”: Ì½:”ÌC Ì½ÌC”ÌE Ì½ÌE”ÌG Ì½ÌG”ÌL Ì½ÌL”ÌM Ì½ÌM”ÌQ Ì½ÌQ”ÌR Ì½ÌR”ÌS Ì½ÌS“” Ì¾”	 Ì¾	”
+ Ì¾
+—” Ì¿” Ì¿” Ì¿” Ì¿” Ì¿” Ì¿”! Ì¿ Ü ” ÌÀ” ÌÀ” ÌÀ” ÌÀ” ÌÀ”" ÌÀ"”# ÌÀ#”( ÌÀ(”) ÌÀ)”? ÌÀ?”ÌE ÌÀÌE”ÌF ÌÀÌF”ÌO ÌÀÌO”ÌQ ÌÀÌQ”ÌR ÌÀÌR”ÌS ÌÀÌS”ÌT ÌÀÌT”ÌU ÌÀÌU”Ìe ÌÀÌe”Ìh ÌÀÌh”Ìl ÌÀÌl”Ìm ÌÀÌm“” ÌÁ”	 ÌÁ	”
+ ÌÁ
+—” ÌÂ” ÌÂ” ÌÂ” ÌÂ” ÌÂ”  ÌÂ”" ÌÂ!–” ÌÃ” ÌÃ” ÌÃ” ÌÃ”" ÌÃ"”$ ÌÃ$•” ÌÄ”  ÌÄ ”# ÌÄ#”( ÌÄ(”) ÌÄ)—” ÌÅ” ÌÅ” ÌÅ”" ÌÅ"”% ÌÅ%”* ÌÅ*”+ ÌÅ+–” ÌÆ” ÌÆ” ÌÆ” ÌÆ” ÌÆ” ÌÆ‘” ÌÇ‘” ÌÇœ” ÌÈ” ÌÈ” ÌÈ” ÌÈ” ÌÈ”1 ÌÈ1”7 ÌÈ7”8 ÌÈ8”ÌA ÌÈÌA”ÌC ÌÈÌC”ÌD ÌÈÌD”ÌE ÌÈÌE‘” ÌÉ“” ÌÊ”	 ÌÊ	”
+ ÌÊ
+—” ÌË” ÌË” ÌË” ÌË” ÌË”  ÌË”" ÌË!—” ÌÌ” ÌÌ” ÌÌ”" ÌÌ"”% ÌÌ%”) ÌÌ)”* ÌÌ*–” ÌÍ” ÌÍ” ÌÍ” ÌÍ”  ÌÍ ”! ÌÍ!œ” ÌÎ” ÌÎ” ÌÎ” ÌÎ” ÌÎ”- ÌÎ-”3 ÌÎ3”4 ÌÎ4”= ÌÎ=”? ÌÎ?”Ì@ ÌÎÌ@”ÌA ÌÎÌA“” ÌÏ”	 ÌÏ	”
+ ÌÏ
+—” ÌĞ” ÌĞ” ÌĞ” ÌĞ” ÌĞ”  ÌĞ”" ÌĞ!œ” ÌÑ” ÌÑ” ÌÑ” ÌÑ” ÌÑ”- ÌÑ-”3 ÌÑ3”4 ÌÑ4”= ÌÑ=”? ÌÑ?”Ì@ ÌÑÌ@”ÌA ÌÑÌA“” ÌÒ”	 ÌÒ	”
+ ÌÒ
+™” ÌÓ” ÌÓ” ÌÓ” ÌÓ”  ÌÓ ”! ÌÓ!”& ÌÓ&”( ÌÓ'”* ÌÓ)—” ÌÔ” ÌÔ” ÌÔ” ÌÔ” ÌÔ”  ÌÔ ”! ÌÔ!—” ÌÕ” ÌÕ” ÌÕ”" ÌÕ"”% ÌÕ%”) ÌÕ)”* ÌÕ*–” ÌÖ” ÌÖ” ÌÖ” ÌÖ”  ÌÖ ”! ÌÖ!Ü ” Ì×” Ì×” Ì×” Ì×” Ì×”0 Ì×0”6 Ì×6”7 Ì×7”Ì@ Ì×Ì@”ÌB Ì×ÌB”ÌD Ì×ÌD”ÌI Ì×ÌI”ÌJ Ì×ÌJ”ÌR Ì×ÌR”ÌS Ì×ÌS”ÌT Ì×ÌT–” ÌØ” ÌØ” ÌØ” ÌØ”- ÌØ-”/ ÌØ/—” ÌÙ” ÌÙ” ÌÙ”- ÌÙ-”0 ÌÙ0”5 ÌÙ5”6 ÌÙ6–” ÌÚ” ÌÚ” ÌÚ” ÌÚ” ÌÚ” ÌÚ‘” ÌÛ“” ÌÜ”	 ÌÜ	”
+ ÌÜ
+—” Ìİ” Ìİ” Ìİ” Ìİ” Ìİ”! Ìİ!”" Ìİ"˜” ÌŞ” ÌŞ”! ÌŞ!”$ ÌŞ$”( ÌŞ(”; ÌŞ;”= ÌŞ=”> ÌŞ>š” Ìß” Ìß” Ìß” Ìß”$ Ìß$”% Ìß%”2 Ìß2”4 Ìß4”ÌA ÌßÌA”ÌB ÌßÌB”” Ìà” Ìà” Ìà” Ìà˜” Ìá” Ìá7” Ìá8”! ÌáÌ@”" ÌáÌA”& ÌáÌE”' ÌáÌF”( ÌáÌG˜” Ìâ” Ìâ”  Ìâ ”/ Ìâ/”0 Ìâ1”< ÌâÌ[”= ÌâÌ\”> ÌâÌ]‘”	 Ìã	—” Ìä” Ìä” Ìä”  Ìä ”# Ìä#”6 Ìä6”7 Ìä7›” Ìå” Ìå” Ìå” Ìå” Ìå”! Ìå!”$ Ìå$”7 Ìå7”8 Ìå8”ÌB ÌåÌB”ÌC ÌåÌC–” Ìæ” Ìæ” Ìæ” Ìæ” Ìæ” Ìæ” Ìç” Ìç” Ìç” Ìç” Ìç”# Ìç#”$ Ìç$”0 Ìç0”1 Ìç1”7 Ìç7”8 Ìç8”ÌA ÌçÌN”ÌB ÌçÌO”ÌC ÌçÌP‘”	 Ìè	—” Ìé” Ìé” Ìé” Ìé” Ìé” Ìé” Ìé” Ìê” Ìê” Ìê” Ìê” Ìê” Ìê” Ìê”& Ìê&”' Ìê'”* Ìê*”/ Ìê/”7 Ìê7”9 Ìê9” Ìë” Ìë” Ìë” Ìë” Ìë”# Ìë#”$ Ìë$”* Ìë*”+ Ìë+”2 Ìë2”3 Ìë3”6 Ìë6”7 Ìë7‘”	 Ìì	š” Ìí” Ìí” Ìí” Ìí”  Ìí ”& Ìí&”' Ìí'”. Ìí.”/ Ìí/”0 Ìí0–” Ìî” Ìî” Ìî”( Ìî(”* Ìî*”+ Ìî+—” Ìï” Ìï” Ìï” Ìï” Ìï”! Ìï!”$ Ìï$”” Ìğ” Ìğ” Ìğ” Ìğ’”	 Ìñ!”
+ Ìñ"Ÿ” Ìò” Ìò” Ìò”) Ìò)”* Ìò*”5 Ìò5”6 ÌòÌL”Ì@ ÌòÌV”ÌA ÌòÌW”ÌC ÌòÌY”ÌG ÌòÌ]”ÌH ÌòÌ^”ÌN ÌòÌd”ÌO ÌòÌe”ÌP ÌòÌfš” Ìó” Ìó” Ìó”% Ìó%”& Ìó&”* Ìó*”+ Ìó+”> Ìó>”? Ìó?”Ì@ ÌóÌ@š” Ìô” Ìô” Ìô” Ìô” Ìô”7 Ìô7”8 Ìô8”= Ìô=”ÌG ÌôÌG”ÌI ÌôÌIš” Ìõ” Ìõ” Ìõ”# Ìõ#”& Ìõ'”- Ìõ;”. Ìõ<”ÌH ÌõÌV”ÌJ ÌõÌl”ÌK ÌõÌm‘”	 Ìö	‘” Ìöš” Ì÷” Ì÷” Ì÷”# Ì÷#”& Ì÷&”- Ì÷-”. Ì÷.”ÌC Ì÷ÌC”ÌE Ì÷ÌE”ÌF Ì÷ÌF‘”	 Ìø	Ü ” Ìù” Ìù” Ìù” Ìù” Ìù” Ìù”  Ìù ”" Ìù"”# Ìù#”7 Ìù7”9 Ìù9”= Ìù=”> Ìù>”ÌP ÌùÌP”ÌQ ÌùÌQ”ÌR ÌùÌR’” Ìú” Ìú’” Ìş” Ìşš” Ìÿ” Ìÿ” Ìÿ” Ìÿ”  Ìÿ ”& Ìÿ&”' Ìÿ'”. Ìÿ.”/ Ìÿ/”0 Ìÿ0œ” Í ” Í ” Í ” Í ”! Í !”' Í '”( Í (”, Í ,”- Í -”3 Í 3”4 Í 4”5 Í 5’” Í” Í”” Í” Í” Í” Í-”” Í” Í” Í” Í“” Í” Í” Í–” Í” Í” Í”  Í ”' Í'”( Í(“” Í” Í” Í–” Í” Í” Í”  Í ”$ Í$”% Í%“” Í” Í” Í–” Í	” Í	” Í	”  Í	 ”% Í	%”& Í	&‘” Í
+–” Í” Í” Í”  Í ”' Í'”( Í(‘”	 Í	’” Í” Í”” Í” Í” Í” Í+”” Í” Í” Í” Í’” Í” Í’” Í” Í’” Í” Í’” Í” Í’” Í” Í’”	 Í	”
+ Í
+™” Í” Í” Í” Í”! Í!”" Í"”# Í#”$ Í$”% Í%” Í” Í” Í” Í” Í” Í”" Í"”# Í#”' Í'”* Í*”1 Í1”2 Í2”3 Í3Ü ” Í” Í” Í” Í” Í” Í” Í” Í” Í”' Í&”( Í'”. Í-”0 Í/”1 Í0”3 Í2”5 Í3Ü ” Í” Í” Í” Í” Í” Í” Í”  Í ”$ Í$”' Í'”2 Í2”3 Í3”4 Í4”5 Í5”6 Í6”7 Í7–” Í” Í” Í” Í”" Í"”$ Í$˜” Í” Í” Í”% Í%”& Í&”' Í'”( Í(”) Í)•” Í” Í” Í”" Í"”# Í#‘” Í‘”	 Í	”” Í” Í” Í” Í’” Í ” Í ’” Í!” Í!š” Í"” Í"” Í"” Í"” Í"” Í"”  Í" ”# Í"#”$ Í"$”& Í"&Ü ” Í#” Í#” Í#” Í#” Í#” Í#”% Í#%”& Í#&”* Í#*”+ Í#+”3 Í#3”4 Í#4”: Í#:”= Í#=”> Í#>”? Í#?”Ì@ Í#Ì@™” Í$” Í$” Í$” Í$” Í$”  Í$ ”# Í$#”$ Í$$”% Í$%—” Í%” Í%” Í%” Í%” Í%” Í%” Í%‘”	 Í&	’” Í'” Í'’” Í(” Í(—” Í)” Í)” Í)”% Í)%”( Í)(”- Í)-”. Í).—” Í*” Í*” Í*” Í*”! Í*!”% Í*%”& Í*&—” Í+” Í+” Í+” Í+” Í+” Í+” Í+›” Í,” Í,” Í,” Í,” Í,”! Í,"”" Í,#”& Í,'”) Í,*”. Í,/”/ Í,0’” Í-” Í-”” Í.”	 Í.”
+ Í.”% Í.-œ” Í/” Í/” Í/” Í/” Í/” Í/” Í/”  Í/ ”' Í/'”( Í/(”+ Í/+”, Í/,™” Í0” Í0” Í0” Í0” Í0”  Í0 ”! Í0!”? Í0?”Ì@ Í0Ì@—” Í1” Í1” Í1”" Í1"”% Í1%”) Í1)”* Í1*œ” Í2” Í2” Í2” Í2” Í2”# Í2#”' Í2'”* Í2*”+ Í2+”1 Í21”6 Í26”7 Í27’” Í29” Í2Ì@Ü  ” Í3” Í3” Í3” Í3”  Í3 ”! Í3!”+ Í3+”, Í3,”5 Í35”6 Í36”: Í3:”= Í3=”> Í3>”ÌH Í3ÌH”ÌI Í3ÌI”ÌS Í3ÌS”ÌT Í3ÌT”ÌX Í3ÌX”Ì[ Í3Ì[”Ì\ Í3Ì\”Ìf Í3Ìf”Ìg Í3Ìg”Ìp Í3Ìp”Ìq Í3Ìq”Ìu Í3Ìu”Ìx Í3Ìx”Ìy Í3Ìy”Ìƒ Í3Ìƒ”Ì„ Í3Ì„”Ì Í3Ì”Ì Í3Ì”Ì Í3Ì’” Í4” Í4š” Í5” Í5”% Í5%”( Í5(”. Í5.”3 Í53”4 Í54”ÌM Í5ÌM”ÌO Í5ÌO”ÌP Í5ÌP–” Í6” Í6” Í6” Í64” Í68”  Í69’” Í7” Í7”” Í8” Í8”  Í8 ”" Í8"˜” Í9”' Í9'”( Í9(”4 Í94”5 Í95”8 Í98”9 Í99”: Í9:™” Í:” Í:” Í:”% Í:%”8 Í:8”9 Í:9”ÌF Í:ÌF”ÌH Í:ÌH”ÌI Í:ÌI‘” Í;‘” Í;Ü ” Í<” Í<” Í<”! Í<!”' Í<'”) Í<)”* Í<*”. Í<.”/ Í</”2 Í<2”4 Í<4”6 Í<6”7 Í<7”? Í<?”Ì@ Í<Ì@”ÌI Í<ÌI”ÌJ Í<ÌJ”ÌK Í<ÌK’” Í=” Í=Ü ” Í>” Í>”& Í>&”) Í>)”* Í>*”0 Í>0”2 Í>2”3 Í>3”7 Í>7”8 Í>8”< Í><”= Í>=”? Í>?”Ì@ Í>Ì@”ÌA Í>ÌA”ÌB Í>ÌB”ÌF Í>ÌF”ÌG Í>ÌG•” Í?”+ Í?+”, Í?,”3 Í?3”6 Í?6’” Í@”$ Í@$œ” ÍA”$ ÍA$”& ÍA&”' ÍA'”- ÍA:”/ ÍA<”5 ÍAÌJ”7 ÍAÌL”= ÍAÌa”ÌA ÍAÌe”ÌC ÍAÌo”ÌE ÍAÌqœ”  ÍB ”' ÍB'”) ÍB)”* ÍB*”2 ÍB2”3 ÍB3”7 ÍB7”8 ÍB8”: ÍB:”< ÍB<”ÌB ÍBÌB”ÌD ÍBÌD””$ ÍC$”* ÍC*”, ÍC,”/ ÍC/’”$ ÍD$”* ÍD*“”! ÍE0”" ÍE1”# ÍE2’” ÍF” ÍF’” ÍG” ÍG™” ÍH”  ÍH ”# ÍH#”) ÍH)”< ÍH<”= ÍH=”ÌJ ÍHÌJ”ÌL ÍHÌL”ÌM ÍHÌM‘” ÍI‘” ÍI™” ÍJ” ÍJ”  ÍJ ”! ÍJ!”& ÍJ&”' ÍJ'”+ ÍJ+”, ÍJ,”- ÍJ-‘” ÍK‘” ÍL‘” ÍM‘” ÍM—” ÍN” ÍN”) ÍN)”* ÍN*”1 ÍN1”3 ÍN3”4 ÍN4‘” ÍOÜ ” ÍP” ÍP” ÍP” ÍP”" ÍP"”# ÍP#”ÌA ÍPÌA”ÌE ÍPÌE”ÌH ÍPÌH”ÌM ÍPÌM”ÌQ ÍPÌQ”ÌR ÍPÌR”ÌX ÍPÌX”ÌY ÍPÌY”Ì` ÍPÌ`”Ìa ÍPÌa”Ìd ÍPÌd”Ìh ÍPÌh”Ìp ÍPÌp”Ìt ÍPÌt”Ìx ÍPÌx’” ÍPÌz” ÍPÌ›” ÍQ” ÍQ” ÍQ” ÍQ” ÍQ” ÍQ”' ÍQ'”( ÍQ(”2 ÍQ2”3 ÍQ3”4 ÍQ4›” ÍR” ÍR” ÍR” ÍR” ÍR”  ÍR ”( ÍR(”) ÍR)”4 ÍR4”5 ÍR5”6 ÍR6Ü ” ÍS” ÍS” ÍS”  ÍS ”( ÍS(”) ÍS)”9 ÍS9”= ÍS=”ÌA ÍSÌA”ÌB ÍSÌB”ÌC ÍSÌC”ÌD ÍSÌD”ÌJ ÍSÌJ”ÌK ÍSÌK”ÌS ÍSÌS”ÌT ÍSÌT”Ìd ÍSÌd”Ìe ÍSÌe”Ìf ÍSÌf”Ìg ÍSÌg”Ìh ÍSÌh”Ìi ÍSÌi”Ìj ÍSÌjš” ÍT” ÍT” ÍT”  ÍT ”" ÍT"”& ÍT&”1 ÍT1”6 ÍT6”9 ÍT9”; ÍT;–” ÍU” ÍU”! ÍU!”$ ÍU$”) ÍU)”* ÍU*•” ÍV” ÍV” ÍV” ÍV” ÍV•” ÍW” ÍW” ÍW”$ ÍW$”% ÍW%‘” ÍXš” ÍY” ÍY” ÍY” ÍY” ÍY” ÍY”# ÍY#”& ÍY&”' ÍY'”) ÍY)Ü ” ÍZ” ÍZ” ÍZ”* ÍZ*”- ÍZ-”2 ÍZ2”6 ÍZ6”< ÍZ<”= ÍZ=”> ÍZ>”? ÍZ?”ÌI ÍZÌI”ÌJ ÍZÌJ”ÌK ÍZÌK”ÌL ÍZÌL”ÌW ÍZÌW”ÌX ÍZÌX‘” Í[‘”	 Í\	•” Í\
+” Í\” Í\” Í\” Í\’” Í]” Í]”” Í^”
+ Í^” Í^” Í^—” Í_” Í_” Í_” Í_” Í_”# Í_#”% Í_%š” Í`” Í`” Í`” Í`” Í`” Í`” Í`”" Í`"”# Í`#”$ Í`$’” Ía” Ía‘”	 Íb	Ÿ” Íc” Íc” Íc” Íc” Íc” Íc”  Íc ”& Íc&”' Íc'”. Íc.”/ Íc/”2 Íc2”5 Íc5”8 Íc8”9 Íc9—” Íd” Íd” Íd” Íd” Íd” Íd” Íd—” Íe” Íe” Íe”% Íe%”( Íe(”- Íe-”. Íe.—” Íf” Íf” Íf” Íf”! Íf!”& Íf&”' Íf'–” Íg” Íg” Íg” Íg” Íg” Íg–” Íh” Íh” Íh”( Íh(”* Íh*”+ Íh+’” Íi” Íi’” Íj” Íj–” Ík” Ík” Ík”+ Ík+”- Ík-”. Ík.—” Íl” Íl” Íl”" Íl"”% Íl%”) Íl)”* Íl*˜” Ím” Ím” Ím”  Ím ”" Ím"”) Ím)”+ Ím+”, Ím,—” Ín” Ín” Ín”  Ín ”# Ín#”, Ín,”- Ín-˜” Ío” Ío” Ío” Ío”! Ío!”( Ío(”* Ío*”+ Ío+—” Íp” Íp” Íp” Íp”" Íp"”& Íp&”' Íp'˜” Íq” Íq” Íq” Íq” Íq” Íq” Íq” Íq›” Ír” Ír” Ír” Ír” Ír” Ír” Ír”* Ír*”- Ír-”6 Ír6”7 Ír7›” Ís” Ís” Ís” Ís” Ís” Ís” Ís”$ Ís$”' Ís'”0 Ís0”1 Ís1›” Ít” Ít” Ít” Ít” Ít” Ít” Ít”% Ít%”( Ít(”1 Ít1”2 Ít2›” Íu” Íu” Íu” Íu” Íu” Íu” Íu”% Íu%”( Íu(”1 Íu1”2 Íu2›” Ív” Ív” Ív” Ív” Ív” Ív” Ív”% Ív%”( Ív(”1 Ív1”2 Ív2›” Íw” Íw” Íw” Íw” Íw” Íw” Íw”( Íw(”+ Íw+”4 Íw4”5 Íw5™” Íx” Íx” Íx” Íx” Íx” Íx”  Íx ”) Íx)”* Íx*‘”	 Íy	Ü ” Íz” Íz” Íz” Íz” Íz” Íz”  Íz ”# Íz#”$ Íz$”8 Íz8”: Íz:”> Íz>”? Íz?”ÌQ ÍzÌQ”ÌR ÍzÌR”ÌS ÍzÌS’” Í{” Í{’” Í|” Í|–” Í}” Í}” Í}” Í}” Í}” Í}’” Í~” Í~•” Í” Í” Í” Í” Í˜” Í€” Í€” Í€” Í€” Í€” Í€”$ Í€$”& Í€&–” Í” Í” Í”  Í ”" Í"”# Í#›” Í‚” Í‚” Í‚” Í‚” Í‚” Í‚”  Í‚ ”# Í‚#”& Í‚&”( Í‚(”) Í‚)–” Íƒ” Íƒ” Íƒ”/ Íƒ/”1 Íƒ1”2 Íƒ2—” Í„” Í„” Í„”& Í„&”) Í„)”- Í„-”. Í„.–” Í…” Í…” Í…” Í…” Í…”  Í… •” Í†” Í†” Í†” Í†” Í†˜” Í‡” Í‡” Í‡” Í‡” Í‡” Í‡”  Í‡ ”! Í‡!–” Íˆ” Íˆ” Íˆ” Íˆ” Íˆ” Íˆ’” Í‰” Í‰‘”	 ÍŠ	˜” Í‹” Í‹” Í‹” Í‹” Í‹” Í‹” Í‹” Í‹’” ÍŒ” ÍŒ•” Í” Í” Í” Í” Í›” Í” Í” Í” Í” Í” Í” Í”& Í&”) Í)”/ Í/”0 Í0–” Í” Í” Í” Í” Í” Í’” Í” Í•” Í‘” Í‘” Í‘” Í‘” Í‘&” Í’” Í’” Í’” Í’” Í’” Í’”  Í’ ”$ Í’$”% Í’%”1 Í’1”2 Í’2”; Í’;”< Í’<”= Í’=–” Í“” Í“” Í“” Í“” Í“” Í“’” Í”” Í”•” Í•” Í•” Í•” Í•” Í•"™” Í–” Í–” Í–” Í–” Í–” Í–” Í–”' Í–'”( Í–(–” Í—” Í—” Í—” Í—” Í—” Í—’” Í˜” Í˜•” Í™” Í™” Í™” Í™” Í™™” Íš” Íš” Íš” Íš” Íš” Íš” Íš” Íš”  Íš –” Í›” Í›” Í›” Í›” Í›” Í›’” Íœ” Íœ•” Í” Í” Í” Í”! Í2Ü ” Í” Í” Í” Í” Í” Í” Í”/ Í/”2 Í2”6 Í6”7 Í7”ÌI ÍÌI”ÌJ ÍÌJ”ÌQ ÍÌQ”Ì] ÍÌ]”Ìb ÍÌb”Ìj ÍÌj”Ìk ÍÌk”Ìl ÍÌl”Ìm ÍÌm”Ìy ÍÌy”Ìz ÍÌz”Ì{ ÍÌ{”Ì| ÍÌ|”Ì† ÍÌ†”Ì‡ ÍÌ‡”Ì“ ÍÌ“”Ì” ÍÌ””Ì• ÍÌ•”Ì– ÍÌ––” ÍŸ” ÍŸ” ÍŸ” ÍŸ” ÍŸ” ÍŸ’” Í ” Í •” Í¡” Í¡” Í¡” Í¡” Í¡™” Í¢” Í¢” Í¢” Í¢” Í¢” Í¢” Í¢”! Í¢!”" Í¢"–” Í£” Í£” Í£” Í£” Í£” Í£’” Í¤” Í¤•” Í¥” Í¥” Í¥” Í¥” Í¥"™” Í¦” Í¦” Í¦” Í¦” Í¦” Í¦” Í¦”' Í¦'”( Í¦(–” Í§” Í§” Í§” Í§” Í§” Í§’” Í¨” Í¨’” Í©” Í©Ü ” Íª” Íª” Íª”  Íª ”" Íª"”, Íª,”- Íª-”; Íª;”< Íª<”= Íª=”? Íª?”ÌG ÍªÌG”ÌH ÍªÌH”ÌX ÍªÌX”ÌY ÍªÌY”ÌZ ÍªÌZ’” Í«” Í«’” Í¬” Í¬—” Í­” Í­” Í­” Í­” Í­” Í­” Í­—” Í®” Í®” Í®”) Í®)”, Í®,”0 Í®0”1 Í®1’” Í¯” Í¯‘”	 Í°	˜” Í±” Í±” Í±”  Í± ”" Í±"”& Í±&”( Í±(”) Í±)’” Í²” Í²’” Í³”	 Í³	—” Í´” Í´” Í´”% Í´%”( Í´(”- Í´-”. Í´.˜” Íµ” Íµ” Íµ”  Íµ ”" Íµ"”' Íµ'”) Íµ)”* Íµ*’” Í¶” Í¶’” Í·” Í·–” Í¸” Í¸” Í¸” Í¸” Í¸” Í¸˜” Í¹” Í¹” Í¹”  Í¹ ”" Í¹"”& Í¹&”( Í¹(”) Í¹)’” Íº” Íº’” Í»”	 Í»	–” Í¼” Í¼” Í¼” Í¼” Í¼” Í¼˜” Í½” Í½” Í½”  Í½ ”" Í½"”' Í½'”) Í½)”* Í½*’” Í¾” Í¾”” Í¿” Í¿”	 Í¿	” Í¿š” ÍÀ” ÍÀ” ÍÀ”  ÍÀ ”" ÍÀ"”& ÍÀ&”' ÍÀ'”+ ÍÀ+”, ÍÀ,”- ÍÀ-’” ÍÁ” ÍÁ•” ÍÂ” ÍÂ” ÍÂ”  ÍÂÌA”$ ÍÂÌEš” ÍÃ” ÍÃ” ÍÃ”  ÍÃ ”" ÍÃ"”3 ÍÃ3”4 ÍÃ4”; ÍÃ;”< ÍÃ<”= ÍÃ=’” ÍÄ” ÍÄ’” ÍÅ” ÍÅ–” ÍÆ” ÍÆ” ÍÆ” ÍÆ”) ÍÆ)”* ÍÆ*’” ÍÇ” ÍÇ’” ÍÈ” ÍÈ˜” ÍÉ” ÍÉ” ÍÉ”  ÍÉ ”" ÍÉ"”0 ÍÉ0”2 ÍÉ2”3 ÍÉ3’” ÍÊ” ÍÊ”” ÍË” ÍË” ÍË” ÍËÜ ” ÍÌ” ÍÌ” ÍÌ” ÍÌ” ÍÌ”+ ÍÌ+”/ ÍÌ/”0 ÍÌ0”6 ÍÌ6”7 ÍÌ7”Ì@ ÍÌÌ@”ÌB ÍÌÌB”ÌD ÍÌÌD”ÌH ÍÌÌH”ÌU ÍÌÌU”ÌV ÍÌÌV”ÌZ ÍÌÌZ”Ìg ÍÌÌg”Ìh ÍÌÌh–” ÍÍ” ÍÍ” ÍÍ” ÍÍ” ÍÍ” ÍÍ–” ÍÎ” ÍÎ” ÍÎ” ÍÎ” ÍÎ” ÍÎ–” ÍÏ” ÍÏ” ÍÏ” ÍÏ” ÍÏ” ÍÏ•”	 ÍĞ	”
+ ÍĞ
+” ÍĞ” ÍĞ” ÍĞ’” ÍÑ” ÍÑ”” ÍÒ” ÍÒ” ÍÒ” ÍÒ+š” ÍÓ” ÍÓ” ÍÓ” ÍÓ” ÍÓ” ÍÓ”% ÍÓ%”) ÍÓ)”- ÍÓ-”/ ÍÓ/—” ÍÔ” ÍÔ” ÍÔ” ÍÔ” ÍÔ”% ÍÔ%”( ÍÔ(”” ÍÕ” ÍÕ” ÍÕ” ÍÕ’” ÍÖ” ÍÖ‘”	 Í×	˜” ÍØ” ÍØ” ÍØ” ÍØ” ÍØ” ÍØ”  ÍØ ”" ÍØ"” ÍÙ” ÍÙ” ÍÙ” ÍÙ” ÍÙ”% ÍÙ%”& ÍÙ&”* ÍÙ*”- ÍÙ-”4 ÍÙ4”5 ÍÙ5”9 ÍÙ9”: ÍÙ:‘”	 ÍÚ	˜” ÍÛ” ÍÛ” ÍÛ” ÍÛ” ÍÛ”# ÍÛ#”' ÍÛ'”) ÍÛ)” ÍÜ” ÍÜ” ÍÜ” ÍÜ” ÍÜ”% ÍÜ%”& ÍÜ&”1 ÍÜ1”4 ÍÜ4”; ÍÜ;”< ÍÜ<”ÌG ÍÜÌG”ÌH ÍÜÌH‘”	 Íİ	” ÍŞ” ÍŞ” ÍŞ” ÍŞ” ÍŞ”! ÍŞ!”" ÍŞ"”+ ÍŞ+”. ÍŞ.”5 ÍŞ5”6 ÍŞ6”? ÍŞ?”Ì@ ÍŞÌ@” Íß” Íß” Íß” Íß” Íß”! Íß!”" Íß"”+ Íß+”. Íß.”5 Íß5”6 Íß6”? Íß?”Ì@ ÍßÌ@–” Íà” Íà” Íà” Íà” Íà” Íà’” Íá” Íá‘” Íâ•”  Íí ” Íí” Íí” Íí”0 Íí0‘” Íí •” Íî” Íî” Íî” Íî” Íî•” Íï” Íï” Íï” Íï”  Íï•” Íğ” Íğ” Íğ"” Íğ&” Íğ'•” Íñ”  Íñ”# Íñ*”% Íñ,”& Íñ-’” ÍY ” ÍY’” Íò” Íò˜” Íó” Íó” Íó” Íó” Íó” Íó” Íó” Íó—” Íô” Íô” Íô” Íô” Íô” Íô” Íô–” Íõ” Íõ” Íõ” Íõ” Íõ” Íõ’” Íö” Íö’” Í÷” Í÷š” Íø” Íø”  Íø ”# Íø#”' Íø'”( Íø(”2 Íø2”4 Íø4”> ÍøÌV”? ÍøÌW”” Íù” Íù” Íù”  Íù ™” Íú” Íú”% Íú&”& Íú'”: Íú;”< ÍúÌj”= ÍúÌk”ÌG ÍúÌu”ÌH ÍúÌv‘”	 Íû	”” Íü” Íü” Íü” Íü’” Íı” Íı”” Íş” Íş” Íş” Íş—” Íÿ” Íÿ” Íÿ” Íÿ” Íÿ” Íÿ” Íÿ’” Í ” Í ’” Í” Í–” Í” Í” Í” Í” Í” Í’” Í” Í’” Í” Í˜” Í” Í” Í” Í” Í” Í” Í” Í’” Í” Í’” Í”	 Í	˜” Í” Í” Í” Í” Í” Í” Í” Í’” Í	” Í	”” Í
+” Í
+”	 Í
+	” Í
+š” Í” Í” Í” Í” Í” Í” Í”! Í!”" Í"”# Í#’” Í” Í’” Í” Í˜” Í” Í” Í” Í” Í” Í” Í” Í’” Í” Í”” Í” Í” Í” Íš” Í” Í” Í” Í” Í” Í” Í”# Í#”$ Í$”% Í%’” Í” Í”” Í” Í” Í” ÍŸ” Í” Í” Í” Í” Í” Í” Í” Í”! Í!”" Í"”. Í.”1 Í1”5 Í5”6 Í6”7 Í7’” Í” Í•” Í” Í” Í”  Í1”$ Í5˜” Í” Í”$ Í$”' Í1”. Í8”2 Í<”4 Í>”5 Í?–” Í” Í” Í” Í”" Í!”$ Í"“” Í” Í” Í—” Í”( Í(”) Í)”4 Í4”7 Í7”ÌA ÍÌA”ÌB ÍÌB’” Í” Í“” Í” Í” Í—” Í”( Í(”) Í)”4 Í4”7 Í7”ÌJ ÍÌJ”ÌK ÍÌK’” Í” Í”” Í” Í” Í” Í—” Í ”( Í (”) Í )”4 Í 4”7 Í 7”ÌL Í ÌL”ÌM Í ÌM’” Í!” Í!‘” Í"›” Í#” Í#”! Í#!”$ Í#$”( Í#(”) Í#)”. Í#.”0 Í#0”ÌH Í#ÌH”ÌJ Í#ÌJ”ÌK Í#ÌK–” Í$” Í$” Í$”# Í$#”' Í$'”) Í$)—” Í%”, Í%,”- Í%-”8 Í%8”; Í%;”ÌF Í%ÌF”ÌG Í%ÌG‘” Í&’” Í'” Í'‘”	 Í(	˜” Í)” Í)” Í)” Í)” Í)”7 Í)7”8 Í)8”9 Í)9’” Í*” Í*’” Í+” Í+˜” Í,” Í,” Í,” Í,” Í,”  Í, ”" Í,"”# Í,#’” Í-” Í-•” Í.” Í.” Í.”  Í.=”$ Í.ÌA›” Í/” Í/” Í/” Í/&” Í/*”  Í/+”' Í/?”( Í/Ì@”5 Í/ÌM”7 Í/ÌO”8 Í/ÌP˜” Í0” Í0” Í0” Í0” Í0” Í0”* Í0*”, Í0,—” Í1” Í1” Í1” Í1” Í1” Í1” Í1˜” Í2” Í2” Í2”- Í2-”. Í2.”Ìb Í2Ìb”Ìc Í2Ìc”Ìd Í2Ìd’” Í3” Í3‘”	 Í4	•” Í5” Í5” Í5” Í5” Í5’” Í5” Í5&—” Í6” Í6” Í6” Í6” Í6”  Í6 ”! Í6!Ÿ” Í7” Í7” Í7” Í7” Í7” Í7” Í7” Í7”! Í7!”" Í7"”/ Í7/”2 Í72”6 Í76”7 Í77”8 Í78Ü ” Í8” Í8” Í8”  Í8 ”# Í8#”' Í8'”( Í8(”/ Í8/”0 Í80”< Í8<”> Í8>”? Í8?”ÌB Í8ÌB”ÌC Í8ÌC”ÌT Í8ÌT”ÌU Í8ÌU”ÌY Í8ÌY”Ì[ Í8Ì[”Ì\ Í8Ì\œ” Í9” Í9” Í9”) Í9)”* Í9*”1 Í91”2 Í92”3 Í93”7 Í97”8 Í98”; Í9:”= Í9<—” Í:” Í:” Í:”( Í:(”+ Í:+”/ Í:/”0 Í:0” Í;” Í;” Í;” Í;” Í;”% Í;%”& Í;&”* Í;*”7 Í;7”8 Í;8”< Í;<”ÌI Í;ÌI”ÌJ Í;ÌJ”” Í<” Í<”! Í<!”) Í<)•” Í=” Í=” Í=” Í=” Í=˜” Í>” Í>” Í>” Í>” Í>”# Í>#”$ Í>$”% Í>%—” Í?” Í?” Í?” Í?” Í?”  Í? ”! Í?!–” Í@” Í@” Í@”. Í@.”0 Í@0”1 Í@1˜” ÍA”	 ÍA	”
+ ÍA
+” ÍA” ÍA” ÍA” ÍA” ÍAÜ ” ÍB” ÍB” ÍB”) ÍB)”* ÍB*”. ÍB.”/ ÍB/”6 ÍB6”7 ÍB7”ÌC ÍBÌC”ÌE ÍBÌE”ÌF ÍBÌF”ÌK ÍBÌK”ÌM ÍBÌM”ÌN ÍBÌN”ÌO ÍBÌO–” ÍC” ÍC” ÍC”' ÍC'”) ÍC)”* ÍC*” ÍD” ÍD” ÍD” ÍD” ÍD”% ÍD%”& ÍD&”* ÍD*”7 ÍD7”8 ÍD8”< ÍD<”ÌI ÍDÌI”ÌJ ÍDÌJ–” ÍE” ÍE”! ÍE!”% ÍE%”& ÍE&”9 ÍE9•” ÍF” ÍF” ÍF” ÍF” ÍFŸ” ÍG” ÍG” ÍG” ÍG” ÍG” ÍG” ÍG”  ÍG ”% ÍG%”& ÍG&”3 ÍG3”6 ÍG6”; ÍG;”< ÍG<”= ÍG=—” ÍH” ÍH” ÍH” ÍH” ÍH” ÍH” ÍH–” ÍI” ÍI” ÍI”- ÍI-”/ ÍI/”0 ÍI0”” ÍJ”	 ÍJ	”
+ ÍJ
+” ÍJ—” ÍK” ÍK” ÍK” ÍK” ÍK” ÍK” ÍK’” ÍL” ÍL’” ÍM” ÍM—” ÍN” ÍN” ÍN” ÍN” ÍN” ÍN”  ÍN ’” ÍO” ÍO‘”	 ÍP	—” ÍQ” ÍQ” ÍQ” ÍQ” ÍQ”! ÍQ!”" ÍQ"Ÿ” ÍR” ÍR” ÍR” ÍR” ÍR” ÍR” ÍR” ÍR”! ÍR!”" ÍR"”/ ÍR/”2 ÍR2”6 ÍR6”7 ÍR7”8 ÍR8” ÍS” ÍS” ÍS” ÍS” ÍS” ÍS”  ÍS ”$ ÍS$”1 ÍS1”2 ÍS2”6 ÍS6”ÌC ÍSÌC”ÌD ÍSÌD–” ÍT” ÍT” ÍT”! ÍT!”" ÍT"”5 ÍT5•”	 ÍU	”
+ ÍU
+” ÍU” ÍU” ÍU–” ÍV” ÍV” ÍV”% ÍV%”' ÍV'”( ÍV(–” ÍW” ÍW” ÍW”* ÍW*”, ÍW,”- ÍW-’” ÍX” ÍX‘” ÍYŸ”  ÍZ ” ÍZ” ÍZ” ÍZ/”( ÍZ<”) ÍZÌR”= ÍZÌf”? ÍZÌh”Ì@ ÍZÌi”ÌG ÍZÌx”ÌI ÍZÌz”ÌU ÍZÌ¦”ÌY ÍZÌª”Ì[ ÍZÌÅ”Ì] ÍZÌÇ–” Í[” Í[” Í[” Í[;” Í[?” Í[Ì@–” Í\” Í\” Í\” Í\” Í\” Í\—” Í]” Í]” Í]” Í]”% Í]%”' Í]4”( Í]5˜” Í^” Í^” Í^” Í^” Í^” Í^” Í^” Í^” Í_” Í_” Í_” Í_” Í_” Í_”$ Í_$”% Í_%”+ Í_+”. Í_.”/ Í_/”0 Í_0”1 Í_1•” Í`” Í`” Í`” Í`” Í`š” Ía” Ía” Ía” Ía” Ía”! Ía!”" Ía"”< Ía<”= Ía=”> Ía>”” Íb” Íb” Íb” Íb‘” ÍcÜ ” Íd” Íd” Íd” Íd!”  Íd"”" Íd1”# Íd2”& ÍdÌD”( ÍdÌF”5 ÍdÌS”7 ÍdÌU”ÌD ÍdÌb”ÌE ÍdÌc”ÌH ÍdÌf”ÌK ÍdÌi”ÌR ÍdÌp”ÌS ÍdÌ”ÌT ÍdÌ–” Íe” Íe” Íe”  Íe ”$ Íe$”& Íe&™” Íf” Íf”! Íf!”$ Íf$”( Íf(”) Íf)”7 Íf7”9 ÍfÌF”: ÍfÌG˜” Íg” Íg” Íg”  Íg ”& Íg&”) Íg)”* Íg*”, Íg,” Íh” Íh”' Íh'”* Íh*”5 Íh5”6 Íh6”ÌA ÍhÌA”ÌB ÍhÌB”ÌH ÍhÌH”ÌK ÍhÌK”ÌL ÍhÌL”ÌM ÍhÌM”ÌN ÍhÌN•” Íi” Íi” Íi”& Íi&”( Íi(š” Íj” Íj” Íj”# Íj#”$ Íj$”) Íj)”* Íj*”ÌC ÍjÌC”ÌD ÍjÌD”ÌE ÍjÌE”” Ík” Ík”# Ík#”$ Ík$‘” ÍlÜ ” Ím”  Ím ”# Ím%”0 Ím2”1 Ím3”3 ÍmÌB”4 ÍmÌC”7 ÍmÌU”9 ÍmÌW”ÌF ÍmÌd”ÌH ÍmÌf”ÌU ÍmÌs”ÌV ÍmÌt”ÌY ÍmÌw”Ì\ ÍmÌz”Ìc ÍmÌ”Ìd ÍmÌ”Ìe ÍmÌŸ‘” Ín‘” Ío‘”	 Íp	‘” Íq‘”	 ÍqÜ ” Ír” Ír” Ír”  Ír!”! Ír"”$ Ír4”& Ír6”3 ÍrÌC”5 ÍrÌE”ÌB ÍrÌR”ÌC ÍrÌS”ÌF ÍrÌV”ÌI ÍrÌY”ÌP ÍrÌ`”ÌQ ÍrÌ}”ÌR ÍrÌ~‘” Ís•” Ít” Ít” Ít” Ít” Ít”” Ít” Ít%” Ít)” Ít*›” Íu” Íu” Íu” Íu”  Íu ”, Íu,”- Íu-”5 Íu5”7 Íu7”8 Íu8”9 Íu9””  Ív ” Ív” Ív” Ív“”  Íw ” Íw” Íw”” Íy” Íy” Íy&” Íy*•” Íx” Íx” Íx#” Íx'” Íx(—” Íz” Íz” Íz” Íz” Íz” Íz” Íz’” Í{” Í{’” Í|” Í|˜” Í}” Í}” Í}” Í}” Í}” Í}” Í}” Í}’” Í~” Í~’” Í”	 Í	˜” Í€” Í€” Í€” Í€” Í€” Í€” Í€” Í€’” Í” Í”” Í‚” Í‚”	 Í‚	” Í‚š” Íƒ” Íƒ” Íƒ” Íƒ” Íƒ” Íƒ” Íƒ”! Íƒ!”" Íƒ"”# Íƒ#’” Í„” Í„’” Í…” Í…˜” Í†” Í†” Í†” Í†” Í†” Í†” Í†” Í†’” Í‡” Í‡”” Íˆ” Íˆ” Íˆ” Íˆš” Í‰” Í‰” Í‰” Í‰” Í‰” Í‰” Í‰”# Í‰#”$ Í‰$”% Í‰%’” ÍŠ” ÍŠ”” Í‹” Í‹” Í‹” Í‹Ÿ” ÍŒ” ÍŒ” ÍŒ” ÍŒ” ÍŒ” ÍŒ” ÍŒ” ÍŒ”! ÍŒ!”" ÍŒ"”. ÍŒ.”1 ÍŒ1”5 ÍŒ5”6 ÍŒ6”7 ÍŒ7’” Í” Í•” Í” Í” Í”  ÍÌA”$ ÍÌEš” Í” Í” Í” Í” Í”% Í%”& Í&”- Í-”. Í.”/ Í/’” Í” Í’” Í‘” Í‘˜” Í’” Í’” Í’” Í’” Í’”" Í’"”$ Í’$”% Í’%’” Í“” Í“‘” Í”“”  Í• ” Í•” Í•“” Íš” Íš”! Íš;˜” Í–” Í–” Í–"”" Í–$”$ Í–&”' Í–'”( Í–(”) Í–)•” Í—” Í—” Í—” Í—” Í—•” Í˜” Í˜” Í˜” Í˜” Í˜•” Í™” Í™” Í™” Í™” Í™š” Í›” Í›” Í›” Í›”! Í›!”" Í›"”1 Í›1”2 Í›2”7 Í›7”8 Í›8™” Íœ” Íœ” Íœ” Íœ”  Íœ ”! Íœ!”0 Íœ0”2 Íœ2”3 Íœ3™” Í” Í” Í”! Í;”- ÍÌG”. ÍÌH”> ÍÌX”Ì@ ÍÌZ”ÌA ÍÌ[˜” Í” Í” Í” Í” Í”) Í<”+ Í=”- Í?˜” ÍŸ” ÍŸ” ÍŸ” ÍŸ”& ÍŸ&”+ ÍŸ+”6 ÍŸ6”8 ÍŸ8˜” Í ”! Í !”" Í "”- Í -”. Í .”4 Í 4”5 Í 5”6 Í 6‘” Í¡“” Í¢”	 Í¢	”
+ Í¢
+š” Í£” Í£” Í£” Í£” Í£”, Í£,”. Í£.”: Í£:”; Í£;”< Í£<” Í¤” Í¤”% Í¤%”( Í¤(”: Í¤:”; Í¤;”ÌT Í¤ÌT”ÌU Í¤ÌU”ÌZ Í¤ÌZ”Ì[ Í¤Ì[”Ìr Í¤Ìr”Ìs Í¤Ìs”Ìt Í¤Ìtœ” Í¥” Í¥” Í¥” Í¥” Í¥”4 Í¥4”5 Í¥5”ÌB Í¥ÌB”ÌC Í¥ÌC”ÌN Í¥ÌN”ÌO Í¥ÌO”ÌP Í¥ÌPœ” Í¦” Í¦” Í¦” Í¦” Í¦”0 Í¦0”1 Í¦1”ÌA Í¦ÌA”ÌB Í¦ÌB”ÌM Í¦ÌM”ÌN Í¦ÌN”ÌO Í¦ÌOœ” Í§” Í§” Í§” Í§” Í§”0 Í§0”1 Í§1”ÌA Í§ÌA”ÌB Í§ÌB”ÌM Í§ÌM”ÌN Í§ÌN”ÌO Í§ÌO—” Í¨” Í¨” Í¨” Í¨” Í¨”" Í¨!”$ Í¨#š” Í©” Í©” Í©”" Í©"”# Í©#”1 Í©1”3 Í©3”? Í©?”Ì@ Í©Ì@”ÌA Í©ÌA“” Íª”	 Íª	”
+ Íª
+’” Í«” Í«‘” Í¬“”  Í­ ” Í­” Í­‘” Í¯—” Í°” Í°” Í°” Í°”& Í°&”( Í°(”) Í°)™” Í±” Í±” Í±” Í±” Í±” Í±”  Í± ”& Í±&”' Í±'’” Í²” Í²’” Í³” Í³Ÿ” Í´” Í´” Í´” Í´” Í´”  Í´ ”& Í´&”( Í´(”; Í´;”= Í´=”> Í´>”ÌH Í´ÌH”ÌL Í´ÌL”ÌM Í´ÌM”ÌN Í´ÌNŸ” Íµ” Íµ” Íµ” Íµ” Íµ”  Íµ ”! Íµ!”" Íµ"”# Íµ#”& Íµ&”' Íµ'”( Íµ(”) Íµ)”3 Íµ3”4 Íµ4’” Í¶” Í¶”” Í·” Í·” Í·” Í·$–” Í¸” Í¸” Í¸” Í¸” Í¸” Í¸›” Í¹” Í¹” Í¹” Í¹” Í¹” Í¹”2 Í¹2”3 Í¹3”= Í¹=”> Í¹>”? Í¹?‘”	 Íº	‘” Íº™” Í»” Í»” Í»” Í»”! Í»!”" Í»"”9 Í»9”: Í»:”; Í»;‘”	 Í¼	’” Í½” Í½‘” Í¾œ”  Í¿ ” Í¿”	 Í¿'” Í¿,” Í¿0” Í¿5” Í¿7”1 Í¿ÌO”5 Í¿ÌS”ÌM Í¿Ìk”ÌO Í¿Í/”ÌP Í¿Í0Ü ,”  ÍÀ ” ÍÀ”	 ÍÀ=”& ÍÀÌZ”* ÍÀÌ^”ÌG ÍÀÌ{”ÌI ÍÀÌ½”Ìl ÍÀÌà”Ìp ÍÀÌä”Ì“ ÍÀÍ”Ì• ÍÀÍc”Ì° ÍÀÍ~”Ì´ ÍÀÍ‚”ÌÏ ÍÀÍ”ÌÑ ÍÀÍİ”Ìó ÍÀÍÿ”Ì÷ ÍÀÍ”Í ÍÀÍ%”Í ÍÀÍc”Í< ÍÀÍ„”Í@ ÍÀÍˆ”Ía ÍÀÍ©”Íc ÍÀÍÜ”Í€ ÍÀÍù”Í„ ÍÀÍı”Í ÍÀÍ”Í  ÍÀÍV”ÍÃ ÍÀÍy”ÍÇ ÍÀÍ}”Íç ÍÀÍ”Íé ÍÀÍó”Í ÍÀÍ”Í ÍÀÍ”Í  ÍÀÍ*”Í" ÍÀÍg”ÍD ÍÀÍ‰”ÍH ÍÀÍ”Íg ÍÀÍ¬”Íi ÍÀÍç”ÍŠ ÍÀÍ”Í ÍÀÍ”Í¬ ÍÀÍ*”Í® ÍÀÍ,”Í¯ ÍÀÍ-˜”  ÍÊ ” ÍÊ”	 ÍÊ	” ÍÊ” ÍÊ” ÍÊ” ÍÊ” ÍÊ˜”  ÍË ” ÍË”	 ÍË	” ÍË” ÍË”+ ÍË+”- ÍË-”. ÍË.˜”  ÍÌ ” ÍÌ”	 ÍÌ	” ÍÌ” ÍÌ”1 ÍÌ1”3 ÍÌ3”4 ÍÌ4˜”  ÍÍ ” ÍÍ”	 ÍÍ	” ÍÍ” ÍÍ”% ÍÍ%”' ÍÍ'”( ÍÍ(˜”  ÍÎ ” ÍÎ”	 ÍÎ	” ÍÎ” ÍÎ”! ÍÎ!”# ÍÎ#”$ ÍÎ$ÔrG–§version¤file§sources®sourcesContent¥names¨mappingsÀ‘À‘ÀÜo‘”    ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”  	 ‘”  
+ ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”    ‘”  ! ‘”  " ‘”  # ‘”  $ ‘”  % ‘”  & ‘”  ' ‘”  ( ‘”  ) ‘”  * ‘”  + ‘”  , ‘”  - ‘”  . ‘”  / ‘”  0 ‘”  1 ‘”  2 ‘”  3 ‘”  4 ‘”  5 ‘”  6 ‘”  7 ‘”  8 ‘”  9 ‘”  : ‘”  ; ‘”  < ‘”  = ‘”  > ‘”  ? ‘”  Ì@ ‘”  ÌA ‘”  ÌB ‘”  ÌC ‘”  ÌD ‘”  ÌE ‘”  ÌF ‘”  ÌG ‘”  ÌH ‘”  ÌI ‘”  ÌJ ‘”  ÌK ‘”  ÌL ‘”  ÌM ‘”  ÌN ‘”  ÌO ‘”  ÌP ‘”  ÌQ ‘”  ÌR ‘”  ÌS ‘”  ÌT ‘”  ÌU ‘”  ÌV ‘”  ÌW ‘”  ÌX ‘”  ÌY ‘”  ÌZ ‘”  Ì[ ‘”  Ì\ ‘”  Ì] ‘”  Ì^ ‘”  Ì_ ‘”  Ì` ‘”  Ìa ‘”  Ìb ‘”  Ìc ‘”  Ìd ‘”  Ìe ‘”  Ìf ‘”  Ìg ‘”  Ìh ‘”  Ìi ‘”  Ìj ‘”  Ìk ‘”  Ìl ‘”  Ìm ‘”  Ìn ‘”  Ìo ‘”  Ìp ‘”  Ìq ‘”  Ìr ‘”  Ìs ‘”  Ìt ‘”  Ìu ‘”  Ìv ‘”  Ìw ‘”  Ìx ‘”  Ìy ‘”  Ìz ‘”  Ì{ ‘”  Ì| ‘”  Ì} ‘”  Ì~ ‘”  Ì ‘”  Ì€ ‘”  Ì ‘”  Ì‚ ‘”  Ìƒ ‘”  Ì„ ‘”  Ì… ‘”  Ì† ‘”  Ì‡ ‘”  Ìˆ ‘”  Ì‰ ‘”  ÌŠ ‘”  Ì‹ ‘”  ÌŒ ‘”  Ì ‘”  Ì ‘”  Ì ‘”  Ì ‘”  Ì‘ ‘”  Ì’ ‘”  Ì“ ‘”  Ì” ‘”  Ì• ‘”  Ì– ‘”  Ì— ‘”  Ì˜ ‘”  Ì™ ‘”  Ìš ‘”  Ì› ‘”  Ìœ ‘”  Ì ‘”  Ì ‘”  ÌŸ ‘”  Ì  ‘”  Ì¡ ‘”  Ì¢ ‘”  Ì£ ‘”  Ì¤ ‘”  Ì¥ ‘”  Ì¦ ‘”  Ì§ ‘”  Ì¨ ‘”  Ì© ‘”  Ìª ‘”  Ì« ‘”  Ì¬ ‘”  Ì­ ‘”  Ì® ‘”  Ì¯ ‘”  Ì° ‘”  Ì± ‘”  Ì² ‘”  Ì³ ‘”  Ì´ ‘”  Ìµ ‘”  Ì¶ ‘”  Ì· ‘”  Ì¸ ‘”  Ì¹ ‘”  Ìº ‘”  Ì» ‘”  Ì¼ ‘”  Ì½ ‘”  Ì¾ ‘”  Ì¿ ‘”  ÌÀ ‘”  ÌÁ ‘”  ÌÂ ‘”  ÌÃ ‘”  ÌÄ ‘”  ÌÅ ‘”  ÌÆ ‘”  ÌÇ ‘”  ÌÈ ‘”  ÌÉ ‘”  ÌÊ ‘”  ÌË ‘”  ÌÌ ‘”  ÌÍ ‘”  ÌÎ ‘”  ÌÏ ‘”  ÌĞ ‘”  ÌÑ ‘”  ÌÒ ‘”  ÌÓ ‘”  ÌÔ ‘”  ÌÕ ‘”  ÌÖ ‘”  Ì× ‘”  ÌØ ‘”  ÌÙ ‘”  ÌÚ ‘”  ÌÛ ‘”  ÌÜ ‘”  Ìİ ‘”  ÌŞ ‘”  Ìß ‘”  Ìà ‘”  Ìá ‘”  Ìâ ‘”  Ìã ‘”  Ìä ‘”  Ìå ‘”  Ìæ ‘”  Ìç ‘”  Ìè ‘”  Ìé ‘”  Ìê ‘”  Ìë ‘”  Ìì ‘”  Ìí ‘”  Ìî ‘”  Ìï ‘”  Ìğ ‘”  Ìñ ‘”  Ìò ‘”  Ìó ‘”  Ìô ‘”  Ìõ ‘”  Ìö ‘”  Ì÷ ‘”  Ìø ‘”  Ìù ‘”  Ìú ‘”  Ìû ‘”  Ìü ‘”  Ìı ‘”  Ìş ‘”  Ìÿ ‘”  Í  ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í	 ‘”  Í
+ ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í  ‘”  Í! ‘”  Í" ‘”  Í# ‘”  Í$ ‘”  Í% ‘”  Í& ‘”  Í' ‘”  Í( ‘”  Í) ‘”  Í* ‘”  Í+ ‘”  Í, ‘”  Í- ‘”  Í. ‘”  Í/ ‘”  Í0 ‘”  Í1 ‘”  Í2 ‘”  Í3 ‘”  Í4 ‘”  Í5 ‘”  Í6 ‘”  Í7 ‘”  Í8 ‘”  Í9 ‘”  Í: ‘”  Í; ‘”  Í< ‘”  Í= ‘”  Í> ‘”  Í? ‘”  Í@ ‘”  ÍA ‘”  ÍB ‘”  ÍC ‘”  ÍD ‘”  ÍE ‘”  ÍF ‘”  ÍG ‘”  ÍH ‘”  ÍI ‘”  ÍJ ‘”  ÍK ‘”  ÍL ‘”  ÍM ‘”  ÍN ‘”  ÍO ‘”  ÍP ‘”  ÍQ ‘”  ÍR ‘”  ÍS ‘”  ÍT ‘”  ÍU ‘”  ÍV ‘”  ÍW ‘”  ÍX ‘”  ÍY ‘”  ÍZ ‘”  Í[ ‘”  Í\ ‘”  Í] ‘”  Í^ ‘”  Í_ ‘”  Í` ‘”  Ía ‘”  Íb ‘”  Íc ‘”  Íd ‘”  Íe ‘”  Íf ‘”  Íg ‘”  Íh ‘”  Íi ‘”  Íj ‘”  Ík ‘”  Íl ‘”  Ím ‘”  Ín ‘”  Ío ‘”  Íp ‘”  Íq ‘”  Ír ‘”  Ís ‘”  Ít ‘”  Íu ‘”  Ív ‘”  Íw ‘”  Íx ‘”  Íy ‘”  Íz ‘”  Í{ ‘”  Í| ‘”  Í} ‘”  Í~ ‘”  Í ‘”  Í€ ‘”  Í ‘”  Í‚ ‘”  Íƒ ‘”  Í„ ‘”  Í… ‘”  Í† ‘”  Í‡ ‘”  Íˆ ‘”  Í‰ ‘”  ÍŠ ‘”  Í‹ ‘”  ÍŒ ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í‘ ‘”  Í’ ‘”  Í“ ‘”  Í” ‘”  Í• ‘”  Í– ‘”  Í— ‘”  Í˜ ‘”  Í™ ‘”  Íš ‘”  Í› ‘”  Íœ ‘”  Í ‘”  Í ‘”  ÍŸ ‘”  Í  ‘”  Í¡ ‘”  Í¢ ‘”  Í£ ‘”  Í¤ ‘”  Í¥ ‘”  Í¦ ‘”  Í§ ‘”  Í¨ ‘”  Í© ‘”  Íª ‘”  Í« ‘”  Í¬ ‘”  Í­ ‘”  Í® ‘”  Í¯ ‘”  Í° ‘”  Í± ‘”  Í² ‘”  Í³ ‘”  Í´ ‘”  Íµ ‘”  Í¶ ‘”  Í· ‘”  Í¸ ‘”  Í¹ ‘”  Íº ‘”  Í» ‘”  Í¼ ‘”  Í½ ‘”  Í¾ ‘”  Í¿ ‘”  ÍÀ ‘”  ÍÁ ‘”  ÍÂ ‘”  ÍÃ ‘”  ÍÄ ‘”  ÍÅ ‘”  ÍÆ ‘”  ÍÇ ‘”  ÍÈ ‘”  ÍÉ ‘”  ÍÊ ‘”  ÍË ‘”  ÍÌ ‘”  ÍÍ ‘”  ÍÎ ‘”  ÍÏ ‘”  ÍĞ ‘”  ÍÑ ‘”  ÍÒ ‘”  ÍÓ ‘”  ÍÔ ‘”  ÍÕ ‘”  ÍÖ ‘”  Í× ‘”  ÍØ ‘”  ÍÙ ‘”  ÍÚ ‘”  ÍÛ ‘”  ÍÜ ‘”  Íİ ‘”  ÍŞ ‘”  Íß ‘”  Íà ‘”  Íá ‘”  Íâ ‘”  Íã ‘”  Íä ‘”  Íå ‘”  Íæ ‘”  Íç ‘”  Íè ‘”  Íé ‘”  Íê ‘”  Íë ‘”  Íì ‘”  Íí ‘”  Íî ‘”  Íï ‘”  Íğ ‘”  Íñ ‘”  Íò ‘”  Íó ‘”  Íô ‘”  Íõ ‘”  Íö ‘”  Í÷ ‘”  Íø ‘”  Íù ‘”  Íú ‘”  Íû ‘”  Íü ‘”  Íı ‘”  Íş ‘”  Íÿ ‘”  Í  ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í	 ‘”  Í
+ ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í  ‘”  Í! ‘”  Í" ‘”  Í# ‘”  Í$ ‘”  Í% ‘”  Í& ‘”  Í' ‘”  Í( ‘”  Í) ‘”  Í* ‘”  Í+ ‘”  Í, ‘”  Í- ‘”  Í. ‘”  Í/ ‘”  Í0 ‘”  Í1 ‘”  Í2 ‘”  Í3 ‘”  Í4 ‘”  Í5 ‘”  Í6 ‘”  Í7 ‘”  Í8 ‘”  Í9 ‘”  Í: ‘”  Í; ‘”  Í< ‘”  Í= ‘”  Í> ‘”  Í? ‘”  Í@ ‘”  ÍA ‘”  ÍB ‘”  ÍC ‘”  ÍD ‘”  ÍE ‘”  ÍF ‘”  ÍG ‘”  ÍH ‘”  ÍI ‘”  ÍJ ‘”  ÍK ‘”  ÍL ‘”  ÍM ‘”  ÍN ‘”  ÍO ‘”  ÍP ‘”  ÍQ ‘”  ÍR ‘”  ÍS ‘”  ÍT ‘”  ÍU ‘”  ÍV ‘”  ÍW ‘”  ÍX ‘”  ÍY ‘”  ÍZ ‘”  Í[ ‘”  Í\ ‘”  Í] ‘”  Í^ ‘”  Í_ ‘”  Í` ‘”  Ía ‘”  Íb ‘”  Íc ‘”  Íd ‘”  Íe ‘”  Íf ‘”  Íg ‘”  Íh ‘”  Íi ‘”  Íj ‘”  Ík ‘”  Íl ‘”  Ím ‘”  Ín ÔrH’§missing¦pluginÃ¦genAbcÂÔ  ÔrI”²dynamicImportCache¹exportAllDeclarationCache»exportNamedDeclarationCache«importCache—ÔrJ–¤type¥start£end«declarationªspecifiers¦source¶ExportNamedDeclarationÍT‡ÍT×À’ÔrK•¤type¥start£end¥local¨exported¯ExportSpecifierÍTÍTÔrL”¤type¥start£end¤nameªIdentifierÍTÍT•¥DanmuLªIdentifierÍT™ÍT¥DanmuK¯ExportSpecifierÍT ÍTÔLªIdentifierÍT ÍT¸¸RequestFullScreenOptionsLªIdentifierÍT¼ÍTÔ¸RequestFullScreenOptionsÀJ¶ExportNamedDeclarationÍTÙÍWˆÀšK¯ExportSpecifierÍTâÍU LªIdentifierÍTâÍTÿ½UniVideoTimeUpdateEventDetailLªIdentifierÍUÍU ½UniVideoTimeUpdateEventDetailK¯ExportSpecifierÍU"ÍUlLªIdentifierÍU"ÍUEÙ#UniVideoFullScreenChangeEventDetailLªIdentifierÍUIÍUlÙ#UniVideoFullScreenChangeEventDetailK¯ExportSpecifierÍUnÍU¨LªIdentifierÍUnÍU‰»UniVideoProgressEventDetailLªIdentifierÍUÍU¨»UniVideoProgressEventDetailK¯ExportSpecifierÍUªÍUòLªIdentifierÍUªÍUÌÙ"UniVideoFullScreenClickEventDetailLªIdentifierÍUĞÍUòÙ"UniVideoFullScreenClickEventDetailK¯ExportSpecifierÍUôÍV:LªIdentifierÍUôÍVÙ!UniVideoControlsToggleEventDetailLªIdentifierÍVÍV:Ù!UniVideoControlsToggleEventDetailK¯ExportSpecifierÍV<ÍVwLªIdentifierÍV<ÍVY½UniVideoTimeUpdateEventDetailLªIdentifierÍV]ÍVwºVideoTimeUpdateEventDetailK¯ExportSpecifierÍVyÍVÀLªIdentifierÍVyÍVœÙ#UniVideoFullScreenChangeEventDetailLªIdentifierÍV ÍVÀÙ VideoFullScreenChangeEventDetailK¯ExportSpecifierÍVÂÍVùLªIdentifierÍVÂÍVİ»UniVideoProgressEventDetailLªIdentifierÍVáÍVù¸VideoProgressEventDetailK¯ExportSpecifierÍVûÍW@LªIdentifierÍVûÍWÙ"UniVideoFullScreenClickEventDetailLªIdentifierÍW!ÍW@¿VideoFullScreenClickEventDetailK¯ExportSpecifierÍWBÍW…LªIdentifierÍWBÍWcÙ!UniVideoControlsToggleEventDetailLªIdentifierÍWgÍW…¾VideoControlsToggleEventDetailÀJ¶ExportNamedDeclarationÍWŠÍW¤À‘K¯ExportSpecifierÍW“ÍW¡LªIdentifierÍW“ÍW˜¥VideoLªIdentifierÍWœÍW¡¥VideoÀJ¶ExportNamedDeclarationÍW¦ÍWÔÀ‘K¯ExportSpecifierÍW¯ÍWÑLªIdentifierÍW¯ÍW¾¯UniVideoElementLªIdentifierÍWÂÍWÑ¯UniVideoElementÀJ¶ExportNamedDeclarationÍWÖÍX
+À‘K¯ExportSpecifierÍWßÍXLªIdentifierÍWßÍWñ²createVideoContextLªIdentifierÍWõÍX²createVideoContextÀJ¶ExportNamedDeclarationÍXÍX4À‘K¯ExportSpecifierÍXÍX1LªIdentifierÍXÍX!¬AudioManagerLªIdentifierÍX%ÍX1¬AudioManagerÀJ¶ExportNamedDeclarationÍX6ÍXZÀ‘K¯ExportSpecifierÍX?ÍXWLªIdentifierÍX?ÍXIªBrightnessLªIdentifierÍXMÍXWªBrightnessÀ–ÔrM•¤type¥start£endªspecifiers¦source±ImportDeclaration +‘ÔrN”¤type¥start£end¥local¶ImportDefaultSpecifierLªIdentifier¥audioÔrO•¤type¥start£end¥value£raw§Literal*¶@ohos.multimedia.audio¸"@ohos.multimedia.audio"M±ImportDeclaration-ÌT‘ÔrP•¤type¥start£end¨imported¥local¯ImportSpecifier6Ì@LªIdentifier6Ì@ªbuildVideoLªIdentifier6Ì@ªbuildVideoO§LiteralÌHÌS©./builder«"./builder"M±ImportDeclarationÌVÌu‘N¶ImportDefaultSpecifierÌ]Ì_LªIdentifierÌ]Ì_¢fsO§LiteralÌeÌt­@ohos.file.fs¯'@ohos.file.fs'M±ImportDeclarationÌwÌ¿’P¯ImportSpecifierÌ€ÌŒLªIdentifierÌ€ÌŒ¬getCurrentMPLªIdentifierÌ€ÌŒ¬getCurrentMPP¯ImportSpecifierÌÌ™LªIdentifierÌÌ™«getRealPathLªIdentifierÌÌ™«getRealPathO§LiteralÌ¡Ì¾»@dcloudio/uni-app-framework½"@dcloudio/uni-app-framework"M±ImportDeclarationÌÁÌì‘N¶ImportDefaultSpecifierÌÈÌÍLªIdentifierÌÈÌÍ¥mediaO§LiteralÌÓÌë¶@ohos.multimedia.media¸"@ohos.multimedia.media"M±ImportDeclarationÌîÍ˜P¯ImportSpecifierÌ÷Í LªIdentifierÌ÷Í ©UTSObjectLªIdentifierÌ÷Í ©UTSObjectP¯ImportSpecifierÍÍLªIdentifierÍÍªUTSHarmonyLªIdentifierÍÍªUTSHarmonyP¯ImportSpecifierÍÍLªIdentifierÍÍ£uniLªIdentifierÍÍ£uniP¯ImportSpecifierÍÍ LªIdentifierÍÍ ­UTSJSONObjectLªIdentifierÍÍ ­UTSJSONObjectP¯ImportSpecifierÍ"Í4LªIdentifierÍ"Í4²UniViewElementImplLªIdentifierÍ"Í4²UniViewElementImplP¯ImportSpecifierÍ6ÍCLªIdentifierÍ6ÍC­defineSyncApiLªIdentifierÍ6ÍC­defineSyncApiP¯ImportSpecifierÍEÍTLªIdentifierÍEÍT¯getCurrentPagesLªIdentifierÍEÍT¯getCurrentPagesP¯ImportSpecifierÍVÍYLªIdentifierÍVÍY£UTSLªIdentifierÍVÍY£UTSO§LiteralÍaÍ~»@dcloudio/uni-app-framework½"@dcloudio/uni-app-framework"
