@@ -1,8 +1,8 @@
 const darkMode = [
   'variant',
   [
-    '&.theme-dark',
-    '.theme-dark &'
+    '&.dark',
+    '.dark &'
   ]
 ];
 
