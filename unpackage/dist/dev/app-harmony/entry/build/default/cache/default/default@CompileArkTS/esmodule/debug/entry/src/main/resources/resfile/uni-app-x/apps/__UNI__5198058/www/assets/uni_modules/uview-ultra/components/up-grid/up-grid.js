@@ -3,12 +3,18 @@ import { u as useUltraUI } from "@normalized:N&&&entry/src/main/resources/resfil
 import { d as deepMerge, b as addStyle, u as upGetRect } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/index&";
 import { d as defProps } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-grid/grid&";
 import { _ as _export_sfc } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper&";
-const { defineComponent: _defineComponent } = globalThis.Vue;
+const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, createSharedDataTemplateRefSetter: _createSharedDataTemplateRefSetter, setSharedDataStyle: _setSharedDataStyle, renderSharedDataEffect: _renderSharedDataEffect, createSharedDataSlot: _createSharedDataSlot, setSharedDataTemplateRef: _setSharedDataTemplateRef } = globalThis.Vue;
+const __className = "GenUniModulesUviewUltraComponentsUpGridUpGrid";
 const { ref, computed, onMounted, watch, getCurrentInstance } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineComponent({
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   ...{
     name: "up-grid"
   },
+  __dynamicSharedData: true,
+  __hash: "4cd366d5",
+  __className,
+  __filename: "uni_modules/uview-ultra/components/up-grid/up-grid.uvue",
   __name: "up-grid",
   props: {
     col: {
@@ -27,6 +33,8 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
   emits: ["click"],
   setup(__props, _a) {
     var __expose = _a.expose, __emit = _a.emit;
+    const __sharedDataScope = _useSharedDataScope();
+    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpGridUpGridSharedData", sharedDataClassId: 0 })));
     const _b = useUltraUI(), children = _b.children, getChildren = _b.getChildren, addChild = _b.addChild;
     const instance = getCurrentInstance().proxy;
     const props = __props;
@@ -92,29 +100,22 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
       getProps,
       getRefs
     });
-    const __returned__ = { children, getChildren, addChild, instance, props, emit, width, parentDataCpu, gridStyle, getWidth, childClick, getProps, getRefs };
-    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
-    return __returned__;
+    return () => {
+      "raw js";
+      const _setTemplateRef = _createSharedDataTemplateRefSetter();
+      _renderSharedDataEffect(() => {
+        return _setSharedDataStyle(__sharedData, 1, [gridStyle.value]);
+      });
+      _createSharedDataSlot("default", null, null);
+      _setSharedDataTemplateRef(__sharedData, 0, (n1) => {
+        _setTemplateRef(n1, "up-grid");
+      });
+      return __sharedData;
+    };
   }
 });
-const _style_0 = {"u-empty":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-empty__wrap":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__scroll-view-wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__scroll-view":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__nav":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__nav__line":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-empty":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-empty__wrap":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__scroll-view-wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__scroll-view":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__nav":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__nav__line":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-grid":{"":{"width":"100%","position":"relative","boxSizing":"border-box","overflow":"hidden","justifyContent":"center","display":"flex","flexDirection":"row","flexWrap":"wrap","alignItems":"center"}},"flex":{"":{"display":"flex"}},"relative":{"":{"position":"relative"}}};
-const { renderSlot: _renderSlot, normalizeStyle: _normalizeStyle, openBlock: _openBlock, createElementBlock: _createElementBlock } = globalThis.Vue;
-function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  return _openBlock(), _createElementBlock(
-    "view",
-    {
-      class: "up-grid",
-      ref: "up-grid",
-      style: _normalizeStyle([$setup.gridStyle])
-    },
-    [
-      _renderSlot(_ctx.$slots, "default")
-    ],
-    4
-    /* STYLE */
-  );
-}
-const __easycom_3 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-grid/up-grid.uvue"]]);
+const _style_0 = {};
+const __easycom_3 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
 export {
   __easycom_3 as _
 };

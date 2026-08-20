@@ -1,13 +1,18 @@
 import { _ as __easycom_1 } from "../up-transition/up-transition.js";
-import { r as resolveEasycom } from "../../../../App.ku.js";
 import { d as deepMerge, b as addStyle } from "../../libs/function/index.js";
 import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
-const { defineComponent: _defineComponent } = globalThis.Vue;
+const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, resolveComponent: _resolveComponent, createSharedDataSlot: _createSharedDataSlot, withSharedDataVaporCtx: _withSharedDataVaporCtx, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, setSharedData: _setSharedData } = globalThis.Vue;
+const __className = "GenUniModulesUviewUltraComponentsUpOverlayUpOverlay";
 const { computed } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineComponent({
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   ...{
     name: "up-overlay"
   },
+  __dynamicSharedData: true,
+  __hash: "66c245bb",
+  __className,
+  __filename: "uni_modules/uview-ultra/components/up-overlay/up-overlay.uvue",
   __name: "up-overlay",
   props: {
     show: {
@@ -35,8 +40,9 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
   },
   emits: ["click"],
   setup(__props, _a) {
-    var __expose = _a.expose, __emit = _a.emit;
-    __expose();
+    var __emit = _a.emit;
+    const __sharedDataScope = _useSharedDataScope();
+    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpOverlayUpOverlaySharedData", sharedDataClassId: 0 })));
     const props = __props;
     const emit = __emit;
     const overlayStyle = computed(() => {
@@ -54,32 +60,43 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
     function clickHandler() {
       emit("click");
     }
-    const __returned__ = { props, emit, overlayStyle, clickHandler };
-    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
-    return __returned__;
+    return () => {
+      "raw js";
+      const _component_up_transition = __easycom_1;
+      const n1 = _createSharedDataComponentWithFallback(
+        _component_up_transition,
+        "01f42171",
+        {
+          show: () => {
+            return __props.show;
+          },
+          "custom-class": "up-overlay",
+          duration: () => {
+            return __props.duration;
+          },
+          "custom-style": () => {
+            return overlayStyle.value;
+          },
+          onClick: () => {
+            return clickHandler;
+          }
+        },
+        {
+          "default": _withSharedDataVaporCtx(() => {
+            _createSharedDataSlot("default", null, null);
+          })
+        },
+        1
+        /* SINGLE_ROOT */
+      );
+      _setSharedData(__sharedData, 0, n1?.sharedData);
+      return __sharedData;
+    };
   }
 });
-const _style_0 = {"u-empty":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-empty__wrap":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__scroll-view-wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__scroll-view":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__nav":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__nav__line":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-empty":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-empty__wrap":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__scroll-view-wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__scroll-view":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__nav":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__nav__line":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-overlay":{"":{"position":"fixed","top":0,"left":0,"width":"100%","height":"100%","backgroundColor":"rgba(0,0,0,0.7)"}},"flex":{"":{"display":"flex"}}};
-const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
-const { renderSlot: _renderSlot, resolveComponent: _resolveComponent, withCtx: _withCtx, openBlock: _openBlock, createBlock: _createBlock } = globalThis.Vue;
-function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  const _component_up_transition = resolveEasycom(__resolveDynamicComponent("up-transition"), __easycom_1);
-  return _openBlock(), _createBlock(_component_up_transition, {
-    show: $props.show,
-    "custom-class": "up-overlay",
-    duration: $props.duration,
-    "custom-style": $setup.overlayStyle,
-    onClick: $setup.clickHandler
-  }, {
-    default: _withCtx(() => [
-      _renderSlot(_ctx.$slots, "default")
-    ]),
-    _: 3
-    /* FORWARDED */
-  }, 8, ["show", "duration", "custom-style"]);
-}
-const __easycom_2 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-overlay/up-overlay.uvue"]]);
+const _style_0 = {};
+const __easycom_0 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
 export {
-  __easycom_2 as _
+  __easycom_0 as _
 };
 //# sourceMappingURL=up-overlay.js.map

@@ -1,15 +1,20 @@
-import { _ as __easycom_0 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-icon/up-icon&";
-import { r as resolveEasycom } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/App.ku&";
-import { _ as __easycom_1$1 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-badge/up-badge&";
+import { _ as __easycom_1$1 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-icon/up-icon&";
+import { _ as __easycom_1$2 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-badge/up-badge&";
 import { b as badgeProps } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-badge/badge&";
-import { a as addUnit, b as addStyle, g as getPx, e as getWindowInfo, s as sleep, d as deepMerge, u as upGetRect } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/index&";
+import { a as addUnit, b as addStyle, d as deepMerge, g as getPx, e as getWindowInfo, s as sleep, u as upGetRect } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/index&";
 import { _ as _export_sfc } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper&";
-const { defineComponent: _defineComponent } = globalThis.Vue;
+const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, createSharedDataTemplateRefSetter: _createSharedDataTemplateRefSetter, resolveComponent: _resolveComponent, setSharedDataStyle: _setSharedDataStyle, renderSharedDataEffect: _renderSharedDataEffect, createSharedDataSlot: _createSharedDataSlot, setSharedDataAttr: _setSharedDataAttr, toSharedDataScrollViewDirection: _toSharedDataScrollViewDirection, toSharedDataNumber: _toSharedDataNumber, setSharedDataScoped: _setSharedDataScoped, createSharedDataVFor: _createSharedDataVFor, setSharedData: _setSharedData, toDisplayString: _toDisplayString, setSharedDataClass: _setSharedDataClass, toSharedDataBoolean: _toSharedDataBoolean, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, createSharedDataIf: _createSharedDataIf, setSharedDataEvent: _setSharedDataEvent, setSharedDataTemplateRef: _setSharedDataTemplateRef, createSharedDataFor: _createSharedDataFor } = globalThis.Vue;
+const __className = "GenUniModulesUviewUltraComponentsUpTabsUpTabs";
 const { ref, computed, watch, onMounted, getCurrentInstance, nextTick } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineComponent({
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   ...{
     name: "up-tabs"
   },
+  __dynamicSharedData: true,
+  __hash: "1e82ec21",
+  __className,
+  __filename: "uni_modules/uview-ultra/components/up-tabs/up-tabs.uvue",
   __name: "up-tabs",
   props: {
     duration: {
@@ -87,7 +92,9 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
   },
   emits: ["click", "longPress", "change", "update:current"],
   setup(__props, _a) {
-    var __expose = _a.expose, __emit = _a.emit;
+    var __expose = _a.expose, __emit = _a.emit, $slots = _a.slots;
+    const __sharedDataScope = _useSharedDataScope();
+    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpTabsUpTabsSharedData", sharedDataClassId: 0 })));
     const props = __props;
     const emit = __emit;
     const instance = getCurrentInstance();
@@ -355,148 +362,181 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
       init,
       resize
     });
-    const __returned__ = { props, emit, instance, firstTime, scrollLeft, scrollViewWidth, lineOffsetLeft, tabsRect, innerCurrent, retryCount, itemRects, tabsWrapperStyle, iconCustomStyle, propsBadge, lineStyle, getShowValue, getBadgePropValue, textStyle, getItemStyle, isListEqual, getTabsRect, getAllItemRect, setLineLeft, setScrollLeft, resize, clickHandler, longPressHandler, init };
-    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
-    return __returned__;
+    return () => {
+      "raw js";
+      const _setTemplateRef = _createSharedDataTemplateRefSetter();
+      const _component_up_icon = __easycom_1$1;
+      const _component_up_badge = __easycom_1$2;
+      _renderSharedDataEffect(() => {
+        return _setSharedDataStyle(__sharedData, 4, tabsWrapperStyle.value);
+      });
+      _createSharedDataSlot("left", null, null);
+      _renderSharedDataEffect(() => {
+        const _tabsWrapperStyle = tabsWrapperStyle.value;
+        _setSharedDataAttr(__sharedData, 5, _toSharedDataScrollViewDirection(__props.scrollable ? "horizontal" : "none"));
+        _setSharedDataAttr(__sharedData, 6, _toSharedDataNumber(scrollLeft.value));
+        _setSharedDataStyle(__sharedData, 7, _tabsWrapperStyle);
+        _setSharedDataStyle(__sharedData, 8, _tabsWrapperStyle);
+      });
+      _createSharedDataFor(_setSharedDataScoped(__sharedData, 0, _createSharedDataVFor(__sharedDataScope, () => {
+        return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 1 });
+      })), () => {
+        return __props.list;
+      }, (__sharedData_VFor0, _for_item0, _for_key0) => {
+        _renderSharedDataEffect(() => {
+          const _index = _for_key0.value;
+          const _item = _for_item0.value;
+          const _item_disabled = _item["disabled"];
+          _setSharedDataClass(__sharedData_VFor0, 15, ["up-tabs__wrapper__nav__item", [
+            `up-tabs__wrapper__nav__item-${_index}`,
+            _item_disabled != null && _item_disabled ? "up-tabs__wrapper__nav__item--disabled" : "",
+            innerCurrent.value == _index ? "up-tabs__wrapper__nav__item-active" : ""
+          ]]);
+          _setSharedDataStyle(__sharedData_VFor0, 16, getItemStyle());
+        });
+        _createSharedDataIf(() => {
+          return _setSharedData(__sharedData_VFor0, 1, _toSharedDataBoolean($slots["icon"]));
+        }, () => {
+          _createSharedDataSlot("icon", {
+            item: () => {
+              return _for_item0.value;
+            },
+            keyName: () => {
+              return __props.keyName;
+            },
+            index: () => {
+              return _for_key0.value;
+            }
+          }, (data) => {
+            return _setSharedData(__sharedData_VFor0, 2, data);
+          });
+        }, () => {
+          _createSharedDataIf(() => {
+            return _setSharedData(__sharedData_VFor0, 3, _toSharedDataBoolean(_for_item0.value["icon"] != null));
+          }, () => {
+            const n9 = _createSharedDataComponentWithFallback(_component_up_icon, "536b07ae-" + _for_key0.value, {
+              name: () => {
+                return _for_item0.value["icon"];
+              },
+              customStyle: () => {
+                return iconCustomStyle.value;
+              }
+            });
+            _setSharedData(__sharedData_VFor0, 4, n9?.sharedData);
+          });
+        }, 261);
+        _createSharedDataIf(() => {
+          return _setSharedData(__sharedData_VFor0, 5, _toSharedDataBoolean($slots["content"] != null));
+        }, () => {
+          _createSharedDataSlot("content", {
+            item: () => {
+              return _for_item0.value;
+            },
+            keyName: () => {
+              return __props.keyName;
+            },
+            index: () => {
+              return _for_key0.value;
+            }
+          }, (data) => {
+            return _setSharedData(__sharedData_VFor0, 6, data);
+          });
+        }, () => {
+          return _createSharedDataIf(() => {
+            return _setSharedData(__sharedData_VFor0, 7, _toSharedDataBoolean($slots["content"] == null && ($slots["default"] != null || $slots["$default"] != null)));
+          }, () => {
+            _createSharedDataSlot("default", {
+              item: () => {
+                return _for_item0.value;
+              },
+              keyName: () => {
+                return __props.keyName;
+              },
+              index: () => {
+                return _for_key0.value;
+              }
+            }, (data) => {
+              return _setSharedData(__sharedData_VFor0, 8, data);
+            });
+          }, () => {
+            _renderSharedDataEffect(() => {
+              const _item = _for_item0.value;
+              const _item_disabled = _item["disabled"];
+              _setSharedDataClass(__sharedData_VFor0, 9, [[_item_disabled != null && _item_disabled ? "up-tabs__wrapper__nav__item__text--disabled" : ""], "up-tabs__wrapper__nav__item__text"]);
+              _setSharedDataStyle(__sharedData_VFor0, 10, textStyle(_for_key0.value));
+              _setSharedData(__sharedData_VFor0, 11, _toDisplayString(_item[__props.keyName]));
+            });
+          }, 1029);
+        }, 773);
+        const n18 = _createSharedDataComponentWithFallback(_component_up_badge, "536b7126-" + _for_key0.value, {
+          show: () => {
+            return getShowValue(_for_item0.value);
+          },
+          isDot: () => {
+            return getBadgePropValue(_for_item0.value, "isDot");
+          },
+          value: () => {
+            return getBadgePropValue(_for_item0.value, "value");
+          },
+          max: () => {
+            return getBadgePropValue(_for_item0.value, "max");
+          },
+          type: () => {
+            return getBadgePropValue(_for_item0.value, "type");
+          },
+          showZero: () => {
+            return getBadgePropValue(_for_item0.value, "showZero");
+          },
+          bgColor: () => {
+            return getBadgePropValue(_for_item0.value, "bgColor");
+          },
+          color: () => {
+            return getBadgePropValue(_for_item0.value, "color");
+          },
+          shape: () => {
+            return getBadgePropValue(_for_item0.value, "shape");
+          },
+          numberType: () => {
+            return getBadgePropValue(_for_item0.value, "numberType");
+          },
+          inverted: () => {
+            return getBadgePropValue(_for_item0.value, "inverted");
+          },
+          customStyle: "margin-left: 4px;"
+        });
+        _setSharedData(__sharedData_VFor0, 12, n18?.sharedData);
+        _setSharedDataEvent(__sharedData_VFor0, 13, () => {
+          return clickHandler(_for_item0.value, _for_key0.value);
+        });
+        _setSharedDataEvent(__sharedData_VFor0, 14, () => {
+          return longPressHandler(_for_item0.value, _for_key0.value);
+        });
+        _setSharedDataTemplateRef(__sharedData_VFor0, 17, (n19) => {
+          _setTemplateRef(n19, `up-tabs__wrapper__nav__item-${_for_key0.value}`, true);
+        });
+        return null;
+      }, (__sharedData_VFor0, item, index) => {
+        return _setSharedData(__sharedData_VFor0, 0, _toDisplayString(index));
+      });
+      _setSharedDataTemplateRef(__sharedData, 1, (n20) => {
+        _setTemplateRef(n20, "up-tabs__wrapper__nav__line");
+      });
+      _setSharedDataTemplateRef(__sharedData, 2, (n21) => {
+        _setTemplateRef(n21, "up-tabs__wrapper__nav");
+      });
+      _setSharedDataTemplateRef(__sharedData, 3, (n22) => {
+        _setTemplateRef(n22, "up-tabs__wrapper__scroll-view");
+      });
+      _renderSharedDataEffect(() => {
+        return _setSharedDataStyle(__sharedData, 9, lineStyle.value);
+      });
+      _createSharedDataSlot("right", null, null);
+      return __sharedData;
+    };
   }
 });
-const _style_0 = {"up-tabs__wrapper":{"":{"display":"flex","flexDirection":"row","alignItems":"center","width":"100%"}},"up-tabs__wrapper__scroll-view-wrapper":{"":{"flexGrow":1,"flexShrink":1,"flexBasis":"0%"}},"up-tabs__wrapper__scroll-view":{"":{"display":"flex","flexDirection":"row","flexGrow":1,"flexShrink":1,"flexBasis":"0%"}},"up-tabs__wrapper__nav":{"":{"display":"flex","flexDirection":"row","position":"relative","height":"100%"}},"up-tabs__wrapper__nav__item":{"":{"paddingTop":0,"paddingRight":11,"paddingBottom":0,"paddingLeft":11,"display":"flex","flexDirection":"row","alignItems":"center","justifyContent":"center","flexShrink":0,"height":"100%"}},"up-tabs__wrapper__nav__item__text":{"":{"fontSize":15,"color":"#606266","!whiteSpace":"nowrap"}},"up-tabs__wrapper__nav__item__text--disabled":{"":{"!color":"#c8c9cc"}},"up-tabs__wrapper__nav__line":{"":{"height":3,"backgroundColor":"var(--theme-color, #0957de)","width":30,"position":"absolute","bottom":2,"borderTopLeftRadius":100,"borderTopRightRadius":100,"borderBottomRightRadius":100,"borderBottomLeftRadius":100,"transitionProperty":"transform","transitionDuration":"300ms"}},"@TRANSITION":{"up-tabs__wrapper__nav__line":{"property":"transform","duration":"300ms"}},"flex":{"":{"display":"flex"}},"relative":{"":{"position":"relative"}}};
-const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
-const { renderSlot: _renderSlot, renderList: _renderList, Fragment: _Fragment, openBlock: _openBlock, createElementBlock: _createElementBlock, createCommentVNode: _createCommentVNode, resolveComponent: _resolveComponent, createVNode: _createVNode, toDisplayString: _toDisplayString, normalizeClass: _normalizeClass, normalizeStyle: _normalizeStyle, createElementVNode: _createElementVNode } = globalThis.Vue;
-function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  const _component_up_icon = resolveEasycom(__resolveDynamicComponent("up-icon"), __easycom_0);
-  const _component_up_badge = resolveEasycom(__resolveDynamicComponent("up-badge"), __easycom_1$1);
-  return _openBlock(), _createElementBlock("view", { class: "up-tabs" }, [
-    _createElementVNode(
-      "view",
-      {
-        class: "up-tabs__wrapper",
-        style: _normalizeStyle($setup.tabsWrapperStyle)
-      },
-      [
-        _renderSlot(_ctx.$slots, "left"),
-        _createElementVNode("view", { class: "up-tabs__wrapper__scroll-view-wrapper" }, [
-          _createElementVNode("scroll-view", {
-            direction: $props.scrollable ? "horizontal" : "none",
-            "scroll-left": $setup.scrollLeft,
-            "scroll-with-animation": "",
-            class: "up-tabs__wrapper__scroll-view",
-            "show-scrollbar": false,
-            ref: "up-tabs__wrapper__scroll-view",
-            style: _normalizeStyle($setup.tabsWrapperStyle)
-          }, [
-            _createElementVNode(
-              "view",
-              {
-                class: "up-tabs__wrapper__nav",
-                ref: "up-tabs__wrapper__nav",
-                style: _normalizeStyle($setup.tabsWrapperStyle)
-              },
-              [
-                (_openBlock(true), _createElementBlock(
-                  _Fragment,
-                  null,
-                  _renderList($props.list, (item, index) => {
-                    return _openBlock(), _createElementBlock("view", {
-                      class: _normalizeClass(["up-tabs__wrapper__nav__item", [
-                        `up-tabs__wrapper__nav__item-${index}`,
-                        item["disabled"] != null && item["disabled"] ? "up-tabs__wrapper__nav__item--disabled" : "",
-                        $setup.innerCurrent == index ? "up-tabs__wrapper__nav__item-active" : ""
-                      ]]),
-                      key: index,
-                      onClick: ($event) => $setup.clickHandler(item, index),
-                      onLongpress: ($event) => $setup.longPressHandler(item, index),
-                      ref_for: true,
-                      ref: `up-tabs__wrapper__nav__item-${index}`,
-                      style: _normalizeStyle($setup.getItemStyle())
-                    }, [
-                      _ctx.$slots["icon"] ? _renderSlot(_ctx.$slots, "icon", {
-                        key: 0,
-                        item,
-                        keyName: $props.keyName,
-                        index
-                      }) : (_openBlock(), _createElementBlock(
-                        _Fragment,
-                        { key: 1 },
-                        [
-                          item["icon"] != null ? (_openBlock(), _createElementBlock("view", {
-                            key: 0,
-                            class: "up-tabs__wrapper__nav__item__prefix-icon"
-                          }, [
-                            _createVNode(_component_up_icon, {
-                              name: item["icon"],
-                              customStyle: $setup.iconCustomStyle
-                            }, null, 8, ["name", "customStyle"])
-                          ])) : _createCommentVNode("v-if", true)
-                        ],
-                        64
-                        /* STABLE_FRAGMENT */
-                      )),
-                      _ctx.$slots["content"] != null ? _renderSlot(_ctx.$slots, "content", {
-                        key: 2,
-                        item,
-                        keyName: $props.keyName,
-                        index
-                      }) : _ctx.$slots["content"] == null && (_ctx.$slots["default"] != null || _ctx.$slots["$default"] != null) ? _renderSlot(_ctx.$slots, "default", {
-                        key: 3,
-                        item,
-                        keyName: $props.keyName,
-                        index
-                      }) : (_openBlock(), _createElementBlock(
-                        "text",
-                        {
-                          key: 4,
-                          class: _normalizeClass([[item["disabled"] != null && item["disabled"] ? "up-tabs__wrapper__nav__item__text--disabled" : ""], "up-tabs__wrapper__nav__item__text"]),
-                          style: _normalizeStyle($setup.textStyle(index))
-                        },
-                        _toDisplayString(item[$props.keyName]),
-                        7
-                        /* TEXT, CLASS, STYLE */
-                      )),
-                      _createVNode(_component_up_badge, {
-                        show: $setup.getShowValue(item),
-                        isDot: $setup.getBadgePropValue(item, "isDot"),
-                        value: $setup.getBadgePropValue(item, "value"),
-                        max: $setup.getBadgePropValue(item, "max"),
-                        type: $setup.getBadgePropValue(item, "type"),
-                        showZero: $setup.getBadgePropValue(item, "showZero"),
-                        bgColor: $setup.getBadgePropValue(item, "bgColor"),
-                        color: $setup.getBadgePropValue(item, "color"),
-                        shape: $setup.getBadgePropValue(item, "shape"),
-                        numberType: $setup.getBadgePropValue(item, "numberType"),
-                        inverted: $setup.getBadgePropValue(item, "inverted"),
-                        customStyle: "margin-left: 4px;"
-                      }, null, 8, ["show", "isDot", "value", "max", "type", "showZero", "bgColor", "color", "shape", "numberType", "inverted"])
-                    ], 46, ["onClick", "onLongpress"]);
-                  }),
-                  128
-                  /* KEYED_FRAGMENT */
-                )),
-                _createElementVNode(
-                  "view",
-                  {
-                    class: "up-tabs__wrapper__nav__line",
-                    ref: "up-tabs__wrapper__nav__line",
-                    style: _normalizeStyle($setup.lineStyle)
-                  },
-                  null,
-                  4
-                  /* STYLE */
-                )
-              ],
-              4
-              /* STYLE */
-            )
-          ], 12, ["direction", "scroll-left"])
-        ]),
-        _renderSlot(_ctx.$slots, "right")
-      ],
-      4
-      /* STYLE */
-    )
-  ]);
-}
-const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-tabs/up-tabs.uvue"]]);
+const _style_0 = {};
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
 export {
   __easycom_1 as _
 };

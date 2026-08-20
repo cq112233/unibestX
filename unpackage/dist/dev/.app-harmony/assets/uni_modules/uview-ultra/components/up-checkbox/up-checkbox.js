@@ -1,15 +1,20 @@
-import { _ as __easycom_0 } from "../up-icon/up-icon.js";
-import { r as resolveEasycom } from "../../../../App.ku.js";
+import { _ as __easycom_1 } from "../up-icon/up-icon.js";
 import { a as addUnit, i as error, d as deepMerge, b as addStyle } from "../../libs/function/index.js";
 import { d as defProps } from "./checkbox.js";
 import { u as useUltraUI } from "../../libs/composable/useUltraUI.js";
 import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
-const { defineComponent: _defineComponent } = globalThis.Vue;
+const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, resolveComponent: _resolveComponent, setSharedDataClass: _setSharedDataClass, setSharedDataStyle: _setSharedDataStyle, renderSharedDataEffect: _renderSharedDataEffect, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, setSharedData: _setSharedData, createSharedDataSlot: _createSharedDataSlot, setSharedDataEvent: _setSharedDataEvent, toDisplayString: _toDisplayString } = globalThis.Vue;
+const __className = "GenUniModulesUviewUltraComponentsUpCheckboxUpCheckbox";
 const { computed, ref, watch, onMounted, inject, getCurrentInstance } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineComponent({
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   ...{
     name: "up-checkbox"
   },
+  __dynamicSharedData: true,
+  __hash: "512d5442",
+  __className,
+  __filename: "uni_modules/uview-ultra/components/up-checkbox/up-checkbox.uvue",
   __name: "up-checkbox",
   props: {
     // checkbox组件的标示符
@@ -94,6 +99,8 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
   setup(__props, _a) {
     var _b;
     var __expose = _a.expose, __emit = _a.emit;
+    const __sharedDataScope = _useSharedDataScope();
+    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpCheckboxUpCheckboxSharedData", sharedDataClassId: 0 })));
     const _c = useUltraUI(), parent = _c.parent, parentData = _c.parentData, getParentData = _c.getParentData;
     const instance = (_b = getCurrentInstance()) === null || _b === void 0 ? null : _b.proxy;
     const props = __props;
@@ -382,70 +389,58 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
       init,
       getInternalState
     });
-    const __returned__ = { parent, parentData, getParentData, instance, props, emit, injectedParentProps, injectedParentToggle, getParentVal, selfChecked, isChecked, elDisabled, elLabelDisabled, elSize, elIconSize, elActiveColor, elInactiveColor, elLabelColor, elShape, elLabelSize, elIconColor, iconClasses, iconWrapStyle, checkboxStyle, iconPlacementClass, borderBottomClass, init, setRadioCheckedStatus, iconClickHandler, wrapperClickHandler, labelClickHandler, getInternalState };
-    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
-    return __returned__;
+    return () => {
+      "raw js";
+      const _component_up_icon = __easycom_1;
+      _renderSharedDataEffect(() => {
+        _setSharedDataClass(__sharedData, 7, ["up-checkbox cursor-pointer", [iconPlacementClass.value, borderBottomClass.value]]);
+        _setSharedDataStyle(__sharedData, 8, [checkboxStyle.value]);
+        _setSharedDataClass(__sharedData, 9, ["up-checkbox__icon-wrap cursor-pointer", iconClasses.value]);
+        _setSharedDataStyle(__sharedData, 10, [iconWrapStyle.value]);
+      });
+      _createSharedDataSlot("icon", null, null, () => {
+        const n2 = _createSharedDataComponentWithFallback(_component_up_icon, "2bb64524", {
+          class: "up-checkbox__icon-wrap__icon",
+          name: "checkbox-mark",
+          size: () => {
+            return elIconSize.value;
+          },
+          color: () => {
+            return elIconColor.value;
+          }
+        });
+        _setSharedData(__sharedData, 4, n2?.sharedData);
+      });
+      _setSharedDataEvent(__sharedData, 5, iconClickHandler);
+      _createSharedDataSlot("label", {
+        label: () => {
+          return __props.label;
+        },
+        elDisabled: () => {
+          return elDisabled.value;
+        }
+      }, (data) => {
+        return _setSharedData(__sharedData, 0, data);
+      }, () => {
+        _setSharedDataEvent(__sharedData, 1, labelClickHandler);
+        _renderSharedDataEffect(() => {
+          const _elLabelSize = elLabelSize.value;
+          _setSharedDataStyle(__sharedData, 2, {
+            color: elDisabled.value ? elInactiveColor.value : elLabelColor.value,
+            fontSize: _elLabelSize,
+            lineHeight: _elLabelSize
+          });
+          _setSharedData(__sharedData, 3, _toDisplayString(__props.label));
+        });
+      });
+      _setSharedDataEvent(__sharedData, 6, wrapperClickHandler);
+      return __sharedData;
+    };
   }
 });
-const _style_0 = {"u-empty":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-empty__wrap":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__scroll-view-wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__scroll-view":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__nav":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__nav__line":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-empty":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-empty__wrap":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__scroll-view-wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__scroll-view":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__nav":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__nav__line":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-checkbox":{"":{"display":"flex","flexDirection":"row","overflow":"hidden","alignItems":"center","marginBottom":5,"marginTop":5}},"up-checkbox-label--left":{"":{"flexDirection":"row"}},"up-checkbox-label--right":{"":{"flexDirection":"row-reverse","justifyContent":"space-between"}},"up-checkbox__icon-wrap":{"":{"display":"flex","flexDirection":"row","alignItems":"center","justifyContent":"center","marginRight":6,"borderTopWidth":1,"borderRightWidth":1,"borderBottomWidth":1,"borderLeftWidth":1,"borderTopColor":"#c8c9cc","borderRightColor":"#c8c9cc","borderBottomColor":"#c8c9cc","borderLeftColor":"#c8c9cc","borderTopStyle":"solid","borderRightStyle":"solid","borderBottomStyle":"solid","borderLeftStyle":"solid"}},"up-checkbox__icon-wrap--circle":{"":{"borderTopLeftRadius":99,"borderTopRightRadius":99,"borderBottomRightRadius":99,"borderBottomLeftRadius":99}},"up-checkbox__icon-wrap--square":{"":{"borderTopLeftRadius":3,"borderTopRightRadius":3,"borderBottomRightRadius":3,"borderBottomLeftRadius":3}},"up-checkbox__icon-wrap--checked":{"":{"color":"#ffffff","backgroundColor":"#FF0000","borderTopColor":"#2979ff","borderRightColor":"#2979ff","borderBottomColor":"#2979ff","borderLeftColor":"#2979ff"}},"up-checkbox__icon-wrap--active":{"":{"backgroundColor":"var(--theme-color, #0957de)","borderTopColor":"var(--theme-color, #0957de)","borderRightColor":"var(--theme-color, #0957de)","borderBottomColor":"var(--theme-color, #0957de)","borderLeftColor":"var(--theme-color, #0957de)"}},"up-checkbox__icon-wrap--disabled":{"":{"!backgroundColor":"#ebedf0"}},"up-checkbox__icon-wrap--disabled--checked":{"":{"!color":"#c8c9cc"}},"up-checkbox__label":{"":{"marginLeft":5,"marginRight":12,"color":"#606266","fontSize":15}},"up-checkbox__label--disabled":{"":{"color":"#c8c9cc"}},"up-border-bottom":{"":{"borderBottomWidth":0.5,"borderColor":"#dadbde","borderBottomStyle":"solid"}},"flex":{"":{"display":"flex"}}};
-const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
-const { renderSlot: _renderSlot, resolveComponent: _resolveComponent, createVNode: _createVNode, withModifiers: _withModifiers, normalizeClass: _normalizeClass, normalizeStyle: _normalizeStyle, createElementVNode: _createElementVNode, toDisplayString: _toDisplayString, openBlock: _openBlock, createElementBlock: _createElementBlock } = globalThis.Vue;
-function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  const _component_up_icon = resolveEasycom(__resolveDynamicComponent("up-icon"), __easycom_0);
-  return _openBlock(), _createElementBlock(
-    "view",
-    {
-      class: _normalizeClass(["up-checkbox cursor-pointer", [$setup.iconPlacementClass, $setup.borderBottomClass]]),
-      style: _normalizeStyle([$setup.checkboxStyle]),
-      onClick: _withModifiers($setup.wrapperClickHandler, ["stop"])
-    },
-    [
-      _createElementVNode(
-        "view",
-        {
-          class: _normalizeClass(["up-checkbox__icon-wrap cursor-pointer", $setup.iconClasses]),
-          onClick: _withModifiers($setup.iconClickHandler, ["stop"]),
-          style: _normalizeStyle([$setup.iconWrapStyle])
-        },
-        [
-          _renderSlot(_ctx.$slots, "icon", {}, () => [
-            _createVNode(_component_up_icon, {
-              class: "up-checkbox__icon-wrap__icon",
-              name: "checkbox-mark",
-              size: $setup.elIconSize,
-              color: $setup.elIconColor
-            }, null, 8, ["size", "color"])
-          ])
-        ],
-        6
-        /* CLASS, STYLE */
-      ),
-      _renderSlot(_ctx.$slots, "label", {
-        label: $props.label,
-        elDisabled: $setup.elDisabled
-      }, () => [
-        _createElementVNode(
-          "text",
-          {
-            onClick: _withModifiers($setup.labelClickHandler, ["stop"]),
-            style: _normalizeStyle({
-              color: $setup.elDisabled ? $setup.elInactiveColor : $setup.elLabelColor,
-              fontSize: $setup.elLabelSize,
-              lineHeight: $setup.elLabelSize
-            })
-          },
-          _toDisplayString($props.label),
-          5
-          /* TEXT, STYLE */
-        )
-      ])
-    ],
-    6
-    /* CLASS, STYLE */
-  );
-}
-const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-checkbox/up-checkbox.uvue"]]);
+const _style_0 = {"up-border-bottom":{"":{"borderBottomWidth":0.5,"borderColor":"#dadbde","borderBottomStyle":"solid"}}};
+const __easycom_6 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
 export {
-  __easycom_1 as _
+  __easycom_6 as _
 };
 //# sourceMappingURL=up-checkbox.js.map

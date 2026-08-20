@@ -1,5 +1,5 @@
-const _imports_0 = "/assets/logo.de257528.png";
+const logoImg = "/assets/logo.de257528.png";
 export {
-  _imports_0 as _
+  logoImg as l
 };
 //# sourceMappingURL=logo.js.map

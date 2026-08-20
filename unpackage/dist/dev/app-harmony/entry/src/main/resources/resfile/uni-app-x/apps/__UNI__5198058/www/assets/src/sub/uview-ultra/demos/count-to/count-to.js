@@ -1,6 +1,6 @@
 import { _ as __easycom_0 } from "../../../../components/NavBar/NavBar.js";
-import { A as AppKu, r as resolveEasycom } from "../../../../../App.ku.js";
 import { _ as __easycom_1 } from "../../../../../uni_modules/uview-ultra/components/up-count-to/up-count-to.js";
+import { A as AppKu } from "../../../../../App.ku.js";
 import { L as LayoutComponent } from "../../../../layouts/default.js";
 import { _ as _export_sfc } from "../../../../../plugin-vue-export-helper.js";
 import "../../../../utils/systemInfo.js";
@@ -41,13 +41,15 @@ import "../../../../utils/theme.js";
 import "../../../../../theme.js";
 import "../../../../store/token.js";
 import "../../../../store/user.js";
+import "../../../../../uni_modules/uview-ultra/libs/mixin/mixin.js";
+import "../../../../../uni_modules/uview-ultra/libs/function/test.js";
+import "../../../../../uni_modules/uview-ultra/libs/function/index.js";
+import "../../../../../uni_modules/uview-ultra/libs/function/digit.js";
+import "../../../../../uni_modules/uview-ultra/libs/config/config.js";
+import "../../../../../uni_modules/uview-ultra/components/up-count-to/countTo.js";
 import "../../../../../uni_modules/uview-ultra/components/up-toast/up-toast.js";
 import "../../../../../uni_modules/uview-ultra/components/up-loading-icon/up-loading-icon.js";
 import "../../../../../uni_modules/uview-ultra/components/up-loading-icon/loadingIcon.js";
-import "../../../../../uni_modules/uview-ultra/libs/config/config.js";
-import "../../../../../uni_modules/uview-ultra/libs/function/index.js";
-import "../../../../../uni_modules/uview-ultra/libs/function/test.js";
-import "../../../../../uni_modules/uview-ultra/libs/function/digit.js";
 import "../../../../../uni_modules/uview-ultra/libs/function/colorGradient.js";
 import "../../../../../uni_modules/uview-ultra/components/up-icon/up-icon.js";
 import "../../../../../uni_modules/uview-ultra/components/up-icon/icons.js";
@@ -66,72 +68,61 @@ import "../../../../../uni_modules/uni-icons/components/uni-icons/uni-icons.js";
 import "../../../../../uni_modules/uni-icons/components/uni-icons/uniicons_file.js";
 import "../../../../utils/i18n.js";
 import "../../../../utils/toast.js";
-import "../../../../../uni_modules/uview-ultra/libs/mixin/mixin.js";
-import "../../../../../uni_modules/uview-ultra/components/up-count-to/countTo.js";
-const { defineComponent: _defineComponent } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineComponent({
+const { defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataPageId: _useSharedDataPageId, useSharedDataPageOptions: _useSharedDataPageOptions, useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataRenderer: _useSharedDataRenderer, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, withSharedDataPage: _withSharedDataPage, resolveComponent: _resolveComponent, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, setSharedData: _setSharedData, withSharedDataVaporCtx: _withSharedDataVaporCtx, createSharedDataComponent: _createSharedDataComponent } = globalThis.Vue;
+const __className = "GenSrcSubUviewUltraDemosCountToCountTo";
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+  __dynamicSharedData: true,
+  __hash: "5b380710",
+  __className,
+  __filename: "src/sub/uview-ultra/demos/count-to/count-to.uvue",
   __name: "count-to",
-  setup(__props, _a) {
-    var __expose = _a.expose;
-    __expose();
-    const __returned__ = { get AppKu() {
-      return AppKu;
-    }, get LayoutComponent() {
-      return LayoutComponent;
-    } };
-    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
-    return __returned__;
+  setup(__props) {
+    const __sharedDataRenderer = _useSharedDataRenderer();
+    const __sharedData = __sharedDataRenderer == "component" ? _withSharedDataComponent(new UniDynamicSharedDataComponent(_useSharedDataScope(), _useSharedDataComponentOptions({ bundleKey: "GenSrcSubUviewUltraDemosCountToCountToSharedData", sharedDataClassId: 0 }))) : _withSharedDataPage(new UniDynamicSharedDataPage(_useSharedDataPageId(), _useSharedDataPageOptions({ bundleKey: "GenSrcSubUviewUltraDemosCountToCountToSharedData", sharedDataClassId: 0 })));
+    _useSharedDataScope(__sharedData);
+    return () => {
+      "raw js";
+      const _component_NavBar = __easycom_0;
+      const _component_up_count_to = __easycom_1;
+      const n10 = _createSharedDataComponent(AppKu, "549b2a21", null, {
+        "default": _withSharedDataVaporCtx(() => {
+          const n9 = _createSharedDataComponent(LayoutComponent, "3eca19f5", {
+            "navigation-style": "custom",
+            "navigation-bar-title-text": "up-count-to 数字滚动"
+          }, {
+            "default": _withSharedDataVaporCtx(() => {
+              const n0 = _createSharedDataComponentWithFallback(_component_NavBar, "cb0db544", {
+                title: "CountTo 数字滚动",
+                "auto-back": true
+              });
+              _setSharedData(__sharedData, 2, n0?.sharedData);
+              const n2 = _createSharedDataComponentWithFallback(_component_up_count_to, "cb0da704", {
+                "end-val": 1e3,
+                color: "#2979ff",
+                "font-size": 30
+              });
+              _setSharedData(__sharedData, 3, n2?.sharedData);
+              const n5 = _createSharedDataComponentWithFallback(_component_up_count_to, "cb0d983a", {
+                "end-val": 1234.56,
+                decimals: 2,
+                separator: ",",
+                color: "#fa3534",
+                "font-size": 24
+              });
+              _setSharedData(__sharedData, 4, n5?.sharedData);
+            })
+          });
+          _setSharedData(__sharedData, 1, n9.sharedData);
+        })
+      });
+      _setSharedData(__sharedData, 0, n10.sharedData);
+      return __sharedData;
+    };
   }
 });
-const _style_0 = {"demo-block":{"":{"marginBottom":12,"paddingTop":12,"paddingRight":12,"paddingBottom":12,"paddingLeft":12,"backgroundColor":"#ffffff","borderTopLeftRadius":8,"borderTopRightRadius":8,"borderBottomRightRadius":8,"borderBottomLeftRadius":8}},"demo-label":{"":{"fontSize":14,"fontWeight":"bold","color":"#606266","marginBottom":10,"paddingLeft":4,"borderLeftWidth":3,"borderLeftStyle":"solid","borderLeftColor":"#2979ff"}},"bg-_b_hf8fafc_B":{"":{"backgroundColor":"#f8fafc"}},"pb-_b30px_B":{"":{"paddingBottom":30}},"p-_b16px_B":{"":{"paddingTop":16,"paddingRight":16,"paddingBottom":16,"paddingLeft":16,"padding":16}},"mt-_b12px_B":{"":{"marginTop":12}},"min-h-screen":{"":{"minHeight":"100vh"}}};
-const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
-const { resolveComponent: _resolveComponent, createVNode: _createVNode, createElementVNode: _createElementVNode, withCtx: _withCtx, openBlock: _openBlock, createBlock: _createBlock } = globalThis.Vue;
-function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  const _component_NavBar = resolveEasycom(__resolveDynamicComponent("NavBar"), __easycom_0);
-  const _component_up_count_to = resolveEasycom(__resolveDynamicComponent("up-count-to"), __easycom_1);
-  return _openBlock(), _createBlock($setup["AppKu"], null, {
-    default: _withCtx(() => [
-      _createVNode($setup["LayoutComponent"], {
-        "navigation-style": "custom",
-        "navigation-bar-title-text": "up-count-to 数字滚动"
-      }, {
-        default: _withCtx(() => [
-          _createElementVNode("view", { class: "page-container bg-_b_hf8fafc_B min-h-screen pb-_b30px_B" }, [
-            _createVNode(_component_NavBar, {
-              title: "CountTo 数字滚动",
-              "auto-back": true
-            }),
-            _createElementVNode("view", { class: "p-_b16px_B" }, [
-              _createElementVNode("view", { class: "demo-block" }, [
-                _createElementVNode("text", { class: "demo-label" }, "基础用法"),
-                _createVNode(_component_up_count_to, {
-                  "end-val": 1e3,
-                  color: "#2979ff",
-                  "font-size": 30
-                })
-              ]),
-              _createElementVNode("view", { class: "demo-block mt-_b12px_B" }, [
-                _createElementVNode("text", { class: "demo-label" }, "指定小数位与分隔符"),
-                _createVNode(_component_up_count_to, {
-                  "end-val": 1234.56,
-                  decimals: 2,
-                  separator: ",",
-                  color: "#fa3534",
-                  "font-size": 24
-                })
-              ])
-            ])
-          ])
-        ]),
-        _: 1
-        /* STABLE */
-      })
-    ]),
-    _: 1
-    /* STABLE */
-  });
-}
-const countTo = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/sub/uview-ultra/demos/count-to/count-to.uvue"]]);
+const _style_0 = {};
+const countTo = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
 export {
   countTo as default
 };

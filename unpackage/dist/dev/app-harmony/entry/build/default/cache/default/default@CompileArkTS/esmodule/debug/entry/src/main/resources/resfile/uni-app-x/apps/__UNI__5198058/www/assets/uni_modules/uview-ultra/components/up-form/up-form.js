@@ -1,10 +1,11 @@
 import { d as defProps } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-form/form&";
 import { S as Schema } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/util/async-validator&";
-import { m as deepClone, k as getProperty, l as setProperty, t as toast } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/index&";
+import { k as deepClone, l as getProperty, m as setProperty, t as toast } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/index&";
 import { u as useUltraUI } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/composable/useUltraUI&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-form/types&";
-import { _ as _export_sfc } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper&";
-const { defineComponent: _defineComponent } = globalThis.Vue;
+const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, createSharedDataSlot: _createSharedDataSlot } = globalThis.Vue;
+const __className = "GenUniModulesUviewUltraComponentsUpFormUpForm";
 const { getCurrentInstance, provide } = globalThis.Vue;
 const { ref, reactive, computed, watch } = globalThis.Vue;
 class UPFormRules extends UTS.UTSType {
@@ -26,10 +27,14 @@ class UPFormRules extends UTS.UTSType {
     delete this.__props__;
   }
 }
-const _sfc_main = /* @__PURE__ */ _defineComponent({
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   ...{
     name: "up-form"
   },
+  __dynamicSharedData: true,
+  __hash: "aeaf2902",
+  __className,
+  __filename: "uni_modules/uview-ultra/components/up-form/up-form.uvue",
   __name: "up-form",
   props: {
     // 当前form的需要验证字段的集合
@@ -76,11 +81,13 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
   },
   emits: [],
   setup(__props, _a) {
-    var __expose = _a.expose, __emit = _a.emit;
+    var __expose = _a.expose;
+    _a.emit;
+    const __sharedDataScope = _useSharedDataScope();
+    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpFormUpFormSharedData", sharedDataClassId: 0 })));
     const _b = useUltraUI(), children = _b.children, getChildren = _b.getChildren, addChild = _b.addChild;
-    const instance = getCurrentInstance().proxy;
+    getCurrentInstance().proxy;
     const props = __props;
-    const emit = __emit;
     const formRules = ref(new UTSJSONObject({}));
     const validator = ref(new Schema(new UTSJSONObject({})));
     const originalModel = ref(null);
@@ -393,19 +400,14 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
       resetFields,
       setRules
     });
-    const __returned__ = { children, getChildren, addChild, instance, props, emit, formRules, validator, originalModel, propsChange, setRules, resetModel, clearValidate, resetFields, validateField, validate, getProps, getRefs, setOriginalModel };
-    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
-    return __returned__;
+    return () => {
+      "raw js";
+      _createSharedDataSlot("default", null, null);
+      return __sharedData;
+    };
   }
 });
-const { renderSlot: _renderSlot, openBlock: _openBlock, createElementBlock: _createElementBlock } = globalThis.Vue;
-function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  return _openBlock(), _createElementBlock("view", { class: "up-form" }, [
-    _renderSlot(_ctx.$slots, "default")
-  ]);
-}
-const __easycom_14 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-form/up-form.uvue"]]);
 export {
-  __easycom_14 as _
+  _sfc_main as _
 };
 //# sourceMappingURL=up-form.js.map

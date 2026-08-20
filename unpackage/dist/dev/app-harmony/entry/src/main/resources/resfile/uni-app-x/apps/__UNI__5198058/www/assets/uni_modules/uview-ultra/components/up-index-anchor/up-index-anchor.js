@@ -2,12 +2,18 @@ import { a as addUnit, i as error, n as getParentFunc } from "../../libs/functio
 import { u as useUltraUI } from "../../libs/composable/useUltraUI.js";
 import { d as defProps } from "./indexAnchor.js";
 import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
-const { defineComponent: _defineComponent } = globalThis.Vue;
+const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, createSharedDataTemplateRefSetter: _createSharedDataTemplateRefSetter, setSharedDataClass: _setSharedDataClass, setSharedDataStyle: _setSharedDataStyle, setSharedData: _setSharedData, toDisplayString: _toDisplayString, setSharedDataTemplateRef: _setSharedDataTemplateRef, renderSharedDataEffect: _renderSharedDataEffect } = globalThis.Vue;
+const __className = "GenUniModulesUviewUltraComponentsUpIndexAnchorUpIndexAnchor";
 const { computed, onMounted, getCurrentInstance } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineComponent({
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   ...{
     name: "up-index-anchor"
   },
+  __dynamicSharedData: true,
+  __hash: "1c555f35",
+  __className,
+  __filename: "uni_modules/uview-ultra/components/up-index-anchor/up-index-anchor.uvue",
   __name: "up-index-anchor",
   props: {
     text: {
@@ -33,12 +39,12 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
   },
   emits: [],
   setup(__props, _a) {
-    var __expose = _a.expose, __emit = _a.emit;
-    __expose();
+    _a.emit;
+    const __sharedDataScope = _useSharedDataScope();
+    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpIndexAnchorUpIndexAnchorSharedData", sharedDataClassId: 0 })));
     const _b = useUltraUI(), parent = _b.parent, parentData = _b.parentData, getParent = _b.getParent;
     const instance = getCurrentInstance().proxy;
     const props = __props;
-    const emit = __emit;
     const textName = computed(() => {
       return props.text.toString();
     });
@@ -81,38 +87,25 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
     onMounted(() => {
       init();
     });
-    const __returned__ = { parent, parentData, getParent, instance, props, emit, textName, parentSticky, anchorStyle, textStyle, init };
-    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
-    return __returned__;
+    return () => {
+      "raw js";
+      const _setTemplateRef = _createSharedDataTemplateRefSetter();
+      _renderSharedDataEffect(() => {
+        const _textName = textName.value;
+        _setSharedDataClass(__sharedData, 0, ["up-index-anchor up-border-bottom", { "up-index-anchor--sticky": parentSticky.value }]);
+        _setSharedDataStyle(__sharedData, 1, anchorStyle.value);
+        _setSharedDataStyle(__sharedData, 2, textStyle.value);
+        _setSharedData(__sharedData, 3, _toDisplayString(_textName));
+        _setSharedDataTemplateRef(__sharedData, 4, (n1) => {
+          _setTemplateRef(n1, `up-index-anchor-${_textName}`);
+        });
+      });
+      return __sharedData;
+    };
   }
 });
-const _style_0 = {"u-empty":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-empty__wrap":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__scroll-view-wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__scroll-view":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__nav":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__nav__line":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-empty":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-empty__wrap":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__scroll-view-wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__scroll-view":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__nav":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__nav__line":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-index-anchor":{"":{"position":"relative","top":0,"display":"flex","flexDirection":"row","alignItems":"center","paddingLeft":15,"zIndex":1}},"up-index-anchor--sticky":{"":{"position":"relative","top":0}},"flex":{"":{"display":"flex"}},"relative":{"":{"position":"relative"}},"up-border-bottom":{"":{"borderBottomWidth":0.5,"borderColor":"#dadbde","borderBottomStyle":"solid"}}};
-const { toDisplayString: _toDisplayString, normalizeStyle: _normalizeStyle, createElementVNode: _createElementVNode, normalizeClass: _normalizeClass, openBlock: _openBlock, createElementBlock: _createElementBlock } = globalThis.Vue;
-function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  return _openBlock(), _createElementBlock(
-    "view",
-    {
-      class: _normalizeClass(["up-index-anchor up-border-bottom", { "up-index-anchor--sticky": $setup.parentSticky }]),
-      ref: `up-index-anchor-${$setup.textName}`,
-      style: _normalizeStyle($setup.anchorStyle)
-    },
-    [
-      _createElementVNode(
-        "text",
-        {
-          class: "up-index-anchor__text",
-          style: _normalizeStyle($setup.textStyle)
-        },
-        _toDisplayString($setup.textName),
-        5
-        /* TEXT, STYLE */
-      )
-    ],
-    6
-    /* CLASS, STYLE */
-  );
-}
-const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-index-anchor/up-index-anchor.uvue"]]);
+const _style_0 = {"up-border-bottom":{"":{"borderBottomWidth":0.5,"borderColor":"#dadbde","borderBottomStyle":"solid"}}};
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
 export {
   __easycom_1 as _
 };

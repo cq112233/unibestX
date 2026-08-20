@@ -1,8 +1,9 @@
-Ôr@Ÿªassertions¤code´customTransformCache¬dependencies¢id¤meta±moduleSideEffects¬originalCode±originalSourcemap«resolvedIds®sourcemapChainµsyntheticNamedExportsµtransformDependencies®transformFiles¨cacheAstÔrAÚ4Æimport { _ as __easycom_1 } from "../../../../uni_modules/z-paging-x/components/z-paging-x/z-paging-x.js";
-import { r as resolveEasycom } from "../../../../App.ku.js";
+Ôr@Ÿªassertions¤code´customTransformCache¬dependencies¢id¤meta±moduleSideEffects¬originalCode±originalSourcemap«resolvedIds®sourcemapChainµsyntheticNamedExportsµtransformDependencies®transformFiles¨cacheAstÔrAÚ%‘import { _ as __easycom_1 } from "../../../../uni_modules/z-paging-x/components/z-paging-x/z-paging-x.js";
 import { C as Card } from "../../basic/components/Card.js";
 import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
-const { defineComponent: _defineComponent } = globalThis.Vue;
+const { defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, createSharedDataTemplateRefSetter: _createSharedDataTemplateRefSetter, resolveComponent: _resolveComponent, setSharedDataEvent: _setSharedDataEvent, setSharedDataScoped: _setSharedDataScoped, createSharedDataVFor: _createSharedDataVFor, setSharedData: _setSharedData, toDisplayString: _toDisplayString, createSharedDataSelector: _createSharedDataSelector, renderSharedDataEffect: _renderSharedDataEffect, setSharedDataStyle: _setSharedDataStyle, createSharedDataFor: _createSharedDataFor, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, withSharedDataVaporCtx: _withSharedDataVaporCtx, createSharedDataComponent: _createSharedDataComponent } = globalThis.Vue;
+const __className = "GenSrcPagesFunctionComponentsZPagingDemoCard";
 const { ref } = globalThis.Vue;
 class CompactArticleItem extends UTS.UTSType {
   static get$UTSMetadata$() {
@@ -33,11 +34,15 @@ class CompactArticleItem extends UTS.UTSType {
     delete this.__props__;
   }
 }
-const _sfc_main = /* @__PURE__ */ _defineComponent({
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+  __dynamicSharedData: true,
+  __hash: "31c4c1a5",
+  __className,
+  __filename: "src/pages/function/components/ZPagingDemoCard.uvue",
   __name: "ZPagingDemoCard",
-  setup(__props, _a) {
-    var __expose = _a.expose;
-    __expose();
+  setup(__props) {
+    const __sharedDataScope = _useSharedDataScope();
+    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenSrcPagesFunctionComponentsZPagingDemoCardSharedData", sharedDataClassId: 0 })));
     const shouldFail = ref(false);
     const tabList = ["å…¨éƒ¨", "æŠ€æœ¯", "è®¾è®¡"];
     const tabIndex = ref(0);
@@ -109,158 +114,107 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
         }
       }, 600);
     }
-    const __returned__ = { shouldFail, tabList, tabIndex, pagingX, dataList, onUpdateModelValue, tabChange, triggerError, triggerClear, getMockArticles, onQuery, get Card() {
-      return Card;
-    } };
-    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
-    return __returned__;
+    return () => {
+      "raw js";
+      const _setTemplateRef = _createSharedDataTemplateRefSetter();
+      const _component_z_paging_x = __easycom_1;
+      const n26 = _createSharedDataComponent(
+        Card,
+        "4b4c5faa",
+        { title: "æ•°æ®åˆ†é¡µåˆ—è¡¨ (z-paging-x)" },
+        {
+          "default": _withSharedDataVaporCtx(() => {
+            _setSharedDataEvent(__sharedData, 4, triggerError);
+            _setSharedDataEvent(__sharedData, 5, triggerClear);
+            const _selector9_0 = _createSharedDataSelector(() => {
+              return tabIndex.value;
+            });
+            const _selector9_1 = _createSharedDataSelector(() => {
+              return tabIndex.value;
+            });
+            const n9 = _createSharedDataFor(_setSharedDataScoped(__sharedData, 3, _createSharedDataVFor(__sharedDataScope, () => {
+              return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 1 });
+            })), () => {
+              return tabList;
+            }, (__sharedData_VFor0, _for_item0, _for_key0) => {
+              _setSharedDataEvent(__sharedData_VFor0, 1, () => {
+                return tabChange(_for_key0.value);
+              });
+              _renderSharedDataEffect(() => {
+                return _setSharedData(__sharedData_VFor0, 4, _toDisplayString(_for_item0.value));
+              });
+              _selector9_0(_for_key0.value, () => {
+                _setSharedDataStyle(__sharedData_VFor0, 2, { backgroundColor: tabIndex.value === _for_key0.value ? "#ffffff" : "transparent" });
+              });
+              _selector9_1(_for_key0.value, () => {
+                _setSharedDataStyle(__sharedData_VFor0, 3, { color: tabIndex.value === _for_key0.value ? "var(--theme-color, #37c2bc)" : "#64748b" });
+              });
+              return null;
+            }, (__sharedData_VFor0, tab, index) => {
+              return _setSharedData(__sharedData_VFor0, 0, _toDisplayString(index));
+            }, 1);
+            n9.onReset(_selector9_0.reset);
+            n9.onReset(_selector9_1.reset);
+            const n25 = _createSharedDataComponentWithFallback(_component_z_paging_x, "e69f0eec", {
+              "list-is": "scroll-view",
+              "model-value": () => {
+                return dataList.value;
+              },
+              "default-page-size": 10,
+              "paging-style": { height: "200px", border: "1px solid #edf2f7", borderTopWidth: "0px", borderBottomLeftRadius: "12px", borderBottomRightRadius: "12px", backgroundColor: "#f8fafc" },
+              "onUpdate:modelValue": () => {
+                return onUpdateModelValue;
+              },
+              onQuery: () => {
+                return onQuery;
+              }
+            }, {
+              "default": () => {
+                _createSharedDataFor(_setSharedDataScoped(__sharedData, 2, _createSharedDataVFor(__sharedDataScope, () => {
+                  return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 2 });
+                })), () => {
+                  return dataList.value;
+                }, (__sharedData_VFor1, _for_item1) => {
+                  let _item;
+                  _renderSharedDataEffect(() => {
+                    _item = _for_item1.value;
+                    _setSharedDataStyle(__sharedData_VFor1, 1, { backgroundColor: _item.tagBgColor, padding: "1px 6px", borderRadius: "4px" });
+                    _setSharedDataStyle(__sharedData_VFor1, 2, { color: _item.tagColor, fontSize: "9px", fontWeight: "bold" });
+                    _setSharedData(__sharedData_VFor1, 3, _toDisplayString(_item.tag));
+                    _setSharedData(__sharedData_VFor1, 5, _toDisplayString(_item.title));
+                    _setSharedData(__sharedData_VFor1, 6, _toDisplayString(_item.summary));
+                  });
+                  _setSharedData(__sharedData_VFor1, 4, _toDisplayString(_item.id));
+                  return null;
+                }, (__sharedData_VFor1, item) => {
+                  return _setSharedData(__sharedData_VFor1, 0, _toDisplayString(item.id));
+                }, 32);
+              }
+            });
+            _setSharedData(__sharedData, 1, n25?.sharedData);
+            _setTemplateRef(n25, pagingX, null, "pagingX");
+          })
+        },
+        1
+        /* SINGLE_ROOT */
+      );
+      _setSharedData(__sharedData, 0, n26.sharedData);
+      return __sharedData;
+    };
   }
 });
-const _style_0 = {"wtu-363vo5-0":{"":{"flexDirection":"column"}},"wtu-1yjgjtw-1":{"":{"marginBottom":12}},"wtu-1shi4c1-2":{"":{"fontSize":13}},"wtu-k196jf-3":{"":{"color":"#64748b"}},"wtu-ipjkxr-4":{"":{"--tw-leading":"18px","lineHeight":"18px"}},"wtu-1qa8yup-5":{"":{"marginBottom":8}},"wtu-13t3cxb-6":{"":{"flexDirection":"row"}},"wtu-13lz6jk-7":{"":{"flexGrow":1,"flexShrink":1,"flexBasis":"0%"}},"wtu-dqdach-8":{"":{"marginRight":8}},"wtu-1q4uxtw-9":{"":{"width":"100%"}},"wtu-1wj5rfx-a":{"":{"height":36}},"wtu-118m6zx-b":{"":{"borderTopLeftRadius":8,"borderTopRightRadius":8,"borderBottomRightRadius":8,"borderBottomLeftRadius":8}},"wtu-11r5j79-c":{"":{"backgroundColor":"#fee2e2"}},"wtu-cab7ja-d":{"":{"display":"flex"}},"wtu-99t06f-e":{"":{"alignItems":"center"}},"wtu-1a6bk3r-f":{"":{"justifyContent":"center"}},"wtu-1q1c76l-g":{"":{"color":"#dc2626"}},"wtu-a0x5no-h":{"":{"fontSize":12}},"wtu-vbfg4k-i":{"":{"--tw-font-weight":"var(--font-weight-bold, 700)","fontWeight":700}},"wtu-1vy0ete-j":{"":{"backgroundColor":"#fef3c7"}},"wtu-12jt6bz-k":{"":{"color":"#d97706"}},"wtu-1vo8z52-l":{"":{"backgroundColor":"#ffffff"}},"wtu-1qagzpp-m":{"":{"paddingTop":8,"paddingBottom":8}},"wtu-unk8et-n":{"":{"paddingLeft":12,"paddingRight":12}},"wtu-1n43ppt-o":{"":{"--tw-border-style":"solid","borderTopStyle":"var(--tw-border-style)","borderRightStyle":"var(--tw-border-style)","borderBottomStyle":"var(--tw-border-style)","borderLeftStyle":"var(--tw-border-style)","borderTopWidth":1,"borderRightWidth":1,"borderBottomWidth":1,"borderLeftWidth":1}},"wtu-5jnqzp-p":{"":{"--tw-border-style":"solid","borderTopStyle":"solid","borderRightStyle":"solid","borderBottomStyle":"solid","borderLeftStyle":"solid"}},"wtu-1s5dir1-q":{"":{"borderTopColor":"#edf2f7","borderRightColor":"#edf2f7","borderBottomColor":"#edf2f7","borderLeftColor":"#edf2f7"}},"wtu-wquw4l-r":{"":{"--tw-border-style":"solid","borderBottomStyle":"var(--tw-border-style)","borderBottomWidth":0}},"wtu-9b5i85-s":{"":{"backgroundColor":"#f1f5f9"}},"wtu-mhanxm-t":{"":{"paddingTop":2,"paddingRight":2,"paddingBottom":2,"paddingLeft":2}},"wtu-1to6p8f-u":{"":{"paddingTop":6,"paddingBottom":6}},"wtu-5shwin-v":{"":{"borderTopLeftRadius":6,"borderTopRightRadius":6,"borderBottomRightRadius":6,"borderBottomLeftRadius":6}},"wtu-d1mip6-w":{"":{"marginLeft":12,"marginRight":12}},"wtu-1nrqtt4-x":{"":{"marginTop":8,"marginBottom":8}},"wtu-r4yzsb-y":{"":{"paddingTop":12,"paddingRight":12,"paddingBottom":12,"paddingLeft":12}},"wtu-1d8uwje-z":{"":{"justifyContent":"space-between"}},"wtu-1qnpy9n-10":{"":{"marginBottom":6}},"wtu-tfarvr-11":{"":{"fontSize":11}},"wtu-1oi0tuv-12":{"":{"color":"#94a3b8"}},"wtu-s0l2i6-13":{"":{"fontSize":14}},"wtu-fw3sss-14":{"":{"color":"#1e293b"}},"wtu-10ykoyt-15":{"":{"marginBottom":4}},"wtu-fbtvf1-16":{"":{"--tw-leading":"16px","lineHeight":"16px"}},"flex":{"":{"display":"flex"}}};
-const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
-const { createElementVNode: _createElementVNode, renderList: _renderList, Fragment: _Fragment, openBlock: _openBlock, createElementBlock: _createElementBlock, toDisplayString: _toDisplayString, normalizeStyle: _normalizeStyle, resolveComponent: _resolveComponent, withCtx: _withCtx, createVNode: _createVNode, createBlock: _createBlock } = globalThis.Vue;
-function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  const _component_z_paging_x = resolveEasycom(__resolveDynamicComponent("z-paging-x"), __easycom_1);
-  return _openBlock(), _createBlock($setup["Card"], { title: "æ•°æ®åˆ†é¡µåˆ—è¡¨ (z-paging-x)" }, {
-    default: _withCtx(() => [
-      _createElementVNode("view", { class: "wtu-363vo5-0 wtu-1yjgjtw-1" }, [
-        _createElementVNode("text", { class: "wtu-1shi4c1-2 wtu-k196jf-3 wtu-ipjkxr-4 wtu-1qa8yup-5" }, " åœ¨å¡ç‰‡ä¸­ç›´æ¥ä½“éªŒå®æ—¶åˆ†é¡µï¼Œæ”¯æŒè§¦åº•åŠ è½½ã€ä¸‹æ‹‰åˆ·æ–°ä»¥åŠå„ç§çŠ¶æ€åˆ‡æ¢ã€‚ "),
-        _createElementVNode("view", { class: "wtu-13t3cxb-6 wtu-1yjgjtw-1" }, [
-          _createElementVNode("view", { class: "wtu-13lz6jk-7 wtu-dqdach-8" }, [
-            _createElementVNode("view", {
-              class: "wtu-1q4uxtw-9 wtu-1wj5rfx-a wtu-118m6zx-b wtu-11r5j79-c wtu-cab7ja-d wtu-13t3cxb-6 wtu-99t06f-e wtu-1a6bk3r-f",
-              onClick: $setup.triggerError
-            }, [
-              _createElementVNode("text", { class: "wtu-1q1c76l-g wtu-a0x5no-h wtu-vbfg4k-i" }, "æ¨¡æ‹ŸåŠ è½½é”™è¯¯")
-            ])
-          ]),
-          _createElementVNode("view", { class: "wtu-13lz6jk-7" }, [
-            _createElementVNode("view", {
-              class: "wtu-1q4uxtw-9 wtu-1wj5rfx-a wtu-118m6zx-b wtu-1vy0ete-j wtu-cab7ja-d wtu-13t3cxb-6 wtu-99t06f-e wtu-1a6bk3r-f",
-              onClick: $setup.triggerClear
-            }, [
-              _createElementVNode("text", { class: "wtu-12jt6bz-k wtu-a0x5no-h wtu-vbfg4k-i" }, "æ¸…ç©ºæ•°æ®")
-            ])
-          ])
-        ])
-      ]),
-      _createElementVNode("view", {
-        class: "wtu-1vo8z52-l wtu-1qagzpp-m wtu-unk8et-n wtu-1n43ppt-o wtu-5jnqzp-p wtu-1s5dir1-q wtu-wquw4l-r",
-        style: { "border-top-left-radius": "12px", "border-top-right-radius": "12px" }
-      }, [
-        _createElementVNode("view", { class: "wtu-13t3cxb-6 wtu-9b5i85-s wtu-118m6zx-b wtu-mhanxm-t" }, [
-          (_openBlock(), _createElementBlock(
-            _Fragment,
-            null,
-            _renderList($setup.tabList, (tab, index) => {
-              return _createElementVNode("view", {
-                key: index,
-                class: "wtu-13lz6jk-7 wtu-99t06f-e wtu-1a6bk3r-f wtu-1to6p8f-u wtu-5shwin-v",
-                style: _normalizeStyle({ backgroundColor: $setup.tabIndex === index ? "#ffffff" : "transparent" }),
-                onClick: ($event) => $setup.tabChange(index)
-              }, [
-                _createElementVNode(
-                  "text",
-                  {
-                    class: "wtu-a0x5no-h wtu-vbfg4k-i",
-                    style: _normalizeStyle({ color: $setup.tabIndex === index ? "var(--theme-color, #37c2bc)" : "#64748b" })
-                  },
-                  _toDisplayString(tab),
-                  5
-                  /* TEXT, STYLE */
-                )
-              ], 12, ["onClick"]);
-            }),
-            64
-            /* STABLE_FRAGMENT */
-          ))
-        ])
-      ]),
-      _createVNode(_component_z_paging_x, {
-        ref: "pagingX",
-        "list-is": "scroll-view",
-        "model-value": $setup.dataList,
-        "default-page-size": 10,
-        "paging-style": { height: "200px", border: "1px solid #edf2f7", borderTopWidth: "0px", borderBottomLeftRadius: "12px", borderBottomRightRadius: "12px", backgroundColor: "#f8fafc" },
-        "onUpdate:modelValue": $setup.onUpdateModelValue,
-        onQuery: $setup.onQuery
-      }, {
-        default: _withCtx(() => [
-          (_openBlock(true), _createElementBlock(
-            _Fragment,
-            null,
-            _renderList($setup.dataList, (item) => {
-              return _openBlock(), _createElementBlock("view", {
-                key: item.id
-              }, [
-                _createElementVNode("view", { class: "wtu-d1mip6-w wtu-1nrqtt4-x wtu-r4yzsb-y wtu-1vo8z52-l wtu-118m6zx-b wtu-1n43ppt-o wtu-5jnqzp-p wtu-1s5dir1-q" }, [
-                  _createElementVNode("view", { class: "wtu-13t3cxb-6 wtu-1d8uwje-z wtu-99t06f-e wtu-1qnpy9n-10" }, [
-                    _createElementVNode(
-                      "view",
-                      {
-                        style: _normalizeStyle({ backgroundColor: item.tagBgColor, padding: "1px 6px", borderRadius: "4px" })
-                      },
-                      [
-                        _createElementVNode(
-                          "text",
-                          {
-                            style: _normalizeStyle({ color: item.tagColor, fontSize: "9px", fontWeight: "bold" })
-                          },
-                          _toDisplayString(item.tag),
-                          5
-                          /* TEXT, STYLE */
-                        )
-                      ],
-                      4
-                      /* STYLE */
-                    ),
-                    _createElementVNode(
-                      "text",
-                      { class: "wtu-tfarvr-11 wtu-1oi0tuv-12" },
-                      "#" + _toDisplayString(item.id),
-                      1
-                      /* TEXT */
-                    )
-                  ]),
-                  _createElementVNode(
-                    "text",
-                    { class: "wtu-s0l2i6-13 wtu-vbfg4k-i wtu-fw3sss-14 wtu-10ykoyt-15" },
-                    _toDisplayString(item.title),
-                    1
-                    /* TEXT */
-                  ),
-                  _createElementVNode(
-                    "text",
-                    { class: "wtu-a0x5no-h wtu-k196jf-3 wtu-fbtvf1-16" },
-                    _toDisplayString(item.summary),
-                    1
-                    /* TEXT */
-                  )
-                ])
-              ]);
-            }),
-            128
-            /* KEYED_FRAGMENT */
-          ))
-        ]),
-        _: 1
-        /* STABLE */
-      }, 8, ["model-value"])
-    ]),
-    _: 1
-    /* STABLE */
-  });
-}
-const ZPagingDemoCard = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/pages/function/components/ZPagingDemoCard.uvue"]]);
+const _style_0 = {};
+const ZPagingDemoCard = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
 export {
   ZPagingDemoCard as Z
 };
 //# sourceMappingURL=ZPagingDemoCard.js.map
-Â”ÙÑ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/z-paging-x/components/z-paging-x/z-paging-x.jsÙ /Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/App.ku.jsÙ¹/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/pages/basic/components/Card.jsÙ²/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper.jsÙÇ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/pages/function/components/ZPagingDemoCard.jsÔrB›ªmoduleName±isLocalDependency¯isNodeEntryFile§pkgPath±belongProjectPath§pkgNameªpkgVersion±dependencyPkgInfo°belongModulePath¨commonjs¯hostModulesInfo¥entryÃÂÙR/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entryÙL/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony¥entry¥1.0.0Ô  ÙR/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entryÔrC’¯hasNamedExportsªisCommonJSÃÂ‘ÔrD’²hostDependencyName®hostModuleName¿./components/ZPagingDemoCard.js¥entryÃÚ4Æimport { _ as __easycom_1 } from "../../../../uni_modules/z-paging-x/components/z-paging-x/z-paging-x.js";
-import { r as resolveEasycom } from "../../../../App.ku.js";
+Â“ÙÑ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/z-paging-x/components/z-paging-x/z-paging-x.jsÙ¹/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/pages/basic/components/Card.jsÙ²/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper.jsÙÇ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/pages/function/components/ZPagingDemoCard.jsÔrB›ªmoduleName±isLocalDependency¯isNodeEntryFile§pkgPath±belongProjectPath§pkgNameªpkgVersion±dependencyPkgInfo°belongModulePath¨commonjs¯hostModulesInfo¥entryÃÂÙR/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entryÙL/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony¥entry¥1.0.0Ô  ÙR/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entryÔrC’¯hasNamedExportsªisCommonJSÃÂ‘ÔrD’²hostDependencyName®hostModuleName¿./components/ZPagingDemoCard.js¥entryÃÚ%‘import { _ as __easycom_1 } from "../../../../uni_modules/z-paging-x/components/z-paging-x/z-paging-x.js";
 import { C as Card } from "../../basic/components/Card.js";
 import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
-const { defineComponent: _defineComponent } = globalThis.Vue;
+const { defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, createSharedDataTemplateRefSetter: _createSharedDataTemplateRefSetter, resolveComponent: _resolveComponent, setSharedDataEvent: _setSharedDataEvent, setSharedDataScoped: _setSharedDataScoped, createSharedDataVFor: _createSharedDataVFor, setSharedData: _setSharedData, toDisplayString: _toDisplayString, createSharedDataSelector: _createSharedDataSelector, renderSharedDataEffect: _renderSharedDataEffect, setSharedDataStyle: _setSharedDataStyle, createSharedDataFor: _createSharedDataFor, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, withSharedDataVaporCtx: _withSharedDataVaporCtx, createSharedDataComponent: _createSharedDataComponent } = globalThis.Vue;
+const __className = "GenSrcPagesFunctionComponentsZPagingDemoCard";
 const { ref } = globalThis.Vue;
 class CompactArticleItem extends UTS.UTSType {
   static get$UTSMetadata$() {
@@ -291,11 +245,15 @@ class CompactArticleItem extends UTS.UTSType {
     delete this.__props__;
   }
 }
-const _sfc_main = /* @__PURE__ */ _defineComponent({
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+  __dynamicSharedData: true,
+  __hash: "31c4c1a5",
+  __className,
+  __filename: "src/pages/function/components/ZPagingDemoCard.uvue",
   __name: "ZPagingDemoCard",
-  setup(__props, _a) {
-    var __expose = _a.expose;
-    __expose();
+  setup(__props) {
+    const __sharedDataScope = _useSharedDataScope();
+    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenSrcPagesFunctionComponentsZPagingDemoCardSharedData", sharedDataClassId: 0 })));
     const shouldFail = ref(false);
     const tabList = ["å…¨éƒ¨", "æŠ€æœ¯", "è®¾è®¡"];
     const tabIndex = ref(0);
@@ -367,159 +325,108 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
         }
       }, 600);
     }
-    const __returned__ = { shouldFail, tabList, tabIndex, pagingX, dataList, onUpdateModelValue, tabChange, triggerError, triggerClear, getMockArticles, onQuery, get Card() {
-      return Card;
-    } };
-    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
-    return __returned__;
+    return () => {
+      "raw js";
+      const _setTemplateRef = _createSharedDataTemplateRefSetter();
+      const _component_z_paging_x = __easycom_1;
+      const n26 = _createSharedDataComponent(
+        Card,
+        "4b4c5faa",
+        { title: "æ•°æ®åˆ†é¡µåˆ—è¡¨ (z-paging-x)" },
+        {
+          "default": _withSharedDataVaporCtx(() => {
+            _setSharedDataEvent(__sharedData, 4, triggerError);
+            _setSharedDataEvent(__sharedData, 5, triggerClear);
+            const _selector9_0 = _createSharedDataSelector(() => {
+              return tabIndex.value;
+            });
+            const _selector9_1 = _createSharedDataSelector(() => {
+              return tabIndex.value;
+            });
+            const n9 = _createSharedDataFor(_setSharedDataScoped(__sharedData, 3, _createSharedDataVFor(__sharedDataScope, () => {
+              return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 1 });
+            })), () => {
+              return tabList;
+            }, (__sharedData_VFor0, _for_item0, _for_key0) => {
+              _setSharedDataEvent(__sharedData_VFor0, 1, () => {
+                return tabChange(_for_key0.value);
+              });
+              _renderSharedDataEffect(() => {
+                return _setSharedData(__sharedData_VFor0, 4, _toDisplayString(_for_item0.value));
+              });
+              _selector9_0(_for_key0.value, () => {
+                _setSharedDataStyle(__sharedData_VFor0, 2, { backgroundColor: tabIndex.value === _for_key0.value ? "#ffffff" : "transparent" });
+              });
+              _selector9_1(_for_key0.value, () => {
+                _setSharedDataStyle(__sharedData_VFor0, 3, { color: tabIndex.value === _for_key0.value ? "var(--theme-color, #37c2bc)" : "#64748b" });
+              });
+              return null;
+            }, (__sharedData_VFor0, tab, index) => {
+              return _setSharedData(__sharedData_VFor0, 0, _toDisplayString(index));
+            }, 1);
+            n9.onReset(_selector9_0.reset);
+            n9.onReset(_selector9_1.reset);
+            const n25 = _createSharedDataComponentWithFallback(_component_z_paging_x, "e69f0eec", {
+              "list-is": "scroll-view",
+              "model-value": () => {
+                return dataList.value;
+              },
+              "default-page-size": 10,
+              "paging-style": { height: "200px", border: "1px solid #edf2f7", borderTopWidth: "0px", borderBottomLeftRadius: "12px", borderBottomRightRadius: "12px", backgroundColor: "#f8fafc" },
+              "onUpdate:modelValue": () => {
+                return onUpdateModelValue;
+              },
+              onQuery: () => {
+                return onQuery;
+              }
+            }, {
+              "default": () => {
+                _createSharedDataFor(_setSharedDataScoped(__sharedData, 2, _createSharedDataVFor(__sharedDataScope, () => {
+                  return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 2 });
+                })), () => {
+                  return dataList.value;
+                }, (__sharedData_VFor1, _for_item1) => {
+                  let _item;
+                  _renderSharedDataEffect(() => {
+                    _item = _for_item1.value;
+                    _setSharedDataStyle(__sharedData_VFor1, 1, { backgroundColor: _item.tagBgColor, padding: "1px 6px", borderRadius: "4px" });
+                    _setSharedDataStyle(__sharedData_VFor1, 2, { color: _item.tagColor, fontSize: "9px", fontWeight: "bold" });
+                    _setSharedData(__sharedData_VFor1, 3, _toDisplayString(_item.tag));
+                    _setSharedData(__sharedData_VFor1, 5, _toDisplayString(_item.title));
+                    _setSharedData(__sharedData_VFor1, 6, _toDisplayString(_item.summary));
+                  });
+                  _setSharedData(__sharedData_VFor1, 4, _toDisplayString(_item.id));
+                  return null;
+                }, (__sharedData_VFor1, item) => {
+                  return _setSharedData(__sharedData_VFor1, 0, _toDisplayString(item.id));
+                }, 32);
+              }
+            });
+            _setSharedData(__sharedData, 1, n25?.sharedData);
+            _setTemplateRef(n25, pagingX, null, "pagingX");
+          })
+        },
+        1
+        /* SINGLE_ROOT */
+      );
+      _setSharedData(__sharedData, 0, n26.sharedData);
+      return __sharedData;
+    };
   }
 });
-const _style_0 = {"wtu-363vo5-0":{"":{"flexDirection":"column"}},"wtu-1yjgjtw-1":{"":{"marginBottom":12}},"wtu-1shi4c1-2":{"":{"fontSize":13}},"wtu-k196jf-3":{"":{"color":"#64748b"}},"wtu-ipjkxr-4":{"":{"--tw-leading":"18px","lineHeight":"18px"}},"wtu-1qa8yup-5":{"":{"marginBottom":8}},"wtu-13t3cxb-6":{"":{"flexDirection":"row"}},"wtu-13lz6jk-7":{"":{"flexGrow":1,"flexShrink":1,"flexBasis":"0%"}},"wtu-dqdach-8":{"":{"marginRight":8}},"wtu-1q4uxtw-9":{"":{"width":"100%"}},"wtu-1wj5rfx-a":{"":{"height":36}},"wtu-118m6zx-b":{"":{"borderTopLeftRadius":8,"borderTopRightRadius":8,"borderBottomRightRadius":8,"borderBottomLeftRadius":8}},"wtu-11r5j79-c":{"":{"backgroundColor":"#fee2e2"}},"wtu-cab7ja-d":{"":{"display":"flex"}},"wtu-99t06f-e":{"":{"alignItems":"center"}},"wtu-1a6bk3r-f":{"":{"justifyContent":"center"}},"wtu-1q1c76l-g":{"":{"color":"#dc2626"}},"wtu-a0x5no-h":{"":{"fontSize":12}},"wtu-vbfg4k-i":{"":{"--tw-font-weight":"var(--font-weight-bold, 700)","fontWeight":700}},"wtu-1vy0ete-j":{"":{"backgroundColor":"#fef3c7"}},"wtu-12jt6bz-k":{"":{"color":"#d97706"}},"wtu-1vo8z52-l":{"":{"backgroundColor":"#ffffff"}},"wtu-1qagzpp-m":{"":{"paddingTop":8,"paddingBottom":8}},"wtu-unk8et-n":{"":{"paddingLeft":12,"paddingRight":12}},"wtu-1n43ppt-o":{"":{"--tw-border-style":"solid","borderTopStyle":"var(--tw-border-style)","borderRightStyle":"var(--tw-border-style)","borderBottomStyle":"var(--tw-border-style)","borderLeftStyle":"var(--tw-border-style)","borderTopWidth":1,"borderRightWidth":1,"borderBottomWidth":1,"borderLeftWidth":1}},"wtu-5jnqzp-p":{"":{"--tw-border-style":"solid","borderTopStyle":"solid","borderRightStyle":"solid","borderBottomStyle":"solid","borderLeftStyle":"solid"}},"wtu-1s5dir1-q":{"":{"borderTopColor":"#edf2f7","borderRightColor":"#edf2f7","borderBottomColor":"#edf2f7","borderLeftColor":"#edf2f7"}},"wtu-wquw4l-r":{"":{"--tw-border-style":"solid","borderBottomStyle":"var(--tw-border-style)","borderBottomWidth":0}},"wtu-9b5i85-s":{"":{"backgroundColor":"#f1f5f9"}},"wtu-mhanxm-t":{"":{"paddingTop":2,"paddingRight":2,"paddingBottom":2,"paddingLeft":2}},"wtu-1to6p8f-u":{"":{"paddingTop":6,"paddingBottom":6}},"wtu-5shwin-v":{"":{"borderTopLeftRadius":6,"borderTopRightRadius":6,"borderBottomRightRadius":6,"borderBottomLeftRadius":6}},"wtu-d1mip6-w":{"":{"marginLeft":12,"marginRight":12}},"wtu-1nrqtt4-x":{"":{"marginTop":8,"marginBottom":8}},"wtu-r4yzsb-y":{"":{"paddingTop":12,"paddingRight":12,"paddingBottom":12,"paddingLeft":12}},"wtu-1d8uwje-z":{"":{"justifyContent":"space-between"}},"wtu-1qnpy9n-10":{"":{"marginBottom":6}},"wtu-tfarvr-11":{"":{"fontSize":11}},"wtu-1oi0tuv-12":{"":{"color":"#94a3b8"}},"wtu-s0l2i6-13":{"":{"fontSize":14}},"wtu-fw3sss-14":{"":{"color":"#1e293b"}},"wtu-10ykoyt-15":{"":{"marginBottom":4}},"wtu-fbtvf1-16":{"":{"--tw-leading":"16px","lineHeight":"16px"}},"flex":{"":{"display":"flex"}}};
-const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
-const { createElementVNode: _createElementVNode, renderList: _renderList, Fragment: _Fragment, openBlock: _openBlock, createElementBlock: _createElementBlock, toDisplayString: _toDisplayString, normalizeStyle: _normalizeStyle, resolveComponent: _resolveComponent, withCtx: _withCtx, createVNode: _createVNode, createBlock: _createBlock } = globalThis.Vue;
-function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  const _component_z_paging_x = resolveEasycom(__resolveDynamicComponent("z-paging-x"), __easycom_1);
-  return _openBlock(), _createBlock($setup["Card"], { title: "æ•°æ®åˆ†é¡µåˆ—è¡¨ (z-paging-x)" }, {
-    default: _withCtx(() => [
-      _createElementVNode("view", { class: "wtu-363vo5-0 wtu-1yjgjtw-1" }, [
-        _createElementVNode("text", { class: "wtu-1shi4c1-2 wtu-k196jf-3 wtu-ipjkxr-4 wtu-1qa8yup-5" }, " åœ¨å¡ç‰‡ä¸­ç›´æ¥ä½“éªŒå®æ—¶åˆ†é¡µï¼Œæ”¯æŒè§¦åº•åŠ è½½ã€ä¸‹æ‹‰åˆ·æ–°ä»¥åŠå„ç§çŠ¶æ€åˆ‡æ¢ã€‚ "),
-        _createElementVNode("view", { class: "wtu-13t3cxb-6 wtu-1yjgjtw-1" }, [
-          _createElementVNode("view", { class: "wtu-13lz6jk-7 wtu-dqdach-8" }, [
-            _createElementVNode("view", {
-              class: "wtu-1q4uxtw-9 wtu-1wj5rfx-a wtu-118m6zx-b wtu-11r5j79-c wtu-cab7ja-d wtu-13t3cxb-6 wtu-99t06f-e wtu-1a6bk3r-f",
-              onClick: $setup.triggerError
-            }, [
-              _createElementVNode("text", { class: "wtu-1q1c76l-g wtu-a0x5no-h wtu-vbfg4k-i" }, "æ¨¡æ‹ŸåŠ è½½é”™è¯¯")
-            ])
-          ]),
-          _createElementVNode("view", { class: "wtu-13lz6jk-7" }, [
-            _createElementVNode("view", {
-              class: "wtu-1q4uxtw-9 wtu-1wj5rfx-a wtu-118m6zx-b wtu-1vy0ete-j wtu-cab7ja-d wtu-13t3cxb-6 wtu-99t06f-e wtu-1a6bk3r-f",
-              onClick: $setup.triggerClear
-            }, [
-              _createElementVNode("text", { class: "wtu-12jt6bz-k wtu-a0x5no-h wtu-vbfg4k-i" }, "æ¸…ç©ºæ•°æ®")
-            ])
-          ])
-        ])
-      ]),
-      _createElementVNode("view", {
-        class: "wtu-1vo8z52-l wtu-1qagzpp-m wtu-unk8et-n wtu-1n43ppt-o wtu-5jnqzp-p wtu-1s5dir1-q wtu-wquw4l-r",
-        style: { "border-top-left-radius": "12px", "border-top-right-radius": "12px" }
-      }, [
-        _createElementVNode("view", { class: "wtu-13t3cxb-6 wtu-9b5i85-s wtu-118m6zx-b wtu-mhanxm-t" }, [
-          (_openBlock(), _createElementBlock(
-            _Fragment,
-            null,
-            _renderList($setup.tabList, (tab, index) => {
-              return _createElementVNode("view", {
-                key: index,
-                class: "wtu-13lz6jk-7 wtu-99t06f-e wtu-1a6bk3r-f wtu-1to6p8f-u wtu-5shwin-v",
-                style: _normalizeStyle({ backgroundColor: $setup.tabIndex === index ? "#ffffff" : "transparent" }),
-                onClick: ($event) => $setup.tabChange(index)
-              }, [
-                _createElementVNode(
-                  "text",
-                  {
-                    class: "wtu-a0x5no-h wtu-vbfg4k-i",
-                    style: _normalizeStyle({ color: $setup.tabIndex === index ? "var(--theme-color, #37c2bc)" : "#64748b" })
-                  },
-                  _toDisplayString(tab),
-                  5
-                  /* TEXT, STYLE */
-                )
-              ], 12, ["onClick"]);
-            }),
-            64
-            /* STABLE_FRAGMENT */
-          ))
-        ])
-      ]),
-      _createVNode(_component_z_paging_x, {
-        ref: "pagingX",
-        "list-is": "scroll-view",
-        "model-value": $setup.dataList,
-        "default-page-size": 10,
-        "paging-style": { height: "200px", border: "1px solid #edf2f7", borderTopWidth: "0px", borderBottomLeftRadius: "12px", borderBottomRightRadius: "12px", backgroundColor: "#f8fafc" },
-        "onUpdate:modelValue": $setup.onUpdateModelValue,
-        onQuery: $setup.onQuery
-      }, {
-        default: _withCtx(() => [
-          (_openBlock(true), _createElementBlock(
-            _Fragment,
-            null,
-            _renderList($setup.dataList, (item) => {
-              return _openBlock(), _createElementBlock("view", {
-                key: item.id
-              }, [
-                _createElementVNode("view", { class: "wtu-d1mip6-w wtu-1nrqtt4-x wtu-r4yzsb-y wtu-1vo8z52-l wtu-118m6zx-b wtu-1n43ppt-o wtu-5jnqzp-p wtu-1s5dir1-q" }, [
-                  _createElementVNode("view", { class: "wtu-13t3cxb-6 wtu-1d8uwje-z wtu-99t06f-e wtu-1qnpy9n-10" }, [
-                    _createElementVNode(
-                      "view",
-                      {
-                        style: _normalizeStyle({ backgroundColor: item.tagBgColor, padding: "1px 6px", borderRadius: "4px" })
-                      },
-                      [
-                        _createElementVNode(
-                          "text",
-                          {
-                            style: _normalizeStyle({ color: item.tagColor, fontSize: "9px", fontWeight: "bold" })
-                          },
-                          _toDisplayString(item.tag),
-                          5
-                          /* TEXT, STYLE */
-                        )
-                      ],
-                      4
-                      /* STYLE */
-                    ),
-                    _createElementVNode(
-                      "text",
-                      { class: "wtu-tfarvr-11 wtu-1oi0tuv-12" },
-                      "#" + _toDisplayString(item.id),
-                      1
-                      /* TEXT */
-                    )
-                  ]),
-                  _createElementVNode(
-                    "text",
-                    { class: "wtu-s0l2i6-13 wtu-vbfg4k-i wtu-fw3sss-14 wtu-10ykoyt-15" },
-                    _toDisplayString(item.title),
-                    1
-                    /* TEXT */
-                  ),
-                  _createElementVNode(
-                    "text",
-                    { class: "wtu-a0x5no-h wtu-k196jf-3 wtu-fbtvf1-16" },
-                    _toDisplayString(item.summary),
-                    1
-                    /* TEXT */
-                  )
-                ])
-              ]);
-            }),
-            128
-            /* KEYED_FRAGMENT */
-          ))
-        ]),
-        _: 1
-        /* STABLE */
-      }, 8, ["model-value"])
-    ]),
-    _: 1
-    /* STABLE */
-  });
-}
-const ZPagingDemoCard = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/pages/function/components/ZPagingDemoCard.uvue"]]);
+const _style_0 = {};
+const ZPagingDemoCard = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
 export {
   ZPagingDemoCard as Z
 };
 //# sourceMappingURL=ZPagingDemoCard.js.map
-ÔrE•§version¨mappings¥names§sources®sourcesContentÜ‘”    ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”  	 ‘”  
- ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”    ‘”  ! ‘”  " ‘”  # ‘”  $ ‘”  % ‘”  & ‘”  ' ‘”  ( ‘”  ) ‘”  * ‘”  + ‘”  , ‘”  - ‘”  . ‘”  / ‘”  0 ‘”  1 ‘”  2 ‘”  3 ‘”  4 ‘”  5 ‘”  6 ‘”  7 ‘”  8 ‘”  9 ‘”  : ‘”  ; ‘”  < ‘”  = ‘”  > ‘”  ? ‘”  Ì@ ‘”  ÌA ‘”  ÌB ‘”  ÌC ‘”  ÌD ‘”  ÌE ‘”  ÌF ‘”  ÌG ‘”  ÌH ‘”  ÌI ‘”  ÌJ ‘”  ÌK ‘”  ÌL ‘”  ÌM ‘”  ÌN ‘”  ÌO ‘”  ÌP ‘”  ÌQ ‘”  ÌR ‘”  ÌS ‘”  ÌT ‘”  ÌU ‘”  ÌV ‘”  ÌW ‘”  ÌX ‘”  ÌY ‘”  ÌZ ‘”  Ì[ ‘”  Ì\ ‘”  Ì] ‘”  Ì^ ‘”  Ì_ ‘”  Ì` ‘”  Ìa ‘”  Ìb ‘”  Ìc ‘”  Ìd ‘”  Ìe ‘”  Ìf ‘”  Ìg ‘”  Ìh ‘”  Ìi ‘”  Ìj ‘”  Ìk ‘”  Ìl ‘”  Ìm ‘”  Ìn ‘”  Ìo ‘”  Ìp ‘”  Ìq ‘”  Ìr ‘”  Ìs ‘”  Ìt ‘”  Ìu ‘”  Ìv ‘”  Ìw ‘”  Ìx ‘”  Ìy ‘”  Ìz ‘”  Ì{ ‘”  Ì| ‘”  Ì} ‘”  Ì~ ‘”  Ì ‘”  Ì€ ‘”  Ì ‘”  Ì‚ ‘”  Ìƒ ‘”  Ì„ ‘”  Ì… ‘”  Ì† ‘”  Ì‡ ‘”  Ìˆ ‘”  Ì‰ ‘”  ÌŠ ‘”  Ì‹ ‘”  ÌŒ ‘”  Ì ‘”  Ì ‘”  Ì ‘”  Ì ‘”  Ì‘ ‘”  Ì’ ‘”  Ì“ ‘”  Ì” ‘”  Ì• ‘”  Ì– ‘”  Ì— ‘”  Ì˜ ‘”  Ì™ ‘”  Ìš ‘”  Ì› ‘”  Ìœ ‘”  Ì ‘”  Ì ‘”  ÌŸ ‘”  Ì  ‘”  Ì¡ ‘”  Ì¢ ‘”  Ì£ ‘”  Ì¤ ‘”  Ì¥ ‘”  Ì¦ ‘”  Ì§ ‘”  Ì¨ ‘”  Ì© ‘”  Ìª ‘”  Ì« ‘”  Ì¬ ‘”  Ì­ ‘”  Ì® ‘”  Ì¯ ‘”  Ì° ‘”  Ì± ‘”  Ì² ‘”  Ì³ ‘”  Ì´ ‘”  Ìµ ‘”  Ì¶ ‘”  Ì· ‘”  Ì¸ ‘”  Ì¹ ‘”  Ìº ‘”  Ì» ‘”  Ì¼ ‘”  Ì½ ‘”  Ì¾ ‘”  Ì¿ ‘”  ÌÀ ‘”  ÌÁ ‘”  ÌÂ ‘”  ÌÃ ‘”  ÌÄ ‘”  ÌÅ ‘”  ÌÆ ‘”  ÌÇ ‘”  ÌÈ ‘”  ÌÉ ‘”  ÌÊ ‘”  ÌË ‘”  ÌÌ ‘”  ÌÍ ‘”  ÌÎ ‘”  ÌÏ ‘”  ÌĞ ‘”  ÌÑ ‘”  ÌÒ ‘”  ÌÓ ‘”  ÌÔ ‘”  ÌÕ ‘”  ÌÖ ‘”  Ì× ‘”  ÌØ ‘”  ÌÙ ‘”  ÌÚ ‘”  ÌÛ ‘”  ÌÜ ‘”  Ìİ ‘”  ÌŞ ‘”  Ìß ‘”  Ìà ‘”  Ìá ‘”  Ìâ ‘”  Ìã ‘”  Ìä ‘”  Ìå ‘”  Ìæ ‘”  Ìç ‘”  Ìè ‘”  Ìé ‘”  Ìê ‘”  Ìë ‘”  Ìì ‘”  Ìí ‘”  Ìî ‘”  Ìï ‘”  Ìğ ‘”  Ìñ ‘”  Ìò ‘”  Ìó ‘”  Ìô ‘”  Ìõ ‘”  Ìö ‘”  Ì÷ ‘”  Ìø ‘”  Ìù ‘”  Ìú ‘”  Ìû ‘”  Ìü ‘”  Ìı ‘”  Ìş ‘”  Ìÿ ‘”  Í  ‘”  Í ‘ÙÇ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/pages/function/components/ZPagingDemoCard.js‘Ú4Æimport { _ as __easycom_1 } from "../../../../uni_modules/z-paging-x/components/z-paging-x/z-paging-x.js";
-import { r as resolveEasycom } from "../../../../App.ku.js";
+ÔrE•§version¨mappings¥names§sources®sourcesContentÜ Ô‘”    ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”  	 ‘”  
+ ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”    ‘”  ! ‘”  " ‘”  # ‘”  $ ‘”  % ‘”  & ‘”  ' ‘”  ( ‘”  ) ‘”  * ‘”  + ‘”  , ‘”  - ‘”  . ‘”  / ‘”  0 ‘”  1 ‘”  2 ‘”  3 ‘”  4 ‘”  5 ‘”  6 ‘”  7 ‘”  8 ‘”  9 ‘”  : ‘”  ; ‘”  < ‘”  = ‘”  > ‘”  ? ‘”  Ì@ ‘”  ÌA ‘”  ÌB ‘”  ÌC ‘”  ÌD ‘”  ÌE ‘”  ÌF ‘”  ÌG ‘”  ÌH ‘”  ÌI ‘”  ÌJ ‘”  ÌK ‘”  ÌL ‘”  ÌM ‘”  ÌN ‘”  ÌO ‘”  ÌP ‘”  ÌQ ‘”  ÌR ‘”  ÌS ‘”  ÌT ‘”  ÌU ‘”  ÌV ‘”  ÌW ‘”  ÌX ‘”  ÌY ‘”  ÌZ ‘”  Ì[ ‘”  Ì\ ‘”  Ì] ‘”  Ì^ ‘”  Ì_ ‘”  Ì` ‘”  Ìa ‘”  Ìb ‘”  Ìc ‘”  Ìd ‘”  Ìe ‘”  Ìf ‘”  Ìg ‘”  Ìh ‘”  Ìi ‘”  Ìj ‘”  Ìk ‘”  Ìl ‘”  Ìm ‘”  Ìn ‘”  Ìo ‘”  Ìp ‘”  Ìq ‘”  Ìr ‘”  Ìs ‘”  Ìt ‘”  Ìu ‘”  Ìv ‘”  Ìw ‘”  Ìx ‘”  Ìy ‘”  Ìz ‘”  Ì{ ‘”  Ì| ‘”  Ì} ‘”  Ì~ ‘”  Ì ‘”  Ì€ ‘”  Ì ‘”  Ì‚ ‘”  Ìƒ ‘”  Ì„ ‘”  Ì… ‘”  Ì† ‘”  Ì‡ ‘”  Ìˆ ‘”  Ì‰ ‘”  ÌŠ ‘”  Ì‹ ‘”  ÌŒ ‘”  Ì ‘”  Ì ‘”  Ì ‘”  Ì ‘”  Ì‘ ‘”  Ì’ ‘”  Ì“ ‘”  Ì” ‘”  Ì• ‘”  Ì– ‘”  Ì— ‘”  Ì˜ ‘”  Ì™ ‘”  Ìš ‘”  Ì› ‘”  Ìœ ‘”  Ì ‘”  Ì ‘”  ÌŸ ‘”  Ì  ‘”  Ì¡ ‘”  Ì¢ ‘”  Ì£ ‘”  Ì¤ ‘”  Ì¥ ‘”  Ì¦ ‘”  Ì§ ‘”  Ì¨ ‘”  Ì© ‘”  Ìª ‘”  Ì« ‘”  Ì¬ ‘”  Ì­ ‘”  Ì® ‘”  Ì¯ ‘”  Ì° ‘”  Ì± ‘”  Ì² ‘”  Ì³ ‘”  Ì´ ‘”  Ìµ ‘”  Ì¶ ‘”  Ì· ‘”  Ì¸ ‘”  Ì¹ ‘”  Ìº ‘”  Ì» ‘”  Ì¼ ‘”  Ì½ ‘”  Ì¾ ‘”  Ì¿ ‘”  ÌÀ ‘”  ÌÁ ‘”  ÌÂ ‘”  ÌÃ ‘”  ÌÄ ‘”  ÌÅ ‘”  ÌÆ ‘”  ÌÇ ‘”  ÌÈ ‘”  ÌÉ ‘”  ÌÊ ‘”  ÌË ‘”  ÌÌ ‘”  ÌÍ ‘”  ÌÎ ‘”  ÌÏ ‘”  ÌĞ ‘”  ÌÑ ‘”  ÌÒ ‘ÙÇ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/pages/function/components/ZPagingDemoCard.js‘Ú%‘import { _ as __easycom_1 } from "../../../../uni_modules/z-paging-x/components/z-paging-x/z-paging-x.js";
 import { C as Card } from "../../basic/components/Card.js";
 import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
-const { defineComponent: _defineComponent } = globalThis.Vue;
+const { defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, createSharedDataTemplateRefSetter: _createSharedDataTemplateRefSetter, resolveComponent: _resolveComponent, setSharedDataEvent: _setSharedDataEvent, setSharedDataScoped: _setSharedDataScoped, createSharedDataVFor: _createSharedDataVFor, setSharedData: _setSharedData, toDisplayString: _toDisplayString, createSharedDataSelector: _createSharedDataSelector, renderSharedDataEffect: _renderSharedDataEffect, setSharedDataStyle: _setSharedDataStyle, createSharedDataFor: _createSharedDataFor, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, withSharedDataVaporCtx: _withSharedDataVaporCtx, createSharedDataComponent: _createSharedDataComponent } = globalThis.Vue;
+const __className = "GenSrcPagesFunctionComponentsZPagingDemoCard";
 const { ref } = globalThis.Vue;
 class CompactArticleItem extends UTS.UTSType {
   static get$UTSMetadata$() {
@@ -550,11 +457,15 @@ class CompactArticleItem extends UTS.UTSType {
     delete this.__props__;
   }
 }
-const _sfc_main = /* @__PURE__ */ _defineComponent({
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+  __dynamicSharedData: true,
+  __hash: "31c4c1a5",
+  __className,
+  __filename: "src/pages/function/components/ZPagingDemoCard.uvue",
   __name: "ZPagingDemoCard",
-  setup(__props, _a) {
-    var __expose = _a.expose;
-    __expose();
+  setup(__props) {
+    const __sharedDataScope = _useSharedDataScope();
+    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenSrcPagesFunctionComponentsZPagingDemoCardSharedData", sharedDataClassId: 0 })));
     const shouldFail = ref(false);
     const tabList = ["å…¨éƒ¨", "æŠ€æœ¯", "è®¾è®¡"];
     const tabIndex = ref(0);
@@ -626,152 +537,100 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
         }
       }, 600);
     }
-    const __returned__ = { shouldFail, tabList, tabIndex, pagingX, dataList, onUpdateModelValue, tabChange, triggerError, triggerClear, getMockArticles, onQuery, get Card() {
-      return Card;
-    } };
-    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
-    return __returned__;
+    return () => {
+      "raw js";
+      const _setTemplateRef = _createSharedDataTemplateRefSetter();
+      const _component_z_paging_x = __easycom_1;
+      const n26 = _createSharedDataComponent(
+        Card,
+        "4b4c5faa",
+        { title: "æ•°æ®åˆ†é¡µåˆ—è¡¨ (z-paging-x)" },
+        {
+          "default": _withSharedDataVaporCtx(() => {
+            _setSharedDataEvent(__sharedData, 4, triggerError);
+            _setSharedDataEvent(__sharedData, 5, triggerClear);
+            const _selector9_0 = _createSharedDataSelector(() => {
+              return tabIndex.value;
+            });
+            const _selector9_1 = _createSharedDataSelector(() => {
+              return tabIndex.value;
+            });
+            const n9 = _createSharedDataFor(_setSharedDataScoped(__sharedData, 3, _createSharedDataVFor(__sharedDataScope, () => {
+              return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 1 });
+            })), () => {
+              return tabList;
+            }, (__sharedData_VFor0, _for_item0, _for_key0) => {
+              _setSharedDataEvent(__sharedData_VFor0, 1, () => {
+                return tabChange(_for_key0.value);
+              });
+              _renderSharedDataEffect(() => {
+                return _setSharedData(__sharedData_VFor0, 4, _toDisplayString(_for_item0.value));
+              });
+              _selector9_0(_for_key0.value, () => {
+                _setSharedDataStyle(__sharedData_VFor0, 2, { backgroundColor: tabIndex.value === _for_key0.value ? "#ffffff" : "transparent" });
+              });
+              _selector9_1(_for_key0.value, () => {
+                _setSharedDataStyle(__sharedData_VFor0, 3, { color: tabIndex.value === _for_key0.value ? "var(--theme-color, #37c2bc)" : "#64748b" });
+              });
+              return null;
+            }, (__sharedData_VFor0, tab, index) => {
+              return _setSharedData(__sharedData_VFor0, 0, _toDisplayString(index));
+            }, 1);
+            n9.onReset(_selector9_0.reset);
+            n9.onReset(_selector9_1.reset);
+            const n25 = _createSharedDataComponentWithFallback(_component_z_paging_x, "e69f0eec", {
+              "list-is": "scroll-view",
+              "model-value": () => {
+                return dataList.value;
+              },
+              "default-page-size": 10,
+              "paging-style": { height: "200px", border: "1px solid #edf2f7", borderTopWidth: "0px", borderBottomLeftRadius: "12px", borderBottomRightRadius: "12px", backgroundColor: "#f8fafc" },
+              "onUpdate:modelValue": () => {
+                return onUpdateModelValue;
+              },
+              onQuery: () => {
+                return onQuery;
+              }
+            }, {
+              "default": () => {
+                _createSharedDataFor(_setSharedDataScoped(__sharedData, 2, _createSharedDataVFor(__sharedDataScope, () => {
+                  return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 2 });
+                })), () => {
+                  return dataList.value;
+                }, (__sharedData_VFor1, _for_item1) => {
+                  let _item;
+                  _renderSharedDataEffect(() => {
+                    _item = _for_item1.value;
+                    _setSharedDataStyle(__sharedData_VFor1, 1, { backgroundColor: _item.tagBgColor, padding: "1px 6px", borderRadius: "4px" });
+                    _setSharedDataStyle(__sharedData_VFor1, 2, { color: _item.tagColor, fontSize: "9px", fontWeight: "bold" });
+                    _setSharedData(__sharedData_VFor1, 3, _toDisplayString(_item.tag));
+                    _setSharedData(__sharedData_VFor1, 5, _toDisplayString(_item.title));
+                    _setSharedData(__sharedData_VFor1, 6, _toDisplayString(_item.summary));
+                  });
+                  _setSharedData(__sharedData_VFor1, 4, _toDisplayString(_item.id));
+                  return null;
+                }, (__sharedData_VFor1, item) => {
+                  return _setSharedData(__sharedData_VFor1, 0, _toDisplayString(item.id));
+                }, 32);
+              }
+            });
+            _setSharedData(__sharedData, 1, n25?.sharedData);
+            _setTemplateRef(n25, pagingX, null, "pagingX");
+          })
+        },
+        1
+        /* SINGLE_ROOT */
+      );
+      _setSharedData(__sharedData, 0, n26.sharedData);
+      return __sharedData;
+    };
   }
 });
-const _style_0 = {"wtu-363vo5-0":{"":{"flexDirection":"column"}},"wtu-1yjgjtw-1":{"":{"marginBottom":12}},"wtu-1shi4c1-2":{"":{"fontSize":13}},"wtu-k196jf-3":{"":{"color":"#64748b"}},"wtu-ipjkxr-4":{"":{"--tw-leading":"18px","lineHeight":"18px"}},"wtu-1qa8yup-5":{"":{"marginBottom":8}},"wtu-13t3cxb-6":{"":{"flexDirection":"row"}},"wtu-13lz6jk-7":{"":{"flexGrow":1,"flexShrink":1,"flexBasis":"0%"}},"wtu-dqdach-8":{"":{"marginRight":8}},"wtu-1q4uxtw-9":{"":{"width":"100%"}},"wtu-1wj5rfx-a":{"":{"height":36}},"wtu-118m6zx-b":{"":{"borderTopLeftRadius":8,"borderTopRightRadius":8,"borderBottomRightRadius":8,"borderBottomLeftRadius":8}},"wtu-11r5j79-c":{"":{"backgroundColor":"#fee2e2"}},"wtu-cab7ja-d":{"":{"display":"flex"}},"wtu-99t06f-e":{"":{"alignItems":"center"}},"wtu-1a6bk3r-f":{"":{"justifyContent":"center"}},"wtu-1q1c76l-g":{"":{"color":"#dc2626"}},"wtu-a0x5no-h":{"":{"fontSize":12}},"wtu-vbfg4k-i":{"":{"--tw-font-weight":"var(--font-weight-bold, 700)","fontWeight":700}},"wtu-1vy0ete-j":{"":{"backgroundColor":"#fef3c7"}},"wtu-12jt6bz-k":{"":{"color":"#d97706"}},"wtu-1vo8z52-l":{"":{"backgroundColor":"#ffffff"}},"wtu-1qagzpp-m":{"":{"paddingTop":8,"paddingBottom":8}},"wtu-unk8et-n":{"":{"paddingLeft":12,"paddingRight":12}},"wtu-1n43ppt-o":{"":{"--tw-border-style":"solid","borderTopStyle":"var(--tw-border-style)","borderRightStyle":"var(--tw-border-style)","borderBottomStyle":"var(--tw-border-style)","borderLeftStyle":"var(--tw-border-style)","borderTopWidth":1,"borderRightWidth":1,"borderBottomWidth":1,"borderLeftWidth":1}},"wtu-5jnqzp-p":{"":{"--tw-border-style":"solid","borderTopStyle":"solid","borderRightStyle":"solid","borderBottomStyle":"solid","borderLeftStyle":"solid"}},"wtu-1s5dir1-q":{"":{"borderTopColor":"#edf2f7","borderRightColor":"#edf2f7","borderBottomColor":"#edf2f7","borderLeftColor":"#edf2f7"}},"wtu-wquw4l-r":{"":{"--tw-border-style":"solid","borderBottomStyle":"var(--tw-border-style)","borderBottomWidth":0}},"wtu-9b5i85-s":{"":{"backgroundColor":"#f1f5f9"}},"wtu-mhanxm-t":{"":{"paddingTop":2,"paddingRight":2,"paddingBottom":2,"paddingLeft":2}},"wtu-1to6p8f-u":{"":{"paddingTop":6,"paddingBottom":6}},"wtu-5shwin-v":{"":{"borderTopLeftRadius":6,"borderTopRightRadius":6,"borderBottomRightRadius":6,"borderBottomLeftRadius":6}},"wtu-d1mip6-w":{"":{"marginLeft":12,"marginRight":12}},"wtu-1nrqtt4-x":{"":{"marginTop":8,"marginBottom":8}},"wtu-r4yzsb-y":{"":{"paddingTop":12,"paddingRight":12,"paddingBottom":12,"paddingLeft":12}},"wtu-1d8uwje-z":{"":{"justifyContent":"space-between"}},"wtu-1qnpy9n-10":{"":{"marginBottom":6}},"wtu-tfarvr-11":{"":{"fontSize":11}},"wtu-1oi0tuv-12":{"":{"color":"#94a3b8"}},"wtu-s0l2i6-13":{"":{"fontSize":14}},"wtu-fw3sss-14":{"":{"color":"#1e293b"}},"wtu-10ykoyt-15":{"":{"marginBottom":4}},"wtu-fbtvf1-16":{"":{"--tw-leading":"16px","lineHeight":"16px"}},"flex":{"":{"display":"flex"}}};
-const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
-const { createElementVNode: _createElementVNode, renderList: _renderList, Fragment: _Fragment, openBlock: _openBlock, createElementBlock: _createElementBlock, toDisplayString: _toDisplayString, normalizeStyle: _normalizeStyle, resolveComponent: _resolveComponent, withCtx: _withCtx, createVNode: _createVNode, createBlock: _createBlock } = globalThis.Vue;
-function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  const _component_z_paging_x = resolveEasycom(__resolveDynamicComponent("z-paging-x"), __easycom_1);
-  return _openBlock(), _createBlock($setup["Card"], { title: "æ•°æ®åˆ†é¡µåˆ—è¡¨ (z-paging-x)" }, {
-    default: _withCtx(() => [
-      _createElementVNode("view", { class: "wtu-363vo5-0 wtu-1yjgjtw-1" }, [
-        _createElementVNode("text", { class: "wtu-1shi4c1-2 wtu-k196jf-3 wtu-ipjkxr-4 wtu-1qa8yup-5" }, " åœ¨å¡ç‰‡ä¸­ç›´æ¥ä½“éªŒå®æ—¶åˆ†é¡µï¼Œæ”¯æŒè§¦åº•åŠ è½½ã€ä¸‹æ‹‰åˆ·æ–°ä»¥åŠå„ç§çŠ¶æ€åˆ‡æ¢ã€‚ "),
-        _createElementVNode("view", { class: "wtu-13t3cxb-6 wtu-1yjgjtw-1" }, [
-          _createElementVNode("view", { class: "wtu-13lz6jk-7 wtu-dqdach-8" }, [
-            _createElementVNode("view", {
-              class: "wtu-1q4uxtw-9 wtu-1wj5rfx-a wtu-118m6zx-b wtu-11r5j79-c wtu-cab7ja-d wtu-13t3cxb-6 wtu-99t06f-e wtu-1a6bk3r-f",
-              onClick: $setup.triggerError
-            }, [
-              _createElementVNode("text", { class: "wtu-1q1c76l-g wtu-a0x5no-h wtu-vbfg4k-i" }, "æ¨¡æ‹ŸåŠ è½½é”™è¯¯")
-            ])
-          ]),
-          _createElementVNode("view", { class: "wtu-13lz6jk-7" }, [
-            _createElementVNode("view", {
-              class: "wtu-1q4uxtw-9 wtu-1wj5rfx-a wtu-118m6zx-b wtu-1vy0ete-j wtu-cab7ja-d wtu-13t3cxb-6 wtu-99t06f-e wtu-1a6bk3r-f",
-              onClick: $setup.triggerClear
-            }, [
-              _createElementVNode("text", { class: "wtu-12jt6bz-k wtu-a0x5no-h wtu-vbfg4k-i" }, "æ¸…ç©ºæ•°æ®")
-            ])
-          ])
-        ])
-      ]),
-      _createElementVNode("view", {
-        class: "wtu-1vo8z52-l wtu-1qagzpp-m wtu-unk8et-n wtu-1n43ppt-o wtu-5jnqzp-p wtu-1s5dir1-q wtu-wquw4l-r",
-        style: { "border-top-left-radius": "12px", "border-top-right-radius": "12px" }
-      }, [
-        _createElementVNode("view", { class: "wtu-13t3cxb-6 wtu-9b5i85-s wtu-118m6zx-b wtu-mhanxm-t" }, [
-          (_openBlock(), _createElementBlock(
-            _Fragment,
-            null,
-            _renderList($setup.tabList, (tab, index) => {
-              return _createElementVNode("view", {
-                key: index,
-                class: "wtu-13lz6jk-7 wtu-99t06f-e wtu-1a6bk3r-f wtu-1to6p8f-u wtu-5shwin-v",
-                style: _normalizeStyle({ backgroundColor: $setup.tabIndex === index ? "#ffffff" : "transparent" }),
-                onClick: ($event) => $setup.tabChange(index)
-              }, [
-                _createElementVNode(
-                  "text",
-                  {
-                    class: "wtu-a0x5no-h wtu-vbfg4k-i",
-                    style: _normalizeStyle({ color: $setup.tabIndex === index ? "var(--theme-color, #37c2bc)" : "#64748b" })
-                  },
-                  _toDisplayString(tab),
-                  5
-                  /* TEXT, STYLE */
-                )
-              ], 12, ["onClick"]);
-            }),
-            64
-            /* STABLE_FRAGMENT */
-          ))
-        ])
-      ]),
-      _createVNode(_component_z_paging_x, {
-        ref: "pagingX",
-        "list-is": "scroll-view",
-        "model-value": $setup.dataList,
-        "default-page-size": 10,
-        "paging-style": { height: "200px", border: "1px solid #edf2f7", borderTopWidth: "0px", borderBottomLeftRadius: "12px", borderBottomRightRadius: "12px", backgroundColor: "#f8fafc" },
-        "onUpdate:modelValue": $setup.onUpdateModelValue,
-        onQuery: $setup.onQuery
-      }, {
-        default: _withCtx(() => [
-          (_openBlock(true), _createElementBlock(
-            _Fragment,
-            null,
-            _renderList($setup.dataList, (item) => {
-              return _openBlock(), _createElementBlock("view", {
-                key: item.id
-              }, [
-                _createElementVNode("view", { class: "wtu-d1mip6-w wtu-1nrqtt4-x wtu-r4yzsb-y wtu-1vo8z52-l wtu-118m6zx-b wtu-1n43ppt-o wtu-5jnqzp-p wtu-1s5dir1-q" }, [
-                  _createElementVNode("view", { class: "wtu-13t3cxb-6 wtu-1d8uwje-z wtu-99t06f-e wtu-1qnpy9n-10" }, [
-                    _createElementVNode(
-                      "view",
-                      {
-                        style: _normalizeStyle({ backgroundColor: item.tagBgColor, padding: "1px 6px", borderRadius: "4px" })
-                      },
-                      [
-                        _createElementVNode(
-                          "text",
-                          {
-                            style: _normalizeStyle({ color: item.tagColor, fontSize: "9px", fontWeight: "bold" })
-                          },
-                          _toDisplayString(item.tag),
-                          5
-                          /* TEXT, STYLE */
-                        )
-                      ],
-                      4
-                      /* STYLE */
-                    ),
-                    _createElementVNode(
-                      "text",
-                      { class: "wtu-tfarvr-11 wtu-1oi0tuv-12" },
-                      "#" + _toDisplayString(item.id),
-                      1
-                      /* TEXT */
-                    )
-                  ]),
-                  _createElementVNode(
-                    "text",
-                    { class: "wtu-s0l2i6-13 wtu-vbfg4k-i wtu-fw3sss-14 wtu-10ykoyt-15" },
-                    _toDisplayString(item.title),
-                    1
-                    /* TEXT */
-                  ),
-                  _createElementVNode(
-                    "text",
-                    { class: "wtu-a0x5no-h wtu-k196jf-3 wtu-fbtvf1-16" },
-                    _toDisplayString(item.summary),
-                    1
-                    /* TEXT */
-                  )
-                ])
-              ]);
-            }),
-            128
-            /* KEYED_FRAGMENT */
-          ))
-        ]),
-        _: 1
-        /* STABLE */
-      }, 8, ["model-value"])
-    ]),
-    _: 1
-    /* STABLE */
-  });
-}
-const ZPagingDemoCard = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/pages/function/components/ZPagingDemoCard.uvue"]]);
+const _style_0 = {};
+const ZPagingDemoCard = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
 export {
   ZPagingDemoCard as Z
 };
 //# sourceMappingURL=ZPagingDemoCard.js.map
-ÔrF”ÙF../../../../uni_modules/z-paging-x/components/z-paging-x/z-paging-x.jsµ../../../../App.ku.js¾../../basic/components/Card.jsÙ'../../../../plugin-vue-export-helper.jsÔrG—ªassertions¨external¢id¤meta±moduleSideEffectsªresolvedByµsyntheticNamedExportsAÂÙÑ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/z-paging-x/components/z-paging-x/z-paging-x.jsAÃªoh-resolveÂGAÂÙ /Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/App.ku.jsAÃªoh-resolveÂGAÂÙ¹/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/pages/basic/components/Card.jsAÃªoh-resolveÂGAÂÙ²/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper.jsAÃªoh-resolveÂ‘ÔrH’§missing¦pluginÃ¦genAbcÂÔ  ÔrI”²dynamicImportCache¹exportAllDeclarationCache»exportNamedDeclarationCache«importCache‘ÔrJ–¤type¥start£end«declarationªspecifiers¦source¶ExportNamedDeclarationÍ3ÀÍ3âÀ‘ÔrK•¤type¥start£end¥local¨exported¯ExportSpecifierÍ3ËÍ3ßÔrL”¤type¥start£end¤nameªIdentifierÍ3ËÍ3Ú¯ZPagingDemoCardLªIdentifierÍ3ŞÍ3ß¡ZÀ”ÔrM•¤type¥start£endªspecifiers¦source±ImportDeclaration Ìj‘ÔrN•¤type¥start£end¨imported¥local¯ImportSpecifier	LªIdentifier	
-¡_LªIdentifier«__easycom_1ÔrO•¤type¥start£end¥value£raw§Literal!ÌiÙF../../../../uni_modules/z-paging-x/components/z-paging-x/z-paging-x.jsÙH"../../../../uni_modules/z-paging-x/components/z-paging-x/z-paging-x.js"M±ImportDeclarationÌkÌ§‘N¯ImportSpecifierÌtÌ‡LªIdentifierÌtÌu¡rLªIdentifierÌyÌ‡®resolveEasycomO§LiteralÌÌ¦µ../../../../App.ku.js·"../../../../App.ku.js"M±ImportDeclarationÌ¨Ìã‘N¯ImportSpecifierÌ±ÌºLªIdentifierÌ±Ì²¡CLªIdentifierÌ¶Ìº¤CardO§LiteralÌÂÌâ¾../../basic/components/Card.jsÙ "../../basic/components/Card.js"M±ImportDeclarationÌäÍ/‘N¯ImportSpecifierÌíÌıLªIdentifierÌíÌî¡_LªIdentifierÌòÌı«_export_sfcO§LiteralÍÍ.Ù'../../../../plugin-vue-export-helper.jsÙ)"../../../../plugin-vue-export-helper.js"
+ÔrF“ÙF../../../../uni_modules/z-paging-x/components/z-paging-x/z-paging-x.js¾../../basic/components/Card.jsÙ'../../../../plugin-vue-export-helper.jsÔrG—ªassertions¨external¢id¤meta±moduleSideEffectsªresolvedByµsyntheticNamedExportsAÂÙÑ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/z-paging-x/components/z-paging-x/z-paging-x.jsAÃªoh-resolveÂGAÂÙ¹/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/pages/basic/components/Card.jsAÃªoh-resolveÂGAÂÙ²/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper.jsAÃªoh-resolveÂ‘ÔrH’§missing¦pluginÃ¦genAbcÂÔ  ÔrI”²dynamicImportCache¹exportAllDeclarationCache»exportNamedDeclarationCache«importCache‘ÔrJ–¤type¥start£end«declarationªspecifiers¦source¶ExportNamedDeclarationÍ$áÍ%À‘ÔrK•¤type¥start£end¥local¨exported¯ExportSpecifierÍ$ìÍ% ÔrL”¤type¥start£end¤nameªIdentifierÍ$ìÍ$û¯ZPagingDemoCardLªIdentifierÍ$ÿÍ% ¡ZÀ“ÔrM•¤type¥start£endªspecifiers¦source±ImportDeclaration Ìj‘ÔrN•¤type¥start£end¨imported¥local¯ImportSpecifier	LªIdentifier	
+¡_LªIdentifier«__easycom_1ÔrO•¤type¥start£end¥value£raw§Literal!ÌiÙF../../../../uni_modules/z-paging-x/components/z-paging-x/z-paging-x.jsÙH"../../../../uni_modules/z-paging-x/components/z-paging-x/z-paging-x.js"M±ImportDeclarationÌkÌ¦‘N¯ImportSpecifierÌtÌ}LªIdentifierÌtÌu¡CLªIdentifierÌyÌ}¤CardO§LiteralÌ…Ì¥¾../../basic/components/Card.jsÙ "../../basic/components/Card.js"M±ImportDeclarationÌ§Ìò‘N¯ImportSpecifierÌ°ÌÀLªIdentifierÌ°Ì±¡_LªIdentifierÌµÌÀ«_export_sfcO§LiteralÌÈÌñÙ'../../../../plugin-vue-export-helper.jsÙ)"../../../../plugin-vue-export-helper.js"

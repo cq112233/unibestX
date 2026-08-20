@@ -1,17 +1,22 @@
-import { _ as __easycom_0 } from "../../../../uni_modules/e-chart/components/e-chart/e-chart.js";
-import { r as resolveEasycom } from "../../../../App.ku.js";
+import { _ as _sfc_main$1 } from "../../../../uni_modules/e-chart/components/e-chart/e-chart.js";
 import { C as Card } from "../../basic/components/Card.js";
 import { a as systemInfo } from "../../../utils/systemInfo.js";
 import { $ as $t } from "../../../utils/i18n.js";
 import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
-const { defineComponent: _defineComponent } = globalThis.Vue;
+const { defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, createSharedDataTemplateRefSetter: _createSharedDataTemplateRefSetter, resolveComponent: _resolveComponent, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, setSharedData: _setSharedData, setSharedDataEvent: _setSharedDataEvent, setSharedDataClass: _setSharedDataClass, toDisplayString: _toDisplayString, renderSharedDataEffect: _renderSharedDataEffect, withSharedDataVaporCtx: _withSharedDataVaporCtx, createSharedDataComponent: _createSharedDataComponent } = globalThis.Vue;
+const __className = "GenSrcPagesFunctionComponentsEchartsDemoCard";
 const { computed, ref, watch } = globalThis.Vue;
 const gridKey = "grid";
-const _sfc_main = /* @__PURE__ */ _defineComponent({
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+  __dynamicSharedData: true,
+  __hash: "56087336",
+  __className,
+  __filename: "src/pages/function/components/EchartsDemoCard.uvue",
   __name: "EchartsDemoCard",
-  setup(__props, _a) {
-    var __expose = _a.expose;
-    __expose();
+  setup(__props) {
+    const __sharedDataScope = _useSharedDataScope();
+    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenSrcPagesFunctionComponentsEchartsDemoCardSharedData", sharedDataClassId: 0 })));
     const echartTitle = computed(() => {
       return $t("basic.echartTitle");
     });
@@ -185,8 +190,8 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
       }
     }
     const windowWidth = computed(() => {
-      var _a2, _b;
-      return (_b = (_a2 = systemInfo.value) === null || _a2 === void 0 ? null : _a2.windowWidth) !== null && _b !== void 0 ? _b : 0;
+      var _a, _b;
+      return (_b = (_a = systemInfo.value) === null || _a === void 0 ? null : _a.windowWidth) !== null && _b !== void 0 ? _b : 0;
     });
     watch(windowWidth, () => {
       setTimeout(() => {
@@ -196,108 +201,54 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
         }
       }, 100);
     });
-    const __returned__ = { echartTitle, echartLineText, echartBarText, echartPieText, echartRef, currentType, gridKey, lineOption, barOption, pieOption, initEchart, changeToLine, changeToBar, changeToPie, windowWidth, get Card() {
-      return Card;
-    } };
-    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
-    return __returned__;
+    return () => {
+      "raw js";
+      const _setTemplateRef = _createSharedDataTemplateRefSetter();
+      const _component_e_chart = _sfc_main$1;
+      const n12 = _createSharedDataComponent(
+        Card,
+        "207b4afe",
+        { title: () => {
+          return echartTitle.value;
+        } },
+        {
+          "default": _withSharedDataVaporCtx(() => {
+            const n0 = _createSharedDataComponentWithFallback(_component_e_chart, "2223d49a", {
+              height: "280px",
+              class: "wtu-1gus49c-0 wtu-1hnun9r-3",
+              onReady: () => {
+                return initEchart;
+              }
+            });
+            _setSharedData(__sharedData, 1, n0?.sharedData);
+            _setTemplateRef(n0, echartRef, null, "echartRef");
+            _setSharedDataEvent(__sharedData, 2, changeToLine);
+            _setSharedDataEvent(__sharedData, 3, changeToBar);
+            _setSharedDataEvent(__sharedData, 4, changeToPie);
+            _renderSharedDataEffect(() => {
+              const _currentType = currentType.value;
+              _setSharedDataClass(__sharedData, 5, ["wtu-1gus49c-0 wtu-utvssx-9 wtu-1gx3c6p-a wtu-1xomkve-b wtu-mcij7f-4 wtu-1vz4tc3-c wtu-80iwab-d", _currentType !== "line" ? "wtu-1t1j6iy-e" : "wtu-1oruciv-f"]);
+              _setSharedDataClass(__sharedData, 6, ["wtu-esa49s-g wtu-100960-h", _currentType !== "line" ? "wtu-ecywtr-i" : "wtu-1y2qqu-j"]);
+              _setSharedData(__sharedData, 7, _toDisplayString(echartLineText.value));
+              _setSharedDataClass(__sharedData, 8, ["wtu-1gus49c-0 wtu-utvssx-9 wtu-1gx3c6p-a wtu-1xomkve-b wtu-mcij7f-4 wtu-1vz4tc3-c wtu-80iwab-d", _currentType !== "bar" ? "wtu-e83h5m-k" : "wtu-96qsb-l"]);
+              _setSharedDataClass(__sharedData, 9, ["wtu-esa49s-g wtu-100960-h", _currentType !== "bar" ? "wtu-rz8j03-m" : "wtu-1y2qqu-j"]);
+              _setSharedData(__sharedData, 10, _toDisplayString(echartBarText.value));
+              _setSharedDataClass(__sharedData, 11, ["wtu-1gus49c-0 wtu-utvssx-9 wtu-1gx3c6p-a wtu-1xomkve-b wtu-mcij7f-4 wtu-1vz4tc3-c wtu-80iwab-d", _currentType !== "pie" ? "wtu-1votq1i-n" : "wtu-kr2m39-o"]);
+              _setSharedDataClass(__sharedData, 12, ["wtu-esa49s-g wtu-100960-h", _currentType !== "pie" ? "wtu-1sjpi71-p" : "wtu-1y2qqu-j"]);
+              _setSharedData(__sharedData, 13, _toDisplayString(echartPieText.value));
+            });
+          })
+        },
+        1
+        /* SINGLE_ROOT */
+      );
+      _setSharedData(__sharedData, 0, n12.sharedData);
+      return __sharedData;
+    };
   }
 });
-const _style_0 = {"wtu-1gus49c-0":{"":{"width":"100%"}},"wtu-fven52-1":{"":{"height":280}},"wtu-15g7x2s-2":{"":{"marginTop":10}},"wtu-1hnun9r-3":{"":{"height":"100%"}},"wtu-mcij7f-4":{"":{"flexDirection":"row"}},"wtu-z7dd2m-5":{"":{"justifyContent":"space-between"}},"wtu-1d3bbdp-6":{"":{"marginTop":15}},"wtu-1jofu1o-7":{"":{"flexGrow":1,"flexShrink":1,"flexBasis":"0%"}},"wtu-s54k3p-8":{"":{"marginRight":8}},"wtu-utvssx-9":{"":{"height":36}},"wtu-1gx3c6p-a":{"":{"borderTopLeftRadius":8,"borderTopRightRadius":8,"borderBottomRightRadius":8,"borderBottomLeftRadius":8}},"wtu-1xomkve-b":{"":{"display":"flex"}},"wtu-1vz4tc3-c":{"":{"alignItems":"center"}},"wtu-80iwab-d":{"":{"justifyContent":"center"}},"wtu-1t1j6iy-e":{"":{"backgroundColor":"#e0edff"}},"wtu-1oruciv-f":{"":{"backgroundColor":"#3b82f6"}},"wtu-esa49s-g":{"":{"fontSize":12}},"wtu-100960-h":{"":{"--tw-font-weight":"var(--font-weight-bold, 700)","fontWeight":700}},"wtu-ecywtr-i":{"":{"color":"#3b82f6"}},"wtu-1y2qqu-j":{"":{"color":"#ffffff"}},"wtu-e83h5m-k":{"":{"backgroundColor":"#d1fae5"}},"wtu-96qsb-l":{"":{"backgroundColor":"#10b981"}},"wtu-rz8j03-m":{"":{"color":"#10b981"}},"wtu-1votq1i-n":{"":{"backgroundColor":"#fef3c7"}},"wtu-kr2m39-o":{"":{"backgroundColor":"#f59e0b"}},"wtu-1sjpi71-p":{"":{"color":"#f59e0b"}},"flex":{"":{"display":"flex"}}};
-const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
-const { resolveComponent: _resolveComponent, createVNode: _createVNode, createElementVNode: _createElementVNode, toDisplayString: _toDisplayString, normalizeClass: _normalizeClass, withCtx: _withCtx, openBlock: _openBlock, createBlock: _createBlock } = globalThis.Vue;
-function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  const _component_e_chart = resolveEasycom(__resolveDynamicComponent("e-chart"), __easycom_0);
-  return _openBlock(), _createBlock($setup["Card"], { title: $setup.echartTitle }, {
-    default: _withCtx(() => [
-      _createElementVNode("view", { class: "wtu-1gus49c-0 wtu-fven52-1 wtu-15g7x2s-2" }, [
-        _createVNode(
-          _component_e_chart,
-          {
-            ref: "echartRef",
-            height: "280px",
-            class: "wtu-1gus49c-0 wtu-1hnun9r-3",
-            onReady: $setup.initEchart
-          },
-          null,
-          512
-          /* NEED_PATCH */
-        )
-      ]),
-      _createElementVNode("view", { class: "wtu-mcij7f-4 wtu-z7dd2m-5 wtu-1d3bbdp-6" }, [
-        _createElementVNode("view", { class: "wtu-1jofu1o-7 wtu-s54k3p-8" }, [
-          _createElementVNode(
-            "view",
-            {
-              class: _normalizeClass(["wtu-1gus49c-0 wtu-utvssx-9 wtu-1gx3c6p-a wtu-1xomkve-b wtu-mcij7f-4 wtu-1vz4tc3-c wtu-80iwab-d", $setup.currentType !== "line" ? "wtu-1t1j6iy-e" : "wtu-1oruciv-f"]),
-              onClick: $setup.changeToLine
-            },
-            [
-              _createElementVNode(
-                "text",
-                {
-                  class: _normalizeClass(["wtu-esa49s-g wtu-100960-h", $setup.currentType !== "line" ? "wtu-ecywtr-i" : "wtu-1y2qqu-j"])
-                },
-                _toDisplayString($setup.echartLineText),
-                3
-                /* TEXT, CLASS */
-              )
-            ],
-            2
-            /* CLASS */
-          )
-        ]),
-        _createElementVNode("view", { class: "wtu-1jofu1o-7 wtu-s54k3p-8" }, [
-          _createElementVNode(
-            "view",
-            {
-              class: _normalizeClass(["wtu-1gus49c-0 wtu-utvssx-9 wtu-1gx3c6p-a wtu-1xomkve-b wtu-mcij7f-4 wtu-1vz4tc3-c wtu-80iwab-d", $setup.currentType !== "bar" ? "wtu-e83h5m-k" : "wtu-96qsb-l"]),
-              onClick: $setup.changeToBar
-            },
-            [
-              _createElementVNode(
-                "text",
-                {
-                  class: _normalizeClass(["wtu-esa49s-g wtu-100960-h", $setup.currentType !== "bar" ? "wtu-rz8j03-m" : "wtu-1y2qqu-j"])
-                },
-                _toDisplayString($setup.echartBarText),
-                3
-                /* TEXT, CLASS */
-              )
-            ],
-            2
-            /* CLASS */
-          )
-        ]),
-        _createElementVNode("view", { class: "wtu-1jofu1o-7" }, [
-          _createElementVNode(
-            "view",
-            {
-              class: _normalizeClass(["wtu-1gus49c-0 wtu-utvssx-9 wtu-1gx3c6p-a wtu-1xomkve-b wtu-mcij7f-4 wtu-1vz4tc3-c wtu-80iwab-d", $setup.currentType !== "pie" ? "wtu-1votq1i-n" : "wtu-kr2m39-o"]),
-              onClick: $setup.changeToPie
-            },
-            [
-              _createElementVNode(
-                "text",
-                {
-                  class: _normalizeClass(["wtu-esa49s-g wtu-100960-h", $setup.currentType !== "pie" ? "wtu-1sjpi71-p" : "wtu-1y2qqu-j"])
-                },
-                _toDisplayString($setup.echartPieText),
-                3
-                /* TEXT, CLASS */
-              )
-            ],
-            2
-            /* CLASS */
-          )
-        ])
-      ])
-    ]),
-    _: 1
-    /* STABLE */
-  }, 8, ["title"]);
-}
-const EchartsDemoCard = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/pages/function/components/EchartsDemoCard.uvue"]]);
+const _style_0 = {};
+const EchartsDemoCard = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
 export {
   EchartsDemoCard as E
 };

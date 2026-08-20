@@ -22,8 +22,8 @@
     <view class="rounded-[10px] p-[12px] mb-[16px] border-[1px] border-solid border-[#e2e8f0]">
       <view class="flex-row justify-between items-center mb-[6px]">
         <text class="text-[13px] text-[#64748b]">接口请求状态:</text>
-        <view :style="{ paddingLeft: '8px', paddingRight: '8px', paddingTop: '2px', paddingBottom: '2px', borderRadius: 10, backgroundColor: statusBgColor }">
-          <text :style="{ fontSize: 12, color: statusColor }">{{ statusText }}</text>
+        <view class="px-[8px] py-[2px] rounded-[10px]" :class="statusBgClass">
+          <text class="text-[12px]" :class="statusTextClass">{{ statusText }}</text>
         </view>
       </view>
       <view v-if="hasResponseData" class="bg-white rounded-[8px] p-[10px] border-[1px] border-solid border-[#e2e8f0]">
@@ -83,21 +83,21 @@ const statusText = computed((): string => {
   }
 });
 
-const statusColor = computed((): string => {
+const statusTextClass = computed((): string => {
   switch (requestStatus.value) {
-    case 'loading': return '#d97706';
-    case 'success': return '#059669';
-    case 'error': return '#dc2626';
-    default: return '#94a3b8';
+    case 'loading': return 'text-[#d97706]';
+    case 'success': return 'text-[#059669]';
+    case 'error': return 'text-[#dc2626]';
+    default: return 'text-[#94a3b8]';
   }
 });
 
-const statusBgColor = computed((): string => {
+const statusBgClass = computed((): string => {
   switch (requestStatus.value) {
-    case 'loading': return '#fef9c3';
-    case 'success': return '#d1fae5';
-    case 'error': return '#fee2e2';
-    default: return '#f1f5f9';
+    case 'loading': return 'bg-[#fef9c3]';
+    case 'success': return 'bg-[#d1fae5]';
+    case 'error': return 'bg-[#fee2e2]';
+    default: return 'bg-[#f1f5f9]';
   }
 });
 

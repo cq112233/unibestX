@@ -1,14 +1,19 @@
 import { _ as __easycom_0 } from "../up-status-bar/up-status-bar.js";
-import { r as resolveEasycom } from "../../../../App.ku.js";
-import { _ as __easycom_0$1 } from "../up-icon/up-icon.js";
+import { _ as __easycom_1$1 } from "../up-icon/up-icon.js";
 import { a as addUnit, g as getPx, b as addStyle, d as deepMerge } from "../../libs/function/index.js";
 import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
-const { defineComponent: _defineComponent } = globalThis.Vue;
+const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, resolveComponent: _resolveComponent, setSharedDataClass: _setSharedDataClass, renderSharedDataEffect: _renderSharedDataEffect, setSharedData: _setSharedData, toSharedDataBoolean: _toSharedDataBoolean, setSharedDataStyle: _setSharedDataStyle, createSharedDataIf: _createSharedDataIf, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, toDisplayString: _toDisplayString, createSharedDataSlot: _createSharedDataSlot, setSharedDataEvent: _setSharedDataEvent } = globalThis.Vue;
+const __className = "GenUniModulesUviewUltraComponentsUpNavbarUpNavbar";
 const { computed } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineComponent({
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   ...{
     name: "up-navbar"
   },
+  __dynamicSharedData: true,
+  __hash: "193d2626",
+  __className,
+  __filename: "uni_modules/uview-ultra/components/up-navbar/up-navbar.uvue",
   __name: "up-navbar",
   props: {
     safeAreaInsetTop: {
@@ -84,8 +89,9 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
   },
   emits: ["leftClick", "rightClick"],
   setup(__props, _a) {
-    var __expose = _a.expose, __emit = _a.emit;
-    __expose();
+    var __emit = _a.emit, $slots = _a.slots;
+    const __sharedDataScope = _useSharedDataScope();
+    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpNavbarUpNavbarSharedData", sharedDataClassId: 0 })));
     const props = __props;
     const emit = __emit;
     const placeholderHeight = computed(() => {
@@ -124,126 +130,99 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
     function rightClick() {
       emit("rightClick");
     }
-    const __returned__ = { props, emit, placeholderHeight, placeholderStyle, contentStyle, leftTextStyle, mergedTitleStyle, leftClick, rightClick };
-    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
-    return __returned__;
+    return () => {
+      "raw js";
+      const _component_up_status_bar = __easycom_0;
+      const _component_up_icon = __easycom_1$1;
+      _renderSharedDataEffect(() => {
+        return _setSharedDataClass(__sharedData, 18, ["up-navbar", [__props.customClass]]);
+      });
+      _createSharedDataIf(() => {
+        return _setSharedData(__sharedData, 0, _toSharedDataBoolean(__props.fixed && __props.placeholder));
+      }, () => {
+        _renderSharedDataEffect(() => {
+          return _setSharedDataStyle(__sharedData, 1, placeholderStyle.value);
+        });
+      });
+      _renderSharedDataEffect(() => {
+        return _setSharedDataClass(__sharedData, 19, [__props.fixed ? "up-navbar--fixed" : ""]);
+      });
+      _createSharedDataIf(() => {
+        return _setSharedData(__sharedData, 2, _toSharedDataBoolean(__props.safeAreaInsetTop));
+      }, () => {
+        const n5 = _createSharedDataComponentWithFallback(_component_up_status_bar, "05520d64", { bgColor: () => {
+          return __props.bgColor;
+        } });
+        _setSharedData(__sharedData, 3, n5?.sharedData);
+      });
+      _renderSharedDataEffect(() => {
+        _setSharedDataClass(__sharedData, 20, ["up-navbar__content", [__props.border ? "up-border-bottom" : ""]]);
+        _setSharedDataStyle(__sharedData, 21, contentStyle.value);
+      });
+      _createSharedDataSlot("left", null, null, () => {
+        _createSharedDataIf(() => {
+          return _setSharedData(__sharedData, 12, _toSharedDataBoolean(__props.leftIcon != ""));
+        }, () => {
+          const n10 = _createSharedDataComponentWithFallback(_component_up_icon, "0551ef98", {
+            name: () => {
+              return __props.leftIcon;
+            },
+            size: () => {
+              return __props.leftIconSize;
+            },
+            color: () => {
+              return __props.leftIconColor;
+            }
+          });
+          _setSharedData(__sharedData, 13, n10?.sharedData);
+        });
+        _createSharedDataIf(() => {
+          return _setSharedData(__sharedData, 14, _toSharedDataBoolean(__props.leftText != ""));
+        }, () => {
+          _renderSharedDataEffect(() => {
+            _setSharedDataStyle(__sharedData, 15, leftTextStyle.value);
+            _setSharedData(__sharedData, 16, _toDisplayString(__props.leftText));
+          });
+        });
+      });
+      _setSharedDataEvent(__sharedData, 17, leftClick);
+      _createSharedDataSlot("center", null, null, () => {
+        _renderSharedDataEffect(() => {
+          _setSharedDataStyle(__sharedData, 4, mergedTitleStyle.value);
+          _setSharedData(__sharedData, 5, _toDisplayString(__props.title));
+        });
+      });
+      _createSharedDataIf(() => {
+        return _setSharedData(__sharedData, 6, _toSharedDataBoolean($slots["right"] != null || __props.rightIcon != "" || __props.rightText != ""));
+      }, () => {
+        _createSharedDataSlot("right", null, null, () => {
+          _createSharedDataIf(() => {
+            return _setSharedData(__sharedData, 7, _toSharedDataBoolean(__props.rightIcon != ""));
+          }, () => {
+            const n24 = _createSharedDataComponentWithFallback(_component_up_icon, "a4f080a6", {
+              name: () => {
+                return __props.rightIcon;
+              },
+              size: "20"
+            });
+            _setSharedData(__sharedData, 8, n24?.sharedData);
+          });
+          _createSharedDataIf(() => {
+            return _setSharedData(__sharedData, 9, _toSharedDataBoolean(__props.rightText != ""));
+          }, () => {
+            _renderSharedDataEffect(() => {
+              return _setSharedData(__sharedData, 10, _toDisplayString(__props.rightText));
+            });
+          });
+        });
+        _setSharedDataEvent(__sharedData, 11, rightClick);
+      });
+      return __sharedData;
+    };
   }
 });
-const _style_0 = {"u-empty":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-empty__wrap":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__scroll-view-wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__scroll-view":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__nav":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__nav__line":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-empty":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-empty__wrap":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__scroll-view-wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__scroll-view":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__nav":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__nav__line":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-navbar--fixed":{"":{"position":"fixed","left":0,"right":0,"top":0,"zIndex":11}},"up-navbar__content":{"":{"display":"flex","flexDirection":"row","alignItems":"center","height":44,"backgroundColor":"#9acafc","position":"relative","justifyContent":"center"}},"up-navbar__content__left":{"":{"paddingTop":0,"paddingRight":13,"paddingBottom":0,"paddingLeft":13,"position":"absolute","top":0,"bottom":0,"display":"flex","flexDirection":"row","alignItems":"center","left":0}},"up-navbar__content__right":{"":{"paddingTop":0,"paddingRight":13,"paddingBottom":0,"paddingLeft":13,"position":"absolute","top":0,"bottom":0,"display":"flex","flexDirection":"row","alignItems":"center","right":0}},"up-navbar__content__left--hover":{"":{"opacity":0.7}},"up-navbar__content__left__text":{"":{"fontSize":15,"marginLeft":3}},"up-navbar__content__title":{"":{"textAlign":"center","fontSize":16,"color":"#303133"}},"up-navbar__content__right__text":{"":{"fontSize":15,"marginLeft":3}},"flex":{"":{"display":"flex"}},"relative":{"":{"position":"relative"}},"up-border-bottom":{"":{"borderBottomWidth":0.5,"borderColor":"#dadbde","borderBottomStyle":"solid"}},"up-line-1":{"":{"overflow":"hidden"}}};
-const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
-const { normalizeStyle: _normalizeStyle, openBlock: _openBlock, createElementBlock: _createElementBlock, createCommentVNode: _createCommentVNode, resolveComponent: _resolveComponent, createBlock: _createBlock, renderSlot: _renderSlot, toDisplayString: _toDisplayString, createElementVNode: _createElementVNode, normalizeClass: _normalizeClass } = globalThis.Vue;
-function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  const _component_up_status_bar = resolveEasycom(__resolveDynamicComponent("up-status-bar"), __easycom_0);
-  const _component_up_icon = resolveEasycom(__resolveDynamicComponent("up-icon"), __easycom_0$1);
-  return _openBlock(), _createElementBlock(
-    "view",
-    {
-      class: _normalizeClass(["up-navbar", [$props.customClass]])
-    },
-    [
-      $props.fixed && $props.placeholder ? (_openBlock(), _createElementBlock(
-        "view",
-        {
-          key: 0,
-          class: "up-navbar__placeholder",
-          style: _normalizeStyle($setup.placeholderStyle)
-        },
-        null,
-        4
-        /* STYLE */
-      )) : _createCommentVNode("v-if", true),
-      _createElementVNode(
-        "view",
-        {
-          class: _normalizeClass([$props.fixed ? "up-navbar--fixed" : ""])
-        },
-        [
-          $props.safeAreaInsetTop ? (_openBlock(), _createBlock(_component_up_status_bar, {
-            key: 0,
-            bgColor: $props.bgColor
-          }, null, 8, ["bgColor"])) : _createCommentVNode("v-if", true),
-          _createElementVNode(
-            "view",
-            {
-              class: _normalizeClass(["up-navbar__content", [$props.border ? "up-border-bottom" : ""]]),
-              style: _normalizeStyle($setup.contentStyle)
-            },
-            [
-              _createElementVNode("view", {
-                class: "up-navbar__content__left",
-                "hover-class": "up-navbar__content__left--hover",
-                "hover-start-time": "150",
-                onClick: $setup.leftClick
-              }, [
-                _renderSlot(_ctx.$slots, "left", {}, () => [
-                  $props.leftIcon != "" ? (_openBlock(), _createBlock(_component_up_icon, {
-                    key: 0,
-                    name: $props.leftIcon,
-                    size: $props.leftIconSize,
-                    color: $props.leftIconColor
-                  }, null, 8, ["name", "size", "color"])) : _createCommentVNode("v-if", true),
-                  $props.leftText != "" ? (_openBlock(), _createElementBlock(
-                    "text",
-                    {
-                      key: 1,
-                      style: _normalizeStyle($setup.leftTextStyle),
-                      class: "up-navbar__content__left__text"
-                    },
-                    _toDisplayString($props.leftText),
-                    5
-                    /* TEXT, STYLE */
-                  )) : _createCommentVNode("v-if", true)
-                ])
-              ]),
-              _renderSlot(_ctx.$slots, "center", {}, () => [
-                _createElementVNode(
-                  "text",
-                  {
-                    class: "up-line-1 up-navbar__content__title",
-                    style: _normalizeStyle($setup.mergedTitleStyle)
-                  },
-                  _toDisplayString($props.title),
-                  5
-                  /* TEXT, STYLE */
-                )
-              ]),
-              _ctx.$slots["right"] != null || $props.rightIcon != "" || $props.rightText != "" ? (_openBlock(), _createElementBlock("view", {
-                key: 0,
-                class: "up-navbar__content__right",
-                onClick: $setup.rightClick
-              }, [
-                _renderSlot(_ctx.$slots, "right", {}, () => [
-                  $props.rightIcon != "" ? (_openBlock(), _createBlock(_component_up_icon, {
-                    key: 0,
-                    name: $props.rightIcon,
-                    size: "20"
-                  }, null, 8, ["name"])) : _createCommentVNode("v-if", true),
-                  $props.rightText != "" ? (_openBlock(), _createElementBlock(
-                    "text",
-                    {
-                      key: 1,
-                      class: "up-navbar__content__right__text"
-                    },
-                    _toDisplayString($props.rightText),
-                    1
-                    /* TEXT */
-                  )) : _createCommentVNode("v-if", true)
-                ])
-              ])) : _createCommentVNode("v-if", true)
-            ],
-            6
-            /* CLASS, STYLE */
-          )
-        ],
-        2
-        /* CLASS */
-      )
-    ],
-    2
-    /* CLASS */
-  );
-}
-const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-navbar/up-navbar.uvue"]]);
+const _style_0 = {"up-border-bottom":{"":{"borderBottomWidth":0.5,"borderColor":"#dadbde","borderBottomStyle":"solid"}}};
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
 export {
   __easycom_1 as _
 };

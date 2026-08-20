@@ -1,19 +1,24 @@
-import { _ as __easycom_0 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-text/up-text&";
-import { r as resolveEasycom } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/App.ku&";
+import { _ as __easycom_1$1 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-text/up-text&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/composable/useMp&";
 import { u as useUltraUI } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/composable/useUltraUI&";
 import { a as addUnit, g as getPx, s as sleep, u as upGetRect } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/index&";
 import { d as defProps } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-album/album&";
-import { i as imageProps } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-image/image&";
+import { d as defProps$1 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-image/image&";
 import { _ as _export_sfc } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper&";
-const { defineComponent: _defineComponent } = globalThis.Vue;
+const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, createSharedDataTemplateRefSetter: _createSharedDataTemplateRefSetter, resolveComponent: _resolveComponent, setSharedDataScoped: _setSharedDataScoped, createSharedDataVFor: _createSharedDataVFor, setSharedData: _setSharedData, toDisplayString: _toDisplayString, setSharedDataStyle: _setSharedDataStyle, renderSharedDataEffect: _renderSharedDataEffect, setSharedDataAttr: _setSharedDataAttr, toSharedDataString: _toSharedDataString, toSharedDataImageMode: _toSharedDataImageMode, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, createSharedDataIf: _createSharedDataIf, setSharedDataEvent: _setSharedDataEvent, createSharedDataFor: _createSharedDataFor, setSharedDataTemplateRef: _setSharedDataTemplateRef } = globalThis.Vue;
+const __className = "GenUniModulesUviewUltraComponentsUpAlbumUpAlbum";
 const { ref, computed, watch, getCurrentInstance } = globalThis.Vue;
 const { onMounted } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineComponent({
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   ...{
     //   ...mpSharedMpOptions,
     name: "up-album"
   },
+  __dynamicSharedData: true,
+  __hash: "305ac7a3",
+  __className,
+  __filename: "uni_modules/uview-ultra/components/up-album/up-album.uvue",
   __name: "up-album",
   props: {
     customStyle: {
@@ -84,12 +89,12 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
     // 图片形状，circle-圆形，square-方形
     shape: {
       type: String,
-      default: imageProps.getString("image.shape")
+      default: defProps$1.getString("image.shape")
     },
     // 圆角，单位任意
     radius: {
       type: [String, Number],
-      default: imageProps.getNumber("image.radius")
+      default: defProps$1.getNumber("image.radius")
     },
     // 自适应换行
     autoWrap: {
@@ -111,8 +116,9 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
   },
   emits: ["preview", "albumWidth"],
   setup(__props, _a) {
-    var __expose = _a.expose, __emit = _a.emit;
-    __expose();
+    var __emit = _a.emit;
+    const __sharedDataScope = _useSharedDataScope();
+    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpAlbumUpAlbumSharedData", sharedDataClassId: 0 })));
     const instance = getCurrentInstance().proxy;
     const props = __props;
     const emit = __emit;
@@ -216,7 +222,7 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
     const moreBorderRadius = computed(() => {
       return props.shape == "circle" ? "50%" : addUnit(props.radius);
     });
-    const albumWidth = computed(() => {
+    computed(() => {
       let width = 0;
       if (props.urls.length == 1) {
         width = singleWidth.value;
@@ -262,83 +268,70 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
         }));
       }
     };
-    const __returned__ = { instance, props, emit, preventEvent, singleWidth, singleHeight, singlePercent, getSrc, getComponentWidth, showUrls, getImageRect, getImageStyle, imageWidth, imageHeight, imageBorderRadius, moreBorderRadius, albumWidth, rowWrapStyle, imageStyleComputed, imageModeComputed, onPreviewTap };
-    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
-    return __returned__;
+    return () => {
+      "raw js";
+      const _setTemplateRef = _createSharedDataTemplateRefSetter();
+      const _component_up_text = __easycom_1$1;
+      _createSharedDataFor(_setSharedDataScoped(__sharedData, 0, _createSharedDataVFor(__sharedDataScope, () => {
+        return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 1 });
+      })), () => {
+        return showUrls.value;
+      }, (__sharedData_VFor0, _for_item0, _for_key0) => {
+        _renderSharedDataEffect(() => {
+          return _setSharedDataStyle(__sharedData_VFor0, 3, rowWrapStyle.value);
+        });
+        _createSharedDataFor(_setSharedDataScoped(__sharedData_VFor0, 1, _createSharedDataVFor(__sharedDataScope, () => {
+          return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 2 });
+        })), () => {
+          return _for_item0.value;
+        }, (__sharedData_VFor1, _for_item1, _for_key1) => {
+          _renderSharedDataEffect(() => {
+            _setSharedDataStyle(__sharedData_VFor1, 4, getImageStyle(_for_key0.value + 1, _for_key1.value + 1));
+            _setSharedDataAttr(__sharedData_VFor1, 5, _toSharedDataString(getSrc(_for_item1.value)));
+            _setSharedDataAttr(__sharedData_VFor1, 6, _toSharedDataImageMode(imageModeComputed.value));
+            _setSharedDataStyle(__sharedData_VFor1, 7, imageStyleComputed.value);
+          });
+          _createSharedDataIf(() => {
+            return false;
+          }, () => {
+            _renderSharedDataEffect(() => {
+              return _setSharedDataStyle(__sharedData_VFor1, 2, {
+                borderRadius: moreBorderRadius.value
+              });
+            });
+            const n7 = _createSharedDataComponentWithFallback(_component_up_text, "661a2120-" + _for_key1.value, {
+              text: () => {
+                return `+${__props.urls.length - parseInt(__props.maxCount.toString())}`;
+              },
+              color: "#fff",
+              size: () => {
+                return parseInt(__props.multipleSize.toString()) * 0.3;
+              },
+              align: "center",
+              customStyle: "justify-content: center"
+            });
+            _setSharedData(__sharedData_VFor1, 1, n7?.sharedData);
+          });
+          _setSharedDataEvent(__sharedData_VFor1, 3, ($event) => {
+            return onPreviewTap($event, getSrc(_for_item1.value));
+          });
+          return null;
+        }, (__sharedData_VFor1, item, index1) => {
+          return _setSharedData(__sharedData_VFor1, 0, _toDisplayString(index1));
+        }, 1);
+        _setSharedDataTemplateRef(__sharedData_VFor0, 2, (n10) => {
+          _setTemplateRef(n10, "up-album__row", true);
+        });
+        return null;
+      }, (__sharedData_VFor0, arr, index) => {
+        return _setSharedData(__sharedData_VFor0, 0, _toDisplayString(index));
+      }, 1);
+      return __sharedData;
+    };
   }
 });
-const _style_0 = {"u-empty":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-empty__wrap":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__scroll-view-wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__scroll-view":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__nav":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__nav__line":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-empty":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-empty__wrap":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__scroll-view-wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__scroll-view":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__nav":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__nav__line":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-album":{"":{"display":"flex","flexDirection":"column"}},"up-album__row":{"":{"display":"flex","flexDirection":"row"}},"up-album__row__wrapper":{"":{"position":"relative"}},"up-album__row__wrapper__text":{"":{"position":"absolute","top":0,"left":0,"right":0,"bottom":0,"backgroundColor":"rgba(0,0,0,0.3)","display":"flex","flexDirection":"row","justifyContent":"center","alignItems":"center"}},"flex":{"":{"display":"flex"}},"relative":{"":{"position":"relative"}}};
-const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
-const { renderList: _renderList, Fragment: _Fragment, openBlock: _openBlock, createElementBlock: _createElementBlock, normalizeStyle: _normalizeStyle, createElementVNode: _createElementVNode, resolveComponent: _resolveComponent, createVNode: _createVNode, createCommentVNode: _createCommentVNode } = globalThis.Vue;
-function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  const _component_up_text = resolveEasycom(__resolveDynamicComponent("up-text"), __easycom_0);
-  return _openBlock(), _createElementBlock("view", { class: "up-album" }, [
-    (_openBlock(true), _createElementBlock(
-      _Fragment,
-      null,
-      _renderList($setup.showUrls, (arr, index) => {
-        return _openBlock(), _createElementBlock(
-          "view",
-          {
-            class: "up-album__row",
-            ref_for: true,
-            ref: "up-album__row",
-            key: index,
-            style: _normalizeStyle($setup.rowWrapStyle)
-          },
-          [
-            (_openBlock(true), _createElementBlock(
-              _Fragment,
-              null,
-              _renderList(arr, (item, index1) => {
-                return _openBlock(), _createElementBlock("view", {
-                  class: "up-album__row__wrapper",
-                  key: index1,
-                  style: _normalizeStyle($setup.getImageStyle(index + 1, index1 + 1)),
-                  onClick: ($event) => $setup.onPreviewTap($event, $setup.getSrc(item))
-                }, [
-                  _createElementVNode("image", {
-                    src: $setup.getSrc(item),
-                    mode: $setup.imageModeComputed,
-                    style: _normalizeStyle($setup.imageStyleComputed)
-                  }, null, 12, ["src", "mode"]),
-                  $props.showMore && $props.urls.length > parseInt($props.rowCount.toString()) * $setup.showUrls.length && index === $setup.showUrls.length - 1 && index1 === $setup.showUrls[$setup.showUrls.length - 1].length - 1 ? (_openBlock(), _createElementBlock(
-                    "view",
-                    {
-                      key: 0,
-                      class: "up-album__row__wrapper__text",
-                      style: _normalizeStyle({
-                        borderRadius: $setup.moreBorderRadius
-                      })
-                    },
-                    [
-                      _createVNode(_component_up_text, {
-                        text: `+${$props.urls.length - parseInt($props.maxCount.toString())}`,
-                        color: "#fff",
-                        size: parseInt($props.multipleSize.toString()) * 0.3,
-                        align: "center",
-                        customStyle: "justify-content: center"
-                      }, null, 8, ["text", "size"])
-                    ],
-                    4
-                    /* STYLE */
-                  )) : _createCommentVNode("v-if", true)
-                ], 12, ["onClick"]);
-              }),
-              128
-              /* KEYED_FRAGMENT */
-            ))
-          ],
-          4
-          /* STYLE */
-        );
-      }),
-      128
-      /* KEYED_FRAGMENT */
-    ))
-  ]);
-}
-const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-album/up-album.uvue"]]);
+const _style_0 = {};
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
 export {
   __easycom_1 as _
 };

@@ -3,9 +3,11 @@ import { s as stringifyStyle } from "@normalized:N&&&entry/src/main/resources/re
 import { a as addUnit } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/lime-shared/addUnit/index&";
 import { u as useIcon, l as loadingFonts } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/lime-icon/index&";
 import { _ as _export_sfc } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper&";
-const { defineComponent: _defineComponent } = globalThis.Vue;
+const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, resolveComponent: _resolveComponent, setSharedData: _setSharedData, toSharedDataBoolean: _toSharedDataBoolean, unref: _unref, setSharedDataEvent: _setSharedDataEvent, setSharedDataClass: _setSharedDataClass, setSharedDataStyle: _setSharedDataStyle, toDisplayString: _toDisplayString, renderSharedDataEffect: _renderSharedDataEffect, setSharedDataAttr: _setSharedDataAttr, toSharedDataString: _toSharedDataString, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, createSharedDataIf: _createSharedDataIf } = globalThis.Vue;
+const __className = "GenUniModulesLimeIconComponentsLIconLIcon";
 const { computed } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineComponent({
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   ...{
     styleIsolation: "app-shared",
     inheritAttrs: true,
@@ -14,21 +16,26 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
       virtualHost: true
     })
   },
+  __dynamicSharedData: true,
+  __hash: "602a56d0",
+  __className,
+  __filename: "uni_modules/lime-icon/components/l-icon/l-icon.uvue",
   __name: "l-icon",
   props: {
-    name: { type: String, required: true, default: "" },
-    color: { type: String, required: false },
-    size: { type: [String, Number], required: false },
-    prefix: { type: String, required: true, default: "l" },
-    inherit: { type: Boolean, required: true, default: true },
-    web: { type: Boolean, required: true, default: false },
-    lClass: { type: null, required: false },
-    lStyle: { type: null, required: false }
+    name: { default: "", type: String },
+    color: { type: String },
+    size: { type: [String, Number] },
+    prefix: { default: "l", type: String },
+    inherit: { type: Boolean, default: true },
+    web: { type: Boolean, default: false },
+    lClass: { type: null },
+    lStyle: { type: null }
   },
   emits: ["click"],
   setup(__props, _a) {
-    var __expose = _a.expose, __emit = _a.emit;
-    __expose();
+    var __emit = _a.emit;
+    const __sharedDataScope = _useSharedDataScope();
+    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesLimeIconComponentsLIconLIconSharedData", sharedDataClassId: 0 })));
     const props = __props;
     const emit = __emit;
     const _b = useIcon(computed(() => {
@@ -66,44 +73,72 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
     const handleClick = () => {
       emit("click");
     };
-    const __returned__ = { props, emit, type, fontIcon, imageUrl, iconifyUrl, parsed, fontLoading, classes, styles, handleClick };
-    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
-    return __returned__;
+    return () => {
+      "raw js";
+      const _component_l_svg = _resolveComponent("l-svg");
+      _createSharedDataIf(() => {
+        return _setSharedData(__sharedData, 0, _toSharedDataBoolean(_unref(type) == "font" && !_unref(fontLoading)));
+      }, () => {
+        _setSharedDataEvent(__sharedData, 1, handleClick);
+        _renderSharedDataEffect(() => {
+          _setSharedDataClass(__sharedData, 2, ["l-icon l-icon--font l-class", _unref(classes)]);
+          _setSharedDataStyle(__sharedData, 3, _unref(styles));
+          _setSharedData(__sharedData, 4, _toDisplayString(_unref(fontIcon)?.char));
+        });
+      }, () => {
+        return _createSharedDataIf(() => {
+          return _setSharedData(__sharedData, 5, _toSharedDataBoolean(_unref(type) == "image" && (!_unref(parsed).isSvg || __props.color == null)));
+        }, () => {
+          _setSharedDataEvent(__sharedData, 6, handleClick);
+          _renderSharedDataEffect(() => {
+            _setSharedDataClass(__sharedData, 7, ["l-icon l-icon--image l-class", _unref(classes)]);
+            _setSharedDataStyle(__sharedData, 8, _unref(styles));
+            _setSharedDataAttr(__sharedData, 9, _toSharedDataString(_unref(imageUrl)));
+          });
+        }, () => {
+          return _createSharedDataIf(() => {
+            return _setSharedData(__sharedData, 10, _toSharedDataBoolean(_unref(iconifyUrl) != null || _unref(type) == "image" && _unref(parsed).isSvg && __props.color != null));
+          }, () => {
+            const n7 = _createSharedDataComponentWithFallback(
+              _component_l_svg,
+              "7ce9032a",
+              {
+                class: () => {
+                  return ["l-icon l-icon--image l-class", _unref(classes)];
+                },
+                style: () => {
+                  return _unref(styles);
+                },
+                src: () => {
+                  return _unref(iconifyUrl) ?? _unref(imageUrl);
+                },
+                color: () => {
+                  return __props.color;
+                },
+                inherit: () => {
+                  return __props.inherit;
+                },
+                web: () => {
+                  return __props.web;
+                },
+                onClick: () => {
+                  return handleClick;
+                }
+              },
+              null,
+              1
+              /* SINGLE_ROOT */
+            );
+            _setSharedData(__sharedData, 11, n7?.sharedData);
+          });
+        }, 517);
+      }, 261);
+      return __sharedData;
+    };
   }
 });
-const _style_0 = { "l-icon--font": { "": { "fontFamily": "l", "textAlign": "center" } }, "l-icon--image": { "": { "width": "var(--l-icon-size, 16px)", "height": "var(--l-icon-size, 16px)" } }, "@FONT-FACE": [{ "fontFamily": "l", "src": 'url("/uni_modules/lime-icon/static/app/t4.ttf")' }] };
-const { toDisplayString: _toDisplayString, normalizeClass: _normalizeClass, normalizeStyle: _normalizeStyle, openBlock: _openBlock, createElementBlock: _createElementBlock, createCommentVNode: _createCommentVNode, resolveComponent: _resolveComponent, createBlock: _createBlock } = globalThis.Vue;
-function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  const _component_l_svg = _resolveComponent("l-svg");
-  return $setup.type == "font" && !$setup.fontLoading ? (_openBlock(), _createElementBlock(
-    "text",
-    {
-      key: 0,
-      class: _normalizeClass(["l-icon l-icon--font l-class", $setup.classes]),
-      style: _normalizeStyle($setup.styles),
-      onClick: $setup.handleClick
-    },
-    _toDisplayString($setup.fontIcon?.char),
-    7
-    /* TEXT, CLASS, STYLE */
-  )) : $setup.type == "image" && (!$setup.parsed.isSvg || $props.color == null) ? (_openBlock(), _createElementBlock("image", {
-    key: 1,
-    class: _normalizeClass(["l-icon l-icon--image l-class", $setup.classes]),
-    style: _normalizeStyle($setup.styles),
-    src: $setup.imageUrl,
-    onClick: $setup.handleClick
-  }, null, 14, ["src"])) : $setup.iconifyUrl != null || $setup.type == "image" && $setup.parsed.isSvg && $props.color != null ? (_openBlock(), _createBlock(_component_l_svg, {
-    key: 2,
-    class: _normalizeClass(["l-icon l-icon--image l-class", $setup.classes]),
-    style: _normalizeStyle($setup.styles),
-    src: $setup.iconifyUrl ?? $setup.imageUrl,
-    color: $props.color,
-    inherit: $props.inherit,
-    web: $props.web,
-    onClick: $setup.handleClick
-  }, null, 8, ["class", "style", "src", "color", "inherit", "web"])) : _createCommentVNode("v-if", true);
-}
-const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/lime-icon/components/l-icon/l-icon.uvue"]]);
+const _style_0 = {"@FONT-FACE":[{"src":"url(\"/uni_modules/lime-icon/static/app/t4.ttf\")","fontFamily":"l"}]};
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
 export {
   __easycom_1 as _
 };

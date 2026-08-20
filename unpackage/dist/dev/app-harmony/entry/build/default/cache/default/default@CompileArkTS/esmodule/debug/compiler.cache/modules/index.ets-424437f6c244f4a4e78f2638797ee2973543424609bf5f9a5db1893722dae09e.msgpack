@@ -1,182 +1,0 @@
-Ôr@Ÿªassertions¤code´customTransformCache¬dependencies¢id¤meta±moduleSideEffects¬originalCode±originalSourcemap«resolvedIds®sourcemapChainµsyntheticNamedExportsµtransformDependencies®transformFiles¨cacheAstÔrAÚ
-import { UTSObject, UTS, defineSyncApi } from "@dcloudio/uni-app-framework";
-class UniWebviewContextLoadDataOptions extends UTSObject {
-    constructor() {
-        super(...arguments);
-        this.baseURL = null;
-        this.mimeType = null;
-        this.encoding = null;
-    }
-}
-const getWebViewContext = (id, component = null) => {
-    let webViewElement = null;
-    if (component == null) {
-        const pages = globalThis.getCurrentPages();
-        if (pages.length > 0) {
-            const page = pages[pages.length - 1];
-            if (!page) {
-                UTS.console.error(`getCurrentPages is empty`);
-                return null;
-            }
-            webViewElement = page.vm.$el?.parentElement?.querySelector('#' + id);
-            if (webViewElement == null) {
-                const dialogPages = page.getDialogPages();
-                if (dialogPages.length > 0) {
-                    const topDialogPage = dialogPages[dialogPages.length - 1];
-                    if (!topDialogPage) {
-                        UTS.console.error(`getDialogPages is empty`);
-                        return null;
-                    }
-                    webViewElement = topDialogPage.vm.$el?.parentElement?.querySelector('#' + id);
-                }
-            }
-        }
-    }
-    else {
-        webViewElement = component.$el?.parentElement?.querySelector('#' + id);
-    }
-    if (webViewElement == null)
-        return null;
-    return new WebViewContextImpl(webViewElement);
-};
-const createWebViewContext = defineSyncApi('createWebViewContext', (id, component = null) => {
-    return getWebViewContext(id, component);
-});
-const createWebviewContext = defineSyncApi('createWebviewContext', (id, component = null) => {
-    return getWebViewContext(id, component);
-});
-class WebViewContextImpl {
-    constructor(webviewElement) {
-        this.webviewElement = null;
-        this.webviewElement = webviewElement;
-    }
-    back() {
-        this.webviewElement?.back();
-    }
-    forward() {
-        this.webviewElement?.forward();
-    }
-    reload() {
-        this.webviewElement?.reload();
-    }
-    stop() {
-        this.webviewElement?.stop();
-    }
-    evalJS(js) {
-        this.webviewElement?.evalJS(js);
-    }
-    getContentHeight() {
-        return this.webviewElement?.getContentHeight() ?? 0;
-    }
-    loadData(options) {
-        this.webviewElement?.loadData(options);
-    }
-}
-export { UniWebviewContextLoadDataOptions as UniWebviewContextLoadDataOptions };
-export { createWebViewContext as createWebViewContext };
-export { createWebviewContext as createWebviewContext };
-//# sourceMappingURL=index.js.mapÂ‘Ùî/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/framework/index.etsÚ$/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/modules/uni_modules/uni-createWebviewContext/utssdk/app-harmony/index.etsÔrB˜±isLocalDependency¯isNodeEntryFile§pkgPath§pkgNameªpkgVersion±belongProjectPath±dependencyPkgInfo¬shouldEmitJsÂÂÙâ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/modules¹@dcloudio/uni-app-modules¥1.0.0ÙL/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmonyÔrC’§pkgNameªpkgVersion¹@dcloudio/uni-app-modules¥1.0.0ÃÃÚnimport { string, ComponentPublicInstance, UTSObject, UniWebViewElement, UniPageImpl, UTS, UniElement, defineSyncApi } from "@dcloudio/uni-app-framework";
-type CreateWebviewContext = (webviewId: string.WebviewIdString, component?: ComponentPublicInstance | null) => WebViewContext | null;
-type CreateWebViewContext = (webviewId: string.WebviewIdString, component?: ComponentPublicInstance | null) => WebViewContext | null;
-class UniWebviewContextLoadDataOptions extends UTSObject {
-    data!: string;
-    baseURL: string | null = null;
-    mimeType: string | null = null;
-    encoding: string | null = null;
-}
-interface WebViewContext {
-    back(): void;
-    forward(): void;
-    reload(): void;
-    stop(): void;
-    evalJS(js: string): void;
-    getContentHeight(): number;
-    loadData(options: UniWebviewContextLoadDataOptions): void;
-}
-const getWebViewContext = (id: string, component: ComponentPublicInstance | null = null): WebViewContext | null =>{
-    let webViewElement: UniWebViewElement | null | undefined = null;
-    if (component == null) {
-        const pages = globalThis.getCurrentPages() as UniPageImpl[];
-        if (pages.length > 0) {
-            const page = pages[pages.length - 1];
-            if (!page) {
-                UTS.console.error(`getCurrentPages is empty`);
-                return null;
-            }
-            webViewElement = ((page.vm as ESObject).$el as UniElement)?.parentElement?.querySelector('#' + id) as UniWebViewElement;
-            if (webViewElement == null) {
-                const dialogPages = page.getDialogPages() as UniPageImpl[];
-                if (dialogPages.length > 0) {
-                    const topDialogPage = dialogPages[dialogPages.length - 1];
-                    if (!topDialogPage) {
-                        UTS.console.error(`getDialogPages is empty`);
-                        return null;
-                    }
-                    webViewElement = ((topDialogPage.vm as ESObject).$el as UniElement)?.parentElement?.querySelector('#' + id) as Object as UniWebViewElement;
-                }
-            }
-        }
-    } else {
-        webViewElement = (component.$el as UniElement)?.parentElement?.querySelector('#' + id) as Object as UniWebViewElement;
-    }
-    if (webViewElement == null) return null;
-    return new WebViewContextImpl(webViewElement);
-};
-const createWebViewContext: CreateWebViewContext = defineSyncApi<WebViewContext | null>('createWebViewContext', (id: string, component: ComponentPublicInstance | null = null): WebViewContext | null =>{
-    return getWebViewContext(id, component);
-}) as CreateWebViewContext;
-const createWebviewContext: CreateWebviewContext = defineSyncApi<WebViewContext | null>('createWebviewContext', (id: string, component: ComponentPublicInstance | null = null): WebViewContext | null =>{
-    return getWebViewContext(id, component);
-}) as CreateWebviewContext;
-class WebViewContextImpl implements WebViewContext {
-    private webviewElement: UniWebViewElement | null = null;
-    constructor(webviewElement: UniWebViewElement){
-        this.webviewElement = webviewElement;
-    }
-    back() {
-        this.webviewElement?.back();
-    }
-    forward() {
-        this.webviewElement?.forward();
-    }
-    reload() {
-        this.webviewElement?.reload();
-    }
-    stop() {
-        this.webviewElement?.stop();
-    }
-    evalJS(js: string) {
-        this.webviewElement?.evalJS(js);
-    }
-    getContentHeight(): number {
-        return this.webviewElement?.getContentHeight() ?? 0;
-    }
-    loadData(options: UniWebviewContextLoadDataOptions) {
-        this.webviewElement?.loadData(options);
-    }
-}
-export { CreateWebviewContext as CreateWebviewContext, UniWebviewContextLoadDataOptions as UniWebviewContextLoadDataOptions, WebViewContext as WebViewContext };
-export { CreateWebViewContext as CreateWebViewContext };
-export { createWebViewContext as createWebViewContext };
-export { createWebviewContext as createWebviewContext };
-ÀÔrD‘»@dcloudio/uni-app-frameworkÔrE—ªassertions¨external¢id¤meta±moduleSideEffectsªresolvedByµsyntheticNamedExportsAÂÙî/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/framework/index.etsAÃªoh-resolveÂ“ÔrF–§version¤fileªsourceRoot§sources¥names¨mappings¨index.js ‘©index.etsÜ Lœ”    ”  ”	  *”  3”  ÌU”  ÌX”  Ìf”&  Ìs”(  Ìu”.  Ì{”ÌK  Ì˜”ÌL  Ì™•”   ” ”& '”/ /”8 8‘”  •” ” ” ” !” "•” ” ” ” "” #•” ” ” ” "” #’”  ” ‘” ›”   ” ” ” ” ” %” '”+ ÌS”/ ÌW”1 Ìp”3 Ìr–” ” ” ” ?” ÌC” ÌD–” ” ” ” ” ” ™” ” ” ” ”   ”! !”0 0”2 ÌC”3 ÌD˜” ” ” ” ” ” ” ” ” ” ” ” ” ” ”$ $”% %”+ +”. .”/ /”0 0”1 1•” ” ” ” ” š” ” ” ” ” ”! !”" "”< <”= =”> >”” ” ” ” ‘” Ü ” ” ” ”! #”" $”$ 3”% 4”( ÌF”* ÌH”7 ÌU”9 ÌW”ÌF Ìd”ÌG Ìe”ÌJ Ìh”ÌM Ìk”ÌO Ìm”ÌP Ìƒ”ÌQ Ì„–” ” ” ”" "”& &”( (™” ” ”! !”$ $”( (”) )”7 7”9 ÌJ”: ÌK˜” ” ” ”   ”& &”) )”* *”, ,”  ”  ”'  '”*  *”5  5”6  6”ÌA  ÌA”ÌB  ÌB”ÌH  ÌH”ÌK  ÌK”ÌL  ÌL”ÌM  ÌM”ÌN  ÌN•” !” !” !”& !&”( !(š” "” "” "”# "#”$ "$”) ")”* "*”ÌC "ÌC”ÌD "ÌD”ÌE "ÌE”” #” #”# ##”$ #$‘” $Ü ” %”" %"”% %'”2 %4”3 %5”5 %ÌD”6 %ÌE”9 %ÌW”; %ÌY”ÌH %Ìf”ÌJ %Ìh”ÌW %Ìu”ÌX %Ìv”Ì[ %Ìy”Ì^ %Ì|”Ì` %Ì~”Ìa %Ì”Ìb %ÌŸ‘” &‘” '‘”	 (	‘” )‘”	 )Ü ” *” *” *”" *#”# *$”& *6”( *8”5 *ÌE”7 *ÌG”ÌD *ÌT”ÌE *ÌU”ÌH *ÌX”ÌK *Ì[”ÌM *Ì]”ÌN *Ì}”ÌO *Ì~‘” +•” ,” ,” ,” ,” ,”” , ” ,'” ,+” ,,˜” -” -” -”! -!”" -"”0 -0”1 -1”2 -2“”  . ” .” .Ÿ”  / ” /” /” /3”* /Ì@”+ /ÌX”ÌA /Ìn”ÌC /Ìp”ÌD /Ìq”ÌF /Ì{”ÌH /Ì}”ÌT /Ì©”ÌX /Ì­”ÌZ /ÌÆ”Ì\ /ÌÈ™” 0” 0” 0” 0” 0”! 0!”* 0*”+ 0+”, 0,””  1 ” 1” 1” 1Ÿ”  2 ” 2” 2” 23”* 2Ì@”+ 2ÌX”ÌA 2Ìn”ÌC 2Ìp”ÌD 2Ìq”ÌF 2Ì{”ÌH 2Ì}”ÌT 2Ì©”ÌX 2Ì­”ÌZ 2ÌÆ”Ì\ 2ÌÈ™” 3” 3” 3” 3” 3”! 3!”* 3*”+ 3+”, 3,””  4 ” 4” 4” 4“”  5 ” 5” 5“” 7” 7” 71•” 6” 6” 67”" 6;”# 6<—” 8” 8” 8” 8” 8”, 8,”- 8-’” 9” 9’” :” :˜” ;” ;” ;” ;” ;”! ;!”# ;#”$ ;$’” <” <’” =” =˜” >” >” >” >” >”$ >$”& >&”' >'’” ?” ?’” Ì@”
- Ì@
-˜” ÌA” ÌA” ÌA” ÌA” ÌA”# ÌA#”% ÌA%”& ÌA&’” ÌB” ÌB’” ÌC” ÌC˜” ÌD” ÌD” ÌD” ÌD” ÌD”! ÌD!”# ÌD#”$ ÌD$’” ÌE” ÌE”” ÌF”
- ÌF
-” ÌF” ÌFš” ÌG” ÌG” ÌG” ÌG” ÌG”# ÌG#”$ ÌG$”& ÌG&”' ÌG'”( ÌG(’” ÌH” ÌH’” ÌI” ÌI›” ÌJ” ÌJ” ÌJ” ÌJ”" ÌJ"”$ ÌJ$”4 ÌJ4”6 ÌJ6”: ÌJ:”; ÌJ;”< ÌJ<’” ÌK” ÌK”” ÌL” ÌL” ÌL” ÌL6š” ÌM” ÌM” ÌM” ÌM” ÌM”% ÌM%”& ÌM&”- ÌM-”. ÌM.”/ ÌM/’” ÌN” ÌN‘” ÌO˜”  ÌP ” ÌP”	 ÌP7”) ÌPÌW”- ÌPÌ[”ÌM ÌPÌ{”ÌO ÌPÌŸ”ÌP ÌPÌ ˜”  ÌR ” ÌR”	 ÌR	” ÌR”! ÌR!”5 ÌR5”7 ÌR7”8 ÌR8˜”  ÌS ” ÌS”	 ÌS	” ÌS”! ÌS!”5 ÌS5”7 ÌS7”8 ÌS8ÔrG–§version¤file§sources®sourcesContent¥names¨mappingsÀ‘À‘ÀÜ M‘”    ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”  	 ‘”  
- ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”    ‘”  ! ‘”  " ‘”  # ‘”  $ ‘”  % ‘”  & ‘”  ' ‘”  ( ‘”  ) ‘”  * ‘”  + ‘”  , ‘”  - ‘”  . ‘”  / ‘”  0 ‘”  1 ‘”  2 ‘”  3 ‘”  4 ‘”  5 ‘”  6 ‘”  7 ‘”  8 ‘”  9 ‘”  : ‘”  ; ‘”  < ‘”  = ‘”  > ‘”  ? ‘”  Ì@ ‘”  ÌA ‘”  ÌB ‘”  ÌC ‘”  ÌD ‘”  ÌE ‘”  ÌF ‘”  ÌG ‘”  ÌH ‘”  ÌI ‘”  ÌJ ‘”  ÌK ‘”  ÌL ÔrH’§missing¦pluginÃ¦genAbcÂÔ  ÔrI”²dynamicImportCache¹exportAllDeclarationCache»exportNamedDeclarationCache«importCache“ÔrJ–¤type¥start£end«declarationªspecifiers¦source¶ExportNamedDeclarationÍ	§Í	÷À‘ÔrK•¤type¥start£end¥local¨exported¯ExportSpecifierÍ	°Í	ôÔrL”¤type¥start£end¤nameªIdentifierÍ	°Í	ĞÙ UniWebviewContextLoadDataOptionsLªIdentifierÍ	ÔÍ	ôÙ UniWebviewContextLoadDataOptionsÀJ¶ExportNamedDeclarationÍ	ùÍ
-1À‘K¯ExportSpecifierÍ
-Í
-.LªIdentifierÍ
-Í
-´createWebViewContextLªIdentifierÍ
-Í
-.´createWebViewContextÀJ¶ExportNamedDeclarationÍ
-3Í
-kÀ‘K¯ExportSpecifierÍ
-<Í
-hLªIdentifierÍ
-<Í
-P´createWebviewContextLªIdentifierÍ
-TÍ
-h´createWebviewContextÀ‘ÔrM•¤type¥start£endªspecifiers¦source±ImportDeclaration ÌL“ÔrN•¤type¥start£end¨imported¥local¯ImportSpecifier	LªIdentifier	©UTSObjectLªIdentifier	©UTSObjectN¯ImportSpecifierLªIdentifier£UTSLªIdentifier£UTSN¯ImportSpecifier&LªIdentifier&­defineSyncApiLªIdentifier&­defineSyncApiÔrO•¤type¥start£end¥value£raw§Literal.ÌK»@dcloudio/uni-app-framework½"@dcloudio/uni-app-framework"

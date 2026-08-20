@@ -1,4 +1,4 @@
-const imageProps = new UTSJSONObject({
+const defProps = new UTSJSONObject({
   // image组件
   image: new UTSJSONObject({
     src: "",
@@ -20,6 +20,6 @@ const imageProps = new UTSJSONObject({
   })
 });
 export {
-  imageProps as i
+  defProps as d
 };
 //# sourceMappingURL=image.js.map

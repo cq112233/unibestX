@@ -2,12 +2,18 @@ import { d as defProps } from "./checkboxGroup.js";
 import { c as bem } from "../../libs/function/index.js";
 import { u as useUltraUI } from "../../libs/composable/useUltraUI.js";
 import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
-const { defineComponent: _defineComponent } = globalThis.Vue;
+const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, setSharedDataClass: _setSharedDataClass, renderSharedDataEffect: _renderSharedDataEffect, createSharedDataSlot: _createSharedDataSlot } = globalThis.Vue;
+const __className = "GenUniModulesUviewUltraComponentsUpCheckboxGroupUpCheckboxGroup";
 const { computed, ref, watch, provide, getCurrentInstance } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineComponent({
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   ...{
     name: "up-checkbox-group"
   },
+  __dynamicSharedData: true,
+  __hash: "0cc955b3",
+  __className,
+  __filename: "uni_modules/uview-ultra/components/up-checkbox-group/up-checkbox-group.uvue",
   __name: "up-checkbox-group",
   props: {
     // 标识符 
@@ -92,8 +98,10 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
   setup(__props, _a) {
     var _b;
     var __expose = _a.expose, __emit = _a.emit;
+    const __sharedDataScope = _useSharedDataScope();
+    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpCheckboxGroupUpCheckboxGroupSharedData", sharedDataClassId: 0 })));
     const _c = useUltraUI(), children = _c.children, getChildren = _c.getChildren, addChild = _c.addChild;
-    const instance = (_b = getCurrentInstance()) === null || _b === void 0 ? null : _b.proxy;
+    (_b = getCurrentInstance()) === null || _b === void 0 ? null : _b.proxy;
     const props = __props;
     const emit = __emit;
     const parentDataSelf = computed(() => {
@@ -175,28 +183,19 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
       getProps,
       getRefs
     });
-    const __returned__ = { children, getChildren, addChild, instance, props, emit, parentDataSelf, bemClass, toggleCheckbox, unCheckedOther, getProps, getRefs };
-    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
-    return __returned__;
+    return () => {
+      "raw js";
+      _renderSharedDataEffect(() => {
+        return _setSharedDataClass(__sharedData, 0, ["up-checkbox-group", bemClass.value]);
+      });
+      _createSharedDataSlot("default", null, null);
+      return __sharedData;
+    };
   }
 });
-const _style_0 = {"u-empty":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-empty__wrap":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__scroll-view-wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__scroll-view":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__nav":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__nav__line":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-empty":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-empty__wrap":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__scroll-view-wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__scroll-view":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__nav":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__nav__line":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-checkbox-group--row":{"":{"display":"flex","flexDirection":"row","flexWrap":"wrap"}},"up-checkbox-group--column":{"":{"display":"flex","flexDirection":"column"}},"flex":{"":{"display":"flex"}}};
-const { renderSlot: _renderSlot, normalizeClass: _normalizeClass, openBlock: _openBlock, createElementBlock: _createElementBlock } = globalThis.Vue;
-function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  return _openBlock(), _createElementBlock(
-    "view",
-    {
-      class: _normalizeClass(["up-checkbox-group", $setup.bemClass])
-    },
-    [
-      _renderSlot(_ctx.$slots, "default")
-    ],
-    2
-    /* CLASS */
-  );
-}
-const __easycom_2 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-checkbox-group/up-checkbox-group.uvue"]]);
+const _style_0 = {};
+const __easycom_7 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
 export {
-  __easycom_2 as _
+  __easycom_7 as _
 };
 //# sourceMappingURL=up-checkbox-group.js.map

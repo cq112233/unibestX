@@ -1,16 +1,21 @@
-import { _ as __easycom_0 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-icon/up-icon&";
-import { r as resolveEasycom } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/App.ku&";
+import { _ as __easycom_1$1 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-icon/up-icon&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/composable/useUltraUI&";
 import { d as deepMerge, b as addStyle, a as addUnit } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/index&";
 import { d as defProps } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-input/input&";
 import { _ as _export_sfc } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper&";
-const { defineComponent: _defineComponent } = globalThis.Vue;
+const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, createSharedDataTemplateRefSetter: _createSharedDataTemplateRefSetter, resolveComponent: _resolveComponent, setSharedDataClass: _setSharedDataClass, setSharedDataStyle: _setSharedDataStyle, renderSharedDataEffect: _renderSharedDataEffect, setSharedData: _setSharedData, toSharedDataBoolean: _toSharedDataBoolean, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, createSharedDataSlot: _createSharedDataSlot, createSharedDataIf: _createSharedDataIf, setSharedDataTemplateRef: _setSharedDataTemplateRef, setSharedDataEvent: _setSharedDataEvent } = globalThis.Vue;
+const __className = "GenUniModulesUviewUltraComponentsUpInputUpInput";
 const { ref, computed, watch, getCurrentInstance } = globalThis.Vue;
 const { onMounted } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineComponent({
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   ...{
     name: "up-input"
   },
+  __dynamicSharedData: true,
+  __hash: "025ff5f2",
+  __className,
+  __filename: "uni_modules/uview-ultra/components/up-input/up-input.uvue",
   __name: "up-input",
   props: {
     customStyle: {
@@ -212,9 +217,10 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
   },
   emits: ["update:modelValue", "focus", "blur", "change", "confirm", "clear", "keyboardheightchange"],
   setup(__props, _a) {
-    var __expose = _a.expose, __emit = _a.emit;
-    __expose();
-    const instance = getCurrentInstance().proxy;
+    var __emit = _a.emit, $slots = _a.slots;
+    const __sharedDataScope = _useSharedDataScope();
+    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpInputUpInputSharedData", sharedDataClassId: 0 })));
+    getCurrentInstance().proxy;
     const props = __props;
     const emit = __emit;
     const clearInput = ref(false);
@@ -225,7 +231,7 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
     const defaultFormat = function(value) {
       return value;
     };
-    const innerFormatter = ref(defaultFormat);
+    ref(defaultFormat);
     const valueChange = function(val = null, isOut) {
       if (clearInput.value) {
         innerValue.value = "";
@@ -334,119 +340,151 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
     const clickHandler = () => {
     };
     const inputNativeRef = ref(null);
-    const doFocus = () => {
-      var _a2;
-      if (inputNativeRef.value != null) {
-        (_a2 = inputNativeRef.value) === null || _a2 === void 0 ? null : _a2.$callMethod("focus");
-      }
-    };
-    const doBlur = () => {
-      var _a2;
-      if (inputNativeRef.value != null) {
-        (_a2 = inputNativeRef.value) === null || _a2 === void 0 ? null : _a2.$callMethod("blur");
-      }
-    };
-    const setFormatter = (e) => {
-      innerFormatter.value = e;
-    };
     onMounted(() => {
       innerValue.value = props.modelValue;
     });
-    const __returned__ = { instance, props, emit, clearInput, innerValue, focused, firstChange, changeFromInner, defaultFormat, innerFormatter, valueChange, isShowClear, inputClass, wrapperStyle, computedWrapperStyle, inputStyle, onInput, onBlur, onFocus, onConfirm, onkeyboardheightchange, onClear, clickHandler, inputNativeRef, doFocus, doBlur, setFormatter };
-    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
-    return __returned__;
+    return () => {
+      "raw js";
+      const _setTemplateRef = _createSharedDataTemplateRefSetter();
+      const _component_up_icon = __easycom_1$1;
+      const _component_input = _resolveComponent("input");
+      _renderSharedDataEffect(() => {
+        _setSharedDataClass(__sharedData, 10, ["up-input", inputClass.value]);
+        _setSharedDataStyle(__sharedData, 11, computedWrapperStyle.value);
+      });
+      _createSharedDataIf(() => {
+        return _setSharedData(__sharedData, 0, _toSharedDataBoolean(__props.prefixIcon != "" || $slots["prefix"] != null));
+      }, () => {
+        _createSharedDataSlot("prefix", null, null, () => {
+          const n4 = _createSharedDataComponentWithFallback(_component_up_icon, "3788ad5e", {
+            name: () => {
+              return __props.prefixIcon;
+            },
+            size: "18",
+            customStyle: () => {
+              return __props.prefixIconStyle;
+            }
+          });
+          _setSharedData(__sharedData, 1, n4?.sharedData);
+        });
+      });
+      const n6 = _createSharedDataComponentWithFallback(_component_input, "37888dd8", {
+        class: "up-input__content__field-wrapper__field",
+        style: () => {
+          return inputStyle.value;
+        },
+        type: () => {
+          return __props.type;
+        },
+        focus: () => {
+          return __props.focus;
+        },
+        cursor: () => {
+          return __props.cursor;
+        },
+        value: () => {
+          return innerValue.value;
+        },
+        "auto-blur": () => {
+          return __props.autoBlur;
+        },
+        disabled: () => {
+          return __props.disabled || __props.readonly;
+        },
+        maxlength: () => {
+          return __props.maxlength;
+        },
+        placeholder: () => {
+          return __props.placeholder;
+        },
+        "placeholder-style": () => {
+          return __props.placeholderStyle;
+        },
+        "placeholder-class": () => {
+          return __props.placeholderClass;
+        },
+        "confirm-type": () => {
+          return __props.confirmType;
+        },
+        "confirm-hold": () => {
+          return __props.confirmHold;
+        },
+        "hold-keyboard": () => {
+          return __props.holdKeyboard;
+        },
+        "cursor-spacing": () => {
+          return __props.cursorSpacing;
+        },
+        "adjust-position": () => {
+          return __props.adjustPosition;
+        },
+        "selection-end": () => {
+          return __props.selectionEnd;
+        },
+        "selection-start": () => {
+          return __props.selectionStart;
+        },
+        password: () => {
+          return __props.password || __props.type === "password" || false;
+        },
+        ignoreCompositionEvent: () => {
+          return __props.ignoreCompositionEvent;
+        },
+        onInput: () => {
+          return onInput;
+        },
+        onBlur: () => {
+          return onBlur;
+        },
+        onFocus: () => {
+          return onFocus;
+        },
+        onConfirm: () => {
+          return onConfirm;
+        },
+        onKeyboardheightchange: () => {
+          return onkeyboardheightchange;
+        }
+      });
+      _setSharedData(__sharedData, 7, n6?.sharedData);
+      _setSharedDataTemplateRef(__sharedData, 8, (n62) => {
+        _setTemplateRef(n62, inputNativeRef, null, "inputNativeRef");
+      });
+      _setSharedDataEvent(__sharedData, 9, clickHandler);
+      _createSharedDataIf(() => {
+        return _setSharedData(__sharedData, 2, _toSharedDataBoolean(isShowClear.value));
+      }, () => {
+        const n10 = _createSharedDataComponentWithFallback(_component_up_icon, "b98dedc6", {
+          name: "close",
+          size: "11",
+          color: "#ffffff",
+          customStyle: "line-height: 12px"
+        });
+        _setSharedData(__sharedData, 3, n10?.sharedData);
+        _setSharedDataEvent(__sharedData, 4, onClear);
+      });
+      _createSharedDataIf(() => {
+        return _setSharedData(__sharedData, 5, _toSharedDataBoolean(__props.suffixIcon != "" || $slots["suffix"] != null));
+      }, () => {
+        _createSharedDataSlot("suffix", null, null, () => {
+          const n16 = _createSharedDataComponentWithFallback(_component_up_icon, "b98dcf42", {
+            name: () => {
+              return __props.suffixIcon;
+            },
+            size: "18",
+            customStyle: () => {
+              return __props.suffixIconStyle;
+            }
+          });
+          _setSharedData(__sharedData, 6, n16?.sharedData);
+        });
+      });
+      return __sharedData;
+    };
   }
 });
-const _style_0 = {"u-empty":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-empty__wrap":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__scroll-view-wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__scroll-view":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__nav":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__nav__line":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-empty":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-empty__wrap":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__scroll-view-wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__scroll-view":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__nav":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__nav__line":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-input":{"":{"display":"flex","flexDirection":"row","alignItems":"center","justifyContent":"space-between","flexGrow":1,"flexShrink":1,"flexBasis":"0%"}},"up-input--radius":{"":{"borderTopLeftRadius":4,"borderTopRightRadius":4,"borderBottomRightRadius":4,"borderBottomLeftRadius":4}},"up-input--square":{"":{"borderTopLeftRadius":4,"borderTopRightRadius":4,"borderBottomRightRadius":4,"borderBottomLeftRadius":4}},"up-input--no-radius":{"":{"borderTopLeftRadius":0,"borderTopRightRadius":0,"borderBottomRightRadius":0,"borderBottomLeftRadius":0}},"up-input--circle":{"":{"borderTopLeftRadius":100,"borderTopRightRadius":100,"borderBottomRightRadius":100,"borderBottomLeftRadius":100}},"up-input__content":{"":{"flexGrow":1,"flexShrink":1,"flexBasis":"0%","display":"flex","flexDirection":"row","alignItems":"center","justifyContent":"space-between"}},"up-input__content__field-wrapper":{"":{"position":"relative","display":"flex","flexDirection":"row","marginTop":0,"marginRight":0,"marginBottom":0,"marginLeft":0,"flexGrow":1,"flexShrink":1,"flexBasis":"0%"}},"up-input__content__field-wrapper__field":{"":{"textAlign":"left","color":"#303133","height":24,"fontSize":15,"flexGrow":1,"flexShrink":1,"flexBasis":"0%"}},"up-input__content__clear":{"":{"width":20,"height":20,"borderTopLeftRadius":100,"borderTopRightRadius":100,"borderBottomRightRadius":100,"borderBottomLeftRadius":100,"backgroundColor":"#c6c7cb","display":"flex","flexDirection":"row","alignItems":"center","justifyContent":"center","transform":"scale(0.82)","marginLeft":4}},"up-input__content__subfix-icon":{"":{"marginLeft":4}},"up-input__content__prefix-icon":{"":{"marginRight":4}},"up-border":{"":{"borderWidth":0.5,"borderColor":"#dadbde","borderStyle":"solid"}},"up-border-bottom":{"":{"borderBottomWidth":0.5,"borderColor":"#dadbde","borderBottomStyle":"solid"}},"flex":{"":{"display":"flex"}},"relative":{"":{"position":"relative"}}};
-const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
-const { renderSlot: _renderSlot, resolveComponent: _resolveComponent, createVNode: _createVNode, openBlock: _openBlock, createElementBlock: _createElementBlock, createCommentVNode: _createCommentVNode, normalizeStyle: _normalizeStyle, createElementVNode: _createElementVNode, normalizeClass: _normalizeClass } = globalThis.Vue;
-function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  const _component_up_icon = resolveEasycom(__resolveDynamicComponent("up-icon"), __easycom_0);
-  return _openBlock(), _createElementBlock(
-    "view",
-    {
-      class: _normalizeClass(["up-input", $setup.inputClass]),
-      style: _normalizeStyle($setup.computedWrapperStyle)
-    },
-    [
-      _createElementVNode("view", { class: "up-input__content" }, [
-        $props.prefixIcon != "" || _ctx.$slots["prefix"] != null ? (_openBlock(), _createElementBlock("view", {
-          key: 0,
-          class: "up-input__content__prefix-icon"
-        }, [
-          _renderSlot(_ctx.$slots, "prefix", {}, () => [
-            _createVNode(_component_up_icon, {
-              name: $props.prefixIcon,
-              size: "18",
-              customStyle: $props.prefixIconStyle
-            }, null, 8, ["name", "customStyle"])
-          ])
-        ])) : _createCommentVNode("v-if", true),
-        _createElementVNode("view", {
-          class: "up-input__content__field-wrapper",
-          onClick: $setup.clickHandler
-        }, [
-          _createElementVNode("input", {
-            ref: "inputNativeRef",
-            class: "up-input__content__field-wrapper__field",
-            style: _normalizeStyle($setup.inputStyle),
-            type: $props.type,
-            focus: $props.focus,
-            cursor: $props.cursor,
-            value: $setup.innerValue,
-            "auto-blur": $props.autoBlur,
-            disabled: $props.disabled || $props.readonly,
-            maxlength: $props.maxlength,
-            placeholder: $props.placeholder,
-            "placeholder-style": $props.placeholderStyle,
-            "placeholder-class": $props.placeholderClass,
-            "confirm-type": $props.confirmType,
-            "confirm-hold": $props.confirmHold,
-            "hold-keyboard": $props.holdKeyboard,
-            "cursor-spacing": $props.cursorSpacing,
-            "adjust-position": $props.adjustPosition,
-            "selection-end": $props.selectionEnd,
-            "selection-start": $props.selectionStart,
-            password: $props.password || $props.type === "password" || false,
-            ignoreCompositionEvent: $props.ignoreCompositionEvent,
-            onInput: $setup.onInput,
-            onBlur: $setup.onBlur,
-            onFocus: $setup.onFocus,
-            onConfirm: $setup.onConfirm,
-            onKeyboardheightchange: $setup.onkeyboardheightchange
-          }, null, 44, ["type", "focus", "cursor", "value", "auto-blur", "disabled", "maxlength", "placeholder", "placeholder-style", "placeholder-class", "confirm-type", "confirm-hold", "hold-keyboard", "cursor-spacing", "adjust-position", "selection-end", "selection-start", "password", "ignoreCompositionEvent"])
-        ]),
-        $setup.isShowClear ? (_openBlock(), _createElementBlock("view", {
-          key: 1,
-          class: "up-input__content__clear",
-          onClick: $setup.onClear
-        }, [
-          _createVNode(_component_up_icon, {
-            name: "close",
-            size: "11",
-            color: "#ffffff",
-            customStyle: "line-height: 12px"
-          })
-        ])) : _createCommentVNode("v-if", true),
-        $props.suffixIcon != "" || _ctx.$slots["suffix"] != null ? (_openBlock(), _createElementBlock("view", {
-          key: 2,
-          class: "up-input__content__subfix-icon"
-        }, [
-          _renderSlot(_ctx.$slots, "suffix", {}, () => [
-            _createVNode(_component_up_icon, {
-              name: $props.suffixIcon,
-              size: "18",
-              customStyle: $props.suffixIconStyle
-            }, null, 8, ["name", "customStyle"])
-          ])
-        ])) : _createCommentVNode("v-if", true)
-      ])
-    ],
-    6
-    /* CLASS, STYLE */
-  );
-}
-const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-input/up-input.uvue"]]);
+const _style_0 = {"up-border":{"":{"borderWidth":0.5,"borderColor":"#dadbde","borderStyle":"solid"}},"up-border-bottom":{"":{"borderBottomWidth":0.5,"borderColor":"#dadbde","borderBottomStyle":"solid"}}};
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
 export {
   __easycom_1 as _
 };

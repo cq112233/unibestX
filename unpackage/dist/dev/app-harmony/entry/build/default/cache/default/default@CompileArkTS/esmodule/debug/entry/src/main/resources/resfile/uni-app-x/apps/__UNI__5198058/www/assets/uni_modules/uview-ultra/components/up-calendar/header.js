@@ -1,10 +1,16 @@
 import { t } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/i18n/index&";
 import { _ as _export_sfc } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper&";
-const { defineComponent: _defineComponent } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineComponent({
+const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, setSharedData: _setSharedData, toSharedDataBoolean: _toSharedDataBoolean, toDisplayString: _toDisplayString, renderSharedDataEffect: _renderSharedDataEffect, createSharedDataIf: _createSharedDataIf, setSharedDataEvent: _setSharedDataEvent, setSharedDataClass: _setSharedDataClass } = globalThis.Vue;
+const __className = "GenUniModulesUviewUltraComponentsUpCalendarHeader";
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   ...{
     name: "up-calendar-header"
   },
+  __dynamicSharedData: true,
+  __hash: "f1ec25ee",
+  __className,
+  __filename: "uni_modules/uview-ultra/components/up-calendar/header.uvue",
   __name: "header",
   props: {
     title: {
@@ -58,8 +64,9 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
   },
   emits: ["prev", "next", "prevYear", "nextYear", "today"],
   setup(__props, _a) {
-    var __expose = _a.expose, __emit = _a.emit;
-    __expose();
+    var __emit = _a.emit;
+    const __sharedDataScope = _useSharedDataScope();
+    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpCalendarHeaderSharedData", sharedDataClassId: 0 })));
     const props = __props;
     const emit = __emit;
     function t$1(key) {
@@ -90,146 +97,79 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
         emit("today");
       }
     }
-    const __returned__ = { props, emit, t: t$1, prev, next, prevYear, nextYear, today };
-    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
-    return __returned__;
+    return () => {
+      "raw js";
+      _createSharedDataIf(() => {
+        return _setSharedData(__sharedData, 0, _toSharedDataBoolean(__props.showTitle));
+      }, () => {
+        _renderSharedDataEffect(() => {
+          return _setSharedData(__sharedData, 1, _toDisplayString(__props.title));
+        });
+      });
+      _createSharedDataIf(() => {
+        return _setSharedData(__sharedData, 2, _toSharedDataBoolean(__props.showSubtitle));
+      }, () => {
+        _createSharedDataIf(() => {
+          return _setSharedData(__sharedData, 3, _toSharedDataBoolean(__props.showSwitch));
+        }, () => {
+          _setSharedDataEvent(__sharedData, 4, prevYear);
+          _renderSharedDataEffect(() => {
+            return _setSharedDataClass(__sharedData, 5, ["up-calendar-header__switch", { "up-calendar-header__switch--disabled": __props.prevYearDisabled }]);
+          });
+        });
+        _createSharedDataIf(() => {
+          return _setSharedData(__sharedData, 6, _toSharedDataBoolean(__props.showSwitch));
+        }, () => {
+          _setSharedDataEvent(__sharedData, 7, prev);
+          _renderSharedDataEffect(() => {
+            return _setSharedDataClass(__sharedData, 8, ["up-calendar-header__switch", { "up-calendar-header__switch--disabled": __props.prevDisabled }]);
+          });
+        });
+        _renderSharedDataEffect(() => {
+          return _setSharedData(__sharedData, 19, _toDisplayString(__props.subtitle));
+        });
+        _createSharedDataIf(() => {
+          return _setSharedData(__sharedData, 9, _toSharedDataBoolean(__props.showSwitch));
+        }, () => {
+          _setSharedDataEvent(__sharedData, 10, next);
+          _renderSharedDataEffect(() => {
+            return _setSharedDataClass(__sharedData, 11, ["up-calendar-header__switch", { "up-calendar-header__switch--disabled": __props.nextDisabled }]);
+          });
+        });
+        _createSharedDataIf(() => {
+          return _setSharedData(__sharedData, 12, _toSharedDataBoolean(__props.showSwitch));
+        }, () => {
+          _setSharedDataEvent(__sharedData, 13, nextYear);
+          _renderSharedDataEffect(() => {
+            return _setSharedDataClass(__sharedData, 14, ["up-calendar-header__switch", { "up-calendar-header__switch--disabled": __props.nextYearDisabled }]);
+          });
+        });
+        _createSharedDataIf(() => {
+          return _setSharedData(__sharedData, 15, _toSharedDataBoolean(__props.showToday));
+        }, () => {
+          _setSharedDataEvent(__sharedData, 16, today);
+          _renderSharedDataEffect(() => {
+            _setSharedDataClass(__sharedData, 17, ["up-calendar-header__today", { "up-calendar-header__today--disabled": __props.todayDisabled }]);
+            _setSharedData(__sharedData, 18, _toDisplayString(__props.todayText));
+          });
+        });
+      });
+      _renderSharedDataEffect(() => {
+        const _t = t$1;
+        _setSharedData(__sharedData, 20, _toDisplayString(_t("up_week_one")));
+        _setSharedData(__sharedData, 21, _toDisplayString(_t("up_week_two")));
+        _setSharedData(__sharedData, 22, _toDisplayString(_t("up_week_three")));
+        _setSharedData(__sharedData, 23, _toDisplayString(_t("up_week_four")));
+        _setSharedData(__sharedData, 24, _toDisplayString(_t("up_week_five")));
+        _setSharedData(__sharedData, 25, _toDisplayString(_t("up_week_six")));
+        _setSharedData(__sharedData, 26, _toDisplayString(_t("up_week_seven")));
+      });
+      return __sharedData;
+    };
   }
 });
-const _style_0 = {"u-empty":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-empty__wrap":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__scroll-view-wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__scroll-view":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__nav":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__nav__line":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-empty":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-empty__wrap":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__scroll-view-wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__scroll-view":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__nav":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__nav__line":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-calendar-header__title":{"":{"fontSize":16,"fontWeight":"bold","textAlign":"center","color":"#303133","height":42,"lineHeight":"42px"}},"up-calendar-header__subtitle":{"":{"fontSize":14,"color":"#303133","height":40,"textAlign":"center","lineHeight":"40px","fontWeight":"bold"}},"up-calendar-header__subtitle-wrap":{"":{"display":"flex","flexDirection":"row","justifyContent":"center","alignItems":"center","position":"relative"}},"up-calendar-header__switch":{"":{"fontSize":16,"color":"#909193","lineHeight":"40px","paddingTop":0,"paddingRight":8,"paddingBottom":0,"paddingLeft":8}},"up-calendar-header__switch--disabled":{"":{"color":"#c0c4cc"}},"up-calendar-header__today":{"":{"position":"absolute","right":15,"fontSize":13,"color":"var(--theme-color, #0957de)"}},"up-calendar-header__today--disabled":{"":{"color":"#c0c4cc"}},"up-calendar-header__weekdays":{"":{"display":"flex","flexDirection":"row","justifyContent":"space-between"}},"up-calendar-header__weekdays__weekday":{"":{"fontSize":13,"color":"#303133","lineHeight":"30px","flexGrow":1,"flexShrink":1,"flexBasis":"0%","textAlign":"center"}},"flex":{"":{"display":"flex"}},"relative":{"":{"position":"relative"}},"up-border-bottom":{"":{"borderBottomWidth":0.5,"borderColor":"#dadbde","borderBottomStyle":"solid"}}};
-const { toDisplayString: _toDisplayString, openBlock: _openBlock, createElementBlock: _createElementBlock, createCommentVNode: _createCommentVNode, normalizeClass: _normalizeClass, createElementVNode: _createElementVNode } = globalThis.Vue;
-function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  return _openBlock(), _createElementBlock("view", { class: "up-calendar-header up-border-bottom" }, [
-    $props.showTitle ? (_openBlock(), _createElementBlock(
-      "text",
-      {
-        key: 0,
-        class: "up-calendar-header__title"
-      },
-      _toDisplayString($props.title),
-      1
-      /* TEXT */
-    )) : _createCommentVNode("v-if", true),
-    $props.showSubtitle ? (_openBlock(), _createElementBlock("view", {
-      key: 1,
-      class: "up-calendar-header__subtitle-wrap"
-    }, [
-      $props.showSwitch ? (_openBlock(), _createElementBlock(
-        "text",
-        {
-          key: 0,
-          class: _normalizeClass(["up-calendar-header__switch", { "up-calendar-header__switch--disabled": $props.prevYearDisabled }]),
-          onClick: $setup.prevYear
-        },
-        "«",
-        2
-        /* CLASS */
-      )) : _createCommentVNode("v-if", true),
-      $props.showSwitch ? (_openBlock(), _createElementBlock(
-        "text",
-        {
-          key: 1,
-          class: _normalizeClass(["up-calendar-header__switch", { "up-calendar-header__switch--disabled": $props.prevDisabled }]),
-          onClick: $setup.prev
-        },
-        "‹",
-        2
-        /* CLASS */
-      )) : _createCommentVNode("v-if", true),
-      _createElementVNode(
-        "text",
-        { class: "up-calendar-header__subtitle" },
-        _toDisplayString($props.subtitle),
-        1
-        /* TEXT */
-      ),
-      $props.showSwitch ? (_openBlock(), _createElementBlock(
-        "text",
-        {
-          key: 2,
-          class: _normalizeClass(["up-calendar-header__switch", { "up-calendar-header__switch--disabled": $props.nextDisabled }]),
-          onClick: $setup.next
-        },
-        "›",
-        2
-        /* CLASS */
-      )) : _createCommentVNode("v-if", true),
-      $props.showSwitch ? (_openBlock(), _createElementBlock(
-        "text",
-        {
-          key: 3,
-          class: _normalizeClass(["up-calendar-header__switch", { "up-calendar-header__switch--disabled": $props.nextYearDisabled }]),
-          onClick: $setup.nextYear
-        },
-        "»",
-        2
-        /* CLASS */
-      )) : _createCommentVNode("v-if", true),
-      $props.showToday ? (_openBlock(), _createElementBlock(
-        "text",
-        {
-          key: 4,
-          class: _normalizeClass(["up-calendar-header__today", { "up-calendar-header__today--disabled": $props.todayDisabled }]),
-          onClick: $setup.today
-        },
-        _toDisplayString($props.todayText),
-        3
-        /* TEXT, CLASS */
-      )) : _createCommentVNode("v-if", true)
-    ])) : _createCommentVNode("v-if", true),
-    _createElementVNode("view", { class: "up-calendar-header__weekdays" }, [
-      _createElementVNode(
-        "text",
-        { class: "up-calendar-header__weekdays__weekday" },
-        _toDisplayString($setup.t("up_week_one")),
-        1
-        /* TEXT */
-      ),
-      _createElementVNode(
-        "text",
-        { class: "up-calendar-header__weekdays__weekday" },
-        _toDisplayString($setup.t("up_week_two")),
-        1
-        /* TEXT */
-      ),
-      _createElementVNode(
-        "text",
-        { class: "up-calendar-header__weekdays__weekday" },
-        _toDisplayString($setup.t("up_week_three")),
-        1
-        /* TEXT */
-      ),
-      _createElementVNode(
-        "text",
-        { class: "up-calendar-header__weekdays__weekday" },
-        _toDisplayString($setup.t("up_week_four")),
-        1
-        /* TEXT */
-      ),
-      _createElementVNode(
-        "text",
-        { class: "up-calendar-header__weekdays__weekday" },
-        _toDisplayString($setup.t("up_week_five")),
-        1
-        /* TEXT */
-      ),
-      _createElementVNode(
-        "text",
-        { class: "up-calendar-header__weekdays__weekday" },
-        _toDisplayString($setup.t("up_week_six")),
-        1
-        /* TEXT */
-      ),
-      _createElementVNode(
-        "text",
-        { class: "up-calendar-header__weekdays__weekday" },
-        _toDisplayString($setup.t("up_week_seven")),
-        1
-        /* TEXT */
-      )
-    ])
-  ]);
-}
-const uHeader = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-calendar/header.uvue"]]);
+const _style_0 = {};
+const uHeader = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
 export {
   uHeader as u
 };

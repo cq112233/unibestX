@@ -1,15 +1,20 @@
 import { _ as __easycom_0 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-status-bar/up-status-bar&";
-import { r as resolveEasycom } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/App.ku&";
-import { _ as __easycom_0$1 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-icon/up-icon&";
-import { _ as __easycom_0$2 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-line/up-line&";
+import { _ as __easycom_1$1 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-icon/up-icon&";
+import { _ as __easycom_1$2 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-line/up-line&";
 import { a as addUnit } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/index&";
 import { _ as _export_sfc } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper&";
-const { defineComponent: _defineComponent } = globalThis.Vue;
+const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, resolveComponent: _resolveComponent, setSharedDataClass: _setSharedDataClass, renderSharedDataEffect: _renderSharedDataEffect, setSharedData: _setSharedData, toSharedDataBoolean: _toSharedDataBoolean, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, createSharedDataIf: _createSharedDataIf, setSharedDataStyle: _setSharedDataStyle, createSharedDataSlot: _createSharedDataSlot, setSharedDataEvent: _setSharedDataEvent } = globalThis.Vue;
+const __className = "GenUniModulesUviewUltraComponentsUpNavbarMiniUpNavbarMini";
 const { computed } = globalThis.Vue;
-const _sfc_main = /* @__PURE__ */ _defineComponent({
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   ...{
     name: "up-navbar-mini"
   },
+  __dynamicSharedData: true,
+  __hash: "05b78300",
+  __className,
+  __filename: "uni_modules/uview-ultra/components/up-navbar-mini/up-navbar-mini.uvue",
   __name: "up-navbar-mini",
   props: {
     safeAreaInsetTop: {
@@ -59,8 +64,9 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
   },
   emits: ["leftClick", "homeClick"],
   setup(__props, _a) {
-    var __expose = _a.expose, __emit = _a.emit;
-    __expose();
+    var __emit = _a.emit;
+    const __sharedDataScope = _useSharedDataScope();
+    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpNavbarMiniUpNavbarMiniSharedData", sharedDataClassId: 0 })));
     const props = __props;
     const emit = __emit;
     const contentStyle = computed(() => {
@@ -81,85 +87,64 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
         uni.reLaunch({ url: props.homeUrl });
       }
     }
-    const __returned__ = { props, emit, contentStyle, leftClick, homeClick };
-    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
-    return __returned__;
+    return () => {
+      "raw js";
+      const _component_up_status_bar = __easycom_0;
+      const _component_up_icon = __easycom_1$1;
+      const _component_up_line = __easycom_1$2;
+      _renderSharedDataEffect(() => {
+        _setSharedDataClass(__sharedData, 7, ["up-navbar-mini", [__props.customClass]]);
+        _setSharedDataClass(__sharedData, 8, ["up-navbar-mini__inner", [__props.fixed ? "up-navbar-mini--fixed" : ""]]);
+      });
+      _createSharedDataIf(() => {
+        return _setSharedData(__sharedData, 0, _toSharedDataBoolean(__props.safeAreaInsetTop));
+      }, () => {
+        const n2 = _createSharedDataComponentWithFallback(_component_up_status_bar, "4b8fb3d5");
+        _setSharedData(__sharedData, 1, n2?.sharedData);
+      });
+      _renderSharedDataEffect(() => {
+        return _setSharedDataStyle(__sharedData, 9, contentStyle.value);
+      });
+      _createSharedDataSlot("left", null, null, () => {
+        const n5 = _createSharedDataComponentWithFallback(_component_up_icon, "4b8fbf8f", {
+          name: () => {
+            return __props.leftIcon;
+          },
+          size: () => {
+            return __props.iconSize;
+          },
+          color: () => {
+            return __props.iconColor;
+          }
+        });
+        _setSharedData(__sharedData, 2, n5?.sharedData);
+      });
+      _setSharedDataEvent(__sharedData, 5, leftClick);
+      const n7 = _createSharedDataComponentWithFallback(_component_up_line, "4b8fc6b4", {
+        direction: "col",
+        color: "#fff",
+        length: "16px"
+      });
+      _setSharedData(__sharedData, 3, n7?.sharedData);
+      _createSharedDataSlot("center", null, null, () => {
+        const n11 = _createSharedDataComponentWithFallback(_component_up_icon, "4b8fce79", {
+          name: "home",
+          size: () => {
+            return __props.iconSize;
+          },
+          color: () => {
+            return __props.iconColor;
+          }
+        });
+        _setSharedData(__sharedData, 4, n11?.sharedData);
+      });
+      _setSharedDataEvent(__sharedData, 6, homeClick);
+      return __sharedData;
+    };
   }
 });
-const _style_0 = {"u-empty":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-empty__wrap":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__scroll-view-wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__scroll-view":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__nav":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"u-tabs__wrapper__nav__line":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-empty":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-empty__wrap":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__scroll-view-wrapper":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__scroll-view":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__nav":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-tabs__wrapper__nav__line":{"":{"display":"flex","flexDirection":"column","flexShrink":0,"flexGrow":0,"flexBasis":"auto","alignItems":"stretch","alignContent":"flex-start"}},"up-navbar-mini__inner":{"":{"width":"180rpx","overflow":"hidden"}},"up-navbar-mini--fixed":{"":{"position":"fixed","left":20,"right":0,"top":10,"zIndex":11}},"up-navbar-mini__content":{"":{"display":"flex","flexDirection":"row","paddingTop":0,"paddingRight":15,"paddingBottom":0,"paddingLeft":15,"borderTopLeftRadius":20,"borderTopRightRadius":20,"borderBottomRightRadius":20,"borderBottomLeftRadius":20,"alignItems":"center","height":36,"backgroundColor":"#9acafc","position":"relative","justifyContent":"space-between"}},"up-navbar-mini__content__left":{"":{"display":"flex","flexDirection":"row","alignItems":"center"}},"up-navbar-mini__content__left--hover":{"":{"opacity":0.7}},"flex":{"":{"display":"flex"}},"relative":{"":{"position":"relative"}}};
-const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
-const { resolveComponent: _resolveComponent, openBlock: _openBlock, createBlock: _createBlock, createCommentVNode: _createCommentVNode, renderSlot: _renderSlot, createVNode: _createVNode, createElementVNode: _createElementVNode, normalizeStyle: _normalizeStyle, normalizeClass: _normalizeClass, createElementBlock: _createElementBlock } = globalThis.Vue;
-function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  const _component_up_status_bar = resolveEasycom(__resolveDynamicComponent("up-status-bar"), __easycom_0);
-  const _component_up_icon = resolveEasycom(__resolveDynamicComponent("up-icon"), __easycom_0$1);
-  const _component_up_line = resolveEasycom(__resolveDynamicComponent("up-line"), __easycom_0$2);
-  return _openBlock(), _createElementBlock(
-    "view",
-    {
-      class: _normalizeClass(["up-navbar-mini", [$props.customClass]])
-    },
-    [
-      _createElementVNode(
-        "view",
-        {
-          class: _normalizeClass(["up-navbar-mini__inner", [$props.fixed ? "up-navbar-mini--fixed" : ""]])
-        },
-        [
-          $props.safeAreaInsetTop ? (_openBlock(), _createBlock(_component_up_status_bar, { key: 0 })) : _createCommentVNode("v-if", true),
-          _createElementVNode(
-            "view",
-            {
-              class: "up-navbar-mini__content",
-              style: _normalizeStyle($setup.contentStyle)
-            },
-            [
-              _createElementVNode("view", {
-                class: "up-navbar-mini__content__left",
-                "hover-class": "up-navbar-mini__content__left--hover",
-                "hover-start-time": "150",
-                onClick: $setup.leftClick
-              }, [
-                _renderSlot(_ctx.$slots, "left", {}, () => [
-                  _createVNode(_component_up_icon, {
-                    name: $props.leftIcon,
-                    size: $props.iconSize,
-                    color: $props.iconColor
-                  }, null, 8, ["name", "size", "color"])
-                ])
-              ]),
-              _createElementVNode("view", { style: { "padding": "10px 10px" } }, [
-                _createVNode(_component_up_line, {
-                  direction: "col",
-                  color: "#fff",
-                  length: "16px"
-                })
-              ]),
-              _createElementVNode("view", {
-                class: "up-navbar-mini__content__center",
-                onClick: $setup.homeClick
-              }, [
-                _renderSlot(_ctx.$slots, "center", {}, () => [
-                  _createVNode(_component_up_icon, {
-                    name: "home",
-                    size: $props.iconSize,
-                    color: $props.iconColor
-                  }, null, 8, ["size", "color"])
-                ])
-              ])
-            ],
-            4
-            /* STYLE */
-          )
-        ],
-        2
-        /* CLASS */
-      )
-    ],
-    2
-    /* CLASS */
-  );
-}
-const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/uview-ultra/components/up-navbar-mini/up-navbar-mini.uvue"]]);
+const _style_0 = {};
+const __easycom_1 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
 export {
   __easycom_1 as _
 };

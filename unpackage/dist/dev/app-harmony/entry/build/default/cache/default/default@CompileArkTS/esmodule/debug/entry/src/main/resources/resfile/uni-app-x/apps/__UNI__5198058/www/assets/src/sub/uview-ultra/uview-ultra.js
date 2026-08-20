@@ -1,24 +1,30 @@
 import { _ as __easycom_0 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/components/NavBar/NavBar&";
-import { A as AppKu, r as resolveEasycom } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/App.ku&";
-import { _ as __easycom_0$1 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-icon/up-icon&";
-import { _ as __easycom_1 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-cell/up-cell&";
-import { _ as __easycom_2 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-cell-group/up-cell-group&";
+import { _ as __easycom_1 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-icon/up-icon&";
+import { _ as __easycom_2 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-cell/up-cell&";
+import { _ as __easycom_3 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-cell-group/up-cell-group&";
+import { A as AppKu } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/App.ku&";
 import { L as LayoutComponent } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/layouts/default&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/store/index&";
 import { u as useAppStore } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/store/app&";
-import { _ as _imports_0 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/static/logo&";
 import { _ as _export_sfc } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/utils/systemInfo&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/utils/theme&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/theme&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-toast/up-toast&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-loading-icon/up-loading-icon&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-loading-icon/loadingIcon&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/config/config&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-icon/icons&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/index&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/test&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/digit&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/e-chart/components/e-chart/uts/WebviewEchart&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/config/config&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/composable/useUltraUI&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-icon/icon&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-line/up-line&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-line/line&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-cell/cell&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-cell-group/cellGroup&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-toast/up-toast&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-loading-icon/up-loading-icon&";
+import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-loading-icon/loadingIcon&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/function/colorGradient&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-gap/up-gap&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/composable/useMp&";
@@ -46,13 +52,6 @@ import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/i18n/locales/zh-CN&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/i18n/locales/en-US&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/src/utils/toast&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-icon/icons&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/composable/useUltraUI&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-icon/icon&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-line/up-line&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-line/line&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-cell/cell&";
-import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-cell-group/cellGroup&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/x-pinia-s/instans/types&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/x-pinia-s/instans/subscriptions&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/x-pinia-s/instans/createPinia&";
@@ -72,14 +71,21 @@ import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/i18n/locales/ko&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/i18n/locales/ja&";
 import "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/i18n/locales/ru&";
-const { defineComponent: _defineComponent } = globalThis.Vue;
+const { defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataPageId: _useSharedDataPageId, useSharedDataPageOptions: _useSharedDataPageOptions, useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataRenderer: _useSharedDataRenderer, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, withSharedDataPage: _withSharedDataPage, resolveComponent: _resolveComponent, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, setSharedData: _setSharedData, toDisplayString: _toDisplayString, withSharedDataVaporCtx: _withSharedDataVaporCtx, createSharedDataComponent: _createSharedDataComponent } = globalThis.Vue;
+const __className = "GenSrcSubUviewUltraUviewUltra";
 const { computed } = globalThis.Vue;
 const demoCount = 73;
-const _sfc_main = /* @__PURE__ */ _defineComponent({
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+  __dynamicSharedData: true,
+  __hash: "162b1bf2",
+  __className,
+  __filename: "src/sub/uview-ultra/uview-ultra.uvue",
   __name: "uview-ultra",
-  setup(__props, _a) {
-    var __expose = _a.expose;
-    __expose();
+  setup(__props) {
+    const __sharedDataRenderer = _useSharedDataRenderer();
+    const __sharedData = __sharedDataRenderer == "component" ? _withSharedDataComponent(new UniDynamicSharedDataComponent(_useSharedDataScope(), _useSharedDataComponentOptions({ bundleKey: "GenSrcSubUviewUltraUviewUltraSharedData", sharedDataClassId: 0 }))) : _withSharedDataPage(new UniDynamicSharedDataPage(_useSharedDataPageId(), _useSharedDataPageOptions({ bundleKey: "GenSrcSubUviewUltraUviewUltraSharedData", sharedDataClassId: 0 })));
+    _useSharedDataScope(__sharedData);
     const appStore = useAppStore();
     const themeColor = computed(() => {
       return appStore.state.theme;
@@ -89,1247 +95,1720 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
         url: `/src/sub/uview-ultra/demos/${page}/${page}`
       });
     }
-    const __returned__ = { appStore, themeColor, demoCount, goToDemo, get AppKu() {
-      return AppKu;
-    }, get LayoutComponent() {
-      return LayoutComponent;
-    } };
-    Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
-    return __returned__;
-  }
-});
-const _style_0 = {"demo-group-card":{"":{"marginTop":0,"marginRight":12,"marginBottom":0,"marginLeft":12,"backgroundColor":"#ffffff","borderTopLeftRadius":12,"borderTopRightRadius":12,"borderBottomRightRadius":12,"borderBottomLeftRadius":12,"paddingTop":12,"paddingRight":0,"paddingBottom":12,"paddingLeft":0,"boxShadow":"0 2px 8px rgba(0, 0, 0, 0.03)"}},"group-title":{"":{"fontSize":14,"fontWeight":"bold","color":"#1e293b","paddingTop":0,"paddingRight":16,"paddingBottom":8,"paddingLeft":16,"borderBottomWidth":1,"borderBottomStyle":"solid","borderBottomColor":"#f1f5f9"}},"bg-_b_hf8fafc_B":{"":{"backgroundColor":"#f8fafc"}},"pb-_b50px_B":{"":{"paddingBottom":50}},"p-_b16px_B":{"":{"paddingTop":16,"paddingRight":16,"paddingBottom":16,"paddingLeft":16,"padding":16}},"bg-white":{"":{"backgroundColor":"var(--color-white)"}},"mb-_b12px_B":{"":{"marginBottom":12}},"shadow-xs":{"":{"--tw-inset-shadow":"0 0 #0000","--tw-inset-ring-shadow":"0 0 #0000","--tw-ring-offset-shadow":"0 0 #0000","--tw-ring-shadow":"0 0 #0000","--tw-shadow":"0 1px 2px 0 rgba(0, 0, 0, 0.05)","boxShadow":"var(--tw-inset-shadow),var(--tw-inset-ring-shadow),var(--tw-ring-offset-shadow),var(--tw-ring-shadow),var(--tw-shadow)","-TwShadow":"0 1px 2px 0 var(--tw-shadow-color,rgba(0,0,0,0.05))"}},"flex-row":{"":{"flexDirection":"row"}},"items-center":{"":{"alignItems":"center"}},"mr-_b12px_B":{"":{"marginRight":12}},"rounded-_b8px_B":{"":{"borderTopLeftRadius":8,"borderTopRightRadius":8,"borderBottomRightRadius":8,"borderBottomLeftRadius":8,"borderRadius":8}},"flex-1":{"":{"flexGrow":1,"flexShrink":1,"flexBasis":"0%","flex":"1"}},"text-_b16px_B":{"":{"fontSize":16}},"font-bold":{"":{"--tw-font-weight":"700","fontWeight":"var(--font-weight-bold)","-TwFontWeight":"var(--font-weight-bold)"}},"text-_b_h1e293b_B":{"":{"color":"#1e293b"}},"text-_b12px_B":{"":{"fontSize":12}},"text-_b_h64748b_B":{"":{"color":"#64748b"}},"mt-_b4px_B":{"":{"marginTop":4}},"mr-_b8px_B":{"":{"marginRight":8}},"mt-_b12px_B":{"":{"marginTop":12}},"flex":{"":{"display":"flex"}}};
-const { resolveDynamicComponent: __resolveDynamicComponent } = globalThis.Vue;
-const { resolveComponent: _resolveComponent, createVNode: _createVNode, createElementVNode: _createElementVNode, toDisplayString: _toDisplayString, withCtx: _withCtx, openBlock: _openBlock, createBlock: _createBlock } = globalThis.Vue;
-function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  const _component_NavBar = resolveEasycom(__resolveDynamicComponent("NavBar"), __easycom_0);
-  const _component_up_icon = resolveEasycom(__resolveDynamicComponent("up-icon"), __easycom_0$1);
-  const _component_up_cell = resolveEasycom(__resolveDynamicComponent("up-cell"), __easycom_1);
-  const _component_up_cell_group = resolveEasycom(__resolveDynamicComponent("up-cell-group"), __easycom_2);
-  return _openBlock(), _createBlock($setup["AppKu"], null, {
-    default: _withCtx(() => [
-      _createVNode($setup["LayoutComponent"], {
-        "navigation-style": "custom",
-        "navigation-bar-title-text": "uview-ultra 示例"
-      }, {
-        default: _withCtx(() => [
-          _createElementVNode("view", { class: "page-container bg-_b_hf8fafc_B pb-_b50px_B" }, [
-            _createVNode(_component_NavBar, {
-              title: "uview-ultra 组件演示",
-              "auto-back": true,
-              "safe-area-inset-top": true
-            }),
-            _createElementVNode("view", { class: "p-_b16px_B bg-white mb-_b12px_B shadow-xs flex-row items-center" }, [
-              _createElementVNode("image", {
-                src: _imports_0,
-                style: { "width": "50px", "height": "50px" },
-                class: "mr-_b12px_B rounded-_b8px_B"
-              }),
-              _createElementVNode("view", { class: "flex-1" }, [
-                _createElementVNode("text", { class: "text-_b16px_B font-bold text-_b_h1e293b_B" }, "uview-ultra 组件库"),
-                _createElementVNode("text", { class: "text-_b12px_B text-_b_h64748b_B mt-_b4px_B" }, "已收录 " + _toDisplayString($setup.demoCount) + " 个组件 Demo"),
-                _createElementVNode("text", { class: "text-_b12px_B text-_b_h64748b_B mt-_b4px_B" }, "点击下方任意功能组件，进入独立页面进行演示")
-              ])
-            ]),
-            _createElementVNode("view", { class: "demo-group-card" }, [
-              _createElementVNode("text", { class: "group-title" }, "基础与展示组件"),
-              _createVNode(_component_up_cell_group, { border: false }, {
-                default: _withCtx(() => [
-                  _createVNode(_component_up_cell, {
+    return () => {
+      "raw js";
+      const _component_NavBar = __easycom_0;
+      const _component_up_icon = __easycom_1;
+      const _component_up_cell = __easycom_2;
+      const _component_up_cell_group = __easycom_3;
+      const n237 = _createSharedDataComponent(AppKu, "078c97b3", null, {
+        "default": _withSharedDataVaporCtx(() => {
+          const n236 = _createSharedDataComponent(LayoutComponent, "2bf342ba", {
+            "navigation-style": "custom",
+            "navigation-bar-title-text": "uview-ultra 示例"
+          }, {
+            "default": _withSharedDataVaporCtx(() => {
+              const n0 = _createSharedDataComponentWithFallback(_component_NavBar, "56c5764c", {
+                title: "uview-ultra 组件演示",
+                "auto-back": true,
+                "safe-area-inset-top": true
+              });
+              _setSharedData(__sharedData, 2, n0?.sharedData);
+              _setSharedData(__sharedData, 151, _toDisplayString(demoCount));
+              const n92 = _createSharedDataComponentWithFallback(_component_up_cell_group, "56c59414", { border: false }, {
+                "default": _withSharedDataVaporCtx(() => {
+                  const _on_click = () => {
+                    return goToDemo("button");
+                  };
+                  const n10 = _createSharedDataComponentWithFallback(_component_up_cell, "56c59490", {
                     title: "Button 按钮",
                     "is-link": "",
-                    onClick: _cache[0] || (_cache[0] = ($event) => $setup.goToDemo("button"))
+                    onClick: () => {
+                      return _on_click;
+                    }
                   }, {
-                    icon: _withCtx(() => [
-                      _createVNode(_component_up_icon, {
+                    "icon": _withSharedDataVaporCtx(() => {
+                      const n8 = _createSharedDataComponentWithFallback(_component_up_icon, "fc2d8c0e", {
                         name: "plus-circle",
-                        color: $setup.themeColor,
+                        color: () => {
+                          return themeColor.value;
+                        },
                         size: "20",
                         class: "mr-_b8px_B"
-                      }, null, 8, ["color"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  _createVNode(_component_up_cell, {
+                      });
+                      _setSharedData(__sharedData, 5, n8?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 4, n10?.sharedData);
+                  const _on_click1 = () => {
+                    return goToDemo("icon");
+                  };
+                  const n13 = _createSharedDataComponentWithFallback(_component_up_cell, "fc2d7e84", {
                     title: "Icon 图标",
                     "is-link": "",
-                    onClick: _cache[1] || (_cache[1] = ($event) => $setup.goToDemo("icon"))
+                    onClick: () => {
+                      return _on_click1;
+                    }
                   }, {
-                    icon: _withCtx(() => [
-                      _createVNode(_component_up_icon, {
+                    "icon": _withSharedDataVaporCtx(() => {
+                      const n11 = _createSharedDataComponentWithFallback(_component_up_icon, "fc2d772e", {
                         name: "photo",
-                        color: $setup.themeColor,
+                        color: () => {
+                          return themeColor.value;
+                        },
                         size: "20",
                         class: "mr-_b8px_B"
-                      }, null, 8, ["color"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  _createVNode(_component_up_cell, {
+                      });
+                      _setSharedData(__sharedData, 7, n11?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 6, n13?.sharedData);
+                  const _on_click2 = () => {
+                    return goToDemo("text");
+                  };
+                  const n16 = _createSharedDataComponentWithFallback(_component_up_cell, "fc2d6ec6", {
                     title: "Text 文本",
                     "is-link": "",
-                    onClick: _cache[2] || (_cache[2] = ($event) => $setup.goToDemo("text"))
+                    onClick: () => {
+                      return _on_click2;
+                    }
                   }, {
-                    icon: _withCtx(() => [
-                      _createVNode(_component_up_icon, {
+                    "icon": _withSharedDataVaporCtx(() => {
+                      const n14 = _createSharedDataComponentWithFallback(_component_up_icon, "fc2d6770", {
                         name: "file-text",
-                        color: $setup.themeColor,
+                        color: () => {
+                          return themeColor.value;
+                        },
                         size: "20",
                         class: "mr-_b8px_B"
-                      }, null, 8, ["color"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  _createVNode(_component_up_cell, {
+                      });
+                      _setSharedData(__sharedData, 9, n14?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 8, n16?.sharedData);
+                  const _on_click3 = () => {
+                    return goToDemo("link");
+                  };
+                  const n19 = _createSharedDataComponentWithFallback(_component_up_cell, "fc2d5f00", {
                     title: "Link 超链接",
                     "is-link": "",
-                    onClick: _cache[3] || (_cache[3] = ($event) => $setup.goToDemo("link"))
+                    onClick: () => {
+                      return _on_click3;
+                    }
                   }, {
-                    icon: _withCtx(() => [
-                      _createVNode(_component_up_icon, {
+                    "icon": _withSharedDataVaporCtx(() => {
+                      const n17 = _createSharedDataComponentWithFallback(_component_up_icon, "fc2d577e", {
                         name: "attach",
-                        color: $setup.themeColor,
+                        color: () => {
+                          return themeColor.value;
+                        },
                         size: "20",
                         class: "mr-_b8px_B"
-                      }, null, 8, ["color"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  _createVNode(_component_up_cell, {
+                      });
+                      _setSharedData(__sharedData, 11, n17?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 10, n19?.sharedData);
+                  const _on_click4 = () => {
+                    return goToDemo("empty");
+                  };
+                  const n22 = _createSharedDataComponentWithFallback(_component_up_cell, "fc2d4a28", {
                     title: "Empty 空白页",
                     "is-link": "",
-                    onClick: _cache[4] || (_cache[4] = ($event) => $setup.goToDemo("empty"))
+                    onClick: () => {
+                      return _on_click4;
+                    }
                   }, {
-                    icon: _withCtx(() => [
-                      _createVNode(_component_up_icon, {
+                    "icon": _withSharedDataVaporCtx(() => {
+                      const n20 = _createSharedDataComponentWithFallback(_component_up_icon, "fc2ca4f8", {
                         name: "info-circle",
-                        color: $setup.themeColor,
+                        color: () => {
+                          return themeColor.value;
+                        },
                         size: "20",
                         class: "mr-_b8px_B"
-                      }, null, 8, ["color"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  _createVNode(_component_up_cell, {
+                      });
+                      _setSharedData(__sharedData, 13, n20?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 12, n22?.sharedData);
+                  const _on_click5 = () => {
+                    return goToDemo("divider");
+                  };
+                  const n25 = _createSharedDataComponentWithFallback(_component_up_cell, "fc2c9c84", {
                     title: "Divider 分割线",
                     "is-link": "",
-                    onClick: _cache[5] || (_cache[5] = ($event) => $setup.goToDemo("divider"))
+                    onClick: () => {
+                      return _on_click5;
+                    }
                   }, {
-                    icon: _withCtx(() => [
-                      _createVNode(_component_up_icon, {
+                    "icon": _withSharedDataVaporCtx(() => {
+                      const n23 = _createSharedDataComponentWithFallback(_component_up_icon, "fc2c94cc", {
                         name: "minus",
-                        color: $setup.themeColor,
+                        color: () => {
+                          return themeColor.value;
+                        },
                         size: "20",
                         class: "mr-_b8px_B"
-                      }, null, 8, ["color"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  _createVNode(_component_up_cell, {
+                      });
+                      _setSharedData(__sharedData, 15, n23?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 14, n25?.sharedData);
+                  const _on_click6 = () => {
+                    return goToDemo("loading-icon");
+                  };
+                  const n28 = _createSharedDataComponentWithFallback(_component_up_cell, "fc2c8778", {
                     title: "LoadingIcon 加载图标",
                     "is-link": "",
-                    onClick: _cache[6] || (_cache[6] = ($event) => $setup.goToDemo("loading-icon"))
+                    onClick: () => {
+                      return _on_click6;
+                    }
                   }, {
-                    icon: _withCtx(() => [
-                      _createVNode(_component_up_icon, {
+                    "icon": _withSharedDataVaporCtx(() => {
+                      const n26 = _createSharedDataComponentWithFallback(_component_up_icon, "fc2c7fac", {
                         name: "reload",
-                        color: $setup.themeColor,
+                        color: () => {
+                          return themeColor.value;
+                        },
                         size: "20",
                         class: "mr-_b8px_B"
-                      }, null, 8, ["color"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  _createVNode(_component_up_cell, {
+                      });
+                      _setSharedData(__sharedData, 17, n26?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 16, n28?.sharedData);
+                  const _on_click7 = () => {
+                    return goToDemo("skeleton");
+                  };
+                  const n31 = _createSharedDataComponentWithFallback(_component_up_cell, "fc2c7742", {
                     title: "Skeleton 骨架屏",
                     "is-link": "",
-                    onClick: _cache[7] || (_cache[7] = ($event) => $setup.goToDemo("skeleton"))
+                    onClick: () => {
+                      return _on_click7;
+                    }
                   }, {
-                    icon: _withCtx(() => [
-                      _createVNode(_component_up_icon, {
+                    "icon": _withSharedDataVaporCtx(() => {
+                      const n29 = _createSharedDataComponentWithFallback(_component_up_icon, "fc2c6fb0", {
                         name: "list-dot",
-                        color: $setup.themeColor,
+                        color: () => {
+                          return themeColor.value;
+                        },
                         size: "20",
                         class: "mr-_b8px_B"
-                      }, null, 8, ["color"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  _createVNode(_component_up_cell, {
+                      });
+                      _setSharedData(__sharedData, 19, n29?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 18, n31?.sharedData);
+                  const _on_click8 = () => {
+                    return goToDemo("tag");
+                  };
+                  const n34 = _createSharedDataComponentWithFallback(_component_up_cell, "fc2c6742", {
                     title: "Tag 标签",
                     "is-link": "",
-                    onClick: _cache[8] || (_cache[8] = ($event) => $setup.goToDemo("tag"))
+                    onClick: () => {
+                      return _on_click8;
+                    }
                   }, {
-                    icon: _withCtx(() => [
-                      _createVNode(_component_up_icon, {
+                    "icon": _withSharedDataVaporCtx(() => {
+                      const n32 = _createSharedDataComponentWithFallback(_component_up_icon, "fc2c5ff0", {
                         name: "tags",
-                        color: $setup.themeColor,
+                        color: () => {
+                          return themeColor.value;
+                        },
                         size: "20",
                         class: "mr-_b8px_B"
-                      }, null, 8, ["color"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  _createVNode(_component_up_cell, {
+                      });
+                      _setSharedData(__sharedData, 21, n32?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 20, n34?.sharedData);
+                  const _on_click9 = () => {
+                    return goToDemo("badge");
+                  };
+                  const n37 = _createSharedDataComponentWithFallback(_component_up_cell, "fc2bb4f4", {
                     title: "Badge 徽标",
                     "is-link": "",
-                    onClick: _cache[9] || (_cache[9] = ($event) => $setup.goToDemo("badge"))
+                    onClick: () => {
+                      return _on_click9;
+                    }
                   }, {
-                    icon: _withCtx(() => [
-                      _createVNode(_component_up_icon, {
+                    "icon": _withSharedDataVaporCtx(() => {
+                      const n35 = _createSharedDataComponentWithFallback(_component_up_icon, "fc2bad46", {
                         name: "info-circle",
-                        color: $setup.themeColor,
+                        color: () => {
+                          return themeColor.value;
+                        },
                         size: "20",
                         class: "mr-_b8px_B"
-                      }, null, 8, ["color"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  _createVNode(_component_up_cell, {
+                      });
+                      _setSharedData(__sharedData, 23, n35?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 22, n37?.sharedData);
+                  const _on_click10 = () => {
+                    return goToDemo("avatar");
+                  };
+                  const n40 = _createSharedDataComponentWithFallback(_component_up_cell, "fc2ba4fc", {
                     title: "Avatar 头像",
                     "is-link": "",
-                    onClick: _cache[10] || (_cache[10] = ($event) => $setup.goToDemo("avatar"))
+                    onClick: () => {
+                      return _on_click10;
+                    }
                   }, {
-                    icon: _withCtx(() => [
-                      _createVNode(_component_up_icon, {
+                    "icon": _withSharedDataVaporCtx(() => {
+                      const n38 = _createSharedDataComponentWithFallback(_component_up_icon, "fc2b9d4a", {
                         name: "account",
-                        color: $setup.themeColor,
+                        color: () => {
+                          return themeColor.value;
+                        },
                         size: "20",
                         class: "mr-_b8px_B"
-                      }, null, 8, ["color"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  _createVNode(_component_up_cell, {
+                      });
+                      _setSharedData(__sharedData, 25, n38?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 24, n40?.sharedData);
+                  const _on_click11 = () => {
+                    return goToDemo("card");
+                  };
+                  const n43 = _createSharedDataComponentWithFallback(_component_up_cell, "fc2b9508", {
                     title: "Card 卡片",
                     "is-link": "",
-                    onClick: _cache[11] || (_cache[11] = ($event) => $setup.goToDemo("card"))
+                    onClick: () => {
+                      return _on_click11;
+                    }
                   }, {
-                    icon: _withCtx(() => [
-                      _createVNode(_component_up_icon, {
+                    "icon": _withSharedDataVaporCtx(() => {
+                      const n41 = _createSharedDataComponentWithFallback(_component_up_icon, "fc2b8d88", {
                         name: "map",
-                        color: $setup.themeColor,
+                        color: () => {
+                          return themeColor.value;
+                        },
                         size: "20",
                         class: "mr-_b8px_B"
-                      }, null, 8, ["color"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  _createVNode(_component_up_cell, {
+                      });
+                      _setSharedData(__sharedData, 27, n41?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 26, n43?.sharedData);
+                  const _on_click12 = () => {
+                    return goToDemo("list");
+                  };
+                  const n46 = _createSharedDataComponentWithFallback(_component_up_cell, "fc2b8038", {
                     title: "List 列表",
                     "is-link": "",
-                    onClick: _cache[12] || (_cache[12] = ($event) => $setup.goToDemo("list"))
+                    onClick: () => {
+                      return _on_click12;
+                    }
                   }, {
-                    icon: _withCtx(() => [
-                      _createVNode(_component_up_icon, {
+                    "icon": _withSharedDataVaporCtx(() => {
+                      const n44 = _createSharedDataComponentWithFallback(_component_up_icon, "fc2b78b8", {
                         name: "list-dot",
-                        color: $setup.themeColor,
+                        color: () => {
+                          return themeColor.value;
+                        },
                         size: "20",
                         class: "mr-_b8px_B"
-                      }, null, 8, ["color"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  _createVNode(_component_up_cell, {
+                      });
+                      _setSharedData(__sharedData, 29, n44?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 28, n46?.sharedData);
+                  const _on_click13 = () => {
+                    return goToDemo("swiper");
+                  };
+                  const n49 = _createSharedDataComponentWithFallback(_component_up_cell, "fc2ad2ca", {
                     title: "Swiper 轮播图",
                     "is-link": "",
-                    onClick: _cache[13] || (_cache[13] = ($event) => $setup.goToDemo("swiper"))
+                    onClick: () => {
+                      return _on_click13;
+                    }
                   }, {
-                    icon: _withCtx(() => [
-                      _createVNode(_component_up_icon, {
+                    "icon": _withSharedDataVaporCtx(() => {
+                      const n47 = _createSharedDataComponentWithFallback(_component_up_icon, "fc2acb40", {
                         name: "photo",
-                        color: $setup.themeColor,
+                        color: () => {
+                          return themeColor.value;
+                        },
                         size: "20",
                         class: "mr-_b8px_B"
-                      }, null, 8, ["color"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  _createVNode(_component_up_cell, {
+                      });
+                      _setSharedData(__sharedData, 31, n47?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 30, n49?.sharedData);
+                  const _on_click14 = () => {
+                    return goToDemo("image");
+                  };
+                  const n52 = _createSharedDataComponentWithFallback(_component_up_cell, "fc2ac302", {
                     title: "Image 图片组件",
                     "is-link": "",
-                    onClick: _cache[14] || (_cache[14] = ($event) => $setup.goToDemo("image"))
+                    onClick: () => {
+                      return _on_click14;
+                    }
                   }, {
-                    icon: _withCtx(() => [
-                      _createVNode(_component_up_icon, {
+                    "icon": _withSharedDataVaporCtx(() => {
+                      const n50 = _createSharedDataComponentWithFallback(_component_up_icon, "fc2abb50", {
                         name: "photo",
-                        color: $setup.themeColor,
+                        color: () => {
+                          return themeColor.value;
+                        },
                         size: "20",
                         class: "mr-_b8px_B"
-                      }, null, 8, ["color"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  _createVNode(_component_up_cell, {
+                      });
+                      _setSharedData(__sharedData, 33, n50?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 32, n52?.sharedData);
+                  const _on_click15 = () => {
+                    return goToDemo("transition");
+                  };
+                  const n55 = _createSharedDataComponentWithFallback(_component_up_cell, "fc2aadfc", {
                     title: "Transition 动画过渡",
                     "is-link": "",
-                    onClick: _cache[15] || (_cache[15] = ($event) => $setup.goToDemo("transition"))
+                    onClick: () => {
+                      return _on_click15;
+                    }
                   }, {
-                    icon: _withCtx(() => [
-                      _createVNode(_component_up_icon, {
+                    "icon": _withSharedDataVaporCtx(() => {
+                      const n53 = _createSharedDataComponentWithFallback(_component_up_icon, "fc2aa636", {
                         name: "play-circle",
-                        color: $setup.themeColor,
+                        color: () => {
+                          return themeColor.value;
+                        },
                         size: "20",
                         class: "mr-_b8px_B"
-                      }, null, 8, ["color"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  _createVNode(_component_up_cell, {
+                      });
+                      _setSharedData(__sharedData, 35, n53?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 34, n55?.sharedData);
+                  const _on_click16 = () => {
+                    return goToDemo("steps");
+                  };
+                  const n58 = _createSharedDataComponentWithFallback(_component_up_cell, "fc2a9dc2", {
                     title: "Steps 步骤条",
                     "is-link": "",
-                    onClick: _cache[16] || (_cache[16] = ($event) => $setup.goToDemo("steps"))
+                    onClick: () => {
+                      return _on_click16;
+                    }
                   }, {
-                    icon: _withCtx(() => [
-                      _createVNode(_component_up_icon, {
+                    "icon": _withSharedDataVaporCtx(() => {
+                      const n56 = _createSharedDataComponentWithFallback(_component_up_icon, "fc2a963c", {
                         name: "order",
-                        color: $setup.themeColor,
+                        color: () => {
+                          return themeColor.value;
+                        },
                         size: "20",
                         class: "mr-_b8px_B"
-                      }, null, 8, ["color"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  _createVNode(_component_up_cell, {
+                      });
+                      _setSharedData(__sharedData, 37, n56?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 36, n58?.sharedData);
+                  const _on_click17 = () => {
+                    return goToDemo("grid");
+                  };
+                  const n61 = _createSharedDataComponentWithFallback(_component_up_cell, "fc29eb3c", {
                     title: "Grid 宫格",
                     "is-link": "",
-                    onClick: _cache[17] || (_cache[17] = ($event) => $setup.goToDemo("grid"))
+                    onClick: () => {
+                      return _on_click17;
+                    }
                   }, {
-                    icon: _withCtx(() => [
-                      _createVNode(_component_up_icon, {
-                        name: "grid",
-                        color: $setup.themeColor,
+                    "icon": _withSharedDataVaporCtx(() => {
+                      const n59 = _createSharedDataComponentWithFallback(_component_up_icon, "fc29e388", {
+                        name: () => {
+                          return "grid";
+                        },
+                        color: () => {
+                          return themeColor.value;
+                        },
                         size: "20",
                         class: "mr-_b8px_B"
-                      }, null, 8, ["color"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  _createVNode(_component_up_cell, {
+                      });
+                      _setSharedData(__sharedData, 39, n59?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 38, n61?.sharedData);
+                  const _on_click18 = () => {
+                    return goToDemo("line");
+                  };
+                  const n64 = _createSharedDataComponentWithFallback(_component_up_cell, "fc29db3c", {
                     title: "Line 线条",
                     "is-link": "",
-                    onClick: _cache[18] || (_cache[18] = ($event) => $setup.goToDemo("line"))
+                    onClick: () => {
+                      return _on_click18;
+                    }
                   }, {
-                    icon: _withCtx(() => [
-                      _createVNode(_component_up_icon, {
+                    "icon": _withSharedDataVaporCtx(() => {
+                      const n62 = _createSharedDataComponentWithFallback(_component_up_icon, "fc29d3bc", {
                         name: "minus",
-                        color: $setup.themeColor,
+                        color: () => {
+                          return themeColor.value;
+                        },
                         size: "20",
                         class: "mr-_b8px_B"
-                      }, null, 8, ["color"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  _createVNode(_component_up_cell, {
+                      });
+                      _setSharedData(__sharedData, 41, n62?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 40, n64?.sharedData);
+                  const _on_click19 = () => {
+                    return goToDemo("album");
+                  };
+                  const n67 = _createSharedDataComponentWithFallback(_component_up_cell, "fc29cb7e", {
                     title: "Album 相册",
                     "is-link": "",
-                    onClick: _cache[19] || (_cache[19] = ($event) => $setup.goToDemo("album"))
+                    onClick: () => {
+                      return _on_click19;
+                    }
                   }, {
-                    icon: _withCtx(() => [
-                      _createVNode(_component_up_icon, {
+                    "icon": _withSharedDataVaporCtx(() => {
+                      const n65 = _createSharedDataComponentWithFallback(_component_up_icon, "fc29c3d0", {
                         name: "photo",
-                        color: $setup.themeColor,
+                        color: () => {
+                          return themeColor.value;
+                        },
                         size: "20",
                         class: "mr-_b8px_B"
-                      }, null, 8, ["color"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  _createVNode(_component_up_cell, {
+                      });
+                      _setSharedData(__sharedData, 43, n65?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 42, n67?.sharedData);
+                  const _on_click20 = () => {
+                    return goToDemo("gap");
+                  };
+                  const n70 = _createSharedDataComponentWithFallback(_component_up_cell, "fc29b67c", {
                     title: "Gap 间隔槽",
                     "is-link": "",
-                    onClick: _cache[20] || (_cache[20] = ($event) => $setup.goToDemo("gap"))
+                    onClick: () => {
+                      return _on_click20;
+                    }
                   }, {
-                    icon: _withCtx(() => [
-                      _createVNode(_component_up_icon, {
+                    "icon": _withSharedDataVaporCtx(() => {
+                      const n68 = _createSharedDataComponentWithFallback(_component_up_icon, "fc29af28", {
                         name: "minus",
-                        color: $setup.themeColor,
+                        color: () => {
+                          return themeColor.value;
+                        },
                         size: "20",
                         class: "mr-_b8px_B"
-                      }, null, 8, ["color"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  _createVNode(_component_up_cell, {
+                      });
+                      _setSharedData(__sharedData, 45, n68?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 44, n70?.sharedData);
+                  const _on_click21 = () => {
+                    return goToDemo("sticky");
+                  };
+                  const n73 = _createSharedDataComponentWithFallback(_component_up_cell, "fc29a6c0", {
                     title: "Sticky 吸顶",
                     "is-link": "",
-                    onClick: _cache[21] || (_cache[21] = ($event) => $setup.goToDemo("sticky"))
+                    onClick: () => {
+                      return _on_click21;
+                    }
                   }, {
-                    icon: _withCtx(() => [
-                      _createVNode(_component_up_icon, {
+                    "icon": _withSharedDataVaporCtx(() => {
+                      const n71 = _createSharedDataComponentWithFallback(_component_up_icon, "fc290184", {
                         name: "arrow-up",
-                        color: $setup.themeColor,
+                        color: () => {
+                          return themeColor.value;
+                        },
                         size: "20",
                         class: "mr-_b8px_B"
-                      }, null, 8, ["color"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  _createVNode(_component_up_cell, {
+                      });
+                      _setSharedData(__sharedData, 47, n71?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 46, n73?.sharedData);
+                  const _on_click22 = () => {
+                    return goToDemo("table");
+                  };
+                  const n76 = _createSharedDataComponentWithFallback(_component_up_cell, "fc28f916", {
                     title: "Table 表格",
                     "is-link": "",
-                    onClick: _cache[22] || (_cache[22] = ($event) => $setup.goToDemo("table"))
+                    onClick: () => {
+                      return _on_click22;
+                    }
                   }, {
-                    icon: _withCtx(() => [
-                      _createVNode(_component_up_icon, {
-                        name: "grid",
-                        color: $setup.themeColor,
+                    "icon": _withSharedDataVaporCtx(() => {
+                      const n74 = _createSharedDataComponentWithFallback(_component_up_icon, "fc28f188", {
+                        name: () => {
+                          return "grid";
+                        },
+                        color: () => {
+                          return themeColor.value;
+                        },
                         size: "20",
                         class: "mr-_b8px_B"
-                      }, null, 8, ["color"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  _createVNode(_component_up_cell, {
+                      });
+                      _setSharedData(__sharedData, 49, n74?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 48, n76?.sharedData);
+                  const _on_click23 = () => {
+                    return goToDemo("lazy-load");
+                  };
+                  const n79 = _createSharedDataComponentWithFallback(_component_up_cell, "fc28e3fc", {
                     title: "LazyLoad 懒加载",
                     "is-link": "",
-                    onClick: _cache[23] || (_cache[23] = ($event) => $setup.goToDemo("lazy-load"))
+                    onClick: () => {
+                      return _on_click23;
+                    }
                   }, {
-                    icon: _withCtx(() => [
-                      _createVNode(_component_up_icon, {
+                    "icon": _withSharedDataVaporCtx(() => {
+                      const n77 = _createSharedDataComponentWithFallback(_component_up_icon, "fc28dc3e", {
                         name: "photo",
-                        color: $setup.themeColor,
+                        color: () => {
+                          return themeColor.value;
+                        },
                         size: "20",
                         class: "mr-_b8px_B"
-                      }, null, 8, ["color"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  _createVNode(_component_up_cell, {
+                      });
+                      _setSharedData(__sharedData, 51, n77?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 50, n79?.sharedData);
+                  const _on_click24 = () => {
+                    return goToDemo("loadmore");
+                  };
+                  const n82 = _createSharedDataComponentWithFallback(_component_up_cell, "fc28d400", {
                     title: "Loadmore 加载更多",
                     "is-link": "",
-                    onClick: _cache[24] || (_cache[24] = ($event) => $setup.goToDemo("loadmore"))
+                    onClick: () => {
+                      return _on_click24;
+                    }
                   }, {
-                    icon: _withCtx(() => [
-                      _createVNode(_component_up_icon, {
+                    "icon": _withSharedDataVaporCtx(() => {
+                      const n80 = _createSharedDataComponentWithFallback(_component_up_icon, "fc28cc42", {
                         name: "more-dot-fill",
-                        color: $setup.themeColor,
+                        color: () => {
+                          return themeColor.value;
+                        },
                         size: "20",
                         class: "mr-_b8px_B"
-                      }, null, 8, ["color"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  _createVNode(_component_up_cell, {
+                      });
+                      _setSharedData(__sharedData, 53, n80?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 52, n82?.sharedData);
+                  const _on_click25 = () => {
+                    return goToDemo("parse");
+                  };
+                  const n85 = _createSharedDataComponentWithFallback(_component_up_cell, "fc28beb4", {
                     title: "Parse 富文本解析",
                     "is-link": "",
-                    onClick: _cache[25] || (_cache[25] = ($event) => $setup.goToDemo("parse"))
+                    onClick: () => {
+                      return _on_click25;
+                    }
                   }, {
-                    icon: _withCtx(() => [
-                      _createVNode(_component_up_icon, {
+                    "icon": _withSharedDataVaporCtx(() => {
+                      const n83 = _createSharedDataComponentWithFallback(_component_up_icon, "fc281980", {
                         name: "file-text",
-                        color: $setup.themeColor,
+                        color: () => {
+                          return themeColor.value;
+                        },
                         size: "20",
                         class: "mr-_b8px_B"
-                      }, null, 8, ["color"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  _createVNode(_component_up_cell, {
+                      });
+                      _setSharedData(__sharedData, 55, n83?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 54, n85?.sharedData);
+                  const _on_click26 = () => {
+                    return goToDemo("qrcode");
+                  };
+                  const n88 = _createSharedDataComponentWithFallback(_component_up_cell, "fc281110", {
                     title: "Qrcode 二维码",
                     "is-link": "",
-                    onClick: _cache[26] || (_cache[26] = ($event) => $setup.goToDemo("qrcode"))
+                    onClick: () => {
+                      return _on_click26;
+                    }
                   }, {
-                    icon: _withCtx(() => [
-                      _createVNode(_component_up_icon, {
+                    "icon": _withSharedDataVaporCtx(() => {
+                      const n86 = _createSharedDataComponentWithFallback(_component_up_icon, "fc280986", {
                         name: "scan",
-                        color: $setup.themeColor,
+                        color: () => {
+                          return themeColor.value;
+                        },
                         size: "20",
                         class: "mr-_b8px_B"
-                      }, null, 8, ["color"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  _createVNode(_component_up_cell, {
+                      });
+                      _setSharedData(__sharedData, 57, n86?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 56, n88?.sharedData);
+                  const _on_click27 = () => {
+                    return goToDemo("waterfall");
+                  };
+                  const n91 = _createSharedDataComponentWithFallback(_component_up_cell, "fc28014a", {
                     title: "Waterfall 瀑布流",
                     "is-link": "",
-                    onClick: _cache[27] || (_cache[27] = ($event) => $setup.goToDemo("waterfall"))
+                    onClick: () => {
+                      return _on_click27;
+                    }
                   }, {
-                    icon: _withCtx(() => [
-                      _createVNode(_component_up_icon, {
-                        name: "grid",
-                        color: $setup.themeColor,
+                    "icon": _withSharedDataVaporCtx(() => {
+                      const n89 = _createSharedDataComponentWithFallback(_component_up_icon, "fc27f98a", {
+                        name: () => {
+                          return "grid";
+                        },
+                        color: () => {
+                          return themeColor.value;
+                        },
                         size: "20",
                         class: "mr-_b8px_B"
-                      }, null, 8, ["color"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  })
-                ]),
-                _: 1
-                /* STABLE */
-              })
-            ]),
-            _createElementVNode("view", { class: "demo-group-card mt-_b12px_B" }, [
-              _createElementVNode("text", { class: "group-title" }, "表单与交互组件"),
-              _createVNode(_component_up_cell_group, { border: false }, {
-                default: _withCtx(() => [
-                  _createVNode(_component_up_cell, {
+                      });
+                      _setSharedData(__sharedData, 59, n89?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 58, n91?.sharedData);
+                })
+              });
+              _setSharedData(__sharedData, 3, n92?.sharedData);
+              const n146 = _createSharedDataComponentWithFallback(_component_up_cell_group, "fc27e342", { border: false }, {
+                "default": _withSharedDataVaporCtx(() => {
+                  const _on_click28 = () => {
+                    return goToDemo("input");
+                  };
+                  const n97 = _createSharedDataComponentWithFallback(_component_up_cell, "fc27dd34", {
                     title: "Input 输入框",
                     "is-link": "",
-                    onClick: _cache[28] || (_cache[28] = ($event) => $setup.goToDemo("input"))
+                    onClick: () => {
+                      return _on_click28;
+                    }
                   }, {
-                    icon: _withCtx(() => [
-                      _createVNode(_component_up_icon, {
+                    "icon": _withSharedDataVaporCtx(() => {
+                      const n95 = _createSharedDataComponentWithFallback(_component_up_icon, "fc27d5ae", {
                         name: "edit-pen",
-                        color: $setup.themeColor,
+                        color: () => {
+                          return themeColor.value;
+                        },
                         size: "20",
                         class: "mr-_b8px_B"
-                      }, null, 8, ["color"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  _createVNode(_component_up_cell, {
+                      });
+                      _setSharedData(__sharedData, 62, n95?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 61, n97?.sharedData);
+                  const _on_click29 = () => {
+                    return goToDemo("checkbox");
+                  };
+                  const n100 = _createSharedDataComponentWithFallback(_component_up_cell, "fc272f96", {
                     title: "Checkbox 复选框",
                     "is-link": "",
-                    onClick: _cache[29] || (_cache[29] = ($event) => $setup.goToDemo("checkbox"))
+                    onClick: () => {
+                      return _on_click29;
+                    }
                   }, {
-                    icon: _withCtx(() => [
-                      _createVNode(_component_up_icon, {
+                    "icon": _withSharedDataVaporCtx(() => {
+                      const n98 = _createSharedDataComponentWithFallback(_component_up_icon, "fc2727da", {
                         name: "checkbox-mark",
-                        color: $setup.themeColor,
+                        color: () => {
+                          return themeColor.value;
+                        },
                         size: "20",
                         class: "mr-_b8px_B"
-                      }, null, 8, ["color"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  _createVNode(_component_up_cell, {
+                      });
+                      _setSharedData(__sharedData, 64, n98?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 63, n100?.sharedData);
+                  const _on_click30 = () => {
+                    return goToDemo("radio");
+                  };
+                  const n103 = _createSharedDataComponentWithFallback(_component_up_cell, "fc271a4c", {
                     title: "Radio 单选框",
                     "is-link": "",
-                    onClick: _cache[30] || (_cache[30] = ($event) => $setup.goToDemo("radio"))
+                    onClick: () => {
+                      return _on_click30;
+                    }
                   }, {
-                    icon: _withCtx(() => [
-                      _createVNode(_component_up_icon, {
+                    "icon": _withSharedDataVaporCtx(() => {
+                      const n101 = _createSharedDataComponentWithFallback(_component_up_icon, "fc2712c6", {
                         name: "checkmark-circle",
-                        color: $setup.themeColor,
+                        color: () => {
+                          return themeColor.value;
+                        },
                         size: "20",
                         class: "mr-_b8px_B"
-                      }, null, 8, ["color"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  _createVNode(_component_up_cell, {
+                      });
+                      _setSharedData(__sharedData, 66, n101?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 65, n103?.sharedData);
+                  const _on_click31 = () => {
+                    return goToDemo("switch");
+                  };
+                  const n106 = _createSharedDataComponentWithFallback(_component_up_cell, "fc270a48", {
                     title: "Switch 开关",
                     "is-link": "",
-                    onClick: _cache[31] || (_cache[31] = ($event) => $setup.goToDemo("switch"))
+                    onClick: () => {
+                      return _on_click31;
+                    }
                   }, {
-                    icon: _withCtx(() => [
-                      _createVNode(_component_up_icon, {
+                    "icon": _withSharedDataVaporCtx(() => {
+                      const n104 = _createSharedDataComponentWithFallback(_component_up_icon, "fc2702c0", {
                         name: "more-circle",
-                        color: $setup.themeColor,
+                        color: () => {
+                          return themeColor.value;
+                        },
                         size: "20",
                         class: "mr-_b8px_B"
-                      }, null, 8, ["color"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  _createVNode(_component_up_cell, {
+                      });
+                      _setSharedData(__sharedData, 68, n104?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 67, n106?.sharedData);
+                  const _on_click32 = () => {
+                    return goToDemo("rate");
+                  };
+                  const n109 = _createSharedDataComponentWithFallback(_component_up_cell, "fc26fa4c", {
                     title: "Rate 评分",
                     "is-link": "",
-                    onClick: _cache[32] || (_cache[32] = ($event) => $setup.goToDemo("rate"))
+                    onClick: () => {
+                      return _on_click32;
+                    }
                   }, {
-                    icon: _withCtx(() => [
-                      _createVNode(_component_up_icon, {
+                    "icon": _withSharedDataVaporCtx(() => {
+                      const n107 = _createSharedDataComponentWithFallback(_component_up_icon, "fc26f2cc", {
                         name: "star",
-                        color: $setup.themeColor,
+                        color: () => {
+                          return themeColor.value;
+                        },
                         size: "20",
                         class: "mr-_b8px_B"
-                      }, null, 8, ["color"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  _createVNode(_component_up_cell, {
+                      });
+                      _setSharedData(__sharedData, 70, n107?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 69, n109?.sharedData);
+                  const _on_click33 = () => {
+                    return goToDemo("number-box");
+                  };
+                  const n112 = _createSharedDataComponentWithFallback(_component_up_cell, "fc2647d0", {
                     title: "NumberBox 步进器",
                     "is-link": "",
-                    onClick: _cache[33] || (_cache[33] = ($event) => $setup.goToDemo("number-box"))
+                    onClick: () => {
+                      return _on_click33;
+                    }
                   }, {
-                    icon: _withCtx(() => [
-                      _createVNode(_component_up_icon, {
+                    "icon": _withSharedDataVaporCtx(() => {
+                      const n110 = _createSharedDataComponentWithFallback(_component_up_icon, "fc26400e", {
                         name: "plus",
-                        color: $setup.themeColor,
+                        color: () => {
+                          return themeColor.value;
+                        },
                         size: "20",
                         class: "mr-_b8px_B"
-                      }, null, 8, ["color"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  _createVNode(_component_up_cell, {
+                      });
+                      _setSharedData(__sharedData, 72, n110?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 71, n112?.sharedData);
+                  const _on_click34 = () => {
+                    return goToDemo("slider");
+                  };
+                  const n115 = _createSharedDataComponentWithFallback(_component_up_cell, "fc2637d2", {
                     title: "Slider 滑块",
                     "is-link": "",
-                    onClick: _cache[34] || (_cache[34] = ($event) => $setup.goToDemo("slider"))
+                    onClick: () => {
+                      return _on_click34;
+                    }
                   }, {
-                    icon: _withCtx(() => [
-                      _createVNode(_component_up_icon, {
+                    "icon": _withSharedDataVaporCtx(() => {
+                      const n113 = _createSharedDataComponentWithFallback(_component_up_icon, "fc26304a", {
                         name: "minus",
-                        color: $setup.themeColor,
+                        color: () => {
+                          return themeColor.value;
+                        },
                         size: "20",
                         class: "mr-_b8px_B"
-                      }, null, 8, ["color"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  _createVNode(_component_up_cell, {
+                      });
+                      _setSharedData(__sharedData, 74, n113?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 73, n115?.sharedData);
+                  const _on_click35 = () => {
+                    return goToDemo("textarea");
+                  };
+                  const n118 = _createSharedDataComponentWithFallback(_component_up_cell, "fc26280c", {
                     title: "Textarea 多行文本",
                     "is-link": "",
-                    onClick: _cache[35] || (_cache[35] = ($event) => $setup.goToDemo("textarea"))
+                    onClick: () => {
+                      return _on_click35;
+                    }
                   }, {
-                    icon: _withCtx(() => [
-                      _createVNode(_component_up_icon, {
+                    "icon": _withSharedDataVaporCtx(() => {
+                      const n116 = _createSharedDataComponentWithFallback(_component_up_icon, "fc261b38", {
                         name: "file-text",
-                        color: $setup.themeColor,
+                        color: () => {
+                          return themeColor.value;
+                        },
                         size: "20",
                         class: "mr-_b8px_B"
-                      }, null, 8, ["color"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  _createVNode(_component_up_cell, {
+                      });
+                      _setSharedData(__sharedData, 76, n116?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 75, n118?.sharedData);
+                  const _on_click36 = () => {
+                    return goToDemo("upload");
+                  };
+                  const n121 = _createSharedDataComponentWithFallback(_component_up_cell, "fc2612c8", {
                     title: "Upload 上传",
                     "is-link": "",
-                    onClick: _cache[36] || (_cache[36] = ($event) => $setup.goToDemo("upload"))
+                    onClick: () => {
+                      return _on_click36;
+                    }
                   }, {
-                    icon: _withCtx(() => [
-                      _createVNode(_component_up_icon, {
+                    "icon": _withSharedDataVaporCtx(() => {
+                      const n119 = _createSharedDataComponentWithFallback(_component_up_icon, "fc260b40", {
                         name: "arrow-up",
-                        color: $setup.themeColor,
+                        color: () => {
+                          return themeColor.value;
+                        },
                         size: "20",
                         class: "mr-_b8px_B"
-                      }, null, 8, ["color"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  _createVNode(_component_up_cell, {
+                      });
+                      _setSharedData(__sharedData, 78, n119?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 77, n121?.sharedData);
+                  const _on_click37 = () => {
+                    return goToDemo("search");
+                  };
+                  const n124 = _createSharedDataComponentWithFallback(_component_up_cell, "fc2602fc", {
                     title: "Search 搜索",
                     "is-link": "",
-                    onClick: _cache[37] || (_cache[37] = ($event) => $setup.goToDemo("search"))
+                    onClick: () => {
+                      return _on_click37;
+                    }
                   }, {
-                    icon: _withCtx(() => [
-                      _createVNode(_component_up_icon, {
+                    "icon": _withSharedDataVaporCtx(() => {
+                      const n122 = _createSharedDataComponentWithFallback(_component_up_icon, "898437aa", {
                         name: "search",
-                        color: $setup.themeColor,
+                        color: () => {
+                          return themeColor.value;
+                        },
                         size: "20",
                         class: "mr-_b8px_B"
-                      }, null, 8, ["color"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  _createVNode(_component_up_cell, {
+                      });
+                      _setSharedData(__sharedData, 80, n122?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 79, n124?.sharedData);
+                  const _on_click38 = () => {
+                    return goToDemo("form");
+                  };
+                  const n127 = _createSharedDataComponentWithFallback(_component_up_cell, "89842a54", {
                     title: "完整 Form 表单示例",
                     "is-link": "",
-                    onClick: _cache[38] || (_cache[38] = ($event) => $setup.goToDemo("form"))
+                    onClick: () => {
+                      return _on_click38;
+                    }
                   }, {
-                    icon: _withCtx(() => [
-                      _createVNode(_component_up_icon, {
+                    "icon": _withSharedDataVaporCtx(() => {
+                      const n125 = _createSharedDataComponentWithFallback(_component_up_icon, "898422ca", {
                         name: "edit-pen",
-                        color: $setup.themeColor,
+                        color: () => {
+                          return themeColor.value;
+                        },
                         size: "20",
                         class: "mr-_b8px_B"
-                      }, null, 8, ["color"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  _createVNode(_component_up_cell, {
+                      });
+                      _setSharedData(__sharedData, 82, n125?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 81, n127?.sharedData);
+                  const _on_click39 = () => {
+                    return goToDemo("pagination");
+                  };
+                  const n130 = _createSharedDataComponentWithFallback(_component_up_cell, "89841a5c", {
                     title: "Pagination 分页器",
                     "is-link": "",
-                    onClick: _cache[39] || (_cache[39] = ($event) => $setup.goToDemo("pagination"))
+                    onClick: () => {
+                      return _on_click39;
+                    }
                   }, {
-                    icon: _withCtx(() => [
-                      _createVNode(_component_up_icon, {
+                    "icon": _withSharedDataVaporCtx(() => {
+                      const n128 = _createSharedDataComponentWithFallback(_component_up_icon, "89841298", {
                         name: "more-circle",
-                        color: $setup.themeColor,
+                        color: () => {
+                          return themeColor.value;
+                        },
                         size: "20",
                         class: "mr-_b8px_B"
-                      }, null, 8, ["color"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  _createVNode(_component_up_cell, {
+                      });
+                      _setSharedData(__sharedData, 84, n128?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 83, n130?.sharedData);
+                  const _on_click40 = () => {
+                    return goToDemo("keyboard");
+                  };
+                  const n133 = _createSharedDataComponentWithFallback(_component_up_cell, "8984050c", {
                     title: "Keyboard 键盘",
                     "is-link": "",
-                    onClick: _cache[40] || (_cache[40] = ($event) => $setup.goToDemo("keyboard"))
+                    onClick: () => {
+                      return _on_click40;
+                    }
                   }, {
-                    icon: _withCtx(() => [
-                      _createVNode(_component_up_icon, {
+                    "icon": _withSharedDataVaporCtx(() => {
+                      const n131 = _createSharedDataComponentWithFallback(_component_up_icon, "8983fd7c", {
                         name: "grid-fill",
-                        color: $setup.themeColor,
+                        color: () => {
+                          return themeColor.value;
+                        },
                         size: "20",
                         class: "mr-_b8px_B"
-                      }, null, 8, ["color"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  _createVNode(_component_up_cell, {
+                      });
+                      _setSharedData(__sharedData, 86, n131?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 85, n133?.sharedData);
+                  const _on_click41 = () => {
+                    return goToDemo("dropdown");
+                  };
+                  const n136 = _createSharedDataComponentWithFallback(_component_up_cell, "8983f50c", {
                     title: "Dropdown 下拉菜单",
                     "is-link": "",
-                    onClick: _cache[41] || (_cache[41] = ($event) => $setup.goToDemo("dropdown"))
+                    onClick: () => {
+                      return _on_click41;
+                    }
                   }, {
-                    icon: _withCtx(() => [
-                      _createVNode(_component_up_icon, {
+                    "icon": _withSharedDataVaporCtx(() => {
+                      const n134 = _createSharedDataComponentWithFallback(_component_up_icon, "89834fa4", {
                         name: "arrow-down-fill",
-                        color: $setup.themeColor,
+                        color: () => {
+                          return themeColor.value;
+                        },
                         size: "20",
                         class: "mr-_b8px_B"
-                      }, null, 8, ["color"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  _createVNode(_component_up_cell, {
+                      });
+                      _setSharedData(__sharedData, 88, n134?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 87, n136?.sharedData);
+                  const _on_click42 = () => {
+                    return goToDemo("swipe-action");
+                  };
+                  const n139 = _createSharedDataComponentWithFallback(_component_up_cell, "89834728", {
                     title: "SwipeAction 滑动操作",
                     "is-link": "",
-                    onClick: _cache[42] || (_cache[42] = ($event) => $setup.goToDemo("swipe-action"))
+                    onClick: () => {
+                      return _on_click42;
+                    }
                   }, {
-                    icon: _withCtx(() => [
-                      _createVNode(_component_up_icon, {
+                    "icon": _withSharedDataVaporCtx(() => {
+                      const n137 = _createSharedDataComponentWithFallback(_component_up_icon, "89833a1c", {
                         name: "list",
-                        color: $setup.themeColor,
+                        color: () => {
+                          return themeColor.value;
+                        },
                         size: "20",
                         class: "mr-_b8px_B"
-                      }, null, 8, ["color"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  _createVNode(_component_up_cell, {
+                      });
+                      _setSharedData(__sharedData, 90, n137?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 89, n139?.sharedData);
+                  const _on_click43 = () => {
+                    return goToDemo("code-input");
+                  };
+                  const n142 = _createSharedDataComponentWithFallback(_component_up_cell, "898331e0", {
                     title: "CodeInput 验证码输入",
                     "is-link": "",
-                    onClick: _cache[43] || (_cache[43] = ($event) => $setup.goToDemo("code-input"))
+                    onClick: () => {
+                      return _on_click43;
+                    }
                   }, {
-                    icon: _withCtx(() => [
-                      _createVNode(_component_up_icon, {
+                    "icon": _withSharedDataVaporCtx(() => {
+                      const n140 = _createSharedDataComponentWithFallback(_component_up_icon, "89832a1a", {
                         name: "lock",
-                        color: $setup.themeColor,
+                        color: () => {
+                          return themeColor.value;
+                        },
                         size: "20",
                         class: "mr-_b8px_B"
-                      }, null, 8, ["color"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  _createVNode(_component_up_cell, {
+                      });
+                      _setSharedData(__sharedData, 92, n140?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 91, n142?.sharedData);
+                  const _on_click44 = () => {
+                    return goToDemo("code");
+                  };
+                  const n145 = _createSharedDataComponentWithFallback(_component_up_cell, "898321de", {
                     title: "Code 验证码倒计时",
                     "is-link": "",
-                    onClick: _cache[44] || (_cache[44] = ($event) => $setup.goToDemo("code"))
+                    onClick: () => {
+                      return _on_click44;
+                    }
                   }, {
-                    icon: _withCtx(() => [
-                      _createVNode(_component_up_icon, {
+                    "icon": _withSharedDataVaporCtx(() => {
+                      const n143 = _createSharedDataComponentWithFallback(_component_up_icon, "89831a56", {
                         name: "clock",
-                        color: $setup.themeColor,
+                        color: () => {
+                          return themeColor.value;
+                        },
                         size: "20",
                         class: "mr-_b8px_B"
-                      }, null, 8, ["color"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  })
-                ]),
-                _: 1
-                /* STABLE */
-              })
-            ]),
-            _createElementVNode("view", { class: "demo-group-card mt-_b12px_B" }, [
-              _createElementVNode("text", { class: "group-title" }, "反馈与提示组件"),
-              _createVNode(_component_up_cell_group, { border: false }, {
-                default: _withCtx(() => [
-                  _createVNode(_component_up_cell, {
+                      });
+                      _setSharedData(__sharedData, 94, n143?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 93, n145?.sharedData);
+                })
+              });
+              _setSharedData(__sharedData, 60, n146?.sharedData);
+              const n206 = _createSharedDataComponentWithFallback(_component_up_cell_group, "8982669c", { border: false }, {
+                "default": _withSharedDataVaporCtx(() => {
+                  const _on_click45 = () => {
+                    return goToDemo("alert");
+                  };
+                  const n151 = _createSharedDataComponentWithFallback(_component_up_cell, "8982608e", {
                     title: "Alert 警告提示",
                     "is-link": "",
-                    onClick: _cache[45] || (_cache[45] = ($event) => $setup.goToDemo("alert"))
+                    onClick: () => {
+                      return _on_click45;
+                    }
                   }, {
-                    icon: _withCtx(() => [
-                      _createVNode(_component_up_icon, {
+                    "icon": _withSharedDataVaporCtx(() => {
+                      const n149 = _createSharedDataComponentWithFallback(_component_up_icon, "898258dc", {
                         name: "info-circle",
-                        color: $setup.themeColor,
+                        color: () => {
+                          return themeColor.value;
+                        },
                         size: "20",
                         class: "mr-_b8px_B"
-                      }, null, 8, ["color"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  _createVNode(_component_up_cell, {
+                      });
+                      _setSharedData(__sharedData, 97, n149?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 96, n151?.sharedData);
+                  const _on_click46 = () => {
+                    return goToDemo("calendar");
+                  };
+                  const n154 = _createSharedDataComponentWithFallback(_component_up_cell, "89825092", {
                     title: "Calendar 日历",
                     "is-link": "",
-                    onClick: _cache[46] || (_cache[46] = ($event) => $setup.goToDemo("calendar"))
+                    onClick: () => {
+                      return _on_click46;
+                    }
                   }, {
-                    icon: _withCtx(() => [
-                      _createVNode(_component_up_icon, {
+                    "icon": _withSharedDataVaporCtx(() => {
+                      const n152 = _createSharedDataComponentWithFallback(_component_up_icon, "898248d8", {
                         name: "calendar",
-                        color: $setup.themeColor,
+                        color: () => {
+                          return themeColor.value;
+                        },
                         size: "20",
                         class: "mr-_b8px_B"
-                      }, null, 8, ["color"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  _createVNode(_component_up_cell, {
+                      });
+                      _setSharedData(__sharedData, 99, n152?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 98, n154?.sharedData);
+                  const _on_click47 = () => {
+                    return goToDemo("picker");
+                  };
+                  const n157 = _createSharedDataComponentWithFallback(_component_up_cell, "8982406a", {
                     title: "Picker 选择器",
                     "is-link": "",
-                    onClick: _cache[47] || (_cache[47] = ($event) => $setup.goToDemo("picker"))
+                    onClick: () => {
+                      return _on_click47;
+                    }
                   }, {
-                    icon: _withCtx(() => [
-                      _createVNode(_component_up_icon, {
+                    "icon": _withSharedDataVaporCtx(() => {
+                      const n155 = _createSharedDataComponentWithFallback(_component_up_icon, "898238e0", {
                         name: "list",
-                        color: $setup.themeColor,
+                        color: () => {
+                          return themeColor.value;
+                        },
                         size: "20",
                         class: "mr-_b8px_B"
-                      }, null, 8, ["color"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  _createVNode(_component_up_cell, {
+                      });
+                      _setSharedData(__sharedData, 101, n155?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 100, n157?.sharedData);
+                  const _on_click48 = () => {
+                    return goToDemo("datetime-picker");
+                  };
+                  const n160 = _createSharedDataComponentWithFallback(_component_up_cell, "89822b8e", {
                     title: "DatetimePicker 时间选择",
                     "is-link": "",
-                    onClick: _cache[48] || (_cache[48] = ($event) => $setup.goToDemo("datetime-picker"))
+                    onClick: () => {
+                      return _on_click48;
+                    }
                   }, {
-                    icon: _withCtx(() => [
-                      _createVNode(_component_up_icon, {
+                    "icon": _withSharedDataVaporCtx(() => {
+                      const n158 = _createSharedDataComponentWithFallback(_component_up_icon, "8982238c", {
                         name: "clock",
-                        color: $setup.themeColor,
+                        color: () => {
+                          return themeColor.value;
+                        },
                         size: "20",
                         class: "mr-_b8px_B"
-                      }, null, 8, ["color"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  _createVNode(_component_up_cell, {
+                      });
+                      _setSharedData(__sharedData, 103, n158?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 102, n160?.sharedData);
+                  const _on_click49 = () => {
+                    return goToDemo("action-sheet");
+                  };
+                  const n163 = _createSharedDataComponentWithFallback(_component_up_cell, "89817da4", {
                     title: "ActionSheet 动作面板",
                     "is-link": "",
-                    onClick: _cache[49] || (_cache[49] = ($event) => $setup.goToDemo("action-sheet"))
+                    onClick: () => {
+                      return _on_click49;
+                    }
                   }, {
-                    icon: _withCtx(() => [
-                      _createVNode(_component_up_icon, {
+                    "icon": _withSharedDataVaporCtx(() => {
+                      const n161 = _createSharedDataComponentWithFallback(_component_up_icon, "898175ae", {
                         name: "server-man",
-                        color: $setup.themeColor,
+                        color: () => {
+                          return themeColor.value;
+                        },
                         size: "20",
                         class: "mr-_b8px_B"
-                      }, null, 8, ["color"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  _createVNode(_component_up_cell, {
+                      });
+                      _setSharedData(__sharedData, 105, n161?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 104, n163?.sharedData);
+                  const _on_click50 = () => {
+                    return goToDemo("notice-bar");
+                  };
+                  const n166 = _createSharedDataComponentWithFallback(_component_up_cell, "89816850", {
                     title: "NoticeBar 滚动通知",
                     "is-link": "",
-                    onClick: _cache[50] || (_cache[50] = ($event) => $setup.goToDemo("notice-bar"))
+                    onClick: () => {
+                      return _on_click50;
+                    }
                   }, {
-                    icon: _withCtx(() => [
-                      _createVNode(_component_up_icon, {
+                    "icon": _withSharedDataVaporCtx(() => {
+                      const n164 = _createSharedDataComponentWithFallback(_component_up_icon, "89816062", {
                         name: "volume",
-                        color: $setup.themeColor,
+                        color: () => {
+                          return themeColor.value;
+                        },
                         size: "20",
                         class: "mr-_b8px_B"
-                      }, null, 8, ["color"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  _createVNode(_component_up_cell, {
+                      });
+                      _setSharedData(__sharedData, 107, n164?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 106, n166?.sharedData);
+                  const _on_click51 = () => {
+                    return goToDemo("collapse");
+                  };
+                  const n169 = _createSharedDataComponentWithFallback(_component_up_cell, "89815822", {
                     title: "Collapse 折叠面板",
                     "is-link": "",
-                    onClick: _cache[51] || (_cache[51] = ($event) => $setup.goToDemo("collapse"))
+                    onClick: () => {
+                      return _on_click51;
+                    }
                   }, {
-                    icon: _withCtx(() => [
-                      _createVNode(_component_up_icon, {
+                    "icon": _withSharedDataVaporCtx(() => {
+                      const n167 = _createSharedDataComponentWithFallback(_component_up_icon, "89815064", {
                         name: "arrow-down",
-                        color: $setup.themeColor,
+                        color: () => {
+                          return themeColor.value;
+                        },
                         size: "20",
                         class: "mr-_b8px_B"
-                      }, null, 8, ["color"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  _createVNode(_component_up_cell, {
+                      });
+                      _setSharedData(__sharedData, 109, n167?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 108, n169?.sharedData);
+                  const _on_click52 = () => {
+                    return goToDemo("toast");
+                  };
+                  const n172 = _createSharedDataComponentWithFallback(_component_up_cell, "89814306", {
                     title: "Toast 消息提示",
                     "is-link": "",
-                    onClick: _cache[52] || (_cache[52] = ($event) => $setup.goToDemo("toast"))
+                    onClick: () => {
+                      return _on_click52;
+                    }
                   }, {
-                    icon: _withCtx(() => [
-                      _createVNode(_component_up_icon, {
+                    "icon": _withSharedDataVaporCtx(() => {
+                      const n170 = _createSharedDataComponentWithFallback(_component_up_icon, "89813b54", {
                         name: "chat",
-                        color: $setup.themeColor,
+                        color: () => {
+                          return themeColor.value;
+                        },
                         size: "20",
                         class: "mr-_b8px_B"
-                      }, null, 8, ["color"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  _createVNode(_component_up_cell, {
+                      });
+                      _setSharedData(__sharedData, 111, n170?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 110, n172?.sharedData);
+                  const _on_click53 = () => {
+                    return goToDemo("notify");
+                  };
+                  const n175 = _createSharedDataComponentWithFallback(_component_up_cell, "8980956e", {
                     title: "Notify 消息通知",
                     "is-link": "",
-                    onClick: _cache[53] || (_cache[53] = ($event) => $setup.goToDemo("notify"))
+                    onClick: () => {
+                      return _on_click53;
+                    }
                   }, {
-                    icon: _withCtx(() => [
-                      _createVNode(_component_up_icon, {
+                    "icon": _withSharedDataVaporCtx(() => {
+                      const n173 = _createSharedDataComponentWithFallback(_component_up_icon, "89808de2", {
                         name: "bell",
-                        color: $setup.themeColor,
+                        color: () => {
+                          return themeColor.value;
+                        },
                         size: "20",
                         class: "mr-_b8px_B"
-                      }, null, 8, ["color"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  _createVNode(_component_up_cell, {
+                      });
+                      _setSharedData(__sharedData, 113, n173?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 112, n175?.sharedData);
+                  const _on_click54 = () => {
+                    return goToDemo("loading-page");
+                  };
+                  const n178 = _createSharedDataComponentWithFallback(_component_up_cell, "898085a6", {
                     title: "LoadingPage 加载页",
                     "is-link": "",
-                    onClick: _cache[54] || (_cache[54] = ($event) => $setup.goToDemo("loading-page"))
+                    onClick: () => {
+                      return _on_click54;
+                    }
                   }, {
-                    icon: _withCtx(() => [
-                      _createVNode(_component_up_icon, {
+                    "icon": _withSharedDataVaporCtx(() => {
+                      const n176 = _createSharedDataComponentWithFallback(_component_up_icon, "8980789c", {
                         name: "more-dot-fill",
-                        color: $setup.themeColor,
+                        color: () => {
+                          return themeColor.value;
+                        },
                         size: "20",
                         class: "mr-_b8px_B"
-                      }, null, 8, ["color"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  _createVNode(_component_up_cell, {
+                      });
+                      _setSharedData(__sharedData, 115, n176?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 114, n178?.sharedData);
+                  const _on_click55 = () => {
+                    return goToDemo("overlay");
+                  };
+                  const n181 = _createSharedDataComponentWithFallback(_component_up_cell, "89807024", {
                     title: "Overlay 遮罩层",
                     "is-link": "",
-                    onClick: _cache[55] || (_cache[55] = ($event) => $setup.goToDemo("overlay"))
+                    onClick: () => {
+                      return _on_click55;
+                    }
                   }, {
-                    icon: _withCtx(() => [
-                      _createVNode(_component_up_icon, {
+                    "icon": _withSharedDataVaporCtx(() => {
+                      const n179 = _createSharedDataComponentWithFallback(_component_up_icon, "89806896", {
                         name: "scan",
-                        color: $setup.themeColor,
+                        color: () => {
+                          return themeColor.value;
+                        },
                         size: "20",
                         class: "mr-_b8px_B"
-                      }, null, 8, ["color"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  _createVNode(_component_up_cell, {
+                      });
+                      _setSharedData(__sharedData, 117, n179?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 116, n181?.sharedData);
+                  const _on_click56 = () => {
+                    return goToDemo("modal");
+                  };
+                  const n184 = _createSharedDataComponentWithFallback(_component_up_cell, "8980605a", {
                     title: "Modal 模态框",
                     "is-link": "",
-                    onClick: _cache[56] || (_cache[56] = ($event) => $setup.goToDemo("modal"))
+                    onClick: () => {
+                      return _on_click56;
+                    }
                   }, {
-                    icon: _withCtx(() => [
-                      _createVNode(_component_up_icon, {
+                    "icon": _withSharedDataVaporCtx(() => {
+                      const n182 = _createSharedDataComponentWithFallback(_component_up_icon, "898058d4", {
                         name: "email",
-                        color: $setup.themeColor,
+                        color: () => {
+                          return themeColor.value;
+                        },
                         size: "20",
                         class: "mr-_b8px_B"
-                      }, null, 8, ["color"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  _createVNode(_component_up_cell, {
+                      });
+                      _setSharedData(__sharedData, 119, n182?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 118, n184?.sharedData);
+                  const _on_click57 = () => {
+                    return goToDemo("popup");
+                  };
+                  const n187 = _createSharedDataComponentWithFallback(_component_up_cell, "897fadd6", {
                     title: "Popup 弹出层",
                     "is-link": "",
-                    onClick: _cache[57] || (_cache[57] = ($event) => $setup.goToDemo("popup"))
+                    onClick: () => {
+                      return _on_click57;
+                    }
                   }, {
-                    icon: _withCtx(() => [
-                      _createVNode(_component_up_icon, {
+                    "icon": _withSharedDataVaporCtx(() => {
+                      const n185 = _createSharedDataComponentWithFallback(_component_up_icon, "897fa626", {
                         name: "server-man",
-                        color: $setup.themeColor,
+                        color: () => {
+                          return themeColor.value;
+                        },
                         size: "20",
                         class: "mr-_b8px_B"
-                      }, null, 8, ["color"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  _createVNode(_component_up_cell, {
+                      });
+                      _setSharedData(__sharedData, 121, n185?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 120, n187?.sharedData);
+                  const _on_click58 = () => {
+                    return goToDemo("no-network");
+                  };
+                  const n190 = _createSharedDataComponentWithFallback(_component_up_cell, "897f9dde", {
                     title: "NoNetwork 无网络提示",
                     "is-link": "",
-                    onClick: _cache[58] || (_cache[58] = ($event) => $setup.goToDemo("no-network"))
+                    onClick: () => {
+                      return _on_click58;
+                    }
                   }, {
-                    icon: _withCtx(() => [
-                      _createVNode(_component_up_icon, {
+                    "icon": _withSharedDataVaporCtx(() => {
+                      const n188 = _createSharedDataComponentWithFallback(_component_up_icon, "897f95ee", {
                         name: "wifi-off",
-                        color: $setup.themeColor,
+                        color: () => {
+                          return themeColor.value;
+                        },
                         size: "20",
                         class: "mr-_b8px_B"
-                      }, null, 8, ["color"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  _createVNode(_component_up_cell, {
+                      });
+                      _setSharedData(__sharedData, 123, n188?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 122, n190?.sharedData);
+                  const _on_click59 = () => {
+                    return goToDemo("line-progress");
+                  };
+                  const n193 = _createSharedDataComponentWithFallback(_component_up_cell, "897f8da8", {
                     title: "LineProgress 线型进度",
                     "is-link": "",
-                    onClick: _cache[59] || (_cache[59] = ($event) => $setup.goToDemo("line-progress"))
+                    onClick: () => {
+                      return _on_click59;
+                    }
                   }, {
-                    icon: _withCtx(() => [
-                      _createVNode(_component_up_icon, {
+                    "icon": _withSharedDataVaporCtx(() => {
+                      const n191 = _createSharedDataComponentWithFallback(_component_up_icon, "897f8098", {
                         name: "minus",
-                        color: $setup.themeColor,
+                        color: () => {
+                          return themeColor.value;
+                        },
                         size: "20",
                         class: "mr-_b8px_B"
-                      }, null, 8, ["color"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  _createVNode(_component_up_cell, {
+                      });
+                      _setSharedData(__sharedData, 125, n191?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 124, n193?.sharedData);
+                  const _on_click60 = () => {
+                    return goToDemo("circle-progress");
+                  };
+                  const n196 = _createSharedDataComponentWithFallback(_component_up_cell, "897f785a", {
                     title: "CircleProgress 圆形进度条",
                     "is-link": "",
-                    onClick: _cache[60] || (_cache[60] = ($event) => $setup.goToDemo("circle-progress"))
+                    onClick: () => {
+                      return _on_click60;
+                    }
                   }, {
-                    icon: _withCtx(() => [
-                      _createVNode(_component_up_icon, {
+                    "icon": _withSharedDataVaporCtx(() => {
+                      const n194 = _createSharedDataComponentWithFallback(_component_up_icon, "897f7056", {
                         name: "reload",
-                        color: $setup.themeColor,
+                        color: () => {
+                          return themeColor.value;
+                        },
                         size: "20",
                         class: "mr-_b8px_B"
-                      }, null, 8, ["color"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  _createVNode(_component_up_cell, {
+                      });
+                      _setSharedData(__sharedData, 127, n194?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 126, n196?.sharedData);
+                  const _on_click61 = () => {
+                    return goToDemo("count-down");
+                  };
+                  const n199 = _createSharedDataComponentWithFallback(_component_up_cell, "897f6816", {
                     title: "CountDown 倒计时",
                     "is-link": "",
-                    onClick: _cache[61] || (_cache[61] = ($event) => $setup.goToDemo("count-down"))
+                    onClick: () => {
+                      return _on_click61;
+                    }
                   }, {
-                    icon: _withCtx(() => [
-                      _createVNode(_component_up_icon, {
+                    "icon": _withSharedDataVaporCtx(() => {
+                      const n197 = _createSharedDataComponentWithFallback(_component_up_icon, "897ebd6a", {
                         name: "clock",
-                        color: $setup.themeColor,
+                        color: () => {
+                          return themeColor.value;
+                        },
                         size: "20",
                         class: "mr-_b8px_B"
-                      }, null, 8, ["color"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  _createVNode(_component_up_cell, {
+                      });
+                      _setSharedData(__sharedData, 129, n197?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 128, n199?.sharedData);
+                  const _on_click62 = () => {
+                    return goToDemo("count-to");
+                  };
+                  const n202 = _createSharedDataComponentWithFallback(_component_up_cell, "897eb52c", {
                     title: "CountTo 数字滚动",
                     "is-link": "",
-                    onClick: _cache[62] || (_cache[62] = ($event) => $setup.goToDemo("count-to"))
+                    onClick: () => {
+                      return _on_click62;
+                    }
                   }, {
-                    icon: _withCtx(() => [
-                      _createVNode(_component_up_icon, {
+                    "icon": _withSharedDataVaporCtx(() => {
+                      const n200 = _createSharedDataComponentWithFallback(_component_up_icon, "897ead9a", {
                         name: "play-right-fill",
-                        color: $setup.themeColor,
+                        color: () => {
+                          return themeColor.value;
+                        },
                         size: "20",
                         class: "mr-_b8px_B"
-                      }, null, 8, ["color"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  _createVNode(_component_up_cell, {
+                      });
+                      _setSharedData(__sharedData, 131, n200?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 130, n202?.sharedData);
+                  const _on_click63 = () => {
+                    return goToDemo("copy");
+                  };
+                  const n205 = _createSharedDataComponentWithFallback(_component_up_cell, "897ea4f4", {
                     title: "Copy 文本复制",
                     "is-link": "",
-                    onClick: _cache[63] || (_cache[63] = ($event) => $setup.goToDemo("copy"))
+                    onClick: () => {
+                      return _on_click63;
+                    }
                   }, {
-                    icon: _withCtx(() => [
-                      _createVNode(_component_up_icon, {
+                    "icon": _withSharedDataVaporCtx(() => {
+                      const n203 = _createSharedDataComponentWithFallback(_component_up_icon, "897e9d70", {
                         name: "file-text",
-                        color: $setup.themeColor,
+                        color: () => {
+                          return themeColor.value;
+                        },
                         size: "20",
                         class: "mr-_b8px_B"
-                      }, null, 8, ["color"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  })
-                ]),
-                _: 1
-                /* STABLE */
-              })
-            ]),
-            _createElementVNode("view", { class: "demo-group-card mt-_b12px_B" }, [
-              _createElementVNode("text", { class: "group-title" }, "导航组件"),
-              _createVNode(_component_up_cell_group, { border: false }, {
-                default: _withCtx(() => [
-                  _createVNode(_component_up_cell, {
+                      });
+                      _setSharedData(__sharedData, 133, n203?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 132, n205?.sharedData);
+                })
+              });
+              _setSharedData(__sharedData, 95, n206?.sharedData);
+              const n233 = _createSharedDataComponentWithFallback(_component_up_cell_group, "897e8764", { border: false }, {
+                "default": _withSharedDataVaporCtx(() => {
+                  const _on_click64 = () => {
+                    return goToDemo("navbar");
+                  };
+                  const n211 = _createSharedDataComponentWithFallback(_component_up_cell, "897e8156", {
                     title: "Navbar 导航栏",
                     "is-link": "",
-                    onClick: _cache[64] || (_cache[64] = ($event) => $setup.goToDemo("navbar"))
+                    onClick: () => {
+                      return _on_click64;
+                    }
                   }, {
-                    icon: _withCtx(() => [
-                      _createVNode(_component_up_icon, {
+                    "icon": _withSharedDataVaporCtx(() => {
+                      const n209 = _createSharedDataComponentWithFallback(_component_up_icon, "897ddc22", {
                         name: "arrow-left",
-                        color: $setup.themeColor,
+                        color: () => {
+                          return themeColor.value;
+                        },
                         size: "20",
                         class: "mr-_b8px_B"
-                      }, null, 8, ["color"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  _createVNode(_component_up_cell, {
+                      });
+                      _setSharedData(__sharedData, 136, n209?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 135, n211?.sharedData);
+                  const _on_click65 = () => {
+                    return goToDemo("navbar-mini");
+                  };
+                  const n214 = _createSharedDataComponentWithFallback(_component_up_cell, "897dd3b0", {
                     title: "NavbarMini 迷你导航",
                     "is-link": "",
-                    onClick: _cache[65] || (_cache[65] = ($event) => $setup.goToDemo("navbar-mini"))
+                    onClick: () => {
+                      return _on_click65;
+                    }
                   }, {
-                    icon: _withCtx(() => [
-                      _createVNode(_component_up_icon, {
+                    "icon": _withSharedDataVaporCtx(() => {
+                      const n212 = _createSharedDataComponentWithFallback(_component_up_icon, "897dcbe8", {
                         name: "arrow-left",
-                        color: $setup.themeColor,
+                        color: () => {
+                          return themeColor.value;
+                        },
                         size: "20",
                         class: "mr-_b8px_B"
-                      }, null, 8, ["color"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  _createVNode(_component_up_cell, {
+                      });
+                      _setSharedData(__sharedData, 138, n212?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 137, n214?.sharedData);
+                  const _on_click66 = () => {
+                    return goToDemo("back-top");
+                  };
+                  const n217 = _createSharedDataComponentWithFallback(_component_up_cell, "897dbe60", {
                     title: "BackTop 返回顶部",
                     "is-link": "",
-                    onClick: _cache[66] || (_cache[66] = ($event) => $setup.goToDemo("back-top"))
+                    onClick: () => {
+                      return _on_click66;
+                    }
                   }, {
-                    icon: _withCtx(() => [
-                      _createVNode(_component_up_icon, {
+                    "icon": _withSharedDataVaporCtx(() => {
+                      const n215 = _createSharedDataComponentWithFallback(_component_up_icon, "897db6a4", {
                         name: "arrow-upward",
-                        color: $setup.themeColor,
+                        color: () => {
+                          return themeColor.value;
+                        },
                         size: "20",
                         class: "mr-_b8px_B"
-                      }, null, 8, ["color"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  _createVNode(_component_up_cell, {
+                      });
+                      _setSharedData(__sharedData, 140, n215?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 139, n217?.sharedData);
+                  const _on_click67 = () => {
+                    return goToDemo("tabbar");
+                  };
+                  const n220 = _createSharedDataComponentWithFallback(_component_up_cell, "897dae58", {
                     title: "Tabbar 底部导航",
                     "is-link": "",
-                    onClick: _cache[67] || (_cache[67] = ($event) => $setup.goToDemo("tabbar"))
+                    onClick: () => {
+                      return _on_click67;
+                    }
                   }, {
-                    icon: _withCtx(() => [
-                      _createVNode(_component_up_icon, {
+                    "icon": _withSharedDataVaporCtx(() => {
+                      const n218 = _createSharedDataComponentWithFallback(_component_up_icon, "897da6a2", {
                         name: "list",
-                        color: $setup.themeColor,
+                        color: () => {
+                          return themeColor.value;
+                        },
                         size: "20",
                         class: "mr-_b8px_B"
-                      }, null, 8, ["color"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  _createVNode(_component_up_cell, {
+                      });
+                      _setSharedData(__sharedData, 142, n218?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 141, n220?.sharedData);
+                  const _on_click68 = () => {
+                    return goToDemo("tabs");
+                  };
+                  const n223 = _createSharedDataComponentWithFallback(_component_up_cell, "897d9e66", {
                     title: "Tabs 标签页",
                     "is-link": "",
-                    onClick: _cache[68] || (_cache[68] = ($event) => $setup.goToDemo("tabs"))
+                    onClick: () => {
+                      return _on_click68;
+                    }
                   }, {
-                    icon: _withCtx(() => [
-                      _createVNode(_component_up_icon, {
+                    "icon": _withSharedDataVaporCtx(() => {
+                      const n221 = _createSharedDataComponentWithFallback(_component_up_icon, "897d96e4", {
                         name: "list",
-                        color: $setup.themeColor,
+                        color: () => {
+                          return themeColor.value;
+                        },
                         size: "20",
                         class: "mr-_b8px_B"
-                      }, null, 8, ["color"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  _createVNode(_component_up_cell, {
+                      });
+                      _setSharedData(__sharedData, 144, n221?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 143, n223?.sharedData);
+                  const _on_click69 = () => {
+                    return goToDemo("subsection");
+                  };
+                  const n226 = _createSharedDataComponentWithFallback(_component_up_cell, "897cebe8", {
                     title: "Subsection 分段器",
                     "is-link": "",
-                    onClick: _cache[69] || (_cache[69] = ($event) => $setup.goToDemo("subsection"))
+                    onClick: () => {
+                      return _on_click69;
+                    }
                   }, {
-                    icon: _withCtx(() => [
-                      _createVNode(_component_up_icon, {
+                    "icon": _withSharedDataVaporCtx(() => {
+                      const n224 = _createSharedDataComponentWithFallback(_component_up_icon, "897ce424", {
                         name: "list",
-                        color: $setup.themeColor,
+                        color: () => {
+                          return themeColor.value;
+                        },
                         size: "20",
                         class: "mr-_b8px_B"
-                      }, null, 8, ["color"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  _createVNode(_component_up_cell, {
+                      });
+                      _setSharedData(__sharedData, 146, n224?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 145, n226?.sharedData);
+                  const _on_click70 = () => {
+                    return goToDemo("index-list");
+                  };
+                  const n229 = _createSharedDataComponentWithFallback(_component_up_cell, "897cdbe8", {
                     title: "IndexList 索引列表",
                     "is-link": "",
-                    onClick: _cache[70] || (_cache[70] = ($event) => $setup.goToDemo("index-list"))
+                    onClick: () => {
+                      return _on_click70;
+                    }
                   }, {
-                    icon: _withCtx(() => [
-                      _createVNode(_component_up_icon, {
+                    "icon": _withSharedDataVaporCtx(() => {
+                      const n227 = _createSharedDataComponentWithFallback(_component_up_icon, "897cd424", {
                         name: "list",
-                        color: $setup.themeColor,
+                        color: () => {
+                          return themeColor.value;
+                        },
                         size: "20",
                         class: "mr-_b8px_B"
-                      }, null, 8, ["color"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  }),
-                  _createVNode(_component_up_cell, {
+                      });
+                      _setSharedData(__sharedData, 148, n227?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 147, n229?.sharedData);
+                  const _on_click71 = () => {
+                    return goToDemo("mp-html");
+                  };
+                  const n232 = _createSharedDataComponentWithFallback(_component_up_cell, "897ccbe8", {
                     title: "MpHtml 富文本组件",
                     "is-link": "",
-                    onClick: _cache[71] || (_cache[71] = ($event) => $setup.goToDemo("mp-html"))
+                    onClick: () => {
+                      return _on_click71;
+                    }
                   }, {
-                    icon: _withCtx(() => [
-                      _createVNode(_component_up_icon, {
+                    "icon": _withSharedDataVaporCtx(() => {
+                      const n230 = _createSharedDataComponentWithFallback(_component_up_icon, "897cbf18", {
                         name: "file-text",
-                        color: $setup.themeColor,
+                        color: () => {
+                          return themeColor.value;
+                        },
                         size: "20",
                         class: "mr-_b8px_B"
-                      }, null, 8, ["color"])
-                    ]),
-                    _: 1
-                    /* STABLE */
-                  })
-                ]),
-                _: 1
-                /* STABLE */
-              })
-            ])
-          ])
-        ]),
-        _: 1
-        /* STABLE */
-      })
-    ]),
-    _: 1
-    /* STABLE */
-  });
-}
-const uviewUltra = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["styles", [_style_0]], ["__file", "/Users/chenqi/Documents/chenqi-front/unibestX/src/sub/uview-ultra/uview-ultra.uvue"]]);
+                      });
+                      _setSharedData(__sharedData, 150, n230?.sharedData);
+                    })
+                  });
+                  _setSharedData(__sharedData, 149, n232?.sharedData);
+                })
+              });
+              _setSharedData(__sharedData, 134, n233?.sharedData);
+            })
+          });
+          _setSharedData(__sharedData, 1, n236.sharedData);
+        })
+      });
+      _setSharedData(__sharedData, 0, n237.sharedData);
+      return __sharedData;
+    };
+  }
+});
+const _style_0 = {"mr-_b8px_B":{"":{"marginRight":8}}};
+const uviewUltra = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
 export {
   uviewUltra as default
 };
