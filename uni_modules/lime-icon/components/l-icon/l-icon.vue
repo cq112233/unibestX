@@ -11,10 +11,9 @@
 	</image>
 
 	<!-- SVG图标（包括Iconify和带有颜色的SVG图片） -->
-	<l-svg v-else-if="iconifyUrl || (type == 'image' && parsed.isSvg && color)" class="l-icon l-icon--image l-class"
-		:class="classes" :style="styles" :src="iconifyUrl || imageUrl" :color="color" :inherit="inherit"
-		:web="web" @click="handleClick">
-	</l-svg>
+	<image v-else-if="iconifyUrl || (type == 'image' && parsed.isSvg && color)" class="l-icon l-icon--image l-class"
+		:class="classes" :style="styles" :src="iconifyUrl || imageUrl" @click="handleClick">
+	</image>
 </template>
 <script lang="ts">
 	// @ts-nocheck

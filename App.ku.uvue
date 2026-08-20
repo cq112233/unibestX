@@ -97,7 +97,7 @@ onShow(() => {
 });
 
 // 主题模式 / 系统深浅色变化时，当前页面不切换也实时同步导航栏
-watch((): boolean => appStore.state.isDark, (newVal: boolean, oldVal: boolean) => {
+watch((): boolean => appStore.state.isDark, (newVal: boolean) => {
   applyNavbarTheme(newVal);
 });
 </script>

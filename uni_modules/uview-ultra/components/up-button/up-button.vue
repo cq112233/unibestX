@@ -496,6 +496,22 @@ $up-button-hairline-border-width: 0.5px !default;
 
     &--plain {
         background-color: $up-button-plain-background-color;
+
+        &.up-button--primary {
+            color: $up-primary;
+        }
+        &.up-button--success {
+            color: $up-success;
+        }
+        &.up-button--error {
+            color: $up-error;
+        }
+        &.up-button--warning {
+            color: $up-warning;
+        }
+        &.up-button--info {
+            color: $up-info;
+        }
     }
 
     &--hairline {

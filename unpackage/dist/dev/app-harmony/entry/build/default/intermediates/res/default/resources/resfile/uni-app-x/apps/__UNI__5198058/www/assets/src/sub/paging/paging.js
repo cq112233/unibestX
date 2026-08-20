@@ -1,7 +1,7 @@
 import { _ as __easycom_0 } from "../../components/NavBar/NavBar.js";
 import { _ as __easycom_1 } from "../../../uni_modules/z-paging-x/components/z-paging-x/z-paging-x.js";
 import { A as AppKu } from "../../../App.ku.js";
-import { L as LayoutComponent } from "../../layouts/default.js";
+import { L as LayoutComponent } from "../../components/layouts/default.js";
 import "../../utils/systemInfo.js";
 import "../../store/index.js";
 import "../../../uni_modules/x-pinia-s/instans/types.js";

@@ -12,12 +12,7 @@
 		</view>
 		<view
 		    class="up-switch__node"
-		    <!-- #ifdef VUE3 -->
-			:class="[modelValue && 'up-switch__node--on']"
-			<!-- #endif -->
-			<!-- #ifdef VUE2 -->
-			:class="[value && 'up-switch__node--on']"
-			<!-- #endif -->
+			:class="[isActive ? 'up-switch__node--on' : '']"
 		    :style="[nodeStyle]"
 		    ref="up-switch__node"
 		>
@@ -25,12 +20,7 @@
 			    :show="loading"
 			    mode="circle"
 			    timingFunction='linear'
-			    <!-- #ifdef VUE3 -->
-				:color="modelValue ? activeColor : '#AAABAD'"
-				<!-- #endif -->
-				<!-- #ifdef VUE2 -->
-				:color="value ? activeColor : '#AAABAD'"
-				<!-- #endif -->
+				:color="loadingIconColor"
 			    :size="size * 0.6"
 			/>
 		</view>
@@ -42,6 +32,7 @@
 	import { mpMixin } from '../../libs/mixin/mpMixin';
 	import { mixin } from '../../libs/mixin/mixin';
 	import { addStyle, addUnit, error } from '../../libs/function/index';
+	import config from '../../libs/config/config.js';
 	/**
 	 * switch 开关选择器
 	 * @description 选择开关一般用于只有两个选择，且只能选其一的场景。
@@ -136,6 +127,12 @@
 			customInactiveColor() {
 				// 之所以需要判断是否自定义了“非激活”颜色，是为了让node圆点离外边框更宽一点的距离
 				return this.inactiveColor !== '#fff' && this.inactiveColor !== '#ffffff'
+			},
+			loadingIconColor() {
+				if (this.isActive) {
+					return (this.activeColor && this.activeColor !== '#2979ff') ? this.activeColor : (config.color && config.color['up-primary'] ? config.color['up-primary'] : '#3c9cff')
+				}
+				return '#AAABAD'
 			}
 		},
 		// #ifdef VUE3

@@ -62,7 +62,7 @@ function triggerSlide(mode: string) {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .demo-block {
   margin-bottom: 12px;
   padding: 12px;
@@ -75,7 +75,9 @@ function triggerSlide(mode: string) {
   color: #606266;
   margin-bottom: 10px;
   padding-left: 4px;
-  border-left: 3px solid #2979ff;
+  border-left-width: 3px;
+  border-left-style: solid;
+  border-left-color: -primary;
 }
 .transition-demo-wrapper {
   display: flex;

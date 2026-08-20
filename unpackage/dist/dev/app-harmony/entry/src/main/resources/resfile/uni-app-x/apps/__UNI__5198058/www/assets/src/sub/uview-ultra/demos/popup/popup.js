@@ -2,7 +2,7 @@ import { _ as __easycom_0 } from "../../../../components/NavBar/NavBar.js";
 import { _ as __easycom_2 } from "../../../../../uni_modules/uview-ultra/components/up-button/up-button.js";
 import { _ as __easycom_2$1 } from "../../../../../uni_modules/uview-ultra/components/up-popup/up-popup.js";
 import { A as AppKu } from "../../../../../App.ku.js";
-import { L as LayoutComponent } from "../../../../layouts/default.js";
+import { L as LayoutComponent } from "../../../../components/layouts/default.js";
 import { _ as _export_sfc } from "../../../../../plugin-vue-export-helper.js";
 import "../../../../utils/systemInfo.js";
 import "../../../../store/index.js";

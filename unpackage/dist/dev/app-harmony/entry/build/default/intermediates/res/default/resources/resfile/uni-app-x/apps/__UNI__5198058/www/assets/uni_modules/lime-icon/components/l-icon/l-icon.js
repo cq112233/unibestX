@@ -4,7 +4,7 @@ import { a as addUnit } from "../../../lime-shared/addUnit/index.js";
 import { u as useIcon, l as loadingFonts } from "../../index.js";
 import { _ as _export_sfc } from "../../../../plugin-vue-export-helper.js";
 const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
-const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, resolveComponent: _resolveComponent, setSharedData: _setSharedData, toSharedDataBoolean: _toSharedDataBoolean, unref: _unref, setSharedDataEvent: _setSharedDataEvent, setSharedDataClass: _setSharedDataClass, setSharedDataStyle: _setSharedDataStyle, toDisplayString: _toDisplayString, renderSharedDataEffect: _renderSharedDataEffect, setSharedDataAttr: _setSharedDataAttr, toSharedDataString: _toSharedDataString, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, createSharedDataIf: _createSharedDataIf } = globalThis.Vue;
+const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, setSharedData: _setSharedData, toSharedDataBoolean: _toSharedDataBoolean, unref: _unref, setSharedDataEvent: _setSharedDataEvent, setSharedDataClass: _setSharedDataClass, setSharedDataStyle: _setSharedDataStyle, toDisplayString: _toDisplayString, renderSharedDataEffect: _renderSharedDataEffect, setSharedDataAttr: _setSharedDataAttr, toSharedDataString: _toSharedDataString, createSharedDataIf: _createSharedDataIf } = globalThis.Vue;
 const __className = "GenUniModulesLimeIconComponentsLIconLIcon";
 const { computed } = globalThis.Vue;
 const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
@@ -17,7 +17,7 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
     })
   },
   __dynamicSharedData: true,
-  __hash: "602a56d0",
+  __hash: "438cd3c4",
   __className,
   __filename: "uni_modules/lime-icon/components/l-icon/l-icon.uvue",
   __name: "l-icon",
@@ -75,7 +75,6 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
     };
     return () => {
       "raw js";
-      const _component_l_svg = _resolveComponent("l-svg");
       _createSharedDataIf(() => {
         return _setSharedData(__sharedData, 0, _toSharedDataBoolean(_unref(type) == "font" && !_unref(fontLoading)));
       }, () => {
@@ -99,37 +98,12 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
           return _createSharedDataIf(() => {
             return _setSharedData(__sharedData, 10, _toSharedDataBoolean(_unref(iconifyUrl) != null || _unref(type) == "image" && _unref(parsed).isSvg && __props.color != null));
           }, () => {
-            const n7 = _createSharedDataComponentWithFallback(
-              _component_l_svg,
-              "7ce9032a",
-              {
-                class: () => {
-                  return ["l-icon l-icon--image l-class", _unref(classes)];
-                },
-                style: () => {
-                  return _unref(styles);
-                },
-                src: () => {
-                  return _unref(iconifyUrl) ?? _unref(imageUrl);
-                },
-                color: () => {
-                  return __props.color;
-                },
-                inherit: () => {
-                  return __props.inherit;
-                },
-                web: () => {
-                  return __props.web;
-                },
-                onClick: () => {
-                  return handleClick;
-                }
-              },
-              null,
-              1
-              /* SINGLE_ROOT */
-            );
-            _setSharedData(__sharedData, 11, n7?.sharedData);
+            _setSharedDataEvent(__sharedData, 11, handleClick);
+            _renderSharedDataEffect(() => {
+              _setSharedDataClass(__sharedData, 12, ["l-icon l-icon--image l-class", _unref(classes)]);
+              _setSharedDataStyle(__sharedData, 13, _unref(styles));
+              _setSharedDataAttr(__sharedData, 14, _toSharedDataString(_unref(iconifyUrl) ?? _unref(imageUrl)));
+            });
           });
         }, 517);
       }, 261);

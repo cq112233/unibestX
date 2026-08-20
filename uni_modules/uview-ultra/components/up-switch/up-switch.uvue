@@ -35,6 +35,7 @@
 <script setup lang="uts">
 import { computed, nextTick } from 'vue'
 import { addStyle, getPx, addUnit, deepMerge } from '../../libs/function/index.uts'
+import config from '../../libs/config/config'
 
 defineOptions({
   name: 'up-switch'
@@ -106,7 +107,7 @@ const loadingColor = computed((): string => {
     if (props.activeColor != '' && props.activeColor != '#2979ff') {
       return props.activeColor
     }
-    return 'var(--theme-color, #2979ff)'
+    return config.getString('color.up-primary') as string
   }
   return '#AAABAD'
 })

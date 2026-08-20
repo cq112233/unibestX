@@ -221,7 +221,7 @@ const textColorCom = computed<string>(() => {
         return props.plain ? props.color : '#ffffff'
     }
     if (props.plain) {
-        if (props.type == 'primary') return 'var(--theme-color, #0957de)'
+        if (props.type == 'primary') return config.getString('color.up-primary') as string
         if (props.type == 'info') return '#000000'
         if (props.type == 'success') return '#5ac725'
         if (props.type == 'error') return '#f56c6c'

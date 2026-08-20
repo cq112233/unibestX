@@ -19,7 +19,7 @@ import { _ as __easycom_2$3 } from "../../../../../uni_modules/uview-ultra/compo
 import { _ as __easycom_18 } from "../../../../../uni_modules/uview-ultra/components/up-datetime-picker/up-datetime-picker.js";
 import { _ as __easycom_19 } from "../../../../../uni_modules/uview-ultra/components/up-action-sheet/up-action-sheet.js";
 import { A as AppKu } from "../../../../../App.ku.js";
-import { L as LayoutComponent } from "../../../../layouts/default.js";
+import { L as LayoutComponent } from "../../../../components/layouts/default.js";
 import { _ as _export_sfc } from "../../../../../plugin-vue-export-helper.js";
 import "../../../../utils/systemInfo.js";
 import "../../../../store/index.js";

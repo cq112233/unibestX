@@ -3,7 +3,7 @@ import { _ as __easycom_1 } from "../../../uni_modules/uview-ultra/components/up
 import { _ as __easycom_2 } from "../../../uni_modules/uview-ultra/components/up-cell/up-cell.js";
 import { _ as __easycom_3 } from "../../../uni_modules/uview-ultra/components/up-cell-group/up-cell-group.js";
 import { A as AppKu } from "../../../App.ku.js";
-import { L as LayoutComponent } from "../../layouts/default.js";
+import { L as LayoutComponent } from "../../components/layouts/default.js";
 import "../../store/index.js";
 import { u as useAppStore } from "../../store/app.js";
 import { _ as _export_sfc } from "../../../plugin-vue-export-helper.js";

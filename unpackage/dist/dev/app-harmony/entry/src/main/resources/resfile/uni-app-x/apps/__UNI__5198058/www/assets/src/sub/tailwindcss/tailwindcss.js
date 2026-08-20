@@ -1,6 +1,6 @@
 import { _ as __easycom_0 } from "../../components/NavBar/NavBar.js";
 import { A as AppKu } from "../../../App.ku.js";
-import { L as LayoutComponent } from "../../layouts/default.js";
+import { L as LayoutComponent } from "../../components/layouts/default.js";
 import { W as WeappTailwindcss } from "./components/WeappTailwindcss.js";
 import { B as BindClass } from "./components/BindClass.js";
 import { _ as _sfc_main$1 } from "./components/t-button.js";
@@ -74,7 +74,7 @@ const __className = "GenSrcSubTailwindcssTailwindcss";
 const { computed, ref, onLoad } = globalThis.Vue;
 const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
   __dynamicSharedData: true,
-  __hash: "84d63276",
+  __hash: "8226498c",
   __className,
   __filename: "src/sub/tailwindcss/tailwindcss.uvue",
   __name: "tailwindcss",
@@ -148,11 +148,11 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
                   return toggleDark;
                 }
               }, {
-                "default": () => {
+                "default": _withSharedDataVaporCtx(() => {
                   _renderSharedDataEffect(() => {
                     return _setSharedData(__sharedData, 6, _toDisplayString(_unref(isDark) ? "切换到亮色模式" : "切换到暗色模式"));
                   });
-                }
+                }, "string")
               });
               _setSharedData(__sharedData, 5, n4?.sharedData);
               _renderSharedDataEffect(() => {
@@ -161,7 +161,7 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
               const _on_click = () => {
                 return setGlobalNum(_unref(globalNum) + 1);
               };
-              const n24 = _createSharedDataComponentWithFallback(_component_button, "ef495674", {
+              const n24 = _createSharedDataComponentWithFallback(_component_button, "ef4956b8", {
                 class: () => {
                   return ["w-64 text-white", _unref(buttonClass)];
                 },
@@ -176,7 +176,7 @@ const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
                 }, "string")
               });
               _setSharedData(__sharedData, 8, n24?.sharedData);
-              const n31 = _createSharedDataComponent(_sfc_main$1, "ef487d38", {
+              const n31 = _createSharedDataComponent(_sfc_main$1, "ef487d7c", {
                 "t-class": "bg-_b_h0977ee_B text-_b31rpx_B",
                 "t-class-content": "px-_b29rpx_B"
               }, {

@@ -234,13 +234,68 @@ export default function uniLayoutsPlugin(options: UniLayoutsOptions = {}) {
     return cachedPagesData;
   }
 
+  const generatedLayoutsDir = path.resolve(projectRoot, 'src/components/_layouts');
+
+  // 同步 src/layouts 到 src/components/_layouts 保证 weapp-tailwindcss 在原生 App 端精准提取 scoped 样式
+  function syncLayouts() {
+    if (!fs.existsSync(layoutDir))
+      return;
+    if (!fs.existsSync(generatedLayoutsDir)) {
+      fs.mkdirSync(generatedLayoutsDir, { recursive: true });
+    }
+
+    const files = fs.readdirSync(layoutDir);
+    const validExtensions = new Set(['.uvue', '.vue']);
+
+    files.forEach((file) => {
+      const ext = path.extname(file);
+      if (validExtensions.has(ext)) {
+        const srcPath = path.join(layoutDir, file);
+        const destPath = path.join(generatedLayoutsDir, file);
+        try {
+          const srcContent = fs.readFileSync(srcPath, 'utf-8');
+          const destContent = fs.existsSync(destPath) ? fs.readFileSync(destPath, 'utf-8') : null;
+          if (srcContent !== destContent) {
+            fs.writeFileSync(destPath, srcContent, 'utf-8');
+          }
+        }
+        catch (err) {
+          console.error(`[Layout Plugin] Failed to sync ${file}:`, err);
+        }
+      }
+    });
+
+    // 清理已在 src/layouts 中被删除的文件
+    try {
+      const generatedFiles = fs.readdirSync(generatedLayoutsDir);
+      generatedFiles.forEach((file) => {
+        const srcPath = path.join(layoutDir, file);
+        if (!fs.existsSync(srcPath)) {
+          fs.unlinkSync(path.join(generatedLayoutsDir, file));
+        }
+      });
+    }
+    catch {
+      // 忽略清理异常
+    }
+  }
+
+  type ResolvedLayout = {
+    fileName: string;
+    importPath: string;
+  };
+
   // 寻找布局文件，支持 .uvue 和 .vue 扩展名
-  function resolveLayoutFile(layoutName: string): string | null {
+  function resolveLayoutFile(layoutName: string): ResolvedLayout | null {
     const extensions = ['.uvue', '.vue'];
-    for (const ext of extensions) {
+    for (let j = 0; j < extensions.length; j++) {
+      const ext = extensions[j];
       const filePath = path.join(layoutDir, `${layoutName}${ext}`);
       if (fs.existsSync(filePath)) {
-        return `${layoutName}${ext}`;
+        return {
+          fileName: `${layoutName}${ext}`,
+          importPath: `@/src/layouts/${layoutName}${ext}`
+        };
       }
     }
     return null;
@@ -252,6 +307,10 @@ export default function uniLayoutsPlugin(options: UniLayoutsOptions = {}) {
       projectRoot = config.root || process.cwd();
       layoutDir = path.resolve(projectRoot, layoutDirName);
       pagesJsonPath = path.resolve(projectRoot, 'pages.json');
+      syncLayouts();
+    },
+    buildStart() {
+      syncLayouts();
     },
     transform(code: string, id: string) {
       const normalizedId = id.replace(/\\/g, '/');
@@ -265,6 +324,7 @@ export default function uniLayoutsPlugin(options: UniLayoutsOptions = {}) {
       }
       if (
         normalizedId.includes('/src/layouts/')
+        || normalizedId.includes('/src/components/_layouts/')
         || normalizedId.includes('App.uvue')
         || normalizedId.includes('App.ku.uvue')
         || normalizedId.includes('/components/')
@@ -366,17 +426,14 @@ export default function uniLayoutsPlugin(options: UniLayoutsOptions = {}) {
       }
 
       // 6. 校验布局组件文件是否存在，不存在则不包裹
-      let layoutFileName = resolveLayoutFile(layoutName as string);
+      let layoutInfo = resolveLayoutFile(layoutName as string);
 
       // 如果默认布局是 default 且找不到，尝试回退到 layout
-      if (!layoutFileName && layoutName === 'default') {
-        layoutFileName = resolveLayoutFile('layout');
-        if (layoutFileName) {
-          layoutName = 'layout';
-        }
+      if (!layoutInfo && layoutName === 'default') {
+        layoutInfo = resolveLayoutFile('layout');
       }
 
-      if (!layoutFileName) {
+      if (!layoutInfo) {
         if (layoutName !== defaultLayoutName && layoutName !== 'layout') {
           console.warn(`[Layout Plugin] Layout "${layoutName}" not found in "${layoutDir}". Skipping wrap for "${id}".`);
         }
@@ -425,7 +482,7 @@ export default function uniLayoutsPlugin(options: UniLayoutsOptions = {}) {
 
       // 9. 自动引入 Layout 组件到 setup script
       const scriptSetupRegex = /<script\s[^>]*\bsetup\b[^>]*>/;
-      const importStatement = `\nimport LayoutComponent from '@/src/layouts/${layoutFileName}'`;
+      const importStatement = `\nimport LayoutComponent from '${layoutInfo.importPath}'`;
 
       if (scriptSetupRegex.test(cleanCode)) {
         cleanCode = cleanCode.replace(scriptSetupRegex, match => match + importStatement);
@@ -438,6 +495,68 @@ export default function uniLayoutsPlugin(options: UniLayoutsOptions = {}) {
         code: cleanCode,
         map: { mappings: '' }
       };
+    },
+
+    configureServer(server: any) {
+      if (fs.existsSync(layoutDir)) {
+        server.watcher.add(layoutDir);
+      }
+      if (fs.existsSync(pagesJsonPath)) {
+        server.watcher.add(pagesJsonPath);
+      }
+
+      server.watcher.on('change', (filePath: string) => {
+        const normalized = filePath.replace(/\\/g, '/');
+        if (normalized.includes(`/${layoutDirName}/`)) {
+          syncLayouts();
+          const fileName = path.basename(filePath);
+          const genFile = path.join(generatedLayoutsDir, fileName);
+          const mod = server.moduleGraph.getModuleById(genFile) || server.moduleGraph.getModuleById(filePath);
+          if (mod) {
+            server.moduleGraph.invalidateModule(mod);
+          }
+          server.ws.send({
+            type: 'full-reload',
+            path: '*'
+          });
+        }
+        else if (normalized.includes('pages.json')) {
+          cachedPagesData = null;
+          server.ws.send({
+            type: 'full-reload',
+            path: '*'
+          });
+        }
+      });
+
+      server.watcher.on('unlink', (filePath: string) => {
+        const normalized = filePath.replace(/\\/g, '/');
+        if (normalized.includes(`/${layoutDirName}/`)) {
+          syncLayouts();
+          server.ws.send({
+            type: 'full-reload',
+            path: '*'
+          });
+        }
+      });
+    },
+
+    handleHotUpdate(ctx: any) {
+      const normalized = ctx.file.replace(/\\/g, '/');
+      if (normalized.includes(`/${layoutDirName}/`)) {
+        syncLayouts();
+        const fileName = path.basename(ctx.file);
+        const genFile = path.join(generatedLayoutsDir, fileName);
+        const mod = ctx.server.moduleGraph.getModuleById(genFile);
+        if (mod) {
+          ctx.server.moduleGraph.invalidateModule(mod);
+        }
+        return ctx.modules;
+      }
+      if (normalized.includes('pages.json')) {
+        cachedPagesData = null;
+        return ctx.modules;
+      }
     }
   };
 }
