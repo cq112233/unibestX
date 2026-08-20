@@ -1,734 +1,0 @@
-Ôr@Ÿªassertions¤code´customTransformCache¬dependencies¢id¤meta±moduleSideEffects¬originalCode±originalSourcemap«resolvedIds®sourcemapChainµsyntheticNamedExportsµtransformDependencies®transformFiles¨cacheAstÔrAÚ-import image from "@ohos.multimedia.image";
-import window from "@ohos.window";
-import componentSnapshot from "@ohos.arkui.componentSnapshot";
-import fs from '@ohos.file.fs';
-export function getSnapShotElementByBody(body) {
-    let el = body;
-    // æ‰¾åˆ°ç¬¬ä¸€ä¸ªåˆæ³•å­èŠ‚ç‚¹ï¼Œé’ˆå¯¹å¤šæ ¹èŠ‚ç‚¹ç¬¬ä¸€ä¸ªå­èŠ‚ç‚¹æ˜¯æ³¨é‡ŠèŠ‚ç‚¹æƒ…å†µ
-    const childNodes = body.childNodes;
-    for (let i = 0; i < childNodes.length; i++) {
-        if (childNodes[i].tagName) {
-            el = childNodes[i];
-            break;
-        }
-    }
-    // å¦‚æœå­èŠ‚ç‚¹é«˜åº¦å°äº bodyï¼Œæˆªå– bodyï¼Œé˜²æ­¢æˆªå›¾è¿‡å°é—®é¢˜
-    if (el.layoutNode.getLayoutHeight() < body.layoutNode.getLayoutHeight()) {
-        el = body;
-    }
-    return el;
-}
-export async function windowSnapShot(context) {
-    return new Promise((resolve, reject) => {
-        window.getLastWindow(context).then(currentWidnow => {
-            currentWidnow.snapshot().then((pixelMap) => {
-                resolve(pixelMap);
-            }).catch(reject);
-        }).catch(reject);
-    });
-}
-export function isScrollAbleElement(el) {
-    return el.tagName === 'SCROLL-VIEW' || el.tagName === 'LIST-VIEW' || el.tagName === 'WEB-VIEW';
-}
-async function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
-export function getSnapshotId() {
-    return `screen_shot_id_${Date.now()}_${Math.floor(Math.random() * 1000000)}`;
-}
-export async function scrollSnapshot(el) {
-    const tagName = el.tagName;
-    if (tagName === 'SCROLL-VIEW' || tagName === 'LIST-VIEW') {
-        return scrollViewScrollSnapshot(el);
-    }
-    return webViewScrollSnapshot(el);
-}
-const SCROLL_VIEW_SCROLL_TIMEOUT = 100;
-export async function scrollViewScrollSnapshot(el) {
-    return new Promise(async (resolve, reject) => {
-        const scroller = el['scroller'];
-        const originOffsetY = scroller.currentOffset().yOffset;
-        const componentWidth = el['widthByAreaChange'];
-        const componentHeight = el['heightByAreaChange'];
-        const areaArray = [];
-        const scrollYOffsets = [];
-        const screenShotId = getSnapshotId();
-        el.frameNode.commonAttribute.id(screenShotId);
-        // æ»šåŠ¨åˆ°é¡¶éƒ¨, ä»¥ä¾¿æˆªå›¾
-        scroller.scrollTo({
-            xOffset: 0,
-            yOffset: 0,
-            animation: {
-                duration: 0
-            }
-        });
-        await sleep(SCROLL_VIEW_SCROLL_TIMEOUT);
-        scrollViewSnapCurrentScreen(scrollYOffsets, el, screenShotId, componentWidth, componentHeight, areaArray, scroller).then(async (pixelMap) => {
-            // æˆªå›¾åæ¢å¤æ»šåŠ¨ä½ç½®
-            scroller.scrollTo({
-                xOffset: 0,
-                yOffset: originOffsetY,
-                animation: {
-                    duration: 0
-                }
-            });
-            await sleep(SCROLL_VIEW_SCROLL_TIMEOUT);
-            // é‡ç½®å…ƒç´ id
-            el.frameNode.commonAttribute.id(undefined);
-            resolve(pixelMap);
-        }).catch((e) => {
-            reject(e);
-        });
-    });
-}
-async function scrollViewSnapCurrentScreen(scrollYOffsets, el, screenShotId, componentWidth, componentHeight, areaArray, scroller) {
-    scrollYOffsets.push(scroller.currentOffset().yOffset);
-    const pixelMap = await componentSnapshot.get(screenShotId);
-    // è·å–å½“å‰è¿™ä¸€å±ä¸­éœ€è¦çš„åƒç´ æ•°æ®
-    const area = await getSnapshotArea(pixelMap, scrollYOffsets, componentWidth, componentHeight);
-    areaArray.push(area);
-    // å¦‚æœæ²¡æœ‰æ»šåŠ¨åˆ°åº•éƒ¨ï¼Œç»§ç»­æ»šåŠ¨æˆªå›¾
-    if (!scroller.isAtEnd()) {
-        scrollerScroll(scroller, calculateNeedScrollDistance(el.scrollHeight, scrollYOffsets[scrollYOffsets.length - 1], componentHeight));
-        await sleep(SCROLL_VIEW_SCROLL_TIMEOUT);
-        return await scrollViewSnapCurrentScreen(scrollYOffsets, el, screenShotId, componentWidth, componentHeight, areaArray, scroller);
-    }
-    else {
-        // æ»šåŠ¨ç»“æŸï¼Œåˆå¹¶æ‰€æœ‰æˆªå›¾
-        return await mergeImage(areaArray, scrollYOffsets[scrollYOffsets.length - 1], componentWidth, componentHeight);
-    }
-}
-function calculateNeedScrollDistance(scrollHeight, lastScrollYOffset, componentHeight) {
-    // ä»¥ä¸‹è®¡ç®—ç”¨äºè§„é¿å‰©ä½™é«˜åº¦ä¸è¶³ä¸€ä¸ªç»„ä»¶é«˜åº¦æ—¶ï¼Œä¸€æ¬¡æ€§æ»šåŠ¨ï¼Œæœ€åæ‹¼æ¥åçš„é•¿å›¾æœ€åä¸€å±ä¸¢å¤±é—®é¢˜
-    // æœªæ‰¾åˆ°å…·ä½“åŸå› ï¼Œåªå‘ç°å¤šæ¬¡å°è·ç¦»æ»šåŠ¨æˆªå›¾å†æ‹¼æ¥å¯ä»¥è§„é¿
-    // å‰©ä½™è¿˜æœ‰è‡³å°‘ä¸€ä¸ªç»„ä»¶é«˜åº¦ï¼Œæ»šåŠ¨ç»„ä»¶é«˜åº¦
-    const hasMoreFullScreen = scrollHeight - lastScrollYOffset >= componentHeight * 2;
-    // å‰©ä½™é«˜åº¦å°äº 120ï¼Œæ»šåŠ¨ 10
-    const needMiniStep = scrollHeight - lastScrollYOffset - componentHeight < 120;
-    // å‰©ä½™é«˜åº¦å¤§äº120 ä½†ä¸è¶³ä¸€ä¸ªç»„ä»¶é«˜åº¦ï¼Œæ»šåŠ¨ 40
-    return hasMoreFullScreen ? componentHeight : needMiniStep ? 10 : 40;
-}
-function scrollerScroll(scroller, scrollHeight) {
-    scroller.scrollTo({
-        xOffset: 0,
-        yOffset: (scroller.currentOffset().yOffset + scrollHeight),
-        animation: {
-            duration: 0,
-        }
-    });
-}
-const WEB_VIEW_SCROLL_TIMEOUT = 800;
-async function webViewScrollSnapshot(el) {
-    return new Promise(async (resolve, reject) => {
-        const controller = el['controller'];
-        const originOffsetY = el['curOffsetY'];
-        const componentWidth = el['widthByAreaChange'];
-        const componentHeight = el['heightByAreaChange'];
-        const scrollHeight = componentHeight * 0.7;
-        const areaArray = [];
-        const scrollYOffsets = [];
-        const screenShotId = getSnapshotId();
-        el.frameNode.commonAttribute.id(screenShotId);
-        // æ»šåŠ¨åˆ°é¡¶éƒ¨, ä»¥ä¾¿æˆªå›¾
-        controller.scrollTo(0, 0);
-        await sleep(WEB_VIEW_SCROLL_TIMEOUT);
-        webViewSnapCurrentScreen(scrollYOffsets, el, screenShotId, componentWidth, componentHeight, scrollHeight, areaArray, controller).then(async (pixelMap) => {
-            // æˆªå›¾åæ¢å¤æ»šåŠ¨ä½ç½®
-            controller.scrollTo(0, originOffsetY);
-            await sleep(WEB_VIEW_SCROLL_TIMEOUT);
-            // é‡ç½®å…ƒç´ id
-            el.frameNode.commonAttribute.id(undefined);
-            resolve(pixelMap);
-        }).catch((e) => {
-            reject(e);
-        });
-    });
-}
-async function webViewSnapCurrentScreen(scrollYOffsets, el, screenShotId, componentWidth, componentHeight, scrollHeight, areaArray, controller) {
-    const curOffsetY = el['curOffsetY'];
-    scrollYOffsets.push(curOffsetY);
-    const pixelMap = await componentSnapshot.get(screenShotId);
-    // è·å–å½“å‰è¿™ä¸€å±ä¸­éœ€è¦çš„åƒç´ æ•°æ®
-    const area = await getSnapshotArea(pixelMap, scrollYOffsets, componentWidth, componentHeight);
-    areaArray.push(area);
-    // å¦‚æœæ²¡æœ‰æ»šåŠ¨åˆ°åº•éƒ¨ï¼Œç»§ç»­æ»šåŠ¨æˆªå›¾
-    if (Math.ceil(curOffsetY + componentHeight) < controller.getPageHeight()) {
-        controller.scrollByWithResult(0, scrollHeight);
-        await sleep(WEB_VIEW_SCROLL_TIMEOUT);
-        return await webViewSnapCurrentScreen(scrollYOffsets, el, screenShotId, componentWidth, componentHeight, scrollHeight, areaArray, controller);
-    }
-    else {
-        // æ»šåŠ¨ç»“æŸï¼Œåˆå¹¶æ‰€æœ‰æˆªå›¾
-        return await mergeImage(areaArray, scrollYOffsets[scrollYOffsets.length - 1], componentWidth, componentHeight);
-    }
-}
-async function getSnapshotArea(pixelMap, scrollYOffsets, width, height) {
-    // Gets the number of bytes per line of image pixels.
-    const stride = pixelMap.getBytesNumberPerRow();
-    // Get the total number of bytes of image pixels.
-    const bytesNumber = pixelMap.getPixelBytesNumber();
-    const buffer = new ArrayBuffer(bytesNumber);
-    const len = scrollYOffsets.length;
-    // éç¬¬ä¸€å±æ—¶æ‰éœ€è¦è£å‰ª
-    if (len >= 2) {
-        // æœ¬åœ°æ»šåŠ¨è·ç¦»
-        const realScrollHeight = scrollYOffsets[len - 1] - scrollYOffsets[len - 2];
-        if (height - realScrollHeight > 0) {
-            const cropRegion = {
-                x: 0,
-                y: vp2px(height - realScrollHeight),
-                size: {
-                    height: Math.round(vp2px(realScrollHeight)),
-                    width: vp2px(width)
-                }
-            };
-            if (cropRegion.size.height == 0) {
-                // å¦‚æœè£å‰ªé«˜åº¦ä¸º0ï¼Œç›´æ¥è¿”å›ç©ºåŒºåŸŸ
-                return {
-                    pixels: buffer,
-                    offset: 0,
-                    stride: stride,
-                    region: {
-                        size: {
-                            width: 0,
-                            height: 0
-                        },
-                        x: 0,
-                        y: 0
-                    }
-                };
-            }
-            // Crop roll area
-            await pixelMap.crop(cropRegion);
-        }
-    }
-    const imgInfo = pixelMap.getImageInfoSync();
-    // Region size, read based on region. PositionArea represents the data within the specified area of the image.
-    const area = {
-        pixels: buffer,
-        offset: 0,
-        stride: stride,
-        region: {
-            size: {
-                width: imgInfo.size.width,
-                height: imgInfo.size.height
-            },
-            x: 0,
-            y: 0
-        }
-    };
-    // Write data to a specified area
-    pixelMap.readPixelsSync(area);
-    return area;
-}
-async function mergeImage(areaArray, lastOffsetY, listWidth, listHeight) {
-    // Create a long screenshot PixelMap
-    const opts = {
-        editable: true,
-        pixelFormat: 4,
-        size: {
-            width: vp2px(listWidth),
-            height: Math.round(vp2px(lastOffsetY + listHeight))
-        }
-    };
-    const longPixelMap = image.createPixelMapSync(opts);
-    let imgPosition = 0;
-    for (let i = 0; i < areaArray.length; i++) {
-        const readArea = areaArray[i];
-        const area = {
-            pixels: readArea.pixels,
-            offset: 0,
-            stride: readArea.stride,
-            region: {
-                size: {
-                    width: readArea.region.size.width,
-                    height: readArea.region.size.height
-                },
-                x: 0,
-                y: imgPosition
-            }
-        };
-        imgPosition += readArea.region.size.height;
-        longPixelMap.writePixelsSync(area);
-    }
-    return longPixelMap;
-}
-export function pixelMapToImgPath(context, format, pixelMap, path) {
-    return new Promise((resolve, reject) => {
-        const fileDir = context.tempDir;
-        const folderName = 'uni-snapshot';
-        const isDirExist = fs.accessSync(`${fileDir}/${folderName}`, fs.AccessModeType.WRITE);
-        if (!isDirExist) {
-            fs.mkdirSync(`${fileDir}/${folderName}`, true);
-        }
-        const file = fs.openSync(`${fileDir}/${folderName}/${path ?? Date.now()}.${format}`, fs.OpenMode.READ_WRITE | fs.OpenMode.CREATE);
-        const imagePackerApi = image.createImagePacker();
-        const packOpts = { format: `image/${format}`, quality: 100 };
-        imagePackerApi.packToFile(pixelMap, file.fd, packOpts, (err) => {
-            pixelMap.release();
-            if (err) {
-                reject({ message: 'pixelMapToImgPath fail' });
-            }
-            else {
-                resolve(file.path);
-            }
-        });
-    });
-}
-//# sourceMappingURL=snapshot.js.mapÂ”Ùs hvigor_ignore__Applications_DevEco-Studio.app_Contents_sdk_default_openharmony_ets_api_@ohos.multimedia.image.d.tsÙi hvigor_ignore__Applications_DevEco-Studio.app_Contents_sdk_default_openharmony_ets_api_@ohos.window.d.tsÙz hvigor_ignore__Applications_DevEco-Studio.app_Contents_sdk_default_openharmony_ets_api_@ohos.arkui.componentSnapshot.d.tsÙj hvigor_ignore__Applications_DevEco-Studio.app_Contents_sdk_default_openharmony_ets_api_@ohos.file.fs.d.tsÙö/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/runtime/helper/snapshot.etsÔrB˜±isLocalDependency¯isNodeEntryFile§pkgPath§pkgNameªpkgVersion±belongProjectPath±dependencyPkgInfo¬shouldEmitJsÂÂÙâ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@vua5rno56y+lxsl9gh9s+khc6tt+o3phvo4zcfixbck=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/runtime½@dcloudio/uni-runtime-harmony¥1.0.0ÙL/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmonyÔrC’§pkgNameªpkgVersion½@dcloudio/uni-runtime-harmony¥1.0.0ÃÃÚ,ıimport {UniElement} from '@dcloudio/uni-app-x/types/native'
-import { UniElementImpl } from '../dom/UniElement'
-import { BusinessError } from '@kit.BasicServicesKit';
-import { image } from '@kit.ImageKit';
-import { window, componentSnapshot } from '@kit.ArkUI';
-import fs from '@ohos.file.fs';
-import { UniBodyElementImpl } from '../dom/UniBodyElement';
-import { webview } from '@kit.ArkWeb';
-
-export function getSnapShotElementByBody(body: UniBodyElementImpl): UniElement {
-  let el: UniElement = body
-  // æ‰¾åˆ°ç¬¬ä¸€ä¸ªåˆæ³•å­èŠ‚ç‚¹ï¼Œé’ˆå¯¹å¤šæ ¹èŠ‚ç‚¹ç¬¬ä¸€ä¸ªå­èŠ‚ç‚¹æ˜¯æ³¨é‡ŠèŠ‚ç‚¹æƒ…å†µ
-  const childNodes = body.childNodes
-  for(let i = 0; i<childNodes.length; i++){
-    if(childNodes[i].tagName){
-      el = childNodes[i]
-      break
-    }
-  }
-  // å¦‚æœå­èŠ‚ç‚¹é«˜åº¦å°äº bodyï¼Œæˆªå– bodyï¼Œé˜²æ­¢æˆªå›¾è¿‡å°é—®é¢˜
-  if((el as UniElementImpl).layoutNode.getLayoutHeight()< body.layoutNode.getLayoutHeight()){
-    el = body
-  }
-  return el
-}
-
-export async function windowSnapShot(context: Context): Promise<PixelMap>{
-  return new Promise((resolve, reject) => {
-    window.getLastWindow(context).then(currentWidnow => {
-      currentWidnow.snapshot().then((pixelMap: image.PixelMap) => {
-        resolve(pixelMap)
-      }).catch(reject)
-    }).catch(reject)
-  })
-}
-
-export function isScrollAbleElement(el: UniElement): boolean {
-  return el.tagName === 'SCROLL-VIEW' || el.tagName === 'LIST-VIEW' || el.tagName === 'WEB-VIEW'
-}
-
-async function sleep(ms: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-export function getSnapshotId(){
-  return `screen_shot_id_${Date.now()}_${Math.floor(Math.random() * 1000000)}`
-}
-
-export async function scrollSnapshot(el: UniElement): Promise<PixelMap> {
-  const tagName = el.tagName
-  if (tagName === 'SCROLL-VIEW' || tagName === 'LIST-VIEW') {
-    return scrollViewScrollSnapshot(el)
-  }
-  return webViewScrollSnapshot(el)
-}
-const SCROLL_VIEW_SCROLL_TIMEOUT = 100
-export async function scrollViewScrollSnapshot(el: UniElement): Promise<PixelMap>{
-  return new Promise(async (resolve, reject) => {
-    const scroller: Scroller = el['scroller']
-    const originOffsetY: number = scroller.currentOffset().yOffset;
-    const componentWidth: number = el['widthByAreaChange']
-    const componentHeight: number = el['heightByAreaChange']
-    const areaArray: image.PositionArea[] = [];
-    const scrollYOffsets: number[] = [];
-    const screenShotId = getSnapshotId();
-    (el as UniElementImpl).frameNode!.commonAttribute.id(screenShotId)
-    // æ»šåŠ¨åˆ°é¡¶éƒ¨, ä»¥ä¾¿æˆªå›¾
-    scroller.scrollTo({
-      xOffset: 0,
-      yOffset: 0,
-      animation:
-      {
-        duration: 0
-      }
-    });
-    await sleep(SCROLL_VIEW_SCROLL_TIMEOUT);
-
-    scrollViewSnapCurrentScreen(scrollYOffsets, el, screenShotId, componentWidth, componentHeight, areaArray, scroller).then(async (pixelMap) => {
-      // æˆªå›¾åæ¢å¤æ»šåŠ¨ä½ç½®
-      scroller.scrollTo({
-        xOffset: 0,
-        yOffset: originOffsetY,
-        animation: {
-          duration: 0
-        }
-      });
-      await sleep(SCROLL_VIEW_SCROLL_TIMEOUT);
-      // é‡ç½®å…ƒç´ id
-      (el as UniElementImpl).frameNode!.commonAttribute.id(undefined)
-      resolve(pixelMap);
-    }).catch((e: BusinessError) => {
-      reject(e);
-    });
-  })
-}
-
-async function scrollViewSnapCurrentScreen(
-  scrollYOffsets: number[],
-  el: UniElement,
-  screenShotId: string,
-  componentWidth: number,
-  componentHeight: number,
-  areaArray: image.PositionArea[],
-  scroller: Scroller
-): Promise<PixelMap>  {
-  scrollYOffsets.push(scroller.currentOffset().yOffset);
-  const pixelMap = await componentSnapshot.get(screenShotId);
-  // è·å–å½“å‰è¿™ä¸€å±ä¸­éœ€è¦çš„åƒç´ æ•°æ®
-  const area: image.PositionArea = await getSnapshotArea(pixelMap, scrollYOffsets, componentWidth, componentHeight);
-  areaArray.push(area);
-  // å¦‚æœæ²¡æœ‰æ»šåŠ¨åˆ°åº•éƒ¨ï¼Œç»§ç»­æ»šåŠ¨æˆªå›¾
-  if (!scroller.isAtEnd()) {
-    scrollerScroll(scroller, calculateNeedScrollDistance(el.scrollHeight, scrollYOffsets[scrollYOffsets.length-1], componentHeight));
-    await sleep(SCROLL_VIEW_SCROLL_TIMEOUT)
-    return await scrollViewSnapCurrentScreen(scrollYOffsets, el, screenShotId, componentWidth, componentHeight, areaArray, scroller);
-  } else {
-    // æ»šåŠ¨ç»“æŸï¼Œåˆå¹¶æ‰€æœ‰æˆªå›¾
-    return await mergeImage(areaArray, scrollYOffsets[scrollYOffsets.length - 1], componentWidth, componentHeight);
-  }
-}
-
-function calculateNeedScrollDistance(
-  scrollHeight: number,
-  lastScrollYOffset: number,
-  componentHeight: number
-): number {
-  // ä»¥ä¸‹è®¡ç®—ç”¨äºè§„é¿å‰©ä½™é«˜åº¦ä¸è¶³ä¸€ä¸ªç»„ä»¶é«˜åº¦æ—¶ï¼Œä¸€æ¬¡æ€§æ»šåŠ¨ï¼Œæœ€åæ‹¼æ¥åçš„é•¿å›¾æœ€åä¸€å±ä¸¢å¤±é—®é¢˜
-  // æœªæ‰¾åˆ°å…·ä½“åŸå› ï¼Œåªå‘ç°å¤šæ¬¡å°è·ç¦»æ»šåŠ¨æˆªå›¾å†æ‹¼æ¥å¯ä»¥è§„é¿
-
-  // å‰©ä½™è¿˜æœ‰è‡³å°‘ä¸€ä¸ªç»„ä»¶é«˜åº¦ï¼Œæ»šåŠ¨ç»„ä»¶é«˜åº¦
-  const hasMoreFullScreen = scrollHeight - lastScrollYOffset >= componentHeight * 2
-  // å‰©ä½™é«˜åº¦å°äº 120ï¼Œæ»šåŠ¨ 10
-  const needMiniStep = scrollHeight - lastScrollYOffset - componentHeight < 120
-  // å‰©ä½™é«˜åº¦å¤§äº120 ä½†ä¸è¶³ä¸€ä¸ªç»„ä»¶é«˜åº¦ï¼Œæ»šåŠ¨ 40
-  return hasMoreFullScreen ? componentHeight : needMiniStep ? 10 : 40
-}
-
-function scrollerScroll(scroller: Scroller, scrollHeight: number): void {
-  scroller.scrollTo({
-    xOffset: 0,
-    yOffset: (scroller.currentOffset().yOffset + scrollHeight),
-    animation: {
-      duration: 0,
-    }
-  });
-}
-
-const WEB_VIEW_SCROLL_TIMEOUT = 800
-async function webViewScrollSnapshot(el: UniElement): Promise<PixelMap>{
-  return new Promise(async (resolve, reject) => {
-    const controller: webview.WebviewController = el['controller']
-    const originOffsetY: number = el['curOffsetY'];
-    const componentWidth: number = el['widthByAreaChange']
-    const componentHeight: number = el['heightByAreaChange']
-    const scrollHeight: number = componentHeight * 0.7
-    const areaArray: image.PositionArea[] = [];
-    const scrollYOffsets: number[] = [];
-    const screenShotId = getSnapshotId();
-    (el as UniElementImpl).frameNode!.commonAttribute.id(screenShotId)
-    // æ»šåŠ¨åˆ°é¡¶éƒ¨, ä»¥ä¾¿æˆªå›¾
-    controller.scrollTo(0, 0);
-    await sleep(WEB_VIEW_SCROLL_TIMEOUT);
-
-    webViewSnapCurrentScreen(scrollYOffsets, el, screenShotId, componentWidth, componentHeight, scrollHeight, areaArray, controller).then(async (pixelMap) => {
-      // æˆªå›¾åæ¢å¤æ»šåŠ¨ä½ç½®
-      controller.scrollTo(0, originOffsetY);
-      await sleep(WEB_VIEW_SCROLL_TIMEOUT);
-      // é‡ç½®å…ƒç´ id
-      (el as UniElementImpl).frameNode!.commonAttribute.id(undefined)
-      resolve(pixelMap);
-    }).catch((e: BusinessError) => {
-      reject(e);
-    });
-  })
-}
-
-async function webViewSnapCurrentScreen(
-  scrollYOffsets: number[],
-  el: UniElement,
-  screenShotId: string,
-  componentWidth: number,
-  componentHeight: number,
-  scrollHeight: number,
-  areaArray: image.PositionArea[],
-  controller: webview.WebviewController
-): Promise<PixelMap>  {
-  const curOffsetY: number = el['curOffsetY'];
-  scrollYOffsets.push(curOffsetY);
-  const pixelMap = await componentSnapshot.get(screenShotId);
-  // è·å–å½“å‰è¿™ä¸€å±ä¸­éœ€è¦çš„åƒç´ æ•°æ®
-  const area: image.PositionArea = await getSnapshotArea(pixelMap, scrollYOffsets, componentWidth, componentHeight);
-  areaArray.push(area);
-  // å¦‚æœæ²¡æœ‰æ»šåŠ¨åˆ°åº•éƒ¨ï¼Œç»§ç»­æ»šåŠ¨æˆªå›¾
-  if (Math.ceil(curOffsetY + componentHeight) < controller.getPageHeight()) {
-    controller.scrollByWithResult(0, scrollHeight);
-    await sleep(WEB_VIEW_SCROLL_TIMEOUT)
-    return await webViewSnapCurrentScreen(scrollYOffsets, el, screenShotId, componentWidth, componentHeight, scrollHeight, areaArray, controller);
-  } else {
-    // æ»šåŠ¨ç»“æŸï¼Œåˆå¹¶æ‰€æœ‰æˆªå›¾
-    return await mergeImage(areaArray, scrollYOffsets[scrollYOffsets.length - 1], componentWidth, componentHeight);
-  }
-}
-
-async function getSnapshotArea(pixelMap: PixelMap, scrollYOffsets: number[], width: number, height: number): Promise<image.PositionArea> {
-  // Gets the number of bytes per line of image pixels.
-  const stride = pixelMap.getBytesNumberPerRow();
-  // Get the total number of bytes of image pixels.
-  const bytesNumber = pixelMap.getPixelBytesNumber();
-  const buffer: ArrayBuffer = new ArrayBuffer(bytesNumber);
-
-  const len = scrollYOffsets.length;
-  // éç¬¬ä¸€å±æ—¶æ‰éœ€è¦è£å‰ª
-  if (len >= 2) {
-    // æœ¬åœ°æ»šåŠ¨è·ç¦»
-    const realScrollHeight = scrollYOffsets[len-1] - scrollYOffsets[len-2];
-    if (height - realScrollHeight > 0) {
-      const cropRegion: image.Region = {
-        x: 0,
-        y: vp2px(height - realScrollHeight),
-        size: {
-          height: Math.round(vp2px(realScrollHeight)),
-          width: vp2px(width)
-        }
-      };
-      if(cropRegion.size.height == 0){
-        // å¦‚æœè£å‰ªé«˜åº¦ä¸º0ï¼Œç›´æ¥è¿”å›ç©ºåŒºåŸŸ
-        return {
-          pixels: buffer,
-          offset: 0,
-          stride: stride,
-          region: {
-            size: {
-              width: 0,
-              height: 0
-            },
-            x: 0,
-            y: 0
-          }
-        };
-      }
-      // Crop roll area
-      await pixelMap.crop(cropRegion);
-    }
-  }
-
-  const imgInfo = pixelMap.getImageInfoSync();
-  // Region size, read based on region. PositionArea represents the data within the specified area of the image.
-  const area: image.PositionArea = {
-    pixels: buffer,
-    offset: 0,
-    stride: stride,
-    region: {
-      size: {
-        width: imgInfo.size.width,
-        height: imgInfo.size.height
-      },
-      x: 0,
-      y: 0
-    }
-  }
-  // Write data to a specified area
-  pixelMap.readPixelsSync(area);
-  return area;
-}
-
-async function mergeImage(areaArray: image.PositionArea[], lastOffsetY: number, listWidth: number,
-  listHeight: number): Promise<PixelMap> {
-  // Create a long screenshot PixelMap
-  const opts: image.InitializationOptions = {
-    editable: true,
-    pixelFormat: 4,
-    size: {
-      width: vp2px(listWidth),
-      height: Math.round(vp2px(lastOffsetY + listHeight))
-    }
-  };
-  const longPixelMap = image.createPixelMapSync(opts);
-  let imgPosition: number = 0;
-
-  for (let i = 0; i < areaArray.length; i++) {
-    const readArea = areaArray[i];
-    const area: image.PositionArea = {
-      pixels: readArea.pixels,
-      offset: 0,
-      stride: readArea.stride,
-      region: {
-        size: {
-          width: readArea.region.size.width,
-          height: readArea.region.size.height
-        },
-        x: 0,
-        y: imgPosition
-      }
-    }
-    imgPosition += readArea.region.size.height;
-    longPixelMap.writePixelsSync(area);
-  }
-  return longPixelMap;
-}
-
-export function pixelMapToImgPath(context: Context, format: string, pixelMap: image.PixelMap, path: string | null): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const fileDir = context.tempDir
-    const folderName = 'uni-snapshot'
-    const isDirExist = fs.accessSync(`${fileDir}/${folderName}`, fs.AccessModeType.WRITE)
-    if (!isDirExist) {
-      fs.mkdirSync(`${fileDir}/${folderName}`, true)
-    }
-    const file = fs.openSync(`${fileDir}/${folderName}/${path ?? Date.now()}.${format}`, fs.OpenMode.READ_WRITE | fs.OpenMode.CREATE);
-    const imagePackerApi = image.createImagePacker();
-    const packOpts: image.PackingOption = { format: `image/${format}`, quality: 100 };
-    imagePackerApi.packToFile(pixelMap, file.fd, packOpts, (err) => {
-      pixelMap.release();
-      if (err) {
-        reject({ message: 'pixelMapToImgPath fail' } as BusinessError)
-      } else {
-        resolve(file.path)
-      }
-    });
-  })
-}
-
-ÀÔrD”¶@ohos.multimedia.image¬@ohos.window½@ohos.arkui.componentSnapshot­@ohos.file.fsÔrE—ªassertions¨external¢id¤meta±moduleSideEffectsªresolvedByµsyntheticNamedExportsAÃÙs hvigor_ignore__Applications_DevEco-Studio.app_Contents_sdk_default_openharmony_ets_api_@ohos.multimedia.image.d.tsAÃªoh-resolveÂEAÃÙi hvigor_ignore__Applications_DevEco-Studio.app_Contents_sdk_default_openharmony_ets_api_@ohos.window.d.tsAÃªoh-resolveÂEAÃÙz hvigor_ignore__Applications_DevEco-Studio.app_Contents_sdk_default_openharmony_ets_api_@ohos.arkui.componentSnapshot.d.tsAÃªoh-resolveÂEAÃÙj hvigor_ignore__Applications_DevEco-Studio.app_Contents_sdk_default_openharmony_ets_api_@ohos.file.fs.d.tsAÃªoh-resolveÂ“ÔrF–§version¤fileªsourceRoot§sources¥names¨mappings«snapshot.js ‘¬snapshot.etsÜ–”   ” 	” ” ”* %”+ &–”   ” 	” ” *”! 6”" 7–”   ” ” "” *”= 6”> 7–”   ” ”	 	” ” ” –”  	 ” 	” 	”( 	(”) 	)”- 	ÌA–” 
-” 
-”
- 
-” 
-” 
-” 
-’” ”% #˜” ”
- ” ” ” ” ”& $”' $Ü ” ”	 ” 
-” ” ” ” ” ” ”" ”# ”) $”+ &”, '”. )”0 *™” ” ” ” ” ” ” ”! ”# ˜” ” ” ” ” ” ” ” ’” ” ‘”	 ‘” ’” ”& $Ü ” ” ”
- ” ” &” '”% 6”' 8”* :”. >”/ ?”9 ÌI”: ÌJ”ÌI ÌY”ÌK Ì[”ÌM Ì\•” ”
- ” 	” ” ‘” ”” ” 	” ” ’”   ” ˜”   ” ” ” ” ”$ $”% %”, 5›” ” 	” ” ” ” ” ”! ”' %”) '”+ )” ” 
-” ” ” ”$  ”% !”& "”* &”+ '”8 4”9 5”; 7œ” ” ” ”" ”$ ”% ”) #”* $”+ %”3 =”5 ?”7 ÌA–” ” ” ”  ”! ”" ™” ” ” ” 	” ” ” ” ” ™”  ”	  ”
-  ”  ”  ”  ”  ”  ”  ”” !” !” !” !’”  " ” "–”  $ ” $” $”# $#”$ $$”& $2Ü ” %” %	” %” %” %” %”' %%”+ %)”- %+”. %,”5 %3”: %8”ÌE %ÌC”ÌI %ÌG”ÌK %ÌI”ÌL %ÌJ”ÌS %ÌQ”ÌX %ÌV”Ìb %Ì`”Ìc %Ì`’”  & ” &–”  ( ” (” (” (” (” (Ü ” )” )	” )” )” )” )” )”! )”" ) ”, )*”- )+”4 )2”6 )4”8 )6”9 )7”: )8”; )9’”  * ” *””  , ” ,” ,” ,Ü ” -” -	” -”! -”" - ”% -#”' -%”+ -)”/ --”0 -.”5 -3”6 -4”: -8”; -9”ÌA -?”ÌC -ÌA”ÌF -ÌD”ÌM -ÌK”ÌN -ÌL”ÌP -ÌN”ÌQ -ÌN’”  . ” .˜”  0 ” 0” 0” 0” 0”$ 0$”% 0%”' 03˜” 1”
- 1” 1” 1” 1” 1” 1” 1š” 2” 2” 2” 2”! 2”% 2#”, 2*”1 2/”< 2:”> 2<—” 3” 3”' 3#”( 3$”* 3&”+ 3'”, 3'‘” 4—” 5” 5	”  5”! 5”# 5!”$ 5"”% 5"’”  6 ” 6–”  7 ” 7”  7 ”# 7#”& 7&”' 7&˜”  8 ” 8” 8” 8” 8”. 8.”/ 8/”1 8=œ” 9” 9	” 9” 9” 9” 9” 9”% 9#”' 9%”- 9+”/ 9-”1 9/™” :” :
-” :” :” :!” :"”& :,”' :-”( :-›” ;” ;
-” ;” ;"”& ;*”' ;+”4 ;8”6 ;:”7 ;;”> ;ÌB”? ;ÌC™” <” <
-” <” <#”! <%”" <&”5 <9”6 <:”7 <:™” =” =
-” =”  =$”" =&”# ='”7 =;”8 =<”9 =<–” >” >
-” >” >,” >.” >/–” ?” ?
-” ?” ?%”! ?'”" ?(—” Ì@” Ì@
-” Ì@” Ì@”* Ì@&”, Ì@(”- Ì@)œ” ÌA”
- ÌA” ÌA” ÌA%” ÌA&”$ ÌA5”% ÌA6”' ÌA8”( ÌA9”4 ÌAÌE”5 ÌAÌF”6 ÌAÌF’” ÌB” ÌB•” ÌC” ÌC” ÌC” ÌC” ÌC”” ÌD” ÌD” ÌD” ÌD”” ÌE” ÌE” ÌE” ÌE“” ÌF” ÌF” ÌG”” ÌH” ÌH” ÌH” ÌH‘” ÌI“”	 ÌJ”
- ÌJ” ÌJ—” ÌK” ÌK
-” ÌK” ÌK”. ÌK*”/ ÌK+”0 ÌK,Ü ” ÌM”# ÌM”$ ÌM ”2 ÌM.”4 ÌM0”6 ÌM2”8 ÌM4”ÌD ÌMÌ@”ÌF ÌMÌB”ÌT ÌMÌP”ÌV ÌMÌR”Ìe ÌMÌa”Ìg ÌMÌc”Ìp ÌMÌl”Ìr ÌMÌn”Ìz ÌMÌv”Ì{ ÌMÌw”Ì| ÌMÌx”Ì€ ÌMÌ|”Ì ÌMÌ}”Ì† ÌMÌ‚”Ìˆ ÌMÌ„”Ì ÌMÌŒ”Ì’ ÌMÌ”Ì” ÌMÌ’” ÌN” ÌN•” ÌO” ÌO” ÌO” ÌO” ÌO”” ÌP” ÌP” ÌP” ÌP”” ÌQ” ÌQ” ÌQ”& ÌQ“” ÌR” ÌR” ÌR”” ÌS
-” ÌS” ÌS” ÌS‘” ÌT	“” ÌU” ÌU” ÌU	—” ÌV” ÌV” ÌV” ÌV”2 ÌV,”3 ÌV-”4 ÌV.’” ÌW” ÌWœ” ÌX” ÌX” ÌX” ÌX'” ÌX(”( ÌX7”) ÌX8”+ ÌX:”, ÌX;”5 ÌXÌD”6 ÌXÌE”7 ÌXÌE–” ÌY” ÌY” ÌY” ÌY” ÌY” ÌYš” ÌZ”	 ÌZ”
- ÌZ” ÌZ” ÌZ” ÌZ” ÌZ” ÌZ” ÌZ ” ÌZ"–” Ì[” Ì[” Ì[” Ì[” Ì[” Ì[”” Ì\”	 Ì\”
- Ì\” Ì\”” Ì]” Ì]” Ì]” Ì]’”  Ì^ ” Ì^Ü ”  Ì` ” Ì`” Ì`”* Ì`*”+ Ìa”9 Ìa”; Ìb”= Ìb”? Ìc”ÌK Ìc”ÌM Ìd”Ì[ Ìd”Ì] Ìe”Ìl Ìe”Ìn Ìf”Ìw Ìf!”Ìy Ìg”Ì Ìg” Ìi” Ìi” Ìi” Ìi” Ìi”  Ìi”! Ìi”. Ìi,”0 Ìi.”1 Ìi/”8 Ìi6”9 Ìi7”: Ìi8œ” Ìj”
- Ìj” Ìj” Ìj” Ìj”, Ìj*”- Ìj+”0 Ìj.”1 Ìj/”= Ìj;”> Ìj<”? Ìj=’” Ìk” ÌkÜ ” Ìl”
- Ìl” Ìl” Ìl#” Ìl)”& Ìl8”' Ìl9”/ ÌlÌA”1 ÌlÌC”? ÌlÌQ”ÌA ÌlÌS”ÌO ÌlÌa”ÌQ ÌlÌc”Ì` ÌlÌr”Ìa ÌlÌs”Ìb ÌlÌt˜” Ìm” Ìm” Ìm” Ìm” Ìm” Ìm” Ìm” Ìm’” Ìn” Ìn˜” Ìo” Ìo”	 Ìo” Ìo” Ìo” Ìo” Ìo” ÌoÜ ” Ìp” Ìp” Ìp” Ìp”! Ìp”< Ìp8”= Ìp9”? Ìp;”Ì@ Ìp<”ÌL ÌpÌH”ÌN ÌpÌJ”Ì\ ÌpÌX”Ì] ÌpÌY”Ìk ÌpÌg”Ìl ÌpÌh”Ìr ÌpÌn”Ìu ÌpÌo”Ìv ÌpÌp”Ìw ÌpÌq”Ìy ÌpÌs”Ìˆ ÌpÌ‚”Ì‰ ÌpÌƒ”ÌŠ ÌpÌ„”Ì‹ ÌpÌ…—” Ìq” Ìq
-” Ìq” Ìq”. Ìq*”/ Ìq+”0 Ìq+Ü ” Ìr” Ìr” Ìr”0 Ìr,”1 Ìr-”? Ìr;”ÌA Ìr=”ÌC Ìr?”ÌE ÌrÌA”ÌQ ÌrÌM”ÌS ÌrÌO”Ìa ÌrÌ]”Ìc ÌrÌ_”Ìr ÌrÌn”Ìt ÌrÌp”Ì} ÌrÌy”Ì ÌrÌ{”Ì‡ ÌrÌƒ”Ìˆ ÌrÌ„”Ì‰ ÌrÌ…‘” Ìs‘”	 Ìs	’” Ìt” ÌtÜ ” Ìu” Ìu” Ìu” Ìu”  Ìu”) Ìu%”+ Ìu'”9 Ìu5”: Ìu6”ÌH ÌuÌD”ÌI ÌuÌE”ÌO ÌuÌK”ÌR ÌuÌN”ÌS ÌuÌO”ÌT ÌuÌP”ÌV ÌuÌR”Ìd ÌuÌ`”Ìf ÌuÌb”Ìu ÌuÌq”Ìv ÌuÌr”Ìw ÌuÌs‘” Ìv’”  Ìw ” Ìw™”  Ìy ”	 Ìy	”$ Ìy$”% Ìz”1 Ìz”3 Ì{”ÌD Ì{”ÌF Ì|”ÌU Ì|’” Ì~”3 Ì~1’” Ì”" Ì ’” Ì” Ìœ” Ì‚”
- Ì‚” Ì‚” Ì‚”* Ì‚(”- Ì‚+”> Ì‚<”ÌB Ì‚Ì@”ÌQ Ì‚ÌO”ÌT Ì‚ÌR”ÌU Ì‚ÌS”ÌV Ì‚ÌS’” Ìƒ” Ìƒœ” Ì„”
- Ì„” Ì„” Ì„”% Ì„#”( Ì„&”9 Ì„7”< Ì„:”ÌK Ì„ÌI”ÌN Ì„ÌL”ÌQ Ì„ÌO”ÌR Ì„ÌO’” Ì…”  Ì…Ü ” Ì†” Ì†	” Ì†” Ì†” Ì†” Ì†”. Ì†,”/ Ì†-”0 Ì†.”1 Ì†/”= Ì†;”> Ì†<”? Ì†=”Ì@ Ì†>”ÌB Ì†Ì@”ÌC Ì†ÌA”ÌD Ì†ÌB”ÌE Ì†ÌC”ÌG Ì†ÌE”ÌH Ì†ÌE’”  Ì‡ ” Ì‡—”  Ì‰ ”	 Ì‰	” Ì‰” Ì‰”  Ì‰*”" Ì‰,”. Ì‰Ì@•” ÌŠ” ÌŠ
-” ÌŠ” ÌŠ” ÌŠ”” Ì‹” Ì‹” Ì‹” Ì‹” ÌŒ” ÌŒ” ÌŒ” ÌŒ” ÌŒ” ÌŒ”( ÌŒ$”* ÌŒ&”+ ÌŒ'”2 ÌŒ.”5 ÌŒ1”ÌA ÌŒ=”ÌB ÌŒ>“” Ì” Ì” Ì”” Ì” Ì” Ì” Ì‘”	 Ì“” Ì” Ì” Ì’”  Ì‘ ” Ì‘–”  Ì“ ” Ì“” Ì“”  Ì“ ”# Ì“#”$ Ì“#–”  Ì” ” Ì”” Ì””$ Ì”$”% Ì”%”' Ì”3œ” Ì•” Ì•	” Ì•” Ì•” Ì•” Ì•” Ì•”% Ì•#”' Ì•%”- Ì•+”/ Ì•-”1 Ì•/™” Ì–” Ì–
-” Ì–” Ì–2” Ì–4” Ì–5”* Ì–ÌA”+ Ì–ÌB”, Ì–ÌB™” Ì—” Ì—
-” Ì—” Ì—"”  Ì—$”! Ì—%”- Ì—1”. Ì—2”/ Ì—3™” Ì˜” Ì˜
-” Ì˜” Ì˜#”! Ì˜%”" Ì˜&”5 Ì˜9”6 Ì˜:”7 Ì˜:™” Ì™” Ì™
-” Ì™”  Ì™$”" Ì™&”# Ì™'”7 Ì™;”8 Ì™<”9 Ì™<˜” Ìš” Ìš
-” Ìš” Ìš!”, Ìš0”/ Ìš3”2 Ìš6”3 Ìš6–” Ì›” Ì›
-” Ì›” Ì›,” Ì›.” Ì›/–” Ìœ” Ìœ
-” Ìœ” Ìœ%”! Ìœ'”" Ìœ(—” Ì” Ì
-” Ì” Ì”* Ì&”, Ì(”- Ì)œ” Ì”
- Ì” Ì” Ì%” Ì&”$ Ì5”% Ì6”' Ì8”( Ì9”4 ÌÌE”5 ÌÌF”6 ÌÌF’” ÌŸ” ÌŸš” Ì ” Ì ” Ì ” Ì ” Ì ” Ì ” Ì ”  Ì ”! Ì ”" Ì —” Ì¡” Ì¡
-” Ì¡” Ì¡”+ Ì¡'”, Ì¡(”- Ì¡)Ü ” Ì£”  Ì£”! Ì£”/ Ì£+”1 Ì£-”3 Ì£/”5 Ì£1”ÌA Ì£=”ÌC Ì£?”ÌQ Ì£ÌM”ÌS Ì£ÌO”Ìb Ì£Ì^”Ìd Ì£Ì`”Ìp Ì£Ìl”Ìr Ì£Ìn”Ì{ Ì£Ìw”Ì} Ì£Ìy”Ì‡ Ì£Ìƒ”Ìˆ Ì£Ì„”Ì‰ Ì£Ì…”Ì Ì£Ì‰”Ì Ì£ÌŠ”Ì“ Ì£Ì”Ì• Ì£Ì‘”Ì Ì£Ì™”ÌŸ Ì£Ì›”Ì¡ Ì£Ì’” Ì¤” Ì¤š” Ì¥” Ì¥” Ì¥” Ì¥”  Ì¥”! Ì¥”# Ì¥”0 Ì¥*”1 Ì¥+”2 Ì¥,—” Ì¦” Ì¦” Ì¦” Ì¦”/ Ì¦)”0 Ì¦*”1 Ì¦+’” Ì§” Ì§œ” Ì¨” Ì¨” Ì¨” Ì¨'” Ì¨(”( Ì¨7”) Ì¨8”+ Ì¨:”, Ì¨;”5 Ì¨ÌD”6 Ì¨ÌE”7 Ì¨ÌE–” Ì©” Ì©” Ì©” Ì©” Ì©” Ì©š” Ìª”	 Ìª”
- Ìª” Ìª” Ìª” Ìª” Ìª” Ìª” Ìª ” Ìª"–” Ì«” Ì«” Ì«” Ì«” Ì«” Ì«”” Ì¬”	 Ì¬”
- Ì¬” Ì¬”” Ì­” Ì­” Ì­” Ì­’”  Ì® ” Ì®Ü ”  Ì° ” Ì°” Ì°”' Ì°'”( Ì±”6 Ì±”8 Ì²”: Ì²”< Ì³”ÌH Ì³”ÌJ Ì´”ÌX Ì´”ÌZ Ìµ”Ìi Ìµ”Ìk Ì¶”Ìw Ì¶”Ìy Ì·”Ì‚ Ì·!”Ì„ Ì¸”Ì Ì¸'™” Ìº”
- Ìº” Ìº” Ìº” Ìº” Ìº ”& Ìº,”' Ìº-”( Ìº.˜” Ì»” Ì»” Ì»” Ì»” Ì»”" Ì» ”# Ì»!”$ Ì»"œ” Ì¼”
- Ì¼” Ì¼” Ì¼” Ì¼”, Ì¼*”- Ì¼+”0 Ì¼.”1 Ì¼/”= Ì¼;”> Ì¼<”? Ì¼=’” Ì½” Ì½Ü ” Ì¾”
- Ì¾” Ì¾” Ì¾#” Ì¾)”& Ì¾8”' Ì¾9”/ Ì¾ÌA”1 Ì¾ÌC”? Ì¾ÌQ”ÌA Ì¾ÌS”ÌO Ì¾Ìa”ÌQ Ì¾Ìc”Ì` Ì¾Ìr”Ìa Ì¾Ìs”Ìb Ì¾Ìt˜” Ì¿” Ì¿” Ì¿” Ì¿” Ì¿” Ì¿” Ì¿” Ì¿’” ÌÀ” ÌÀÜ ” ÌÁ” ÌÁ” ÌÁ
-” ÌÁ” ÌÁ” ÌÁ” ÌÁ” ÌÁ”. ÌÁ,”/ ÌÁ-”2 ÌÁ0”< ÌÁ:”= ÌÁ;”ÌJ ÌÁÌH”ÌL ÌÁÌJ”ÌN ÌÁÌLš” ÌÂ” ÌÂ” ÌÂ”% ÌÂ!”& ÌÂ"”' ÌÂ#”) ÌÂ%”5 ÌÂ1”6 ÌÂ2”7 ÌÂ3—” ÌÃ” ÌÃ
-” ÌÃ” ÌÃ”+ ÌÃ'”, ÌÃ(”- ÌÃ(Ü ” ÌÄ” ÌÄ” ÌÄ”- ÌÄ)”. ÌÄ*”< ÌÄ8”> ÌÄ:”Ì@ ÌÄ<”ÌB ÌÄ>”ÌN ÌÄÌJ”ÌP ÌÄÌL”Ì^ ÌÄÌZ”Ì` ÌÄÌ\”Ìo ÌÄÌk”Ìq ÌÄÌm”Ì} ÌÄÌy”Ì ÌÄÌ{”Ìˆ ÌÄÌ„”ÌŠ ÌÄÌ†”Ì” ÌÄÌ”Ì• ÌÄÌ‘”Ì– ÌÄÌ’‘” ÌÅ‘”	 ÌÅ	’” ÌÆ” ÌÆÜ ” ÌÇ” ÌÇ” ÌÇ” ÌÇ”  ÌÇ”) ÌÇ%”+ ÌÇ'”9 ÌÇ5”: ÌÇ6”ÌH ÌÇÌD”ÌI ÌÇÌE”ÌO ÌÇÌK”ÌR ÌÇÌN”ÌS ÌÇÌO”ÌT ÌÇÌP”ÌV ÌÇÌR”Ìd ÌÇÌ`”Ìf ÌÇÌb”Ìu ÌÇÌq”Ìv ÌÇÌr”Ìw ÌÇÌs‘” ÌÈ’”  ÌÉ ” ÌÉœ”  ÌË ” ÌË” ÌË” ÌË” ÌË”' ÌË1”) ÌË3”7 ÌËÌK”9 ÌËÌM”> ÌËÌZ”Ì@ ÌËÌ\”ÌF ÌËÌj’” ÌÌ”9 ÌÌ7™” ÌÍ”
- ÌÍ” ÌÍ” ÌÍ” ÌÍ” ÌÍ”0 ÌÍ.”2 ÌÍ0”3 ÌÍ1’” ÌÎ”5 ÌÎ3™” ÌÏ”
- ÌÏ” ÌÏ” ÌÏ”  ÌÏ”! ÌÏ”4 ÌÏ2”6 ÌÏ4”7 ÌÏ5š” ÌĞ”
- ÌĞ” ÌĞ” ÌĞ” ÌĞ"”" ÌĞ-”# ÌĞ.”. ÌĞ9”/ ÌĞ:”0 ÌĞ;˜” ÌÒ”
- ÌÒ” ÌÒ” ÌÒ” ÌÒ” ÌÒ”% ÌÒ#”& ÌÒ$’” ÌÓ” ÌÓ–” ÌÔ” ÌÔ” ÌÔ	” ÌÔ” ÌÔ” ÌÔ’” ÌÕ” ÌÕÜ ” ÌÖ” ÌÖ
-” ÌÖ”! ÌÖ”/ ÌÖ+”0 ÌÖ,”3 ÌÖ/”6 ÌÖ0”7 ÌÖ1”8 ÌÖ2”; ÌÖ5”ÌI ÌÖÌC”ÌJ ÌÖÌD”ÌM ÌÖÌG”ÌP ÌÖÌH”ÌQ ÌÖÌI”ÌR ÌÖÌJ”ÌS ÌÖÌK˜” Ì×” Ì×” Ì×” Ì×”% Ì×!”( Ì×$”) Ì×%”+ Ì×'”” ÌØ” ÌØ” ÌØ” ÌØ'”” ÌÙ” ÌÙ	” ÌÙ” ÌÙ™” ÌÚ” ÌÚ	” ÌÚ” ÌÚ” ÌÚ” ÌÚ”" ÌÚ”2 ÌÚ*”3 ÌÚ+“” ÌÛ” ÌÛ” ÌÛœ” ÌÜ
-” ÌÜ” ÌÜ”  ÌÜ”! ÌÜ”& ÌÜ”' ÌÜ”, ÌÜ"”- ÌÜ#”= ÌÜ3”> ÌÜ4”? ÌÜ5—” Ìİ
-” Ìİ” Ìİ”  Ìİ”! Ìİ”& Ìİ”' Ìİ‘” ÌŞ	’” Ìß” Ìßš” Ìà” Ìà	” Ìà” Ìà” Ìà”  Ìà”& Ìà”* Ìà#”+ Ìà$”- Ìà%’” Ìá”# Ìá’” Ìâ” Ìâ”” Ìã
-” Ìã” Ìã”" Ìã”” Ìä
-” Ìä” Ìä” Ìä”” Ìå
-” Ìå” Ìå”" Ìå“” Ìæ
-” Ìæ” Ìæ“” Ìç” Ìç” Ìç”” Ìè”! Ìè”# Ìè”$ Ìè”” Ìé”" Ìé”$ Ìé”% Ìé‘” Ìê”” Ìë” Ìë” Ìë” Ìë”” Ìì” Ìì” Ìì” Ìì‘” Ìí’” Ìî	” Ìî
-‘” Ìï’” Ìğ” Ìğ™” Ìñ” Ìñ” Ìñ” Ìñ” Ìñ”  Ìñ”* Ìñ$”+ Ìñ%”, Ìñ&‘”	 Ìò‘” Ìó™” Ìõ”
- Ìõ” Ìõ” Ìõ” Ìõ” Ìõ”- Ìõ+”/ Ìõ-”0 Ìõ.’” Ìö”Ìr ÌöÌp”” Ì÷”
- Ì÷” Ì÷” Ì÷#”” Ìø” Ìø
-” Ìø” Ìø”” Ìù” Ìù
-” Ìù” Ìù”” Ìú” Ìú
-” Ìú” Ìú“” Ìû” Ìû
-” Ìû“” Ìü” Ìü
-” Ìü˜” Ìı” Ìı” Ìı” Ìı” Ìı”# Ìı”$ Ìı”) Ìı!˜” Ìş” Ìş” Ìş” Ìş”  Ìş”$ Ìş”% Ìş”+ Ìş#‘” Ìÿ”” Í ” Í ” Í 	” Í 
-”” Í” Í” Í	” Í
-‘”	 Í’” Í” Í’” Í”% Í#˜” Í” Í
-” Í” Í” Í”  Í”! Í”" Í ”” Í” Í	” Í” Í’”  Í ” Íœ”  Í	 ” Í	” Í	” Í	” Í	”# Í	9”% Í	;”0 Í	ÌN”2 Í	ÌP”; Í	Ìa”= Í
-”ÌG Í
-’” Í”( Í&”” Í”
- Í” Í” Í,”” Í” Í” Í” Í”” Í” Í” Í” Í“” Í” Í” Í
-—” Í” Í” Í” Í” Í”" Í”# Í” Í” Í” Í” Í” Í” Í” Í”$ Í”% Í”0 Í*”3 Í-”= Í7”> Í8”? Í9‘”	 Í’” Í” Í›” Í”
- Í” Í” Í” Í” Í”1 Í/”2 Í0”6 Í4”7 Í5”8 Í6–” Í” Í” Í” Í” Í” ÍÜ ” Í”	 Í” Í” Í” Í” Í” Í” Í” Í”! Í”" Í ”( Í&”* Í(”+ Í)”- Í+”/ Í-™” Í” Í
-” Í” Í”" Í”# Í”$ Í ”% Í!”& Í"”” Í” Í
-” Í” Í%–” Í” Í” Í” Í” Í”# Í”” Í” Í” Í” Í–” Í” Í” Í” Í” Í”# Í“” Í” Í” Í“” Í” Í” Íš” Í
-” Í” Í”# Í”$ Í”* Í ”+ Í!”/ Í%”0 Í&”5 Í+š” Í 
-” Í ” Í ”$ Í ”% Í ”+ Í !”, Í "”0 Í &”1 Í '”7 Í -‘” Í!	”” Í"” Í"	” Í"” Í"”” Í#” Í#	” Í#” Í#‘” Í$’”	 Í%”
- Í%›” Í&” Í&” Í&” Í&”  Í&”& Í&"”' Í&#”+ Í&'”, Í&(”2 Í&.”3 Í&/˜” Í'” Í'” Í'”$ Í' ”% Í'!”) Í'%”* Í'&”+ Í''‘” Í(”” Í)” Í)	” Í)” Í)’”  Í* ” Í*œ”  Í, ” Í,” Í,”! Í,!”" Í,"”) Í,2”+ Í,4”1 Í,ÌB”3 Í,ÌD”; Í,Ì\”= Í,Ì^”ÌA Í,Ìq›” Í-” Í-	” Í-” Í-” Í-” Í-” Í-”! Í-”' Í-%”) Í-'”+ Í-)˜” Í.” Í.
-” Í.” Í.” Í.”  Í.”' Í.#”( Í.#–” Í/” Í/
-” Í/” Í/”) Í/%”* Í/%Ü ” Í0” Í0
-” Í0” Í0” Í0” Í0”( Í0$”) Í0%”, Í0(”3 Í0/”7 Í03”ÌA Í0=”ÌC Í0?”ÌE Í0ÌA”ÌG Í0ÌC”ÌH Í0ÌD”ÌV Í0ÌR”ÌW Í0ÌS”Ì\ Í0ÌX”Ì] Í0ÌY”Ì^ Í0ÌY•” Í1” Í1” Í1	” Í1” Í1” Í2” Í2” Í2	” Í2” Í2” Í2”# Í2”' Í2!”1 Í2+”3 Í2-”5 Í2/”9 Í23”: Í24”; Í24‘”	 Í3Ü $” Í4” Í4
-” Í4” Í4” Í4” Í4”  Í4”! Í4”$ Í4 ”+ Í4'”/ Í4+”9 Í45”= Í49”ÌA Í4=”ÌE Í4ÌA”ÌI Í4ÌE”ÌJ Í4ÌF”ÌM Í4ÌI”ÌO Í4ÌK”ÌS Í4ÌO”ÌY Í4ÌU”Ì[ Í4ÌW”Ì] Í4ÌY”Ì_ Í4Ì[”Ì` Í4Ì\”Ìh Í4Ìd”Ìi Í4Ìe”Ìs Í4Ìo”Ìv Í4Ìr”Ìx Í4Ìt”Ìy Í4Ìu”Ì Í4Ì}”Ì‚ Í4Ì~”Ìˆ Í4Ì„”Ì‰ Í4Ì…”ÌŠ Í4Ì†™” Í5” Í5
-” Í5” Í5”$ Í5 ”% Í5!”6 Í52”8 Í54”9 Í55Ü ” Í6” Í6
-” Í6” Í6*” Í6,”! Í62”# Í64”, Í6=”2 Í6ÌC”4 Í6ÌE”6 Í6ÌG”= Í6ÌN”? Í6ÌP”ÌB Í6ÌS”ÌD Í6ÌU”ÌE Í6ÌVÜ ” Í7” Í7” Í7”! Í7”" Í7”* Í7&”, Í7(”0 Í7,”1 Í7-”3 Í7/”5 Í71”= Í79”? Í7;”Ì@ Í7<”ÌC Í7?”ÌE Í7ÌA”ÌG Í7ÌC–” Í8” Í8” Í8” Í8” Í8” Í8”” Í9” Í9
-” Í9” Í9š” Í:” Í:” Í:” Í:”  Í:”" Í:”: Í:2”< Í:ÌE”= Í:ÌF”> Í:ÌF‘” Í;‘” Í;˜” Í<” Í<” Í<” Í<” Í<”! Í<”" Í<”# Í<‘” Í=”” Í>”	 Í>”
- Í>” Í>”” Í?” Í?” Í?” Í?’”  Í@ ” Í@ÔrG–§version¤file§sources®sourcesContent¥names¨mappingsÀ‘À‘ÀÜ‘”    ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”  	 ‘”  
- ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”    ‘”  ! ‘”  " ‘”  # ‘”  $ ‘”  % ‘”  & ‘”  ' ‘”  ( ‘”  ) ‘”  * ‘”  + ‘”  , ‘”  - ‘”  . ‘”  / ‘”  0 ‘”  1 ‘”  2 ‘”  3 ‘”  4 ‘”  5 ‘”  6 ‘”  7 ‘”  8 ‘”  9 ‘”  : ‘”  ; ‘”  < ‘”  = ‘”  > ‘”  ? ‘”  Ì@ ‘”  ÌA ‘”  ÌB ‘”  ÌC ‘”  ÌD ‘”  ÌE ‘”  ÌF ‘”  ÌG ‘”  ÌH ‘”  ÌI ‘”  ÌJ ‘”  ÌK ‘”  ÌL ‘”  ÌM ‘”  ÌN ‘”  ÌO ‘”  ÌP ‘”  ÌQ ‘”  ÌR ‘”  ÌS ‘”  ÌT ‘”  ÌU ‘”  ÌV ‘”  ÌW ‘”  ÌX ‘”  ÌY ‘”  ÌZ ‘”  Ì[ ‘”  Ì\ ‘”  Ì] ‘”  Ì^ ‘”  Ì_ ‘”  Ì` ‘”  Ìa ‘”  Ìb ‘”  Ìc ‘”  Ìd ‘”  Ìe ‘”  Ìf ‘”  Ìg ‘”  Ìh ‘”  Ìi ‘”  Ìj ‘”  Ìk ‘”  Ìl ‘”  Ìm ‘”  Ìn ‘”  Ìo ‘”  Ìp ‘”  Ìq ‘”  Ìr ‘”  Ìs ‘”  Ìt ‘”  Ìu ‘”  Ìv ‘”  Ìw ‘”  Ìx ‘”  Ìy ‘”  Ìz ‘”  Ì{ ‘”  Ì| ‘”  Ì} ‘”  Ì~ ‘”  Ì ‘”  Ì€ ‘”  Ì ‘”  Ì‚ ‘”  Ìƒ ‘”  Ì„ ‘”  Ì… ‘”  Ì† ‘”  Ì‡ ‘”  Ìˆ ‘”  Ì‰ ‘”  ÌŠ ‘”  Ì‹ ‘”  ÌŒ ‘”  Ì ‘”  Ì ‘”  Ì ‘”  Ì ‘”  Ì‘ ‘”  Ì’ ‘”  Ì“ ‘”  Ì” ‘”  Ì• ‘”  Ì– ‘”  Ì— ‘”  Ì˜ ‘”  Ì™ ‘”  Ìš ‘”  Ì› ‘”  Ìœ ‘”  Ì ‘”  Ì ‘”  ÌŸ ‘”  Ì  ‘”  Ì¡ ‘”  Ì¢ ‘”  Ì£ ‘”  Ì¤ ‘”  Ì¥ ‘”  Ì¦ ‘”  Ì§ ‘”  Ì¨ ‘”  Ì© ‘”  Ìª ‘”  Ì« ‘”  Ì¬ ‘”  Ì­ ‘”  Ì® ‘”  Ì¯ ‘”  Ì° ‘”  Ì± ‘”  Ì² ‘”  Ì³ ‘”  Ì´ ‘”  Ìµ ‘”  Ì¶ ‘”  Ì· ‘”  Ì¸ ‘”  Ì¹ ‘”  Ìº ‘”  Ì» ‘”  Ì¼ ‘”  Ì½ ‘”  Ì¾ ‘”  Ì¿ ‘”  ÌÀ ‘”  ÌÁ ‘”  ÌÂ ‘”  ÌÃ ‘”  ÌÄ ‘”  ÌÅ ‘”  ÌÆ ‘”  ÌÇ ‘”  ÌÈ ‘”  ÌÉ ‘”  ÌÊ ‘”  ÌË ‘”  ÌÌ ‘”  ÌÍ ‘”  ÌÎ ‘”  ÌÏ ‘”  ÌĞ ‘”  ÌÑ ‘”  ÌÒ ‘”  ÌÓ ‘”  ÌÔ ‘”  ÌÕ ‘”  ÌÖ ‘”  Ì× ‘”  ÌØ ‘”  ÌÙ ‘”  ÌÚ ‘”  ÌÛ ‘”  ÌÜ ‘”  Ìİ ‘”  ÌŞ ‘”  Ìß ‘”  Ìà ‘”  Ìá ‘”  Ìâ ‘”  Ìã ‘”  Ìä ‘”  Ìå ‘”  Ìæ ‘”  Ìç ‘”  Ìè ‘”  Ìé ‘”  Ìê ‘”  Ìë ‘”  Ìì ‘”  Ìí ‘”  Ìî ‘”  Ìï ‘”  Ìğ ‘”  Ìñ ‘”  Ìò ‘”  Ìó ‘”  Ìô ‘”  Ìõ ‘”  Ìö ‘”  Ì÷ ‘”  Ìø ‘”  Ìù ‘”  Ìú ‘”  Ìû ‘”  Ìü ‘”  Ìı ‘”  Ìş ‘”  Ìÿ ‘”  Í  ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í	 ‘”  Í
- ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ÔrH’§missing¦pluginÃ¦genAbcÂÔ  ÔrI”²dynamicImportCache¹exportAllDeclarationCache»exportNamedDeclarationCache«importCache—ÔrJ–¤type¥start£end«declarationªspecifiers¦source¶ExportNamedDeclarationÌ²ÍŒÔrK™¤type¥start£end¢idªexpression©generator¥async¦params¤body³FunctionDeclarationÌ¹ÍŒÔrL”¤type¥start£end¤nameªIdentifierÌÂÌÚ¸getSnapShotElementByBodyÂÂÂ‘LªIdentifierÌÛÌß¤bodyÔrM”¤type¥start£end¤body®BlockStatementÌáÍŒ•ÔrN•¤type¥start£end¬declarations¤kind³VariableDeclarationÌèÌö‘ÔrO•¤type¥start£end¢id¤init²VariableDeclaratorÌìÌõLªIdentifierÌìÌî¢elLªIdentifierÌñÌõ¤body£letN³VariableDeclarationÍ#ÍF‘O²VariableDeclaratorÍ)ÍELªIdentifierÍ)Í3ªchildNodesÔrP—¤type¥start£end¦object¨property¨computed¨optional°MemberExpressionÍ6ÍELªIdentifierÍ6Í:¤bodyLªIdentifierÍ;ÍEªchildNodesÂÂ¥constÔrQ—¤type¥start£end¤init¤test¦update¤body¬ForStatementÍLÍæN³VariableDeclarationÍQÍZ‘O²VariableDeclaratorÍUÍZLªIdentifierÍUÍV¡iÔrR•¤type¥start£end¥value£raw§LiteralÍYÍZ ¡0£letÔrS–¤type¥start£end¤left¨operator¥right°BinaryExpressionÍ\ÍqLªIdentifierÍ\Í]¡i¡<P°MemberExpressionÍ`ÍqLªIdentifierÍ`ÍjªchildNodesLªIdentifierÍkÍq¦lengthÂÂÔrT–¤type¥start£end¨operator¦prefix¨argument°UpdateExpressionÍsÍv¢++ÂLªIdentifierÍsÍt¡iM®BlockStatementÍxÍæ‘ÔrU–¤type¥start£end¤testªconsequent©alternate«IfStatementÍƒÍßP°MemberExpressionÍ‡ÍœP°MemberExpressionÍ‡Í”LªIdentifierÍ‡Í‘ªchildNodesLªIdentifierÍ’Í“¡iÃÂLªIdentifierÍ•Íœ§tagNameÂÂM®BlockStatementÍÍß’ÔrV”¤type¥start£endªexpression³ExpressionStatementÍ­ÍÀÔrW–¤type¥start£end¨operator¤left¥right´AssignmentExpressionÍ­Í¿¡=LªIdentifierÍ­Í¯¢elP°MemberExpressionÍ²Í¿LªIdentifierÍ²Í¼ªchildNodesLªIdentifierÍ½Í¾¡iÃÂÔrX”¤type¥start£end¥label®BreakStatementÍÎÍÔÀÀU«IfStatementÍÍyS°BinaryExpressionÍÍ[ÔrY–¤type¥start£end¦callee©arguments¨optional®CallExpressionÍÍ7P°MemberExpressionÍÍ5P°MemberExpressionÍÍ%LªIdentifierÍÍ¢elLªIdentifierÍÍ%ªlayoutNodeÂÂLªIdentifierÍ&Í5¯getLayoutHeightÂÂÂ¡<Y®CallExpressionÍ:Í[P°MemberExpressionÍ:ÍYP°MemberExpressionÍ:ÍILªIdentifierÍ:Í>¤bodyLªIdentifierÍ?ÍIªlayoutNodeÂÂLªIdentifierÍJÍY¯getLayoutHeightÂÂÂM®BlockStatementÍ]Íy‘V³ExpressionStatementÍhÍrW´AssignmentExpressionÍhÍq¡=LªIdentifierÍhÍj¢elLªIdentifierÍmÍq¤bodyÀÔrZ”¤type¥start£end¨argument¯ReturnStatementÍÍ‰LªIdentifierÍ†Íˆ¢elÀJ¶ExportNamedDeclarationÍÍĞK³FunctionDeclarationÍ•ÍĞLªIdentifierÍ¤Í²®windowSnapShotÂÂÃ‘LªIdentifierÍ³Íº§contextM®BlockStatementÍ¼ÍĞ‘Z¯ReturnStatementÍÃÍÍÔr[•¤type¥start£end¦callee©arguments­NewExpressionÍÊÍÌLªIdentifierÍÎÍÕ§Promise‘K·ArrowFunctionExpressionÍÖÍËÀÂÂÂ’LªIdentifierÍ×ÍŞ§resolveLªIdentifierÍàÍæ¦rejectM®BlockStatementÍëÍË‘V³ExpressionStatementÍöÍÄY®CallExpressionÍöÍÃP°MemberExpressionÍöÍ»Y®CallExpressionÍöÍµP°MemberExpressionÍöÍY®CallExpressionÍöÍP°MemberExpressionÍöÍ
-LªIdentifierÍöÍü¦windowLªIdentifierÍıÍ
-­getLastWindowÂÂ‘LªIdentifierÍÍ§contextÂLªIdentifierÍÍ¤thenÂÂ‘K·ArrowFunctionExpressionÍÍ´ÀÂÂÂ‘LªIdentifierÍÍ&­currentWidnowM®BlockStatementÍ*Í´‘V³ExpressionStatementÍ9Í©Y®CallExpressionÍ9Í¨P°MemberExpressionÍ9Í Y®CallExpressionÍ9ÍšP°MemberExpressionÍ9ÍVY®CallExpressionÍ9ÍQP°MemberExpressionÍ9ÍOLªIdentifierÍ9ÍF­currentWidnowLªIdentifierÍGÍO¨snapshotÂÂÂLªIdentifierÍRÍV¤thenÂÂ‘K·ArrowFunctionExpressionÍWÍ™ÀÂÂÂ‘LªIdentifierÍXÍ`¨pixelMapM®BlockStatementÍeÍ™‘V³ExpressionStatementÍxÍŠY®CallExpressionÍxÍ‰LªIdentifierÍxÍ§resolve‘LªIdentifierÍ€Íˆ¨pixelMapÂÂLªIdentifierÍ›Í ¥catchÂÂ‘LªIdentifierÍ¡Í§¦rejectÂÂLªIdentifierÍ¶Í»¥catchÂÂ‘LªIdentifierÍ¼ÍÂ¦rejectÂÀJ¶ExportNamedDeclarationÍÒÍcK³FunctionDeclarationÍÙÍcLªIdentifierÍâÍõ³isScrollAbleElementÂÂÂ‘LªIdentifierÍöÍø¢elM®BlockStatementÍúÍc‘Z¯ReturnStatementÍÍ`S±LogicalExpressionÍÍ_S±LogicalExpressionÍÍBS°BinaryExpressionÍÍ$P°MemberExpressionÍÍLªIdentifierÍÍ
-¢elLªIdentifierÍÍ§tagNameÂÂ£===R§LiteralÍÍ$«SCROLL-VIEW­'SCROLL-VIEW'¢||S°BinaryExpressionÍ(ÍBP°MemberExpressionÍ(Í2LªIdentifierÍ(Í*¢elLªIdentifierÍ+Í2§tagNameÂÂ£===R§LiteralÍ7ÍB©LIST-VIEW«'LIST-VIEW'¢||S°BinaryExpressionÍFÍ_P°MemberExpressionÍFÍPLªIdentifierÍFÍH¢elLªIdentifierÍIÍP§tagNameÂÂ£===R§LiteralÍUÍ_¨WEB-VIEWª'WEB-VIEW'ÀJ¶ExportNamedDeclarationÍÁÍ8K³FunctionDeclarationÍÈÍ8LªIdentifierÍÑÍŞ­getSnapshotIdÂÂÂM®BlockStatementÍáÍ8‘Z¯ReturnStatementÍèÍ5Ôr\•¤type¥start£end«expressions¦quasis¯TemplateLiteralÍïÍ4’Y®CallExpressionÍÍP°MemberExpressionÍÍ	LªIdentifierÍÍ¤DateLªIdentifierÍÍ	£nowÂÂÂY®CallExpressionÍÍ2P°MemberExpressionÍÍLªIdentifierÍÍ¤MathLªIdentifierÍÍ¥floorÂÂ‘S°BinaryExpressionÍÍ1Y®CallExpressionÍÍ'P°MemberExpressionÍÍ%LªIdentifierÍÍ¤MathLªIdentifierÍÍ%¦randomÂÂÂ¡*R§LiteralÍ*Í1Î B@§1000000Â“Ôr]•¤type¥start£end¥value¤tail¯TemplateElementÍğÍÿÔr^’£raw¦cooked¯screen_shot_id_¯screen_shot_id_Â]¯TemplateElementÍÍ^¡_¡_Â]¯TemplateElementÍ3Í3^  ÃÀJ¶ExportNamedDeclarationÍ:Í%K³FunctionDeclarationÍAÍ%LªIdentifierÍPÍ^®scrollSnapshotÂÂÃ‘LªIdentifierÍ_Ía¢elM®BlockStatementÍcÍ%“N³VariableDeclarationÍjÍ…‘O²VariableDeclaratorÍpÍ„LªIdentifierÍpÍw§tagNameP°MemberExpressionÍzÍ„LªIdentifierÍzÍ|¢elLªIdentifierÍ}Í„§tagNameÂÂ¥constU«IfStatementÍ‹ÍûS±LogicalExpressionÍÍÃS°BinaryExpressionÍÍ¨LªIdentifierÍÍ–§tagName£===R§LiteralÍ›Í¨«SCROLL-VIEW­'SCROLL-VIEW'¢||S°BinaryExpressionÍ¬ÍÃLªIdentifierÍ¬Í³§tagName£===R§LiteralÍ¸ÍÃ©LIST-VIEW«'LIST-VIEW'M®BlockStatementÍÅÍû‘Z¯ReturnStatementÍĞÍôY®CallExpressionÍ×ÍóLªIdentifierÍ×Íï¸scrollViewScrollSnapshot‘LªIdentifierÍğÍò¢elÂÀZ¯ReturnStatementÍÍ"Y®CallExpressionÍÍ!LªIdentifierÍÍµwebViewScrollSnapshot‘LªIdentifierÍÍ ¢elÂÀJ¶ExportNamedDeclarationÍPÍœK³FunctionDeclarationÍWÍœLªIdentifierÍfÍ~¸scrollViewScrollSnapshotÂÂÃ‘LªIdentifierÍÍ¢elM®BlockStatementÍƒÍœ‘Z¯ReturnStatementÍŠÍ™[­NewExpressionÍ‘Í˜LªIdentifierÍ•Íœ§Promise‘K·ArrowFunctionExpressionÍÍ—ÀÂÂÃ’LªIdentifierÍ¤Í«§resolveLªIdentifierÍ­Í³¦rejectM®BlockStatementÍ¸Í—›N³VariableDeclarationÍÃÍã‘O²VariableDeclaratorÍÉÍâLªIdentifierÍÉÍÑ¨scrollerP°MemberExpressionÍÔÍâLªIdentifierÍÔÍÖ¢elR§LiteralÍ×Íá¨scrollerª'scroller'ÃÂ¥constN³VariableDeclarationÍíÍ$‘O²VariableDeclaratorÍóÍ#LªIdentifierÍóÍ ­originOffsetYP°MemberExpressionÍÍ#Y®CallExpressionÍÍP°MemberExpressionÍÍLªIdentifierÍÍ¨scrollerLªIdentifierÍÍ­currentOffsetÂÂÂLªIdentifierÍÍ#§yOffsetÂÂ¥constN³VariableDeclarationÍ.Í]‘O²VariableDeclaratorÍ4Í\LªIdentifierÍ4ÍB®componentWidthP°MemberExpressionÍEÍ\LªIdentifierÍEÍG¢elR§LiteralÍHÍ[±widthByAreaChange³'widthByAreaChange'ÃÂ¥constN³VariableDeclarationÍgÍ˜‘O²VariableDeclaratorÍmÍ—LªIdentifierÍmÍ|¯componentHeightP°MemberExpressionÍÍ—LªIdentifierÍÍ¢elR§LiteralÍ‚Í–²heightByAreaChange´'heightByAreaChange'ÃÂ¥constN³VariableDeclarationÍ¢Í·‘O²VariableDeclaratorÍ¨Í¶LªIdentifierÍ¨Í±©areaArrayÔr_”¤type¥start£end¨elements¯ArrayExpressionÍ´Í¶¥constN³VariableDeclarationÍÁÍÛ‘O²VariableDeclaratorÍÇÍÚLªIdentifierÍÇÍÕ®scrollYOffsets_¯ArrayExpressionÍØÍÚ¥constN³VariableDeclarationÍåÍ
-‘O²VariableDeclaratorÍëÍ	LªIdentifierÍëÍ÷¬screenShotIdY®CallExpressionÍúÍ	LªIdentifierÍúÍ­getSnapshotIdÂ¥constV³ExpressionStatementÍÍBY®CallExpressionÍÍAP°MemberExpressionÍÍ3P°MemberExpressionÍÍ0P°MemberExpressionÍÍ LªIdentifierÍÍ¢elLªIdentifierÍÍ ©frameNodeÂÂLªIdentifierÍ!Í0¯commonAttributeÂÂLªIdentifierÍ1Í3¢idÂÂ‘LªIdentifierÍ4Í@¬screenShotIdÂV³ExpressionStatementÍdÍüY®CallExpressionÍdÍûP°MemberExpressionÍdÍuLªIdentifierÍdÍl¨scrollerLªIdentifierÍmÍu¨scrollToÂÂ‘Ôr`”¤type¥start£endªproperties°ObjectExpressionÍvÍú“Ôra™¤type¥start£end¦method©shorthand¨computed£key¥value¤kind¨PropertyÍ…ÍÂÂÂLªIdentifierÍ…ÍŒ§xOffsetR§LiteralÍÍ ¡0¤inita¨PropertyÍÍ¨ÂÂÂLªIdentifierÍÍ¥§yOffsetR§LiteralÍ§Í¨ ¡0¤inita¨PropertyÍ·ÍïÂÂÂLªIdentifierÍ·ÍÀ©animation`°ObjectExpressionÍÂÍï‘a¨PropertyÍÕÍàÂÂÂLªIdentifierÍÕÍİ¨durationR§LiteralÍßÍà ¡0¤init¤initÂV³ExpressionStatementÍ	Í	.Z¯AwaitExpressionÍ	Í	-Y®CallExpressionÍ	Í	-LªIdentifierÍ	Í	¥sleep‘LªIdentifierÍ	Í	,ºSCROLL_VIEW_SCROLL_TIMEOUTÂV³ExpressionStatementÍ	8ÍY®CallExpressionÍ	8ÍP°MemberExpressionÍ	8ÍbY®CallExpressionÍ	8Í\P°MemberExpressionÍ	8Í	°Y®CallExpressionÍ	8Í	«LªIdentifierÍ	8Í	S»scrollViewSnapCurrentScreen—LªIdentifierÍ	TÍ	b®scrollYOffsetsLªIdentifierÍ	dÍ	f¢elLªIdentifierÍ	hÍ	t¬screenShotIdLªIdentifierÍ	vÍ	„®componentWidthLªIdentifierÍ	†Í	•¯componentHeightLªIdentifierÍ	—Í	 ©areaArrayLªIdentifierÍ	¢Í	ª¨scrollerÂLªIdentifierÍ	¬Í	°¤thenÂÂ‘K·ArrowFunctionExpressionÍ	±Í[ÀÂÂÃ‘LªIdentifierÍ	¸Í	À¨pixelMapM®BlockStatementÍ	ÅÍ[”V³ExpressionStatementÍ	îÍ
-ªY®CallExpressionÍ	îÍ
-©P°MemberExpressionÍ	îÍ	ÿLªIdentifierÍ	îÍ	ö¨scrollerLªIdentifierÍ	÷Í	ÿ¨scrollToÂÂ‘`°ObjectExpressionÍ
- Í
-¨“a¨PropertyÍ
-Í
-ÂÂÂLªIdentifierÍ
-Í
-§xOffsetR§LiteralÍ
-Í
- ¡0¤inita¨PropertyÍ
-0Í
-FÂÂÂLªIdentifierÍ
-0Í
-7§yOffsetLªIdentifierÍ
-9Í
-F­originOffsetY¤inita¨PropertyÍ
-YÍ
-™ÂÂÂLªIdentifierÍ
-YÍ
-b©animation`°ObjectExpressionÍ
-dÍ
-™‘a¨PropertyÍ
-{Í
-†ÂÂÂLªIdentifierÍ
-{Í
-ƒ¨durationR§LiteralÍ
-…Í
-† ¡0¤init¤initÂV³ExpressionStatementÍ
-¸Í
-àZ¯AwaitExpressionÍ
-¸Í
-ßY®CallExpressionÍ
-¾Í
-ßLªIdentifierÍ
-¾Í
-Ã¥sleep‘LªIdentifierÍ
-ÄÍ
-ŞºSCROLL_VIEW_SCROLL_TIMEOUTÂV³ExpressionStatementÍÍ0Y®CallExpressionÍÍ/P°MemberExpressionÍÍ$P°MemberExpressionÍÍ!P°MemberExpressionÍÍLªIdentifierÍÍ¢elLªIdentifierÍÍ©frameNodeÂÂLªIdentifierÍÍ!¯commonAttributeÂÂLªIdentifierÍ"Í$¢idÂÂ‘LªIdentifierÍ%Í.©undefinedÂV³ExpressionStatementÍ>ÍPY®CallExpressionÍ>ÍOLªIdentifierÍ>ÍE§resolve‘LªIdentifierÍFÍN¨pixelMapÂÂLªIdentifierÍ]Íb¥catchÂÂ‘K·ArrowFunctionExpressionÍcÍÀÂÂÂ‘LªIdentifierÍdÍe¡eM®BlockStatementÍjÍ‘V³ExpressionStatementÍyÍƒY®CallExpressionÍyÍ‚LªIdentifierÍyÍ¦reject‘LªIdentifierÍ€Í¡eÂÂÀJ¶ExportNamedDeclarationÍ&‹Í*ZK³FunctionDeclarationÍ&’Í*ZLªIdentifierÍ&›Í&¬±pixelMapToImgPathÂÂÂ”LªIdentifierÍ&­Í&´§contextLªIdentifierÍ&¶Í&¼¦formatLªIdentifierÍ&¾Í&Æ¨pixelMapLªIdentifierÍ&ÈÍ&Ì¤pathM®BlockStatementÍ&ÎÍ*Z‘Z¯ReturnStatementÍ&ÕÍ*W[­NewExpressionÍ&ÜÍ*VLªIdentifierÍ&àÍ&ç§Promise‘K·ArrowFunctionExpressionÍ&èÍ*UÀÂÂÂ’LªIdentifierÍ&éÍ&ğ§resolveLªIdentifierÍ&òÍ&ø¦rejectM®BlockStatementÍ&ıÍ*U˜N³VariableDeclarationÍ'Í'(‘O²VariableDeclaratorÍ'Í''LªIdentifierÍ'Í'§fileDirP°MemberExpressionÍ'Í''LªIdentifierÍ'Í'§contextLªIdentifierÍ' Í''§tempDirÂÂ¥constN³VariableDeclarationÍ'2Í'T‘O²VariableDeclaratorÍ'8Í'SLªIdentifierÍ'8Í'BªfolderNameR§LiteralÍ'EÍ'S¬uni-snapshot®'uni-snapshot'¥constN³VariableDeclarationÍ'^Í'´‘O²VariableDeclaratorÍ'dÍ'³LªIdentifierÍ'dÍ'nªisDirExistY®CallExpressionÍ'qÍ'³P°MemberExpressionÍ'qÍ'~LªIdentifierÍ'qÍ's¢fsLªIdentifierÍ'tÍ'~ªaccessSyncÂÂ’\¯TemplateLiteralÍ'Í'™’LªIdentifierÍ'‚Í'‰§fileDirLªIdentifierÍ'Í'—ªfolderName“]¯TemplateElementÍ'€Í'€^  Â]¯TemplateElementÍ'ŠÍ'‹^¡/¡/Â]¯TemplateElementÍ'˜Í'˜^  ÃP°MemberExpressionÍ'›Í'²P°MemberExpressionÍ'›Í'¬LªIdentifierÍ'›Í'¢fsLªIdentifierÍ'Í'¬®AccessModeTypeÂÂLªIdentifierÍ'­Í'²¥WRITEÂÂÂ¥constU«IfStatementÍ'¾Í(T¯UnaryExpressionÍ'ÂÍ'Í¡!ÃLªIdentifierÍ'ÃÍ'ÍªisDirExistM®BlockStatementÍ'ÏÍ(‘V³ExpressionStatementÍ'ŞÍ(Y®CallExpressionÍ'ŞÍ(P°MemberExpressionÍ'ŞÍ'êLªIdentifierÍ'ŞÍ'à¢fsLªIdentifierÍ'áÍ'ê©mkdirSyncÂÂ’\¯TemplateLiteralÍ'ëÍ(’LªIdentifierÍ'îÍ'õ§fileDirLªIdentifierÍ'ùÍ(ªfolderName“]¯TemplateElementÍ'ìÍ'ì^  Â]¯TemplateElementÍ'öÍ'÷^¡/¡/Â]¯TemplateElementÍ(Í(^  ÃR§LiteralÍ(Í(Ã¤trueÂÀN³VariableDeclarationÍ("Í(¤‘O²VariableDeclaratorÍ((Í(£LªIdentifierÍ((Í(,¤fileY®CallExpressionÍ(/Í(£P°MemberExpressionÍ(/Í(:LªIdentifierÍ(/Í(1¢fsLªIdentifierÍ(2Í(:¨openSyncÂÂ’\¯TemplateLiteralÍ(;Í(u”LªIdentifierÍ(>Í(E§fileDirLªIdentifierÍ(IÍ(SªfolderNameS±LogicalExpressionÍ(WÍ(iLªIdentifierÍ(WÍ([¤path¢??Y®CallExpressionÍ(_Í(iP°MemberExpressionÍ(_Í(gLªIdentifierÍ(_Í(c¤DateLªIdentifierÍ(dÍ(g£nowÂÂÂLªIdentifierÍ(mÍ(s¦format•]¯TemplateElementÍ(<Í(<^  Â]¯TemplateElementÍ(FÍ(G^¡/¡/Â]¯TemplateElementÍ(TÍ(U^¡/¡/Â]¯TemplateElementÍ(jÍ(k^¡.¡.Â]¯TemplateElementÍ(tÍ(t^  ÃS°BinaryExpressionÍ(wÍ(¢P°MemberExpressionÍ(wÍ(P°MemberExpressionÍ(wÍ(‚LªIdentifierÍ(wÍ(y¢fsLªIdentifierÍ(zÍ(‚¨OpenModeÂÂLªIdentifierÍ(ƒÍ(ªREAD_WRITEÂÂ¡|P°MemberExpressionÍ(Í(¢P°MemberExpressionÍ(Í(›LªIdentifierÍ(Í(’¢fsLªIdentifierÍ(“Í(›¨OpenModeÂÂLªIdentifierÍ(œÍ(¢¦CREATEÂÂÂ¥constN³VariableDeclarationÍ(®Í(ß‘O²VariableDeclaratorÍ(´Í(ŞLªIdentifierÍ(´Í(Â®imagePackerApiY®CallExpressionÍ(ÅÍ(ŞP°MemberExpressionÍ(ÅÍ(ÜLªIdentifierÍ(ÅÍ(Ê¥imageLªIdentifierÍ(ËÍ(Ü±createImagePackerÂÂÂ¥constN³VariableDeclarationÍ(éÍ)&‘O²VariableDeclaratorÍ(ïÍ)%LªIdentifierÍ(ïÍ(÷¨packOpts`°ObjectExpressionÍ(úÍ)%’a¨PropertyÍ(üÍ)ÂÂÂLªIdentifierÍ(üÍ)¦format\¯TemplateLiteralÍ)Í)‘LªIdentifierÍ)Í)¦format’]¯TemplateElementÍ)Í)^¦image/¦image/Â]¯TemplateElementÍ)Í)^  Ã¤inita¨PropertyÍ)Í)#ÂÂÂLªIdentifierÍ)Í)§qualityR§LiteralÍ) Í)#Ìd£100¤init¥constV³ExpressionStatementÍ)0Í*NY®CallExpressionÍ)0Í*MP°MemberExpressionÍ)0Í)ILªIdentifierÍ)0Í)>®imagePackerApiLªIdentifierÍ)?Í)IªpackToFileÂÂ”LªIdentifierÍ)JÍ)R¨pixelMapP°MemberExpressionÍ)TÍ)[LªIdentifierÍ)TÍ)X¤fileLªIdentifierÍ)YÍ)[¢fdÂÂLªIdentifierÍ)]Í)e¨packOptsK·ArrowFunctionExpressionÍ)gÍ*LÀÂÂÂ‘LªIdentifierÍ)hÍ)k£errM®BlockStatementÍ)pÍ*L’V³ExpressionStatementÍ)Í)’Y®CallExpressionÍ)Í)‘P°MemberExpressionÍ)Í)LªIdentifierÍ)Í)‡¨pixelMapLªIdentifierÍ)ˆÍ)§releaseÂÂÂU«IfStatementÍ) Í*ALªIdentifierÍ)¤Í)§£errM®BlockStatementÍ)©Í)ù‘V³ExpressionStatementÍ)¼Í)êY®CallExpressionÍ)¼Í)éLªIdentifierÍ)¼Í)Â¦reject‘`°ObjectExpressionÍ)ÃÍ)è‘a¨PropertyÍ)ÅÍ)æÂÂÂLªIdentifierÍ)ÅÍ)Ì§messageR§LiteralÍ)ÎÍ)æ¶pixelMapToImgPath fail¸'pixelMapToImgPath fail'¤initÂM®BlockStatementÍ*Í*A‘V³ExpressionStatementÍ*Í*2Y®CallExpressionÍ*Í*1LªIdentifierÍ*Í*&§resolve‘P°MemberExpressionÍ*'Í*0LªIdentifierÍ*'Í*+¤fileLªIdentifierÍ*,Í*0¤pathÂÂÂÂÀ”Ôrb•¤type¥start£endªspecifiers¦source±ImportDeclaration +‘Ôrc”¤type¥start£end¥local¶ImportDefaultSpecifierLªIdentifier¥imageR§Literal*¶@ohos.multimedia.image¸"@ohos.multimedia.image"b±ImportDeclaration-ÌO‘c¶ImportDefaultSpecifier4:LªIdentifier4:¦windowR§LiteralÌ@ÌN¬@ohos.window®"@ohos.window"b±ImportDeclarationÌQÌ‘c¶ImportDefaultSpecifierÌXÌiLªIdentifierÌXÌi±componentSnapshotR§LiteralÌoÌ½@ohos.arkui.componentSnapshot¿"@ohos.arkui.componentSnapshot"b±ImportDeclarationÌ‘Ì°‘c¶ImportDefaultSpecifierÌ˜ÌšLªIdentifierÌ˜Ìš¢fsR§LiteralÌ Ì¯­@ohos.file.fs¯'@ohos.file.fs'
