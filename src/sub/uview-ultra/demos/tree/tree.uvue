@@ -101,6 +101,13 @@
 <script setup lang="uts">
 import { ref } from 'vue';
 
+definePage({
+  style: {
+    navigationStyle: 'custom',
+    navigationBarTitleText: 'up-tree 树形'
+  }
+});
+
 const treeData = ref<UTSJSONObject[]>([
   {
     id: 1,

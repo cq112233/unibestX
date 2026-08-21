@@ -1,0 +1,61 @@
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
+    <NavBar title="up-number-box 步进器" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
+    <view class="p-[16px]">
+      <view class="demo-block">
+        <text class="demo-label">基础用法</text>
+        <up-number-box v-model="numberValue1"></up-number-box>
+      </view>
+
+      <view class="demo-block mt-[12px]">
+        <text class="demo-label">指定步长</text>
+        <up-number-box v-model="numberValue2" :step="2"></up-number-box>
+      </view>
+
+      <view class="demo-block mt-[12px]">
+        <text class="demo-label">限制最大/最小值</text>
+        <up-number-box v-model="numberValue3" :min="5" :max="10"></up-number-box>
+      </view>
+
+      <view class="demo-block mt-[12px]">
+        <text class="demo-label">禁用状态</text>
+        <up-number-box v-model="numberValue4" :disabled="true"></up-number-box>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { ref } from 'vue';
+
+definePage({
+  style: {
+    navigationStyle: 'custom',
+    navigationBarTitleText: 'up-number-box 步进器'
+  }
+});
+
+const numberValue1 = ref(1);
+const numberValue2 = ref(1);
+const numberValue3 = ref(5);
+const numberValue4 = ref(1);
+</script>
+
+<style lang="scss" scoped>
+.demo-block {
+  margin-bottom: 12px;
+  padding: 12px;
+  background-color: #ffffff;
+  border-radius: 8px;
+}
+.demo-label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #606266;
+  margin-bottom: 10px;
+  padding-left: 4px;
+  border-left-width: 3px;
+  border-left-style: solid;
+  border-left-color: $up-primary;
+}
+</style>

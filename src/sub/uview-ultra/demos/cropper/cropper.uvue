@@ -47,6 +47,13 @@
 <script setup lang="uts">
 import { ref } from 'vue';
 
+definePage({
+  style: {
+    navigationStyle: 'custom',
+    navigationBarTitleText: 'up-cropper 裁剪'
+  }
+});
+
 const croppedPath = ref<string>('');
 const eventLog = ref<string>('');
 const cropperRef = ref(null as ComponentPublicInstance | null);

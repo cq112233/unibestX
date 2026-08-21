@@ -73,6 +73,13 @@
 import { computed } from 'vue';
 import { useAppStore } from '@/src/store/index.uts';
 
+definePage({
+  style: {
+    navigationStyle: 'custom',
+    navigationBarTitleText: 'up-title 标题'
+  }
+});
+
 const appStore = useAppStore();
 const themeColor = computed<string>(() => appStore.state.theme);
 </script>

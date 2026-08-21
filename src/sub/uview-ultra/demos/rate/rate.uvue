@@ -1,0 +1,67 @@
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
+    <NavBar title="up-rate 评分" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
+    <view class="p-[16px]">
+      <view class="demo-block">
+        <text class="demo-label">基础用法</text>
+        <up-rate v-model="rateValue1" :count="5"></up-rate>
+      </view>
+
+      <view class="demo-block mt-[12px]">
+        <text class="demo-label">自定义图标与颜色</text>
+        <up-rate v-model="rateValue2" :count="5" active-icon="heart-fill" inactive-icon="heart" active-color="#fa3534"></up-rate>
+      </view>
+
+      <view class="demo-block mt-[12px]">
+        <text class="demo-label">半星展示</text>
+        <up-rate v-model="rateValue3" :count="5" :allow-half="true"></up-rate>
+      </view>
+
+      <view class="demo-block mt-[12px]">
+        <text class="demo-label">只读状态</text>
+        <up-rate v-model="rateValue4" :count="5" :readonly="true"></up-rate>
+      </view>
+
+      <view class="demo-block mt-[12px]">
+        <text class="demo-label">禁用状态</text>
+        <up-rate v-model="rateValue5" :count="5" :disabled="true"></up-rate>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { ref } from 'vue';
+
+definePage({
+  style: {
+    navigationStyle: 'custom',
+    navigationBarTitleText: 'up-rate 评分'
+  }
+});
+
+const rateValue1 = ref(3);
+const rateValue2 = ref(4);
+const rateValue3 = ref(3.5);
+const rateValue4 = ref(4);
+const rateValue5 = ref(2);
+</script>
+
+<style lang="scss" scoped>
+.demo-block {
+  margin-bottom: 12px;
+  padding: 12px;
+  background-color: #ffffff;
+  border-radius: 8px;
+}
+.demo-label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #606266;
+  margin-bottom: 10px;
+  padding-left: 4px;
+  border-left-width: 3px;
+  border-left-style: solid;
+  border-left-color: $up-primary;
+}
+</style>

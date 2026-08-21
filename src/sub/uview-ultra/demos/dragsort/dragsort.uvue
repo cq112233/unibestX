@@ -166,6 +166,13 @@
 <script setup lang="uts">
 import { ref } from 'vue';
 
+definePage({
+  style: {
+    navigationStyle: 'custom',
+    navigationBarTitleText: 'up-dragsort 拖拽排序'
+  }
+});
+
 const plainList = ref<UTSJSONObject[]>([
   { id: 1, label: '普通列表项 1' },
   { id: 2, label: '普通列表项 2' },

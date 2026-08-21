@@ -29,6 +29,13 @@
 <script setup lang="uts">
 import { ref } from 'vue';
 
+definePage({
+  style: {
+    navigationStyle: 'custom',
+    navigationBarTitleText: 'up-pdf-reader PDF 阅读'
+  }
+});
+
 const height = ref<string>('600px');
 const pdfUrl = 'https://mozilla.github.io/pdf.js/web/compressed.tracemonkey-pldi-09.pdf';
 

@@ -125,6 +125,13 @@
 <script setup lang="uts">
 import { ref } from 'vue';
 
+definePage({
+  style: {
+    navigationStyle: 'custom',
+    navigationBarTitleText: 'up-coupon 优惠券'
+  }
+});
+
 const eventLog = ref<string>('点击优惠券查看事件');
 
 function onClick() {

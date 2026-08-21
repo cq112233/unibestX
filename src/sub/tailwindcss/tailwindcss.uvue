@@ -54,12 +54,12 @@ onLoad((): void => {
 
 <template>
   <view>
-    <NavBar title="weapp-tailwindcss 示例"></NavBar>
+    <NavBar title="weapp-tailwindcss 示例" :auto-back="true" :safe-area-inset-top="true"></NavBar>
     <view class="content" :class="{ dark: isDark }">
       <WeappTailwindcss />
       <BindClass />
       <button class="mt-4 w-64 rounded-full bg-[#eccc68] px-4 py-2 text-white dark:bg-[#3498db]" @click="toggleDark">
-        {{ isDark ? '切换到亮色模式' : '切换到暗色模式' }}
+        <text>{{ isDark ? '切换到亮色模式' : '切换到暗色模式' }}</text>
       </button>
       <view class="w-full bg-[#164e63] p-[12px] issue-1002-probe">
         <text class="text-xs text-white">issue-1002 text-xs</text>

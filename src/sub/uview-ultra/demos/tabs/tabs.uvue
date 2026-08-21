@@ -1,0 +1,189 @@
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
+    <NavBar title="Tabs 标签页" :auto-back="true" />
+    <view class="p-[16px]">
+      <!-- 1. 超长横向滚动标签栏 -->
+      <view class="demo-block">
+        <text class="demo-label">超长横向滚动标签 (14项)</text>
+        <up-tabs
+          v-model:current="currentLong"
+          :list="longList"
+          @change="onLongChange"
+        ></up-tabs>
+        <view class="content-box mt-[10px]">
+          <text class="content-text">当前选中：{{ longList[currentLong].name }} (第 {{ currentLong + 1 }} 项)</text>
+        </view>
+      </view>
+
+      <!-- 2. 基础用法与内容联动 -->
+      <view class="demo-block mt-[12px]">
+        <text class="demo-label">基础用法与内容联动</text>
+        <up-tabs
+          v-model:current="currentBase"
+          :list="baseList"
+          @change="onBaseChange"
+        ></up-tabs>
+        <view class="content-box mt-[10px]">
+          <text class="content-text">正在浏览：{{ baseList[currentBase].name }} 分类内容</text>
+        </view>
+      </view>
+
+      <!-- 3. 带角标 / 红点提示 -->
+      <view class="demo-block mt-[12px]">
+        <text class="demo-label">带角标与红点提示</text>
+        <up-tabs
+          v-model:current="currentBadge"
+          :list="badgeList"
+        ></up-tabs>
+      </view>
+
+      <!-- 4. 禁用特定标签 -->
+      <view class="demo-block mt-[12px]">
+        <text class="demo-label">禁用特定标签项</text>
+        <up-tabs
+          v-model:current="currentDisabled"
+          :list="disabledList"
+        ></up-tabs>
+      </view>
+
+      <!-- 5. 自定义滑块与选中样式 -->
+      <view class="demo-block mt-[12px]">
+        <text class="demo-label">自定义滑块与高亮样式</text>
+        <up-tabs
+          v-model:current="currentCustom"
+          :list="customList"
+          line-color="#fa3534"
+          line-width="32px"
+          line-height="4px"
+          :active-style="{ color: '#fa3534', fontWeight: 'bold' } as UTSJSONObject"
+          :inactive-style="{ color: '#909399' } as UTSJSONObject"
+        ></up-tabs>
+      </view>
+
+      <!-- 6. 等分布局（不可滚动） -->
+      <view class="demo-block mt-[12px]">
+        <text class="demo-label">等分布局 (不可滚动: scrollable=false)</text>
+        <up-tabs
+          v-model:current="currentEqual"
+          :list="equalList"
+          :scrollable="false"
+          line-color="#19be6b"
+          :active-style="{ color: '#19be6b', fontWeight: 'bold' } as UTSJSONObject"
+        ></up-tabs>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { ref } from 'vue';
+
+definePage({
+  style: {
+    navigationStyle: 'custom',
+    navigationBarTitleText: 'Tabs 标签页'
+  }
+});
+
+// 1. 超长标签列表 (14项)
+const currentLong = ref<number>(0);
+const longList = ref<Array<UTSJSONObject>>([
+  { name: '关注' },
+  { name: '推荐' },
+  { name: '电影' },
+  { name: '电视剧' },
+  { name: '综艺' },
+  { name: '动漫' },
+  { name: '少儿' },
+  { name: '纪录片' },
+  { name: '体育' },
+  { name: '游戏' },
+  { name: '音乐' },
+  { name: '搞笑' },
+  { name: '科技' },
+  { name: '美食' }
+]);
+
+// 2. 基础标签列表
+const currentBase = ref<number>(0);
+const baseList = ref<Array<UTSJSONObject>>([
+  { name: '关注' },
+  { name: '推荐' },
+  { name: '电影' },
+  { name: '科技' }
+]);
+
+// 3. 带徽标列表
+const currentBadge = ref<number>(0);
+const badgeList = ref<Array<UTSJSONObject>>([
+  { name: '关注', badge: { isDot: true } as UTSJSONObject },
+  { name: '推荐', badge: { value: 5 } as UTSJSONObject },
+  { name: '消息', badge: { value: 99 } as UTSJSONObject },
+  { name: '热榜' }
+]);
+
+// 4. 禁用项列表
+const currentDisabled = ref<number>(0);
+const disabledList = ref<Array<UTSJSONObject>>([
+  { name: '国内新闻' },
+  { name: '国际焦点' },
+  { name: '付费专区', disabled: true },
+  { name: '数码测评' }
+]);
+
+// 5. 自定义样式列表
+const currentCustom = ref<number>(1);
+const customList = ref<Array<UTSJSONObject>>([
+  { name: '最新发布' },
+  { name: '最热推荐' },
+  { name: '好评排行' },
+  { name: '折扣特惠' }
+]);
+
+// 6. 等分不可滚动列表
+const currentEqual = ref<number>(0);
+const equalList = ref<Array<UTSJSONObject>>([
+  { name: '待付款' },
+  { name: '待发货' },
+  { name: '待收货' },
+  { name: '待评价' }
+]);
+
+function onLongChange(item: UTSJSONObject) {
+  console.log('超长Tabs切换:', item);
+}
+
+function onBaseChange(item: UTSJSONObject) {
+  console.log('基础Tabs切换:', item);
+}
+</script>
+
+<style lang="scss" scoped>
+.demo-block {
+  margin-bottom: 12px;
+  padding: 12px;
+  background-color: #ffffff;
+  border-radius: 8px;
+}
+.demo-label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #606266;
+  margin-bottom: 10px;
+  padding-left: 4px;
+  border-left-width: 3px;
+  border-left-style: solid;
+  border-left-color: $up-primary;
+}
+.content-box {
+  padding: 14px;
+  background-color: #f1f5f9;
+  border-radius: 6px;
+  align-items: center;
+  justify-content: center;
+}
+.content-text {
+  font-size: 13px;
+  color: #475569;
+}
+</style>

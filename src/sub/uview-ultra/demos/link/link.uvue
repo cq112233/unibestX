@@ -1,0 +1,49 @@
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
+    <NavBar title="Link 超链接" :auto-back="true" />
+    <view class="p-[16px]">
+      <view class="demo-block">
+        <text class="demo-label">基本使用</text>
+        <up-link href="https://uniapp.dcloud.io/" text="打开 uni-app 官网"></up-link>
+      </view>
+
+      <view class="demo-block">
+        <text class="demo-label">显示下划线</text>
+        <up-link href="https://uview-plus.jiangruyi.com/" text="带下划线的超链接" :under-line="true"></up-link>
+      </view>
+
+      <view class="demo-block">
+        <text class="demo-label">自定义颜色与大小</text>
+        <up-link href="https://github.com" text="自定义绿色 16px" color="#19be6b" font-size="16"></up-link>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+definePage({
+  style: {
+    navigationStyle: 'custom',
+    navigationBarTitleText: 'Link 超链接'
+  }
+});
+</script>
+
+<style lang="scss" scoped>
+.demo-block {
+  margin-bottom: 12px;
+  padding: 12px;
+  background-color: #ffffff;
+  border-radius: 8px;
+}
+.demo-label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #606266;
+  margin-bottom: 10px;
+  padding-left: 4px;
+  border-left-width: 3px;
+  border-left-style: solid;
+  border-left-color: $up-primary;
+}
+</style>

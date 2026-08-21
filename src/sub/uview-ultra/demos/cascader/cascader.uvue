@@ -119,6 +119,13 @@
 <script setup lang="uts">
 import { ref } from 'vue';
 
+definePage({
+  style: {
+    navigationStyle: 'custom',
+    navigationBarTitleText: 'up-cascader 级联选择器'
+  }
+});
+
 const showArea = ref<boolean>(false);
 const showCategory = ref<boolean>(false);
 const showOrg = ref<boolean>(false);

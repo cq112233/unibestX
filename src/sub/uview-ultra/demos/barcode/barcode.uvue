@@ -78,6 +78,13 @@
 <script setup lang="uts">
 import { ref } from 'vue';
 
+definePage({
+  style: {
+    navigationStyle: 'custom',
+    navigationBarTitleText: 'up-barcode 条形码'
+  }
+});
+
 const barcodeValue = ref<string>('123456789012');
 const eventLog = ref<string>('');
 

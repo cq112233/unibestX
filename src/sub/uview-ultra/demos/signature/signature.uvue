@@ -67,6 +67,14 @@
 
 <script setup lang="uts">
 import { ref } from 'vue';
+
+definePage({
+  style: {
+    navigationStyle: 'custom',
+    navigationBarTitleText: 'up-signature 签名'
+  }
+});
+
 const bgColor = ref<string>('#ffffff');
 
 const sigRef1 = ref(null as ComponentPublicInstance | null);

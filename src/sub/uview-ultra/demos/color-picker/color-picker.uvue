@@ -54,6 +54,13 @@
 <script setup lang="uts">
 import { ref } from 'vue';
 
+definePage({
+  style: {
+    navigationStyle: 'custom',
+    navigationBarTitleText: 'up-color-picker 颜色选择'
+  }
+});
+
 const color1 = ref<string>('#ff0000');
 const color2 = ref<string>('#2979ff');
 const color3 = ref<string>('#19be6b');

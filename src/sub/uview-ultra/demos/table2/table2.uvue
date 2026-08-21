@@ -134,6 +134,13 @@
 <script setup lang="uts">
 import { ref } from 'vue';
 
+definePage({
+  style: {
+    navigationStyle: 'custom',
+    navigationBarTitleText: 'up-table2 表格'
+  }
+});
+
 const eventLog = ref<string>('点击行 / 勾选 / 排序 / 筛选 / 展开等操作日志将显示在这里');
 
 const currentRowId = ref<string>('');
