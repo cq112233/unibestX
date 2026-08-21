@@ -1,856 +1,0 @@
-Ôr@Ÿªassertions¤code´customTransformCache¬dependencies¢id¤meta±moduleSideEffects¬originalCode±originalSourcemap«resolvedIds®sourcemapChainµsyntheticNamedExportsµtransformDependencies®transformFiles¨cacheAstÔrAÚ2Ximport media from '@ohos.multimedia.media';
-import { UTSObject, UTS, UniError, UTSHarmony, defineSyncApi } from "@dcloudio/uni-app-framework";
-import fileIo__1 from "@ohos.file.fs";
-import fileIo from "@ohos.file.fs";
-import { getEnv } from "@dcloudio/uni-app-framework";
-const API_GET_RECORDER_MANAGER = 'getRecorderManager';
-class RecorderManagerStartOptions extends UTSObject {
-    constructor() {
-        super(...arguments);
-        this.duration = null;
-        this.sampleRate = null;
-        this.numberOfChannels = null;
-        this.encodeBitRate = null;
-        this.format = null;
-        this.frameSize = null;
-    }
-}
-const callbacks = {
-    pause: null,
-    resume: null,
-    start: null,
-    stop: null,
-    error: null,
-    frameRecorded: null,
-    interruptionBegin: null,
-    interruptionEnd: null
-};
-function setRecordStateCallback(state, cb = null) {
-    switch (state) {
-        case 'pause':
-            callbacks.pause = cb;
-            break;
-        case 'resume':
-            callbacks.resume = cb;
-            break;
-        case 'start':
-            callbacks.start = cb;
-            break;
-        case 'stop':
-            callbacks.stop = cb;
-            break;
-        case 'error':
-            callbacks.error = cb;
-            break;
-        case 'frameRecorded':
-            callbacks.frameRecorded = cb;
-            break;
-        case 'interruptionBegin':
-            callbacks.interruptionBegin = cb;
-            break;
-        case 'interruptionEnd':
-            callbacks.interruptionEnd = cb;
-            break;
-    }
-}
-function deleteRecordStateCallback(state) {
-    setRecordStateCallback(state);
-}
-function onRecorderStateChange(state, res = null) {
-    switch (state) {
-        case 'pause':
-            return callbacks.pause?.(res);
-        case 'resume':
-            return callbacks.resume?.(res);
-        case 'start':
-            return callbacks.start?.(res);
-        case 'stop':
-            return callbacks.stop?.(res);
-        case 'error':
-            return callbacks.error?.(res);
-        case 'frameRecorded':
-            return callbacks.frameRecorded?.(res);
-        case 'interruptionBegin':
-            return callbacks.interruptionBegin?.(res);
-        case 'interruptionEnd':
-            return callbacks.interruptionEnd?.(res);
-    }
-}
-function createFile(supportFormats, format, defaultExt) {
-    const TEMP_PATH = getEnv().TEMP_PATH;
-    const filePath = `${TEMP_PATH}/uni-recorder/`;
-    if (!fileIo.accessSync(filePath)) {
-        fileIo.mkdirSync(filePath, true);
-    }
-    const fileName = `${Date.now()}.${supportFormats.includes(format ?? '') ? format?.toLocaleLowerCase() : defaultExt}`;
-    const file = fileIo.openSync(`${filePath}${fileName}`, fileIo.OpenMode.READ_WRITE | fileIo.OpenMode.CREATE);
-    return file;
-}
-function transformErrorCode(errCode) {
-    switch (errCode) {
-        case 201:
-            return 1107601;
-        case 401:
-            return 1107606;
-        case 5400106:
-            return 1107605;
-        case 5400107:
-            return 1107607;
-    }
-    return errCode;
-}
-const RecorderManagerUniErrorSubject = 'uni-recorder';
-const RecorderManagerUniErrors = new Map([
-    [
-        1107601,
-        'No microphone permissions.'
-    ],
-    [
-        1107602,
-        'This sample rate is not supported.'
-    ],
-    [
-        1107603,
-        'The sample rate does not match the encoding bitrate.'
-    ],
-    [
-        1107604,
-        'Failed to start.'
-    ],
-    [
-        1107605,
-        'This audio format is not supported.'
-    ],
-    [
-        1107606,
-        'Other errors.'
-    ],
-    [
-        1107607,
-        'Audio interrupted.'
-    ],
-    [
-        1107608,
-        'Audio is recording.'
-    ]
-]);
-class RecorderManagerFailImpl extends UniError {
-    constructor(errCode, errMsg = '') {
-        super();
-        this.errSubject = RecorderManagerUniErrorSubject;
-        this.errCode = errCode;
-        this.errMsg = errMsg != "" ? errMsg : (UTS.mapGet(RecorderManagerUniErrors, errCode) ?? errMsg);
-    }
-}
-const supportFormats = [
-    'aac',
-    'mp3',
-    'm4a',
-    'wav'
-];
-function getAudioCodec(format) {
-    switch (format) {
-        case 'aac':
-            return media.CodecMimeType.AUDIO_AAC;
-        case 'mp3':
-            return media.CodecMimeType.AUDIO_MP3;
-        case 'm4a':
-            return media.CodecMimeType.AUDIO_AAC;
-        case 'wav':
-            return media.CodecMimeType.AUDIO_G711MU;
-        default:
-            return media.CodecMimeType.AUDIO_AAC;
-    }
-}
-function getFileFormat(format) {
-    switch (format) {
-        case 'aac':
-            return media.ContainerFormatType.CFT_MPEG_4A;
-        case 'mp3':
-            return media.ContainerFormatType.CFT_MP3;
-        case 'm4a':
-            return media.ContainerFormatType.CFT_MPEG_4A;
-        case 'wav':
-            return media.ContainerFormatType.CFT_WAV;
-        default:
-            return media.ContainerFormatType.CFT_MPEG_4A;
-    }
-}
-class AVRecorder {
-    constructor() {
-        this.isFirstStart = true;
-    }
-    onStateChange(file) {
-        if (this.avRecorder) {
-            this.avRecorder.on('stateChange', async (state, reason) => {
-                switch (state) {
-                    case 'idle':
-                        this.isFirstStart = true;
-                        break;
-                    case 'started':
-                        if (this.isFirstStart) {
-                            this.isFirstStart = false;
-                            onRecorderStateChange('start');
-                        }
-                        else {
-                            if (reason === media.StateChangeReason.BACKGROUND) {
-                                onRecorderStateChange('interruptionEnd');
-                            }
-                            onRecorderStateChange('resume');
-                        }
-                        break;
-                    case 'paused':
-                        if (reason === media.StateChangeReason.BACKGROUND) {
-                            onRecorderStateChange('interruptionBegin');
-                        }
-                        onRecorderStateChange('pause');
-                        break;
-                    case 'stopped':
-                        onRecorderStateChange('stop', {
-                            tempFilePath: file.path
-                        });
-                        fileIo__1.closeSync(file);
-                        break;
-                }
-            });
-            this.avRecorder.on('error', (err) => {
-                onRecorderStateChange('error', new RecorderManagerFailImpl(transformErrorCode(err.code), err.message));
-            });
-        }
-    }
-    async release() {
-        if (this.avRecorder !== undefined) {
-            await this.avRecorder.reset();
-            await this.avRecorder.release();
-            this.avRecorder = undefined;
-        }
-    }
-    async start(options) {
-        if (this.avRecorder !== undefined) {
-            await this.release();
-        }
-        this.avRecorder = await media.createAVRecorder();
-        const _options_sampleRate = options.sampleRate, sampleRate = _options_sampleRate == null ? 8000 : _options_sampleRate, _options_numberOfChannels = options.numberOfChannels, numberOfChannels = _options_numberOfChannels == null ? 2 : _options_numberOfChannels, _options_encodeBitRate = options.encodeBitRate, encodeBitRate = _options_encodeBitRate == null ? 48000 : _options_encodeBitRate, _options_duration = options.duration, duration = _options_duration == null ? 60000 : _options_duration, _options_format = options.format, format = _options_format == null ? 'aac' : _options_format;
-        const file = createFile(supportFormats, format, 'aac');
-        this.onStateChange(file);
-        const audioProfile = {
-            audioBitrate: format === 'wav' ? 64000 : encodeBitRate,
-            audioChannels: format === 'wav' ? 1 : numberOfChannels,
-            audioCodec: getAudioCodec(format),
-            audioSampleRate: format === 'wav' ? 8000 : sampleRate,
-            fileFormat: getFileFormat(format)
-        };
-        const audioConfig = {
-            audioSourceType: media.AudioSourceType.AUDIO_SOURCE_TYPE_MIC,
-            profile: audioProfile,
-            url: 'fd://' + file.fd
-        };
-        return new Promise((resolve, reject) => {
-            UTSHarmony.requestSystemPermission([
-                'ohos.permission.MICROPHONE'
-            ], async (allRight) => {
-                if (allRight) {
-                    await this.avRecorder?.prepare(audioConfig);
-                    await this.avRecorder?.start();
-                    if (duration) {
-                        setTimeout(async () => {
-                            await this.avRecorder?.stop();
-                        }, duration);
-                    }
-                    resolve();
-                }
-                else {
-                    onRecorderStateChange('error', new RecorderManagerFailImpl(1107601));
-                    reject();
-                }
-            }, (doNotAskAgain) => {
-                onRecorderStateChange('error', new RecorderManagerFailImpl(1107601));
-                reject();
-            });
-        });
-    }
-    async pause() {
-        if (this.avRecorder !== undefined && this.avRecorder.state === 'started') {
-            await this.avRecorder.pause();
-        }
-    }
-    async resume() {
-        if (this.avRecorder !== undefined && this.avRecorder.state === 'paused') {
-            await this.avRecorder.resume();
-        }
-    }
-    async stop() {
-        if (this.avRecorder !== undefined && (this.avRecorder.state === 'started' || this.avRecorder.state === 'paused')) {
-            await this.avRecorder.stop();
-            await this.release();
-            this.isFirstStart = true;
-        }
-    }
-}
-let RECORDER_MANAGER = null;
-const DEFAULT_FORMAT = 'aac';
-class RecorderManagerImpl {
-    constructor() {
-        this.__v_skip = true;
-    }
-    start(options = null) {
-        if (options == null)
-            options = {};
-        if (!options.format)
-            options.format = DEFAULT_FORMAT;
-        if (supportFormats.includes((options.format ?? ''))) {
-            RECORDER_MANAGER = new AVRecorder();
-        }
-        if (RECORDER_MANAGER) {
-            RECORDER_MANAGER.start(options);
-        }
-        else {
-            onRecorderStateChange('error', new RecorderManagerFailImpl(1107605));
-        }
-    }
-    pause() {
-        if (RECORDER_MANAGER)
-            RECORDER_MANAGER.pause();
-    }
-    resume() {
-        if (RECORDER_MANAGER)
-            RECORDER_MANAGER.resume();
-    }
-    async stop() {
-        if (RECORDER_MANAGER) {
-            try {
-                await RECORDER_MANAGER.stop();
-            }
-            catch (error) { }
-            RECORDER_MANAGER = null;
-        }
-    }
-    onStart(options) {
-        setRecordStateCallback('start', options);
-    }
-    onPause(options) {
-        setRecordStateCallback('pause', options);
-    }
-    onStop(options) {
-        setRecordStateCallback('stop', options);
-    }
-    onFrameRecorded(options) {
-        setRecordStateCallback('frameRecorded', options);
-    }
-    onError(options) {
-        setRecordStateCallback('error', options);
-    }
-    onResume(options) {
-        setRecordStateCallback('resume', options);
-    }
-    onInterruptionBegin(options) {
-        setRecordStateCallback('interruptionBegin', options);
-    }
-    onInterruptionEnd(options) {
-        setRecordStateCallback('interruptionEnd', options);
-    }
-    offStart() {
-        deleteRecordStateCallback('start');
-    }
-    offPause() {
-        deleteRecordStateCallback('pause');
-    }
-    offStop() {
-        deleteRecordStateCallback('stop');
-    }
-    offFrameRecorded() {
-        deleteRecordStateCallback('frameRecorded');
-    }
-    offError() {
-        deleteRecordStateCallback('error');
-    }
-    offResume() {
-        deleteRecordStateCallback('resume');
-    }
-    offInterruptionBegin() {
-        deleteRecordStateCallback('interruptionBegin');
-    }
-    offInterruptionEnd() {
-        deleteRecordStateCallback('interruptionEnd');
-    }
-}
-let recorderManager = null;
-const getRecorderManager = defineSyncApi(API_GET_RECORDER_MANAGER, () => {
-    if (recorderManager)
-        return recorderManager;
-    else
-        recorderManager = new RecorderManagerImpl();
-    return recorderManager;
-});
-export { RecorderManagerStartOptions as RecorderManagerStartOptions };
-export { getRecorderManager as getRecorderManager };
-//# sourceMappingURL=index.js.mapÂ“Ùs hvigor_ignore__Applications_DevEco-Studio.app_Contents_sdk_default_openharmony_ets_api_@ohos.multimedia.media.d.tsÙî/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@hnpaqqbd4i9bxcrp3ktun4a1gqv9ys2o5pljtcetlzk=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/framework/index.etsÙj hvigor_ignore__Applications_DevEco-Studio.app_Contents_sdk_default_openharmony_ets_api_@ohos.file.fs.d.tsÚ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@hnpaqqbd4i9bxcrp3ktun4a1gqv9ys2o5pljtcetlzk=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/modules/uni_modules/uni-recorder/utssdk/app-harmony/index.etsÔrB˜±isLocalDependency¯isNodeEntryFile§pkgPath§pkgNameªpkgVersion±belongProjectPath±dependencyPkgInfo¬shouldEmitJsÂÂÙâ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@hnpaqqbd4i9bxcrp3ktun4a1gqv9ys2o5pljtcetlzk=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/modules¹@dcloudio/uni-app-modules¥1.0.0ÙL/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmonyÔrC’§pkgNameªpkgVersion¹@dcloudio/uni-app-modules¥1.0.0ÃÃÚ>Âimport media from '@ohos.multimedia.media';
-import { BusinessError } from '@kit.BasicServicesKit';
-import { UTSObject, onError, IUniError, UTS, UniError, UTSHarmony, defineSyncApi } from "@dcloudio/uni-app-framework";
-import { fileIo as fileIo__1 } from '@kit.CoreFileKit';
-import { fileIo } from '@kit.CoreFileKit';
-import { getEnv } from "@dcloudio/uni-app-framework";
-const API_GET_RECORDER_MANAGER = 'getRecorderManager';
-type GetRecorderManager = () => RecorderManager;
-class RecorderManagerStartOptions extends UTSObject {
-    duration: number | null = null;
-    sampleRate: number | null = null;
-    numberOfChannels: number | null = null;
-    encodeBitRate: number | null = null;
-    format: 'aac' | 'mp3' | 'pcm' | 'wav' | 'm4a' | null = null;
-    frameSize: number | null = null;
-}
-interface RecorderManagerOnStopResult {
-    tempFilePath: string;
-}
-interface RecorderManager {
-    start(options: RecorderManagerStartOptions): void;
-    pause(): void;
-    resume(): void;
-    stop(): void;
-    onStart(options: (result: Object) => void): void;
-    offStart(): void;
-    onPause(options: (result: Object) => void): void;
-    offPause(): void;
-    onStop(options: (result: RecorderManagerOnStopResult) => void): void;
-    offStop(): void;
-    onFrameRecorded(options: (result: Object) => void): void;
-    offFrameRecorded(): void;
-    onError(options: (result: IRecorderManagerFail) => void): void;
-    offError(): void;
-    onResume(options: (result: Object) => void): void;
-    offResume(): void;
-    onInterruptionBegin(options: (result: Object) => void): void;
-    offInterruptionBegin(): void;
-    onInterruptionEnd(options: (result: Object) => void): void;
-    offInterruptionEnd(): void;
-}
-type RecorderManagerErrorCode = 1107601 | 1107602 | 1107603 | 1107604 | 1107605 | 1107606 | 1107607 | 1107608;
-interface IRecorderManagerFail extends IUniError {
-    errCode: RecorderManagerErrorCode;
-}
-type RecorderState = 'pause' | 'resume' | 'start' | 'stop' | 'error' | 'frameRecorded' | 'interruptionBegin' | 'interruptionEnd';
-type ErrorCb = (result: IRecorderManagerFail) => void;
-interface Callbacks {
-    pause?: Function | null;
-    resume?: Function | null;
-    start?: Function | null;
-    stop?: Function | null;
-    error?: ErrorCb | null;
-    frameRecorded?: Function | null;
-    interruptionBegin?: Function | null;
-    interruptionEnd?: Function | null;
-}
-const callbacks: Callbacks = {
-    pause: null,
-    resume: null,
-    start: null,
-    stop: null,
-    error: null,
-    frameRecorded: null,
-    interruptionBegin: null,
-    interruptionEnd: null
-};
-function setRecordStateCallback(state: RecorderState, cb: Function | ErrorCb | null = null) {
-    switch(state){
-        case 'pause':
-            callbacks.pause = cb;
-            break;
-        case 'resume':
-            callbacks.resume = cb;
-            break;
-        case 'start':
-            callbacks.start = cb;
-            break;
-        case 'stop':
-            callbacks.stop = cb;
-            break;
-        case 'error':
-            callbacks.error = cb as ErrorCb;
-            break;
-        case 'frameRecorded':
-            callbacks.frameRecorded = cb;
-            break;
-        case 'interruptionBegin':
-            callbacks.interruptionBegin = cb;
-            break;
-        case 'interruptionEnd':
-            callbacks.interruptionEnd = cb;
-            break;
-    }
-}
-function deleteRecordStateCallback(state: RecorderState) {
-    setRecordStateCallback(state);
-}
-interface StateChangeRes extends RecorderManagerOnStopResult {
-    errMsg?: string;
-    frameBuffer?: ArrayBuffer;
-    isLastFrame?: boolean;
-    doNotAskAgain?: boolean;
-}
-function onRecorderStateChange(state: RecorderState, res: StateChangeRes | IRecorderManagerFail | null = null): void {
-    switch(state){
-        case 'pause':
-            return callbacks.pause?.(res);
-        case 'resume':
-            return callbacks.resume?.(res);
-        case 'start':
-            return callbacks.start?.(res);
-        case 'stop':
-            return callbacks.stop?.(res);
-        case 'error':
-            return callbacks.error?.(res as IRecorderManagerFail);
-        case 'frameRecorded':
-            return callbacks.frameRecorded?.(res);
-        case 'interruptionBegin':
-            return callbacks.interruptionBegin?.(res);
-        case 'interruptionEnd':
-            return callbacks.interruptionEnd?.(res);
-    }
-}
-function createFile(supportFormats: string[], format: string, defaultExt: string): fileIo.File {
-    const TEMP_PATH = getEnv().TEMP_PATH as string;
-    const filePath = `${TEMP_PATH}/uni-recorder/`;
-    if (!fileIo.accessSync(filePath)) {
-        fileIo.mkdirSync(filePath, true);
-    }
-    const fileName = `${Date.now()}.${supportFormats.includes(format ?? '') ? format?.toLocaleLowerCase() : defaultExt}`;
-    const file: fileIo.File = fileIo.openSync(`${filePath}${fileName}`, fileIo.OpenMode.READ_WRITE | fileIo.OpenMode.CREATE);
-    return file;
-}
-function transformErrorCode(errCode: number): RecorderManagerErrorCode {
-    switch(errCode){
-        case 201:
-            return 1107601;
-        case 401:
-            return 1107606;
-        case 5400106:
-            return 1107605;
-        case 5400107:
-            return 1107607;
-    }
-    return errCode as RecorderManagerErrorCode;
-}
-const RecorderManagerUniErrorSubject = 'uni-recorder';
-const RecorderManagerUniErrors: Map<RecorderManagerErrorCode, string> = new Map([
-    [
-        1107601,
-        'No microphone permissions.'
-    ],
-    [
-        1107602,
-        'This sample rate is not supported.'
-    ],
-    [
-        1107603,
-        'The sample rate does not match the encoding bitrate.'
-    ],
-    [
-        1107604,
-        'Failed to start.'
-    ],
-    [
-        1107605,
-        'This audio format is not supported.'
-    ],
-    [
-        1107606,
-        'Other errors.'
-    ],
-    [
-        1107607,
-        'Audio interrupted.'
-    ],
-    [
-        1107608,
-        'Audio is recording.'
-    ]
-]);
-class RecorderManagerFailImpl extends UniError implements IRecorderManagerFail {
-    errCode: RecorderManagerErrorCode;
-    constructor(errCode: RecorderManagerErrorCode, errMsg: string = ''){
-        super();
-        this.errSubject = RecorderManagerUniErrorSubject;
-        this.errCode = errCode;
-        this.errMsg = errMsg != "" ? errMsg : (UTS.mapGet(RecorderManagerUniErrors, errCode) ?? errMsg);
-    }
-}
-type SupportFormat = 'aac' | 'mp3' | 'm4a' | 'wav';
-const supportFormats: Array<SupportFormat> = [
-    'aac',
-    'mp3',
-    'm4a',
-    'wav'
-];
-function getAudioCodec(format: SupportFormat): media.CodecMimeType {
-    switch(format){
-        case 'aac':
-            return media.CodecMimeType.AUDIO_AAC;
-        case 'mp3':
-            return media.CodecMimeType.AUDIO_MP3;
-        case 'm4a':
-            return media.CodecMimeType.AUDIO_AAC;
-        case 'wav':
-            return media.CodecMimeType.AUDIO_G711MU;
-        default:
-            return media.CodecMimeType.AUDIO_AAC;
-    }
-}
-function getFileFormat(format: SupportFormat): media.ContainerFormatType {
-    switch(format){
-        case 'aac':
-            return media.ContainerFormatType.CFT_MPEG_4A;
-        case 'mp3':
-            return media.ContainerFormatType.CFT_MP3;
-        case 'm4a':
-            return media.ContainerFormatType.CFT_MPEG_4A;
-        case 'wav':
-            return media.ContainerFormatType.CFT_WAV;
-        default:
-            return media.ContainerFormatType.CFT_MPEG_4A;
-    }
-}
-class AVRecorder {
-    private avRecorder?: media.AVRecorder;
-    private isFirstStart: boolean = true;
-    constructor(){}
-    private onStateChange(file: fileIo__1.File) {
-        if (this.avRecorder) {
-            this.avRecorder.on('stateChange', async (state, reason)=>{
-                switch(state){
-                    case 'idle':
-                        this.isFirstStart = true;
-                        break;
-                    case 'started':
-                        if (this.isFirstStart) {
-                            this.isFirstStart = false;
-                            onRecorderStateChange('start');
-                        } else {
-                            if (reason === media.StateChangeReason.BACKGROUND) {
-                                onRecorderStateChange('interruptionEnd');
-                            }
-                            onRecorderStateChange('resume');
-                        }
-                        break;
-                    case 'paused':
-                        if (reason === media.StateChangeReason.BACKGROUND) {
-                            onRecorderStateChange('interruptionBegin');
-                        }
-                        onRecorderStateChange('pause');
-                        break;
-                    case 'stopped':
-                        onRecorderStateChange('stop', {
-                            tempFilePath: file.path
-                        } as StateChangeRes);
-                        fileIo__1.closeSync(file);
-                        break;
-                }
-            });
-            this.avRecorder.on('error', (err: BusinessError)=>{
-                onRecorderStateChange('error', new RecorderManagerFailImpl(transformErrorCode(err.code), err.message) as IRecorderManagerFail);
-            });
-        }
-    }
-    private async release(): Promise<void> {
-        if (this.avRecorder !== undefined) {
-            await this.avRecorder.reset();
-            await this.avRecorder.release();
-            this.avRecorder = undefined;
-        }
-    }
-    async start(options: RecorderManagerStartOptions): Promise<void> {
-        if (this.avRecorder !== undefined) {
-            await this.release();
-        }
-        this.avRecorder = await media.createAVRecorder();
-        const _options_sampleRate = options.sampleRate, sampleRate = _options_sampleRate == null ? 8000 : _options_sampleRate, _options_numberOfChannels = options.numberOfChannels, numberOfChannels = _options_numberOfChannels == null ? 2 : _options_numberOfChannels, _options_encodeBitRate = options.encodeBitRate, encodeBitRate = _options_encodeBitRate == null ? 48000 : _options_encodeBitRate, _options_duration = options.duration, duration = _options_duration == null ? 60000 : _options_duration, _options_format = options.format, format = _options_format == null ? 'aac' : _options_format;
-        const file = createFile(supportFormats, format!, 'aac');
-        this.onStateChange(file);
-        const audioProfile: media.AVRecorderProfile = {
-            audioBitrate: format === 'wav' ? 64000 : encodeBitRate!,
-            audioChannels: format === 'wav' ? 1 : numberOfChannels!,
-            audioCodec: getAudioCodec(format! as SupportFormat),
-            audioSampleRate: format === 'wav' ? 8000 : sampleRate!,
-            fileFormat: getFileFormat(format! as SupportFormat)
-        };
-        const audioConfig: media.AVRecorderConfig = {
-            audioSourceType: media.AudioSourceType.AUDIO_SOURCE_TYPE_MIC,
-            profile: audioProfile,
-            url: 'fd://' + file.fd
-        };
-        return new Promise((resolve, reject)=>{
-            UTSHarmony.requestSystemPermission([
-                'ohos.permission.MICROPHONE'
-            ], async (allRight: boolean): Promise<void> =>{
-                if (allRight) {
-                    await this.avRecorder?.prepare(audioConfig);
-                    await this.avRecorder?.start();
-                    if (duration) {
-                        setTimeout(async (): Promise<void> =>{
-                            await this.avRecorder?.stop();
-                        }, duration);
-                    }
-                    resolve();
-                } else {
-                    onRecorderStateChange('error', new RecorderManagerFailImpl(1107601) as IRecorderManagerFail);
-                    reject();
-                }
-            }, (doNotAskAgain: boolean)=>{
-                onRecorderStateChange('error', new RecorderManagerFailImpl(1107601) as IRecorderManagerFail);
-                reject();
-            });
-        });
-    }
-    async pause(): Promise<void> {
-        if (this.avRecorder !== undefined && this.avRecorder.state === 'started') {
-            await this.avRecorder.pause();
-        }
-    }
-    async resume(): Promise<void> {
-        if (this.avRecorder !== undefined && this.avRecorder.state === 'paused') {
-            await this.avRecorder.resume();
-        }
-    }
-    async stop(): Promise<void> {
-        if (this.avRecorder !== undefined && (this.avRecorder.state === 'started' || this.avRecorder.state === 'paused')) {
-            await this.avRecorder.stop();
-            await this.release();
-            this.isFirstStart = true;
-        }
-    }
-}
-let RECORDER_MANAGER: AVRecorder | null = null;
-const DEFAULT_FORMAT = 'aac';
-class RecorderManagerImpl implements RecorderManager {
-    __v_skip: boolean = true;
-    start(options: RecorderManagerStartOptions | null = null): void {
-        if (options == null) options = {} as RecorderManagerStartOptions;
-        if (!options.format) options.format = DEFAULT_FORMAT;
-        if (supportFormats.includes((options.format ?? '') as SupportFormat)) {
-            RECORDER_MANAGER = new AVRecorder();
-        }
-        if (RECORDER_MANAGER) {
-            RECORDER_MANAGER.start(options);
-        } else {
-            onRecorderStateChange('error', new RecorderManagerFailImpl(1107605));
-        }
-    }
-    pause(): void {
-        if (RECORDER_MANAGER) RECORDER_MANAGER.pause();
-    }
-    resume(): void {
-        if (RECORDER_MANAGER) RECORDER_MANAGER.resume();
-    }
-    async stop(): Promise<void> {
-        if (RECORDER_MANAGER) {
-            try {
-                await RECORDER_MANAGER.stop();
-            } catch (error) {}
-            RECORDER_MANAGER = null;
-        }
-    }
-    onStart(options: (result: Object) => void): void {
-        setRecordStateCallback('start', options);
-    }
-    onPause(options: (result: Object) => void): void {
-        setRecordStateCallback('pause', options);
-    }
-    onStop(options: (result: RecorderManagerOnStopResult) => void): void {
-        setRecordStateCallback('stop', options);
-    }
-    onFrameRecorded(options: (result: Object) => void): void {
-        setRecordStateCallback('frameRecorded', options);
-    }
-    onError(options: (result: IRecorderManagerFail) => void): void {
-        setRecordStateCallback('error', options);
-    }
-    onResume(options: (result: Object) => void): void {
-        setRecordStateCallback('resume', options);
-    }
-    onInterruptionBegin(options: (result: Object) => void): void {
-        setRecordStateCallback('interruptionBegin', options);
-    }
-    onInterruptionEnd(options: (result: Object) => void): void {
-        setRecordStateCallback('interruptionEnd', options);
-    }
-    offStart(): void {
-        deleteRecordStateCallback('start');
-    }
-    offPause(): void {
-        deleteRecordStateCallback('pause');
-    }
-    offStop(): void {
-        deleteRecordStateCallback('stop');
-    }
-    offFrameRecorded(): void {
-        deleteRecordStateCallback('frameRecorded');
-    }
-    offError(): void {
-        deleteRecordStateCallback('error');
-    }
-    offResume(): void {
-        deleteRecordStateCallback('resume');
-    }
-    offInterruptionBegin(): void {
-        deleteRecordStateCallback('interruptionBegin');
-    }
-    offInterruptionEnd(): void {
-        deleteRecordStateCallback('interruptionEnd');
-    }
-}
-let recorderManager: RecorderManager | null = null;
-const getRecorderManager: GetRecorderManager = defineSyncApi<RecorderManager>(API_GET_RECORDER_MANAGER, (): RecorderManager =>{
-    if (recorderManager) return recorderManager;
-    else recorderManager = new RecorderManagerImpl();
-    return recorderManager;
-}) as GetRecorderManager;
-export { GetRecorderManager as GetRecorderManager, IRecorderManagerFail as IRecorderManagerFail, RecorderManager as RecorderManager, RecorderManagerErrorCode as RecorderManagerErrorCode, RecorderManagerOnStopResult as RecorderManagerOnStopResult, RecorderManagerStartOptions as RecorderManagerStartOptions };
-export { getRecorderManager as getRecorderManager };
-ÀÔrD“¶@ohos.multimedia.media­@ohos.file.fs»@dcloudio/uni-app-frameworkÔrE—ªassertions¨external¢id¤meta±moduleSideEffectsªresolvedByµsyntheticNamedExportsAÃÙs hvigor_ignore__Applications_DevEco-Studio.app_Contents_sdk_default_openharmony_ets_api_@ohos.multimedia.media.d.tsAÃªoh-resolveÂEAÃÙj hvigor_ignore__Applications_DevEco-Studio.app_Contents_sdk_default_openharmony_ets_api_@ohos.file.fs.d.tsAÃªoh-resolveÂEAÂÙî/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@hnpaqqbd4i9bxcrp3ktun4a1gqv9ys2o5pljtcetlzk=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/framework/index.etsAÃªoh-resolveÂ“ÔrF–§version¤fileªsourceRoot§sources¥names¨mappings¨index.js ‘©index.etsÜ‚–”    ”  ”  ”  ”*  *”+  +Ü ”   ” ”	 	” ” (” +” -”! 5”# 7”- ÌA”/ ÌC”< ÌP”> ÌR”ÌD ÌX”Ìa Ìu”Ìb Ìv–”   ” ” ” $”% 6”& 7–”   ” 	” ” ”" )”# *˜”   ” ”	 	” ” ” ”4 4”5 5–”   ” ” ”! !”5 5”6 6•”   ” ”! "”* *”3 3‘”  •” 	” 	” 	” 	"” 	#•” 
-” 
-” 
- ” 
-$” 
-%•” ” ”  &”$ *”% +•” ” ” #”! '”" (•” ” 
-” ;” ?” Ì@•” ” ” ” #” $’”  ” ‘” ””  9 ” 9” 9” 9”” :”	 :	” :” :”” ;”
- ;
-” ;” ;”” <”	 <	” <” <”” =” =”
- =
-” =”” >”	 >	” >” >”” ?” ?” ?” ?”” Ì@” Ì@” Ì@” Ì@”” ÌA” ÌA” ÌA” ÌA’” ÌB” ÌB˜”  ÌC ”	 ÌC	” ÌC”  ÌC ”% ÌC4”' ÌC6”, ÌCÌV”0 ÌCÌZ”” ÌD” ÌD” ÌD” ÌD“” ÌE” ÌE” ÌE—” ÌF” ÌF” ÌF” ÌF” ÌF”  ÌF ”! ÌF!’” ÌG” ÌG“” ÌH” ÌH” ÌH—” ÌI” ÌI” ÌI” ÌI” ÌI”! ÌI!”" ÌI"’” ÌJ” ÌJ“” ÌK” ÌK” ÌK—” ÌL” ÌL” ÌL” ÌL” ÌL”  ÌL ”! ÌL!’” ÌM” ÌM“” ÌN” ÌN” ÌN—” ÌO” ÌO” ÌO” ÌO” ÌO” ÌO”  ÌO ’” ÌP” ÌP“” ÌQ” ÌQ” ÌQ—” ÌR” ÌR” ÌR” ÌR” ÌR”  ÌR+”! ÌR,’” ÌS” ÌS“” ÌT” ÌT” ÌT—” ÌU” ÌU” ÌU”# ÌU#”& ÌU&”( ÌU(”) ÌU)’” ÌV” ÌV“” ÌW” ÌW”  ÌW —” ÌX” ÌX” ÌX”' ÌX'”* ÌX*”, ÌX,”- ÌX-’” ÌY” ÌY“” ÌZ” ÌZ” ÌZ—” Ì[” Ì[” Ì[”% Ì[%”( Ì[(”* Ì[*”+ Ì[+’” Ì\” Ì\‘” Ì]’”  Ì^ ” Ì^•”  Ì_ ”	 Ì_	”" Ì_"”# Ì_#”( Ì_7–” Ì`” Ì`” Ì`”  Ì` ”! Ì`!”" Ì`"’”  Ìa ” Ìa˜”  Ìh ”	 Ìh	” Ìh” Ìh”$ Ìh3”& Ìh5”, ÌhÌi”0 ÌhÌm”” Ìi” Ìi” Ìi” Ìi“” Ìj” Ìj” Ìjš” Ìk” Ìk” Ìk” Ìk”" Ìk"”$ Ìk$”% Ìk%”( Ìk(”) Ìk)”* Ìk*“” Ìl” Ìl” Ìlš” Ìm” Ìm” Ìm” Ìm”# Ìm#”% Ìm%”& Ìm&”) Ìm)”* Ìm*”+ Ìm+“” Ìn” Ìn” Ìnš” Ìo” Ìo” Ìo” Ìo”" Ìo"”$ Ìo$”% Ìo%”( Ìo(”) Ìo)”* Ìo*“” Ìp” Ìp” Ìpš” Ìq” Ìq” Ìq” Ìq”! Ìq!”# Ìq#”$ Ìq$”' Ìq'”( Ìq(”) Ìq)“” Ìr” Ìr” Ìrš” Ìs” Ìs” Ìs” Ìs”" Ìs"”$ Ìs$”% Ìs%”( ÌsÌ@”) ÌsÌA”* ÌsÌB“” Ìt” Ìt” Ìtš” Ìu” Ìu” Ìu” Ìu”* Ìu*”, Ìu,”- Ìu-”0 Ìu0”1 Ìu1”2 Ìu2“” Ìv” Ìv”  Ìv š” Ìw” Ìw” Ìw” Ìw”. Ìw.”0 Ìw0”1 Ìw1”4 Ìw4”5 Ìw5”6 Ìw6“” Ìx” Ìx” Ìxš” Ìy” Ìy” Ìy” Ìy”, Ìy,”. Ìy.”/ Ìy/”2 Ìy2”3 Ìy3”4 Ìy4‘” Ìz’”  Ì{ ” Ì{™”  Ì| ”	 Ì|	” Ì|” Ì|”" Ì|,”$ Ì|.”* Ì|<”, Ì|>”6 Ì|ÌP™” Ì}”
- Ì}
-” Ì}” Ì}” Ì}” Ì}” Ì}”( Ì}2”) Ì}3˜” Ì~”
- Ì~
-” Ì~” Ì~” Ì~”! Ì~!”1 Ì~1”2 Ì~2š” Ì” Ì”	 Ì	” Ì” Ì” Ì” Ì”# Ì#”$ Ì$”& Ì&š” Ì€” Ì€” Ì€” Ì€” Ì€”! Ì€!”# Ì€#”' Ì€'”( Ì€(”) Ì€)‘” ÌÜ ” Ì‚”
- Ì‚
-” Ì‚” Ì‚” Ì‚” Ì‚” Ì‚”  Ì‚ ”" Ì‚"”& Ì‚&”4 Ì‚4”5 Ì‚5”= Ì‚=”> Ì‚>”ÌD Ì‚ÌD”ÌH Ì‚ÌH”ÌJ Ì‚ÌJ”ÌK Ì‚ÌK”ÌL Ì‚ÌL”ÌM Ì‚ÌM”ÌN Ì‚ÌN”ÌT Ì‚ÌT”ÌV Ì‚ÌV”Ìg Ì‚Ìg”Ìi Ì‚Ìi”Ìj Ì‚Ìj”Ìk Ì‚Ìk”Ìl Ì‚Ìl”Ìv Ì‚Ìv”Ìx Ì‚Ìx”Ìy Ì‚ÌyÜ ” Ìƒ”
- Ìƒ
-” Ìƒ” Ìƒ” Ìƒ$” Ìƒ%”  Ìƒ-”! Ìƒ.”$ Ìƒ1”, Ìƒ9”/ Ìƒ<”7 ÌƒÌD”9 ÌƒÌF”; ÌƒÌH”ÌA ÌƒÌN”ÌB ÌƒÌO”ÌJ ÌƒÌW”ÌK ÌƒÌX”ÌU ÌƒÌb”ÌX ÌƒÌe”Ì^ ÌƒÌk”Ì_ ÌƒÌl”Ìg ÌƒÌt”Ìh ÌƒÌu”Ìn ÌƒÌ{”Ìo ÌƒÌ|”Ìp ÌƒÌ}”” Ì„” Ì„” Ì„” Ì„’”  Ì… ” Ì…•”  Ì† ”	 Ì†	” Ì†” Ì†”# Ì†+”” Ì‡” Ì‡” Ì‡” Ì‡“” Ìˆ” Ìˆ” Ìˆ”” Ì‰” Ì‰” Ì‰” Ì‰“” ÌŠ” ÌŠ” ÌŠ”” Ì‹” Ì‹” Ì‹” Ì‹“” ÌŒ” ÌŒ” ÌŒ”” Ì” Ì” Ì” Ì“” Ì” Ì” Ì”” Ì” Ì” Ì” Ì‘” Ì”” Ì‘” Ì‘” Ì‘.” Ì‘/’”  Ì’ ” Ì’–”  Ì“ ” Ì“”$ Ì“$”' Ì“'”5 Ì“5”6 Ì“6—”  Ì” ” Ì”” Ì””! Ì”ÌH”% Ì”ÌL”( Ì”ÌO”) Ì”ÌP‘” Ì•’” Ì–” Ì–’” Ì—”$ Ì—$‘” Ì˜‘” Ì™’” Ìš” Ìš’” Ì›”, Ì›,‘” Ìœ‘” Ì’” Ì” Ì’” ÌŸ”> ÌŸ>‘” Ì ‘” Ì¡’” Ì¢” Ì¢’” Ì£” Ì£‘” Ì¤‘” Ì¥’” Ì¦” Ì¦’” Ì§”- Ì§-‘” Ì¨‘” Ì©’” Ìª” Ìª’” Ì«” Ì«‘” Ì¬‘” Ì­’” Ì®” Ì®’” Ì¯” Ì¯‘” Ì°‘” Ì±’” Ì²” Ì²’” Ì³” Ì³‘” Ì´“” Ìµ” Ìµ” Ìµ•”  Ì¶ ” Ì¶” Ì¶”& Ì¶&”. Ì¶.–” Ì¸” Ì¸” Ì¸1” Ì¸3”" Ì¸ÌD”$ Ì¸ÌF”” Ì¹” Ì¹” Ì¹” Ì¹—” Ìº” Ìº” Ìº” Ìº” Ìº”8 Ìº8”9 Ìº9—” Ì»” Ì»” Ì»” Ì»” Ì»” Ì»” Ì»Ü ” Ì¼” Ì¼” Ì¼” Ì¼” Ì¼” Ì¼”  Ì¼ ”" Ì¼"”# Ì¼#”$ Ì¼$”% Ì¼%”+ Ì¼+”, Ì¼,”- Ì¼-”. Ì¼.”/ Ì¼/”2 Ì¼2”3 Ì¼3”9 Ì¼9”: Ì¼:”ÌR Ì¼ÌR”ÌT Ì¼ÌT”Ì[ Ì¼Ì[”Ì\ Ì¼Ì\”Ì` Ì¼Ì`”Ìf Ì¼Ìf”Ìg Ì¼Ìg”Ìh Ì¼Ìh’” Ì½” Ì½‘” Ì¾””  ÌÀ ” ÌÀ” ÌÀ” ÌÀ-’” ÌÁ”	 ÌÁ	’” ÌÂ”	 ÌÂ	’” ÌÃ”	 ÌÃ	’” ÌÄ”	 ÌÄ	’” ÌÅ” ÌÅ•”  ÌÆ ”	 ÌÆ	” ÌÆ” ÌÆ” ÌÆ,”” ÌÇ” ÌÇ” ÌÇ” ÌÇ“” ÌÈ” ÌÈ” ÌÈ˜” ÌÉ” ÌÉ” ÌÉ” ÌÉ”& ÌÉ&”' ÌÉ'”0 ÌÉ0”1 ÌÉ1“” ÌÊ” ÌÊ” ÌÊ˜” ÌË” ÌË” ÌË” ÌË”& ÌË&”' ÌË'”0 ÌË0”1 ÌË1“” ÌÌ” ÌÌ” ÌÌ˜” ÌÍ” ÌÍ” ÌÍ” ÌÍ”& ÌÍ&”' ÌÍ'”0 ÌÍ0”1 ÌÍ1“” ÌÎ” ÌÎ” ÌÎ˜” ÌÏ” ÌÏ” ÌÏ” ÌÏ”& ÌÏ&”' ÌÏ'”3 ÌÏ3”4 ÌÏ4‘” ÌĞ˜” ÌÑ” ÌÑ” ÌÑ” ÌÑ”& ÌÑ&”' ÌÑ'”0 ÌÑ0”1 ÌÑ1‘” ÌÒ’”  ÌÓ ” ÌÓ•”  ÌÔ ”	 ÌÔ	” ÌÔ” ÌÔ” ÌÔ,”” ÌÕ” ÌÕ” ÌÕ” ÌÕ“” ÌÖ” ÌÖ” ÌÖ˜” Ì×” Ì×” Ì×” Ì×”, Ì×,”- Ì×-”8 Ì×8”9 Ì×9“” ÌØ” ÌØ” ÌØ˜” ÌÙ” ÌÙ” ÌÙ” ÌÙ”, ÌÙ,”- ÌÙ-”4 ÌÙ4”5 ÌÙ5“” ÌÚ” ÌÚ” ÌÚ˜” ÌÛ” ÌÛ” ÌÛ” ÌÛ”, ÌÛ,”- ÌÛ-”8 ÌÛ8”9 ÌÛ9“” ÌÜ” ÌÜ” ÌÜ˜” Ìİ” Ìİ” Ìİ” Ìİ”, Ìİ,”- Ìİ-”4 Ìİ4”5 Ìİ5‘” ÌŞ˜” Ìß” Ìß” Ìß” Ìß”, Ìß,”- Ìß-”8 Ìß8”9 Ìß9‘” Ìà’”  Ìá ” Ìá“”  Ìâ ” Ìâ” Ìâ‘” Ìå•” Ìä” Ìä” Ìä$”  Ìä(”! Ìä)’” Ìå” Ìå”” Ìæ” Ìæ” Ìæ” Ìæ.–” Ìç” Ìç” Ìç” Ìç” Ìç” ÌçÜ ” Ìè” Ìè” Ìè” Ìè” Ìè” Ìè” Ìè”, Ìè,”. Ìè.”3 Ìè3”5 Ìè5”: Ìè:”< Ìè<”ÌB ÌèÌB”ÌD ÌèÌC”ÌF ÌèÌE”” Ìé” Ìé” Ìé” Ìé“” Ìê” Ìê” Ìê—” Ìë” Ìë” Ìë”) Ìë)”, Ìë,”0 Ìë0”1 Ìë1’” Ìì” Ìì“” Ìí” Ìí”" Ìí"–” Ìî” Ìî”  Ìî ”! Ìî!”- Ìî-”/ Ìî/—” Ìï”  Ìï ”! Ìï!”- Ìï-”0 Ìï0”5 Ìï5”6 Ìï6–” Ìğ”1 Ìğ1”2 Ìğ2”9 Ìğ9”: Ìğ:”; Ìğ;‘” Ìñ‘” Ìñš” Ìò”  Ìò ”& Ìò&”+ Ìò+”0 Ìò0”1 Ìò1”ÌB ÌòÌB”ÌC ÌòÌC”ÌM ÌòÌM”ÌO ÌòÌO–”  Ìó ”5 Ìó5”6 Ìó6”ÌG ÌóÌG”ÌH ÌóÌH”ÌI ÌóÌI‘” Ìô–” Ìõ”1 Ìõ1”2 Ìõ2”: Ìõ:”; Ìõ;”< Ìõ<‘” Ìö’” Ì÷” Ì÷“” Ìø” Ìø”! Ìø!š” Ìù” Ìù”" Ìù"”' Ìù'”, Ìù,”- Ìù-”> Ìù>”? Ìù?”ÌI ÌùÌI”ÌK ÌùÌK–” Ìú”1 Ìú1”2 Ìú2”ÌE ÌúÌE”ÌF ÌúÌF”ÌG ÌúÌG‘” Ìû–” Ìü”- Ìü-”. Ìü.”5 Ìü5”6 Ìü6”7 Ìü7’” Ìı” Ìı“” Ìş” Ìş”" Ìş"•” Ìÿ”- Ìÿ-”. Ìÿ.”4 Ìÿ4”6 Ìÿ6–” Í ”( Í (”* Í *”. Í .”/ Í /”3 Í 3“” Í+” Í,” Í-˜” Í”! Í!”" Í"”+ Í+”, Í,”0 Í0”1 Í1”2 Í2’” Í” Í‘” Í”” Í” Í” Í” Í” Í” Í” Í” Í” Í” Í” Í”& Í&”( Í(”) Í)”, Í;”. Í<”0 Í>Ü ” Í”% Í%”& Í&”- Í-”/ Í/”3 Í3”ÌJ ÍÌJ”ÌK ÍÌK”Ì] ÍÌ]”Ì^ ÍÌ^”Ìa ÍÌa”Ìb ÍÌb”Ìf ÍÌf”Ìg ÍÌg”Ìi ÍÌi”Ìl ÍÌl”Ìm ÍÌm”Ìt ÍÌt”Ìu ÍÌ”Ìv ÍÌ”Ìw ÍÌ”” Í” Í” Í” Í‘”	 Í		’” Í
-” Í
-”” Í”	 Í”
- Í” Í˜” Í” Í” Í” Í” Í”  Í ”) Í)”+ Í+™” Í” Í” Í” Í”! Í!”" Í"”' Í'”) Í)”* Í*™” Í” Í” Í” Í”! Í!”" Í"”) Í)”+ Í+”, Í,—” Í” Í” Í” Í” Í”' Í'”( Í(‘”	 Í	’” Í” Í–” Í”	 Í	”
- Í
-” Í” Í” Í4˜” Í” Í” Í” Í” Í”  Í ”) Í)”+ Í+—” Í” Í” Í” Í” Í”  Í ”! Í!‘”	 Í	›” Í” Í” Í” Í” Í”  Í ”% Í%”& Í&”6 Í6”8 Í8”9 Í9Ü f” Í” Í”! Í!”$ Í$”+ Í+”, Í,”6 Í6”8 Í8”ÌB ÍÌB”ÌE ÍÌE”ÌX ÍÌX”Ì\ ÍÌ\”Ì` ÍÌ`”Ìa ÍÌa”Ìb ÍÌb”Ìc ÍÌc”Ìg ÍÌg”Ìh ÍÌh”Ìi ÍÌi”Ìj ÍÌj”Ì} ÍÌ}”Ì ÍÌ”Ì˜ ÍÌ˜”Ì› ÍÌ›”Ì¢ ÍÌ¢”Ì£ ÍÌ£”Ì³ ÍÌ³”Ìµ ÍÌµ”ÌÅ ÍÌÅ”ÌÈ ÍÌÈ”Ìá ÍÌá”Ìå ÍÌå”Ìé ÍÌé”Ìê ÍÌê”Ìë ÍÌë”Ìì ÍÌì”Ìí ÍÌí”Ìî ÍÌî”Ìï ÍÌï”Ìğ ÍÌğ”Í	 ÍÍ	”Í ÍÍ”Í! ÍÍ!”Í$ ÍÍ$”Í+ ÍÍ+”Í, ÍÍ,”Í9 ÍÍ9”Í; ÍÍ;”ÍH ÍÍH”ÍK ÍÍK”Ía ÍÍa”Íe ÍÍe”Íi ÍÍi”Íj ÍÍj”Ík ÍÍk”Íl ÍÍl”Íq ÍÍq”Ír ÍÍr”Ís ÍÍs”Ít ÍÍt”ÍŠ ÍÍŠ”ÍŒ ÍÍŒ”Í ÍÍ”Í  ÍÍ ”Í§ ÍÍ§”Í¨ ÍÍ¨”Í° ÍÍ°”Í² ÍÍ²”Íº ÍÍº”Í½ ÍÍ½”ÍÎ ÍÍÎ”ÍÒ ÍÍÒ”ÍÖ ÍÍÖ”Í× ÍÍ×”ÍØ ÍÍØ”ÍÙ ÍÍÙ”ÍŞ ÍÍŞ”Íß ÍÍß”Íà ÍÍà”Íá ÍÍá”Íò ÍÍò”Íô ÍÍô”Í ÍÍ”Í ÍÍ”Í ÍÍ”Í ÍÍ”Í ÍÍ”Í ÍÍ”Í ÍÍ”Í ÍÍ”Í. ÍÍ.”Í2 ÍÍ2”Í6 ÍÍ6”Í7 ÍÍ7”Í8 ÍÍ8”Í9 ÍÍ9”Í> ÍÍ>”Í? ÍÍ?”Í@ ÍÍ@”ÍA ÍÍA”ÍP ÍÍP”ÍQ ÍÍQ” Í” Í” Í” Í” Í”  Í ”. Í.”0 Í0”6 Í7”8 Í9”= Í>”> Í?”? ÍÌ@˜” Í” Í” Í” Í” Í” Í”  Í ”! Í!”” Í” Í” Í” Í6” Í” Í” Í”  Í ”% Í%”* Í*”+ Í+”, Í,”- Í-”2 Í2”3 Í3”4 Í4”5 Í5”ÌB ÍÌC” Í” Í” Í”! Í!”& Í&”+ Í+”, Í,”- Í-”. Í.”/ Í/”0 Í0”1 Í1”2 Í2”ÌB ÍÌC—” Í” Í” Í”% Í%”& Í&”, Í>”- Í?” Í” Í” Í”# Í#”( Í(”- Í-”. Í.”/ Í/”0 Í0”4 Í4”5 Í5”6 Í6”7 Í7”ÌA ÍÌB—” Í” Í” Í”% Í%”& Í&”, Í>”- Í?’”	 Í 	”
- Í 
-”” Í!” Í!” Í!” Í!4˜” Í"” Í"” Í"”" Í""”# Í"#”2 Í"2”3 Í"3”ÌH Í"ÌH”” Í#” Í#” Í#”! Í#!˜” Í$” Í$” Í$” Í$” Í$” Í$”  Í$ ”" Í$"’”	 Í%	”
- Í%
-›” Í&” Í&” Í&” Í&” Í&” Í&”# Í&#”% Í&%”+ Í&+”- Í&,”/ Í&.•” Í'” Í'” Í'”. Í'.”/ Í'/’” Í(”, Í(,—” Í)” Í)” Í)” Í)” Í)'”  Í)8”" Í):”” Í*” Í*” Í*” Í*›” Í+” Í+” Í+” Í+”) Í+)”+ Í++”2 Í+2”3 Í+3”> Í+>”? Í+?”Ì@ Í+Ì@™” Í,” Í,” Í,” Í,”) Í,)”+ Í,+”0 Í,0”2 Í,2”3 Í,3”” Í-” Í-”  Í- ”" Í-"–” Í.”" Í."”# Í.#”( Í.(”, Í.;”. Í.=™” Í/”" Í/"”& Í/&”' Í/'”1 Í/1”3 Í/3”7 Í/7”9 Í/9”: Í/:–” Í0” Í0” Í0”# Í0#”$ Í0$”% Í0%‘” Í1”” Í2” Í2” Í2” Í2‘” Í3‘” Í3œ” Í4”) Í4)”* Í4*”1 Í41”3 Í43”7 Í47”ÌN Í4ÌN”ÌO Í4ÌO”ÌV Í4ÌV”ÌW Í4Ìo”ÌX Í4Ìp”ÌY Í4Ìq”” Í5” Í5” Í5” Í5‘” Í6—” Í7” Í7” Í7” Í7” Í7&” Í7'”! Í7)œ” Í8”% Í8%”& Í8&”- Í8-”/ Í8/”3 Í83”ÌJ Í8ÌJ”ÌK Í8ÌK”ÌR Í8ÌR”ÌS Í8Ìk”ÌT Í8Ìl”ÌU Í8Ìm”” Í9” Í9” Í9” Í9”” Í:” Í:” Í:” Í:”” Í;”	 Í;	”
- Í;
-” Í;’” Í<” Í<”” Í=”	 Í=	”
- Í=
-” Í=Ü ” Í>” Í>” Í>” Í>” Í>”  Í> ”) Í>)”- Í>-”1 Í>1”2 Í>2”< Í><”= Í>=”ÌB Í>ÌB”ÌG Í>ÌG”ÌP Í>ÌP”ÌR Í>ÌR™” Í?” Í?” Í?” Í?”! Í?!”" Í?"”' Í?'”) Í?)”* Í?*‘”	 Í@	’” ÍA” ÍA”” ÍB”	 ÍB	”
- ÍB
-” ÍBÜ ” ÍC” ÍC” ÍC” ÍC” ÍC”  ÍC ”) ÍC)”- ÍC-”1 ÍC1”2 ÍC2”< ÍC<”= ÍC=”ÌB ÍCÌB”ÌG ÍCÌG”ÌO ÍCÌO”ÌQ ÍCÌQ™” ÍD” ÍD” ÍD” ÍD”! ÍD!”" ÍD"”( ÍD(”* ÍD*”+ ÍD+‘”	 ÍE	’” ÍF” ÍF”” ÍG”	 ÍG	”
- ÍG
-” ÍGÜ ” ÍH” ÍH” ÍH” ÍH” ÍH”  ÍH ”) ÍH)”- ÍH-”. ÍH.”2 ÍH2”3 ÍH3”= ÍH=”> ÍH>”ÌC ÍHÌC”ÌH ÍHÌH”ÌQ ÍHÌQ”ÌU ÍHÌU”ÌY ÍHÌY”ÌZ ÍHÌZ”Ìd ÍHÌd”Ìe ÍHÌe”Ìj ÍHÌj”Ìo ÍHÌo”Ìw ÍHÌw”Ìx ÍHÌx”Ìz ÍHÌz™” ÍI” ÍI” ÍI” ÍI”! ÍI!”" ÍI"”& ÍI&”( ÍI(”) ÍI)—” ÍJ” ÍJ” ÍJ” ÍJ” ÍJ”  ÍJ ”! ÍJ!—” ÍK” ÍK” ÍK” ÍK”  ÍK ”$ ÍK$”% ÍK%‘”	 ÍL	’” ÍM” ÍM‘” ÍN–”  ÍO ” ÍO” ÍO” ÍO*” ÍO.” ÍO/–”  ÍP ” ÍP” ÍP” ÍP” ÍP” ÍP“”  ÍQ ” ÍQ” ÍQ‘” ÍQ •” ÍR” ÍR” ÍR” ÍR” ÍR’” Í ” Í•” ÍS”	 ÍS	”
- ÍS
-” ÍS8” ÍS<•” ÍT” ÍT” ÍT” ÍT” ÍT•” ÍT” ÍT$” ÍT'” ÍTÌH” ÍTÌI–” ÍU” ÍU” ÍU” ÍU” ÍU” ÍU—” ÍU” ÍU$” ÍU%” ÍU+” ÍU.”+ ÍU<”, ÍU=Ÿ” ÍV” ÍV” ÍV” ÍV”# ÍV#”$ ÍV$”% ÍV%”, ÍV,”- ÍV-”3 ÍV3”7 ÍV7”9 ÍV9”: ÍVÌK”; ÍVÌL”= ÍVÌN—” ÍW” ÍW” ÍW”# ÍW#”- ÍW-”/ ÍW/”0 ÍW0‘”	 ÍX	”” ÍY” ÍY” ÍY” ÍY˜” ÍZ” ÍZ” ÍZ”" ÍZ"”# ÍZ#”* ÍZ*”+ ÍZ+”, ÍZ,‘”	 Í[	‘” Í[œ” Í\”! Í\!”" Í\"”) Í\)”+ Í\+”/ Í\/”ÌF Í\ÌF”ÌG Í\ÌG”ÌN Í\ÌN”ÌO Í\ÌO”ÌP Í\ÌP”ÌQ Í\ÌQ‘”	 Í]	’” Í^” Í^’” Í_”	 Í_	“” Í`” Í`” Í`–” Í`” Í`.” Í`/”" Í`4”$ Í`6”% Í`7’” Ía” Ía’” Íb”
- Íb
-“” Íc” Íc” Íc–” Íc” Íc.” Íc/”# Íc5”% Íc7”& Íc8’” Íd” Íd”” Íe”	 Íe	”
- Íe
-” Íe”” Íf” Íf” Íf” Íf’” Íg” Íg—” Íh” Íh”& Íh&”' Íh'”+ Íh+”- Íh-”. Íh.‘” Íi•” Íi” Íi” Íi” Íi” Íi•” Íj” Íj” Íj”# Íj#”$ Íj$‘”	 Ík	’” Íl” Íl”” Ím” Ím” Ím” Ím-˜” Ín” Ín” Ín”& Ín&”( Ín(”/ Ín/”0 Ín0”1 Ín1’” Ío” Ío”” Íp” Íp” Íp” Íp-˜” Íq” Íq” Íq”& Íq&”( Íq(”/ Íq/”0 Íq0”1 Íq1’” Ír” Ír”” Ís”
- Ís
-” Ís” ÍsÌA˜” Ít” Ít” Ít”% Ít%”' Ít'”. Ít.”/ Ít/”0 Ít0’” Íu” Íu”” Ív” Ív” Ív” Ív5˜” Íw” Íw” Íw”. Íw.”0 Íw0”7 Íw7”8 Íw8”9 Íw9’” Íx” Íx”” Íy” Íy” Íy” Íy;˜” Íz” Íz” Íz”& Íz&”( Íz(”/ Íz/”0 Íz0”1 Íz1’” Í{” Í{”” Í|” Í|” Í|” Í|.˜” Í}” Í}” Í}”' Í}'”) Í})”0 Í}0”1 Í}1”2 Í}2’” Í~” Í~”” Í” Í” Í” Í9˜” Í€” Í€” Í€”2 Í€2”4 Í€4”; Í€;”< Í€<”= Í€=’” Í” Í”” Í‚” Í‚” Í‚” Í‚7˜” Íƒ” Íƒ” Íƒ”0 Íƒ0”2 Íƒ2”9 Íƒ9”: Íƒ:”; Íƒ;’” Í„” Í„’” Í…” Í…–” Í†”! Í†!”" Í†"”) Í†)”* Í†*”+ Í†+’” Í‡” Í‡’” Íˆ” Íˆ–” Í‰”! Í‰!”" Í‰"”) Í‰)”* Í‰*”+ Í‰+’” ÍŠ” ÍŠ’” Í‹” Í‹–” ÍŒ”! ÍŒ!”" ÍŒ"”( ÍŒ(”) ÍŒ)”* ÍŒ*’” Í” Í’” Í” Í–” Í”! Í!”" Í"”1 Í1”2 Í2”3 Í3’” Í” Í’” Í‘” Í‘–” Í’”! Í’!”" Í’"”) Í’)”* Í’*”+ Í’+’” Í“” Í“’” Í”” Í”–” Í•”! Í•!”" Í•"”* Í•*”+ Í•+”, Í•,’” Í–” Í–’” Í—” Í—–” Í˜”! Í˜!”" Í˜"”5 Í˜5”6 Í˜6”7 Í˜7’” Í™” Í™’” Íš” Íš–” Í›”! Í›!”" Í›"”3 Í›3”4 Í›4”5 Í›5’” Íœ” Íœ‘” Í–”  Í ” Í” Í” Í.” Í2” Í3š”  ÍŸ ” ÍŸ” ÍŸ” ÍŸ/”( ÍŸ<”) ÍŸÌN”ÌA ÍŸÌf”ÌC ÍŸÌh”ÌF ÍŸÌ|”ÌH ÍŸÌ~“” Í ” Í ” Í ”” Í ” Í  ” Í /” Í 0—” Í¡	” Í¡” Í¡” Í¡”1 Í¡2”3 Í¡4”4 Í¡5”” Í¢” Í¢” Í¢” Í¢””  Í£ ” Í£” Í£” Í£˜”  Í¤ ” Í¤”	 Í¤Ì÷”$ Í¤Í”( Í¤Í”ÌC Í¤Í1”ÌE Í¤Í3”ÌF Í¤Í4˜”  Í¥ ” Í¥”	 Í¥	” Í¥” Í¥”1 Í¥1”3 Í¥3”4 Í¥4ÔrG–§version¤file§sources®sourcesContent¥names¨mappingsÀ‘À‘ÀÜƒ‘”    ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”  	 ‘”  
- ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”    ‘”  ! ‘”  " ‘”  # ‘”  $ ‘”  % ‘”  & ‘”  ' ‘”  ( ‘”  ) ‘”  * ‘”  + ‘”  , ‘”  - ‘”  . ‘”  / ‘”  0 ‘”  1 ‘”  2 ‘”  3 ‘”  4 ‘”  5 ‘”  6 ‘”  7 ‘”  8 ‘”  9 ‘”  : ‘”  ; ‘”  < ‘”  = ‘”  > ‘”  ? ‘”  Ì@ ‘”  ÌA ‘”  ÌB ‘”  ÌC ‘”  ÌD ‘”  ÌE ‘”  ÌF ‘”  ÌG ‘”  ÌH ‘”  ÌI ‘”  ÌJ ‘”  ÌK ‘”  ÌL ‘”  ÌM ‘”  ÌN ‘”  ÌO ‘”  ÌP ‘”  ÌQ ‘”  ÌR ‘”  ÌS ‘”  ÌT ‘”  ÌU ‘”  ÌV ‘”  ÌW ‘”  ÌX ‘”  ÌY ‘”  ÌZ ‘”  Ì[ ‘”  Ì\ ‘”  Ì] ‘”  Ì^ ‘”  Ì_ ‘”  Ì` ‘”  Ìa ‘”  Ìb ‘”  Ìc ‘”  Ìd ‘”  Ìe ‘”  Ìf ‘”  Ìg ‘”  Ìh ‘”  Ìi ‘”  Ìj ‘”  Ìk ‘”  Ìl ‘”  Ìm ‘”  Ìn ‘”  Ìo ‘”  Ìp ‘”  Ìq ‘”  Ìr ‘”  Ìs ‘”  Ìt ‘”  Ìu ‘”  Ìv ‘”  Ìw ‘”  Ìx ‘”  Ìy ‘”  Ìz ‘”  Ì{ ‘”  Ì| ‘”  Ì} ‘”  Ì~ ‘”  Ì ‘”  Ì€ ‘”  Ì ‘”  Ì‚ ‘”  Ìƒ ‘”  Ì„ ‘”  Ì… ‘”  Ì† ‘”  Ì‡ ‘”  Ìˆ ‘”  Ì‰ ‘”  ÌŠ ‘”  Ì‹ ‘”  ÌŒ ‘”  Ì ‘”  Ì ‘”  Ì ‘”  Ì ‘”  Ì‘ ‘”  Ì’ ‘”  Ì“ ‘”  Ì” ‘”  Ì• ‘”  Ì– ‘”  Ì— ‘”  Ì˜ ‘”  Ì™ ‘”  Ìš ‘”  Ì› ‘”  Ìœ ‘”  Ì ‘”  Ì ‘”  ÌŸ ‘”  Ì  ‘”  Ì¡ ‘”  Ì¢ ‘”  Ì£ ‘”  Ì¤ ‘”  Ì¥ ‘”  Ì¦ ‘”  Ì§ ‘”  Ì¨ ‘”  Ì© ‘”  Ìª ‘”  Ì« ‘”  Ì¬ ‘”  Ì­ ‘”  Ì® ‘”  Ì¯ ‘”  Ì° ‘”  Ì± ‘”  Ì² ‘”  Ì³ ‘”  Ì´ ‘”  Ìµ ‘”  Ì¶ ‘”  Ì· ‘”  Ì¸ ‘”  Ì¹ ‘”  Ìº ‘”  Ì» ‘”  Ì¼ ‘”  Ì½ ‘”  Ì¾ ‘”  Ì¿ ‘”  ÌÀ ‘”  ÌÁ ‘”  ÌÂ ‘”  ÌÃ ‘”  ÌÄ ‘”  ÌÅ ‘”  ÌÆ ‘”  ÌÇ ‘”  ÌÈ ‘”  ÌÉ ‘”  ÌÊ ‘”  ÌË ‘”  ÌÌ ‘”  ÌÍ ‘”  ÌÎ ‘”  ÌÏ ‘”  ÌĞ ‘”  ÌÑ ‘”  ÌÒ ‘”  ÌÓ ‘”  ÌÔ ‘”  ÌÕ ‘”  ÌÖ ‘”  Ì× ‘”  ÌØ ‘”  ÌÙ ‘”  ÌÚ ‘”  ÌÛ ‘”  ÌÜ ‘”  Ìİ ‘”  ÌŞ ‘”  Ìß ‘”  Ìà ‘”  Ìá ‘”  Ìâ ‘”  Ìã ‘”  Ìä ‘”  Ìå ‘”  Ìæ ‘”  Ìç ‘”  Ìè ‘”  Ìé ‘”  Ìê ‘”  Ìë ‘”  Ìì ‘”  Ìí ‘”  Ìî ‘”  Ìï ‘”  Ìğ ‘”  Ìñ ‘”  Ìò ‘”  Ìó ‘”  Ìô ‘”  Ìõ ‘”  Ìö ‘”  Ì÷ ‘”  Ìø ‘”  Ìù ‘”  Ìú ‘”  Ìû ‘”  Ìü ‘”  Ìı ‘”  Ìş ‘”  Ìÿ ‘”  Í  ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í	 ‘”  Í
- ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í  ‘”  Í! ‘”  Í" ‘”  Í# ‘”  Í$ ‘”  Í% ‘”  Í& ‘”  Í' ‘”  Í( ‘”  Í) ‘”  Í* ‘”  Í+ ‘”  Í, ‘”  Í- ‘”  Í. ‘”  Í/ ‘”  Í0 ‘”  Í1 ‘”  Í2 ‘”  Í3 ‘”  Í4 ‘”  Í5 ‘”  Í6 ‘”  Í7 ‘”  Í8 ‘”  Í9 ‘”  Í: ‘”  Í; ‘”  Í< ‘”  Í= ‘”  Í> ‘”  Í? ‘”  Í@ ‘”  ÍA ‘”  ÍB ‘”  ÍC ‘”  ÍD ‘”  ÍE ‘”  ÍF ‘”  ÍG ‘”  ÍH ‘”  ÍI ‘”  ÍJ ‘”  ÍK ‘”  ÍL ‘”  ÍM ‘”  ÍN ‘”  ÍO ‘”  ÍP ‘”  ÍQ ‘”  ÍR ‘”  ÍS ‘”  ÍT ‘”  ÍU ‘”  ÍV ‘”  ÍW ‘”  ÍX ‘”  ÍY ‘”  ÍZ ‘”  Í[ ‘”  Í\ ‘”  Í] ‘”  Í^ ‘”  Í_ ‘”  Í` ‘”  Ía ‘”  Íb ‘”  Íc ‘”  Íd ‘”  Íe ‘”  Íf ‘”  Íg ‘”  Íh ‘”  Íi ‘”  Íj ‘”  Ík ‘”  Íl ‘”  Ím ‘”  Ín ‘”  Ío ‘”  Íp ‘”  Íq ‘”  Ír ‘”  Ís ‘”  Ít ‘”  Íu ‘”  Ív ‘”  Íw ‘”  Íx ‘”  Íy ‘”  Íz ‘”  Í{ ‘”  Í| ‘”  Í} ‘”  Í~ ‘”  Í ‘”  Í€ ‘”  Í ‘”  Í‚ ÔrH’§missing¦pluginÃ¦genAbcÂÔ  ÔrI”²dynamicImportCache¹exportAllDeclarationCache»exportNamedDeclarationCache«importCache’ÔrJ–¤type¥start£end«declarationªspecifiers¦source¶ExportNamedDeclarationÍ1¹Í1ÿÀ‘ÔrK•¤type¥start£end¥local¨exported¯ExportSpecifierÍ1ÂÍ1üÔrL”¤type¥start£end¤nameªIdentifierÍ1ÂÍ1İ»RecorderManagerStartOptionsLªIdentifierÍ1áÍ1ü»RecorderManagerStartOptionsÀJ¶ExportNamedDeclarationÍ2Í25À‘K¯ExportSpecifierÍ2
-Í22LªIdentifierÍ2
-Í2²getRecorderManagerLªIdentifierÍ2 Í22²getRecorderManagerÀ•ÔrM•¤type¥start£endªspecifiers¦source±ImportDeclaration +‘ÔrN”¤type¥start£end¥local¶ImportDefaultSpecifierLªIdentifier¥mediaÔrO•¤type¥start£end¥value£raw§Literal*¶@ohos.multimedia.media¸'@ohos.multimedia.media'M±ImportDeclaration-Ì•ÔrP•¤type¥start£end¨imported¥local¯ImportSpecifier6?LªIdentifier6?©UTSObjectLªIdentifier6?©UTSObjectP¯ImportSpecifierÌAÌDLªIdentifierÌAÌD£UTSLªIdentifierÌAÌD£UTSP¯ImportSpecifierÌFÌNLªIdentifierÌFÌN¨UniErrorLªIdentifierÌFÌN¨UniErrorP¯ImportSpecifierÌPÌZLªIdentifierÌPÌZªUTSHarmonyLªIdentifierÌPÌZªUTSHarmonyP¯ImportSpecifierÌ\ÌiLªIdentifierÌ\Ìi­defineSyncApiLªIdentifierÌ\Ìi­defineSyncApiO§LiteralÌqÌ»@dcloudio/uni-app-framework½"@dcloudio/uni-app-framework"M±ImportDeclarationÌ‘Ì·‘N¶ImportDefaultSpecifierÌ˜Ì¡LªIdentifierÌ˜Ì¡©fileIo__1O§LiteralÌ§Ì¶­@ohos.file.fs¯"@ohos.file.fs"M±ImportDeclarationÌ¹ÌÜ‘N¶ImportDefaultSpecifierÌÀÌÆLªIdentifierÌÀÌÆ¦fileIoO§LiteralÌÌÌÛ­@ohos.file.fs¯"@ohos.file.fs"M±ImportDeclarationÌŞÍ‘P¯ImportSpecifierÌçÌíLªIdentifierÌçÌí¦getEnvLªIdentifierÌçÌí¦getEnvO§LiteralÌõÍ»@dcloudio/uni-app-framework½"@dcloudio/uni-app-framework"
