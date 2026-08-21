@@ -49,6 +49,14 @@ function makeId(prefix: string): string {
 	return prefix + Date.now().toString()
 }
 
+function getPixelRatio(): number {
+	const info = uni.getSystemInfoSync()
+	if (info.pixelRatio > 0) {
+		return info.pixelRatio
+	}
+	return 1
+}
+
 function toObject(value: any | null): UTSJSONObject {
 	return value == null ? ({} as UTSJSONObject) : value as UTSJSONObject
 }
@@ -205,13 +213,20 @@ const props = defineProps({
 const emit = defineEmits(['avtinit', 'confirm', 'cancel', 'error'])
 const instance = getCurrentInstance()
 
+function resolveFillColor(): string {
+	if (props.fillColor == 'transparent') {
+		return 'rgba(0,0,0,0)'
+	}
+	return props.fillColor
+}
+
 const canvasId = ref<string>(makeId('up-cropper-'))
 const exportCanvasId = ref<string>(makeId('up-cropper-export-'))
 let canvasContext: CanvasContext | null = null
 let exportCanvasContext: CanvasContext | null = null
 let ctx: CanvasRenderingContext2D | null = null
 let exportCtx: CanvasRenderingContext2D | null = null
-let imageElement: any | null = null
+let imageElement: UniImageElement | null = null
 const imagePath = ref<string>('')
 const imageWidth = ref<number>(0)
 const imageHeight = ref<number>(0)
@@ -281,13 +296,32 @@ function initCanvas(): Promise<void> {
 			component: instance?.proxy,
 			success: (context: CanvasContext) => {
 				canvasContext = context
-				ctx = context.getContext('2d')
+				const c2d = context.getContext('2d')
+				if (c2d == null) {
+					reject(new Error('Canvas context is not ready'))
+					return
+				}
+				const pixelRatio = getPixelRatio()
+				const canvas = c2d.canvas
+				canvas.width = canvasWidth.value * pixelRatio
+				canvas.height = canvasHeight.value * pixelRatio
+				c2d.scale(pixelRatio, pixelRatio)
+				ctx = c2d
 				uni.createCanvasContextAsync({
 					id: exportCanvasId.value as string.IDString,
 					component: instance?.proxy,
 					success: (exportContext: CanvasContext) => {
 						exportCanvasContext = exportContext
-						exportCtx = exportContext.getContext('2d')
+						const export2d = exportContext.getContext('2d')
+						if (export2d == null) {
+							reject(new Error('Export canvas context is not ready'))
+							return
+						}
+						const exportCanvas = export2d.canvas
+						exportCanvas.width = outputWidth.value * pixelRatio
+						exportCanvas.height = outputHeight.value * pixelRatio
+						export2d.scale(pixelRatio, pixelRatio)
+						exportCtx = export2d
 						resolve()
 					},
 					fail: (err: UniError) => {
@@ -409,11 +443,11 @@ function draw(): void {
 	context.beginPath()
 	context.rect(cropL, cropT, cropW, cropH)
 	context.clip()
-	context.fillStyle = props.fillColor
+	context.fillStyle = resolveFillColor()
 	context.fillRect(cropL, cropT, cropW, cropH)
 	context.translate(imgX + displayW / 2, imgY + displayH / 2)
 	context.rotate(rotateDeg.value * Math.PI / 180)
-	context.drawImage(image, -displayW / 2, -displayH / 2, displayW, displayH)
+	context.drawImage(image as UniImageElementImpl, -displayW / 2, -displayH / 2, displayW, displayH)
 	context.restore()
 	context.strokeStyle = '#ffffff'
 	context.lineWidth = 2
@@ -421,7 +455,6 @@ function draw(): void {
 	if (canChangeSizeLocal.value) {
 		drawResizeHandles(context, cropL, cropT, cropW, cropH)
 	}
-	context.draw()
 }
 
 function createCanvasImage(path: string): void {
@@ -642,7 +675,7 @@ function drawPreview(): void {
 	context.beginPath()
 	context.rect(x, y, previewW, previewH)
 	context.clip()
-	context.fillStyle = props.fillColor
+	context.fillStyle = resolveFillColor()
 	context.fillRect(x, y, previewW, previewH)
 	const scaleX = previewW / cropW
 	const scaleY = previewH / cropH
@@ -652,12 +685,11 @@ function drawPreview(): void {
 	const displayH = numberValue(displayHeight.value, 0)
 	context.translate(x + (imageX.value + displayW / 2 - cropL) * scaleX, y + (imageY.value + displayH / 2 - cropT) * scaleY)
 	context.rotate(rotateDeg.value * Math.PI / 180)
-	context.drawImage(image, -displayW * scaleX / 2, -displayH * scaleY / 2, displayW * scaleX, displayH * scaleY)
+	context.drawImage(image as UniImageElementImpl, -displayW * scaleX / 2, -displayH * scaleY / 2, displayW * scaleX, displayH * scaleY)
 	context.restore()
 	context.strokeStyle = '#ffffff'
 	context.lineWidth = 1
 	context.strokeRect(x, y, previewW, previewH)
-	context.draw()
 }
 
 function preview(): void {
@@ -689,7 +721,7 @@ function confirm(): void {
 	const imgX = numberValue(imageX.value, 0)
 	const imgY = numberValue(imageY.value, 0)
 	context.clearRect(0, 0, outputW, outputH)
-	context.fillStyle = props.fillColor
+	context.fillStyle = resolveFillColor()
 	context.fillRect(0, 0, outputW, outputH)
 	context.save()
 	const scaleX = outputW / Math.max(1, cropW)
@@ -697,9 +729,8 @@ function confirm(): void {
 	context.scale(scaleX, scaleY)
 	context.translate(imgX + displayW / 2 - cropL, imgY + displayH / 2 - cropT)
 	context.rotate(rotateDeg.value * Math.PI / 180)
-	context.drawImage(image, -displayW / 2, -displayH / 2, displayW, displayH)
+	context.drawImage(image as UniImageElementImpl, -displayW / 2, -displayH / 2, displayW, displayH)
 	context.restore()
-	context.draw()
 	const quality = clamp(numberValue(props.quality, 1), 0, 1)
 	const path = canvas.toDataURL('image/png', quality)
 	visible.value = false

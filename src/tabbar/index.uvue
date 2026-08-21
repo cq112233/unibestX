@@ -55,6 +55,7 @@ onMounted(() => {
 
   // #ifndef MP-WEIXIN || MP-ALIPAY
   uni.hideTabBar({
+    animation: false,
     fail: (err: any) => {
       console.log('hideTabBar fail: ', err);
     }

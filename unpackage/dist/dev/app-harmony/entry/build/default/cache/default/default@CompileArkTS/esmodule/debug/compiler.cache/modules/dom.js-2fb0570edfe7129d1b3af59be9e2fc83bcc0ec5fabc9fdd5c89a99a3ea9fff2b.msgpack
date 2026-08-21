@@ -1,0 +1,4168 @@
+Ôr@Ÿªassertions¤code´customTransformCache¬dependencies¢id¤meta±moduleSideEffects¬originalCode±originalSourcemap«resolvedIds®sourcemapChainµsyntheticNamedExportsµtransformDependencies®transformFiles¨cacheAstÔrAÚ‡4// packages/uni-dom/src/CSSStyleDeclaration.ts
+var CSSStyleDeclaration = class {
+  constructor(element) {
+    this._element = element;
+  }
+  get element() {
+    return this._element;
+  }
+  getPropertyValue(property) {
+    return this._element.getCSSPropertyValue(property) || "";
+  }
+  setProperty(property, value, priority) {
+    this._element.updateStyle(property, value);
+  }
+  removeProperty(property) {
+    return "";
+  }
+  getPropertyPriority(property) {
+    return "";
+  }
+};
+
+// packages/uni-dom/src/NativeMap.ts
+var NativeMap = class extends Map {
+  get(key) {
+    const value = super.get(key);
+    return value === void 0 ? null : value;
+  }
+};
+
+// packages/uni-dom/src/NodeData.ts
+var NodeData = class {
+  constructor(id, name, attrs = new NativeMap(), style = new NativeMap()) {
+    this.id = id;
+    this.name = name;
+    this.attrs = attrs;
+    this.style = style;
+  }
+};
+
+// packages/uni-dom/src/UniCallbackWrapper.ts
+var UniCallbackWrapper = class {
+  constructor(callback) {
+    this.callback = callback;
+  }
+};
+
+// packages/uni-dom/src/DOMRect.ts
+var DOMRect = class {
+  constructor(x, y, width, height) {
+    this._x = x ?? 0;
+    this._y = y ?? 0;
+    this._width = width ?? 0;
+    this._height = height ?? 0;
+  }
+  get x() {
+    return this._x;
+  }
+  set x(x) {
+    this._x = x;
+  }
+  get y() {
+    return this._y;
+  }
+  set y(y) {
+    this._y = y;
+  }
+  get width() {
+    return this._width;
+  }
+  set width(width) {
+    this._width = width;
+  }
+  get height() {
+    return this._height;
+  }
+  set height(height) {
+    this._height = height;
+  }
+  get left() {
+    if (this._width >= 0) {
+      return this._x;
+    }
+    return this._x + this._width;
+  }
+  set left(left) {
+  }
+  get top() {
+    if (this._height >= 0) {
+      return this._y;
+    }
+    return this._y + this._height;
+  }
+  set top(top) {
+  }
+  get right() {
+    if (this._width >= 0) {
+      return this._x + this._width;
+    }
+    return this._x;
+  }
+  set right(right) {
+  }
+  get bottom() {
+    if (this._height >= 0) {
+      return this._y + this._height;
+    }
+    return this._y;
+  }
+  set bottom(bottom) {
+  }
+  toJSON() {
+    return {
+      x: this.x,
+      y: this.y,
+      width: this.width,
+      height: this.height,
+      left: this.left,
+      top: this.top,
+      right: this.right,
+      bottom: this.bottom
+    };
+  }
+};
+
+// ../uni-app-next/packages/uni-shared/dist/uni-shared.es.js
+var BUILT_IN_TAG_NAMES = [
+  "ad",
+  "ad-content-page",
+  "ad-draw",
+  "audio",
+  "button",
+  "camera",
+  "canvas",
+  "checkbox",
+  "checkbox-group",
+  "cover-image",
+  "cover-view",
+  "editor",
+  "form",
+  "functional-page-navigator",
+  "icon",
+  "image",
+  "input",
+  "label",
+  "live-player",
+  "live-pusher",
+  "map",
+  "movable-area",
+  "movable-view",
+  "navigator",
+  "official-account",
+  "open-data",
+  "picker",
+  "picker-view",
+  "picker-view-column",
+  "progress",
+  "radio",
+  "radio-group",
+  "rich-text",
+  "scroll-view",
+  "slider",
+  "swiper",
+  "swiper-item",
+  "switch",
+  "text",
+  "textarea",
+  "video",
+  "view",
+  "web-view",
+  "location-picker",
+  "location-view"
+];
+var BUILT_IN_TAGS = BUILT_IN_TAG_NAMES.map((tag) => "uni-" + tag);
+var H5_BUILT_IN_TAG_NAMES = BUILT_IN_TAG_NAMES.filter((tag) => tag !== "audio");
+var H5_BUILT_IN_TAGS = H5_BUILT_IN_TAG_NAMES.map((tag) => "uni-" + tag);
+var TAGS = [
+  "app",
+  "layout",
+  "content",
+  "main",
+  "top-window",
+  "left-window",
+  "right-window",
+  "tabbar",
+  "page",
+  "page-head",
+  "page-wrapper",
+  "page-body",
+  "page-refresh",
+  "actionsheet",
+  "modal",
+  "toast",
+  "resize-sensor",
+  "shadow-root"
+].map((tag) => "uni-" + tag);
+var UVUE_WEB_BUILT_IN_TAGS = [
+  "page-container",
+  "list-view",
+  "list-item",
+  "sticky-section",
+  "sticky-header",
+  "cloud-db-element",
+  "loading-element",
+  "loading"
+].map((tag) => "uni-" + tag);
+var UVUE_MP_BUILT_IN_TAGS = [
+  "list-view",
+  "list-item",
+  "sticky-section",
+  "sticky-header",
+  "cloud-db-element",
+  "loading-element"
+].map((tag) => "uni-" + tag);
+var UVUE_HARMONY_BUILT_IN_TAGS = [
+  // TODO åˆ—å‡ºå®Œæ•´åˆ—è¡¨
+  ...BUILT_IN_TAG_NAMES,
+  "volume-panel"
+];
+var UNI_UI_CONFLICT_TAGS = ["list-item"].map((tag) => "uni-" + tag);
+var NVUE_CUSTOM_COMPONENTS = [
+  "ad",
+  "ad-draw",
+  "button",
+  "checkbox-group",
+  "checkbox",
+  "form",
+  "icon",
+  "label",
+  "movable-area",
+  "movable-view",
+  "navigator",
+  "picker",
+  "progress",
+  "radio-group",
+  "radio",
+  "rich-text",
+  "swiper-item",
+  "swiper",
+  "switch",
+  "slider",
+  "picker-view",
+  "picker-view-column"
+];
+var UVUE_BUILT_IN_EASY_COMPONENTS = [
+  "map",
+  "camera",
+  "live-player",
+  "live-pusher",
+  "loading",
+  "web-view",
+  "rich-text",
+  "page-container",
+  "editor",
+  "video"
+];
+var UVUE_CUSTOM_COMPONENTS = [
+  ...NVUE_CUSTOM_COMPONENTS,
+  ...UVUE_BUILT_IN_EASY_COMPONENTS
+];
+var COMPONENT_SELECTOR_PREFIX = "uni-";
+var COMPONENT_PREFIX = "v-" + COMPONENT_SELECTOR_PREFIX;
+function once(fn, ctx = null) {
+  let res;
+  return ((...args) => {
+    if (fn) {
+      res = fn.apply(ctx, args);
+      fn = null;
+    }
+    return res;
+  });
+}
+var unitRE = new RegExp(`"[^"]+"|'[^']+'|url\\([^)]+\\)|(\\d*\\.?\\d+)[r|u]px`, "g");
+var defaultRpx2Unit = {
+  unit: "rem",
+  unitRatio: 10 / 320,
+  unitPrecision: 5
+};
+var invokeCreateErrorHandler = once((app, createErrorHandler) => {
+  return createErrorHandler(app);
+});
+var E = function() {
+};
+E.prototype = {
+  _id: 1,
+  on: function(name, callback, ctx) {
+    var e = this.e || (this.e = {});
+    (e[name] || (e[name] = [])).push({
+      fn: callback,
+      ctx,
+      _id: this._id
+    });
+    return this._id++;
+  },
+  once: function(name, callback, ctx) {
+    var self2 = this;
+    function listener() {
+      self2.off(name, listener);
+      callback.apply(ctx, arguments);
+    }
+    listener._ = callback;
+    return this.on(name, listener, ctx);
+  },
+  emit: function(name) {
+    var data = [].slice.call(arguments, 1);
+    var evtArr = ((this.e || (this.e = {}))[name] || []).slice();
+    var i = 0;
+    var len = evtArr.length;
+    for (i; i < len; i++) {
+      evtArr[i].fn.apply(evtArr[i].ctx, data);
+    }
+    return this;
+  },
+  off: function(name, event) {
+    var e = this.e || (this.e = {});
+    var evts = e[name];
+    var liveEvents = [];
+    if (evts && event) {
+      for (var i = evts.length - 1; i >= 0; i--) {
+        if (evts[i].fn === event || evts[i].fn._ === event || evts[i]._id === event) {
+          evts.splice(i, 1);
+          break;
+        }
+      }
+      liveEvents = evts;
+    }
+    liveEvents.length ? e[name] = liveEvents : delete e[name];
+    return this;
+  }
+};
+var UniDOMStringMap = class extends Map {
+  constructor(options) {
+    super();
+    this._options = options;
+  }
+  get(key) {
+    const normalizedKey = normalizeDatasetKey(String(key));
+    return super.has(normalizedKey) ? super.get(normalizedKey) : null;
+  }
+  set(key, value) {
+    var _a, _b;
+    const normalizedKey = normalizeDatasetKey(String(key));
+    super.set(normalizedKey, value);
+    (_b = (_a = this._options) === null || _a === void 0 ? void 0 : _a.onSet) === null || _b === void 0 ? void 0 : _b.call(_a, normalizedKey, value);
+    return this;
+  }
+  has(key) {
+    return super.has(normalizeDatasetKey(String(key)));
+  }
+  delete(key) {
+    var _a, _b;
+    const normalizedKey = normalizeDatasetKey(String(key));
+    const deleted = super.delete(normalizedKey);
+    if (deleted) {
+      (_b = (_a = this._options) === null || _a === void 0 ? void 0 : _a.onDelete) === null || _b === void 0 ? void 0 : _b.call(_a, normalizedKey);
+    }
+    return deleted;
+  }
+  clear() {
+    const keys = Array.from(super.keys());
+    super.clear();
+    keys.forEach((key) => {
+      var _a, _b;
+      return (_b = (_a = this._options) === null || _a === void 0 ? void 0 : _a.onDelete) === null || _b === void 0 ? void 0 : _b.call(_a, key);
+    });
+  }
+};
+function normalizeDatasetKey(key) {
+  const normalizedKey = key.replace(/[A-Z]/g, (char) => char.toLowerCase());
+  if (normalizedKey.indexOf("data-") !== 0) {
+    return key;
+  }
+  return normalizedKey.slice(5).replace(/-([a-z])/g, (_, char) => char.toUpperCase());
+}
+function isReservedDatasetKey(target, key) {
+  return key in target;
+}
+function setDatasetValue(dataset, key, value) {
+  Map.prototype.set.call(dataset, normalizeDatasetKey(String(key)), value);
+}
+function initDataset(dataset, source) {
+  if (!source) {
+    return;
+  }
+  if (source instanceof Map) {
+    source.forEach((value, key) => setDatasetValue(dataset, key, value));
+    return;
+  }
+  Object.keys(source).forEach((key) => setDatasetValue(dataset, key, source[key]));
+}
+function createUniDOMStringMap(source, options) {
+  const target = new UniDOMStringMap(options);
+  initDataset(target, source);
+  return new Proxy(target, {
+    get(target2, key, receiver) {
+      if (typeof key === "string") {
+        if (!isReservedDatasetKey(target2, key)) {
+          return target2.has(key) ? target2.get(key) : null;
+        }
+      }
+      const value = Reflect.get(target2, key, target2);
+      if (typeof value === "function") {
+        return (...args) => {
+          const result = value.apply(target2, args);
+          return result === target2 ? receiver : result;
+        };
+      }
+      return value;
+    },
+    set(target2, key, value, receiver) {
+      if (typeof key === "string" && !isReservedDatasetKey(target2, key)) {
+        target2.set(key, value);
+        return true;
+      }
+      return Reflect.set(target2, key, value, receiver);
+    },
+    deleteProperty(target2, key) {
+      if (typeof key === "string" && !isReservedDatasetKey(target2, key) && target2.has(key)) {
+        return target2.delete(key);
+      }
+      return Reflect.deleteProperty(target2, key);
+    },
+    has(target2, key) {
+      if (typeof key === "string" && target2.has(key)) {
+        return true;
+      }
+      return Reflect.has(target2, key);
+    },
+    ownKeys(target2) {
+      return Array.from(target2.keys()).filter((key) => !isReservedDatasetKey(target2, key));
+    },
+    getOwnPropertyDescriptor(target2, key) {
+      if (typeof key === "string" && !isReservedDatasetKey(target2, key) && target2.has(key)) {
+        return {
+          configurable: true,
+          enumerable: true,
+          value: target2.get(key),
+          writable: true
+        };
+      }
+      return Reflect.getOwnPropertyDescriptor(target2, key);
+    }
+  });
+}
+
+// packages/uni-dom/src/UniEvent/types.ts
+var UniEvent = class {
+  constructor(type, eventInit) {
+    this.__v_skip = true;
+    this.timeStamp = Date.now();
+    this._bubbles = false;
+    this._cancelable = false;
+    // æš‚æ—¶ä½¿ç”¨å±æ€§å£°æ˜ï¼Œç”¨äºå†…éƒ¨é‡å†™
+    this.stopPropagation = () => {
+    };
+    this.preventDefault = () => {
+    };
+    this.type = type;
+    if (eventInit) {
+      this._bubbles = !!eventInit.bubbles;
+      this._cancelable = !!eventInit.cancelable;
+    }
+  }
+  get [Symbol.toStringTag]() {
+    return "UniEvent";
+  }
+  get bubbles() {
+    return this._bubbles;
+  }
+  set bubbles(value) {
+  }
+  get cancelable() {
+    return this._cancelable;
+  }
+  set cancelable(value) {
+  }
+};
+
+// packages/uni-dom/src/UniEvent/UniMouseEvent.ts
+var UniMouseEvent = class extends UniEvent {
+  constructor(type, x, y, clientX, clientY, pageX, pageY, screenX, screenY) {
+    super(type, {
+      bubbles: true,
+      cancelable: true
+    });
+    this.x = x;
+    this.y = y;
+    this.clientX = clientX;
+    this.clientY = clientY;
+    this.pageX = pageX;
+    this.pageY = pageY;
+    this.screenX = screenX;
+    this.screenY = screenY;
+  }
+};
+
+// packages/uni-dom/src/UniEvent/UniPointerEvent.ts
+var UniPointerEvent = class extends UniEvent {
+  constructor(type, x, y, clientX, clientY, pageX, pageY, screenX, screenY) {
+    super(type, {
+      bubbles: true,
+      cancelable: true
+    });
+    this.x = x;
+    this.y = y;
+    this.clientX = clientX;
+    this.clientY = clientY;
+    this.pageX = pageX;
+    this.pageY = pageY;
+    this.screenX = screenX;
+    this.screenY = screenY;
+  }
+};
+
+// packages/uni-dom/src/UniEvent/UniTouchEvent.ts
+var UniTouch = class {
+  constructor() {
+    this.clientX = 0;
+    this.clientY = 0;
+    this.identifier = 0;
+    this.pageX = 0;
+    this.pageY = 0;
+    this.screenX = 0;
+    this.screenY = 0;
+    this.force = null;
+  }
+};
+var UniTouchEvent = class extends UniEvent {
+  constructor(type, touches, changedTouches) {
+    super(type, { bubbles: true, cancelable: true });
+    this.touches = touches;
+    this.changedTouches = changedTouches;
+  }
+};
+
+// packages/uni-dom/src/UniNativeAppManager.ts
+var mainApp = null;
+function setUniApp(app) {
+  mainApp = app;
+}
+function getUniApp() {
+  return mainApp;
+}
+
+// packages/uni-dom/src/BuiltInElement.ts
+var store = /* @__PURE__ */ new Map();
+function define(name, constructor) {
+  store.set(name, constructor);
+}
+function find(name) {
+  return store.get(name);
+}
+var elementCache = /* @__PURE__ */ new Map();
+function buildElement(elementInfo, pageOrId) {
+  const app = getUniApp();
+  let page;
+  let pageId;
+  if (typeof pageOrId === "string" || typeof pageOrId === "number") {
+    pageId = String(pageOrId);
+    page = app.pageManager.findPageById(pageId);
+  } else {
+    page = pageOrId;
+    pageId = page.pageId;
+  }
+  const tagName = elementInfo.tagName;
+  const key = `${tagName}:${pageId}:${elementInfo.id}`;
+  if (elementCache.has(key)) {
+    const el2 = elementCache.get(key)?.deref();
+    if (el2) {
+      return el2;
+    }
+  }
+  let elementConstructor = find(tagName);
+  if (!elementConstructor) {
+    elementConstructor = find(elementInfo.originTagName);
+    if (!elementConstructor) {
+      throw new Error(`Cannot find element constructor for tag: ${tagName}`);
+    }
+  }
+  const el = new elementConstructor(elementInfo.id, page, tagName);
+  if (typeof elementInfo.vueId !== "undefined") {
+    el.ext.set("vueComponentId", elementInfo.vueId);
+  }
+  elementCache.set(key, new WeakRef(el));
+  return el;
+}
+
+// packages/uni-dom/src/FullscreenEvent/change.ts
+var fullscreenchangeEvent = class extends UniEvent {
+  constructor() {
+    super("fullscreenchange");
+  }
+};
+
+// packages/uni-dom/src/FullscreenEvent/error.ts
+var FullscreenError = class extends UniEvent {
+  constructor(errSubject, errCode, errMsg) {
+    super("fullscreenerror");
+    this.errCode = 106601;
+    this.errSubject = "requestFullscreen";
+    this.data = {};
+    this.errMsg = "";
+    this.errCode = errCode;
+    this.errSubject = errSubject;
+    this.errMsg = errMsg ?? `${errSubject}:fail`;
+    this.cause = new Error(this.errMsg);
+  }
+};
+var AlreadyFullScreenError = class extends FullscreenError {
+  constructor() {
+    super(
+      "requestFullscreen",
+      106600 /* AlreadyFullScreen */,
+      `requestFullscreen:fail Already in fullscreen`
+    );
+  }
+};
+var ElementNotSupportFullScreenError = class extends FullscreenError {
+  constructor() {
+    super(
+      "requestFullscreen",
+      106601 /* ElementNotSupportFullScreen */,
+      `requestFullscreen:fail Element does not support fullscreen`
+    );
+  }
+};
+var NoElementFullScreenError = class extends FullscreenError {
+  constructor(errSubject) {
+    super(
+      errSubject,
+      106602 /* NoElementFullScreen */,
+      `${errSubject}:fail No element is in fullscreen`
+    );
+  }
+};
+var PageNotReadyOrDestroyedError = class extends FullscreenError {
+  constructor(errSubject) {
+    super(
+      errSubject,
+      106603 /* PageNotReadyOrDestroyed */,
+      `${errSubject}:fail Page is not ready or has been destroyed`
+    );
+  }
+};
+var ComponentNotReadyError = class extends FullscreenError {
+  constructor(errSubject) {
+    super(
+      errSubject,
+      106604 /* ComponentNotReady */,
+      `${errSubject}:fail Component is not ready`
+    );
+  }
+};
+var fullscreenerrorEvent = class extends UniEvent {
+  constructor() {
+    super("fullscreenerror");
+  }
+};
+function getFullscreenError(errSubject, errCode = 106601) {
+  switch (errCode) {
+    case 106600 /* AlreadyFullScreen */:
+      return new AlreadyFullScreenError();
+    case 106601 /* ElementNotSupportFullScreen */:
+      return new ElementNotSupportFullScreenError();
+    case 106602 /* NoElementFullScreen */:
+      return new NoElementFullScreenError(errSubject);
+    case 106603 /* PageNotReadyOrDestroyed */:
+      return new PageNotReadyOrDestroyedError(errSubject);
+    case 106604 /* ComponentNotReady */:
+      return new ComponentNotReadyError(errSubject);
+  }
+  return new FullscreenError(errSubject, errCode);
+}
+
+// packages/uni-dom/src/UniElement.ts
+var UNI_MOUSE_EVENT_TYPES = ["mousedown", "mousemove", "mouseup"];
+var UNI_POINTER_EVENT_TYPES = ["click", "tap"];
+var UNI_TOUCH_EVENT_TYPES = [
+  "touchstart",
+  "touchmove",
+  "touchcancel",
+  "touchend",
+  "longpress",
+  "longtap"
+];
+var elementDatasetCache = /* @__PURE__ */ new WeakMap();
+function getPageDatasetCache(page) {
+  let cache = elementDatasetCache.get(page);
+  if (!cache) {
+    cache = /* @__PURE__ */ new Map();
+    elementDatasetCache.set(page, cache);
+  }
+  return cache;
+}
+var UNI_BASE_EVENT_TYPES = [
+  ...UNI_MOUSE_EVENT_TYPES,
+  ...UNI_POINTER_EVENT_TYPES,
+  ...UNI_TOUCH_EVENT_TYPES
+];
+var UniElementImpl = class {
+  constructor(id, page, tagName) {
+    this.ext = /* @__PURE__ */ new Map();
+    this._style = null;
+    this._nativeElement = null;
+    this.__id = id;
+    this.page = page;
+    this.tagName = this.nodeName = tagName.toUpperCase();
+  }
+  get uniPage() {
+    return this.page.__uniPage;
+  }
+  // accessor ä½¿ UniCustomElement Proxy å°† dataset èµ‹å€¼ä¿ç•™åœ¨ JS elementï¼Œé¿å…è½¬å‘åˆ° iOS uts delegateã€‚
+  get dataset() {
+    const cache = getPageDatasetCache(this.page);
+    let dataset = cache.get(this.__id);
+    if (!dataset) {
+      dataset = createUniDOMStringMap();
+      cache.set(this.__id, dataset);
+    }
+    return dataset;
+  }
+  set dataset(dataset) {
+    getPageDatasetCache(this.page).set(this.__id, dataset);
+  }
+  /**
+   * ç”¨äºå…¼å®¹è€ç‰ˆæœ¬ä½¿ç”¨æ–¹å¼
+   * @internal
+   */
+  get pageId() {
+    return this.page.pageId;
+  }
+  get [Symbol.toStringTag]() {
+    return "UniElement";
+  }
+  get nativeElement() {
+    if (!this._nativeElement && this.page) {
+      if (true) {
+        this._nativeElement = new UniElementJs(
+          Number(this.page.pageId),
+          this.__id
+        );
+      } else {
+        this._nativeElement = this.page.page.getUniElementJsById(
+          this.__id
+        );
+      }
+    }
+    if (true) {
+      if (!this._nativeElement) {
+        console.warn(
+          `Element ${this.tagName} (id: ${this.__id}) on page ${this.page.pageId} does not have a native element.`
+        );
+      }
+    }
+    return this._nativeElement;
+  }
+  /**
+   * TODO çº æ­£ç±»å‹
+   */
+  getNodeId() {
+    return this.__id;
+  }
+  get offsetLeft() {
+    return this.nativeElement.offsetLeft;
+  }
+  get offsetTop() {
+    return this.nativeElement.offsetTop;
+  }
+  get offsetWidth() {
+    return this.nativeElement.offsetWidth;
+  }
+  get offsetHeight() {
+    return this.nativeElement.offsetHeight;
+  }
+  get style() {
+    if (!this._style) {
+      this._style = new CSSStyleDeclaration(this.nativeElement);
+    }
+    return this._style;
+  }
+  get parentElement() {
+    return this.nativeElement.parentElement;
+  }
+  get children() {
+    return this.nativeElement.children;
+  }
+  get previousElementSibling() {
+    return this.nativeElement.previousElementSibling;
+  }
+  get nextElementSibling() {
+    return this.nativeElement.nextElementSibling;
+  }
+  get classList() {
+    const classList = this.nativeElement.classList;
+    let normalized = null;
+    for (let i = 0; i < classList.length; i++) {
+      const item = classList[i];
+      if (item.charCodeAt(0) === 94) {
+        if (normalized === null) {
+          normalized = classList.slice(0, i);
+        }
+        let start = 1;
+        while (item.charCodeAt(start) === 94) {
+          start++;
+        }
+        normalized.push(item.slice(start));
+      } else if (normalized !== null) {
+        normalized.push(item);
+      }
+    }
+    return normalized || classList;
+  }
+  get scrollWidth() {
+    return this.nativeElement.scrollWidth;
+  }
+  get scrollHeight() {
+    return this.nativeElement.scrollHeight;
+  }
+  get scrollLeft() {
+    return this.nativeElement.scrollLeft;
+  }
+  set scrollLeft(v) {
+    this.nativeElement.scrollLeft = v;
+  }
+  get scrollTop() {
+    return this.nativeElement.scrollTop;
+  }
+  set scrollTop(v) {
+    this.nativeElement.scrollTop = v;
+  }
+  takeSnapshot(options) {
+    this.nativeElement.takeSnapshot({
+      success: (res) => {
+        options?.success?.(res);
+        options?.complete?.(res);
+      },
+      fail: (err) => {
+        options?.fail?.(err);
+        options?.complete?.(err);
+      },
+      complete: (_) => {
+      }
+    });
+  }
+  appendChild(aChild) {
+    throw new Error("Method not implemented.");
+  }
+  insertBefore(newChild, refChild) {
+    throw new Error("Method not implemented.");
+  }
+  setAttribute(key, value) {
+    this.nativeElement.setAttribute(key, value);
+  }
+  setAnyAttribute(key, value) {
+    this.nativeElement.setAttribute(key, value);
+  }
+  getAttribute(key) {
+    return this.nativeElement.getAttribute(key) ?? null;
+  }
+  getAnyAttribute(key) {
+    return this.nativeElement.getAttribute(key);
+  }
+  hasAttribute(key) {
+    return this.nativeElement.hasAttribute(key);
+  }
+  removeAttribute(key) {
+    this.nativeElement.removeAttribute(key);
+  }
+  updateStyle(map) {
+    throw new Error("Method not implemented.");
+  }
+  getBoundingClientRect() {
+    return this.nativeElement.getBoundingClientRect() ?? new DOMRect();
+  }
+  getBoundingClientRectAsync(options) {
+    if (options) {
+      return new Promise((resolve, reject) => {
+        const rect = this.getBoundingClientRect();
+        options?.success?.(rect);
+        options?.complete?.(rect);
+        resolve(rect);
+      });
+    } else {
+      return new Promise((resolve, reject) => {
+        resolve(this.getBoundingClientRect());
+      });
+    }
+  }
+  getDrawableContext() {
+    throw new Error("Method not implemented.");
+  }
+  addEventListener(type, callback) {
+    const callbackWrapper = new UniCallbackWrapper(callback);
+    this.nativeElement.addEventListener(type, callback);
+    return callbackWrapper;
+  }
+  removeEventListener(type, callbackWrapper) {
+    const callback = callbackWrapper.callback;
+    this.nativeElement.removeEventListener(type, callback);
+  }
+  removeChild(aChild) {
+    throw new Error("Method not implemented.");
+  }
+  remove() {
+    throw new Error("Method not implemented.");
+  }
+  dispatchEvent(type, value) {
+    this.nativeElement.dispatchEvent(
+      value ? value : type
+    );
+  }
+  scrollTo(x, y) {
+    this.nativeElement.scrollTo(x, y);
+  }
+  scrollBy(x, y) {
+    this.nativeElement.scrollBy(x, y);
+  }
+  querySelector(selector) {
+    return this.nativeElement.querySelector(selector);
+  }
+  querySelectorAll(selector) {
+    return this.nativeElement.querySelectorAll(selector);
+  }
+  focus() {
+  }
+  blur() {
+  }
+  getIOSView() {
+    return null;
+  }
+  /**
+   * @deprecated use .uniPage
+   */
+  getPage() {
+    return this.uniPage;
+  }
+  animate(keyframes, options) {
+    return this.nativeElement.animate(keyframes, options);
+  }
+  getHarmonyController() {
+    return null;
+  }
+  requestFullscreen(options) {
+    const err = new ElementNotSupportFullScreenError();
+    options?.fail?.(err);
+    options?.complete?.(err);
+  }
+  getDelegate(prop) {
+    if (this.pageId) {
+      const delegate = this.page.page.getUniElementExtById?.(this.__id);
+      const value = delegate?.[prop];
+      return typeof value === "function" ? value.bind(delegate) : value;
+    }
+    return void 0;
+  }
+  setDelegate(prop, value) {
+    if (this.pageId) {
+      const delegate = this.page.page.getUniElementExtById?.(this.__id);
+      if (delegate) {
+        delegate[prop] = value;
+        return true;
+      }
+    }
+    return false;
+  }
+  static buildEvent(nativeEvent, page, event) {
+    if (!event) {
+      if (UNI_MOUSE_EVENT_TYPES.includes(nativeEvent.type)) {
+        const e = nativeEvent;
+        event = new UniMouseEvent(
+          nativeEvent.type,
+          e.x,
+          e.y,
+          e.clientX,
+          e.clientY,
+          e.pageX,
+          e.pageY,
+          e.screenX,
+          e.screenY
+        );
+      } else if (UNI_POINTER_EVENT_TYPES.includes(nativeEvent.type)) {
+        const e = nativeEvent;
+        event = new UniPointerEvent(
+          nativeEvent.type,
+          e.x,
+          e.y,
+          e.clientX,
+          e.clientY,
+          e.pageX,
+          e.pageY,
+          e.screenX,
+          e.screenY
+        );
+      } else if (UNI_TOUCH_EVENT_TYPES.includes(nativeEvent.type)) {
+        const e = nativeEvent;
+        event = new UniTouchEvent(nativeEvent.type, e.touches, e.changedTouches);
+      } else {
+        event = new UniEvent(nativeEvent.type);
+      }
+    }
+    event.target = nativeEvent.target ? buildElement(nativeEvent.target, page) : null;
+    event.currentTarget = nativeEvent.currentTarget ? buildElement(nativeEvent.currentTarget, page) : null;
+    event.stopPropagation = nativeEvent.stopPropagation;
+    event.preventDefault = nativeEvent.preventDefault;
+    return event;
+  }
+};
+
+// packages/uni-dom/src/Text.ts
+var UniTextElementImpl = class extends UniElementImpl {
+  get value() {
+    return this.nativeElement.value;
+  }
+  set value(val) {
+    this.nativeElement.value = val;
+  }
+  getTextExtra() {
+    throw new Error("Method not implemented.");
+  }
+};
+
+// packages/uni-dom/src/UniCommentElement.ts
+var UniCommentElementImpl = class extends UniElementImpl {
+  get [Symbol.toStringTag]() {
+    return "UniComment";
+  }
+};
+
+// packages/uni-dom/src/UniDocument.ts
+var UniDocumentImpl = class {
+  constructor(page) {
+    this.page = page;
+  }
+  createElement() {
+  }
+  createComment() {
+  }
+  waitNativeRender(callback) {
+    this.page?.waitNativeRender(callback);
+  }
+};
+
+// packages/uni-dom/src/GlobalDocument.ts
+var GlobalDocument = class {
+  get body() {
+    this.checkRootDocument();
+    return {
+      page: this.uniPage,
+      appendChild() {
+      },
+      insertBefore() {
+      },
+      removeChild() {
+      }
+    };
+  }
+  checkRootDocument() {
+    if (!this.uniPage) {
+      this.uniPage = {
+        document: new UniDocumentImpl()
+      };
+    }
+  }
+  createElement(data) {
+    this.checkRootDocument();
+    return this.uniPage.document.createElement(data);
+  }
+  createComment(data) {
+    this.checkRootDocument();
+    return this.uniPage.document.createComment(data);
+  }
+  dispose() {
+    if (this.uniPage) {
+      this.uniPage.close();
+    }
+  }
+};
+
+// packages/uni-dom/src/UniEvent/index.ts
+function buildEvent(event, pageId, uniEvent) {
+  const app = getUniApp();
+  const page = app.pageManager.findPageById(String(pageId));
+  if (!page) {
+    throw new Error(`Cannot find page for id: ${pageId}`);
+  }
+  const originTagName = event.currentTarget.originTagName;
+  const elementConstructor = find(originTagName);
+  if (!elementConstructor) {
+    throw new Error(`Cannot find element constructor for tag: ${originTagName}`);
+  }
+  return elementConstructor.buildEvent(event, page, uniEvent);
+}
+
+// packages/uni-dom/src/CustomEvent.ts
+var UniCustomEventOptions = class {
+  constructor(detail) {
+    this.detail = detail;
+  }
+};
+var UniCustomEvent = class extends UniEvent {
+  constructor(type, options) {
+    super(type);
+    this.detail = typeof options === "object" && "detail" in options ? options.detail : options;
+  }
+};
+
+// packages/uni-dom/src/ScrollEvent.ts
+var UniScrollEventDetail = class {
+  constructor(detail) {
+    this.scrollTop = detail.scrollTop;
+    this.scrollLeft = detail.scrollLeft;
+    this.scrollHeight = detail.scrollHeight;
+    this.scrollWidth = detail.scrollWidth;
+    this.deltaY = detail.deltaY;
+    this.deltaX = detail.deltaX;
+  }
+};
+var UniScrollEvent = class extends UniCustomEvent {
+  constructor(type, detail) {
+    super(type, detail);
+  }
+};
+
+// packages/uni-dom/src/ScrollToLowerEvent.ts
+var UniScrollToLowerEventDetail = class {
+  constructor(detail) {
+    this.direction = detail.direction;
+  }
+};
+var UniScrollToLowerEvent = class extends UniCustomEvent {
+  constructor(type, detail) {
+    super(type, detail);
+  }
+};
+
+// packages/uni-dom/src/ScrollToUpperEvent.ts
+var UniScrollToUpperEventDetail = class {
+  constructor(detail) {
+    this.direction = detail.direction;
+  }
+};
+var UniScrollToUpperEvent = class extends UniCustomEvent {
+  constructor(type, detail) {
+    super(type, detail);
+  }
+};
+
+// packages/uni-dom/src/RefresherEvent.ts
+var UniRefresherEventDetail = class {
+  constructor(data) {
+    this.dy = typeof data === "number" ? data : data.dy;
+  }
+};
+var UniRefresherEvent = class extends UniEvent {
+  constructor(type, detail) {
+    super(type);
+    this.detail = typeof detail === "number" ? new UniRefresherEventDetail(detail) : new UniRefresherEventDetail(detail);
+  }
+};
+
+// packages/uni-dom/src/UniScrollViewElement.ts
+var UniScrollViewElementImpl = class extends UniElementImpl {
+  static buildEvent(nativeEvent, page, event) {
+    if (["scroll", "scrollend"].includes(nativeEvent.type)) {
+      const e = nativeEvent;
+      event = new UniScrollEvent(nativeEvent.type, e.detail);
+    } else if (nativeEvent.type === "scrolltolower") {
+      const e = nativeEvent;
+      event = new UniScrollToLowerEvent(nativeEvent.type, e.detail);
+    } else if (nativeEvent.type === "scrolltoupper") {
+      const e = nativeEvent;
+      event = new UniScrollToUpperEvent(nativeEvent.type, e.detail);
+    } else if ([
+      "refresherpulling",
+      "refresherrefresh",
+      "refresherrestore",
+      "refresherabort"
+    ].includes(nativeEvent.type)) {
+      const e = nativeEvent;
+      event = new UniRefresherEvent(nativeEvent.type, e.detail);
+    }
+    return super.buildEvent(nativeEvent, page, event);
+  }
+};
+
+// packages/uni-dom/src/UniRichTextNativeEvent.ts
+var UniRichTextNativeItemClickEventDetail = class {
+  constructor(detail) {
+    this.src = detail.src;
+    this.href = detail.href;
+  }
+};
+var UniRichTextNativeItemClickEvent = class extends UniCustomEvent {
+  constructor(type, detail) {
+    super(type, detail);
+  }
+};
+
+// packages/uni-dom/src/UniRichTextNativeElement.ts
+var UniRichTextNativeElementImpl = class extends UniElementImpl {
+  static buildEvent(nativeEvent, page, event) {
+    if (nativeEvent.type === "itemclick") {
+      const e = nativeEvent;
+      return new UniRichTextNativeItemClickEvent(nativeEvent.type, e.detail);
+    }
+    return super.buildEvent(nativeEvent, page, event);
+  }
+};
+
+// packages/uni-dom/src/UniImageLoadEvent.ts
+var UniImageLoadEventDetail = class {
+  constructor(detail) {
+    this.width = detail.width;
+    this.height = detail.height;
+  }
+};
+var UniImageLoadEvent = class extends UniCustomEvent {
+  constructor(type, detail) {
+    super(type, detail);
+  }
+};
+
+// packages/uni-dom/src/UniImageErrorEvent.ts
+var UniImageErrorEventDetail = class {
+  constructor(detail) {
+    this.errMsg = detail.errMsg;
+  }
+};
+var UniImageErrorEvent = class extends UniCustomEvent {
+  constructor(type, detail) {
+    super(type, detail);
+  }
+};
+
+// packages/uni-dom/src/UniImageElement.ts
+var UniImageElementImpl = class extends UniElementImpl {
+  constructor() {
+    super(...arguments);
+    this._src = "";
+  }
+  get src() {
+    return this._src;
+  }
+  set src(value) {
+    this._src = value;
+  }
+  onload() {
+    throw new Error("Method not implemented.");
+  }
+  static buildEvent(nativeEvent, page, event) {
+    if (nativeEvent.type === "load") {
+      const e = nativeEvent;
+      event = new UniImageLoadEvent(nativeEvent.type, e.detail);
+    } else if (nativeEvent.type === "error") {
+      const e = nativeEvent;
+      event = new UniImageErrorEvent(nativeEvent.type, e.detail);
+    }
+    return super.buildEvent(nativeEvent, page, event);
+  }
+};
+
+// packages/uni-dom/src/UniEvent/UniInputEvent.ts
+var UniInputEventDetail = class {
+  constructor(detailOrValue, cursor, keyCode) {
+    if (typeof detailOrValue === "string") {
+      this.value = detailOrValue;
+      this.cursor = cursor ?? 0;
+      this.keyCode = keyCode ?? 0;
+    } else {
+      this.value = detailOrValue.value;
+      this.cursor = detailOrValue.cursor;
+      this.keyCode = detailOrValue.keyCode;
+    }
+  }
+};
+var UniInputEvent = class extends UniEvent {
+  constructor(type, detail) {
+    super(type);
+    this.detail = new UniInputEventDetail(detail);
+  }
+};
+var InputEvent = UniInputEvent;
+var InputEventDetail = UniInputEventDetail;
+
+// packages/uni-dom/src/UniNativeViewInitEvent.ts
+var UniNativeViewInitEventDetail = class {
+  constructor(data) {
+    this.element = data.element;
+  }
+};
+var UniNativeViewInitEvent = class extends UniCustomEvent {
+  constructor(type, detail) {
+    super(type, new UniNativeViewInitEventDetail(detail));
+  }
+};
+
+// packages/uni-dom/src/UniNativeViewReadyEvent.ts
+var UniNativeViewReadyEventDetail = class {
+  constructor(data) {
+    this.element = data.element;
+  }
+};
+var UniNativeViewReadyEvent = class extends UniCustomEvent {
+  constructor(type, detail) {
+    super(type, new UniNativeViewReadyEventDetail(detail));
+  }
+};
+
+// packages/uni-dom/src/UniNativeViewEvent.ts
+var UniNativeViewEvent = class extends UniCustomEvent {
+};
+
+// packages/uni-dom/src/waitNativeRender.ts
+function waitNativeRender(callback) {
+  const app = getUniApp();
+  if (app) {
+    const page = app.pageManager.getTopPage();
+    if (page) {
+      page.document.waitNativeRender(callback);
+      return;
+    }
+  }
+  callback();
+}
+export {
+  AlreadyFullScreenError,
+  CSSStyleDeclaration,
+  ComponentNotReadyError,
+  DOMRect,
+  ElementNotSupportFullScreenError,
+  FullscreenError,
+  GlobalDocument,
+  InputEvent,
+  InputEventDetail,
+  NativeMap,
+  NoElementFullScreenError,
+  NodeData,
+  PageNotReadyOrDestroyedError,
+  UNI_BASE_EVENT_TYPES,
+  UniCallbackWrapper,
+  UniCommentElementImpl,
+  UniCustomEvent,
+  UniCustomEventOptions,
+  UniDocumentImpl,
+  UniElementImpl,
+  UniEvent,
+  UniImageElementImpl,
+  UniImageErrorEvent,
+  UniImageErrorEventDetail,
+  UniImageLoadEvent,
+  UniImageLoadEventDetail,
+  UniInputEvent,
+  UniInputEventDetail,
+  UniMouseEvent,
+  UniNativeViewEvent,
+  UniNativeViewInitEvent,
+  UniNativeViewInitEventDetail,
+  UniNativeViewReadyEvent,
+  UniNativeViewReadyEventDetail,
+  UniPointerEvent,
+  UniRefresherEvent,
+  UniRefresherEventDetail,
+  UniRichTextNativeElementImpl,
+  UniRichTextNativeItemClickEvent,
+  UniRichTextNativeItemClickEventDetail,
+  UniScrollEvent,
+  UniScrollEventDetail,
+  UniScrollToLowerEvent,
+  UniScrollToLowerEventDetail,
+  UniScrollToUpperEvent,
+  UniScrollToUpperEventDetail,
+  UniScrollViewElementImpl,
+  UniTextElementImpl,
+  UniTouch,
+  UniTouchEvent,
+  buildElement,
+  buildEvent,
+  define,
+  find,
+  fullscreenchangeEvent,
+  fullscreenerrorEvent,
+  getFullscreenError,
+  getUniApp,
+  setUniApp,
+  waitNativeRender
+};
+ÂÙî/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@hnpaqqbd4i9bxcrp3ktun4a1gqv9ys2o5pljtcetlzk=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/runtime/libs/dom.jsÔrB˜±isLocalDependency¯isNodeEntryFile§pkgPath§pkgNameªpkgVersion±belongProjectPath±dependencyPkgInfo¨commonjsÂÂÙâ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@hnpaqqbd4i9bxcrp3ktun4a1gqv9ys2o5pljtcetlzk=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/runtime½@dcloudio/uni-runtime-harmony¥1.0.0ÙL/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmonyÔrC’§pkgNameªpkgVersion½@dcloudio/uni-runtime-harmony¥1.0.0ÔrD’¯hasNamedExportsªisCommonJSÃÂÃÚ‡4// packages/uni-dom/src/CSSStyleDeclaration.ts
+var CSSStyleDeclaration = class {
+  constructor(element) {
+    this._element = element;
+  }
+  get element() {
+    return this._element;
+  }
+  getPropertyValue(property) {
+    return this._element.getCSSPropertyValue(property) || "";
+  }
+  setProperty(property, value, priority) {
+    this._element.updateStyle(property, value);
+  }
+  removeProperty(property) {
+    return "";
+  }
+  getPropertyPriority(property) {
+    return "";
+  }
+};
+
+// packages/uni-dom/src/NativeMap.ts
+var NativeMap = class extends Map {
+  get(key) {
+    const value = super.get(key);
+    return value === void 0 ? null : value;
+  }
+};
+
+// packages/uni-dom/src/NodeData.ts
+var NodeData = class {
+  constructor(id, name, attrs = new NativeMap(), style = new NativeMap()) {
+    this.id = id;
+    this.name = name;
+    this.attrs = attrs;
+    this.style = style;
+  }
+};
+
+// packages/uni-dom/src/UniCallbackWrapper.ts
+var UniCallbackWrapper = class {
+  constructor(callback) {
+    this.callback = callback;
+  }
+};
+
+// packages/uni-dom/src/DOMRect.ts
+var DOMRect = class {
+  constructor(x, y, width, height) {
+    this._x = x ?? 0;
+    this._y = y ?? 0;
+    this._width = width ?? 0;
+    this._height = height ?? 0;
+  }
+  get x() {
+    return this._x;
+  }
+  set x(x) {
+    this._x = x;
+  }
+  get y() {
+    return this._y;
+  }
+  set y(y) {
+    this._y = y;
+  }
+  get width() {
+    return this._width;
+  }
+  set width(width) {
+    this._width = width;
+  }
+  get height() {
+    return this._height;
+  }
+  set height(height) {
+    this._height = height;
+  }
+  get left() {
+    if (this._width >= 0) {
+      return this._x;
+    }
+    return this._x + this._width;
+  }
+  set left(left) {
+  }
+  get top() {
+    if (this._height >= 0) {
+      return this._y;
+    }
+    return this._y + this._height;
+  }
+  set top(top) {
+  }
+  get right() {
+    if (this._width >= 0) {
+      return this._x + this._width;
+    }
+    return this._x;
+  }
+  set right(right) {
+  }
+  get bottom() {
+    if (this._height >= 0) {
+      return this._y + this._height;
+    }
+    return this._y;
+  }
+  set bottom(bottom) {
+  }
+  toJSON() {
+    return {
+      x: this.x,
+      y: this.y,
+      width: this.width,
+      height: this.height,
+      left: this.left,
+      top: this.top,
+      right: this.right,
+      bottom: this.bottom
+    };
+  }
+};
+
+// ../uni-app-next/packages/uni-shared/dist/uni-shared.es.js
+var BUILT_IN_TAG_NAMES = [
+  "ad",
+  "ad-content-page",
+  "ad-draw",
+  "audio",
+  "button",
+  "camera",
+  "canvas",
+  "checkbox",
+  "checkbox-group",
+  "cover-image",
+  "cover-view",
+  "editor",
+  "form",
+  "functional-page-navigator",
+  "icon",
+  "image",
+  "input",
+  "label",
+  "live-player",
+  "live-pusher",
+  "map",
+  "movable-area",
+  "movable-view",
+  "navigator",
+  "official-account",
+  "open-data",
+  "picker",
+  "picker-view",
+  "picker-view-column",
+  "progress",
+  "radio",
+  "radio-group",
+  "rich-text",
+  "scroll-view",
+  "slider",
+  "swiper",
+  "swiper-item",
+  "switch",
+  "text",
+  "textarea",
+  "video",
+  "view",
+  "web-view",
+  "location-picker",
+  "location-view"
+];
+var BUILT_IN_TAGS = BUILT_IN_TAG_NAMES.map((tag) => "uni-" + tag);
+var H5_BUILT_IN_TAG_NAMES = BUILT_IN_TAG_NAMES.filter((tag) => tag !== "audio");
+var H5_BUILT_IN_TAGS = H5_BUILT_IN_TAG_NAMES.map((tag) => "uni-" + tag);
+var TAGS = [
+  "app",
+  "layout",
+  "content",
+  "main",
+  "top-window",
+  "left-window",
+  "right-window",
+  "tabbar",
+  "page",
+  "page-head",
+  "page-wrapper",
+  "page-body",
+  "page-refresh",
+  "actionsheet",
+  "modal",
+  "toast",
+  "resize-sensor",
+  "shadow-root"
+].map((tag) => "uni-" + tag);
+var UVUE_WEB_BUILT_IN_TAGS = [
+  "page-container",
+  "list-view",
+  "list-item",
+  "sticky-section",
+  "sticky-header",
+  "cloud-db-element",
+  "loading-element",
+  "loading"
+].map((tag) => "uni-" + tag);
+var UVUE_MP_BUILT_IN_TAGS = [
+  "list-view",
+  "list-item",
+  "sticky-section",
+  "sticky-header",
+  "cloud-db-element",
+  "loading-element"
+].map((tag) => "uni-" + tag);
+var UVUE_HARMONY_BUILT_IN_TAGS = [
+  // TODO åˆ—å‡ºå®Œæ•´åˆ—è¡¨
+  ...BUILT_IN_TAG_NAMES,
+  "volume-panel"
+];
+var UNI_UI_CONFLICT_TAGS = ["list-item"].map((tag) => "uni-" + tag);
+var NVUE_CUSTOM_COMPONENTS = [
+  "ad",
+  "ad-draw",
+  "button",
+  "checkbox-group",
+  "checkbox",
+  "form",
+  "icon",
+  "label",
+  "movable-area",
+  "movable-view",
+  "navigator",
+  "picker",
+  "progress",
+  "radio-group",
+  "radio",
+  "rich-text",
+  "swiper-item",
+  "swiper",
+  "switch",
+  "slider",
+  "picker-view",
+  "picker-view-column"
+];
+var UVUE_BUILT_IN_EASY_COMPONENTS = [
+  "map",
+  "camera",
+  "live-player",
+  "live-pusher",
+  "loading",
+  "web-view",
+  "rich-text",
+  "page-container",
+  "editor",
+  "video"
+];
+var UVUE_CUSTOM_COMPONENTS = [
+  ...NVUE_CUSTOM_COMPONENTS,
+  ...UVUE_BUILT_IN_EASY_COMPONENTS
+];
+var COMPONENT_SELECTOR_PREFIX = "uni-";
+var COMPONENT_PREFIX = "v-" + COMPONENT_SELECTOR_PREFIX;
+function once(fn, ctx = null) {
+  let res;
+  return ((...args) => {
+    if (fn) {
+      res = fn.apply(ctx, args);
+      fn = null;
+    }
+    return res;
+  });
+}
+var unitRE = new RegExp(`"[^"]+"|'[^']+'|url\\([^)]+\\)|(\\d*\\.?\\d+)[r|u]px`, "g");
+var defaultRpx2Unit = {
+  unit: "rem",
+  unitRatio: 10 / 320,
+  unitPrecision: 5
+};
+var invokeCreateErrorHandler = once((app, createErrorHandler) => {
+  return createErrorHandler(app);
+});
+var E = function() {
+};
+E.prototype = {
+  _id: 1,
+  on: function(name, callback, ctx) {
+    var e = this.e || (this.e = {});
+    (e[name] || (e[name] = [])).push({
+      fn: callback,
+      ctx,
+      _id: this._id
+    });
+    return this._id++;
+  },
+  once: function(name, callback, ctx) {
+    var self2 = this;
+    function listener() {
+      self2.off(name, listener);
+      callback.apply(ctx, arguments);
+    }
+    listener._ = callback;
+    return this.on(name, listener, ctx);
+  },
+  emit: function(name) {
+    var data = [].slice.call(arguments, 1);
+    var evtArr = ((this.e || (this.e = {}))[name] || []).slice();
+    var i = 0;
+    var len = evtArr.length;
+    for (i; i < len; i++) {
+      evtArr[i].fn.apply(evtArr[i].ctx, data);
+    }
+    return this;
+  },
+  off: function(name, event) {
+    var e = this.e || (this.e = {});
+    var evts = e[name];
+    var liveEvents = [];
+    if (evts && event) {
+      for (var i = evts.length - 1; i >= 0; i--) {
+        if (evts[i].fn === event || evts[i].fn._ === event || evts[i]._id === event) {
+          evts.splice(i, 1);
+          break;
+        }
+      }
+      liveEvents = evts;
+    }
+    liveEvents.length ? e[name] = liveEvents : delete e[name];
+    return this;
+  }
+};
+var UniDOMStringMap = class extends Map {
+  constructor(options) {
+    super();
+    this._options = options;
+  }
+  get(key) {
+    const normalizedKey = normalizeDatasetKey(String(key));
+    return super.has(normalizedKey) ? super.get(normalizedKey) : null;
+  }
+  set(key, value) {
+    var _a, _b;
+    const normalizedKey = normalizeDatasetKey(String(key));
+    super.set(normalizedKey, value);
+    (_b = (_a = this._options) === null || _a === void 0 ? void 0 : _a.onSet) === null || _b === void 0 ? void 0 : _b.call(_a, normalizedKey, value);
+    return this;
+  }
+  has(key) {
+    return super.has(normalizeDatasetKey(String(key)));
+  }
+  delete(key) {
+    var _a, _b;
+    const normalizedKey = normalizeDatasetKey(String(key));
+    const deleted = super.delete(normalizedKey);
+    if (deleted) {
+      (_b = (_a = this._options) === null || _a === void 0 ? void 0 : _a.onDelete) === null || _b === void 0 ? void 0 : _b.call(_a, normalizedKey);
+    }
+    return deleted;
+  }
+  clear() {
+    const keys = Array.from(super.keys());
+    super.clear();
+    keys.forEach((key) => {
+      var _a, _b;
+      return (_b = (_a = this._options) === null || _a === void 0 ? void 0 : _a.onDelete) === null || _b === void 0 ? void 0 : _b.call(_a, key);
+    });
+  }
+};
+function normalizeDatasetKey(key) {
+  const normalizedKey = key.replace(/[A-Z]/g, (char) => char.toLowerCase());
+  if (normalizedKey.indexOf("data-") !== 0) {
+    return key;
+  }
+  return normalizedKey.slice(5).replace(/-([a-z])/g, (_, char) => char.toUpperCase());
+}
+function isReservedDatasetKey(target, key) {
+  return key in target;
+}
+function setDatasetValue(dataset, key, value) {
+  Map.prototype.set.call(dataset, normalizeDatasetKey(String(key)), value);
+}
+function initDataset(dataset, source) {
+  if (!source) {
+    return;
+  }
+  if (source instanceof Map) {
+    source.forEach((value, key) => setDatasetValue(dataset, key, value));
+    return;
+  }
+  Object.keys(source).forEach((key) => setDatasetValue(dataset, key, source[key]));
+}
+function createUniDOMStringMap(source, options) {
+  const target = new UniDOMStringMap(options);
+  initDataset(target, source);
+  return new Proxy(target, {
+    get(target2, key, receiver) {
+      if (typeof key === "string") {
+        if (!isReservedDatasetKey(target2, key)) {
+          return target2.has(key) ? target2.get(key) : null;
+        }
+      }
+      const value = Reflect.get(target2, key, target2);
+      if (typeof value === "function") {
+        return (...args) => {
+          const result = value.apply(target2, args);
+          return result === target2 ? receiver : result;
+        };
+      }
+      return value;
+    },
+    set(target2, key, value, receiver) {
+      if (typeof key === "string" && !isReservedDatasetKey(target2, key)) {
+        target2.set(key, value);
+        return true;
+      }
+      return Reflect.set(target2, key, value, receiver);
+    },
+    deleteProperty(target2, key) {
+      if (typeof key === "string" && !isReservedDatasetKey(target2, key) && target2.has(key)) {
+        return target2.delete(key);
+      }
+      return Reflect.deleteProperty(target2, key);
+    },
+    has(target2, key) {
+      if (typeof key === "string" && target2.has(key)) {
+        return true;
+      }
+      return Reflect.has(target2, key);
+    },
+    ownKeys(target2) {
+      return Array.from(target2.keys()).filter((key) => !isReservedDatasetKey(target2, key));
+    },
+    getOwnPropertyDescriptor(target2, key) {
+      if (typeof key === "string" && !isReservedDatasetKey(target2, key) && target2.has(key)) {
+        return {
+          configurable: true,
+          enumerable: true,
+          value: target2.get(key),
+          writable: true
+        };
+      }
+      return Reflect.getOwnPropertyDescriptor(target2, key);
+    }
+  });
+}
+
+// packages/uni-dom/src/UniEvent/types.ts
+var UniEvent = class {
+  constructor(type, eventInit) {
+    this.__v_skip = true;
+    this.timeStamp = Date.now();
+    this._bubbles = false;
+    this._cancelable = false;
+    // æš‚æ—¶ä½¿ç”¨å±æ€§å£°æ˜ï¼Œç”¨äºå†…éƒ¨é‡å†™
+    this.stopPropagation = () => {
+    };
+    this.preventDefault = () => {
+    };
+    this.type = type;
+    if (eventInit) {
+      this._bubbles = !!eventInit.bubbles;
+      this._cancelable = !!eventInit.cancelable;
+    }
+  }
+  get [Symbol.toStringTag]() {
+    return "UniEvent";
+  }
+  get bubbles() {
+    return this._bubbles;
+  }
+  set bubbles(value) {
+  }
+  get cancelable() {
+    return this._cancelable;
+  }
+  set cancelable(value) {
+  }
+};
+
+// packages/uni-dom/src/UniEvent/UniMouseEvent.ts
+var UniMouseEvent = class extends UniEvent {
+  constructor(type, x, y, clientX, clientY, pageX, pageY, screenX, screenY) {
+    super(type, {
+      bubbles: true,
+      cancelable: true
+    });
+    this.x = x;
+    this.y = y;
+    this.clientX = clientX;
+    this.clientY = clientY;
+    this.pageX = pageX;
+    this.pageY = pageY;
+    this.screenX = screenX;
+    this.screenY = screenY;
+  }
+};
+
+// packages/uni-dom/src/UniEvent/UniPointerEvent.ts
+var UniPointerEvent = class extends UniEvent {
+  constructor(type, x, y, clientX, clientY, pageX, pageY, screenX, screenY) {
+    super(type, {
+      bubbles: true,
+      cancelable: true
+    });
+    this.x = x;
+    this.y = y;
+    this.clientX = clientX;
+    this.clientY = clientY;
+    this.pageX = pageX;
+    this.pageY = pageY;
+    this.screenX = screenX;
+    this.screenY = screenY;
+  }
+};
+
+// packages/uni-dom/src/UniEvent/UniTouchEvent.ts
+var UniTouch = class {
+  constructor() {
+    this.clientX = 0;
+    this.clientY = 0;
+    this.identifier = 0;
+    this.pageX = 0;
+    this.pageY = 0;
+    this.screenX = 0;
+    this.screenY = 0;
+    this.force = null;
+  }
+};
+var UniTouchEvent = class extends UniEvent {
+  constructor(type, touches, changedTouches) {
+    super(type, { bubbles: true, cancelable: true });
+    this.touches = touches;
+    this.changedTouches = changedTouches;
+  }
+};
+
+// packages/uni-dom/src/UniNativeAppManager.ts
+var mainApp = null;
+function setUniApp(app) {
+  mainApp = app;
+}
+function getUniApp() {
+  return mainApp;
+}
+
+// packages/uni-dom/src/BuiltInElement.ts
+var store = /* @__PURE__ */ new Map();
+function define(name, constructor) {
+  store.set(name, constructor);
+}
+function find(name) {
+  return store.get(name);
+}
+var elementCache = /* @__PURE__ */ new Map();
+function buildElement(elementInfo, pageOrId) {
+  const app = getUniApp();
+  let page;
+  let pageId;
+  if (typeof pageOrId === "string" || typeof pageOrId === "number") {
+    pageId = String(pageOrId);
+    page = app.pageManager.findPageById(pageId);
+  } else {
+    page = pageOrId;
+    pageId = page.pageId;
+  }
+  const tagName = elementInfo.tagName;
+  const key = `${tagName}:${pageId}:${elementInfo.id}`;
+  if (elementCache.has(key)) {
+    const el2 = elementCache.get(key)?.deref();
+    if (el2) {
+      return el2;
+    }
+  }
+  let elementConstructor = find(tagName);
+  if (!elementConstructor) {
+    elementConstructor = find(elementInfo.originTagName);
+    if (!elementConstructor) {
+      throw new Error(`Cannot find element constructor for tag: ${tagName}`);
+    }
+  }
+  const el = new elementConstructor(elementInfo.id, page, tagName);
+  if (typeof elementInfo.vueId !== "undefined") {
+    el.ext.set("vueComponentId", elementInfo.vueId);
+  }
+  elementCache.set(key, new WeakRef(el));
+  return el;
+}
+
+// packages/uni-dom/src/FullscreenEvent/change.ts
+var fullscreenchangeEvent = class extends UniEvent {
+  constructor() {
+    super("fullscreenchange");
+  }
+};
+
+// packages/uni-dom/src/FullscreenEvent/error.ts
+var FullscreenError = class extends UniEvent {
+  constructor(errSubject, errCode, errMsg) {
+    super("fullscreenerror");
+    this.errCode = 106601;
+    this.errSubject = "requestFullscreen";
+    this.data = {};
+    this.errMsg = "";
+    this.errCode = errCode;
+    this.errSubject = errSubject;
+    this.errMsg = errMsg ?? `${errSubject}:fail`;
+    this.cause = new Error(this.errMsg);
+  }
+};
+var AlreadyFullScreenError = class extends FullscreenError {
+  constructor() {
+    super(
+      "requestFullscreen",
+      106600 /* AlreadyFullScreen */,
+      `requestFullscreen:fail Already in fullscreen`
+    );
+  }
+};
+var ElementNotSupportFullScreenError = class extends FullscreenError {
+  constructor() {
+    super(
+      "requestFullscreen",
+      106601 /* ElementNotSupportFullScreen */,
+      `requestFullscreen:fail Element does not support fullscreen`
+    );
+  }
+};
+var NoElementFullScreenError = class extends FullscreenError {
+  constructor(errSubject) {
+    super(
+      errSubject,
+      106602 /* NoElementFullScreen */,
+      `${errSubject}:fail No element is in fullscreen`
+    );
+  }
+};
+var PageNotReadyOrDestroyedError = class extends FullscreenError {
+  constructor(errSubject) {
+    super(
+      errSubject,
+      106603 /* PageNotReadyOrDestroyed */,
+      `${errSubject}:fail Page is not ready or has been destroyed`
+    );
+  }
+};
+var ComponentNotReadyError = class extends FullscreenError {
+  constructor(errSubject) {
+    super(
+      errSubject,
+      106604 /* ComponentNotReady */,
+      `${errSubject}:fail Component is not ready`
+    );
+  }
+};
+var fullscreenerrorEvent = class extends UniEvent {
+  constructor() {
+    super("fullscreenerror");
+  }
+};
+function getFullscreenError(errSubject, errCode = 106601) {
+  switch (errCode) {
+    case 106600 /* AlreadyFullScreen */:
+      return new AlreadyFullScreenError();
+    case 106601 /* ElementNotSupportFullScreen */:
+      return new ElementNotSupportFullScreenError();
+    case 106602 /* NoElementFullScreen */:
+      return new NoElementFullScreenError(errSubject);
+    case 106603 /* PageNotReadyOrDestroyed */:
+      return new PageNotReadyOrDestroyedError(errSubject);
+    case 106604 /* ComponentNotReady */:
+      return new ComponentNotReadyError(errSubject);
+  }
+  return new FullscreenError(errSubject, errCode);
+}
+
+// packages/uni-dom/src/UniElement.ts
+var UNI_MOUSE_EVENT_TYPES = ["mousedown", "mousemove", "mouseup"];
+var UNI_POINTER_EVENT_TYPES = ["click", "tap"];
+var UNI_TOUCH_EVENT_TYPES = [
+  "touchstart",
+  "touchmove",
+  "touchcancel",
+  "touchend",
+  "longpress",
+  "longtap"
+];
+var elementDatasetCache = /* @__PURE__ */ new WeakMap();
+function getPageDatasetCache(page) {
+  let cache = elementDatasetCache.get(page);
+  if (!cache) {
+    cache = /* @__PURE__ */ new Map();
+    elementDatasetCache.set(page, cache);
+  }
+  return cache;
+}
+var UNI_BASE_EVENT_TYPES = [
+  ...UNI_MOUSE_EVENT_TYPES,
+  ...UNI_POINTER_EVENT_TYPES,
+  ...UNI_TOUCH_EVENT_TYPES
+];
+var UniElementImpl = class {
+  constructor(id, page, tagName) {
+    this.ext = /* @__PURE__ */ new Map();
+    this._style = null;
+    this._nativeElement = null;
+    this.__id = id;
+    this.page = page;
+    this.tagName = this.nodeName = tagName.toUpperCase();
+  }
+  get uniPage() {
+    return this.page.__uniPage;
+  }
+  // accessor ä½¿ UniCustomElement Proxy å°† dataset èµ‹å€¼ä¿ç•™åœ¨ JS elementï¼Œé¿å…è½¬å‘åˆ° iOS uts delegateã€‚
+  get dataset() {
+    const cache = getPageDatasetCache(this.page);
+    let dataset = cache.get(this.__id);
+    if (!dataset) {
+      dataset = createUniDOMStringMap();
+      cache.set(this.__id, dataset);
+    }
+    return dataset;
+  }
+  set dataset(dataset) {
+    getPageDatasetCache(this.page).set(this.__id, dataset);
+  }
+  /**
+   * ç”¨äºå…¼å®¹è€ç‰ˆæœ¬ä½¿ç”¨æ–¹å¼
+   * @internal
+   */
+  get pageId() {
+    return this.page.pageId;
+  }
+  get [Symbol.toStringTag]() {
+    return "UniElement";
+  }
+  get nativeElement() {
+    if (!this._nativeElement && this.page) {
+      if (true) {
+        this._nativeElement = new UniElementJs(
+          Number(this.page.pageId),
+          this.__id
+        );
+      } else {
+        this._nativeElement = this.page.page.getUniElementJsById(
+          this.__id
+        );
+      }
+    }
+    if (true) {
+      if (!this._nativeElement) {
+        console.warn(
+          `Element ${this.tagName} (id: ${this.__id}) on page ${this.page.pageId} does not have a native element.`
+        );
+      }
+    }
+    return this._nativeElement;
+  }
+  /**
+   * TODO çº æ­£ç±»å‹
+   */
+  getNodeId() {
+    return this.__id;
+  }
+  get offsetLeft() {
+    return this.nativeElement.offsetLeft;
+  }
+  get offsetTop() {
+    return this.nativeElement.offsetTop;
+  }
+  get offsetWidth() {
+    return this.nativeElement.offsetWidth;
+  }
+  get offsetHeight() {
+    return this.nativeElement.offsetHeight;
+  }
+  get style() {
+    if (!this._style) {
+      this._style = new CSSStyleDeclaration(this.nativeElement);
+    }
+    return this._style;
+  }
+  get parentElement() {
+    return this.nativeElement.parentElement;
+  }
+  get children() {
+    return this.nativeElement.children;
+  }
+  get previousElementSibling() {
+    return this.nativeElement.previousElementSibling;
+  }
+  get nextElementSibling() {
+    return this.nativeElement.nextElementSibling;
+  }
+  get classList() {
+    const classList = this.nativeElement.classList;
+    let normalized = null;
+    for (let i = 0; i < classList.length; i++) {
+      const item = classList[i];
+      if (item.charCodeAt(0) === 94) {
+        if (normalized === null) {
+          normalized = classList.slice(0, i);
+        }
+        let start = 1;
+        while (item.charCodeAt(start) === 94) {
+          start++;
+        }
+        normalized.push(item.slice(start));
+      } else if (normalized !== null) {
+        normalized.push(item);
+      }
+    }
+    return normalized || classList;
+  }
+  get scrollWidth() {
+    return this.nativeElement.scrollWidth;
+  }
+  get scrollHeight() {
+    return this.nativeElement.scrollHeight;
+  }
+  get scrollLeft() {
+    return this.nativeElement.scrollLeft;
+  }
+  set scrollLeft(v) {
+    this.nativeElement.scrollLeft = v;
+  }
+  get scrollTop() {
+    return this.nativeElement.scrollTop;
+  }
+  set scrollTop(v) {
+    this.nativeElement.scrollTop = v;
+  }
+  takeSnapshot(options) {
+    this.nativeElement.takeSnapshot({
+      success: (res) => {
+        options?.success?.(res);
+        options?.complete?.(res);
+      },
+      fail: (err) => {
+        options?.fail?.(err);
+        options?.complete?.(err);
+      },
+      complete: (_) => {
+      }
+    });
+  }
+  appendChild(aChild) {
+    throw new Error("Method not implemented.");
+  }
+  insertBefore(newChild, refChild) {
+    throw new Error("Method not implemented.");
+  }
+  setAttribute(key, value) {
+    this.nativeElement.setAttribute(key, value);
+  }
+  setAnyAttribute(key, value) {
+    this.nativeElement.setAttribute(key, value);
+  }
+  getAttribute(key) {
+    return this.nativeElement.getAttribute(key) ?? null;
+  }
+  getAnyAttribute(key) {
+    return this.nativeElement.getAttribute(key);
+  }
+  hasAttribute(key) {
+    return this.nativeElement.hasAttribute(key);
+  }
+  removeAttribute(key) {
+    this.nativeElement.removeAttribute(key);
+  }
+  updateStyle(map) {
+    throw new Error("Method not implemented.");
+  }
+  getBoundingClientRect() {
+    return this.nativeElement.getBoundingClientRect() ?? new DOMRect();
+  }
+  getBoundingClientRectAsync(options) {
+    if (options) {
+      return new Promise((resolve, reject) => {
+        const rect = this.getBoundingClientRect();
+        options?.success?.(rect);
+        options?.complete?.(rect);
+        resolve(rect);
+      });
+    } else {
+      return new Promise((resolve, reject) => {
+        resolve(this.getBoundingClientRect());
+      });
+    }
+  }
+  getDrawableContext() {
+    throw new Error("Method not implemented.");
+  }
+  addEventListener(type, callback) {
+    const callbackWrapper = new UniCallbackWrapper(callback);
+    this.nativeElement.addEventListener(type, callback);
+    return callbackWrapper;
+  }
+  removeEventListener(type, callbackWrapper) {
+    const callback = callbackWrapper.callback;
+    this.nativeElement.removeEventListener(type, callback);
+  }
+  removeChild(aChild) {
+    throw new Error("Method not implemented.");
+  }
+  remove() {
+    throw new Error("Method not implemented.");
+  }
+  dispatchEvent(type, value) {
+    this.nativeElement.dispatchEvent(
+      value ? value : type
+    );
+  }
+  scrollTo(x, y) {
+    this.nativeElement.scrollTo(x, y);
+  }
+  scrollBy(x, y) {
+    this.nativeElement.scrollBy(x, y);
+  }
+  querySelector(selector) {
+    return this.nativeElement.querySelector(selector);
+  }
+  querySelectorAll(selector) {
+    return this.nativeElement.querySelectorAll(selector);
+  }
+  focus() {
+  }
+  blur() {
+  }
+  getIOSView() {
+    return null;
+  }
+  /**
+   * @deprecated use .uniPage
+   */
+  getPage() {
+    return this.uniPage;
+  }
+  animate(keyframes, options) {
+    return this.nativeElement.animate(keyframes, options);
+  }
+  getHarmonyController() {
+    return null;
+  }
+  requestFullscreen(options) {
+    const err = new ElementNotSupportFullScreenError();
+    options?.fail?.(err);
+    options?.complete?.(err);
+  }
+  getDelegate(prop) {
+    if (this.pageId) {
+      const delegate = this.page.page.getUniElementExtById?.(this.__id);
+      const value = delegate?.[prop];
+      return typeof value === "function" ? value.bind(delegate) : value;
+    }
+    return void 0;
+  }
+  setDelegate(prop, value) {
+    if (this.pageId) {
+      const delegate = this.page.page.getUniElementExtById?.(this.__id);
+      if (delegate) {
+        delegate[prop] = value;
+        return true;
+      }
+    }
+    return false;
+  }
+  static buildEvent(nativeEvent, page, event) {
+    if (!event) {
+      if (UNI_MOUSE_EVENT_TYPES.includes(nativeEvent.type)) {
+        const e = nativeEvent;
+        event = new UniMouseEvent(
+          nativeEvent.type,
+          e.x,
+          e.y,
+          e.clientX,
+          e.clientY,
+          e.pageX,
+          e.pageY,
+          e.screenX,
+          e.screenY
+        );
+      } else if (UNI_POINTER_EVENT_TYPES.includes(nativeEvent.type)) {
+        const e = nativeEvent;
+        event = new UniPointerEvent(
+          nativeEvent.type,
+          e.x,
+          e.y,
+          e.clientX,
+          e.clientY,
+          e.pageX,
+          e.pageY,
+          e.screenX,
+          e.screenY
+        );
+      } else if (UNI_TOUCH_EVENT_TYPES.includes(nativeEvent.type)) {
+        const e = nativeEvent;
+        event = new UniTouchEvent(nativeEvent.type, e.touches, e.changedTouches);
+      } else {
+        event = new UniEvent(nativeEvent.type);
+      }
+    }
+    event.target = nativeEvent.target ? buildElement(nativeEvent.target, page) : null;
+    event.currentTarget = nativeEvent.currentTarget ? buildElement(nativeEvent.currentTarget, page) : null;
+    event.stopPropagation = nativeEvent.stopPropagation;
+    event.preventDefault = nativeEvent.preventDefault;
+    return event;
+  }
+};
+
+// packages/uni-dom/src/Text.ts
+var UniTextElementImpl = class extends UniElementImpl {
+  get value() {
+    return this.nativeElement.value;
+  }
+  set value(val) {
+    this.nativeElement.value = val;
+  }
+  getTextExtra() {
+    throw new Error("Method not implemented.");
+  }
+};
+
+// packages/uni-dom/src/UniCommentElement.ts
+var UniCommentElementImpl = class extends UniElementImpl {
+  get [Symbol.toStringTag]() {
+    return "UniComment";
+  }
+};
+
+// packages/uni-dom/src/UniDocument.ts
+var UniDocumentImpl = class {
+  constructor(page) {
+    this.page = page;
+  }
+  createElement() {
+  }
+  createComment() {
+  }
+  waitNativeRender(callback) {
+    this.page?.waitNativeRender(callback);
+  }
+};
+
+// packages/uni-dom/src/GlobalDocument.ts
+var GlobalDocument = class {
+  get body() {
+    this.checkRootDocument();
+    return {
+      page: this.uniPage,
+      appendChild() {
+      },
+      insertBefore() {
+      },
+      removeChild() {
+      }
+    };
+  }
+  checkRootDocument() {
+    if (!this.uniPage) {
+      this.uniPage = {
+        document: new UniDocumentImpl()
+      };
+    }
+  }
+  createElement(data) {
+    this.checkRootDocument();
+    return this.uniPage.document.createElement(data);
+  }
+  createComment(data) {
+    this.checkRootDocument();
+    return this.uniPage.document.createComment(data);
+  }
+  dispose() {
+    if (this.uniPage) {
+      this.uniPage.close();
+    }
+  }
+};
+
+// packages/uni-dom/src/UniEvent/index.ts
+function buildEvent(event, pageId, uniEvent) {
+  const app = getUniApp();
+  const page = app.pageManager.findPageById(String(pageId));
+  if (!page) {
+    throw new Error(`Cannot find page for id: ${pageId}`);
+  }
+  const originTagName = event.currentTarget.originTagName;
+  const elementConstructor = find(originTagName);
+  if (!elementConstructor) {
+    throw new Error(`Cannot find element constructor for tag: ${originTagName}`);
+  }
+  return elementConstructor.buildEvent(event, page, uniEvent);
+}
+
+// packages/uni-dom/src/CustomEvent.ts
+var UniCustomEventOptions = class {
+  constructor(detail) {
+    this.detail = detail;
+  }
+};
+var UniCustomEvent = class extends UniEvent {
+  constructor(type, options) {
+    super(type);
+    this.detail = typeof options === "object" && "detail" in options ? options.detail : options;
+  }
+};
+
+// packages/uni-dom/src/ScrollEvent.ts
+var UniScrollEventDetail = class {
+  constructor(detail) {
+    this.scrollTop = detail.scrollTop;
+    this.scrollLeft = detail.scrollLeft;
+    this.scrollHeight = detail.scrollHeight;
+    this.scrollWidth = detail.scrollWidth;
+    this.deltaY = detail.deltaY;
+    this.deltaX = detail.deltaX;
+  }
+};
+var UniScrollEvent = class extends UniCustomEvent {
+  constructor(type, detail) {
+    super(type, detail);
+  }
+};
+
+// packages/uni-dom/src/ScrollToLowerEvent.ts
+var UniScrollToLowerEventDetail = class {
+  constructor(detail) {
+    this.direction = detail.direction;
+  }
+};
+var UniScrollToLowerEvent = class extends UniCustomEvent {
+  constructor(type, detail) {
+    super(type, detail);
+  }
+};
+
+// packages/uni-dom/src/ScrollToUpperEvent.ts
+var UniScrollToUpperEventDetail = class {
+  constructor(detail) {
+    this.direction = detail.direction;
+  }
+};
+var UniScrollToUpperEvent = class extends UniCustomEvent {
+  constructor(type, detail) {
+    super(type, detail);
+  }
+};
+
+// packages/uni-dom/src/RefresherEvent.ts
+var UniRefresherEventDetail = class {
+  constructor(data) {
+    this.dy = typeof data === "number" ? data : data.dy;
+  }
+};
+var UniRefresherEvent = class extends UniEvent {
+  constructor(type, detail) {
+    super(type);
+    this.detail = typeof detail === "number" ? new UniRefresherEventDetail(detail) : new UniRefresherEventDetail(detail);
+  }
+};
+
+// packages/uni-dom/src/UniScrollViewElement.ts
+var UniScrollViewElementImpl = class extends UniElementImpl {
+  static buildEvent(nativeEvent, page, event) {
+    if (["scroll", "scrollend"].includes(nativeEvent.type)) {
+      const e = nativeEvent;
+      event = new UniScrollEvent(nativeEvent.type, e.detail);
+    } else if (nativeEvent.type === "scrolltolower") {
+      const e = nativeEvent;
+      event = new UniScrollToLowerEvent(nativeEvent.type, e.detail);
+    } else if (nativeEvent.type === "scrolltoupper") {
+      const e = nativeEvent;
+      event = new UniScrollToUpperEvent(nativeEvent.type, e.detail);
+    } else if ([
+      "refresherpulling",
+      "refresherrefresh",
+      "refresherrestore",
+      "refresherabort"
+    ].includes(nativeEvent.type)) {
+      const e = nativeEvent;
+      event = new UniRefresherEvent(nativeEvent.type, e.detail);
+    }
+    return super.buildEvent(nativeEvent, page, event);
+  }
+};
+
+// packages/uni-dom/src/UniRichTextNativeEvent.ts
+var UniRichTextNativeItemClickEventDetail = class {
+  constructor(detail) {
+    this.src = detail.src;
+    this.href = detail.href;
+  }
+};
+var UniRichTextNativeItemClickEvent = class extends UniCustomEvent {
+  constructor(type, detail) {
+    super(type, detail);
+  }
+};
+
+// packages/uni-dom/src/UniRichTextNativeElement.ts
+var UniRichTextNativeElementImpl = class extends UniElementImpl {
+  static buildEvent(nativeEvent, page, event) {
+    if (nativeEvent.type === "itemclick") {
+      const e = nativeEvent;
+      return new UniRichTextNativeItemClickEvent(nativeEvent.type, e.detail);
+    }
+    return super.buildEvent(nativeEvent, page, event);
+  }
+};
+
+// packages/uni-dom/src/UniImageLoadEvent.ts
+var UniImageLoadEventDetail = class {
+  constructor(detail) {
+    this.width = detail.width;
+    this.height = detail.height;
+  }
+};
+var UniImageLoadEvent = class extends UniCustomEvent {
+  constructor(type, detail) {
+    super(type, detail);
+  }
+};
+
+// packages/uni-dom/src/UniImageErrorEvent.ts
+var UniImageErrorEventDetail = class {
+  constructor(detail) {
+    this.errMsg = detail.errMsg;
+  }
+};
+var UniImageErrorEvent = class extends UniCustomEvent {
+  constructor(type, detail) {
+    super(type, detail);
+  }
+};
+
+// packages/uni-dom/src/UniImageElement.ts
+var UniImageElementImpl = class extends UniElementImpl {
+  constructor() {
+    super(...arguments);
+    this._src = "";
+  }
+  get src() {
+    return this._src;
+  }
+  set src(value) {
+    this._src = value;
+  }
+  onload() {
+    throw new Error("Method not implemented.");
+  }
+  static buildEvent(nativeEvent, page, event) {
+    if (nativeEvent.type === "load") {
+      const e = nativeEvent;
+      event = new UniImageLoadEvent(nativeEvent.type, e.detail);
+    } else if (nativeEvent.type === "error") {
+      const e = nativeEvent;
+      event = new UniImageErrorEvent(nativeEvent.type, e.detail);
+    }
+    return super.buildEvent(nativeEvent, page, event);
+  }
+};
+
+// packages/uni-dom/src/UniEvent/UniInputEvent.ts
+var UniInputEventDetail = class {
+  constructor(detailOrValue, cursor, keyCode) {
+    if (typeof detailOrValue === "string") {
+      this.value = detailOrValue;
+      this.cursor = cursor ?? 0;
+      this.keyCode = keyCode ?? 0;
+    } else {
+      this.value = detailOrValue.value;
+      this.cursor = detailOrValue.cursor;
+      this.keyCode = detailOrValue.keyCode;
+    }
+  }
+};
+var UniInputEvent = class extends UniEvent {
+  constructor(type, detail) {
+    super(type);
+    this.detail = new UniInputEventDetail(detail);
+  }
+};
+var InputEvent = UniInputEvent;
+var InputEventDetail = UniInputEventDetail;
+
+// packages/uni-dom/src/UniNativeViewInitEvent.ts
+var UniNativeViewInitEventDetail = class {
+  constructor(data) {
+    this.element = data.element;
+  }
+};
+var UniNativeViewInitEvent = class extends UniCustomEvent {
+  constructor(type, detail) {
+    super(type, new UniNativeViewInitEventDetail(detail));
+  }
+};
+
+// packages/uni-dom/src/UniNativeViewReadyEvent.ts
+var UniNativeViewReadyEventDetail = class {
+  constructor(data) {
+    this.element = data.element;
+  }
+};
+var UniNativeViewReadyEvent = class extends UniCustomEvent {
+  constructor(type, detail) {
+    super(type, new UniNativeViewReadyEventDetail(detail));
+  }
+};
+
+// packages/uni-dom/src/UniNativeViewEvent.ts
+var UniNativeViewEvent = class extends UniCustomEvent {
+};
+
+// packages/uni-dom/src/waitNativeRender.ts
+function waitNativeRender(callback) {
+  const app = getUniApp();
+  if (app) {
+    const page = app.pageManager.getTopPage();
+    if (page) {
+      page.document.waitNativeRender(callback);
+      return;
+    }
+  }
+  callback();
+}
+export {
+  AlreadyFullScreenError,
+  CSSStyleDeclaration,
+  ComponentNotReadyError,
+  DOMRect,
+  ElementNotSupportFullScreenError,
+  FullscreenError,
+  GlobalDocument,
+  InputEvent,
+  InputEventDetail,
+  NativeMap,
+  NoElementFullScreenError,
+  NodeData,
+  PageNotReadyOrDestroyedError,
+  UNI_BASE_EVENT_TYPES,
+  UniCallbackWrapper,
+  UniCommentElementImpl,
+  UniCustomEvent,
+  UniCustomEventOptions,
+  UniDocumentImpl,
+  UniElementImpl,
+  UniEvent,
+  UniImageElementImpl,
+  UniImageErrorEvent,
+  UniImageErrorEventDetail,
+  UniImageLoadEvent,
+  UniImageLoadEventDetail,
+  UniInputEvent,
+  UniInputEventDetail,
+  UniMouseEvent,
+  UniNativeViewEvent,
+  UniNativeViewInitEvent,
+  UniNativeViewInitEventDetail,
+  UniNativeViewReadyEvent,
+  UniNativeViewReadyEventDetail,
+  UniPointerEvent,
+  UniRefresherEvent,
+  UniRefresherEventDetail,
+  UniRichTextNativeElementImpl,
+  UniRichTextNativeItemClickEvent,
+  UniRichTextNativeItemClickEventDetail,
+  UniScrollEvent,
+  UniScrollEventDetail,
+  UniScrollToLowerEvent,
+  UniScrollToLowerEventDetail,
+  UniScrollToUpperEvent,
+  UniScrollToUpperEventDetail,
+  UniScrollViewElementImpl,
+  UniTextElementImpl,
+  UniTouch,
+  UniTouchEvent,
+  buildElement,
+  buildEvent,
+  define,
+  find,
+  fullscreenchangeEvent,
+  fullscreenerrorEvent,
+  getFullscreenError,
+  getUniApp,
+  setUniApp,
+  waitNativeRender
+};
+ÔrE•§version¨mappings¥names§sources®sourcesContentÜk‘”    ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”  	 ‘”  
+ ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”    ‘”  ! ‘”  " ‘”  # ‘”  $ ‘”  % ‘”  & ‘”  ' ‘”  ( ‘”  ) ‘”  * ‘”  + ‘”  , ‘”  - ‘”  . ‘”  / ‘”  0 ‘”  1 ‘”  2 ‘”  3 ‘”  4 ‘”  5 ‘”  6 ‘”  7 ‘”  8 ‘”  9 ‘”  : ‘”  ; ‘”  < ‘”  = ‘”  > ‘”  ? ‘”  Ì@ ‘”  ÌA ‘”  ÌB ‘”  ÌC ‘”  ÌD ‘”  ÌE ‘”  ÌF ‘”  ÌG ‘”  ÌH ‘”  ÌI ‘”  ÌJ ‘”  ÌK ‘”  ÌL ‘”  ÌM ‘”  ÌN ‘”  ÌO ‘”  ÌP ‘”  ÌQ ‘”  ÌR ‘”  ÌS ‘”  ÌT ‘”  ÌU ‘”  ÌV ‘”  ÌW ‘”  ÌX ‘”  ÌY ‘”  ÌZ ‘”  Ì[ ‘”  Ì\ ‘”  Ì] ‘”  Ì^ ‘”  Ì_ ‘”  Ì` ‘”  Ìa ‘”  Ìb ‘”  Ìc ‘”  Ìd ‘”  Ìe ‘”  Ìf ‘”  Ìg ‘”  Ìh ‘”  Ìi ‘”  Ìj ‘”  Ìk ‘”  Ìl ‘”  Ìm ‘”  Ìn ‘”  Ìo ‘”  Ìp ‘”  Ìq ‘”  Ìr ‘”  Ìs ‘”  Ìt ‘”  Ìu ‘”  Ìv ‘”  Ìw ‘”  Ìx ‘”  Ìy ‘”  Ìz ‘”  Ì{ ‘”  Ì| ‘”  Ì} ‘”  Ì~ ‘”  Ì ‘”  Ì€ ‘”  Ì ‘”  Ì‚ ‘”  Ìƒ ‘”  Ì„ ‘”  Ì… ‘”  Ì† ‘”  Ì‡ ‘”  Ìˆ ‘”  Ì‰ ‘”  ÌŠ ‘”  Ì‹ ‘”  ÌŒ ‘”  Ì ‘”  Ì ‘”  Ì ‘”  Ì ‘”  Ì‘ ‘”  Ì’ ‘”  Ì“ ‘”  Ì” ‘”  Ì• ‘”  Ì– ‘”  Ì— ‘”  Ì˜ ‘”  Ì™ ‘”  Ìš ‘”  Ì› ‘”  Ìœ ‘”  Ì ‘”  Ì ‘”  ÌŸ ‘”  Ì  ‘”  Ì¡ ‘”  Ì¢ ‘”  Ì£ ‘”  Ì¤ ‘”  Ì¥ ‘”  Ì¦ ‘”  Ì§ ‘”  Ì¨ ‘”  Ì© ‘”  Ìª ‘”  Ì« ‘”  Ì¬ ‘”  Ì­ ‘”  Ì® ‘”  Ì¯ ‘”  Ì° ‘”  Ì± ‘”  Ì² ‘”  Ì³ ‘”  Ì´ ‘”  Ìµ ‘”  Ì¶ ‘”  Ì· ‘”  Ì¸ ‘”  Ì¹ ‘”  Ìº ‘”  Ì» ‘”  Ì¼ ‘”  Ì½ ‘”  Ì¾ ‘”  Ì¿ ‘”  ÌÀ ‘”  ÌÁ ‘”  ÌÂ ‘”  ÌÃ ‘”  ÌÄ ‘”  ÌÅ ‘”  ÌÆ ‘”  ÌÇ ‘”  ÌÈ ‘”  ÌÉ ‘”  ÌÊ ‘”  ÌË ‘”  ÌÌ ‘”  ÌÍ ‘”  ÌÎ ‘”  ÌÏ ‘”  ÌĞ ‘”  ÌÑ ‘”  ÌÒ ‘”  ÌÓ ‘”  ÌÔ ‘”  ÌÕ ‘”  ÌÖ ‘”  Ì× ‘”  ÌØ ‘”  ÌÙ ‘”  ÌÚ ‘”  ÌÛ ‘”  ÌÜ ‘”  Ìİ ‘”  ÌŞ ‘”  Ìß ‘”  Ìà ‘”  Ìá ‘”  Ìâ ‘”  Ìã ‘”  Ìä ‘”  Ìå ‘”  Ìæ ‘”  Ìç ‘”  Ìè ‘”  Ìé ‘”  Ìê ‘”  Ìë ‘”  Ìì ‘”  Ìí ‘”  Ìî ‘”  Ìï ‘”  Ìğ ‘”  Ìñ ‘”  Ìò ‘”  Ìó ‘”  Ìô ‘”  Ìõ ‘”  Ìö ‘”  Ì÷ ‘”  Ìø ‘”  Ìù ‘”  Ìú ‘”  Ìû ‘”  Ìü ‘”  Ìı ‘”  Ìş ‘”  Ìÿ ‘”  Í  ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í	 ‘”  Í
+ ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í  ‘”  Í! ‘”  Í" ‘”  Í# ‘”  Í$ ‘”  Í% ‘”  Í& ‘”  Í' ‘”  Í( ‘”  Í) ‘”  Í* ‘”  Í+ ‘”  Í, ‘”  Í- ‘”  Í. ‘”  Í/ ‘”  Í0 ‘”  Í1 ‘”  Í2 ‘”  Í3 ‘”  Í4 ‘”  Í5 ‘”  Í6 ‘”  Í7 ‘”  Í8 ‘”  Í9 ‘”  Í: ‘”  Í; ‘”  Í< ‘”  Í= ‘”  Í> ‘”  Í? ‘”  Í@ ‘”  ÍA ‘”  ÍB ‘”  ÍC ‘”  ÍD ‘”  ÍE ‘”  ÍF ‘”  ÍG ‘”  ÍH ‘”  ÍI ‘”  ÍJ ‘”  ÍK ‘”  ÍL ‘”  ÍM ‘”  ÍN ‘”  ÍO ‘”  ÍP ‘”  ÍQ ‘”  ÍR ‘”  ÍS ‘”  ÍT ‘”  ÍU ‘”  ÍV ‘”  ÍW ‘”  ÍX ‘”  ÍY ‘”  ÍZ ‘”  Í[ ‘”  Í\ ‘”  Í] ‘”  Í^ ‘”  Í_ ‘”  Í` ‘”  Ía ‘”  Íb ‘”  Íc ‘”  Íd ‘”  Íe ‘”  Íf ‘”  Íg ‘”  Íh ‘”  Íi ‘”  Íj ‘”  Ík ‘”  Íl ‘”  Ím ‘”  Ín ‘”  Ío ‘”  Íp ‘”  Íq ‘”  Ír ‘”  Ís ‘”  Ít ‘”  Íu ‘”  Ív ‘”  Íw ‘”  Íx ‘”  Íy ‘”  Íz ‘”  Í{ ‘”  Í| ‘”  Í} ‘”  Í~ ‘”  Í ‘”  Í€ ‘”  Í ‘”  Í‚ ‘”  Íƒ ‘”  Í„ ‘”  Í… ‘”  Í† ‘”  Í‡ ‘”  Íˆ ‘”  Í‰ ‘”  ÍŠ ‘”  Í‹ ‘”  ÍŒ ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í‘ ‘”  Í’ ‘”  Í“ ‘”  Í” ‘”  Í• ‘”  Í– ‘”  Í— ‘”  Í˜ ‘”  Í™ ‘”  Íš ‘”  Í› ‘”  Íœ ‘”  Í ‘”  Í ‘”  ÍŸ ‘”  Í  ‘”  Í¡ ‘”  Í¢ ‘”  Í£ ‘”  Í¤ ‘”  Í¥ ‘”  Í¦ ‘”  Í§ ‘”  Í¨ ‘”  Í© ‘”  Íª ‘”  Í« ‘”  Í¬ ‘”  Í­ ‘”  Í® ‘”  Í¯ ‘”  Í° ‘”  Í± ‘”  Í² ‘”  Í³ ‘”  Í´ ‘”  Íµ ‘”  Í¶ ‘”  Í· ‘”  Í¸ ‘”  Í¹ ‘”  Íº ‘”  Í» ‘”  Í¼ ‘”  Í½ ‘”  Í¾ ‘”  Í¿ ‘”  ÍÀ ‘”  ÍÁ ‘”  ÍÂ ‘”  ÍÃ ‘”  ÍÄ ‘”  ÍÅ ‘”  ÍÆ ‘”  ÍÇ ‘”  ÍÈ ‘”  ÍÉ ‘”  ÍÊ ‘”  ÍË ‘”  ÍÌ ‘”  ÍÍ ‘”  ÍÎ ‘”  ÍÏ ‘”  ÍĞ ‘”  ÍÑ ‘”  ÍÒ ‘”  ÍÓ ‘”  ÍÔ ‘”  ÍÕ ‘”  ÍÖ ‘”  Í× ‘”  ÍØ ‘”  ÍÙ ‘”  ÍÚ ‘”  ÍÛ ‘”  ÍÜ ‘”  Íİ ‘”  ÍŞ ‘”  Íß ‘”  Íà ‘”  Íá ‘”  Íâ ‘”  Íã ‘”  Íä ‘”  Íå ‘”  Íæ ‘”  Íç ‘”  Íè ‘”  Íé ‘”  Íê ‘”  Íë ‘”  Íì ‘”  Íí ‘”  Íî ‘”  Íï ‘”  Íğ ‘”  Íñ ‘”  Íò ‘”  Íó ‘”  Íô ‘”  Íõ ‘”  Íö ‘”  Í÷ ‘”  Íø ‘”  Íù ‘”  Íú ‘”  Íû ‘”  Íü ‘”  Íı ‘”  Íş ‘”  Íÿ ‘”  Í  ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í	 ‘”  Í
+ ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í  ‘”  Í! ‘”  Í" ‘”  Í# ‘”  Í$ ‘”  Í% ‘”  Í& ‘”  Í' ‘”  Í( ‘”  Í) ‘”  Í* ‘”  Í+ ‘”  Í, ‘”  Í- ‘”  Í. ‘”  Í/ ‘”  Í0 ‘”  Í1 ‘”  Í2 ‘”  Í3 ‘”  Í4 ‘”  Í5 ‘”  Í6 ‘”  Í7 ‘”  Í8 ‘”  Í9 ‘”  Í: ‘”  Í; ‘”  Í< ‘”  Í= ‘”  Í> ‘”  Í? ‘”  Í@ ‘”  ÍA ‘”  ÍB ‘”  ÍC ‘”  ÍD ‘”  ÍE ‘”  ÍF ‘”  ÍG ‘”  ÍH ‘”  ÍI ‘”  ÍJ ‘”  ÍK ‘”  ÍL ‘”  ÍM ‘”  ÍN ‘”  ÍO ‘”  ÍP ‘”  ÍQ ‘”  ÍR ‘”  ÍS ‘”  ÍT ‘”  ÍU ‘”  ÍV ‘”  ÍW ‘”  ÍX ‘”  ÍY ‘”  ÍZ ‘”  Í[ ‘”  Í\ ‘”  Í] ‘”  Í^ ‘”  Í_ ‘”  Í` ‘”  Ía ‘”  Íb ‘”  Íc ‘”  Íd ‘”  Íe ‘”  Íf ‘”  Íg ‘”  Íh ‘”  Íi ‘”  Íj ‘”  Ík ‘”  Íl ‘”  Ím ‘”  Ín ‘”  Ío ‘”  Íp ‘”  Íq ‘”  Ír ‘”  Ís ‘”  Ít ‘”  Íu ‘”  Ív ‘”  Íw ‘”  Íx ‘”  Íy ‘”  Íz ‘”  Í{ ‘”  Í| ‘”  Í} ‘”  Í~ ‘”  Í ‘”  Í€ ‘”  Í ‘”  Í‚ ‘”  Íƒ ‘”  Í„ ‘”  Í… ‘”  Í† ‘”  Í‡ ‘”  Íˆ ‘”  Í‰ ‘”  ÍŠ ‘”  Í‹ ‘”  ÍŒ ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í‘ ‘”  Í’ ‘”  Í“ ‘”  Í” ‘”  Í• ‘”  Í– ‘”  Í— ‘”  Í˜ ‘”  Í™ ‘”  Íš ‘”  Í› ‘”  Íœ ‘”  Í ‘”  Í ‘”  ÍŸ ‘”  Í  ‘”  Í¡ ‘”  Í¢ ‘”  Í£ ‘”  Í¤ ‘”  Í¥ ‘”  Í¦ ‘”  Í§ ‘”  Í¨ ‘”  Í© ‘”  Íª ‘”  Í« ‘”  Í¬ ‘”  Í­ ‘”  Í® ‘”  Í¯ ‘”  Í° ‘”  Í± ‘”  Í² ‘”  Í³ ‘”  Í´ ‘”  Íµ ‘”  Í¶ ‘”  Í· ‘”  Í¸ ‘”  Í¹ ‘”  Íº ‘”  Í» ‘”  Í¼ ‘”  Í½ ‘”  Í¾ ‘”  Í¿ ‘”  ÍÀ ‘”  ÍÁ ‘”  ÍÂ ‘”  ÍÃ ‘”  ÍÄ ‘”  ÍÅ ‘”  ÍÆ ‘”  ÍÇ ‘”  ÍÈ ‘”  ÍÉ ‘”  ÍÊ ‘”  ÍË ‘”  ÍÌ ‘”  ÍÍ ‘”  ÍÎ ‘”  ÍÏ ‘”  ÍĞ ‘”  ÍÑ ‘”  ÍÒ ‘”  ÍÓ ‘”  ÍÔ ‘”  ÍÕ ‘”  ÍÖ ‘”  Í× ‘”  ÍØ ‘”  ÍÙ ‘”  ÍÚ ‘”  ÍÛ ‘”  ÍÜ ‘”  Íİ ‘”  ÍŞ ‘”  Íß ‘”  Íà ‘”  Íá ‘”  Íâ ‘”  Íã ‘”  Íä ‘”  Íå ‘”  Íæ ‘”  Íç ‘”  Íè ‘”  Íé ‘”  Íê ‘”  Íë ‘”  Íì ‘”  Íí ‘”  Íî ‘”  Íï ‘”  Íğ ‘”  Íñ ‘”  Íò ‘”  Íó ‘”  Íô ‘”  Íõ ‘”  Íö ‘”  Í÷ ‘”  Íø ‘”  Íù ‘”  Íú ‘”  Íû ‘”  Íü ‘”  Íı ‘”  Íş ‘”  Íÿ ‘”  Í  ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í	 ‘”  Í
+ ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í  ‘”  Í! ‘”  Í" ‘”  Í# ‘”  Í$ ‘”  Í% ‘”  Í& ‘”  Í' ‘”  Í( ‘”  Í) ‘”  Í* ‘”  Í+ ‘”  Í, ‘”  Í- ‘”  Í. ‘”  Í/ ‘”  Í0 ‘”  Í1 ‘”  Í2 ‘”  Í3 ‘”  Í4 ‘”  Í5 ‘”  Í6 ‘”  Í7 ‘”  Í8 ‘”  Í9 ‘”  Í: ‘”  Í; ‘”  Í< ‘”  Í= ‘”  Í> ‘”  Í? ‘”  Í@ ‘”  ÍA ‘”  ÍB ‘”  ÍC ‘”  ÍD ‘”  ÍE ‘”  ÍF ‘”  ÍG ‘”  ÍH ‘”  ÍI ‘”  ÍJ ‘”  ÍK ‘”  ÍL ‘”  ÍM ‘”  ÍN ‘”  ÍO ‘”  ÍP ‘”  ÍQ ‘”  ÍR ‘”  ÍS ‘”  ÍT ‘”  ÍU ‘”  ÍV ‘”  ÍW ‘”  ÍX ‘”  ÍY ‘”  ÍZ ‘”  Í[ ‘”  Í\ ‘”  Í] ‘”  Í^ ‘”  Í_ ‘”  Í` ‘”  Ía ‘”  Íb ‘”  Íc ‘”  Íd ‘”  Íe ‘”  Íf ‘”  Íg ‘”  Íh ‘”  Íi ‘”  Íj ‘”  Ík ‘”  Íl ‘”  Ím ‘”  Ín ‘”  Ío ‘”  Íp ‘”  Íq ‘”  Ír ‘”  Ís ‘”  Ít ‘”  Íu ‘”  Ív ‘”  Íw ‘”  Íx ‘”  Íy ‘”  Íz ‘”  Í{ ‘”  Í| ‘”  Í} ‘”  Í~ ‘”  Í ‘”  Í€ ‘”  Í ‘”  Í‚ ‘”  Íƒ ‘”  Í„ ‘”  Í… ‘”  Í† ‘”  Í‡ ‘”  Íˆ ‘”  Í‰ ‘”  ÍŠ ‘”  Í‹ ‘”  ÍŒ ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í‘ ‘”  Í’ ‘”  Í“ ‘”  Í” ‘”  Í• ‘”  Í– ‘”  Í— ‘”  Í˜ ‘”  Í™ ‘”  Íš ‘”  Í› ‘”  Íœ ‘”  Í ‘”  Í ‘”  ÍŸ ‘”  Í  ‘”  Í¡ ‘”  Í¢ ‘”  Í£ ‘”  Í¤ ‘”  Í¥ ‘”  Í¦ ‘”  Í§ ‘”  Í¨ ‘”  Í© ‘”  Íª ‘”  Í« ‘”  Í¬ ‘”  Í­ ‘”  Í® ‘”  Í¯ ‘”  Í° ‘”  Í± ‘”  Í² ‘”  Í³ ‘”  Í´ ‘”  Íµ ‘”  Í¶ ‘”  Í· ‘”  Í¸ ‘”  Í¹ ‘”  Íº ‘”  Í» ‘”  Í¼ ‘”  Í½ ‘”  Í¾ ‘”  Í¿ ‘”  ÍÀ ‘”  ÍÁ ‘”  ÍÂ ‘”  ÍÃ ‘”  ÍÄ ‘”  ÍÅ ‘”  ÍÆ ‘”  ÍÇ ‘”  ÍÈ ‘”  ÍÉ ‘”  ÍÊ ‘”  ÍË ‘”  ÍÌ ‘”  ÍÍ ‘”  ÍÎ ‘”  ÍÏ ‘”  ÍĞ ‘”  ÍÑ ‘”  ÍÒ ‘”  ÍÓ ‘”  ÍÔ ‘”  ÍÕ ‘”  ÍÖ ‘”  Í× ‘”  ÍØ ‘”  ÍÙ ‘”  ÍÚ ‘”  ÍÛ ‘”  ÍÜ ‘”  Íİ ‘”  ÍŞ ‘”  Íß ‘”  Íà ‘”  Íá ‘”  Íâ ‘”  Íã ‘”  Íä ‘”  Íå ‘”  Íæ ‘”  Íç ‘”  Íè ‘”  Íé ‘”  Íê ‘”  Íë ‘”  Íì ‘”  Íí ‘”  Íî ‘”  Íï ‘”  Íğ ‘”  Íñ ‘”  Íò ‘”  Íó ‘”  Íô ‘”  Íõ ‘”  Íö ‘”  Í÷ ‘”  Íø ‘”  Íù ‘”  Íú ‘”  Íû ‘”  Íü ‘”  Íı ‘”  Íş ‘”  Íÿ ‘”  Í  ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í	 ‘”  Í
+ ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í  ‘”  Í! ‘”  Í" ‘”  Í# ‘”  Í$ ‘”  Í% ‘”  Í& ‘”  Í' ‘”  Í( ‘”  Í) ‘”  Í* ‘”  Í+ ‘”  Í, ‘”  Í- ‘”  Í. ‘”  Í/ ‘”  Í0 ‘”  Í1 ‘”  Í2 ‘”  Í3 ‘”  Í4 ‘”  Í5 ‘”  Í6 ‘”  Í7 ‘”  Í8 ‘”  Í9 ‘”  Í: ‘”  Í; ‘”  Í< ‘”  Í= ‘”  Í> ‘”  Í? ‘”  Í@ ‘”  ÍA ‘”  ÍB ‘”  ÍC ‘”  ÍD ‘”  ÍE ‘”  ÍF ‘”  ÍG ‘”  ÍH ‘”  ÍI ‘”  ÍJ ‘”  ÍK ‘”  ÍL ‘”  ÍM ‘”  ÍN ‘”  ÍO ‘”  ÍP ‘”  ÍQ ‘”  ÍR ‘”  ÍS ‘”  ÍT ‘”  ÍU ‘”  ÍV ‘”  ÍW ‘”  ÍX ‘”  ÍY ‘”  ÍZ ‘”  Í[ ‘”  Í\ ‘”  Í] ‘”  Í^ ‘”  Í_ ‘”  Í` ‘”  Ía ‘”  Íb ‘”  Íc ‘”  Íd ‘”  Íe ‘”  Íf ‘”  Íg ‘”  Íh ‘”  Íi ‘”  Íj ‘”  Ík ‘”  Íl ‘”  Ím ‘”  Ín ‘”  Ío ‘”  Íp ‘”  Íq ‘”  Ír ‘”  Ís ‘”  Ít ‘”  Íu ‘”  Ív ‘”  Íw ‘”  Íx ‘”  Íy ‘”  Íz ‘”  Í{ ‘”  Í| ‘”  Í} ‘”  Í~ ‘”  Í ‘”  Í€ ‘”  Í ‘”  Í‚ ‘”  Íƒ ‘”  Í„ ‘”  Í… ‘”  Í† ‘”  Í‡ ‘”  Íˆ ‘”  Í‰ ‘”  ÍŠ ‘”  Í‹ ‘”  ÍŒ ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í‘ ‘”  Í’ ‘”  Í“ ‘”  Í” ‘”  Í• ‘”  Í– ‘”  Í— ‘”  Í˜ ‘”  Í™ ‘”  Íš ‘”  Í› ‘”  Íœ ‘”  Í ‘”  Í ‘”  ÍŸ ‘”  Í  ‘”  Í¡ ‘”  Í¢ ‘”  Í£ ‘”  Í¤ ‘”  Í¥ ‘”  Í¦ ‘”  Í§ ‘”  Í¨ ‘”  Í© ‘”  Íª ‘”  Í« ‘”  Í¬ ‘”  Í­ ‘”  Í® ‘”  Í¯ ‘”  Í° ‘”  Í± ‘”  Í² ‘”  Í³ ‘”  Í´ ‘”  Íµ ‘”  Í¶ ‘”  Í· ‘”  Í¸ ‘”  Í¹ ‘”  Íº ‘”  Í» ‘”  Í¼ ‘”  Í½ ‘”  Í¾ ‘”  Í¿ ‘”  ÍÀ ‘”  ÍÁ ‘”  ÍÂ ‘”  ÍÃ ‘”  ÍÄ ‘”  ÍÅ ‘”  ÍÆ ‘”  ÍÇ ‘”  ÍÈ ‘”  ÍÉ ‘”  ÍÊ ‘”  ÍË ‘”  ÍÌ ‘”  ÍÍ ‘”  ÍÎ ‘”  ÍÏ ‘”  ÍĞ ‘”  ÍÑ ‘”  ÍÒ ‘”  ÍÓ ‘”  ÍÔ ‘”  ÍÕ ‘”  ÍÖ ‘”  Í× ‘”  ÍØ ‘”  ÍÙ ‘”  ÍÚ ‘”  ÍÛ ‘”  ÍÜ ‘”  Íİ ‘”  ÍŞ ‘”  Íß ‘”  Íà ‘”  Íá ‘”  Íâ ‘”  Íã ‘”  Íä ‘”  Íå ‘”  Íæ ‘”  Íç ‘”  Íè ‘”  Íé ‘”  Íê ‘”  Íë ‘”  Íì ‘”  Íí ‘”  Íî ‘”  Íï ‘”  Íğ ‘”  Íñ ‘”  Íò ‘”  Íó ‘”  Íô ‘”  Íõ ‘”  Íö ‘”  Í÷ ‘”  Íø ‘”  Íù ‘”  Íú ‘”  Íû ‘”  Íü ‘”  Íı ‘”  Íş ‘”  Íÿ ‘”  Í  ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í	 ‘”  Í
+ ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í  ‘”  Í! ‘”  Í" ‘”  Í# ‘”  Í$ ‘”  Í% ‘”  Í& ‘”  Í' ‘”  Í( ‘”  Í) ‘”  Í* ‘”  Í+ ‘”  Í, ‘”  Í- ‘”  Í. ‘”  Í/ ‘”  Í0 ‘”  Í1 ‘”  Í2 ‘”  Í3 ‘”  Í4 ‘”  Í5 ‘”  Í6 ‘”  Í7 ‘”  Í8 ‘”  Í9 ‘”  Í: ‘”  Í; ‘”  Í< ‘”  Í= ‘”  Í> ‘”  Í? ‘”  Í@ ‘”  ÍA ‘”  ÍB ‘”  ÍC ‘”  ÍD ‘”  ÍE ‘”  ÍF ‘”  ÍG ‘”  ÍH ‘”  ÍI ‘”  ÍJ ‘”  ÍK ‘”  ÍL ‘”  ÍM ‘”  ÍN ‘”  ÍO ‘”  ÍP ‘”  ÍQ ‘”  ÍR ‘”  ÍS ‘”  ÍT ‘”  ÍU ‘”  ÍV ‘”  ÍW ‘”  ÍX ‘”  ÍY ‘”  ÍZ ‘”  Í[ ‘”  Í\ ‘”  Í] ‘”  Í^ ‘”  Í_ ‘”  Í` ‘”  Ía ‘”  Íb ‘”  Íc ‘”  Íd ‘”  Íe ‘”  Íf ‘”  Íg ‘”  Íh ‘”  Íi ‘Ùî/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@hnpaqqbd4i9bxcrp3ktun4a1gqv9ys2o5pljtcetlzk=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/runtime/libs/dom.js‘Ú‡4// packages/uni-dom/src/CSSStyleDeclaration.ts
+var CSSStyleDeclaration = class {
+  constructor(element) {
+    this._element = element;
+  }
+  get element() {
+    return this._element;
+  }
+  getPropertyValue(property) {
+    return this._element.getCSSPropertyValue(property) || "";
+  }
+  setProperty(property, value, priority) {
+    this._element.updateStyle(property, value);
+  }
+  removeProperty(property) {
+    return "";
+  }
+  getPropertyPriority(property) {
+    return "";
+  }
+};
+
+// packages/uni-dom/src/NativeMap.ts
+var NativeMap = class extends Map {
+  get(key) {
+    const value = super.get(key);
+    return value === void 0 ? null : value;
+  }
+};
+
+// packages/uni-dom/src/NodeData.ts
+var NodeData = class {
+  constructor(id, name, attrs = new NativeMap(), style = new NativeMap()) {
+    this.id = id;
+    this.name = name;
+    this.attrs = attrs;
+    this.style = style;
+  }
+};
+
+// packages/uni-dom/src/UniCallbackWrapper.ts
+var UniCallbackWrapper = class {
+  constructor(callback) {
+    this.callback = callback;
+  }
+};
+
+// packages/uni-dom/src/DOMRect.ts
+var DOMRect = class {
+  constructor(x, y, width, height) {
+    this._x = x ?? 0;
+    this._y = y ?? 0;
+    this._width = width ?? 0;
+    this._height = height ?? 0;
+  }
+  get x() {
+    return this._x;
+  }
+  set x(x) {
+    this._x = x;
+  }
+  get y() {
+    return this._y;
+  }
+  set y(y) {
+    this._y = y;
+  }
+  get width() {
+    return this._width;
+  }
+  set width(width) {
+    this._width = width;
+  }
+  get height() {
+    return this._height;
+  }
+  set height(height) {
+    this._height = height;
+  }
+  get left() {
+    if (this._width >= 0) {
+      return this._x;
+    }
+    return this._x + this._width;
+  }
+  set left(left) {
+  }
+  get top() {
+    if (this._height >= 0) {
+      return this._y;
+    }
+    return this._y + this._height;
+  }
+  set top(top) {
+  }
+  get right() {
+    if (this._width >= 0) {
+      return this._x + this._width;
+    }
+    return this._x;
+  }
+  set right(right) {
+  }
+  get bottom() {
+    if (this._height >= 0) {
+      return this._y + this._height;
+    }
+    return this._y;
+  }
+  set bottom(bottom) {
+  }
+  toJSON() {
+    return {
+      x: this.x,
+      y: this.y,
+      width: this.width,
+      height: this.height,
+      left: this.left,
+      top: this.top,
+      right: this.right,
+      bottom: this.bottom
+    };
+  }
+};
+
+// ../uni-app-next/packages/uni-shared/dist/uni-shared.es.js
+var BUILT_IN_TAG_NAMES = [
+  "ad",
+  "ad-content-page",
+  "ad-draw",
+  "audio",
+  "button",
+  "camera",
+  "canvas",
+  "checkbox",
+  "checkbox-group",
+  "cover-image",
+  "cover-view",
+  "editor",
+  "form",
+  "functional-page-navigator",
+  "icon",
+  "image",
+  "input",
+  "label",
+  "live-player",
+  "live-pusher",
+  "map",
+  "movable-area",
+  "movable-view",
+  "navigator",
+  "official-account",
+  "open-data",
+  "picker",
+  "picker-view",
+  "picker-view-column",
+  "progress",
+  "radio",
+  "radio-group",
+  "rich-text",
+  "scroll-view",
+  "slider",
+  "swiper",
+  "swiper-item",
+  "switch",
+  "text",
+  "textarea",
+  "video",
+  "view",
+  "web-view",
+  "location-picker",
+  "location-view"
+];
+var BUILT_IN_TAGS = BUILT_IN_TAG_NAMES.map((tag) => "uni-" + tag);
+var H5_BUILT_IN_TAG_NAMES = BUILT_IN_TAG_NAMES.filter((tag) => tag !== "audio");
+var H5_BUILT_IN_TAGS = H5_BUILT_IN_TAG_NAMES.map((tag) => "uni-" + tag);
+var TAGS = [
+  "app",
+  "layout",
+  "content",
+  "main",
+  "top-window",
+  "left-window",
+  "right-window",
+  "tabbar",
+  "page",
+  "page-head",
+  "page-wrapper",
+  "page-body",
+  "page-refresh",
+  "actionsheet",
+  "modal",
+  "toast",
+  "resize-sensor",
+  "shadow-root"
+].map((tag) => "uni-" + tag);
+var UVUE_WEB_BUILT_IN_TAGS = [
+  "page-container",
+  "list-view",
+  "list-item",
+  "sticky-section",
+  "sticky-header",
+  "cloud-db-element",
+  "loading-element",
+  "loading"
+].map((tag) => "uni-" + tag);
+var UVUE_MP_BUILT_IN_TAGS = [
+  "list-view",
+  "list-item",
+  "sticky-section",
+  "sticky-header",
+  "cloud-db-element",
+  "loading-element"
+].map((tag) => "uni-" + tag);
+var UVUE_HARMONY_BUILT_IN_TAGS = [
+  // TODO åˆ—å‡ºå®Œæ•´åˆ—è¡¨
+  ...BUILT_IN_TAG_NAMES,
+  "volume-panel"
+];
+var UNI_UI_CONFLICT_TAGS = ["list-item"].map((tag) => "uni-" + tag);
+var NVUE_CUSTOM_COMPONENTS = [
+  "ad",
+  "ad-draw",
+  "button",
+  "checkbox-group",
+  "checkbox",
+  "form",
+  "icon",
+  "label",
+  "movable-area",
+  "movable-view",
+  "navigator",
+  "picker",
+  "progress",
+  "radio-group",
+  "radio",
+  "rich-text",
+  "swiper-item",
+  "swiper",
+  "switch",
+  "slider",
+  "picker-view",
+  "picker-view-column"
+];
+var UVUE_BUILT_IN_EASY_COMPONENTS = [
+  "map",
+  "camera",
+  "live-player",
+  "live-pusher",
+  "loading",
+  "web-view",
+  "rich-text",
+  "page-container",
+  "editor",
+  "video"
+];
+var UVUE_CUSTOM_COMPONENTS = [
+  ...NVUE_CUSTOM_COMPONENTS,
+  ...UVUE_BUILT_IN_EASY_COMPONENTS
+];
+var COMPONENT_SELECTOR_PREFIX = "uni-";
+var COMPONENT_PREFIX = "v-" + COMPONENT_SELECTOR_PREFIX;
+function once(fn, ctx = null) {
+  let res;
+  return ((...args) => {
+    if (fn) {
+      res = fn.apply(ctx, args);
+      fn = null;
+    }
+    return res;
+  });
+}
+var unitRE = new RegExp(`"[^"]+"|'[^']+'|url\\([^)]+\\)|(\\d*\\.?\\d+)[r|u]px`, "g");
+var defaultRpx2Unit = {
+  unit: "rem",
+  unitRatio: 10 / 320,
+  unitPrecision: 5
+};
+var invokeCreateErrorHandler = once((app, createErrorHandler) => {
+  return createErrorHandler(app);
+});
+var E = function() {
+};
+E.prototype = {
+  _id: 1,
+  on: function(name, callback, ctx) {
+    var e = this.e || (this.e = {});
+    (e[name] || (e[name] = [])).push({
+      fn: callback,
+      ctx,
+      _id: this._id
+    });
+    return this._id++;
+  },
+  once: function(name, callback, ctx) {
+    var self2 = this;
+    function listener() {
+      self2.off(name, listener);
+      callback.apply(ctx, arguments);
+    }
+    listener._ = callback;
+    return this.on(name, listener, ctx);
+  },
+  emit: function(name) {
+    var data = [].slice.call(arguments, 1);
+    var evtArr = ((this.e || (this.e = {}))[name] || []).slice();
+    var i = 0;
+    var len = evtArr.length;
+    for (i; i < len; i++) {
+      evtArr[i].fn.apply(evtArr[i].ctx, data);
+    }
+    return this;
+  },
+  off: function(name, event) {
+    var e = this.e || (this.e = {});
+    var evts = e[name];
+    var liveEvents = [];
+    if (evts && event) {
+      for (var i = evts.length - 1; i >= 0; i--) {
+        if (evts[i].fn === event || evts[i].fn._ === event || evts[i]._id === event) {
+          evts.splice(i, 1);
+          break;
+        }
+      }
+      liveEvents = evts;
+    }
+    liveEvents.length ? e[name] = liveEvents : delete e[name];
+    return this;
+  }
+};
+var UniDOMStringMap = class extends Map {
+  constructor(options) {
+    super();
+    this._options = options;
+  }
+  get(key) {
+    const normalizedKey = normalizeDatasetKey(String(key));
+    return super.has(normalizedKey) ? super.get(normalizedKey) : null;
+  }
+  set(key, value) {
+    var _a, _b;
+    const normalizedKey = normalizeDatasetKey(String(key));
+    super.set(normalizedKey, value);
+    (_b = (_a = this._options) === null || _a === void 0 ? void 0 : _a.onSet) === null || _b === void 0 ? void 0 : _b.call(_a, normalizedKey, value);
+    return this;
+  }
+  has(key) {
+    return super.has(normalizeDatasetKey(String(key)));
+  }
+  delete(key) {
+    var _a, _b;
+    const normalizedKey = normalizeDatasetKey(String(key));
+    const deleted = super.delete(normalizedKey);
+    if (deleted) {
+      (_b = (_a = this._options) === null || _a === void 0 ? void 0 : _a.onDelete) === null || _b === void 0 ? void 0 : _b.call(_a, normalizedKey);
+    }
+    return deleted;
+  }
+  clear() {
+    const keys = Array.from(super.keys());
+    super.clear();
+    keys.forEach((key) => {
+      var _a, _b;
+      return (_b = (_a = this._options) === null || _a === void 0 ? void 0 : _a.onDelete) === null || _b === void 0 ? void 0 : _b.call(_a, key);
+    });
+  }
+};
+function normalizeDatasetKey(key) {
+  const normalizedKey = key.replace(/[A-Z]/g, (char) => char.toLowerCase());
+  if (normalizedKey.indexOf("data-") !== 0) {
+    return key;
+  }
+  return normalizedKey.slice(5).replace(/-([a-z])/g, (_, char) => char.toUpperCase());
+}
+function isReservedDatasetKey(target, key) {
+  return key in target;
+}
+function setDatasetValue(dataset, key, value) {
+  Map.prototype.set.call(dataset, normalizeDatasetKey(String(key)), value);
+}
+function initDataset(dataset, source) {
+  if (!source) {
+    return;
+  }
+  if (source instanceof Map) {
+    source.forEach((value, key) => setDatasetValue(dataset, key, value));
+    return;
+  }
+  Object.keys(source).forEach((key) => setDatasetValue(dataset, key, source[key]));
+}
+function createUniDOMStringMap(source, options) {
+  const target = new UniDOMStringMap(options);
+  initDataset(target, source);
+  return new Proxy(target, {
+    get(target2, key, receiver) {
+      if (typeof key === "string") {
+        if (!isReservedDatasetKey(target2, key)) {
+          return target2.has(key) ? target2.get(key) : null;
+        }
+      }
+      const value = Reflect.get(target2, key, target2);
+      if (typeof value === "function") {
+        return (...args) => {
+          const result = value.apply(target2, args);
+          return result === target2 ? receiver : result;
+        };
+      }
+      return value;
+    },
+    set(target2, key, value, receiver) {
+      if (typeof key === "string" && !isReservedDatasetKey(target2, key)) {
+        target2.set(key, value);
+        return true;
+      }
+      return Reflect.set(target2, key, value, receiver);
+    },
+    deleteProperty(target2, key) {
+      if (typeof key === "string" && !isReservedDatasetKey(target2, key) && target2.has(key)) {
+        return target2.delete(key);
+      }
+      return Reflect.deleteProperty(target2, key);
+    },
+    has(target2, key) {
+      if (typeof key === "string" && target2.has(key)) {
+        return true;
+      }
+      return Reflect.has(target2, key);
+    },
+    ownKeys(target2) {
+      return Array.from(target2.keys()).filter((key) => !isReservedDatasetKey(target2, key));
+    },
+    getOwnPropertyDescriptor(target2, key) {
+      if (typeof key === "string" && !isReservedDatasetKey(target2, key) && target2.has(key)) {
+        return {
+          configurable: true,
+          enumerable: true,
+          value: target2.get(key),
+          writable: true
+        };
+      }
+      return Reflect.getOwnPropertyDescriptor(target2, key);
+    }
+  });
+}
+
+// packages/uni-dom/src/UniEvent/types.ts
+var UniEvent = class {
+  constructor(type, eventInit) {
+    this.__v_skip = true;
+    this.timeStamp = Date.now();
+    this._bubbles = false;
+    this._cancelable = false;
+    // æš‚æ—¶ä½¿ç”¨å±æ€§å£°æ˜ï¼Œç”¨äºå†…éƒ¨é‡å†™
+    this.stopPropagation = () => {
+    };
+    this.preventDefault = () => {
+    };
+    this.type = type;
+    if (eventInit) {
+      this._bubbles = !!eventInit.bubbles;
+      this._cancelable = !!eventInit.cancelable;
+    }
+  }
+  get [Symbol.toStringTag]() {
+    return "UniEvent";
+  }
+  get bubbles() {
+    return this._bubbles;
+  }
+  set bubbles(value) {
+  }
+  get cancelable() {
+    return this._cancelable;
+  }
+  set cancelable(value) {
+  }
+};
+
+// packages/uni-dom/src/UniEvent/UniMouseEvent.ts
+var UniMouseEvent = class extends UniEvent {
+  constructor(type, x, y, clientX, clientY, pageX, pageY, screenX, screenY) {
+    super(type, {
+      bubbles: true,
+      cancelable: true
+    });
+    this.x = x;
+    this.y = y;
+    this.clientX = clientX;
+    this.clientY = clientY;
+    this.pageX = pageX;
+    this.pageY = pageY;
+    this.screenX = screenX;
+    this.screenY = screenY;
+  }
+};
+
+// packages/uni-dom/src/UniEvent/UniPointerEvent.ts
+var UniPointerEvent = class extends UniEvent {
+  constructor(type, x, y, clientX, clientY, pageX, pageY, screenX, screenY) {
+    super(type, {
+      bubbles: true,
+      cancelable: true
+    });
+    this.x = x;
+    this.y = y;
+    this.clientX = clientX;
+    this.clientY = clientY;
+    this.pageX = pageX;
+    this.pageY = pageY;
+    this.screenX = screenX;
+    this.screenY = screenY;
+  }
+};
+
+// packages/uni-dom/src/UniEvent/UniTouchEvent.ts
+var UniTouch = class {
+  constructor() {
+    this.clientX = 0;
+    this.clientY = 0;
+    this.identifier = 0;
+    this.pageX = 0;
+    this.pageY = 0;
+    this.screenX = 0;
+    this.screenY = 0;
+    this.force = null;
+  }
+};
+var UniTouchEvent = class extends UniEvent {
+  constructor(type, touches, changedTouches) {
+    super(type, { bubbles: true, cancelable: true });
+    this.touches = touches;
+    this.changedTouches = changedTouches;
+  }
+};
+
+// packages/uni-dom/src/UniNativeAppManager.ts
+var mainApp = null;
+function setUniApp(app) {
+  mainApp = app;
+}
+function getUniApp() {
+  return mainApp;
+}
+
+// packages/uni-dom/src/BuiltInElement.ts
+var store = /* @__PURE__ */ new Map();
+function define(name, constructor) {
+  store.set(name, constructor);
+}
+function find(name) {
+  return store.get(name);
+}
+var elementCache = /* @__PURE__ */ new Map();
+function buildElement(elementInfo, pageOrId) {
+  const app = getUniApp();
+  let page;
+  let pageId;
+  if (typeof pageOrId === "string" || typeof pageOrId === "number") {
+    pageId = String(pageOrId);
+    page = app.pageManager.findPageById(pageId);
+  } else {
+    page = pageOrId;
+    pageId = page.pageId;
+  }
+  const tagName = elementInfo.tagName;
+  const key = `${tagName}:${pageId}:${elementInfo.id}`;
+  if (elementCache.has(key)) {
+    const el2 = elementCache.get(key)?.deref();
+    if (el2) {
+      return el2;
+    }
+  }
+  let elementConstructor = find(tagName);
+  if (!elementConstructor) {
+    elementConstructor = find(elementInfo.originTagName);
+    if (!elementConstructor) {
+      throw new Error(`Cannot find element constructor for tag: ${tagName}`);
+    }
+  }
+  const el = new elementConstructor(elementInfo.id, page, tagName);
+  if (typeof elementInfo.vueId !== "undefined") {
+    el.ext.set("vueComponentId", elementInfo.vueId);
+  }
+  elementCache.set(key, new WeakRef(el));
+  return el;
+}
+
+// packages/uni-dom/src/FullscreenEvent/change.ts
+var fullscreenchangeEvent = class extends UniEvent {
+  constructor() {
+    super("fullscreenchange");
+  }
+};
+
+// packages/uni-dom/src/FullscreenEvent/error.ts
+var FullscreenError = class extends UniEvent {
+  constructor(errSubject, errCode, errMsg) {
+    super("fullscreenerror");
+    this.errCode = 106601;
+    this.errSubject = "requestFullscreen";
+    this.data = {};
+    this.errMsg = "";
+    this.errCode = errCode;
+    this.errSubject = errSubject;
+    this.errMsg = errMsg ?? `${errSubject}:fail`;
+    this.cause = new Error(this.errMsg);
+  }
+};
+var AlreadyFullScreenError = class extends FullscreenError {
+  constructor() {
+    super(
+      "requestFullscreen",
+      106600 /* AlreadyFullScreen */,
+      `requestFullscreen:fail Already in fullscreen`
+    );
+  }
+};
+var ElementNotSupportFullScreenError = class extends FullscreenError {
+  constructor() {
+    super(
+      "requestFullscreen",
+      106601 /* ElementNotSupportFullScreen */,
+      `requestFullscreen:fail Element does not support fullscreen`
+    );
+  }
+};
+var NoElementFullScreenError = class extends FullscreenError {
+  constructor(errSubject) {
+    super(
+      errSubject,
+      106602 /* NoElementFullScreen */,
+      `${errSubject}:fail No element is in fullscreen`
+    );
+  }
+};
+var PageNotReadyOrDestroyedError = class extends FullscreenError {
+  constructor(errSubject) {
+    super(
+      errSubject,
+      106603 /* PageNotReadyOrDestroyed */,
+      `${errSubject}:fail Page is not ready or has been destroyed`
+    );
+  }
+};
+var ComponentNotReadyError = class extends FullscreenError {
+  constructor(errSubject) {
+    super(
+      errSubject,
+      106604 /* ComponentNotReady */,
+      `${errSubject}:fail Component is not ready`
+    );
+  }
+};
+var fullscreenerrorEvent = class extends UniEvent {
+  constructor() {
+    super("fullscreenerror");
+  }
+};
+function getFullscreenError(errSubject, errCode = 106601) {
+  switch (errCode) {
+    case 106600 /* AlreadyFullScreen */:
+      return new AlreadyFullScreenError();
+    case 106601 /* ElementNotSupportFullScreen */:
+      return new ElementNotSupportFullScreenError();
+    case 106602 /* NoElementFullScreen */:
+      return new NoElementFullScreenError(errSubject);
+    case 106603 /* PageNotReadyOrDestroyed */:
+      return new PageNotReadyOrDestroyedError(errSubject);
+    case 106604 /* ComponentNotReady */:
+      return new ComponentNotReadyError(errSubject);
+  }
+  return new FullscreenError(errSubject, errCode);
+}
+
+// packages/uni-dom/src/UniElement.ts
+var UNI_MOUSE_EVENT_TYPES = ["mousedown", "mousemove", "mouseup"];
+var UNI_POINTER_EVENT_TYPES = ["click", "tap"];
+var UNI_TOUCH_EVENT_TYPES = [
+  "touchstart",
+  "touchmove",
+  "touchcancel",
+  "touchend",
+  "longpress",
+  "longtap"
+];
+var elementDatasetCache = /* @__PURE__ */ new WeakMap();
+function getPageDatasetCache(page) {
+  let cache = elementDatasetCache.get(page);
+  if (!cache) {
+    cache = /* @__PURE__ */ new Map();
+    elementDatasetCache.set(page, cache);
+  }
+  return cache;
+}
+var UNI_BASE_EVENT_TYPES = [
+  ...UNI_MOUSE_EVENT_TYPES,
+  ...UNI_POINTER_EVENT_TYPES,
+  ...UNI_TOUCH_EVENT_TYPES
+];
+var UniElementImpl = class {
+  constructor(id, page, tagName) {
+    this.ext = /* @__PURE__ */ new Map();
+    this._style = null;
+    this._nativeElement = null;
+    this.__id = id;
+    this.page = page;
+    this.tagName = this.nodeName = tagName.toUpperCase();
+  }
+  get uniPage() {
+    return this.page.__uniPage;
+  }
+  // accessor ä½¿ UniCustomElement Proxy å°† dataset èµ‹å€¼ä¿ç•™åœ¨ JS elementï¼Œé¿å…è½¬å‘åˆ° iOS uts delegateã€‚
+  get dataset() {
+    const cache = getPageDatasetCache(this.page);
+    let dataset = cache.get(this.__id);
+    if (!dataset) {
+      dataset = createUniDOMStringMap();
+      cache.set(this.__id, dataset);
+    }
+    return dataset;
+  }
+  set dataset(dataset) {
+    getPageDatasetCache(this.page).set(this.__id, dataset);
+  }
+  /**
+   * ç”¨äºå…¼å®¹è€ç‰ˆæœ¬ä½¿ç”¨æ–¹å¼
+   * @internal
+   */
+  get pageId() {
+    return this.page.pageId;
+  }
+  get [Symbol.toStringTag]() {
+    return "UniElement";
+  }
+  get nativeElement() {
+    if (!this._nativeElement && this.page) {
+      if (true) {
+        this._nativeElement = new UniElementJs(
+          Number(this.page.pageId),
+          this.__id
+        );
+      } else {
+        this._nativeElement = this.page.page.getUniElementJsById(
+          this.__id
+        );
+      }
+    }
+    if (true) {
+      if (!this._nativeElement) {
+        console.warn(
+          `Element ${this.tagName} (id: ${this.__id}) on page ${this.page.pageId} does not have a native element.`
+        );
+      }
+    }
+    return this._nativeElement;
+  }
+  /**
+   * TODO çº æ­£ç±»å‹
+   */
+  getNodeId() {
+    return this.__id;
+  }
+  get offsetLeft() {
+    return this.nativeElement.offsetLeft;
+  }
+  get offsetTop() {
+    return this.nativeElement.offsetTop;
+  }
+  get offsetWidth() {
+    return this.nativeElement.offsetWidth;
+  }
+  get offsetHeight() {
+    return this.nativeElement.offsetHeight;
+  }
+  get style() {
+    if (!this._style) {
+      this._style = new CSSStyleDeclaration(this.nativeElement);
+    }
+    return this._style;
+  }
+  get parentElement() {
+    return this.nativeElement.parentElement;
+  }
+  get children() {
+    return this.nativeElement.children;
+  }
+  get previousElementSibling() {
+    return this.nativeElement.previousElementSibling;
+  }
+  get nextElementSibling() {
+    return this.nativeElement.nextElementSibling;
+  }
+  get classList() {
+    const classList = this.nativeElement.classList;
+    let normalized = null;
+    for (let i = 0; i < classList.length; i++) {
+      const item = classList[i];
+      if (item.charCodeAt(0) === 94) {
+        if (normalized === null) {
+          normalized = classList.slice(0, i);
+        }
+        let start = 1;
+        while (item.charCodeAt(start) === 94) {
+          start++;
+        }
+        normalized.push(item.slice(start));
+      } else if (normalized !== null) {
+        normalized.push(item);
+      }
+    }
+    return normalized || classList;
+  }
+  get scrollWidth() {
+    return this.nativeElement.scrollWidth;
+  }
+  get scrollHeight() {
+    return this.nativeElement.scrollHeight;
+  }
+  get scrollLeft() {
+    return this.nativeElement.scrollLeft;
+  }
+  set scrollLeft(v) {
+    this.nativeElement.scrollLeft = v;
+  }
+  get scrollTop() {
+    return this.nativeElement.scrollTop;
+  }
+  set scrollTop(v) {
+    this.nativeElement.scrollTop = v;
+  }
+  takeSnapshot(options) {
+    this.nativeElement.takeSnapshot({
+      success: (res) => {
+        options?.success?.(res);
+        options?.complete?.(res);
+      },
+      fail: (err) => {
+        options?.fail?.(err);
+        options?.complete?.(err);
+      },
+      complete: (_) => {
+      }
+    });
+  }
+  appendChild(aChild) {
+    throw new Error("Method not implemented.");
+  }
+  insertBefore(newChild, refChild) {
+    throw new Error("Method not implemented.");
+  }
+  setAttribute(key, value) {
+    this.nativeElement.setAttribute(key, value);
+  }
+  setAnyAttribute(key, value) {
+    this.nativeElement.setAttribute(key, value);
+  }
+  getAttribute(key) {
+    return this.nativeElement.getAttribute(key) ?? null;
+  }
+  getAnyAttribute(key) {
+    return this.nativeElement.getAttribute(key);
+  }
+  hasAttribute(key) {
+    return this.nativeElement.hasAttribute(key);
+  }
+  removeAttribute(key) {
+    this.nativeElement.removeAttribute(key);
+  }
+  updateStyle(map) {
+    throw new Error("Method not implemented.");
+  }
+  getBoundingClientRect() {
+    return this.nativeElement.getBoundingClientRect() ?? new DOMRect();
+  }
+  getBoundingClientRectAsync(options) {
+    if (options) {
+      return new Promise((resolve, reject) => {
+        const rect = this.getBoundingClientRect();
+        options?.success?.(rect);
+        options?.complete?.(rect);
+        resolve(rect);
+      });
+    } else {
+      return new Promise((resolve, reject) => {
+        resolve(this.getBoundingClientRect());
+      });
+    }
+  }
+  getDrawableContext() {
+    throw new Error("Method not implemented.");
+  }
+  addEventListener(type, callback) {
+    const callbackWrapper = new UniCallbackWrapper(callback);
+    this.nativeElement.addEventListener(type, callback);
+    return callbackWrapper;
+  }
+  removeEventListener(type, callbackWrapper) {
+    const callback = callbackWrapper.callback;
+    this.nativeElement.removeEventListener(type, callback);
+  }
+  removeChild(aChild) {
+    throw new Error("Method not implemented.");
+  }
+  remove() {
+    throw new Error("Method not implemented.");
+  }
+  dispatchEvent(type, value) {
+    this.nativeElement.dispatchEvent(
+      value ? value : type
+    );
+  }
+  scrollTo(x, y) {
+    this.nativeElement.scrollTo(x, y);
+  }
+  scrollBy(x, y) {
+    this.nativeElement.scrollBy(x, y);
+  }
+  querySelector(selector) {
+    return this.nativeElement.querySelector(selector);
+  }
+  querySelectorAll(selector) {
+    return this.nativeElement.querySelectorAll(selector);
+  }
+  focus() {
+  }
+  blur() {
+  }
+  getIOSView() {
+    return null;
+  }
+  /**
+   * @deprecated use .uniPage
+   */
+  getPage() {
+    return this.uniPage;
+  }
+  animate(keyframes, options) {
+    return this.nativeElement.animate(keyframes, options);
+  }
+  getHarmonyController() {
+    return null;
+  }
+  requestFullscreen(options) {
+    const err = new ElementNotSupportFullScreenError();
+    options?.fail?.(err);
+    options?.complete?.(err);
+  }
+  getDelegate(prop) {
+    if (this.pageId) {
+      const delegate = this.page.page.getUniElementExtById?.(this.__id);
+      const value = delegate?.[prop];
+      return typeof value === "function" ? value.bind(delegate) : value;
+    }
+    return void 0;
+  }
+  setDelegate(prop, value) {
+    if (this.pageId) {
+      const delegate = this.page.page.getUniElementExtById?.(this.__id);
+      if (delegate) {
+        delegate[prop] = value;
+        return true;
+      }
+    }
+    return false;
+  }
+  static buildEvent(nativeEvent, page, event) {
+    if (!event) {
+      if (UNI_MOUSE_EVENT_TYPES.includes(nativeEvent.type)) {
+        const e = nativeEvent;
+        event = new UniMouseEvent(
+          nativeEvent.type,
+          e.x,
+          e.y,
+          e.clientX,
+          e.clientY,
+          e.pageX,
+          e.pageY,
+          e.screenX,
+          e.screenY
+        );
+      } else if (UNI_POINTER_EVENT_TYPES.includes(nativeEvent.type)) {
+        const e = nativeEvent;
+        event = new UniPointerEvent(
+          nativeEvent.type,
+          e.x,
+          e.y,
+          e.clientX,
+          e.clientY,
+          e.pageX,
+          e.pageY,
+          e.screenX,
+          e.screenY
+        );
+      } else if (UNI_TOUCH_EVENT_TYPES.includes(nativeEvent.type)) {
+        const e = nativeEvent;
+        event = new UniTouchEvent(nativeEvent.type, e.touches, e.changedTouches);
+      } else {
+        event = new UniEvent(nativeEvent.type);
+      }
+    }
+    event.target = nativeEvent.target ? buildElement(nativeEvent.target, page) : null;
+    event.currentTarget = nativeEvent.currentTarget ? buildElement(nativeEvent.currentTarget, page) : null;
+    event.stopPropagation = nativeEvent.stopPropagation;
+    event.preventDefault = nativeEvent.preventDefault;
+    return event;
+  }
+};
+
+// packages/uni-dom/src/Text.ts
+var UniTextElementImpl = class extends UniElementImpl {
+  get value() {
+    return this.nativeElement.value;
+  }
+  set value(val) {
+    this.nativeElement.value = val;
+  }
+  getTextExtra() {
+    throw new Error("Method not implemented.");
+  }
+};
+
+// packages/uni-dom/src/UniCommentElement.ts
+var UniCommentElementImpl = class extends UniElementImpl {
+  get [Symbol.toStringTag]() {
+    return "UniComment";
+  }
+};
+
+// packages/uni-dom/src/UniDocument.ts
+var UniDocumentImpl = class {
+  constructor(page) {
+    this.page = page;
+  }
+  createElement() {
+  }
+  createComment() {
+  }
+  waitNativeRender(callback) {
+    this.page?.waitNativeRender(callback);
+  }
+};
+
+// packages/uni-dom/src/GlobalDocument.ts
+var GlobalDocument = class {
+  get body() {
+    this.checkRootDocument();
+    return {
+      page: this.uniPage,
+      appendChild() {
+      },
+      insertBefore() {
+      },
+      removeChild() {
+      }
+    };
+  }
+  checkRootDocument() {
+    if (!this.uniPage) {
+      this.uniPage = {
+        document: new UniDocumentImpl()
+      };
+    }
+  }
+  createElement(data) {
+    this.checkRootDocument();
+    return this.uniPage.document.createElement(data);
+  }
+  createComment(data) {
+    this.checkRootDocument();
+    return this.uniPage.document.createComment(data);
+  }
+  dispose() {
+    if (this.uniPage) {
+      this.uniPage.close();
+    }
+  }
+};
+
+// packages/uni-dom/src/UniEvent/index.ts
+function buildEvent(event, pageId, uniEvent) {
+  const app = getUniApp();
+  const page = app.pageManager.findPageById(String(pageId));
+  if (!page) {
+    throw new Error(`Cannot find page for id: ${pageId}`);
+  }
+  const originTagName = event.currentTarget.originTagName;
+  const elementConstructor = find(originTagName);
+  if (!elementConstructor) {
+    throw new Error(`Cannot find element constructor for tag: ${originTagName}`);
+  }
+  return elementConstructor.buildEvent(event, page, uniEvent);
+}
+
+// packages/uni-dom/src/CustomEvent.ts
+var UniCustomEventOptions = class {
+  constructor(detail) {
+    this.detail = detail;
+  }
+};
+var UniCustomEvent = class extends UniEvent {
+  constructor(type, options) {
+    super(type);
+    this.detail = typeof options === "object" && "detail" in options ? options.detail : options;
+  }
+};
+
+// packages/uni-dom/src/ScrollEvent.ts
+var UniScrollEventDetail = class {
+  constructor(detail) {
+    this.scrollTop = detail.scrollTop;
+    this.scrollLeft = detail.scrollLeft;
+    this.scrollHeight = detail.scrollHeight;
+    this.scrollWidth = detail.scrollWidth;
+    this.deltaY = detail.deltaY;
+    this.deltaX = detail.deltaX;
+  }
+};
+var UniScrollEvent = class extends UniCustomEvent {
+  constructor(type, detail) {
+    super(type, detail);
+  }
+};
+
+// packages/uni-dom/src/ScrollToLowerEvent.ts
+var UniScrollToLowerEventDetail = class {
+  constructor(detail) {
+    this.direction = detail.direction;
+  }
+};
+var UniScrollToLowerEvent = class extends UniCustomEvent {
+  constructor(type, detail) {
+    super(type, detail);
+  }
+};
+
+// packages/uni-dom/src/ScrollToUpperEvent.ts
+var UniScrollToUpperEventDetail = class {
+  constructor(detail) {
+    this.direction = detail.direction;
+  }
+};
+var UniScrollToUpperEvent = class extends UniCustomEvent {
+  constructor(type, detail) {
+    super(type, detail);
+  }
+};
+
+// packages/uni-dom/src/RefresherEvent.ts
+var UniRefresherEventDetail = class {
+  constructor(data) {
+    this.dy = typeof data === "number" ? data : data.dy;
+  }
+};
+var UniRefresherEvent = class extends UniEvent {
+  constructor(type, detail) {
+    super(type);
+    this.detail = typeof detail === "number" ? new UniRefresherEventDetail(detail) : new UniRefresherEventDetail(detail);
+  }
+};
+
+// packages/uni-dom/src/UniScrollViewElement.ts
+var UniScrollViewElementImpl = class extends UniElementImpl {
+  static buildEvent(nativeEvent, page, event) {
+    if (["scroll", "scrollend"].includes(nativeEvent.type)) {
+      const e = nativeEvent;
+      event = new UniScrollEvent(nativeEvent.type, e.detail);
+    } else if (nativeEvent.type === "scrolltolower") {
+      const e = nativeEvent;
+      event = new UniScrollToLowerEvent(nativeEvent.type, e.detail);
+    } else if (nativeEvent.type === "scrolltoupper") {
+      const e = nativeEvent;
+      event = new UniScrollToUpperEvent(nativeEvent.type, e.detail);
+    } else if ([
+      "refresherpulling",
+      "refresherrefresh",
+      "refresherrestore",
+      "refresherabort"
+    ].includes(nativeEvent.type)) {
+      const e = nativeEvent;
+      event = new UniRefresherEvent(nativeEvent.type, e.detail);
+    }
+    return super.buildEvent(nativeEvent, page, event);
+  }
+};
+
+// packages/uni-dom/src/UniRichTextNativeEvent.ts
+var UniRichTextNativeItemClickEventDetail = class {
+  constructor(detail) {
+    this.src = detail.src;
+    this.href = detail.href;
+  }
+};
+var UniRichTextNativeItemClickEvent = class extends UniCustomEvent {
+  constructor(type, detail) {
+    super(type, detail);
+  }
+};
+
+// packages/uni-dom/src/UniRichTextNativeElement.ts
+var UniRichTextNativeElementImpl = class extends UniElementImpl {
+  static buildEvent(nativeEvent, page, event) {
+    if (nativeEvent.type === "itemclick") {
+      const e = nativeEvent;
+      return new UniRichTextNativeItemClickEvent(nativeEvent.type, e.detail);
+    }
+    return super.buildEvent(nativeEvent, page, event);
+  }
+};
+
+// packages/uni-dom/src/UniImageLoadEvent.ts
+var UniImageLoadEventDetail = class {
+  constructor(detail) {
+    this.width = detail.width;
+    this.height = detail.height;
+  }
+};
+var UniImageLoadEvent = class extends UniCustomEvent {
+  constructor(type, detail) {
+    super(type, detail);
+  }
+};
+
+// packages/uni-dom/src/UniImageErrorEvent.ts
+var UniImageErrorEventDetail = class {
+  constructor(detail) {
+    this.errMsg = detail.errMsg;
+  }
+};
+var UniImageErrorEvent = class extends UniCustomEvent {
+  constructor(type, detail) {
+    super(type, detail);
+  }
+};
+
+// packages/uni-dom/src/UniImageElement.ts
+var UniImageElementImpl = class extends UniElementImpl {
+  constructor() {
+    super(...arguments);
+    this._src = "";
+  }
+  get src() {
+    return this._src;
+  }
+  set src(value) {
+    this._src = value;
+  }
+  onload() {
+    throw new Error("Method not implemented.");
+  }
+  static buildEvent(nativeEvent, page, event) {
+    if (nativeEvent.type === "load") {
+      const e = nativeEvent;
+      event = new UniImageLoadEvent(nativeEvent.type, e.detail);
+    } else if (nativeEvent.type === "error") {
+      const e = nativeEvent;
+      event = new UniImageErrorEvent(nativeEvent.type, e.detail);
+    }
+    return super.buildEvent(nativeEvent, page, event);
+  }
+};
+
+// packages/uni-dom/src/UniEvent/UniInputEvent.ts
+var UniInputEventDetail = class {
+  constructor(detailOrValue, cursor, keyCode) {
+    if (typeof detailOrValue === "string") {
+      this.value = detailOrValue;
+      this.cursor = cursor ?? 0;
+      this.keyCode = keyCode ?? 0;
+    } else {
+      this.value = detailOrValue.value;
+      this.cursor = detailOrValue.cursor;
+      this.keyCode = detailOrValue.keyCode;
+    }
+  }
+};
+var UniInputEvent = class extends UniEvent {
+  constructor(type, detail) {
+    super(type);
+    this.detail = new UniInputEventDetail(detail);
+  }
+};
+var InputEvent = UniInputEvent;
+var InputEventDetail = UniInputEventDetail;
+
+// packages/uni-dom/src/UniNativeViewInitEvent.ts
+var UniNativeViewInitEventDetail = class {
+  constructor(data) {
+    this.element = data.element;
+  }
+};
+var UniNativeViewInitEvent = class extends UniCustomEvent {
+  constructor(type, detail) {
+    super(type, new UniNativeViewInitEventDetail(detail));
+  }
+};
+
+// packages/uni-dom/src/UniNativeViewReadyEvent.ts
+var UniNativeViewReadyEventDetail = class {
+  constructor(data) {
+    this.element = data.element;
+  }
+};
+var UniNativeViewReadyEvent = class extends UniCustomEvent {
+  constructor(type, detail) {
+    super(type, new UniNativeViewReadyEventDetail(detail));
+  }
+};
+
+// packages/uni-dom/src/UniNativeViewEvent.ts
+var UniNativeViewEvent = class extends UniCustomEvent {
+};
+
+// packages/uni-dom/src/waitNativeRender.ts
+function waitNativeRender(callback) {
+  const app = getUniApp();
+  if (app) {
+    const page = app.pageManager.getTopPage();
+    if (page) {
+      page.document.waitNativeRender(callback);
+      return;
+    }
+  }
+  callback();
+}
+export {
+  AlreadyFullScreenError,
+  CSSStyleDeclaration,
+  ComponentNotReadyError,
+  DOMRect,
+  ElementNotSupportFullScreenError,
+  FullscreenError,
+  GlobalDocument,
+  InputEvent,
+  InputEventDetail,
+  NativeMap,
+  NoElementFullScreenError,
+  NodeData,
+  PageNotReadyOrDestroyedError,
+  UNI_BASE_EVENT_TYPES,
+  UniCallbackWrapper,
+  UniCommentElementImpl,
+  UniCustomEvent,
+  UniCustomEventOptions,
+  UniDocumentImpl,
+  UniElementImpl,
+  UniEvent,
+  UniImageElementImpl,
+  UniImageErrorEvent,
+  UniImageErrorEventDetail,
+  UniImageLoadEvent,
+  UniImageLoadEventDetail,
+  UniInputEvent,
+  UniInputEventDetail,
+  UniMouseEvent,
+  UniNativeViewEvent,
+  UniNativeViewInitEvent,
+  UniNativeViewInitEventDetail,
+  UniNativeViewReadyEvent,
+  UniNativeViewReadyEventDetail,
+  UniPointerEvent,
+  UniRefresherEvent,
+  UniRefresherEventDetail,
+  UniRichTextNativeElementImpl,
+  UniRichTextNativeItemClickEvent,
+  UniRichTextNativeItemClickEventDetail,
+  UniScrollEvent,
+  UniScrollEventDetail,
+  UniScrollToLowerEvent,
+  UniScrollToLowerEventDetail,
+  UniScrollToUpperEvent,
+  UniScrollToUpperEventDetail,
+  UniScrollViewElementImpl,
+  UniTextElementImpl,
+  UniTouch,
+  UniTouchEvent,
+  buildElement,
+  buildEvent,
+  define,
+  find,
+  fullscreenchangeEvent,
+  fullscreenerrorEvent,
+  getFullscreenError,
+  getUniApp,
+  setUniApp,
+  waitNativeRender
+};
+A‘ÔrF’§missing¦pluginÃ¦genAbcÂÔ  ÔrG”²dynamicImportCache¹exportAllDeclarationCache»exportNamedDeclarationCache«importCache‘ÔrH–¤type¥start£end«declarationªspecifiers¦source¶ExportNamedDeclarationÍ‘Í†ÏÀÜ <ÔrI•¤type¥start£end¥local¨exported¯ExportSpecifierÍœÍ²ÔrJ”¤type¥start£end¤nameªIdentifierÍœÍ²¶AlreadyFullScreenErrorJªIdentifierÍœÍ²¶AlreadyFullScreenErrorI¯ExportSpecifierÍ¶ÍÉJªIdentifierÍ¶ÍÉ³CSSStyleDeclarationJªIdentifierÍ¶ÍÉ³CSSStyleDeclarationI¯ExportSpecifierÍÍÍãJªIdentifierÍÍÍã¶ComponentNotReadyErrorJªIdentifierÍÍÍã¶ComponentNotReadyErrorI¯ExportSpecifierÍçÍîJªIdentifierÍçÍî§DOMRectJªIdentifierÍçÍî§DOMRectI¯ExportSpecifierÍòÍ‚JªIdentifierÍòÍ‚Ù ElementNotSupportFullScreenErrorJªIdentifierÍòÍ‚Ù ElementNotSupportFullScreenErrorI¯ExportSpecifierÍ‚Í‚%JªIdentifierÍ‚Í‚%¯FullscreenErrorJªIdentifierÍ‚Í‚%¯FullscreenErrorI¯ExportSpecifierÍ‚)Í‚7JªIdentifierÍ‚)Í‚7®GlobalDocumentJªIdentifierÍ‚)Í‚7®GlobalDocumentI¯ExportSpecifierÍ‚;Í‚EJªIdentifierÍ‚;Í‚EªInputEventJªIdentifierÍ‚;Í‚EªInputEventI¯ExportSpecifierÍ‚IÍ‚YJªIdentifierÍ‚IÍ‚Y°InputEventDetailJªIdentifierÍ‚IÍ‚Y°InputEventDetailI¯ExportSpecifierÍ‚]Í‚fJªIdentifierÍ‚]Í‚f©NativeMapJªIdentifierÍ‚]Í‚f©NativeMapI¯ExportSpecifierÍ‚jÍ‚‚JªIdentifierÍ‚jÍ‚‚¸NoElementFullScreenErrorJªIdentifierÍ‚jÍ‚‚¸NoElementFullScreenErrorI¯ExportSpecifierÍ‚†Í‚JªIdentifierÍ‚†Í‚¨NodeDataJªIdentifierÍ‚†Í‚¨NodeDataI¯ExportSpecifierÍ‚’Í‚®JªIdentifierÍ‚’Í‚®¼PageNotReadyOrDestroyedErrorJªIdentifierÍ‚’Í‚®¼PageNotReadyOrDestroyedErrorI¯ExportSpecifierÍ‚²Í‚ÆJªIdentifierÍ‚²Í‚Æ´UNI_BASE_EVENT_TYPESJªIdentifierÍ‚²Í‚Æ´UNI_BASE_EVENT_TYPESI¯ExportSpecifierÍ‚ÊÍ‚ÜJªIdentifierÍ‚ÊÍ‚Ü²UniCallbackWrapperJªIdentifierÍ‚ÊÍ‚Ü²UniCallbackWrapperI¯ExportSpecifierÍ‚àÍ‚õJªIdentifierÍ‚àÍ‚õµUniCommentElementImplJªIdentifierÍ‚àÍ‚õµUniCommentElementImplI¯ExportSpecifierÍ‚ùÍƒJªIdentifierÍ‚ùÍƒ®UniCustomEventJªIdentifierÍ‚ùÍƒ®UniCustomEventI¯ExportSpecifierÍƒÍƒ JªIdentifierÍƒÍƒ µUniCustomEventOptionsJªIdentifierÍƒÍƒ µUniCustomEventOptionsI¯ExportSpecifierÍƒ$Íƒ3JªIdentifierÍƒ$Íƒ3¯UniDocumentImplJªIdentifierÍƒ$Íƒ3¯UniDocumentImplI¯ExportSpecifierÍƒ7ÍƒEJªIdentifierÍƒ7ÍƒE®UniElementImplJªIdentifierÍƒ7ÍƒE®UniElementImplI¯ExportSpecifierÍƒIÍƒQJªIdentifierÍƒIÍƒQ¨UniEventJªIdentifierÍƒIÍƒQ¨UniEventI¯ExportSpecifierÍƒUÍƒhJªIdentifierÍƒUÍƒh³UniImageElementImplJªIdentifierÍƒUÍƒh³UniImageElementImplI¯ExportSpecifierÍƒlÍƒ~JªIdentifierÍƒlÍƒ~²UniImageErrorEventJªIdentifierÍƒlÍƒ~²UniImageErrorEventI¯ExportSpecifierÍƒ‚ÍƒšJªIdentifierÍƒ‚Íƒš¸UniImageErrorEventDetailJªIdentifierÍƒ‚Íƒš¸UniImageErrorEventDetailI¯ExportSpecifierÍƒÍƒ¯JªIdentifierÍƒÍƒ¯±UniImageLoadEventJªIdentifierÍƒÍƒ¯±UniImageLoadEventI¯ExportSpecifierÍƒ³ÍƒÊJªIdentifierÍƒ³ÍƒÊ·UniImageLoadEventDetailJªIdentifierÍƒ³ÍƒÊ·UniImageLoadEventDetailI¯ExportSpecifierÍƒÎÍƒÛJªIdentifierÍƒÎÍƒÛ­UniInputEventJªIdentifierÍƒÎÍƒÛ­UniInputEventI¯ExportSpecifierÍƒßÍƒòJªIdentifierÍƒßÍƒò³UniInputEventDetailJªIdentifierÍƒßÍƒò³UniInputEventDetailI¯ExportSpecifierÍƒöÍ„JªIdentifierÍƒöÍ„­UniMouseEventJªIdentifierÍƒöÍ„­UniMouseEventI¯ExportSpecifierÍ„Í„JªIdentifierÍ„Í„²UniNativeViewEventJªIdentifierÍ„Í„²UniNativeViewEventI¯ExportSpecifierÍ„Í„3JªIdentifierÍ„Í„3¶UniNativeViewInitEventJªIdentifierÍ„Í„3¶UniNativeViewInitEventI¯ExportSpecifierÍ„7Í„SJªIdentifierÍ„7Í„S¼UniNativeViewInitEventDetailJªIdentifierÍ„7Í„S¼UniNativeViewInitEventDetailI¯ExportSpecifierÍ„WÍ„nJªIdentifierÍ„WÍ„n·UniNativeViewReadyEventJªIdentifierÍ„WÍ„n·UniNativeViewReadyEventI¯ExportSpecifierÍ„rÍ„JªIdentifierÍ„rÍ„½UniNativeViewReadyEventDetailJªIdentifierÍ„rÍ„½UniNativeViewReadyEventDetailI¯ExportSpecifierÍ„“Í„¢JªIdentifierÍ„“Í„¢¯UniPointerEventJªIdentifierÍ„“Í„¢¯UniPointerEventI¯ExportSpecifierÍ„¦Í„·JªIdentifierÍ„¦Í„·±UniRefresherEventJªIdentifierÍ„¦Í„·±UniRefresherEventI¯ExportSpecifierÍ„»Í„ÒJªIdentifierÍ„»Í„Ò·UniRefresherEventDetailJªIdentifierÍ„»Í„Ò·UniRefresherEventDetailI¯ExportSpecifierÍ„ÖÍ„òJªIdentifierÍ„ÖÍ„ò¼UniRichTextNativeElementImplJªIdentifierÍ„ÖÍ„ò¼UniRichTextNativeElementImplI¯ExportSpecifierÍ„öÍ…JªIdentifierÍ„öÍ…¿UniRichTextNativeItemClickEventJªIdentifierÍ„öÍ…¿UniRichTextNativeItemClickEventI¯ExportSpecifierÍ…Í…>JªIdentifierÍ…Í…>Ù%UniRichTextNativeItemClickEventDetailJªIdentifierÍ…Í…>Ù%UniRichTextNativeItemClickEventDetailI¯ExportSpecifierÍ…BÍ…PJªIdentifierÍ…BÍ…P®UniScrollEventJªIdentifierÍ…BÍ…P®UniScrollEventI¯ExportSpecifierÍ…TÍ…hJªIdentifierÍ…TÍ…h´UniScrollEventDetailJªIdentifierÍ…TÍ…h´UniScrollEventDetailI¯ExportSpecifierÍ…lÍ…JªIdentifierÍ…lÍ…µUniScrollToLowerEventJªIdentifierÍ…lÍ…µUniScrollToLowerEventI¯ExportSpecifierÍ……Í… JªIdentifierÍ……Í… »UniScrollToLowerEventDetailJªIdentifierÍ……Í… »UniScrollToLowerEventDetailI¯ExportSpecifierÍ…¤Í…¹JªIdentifierÍ…¤Í…¹µUniScrollToUpperEventJªIdentifierÍ…¤Í…¹µUniScrollToUpperEventI¯ExportSpecifierÍ…½Í…ØJªIdentifierÍ…½Í…Ø»UniScrollToUpperEventDetailJªIdentifierÍ…½Í…Ø»UniScrollToUpperEventDetailI¯ExportSpecifierÍ…ÜÍ…ôJªIdentifierÍ…ÜÍ…ô¸UniScrollViewElementImplJªIdentifierÍ…ÜÍ…ô¸UniScrollViewElementImplI¯ExportSpecifierÍ…øÍ†
+JªIdentifierÍ…øÍ†
+²UniTextElementImplJªIdentifierÍ…øÍ†
+²UniTextElementImplI¯ExportSpecifierÍ†Í†JªIdentifierÍ†Í†¨UniTouchJªIdentifierÍ†Í†¨UniTouchI¯ExportSpecifierÍ†Í†'JªIdentifierÍ†Í†'­UniTouchEventJªIdentifierÍ†Í†'­UniTouchEventI¯ExportSpecifierÍ†+Í†7JªIdentifierÍ†+Í†7¬buildElementJªIdentifierÍ†+Í†7¬buildElementI¯ExportSpecifierÍ†;Í†EJªIdentifierÍ†;Í†EªbuildEventJªIdentifierÍ†;Í†EªbuildEventI¯ExportSpecifierÍ†IÍ†OJªIdentifierÍ†IÍ†O¦defineJªIdentifierÍ†IÍ†O¦defineI¯ExportSpecifierÍ†SÍ†WJªIdentifierÍ†SÍ†W¤findJªIdentifierÍ†SÍ†W¤findI¯ExportSpecifierÍ†[Í†pJªIdentifierÍ†[Í†pµfullscreenchangeEventJªIdentifierÍ†[Í†pµfullscreenchangeEventI¯ExportSpecifierÍ†tÍ†ˆJªIdentifierÍ†tÍ†ˆ´fullscreenerrorEventJªIdentifierÍ†tÍ†ˆ´fullscreenerrorEventI¯ExportSpecifierÍ†ŒÍ†JªIdentifierÍ†ŒÍ†²getFullscreenErrorJªIdentifierÍ†ŒÍ†²getFullscreenErrorI¯ExportSpecifierÍ†¢Í†«JªIdentifierÍ†¢Í†«©getUniAppJªIdentifierÍ†¢Í†«©getUniAppI¯ExportSpecifierÍ†¯Í†¸JªIdentifierÍ†¯Í†¸©setUniAppJªIdentifierÍ†¯Í†¸©setUniAppI¯ExportSpecifierÍ†¼Í†ÌJªIdentifierÍ†¼Í†Ì°waitNativeRenderJªIdentifierÍ†¼Í†Ì°waitNativeRenderÀ

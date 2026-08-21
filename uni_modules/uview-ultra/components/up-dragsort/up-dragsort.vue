@@ -62,6 +62,11 @@ export default {
         columns: {
             type: Number,
             default: 3
+        },
+        // 仅手柄可拖拽（配合 handler 插槽使用）
+        handleDrag: {
+            type: Boolean,
+            default: false
         }
     },
     data() {
@@ -209,7 +214,7 @@ export default {
             })
         },
         onTouchStart(index, e) {
-            if (this.$slots.handler && e.currentTarget.dataset.action !== 'handler') {
+            if ((this.handleDrag || this.$slots.handler) && e.currentTarget.dataset.action !== 'handler') {
                 return
             }
             if (this.list[index]?.draggable === false) return;

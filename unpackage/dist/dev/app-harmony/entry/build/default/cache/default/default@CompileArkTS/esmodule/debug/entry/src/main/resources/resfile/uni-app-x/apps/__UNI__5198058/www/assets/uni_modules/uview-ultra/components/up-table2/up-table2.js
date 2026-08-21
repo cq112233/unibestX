@@ -1,0 +1,1289 @@
+import { _ as _export_sfc } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper&";
+const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, resolveComponent: _resolveComponent, setSharedDataClass: _setSharedDataClass, setSharedDataStyle: _setSharedDataStyle, renderSharedDataEffect: _renderSharedDataEffect, setSharedData: _setSharedData, toSharedDataBoolean: _toSharedDataBoolean, setSharedDataScoped: _setSharedDataScoped, createSharedDataVFor: _createSharedDataVFor, toDisplayString: _toDisplayString, withModifiers: _withModifiers, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, createSharedDataIf: _createSharedDataIf, setSharedDataEvent: _setSharedDataEvent, createSharedDataFor: _createSharedDataFor, createSharedDataSlot: _createSharedDataSlot } = globalThis.Vue;
+const __className = "GenUniModulesUviewUltraComponentsUpTable2UpTable2";
+const { ref, computed, watch, onMounted } = globalThis.Vue;
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+  ...{
+    name: "up-table2"
+  },
+  __dynamicSharedData: true,
+  __hash: "2757fb7c",
+  __className,
+  __filename: "uni_modules/uview-ultra/components/up-table2/up-table2.uvue",
+  __name: "up-table2",
+  props: {
+    data: {
+      type: Array,
+      required: true,
+      default: () => {
+        return [];
+      }
+    },
+    columns: {
+      type: Array,
+      required: true,
+      default: () => {
+        return [];
+      }
+    },
+    rowKey: {
+      type: String,
+      default: "id"
+    },
+    border: {
+      type: Boolean,
+      default: false
+    },
+    stripe: {
+      type: Boolean,
+      default: false
+    },
+    height: {
+      type: [String, Number],
+      default: null
+    },
+    maxHeight: {
+      type: [String, Number],
+      default: null
+    },
+    showHeader: {
+      type: Boolean,
+      default: true
+    },
+    emptyText: {
+      type: String,
+      default: "No Data"
+    },
+    sortable: {
+      type: Boolean,
+      default: false
+    },
+    multiSort: {
+      type: Boolean,
+      default: false
+    },
+    filters: {
+      type: Object,
+      default: () => {
+        return new UTSJSONObject({});
+      }
+    },
+    highlightCurrentRow: {
+      type: Boolean,
+      default: false
+    },
+    currentRowKey: {
+      type: [String, Number],
+      default: null
+    },
+    treeProps: {
+      type: Object,
+      default: () => {
+        return new UTSJSONObject({ children: "children", hasChildren: "hasChildren" });
+      }
+    },
+    expandRowKeys: {
+      type: Array,
+      default: () => {
+        return [];
+      }
+    },
+    rowHeight: {
+      type: [String, Number],
+      default: 44
+    },
+    expandWidth: {
+      type: [String, Number],
+      default: 24
+    },
+    mainCol: {
+      type: String,
+      default: ""
+    },
+    fixedHeader: {
+      type: Boolean,
+      default: false
+    },
+    spanMethod: {
+      type: Function,
+      default: null
+    },
+    cellStyle: {
+      type: Function,
+      default: null
+    },
+    cellClassName: {
+      type: Function,
+      default: null
+    },
+    rowClassName: {
+      type: Function,
+      default: null
+    },
+    headerCellClassName: {
+      type: Function,
+      default: null
+    }
+  },
+  emits: [
+    "row-click",
+    "header-click",
+    "selection-change",
+    "select",
+    "select-all",
+    "sort-change",
+    "filter-change",
+    "expand-change",
+    "current-change"
+  ],
+  setup(__props, _a) {
+    var __expose = _a.expose, __emit = _a.emit;
+    const __sharedDataScope = _useSharedDataScope();
+    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpTable2UpTable2SharedData", sharedDataClassId: 0 })));
+    function createRowList() {
+      return [];
+    }
+    function createStringList() {
+      return [];
+    }
+    function createEmptyObject() {
+      return new UTSJSONObject({});
+    }
+    function createSpan(rowspan = 1, colspan = 1) {
+      return new UTSJSONObject({
+        rowspan,
+        colspan
+      });
+    }
+    function createSpanArray() {
+      return [1, 1];
+    }
+    function valueToString(value = null) {
+      return value == null ? "" : value.toString();
+    }
+    function toNumber(value = null, fallback = 0) {
+      if (value == null) {
+        return fallback;
+      }
+      const text = valueToString(value);
+      if (text == "") {
+        return fallback;
+      }
+      const parsed = parseInt(text);
+      return isNaN(parsed) ? fallback : parsed;
+    }
+    function normalizeColumnWidth(value = null) {
+      const width = toNumber(value, 80);
+      return width < 80 ? 80 : width;
+    }
+    function addUnitLocal(value = null) {
+      if (value == null) {
+        return "auto";
+      }
+      const text = valueToString(value);
+      if (text == "") {
+        return "auto";
+      }
+      if (text.endsWith("px") || text.endsWith("%") || text.endsWith("rpx")) {
+        return text;
+      }
+      const numeric = /^-?\d+(\.\d+)?$/.test(text);
+      return numeric ? text + "px" : text;
+    }
+    function getTableMinWidthPx() {
+      return 375;
+    }
+    const props = __props;
+    const emit = __emit;
+    function normalizeKey(value = null) {
+      return valueToString(value);
+    }
+    function normalizeKeys(keys = null) {
+      const result = createStringList();
+      if (keys == null) {
+        return result;
+      }
+      for (let i = 0; i < keys.length; i++) {
+        result.push(normalizeKey(keys[i]));
+      }
+      return result;
+    }
+    const expandedKeys = ref(normalizeKeys(props.expandRowKeys));
+    const selectedKeys = ref(createStringList());
+    const sortKey = ref("");
+    const sortOrder = ref("");
+    const currentRowValue = ref(normalizeKey(props.currentRowKey));
+    const scrollLeftValue = ref(0);
+    onMounted(() => {
+      expandedKeys.value = normalizeKeys(props.expandRowKeys);
+      currentRowValue.value = normalizeKey(props.currentRowKey);
+    });
+    const rowHeightValue = computed(() => {
+      return addUnitLocal(props.rowHeight);
+    });
+    const expandWidthValue = computed(() => {
+      return addUnitLocal(props.expandWidth);
+    });
+    function isSelectionColumn(col) {
+      return valueToString(col["type"]) == "selection";
+    }
+    function getColumnField(col) {
+      return valueToString(col["key"]);
+    }
+    const mainColumnKey = computed(() => {
+      if (props.mainCol != "") {
+        return props.mainCol;
+      }
+      const cols = props.columns;
+      for (let i = 0; i < cols.length; i++) {
+        const col = cols[i];
+        if (!isSelectionColumn(col)) {
+          const key = getColumnField(col);
+          if (key != "") {
+            return key;
+          }
+        }
+      }
+      return "";
+    });
+    function isMainColumn(col) {
+      const field = getColumnField(col);
+      return field != "" && field == mainColumnKey.value;
+    }
+    function getChildrenKey() {
+      const tree = props.treeProps;
+      const key = tree["children"];
+      return valueToString(key) == "" ? "children" : valueToString(key);
+    }
+    function getRowKeyValue(row) {
+      return normalizeKey(row[props.rowKey]);
+    }
+    function getRowKey(row, index) {
+      const key = getRowKeyValue(row);
+      return key == "" ? index.toString() : key;
+    }
+    function getParentRow(item) {
+      return item["parentRow"];
+    }
+    function getColumnKey(col, index) {
+      const key = getColumnField(col);
+      if (key != "") {
+        return key;
+      }
+      const typeText = valueToString(col["type"]);
+      return typeText == "" ? "col_" + index.toString() : typeText + "_" + index.toString();
+    }
+    function getColumnIndex(col) {
+      const cols = props.columns;
+      for (let i = 0; i < cols.length; i++) {
+        if (cols[i] == col) {
+          return i;
+        }
+      }
+      return 0;
+    }
+    function getColumnTitle(col) {
+      return valueToString(col["title"]);
+    }
+    function isSortableColumn(col) {
+      if (isSelectionColumn(col)) {
+        return false;
+      }
+      if (props.sortable) {
+        return true;
+      }
+      const colSortable = valueToString(col["sortable"]);
+      return colSortable == "true" || colSortable == "1";
+    }
+    function getHeaderAlignValue(col) {
+      const headerAlign = valueToString(col["headerAlign"]);
+      if (headerAlign == "center" || headerAlign == "right" || headerAlign == "left") {
+        return headerAlign;
+      }
+      const align = valueToString(col["align"]);
+      if (align == "center" || align == "right" || align == "left") {
+        return align;
+      }
+      return "center";
+    }
+    function getHeaderAlignClass(col) {
+      return "up-text-" + getHeaderAlignValue(col);
+    }
+    function getCellAlignValue(col) {
+      const align = valueToString(col["align"]);
+      if (align == "center" || align == "right" || align == "left") {
+        return align;
+      }
+      return "center";
+    }
+    function getCellAlignClass(col) {
+      return "up-text-" + getCellAlignValue(col);
+    }
+    function getCellClassName(row, col) {
+      if (props.cellClassName == null) {
+        return "";
+      }
+      const callback = props.cellClassName;
+      const result = callback(row, col);
+      return valueToString(result);
+    }
+    function getColumnWidthNumber(col) {
+      const cols = props.columns;
+      let total = 0;
+      for (let i = 0; i < cols.length; i++) {
+        total += normalizeColumnWidth(cols[i]["width"]);
+      }
+      const width = normalizeColumnWidth(col["width"]);
+      if (total <= 0) {
+        return width;
+      }
+      const contentWidth = Math.max(total, getTableMinWidthPx());
+      return Math.floor(width * contentWidth / total);
+    }
+    function getColumnWidth(col) {
+      return getColumnWidthNumber(col).toString() + "px";
+    }
+    function getHeaderCellStyle(col) {
+      const style = createEmptyObject();
+      style["width"] = getColumnWidth(col);
+      return style;
+    }
+    function getFixedHeaderCellStyle(col) {
+      const style = getHeaderCellStyle(col);
+      style["backgroundColor"] = "#f5f7fa";
+      return style;
+    }
+    function getSpanValue(value = null, fallback = 1) {
+      if (value == null || valueToString(value) == "") {
+        return fallback;
+      }
+      const parsed = parseInt(value.toString());
+      return isNaN(parsed) ? fallback : parsed;
+    }
+    function getCellSpanArray(row, column, rowIndex, columnIndex) {
+      if (typeof props.spanMethod != "function" || props.spanMethod == null) {
+        return createSpanArray();
+      }
+      const callback = props.spanMethod;
+      const result = callback(new UTSJSONObject({
+        row,
+        column,
+        rowIndex,
+        columnIndex
+      }));
+      if (Array.isArray(result)) {
+        const arr = result;
+        const rowspan = arr.length > 0 ? getSpanValue(arr[0], 1) : 1;
+        const colspan = arr.length > 1 ? getSpanValue(arr[1], 1) : 1;
+        return [rowspan, colspan];
+      }
+      const spanObject = result;
+      if (spanObject != null) {
+        const rowspan = getSpanValue(spanObject["rowspan"], 1);
+        const colspan = getSpanValue(spanObject["colspan"], 1);
+        return [rowspan, colspan];
+      }
+      return createSpanArray();
+    }
+    function getCellSpan(row, column, rowIndex, columnIndex) {
+      const span = getCellSpanArray(row, column, rowIndex, columnIndex);
+      const rowspan = span.length > 0 ? span[0] : 1;
+      const colspan = span.length > 1 ? span[1] : 1;
+      return createSpan(rowspan, colspan);
+    }
+    function getCellSpanClass(row, column, rowIndex, columnIndex) {
+      const span = getCellSpan(row, column, rowIndex, columnIndex);
+      if (span["rowspan"] == 0 || span["colspan"] == 0) {
+        return "up-table-cell-hidden";
+      }
+      if (span["rowspan"] > 1 || span["colspan"] > 1) {
+        return "up-table-cell-merged";
+      }
+      return "";
+    }
+    function getCellSpanStyle(row, column, rowIndex, columnIndex) {
+      const span = getCellSpan(row, column, rowIndex, columnIndex);
+      const style = createEmptyObject();
+      const rowspan = span["rowspan"];
+      const colspan = span["colspan"];
+      if (rowspan == 0 || colspan == 0) {
+        return style;
+      }
+      if (rowspan > 1) {
+        const rHeight = toNumber(props.rowHeight, 44);
+        style["height"] = (rowspan * rHeight).toString() + "px";
+      }
+      if (colspan > 1) {
+        const cols = props.columns;
+        let width = 0;
+        for (let i = columnIndex; i < columnIndex + colspan && i < cols.length; i++) {
+          width += getColumnWidthNumber(cols[i]);
+        }
+        style["width"] = width.toString() + "px";
+      }
+      return style;
+    }
+    const hasTree = computed(() => {
+      const cKey = getChildrenKey();
+      const rows = props.data;
+      for (let i = 0; i < rows.length; i++) {
+        const row = rows[i];
+        const children = row[cKey];
+        if (Array.isArray(children) && children.length > 0) {
+          return true;
+        }
+      }
+      return false;
+    });
+    function getBaseCellStyle(row, col, rowIndex, columnIndex, level) {
+      const style = createEmptyObject();
+      const spanStyle = getCellSpanStyle(row, col, rowIndex, columnIndex);
+      const spanKeys = UTSJSONObject.keys(spanStyle);
+      if (spanKeys.indexOf("width") == -1) {
+        style["width"] = getColumnWidth(col);
+      }
+      if (hasTree.value && isMainColumn(col) && level > 1) {
+        style["paddingLeft"] = ((level - 1) * 16).toString() + "px";
+      }
+      const colStyle = col["style"];
+      if (colStyle != null) {
+        const keys = UTSJSONObject.keys(colStyle);
+        for (let i = 0; i < keys.length; i++) {
+          const key = keys[i];
+          if (key == "color" || key == "textAlign" || key == "text-align") {
+            continue;
+          }
+          style[key] = colStyle[key];
+        }
+      }
+      for (let i = 0; i < spanKeys.length; i++) {
+        const key = spanKeys[i];
+        style[key] = spanStyle[key];
+      }
+      return style;
+    }
+    function getCellStyle(row, col, rowIndex, columnIndex, level) {
+      return getBaseCellStyle(row, col, rowIndex, columnIndex, level);
+    }
+    function getFixedCellStyle(row, col, rowIndex, columnIndex, level) {
+      const style = getBaseCellStyle(row, col, rowIndex, columnIndex, level);
+      style["backgroundColor"] = "#ffffff";
+      return style;
+    }
+    function isExpanded(row) {
+      const key = getRowKeyValue(row);
+      if (key == "") {
+        return false;
+      }
+      return expandedKeys.value.indexOf(key) > -1;
+    }
+    function hasChildrenRow(row) {
+      const rawChildren = row[getChildrenKey()];
+      if (rawChildren == null || !Array.isArray(rawChildren)) {
+        return false;
+      }
+      const children = rawChildren;
+      return children.length > 0;
+    }
+    function showTreeIcon(col, row) {
+      if (!hasTree.value) {
+        return false;
+      }
+      if (!isMainColumn(col)) {
+        return false;
+      }
+      return hasChildrenRow(row);
+    }
+    function compareRows(a, b) {
+      const key = sortKey.value;
+      if (key == "") {
+        return 0;
+      }
+      const textA = valueToString(a[key]);
+      const textB = valueToString(b[key]);
+      let result = 0;
+      const numberA = parseFloat(textA);
+      const numberB = parseFloat(textB);
+      const bothNumeric = !isNaN(numberA) && !isNaN(numberB);
+      if (bothNumeric) {
+        result = numberA > numberB ? 1 : numberA < numberB ? -1 : 0;
+      } else {
+        result = textA > textB ? 1 : textA < textB ? -1 : 0;
+      }
+      return sortOrder.value == "descending" ? -result : result;
+    }
+    function applySort(rows) {
+      if (!Array.isArray(rows) || rows.length == 0) {
+        return createRowList();
+      }
+      if (sortKey.value == "" || sortOrder.value == "") {
+        return rows.slice();
+      }
+      const data = rows.slice();
+      data.sort((a, b) => {
+        return compareRows(a, b);
+      });
+      return data;
+    }
+    function applyFilters(rows) {
+      if (!Array.isArray(rows) || rows.length == 0) {
+        return createRowList();
+      }
+      const flt = props.filters;
+      const filterKeys = UTSJSONObject.keys(flt);
+      if (filterKeys.length == 0) {
+        return rows.slice();
+      }
+      const result = createRowList();
+      for (let i = 0; i < rows.length; i++) {
+        const row = rows[i];
+        let matched = true;
+        for (let j = 0; j < filterKeys.length; j++) {
+          const filterKey = filterKeys[j];
+          const filterValue = flt[filterKey];
+          const filterText = valueToString(filterValue);
+          if (filterText == "") {
+            continue;
+          }
+          const rowText = valueToString(row[filterKey]);
+          if (rowText.indexOf(filterText) == -1) {
+            matched = false;
+            break;
+          }
+        }
+        if (matched) {
+          result.push(row);
+        }
+      }
+      return result;
+    }
+    const processedData = computed(() => {
+      const rows = props.data;
+      const filtered = applyFilters(rows);
+      return applySort(filtered);
+    });
+    function collectFlatRows(rows, parentRow = null, level, result) {
+      if (!Array.isArray(rows) || rows.length == 0) {
+        return null;
+      }
+      const cKey = getChildrenKey();
+      for (let i = 0; i < rows.length; i++) {
+        const row = rows[i];
+        result.push(new UTSJSONObject({
+          row,
+          parentRow,
+          level,
+          rowIndex: i
+        }));
+        const children = row[cKey];
+        if (children != null && children.length > 0 && isExpanded(row)) {
+          collectFlatRows(children, row, level + 1, result);
+        }
+      }
+    }
+    const flatRows = computed(() => {
+      const result = createRowList();
+      collectFlatRows(processedData.value, null, 1, result);
+      return result;
+    });
+    const hasData = computed(() => {
+      return flatRows.value.length > 0;
+    });
+    const fixedLeftColumns = computed(() => {
+      const result = createRowList();
+      const cols = props.columns;
+      let started = false;
+      for (let i = 0; i < cols.length; i++) {
+        const col = cols[i];
+        if (valueToString(col["fixed"]) == "left") {
+          result.push(col);
+          started = true;
+        } else if (started) {
+          break;
+        }
+      }
+      return result;
+    });
+    const showFixedShadow = computed(() => {
+      return scrollLeftValue.value > 0 && fixedLeftColumns.value.length > 0;
+    });
+    function safeToNumber(value = null, fallback = 0) {
+      return toNumber(value, fallback);
+    }
+    function getTableContentWidthValue() {
+      const cols = props.columns;
+      let total = 0;
+      for (let i = 0; i < cols.length; i++) {
+        total += normalizeColumnWidth(cols[i]["width"]);
+      }
+      const minWidth = getTableMinWidthPx();
+      return total > 0 ? Math.max(total, minWidth) : minWidth;
+    }
+    function getTableContentWidth() {
+      return getTableContentWidthValue().toString() + "px";
+    }
+    function getTableContentStyle() {
+      const style = createEmptyObject();
+      const contentWidth = getTableContentWidth();
+      style["width"] = "100%";
+      style["minWidth"] = contentWidth;
+      return style;
+    }
+    function getNaturalTableHeight() {
+      const headerHeight = props.showHeader ? 44 : 0;
+      const rHeight = toNumber(props.rowHeight, 44);
+      const rows = hasData.value ? flatRows.value.length : 1;
+      return (headerHeight + rHeight * rows).toString() + "px";
+    }
+    function getScrollStyle() {
+      const style = createEmptyObject();
+      const heightText = addUnitLocal(props.height);
+      if (heightText != "auto") {
+        style["height"] = heightText;
+      } else {
+        style["height"] = getNaturalTableHeight();
+      }
+      return style;
+    }
+    function getBodyStyle() {
+      const style = createEmptyObject();
+      const maxHeightText = addUnitLocal(props.maxHeight);
+      if (maxHeightText != "auto") {
+        style["maxHeight"] = maxHeightText;
+      }
+      return style;
+    }
+    function getFixedShadowWidth() {
+      const cols = fixedLeftColumns.value;
+      let total = 0;
+      for (let i = 0; i < cols.length; i++) {
+        const col = cols[i];
+        const width = getColumnWidthNumber(col);
+        total += width;
+        if (props.border) {
+          total += 1;
+        }
+      }
+      return total;
+    }
+    function getFixedShadowStyle() {
+      const style = createEmptyObject();
+      style["height"] = getNaturalTableHeight();
+      style["width"] = getFixedShadowWidth().toString() + "px";
+      return style;
+    }
+    function isHiddenBySameRowColspan(row, rowIndex, columnIndex) {
+      const cols = props.columns;
+      for (let i = 0; i < columnIndex && i < cols.length; i++) {
+        const span = getCellSpan(row, cols[i], rowIndex, i);
+        const rowspan = span["rowspan"];
+        const colspan = span["colspan"];
+        if (rowspan > 0 && colspan > 1 && i + colspan > columnIndex) {
+          return true;
+        }
+      }
+      return false;
+    }
+    function isCellRendered(row, rowIndex, columnIndex) {
+      const col = props.columns[columnIndex];
+      const span = getCellSpan(row, col, rowIndex, columnIndex);
+      const rowspan = span["rowspan"];
+      const colspan = span["colspan"];
+      if (rowspan == 0 || colspan == 0) {
+        return !isHiddenBySameRowColspan(row, rowIndex, columnIndex);
+      }
+      return true;
+    }
+    function getRowCells(row, rowIndex) {
+      const result = createRowList();
+      const cols = props.columns;
+      for (let i = 0; i < cols.length; i++) {
+        if (isCellRendered(row, rowIndex, i)) {
+          result.push(new UTSJSONObject({
+            col: cols[i],
+            colIndex: i
+          }));
+        }
+      }
+      return result;
+    }
+    function getFixedRowCells(row, rowIndex) {
+      const result = createRowList();
+      const cols = fixedLeftColumns.value;
+      for (let i = 0; i < cols.length; i++) {
+        const colIndex = getColumnIndex(cols[i]);
+        if (isCellRendered(row, rowIndex, colIndex)) {
+          result.push(new UTSJSONObject({
+            col: cols[i],
+            colIndex
+          }));
+        }
+      }
+      return result;
+    }
+    function getCellText(row, col) {
+      const field = getColumnField(col);
+      if (field == "") {
+        return "";
+      }
+      const text = valueToString(row[field]);
+      return text == "" ? "-" : text;
+    }
+    function toggleExpand(row) {
+      if (!hasChildrenRow(row)) {
+        return null;
+      }
+      const key = getRowKeyValue(row);
+      if (key == "") {
+        return null;
+      }
+      const list = expandedKeys.value;
+      const index = list.indexOf(key);
+      if (index > -1) {
+        list.splice(index, 1);
+      } else {
+        list.push(key);
+      }
+      expandedKeys.value = list;
+      emit("expand-change", list.slice());
+    }
+    function isSelected(row) {
+      const key = getRowKeyValue(row);
+      if (key == "") {
+        return false;
+      }
+      return selectedKeys.value.indexOf(key) > -1;
+    }
+    function addSelectedRowAndChildren(row, selKeys) {
+      const key = getRowKeyValue(row);
+      if (key != "" && selKeys.indexOf(key) == -1) {
+        selKeys.push(key);
+      }
+      const children = row[getChildrenKey()];
+      if (children == null || !Array.isArray(children)) {
+        return null;
+      }
+      for (let i = 0; i < children.length; i++) {
+        addSelectedRowAndChildren(children[i], selKeys);
+      }
+    }
+    function removeSelectedRowAndChildren(row, selKeys) {
+      const key = getRowKeyValue(row);
+      const index = selKeys.indexOf(key);
+      if (index > -1) {
+        selKeys.splice(index, 1);
+      }
+      const children = row[getChildrenKey()];
+      if (children == null || !Array.isArray(children)) {
+        return null;
+      }
+      for (let i = 0; i < children.length; i++) {
+        removeSelectedRowAndChildren(children[i], selKeys);
+      }
+    }
+    function collectAllRows(rows, result) {
+      if (!Array.isArray(rows) || rows.length == 0) {
+        return null;
+      }
+      const cKey = getChildrenKey();
+      for (let i = 0; i < rows.length; i++) {
+        const row = rows[i];
+        result.push(row);
+        const children = row[cKey];
+        if (children != null && Array.isArray(children) && children.length > 0) {
+          collectAllRows(children, result);
+        }
+      }
+    }
+    function getAllRows() {
+      const result = createRowList();
+      collectAllRows(processedData.value, result);
+      return result;
+    }
+    function getSelectedRows() {
+      const result = createRowList();
+      const rows = getAllRows();
+      for (let i = 0; i < rows.length; i++) {
+        const row = rows[i];
+        if (isSelected(row)) {
+          result.push(row);
+        }
+      }
+      return result;
+    }
+    function isAllSelected() {
+      const rows = getAllRows();
+      if (rows.length == 0) {
+        return false;
+      }
+      for (let i = 0; i < rows.length; i++) {
+        if (!isSelected(rows[i])) {
+          return false;
+        }
+      }
+      return true;
+    }
+    function toggleSelectAll() {
+      const rows = getAllRows();
+      if (isAllSelected()) {
+        selectedKeys.value = createStringList();
+      } else {
+        const next = createStringList();
+        for (let i = 0; i < rows.length; i++) {
+          const key = getRowKeyValue(rows[i]);
+          if (key != "") {
+            next.push(key);
+          }
+        }
+        selectedKeys.value = next;
+      }
+      const selRows = getSelectedRows();
+      emit("select-all", selRows);
+      emit("selection-change", selRows);
+    }
+    function toggleSelect(row) {
+      const key = getRowKeyValue(row);
+      if (key == "") {
+        return null;
+      }
+      const selKeys = selectedKeys.value;
+      const index = selKeys.indexOf(key);
+      if (index > -1) {
+        removeSelectedRowAndChildren(row, selKeys);
+      } else {
+        addSelectedRowAndChildren(row, selKeys);
+      }
+      selectedKeys.value = selKeys;
+      emit("select", row, isSelected(row));
+      emit("selection-change", getSelectedRows());
+    }
+    function pruneSelection() {
+      const valid = createStringList();
+      const rows = getAllRows();
+      for (let i = 0; i < rows.length; i++) {
+        const key = getRowKeyValue(rows[i]);
+        if (key != "") {
+          valid.push(key);
+        }
+      }
+      const next = createStringList();
+      const selKeys = selectedKeys.value;
+      for (let i = 0; i < selKeys.length; i++) {
+        const key = selKeys[i];
+        if (valid.indexOf(key) > -1) {
+          next.push(key);
+        }
+      }
+      selectedKeys.value = next;
+    }
+    function handleRowClick(row) {
+      if (props.highlightCurrentRow) {
+        currentRowValue.value = getRowKeyValue(row);
+        emit("current-change", row);
+      }
+      emit("row-click", row);
+    }
+    function getRowClass(row, flatIndex) {
+      let className = "";
+      if (props.highlightCurrentRow && currentRowValue.value != "" && currentRowValue.value == getRowKeyValue(row)) {
+        className += " up-table-row-highlight";
+      }
+      if (props.stripe && flatIndex % 2 == 1) {
+        className += " up-table-row-zebra";
+      }
+      if (props.rowClassName != null) {
+        const callback = props.rowClassName;
+        const customClass = valueToString(callback(row, flatIndex));
+        if (customClass != "") {
+          className += " " + customClass;
+        }
+      }
+      return className;
+    }
+    function getSortConditions() {
+      if (sortKey.value == "" || sortOrder.value == "") {
+        return createRowList();
+      }
+      return [new UTSJSONObject({
+        key: sortKey.value,
+        order: sortOrder.value
+      })];
+    }
+    function handleHeaderClick(col) {
+      emit("header-click", col);
+      if (!isSortableColumn(col)) {
+        return null;
+      }
+      const key = getColumnField(col);
+      if (key == "") {
+        return null;
+      }
+      if (sortKey.value != key) {
+        sortKey.value = key;
+        sortOrder.value = "ascending";
+      } else if (sortOrder.value == "ascending") {
+        sortOrder.value = "descending";
+      } else {
+        sortKey.value = "";
+        sortOrder.value = "";
+      }
+      emit("sort-change", getSortConditions());
+    }
+    function getSortIcon(col) {
+      const key = getColumnField(col);
+      if (key == "" || !isSortableColumn(col)) {
+        return "";
+      }
+      if (sortKey.value != key || sortOrder.value == "") {
+        return "-";
+      }
+      return sortOrder.value == "ascending" ? "^" : "v";
+    }
+    function onScroll(e) {
+      scrollLeftValue.value = e.detail.scrollLeft;
+    }
+    watch(() => {
+      return props.expandRowKeys;
+    }, (newVal = null) => {
+      expandedKeys.value = normalizeKeys(newVal);
+    }, { immediate: true });
+    watch(() => {
+      return props.currentRowKey;
+    }, (newVal = null) => {
+      currentRowValue.value = normalizeKey(newVal);
+    }, { immediate: true });
+    watch(() => {
+      return props.filters;
+    }, (newVal) => {
+      emit("filter-change", newVal);
+    }, { deep: true });
+    watch(() => {
+      return props.data;
+    }, () => {
+      pruneSelection();
+    }, { deep: true });
+    __expose({
+      getSelectedRows,
+      toggleSelectAll,
+      toggleSelect,
+      toggleExpand,
+      isExpanded,
+      isSelected
+    });
+    return () => {
+      "raw js";
+      const _component_checkbox = _resolveComponent("checkbox");
+      _renderSharedDataEffect(() => {
+        _setSharedDataClass(__sharedData, 14, ["up-table2", __props.border ? "up-table-border" : ""]);
+        _setSharedDataStyle(__sharedData, 15, getScrollStyle());
+        _setSharedDataStyle(__sharedData, 16, getTableContentStyle());
+      });
+      _createSharedDataIf(() => {
+        return _setSharedData(__sharedData, 7, _toSharedDataBoolean(__props.showHeader));
+      }, () => {
+        _createSharedDataFor(_setSharedDataScoped(__sharedData, 8, _createSharedDataVFor(__sharedDataScope, () => {
+          return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 1 });
+        })), () => {
+          return __props.columns;
+        }, (__sharedData_VFor0, _for_item0, _for_key0) => {
+          _renderSharedDataEffect(() => {
+            const _col = _for_item0.value;
+            _setSharedDataClass(__sharedData_VFor0, 8, ["up-table-cell up-table-header-cell", [getHeaderAlignClass(_col)]]);
+            _setSharedDataStyle(__sharedData_VFor0, 9, getHeaderCellStyle(_col));
+          });
+          _createSharedDataIf(() => {
+            return _setSharedData(__sharedData_VFor0, 1, _toSharedDataBoolean(isSelectionColumn(_for_item0.value)));
+          }, () => {
+            const n6 = _createSharedDataComponentWithFallback(_component_checkbox, "1311ac51-" + getColumnKey(_for_item0.value, _for_key0.value), {
+              checked: () => {
+                return isAllSelected();
+              },
+              onClick: () => {
+                return _withModifiers(toggleSelectAll, ["stop"]);
+              }
+            });
+            _setSharedData(__sharedData_VFor0, 2, n6?.sharedData);
+          }, () => {
+            _renderSharedDataEffect(() => {
+              const _col = _for_item0.value;
+              _setSharedDataStyle(__sharedData_VFor0, 5, { textAlign: getHeaderAlignValue(_col) });
+              _setSharedData(__sharedData_VFor0, 6, _toDisplayString(getColumnTitle(_col)));
+            });
+            _createSharedDataIf(() => {
+              return _setSharedData(__sharedData_VFor0, 3, _toSharedDataBoolean(isSortableColumn(_for_item0.value)));
+            }, () => {
+              _renderSharedDataEffect(() => {
+                return _setSharedData(__sharedData_VFor0, 4, _toDisplayString(getSortIcon(_for_item0.value)));
+              });
+            });
+          }, 265);
+          _setSharedDataEvent(__sharedData_VFor0, 7, () => {
+            return handleHeaderClick(_for_item0.value);
+          });
+          return null;
+        }, (__sharedData_VFor0, col, colIndex) => {
+          return _setSharedData(__sharedData_VFor0, 0, _toDisplayString(getColumnKey(col, colIndex)));
+        }, 1);
+      });
+      _createSharedDataIf(() => {
+        return _setSharedData(__sharedData, 9, _toSharedDataBoolean(hasData.value));
+      }, () => {
+        _renderSharedDataEffect(() => {
+          return _setSharedDataStyle(__sharedData, 11, getBodyStyle());
+        });
+        _createSharedDataFor(_setSharedDataScoped(__sharedData, 10, _createSharedDataVFor(__sharedDataScope, () => {
+          return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 2 });
+        })), () => {
+          return flatRows.value;
+        }, (__sharedData_VFor1, _for_item1, _for_key1) => {
+          _renderSharedDataEffect(() => {
+            _setSharedDataClass(__sharedData_VFor1, 3, ["up-table-row up-table-body-row", getRowClass(_for_item1.value["row"], _for_key1.value)]);
+            _setSharedDataStyle(__sharedData_VFor1, 4, { height: rowHeightValue.value });
+          });
+          _createSharedDataFor(_setSharedDataScoped(__sharedData_VFor1, 1, _createSharedDataVFor(__sharedDataScope, () => {
+            return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 3 });
+          })), () => {
+            return getRowCells(_for_item1.value["row"], safeToNumber(_for_item1.value["rowIndex"]));
+          }, (__sharedData_VFor2, _for_item2, _for_key2) => {
+            _renderSharedDataEffect(() => {
+              const _cell = _for_item2.value;
+              const _item = _for_item1.value;
+              const _safeToNumber = safeToNumber;
+              const _cell_col = _cell["col"];
+              const _item_row = _item["row"];
+              _setSharedDataClass(__sharedData_VFor2, 9, ["up-table-cell up-table-body-cell", [getCellAlignClass(_cell_col), getCellClassName(_item_row, _cell_col), getCellSpanClass(_item_row, _cell_col, _safeToNumber(_item["rowIndex"]), _safeToNumber(_cell["colIndex"]))]]);
+              _setSharedDataStyle(__sharedData_VFor2, 10, getCellStyle(_item_row, _cell_col, _safeToNumber(_item["rowIndex"]), _safeToNumber(_cell["colIndex"]), _safeToNumber(_item["level"], 1)));
+            });
+            _createSharedDataIf(() => {
+              return _setSharedData(__sharedData_VFor2, 1, _toSharedDataBoolean(isSelectionColumn(_for_item2.value["col"])));
+            }, () => {
+              const _on_click = () => {
+                return toggleSelect(_for_item1.value["row"]);
+              };
+              const n23 = _createSharedDataComponentWithFallback(_component_checkbox, "4f2133e6-" + getColumnKey(_for_item2.value["col"], safeToNumber(_for_item2.value["colIndex"])), {
+                checked: () => {
+                  return isSelected(_for_item1.value["row"]);
+                },
+                onClick: () => {
+                  return _withModifiers(_on_click, ["stop"]);
+                }
+              });
+              _setSharedData(__sharedData_VFor2, 2, n23?.sharedData);
+            }, () => {
+              _createSharedDataIf(() => {
+                return _setSharedData(__sharedData_VFor2, 3, _toSharedDataBoolean(showTreeIcon(_for_item2.value["col"], _for_item1.value["row"])));
+              }, () => {
+                _setSharedDataEvent(__sharedData_VFor2, 4, () => {
+                  return toggleExpand(_for_item1.value["row"]);
+                });
+                _renderSharedDataEffect(() => {
+                  _setSharedDataStyle(__sharedData_VFor2, 5, { width: expandWidthValue.value });
+                  _setSharedData(__sharedData_VFor2, 6, _toDisplayString(isExpanded(_for_item1.value["row"]) ? "-" : "+"));
+                });
+              });
+              _createSharedDataSlot("cell", {
+                row: () => {
+                  return _for_item1.value["row"];
+                },
+                column: () => {
+                  return _for_item2.value["col"];
+                },
+                prow: () => {
+                  return getParentRow(_for_item1.value);
+                },
+                rowIndex: () => {
+                  return safeToNumber(_for_item1.value["rowIndex"]);
+                },
+                columnIndex: () => {
+                  return safeToNumber(_for_item2.value["colIndex"]);
+                },
+                level: () => {
+                  return safeToNumber(_for_item1.value["level"], 1);
+                }
+              }, (data) => {
+                return _setSharedData(__sharedData_VFor2, 7, data);
+              }, () => {
+                _renderSharedDataEffect(() => {
+                  return _setSharedData(__sharedData_VFor2, 8, _toDisplayString(getCellText(_for_item1.value["row"], _for_item2.value["col"])));
+                });
+              });
+            }, 1033);
+            return null;
+          }, (__sharedData_VFor2, cell, idx) => {
+            return _setSharedData(__sharedData_VFor2, 0, _toDisplayString(getColumnKey(cell["col"], safeToNumber(cell["colIndex"]))));
+          }, 1);
+          _setSharedDataEvent(__sharedData_VFor1, 2, () => {
+            return handleRowClick(_for_item1.value["row"]);
+          });
+          return null;
+        }, (__sharedData_VFor1, item, flatIndex) => {
+          return _setSharedData(__sharedData_VFor1, 0, _toDisplayString(getRowKey(item["row"], flatIndex)));
+        }, 1);
+      }, () => {
+        _createSharedDataSlot("empty", null, null, () => {
+          _renderSharedDataEffect(() => {
+            return _setSharedData(__sharedData, 12, _toDisplayString(__props.emptyText));
+          });
+        });
+      }, 1541);
+      _setSharedDataEvent(__sharedData, 13, onScroll);
+      _createSharedDataIf(() => {
+        return _setSharedData(__sharedData, 0, _toSharedDataBoolean(showFixedShadow.value));
+      }, () => {
+        _renderSharedDataEffect(() => {
+          return _setSharedDataStyle(__sharedData, 6, getFixedShadowStyle());
+        });
+        _createSharedDataIf(() => {
+          return _setSharedData(__sharedData, 1, _toSharedDataBoolean(__props.showHeader));
+        }, () => {
+          _createSharedDataFor(_setSharedDataScoped(__sharedData, 2, _createSharedDataVFor(__sharedDataScope, () => {
+            return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 4 });
+          })), () => {
+            return fixedLeftColumns.value;
+          }, (__sharedData_VFor3, _for_item3, _for_key3) => {
+            _renderSharedDataEffect(() => {
+              const _col = _for_item3.value;
+              _setSharedDataClass(__sharedData_VFor3, 8, ["up-table-cell up-table-header-cell", [getHeaderAlignClass(_col)]]);
+              _setSharedDataStyle(__sharedData_VFor3, 9, getFixedHeaderCellStyle(_col));
+            });
+            _createSharedDataIf(() => {
+              return _setSharedData(__sharedData_VFor3, 1, _toSharedDataBoolean(isSelectionColumn(_for_item3.value)));
+            }, () => {
+              const n51 = _createSharedDataComponentWithFallback(_component_checkbox, "4f2281be-" + getColumnKey(_for_item3.value, _for_key3.value), {
+                checked: () => {
+                  return isAllSelected();
+                },
+                onClick: () => {
+                  return _withModifiers(toggleSelectAll, ["stop"]);
+                }
+              });
+              _setSharedData(__sharedData_VFor3, 2, n51?.sharedData);
+            }, () => {
+              _renderSharedDataEffect(() => {
+                const _col = _for_item3.value;
+                _setSharedDataStyle(__sharedData_VFor3, 5, { textAlign: getHeaderAlignValue(_col) });
+                _setSharedData(__sharedData_VFor3, 6, _toDisplayString(getColumnTitle(_col)));
+              });
+              _createSharedDataIf(() => {
+                return _setSharedData(__sharedData_VFor3, 3, _toSharedDataBoolean(isSortableColumn(_for_item3.value)));
+              }, () => {
+                _renderSharedDataEffect(() => {
+                  return _setSharedData(__sharedData_VFor3, 4, _toDisplayString(getSortIcon(_for_item3.value)));
+                });
+              });
+            }, 1801);
+            _setSharedDataEvent(__sharedData_VFor3, 7, () => {
+              return handleHeaderClick(_for_item3.value);
+            });
+            return null;
+          }, (__sharedData_VFor3, col, fixedIndex) => {
+            return _setSharedData(__sharedData_VFor3, 0, _toDisplayString(getColumnKey(col, fixedIndex)));
+          }, 1);
+        });
+        _createSharedDataIf(() => {
+          return _setSharedData(__sharedData, 3, _toSharedDataBoolean(hasData.value));
+        }, () => {
+          _renderSharedDataEffect(() => {
+            return _setSharedDataStyle(__sharedData, 5, getBodyStyle());
+          });
+          _createSharedDataFor(_setSharedDataScoped(__sharedData, 4, _createSharedDataVFor(__sharedDataScope, () => {
+            return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 5 });
+          })), () => {
+            return flatRows.value;
+          }, (__sharedData_VFor4, _for_item4, _for_key4) => {
+            _renderSharedDataEffect(() => {
+              _setSharedDataClass(__sharedData_VFor4, 3, ["up-table-row up-table-body-row", getRowClass(_for_item4.value["row"], _for_key4.value)]);
+              _setSharedDataStyle(__sharedData_VFor4, 4, { height: rowHeightValue.value });
+            });
+            _createSharedDataFor(_setSharedDataScoped(__sharedData_VFor4, 1, _createSharedDataVFor(__sharedDataScope, () => {
+              return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 6 });
+            })), () => {
+              return getFixedRowCells(_for_item4.value["row"], safeToNumber(_for_item4.value["rowIndex"]));
+            }, (__sharedData_VFor5, _for_item5, _for_key5) => {
+              _renderSharedDataEffect(() => {
+                const _cell = _for_item5.value;
+                const _item = _for_item4.value;
+                const _safeToNumber = safeToNumber;
+                const _cell_col = _cell["col"];
+                const _item_row = _item["row"];
+                _setSharedDataClass(__sharedData_VFor5, 9, ["up-table-cell up-table-body-cell", [getCellAlignClass(_cell_col), getCellClassName(_item_row, _cell_col), getCellSpanClass(_item_row, _cell_col, _safeToNumber(_item["rowIndex"]), _safeToNumber(_cell["colIndex"]))]]);
+                _setSharedDataStyle(__sharedData_VFor5, 10, getFixedCellStyle(_item_row, _cell_col, _safeToNumber(_item["rowIndex"]), _safeToNumber(_cell["colIndex"]), _safeToNumber(_item["level"], 1)));
+              });
+              _createSharedDataIf(() => {
+                return _setSharedData(__sharedData_VFor5, 1, _toSharedDataBoolean(isSelectionColumn(_for_item5.value["col"])));
+              }, () => {
+                const _on_click1 = () => {
+                  return toggleSelect(_for_item4.value["row"]);
+                };
+                const n68 = _createSharedDataComponentWithFallback(_component_checkbox, "4f236a5b-" + ("fixed_" + getColumnKey(_for_item5.value["col"], safeToNumber(_for_item5.value["colIndex"]))), {
+                  checked: () => {
+                    return isSelected(_for_item4.value["row"]);
+                  },
+                  onClick: () => {
+                    return _withModifiers(_on_click1, ["stop"]);
+                  }
+                });
+                _setSharedData(__sharedData_VFor5, 2, n68?.sharedData);
+              }, () => {
+                _createSharedDataIf(() => {
+                  return _setSharedData(__sharedData_VFor5, 3, _toSharedDataBoolean(showTreeIcon(_for_item5.value["col"], _for_item4.value["row"])));
+                }, () => {
+                  _setSharedDataEvent(__sharedData_VFor5, 4, () => {
+                    return toggleExpand(_for_item4.value["row"]);
+                  });
+                  _renderSharedDataEffect(() => {
+                    _setSharedDataStyle(__sharedData_VFor5, 5, { width: expandWidthValue.value });
+                    _setSharedData(__sharedData_VFor5, 6, _toDisplayString(isExpanded(_for_item4.value["row"]) ? "-" : "+"));
+                  });
+                });
+                _createSharedDataSlot("cell", {
+                  row: () => {
+                    return _for_item4.value["row"];
+                  },
+                  column: () => {
+                    return _for_item5.value["col"];
+                  },
+                  prow: () => {
+                    return getParentRow(_for_item4.value);
+                  },
+                  rowIndex: () => {
+                    return safeToNumber(_for_item4.value["rowIndex"]);
+                  },
+                  columnIndex: () => {
+                    return safeToNumber(_for_item5.value["colIndex"]);
+                  },
+                  level: () => {
+                    return safeToNumber(_for_item4.value["level"], 1);
+                  }
+                }, (data) => {
+                  return _setSharedData(__sharedData_VFor5, 7, data);
+                }, () => {
+                  _renderSharedDataEffect(() => {
+                    return _setSharedData(__sharedData_VFor5, 8, _toDisplayString(getCellText(_for_item4.value["row"], _for_item5.value["col"])));
+                  });
+                });
+              }, 2569);
+              return null;
+            }, (__sharedData_VFor5, cell, idx) => {
+              return _setSharedData(__sharedData_VFor5, 0, _toDisplayString("fixed_" + getColumnKey(cell["col"], safeToNumber(cell["colIndex"]))));
+            }, 1);
+            _setSharedDataEvent(__sharedData_VFor4, 2, () => {
+              return handleRowClick(_for_item4.value["row"]);
+            });
+            return null;
+          }, (__sharedData_VFor4, item, flatIndex) => {
+            return _setSharedData(__sharedData_VFor4, 0, _toDisplayString("fixed_" + getRowKey(item["row"], flatIndex)));
+          }, 1);
+        });
+      });
+      return __sharedData;
+    };
+  }
+});
+const _style_0 = {};
+const __easycom_2 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+export {
+  __easycom_2 as _
+};
+//# sourceMappingURL=up-table2.js.map

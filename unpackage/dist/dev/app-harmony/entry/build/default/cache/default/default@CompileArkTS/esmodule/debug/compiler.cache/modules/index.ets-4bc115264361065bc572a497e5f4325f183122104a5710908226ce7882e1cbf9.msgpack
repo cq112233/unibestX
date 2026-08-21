@@ -1,0 +1,1099 @@
+Ôr@Ÿªassertions¤code´customTransformCache¬dependencies¢id¤meta±moduleSideEffects¬originalCode±originalSourcemap«resolvedIds®sourcemapChainµsyntheticNamedExportsµtransformDependencies®transformFiles¨cacheAstÔrAÚA½import { EXTENDED_COLOR_KEYWORDS, uniCanvasGradient } from "./canvas.color";
+import { UniError, Image, Path2D, requestAnimationFrame, cancelAnimationFrame, UTSObject, UTSJSONObject, UniNativeViewElementImpl, nextTick, uni } from "@dcloudio/uni-app-framework";
+import { buildCanvas, HarmonyCanvasRenderingContext2D } from "./canvas";
+class CreateCanvasContextAsyncOptions extends UTSObject {
+    constructor() {
+        super(...arguments);
+        this.component = null;
+        this.success = null;
+        this.fail = null;
+        this.complete = null;
+    }
+}
+class UniCanvasRenderingContext2D {
+    constructor(element, context) {
+        this._firstMoveTo = false;
+        this._element = element;
+        this._context = context;
+    }
+    arc(x, y, radius, startAngle, endAngle, counterclockwise = null) {
+        if (counterclockwise) {
+            this._context.arc(px2vp(x), px2vp(y), px2vp(radius), startAngle, endAngle, counterclockwise);
+        }
+        else {
+            this._context.arc(px2vp(x), px2vp(y), px2vp(radius), startAngle, endAngle);
+        }
+    }
+    arcTo(x1, y1, x2, y2, radius) {
+        this._context.arcTo(px2vp(x1), px2vp(y1), px2vp(x2), px2vp(y2), px2vp(radius));
+    }
+    beginPath() {
+        this._context.beginPath();
+        this._firstMoveTo = false;
+    }
+    bezierCurveTo(cp1x, cp1y, cp2x, cp2y, x, y) {
+        this._context.bezierCurveTo(px2vp(cp1x), px2vp(cp1y), px2vp(cp2x), px2vp(cp2y), px2vp(x), px2vp(y));
+    }
+    clearRect(x, y, w, h) {
+        this._context.clearRect(px2vp(x), px2vp(y), px2vp(w), px2vp(h));
+    }
+    clip(path = null, fillRule = null) {
+        if (path) {
+            if (fillRule && typeof path != 'string') {
+                this._context.clip(path, fillRule);
+            }
+            else {
+                if (typeof path == 'string') {
+                    this._context.clip(path);
+                }
+                else {
+                    this._context.clip(path);
+                }
+            }
+        }
+        else {
+            this._context.clip();
+        }
+    }
+    closePath() {
+        this._context.closePath();
+    }
+    createConicGradient(startAngle, x, y) {
+        return this._uniCanvasGradient(this._context.createConicGradient(startAngle, px2vp(x), px2vp(y)));
+    }
+    createImageData(sw, sh = null) {
+        if (typeof sw == 'number') {
+            return this._context.createImageData(px2vp(sw), px2vp(sh));
+        }
+        return this._context.createImageData(sw);
+    }
+    createLinearGradient(x0, y0, x1, y1) {
+        return this._uniCanvasGradient(this._context.createLinearGradient(px2vp(x0), px2vp(y0), px2vp(x1), px2vp(y1)));
+    }
+    createPattern(image, repetition) {
+        if (repetition.length) {
+            return this._context.createPattern(image.bitmap, repetition);
+        }
+        else {
+            return this._context.createPattern(image.bitmap);
+        }
+    }
+    createRadialGradient(x0, y0, r0, x1, y1, r1) {
+        return this._uniCanvasGradient(this._context.createRadialGradient(px2vp(x0), px2vp(y0), px2vp(r0), px2vp(x1), px2vp(y1), px2vp(r1)));
+    }
+    draw() { }
+    drawImage(image, dx, dy, dw = null, dh = null) {
+        if (!image.bitmap) {
+            return;
+        }
+        if (dw && dh) {
+            this._context.drawImage(image.bitmap, px2vp(dx), px2vp(dy), px2vp(dw), px2vp(dh));
+        }
+        else {
+            this._context.drawImage(image.bitmap, px2vp(dx), px2vp(dy));
+        }
+    }
+    ellipse(x, y, radiusX, radiusY, rotation, startAngle, endAngle, counterclockwise = null) {
+        if (counterclockwise) {
+            this._context.ellipse(px2vp(x), px2vp(y), px2vp(radiusX), px2vp(radiusY), rotation, startAngle, endAngle, counterclockwise);
+        }
+        else {
+            this._context.ellipse(px2vp(x), px2vp(y), px2vp(radiusX), px2vp(radiusY), rotation, startAngle, endAngle);
+        }
+    }
+    fill(path = null, fillRule = null) {
+        if (path) {
+            if (fillRule && typeof path != 'string') {
+                this._context.fill(path, fillRule);
+            }
+            else {
+                if (typeof path == 'string') {
+                    this._context.fill(path);
+                }
+                else {
+                    this._context.fill(path);
+                }
+            }
+        }
+        else {
+            this._context.fill();
+        }
+    }
+    fillRect(x, y, w, h) {
+        this._context.fillRect(px2vp(x), px2vp(y), px2vp(w), px2vp(h));
+    }
+    fillText(text, x, y, maxWidth = null) {
+        if (maxWidth) {
+            this._context.fillText(text, px2vp(x), px2vp(y), px2vp(maxWidth));
+        }
+        else {
+            this._context.fillText(text, px2vp(x), px2vp(y));
+        }
+    }
+    getImageData(sx, sy, sw, sh) {
+        return this._context.getImageData(px2vp(sx), px2vp(sy), px2vp(sw), px2vp(sh));
+    }
+    getLineDash() {
+        return this.vp2pxArray(this._context.getLineDash());
+    }
+    isContextLost() {
+        return false;
+    }
+    isPointInPath(path, x, y = null, fillRule = null) {
+        return false;
+    }
+    isPointInStroke(path, x, y = null) {
+        return false;
+    }
+    lineTo(x, y) {
+        if (!this._firstMoveTo) {
+            this.moveTo(x, y);
+        }
+        this._context.lineTo(px2vp(x), px2vp(y));
+    }
+    measureText(text) {
+        const textMetrics = this._context.measureText(text);
+        return {
+            width: vp2px(textMetrics.width),
+            height: vp2px(textMetrics.height),
+            actualBoundingBoxLeft: vp2px(textMetrics.actualBoundingBoxLeft),
+            actualBoundingBoxRight: vp2px(textMetrics.actualBoundingBoxRight),
+            fontBoundingBoxAscent: vp2px(textMetrics.fontBoundingBoxAscent),
+            fontBoundingBoxDescent: vp2px(textMetrics.fontBoundingBoxDescent),
+            actualBoundingBoxAscent: vp2px(textMetrics.actualBoundingBoxAscent),
+            actualBoundingBoxDescent: vp2px(textMetrics.actualBoundingBoxDescent),
+            emHeightAscent: vp2px(textMetrics.emHeightAscent),
+            emHeightDescent: vp2px(textMetrics.emHeightDescent),
+            hangingBaseline: vp2px(textMetrics.hangingBaseline),
+            alphabeticBaseline: vp2px(textMetrics.alphabeticBaseline),
+            ideographicBaseline: vp2px(textMetrics.ideographicBaseline)
+        };
+    }
+    moveTo(x, y) {
+        this._context.moveTo(px2vp(x), px2vp(y));
+        this._firstMoveTo = true;
+    }
+    putImageData(imageData, dx, dy, dirtyX = null, dirtyY = null, dirtyWidth = null, dirtyHeight = null) {
+        if (dirtyX && dirtyY && dirtyWidth && dirtyHeight) {
+            this._context.putImageData(imageData, px2vp(dx), px2vp(dy), px2vp(dirtyX), px2vp(dirtyY), px2vp(dirtyWidth), px2vp(dirtyHeight));
+        }
+        else {
+            this._context.putImageData(imageData, px2vp(dx), px2vp(dy));
+        }
+    }
+    quadraticCurveTo(cpx, cpy, x, y) {
+        this._context.quadraticCurveTo(px2vp(cpx), px2vp(cpy), px2vp(x), px2vp(y));
+    }
+    rect(x, y, w, h) {
+        this._context.rect(px2vp(x), px2vp(y), px2vp(w), px2vp(h));
+    }
+    reset() {
+        this._context.reset();
+        this._firstMoveTo = false;
+    }
+    resetTransform() {
+        this._context.resetTransform();
+    }
+    restore() {
+        this._context.restore();
+    }
+    rotate(angle) {
+        this._context.rotate(angle);
+    }
+    roundRect(x, y, w, h, radii = null) {
+        throw new Error('Not implemented');
+    }
+    save() {
+        this._context.save();
+    }
+    scale(x, y) {
+        this._context.scale(x, y);
+    }
+    setLineDash(segments) {
+        this._context.setLineDash(this.px2vpArray(segments));
+    }
+    setTransform(a, b, c, d, e, f) {
+        this._context.setTransform(a, b, c, d, px2vp(e), px2vp(f));
+    }
+    stroke(path = null) {
+        if (path) {
+            this._context.stroke(path);
+        }
+        else {
+            this._context.stroke();
+        }
+    }
+    strokeRect(x, y, w, h) {
+        this._context.strokeRect(px2vp(x), px2vp(y), px2vp(w), px2vp(h));
+    }
+    strokeText(text, x, y, maxWidth = null) {
+        if (maxWidth) {
+            this._context.strokeText(text, px2vp(x), px2vp(y), px2vp(maxWidth));
+        }
+        else {
+            this._context.strokeText(text, px2vp(x), px2vp(y));
+        }
+    }
+    transform(a, b, c, d, e, f) {
+        this._context.transform(a, b, c, d, px2vp(e), px2vp(f));
+    }
+    translate(x, y) {
+        this._context.translate(px2vp(x), px2vp(y));
+    }
+    get canvas() {
+        return this._element;
+    }
+    get direction() {
+        return this._context.direction;
+    }
+    set direction(value) {
+        this._context.direction = value;
+    }
+    get fillStyle() {
+        return this._context.fillStyle;
+    }
+    set fillStyle(value) {
+        if (typeof value == 'string') {
+            this._context.fillStyle = this._fixColor(value);
+        }
+        else {
+            this._context.fillStyle = value;
+        }
+    }
+    get filter() {
+        return '';
+    }
+    set filter(value) { }
+    get font() {
+        return this._context.font;
+    }
+    set font(value) {
+        this._context.font = value;
+    }
+    get fontStretch() {
+        return 'condensed';
+    }
+    set fontStretch(value) { }
+    get globalAlpha() {
+        return this._context.globalAlpha;
+    }
+    set globalAlpha(value) {
+        this._context.globalAlpha = value;
+    }
+    get globalCompositeOperation() {
+        return this._context.globalCompositeOperation;
+    }
+    set globalCompositeOperation(value) {
+        this._context.globalCompositeOperation = value;
+    }
+    get imageSmoothingEnabled() {
+        return this._context.imageSmoothingEnabled;
+    }
+    set imageSmoothingEnabled(value) {
+        this._context.imageSmoothingEnabled = value;
+    }
+    get imageSmoothingQuality() {
+        return this._context.imageSmoothingQuality;
+    }
+    set imageSmoothingQuality(value) {
+        this._context.imageSmoothingQuality = value;
+    }
+    get letterSpacing() {
+        return '';
+    }
+    set letterSpacing(value) { }
+    get lineWidth() {
+        return vp2px(this._context.lineWidth);
+    }
+    set lineWidth(value) {
+        this._context.lineWidth = px2vp(value);
+    }
+    get lineCap() {
+        return this._context.lineCap;
+    }
+    set lineCap(value) {
+        this._context.lineCap = value;
+    }
+    get lineJoin() {
+        return this._context.lineJoin;
+    }
+    set lineJoin(value) {
+        this._context.lineJoin = value;
+    }
+    get lineDashOffset() {
+        return vp2px(this._context.lineDashOffset);
+    }
+    set lineDashOffset(value) {
+        this._context.lineDashOffset = px2vp(value);
+    }
+    get miterLimit() {
+        return this._context.miterLimit;
+    }
+    set miterLimit(value) {
+        this._context.miterLimit = value;
+    }
+    get strokeStyle() {
+        return this._context.strokeStyle;
+    }
+    set strokeStyle(value) {
+        if (typeof value == 'string') {
+            this._context.strokeStyle = this._fixColor(value);
+        }
+        else {
+            this._context.strokeStyle = value;
+        }
+    }
+    get shadowBlur() {
+        return this._context.shadowBlur;
+    }
+    set shadowBlur(value) {
+        this._context.shadowBlur = value;
+    }
+    get shadowColor() {
+        return this._context.shadowColor;
+    }
+    set shadowColor(value) {
+        this._context.shadowColor = value;
+    }
+    get shadowOffsetX() {
+        return vp2px(this._context.shadowOffsetX);
+    }
+    set shadowOffsetX(value) {
+        this._context.shadowOffsetX = px2vp(value);
+    }
+    get shadowOffsetY() {
+        return vp2px(this._context.shadowOffsetY);
+    }
+    set shadowOffsetY(value) {
+        this._context.shadowOffsetY = px2vp(value);
+    }
+    get textAlign() {
+        return this._context.textAlign;
+    }
+    set textAlign(value) {
+        this._context.textAlign = value;
+    }
+    get textBaseline() {
+        return this._context.textBaseline;
+    }
+    set textBaseline(value) {
+        this._context.textBaseline = value;
+    }
+    get textRendering() {
+        return 'auto';
+    }
+    set textRendering(value) { }
+    get wordSpacing() {
+        return '';
+    }
+    set wordSpacing(value) { }
+    px2vpArray(array) {
+        for (let i = 0; i < array.length; i++) {
+            array[i] = px2vp(array[i]);
+        }
+        return array;
+    }
+    vp2pxArray(array) {
+        for (let i = 0; i < array.length; i++) {
+            array[i] = vp2px(array[i]);
+        }
+        return array;
+    }
+    _uniCanvasGradient(gradient) {
+        uniCanvasGradient(gradient);
+        return gradient;
+    }
+    _fixColor(color) {
+        if (color.startsWith('#') || color.startsWith('rgb') || color.startsWith('rgba')) {
+            return color;
+        }
+        const colorValue = EXTENDED_COLOR_KEYWORDS[color];
+        if (colorValue) {
+            return colorValue;
+        }
+        if (color == 'transparent') {
+            return 'rgba(0,0,0,0)';
+        }
+        return color;
+    }
+}
+class UniNativeCanvas {
+    constructor(element) {
+        this.harmonyBuilderNode = null;
+        this.settings = new RenderingContextSettings(true);
+        this.context = new HarmonyCanvasRenderingContext2D(this.settings);
+        this._width = 0;
+        this._height = 0;
+        this.element = element;
+        this.context2D = new UniCanvasRenderingContext2D(element, this.context);
+        this.element.bindHarmonyWrappedBuilder(wrapBuilder(buildCanvas), {
+            context: this.context,
+            background: "#00000000"
+        });
+        this.harmonyBuilderNode = element.getHarmonyComponentContent();
+        element.bindHarmonyController(this);
+    }
+    updateBackground(color) {
+        try {
+            this.harmonyBuilderNode?.update(new UTSJSONObject({
+                background: color
+            }));
+        }
+        catch (e) { }
+    }
+    get width() {
+        return this._width != 0 ? this._width : vp2px(this.element.offsetWidth);
+    }
+    set width(value) {
+        this._width = value;
+    }
+    get height() {
+        return this._height != 0 ? this._height : vp2px(this.element.offsetHeight);
+    }
+    set height(value) {
+        this._height = value;
+    }
+    getContext(_) {
+        return this.context2D;
+    }
+    toDataURL(type = null, quality = null) {
+        return this.context.toDataURL(type, quality);
+    }
+    destroy() { }
+}
+class UniCanvasElement extends UniNativeViewElementImpl {
+    get width() {
+        return this.getHarmonyController().width;
+    }
+    set width(value) {
+        this.getHarmonyController().width = value;
+    }
+    get height() {
+        return this.getHarmonyController().height;
+    }
+    set height(value) {
+        this.getHarmonyController().height = value;
+    }
+    getContext(_) {
+        return this.getHarmonyController().getContext(_);
+    }
+    toDataURL(type = null, quality = null) {
+        return this.getHarmonyController().toDataURL(type, quality);
+    }
+}
+class UniCanvasContext {
+    constructor(element) {
+        this._element = element;
+        this._context = this._element.getContext('2d');
+    }
+    getContext(type) {
+        return this._element.getContext(type);
+    }
+    toDataURL(type = null, encoderOptions = null) {
+        return this._element.toDataURL(type, encoderOptions);
+    }
+    createImage() {
+        return new Image();
+    }
+    createPath2D() {
+        return new Path2D();
+    }
+    requestAnimationFrame(callback) {
+        return requestAnimationFrame(callback);
+    }
+    cancelAnimationFrame(taskId) {
+        cancelAnimationFrame(taskId);
+    }
+}
+const createCanvasContextAsync = (options) => {
+    nextTick(() => {
+        let element = uni.getElementById(options.id);
+        if (element) {
+            const canvasElement = element;
+            options.success?.(new UniCanvasContext(canvasElement));
+        }
+        else {
+            const uniError = new UniError('uni-createCanvasContextAsync', -1, 'canvas id invalid.');
+            options.fail?.(uniError);
+        }
+        options.complete?.();
+    });
+};
+export { UniNativeCanvas as UniNativeCanvas, UniCanvasElement as UniCanvasElement, CreateCanvasContextAsyncOptions as CreateCanvasContextAsyncOptions };
+export { createCanvasContextAsync as createCanvasContextAsync };
+//# sourceMappingURL=index.js.mapÂ“Ú!/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@hnpaqqbd4i9bxcrp3ktun4a1gqv9ys2o5pljtcetlzk=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/modules/uni_modules/uni-canvas-dom2/utssdk/app-harmony/canvas.color.jsÙî/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@hnpaqqbd4i9bxcrp3ktun4a1gqv9ys2o5pljtcetlzk=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/framework/index.etsÚ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@hnpaqqbd4i9bxcrp3ktun4a1gqv9ys2o5pljtcetlzk=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/modules/uni_modules/uni-canvas-dom2/utssdk/app-harmony/canvas.etsÚ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@hnpaqqbd4i9bxcrp3ktun4a1gqv9ys2o5pljtcetlzk=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/modules/uni_modules/uni-canvas-dom2/utssdk/app-harmony/index.etsÔrB˜±isLocalDependency¯isNodeEntryFile§pkgPath§pkgNameªpkgVersion±belongProjectPath±dependencyPkgInfo¬shouldEmitJsÂÂÙâ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@hnpaqqbd4i9bxcrp3ktun4a1gqv9ys2o5pljtcetlzk=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/modules¹@dcloudio/uni-app-modules¥1.0.0ÙL/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmonyÔrC’§pkgNameªpkgVersion¹@dcloudio/uni-app-modules¥1.0.0ÃÃÚXåimport { EXTENDED_COLOR_KEYWORDS, uniCanvasGradient } from "./canvas.color";
+import { UniError, CanvasRenderingContext2D, Image, Path2D, requestAnimationFrame, cancelAnimationFrame, string, ComponentPublicInstance, UTSObject, h, UTSJSONObject, UniNativeViewElementImpl, nextTick, uni } from "@dcloudio/uni-app-framework";
+import { buildCanvas, HarmonyCanvasRenderingContext2D } from "./canvas";
+type CreateCanvasContextAsyncSuccessCallback = (context: CanvasContext) => void;
+type CreateCanvasContextAsyncFailCallback = (error: UniError) => void;
+type CreateCanvasContextAsyncCompleteCallback = () => void;
+type RequestAnimationFrameCallback = (time: number) => void;
+interface CanvasContext {
+    getContext(type: '2d'): CanvasRenderingContext2D | null;
+    toDataURL(): string;
+    toDataURL(type: string): string;
+    toDataURL(type: string, encoderOptions: Object): string;
+    createImage(): Image;
+    createPath2D(): Path2D;
+    requestAnimationFrame(callback: RequestAnimationFrameCallback): number;
+    cancelAnimationFrame(taskId: number): void;
+}
+class CreateCanvasContextAsyncOptions extends UTSObject {
+    id!: string.IDString;
+    component: ComponentPublicInstance | null = null;
+    success: CreateCanvasContextAsyncSuccessCallback | null = null;
+    fail: CreateCanvasContextAsyncFailCallback | null = null;
+    complete: CreateCanvasContextAsyncCompleteCallback | null = null;
+}
+type CreateCanvasContextAsync = (options: CreateCanvasContextAsyncOptions) => void;
+type CanvasTextRendering = "auto" | "geometricPrecision" | "optimizeLegibility" | "optimizeSpeed";
+type CanvasFontStretch = "condensed" | "expanded" | "extra-condensed" | "extra-expanded" | "normal" | "semi-condensed" | "semi-expanded" | "ultra-condensed" | "ultra-expanded";
+type GlobalCompositeOperation = "color" | "color-burn" | "color-dodge" | "copy" | "darken" | "destination-atop" | "destination-in" | "destination-out" | "destination-over" | "difference" | "exclusion" | "hard-light" | "hue" | "lighten" | "lighter" | "luminosity" | "multiply" | "overlay" | "saturation" | "screen" | "soft-light" | "source-atop" | "source-in" | "source-out" | "source-over" | "xor";
+class UniCanvasRenderingContext2D implements CanvasRenderingContext2D {
+    private readonly _element: UniCanvasElement;
+    private readonly _context: ESObject;
+    private _firstMoveTo = false;
+    constructor(element: UniCanvasElement, context: ESObject){
+        this._element = element;
+        this._context = context;
+    }
+    arc(x: number, y: number, radius: number, startAngle: number, endAngle: number, counterclockwise: boolean | null = null): void {
+        if (counterclockwise) {
+            this._context.arc(px2vp(x), px2vp(y), px2vp(radius), startAngle, endAngle, counterclockwise);
+        } else {
+            this._context.arc(px2vp(x), px2vp(y), px2vp(radius), startAngle, endAngle);
+        }
+    }
+    arcTo(x1: number, y1: number, x2: number, y2: number, radius: number): void {
+        this._context.arcTo(px2vp(x1), px2vp(y1), px2vp(x2), px2vp(y2), px2vp(radius));
+    }
+    beginPath(): void {
+        this._context.beginPath();
+        this._firstMoveTo = false;
+    }
+    bezierCurveTo(cp1x: number, cp1y: number, cp2x: number, cp2y: number, x: number, y: number): void {
+        this._context.bezierCurveTo(px2vp(cp1x), px2vp(cp1y), px2vp(cp2x), px2vp(cp2y), px2vp(x), px2vp(y));
+    }
+    clearRect(x: number, y: number, w: number, h: number): void {
+        this._context.clearRect(px2vp(x), px2vp(y), px2vp(w), px2vp(h));
+    }
+    clip(): void;
+    clip(fillRule: CanvasFillRule): void;
+    clip(path: Path2D): void;
+    clip(path: Path2D, fillRule: CanvasFillRule): void;
+    clip(path: Path2D | CanvasFillRule | null = null, fillRule: CanvasFillRule | null = null): void {
+        if (path) {
+            if (fillRule && typeof path != 'string') {
+                this._context.clip(path, fillRule);
+            } else {
+                if (typeof path == 'string') {
+                    this._context.clip(path);
+                } else {
+                    this._context.clip(path);
+                }
+            }
+        } else {
+            this._context.clip();
+        }
+    }
+    closePath(): void {
+        this._context.closePath();
+    }
+    createConicGradient(startAngle: number, x: number, y: number): CanvasGradient {
+        return this._uniCanvasGradient(this._context.createConicGradient(startAngle, px2vp(x), px2vp(y)));
+    }
+    createImageData(sw: number | ImageData, sh: number | null = null): ImageData {
+        if (typeof sw == 'number') {
+            return this._context.createImageData(px2vp(sw), px2vp(sh));
+        }
+        return this._context.createImageData(sw);
+    }
+    createLinearGradient(x0: number, y0: number, x1: number, y1: number): CanvasGradient {
+        return this._uniCanvasGradient(this._context.createLinearGradient(px2vp(x0), px2vp(y0), px2vp(x1), px2vp(y1)));
+    }
+    createPattern(image: Image, repetition: string): CanvasPattern {
+        if (repetition.length) {
+            return this._context.createPattern((image as ESObject).bitmap!, repetition);
+        } else {
+            return this._context.createPattern((image as ESObject).bitmap!);
+        }
+    }
+    createRadialGradient(x0: number, y0: number, r0: number, x1: number, y1: number, r1: number): CanvasGradient {
+        return this._uniCanvasGradient(this._context.createRadialGradient(px2vp(x0), px2vp(y0), px2vp(r0), px2vp(x1), px2vp(y1), px2vp(r1)));
+    }
+    draw(): void {}
+    drawImage(image: Image, dx: number, dy: number): void;
+    drawImage(image: Image, dx: number, dy: number, dw: number | null = null, dh: number | null = null): void {
+        if (!(image as ESObject).bitmap) {
+            return;
+        }
+        if (dw && dh) {
+            this._context.drawImage((image as ESObject).bitmap!, px2vp(dx), px2vp(dy), px2vp(dw), px2vp(dh));
+        } else {
+            this._context.drawImage((image as ESObject).bitmap!, px2vp(dx), px2vp(dy));
+        }
+    }
+    ellipse(x: number, y: number, radiusX: number, radiusY: number, rotation: number, startAngle: number, endAngle: number, counterclockwise: boolean | null = null): void {
+        if (counterclockwise) {
+            this._context.ellipse(px2vp(x), px2vp(y), px2vp(radiusX), px2vp(radiusY), rotation, startAngle, endAngle, counterclockwise);
+        } else {
+            this._context.ellipse(px2vp(x), px2vp(y), px2vp(radiusX), px2vp(radiusY), rotation, startAngle, endAngle);
+        }
+    }
+    fill(): void;
+    fill(fillRule: CanvasFillRule): void;
+    fill(path: Path2D): void;
+    fill(path: Path2D, fillRule: CanvasFillRule): void;
+    fill(path: Path2D | CanvasFillRule | null = null, fillRule: CanvasFillRule | null = null): void {
+        if (path) {
+            if (fillRule && typeof path != 'string') {
+                this._context.fill(path, fillRule);
+            } else {
+                if (typeof path == 'string') {
+                    this._context.fill(path);
+                } else {
+                    this._context.fill(path);
+                }
+            }
+        } else {
+            this._context.fill();
+        }
+    }
+    fillRect(x: number, y: number, w: number, h: number): void {
+        this._context.fillRect(px2vp(x), px2vp(y), px2vp(w), px2vp(h));
+    }
+    fillText(text: string, x: number, y: number, maxWidth: number | null = null): void {
+        if (maxWidth) {
+            this._context.fillText(text, px2vp(x), px2vp(y), px2vp(maxWidth));
+        } else {
+            this._context.fillText(text, px2vp(x), px2vp(y));
+        }
+    }
+    getImageData(sx: number, sy: number, sw: number, sh: number): ImageData {
+        return this._context.getImageData(px2vp(sx), px2vp(sy), px2vp(sw), px2vp(sh));
+    }
+    getLineDash(): number[] {
+        return this.vp2pxArray(this._context.getLineDash());
+    }
+    isContextLost(): boolean {
+        return false;
+    }
+    isPointInPath(x: number, y: number): boolean;
+    isPointInPath(x: number, y: number, fillRule: string): boolean;
+    isPointInPath(path: Path2D, x: number, y: number): boolean;
+    isPointInPath(path: Path2D, x: number, y: number, fillRule: string): boolean;
+    isPointInPath(path: Object, x: number, y: Object | null = null, fillRule: string | null = null): boolean {
+        return false;
+    }
+    isPointInStroke(x: number, y: number): boolean;
+    isPointInStroke(path: Path2D, x: number, y: number): boolean;
+    isPointInStroke(path: Object, x: number, y: number | null = null): boolean {
+        return false;
+    }
+    lineTo(x: number, y: number): void {
+        if (!this._firstMoveTo) {
+            this.moveTo(x, y);
+        }
+        this._context.lineTo(px2vp(x), px2vp(y));
+    }
+    measureText(text: string): TextMetrics {
+        const textMetrics: TextMetrics = this._context.measureText(text);
+        return {
+            width: vp2px(textMetrics.width),
+            height: vp2px(textMetrics.height),
+            actualBoundingBoxLeft: vp2px(textMetrics.actualBoundingBoxLeft),
+            actualBoundingBoxRight: vp2px(textMetrics.actualBoundingBoxRight),
+            fontBoundingBoxAscent: vp2px(textMetrics.fontBoundingBoxAscent),
+            fontBoundingBoxDescent: vp2px(textMetrics.fontBoundingBoxDescent),
+            actualBoundingBoxAscent: vp2px(textMetrics.actualBoundingBoxAscent),
+            actualBoundingBoxDescent: vp2px(textMetrics.actualBoundingBoxDescent),
+            emHeightAscent: vp2px(textMetrics.emHeightAscent),
+            emHeightDescent: vp2px(textMetrics.emHeightDescent),
+            hangingBaseline: vp2px(textMetrics.hangingBaseline),
+            alphabeticBaseline: vp2px(textMetrics.alphabeticBaseline),
+            ideographicBaseline: vp2px(textMetrics.ideographicBaseline)
+        };
+    }
+    moveTo(x: number, y: number): void {
+        this._context.moveTo(px2vp(x), px2vp(y));
+        this._firstMoveTo = true;
+    }
+    putImageData(imageData: ImageData, dx: number, dy: number): void;
+    putImageData(imageData: ImageData, dx: number, dy: number, dirtyX: number | null = null, dirtyY: number | null = null, dirtyWidth: number | null = null, dirtyHeight: number | null = null): void {
+        if (dirtyX && dirtyY && dirtyWidth && dirtyHeight) {
+            this._context.putImageData(imageData, px2vp(dx), px2vp(dy), px2vp(dirtyX), px2vp(dirtyY), px2vp(dirtyWidth), px2vp(dirtyHeight));
+        } else {
+            this._context.putImageData(imageData, px2vp(dx), px2vp(dy));
+        }
+    }
+    quadraticCurveTo(cpx: number, cpy: number, x: number, y: number): void {
+        this._context.quadraticCurveTo(px2vp(cpx), px2vp(cpy), px2vp(x), px2vp(y));
+    }
+    rect(x: number, y: number, w: number, h: number): void {
+        this._context.rect(px2vp(x), px2vp(y), px2vp(w), px2vp(h));
+    }
+    reset(): void {
+        this._context.reset();
+        this._firstMoveTo = false;
+    }
+    resetTransform(): void {
+        this._context.resetTransform();
+    }
+    restore(): void {
+        this._context.restore();
+    }
+    rotate(angle: number): void {
+        this._context.rotate(angle);
+    }
+    roundRect(x: number, y: number, w: number, h: number, radii: number | null = null): void {
+        throw new Error('Not implemented');
+    }
+    save(): void {
+        this._context.save();
+    }
+    scale(x: number, y: number): void {
+        this._context.scale(x, y);
+    }
+    setLineDash(segments: number[]): void {
+        this._context.setLineDash(this.px2vpArray(segments));
+    }
+    setTransform(a: number, b: number, c: number, d: number, e: number, f: number): void {
+        this._context.setTransform(a, b, c, d, px2vp(e), px2vp(f));
+    }
+    stroke(): void;
+    stroke(path: Path2D | null = null): void {
+        if (path) {
+            this._context.stroke(path!);
+        } else {
+            this._context.stroke();
+        }
+    }
+    strokeRect(x: number, y: number, w: number, h: number): void {
+        this._context.strokeRect(px2vp(x), px2vp(y), px2vp(w), px2vp(h));
+    }
+    strokeText(text: string, x: number, y: number, maxWidth: number | null = null): void {
+        if (maxWidth) {
+            this._context.strokeText(text, px2vp(x), px2vp(y), px2vp(maxWidth));
+        } else {
+            this._context.strokeText(text, px2vp(x), px2vp(y));
+        }
+    }
+    transform(a: number, b: number, c: number, d: number, e: number, f: number): void {
+        this._context.transform(a, b, c, d, px2vp(e), px2vp(f));
+    }
+    translate(x: number, y: number): void {
+        this._context.translate(px2vp(x), px2vp(y));
+    }
+    get canvas(): UniCanvasElement {
+        return this._element;
+    }
+    get direction(): CanvasDirection {
+        return this._context.direction;
+    }
+    set direction(value: CanvasDirection) {
+        this._context.direction = value;
+    }
+    get fillStyle(): string | CanvasGradient | CanvasPattern {
+        return this._context.fillStyle as (string | CanvasGradient | CanvasPattern);
+    }
+    set fillStyle(value: string | CanvasGradient | CanvasPattern) {
+        if (typeof value == 'string') {
+            this._context.fillStyle = this._fixColor(value);
+        } else {
+            this._context.fillStyle = value;
+        }
+    }
+    get filter(): string {
+        return '';
+    }
+    set filter(value: string) {}
+    get font(): string {
+        return this._context.font;
+    }
+    set font(value: string) {
+        this._context.font = value;
+    }
+    get fontStretch(): CanvasFontStretch {
+        return 'condensed';
+    }
+    set fontStretch(value: CanvasFontStretch) {}
+    get globalAlpha(): number {
+        return this._context.globalAlpha;
+    }
+    set globalAlpha(value: number) {
+        this._context.globalAlpha = value;
+    }
+    get globalCompositeOperation(): GlobalCompositeOperation {
+        return this._context.globalCompositeOperation as GlobalCompositeOperation;
+    }
+    set globalCompositeOperation(value: GlobalCompositeOperation) {
+        this._context.globalCompositeOperation = value;
+    }
+    get imageSmoothingEnabled(): boolean {
+        return this._context.imageSmoothingEnabled;
+    }
+    set imageSmoothingEnabled(value: boolean) {
+        this._context.imageSmoothingEnabled = value;
+    }
+    get imageSmoothingQuality(): ImageSmoothingQuality {
+        return this._context.imageSmoothingQuality;
+    }
+    set imageSmoothingQuality(value: ImageSmoothingQuality) {
+        this._context.imageSmoothingQuality = value;
+    }
+    get letterSpacing(): string {
+        return '';
+    }
+    set letterSpacing(value: string) {}
+    get lineWidth(): number {
+        return vp2px(this._context.lineWidth);
+    }
+    set lineWidth(value: number) {
+        this._context.lineWidth = px2vp(value);
+    }
+    get lineCap(): CanvasLineCap {
+        return this._context.lineCap;
+    }
+    set lineCap(value: CanvasLineCap) {
+        this._context.lineCap = value;
+    }
+    get lineJoin(): CanvasLineJoin {
+        return this._context.lineJoin;
+    }
+    set lineJoin(value: CanvasLineJoin) {
+        this._context.lineJoin = value;
+    }
+    get lineDashOffset(): number {
+        return vp2px(this._context.lineDashOffset);
+    }
+    set lineDashOffset(value: number) {
+        this._context.lineDashOffset = px2vp(value);
+    }
+    get miterLimit(): number {
+        return this._context.miterLimit;
+    }
+    set miterLimit(value: number) {
+        this._context.miterLimit = value;
+    }
+    get strokeStyle(): string | CanvasGradient | CanvasPattern {
+        return this._context.strokeStyle as (string | CanvasGradient | CanvasPattern);
+    }
+    set strokeStyle(value: string | CanvasGradient | CanvasPattern) {
+        if (typeof value == 'string') {
+            this._context.strokeStyle = this._fixColor(value);
+        } else {
+            this._context.strokeStyle = value;
+        }
+    }
+    get shadowBlur(): number {
+        return this._context.shadowBlur;
+    }
+    set shadowBlur(value: number) {
+        this._context.shadowBlur = value;
+    }
+    get shadowColor(): string {
+        return this._context.shadowColor;
+    }
+    set shadowColor(value: string) {
+        this._context.shadowColor = value;
+    }
+    get shadowOffsetX(): number {
+        return vp2px(this._context.shadowOffsetX);
+    }
+    set shadowOffsetX(value: number) {
+        this._context.shadowOffsetX = px2vp(value);
+    }
+    get shadowOffsetY(): number {
+        return vp2px(this._context.shadowOffsetY);
+    }
+    set shadowOffsetY(value: number) {
+        this._context.shadowOffsetY = px2vp(value);
+    }
+    get textAlign(): CanvasTextAlign {
+        return this._context.textAlign;
+    }
+    set textAlign(value: CanvasTextAlign) {
+        this._context.textAlign = value;
+    }
+    get textBaseline(): CanvasTextBaseline {
+        return this._context.textBaseline;
+    }
+    set textBaseline(value: CanvasTextBaseline) {
+        this._context.textBaseline = value;
+    }
+    get textRendering(): CanvasTextRendering {
+        return 'auto';
+    }
+    set textRendering(value: CanvasTextRendering) {}
+    get wordSpacing(): string {
+        return '';
+    }
+    set wordSpacing(value: string) {}
+    private px2vpArray(array: number[]): number[] {
+        for(let i = 0; i < array.length; i++){
+            array[i] = px2vp(array[i]);
+        }
+        return array;
+    }
+    private vp2pxArray(array: number[]): number[] {
+        for(let i = 0; i < array.length; i++){
+            array[i] = vp2px(array[i]);
+        }
+        return array;
+    }
+    private _uniCanvasGradient(gradient: CanvasGradient): CanvasGradient {
+        uniCanvasGradient(gradient);
+        return gradient;
+    }
+    private _fixColor(color: string): string {
+        if (color.startsWith('#') || color.startsWith('rgb') || color.startsWith('rgba')) {
+            return color;
+        }
+        const colorValue: string | undefined = EXTENDED_COLOR_KEYWORDS[color];
+        if (colorValue) {
+            return colorValue;
+        }
+        if (color == 'transparent') {
+            return 'rgba(0,0,0,0)';
+        }
+        return color;
+    }
+}
+interface CanvasBuilderOptions {
+    context: ESObject;
+    background: string;
+}
+class UniNativeCanvas {
+    private element: UniCanvasElement;
+    private harmonyBuilderNode: ComponentContent | null = null;
+    private settings: RenderingContextSettings = new RenderingContextSettings(true);
+    private context = new HarmonyCanvasRenderingContext2D(this.settings);
+    private readonly context2D: UniCanvasRenderingContext2D;
+    private _width = 0;
+    private _height = 0;
+    constructor(element: UniCanvasElement){
+        this.element = element;
+        this.context2D = new UniCanvasRenderingContext2D(element, this.context);
+        this.element.bindHarmonyWrappedBuilder(wrapBuilder<[CanvasBuilderOptions]>(buildCanvas), {
+            context: this.context,
+            background: "#00000000"
+        } as CanvasBuilderOptions);
+        this.harmonyBuilderNode = (element as ESObject).getHarmonyComponentContent();
+        element.bindHarmonyController(this);
+    }
+    updateBackground(color: string) {
+        try {
+            this.harmonyBuilderNode?.update(new UTSJSONObject({
+                background: color
+            }));
+        } catch (e) {}
+    }
+    get width(): number {
+        return this._width != 0 ? this._width : vp2px(this.element.offsetWidth);
+    }
+    set width(value: number) {
+        this._width = value;
+    }
+    get height(): number {
+        return this._height != 0 ? this._height : vp2px(this.element.offsetHeight);
+    }
+    set height(value: number) {
+        this._height = value;
+    }
+    getContext(_: string): UniCanvasRenderingContext2D | null {
+        return this.context2D;
+    }
+    toDataURL(type: string | null = null, quality: Object | null = null): string {
+        return this.context.toDataURL(type, quality);
+    }
+    destroy() {}
+}
+class UniCanvasElement extends UniNativeViewElementImpl {
+    get width(): number {
+        return this.getHarmonyController<UniNativeCanvas>()!.width;
+    }
+    set width(value: number) {
+        this.getHarmonyController<UniNativeCanvas>()!.width = value;
+    }
+    get height(): number {
+        return this.getHarmonyController<UniNativeCanvas>()!.height;
+    }
+    set height(value: number) {
+        this.getHarmonyController<UniNativeCanvas>()!.height = value;
+    }
+    getContext(_: string): UniCanvasRenderingContext2D | null {
+        return this.getHarmonyController<UniNativeCanvas>()!.getContext(_);
+    }
+    toDataURL(type: string | null = null, quality: Object | null = null): string {
+        return this.getHarmonyController<UniNativeCanvas>()!.toDataURL(type, quality);
+    }
+}
+class UniCanvasContext implements CanvasContext {
+    _element: UniCanvasElement;
+    _context: UniCanvasRenderingContext2D;
+    constructor(element: UniCanvasElement){
+        this._element = element;
+        this._context = this._element.getContext('2d')!;
+    }
+    getContext(type: string): UniCanvasRenderingContext2D | null {
+        return this._element.getContext(type);
+    }
+    toDataURL(): string;
+    toDataURL(type: string): string;
+    toDataURL(type: string | null = null, encoderOptions: Object | null = null): string {
+        return this._element.toDataURL(type, encoderOptions);
+    }
+    createImage(): Image {
+        return new Image();
+    }
+    createPath2D(): Path2D {
+        return new Path2D();
+    }
+    requestAnimationFrame(callback: RequestAnimationFrameCallback): number {
+        return requestAnimationFrame(callback);
+    }
+    cancelAnimationFrame(taskId: number) {
+        cancelAnimationFrame(taskId);
+    }
+}
+const createCanvasContextAsync: CreateCanvasContextAsync = (options: CreateCanvasContextAsyncOptions)=>{
+    nextTick(()=>{
+        let element: ESObject = uni.getElementById(options.id);
+        if (element) {
+            const canvasElement = element as Object as UniCanvasElement;
+            options.success?.(new UniCanvasContext(canvasElement));
+        } else {
+            const uniError = new UniError('uni-createCanvasContextAsync', -1, 'canvas id invalid.');
+            options.fail?.(uniError);
+        }
+        options.complete?.();
+    });
+};
+export { UniNativeCanvas as UniNativeCanvas, UniCanvasElement as UniCanvasElement, CanvasContext as CanvasContext, CreateCanvasContextAsync as CreateCanvasContextAsync, CreateCanvasContextAsyncOptions as CreateCanvasContextAsyncOptions, RequestAnimationFrameCallback as RequestAnimationFrameCallback, CreateCanvasContextAsyncSuccessCallback as CreateCanvasContextAsyncSuccessCallback, CreateCanvasContextAsyncFailCallback as CreateCanvasContextAsyncFailCallback, CreateCanvasContextAsyncCompleteCallback as CreateCanvasContextAsyncCompleteCallback };
+export { createCanvasContextAsync as createCanvasContextAsync };
+ÀÔrD“»@dcloudio/uni-app-framework¨./canvas®./canvas.colorÔrE—ªassertions¨external¢id¤meta±moduleSideEffectsªresolvedByµsyntheticNamedExportsAÂÙî/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@hnpaqqbd4i9bxcrp3ktun4a1gqv9ys2o5pljtcetlzk=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/framework/index.etsAÃªoh-resolveÂEAÂÚ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@hnpaqqbd4i9bxcrp3ktun4a1gqv9ys2o5pljtcetlzk=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/modules/uni_modules/uni-canvas-dom2/utssdk/app-harmony/canvas.etsAÃªoh-resolveÂEAÂÚ!/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@hnpaqqbd4i9bxcrp3ktun4a1gqv9ys2o5pljtcetlzk=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/modules/uni_modules/uni-canvas-dom2/utssdk/app-harmony/canvas.color.jsAÃªoh-resolveÂ“ÔrF–§version¤fileªsourceRoot§sources¥names¨mappings¨index.js ‘©index.etsÜš”    ”  ”	  	”    ”"  "”3  3”5  5”;  ;”ÌK  ÌK”ÌL  ÌLÜ ”   ” ”	 	” ” -” 2” 4”  :”" <”7 ÌQ”9 ÌS”ÌM Ìg”ÌO ÌŠ”ÌX Ì“”ÌZ Ì˜”Ìg Ì¥”Ìi Ì§”Ì Ì¿”Ìƒ ÌÁ”Ì‹ ÌÉ”Ì ÌË”Ì ÌÎ”Ì’ ÌĞ”Ì˜ ÌÖ”Ìµ Ìó”Ì¶ Ìôš”   ” ”	 	” ” ”5 5”7 7”= =”ÌG ÌG”ÌH ÌH•”   ” ”% &”. .”7 7‘”  •” ” ” 0” 4” 5•” ” ” >” ÌB” ÌC•” ” ” 8” <” =•” ” ” Ì@” ÌD” ÌE’”  ” ‘” “”   ” ”! !•”  ”  ”  )”  +”   <•” ” ” ”!  ”" !—” !” !” !” !” !” !”  ! —” "” "” "” "” "” "”  " ’” #” #Ÿ” $” $” $”	 $” $” $” $” $,” $.”  $Ì@”" $ÌB”* $ÌR”, $ÌT”? $Ìw”ÌC $Ì{”” %” %” %” %Ü ” &” &” &” &” &” &” &”# &#”$ &$”% &%”& &&”( &(”- &-”. &.”/ &/”0 &0”2 &2”7 &7”8 &8”> &>”? &?”ÌA &ÌA”ÌK &ÌK”ÌM &ÌM”ÌU &ÌU”ÌW &ÌW”Ìg &Ìg”Ìh &Ìh”Ìi &Ìi‘”	 '	‘” 'Ü ” (” (” (” (” (” (” (”# (#”$ ($”% (%”& (&”( ((”- (-”. (.”/ (/”0 (0”2 (2”7 (7”8 (8”> (>”? (?”ÌA (ÌA”ÌK (ÌK”ÌM (ÌM”ÌU (ÌU”ÌV (ÌV”ÌW (ÌW‘”	 )	’” *” *œ” +”	 +	”
+ +
+” +” +” + ” +"” +,” +.” +8” +:”  +ÌHÜ !” ,” ,” ,” ,” ,” ,” ,”! ,!”" ,"”$ ,$”% ,%”' ,'”, ,,”- ,-”/ ,/”0 ,0”2 ,2”7 ,7”8 ,8”: ,:”; ,;”= ,=”ÌB ,ÌB”ÌC ,ÌC”ÌE ,ÌE”ÌF ,ÌF”ÌH ,ÌH”ÌM ,ÌM”ÌN ,ÌN”ÌT ,ÌT”ÌU ,ÌU”ÌV ,ÌV”ÌW ,ÌW’” -” -’” .” .˜” /” /” /” /” /” /”! /!”" /"—” 0” 0” 0” 0” 0”! 0!”" 0"’” 1” 1” 2” 2” 2” 2” 2 ” 2,” 2.”" 2:”$ 2<”( 2ÌH”* 2ÌJ”+ 2ÌS”- 2ÌU”. 2Ì^Ü &” 3” 3” 3” 3” 3”# 3#”$ 3$”) 3)”* 3*”. 3.”/ 3/”1 31”6 36”7 37”; 3;”< 3<”> 3>”ÌC 3ÌC”ÌD 3ÌD”ÌH 3ÌH”ÌI 3ÌI”ÌK 3ÌK”ÌP 3ÌP”ÌQ 3ÌQ”ÌU 3ÌU”ÌV 3ÌV”ÌX 3ÌX”Ì] 3Ì]”Ì^ 3Ì^”Ì_ 3Ì_”Ì` 3Ì`”Ìb 3Ìb”Ìg 3Ìg”Ìh 3Ìh”Ìi 3Ìi”Ìj 3Ìj”Ìk 3Ìk”Ìl 3Ìl’” 4” 4š” 5” 5” 5” 5” 5” 5"” 5$” 5-” 5/” 58Ü ” 6” 6” 6” 6” 6” 6”  6 ”% 6%”& 6&”' 6'”( 6(”* 6*”/ 6/”0 60”1 61”2 62”4 64”9 69”: 6:”; 6;”< 6<”> 6>”ÌC 6ÌC”ÌD 6ÌD”ÌE 6ÌE”ÌF 6ÌF”ÌG 6ÌG”ÌH 6ÌH’” 7” 7˜” <” <”	 <	” <0” <4” <6”! <ÌX”% <Ì\”” =” =” =” =™” >” >” >” >”# >#”' >'”+ >+”3 >3”5 >5œ” ?” ?” ?” ?” ?”" ?"”# ?#”' ?'”) ?)”1 ?1”2 ?2”3 ?3‘” Ì@‘” Ì@—” ÌA” ÌA” ÌA” ÌA”# ÌA#”+ ÌA+”- ÌA-š” ÌB” ÌB” ÌB”! ÌB!”" ÌB"”& ÌB&”' ÌB'”+ ÌB+”, ÌB,”- ÌB-‘” ÌC‘” ÌCš” ÌD” ÌD” ÌD”! ÌD!”" ÌD"”& ÌD&”' ÌD'”+ ÌD+”, ÌD,”- ÌD-‘” ÌE‘” ÌF‘”	 ÌG	‘” ÌG˜” ÌH” ÌH” ÌH” ÌH” ÌH” ÌH”  ÌH ”! ÌH!‘”	 ÌI	’” ÌJ” ÌJ’” ÌK” ÌK˜” ÌL” ÌL” ÌL” ÌL” ÌL” ÌL”! ÌL!”" ÌL"’” ÌM” ÌM˜” ÌN” ÌN” ÌN”" ÌN*”$ ÌN,”% ÌN5”' ÌN7”( ÌNÌ@Ü ” ÌO” ÌO” ÌO” ÌO”& ÌO&”' ÌO'”+ ÌO+”, ÌO,”4 ÌO4”5 ÌO5”ÌH ÌOÌH”ÌI ÌOÌI”ÌS ÌOÌS”ÌU ÌOÌU”ÌZ ÌOÌZ”Ì[ ÌOÌ[”Ì\ ÌOÌ\”Ì] ÌOÌ]”Ì_ ÌOÌ_”Ìd ÌOÌd”Ìe ÌOÌe”Ìf ÌOÌf”Ìg ÌOÌg”Ìh ÌOÌh”Ìi ÌOÌi”Ìj ÌOÌj’” ÌP” ÌP—” ÌQ” ÌQ” ÌQ” ÌQ*” ÌQ,” ÌQÌ@”! ÌQÌD—” ÌR” ÌR” ÌR” ÌR” ÌR”! ÌR!”# ÌR#Ü ” ÌS” ÌS” ÌS” ÌS”  ÌS ”! ÌS!”0 ÌS0”1 ÌS1”6 ÌS6”7 ÌS7”9 ÌS9”: ÌS:”< ÌS<”ÌA ÌSÌA”ÌB ÌSÌB”ÌD ÌSÌD”ÌE ÌSÌE”ÌF ÌSÌF”ÌG ÌSÌG‘”	 ÌT	›” ÌU” ÌU” ÌU” ÌU” ÌU” ÌU”, ÌU,”- ÌU-”/ ÌU/”0 ÌU0”1 ÌU1’” ÌV” ÌVš” ÌW” ÌW” ÌW” ÌW#” ÌW%” ÌW/”! ÌW1”# ÌW;”% ÌW=”' ÌWÌGÜ "” ÌX” ÌX” ÌX” ÌX”& ÌX&”' ÌX'”+ ÌX+”, ÌX,”4 ÌX4”5 ÌX5”ÌI ÌXÌI”ÌJ ÌXÌJ”ÌO ÌXÌO”ÌP ÌXÌP”ÌR ÌXÌR”ÌS ÌXÌS”ÌU ÌXÌU”ÌZ ÌXÌZ”Ì[ ÌXÌ[”Ì] ÌXÌ]”Ì^ ÌXÌ^”Ì` ÌXÌ`”Ìe ÌXÌe”Ìf ÌXÌf”Ìh ÌXÌh”Ìi ÌXÌi”Ìk ÌXÌk”Ìp ÌXÌp”Ìq ÌXÌq”Ìs ÌXÌs”Ìt ÌXÌt”Ìu ÌXÌu”Ìv ÌXÌv”Ìw ÌXÌw’” ÌY” ÌY–” ÌZ” ÌZ” ÌZ” ÌZ” ÌZ ”# ÌZ2–” Ì[” Ì[” Ì[” Ì[” Ì[” Ì[Ÿ” Ì\” Ì\” Ì\” Ì\”  Ì\ ”! Ì\!”. Ì\.”/ Ì\0”4 Ì\ÌB”5 Ì\ÌC”; Ì\ÌJ”= Ì\ÌL”ÌG Ì\ÌV”ÌH Ì\ÌW”ÌI Ì\ÌX‘”	 Ì]	‘” Ì]” Ì^” Ì^” Ì^” Ì^”  Ì^ ”! Ì^!”. Ì^.”/ Ì^0”4 Ì^ÌB”5 Ì^ÌC”; Ì^ÌJ”< Ì^ÌK”= Ì^ÌL‘”	 Ì_	’” Ì`” Ì`” Ìa” Ìa” Ìa” Ìa#” Ìa%” Ìa/”! Ìa1”# Ìa;”% Ìa=”' ÌaÌG”) ÌaÌI”+ ÌaÌS”- ÌaÌU”/ ÌaÌ_Ü ,” Ìb” Ìb” Ìb” Ìb”& Ìb&”' Ìb'”+ Ìb+”, Ìb,”4 Ìb4”5 Ìb5”ÌI ÌbÌI”ÌJ ÌbÌJ”ÌO ÌbÌO”ÌP ÌbÌP”ÌR ÌbÌR”ÌS ÌbÌS”ÌU ÌbÌU”ÌZ ÌbÌZ”Ì[ ÌbÌ[”Ì] ÌbÌ]”Ì^ ÌbÌ^”Ì` ÌbÌ`”Ìe ÌbÌe”Ìf ÌbÌf”Ìh ÌbÌh”Ìi ÌbÌi”Ìk ÌbÌk”Ìp ÌbÌp”Ìq ÌbÌq”Ìs ÌbÌs”Ìt ÌbÌt”Ìv ÌbÌv”Ì{ ÌbÌ{”Ì| ÌbÌ|”Ì~ ÌbÌ~”Ì ÌbÌ”Ì ÌbÌ”Ì† ÌbÌ†”Ì‡ ÌbÌ‡”Ì‰ ÌbÌ‰”ÌŠ ÌbÌŠ”Ì‹ ÌbÌ‹”ÌŒ ÌbÌŒ”Ì ÌbÌ’” Ìc” Ìc”” Ìd” Ìd” Ìd” Ìd” Ìf” Ìf” Ìf” Ìf” Ìf” Ìf&” Ìf(” Ìf2” Ìf4”" ÌfÌH”& ÌfÌL”( ÌfÌN”- ÌfÌb”1 ÌfÌf—” Ìg” Ìg” Ìg” Ìg ” Ìg!” Ìg'” Ìg)’” Ìh” Ìh‘”	 Ìi	–” Ìj” Ìj” Ìj” Ìj” Ìj” ÌjÜ  ” Ìk” Ìk” Ìk” Ìk” Ìk”# Ìk#”$ Ìk%”) Ìk7”* Ìk8”0 Ìk?”2 ÌkÌA”7 ÌkÌF”8 ÌkÌG”: ÌkÌI”; ÌkÌJ”= ÌkÌL”ÌB ÌkÌQ”ÌC ÌkÌR”ÌE ÌkÌT”ÌF ÌkÌU”ÌH ÌkÌW”ÌM ÌkÌ\”ÌN ÌkÌ]”ÌP ÌkÌ_”ÌQ ÌkÌ`”ÌS ÌkÌb”ÌX ÌkÌg”ÌY ÌkÌh”Ì[ ÌkÌj”Ì\ ÌkÌk”Ì] ÌkÌl”Ì^ ÌkÌm‘”	 Ìl	‘” ÌlÜ ” Ìm” Ìm” Ìm” Ìm” Ìm”# Ìm#”$ Ìm%”) Ìm7”* Ìm8”0 Ìm?”2 ÌmÌA”7 ÌmÌF”8 ÌmÌG”: ÌmÌI”; ÌmÌJ”= ÌmÌL”ÌB ÌmÌQ”ÌC ÌmÌR”ÌE ÌmÌT”ÌF ÌmÌU”ÌG ÌmÌV”ÌH ÌmÌW‘”	 Ìn	’” Ìo” ÌoÜ ” Ìp” Ìp” Ìp” Ìp” Ìp” Ìp ” Ìp"” Ìp1” Ìp3”" ÌpÌB”$ ÌpÌD”, ÌpÌT”. ÌpÌV”8 ÌpÌh”: ÌpÌj”ÌB ÌpÌz”ÌD ÌpÌ|”ÌW ÌpÌŸ”Ì[ ÌpÌ£”” Ìq” Ìq” Ìq” ÌqÜ $” Ìr” Ìr” Ìr” Ìr” Ìr”! Ìr!”" Ìr"”' Ìr'”( Ìr(”) Ìr)”* Ìr*”, Ìr,”1 Ìr1”2 Ìr2”3 Ìr3”4 Ìr4”6 Ìr6”; Ìr;”< Ìr<”ÌC ÌrÌC”ÌD ÌrÌD”ÌF ÌrÌF”ÌK ÌrÌK”ÌL ÌrÌL”ÌS ÌrÌS”ÌT ÌrÌT”ÌV ÌrÌV”Ì^ ÌrÌ^”Ì` ÌrÌ`”Ìj ÌrÌj”Ìl ÌrÌl”Ìt ÌrÌt”Ìv ÌrÌv”Ì† ÌrÌ†”Ì‡ ÌrÌ‡”Ìˆ ÌrÌˆ‘”	 Ìs	‘” ÌsÜ "” Ìt” Ìt” Ìt” Ìt” Ìt”! Ìt!”" Ìt"”' Ìt'”( Ìt(”) Ìt)”* Ìt*”, Ìt,”1 Ìt1”2 Ìt2”3 Ìt3”4 Ìt4”6 Ìt6”; Ìt;”< Ìt<”ÌC ÌtÌC”ÌD ÌtÌD”ÌF ÌtÌF”ÌK ÌtÌK”ÌL ÌtÌL”ÌS ÌtÌS”ÌT ÌtÌT”ÌV ÌtÌV”Ì^ ÌtÌ^”Ì` ÌtÌ`”Ìj ÌtÌj”Ìl ÌtÌl”Ìt ÌtÌt”Ìu ÌtÌu”Ìv ÌtÌv‘”	 Ìu	’” Ìv” Ìv˜” Ì{” Ì{”	 Ì{	” Ì{0” Ì{4” Ì{6”! Ì{ÌX”% Ì{Ì\”” Ì|” Ì|” Ì|” Ì|™” Ì}” Ì}” Ì}” Ì}”# Ì}#”' Ì}'”+ Ì}+”3 Ì}3”5 Ì}5œ” Ì~” Ì~” Ì~” Ì~” Ì~”" Ì~"”# Ì~#”' Ì~'”) Ì~)”1 Ì~1”2 Ì~2”3 Ì~3‘” Ì‘” Ì—” Ì€” Ì€” Ì€” Ì€”# Ì€#”+ Ì€+”- Ì€-š” Ì” Ì” Ì”! Ì!”" Ì"”& Ì&”' Ì'”+ Ì+”, Ì,”- Ì-‘” Ì‚‘” Ì‚š” Ìƒ” Ìƒ” Ìƒ”! Ìƒ!”" Ìƒ"”& Ìƒ&”' Ìƒ'”+ Ìƒ+”, Ìƒ,”- Ìƒ-‘” Ì„‘” Ì…‘”	 Ì†	‘” Ì†˜” Ì‡” Ì‡” Ì‡” Ì‡” Ì‡” Ì‡”  Ì‡ ”! Ì‡!‘”	 Ìˆ	’” Ì‰” Ì‰š” ÌŠ” ÌŠ” ÌŠ” ÌŠ” ÌŠ” ÌŠ!” ÌŠ#” ÌŠ,” ÌŠ.” ÌŠ7Ü ” Ì‹” Ì‹” Ì‹” Ì‹” Ì‹” Ì‹” Ì‹”$ Ì‹$”% Ì‹%”& Ì‹&”' Ì‹'”) Ì‹)”. Ì‹.”/ Ì‹/”0 Ì‹0”1 Ì‹1”3 Ì‹3”8 Ì‹8”9 Ì‹9”: Ì‹:”; Ì‹;”= Ì‹=”ÌB Ì‹ÌB”ÌC Ì‹ÌC”ÌD Ì‹ÌD”ÌE Ì‹ÌE”ÌF Ì‹ÌF”ÌG Ì‹ÌG’” ÌŒ” ÌŒ›” Ì” Ì” Ì” Ì” Ì” Ì$” Ì&” Ì/” Ì1”$ ÌÌK”( ÌÌO”” Ì” Ì” Ì” ÌÜ ” Ì” Ì” Ì” Ì” Ì”" Ì"”# Ì#”' Ì'”) Ì)”. Ì.”/ Ì/”0 Ì0”1 Ì1”3 Ì3”8 Ì8”9 Ì9”: Ì:”; Ì;”= Ì=”ÌB ÌÌB”ÌC ÌÌC”ÌK ÌÌK”ÌL ÌÌL”ÌM ÌÌM”ÌN ÌÌN‘”	 Ì	‘” ÌÜ ” Ì‘” Ì‘” Ì‘” Ì‘” Ì‘”" Ì‘"”# Ì‘#”' Ì‘'”) Ì‘)”. Ì‘.”/ Ì‘/”0 Ì‘0”1 Ì‘1”3 Ì‘3”8 Ì‘8”9 Ì‘9”: Ì‘:”; Ì‘;”< Ì‘<”= Ì‘=‘”	 Ì’	’” Ì“” Ì“š” Ì”” Ì”” Ì”” Ì”” Ì”” Ì”'” Ì”)” Ì”3” Ì”5” Ì”?Ü ” Ì•” Ì•” Ì•” Ì•” Ì•” Ì•”) Ì•)”* Ì•*”/ Ì•/”0 Ì•0”2 Ì•2”3 Ì•3”5 Ì•5”: Ì•:”; Ì•;”= Ì•=”> Ì•>”Ì@ Ì•Ì@”ÌE Ì•ÌE”ÌF Ì•ÌF”ÌH Ì•ÌH”ÌI Ì•ÌI”ÌK Ì•ÌK”ÌP Ì•ÌP”ÌQ Ì•ÌQ”ÌS Ì•ÌS”ÌT Ì•ÌT”ÌU Ì•ÌU”ÌV Ì•ÌV’” Ì–” Ì–’” Ì—” Ì—” Ì˜” Ì˜” Ì˜” Ì˜” Ì˜” Ì˜”# Ì˜#”$ Ì˜$”, Ì˜,”- Ì˜-”8 Ì˜8”: Ì˜:”; Ì˜;”< Ì˜<’” Ì™” Ì™’” Ìš” Ìš”” Ì›” Ì›” Ì›” Ì›’” Ìœ” Ìœœ” Ì¡” Ì¡” Ì¡” Ì¡” Ì¡ ” Ì¡)” Ì¡+” Ì¡>”# Ì¡ÌB”% Ì¡ÌD”0 Ì¡Ì^”4 Ì¡Ìb”” Ì¢” Ì¢” Ì¢” Ì¢’” Ì£” Ì£™” Ì¦” Ì¦” Ì¦” Ì¦ ” Ì¦"” Ì¦+” Ì¦-”! Ì¦Ì@”% Ì¦ÌD”” Ì§” Ì§” Ì§” Ì§’” Ì¨” Ì¨–” Ì©”
+ Ì©
+” Ì©” Ì©” Ì©” Ì©—” Ìª” Ìª” Ìª” Ìª” Ìª” Ìª”  Ìª š” Ì«” Ì«” Ì«” Ì«” Ì«” Ì«” Ì«” Ì«” Ì«” Ì«‘”	 Ì¬	Ü ” Ì­” Ì­” Ì­” Ì­” Ì­” Ì­” Ì­”" Ì­"”# Ì­#”$ Ì­$”% Ì­%”' Ì­'”, Ì­,”- Ì­-”. Ì­.”/ Ì­/”0 Ì­0”1 Ì­1’” Ì®” Ì®”” Ì¯” Ì¯” Ì¯” Ì¯” Ì°” Ì°” Ì°” Ì°)”  Ì°-”! Ì°.”) Ì°6”* Ì°7”5 Ì°ÌB”6 Ì°ÌC”: Ì°ÌG”; Ì°ÌH”< Ì°ÌI’” Ì±” Ì±™” Ì²” Ì²” Ì²” Ì²” Ì²”$ Ì²$”% Ì²%”* Ì²*”+ Ì²+™” Ì³” Ì³” Ì³” Ì³” Ì³”% Ì³%”& Ì³&”, Ì³,”- Ì³-™” Ì´”! Ì´!”# Ì´#”( Ì´(”) Ì´)”4 Ì´4”5 Ì´5”ÌJ Ì´ÌJ”ÌK Ì´ÌK™” Ìµ”" Ìµ"”$ Ìµ$”) Ìµ)”* Ìµ*”5 Ìµ5”6 Ìµ6”ÌL ÌµÌL”ÌM ÌµÌM™” Ì¶”! Ì¶!”# Ì¶#”( Ì¶(”) Ì¶)”4 Ì¶4”5 Ì¶5”ÌJ Ì¶ÌJ”ÌK Ì¶ÌK™” Ì·”" Ì·"”$ Ì·$”) Ì·)”* Ì·*”5 Ì·5”6 Ì·6”ÌL Ì·ÌL”ÌM Ì·ÌM™” Ì¸”# Ì¸#”% Ì¸%”* Ì¸*”+ Ì¸+”6 Ì¸6”7 Ì¸7”ÌN Ì¸ÌN”ÌO Ì¸ÌO™” Ì¹”$ Ì¹$”& Ì¹&”+ Ì¹+”, Ì¹,”7 Ì¹7”8 Ì¹8”ÌP Ì¹ÌP”ÌQ Ì¹ÌQ™” Ìº” Ìº” Ìº”! Ìº!”" Ìº"”- Ìº-”. Ìº.”< Ìº<”= Ìº=™” Ì»” Ì»” Ì»”" Ì»"”# Ì»#”. Ì».”/ Ì»/”> Ì»>”? Ì»?™” Ì¼” Ì¼” Ì¼”" Ì¼"”# Ì¼#”. Ì¼.”/ Ì¼/”> Ì¼>”? Ì¼?™” Ì½” Ì½”  Ì½ ”% Ì½%”& Ì½&”1 Ì½1”2 Ì½2”ÌD Ì½ÌD”ÌE Ì½ÌE™” Ì¾” Ì¾”! Ì¾!”& Ì¾&”' Ì¾'”2 Ì¾2”3 Ì¾3”ÌF Ì¾ÌF”ÌG Ì¾ÌG’”	 Ì¿	”
+ Ì¿
+’” ÌÀ” ÌÀ–” ÌÁ”
+ ÌÁ
+” ÌÁ” ÌÁ” ÌÁ” ÌÁÜ ” ÌÂ” ÌÂ” ÌÂ” ÌÂ” ÌÂ” ÌÂ” ÌÂ”" ÌÂ"”# ÌÂ#”$ ÌÂ$”% ÌÂ%”' ÌÂ'”, ÌÂ,”- ÌÂ-”. ÌÂ.”/ ÌÂ/”0 ÌÂ0”1 ÌÂ1—” ÌÃ” ÌÃ” ÌÃ” ÌÃ” ÌÃ”  ÌÃ ”! ÌÃ!’” ÌÄ” ÌÄÜ ” ÌÆ” ÌÆ” ÌÆ” ÌÆ%” ÌÆ'” ÌÆ1”  ÌÆ3”" ÌÆ=”$ ÌÆ?”- ÌÆÌW”1 ÌÆÌ[”3 ÌÆÌ]”< ÌÆÌu”Ì@ ÌÆÌy”ÌB ÌÆÌ{”ÌO ÌÆÌ—”ÌS ÌÆÌ›”ÌU ÌÆÌ”Ìc ÌÆÌº”Ìg ÌÆÌ¾š” ÌÇ” ÌÇ” ÌÇ” ÌÇ” ÌÇ”  ÌÇ ”* ÌÇ*”. ÌÇ.”9 ÌÇ9”; ÌÇ;Ü (” ÌÈ” ÌÈ” ÌÈ” ÌÈ” ÌÈ”& ÌÈ&”' ÌÈ'”0 ÌÈ0”2 ÌÈ2”7 ÌÈ7”8 ÌÈ8”: ÌÈ:”; ÌÈ;”= ÌÈ=”ÌB ÌÈÌB”ÌC ÌÈÌC”ÌE ÌÈÌE”ÌF ÌÈÌF”ÌH ÌÈÌH”ÌM ÌÈÌM”ÌN ÌÈÌN”ÌT ÌÈÌT”ÌU ÌÈÌU”ÌW ÌÈÌW”Ì\ ÌÈÌ\”Ì] ÌÈÌ]”Ìc ÌÈÌc”Ìd ÌÈÌd”Ìf ÌÈÌf”Ìk ÌÈÌk”Ìl ÌÈÌl”Ìv ÌÈÌv”Ìw ÌÈÌw”Ìy ÌÈÌy”Ì~ ÌÈÌ~”Ì ÌÈÌ”ÌŠ ÌÈÌŠ”Ì‹ ÌÈÌ‹”ÌŒ ÌÈÌŒ”Ì ÌÈÌ‘”	 ÌÉ	‘” ÌÉÜ ” ÌÊ” ÌÊ” ÌÊ” ÌÊ” ÌÊ”& ÌÊ&”' ÌÊ'”0 ÌÊ0”2 ÌÊ2”7 ÌÊ7”8 ÌÊ8”: ÌÊ:”; ÌÊ;”= ÌÊ=”ÌB ÌÊÌB”ÌC ÌÊÌC”ÌE ÌÊÌE”ÌF ÌÊÌF”ÌG ÌÊÌG”ÌH ÌÊÌH‘”	 ÌË	’” ÌÌ” ÌÌš” ÌÍ” ÌÍ” ÌÍ” ÌÍ ” ÌÍ"” ÌÍ-” ÌÍ/”  ÌÍ8”" ÌÍ:”# ÌÍÌCÜ ” ÌÎ” ÌÎ” ÌÎ” ÌÎ” ÌÎ”& ÌÎ&”' ÌÎ'”, ÌÎ,”- ÌÎ-”0 ÌÎ0”1 ÌÎ1”3 ÌÎ3”8 ÌÎ8”9 ÌÎ9”< ÌÎ<”= ÌÎ=”? ÌÎ?”ÌD ÌÎÌD”ÌE ÌÎÌE”ÌF ÌÎÌF”ÌG ÌÎÌG”ÌI ÌÎÌI”ÌN ÌÎÌN”ÌO ÌÎÌO”ÌP ÌÎÌP”ÌQ ÌÎÌQ”ÌR ÌÎÌR”ÌS ÌÎÌS’” ÌÏ” ÌÏš” ÌĞ” ÌĞ”	 ÌĞ	”
+ ÌĞ” ÌĞ” ÌĞ” ÌĞ” ÌĞ(” ÌĞ*” ÌĞ3Ü ” ÌÑ” ÌÑ” ÌÑ” ÌÑ” ÌÑ” ÌÑ” ÌÑ”  ÌÑ ”! ÌÑ!”" ÌÑ"”# ÌÑ#”% ÌÑ%”* ÌÑ*”+ ÌÑ+”, ÌÑ,”- ÌÑ-”/ ÌÑ/”4 ÌÑ4”5 ÌÑ5”6 ÌÑ6”7 ÌÑ7”9 ÌÑ9”> ÌÑ>”? ÌÑ?”Ì@ ÌÑÌ@”ÌA ÌÑÌA”ÌB ÌÑÌB”ÌC ÌÑÌC’” ÌÒ” ÌÒ’” ÌÓ”	 ÌÓ	˜” ÌÔ” ÌÔ” ÌÔ” ÌÔ” ÌÔ” ÌÔ” ÌÔ” ÌÔ—” ÌÕ” ÌÕ” ÌÕ” ÌÕ” ÌÕ”! ÌÕ!”" ÌÕ"’” ÌÖ” ÌÖ’” Ì×” Ì×˜” ÌØ” ÌØ” ÌØ” ÌØ” ÌØ”$ ÌØ$”& ÌØ&”' ÌØ'’” ÌÙ” ÌÙ’” ÌÚ” ÌÚ˜” ÌÛ” ÌÛ” ÌÛ” ÌÛ” ÌÛ” ÌÛ” ÌÛ”  ÌÛ ’” ÌÜ” ÌÜ”” Ìİ”
+ Ìİ
+” Ìİ” Ìİš” ÌŞ” ÌŞ” ÌŞ” ÌŞ” ÌŞ” ÌŞ” ÌŞ”" ÌŞ"”# ÌŞ#”$ ÌŞ$’” Ìß” Ìß” Ìà” Ìà” Ìà” Ìà” Ìà” Ìà"” Ìà$” Ìà-” Ìà/” Ìà8” Ìà:”" ÌàÌQ”& ÌàÌU˜” Ìá” Ìá” Ìá” Ìá” Ìá”) Ìá)”* Ìá*”+ Ìá+’” Ìâ” Ìâ’” Ìã” Ìã˜” Ìä” Ìä” Ìä” Ìä” Ìä” Ìä” Ìä” Ìä’” Ìå” Ìå–” Ìæ”	 Ìæ	”
+ Ìæ
+” Ìæ” Ìæ” Ìæœ” Ìç” Ìç” Ìç” Ìç” Ìç” Ìç” Ìç” Ìç” Ìç”  Ìç ”! Ìç!”" Ìç"’” Ìè” Ìè”” Ìé” Ìé” Ìé” Ìé"Ÿ” Ìê” Ìê” Ìê” Ìê” Ìê”! Ìê!”" Ìê"”& Ìê&”' Ìê'”1 Ìê1”2 Ìê2”: Ìê:”; Ìê;”< Ìê<”= Ìê=’” Ìë” Ìë” Ìì” Ìì” Ìì” Ìì” Ìì” Ìì%” Ìì'” Ìì0” Ìì2” Ìì;” Ìì=” ÌìÌF”  ÌìÌH”! ÌìÌQÜ ” Ìí” Ìí” Ìí” Ìí” Ìí”" Ìí"”# Ìí#”$ Ìí$”& Ìí&”' Ìí'”) Ìí)”* Ìí*”, Ìí,”- Ìí-”/ Ìí/”4 Ìí4”5 Ìí5”6 Ìí6”7 Ìí7”9 Ìí9”> Ìí>”? Ìí?”Ì@ ÌíÌ@”ÌA ÌíÌA”ÌB ÌíÌB”ÌC ÌíÌC’” Ìî” Ìî•” Ìğ”
+ Ìğ
+” Ìğ” Ìğ!” Ìğ%”” Ìñ” Ìñ” Ìñ” Ìñš” Ìò” Ìò” Ìò” Ìò” Ìò”  Ìò ”! Ìò!”% Ìò&”& Ìò'”' Ìò(‘”	 Ìó	‘” Ìó˜” Ìô” Ìô” Ìô” Ìô” Ìô”  Ìô ”" Ìô"”# Ìô#‘”	 Ìõ	’” Ìö” Ìöš” Ì÷” Ì÷” Ì÷” Ì÷” Ì÷” Ì÷#” Ì÷%” Ì÷.” Ì÷0” Ì÷9Ü ” Ìø” Ìø” Ìø” Ìø” Ìø”  Ìø ”! Ìø!”& Ìø&”' Ìø'”( Ìø(”) Ìø)”+ Ìø+”0 Ìø0”1 Ìø1”2 Ìø2”3 Ìø3”5 Ìø5”: Ìø:”; Ìø;”< Ìø<”= Ìø=”? Ìø?”ÌD ÌøÌD”ÌE ÌøÌE”ÌF ÌøÌF”ÌG ÌøÌG”ÌH ÌøÌH”ÌI ÌøÌI’” Ìù” Ìù›” Ìú” Ìú” Ìú” Ìú” Ìú” Ìú&” Ìú(” Ìú1” Ìú3”& ÌúÌM”* ÌúÌQ”” Ìû” Ìû” Ìû” ÌûÜ ” Ìü” Ìü” Ìü” Ìü” Ìü”$ Ìü$”% Ìü%”) Ìü)”+ Ìü+”0 Ìü0”1 Ìü1”2 Ìü2”3 Ìü3”5 Ìü5”: Ìü:”; Ìü;”< Ìü<”= Ìü=”? Ìü?”ÌD ÌüÌD”ÌE ÌüÌE”ÌM ÌüÌM”ÌN ÌüÌN”ÌO ÌüÌO”ÌP ÌüÌP‘”	 Ìı	‘” ÌıÜ ” Ìş” Ìş” Ìş” Ìş” Ìş”$ Ìş$”% Ìş%”) Ìş)”+ Ìş+”0 Ìş0”1 Ìş1”2 Ìş2”3 Ìş3”5 Ìş5”: Ìş:”; Ìş;”< Ìş<”= Ìş=”> Ìş>”? Ìş?‘”	 Ìÿ	’” Í ” Í ” Í” Í” Í” Í” Í” Í"” Í$” Í-” Í/” Í8” Í:” ÍÌC” ÍÌE” ÍÌNÜ ” Í” Í” Í” Í” Í” Í”  Í ”! Í!”# Í#”$ Í$”& Í&”' Í'”) Í)”* Í*”, Í,”1 Í1”2 Í2”3 Í3”4 Í4”6 Í6”; Í;”< Í<”= Í=”> Í>”? Í?”Ì@ ÍÌ@’” Í” Í–” Í” Í” Í” Í” Í” Í"Ü ” Í” Í” Í” Í” Í” Í”  Í ”% Í%”& Í&”' Í'”( Í(”* Í*”/ Í/”0 Í0”1 Í1”2 Í2”3 Í3”4 Í4’” Í” Í“” Í” Í” Í–” Í” Í” Í” Í” Í” Í’” Í	” Í	“” Í
+” Í
+” Í
+˜” Í” Í” Í” Í” Í” Í”& Í&”' Í'’” Í” Í•” Í” Í” Í” Í” Í(™” Í” Í” Í” Í” Í” Í”" Í"”' Í'”( Í(’” Í” Í“” Í” Í” Í˜” Í” Í” Í” Í” Í” Í”& ÍÌS”' ÍÌT’” Í” Í•” Í” Í” Í” Í” ÍÌ@—” Í” Í” Í” Í” Í”$ Í$”& Í&” Í” Í” Í” Í” Í”# Í#”& Í&”* Í*”+ Í+”4 Í4”5 Í5”: Í:”; Í;”< Í<‘”	 Í	‘” Í™” Í” Í” Í” Í” Í”# Í#”& Í&”+ Í+”, Í,‘”	 Í	’” Í” Í“” Í” Í” Í”” Í” Í” Í” Í’” Í” Í—” Í” Í” Í” Í” Í” Í” Í “” Í” Í” Í˜” Í” Í” Í” Í” Í” Í”! Í!”" Í"’” Í ” Í •” Í!” Í!” Í!” Í!” Í!™” Í"” Í"” Í"” Í"” Í"” Í"” Í"”" Í""”# Í"#’” Í#” Í#“” Í$” Í$” Í$”” Í%” Í%” Í%” Í%’” Í&” Í&—” Í'” Í'” Í'” Í'” Í',” Í'/” Í'0“” Í(” Í(” Í(˜” Í)” Í)” Í)” Í)” Í)” Í)”( Í)(”) Í))’” Í*” Í*•” Í+” Í+” Í+” Í+” Í+!™” Í,” Í,” Í,” Í,” Í,”! Í,!”$ Í,$”) Í,)”* Í,*’” Í-” Í-“” Í.” Í.”  Í. ˜” Í/” Í/” Í/” Í/” Í/” Í/”5 Í/ÌQ”6 Í/ÌR’” Í0” Í0•” Í1” Í1”  Í1 ”! Í1!”& Í1Ì@™” Í2” Í2” Í2” Í2” Í2”. Í2.”1 Í21”6 Í26”7 Í27’” Í3” Í3“” Í4” Í4” Í4˜” Í5” Í5” Í5” Í5” Í5” Í5”2 Í52”3 Í53’” Í6” Í6•” Í7” Í7” Í7” Í7”# Í7,™” Í8” Í8” Í8” Í8” Í8”+ Í8+”. Í8.”3 Í83”4 Í84’” Í9” Í9“” Í:” Í:” Í:˜” Í;” Í;” Í;” Í;” Í;” Í;”2 Í;2”3 Í;3’” Í<” Í<•” Í=” Í=” Í=” Í=”# Í=:™” Í>” Í>” Í>” Í>” Í>”+ Í>+”. Í>.”3 Í>3”4 Í>4’” Í?” Í?“” Í@” Í@” Í@”” ÍA” ÍA” ÍA” ÍA’” ÍB” ÍB—” ÍC” ÍC” ÍC” ÍC” ÍC#” ÍC&”  ÍC'“” ÍD” ÍD” ÍD›” ÍE” ÍE” ÍE” ÍE” ÍE” ÍE”" ÍE"”# ÍE#”, ÍE,”- ÍE-”. ÍE.’” ÍF” ÍF•” ÍG” ÍG” ÍG” ÍG” ÍGœ” ÍH” ÍH” ÍH” ÍH” ÍH” ÍH”" ÍH"”' ÍH'”( ÍH(”- ÍH-”. ÍH.”/ ÍH/’” ÍI” ÍI“” ÍJ” ÍJ” ÍJ˜” ÍK” ÍK” ÍK” ÍK” ÍK” ÍK”$ ÍK$”% ÍK%’” ÍL” ÍL•” ÍM” ÍM” ÍM” ÍM” ÍM$™” ÍN” ÍN” ÍN” ÍN” ÍN” ÍN”  ÍN ”% ÍN%”& ÍN&’” ÍO” ÍO“” ÍP” ÍP” ÍP˜” ÍQ” ÍQ” ÍQ” ÍQ” ÍQ” ÍQ”% ÍQ%”& ÍQ&’” ÍR” ÍR•” ÍS” ÍS” ÍS” ÍS” ÍS&™” ÍT” ÍT” ÍT” ÍT” ÍT” ÍT”! ÍT!”& ÍT&”' ÍT'’” ÍU” ÍU“” ÍV” ÍV” ÍV›” ÍW” ÍW” ÍW” ÍW” ÍW” ÍW”" ÍW"”# ÍW#”1 ÍW1”2 ÍW2”3 ÍW3’” ÍX” ÍX•” ÍY” ÍY” ÍY” ÍY” ÍY$œ” ÍZ” ÍZ” ÍZ” ÍZ” ÍZ”$ ÍZ$”' ÍZ'”, ÍZ,”- ÍZ-”2 ÍZ2”3 ÍZ3”4 ÍZ4’” Í[” Í[“” Í\” Í\” Í\˜” Í]” Í]” Í]” Í]” Í]” Í]”' Í]'”( Í](’” Í^” Í^•” Í_” Í_” Í_” Í_” Í_ ™” Í`” Í`” Í`” Í`” Í`”  Í` ”# Í`#”( Í`(”) Í`)’” Ía” Ía“” Íb” Íb” Íb˜” Íc” Íc” Íc” Íc” Íc” Íc”( ÍcÌU”) ÍcÌV’” Íd” Íd•” Íe” Íe” Íe” Íe” ÍeÌB—” Íf” Íf” Íf” Íf” Íf”$ Íf$”& Íf&” Íg” Íg” Íg” Íg” Íg”% Íg%”( Íg(”, Íg,”- Íg-”6 Íg6”7 Íg7”< Íg<”= Íg=”> Íg>‘”	 Íh	‘” Íh™” Íi” Íi” Íi” Íi” Íi”% Íi%”( Íi(”- Íi-”. Íi.‘”	 Íj	’” Ík” Ík“” Íl” Íl” Íl˜” Ím” Ím” Ím” Ím” Ím” Ím”' Ím'”( Ím(’” Ín” Ín•” Ío” Ío” Ío” Ío” Ío ™” Íp” Íp” Íp” Íp” Íp”  Íp ”# Íp#”( Íp(”) Íp)’” Íq” Íq“” Ír” Ír” Ír˜” Ís” Ís” Ís” Ís” Ís” Ís”( Ís(”) Ís)’” Ít” Ít•” Íu” Íu” Íu” Íu” Íu!™” Ív” Ív” Ív” Ív” Ív”! Ív!”$ Ív$”) Ív)”* Ív*’” Íw” Íw“” Íx” Íx” Íx›” Íy” Íy” Íy” Íy” Íy” Íy”" Íy"”# Íy#”0 Íy0”1 Íy1”2 Íy2’” Íz” Íz•” Í{” Í{” Í{” Í{” Í{#œ” Í|” Í|” Í|” Í|” Í|”# Í|#”& Í|&”+ Í|+”, Í|,”1 Í|1”2 Í|2”3 Í|3’” Í}” Í}“” Í~” Í~” Í~›” Í” Í” Í” Í” Í” Í”" Í"”# Í#”0 Í0”1 Í1”2 Í2’” Í€” Í€•” Í” Í” Í” Í” Í#œ” Í‚” Í‚” Í‚” Í‚” Í‚”# Í‚#”& Í‚&”+ Í‚+”, Í‚,”1 Í‚1”2 Í‚2”3 Í‚3’” Íƒ” Íƒ“” Í„” Í„” Í„˜” Í…” Í…” Í…” Í…” Í…” Í…”& Í…&”' Í…'’” Í†” Í†•” Í‡” Í‡” Í‡” Í‡” Í‡(™” Íˆ” Íˆ” Íˆ” Íˆ” Íˆ” Íˆ”" Íˆ"”' Íˆ'”( Íˆ(’” Í‰” Í‰“” ÍŠ” ÍŠ” ÍŠ˜” Í‹” Í‹” Í‹” Í‹” Í‹” Í‹”) Í‹)”* Í‹*’” ÍŒ” ÍŒ•” Í” Í” Í” Í” Í.™” Í” Í” Í” Í” Í”" Í"”% Í%”* Í*”+ Í+’” Í” Í“” Í” Í” Í”” Í‘” Í‘” Í‘” Í‘’” Í’” Í’—” Í“” Í“” Í“” Í“” Í“0” Í“3”  Í“4“” Í”” Í”” Í””” Í•” Í•” Í•” Í•’” Í–” Í–—” Í—” Í—” Í—” Í—” Í—!” Í—$” Í—%”” Í˜” Í˜” Í˜” Í˜&Ü ” Í™” Í™” Í™” Í™” Í™” Í™” Í™” Í™” Í™”! Í™ ”" Í™!”( Í™'”* Í™)”+ Í™*”- Í™,”/ Í™-” Íš” Íš” Íš” Íš” Íš” Íš” Íš” Íš”" Íš"”# Íš#”$ Íš$”% Íš%”& Íš&”' Íš'‘”	 Í›	”” Íœ” Íœ” Íœ” Íœ’” Í” Í”” Í” Í” Í” Í&Ü ” ÍŸ” ÍŸ” ÍŸ” ÍŸ” ÍŸ” ÍŸ” ÍŸ” ÍŸ” ÍŸ”! ÍŸ ”" ÍŸ!”( ÍŸ'”* ÍŸ)”+ ÍŸ*”- ÍŸ,”/ ÍŸ-” Í ” Í ” Í ” Í ” Í ” Í ” Í ” Í ”" Í "”# Í #”$ Í $”% Í %”& Í &”' Í '‘”	 Í¡	”” Í¢” Í¢” Í¢” Í¢’” Í£” Í£”” Í¤” Í¤” Í¤” Í¤7–” Í¥” Í¥” Í¥”" Í¥"”# Í¥#”$ Í¥$”” Í¦” Í¦” Í¦” Í¦’” Í§” Í§”” Í¨” Í¨” Í¨” Í¨#Ü ” Í©” Í©” Í©” Í©” Í©” Í©”  Í© ”! Í©!”% Í©%”* Í©*”+ Í©+”5 Í©5”6 Í©6”; Í©;”< Í©<”Ì@ Í©Ì@”ÌE Í©ÌE”ÌF Í©ÌF”ÌP Í©ÌP”ÌQ Í©ÌQ”ÌW Í©ÌW”ÌX Í©ÌX”ÌZ Í©ÌZ”” Íª” Íª” Íª” Íª‘”	 Í«	™” Í¬” Í¬” Í¬” Í¬/”2 Í¬ÌF”3 Í¬ÌG”8 Í¬ÌL”9 Í¬ÌM”: Í¬ÌN”” Í­” Í­” Í­” Í­”” Í®” Í®” Í®” Í®‘”	 Í¯	–” Í°” Í°” Í°” Í°”" Í°"”$ Í°$”” Í±” Í±”" Í±"”# Í±#‘”	 Í²	”” Í³” Í³” Í³” Í³’” Í´” Í´‘” Íµ“”  Íº ” Íº” Íº“” ÍÂ” ÍÂ” ÍÂ)•” Í¼” Í¼”" Í¼:”& Í¼>”' Í¼?™” Í½” Í½” Í½1” Í½5”4 Í½ÌM”5 Í½ÌN”9 Í½ÌR”: Í½ÌS”; Í½ÌT›” Í¾” Í¾” Í¾” Í¾”: Í¾9”; Í¾:”? Í¾>”Ì@ Í¾?”ÌH Í¾ÌG”ÌI Í¾ÌH”ÌJ Í¾ÌI•” ÍÀ” ÍÀ” ÍÀ” ÍÀ” ÍÀ•” ÍÁ” ÍÁ” ÍÁ” ÍÁ” ÍÁ—” ÍÃ” ÍÃ” ÍÃ” ÍÃ” ÍÃ” ÍÃ” ÍÃŸ” ÍÄ” ÍÄ” ÍÄ” ÍÄ” ÍÄ” ÍÄ”8 ÍÄ8”9 ÍÄ9”Ì@ ÍÄÌ@”ÌB ÍÄÌB”ÌF ÍÄÌF”ÌG ÍÄÌG”ÌN ÍÄÌN”ÌO ÍÄÌO”ÌP ÍÄÌPœ” ÍÅ” ÍÅ” ÍÅ” ÍÅ” ÍÅ”. ÍÅ.”/ ÍÅ/”: ÍÅ:”; ÍÅÌS”ÌF ÍÅÌ^”ÌG ÍÅÌ_”ÌI ÍÅÌa–” ÍÆ” ÍÆ” ÍÆ” ÍÆ” ÍÆ”! ÍÆ!”” ÍÇ” ÍÇ” ÍÇ”# ÍÇ#“”	 ÍÈ!”
+ ÍÈ"” ÍÈ#š” ÍÉ” ÍÉ” ÍÉ” ÍÉ”" ÍÉ#”) ÍÉ7”* ÍÉ8”ÌD ÍÉÌR”ÌF ÍÉÌT”ÌG ÍÉÌU˜” ÍÊ” ÍÊ” ÍÊ”% ÍÊ%”& ÍÊ&”* ÍÊ*”+ ÍÊ+”, ÍÊ,’” ÍË” ÍË”” ÍÌ” ÍÌ” ÍÌ” ÍÌ"’” ÍÍ” ÍÍš” ÍÎ” ÍÎ” ÍÎ”# ÍÎ#”% ÍÎ%”+ ÍÎ+”, ÍÎ,”0 ÍÎ0”= ÍÎ=”> ÍÎ>”” ÍÏ” ÍÏ” ÍÏ”! ÍÏ!”” ÍĞ” ÍĞ” ÍĞ” ÍĞ‘”	 ÍÑ	•” ÍÑ
+” ÍÑ” ÍÑ” ÍÑ” ÍÑ’” ÍÒ” ÍÒ“” ÍÓ” ÍÓ” ÍÓÜ ” ÍÔ” ÍÔ” ÍÔ” ÍÔ” ÍÔ” ÍÔ” ÍÔ”  ÍÔ ”! ÍÔ!”" ÍÔ"”& ÍÔ&”' ÍÔ'”- ÍÔ-”. ÍÔ.”/ ÍÔ/”0 ÍÔ0”5 ÍÔ5”6 ÍÔ6”: ÍÔ:”; ÍÔ;”ÌB ÍÔÌB”ÌC ÍÔÌC”ÌN ÍÔÌN”ÌO ÍÔÌO”ÌP ÍÔÌP’” ÍÕ” ÍÕ•” ÍÖ” ÍÖ” ÍÖ” ÍÖ” ÍÖ—” Í×” Í×” Í×” Í×” Í×” Í×” Í×’” ÍØ” ÍØ“” ÍÙ” ÍÙ” ÍÙÜ ” ÍÚ” ÍÚ” ÍÚ” ÍÚ” ÍÚ” ÍÚ”  ÍÚ ”! ÍÚ!”" ÍÚ"”# ÍÚ#”' ÍÚ'”( ÍÚ(”/ ÍÚ/”0 ÍÚ0”1 ÍÚ1”2 ÍÚ2”7 ÍÚ7”8 ÍÚ8”< ÍÚ<”= ÍÚ=”ÌD ÍÚÌD”ÌE ÍÚÌE”ÌQ ÍÚÌQ”ÌR ÍÚÌR”ÌS ÍÚÌS’” ÍÛ” ÍÛ•” ÍÜ” ÍÜ” ÍÜ” ÍÜ” ÍÜ—” Íİ” Íİ” Íİ” Íİ” Íİ” Íİ” Íİ’” ÍŞ” ÍŞ”” Íß” Íß” Íß” Íß–” Íà” Íà” Íà” Íà” Íà” Íà’” Íá” Íá˜” Íâ” Íâ” Íâ” Íâ$” Íâ(” Íâ*”% ÍâÌC”) ÍâÌG” Íã” Íã” Íã” Íã” Íã” Íã”% Íã%”& Íã&”* Íã*”, Íã,”3 Íã3”4 Íã4”5 Íã5’” Íä” Íä”” Íå” Íå” Íå” Íå‘” Íæ•”  Íç ” Íç” Íç” Íç”7 Íç7“” Íè” Íè” Íè™” Íé” Íé” Íé” Íé”( Íé(”* Íé<”+ Íé=”0 ÍéÌB”1 ÍéÌC’” Íê” Íê•” Íë” Íë” Íë” Íë” Íëš” Íì” Íì” Íì”! Íì!”# Íì5”$ Íì6”) Íì;”, Íì>”1 ÍìÌC”2 ÍìÌD’” Íí” Íí“” Íî” Íî” Íî™” Íï” Íï” Íï” Íï”( Íï(”* Íï<”+ Íï=”1 ÍïÌC”2 ÍïÌD’” Íğ” Íğ•” Íñ” Íñ” Íñ” Íñ” Íñš” Íò” Íò” Íò”! Íò!”# Íò5”$ Íò6”* Íò<”- Íò?”2 ÍòÌD”3 ÍòÌE’” Íó” Íó”” Íô” Íô” Íô” Íôœ” Íõ” Íõ” Íõ” Íõ”( Íõ(”* Íõ<”+ Íõ=”5 ÍõÌG”6 ÍõÌH”7 ÍõÌI”8 ÍõÌJ”9 ÍõÌK’” Íö” Íö˜” Í÷” Í÷” Í÷” Í÷$” Í÷(” Í÷*”% Í÷ÌC”) Í÷ÌG” Íø” Íø” Íø” Íø”( Íø(”* Íø<”+ Íø=”4 ÍøÌF”5 ÍøÌG”9 ÍøÌK”; ÍøÌM”ÌB ÍøÌT”ÌC ÍøÌU”ÌD ÍøÌV’” Íù” Íù‘” Íú“”  Íû ” Íû” Íû“” Íş” Íş” Íş)—” Íÿ” Íÿ” Íÿ” Íÿ” Íÿ” Íÿ”  Íÿ ” Í ” Í ” Í ” Í ” Í ” Í ” Í ”% Í %”& Í &”0 Í 0”1 Í 1”5 Í 5”6 Í 7”7 Í 8’” Í” Í”” Í” Í” Í” Í›” Í” Í” Í” Í” Í” Í”' Í'”( Í(”, Í,”- Í-”. Í.’” Í” Í˜” Í” Í” Í” Í$” Í(” Í*”, ÍÌJ”0 ÍÌN” Í” Í” Í” Í” Í” Í”& Í&”' Í'”+ Í+”- Í-”; Í;”< Í<”= Í=’” Í	” Í	’” Í
+” Í
+–” Í” Í” Í” Í” Í” Í’” Í” Í’” Í” Í–” Í” Í” Í” Í” Í” Í’” Í” Í”” Í” Í” Í”" ÍÌA—” Í” Í”$ Í$”% Í%”- Í-”. Í.”/ Í/’” Í” Í”” Í” Í” Í” Í'–” Í” Í” Í”# Í#”$ Í$”% Í%’” Í” Í‘” Í˜”  Í ” Í” Í”! Í;”" Í<”) ÍÌd”+ ÍÌe”- ÍÌg•” Í” Í” Í” Í” Í” Í” Í” Í” Í ” Í#” Í$”( Í2”) Í3”0 Í:”1 Í;”3 Í=”4 Í>”5 Í?”” Í” Í” Í” Í–” Í” Í” Í”" Í"”) ÍÌG”* ÍÌH” Í” Í” Í” Í” Í” Í”" Í"”2 Í2”3 Í3”Ì@ ÍÌ@”ÌA ÍÌA”ÌB ÍÌB”ÌC ÍÌC‘”	 Í	‘” ÍŸ” Í” Í” Í” Í”! Í!”) Í)”* Í*”ÌH ÍÌH”ÌJ ÍÌJ”ÌK ÍÌK”ÌL ÍÌL”ÌN ÍÌN”Ìb ÍÌb”Ìc ÍÌc”Ìd ÍÌd™” Í” Í” Í” Í” Í” Í”# Í#”$ Í$”% Í%‘”	 Í 	—” Í!” Í!” Í!” Í!” Í!” Í!” Í!”” Í"” Í"” Í"” Í"“”  Í# ” Í#” Í#Ü ”  Í$ ” Í$”	 Í$	” Í$” Í$”+ Í$+”- Í$-”= Í$=”ÌA Í$ÌA”ÌQ Í$ÌQ”ÌS Í$Ì©”Ìr Í$ÌÈ”Ìv Í$ÌÌ”Ì• Í$Ìë”Ì— Í$Í%”Ì˜ Í$Í&˜”  Í% ” Í%”	 Í%	”! Í%!”% Í%%”= Í%=”? Í%?”Ì@ Í%Ì@ÔrG–§version¤file§sources®sourcesContent¥names¨mappingsÀ‘À‘ÀÜ‘”    ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”  	 ‘”  
+ ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”    ‘”  ! ‘”  " ‘”  # ‘”  $ ‘”  % ‘”  & ‘”  ' ‘”  ( ‘”  ) ‘”  * ‘”  + ‘”  , ‘”  - ‘”  . ‘”  / ‘”  0 ‘”  1 ‘”  2 ‘”  3 ‘”  4 ‘”  5 ‘”  6 ‘”  7 ‘”  8 ‘”  9 ‘”  : ‘”  ; ‘”  < ‘”  = ‘”  > ‘”  ? ‘”  Ì@ ‘”  ÌA ‘”  ÌB ‘”  ÌC ‘”  ÌD ‘”  ÌE ‘”  ÌF ‘”  ÌG ‘”  ÌH ‘”  ÌI ‘”  ÌJ ‘”  ÌK ‘”  ÌL ‘”  ÌM ‘”  ÌN ‘”  ÌO ‘”  ÌP ‘”  ÌQ ‘”  ÌR ‘”  ÌS ‘”  ÌT ‘”  ÌU ‘”  ÌV ‘”  ÌW ‘”  ÌX ‘”  ÌY ‘”  ÌZ ‘”  Ì[ ‘”  Ì\ ‘”  Ì] ‘”  Ì^ ‘”  Ì_ ‘”  Ì` ‘”  Ìa ‘”  Ìb ‘”  Ìc ‘”  Ìd ‘”  Ìe ‘”  Ìf ‘”  Ìg ‘”  Ìh ‘”  Ìi ‘”  Ìj ‘”  Ìk ‘”  Ìl ‘”  Ìm ‘”  Ìn ‘”  Ìo ‘”  Ìp ‘”  Ìq ‘”  Ìr ‘”  Ìs ‘”  Ìt ‘”  Ìu ‘”  Ìv ‘”  Ìw ‘”  Ìx ‘”  Ìy ‘”  Ìz ‘”  Ì{ ‘”  Ì| ‘”  Ì} ‘”  Ì~ ‘”  Ì ‘”  Ì€ ‘”  Ì ‘”  Ì‚ ‘”  Ìƒ ‘”  Ì„ ‘”  Ì… ‘”  Ì† ‘”  Ì‡ ‘”  Ìˆ ‘”  Ì‰ ‘”  ÌŠ ‘”  Ì‹ ‘”  ÌŒ ‘”  Ì ‘”  Ì ‘”  Ì ‘”  Ì ‘”  Ì‘ ‘”  Ì’ ‘”  Ì“ ‘”  Ì” ‘”  Ì• ‘”  Ì– ‘”  Ì— ‘”  Ì˜ ‘”  Ì™ ‘”  Ìš ‘”  Ì› ‘”  Ìœ ‘”  Ì ‘”  Ì ‘”  ÌŸ ‘”  Ì  ‘”  Ì¡ ‘”  Ì¢ ‘”  Ì£ ‘”  Ì¤ ‘”  Ì¥ ‘”  Ì¦ ‘”  Ì§ ‘”  Ì¨ ‘”  Ì© ‘”  Ìª ‘”  Ì« ‘”  Ì¬ ‘”  Ì­ ‘”  Ì® ‘”  Ì¯ ‘”  Ì° ‘”  Ì± ‘”  Ì² ‘”  Ì³ ‘”  Ì´ ‘”  Ìµ ‘”  Ì¶ ‘”  Ì· ‘”  Ì¸ ‘”  Ì¹ ‘”  Ìº ‘”  Ì» ‘”  Ì¼ ‘”  Ì½ ‘”  Ì¾ ‘”  Ì¿ ‘”  ÌÀ ‘”  ÌÁ ‘”  ÌÂ ‘”  ÌÃ ‘”  ÌÄ ‘”  ÌÅ ‘”  ÌÆ ‘”  ÌÇ ‘”  ÌÈ ‘”  ÌÉ ‘”  ÌÊ ‘”  ÌË ‘”  ÌÌ ‘”  ÌÍ ‘”  ÌÎ ‘”  ÌÏ ‘”  ÌĞ ‘”  ÌÑ ‘”  ÌÒ ‘”  ÌÓ ‘”  ÌÔ ‘”  ÌÕ ‘”  ÌÖ ‘”  Ì× ‘”  ÌØ ‘”  ÌÙ ‘”  ÌÚ ‘”  ÌÛ ‘”  ÌÜ ‘”  Ìİ ‘”  ÌŞ ‘”  Ìß ‘”  Ìà ‘”  Ìá ‘”  Ìâ ‘”  Ìã ‘”  Ìä ‘”  Ìå ‘”  Ìæ ‘”  Ìç ‘”  Ìè ‘”  Ìé ‘”  Ìê ‘”  Ìë ‘”  Ìì ‘”  Ìí ‘”  Ìî ‘”  Ìï ‘”  Ìğ ‘”  Ìñ ‘”  Ìò ‘”  Ìó ‘”  Ìô ‘”  Ìõ ‘”  Ìö ‘”  Ì÷ ‘”  Ìø ‘”  Ìù ‘”  Ìú ‘”  Ìû ‘”  Ìü ‘”  Ìı ‘”  Ìş ‘”  Ìÿ ‘”  Í  ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í	 ‘”  Í
+ ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í  ‘”  Í! ‘”  Í" ‘”  Í# ‘”  Í$ ‘”  Í% ‘”  Í& ‘”  Í' ‘”  Í( ‘”  Í) ‘”  Í* ‘”  Í+ ‘”  Í, ‘”  Í- ‘”  Í. ‘”  Í/ ‘”  Í0 ‘”  Í1 ‘”  Í2 ‘”  Í3 ‘”  Í4 ‘”  Í5 ‘”  Í6 ‘”  Í7 ‘”  Í8 ‘”  Í9 ‘”  Í: ‘”  Í; ‘”  Í< ‘”  Í= ‘”  Í> ‘”  Í? ‘”  Í@ ‘”  ÍA ‘”  ÍB ‘”  ÍC ‘”  ÍD ‘”  ÍE ‘”  ÍF ‘”  ÍG ‘”  ÍH ‘”  ÍI ‘”  ÍJ ‘”  ÍK ‘”  ÍL ‘”  ÍM ‘”  ÍN ‘”  ÍO ‘”  ÍP ‘”  ÍQ ‘”  ÍR ‘”  ÍS ‘”  ÍT ‘”  ÍU ‘”  ÍV ‘”  ÍW ‘”  ÍX ‘”  ÍY ‘”  ÍZ ‘”  Í[ ‘”  Í\ ‘”  Í] ‘”  Í^ ‘”  Í_ ‘”  Í` ‘”  Ía ‘”  Íb ‘”  Íc ‘”  Íd ‘”  Íe ‘”  Íf ‘”  Íg ‘”  Íh ‘”  Íi ‘”  Íj ‘”  Ík ‘”  Íl ‘”  Ím ‘”  Ín ‘”  Ío ‘”  Íp ‘”  Íq ‘”  Ír ‘”  Ís ‘”  Ít ‘”  Íu ‘”  Ív ‘”  Íw ‘”  Íx ‘”  Íy ‘”  Íz ‘”  Í{ ‘”  Í| ‘”  Í} ‘”  Í~ ‘”  Í ‘”  Í€ ‘”  Í ‘”  Í‚ ‘”  Íƒ ‘”  Í„ ‘”  Í… ‘”  Í† ‘”  Í‡ ‘”  Íˆ ‘”  Í‰ ‘”  ÍŠ ‘”  Í‹ ‘”  ÍŒ ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í‘ ‘”  Í’ ‘”  Í“ ‘”  Í” ‘”  Í• ‘”  Í– ‘”  Í— ‘”  Í˜ ‘”  Í™ ‘”  Íš ‘”  Í› ‘”  Íœ ‘”  Í ‘”  Í ‘”  ÍŸ ‘”  Í  ‘”  Í¡ ‘”  Í¢ ‘”  Í£ ‘”  Í¤ ‘”  Í¥ ‘”  Í¦ ‘”  Í§ ‘”  Í¨ ‘”  Í© ‘”  Íª ‘”  Í« ‘”  Í¬ ‘”  Í­ ‘”  Í® ‘”  Í¯ ‘”  Í° ‘”  Í± ‘”  Í² ‘”  Í³ ‘”  Í´ ‘”  Íµ ‘”  Í¶ ‘”  Í· ‘”  Í¸ ‘”  Í¹ ‘”  Íº ‘”  Í» ‘”  Í¼ ‘”  Í½ ‘”  Í¾ ‘”  Í¿ ‘”  ÍÀ ‘”  ÍÁ ‘”  ÍÂ ‘”  ÍÃ ‘”  ÍÄ ‘”  ÍÅ ‘”  ÍÆ ‘”  ÍÇ ‘”  ÍÈ ‘”  ÍÉ ‘”  ÍÊ ‘”  ÍË ‘”  ÍÌ ‘”  ÍÍ ‘”  ÍÎ ‘”  ÍÏ ‘”  ÍĞ ‘”  ÍÑ ‘”  ÍÒ ‘”  ÍÓ ‘”  ÍÔ ‘”  ÍÕ ‘”  ÍÖ ‘”  Í× ‘”  ÍØ ‘”  ÍÙ ‘”  ÍÚ ‘”  ÍÛ ‘”  ÍÜ ‘”  Íİ ‘”  ÍŞ ‘”  Íß ‘”  Íà ‘”  Íá ‘”  Íâ ‘”  Íã ‘”  Íä ‘”  Íå ‘”  Íæ ‘”  Íç ‘”  Íè ‘”  Íé ‘”  Íê ‘”  Íë ‘”  Íì ‘”  Íí ‘”  Íî ‘”  Íï ‘”  Íğ ‘”  Íñ ‘”  Íò ‘”  Íó ‘”  Íô ‘”  Íõ ‘”  Íö ‘”  Í÷ ‘”  Íø ‘”  Íù ‘”  Íú ‘”  Íû ‘”  Íü ‘”  Íı ‘”  Íş ‘”  Íÿ ‘”  Í  ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í	 ‘”  Í
+ ‘”  Í ÔrH’§missing¦pluginÃ¦genAbcÂÔ  ÔrI”²dynamicImportCache¹exportAllDeclarationCache»exportNamedDeclarationCache«importCache’ÔrJ–¤type¥start£end«declarationªspecifiers¦source¶ExportNamedDeclarationÍ@ÀÍAXÀ“ÔrK•¤type¥start£end¥local¨exported¯ExportSpecifierÍ@ÉÍ@ëÔrL”¤type¥start£end¤nameªIdentifierÍ@ÉÍ@Ø¯UniNativeCanvasLªIdentifierÍ@ÜÍ@ë¯UniNativeCanvasK¯ExportSpecifierÍ@íÍALªIdentifierÍ@íÍ@ı°UniCanvasElementLªIdentifierÍAÍA°UniCanvasElementK¯ExportSpecifierÍAÍAULªIdentifierÍAÍA2¿CreateCanvasContextAsyncOptionsLªIdentifierÍA6ÍAU¿CreateCanvasContextAsyncOptionsÀJ¶ExportNamedDeclarationÍAZÍAšÀ‘K¯ExportSpecifierÍAcÍA—LªIdentifierÍAcÍA{¸createCanvasContextAsyncLªIdentifierÍAÍA—¸createCanvasContextAsyncÀ“ÔrM•¤type¥start£endªspecifiers¦source±ImportDeclaration ÌL’ÔrN•¤type¥start£end¨imported¥local¯ImportSpecifier	 LªIdentifier	 ·EXTENDED_COLOR_KEYWORDSLªIdentifier	 ·EXTENDED_COLOR_KEYWORDSN¯ImportSpecifier"3LªIdentifier"3±uniCanvasGradientLªIdentifier"3±uniCanvasGradientÔrO•¤type¥start£end¥value£raw§Literal;ÌK®./canvas.color°"./canvas.color"M±ImportDeclarationÌNÍšN¯ImportSpecifierÌWÌ_LªIdentifierÌWÌ_¨UniErrorLªIdentifierÌWÌ_¨UniErrorN¯ImportSpecifierÌaÌfLªIdentifierÌaÌf¥ImageLªIdentifierÌaÌf¥ImageN¯ImportSpecifierÌhÌnLªIdentifierÌhÌn¦Path2DLªIdentifierÌhÌn¦Path2DN¯ImportSpecifierÌpÌ…LªIdentifierÌpÌ…µrequestAnimationFrameLªIdentifierÌpÌ…µrequestAnimationFrameN¯ImportSpecifierÌ‡Ì›LªIdentifierÌ‡Ì›´cancelAnimationFrameLªIdentifierÌ‡Ì›´cancelAnimationFrameN¯ImportSpecifierÌÌ¦LªIdentifierÌÌ¦©UTSObjectLªIdentifierÌÌ¦©UTSObjectN¯ImportSpecifierÌ¨ÌµLªIdentifierÌ¨Ìµ­UTSJSONObjectLªIdentifierÌ¨Ìµ­UTSJSONObjectN¯ImportSpecifierÌ·ÌÏLªIdentifierÌ·ÌÏ¸UniNativeViewElementImplLªIdentifierÌ·ÌÏ¸UniNativeViewElementImplN¯ImportSpecifierÌÑÌÙLªIdentifierÌÑÌÙ¨nextTickLªIdentifierÌÑÌÙ¨nextTickN¯ImportSpecifierÌÛÌŞLªIdentifierÌÛÌŞ£uniLªIdentifierÌÛÌŞ£uniO§LiteralÌæÍ»@dcloudio/uni-app-framework½"@dcloudio/uni-app-framework"M±ImportDeclarationÍÍN’N¯ImportSpecifierÍÍLªIdentifierÍÍ«buildCanvasLªIdentifierÍÍ«buildCanvasN¯ImportSpecifierÍÍ;LªIdentifierÍÍ;¿HarmonyCanvasRenderingContext2DLªIdentifierÍÍ;¿HarmonyCanvasRenderingContext2DO§LiteralÍCÍM¨./canvasª"./canvas"

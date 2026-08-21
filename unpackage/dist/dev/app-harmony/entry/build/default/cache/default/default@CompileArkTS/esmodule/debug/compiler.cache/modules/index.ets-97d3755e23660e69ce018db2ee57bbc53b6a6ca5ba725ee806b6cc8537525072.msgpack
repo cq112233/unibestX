@@ -1,0 +1,1538 @@
+Ôr@Ÿªassertions¤code´customTransformCache¬dependencies¢id¤meta±moduleSideEffects¬originalCode±originalSourcemap«resolvedIds®sourcemapChainµsyntheticNamedExportsµtransformDependencies®transformFiles¨cacheAstÔrAÚc|import buffer from '@ohos.buffer';
+import { FrameCallback } from "@ohos.arkui.UIContext";
+import { buildWeb } from "./builder";
+import componentSnapshot from "@ohos.arkui.componentSnapshot";
+import { createDownloadDelegate } from "./webview";
+import fs from "@ohos.file.fs";
+import image__1 from "@ohos.multimedia.image";
+import image from "@ohos.multimedia.image";
+import { UTSObject, UTS, UniNativeViewEvent, UTSJSONObject, UniViewElementImpl, getCurrentPages, defineSyncApi } from "@dcloudio/uni-app-framework";
+import { uni, getCurrentMP, getAbilityContext } from "@dcloudio/uni-app-framework";
+import util from "@ohos.util";
+import webview from "@ohos.web.webview";
+class WebViewProgressStyles extends UTSObject {
+}
+class WebViewStyles extends UTSObject {
+}
+class UniWebviewContextLoadDataOptions extends UTSObject {
+    constructor() {
+        super(...arguments);
+        this.baseURL = null;
+        this.mimeType = null;
+        this.encoding = null;
+    }
+}
+class UniWebViewElementLoadDataOptions extends UTSObject {
+    constructor() {
+        super(...arguments);
+        this.baseURL = null;
+        this.mimeType = null;
+        this.encoding = null;
+    }
+}
+class CustomFrameCallback extends FrameCallback {
+    constructor(cb) {
+        super();
+        this.cb = cb;
+    }
+    onIdle() {
+        this.cb();
+    }
+}
+async function getSnapshotArea(pixelMap, scrollYOffsets, width, height) {
+    const stride = pixelMap.getBytesNumberPerRow();
+    const bytesNumber = pixelMap.getPixelBytesNumber();
+    const buffer = new ArrayBuffer(bytesNumber);
+    const len = scrollYOffsets.length;
+    if (len >= 2) {
+        const realScrollHeight = scrollYOffsets[len - 1] - scrollYOffsets[len - 2];
+        if (height - realScrollHeight > 0) {
+            const cropRegion = {
+                x: 0,
+                y: vp2px(height - realScrollHeight),
+                size: {
+                    height: vp2px(realScrollHeight),
+                    width: vp2px(width)
+                }
+            };
+            if (cropRegion.size.height == 0) {
+                return {
+                    pixels: buffer,
+                    offset: 0,
+                    stride: stride,
+                    region: {
+                        size: {
+                            width: 0,
+                            height: 0
+                        },
+                        x: 0,
+                        y: 0
+                    }
+                };
+            }
+            await pixelMap.crop(cropRegion);
+        }
+    }
+    const imgInfo = pixelMap.getImageInfoSync();
+    const area = {
+        pixels: buffer,
+        offset: 0,
+        stride: stride,
+        region: {
+            size: {
+                width: imgInfo.size.width,
+                height: imgInfo.size.height
+            },
+            x: 0,
+            y: 0
+        }
+    };
+    pixelMap.readPixelsSync(area);
+    return area;
+}
+async function mergeImage(areaArray, lastOffsetY, listWidth, listHeight) {
+    const opts = {
+        editable: true,
+        pixelFormat: 4,
+        size: {
+            width: vp2px(listWidth),
+            height: Math.round(vp2px(lastOffsetY + listHeight))
+        }
+    };
+    const longPixelMap = image.createPixelMapSync(opts);
+    let imgPosition = 0;
+    for (let i = 0; i < areaArray.length; i++) {
+        const readArea = areaArray[i];
+        const area = {
+            pixels: readArea.pixels,
+            offset: 0,
+            stride: readArea.stride,
+            region: {
+                size: {
+                    width: readArea.region.size.width,
+                    height: readArea.region.size.height
+                },
+                x: 0,
+                y: imgPosition
+            }
+        };
+        imgPosition += readArea.region.size.height;
+        longPixelMap.writePixelsSync(area);
+    }
+    return longPixelMap;
+}
+const BASE64_ENCODING = 'base64';
+class BindWebViewController {
+    constructor() {
+        this.controllerAttachedInvokers = [];
+        this.isControllerAttached = false;
+        this.isPageEnd = false;
+        this.controller = new webview.WebviewController();
+    }
+    invokeController(methodName, ...args) {
+        if (this.isControllerAttached) {
+            return this.controller[methodName](...args);
+        }
+        else {
+            this.controllerAttachedInvokers.push(() => {
+                this.controller[methodName](...args);
+            });
+        }
+    }
+    onControllerAttached() {
+        if (!this.isControllerAttached) {
+            this.isControllerAttached = true;
+            this.controllerAttachedInvokers.forEach((cb) => cb());
+            this.controllerAttachedInvokers = [];
+        }
+    }
+    onPageEnd() {
+        if (!this.isPageEnd) {
+            this.isPageEnd = true;
+        }
+    }
+    back() {
+        this.invokeController('backward');
+    }
+    forward() {
+        this.invokeController('forward');
+    }
+    reload() {
+        this.invokeController('refresh');
+    }
+    stop() {
+        this.invokeController('stop');
+    }
+    evalJS(js) {
+        this.invokeController('runJavaScript', js);
+    }
+    getContentHeight() {
+        return this.controller.getPageHeight();
+    }
+    canBack() {
+        return this.controller.accessBackward();
+    }
+    canForward() {
+        return this.controller.accessForward();
+    }
+    loadData(options) {
+        let data = options.data;
+        let encoding = options?.encoding;
+        const baseURL = options?.baseURL ?? '';
+        if (encoding == null && baseURL.length === 0) {
+            try {
+                const htmlBytes = new util.TextEncoder().encodeInto(data);
+                const byteOffset = htmlBytes.byteOffset;
+                const byteLength = htmlBytes.byteLength;
+                const htmlBuffer = byteOffset == 0 && byteLength == htmlBytes.buffer.byteLength ? htmlBytes.buffer : htmlBytes.buffer.slice(byteOffset, byteOffset + byteLength);
+                data = buffer.from(htmlBuffer).toString(BASE64_ENCODING);
+                encoding = BASE64_ENCODING;
+            }
+            catch (error) {
+                UTS.console.error('[WebView loadData] Failed to encode data to base64:', error);
+            }
+        }
+        if (encoding !== BASE64_ENCODING) {
+            data = data.replace(/#/g, '%23');
+        }
+        this.invokeController('loadData', data, options.mimeType ?? "text/html", encoding ?? "UTF-8", baseURL ?? '');
+    }
+}
+function capitalizeFirstLetter(str) {
+    if (!str)
+        return '';
+    const firstLetter = str.charAt(0).toUpperCase();
+    const restOfString = str.slice(1);
+    return firstLetter + restOfString;
+}
+class NativeWebView {
+    constructor(element, events = {}) {
+        this.__v_skip = true;
+        this.params = {
+            src: '',
+            horizontalScrollBarAccess: true,
+            verticalScrollBarAccess: true,
+            bounces: true,
+            disableUserSelectMenu: false
+        };
+        this.events = {};
+        this.lastPageHeight = 0;
+        this.id = `web_view_id_${Date.now()}_${Math.floor(Math.random() * 1000000)}`;
+        this.bindWebViewController = new BindWebViewController();
+        this.events = events;
+        this.element = element;
+        this.initParams();
+        this.element.bindHarmonyWrappedBuilder(wrapBuilder(buildWeb), this.params);
+        this.element.bindHarmonyController(this.bindWebViewController);
+        if (typeof this.element['getHarmonyComponentContent'] === 'function') {
+            this.webComponentContent = this.element.getHarmonyComponentContent();
+        }
+        else {
+            this.webComponentContent = this.element.getHarmonyBuilderNode();
+        }
+        if (this.element.parentElement) {
+            this.webviewElement = this.element.parentElement;
+            this.webviewElement.setNativeWebView(this);
+        }
+    }
+    dispatchEvent(type, event) {
+        this.events[`on${capitalizeFirstLetter(type)}`]?.(event);
+    }
+    initParams() {
+        this.params.id = this.id;
+        this.params.delegate = createDownloadDelegate();
+        this.params.controller = this.bindWebViewController.controller;
+        this.params.onMessage = (event) => {
+            const detail = new UTSJSONObject();
+            detail.set('data', event.detail.data);
+            this.dispatchEvent('message', new UniNativeViewEvent("message", detail));
+        };
+        this.params.onTitleUpdate = (event) => { };
+        this.params.onPostMessageToService = (event) => {
+            const detail = event.detail;
+            const name = detail.args.data.name;
+            const arg = detail.args.data.arg;
+            switch (name) {
+                case 'navigateTo':
+                    uni.navigateTo({
+                        url: encodeURI(arg.url)
+                    });
+                    break;
+                case 'navigateBack':
+                    const delta = parseInt(arg.delta);
+                    uni.navigateBack({
+                        delta: !isNaN(delta) ? delta : 1
+                    });
+                    break;
+                case 'switchTab':
+                    uni.switchTab({
+                        url: encodeURI(arg.url)
+                    });
+                    break;
+                case 'reLaunch':
+                    uni.reLaunch({
+                        url: encodeURI(arg.url)
+                    });
+                    break;
+                case 'redirectTo':
+                    uni.redirectTo({
+                        url: encodeURI(arg.url)
+                    });
+                    break;
+            }
+        };
+        this.params.onContentHeightChange = (contentHeight) => {
+            this.lastPageHeight = contentHeight;
+            const detail = new UTSJSONObject();
+            detail.set('height', contentHeight);
+            this.dispatchEvent('contentheightchange', new UniNativeViewEvent("contentheightchange", detail));
+        };
+        this.params.onLoad = (event) => {
+            this.bindWebViewController.onPageEnd();
+            const detail = new UTSJSONObject();
+            detail.set('url', event.detail.url);
+            detail.set('src', event.detail.src);
+            this.dispatchEvent('load', new UniNativeViewEvent("load", detail));
+        };
+        this.params.onLoading = (event) => {
+            const detail = new UTSJSONObject();
+            detail.set('url', event.detail.url);
+            detail.set('src', event.detail.src);
+            this.dispatchEvent('loading', new UniNativeViewEvent("loading", detail));
+        };
+        this.params.onDownload = (event) => {
+            const detail = new UTSJSONObject();
+            detail.set('url', event.detail.url);
+            detail.set('userAgent', event.detail.userAgent);
+            detail.set('contentDisposition', event.detail.contentDisposition);
+            detail.set('mimetype', event.detail.mimetype);
+            detail.set('contentLength', event.detail.contentLength);
+            this.dispatchEvent('download', new UniNativeViewEvent("download", detail));
+        };
+        this.params.onError = (event) => {
+            const detail = new UTSJSONObject();
+            detail.set('errSubject', event.detail.errSubject);
+            detail.set('errCode', event.detail.errCode);
+            detail.set('errMsg', event.detail.errMsg);
+            detail.set('url', event.detail.url);
+            detail.set('fullUrl', event.detail.fullUrl);
+            detail.set('src', event.detail.src);
+            this.dispatchEvent('error', new UniNativeViewEvent("error", detail));
+        };
+        this.params.onControllerAttached = () => {
+            this.bindWebViewController.onControllerAttached();
+        };
+        this.params.handleAreaChange = (_, newValue) => {
+            if (this.webviewElement) {
+                this.webviewElement.widthByAreaChange = newValue.width;
+                this.webviewElement.heightByAreaChange = newValue.height;
+            }
+        };
+        this.params.handleScroll = (event) => {
+            if (this.webviewElement) {
+                this.webviewElement.curOffsetY = event.yOffset;
+            }
+        };
+    }
+    setSrc(src = null) {
+        if (this.params.src !== src) {
+            this.params.src = src ?? '';
+            this.updateParams();
+        }
+    }
+    setWebViewStyles(webViewStyles = null) { }
+    setHorizontalScrollBarAccess(access) {
+        if (this.params.horizontalScrollBarAccess !== access) {
+            this.params.horizontalScrollBarAccess = access;
+            this.updateParams();
+        }
+    }
+    setVerticalScrollBarAccess(access) {
+        if (this.params.verticalScrollBarAccess !== access) {
+            this.params.verticalScrollBarAccess = access;
+            this.updateParams();
+        }
+    }
+    setBounces(bounces) {
+        if (this.params.bounces !== bounces) {
+            this.params.bounces = bounces;
+            this.updateParams();
+        }
+    }
+    setDisableUserSelectMenu(disableUserSelectMenu) {
+        if (this.params.disableUserSelectMenu !== disableUserSelectMenu) {
+            this.params.disableUserSelectMenu = disableUserSelectMenu;
+            this.updateParams();
+        }
+    }
+    updateParams() {
+        this.webComponentContent.update(this.params);
+    }
+    back() {
+        this.bindWebViewController.back();
+    }
+    forward() {
+        this.bindWebViewController.forward();
+    }
+    reload() {
+        this.bindWebViewController.reload();
+    }
+    stop() {
+        this.bindWebViewController.stop();
+    }
+    evalJS(js) {
+        this.bindWebViewController.evalJS(js);
+    }
+    getContentHeight() {
+        const pageHeight = this.bindWebViewController.getContentHeight();
+        if (this.lastPageHeight === 0 && this.lastPageHeight !== pageHeight) {
+            return pageHeight;
+        }
+        return this.lastPageHeight;
+    }
+    loadData(options) {
+        this.bindWebViewController.loadData(options);
+    }
+    destroy() {
+        this.params.delegate?.onBeforeDownload(undefined);
+        this.params.delegate?.onDownloadUpdated(undefined);
+        this.params.delegate?.onDownloadFinish(undefined);
+        this.params.delegate?.onDownloadFailed(undefined);
+        this.webComponentContent.dispose();
+    }
+}
+class UniWebViewElement extends UniViewElementImpl {
+    constructor() {
+        super(...arguments);
+        this.tagName = 'WEB-VIEW';
+        this.nodeName = 'WEB-VIEW';
+        this.uiContext = null;
+        this.nativeWebview = null;
+        this.nativeWebviewAttachedInvokers = [];
+        this.isNativeWebviewAttached = false;
+        this.lastScrollHeight = 0;
+        this.widthByAreaChange = 0;
+        this.heightByAreaChange = 0;
+        this.curOffsetY = 0;
+    }
+    getHarmonyController() {
+        return this.nativeWebview?.bindWebViewController?.controller ?? null;
+    }
+    setNativeWebView(nativeWebview) {
+        this.nativeWebview = nativeWebview;
+        if (!this.isNativeWebviewAttached) {
+            this.isNativeWebviewAttached = true;
+            this.nativeWebviewAttachedInvokers.forEach((cb) => cb());
+            this.nativeWebviewAttachedInvokers = [];
+        }
+    }
+    invokeNativeWebview(fn) {
+        if (this.isNativeWebviewAttached && this.nativeWebview != null) {
+            fn();
+        }
+        else {
+            this.nativeWebviewAttachedInvokers.push(fn);
+        }
+    }
+    back() {
+        this.invokeNativeWebview(() => {
+            this.nativeWebview?.back();
+        });
+    }
+    forward() {
+        this.invokeNativeWebview(() => {
+            this.nativeWebview?.forward();
+        });
+    }
+    reload() {
+        this.invokeNativeWebview(() => {
+            this.nativeWebview?.reload();
+        });
+    }
+    stop() {
+        this.invokeNativeWebview(() => {
+            this.nativeWebview?.stop();
+        });
+    }
+    evalJS(js) {
+        this.invokeNativeWebview(() => {
+            this.nativeWebview?.evalJS(js);
+        });
+    }
+    getContentHeight() {
+        return this.nativeWebview?.getContentHeight() ?? 0;
+    }
+    loadData(options) {
+        this.invokeNativeWebview(() => {
+            this.nativeWebview?.loadData(options);
+        });
+    }
+    awaitOnIdle() {
+        return new Promise((resolve) => {
+            const context = this.getUIContext();
+            if (context) {
+                context.postDelayedFrameCallback(new CustomFrameCallback(resolve), 50);
+            }
+            else {
+                setTimeout(resolve, 100);
+            }
+        });
+    }
+    getUIContext() {
+        if (this.uiContext)
+            return this.uiContext;
+        const mainWindow = getCurrentMP().window;
+        if (!mainWindow)
+            return null;
+        const uiContext = mainWindow.getUIContext();
+        if (!uiContext)
+            return null;
+        this.uiContext = uiContext;
+        return this.uiContext;
+    }
+    async webViewScrollSnapshot() {
+        return new Promise(async (resolve, reject) => {
+            this.lastScrollHeight = 0;
+            const controller = this.getHarmonyController();
+            const originOffsetY = this.curOffsetY;
+            const componentWidth = this.widthByAreaChange;
+            const componentHeight = this.heightByAreaChange;
+            const scrollHeight = componentHeight * 0.7;
+            const areaArray = [];
+            const scrollYOffsets = [];
+            controller.scrollTo(0, 0);
+            await this.awaitOnIdle();
+            this.webViewSnapCurrentScreen(scrollYOffsets, componentWidth, componentHeight, scrollHeight, areaArray, controller).then(async (pixelMap) => {
+                controller.scrollTo(0, originOffsetY);
+                await this.awaitOnIdle();
+                resolve(pixelMap);
+            }).catch((e) => {
+                reject(e);
+            });
+        });
+    }
+    async webViewSnapCurrentScreen(scrollYOffsets, componentWidth, componentHeight, scrollHeight, areaArray, controller) {
+        const componentId = this.nativeWebview?.id;
+        const curOffsetY = this.curOffsetY;
+        scrollYOffsets.push(curOffsetY);
+        await this.awaitOnIdle();
+        const pixelMap = await componentSnapshot.get(componentId);
+        const area = await getSnapshotArea(pixelMap, scrollYOffsets, componentWidth, componentHeight);
+        areaArray.push(area);
+        const totalScrollHeight = curOffsetY + componentHeight;
+        if (Math.ceil(totalScrollHeight) < controller.getPageHeight() && this.lastScrollHeight !== totalScrollHeight) {
+            this.lastScrollHeight = totalScrollHeight;
+            controller.scrollByWithResult(0, scrollHeight);
+            await this.awaitOnIdle();
+            return await this.webViewSnapCurrentScreen(scrollYOffsets, componentWidth, componentHeight, scrollHeight, areaArray, controller);
+        }
+        else {
+            return await mergeImage(areaArray, scrollYOffsets[scrollYOffsets.length - 1], componentWidth, componentHeight);
+        }
+    }
+    pixelMapToImgPath(context, format, pixelMap) {
+        return new Promise((resolve, reject) => {
+            const fileDir = context.tempDir;
+            const folderName = 'uni-snapshot';
+            const isDirExist = fs.accessSync(`${fileDir}/${folderName}`, fs.AccessModeType.WRITE);
+            if (!isDirExist) {
+                fs.mkdirSync(`${fileDir}/${folderName}`, true);
+            }
+            const file = fs.openSync(`${fileDir}/${folderName}/${Date.now()}.${format}`, fs.OpenMode.READ_WRITE | fs.OpenMode.CREATE);
+            const imagePackerApi = image__1.createImagePacker();
+            const packOpts = {
+                format: `image/${format}`,
+                quality: 100
+            };
+            imagePackerApi.packToFile(pixelMap, file.fd, packOpts, (err) => {
+                pixelMap.release();
+                if (err) {
+                    reject({
+                        message: 'pixelMapToImgPath fail'
+                    });
+                }
+                else {
+                    resolve(file.path);
+                }
+            });
+        });
+    }
+    takeSnapshot(options) {
+        const DEFAULT_TYPE = 'file';
+        const DEFAULT_FORMAT = 'png';
+        let type = options.type;
+        let format = options.format;
+        if (type !== DEFAULT_TYPE) {
+            type = DEFAULT_TYPE;
+        }
+        if (format !== DEFAULT_FORMAT) {
+            format = DEFAULT_FORMAT;
+        }
+        const controller = this.getHarmonyController();
+        if (controller) {
+            try {
+                this.webViewScrollSnapshot().then((imagePixelMap) => {
+                    if (type === DEFAULT_TYPE && imagePixelMap) {
+                        this.pixelMapToImgPath(getAbilityContext(), format, imagePixelMap).then((tempFilePath) => {
+                            const res = {
+                                tempFilePath
+                            };
+                            options.success?.(res);
+                            options.complete?.(res);
+                        }).catch((error) => {
+                            const err = {
+                                errMsg: `UniElement takeSnapshot fail: ${error.message}`
+                            };
+                            options.fail?.(err);
+                            options.complete?.(err);
+                        }).finally(() => {
+                            imagePixelMap.release();
+                        });
+                    }
+                }).catch((error) => {
+                    const err = {
+                        errMsg: `UniElement takeSnapshot fail: ${typeof error === 'number' ? error : error.message}`
+                    };
+                    options.fail?.(err);
+                    options.complete?.(err);
+                });
+            }
+            catch (err) {
+                if (err) {
+                    const takeSnapshotFail = {
+                        errMsg: err.message
+                    };
+                    options?.fail?.(takeSnapshotFail);
+                    options?.complete?.(takeSnapshotFail);
+                    return;
+                }
+            }
+        }
+    }
+    dispose() {
+        this.nativeWebview?.destroy();
+        this.nativeWebview = null;
+    }
+}
+const getWebViewContext = (id, component = null) => {
+    let webViewElement = null;
+    if (component == null) {
+        const pages = getCurrentPages();
+        if (pages.length > 0) {
+            const page = pages[pages.length - 1];
+            if (!page) {
+                UTS.console.error(`getCurrentPages is empty`);
+                return null;
+            }
+            webViewElement = page.vm.$el?.parentElement?.querySelector('#' + id);
+            if (webViewElement == null) {
+                const dialogPages = page.getDialogPages();
+                if (dialogPages.length > 0) {
+                    const topDialogPage = dialogPages[dialogPages.length - 1];
+                    if (!topDialogPage) {
+                        UTS.console.error(`getDialogPages is empty`);
+                        return null;
+                    }
+                    webViewElement = topDialogPage.vm.$el?.parentElement?.querySelector('#' + id);
+                }
+            }
+        }
+    }
+    else {
+        webViewElement = component.$el?.parentElement?.querySelector('#' + id);
+    }
+    if (webViewElement == null)
+        return null;
+    return new WebViewContextImpl(webViewElement);
+};
+const createWebViewContext = defineSyncApi('createWebViewContext', (id, component = null) => {
+    return getWebViewContext(id, component);
+});
+const createWebviewContext = defineSyncApi('createWebviewContext', (id, component = null) => {
+    return getWebViewContext(id, component);
+});
+class WebViewContextImpl {
+    constructor(webViewElement = null) {
+        this.webViewElement = null;
+        this.webViewElement = webViewElement;
+    }
+    back() {
+        this.webViewElement?.back();
+    }
+    forward() {
+        this.webViewElement?.forward();
+    }
+    reload() {
+        this.webViewElement?.reload();
+    }
+    stop() {
+        this.webViewElement?.stop();
+    }
+    evalJS(js) {
+        this.webViewElement?.evalJS(js);
+    }
+    getContentHeight() {
+        return this.webViewElement?.getContentHeight() ?? 0;
+    }
+    loadData(options) {
+        this.webViewElement?.loadData(options);
+    }
+}
+export { UniWebviewContextLoadDataOptions as UniWebviewContextLoadDataOptions, UniWebViewElementLoadDataOptions as UniWebViewElementLoadDataOptions, WebViewProgressStyles as WebViewProgressStyles, WebViewStyles as WebViewStyles };
+export { NativeWebView as NativeWebView };
+export { UniWebViewElement as UniWebViewElement };
+export { createWebViewContext as createWebViewContext };
+export { createWebviewContext as createWebviewContext };
+//# sourceMappingURL=index.js.mapÂšÙi hvigor_ignore__Applications_DevEco-Studio.app_Contents_sdk_default_openharmony_ets_api_@ohos.buffer.d.tsÙr hvigor_ignore__Applications_DevEco-Studio.app_Contents_sdk_default_openharmony_ets_api_@ohos.arkui.UIContext.d.tsÚ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@hnpaqqbd4i9bxcrp3ktun4a1gqv9ys2o5pljtcetlzk=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/modules/uni_modules/uni-web-view/utssdk/app-harmony/builder.etsÙz hvigor_ignore__Applications_DevEco-Studio.app_Contents_sdk_default_openharmony_ets_api_@ohos.arkui.componentSnapshot.d.tsÚ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@hnpaqqbd4i9bxcrp3ktun4a1gqv9ys2o5pljtcetlzk=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/modules/uni_modules/uni-web-view/utssdk/app-harmony/webview.etsÙj hvigor_ignore__Applications_DevEco-Studio.app_Contents_sdk_default_openharmony_ets_api_@ohos.file.fs.d.tsÙs hvigor_ignore__Applications_DevEco-Studio.app_Contents_sdk_default_openharmony_ets_api_@ohos.multimedia.image.d.tsÙî/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@hnpaqqbd4i9bxcrp3ktun4a1gqv9ys2o5pljtcetlzk=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/framework/index.etsÙg hvigor_ignore__Applications_DevEco-Studio.app_Contents_sdk_default_openharmony_ets_api_@ohos.util.d.tsÙn hvigor_ignore__Applications_DevEco-Studio.app_Contents_sdk_default_openharmony_ets_api_@ohos.web.webview.d.tsÚ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@hnpaqqbd4i9bxcrp3ktun4a1gqv9ys2o5pljtcetlzk=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/modules/uni_modules/uni-web-view/utssdk/app-harmony/index.etsÔrB˜±isLocalDependency¯isNodeEntryFile§pkgPath§pkgNameªpkgVersion±belongProjectPath±dependencyPkgInfo¬shouldEmitJsÂÂÙâ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@hnpaqqbd4i9bxcrp3ktun4a1gqv9ys2o5pljtcetlzk=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/modules¹@dcloudio/uni-app-modules¥1.0.0ÙL/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmonyÔrC’§pkgNameªpkgVersion¹@dcloudio/uni-app-modules¥1.0.0ÃÃÚvïimport buffer from '@ohos.buffer';
+import { BusinessError } from '@kit.BasicServicesKit';
+import { FrameCallback } from '@kit.ArkUI';
+import { buildWeb, TitleUpdateEvent, PostMessageToServiceEvent, LoadEvent, MessageEvent, LoadingEvent, DownloadEvent, ErrorEvent } from "./builder";
+import { componentSnapshot, FrameCallback as FrameCallback__1 } from '@kit.ArkUI';
+import { createDownloadDelegate } from "./webview";
+import { fileIo as fs } from '@kit.CoreFileKit';
+import { image as image__1 } from '@kit.ImageKit';
+import { image } from '@kit.ImageKit';
+import { string, UTSObject, ComponentPublicInstance, UTS, onLoad, onError, UniNativeViewEvent, UniNativeViewElement, UTSJSONObject, NavigateToOptions, NavigateBackOptions, SwitchTabOptions, ReLaunchOptions, RedirectToOptions, UniElement, UniViewElementImpl, getCurrentPages, UniPage, defineSyncApi } from "@dcloudio/uni-app-framework";
+import { uni, getCurrentMP, getAbilityContext } from "@dcloudio/uni-app-framework";
+import { util } from '@kit.ArkTS';
+import { webview } from '@kit.ArkWeb';
+class WebViewProgressStyles extends UTSObject {
+    color!: string.ColorString;
+}
+class WebViewStyles extends UTSObject {
+    progress!: WebViewProgressStyles | boolean;
+}
+class UniWebviewContextLoadDataOptions extends UTSObject {
+    data!: string;
+    baseURL: string | null = null;
+    mimeType: string | null = null;
+    encoding: string | null = null;
+}
+type UniWebViewContextLoadDataOptions = UniWebviewContextLoadDataOptions;
+class UniWebViewElementLoadDataOptions extends UTSObject {
+    data!: string;
+    baseURL: string | null = null;
+    mimeType: string | null = null;
+    encoding: string | null = null;
+}
+interface WebviewContext {
+    forward(): void;
+    back(): void;
+    reload(): void;
+    stop(): void;
+    evalJS(js: string): void;
+    getContentHeight(): number;
+    loadData(options: UniWebViewContextLoadDataOptions): void;
+}
+interface WebViewContext extends WebviewContext {
+}
+type CreateWebviewContext = (webviewId: string.WebviewIdString, component?: ComponentPublicInstance | null) => WebviewContext | null;
+type CreateWebViewContext = (webviewId: string.WebviewIdString, component?: ComponentPublicInstance | null) => WebViewContext | null;
+class CustomFrameCallback extends FrameCallback {
+    cb: () => void;
+    constructor(cb: () => void){
+        super();
+        this.cb = cb;
+    }
+    onIdle() {
+        this.cb();
+    }
+}
+async function getSnapshotArea(pixelMap: PixelMap, scrollYOffsets: number[], width: number, height: number): Promise<image.PositionArea> {
+    const stride = pixelMap.getBytesNumberPerRow();
+    const bytesNumber = pixelMap.getPixelBytesNumber();
+    const buffer: ArrayBuffer = new ArrayBuffer(bytesNumber);
+    const len = scrollYOffsets.length;
+    if (len >= 2) {
+        const realScrollHeight = scrollYOffsets[len - 1] - scrollYOffsets[len - 2];
+        if (height - realScrollHeight > 0) {
+            const cropRegion: image.Region = {
+                x: 0,
+                y: vp2px(height - realScrollHeight),
+                size: {
+                    height: vp2px(realScrollHeight),
+                    width: vp2px(width)
+                }
+            };
+            if (cropRegion.size.height == 0) {
+                return {
+                    pixels: buffer,
+                    offset: 0,
+                    stride: stride,
+                    region: {
+                        size: {
+                            width: 0,
+                            height: 0
+                        },
+                        x: 0,
+                        y: 0
+                    }
+                };
+            }
+            await pixelMap.crop(cropRegion);
+        }
+    }
+    const imgInfo = pixelMap.getImageInfoSync();
+    const area: image.PositionArea = {
+        pixels: buffer,
+        offset: 0,
+        stride: stride,
+        region: {
+            size: {
+                width: imgInfo.size.width,
+                height: imgInfo.size.height
+            },
+            x: 0,
+            y: 0
+        }
+    };
+    pixelMap.readPixelsSync(area);
+    return area;
+}
+async function mergeImage(areaArray: image.PositionArea[], lastOffsetY: number, listWidth: number, listHeight: number): Promise<PixelMap> {
+    const opts: image.InitializationOptions = {
+        editable: true,
+        pixelFormat: 4,
+        size: {
+            width: vp2px(listWidth),
+            height: Math.round(vp2px(lastOffsetY + listHeight))
+        }
+    };
+    const longPixelMap = image.createPixelMapSync(opts);
+    let imgPosition: number = 0;
+    for(let i = 0; i < areaArray.length; i++){
+        const readArea = areaArray[i];
+        const area: image.PositionArea = {
+            pixels: readArea.pixels,
+            offset: 0,
+            stride: readArea.stride,
+            region: {
+                size: {
+                    width: readArea.region.size.width,
+                    height: readArea.region.size.height
+                },
+                x: 0,
+                y: imgPosition
+            }
+        };
+        imgPosition += readArea.region.size.height;
+        longPixelMap.writePixelsSync(area);
+    }
+    return longPixelMap;
+}
+const BASE64_ENCODING = 'base64';
+class BindWebViewController {
+    private controllerAttachedInvokers: Array<() => void> = [];
+    isControllerAttached: boolean = false;
+    isPageEnd: boolean = false;
+    controller: webview.WebviewController = new webview.WebviewController();
+    constructor(){}
+    private invokeController(methodName: string, ...args: ESObject[]): ESObject {
+        if (this.isControllerAttached) {
+            return this.controller[methodName](...args);
+        } else {
+            this.controllerAttachedInvokers.push(()=>{
+                this.controller[methodName](...args);
+            });
+        }
+    }
+    onControllerAttached() {
+        if (!this.isControllerAttached) {
+            this.isControllerAttached = true;
+            this.controllerAttachedInvokers.forEach((cb)=>cb());
+            this.controllerAttachedInvokers = [];
+        }
+    }
+    onPageEnd() {
+        if (!this.isPageEnd) {
+            this.isPageEnd = true;
+        }
+    }
+    back() {
+        this.invokeController('backward');
+    }
+    forward() {
+        this.invokeController('forward');
+    }
+    reload() {
+        this.invokeController('refresh');
+    }
+    stop() {
+        this.invokeController('stop');
+    }
+    evalJS(js: string) {
+        this.invokeController('runJavaScript', js);
+    }
+    getContentHeight(): number {
+        return this.controller.getPageHeight();
+    }
+    canBack(): boolean {
+        return this.controller.accessBackward();
+    }
+    canForward(): boolean {
+        return this.controller.accessForward();
+    }
+    loadData(options: UniWebViewElementLoadDataOptions) {
+        let data = options.data;
+        let encoding = options?.encoding;
+        const baseURL = options?.baseURL ?? '';
+        if (encoding == null && baseURL.length === 0) {
+            try {
+                const htmlBytes = new util.TextEncoder().encodeInto(data);
+                const byteOffset = htmlBytes.byteOffset;
+                const byteLength = htmlBytes.byteLength;
+                const htmlBuffer = byteOffset == 0 && byteLength == htmlBytes.buffer.byteLength ? htmlBytes.buffer : htmlBytes.buffer.slice(byteOffset, byteOffset + byteLength);
+                data = buffer.from(htmlBuffer).toString(BASE64_ENCODING);
+                encoding = BASE64_ENCODING;
+            } catch (error) {
+                UTS.console.error('[WebView loadData] Failed to encode data to base64:', error);
+            }
+        }
+        if (encoding !== BASE64_ENCODING) {
+            data = data.replace(/#/g, '%23');
+        }
+        this.invokeController('loadData', data, options.mimeType ?? "text/html", encoding ?? "UTF-8", baseURL ?? '');
+    }
+}
+interface BuilderWebViewParams {
+    id?: string;
+    src?: string;
+    horizontalScrollBarAccess: boolean;
+    verticalScrollBarAccess: boolean;
+    bounces: boolean;
+    disableUserSelectMenu: boolean;
+    controller?: webview.WebviewController;
+    delegate?: webview.WebDownloadDelegate;
+    onMessage?: (event: MessageEvent) => void;
+    onTitleUpdate?: (event: TitleUpdateEvent) => void;
+    onPostMessageToService?: (event: PostMessageToServiceEvent) => void;
+    onContentHeightChange?: (contentHeight: number) => void;
+    onLoad?: (event: LoadEvent) => void;
+    onLoading?: (event: LoadingEvent) => void;
+    onDownload?: (event: DownloadEvent) => void;
+    onError?: (event: ErrorEvent) => void;
+    onControllerAttached?: () => void;
+    handleAreaChange?: (oldValue: Area, newValue: Area) => void;
+    handleScroll?: (event: OnScrollEvent) => void;
+}
+interface BuilderWebViewEvents {
+    onMessage?: (customEvent: UniNativeViewEvent) => void;
+    onLoad?: (customEvent: UniNativeViewEvent) => void;
+    onLoading?: (customEvent: UniNativeViewEvent) => void;
+    onDownload?: (customEvent: UniNativeViewEvent) => void;
+    onContentheightchange?: (customEvent: UniNativeViewEvent) => void;
+    onError?: (customEvent: UniNativeViewEvent) => void;
+}
+function capitalizeFirstLetter(str: string): string {
+    if (!str) return '';
+    const firstLetter = str.charAt(0).toUpperCase();
+    const restOfString = str.slice(1);
+    return firstLetter + restOfString;
+}
+class NativeWebView {
+    __v_skip: boolean = true;
+    private webviewElement: UniWebViewElement | undefined;
+    private element: UniNativeViewElement;
+    private params: BuilderWebViewParams = {
+        src: '',
+        horizontalScrollBarAccess: true,
+        verticalScrollBarAccess: true,
+        bounces: true,
+        disableUserSelectMenu: false
+    };
+    private events: BuilderWebViewEvents = {};
+    private webComponentContent: ComponentContent;
+    private lastPageHeight: number = 0;
+    id = `web_view_id_${Date.now()}_${Math.floor(Math.random() * 1000000)}`;
+    bindWebViewController: BindWebViewController = new BindWebViewController();
+    constructor(element: UniNativeViewElement, events: BuilderWebViewEvents = {}){
+        this.events = events;
+        this.element = element;
+        this.initParams();
+        this.element.bindHarmonyWrappedBuilder(wrapBuilder<[BuilderWebViewParams]>(buildWeb), this.params);
+        this.element.bindHarmonyController(this.bindWebViewController);
+        if (typeof this.element['getHarmonyComponentContent'] === 'function') {
+            this.webComponentContent = (this.element as ESObject).getHarmonyComponentContent() as ComponentContent;
+        } else {
+            this.webComponentContent = this.element.getHarmonyBuilderNode();
+        }
+        if (this.element.parentElement) {
+            this.webviewElement = this.element.parentElement as Object as UniWebViewElement;
+            this.webviewElement.setNativeWebView(this);
+        }
+    }
+    private dispatchEvent(type: string, event: UniNativeViewEvent) {
+        (this.events as ESObject)[`on${capitalizeFirstLetter(type)}`]?.(event);
+    }
+    private initParams() {
+        this.params.id = this.id;
+        this.params.delegate = createDownloadDelegate();
+        this.params.controller = this.bindWebViewController.controller;
+        this.params.onMessage = (event: MessageEvent)=>{
+            const detail = new UTSJSONObject();
+            detail.set('data', event.detail.data);
+            this.dispatchEvent('message', new UniNativeViewEvent("message", detail));
+        };
+        this.params.onTitleUpdate = (event: TitleUpdateEvent)=>{};
+        this.params.onPostMessageToService = (event: PostMessageToServiceEvent)=>{
+            const detail = event.detail;
+            const name = detail.args.data.name;
+            const arg: ESObject = detail.args.data.arg;
+            switch(name){
+                case 'navigateTo':
+                    uni.navigateTo({
+                        url: encodeURI(arg.url)
+                    } as NavigateToOptions);
+                    break;
+                case 'navigateBack':
+                    const delta = parseInt(arg.delta);
+                    uni.navigateBack({
+                        delta: !isNaN(delta) ? delta : 1
+                    } as NavigateBackOptions);
+                    break;
+                case 'switchTab':
+                    uni.switchTab({
+                        url: encodeURI(arg.url)
+                    } as SwitchTabOptions);
+                    break;
+                case 'reLaunch':
+                    uni.reLaunch({
+                        url: encodeURI(arg.url)
+                    } as ReLaunchOptions);
+                    break;
+                case 'redirectTo':
+                    uni.redirectTo({
+                        url: encodeURI(arg.url)
+                    } as RedirectToOptions);
+                    break;
+            }
+        };
+        this.params.onContentHeightChange = (contentHeight: number)=>{
+            this.lastPageHeight = contentHeight;
+            const detail = new UTSJSONObject();
+            detail.set('height', contentHeight);
+            this.dispatchEvent('contentheightchange', new UniNativeViewEvent("contentheightchange", detail));
+        };
+        this.params.onLoad = (event: LoadEvent)=>{
+            this.bindWebViewController.onPageEnd();
+            const detail = new UTSJSONObject();
+            detail.set('url', event.detail.url);
+            detail.set('src', event.detail.src);
+            this.dispatchEvent('load', new UniNativeViewEvent("load", detail));
+        };
+        this.params.onLoading = (event: LoadingEvent)=>{
+            const detail = new UTSJSONObject();
+            detail.set('url', event.detail.url);
+            detail.set('src', event.detail.src);
+            this.dispatchEvent('loading', new UniNativeViewEvent("loading", detail));
+        };
+        this.params.onDownload = (event: DownloadEvent)=>{
+            const detail = new UTSJSONObject();
+            detail.set('url', event.detail.url);
+            detail.set('userAgent', event.detail.userAgent);
+            detail.set('contentDisposition', event.detail.contentDisposition);
+            detail.set('mimetype', event.detail.mimetype);
+            detail.set('contentLength', event.detail.contentLength);
+            this.dispatchEvent('download', new UniNativeViewEvent("download", detail));
+        };
+        this.params.onError = (event: ErrorEvent)=>{
+            const detail = new UTSJSONObject();
+            detail.set('errSubject', event.detail.errSubject);
+            detail.set('errCode', event.detail.errCode);
+            detail.set('errMsg', event.detail.errMsg);
+            detail.set('url', event.detail.url);
+            detail.set('fullUrl', event.detail.fullUrl);
+            detail.set('src', event.detail.src);
+            this.dispatchEvent('error', new UniNativeViewEvent("error", detail));
+        };
+        this.params.onControllerAttached = ()=>{
+            this.bindWebViewController.onControllerAttached();
+        };
+        this.params.handleAreaChange = (_: Area, newValue: Area)=>{
+            if (this.webviewElement) {
+                this.webviewElement.widthByAreaChange = newValue.width as number;
+                this.webviewElement.heightByAreaChange = newValue.height as number;
+            }
+        };
+        this.params.handleScroll = (event)=>{
+            if (this.webviewElement) {
+                this.webviewElement.curOffsetY = event.yOffset;
+            }
+        };
+    }
+    setSrc(src: string | null = null) {
+        if (this.params.src !== src) {
+            this.params.src = src ?? '';
+            this.updateParams();
+        }
+    }
+    setWebViewStyles(webViewStyles: WebViewStyles | null = null) {}
+    setHorizontalScrollBarAccess(access: boolean) {
+        if (this.params.horizontalScrollBarAccess !== access) {
+            this.params.horizontalScrollBarAccess = access;
+            this.updateParams();
+        }
+    }
+    setVerticalScrollBarAccess(access: boolean) {
+        if (this.params.verticalScrollBarAccess !== access) {
+            this.params.verticalScrollBarAccess = access;
+            this.updateParams();
+        }
+    }
+    setBounces(bounces: boolean) {
+        if (this.params.bounces !== bounces) {
+            this.params.bounces = bounces;
+            this.updateParams();
+        }
+    }
+    setDisableUserSelectMenu(disableUserSelectMenu: boolean) {
+        if (this.params.disableUserSelectMenu !== disableUserSelectMenu) {
+            this.params.disableUserSelectMenu = disableUserSelectMenu;
+            this.updateParams();
+        }
+    }
+    private updateParams() {
+        this.webComponentContent.update(this.params);
+    }
+    back() {
+        this.bindWebViewController.back();
+    }
+    forward() {
+        this.bindWebViewController.forward();
+    }
+    reload() {
+        this.bindWebViewController.reload();
+    }
+    stop() {
+        this.bindWebViewController.stop();
+    }
+    evalJS(js: string) {
+        this.bindWebViewController.evalJS(js);
+    }
+    getContentHeight(): number {
+        const pageHeight = this.bindWebViewController.getContentHeight();
+        if (this.lastPageHeight === 0 && this.lastPageHeight !== pageHeight) {
+            return pageHeight;
+        }
+        return this.lastPageHeight;
+    }
+    loadData(options: UniWebViewElementLoadDataOptions) {
+        this.bindWebViewController.loadData(options);
+    }
+    destroy() {
+        this.params.delegate?.onBeforeDownload(undefined);
+        this.params.delegate?.onDownloadUpdated(undefined);
+        this.params.delegate?.onDownloadFinish(undefined);
+        this.params.delegate?.onDownloadFailed(undefined);
+        this.webComponentContent.dispose();
+    }
+}
+interface IUniWebViewElement extends UniElement {
+    back(): void;
+    forward(): void;
+    reload(): void;
+    stop(): void;
+    evalJS(js: string): void;
+    getContentHeight(): number;
+    loadData(options: UniWebViewElementLoadDataOptions): void;
+}
+interface TakeSnapshotSuccess {
+    tempFilePath: string;
+}
+interface TakeSnapshotFail {
+    errMsg: string;
+}
+interface TakeSnapshotOptions {
+    type?: string;
+    format?: string;
+    success?: (res: TakeSnapshotSuccess) => void;
+    fail?: (err: TakeSnapshotFail) => void;
+    complete?: (res: ESObject) => void;
+}
+class UniWebViewElement extends UniViewElementImpl implements IUniWebViewElement {
+    tagName: string = 'WEB-VIEW';
+    nodeName: string = 'WEB-VIEW';
+    private uiContext: UIContext | null = null;
+    private nativeWebview: NativeWebView | null = null;
+    private nativeWebviewAttachedInvokers: Array<() => void> = [];
+    private isNativeWebviewAttached: boolean = false;
+    private lastScrollHeight: number = 0;
+    widthByAreaChange: number = 0;
+    heightByAreaChange: number = 0;
+    curOffsetY: number = 0;
+    getHarmonyController(): webview.WebviewController | null {
+        return this.nativeWebview?.bindWebViewController?.controller ?? null;
+    }
+    setNativeWebView(nativeWebview: NativeWebView) {
+        this.nativeWebview = nativeWebview;
+        if (!this.isNativeWebviewAttached) {
+            this.isNativeWebviewAttached = true;
+            this.nativeWebviewAttachedInvokers.forEach((cb)=>cb());
+            this.nativeWebviewAttachedInvokers = [];
+        }
+    }
+    private invokeNativeWebview(fn: () => void) {
+        if (this.isNativeWebviewAttached && this.nativeWebview != null) {
+            fn();
+        } else {
+            this.nativeWebviewAttachedInvokers.push(fn);
+        }
+    }
+    back() {
+        this.invokeNativeWebview(()=>{
+            this.nativeWebview?.back();
+        });
+    }
+    forward() {
+        this.invokeNativeWebview(()=>{
+            this.nativeWebview?.forward();
+        });
+    }
+    reload() {
+        this.invokeNativeWebview(()=>{
+            this.nativeWebview?.reload();
+        });
+    }
+    stop() {
+        this.invokeNativeWebview(()=>{
+            this.nativeWebview?.stop();
+        });
+    }
+    evalJS(js: string) {
+        this.invokeNativeWebview(()=>{
+            this.nativeWebview?.evalJS(js);
+        });
+    }
+    getContentHeight(): number {
+        return this.nativeWebview?.getContentHeight() ?? 0;
+    }
+    loadData(options: UniWebViewElementLoadDataOptions) {
+        this.invokeNativeWebview(()=>{
+            this.nativeWebview?.loadData(options);
+        });
+    }
+    private awaitOnIdle(): Promise<void> {
+        return new Promise((resolve)=>{
+            const context = this.getUIContext();
+            if (context) {
+                context.postDelayedFrameCallback(new CustomFrameCallback(resolve as () => void) as FrameCallback__1, 50);
+            } else {
+                setTimeout(resolve, 100);
+            }
+        });
+    }
+    private getUIContext(): UIContext | null {
+        if (this.uiContext) return this.uiContext;
+        const mainWindow = getCurrentMP().window;
+        if (!mainWindow) return null;
+        const uiContext = mainWindow.getUIContext();
+        if (!uiContext) return null;
+        this.uiContext = uiContext;
+        return this.uiContext;
+    }
+    private async webViewScrollSnapshot(): Promise<PixelMap> {
+        return new Promise(async (resolve, reject)=>{
+            this.lastScrollHeight = 0;
+            const controller: webview.WebviewController = this.getHarmonyController() as webview.WebviewController;
+            const originOffsetY: number = this.curOffsetY;
+            const componentWidth: number = this.widthByAreaChange;
+            const componentHeight: number = this.heightByAreaChange;
+            const scrollHeight: number = componentHeight * 0.7;
+            const areaArray: image__1.PositionArea[] = [];
+            const scrollYOffsets: number[] = [];
+            controller.scrollTo(0, 0);
+            await this.awaitOnIdle();
+            this.webViewSnapCurrentScreen(scrollYOffsets, componentWidth, componentHeight, scrollHeight, areaArray, controller).then(async (pixelMap: PixelMap)=>{
+                controller.scrollTo(0, originOffsetY);
+                await this.awaitOnIdle();
+                resolve(pixelMap);
+            }).catch((e: BusinessError)=>{
+                reject(e);
+            });
+        }) as Promise<PixelMap>;
+    }
+    private async webViewSnapCurrentScreen(scrollYOffsets: number[], componentWidth: number, componentHeight: number, scrollHeight: number, areaArray: image__1.PositionArea[], controller: webview.WebviewController): Promise<PixelMap> {
+        const componentId = this.nativeWebview?.id;
+        const curOffsetY: number = this.curOffsetY;
+        scrollYOffsets.push(curOffsetY);
+        await this.awaitOnIdle();
+        const pixelMap: PixelMap = await componentSnapshot.get(componentId)!;
+        const area: image__1.PositionArea = await getSnapshotArea(pixelMap, scrollYOffsets, componentWidth, componentHeight);
+        areaArray.push(area);
+        const totalScrollHeight = curOffsetY + componentHeight;
+        if (Math.ceil(totalScrollHeight) < controller.getPageHeight() && this.lastScrollHeight !== totalScrollHeight) {
+            this.lastScrollHeight = totalScrollHeight;
+            controller.scrollByWithResult(0, scrollHeight);
+            await this.awaitOnIdle();
+            return await this.webViewSnapCurrentScreen(scrollYOffsets, componentWidth, componentHeight, scrollHeight, areaArray, controller);
+        } else {
+            return await mergeImage(areaArray, scrollYOffsets[scrollYOffsets.length - 1], componentWidth, componentHeight);
+        }
+    }
+    private pixelMapToImgPath(context: Context, format: string, pixelMap: image__1.PixelMap): Promise<string> {
+        return new Promise((resolve, reject)=>{
+            const fileDir = context.tempDir;
+            const folderName = 'uni-snapshot';
+            const isDirExist = fs.accessSync(`${fileDir}/${folderName}`, fs.AccessModeType.WRITE);
+            if (!isDirExist) {
+                fs.mkdirSync(`${fileDir}/${folderName}`, true);
+            }
+            const file = fs.openSync(`${fileDir}/${folderName}/${Date.now()}.${format}`, fs.OpenMode.READ_WRITE | fs.OpenMode.CREATE);
+            const imagePackerApi = image__1.createImagePacker();
+            const packOpts: image__1.PackingOption = {
+                format: `image/${format}`,
+                quality: 100
+            };
+            imagePackerApi.packToFile(pixelMap, file.fd, packOpts, (err)=>{
+                pixelMap.release();
+                if (err) {
+                    reject({
+                        message: 'pixelMapToImgPath fail'
+                    } as BusinessError);
+                } else {
+                    resolve(file.path);
+                }
+            });
+        });
+    }
+    takeSnapshot(options: TakeSnapshotOptions) {
+        const DEFAULT_TYPE = 'file';
+        const DEFAULT_FORMAT = 'png';
+        let type = options.type!;
+        let format = options.format!;
+        if (type !== DEFAULT_TYPE) {
+            type = DEFAULT_TYPE;
+        }
+        if (format !== DEFAULT_FORMAT) {
+            format = DEFAULT_FORMAT;
+        }
+        const controller = this.getHarmonyController();
+        if (controller) {
+            try {
+                this.webViewScrollSnapshot().then((imagePixelMap: PixelMap)=>{
+                    if (type === DEFAULT_TYPE && imagePixelMap) {
+                        this.pixelMapToImgPath(getAbilityContext(), format, imagePixelMap).then((tempFilePath: string)=>{
+                            const res: TakeSnapshotSuccess = {
+                                tempFilePath
+                            };
+                            options.success?.(res);
+                            options.complete?.(res);
+                        }).catch((error: BusinessError)=>{
+                            const err: TakeSnapshotFail = {
+                                errMsg: `UniElement takeSnapshot fail: ${error.message}`
+                            };
+                            options.fail?.(err);
+                            options.complete?.(err);
+                        }).finally(()=>{
+                            imagePixelMap.release();
+                        });
+                    }
+                }).catch((error: BusinessError | number)=>{
+                    const err: TakeSnapshotFail = {
+                        errMsg: `UniElement takeSnapshot fail: ${typeof error === 'number' ? error : error.message}`
+                    };
+                    options.fail?.(err);
+                    options.complete?.(err);
+                });
+            } catch (err) {
+                if (err) {
+                    const takeSnapshotFail: TakeSnapshotFail = {
+                        errMsg: (err as BusinessError).message
+                    };
+                    options?.fail?.(takeSnapshotFail);
+                    options?.complete?.(takeSnapshotFail);
+                    return;
+                }
+            }
+        }
+    }
+    dispose() {
+        this.nativeWebview?.destroy();
+        this.nativeWebview = null;
+    }
+}
+const getWebViewContext = (id: string, component: ComponentPublicInstance | null = null): WebViewContext | null =>{
+    let webViewElement: UniWebViewElement | null | undefined = null;
+    if (component == null) {
+        const pages = getCurrentPages() as UniPage[];
+        if (pages.length > 0) {
+            const page = pages[pages.length - 1];
+            if (!page) {
+                UTS.console.error(`getCurrentPages is empty`);
+                return null;
+            }
+            webViewElement = ((page.vm as ESObject).$el as UniElement)?.parentElement?.querySelector('#' + id) as UniWebViewElement;
+            if (webViewElement == null) {
+                const dialogPages = page.getDialogPages() as UniPage[];
+                if (dialogPages.length > 0) {
+                    const topDialogPage = dialogPages[dialogPages.length - 1];
+                    if (!topDialogPage) {
+                        UTS.console.error(`getDialogPages is empty`);
+                        return null;
+                    }
+                    webViewElement = ((topDialogPage.vm as ESObject).$el as UniElement)?.parentElement?.querySelector('#' + id) as Object as UniWebViewElement;
+                }
+            }
+        }
+    } else {
+        webViewElement = (component.$el as UniElement)?.parentElement?.querySelector('#' + id) as Object as UniWebViewElement;
+    }
+    if (webViewElement == null) return null;
+    return new WebViewContextImpl(webViewElement);
+};
+const createWebViewContext: CreateWebViewContext = defineSyncApi<WebViewContext | null>('createWebViewContext', (id: string, component: ComponentPublicInstance | null = null): WebViewContext | null =>{
+    return getWebViewContext(id, component);
+}) as CreateWebViewContext;
+const createWebviewContext: CreateWebviewContext = defineSyncApi<WebviewContext | null>('createWebviewContext', (id: string, component: ComponentPublicInstance | null = null): WebviewContext | null =>{
+    return getWebViewContext(id, component) as WebviewContext | null;
+}) as CreateWebviewContext;
+class WebViewContextImpl implements WebViewContext {
+    private webViewElement?: UniWebViewElement | null = null;
+    constructor(webViewElement: UniWebViewElement | null = null){
+        this.webViewElement = webViewElement;
+    }
+    back() {
+        this.webViewElement?.back();
+    }
+    forward() {
+        this.webViewElement?.forward();
+    }
+    reload() {
+        this.webViewElement?.reload();
+    }
+    stop() {
+        this.webViewElement?.stop();
+    }
+    evalJS(js: string) {
+        this.webViewElement?.evalJS(js);
+    }
+    getContentHeight(): number {
+        return this.webViewElement?.getContentHeight() ?? 0;
+    }
+    loadData(options: UniWebViewContextLoadDataOptions) {
+        this.webViewElement?.loadData(options as UniWebViewElementLoadDataOptions);
+    }
+}
+export { CreateWebViewContext as CreateWebViewContext, CreateWebviewContext as CreateWebviewContext, UniWebviewContextLoadDataOptions as UniWebviewContextLoadDataOptions, UniWebViewContextLoadDataOptions as UniWebViewContextLoadDataOptions, UniWebViewElementLoadDataOptions as UniWebViewElementLoadDataOptions, WebViewProgressStyles as WebViewProgressStyles, WebViewStyles as WebViewStyles, WebViewContext as WebViewContext, WebviewContext as WebviewContext };
+export { NativeWebView as NativeWebView };
+export { UniWebViewElement as UniWebViewElement };
+export { createWebViewContext as createWebViewContext };
+export { createWebviewContext as createWebviewContext };
+ÀÔrDš¬@ohos.bufferµ@ohos.arkui.UIContext½@ohos.arkui.componentSnapshot­@ohos.file.fs¶@ohos.multimedia.imageª@ohos.util±@ohos.web.webview©./webview©./builder»@dcloudio/uni-app-frameworkÔrE—ªassertions¨external¢id¤meta±moduleSideEffectsªresolvedByµsyntheticNamedExportsAÃÙi hvigor_ignore__Applications_DevEco-Studio.app_Contents_sdk_default_openharmony_ets_api_@ohos.buffer.d.tsAÃªoh-resolveÂEAÃÙr hvigor_ignore__Applications_DevEco-Studio.app_Contents_sdk_default_openharmony_ets_api_@ohos.arkui.UIContext.d.tsAÃªoh-resolveÂEAÃÙz hvigor_ignore__Applications_DevEco-Studio.app_Contents_sdk_default_openharmony_ets_api_@ohos.arkui.componentSnapshot.d.tsAÃªoh-resolveÂEAÃÙj hvigor_ignore__Applications_DevEco-Studio.app_Contents_sdk_default_openharmony_ets_api_@ohos.file.fs.d.tsAÃªoh-resolveÂEAÃÙs hvigor_ignore__Applications_DevEco-Studio.app_Contents_sdk_default_openharmony_ets_api_@ohos.multimedia.image.d.tsAÃªoh-resolveÂEAÃÙg hvigor_ignore__Applications_DevEco-Studio.app_Contents_sdk_default_openharmony_ets_api_@ohos.util.d.tsAÃªoh-resolveÂEAÃÙn hvigor_ignore__Applications_DevEco-Studio.app_Contents_sdk_default_openharmony_ets_api_@ohos.web.webview.d.tsAÃªoh-resolveÂEAÂÚ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@hnpaqqbd4i9bxcrp3ktun4a1gqv9ys2o5pljtcetlzk=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/modules/uni_modules/uni-web-view/utssdk/app-harmony/webview.etsAÃªoh-resolveÂEAÂÚ/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@hnpaqqbd4i9bxcrp3ktun4a1gqv9ys2o5pljtcetlzk=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/modules/uni_modules/uni-web-view/utssdk/app-harmony/builder.etsAÃªoh-resolveÂEAÂÙî/Users/chenqi/Documents/chenqi-front/unibestX/unpackage/dist/dev/app-harmony/oh_modules/.ohpm/@dcloudio+uni-app-x-runtime@hnpaqqbd4i9bxcrp3ktun4a1gqv9ys2o5pljtcetlzk=/oh_modules/@dcloudio/uni-app-x-runtime/src/main/ets/framework/index.etsAÃªoh-resolveÂ“ÔrF–§version¤fileªsourceRoot§sources¥names¨mappings¨index.js ‘©index.etsÜ­–”    ”  ”  ”  ”!  !”"  "˜”   ” 	”	 	” ” ” ”5 *”6 +˜”   ” ”	 	” ” Ì‚” Ìˆ”$ Ì“”% Ì”–”   ” 	” ” ÌE”= ÌQ”> ÌR˜”   ” ”	 	” ”! !”' '”2 2”3 3–”   ” ”	 ” ” /” 0–”   ” ” ” "”- 1”. 2–”   ” 	” ” ”* %”+ &Ü ”  	 ” 	”	 	” 	” 	5” 	8” 	ÌK”+ 	Ì]”- 	Ìu”: 	Ì‚”< 	Ìî”ÌN 	Í ”ÌP 	Í”Ì_ 	Í”Ìa 	Í”Ìn 	Í)”Ìp 	Í+”Ìv 	Í1”Ì“ 	ÍN”Ì” 	ÍOœ”  
+ ” 
+”	 
+	” 
+” 
+” 
+” 
+”- 
+-”/ 
+/”5 
+5”ÌR 
+ÌR”ÌS 
+ÌS–”   ” 	” ” ” !” "–”   ” 	” ” ”' %”( &•”   ” ” ”$ $”- -‘” •”   ” ” ” ”% %‘” •”   ” ”& '”/ /”8 8‘”  •” ” ” ” !” "•” ” ” ” "” #•” ” ” ” "” #’”  ” ‘” •”   ” ”& '”/ /”8 8‘”  •” ” ” ” !” "•” ” ” ” "” #•” ” ” ” "” #’”  ” ‘” •”  - ” -” -”" -"”/ -/“” /” /” /”” 0” 0” 0” 0—” 1” 1” 1” 1” 1” 1” 1’” 2” 2’” 3”
+ 3
+–” 4” 4” 4” 4” 4” 4’” 5” 5‘” 6œ”  7 ” 7” 7” 7” 7”' 71”) 73”7 7ÌK”9 7ÌM”> 7ÌZ”Ì@ 7Ì\”ÌF 7Ìj™” 8”
+ 8
+” 8” 8” 8” 8”0 80”2 82”3 83™” 9”
+ 9
+” 9” 9”  9 ”! 9!”4 94”6 96”7 97š” :”
+ :
+” :” : ” :$”" :/”# :0”. :;”/ :<”0 :=˜” ;”
+ ;
+” ;” ;” ;” ;”% ;%”& ;&–” <” <” <” <” <” <Ü ” =” =” =”! =!”/ =/”0 =0”3 =3”6 =6”7 =7”8 =8”; =;”ÌI =ÌI”ÌJ =ÌJ”ÌM =ÌM”ÌP =ÌP”ÌQ =ÌQ”ÌR =ÌR”ÌS =ÌS˜” >” >” >” >”% >%”( >(”) >)”+ >+”” ?” ?” ?” ?-”” Ì@” Ì@” Ì@” Ì@™” ÌA” ÌA” ÌA” ÌA” ÌA” ÌA”" ÌA"”2 ÌA2”3 ÌA3“” ÌB” ÌB” ÌB—” ÌC” ÌC” ÌC”! ÌC!”" ÌC"”2 ÌC2”3 ÌC3—” ÌD” ÌD” ÌD”  ÌD ”! ÌD!”& ÌD&”' ÌD'‘” ÌE’” ÌF” ÌFš” ÌG” ÌG” ÌG” ÌG” ÌG”  ÌG ”& ÌG&”* ÌG*”+ ÌG+”- ÌG-’” ÌH” ÌH”” ÌI” ÌI” ÌI”" ÌI"”” ÌJ” ÌJ” ÌJ” ÌJ”” ÌK” ÌK” ÌK”" ÌK"“” ÌL” ÌL” ÌL“” ÌM” ÌM” ÌM”” ÌN”! ÌN!”# ÌN#”$ ÌN$”” ÌO”" ÌO"”$ ÌO$”% ÌO%‘” ÌP”” ÌQ” ÌQ” ÌQ” ÌQ”” ÌR” ÌR” ÌR” ÌR‘” ÌS’” ÌT” ÌT‘” ÌU™” ÌV” ÌV” ÌV” ÌV” ÌV”  ÌV ”* ÌV*”+ ÌV+”, ÌV,‘”	 ÌW	‘” ÌX™” ÌY”
+ ÌY
+” ÌY” ÌY” ÌY” ÌY”- ÌY-”/ ÌY/”0 ÌY0”” ÌZ”
+ ÌZ
+” ÌZ” ÌZ%”” Ì[” Ì[” Ì[” Ì[”” Ì\” Ì\” Ì\” Ì\”” Ì]” Ì]” Ì]” Ì]“” Ì^” Ì^” Ì^“” Ì_” Ì_” Ì_˜” Ì`” Ì`” Ì`” Ì`” Ì`”# Ì`#”$ Ì`$”) Ì`)˜” Ìa” Ìa” Ìa” Ìa”  Ìa ”$ Ìa$”% Ìa%”+ Ìa+‘” Ìb”” Ìc” Ìc” Ìc” Ìc”” Ìd” Ìd” Ìd” Ìd‘”	 Ìe	’” Ìf” Ìf˜” Ìg” Ìg” Ìg” Ìg” Ìg”  Ìg ”! Ìg!”" Ìg"”” Ìh” Ìh” Ìh” Ìh’”  Ìi ” Ìiœ”  Ìj ” Ìj” Ìj” Ìj” Ìj”# Ìj9”% Ìj;”0 ÌjÌN”2 ÌjÌP”; ÌjÌa”= ÌjÌc”ÌG ÌjÌu”” Ìk”
+ Ìk
+” Ìk” Ìk.”” Ìl” Ìl” Ìl” Ìl”” Ìm” Ìm” Ìm” Ìm“” Ìn” Ìn” Ìn—” Ìo” Ìo” Ìo” Ìo” Ìo”" Ìo"”# Ìo#” Ìp” Ìp” Ìp” Ìp” Ìp” Ìp” Ìp”$ Ìp$”% Ìp%”0 Ìp0”3 Ìp3”= Ìp=”> Ìp>”? Ìp?‘”	 Ìq	’” Ìr” Ìr›” Ìs”
+ Ìs
+” Ìs” Ìs” Ìs” Ìs”1 Ìs1”2 Ìs2”6 Ìs6”7 Ìs7”8 Ìs8–” Ìt” Ìt” Ìt” Ìt” Ìt” Ìt Ü ” Ìu”	 Ìu” Ìu” Ìu” Ìu” Ìu” Ìu” Ìu” Ìu”! Ìu ”" Ìu!”( Ìu'”* Ìu)”+ Ìu*”- Ìu,”/ Ìu-™” Ìv” Ìv” Ìv” Ìv”" Ìv"”# Ìv#”$ Ìv$”% Ìv%”& Ìv&”” Ìw” Ìw” Ìw” Ìw)–” Ìx” Ìx” Ìx” Ìx” Ìx”# Ìx#”” Ìy” Ìy” Ìy” Ìy–” Ìz” Ìz” Ìz” Ìz” Ìz”# Ìz#“” Ì{” Ì{” Ì{“” Ì|” Ì|” Ì|š” Ì}” Ì}” Ì}”# Ì}#”$ Ì}$”* Ì}*”+ Ì}+”/ Ì}/”0 Ì}0”5 Ì}5š” Ì~” Ì~” Ì~”$ Ì~$”% Ì~%”+ Ì~+”, Ì~,”0 Ì~0”1 Ì~1”7 Ì~7‘” Ì”” Ì€” Ì€” Ì€” Ì€”” Ì” Ì” Ì” Ì‘” Ì‚’”	 Ìƒ	”
+ Ìƒ
+›” Ì„” Ì„” Ì„” Ì„”  Ì„ ”& Ì„&”' Ì„'”+ Ì„+”, Ì„,”2 Ì„2”3 Ì„3˜” Ì…” Ì…” Ì…”$ Ì…$”% Ì…%”) Ì…)”* Ì…*”+ Ì…+‘” Ì†”” Ì‡” Ì‡” Ì‡” Ì‡’”  Ìˆ ” Ìˆ–”  Ì‰ ” Ì‰” Ì‰” Ì‰”  Ì‰ ”! Ì‰!“”  ÌŠ ” ÌŠ” ÌŠ‘” Ì•” Ì‹”' Ì‹&”* Ì‹<”, Ì‹>”- Ì‹?•” ÌŒ”! ÌŒ”$ ÌŒ$”) ÌŒ)”* ÌŒ*•” Ì” Ì” Ì” Ì” Ì™” Ì” Ì” Ì,” Ì0”% Ì7”& Ì8”7 ÌÌI”9 ÌÌK”: ÌÌL’” Ì” Ì—” Ì” Ì” Ì” Ì/”! Ì1”$ Ì4”( ÌÌD–” Ì‘” Ì‘” Ì‘” Ì‘”% Ì‘%”' Ì‘'” Ì’” Ì’” Ì’” Ì’”" Ì’"”# Ì’#”- Ì’-”. Ì’.”/ Ì’/”2 Ì’2”6 Ì’6”7 Ì’7”8 Ì’8‘”	 Ì“	‘” Ì“™” Ì”” Ì”” Ì””+ Ì”+”, Ì”,”0 Ì”0”1 Ì”1”4 Ì”3”6 Ì”5œ” Ì•” Ì•” Ì•” Ì•”  Ì• ”* Ì•*”+ Ì•+”, Ì•,”/ Ì•/”3 Ì•3”4 Ì•4”5 Ì•5”” Ì–” Ì–” Ì–” Ì–‘”	 Ì—	’” Ì˜” Ì˜’” Ì™” Ì™—” Ìš” Ìš” Ìš” Ìš” Ìš”& Ìš&”( Ìš(—” Ì›” Ì›” Ì›”% Ì›%”( Ì›(”, Ì›,”- Ì›-Ü ” Ìœ” Ìœ” Ìœ”+ Ìœ+”, Ìœ,”3 Ìœ3”4 Ìœ4”5 Ìœ5”7 Ìœ7”9 Ìœ8”; Ìœ:”< Ìœ:”> Ìœ<”Ì@ Ìœ>”ÌA Ìœ?”ÌB ÌœÌ@—” Ì” Ì” Ì”+ Ì+”. Ì.”0 Ì0”1 Ì1‘”	 Ì	’” ÌŸ” ÌŸ’” Ì ” Ì —” Ì¡” Ì¡” Ì¡” Ì¡” Ì¡” Ì¡” Ì¡—” Ì¢” Ì¢” Ì¢” Ì¢” Ì¢”! Ì¢!”" Ì¢"‘”	 Ì£	’” Ì¤” Ì¤’” Ì¥” Ì¥˜” Ì¦” Ì¦” Ì¦” Ì¦” Ì¦”( Ì¦(”) Ì¦)”* Ì¦*’” Ì§” Ì§’” Ì¨” Ì¨˜” Ì©” Ì©” Ì©” Ì©” Ì©”' Ì©'”( Ì©(”) Ì©)’” Ìª” Ìª’” Ì«”
+ Ì«
+˜” Ì¬” Ì¬” Ì¬” Ì¬” Ì¬”' Ì¬'”( Ì¬(”) Ì¬)’” Ì­” Ì­’” Ì®” Ì®˜” Ì¯” Ì¯” Ì¯” Ì¯” Ì¯”$ Ì¯$”% Ì¯%”& Ì¯&’” Ì°” Ì°”” Ì±”
+ Ì±
+” Ì±” Ì±š” Ì²” Ì²” Ì²” Ì²” Ì²”- Ì²-”/ Ì²/”1 Ì²1”2 Ì²2”3 Ì²3’” Ì³” Ì³’” Ì´” Ì´™” Ìµ” Ìµ” Ìµ” Ìµ” Ìµ” Ìµ”, Ìµ,”. Ìµ.”/ Ìµ/’” Ì¶” Ì¶’” Ì·” Ì·™” Ì¸” Ì¸” Ì¸” Ì¸” Ì¸” Ì¸”- Ì¸-”/ Ì¸/”0 Ì¸0’” Ì¹” Ì¹’” Ìº” Ìº™” Ì»” Ì»” Ì»” Ì»” Ì»” Ì»”, Ì»,”. Ì».”/ Ì»/’” Ì¼” Ì¼”” Ì½” Ì½” Ì½” Ì½6˜” Ì¾” Ì¾” Ì¾” Ì¾” Ì¾” Ì¾” Ì¾”  Ì¾ ˜” Ì¿” Ì¿” Ì¿” Ì¿” Ì¿”  Ì¿ ”( Ì¿(”) Ì¿)š” ÌÀ” ÌÀ” ÌÀ” ÌÀ” ÌÀ”! ÌÀ!”( ÌÀ(”, ÌÀ,”. ÌÀ.”/ ÌÀ/œ” ÌÁ” ÌÁ” ÌÁ” ÌÁ” ÌÁ”  ÌÁ ”' ÌÁ'”( ÌÁ(”. ÌÁ.”3 ÌÁ3”4 ÌÁ4”6 ÌÁ6’” ÌÂ” ÌÂŸ” ÌÃ” ÌÃ” ÌÃ”" ÌÃ"”& ÌÃ&”* ÌÃ*”+ ÌÃ+”6 ÌÃ6”8 ÌÃ8”9 ÌÃ9”ÌC ÌÃÌC”ÌD ÌÃÌD”ÌH ÌÃÌH”ÌI ÌÃÌI”ÌJ ÌÃÌJ˜” ÌÄ” ÌÄ”  ÌÄ ”# ÌÄ#”, ÌÄ,”- ÌÄ-”7 ÌÄ7”8 ÌÄ8˜” ÌÅ” ÌÅ”  ÌÅ ”# ÌÅ#”, ÌÅ,”- ÌÅ-”7 ÌÅ7”8 ÌÅ8Ü %” ÌÆ” ÌÆ”  ÌÆ ”# ÌÆ#”- ÌÆ-”1 ÌÆ1”2 ÌÆ2”6 ÌÆ6”Ì@ ÌÆÌ@”ÌD ÌÆÌD”ÌM ÌÆÌM”ÌN ÌÆÌN”ÌT ÌÆÌT”ÌU ÌÆÌU”Ì_ ÌÆÌ_”Ì` ÌÆÌ`”Ìa ÌÆÌa”Ìb ÌÆÌb”Ìk ÌÆÌk”Ìl ÌÆÌl”Ìr ÌÆÌr”Ìs ÌÆÌs”Ìt ÌÆÌt”Ìu ÌÆÌu”Ì~ ÌÆÌ~”Ì ÌÆÌ”Ì… ÌÆÌ…”Ì† ÌÆÌ†”Ì‹ ÌÆÌ‹”ÌŒ ÌÆÌŒ”Ì– ÌÆÌ–”Ì˜ ÌÆÌ˜”Ì¢ ÌÆÌ¢”Ì¥ ÌÆÌ¥”Ì¯ ÌÆÌ¯”Ì° ÌÆÌ°”Ì± ÌÆÌ±Ÿ” ÌÇ” ÌÇ” ÌÇ” ÌÇ” ÌÇ”" ÌÇ"”# ÌÇ#”- ÌÇ-”. ÌÇ.”/ ÌÇ/”7 ÌÇ7”8 ÌÇ8”ÌG ÌÇÌG”ÌH ÌÇÌH”ÌI ÌÇÌI•” ÌÈ” ÌÈ” ÌÈ”* ÌÈ*”+ ÌÈ+‘” ÌÉ”” ÌÉ” ÌÉ” ÌÉ” ÌÉœ” ÌÊ” ÌÊ” ÌÊ” ÌÊ” ÌÊ”! ÌÊ!”" ÌÊ"”ÌW ÌÊÌW”ÌY ÌÊÌY”Ì^ ÌÊÌ^”Ì_ ÌÊÌ_”Ì` ÌÊÌ`‘” ÌË‘”	 ÌÌ	–” ÌÍ” ÌÍ” ÌÍ” ÌÍ”( ÌÍ(”* ÌÍ*œ” ÌÎ” ÌÎ” ÌÎ” ÌÎ” ÌÎ” ÌÎ”  ÌÎ ”$ ÌÎ$”& ÌÎ&”+ ÌÎ+”, ÌÎ,”- ÌÎ-‘”	 ÌÏ	Ü ” ÌĞ” ÌĞ” ÌĞ” ÌĞ” ÌĞ”( ÌĞ(”* ÌĞ*”. ÌĞ.”0 ÌĞ0”7 ÌĞ7”8 ÌĞ8”Ì@ ÌĞÌ@”ÌD ÌĞÌD”ÌO ÌĞÌO”ÌQ ÌĞÌQ”ÌY ÌĞÌY”Ì] ÌĞÌ]”Ìd ÌĞÌd”Ìf ÌĞÌf”Ìm ÌĞÌm”Ìq ÌĞÌq”Ìs ÌĞÌs”Ìt ÌĞÌt”Ìu ÌĞÌu’” ÌÑ” ÌÑ‘” ÌÒ•”  Ìğ ”	 Ìğ	” Ìğ” Ìğ”" Ìğ*”” Ìñ” Ìñ”	 Ìñ	” Ìñ”” Ìñ” Ìñ” Ìñ” Ìñ” Ìò”
+ Ìò
+” Ìò” Ìò” Ìò” Ìò”" Ìò"”# Ìò#”$ Ìò$”% Ìò%”& Ìò&”1 Ìò1”3 Ìò3”4 Ìò4›” Ìó”
+ Ìó
+” Ìó” Ìó” Ìó” Ìó”" Ìó"”# Ìó#”$ Ìó$”% Ìó%”& Ìó&–” Ìô” Ìô” Ìô” Ìô”% Ìô%”& Ìô&’”  Ìõ ” Ìõ“”  Ìö ” Ìö” Ìö–” Í” Í” Í-” Í/”" ÍÌN”$ ÍÌP•” Ì÷” Ì÷” Ì÷” Ì÷” Ì÷“” Ìú” Ìú” Ìú+”” Ìû” Ìû” Ìû” Ìû”” Ìü”% Ìü!”' Ìü#”+ Ìü'”” Ìı”# Ìı”% Ìı!”) Ìı%”” Ìş” Ìş” Ìş” Ìş”” Ìÿ”! Ìÿ”# Ìÿ”( Ìÿ$’”	 Í ”
+ Í •” Í” Í” Í+” Í-” Í.•” Í” Í” Í%” Í&”  Í'Ü ” Í” Í” Í	”! Í”% Í”& Í”) Í ”+ Í"”/ Í&”3 Í*”4 Í+”9 Í0”: Í1”> Í5”? Í6”ÌE Í<”ÌG Í>”ÌJ ÍÌA”ÌQ ÍÌH”ÌR ÍÌI”ÌT ÍÌK”ÌU ÍÌL—” Í”" Í”% Í3”) Í7”> ÍÌL”Ì@ ÍÌN”ÌA ÍÌO—” Í” Í” Í” Í” Í” Í” Í—” Í” Í” Í” Í” Í” Í” Í–” Í	” Í	” Í	” Í	” Í	” Í	Ü ” Í
+” Í
+” Í
+” Í
+” Í
+”. Í
+.”/ Í
+/”: Í
+:”; Í
+ÌS”ÌC Í
+Ì[”ÌD Í
+Ì\”ÌF Í
+Ì^”ÌJ Í
+Ìb”ÌK Í
+Ìc”ÌQ Í
+Ìi”ÌR Í
+Ìj”ÌS Í
+Ìkœ” Í” Í” Í” Í” Í”* Í*”+ Í+”/ Í/”0 Í0”ÌE ÍÌE”ÌF ÍÌF”ÌG ÍÌGœ” Í” Í” Í” Í” Í” Í”  Í ”< Í<”= Í=”ÌB ÍÌB”ÌL ÍÌL”ÌN ÍÌNœ” Í” Í” Í”$ Í$”' Í(”+ Í,”, Í-”3 ÍÌA”4 ÍÌB”ÌN ÍÌ\”ÌP ÍÌr”ÌQ ÍÌs‘”	 Í	‘” Íœ” Í” Í” Í”$ Í$”' Í'”+ Í+”, Í,”3 Í3”4 Í4”ÌI ÍÌI”ÌK ÍÌK”ÌL ÍÌL‘”	 Í	˜” Í” Í” Í” Í” Í” Í”& Í&”( Í(›” Í” Í” Í” Í”" Í"”& Í&”' Í'”. Í.”/ Í/”< ÍÌ[”= ÍÌ\š” Í” Í” Í” Í”  Í ”0 Í0”1 Í1”5 Í5”6 Í6”7 Í7‘”	 Í	’” Í” Í–” Í” Í” Í” Í&” Í(” ÍÌAÜ ” Í	” Í” Í” Í!” Í"” Í'”. Í<”/ Í=”3 ÍÌA”4 ÍÌB”6 ÍÌD”7 ÍÌE”9 ÍÌG”: ÍÌH”? ÍÌM”Ì@ ÍÌN”ÌA ÍÌO’” Í” Í’” Í” Í›” Í” Í” Í” Í” Í” Í” Í” Í” Í”  Í ”! Í!š” Í” Í” Í” Í” Í” Í” Í”5 Í5”7 Í7”8 Í8” Í” Í” Í” Í” Í” Í”! Í!”% Í%”& Í&”; Í;”< Í<”ÌF ÍÌF”ÌG ÍÌG›” Í” Í” Í” Í” Í” Í”  Í ”! Í!”& Í4”( Í5”* Í7˜” Í” Í” Í” Í” Í”, Í,”. Í.”/ Í/” Í” Í” Í” Í” Í” Í” Í”$ Í$”% Í%”+ Í+”, Í,”0 Í0”1 Í1”2 Í2Ü ” Í ” Í ” Í ” Í ” Í ”( Í (”* Í *”. Í .”Ì@ Í Ì@”ÌA Í ÌA”ÌJ Í ÌJ”ÌL Í ÌL”ÌR Í ÌR”ÌS Í ÌS”ÌT Í ÌT”ÌU Í ÌU“” Í!”	 Í!	”
+ Í!
+” Í"” Í"” Í"” Í"” Í"”! Í"!”$ Í"$”% Í"%”* Í"<”, Í"=”. Í"?”1 Í"Ì@”2 Í"ÌA”3 Í"ÌB›” Í#” Í#” Í#” Í#” Í#”* Í#*”- Í#-”. Í#.”3 Í#ÌN”5 Í#ÌO”7 Í#ÌQ˜” Í$” Í$” Í$” Í$”  Í$ ”! Í$!”' Í$'”( Í$(œ” Í%” Í%” Í%” Í%” Í%”  Í% ”$ Í%$”% Í%%”) Í%)”* Í%*”. Í%.”/ Í%/œ” Í&” Í&” Í&” Í&"” Í&(” Í&)”# Í&-”$ Í&.”( Í&2”) Í&3”, Í&6”- Í&7”” Í'” Í'” Í'” Í'“” Í(” Í(”! Í(!•” Í)” Í)” Í)”" Í)"”# Í)#™” Í*” Í*” Í*”& Í*&”' Í*'”* Í**”+ Í*+”. Í*.”/ Í*/“” Í+*” Í++” Í+,’” Í,” Í,“” Í-” Í-”# Í-#›” Í.” Í.” Í.”" Í."”* Í.*”+ Í.+”. Í..”/ Í./”4 Í.4”5 Í.5”6 Í.6•” Í/” Í/” Í/”$ Í/$”% Í/%Ü ” Í0” Í0” Í0”  Í0 ”% Í0%”& Í0&”+ Í0+”, Í0,”- Í0-”. Í0.”/ Í0/”4 Í04”5 Í05”6 Í06”7 Í07”8 Í08“” Í1,” Í1-” Í1.’” Í2” Í2“” Í3” Í3”  Í3 •” Í4” Í4” Í4”! Í4!”" Í4"™” Í5” Í5” Í5”& Í5&”' Í5'”* Í5*”+ Í5+”. Í5.”/ Í5/“” Í6)” Í6*” Í6+’” Í7” Í7“” Í8” Í8” Í8•” Í9” Í9” Í9”  Í9 ”! Í9!™” Í:” Í:” Í:”& Í:&”' Í:'”* Í:*”+ Í:+”. Í:.”/ Í:/“” Í;(” Í;)” Í;*’” Í<” Í<“” Í=” Í=”! Í=!•” Í>” Í>” Í>”" Í>"”# Í>#™” Í?” Í?” Í?”& Í?&”' Í?'”* Í?*”+ Í?+”. Í?.”/ Í?/“” Í@*” Í@+” Í@,’” ÍA” ÍA‘” ÍB“” ÍC”	 ÍC	”
+ ÍC
+›” ÍD” ÍD” ÍD” ÍD” ÍD”) ÍD)”, ÍD,”- ÍD-”: ÍDÌB”< ÍDÌC”> ÍDÌE—” ÍE” ÍE” ÍE” ÍE”" ÍE"”/ ÍE/”0 ÍE0˜” ÍF” ÍF” ÍF” ÍF” ÍF”, ÍF,”. ÍF.”/ ÍF/š” ÍG” ÍG” ÍG” ÍG” ÍG” ÍG”! ÍG!”. ÍG.”/ ÍG/”0 ÍG0Ü ” ÍH” ÍH” ÍH” ÍH” ÍH”4 ÍH4”6 ÍH6”: ÍH:”ÌL ÍHÌL”ÌM ÍHÌM”Ìb ÍHÌb”Ìd ÍHÌd”Ìj ÍHÌj”Ìk ÍHÌk”Ìl ÍHÌl”Ìm ÍHÌm“” ÍI”	 ÍI	”
+ ÍI
+›” ÍJ” ÍJ” ÍJ” ÍJ” ÍJ” ÍJ” ÍJ” ÍJ”# ÍJ.”% ÍJ/”' ÍJ1˜” ÍK” ÍK” ÍK”& ÍK&”' ÍK'”0 ÍK0”2 ÍK2”3 ÍK3˜” ÍL” ÍL” ÍL” ÍL” ÍL”, ÍL,”. ÍL.”/ ÍL/” ÍM” ÍM” ÍM” ÍM” ÍM” ÍM” ÍM”# ÍM#”$ ÍM$”* ÍM*”+ ÍM+”. ÍM.”/ ÍM/”0 ÍM0” ÍN” ÍN” ÍN” ÍN” ÍN” ÍN” ÍN”# ÍN#”$ ÍN$”* ÍN*”+ ÍN+”. ÍN.”/ ÍN/”0 ÍN0Ü ” ÍO” ÍO” ÍO” ÍO” ÍO”% ÍO%”' ÍO'”+ ÍO+”= ÍO=”> ÍO>”ÌD ÍOÌD”ÌF ÍOÌF”ÌL ÍOÌL”ÌM ÍOÌM”ÌN ÍOÌN”ÌO ÍOÌO“” ÍP”	 ÍP	”
+ ÍP
+›” ÍQ” ÍQ” ÍQ” ÍQ” ÍQ” ÍQ”  ÍQ ”! ÍQ!”& ÍQ4”( ÍQ5”* ÍQ7˜” ÍR” ÍR” ÍR” ÍR” ÍR”, ÍR,”. ÍR.”/ ÍR/” ÍS” ÍS” ÍS” ÍS” ÍS” ÍS” ÍS”# ÍS#”$ ÍS$”* ÍS*”+ ÍS+”. ÍS.”/ ÍS/”0 ÍS0” ÍT” ÍT” ÍT” ÍT” ÍT” ÍT” ÍT”# ÍT#”$ ÍT$”* ÍT*”+ ÍT+”. ÍT.”/ ÍT/”0 ÍT0Ü ” ÍU” ÍU” ÍU” ÍU” ÍU”( ÍU(”* ÍU*”. ÍU.”Ì@ ÍUÌ@”ÌA ÍUÌA”ÌJ ÍUÌJ”ÌL ÍUÌL”ÌR ÍUÌR”ÌS ÍUÌS”ÌT ÍUÌT”ÌU ÍUÌU“” ÍV”	 ÍV	”
+ ÍV
+›” ÍW” ÍW” ÍW” ÍW” ÍW” ÍW”! ÍW!”" ÍW"”' ÍW6”) ÍW7”+ ÍW9˜” ÍX” ÍX” ÍX” ÍX” ÍX”, ÍX,”. ÍX.”/ ÍX/” ÍY” ÍY” ÍY” ÍY” ÍY” ÍY” ÍY”# ÍY#”$ ÍY$”* ÍY*”+ ÍY+”. ÍY.”/ ÍY/”0 ÍY0” ÍZ” ÍZ” ÍZ” ÍZ” ÍZ”" ÍZ"”$ ÍZ$”) ÍZ)”* ÍZ*”0 ÍZ0”1 ÍZ1”: ÍZ:”; ÍZ;”< ÍZ<” Í[” Í[” Í[” Í[” Í[”+ Í[+”- Í[-”2 Í[2”3 Í[3”9 Í[9”: Í[:”ÌL Í[ÌL”ÌM Í[ÌM”ÌN Í[ÌN” Í\” Í\” Í\” Í\” Í\”! Í\!”# Í\#”( Í\(”) Í\)”/ Í\/”0 Í\0”8 Í\8”9 Í\9”: Í\:” Í]” Í]” Í]” Í]” Í]”& Í]&”( Í](”- Í]-”. Í].”4 Í]4”5 Í]5”ÌB Í]ÌB”ÌC Í]ÌC”ÌD Í]ÌDÜ ” Í^” Í^” Í^” Í^” Í^”) Í^)”+ Í^+”/ Í^/”ÌA Í^ÌA”ÌB Í^ÌB”ÌL Í^ÌL”ÌN Í^ÌN”ÌT Í^ÌT”ÌU Í^ÌU”ÌV Í^ÌV”ÌW Í^ÌW“” Í_”	 Í_	”
+ Í_
+›” Í`” Í`” Í`” Í`” Í`” Í`” Í`” Í`”$ Í`0”& Í`1”( Í`3˜” Ía” Ía” Ía” Ía” Ía”, Ía,”. Ía.”/ Ía/” Íb” Íb” Íb” Íb” Íb”# Íb#”% Íb%”* Íb*”+ Íb+”1 Íb1”2 Íb2”< Íb<”= Íb=”> Íb>” Íc” Íc” Íc” Íc” Íc”  Íc ”" Íc"”' Íc'”( Íc(”. Íc.”/ Íc/”6 Íc6”7 Íc7”8 Íc8” Íd” Íd” Íd” Íd” Íd” Íd”! Íd!”& Íd&”' Íd'”- Íd-”. Íd.”4 Íd4”5 Íd5”6 Íd6” Íe” Íe” Íe” Íe” Íe” Íe” Íe”# Íe#”$ Íe$”* Íe*”+ Íe+”. Íe.”/ Íe/”0 Íe0” Íf” Íf” Íf” Íf” Íf”  Íf ”" Íf"”' Íf'”( Íf(”. Íf.”/ Íf/”6 Íf6”7 Íf7”8 Íf8” Íg” Íg” Íg” Íg” Íg” Íg” Íg”# Íg#”$ Íg$”* Íg*”+ Íg+”. Íg.”/ Íg/”0 Íg0Ü ” Íh” Íh” Íh” Íh” Íh”& Íh&”( Íh(”, Íh,”> Íh>”? Íh?”ÌF ÍhÌF”ÌH ÍhÌH”ÌN ÍhÌN”ÌO ÍhÌO”ÌP ÍhÌP”ÌQ ÍhÌQ“” Íi”	 Íi	”
+ Íi
+™” Íj” Íj” Íj” Íj” Íj”( Íj(”+ Íj+”. Íj-”0 Íj/˜” Ík” Ík” Ík”& Ík&”' Ík'”; Ík;”= Ík=”> Ík>“” Íl”	 Íl	”
+ Íl
+” Ím” Ím” Ím” Ím” Ím”$ Ím$”' Ím'”( Ím(”) Ím/”+ Ím1”3 Ím?”5 ÍmÌ@”7 ÍmÌB–” Ín” Ín” Ín” Ín”# Ín#”% Ín%›” Ío” Ío” Ío”# Ío#”$ Ío$”5 Ío5”8 Ío8”Ì@ ÍoÌ@”ÌA ÍoÌA”ÌF ÍoÌP”ÌG ÍoÌQ›” Íp” Íp” Íp”# Íp#”$ Íp$”6 Íp6”9 Íp9”ÌA ÍpÌA”ÌB ÍpÌB”ÌH ÍpÌR”ÌI ÍpÌS‘” Íq“” Ír”	 Ír	”
+ Ír
+›” Ís” Ís” Ís” Ís” Ís”  Ís ”# Ís#”$ Ís$”) Ís)”+ Ís*”- Ís,–” Ít” Ít” Ít” Ít”# Ít#”% Ít%›” Íu” Íu” Íu”# Íu#”$ Íu$”. Íu.”1 Íu1”6 Íu6”7 Íu7”> Íu>”? Íu?‘” Ív“” Íw”	 Íw	”
+ Íw
+’” Íx” Íx•” Íy”
+ Íy
+” Íy” Íy ” Íy$š” Íz” Íz” Íz” Íz” Íz” Íz” Íz”  Íz ”# Íz#”% Íz%›” Í{” Í{” Í{” Í{” Í{” Í{” Í{”! Í{!”% Í{%”' Í{'”( Í{(–” Í|” Í|” Í|” Í|” Í|”  Í| ‘”	 Í}	’” Í~” Í~—” Í” Í” Í”% Í;”) Í?”- ÍÌB”. ÍÌC”” Í€”  Í€ ”! Í€!”' Í€0š” Í” Í” Í” Í” Í” Í”1 Í1”6 Í6”< Í<”> Í>™” Í‚” Í‚” Í‚” Í‚” Í‚”1 Í‚1”4 Í‚4”: Í‚:”; Í‚;–” Íƒ” Íƒ” Íƒ” Íƒ” Íƒ”  Íƒ ‘”	 Í„	’” Í…” Í…”” Í†” Í†” Í†”% Í†.š” Í‡” Í‡” Í‡” Í‡” Í‡” Í‡”/ Í‡/”4 Í‡4”: Í‡:”< Í‡<™” Íˆ” Íˆ” Íˆ” Íˆ” Íˆ”/ Íˆ/”2 Íˆ2”8 Íˆ8”9 Íˆ9–” Í‰” Í‰” Í‰” Í‰” Í‰”  Í‰ ‘”	 ÍŠ	’” Í‹” Í‹”” ÍŒ” ÍŒ” ÍŒ” ÍŒš” Í” Í” Í” Í” Í” Í” Í”$ Í$”+ Í+”- Í-™” Í” Í” Í” Í” Í” Í”" Í"”) Í)”* Í*–” Í” Í” Í” Í” Í”  Í ‘”	 Í	’” Í‘” Í‘”” Í’” Í’” Í’”2 Í’;š” Í“” Í“” Í“” Í“” Í“” Í“”- Í“-”2 Í“2”ÌG Í“ÌG”ÌI Í“ÌI™” Í”” Í”” Í”” Í”” Í””- Í”-”0 Í”0”ÌE Í”ÌE”ÌF Í”ÌF–” Í•” Í•” Í•” Í•” Í•”  Í• ‘”	 Í–	’” Í—” Í—’” Í˜” Í˜œ” Í™” Í™” Í™”  Í™ ”! Í™!”' Í™'”( Í™(”, Í™,”- Í™-”3 Í™3”4 Í™4”5 Í™5’” Íš” Íš’” Í›” Í›˜” Íœ” Íœ” Íœ”" Íœ"”# Íœ#”' Íœ'”) Íœ)”* Íœ*’” Í” Í’” Í” Í˜” ÍŸ” ÍŸ” ÍŸ”" ÍŸ"”# ÍŸ#”* ÍŸ*”, ÍŸ,”- ÍŸ-’” Í ” Í ’” Í¡”
+ Í¡
+˜” Í¢” Í¢” Í¢”" Í¢"”# Í¢#”) Í¢)”+ Í¢+”, Í¢,’” Í£” Í£’” Í¤” Í¤˜” Í¥” Í¥” Í¥”" Í¥"”# Í¥#”' Í¥'”) Í¥)”* Í¥*’” Í¦” Í¦”” Í§”
+ Í§
+” Í§” Í§š” Í¨” Í¨” Í¨”" Í¨"”# Í¨#”) Í¨)”* Í¨*”, Í¨,”- Í¨-”. Í¨.’” Í©” Í©’” Íª” Íª›” Í«” Í«” Í«” Í«” Í«”  Í« ”5 Í«5”6 Í«6”ÌF Í«ÌF”ÌH Í«ÌH”ÌI Í«ÌI” Í¬” Í¬” Í¬” Í¬” Í¬”$ Í¬$”% Í¬%”) Í¬)”- Í¬-”. Í¬.”< Í¬<”ÌA Í¬ÌA”ÌK Í¬ÌK”ÌM Í¬ÌM”” Í­” Í­” Í­” Í­‘”	 Í®	–” Í¯” Í¯” Í¯” Í¯”" Í¯"”# Í¯#’” Í°” Í°”” Í±” Í±” Í±” Í±6š” Í²” Í²” Í²”" Í²"”# Í²#”+ Í²+”, Í²,”3 Í²3”4 Í²4”5 Í²5’” Í³” Í³’” Í´” Í´œ” Íµ” Íµ” Íµ” Íµ” Íµ” Íµ” Íµ”. Íµ.”/ Íµ/”8 Íµ8”9 Íµ9”: Íµ:œ” Í¶” Í¶” Í¶” Í¶” Í¶” Í¶” Í¶”/ Í¶/”0 Í¶0”9 Í¶9”: Í¶:”; Í¶;œ” Í·” Í·” Í·” Í·” Í·” Í·” Í·”. Í·.”/ Í·/”8 Í·8”9 Í·9”: Í·:œ” Í¸” Í¸” Í¸” Í¸” Í¸” Í¸” Í¸”. Í¸.”/ Í¸/”8 Í¸8”9 Í¸9”: Í¸:˜” Í¹” Í¹” Í¹”  Í¹ ”! Í¹!”( Í¹(”* Í¹*”+ Í¹+’” Íº” Íº‘” Í»•”  ÍÒ ” ÍÒ” ÍÒ”  ÍÒ ”2 ÍÒ2‘” ÍÒ •” ÍÓ” ÍÓ” ÍÓ”! ÍÓ ”" ÍÓ!•” ÍÔ” ÍÔ” ÍÔ”" ÍÔ!”# ÍÔ"•” ÍÕ” ÍÕ” ÍÕ*” ÍÕ.” ÍÕ/•” ÍÖ” ÍÖ” ÍÖ2”! ÍÖ6”" ÍÖ7•” Í×”* Í×)”- Í×?”/ Í×ÌA”0 Í×ÌB•” ÍØ”$ ÍØ#”' ÍØ/”, ÍØ4”- ÍØ5•” ÍÙ” ÍÙ”  ÍÙ'”! ÍÙ(”" ÍÙ)•” ÍÚ” ÍÚ”! ÍÚ ”" ÍÚ!”# ÍÚ"•” ÍÛ” ÍÛ”" ÍÛ!”# ÍÛ"”$ ÍÛ#•” ÍÜ” ÍÜ” ÍÜ” ÍÜ” ÍÜ’” Í› ” Í›’” Íİ” Íİœ” ÍŞ” ÍŞ” ÍŞ” ÍŞ”! ÍŞ!”# ÍŞ#”8 ÍŞ8”: ÍŞ:”ÌD ÍŞÌD”ÌH ÍŞÌH”ÌL ÍŞÌL”ÌM ÍŞÌM’” Íß” Íß”” Íà” Íà” Íà”" Íà1—” Íá” Íá” Íá” Íá” Íá”* Íá*”+ Íá+—” Íâ” Íâ” Íâ” Íâ” Íâ”) Íâ)”+ Íâ+—” Íã” Íã” Íã”( Íã(”+ Íã+”/ Íã/”0 Íã0Ü ” Íä” Íä” Íä”. Íä.”/ Íä/”6 Íä6”7 Íä7”8 Íä8”: Íä:”< Íä;”> Íä=”? Íä=”ÌA Íä?”ÌC ÍäÌA”ÌD ÍäÌB”ÌE ÍäÌC—” Íå” Íå” Íå”. Íå.”1 Íå1”3 Íå3”4 Íå4‘”	 Íæ	’” Íç” Íç”” Íè” Íè” Íè ” Íè.œ” Íé” Íé” Íé” Íé”( Íé(”, Íé,”0 Íé0”1 Íé1”> Íé>”ÌB ÍéÌB”ÌF ÍéÌF”ÌH ÍéÌH”” Íê” Íê” Íê” Íê‘”	 Íë	‘” Íëš” Íì” Íì” Íì”. Íì.”/ Íì/”3 Íì3”4 Íì4”6 Íì6”7 Íì7”8 Íì8‘”	 Íí	’” Íî” Íî’” Íï” Íï—” Íğ” Íğ” Íğ”  Íğ ”! Íğ!”$ Íğ#”& Íğ%˜” Íñ” Íñ” Íñ” Íñ”  Íñ ”$ Íñ$”& Íñ&”' Íñ'”” Íò”	 Íò	”
+ Íò
+” Íò’” Íó” Íó’” Íô” Íô—” Íõ” Íõ” Íõ”  Íõ ”! Íõ!”$ Íõ#”& Íõ%˜” Íö” Íö” Íö” Íö”  Íö ”' Íö'”) Íö)”* Íö*”” Í÷”	 Í÷	”
+ Í÷
+” Í÷’” Íø” Íø’” Íù”
+ Íù
+—” Íú” Íú” Íú”  Íú ”! Íú!”$ Íú#”& Íú%˜” Íû” Íû” Íû” Íû”  Íû ”& Íû&”( Íû(”) Íû)”” Íü”	 Íü	”
+ Íü
+” Íü’” Íı” Íı’” Íş” Íş—” Íÿ” Íÿ” Íÿ”  Íÿ ”! Íÿ!”$ Íÿ#”& Íÿ%˜” Í ” Í ” Í ” Í ”  Í  ”$ Í $”& Í &”' Í '”” Í”	 Í	”
+ Í
+” Í’” Í” Í”” Í”
+ Í
+” Í” Í—” Í” Í” Í”  Í ”! Í!”$ Í#”& Í%š” Í” Í” Í” Í”  Í ”& Í&”' Í'”) Í)”* Í*”+ Í+”” Í”	 Í	”
+ Í
+” Í’” Í” Í’” Í” Í›” Í	” Í	” Í	” Í	”! Í	!”# Í	#”3 Í	3”5 Í	5”9 Í	9”: Í	:”; Í	;’” Í
+” Í
+”” Í” Í” Í” Í6—” Í” Í” Í”  Í ”! Í!”$ Í#”& Í%š” Í” Í” Í” Í”  Í ”( Í(”) Í)”0 Í0”1 Í1”2 Í2”” Í”	 Í	”
+ Í
+” Í’” Í” Í’” Í” Í™” Í” Í” Í” Í” Í” Í”# Í#”% Í$”' Í&™” Í” Í” Í” Í”  Í ”! Í!”- Í-”/ Í/”0 Í0”” Í” Í” Í” Í” Í” Í” Í”0 Í0”1 Í1”5 Í5”ÌH ÍÌH”ÌI ÍÌI”ÌP ÍÌ^”ÌQ ÍÌs”ÌS ÍÌu”ÌU ÍÌw”ÌV ÍÌx”ÌW ÍÌy‘” Í‘” Í˜” Í” Í” Í”" Í"”$ Í$”' Í'”( Í(”) Í)‘” Í”” Í”	 Í	”
+ Í
+” Í’” Í” Í’” Í” Í•” Í” Í” Í” Í” Í–” Í” Í#” Í'” Í(”! Í1”" Í2™” Í” Í” Í” Í”' Í'”) Í)”* Í*”0 Í0”1 Í1”” Í” Í” Í” Í”” Í” Í ” Í$” Í%™” Í” Í” Í” Í”$ Í$”% Í%”1 Í1”3 Í3”4 Í4”” Í” Í” Í” Í”” Í” Í” Í#” Í$—” Í ” Í ” Í ” Í ” Í ”" Í "”# Í #–” Í!” Í!” Í!” Í!” Í!” Í!’” Í"” Í"”” Í#”	 Í#”
+ Í#” Í#'œ” Í$” Í$” Í$” Í$” Í$”  Í$ ”" Í$"”) Í$)”+ Í$+”1 Í$1”3 Í$2”5 Í$4—” Í%” Í%” Í%”! Í%!”$ Í%$”% Í%%”& Í%&™” Í&” Í&” Í&” Í&:”# Í&>”$ Í&?”8 Í&ÌS”: Í&Ìr”; Í&Ìs˜” Í'” Í'” Í'”" Í'*”& Í'.”' Í'/”1 Í'9”2 Í':˜” Í(” Í(”  Í( ”# Í(+”' Í(/”( Í(0”9 Í(ÌA”: Í(ÌB˜” Í)” Í)”! Í)!”$ Í),”( Í)0”) Í)1”; Í)ÌC”< Í)ÌD˜” Í*” Í*” Í*”! Í*)”0 Í*8”3 Í*;”6 Í*>”7 Í*?–” Í+” Í+” Í+” Í+7”  Í+9”! Í+:–” Í,” Í,”  Í, ”# Í,-”% Í,/”& Í,0š” Í-” Í-” Í-” Í-”  Í- ”! Í-!”# Í-#”$ Í-$”% Í-%”& Í-&—” Í.” Í.” Í.” Í.”" Í."”$ Í.$”% Í.%Ü ” Í/” Í/” Í/”) Í/)”* Í/*”8 Í/8”: Í/:”ÌH Í/ÌH”ÌJ Í/ÌJ”ÌY Í/ÌY”Ì[ Í/Ì[”Ìg Í/Ìg”Ìi Í/Ìi”Ìr Í/Ìr”Ìt Í/Ìt”Ì~ Í/Ì~”Ì Í/Ì”Ì€ Í/Ì€”Ì„ Í/Ì„”Ì… Í/Ì…”ÌŠ Í/ÌŠ”ÌŒ Í/ÌŒ”Ì” Í/Ì”Ì– Í/ÌŸ”Ì˜ Í/Ì¡š” Í0” Í0” Í0”# Í0#”$ Í0$”% Í0%”' Í0'”4 Í04”5 Í05”6 Í06—” Í1” Í1” Í1” Í1”& Í1&”( Í1(”) Í1)–” Í2” Í2” Í2”  Í2 ”! Í2!”" Í2"š” Í3” Í3” Í3” Í3” Í3” Í3” Í3” Í3&” Í3'” Í3)–” Í4” Í4” Í4” Í4” Í4” Í4”” Í5” Í5” Í5” Í5”” Í6”	 Í6	”
+ Í6” Í6 ’” Í7” Í7Ü ” Í8”	 Í8”
+ Í8”" Í8*”# Í8+”1 Í8ÌC”3 Í8ÌE”ÌA Í8Ì[”ÌC Í8Ì]”ÌR Í8Ìt”ÌT Í8Ìv”Ì` Í8ÌŠ”Ìb Í8ÌŒ”Ìk Í8Ì®”Ìm Í8Ì°”Ìw Í8ÌÕš” Í9” Í9” Í9” Í9”  Í9 ”! Í9!”. Í9.”0 Í90”2 Í92”3 Í93˜” Í:” Í:” Í:” Í:#” Í:'”  Í:(”* Í:2”+ Í:3˜” Í;” Í;” Í;” Í;” Í;”& Í;&”' Í;'”( Í;(—” Í<” Í<” Í<” Í<” Í<”  Í< ”! Í<!œ” Í=” Í=” Í=” Í=#” Í=)”0 Í=:”1 Í=;”4 Í=>”5 Í=?”Ì@ Í=ÌJ”ÌA Í=ÌL”ÌB Í=ÌMÜ ” Í>” Í>” Í>” Í>,” Í>2”* Í>ÌA”+ Í>ÌB”3 Í>ÌJ”5 Í>ÌL”ÌC Í>ÌZ”ÌE Í>Ì\”ÌS Í>Ìj”ÌU Í>Ìl”Ìd Í>Ì{”Ìe Í>Ì|”Ìf Í>Ì}˜” Í?” Í?” Í?” Í?” Í?” Í?” Í?” Í?˜” Í@” Í@” Í@”" Í@"”, Í@,”/ Í@/”> Í@>”? Í@?Ü ” ÍA” ÍA” ÍA” ÍA” ÍA” ÍA”' ÍA'”( ÍA(”+ ÍA+”5 ÍA5”6 ÍA6”ÌC ÍAÌC”ÌE ÍAÌE”ÌI ÍAÌI”ÌM ÍAÌM”ÌN ÍAÌN”Ì^ ÍAÌ^”Ìc ÍAÌc”Ìt ÍAÌt”Ìv ÍAÌv—” ÍB” ÍB” ÍB”! ÍB!”$ ÍB$”5 ÍB5”6 ÍB6š” ÍC” ÍC” ÍC”) ÍC)”* ÍC*”+ ÍC+”- ÍC-”9 ÍC9”: ÍC:”; ÍC;—” ÍD” ÍD” ÍD” ÍD”" ÍD"”$ ÍD$”% ÍD%Ü ” ÍE” ÍE” ÍE” ÍE” ÍE”6 ÍE6”7 ÍE7”ÌE ÍEÌE”ÌG ÍEÌG”ÌU ÍEÌU”ÌW ÍEÌW”Ìf ÍEÌf”Ìh ÍEÌh”Ìt ÍEÌt”Ìv ÍEÌv”Ì ÍEÌ”Ì ÍEÌ”Ì‹ ÍEÌ‹”ÌŒ ÍEÌŒ”Ì ÍEÌ‘”	 ÍF	‘” ÍFÜ ” ÍG” ÍG” ÍG”# ÍG#”$ ÍG$”- ÍG-”/ ÍG/”= ÍG=”> ÍG>”ÌL ÍGÌL”ÌM ÍGÌM”ÌS ÍGÌS”ÌV ÍGÌV”ÌW ÍGÌW”ÌX ÍGÌX”ÌZ ÍGÌZ”Ìh ÍGÌh”Ìj ÍGÌj”Ìy ÍGÌy”Ìz ÍGÌz”Ì{ ÍGÌ{‘”	 ÍH	’” ÍI” ÍI˜” ÍJ” ÍJ” ÍJ” ÍJ.” ÍJ0”% ÍJ>”' ÍJÌ@”/ ÍJÌ[›” ÍK” ÍK” ÍK” ÍK” ÍK” ÍK”# ÍK#”% ÍK%”+ ÍK+”- ÍK,”/ ÍK.˜” ÍL” ÍL” ÍL” ÍL”# ÍL#”$ ÍL$”+ ÍL+”, ÍL,–” ÍM” ÍM” ÍM” ÍM”- ÍM-”. ÍM.Ü ” ÍN” ÍN” ÍN” ÍN”! ÍN!”" ÍN"”, ÍN,”- ÍN-”0 ÍN0”7 ÍN7”; ÍN;”ÌE ÍNÌE”ÌG ÍNÌG”ÌI ÍNÌI”ÌK ÍNÌK”ÌL ÍNÌL”ÌZ ÍNÌZ”Ì[ ÍNÌ[”Ì` ÍNÌ`”Ìa ÍNÌa”Ìb ÍNÌb•” ÍO” ÍO” ÍO” ÍO” ÍO” ÍP” ÍP” ÍP” ÍP” ÍP”  ÍP ”' ÍP'”+ ÍP+”5 ÍP5”7 ÍP7”9 ÍP9”= ÍP=”> ÍP>”? ÍP?‘” ÍQÜ "” ÍR” ÍR” ÍR” ÍR” ÍR” ÍR”$ ÍR$”% ÍR%”( ÍR(”/ ÍR/”3 ÍR3”= ÍR=”ÌA ÍRÌA”ÌE ÍRÌE”ÌF ÍRÌF”ÌI ÍRÌI”ÌK ÍRÌK”ÌO ÍRÌO”ÌU ÍRÌU”ÌW ÍRÌW”ÌY ÍRÌY”Ì[ ÍRÌ[”Ì\ ÍRÌ\”Ìd ÍRÌd”Ìe ÍRÌe”Ìo ÍRÌo”Ìr ÍRÌr”Ìt ÍRÌt”Ìu ÍRÌu”Ì} ÍRÌ}”Ì~ ÍRÌ~”Ì„ ÍRÌ„”Ì… ÍRÌ…”Ì† ÍRÌ†™” ÍS” ÍS”  ÍS ”# ÍS#”+ ÍS+”, ÍS,”= ÍS=”? ÍS?”Ì@ ÍSÌ@”” ÍT” ÍT” ÍT” ÍT5–” ÍU” ÍU” ÍU”! ÍU!”' ÍU'”) ÍU)”” ÍV” ÍV” ÍV” ÍV’” ÍW” ÍWÜ ” ÍX” ÍX” ÍX”% ÍX%”& ÍX&”. ÍX.”0 ÍX0”4 ÍX4”5 ÍX5”7 ÍX7”9 ÍX9”ÌA ÍXÌA”ÌC ÍXÌC”ÌD ÍXÌD”ÌG ÍXÌG”ÌI ÍXÌH”ÌK ÍXÌJ–” ÍY” ÍY” ÍY”  ÍY ”" ÍY"”# ÍY#”” ÍZ” ÍZ” ÍZ” ÍZ“” Í[” Í[” Í[”” Í\” Í\”! Í\!”9 Í\9“” Í]&” Í]'” Í](‘” Í^‘” Í^˜” Í_” Í_” Í_”  Í_ ”! Í_!”% Í_%”& Í_&”' Í_'‘” Í`”” Ía” Ía” Ía” Ía”” Íb”	 Íb	”
+ Íb
+” Íb’” Íc” Íc”” Íd” Íd” Íd” Íd-–” Íe” Íe” Íe” Íe”# Íe#”$ Íe$–” Íf” Íf” Íf” Íf”$ Íf$”% Íf%˜” Íg” Íg” Íg” Íg” Íg” Íg” Íg ”  Íg!˜” Íh” Íh” Íh” Íh” Íh” Íh”# Íh$”$ Íh%–” Íi” Íi” Íi” Íi”! Íi!”# Íi#•” Íj” Íj” Íj” Íj”  Íj ‘”	 Ík	–” Íl” Íl” Íl” Íl”% Íl%”' Íl'•” Ím” Ím” Ím”# Ím#”$ Ím$‘”	 Ín	™” Ío” Ío” Ío” Ío” Ío”  Ío ”4 Ío4”6 Ío6”7 Ío7”” Íp” Íp” Íp” Íp’” Íq” Íqœ” Ír” Ír” Ír”* Ír*”, Ír,”- Ír-”1 Ír1”2 Ír2”3 Ír3”Ì@ ÍrÌJ”ÌB ÍrÌK”ÌD ÍrÌM˜” Ís” Ís” Ís”! Ís!”- Ís-”1 Ís1”> Ís>”Ì@ ÍsÌ@Ü ” Ít” Ít” Ít”. Ít.”/ Ít/”Ì@ ÍtÌ@”ÌB ÍtÌB”ÌD ÍtÌD”ÌJ ÍtÌJ”ÌL ÍtÌL”ÌY ÍtÌY”ÌZ ÍtÌZ”Ì[ ÍtÌ[”Ì_ ÍtÌ_”Ì` ÍtÌ`”Ìa ÍtÌa”Ìm ÍtÌu”Ìo ÍtÌv”Ìq ÍtÌx”” Íu”" Íu"”% Íu%”( Íu=’”  Ív ”, Ív,’” Íw” Íw™” Íx”# Íx#”$ Íx$”+ Íx+”- Íx-”. Íx.”1 Íx1”2 Íx2”3 Íx3™” Íy”# Íy#”$ Íy$”, Íy,”. Íy.”/ Íy/”2 Íy2”3 Íy3”4 Íy4š” Íz” Íz” Íz” Íz”  Íz ”! Íz!”" Íz"”' Íz6”) Íz7”+ Íz9”” Í{”" Í{"”% Í{%”( Í{:˜”  Í| ”& Í|&”( Í|(”ÌI Í|ÌI”ÌN Í|ÌN”ÌO Í|ÌO”ÌV Í|ÌV”ÌX Í|ÌX’” Í}” Í}™” Í~”# Í~#”$ Í~$”( Í~(”* Í~*”+ Í~+”. Í~.”/ Í~/”0 Í~0™” Í”# Í#”$ Í$”, Í,”. Í.”/ Í/”2 Í2”3 Í3”4 Í4˜” Í€” Í€” Í€” Í€”" Í€"”# Í€#”& Í€%”( Í€'–” Í”) Í)”* Í*”1 Í1”3 Í3”4 Í4”” Í‚” Í‚” Í‚” Í‚‘” Íƒš” Í„” Í„” Í„” Í„” Í„” Í„” Í„” Í„7”! Í„8”# Í„:”” Í…” Í…” Í…”  Í…2Ü ” Í†” Í†”  Í† ”ÌA Í†ÌA”ÌH Í†ÌH”ÌM Í†ÌM”ÌR Í†ÌR”ÌZ Í†ÌZ”Ì[ Í†Ì[”Ì\ Í†Ì\”Ì] Í†Ì]”Ìb Í†Ìb”Ìc Í†Ìc”Ìd Í†Ìd”Ìe Í†Ìe”Ìj Í†Ìj”Ìk Í†Ìk”Ìr Í†Ìr”Ìt Í†Ìt’” Í‡” Í‡™” Íˆ” Íˆ” Íˆ”  Íˆ ”" Íˆ"”# Íˆ#”& Íˆ&”' Íˆ'”( Íˆ(™” Í‰” Í‰” Í‰”$ Í‰$”& Í‰&”' Í‰'”* Í‰*”+ Í‰+”, Í‰,”” ÍŠ” ÍŠ” ÍŠ” ÍŠ‘” Í‹”” Í‹” Í‹” Í‹” Í‹”” ÍŒ” ÍŒ” ÍŒ” ÍŒ”” Í” Í”* Í*”- Í?–” Í” Í”  Í!”# Í6”$ Í7”+ Í>’” Í” Í™” Í” Í” Í”! Í!”# Í#”$ Í$”4 Í4”5 Í5”6 Í6™” Í‘” Í‘” Í‘”% Í‘%”' Í‘'”( Í‘(”8 Í‘8”9 Í‘9”: Í‘:’” Í’” Í’‘” Í“‘” Í”‘”	 Í•	’” Í–” Í–’” Í—” Í—˜” Í˜” Í˜” Í˜” Í˜” Í˜”# Í˜#”% Í˜%”& Í˜&—” Í™” Í™” Í™” Í™” Í™”! Í™!”" Í™"’” Íš” Íš‘” Í››”  Íœ ” Íœ” Íœ” Íœ” Íœ” Íœ%” Íœ'”+ ÍœÌS”/ ÍœÌW”1 ÍœÌp”3 ÍœÌr–” Í” Í” Í” Í?” ÍÌC” ÍÌD–” Í” Í” Í” Í” Í” Í—” ÍŸ” ÍŸ” ÍŸ” ÍŸ”% ÍŸ%”' ÍŸ4”( ÍŸ5˜” Í ” Í ” Í ” Í ” Í ” Í ” Í ” Í ” Í¡” Í¡” Í¡” Í¡” Í¡” Í¡”$ Í¡$”% Í¡%”+ Í¡+”. Í¡.”/ Í¡/”0 Í¡0”1 Í¡1•” Í¢” Í¢” Í¢” Í¢” Í¢š” Í£” Í£” Í£” Í£” Í£”! Í£!”" Í£"”< Í£<”= Í£=”> Í£>”” Í¤” Í¤” Í¤” Í¤‘” Í¥Ü ” Í¦” Í¦” Í¦”! Í¦#”" Í¦$”$ Í¦3”% Í¦4”( Í¦ÌF”* Í¦ÌH”7 Í¦ÌU”9 Í¦ÌW”ÌF Í¦Ìd”ÌG Í¦Ìe”ÌJ Í¦Ìh”ÌM Í¦Ìk”ÌO Í¦Ìm”ÌP Í¦Ìƒ”ÌQ Í¦Ì„–” Í§” Í§” Í§”" Í§"”& Í§&”( Í§(™” Í¨” Í¨”! Í¨!”$ Í¨$”( Í¨(”) Í¨)”7 Í¨7”9 Í¨ÌF”: Í¨ÌG˜” Í©” Í©” Í©”  Í© ”& Í©&”) Í©)”* Í©*”, Í©,” Íª” Íª”' Íª'”* Íª*”5 Íª5”6 Íª6”ÌA ÍªÌA”ÌB ÍªÌB”ÌH ÍªÌH”ÌK ÍªÌK”ÌL ÍªÌL”ÌM ÍªÌM”ÌN ÍªÌN•” Í«” Í«” Í«”& Í«&”( Í«(š” Í¬” Í¬” Í¬”# Í¬#”$ Í¬$”) Í¬)”* Í¬*”ÌC Í¬ÌC”ÌD Í¬ÌD”ÌE Í¬ÌE”” Í­” Í­”# Í­#”$ Í­$‘” Í®Ü ” Í¯”" Í¯"”% Í¯'”2 Í¯4”3 Í¯5”5 Í¯ÌD”6 Í¯ÌE”9 Í¯ÌW”; Í¯ÌY”ÌH Í¯Ìf”ÌJ Í¯Ìh”ÌW Í¯Ìu”ÌX Í¯Ìv”Ì[ Í¯Ìy”Ì^ Í¯Ì|”Ì` Í¯Ì~”Ìa Í¯Ì”Ìb Í¯ÌŸ‘” Í°‘” Í±‘”	 Í²	‘” Í³‘”	 Í³Ü ” Í´” Í´” Í´”" Í´#”# Í´$”& Í´6”( Í´8”5 Í´ÌE”7 Í´ÌG”ÌD Í´ÌT”ÌE Í´ÌU”ÌH Í´ÌX”ÌK Í´Ì[”ÌM Í´Ì]”ÌN Í´Ì}”ÌO Í´Ì~‘” Íµ•” Í¶” Í¶” Í¶” Í¶” Í¶”” Í¶ ” Í¶'” Í¶+” Í¶,˜” Í·” Í·” Í·”! Í·!”" Í·"”0 Í·0”1 Í·1”2 Í·2“”  Í¸ ” Í¸” Í¸Ÿ”  Í¹ ” Í¹” Í¹” Í¹3”* Í¹Ì@”+ Í¹ÌX”ÌA Í¹Ìn”ÌC Í¹Ìp”ÌD Í¹Ìq”ÌF Í¹Ì{”ÌH Í¹Ì}”ÌT Í¹Ì©”ÌX Í¹Ì­”ÌZ Í¹ÌÆ”Ì\ Í¹ÌÈ™” Íº” Íº” Íº” Íº” Íº”! Íº!”* Íº*”+ Íº+”, Íº,””  Í» ” Í»” Í»” Í»Ÿ”  Í¼ ” Í¼” Í¼” Í¼3”* Í¼Ì@”+ Í¼ÌX”ÌA Í¼Ìn”ÌC Í¼Ìp”ÌD Í¼Ìq”ÌF Í¼Ì{”ÌH Í¼Ì}”ÌT Í¼Ì©”ÌX Í¼Ì­”ÌZ Í¼ÌÆ”Ì\ Í¼ÌÈ™” Í½” Í½” Í½” Í½” Í½”! Í½!”* Í½*”+ Í½ÌD”, Í½ÌE””  Í¾ ” Í¾” Í¾” Í¾“”  Í¿ ” Í¿” Í¿”” ÍÁ” ÍÁ”! ÍÁ;”% ÍÁ?•” ÍÀ” ÍÀ” ÍÀ8”" ÍÀ<”# ÍÀ=—” ÍÂ” ÍÂ” ÍÂ” ÍÂ” ÍÂ”, ÍÂ,”- ÍÂ-’” ÍÃ” ÍÃ’” ÍÄ” ÍÄ˜” ÍÅ” ÍÅ” ÍÅ” ÍÅ” ÍÅ”! ÍÅ!”# ÍÅ#”$ ÍÅ$’” ÍÆ” ÍÆ’” ÍÇ” ÍÇ˜” ÍÈ” ÍÈ” ÍÈ” ÍÈ” ÍÈ”$ ÍÈ$”& ÍÈ&”' ÍÈ'’” ÍÉ” ÍÉ’” ÍÊ”
+ ÍÊ
+˜” ÍË” ÍË” ÍË” ÍË” ÍË”# ÍË#”% ÍË%”& ÍË&’” ÍÌ” ÍÌ’” ÍÍ” ÍÍ˜” ÍÎ” ÍÎ” ÍÎ” ÍÎ” ÍÎ”! ÍÎ!”# ÍÎ#”$ ÍÎ$’” ÍÏ” ÍÏ”” ÍĞ”
+ ÍĞ
+” ÍĞ” ÍĞš” ÍÑ” ÍÑ” ÍÑ” ÍÑ” ÍÑ”# ÍÑ#”$ ÍÑ$”& ÍÑ&”' ÍÑ'”( ÍÑ(’” ÍÒ” ÍÒ’” ÍÓ” ÍÓ›” ÍÔ” ÍÔ” ÍÔ” ÍÔ”" ÍÔ"”$ ÍÔ$”4 ÍÔ4”6 ÍÔ6”: ÍÔ:”; ÍÔ;”< ÍÔ<’” ÍÕ” ÍÕ”” ÍÖ” ÍÖ” ÍÖ” ÍÖ6š” Í×” Í×” Í×” Í×” Í×”% Í×%”& Í×&”- Í×ÌQ”. Í×ÌR”/ Í×ÌS’” ÍØ” ÍØ‘” ÍÙÜ ”  ÍÚ ” ÍÚ”	 ÍÚÌe”) ÍÚÌ…”- ÍÚÌ‰”ÌM ÍÚÌ©”ÌO ÍÚÌñ”Ìo ÍÚÍ”Ìs ÍÚÍ”Ì“ ÍÚÍ5”Ì• ÍÚÍ7”Ìª ÍÚÍL”Ì® ÍÚÍP”ÌÃ ÍÚÍe”ÌÅ ÍÚÍg”ÌÒ ÍÚÍt”ÌÖ ÍÚÍx”Ìã ÍÚÍ…”Ìå ÍÚÍË”Ìæ ÍÚÍÌ˜”  ÍÛ ” ÍÛ”	 ÍÛ	” ÍÛ” ÍÛ”' ÍÛ'”) ÍÛ)”* ÍÛ*˜”  ÍÜ ” ÍÜ”	 ÍÜ	” ÍÜ” ÍÜ”/ ÍÜ/”1 ÍÜ1”2 ÍÜ2˜”  Íİ ” Íİ”	 Íİ	” Íİ”! Íİ!”5 Íİ5”7 Íİ7”8 Íİ8˜”  ÍŞ ” ÍŞ”	 ÍŞ	” ÍŞ”! ÍŞ!”5 ÍŞ5”7 ÍŞ7”8 ÍŞ8ÔrG–§version¤file§sources®sourcesContent¥names¨mappingsÀ‘À‘ÀÜ®‘”    ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”  	 ‘”  
+ ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”   ‘”    ‘”  ! ‘”  " ‘”  # ‘”  $ ‘”  % ‘”  & ‘”  ' ‘”  ( ‘”  ) ‘”  * ‘”  + ‘”  , ‘”  - ‘”  . ‘”  / ‘”  0 ‘”  1 ‘”  2 ‘”  3 ‘”  4 ‘”  5 ‘”  6 ‘”  7 ‘”  8 ‘”  9 ‘”  : ‘”  ; ‘”  < ‘”  = ‘”  > ‘”  ? ‘”  Ì@ ‘”  ÌA ‘”  ÌB ‘”  ÌC ‘”  ÌD ‘”  ÌE ‘”  ÌF ‘”  ÌG ‘”  ÌH ‘”  ÌI ‘”  ÌJ ‘”  ÌK ‘”  ÌL ‘”  ÌM ‘”  ÌN ‘”  ÌO ‘”  ÌP ‘”  ÌQ ‘”  ÌR ‘”  ÌS ‘”  ÌT ‘”  ÌU ‘”  ÌV ‘”  ÌW ‘”  ÌX ‘”  ÌY ‘”  ÌZ ‘”  Ì[ ‘”  Ì\ ‘”  Ì] ‘”  Ì^ ‘”  Ì_ ‘”  Ì` ‘”  Ìa ‘”  Ìb ‘”  Ìc ‘”  Ìd ‘”  Ìe ‘”  Ìf ‘”  Ìg ‘”  Ìh ‘”  Ìi ‘”  Ìj ‘”  Ìk ‘”  Ìl ‘”  Ìm ‘”  Ìn ‘”  Ìo ‘”  Ìp ‘”  Ìq ‘”  Ìr ‘”  Ìs ‘”  Ìt ‘”  Ìu ‘”  Ìv ‘”  Ìw ‘”  Ìx ‘”  Ìy ‘”  Ìz ‘”  Ì{ ‘”  Ì| ‘”  Ì} ‘”  Ì~ ‘”  Ì ‘”  Ì€ ‘”  Ì ‘”  Ì‚ ‘”  Ìƒ ‘”  Ì„ ‘”  Ì… ‘”  Ì† ‘”  Ì‡ ‘”  Ìˆ ‘”  Ì‰ ‘”  ÌŠ ‘”  Ì‹ ‘”  ÌŒ ‘”  Ì ‘”  Ì ‘”  Ì ‘”  Ì ‘”  Ì‘ ‘”  Ì’ ‘”  Ì“ ‘”  Ì” ‘”  Ì• ‘”  Ì– ‘”  Ì— ‘”  Ì˜ ‘”  Ì™ ‘”  Ìš ‘”  Ì› ‘”  Ìœ ‘”  Ì ‘”  Ì ‘”  ÌŸ ‘”  Ì  ‘”  Ì¡ ‘”  Ì¢ ‘”  Ì£ ‘”  Ì¤ ‘”  Ì¥ ‘”  Ì¦ ‘”  Ì§ ‘”  Ì¨ ‘”  Ì© ‘”  Ìª ‘”  Ì« ‘”  Ì¬ ‘”  Ì­ ‘”  Ì® ‘”  Ì¯ ‘”  Ì° ‘”  Ì± ‘”  Ì² ‘”  Ì³ ‘”  Ì´ ‘”  Ìµ ‘”  Ì¶ ‘”  Ì· ‘”  Ì¸ ‘”  Ì¹ ‘”  Ìº ‘”  Ì» ‘”  Ì¼ ‘”  Ì½ ‘”  Ì¾ ‘”  Ì¿ ‘”  ÌÀ ‘”  ÌÁ ‘”  ÌÂ ‘”  ÌÃ ‘”  ÌÄ ‘”  ÌÅ ‘”  ÌÆ ‘”  ÌÇ ‘”  ÌÈ ‘”  ÌÉ ‘”  ÌÊ ‘”  ÌË ‘”  ÌÌ ‘”  ÌÍ ‘”  ÌÎ ‘”  ÌÏ ‘”  ÌĞ ‘”  ÌÑ ‘”  ÌÒ ‘”  ÌÓ ‘”  ÌÔ ‘”  ÌÕ ‘”  ÌÖ ‘”  Ì× ‘”  ÌØ ‘”  ÌÙ ‘”  ÌÚ ‘”  ÌÛ ‘”  ÌÜ ‘”  Ìİ ‘”  ÌŞ ‘”  Ìß ‘”  Ìà ‘”  Ìá ‘”  Ìâ ‘”  Ìã ‘”  Ìä ‘”  Ìå ‘”  Ìæ ‘”  Ìç ‘”  Ìè ‘”  Ìé ‘”  Ìê ‘”  Ìë ‘”  Ìì ‘”  Ìí ‘”  Ìî ‘”  Ìï ‘”  Ìğ ‘”  Ìñ ‘”  Ìò ‘”  Ìó ‘”  Ìô ‘”  Ìõ ‘”  Ìö ‘”  Ì÷ ‘”  Ìø ‘”  Ìù ‘”  Ìú ‘”  Ìû ‘”  Ìü ‘”  Ìı ‘”  Ìş ‘”  Ìÿ ‘”  Í  ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í	 ‘”  Í
+ ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í  ‘”  Í! ‘”  Í" ‘”  Í# ‘”  Í$ ‘”  Í% ‘”  Í& ‘”  Í' ‘”  Í( ‘”  Í) ‘”  Í* ‘”  Í+ ‘”  Í, ‘”  Í- ‘”  Í. ‘”  Í/ ‘”  Í0 ‘”  Í1 ‘”  Í2 ‘”  Í3 ‘”  Í4 ‘”  Í5 ‘”  Í6 ‘”  Í7 ‘”  Í8 ‘”  Í9 ‘”  Í: ‘”  Í; ‘”  Í< ‘”  Í= ‘”  Í> ‘”  Í? ‘”  Í@ ‘”  ÍA ‘”  ÍB ‘”  ÍC ‘”  ÍD ‘”  ÍE ‘”  ÍF ‘”  ÍG ‘”  ÍH ‘”  ÍI ‘”  ÍJ ‘”  ÍK ‘”  ÍL ‘”  ÍM ‘”  ÍN ‘”  ÍO ‘”  ÍP ‘”  ÍQ ‘”  ÍR ‘”  ÍS ‘”  ÍT ‘”  ÍU ‘”  ÍV ‘”  ÍW ‘”  ÍX ‘”  ÍY ‘”  ÍZ ‘”  Í[ ‘”  Í\ ‘”  Í] ‘”  Í^ ‘”  Í_ ‘”  Í` ‘”  Ía ‘”  Íb ‘”  Íc ‘”  Íd ‘”  Íe ‘”  Íf ‘”  Íg ‘”  Íh ‘”  Íi ‘”  Íj ‘”  Ík ‘”  Íl ‘”  Ím ‘”  Ín ‘”  Ío ‘”  Íp ‘”  Íq ‘”  Ír ‘”  Ís ‘”  Ít ‘”  Íu ‘”  Ív ‘”  Íw ‘”  Íx ‘”  Íy ‘”  Íz ‘”  Í{ ‘”  Í| ‘”  Í} ‘”  Í~ ‘”  Í ‘”  Í€ ‘”  Í ‘”  Í‚ ‘”  Íƒ ‘”  Í„ ‘”  Í… ‘”  Í† ‘”  Í‡ ‘”  Íˆ ‘”  Í‰ ‘”  ÍŠ ‘”  Í‹ ‘”  ÍŒ ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í‘ ‘”  Í’ ‘”  Í“ ‘”  Í” ‘”  Í• ‘”  Í– ‘”  Í— ‘”  Í˜ ‘”  Í™ ‘”  Íš ‘”  Í› ‘”  Íœ ‘”  Í ‘”  Í ‘”  ÍŸ ‘”  Í  ‘”  Í¡ ‘”  Í¢ ‘”  Í£ ‘”  Í¤ ‘”  Í¥ ‘”  Í¦ ‘”  Í§ ‘”  Í¨ ‘”  Í© ‘”  Íª ‘”  Í« ‘”  Í¬ ‘”  Í­ ‘”  Í® ‘”  Í¯ ‘”  Í° ‘”  Í± ‘”  Í² ‘”  Í³ ‘”  Í´ ‘”  Íµ ‘”  Í¶ ‘”  Í· ‘”  Í¸ ‘”  Í¹ ‘”  Íº ‘”  Í» ‘”  Í¼ ‘”  Í½ ‘”  Í¾ ‘”  Í¿ ‘”  ÍÀ ‘”  ÍÁ ‘”  ÍÂ ‘”  ÍÃ ‘”  ÍÄ ‘”  ÍÅ ‘”  ÍÆ ‘”  ÍÇ ‘”  ÍÈ ‘”  ÍÉ ‘”  ÍÊ ‘”  ÍË ‘”  ÍÌ ‘”  ÍÍ ‘”  ÍÎ ‘”  ÍÏ ‘”  ÍĞ ‘”  ÍÑ ‘”  ÍÒ ‘”  ÍÓ ‘”  ÍÔ ‘”  ÍÕ ‘”  ÍÖ ‘”  Í× ‘”  ÍØ ‘”  ÍÙ ‘”  ÍÚ ‘”  ÍÛ ‘”  ÍÜ ‘”  Íİ ‘”  ÍŞ ‘”  Íß ‘”  Íà ‘”  Íá ‘”  Íâ ‘”  Íã ‘”  Íä ‘”  Íå ‘”  Íæ ‘”  Íç ‘”  Íè ‘”  Íé ‘”  Íê ‘”  Íë ‘”  Íì ‘”  Íí ‘”  Íî ‘”  Íï ‘”  Íğ ‘”  Íñ ‘”  Íò ‘”  Íó ‘”  Íô ‘”  Íõ ‘”  Íö ‘”  Í÷ ‘”  Íø ‘”  Íù ‘”  Íú ‘”  Íû ‘”  Íü ‘”  Íı ‘”  Íş ‘”  Íÿ ‘”  Í  ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í	 ‘”  Í
+ ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í  ‘”  Í! ‘”  Í" ‘”  Í# ‘”  Í$ ‘”  Í% ‘”  Í& ‘”  Í' ‘”  Í( ‘”  Í) ‘”  Í* ‘”  Í+ ‘”  Í, ‘”  Í- ‘”  Í. ‘”  Í/ ‘”  Í0 ‘”  Í1 ‘”  Í2 ‘”  Í3 ‘”  Í4 ‘”  Í5 ‘”  Í6 ‘”  Í7 ‘”  Í8 ‘”  Í9 ‘”  Í: ‘”  Í; ‘”  Í< ‘”  Í= ‘”  Í> ‘”  Í? ‘”  Í@ ‘”  ÍA ‘”  ÍB ‘”  ÍC ‘”  ÍD ‘”  ÍE ‘”  ÍF ‘”  ÍG ‘”  ÍH ‘”  ÍI ‘”  ÍJ ‘”  ÍK ‘”  ÍL ‘”  ÍM ‘”  ÍN ‘”  ÍO ‘”  ÍP ‘”  ÍQ ‘”  ÍR ‘”  ÍS ‘”  ÍT ‘”  ÍU ‘”  ÍV ‘”  ÍW ‘”  ÍX ‘”  ÍY ‘”  ÍZ ‘”  Í[ ‘”  Í\ ‘”  Í] ‘”  Í^ ‘”  Í_ ‘”  Í` ‘”  Ía ‘”  Íb ‘”  Íc ‘”  Íd ‘”  Íe ‘”  Íf ‘”  Íg ‘”  Íh ‘”  Íi ‘”  Íj ‘”  Ík ‘”  Íl ‘”  Ím ‘”  Ín ‘”  Ío ‘”  Íp ‘”  Íq ‘”  Ír ‘”  Ís ‘”  Ít ‘”  Íu ‘”  Ív ‘”  Íw ‘”  Íx ‘”  Íy ‘”  Íz ‘”  Í{ ‘”  Í| ‘”  Í} ‘”  Í~ ‘”  Í ‘”  Í€ ‘”  Í ‘”  Í‚ ‘”  Íƒ ‘”  Í„ ‘”  Í… ‘”  Í† ‘”  Í‡ ‘”  Íˆ ‘”  Í‰ ‘”  ÍŠ ‘”  Í‹ ‘”  ÍŒ ‘”  Í ‘”  Í ‘”  Í ‘”  Í ‘”  Í‘ ‘”  Í’ ‘”  Í“ ‘”  Í” ‘”  Í• ‘”  Í– ‘”  Í— ‘”  Í˜ ‘”  Í™ ‘”  Íš ‘”  Í› ‘”  Íœ ‘”  Í ‘”  Í ‘”  ÍŸ ‘”  Í  ‘”  Í¡ ‘”  Í¢ ‘”  Í£ ‘”  Í¤ ‘”  Í¥ ‘”  Í¦ ‘”  Í§ ‘”  Í¨ ‘”  Í© ‘”  Íª ‘”  Í« ‘”  Í¬ ‘”  Í­ ÔrH’§missing¦pluginÃ¦genAbcÂÔ  ÔrI”²dynamicImportCache¹exportAllDeclarationCache»exportNamedDeclarationCache«importCache•ÔrJ–¤type¥start£end«declarationªspecifiers¦source¶ExportNamedDeclarationÍaŸÍb…À”ÔrK•¤type¥start£end¥local¨exported¯ExportSpecifierÍa¨ÍaìÔrL”¤type¥start£end¤nameªIdentifierÍa¨ÍaÈÙ UniWebviewContextLoadDataOptionsLªIdentifierÍaÌÍaìÙ UniWebviewContextLoadDataOptionsK¯ExportSpecifierÍaîÍb2LªIdentifierÍaîÍbÙ UniWebViewElementLoadDataOptionsLªIdentifierÍbÍb2Ù UniWebViewElementLoadDataOptionsK¯ExportSpecifierÍb4ÍbbLªIdentifierÍb4ÍbIµWebViewProgressStylesLªIdentifierÍbMÍbbµWebViewProgressStylesK¯ExportSpecifierÍbdÍb‚LªIdentifierÍbdÍbq­WebViewStylesLªIdentifierÍbuÍb‚­WebViewStylesÀJ¶ExportNamedDeclarationÍb‡Íb±À‘K¯ExportSpecifierÍbÍb®LªIdentifierÍbÍb­NativeWebViewLªIdentifierÍb¡Íb®­NativeWebViewÀJ¶ExportNamedDeclarationÍb³ÍbåÀ‘K¯ExportSpecifierÍb¼ÍbâLªIdentifierÍb¼ÍbÍ±UniWebViewElementLªIdentifierÍbÑÍbâ±UniWebViewElementÀJ¶ExportNamedDeclarationÍbçÍcÀ‘K¯ExportSpecifierÍbğÍcLªIdentifierÍbğÍc´createWebViewContextLªIdentifierÍcÍc´createWebViewContextÀJ¶ExportNamedDeclarationÍc!ÍcYÀ‘K¯ExportSpecifierÍc*ÍcVLªIdentifierÍc*Íc>´createWebviewContextLªIdentifierÍcBÍcV´createWebviewContextÀœÔrM•¤type¥start£endªspecifiers¦source±ImportDeclaration "‘ÔrN”¤type¥start£end¥local¶ImportDefaultSpecifierLªIdentifier¦bufferÔrO•¤type¥start£end¥value£raw§Literal!¬@ohos.buffer®'@ohos.buffer'M±ImportDeclaration$ÌZ‘ÔrP•¤type¥start£end¨imported¥local¯ImportSpecifier-:LªIdentifier-:­FrameCallbackLªIdentifier-:­FrameCallbackO§LiteralÌBÌYµ@ohos.arkui.UIContext·"@ohos.arkui.UIContext"M±ImportDeclarationÌ\Ì‘P¯ImportSpecifierÌeÌmLªIdentifierÌeÌm¨buildWebLªIdentifierÌeÌm¨buildWebO§LiteralÌuÌ€©./builder«"./builder"M±ImportDeclarationÌƒÌÁ‘N¶ImportDefaultSpecifierÌŠÌ›LªIdentifierÌŠÌ›±componentSnapshotO§LiteralÌ¡ÌÀ½@ohos.arkui.componentSnapshot¿"@ohos.arkui.componentSnapshot"M±ImportDeclarationÌÃÌö‘P¯ImportSpecifierÌÌÌâLªIdentifierÌÌÌâ¶createDownloadDelegateLªIdentifierÌÌÌâ¶createDownloadDelegateO§LiteralÌêÌõ©./webview«"./webview"M±ImportDeclarationÌøÍ‘N¶ImportDefaultSpecifierÌÿÍLªIdentifierÌÿÍ¢fsO§LiteralÍÍ­@ohos.file.fs¯"@ohos.file.fs"M±ImportDeclarationÍÍG‘N¶ImportDefaultSpecifierÍ Í(LªIdentifierÍ Í(¨image__1O§LiteralÍ.ÍF¶@ohos.multimedia.image¸"@ohos.multimedia.image"M±ImportDeclarationÍIÍt‘N¶ImportDefaultSpecifierÍPÍULªIdentifierÍPÍU¥imageO§LiteralÍ[Ís¶@ohos.multimedia.image¸"@ohos.multimedia.image"M±ImportDeclarationÍvÍ
+—P¯ImportSpecifierÍÍˆLªIdentifierÍÍˆ©UTSObjectLªIdentifierÍÍˆ©UTSObjectP¯ImportSpecifierÍŠÍLªIdentifierÍŠÍ£UTSLªIdentifierÍŠÍ£UTSP¯ImportSpecifierÍÍ¡LªIdentifierÍÍ¡²UniNativeViewEventLªIdentifierÍÍ¡²UniNativeViewEventP¯ImportSpecifierÍ£Í°LªIdentifierÍ£Í°­UTSJSONObjectLªIdentifierÍ£Í°­UTSJSONObjectP¯ImportSpecifierÍ²ÍÄLªIdentifierÍ²ÍÄ²UniViewElementImplLªIdentifierÍ²ÍÄ²UniViewElementImplP¯ImportSpecifierÍÆÍÕLªIdentifierÍÆÍÕ¯getCurrentPagesLªIdentifierÍÆÍÕ¯getCurrentPagesP¯ImportSpecifierÍ×ÍäLªIdentifierÍ×Íä­defineSyncApiLªIdentifierÍ×Íä­defineSyncApiO§LiteralÍìÍ	»@dcloudio/uni-app-framework½"@dcloudio/uni-app-framework"M±ImportDeclarationÍÍ_“P¯ImportSpecifierÍÍLªIdentifierÍÍ£uniLªIdentifierÍÍ£uniP¯ImportSpecifierÍÍ&LªIdentifierÍÍ&¬getCurrentMPLªIdentifierÍÍ&¬getCurrentMPP¯ImportSpecifierÍ(Í9LªIdentifierÍ(Í9±getAbilityContextLªIdentifierÍ(Í9±getAbilityContextO§LiteralÍAÍ^»@dcloudio/uni-app-framework½"@dcloudio/uni-app-framework"M±ImportDeclarationÍaÍ‘N¶ImportDefaultSpecifierÍhÍlLªIdentifierÍhÍl¤utilO§LiteralÍrÍ~ª@ohos.util¬"@ohos.util"M±ImportDeclarationÍÍ©‘N¶ImportDefaultSpecifierÍˆÍLªIdentifierÍˆÍ§webviewO§LiteralÍ•Í¨±@ohos.web.webview³"@ohos.web.webview"

@@ -224,6 +224,9 @@ function fileToPagePath(filePath: string, pagesDir: string, projectRoot: string)
   return path.posix.join(pagesDir, withoutExt);
 }
 
+/** 最近一次成功解析的 pages.config.json，用于语法错误时的防崩缓存兜底 */
+let lastGoodBaseConfig: BaseConfig | null = null;
+
 // ==========================================
 // 核心：生成 pages.json
 // ==========================================
@@ -234,15 +237,29 @@ function generatePagesJson(
 ): void {
   // 1. 读取基础配置
   let baseConfig: BaseConfig = {};
+  let configParseFailed = false;
   const configPath = path.resolve(projectRoot, opts.configFile);
   if (fs.existsSync(configPath)) {
     try {
       const raw = fs.readFileSync(configPath, 'utf-8');
       baseConfig = JSON5.parse(raw) as BaseConfig;
+      lastGoodBaseConfig = baseConfig;
     }
     catch (e) {
-      console.error('[uni-pages] Failed to parse config file:', e);
+      // 配置存在语法错误（通常为用户正在编辑中途）：用上次成功的配置兜底，
+      // 本次生成绝不同步回写，避免覆盖用户正在编辑的文件导致 globalStyle/tabBar/easycom 与格式丢失
+      configParseFailed = true;
+      if (lastGoodBaseConfig != null) {
+        baseConfig = lastGoodBaseConfig;
+      }
+      console.warn(`[uni-pages] ${opts.configFile} has syntax errors, using last good cache and skipping write-back:`, (e as Error).message);
     }
+  }
+
+  // 无缓存可用时直接中止，保持 pages.config.json 与 pages.json 原样，等待用户修复语法
+  if (configParseFailed && lastGoodBaseConfig == null) {
+    console.error(`[uni-pages] Aborted: ${opts.configFile} has syntax errors and no cached config is available. Fix the file first.`);
+    return;
   }
 
   // 读取已有的 pages.json 作为回退兜底，防止编辑中途语法错误导致配置丢失而频繁重载
@@ -442,7 +459,8 @@ function generatePagesJson(
   }
 
   // 8. 自动同步回写 pages.config.json（保证手动配置文件与新建/删除/修改页面完全双向同步）
-  if (fs.existsSync(configPath)) {
+  // 配置文件存在语法错误时绝不回写，避免破坏用户正在编辑的文件
+  if (fs.existsSync(configPath) && !configParseFailed) {
     let configUpdated = false;
     const currentConfigRaw = fs.readFileSync(configPath, 'utf-8');
     let currentConfig: BaseConfig = {};

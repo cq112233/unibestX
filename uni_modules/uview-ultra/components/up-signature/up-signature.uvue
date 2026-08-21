@@ -1,21 +1,40 @@
 <template>
 	<view class="up-signature">
 		<view class="up-signature__canvas-wrap" :style="canvasWrapStyle">
-			<up-canvas
-				ref="signatureCanvas"
-				:canvas-id="canvasId"
-				:width="canvasWidth"
-				:height="canvasHeight"
-				:bg-color="bgColor"
+			<!-- #ifdef APP-ANDROID || APP-IOS -->
+			<view
+				ref="drawAreaRef"
+				class="up-signature__canvas"
 				@touchstart="touchStart"
 				@touchmove="touchMove"
 				@touchend="touchEnd"
+				@touchcancel="touchEnd"
+			></view>
+			<!-- #endif -->
+			<!-- #ifdef APP-HARMONY -->
+			<canvas
+				ref="canvasRef"
 				class="up-signature__canvas"
-			></up-canvas>
+				@touchstart="touchStart"
+				@touchmove="touchMove"
+				@touchend="touchEnd"
+				@touchcancel="touchEnd"
+			></canvas>
+			<!-- #endif -->
+			<!-- #ifndef APP -->
+			<canvas
+				:id="canvasId"
+				class="up-signature__canvas"
+				@touchstart="touchStart"
+				@touchmove="touchMove"
+				@touchend="touchEnd"
+				@touchcancel="touchEnd"
+			></canvas>
+			<!-- #endif -->
 		</view>
 
 		<view v-if="showToolbar" class="up-signature__toolbar">
-			<view class="up-signature__toolbar-icons up-flex up-flex-x">
+			<view class="up-signature__toolbar-icons">
 				<view class="up-signature__toolbar-icon" @click="undo">
 				<up-icon name="arrow-left" size="22" :color="pathCount == 0 ? '#ccc' : '#999'"></up-icon>
 				</view>
@@ -54,7 +73,7 @@
 							v-for="(color, index) in colorItems"
 							:key="index"
 							class="up-signature__color-item"
-							:class="lineColor === color ? 'up-signature__color-item--active' : ''"
+							:class="lineColor == color ? 'up-signature__color-item--active' : ''"
 							:style="getColorStyle(color)"
 							@click="selectColor(color)"
 						></view>
@@ -66,7 +85,7 @@
 </template>
 
 <script setup lang="uts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted, nextTick, getCurrentInstance } from 'vue'
 import { t } from '../../libs/i18n/index.uts'
 
 type SignaturePoint = {
@@ -77,8 +96,15 @@ type SignaturePoint = {
 	width: number
 }
 
+// #ifdef APP-ANDROID || APP-IOS
+type SignatureCanvasContext = DrawableContext
+// #endif
+// #ifndef APP-ANDROID || APP-IOS
+type SignatureCanvasContext = CanvasRenderingContext2D
+// #endif
+
 function normalizeNumber(value: any | null, defaultValue: number = 0): number {
-	if (typeof value === 'number') {
+	if (typeof value == 'number') {
 		return value as number
 	}
 	if (value == null) {
@@ -119,19 +145,6 @@ function createPoint(x: number, y: number, type: string, color: string, width: n
 	} as SignaturePoint
 }
 
-function getTouchPoint(e: UniTouchEvent): SignaturePoint {
-	let x = 0
-	let y = 0
-	if (e.touches.length > 0) {
-		x = e.touches[0].pageX
-		y = e.touches[0].pageY
-	} else if (e.changedTouches.length > 0) {
-		x = e.changedTouches[0].pageX
-		y = e.changedTouches[0].pageY
-	}
-	return createPoint(x, y, 'move', '', 0)
-}
-
 defineOptions({
 	name: 'up-signature'
 })
@@ -165,8 +178,14 @@ const props = defineProps({
 
 const emit = defineEmits(['confirm', 'error', 'change', 'clear'])
 
-const signatureCanvas = ref<any | null>(null)
-const canvasId = ref<string>('up-signature-' + Date.now().toString())
+let canvasCompCount = 0
+
+function makeCanvasId(prefix: string): string {
+	return prefix + Date.now().toString() + '_' + (++canvasCompCount).toString()
+}
+
+const instance = getCurrentInstance()
+const canvasId = ref<string>(makeCanvasId('up-signature-'))
 const canvasWidth = ref<number>(normalizeNumber(props.width, 300))
 const canvasHeight = ref<number>(normalizeNumber(props.height, 200))
 const lineColor = ref<string>(props.color)
@@ -178,6 +197,24 @@ const isEmpty = ref<boolean>(true)
 const presetColors = ref<Array<string>>(createColors())
 const showBrushSettings = ref<boolean>(false)
 const showColorSettings = ref<boolean>(false)
+
+let ctx: SignatureCanvasContext | null = null
+let lastDrawX = 0
+let lastDrawY = 0
+
+// #ifdef APP-ANDROID || APP-IOS
+const drawAreaRef = ref<UniElement | null>(null)
+// #endif
+// #ifdef APP-HARMONY
+const canvasRef = ref<UniCanvasElement | null>(null)
+// #endif
+// #ifndef APP
+let canvasContext: CanvasContext | null = null
+let canvasEl: UniCanvasElement | null = null
+// #ifdef WEB
+let isMouseDown = false
+// #endif
+// #endif
 
 const pathCount = computed<number>(() => {
 	return pathStack.value.length
@@ -217,48 +254,215 @@ function getLineWidth(): number {
 	return normalizeNumber(lineWidth.value, 3)
 }
 
-function touchStart(e: UniTouchEvent): void {
-	const canvas = signatureCanvas.value
-	if (canvas == null) return
+function getDrawElement(): UniElement | null {
+	// #ifdef APP-ANDROID || APP-IOS
+	return drawAreaRef.value
+	// #endif
+	// #ifdef APP-HARMONY
+	return canvasRef.value
+	// #endif
+	// #ifndef APP
+	return canvasEl as UniElement | null
+	// #endif
+}
+
+function getTouchPoint(e: UniTouchEvent): SignaturePoint {
+	let x = 0
+	let y = 0
+	let touch: UniTouch | null = null
+	if (e.touches.length > 0) {
+		touch = e.touches[0]
+	} else if (e.changedTouches.length > 0) {
+		touch = e.changedTouches[0]
+	}
+	if (touch != null) {
+		const el = getDrawElement()
+		if (el != null) {
+			const rect = el.getBoundingClientRect()
+			x = touch.clientX - rect.left
+			y = touch.clientY - rect.top
+		}
+	}
+	return createPoint(x, y, 'move', '', 0)
+}
+
+function applyLineStyle(color: string, width: number): void {
+	if (ctx == null) return
+	ctx!.lineWidth = width
+	ctx!.strokeStyle = color
+	ctx!.lineCap = 'round'
+	ctx!.lineJoin = 'round'
+}
+
+function beginPath(): void {
+	if (ctx != null) {
+		ctx!.beginPath()
+	}
+}
+
+function moveTo(x: number, y: number): void {
+	if (ctx != null) {
+		ctx!.moveTo(x, y)
+	}
+}
+
+function lineTo(x: number, y: number): void {
+	if (ctx != null) {
+		ctx!.lineTo(x, y)
+	}
+}
+
+function stroke(): void {
+	if (ctx == null) return
+	ctx!.stroke()
+	// #ifdef APP-ANDROID || APP-IOS
+	ctx!.update()
+	// #endif
+}
+
+function closePath(): void {
+	if (ctx != null) {
+		ctx!.closePath()
+	}
+}
+
+function clearDrawing(): void {
+	if (ctx == null) return
+	// #ifdef APP-ANDROID || APP-IOS
+	ctx!.reset()
+	ctx!.fillStyle = props.bgColor
+	ctx!.fillRect(0, 0, canvasWidth.value, canvasHeight.value)
+	ctx!.update()
+	// #endif
+	// #ifndef APP-ANDROID || APP-IOS
+	ctx!.clearRect(0, 0, canvasWidth.value, canvasHeight.value)
+	ctx!.fillStyle = props.bgColor
+	ctx!.fillRect(0, 0, canvasWidth.value, canvasHeight.value)
+	// #endif
+}
+
+function startDraw(x: number, y: number): void {
 	isDrawing.value = true
 	isEmpty.value = false
 	currentPath.value = createPath()
-	const point = getTouchPoint(e)
 	const col = getLineColor()
 	const wid = getLineWidth()
-	const startPoint = createPoint(normalizeNumber(point.x, 0), normalizeNumber(point.y, 0), 'start', col, wid)
+	const startPoint = createPoint(normalizeNumber(x, 0), normalizeNumber(y, 0), 'start', col, wid)
 	currentPath.value.push(startPoint)
-	canvas.setLineStyle(col, wid)
-	canvas.beginPath()
-	canvas.moveTo(startPoint.x, startPoint.y)
+	lastDrawX = startPoint.x
+	lastDrawY = startPoint.y
 	emit('change', currentPath.value)
 }
 
-function touchMove(e: UniTouchEvent): void {
+function moveDraw(x: number, y: number): void {
 	if (!isDrawing.value) return
-	const canvas = signatureCanvas.value
-	if (canvas == null) return
-	const point = getTouchPoint(e)
-	const movePoint = createPoint(normalizeNumber(point.x, 0), normalizeNumber(point.y, 0), 'move', getLineColor(), getLineWidth())
+	const movePoint = createPoint(normalizeNumber(x, 0), normalizeNumber(y, 0), 'move', getLineColor(), getLineWidth())
 	currentPath.value.push(movePoint)
-	canvas.lineTo(movePoint.x, movePoint.y)
-	canvas.stroke()
-	canvas.draw(false)
+	applyLineStyle(movePoint.color, movePoint.width)
+	beginPath()
+	moveTo(lastDrawX, lastDrawY)
+	lineTo(movePoint.x, movePoint.y)
+	stroke()
+	closePath()
+	lastDrawX = movePoint.x
+	lastDrawY = movePoint.y
 	emit('change', currentPath.value)
 }
 
-function touchEnd(): void {
+function endDraw(): void {
 	if (!isDrawing.value) return
-	const canvas = signatureCanvas.value
 	isDrawing.value = false
-	if (canvas != null) {
-		canvas.closePath()
-		canvas.draw(true)
-	}
 	if (currentPath.value.length > 0) {
 		pathStack.value.push(currentPath.value)
 	}
 	currentPath.value = createPath()
+}
+
+// #ifdef WEB
+function attachMouseEvents(canvas: UniCanvasElement): void {
+	canvas.addEventListener('mousedown', (event: UniMouseEvent) => {
+		isMouseDown = true
+		const rect = canvas.getBoundingClientRect()
+		startDraw(event.clientX - rect.left, event.clientY - rect.top)
+	})
+	canvas.addEventListener('mousemove', (event: UniMouseEvent) => {
+		if (!isMouseDown) return
+		const rect = canvas.getBoundingClientRect()
+		moveDraw(event.clientX - rect.left, event.clientY - rect.top)
+	})
+	canvas.addEventListener('mouseup', () => {
+		isMouseDown = false
+		endDraw()
+	})
+}
+// #endif
+
+function initContext(): void {
+	// #ifdef APP-ANDROID || APP-IOS
+	const drawArea = drawAreaRef.value
+	if (drawArea == null) return
+	ctx = drawArea.getDrawableContext() as DrawableContext
+	clearDrawing()
+	// #endif
+	// #ifdef APP-HARMONY
+	const canvas = canvasRef.value
+	if (canvas == null) return
+	const dpr = uni.getDeviceInfo().devicePixelRatio ?? 1
+	canvas.width = canvas.offsetWidth * dpr
+	canvas.height = canvas.offsetHeight * dpr
+	const c = canvas.getContext('2d')
+	if (c != null) {
+		ctx = c
+		c.scale(dpr, dpr)
+		clearDrawing()
+	}
+	// #endif
+	// #ifndef APP
+	uni.createCanvasContextAsync({
+		id: canvasId.value as string.IDString,
+		component: instance?.proxy,
+		success: (context: CanvasContext) => {
+			canvasContext = context
+			const c = context.getContext('2d')
+			if (c != null) {
+				ctx = c
+				canvasEl = c.canvas
+				const ratio = uni.getDeviceInfo().devicePixelRatio ?? 1
+				if (canvasEl != null) {
+					canvasEl.width = canvasEl.offsetWidth * ratio
+					canvasEl.height = canvasEl.offsetHeight * ratio
+					c.scale(ratio, ratio)
+					// #ifdef WEB
+					attachMouseEvents(canvasEl)
+					// #endif
+				}
+				clearDrawing()
+			}
+		},
+		fail: (err: UniError) => {
+			console.error('初始化Canvas失败:', err)
+		}
+	})
+	// #endif
+}
+
+function touchStart(e: UniTouchEvent): void {
+	e.stopPropagation()
+	e.preventDefault()
+	const point = getTouchPoint(e)
+	startDraw(point.x, point.y)
+}
+
+function touchMove(e: UniTouchEvent): void {
+	if (!isDrawing.value) return
+	e.stopPropagation()
+	e.preventDefault()
+	const point = getTouchPoint(e)
+	moveDraw(point.x, point.y)
+}
+
+function touchEnd(): void {
+	endDraw()
 }
 
 function selectColor(col: string): void {
@@ -266,9 +470,7 @@ function selectColor(col: string): void {
 }
 
 function redraw(): void {
-	const canvas = signatureCanvas.value
-	if (canvas == null) return
-	canvas.clearCanvas()
+	clearDrawing()
 	const stack = pathStack.value
 	if (stack.length == 0) {
 		isEmpty.value = true
@@ -278,18 +480,18 @@ function redraw(): void {
 	for (let i = 0; i < stack.length; i++) {
 		const path = stack[i]
 		if (path.length == 0) continue
-		canvas.beginPath()
+		beginPath()
 		for (let j = 0; j < path.length; j++) {
 			const point = path[j]
-			if (j == 0 && point.type === 'start') {
-				canvas.setLineStyle(point.color, point.width)
-				canvas.moveTo(point.x, point.y)
-			} else if (point.type === 'move') {
-				canvas.lineTo(point.x, point.y)
+			if (j == 0 && point.type == 'start') {
+				applyLineStyle(point.color, point.width)
+				moveTo(point.x, point.y)
+			} else if (point.type == 'move') {
+				lineTo(point.x, point.y)
 			}
 		}
-		canvas.stroke()
-		canvas.draw(true)
+		stroke()
+		closePath()
 	}
 }
 
@@ -300,10 +502,7 @@ function undo(): void {
 }
 
 function clearCanvas(): void {
-	const canvas = signatureCanvas.value
-	if (canvas != null) {
-		canvas.clearCanvas()
-	}
+	clearDrawing()
 	pathStack.value = createPathStack()
 	currentPath.value = createPath()
 	isEmpty.value = true
@@ -315,22 +514,48 @@ function exportSignature(): void {
 		emit('error', '签名为空')
 		return
 	}
-	const canvas = signatureCanvas.value
-	if (canvas == null) {
+	redraw()
+	// #ifdef APP-ANDROID || APP-IOS
+	const el = drawAreaRef.value
+	if (el == null) {
 		emit('error', '无法获取画布实例')
 		return
 	}
-	redraw()
-	const result = canvas.exportImage('png', 1)
-	if (result == null) {
+	el.takeSnapshot({
+		format: 'png',
+		success: (res: TakeSnapshotSuccess) => {
+			const tempFilePath = res.tempFilePath
+			if (tempFilePath == '') {
+				emit('error', '导出签名图片失败')
+			} else {
+				emit('confirm', tempFilePath)
+			}
+		},
+		fail: (err: TakeSnapshotFail) => {
+			emit('error', err.errMsg)
+		}
+	} as TakeSnapshotOptions)
+	// #endif
+	// #ifdef APP-HARMONY
+	const harmonyCanvas = canvasRef.value
+	if (harmonyCanvas == null) {
+		emit('error', '无法获取画布实例')
+		return
+	}
+	emit('confirm', harmonyCanvas.toDataURL('image/png', 1))
+	// #endif
+	// #ifndef APP
+	if (canvasContext == null) {
+		emit('error', '无法获取画布实例')
+		return
+	}
+	const dataUrl = canvasContext.toDataURL('image/png', 1)
+	if (dataUrl == null || dataUrl == '') {
 		emit('error', '导出签名图片失败')
 		return
 	}
-	;(result as Promise<string>).then((imagePath: string) => {
-		emit('confirm', imagePath)
-	}).catch((err: any | null) => {
-		emit('error', err)
-	})
+	emit('confirm', dataUrl)
+	// #endif
 }
 
 function toggleBrushSettings(): void {
@@ -347,20 +572,39 @@ function toggleColorSettings(): void {
 	}
 }
 
-watch(() => props.width, (newVal: any | null) => {
+watch((): any => props.width, (newVal: any | null) => {
 	canvasWidth.value = normalizeNumber(newVal, 300)
 })
 
-watch(() => props.height, (newVal: any | null) => {
+watch((): any => props.height, (newVal: any | null) => {
 	canvasHeight.value = normalizeNumber(newVal, 200)
 })
 
-watch(() => props.color, (newVal: string) => {
+watch((): any => props.color, (newVal: string) => {
 	lineColor.value = newVal
 })
 
-watch(() => props.thickness, (newVal: any | null) => {
+watch((): any => props.thickness, (newVal: any | null) => {
 	lineWidth.value = normalizeNumber(newVal, 3)
+})
+
+let initAttempts = 0
+
+function scheduleInit(delay: number): void {
+	setTimeout(() => {
+		initContext()
+		if (ctx == null && initAttempts < 2) {
+			initAttempts++
+			scheduleInit(200)
+		}
+	}, delay)
+}
+
+onMounted(() => {
+	nextTick(() => {
+		initAttempts = 0
+		scheduleInit(100)
+	})
 })
 
 defineExpose({
@@ -396,14 +640,21 @@ defineExpose({
 
 		&__toolbar-icons {
 			display: flex;
+			flex-direction: row;
 			justify-content: space-between;
 			align-items: center;
+			width: 100%;
 			padding: 1px 0;
 			border-radius: 4px;
 		}
 
 		&__toolbar-icon {
-			padding: 5px;
+			flex: 1;
+			display: flex;
+			flex-direction: row;
+			justify-content: center;
+			align-items: center;
+			padding: 5px 0;
 		}
 
 		&__brush-settings,

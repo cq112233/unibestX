@@ -77,7 +77,7 @@
         ]" :style="{height: rowHeight}" @click="handleRowClick(row)">
         <view v-for="(col, colIndex) in columns" :key="col.key" 
             class="up-table-cell"
-            :class="[col.align ? 'up-text-' + col.align : '',
+            :class="[col.align ? 'up-text-' + col.align : 'up-text-center',
                 cellClassName ? cellClassName(row, col) : '',
                 getFixedClass(col),
                 getCellSpanClass(rowIndex, colIndex)

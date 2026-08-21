@@ -14,6 +14,8 @@
 4. **与 Layout 深度联动**：支持通过 `layout: 'default' | 'empty' | false` 动态切换或禁用页面的布局组件。
 5. **实时热更新**：保存页面代码时，`pages.json` 毫秒级自动同步更新，并在语法错误时具备防崩缓存兜底。
 
+> ⚠️ **语法错误保护**：当 `pages.config.json` 存在语法错误（例如编辑中途）时，插件会使用最近一次成功解析的配置兜底生成 `pages.json`，并且**绝不会回写/覆盖** `pages.config.json`，避免 `globalStyle`、`tabBar`、`easycom` 以及自定义格式被自动同步破坏。修复语法后保存文件即可恢复自动同步。
+
 ---
 
 ## `definePage` 使用指南

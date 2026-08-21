@@ -612,7 +612,6 @@ function drawCanvasBarcode(): Promise<void> {
       if (props.displayValue) {
         drawCanvasText(context, barcodeY, textHeight)
       }
-      context.draw()
       resolve()
     } catch (err) {
       reject(err)

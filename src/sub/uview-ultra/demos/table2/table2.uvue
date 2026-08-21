@@ -1,0 +1,389 @@
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
+    <NavBar title="up-table2 表格"></NavBar>
+    <view class="p-[16px]">
+      <!-- 1. 基础表格（斑马纹 + 边框） -->
+      <view class="demo-block">
+        <up-title class="demo-title">
+          <text class="demo-title-text">基础表格（斑马纹 + 边框）</text>
+        </up-title>
+        <up-table2
+          :data="tableData"
+          :columns="columns"
+          stripe
+          border
+          @row-click="handleRowClick"
+        ></up-table2>
+      </view>
+
+      <!-- 2. 表格样式自定义 -->
+      <view class="demo-block mt-[12px]">
+        <up-title class="demo-title">
+          <text class="demo-title-text">表格样式自定义（cellStyle + 列 style）</text>
+        </up-title>
+        <up-table2
+          :data="tableData"
+          :columns="columnsStyle"
+          stripe
+          border
+          :cell-style="cellStyleFunc"
+        >
+          <template #cell="{ row, column }">
+            <text
+              class="custom-cell-text"
+              :style="getCellTextStyle(column as UTSJSONObject, row as UTSJSONObject)"
+            >
+              {{ getLabel(row as UTSJSONObject, column as UTSJSONObject) }}
+            </text>
+          </template>
+        </up-table2>
+      </view>
+
+      <!-- 3. 单选高亮 -->
+      <view class="demo-block mt-[12px]">
+        <up-title class="demo-title">
+          <text class="demo-title-text">单选高亮（highlight-current-row）</text>
+        </up-title>
+        <up-table2
+          :data="tableData"
+          :columns="columns"
+          highlight-current-row
+          :current-row-key="currentRowId"
+          @row-click="handleRowClick"
+          @current-change="onCurrentChange"
+        ></up-table2>
+      </view>
+
+      <!-- 4. 复选框选择 -->
+      <view class="demo-block mt-[12px]">
+        <up-title class="demo-title">
+          <text class="demo-title-text">复选框选择（type: selection）</text>
+        </up-title>
+        <up-table2
+          :data="tableData"
+          :columns="columnsCheck"
+          row-key="id"
+          @selection-change="onSelectionChange"
+          @select="onSelect"
+        ></up-table2>
+      </view>
+
+      <!-- 5. 排序与筛选 -->
+      <view class="demo-block mt-[12px]">
+        <up-title class="demo-title">
+          <text class="demo-title-text">排序与筛选（sortable + filters）</text>
+        </up-title>
+        <view class="filter-bar">
+          <up-button text="全部" type="primary" :plain="!getFilterActive('')" size="mini" class="filter-btn" @click="changeFilter('')"></up-button>
+          <up-button text="筛选姓「张」" type="primary" :plain="!getFilterActive('张')" size="mini" class="filter-btn" @click="changeFilter('张')"></up-button>
+        </view>
+        <up-table2
+          :data="tableData"
+          :columns="columnsSort"
+          sortable
+          :filters="filtersValue"
+          @sort-change="onSortChange"
+          @filter-change="onFilterChange"
+        ></up-table2>
+      </view>
+
+      <!-- 6. 树形结构 + 固定列 -->
+      <view class="demo-block mt-[12px]">
+        <up-title class="demo-title">
+          <text class="demo-title-text">树形结构 + 固定列（fixed: left）</text>
+        </up-title>
+        <up-table2
+          :data="treeData"
+          :columns="columnsTree"
+          :tree-props="treePropsValue"
+          :expand-row-keys="expandKeys"
+          @expand-change="onExpandChange"
+        ></up-table2>
+      </view>
+
+      <!-- 7. 单元格合并 -->
+      <view class="demo-block mt-[12px]">
+        <up-title class="demo-title">
+          <text class="demo-title-text">单元格合并（span-method）</text>
+        </up-title>
+        <up-table2
+          :data="spanData"
+          :columns="columnsSpan"
+          :span-method="spanMethod"
+          border
+        ></up-table2>
+      </view>
+
+      <!-- 8. 说明 -->
+      <view class="demo-block mt-[12px]">
+        <up-title class="demo-title">
+          <text class="demo-title-text">说明</text>
+        </up-title>
+        <text class="demo-text">
+          up-table2 兼容 Element Plus 表格 API：支持斑马纹/边框、cellStyle/rowClassName 等样式回调、单选高亮、复选框选择、排序与筛选、树形结构、固定列与单元格合并；App 端（安卓/iOS/鸿蒙）基于原生 scroll-view 与 UTSJSONObject 实现，H5/小程序沿用原 .vue 实现。注意：小程序不支持直接传 Function 类型 props。
+        </text>
+      </view>
+
+      <view class="log-box mt-[10px]">
+        <text class="log-text">{{ eventLog }}</text>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { ref } from 'vue';
+
+const eventLog = ref<string>('点击行 / 勾选 / 排序 / 筛选 / 展开等操作日志将显示在这里');
+
+const currentRowId = ref<string>('');
+
+const tableData = ref<UTSJSONObject[]>([
+  { id: 1, name: '张三', age: 25, city: '北京' },
+  { id: 2, name: '李四', age: 30, city: '上海' },
+  { id: 3, name: '王五', age: 28, city: '广州' },
+  { id: 4, name: '赵六', age: 35, city: '深圳' },
+  { id: 5, name: '张三丰', age: 22, city: '成都' }
+] as UTSJSONObject[]);
+
+const columns = ref<UTSJSONObject[]>([
+  { title: '姓名', key: 'name', width: '100px', align: 'center' },
+  { title: '年龄', key: 'age', width: '80px', align: 'center' },
+  { title: '城市', key: 'city', width: '100px', align: 'center' }
+] as UTSJSONObject[]);
+
+const columnsStyle = ref<UTSJSONObject[]>([
+  { title: '姓名', key: 'name', width: '100px', align: 'center' },
+  {
+    align: 'center',
+    title: '年龄',
+    key: 'age',
+    width: '80px',
+    style: { 'background': '#eef2ff', 'color': '#4f46e5', 'justify-content': 'center' } as UTSJSONObject
+  },
+  { title: '城市', key: 'city', width: '100px', align: 'center' }
+] as UTSJSONObject[]);
+
+const columnsCheck = ref<UTSJSONObject[]>([
+  { type: 'selection', width: '60px' },
+  { title: '姓名', key: 'name', width: '100px' },
+  { title: '年龄', key: 'age', width: '80px' },
+  { title: '城市', key: 'city', width: '100px' }
+] as UTSJSONObject[]);
+
+const columnsSort = ref<UTSJSONObject[]>([
+  { title: '姓名', key: 'name', sortable: true, width: '100px' },
+  { title: '年龄', key: 'age', sortable: true, width: '80px' },
+  { title: '城市', key: 'city', width: '100px' }
+] as UTSJSONObject[]);
+
+const filtersValue = ref<UTSJSONObject>({ name: '' } as UTSJSONObject);
+
+const treeData = ref<UTSJSONObject[]>([
+  {
+    id: 1,
+    name: '部门A',
+    dept: '研发部',
+    age: 0,
+    children: [
+      { id: 2, name: '员工1', dept: '前端组', age: 22 },
+      { id: 3, name: '员工2', dept: '后端组', age: 24 }
+    ]
+  },
+  { id: 4, name: '部门B', dept: '产品部', age: 0 },
+  {
+    id: 5,
+    name: '部门C',
+    dept: '设计部',
+    age: 0,
+    children: [
+      { id: 6, name: '员工3', dept: 'UI组', age: 26 },
+      { id: 7, name: '员工4', dept: '交互组', age: 27 }
+    ]
+  }
+] as UTSJSONObject[]);
+
+const columnsTree = ref<UTSJSONObject[]>([
+  { title: '名称', key: 'name', fixed: 'left', width: '110px' },
+  { title: '部门', key: 'dept', width: '110px' },
+  { title: '年龄', key: 'age', width: '80px' }
+] as UTSJSONObject[]);
+
+const treePropsValue = ref<UTSJSONObject>({ children: 'children' } as UTSJSONObject);
+const expandKeys = ref<string[]>(['1', '5']);
+
+const spanData = ref<UTSJSONObject[]>([
+  { id: 1, name: '苹果', amount: 10, date: '2023-01-01' },
+  { id: 2, name: '苹果', amount: 15, date: '2023-01-01' },
+  { id: 3, name: '香蕉', amount: 8, date: '2023-01-02' },
+  { id: 4, name: '香蕉', amount: 12, date: '2023-01-02' }
+] as UTSJSONObject[]);
+
+const columnsSpan = ref<UTSJSONObject[]>([
+  { title: 'ID', key: 'id', width: '60px' },
+  { title: '姓名', key: 'name', width: '90px' },
+  { title: '数量', key: 'amount', width: '80px' },
+  { title: '日期', key: 'date', width: '120px' }
+] as UTSJSONObject[]);
+
+function getLabel(row: UTSJSONObject, column: UTSJSONObject): string {
+  const key = column.key;
+  if (key == null) {
+    return '';
+  }
+  const value = row[key.toString()];
+  return value == null ? '-' : value.toString();
+}
+
+function getCellTextStyle(column: UTSJSONObject, row: UTSJSONObject): UTSJSONObject {
+  const style = {} as UTSJSONObject;
+  const key = column.key;
+  if (key != null && key.toString() == 'age' && row.age != null && row.age.toString() == '25') {
+    style.color = '#4f46e5';
+    style.fontWeight = 'bold';
+  }
+  return style;
+}
+
+function cellStyleFunc(scope: UTSJSONObject): UTSJSONObject {
+  const style = {} as UTSJSONObject;
+  const column = scope.column as UTSJSONObject | null;
+  const row = scope.row as UTSJSONObject | null;
+  if (column != null && row != null && column.key != null && column.key.toString() == 'age' && row.age != null && row.age.toString() == '25') {
+    style.backgroundColor = '#eef2ff';
+  }
+  return style;
+}
+
+function toNumber(value: any | null, fallback: number = 0): number {
+  if (value == null) {
+    return fallback;
+  }
+  const parsed = parseInt(value.toString());
+  return isNaN(parsed) ? fallback : parsed;
+}
+
+function spanMethod(scope: UTSJSONObject): any | null {
+  const rowIndex = toNumber(scope.rowIndex, 0);
+  const columnIndex = toNumber(scope.columnIndex, 0);
+  if (columnIndex == 1) {
+    if (rowIndex == 0 || rowIndex == 1) {
+      return rowIndex == 0 ? ([2, 1] as number[]) : ([0, 0] as number[]);
+    }
+    if (rowIndex == 2 || rowIndex == 3) {
+      return rowIndex == 2 ? ([2, 1] as number[]) : ([0, 0] as number[]);
+    }
+  }
+  if (columnIndex == 3) {
+    if (rowIndex == 0 || rowIndex == 1) {
+      return rowIndex == 0 ? ([2, 1] as number[]) : ([0, 0] as number[]);
+    }
+    if (rowIndex == 2 || rowIndex == 3) {
+      return rowIndex == 2 ? ([2, 1] as number[]) : ([0, 0] as number[]);
+    }
+  }
+  return null;
+}
+
+function valueToString(value: any | null): string {
+  return value == null ? '' : value.toString();
+}
+
+function getRowText(row: UTSJSONObject): string {
+  const id = row.id == null ? '' : row.id.toString();
+  const name = row.name == null ? '' : row.name.toString();
+  return `#${id} ${name}`;
+}
+
+function getFilterActive(value: string): boolean {
+  return filtersValue.value.name != null && filtersValue.value.name.toString() == value;
+}
+
+function changeFilter(value: string): void {
+  filtersValue.value = { name: value } as UTSJSONObject;
+}
+
+function handleRowClick(row: UTSJSONObject): void {
+  currentRowId.value = row.id == null ? '' : row.id.toString();
+  eventLog.value = `row-click => ${getRowText(row)}`;
+}
+
+function onCurrentChange(row: UTSJSONObject): void {
+  eventLog.value = `current-change => ${getRowText(row)}`;
+}
+
+function onSelectionChange(selection: UTSJSONObject[]): void {
+  eventLog.value = `selection-change => 已选 ${selection.length} 行`;
+}
+
+function onSelect(row: UTSJSONObject, selected: boolean): void {
+  eventLog.value = `select => ${getRowText(row)} ${selected ? '勾选' : '取消'}`;
+}
+
+function onSortChange(conditions: UTSJSONObject[]): void {
+  if (conditions.length == 0) {
+    eventLog.value = 'sort-change => 取消排序';
+    return;
+  }
+  const item = conditions[0] as UTSJSONObject;
+  eventLog.value = `sort-change => ${valueToString(item.key)} ${valueToString(item.order)}`;
+}
+
+function onFilterChange(filters: UTSJSONObject): void {
+  eventLog.value = `filter-change => 筛选 name = "${valueToString(filters.name)}"`;
+}
+
+function onExpandChange(keys: string[]): void {
+  eventLog.value = `expand-change => 展开行 keys: ${keys.join(',')}`;
+}
+</script>
+
+<style lang="scss" scoped>
+.demo-block {
+  margin-bottom: 12px;
+  padding: 12px;
+  background-color: #ffffff;
+  border-radius: 8px;
+}
+
+.demo-title {
+  margin-bottom: 10px;
+}
+.demo-title-text {
+  font-size: 14px;
+  font-weight: bold;
+  color: #606266;
+}
+
+.demo-text {
+  font-size: 13px;
+  line-height: 20px;
+  color: #64748b;
+}
+
+.log-box {
+  padding: 10px 12px;
+  background-color: #0f172a;
+  border-radius: 8px;
+}
+
+.log-text {
+  font-size: 12px;
+  line-height: 18px;
+  color: #93c5fd;
+}
+
+.filter-bar {
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 10px;
+}
+
+.filter-btn {
+  margin-right: 10px;
+}
+
+.custom-cell-text {
+  font-size: 13px;
+}
+</style>

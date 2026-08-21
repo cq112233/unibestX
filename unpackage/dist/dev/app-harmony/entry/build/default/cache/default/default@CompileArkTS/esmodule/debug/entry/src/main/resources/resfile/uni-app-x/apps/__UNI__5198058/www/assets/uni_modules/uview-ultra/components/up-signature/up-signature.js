@@ -1,0 +1,533 @@
+import { _ as __easycom_1 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-icon/up-icon&";
+import { _ as __easycom_1$1 } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/components/up-slider/up-slider&";
+import { t } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/uni_modules/uview-ultra/libs/i18n/index&";
+import { _ as _export_sfc } from "@normalized:N&&&entry/src/main/resources/resfile/uni-app-x/apps/__UNI__5198058/www/assets/plugin-vue-export-helper&";
+const { defineEmits: _defineEmits, defineVaporSharedDataComponent: _defineVaporSharedDataComponent } = globalThis.Vue;
+const { useSharedDataComponentOptions: _useSharedDataComponentOptions, useSharedDataScope: _useSharedDataScope, withSharedDataComponent: _withSharedDataComponent, createSharedDataTemplateRefSetter: _createSharedDataTemplateRefSetter, resolveComponent: _resolveComponent, setSharedDataStyle: _setSharedDataStyle, renderSharedDataEffect: _renderSharedDataEffect, createSharedDataComponentWithFallback: _createSharedDataComponentWithFallback, setSharedData: _setSharedData, setSharedDataTemplateRef: _setSharedDataTemplateRef, toSharedDataBoolean: _toSharedDataBoolean, setSharedDataEvent: _setSharedDataEvent, toDisplayString: _toDisplayString, createSharedDataIf: _createSharedDataIf, setSharedDataScoped: _setSharedDataScoped, createSharedDataVFor: _createSharedDataVFor, setSharedDataClass: _setSharedDataClass, createSharedDataFor: _createSharedDataFor } = globalThis.Vue;
+const __className = "GenUniModulesUviewUltraComponentsUpSignatureUpSignature";
+const { ref, computed, watch, onMounted, nextTick, getCurrentInstance } = globalThis.Vue;
+class SignaturePoint extends UTS.UTSType {
+  static get$UTSMetadata$() {
+    return {
+      kind: 2,
+      get fields() {
+        return {
+          x: { type: Number, optional: false },
+          y: { type: Number, optional: false },
+          type: { type: String, optional: false },
+          color: { type: String, optional: false },
+          width: { type: Number, optional: false }
+        };
+      },
+      name: "SignaturePoint"
+    };
+  }
+  constructor(options, metadata = SignaturePoint.get$UTSMetadata$(), isJSONParse = false) {
+    super();
+    this.__props__ = UTS.UTSType.initProps(options, metadata, isJSONParse);
+    this.x = this.__props__.x;
+    this.y = this.__props__.y;
+    this.type = this.__props__.type;
+    this.color = this.__props__.color;
+    this.width = this.__props__.width;
+    delete this.__props__;
+  }
+}
+const _sfc_main = /* @__PURE__ */ _defineVaporSharedDataComponent({
+  ...{
+    name: "up-signature"
+  },
+  __dynamicSharedData: true,
+  __hash: "4bfccdac",
+  __className,
+  __filename: "uni_modules/uview-ultra/components/up-signature/up-signature.uvue",
+  __name: "up-signature",
+  props: {
+    width: {
+      type: [String, Number],
+      default: 300
+    },
+    height: {
+      type: [String, Number],
+      default: 200
+    },
+    bgColor: {
+      type: String,
+      default: "#ffffff"
+    },
+    color: {
+      type: String,
+      default: "#000000"
+    },
+    thickness: {
+      type: [String, Number],
+      default: 3
+    },
+    showToolbar: {
+      type: Boolean,
+      default: true
+    }
+  },
+  emits: ["confirm", "error", "change", "clear"],
+  setup(__props, _a) {
+    var __expose = _a.expose, __emit = _a.emit;
+    const __sharedDataScope = _useSharedDataScope();
+    const __sharedData = _withSharedDataComponent(new UniDynamicSharedDataComponent(__sharedDataScope, _useSharedDataComponentOptions({ bundleKey: "GenUniModulesUviewUltraComponentsUpSignatureUpSignatureSharedData", sharedDataClassId: 0 })));
+    function normalizeNumber(value = null, defaultValue = 0) {
+      if (typeof value == "number") {
+        return value;
+      }
+      if (value == null) {
+        return defaultValue;
+      }
+      const parsed = parseFloat(value.toString());
+      return isNaN(parsed) ? defaultValue : parsed;
+    }
+    function createPath() {
+      return [];
+    }
+    function createPathStack() {
+      return [];
+    }
+    function createColors() {
+      return [
+        "#000000",
+        "#ff0000",
+        "#00ff00",
+        "#0000ff",
+        "#ffff00",
+        "#00ffff",
+        "#ff00ff",
+        "#ffffff"
+      ];
+    }
+    function createPoint(x, y, type, color, width) {
+      return new SignaturePoint({
+        x,
+        y,
+        type,
+        color,
+        width
+      });
+    }
+    const props = __props;
+    const emit = __emit;
+    let canvasCompCount = 0;
+    function makeCanvasId(prefix) {
+      return prefix + Date.now().toString() + "_" + (++canvasCompCount).toString();
+    }
+    getCurrentInstance();
+    ref(makeCanvasId("up-signature-"));
+    const canvasWidth = ref(normalizeNumber(props.width, 300));
+    const canvasHeight = ref(normalizeNumber(props.height, 200));
+    const lineColor = ref(props.color);
+    const lineWidth = ref(normalizeNumber(props.thickness, 3));
+    const isDrawing = ref(false);
+    const pathStack = ref(createPathStack());
+    const currentPath = ref(createPath());
+    const isEmpty = ref(true);
+    const presetColors = ref(createColors());
+    const showBrushSettings = ref(false);
+    const showColorSettings = ref(false);
+    let ctx = null;
+    let lastDrawX = 0;
+    let lastDrawY = 0;
+    const canvasRef = ref(null);
+    const pathCount = computed(() => {
+      return pathStack.value.length;
+    });
+    const colorItems = computed(() => {
+      return presetColors.value;
+    });
+    const canvasWrapStyle = computed(() => {
+      const style = new UTSJSONObject({});
+      style["width"] = canvasWidth.value.toString() + "px";
+      style["height"] = canvasHeight.value.toString() + "px";
+      style["backgroundColor"] = props.bgColor;
+      return style;
+    });
+    const penSizeLabel = computed(() => {
+      return t("up.signature.penSize");
+    });
+    const penColorLabel = computed(() => {
+      return t("up.signature.penColor");
+    });
+    function getColorStyle(col) {
+      const style = new UTSJSONObject({});
+      style["backgroundColor"] = col;
+      return style;
+    }
+    function getLineColor() {
+      return lineColor.value == null ? "#000000" : lineColor.value.toString();
+    }
+    function getLineWidth() {
+      return normalizeNumber(lineWidth.value, 3);
+    }
+    function getDrawElement() {
+      return canvasRef.value;
+    }
+    function getTouchPoint(e) {
+      let x = 0;
+      let y = 0;
+      let touch = null;
+      if (e.touches.length > 0) {
+        touch = e.touches[0];
+      } else if (e.changedTouches.length > 0) {
+        touch = e.changedTouches[0];
+      }
+      if (touch != null) {
+        const el = getDrawElement();
+        if (el != null) {
+          const rect = el.getBoundingClientRect();
+          x = touch.clientX - rect.left;
+          y = touch.clientY - rect.top;
+        }
+      }
+      return createPoint(x, y, "move", "", 0);
+    }
+    function applyLineStyle(color, width) {
+      if (ctx == null)
+        return null;
+      ctx.lineWidth = width;
+      ctx.strokeStyle = color;
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+    }
+    function beginPath() {
+      if (ctx != null) {
+        ctx.beginPath();
+      }
+    }
+    function moveTo(x, y) {
+      if (ctx != null) {
+        ctx.moveTo(x, y);
+      }
+    }
+    function lineTo(x, y) {
+      if (ctx != null) {
+        ctx.lineTo(x, y);
+      }
+    }
+    function stroke() {
+      if (ctx == null)
+        return null;
+      ctx.stroke();
+    }
+    function closePath() {
+      if (ctx != null) {
+        ctx.closePath();
+      }
+    }
+    function clearDrawing() {
+      if (ctx == null)
+        return null;
+      ctx.clearRect(0, 0, canvasWidth.value, canvasHeight.value);
+      ctx.fillStyle = props.bgColor;
+      ctx.fillRect(0, 0, canvasWidth.value, canvasHeight.value);
+    }
+    function startDraw(x, y) {
+      isDrawing.value = true;
+      isEmpty.value = false;
+      currentPath.value = createPath();
+      const col = getLineColor();
+      const wid = getLineWidth();
+      const startPoint = createPoint(normalizeNumber(x, 0), normalizeNumber(y, 0), "start", col, wid);
+      currentPath.value.push(startPoint);
+      lastDrawX = startPoint.x;
+      lastDrawY = startPoint.y;
+      emit("change", currentPath.value);
+    }
+    function moveDraw(x, y) {
+      if (!isDrawing.value)
+        return null;
+      const movePoint = createPoint(normalizeNumber(x, 0), normalizeNumber(y, 0), "move", getLineColor(), getLineWidth());
+      currentPath.value.push(movePoint);
+      applyLineStyle(movePoint.color, movePoint.width);
+      beginPath();
+      moveTo(lastDrawX, lastDrawY);
+      lineTo(movePoint.x, movePoint.y);
+      stroke();
+      closePath();
+      lastDrawX = movePoint.x;
+      lastDrawY = movePoint.y;
+      emit("change", currentPath.value);
+    }
+    function endDraw() {
+      if (!isDrawing.value)
+        return null;
+      isDrawing.value = false;
+      if (currentPath.value.length > 0) {
+        pathStack.value.push(currentPath.value);
+      }
+      currentPath.value = createPath();
+    }
+    function initContext() {
+      var _a2;
+      const canvas = canvasRef.value;
+      if (canvas == null)
+        return null;
+      const dpr = (_a2 = uni.getDeviceInfo().devicePixelRatio) !== null && _a2 !== void 0 ? _a2 : 1;
+      canvas.width = canvas.offsetWidth * dpr;
+      canvas.height = canvas.offsetHeight * dpr;
+      const c = canvas.getContext("2d");
+      if (c != null) {
+        ctx = c;
+        c.scale(dpr, dpr);
+        clearDrawing();
+      }
+    }
+    function touchStart(e) {
+      e.stopPropagation();
+      e.preventDefault();
+      const point = getTouchPoint(e);
+      startDraw(point.x, point.y);
+    }
+    function touchMove(e) {
+      if (!isDrawing.value)
+        return null;
+      e.stopPropagation();
+      e.preventDefault();
+      const point = getTouchPoint(e);
+      moveDraw(point.x, point.y);
+    }
+    function touchEnd() {
+      endDraw();
+    }
+    function selectColor(col) {
+      lineColor.value = col;
+    }
+    function redraw() {
+      clearDrawing();
+      const stack = pathStack.value;
+      if (stack.length == 0) {
+        isEmpty.value = true;
+        return null;
+      }
+      isEmpty.value = false;
+      for (let i = 0; i < stack.length; i++) {
+        const path = stack[i];
+        if (path.length == 0)
+          continue;
+        beginPath();
+        for (let j = 0; j < path.length; j++) {
+          const point = path[j];
+          if (j == 0 && point.type == "start") {
+            applyLineStyle(point.color, point.width);
+            moveTo(point.x, point.y);
+          } else if (point.type == "move") {
+            lineTo(point.x, point.y);
+          }
+        }
+        stroke();
+        closePath();
+      }
+    }
+    function undo() {
+      if (pathStack.value.length == 0)
+        return null;
+      UTS.arrayPop(pathStack.value);
+      redraw();
+    }
+    function clearCanvas() {
+      clearDrawing();
+      pathStack.value = createPathStack();
+      currentPath.value = createPath();
+      isEmpty.value = true;
+      emit("clear");
+    }
+    function exportSignature() {
+      if (isEmpty.value) {
+        emit("error", "签名为空");
+        return null;
+      }
+      redraw();
+      const harmonyCanvas = canvasRef.value;
+      if (harmonyCanvas == null) {
+        emit("error", "无法获取画布实例");
+        return null;
+      }
+      emit("confirm", harmonyCanvas.toDataURL("image/png", 1));
+    }
+    function toggleBrushSettings() {
+      showBrushSettings.value = !showBrushSettings.value;
+      if (showBrushSettings.value) {
+        showColorSettings.value = false;
+      }
+    }
+    function toggleColorSettings() {
+      showColorSettings.value = !showColorSettings.value;
+      if (showColorSettings.value) {
+        showBrushSettings.value = false;
+      }
+    }
+    watch(() => {
+      return props.width;
+    }, (newVal = null) => {
+      canvasWidth.value = normalizeNumber(newVal, 300);
+    });
+    watch(() => {
+      return props.height;
+    }, (newVal = null) => {
+      canvasHeight.value = normalizeNumber(newVal, 200);
+    });
+    watch(() => {
+      return props.color;
+    }, (newVal) => {
+      lineColor.value = newVal;
+    });
+    watch(() => {
+      return props.thickness;
+    }, (newVal = null) => {
+      lineWidth.value = normalizeNumber(newVal, 3);
+    });
+    let initAttempts = 0;
+    function scheduleInit(delay) {
+      setTimeout(() => {
+        initContext();
+        if (ctx == null && initAttempts < 2) {
+          initAttempts++;
+          scheduleInit(200);
+        }
+      }, delay);
+    }
+    onMounted(() => {
+      nextTick(() => {
+        initAttempts = 0;
+        scheduleInit(100);
+      });
+    });
+    __expose({
+      undo,
+      clearCanvas,
+      redraw,
+      exportSignature
+    });
+    return () => {
+      "raw js";
+      const _setTemplateRef = _createSharedDataTemplateRefSetter();
+      const _component_canvas = _resolveComponent("canvas");
+      const _component_up_icon = __easycom_1;
+      const _component_up_slider = __easycom_1$1;
+      _renderSharedDataEffect(() => {
+        return _setSharedDataStyle(__sharedData, 19, canvasWrapStyle.value);
+      });
+      const n0 = _createSharedDataComponentWithFallback(_component_canvas, "00dcd15e", {
+        class: "up-signature__canvas",
+        onTouchstart: () => {
+          return touchStart;
+        },
+        onTouchmove: () => {
+          return touchMove;
+        },
+        onTouchend: () => {
+          return touchEnd;
+        },
+        onTouchcancel: () => {
+          return touchEnd;
+        }
+      });
+      _setSharedData(__sharedData, 17, n0?.sharedData);
+      _setSharedDataTemplateRef(__sharedData, 18, (n02) => {
+        _setTemplateRef(n02, canvasRef, null, "canvasRef");
+      });
+      _createSharedDataIf(() => {
+        return _setSharedData(__sharedData, 0, _toSharedDataBoolean(__props.showToolbar));
+      }, () => {
+        const n4 = _createSharedDataComponentWithFallback(_component_up_icon, "00dcb91e", {
+          name: "arrow-left",
+          size: "22",
+          color: () => {
+            return pathCount.value == 0 ? "#ccc" : "#999";
+          }
+        });
+        _setSharedData(__sharedData, 7, n4?.sharedData);
+        _setSharedDataEvent(__sharedData, 12, undo);
+        const n6 = _createSharedDataComponentWithFallback(_component_up_icon, "00dcaaa2", {
+          name: "trash",
+          size: "25",
+          color: "#999"
+        });
+        _setSharedData(__sharedData, 8, n6?.sharedData);
+        _setSharedDataEvent(__sharedData, 13, clearCanvas);
+        const n8 = _createSharedDataComponentWithFallback(_component_up_icon, "00dc9d02", {
+          name: "edit-pen",
+          size: "25",
+          color: "#999"
+        });
+        _setSharedData(__sharedData, 9, n8?.sharedData);
+        _setSharedDataEvent(__sharedData, 14, toggleBrushSettings);
+        const n10 = _createSharedDataComponentWithFallback(_component_up_icon, "00dc9448", {
+          name: "grid",
+          size: "24",
+          color: "#999"
+        });
+        _setSharedData(__sharedData, 10, n10?.sharedData);
+        _setSharedDataEvent(__sharedData, 15, toggleColorSettings);
+        const n12 = _createSharedDataComponentWithFallback(_component_up_icon, "1abd5a7a", {
+          name: "checkmark",
+          size: "25",
+          color: () => {
+            return isEmpty.value ? "#ccc" : "#999";
+          }
+        });
+        _setSharedData(__sharedData, 11, n12?.sharedData);
+        _setSharedDataEvent(__sharedData, 16, exportSignature);
+        _createSharedDataIf(() => {
+          return _setSharedData(__sharedData, 1, _toSharedDataBoolean(showBrushSettings.value));
+        }, () => {
+          _renderSharedDataEffect(() => {
+            return _setSharedData(__sharedData, 3, _toDisplayString(penSizeLabel.value));
+          });
+          const n18 = _createSharedDataComponentWithFallback(_component_up_slider, "1abd43f4", {
+            modelValue: () => {
+              return lineWidth.value;
+            },
+            "onUpdate:modelValue": () => {
+              return (_value) => {
+                return lineWidth.value = _value;
+              };
+            },
+            min: 1,
+            max: 20,
+            step: 1,
+            "value-show": () => {
+              return lineWidth.value;
+            }
+          });
+          _setSharedData(__sharedData, 2, n18?.sharedData);
+        });
+        _createSharedDataIf(() => {
+          return _setSharedData(__sharedData, 4, _toSharedDataBoolean(showColorSettings.value));
+        }, () => {
+          _renderSharedDataEffect(() => {
+            return _setSharedData(__sharedData, 6, _toDisplayString(penColorLabel.value));
+          });
+          _createSharedDataFor(_setSharedDataScoped(__sharedData, 5, _createSharedDataVFor(__sharedDataScope, () => {
+            return new UniDynamicSharedData(__sharedDataScope, { bundleKey: `${__className}SharedData`, sharedDataClassId: 1 });
+          })), () => {
+            return colorItems.value;
+          }, (__sharedData_VFor0, _for_item0, _for_key0) => {
+            _setSharedDataEvent(__sharedData_VFor0, 1, () => {
+              return selectColor(_for_item0.value);
+            });
+            _renderSharedDataEffect(() => {
+              const _color = _for_item0.value;
+              _setSharedDataClass(__sharedData_VFor0, 2, ["up-signature__color-item", lineColor.value == _color ? "up-signature__color-item--active" : ""]);
+              _setSharedDataStyle(__sharedData_VFor0, 3, getColorStyle(_color));
+            });
+            return null;
+          }, (__sharedData_VFor0, color, index) => {
+            return _setSharedData(__sharedData_VFor0, 0, _toDisplayString(index));
+          }, 1);
+        });
+      });
+      return __sharedData;
+    };
+  }
+});
+const _style_0 = {};
+const __easycom_2 = /* @__PURE__ */ _export_sfc(_sfc_main, [["styles", [_style_0]]]);
+export {
+  __easycom_2 as _
+};
+//# sourceMappingURL=up-signature.js.map

@@ -1,0 +1,21 @@
+export declare const UTSConsole: {
+    log(...messages: any[]): void;
+    info(...messages: any[]): void;
+    warn(...messages: any[]): void;
+    error(...messages: any[]): void;
+    debug(...messages: any[]): void;
+    trace: typeof console.trace;
+    traceHybridStack: typeof console.traceHybridStack;
+    dir: typeof console.dir;
+    dirxml: typeof console.dirxml;
+    time: typeof console.time;
+    timeEnd: typeof console.timeEnd;
+    timeLog: typeof console.timeLog;
+    group: typeof console.group;
+    groupCollapsed: typeof console.groupCollapsed;
+    groupEnd: typeof console.groupEnd;
+    count: typeof console.count;
+    assert: typeof console.assert;
+    table: typeof console.table;
+    countReset: typeof console.countReset;
+};

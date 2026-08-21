@@ -9,7 +9,7 @@
                 :style="{minWidth: scrollWidth}">
                 <view class="up-table-row">
                     <view v-for="(col, colIndex) in columns" :key="col.key" class="up-table-cell"
-                        :class="[col.headerAlign ? 'up-text-' + col.headerAlign : (col.align ? 'up-text-' + col.align : '') ,
+                        :class="[col.headerAlign ? 'up-text-' + col.headerAlign : (col.align ? 'up-text-' + col.align : 'up-text-center') ,
                             headerCellClassName ? headerCellClassName(col) : '',
                             getFixedClass(col)
                         ]" :style="headerColStyle(col)" @click="handleHeaderClick(col)">
@@ -38,7 +38,7 @@
                             stripe && flatIndex % 2 === 1 ? 'up-table-row-zebra' : ''
                         ]" :style="{ height: rowHeight }" @click="handleRowClick(item.row)">
                             <view v-for="(col, colIndex) in columns" :key="col.key" class="up-table-cell"
-                                :class="[col.align ? 'up-text-' + col.align : '',
+                                :class="[col.align ? 'up-text-' + col.align : 'up-text-center',
                                     cellClassName ? cellClassName(item.row, col) : '',
                                     getFixedClass(col),
                                     getCellSpanClass(item.row, col, item.rowIndex, colIndex)
@@ -120,7 +120,7 @@
                 <view class="up-table-row" :style="{height: headerHeight}">
                     <view v-for="(col, colIndex) in visibleFixedLeftColumns" :key="col.key" class="up-table-cell"
                         :style="headerColStyle(col)"
-                        :class="[col.align ? 'up-text-' + col.align : '',
+                        :class="[col.align ? 'up-text-' + col.align : 'up-text-center',
                             headerCellClassName ? headerCellClassName(col) : '',
                             getFixedClass(col)
                         ]" @click="handleHeaderClick(col)">
@@ -149,7 +149,7 @@
                             stripe && flatIndex % 2 === 1 ? 'up-table-row-zebra' : ''
                         ]" :style="{ height: rowHeight }" @click="handleRowClick(item.row)">
                             <view v-for="(col, colIndex) in visibleFixedLeftColumns" :key="col.key" class="up-table-cell"
-                                :class="[col.align ? 'up-text-' + col.align : '',
+                                :class="[col.headerAlign ? 'up-text-' + col.headerAlign : (col.align ? 'up-text-' + col.align : 'up-text-center'),
                                     cellClassName ? cellClassName(item.row, col) : '',
                                     getFixedClass(col),
                                     getCellSpanClass(item.row, col, item.rowIndex, colIndex)

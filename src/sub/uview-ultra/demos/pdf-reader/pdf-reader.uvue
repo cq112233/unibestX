@@ -1,0 +1,68 @@
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
+    <NavBar title="up-pdf-reader PDF 阅读"></NavBar>
+    <view class="p-[16px]">
+      <!-- 基础用法：同一时刻只渲染一个 web-view，避免 Web/小程序端全屏覆盖 -->
+      <view class="demo-block">
+        <up-title class="demo-title">
+          <text class="demo-title-text">基础用法（web-view 加载 PDF）</text>
+        </up-title>
+        <view class="height-switch">
+          <up-button text="高度 600px" type="primary" :plain="height != '600px'" size="mini" class="height-option" @click="setHeight('600px')"></up-button>
+          <up-button text="高度 400px" type="primary" :plain="height != '400px'" size="mini" class="height-option" @click="setHeight('400px')"></up-button>
+        </view>
+        <up-pdf-reader :src="pdfUrl" :height="height"></up-pdf-reader>
+      </view>
+
+      <view class="demo-block mt-[12px]">
+        <up-title class="demo-title">
+          <text class="demo-title-text">说明</text>
+        </up-title>
+        <text class="demo-text">
+          up-pdf-reader 基于 web-view + pdf.js 渲染 PDF。Web/小程序端 web-view 会忽略宽高并全屏显示，且同一页面只能渲染一个；App 端可自由调整高度，内容在 web-view 内部滚动。若 PDF 区域空白，请更换为可达的 PDF 地址，或把 baseUrl 换成自部署的 pdf.js 路径。
+        </text>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { ref } from 'vue';
+
+const height = ref<string>('600px');
+const pdfUrl = 'https://mozilla.github.io/pdf.js/web/compressed.tracemonkey-pldi-09.pdf';
+
+function setHeight(val: string): void {
+  height.value = val;
+}
+</script>
+
+<style lang="scss" scoped>
+.demo-block {
+  margin-bottom: 12px;
+  padding: 12px;
+  background-color: #ffffff;
+  border-radius: 8px;
+}
+.demo-title {
+  margin-bottom: 10px;
+}
+.demo-title-text {
+  font-size: 14px;
+  font-weight: bold;
+  color: #606266;
+}
+.demo-text {
+  font-size: 13px;
+  color: #475569;
+  line-height: 20px;
+}
+.height-switch {
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 12px;
+}
+.height-option {
+  margin-right: 10px;
+}
+</style>

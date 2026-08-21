@@ -135,7 +135,6 @@ function clearCanvas(): void {
     setFillStyle(props.bgColor)
     if (ctx != null) {
         ctx!.fillRect(0, 0, actualWidth.value, actualHeight.value)
-        ctx!.draw()
     }
 }
 
@@ -238,9 +237,6 @@ function closePath(): void {
 }
 
 function draw(_isLastDraw: boolean = false): void {
-    if (ctx != null) {
-        ctx!.draw()
-    }
 }
 
 function exportImage(fileType: string = 'png', quality: number = 1): Promise<string> {

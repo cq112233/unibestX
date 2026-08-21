@@ -4,14 +4,14 @@
 		<view class="up-coupon__content">
 			<!-- 左侧金额区域 -->
 			<view class="up-coupon__amount">
-				<slot name="unit" :unit="unit" :unitPosition="unitPosition" v-if="unitPosition === 'left'">
-					<text class="up-coupon__amount-unit" v-if="unitPosition === 'left'">{{ unit }}</text>
+				<slot name="unit" :unit="unit" :unitPosition="unitPosition" v-if="unitPosition == 'left'">
+					<text class="up-coupon__amount-unit" v-if="unitPosition == 'left'">{{ unit }}</text>
 				</slot>
 				<slot name="amount" :amount="amount">
 					<text class="up-coupon__amount-value">{{ amount }}</text>
 				</slot>
-				<slot name="unit" :unit="unit" :unitPosition="unitPosition" v-if="unitPosition === 'right'">
-					<text class="up-coupon__amount-unit" v-if="unitPosition === 'right'">{{ unit }}</text>
+				<slot name="unit" :unit="unit" :unitPosition="unitPosition" v-if="unitPosition == 'right'">
+					<text class="up-coupon__amount-unit" v-if="unitPosition == 'right'">{{ unit }}</text>
 				</slot>
 				<slot name="limit" :limit="limit">
 					<text class="up-coupon__amount-limit" v-if="limit">{{ limit }}</text>
@@ -34,16 +34,17 @@
 			<!-- 右侧操作区域 -->
 			<view class="up-coupon__action up-padding-right-20">
 				<slot name="action" :actionText="actionText" :circle="circle">
-                    <up-tag type="error" :bgColor="hasType() ? 'transparent' : '#eb433d'"
+                    <up-tag type="error" :text="actionText"
+                        :bgColor="hasType() ? 'transparent' : '#eb433d'"
                         :borderColor="hasType() ? '#eee' : '#eb433d'" borderRadius="6px"
                         size="medium" class="up-coupon__action-text"
-                        :shape="circle ? 'circle': 'circle'">{{ actionText }}</up-tag>
+                        :shape="circle ? 'circle' : 'square'"></up-tag>
 				</slot>
 			</view>
 		</view>
 		
 		<!-- 红包绳子效果 -->
-		<view v-if="shape === 'envelope'" class="up-coupon__rope"></view>
+		<view v-if="shape == 'envelope'" class="up-coupon__rope"></view>
 		
 		<!-- 默认插槽，可用于添加额外内容 -->
 		<slot></slot>
@@ -142,8 +143,10 @@ function handleClick() {
 	.up-coupon {
 		position: relative;
 		overflow: hidden;
-		border-radius: 8rpx;
-		background-color: #ffebf0;
+		border-radius: 16rpx;
+		background-color: #ffffff;
+		border-width: 1px;
+		border-color: #f0f1f4;
         width: 100%;
 		
 		&--coupon {
@@ -176,7 +179,8 @@ function handleClick() {
 		}
 		
 		&__content {
-			@include flex;
+			display: flex;
+			flex-direction: row;
 			align-items: center;
 			justify-content: space-between;
 			padding: 20rpx;
@@ -185,9 +189,9 @@ function handleClick() {
 		}
 		
 		&__amount {
-			@include flex;
+			display: flex;
 			flex-direction: row;
-			align-items: baseline;
+			align-items: flex-end;
 			min-width: 140rpx;
 			
 			&-unit {
@@ -205,7 +209,7 @@ function handleClick() {
 			
 			&-limit {
 				font-size: 20rpx;
-				color: $up-tips-color;
+				color: #909193;
 				margin-left: 8rpx;
 			}
 		}
@@ -218,26 +222,27 @@ function handleClick() {
 			&-title {
 				font-size: 28rpx;
 				font-weight: bold;
-				color: $up-main-color;
+				color: #303133;
 				margin-bottom: 8rpx;
 				text-overflow: ellipsis;
 			}
 			
 			&-desc {
 				font-size: 22rpx;
-				color: $up-tips-color;
+				color: #909193;
 				margin-bottom: 6rpx;
 				text-overflow: ellipsis;
 			}
 			
 			&-time {
 				font-size: 20rpx;
-				color: $up-light-color;
+				color: #c0c4cc;
 			}
 		}
 		
 		&__action {
-			@include flex;
+			display: flex;
+			flex-direction: row;
 			align-items: center;
 			justify-content: center;
 		}

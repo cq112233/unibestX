@@ -15,7 +15,7 @@
                             <checkbox :checked="isAllSelected()" @click.stop="toggleSelectAll" />
                         </view>
                         <template v-else>
-                            <text class="up-table-header-text">{{ getColumnTitle(col) }}</text>
+                            <text class="up-table-header-text" :style="{ textAlign: getHeaderAlignValue(col) }">{{ getColumnTitle(col) }}</text>
                             <text v-if="isSortableColumn(col)" class="up-table-sort-icon">{{ getSortIcon(col) }}</text>
                         </template>
                     </view>
@@ -53,7 +53,7 @@
                                     name="cell"
                                     :row="item['row'] as UTSJSONObject"
                                     :column="cell['col'] as UTSJSONObject"
-                                    :prow="item['parentRow'] as UTSJSONObject | null"
+                                    :prow="getParentRow(item)"
                                     :rowIndex="safeToNumber(item['rowIndex'])"
                                     :columnIndex="safeToNumber(cell['colIndex'])"
                                     :level="safeToNumber(item['level'], 1)"
@@ -67,7 +67,7 @@
 
                 <view v-else class="up-table-empty">
                     <slot name="empty">
-                        <text>{{ emptyText }}</text>
+                        <text class="up-table-empty-text">{{ emptyText }}</text>
                     </slot>
                 </view>
             </view>
@@ -87,7 +87,7 @@
                         <checkbox :checked="isAllSelected()" @click.stop="toggleSelectAll" />
                     </view>
                     <template v-else>
-                        <text class="up-table-header-text">{{ getColumnTitle(col) }}</text>
+                        <text class="up-table-header-text" :style="{ textAlign: getHeaderAlignValue(col) }">{{ getColumnTitle(col) }}</text>
                         <text v-if="isSortableColumn(col)" class="up-table-sort-icon">{{ getSortIcon(col) }}</text>
                     </template>
                 </view>
@@ -125,7 +125,7 @@
                                 name="cell"
                                 :row="item['row'] as UTSJSONObject"
                                 :column="cell['col'] as UTSJSONObject"
-                                :prow="item['parentRow'] as UTSJSONObject | null"
+                                :prow="getParentRow(item)"
                                 :rowIndex="safeToNumber(item['rowIndex'])"
                                 :columnIndex="safeToNumber(cell['colIndex'])"
                                 :level="safeToNumber(item['level'], 1)"
@@ -153,13 +153,6 @@ function createStringList(): string[] {
 
 function createEmptyObject(): UTSJSONObject {
     return {} as UTSJSONObject
-}
-
-function createTreeProps(): UTSJSONObject {
-    return {
-        children: 'children',
-        hasChildren: 'hasChildren'
-    } as UTSJSONObject
 }
 
 function createSpan(rowspan: number = 1, colspan: number = 1): UTSJSONObject {
@@ -213,7 +206,7 @@ function getTableMinWidthPx(): number {
     return 375
 }
 
-type SpanMethodCallback = (scope: UTSJSONObject) => any
+type SpanMethodCallback = (scope: UTSJSONObject) => any | null
 type CellStyleCallback = (scope: UTSJSONObject) => UTSJSONObject | null
 type CellClassNameCallback = (row: UTSJSONObject, col: UTSJSONObject) => string
 type RowClassNameCallback = (row: UTSJSONObject, rowIndex: number) => string
@@ -227,12 +220,12 @@ const props = defineProps({
     data: {
         type: Array as PropType<UTSJSONObject[]>,
         required: true,
-        default: () => createRowList()
+        default: () => [] as UTSJSONObject[]
     },
     columns: {
         type: Array as PropType<UTSJSONObject[]>,
         required: true,
-        default: () => createRowList()
+        default: () => [] as UTSJSONObject[]
     },
     rowKey: {
         type: String,
@@ -272,7 +265,7 @@ const props = defineProps({
     },
     filters: {
         type: Object as PropType<UTSJSONObject>,
-        default: () => createEmptyObject()
+        default: () => ({} as UTSJSONObject)
     },
     highlightCurrentRow: {
         type: Boolean,
@@ -284,7 +277,7 @@ const props = defineProps({
     },
     treeProps: {
         type: Object as PropType<UTSJSONObject>,
-        default: () => createTreeProps()
+        default: () => ({ children: 'children', hasChildren: 'hasChildren' } as UTSJSONObject)
     },
     expandRowKeys: {
         type: Array as PropType<any[]>,
@@ -415,6 +408,10 @@ function getRowKey(row: UTSJSONObject, index: number): string {
     return key == '' ? index.toString() : key
 }
 
+function getParentRow(item: UTSJSONObject): UTSJSONObject | null {
+    return item['parentRow'] as UTSJSONObject | null
+}
+
 function getColumnKey(col: UTSJSONObject, index: number): string {
     const key = getColumnField(col)
     if (key != '') {
@@ -427,7 +424,7 @@ function getColumnKey(col: UTSJSONObject, index: number): string {
 function getColumnIndex(col: UTSJSONObject): number {
     const cols = props.columns
     for (let i = 0; i < cols.length; i++) {
-        if ((cols[i] as UTSJSONObject) === col) {
+        if ((cols[i] as UTSJSONObject) == col) {
             return i
         }
     }
@@ -449,24 +446,32 @@ function isSortableColumn(col: UTSJSONObject): boolean {
     return colSortable == 'true' || colSortable == '1'
 }
 
-function getHeaderAlignClass(col: UTSJSONObject): string {
+function getHeaderAlignValue(col: UTSJSONObject): string {
     const headerAlign = valueToString(col['headerAlign'])
     if (headerAlign == 'center' || headerAlign == 'right' || headerAlign == 'left') {
-        return 'up-text-' + headerAlign
+        return headerAlign
     }
     const align = valueToString(col['align'])
     if (align == 'center' || align == 'right' || align == 'left') {
-        return 'up-text-' + align
+        return align
     }
-    return 'up-text-left'
+    return 'center'
+}
+
+function getHeaderAlignClass(col: UTSJSONObject): string {
+    return 'up-text-' + getHeaderAlignValue(col)
+}
+
+function getCellAlignValue(col: UTSJSONObject): string {
+    const align = valueToString(col['align'])
+    if (align == 'center' || align == 'right' || align == 'left') {
+        return align
+    }
+    return 'center'
 }
 
 function getCellAlignClass(col: UTSJSONObject): string {
-    const align = valueToString(col['align'])
-    if (align == 'center' || align == 'right' || align == 'left') {
-        return 'up-text-' + align
-    }
-    return 'up-text-left'
+    return 'up-text-' + getCellAlignValue(col)
 }
 
 function getCellClassName(row: UTSJSONObject, col: UTSJSONObject): string {
@@ -517,7 +522,7 @@ function getSpanValue(value: any | null, fallback: number = 1): number {
 }
 
 function getCellSpanArray(row: UTSJSONObject, column: UTSJSONObject, rowIndex: number, columnIndex: number): number[] {
-    if (typeof props.spanMethod !== 'function' || props.spanMethod == null) {
+    if (typeof props.spanMethod != 'function' || props.spanMethod == null) {
         return createSpanArray()
     }
     const callback = props.spanMethod as SpanMethodCallback
@@ -582,6 +587,19 @@ function getCellSpanStyle(row: UTSJSONObject, column: UTSJSONObject, rowIndex: n
     }
     return style
 }
+
+const hasTree = computed<boolean>(() => {
+    const cKey = getChildrenKey()
+    const rows = props.data
+    for (let i = 0; i < rows.length; i++) {
+        const row = rows[i] as UTSJSONObject
+        const children = row[cKey] as UTSJSONObject[] | null
+        if (Array.isArray(children) && (children as UTSJSONObject[]).length > 0) {
+            return true
+        }
+    }
+    return false
+})
 
 function getBaseCellStyle(row: UTSJSONObject, col: UTSJSONObject, rowIndex: number, columnIndex: number, level: number): UTSJSONObject {
     const style = createEmptyObject()
@@ -745,19 +763,6 @@ const flatRows = computed<UTSJSONObject[]>(() => {
 })
 
 const hasData = computed<boolean>(() => flatRows.value.length > 0)
-
-const hasTree = computed<boolean>(() => {
-    const cKey = getChildrenKey()
-    const rows = processedData.value
-    for (let i = 0; i < rows.length; i++) {
-        const row = rows[i] as UTSJSONObject
-        const children = row[cKey] as UTSJSONObject[] | null
-        if (Array.isArray(children) && (children as UTSJSONObject[]).length > 0) {
-            return true
-        }
-    }
-    return false
-})
 
 const fixedLeftColumns = computed<UTSJSONObject[]>(() => {
     const result = createRowList()
@@ -1160,19 +1165,19 @@ function onScrollRaw(e: Event): void {
 }
 // #endif
 
-watch(() => props.expandRowKeys, (newVal: any[] | null) => {
+watch((): any[] => props.expandRowKeys, (newVal: any[] | null) => {
     expandedKeys.value = normalizeKeys(newVal)
 }, { immediate: true })
 
-watch(() => props.currentRowKey, (newVal: any | null) => {
+watch((): any | null => props.currentRowKey, (newVal: any | null) => {
     currentRowValue.value = normalizeKey(newVal)
 }, { immediate: true })
 
-watch(() => props.filters, (newVal: UTSJSONObject) => {
+watch((): UTSJSONObject => props.filters, (newVal: UTSJSONObject) => {
     emit('filter-change', newVal)
 }, { deep: true })
 
-watch(() => props.data, () => {
+watch((): UTSJSONObject[] => props.data, () => {
     pruneSelection()
 }, { deep: true })
 
@@ -1226,7 +1231,6 @@ defineExpose({
 }
 
 .up-table-body-cell {
-    font-size: 12px;
     padding-top: 4px;
     padding-bottom: 4px;
 }
@@ -1238,7 +1242,6 @@ defineExpose({
     flex-shrink: 0;
     box-sizing: border-box;
     align-items: center;
-    font-size: 13px;
     padding: 6px 6px;
     border-bottom: 1px solid #ebeef5;
 }
@@ -1252,12 +1255,14 @@ defineExpose({
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
+    font-size: 13px;
 }
 
 .up-table-cell-text {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    font-size: 13px;
 }
 
 .up-table-sort-icon {
@@ -1274,8 +1279,14 @@ defineExpose({
 }
 
 .up-table-empty {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
     padding: 20px;
-    text-align: center;
+}
+
+.up-table-empty-text {
     color: #999;
 }
 

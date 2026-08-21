@@ -168,6 +168,14 @@ function makeId(): string {
 	return 'up-poster-canvas-' + Date.now().toString()
 }
 
+function getPixelRatio(): number {
+	const info = uni.getSystemInfoSync()
+	if (info.pixelRatio > 0) {
+		return info.pixelRatio
+	}
+	return 1
+}
+
 defineOptions({
 	name: 'up-poster'
 })
@@ -183,7 +191,7 @@ const emit = defineEmits(['export', 'error'])
 const instance = getCurrentInstance()
 
 const canvasId = ref<string>(makeId())
-const showCanvas = ref<boolean>(false)
+const showCanvas = ref<boolean>(true)
 const canvasWidth = ref<number>(375)
 const canvasHeight = ref<number>(557)
 let canvasContext: CanvasContext | null = null
@@ -225,7 +233,17 @@ function initCanvas(): Promise<void> {
 			component: instance?.proxy,
 			success: (context: CanvasContext) => {
 				canvasContext = context
-				ctx = context.getContext('2d')
+				const c2d = context.getContext('2d')
+				if (c2d == null) {
+					reject(new Error('Canvas context is not ready'))
+					return
+				}
+				const pixelRatio = getPixelRatio()
+				const canvas = c2d.canvas
+				canvas.width = canvasWidth.value * pixelRatio
+				canvas.height = canvasHeight.value * pixelRatio
+				c2d.scale(pixelRatio, pixelRatio)
+				ctx = c2d
 				resolve()
 			},
 			fail: (err: UniError) => {
@@ -531,8 +549,8 @@ function drawQrCode(item: PosterItem): void {
 			const index = row * count + col
 			if (index >= cells.length) continue
 			const cell = cells[index]
-			if ((cell['dark'] as boolean) != true) continue
-			context.fillStyle = colorValue(cell['color'], foreground)
+			if (!cell.getBoolean('dark', false)) continue
+			context.fillStyle = cell.getString('color', foreground)
 			context.fillRect(x + col * cellSize, y + row * cellSize, cellSize + 0.5, cellSize + 0.5)
 		}
 	}
@@ -593,9 +611,6 @@ function drawPosterSync(): Promise<void> {
 function drawPoster(): Promise<void> {
 	return new Promise((resolve) => {
 		drawPosterSync().then(() => {
-			if (ctx != null) {
-				ctx!.draw()
-			}
 			resolve()
 		})
 	})
@@ -613,11 +628,27 @@ function generatePoster(): Promise<string> {
 						return
 					}
 					const dataUrl = canvasContext!.toDataURL('image/png', 1)
-					showCanvas.value = false
+					// #ifdef APP
+					const base64 = dataUrl.indexOf(',') >= 0 ? dataUrl.substring(dataUrl.indexOf(',') + 1) : dataUrl
+					const fileSystemManager = uni.getFileSystemManager()
+					const filePath = `${uni.env.USER_DATA_PATH}/up-poster-${Date.now()}.png`
+					fileSystemManager.writeFile({
+						filePath,
+						encoding: 'base64',
+						data: base64,
+						success: () => {
+							resolve(filePath)
+						},
+						fail: (err: any) => {
+							reject(new Error('write poster file failed: ' + JSON.stringify(err)))
+						}
+					} as WriteFileOptions)
+					// #endif
+					// #ifndef APP
 					resolve(dataUrl)
+					// #endif
 				})
 			}).catch((err: any | null) => {
-				showCanvas.value = false
 				reject(err)
 			})
 		})

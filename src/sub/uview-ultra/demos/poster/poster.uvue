@@ -1,0 +1,284 @@
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
+    <NavBar title="up-poster 海报"></NavBar>
+    <view class="p-[16px]">
+      <!-- 1. 基础用法 -->
+      <view class="demo-block">
+        <up-title class="demo-title">
+          <text class="demo-title-text">基础用法（生成海报图片）</text>
+        </up-title>
+        <view v-if="posterPath.length > 0" class="poster-preview">
+          <image :src="posterPath" class="poster-image" mode="aspectFit"></image>
+        </view>
+        <view v-else class="poster-placeholder">
+          <text class="poster-placeholder-text">点击下方按钮生成海报</text>
+        </view>
+        <view class="btn-row mt-[10px]">
+          <up-button text="生成海报" type="primary" size="small" class="demo-btn" @click="onGenerate"></up-button>
+          <up-button text="切换样式" type="primary" plain size="small" class="demo-btn" @click="onSwitchJson"></up-button>
+        </view>
+        <text class="log-text mt-[10px]">{{ eventLog }}</text>
+      </view>
+
+      <view class="demo-block mt-[12px]">
+        <up-title class="demo-title">
+          <text class="demo-title-text">说明</text>
+        </up-title>
+        <text class="demo-text">
+          up-poster 通过 :json 配置海报内容（背景/文本/图片/二维码），调用 exportImage() 生成图片并触发 export 事件返回临时路径。
+        </text>
+      </view>
+    </view>
+
+    <up-poster
+      ref="posterRef"
+      :json="posterJson"
+      @export="onExport"
+      @error="onError"
+    ></up-poster>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { ref } from 'vue';
+
+const baseJson = ref<UTSJSONObject>({
+  css: {
+    width: '375px',
+    height: '600px',
+    background: 'linear-gradient(to bottom, #0957de, #7c3aed)',
+    radius: '12px'
+  },
+  views: [
+    {
+      type: 'view',
+      css: {
+        left: 20,
+        top: 20,
+        width: 335,
+        height: 120,
+        background: 'rgba(255, 255, 255, 0.2)',
+        radius: 12
+      }
+    },
+    {
+      type: 'text',
+      text: 'unibestX',
+      css: { left: 40, top: 40, width: 240, fontSize: 28, lineHeight: 34, color: '#ffffff', fontWeight: 'bold' }
+    },
+    {
+      type: 'text',
+      text: 'uni-app X 开发模板',
+      css: { left: 40, top: 84, width: 260, fontSize: 15, lineHeight: 20, color: '#e2e8f0' }
+    },
+    {
+      type: 'image',
+      src: '/static/logo.png',
+      css: { left: 30, top: 170, width: 100, height: 100, radius: 50 }
+    },
+    {
+      type: 'text',
+      text: 'uview-ultra',
+      css: { left: 150, top: 188, width: 200, fontSize: 22, lineHeight: 28, color: '#1e293b', fontWeight: 'bold' }
+    },
+    {
+      type: 'text',
+      text: '基于 uni-app X 的组件库',
+      css: { left: 150, top: 224, width: 200, fontSize: 14, lineHeight: 20, color: '#64748b' }
+    },
+    {
+      type: 'view',
+      css: {
+        left: 30,
+        top: 300,
+        width: 315,
+        height: 120,
+        background: '#f8fafc',
+        radius: 12
+      }
+    },
+    {
+      type: 'text',
+      text: '扫码查看',
+      css: { left: 60, top: 320, width: 120, fontSize: 16, lineHeight: 22, color: '#334155', fontWeight: 'bold' }
+    },
+    {
+      type: 'qrcode',
+      text: 'https://uview-ultra.lingyun.net',
+      css: { left: 200, top: 310, width: 100, foreground: '#0957de', background: '#ffffff', lv: 3 }
+    },
+    {
+      type: 'view',
+      css: {
+        left: 30,
+        top: 440,
+        width: 315,
+        height: 130,
+        background: 'linear-gradient(to right, #f59e0b, #ef4444)',
+        radius: 12
+      }
+    },
+    {
+      type: 'text',
+      text: '2026.08.20',
+      css: { left: 60, top: 486, width: 260, fontSize: 24, lineHeight: 30, color: '#ffffff', fontWeight: 'bold' }
+    }
+  ]
+} as UTSJSONObject);
+
+const posterJson = ref<UTSJSONObject>(baseJson.value);
+
+const customJson = ref<UTSJSONObject>({
+  css: {
+    width: '300px',
+    height: '480px',
+    background: 'linear-gradient(to bottom, #0f172a, #334155)',
+    radius: '8px'
+  },
+  views: [
+    {
+      type: 'text',
+      text: 'CUSTOM POSTER',
+      css: { left: 30, top: 30, width: 240, fontSize: 24, lineHeight: 30, color: '#fbbf24', fontWeight: 'bold' }
+    },
+    {
+      type: 'text',
+      text: '自定义样式海报',
+      css: { left: 30, top: 74, width: 240, fontSize: 15, lineHeight: 20, color: '#e2e8f0' }
+    },
+    {
+      type: 'qrcode',
+      text: 'https://github.com/cq112233/unibestX',
+      css: { left: 100, top: 140, width: 100, foreground: '#f8fafc', background: '#ffffff', lv: 3 }
+    },
+    {
+      type: 'text',
+      text: '扫码关注',
+      css: { left: 30, top: 270, width: 240, fontSize: 16, lineHeight: 22, color: '#94a3b8' }
+    },
+    {
+      type: 'view',
+      css: {
+        left: 30,
+        top: 330,
+        width: 240,
+        height: 80,
+        background: 'linear-gradient(to right, #0ea5e9, #6366f1)',
+        radius: 40
+      }
+    },
+    {
+      type: 'text',
+      text: '立即体验',
+      css: { left: 30, top: 360, width: 240, fontSize: 20, lineHeight: 26, color: '#ffffff', fontWeight: 'bold' }
+    }
+  ]
+} as UTSJSONObject);
+
+const posterPath = ref<string>('');
+const eventLog = ref<string>('');
+const isCustom = ref<boolean>(false);
+
+const posterRef = ref(null as ComponentPublicInstance | null);
+
+function onGenerate() {
+  const poster = posterRef.value;
+  if (poster == null)
+    return;
+  poster.$callMethod('exportImage');
+  eventLog.value = '正在生成海报...';
+}
+
+function onSwitchJson() {
+  const poster = posterRef.value;
+  if (poster == null)
+    return;
+  if (isCustom.value) {
+    posterJson.value = baseJson.value;
+    isCustom.value = false;
+    eventLog.value = '已切换回默认样式，正在生成...';
+  }
+  else {
+    posterJson.value = customJson.value;
+    isCustom.value = true;
+    eventLog.value = '已切换自定义样式，正在生成...';
+  }
+  poster.$callMethod('exportImage');
+}
+
+function onExport(event: UTSJSONObject) {
+  const path = event.path;
+  if (path != null && path.toString().length > 0) {
+    posterPath.value = path.toString();
+    eventLog.value = '生成成功';
+  }
+  else {
+    eventLog.value = '生成失败：未返回图片路径';
+  }
+}
+
+function onError(event: UTSJSONObject) {
+  const message = event.message;
+  eventLog.value = `error => ${message == null ? '生成失败' : message.toString()}`;
+}
+</script>
+
+<style lang="scss" scoped>
+.demo-block {
+  margin-bottom: 12px;
+  padding: 12px;
+  background-color: #ffffff;
+  border-radius: 8px;
+}
+.demo-title {
+  margin-bottom: 10px;
+}
+.demo-title-text {
+  font-size: 14px;
+  font-weight: bold;
+  color: #606266;
+}
+.demo-text {
+  font-size: 13px;
+  color: #475569;
+  line-height: 20px;
+}
+.poster-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 10px;
+  background-color: #f1f5f9;
+  border-radius: 8px;
+}
+.poster-image {
+  width: 260px;
+  height: 400px;
+}
+.poster-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 200px;
+  background-color: #f1f5f9;
+  border-radius: 8px;
+}
+.poster-placeholder-text {
+  font-size: 13px;
+  color: #94a3b8;
+}
+.log-text {
+  font-size: 13px;
+  color: #475569;
+  line-height: 20px;
+}
+.btn-row {
+  display: flex;
+  flex-direction: row;
+}
+.demo-btn {
+  margin-right: 10px;
+}
+</style>

@@ -1,8 +1,7 @@
 <template>
 	<view class="up-pdf-reader" :style="{ height: height }">
 		<web-view :fullscreen="false"
-			:src="viewerUrl" :style="{ width: '750rpx', height: height }"
-            :webview-styles="{ width: '750rpx', height: height }"
+			:src="viewerUrl" :style="{ width: '100%', height: height }"
 			frameborder="0"
 		></web-view>
 	</view>

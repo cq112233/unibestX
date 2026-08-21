@@ -2,55 +2,51 @@
 	<up-popup
 		:show="popupShow"
 		mode="bottom"
-		:popup="false"
-		:mask="true"
+		:overlay="true"
 		:closeable="closeable"
-		:safe-area-inset-bottom="true"
-		close-icon-color="#ffffff"
-		:z-index="uZIndex"
-		:maskCloseAble="maskCloseAble"
+		:safeAreaInsetBottom="true"
+		:zIndex="uZIndex"
+		:closeOnClickOverlay="maskCloseAble"
 		@close="close"
 	>
-		<view class="up-p-t-30 up-p-l-20 up-m-b-10" v-if="headerDirection == 'column'">
-			<up-steps v-if="popupShow" dot direction="column" v-model:current="tabsIndex">
+		<view class="up-cascader__header up-cascader__header--column" v-if="headerDirection == 'column'">
+			<up-steps v-if="popupShow" dot direction="column" :current="tabsIndex">
 				<up-steps-item
 					v-for="(item, index) in genTabsList"
 					:key="index"
+					:index="index"
 					:title="getTabName(item)"
-					@click="tabsIndex = index"
+					@click="stepClick(index)"
 				></up-steps-item>
 			</up-steps>
 		</view>
-		<view class="up-p-t-20 up-m-b-10" v-else>
+		<view class="up-cascader__header up-cascader__header--row" v-else>
 			<up-tabs
 				v-if="popupShow"
 				:list="genTabsList"
 				:scrollable="true"
 				v-model:current="tabsIndex"
 				@change="tabsChange"
-				ref="tabs"
 			></up-tabs>
 		</view>
 		<view class="area-box">
-			<view class="area-box__levels up-flex" :class="{ 'change': isChange }" :style="levelWrapStyle">
+			<view class="area-box__levels" :class="{ 'change': isChange }" :style="levelWrapStyle">
 				<template v-for="(levelData, levelIndex) in levelList" :key="levelIndex">
 					<view
 						v-if="optionsCols == 2 || levelIndex == tabsIndex"
 						class="area-item"
 						:style="getAreaItemStyle()"
 					>
-						<view class="up-padding-10 up-bg-gray" style="height: 100%;">
-							<scroll-view direction="vertical" style="height: 100%;">
+						<view class="area-item__panel">
+							<scroll-view direction="vertical" class="area-item__scroll">
 								<up-cell-group v-if="canShowLevel(levelIndex)">
 									<up-cell
 										v-for="(item, index) in levelData"
 										:key="index"
 										:title="getItemLabel(item)"
-										:arrow="false"
-										:index="index"
 										@click="levelChange(levelIndex, index)"
 									>
-										<template v-slot:right-icon>
+										<template #right-icon>
 											<up-icon
 												v-if="isSelected(levelIndex, index)"
 												size="17"
@@ -65,19 +61,25 @@
 				</template>
 			</view>
 		</view>
-		<view class="up-cascader-action up-flex up-flex-between">
-			<view class="up-padding-20 up-flex-fill">
-				<up-button @click="handleCancel" type="default">{{ cancelText }}</up-button>
+		<view class="up-cascader-action">
+			<view class="up-cascader-action__btn">
+				<up-button
+					@click="handleCancel"
+					type="default"
+					:customStyle="{ backgroundColor: '#f5f6f7' }"
+				>
+					<text class="up-cascader-action__cancel-text">{{ cancelText }}</text>
+				</up-button>
 			</view>
-			<view class="up-padding-20 up-flex-fill">
-				<up-button @click="handleConfirm" type="primary">{{ confirmText }}</up-button>
+			<view class="up-cascader-action__btn">
+				<up-button @click="handleConfirm" type="primary" :text="confirmText"></up-button>
 			</view>
 		</view>
 	</up-popup>
 </template>
 
 <script setup lang="uts">
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { t } from '../../libs/i18n'
 
 function toText(value: any | null): string {
@@ -155,30 +157,30 @@ const tabsIndex = ref<number>(0)
 const popupShow = ref<boolean>(props.show)
 const confirmValues = ref<Array<any>>([])
 
-const isChange = computed<boolean>(() => {
+const isChange = computed<boolean>((): boolean => {
 	return tabsIndex.value > 1
 })
 
-const levelWrapStyle = computed<string>(() => {
+const levelWrapStyle = computed<string>((): string => {
 	if (props.optionsCols == 2 && isChange.value) {
 		return 'transform: translateX(-33.3333333%)'
 	}
 	return ''
 })
 
-const cancelText = computed<string>(() => {
+const cancelText = computed<string>((): string => {
 	return t('up.common.cancel')
 })
 
-const confirmText = computed<string>(() => {
+const confirmText = computed<string>((): string => {
 	return t('up.common.confirm')
 })
 
-const placeholderText = computed<string>(() => {
+const placeholderText = computed<string>((): string => {
 	return t('up.common.pleaseChoose')
 })
 
-const uZIndex = computed<number>(() => {
+const uZIndex = computed<number>((): number => {
 	if (typeof props.zIndex == 'number' && (props.zIndex as number) > 0) {
 		return props.zIndex as number
 	}
@@ -195,9 +197,9 @@ function getDataList(): Array<UTSJSONObject> {
 }
 
 function getChildren(item: UTSJSONObject): Array<UTSJSONObject> {
-	const children = item[props.childrenKey]
-	if (children == null) return emptyObjectList()
-	return children as Array<UTSJSONObject>
+	const children = item[props.childrenKey] as Array<UTSJSONObject> | null
+	if (children != null && Array.isArray(children)) return children as Array<UTSJSONObject>
+	return emptyObjectList()
 }
 
 function getItemLabel(item: UTSJSONObject): string {
@@ -221,20 +223,31 @@ function canShowLevel(levelIndex: number): boolean {
 	return levelIndex == 0 || selectedValueIndexs.value.length >= levelIndex
 }
 
-const genTabsList = computed<Array<UTSJSONObject>>(() => {
+function stepClick(index: number): void {
+	tabsIndex.value = index
+}
+
+const genTabsList = computed<Array<UTSJSONObject>>((): Array<UTSJSONObject> => {
 	const tabsList = [] as Array<UTSJSONObject>
-	tabsList.push({ name: placeholderText.value } as UTSJSONObject)
-	for (let i = 0; i < selectedValueIndexs.value.length; i++) {
-		if (i >= levelList.value.length) break
+	const levelCount = Math.min(selectedValueIndexs.value.length, levelList.value.length)
+	for (let i = 0; i < levelCount; i++) {
 		const selectedIndex = selectedValueIndexs.value[i]
 		const levelData = levelList.value[i]
-		if (selectedIndex < 0 || selectedIndex >= levelData.length) continue
-		const selectedItem = levelData[selectedIndex]
-		tabsList[i] = { name: getItemLabel(selectedItem) } as UTSJSONObject
-		const children = getChildren(selectedItem)
-		if (i == selectedValueIndexs.value.length - 1 && children.length > 0) {
+		if (selectedIndex < 0 || selectedIndex >= levelData.length) {
 			tabsList.push({ name: placeholderText.value } as UTSJSONObject)
+			continue
 		}
+		const selectedItem = levelData[selectedIndex]
+		tabsList.push({ name: getItemLabel(selectedItem) } as UTSJSONObject)
+		if (i == selectedValueIndexs.value.length - 1) {
+			const children = getChildren(selectedItem)
+			if (children.length > 0) {
+				tabsList.push({ name: placeholderText.value } as UTSJSONObject)
+			}
+		}
+	}
+	if (tabsList.length == 0) {
+		tabsList.push({ name: placeholderText.value } as UTSJSONObject)
 	}
 	return tabsList
 })
@@ -277,23 +290,22 @@ function setDefaultValue(): void {
 		tabsIndex.value = 0
 		return
 	}
+	const nextLevels = [root] as Array<Array<UTSJSONObject>>
+	const nextIndexs = [] as Array<number>
 	let currentLevelData = root
 	for (let i = 0; i < values.length; i++) {
-		if (i >= levelList.value.length) {
-			levelList.value.push(currentLevelData)
-		} else {
-			levelList.value[i] = currentLevelData
-		}
 		const index = findValueIndex(currentLevelData, values[i])
 		if (index == -1) break
-		selectedValueIndexs.value.push(index)
+		nextIndexs.push(index)
 		const children = getChildren(currentLevelData[index])
 		if (children.length == 0) break
 		currentLevelData = children
 		if (i < values.length - 1) {
-			levelList.value.push(children)
+			nextLevels.push(children)
 		}
 	}
+	levelList.value = nextLevels
+	selectedValueIndexs.value = nextIndexs
 	confirmValues.value = getSelectedValues()
 	tabsIndex.value = selectedValueIndexs.value.length > 0 ? selectedValueIndexs.value.length - 1 : 0
 }
@@ -324,22 +336,28 @@ function levelChange(levelIndex: number, index: number): void {
 	if (levelIndex < 0 || levelIndex >= levelList.value.length) return
 	const levelData = levelList.value[levelIndex]
 	if (index < 0 || index >= levelData.length) return
-	selectedValueIndexs.value.splice(levelIndex)
-	selectedValueIndexs.value.push(index)
-	levelList.value.splice(levelIndex + 1)
+	const nextIndexs = [] as Array<number>
+	for (let i = 0; i < levelIndex; i++) {
+		nextIndexs.push(selectedValueIndexs.value[i])
+	}
+	nextIndexs.push(index)
+	selectedValueIndexs.value = nextIndexs
+	const nextLevels = [] as Array<Array<UTSJSONObject>>
+	for (let i = 0; i <= levelIndex; i++) {
+		nextLevels.push(levelList.value[i])
+	}
 	const currentItem = levelData[index]
 	const children = getChildren(currentItem)
 	if (children.length > 0) {
-		levelList.value.push(children)
+		nextLevels.push(children)
 		tabsIndex.value = levelIndex + 1
-		confirmValues.value = getSelectedValues()
-		emit('change', confirmValues.value)
-		return
+	} else {
+		tabsIndex.value = levelIndex
 	}
-	tabsIndex.value = levelIndex
+	levelList.value = nextLevels
 	confirmValues.value = getSelectedValues()
 	emit('change', confirmValues.value)
-	if (props.autoClose) {
+	if (children.length == 0 && props.autoClose) {
 		handleConfirm()
 	}
 }
@@ -348,21 +366,29 @@ function handleCancel(): void {
 	close()
 }
 
-watch(() => props.data, () => {
+watch((): Array<UTSJSONObject> => props.data, (): void => {
 	initLevelList()
 	setDefaultValue()
 }, { deep: true, immediate: true })
 
-watch(() => props.show, (newVal: boolean) => {
+watch((): boolean => props.show, (newVal: boolean): void => {
 	popupShow.value = newVal
 })
 
-watch(() => props.modelValue, () => {
+watch((): Array<any> => props.modelValue, (): void => {
 	setDefaultValue()
 }, { deep: true, immediate: true })
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
+.up-cascader__header--column {
+	padding: 30rpx 0 10rpx 20rpx;
+}
+
+.up-cascader__header--row {
+	padding: 20rpx 0 10rpx;
+}
+
 .area-box {
 	width: 100%;
 	overflow: hidden;
@@ -370,6 +396,8 @@ watch(() => props.modelValue, () => {
 }
 
 .area-box__levels {
+	display: flex;
+	flex-direction: row;
 	width: 150%;
 	transition: transform 0.3s ease-in-out 0s;
 	transform: translateX(0);
@@ -379,9 +407,34 @@ watch(() => props.modelValue, () => {
 	height: 800rpx;
 }
 
+.area-item__panel {
+	height: 100%;
+	padding: 10rpx;
+	background-color: #f6f7f9;
+}
+
+.area-item__scroll {
+	height: 100%;
+}
+
 .up-cascader-action {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
 	border-top-width: 1px;
 	border-top-style: solid;
 	border-top-color: #eee;
+}
+
+.up-cascader-action__btn {
+	flex-grow: 1;
+	flex-shrink: 1;
+	flex-basis: 0%;
+	padding: 20rpx;
+}
+
+.up-cascader-action__cancel-text {
+	font-size: 15px;
+	color: #323233;
 }
 </style>

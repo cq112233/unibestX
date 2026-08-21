@@ -2,7 +2,6 @@
 	<view class="up-pdf-reader" :style="readerStyle">
 		<web-view :fullscreen="false"
 			:src="viewerUrl" :style="webViewStyle"
-            :webview-styles="webViewStyle"
 			frameborder="0"
 		></web-view>
 	</view>
@@ -41,7 +40,7 @@ const readerStyle = computed<UTSJSONObject>(() => {
 
 const webViewStyle = computed<UTSJSONObject>(() => {
 	const style = {} as UTSJSONObject
-	style['width'] = '750rpx'
+	style['width'] = '100%'
 	style['height'] = props.height
 	return style
 })
@@ -51,12 +50,12 @@ function updateViewerUrl(): void {
 	viewerUrl.value = base + '/static/pdfjs/web/viewer.html?file=' + encodeURIComponent(props.src)
 }
 
-watch(() => props.baseUrl, (val: string) => {
+watch((): string => props.baseUrl, (val: string) => {
 	baseUrlInner.value = val
 	updateViewerUrl()
 })
 
-watch(() => props.src, () => {
+watch((): string => props.src, () => {
 	updateViewerUrl()
 })
 
