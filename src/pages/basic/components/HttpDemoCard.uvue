@@ -7,6 +7,44 @@
       </text>
     </view>
 
+    <!-- uniCloud -->
+    <view class="mb-[16px]">
+      <view class="flex-row items-center justify-between mb-[10px]">
+        <view class="flex-row items-center">
+          <view class="w-[32px] h-[32px] rounded-[8px] bg-[#e6fffb] border-[1px] border-solid border-[#99f6e4] items-center justify-center mr-[10px]">
+            <text class="text-[12px] font-bold text-[#0f766e]">UC</text>
+          </view>
+          <view>
+            <text class="text-[14px] font-bold text-[#1e293b]">uniCloud 云对象</text>
+            <text class="text-[11px] text-[#64748b] mt-[2px]">user.getUserInfo</text>
+          </view>
+        </view>
+        <view class="flex-row items-center px-[8px] py-[4px] rounded-[10px]" :class="cloudStatusBgClass">
+          <view class="w-[6px] h-[6px] rounded-[3px] mr-[5px]" :class="cloudStatusDotClass" />
+          <text class="text-[11px]" :class="cloudStatusTextClass">{{ cloudStatusText }}</text>
+        </view>
+      </view>
+
+      <view class="rounded-[8px] bg-[#f8fafc] border-[1px] border-solid border-[#cbd5e1] overflow-hidden">
+        <view class="h-[3px] bg-[#14b8a6]" />
+        <view class="p-[12px]">
+          <view class="flex-row items-center justify-between mb-[8px]">
+            <text class="text-[11px] text-[#64748b]">响应数据</text>
+            <text class="text-[10px] text-[#94a3b8]">JSON</text>
+          </view>
+          <text v-if="cloudLoading" class="text-[12px] text-[#0f766e]">正在连接云端服务...</text>
+          <text v-else-if="hasCloudError" class="text-[12px] text-[#dc2626]">{{ cloudErrorMsg }}</text>
+          <text v-else class="text-[12px] text-[#334155]" style="line-height: 20px">{{ userInfo }}</text>
+
+          <view v-if="hasCloudError" class="mt-[10px] flex-row">
+            <view class="h-[32px] px-[12px] rounded-[6px] bg-[#0f766e] items-center justify-center" @click="getUserInfo">
+              <text class="text-[12px] text-white">重新获取</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
     <!-- Mock 数据区域 -->
     <view class="mb-[16px]">
       <text class="text-[14px] font-bold text-[#2d3748] mb-[10px]">Mock 数据列表（ID 为任意类型）</text>
@@ -70,6 +108,9 @@ const loading = ref<boolean>(false);
 const requestStatus = ref<string>('idle'); // idle | loading | success | error
 const responseData = ref<IFoo | null>(null);
 const errorMsg = ref<string>('');
+const userInfo = ref<string>('');
+const cloudLoading = ref<boolean>(false);
+const cloudErrorMsg = ref<string>('');
 
 // ==========================================
 // 计算属性
@@ -115,6 +156,42 @@ const responseText = computed((): string => {
   if (data == null)
     return '';
   return `id: ${data.id}, name: ${data.name}`;
+});
+
+const hasCloudError = computed((): boolean => {
+  return cloudErrorMsg.value.length > 0;
+});
+
+const cloudStatusText = computed((): string => {
+  if (cloudLoading.value)
+    return '连接中';
+  if (hasCloudError.value)
+    return '连接失败';
+  return '已连接';
+});
+
+const cloudStatusBgClass = computed((): string => {
+  if (cloudLoading.value)
+    return 'bg-[#fef9c3]';
+  if (hasCloudError.value)
+    return 'bg-[#fee2e2]';
+  return 'bg-[#ccfbf1]';
+});
+
+const cloudStatusDotClass = computed((): string => {
+  if (cloudLoading.value)
+    return 'bg-[#d97706]';
+  if (hasCloudError.value)
+    return 'bg-[#dc2626]';
+  return 'bg-[#0d9488]';
+});
+
+const cloudStatusTextClass = computed((): string => {
+  if (cloudLoading.value)
+    return 'text-[#a16207]';
+  if (hasCloudError.value)
+    return 'text-[#b91c1c]';
+  return 'text-[#0f766e]';
 });
 
 // ==========================================
@@ -175,9 +252,27 @@ async function fetchRealApi() {
   loading.value = false;
 }
 
+async function getUserInfo() {
+  cloudLoading.value = true;
+  cloudErrorMsg.value = '';
+
+  try {
+    const res = await uniCloud.importObject('user').getUserInfo();
+    userInfo.value = JSON.stringify(res.data);
+    console.log('res', res);
+  }
+  catch (err) {
+    cloudErrorMsg.value = '云端数据获取失败，请检查 uniCloud 配置后重试';
+    console.error('getUserInfo error:', err);
+  }
+
+  cloudLoading.value = false;
+}
+
 // 页面挂载时自动加载 Mock 数据
 onMounted(() => {
   loadMockData();
+  getUserInfo();
 });
 </script>
 
