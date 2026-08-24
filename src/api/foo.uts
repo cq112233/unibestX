@@ -1,5 +1,9 @@
 import { API_DOMAINS, http } from '../http/request';
 import type { LimeRequestConfig } from '@/uni_modules/lime-request';
+import { DEFAULT_OSS_UPLOAD_PATH, uploadFile } from '../utils/upload.uts';
+import type { UploadFileOptions } from '../utils/upload.uts';
+
+export const FOO_UPLOAD_PATH: string = DEFAULT_OSS_UPLOAD_PATH;
 
 // ==========================================
 // 类型定义
@@ -98,4 +102,24 @@ export function updateFoo(id: number, data: IFoo): Promise<IFoo> {
  */
 export function deleteFoo(id: number): Promise<any> {
   return http.delete<any>(`/foo/${id}`);
+}
+
+/**
+ * 上传文件示例 —— 使用 utils/upload.uts
+ * 上传成功返回 OSS 地址
+ * @param filePath 本地文件路径
+ * @param ignoreAuth 是否跳过鉴权（默认 true 用于演示接口）
+ * @param uploadPathOrUrl 动态上传接口路径或完整 URL（不传默认使用 FOO_UPLOAD_PATH）
+ */
+export function uploadFooFile(
+  filePath: string,
+  ignoreAuth: boolean = false,
+  uploadPathOrUrl: string = FOO_UPLOAD_PATH
+): Promise<string> {
+  return uploadFile({
+    url: uploadPathOrUrl,
+    filePath,
+    formData: null,
+    ignoreAuth
+  } as UploadFileOptions);
 }

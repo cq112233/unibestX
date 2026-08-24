@@ -318,6 +318,7 @@ unibestX/
 │   ├── types/                # 全局 TypeScript / UTS 类型定义
 │   │   └── uni.d.ts          #   definePage 宏、Vue 宏与全局 API 类型补全
 │   └── utils/                # 全局工具函数
+│       ├── upload.uts        #   文件上传封装（基于原生 uni.uploadFile，支持 OSS 上传与动态 BaseURL）
 │       ├── toast.uts         #   全局 Toast 轻提示
 │       ├── systemInfo.uts    #   屏幕与系统信息获取
 │       ├── backPress.uts     #   Android 物理返回键双击退出
@@ -465,6 +466,53 @@ uni-app x 推出了新一代的 **蒸汽模式（Vapor）**。新版渲染引擎
 - 多域名支持
 - 401 自动登出
 - 支持忽略认证的请求
+
+### 文件上传
+
+基于原生 `uni.uploadFile` 统一封装的高性能跨端文件上传模块（位于 `src/utils/upload.uts`）：
+
+- **跨端原生适配**：全端通用（App Android / iOS / HarmonyOS、微信小程序、H5）。
+- **统一鉴权**：自动从 `TokenStore` 注入 `header.token`（支持 `ignoreAuth: true` 跳过鉴权）。
+- **智能路径拼接**：支持传入完整 URL 或仅传入相对接口路径（如 `/api/upload` 自动与基础域名拼接）。
+- **上传进度监听**：支持 `onProgress` 进度回调。
+- **智能响应解析**：兼容 `code: 200`、`code: "10000"`、`success: true`、`data: "url"`、`data: { url: "..." }` 等多种后端返回格式，若业务失败自动提取错误信息。
+
+#### 配置说明（通过 .env 环境变量）
+
+项目支持直接在对应环境的 `.env` 文件（`.env.development` / `.env.test` / `.env.production`）中配置上传接口基础域名与路由路径：
+
+```ini
+# .env.development / .env.production
+VITE_UPLOAD_BASEURL=https://xxx.com                     # 上传基础域名
+VITE_UPLOAD_PATH=/gateway/user/sys/oss/upload/xxx       # 上传接口路由
+```
+
+底层 [`src/utils/upload.uts`](src/utils/upload.uts) 会自动从 `import.meta.env` 读取当前环境的配置，无需改动源码。
+
+#### 调用示例
+
+```uts
+import { uploadOssFile, uploadFile } from '@/src/utils/upload';
+
+// 1. 快捷上传图片到 OSS
+uploadOssFile(filePath)
+  .then((ossUrl: string) => {
+    console.log('上传成功 OSS 地址:', ossUrl);
+  })
+  .catch((err: Error | null) => {
+    uni.showToast({ title: err?.message ?? '上传失败', icon: 'none' });
+  });
+
+// 2. 自定义上传接口与进度监听
+uploadFile({
+  url: '/api/custom-upload', // 相对路径自动拼接 BaseURL，也可传完整 http(s) URL
+  filePath,
+  name: 'file',
+  onProgress: (progress: number) => {
+    console.log(`当前上传进度: ${progress}%`);
+  }
+});
+```
 
 ### 状态管理
 

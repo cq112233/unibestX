@@ -1,1 +1,0 @@
-import{x as s,b as a,c as t,w as e,y as o,h as d}from"./index-w4Y8U_lA.js";const n=s({},[["render",function(s,n){const r=d;return a(),t(r,{class:"default-layout"},{default:e(()=>[o(s.$slots,"default",{},void 0,!0)]),_:3})}],["__scopeId","data-v-915eb907"]]);export{n as L};

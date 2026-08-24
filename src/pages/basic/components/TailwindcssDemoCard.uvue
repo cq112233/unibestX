@@ -6,6 +6,13 @@
         暗黑变体与多端平台变体，一套类名全端生效，写法与 Web 端完全一致。
       </text>
 
+      <!-- 官网网址提示 -->
+      <view class="flex-row items-center bg-[#f1f5f9] p-[8px] rounded-[6px] mb-[12px]" @click="copyWebsiteUrl">
+        <text class="text-[12px] text-[#475569] font-medium mr-[4px]">官网：</text>
+        <text class="text-[12px] text-[#2563eb] underline flex-1">https://tw.icebreaker.top/zh-cn/</text>
+        <text class="text-[11px] text-[#94a3b8]">点击复制</text>
+      </view>
+
       <!-- 特性标签 -->
       <view class="flex-row items-center flex-wrap">
         <view class="mr-[6px] mb-[4px] px-[10px] py-[3px] rounded-[20px] bg-[#e0edff] border-[1px] border-solid border-[#bfdbfe]">
@@ -32,6 +39,18 @@
 
 <script setup lang="uts">
 import Card from './Card.uvue';
+
+function copyWebsiteUrl() {
+  uni.setClipboardData({
+    data: 'https://tw.icebreaker.top/zh-cn/',
+    success: () => {
+      uni.showToast({
+        title: '官网网址已复制到剪贴板',
+        icon: 'none'
+      });
+    }
+  });
+}
 
 function navigateToDemo() {
   uni.navigateTo({

@@ -28,6 +28,21 @@
 * **多域名支持**：轻松配置和切换不同的 API 域名环境。
 * **灵活配置**：支持配置特定请求忽略认证。
 
+## 文件上传 (Upload)
+
+基于官方原生 `uni.uploadFile` 封装的文件上传模块（位于 `src/utils/upload.uts`）：
+
+* **全端通用**：全平台原生支持（App Android / iOS / HarmonyOS、微信小程序、H5）。
+* **Token 自动注入**：自动在 header 携带 Token（支持 `ignoreAuth: true` 跳过）。
+* **BaseURL 动态拼接**：支持传入完整 URL 或仅传入相对接口路径。
+* **进度监听**：支持 `onProgress` 上传进度回调。
+* **环境变量配置**：支持直接在对应环境的 `.env`（如 `.env.development` / `.env.production`）中配置：
+
+  ```ini
+  VITE_UPLOAD_BASEURL=https://xxx.com
+  VITE_UPLOAD_PATH=/gateway/user/sys/oss/upload/xxx
+  ```
+
 ## 状态管理与持久化
 
 基于 `x-pinia-s` (专为 uni-app X 优化的 Pinia)：

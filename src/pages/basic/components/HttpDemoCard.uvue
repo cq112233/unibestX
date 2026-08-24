@@ -91,14 +91,90 @@
         </view>
       </view>
     </view>
+    <!-- 文件上传 Demo（uploadFooFile → utils/upload.uts → uni.uploadFile） -->
+    <view class="mt-[16px]">
+      <view class="flex-row items-center mb-[10px]">
+        <view class="w-[32px] h-[32px] rounded-[8px] bg-[#fff7ed] border-[1px] border-solid border-[#fdba74] items-center justify-center mr-[10px]">
+          <text class="text-[12px] font-bold text-[#c2410c]">UP</text>
+        </view>
+        <view class="flex-1">
+          <text class="text-[14px] font-bold text-[#1e293b]">文件上传</text>
+          <text class="text-[11px] text-[#64748b] mt-[2px]">{{ uploadPath }}</text>
+        </view>
+      </view>
+
+      <!-- 配置提示 -->
+      <view class="flex-row items-center bg-[#fff7ed] p-[8px] rounded-[6px] mb-[10px] border-[1px] border-solid border-[#ffedd5]">
+        <text class="text-[11px] text-[#c2410c] leading-[16px] flex-1">
+          💡 上传 OSS 接口地址支持直接在 .env 环境变量中配置（VITE_UPLOAD_BASEURL / VITE_UPLOAD_PATH）
+        </text>
+      </view>
+
+      <view class="rounded-[8px] bg-[#f8fafc] border-[1px] border-solid border-[#cbd5e1] overflow-hidden">
+        <view class="h-[3px] bg-[#f97316]" />
+        <view class="p-[12px]">
+          <view class="flex-row items-center justify-between mb-[8px]">
+            <text class="text-[11px] text-[#64748b]">上传结果</text>
+            <text class="text-[10px] text-[#94a3b8]">POST</text>
+          </view>
+          <text v-if="uploadLoading" class="text-[12px] text-[#c2410c]">正在上传...</text>
+          <text v-else-if="hasUploadError" class="text-[12px] text-[#dc2626]">{{ uploadError }}</text>
+          <view v-else-if="hasUploadResult">
+            <!-- 上：图片居中预览（支持点击放大） -->
+            <view class="items-center justify-center py-[10px] bg-white rounded-[8px] border-[1px] border-solid border-[#e2e8f0]">
+              <image
+                :src="uploadResultText"
+                class="w-[120px] h-[120px] rounded-[8px]"
+                mode="aspectFill"
+                @click="previewUploadedImage"
+              />
+              <text class="text-[10px] text-[#94a3b8] mt-[6px]">点击查看大图</text>
+            </view>
+
+            <!-- 下：OSS 链接美化展示卡片（支持一键复制） -->
+            <view class="mt-[10px] p-[10px] bg-[#f8fafc] rounded-[8px] border-[1px] border-solid border-[#e2e8f0]">
+              <view class="flex-row items-center justify-between mb-[6px]">
+                <view class="flex-row items-center">
+                  <view class="w-[3px] h-[12px] bg-[#f97316] rounded-[2px] mr-[6px]" />
+                  <text class="text-[11px] font-bold text-[#475569]">OSS 链接地址</text>
+                </view>
+                <view
+                  class="px-[8px] py-[3px] rounded-[4px] bg-[#ea580c] flex-row items-center"
+                  @click="copyUploadUrl"
+                >
+                  <text class="text-[10px] text-white font-medium">复制链接</text>
+                </view>
+              </view>
+              <text
+                class="oss-url-text text-[11px] text-[#334155] leading-[18px]"
+                :selectable="true"
+              >
+                {{ uploadResultText }}
+              </text>
+            </view>
+          </view>
+          <text v-else class="text-[12px] text-[#94a3b8]">未选择文件</text>
+        </view>
+      </view>
+
+      <view class="mt-[10px]">
+        <view
+          class="bg-[#f97316] rounded-[8px] h-[42px] w-full flex flex-row items-center justify-center"
+          @click="chooseAndUpload"
+        >
+          <text class="text-[#ffffff] text-[14px]">{{ uploadLoading ? '上传中...' : '选择图片并上传' }}</text>
+        </view>
+      </view>
+    </view>
   </Card>
 </template>
 
 <script setup lang="uts">
 import { computed, ref } from 'vue';
 import Card from './Card.uvue';
-import { foo, getFooList } from '@/src/api/foo';
+import { foo, FOO_UPLOAD_PATH, getFooList, uploadFooFile } from '@/src/api/foo';
 import type { IFoo } from '@/src/api/foo';
+import { DEFAULT_OSS_BASE_URL } from '@/src/utils/upload';
 
 // ==========================================
 // 响应式状态
@@ -111,6 +187,10 @@ const errorMsg = ref<string>('');
 const userInfo = ref<string>('');
 const cloudLoading = ref<boolean>(false);
 const cloudErrorMsg = ref<string>('');
+const uploadPath = ref<string>(FOO_UPLOAD_PATH);
+const uploadLoading = ref<boolean>(false);
+const uploadResult = ref<string>('');
+const uploadError = ref<string>('');
 
 // ==========================================
 // 计算属性
@@ -194,6 +274,18 @@ const cloudStatusTextClass = computed((): string => {
   return 'text-[#0f766e]';
 });
 
+const hasUploadError = computed((): boolean => {
+  return uploadError.value.length > 0;
+});
+
+const hasUploadResult = computed((): boolean => {
+  return uploadResult.value.length > 0;
+});
+
+const uploadResultText = computed((): string => {
+  return uploadResult.value;
+});
+
 // ==========================================
 // 方法
 // ==========================================
@@ -269,6 +361,104 @@ async function getUserInfo() {
   cloudLoading.value = false;
 }
 
+/**
+ * 执行上传并展示结果
+ */
+async function uploadFileByPath(filePath: string) {
+  if (DEFAULT_OSS_BASE_URL == '' || DEFAULT_OSS_BASE_URL.includes('xxx') || uploadPath.value == '' || uploadPath.value.includes('xxx')) {
+    uploadError.value = '请在对应环境的 .env 文件中配置真实的 VITE_UPLOAD_BASEURL 与 VITE_UPLOAD_PATH';
+    uni.showToast({
+      title: '请先在 .env 中配置真实上传地址',
+      icon: 'none'
+    });
+    return;
+  }
+  uploadLoading.value = true;
+  uploadError.value = '';
+  uploadResult.value = '';
+
+  try {
+    const ossUrl = await uploadFooFile(filePath, true, uploadPath.value);
+    uploadResult.value = ossUrl;
+  }
+  catch (err) {
+    let msg = '上传失败';
+    if (err instanceof Error) {
+      msg = (err as Error).message;
+    }
+    else if (err != null) {
+      msg = `${err}`;
+    }
+    uploadError.value = msg;
+  }
+
+  uploadLoading.value = false;
+}
+
+/**
+ * 选择图片并上传（uploadFooFile → utils/upload.uts → uni.uploadFile）
+ */
+function chooseAndUpload() {
+  if (uploadLoading.value) {
+    return;
+  }
+  uploadError.value = '';
+  uni.chooseImage({
+    count: 1,
+    sourceType: ['album', 'camera'],
+    success: (res) => {
+      const paths = res.tempFilePaths;
+      if (paths.length <= 0) {
+        uploadError.value = '未选择文件';
+        return;
+      }
+      uploadFileByPath(paths[0] as string);
+    },
+    fail: (err) => {
+      console.log('chooseImage fail:', err);
+      let errMsg = '';
+      if (err != null && err.errMsg != null) {
+        errMsg = `${err.errMsg}`;
+      }
+      // 用户主动取消时不显示为错误
+      if (errMsg.includes('cancel')) {
+        return;
+      }
+      uploadError.value = errMsg != '' ? `选择文件失败: ${errMsg}` : '选择文件失败';
+    }
+  });
+}
+
+/**
+ * 复制 OSS 链接到剪贴板
+ */
+function copyUploadUrl() {
+  const url = uploadResult.value;
+  if (url == '') {
+    return;
+  }
+  uni.setClipboardData({
+    data: url,
+    showToast: false,
+    success: () => {
+      uni.showToast({ title: '链接已复制', icon: 'success' });
+    }
+  });
+}
+
+/**
+ * 点击查看图片大图
+ */
+function previewUploadedImage() {
+  const url = uploadResult.value;
+  if (url == '') {
+    return;
+  }
+  uni.previewImage({
+    urls: [url]
+  });
+}
+
 // 页面挂载时自动加载 Mock 数据
 onMounted(() => {
   loadMockData();
@@ -276,5 +466,10 @@ onMounted(() => {
 });
 </script>
 
-<style>
+<style scoped>
+/* #ifdef H5 || MP-WEIXIN */
+.oss-url-text {
+  word-break: break-all;
+}
+/* #endif */
 </style>

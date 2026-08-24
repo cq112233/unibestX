@@ -57,7 +57,9 @@ requestInstance.interceptors.request.use(
       config.header = {} as UTSJSONObject;
     }
     const header = config.header as UTSJSONObject;
-    if (header['Content-Type'] == null) {
+    // UPLOAD 由 uni.uploadFile 自动生成 multipart Content-Type（含 boundary），
+    // 不能强制 JSON，否则 H5 端上传可能失败
+    if (config.method != 'UPLOAD' && header['Content-Type'] == null) {
       header['Content-Type'] = ContentTypeEnum.AppJson;
     }
     if (header.Accept == null) {
@@ -222,6 +224,19 @@ export class HttpClient {
     _config.data = data;
     _config.method = 'DELETE';
     return this.request<T>(_config);
+  }
+
+  /**
+   * 上传文件（lime-request UPLOAD，自动携带 token，响应为原始 JSON 字符串）
+   */
+  upload<T>(url: string, config: LimeRequestConfig | null = null): Promise<T> {
+    return requestInstance.upload(url, config).then((res: LimeRequestResponse<any>): T => {
+      const rawData = res.data;
+      if (rawData === null) {
+        throw new Error('上传响应为空');
+      }
+      return rawData as T;
+    });
   }
 }
 
