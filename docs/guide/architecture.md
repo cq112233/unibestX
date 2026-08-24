@@ -11,6 +11,7 @@
 | **前端框架** | Vue 3 | 采用 Composition API 编写 UI 逻辑 |
 | **构建工具** | Vite 5 | 提供极速的本地开发启动与热更新体验 |
 | **CSS 引擎** | Tailwind CSS | v4 + weapp-tailwindcss 原子化 CSS，轻量且高效 |
+| **UI 组件库** | 多分支方案 | main 分支无内置 UI 库（纯净底座）；开箱即用可选 `uniX-rice-ui`（Rice UI 40+）/ `uniX-uview-ultra`（uview-ultra 80+） |
 | **分页组件** | z-paging-x | 提供强大的下拉刷新与分页列表加载体验 |
 | **状态管理** | x-pinia-s | 兼容 uni-app X 的 Pinia 方案 |
 | **HTTP 请求** | lime-request | uni-app X 兼容的现代化请求库 |
