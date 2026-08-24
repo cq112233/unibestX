@@ -49,7 +49,7 @@ export default defineConfig({
   },
   server: {
     host: '0.0.0.0',
-    port: 9001,
+    port: 8080,
     // H5 走代理模式时生效（.env 里 VITE_H5_USE_PROXY=true）；直连模式（false）请求不经过此代理
     proxy: {
       '/api': {

@@ -1,4 +1,4 @@
-name: Deploy to GitHub Pages
+name: Deploy site to GitHub Pages
 
 on:
   push:
@@ -15,12 +15,38 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout 🛎️
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Deploy to GitHub Pages 🚀
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build VitePress site (官网)
+        run: pnpm run docs:build
+
+      - name: Assemble publish directory
+        run: |
+          rm -rf publish
+          mkdir -p publish/docs
+          if [ -d unpackage/dist/build/web ]; then
+            cp -r unpackage/dist/build/web/. publish/
+          fi
+          cp -r docs/.vitepress/dist/. publish/docs/
+
+      - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./unpackage/dist/build/web # 直接部署 HBuilderX 打包后提交的 H5 产物目录
-          force_orphan: true # 可选，使 gh-pages 分支的历史记录更干净
+          publish_dir: ./publish
+          force_orphan: true # 一次性发布官网 + H5 演示站，避免两个 workflow 互相覆盖
