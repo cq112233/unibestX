@@ -2,10 +2,7 @@ import App from './App.uvue'; // 导入应用根组件 App.uvue
 import { createSSRApp } from 'vue'; // 导入 Vue 的 SSR 应用创建方法
 import pinia from './src/store'; // 导入 Pinia 状态管理实例（在 App-Android 平台上强制进行顶层定义约束）
 import i18n from './src/i18n'; // 导入 i18n 国际化配置实例
-import ultraUI from '@/uni_modules/uview-ultra/index.uts'; // 导入 uview-ultra 跨端 UI 组件库
 import { installRouteInterceptor } from './src/router/interceptor'; // 导入全局路由拦截器安装函数
-
-import { setupH5Components } from './src/utils/h5-components.uts';
 
 /**
  * 创建应用实例的入口函数
@@ -25,21 +22,6 @@ export function createApp() {
 
   // 注册 i18n 国际化插件
   app.use(i18n);
-
-  // 注册 uview-ultra UI 组件库并传入自定义初始化配置项
-  app.use(ultraUI, () => {
-    return {
-      options: {
-        config: {
-          // 开启只加载一次字体图标的优化，避免重复加载
-          loadFontOnce: true
-        }
-      }
-    };
-  });
-
-  // 临时修复 H5 生产环境 easycom 失效导致内置组件不渲染的问题
-  setupH5Components(app);
 
   // 返回创建好的应用实例对象，供系统挂载运行
   return {

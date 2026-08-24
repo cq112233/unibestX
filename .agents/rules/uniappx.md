@@ -99,11 +99,9 @@ description: uni-app X (UTS) 开发规范与踩坑避坑指南，适用于跨端
 	    *   `self-start` → `align-self: flex-start`
 
 	*SCSS 变量的动态化覆盖**：
-    在 `uni.scss` 中引入第三方组件库（如 `uview-ultra`）的 `theme.scss` 变量后，如需将某些编译期 SCSS 变量（如 `$up-primary`）转化为运行时的动态 CSS 变量，可在 `uni.scss` 引入之后重新赋值：
+    在 `uni.scss` 中引入第三方组件库的 SCSS 变量后，如需将某些编译期 SCSS 变量转化为运行时的动态 CSS 变量，可在 `uni.scss` 引入之后重新赋值：
     ```scss
-    @import '@/uni_modules/uview-ultra/theme.scss';
-    $up-primary: var(--theme-color, #0957DE);
-    $u-primary: var(--theme-color, #0957DE);
+    $app-primary: var(--theme-color, #0957DE);
     ```
 
 ---
@@ -111,8 +109,8 @@ description: uni-app X (UTS) 开发规范与踩坑避坑指南，适用于跨端
 ## 3. Easycom 与组件自动导入
 *   **免去手动 import**：
     在 `uni_modules` 中的组件，如其目录结构为 `uni_modules/[module-name]/components/[component-name]/[component-name].uvue`，uni-app X 的编译器会自动通过 `easycom` 规则加载，**无需且禁止在页面的 `<script>` 中手动 import 它们**。
-    *   *错误示例*：`import upActionSheet from 'uview-ultra/components/up-action-sheet/up-action-sheet.vue'` (会导致模块加载失败或 App 平台报错)。
-    *   *正确做法*：直接在 `<template>` 中写 `<up-action-sheet>`，并在 `pages.json` 中配置对应的 `easycom` 匹配规则。
+    *   *错误示例*：`import myComponent from 'uni_modules/my-module/components/my-component/my-component.uvue'` (会导致模块加载失败或 App 平台报错)。
+    *   *正确做法*：直接在 `<template>` 中写 `<my-component>`，并在 `pages.json` 中配置对应的 `easycom` 匹配规则。
 
 ---
 

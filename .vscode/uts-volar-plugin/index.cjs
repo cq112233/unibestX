@@ -9,8 +9,8 @@ function createSfcParser(CompilerDOM) {
       isNativeTag: () => true,
       isPreTag: () => true,
       parseMode: 'sfc',
-      onError: e => { errors.push(e); },
-      comments: true,
+      onError: (e) => { errors.push(e); },
+      comments: true
     });
     const descriptor = {
       filename: 'anonymous.vue',
@@ -23,7 +23,7 @@ function createSfcParser(CompilerDOM) {
       customBlocks: [],
       cssVars: [],
       slotted: false,
-      shouldForceReload: () => false,
+      shouldForceReload: () => false
     };
     for (const node of ast.children) {
       if (node.type === CompilerDOM.NodeTypes.COMMENT) {
@@ -75,7 +75,7 @@ function createSfcParser(CompilerDOM) {
         start = {
           line: start.line,
           column: start.column + offset,
-          offset: start.offset + offset,
+          offset: start.offset + offset
         };
       }
       end = { ...start };
@@ -175,6 +175,6 @@ module.exports = ({ modules }) => {
         }
       }
       return sfc;
-    },
+    }
   };
 };

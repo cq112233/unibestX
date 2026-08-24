@@ -25,16 +25,13 @@
 > - 最好升级至最新 **HBuilderX 5.24 版本**，完整体验无虚拟 DOM 高性能原生渲染；
 > - 旧版本可切换 **VDOM 模式**（`manifest.json` 中 `"vapor": false`）稳定运行。
 
-> ⚡ **渲染模式与 UI 组件库重要说明**
+> ⚡ **渲染模式说明**
 >
 > 1. 🚀 **main 分支全面兼容 VDOM 模式与 Vapor 模式（默认 Vapor 蒸汽模式）**：
 >    - `main` 分支现已全面兼通 Vue3 传统 **VDOM 模式** 与 **Vapor 模式**（蒸汽模式，无虚拟 DOM 高性能原生渲染）；
 >    - **默认采用 Vapor 蒸汽模式**，开发者可在 `manifest.json` 中按需切换回 VDOM 模式。
-> 2. 📦 **关于 uview-ultra 组件库**：
->    - `main` 分支内置了深度修复版的 `uview-ultra`，已全面适配多端与 VDOM/Vapor 模式，常用基础功能**基本够用**；
->    - 因个人精力有限，作者后续将**不再对 uview-ultra 进行维护与定制更新**。
-> 3. 🌟 **推荐分支：`uniX-rice-ui`（有团队持续维护）**：
->    - 如需长期维护、享受官方团队持续迭代更新的 UI 组件库，强烈推荐切换使用 **`uniX-rice-ui`** 分支（集成 Rice UI 官方支持，团队持续更新，完美支持 VDOM 与 Vapor 模式）。
+> 2. 🌟 **推荐分支：`uniX-rice-ui`（集成 Rice UI 组件库）**：
+>    - 如需集成完整现代 UI 组件库（Rice UI 官方支持，团队持续更新，完美支持 VDOM 与 Vapor 模式），推荐切换使用 **`uniX-rice-ui`** 分支。
 >
 > ```bash
 > # 切换至 uniX-rice-ui 分支
@@ -46,7 +43,7 @@
 > 本项目内置的 **`z-paging-x`** 分页组件（如 [z-paging-x.uvue](file:///Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/z-paging-x/components/z-paging-x/z-paging-x.uvue)）已由作者进行了**深度定制修改与修复**，专门用于兼容 `uni-app X` 各端平台（特别针对 Android 原生嵌套手势协商、`type="nested"` 架构支持以及各端 CSS 解析限制等进行了优化）。
 > **提示**：请勿直接从官方插件市场重新下载覆盖。若从官方重新下载安装，可能会导致多端兼容性与手势机制失效，届时请务必重新测试与调试！
 
-`unibestX` —— 最好的 `uni-app X` 开发模板，由 `uni-app X` + `Vue3` + `UTS` + `Vite5` + `Tailwind CSS` + `uview-ultra` + `z-paging-x` 构成，使用了下一代 uni-app 原生开发技术栈，通过 `HBuilderX` 运行 `Android`、`iOS`、`鸿蒙`、`H5` 和 `小程序` 等多端平台。
+`unibestX` —— 最好的 `uni-app X` 开发模板，由 `uni-app X` + `Vue3` + `UTS` + `Vite5` + `Tailwind CSS` + `z-paging-x` 构成，使用了下一代 uni-app 原生开发技术栈，通过 `HBuilderX` 运行 `Android`、`iOS`、`鸿蒙`、`H5` 和 `小程序` 等多端平台。
 
 👉 **在线 H5 演示体验**：[https://cq112233.github.io/unibestX/](https://cq112233.github.io/unibestX/)
 
@@ -206,21 +203,19 @@ pnpm build:h5
 | 组件库 | 简介 | 推荐分支 / 官网地址 | 维护状态 |
 | :--- | :--- | :--- | :--- |
 | **Rice UI（强烈推荐）** | 专为 uni-app X 打造的现代 UI 组件库，**完美支持 Vapor 蒸汽模式与 VDOM 模式无缝切换**，由 Rice UI 官方团队持续维护与技术支持。 | **`uniX-rice-ui` 分支** / [https://riceui.cn/](https://riceui.cn/) | 团队持续维护与迭代 |
-| **uview-ultra** | 专为 uni-app X 打造的 UI 库，本项目 main 分支内置了深度修复版，已全面兼容 Vapor/VDOM 模式，基础功能基本够用。 | **`main` 分支** / [https://uview-ultra.lingyun.net/](https://uview-ultra.lingyun.net/) | 已停止后续维护与定制 |
 | **TMUI** | 功能丰富、高度可定制的企业级组件库，提供完善的业务组件和主题系统。 | [https://tmui.design/](https://tmui.design/) | 社区维护 |
 | **Lime UI** | 社区活跃的 uni-app X 组件库，组件风格清新，覆盖常用移动端场景。 | [https://limex.qcoon.cn/](https://limex.qcoon.cn/) | 社区维护 |
 
 > 💡 **选型与分支建议**：
 >
-> 1. **主分支（`main`）**：全面兼容 **VDOM 模式** 与 **Vapor 模式**（**默认采用 Vapor 蒸汽模式**）。内置了作者深度修复的 `uview-ultra` 组件库，常用基础组件功能完备、**基本够用**。但由于个人精力有限，作者后续将**不再对其进行维护与后续定制**。
-> 2. **`uniX-rice-ui` 分支（强烈推荐）**：集成了由 **Rice UI 官方团队持续维护** 的组件库，同样完美支持 VDOM 和 Vapor 模式。若有新项目或需要长期维护支持，强烈建议选用 **`uniX-rice-ui`** 分支。
+> 1. **主分支（`main`）**：全面兼容 **VDOM 模式** 与 **Vapor 模式**（**默认采用 Vapor 蒸汽模式**）。轻量化底座，开发者可按需引入任意喜爱的组件库或采用 Tailwind CSS 自行封装。
+> 2. **`uniX-rice-ui` 分支（强烈推荐）**：集成了由 **Rice UI 官方团队持续维护** 的组件库，同样完美支持 VDOM 和 Vapor 模式。若需要开箱即用的成套组件库，强烈建议选用 **`uniX-rice-ui`** 分支。
 
 ## ✨ 特性
 
 - 🚀 **uni-app X (VDOM & Vapor 全面兼容)** — 默认启用传统 VDOM 模式，同时完美兼容 Vapor 蒸汽模式（无虚拟 DOM 高性能原生渲染）自由切换
 - 💪 **Vue3 + Vite5** — 最新前端技术栈，开发体验极佳
 - 🎨 **Tailwind CSS** — 原子化 CSS 引擎（v4 + weapp-tailwindcss），高效编写样式
-- 📦 **uview-ultra** — 专为 uni-app X 打造的 UI 组件库（内置深度修复版，已全面兼容 VDOM 与 Vapor 模式，常用基础功能完备，基本够用；后续不再单独维护与定制）
 - 📜 **z-paging-x** — 强大的分页列表组件（本项目已对 [z-paging-x.uvue](file:///Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/z-paging-x/components/z-paging-x/z-paging-x.uvue) 底层 Android 嵌套手势协商、Flex 布局及 `type="nested"` 架构进行了深度兼容修改与适配）
 - 🔧 **Pinia 持久化** — 状态管理 + 本地持久化，开箱即用
 - 🌐 **i18n 多语言** — 内置中英文切换，支持自动检测系统语言
@@ -306,9 +301,9 @@ unibestX/
 │   ├── sub/                  # 应用分包页面（按需加载）
 │   │   ├── auth/             #   登录、注册、找回密码
 │   │   ├── paging/           #   z-paging-x 分页列表各种场景演示
+│   │   ├── tailwindcss/      #   weapp-tailwindcss 演示页面
 │   │   ├── test/             #   页面间参数传递测试
-│   │   ├── uiTest/           #   UI 测试与排版页面
-│   │   └── uview-ultra/      #   uview-ultra 组件库示例
+│   │   └── uiTest/           #   UI 测试与排版页面
 │   ├── tabbar/               # 自定义 TabBar
 │   │   ├── index.uvue        #   TabBar 底部容器
 │   │   ├── TabbarItem.uvue   #   单个 Tab 项与角标
@@ -326,7 +321,6 @@ unibestX/
 │       └── i18n.uts          #   多语言辅助工具
 ├── uni_modules/              # uni-app 扩展插件模块
 │   ├── unix-crypto/          #   全端跨平台加密解密库（AES/DES/RSA/MD5/SHA/HMAC/Base64/UUID）
-│   ├── uview-ultra/          #   针对 uni-app X 深度优化适配的 UI 组件库
 │   ├── z-paging-x/           #   针对 uni-app X 深度优化适配的分页组件
 │   ├── iRainna-lodash/       #   UTS 版 Lodash 工具库
 │   ├── lime-request/         #   HTTP 请求核心库
@@ -335,7 +329,7 @@ unibestX/
 │   └── ...                   #   其他官方/三方 uni_modules
 ├── js_sdk/                   # JS / UTS SDK 资源
 ├── docs/                     # VitePress 项目文档源码
-├── App.ku.uvue               # 全局根包裹组件（动态主题注入、全局 Toast 容器）
+├── App.ku.uvue               # 全局根包裹组件（动态主题注入、自定义 Tabbar）
 ├── main.uts                  # 应用主入口文件
 ├── pages.json                # ⚠️ 自动生成的页面路由表（编译产物，构建时自动覆盖，请勿手动编辑）
 ├── manifest.json             # 应用配置清单（多端 AppID、权限、原生模块配置）
@@ -375,9 +369,9 @@ unibestX/
 
    ```json
    {
-     "path": "uview-ultra/demos/circle-progress/circle-progress",
+     "path": "tailwindcss/tailwindcss",
      "style": {
-       "navigationBarTitleText": "CircleProgress 圆形进度条",
+       "navigationBarTitleText": "weapp-tailwindcss 示例",
        "navigationStyle": "custom"
      }
    }
@@ -549,7 +543,6 @@ uploadFile({
 | 前端框架    | Vue 3                 | Composition API                        |
 | 构建工具    | Vite 5                | 极速开发体验                                 |
 | CSS 引擎  | Tailwind CSS           | v4 + weapp-tailwindcss，方括号任意值语法          |
-| UI 组件库  | uview-ultra           | uni-app X 专用 UI 库（内置深度修复版，全面兼容 VDOM/Vapor 模式，基础功能完备基本够用；后续不再维护定制） |
 | 分页组件    | z-paging-x            | 强大的下拉刷新 + 分页加载                         |
 | 状态管理    | x-pinia-s (Pinia)     | uni-app X 版 Pinia                      |
 | HTTP 请求 | lime-request          | uni-app X 兼容请求库                        |

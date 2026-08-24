@@ -11,17 +11,6 @@
       <text class="text-[14px] text-[#475569] mt-[8px]">
         {{ helloText }}
       </text>
-
-      <!-- 组件库多语言同步预览 -->
-      <view class="h-[1px] bg-[#f1f5f9] my-[12px]" />
-      <view>
-        <text class="text-[12px] text-[#94a3b8] mb-[6px]">{{ uviewPreview }}</text>
-        <view class="flex-row items-center flex-wrap">
-          <text class="text-[13px] text-[#2563eb] bg-[#eff6ff] px-[8px] py-[4px] rounded-[4px] font-medium mr-[8px] mb-[4px]">{{ uViewChooseDates }}</text>
-          <text class="text-[13px] text-[#059669] bg-[#ecfdf5] px-[8px] py-[4px] rounded-[4px] font-medium mr-[8px] mb-[4px]">{{ uViewConfirm }}</text>
-          <text class="text-[13px] text-[#d97706] bg-[#fffbe2] px-[8px] py-[4px] rounded-[4px] font-medium mb-[4px]">{{ uViewStart }} / {{ uViewEnd }}</text>
-        </view>
-      </view>
     </view>
 
     <!-- 选项列表 -->
@@ -54,7 +43,6 @@ import Card from './Card.uvue';
 import { computed } from 'vue';
 import { useAppStore } from '@/src/store/index.uts';
 import { $t, setTabbarItem } from '@/src/utils/i18n';
-import { t as uViewT } from '@/uni_modules/uview-ultra/libs/i18n/index.uts';
 
 const appStore = useAppStore();
 
@@ -62,7 +50,6 @@ const langTitle = computed((): string => $t('basic.langTitle'));
 const langPreview = computed((): string => $t('basic.langPreview'));
 const welcomeText = computed((): string => $t('message.welcome'));
 const helloText = computed((): string => $t('message.hello', { msg: 'hi' }));
-const uviewPreview = computed((): string => $t('basic.uviewPreview'));
 
 // 使用 computed 响应式获取当前 i18n 对象的语言环境
 const currentLocale = computed((): string => {
@@ -75,26 +62,6 @@ const isZhCN = computed((): boolean => {
 
 const isEnUS = computed((): boolean => {
   return currentLocale.value == 'en-US';
-});
-
-const uViewChooseDates = computed((): string => {
-  const _dummy = currentLocale.value;
-  return uViewT('up.calendar.chooseDates', {} as UTSJSONObject);
-});
-
-const uViewConfirm = computed((): string => {
-  const _dummy = currentLocale.value;
-  return uViewT('up.common.confirm', {} as UTSJSONObject);
-});
-
-const uViewStart = computed((): string => {
-  const _dummy = currentLocale.value;
-  return uViewT('up.common.start', {} as UTSJSONObject);
-});
-
-const uViewEnd = computed((): string => {
-  const _dummy = currentLocale.value;
-  return uViewT('up.common.end', {} as UTSJSONObject);
 });
 
 function switchLanguage(lang: string) {
