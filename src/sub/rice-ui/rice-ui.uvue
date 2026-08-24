@@ -1,5 +1,5 @@
 <template>
-  <view class="page-container pb-50px" :class="isDarkMode ? 'bg-[#121212]' : 'bg-[#f8fafc]'">
+  <view class=" pb-[50px]" :class="isDarkMode ? 'bg-[#121212]' : 'bg-[#f8fafc]'">
     <NavBar
       title="Rice UI 组件演示"
       :auto-back="true"
@@ -9,36 +9,36 @@
 
     <!-- 顶部 Banner -->
     <view
-      class="p-16px mb-12px shadow-xs flex-row items-center justify-between"
+      class="p-[16px] mb-[12px] shadow-xs flex-row items-center justify-between"
       :class="isDarkMode ? 'bg-[#1e1e1e]' : 'bg-white'"
     >
       <view class="flex-row items-center flex-1">
-        <image src="/static/logo.png" style="width: 48px; height: 48px;" class="mr-12px rounded-8px" />
+        <image src="/static/logo.png" style="width: 48px; height: 48px;" class="mr-[12px] rounded-[8px]" />
         <view class="flex-1">
           <view class="flex-row items-center">
-            <text class="text-16px font-bold" :class="isDarkMode ? 'text-[#f8fafc]' : 'text-[#1e293b]'">Rice UI 组件库</text>
+            <text class="text-[16px] font-bold" :class="isDarkMode ? 'text-[#f8fafc]' : 'text-[#1e293b]'">Rice UI 组件库</text>
             <!-- 当前主题色小标记 -->
-            <view class="w-10px h-10px rounded-5px ml-8px" :style="{ backgroundColor: currentTheme }" />
+            <view class="w-[10px] h-[10px] rounded-[5px] ml-[8px]" :style="{ backgroundColor: currentTheme }" />
           </view>
-          <text class="text-12px mt-4px" :class="isDarkMode ? 'text-[#94a3b8]' : 'text-[#64748b]'">基于 uni-app X 打造，48+ 跨端组件</text>
+          <text class="text-[12px] mt-[4px]" :class="isDarkMode ? 'text-[#94a3b8]' : 'text-[#64748b]'">基于 uni-app X 打造，48+ 跨端组件</text>
         </view>
       </view>
       <view
-        class="px-10px py-6px rounded-6px flex-row items-center"
+        class="px-[10px] py-[6px] rounded-[6px] flex-row items-center"
         :class="isDarkMode ? 'bg-[#334155]' : 'bg-[#f1f5f9]'"
         @click="toggleTheme"
       >
-        <text class="text-12px font-medium" :class="isDarkMode ? 'text-[#f8fafc]' : 'text-[#334155]'">
+        <text class="text-[12px] font-medium" :class="isDarkMode ? 'text-[#f8fafc]' : 'text-[#334155]'">
           {{ isDarkMode ? '🌙 暗黑' : '☀️ 明亮' }}
         </text>
       </view>
     </view>
 
     <!-- 1. 基础组件 -->
-    <view class="demo-group-card" :class="isDarkMode ? 'bg-[#1e1e1e]' : 'bg-white'">
-      <view class="flex-row items-center mb-10px">
-        <view class="w-4px h-16px rounded-2px mr-8px" :style="{ backgroundColor: currentTheme }" />
-        <text class="group-title" :class="isDarkMode ? 'text-[#f8fafc]' : 'text-[#1e293b]'">基础组件 (4)</text>
+    <view class="mx-[16px] mb-[16px] p-[16px] rounded-[12px] shadow-sm" :class="isDarkMode ? 'bg-[#1e1e1e]' : 'bg-white'">
+      <view class="flex-row items-center mb-[10px]">
+        <view class="w-[4px] h-[16px] rounded-[2px] mr-[8px]" :style="{ backgroundColor: currentTheme }" />
+        <text class="text-[15px] font-bold" :class="isDarkMode ? 'text-[#f8fafc]' : 'text-[#1e293b]'">基础组件 (4)</text>
       </view>
       <rice-cell-group :border="false">
         <rice-cell title="Button 按钮" is-link @click="goToDemo('button')">
@@ -65,10 +65,10 @@
     </view>
 
     <!-- 2. 表单组件 -->
-    <view class="demo-group-card" :class="isDarkMode ? 'bg-[#1e1e1e]' : 'bg-white'">
-      <view class="flex-row items-center mb-10px">
-        <view class="w-4px h-16px rounded-2px mr-8px" :style="{ backgroundColor: currentTheme }" />
-        <text class="group-title" :class="isDarkMode ? 'text-[#f8fafc]' : 'text-[#1e293b]'">表单组件 (18)</text>
+    <view class="mx-[16px] mb-[16px] p-[16px] rounded-[12px] shadow-sm" :class="isDarkMode ? 'bg-[#1e1e1e]' : 'bg-white'">
+      <view class="flex-row items-center mb-[10px]">
+        <view class="w-[4px] h-[16px] rounded-[2px] mr-[8px]" :style="{ backgroundColor: currentTheme }" />
+        <text class="text-[15px] font-bold" :class="isDarkMode ? 'text-[#f8fafc]' : 'text-[#1e293b]'">表单组件 (18)</text>
       </view>
       <rice-cell-group :border="false">
         <rice-cell title="Calendar 日历" is-link @click="goToDemo('calendar')">
@@ -165,10 +165,10 @@
     </view>
 
     <!-- 3. 数据展示 -->
-    <view class="demo-group-card" :class="isDarkMode ? 'bg-[#1e1e1e]' : 'bg-white'">
-      <view class="flex-row items-center mb-10px">
-        <view class="w-4px h-16px rounded-2px mr-8px" :style="{ backgroundColor: currentTheme }" />
-        <text class="group-title" :class="isDarkMode ? 'text-[#f8fafc]' : 'text-[#1e293b]'">数据展示 (15)</text>
+    <view class="mx-[16px] mb-[16px] p-[16px] rounded-[12px] shadow-sm" :class="isDarkMode ? 'bg-[#1e1e1e]' : 'bg-white'">
+      <view class="flex-row items-center mb-[10px]">
+        <view class="w-[4px] h-[16px] rounded-[2px] mr-[8px]" :style="{ backgroundColor: currentTheme }" />
+        <text class="text-[15px] font-bold" :class="isDarkMode ? 'text-[#f8fafc]' : 'text-[#1e293b]'">数据展示 (15)</text>
       </view>
       <rice-cell-group :border="false">
         <rice-cell title="Avatar 头像" is-link @click="goToDemo('avatar')">
@@ -250,10 +250,10 @@
     </view>
 
     <!-- 4. 反馈组件 -->
-    <view class="demo-group-card" :class="isDarkMode ? 'bg-[#1e1e1e]' : 'bg-white'">
-      <view class="flex-row items-center mb-10px">
-        <view class="w-4px h-16px rounded-2px mr-8px" :style="{ backgroundColor: currentTheme }" />
-        <text class="group-title" :class="isDarkMode ? 'text-[#f8fafc]' : 'text-[#1e293b]'">反馈组件 (8)</text>
+    <view class="mx-[16px] mb-[16px] p-[16px] rounded-[12px] shadow-sm" :class="isDarkMode ? 'bg-[#1e1e1e]' : 'bg-white'">
+      <view class="flex-row items-center mb-[10px]">
+        <view class="w-[4px] h-[16px] rounded-[2px] mr-[8px]" :style="{ backgroundColor: currentTheme }" />
+        <text class="text-[15px] font-bold" :class="isDarkMode ? 'text-[#f8fafc]' : 'text-[#1e293b]'">反馈组件 (8)</text>
       </view>
       <rice-cell-group :border="false">
         <rice-cell title="ActionSheet 动作面板" is-link @click="goToDemo('action-sheet')">
@@ -300,10 +300,10 @@
     </view>
 
     <!-- 5. 导航组件 -->
-    <view class="demo-group-card" :class="isDarkMode ? 'bg-[#1e1e1e]' : 'bg-white'">
-      <view class="flex-row items-center mb-10px">
-        <view class="w-4px h-16px rounded-2px mr-8px" :style="{ backgroundColor: currentTheme }" />
-        <text class="group-title" :class="isDarkMode ? 'text-[#f8fafc]' : 'text-[#1e293b]'">导航组件 (4)</text>
+    <view class="mx-[16px] mb-[16px] p-[16px] rounded-[12px] shadow-sm" :class="isDarkMode ? 'bg-[#1e1e1e]' : 'bg-white'">
+      <view class="flex-row items-center mb-[10px]">
+        <view class="w-[4px] h-[16px] rounded-[2px] mr-[8px]" :style="{ backgroundColor: currentTheme }" />
+        <text class="text-[15px] font-bold" :class="isDarkMode ? 'text-[#f8fafc]' : 'text-[#1e293b]'">导航组件 (4)</text>
       </view>
       <rice-cell-group :border="false">
         <rice-cell title="BackTop 返回顶部" is-link @click="goToDemo('back-top')">
@@ -332,26 +332,32 @@
 </template>
 
 <script setup lang="uts">
-import { useAppStore } from '@/src/store'
-import { isDark, setTheme } from '@/uni_modules/rice-ui'
-import { computed } from 'vue'
+import { useAppStore } from '@/src/store';
+import { isDark, setTheme } from '@/uni_modules/rice-ui';
+import { computed } from 'vue';
 
-const appStore = useAppStore()
+definePage({
+  style: {
+    navigationStyle: 'custom'
+  }
+});
+
+const appStore = useAppStore();
 
 const currentTheme = computed((): string => {
-  return appStore.state.theme
-})
+  return appStore.state.theme;
+});
 
 const isDarkMode = computed((): boolean => {
-  return isDark.value
-})
+  return isDark.value;
+});
 
 function toggleTheme() {
   if (isDarkMode.value) {
-    setTheme('light')
+    setTheme('light');
   }
   else {
-    setTheme('dark')
+    setTheme('dark');
   }
 }
 
@@ -359,27 +365,12 @@ function goToDemo(page: string) {
   uni.navigateTo({
     url: `/src/sub/rice-ui/demos/${page}/${page}`,
     fail: (err) => {
-      console.error('goToDemo fail:', err)
+      console.error('goToDemo fail:', err);
       uni.showToast({
         title: `打开 ${page} 页面失败`,
-        icon: 'none',
-      })
-    },
-  })
+        icon: 'none'
+      });
+    }
+  });
 }
 </script>
-
-<style scoped>
-.demo-group-card {
-  margin: 0 16px 16px 16px;
-  padding: 16px;
-  background-color: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
-}
-.group-title {
-  font-size: 15px;
-  font-weight: bold;
-  color: #1e293b;
-}
-</style>

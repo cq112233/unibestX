@@ -1,25 +1,25 @@
 <template>
-  <view class="page-container bg-[#f8fafc] min-h-screen pb-30px">
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
     <NavBar title="TimeFormat 时间格式化" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
-    <view class="p-16px">
+    <view class="p-[16px]">
       <!-- 基础时间格式化 -->
-      <view class="demo-block">
-        <text class="demo-label" :style="{ borderLeftColor: currentTheme }">相对时间与标准格式化</text>
+      <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
+        <text class="text-[14px] font-bold text-[#334155] mb-[12px] pl-[6px] border-l-[3px] border-solid" :style="{ borderLeftColor: currentTheme }">相对时间与标准格式化</text>
         <view class="flex-col">
-          <view class="flex-row items-center justify-between py-10px border-bottom-width-1px border-bottom-style-solid border-bottom-color-[#f1f5f9]">
-            <text class="text-14px text-[#334155]">标准年月日：</text>
+          <view class="flex-row items-center justify-between py-[10px] border-bottom-width-[1px] border-bottom-style-solid border-bottom-color-[#f1f5f9]">
+            <text class="text-[14px] text-[#334155]">标准年月日：</text>
             <rice-time-format :timestamp="now" format="YYYY-MM-DD" />
           </view>
-          <view class="flex-row items-center justify-between py-10px border-bottom-width-1px border-bottom-style-solid border-bottom-color-[#f1f5f9]">
-            <text class="text-14px text-[#334155]">完整时间：</text>
+          <view class="flex-row items-center justify-between py-[10px] border-bottom-width-[1px] border-bottom-style-solid border-bottom-color-[#f1f5f9]">
+            <text class="text-[14px] text-[#334155]">完整时间：</text>
             <rice-time-format :timestamp="now" format="YYYY-MM-DD HH:mm:ss" />
           </view>
-          <view class="flex-row items-center justify-between py-10px border-bottom-width-1px border-bottom-style-solid border-bottom-color-[#f1f5f9]">
-            <text class="text-14px text-[#334155]">相对时间 (刚刚/前)：</text>
+          <view class="flex-row items-center justify-between py-[10px] border-bottom-width-[1px] border-bottom-style-solid border-bottom-color-[#f1f5f9]">
+            <text class="text-[14px] text-[#334155]">相对时间 (刚刚/前)：</text>
             <rice-time-format :timestamp="fiveMinsAgo" format="relative" />
           </view>
-          <view class="flex-row items-center justify-between py-10px">
-            <text class="text-14px text-[#334155]">昨天相对时间：</text>
+          <view class="flex-row items-center justify-between py-[10px]">
+            <text class="text-[14px] text-[#334155]">昨天相对时间：</text>
             <rice-time-format :timestamp="yesterday" format="relative" />
           </view>
         </view>
@@ -29,31 +29,14 @@
 </template>
 
 <script setup lang="uts">
-import { useAppStore } from '@/src/store'
-import { computed } from 'vue'
+import { useAppStore } from '@/src/store';
+import { computed } from 'vue';
 
-const appStore = useAppStore()
-const currentTheme = computed((): string => appStore.state.theme)
+const appStore = useAppStore();
+const currentTheme = computed((): string => appStore.state.theme);
 
-const now = Date.now()
-const fiveMinsAgo = now - 5 * 60 * 1000
-const yesterday = now - 24 * 60 * 60 * 1000
+const now = Date.now();
+const fiveMinsAgo = now - 5 * 60 * 1000;
+const yesterday = now - 24 * 60 * 60 * 1000;
 </script>
 
-<style scoped>
-.demo-block {
-  margin-bottom: 12px;
-  padding: 14px;
-  background-color: #ffffff;
-  border-radius: 10px;
-}
-.demo-label {
-  font-size: 14px;
-  font-weight: bold;
-  color: #334155;
-  margin-bottom: 12px;
-  padding-left: 6px;
-  border-left-width: 3px;
-  border-left-style: solid;
-}
-</style>

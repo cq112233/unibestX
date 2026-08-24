@@ -1,33 +1,33 @@
 <template>
-  <view class="page-container bg-[#f8fafc] min-h-screen pb-30px">
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
     <NavBar title="CodeInput 验证码" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
-    <view class="p-16px">
+    <view class="p-[16px]">
       <!-- 基础框状 -->
-      <view class="demo-block">
-        <text class="demo-label" :style="{ borderLeftColor: currentTheme }">基础框状验证码 (Box)</text>
-        <view class="py-10px flex-row justify-center">
+      <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
+        <text class="text-[14px] font-bold text-[#334155] mb-[12px] pl-[6px] border-l-[3px] border-solid" :style="{ borderLeftColor: currentTheme }">基础框状验证码 (Box)</text>
+        <view class="py-[10px] flex-row justify-center">
           <rice-code-input v-model="code1" :maxlength="4" :color="currentTheme" mode="box" />
         </view>
-        <view class="mt-8px text-center">
-          <text class="text-12px text-[#64748b]">当前输入：{{ code1 }}</text>
+        <view class="mt-[8px] text-center">
+          <text class="text-[12px] text-[#64748b]">当前输入：{{ code1 }}</text>
         </view>
       </view>
 
       <!-- 下划线状 -->
-      <view class="demo-block">
-        <text class="demo-label" :style="{ borderLeftColor: currentTheme }">下划线模式 (Line)</text>
-        <view class="py-10px flex-row justify-center">
+      <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
+        <text class="text-[14px] font-bold text-[#334155] mb-[12px] pl-[6px] border-l-[3px] border-solid" :style="{ borderLeftColor: currentTheme }">下划线模式 (Line)</text>
+        <view class="py-[10px] flex-row justify-center">
           <rice-code-input v-model="code2" :maxlength="6" :color="currentTheme" mode="line" />
         </view>
-        <view class="mt-8px text-center">
-          <text class="text-12px text-[#64748b]">当前输入：{{ code2 }}</text>
+        <view class="mt-[8px] text-center">
+          <text class="text-[12px] text-[#64748b]">当前输入：{{ code2 }}</text>
         </view>
       </view>
 
       <!-- 密文模式 -->
-      <view class="demo-block">
-        <text class="demo-label" :style="{ borderLeftColor: currentTheme }">密文掩码模式 (Dot)</text>
-        <view class="py-10px flex-row justify-center">
+      <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
+        <text class="text-[14px] font-bold text-[#334155] mb-[12px] pl-[6px] border-l-[3px] border-solid" :style="{ borderLeftColor: currentTheme }">密文掩码模式 (Dot)</text>
+        <view class="py-[10px] flex-row justify-center">
           <rice-code-input v-model="code3" :maxlength="4" :color="currentTheme" :dot="true" />
         </view>
       </view>
@@ -36,31 +36,14 @@
 </template>
 
 <script setup lang="uts">
-import { useAppStore } from '@/src/store'
-import { computed } from 'vue'
+import { useAppStore } from '@/src/store';
+import { computed } from 'vue';
 
-const appStore = useAppStore()
-const currentTheme = computed((): string => appStore.state.theme)
+const appStore = useAppStore();
+const currentTheme = computed((): string => appStore.state.theme);
 
-const code1 = ref('')
-const code2 = ref('123')
-const code3 = ref('8888')
+const code1 = ref('');
+const code2 = ref('123');
+const code3 = ref('8888');
 </script>
 
-<style scoped>
-.demo-block {
-  margin-bottom: 12px;
-  padding: 14px;
-  background-color: #ffffff;
-  border-radius: 10px;
-}
-.demo-label {
-  font-size: 14px;
-  font-weight: bold;
-  color: #334155;
-  margin-bottom: 12px;
-  padding-left: 6px;
-  border-left-width: 3px;
-  border-left-style: solid;
-}
-</style>

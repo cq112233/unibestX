@@ -1,56 +1,56 @@
 <template>
-  <view class="page-container bg-[#f8fafc] min-h-screen pb-30px">
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
     <NavBar title="Tag 标签" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
-    <view class="p-16px">
+    <view class="p-[16px]">
       <!-- 基础类型 -->
-      <view class="demo-block">
-        <text class="demo-label" :style="{ borderLeftColor: currentTheme }">标签类型 (Type)</text>
+      <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
+        <text class="text-[14px] font-bold text-[#334155] mb-[12px] pl-[6px] border-l-[3px] border-solid" :style="{ borderLeftColor: currentTheme }">标签类型 (Type)</text>
         <view class="flex-row items-center flex-wrap">
-          <view class="mr-8px mb-8px">
+          <view class="mr-[8px] mb-[8px]">
             <rice-tag type="primary" :color="currentTheme" text="主要标签" />
           </view>
-          <view class="mr-8px mb-8px">
+          <view class="mr-[8px] mb-[8px]">
             <rice-tag type="success" text="成功标签" />
           </view>
-          <view class="mr-8px mb-8px">
+          <view class="mr-[8px] mb-[8px]">
             <rice-tag type="warning" text="警告标签" />
           </view>
-          <view class="mr-8px mb-8px">
+          <view class="mr-[8px] mb-[8px]">
             <rice-tag type="error" text="危险标签" />
           </view>
-          <view class="mb-8px">
+          <view class="mb-[8px]">
             <rice-tag type="info" text="默认标签" />
           </view>
         </view>
       </view>
 
       <!-- 样式风格 -->
-      <view class="demo-block">
-        <text class="demo-label" :style="{ borderLeftColor: currentTheme }">空心与圆角 (Plain & Round)</text>
+      <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
+        <text class="text-[14px] font-bold text-[#334155] mb-[12px] pl-[6px] border-l-[3px] border-solid" :style="{ borderLeftColor: currentTheme }">空心与圆角 (Plain & Round)</text>
         <view class="flex-row items-center flex-wrap">
-          <view class="mr-8px mb-8px">
+          <view class="mr-[8px] mb-[8px]">
             <rice-tag type="primary" :color="currentTheme" text="空心标签" :plain="true" />
           </view>
-          <view class="mr-8px mb-8px">
+          <view class="mr-[8px] mb-[8px]">
             <rice-tag type="success" text="圆角标签" :round="true" />
           </view>
-          <view class="mr-8px mb-8px">
+          <view class="mr-[8px] mb-[8px]">
             <rice-tag type="warning" text="标记样式" :mark="true" />
           </view>
-          <view class="mb-8px">
+          <view class="mb-[8px]">
             <rice-tag type="primary" color="#7232dd" text="自定义颜色" />
           </view>
         </view>
       </view>
 
       <!-- 可关闭标签 -->
-      <view class="demo-block">
-        <text class="demo-label" :style="{ borderLeftColor: currentTheme }">可关闭标签 (Closeable)</text>
+      <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
+        <text class="text-[14px] font-bold text-[#334155] mb-[12px] pl-[6px] border-l-[3px] border-solid" :style="{ borderLeftColor: currentTheme }">可关闭标签 (Closeable)</text>
         <view class="flex-row items-center flex-wrap">
-          <view v-if="showTag1" class="mr-8px mb-8px">
+          <view v-if="showTag1" class="mr-[8px] mb-[8px]">
             <rice-tag type="primary" :color="currentTheme" text="可关闭 1" :closeable="true" @close="showTag1 = false" />
           </view>
-          <view v-if="showTag2" class="mb-8px">
+          <view v-if="showTag2" class="mb-[8px]">
             <rice-tag type="success" text="可关闭 2" :closeable="true" @close="showTag2 = false" />
           </view>
         </view>
@@ -60,30 +60,13 @@
 </template>
 
 <script setup lang="uts">
-import { useAppStore } from '@/src/store'
-import { computed } from 'vue'
+import { useAppStore } from '@/src/store';
+import { computed } from 'vue';
 
-const appStore = useAppStore()
-const currentTheme = computed((): string => appStore.state.theme)
+const appStore = useAppStore();
+const currentTheme = computed((): string => appStore.state.theme);
 
-const showTag1 = ref(true)
-const showTag2 = ref(true)
+const showTag1 = ref(true);
+const showTag2 = ref(true);
 </script>
 
-<style scoped>
-.demo-block {
-  margin-bottom: 12px;
-  padding: 14px;
-  background-color: #ffffff;
-  border-radius: 10px;
-}
-.demo-label {
-  font-size: 14px;
-  font-weight: bold;
-  color: #334155;
-  margin-bottom: 12px;
-  padding-left: 6px;
-  border-left-width: 3px;
-  border-left-style: solid;
-}
-</style>

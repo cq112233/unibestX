@@ -1,25 +1,25 @@
 <template>
-  <view class="page-container bg-[#f8fafc] min-h-screen pb-30px">
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
     <NavBar title="Calendar 日历" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
-    <view class="p-16px">
+    <view class="p-[16px]">
       <!-- 基础内联日历 -->
-      <view class="demo-block">
-        <text class="demo-label" :style="{ borderLeftColor: currentTheme }">内嵌日历展示</text>
-        <view class="rounded-8px overflow-hidden border-width-1px border-solid border-color-[#e2e8f0]">
+      <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
+        <text class="text-[14px] font-bold text-[#334155] mb-[12px] pl-[6px] border-l-[3px] border-solid" :style="{ borderLeftColor: currentTheme }">内嵌日历展示</text>
+        <view class="rounded-[8px] overflow-hidden border-width-[1px] border-solid border-color-[#e2e8f0]">
           <rice-calendar :use-popup="false" :show-title="true" :color="currentTheme" title="选择日期" @confirm="onDateConfirm" />
         </view>
-        <view class="mt-10px">
-          <text class="text-13px text-[#64748b]">已选日期：{{ selectedDate }}</text>
+        <view class="mt-[10px]">
+          <text class="text-[13px] text-[#64748b]">已选日期：{{ selectedDate }}</text>
         </view>
       </view>
 
       <!-- 弹窗式日历 -->
-      <view class="demo-block">
-        <text class="demo-label" :style="{ borderLeftColor: currentTheme }">弹窗模式 (Popup)</text>
+      <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
+        <text class="text-[14px] font-bold text-[#334155] mb-[12px] pl-[6px] border-l-[3px] border-solid" :style="{ borderLeftColor: currentTheme }">弹窗模式 (Popup)</text>
         <rice-button type="primary" :color="currentTheme" text="打开弹窗日历" @click="showPopupCalendar = true" />
         <rice-calendar v-model:show="showPopupCalendar" :use-popup="true" :color="currentTheme" title="弹窗选择日期" @confirm="onPopupDateConfirm" />
-        <view v-if="popupSelectedDate != ''" class="mt-10px">
-          <text class="text-13px text-[#059669]">弹窗选定：{{ popupSelectedDate }}</text>
+        <view v-if="popupSelectedDate != ''" class="mt-[10px]">
+          <text class="text-[13px] text-[#059669]">弹窗选定：{{ popupSelectedDate }}</text>
         </view>
       </view>
     </view>
@@ -27,40 +27,23 @@
 </template>
 
 <script setup lang="uts">
-import { useAppStore } from '@/src/store'
-import { computed } from 'vue'
+import { useAppStore } from '@/src/store';
+import { computed } from 'vue';
 
-const appStore = useAppStore()
-const currentTheme = computed((): string => appStore.state.theme)
+const appStore = useAppStore();
+const currentTheme = computed((): string => appStore.state.theme);
 
-const selectedDate = ref('今天')
-const showPopupCalendar = ref(false)
-const popupSelectedDate = ref('')
+const selectedDate = ref('今天');
+const showPopupCalendar = ref(false);
+const popupSelectedDate = ref('');
 
 function onDateConfirm(val: any) {
-  selectedDate.value = JSON.stringify(val)
+  selectedDate.value = JSON.stringify(val);
 }
 
 function onPopupDateConfirm(val: any) {
-  popupSelectedDate.value = JSON.stringify(val)
-  showPopupCalendar.value = false
+  popupSelectedDate.value = JSON.stringify(val);
+  showPopupCalendar.value = false;
 }
 </script>
 
-<style scoped>
-.demo-block {
-  margin-bottom: 12px;
-  padding: 14px;
-  background-color: #ffffff;
-  border-radius: 10px;
-}
-.demo-label {
-  font-size: 14px;
-  font-weight: bold;
-  color: #334155;
-  margin-bottom: 12px;
-  padding-left: 6px;
-  border-left-width: 3px;
-  border-left-style: solid;
-}
-</style>

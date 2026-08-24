@@ -1,10 +1,10 @@
 <template>
-  <view class="page-container bg-[#f8fafc] min-h-screen pb-30px">
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
     <NavBar title="Cell 单元格" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
-    <view class="p-16px">
+    <view class="p-[16px]">
       <!-- 基础单元格 -->
-      <view class="demo-block">
-        <text class="demo-label" :style="{ borderLeftColor: currentTheme }">单元格列表</text>
+      <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
+        <text class="text-[14px] font-bold text-[#334155] mb-[12px] pl-[6px] border-l-[3px] border-solid" :style="{ borderLeftColor: currentTheme }">单元格列表</text>
         <rice-cell-group>
           <rice-cell title="个人信息" value="已完善" is-link />
           <rice-cell title="收货地址" value="浙江省杭州市" is-link />
@@ -18,8 +18,8 @@
       </view>
 
       <!-- 带图标单元格 -->
-      <view class="demo-block">
-        <text class="demo-label" :style="{ borderLeftColor: currentTheme }">带前缀图标单元格</text>
+      <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
+        <text class="text-[14px] font-bold text-[#334155] mb-[12px] pl-[6px] border-l-[3px] border-solid" :style="{ borderLeftColor: currentTheme }">带前缀图标单元格</text>
         <rice-cell-group>
           <rice-cell title="我的消息" value="3 条未读" is-link>
             <template #icon>
@@ -38,29 +38,12 @@
 </template>
 
 <script setup lang="uts">
-import { useAppStore } from '@/src/store'
-import { computed } from 'vue'
+import { useAppStore } from '@/src/store';
+import { computed } from 'vue';
 
-const appStore = useAppStore()
-const currentTheme = computed((): string => appStore.state.theme)
+const appStore = useAppStore();
+const currentTheme = computed((): string => appStore.state.theme);
 
-const cellSwitch = ref(true)
+const cellSwitch = ref(true);
 </script>
 
-<style scoped>
-.demo-block {
-  margin-bottom: 12px;
-  padding: 14px;
-  background-color: #ffffff;
-  border-radius: 10px;
-}
-.demo-label {
-  font-size: 14px;
-  font-weight: bold;
-  color: #334155;
-  margin-bottom: 12px;
-  padding-left: 6px;
-  border-left-width: 3px;
-  border-left-style: solid;
-}
-</style>

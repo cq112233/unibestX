@@ -1,30 +1,30 @@
 <template>
-  <view class="page-container bg-[#f8fafc] min-h-screen pb-30px">
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
     <NavBar title="Stepper 步进器" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
-    <view class="p-16px">
+    <view class="p-[16px]">
       <!-- 基础用法 -->
-      <view class="demo-block">
-        <text class="demo-label" :style="{ borderLeftColor: currentTheme }">基础步进器</text>
+      <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
+        <text class="text-[14px] font-bold text-[#334155] mb-[12px] pl-[6px] border-l-[3px] border-solid" :style="{ borderLeftColor: currentTheme }">基础步进器</text>
         <view class="flex-row items-center justify-between">
-          <text class="text-14px text-[#334155]">购买数量</text>
+          <text class="text-[14px] text-[#334155]">购买数量</text>
           <rice-stepper v-model="stepVal1" :button-style="{ color: currentTheme }" />
         </view>
       </view>
 
       <!-- 步长与限制 -->
-      <view class="demo-block">
-        <text class="demo-label" :style="{ borderLeftColor: currentTheme }">限制范围 (Min: 1, Max: 10, Step: 2)</text>
+      <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
+        <text class="text-[14px] font-bold text-[#334155] mb-[12px] pl-[6px] border-l-[3px] border-solid" :style="{ borderLeftColor: currentTheme }">限制范围 (Min: 1, Max: 10, Step: 2)</text>
         <view class="flex-row items-center justify-between">
-          <text class="text-14px text-[#334155]">批量调整</text>
+          <text class="text-[14px] text-[#334155]">批量调整</text>
           <rice-stepper v-model="stepVal2" :min="1" :max="10" :step="2" :button-style="{ color: currentTheme }" />
         </view>
       </view>
 
       <!-- 禁用状态 -->
-      <view class="demo-block">
-        <text class="demo-label" :style="{ borderLeftColor: currentTheme }">禁用状态</text>
+      <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
+        <text class="text-[14px] font-bold text-[#334155] mb-[12px] pl-[6px] border-l-[3px] border-solid" :style="{ borderLeftColor: currentTheme }">禁用状态</text>
         <view class="flex-row items-center justify-between">
-          <text class="text-14px text-[#94a3b8]">不可调节</text>
+          <text class="text-[14px] text-[#94a3b8]">不可调节</text>
           <rice-stepper :model-value="5" :disabled="true" />
         </view>
       </view>
@@ -33,30 +33,13 @@
 </template>
 
 <script setup lang="uts">
-import { useAppStore } from '@/src/store'
-import { computed } from 'vue'
+import { useAppStore } from '@/src/store';
+import { computed } from 'vue';
 
-const appStore = useAppStore()
-const currentTheme = computed((): string => appStore.state.theme)
+const appStore = useAppStore();
+const currentTheme = computed((): string => appStore.state.theme);
 
-const stepVal1 = ref(1)
-const stepVal2 = ref(2)
+const stepVal1 = ref(1);
+const stepVal2 = ref(2);
 </script>
 
-<style scoped>
-.demo-block {
-  margin-bottom: 12px;
-  padding: 14px;
-  background-color: #ffffff;
-  border-radius: 10px;
-}
-.demo-label {
-  font-size: 14px;
-  font-weight: bold;
-  color: #334155;
-  margin-bottom: 12px;
-  padding-left: 6px;
-  border-left-width: 3px;
-  border-left-style: solid;
-}
-</style>

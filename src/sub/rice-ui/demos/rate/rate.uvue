@@ -1,21 +1,21 @@
 <template>
-  <view class="page-container bg-[#f8fafc] min-h-screen pb-30px">
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
     <NavBar title="Rate 评分" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
-    <view class="p-16px">
+    <view class="p-[16px]">
       <!-- 基础用法 -->
-      <view class="demo-block">
-        <text class="demo-label" :style="{ borderLeftColor: currentTheme }">基础评分</text>
+      <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
+        <text class="text-[14px] font-bold text-[#334155] mb-[12px] pl-[6px] border-l-[3px] border-solid" :style="{ borderLeftColor: currentTheme }">基础评分</text>
         <view class="flex-row items-center justify-between">
           <rice-rate v-model="rate1" :color="currentTheme" />
-          <text class="text-14px text-[#64748b]">{{ rate1 }} 星</text>
+          <text class="text-[14px] text-[#64748b]">{{ rate1 }} 星</text>
         </view>
       </view>
 
       <!-- 自定义颜色与大小 -->
-      <view class="demo-block">
-        <text class="demo-label" :style="{ borderLeftColor: currentTheme }">自定义图标颜色与大小</text>
+      <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
+        <text class="text-[14px] font-bold text-[#334155] mb-[12px] pl-[6px] border-l-[3px] border-solid" :style="{ borderLeftColor: currentTheme }">自定义图标颜色与大小</text>
         <view class="flex-col">
-          <view class="mb-12px">
+          <view class="mb-[12px]">
             <rice-rate v-model="rate2" color="#ffd21e" size="28px" />
           </view>
           <view>
@@ -25,8 +25,8 @@
       </view>
 
       <!-- 只读与禁用 -->
-      <view class="demo-block">
-        <text class="demo-label" :style="{ borderLeftColor: currentTheme }">只读状态</text>
+      <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
+        <text class="text-[14px] font-bold text-[#334155] mb-[12px] pl-[6px] border-l-[3px] border-solid" :style="{ borderLeftColor: currentTheme }">只读状态</text>
         <rice-rate :model-value="4" :readonly="true" :color="currentTheme" size="22px" />
       </view>
     </view>
@@ -34,31 +34,14 @@
 </template>
 
 <script setup lang="uts">
-import { useAppStore } from '@/src/store'
-import { computed } from 'vue'
+import { useAppStore } from '@/src/store';
+import { computed } from 'vue';
 
-const appStore = useAppStore()
-const currentTheme = computed((): string => appStore.state.theme)
+const appStore = useAppStore();
+const currentTheme = computed((): string => appStore.state.theme);
 
-const rate1 = ref(3)
-const rate2 = ref(4)
-const rate3 = ref(3.5)
+const rate1 = ref(3);
+const rate2 = ref(4);
+const rate3 = ref(3.5);
 </script>
 
-<style scoped>
-.demo-block {
-  margin-bottom: 12px;
-  padding: 14px;
-  background-color: #ffffff;
-  border-radius: 10px;
-}
-.demo-label {
-  font-size: 14px;
-  font-weight: bold;
-  color: #334155;
-  margin-bottom: 12px;
-  padding-left: 6px;
-  border-left-width: 3px;
-  border-left-style: solid;
-}
-</style>

@@ -1,62 +1,62 @@
 <template>
-  <view class="page-container bg-[#f8fafc] min-h-screen pb-60px">
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-[60px]">
     <NavBar title="BackTop 返回顶部" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
-    <view class="p-16px">
+    <view class="p-[16px]">
       <!-- 功能说明与控制面板 -->
-      <view class="demo-block">
-        <text class="demo-label" :style="{ borderLeftColor: currentTheme }">返回顶部控制与说明</text>
-        <text class="text-13px text-[#64748b] leading-20px mb-8px">
+      <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
+        <text class="text-[14px] font-bold text-[#334155] mb-[12px] pl-[6px] border-l-[3px] border-solid" :style="{ borderLeftColor: currentTheme }">返回顶部控制与说明</text>
+        <text class="text-[13px] text-[#64748b] leading-[20px] mb-[8px]">
           当向下滚动列表超过 100px 时，右下角将浮现 BackTop 按钮，点击即可平滑回滚到列表顶部。
         </text>
 
         <!-- 实时滚动距离监控 -->
-        <view class="p-10px rounded-6px bg-[#f1f5f9] mb-12px flex-row items-center justify-between">
-          <text class="text-12px text-[#475569]">当前列表滚动 (scrollTop):</text>
-          <text class="text-13px font-bold" :style="{ color: currentTheme }">{{ Math.round(scrollTop) }} px</text>
+        <view class="p-[10px] rounded-[6px] bg-[#f1f5f9] mb-[12px] flex-row items-center justify-between">
+          <text class="text-[12px] text-[#475569]">当前列表滚动 (scrollTop):</text>
+          <text class="text-[13px] font-bold" :style="{ color: currentTheme }">{{ Math.round(scrollTop) }} px</text>
         </view>
 
         <!-- 模式切换 -->
-        <view class="flex-row items-center justify-between mb-8px">
-          <text class="text-13px text-[#334155] font-medium">展示形态：</text>
+        <view class="flex-row items-center justify-between mb-[8px]">
+          <text class="text-[13px] text-[#334155] font-medium">展示形态：</text>
           <view class="flex-row">
             <view
-              class="px-10px py-4px rounded-4px mr-6px"
+              class="px-[10px] py-[4px] rounded-[4px] mr-[6px]"
               :class="currentMode == 'round' ? 'bg-[#334155]' : 'bg-[#f1f5f9]'"
               @click="currentMode = 'round'"
             >
-              <text class="text-12px" :class="currentMode == 'round' ? 'text-white' : 'text-[#64748b]'">圆形</text>
+              <text class="text-[12px]" :class="currentMode == 'round' ? 'text-white' : 'text-[#64748b]'">圆形</text>
             </view>
             <view
-              class="px-10px py-4px rounded-4px"
+              class="px-[10px] py-[4px] rounded-[4px]"
               :class="currentMode == 'half-round' ? 'bg-[#334155]' : 'bg-[#f1f5f9]'"
               @click="currentMode = 'half-round'"
             >
-              <text class="text-12px" :class="currentMode == 'half-round' ? 'text-white' : 'text-[#64748b]'">半圆贴边</text>
+              <text class="text-[12px]" :class="currentMode == 'half-round' ? 'text-white' : 'text-[#64748b]'">半圆贴边</text>
             </view>
           </view>
         </view>
 
         <!-- 一键测试滚动按钮 -->
-        <view class="flex-row items-center justify-between mt-10px">
+        <view class="flex-row items-center justify-between mt-[10px]">
           <view
-            class="flex-1 py-8px rounded-6px items-center justify-center mr-6px"
+            class="flex-1 py-[8px] rounded-[6px] items-center justify-center mr-[6px]"
             :style="{ backgroundColor: currentTheme }"
             @click="scrollToDistance(600)"
           >
-            <text class="text-12px text-white font-medium">滚动到 600px</text>
+            <text class="text-[12px] text-white font-medium">滚动到 600px</text>
           </view>
           <view
-            class="flex-1 py-8px rounded-6px items-center justify-center ml-6px bg-[#e2e8f0]"
+            class="flex-1 py-[8px] rounded-[6px] items-center justify-center ml-[6px] bg-[#e2e8f0]"
             @click="scrollToDistance(0)"
           >
-            <text class="text-12px text-[#334155] font-medium">回顶部</text>
+            <text class="text-[12px] text-[#334155] font-medium">回顶部</text>
           </view>
         </view>
       </view>
 
       <!-- 模拟长列表内容 (独立滚动区域) -->
-      <view class="demo-block">
-        <text class="demo-label" :style="{ borderLeftColor: currentTheme }">模拟长列表内容（在框内向下滚动）</text>
+      <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
+        <text class="text-[14px] font-bold text-[#334155] mb-[12px] pl-[6px] border-l-[3px] border-solid" :style="{ borderLeftColor: currentTheme }">模拟长列表内容（在框内向下滚动）</text>
         <scroll-view
           direction="vertical"
           style="height: 380px;"
@@ -66,10 +66,10 @@
           <view
             v-for="item in 40"
             :key="item"
-            class="py-14px border-bottom-width-1px border-bottom-style-solid border-bottom-color-[#f1f5f9] flex-row items-center justify-between"
+            class="py-[14px] border-bottom-width-[1px] border-bottom-style-solid border-bottom-color-[#f1f5f9] flex-row items-center justify-between"
           >
-            <text class="text-14px text-[#334155]">列表项 {{ item }}</text>
-            <text class="text-12px text-[#94a3b8]">下滑触发返回顶部</text>
+            <text class="text-[14px] text-[#334155]">列表项 {{ item }}</text>
+            <text class="text-[12px] text-[#94a3b8]">下滑触发返回顶部</text>
           </view>
         </scroll-view>
       </view>
@@ -90,48 +90,31 @@
 </template>
 
 <script setup lang="uts">
-import { useAppStore } from '@/src/store'
-import { computed, ref } from 'vue'
+import { useAppStore } from '@/src/store';
+import { computed, ref } from 'vue';
 
-const appStore = useAppStore()
-const currentTheme = computed((): string => appStore.state.theme)
+const appStore = useAppStore();
+const currentTheme = computed((): string => appStore.state.theme);
 
-const currentMode = ref<'round' | 'half-round'>('round')
-const scrollTop = ref<number>(0)
-const targetScrollTop = ref<number>(0)
+const currentMode = ref<'round' | 'half-round'>('round');
+const scrollTop = ref<number>(0);
+const targetScrollTop = ref<number>(0);
 
 function onScroll(e: UniScrollEvent) {
-  scrollTop.value = e.detail.scrollTop
+  scrollTop.value = e.detail.scrollTop;
 }
 
 function scrollToDistance(top: number) {
   if (top == 0) {
-    targetScrollTop.value = targetScrollTop.value == 0 ? 0.0001 : 0
+    targetScrollTop.value = targetScrollTop.value == 0 ? 0.0001 : 0;
   }
   else {
-    targetScrollTop.value = top
+    targetScrollTop.value = top;
   }
 }
 
 function onBackTopClick() {
-  targetScrollTop.value = targetScrollTop.value == 0 ? 0.0001 : 0
+  targetScrollTop.value = targetScrollTop.value == 0 ? 0.0001 : 0;
 }
 </script>
 
-<style scoped>
-.demo-block {
-  margin-bottom: 12px;
-  padding: 14px;
-  background-color: #ffffff;
-  border-radius: 10px;
-}
-.demo-label {
-  font-size: 14px;
-  font-weight: bold;
-  color: #334155;
-  margin-bottom: 12px;
-  padding-left: 6px;
-  border-left-width: 3px;
-  border-left-style: solid;
-}
-</style>

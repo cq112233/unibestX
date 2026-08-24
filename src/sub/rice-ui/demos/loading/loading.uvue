@@ -1,29 +1,29 @@
 <template>
-  <view class="page-container bg-[#f8fafc] min-h-screen pb-30px">
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
     <NavBar title="Loading 加载" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
-    <view class="p-16px">
+    <view class="p-[16px]">
       <!-- 基础加载图标 -->
-      <view class="demo-block">
-        <text class="demo-label" :style="{ borderLeftColor: currentTheme }">加载类型与模式</text>
-        <view class="flex-row items-center justify-around py-10px">
+      <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
+        <text class="text-[14px] font-bold text-[#334155] mb-[12px] pl-[6px] border-l-[3px] border-solid" :style="{ borderLeftColor: currentTheme }">加载类型与模式</text>
+        <view class="flex-row items-center justify-around py-[10px]">
           <view class="flex-col items-center">
             <rice-loading mode="circular" size="28px" :color="currentTheme" />
-            <text class="text-12px text-[#64748b] mt-6px">circular</text>
+            <text class="text-[12px] text-[#64748b] mt-[6px]">circular</text>
           </view>
           <view class="flex-col items-center">
             <rice-loading mode="spinner" size="28px" color="#07c160" />
-            <text class="text-12px text-[#64748b] mt-6px">spinner</text>
+            <text class="text-[12px] text-[#64748b] mt-[6px]">spinner</text>
           </view>
         </view>
       </view>
 
       <!-- 尺寸与文字 -->
-      <view class="demo-block">
-        <text class="demo-label" :style="{ borderLeftColor: currentTheme }">自定义尺寸与文字</text>
-        <view class="flex-row items-center justify-around py-10px">
+      <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
+        <text class="text-[14px] font-bold text-[#334155] mb-[12px] pl-[6px] border-l-[3px] border-solid" :style="{ borderLeftColor: currentTheme }">自定义尺寸与文字</text>
+        <view class="flex-row items-center justify-around py-[10px]">
           <view class="flex-col items-center">
             <rice-loading size="36px" color="#ee0a24" />
-            <text class="text-12px text-[#64748b] mt-6px">36px</text>
+            <text class="text-[12px] text-[#64748b] mt-[6px]">36px</text>
           </view>
           <view class="flex-col items-center">
             <rice-loading size="24px" text="加载中..." :color="currentTheme" />
@@ -35,27 +35,10 @@
 </template>
 
 <script setup lang="uts">
-import { useAppStore } from '@/src/store'
-import { computed } from 'vue'
+import { useAppStore } from '@/src/store';
+import { computed } from 'vue';
 
-const appStore = useAppStore()
-const currentTheme = computed((): string => appStore.state.theme)
+const appStore = useAppStore();
+const currentTheme = computed((): string => appStore.state.theme);
 </script>
 
-<style scoped>
-.demo-block {
-  margin-bottom: 12px;
-  padding: 14px;
-  background-color: #ffffff;
-  border-radius: 10px;
-}
-.demo-label {
-  font-size: 14px;
-  font-weight: bold;
-  color: #334155;
-  margin-bottom: 12px;
-  padding-left: 6px;
-  border-left-width: 3px;
-  border-left-style: solid;
-}
-</style>

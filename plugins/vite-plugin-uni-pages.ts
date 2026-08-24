@@ -404,6 +404,17 @@ function generatePagesJson(
     }
   }
 
+  // 保留手动配置中、磁盘上真实存在但不在扫描目录内的页面（如 uni_modules 内置页面）
+  for (let k = 0; k < manualPages.length; k++) {
+    const mp = manualPages[k];
+    if (finalPages.some(p => p.path === mp.path)) {
+      continue;
+    }
+    if (fs.existsSync(path.resolve(projectRoot, `${mp.path}.uvue`))) {
+      finalPages.push(mp);
+    }
+  }
+
   // 5. 首页排最前（在 uni-app 中 pages.json 的第一项 pages[0] 即为应用默认启动首页）
   // 优先级：definePage type: 'home' / isHome: true（页面内显式声明最高）> opts.homePage（插件选项）> baseConfig.homePage（配置文件）
   let home = '';

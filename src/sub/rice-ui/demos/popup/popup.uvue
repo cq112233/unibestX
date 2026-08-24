@@ -1,18 +1,18 @@
 <template>
-  <view class="page-container bg-[#f8fafc] min-h-screen pb-30px">
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
     <NavBar title="Popup 弹出层" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
-    <view class="p-16px">
+    <view class="p-[16px]">
       <!-- 弹出位置 -->
-      <view class="demo-block">
-        <text class="demo-label" :style="{ borderLeftColor: currentTheme }">弹出位置</text>
+      <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
+        <text class="text-[14px] font-bold text-[#334155] mb-[12px] pl-[6px] border-l-[3px] border-solid" :style="{ borderLeftColor: currentTheme }">弹出位置</text>
         <view class="flex-col">
-          <view class="mb-10px">
+          <view class="mb-[10px]">
             <rice-button type="primary" :color="currentTheme" text="底部弹出 (Bottom)" @click="openPopup('bottom')" />
           </view>
-          <view class="mb-10px">
+          <view class="mb-[10px]">
             <rice-button type="success" text="顶部弹出 (Top)" @click="openPopup('top')" />
           </view>
-          <view class="mb-10px">
+          <view class="mb-[10px]">
             <rice-button type="warning" text="居中弹出 (Center)" @click="openPopup('center')" />
           </view>
           <view><rice-button type="info" text="左侧弹出 (Left)" @click="openPopup('left')" /></view>
@@ -22,60 +22,43 @@
 
     <!-- 弹窗组件 -->
     <rice-popup v-model:show="showPopup" :position="position" :round="true" :closeable="true">
-      <view class="p-24px" :style="popupStyle">
-        <text class="text-16px font-bold text-[#1e293b]">这是 {{ position }} 弹出的内容</text>
-        <text class="text-13px text-[#64748b] mt-8px">点击右上角或点击遮罩层可关闭弹窗</text>
+      <view class="p-[24px]" :style="popupStyle">
+        <text class="text-[16px] font-bold text-[#1e293b]">这是 {{ position }} 弹出的内容</text>
+        <text class="text-[13px] text-[#64748b] mt-[8px]">点击右上角或点击遮罩层可关闭弹窗</text>
       </view>
     </rice-popup>
   </view>
 </template>
 
 <script setup lang="uts">
-import { useAppStore } from '@/src/store'
-import { computed } from 'vue'
+import { useAppStore } from '@/src/store';
+import { computed } from 'vue';
 
-const appStore = useAppStore()
-const currentTheme = computed((): string => appStore.state.theme)
+const appStore = useAppStore();
+const currentTheme = computed((): string => appStore.state.theme);
 
-const showPopup = ref(false)
-const position = ref('bottom')
+const showPopup = ref(false);
+const position = ref('bottom');
 
 const popupStyle = computed((): Map<string, string> => {
-  const map = new Map<string, string>()
+  const map = new Map<string, string>();
   if (position.value == 'bottom' || position.value == 'top') {
-    map.set('min-height', '200px')
+    map.set('min-height', '200px');
   }
   else if (position.value == 'left' || position.value == 'right') {
-    map.set('width', '240px')
-    map.set('height', '100%')
+    map.set('width', '240px');
+    map.set('height', '100%');
   }
   else {
-    map.set('width', '280px')
-    map.set('border-radius', '12px')
+    map.set('width', '280px');
+    map.set('border-radius', '12px');
   }
-  return map
-})
+  return map;
+});
 
 function openPopup(pos: string) {
-  position.value = pos
-  showPopup.value = true
+  position.value = pos;
+  showPopup.value = true;
 }
 </script>
 
-<style scoped>
-.demo-block {
-  margin-bottom: 12px;
-  padding: 14px;
-  background-color: #ffffff;
-  border-radius: 10px;
-}
-.demo-label {
-  font-size: 14px;
-  font-weight: bold;
-  color: #334155;
-  margin-bottom: 12px;
-  padding-left: 6px;
-  border-left-width: 3px;
-  border-left-style: solid;
-}
-</style>

@@ -1,23 +1,23 @@
 <template>
-  <view class="page-container bg-[#f8fafc] min-h-screen pb-30px">
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
     <NavBar title="Collapse 折叠面板" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
-    <view class="p-16px">
+    <view class="p-[16px]">
       <!-- 基础折叠面板 -->
-      <view class="demo-block">
-        <text class="demo-label" :style="{ borderLeftColor: currentTheme }">基础用法</text>
+      <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
+        <text class="text-[14px] font-bold text-[#334155] mb-[12px] pl-[6px] border-l-[3px] border-solid" :style="{ borderLeftColor: currentTheme }">基础用法</text>
         <rice-collapse v-model="activeNames">
           <rice-collapse-item title="什么是 Rice UI？" name="1">
-            <text class="text-13px text-[#64748b] leading-20px">
+            <text class="text-[13px] text-[#64748b] leading-[20px]">
               Rice UI 是一款专为 uni-app X 打造的高性能跨端组件库，基于 Vue 3 组合式 API 开发，兼容 Android、iOS、鸿蒙Next、微信小程序和 H5。
             </text>
           </rice-collapse-item>
           <rice-collapse-item title="是否支持蒸汽模式 (Vapor Mode)？" name="2">
-            <text class="text-13px text-[#64748b] leading-20px">
+            <text class="text-[13px] text-[#64748b] leading-[20px]">
               是的！Rice UI 全面支持蒸汽模式（Vapor Mode），提供更轻量的包体积与极速的原生渲染体验。
             </text>
           </rice-collapse-item>
           <rice-collapse-item title="如何使用暗黑模式？" name="3">
-            <text class="text-13px text-[#64748b] leading-20px">
+            <text class="text-[13px] text-[#64748b] leading-[20px]">
               可以通过 setTheme('dark' | 'light') 快速切换组件库主题，并自动适配 CSS 变量。
             </text>
           </rice-collapse-item>
@@ -28,29 +28,12 @@
 </template>
 
 <script setup lang="uts">
-import { useAppStore } from '@/src/store'
-import { computed } from 'vue'
+import { useAppStore } from '@/src/store';
+import { computed } from 'vue';
 
-const appStore = useAppStore()
-const currentTheme = computed((): string => appStore.state.theme)
+const appStore = useAppStore();
+const currentTheme = computed((): string => appStore.state.theme);
 
-const activeNames = ref<string[]>(['1'])
+const activeNames = ref<string[]>(['1']);
 </script>
 
-<style scoped>
-.demo-block {
-  margin-bottom: 12px;
-  padding: 14px;
-  background-color: #ffffff;
-  border-radius: 10px;
-}
-.demo-label {
-  font-size: 14px;
-  font-weight: bold;
-  color: #334155;
-  margin-bottom: 12px;
-  padding-left: 6px;
-  border-left-width: 3px;
-  border-left-style: solid;
-}
-</style>

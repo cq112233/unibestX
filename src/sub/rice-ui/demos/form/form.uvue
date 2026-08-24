@@ -1,10 +1,10 @@
 <template>
-  <view class="page-container bg-[#f8fafc] min-h-screen pb-30px">
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
     <NavBar title="Form 表单" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
-    <view class="p-16px">
+    <view class="p-[16px]">
       <!-- 基础表单 -->
-      <view class="demo-block">
-        <text class="demo-label" :style="{ borderLeftColor: currentTheme }">基础表单与校验</text>
+      <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
+        <text class="text-[14px] font-bold text-[#334155] mb-[12px] pl-[6px] border-l-[3px] border-solid" :style="{ borderLeftColor: currentTheme }">基础表单与校验</text>
         <rice-form ref="formRef" :model="formData">
           <rice-form-item label="用户名" prop="username" :required="true">
             <rice-input v-model="formData.username" placeholder="请输入用户名" />
@@ -16,7 +16,7 @@
             <rice-input v-model="formData.phone" placeholder="请输入手机号" />
           </rice-form-item>
         </rice-form>
-        <view class="mt-16px">
+        <view class="mt-[16px]">
           <rice-button type="primary" :color="currentTheme" text="提交表单" @click="submitForm" />
         </view>
       </view>
@@ -25,53 +25,36 @@
 </template>
 
 <script setup lang="uts">
-import { useAppStore } from '@/src/store'
-import { computed } from 'vue'
+import { useAppStore } from '@/src/store';
+import { computed } from 'vue';
 
-const appStore = useAppStore()
-const currentTheme = computed((): string => appStore.state.theme)
+const appStore = useAppStore();
+const currentTheme = computed((): string => appStore.state.theme);
 
 type UserForm = {
-  username: string
-  password: string
-  phone: string
-}
+  username: string;
+  password: string;
+  phone: string;
+};
 
 const formData = reactive<UserForm>({
   username: '',
   password: '',
-  phone: '',
-})
+  phone: ''
+});
 
 function submitForm() {
   if (formData.username == '' || formData.password == '') {
     uni.showToast({
       title: '请完整填写表单项',
-      icon: 'none',
-    })
-    return
+      icon: 'none'
+    });
+    return;
   }
   uni.showToast({
     title: `提交成功: ${formData.username}`,
-    icon: 'success',
-  })
+    icon: 'success'
+  });
 }
 </script>
 
-<style scoped>
-.demo-block {
-  margin-bottom: 12px;
-  padding: 14px;
-  background-color: #ffffff;
-  border-radius: 10px;
-}
-.demo-label {
-  font-size: 14px;
-  font-weight: bold;
-  color: #334155;
-  margin-bottom: 12px;
-  padding-left: 6px;
-  border-left-width: 3px;
-  border-left-style: solid;
-}
-</style>
