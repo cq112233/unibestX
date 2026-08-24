@@ -1,0 +1,478 @@
+<template>
+	<view :class="formItemClass" ref="formItemRef" :style="customStyle" :id="formItemId" @click="handleClick">
+		<view :class="formItemInnerClass">
+			<!-- label -->
+			<view :class="labelClass" :style="[labelInnerStyle,splitCssProperty(_labelStyle).rectCssProperty]"
+				v-if="label!=null||slots['label']!=null">
+				<text v-if="_requiredPosition=='left'&&showRequired" class="rice-form-item--required">*</text>
+				<slot name="label">
+					<text class="rice-form-item__label__text"
+						:style="splitCssProperty(_labelStyle).textCssProperty">{{label}}</text>
+				</slot>
+				<text v-if="_requiredPosition=='right'&&showRequired" class="rice-form-item--required">*</text>
+			</view>
+			<!-- 内容 -->
+			<view class="rice-form-item__wrapper">
+				<view class="rice-form-item__content" :style="contentStyle" @click="clickContent">
+					<slot />
+				</view>
+				<!-- 尾部icon -->
+				<slot name="suffix">
+					<rice-icon v-if="hasStrValue(suffixIcon)" :name="suffixIcon" :custom-style="suffixIconStyle"
+						@click="clickSuffix" />
+				</slot>
+			</view>
+		</view>
+		<!-- 错误提示 -->
+		<view v-if="hasStrValue(state.validateMessage)&&_showError" class="rice-form-item__error"
+			:style="[errorStyle,splitCssProperty(_errorStyle).rectCssProperty]">
+			<slot name="error" :message="state.validateMessage">
+				<text class="rice-form-item__error__text"
+					:style="splitCssProperty(_errorStyle).textCssProperty">{{state.validateMessage}}</text>
+			</slot>
+		</view>
+	</view>
+</template>
+
+<script setup>
+	import { useNamespace } from "../../libs/use";
+	import { addUnit, hasStrValue, splitCssProperty, getParentEl, debugWarn, isSameValue } from "../../libs/utils";
+	import { formInjectKey, formDataInjectKey, FormItemContext, FormRules, FormTrigger, FormItemContextProvide } from "../rice-form"
+	import { formItemBlurInjectKey, formItemContextInjectKey } from "./index.uts"
+	import { FormItemProps, FormItemState } from "./type.uts"
+
+	defineOptions({
+		name: 'rice-form-item',
+		styleIsolation: 'app-and-page'
+	})
+
+	const ns = useNamespace('form-item')
+	const emit = defineEmits<{
+		clickSuffix : [],
+		click : [],
+		clickContent : [],
+	}>()
+
+	const slots = defineSlots<{
+		label() : any,
+		suffix() : any,
+		error(props : { message : string }) : any,
+	}>()
+
+	const props = withDefaults(defineProps<FormItemProps>(), {
+		showRequired: null,
+		borderBottom: null,
+		errorBottom: null,
+		required: null,
+		showError: null,
+		labelStyle: () : UTSJSONObject => ({}),
+		contentStyle: () : UTSJSONObject => ({}),
+		errorStyle: () : UTSJSONObject => ({}),
+		customStyle: () : UTSJSONObject => ({})
+	})
+	const formItemId = `rice-form-item-${props.name}`
+
+	const form = inject<RiceFormComponentPublicInstance | null>(formInjectKey, null)
+	const formData = inject<Ref<UTSJSONObject> | null>(formDataInjectKey, null)
+	const formItemContext = inject<FormItemContextProvide | null>(formItemContextInjectKey, null)
+	const formItems = computed(() => formItemContext?.formItems.value ?? [] as FormItemContext[])
+	const _showError = computed<boolean>(() => props.showError ?? form?.showError ?? true)
+
+	const state = reactive<FormItemState>({
+		name: props.name,
+		label: props.label,
+		status: 'unvalidate',
+		validateMessage: "",
+	})
+
+	// 当前表单项对应的值
+	const fieldValue = computed(() : any | null => {
+		if (!hasStrValue(props.name) || formData == null) return null
+		//@ts-ignore
+		return formData!.value.getAny(props.name!)
+
+	})
+
+	//校验规则合集
+	const rulesList = computed<FormRules[]>(() => {
+		const rules = [] as FormRules[]
+		const name = props.name ?? ''
+		if (name == '') return [] as FormRules[]
+		if (props.rules != null && props.rules!.length > 0) {
+			rules.push(...props.rules)
+		}
+		//合并form表单上面对应的rules
+		const formRules = (form?.rules) as Map<string, FormRules[]> | null
+		if (formRules != null) {
+			const list = formRules.get(name)
+			if (list != null && list.length > 0) {
+				rules.push(...list)
+			}
+		}
+		//必填项，如果props里面的required为true，且rules里面没有对应的required，就手动push进去
+		const rulesRequired = rules.find(v => v.required == true)
+		if (props.required == true && rulesRequired == null) {
+			rules.unshift({
+				required: true,
+				message: '必填项'
+			} as FormRules)
+		}
+		return rules
+
+	})
+
+	//是否显示必填的星号
+	const showRequired = computed(() => {
+		return props.showRequired ?? form?.showRequired ?? rulesList.value.some(v => v.required == true)
+	})
+
+	const formItemRef = ref<UniElement | null>(null)
+	const scrollRef = ref<UniElement | null>(null)
+	/**
+	 * 滚动到指定的字段
+	 */
+	const scrollToField = async () => {
+		// #ifdef APP
+		if (scrollRef.value == null) return
+		scrollRef.value!.removeAttribute('scroll-into-view')
+		await nextTick()
+		scrollRef.value!.setAnyAttribute('scroll-into-view', formItemId)
+		// #endif
+
+	}
+
+	/**
+	 * 获取校验失败时的信息
+	 */
+	function getRuleMessage(rule : FormRules, value ?: any | null) {
+		if (typeof value == 'string') return value
+		return rule.message ?? ''
+	}
+
+	/**
+	 * 是否为空数据
+	 */
+	const isEmptyValue = (value : any | null) => {
+		// #ifndef APP-ANDROID
+		if (value === undefined) return true
+		// #endif
+		if (value == null) return true
+		if (typeof value == 'string') return value.trim().length == 0
+		if (Array.isArray(value)) return value.length == 0
+		if (typeof value == 'object') {
+			if (value instanceof UTSJSONObject) {
+				return UTSJSONObject.keys(value).length == 0
+			}
+			return JSON.stringify(value) == '{}'
+		}
+		return false
+	}
+
+	/**
+	 * 执行同步校验
+	 */
+	const runSyncRule = (rule : FormRules, value : any | null) => {
+		//校验必填项
+		if (rule.required == true && isEmptyValue(value)) {
+			return false
+		}
+		//正则表达式
+		if (rule.pattern != null) {
+			const newVal = typeof value == 'number'
+				? value.toString(value)
+				: value
+			if (typeof newVal == 'string') {
+				return rule.pattern.test(newVal)
+			}
+		}
+		let len : number | null = null
+		if (typeof value == 'number') {
+			len = value
+		} else if (typeof value == 'string') {
+			len = value.trim().length
+		} else if (Array.isArray(value)) {
+			len = value.length
+		}
+		//最小值/长度校验
+		if (rule.min != null && len != null) {
+			if (len < rule.min) return false
+		}
+		if (rule.max != null && len != null) {
+			if (len > rule.max) return false
+		}
+		return true
+	}
+
+	/**
+	 * 表单校验，只要有一条规则不符合，就直接返回
+	 */
+
+	async function validate(trigger : FormTrigger) : Promise<FormItemState> {
+		state.name = props.name
+		state.label = props.label
+		const list = trigger == 'all'
+			? rulesList.value
+			: rulesList.value.filter(v => {
+				if (v.trigger == 'all') return true
+				return (v.trigger ?? 'change') == trigger
+			})
+		if (list.length == 0 && trigger != 'all') return state
+		for (let i = 0; i < list.length; i++) {
+			const rule = list[i]
+			state.rule = rule
+			//同步校验
+			const syncResult = runSyncRule(rule, fieldValue.value)
+			if (!syncResult) {
+				state.status = 'failed'
+				state.validateMessage = getRuleMessage(rule, null)
+				return state
+			}
+
+			if (typeof rule.validator == 'function') {
+				try {
+					//可能为异步的校验
+					const returnVal = await rule.validator(fieldValue.value)
+					if (returnVal != true) {
+						state.status = 'failed'
+						state.validateMessage = getRuleMessage(rule, returnVal)
+						return state
+					}
+				} catch (error) {
+					state.status = 'failed'
+					state.validateMessage = getRuleMessage(rule, error)
+					return state
+				}
+			}
+
+		}
+		state.status = 'passed'
+		state.validateMessage = ''
+		return state
+	}
+
+	/**
+	 * 失去焦点时的校验，仅 input/textarea 组件有效
+	 */
+
+	const handleBlur = () => {
+		validate('blur')
+	}
+
+	provide(formItemBlurInjectKey, handleBlur)
+
+	/**
+	 * 值改变时，触发校验
+	 */
+	watch(fieldValue, (newVal : any | null, oldValue : any | null) => {
+		if (hasStrValue(props.name) && !isSameValue(newVal, oldValue)) {
+			validate('change')
+		}
+	}, {
+		deep: true
+	})
+
+	/**
+	 * 清空校验信息
+	 */
+	const clearValidate = () => {
+		state.status = 'unvalidate'
+		state.validateMessage = ""
+	}
+
+	const clickSuffix = () => {
+		if (form?.disabled == true || form?.readonly == true) return
+		emit('clickSuffix')
+	}
+
+	const handleClick = () => {
+		if (form?.disabled == true || form?.readonly == true) return
+		emit('click')
+	}
+
+	const clickContent = () => {
+		if (form?.disabled == true || form?.readonly == true) return
+		emit('clickContent')
+	}
+
+	const context : FormItemContext = {
+		name: props.name,
+		validate,
+		clearValidate,
+		scrollToField,
+	}
+
+	//style
+	//@ts-ignore
+	const _labelStyle = computed<UTSJSONObject>(() => UTSJSONObject.assign((form?.labelStyle ?? {}), props.labelStyle))
+	//@ts-ignore
+	const _errorStyle = computed<UTSJSONObject>(() => UTSJSONObject.assign((form?.errorStyle ?? {}), props.errorStyle))
+	const _requiredPosition = computed(() => props.requiredPosition ?? form?.requiredPosition ?? 'left')
+	const showBorderBottom = computed(() => props.borderBottom ?? form?.borderBottom ?? true)
+	const showErrBottom = computed(() => (props.errorBottom ?? form?.errorBottom ?? false) && state.status == 'failed')
+	const _labelPosition = computed(() => props.labelPosition ?? form?.labelPosition ?? 'left')
+
+	const formItemClass = computed(() => {
+		const basic = [ns.b(""), ns.theme()]
+		if (showBorderBottom.value) {
+			basic.push(ns.m(showErrBottom.value ? 'border--error' : 'border'))
+		}
+		return basic
+	})
+
+	const formItemInnerClass = computed(() => {
+		const basic = [ns.e("inner")]
+		//label文字的位置
+		if (_labelPosition.value == 'top') {
+			basic.push(ns.e('inner--top'))
+		}
+		return basic
+	})
+
+	const labelClass = computed(() => {
+		return [
+			ns.e("label"),
+			ns.is("__label--top", _labelPosition.value == 'top'),
+			ns.is("__label--right", _labelPosition.value == 'right'),
+		]
+	})
+
+	const _labelWidth = computed<string | null>(() => {
+		const width = props.labelWidth ?? form?.labelWidth
+		if (width != null) return addUnit(width!)
+		return width
+	})
+
+	const labelInnerStyle = computed(() => {
+		const css = new Map<string, string>()
+		if (props.label != null && _labelWidth.value != null) {
+			css.set('width', _labelWidth.value)
+		}
+		return css
+	})
+
+	const errorStyle = computed(() => {
+		const css = new Map<string, string>()
+		if (_labelWidth.value != null && _labelWidth.value != 'auto' && _labelPosition.value != 'top') {
+			css.set('margin-left', _labelWidth.value)
+		}
+		return css
+	})
+
+	onMounted(() => {
+		formItemContext?.addField!(context)
+		// #ifdef APP
+		scrollRef.value = getParentEl(formItemRef.value, ['scroll-view', 'list-view'])
+		// #endif
+	})
+
+	onUnmounted(() => {
+		formItemContext?.removeField!(context)
+	})
+</script>
+
+<style scoped lang="scss">
+	/* #ifndef APP */
+	@mixin bottom-border($color) {
+		&::after {
+			content: '';
+			position: absolute;
+			bottom: 0;
+			left: 0;
+			right: 0;
+			border-bottom: 1px solid $color;
+			transform: scale(1, 0.5);
+		}
+	}
+
+	/* #endif */
+
+	.rice-form-item {
+
+		padding: 15px 0;
+
+		&__inner {
+			flex-direction: row;
+
+			&--top {
+				flex-direction: column;
+			}
+		}
+
+
+		&__label {
+			flex-direction: row;
+			align-items: center;
+			padding-right: 12px;
+
+			&__text {
+				/* #ifndef APP */
+				flex: 0 1 auto;
+				/* #endif */
+				font-size: 15px;
+				color: var(--rice-text-color);
+			}
+
+			&--top {
+				margin-bottom: 8px;
+			}
+
+			&--right {
+				justify-content: flex-end;
+			}
+
+		}
+
+
+		&__wrapper {
+			flex: 1;
+			flex-direction: row;
+			align-items: center;
+		}
+
+		&__content {
+			flex: 1;
+		}
+
+		&__error {
+			margin-top: 5px;
+
+			&__text {
+				color: var(--rice-form-error-color);
+				font-size: 12px;
+				/* #ifndef APP */
+				word-break: break-all;
+				/* #endif */
+			}
+		}
+
+		&--required {
+			color: var(--rice-form-error-color);
+			font-size: 15px;
+		}
+
+		&--border {
+			/* #ifdef APP */
+			border-bottom: 0.5px solid var(--rice-form-item-border);
+			/* #endif */
+
+			/* #ifndef APP */
+			position: relative;
+			@include bottom-border(var(--rice-form-item-border));
+
+			/* #endif */
+
+			&--error {
+				/* #ifdef APP */
+				border-bottom: 0.5px solid var(--rice-form-error-color);
+				/* #endif */
+
+				/* #ifndef APP */
+				position: relative;
+				@include bottom-border(var(--rice-form-error-color));
+
+				/* #endif */
+
+			}
+		}
+	}
+</style>

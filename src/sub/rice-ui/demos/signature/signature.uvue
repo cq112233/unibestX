@@ -1,0 +1,54 @@
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-30px">
+    <NavBar title="Signature 签名" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
+    <view class="p-16px">
+      <!-- 基础签名 -->
+      <view class="demo-block">
+        <text class="demo-label" :style="{ borderLeftColor: currentTheme }">手写签名板</text>
+        <view class="rounded-8px overflow-hidden border-width-1px border-solid border-color-[#e2e8f0]">
+          <rice-signature tips="请在上方空白区域书写您的签名" :pen-color="currentTheme" @submit="onSubmit" />
+        </view>
+        <view v-if="signatureImg != ''" class="mt-12px">
+          <text class="text-13px text-[#059669]">签名已生成！</text>
+          <image :src="signatureImg" style="width: 200px; height: 100px;" class="mt-8px bg-[#f1f5f9] rounded-6px" />
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { useAppStore } from '@/src/store'
+import { computed } from 'vue'
+
+const appStore = useAppStore()
+const currentTheme = computed((): string => appStore.state.theme)
+
+const signatureImg = ref('')
+
+function onSubmit(img: string) {
+  signatureImg.value = img
+  uni.showToast({
+    title: '签名保存成功',
+    icon: 'success',
+  })
+}
+</script>
+
+<style scoped>
+.demo-block {
+  margin-bottom: 12px;
+  padding: 14px;
+  background-color: #ffffff;
+  border-radius: 10px;
+}
+.demo-label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #334155;
+  margin-bottom: 12px;
+  padding-left: 6px;
+  border-left-width: 3px;
+  border-left-style: solid;
+}
+</style>

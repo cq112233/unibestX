@@ -1,0 +1,58 @@
+<template>
+	<view class="rice-row" :style="[rowStyle,customStyle]">
+		<slot></slot>
+	</view>
+</template>
+
+<script setup>
+
+	import { addUnit } from '../../libs/utils';
+	import { RowProps, RowProvide, rowInjectKey } from './index.uts';
+	
+	defineOptions({
+		name: 'rice-row',
+		styleIsolation: 'app-and-page'
+	})
+
+	const props = withDefaults(defineProps<RowProps>(), {
+		gutter: 0,
+		justify: 'start',
+		customStyle: () : UTSJSONObject => ({})
+	})
+
+	const alignItems = computed(() => {
+		if (props.align == 'top') return 'flex-start'
+		else if (props.align == 'center') return 'center'
+		else if (props.align == 'bottom') return 'flex-end'
+		return ""
+	})
+
+	const rowStyle = computed(() => {
+		const css = new Map<string, string>()
+		if (props.gutter > 0) {
+			const gutterNum = addUnit(props.gutter / 2)
+			css.set('margin-left', `-${gutterNum}`)
+			css.set('margin-right', `-${gutterNum}`)
+		}
+		let justifyContent = props.justify
+		if (props.justify == 'start' || props.justify == 'end') {
+			justifyContent = 'flex-' + justifyContent
+		}
+		css.set('justify-content', justifyContent)
+		if (alignItems.value != "") {
+			css.set('align-items', alignItems.value)
+		}
+		return css
+	})
+
+	provide(rowInjectKey, {
+		gutter: toRef<number>(() => props.gutter),
+	} as RowProvide)
+</script>
+
+<style scoped lang="scss">
+	.rice-row {
+		flex-direction: row;
+		flex-wrap: wrap;
+	}
+</style>

@@ -1,0 +1,42 @@
+
+export type ActionSheetAction = {
+	name : string,
+	value ?: string | number,
+	subname ?: string,
+	color ?: string,
+	icon ?: string,
+	iconSize ?: string | number,
+	iconFontFamily ?: string,
+	disabled ?: boolean,
+}
+
+export type ActionSheetProps = {
+	actions ?: ActionSheetAction[],
+	title ?: string,
+	showCancel ?: boolean,
+	cancelText ?: string,
+	duration ?: number,
+	zIndex ?: number,
+	opacity ?: boolean,
+	overlay ?: boolean,
+	overlayBgColor ?: string,
+	closeOnClickAction ?: boolean,
+	closeOnClickOverlay ?: boolean,
+	radius ?: number | string,
+	safeAreaInsetBottom ?: boolean,
+	useDialogPage ?: boolean,
+	customStyle ?: UTSJSONObject,
+	// #ifndef APP
+	target ?: UniElement, //非APP端调用api时需要使用
+	// #endif
+	//api调用时的回调
+	select ?: (action : ActionSheetAction, index : number) => void,
+	cancel ?: () => void,
+	clickOverlay ?: () => void,
+	open ?: () => void,
+	close ?: () => void,
+	opened ?: () => void,
+	closed ?: () => void,
+	ready ?: (pageIns : UniPage) => void,
+	fail ?: (errMsg : string) => void,
+}

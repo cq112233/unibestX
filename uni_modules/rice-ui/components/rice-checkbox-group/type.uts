@@ -1,0 +1,36 @@
+import type { Ref } from "vue"
+export type CheckboxDirection = 'row' | 'col'
+export type CheckboxShape = 'round' | 'square'
+export type CheckboxIconPosition = 'left' | 'right'
+export type CheckboxValueType = string | number | boolean
+
+export type CheckboxGroupProps = {
+	max ?: number,
+	disabled ?: boolean,
+	readonly ?: boolean,
+	direction ?: CheckboxDirection,
+	checkedColor ?: string,
+	iconSize ?: string | number,
+	labelSize ?: string | number,
+	labelColor ?: string,
+	shape ?: CheckboxShape,
+	iconPosition ?: CheckboxIconPosition,
+	spaceBetween ?: boolean,
+	customStyle ?: UTSJSONObject,
+}
+
+export type CheckboxGroupProvide = {
+	modelValue : Ref<CheckboxValueType[]>,
+	disabled : Ref<boolean>,
+	readonly : Ref<boolean>,
+	direction : Ref<CheckboxDirection>,
+	iconPosition : Ref<CheckboxIconPosition>,
+	spaceBetween : Ref<boolean>,
+	iconSize : Ref<string | number | null>,
+	labelSize : Ref<string | number | null>,
+	labelColor : Ref<string | null>,
+	checkedColor : Ref<string | null>,
+	shape : Ref<CheckboxShape>,
+	max : Ref<number | null>,
+	updateValue : (value : CheckboxValueType[]) => void,
+}

@@ -1,0 +1,79 @@
+
+import { LunarInfoType } from './lunar.uts'
+
+export type CalendarData = {
+	fullDate : string,
+	year : number,
+	month : number,
+	date : number,
+	day : number,
+	lunarInfo ?: LunarInfoType,
+	isToday : boolean,
+	text ?: string,
+	topInfo ?: string,
+	topInfoColor ?: string,
+	bottomInfo ?: string,
+	bottomInfoColor ?: string,
+	badge ?: boolean,
+	disabled ?: boolean,
+	isCurrentMonth ?: boolean,
+}
+
+export type GridItem = {
+	x : number;
+	y : number;
+	width : number;
+	height : number;
+	data : CalendarData
+}
+
+export type CalendarFormatter = (day : CalendarData) => CalendarData
+
+export type CalendarMode = 'single' | 'multiple' | 'range'
+export type CalendarSwitchMode = 'month' | 'year-month' | 'none'
+
+export type CalendarSwitchPanelType = 'prev-week' | 'next-week' | 'prev-month' | 'next-month' | 'prev-year' | 'next-year'
+export type CalendarPanelChangeResult = {
+	firstDate : string, //月日历返回当前面板所属月份的第一天；周日历返回当前周内属于当前月的第一天
+	lastDate : string, //月日历返回当前面板所属月份的最后一天；周日历返回当前周内属于当前月的最后一天
+	panelDate : string, //面板上面显示的值，即getPanelYearMonthByDate返回的值
+	prevMonthFirstDate:string, //当前面板上个月的第一条数据,_showFullDate为false或没有就返回空字符串
+	nextMonthLastDate:string, //当前面板下个月的最后一条数据,_showFullDate为false或没有就返回空字符串
+	week : number,//当前的周数，weeklyCalendar 为true时有效
+}
+
+export type CalendarProps = {
+	mode ?: CalendarMode,
+	date ?: any | null,//android：不支持string | string[]，传数组类型时会报错
+	switchMode ?: CalendarSwitchMode,
+	minDate ?: string,
+	maxDate ?: string,
+	lunar ?: boolean,
+	title ?: string,
+	showTitle ?: boolean,
+	color ?: string,
+	formatter ?: CalendarFormatter,
+	showSubtitle ?: boolean,
+	showConfirmBtn ?: boolean,
+	confirmText ?: string,
+	confirmDisabledText ?: string,
+	maxRange ?: number,
+	rangePrompt ?: string,
+	showRangePrompt ?: boolean,
+	allowSameDay ?: boolean,
+	rowHeight ?: string | number,
+	readonly ?: boolean,
+	firstDayOfWeek ?: number,
+	closeable ?: boolean,
+	closeIcon ?: string,
+	usePopup ?: boolean,
+	closeOnClickClose ?: boolean,
+	closeOnClickOverlay ?: boolean,
+	safeAreaInsetBottom ?: boolean,
+	zIndex ?: number,
+	weeklyCalendar ?: boolean,
+	showWeeklyText ?: boolean,
+	showFullDate ?: boolean,
+	showMonthMark ?: boolean,
+	customStyle ?: UTSJSONObject,
+}

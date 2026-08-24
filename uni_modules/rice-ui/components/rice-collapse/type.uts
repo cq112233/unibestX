@@ -1,0 +1,14 @@
+
+export type CollapseActiveName = string | number
+
+export type CollapseInjectKey = {
+	activeNames : Ref<CollapseActiveName[]>,
+	duration : Ref<number>,
+	handleItemClick : (name : CollapseActiveName) => void,
+}
+
+export type CollapseProps = {
+	accordion ?: boolean,
+	border ?: boolean,
+	duration ?: number,
+}

@@ -1,0 +1,342 @@
+<template>
+	<view :class="inputClass" :style="[rootStyle,customStyle]">
+		<view v-if="$slots['prefix']!=null || prefixIcon!=null" class="rice-input__prefix">
+			<slot name="prefix">
+				<rice-icon :name="prefixIcon" :size="iconSize" :color="iconColor" @click="clickLeftIcon" />
+			</slot>
+		</view>
+		<input v-model="modelValue" :type="inputType" :inputmode="inputmode" :placeholder="placeholder"
+			:password="isPassword" :disabled="isDisabled||isReadonly" :maxlength="maxlength"
+			:placeholder-style="_placeholderStyle" :cursor-spacing="cursorSpacing" :cursor-color="cursorColor"
+			:auto-focus="autoFocus" :focus="focus" :confirm-type="confirmType" :confirm-hold="confirmHold" :cursor="cursor"
+			:selection-start="selectionStart" :selection-end="selectionEnd" :adjust-position="adjustPosition"
+			:hold-keyboard="holdKeyboard" :class="inputInnerClass" :style="[customInputStyle,iputStyle]" @input="onInput"
+			@focus="onFocus" @blur="onBlur" @keyboardheightchange="onKeyboardheightchange" @change="onChange"
+			@confirm="onConfirm" @nicknamereview="onNicknamereview" />
+		<rice-icon v-if="isShowPassword" :name="showPasswordValue?'eyes':'eyes-close'" size="17px" :custom-style="iconStyle"
+			@click="changeShowPassword" />
+		<rice-icon v-if="isShowClearable" :name="clearIcon" size="17px" :custom-style="iconStyle" @click="onClear" />
+		<view v-if="$slots['suffix']!=null||suffixIcon!=null" class="rice-input__suffix">
+			<slot name="suffix">
+				<rice-icon :name="suffixIcon" :size="iconSize" :color="iconColor" @click="clickRightIcon" />
+			</slot>
+		</view>
+		<!-- #ifndef APP -->
+		<view v-if="isDisabled||isReadonly" class="rice-input__mask"></view>
+		<!-- #endif -->
+	</view>
+</template>
+
+<script setup>
+	import { useNamespace } from "../../libs/use"
+	import { isDark } from "../../libs/store"
+	import { hasStrValue, addUnit } from "../../libs/utils"
+	import { formDisabledInjectKey, formReadonlyInjectKey } from "../rice-form"
+	import { formItemBlurInjectKey } from "../rice-form-item"
+	import { InputProps } from "./type.uts"
+	defineOptions({
+		name: 'rice-input',
+		styleIsolation: 'app-and-page'
+	})
+	const ns = useNamespace("input")
+	const slots = useSlots();
+	const emit = defineEmits<{
+		input : [value: string],
+		focus : [event: UniInputFocusEvent],
+		blur : [event: UniInputBlurEvent],
+		keyboardheightchange : [event: UniInputKeyboardHeightChangeEvent],
+		change : [value: string],
+		confirm : [value: string],
+		nicknamereview : [event: any],
+		clickLeftIcon : [],
+		clickRightIcon : [],
+	}>()
+
+	const props = withDefaults(defineProps<InputProps>(), {
+		type: "text",
+		maxlength: -1,
+		cursorSpacing: 0,
+		autoFocus: false,
+		focus: false,
+		confirmType: 'done',
+		confirmHold: false,
+		cursor: 0,
+		selectionStart: -1,
+		selectionEnd: -1,
+		adjustPosition: true,
+		holdKeyboard: false,
+		border: 'surround',
+		focusBorder: false,
+		shape: 'square',
+		clearable: false,
+		showPassword: true,
+		iconSize: '16px',
+		clearTrigger: 'focus',
+		clearIcon: 'clear',
+		showPasswordTrigger: 'focus',
+		iputStyle: () : UTSJSONObject => ({}),
+		customStyle: () : UTSJSONObject => ({}),
+	})
+
+	const modelValue = defineModel({
+		type: String,
+		default: ""
+	})
+
+	const inputType = computed(() => {
+		const type = props.type
+		if (type == 'password') return 'text'
+		return type
+	})
+
+	const formDisabled = inject<Ref<boolean | null> | null>(formDisabledInjectKey, null)
+	const formReadonly = inject<Ref<boolean | null> | null>(formReadonlyInjectKey, null)
+	const formItemBlur = inject<(() => void) | null>(formItemBlurInjectKey, null)
+
+	const isFocus = ref(false)
+	const showPasswordValue = ref(false)
+
+	// #ifdef APP-HARMONY
+	const isPassword = computed<boolean | null>(() => (props.type == 'password' && !showPasswordValue.value) ? true : null)
+	// #endif
+
+	// #ifndef APP-HARMONY
+	const isPassword = computed<boolean>(() => props.type == 'password' && !showPasswordValue.value)
+	// #endif
+
+	const isDisabled = computed<boolean>(() => (formDisabled?.value ?? false) || (props.disabled ?? false))
+	const isReadonly = computed<boolean>(() => (formReadonly?.value ?? false) || (props.readonly ?? false))
+
+	const isShowClearable = computed<boolean>(() => {
+		if (isDisabled.value) return false
+		const shouldTrigger = props.clearTrigger == 'focus' ? isFocus.value : true
+		return props.clearable && modelValue.value != "" && shouldTrigger
+	})
+
+	const isShowPassword = computed<boolean>(() => {
+		if (props.showPassword == false) return false
+		const isPasswordType = props.type == 'password'
+		const shouldTrigger = props.showPasswordTrigger == 'focus' ? isFocus.value : true
+		return isPasswordType && modelValue.value != "" && shouldTrigger
+	})
+
+	const changeShowPassword = () => {
+		if (isDisabled.value || isReadonly.value) return
+		showPasswordValue.value = !showPasswordValue.value
+	}
+
+	const onClear = () => {
+		if (isDisabled.value || isReadonly.value) return
+		modelValue.value = ""
+	}
+
+	const onInput = (e : UniInputEvent) => {
+		emit('input', e.detail.value)
+	}
+
+	const onFocus = (e : UniInputFocusEvent) => {
+		isFocus.value = true
+		emit('focus', e)
+	}
+
+	let timer : null | number = null
+	const onBlur = (e : UniInputBlurEvent) => {
+		//加个延迟，防止web等端清除按钮点击不到
+		timer = setTimeout(() => {
+			isFocus.value = false
+			emit('blur', e)
+		}, 100)
+
+		formItemBlur?.()
+	}
+
+	const onKeyboardheightchange = (e : UniInputKeyboardHeightChangeEvent) => {
+		emit('keyboardheightchange', e)
+	}
+
+	const onChange = (e : UniInputChangeEvent) => {
+		emit('change', e.detail.value)
+	}
+
+	const onConfirm = (e : UniInputConfirmEvent) => {
+		emit('confirm', e.detail.value)
+	}
+
+	const onNicknamereview = (e : any) => {
+		emit('nicknamereview', e)
+	}
+
+	const clickLeftIcon = () => {
+		emit('clickLeftIcon')
+	}
+
+	const clickRightIcon = () => {
+		emit('clickRightIcon')
+	}
+
+	const iconStyle = computed(() => {
+		return {
+			paddingLeft: '6px',
+			opacity: isDisabled.value ? 0.4 : 1
+		}
+	})
+
+	const rootStyle = computed(() => {
+		const css = new Map<string, string>()
+		if (hasStrValue(props.bgColor)) {
+			css.set('background-color', props.bgColor!)
+		}
+
+		if (props.height != null) css.set('height', addUnit(props.height!))
+		return css
+	})
+
+	const customInputStyle = computed(() => {
+		const css = new Map<string, string>()
+		if (hasStrValue(props.color)) css.set('color', props.color!)
+		if (props.fontSize != null) css.set('font-size', addUnit(props.fontSize!))
+		return css
+	})
+
+	const inputClass = computed(() => {
+		return [
+			ns.b(""),
+			ns.theme(),
+			ns.is("disabled", isDisabled.value),
+			ns.m(props.border),
+			ns.m(props.shape),
+			ns.is("border--focus", isFocus.value && props.border != 'none' && props.focusBorder)
+		]
+	})
+
+	const inputInnerClass = computed(() => {
+		return [
+			ns.e("input"),
+			ns.is("__input--disabled", isDisabled.value),
+			ns.e(`input--${props.inputAlign ?? 'left'}`),
+			// #ifdef VUE3-VAPOR
+			ns.is("__input--dark", isDark.value),
+			ns.is("__input--disabled--dark", isDisabled.value && isDark.value),
+			// #endif
+		]
+	})
+
+	const _placeholderStyle = computed(() => {
+		let baseColor = isDark.value ? '#4d4d4d' : '#c8c9cc'
+		let css = `color:${baseColor};font-size:${addUnit(props.fontSize ?? '15px')};`
+		return css + (props.placeholderStyle ?? "")
+	})
+
+	onUnmounted(() => {
+		if (timer != null) clearTimeout(timer!)
+	})
+</script>
+
+<style scoped lang="scss">
+	.rice-input {
+		/* #ifndef APP */
+		position: relative;
+		/* #endif */
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		justify-content: space-between;
+		height: 42px;
+		padding: 0 10px;
+
+		&__prefix {
+			padding-right: 10px;
+		}
+
+		&__suffix {
+			padding-left: 10px;
+		}
+
+		&__input {
+			flex: 1;
+			text-align: left;
+			font-size: 15px;
+			height: 100%;
+
+			/* #ifndef VUE3-VAPOR */
+			color: var(--rice-text-color);
+			/* #endif */
+
+			/* #ifdef VUE3-VAPOR  */
+			color: #323233;
+
+			&--dark {
+				color: #f5f5f5;
+			}
+
+			/* #endif */
+
+			&--disabled {
+				/* #ifndef VUE3-VAPOR */
+				color: var(--rice-input-disabled-text-color);
+				/* #endif */
+
+				/* #ifdef VUE3-VAPOR  */
+				color: #c0c4cc;
+
+				&--dark {
+					color: #8d9095;
+				}
+
+				/* #endif */
+			}
+
+			&--center {
+				text-align: center;
+			}
+
+			&--right {
+				text-align: right;
+			}
+
+		}
+
+		/* #ifndef APP */
+		&__mask {
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+		}
+
+		/* #endif */
+
+		&--surround {
+			border-radius: 4px;
+			border: 1px solid var(--rice-input-border-color);
+		}
+
+		&--bottom {
+			border-bottom: 1px solid var(--rice-input-border-color);
+			padding-left: 0;
+			padding-right: 0;
+		}
+
+		&--none {
+			padding-left: 0;
+			padding-right: 0;
+		}
+
+		&--border--focus {
+			border-color: var(--rice-primary-color);
+		}
+
+		&--round {
+			border-radius: 100px;
+		}
+
+		&--disabled {
+			background-color: var(--rice-input-disabled-background);
+			/* #ifdef WEB */
+			cursor: not-allowed;
+			/* #endif */
+		}
+
+	}
+</style>

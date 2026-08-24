@@ -1,0 +1,477 @@
+<template>
+	<view class="rice-swipe-actions-item" :class="ns.theme()" :style="customStyle">
+		<!-- 微信小程序使用wxs实现，减少通讯延迟 -->
+
+		<!-- #ifdef MP-WEIXIN -->
+		<view class="rice-swipe__cell" :mpProps="mpProps" :change:mpProps="wxs.updateMpProps" :opened="state.opened"
+			:change:opened="wxs.updateOpened" :currentPosition="currentPosition"
+			:change:currentPosition="wxs.updateCurrentPosition" @touchstart="wxs.onTouchstart" @touchmove="wxs.onTouchmove"
+			@touchend="wxs.onTouchend" @touchcancel="wxs.onTouchend">
+		<!-- #endif -->
+			<!-- #ifndef MP-WEIXIN -->
+			<view class="rice-swipe__cell" ref="swipeRef" @touchstart="onTouchstart" @touchmove="onTouchmove"
+				@touchend="onTouchend" @touchcancel="onTouchend">
+			<!-- #endif -->
+				<!-- 左侧菜单 -->
+				<view v-if="hasLeftAction" class="rice-swipe__cell__left" ref="leftActionRef">
+					<slot name="left">
+						<!-- #ifdef VUE3-VAPOR -->
+						<view v-for="(item,index) in leftMenu" :key="index" :style="getMenuStyle(item.style)"
+							class="rice-swipe__cell__menu rice-swipe_cell__left__menu" @click="clickMenu('left',index)">
+						<!-- #endif -->
+							<!-- #ifndef VUE3-VAPOR -->
+							<view v-for="(item,index) in leftMenu" :key="index" :style="getMenuStyle(item.style)"
+								class="rice-swipe__cell__menu rice-swipe_cell__left__menu" data-riceswipe="swipe-actions"
+								@click="clickMenu('left',index)">
+							<!-- #endif -->
+								<rice-icon v-if="hasStrValue(item.icon)" :name="item.icon" :size="item.iconSize"
+									:color="item.style?.['color']" :custom-style="{marginRight:hasStrValue(item.text)?'4px':'0'}" />
+								<text :style="getMenuTextStyle(item.style)" class="rice-swipe__cell__text">{{item.text}}</text>
+							</view>
+					</slot>
+				</view>
+				<!-- 内容区域 -->
+				<view class="rice-swipe__cell__content" @click="clickContent">
+					<slot></slot>
+				</view>
+				<!-- 右侧菜单 -->
+				<view v-if="hasRightAction" class="rice-swipe__cell__right" ref="rightActionRef">
+					<slot name="right">
+						<!-- #ifdef VUE3-VAPOR -->
+						<view v-for="(item,index) in rightMenu" :key="index" :style="getMenuStyle(item.style)"
+							class="rice-swipe__cell__menu rice-swipe_cell__right__menu" @click="clickMenu('right',index)">
+						<!-- #endif -->
+							<!-- #ifndef VUE3-VAPOR -->
+							<view v-for="(item,index) in rightMenu" :key="index" :style="getMenuStyle(item.style)"
+								class="rice-swipe__cell__menu rice-swipe_cell__right__menu" data-riceswipe="swipe-actions"
+								@click="clickMenu('right',index)">
+							<!-- #endif -->
+								<rice-icon v-if="hasStrValue(item.icon)" :name="item.icon" :size="item.iconSize"
+									:color="item.style?.['color']" :custom-style="{marginRight:hasStrValue(item.text)?'4px':'0'}" />
+								<text class="rice-swipe__cell__text" :style="getMenuTextStyle(item.style)">{{item.text}}</text>
+							</view>
+					</slot>
+				</view>
+			</view>
+		</view>
+</template>
+
+<script setup>
+	import { swipeActionsName, swipeActionsInjectKey, SwipeActionsProvide } from '../rice-swipe-actions';
+	import { useNamespace, useTouch, useParent } from "../../libs/use"
+	import { clamp, hasStrValue, splitCssProperty } from "../../libs/utils"
+	import { SwipeActionsItemProps, SwipeActionsMenu, SwipeActionsPosition, SwipeActionsState, SwipeActionsMenuRect, SwipeActionsItemOpen, SwipeActionsItemClose, SwipeActionsItemClick } from './type.uts';
+
+	defineOptions({
+		name: 'rice-swipe-actions-item',
+		styleIsolation: "app-and-page"
+	})
+	const ns= useNamespace('swipe-actions-item')
+	const slot = useSlots()
+	const emit = defineEmits<{
+		open : [e: SwipeActionsItemOpen],
+		close : [e: SwipeActionsItemClose],
+		click : [e: SwipeActionsItemClick]
+	}>()
+
+	const swipeActions = inject<SwipeActionsProvide | null>(swipeActionsInjectKey, null)
+
+	useParent(swipeActionsName)
+
+	const props = withDefaults(defineProps<SwipeActionsItemProps>(), {
+		duration: 300,
+		iosStyle: null,
+		disabled: false,
+		autoClose: null,
+		leftMenu: () : SwipeActionsMenu[] => ([]),
+		rightMenu: () : SwipeActionsMenu[] => ([]),
+		customStyle: () : UTSJSONObject => ({}),
+	})
+
+	const hasLeftAction = computed(() => props.leftMenu.length > 0 || slot['left'] != null)
+	const hasRightAction = computed(() => props.rightMenu.length > 0 || slot['right'] != null)
+	const isDisabled = computed<boolean>(() => props.disabled || (swipeActions?.disabled.value ?? false))
+	const isAutoClose = computed<boolean>(() => props.autoClose ?? swipeActions?.autoClose.value ?? true)
+	const isIosStyle = computed<boolean>(() => props.iosStyle ?? swipeActions?.iosStyle.value ?? true)
+
+	const state = reactive<SwipeActionsState>({
+		x: 0,
+		leftWidth: 0,
+		rightWidth: 0,
+		opened: false,
+		position: 'cell'
+	})
+
+	const instance = getCurrentInstance()
+	const closeOtherSwipe = () => {
+		swipeActions?.closeOtherSwipe?.(instance)
+	}
+
+	// #ifndef MP-WEIXIN
+	const swipeRef = ref<UniElement | null>(null)
+	const leftActionRef = ref<UniElement | null>(null)
+	const rightActionRef = ref<UniElement | null>(null)
+	const skipMove = ref(false)
+	const lastX = ref(0)
+
+	const touch = useTouch()
+	const durationTime = computed(() => touch.dragging.value ? '0ms' : props.duration + 'ms')
+
+	const menuRect = reactive<SwipeActionsMenuRect>({
+		rightMenuDom: [],
+		rightMenuOffset: [],
+		leftMenuOffset: [],
+		leftMenuDom: [],
+	})
+
+	const getDomChildren = (dom : UniElement | null) : UniElement[] => {
+		if (dom == null) return [] as UniElement[]
+		let children = dom.children
+		//app平台使用slot时children会多一层 COMMENT 标签，不知道是不是uniappx的bug,要排除这个标签
+		// #ifdef APP
+		children = children.filter(v => v.tagName != 'COMMENT' && v.nodeName != '#comment')
+		// #endif
+		//插槽传递过来的层级可能只有一层并且不是按钮组，需要判断一下
+		// #ifdef VUE3-VAPOR
+		// 蒸汽模式不支持data-*，所以蒸汽模式只正常按钮组
+		const isSwipeActions = true
+		// #endif
+		// #ifndef VUE3-VAPOR
+		const isSwipeActions = children[0].dataset['riceswipe'] == 'swipe-actions'
+		// #endif
+		if (children.length == 1 && isSwipeActions) {
+			children = children[0].children
+			// #ifdef APP
+			children = children.filter(v => v.tagName != 'COMMENT' && v.nodeName != '#comment')
+			// #endif
+		}
+		return children
+	}
+
+
+	const resize = () => {
+		//右侧按钮区域的宽度
+		menuRect.rightMenuOffset = [] as number[]
+		menuRect.rightMenuDom = [] as UniElement[]
+		state.rightWidth = rightActionRef.value?.getBoundingClientRect().width ?? 0
+		if (rightActionRef.value != null && isIosStyle.value) {
+			menuRect.rightMenuDom = getDomChildren(rightActionRef.value)
+			let rightOffset = 0
+			for (let i = 0; i < menuRect.rightMenuDom.length; i++) {
+				rightOffset += menuRect.rightMenuDom[i].getBoundingClientRect().width
+				menuRect.rightMenuOffset.push(-rightOffset)
+			}
+		}
+		//左侧按钮区域的宽度
+		menuRect.leftMenuOffset == [] as number[]
+		menuRect.leftMenuDom = [] as UniElement[]
+
+		state.leftWidth = leftActionRef.value?.getBoundingClientRect().width ?? 0
+		if (leftActionRef.value != null && isIosStyle.value) {
+			menuRect.leftMenuDom = getDomChildren(leftActionRef.value)
+			let leftOffset = state.leftWidth
+			for (let i = 0; i < menuRect.leftMenuDom.length; i++) {
+				menuRect.leftMenuOffset.push(leftOffset)
+				leftOffset -= menuRect.leftMenuDom[i].getBoundingClientRect().width
+			}
+		}
+
+	}
+
+	const getCurrentPosition = (x : number) : SwipeActionsPosition => {
+		if (x == 0) return 'cell'
+		return x > 0 ? 'left' : 'right'
+	}
+
+
+	function handleLeftActions(x : number, isOpen = false) {
+		if (leftActionRef.value == null) return
+		if (x < 0) x = 0
+		const children = menuRect.leftMenuDom
+		for (let i = 0; i < children.length; i++) {
+			let moveX = 0
+			if (i != children.length - 1) {
+				const offset = menuRect.leftMenuOffset[i + 1]
+				moveX = offset - x * (offset / state.leftWidth)
+			}
+
+			if (moveX < 0) moveX = 0
+			if (isOpen) moveX = 0
+			children[i].style.setProperty('transition-property', 'transform')
+			children[i].style.setProperty('transition-duration', durationTime.value)
+			children[i].style.setProperty('transform', `translateX(${moveX}px)`)
+			children[i].style.setProperty('z-index', children.length - i)
+		}
+	}
+
+
+	function handleRightActions(x : number, isOpen = false) {
+		if (rightActionRef.value == null) return
+		if (x > 0) x = 0
+		const children = menuRect.rightMenuDom
+		for (let i = 0; i < children.length; i++) {
+			let moveX = 0
+			if (i > 0) {
+				const offset = menuRect.rightMenuOffset[i - 1]
+				moveX = offset + x * (offset / state.rightWidth)
+			}
+			if (moveX > 0) moveX = 0
+			if (isOpen) moveX = 0
+			children[i].style.setProperty('transition-property', 'transform')
+			children[i].style.setProperty('transition-duration', durationTime.value)
+			children[i].style.setProperty('transform', `translateX(${moveX}px)`)
+
+		}
+	}
+
+	function animateActions(x : number, isOpen = false) {
+		state.x = clamp(x, -state.rightWidth, state.leftWidth)
+		swipeRef.value?.style.setProperty('transition-property', 'transform')
+		swipeRef.value?.style.setProperty('transition-duration', durationTime.value)
+		swipeRef.value?.style.setProperty('transform', `translateX(${state.x}px)`)
+		if (isIosStyle.value) {
+			handleLeftActions(state.x, isOpen)
+			handleRightActions(state.x, isOpen)
+		}
+	}
+
+
+	const onTouchstart = async (e : UniTouchEvent) => {
+		if (isDisabled.value) return
+		skipMove.value = false;
+		touch.start(e)
+		resize()
+		lastX.value = state.x
+		closeOtherSwipe()
+	}
+
+	const onTouchmove = async (e : UniTouchEvent) => {
+		if (isDisabled.value || skipMove.value) return
+		touch.move(e)
+		if (touch.direction.value == 'vertical') {
+			skipMove.value = true
+		}
+		if (touch.direction.value != 'horizontal') return
+		const offsetX = touch.deltaX.value + lastX.value
+		state.position = getCurrentPosition(offsetX)
+		animateActions(offsetX)
+		if (e.cancelable) {
+			e.preventDefault()
+		}
+		e.stopPropagation()
+	}
+
+	const getThreshold = () => {
+		const THRESHOLD = 0.15
+		const num = state.opened ? 1 - THRESHOLD : THRESHOLD
+		return state.position == 'left' ? state.leftWidth * num : state.rightWidth * num
+	}
+
+	// #endif
+
+	const emitOpen = () => {
+		emit('open', {
+			name: props.name,
+			position: state.position,
+		} as SwipeActionsItemOpen)
+	}
+
+	function handleOpen() {
+		closeOtherSwipe()
+		const offsetX = state.position == 'left' ? state.leftWidth : -state.rightWidth
+		touch.changeDragging(false)
+		animateActions(offsetX, true)
+		if (!state.opened) {
+			state.opened = true
+			emitOpen()
+		}
+	}
+
+	function open(position : SwipeActionsPosition) {
+		if (position != 'left' && position != 'right') return
+		if (state.opened && position == state.position) return
+		state.position = position
+		// #ifndef MP-WEIXIN
+		resize()
+		handleOpen()
+		// #endif
+
+		// #ifdef MP-WEIXIN
+		state.opened = true
+		// #endif
+	}
+
+	const emitClose = () => {
+		emit('close', {
+			name: props.name,
+		} as SwipeActionsItemClose)
+	}
+
+	const handleClose = () => {
+		state.position = 'cell'
+		// #ifndef MP-WEIXIN
+		touch.changeDragging(false)
+		animateActions(0)
+		if (state.opened) {
+			state.opened = false
+			emitClose()
+		}
+		// #endif
+		// #ifdef MP-WEIXIN
+		if (state.opened) state.opened = false
+		// #endif
+	}
+
+	// #ifndef MP-WEIXIN
+	const onTouchend = async (e : UniTouchEvent) => {
+		if (isDisabled.value) return
+		touch.end()
+		const threshold = getThreshold()
+		if (Math.abs(state.x) > threshold) {
+			handleOpen()
+		} else {
+			handleClose()
+		}
+	}
+	// #endif
+
+	const emitClick = (position : SwipeActionsPosition, index : number) => {
+		emit('click', {
+			name: props.name,
+			position,
+			index,
+			opened: state.opened
+		} as SwipeActionsItemClick)
+	}
+
+	const clickContent = () => {
+		// #ifdef APP-HARMONY
+		if (!touch.isTap.value) return
+		// #endif
+		emitClick('cell', -1)
+		if (isAutoClose.value && state.opened) {
+			handleClose()
+		}
+	}
+
+	//@ts-ignore
+	const clickMenu = (position : SwipeActionsPosition, index : number) => {
+		emitClick(position, index)
+		if (isAutoClose.value) {
+			handleClose()
+		}
+	}
+
+	/**
+	 * 获取菜单项的style样式-uvue 字体的样式不能设置在view上
+	 */
+	const getMenuStyle = (style ?: UTSJSONObject) => splitCssProperty(style).rectCssProperty
+
+	/**
+	 * 获取菜单项文字的style样式
+	 */
+	const getMenuTextStyle = (style ?: UTSJSONObject) => splitCssProperty(style).textCssProperty
+
+
+	// #ifdef MP-WEIXIN
+	const currentPosition = computed(() => state.position)
+	const mpProps = computed(() => {
+		return {
+			duration: props.duration,
+			iosStyle: isIosStyle.value,
+			disabled: isDisabled.value,
+		}
+	})
+
+	const _emitOpen = (params) => {
+		state.opened = true
+		state.position = params.position
+		emitOpen()
+	}
+
+	const _emitClose = () => {
+		state.opened = false
+		emitClose()
+	}
+
+	// #endif
+
+
+	defineExpose({
+		open,
+		close: handleClose,
+		// #ifdef MP-WEIXIN
+		_closeOtherSwipe: closeOtherSwipe,
+		_emitOpen,
+		_emitClose,
+
+		// #endif
+	})
+</script>
+
+<!-- #ifdef MP-WEIXIN -->
+<script module="touch" lang="wxs" src="../../libs/use/useTouch/touch.wxs"></script>
+<script module="wxs" lang="wxs" src="./wx.wxs"></script>
+<!-- #endif -->
+
+
+<style scoped lang="scss">
+	@mixin transition {
+		transition-property: transform;
+		transition-duration: 0ms;
+		transition-timing-function: ease;
+	}
+
+	.rice-swipe-actions-item {}
+
+	.rice-swipe__cell {
+		@include transition();
+		overflow: visible;
+		position: relative;
+		width: 100%;
+		flex-direction: row;
+		flex-shrink: 0;
+
+		&__left,
+		&__right {
+			position: absolute;
+			top: 0;
+			z-index: 1;
+			height: 100%;
+			flex-direction: row;
+			align-items: center;
+			box-sizing: border-box;
+		}
+
+		&__left {
+			left: 0;
+			transform: translateX(-100%);
+		}
+
+		&__right {
+			right: 0;
+			transform: translateX(100%);
+		}
+
+		&__content {
+			width: 100%;
+		}
+
+		&__text {
+			font-size: 14px;
+
+		}
+
+		&__menu {
+			@include transition();
+			flex-direction: row;
+			align-items: center;
+			justify-content: center;
+			height: 100%;
+			padding: 0 20rpx;
+			box-sizing: border-box;
+		}
+
+
+	}
+</style>

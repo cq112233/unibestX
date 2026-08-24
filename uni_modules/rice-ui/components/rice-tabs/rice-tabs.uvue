@@ -1,0 +1,370 @@
+<template>
+	<view class="rice-tabs" :class="ns.theme()" :style="[tabsStyle,customStyle]">
+		<slot name="left"></slot>
+
+		<!-- #ifdef MP -->
+		<scroll-view class="rice-tabs__scroll" ref="tabScrollRef" direction="horizontal" :show-scrollbar="false"
+			:scrollLeft="scrollLeft" :scroll-with-animation="true">
+			<view class="rice-tabs__scrollmp">
+			<!-- #endif -->
+
+				<!-- #ifndef MP -->
+				<scroll-view class="rice-tabs__scroll" ref="tabScrollRef" direction="horizontal" :show-scrollbar="false"
+					:scroll-with-animation="true">
+				<!-- #endif -->
+
+					<view v-for="(item,index) in list" :key="index" ref="tabsItemRef" class="rice-tabs__item"
+						:class="{'rice-tabs--shrink':props.shrink}" :style="getItemStyle(item,index)" @click="tabClick(item,index)">
+						<rice-badge v-if="item.badge!=null" :is-dot="item.badge!.isDot" :value="item.badge!.value"
+							:show-zero="item.badge!.showZero??true" :offset="[10,0]">
+							<text class="rice-tabs__item__text" :class="getTextClass(item,index)"
+								:style="getTextStyle(item,index)">{{item.name}}</text>
+						</rice-badge>
+						<text v-else class="rice-tabs__item__text" :class="getTextClass(item,index)"
+							:style="getTextStyle(item,index)">{{item.name}}</text>
+						<view v-if="lineMode=='zoom'" class="rice-tabs__item__line"
+							:style="[getActiveZoomStyle(index),indicatorStyle]"></view>
+					</view>
+
+					<view v-if="lineMode=='slide'" ref="indicatorRef" :style="indicatorStyle" class="rice-tabs__indicator"
+						:class="{'rice-tabs__indicator--animate':!initAnimate}"></view>
+
+			<!-- #ifdef MP -->
+			</view>
+			<!-- #endif -->
+		</scroll-view>
+		<slot name="right"></slot>
+	</view>
+</template>
+
+<script setup>
+	import { addUnit, getPxNum } from "../../libs/utils"
+	import { useNamespace } from "../../libs/use"
+	import { TabsProps, TabsOptions, TabsItemRect, TabsClickTab, TabsChange } from './type.uts';
+
+	defineOptions({
+		name: 'rice-tabs',
+		styleIsolation: 'app-and-page',
+		externalClasses: ['active-text-class', 'inactive-textClass', 'disabled-text-class', 'text-class']
+	})
+
+	const emit = defineEmits<{
+		clickTab : [TabsClickTab],
+		change : [TabsChange]
+	}>()
+
+	const ns = useNamespace('tabs')
+
+	const props = withDefaults(defineProps<TabsProps>(), {
+		list: () : TabsOptions[] => ([] as TabsOptions[]),
+		lineMode: 'slide',
+		shrink: false,
+		lineWidth: '20px',
+		initAnimate: true,
+		itemStyle: () : UTSJSONObject => ({}),
+		customStyle: () : UTSJSONObject => ({}),
+	})
+
+	const modelValue = defineModel({
+		type: Number,
+		default: 0
+	})
+
+	const scrollLeft = ref(0)
+	let isFirstMove = ref(true)
+	const indicatorRef = shallowRef<UniElement | null>(null)
+	const tabScrollRef = shallowRef<UniElement | null>(null)
+	const tabsItemRef = ref<UniElement[]>([])
+	const tabsItemRect = ref<TabsItemRect[]>([])
+
+	const cacheTabItemsSize = async () => {
+		tabsItemRect.value = []
+		// #ifdef MP
+		let totalWidth = 0
+		// #endif
+		for (let i = 0; i < tabsItemRef.value.length; i++) {
+			const element = tabsItemRef.value[i]
+
+			// #ifdef MP
+			const rect = await element.getBoundingClientRectAsync()!
+			const x = i == 0 ? 0 : totalWidth
+			const w = rect.width
+			totalWidth += w
+			// #endif
+
+			// #ifndef MP
+			const x = element.offsetLeft
+			const w = element.offsetWidth
+			// #endif
+
+			tabsItemRect.value.push({
+				x,
+				w
+			} as TabsItemRect)
+		}
+	}
+
+	const updateTabIndicator = async (currentIndex : number, moveToIndex : number, percentage : number) => {
+		if (tabsItemRect.value.length == 0 || moveToIndex >= tabsItemRect.value.length) return
+		const currentSize = tabsItemRect.value[currentIndex]
+		const moveToSize = tabsItemRect.value[moveToIndex]
+		const indicatorLineX = moveToSize.x
+		const indicatorLineW = getPxNum(props.lineWidth!, moveToSize.w)
+		const x = indicatorLineX + (moveToSize.w - indicatorLineW) / 2
+
+
+		if (!props.initAnimate) {
+			indicatorRef.value?.style.setProperty('opacity', isFirstMove.value ? 0 : 1)
+			indicatorRef.value?.style.setProperty('transition-duration', isFirstMove.value ? '0ms' : '300ms')
+		}
+
+		indicatorRef.value?.style.setProperty('width', indicatorLineW + 'px')
+		indicatorRef.value?.style?.setProperty('transform', `translateX(${x}px)`)
+
+		const rect = await tabScrollRef.value!.getBoundingClientRectAsync()!
+		// #ifndef MP
+		tabScrollRef.value!.scrollLeft = x - rect.width / 2
+		// #endif
+		// #ifdef MP
+		scrollLeft.value = x - rect.width / 2
+		// #endif
+		await nextTick()
+		indicatorRef.value?.style.setProperty('opacity', 1)
+		isFirstMove.value = false
+
+	}
+
+	/**
+	 * 点击tab
+	 */
+	//@ts-ignore
+	const tabClick = (tab : TabsOptions, index : number) => {
+		emit('clickTab', {
+			index,
+			name: tab.name,
+			value: tab.value,
+			disabled: tab.disabled ?? false
+		} as TabsClickTab)
+
+		if (modelValue.value == index || tab.disabled == true) return
+		updateTabIndicator(modelValue.value, index, 1)
+
+		modelValue.value = index
+		emit('change', {
+			index,
+			name: tab.name,
+			value: tab.value,
+			disabled: tab.disabled ?? false
+		} as TabsChange)
+
+
+	}
+
+	const getActiveZoomStyle = (index : number) => {
+		const css = new Map<string, string>()
+		let width = '0px'
+		if (index == modelValue.value) {
+			width = addUnit(props.lineWidth ?? '20px')
+		}
+		css.set('width', width)
+		return css
+	}
+
+
+	const resize = async () => {
+		await nextTick()
+		await cacheTabItemsSize()
+		updateTabIndicator(modelValue.value, modelValue.value, 1)
+	}
+
+
+	const tabsStyle = computed(() => {
+		const css = new Map<string, string>()
+		if (props.height != null) {
+			css.set('height', addUnit(props.height!))
+		}
+		if (props.bgColor != null) {
+			css.set('background-color', props.bgColor!)
+		}
+		return css
+	})
+
+
+	const indicatorStyle = computed(() => {
+		const css = new Map<string, string>()
+		if (props.lineHeight != null) css.set('height', addUnit(props.lineHeight!))
+		if (props.lineColor != null) css.set('background-color', props.lineColor!)
+		return css
+	})
+
+	const getItemStyle = (tab : TabsOptions, index : number) => {
+		const basic : UTSJSONObject[] = [props.itemStyle]
+		if (tab.disabled == true) return basic
+		const isSelected = index == modelValue.value
+		if (isSelected && props.activeStyle != null) {
+			basic.push(props.activeStyle!)
+		}
+		if (!isSelected && props.inactiveStyle != null) {
+			basic.push(props.inactiveStyle!)
+		}
+		return basic
+	}
+
+	const getTextClass = (tab : TabsOptions, index : number) => {
+		const basic = [] as any[]
+		const isSelected = index == modelValue.value
+		if (props.textClass != null) {
+			basic.push(props.textClass!)
+		}
+
+		if (isSelected) {
+			basic.push('rice-tabs__item__active')
+			basic.push((props.activeTextClass ?? "") as string)
+		} else {
+			basic.push((props.inactiveTextClass ?? "") as string)
+		}
+		if (tab.disabled == true) {
+			basic.push('rice-tabs__item__disabled')
+			basic.push((props.disabledTextClass ?? "") as string)
+		}
+		return basic
+	}
+
+	const getTextStyle = (tab : TabsOptions, index : number) => {
+		const css = new Map<string, string>()
+		const isSelected = index == modelValue.value
+		if (isSelected && props.titleActiveColor != null) {
+			css.set('color', props.titleActiveColor!)
+		}
+		if (!isSelected && props.titleInactiveColor != null) {
+			css.set('color', props.titleInactiveColor!)
+		}
+		return css
+	}
+
+	watch(modelValue, async (newVal : number, oldVal : number) => {
+		updateTabIndicator(oldVal, newVal, 1)
+	})
+
+	watch(() : (any | null)[] => [props.lineWidth, props.lineHeight, props.list], async () => {
+		await nextTick()
+		resize()
+	})
+
+	onMounted(() => {
+		setTimeout(() => {
+			resize()
+		}, 100)
+	})
+
+	defineExpose({
+		resize
+	})
+</script>
+
+<style scoped lang="scss">
+	.rice-tabs {
+		flex-direction: row;
+		height: 44px;
+		background-color: var(--rice-tabs-background);
+
+		&__scroll {
+			/* #ifndef MP */
+			position: relative;
+			/* #endif */
+			flex-direction: row;
+			height: 100%;
+			flex: 1;
+		}
+
+		/* #ifdef MP */
+		&__scrollmp {
+			position: relative;
+			flex: 1;
+			height: 100%;
+			flex-direction: row;
+			align-items: center;
+			overflow: visible;
+		}
+
+		/* #endif */
+
+		&__item {
+			position: relative;
+			flex-direction: row;
+			align-items: center;
+			justify-content: center;
+			padding: 0 12px;
+			flex-grow: 1;
+			flex-shrink: 0;
+			overflow: visible;
+			/* #ifdef WEB */
+			cursor: pointer;
+
+			/* #endif */
+			/* #ifdef MP */
+			height: 100%;
+
+			/* #endif */
+			&__text {
+				transition: color .3s;
+				font-size: 15px;
+				color: var(--rice-text-color-2);
+			}
+
+			&__active {
+				color: var(--rice-text-color);
+			}
+
+			&__disabled {
+				color: var(--rice-tabs-disabled-text-color);
+				/* #ifdef WEB */
+				cursor: not-allowed;
+				/* #endif */
+			}
+
+			&__line {
+				position: absolute;
+				z-index: 1;
+				bottom: 2px;
+				left: 50%;
+				border-radius: 100px;
+				transform: translateX(-50%);
+				transition-property: width;
+				transition-duration: 250ms;
+				width: 0px;
+				height: 3px;
+				background-color: var(--rice-primary-color);
+			}
+
+		}
+
+		&--shrink {
+			padding: 0 8px;
+			/* #ifndef VUE3-VAPOR */
+			flex: none;
+			/* #endif */
+			/* #ifdef VUE3-VAPOR */
+			flex-grow: 0;
+			/* #endif */
+		}
+
+		&__indicator {
+			position: absolute;
+			z-index: 1;
+			bottom: 2px;
+			left: 0px;
+			border-radius: 100px;
+			transition-property: transform, width;
+			transition-duration: 250ms;
+			width: 20px;
+			height: 3px;
+			background-color: var(--rice-primary-color);
+
+			&--animate {
+				opacity: 0;
+			}
+		}
+
+	}
+</style>

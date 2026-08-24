@@ -1,0 +1,42 @@
+import { isImage, isVideo } from "../../libs/utils"
+import { UploaderFileItem } from "./type.uts"
+
+/**
+ * 获取文件的id
+ */
+let fileId = 1
+export const getFileId = () => `${Date.now() + fileId++}`
+/**
+ * 获取文件的后缀名
+ */
+
+export const getFileExtension = (url : string) => {
+	const lastDotIndex = url.lastIndexOf('.')
+	if (lastDotIndex == -1 || lastDotIndex == url.length - 1) {
+		return ''
+	}
+	return url.slice(lastDotIndex + 1)
+}
+
+/**
+ * 获取文件的类型
+ */
+export const getFileType = (file : UploaderFileItem) => {
+	if (file.fileType != null && file.fileType != '') return file.fileType
+	if (isImage(file.url)) return 'image'
+	if (isVideo(file.url)) return 'video'
+	return getFileExtension(file.url)
+}
+
+/**
+ * 根据type获取web端的文件类型
+ */
+
+// #ifdef WEB
+export const getWebFileType = (type ?: string) => {
+	if (type == null) return ''
+	if (type.indexOf('image') == 0) return 'image'
+	if (type.indexOf('video') == 0) return 'video'
+	return ''
+}
+// #endif

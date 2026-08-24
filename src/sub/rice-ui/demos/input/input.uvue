@@ -1,0 +1,66 @@
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-30px">
+    <NavBar title="Input 输入框" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
+    <view class="p-16px">
+      <!-- 基础用法 -->
+      <view class="demo-block">
+        <text class="demo-label" :style="{ borderLeftColor: currentTheme }">基础输入框</text>
+        <view class="mb-10px">
+          <rice-input v-model="text1" placeholder="请输入文本" />
+        </view>
+        <view class="mb-10px">
+          <rice-input v-model="text2" placeholder="可一键清空" :clearable="true" />
+        </view>
+        <view class="mb-10px">
+          <rice-input v-model="text3" placeholder="密码输入框" :show-password="true" />
+        </view>
+        <view>
+          <rice-input :disabled="true" placeholder="禁用状态输入框" />
+        </view>
+      </view>
+
+      <!-- 前缀与后缀图标 -->
+      <view class="demo-block">
+        <text class="demo-label" :style="{ borderLeftColor: currentTheme }">带图标输入框</text>
+        <view class="mb-10px">
+          <rice-input v-model="text4" placeholder="前缀搜索图标" prefix-icon="search" />
+        </view>
+        <view>
+          <rice-input v-model="text5" placeholder="后缀眼睛图标" suffix-icon="eyes" />
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { useAppStore } from '@/src/store'
+import { computed } from 'vue'
+
+const appStore = useAppStore()
+const currentTheme = computed((): string => appStore.state.theme)
+
+const text1 = ref('')
+const text2 = ref('Hello Rice UI')
+const text3 = ref('123456')
+const text4 = ref('')
+const text5 = ref('')
+</script>
+
+<style scoped>
+.demo-block {
+  margin-bottom: 12px;
+  padding: 14px;
+  background-color: #ffffff;
+  border-radius: 10px;
+}
+.demo-label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #334155;
+  margin-bottom: 12px;
+  padding-left: 6px;
+  border-left-width: 3px;
+  border-left-style: solid;
+}
+</style>

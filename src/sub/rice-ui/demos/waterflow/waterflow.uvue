@@ -1,0 +1,74 @@
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-30px">
+    <NavBar title="Waterflow 瀑布流" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
+    <view class="p-16px">
+      <!-- 瀑布流布局 -->
+      <view class="demo-block">
+        <text class="demo-label" :style="{ borderLeftColor: currentTheme }">双列瀑布流列表</text>
+        <view class="flex-row justify-between">
+          <view class="flex-1 mr-6px">
+            <view v-for="item in leftList" :key="item.id" class="waterfall-card" :style="{ height: item.height, backgroundColor: currentTheme }">
+              <text class="text-white text-14px font-bold">瀑布卡片 {{ item.id }}</text>
+            </view>
+          </view>
+          <view class="flex-1 ml-6px">
+            <view v-for="item in rightList" :key="item.id" class="waterfall-card opacity-80" :style="{ height: item.height, backgroundColor: currentTheme }">
+              <text class="text-white text-14px font-bold">瀑布卡片 {{ item.id }}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { useAppStore } from '@/src/store'
+import { computed } from 'vue'
+
+const appStore = useAppStore()
+const currentTheme = computed((): string => appStore.state.theme)
+
+type CardItem = {
+  id: number
+  height: string
+}
+
+const leftList: CardItem[] = [
+  { id: 1, height: '120px' },
+  { id: 3, height: '160px' },
+  { id: 5, height: '100px' },
+]
+
+const rightList: CardItem[] = [
+  { id: 2, height: '150px' },
+  { id: 4, height: '110px' },
+  { id: 6, height: '140px' },
+]
+</script>
+
+<style scoped>
+.demo-block {
+  margin-bottom: 12px;
+  padding: 14px;
+  background-color: #ffffff;
+  border-radius: 10px;
+}
+.demo-label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #334155;
+  margin-bottom: 12px;
+  padding-left: 6px;
+  border-left-width: 3px;
+  border-left-style: solid;
+}
+.waterfall-card {
+  border-radius: 8px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+</style>

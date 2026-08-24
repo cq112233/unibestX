@@ -1,0 +1,57 @@
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-30px">
+    <NavBar title="Slider 滑块" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
+    <view class="p-16px">
+      <!-- 基础滑块 -->
+      <view class="demo-block">
+        <text class="demo-label" :style="{ borderLeftColor: currentTheme }">基础用法</text>
+        <view class="py-12px px-8px">
+          <rice-slider v-model="val1" :active-color="currentTheme" />
+        </view>
+        <view class="mt-8px">
+          <text class="text-13px text-[#64748b]">当前数值：{{ val1 }}</text>
+        </view>
+      </view>
+
+      <!-- 自定义区间与步长 -->
+      <view class="demo-block">
+        <text class="demo-label" :style="{ borderLeftColor: currentTheme }">自定义步长 (Step: 10)</text>
+        <view class="py-12px px-8px">
+          <rice-slider v-model="val2" :step="10" :active-color="currentTheme" />
+        </view>
+        <view class="mt-8px">
+          <text class="text-13px text-[#64748b]">当前数值：{{ val2 }}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { useAppStore } from '@/src/store'
+import { computed } from 'vue'
+
+const appStore = useAppStore()
+const currentTheme = computed((): string => appStore.state.theme)
+
+const val1 = ref(50)
+const val2 = ref(20)
+</script>
+
+<style scoped>
+.demo-block {
+  margin-bottom: 12px;
+  padding: 14px;
+  background-color: #ffffff;
+  border-radius: 10px;
+}
+.demo-label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #334155;
+  margin-bottom: 12px;
+  padding-left: 6px;
+  border-left-width: 3px;
+  border-left-style: solid;
+}
+</style>

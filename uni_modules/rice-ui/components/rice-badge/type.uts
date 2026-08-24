@@ -1,0 +1,16 @@
+export type BadgeProps = {
+	value ?: string | number,
+	max ?: number,
+	isDot ?: boolean,
+	hidden ?: boolean,
+	type ?: 'primary' | 'success' | 'warning' | 'error',
+	showZero ?: boolean,
+	bgColor ?: string,
+	color ?: string,
+	fontSize ?: string | number,
+	position ?: 'top-right' | 'top-left' | 'bottom-left' | 'bottom-right',
+	offset ?: Array<number | string>,
+	absolute ?: boolean,
+	textClass ?: string,
+	badgeStyle ?: UTSJSONObject,
+}

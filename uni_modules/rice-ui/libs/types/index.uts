@@ -1,0 +1,1 @@
+export type BeforeChangeInterceptor = () => Promise<boolean> | boolean

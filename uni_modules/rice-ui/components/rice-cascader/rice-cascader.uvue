@@ -1,0 +1,488 @@
+<template>
+	<rice-overlay v-if="usePopup" v-model:show="show" :z-index="zIndex-1" :close-on-click-overlay="closeOnClickOverlay"
+		:duration="300" />
+	<!-- #ifndef VUE3-VAPOR -->
+	<template v-if="showCascader">
+	<!-- #endif -->
+
+		<view class="rice-cascader" :class="rootClass" :style="[rootStyle,customStyle]" ref="cascaderRef">
+			<view v-if="hasHeader" class="rice-cascader__header">
+				<slot name="title">
+					<text v-if="hasStrValue(title)" class="rice-cascader__header__title"
+						:class="{'rice-cascader__header__title--left':titleAlign=='left'}">{{title}}</text>
+				</slot>
+				<rice-icon v-if="closeable" :name="closeIcon" size="20px" :custom-style="closeIconStyle" @click="clickClose" />
+			</view>
+
+			<rice-tabs :list="tabs" v-model="tabIndex" :init-animate="false" shrink :title-active-color="activeColor"
+				:line-color="activeColor" title-inactive-color="var(--rice-text-color)" style="padding: 0 8px;"
+				line-mode="zoom" />
+			<rice-divider hairline style="margin-top: -2px;margin-bottom: 0;" />
+
+			<swiper class="rice-cascader__swiper" :current="swiperIndex" :duration="120" :disable-touch="true">
+				<!-- #ifndef MP -->
+				<swiper-item v-for="(item,index) in list" :key="index" class="rice-cascader__swiper__item">
+				<!-- #endif -->
+					<!-- #ifdef MP -->
+					<!-- 小程序端禁止touch操作 -->
+					<swiper-item v-for="(item,index) in list" :key="index" class="rice-cascader__swiper__item"
+						@touchmove.prevent="onTouchMove">
+					<!-- #endif -->
+						<slot name="optionsTop" :tabIndex="tabIndex"></slot>
+						<list-view class="rice-cascader__list" :show-scrollbar="false" direction="vertical">
+							<list-item v-for="(option,optionIndex) in item" :key="option.value" class="rice-cascader__option"
+								:class="getOptionClass(optionIndex)" @click="clickOption(option,index)">
+								<text class="rice-cascader__option__text" :class="getOptionTextClass(option)"
+									:style="getOptionTextStyle(option,index)">{{option.text}}</text>
+								<rice-icon v-if="getIsSelected(option,index)" name="checked" :color="activeColor" />
+							</list-item>
+						</list-view>
+						<slot name="optionsBottom" :tabIndex="tabIndex"></slot>
+					</swiper-item>
+			</swiper>
+		</view>
+
+	<!-- #ifndef VUE3-VAPOR -->
+	</template>
+	<!-- #endif -->
+
+</template>
+
+<script setup>
+	import { useNamespace, usePopup as useBottomPopup, useSafeArea, safeAreaInsets } from "../../libs/use"
+	import { addUnit, hasStrValue, isSameValue } from "../../libs/utils"
+	import { TabsOptions } from "../rice-tabs/type"
+	import { CascaderProps, CascaderOption, CascaderEvent, CascaderClickDisabledEvent, GetSelectedOptionsByValue } from "./type.uts"
+
+	defineOptions({
+		name: 'rice-cascader',
+		styleIsolation: 'app-and-page'
+	})
+
+	const ns = useNamespace('cascader')
+
+	useSafeArea()
+
+	const emit = defineEmits<{
+		change : [value: CascaderEvent],
+		finish : [value: CascaderEvent],
+		clickClose : [],
+		clickDisabled : [value: CascaderClickDisabledEvent],
+		open : [],
+		close : [],
+		opened : [],
+		closed : [],
+	}>()
+
+	const slots = defineSlots<{
+		title() : any,
+		optionsTop(props : { tabIndex : number }) : any,
+		optionsBottom(props : { tabIndex : number }) : any,
+	}>()
+
+	const props = withDefaults(defineProps<CascaderProps>(), {
+		placeholder: '请选择',
+		closeable: true,
+		closeIcon: 'cross',
+		usePopup: true,
+		closeOnFinish: true,
+		closeOnClickClose: true,
+		closeOnClickOverlay: true,
+		zIndex: 999,
+		safeAreaInsetBottom: null,
+		activeColor: 'var(--rice-primary-color)',
+		options: () : CascaderOption[] => ([]),
+		customStyle: () : UTSJSONObject => ({})
+	})
+
+	const modelValue = defineModel({
+		type: [String, Number] as PropType<string | number | null>,
+	})
+
+	const show = defineModel('show', {
+		type: Boolean,
+		default: false
+	})
+
+	const cascaderRef = shallowRef<UniElement | null>(null)
+
+	//popup
+	const { realShow } = useBottomPopup(cascaderRef, {
+		show,
+		duration: 300,
+		position: 'bottom',
+		opacity: false,
+	})
+
+	const list = ref<CascaderOption[][]>([])
+	const selectedOptions = ref<CascaderOption[]>([])
+	const selectedPathMap = ref(new Map<string, CascaderOption[]>())
+	const tabIndex = ref(0)
+	const swiperIndex = ref(0)
+	const isShow = computed<boolean>(() => props.usePopup ? realShow.value : true)
+
+	// #ifndef VUE3-VAPOR
+	//显示过一次后就不再销毁
+	const initShow = ref(false)
+	const showCascader = computed(() => initShow.value ? initShow.value : isShow.value)
+	// #endif
+
+	const hasHeader = computed<boolean>(() => hasStrValue(props.title) || props.closeable || slots['title'] != null)
+	const isSafeAreaInsetBottom = computed<boolean>(() => props.safeAreaInsetBottom ?? props.usePopup)
+
+	//tabs 选项
+	const tabs = computed(() => {
+		const selected = selectedOptions.value.map(option => ({ name: option.text }) as TabsOptions)
+		if (selectedOptions.value.length < list.value.length) {
+			selected.push({
+				name: props.placeholder
+			})
+		}
+		return selected
+	})
+
+	function getValueCacheKey(value : string | number | null) : string {
+		if (value == null) return ''
+		if (typeof value == 'number') {
+			return 'number:' + value.toString()
+		}
+		return 'string:' + value
+	}
+
+	function buildSelectedPathMap(options : CascaderOption[], parentPath : CascaderOption[]) : void {
+		for (let i = 0; i < options.length; i++) {
+			const option = options[i]
+			const path = parentPath.concat([option])
+			const key = getValueCacheKey(option.value)
+			if (!selectedPathMap.value.has(key)) {
+				selectedPathMap.value.set(key, path)
+			}
+			if (option.children != null && option.children!.length > 0) {
+				buildSelectedPathMap(option.children!, path)
+			}
+		}
+	}
+
+	/**
+	 * 获取selected 的值
+	 */
+	let getSelectedOptionsByValue : GetSelectedOptionsByValue = null
+	getSelectedOptionsByValue = (_options : CascaderOption[], value ?: string | number | null) => {
+		if (value == null) return [] as CascaderOption[]
+		return selectedPathMap.value.get(getValueCacheKey(value)) ?? [] as CascaderOption[]
+	}
+
+	/**
+	 * 设置tab的索引值
+	 */
+	const setTabIndex = async () => {
+		await nextTick()
+		tabIndex.value = Math.max(list.value.length - 1, 0)
+	}
+
+	/**
+	 * 更新值
+	 */
+	const updateList = () => {
+		if (!isShow.value) return
+		if (modelValue.value != null) {
+			const selected = getSelectedOptionsByValue!(props.options, modelValue.value)
+			selectedOptions.value = selected
+			if (selected.length > 0) {
+				let cursor = props.options
+				const data = [] as CascaderOption[][]
+				for (let i = 0; i < selected.length; i++) {
+					const option = selected[i]
+					data.push(cursor)
+					const next = cursor.find(item => isSameValue(item.value, option.value))
+					if (next != null) {
+						cursor = next.children ?? [] as CascaderOption[]
+					}
+				}
+				if (cursor.length > 0) {
+					data.push(cursor)
+				}
+				list.value = data
+				setTabIndex()
+				return
+			}
+
+		}
+		selectedOptions.value = []
+		list.value = [props.options]
+		setTabIndex()
+	}
+
+	const getIsSelected = (option : CascaderOption, index : number) => {
+		if (index >= selectedOptions.value.length) {
+			return false
+		}
+		return isSameValue(selectedOptions.value[index].value, option.value)
+	}
+
+	const clickOption = (option : CascaderOption, index : number) => {
+		if (option.disabled == true) {
+			emit('clickDisabled', {
+				tabIndex: index,
+				option,
+			} as CascaderClickDisabledEvent)
+			return
+		}
+		const nextIndex = index + 1
+		if (list.value.length > nextIndex) {
+			list.value = list.value.slice(0, nextIndex)
+		}
+
+		if (Array.isArray(option.children) && option.children.length > 0) {
+			list.value.push(option.children)
+			setTabIndex()
+		}
+
+		const oldModelValue = modelValue.value
+		modelValue.value = option.value
+		selectedOptions.value = getSelectedOptionsByValue!(props.options, option.value)
+		const params = {
+			value: option.value,
+			tabIndex: tabIndex.value,
+			selectedOptions: selectedOptions.value
+		} as CascaderEvent
+
+		if (!isSameValue(option.value, oldModelValue)) {
+			emit('change', params)
+		}
+
+		if (option.children == null || !Array.isArray(option.children) || option.children.length == 0) {
+			if (props.closeOnFinish && props.usePopup) {
+				show.value = false
+			}
+			emit('finish', params)
+		}
+	}
+
+	const clickClose = () => {
+		if (props.usePopup && props.closeOnClickClose) {
+			show.value = false
+		}
+		emit('clickClose')
+	}
+
+	watch(modelValue, (newVal : string | number | null) => {
+		if (newVal != null) {
+			const selectedValues = selectedOptions.value.map(v => v.value)
+			if (selectedValues.includes(newVal)) {
+				return
+			}
+		}
+		updateList()
+	})
+
+	watch(() : CascaderOption[] => props.options, () => {
+		selectedPathMap.value.clear()
+		buildSelectedPathMap(props.options, [] as CascaderOption[])
+		if (isShow.value) {
+			updateList()
+		}
+	}, {
+		deep: true,
+		immediate: true,
+	})
+
+	watch(isShow, (newVal : boolean) => {
+		if (newVal) {
+			if (props.usePopup) {
+				updateList()
+			}
+			// #ifndef VUE3-VAPOR
+			initShow.value = true
+			// #endif
+		}
+	}, {
+		immediate: true
+	})
+
+	let timer : number | null = null
+	watch(tabIndex, async (newVal : number) => {
+		// #ifndef VUE3-VAPOR
+		await nextTick()
+		if (timer != null) clearTimeout(timer!)
+		timer = setTimeout(() => {
+			swiperIndex.value = newVal
+		}, 30)
+		// #endif
+		// #ifdef VUE3-VAPOR
+		swiperIndex.value = newVal
+		// #endif
+	}, {
+		immediate: true
+	})
+
+	// #ifdef MP
+	const onTouchMove = () => { }
+	// #endif
+
+
+
+	const rootClass = computed(() => {
+		return [
+			ns.theme(),
+			ns.is('popup', props.usePopup),
+		]
+	})
+
+	const rootStyle = computed(() => {
+		const css = new Map<string, string | number>()
+		if (props.usePopup) {
+			css.set('z-index', props.zIndex)
+		}
+		// #ifndef WEB
+		if (isSafeAreaInsetBottom.value) {
+			css.set('padding-bottom', safeAreaInsets.value.bottom + 'px')
+		}
+		// #endif
+		return css
+	})
+
+
+	const getOptionTextClass = (option : CascaderOption) => {
+		return {
+			'rice-cascader__option__text--disabled': option.disabled == true,
+		}
+	}
+
+	const getOptionTextStyle = (option : CascaderOption, index : number) => {
+		const css = new Map<string, string>()
+		if (props.fontSize != null) {
+			css.set('font-size', addUnit(props.fontSize!))
+		}
+		const isSelected = getIsSelected(option, index)
+		if (props.color != null && !isSelected && option.disabled != true) {
+			css.set('color', props.color!)
+		}
+		if (props.activeColor != null && isSelected) {
+			css.set('color', props.activeColor!)
+		}
+		return css
+	}
+
+	const getOptionClass = (index : number) => {
+		return {
+			'rice-cascader__option--first': index == 0 && slots['optionsTop'] == null,
+			'rice-cascader__option--border': props.border == true
+		}
+	}
+
+	const getSelectedOptions = () : CascaderOption[] => {
+		return selectedOptions.value.slice()
+	}
+
+	const closeIconStyle = computed(() => {
+		return {
+			position: 'absolute',
+			right: '16px',
+			top: '8px',
+			zIndex: 9,
+			padding: '4px 8px',
+		}
+	})
+
+
+	onUnmounted(() => {
+		if (timer != null) clearTimeout(timer!)
+	})
+
+	defineExpose({
+		getSelectedOptions,
+	})
+</script>
+
+<style scoped lang="scss">
+	@import "../../libs/style/mixins/hairline";
+
+	.rice-cascader {
+		position: relative;
+		background-color: var(--rice-cascader-background);
+		height: 480px;
+
+		&--popup {
+			position: fixed;
+			bottom: 0;
+			left: 0;
+			right: 0;
+			border-radius: 12px 12px 0 0;
+			transition-property: transform;
+			transform: translateY(100%);
+		}
+
+		&__header {
+			position: relative;
+			height: 48px;
+			align-items: center;
+			justify-content: center;
+			padding: 0 16px;
+
+			&__title {
+				font-size: 18px;
+				font-weight: bold;
+				color: var(--rice-text-color);
+				text-align: center;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+				width: 100%;
+
+				&--left {
+					text-align: left;
+				}
+			}
+		}
+
+
+		&__swiper {
+			flex: 1;
+
+			&__item {
+				height: 100%;
+			}
+		}
+
+
+		&__list {
+			flex: 1;
+		}
+
+		&__option {
+			flex-direction: row;
+			align-items: center;
+			justify-content: space-between;
+			padding: 10px 16px;
+
+			&__text {
+				font-size: 16px;
+				color: var(--rice-text-color);
+
+				/* #ifdef WEB */
+				cursor: pointer;
+
+				/* #endif */
+				&--disabled {
+					color: var(--rice-cascader-disabled-text-color);
+
+					/* #ifdef WEB */
+					cursor: not-allowed;
+					/* #endif */
+				}
+			}
+
+			&--border {
+				@include hairline-bottom;
+			}
+
+			&--first {
+				padding-top: 20px;
+			}
+
+			&--border {
+				@include hairline-bottom;
+			}
+		}
+	}
+</style>

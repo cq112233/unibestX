@@ -1,0 +1,20 @@
+
+export type RateStatus = {
+	status : 'full' | 'half' | 'void',
+	value : number,
+}
+export type RateProps = {
+	count ?: number,
+	icon ?: string,
+	voidIcon ?: string,
+	size ?: string | number,
+	gutter ?: string | number,
+	color ?: string,
+	voidColor ?: string,
+	allowHalf ?: boolean,
+	clearable ?: boolean,
+	readonly ?: boolean,
+	disabled ?: boolean,
+	touchable ?: boolean,
+	customStyle : UTSJSONObject,
+}

@@ -1,0 +1,114 @@
+@use 'sass:map';
+
+$button-size: (
+  'large':(
+		height:50px,
+    padding:0 20px,
+    fontSize:14px,
+  ),
+	
+  'small':(
+		height:32px,
+    padding:0 10px,
+    fontSize:12px,
+
+  ),
+  'mini':(
+		height:26px,
+    padding:0 4px,
+    fontSize:10px,
+  ),
+);
+
+
+@mixin buttonSize(){
+	@each $key,
+	$value in $button-size {
+		$selector: &+'--'+$key;
+		$textSelector: &+'--'+$key+'__text';
+		@at-root #{$selector} {
+			height: map.get($button-size, $key, 'height');
+			padding: map.get($button-size, $key, 'padding');
+		}
+		@at-root  #{$textSelector}{
+			font-size: map.get($button-size, $key, 'fontSize');
+		}
+	}
+}
+
+
+$text-class-themes: ('default', 'info');
+
+$theme-colors: (
+  'primary': (
+    base: var(--rice-primary-color),
+    plain: var(--rice-primary-color-1),
+    hover: var(--rice-primary-color-7),
+    text: var(--rice-primary-color)
+  ),
+  'success': (
+    base: var(--rice-success-color),
+    plain: var(--rice-success-color-1),
+    hover: var(--rice-success-color-7),
+    text: var(--rice-success-color)
+  ),
+  'warning': (
+    base: var(--rice-warning-color),
+    plain: var(--rice-warning-color-1),
+    hover: var(--rice-warning-color-7),
+    text: var(--rice-warning-color)
+  ),
+  'error': (
+    base: var(--rice-error-color),
+    plain: var(--rice-error-color-1),
+    hover: var(--rice-error-color-7),
+    text: var(--rice-error-color)
+  ),
+  'default': (
+    base: var(--rice-button-default-background),
+    border: var(--rice-button-default-border),
+    plain: transparent,
+    hover: var(--rice-button-default-hover-background),
+    text: var(--rice-text-color)
+  ),
+  'info': (
+    base: var(--rice-button-info-background),
+    plain: transparent,
+    hover: var(--rice-button-info-hover-background),
+    text: var(--rice-text-color)
+  )
+);
+
+@mixin button-variant($theme, $colors) {
+  &--#{$theme} {
+    background-color: map-get($colors, base);
+    border-color: map-get($colors, border) or map-get($colors, base);
+
+    &--plain-fill {
+      background-color: map-get($colors, plain);
+      
+      /* #ifndef APP */
+      color: map-get($colors, text);
+      /* #endif */
+			@if not index($text-class-themes,$theme){
+				border-color: map-get($colors, base);
+			}
+			
+    }
+
+    &--plain__text {
+      color: map-get($colors, text);
+    }
+
+    &--hover {
+      background-color: map-get($colors, hover);
+      border-color: map-get($colors, hover);
+    }
+
+    @if index($text-class-themes, $theme) {
+      &__text {
+        color: map-get($colors, text);
+      }
+    }
+  }
+}

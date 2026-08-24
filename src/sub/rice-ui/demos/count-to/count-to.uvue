@@ -1,0 +1,56 @@
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-30px">
+    <NavBar title="CountTo 数字滚动" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
+    <view class="p-16px">
+      <!-- 基础滚动 -->
+      <view class="demo-block">
+        <text class="demo-label" :style="{ borderLeftColor: currentTheme }">基础数字滚动 (0 -> 12345)</text>
+        <view class="py-10px">
+          <rice-count-to :start-val="0" :end-val="12345" font-size="32px" :color="currentTheme" :bold="true" />
+        </view>
+      </view>
+
+      <!-- 小数点与千分位 -->
+      <view class="demo-block">
+        <text class="demo-label" :style="{ borderLeftColor: currentTheme }">带小数与自定义时长 (0.00 -> 3688.88)</text>
+        <view class="py-10px">
+          <rice-count-to
+            :start-val="0"
+            :end-val="3688.88"
+            :decimals="2"
+            :duration="2500"
+            font-size="30px"
+            color="#07c160"
+            :bold="true"
+          />
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { useAppStore } from '@/src/store'
+import { computed } from 'vue'
+
+const appStore = useAppStore()
+const currentTheme = computed((): string => appStore.state.theme)
+</script>
+
+<style scoped>
+.demo-block {
+  margin-bottom: 12px;
+  padding: 14px;
+  background-color: #ffffff;
+  border-radius: 10px;
+}
+.demo-label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #334155;
+  margin-bottom: 12px;
+  padding-left: 6px;
+  border-left-width: 3px;
+  border-left-style: solid;
+}
+</style>

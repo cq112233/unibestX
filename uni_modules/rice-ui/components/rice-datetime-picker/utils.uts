@@ -1,0 +1,77 @@
+import { padZero } from "../../libs/utils"
+import { PickerOption } from '../rice-picker';
+import { DateTimePickerUnit, DateTimePickerFormatter, DateTimePickerFilter, DateTimePickerType } from "./type.uts"
+
+export const DATE_MODES = ['year', 'month', 'day'] as DateTimePickerUnit[];
+export const TIME_MODES = ['hour', 'minute', 'second'] as DateTimePickerUnit[];
+export const FULL_MODES = [...DATE_MODES, ...TIME_MODES] as DateTimePickerUnit[];
+
+export const startOfMaps = {
+	year: 'year',
+	month: 'month',
+	date: 'date',
+	minute: 'minute',
+	time: 'second',
+	datehour: 'hour',
+	dateminute: 'minute',
+	datetime: 'second',
+}
+
+const unitMaps = {
+	year: ['year'] as DateTimePickerUnit[],//年
+	month: ['year', 'month'] as DateTimePickerUnit[],//年月
+	date: DATE_MODES, //年月日
+	minute: ['hour', 'minute'] as DateTimePickerUnit[],//时分
+	time: TIME_MODES, //时分秒
+	datehour: [...DATE_MODES, 'hour'] as DateTimePickerUnit[], //年月日时
+	dateminute: [...DATE_MODES, 'hour', 'minute'] as DateTimePickerUnit[], //年月日时分
+	datetime: FULL_MODES, //年月日时分秒
+};
+
+const isFun = (val ?: any | null) => val != null && typeof val == 'function'
+
+export const getMode = (type : DateTimePickerType) => {
+	const maps = unitMaps[type] as DateTimePickerUnit[] | null
+	return maps ?? unitMaps['date'] as DateTimePickerUnit[]
+}
+
+export const getOptions = (min : number, max : number, type : DateTimePickerUnit, formatter ?: DateTimePickerFormatter, filter ?: DateTimePickerFilter) => {
+	if (min > max) min = max
+	const n = max - min + 1
+	let options = [] as PickerOption[]
+	for (let i = 0; i < n; i++) {
+		const value = min + i
+		let option = {
+			value: value,
+			text: padZero(value),
+			extend: {
+				type
+			},
+		} as PickerOption
+		if (isFun(formatter)) {
+			option = formatter!(type, option)
+		}
+		options.push(option)
+	}
+
+	return isFun(filter) ? filter!(type, options) : options
+}
+
+export const isTime = (val ?: string | null) => {
+	if (val == null) return false
+	const timeRegex = /^(0?[0-9]|1[0-9]|2[0-3])([:]([0-5]?[0-9])){1,2}$/;
+	return timeRegex.test(val)
+}
+
+/**
+ * 支持的格式
+ * YYYY、YYYY-MM、YYYY-MM-DD、YYYY-MM-DD HH 、YYYY-MM-DD HH:mm 、YYYY-MM-DD HH:mm:ss`
+ * YYYY、YYYY/MM、YYYY/MM/DD、YYYY/MM/DD HH 、YYYY/MM/DD HH:mm 、YYYY/MM/DD HH:mm:ss`
+ */
+export const isRightDate = (val ?: string | null) => {
+	const reg = /^(?:\d{2,4})(?:[-\/](?:0?[1-9]|1[0-2])(?:[-\/](?:0?[1-9]|[12][0-9]|3[01])(?:\s(?:[01]?[0-9]|2[0-3])(?::[0-5]?[0-9](?::[0-5]?[0-9])?)?)?)?)?$/
+	const flag = val == null ? false : reg.test(val)
+
+	return flag
+}
+

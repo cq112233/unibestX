@@ -1,0 +1,744 @@
+<template>
+	<view class="rice-color-picker" :class="ns.theme()">
+		<!-- 颜色面板 -->
+		<view class="rice-color-picker__panel" :class="panelClass" ref="panelRef" @touchstart.stop="onPanelTouchstart"
+			@touchmove.stop="onPanelTouchmove" @touchend.stop="onPanelTouchend" @touchcancel.stop="onPanelTouchend">
+			<view class="rice-color-picker__panel--base" :style="panelStyle"></view>
+			<view class="rice-color-picker__panel--white"></view>
+			<view class="rice-color-picker__panel--black"></view>
+			<view class="rice-color-picker__panel--cursor" :style="panelCursorStyle" ref="cursorRef"></view>
+		</view>
+		<!-- slider 滑块 -->
+		<view class="rice-color-picker__slider">
+			<view class="rice-color-picker__slider__preview" :class="previewClass" :style="previewStyle"></view>
+			<view class="rice-color-picker__slider__drag">
+				<view class="rice-color-picker__slider__view">
+					<rice-slider :model-value="hueSliderValue" :min="0" :max="360" active-color="transparent"
+						:button-color="sliderButtonColor" :inactive-color="slideInactiveColor" class="rice-color-picker--slider"
+						track-height="8px" button-size="24px" @changing="onHueSliderChanging" @change="onHueSliderChange" />
+					<!-- #ifdef APP -->
+					<!-- app端背景色不支持复杂的渐变色，使用view覆盖在上面 -->
+					<view class="rice-color-picker__hub">
+						<view v-for="item in 6" :key="item" class="rice-color-picker__hub__item"
+							:class="`rice-color-picker__hub__item${item}`"></view>
+					</view>
+					<!-- #endif -->
+				</view>
+				<view v-if="showAlpha" class="rice-color-picker--slider">
+					<rice-slider :model-value="alphaSliderValue" :min="0" :max="100" :button-color="sliderButtonColor"
+						class="rice-color-picker--slider" track-height="8px" button-size="24px"
+						:inactive-color="sliderInactiveColor" active-color="transparent" @changing="onAlphaSliderChanging"
+						@change="onAlphaSliderChange" />
+					<!-- app端背景色不支持复杂的渐变色，使用image覆盖在上面 -->
+					<view class="rice-color-picker--alpha">
+						<image class="rice-color-picker--alpha__img" src="/uni_modules/rice-ui/static/images/alpha-box.png"
+							mode="heightFix" />
+						<image class="rice-color-picker--alpha__img" src="/uni_modules/rice-ui/static/images/alpha-box.png"
+							mode="heightFix" />
+					</view>
+				</view>
+			</view>
+		</view>
+
+		<!-- RGBA/HEX切换 -->
+		<view class="rice-color-picker__result">
+			<view class="rice-color-picker__switch" @click="changeFormat">
+				<rice-icon v-if="!disabledSwitch" name="arrow-left" size="14px" />
+				<text class="rice-color-picker__switch__text">{{currentFormat}}</text>
+				<rice-icon v-if="!disabledSwitch" name="arrow-right" size="14px" />
+			</view>
+			<!-- HEX -->
+			<view v-if="currentFormat == 'HEX'" class="rice-color-picker__result__box">
+				<text class="rice-color-picker__result__text rice-color-picker__result__symbol">#</text>
+				<input :value="hexInputVal" :class="inputClass" style="text-align: left;" :disabled="disabledInput"
+					:maxlength="hexInputMaxLength" @input="onHexInput" @blur="onHexBlur" @confirm="onHexBlur" />
+				<text class="rice-color-picker__result__text">{{alphaInput}}%</text>
+			</view>
+			<!-- RGBA -->
+			<view v-else class="rice-color-picker__result__box">
+				<input v-model="redInput" :class="inputClass" :disabled="disabledInput" type="number" @blur="onRgbBlur"
+					@confirm="onRgbBlur" />
+				<input v-model="greenInput" :class="inputClass" :disabled="disabledInput" type="number" @blur="onRgbBlur"
+					@confirm="onRgbBlur" />
+				<input v-model="blueInput" :class="inputClass" :disabled="disabledInput" type="number" @blur="onRgbBlur"
+					@confirm="onRgbBlur" />
+				<view class="rice-color-picker__result__alpha">
+					<input v-model="alphaInput" :disabled="disabledInput" type="number" class="rice-color-picker__result__input2"
+						@blur="onRgbBlur" @confirm="onRgbBlur" />
+					<text class="rice-color-picker__result__text2">%</text>
+				</view>
+			</view>
+		</view>
+
+		<!-- 预置颜色 -->
+		<view v-if="presetColors.length>0" class="rice-color-picker__preset">
+			<view v-for="(item,index) in presetColors" :style="{background:item}" :key="index"
+				class="rice-color-picker__preset__item" @click="selectPreset(item)"></view>
+		</view>
+	</view>
+</template>
+
+<script setup>
+	import { useNamespace } from '../../libs/use';
+	import { clamp, padZero } from '../../libs/utils';
+	import { ColorPickerColorState, ColorPickerProps, } from './type.uts';
+	import { clampInt, parseColor, defaultColor, percentToAlpha, formatAlpha, clampAlpha, rgbaToHex, parseNumber, rgbToHsv, hsvToRgb, parseHexColor } from "./utils.uts"
+
+	// #ifdef VUE3-VAPOR && APP
+	import { isDark } from "../../libs/store"
+	// #endif
+
+	defineOptions({
+		name: 'rice-color-picker',
+		styleIsolation: 'app-and-page',
+		externalClasses: ['preview-class', 'panel-class']
+	})
+
+	const ns = useNamespace('color-picker')
+
+	const props = withDefaults(defineProps<ColorPickerProps>(), {
+		presetColors: () : string[] => ([]),
+		showAlpha: true,
+		disabledInput: false,
+		disabledSwitch: false,
+		previewClass: '',
+		panelClass: '',
+	})
+
+	const emit = defineEmits<{
+		changing : [value: string],
+		change : [value: string],
+	}>()
+
+	const color = defineModel({
+		type: String,
+		default: ''
+	})
+
+	const panelWidth = ref(0)
+	const panelHeight = ref(0)
+	const panelLeft = ref(0)
+	const panelTop = ref(0)
+	const hueSliderValue = ref(0)
+	const alphaSliderValue = ref(0)
+	const hexInput = ref(defaultColor)
+	const redInput = ref('')
+	const greenInput = ref('')
+	const blueInput = ref('')
+	const alphaInput = ref('')
+	const panelRef = shallowRef<UniElement | null>(null)
+	const cursorRef = shallowRef<UniElement | null>(null)
+	const panelDragging = ref(false)
+	const syncingModelValue = ref(false)
+	//#1989fa
+	const current = reactive<ColorPickerColorState>({
+		r: 25,
+		g: 137,
+		b: 250,
+		a: 1,
+		h: 30,
+		s: 88,
+		v: 98
+	})
+
+	//去掉输入框上面的 # 号
+	const hexInputVal = computed(() => {
+		return hexInput.value.startsWith('#') ? hexInput.value.slice(1) : hexInput.value
+	})
+
+	const hexInputMaxLength = computed(() => current.a < 1 ? 8 : 6)
+
+	/**
+	 * 颜色格式：目前只支持 HEX/RGB;APP端也只支持这两种
+	 */
+	const currentFormat = ref('HEX')
+
+	const setCurrentFormat = (value ?: string) => {
+		if (value == null) return
+		currentFormat.value = value!.startsWith('#') ? 'HEX' : "RGB"
+	}
+
+	const changeFormat = () => {
+		if (props.disabledSwitch) return
+		currentFormat.value = currentFormat.value == 'HEX' ? 'RGB' : 'HEX'
+	}
+
+	// #ifdef APP
+	const slideInactiveColor = ref('transparent')
+	// #endif
+
+	// #ifndef APP
+	const slideInactiveColor = ref('linear-gradient(90deg,red,#ff0 17%,#0f0 33%,#0ff,#00f 67%,#f0f 83%,red)')
+	// #endif
+
+	/**
+	 * 同步输入框的字段
+	 */
+	const syncFields = () => {
+		hexInput.value = rgbaToHex(current.r, current.g, current.b, current.a)
+		redInput.value = `${current.r}`
+		greenInput.value = `${current.g}`
+		blueInput.value = `${current.b}`
+		alphaInput.value = `${Math.round(current.a * 100)}`
+	}
+
+	/**
+	 * 同步slider的值
+	 */
+	const syncAlphaSliderValues = () => {
+		//面板拖动的时候不要移动slider
+		if (panelDragging.value) return
+		alphaSliderValue.value = Math.round(current.a * 100)
+	}
+
+	const syncHueSliderValues = () => {
+		//面板拖动的时候不要移动slider
+		if (panelDragging.value) return
+		hueSliderValue.value = Math.round(current.h)
+	}
+
+	const updateCursor = () => {
+		cursorRef.value?.style.setProperty('left', `${current.s}%`)
+		cursorRef.value?.style.setProperty('top', `${100 - current.v}%`)
+	}
+
+	const updateStateFromRgb = (r : number, g : number, b : number, a : number) => {
+		current.r = clampInt(r, 0, 255)
+		current.g = clampInt(g, 0, 255)
+		current.b = clampInt(b, 0, 255)
+		current.a = clampAlpha(a)
+		const hsv = rgbToHsv(current.r, current.g, current.b)
+		current.h = hsv.h
+		current.s = hsv.s
+		current.v = hsv.v
+		syncFields()
+		syncAlphaSliderValues()
+		syncHueSliderValues()
+		updateCursor()
+	}
+
+	const updateStateFromHsv = (h : number, s : number, v : number, a : number) => {
+		current.h = clamp(h, 0, 360)
+		current.s = clamp(s, 0, 100)
+		current.v = clamp(v, 0, 100)
+		current.a = clampAlpha(a)
+		const rgb = hsvToRgb(current.h, current.s, current.v)
+		current.r = rgb.r
+		current.g = rgb.g
+		current.b = rgb.b
+		syncFields()
+		updateCursor()
+	}
+
+	const getColorValue = () : string => {
+		if (currentFormat.value == 'HEX') {
+			return rgbaToHex(current.r, current.g, current.b, current.a)
+		}
+		const alpha = formatAlpha(current.a)
+		return alpha == '1'
+			? `rgb(${current.r}, ${current.g}, ${current.b})`
+			: `rgba(${current.r}, ${current.g}, ${current.b}, ${alpha})`
+	}
+
+	const emitChangingValue = () => {
+		emit('changing', getColorValue())
+	}
+
+	/**
+	 * 更新modelvalue的值
+	 */
+	const updateModelValue = () => {
+		const nextColor = getColorValue()
+		if (color.value == nextColor) return
+		syncingModelValue.value = true
+		color.value = nextColor
+		emit('change', nextColor)
+		nextTick(() => {
+			syncingModelValue.value = false
+		})
+	}
+
+	const setColorFromString = (value : string) => {
+		const parsed = parseColor(value)
+		updateStateFromRgb(parsed.r, parsed.g, parsed.b, parsed.a)
+		setCurrentFormat(value)
+	}
+
+
+	// #ifdef VUE3-VAPOR && APP-HARMONY
+	const findPopupParent = (el : UniElement | null) : UniElement | null => {
+		let currentEl = el
+		while (currentEl != null) {
+			const classList = currentEl.classList
+			for (let i = 0; i < classList.length; i++) {
+				if (classList[i] == 'rice-popup') {
+					return currentEl
+				}
+			}
+			currentEl = currentEl.parentElement
+		}
+		return null
+	}
+	// #endif
+
+	async function updatePanelRect() {
+		await nextTick()
+		if (panelRef.value == null) return
+		const rect = await panelRef.value.getBoundingClientRectAsync()!
+		panelWidth.value = rect.width
+		panelHeight.value = rect.height
+
+		//在鸿蒙蒸汽模式的 popup 内，直接取 panel rect 可能与触摸坐标系不一致。
+		//鸿蒙蒸汽模式rice-popup组件根节点 + offset 计算内部坐标
+		// #ifdef VUE3-VAPOR && APP-HARMONY
+		const popupEl = findPopupParent(panelRef.value)
+		if (popupEl != null) {
+			const popupRect = popupEl.getBoundingClientRect()
+			let leftOffset = panelRef.value.offsetLeft
+			let topOffset = panelRef.value.offsetTop
+			let parentEl = panelRef.value.parentElement
+			while (parentEl != null && parentEl != popupEl) {
+				leftOffset += parentEl.offsetLeft
+				topOffset += parentEl.offsetTop
+				parentEl = parentEl.parentElement
+			}
+			panelLeft.value = popupRect.left + leftOffset
+			panelTop.value = popupRect.top + topOffset
+			return
+		}
+		// #endif
+		panelLeft.value = rect.left
+		panelTop.value = rect.top
+	}
+
+
+	const updateByPanelPosition = (clientX : number, clientY : number, shouldCommit : boolean) => {
+		if (panelWidth.value <= 0 || panelHeight.value <= 0) return
+		const x = clamp(clientX - panelLeft.value, 0, panelWidth.value)
+		const y = clamp(clientY - panelTop.value, 0, panelHeight.value)
+		const saturation = panelWidth.value == 0 ? 0 : x / panelWidth.value * 100
+		const brightness = panelHeight.value == 0 ? 0 : (1 - y / panelHeight.value) * 100
+		updateStateFromHsv(current.h, saturation, brightness, current.a)
+		if (shouldCommit) {
+			updateModelValue()
+		} else {
+			emitChangingValue()
+		}
+	}
+
+	/**
+	 * 面板拖动
+	 */
+
+	//在鸿蒙蒸汽模式下用“组件根节点 + offset”的内部坐标系算 panel 位置，避免 Popup 里的 rect.top/left 偏移。
+	const onPanelTouchstart = async (e : UniTouchEvent) => {
+		panelDragging.value = true
+		await updatePanelRect()
+		updateByPanelPosition(e.touches[0].clientX, e.touches[0].clientY, false)
+	}
+
+	const onPanelTouchmove = (e : UniTouchEvent) => {
+		if (!panelDragging.value) return
+		updateByPanelPosition(e.touches[0].clientX, e.touches[0].clientY, false)
+		e.preventDefault()
+	}
+
+	const onPanelTouchend = () => {
+		panelDragging.value = false
+		syncFields()
+		updateModelValue()
+	}
+
+
+	const selectPreset = (value : string) => {
+		setColorFromString(value)
+		updateModelValue()
+	}
+
+	const updateHueBySlider = (value : number, shouldCommit : boolean) => {
+		updateStateFromHsv(value, current.s, current.v, current.a)
+		if (shouldCommit) {
+			updateModelValue()
+		} else {
+			emitChangingValue()
+		}
+	}
+
+	const onHueSliderChanging = (value : number) => {
+		updateHueBySlider(value, false)
+	}
+
+	const onHueSliderChange = (value : number) => {
+		updateHueBySlider(value, true)
+	}
+
+	const updateAlphaBySlider = (value : number, shouldCommit : boolean) => {
+		current.a = value / 100
+		syncFields()
+		if (shouldCommit) {
+			updateModelValue()
+		} else {
+			emitChangingValue()
+		}
+	}
+
+	const onAlphaSliderChanging = (value : number) => {
+		updateAlphaBySlider(value, false)
+	}
+
+	const onAlphaSliderChange = (value : number) => {
+		updateAlphaBySlider(value, true)
+	}
+
+	/**
+	 * HEX 颜色值输入框
+	 */
+
+	const onHexInput = (e : UniInputEvent) => {
+		hexInput.value = e.detail.value
+	}
+
+	const onHexBlur = () => {
+		const raw = hexInput.value.trim().replace('#', '')
+		if (raw.length == 3) {
+			hexInput.value = `#${raw[0]}${raw[0]}${raw[1]}${raw[1]}${raw[2]}${raw[2]}`
+		} else if (raw.length >= 8) {
+			hexInput.value = `#${raw.slice(0, 8)}`
+		} else if (raw.length >= 6) {
+			hexInput.value = `#${raw.slice(0, 6)}`
+		}
+		const parsed = parseHexColor(hexInput.value)
+		if (parsed == null) {
+			hexInput.value = color.value
+			return
+		}
+		updateStateFromRgb(parsed.r, parsed.g, parsed.b, parsed.a)
+		updateModelValue()
+	}
+
+	const onRgbBlur = () => {
+		const nextR = clampInt(parseNumber(redInput.value, current.r), 0, 255)
+		const nextG = clampInt(parseNumber(greenInput.value, current.g), 0, 255)
+		const nextB = clampInt(parseNumber(blueInput.value, current.b), 0, 255)
+		const nextA = percentToAlpha(clampInt(parseNumber(alphaInput.value, current.a * 100), 0, 100))
+		updateStateFromRgb(nextR, nextG, nextB, nextA)
+		updateModelValue()
+	}
+
+
+	//slider 的背景色
+	const sliderInactiveColor = computed<string>(() => `linear-gradient(to right, rgba(0, 0, 0,0), rgb(${current.r}, ${current.g}, ${current.b}))`)
+
+	/**
+	 * 面板的背景色
+	 */
+	const panelStyle = computed(() => {
+		const hueRgb = hsvToRgb(current.h, 100, 100)
+		return {
+			background: `rgb(${hueRgb.r}, ${hueRgb.g}, ${hueRgb.b})`
+		}
+	})
+
+	/**
+	 * 移动小球的背景色
+	 */
+	const panelCursorStyle = computed(() => {
+		return {
+			backgroundColor: `rgba(${current.r}, ${current.g}, ${current.b}, ${current.a})`
+		}
+	})
+
+	/**
+	 * 当前预览块的背景色
+	 */
+	const previewStyle = computed(() => {
+		const css = new Map<string, string>()
+		css.set('background', `rgba(${current.r}, ${current.g}, ${current.b}, ${current.a})`)
+		return css
+	})
+
+	//slider 按钮背景色
+	const sliderButtonColor = computed(() => `rgb(${current.r}, ${current.g}, ${current.b})`)
+
+	//蒸汽模式的input不支持css变量
+	const inputClass = computed(() => {
+
+		// #ifndef VUE3-VAPOR
+		return 'rice-color-picker__result__input'
+		// #endif
+
+		// #ifdef VUE3-VAPOR
+		return [
+			'rice-color-picker__result__input',
+			{
+				'rice-color-picker__text--dark': isDark.value
+			},
+		]
+		// #endif
+	})
+
+
+	watch(color, (newValue : string) => {
+		if (newValue.trim() == '' || syncingModelValue.value) {
+			return
+		}
+		setColorFromString(newValue)
+	})
+
+	onMounted(() => {
+		const initColor = (color.value != null && color.value != '') ? color.value : defaultColor
+		setColorFromString(initColor as string)
+	})
+</script>
+
+<style scoped lang="scss">
+	@mixin inputColor {
+		font-size: 15px;
+		/* #ifdef VUE3-VAPOR */
+		color: #969799;
+		/* #endif */
+		/* #ifndef VUE3-VAPOR */
+		color: var(--rice-text-color-2);
+		/* #endif */
+	}
+
+	.rice-color-picker {
+		padding: 12px;
+		border-top-left-radius: 12px;
+		border-top-right-radius: 12px;
+		background-color: var(--rice-color-picker-background);
+
+		&__panel {
+			position: relative;
+			height: 150px;
+			border-radius: 4px;
+			margin-bottom: 16px;
+
+			&--base,
+			&--white,
+			&--black {
+				position: absolute;
+				left: 0;
+				top: 0;
+				right: 0;
+				bottom: 0;
+			}
+
+			&--white {
+				background-image: linear-gradient(to right, rgb(255, 255, 255), rgba(255, 255, 255, 0));
+			}
+
+			&--black {
+				background-image: linear-gradient(to top, rgb(0, 0, 0), rgba(0, 0, 0, 0));
+			}
+
+			&--cursor {
+				position: absolute;
+				width: 20px;
+				height: 20px;
+				transform: translate(-50%, -50%);
+				border-radius: 999px;
+				border: 2px solid #fff;
+			}
+		}
+
+		&__slider {
+			flex-direction: row;
+			align-items: center;
+
+			&__preview {
+				height: 36px;
+				width: 36px;
+				border-radius: 4px;
+				margin-right: 12px;
+			}
+
+			&__drag {
+				flex: 1;
+			}
+
+			&__view {
+				position: relative;
+				align-items: center;
+				justify-content: center;
+				height: 24px;
+			}
+		}
+
+		&--slider {
+			position: relative;
+			z-index: 2;
+			width: 100%;
+		}
+
+		&--alpha {
+			position: absolute;
+			z-index: 1;
+			top: 50%;
+			left: 0;
+			width: 100%;
+			transform: translateY(-50%);
+			flex-direction: row;
+			height: 8px;
+			border-radius: 8px;
+
+			&__img {
+				height: 100%;
+			}
+		}
+
+
+		&__preset {
+			flex-direction: row;
+			align-items: center;
+			flex-wrap: wrap;
+			margin-top: 16px;
+
+			&__item {
+				width: 24px;
+				height: 24px;
+				border-radius: 4px;
+				margin-top: 8px;
+				margin-right: 8px;
+				border: 1px solid var(--rice-border-color);
+
+			}
+
+			&__view {
+				width: 100%;
+				height: 100%;
+			}
+		}
+	}
+
+	.rice-color-picker__result {
+		margin-top: 12px;
+		flex-direction: row;
+		justify-content: center;
+
+		&__box {
+			flex-direction: row;
+			align-items: center;
+			justify-content: center;
+			flex: 1;
+			margin-left: 12px;
+			border: 1px solid var(--rice-border-color);
+			border-radius: 4px;
+			height: 28px;
+		}
+
+		&__input {
+			@include inputColor;
+			flex: 1;
+			text-align: center;
+			border-right: 1px solid var(--rice-border-color);
+			height: 100%;
+		}
+
+
+		&__alpha {
+			flex-direction: row;
+			align-items: center;
+			flex: 1;
+			height: 100%;
+		}
+
+		&__input2 {
+			@include inputColor;
+			flex: 1;
+			height: 100%;
+			text-align: right;
+			padding-right: 2px;
+		}
+
+		&__text {
+			@include inputColor;
+			text-align: center;
+			width: 65px;
+			/* #ifdef VUE3-VAPOR */
+			color: var(--rice-text-color-2);
+			/* #endif */
+		}
+
+		&__text2 {
+			@include inputColor;
+			width: 36%;
+			/* #ifdef VUE3-VAPOR */
+			color: var(--rice-text-color-2);
+			/* #endif */
+		}
+
+		&__symbol {
+			width: 30%;
+			text-align: right;
+			padding-right: 2px;
+		}
+	}
+
+	.rice-color-picker__switch {
+		flex-direction: row;
+		align-items: center;
+		justify-content: center;
+		height: 28px;
+		width: 72px;
+		border-radius: 4px;
+		border: 1px solid var(--rice-border-color);
+
+		&__text {
+			font-size: 14px;
+			color: var(--rice-text-color-2);
+		}
+	}
+
+	/* #ifdef VUE3-VAPOR && APP */
+	.rice-color-picker__text--dark {
+		color: #707070;
+	}
+
+	/* #endif */
+
+
+	// #ifdef APP
+	.rice-color-picker__hub {
+		position: absolute;
+		z-index: 1;
+		top: 50%;
+		left: 0;
+		width: 100%;
+		transform: translateY(-50%);
+		flex-direction: row;
+		height: 8px;
+		border-radius: 8px;
+
+		&__item {
+			width: 16.8%;
+			height: 100%;
+		}
+
+		&__item1 {
+			background: linear-gradient(to right, rgb(255, 0, 0), rgb(255, 255, 0));
+		}
+
+		&__item2 {
+			background: linear-gradient(to right, rgb(255, 255, 0), rgb(0, 255, 0));
+		}
+
+		&__item3 {
+			background: linear-gradient(to right, rgb(0, 255, 0), rgb(0, 255, 255));
+		}
+
+		&__item4 {
+			background: linear-gradient(to right, rgb(0, 255, 255), rgb(0, 0, 255));
+		}
+
+		&__item5 {
+			background: linear-gradient(to right, rgb(0, 0, 255), rgb(255, 0, 255));
+		}
+
+		&__item6 {
+			background: linear-gradient(to right, rgb(255, 0, 255), rgb(255, 0, 0));
+		}
+	}
+
+	// #endif
+</style>

@@ -1,0 +1,87 @@
+@use 'sass:map';
+@import "../../libs/style/theme.scss";
+
+
+$tag-size: (
+  'large':(
+		height:30px,
+    padding:0 14px,
+    fontSize:15px,
+  ),
+	
+  'small':(
+		height:22px,
+    padding:0 6px,
+    fontSize:12px,
+  ),
+);
+
+
+
+@mixin tagSize(){
+	@each $key,
+	$value in $tag-size {
+		$selector: &+'--'+$key;
+		$textSelector: &+'--'+$key+'__text';
+		@at-root #{$selector} {
+			height: map.get($tag-size, $key, 'height');
+			padding: map.get($tag-size, $key, 'padding');
+		}
+		@at-root  #{$textSelector}{
+			font-size: map.get($tag-size, $key, 'fontSize');
+		}
+	}
+}
+
+
+$tag-types: (
+  primary: (
+    bg-color: var(--rice-primary-color-1),
+    border-color: var(--rice-primary-color)
+  ),
+  success: (
+    bg-color: var(--rice-success-color-1),
+    border-color: var(--rice-success-color)
+  ),
+  warning: (
+    bg-color: var(--rice-warning-color-1),
+    border-color: var(--rice-warning-color)
+  ),
+  error: (
+    bg-color: var(--rice-error-color-1),
+    border-color: var(--rice-error-color)
+  )
+);
+
+
+@mixin tagTheme(){
+	@each $theme,
+	$color in $theme-colors {
+		&--#{$theme} {
+			background-color: $color;
+			border: 1px solid $color;
+
+		}
+		&--#{$theme}__text {
+			color: var(--rice-text-color-white);
+		}
+		&--#{$theme}--plain__text {
+			color:  $color;
+		}
+	
+	};
+	
+
+	
+	@each $type, $colors in $tag-types {
+	  &--#{$type}--plain-fill {
+	    background-color: map-get($colors, bg-color);
+	    border-color: map-get($colors, border-color);
+			/* #ifndef APP */
+			color: map-get($colors, border-color);
+			/* #endif */
+	  }
+	}
+	
+	
+}

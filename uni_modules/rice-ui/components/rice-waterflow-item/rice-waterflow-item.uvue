@@ -1,0 +1,126 @@
+<template>
+	<!-- #ifdef APP && !VUE3-VAPOR -->
+	<flow-item :type="type">
+		<slot :remeasure="remeasure"></slot>
+	</flow-item>
+	<!-- #endif -->
+
+	<!-- #ifdef VUE3-VAPOR || MP || WEB -->
+	<view class="rice-waterflow-item" :style="itemStyle" ref="itemRef">
+		<slot :remeasure="remeasure"></slot>
+	</view>
+	<!-- #endif -->
+
+</template>
+
+<script setup>
+	import { useParent } from "../../libs/use"
+	import { WaterflowProvide, waterflowInjectKey, waterflowName } from "../rice-waterflow/index.uts"
+	import { WaterflowItemProps } from "./type.uts"
+	defineOptions({
+		name: 'rice-waterflow-item',
+		styleIsolation: 'app-and-page'
+	})
+
+	const props = withDefaults(defineProps<WaterflowItemProps>(), {
+		type: 0
+	})
+
+	// #ifdef APP && !VUE3-VAPOR
+	const remeasure = () => { }
+	// #endif
+
+	const slots = defineSlots<{
+		default(props : { remeasure : () => void }) : any
+	}>()
+
+	// #ifdef VUE3-VAPOR || MP || WEB
+
+	const itemRef = shallowRef<UniElement | null>(null)
+	const { childIndex } = useParent(waterflowName)
+	const waterflow = inject<WaterflowProvide | null>(waterflowInjectKey, null)
+	let measureTimer : number | null = null
+
+	const itemStyle = computed(() => {
+		const css = new Map<string, string>()
+		const index = childIndex.value
+		const width = waterflow?.itemWidth.value ?? 0
+		const layout = index >= 0 ? waterflow?.itemLayouts.value[index] : null
+		if (width > 0) {
+			css.set('width', width + 'px')
+		}
+		if (layout != null) {
+			css.set('transform', `translate(${layout.x}px, ${layout.y}px)`)
+		}
+		css.set('opacity', waterflow?.ready.value == true && layout != null ? '1' : '0')
+		return css
+	})
+
+	const measure = async () => {
+		if (itemRef.value == null || childIndex.value < 0) return
+		await nextTick()
+		const rect = await itemRef.value!.getBoundingClientRectAsync()!
+		waterflow?.updateItemHeight(childIndex.value, rect.height)
+	}
+
+	// 非 App 端对外暴露的重新测量入口，适合图片加载完成后调用。
+	let remeasureTimer : number | null = null
+	const remeasure = () => {
+		// #ifdef WEB || MP
+		if (remeasureTimer != null) {
+			clearTimeout(remeasureTimer!)
+		}
+		remeasureTimer = setTimeout(() => {
+			requestMeasure(0)
+		}, 100)
+		// #endif
+	}
+
+	const requestMeasure = (delay = 16) => {
+		if (measureTimer != null) {
+			clearTimeout(measureTimer)
+		}
+		measureTimer = setTimeout(() => {
+			measure()
+		}, delay)
+	}
+
+	watch(() => waterflow?.itemWidth.value ?? 0, () => {
+		requestMeasure(24)
+	})
+
+	onMounted(() => {
+		waterflow?.requestLayout()
+		requestMeasure(24)
+	})
+
+	// #ifdef VUE3-VAPOR
+	//蒸汽模式在这里监听可以在内容方式改变时重新排版
+	onUpdated(() => {
+		requestMeasure(24)
+	})
+
+	// #endif
+
+	onUnmounted(() => {
+		if (measureTimer != null) clearTimeout(measureTimer!)
+		if (remeasureTimer != null) clearTimeout(remeasureTimer!)
+		waterflow?.requestLayout()
+	})
+
+	defineExpose({
+		remeasure,
+	})
+	// #endif
+</script>
+
+<style scoped lang="scss">
+	/* #ifdef VUE3-VAPOR || MP || WEB */
+	.rice-waterflow-item {
+		position: absolute;
+		left: 0;
+		top: 0;
+		box-sizing: border-box;
+	}
+	/* #endif */
+</style>

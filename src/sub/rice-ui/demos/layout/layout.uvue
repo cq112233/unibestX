@@ -1,0 +1,128 @@
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-30px">
+    <NavBar title="Layout 布局" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
+    <view class="p-16px">
+      <!-- 基础栅格 -->
+      <view class="demo-block">
+        <text class="demo-label" :style="{ borderLeftColor: currentTheme }">基础 24 栅格</text>
+        <view class="mb-10px">
+          <rice-row>
+            <rice-col :span="24">
+              <view class="col-item" :style="{ backgroundColor: currentTheme }">
+                <text class="text-white text-12px">span: 24</text>
+              </view>
+            </rice-col>
+          </rice-row>
+        </view>
+        <view class="mb-10px">
+          <rice-row>
+            <rice-col :span="12">
+              <view class="col-item opacity-80" :style="{ backgroundColor: currentTheme }">
+                <text class="text-white text-12px">span: 12</text>
+              </view>
+            </rice-col>
+            <rice-col :span="12">
+              <view class="col-item" :style="{ backgroundColor: currentTheme }">
+                <text class="text-white text-12px">span: 12</text>
+              </view>
+            </rice-col>
+          </rice-row>
+        </view>
+        <view class="mb-10px">
+          <rice-row>
+            <rice-col :span="8">
+              <view class="col-item opacity-80" :style="{ backgroundColor: currentTheme }">
+                <text class="text-white text-12px">span: 8</text>
+              </view>
+            </rice-col>
+            <rice-col :span="8">
+              <view class="col-item" :style="{ backgroundColor: currentTheme }">
+                <text class="text-white text-12px">span: 8</text>
+              </view>
+            </rice-col>
+            <rice-col :span="8">
+              <view class="col-item opacity-80" :style="{ backgroundColor: currentTheme }">
+                <text class="text-white text-12px">span: 8</text>
+              </view>
+            </rice-col>
+          </rice-row>
+        </view>
+      </view>
+
+      <!-- 列间距 (Gutter) -->
+      <view class="demo-block">
+        <text class="demo-label" :style="{ borderLeftColor: currentTheme }">列间距 (Gutter)</text>
+        <rice-row :gutter="12">
+          <rice-col :span="8">
+            <view class="col-item opacity-80" :style="{ backgroundColor: currentTheme }">
+              <text class="text-white text-12px">span: 8</text>
+            </view>
+          </rice-col>
+          <rice-col :span="8">
+            <view class="col-item" :style="{ backgroundColor: currentTheme }">
+              <text class="text-white text-12px">span: 8</text>
+            </view>
+          </rice-col>
+          <rice-col :span="8">
+            <view class="col-item opacity-80" :style="{ backgroundColor: currentTheme }">
+              <text class="text-white text-12px">span: 8</text>
+            </view>
+          </rice-col>
+        </rice-row>
+      </view>
+
+      <!-- 列偏移 (Offset) -->
+      <view class="demo-block">
+        <text class="demo-label" :style="{ borderLeftColor: currentTheme }">列偏移 (Offset)</text>
+        <view class="mb-10px">
+          <rice-row>
+            <rice-col :span="8">
+              <view class="col-item opacity-80" :style="{ backgroundColor: currentTheme }">
+                <text class="text-white text-12px">span: 8</text>
+              </view>
+            </rice-col>
+            <rice-col :span="8" :offset="8">
+              <view class="col-item" :style="{ backgroundColor: currentTheme }">
+                <text class="text-white text-12px">offset: 8</text>
+              </view>
+            </rice-col>
+          </rice-row>
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { useAppStore } from '@/src/store'
+import { computed } from 'vue'
+
+const appStore = useAppStore()
+const currentTheme = computed((): string => appStore.state.theme)
+</script>
+
+<style scoped>
+.demo-block {
+  margin-bottom: 12px;
+  padding: 14px;
+  background-color: #ffffff;
+  border-radius: 10px;
+}
+.demo-label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #334155;
+  margin-bottom: 12px;
+  padding-left: 6px;
+  border-left-width: 3px;
+  border-left-style: solid;
+}
+.col-item {
+  height: 36px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+}
+</style>

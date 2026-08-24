@@ -1,0 +1,9 @@
+export type IconProps = {
+	name ?: string,
+	size ?: string | number,
+	color ?: string,
+	bold ?: boolean,
+	fontFamily ?: string,
+	stop ?: boolean,
+	customStyle ?: UTSJSONObject,
+}

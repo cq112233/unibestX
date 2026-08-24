@@ -1,0 +1,70 @@
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-30px">
+    <NavBar title="Dialog 对话框" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
+    <view class="p-16px">
+      <!-- 基础对话框 -->
+      <view class="demo-block">
+        <text class="demo-label" :style="{ borderLeftColor: currentTheme }">提示弹窗</text>
+        <rice-button type="primary" :color="currentTheme" text="打开确认对话框" @click="showDialog1 = true" />
+        <rice-dialog
+          v-model:show="showDialog1"
+          title="系统提示"
+          message="是否确认退出当前登录状态？"
+          :confirm-button-color="currentTheme"
+          :show-cancel-button="true"
+          @confirm="onConfirm"
+        />
+      </view>
+
+      <!-- 圆角按钮对话框 -->
+      <view class="demo-block">
+        <text class="demo-label" :style="{ borderLeftColor: currentTheme }">圆角按钮风格</text>
+        <rice-button type="success" text="打开圆角对话框" @click="showDialog2 = true" />
+        <rice-dialog
+          v-model:show="showDialog2"
+          title="恭喜完成"
+          message="恭喜您已成功完成全部设置！"
+          button-theme="round"
+          :confirm-button-color="currentTheme"
+          :show-cancel-button="false"
+        />
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { useAppStore } from '@/src/store'
+import { computed } from 'vue'
+
+const appStore = useAppStore()
+const currentTheme = computed((): string => appStore.state.theme)
+
+const showDialog1 = ref(false)
+const showDialog2 = ref(false)
+
+function onConfirm() {
+  uni.showToast({
+    title: '已确认操作',
+    icon: 'success',
+  })
+}
+</script>
+
+<style scoped>
+.demo-block {
+  margin-bottom: 12px;
+  padding: 14px;
+  background-color: #ffffff;
+  border-radius: 10px;
+}
+.demo-label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #334155;
+  margin-bottom: 12px;
+  padding-left: 6px;
+  border-left-width: 3px;
+  border-left-style: solid;
+}
+</style>

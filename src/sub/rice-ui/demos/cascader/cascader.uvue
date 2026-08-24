@@ -1,0 +1,105 @@
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-30px">
+    <NavBar title="Cascader 级联选择" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
+    <view class="p-16px">
+      <!-- 基础用法 -->
+      <view class="demo-block">
+        <text class="demo-label" :style="{ borderLeftColor: currentTheme }">级联选择器</text>
+        <view class="rounded-8px overflow-hidden border-width-1px border-solid border-color-[#e2e8f0]">
+          <rice-cascader
+            :options="options"
+            :use-popup="false"
+            :active-color="currentTheme"
+            title="选择所在地区"
+            @finish="onFinish"
+          />
+        </view>
+        <view class="mt-12px">
+          <text class="text-13px text-[#64748b]">已选结果：{{ resultText }}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { useAppStore } from '@/src/store'
+import type { CascaderEvent, CascaderOption } from '@/uni_modules/rice-ui'
+import { computed } from 'vue'
+
+const appStore = useAppStore()
+const currentTheme = computed((): string => appStore.state.theme)
+
+const resultText = ref('未选择')
+
+const options: CascaderOption[] = [
+  {
+    text: '浙江省',
+    value: '330000',
+    children: [
+      {
+        text: '杭州市',
+        value: '330100',
+        children: [
+          { text: '西湖区', value: '330106' },
+          { text: '余杭区', value: '330110' },
+          { text: '滨江区', value: '330108' },
+        ] as CascaderOption[],
+      },
+      {
+        text: '宁波市',
+        value: '330200',
+        children: [
+          { text: '海曙区', value: '330203' },
+          { text: '江北区', value: '330205' },
+        ] as CascaderOption[],
+      },
+    ] as CascaderOption[],
+  },
+  {
+    text: '江苏省',
+    value: '320000',
+    children: [
+      {
+        text: '南京市',
+        value: '320100',
+        children: [
+          { text: '玄武区', value: '320102' },
+          { text: '秦淮区', value: '320104' },
+        ] as CascaderOption[],
+      },
+      {
+        text: '苏州市',
+        value: '320500',
+        children: [
+          { text: '姑苏区', value: '320508' },
+          { text: '虎丘区', value: '320505' },
+        ] as CascaderOption[],
+      },
+    ] as CascaderOption[],
+  },
+]
+
+function onFinish(e: CascaderEvent) {
+  const names = e.selectedOptions.map((item: CascaderOption): string => item.text)
+  resultText.value = names.join(' / ')
+}
+</script>
+
+<style scoped>
+.demo-block {
+  margin-bottom: 12px;
+  padding: 14px;
+  background-color: #ffffff;
+  border-radius: 10px;
+}
+.demo-label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #334155;
+  margin-bottom: 12px;
+  padding-left: 6px;
+  border-left-width: 3px;
+  border-left-style: solid;
+}
+</style>

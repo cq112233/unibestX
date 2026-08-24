@@ -1,0 +1,53 @@
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-30px">
+    <NavBar title="Uploader 上传" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
+    <view class="p-16px">
+      <!-- 基础图片上传 -->
+      <view class="demo-block">
+        <text class="demo-label" :style="{ borderLeftColor: currentTheme }">图片上传与预览</text>
+        <rice-uploader
+          :model-value="fileList"
+          :max-count="3"
+          @update:model-value="onUpdateFileList"
+        />
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { useAppStore } from '@/src/store'
+import type { UploaderFileItem } from '@/uni_modules/rice-ui'
+import { computed, ref } from 'vue'
+
+const appStore = useAppStore()
+const currentTheme = computed((): string => appStore.state.theme)
+
+const fileList = ref<UploaderFileItem[]>([
+  {
+    url: '/static/logo.png',
+  } as UploaderFileItem,
+])
+
+function onUpdateFileList(files: UploaderFileItem[]) {
+  fileList.value = files
+}
+</script>
+
+<style scoped>
+.demo-block {
+  margin-bottom: 12px;
+  padding: 14px;
+  background-color: #ffffff;
+  border-radius: 10px;
+}
+.demo-label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #334155;
+  margin-bottom: 12px;
+  padding-left: 6px;
+  border-left-width: 3px;
+  border-left-style: solid;
+}
+</style>

@@ -1,0 +1,130 @@
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-30px">
+    <NavBar title="Button 按钮" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
+    <view class="p-16px">
+      <!-- 基础用法 -->
+      <view class="demo-block">
+        <text class="demo-label" :style="{ borderLeftColor: currentTheme }">按钮类型</text>
+        <view class="flex-col">
+          <view class="mb-10px">
+            <rice-button type="primary" :color="currentTheme" text="主要按钮" />
+          </view>
+          <view class="mb-10px">
+            <rice-button type="success" text="成功按钮" />
+          </view>
+          <view class="mb-10px">
+            <rice-button type="warning" text="警告按钮" />
+          </view>
+          <view class="mb-10px">
+            <rice-button type="error" text="危险按钮" />
+          </view>
+          <view class="mb-10px">
+            <rice-button type="info" text="信息按钮" />
+          </view>
+          <view class="mb-10px">
+            <rice-button type="default" text="默认按钮" />
+          </view>
+        </view>
+      </view>
+
+      <!-- 朴素按钮 -->
+      <view class="demo-block">
+        <text class="demo-label" :style="{ borderLeftColor: currentTheme }">朴素按钮 (Plain)</text>
+        <view class="flex-row items-center flex-wrap">
+          <view class="mr-10px mb-10px">
+            <rice-button type="primary" :color="currentTheme" text="朴素主要" :plain="true" />
+          </view>
+          <view class="mr-10px mb-10px">
+            <rice-button type="success" text="朴素成功" :plain="true" />
+          </view>
+          <view class="mr-10px mb-10px">
+            <rice-button type="warning" text="朴素警告" :plain="true" />
+          </view>
+          <view class="mb-10px">
+            <rice-button type="error" text="朴素危险" :plain="true" />
+          </view>
+        </view>
+      </view>
+
+      <!-- 按钮尺寸 -->
+      <view class="demo-block">
+        <text class="demo-label" :style="{ borderLeftColor: currentTheme }">按钮尺寸 (Size)</text>
+        <view class="flex-col">
+          <view class="mb-10px">
+            <rice-button type="primary" :color="currentTheme" text="大号按钮 (large)" size="large" />
+          </view>
+          <view class="mb-10px">
+            <rice-button type="primary" :color="currentTheme" text="普通按钮 (normal)" size="normal" />
+          </view>
+          <view class="flex-row items-center">
+            <view class="mr-10px">
+              <rice-button type="primary" :color="currentTheme" text="小型按钮 (small)" size="small" />
+            </view>
+            <view><rice-button type="primary" :color="currentTheme" text="迷你 (mini)" size="mini" /></view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 图标与加载 -->
+      <view class="demo-block">
+        <text class="demo-label" :style="{ borderLeftColor: currentTheme }">图标与加载状态</text>
+        <view class="flex-row items-center flex-wrap">
+          <view class="mr-10px mb-10px">
+            <rice-button type="primary" :color="currentTheme" icon="search" text="搜索" />
+          </view>
+          <view class="mr-10px mb-10px">
+            <rice-button type="success" icon="plus" text="添加" />
+          </view>
+          <view class="mr-10px mb-10px">
+            <rice-button type="primary" :color="currentTheme" :loading="true" loading-text="加载中..." />
+          </view>
+          <view class="mb-10px">
+            <rice-button type="primary" :color="currentTheme" :disabled="true" text="禁用状态" />
+          </view>
+        </view>
+      </view>
+
+      <!-- 形状与自定义颜色 -->
+      <view class="demo-block">
+        <text class="demo-label" :style="{ borderLeftColor: currentTheme }">形状与自定义颜色</text>
+        <view class="flex-row items-center flex-wrap">
+          <view class="mr-10px mb-10px">
+            <rice-button type="primary" :color="currentTheme" shape="round" text="圆形按钮" />
+          </view>
+          <view class="mr-10px mb-10px">
+            <rice-button color="#7232dd" text="单色按钮" />
+          </view>
+          <view class="mb-10px">
+            <rice-button color="linear-gradient(to right, #ff6034, #ee0a24)" text="渐变按钮" />
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { useAppStore } from '@/src/store'
+import { computed } from 'vue'
+
+const appStore = useAppStore()
+const currentTheme = computed((): string => appStore.state.theme)
+</script>
+
+<style scoped>
+.demo-block {
+  margin-bottom: 12px;
+  padding: 14px;
+  background-color: #ffffff;
+  border-radius: 10px;
+}
+.demo-label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #334155;
+  margin-bottom: 12px;
+  padding-left: 6px;
+  border-left-width: 3px;
+  border-left-style: solid;
+}
+</style>
