@@ -1,0 +1,314 @@
+<template>
+	<view class="up-popup" :class="[customClass]">
+		<up-overlay
+			:show="show && !pageInline"
+			@click="overlayClick"
+			v-if="overlay && !pageInline"
+			:zIndex="zIndex"
+			:duration="overlayDuration"
+			:customStyle="overlayStyle"
+			:opacity="overlayOpacity"
+		></up-overlay>
+		<up-transition
+			:show="pageInline ? true : show"
+			:customStyle="transitionStyle"
+			:mode="pageInline ? 'none' : position"
+			:duration="duration"
+			@afterEnter="afterEnter"
+			@click="clickHandler"
+		>
+			<view
+				class="up-popup__content"
+				:style="[contentStyle]"
+				@tap.stop="noop"
+			>
+				<up-status-bar v-if="safeAreaInsetTop"></up-status-bar>
+				<slot></slot>
+				<view
+					v-if="closeable"
+					@tap.stop="close"
+					class="up-popup__content__close"
+					:class="['up-popup__content__close--' + closeIconPos]"
+					hover-class="up-popup__content__close--hover"
+					hover-stay-time="150"
+				>
+					<up-icon
+						name="close"
+						color="#909399"
+						size="18"
+						bold
+					></up-icon>
+				</view>
+				<up-safe-bottom v-if="safeAreaInsetBottom"></up-safe-bottom>
+			</view>
+		</up-transition>
+	</view>
+</template>
+
+<script setup lang="uts">
+import { computed, ref } from 'vue'
+import defProps from './popup'
+import { addUnit, addStyle, deepMerge } from '../../libs/function/index'
+
+defineOptions({
+  name: 'up-popup'
+})
+
+const props = defineProps({
+  show: {
+    type: Boolean,
+    default: false
+  },
+  overlay: {
+    type: Boolean,
+    default: true
+  },
+  mode: {
+    type: String,
+    default: 'bottom'
+  },
+  duration: {
+    type: [String, Number],
+    default: 300
+  },
+  closeable: {
+    type: Boolean,
+    default: false
+  },
+  overlayStyle: {
+    type: [Object, String],
+    default: () => ({})
+  },
+  closeOnClickOverlay: {
+    type: Boolean,
+    default: true
+  },
+  zIndex: {
+    type: [String, Number],
+    default: 10075
+  },
+  safeAreaInsetBottom: {
+    type: Boolean,
+    default: true
+  },
+  safeAreaInsetTop: {
+    type: Boolean,
+    default: false
+  },
+  closeIconPos: {
+    type: String,
+    default: 'top-right'
+  },
+  round: {
+    type: [Boolean, String, Number],
+    default: 0
+  },
+  zoom: {
+    type: Boolean,
+    default: true
+  },
+  bgColor: {
+    type: String,
+    default: ''
+  },
+  overlayOpacity: {
+    type: [Number, String],
+    default: 0.5
+  },
+  pageInline: {
+    type: Boolean,
+    default: false
+  },
+  customClass: {
+    type: String,
+    default: ''
+  },
+  customStyle: {
+    type: Object,
+    default: () => ({})
+  }
+})
+
+const emit = defineEmits(['open', 'close', 'click', 'update:show'])
+
+const overlayDuration = computed<number>(() => {
+  return parseInt(props.duration.toString()) + 50
+})
+
+const position = computed<string>(() => {
+  if (props.mode === 'center') {
+    return props.zoom ? 'fade-zoom' : 'fade'
+  }
+  if (props.mode === 'left') {
+    return 'slide-left'
+  }
+  if (props.mode === 'right') {
+    return 'slide-right'
+  }
+  if (props.mode === 'bottom') {
+    return 'slide-up'
+  }
+  if (props.mode === 'top') {
+    return 'slide-down'
+  }
+  return ''
+})
+
+const transitionStyle = computed<UTSJSONObject>(() => {
+  const style = {
+    display: 'flex',
+  } as UTSJSONObject
+  if (!props.pageInline) {
+    style['zIndex'] = parseInt(props.zIndex.toString()) + 1
+    style['position'] = 'fixed'
+  }
+  style[props.mode] = 0
+  if (props.mode === 'left' || props.mode === 'right') {
+    return deepMerge(style, {
+      bottom: 0,
+      top: 0,
+    }) as UTSJSONObject
+  } else if (props.mode === 'top' || props.mode === 'bottom') {
+    return deepMerge(style, {
+      left: 0,
+      right: 0,
+    }) as UTSJSONObject
+  } else if (props.mode === 'center') {
+    return deepMerge(style, {
+      alignItems: 'center',
+      'justify-content': 'center',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0
+    }) as UTSJSONObject
+  }
+  return style
+})
+
+const contentStyle = computed<UTSJSONObject>(() => {
+  const style = {} as UTSJSONObject
+  if (props.mode !== 'center') {
+    style['flex'] = 1
+  }
+  if (props.bgColor != '') {
+    style['backgroundColor'] = props.bgColor
+  }
+  if (props.round.toString() != '' && props.round != false) {
+    const value = addUnit(props.round)
+    if (props.mode === 'top') {
+      style['borderBottomLeftRadius'] = value
+      style['borderBottomRightRadius'] = value
+    } else if (props.mode === 'bottom') {
+      style['borderTopLeftRadius'] = value
+      style['borderTopRightRadius'] = value
+    } else if (props.mode === 'center') {
+      style['borderRadius'] = value
+    }
+  }
+  return deepMerge(style, addStyle(props.customStyle)) as UTSJSONObject
+})
+
+function noop() {}
+
+function overlayClick(): void {
+  if (props.closeOnClickOverlay) {
+    emit('update:show', false)
+    emit('close')
+  }
+}
+
+function close(): void {
+  emit('update:show', false)
+  emit('close')
+}
+
+function afterEnter(): void {
+  emit('open')
+}
+
+function clickHandler(): void {
+  if (props.mode === 'center') {
+    overlayClick()
+  }
+  emit('click')
+}
+</script>
+
+<style lang="scss" scoped>
+	@import "../../libs/css/components.scss";
+	$up-popup-flex:1 !default;
+	$up-popup-content-background-color: #fff !default;
+
+	.up-popup {
+		flex: $up-popup-flex;
+
+		&__content {
+			background-color: $up-popup-content-background-color;
+			position: relative;
+
+			&--round-top {
+				border-top-left-radius: 0;
+				border-top-right-radius: 0;
+				border-bottom-left-radius: 10px;
+				border-bottom-right-radius: 10px;
+			}
+
+			&--round-left {
+				border-top-left-radius: 0;
+				border-top-right-radius: 10px;
+				border-bottom-left-radius: 0;
+				border-bottom-right-radius: 10px;
+			}
+
+			&--round-right {
+				border-top-left-radius: 10px;
+				border-top-right-radius: 0;
+				border-bottom-left-radius: 10px;
+				border-bottom-right-radius: 0;
+			}
+
+			&--round-bottom {
+				border-top-left-radius: 10px;
+				border-top-right-radius: 10px;
+				border-bottom-left-radius: 0;
+				border-bottom-right-radius: 0;
+			}
+
+			&--round-center {
+				border-top-left-radius: 10px;
+				border-top-right-radius: 10px;
+				border-bottom-left-radius: 10px;
+				border-bottom-right-radius: 10px;
+			}
+
+			&__close {
+				position: absolute;
+
+				&--hover {
+					opacity: 0.4;
+				}
+			}
+
+			&__close--top-left {
+				top: 15px;
+				left: 15px;
+			}
+
+			&__close--top-right {
+				top: 15px;
+				right: 15px;
+			}
+
+			&__close--bottom-left {
+				bottom: 15px;
+				left: 15px;
+			}
+
+			&__close--bottom-right {
+				right: 15px;
+				bottom: 15px;
+			}
+		}
+	}
+</style>

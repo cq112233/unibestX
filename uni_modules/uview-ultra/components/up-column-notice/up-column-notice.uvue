@@ -1,0 +1,194 @@
+<template>
+	<view
+		class="up-notice"
+		@tap="clickHandler"
+	>
+		<slot name="icon">
+			<view
+				class="up-notice__left-icon"
+				v-if="icon"
+			>
+				<up-icon
+					:name="icon"
+					:color="color"
+					size="19"
+				></up-icon>
+			</view>
+		</slot>
+		<swiper
+			:disable-touch="disableTouch"
+			:vertical="step ? false : true"
+			circular
+			:interval="duration"
+			:autoplay="true"
+			class="up-notice__swiper"
+			@change="noticeChange"
+		>
+			<swiper-item
+				v-for="(item, index) in text"
+				:key="index"
+				class="up-notice__swiper__item"
+			>
+				<text
+					class="up-notice__swiper__item__text up-line-1"
+					:style="[textStyle]"
+				>{{ item }}</text>
+			</swiper-item>
+		</swiper>
+		<view
+			class="up-notice__right-icon"
+			v-if="['link', 'closable'].includes(mode)"
+		>
+			<up-icon
+				v-if="mode === 'link'"
+				name="arrow-right"
+				:size="17"
+				:color="color"
+			></up-icon>
+			<up-icon
+				v-if="mode === 'closable'"
+				name="close"
+				:size="16"
+				:color="color"
+				@click="close"
+			></up-icon>
+		</view>
+	</view>
+</template>
+
+<script setup lang="uts">
+import type { PropType } from 'vue'
+import { computed, reactive } from 'vue';
+import defProps from './columnNotice';
+import { addUnit, error } from '../../libs/function/index';
+import { array as testArray } from '../../libs/function/test';
+
+// 定义属性
+const props = defineProps({
+    text: {
+		type: Array as PropType<string[]>,
+	    default: () : Array<string> => {
+		    return []
+	    }
+    },
+    icon: {
+        type: String,
+        default: () => defProps.getString('columnNotice.icon')
+    },
+    mode: {
+        type: String,
+        default: () => defProps.getString('columnNotice.mode')
+    },
+    color: {
+        type: String,
+        default: () => defProps.getString('columnNotice.color')
+    },
+    bgColor: {
+        type: String,
+        default: () => defProps.getString('columnNotice.bgColor')
+    },
+    fontSize: {
+        type: [String, Number],
+        default: () => defProps.getNumber('columnNotice.fontSize')
+    },
+    speed: {
+        type: [String, Number],
+        default: () => defProps.getNumber('columnNotice.speed')
+    },
+    step: {
+        type: Boolean,
+        default: () => defProps.getBoolean('columnNotice.step')
+    },
+    duration: {
+        type: [String, Number],
+        default: () => defProps.getNumber('columnNotice.duration')
+    },
+    disableTouch: {
+        type: Boolean,
+        default: () => defProps.getBoolean('columnNotice.disableTouch')
+    }
+});
+
+// 定义事件
+const emit = defineEmits(['click', 'close']);
+
+// 响应式数据
+const index = ref(0)
+
+// 文字内容的样式
+const textStyle = computed(() => {
+    let style = {};
+    style['color'] = props.color;
+    style['fontSize'] = addUnit(props.fontSize);
+    return style;
+});
+
+// 垂直或者水平滚动
+const vertical = computed(() => {
+    if (props.mode == 'horizontal') return false;
+    else return true;
+});
+
+// 方法
+const noticeChange = (e: UniSwiperChangeEvent) => {
+    index.value = e.detail.current;
+};
+
+// 点击通告栏
+const clickHandler = () => {
+    emit('click', index.value);
+};
+
+// 点击关闭按钮
+const close = () => {
+    emit('close');
+};
+
+// 监听text的变化
+import { watch } from 'vue';
+watch((): string[] => props.text, (newValue: string[]) => {
+    if (!testArray(newValue)) {
+        error('noticebar组件direction为column时，要求text参数为数组形式');
+    }
+}, {
+    immediate: true
+});
+</script>
+
+<style lang="scss" scoped>
+	@import "../../libs/css/components.scss";
+
+	.up-notice {
+		@include flex;
+		align-items: center;
+		justify-content: space-between;
+
+		&__left-icon {
+			align-items: center;
+			margin-right: 5px;
+		}
+
+		&__right-icon {
+			margin-left: 5px;
+			align-items: center;
+		}
+
+		&__swiper {
+			height: 16px;
+			@include flex;
+			align-items: center;
+			flex: 1;
+
+			&__item {
+				@include flex;
+				align-items: center;
+				overflow: hidden;
+
+				&__text {
+					font-size: 14px;
+					color: $up-warning;
+				}
+			}
+		}
+	}
+</style>

@@ -1,0 +1,145 @@
+<template>
+	<view
+	    class="up-grid"
+		ref='up-grid'
+	    :style="[gridStyle]"
+	>
+		<slot />
+	</view>
+</template>
+
+<script setup lang="uts">
+	import type { PropType } from 'vue';
+	import { ref, computed, onMounted, watch, getCurrentInstance } from 'vue'
+	import { mpSharedMpOptions } from '../../libs/composable/useMp'
+	import { commonProps, useUltraUI } from '../../libs/composable/useUltraUI'
+	import { addStyle, deepMerge, upGetRect } from '../../libs/function/index'
+	import defProps from './grid.uts';
+	const { children, getChildren, addChild } = useUltraUI();
+	
+	const instance = getCurrentInstance()!.proxy!;
+	
+	// options
+	defineOptions({
+		name: 'up-grid'
+	});
+	
+	// props
+	const props = defineProps({
+		col: {
+			type: [String, Number],
+			default: defProps.getNumber('grid.col')
+		},
+		border: {
+			type: Boolean,
+			default: defProps.getBoolean('grid.border')
+		},
+		align: {
+			type: String,
+			default: defProps.getString('grid.align')
+		},
+	});
+	
+	// 定义事件
+	const emit = defineEmits<{
+		(e: 'click', name: any): void;
+	}>();
+	
+	// 定义响应式数据
+	const width = ref<number>(0);
+	
+	// 计算父组件的值是否发生变化
+	const parentDataCpu = computed(() => {
+		return {
+			col: props.col,
+			border: props.border,
+			align: props.align
+		}
+	});
+	
+	// 宫格对齐方式
+	const gridStyle = computed(() => {
+		let style = {};
+		switch (props.align) {
+			case 'left':
+				style['justifyContent'] = 'flex-start';
+				break;
+			case 'center':
+				style['justifyContent'] = 'center';
+				break;
+			case 'right':
+				style['justifyContent'] = 'flex-end';
+				break;
+			default:
+				style['justifyContent'] = 'flex-start';
+		};
+		return deepMerge(style, addStyle({}));
+	});
+	
+	// 获取父元素的尺寸
+	const getWidth = () => {
+		// @ts-ignore
+		upGetRect(`.up-grid`, false, instance).then((size: NodeInfo) => {
+			if (size.width != null) {
+				width.value = size.width;
+			}
+		});
+	};
+	
+	// 此方法由up-grid-item触发，用于在up-grid发出事件
+	const childClick = (name: any) => {
+		emit('click', name);
+	};
+	
+	// 监听props变化，当父组件需要子组件需要共享的参数发生了变化，手动通知子组件
+	watch(parentDataCpu, () => {
+		if (children.value.length > 0) {
+			// console.log('^^^^^^^^^^^^^^^^^^^^');
+			children.value.map((child: ComponentPublicInstance) => {
+				// 判断子组件(up-radio)如果有updateParentData方法的话，就就执行(执行的结果是子组件重新从父组件拉取了最新的值)
+				//if (typeof(child.updateParentData) == 'function') {
+					// child.updateParentData()
+					// @ts-ignore
+					child.$callMethod('updateParentData', instance);
+				//}
+			});
+		}
+	});
+	
+	onMounted(() => {
+		getWidth();
+	});
+
+	const getProps = function(): UTSJSONObject {
+		return parentDataCpu.value
+	}
+	const getRefs = function() {
+		return {
+			width: width.value
+		}
+	}
+	
+	defineExpose({
+		childClick,
+		getChildren,
+		addChild,
+		children,
+		getProps,
+		getRefs
+	});
+</script>
+
+<style lang="scss" scoped>
+	@import "../../libs/css/components.scss";
+    $up-grid-width:100% !default;
+	.up-grid {
+		width: $up-grid-width;
+		position: relative;
+		box-sizing: border-box;
+		overflow: hidden;
+		justify-content: center;
+		@include flex;
+		flex-wrap: wrap;
+		align-items: center;
+	}
+</style>

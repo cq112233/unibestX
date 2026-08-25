@@ -1,0 +1,181 @@
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
+    <NavBar title="up-coupon 优惠券"></NavBar>
+    <view class="p-[16px]">
+      <!-- 1. 基础用法 -->
+      <view class="demo-block">
+        <up-title class="demo-title">
+          <text class="demo-title-text">基础用法</text>
+        </up-title>
+        <up-coupon
+          amount="50"
+          title="新人专享优惠券"
+          desc="满 100 元可用"
+          time="有效期至 2026-12-31"
+          action-text="立即领取"
+          @click="onClick"
+        ></up-coupon>
+      </view>
+
+      <!-- 2. 不同形态 -->
+      <view class="demo-block mt-[12px]">
+        <up-title class="demo-title">
+          <text class="demo-title-text">不同形态（coupon / envelope / card）</text>
+        </up-title>
+        <up-coupon
+          amount="20"
+          title="信封样式"
+          shape="envelope"
+          @click="onClick"
+        ></up-coupon>
+        <up-coupon
+          class="mt-[12px]"
+          amount="30"
+          title="卡片样式"
+          desc="全场通用"
+          shape="card"
+          @click="onClick"
+        ></up-coupon>
+      </view>
+
+      <!-- 3. 不同尺寸 -->
+      <view class="demo-block mt-[12px]">
+        <up-title class="demo-title">
+          <text class="demo-title-text">不同尺寸（small / medium / large）</text>
+        </up-title>
+        <up-coupon
+          amount="10"
+          title="小型"
+          size="small"
+          @click="onClick"
+        ></up-coupon>
+        <up-coupon
+          class="mt-[12px]"
+          amount="10"
+          title="中型"
+          size="medium"
+          @click="onClick"
+        ></up-coupon>
+        <up-coupon
+          class="mt-[12px]"
+          amount="10"
+          title="大型"
+          size="large"
+          @click="onClick"
+        ></up-coupon>
+      </view>
+
+      <!-- 4. 禁用 + 自定义颜色 -->
+      <view class="demo-block mt-[12px]">
+        <up-title class="demo-title">
+          <text class="demo-title-text">禁用状态 / 自定义背景色</text>
+        </up-title>
+        <up-coupon
+          amount="99"
+          title="已失效优惠券"
+          action-text="已过期"
+          disabled
+          @click="onClick"
+        ></up-coupon>
+        <up-coupon
+          class="mt-[12px]"
+          amount="15"
+          title="自定义背景"
+          bg-color="#eef7ff"
+          action-text="去使用"
+          @click="onClick"
+        ></up-coupon>
+      </view>
+
+      <!-- 5. 自定义操作插槽 -->
+      <view class="demo-block mt-[12px]">
+        <up-title class="demo-title">
+          <text class="demo-title-text">自定义操作插槽</text>
+        </up-title>
+        <up-coupon
+          amount="88"
+          title="大额优惠券"
+          desc="自定义右侧按钮"
+          @click="onClick"
+        >
+          <template #action>
+            <view class="custom-action">
+              <text class="custom-action-text">点击领取</text>
+            </view>
+          </template>
+        </up-coupon>
+      </view>
+
+      <view class="demo-block mt-[12px]">
+        <up-title class="demo-title">
+          <text class="demo-title-text">说明</text>
+        </up-title>
+        <text class="demo-text">
+          up-coupon 支持 coupon / envelope / card 三种形态、small / medium / large 三种尺寸，可自定义插槽与点击事件。
+        </text>
+      </view>
+
+      <view class="log-box mt-[10px]">
+        <text class="log-text">{{ eventLog }}</text>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { ref } from 'vue';
+
+definePage({
+  style: {
+    navigationStyle: 'custom',
+    navigationBarTitleText: 'up-coupon 优惠券'
+  }
+});
+
+const eventLog = ref<string>('点击优惠券查看事件');
+
+function onClick() {
+  eventLog.value = 'click => 点击了优惠券';
+}
+</script>
+
+<style lang="scss" scoped>
+.demo-block {
+  margin-bottom: 12px;
+  padding: 12px;
+  background-color: #ffffff;
+  border-radius: 8px;
+}
+.demo-title {
+  margin-bottom: 10px;
+}
+.demo-title-text {
+  font-size: 14px;
+  font-weight: bold;
+  color: #606266;
+}
+.demo-text {
+  font-size: 13px;
+  color: #475569;
+  line-height: 20px;
+}
+.custom-action {
+  padding: 8px 14px;
+  background-image: linear-gradient(to bottom right, #0957de, #7c3aed);
+  border-radius: 6px;
+}
+.custom-action-text {
+  font-size: 13px;
+  color: #ffffff;
+}
+.log-box {
+  padding: 10px;
+  background-color: #f1f5f9;
+  border-radius: 8px;
+}
+.log-text {
+  font-size: 13px;
+  color: #475569;
+  line-height: 20px;
+}
+</style>

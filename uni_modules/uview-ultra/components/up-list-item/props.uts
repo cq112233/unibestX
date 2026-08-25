@@ -1,0 +1,21 @@
+/*
+ * @Author       : jry
+ * @Description  : uview-plus component's props mixin file
+ * @version      : 4.0
+ * @Date         : 2024-12-17 16:40:33
+ * @LastAuthor   : jry
+ * @lastTime     : 2024-12-17 16:40:33
+ */
+import { defineMixin } from '../../libs/vue.uts'
+import defProps from './listItem.uts'
+let listItemProp = defProps['listItem'] as UTSJSONObject
+
+export const propsListItem = defineMixin({
+    props: {
+        // 用于滚动到指定item
+        anchor: {
+            type: [String, Number],
+            default: listItemProp['anchor']
+        }
+    }
+});

@@ -1,0 +1,87 @@
+<template>
+	<view class="up-view" :style="viewStyle" @click="clickHandler">
+		<slot></slot>
+	</view>
+</template>
+
+<script setup lang="uts">
+import { computed } from 'vue'
+
+defineOptions({
+	name: 'up-view'
+})
+
+const props = defineProps({
+	backgroundColor: {
+		type: String,
+		default: ''
+	},
+	flexDirection: {
+		type: String,
+		default: ''
+	},
+	justifyContent: {
+		type: String,
+		default: ''
+	},
+	alignItems: {
+		type: String,
+		default: ''
+	},
+	flex1: {
+		type: [String, Number],
+		default: ''
+	},
+	width: {
+		type: String,
+		default: ''
+	},
+	height: {
+		type: String,
+		default: ''
+	},
+	padding: {
+		type: String,
+		default: ''
+	},
+	margin: {
+		type: String,
+		default: ''
+	},
+	borderColor: {
+		type: String,
+		default: ''
+	}
+})
+
+const emit = defineEmits(['click'])
+
+function stringValue(value: any | null): string {
+	return value == null ? '' : value.toString()
+}
+
+const viewStyle = computed<UTSJSONObject>(() => {
+	const style = {} as UTSJSONObject
+	if (props.backgroundColor.length > 0) style['backgroundColor'] = props.backgroundColor
+	if (props.flexDirection.length > 0) style['flexDirection'] = props.flexDirection
+	if (props.justifyContent.length > 0) style['justifyContent'] = props.justifyContent
+	if (props.alignItems.length > 0) style['alignItems'] = props.alignItems
+	if (stringValue(props.flex1).length > 0) style['flex'] = stringValue(props.flex1)
+	if (props.width.length > 0) style['width'] = props.width
+	if (props.height.length > 0) style['height'] = props.height
+	if (props.padding.length > 0) style['padding'] = props.padding
+	if (props.margin.length > 0) style['margin'] = props.margin
+	if (props.borderColor.length > 0) style['borderColor'] = props.borderColor
+	return style
+})
+
+function clickHandler(): void {
+	emit('click')
+}
+</script>
+
+<style lang="scss" scoped>
+	.up-view {
+		display: flex;
+	}
+</style>

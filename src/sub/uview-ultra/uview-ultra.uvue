@@ -1,0 +1,515 @@
+<template>
+  <view class="page-container bg-[#f8fafc] pb-[50px]">
+    <NavBar
+      title="uview-ultra 组件演示"
+      :auto-back="true"
+      :safe-area-inset-top="true"
+    ></NavBar>
+
+    <!-- 顶部 Banner -->
+    <view class="p-[16px] bg-white mb-[12px] shadow-xs flex-row items-center">
+      <image src="/static/logo.png" style="width: 50px; height: 50px;" class="mr-[12px] rounded-[8px]" />
+      <view class="flex-1">
+        <text class="text-[16px] font-bold text-[#1e293b]">uview-ultra 组件库</text>
+        <text class="text-[12px] text-[#64748b] mt-[4px]">已收录 {{ demoCount }} 个组件 Demo</text>
+        <text class="text-[12px] text-[#64748b] mt-[4px]">点击下方任意功能组件，进入独立页面进行演示</text>
+      </view>
+    </view>
+
+    <!-- 0. 新增组件（新加组件集中在此，处理完可移除本节） -->
+    <view class="demo-group-card">
+      <text class="group-title">新增组件</text>
+      <up-cell-group :border="false">
+        <up-cell title="Coupon 优惠券" is-link @click="goToDemo('coupon')">
+          <template #icon>
+            <up-icon name="coupon" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+        <up-cell title="PdfReader PDF 阅读" is-link @click="goToDemo('pdf-reader')">
+          <template #icon>
+            <up-icon name="file-text-fill" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+        <up-cell title="Tree 树形" is-link @click="goToDemo('tree')">
+          <template #icon>
+            <up-icon name="list-dot" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+        <up-cell title="Barcode 条形码" is-link @click="goToDemo('barcode')">
+          <template #icon>
+            <up-icon name="scan" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+        <up-cell title="Poster 海报" is-link @click="goToDemo('poster')">
+          <template #icon>
+            <up-icon name="photo" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+        <up-cell title="ShortVideo 短视频" is-link @click="goToDemo('short-video')">
+          <template #icon>
+            <up-icon name="play-right" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+        <up-cell title="ColorPicker 颜色选择" is-link @click="goToDemo('color-picker')">
+          <template #icon>
+            <up-icon name="edit-pen" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+        <up-cell title="Cropper 裁剪" is-link @click="goToDemo('cropper')">
+          <template #icon>
+            <up-icon name="photo" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+        <up-cell title="Dragsort 拖拽排序" is-link @click="goToDemo('dragsort')">
+          <template #icon>
+            <up-icon name="order" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+        <up-cell title="Signature 签名" is-link @click="goToDemo('signature')">
+          <template #icon>
+            <up-icon name="edit-pen" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+        <up-cell title="Table2 表格" is-link @click="goToDemo('table2')">
+          <template #icon>
+            <up-icon name="grid" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+        <up-cell title="Title 标题" is-link @click="goToDemo('title')">
+          <template #icon>
+            <up-icon name="edit-pen" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+        <up-cell title="Cascader 级联选择器" is-link @click="goToDemo('cascader')">
+          <template #icon>
+            <up-icon name="list" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+      </up-cell-group>
+    </view>
+
+    <!-- 1. 基础与展示组件 -->
+    <view class="demo-group-card">
+      <text class="group-title">基础与展示组件</text>
+      <up-cell-group :border="false">
+        <up-cell title="Button 按钮" is-link @click="goToDemo('button')">
+          <template #icon>
+            <up-icon name="plus-circle" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+        <up-cell title="Icon 图标" is-link @click="goToDemo('icon')">
+          <template #icon>
+            <up-icon name="photo" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+        <up-cell title="Text 文本" is-link @click="goToDemo('text')">
+          <template #icon>
+            <up-icon name="file-text" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+        <up-cell title="Link 超链接" is-link @click="goToDemo('link')">
+          <template #icon>
+            <up-icon name="attach" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+        <up-cell title="Empty 空白页" is-link @click="goToDemo('empty')">
+          <template #icon>
+            <up-icon name="info-circle" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+        <up-cell title="Divider 分割线" is-link @click="goToDemo('divider')">
+          <template #icon>
+            <up-icon name="minus" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+        <up-cell title="LoadingIcon 加载图标" is-link @click="goToDemo('loading-icon')">
+          <template #icon>
+            <up-icon name="reload" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+        <up-cell title="Skeleton 骨架屏" is-link @click="goToDemo('skeleton')">
+          <template #icon>
+            <up-icon name="list-dot" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+        <up-cell title="Tag 标签" is-link @click="goToDemo('tag')">
+          <template #icon>
+            <up-icon name="tags" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+        <up-cell title="Badge 徽标" is-link @click="goToDemo('badge')">
+          <template #icon>
+            <up-icon name="info-circle" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+        <up-cell title="Avatar 头像" is-link @click="goToDemo('avatar')">
+          <template #icon>
+            <up-icon name="account" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+        <up-cell title="Card 卡片" is-link @click="goToDemo('card')">
+          <template #icon>
+            <up-icon name="map" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+        <up-cell title="List 列表" is-link @click="goToDemo('list')">
+          <template #icon>
+            <up-icon name="list-dot" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+        <up-cell title="Swiper 轮播图" is-link @click="goToDemo('swiper')">
+          <template #icon>
+            <up-icon name="photo" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+        <up-cell title="Image 图片组件" is-link @click="goToDemo('image')">
+          <template #icon>
+            <up-icon name="photo" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+        <up-cell title="Transition 动画过渡" is-link @click="goToDemo('transition')">
+          <template #icon>
+            <up-icon name="play-circle" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+        <up-cell title="Steps 步骤条" is-link @click="goToDemo('steps')">
+          <template #icon>
+            <up-icon name="order" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+
+        <up-cell title="Grid 宫格" is-link @click="goToDemo('gr' + 'id')">
+          <template #icon>
+            <up-icon :name="'gr' + 'id'" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+        <up-cell title="Line 线条" is-link @click="goToDemo('line')">
+          <template #icon>
+            <up-icon name="minus" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+        <up-cell title="Album 相册" is-link @click="goToDemo('album')">
+          <template #icon>
+            <up-icon name="photo" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+        <up-cell title="Gap 间隔槽" is-link @click="goToDemo('gap')">
+          <template #icon>
+            <up-icon name="minus" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+        <up-cell title="Sticky 吸顶" is-link @click="goToDemo('sti' + 'cky')">
+          <template #icon>
+            <up-icon name="arrow-up" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+        <up-cell title="Table 表格" is-link @click="goToDemo('tab' + 'le')">
+          <template #icon>
+            <up-icon :name="'gr' + 'id'" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+        <up-cell title="LazyLoad 懒加载" is-link @click="goToDemo('lazy-load')">
+          <template #icon>
+            <up-icon name="photo" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+        <up-cell title="Loadmore 加载更多" is-link @click="goToDemo('loadmore')">
+          <template #icon>
+            <up-icon name="more-dot-fill" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+        <up-cell title="Parse 富文本解析" is-link @click="goToDemo('parse')">
+          <template #icon>
+            <up-icon name="file-text" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+        <up-cell title="Qrcode 二维码" is-link @click="goToDemo('qrcode')">
+          <template #icon>
+            <up-icon name="scan" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+        <up-cell title="Waterfall 瀑布流" is-link @click="goToDemo('waterfall')">
+          <template #icon>
+            <up-icon :name="'gr' + 'id'" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+      </up-cell-group>
+    </view>
+
+    <!-- 2. 表单与交互组件 -->
+    <view class="demo-group-card mt-[12px]">
+      <text class="group-title">表单与交互组件</text>
+      <up-cell-group :border="false">
+        <up-cell title="Input 输入框" is-link @click="goToDemo('input')">
+          <template #icon>
+            <up-icon name="edit-pen" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+        <up-cell title="Checkbox 复选框" is-link @click="goToDemo('checkbox')">
+          <template #icon>
+            <up-icon name="checkbox-mark" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+        <up-cell title="Radio 单选框" is-link @click="goToDemo('radio')">
+          <template #icon>
+            <up-icon name="checkmark-circle" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+        <up-cell title="Switch 开关" is-link @click="goToDemo('switch')">
+          <template #icon>
+            <up-icon name="more-circle" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+        <up-cell title="Rate 评分" is-link @click="goToDemo('rate')">
+          <template #icon>
+            <up-icon name="star" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+        <up-cell title="NumberBox 步进器" is-link @click="goToDemo('number-box')">
+          <template #icon>
+            <up-icon name="plus" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+        <up-cell title="Slider 滑块" is-link @click="goToDemo('slider')">
+          <template #icon>
+            <up-icon name="minus" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+        <up-cell title="Textarea 多行文本" is-link @click="goToDemo('textarea')">
+          <template #icon>
+            <up-icon name="file-text" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+        <up-cell title="Upload 上传" is-link @click="goToDemo('upload')">
+          <template #icon>
+            <up-icon name="arrow-up" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+        <up-cell title="Search 搜索" is-link @click="goToDemo('search')">
+          <template #icon>
+            <up-icon name="search" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+        <up-cell title="完整 Form 表单示例" is-link @click="goToDemo('form')">
+          <template #icon>
+            <up-icon name="edit-pen" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+        <up-cell title="Pagination 分页器" is-link @click="goToDemo('pagination')">
+          <template #icon>
+            <up-icon name="more-circle" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+
+        <up-cell title="Keyboard 键盘" is-link @click="goToDemo('keyboard')">
+          <template #icon>
+            <up-icon name="grid-fill" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+        <up-cell title="Dropdown 下拉菜单" is-link @click="goToDemo('dropdown')">
+          <template #icon>
+            <up-icon name="arrow-down-fill" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+        <up-cell title="SwipeAction 滑动操作" is-link @click="goToDemo('swipe-action')">
+          <template #icon>
+            <up-icon name="list" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+        <up-cell title="CodeInput 验证码输入" is-link @click="goToDemo('code-input')">
+          <template #icon>
+            <up-icon name="lock" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+        <up-cell title="Code 验证码倒计时" is-link @click="goToDemo('code')">
+          <template #icon>
+            <up-icon name="clock" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+      </up-cell-group>
+    </view>
+
+    <!-- 3. 反馈与提示组件 -->
+    <view class="demo-group-card mt-[12px]">
+      <text class="group-title">反馈与提示组件</text>
+      <up-cell-group :border="false">
+        <up-cell title="Alert 警告提示" is-link @click="goToDemo('alert')">
+          <template #icon>
+            <up-icon name="info-circle" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+        <up-cell title="Calendar 日历" is-link @click="goToDemo('calendar')">
+          <template #icon>
+            <up-icon name="calendar" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+        <up-cell title="Picker 选择器" is-link @click="goToDemo('picker')">
+          <template #icon>
+            <up-icon name="list" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+        <up-cell title="DatetimePicker 时间选择" is-link @click="goToDemo('datetime-picker')">
+          <template #icon>
+            <up-icon name="clock" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+        <up-cell title="ActionSheet 动作面板" is-link @click="goToDemo('action-sheet')">
+          <template #icon>
+            <up-icon name="server-man" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+        <up-cell title="NoticeBar 滚动通知" is-link @click="goToDemo('notice-bar')">
+          <template #icon>
+            <up-icon name="volume" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+        <up-cell title="Collapse 折叠面板" is-link @click="goToDemo('collapse')">
+          <template #icon>
+            <up-icon name="arrow-down" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+        <up-cell title="Toast 消息提示" is-link @click="goToDemo('toast')">
+          <template #icon>
+            <up-icon name="chat" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+        <up-cell title="Notify 消息通知" is-link @click="goToDemo('notify')">
+          <template #icon>
+            <up-icon name="bell" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+        <up-cell title="LoadingPage 加载页" is-link @click="goToDemo('loading-page')">
+          <template #icon>
+            <up-icon name="more-dot-fill" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+        <up-cell title="Overlay 遮罩层" is-link @click="goToDemo('overlay')">
+          <template #icon>
+            <up-icon name="scan" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+        <up-cell title="Modal 模态框" is-link @click="goToDemo('modal')">
+          <template #icon>
+            <up-icon name="email" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+        <up-cell title="Popup 弹出层" is-link @click="goToDemo('popup')">
+          <template #icon>
+            <up-icon name="server-man" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+        <up-cell title="NoNetwork 无网络提示" is-link @click="goToDemo('no-network')">
+          <template #icon>
+            <up-icon name="wifi-off" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+
+        <up-cell title="LineProgress 线型进度" is-link @click="goToDemo('line-progress')">
+          <template #icon>
+            <up-icon name="minus" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+        <up-cell title="CircleProgress 圆形进度条" is-link @click="goToDemo('circle-progress')">
+          <template #icon>
+            <up-icon name="reload" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+        <up-cell title="CountDown 倒计时" is-link @click="goToDemo('count-down')">
+          <template #icon>
+            <up-icon name="clock" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+        <up-cell title="CountTo 数字滚动" is-link @click="goToDemo('count-to')">
+          <template #icon>
+            <up-icon name="play-right-fill" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+        <up-cell title="Copy 文本复制" is-link @click="goToDemo('copy')">
+          <template #icon>
+            <up-icon name="file-text" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+      </up-cell-group>
+    </view>
+
+    <!-- 4. 导航组件 -->
+    <view class="demo-group-card mt-[12px]">
+      <text class="group-title">导航组件</text>
+      <up-cell-group :border="false">
+        <up-cell title="Navbar 导航栏" is-link @click="goToDemo('navbar')">
+          <template #icon>
+            <up-icon name="arrow-left" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+        <up-cell title="NavbarMini 迷你导航" is-link @click="goToDemo('navbar-mini')">
+          <template #icon>
+            <up-icon name="arrow-left" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+        <up-cell title="BackTop 返回顶部" is-link @click="goToDemo('back-top')">
+          <template #icon>
+            <up-icon name="arrow-upward" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+        <up-cell title="Tabbar 底部导航" is-link @click="goToDemo('tabbar')">
+          <template #icon>
+            <up-icon name="list" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+        <up-cell title="Tabs 标签页" is-link @click="goToDemo('tabs')">
+          <template #icon>
+            <up-icon name="list" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+        <up-cell title="Subsection 分段器" is-link @click="goToDemo('subsection')">
+          <template #icon>
+            <up-icon name="list" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+        <up-cell title="IndexList 索引列表" is-link @click="goToDemo('index-list')">
+          <template #icon>
+            <up-icon name="list" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+        <up-cell title="MpHtml 富文本组件" is-link @click="goToDemo('mp-html')">
+          <template #icon>
+            <up-icon name="file-text" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
+      </up-cell-group>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed } from 'vue';
+import { useAppStore } from '@/src/store/index.uts';
+
+const appStore = useAppStore();
+const themeColor = computed<string>(() => appStore.state.theme);
+const demoCount: number = 85;
+
+function goToDemo(page: string): void {
+  uni.navigateTo({
+    url: `/src/sub/uview-ultra/demos/${page}/${page}`
+  });
+}
+</script>
+
+<style scoped>
+.demo-group-card {
+  margin: 0 12px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 12px 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+.group-title {
+  font-size: 14px;
+  font-weight: bold;
+  color: #1e293b;
+  padding: 0 16px 8px 16px;
+  border-bottom: 1px solid #f1f5f9;
+}
+</style>

@@ -1,0 +1,168 @@
+<template>
+	<scroll-view
+		class="up-list"
+		direction="vertical"
+		:scroll-into-view="scrollIntoView"
+		:style="[listStyle]"
+		:scroll-top="parseFloat(scrollTop.toString())"
+		:lower-threshold="parseFloat(lowerThreshold.toString())"
+		:upper-threshold="parseFloat(upperThreshold.toString())"
+		:show-scrollbar="showScrollbar"
+		:scroll-with-animation="scrollWithAnimation"
+		@scroll="onScroll"
+		@scrolltolower="scrolltolower"
+		@scrolltoupper="scrolltoupper"
+		:refresher-enabled="refresherEnabled"
+		:refresher-threshold="refresherThreshold"
+		:refresher-default-style="refresherDefaultStyle"
+		:refresher-background="refresherBackground"
+		:refresher-triggered="refresherTriggered"
+		@refresherpulling="refresherpulling"
+		@refresherrefresh="refresherrefresh"
+		@refresherrestore="refresherrestore"
+		@refresherabort="refresherabort"
+	>
+		<view>
+			<slot />
+		</view>
+	</scroll-view>
+</template>
+
+<script setup lang="uts">
+import { ref, computed, provide } from 'vue'
+import { addUnit, addStyle, deepMerge, sleep, getWindowInfo } from '../../libs/function/index.uts'
+
+defineOptions({
+	name: 'up-list'
+})
+
+const props = defineProps({
+	showScrollbar: {
+		type: Boolean,
+		default: false
+	},
+	lowerThreshold: {
+		type: [String, Number],
+		default: 50
+	},
+	upperThreshold: {
+		type: [String, Number],
+		default: 0
+	},
+	scrollTop: {
+		type: [String, Number],
+		default: 0
+	},
+	scrollable: {
+		type: Boolean,
+		default: true
+	},
+	scrollIntoView: {
+		type: String,
+		default: ''
+	},
+	scrollWithAnimation: {
+		type: Boolean,
+		default: false
+	},
+	height: {
+		type: [String, Number],
+		default: 0
+	},
+	width: {
+		type: [String, Number],
+		default: 0
+	},
+	refresherEnabled: {
+		type: Boolean,
+		default: false
+	},
+	refresherThreshold: {
+		type: Number,
+		default: 45
+	},
+	refresherDefaultStyle: {
+		type: String,
+		default: 'black'
+	},
+	refresherBackground: {
+		type: String,
+		default: '#FFF'
+	},
+	refresherTriggered: {
+		type: Boolean,
+		default: false
+	},
+	customStyle: {
+		type: Object,
+		default: () => ({})
+	}
+})
+
+const emit = defineEmits([
+	"scroll", "scrolltolower", "scroll-to-lower", "scrolltoupper", "scroll-to-upper",
+	"refresherpulling", "refresherrefresh", "refresherrestore", "refresherabort"
+])
+
+const innerScrollTop = ref<number>(0)
+const offset = ref<number>(0)
+const sys = getWindowInfo()
+
+const listStyle = computed<UTSJSONObject>(() => {
+	const style = {} as UTSJSONObject
+	if (props.width != 0) style['width'] = addUnit(props.width)
+	if (props.height != 0) style['height'] = addUnit(props.height)
+	if (style['height'] == null) style['height'] = addUnit(sys.windowHeight, 'px')
+	return deepMerge(style, addStyle(props.customStyle))
+})
+
+provide('upListContext', {
+	innerScrollTop,
+	updateOffsetFromChild: (top: number) => {
+		offset.value = top
+	}
+})
+
+function onScroll(e: UniScrollEvent) {
+	let top = e.detail.scrollTop
+	innerScrollTop.value = top
+	emit('scroll', top)
+}
+
+function scrolltolower(e: UniScrollToLowerEvent) {
+	sleep(30).then(() => {
+		emit('scrolltolower')
+		emit('scroll-to-lower')
+	})
+}
+
+function scrolltoupper(e: UniScrollToUpperEvent) {
+	sleep(30).then(() => {
+		emit('scrolltoupper')
+		emit('scroll-to-upper')
+		offset.value = 0
+	})
+}
+
+function refresherpulling(e: UniRefresherEvent) {
+	emit('refresherpulling', e)
+}
+
+function refresherrefresh(e: UniRefresherEvent) {
+	emit('refresherrefresh', e)
+}
+
+function refresherrestore(e: UniRefresherEvent) {
+	emit('refresherrestore', e)
+}
+
+function refresherabort(e: UniRefresherEvent) {
+	emit('refresherabort', e)
+}
+</script>
+
+<style lang="scss" scoped>
+	.up-list {
+		flex-direction: column;
+	}
+</style>

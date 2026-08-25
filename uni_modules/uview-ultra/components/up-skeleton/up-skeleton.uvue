@@ -1,0 +1,217 @@
+<template>
+	<view class="up-skeleton">
+		<view
+		    class="up-skeleton__wrapper"
+		    ref="up-skeleton__wrapper"
+		    v-if="loading"
+			style="display: flex; flex-direction: row;"
+		>
+			<view
+			    class="up-skeleton__wrapper__avatar"
+			    v-if="avatar"
+			    :class="[`up-skeleton__wrapper__avatar--${avatarShape}`, animate ? 'animate' : '']"
+			    :style="avatarStyle"
+			></view>
+			<view
+			    class="up-skeleton__wrapper__content"
+			    ref="up-skeleton__wrapper__content"
+				style="flex: 1;"
+			>
+				<view
+				    class="up-skeleton__wrapper__content__title"
+				    v-if="title"
+				    :style="titleStyle"
+				    :class="[animate ? 'animate' : '']"
+				></view>
+				<view
+				    class="up-skeleton__wrapper__content__rows"
+				    :class="[animate ? 'animate' : '']"
+				    v-for="(item, index) in rowsArray"
+				    :key="index"
+				    :style="getRowStyle(item)"
+				>
+		
+				</view>
+			</view>
+		</view>
+		<slot v-else />
+	</view>
+</template>
+
+<script setup lang="uts">
+import { computed, onMounted } from 'vue'
+import { addUnit, sleep } from '../../libs/function/index.uts'
+
+defineOptions({
+  name: 'up-skeleton'
+})
+
+const props = defineProps({
+  loading: {
+    type: Boolean,
+    default: true
+  },
+  animate: {
+    type: Boolean,
+    default: true
+  },
+  rows: {
+    type: [String, Number],
+    default: 0
+  },
+  rowsWidth: {
+    type: [String, Number, Array],
+    default: '100%'
+  },
+  rowsHeight: {
+    type: [String, Number, Array],
+    default: 18
+  },
+  title: {
+    type: Boolean,
+    default: true
+  },
+  titleWidth: {
+    type: [String, Number],
+    default: '50%'
+  },
+  titleHeight: {
+    type: [String, Number],
+    default: 18
+  },
+  avatar: {
+    type: Boolean,
+    default: false
+  },
+  avatarSize: {
+    type: [String, Number],
+    default: 32
+  },
+  avatarShape: {
+    type: String,
+    default: 'circle'
+  }
+})
+
+const rowsArray = computed<Array<UTSJSONObject>>(() => {
+  const rows: Array<UTSJSONObject> = []
+  const rowCount = parseInt(props.rows.toString())
+  const rWidth = props.rowsWidth
+  const rHeight = props.rowsHeight
+  for (let i = 0; i < rowCount; i++) {
+    let item: UTSJSONObject = {}
+    let rowWidth: string | number = ''
+    if (rWidth instanceof Array) {
+      const rWidthArr = rWidth as Array<any>
+      if (i == rowCount - 1) {
+        rowWidth = '70%'
+      } else {
+        rowWidth = rWidthArr[i] != null ? (rWidthArr[i] ?? '0px') : (i == rWidthArr.length ? '70%' : '100%')
+      }
+    } else {
+      if (i == rowCount - 1) {
+        rowWidth = '70%'
+      } else {
+        rowWidth = rWidth != null ? rWidth.toString() : ''
+      }
+    }
+    
+    let rowHeight: string | number = ''
+    if (rHeight instanceof Array) {
+      const rHeightArr = rHeight as Array<any>
+      rowHeight = rHeightArr[i] != null ? (rHeightArr[i] ?? '0px') : '18px'
+    } else {
+      rowHeight = rHeight != null ? rHeight.toString() : ''
+    }
+    
+    if (!props.title && i == 0) {
+      item['marginTop'] = '0px'
+    } else if (props.title && i == 0) {
+      item['marginTop'] = '20px'
+    } else {
+      item['marginTop'] = '12px'
+    }
+
+    item['width'] = addUnit(rowWidth)
+    item['height'] = addUnit(rowHeight)
+    rows.push(item)
+  }
+  return rows
+})
+
+const uTitleWidth = computed<string>(() => {
+  let tWidth = '0px'
+  tWidth = addUnit(props.titleWidth)
+  return addUnit(tWidth)
+})
+
+const avatarStyle = computed((): UTSJSONObject => {
+  return {
+    height: addUnit(props.avatarSize),
+    width: addUnit(props.avatarSize)
+  } as UTSJSONObject
+})
+
+const titleStyle = computed((): UTSJSONObject => {
+  return {
+    width: uTitleWidth.value,
+    height: addUnit(props.titleHeight)
+  } as UTSJSONObject
+})
+
+function getRowStyle(item: UTSJSONObject): UTSJSONObject {
+  return {
+    width: item['width'],
+    height: item['height'],
+    marginTop: item['marginTop']
+  } as UTSJSONObject
+}
+
+async function getComponentWidth() {
+  await sleep(20)
+}
+
+onMounted(() => {
+  getComponentWidth()
+})
+</script>
+
+<style lang="scss" scoped>
+	@mixin background {
+		background-color: #F1F2F4;
+	}
+	.up-skeleton {
+		flex: 1;
+		
+		&__wrapper {
+			@include flex(row);
+			
+			&__avatar {
+				@include background;
+				margin-right: 15px;
+			
+				&--circle {
+					border-radius: 100px;
+				}
+			
+				&--square {
+					border-radius: 4px;
+				}
+			}
+			
+			&__content {
+				flex: 1;
+			
+				&__rows,
+				&__title {
+					@include background;
+					border-radius: 3px;
+				}
+			}
+		}
+	}
+
+
+
+
+</style>

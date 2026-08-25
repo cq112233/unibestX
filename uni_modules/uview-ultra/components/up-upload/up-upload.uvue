@@ -1,0 +1,779 @@
+<template>
+	<view class="up-upload" :style="customUploadStyle">
+		<view class="up-upload__wrap" >
+			<template v-if="previewImage">
+				<view
+				    class="up-upload__wrap__preview"
+				    v-for="(item, index) in lists"
+				    :key="index"
+				>
+					<image
+					    v-if="item.isImage || (item.type != null && item.type == 'image')"
+					    :src="item.thumb != null ? item.thumb : item.url"
+					    :mode="imageMode"
+					    class="up-upload__wrap__preview__image"
+					    @tap="onClickPreview(item, index)"
+						:style="itemDimensionStyle"
+					/>
+					<view class="up-upload__wrap__preview__video"
+						:style="itemDimensionStyle"
+						v-else-if="(item.isVideo || (item.type != null && item.type == 'video')) && getVideoThumb">
+						<image
+							v-if="item.thumb"
+						    :src="item.thumb"
+						    :mode="imageMode"
+						    class="up-upload__wrap__preview__image"
+						    @tap="onClickPreview(item, index)"
+							:style="itemDimensionStyle"
+						/>
+						<up-icon
+							v-else
+						    color="#80CBF9"
+						    size="26"
+						    :name="item.isVideo || (item.type != null && item.type == 'video') ? 'movie' : 'file-text'"
+						></up-icon>
+						<view v-if="item.status == 'success'"
+							class="up-upload__wrap__play"
+							@tap="onClickPreview(item, index)">
+							<slot name="playIcon"></slot>
+							<up-icon v-if="$slots['playIcon'] == null"
+								class="up-upload__wrap__play__icon"
+								name="play-right" size="22px"></up-icon>
+						</view>
+					</view>
+					<view
+					    v-else
+					    class="up-upload__wrap__preview__other"
+						@tap="onClickPreview(item, index)"
+						:style="itemDimensionStyle"
+					>
+						<up-icon
+						    color="#80CBF9"
+						    size="26"
+						    :name="item.isVideo || (item.type != null && item.type == 'video') ? 'movie' : 'folder'"
+						></up-icon>
+						<text class="up-upload__wrap__preview__other__text">
+							{{ getOtherItemText(item) }}
+						</text>
+					</view>
+					<view
+					    class="up-upload__status"
+					    v-if="item.status == 'uploading' || item.status == 'failed'"
+					>
+						<view class="up-upload__status__icon">
+							<up-icon
+							    v-if="item.status == 'failed'"
+							    name="close-circle"
+							    color="#ffffff"
+							    size="25"
+							/>
+							<up-loading-icon
+							    size="22"
+							    mode="circle"
+							    v-else
+							/>
+						</view>
+						<text
+						    v-if="item.message != null && item.message != ''"
+						    class="up-upload__status__message"
+						>{{ item.message }}</text>
+						<up-gap class="up-upload__progress" height="3px"
+							:style="getProgressStyle(item)"></up-gap>
+					</view>
+					<view
+					    class="up-upload__deletable"
+					    v-if="item.status != 'uploading' && (deletable || item.deletable)"
+					    @tap.stop="deleteItem(index)"
+					>
+						<view class="up-upload__deletable__icon">
+							<up-icon
+							    name="close"
+							    color="#ffffff"
+							    size="10"
+							></up-icon>
+						</view>
+					</view>
+					<slot name="success">
+						<view
+							class="up-upload__success"
+							v-if="item.status == 'success'"
+						>
+							<view class="up-upload__success__icon">
+								<up-icon
+									name="checkmark"
+									color="#ffffff"
+									size="12"
+								></up-icon>
+							</view>
+						</view>
+					</slot>
+				</view>
+			</template>
+			<template v-if="isInCount">
+				<view
+				    v-if="$slots['trigger'] != null"
+				    @tap="onChooseTap"
+				>
+					<slot name="trigger" />
+				</view>
+				<view
+				    v-else-if="$slots['trigger'] == null && ($slots['default'] != null || $slots['$default'] != null)"
+				    @tap="onChooseTap"
+				>
+					<slot />
+				</view>
+				<view
+				    v-else
+				    class="up-upload__button"
+				    :hover-class="!disabled ? 'up-upload__button--hover' : ''"
+				    hover-stay-time="150"
+				    @tap="onChooseTap"
+				    :class="[disabled ? 'up-upload__button--disabled' : '']"
+					:style="itemDimensionStyle"
+				>
+					<up-icon
+					    :name="uploadIcon"
+					    size="26"
+					    :color="uploadIconColor"
+					></up-icon>
+					<text
+					    v-if="uploadText != ''"
+					    class="up-upload__button__text"
+					>{{ uploadText }}</text>
+				</view>
+			</template>
+		</view>
+		<up-popup
+			mode="center"
+			v-model:show="popupShow">
+			<video id="myVideo" v-if="popupShow"
+				:src="currentItemIndex >= 0 ? lists[currentItemIndex].url : ''"
+				@error="videoErrorCallback" show-center-play-btn
+				:object-fit='videoPreviewObjectFit' show-fullscreen-btn='true'
+				enable-play-gesture controls
+				:autoplay="true" auto-pause-if-open-native
+				:initial-time='0.1'>
+			</video>
+		</up-popup>
+	</view>
+</template>
+
+<script setup lang="uts">
+import { ref, watch } from 'vue'
+import { chooseFile } from './utils.uts'
+import { addStyle, addUnit, toast } from '../../libs/function/index.uts'
+import { func as testFunc, promise as testPromise, image as testImage, video as testVideo } from '../../libs/function/test.uts'
+import { t as $t } from '../../libs/i18n/index.uts'
+import { UPUploadListItem, UPUploadFileChoosed, UPUploadChooseFileOptions } from './types.uts'
+
+type UPUploadReadCallback = (file: Array<UPUploadFileChoosed | null>, detail: UTSJSONObject) => any
+
+defineOptions({
+	name: "up-upload"
+})
+
+const props = defineProps({
+	accept: {
+		type: String,
+		default: 'image'
+	},
+	extension: {
+		type: Array as PropType<Array<string>>,
+		default: () => [] as Array<string>
+	},
+	capture: {
+		type: [Array, String],
+		default: () => ['album', 'camera'] as Array<string>
+	},
+	compressed: {
+		type: Boolean,
+		default: true
+	},
+	camera: {
+		type: String,
+		default: 'back'
+	},
+	maxDuration: {
+		type: Number,
+		default: 60
+	},
+	uploadIcon: {
+		type: String,
+		default: 'camera-fill'
+	},
+	uploadIconColor: {
+		type: String,
+		default: '#D3D4D6'
+	},
+	useBeforeRead: {
+		type: Boolean,
+		default: false
+	},
+	afterRead: {
+		type: Function,
+		default: null
+	},
+	beforeRead: {
+		type: Function,
+		default: null
+	},
+	previewFullImage: {
+		type: Boolean,
+		default: true
+	},
+	maxCount: {
+		type: [String, Number],
+		default: 52
+	},
+	disabled: {
+		type: Boolean,
+		default: false
+	},
+	imageMode: {
+		type: String,
+		default: 'aspectFill'
+	},
+	name: {
+		type: String,
+		default: ''
+	},
+	sizeType: {
+		type: Array as PropType<Array<string>>,
+		default: () => ['original', 'compressed'] as Array<string>
+	},
+	multiple: {
+		type: Boolean,
+		default: false
+	},
+	deletable: {
+		type: Boolean,
+		default: true
+	},
+	maxSize: {
+		type: [String, Number],
+		default: Number.MAX_VALUE
+	},
+	fileList: {
+		type: Array as PropType<Array<UTSJSONObject>>,
+		default: () => [] as Array<UTSJSONObject>
+	},
+	uploadText: {
+		type: String,
+		default: ''
+	},
+	width: {
+		type: [String, Number],
+		default: 80
+	},
+	height: {
+		type: [String, Number],
+		default: 80
+	},
+	previewImage: {
+		type: Boolean,
+		default: true
+	},
+	autoDelete: {
+		type: Boolean,
+		default: false
+	},
+	autoUpload: {
+		type: Boolean,
+		default: false
+	},
+	autoUploadApi: {
+		type: String,
+		default: ''
+	},
+	autoUploadDriver: {
+		type: String,
+		default: ''
+	},
+	autoUploadAuthUrl: {
+		type: String,
+		default: ''
+	},
+	autoUploadHeader: {
+		type: Object as PropType<UTSJSONObject>,
+		default: () => ({}) as UTSJSONObject
+	},
+	getVideoThumb: {
+		type: Boolean,
+		default: false
+	},
+	customAfterAutoUpload: {
+		type: Boolean,
+		default: false
+	},
+	videoPreviewObjectFit: {
+		type: String,
+		default: 'cover'
+	},
+	customStyle: {
+		type: Object,
+		default: () => ({})
+	}
+})
+
+const emit = defineEmits(['error', 'beforeRead', 'oversize', 'afterRead', 'delete', 'clickPreview', 'update:fileList', 'afterAutoUpload'])
+
+const lists = ref<Array<UPUploadListItem>>([])
+const isInCount = ref<boolean>(true)
+const popupShow = ref<boolean>(false)
+const currentItemIndex = ref<number>(-1)
+
+const customUploadStyle = computed((): UTSJSONObject => {
+	return addStyle(props.customStyle) as UTSJSONObject
+})
+
+const itemDimensionStyle = computed((): UTSJSONObject => {
+	return {
+		width: addUnit(props.width),
+		height: addUnit(props.height)
+	} as UTSJSONObject
+})
+
+function getProgressStyle(item: any): UTSJSONObject {
+	const it = item as UTSJSONObject
+	const prog = (it['progress'] as number | null) ?? 0
+	return {
+		width: `${prog}%`
+	} as UTSJSONObject
+}
+
+function formatFileList() {
+	let fileList = props.fileList as UTSJSONObject[]
+	let maxCount = parseInt(props.maxCount.toString())
+	let resLists = [] as UPUploadListItem[]
+	fileList.forEach((item: UTSJSONObject) => {
+		const name = item['name'] != null
+			? item['name'] as string
+			: item['url'] != null ? item['url'] as string : item['thumb'] as string
+		let tmp = UTSJSONObject.assign(UTSJSONObject.assign({}, item), {
+			isImage: item['name'] != null ? testImage(item['name'] as string) : (props.accept == 'image' ?? testImage(name)),
+			isVideo: item['name'] != null ? testVideo(item['name'] as string) : (props.accept == 'video' ?? testVideo(name)),
+			deletable: typeof item.deletable == 'boolean' ? item.deletable : props.deletable,
+		})
+		let tmpObj = (JSON.parse<UPUploadListItem>(JSON.stringify(tmp)))
+		if (tmpObj != null) {
+			resLists.push(tmpObj!)
+		}
+	})
+	lists.value = resLists
+	isInCount.value = resLists.length < maxCount
+}
+
+watch((): Array<UTSJSONObject> => props.fileList, () => {
+	formatFileList()
+}, { immediate: true, deep: true })
+
+watch((): boolean => props.deletable, () => {
+	formatFileList()
+})
+
+watch((): any => props.maxCount, () => {
+	formatFileList()
+})
+
+watch((): string => props.accept, () => {
+	formatFileList()
+})
+
+watch(popupShow, (newVal: boolean) => {
+	if (!newVal) {
+		currentItemIndex.value = -1
+	}
+})
+
+function convertFileToUTSJSON(file: Array<UPUploadFileChoosed | null>): Array<UTSJSONObject> {
+	const result: Array<UTSJSONObject> = []
+	file.forEach((item: UPUploadFileChoosed | null) => {
+		if (item != null) {
+			const obj = JSON.parseObject(JSON.stringify(item))
+			if (obj != null) {
+				result.push(obj)
+			}
+		}
+	})
+	return result
+}
+
+function getDetail(index: number | null = null): UTSJSONObject {
+	return {
+		name: props.name,
+		index: index == null ? props.fileList.length : index,
+	} as UTSJSONObject
+}
+
+function getOtherItemText(item: UPUploadListItem): string {
+	const isVid = item.isVideo || (item.type != null && item.type == 'video')
+	if (isVid) {
+		if (item.name != null && (item.name as string) != '') return item.name as string
+		return $t("up.common.video")
+	}
+	if (item.name != null && (item.name as string) != '') return item.name as string
+	return $t("up.common.file")
+}
+
+function onAfterRead(file: Array<UPUploadFileChoosed | null>) {
+	let maxSize = parseFloat(props.maxSize.toString())
+	let afterRead = props.afterRead
+	const even = (item: UPUploadFileChoosed | null): boolean => {
+		let tmp: number = (item != null && item.size != null) ? item.size : 0
+		return tmp > maxSize
+	}
+	const oversize = file.some(even)
+	if (oversize) {
+		toast($t("up.upload.sizeExceed", {} as UTSJSONObject))
+		emit('oversize', UTSJSONObject.assign({
+			file: convertFileToUTSJSON(file)
+		}, getDetail(null)))
+		return
+	}
+	if (typeof afterRead == 'function') {
+		;(afterRead as UPUploadReadCallback)(file, getDetail(null))
+	}
+	emit('afterRead', UTSJSONObject.assign({
+		file: convertFileToUTSJSON(file)
+	}, getDetail(null)))
+}
+
+function onBeforeRead(file: Array<UPUploadFileChoosed | null>) {
+	let beforeRead = props.beforeRead
+	let useBeforeRead = props.useBeforeRead
+	let res: any = file
+	if (beforeRead != null && testFunc(beforeRead)) {
+		res = (beforeRead as UPUploadReadCallback)(file, getDetail(null))
+	}
+	if (useBeforeRead) {
+		emit(
+			'beforeRead',
+			UTSJSONObject.assign(UTSJSONObject.assign({
+				file: convertFileToUTSJSON(file)
+			}, getDetail(null)), {
+				callback: (ok: boolean) => {
+					if (ok) {
+						onAfterRead(file)
+					}
+				},
+			})
+		)
+		return
+	}
+	if (typeof res == 'boolean' && !(res as boolean)) {
+		return
+	}
+	const readFile = (res != null ? res : file) as Array<UPUploadFileChoosed | null>
+	onAfterRead(readFile)
+}
+
+function chooseFileAction(params: UTSJSONObject): boolean {
+	let maxCount = parseInt(props.maxCount.toString())
+	let disabled = props.disabled
+	if (disabled) return false
+	const chooseParams = UTSJSONObject.assign({
+		accept: props.accept,
+		extension: props.extension,
+		multiple: props.multiple,
+		capture: props.capture,
+		compressed: props.compressed,
+		maxDuration: props.maxDuration,
+		sizeType: props.sizeType,
+		camera: props.camera,
+	}, {
+		maxCount: maxCount - lists.value.length,
+		...params
+	})
+	let chooseParamsObj = JSON.parseObject<UPUploadChooseFileOptions>(JSON.stringify(chooseParams))
+	if (chooseParamsObj != null) {
+		chooseFile(chooseParamsObj).then((res: Array<UPUploadFileChoosed|null>) => {
+			onBeforeRead(res)
+		})
+	}
+	return true
+}
+
+function onChooseTap(): void {
+	chooseFileAction({} as UTSJSONObject)
+}
+
+function videoErrorCallback() {}
+
+function deleteItem(index: number) {
+	const currentFileList = [...props.fileList]
+	if (props.autoDelete) {
+		currentFileList.splice(index, 1)
+		emit('update:fileList', currentFileList)
+	} else {
+		emit(
+			'delete',
+			UTSJSONObject.assign(UTSJSONObject.assign({}, getDetail(index)), {
+				file: currentFileList[index],
+			})
+		)
+	}
+}
+
+function onPreviewImage(previewItem: UPUploadListItem, index: number) {
+	if (!previewItem.isImage || !props.previewFullImage) return
+	let current = 0
+	const urls = [] as Array<string>
+	let imageIndex = 0
+	for (let i = 0; i < lists.value.length; i++) {
+		const item = lists.value[i]
+		if (item.isImage || (item.type != null && item.type == 'image')) {
+			urls.push(item.url != null ? item.url as string : item.thumb as string)
+			if (i == index) {
+				current = imageIndex
+			}
+			imageIndex += 1
+		}
+	}
+	if (urls.length < 1) {
+		return
+	}
+	uni.previewImage({
+		urls: urls,
+		current: current,
+		fail() {
+			toast($t("up.upload.previewImageFail", {} as UTSJSONObject))
+		},
+	})
+}
+
+function onPreviewVideo(previewItem: UPUploadListItem, index: number) {
+	if (!props.previewFullImage) return
+	popupShow.value = true
+	currentItemIndex.value = index
+}
+
+function onClickPreview(item: UPUploadListItem, index: number) {
+	if (props.previewFullImage) {
+		switch (item.type) {
+			case 'image':
+				onPreviewImage(item, index)
+				break
+			case 'video':
+				onPreviewVideo(item, index)
+				break
+			default:
+				break
+		}
+	}
+	emit(
+		'clickPreview',
+		UTSJSONObject.assign(UTSJSONObject.assign({}, item as any as UTSJSONObject), getDetail(index))
+	)
+}
+</script>
+
+<style lang="scss" scoped>
+	$up-upload-preview-border-radius: 2px !default;
+	$up-upload-preview-margin: 0 8px 8px 0 !default;
+	$up-upload-image-width:80px !default;
+	$up-upload-image-height:$up-upload-image-width;
+	$up-upload-other-bgColor: rgb(242, 242, 242) !default;
+	$up-upload-other-flex:1 !default;
+	$up-upload-text-font-size:11px !default;
+	$up-upload-text-color:$up-tips-color !default;
+	$up-upload-text-margin-top:2px !default;
+	$up-upload-deletable-right:0 !default;
+	$up-upload-deletable-top:0 !default;
+	$up-upload-deletable-bgColor:rgb(55, 55, 55) !default;
+	$up-upload-deletable-height:14px !default;
+	$up-upload-deletable-width:$up-upload-deletable-height;
+	$up-upload-deletable-boder-bottom-left-radius:100px !default;
+	$up-upload-deletable-zIndex:3 !default;
+	$up-upload-success-bottom:0 !default;
+	$up-upload-success-right:0 !default;
+	$up-upload-success-border-style:solid !default;
+	$up-upload-success-border-top-color:transparent !default;
+	$up-upload-success-border-left-color:transparent !default;
+	$up-upload-success-border-bottom-color: $up-success !default;
+	$up-upload-success-border-right-color:$up-upload-success-border-bottom-color;
+	$up-upload-success-border-width:9px !default;
+	$up-upload-icon-top:0px !default;
+	$up-upload-icon-right:0px !default;
+	$up-upload-icon-h5-top:1px !default;
+	$up-upload-icon-h5-right:0 !default;
+	$up-upload-icon-width:16px !default;
+	$up-upload-icon-height:$up-upload-icon-width;
+	$up-upload-success-icon-bottom:-10px !default;
+	$up-upload-success-icon-right:-10px !default;
+	$up-upload-status-right:0 !default;
+	$up-upload-status-left:0 !default;
+	$up-upload-status-bottom:0 !default;
+	$up-upload-status-top:0 !default;
+	$up-upload-status-bgColor:rgba(0, 0, 0, 0.5) !default;
+	$up-upload-status-icon-Zindex:1 !default;
+	$up-upload-message-font-size:12px !default;
+	$up-upload-message-color:#FFFFFF !default;
+	$up-upload-message-margin-top:5px !default;
+	$up-upload-button-width:80px !default;
+	$up-upload-button-height:$up-upload-button-width;
+	$up-upload-button-bgColor:rgb(244, 245, 247) !default;
+	$up-upload-button-border-radius:2px !default;
+	$up-upload-botton-margin: 0 8px 8px 0 !default;
+	$up-upload-text-font-size:11px !default;
+	$up-upload-text-color:$up-tips-color !default;
+	$up-upload-text-margin-top: 2px !default;
+	$up-upload-hover-bgColor:rgb(230, 231, 233) !default;
+	$up-upload-disabled-opacity:.5 !default;
+
+	.up-upload {
+		@include flex(column);
+		flex: 1;
+
+		&__wrap {
+			@include flex;
+			flex-wrap: wrap;
+
+			&__preview {
+				border-radius: $up-upload-preview-border-radius;
+				margin: $up-upload-preview-margin;
+				position: relative;
+				overflow: hidden;
+				@include flex;
+
+				&__image {
+					width: $up-upload-image-width;
+					height: $up-upload-image-height;
+				}
+
+				&__video,
+				&__other {
+					width: $up-upload-image-width;
+					height: $up-upload-image-height;
+					background-color: $up-upload-other-bgColor;
+					flex: $up-upload-other-flex;
+					@include flex(column);
+					justify-content: center;
+					align-items: center;
+
+					&__text {
+						font-size: $up-upload-text-font-size;
+						color: $up-upload-text-color;
+						margin-top: $up-upload-text-margin-top;
+					}
+				}
+			}
+		}
+		&__wrap__play {
+			position: absolute;
+			top: 0px;
+			left: 0px;
+			bottom: 0px;
+			right: 0px;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			&__icon {
+				background: #fff;
+				border-radius: 100px;
+				opacity: 0.8;
+			};
+		}
+
+		&__deletable {
+			position: absolute;
+			top: $up-upload-deletable-top;
+			right: $up-upload-deletable-right;
+			background-color: $up-upload-deletable-bgColor;
+			height: $up-upload-deletable-height;
+			width: $up-upload-deletable-width;
+			@include flex;
+			border-bottom-left-radius: $up-upload-deletable-boder-bottom-left-radius;
+			align-items: center;
+			justify-content: center;
+			z-index: $up-upload-deletable-zIndex;
+
+			&__icon {
+				position: absolute;
+				transform: scale(0.7);
+				top: $up-upload-icon-top;
+				right: $up-upload-icon-right;
+				/* #ifdef H5 */
+				top: $up-upload-icon-h5-top;
+				right: $up-upload-icon-h5-right;
+				/* #endif */
+			}
+		}
+
+		&__success {
+			position: absolute;
+			bottom: $up-upload-success-bottom;
+			right: $up-upload-success-right;
+			@include flex;
+			border-style: $up-upload-success-border-style;
+			border-top-color: $up-upload-success-border-top-color;
+			border-left-color: $up-upload-success-border-left-color;
+			border-bottom-color: $up-upload-success-border-bottom-color;
+			border-right-color: $up-upload-success-border-right-color;
+			border-width: $up-upload-success-border-width;
+			align-items: center;
+			justify-content: center;
+
+			&__icon {
+				position: absolute;
+				transform: scale(0.7);
+				bottom: $up-upload-success-icon-bottom;
+				right: $up-upload-success-icon-right;
+			}
+		}
+		&__progress {
+			background-color: $up-primary !important;
+			position: absolute;
+			bottom: 0;
+			left: 0;
+		}
+
+		&__status {
+			position: absolute;
+			top: $up-upload-status-top;
+			bottom: $up-upload-status-bottom;
+			left: $up-upload-status-left;
+			right: $up-upload-status-right;
+			background-color: $up-upload-status-bgColor;
+			@include flex(column);
+			align-items: center;
+			justify-content: center;
+
+			&__icon {
+				position: relative;
+				z-index: $up-upload-status-icon-Zindex;
+			}
+
+			&__message {
+				font-size: $up-upload-message-font-size;
+				color: $up-upload-message-color;
+				margin-top: $up-upload-message-margin-top;
+			}
+		}
+
+		&__button {
+			@include flex(column);
+			align-items: center;
+			justify-content: center;
+			width: $up-upload-button-width;
+			height: $up-upload-button-height;
+			background-color: $up-upload-button-bgColor;
+			border-radius: $up-upload-button-border-radius;
+			margin: $up-upload-botton-margin;
+			box-sizing: border-box;
+
+			&__text {
+				font-size: $up-upload-text-font-size;
+				color: $up-upload-text-color;
+				margin-top: $up-upload-text-margin-top;
+			}
+
+			&--hover {
+				background-color: $up-upload-hover-bgColor;
+			}
+
+			&--disabled {
+				opacity: $up-upload-disabled-opacity;
+			}
+		}
+	}
+</style>

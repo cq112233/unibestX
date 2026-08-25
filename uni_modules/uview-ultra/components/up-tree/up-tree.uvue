@@ -1,0 +1,754 @@
+<template>
+  <view class="up-tree">
+    <view
+      v-for="item in visibleItems"
+      :key="getItemKey(item)"
+      class="up-tree-node"
+      :class="getNodeClass(item)"
+    >
+      <view
+        class="up-tree-node__content"
+        :class="getNodeContentClass(item)"
+        :style="getNodeContentStyle(item)"
+        @tap="handleNodeClick(item)"
+      >
+        <view class="up-tree-node__switcher" @tap.stop="handleExpandClick(item)">
+          <up-icon
+            v-if="getItemHasChildren(item)"
+            :name="getItemExpanded(item) ? collapseIcon : expandIcon"
+            :size="iconSize"
+            :color="switcherColor"
+          />
+        </view>
+        <up-checkbox
+          v-if="showCheckbox"
+          class="up-tree-node__checkbox"
+          usedAlone
+          :size="checkboxSize"
+          :checked="getItemChecked(item)"
+          :disabled="getItemDisabled(item)"
+          @change="handleCheckboxChangeEvent(item, $event)"
+        />
+        <view class="up-tree-node__label">
+          <!-- #ifndef MP-WEIXIN -->
+          <slot
+            :node="getItemNode(item)"
+            :data="getItemNode(item)"
+            :level="getItemSlotLevel(item)"
+            :expanded="getItemExpanded(item)"
+            :checked="getItemChecked(item)"
+            :indeterminate="getItemIndeterminate(item)"
+            :disabled="getItemDisabled(item)"
+          >
+            <text class="up-tree-node__text">{{ getItemLabel(item) }}</text>
+          </slot>
+          <!-- #endif -->
+          <!-- #ifdef MP-WEIXIN -->
+          <text class="up-tree-node__text">{{ getItemLabel(item) }}</text>
+          <!-- #endif -->
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { ref, computed, watch } from 'vue'
+import { deepClone } from '../../libs/function/index.uts'
+
+function createTreeList(): UTSJSONObject[] {
+  return [] as UTSJSONObject[]
+}
+
+function createNodeMap(): Map<string, UTSJSONObject> {
+  return new Map<string, UTSJSONObject>()
+}
+
+function createTreeProps(): UTSJSONObject {
+  return {
+    label: 'label',
+    children: 'children',
+    nodeKey: 'id',
+    disabled: 'disabled'
+  } as UTSJSONObject
+}
+
+function valueToString(value: any | null): string {
+  return value == null ? '' : value.toString()
+}
+
+function valueToBoolean(value: any | null): boolean {
+  return value == true
+}
+
+defineOptions({
+  name: 'up-tree'
+})
+
+const props = defineProps({
+  data: {
+    type: Array as PropType<UTSJSONObject[]>,
+    default: () => [] as UTSJSONObject[]
+  },
+  props: {
+    type: Object as PropType<UTSJSONObject>,
+    default: () => ({
+      label: 'label',
+      children: 'children',
+      nodeKey: 'id',
+      disabled: 'disabled'
+    } as UTSJSONObject)
+  },
+  nodeKey: {
+    type: String,
+    default: ''
+  },
+  showCheckbox: {
+    type: Boolean,
+    default: false
+  },
+  defaultExpandAll: {
+    type: Boolean,
+    default: false
+  },
+  defaultExpandedKeys: {
+    type: Array as PropType<any[]>,
+    default: () => [] as any[]
+  },
+  defaultCheckedKeys: {
+    type: Array as PropType<any[]>,
+    default: () => [] as any[]
+  },
+  expandOnClickNode: {
+    type: Boolean,
+    default: true
+  },
+  checkOnClickNode: {
+    type: Boolean,
+    default: false
+  },
+  checkStrictly: {
+    type: Boolean,
+    default: false
+  },
+  accordion: {
+    type: Boolean,
+    default: false
+  },
+  highlightCurrent: {
+    type: Boolean,
+    default: false
+  },
+  currentNodeKey: {
+    type: [String, Number],
+    default: ''
+  },
+  indent: {
+    type: [String, Number],
+    default: 32
+  },
+  iconSize: {
+    type: [String, Number],
+    default: 14
+  },
+  checkboxSize: {
+    type: [String, Number],
+    default: 16
+  },
+  expandIcon: {
+    type: String,
+    default: 'play-right-fill'
+  },
+  collapseIcon: {
+    type: String,
+    default: 'arrow-down-fill'
+  }
+})
+
+const emit = defineEmits(['node-click', 'check-change', 'check', 'node-expand', 'node-collapse', 'current-change'])
+
+const treeData = ref<UTSJSONObject[]>(createTreeList())
+const currentKey = ref<string>(valueToString(props.currentNodeKey))
+let nodeMap: Map<string, UTSJSONObject> = createNodeMap()
+let privateKeySeed: number = 0
+
+const treeProps = computed<UTSJSONObject>(() => {
+  const merged = createTreeProps()
+  const custom = props.props
+  const label = custom['label']
+  if (valueToString(label) != '') {
+    merged['label'] = label
+  }
+  const children = custom['children']
+  if (valueToString(children) != '') {
+    merged['children'] = children
+  }
+  const nKey = custom['nodeKey']
+  if (valueToString(nKey) != '') {
+    merged['nodeKey'] = nKey
+  }
+  const disabled = custom['disabled']
+  if (valueToString(disabled) != '') {
+    merged['disabled'] = disabled
+  }
+  return merged
+})
+
+const labelKey = computed<string>(() => {
+  return valueToString(treeProps.value['label']) == '' ? 'label' : valueToString(treeProps.value['label'])
+})
+
+const childrenKey = computed<string>(() => {
+  return valueToString(treeProps.value['children']) == '' ? 'children' : valueToString(treeProps.value['children'])
+})
+
+const disabledKey = computed<string>(() => {
+  return valueToString(treeProps.value['disabled']) == '' ? 'disabled' : valueToString(treeProps.value['disabled'])
+})
+
+const keyField = computed<string>(() => {
+  return props.nodeKey != '' ? props.nodeKey : valueToString(treeProps.value['nodeKey'])
+})
+
+const switcherColor = computed<string>(() => '#606266')
+
+function getItemHasChildren(item: UTSJSONObject): boolean {
+  return valueToBoolean(item['hasChildren'])
+}
+
+function getItemExpanded(item: UTSJSONObject): boolean {
+  return valueToBoolean(item['expanded'])
+}
+
+function getItemChecked(item: UTSJSONObject): boolean {
+  return valueToBoolean(item['checked'])
+}
+
+function getItemIndeterminate(item: UTSJSONObject): boolean {
+  return valueToBoolean(item['indeterminate'])
+}
+
+function getItemDisabled(item: UTSJSONObject): boolean {
+  return valueToBoolean(item['disabled'])
+}
+
+function getItemSlotLevel(item: UTSJSONObject): number {
+  const val = item['slotLevel']
+  if (typeof val === 'number') {
+    return val as number
+  }
+  return parseInt(valueToString(val))
+}
+
+function getItemLabel(item: UTSJSONObject): string {
+  return valueToString(item['label'])
+}
+
+function getChildren(node: UTSJSONObject): UTSJSONObject[] {
+  const rawChildren = node[childrenKey.value] as UTSJSONObject[] | null
+  if (Array.isArray(rawChildren)) {
+    return rawChildren as UTSJSONObject[]
+  }
+  return createTreeList()
+}
+
+function getNodeKey(node: UTSJSONObject): string {
+  return valueToString(node['__upTreeKey'])
+}
+
+function getNodeLabel(node: UTSJSONObject): string {
+  return valueToString(node[labelKey.value])
+}
+
+function isNodeDisabled(node: UTSJSONObject): boolean {
+  return valueToBoolean(node[disabledKey.value])
+}
+
+function includesKey(keys: any[], key: string): boolean {
+  for (let i = 0; i < keys.length; i++) {
+    if (valueToString(keys[i]) == key) {
+      return true
+    }
+  }
+  return false
+}
+
+function resolveNodeKey(node: UTSJSONObject, parentKey: string, index: number): string {
+  const rawKey = node[keyField.value]
+  const normalized = valueToString(rawKey)
+  if (normalized != '') {
+    return normalized
+  }
+  privateKeySeed = privateKeySeed + 1
+  return (parentKey == '' ? 'root' : parentKey) + '-' + index.toString() + '-' + privateKeySeed.toString()
+}
+
+function setChildrenChecked(node: UTSJSONObject, checked: boolean): void {
+  const children = getChildren(node)
+  for (let i = 0; i < children.length; i++) {
+    const child = children[i] as UTSJSONObject
+    if (!isNodeDisabled(child)) {
+      child['checked'] = checked
+      child['indeterminate'] = false
+      setChildrenChecked(child, checked)
+    }
+  }
+}
+
+function cloneNodes(nodes: UTSJSONObject[], parentKey: string, level: number): UTSJSONObject[] {
+  const list = [] as UTSJSONObject[]
+  for (let i = 0; i < nodes.length; i++) {
+    const source = nodes[i] as UTSJSONObject
+    const cloned = deepClone(source) as UTSJSONObject | null
+    const clone = cloned == null ? ({} as UTSJSONObject) : cloned
+    const key = resolveNodeKey(clone, parentKey, i)
+    const rawChildren = source[childrenKey.value] as UTSJSONObject[] | null
+    const children = Array.isArray(rawChildren) ? (rawChildren as UTSJSONObject[]) : createTreeList()
+    const expanded = props.defaultExpandAll || includesKey(props.defaultExpandedKeys, key) || valueToBoolean(clone['expanded'])
+    const checked = includesKey(props.defaultCheckedKeys, key) || valueToBoolean(clone['checked'])
+
+    clone['__upTreeKey'] = key
+    clone['__upTreeParentKey'] = parentKey
+    clone['__upTreeLevel'] = level
+    clone['expanded'] = expanded
+    clone['checked'] = checked
+    clone['indeterminate'] = false
+    clone[childrenKey.value] = cloneNodes(children, key, level + 1)
+    if (checked && !props.checkStrictly) {
+      setChildrenChecked(clone, true)
+    }
+
+    nodeMap.set(key, clone)
+    list.push(clone)
+  }
+  return list
+}
+
+function syncParentChecked(nodes: UTSJSONObject[]): void {
+  for (let i = 0; i < nodes.length; i++) {
+    const node = nodes[i] as UTSJSONObject
+    const children = getChildren(node)
+    if (children.length > 0) {
+      syncParentChecked(children)
+      let enabledCount = 0
+      let checkedCount = 0
+      let someChecked = false
+      for (let j = 0; j < children.length; j++) {
+        const child = children[j] as UTSJSONObject
+        if (!isNodeDisabled(child)) {
+          enabledCount = enabledCount + 1
+          if (valueToBoolean(child['checked'])) {
+            checkedCount = checkedCount + 1
+          }
+          if (valueToBoolean(child['checked']) || valueToBoolean(child['indeterminate'])) {
+            someChecked = true
+          }
+        }
+      }
+      const allChecked = enabledCount > 0 && checkedCount == enabledCount
+      node['checked'] = allChecked
+      node['indeterminate'] = !allChecked && someChecked
+    }
+  }
+}
+
+function collectVisibleNodes(nodes: UTSJSONObject[], level: number, result: UTSJSONObject[]): void {
+  for (let i = 0; i < nodes.length; i++) {
+    const node = nodes[i] as UTSJSONObject
+    const children = getChildren(node)
+    const item = {
+      key: getNodeKey(node),
+      node,
+      level,
+      slotLevel: level + 1,
+      label: getNodeLabel(node),
+      hasChildren: children.length > 0,
+      expanded: valueToBoolean(node['expanded']),
+      checked: valueToBoolean(node['checked']),
+      indeterminate: valueToBoolean(node['indeterminate']),
+      disabled: isNodeDisabled(node)
+    } as UTSJSONObject
+    result.push(item)
+    if (children.length > 0 && valueToBoolean(node['expanded'])) {
+      collectVisibleNodes(children, level + 1, result)
+    }
+  }
+}
+
+const visibleItems = ref<UTSJSONObject[]>(createTreeList())
+
+let renderVersion: number = 0
+
+function rebuildVisibleItems(): void {
+  renderVersion = renderVersion + 1
+  const result = [] as UTSJSONObject[]
+  collectVisibleNodes(treeData.value, 0, result)
+  for (let i = 0; i < result.length; i++) {
+    const item = result[i] as UTSJSONObject
+    item['renderKey'] = valueToString(item['key']) + '@' + renderVersion.toString()
+  }
+  visibleItems.value = result
+}
+
+function getItemKey(item: UTSJSONObject): string {
+  return valueToString(item['renderKey'])
+}
+
+function getItemNode(item: UTSJSONObject): UTSJSONObject {
+  const node = item['node'] as UTSJSONObject | null
+  return node == null ? ({} as UTSJSONObject) : node
+}
+
+function initTree(): void {
+  privateKeySeed = 0
+  nodeMap = createNodeMap()
+  treeData.value = cloneNodes(props.data, '', 0)
+  if (!props.checkStrictly) {
+    syncParentChecked(treeData.value)
+  }
+  rebuildVisibleItems()
+}
+
+function getNodeClass(item: UTSJSONObject): string {
+  const classes = [] as string[]
+  if (valueToBoolean(item['disabled'])) {
+    classes.push('up-tree-node--disabled')
+  }
+  return classes.join(' ')
+}
+
+function getNodeContentClass(item: UTSJSONObject): string {
+  if (props.highlightCurrent && valueToString(item['key']) == currentKey.value) {
+    return 'up-tree-node__content--current'
+  }
+  return ''
+}
+
+function getIndentValue(level: number): string {
+  const raw = props.indent
+  if (typeof raw == 'number') {
+    return ((raw as number) * level).toString() + 'rpx'
+  }
+  const val = valueToString(raw)
+  if (val == '') {
+    return '0rpx'
+  }
+  if (val.endsWith('px')) {
+    return (parseFloat(val.replace('px', '')) * level).toString() + 'px'
+  }
+  if (val.endsWith('rpx')) {
+    return (parseFloat(val.replace('rpx', '')) * level).toString() + 'rpx'
+  }
+  return (parseFloat(val) * level).toString() + 'rpx'
+}
+
+function getNodeByKey(key: any): UTSJSONObject | null {
+  return nodeMap.get(valueToString(key)) as UTSJSONObject | null
+}
+
+function getCurrentNode(): UTSJSONObject | null {
+  return getNodeByKey(currentKey.value)
+}
+
+function getParentNode(node: UTSJSONObject): UTSJSONObject | null {
+  const parentKey = valueToString(node['__upTreeParentKey'])
+  if (parentKey == '') {
+    return null
+  }
+  return nodeMap.get(parentKey) as UTSJSONObject | null
+}
+
+function collapseSiblingNodes(node: UTSJSONObject): void {
+  const parent = getParentNode(node)
+  const siblings = parent == null ? treeData.value : getChildren(parent)
+  const curKey = getNodeKey(node)
+  for (let i = 0; i < siblings.length; i++) {
+    const sibling = siblings[i] as UTSJSONObject
+    if (getNodeKey(sibling) != curKey) {
+      sibling['expanded'] = false
+    }
+  }
+}
+
+function getNodeContentStyle(item: UTSJSONObject): UTSJSONObject {
+  return {
+    paddingLeft: getIndentValue(item['level'] as number)
+  } as UTSJSONObject
+}
+
+function toggleExpand(item: UTSJSONObject): void {
+  const node = item['node'] as UTSJSONObject
+  const nextExpanded = !valueToBoolean(node['expanded'])
+  if (props.accordion && nextExpanded) {
+    collapseSiblingNodes(node)
+  }
+  node['expanded'] = nextExpanded
+  if (nextExpanded) {
+    emit('node-expand', node)
+  } else {
+    emit('node-collapse', node)
+  }
+}
+
+function handleExpandClick(item: UTSJSONObject): void {
+  if (valueToBoolean(item['hasChildren'])) {
+    toggleExpand(item)
+    rebuildVisibleItems()
+  }
+}
+
+function updateParentChecked(node: UTSJSONObject): void {
+  const parent = getParentNode(node)
+  if (parent == null) {
+    return
+  }
+  const children = getChildren(parent)
+  let enabledCount = 0
+  let checkedCount = 0
+  let someChecked = false
+  for (let i = 0; i < children.length; i++) {
+    const child = children[i] as UTSJSONObject
+    if (!isNodeDisabled(child)) {
+      enabledCount = enabledCount + 1
+      if (valueToBoolean(child['checked'])) {
+        checkedCount = checkedCount + 1
+      }
+      if (valueToBoolean(child['checked']) || valueToBoolean(child['indeterminate'])) {
+        someChecked = true
+      }
+    }
+  }
+  const allChecked = enabledCount > 0 && checkedCount == enabledCount
+  parent['checked'] = allChecked
+  parent['indeterminate'] = !allChecked && someChecked
+  updateParentChecked(parent)
+}
+
+function setNodeChecked(node: UTSJSONObject, checked: boolean, deep: boolean): void {
+  node['checked'] = checked
+  node['indeterminate'] = false
+  if (!props.checkStrictly && deep) {
+    setChildrenChecked(node, checked)
+  }
+  if (!props.checkStrictly) {
+    updateParentChecked(node)
+  }
+}
+
+function walkNodes(nodes: UTSJSONObject[], callback: (node: UTSJSONObject) => void): void {
+  for (let i = 0; i < nodes.length; i++) {
+    const node = nodes[i] as UTSJSONObject
+    callback(node)
+    walkNodes(getChildren(node), callback)
+  }
+}
+
+function getCheckedNodes(leafOnly: boolean = false): UTSJSONObject[] {
+  const result = [] as UTSJSONObject[]
+  walkNodes(treeData.value, (node: UTSJSONObject): void => {
+    const isLeaf = getChildren(node).length == 0
+    if (valueToBoolean(node['checked']) && (!leafOnly || isLeaf)) {
+      result.push(node)
+    }
+  })
+  return result
+}
+
+function getCheckedKeys(leafOnly: boolean = false): string[] {
+  const checkedNodes = getCheckedNodes(leafOnly)
+  const result = [] as string[]
+  for (let i = 0; i < checkedNodes.length; i++) {
+    result.push(getNodeKey(checkedNodes[i] as UTSJSONObject))
+  }
+  return result
+}
+
+function getHalfCheckedNodes(): UTSJSONObject[] {
+  const result = [] as UTSJSONObject[]
+  walkNodes(treeData.value, (node: UTSJSONObject): void => {
+    if (valueToBoolean(node['indeterminate'])) {
+      result.push(node)
+    }
+  })
+  return result
+}
+
+function getHalfCheckedKeys(): string[] {
+  const halfCheckedNodes = getHalfCheckedNodes()
+  const result = [] as string[]
+  for (let i = 0; i < halfCheckedNodes.length; i++) {
+    result.push(getNodeKey(halfCheckedNodes[i] as UTSJSONObject))
+  }
+  return result
+}
+
+function emitCheck(node: UTSJSONObject): void {
+  emit('check', node, {
+    checkedNodes: getCheckedNodes(false),
+    checkedKeys: getCheckedKeys(false),
+    halfCheckedNodes: getHalfCheckedNodes(),
+    halfCheckedKeys: getHalfCheckedKeys()
+  } as UTSJSONObject)
+}
+
+function handleNodeClick(item: UTSJSONObject): void {
+  const node = item['node'] as UTSJSONObject
+  const oldCurrentNode = getCurrentNode()
+  currentKey.value = valueToString(item['key'])
+  if (props.expandOnClickNode && valueToBoolean(item['hasChildren'])) {
+    toggleExpand(item)
+  }
+  if (props.checkOnClickNode && props.showCheckbox && !valueToBoolean(item['disabled'])) {
+    setNodeChecked(node, !valueToBoolean(node['checked']), true)
+    emitCheck(node)
+  }
+  emit('node-click', node)
+  if (oldCurrentNode !== node) {
+    emit('current-change', node, oldCurrentNode)
+  }
+  rebuildVisibleItems()
+}
+
+function handleCheckboxChange(item: UTSJSONObject, checked: boolean): void {
+  if (valueToBoolean(item['disabled'])) {
+    return
+  }
+  const node = item['node'] as UTSJSONObject
+  setNodeChecked(node, checked, true)
+  emit('check-change', node, checked)
+  emitCheck(node)
+  rebuildVisibleItems()
+}
+
+function handleCheckboxChangeEvent(item: UTSJSONObject, event: any | null): void {
+  handleCheckboxChange(item, valueToBoolean(event))
+}
+
+function setCheckedKeys(keys: any[], leafOnly: boolean = false): void {
+  walkNodes(treeData.value, (node: UTSJSONObject): void => {
+    node['checked'] = false
+    node['indeterminate'] = false
+  })
+  for (let i = 0; i < keys.length; i++) {
+    const node = getNodeByKey(keys[i])
+    if (node != null) {
+      const isLeaf = getChildren(node).length == 0
+      if (!leafOnly || isLeaf) {
+        setNodeChecked(node, true, !props.checkStrictly)
+      }
+    }
+  }
+  if (!props.checkStrictly) {
+    syncParentChecked(treeData.value)
+  }
+  rebuildVisibleItems()
+}
+
+function setChecked(key: any, checked: boolean, deep: boolean = true): void {
+  const node = getNodeByKey(key)
+  if (node != null) {
+    setNodeChecked(node, checked, deep)
+    rebuildVisibleItems()
+  }
+}
+
+function setCurrentKey(key: any): void {
+  currentKey.value = valueToString(key)
+}
+
+function getCurrentKey(): string {
+  return currentKey.value
+}
+
+watch((): Array<UTSJSONObject> => props.data, () => {
+  initTree()
+}, { deep: true, immediate: true })
+
+watch((): UTSJSONObject => props.props, () => {
+  initTree()
+}, { deep: true })
+
+watch((): string => props.nodeKey, () => {
+  initTree()
+})
+
+watch((): boolean => props.defaultExpandAll, () => {
+  initTree()
+})
+
+watch((): any[] => props.defaultExpandedKeys, () => {
+  initTree()
+})
+
+watch((): any[] => props.defaultCheckedKeys, () => {
+  initTree()
+})
+
+watch((): boolean => props.checkStrictly, () => {
+  initTree()
+})
+
+watch((): any | null => props.currentNodeKey, (value: any) => {
+  currentKey.value = valueToString(value)
+}, { immediate: true })
+
+defineExpose({
+  getCheckedNodes,
+  getCheckedKeys,
+  getHalfCheckedNodes,
+  getHalfCheckedKeys,
+  setCheckedKeys,
+  setChecked,
+  setCurrentKey,
+  getCurrentKey,
+  getCurrentNode
+})
+</script>
+
+<style scoped>
+.up-tree-node__content {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  min-height: 72rpx;
+  box-sizing: border-box;
+  border-radius: 8rpx;
+}
+
+.up-tree-node__content--current {
+  background-color: var(--up-primary-light, #ecf5ff);
+}
+
+.up-tree-node--disabled {
+  opacity: 0.55;
+}
+
+.up-tree-node__switcher {
+  width: 36rpx;
+  height: 36rpx;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.up-tree-node__checkbox {
+  margin-left: 8rpx;
+  margin-right: 8rpx;
+}
+
+.up-tree-node__label {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.up-tree-node__text {
+  color: var(--up-main-color, #303133);
+  font-size: 28rpx;
+  line-height: 40rpx;
+}
+</style>

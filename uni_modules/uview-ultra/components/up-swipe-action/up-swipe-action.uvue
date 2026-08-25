@@ -1,0 +1,37 @@
+<template>
+	<view class="up-swipe-action">
+		<slot></slot>
+	</view>
+</template>
+
+<script setup lang="uts">
+import { ref, provide, watch } from 'vue'
+
+defineOptions({
+	name: 'up-swipe-action'
+})
+
+const props = defineProps({
+	autoClose: {
+		type: Boolean,
+		default: true
+	}
+})
+
+const activeItemId = ref<number>(-1)
+
+function registerActive(id: number) {
+	if (props.autoClose) {
+		activeItemId.value = id
+	}
+}
+
+provide('upSwipeActionContext', {
+	autoClose: props.autoClose,
+	activeItemId,
+	registerActive
+})
+</script>
+
+<style lang="scss" scoped>
+</style>

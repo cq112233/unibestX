@@ -1,0 +1,600 @@
+<template>
+	<up-popup
+		:show="show"
+		mode="bottom"
+		closeable
+		@close="close"
+		:round="round"
+		:closeOnClickOverlay="closeOnClickOverlay"
+		:safeAreaInsetBottom="safeAreaInsetBottom"
+	>
+		<view class="up-calendar">
+			<uHeader
+				:title="elTitle"
+				:subtitle="subtitle"
+				:showSubtitle="showSubtitle"
+				:showTitle="showTitle"
+				:showSwitch="monthSwitch"
+				:showToday="showToday"
+				:todayText="todayText"
+				:todayDisabled="todayDisabled"
+				:prevDisabled="switchPrevDisabled"
+				:nextDisabled="switchNextDisabled"
+				:prevYearDisabled="switchPrevYearDisabled"
+				:nextYearDisabled="switchNextYearDisabled"
+				@prev="prevMonth"
+				@next="nextMonth"
+				@prevYear="prevYear"
+				@nextYear="nextYear"
+				@today="jumpToToday"
+			></uHeader>
+			<scroll-view
+				v-if="!monthSwitch"
+				:style="listStyle"
+				direction="vertical"
+				@scroll="onScroll"
+				:scroll-top="scrollTop"
+				:scroll-into-view="scrollIntoView"
+			>
+				<uMonth
+					:color="color"
+					:rowHeight="rowHeight"
+					:showMark="showMark"
+					:months="months"
+					:mode="mode"
+					:maxCount="maxCount"
+					:startText="elStartText"
+					:endText="elEndText"
+					:defaultDate="defaultDate"
+					:minDate="innerMinDate"
+					:maxDate="innerMaxDate"
+					:maxMonth="monthNum"
+					:readonly="readonly"
+					:maxRange="maxRange"
+					:rangePrompt="rangePrompt"
+					:showRangePrompt="showRangePrompt"
+					:allowSameDay="allowSameDay"
+					:todayDate="todayDate"
+					ref="month"
+					@monthSelected="monthSelectedM"
+					@updateMonthTop="onUpdateMonthTopM"
+				></uMonth>
+			</scroll-view>
+			<view
+				v-else
+				:style="listStyle"
+			>
+				<uMonth
+					:color="color"
+					:rowHeight="rowHeight"
+					:showMark="showMark"
+					:months="currentMonths"
+					:mode="mode"
+					:maxCount="maxCount"
+					:startText="elStartText"
+					:endText="elEndText"
+					:defaultDate="defaultDate"
+					:minDate="innerMinDate"
+					:maxDate="innerMaxDate"
+					:maxMonth="monthNum"
+					:readonly="readonly"
+					:maxRange="maxRange"
+					:rangePrompt="rangePrompt"
+					:showRangePrompt="showRangePrompt"
+					:allowSameDay="allowSameDay"
+					:todayDate="todayDate"
+					ref="month"
+					@monthSelected="monthSelectedM"
+					@updateMonthTop="onUpdateMonthTopM"
+				></uMonth>
+			</view>
+			<slot name="footer" v-if="showConfirm">
+				<view class="up-calendar__confirm">
+					<up-button
+						shape="circle"
+						:text="
+                            buttonDisabled ? elConfirmDisabledText : elConfirmText
+                        "
+						:color="color == '#3c9cff' ? '' : color"
+						:type="color == '#3c9cff' ? 'primary' : ''"
+						@click="confirm"
+						:disabled="buttonDisabled"
+						customStyle="min-width:120px;"
+					></up-button>
+				</view>
+			</slot>
+		</view>
+	</up-popup>
+</template>
+
+<script setup lang="uts">
+import { ref, computed, watch, onMounted, nextTick } from 'vue'
+import uHeader from './header.uvue'
+import uMonth from './month.uvue'
+import { UPCalendarMonthsItemDate, CalendarMonthItem } from './types.uts'
+import { dayuts } from '@/uni_modules/lime-dayuts'
+import { t as $t, formatMonthTitle } from '../../libs/i18n/index.uts'
+import { addUnit, range, error, padZero } from '../../libs/function/index'
+import { number as testNumber, array as testArray } from '../../libs/function/test'
+
+defineOptions({
+	name: 'up-calendar'
+})
+
+const props = defineProps({
+	title: {
+		type: String,
+		default: ''
+	},
+	showTitle: {
+		type: Boolean,
+		default: true
+	},
+	showSubtitle: {
+		type: Boolean,
+		default: true
+	},
+	mode: {
+		type: String,
+		default: 'single'
+	},
+	startText: {
+		type: String,
+		default: '开始'
+	},
+	endText: {
+		type: String,
+		default: '结束'
+	},
+	customList: {
+		type: Array as PropType<Array<any>>,
+		default: () => [] as Array<any>
+	},
+	color: {
+		type: String,
+		default: '#3c9cff'
+	},
+	minDate: {
+		type: [String, Number],
+		default: 0
+	},
+	maxDate: {
+		type: [String, Number],
+		default: 0
+	},
+	defaultDate: {
+		type: [Array, String, Date],
+		default: null
+	},
+	maxCount: {
+		type: [String, Number],
+		default: 999
+	},
+	rowHeight: {
+		type: [String, Number],
+		default: 56
+	},
+	formatter: {
+		type: Function,
+		default: null
+	},
+	showLunar: {
+		type: Boolean,
+		default: false
+	},
+	showMark: {
+		type: Boolean,
+		default: true
+	},
+	confirmText: {
+		type: String,
+		default: '确定'
+	},
+	confirmDisabledText: {
+		type: String,
+		default: '确定'
+	},
+	show: {
+		type: Boolean,
+		default: false
+	},
+	closeOnClickOverlay: {
+		type: Boolean,
+		default: false
+	},
+	readonly: {
+		type: Boolean,
+		default: false
+	},
+	showConfirm: {
+		type: Boolean,
+		default: true
+	},
+	maxRange: {
+		type: [Number, String],
+		default: 365
+	},
+	rangePrompt: {
+		type: String,
+		default: ''
+	},
+	showRangePrompt: {
+		type: Boolean,
+		default: true
+	},
+	allowSameDay: {
+		type: Boolean,
+		default: false
+	},
+	rangeResultMode: {
+		type: String,
+		default: 'all'
+	},
+	round: {
+		type: [Boolean, String, Number],
+		default: 0
+	},
+	monthNum: {
+		type: [Number, String],
+		default: 3
+	},
+	monthSwitch: {
+		type: Boolean,
+		default: false
+	},
+	showToday: {
+		type: Boolean,
+		default: true
+	},
+	safeAreaInsetBottom: {
+		type: Boolean,
+		default: true
+	}
+})
+
+const emit = defineEmits(['confirm', 'close'])
+
+const inited = ref<boolean>(false)
+const months = ref<Array<CalendarMonthItem>>([])
+const monthIndex = ref<number>(0)
+const listHeight = ref<number>(0)
+const listStyle = computed((): UTSJSONObject => {
+	return {
+		height: addUnit(listHeight.value)
+	} as UTSJSONObject
+})
+const selected = ref<Array<string>>([])
+const scrollIntoView = ref<string>('')
+const scrollTop = ref<number>(0)
+
+const innerMaxDate = computed<string>(() => {
+	return props.maxDate.toString()
+})
+
+const innerMinDate = computed<string>(() => {
+	return props.minDate.toString()
+})
+
+const todayDate = computed<string>(() => {
+	return dayuts().format('YYYY-MM-DD')
+})
+
+const todayText = computed<string>(() => {
+	return $t('up.calendar.today', {} as UTSJSONObject)
+})
+
+const todayDisabled = computed<boolean>(() => {
+	let today = dayuts(todayDate.value as any)
+	let minD = innerMinDate.value
+	let maxD = innerMaxDate.value
+	if (minD != '' && minD != '0' && today.isBefore(dayuts(minD as any), 'day')) {
+		return true
+	}
+	if (maxD != '' && maxD != '0' && today.isAfter(dayuts(maxD as any), 'day')) {
+		return true
+	}
+	return false
+})
+
+const elTitle = computed<string>(() => {
+	if (props.title != '' && props.title != '日期选择') {
+		return props.title
+	}
+	return $t('up.calendar.chooseDates', {} as UTSJSONObject)
+})
+
+const elConfirmText = computed<string>(() => {
+	if (props.confirmText != '' && props.confirmText != '确定') {
+		return props.confirmText
+	}
+	return $t('up.common.confirm', {} as UTSJSONObject)
+})
+
+const elConfirmDisabledText = computed<string>(() => {
+	if (props.confirmDisabledText != '' && props.confirmDisabledText != '确定') {
+		return props.confirmDisabledText
+	}
+	return $t('up.common.confirm', {} as UTSJSONObject)
+})
+
+const elStartText = computed<string>(() => {
+	if (props.startText != '' && props.startText != '开始') {
+		return props.startText
+	}
+	return $t('up.common.start', {} as UTSJSONObject)
+})
+
+const elEndText = computed<string>(() => {
+	if (props.endText != '' && props.endText != '结束') {
+		return props.endText
+	}
+	return $t('up.common.end', {} as UTSJSONObject)
+})
+
+const subtitle = computed<string>(() => {
+	if (months.value.length > 0) {
+		const item = months.value[monthIndex.value]
+		return formatMonthTitle(item.year, item.month)
+	}
+	return ''
+})
+
+const currentMonths = computed<Array<CalendarMonthItem>>(() => {
+	if (props.monthSwitch && months.value.length > 0) {
+		return [months.value[monthIndex.value]]
+	}
+	return months.value
+})
+
+const switchPrevDisabled = computed<boolean>(() => {
+	return monthIndex.value <= 0
+})
+
+const switchNextDisabled = computed<boolean>(() => {
+	return monthIndex.value >= months.value.length - 1
+})
+
+const switchPrevYearDisabled = computed<boolean>(() => {
+	return monthIndex.value - 12 < 0
+})
+
+const switchNextYearDisabled = computed<boolean>(() => {
+	return monthIndex.value + 12 > months.value.length - 1
+})
+
+const buttonDisabled = computed<boolean>(() => {
+	if (props.mode === 'range') {
+		return selected.value.length <= 1
+	}
+	return false
+})
+
+function getConfirmValue(selParam: Array<string> | null = null): Array<string> {
+	const sel = selParam ?? selected.value
+	if (props.mode == 'range' && props.rangeResultMode == 'boundary' && sel.length >= 2) {
+		let len = sel.length - 1
+		return [sel[0], sel[len]]
+	}
+	return sel
+}
+
+function monthSelectedM(e: Array<string>, scene: string) {
+	selected.value = e
+	if (!props.showConfirm) {
+		if (
+			props.mode === 'multiple' ||
+			props.mode === 'single' ||
+			(props.mode === 'range' && selected.value.length >= 2)
+		) {
+			if (scene === 'tap') {
+				emit('confirm', getConfirmValue())
+			}
+		}
+	}
+}
+
+function getMonths(minD: any, maxD: any): number {
+	const minYear = dayuts(minD as any).year()
+	const minMonth = dayuts(minD as any).month() + 1
+	const maxYear = dayuts(maxD as any).year()
+	const maxMonth = dayuts(maxD as any).month() + 1
+	return (maxYear - minYear) * 12 + (maxMonth - minMonth) + 1
+}
+
+function getDefaultMonthIndex(): number {
+	let sel = dayuts().format('YYYY-MM')
+	if (props.defaultDate != null) {
+		if (!testArray(props.defaultDate)) {
+			sel = dayuts(props.defaultDate as any).format('YYYY-MM')
+		} else if ((props.defaultDate as Array<any>).length > 0) {
+			sel = dayuts((props.defaultDate as Array<any>)[0] as any).format('YYYY-MM')
+		}
+	}
+	const idx = months.value.findIndex(({ year, month }): boolean => {
+		month = padZero(month)
+		return `${year}-${month}` === sel
+	})
+	return idx == -1 ? 0 : idx
+}
+
+function setMonth() {
+	const minD = (innerMinDate.value != '' && innerMinDate.value != '0') ? innerMinDate.value : dayuts().valueOf()
+	const maxD = (innerMaxDate.value != '' && innerMaxDate.value != '0')
+		? innerMaxDate.value
+		: dayuts(minD as any).add(parseInt(props.monthNum.toString()) - 1, 'month').valueOf()
+	const monthCount = range(1, parseInt(props.monthNum.toString()), getMonths(minD, maxD))
+	let newMonths = [] as Array<CalendarMonthItem>
+	const minDateStr = dayuts(minD as any).format('YYYY-MM-DD')
+	const maxDateStr = dayuts(maxD as any).format('YYYY-MM-DD')
+	for (let i = 0; i < monthCount; i++) {
+		const monthBase = dayuts(minD as any).add(i, 'month')
+		const daysInMonth = monthBase.daysInMonth()
+		const monthValue = monthBase.month() + 1
+		const yearValue = monthBase.year()
+		let cdate: Array<UPCalendarMonthsItemDate> = []
+		for (let day = 1; day <= daysInMonth; day++) {
+			const dayBase = monthBase.date(day)
+			const date = dayBase.format('YYYY-MM-DD')
+			const week = dayBase.day()
+			let config = {
+				day: day.toString(),
+				week,
+				disabled: date < minDateStr || date > maxDateStr,
+				date: new Date(date),
+				dateStr: date,
+				bottomInfo: '',
+				dot: false,
+				month: monthValue
+			} as UPCalendarMonthsItemDate
+			cdate.push(config)
+		}
+		let md: CalendarMonthItem = {
+			top: 0,
+			date: cdate,
+			month: monthValue.toString(),
+			year: yearValue.toString()
+		}
+		newMonths.push(md)
+	}
+	months.value = newMonths
+	if (props.monthSwitch) {
+		monthIndex.value = getDefaultMonthIndex()
+	}
+}
+
+function scrollIntoDefaultMonth(selMonth: string) {
+	const _index = months.value.findIndex(({ year, month }): boolean => {
+		month = padZero(month)
+		return `${year}-${month}` === selMonth
+	})
+	if (_index != -1) {
+		nextTick(() => {
+			scrollIntoView.value = ''
+			scrollIntoView.value = `month-${_index}`
+		})
+	}
+}
+
+function jumpToToday() {
+	if (todayDisabled.value) return
+	const targetMonth = dayuts(todayDate.value as any).format('YYYY-MM')
+	if (props.monthSwitch) {
+		const todayMonthIdx = months.value.findIndex(({ year, month }): boolean => {
+			month = padZero(month)
+			return `${year}-${month}` == targetMonth
+		})
+		if (todayMonthIdx != -1) {
+			monthIndex.value = todayMonthIdx
+		}
+		return
+	}
+	scrollIntoDefaultMonth(targetMonth)
+}
+
+function updateMonthTopM(topArr: Array<number>) {
+	topArr.map((item, index) => {
+		if (index < months.value.length) {
+			months.value[index].top = item
+		}
+	})
+	if (props.defaultDate == null) {
+		const sel = dayuts().format("YYYY-MM")
+		scrollIntoDefaultMonth(sel)
+		return
+	}
+	let sel = dayuts().format("YYYY-MM")
+	if (!testArray(props.defaultDate)) {
+		sel = dayuts(props.defaultDate as any).format("YYYY-MM")
+	} else {
+		sel = dayuts((props.defaultDate as Array<any>)[0] as any).format("YYYY-MM")
+	}
+	scrollIntoDefaultMonth(sel)
+}
+
+function onUpdateMonthTopM(topArr: Array<number>) {
+	if (props.monthSwitch) return
+	updateMonthTopM(topArr)
+}
+
+function onScroll(event: UniScrollEvent) {
+	const curScrollTop = Math.max(0, event.detail.scrollTop)
+	for (let i = 0; i < months.value.length; i++) {
+		if (curScrollTop >= (months.value[i].top > 0 ? months.value[i].top : listHeight.value)) {
+			monthIndex.value = i
+		}
+	}
+}
+
+function init() {
+	listHeight.value = parseInt(props.rowHeight.toString()) * (props.monthSwitch ? 6 : 5) + 30
+	setMonth()
+	inited.value = true
+}
+
+function close() {
+	emit('close')
+}
+
+function confirm() {
+	if (!buttonDisabled.value) {
+		emit('confirm', getConfirmValue())
+	}
+}
+
+function prevMonth() {
+	if (!switchPrevDisabled.value) {
+		monthIndex.value -= 1
+	}
+}
+
+function nextMonth() {
+	if (!switchNextDisabled.value) {
+		monthIndex.value += 1
+	}
+}
+
+function prevYear() {
+	if (!switchPrevYearDisabled.value) {
+		monthIndex.value -= 12
+	}
+}
+
+function nextYear() {
+	if (!switchNextYearDisabled.value) {
+		monthIndex.value += 12
+	}
+}
+
+watch((): boolean => props.show, (nval: boolean) => {
+	if (nval) {
+		init()
+	} else {
+		scrollIntoView.value = ''
+	}
+}, { immediate: true })
+
+watch((): Array<any | null> => [props.defaultDate, innerMinDate.value, innerMaxDate.value] as Array<any | null>, () => {
+	if (inited.value) setMonth()
+})
+
+onMounted(() => {
+	init()
+})
+
+defineExpose({
+	init,
+	setMonth,
+	confirm,
+	close
+})
+</script>
+
+<style lang="scss" scoped>
+@import '../../libs/css/components.scss';
+
+.up-calendar {
+	&__confirm {
+		padding: 12px 18px 16px 18px;
+	}
+}
+</style>

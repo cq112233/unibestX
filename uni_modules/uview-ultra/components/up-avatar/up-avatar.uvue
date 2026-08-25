@@ -1,0 +1,202 @@
+<template>
+	<view
+		class="up-avatar"
+		:class="[`up-avatar--${shape}`]"
+		:style="avatarStyle"
+		@tap="clickHandler"
+	>
+		<slot>
+			<template v-if="icon != ''">
+				<up-icon
+					:name="icon"
+					:size="fontSize"
+					:color="color"
+				></up-icon>
+			</template>
+			<template v-else-if="text != ''">
+				<up-text
+					:text="text"
+					:size="fontSize"
+					:color="color"
+					align="center"
+					:style="{justifyContent: 'center'}"
+				></up-text>
+			</template>
+			<template v-else>
+				<image
+					class="up-avatar__image"
+					:class="[`up-avatar__image--${shape}`]"
+					:src="avatarUrl != '' ? avatarUrl : defaultUrl"
+					:mode="mode"
+					@error="errorHandler"
+					:style="imageSizeStyle"
+				></image>
+			</template>
+		</slot>
+	</view>
+</template>
+
+<script setup lang="uts">
+import { ref, computed, watch, onMounted } from 'vue'
+import { addStyle, addUnit, random, deepMerge } from '../../libs/function/index'
+
+defineOptions({
+  name: 'up-avatar'
+})
+
+const props = defineProps({
+  src: {
+    type: String,
+    default: ''
+  },
+  shape: {
+    type: String,
+    default: 'circle'
+  },
+  size: {
+    type: [String, Number],
+    default: 40
+  },
+  mode: {
+    type: String,
+    default: 'scaleToFill'
+  },
+  text: {
+    type: String,
+    default: ''
+  },
+  bgColor: {
+    type: String,
+    default: '#eee'
+  },
+  color: {
+    type: String,
+    default: '#fff'
+  },
+  fontSize: {
+    type: [String, Number],
+    default: 18
+  },
+  icon: {
+    type: String,
+    default: ''
+  },
+  mpAvatar: {
+    type: Boolean,
+    default: false
+  },
+  randomBgColor: {
+    type: Boolean,
+    default: false
+  },
+  defaultUrl: {
+    type: String,
+    default: ''
+  },
+  colorIndex: {
+    type: [String, Number],
+    default: ''
+  },
+  name: {
+    type: String,
+    default: ''
+  },
+  customStyle: {
+    type: Object,
+    default: () => ({})
+  }
+})
+
+const emit = defineEmits(['click'])
+
+const colors = [
+  '#ffb34b', '#f2bba9', '#f7a196', '#f18080', '#88a867', '#bfbf39', '#89c152', '#94d554', '#f19ec2',
+  '#afaae4', '#e1b0df', '#c38cc1', '#72dcdc', '#9acdcb', '#77b1cc', '#448aca', '#86cefa', '#98d1ee',
+  '#73d1f1', '#80a7dc'
+]
+const avatarUrl = ref<string>('')
+
+const getBackColor = computed<string>(() => {
+  let result = '#eeeeee'
+  if (props.text !== '' || props.icon !== '') {
+    const colorIndexNo = parseInt(props.colorIndex.toString())
+    if (props.randomBgColor) {
+      if (props.colorIndex.toString() !== '') {
+        result = colors[colorIndexNo]
+      } else {
+        result = colors[random(0, 19)]
+      }
+    } else {
+      result = props.bgColor
+    }
+  } else {
+    result = 'transparent'
+  }
+  return result
+})
+
+const avatarStyle = computed((): UTSJSONObject => {
+  const custom = addStyle(props.customStyle) as UTSJSONObject
+  const base = {
+    backgroundColor: getBackColor.value,
+    width: addUnit(props.size),
+    height: addUnit(props.size)
+  } as UTSJSONObject
+  return deepMerge(base, custom) as UTSJSONObject
+})
+
+const imageSizeStyle = computed((): UTSJSONObject => {
+  return {
+    width: addUnit(props.size),
+    height: addUnit(props.size)
+  } as UTSJSONObject
+})
+
+const errorHandler = () => {
+  avatarUrl.value = props.defaultUrl
+}
+
+const clickHandler = () => {
+  emit('click', props.name)
+}
+
+watch((): string => props.src, (newValue: string) => {
+  avatarUrl.value = newValue
+})
+
+onMounted(() => {
+  avatarUrl.value = props.src
+})
+</script>
+
+<style lang="scss" scoped>
+@import "../../libs/css/components.scss";
+
+.up-avatar {
+  @include flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+
+  &--circle {
+    border-radius: 100px;
+  }
+
+  &--square {
+    border-radius: 4px;
+  }
+
+  &__image {
+    width: 100%;
+    height: 100%;
+
+    &--circle {
+      border-radius: 100px;
+    }
+
+    &--square {
+      border-radius: 4px;
+    }
+  }
+}
+</style>

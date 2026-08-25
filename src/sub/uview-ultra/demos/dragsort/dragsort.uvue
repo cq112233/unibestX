@@ -1,0 +1,398 @@
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
+    <NavBar title="up-dragsort 拖拽排序"></NavBar>
+    <view class="p-[16px]">
+      <!-- 0. 无手柄（整项拖拽） -->
+      <view class="demo-block">
+        <up-title class="demo-title">
+          <text class="demo-title-text">无手柄（按住整项任意位置拖拽排序）</text>
+        </up-title>
+        <up-dragsort
+          :initial-list="plainList"
+          direction="vertical"
+          @drag-end="onDragEnd"
+        >
+          <template #default="{ item, index }">
+            <view class="drag-item">
+              <text class="drag-item-text">{{ getLabel(item as UTSJSONObject) }}</text>
+              <text class="drag-item-index">{{ (index as number) + 1 }}</text>
+            </view>
+          </template>
+        </up-dragsort>
+      </view>
+
+      <!-- 1. 垂直拖拽（右侧手柄） -->
+      <view class="demo-block mt-[12px]">
+        <up-title class="demo-title">
+          <text class="demo-title-text">垂直拖拽（按住右侧手柄排序）</text>
+        </up-title>
+        <up-dragsort
+          :initial-list="verticalList"
+          direction="vertical"
+          handle-drag
+          @drag-end="onDragEnd"
+        >
+          <template #handler>
+            <view class="drag-handler">
+              <up-icon name="list" color="#64748b" size="20" />
+            </view>
+          </template>
+          <template #default="{ item, index }">
+            <view class="drag-item">
+              <text class="drag-item-text">{{ getLabel(item as UTSJSONObject) }}</text>
+              <text class="drag-item-index">{{ (index as number) + 1 }}</text>
+            </view>
+          </template>
+        </up-dragsort>
+      </view>
+
+      <!-- 2. 垂直拖拽（左侧手柄） -->
+      <view class="demo-block mt-[12px]">
+        <up-title class="demo-title">
+          <text class="demo-title-text">垂直拖拽（按住左侧手柄排序）</text>
+        </up-title>
+        <up-dragsort
+          :initial-list="leftHandleList"
+          direction="vertical"
+          handle-drag
+          handler-position="left"
+          @drag-end="onDragEnd"
+        >
+          <template #handler>
+            <view class="drag-handler drag-handler--left">
+              <up-icon name="list" color="#64748b" size="20" />
+            </view>
+          </template>
+          <template #default="{ item, index }">
+            <view class="drag-item drag-item--left">
+              <text class="drag-item-text">{{ getLabel(item as UTSJSONObject) }}</text>
+              <text class="drag-item-index">{{ (index as number) + 1 }}</text>
+            </view>
+          </template>
+        </up-dragsort>
+      </view>
+
+      <!-- 3. 水平拖拽 -->
+      <view class="demo-block mt-[12px]">
+        <up-title class="demo-title">
+          <text class="demo-title-text">水平拖拽（按住右侧手柄左右拖动）</text>
+        </up-title>
+        <up-dragsort
+          :initial-list="horizontalList"
+          direction="horizontal"
+          handle-drag
+          @drag-end="onDragEnd"
+        >
+          <template #handler>
+            <view class="drag-handler-h">
+              <up-icon name="list" color="#2563eb" size="20" />
+            </view>
+          </template>
+          <template #default="{ item }">
+            <view class="drag-item-h">
+              <text class="drag-item-text">{{ getLabel(item as UTSJSONObject) }}</text>
+            </view>
+          </template>
+        </up-dragsort>
+      </view>
+
+      <!-- 4. 九宫格拖拽 -->
+      <view class="demo-block mt-[12px]">
+        <up-title class="demo-title">
+          <text class="demo-title-text">九宫格拖拽（direction="all"、3 列，按住角标拖拽）</text>
+        </up-title>
+        <up-dragsort
+          :initial-list="gridList"
+          direction="all"
+          :columns="3"
+          handle-drag
+          @drag-end="onDragEnd"
+        >
+          <template #handler>
+            <view class="drag-handler-grid">
+              <up-icon name="list" color="#475569" size="14" />
+            </view>
+          </template>
+          <template #default="{ item, index }">
+            <view class="drag-item-grid">
+              <text class="drag-item-grid-text">{{ getLabel(item as UTSJSONObject) }}</text>
+              <text class="drag-item-grid-index">#{{ (index as number) + 1 }}</text>
+            </view>
+          </template>
+        </up-dragsort>
+      </view>
+
+      <!-- 5. 部分项禁用 -->
+      <view class="demo-block mt-[12px]">
+        <up-title class="demo-title">
+          <text class="demo-title-text">部分项禁用拖拽（draggable: false）</text>
+        </up-title>
+        <up-dragsort
+          :initial-list="disabledList"
+          direction="vertical"
+          handle-drag
+          @drag-end="onDragEnd"
+        >
+          <template #handler="{ item }">
+            <view class="drag-handler" :class="getItemDisabled(item as UTSJSONObject) ? 'drag-handler--disabled' : ''">
+              <up-icon name="list" :color="getItemDisabled(item as UTSJSONObject) ? '#94a3b8' : '#64748b'" size="20" />
+            </view>
+          </template>
+          <template #default="{ item }">
+            <view class="drag-item" :class="getItemDisabled(item as UTSJSONObject) ? 'drag-item--disabled' : ''">
+              <text class="drag-item-text">{{ getLabel(item as UTSJSONObject) }}</text>
+            </view>
+          </template>
+        </up-dragsort>
+      </view>
+
+      <!-- 6. 说明 -->
+      <view class="demo-block mt-[12px]">
+        <up-title class="demo-title">
+          <text class="demo-title-text">说明</text>
+        </up-title>
+        <text class="demo-text">
+          up-dragsort 在 App 端（安卓/iOS/鸿蒙）使用原生 touch 手势实现，H5/小程序沿用 movable-view 原实现；不传 handler 插槽时按住整项任意位置即可拖拽排序，传入 handler 插槽并配合 handle-drag 属性则仅手柄可拖拽，handler-position 属性可控制手柄在左/右；支持 vertical / horizontal / all 三种方向，drag-end 事件返回排序后的列表。
+        </text>
+      </view>
+
+      <view class="log-box mt-[10px]">
+        <text class="log-text">{{ eventLog }}</text>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { ref } from 'vue';
+
+definePage({
+  style: {
+    navigationStyle: 'custom',
+    navigationBarTitleText: 'up-dragsort 拖拽排序'
+  }
+});
+
+const plainList = ref<UTSJSONObject[]>([
+  { id: 1, label: '普通列表项 1' },
+  { id: 2, label: '普通列表项 2' },
+  { id: 3, label: '普通列表项 3' },
+  { id: 4, label: '普通列表项 4' },
+  { id: 5, label: '普通列表项 5' }
+] as UTSJSONObject[]);
+
+const leftHandleList = ref<UTSJSONObject[]>([
+  { id: 1, label: '左侧手柄项 1' },
+  { id: 2, label: '左侧手柄项 2' },
+  { id: 3, label: '左侧手柄项 3' },
+  { id: 4, label: '左侧手柄项 4' }
+] as UTSJSONObject[]);
+
+const verticalList = ref<UTSJSONObject[]>([
+  { id: 1, label: '列表项 1' },
+  { id: 2, label: '列表项 2' },
+  { id: 3, label: '列表项 3' },
+  { id: 4, label: '列表项 4' },
+  { id: 5, label: '列表项 5' }
+] as UTSJSONObject[]);
+
+const horizontalList = ref<UTSJSONObject[]>([
+  { id: 1, label: '卡片 1' },
+  { id: 2, label: '卡片 2' },
+  { id: 3, label: '卡片 3' },
+  { id: 4, label: '卡片 4' }
+] as UTSJSONObject[]);
+
+const gridList = ref<UTSJSONObject[]>([
+  { id: 1, label: '应用 1' },
+  { id: 2, label: '应用 2' },
+  { id: 3, label: '应用 3' },
+  { id: 4, label: '应用 4' },
+  { id: 5, label: '应用 5' },
+  { id: 6, label: '应用 6' },
+  { id: 7, label: '应用 7' },
+  { id: 8, label: '应用 8' }
+] as UTSJSONObject[]);
+
+const disabledList = ref<UTSJSONObject[]>([
+  { id: 1, label: '普通项 1' },
+  { id: 2, label: '锁定项（不可拖动）', draggable: false },
+  { id: 3, label: '普通项 2' },
+  { id: 4, label: '普通项 3' },
+  { id: 5, label: '锁定项（不可拖动）', draggable: false },
+  { id: 6, label: '普通项 4' }
+] as UTSJSONObject[]);
+
+const eventLog = ref<string>('拖拽完成后，drag-end 会返回最新列表顺序');
+
+function getLabel(item: UTSJSONObject): string {
+  const label = item.label;
+  return label == null ? '' : label.toString();
+}
+
+function getItemDisabled(item: UTSJSONObject): boolean {
+  const draggableValue = item.draggable;
+  return draggableValue != null && draggableValue.toString() == 'false';
+}
+
+function getOrder(list: UTSJSONObject[]): string {
+  const labels = [] as string[];
+  for (let i = 0; i < list.length; i++) {
+    labels.push(getLabel(list[i]));
+  }
+  return labels.join(' → ');
+}
+
+function onDragEnd(list: UTSJSONObject[]) {
+  eventLog.value = `drag-end => ${getOrder(list)}`;
+}
+</script>
+
+<style lang="scss" scoped>
+.demo-block {
+  margin-bottom: 12px;
+  padding: 12px;
+  background-color: #ffffff;
+  border-radius: 8px;
+}
+.demo-title {
+  margin-bottom: 10px;
+}
+.demo-title-text {
+  font-size: 14px;
+  font-weight: bold;
+  color: #606266;
+}
+.demo-text {
+  font-size: 13px;
+  color: #475569;
+  line-height: 20px;
+}
+.log-box {
+  padding: 10px;
+  background-color: #f1f5f9;
+  border-radius: 8px;
+}
+.log-text {
+  font-size: 13px;
+  color: #475569;
+  line-height: 20px;
+}
+.drag-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  height: 56px;
+  padding-left: 12px;
+  padding-right: 52px;
+  background-color: #ffffff;
+  border-bottom-width: 1px;
+  border-bottom-style: solid;
+  border-bottom-color: #eef2f7;
+}
+.drag-item--disabled {
+  background-color: #f8fafc;
+}
+.drag-item-text {
+  font-size: 14px;
+  color: #1e293b;
+}
+.drag-item-index {
+  margin-left: auto;
+  font-size: 12px;
+  color: #94a3b8;
+}
+.drag-handler {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 44px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #eef2f7;
+  border-left-width: 1px;
+  border-left-style: solid;
+  border-left-color: #e2e8f0;
+}
+.drag-handler--left {
+  left: 0;
+  right: auto;
+  border-left-width: 0px;
+  border-right-width: 1px;
+  border-right-style: solid;
+  border-right-color: #e2e8f0;
+}
+.drag-item--left {
+  padding-left: 52px;
+  padding-right: 12px;
+}
+.drag-handler--disabled {
+  background-color: #e2e8f0;
+}
+.drag-handler-h {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 40px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #dbeafe;
+  border-left-width: 1px;
+  border-left-style: solid;
+  border-left-color: #bfdbfe;
+  border-radius: 0 8px 8px 0;
+}
+.drag-item-h {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 140px;
+  height: 56px;
+  margin-right: 8px;
+  background-color: #eff6ff;
+  border-width: 1px;
+  border-style: solid;
+  border-color: #bfdbfe;
+  border-radius: 8px;
+  box-sizing: border-box;
+}
+.drag-item-grid {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 96px;
+  height: 96px;
+  background-color: #f1f5f9;
+  border-width: 1px;
+  border-style: solid;
+  border-color: #e2e8f0;
+  border-radius: 8px;
+  box-sizing: border-box;
+}
+.drag-item-grid-text {
+  font-size: 13px;
+  color: #334155;
+}
+.drag-item-grid-index {
+  margin-top: 6px;
+  font-size: 11px;
+  color: #94a3b8;
+}
+.drag-handler-grid {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #e2e8f0;
+  border-radius: 0 8px 0 8px;
+}
+</style>

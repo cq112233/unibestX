@@ -1,0 +1,65 @@
+/*
+ * @Author       : jry
+ * @Description  : uview-plus component's props mixin file
+ * @version      : 4.0
+ * @Date         : 2024-04-22 16:44:21
+ * @LastAuthor   : jry
+ * @lastTime     : 2024-08-28 12:27:20
+ */
+import { defineMixin } from '../../libs/vue.uts'
+import defProps from './formItem.uts'
+let formItemProp = defProps['formItem'] as UTSJSONObject
+
+export const propsFormItem = defineMixin({
+    props: {
+        // input的label提示语
+        label: {
+            type: String,
+            default: formItemProp['label']
+        },
+        // 绑定的值
+        prop: {
+            type: String,
+            default: formItemProp['prop']
+        },
+        // 绑定的规则
+        rules: {
+            type: Array,
+            default: formItemProp['rules']
+        },
+        // 是否显示表单域的下划线边框
+        borderBottom: {
+            type: [String, Boolean],
+            default: formItemProp['borderBottom']
+        },
+        // label的位置，left-左边，top-上边
+        labelPosition: {
+            type: String,
+            default: formItemProp['labelPosition']
+        },
+        // label的宽度，单位px
+        labelWidth: {
+            type: [String, Number],
+            default: formItemProp['labelWidth']
+        },
+        // 右侧图标
+        rightIcon: {
+            type: String,
+            default: formItemProp['rightIcon']
+        },
+        // 左侧图标
+        leftIcon: {
+            type: String,
+            default: formItemProp['leftIcon']
+        },
+        // 是否显示左边的必填星号，只作显示用，具体校验必填的逻辑，请在rules中配置
+        required: {
+            type: Boolean,
+            default: formItemProp['required']
+        },
+        leftIconStyle: {
+            type: [String, Object],
+            default: formItemProp['leftIconStyle']
+        }
+    }
+});

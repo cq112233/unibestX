@@ -1,0 +1,91 @@
+<template>
+	<view
+	    class="up-steps"
+	    :class="[`up-steps--${direction}`]"
+	>
+		<slot></slot>
+	</view>
+</template>
+
+<script setup lang="uts">
+import { provide, ref, computed } from 'vue'
+
+defineOptions({
+  name: 'up-steps'
+})
+
+const props = defineProps({
+  direction: {
+    type: String,
+    default: 'row'
+  },
+  current: {
+    type: [String, Number],
+    default: 0
+  },
+  activeColor: {
+    type: String,
+    default: '#3c9cff'
+  },
+  inactiveColor: {
+    type: String,
+    default: '#969799'
+  },
+  activeIcon: {
+    type: String,
+    default: ''
+  },
+  inactiveIcon: {
+    type: String,
+    default: ''
+  },
+  dot: {
+    type: Boolean,
+    default: false
+  }
+})
+
+const parentState = computed((): UTSJSONObject => {
+  return {
+    direction: props.direction,
+    current: props.current,
+    activeColor: props.activeColor,
+    inactiveColor: props.inactiveColor,
+    activeIcon: props.activeIcon,
+    inactiveIcon: props.inactiveIcon,
+    dot: props.dot
+  } as UTSJSONObject
+})
+
+provide('upStepsProps', parentState)
+
+const itemCount = ref<number>(0)
+const registerStepItem = (): number => {
+  const currentIndex = itemCount.value
+  itemCount.value = itemCount.value + 1
+  return currentIndex
+}
+
+provide('upStepsRegister', registerStepItem)
+provide('upStepsItemCount', itemCount)
+</script>
+
+<style lang="scss" scoped>
+	@import "../../libs/css/components.scss";
+	
+	.up-steps {
+		display: flex;
+		width: 100%;
+
+		&--column {
+			flex-direction: column;
+			width: 100%;
+		}
+
+		&--row {
+			flex-direction: row;
+			width: 100%;
+			align-items: flex-start;
+		}
+	}
+</style>

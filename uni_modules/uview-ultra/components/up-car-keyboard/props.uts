@@ -1,0 +1,27 @@
+/*
+ * @Author       : jry
+ * @Description  : uview-plus component's props mixin file
+ * @version      : 4.0
+ * @Date         : 2025-12-17 08:48:27
+ * @LastAuthor   : jry
+ * @lastTime     : 2025-12-17 08:48:27
+ */
+import { defineMixin } from '../../libs/vue.uts'
+import defProps from './carKeyboard.uts'
+
+let keyboardProp = defProps['carKeyboard'] as UTSJSONObject
+
+export const propsCarKeyboard = defineMixin({
+	props: {
+		// 是否打乱键盘的顺序
+		random: {
+			type: Boolean,
+			default: keyboardProp['random']
+		},
+		// 是否自动切换到英文
+		autoChange: {
+			type: Boolean,
+			default: keyboardProp['autoChange']
+		}
+	}
+});

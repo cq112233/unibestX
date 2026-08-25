@@ -1,0 +1,133 @@
+<template>
+	<view class="up-popover">
+		<up-tooltip
+			ref="tooltip"
+			:text="textValue"
+			:color="color"
+			:bg-color="bgColor"
+			:popup-bg-color="popupBgColor"
+			:placement="placement"
+			:trigger-mode="triggerMode"
+			:show="displayShow"
+			:z-index="zIndex"
+			:force-position="forcePosition"
+			:direction="direction"
+			@open="onOpen"
+			@close="onClose"
+			@click="onClick"
+		>
+			<template #trigger>
+				<slot name="trigger"></slot>
+			</template>
+			<template #content>
+				<view class="up-popover__content">
+					<slot name="content">
+						<text>{{ textValue }}</text>
+					</slot>
+				</view>
+			</template>
+		</up-tooltip>
+	</view>
+</template>
+
+<script setup lang="uts">
+import { ref, computed } from 'vue'
+
+defineOptions({
+	name: 'up-popover'
+})
+
+const props = defineProps({
+	text: {
+		type: [String, Number],
+		default: ''
+	},
+	color: {
+		type: String,
+		default: '#333'
+	},
+	bgColor: {
+		type: String,
+		default: '#f7f7f7'
+	},
+	popupBgColor: {
+		type: String,
+		default: '#f7f7f7'
+	},
+	placement: {
+		type: String,
+		default: 'top'
+	},
+	triggerMode: {
+		type: String,
+		default: 'click'
+	},
+	show: {
+		type: Boolean,
+		default: false
+	},
+	zIndex: {
+		type: [Number, String],
+		default: 10070
+	},
+	forcePosition: {
+		type: Object,
+		default: () => ({})
+	},
+	direction: {
+		type: String,
+		default: 'top'
+	}
+})
+
+const emit = defineEmits(['open', 'close', 'click'])
+
+const innerShow = ref<boolean>(false)
+
+const textValue = computed<string>(() => {
+	return props.text == null ? '' : props.text.toString()
+})
+
+const displayShow = computed<boolean>(() => {
+	return props.show || innerShow.value
+})
+
+function onOpen(): void {
+	innerShow.value = true
+	emit('open')
+}
+
+function onClose(): void {
+	innerShow.value = false
+	emit('close')
+}
+
+function onClick(): void {
+	emit('click')
+}
+
+function open(): void {
+	innerShow.value = true
+	emit('open')
+}
+
+function close(): void {
+	innerShow.value = false
+	emit('close')
+}
+
+defineExpose({
+	open,
+	close
+})
+</script>
+
+<style lang="scss" scoped>	
+	.up-popover {
+		&__content {
+			@include flex;
+			align-items: center;
+			padding: 12px 16px;
+		}
+	}
+</style>

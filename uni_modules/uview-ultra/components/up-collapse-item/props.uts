@@ -1,0 +1,69 @@
+import { defineMixin } from '../../libs/vue'
+import defProps from './collapseItem.uts'
+let crtProp = defProps['collapseItem'] as UTSJSONObject
+
+export const propsCollapseItem = defineMixin({
+    props: {
+        // 标题
+        title: {
+            type: String,
+            default: crtProp['title']
+        },
+        // 标题右侧内容
+        value: {
+            type: String,
+            default: crtProp['value']
+        },
+        // 标题下方的描述信息
+        label: {
+            type: String,
+            default: crtProp['label']
+        },
+        // 是否禁用折叠面板
+        disabled: {
+            type: Boolean,
+            default: crtProp['disabled']
+        },
+        // 是否展示右侧箭头并开启点击反馈
+        isLink: {
+            type: Boolean,
+            default: crtProp['isLink']
+        },
+        // 是否开启点击反馈
+        clickable: {
+            type: Boolean,
+            default: crtProp['clickable']
+        },
+        // 是否显示内边框
+        border: {
+            type: Boolean,
+            default: crtProp['border']
+        },
+        // 标题的对齐方式
+        align: {
+            type: String,
+            default: crtProp['align']
+        },
+        // 唯一标识符
+        name: {
+            // type: [String, Number],
+			type: [String],
+            default: crtProp['name']
+        },
+        // 标题左侧图片，可为绝对路径的图片或内置图标
+        icon: {
+            type: String,
+            default: crtProp['icon']
+        },
+        // 面板展开收起的过渡时间，单位ms
+        duration: {
+            type: Number,
+            default: crtProp['duration']
+        },
+        // 显示右侧图标
+        showRight: {
+            type: Boolean,
+            default: crtProp['showRight']
+        },
+    }
+})

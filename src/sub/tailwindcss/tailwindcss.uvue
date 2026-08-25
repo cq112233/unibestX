@@ -58,9 +58,7 @@ onLoad((): void => {
     <view class="content" :class="{ dark: isDark }">
       <WeappTailwindcss />
       <BindClass />
-      <button class="mt-4 w-64 rounded-full px-4 py-2 text-white" :style="{ backgroundColor: isDark ? '#3498db' : '#eccc68' }" @click="toggleDark">
-        {{ isDark ? '切换到亮色模式' : '切换到暗色模式' }}
-      </button>
+      <button class="mt-4 w-64 rounded-full px-4 py-2 text-white" :style="{ backgroundColor: isDark ? '#3498db' : '#eccc68' }" @click="toggleDark">{{ isDark ? '切换到亮色模式' : '切换到暗色模式' }}</button>
       <view class="w-full bg-[#164e63] p-[12px] issue-1002-probe">
         <text class="text-xs text-white">issue-1002 text-xs</text>
         <text class="text-sm text-white">issue-1002 text-sm</text>

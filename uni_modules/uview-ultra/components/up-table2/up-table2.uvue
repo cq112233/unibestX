@@ -1,0 +1,1340 @@
+<template>
+    <view class="up-table2" :class="border ? 'up-table-border' : ''">
+        <scroll-view direction="horizontal" class="up-table2-scroll" :style="getScrollStyle()" @scroll="onScroll">
+            <view class="up-table2-content" :style="getTableContentStyle()">
+                <view v-if="showHeader" class="up-table-row up-table-header-row">
+                    <view
+                        v-for="(col, colIndex) in columns"
+                        :key="getColumnKey(col, colIndex)"
+                        class="up-table-cell up-table-header-cell"
+                        :class="[getHeaderAlignClass(col)]"
+                        :style="getHeaderCellStyle(col)"
+                        @click="handleHeaderClick(col)"
+                    >
+                        <view v-if="isSelectionColumn(col)">
+                            <checkbox :checked="isAllSelected()" @click.stop="toggleSelectAll" />
+                        </view>
+                        <template v-else>
+                            <text class="up-table-header-text" :style="{ textAlign: getHeaderAlignValue(col) }">{{ getColumnTitle(col) }}</text>
+                            <text v-if="isSortableColumn(col)" class="up-table-sort-icon">{{ getSortIcon(col) }}</text>
+                        </template>
+                    </view>
+                </view>
+
+                <view v-if="hasData" class="up-table-body" :style="getBodyStyle()">
+                    <view
+                        v-for="(item, flatIndex) in flatRows"
+                        :key="getRowKey(item['row'] as UTSJSONObject, flatIndex)"
+                        class="up-table-row up-table-body-row"
+                        :class="getRowClass(item['row'] as UTSJSONObject, flatIndex)"
+                        :style="{ height: rowHeightValue }"
+                        @click="handleRowClick(item['row'] as UTSJSONObject)"
+                    >
+                        <view
+                            v-for="(cell, idx) in getRowCells(item['row'] as UTSJSONObject, safeToNumber(item['rowIndex']))"
+                            :key="getColumnKey(cell['col'] as UTSJSONObject, safeToNumber(cell['colIndex']))"
+                            class="up-table-cell up-table-body-cell"
+                            :class="[getCellAlignClass(cell['col'] as UTSJSONObject), getCellClassName(item['row'] as UTSJSONObject, cell['col'] as UTSJSONObject), getCellSpanClass(item['row'] as UTSJSONObject, cell['col'] as UTSJSONObject, safeToNumber(item['rowIndex']), safeToNumber(cell['colIndex']))]"
+                            :style="getCellStyle(item['row'] as UTSJSONObject, cell['col'] as UTSJSONObject, safeToNumber(item['rowIndex']), safeToNumber(cell['colIndex']), safeToNumber(item['level'], 1))"
+                        >
+                            <view v-if="isSelectionColumn(cell['col'] as UTSJSONObject)">
+                                <checkbox :checked="isSelected(item['row'] as UTSJSONObject)" @click.stop="toggleSelect(item['row'] as UTSJSONObject)" />
+                            </view>
+                            <template v-else>
+                                <view
+                                    v-if="showTreeIcon(cell['col'] as UTSJSONObject, item['row'] as UTSJSONObject)"
+                                    class="up-table-tree-toggle"
+                                    :style="{ width: expandWidthValue }"
+                                    @click.stop="toggleExpand(item['row'] as UTSJSONObject)"
+                                >
+                                    <text>{{ isExpanded(item['row'] as UTSJSONObject) ? '-' : '+' }}</text>
+                                </view>
+                                <slot
+                                    name="cell"
+                                    :row="item['row'] as UTSJSONObject"
+                                    :column="cell['col'] as UTSJSONObject"
+                                    :prow="getParentRow(item)"
+                                    :rowIndex="safeToNumber(item['rowIndex'])"
+                                    :columnIndex="safeToNumber(cell['colIndex'])"
+                                    :level="safeToNumber(item['level'], 1)"
+                                >
+                                    <text class="up-table-cell-text">{{ getCellText(item['row'] as UTSJSONObject, cell['col'] as UTSJSONObject) }}</text>
+                                </slot>
+                            </template>
+                        </view>
+                    </view>
+                </view>
+
+                <view v-else class="up-table-empty">
+                    <slot name="empty">
+                        <text class="up-table-empty-text">{{ emptyText }}</text>
+                    </slot>
+                </view>
+            </view>
+        </scroll-view>
+
+        <view v-if="showFixedShadow" class="up-table-fixed-shadow" :style="getFixedShadowStyle()">
+            <view v-if="showHeader" class="up-table-row up-table-header-row">
+                <view
+                    v-for="(col, fixedIndex) in fixedLeftColumns"
+                    :key="getColumnKey(col, fixedIndex)"
+                    class="up-table-cell up-table-header-cell"
+                    :class="[getHeaderAlignClass(col)]"
+                    :style="getFixedHeaderCellStyle(col)"
+                    @click="handleHeaderClick(col)"
+                >
+                    <view v-if="isSelectionColumn(col)">
+                        <checkbox :checked="isAllSelected()" @click.stop="toggleSelectAll" />
+                    </view>
+                    <template v-else>
+                        <text class="up-table-header-text" :style="{ textAlign: getHeaderAlignValue(col) }">{{ getColumnTitle(col) }}</text>
+                        <text v-if="isSortableColumn(col)" class="up-table-sort-icon">{{ getSortIcon(col) }}</text>
+                    </template>
+                </view>
+            </view>
+
+            <view v-if="hasData" class="up-table-body" :style="getBodyStyle()">
+                <view
+                    v-for="(item, flatIndex) in flatRows"
+                    :key="'fixed_' + getRowKey(item['row'] as UTSJSONObject, flatIndex)"
+                    class="up-table-row up-table-body-row"
+                    :class="getRowClass(item['row'] as UTSJSONObject, flatIndex)"
+                    :style="{ height: rowHeightValue }"
+                    @click="handleRowClick(item['row'] as UTSJSONObject)"
+                >
+                    <view
+                        v-for="(cell, idx) in getFixedRowCells(item['row'] as UTSJSONObject, safeToNumber(item['rowIndex']))"
+                        :key="'fixed_' + getColumnKey(cell['col'] as UTSJSONObject, safeToNumber(cell['colIndex']))"
+                        class="up-table-cell up-table-body-cell"
+                        :class="[getCellAlignClass(cell['col'] as UTSJSONObject), getCellClassName(item['row'] as UTSJSONObject, cell['col'] as UTSJSONObject), getCellSpanClass(item['row'] as UTSJSONObject, cell['col'] as UTSJSONObject, safeToNumber(item['rowIndex']), safeToNumber(cell['colIndex']))]"
+                        :style="getFixedCellStyle(item['row'] as UTSJSONObject, cell['col'] as UTSJSONObject, safeToNumber(item['rowIndex']), safeToNumber(cell['colIndex']), safeToNumber(item['level'], 1))"
+                    >
+                        <view v-if="isSelectionColumn(cell['col'] as UTSJSONObject)">
+                            <checkbox :checked="isSelected(item['row'] as UTSJSONObject)" @click.stop="toggleSelect(item['row'] as UTSJSONObject)" />
+                        </view>
+                        <template v-else>
+                            <view
+                                v-if="showTreeIcon(cell['col'] as UTSJSONObject, item['row'] as UTSJSONObject)"
+                                class="up-table-tree-toggle"
+                                :style="{ width: expandWidthValue }"
+                                @click.stop="toggleExpand(item['row'] as UTSJSONObject)"
+                            >
+                                <text>{{ isExpanded(item['row'] as UTSJSONObject) ? '-' : '+' }}</text>
+                            </view>
+                            <slot
+                                name="cell"
+                                :row="item['row'] as UTSJSONObject"
+                                :column="cell['col'] as UTSJSONObject"
+                                :prow="getParentRow(item)"
+                                :rowIndex="safeToNumber(item['rowIndex'])"
+                                :columnIndex="safeToNumber(cell['colIndex'])"
+                                :level="safeToNumber(item['level'], 1)"
+                            >
+                                <text class="up-table-cell-text">{{ getCellText(item['row'] as UTSJSONObject, cell['col'] as UTSJSONObject) }}</text>
+                            </slot>
+                        </template>
+                    </view>
+                </view>
+            </view>
+        </view>
+    </view>
+</template>
+
+<script setup lang="uts">
+import { ref, computed, watch, onMounted } from 'vue'
+
+function createRowList(): UTSJSONObject[] {
+    return [] as UTSJSONObject[]
+}
+
+function createStringList(): string[] {
+    return [] as string[]
+}
+
+function createEmptyObject(): UTSJSONObject {
+    return {} as UTSJSONObject
+}
+
+function createSpan(rowspan: number = 1, colspan: number = 1): UTSJSONObject {
+    return {
+        rowspan: rowspan,
+        colspan: colspan
+    } as UTSJSONObject
+}
+
+function createSpanArray(): number[] {
+    return [1, 1] as number[]
+}
+
+function valueToString(value: any | null): string {
+    return value == null ? '' : value.toString()
+}
+
+function toNumber(value: any | null, fallback: number = 0): number {
+    if (value == null) {
+        return fallback
+    }
+    const text = valueToString(value)
+    if (text == '') {
+        return fallback
+    }
+    const parsed = parseInt(text)
+    return isNaN(parsed) ? fallback : parsed
+}
+
+function normalizeColumnWidth(value: any | null): number {
+    const width = toNumber(value, 80)
+    return width < 80 ? 80 : width
+}
+
+function addUnitLocal(value: any | null): string {
+    if (value == null) {
+        return 'auto'
+    }
+    const text = valueToString(value)
+    if (text == '') {
+        return 'auto'
+    }
+    if (text.endsWith('px') || text.endsWith('%') || text.endsWith('rpx')) {
+        return text
+    }
+    const numeric = /^-?\d+(\.\d+)?$/.test(text)
+    return numeric ? (text + 'px') : text
+}
+
+function getTableMinWidthPx(): number {
+    return 375
+}
+
+type SpanMethodCallback = (scope: UTSJSONObject) => any | null
+type CellStyleCallback = (scope: UTSJSONObject) => UTSJSONObject | null
+type CellClassNameCallback = (row: UTSJSONObject, col: UTSJSONObject) => string
+type RowClassNameCallback = (row: UTSJSONObject, rowIndex: number) => string
+type HeaderCellClassNameCallback = (col: UTSJSONObject) => string
+
+defineOptions({
+    name: 'up-table2'
+})
+
+const props = defineProps({
+    data: {
+        type: Array as PropType<UTSJSONObject[]>,
+        required: true,
+        default: () => [] as UTSJSONObject[]
+    },
+    columns: {
+        type: Array as PropType<UTSJSONObject[]>,
+        required: true,
+        default: () => [] as UTSJSONObject[]
+    },
+    rowKey: {
+        type: String,
+        default: 'id'
+    },
+    border: {
+        type: Boolean,
+        default: false
+    },
+    stripe: {
+        type: Boolean,
+        default: false
+    },
+    height: {
+        type: [String, Number],
+        default: null
+    },
+    maxHeight: {
+        type: [String, Number],
+        default: null
+    },
+    showHeader: {
+        type: Boolean,
+        default: true
+    },
+    emptyText: {
+        type: String,
+        default: 'No Data'
+    },
+    sortable: {
+        type: Boolean,
+        default: false
+    },
+    multiSort: {
+        type: Boolean,
+        default: false
+    },
+    filters: {
+        type: Object as PropType<UTSJSONObject>,
+        default: () => ({} as UTSJSONObject)
+    },
+    highlightCurrentRow: {
+        type: Boolean,
+        default: false
+    },
+    currentRowKey: {
+        type: [String, Number],
+        default: null
+    },
+    treeProps: {
+        type: Object as PropType<UTSJSONObject>,
+        default: () => ({ children: 'children', hasChildren: 'hasChildren' } as UTSJSONObject)
+    },
+    expandRowKeys: {
+        type: Array as PropType<any[]>,
+        default: () => [] as any[]
+    },
+    rowHeight: {
+        type: [String, Number],
+        default: 44
+    },
+    expandWidth: {
+        type: [String, Number],
+        default: 24
+    },
+    mainCol: {
+        type: String,
+        default: ''
+    },
+    fixedHeader: {
+        type: Boolean,
+        default: false
+    },
+    spanMethod: {
+        type: Function as PropType<SpanMethodCallback | null>,
+        default: null
+    },
+    cellStyle: {
+        type: Function as PropType<CellStyleCallback | null>,
+        default: null
+    },
+    cellClassName: {
+        type: Function as PropType<CellClassNameCallback | null>,
+        default: null
+    },
+    rowClassName: {
+        type: Function as PropType<RowClassNameCallback | null>,
+        default: null
+    },
+    headerCellClassName: {
+        type: Function as PropType<HeaderCellClassNameCallback | null>,
+        default: null
+    }
+})
+
+const emit = defineEmits([
+    'row-click',
+    'header-click',
+    'selection-change',
+    'select',
+    'select-all',
+    'sort-change',
+    'filter-change',
+    'expand-change',
+    'current-change'
+])
+
+function normalizeKey(value: any | null): string {
+    return valueToString(value)
+}
+
+function normalizeKeys(keys: any[] | null): string[] {
+    const result = createStringList()
+    if (keys == null) {
+        return result
+    }
+    for (let i = 0; i < keys.length; i++) {
+        result.push(normalizeKey(keys[i]))
+    }
+    return result
+}
+
+const expandedKeys = ref<string[]>(normalizeKeys(props.expandRowKeys))
+const selectedKeys = ref<string[]>(createStringList())
+const sortKey = ref<string>('')
+const sortOrder = ref<string>('')
+const currentRowValue = ref<string>(normalizeKey(props.currentRowKey))
+const scrollLeftValue = ref<number>(0)
+
+onMounted(() => {
+    expandedKeys.value = normalizeKeys(props.expandRowKeys)
+    currentRowValue.value = normalizeKey(props.currentRowKey)
+})
+
+const rowHeightValue = computed<string>(() => addUnitLocal(props.rowHeight))
+const expandWidthValue = computed<string>(() => addUnitLocal(props.expandWidth))
+
+function isSelectionColumn(col: UTSJSONObject): boolean {
+    return valueToString(col['type']) == 'selection'
+}
+
+function getColumnField(col: UTSJSONObject): string {
+    return valueToString(col['key'])
+}
+
+const mainColumnKey = computed<string>(() => {
+    if (props.mainCol != '') {
+        return props.mainCol
+    }
+    const cols = props.columns
+    for (let i = 0; i < cols.length; i++) {
+        const col = cols[i] as UTSJSONObject
+        if (!isSelectionColumn(col)) {
+            const key = getColumnField(col)
+            if (key != '') {
+                return key
+            }
+        }
+    }
+    return ''
+})
+
+function isMainColumn(col: UTSJSONObject): boolean {
+    const field = getColumnField(col)
+    return field != '' && field == mainColumnKey.value
+}
+
+function getChildrenKey(): string {
+    const tree = props.treeProps
+    const key = tree['children']
+    return valueToString(key) == '' ? 'children' : valueToString(key)
+}
+
+function getRowKeyValue(row: UTSJSONObject): string {
+    return normalizeKey(row[props.rowKey])
+}
+
+function getRowKey(row: UTSJSONObject, index: number): string {
+    const key = getRowKeyValue(row)
+    return key == '' ? index.toString() : key
+}
+
+function getParentRow(item: UTSJSONObject): UTSJSONObject | null {
+    return item['parentRow'] as UTSJSONObject | null
+}
+
+function getColumnKey(col: UTSJSONObject, index: number): string {
+    const key = getColumnField(col)
+    if (key != '') {
+        return key
+    }
+    const typeText = valueToString(col['type'])
+    return typeText == '' ? ('col_' + index.toString()) : (typeText + '_' + index.toString())
+}
+
+function getColumnIndex(col: UTSJSONObject): number {
+    const cols = props.columns
+    for (let i = 0; i < cols.length; i++) {
+        if ((cols[i] as UTSJSONObject) == col) {
+            return i
+        }
+    }
+    return 0
+}
+
+function getColumnTitle(col: UTSJSONObject): string {
+    return valueToString(col['title'])
+}
+
+function isSortableColumn(col: UTSJSONObject): boolean {
+    if (isSelectionColumn(col)) {
+        return false
+    }
+    if (props.sortable) {
+        return true
+    }
+    const colSortable = valueToString(col['sortable'])
+    return colSortable == 'true' || colSortable == '1'
+}
+
+function getHeaderAlignValue(col: UTSJSONObject): string {
+    const headerAlign = valueToString(col['headerAlign'])
+    if (headerAlign == 'center' || headerAlign == 'right' || headerAlign == 'left') {
+        return headerAlign
+    }
+    const align = valueToString(col['align'])
+    if (align == 'center' || align == 'right' || align == 'left') {
+        return align
+    }
+    return 'center'
+}
+
+function getHeaderAlignClass(col: UTSJSONObject): string {
+    return 'up-text-' + getHeaderAlignValue(col)
+}
+
+function getCellAlignValue(col: UTSJSONObject): string {
+    const align = valueToString(col['align'])
+    if (align == 'center' || align == 'right' || align == 'left') {
+        return align
+    }
+    return 'center'
+}
+
+function getCellAlignClass(col: UTSJSONObject): string {
+    return 'up-text-' + getCellAlignValue(col)
+}
+
+function getCellClassName(row: UTSJSONObject, col: UTSJSONObject): string {
+    if (props.cellClassName == null) {
+        return ''
+    }
+    const callback = props.cellClassName as CellClassNameCallback
+    const result = callback(row, col)
+    return valueToString(result)
+}
+
+function getColumnWidthNumber(col: UTSJSONObject): number {
+    const cols = props.columns
+    let total = 0
+    for (let i = 0; i < cols.length; i++) {
+        total += normalizeColumnWidth((cols[i] as UTSJSONObject)['width'])
+    }
+    const width = normalizeColumnWidth(col['width'])
+    if (total <= 0) {
+        return width
+    }
+    const contentWidth = Math.max(total, getTableMinWidthPx())
+    return Math.floor(width * contentWidth / total)
+}
+
+function getColumnWidth(col: UTSJSONObject): string {
+    return getColumnWidthNumber(col).toString() + 'px'
+}
+
+function getHeaderCellStyle(col: UTSJSONObject): UTSJSONObject {
+    const style = createEmptyObject()
+    style['width'] = getColumnWidth(col)
+    return style
+}
+
+function getFixedHeaderCellStyle(col: UTSJSONObject): UTSJSONObject {
+    const style = getHeaderCellStyle(col)
+    style['backgroundColor'] = '#f5f7fa'
+    return style
+}
+
+function getSpanValue(value: any | null, fallback: number = 1): number {
+    if (value == null || valueToString(value) == '') {
+        return fallback
+    }
+    const parsed = parseInt(value.toString())
+    return isNaN(parsed) ? fallback : parsed
+}
+
+function getCellSpanArray(row: UTSJSONObject, column: UTSJSONObject, rowIndex: number, columnIndex: number): number[] {
+    if (typeof props.spanMethod != 'function' || props.spanMethod == null) {
+        return createSpanArray()
+    }
+    const callback = props.spanMethod as SpanMethodCallback
+    const result = callback({
+        row: row,
+        column: column,
+        rowIndex: rowIndex,
+        columnIndex: columnIndex
+    } as UTSJSONObject)
+    if (Array.isArray(result)) {
+        const arr = result as number[]
+        const rowspan = arr.length > 0 ? getSpanValue(arr[0], 1) : 1
+        const colspan = arr.length > 1 ? getSpanValue(arr[1], 1) : 1
+        return [rowspan, colspan] as number[]
+    }
+    const spanObject = result as UTSJSONObject | null
+    if (spanObject != null) {
+        const rowspan = getSpanValue(spanObject['rowspan'], 1)
+        const colspan = getSpanValue(spanObject['colspan'], 1)
+        return [rowspan, colspan] as number[]
+    }
+    return createSpanArray()
+}
+
+function getCellSpan(row: UTSJSONObject, column: UTSJSONObject, rowIndex: number, columnIndex: number): UTSJSONObject {
+    const span = getCellSpanArray(row, column, rowIndex, columnIndex)
+    const rowspan = span.length > 0 ? span[0] : 1
+    const colspan = span.length > 1 ? span[1] : 1
+    return createSpan(rowspan, colspan)
+}
+
+function getCellSpanClass(row: UTSJSONObject, column: UTSJSONObject, rowIndex: number, columnIndex: number): string {
+    const span = getCellSpan(row, column, rowIndex, columnIndex)
+    if ((span['rowspan'] as number) == 0 || (span['colspan'] as number) == 0) {
+        return 'up-table-cell-hidden'
+    }
+    if ((span['rowspan'] as number) > 1 || (span['colspan'] as number) > 1) {
+        return 'up-table-cell-merged'
+    }
+    return ''
+}
+
+function getCellSpanStyle(row: UTSJSONObject, column: UTSJSONObject, rowIndex: number, columnIndex: number): UTSJSONObject {
+    const span = getCellSpan(row, column, rowIndex, columnIndex)
+    const style = createEmptyObject()
+    const rowspan = span['rowspan'] as number
+    const colspan = span['colspan'] as number
+    if (rowspan == 0 || colspan == 0) {
+        return style
+    }
+    if (rowspan > 1) {
+        const rHeight = toNumber(props.rowHeight, 44)
+        style['height'] = (rowspan * rHeight).toString() + 'px'
+    }
+    if (colspan > 1) {
+        const cols = props.columns
+        let width = 0
+        for (let i = columnIndex; i < columnIndex + colspan && i < cols.length; i++) {
+            width += getColumnWidthNumber(cols[i] as UTSJSONObject)
+        }
+        style['width'] = width.toString() + 'px'
+    }
+    return style
+}
+
+const hasTree = computed<boolean>(() => {
+    const cKey = getChildrenKey()
+    const rows = props.data
+    for (let i = 0; i < rows.length; i++) {
+        const row = rows[i] as UTSJSONObject
+        const children = row[cKey] as UTSJSONObject[] | null
+        if (Array.isArray(children) && (children as UTSJSONObject[]).length > 0) {
+            return true
+        }
+    }
+    return false
+})
+
+function getBaseCellStyle(row: UTSJSONObject, col: UTSJSONObject, rowIndex: number, columnIndex: number, level: number): UTSJSONObject {
+    const style = createEmptyObject()
+    const spanStyle = getCellSpanStyle(row, col, rowIndex, columnIndex)
+    const spanKeys = UTSJSONObject.keys(spanStyle)
+    if (spanKeys.indexOf('width') == -1) {
+        style['width'] = getColumnWidth(col)
+    }
+    if (hasTree.value && isMainColumn(col) && level > 1) {
+        style['paddingLeft'] = ((level - 1) * 16).toString() + 'px'
+    }
+    const colStyle = col['style'] as UTSJSONObject | null
+    if (colStyle != null) {
+        const keys = UTSJSONObject.keys(colStyle)
+        for (let i = 0; i < keys.length; i++) {
+            const key = keys[i]
+            if (key == 'color' || key == 'textAlign' || key == 'text-align') {
+                continue
+            }
+            style[key] = colStyle[key]
+        }
+    }
+    for (let i = 0; i < spanKeys.length; i++) {
+        const key = spanKeys[i]
+        style[key] = spanStyle[key]
+    }
+    return style
+}
+
+function getCellStyle(row: UTSJSONObject, col: UTSJSONObject, rowIndex: number, columnIndex: number, level: number): UTSJSONObject {
+    return getBaseCellStyle(row, col, rowIndex, columnIndex, level)
+}
+
+function getFixedCellStyle(row: UTSJSONObject, col: UTSJSONObject, rowIndex: number, columnIndex: number, level: number): UTSJSONObject {
+    const style = getBaseCellStyle(row, col, rowIndex, columnIndex, level)
+    style['backgroundColor'] = '#ffffff'
+    return style
+}
+
+function isExpanded(row: UTSJSONObject): boolean {
+    const key = getRowKeyValue(row)
+    if (key == '') {
+        return false
+    }
+    return expandedKeys.value.indexOf(key) > -1
+}
+
+function hasChildrenRow(row: UTSJSONObject): boolean {
+    const rawChildren = row[getChildrenKey()] as any | null
+    if (rawChildren == null || !Array.isArray(rawChildren)) {
+        return false
+    }
+    const children = rawChildren as UTSJSONObject[]
+    return children.length > 0
+}
+
+function showTreeIcon(col: UTSJSONObject, row: UTSJSONObject): boolean {
+    if (!hasTree.value) {
+        return false
+    }
+    if (!isMainColumn(col)) {
+        return false
+    }
+    return hasChildrenRow(row)
+}
+
+function compareRows(a: UTSJSONObject, b: UTSJSONObject): number {
+    const key = sortKey.value
+    if (key == '') {
+        return 0
+    }
+    const textA = valueToString(a[key])
+    const textB = valueToString(b[key])
+    let result = 0
+    const numberA = parseFloat(textA)
+    const numberB = parseFloat(textB)
+    const bothNumeric = !isNaN(numberA) && !isNaN(numberB)
+    if (bothNumeric) {
+        result = numberA > numberB ? 1 : (numberA < numberB ? -1 : 0)
+    } else {
+        result = textA > textB ? 1 : (textA < textB ? -1 : 0)
+    }
+    return sortOrder.value == 'descending' ? -result : result
+}
+
+function applySort(rows: UTSJSONObject[]): UTSJSONObject[] {
+    if (!Array.isArray(rows) || rows.length == 0) {
+        return createRowList()
+    }
+    if (sortKey.value == '' || sortOrder.value == '') {
+        return rows.slice()
+    }
+    const data = rows.slice()
+    data.sort((a: UTSJSONObject, b: UTSJSONObject): number => compareRows(a, b))
+    return data
+}
+
+function applyFilters(rows: UTSJSONObject[]): UTSJSONObject[] {
+    if (!Array.isArray(rows) || rows.length == 0) {
+        return createRowList()
+    }
+    const flt = props.filters
+    const filterKeys = UTSJSONObject.keys(flt)
+    if (filterKeys.length == 0) {
+        return rows.slice()
+    }
+    const result = createRowList()
+    for (let i = 0; i < rows.length; i++) {
+        const row = rows[i] as UTSJSONObject
+        let matched = true
+        for (let j = 0; j < filterKeys.length; j++) {
+            const filterKey = filterKeys[j]
+            const filterValue = flt[filterKey]
+            const filterText = valueToString(filterValue)
+            if (filterText == '') {
+                continue
+            }
+            const rowText = valueToString(row[filterKey])
+            if (rowText.indexOf(filterText) == -1) {
+                matched = false
+                break
+            }
+        }
+        if (matched) {
+            result.push(row)
+        }
+    }
+    return result
+}
+
+const processedData = computed<UTSJSONObject[]>(() => {
+    const rows = props.data
+    const filtered = applyFilters(rows)
+    return applySort(filtered)
+})
+
+function collectFlatRows(rows: UTSJSONObject[], parentRow: UTSJSONObject | null, level: number, result: UTSJSONObject[]): void {
+    if (!Array.isArray(rows) || rows.length == 0) {
+        return
+    }
+    const cKey = getChildrenKey()
+    for (let i = 0; i < rows.length; i++) {
+        const row = rows[i] as UTSJSONObject
+        result.push({
+            row: row,
+            parentRow: parentRow,
+            level: level,
+            rowIndex: i
+        } as UTSJSONObject)
+        const children = row[cKey] as UTSJSONObject[] | null
+        if (children != null && children.length > 0 && isExpanded(row)) {
+            collectFlatRows(children, row, level + 1, result)
+        }
+    }
+}
+
+const flatRows = computed<UTSJSONObject[]>(() => {
+    const result = createRowList()
+    collectFlatRows(processedData.value, null, 1, result)
+    return result
+})
+
+const hasData = computed<boolean>(() => flatRows.value.length > 0)
+
+const fixedLeftColumns = computed<UTSJSONObject[]>(() => {
+    const result = createRowList()
+    const cols = props.columns
+    let started = false
+    for (let i = 0; i < cols.length; i++) {
+        const col = cols[i] as UTSJSONObject
+        if (valueToString(col['fixed']) == 'left') {
+            result.push(col)
+            started = true
+        } else if (started) {
+            break
+        }
+    }
+    return result
+})
+
+const showFixedShadow = computed<boolean>(() => {
+    return scrollLeftValue.value > 0 && fixedLeftColumns.value.length > 0
+})
+
+function safeToNumber(value: any | null, fallback: number = 0): number {
+    return toNumber(value, fallback)
+}
+
+function getTableContentWidthValue(): number {
+    const cols = props.columns
+    let total = 0
+    for (let i = 0; i < cols.length; i++) {
+        total += normalizeColumnWidth((cols[i] as UTSJSONObject)['width'])
+    }
+    const minWidth = getTableMinWidthPx()
+    return total > 0 ? Math.max(total, minWidth) : minWidth
+}
+
+function getTableContentWidth(): string {
+    return getTableContentWidthValue().toString() + 'px'
+}
+
+function getTableContentStyle(): UTSJSONObject {
+    const style = createEmptyObject()
+    const contentWidth = getTableContentWidth()
+    // #ifdef APP
+    style['width'] = '100%'
+    style['minWidth'] = contentWidth
+    // #endif
+    // #ifndef APP
+    style['width'] = contentWidth
+    style['minWidth'] = contentWidth
+    // #endif
+    return style
+}
+
+function getNaturalTableHeight(): string {
+    const headerHeight = props.showHeader ? 44 : 0
+    const rHeight = toNumber(props.rowHeight, 44)
+    const rows = hasData.value ? flatRows.value.length : 1
+    return (headerHeight + rHeight * rows).toString() + 'px'
+}
+
+function getScrollStyle(): UTSJSONObject {
+    const style = createEmptyObject()
+    const heightText = addUnitLocal(props.height)
+    if (heightText != 'auto') {
+        style['height'] = heightText
+    } else {
+        style['height'] = getNaturalTableHeight()
+    }
+    return style
+}
+
+function getBodyStyle(): UTSJSONObject {
+    const style = createEmptyObject()
+    const maxHeightText = addUnitLocal(props.maxHeight)
+    if (maxHeightText != 'auto') {
+        style['maxHeight'] = maxHeightText
+    }
+    return style
+}
+
+function getFixedShadowWidth(): number {
+    const cols = fixedLeftColumns.value
+    let total = 0
+    for (let i = 0; i < cols.length; i++) {
+        const col = cols[i] as UTSJSONObject
+        const width = getColumnWidthNumber(col)
+        total += width
+        if (props.border) {
+            total += 1
+        }
+    }
+    return total
+}
+
+function getFixedShadowStyle(): UTSJSONObject {
+    const style = createEmptyObject()
+    style['height'] = getNaturalTableHeight()
+    style['width'] = getFixedShadowWidth().toString() + 'px'
+    return style
+}
+
+function isHiddenBySameRowColspan(row: UTSJSONObject, rowIndex: number, columnIndex: number): boolean {
+    const cols = props.columns
+    for (let i = 0; i < columnIndex && i < cols.length; i++) {
+        const span = getCellSpan(row, cols[i] as UTSJSONObject, rowIndex, i)
+        const rowspan = span['rowspan'] as number
+        const colspan = span['colspan'] as number
+        if (rowspan > 0 && colspan > 1 && i + colspan > columnIndex) {
+            return true
+        }
+    }
+    return false
+}
+
+function isCellRendered(row: UTSJSONObject, rowIndex: number, columnIndex: number): boolean {
+    const col = props.columns[columnIndex] as UTSJSONObject
+    const span = getCellSpan(row, col, rowIndex, columnIndex)
+    const rowspan = span['rowspan'] as number
+    const colspan = span['colspan'] as number
+    if (rowspan == 0 || colspan == 0) {
+        return !isHiddenBySameRowColspan(row, rowIndex, columnIndex)
+    }
+    return true
+}
+
+function getRowCells(row: UTSJSONObject, rowIndex: number): UTSJSONObject[] {
+    const result = createRowList()
+    const cols = props.columns
+    for (let i = 0; i < cols.length; i++) {
+        if (isCellRendered(row, rowIndex, i)) {
+            result.push({
+                col: cols[i],
+                colIndex: i
+            } as UTSJSONObject)
+        }
+    }
+    return result
+}
+
+function getFixedRowCells(row: UTSJSONObject, rowIndex: number): UTSJSONObject[] {
+    const result = createRowList()
+    const cols = fixedLeftColumns.value
+    for (let i = 0; i < cols.length; i++) {
+        const colIndex = getColumnIndex(cols[i] as UTSJSONObject)
+        if (isCellRendered(row, rowIndex, colIndex)) {
+            result.push({
+                col: cols[i],
+                colIndex: colIndex
+            } as UTSJSONObject)
+        }
+    }
+    return result
+}
+
+function getCellText(row: UTSJSONObject, col: UTSJSONObject): string {
+    const field = getColumnField(col)
+    if (field == '') {
+        return ''
+    }
+    const text = valueToString(row[field])
+    return text == '' ? '-' : text
+}
+
+function toggleExpand(row: UTSJSONObject): void {
+    if (!hasChildrenRow(row)) {
+        return
+    }
+    const key = getRowKeyValue(row)
+    if (key == '') {
+        return
+    }
+    const list = expandedKeys.value
+    const index = list.indexOf(key)
+    if (index > -1) {
+        list.splice(index, 1)
+    } else {
+        list.push(key)
+    }
+    expandedKeys.value = list
+    emit('expand-change', list.slice())
+}
+
+function isSelected(row: UTSJSONObject): boolean {
+    const key = getRowKeyValue(row)
+    if (key == '') {
+        return false
+    }
+    return selectedKeys.value.indexOf(key) > -1
+}
+
+function addSelectedRowAndChildren(row: UTSJSONObject, selKeys: string[]): void {
+    const key = getRowKeyValue(row)
+    if (key != '' && selKeys.indexOf(key) == -1) {
+        selKeys.push(key)
+    }
+    const children = row[getChildrenKey()] as UTSJSONObject[] | null
+    if (children == null || !Array.isArray(children)) {
+        return
+    }
+    for (let i = 0; i < children.length; i++) {
+        addSelectedRowAndChildren(children[i] as UTSJSONObject, selKeys)
+    }
+}
+
+function removeSelectedRowAndChildren(row: UTSJSONObject, selKeys: string[]): void {
+    const key = getRowKeyValue(row)
+    const index = selKeys.indexOf(key)
+    if (index > -1) {
+        selKeys.splice(index, 1)
+    }
+    const children = row[getChildrenKey()] as UTSJSONObject[] | null
+    if (children == null || !Array.isArray(children)) {
+        return
+    }
+    for (let i = 0; i < children.length; i++) {
+        removeSelectedRowAndChildren(children[i] as UTSJSONObject, selKeys)
+    }
+}
+
+function collectAllRows(rows: UTSJSONObject[], result: UTSJSONObject[]): void {
+    if (!Array.isArray(rows) || rows.length == 0) {
+        return
+    }
+    const cKey = getChildrenKey()
+    for (let i = 0; i < rows.length; i++) {
+        const row = rows[i] as UTSJSONObject
+        result.push(row)
+        const children = row[cKey] as UTSJSONObject[] | null
+        if (children != null && Array.isArray(children) && children.length > 0) {
+            collectAllRows(children, result)
+        }
+    }
+}
+
+function getAllRows(): UTSJSONObject[] {
+    const result = createRowList()
+    collectAllRows(processedData.value, result)
+    return result
+}
+
+function getSelectedRows(): UTSJSONObject[] {
+    const result = createRowList()
+    const rows = getAllRows()
+    for (let i = 0; i < rows.length; i++) {
+        const row = rows[i] as UTSJSONObject
+        if (isSelected(row)) {
+            result.push(row)
+        }
+    }
+    return result
+}
+
+function isAllSelected(): boolean {
+    const rows = getAllRows()
+    if (rows.length == 0) {
+        return false
+    }
+    for (let i = 0; i < rows.length; i++) {
+        if (!isSelected(rows[i] as UTSJSONObject)) {
+            return false
+        }
+    }
+    return true
+}
+
+function toggleSelectAll(): void {
+    const rows = getAllRows()
+    if (isAllSelected()) {
+        selectedKeys.value = createStringList()
+    } else {
+        const next = createStringList()
+        for (let i = 0; i < rows.length; i++) {
+            const key = getRowKeyValue(rows[i] as UTSJSONObject)
+            if (key != '') {
+                next.push(key)
+            }
+        }
+        selectedKeys.value = next
+    }
+    const selRows = getSelectedRows()
+    emit('select-all', selRows)
+    emit('selection-change', selRows)
+}
+
+function toggleSelect(row: UTSJSONObject): void {
+    const key = getRowKeyValue(row)
+    if (key == '') {
+        return
+    }
+    const selKeys = selectedKeys.value
+    const index = selKeys.indexOf(key)
+    if (index > -1) {
+        removeSelectedRowAndChildren(row, selKeys)
+    } else {
+        addSelectedRowAndChildren(row, selKeys)
+    }
+    selectedKeys.value = selKeys
+    emit('select', row, isSelected(row))
+    emit('selection-change', getSelectedRows())
+}
+
+function pruneSelection(): void {
+    const valid = createStringList()
+    const rows = getAllRows()
+    for (let i = 0; i < rows.length; i++) {
+        const key = getRowKeyValue(rows[i] as UTSJSONObject)
+        if (key != '') {
+            valid.push(key)
+        }
+    }
+    const next = createStringList()
+    const selKeys = selectedKeys.value
+    for (let i = 0; i < selKeys.length; i++) {
+        const key = selKeys[i]
+        if (valid.indexOf(key) > -1) {
+            next.push(key)
+        }
+    }
+    selectedKeys.value = next
+}
+
+function handleRowClick(row: UTSJSONObject): void {
+    if (props.highlightCurrentRow) {
+        currentRowValue.value = getRowKeyValue(row)
+        emit('current-change', row)
+    }
+    emit('row-click', row)
+}
+
+function getRowClass(row: UTSJSONObject, flatIndex: number): string {
+    let className = ''
+    if (props.highlightCurrentRow && currentRowValue.value != '' && currentRowValue.value == getRowKeyValue(row)) {
+        className += ' up-table-row-highlight'
+    }
+    if (props.stripe && flatIndex % 2 == 1) {
+        className += ' up-table-row-zebra'
+    }
+    if (props.rowClassName != null) {
+        const callback = props.rowClassName as RowClassNameCallback
+        const customClass = valueToString(callback(row, flatIndex))
+        if (customClass != '') {
+            className += ' ' + customClass
+        }
+    }
+    return className
+}
+
+function getSortConditions(): UTSJSONObject[] {
+    if (sortKey.value == '' || sortOrder.value == '') {
+        return createRowList()
+    }
+    return [{
+        key: sortKey.value,
+        order: sortOrder.value
+    } as UTSJSONObject]
+}
+
+function handleHeaderClick(col: UTSJSONObject): void {
+    emit('header-click', col)
+    if (!isSortableColumn(col)) {
+        return
+    }
+    const key = getColumnField(col)
+    if (key == '') {
+        return
+    }
+    if (sortKey.value != key) {
+        sortKey.value = key
+        sortOrder.value = 'ascending'
+    } else if (sortOrder.value == 'ascending') {
+        sortOrder.value = 'descending'
+    } else {
+        sortKey.value = ''
+        sortOrder.value = ''
+    }
+    emit('sort-change', getSortConditions())
+}
+
+function getSortIcon(col: UTSJSONObject): string {
+    const key = getColumnField(col)
+    if (key == '' || !isSortableColumn(col)) {
+        return ''
+    }
+    if (sortKey.value != key || sortOrder.value == '') {
+        return '-'
+    }
+    return sortOrder.value == 'ascending' ? '^' : 'v'
+}
+
+function onScroll(e: UniScrollEvent): void {
+    scrollLeftValue.value = e.detail.scrollLeft
+}
+
+// #ifndef APP
+function onScrollRaw(e: Event): void {
+    const target = e.target as HTMLElement | null
+    if (target != null) {
+        scrollLeftValue.value = (target as any).scrollLeft as number
+    }
+}
+// #endif
+
+watch((): any[] => props.expandRowKeys, (newVal: any[] | null) => {
+    expandedKeys.value = normalizeKeys(newVal)
+}, { immediate: true })
+
+watch((): any | null => props.currentRowKey, (newVal: any | null) => {
+    currentRowValue.value = normalizeKey(newVal)
+}, { immediate: true })
+
+watch((): UTSJSONObject => props.filters, (newVal: UTSJSONObject) => {
+    emit('filter-change', newVal)
+}, { deep: true })
+
+watch((): UTSJSONObject[] => props.data, () => {
+    pruneSelection()
+}, { deep: true })
+
+defineExpose({
+    getSelectedRows,
+    toggleSelectAll,
+    toggleSelect,
+    toggleExpand,
+    isExpanded,
+    isSelected
+})
+</script>
+
+<style lang="scss" scoped>
+.up-table2 {
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+.up-table2-scroll {
+    width: 100%;
+}
+
+/* #ifndef APP */
+.up-table2-scroll-h5 {
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+}
+/* #endif */
+
+.up-table2-content {
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+}
+
+.up-table-row {
+    display: flex;
+    flex-direction: row;
+    overflow: visible;
+}
+
+.up-table-header-row {
+    background-color: #f5f7fa;
+}
+
+.up-table-body {
+    width: 100%;
+}
+
+.up-table-body-cell {
+    padding-top: 4px;
+    padding-bottom: 4px;
+}
+
+.up-table-cell {
+    min-width: 0;
+    display: flex;
+    flex-direction: row;
+    flex-shrink: 0;
+    box-sizing: border-box;
+    align-items: center;
+    padding: 6px 6px;
+    border-bottom: 1px solid #ebeef5;
+}
+
+.up-table-header-cell {
+    border-bottom: 1px solid #dcdfe6;
+}
+
+.up-table-header-text {
+    width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-size: 13px;
+}
+
+.up-table-cell-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 13px;
+}
+
+.up-table-sort-icon {
+    margin-left: 6px;
+    color: #909399;
+}
+
+.up-table-tree-toggle {
+    width: 24px;
+    margin-right: 4px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.up-table-empty {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.up-table-empty-text {
+    color: #999;
+}
+
+.up-table-row-zebra {
+    background-color: #fafafa;
+}
+
+.up-table-row-highlight {
+    background-color: #ecf5ff;
+}
+
+.up-text-left {
+    justify-content: flex-start;
+}
+
+.up-text-center {
+    justify-content: center;
+}
+
+.up-text-right {
+    justify-content: flex-end;
+}
+
+.up-table-border {
+    border-top: 1px solid #ebeef5;
+    border-left: 1px solid #ebeef5;
+    border-right: 1px solid #ebeef5;
+}
+
+.up-table-cell-hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.up-table-cell-merged {
+    position: relative;
+    z-index: 2;
+    align-items: center;
+    overflow: visible;
+}
+
+.up-table-fixed-shadow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 20;
+    overflow: hidden;
+    background-color: #ffffff;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.15);
+}
+</style>

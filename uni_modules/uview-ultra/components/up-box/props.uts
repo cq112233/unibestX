@@ -1,0 +1,58 @@
+import { defineMixin } from '../../libs/vue.uts'
+import defProps from './box.uts'
+import { getString, getNumber, getBoolean, getArray } from '../../libs/function/index.uts'
+
+export const propsBox = defineMixin({
+    props: {
+        // 背景色
+        bgColors: {
+            type: Array,
+            default: () => getArray('box.bgColors')
+        },
+        // 高度
+        height: {
+            type: String,
+            default: () => getString('box.height')
+        },
+        // 圆角
+        borderRadius: {
+            type: String,
+            default: () => getString('box.borderRadius')
+        },
+        // 间隔
+        gap: {
+            type: String,
+            default: () => getString('box.gap')
+        },
+        // 左侧图标
+        leftIcon: {
+            type: String,
+            default: () => getString('box.leftIcon')
+        },
+        // 左侧文案
+        leftTitle: {
+            type: String,
+            default: () => getString('box.leftTitle')
+        },
+        // 右上图标
+        rightTopIcon: {
+            type: String,
+            default: () => getString('box.rightTopIcon')
+        },
+        // 右上文案
+        rightTopTitle: {
+            type: String,
+            default: () => getString('box.rightTopTitle')
+        },
+        // 右下图标
+        rightBottomIcon: {
+            type: String,
+            default: () => getString('box.rightBottomIcon')
+        },
+        // 右下文案
+        rightBottomTitle: {
+            type: String,
+            default: () => getString('box.rightBottomTitle')
+        },
+    }
+})

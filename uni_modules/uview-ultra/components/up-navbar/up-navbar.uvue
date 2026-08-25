@@ -1,0 +1,251 @@
+<template>
+	<view class="up-navbar" :class="[customClass]">
+		<view
+			class="up-navbar__placeholder"
+			v-if="fixed && placeholder"
+			:style="placeholderStyle"
+		></view>
+		<view :class="[fixed ? 'up-navbar--fixed' : '']">
+			<up-status-bar
+				v-if="safeAreaInsetTop"
+				:bgColor="bgColor"
+			></up-status-bar>
+			<view
+				class="up-navbar__content"
+				:class="[border ? 'up-border-bottom' : '']"
+				:style="contentStyle"
+			>
+				<view
+					class="up-navbar__content__left"
+					hover-class="up-navbar__content__left--hover"
+					hover-start-time="150"
+					@tap="leftClick"
+				>
+					<slot name="left">
+						<up-icon
+							v-if="leftIcon != ''"
+							:name="leftIcon"
+							:size="leftIconSize"
+							:color="leftIconColor"
+						></up-icon>
+						<text
+							v-if="leftText != ''"
+							:style="leftTextStyle"
+							class="up-navbar__content__left__text"
+						>{{ leftText }}</text>
+					</slot>
+				</view>
+				<slot name="center">
+					<text
+						class="up-line-1 up-navbar__content__title"
+						:style="mergedTitleStyle"
+					>{{ title }}</text>
+				</slot>
+				<view
+					class="up-navbar__content__right"
+					v-if="$slots['right'] != null || rightIcon != '' || rightText != ''"
+					@tap="rightClick"
+				>
+					<slot name="right">
+						<up-icon
+							v-if="rightIcon != ''"
+							:name="rightIcon"
+							size="20"
+						></up-icon>
+						<text
+							v-if="rightText != ''"
+							class="up-navbar__content__right__text"
+						>{{ rightText }}</text>
+					</slot>
+				</view>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script setup lang="uts">
+import { computed } from 'vue'
+import { addUnit, addStyle, getPx, deepMerge } from '../../libs/function/index.uts'
+
+defineOptions({
+  name: 'up-navbar'
+})
+
+const props = defineProps({
+  safeAreaInsetTop: {
+    type: Boolean,
+    default: true
+  },
+  placeholder: {
+    type: Boolean,
+    default: false
+  },
+  fixed: {
+    type: Boolean,
+    default: false
+  },
+  border: {
+    type: Boolean,
+    default: false
+  },
+  leftIcon: {
+    type: String,
+    default: 'arrow-left'
+  },
+  leftText: {
+    type: String,
+    default: ''
+  },
+  rightText: {
+    type: String,
+    default: ''
+  },
+  rightIcon: {
+    type: String,
+    default: ''
+  },
+  title: {
+    type: String,
+    default: ''
+  },
+  bgColor: {
+    type: String,
+    default: '#ffffff'
+  },
+  titleWidth: {
+    type: [String, Number],
+    default: '400rpx'
+  },
+  height: {
+    type: [String, Number],
+    default: '44px'
+  },
+  leftIconSize: {
+    type: [String, Number],
+    default: 20
+  },
+  leftIconColor: {
+    type: String,
+    default: '#303133'
+  },
+  autoBack: {
+    type: Boolean,
+    default: false
+  },
+  titleStyle: {
+    type: [Object, String],
+    default: () => ({})
+  },
+  customClass: {
+    type: String,
+    default: ''
+  }
+})
+
+const emit = defineEmits(['leftClick', 'rightClick'])
+
+const placeholderHeight = computed<string>(() => {
+  const statusBarHeight = uni.getSystemInfoSync().statusBarHeight
+  return addUnit(parseInt(getPx(props.height)) + statusBarHeight, 'px')
+})
+
+const placeholderStyle = computed((): UTSJSONObject => {
+  return {
+    height: placeholderHeight.value
+  } as UTSJSONObject
+})
+
+const contentStyle = computed((): UTSJSONObject => {
+  return {
+    height: addUnit(props.height),
+    backgroundColor: props.bgColor
+  } as UTSJSONObject
+})
+
+const leftTextStyle = computed((): UTSJSONObject => {
+  return {
+    color: props.leftIconColor
+  } as UTSJSONObject
+})
+
+const mergedTitleStyle = computed((): UTSJSONObject => {
+  const custom = addStyle(props.titleStyle) as UTSJSONObject
+  const base = {
+    width: addUnit(props.titleWidth)
+  } as UTSJSONObject
+  return deepMerge(base, custom) as UTSJSONObject
+})
+
+function leftClick(): void {
+  emit('leftClick')
+  if (props.autoBack) {
+    uni.navigateBack()
+  }
+}
+
+function rightClick(): void {
+  emit('rightClick')
+}
+</script>
+
+<style lang="scss" scoped>
+	@import "../../libs/css/components.scss";
+
+	.up-navbar {
+
+		&--fixed {
+			position: fixed;
+			left: 0;
+			right: 0;
+			top: 0;
+			z-index: 11;
+		}
+
+		&__content {
+			@include flex(row);
+			align-items: center;
+			height: 44px;
+			background-color: #9acafc;
+			position: relative;
+			justify-content: center;
+
+			&__left,
+			&__right {
+				padding: 0 13px;
+				position: absolute;
+				top: 0;
+				bottom: 0;
+				@include flex(row);
+				align-items: center;
+			}
+
+			&__left {
+				left: 0;
+				
+				&--hover {
+					opacity: 0.7;
+				}
+
+				&__text {
+					font-size: 15px;
+					margin-left: 3px;
+				}
+			}
+
+			&__title {
+				text-align: center;
+				font-size: 16px;
+				color: $up-main-color;
+			}
+
+			&__right {
+				right: 0;
+
+				&__text {
+					font-size: 15px;
+					margin-left: 3px;
+				}
+			}
+		}
+	}
+</style>

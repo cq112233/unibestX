@@ -1,0 +1,466 @@
+<template>
+	<view class="up-number-box">
+		<view
+		    class="up-number-box__slot cursor-pointer"
+		    @tap.stop="clickHandler('minus')"
+		    @touchstart="onTouchStart('minus')"
+		    @touchend.stop="clearTimeoutHandler"
+		    v-if="showMinus && !hideMinus && $slots['minus'] != null"
+		>
+			<slot name="minus" />
+		</view>
+		<view
+		    v-else-if="showMinus && !hideMinus"
+		    class="up-number-box__minus cursor-pointer"
+		    @tap.stop="clickHandler('minus')"
+		    @touchstart="onTouchStart('minus')"
+		    @touchend.stop="clearTimeoutHandler"
+		    hover-class="up-number-box__minus--hover"
+		    hover-stay-time="150"
+		    :class="{'up-number-box__minus--disabled': isDisabled('minus') }"
+		    :style="buttonStyle('minus')"
+		>
+			<up-icon
+			    name="minus"
+			    :color="isDisabled('minus') ? '#c8c9cc' : '#323233'"
+			    size="15"
+			    bold
+				:customStyle="iconStyle"
+			></up-icon>
+		</view>
+
+		<template v-if="!hideMinus">
+			<slot name="input">
+				<!-- #ifdef MP-WEIXIN -->
+				<input
+					:disabled="disabledInput || disabled"
+					:cursor-spacing="getCursorSpacing"
+					:class="{ 'up-number-box__input--disabled': disabled || disabledInput }"
+					:value="currentValue"
+					class="up-number-box__input"
+					@blur="onBlur"
+					@focus="onFocus"
+					@input="onInput"
+					type="number"
+					:style="inputStyle"
+				/>
+				<!-- #endif -->
+				<!-- #ifndef MP-WEIXIN -->
+				<input
+					:disabled="disabledInput || disabled"
+					:cursor-spacing="getCursorSpacing"
+					:class="{ 'up-number-box__input--disabled': disabled || disabledInput }"
+					v-model="currentValue"
+					class="up-number-box__input"
+					@blur="onBlur"
+					@focus="onFocus"
+					@input="onInput"
+					type="number"
+					:style="inputStyle"
+				/>
+				<!-- #endif -->
+			</slot>
+		</template>
+		<view
+		    class="up-number-box__slot cursor-pointer"
+		    @tap.stop="clickHandler('plus')"
+		    @touchstart="onTouchStart('plus')"
+		    @touchend.stop="clearTimeoutHandler"
+		    v-if="showPlus && $slots['plus'] != null"
+		>
+			<slot name="plus" />
+		</view>
+		<view
+		    v-else-if="showPlus"
+		    class="up-number-box__plus cursor-pointer"
+		    @tap.stop="clickHandler('plus')"
+		    @touchstart="onTouchStart('plus')"
+		    @touchend.stop="clearTimeoutHandler"
+		    hover-class="up-number-box__plus--hover"
+		    hover-stay-time="150"
+		    :class="{ 'up-number-box__minus--disabled': isDisabled('plus') }"
+		    :style="buttonStyle('plus')"
+		>
+			<up-icon
+			    name="plus"
+			    :color="isDisabled('plus') ? '#c8c9cc' : '#323233'"
+			    size="15"
+			    bold
+				:customStyle="iconStyle"
+			></up-icon>
+		</view>
+	</view>
+</template>
+
+<script setup lang="uts">
+import { computed, ref, watch, onMounted, nextTick } from 'vue'
+import { getPx, addUnit } from '../../libs/function/index.uts'
+
+defineOptions({
+  name: 'up-number-box'
+})
+
+const props = defineProps({
+  name: {
+    type: [String, Number],
+    default: ''
+  },
+  modelValue: {
+    type: [String, Number],
+    default: 0
+  },
+  min: {
+    type: [String, Number],
+    default: 1
+  },
+  max: {
+    type: [String, Number],
+    default: 999999999
+  },
+  step: {
+    type: [String, Number],
+    default: 1
+  },
+  integer: {
+    type: Boolean,
+    default: false
+  },
+  disabled: {
+    type: Boolean,
+    default: false
+  },
+  disabledInput: {
+    type: Boolean,
+    default: false
+  },
+  asyncChange: {
+    type: Boolean,
+    default: false
+  },
+  inputWidth: {
+    type: [String, Number],
+    default: 35
+  },
+  showMinus: {
+    type: Boolean,
+    default: true
+  },
+  showPlus: {
+    type: Boolean,
+    default: true
+  },
+  decimalLength: {
+    type: [String, Number],
+    default: 0
+  },
+  longPress: {
+    type: Boolean,
+    default: true
+  },
+  color: {
+    type: String,
+    default: '#323233'
+  },
+  buttonWidth: {
+    type: [String, Number],
+    default: 35
+  },
+  buttonSize: {
+    type: [String, Number],
+    default: 30
+  },
+  buttonRadius: {
+    type: String,
+    default: '4px'
+  },
+  bgColor: {
+    type: String,
+    default: '#EBECEE'
+  },
+  disabledBgColor: {
+    type: String,
+    default: '#f7f8fa'
+  },
+  inputBgColor: {
+    type: String,
+    default: ''
+  },
+  cursorSpacing: {
+    type: [String, Number],
+    default: 100
+  },
+  disablePlus: {
+    type: Boolean,
+    default: false
+  },
+  disableMinus: {
+    type: Boolean,
+    default: false
+  },
+  iconStyle: {
+    type: [Object, String],
+    default: () => ({})
+  },
+  miniMode: {
+    type: Boolean,
+    default: false
+  }
+})
+
+const emit = defineEmits(['update:modelValue', 'focus', 'blur', 'overlimit', 'change', 'plus', 'minus'])
+
+const type = ref<string>('')
+const currentValue = ref<string | number>('')
+const longPressTimer = ref<number | null>(null)
+
+const hideMinus = computed<boolean>(() => {
+  return currentValue.value.toString() == '0' && props.miniMode == true
+})
+
+const getCursorSpacing = computed<string>(() => {
+  return getPx(props.cursorSpacing)
+})
+
+const inputStyle = computed<UTSJSONObject>(() => {
+  const style = {
+    color: props.color,
+    backgroundColor: props.inputBgColor != '' ? props.inputBgColor : props.bgColor,
+    height: addUnit(props.buttonSize),
+    width: addUnit(props.inputWidth)
+  } as UTSJSONObject
+  return style
+})
+
+function filter(value: string | number): string {
+  let val = value.toString()
+  val = val.replace(/[^0-9.-]/g, '')
+  if (props.integer && val.indexOf('.') != -1) {
+    val = val.split('.')[0]
+  }
+  return val
+}
+
+function format(value: string): number {
+  const filtered = filter(value)
+  let valueNum: number = filtered == '' ? 0 : parseFloat(filtered)
+  const minVal = parseFloat(props.min.toString())
+  const maxVal = parseFloat(props.max.toString())
+  valueNum = Math.max(Math.min(maxVal, valueNum), minVal)
+  const decimalLen = parseInt(props.decimalLength.toString())
+  if (decimalLen != 0 && valueNum != 0) {
+    valueNum = parseFloat(valueNum.toFixed(decimalLen))
+  }
+  return valueNum
+}
+
+function isDisabled(btnType: string): boolean {
+  if (btnType === 'plus') {
+    return props.disabled || props.disablePlus
+  }
+  return (
+    props.disabled ||
+    props.disableMinus ||
+    parseFloat(currentValue.value.toString()) <= parseFloat(props.min.toString())
+  )
+}
+
+function buttonStyle(btnType: string): UTSJSONObject {
+  const style = {
+    backgroundColor: props.bgColor,
+    width: addUnit(props.buttonWidth),
+    height: addUnit(props.buttonSize),
+    borderRadius: props.buttonRadius
+  } as UTSJSONObject
+  if (isDisabled(btnType)) {
+    style['backgroundColor'] = props.disabledBgColor
+  }
+  return style
+}
+
+function emitChange(value: string | number, changeType: string = '') {
+  if (!props.asyncChange) {
+    nextTick(() => {
+      emit('update:modelValue', value)
+      currentValue.value = value
+    })
+  }
+  emit('change', {
+    value: parseFloat(value.toString()),
+    name: props.name,
+    type: changeType
+  } as UTSJSONObject)
+}
+
+function check() {
+  const val = format(currentValue.value.toString())
+  if (val !== currentValue.value) {
+    currentValue.value = val
+    emitChange(val)
+  }
+}
+
+function add(num1: number, num2: number): number {
+  const cardinal = Math.pow(10, 10)
+  return Math.round((num1 + num2) * cardinal) / cardinal
+}
+
+function onChange() {
+  const crtType = type.value
+  if (isDisabled(crtType)) {
+    emit('overlimit', crtType)
+    return
+  }
+  const stepVal = parseFloat(props.step.toString())
+  const diff = crtType === 'minus' ? -stepVal : stepVal
+  const value = format(add(parseFloat(currentValue.value.toString()), diff).toString())
+  emitChange(value, crtType)
+  if (crtType == 'plus') {
+    emit('plus')
+  } else if (crtType == 'minus') {
+    emit('minus')
+  }
+}
+
+function clearTimeoutHandler() {
+  if (longPressTimer.value != null) {
+    clearTimeout(longPressTimer.value!)
+    longPressTimer.value = null
+  }
+}
+
+function longPressStep() {
+  clearTimeoutHandler()
+  longPressTimer.value = setTimeout(() => {
+    onChange()
+    longPressStep()
+  }, 250)
+}
+
+function onTouchStart(btnType: string) {
+  if (!props.longPress) return
+  clearTimeoutHandler()
+  type.value = btnType
+  longPressTimer.value = setTimeout(() => {
+    onChange()
+    longPressStep()
+  }, 600)
+}
+
+function clickHandler(btnType: string): void {
+  type.value = btnType
+  onChange()
+}
+
+function onFocus(event: UniInputFocusEvent) {
+  emit('focus', {
+    ...event.detail,
+    name: props.name,
+  } as UTSJSONObject)
+}
+
+function onBlur(event: UniInputBlurEvent) {
+  const value = format(event.detail.value)
+  emitChange(value)
+  emit('blur', {
+    ...event.detail,
+    name: props.name,
+  } as UTSJSONObject)
+}
+
+function onInput(e: UniInputEvent) {
+  const value = e.detail.value
+  if (value === '') {
+    currentValue.value = ''
+    return
+  }
+  let formatted = filter(value.toString())
+  emitChange(value)
+  const decimalLen = parseInt(props.decimalLength.toString())
+  if (formatted.indexOf('.') != -1 && decimalLen > 0) {
+    const pair = formatted.split('.')
+    formatted = `${pair[0]}.${pair[1].slice(0, decimalLen)}`
+  }
+  const formatted2 = format(formatted)
+  emitChange(formatted2)
+}
+
+function init() {
+  currentValue.value = format(props.modelValue != null ? props.modelValue.toString() : '0')
+}
+
+watch((): any => props.modelValue, (newV: string | number) => {
+  if (newV !== currentValue.value) {
+    currentValue.value = format(newV.toString())
+  }
+})
+
+watch((): Array<any | null> => [props.integer, props.decimalLength, props.min, props.max] as Array<any | null>, () => {
+  check()
+})
+
+onMounted(() => {
+  init()
+})
+</script>
+
+<style lang="scss" scoped>
+	$up-numberBox-hover-bgColor: #E6E6E6 !default;
+	$up-numberBox-disabled-color: #c8c9cc !default;
+	$up-numberBox-disabled-bgColor: #f7f8fa !default;
+	$up-numberBox-plus-radius: 4px !default;
+	$up-numberBox-minus-radius: 4px !default;
+	$up-numberBox-input-text-align: center !default;
+	$up-numberBox-input-font-size: 15px !default;
+	$up-numberBox-input-padding: 0 !default;
+	$up-numberBox-input-margin: 0 2px !default;
+	$up-numberBox-input-disabled-color: #c8c9cc !default;
+	$up-numberBox-input-disabled-bgColor: #f2f3f5 !default;
+
+	.up-number-box {
+		@include flex(row);
+		align-items: center;
+
+		&__slot {
+			// touch-action: none;
+		}
+
+		&__plus,
+		&__minus {
+			width: 35px;
+			@include flex;
+			justify-content: center;
+			align-items: center;
+			// touch-action: none;
+
+			&--hover {
+				background-color: $up-numberBox-hover-bgColor !important;
+			}
+
+			&--disabled {
+				background-color: $up-numberBox-disabled-bgColor;
+			}
+		}
+
+		&__plus {
+			border-top-right-radius: $up-numberBox-plus-radius;
+			border-bottom-right-radius: $up-numberBox-plus-radius;
+		}
+
+		&__minus {
+			border-top-left-radius: $up-numberBox-minus-radius;
+			border-bottom-left-radius: $up-numberBox-minus-radius;
+		}
+
+		&__input {
+			text-align: $up-numberBox-input-text-align;
+			font-size: $up-numberBox-input-font-size;
+			padding: $up-numberBox-input-padding;
+			margin: $up-numberBox-input-margin;
+
+			&--disabled {
+				color: $up-numberBox-input-disabled-color;
+				background-color: $up-numberBox-input-disabled-bgColor;
+			}
+		}
+	}
+</style>

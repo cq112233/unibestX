@@ -1,7 +1,22 @@
 import { defineStore, PiniaStoreBase } from '@/uni_modules/x-pinia-s';
 import { themeColor } from '@/src/tabbar/store';
 import i18n from '@/src/i18n/index.uts';
+import { setLocale as setUViewLocale } from '@/uni_modules/uview-ultra/libs/i18n/index.uts';
+import uViewConfig from '@/uni_modules/uview-ultra/libs/config/config.uts';
 import { getSystemTheme } from '@/src/utils/theme.uts';
+
+// ==========================================
+// 业务与组件库主题同步辅助方法
+// ==========================================
+function syncUViewTheme(color: string): void {
+  try {
+    const colorMap = uViewConfig.color as UTSJSONObject;
+    colorMap['up-primary'] = color;
+  }
+  catch {
+    // ignore
+  }
+}
 
 // ==========================================
 // 类型定义
@@ -60,6 +75,7 @@ export class AppStore extends PiniaStoreBase {
     this.bindState(this.state);
     // 从持久化或默认状态中同步一次到全局
     themeColor.value = this.state.theme;
+    syncUViewTheme(this.state.theme);
 
     // #ifdef H5
     const docEl = document.documentElement;
@@ -70,6 +86,7 @@ export class AppStore extends PiniaStoreBase {
 
     // 同步语言到 i18n
     i18n.global.locale.value = this.state.locale;
+    setUViewLocale(this.state.locale);
   }
 
   // ==========================================
@@ -83,6 +100,7 @@ export class AppStore extends PiniaStoreBase {
     this.state.isDark = defaultAppState.isDark;
 
     themeColor.value = defaultAppState.theme;
+    syncUViewTheme(defaultAppState.theme);
 
     // #ifdef H5
     const docEl = document.documentElement;
@@ -91,6 +109,7 @@ export class AppStore extends PiniaStoreBase {
     }
     // #endif
     i18n.global.locale.value = defaultAppState.locale;
+    setUViewLocale(defaultAppState.locale);
 
     // 重新应用外观模式（App 端同步 setAppTheme）
     this.initThemeMode();
@@ -101,6 +120,7 @@ export class AppStore extends PiniaStoreBase {
       const colorVal = _data.theme as string;
       this.state.theme = colorVal;
       themeColor.value = colorVal;
+      syncUViewTheme(colorVal);
 
       // #ifdef H5
       const docEl = document.documentElement;
@@ -113,6 +133,7 @@ export class AppStore extends PiniaStoreBase {
       const localeVal = _data.locale as string;
       this.state.locale = localeVal;
       i18n.global.locale.value = localeVal;
+      setUViewLocale(localeVal);
     }
     if (_data.themeMode != null) {
       const modeVal = _data.themeMode as string;
@@ -148,6 +169,7 @@ export class AppStore extends PiniaStoreBase {
   setTheme(theme: string): void {
     this.state.theme = theme;
     themeColor.value = theme;
+    syncUViewTheme(theme);
 
     // #ifdef H5
     const docEl = document.documentElement;
@@ -263,6 +285,7 @@ export class AppStore extends PiniaStoreBase {
   setLocale(locale: string): void {
     this.state.locale = locale;
     i18n.global.locale.value = locale;
+    setUViewLocale(locale);
   }
 }
 

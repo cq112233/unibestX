@@ -1,0 +1,261 @@
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
+    <NavBar title="up-datetime-picker 时间选择" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
+    <view class="p-[16px]">
+      <!-- 1. 基础模式 -->
+      <view class="demo-block">
+        <text class="demo-label">完整时间</text>
+        <view class="flex-row items-center justify-between">
+          <up-button type="primary" text="年月日时分" size="mini" @click="dtShow1 = true"></up-button>
+          <text class="text-[13px] text-gray-500">{{ formatDate(dtValue1) }}</text>
+        </view>
+      </view>
+
+      <view class="demo-block mt-[12px]">
+        <text class="demo-label">仅选日期</text>
+        <view class="flex-row items-center justify-between">
+          <up-button type="success" text="年月日" size="mini" @click="dtShow2 = true"></up-button>
+          <text class="text-[13px] text-gray-500">{{ formatDateOnly(dtValue2) }}</text>
+        </view>
+      </view>
+
+      <view class="demo-block mt-[12px]">
+        <text class="demo-label">年月选择</text>
+        <view class="flex-row items-center justify-between">
+          <up-button type="warning" text="年月" size="mini" @click="dtShow3 = true"></up-button>
+          <text class="text-[13px] text-gray-500">{{ formatYearMonth(dtValue3) }}</text>
+        </view>
+      </view>
+
+      <view class="demo-block mt-[12px]">
+        <text class="demo-label">仅选时间</text>
+        <view class="flex-row items-center justify-between">
+          <up-button type="error" text="时分" size="mini" @click="dtShow4 = true"></up-button>
+          <text class="text-[13px] text-gray-500">{{ dtValue4 }}</text>
+        </view>
+      </view>
+
+      <!-- 2. 最大最小日期限制 -->
+      <view class="demo-block mt-[12px]">
+        <text class="demo-label">限制最大最小日期 (2026-08-01 ~ 2026-08-31)</text>
+        <view class="flex-row items-center justify-between">
+          <up-button type="primary" text="选择当月日期" size="mini" @click="dtShowMinMaxDate = true"></up-button>
+          <text class="text-[13px] text-gray-500">{{ formatDateOnly(dtValueMinMaxDate) }}</text>
+        </view>
+      </view>
+
+      <!-- 3. 最大最小时间限制 -->
+      <view class="demo-block mt-[12px]">
+        <text class="demo-label">限制工作时间 (09:00 ~ 18:00)</text>
+        <view class="flex-row items-center justify-between">
+          <up-button type="warning" text="选择时分范围" size="mini" @click="dtShowMinMaxTime = true"></up-button>
+          <text class="text-[13px] text-gray-500">{{ dtValueMinMaxTime }}</text>
+        </view>
+      </view>
+
+      <!-- 4. 开始时间与结束时间联动 -->
+      <view class="demo-block mt-[12px]">
+        <text class="demo-label">开始与结束时间联动 (结束不早于开始)</text>
+        <view class="flex-row items-center justify-between mb-[8px]">
+          <text class="text-[13px] text-gray-700">开始日期：</text>
+          <view class="flex-row items-center">
+            <up-button type="primary" text="选择开始" size="mini" @click="dtShowStart = true"></up-button>
+            <text class="ml-[10px] text-[13px] text-gray-500">{{ formatDateOnly(dtValueStart) }}</text>
+          </view>
+        </view>
+        <view class="flex-row items-center justify-between">
+          <text class="text-[13px] text-gray-700">结束日期：</text>
+          <view class="flex-row items-center">
+            <up-button type="success" text="选择结束" size="mini" @click="dtShowEnd = true"></up-button>
+            <text class="ml-[10px] text-[13px] text-gray-500">{{ formatDateOnly(dtValueEnd) }}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 基础选择器 -->
+    <up-datetime-picker v-model="dtValue1" :show="dtShow1" mode="datetime" @confirm="onConfirm1" @cancel="dtShow1 = false"></up-datetime-picker>
+    <up-datetime-picker v-model="dtValue2" :show="dtShow2" mode="date" @confirm="onConfirm2" @cancel="dtShow2 = false"></up-datetime-picker>
+    <up-datetime-picker v-model="dtValue3" :show="dtShow3" mode="year-month" @confirm="onConfirm3" @cancel="dtShow3 = false"></up-datetime-picker>
+    <up-datetime-picker v-model="dtValue4" :show="dtShow4" mode="time" @confirm="onConfirm4" @cancel="dtShow4 = false"></up-datetime-picker>
+
+    <!-- 最大最小日期限制 -->
+    <up-datetime-picker
+      v-model="dtValueMinMaxDate"
+      :show="dtShowMinMaxDate"
+      mode="date"
+      :min-date="limitMinDate"
+      :max-date="limitMaxDate"
+      @confirm="onConfirmMinMaxDate"
+      @cancel="dtShowMinMaxDate = false"
+    ></up-datetime-picker>
+
+    <!-- 最大最小时间限制 -->
+    <up-datetime-picker
+      v-model="dtValueMinMaxTime"
+      :show="dtShowMinMaxTime"
+      mode="time"
+      :min-hour="9"
+      :max-hour="18"
+      @confirm="onConfirmMinMaxTime"
+      @cancel="dtShowMinMaxTime = false"
+    ></up-datetime-picker>
+
+    <!-- 开始时间 (最大不能超过结束时间) -->
+    <up-datetime-picker
+      v-model="dtValueStart"
+      :show="dtShowStart"
+      mode="date"
+      :max-date="dtValueEnd"
+      @confirm="onConfirmStart"
+      @cancel="dtShowStart = false"
+    ></up-datetime-picker>
+
+    <!-- 结束时间 (最小不能早于开始时间) -->
+    <up-datetime-picker
+      v-model="dtValueEnd"
+      :show="dtShowEnd"
+      mode="date"
+      :min-date="dtValueStart"
+      @confirm="onConfirmEnd"
+      @cancel="dtShowEnd = false"
+    ></up-datetime-picker>
+  </view>
+</template>
+
+<script setup lang="uts">
+/* eslint-disable dot-notation */
+import { ref } from 'vue';
+
+definePage({
+  style: {
+    navigationStyle: 'custom',
+    navigationBarTitleText: 'up-datetime-picker 时间选择'
+  }
+});
+
+const dtShow1 = ref<boolean>(false);
+const dtShow2 = ref<boolean>(false);
+const dtShow3 = ref<boolean>(false);
+const dtShow4 = ref<boolean>(false);
+const dtShowMinMaxDate = ref<boolean>(false);
+const dtShowMinMaxTime = ref<boolean>(false);
+const dtShowStart = ref<boolean>(false);
+const dtShowEnd = ref<boolean>(false);
+
+const dtValue1 = ref<number>(Date.parse('2026-08-10 08:30:00'));
+const dtValue2 = ref<number>(Date.parse('2026-08-10 00:00:00'));
+const dtValue3 = ref<number>(Date.parse('2026-08-10 00:00:00'));
+const dtValue4 = ref<string>('08:30');
+
+// 最大最小日期限制 (2026-08-01 ~ 2026-08-31)
+const limitMinDate = Date.parse('2026-08-01 00:00:00');
+const limitMaxDate = Date.parse('2026-08-31 00:00:00');
+const dtValueMinMaxDate = ref<number>(Date.parse('2026-08-10 00:00:00'));
+const dtValueMinMaxTime = ref<string>('09:30');
+
+// 开始与结束时间联动 (结束时间不得早于开始时间)
+const dtValueStart = ref<number>(Date.parse('2026-08-10 00:00:00'));
+const dtValueEnd = ref<number>(Date.parse('2026-08-20 00:00:00'));
+
+function formatDate(timestamp: number): string {
+  const d = new Date(timestamp);
+  const year = d.getFullYear();
+  const month = (d.getMonth() + 1 < 10 ? '0' : '') + (d.getMonth() + 1);
+  const date = (d.getDate() < 10 ? '0' : '') + d.getDate();
+  const hours = (d.getHours() < 10 ? '0' : '') + d.getHours();
+  const minutes = (d.getMinutes() < 10 ? '0' : '') + d.getMinutes();
+  return `${year}-${month}-${date} ${hours}:${minutes}`;
+}
+
+function formatDateOnly(timestamp: number): string {
+  const d = new Date(timestamp);
+  const year = d.getFullYear();
+  const month = (d.getMonth() + 1 < 10 ? '0' : '') + (d.getMonth() + 1);
+  const date = (d.getDate() < 10 ? '0' : '') + d.getDate();
+  return `${year}-${month}-${date}`;
+}
+
+function formatYearMonth(timestamp: number): string {
+  const d = new Date(timestamp);
+  const year = d.getFullYear();
+  const month = (d.getMonth() + 1 < 10 ? '0' : '') + (d.getMonth() + 1);
+  return `${year}-${month}`;
+}
+
+function onConfirm1(e: UTSJSONObject) {
+  const val = e['value'];
+  if (val != null) {
+    dtValue1.value = val as number;
+  }
+  dtShow1.value = false;
+}
+function onConfirm2(e: UTSJSONObject) {
+  const val = e['value'];
+  if (val != null) {
+    dtValue2.value = val as number;
+  }
+  dtShow2.value = false;
+}
+function onConfirm3(e: UTSJSONObject) {
+  const val = e['value'];
+  if (val != null) {
+    dtValue3.value = val as number;
+  }
+  dtShow3.value = false;
+}
+function onConfirm4(e: UTSJSONObject) {
+  const val = e['value'];
+  if (val != null) {
+    dtValue4.value = val.toString();
+  }
+  dtShow4.value = false;
+}
+function onConfirmMinMaxDate(e: UTSJSONObject) {
+  const val = e['value'];
+  if (val != null) {
+    dtValueMinMaxDate.value = val as number;
+  }
+  dtShowMinMaxDate.value = false;
+}
+function onConfirmMinMaxTime(e: UTSJSONObject) {
+  const val = e['value'];
+  if (val != null) {
+    dtValueMinMaxTime.value = val.toString();
+  }
+  dtShowMinMaxTime.value = false;
+}
+function onConfirmStart(e: UTSJSONObject) {
+  const val = e['value'];
+  if (val != null) {
+    dtValueStart.value = val as number;
+  }
+  dtShowStart.value = false;
+}
+function onConfirmEnd(e: UTSJSONObject) {
+  const val = e['value'];
+  if (val != null) {
+    dtValueEnd.value = val as number;
+  }
+  dtShowEnd.value = false;
+}
+</script>
+
+<style lang="scss" scoped>
+.demo-block {
+  margin-bottom: 12px;
+  padding: 12px;
+  background-color: #ffffff;
+  border-radius: 8px;
+}
+.demo-label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #606266;
+  margin-bottom: 10px;
+  padding-left: 4px;
+  border-left-width: 3px;
+  border-left-style: solid;
+  border-left-color: $up-primary;
+}
+</style>

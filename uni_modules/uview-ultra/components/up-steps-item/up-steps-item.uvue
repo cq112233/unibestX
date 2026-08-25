@@ -1,0 +1,451 @@
+<template>
+	<view class="up-steps-item" :class="[`up-steps-item--${direction}`]" :style="itemContainerStyle">
+		<!-- 水平模式连接线：左半段 (从左边缘到中心) -->
+		<view
+			v-if="direction == 'row' && stepIndex > 0"
+			class="up-steps-item__line up-steps-item__line--row-left"
+			:style="lineLeftStyle"
+		></view>
+		<!-- 水平模式连接线：右半段 (从中心到右边缘) -->
+		<view
+			v-if="direction == 'row' && (childLength == 0 || stepIndex < childLength - 1)"
+			class="up-steps-item__line up-steps-item__line--row-right"
+			:style="lineRightStyle"
+		></view>
+
+		<!-- 垂直模式连接线：上半段 (从顶部到中心) -->
+		<view
+			v-if="direction == 'column' && stepIndex > 0"
+			class="up-steps-item__line up-steps-item__line--col-top"
+			:style="lineColTopStyle"
+		></view>
+		<!-- 垂直模式连接线：下半段 (从中心到底部) -->
+		<view
+			v-if="direction == 'column' && (childLength == 0 || stepIndex < childLength - 1)"
+			class="up-steps-item__line up-steps-item__line--col-bottom"
+			:style="lineColBottomStyle"
+		></view>
+
+		<!-- 节点图标 / 圆圈 / 点 -->
+		<view
+			class="up-steps-item__wrapper"
+			:class="[`up-steps-item__wrapper--${direction}`, isDot ? `up-steps-item__wrapper--${direction}--dot` : '']"
+			:style="itemStyleInner"
+		>
+			<slot name="icon">
+				<!-- 点状模式 -->
+				<view
+					v-if="isDot"
+					class="up-steps-item__wrapper__dot"
+					:style="dotStyle"
+				></view>
+				<!-- 自定义图标模式 -->
+				<view
+					v-else-if="activeIcon != '' || inactiveIcon != ''"
+					class="up-steps-item__wrapper__icon"
+				>
+					<up-icon
+						:name="stepIndex <= currentStep ? (activeIcon != '' ? activeIcon : inactiveIcon) : (inactiveIcon != '' ? inactiveIcon : activeIcon)"
+						:size="iconSize"
+						:color="stepIndex <= currentStep ? (activeColor != '' ? activeColor : '#3c9cff') : inactiveColor"
+					></up-icon>
+				</view>
+				<!-- 默认序号 / 勾选圆圈模式 -->
+				<view
+					v-else
+					class="up-steps-item__wrapper__circle"
+					:style="circleStyle"
+				>
+					<text
+						v-if="statusClass == 'process' || statusClass == 'wait'"
+						class="up-steps-item__wrapper__circle__text"
+						:style="circleTextStyle"
+					>{{ stepIndex + 1 }}</text>
+					<up-icon
+						v-else
+						:color="statusClass == 'error' ? '#f56c6c' : (activeColor != '' ? activeColor : '#3c9cff')"
+						size="12"
+						:name="statusClass == 'error' ? 'close' : 'checkmark'"
+					></up-icon>
+				</view>
+			</slot>
+		</view>
+
+		<!-- 内容区 (标题 + 描述) -->
+		<view
+			class="up-steps-item__content"
+			:class="[`up-steps-item__content--${direction}`]"
+			:style="contentStyle"
+		>
+			<slot name="content" :index="stepIndex">
+				<slot name="title">
+					<text class="up-steps-item__content__title-text" :style="titleStyle">{{ title.toString() }}</text>
+				</slot>
+				<slot name="desc">
+					<text v-if="desc.toString() != ''" class="up-steps-item__content__desc-text" :style="descStyle">{{ desc.toString() }}</text>
+				</slot>
+			</slot>
+		</view>
+	</view>
+</template>
+
+<script setup lang="uts">
+import { computed, inject, ref, onMounted } from 'vue'
+import type { Ref, ComputedRef } from 'vue'
+
+defineOptions({
+  name: 'up-steps-item'
+})
+
+const props = defineProps({
+  title: {
+    type: [String, Number],
+    default: ''
+  },
+  desc: {
+    type: [String, Number],
+    default: ''
+  },
+  iconSize: {
+    type: [String, Number],
+    default: 17
+  },
+  error: {
+    type: Boolean,
+    default: false
+  },
+  index: {
+    type: [Number, String],
+    default: null
+  },
+  itemStyle: {
+    type: Object,
+    default: () => ({})
+  }
+})
+
+const parentProps = inject<ComputedRef<UTSJSONObject> | null>('upStepsProps', null)
+const registerStep = inject<(() => number) | null>('upStepsRegister', null)
+const totalSteps = inject<Ref<number> | null>('upStepsItemCount', null)
+
+const internalIndex = ref<number>(0)
+
+onMounted(() => {
+  if (props.index != null) {
+    internalIndex.value = parseInt(props.index!.toString())
+  } else if (registerStep != null) {
+    internalIndex.value = registerStep()
+  }
+})
+
+function getParentProp(key: string, defaultVal: any): any {
+  if (parentProps == null) return defaultVal
+  const obj = parentProps!.value
+  if (obj != null && obj[key] != null) {
+    return (obj[key] ?? defaultVal) as any
+  }
+  return defaultVal
+}
+
+const stepIndex = computed<number>((): number => {
+  if (props.index != null) return parseInt(props.index!.toString())
+  return internalIndex.value
+})
+
+const childLength = computed<number>((): number => {
+  return totalSteps?.value ?? 0
+})
+
+const direction = computed<string>((): string => {
+  return getParentProp('direction', 'row').toString()
+})
+
+const currentStep = computed<number>((): number => {
+  const c = getParentProp('current', 0)
+  return parseInt(c.toString())
+})
+
+const activeColor = computed<string>((): string => {
+  return getParentProp('activeColor', '#3c9cff').toString()
+})
+
+const inactiveColor = computed<string>((): string => {
+  return getParentProp('inactiveColor', '#969799').toString()
+})
+
+const activeIcon = computed<string>((): string => {
+  return getParentProp('activeIcon', '').toString()
+})
+
+const inactiveIcon = computed<string>((): string => {
+  return getParentProp('inactiveIcon', '').toString()
+})
+
+const isDot = computed<boolean>((): boolean => {
+  return (getParentProp('dot', false) as boolean | null) ?? false
+})
+
+const statusClass = computed<string>((): string => {
+  if (props.error) return 'error'
+  if (stepIndex.value < currentStep.value) return 'finish'
+  if (stepIndex.value == currentStep.value) return 'process'
+  return 'wait'
+})
+
+const itemContainerStyle = computed((): UTSJSONObject => {
+  const style = {} as UTSJSONObject
+  if (direction.value == 'row') {
+    style['flex'] = '1'
+  } else {
+    style['width'] = '100%'
+  }
+  return style
+})
+
+const itemStyleInner = computed((): UTSJSONObject => {
+  return (props.itemStyle ?? {}) as UTSJSONObject
+})
+
+const contentStyle = computed((): UTSJSONObject => {
+  return {} as UTSJSONObject
+})
+
+// 水平左连接线（连接上一节点）
+const lineLeftStyle = computed((): UTSJSONObject => {
+  const style = {} as UTSJSONObject
+  if (stepIndex.value <= currentStep.value) {
+    style['backgroundColor'] = activeColor.value
+  } else {
+    style['backgroundColor'] = inactiveColor.value
+  }
+  return style
+})
+
+// 水平右连接线（连接下一节点）
+const lineRightStyle = computed((): UTSJSONObject => {
+  const style = {} as UTSJSONObject
+  if (stepIndex.value < currentStep.value) {
+    style['backgroundColor'] = activeColor.value
+  } else {
+    style['backgroundColor'] = inactiveColor.value
+  }
+  return style
+})
+
+// 垂直上连接线
+const lineColTopStyle = computed((): UTSJSONObject => {
+  const style = {} as UTSJSONObject
+  if (stepIndex.value <= currentStep.value) {
+    style['backgroundColor'] = activeColor.value
+  } else {
+    style['backgroundColor'] = inactiveColor.value
+  }
+  return style
+})
+
+// 垂直下连接线
+const lineColBottomStyle = computed((): UTSJSONObject => {
+  const style = {} as UTSJSONObject
+  if (stepIndex.value < currentStep.value) {
+    style['backgroundColor'] = activeColor.value
+  } else {
+    style['backgroundColor'] = inactiveColor.value
+  }
+  return style
+})
+
+const dotStyle = computed((): UTSJSONObject => {
+  const style = {} as UTSJSONObject
+  if (statusClass.value == 'finish' || statusClass.value == 'process') {
+    style['backgroundColor'] = activeColor.value
+  } else {
+    style['backgroundColor'] = inactiveColor.value
+  }
+  return style
+})
+
+const circleStyle = computed((): UTSJSONObject => {
+  const style = {} as UTSJSONObject
+  if (statusClass.value == 'process') {
+    style['backgroundColor'] = activeColor.value
+    style['borderColor'] = activeColor.value
+  } else if (statusClass.value == 'finish') {
+    style['backgroundColor'] = '#ffffff'
+    style['borderColor'] = activeColor.value
+  } else if (statusClass.value == 'error') {
+    style['backgroundColor'] = '#ffffff'
+    style['borderColor'] = '#f56c6c'
+  } else {
+    style['backgroundColor'] = '#ffffff'
+    style['borderColor'] = inactiveColor.value
+  }
+  return style
+})
+
+const circleTextStyle = computed((): UTSJSONObject => {
+  const style = {} as UTSJSONObject
+  if (statusClass.value == 'process') {
+    style['color'] = '#ffffff'
+  } else {
+    style['color'] = inactiveColor.value
+  }
+  return style
+})
+
+const titleStyle = computed((): UTSJSONObject => {
+  const style = {} as UTSJSONObject
+  if (statusClass.value == 'process' || statusClass.value == 'finish') {
+    style['color'] = '#303133'
+    style['fontWeight'] = 'bold'
+  } else {
+    style['color'] = inactiveColor.value
+  }
+  return style
+})
+
+const descStyle = computed((): UTSJSONObject => {
+  const style = {} as UTSJSONObject
+  style['color'] = '#909399'
+  return style
+})
+</script>
+
+<style lang="scss" scoped>
+	@import "../../libs/css/components.scss";
+
+	.up-steps-item {
+		position: relative;
+		display: flex;
+
+		&--row {
+			flex: 1;
+			flex-direction: column;
+			align-items: center;
+			justify-content: flex-start;
+		}
+
+		&--column {
+			flex-direction: row;
+			align-items: flex-start;
+			width: 100%;
+			min-height: 60px;
+		}
+
+		&__wrapper {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			position: relative;
+			background-color: #ffffff;
+			z-index: 2;
+
+			&--row {
+				height: 24px;
+				width: 24px;
+
+				&--dot {
+					width: 16px;
+					height: 16px;
+				}
+			}
+
+			&--column {
+				width: 24px;
+				height: 24px;
+				margin-right: 10px;
+
+				&--dot {
+					height: 16px;
+					width: 16px;
+				}
+			}
+
+			&__circle {
+				width: 20px;
+				height: 20px;
+				border-radius: 100px;
+				border-width: 1px;
+				border-style: solid;
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+				justify-content: center;
+
+				&__text {
+					font-size: 11px;
+					text-align: center;
+					line-height: 11px;
+				}
+			}
+
+			&__dot {
+				width: 8px;
+				height: 8px;
+				border-radius: 100px;
+			}
+		}
+
+		&__content {
+			display: flex;
+
+			&--row {
+				flex-direction: column;
+				align-items: center;
+				margin-top: 6px;
+				width: 100%;
+			}
+
+			&--column {
+				flex-direction: column;
+				flex: 1;
+				padding-bottom: 16px;
+			}
+
+			&__title-text {
+				font-size: 13px;
+				line-height: 18px;
+				text-align: center;
+			}
+
+			&__desc-text {
+				font-size: 11px;
+				line-height: 16px;
+				margin-top: 2px;
+				text-align: center;
+			}
+		}
+
+		&__line {
+			position: absolute;
+			z-index: 1;
+
+			&--row-left {
+				top: 11px;
+				left: 0;
+				width: 50%;
+				height: 2px;
+			}
+
+			&--row-right {
+				top: 11px;
+				left: 50%;
+				width: 50%;
+				height: 2px;
+			}
+
+			&--col-top {
+				top: 0;
+				left: 11px;
+				width: 2px;
+				height: 12px;
+			}
+
+			&--col-bottom {
+				top: 12px;
+				bottom: 0;
+				left: 11px;
+				width: 2px;
+			}
+		}
+	}
+</style>

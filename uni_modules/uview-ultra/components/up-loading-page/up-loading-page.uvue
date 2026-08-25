@@ -1,0 +1,156 @@
+<template>
+    <up-transition
+        :show="loading"
+        :custom-style="transitionStyle"
+    >
+        <view class="up-loading-page">
+            <view class="up-loading-page__warpper">
+                <view class="up-loading-page__warpper__loading-icon">
+                    <image
+                        v-if="image != ''"
+                        :src="image"
+                        class="up-loading-page__warpper__loading-icon__img"
+                        mode="widthFix"
+						:style="imageSizeStyle"
+                    ></image>
+                    <up-loading-icon
+                        v-else
+                        :mode="loadingMode"
+                        :size="formattedIconSize"
+                        :color="loadingColor"
+                    ></up-loading-icon>
+                </view>
+                <slot>
+                    <text
+                        class="up-loading-page__warpper__text"
+                        :style="textStyle"
+                        >{{ loadingText }}</text
+                    >
+                </slot>
+            </view>
+        </view>
+    </up-transition>
+</template>
+
+<script setup lang="uts">
+import { computed } from 'vue'
+import { addUnit, deepMerge, addStyle } from '../../libs/function/index'
+
+defineOptions({
+  name: 'up-loading-page'
+})
+
+const props = defineProps({
+  loadingText: {
+    type: [String, Number],
+    default: '正在加载'
+  },
+  image: {
+    type: String,
+    default: ''
+  },
+  loadingMode: {
+    type: String,
+    default: 'circle'
+  },
+  loading: {
+    type: Boolean,
+    default: false
+  },
+  bgColor: {
+    type: String,
+    default: '#ffffff'
+  },
+  color: {
+    type: String,
+    default: '#C8C8C8'
+  },
+  fontSize: {
+    type: [String, Number],
+    default: 19
+  },
+  iconSize: {
+    type: [String, Number],
+    default: 28
+  },
+  loadingColor: {
+    type: String,
+    default: '#C8C8C8'
+  },
+  zIndex: {
+    type: [Number],
+    default: 10
+  },
+  customStyle: {
+    type: Object,
+    default: () => ({})
+  }
+})
+
+const imageSizeStyle = computed((): UTSJSONObject => {
+  return {
+    width: addUnit(props.iconSize),
+    height: addUnit(props.iconSize)
+  } as UTSJSONObject
+})
+
+const formattedIconSize = computed((): string => {
+  return addUnit(props.iconSize)
+})
+
+const textStyle = computed((): UTSJSONObject => {
+  return {
+    fontSize: addUnit(props.fontSize),
+    color: props.color
+  } as UTSJSONObject
+})
+
+const transitionStyle = computed<UTSJSONObject>(() => {
+  const base = {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: props.bgColor,
+    display: 'flex',
+    zIndex: props.zIndex
+  } as UTSJSONObject
+  return deepMerge(base, addStyle(props.customStyle)) as UTSJSONObject
+})
+</script>
+
+<style lang="scss" scoped>
+@import "../../libs/css/components.scss";
+
+$text-color: rgb(200, 200, 200) !default;
+$text-size: 19px !default;
+$up-loading-icon-margin-bottom: 10px !default;
+
+.up-loading-page {
+    @include flex(column);
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+
+    &__warpper {
+        @include flex(column);
+        justify-content: center;
+        align-items: center;
+
+        &__loading-icon {
+            margin-bottom: $up-loading-icon-margin-bottom;
+
+            &__img {
+                width: 40px;
+                height: 40px;
+            }
+        }
+
+        &__text {
+            font-size: $text-size;
+            color: $text-color;
+        }
+    }
+}
+</style>

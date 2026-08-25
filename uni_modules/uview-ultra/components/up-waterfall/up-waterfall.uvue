@@ -1,0 +1,148 @@
+<template>
+    <view class="up-waterfall">
+        <view 
+            v-for="(column, index) in columnList" 
+            :key="index"
+            :id="`up-column-${index}`"
+            class="up-column"
+            :style="getColumnStyle(index)"
+        >
+            <slot name="column" :colIndex="index" :colList="column">
+                <view v-for="(item, itemIndex) in column" :key="itemIndex">
+                    <slot :item="item" :itemIndex="itemIndex"></slot>
+                </view>
+            </slot>
+        </view>
+    </view>
+</template>
+
+<script setup lang="uts">
+import { ref, computed, onMounted } from 'vue'
+
+defineOptions({
+    name: "up-waterfall"
+})
+
+const props = defineProps({
+    modelValue: {
+        type: Array as PropType<Array<UTSJSONObject>>,
+        default: () => [] as Array<UTSJSONObject>
+    },
+    value: {
+        type: Array as PropType<Array<UTSJSONObject>>,
+        default: () => [] as Array<UTSJSONObject>
+    },
+    columns: {
+        type: [String, Number],
+        default: 2
+    },
+    columnsMin: {
+        type: [String, Number],
+        default: 2
+    },
+    minColumnWidth: {
+        type: Number,
+        default: 160
+    },
+    idKey: {
+        type: String,
+        default: 'id'
+    }
+})
+
+const emit = defineEmits(['update:modelValue', 'update:value'])
+
+const windowWidth = ref<number>(375)
+
+onMounted(() => {
+    windowWidth.value = uni.getSystemInfoSync().windowWidth
+})
+
+function getColumnsCount(): number {
+    if (props.columns.toString() == 'auto') {
+        const columnGap: number = 7
+        let columnCount: number = Math.max(1, Math.floor(windowWidth.value / (props.minColumnWidth + columnGap)))
+        const minCol: number = parseInt(props.columnsMin.toString())
+        if (columnCount < minCol) {
+            columnCount = minCol
+        }
+        return columnCount
+    }
+    return parseInt(props.columns.toString())
+}
+
+const columnList = computed<UTSJSONObject[][]>(() => {
+    const cols = getColumnsCount()
+    const result: UTSJSONObject[][] = []
+    for (let i: number = 0; i < cols; i++) {
+        result.push([] as UTSJSONObject[])
+    }
+    const dataList = props.modelValue.length > 0 ? props.modelValue : props.value
+    for (let i: number = 0; i < dataList.length; i++) {
+        const colIndex: number = i % cols
+        result[colIndex].push(dataList[i])
+    }
+    return result
+})
+
+function getColumnStyle(index: number): UTSJSONObject {
+    const style = {} as UTSJSONObject
+    if (index > 0) {
+        style['marginLeft'] = '10rpx'
+    }
+    return style
+}
+
+function clear() {
+    emit('update:modelValue', [] as UTSJSONObject[])
+    emit('update:value', [] as UTSJSONObject[])
+}
+
+function remove(id: any | null) {
+    if (id == null) return
+    const dataList = props.modelValue.length > 0 ? props.modelValue : props.value
+    const idx = dataList.findIndex((val: UTSJSONObject) => {
+        return val[props.idKey] != null && val[props.idKey]!.toString() == id.toString()
+    })
+    if (idx != -1) {
+        const newData: UTSJSONObject[] = JSON.parse(JSON.stringify(dataList)) as UTSJSONObject[]
+        newData.splice(idx, 1)
+        emit('update:modelValue', newData)
+        emit('update:value', newData)
+    }
+}
+
+function modify(id: any, key: string, val: any) {
+    const dataList = props.modelValue.length > 0 ? props.modelValue : props.value
+    const idx = dataList.findIndex((item: UTSJSONObject) => {
+        return item[props.idKey] != null && item[props.idKey]!.toString() == id.toString()
+    })
+    if (idx != -1) {
+        const newData: UTSJSONObject[] = JSON.parse(JSON.stringify(dataList)) as UTSJSONObject[]
+        newData[idx][key] = val
+        emit('update:modelValue', newData)
+        emit('update:value', newData)
+    }
+}
+
+defineExpose({
+    clear,
+    remove,
+    modify
+})
+</script>
+
+<style lang="scss" scoped>
+    .up-waterfall {
+        @include flex;
+        flex-direction: row;
+        align-items: flex-start;
+    }
+
+    .up-column {
+        @include flex;
+        flex: 1;
+        flex-direction: column;
+        overflow: hidden;
+    }
+</style>

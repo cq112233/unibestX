@@ -1,0 +1,358 @@
+<template>
+	<view class="up-dropdown" :style="dropdownStyle">
+		<view class="up-dropdown__menu" :style="menuStyle" :class="{
+			'u-border-bottom': props.borderBottom
+		}">
+			<view class="up-dropdown__menu__item" v-for="(item, index) in menuList" :key="index" @tap.stop="menuClick(index)">
+				<view class="up-flex up-flex-row">
+					<text class="up-dropdown__menu__item__text" :class="{
+						'up-dropdown__menu__item__text--active': (index == current || highlightIndexList.includes(index)) && props.activeColor == '#2979ff'
+					}" :style="getContentTextStyle(item, index)">{{item['title']}}</text>
+					<view class="up-dropdown__menu__item__arrow" :class="{
+						'up-dropdown__menu__item__arrow--rotate': index == current
+					}">
+						<up-icon :custom-style="{display: 'flex'}" :name="props.menuIcon"
+							:size="menuIconSizeUnit"
+							:color="getMenuIconColor(index)"></up-icon>
+					</view>
+				</view>
+			</view>
+		</view>
+		<view class="up-dropdown__content" :style="contentWrapStyle"
+		 @tap="maskClick" @touchmove.stop.prevent>
+			<view @tap.stop.prevent class="up-dropdown__content__popup" :style="popupStyle">
+				<slot></slot>
+			</view>
+			<view class="up-dropdown__content__mask"></view>
+		</view>
+	</view>
+</template>
+
+<script setup lang="uts">
+	import { computed, ref, watch, onMounted, getCurrentInstance, provide } from 'vue'
+	import { addUnit, getWindowInfo, upGetRect, deepMerge } from '../../libs/function/index.uts';
+	import { UPDropdownMenu } from './types.uts';
+	const instance = getCurrentInstance()
+	
+	defineOptions({
+		name: 'up-dropdown'
+	})
+	
+	// 定义 props
+	const props = defineProps({
+		// 菜单标题和选项的激活态颜色
+		activeColor: {
+			type: String,
+			default: '#2979ff'
+		},
+		// 菜单标题和选项的未激活态颜色
+		inactiveColor: {
+			type: String,
+			default: '#606266'
+		},
+		// 点击遮罩是否关闭菜单
+		closeOnClickMask: {
+			type: Boolean,
+			default: true
+		},
+		// 点击当前激活项标题是否关闭菜单
+		closeOnClickSelf: {
+			type: Boolean,
+			default: true
+		},
+		// 过渡时间
+		duration: {
+			type: [Number, String],
+			default: 300
+		},
+		// 标题菜单的高度
+		height: {
+			type: [Number, String],
+			default: 40
+		},
+		// 是否显示下边框
+		borderBottom: {
+			type: Boolean,
+			default: false
+		},
+		// 标题的字体大小
+		titleSize: {
+			type: [Number, String],
+			default: 14
+		},
+		// 下拉出来的内容部分的圆角值
+		borderRadius: {
+			type: [Number, String],
+			default: 0
+		},
+		// 菜单右侧的icon图标
+		menuIcon: {
+			type: String,
+			default: 'arrow-down'
+		},
+		// 菜单右侧图标的大小
+		menuIconSize: {
+			type: [Number, String],
+			default: 14
+		}
+	});
+	
+	// 定义 emit
+	const emit = defineEmits(['open', 'close']);
+	
+	// 定义响应式数据
+	const menuList = ref([] as Array<UPDropdownMenu>);
+	const active = ref(false);
+	const current = ref(-1 as number);
+	const contentStyle = ref<UTSJSONObject>({
+		zIndex: -1,
+		opacity: 0
+	});
+	const highlightIndexList = ref([] as Array<number>)
+	const contentHeight = ref(0 as number)
+	
+	watch(contentHeight, (newVal: number) => {
+		if (active.value) {
+			contentStyle.value['height'] = newVal + 'px'
+		}
+	})
+	
+	const dropdownStyle = computed((): UTSJSONObject => {
+		const h = active.value
+			? addUnit(contentHeight.value + parseInt(props.height.toString()))
+			: addUnit(props.height)
+		return { height: h } as UTSJSONObject
+	})
+
+	const menuStyle = computed((): UTSJSONObject => {
+		return { height: addUnit(props.height) } as UTSJSONObject
+	})
+
+	const contentWrapStyle = computed((): UTSJSONObject => {
+		const style = deepMerge(contentStyle.value, {
+			top: addUnit(props.height),
+			transition: `opacity ${parseInt(props.duration.toString()) / 1000}s, z-index ${parseInt(props.duration.toString()) / 1000}s linear`,
+		} as UTSJSONObject) as UTSJSONObject
+		return style
+	})
+
+	const menuIconSizeUnit = computed((): string => {
+		return addUnit(props.menuIconSize)
+	})
+
+	function getMenuIconColor(index: number): string {
+		if (index == current.value || highlightIndexList.value.includes(index)) {
+			return props.activeColor == '#2979ff' ? 'primary' : props.activeColor
+		}
+		return '#c0c4cc'
+	}
+
+	// 下拉出来部分的样式
+	const popupStyle = computed((): UTSJSONObject => {
+		let style = {} as UTSJSONObject
+		style['transform'] = `translateY(${active.value ? '0%' : '-100%'})`
+		style['transition-duration'] = parseInt(props.duration.toString()) / 1000 + 's'
+		style['borderRadius'] = `0 0 ${addUnit(props.borderRadius)} ${addUnit(props.borderRadius)}`
+		return style
+	})
+
+	function getContentHeight() {
+		let windowHeight = getWindowInfo().windowHeight;
+		upGetRect('.up-dropdown__menu', false, instance?.proxy).then((res) => {
+			if (res.bottom != null && res.bottom! > 0) {
+				contentHeight.value = windowHeight - res.bottom!;
+			} else {
+				contentHeight.value = windowHeight;
+			}
+		});
+	}
+	
+	function open(index: number) {
+		getContentHeight();
+		contentStyle.value = {
+			zIndex: 11,
+			height: contentHeight.value + 'px',
+			opacity: 1
+		};
+		active.value = true;
+		current.value = index;
+		emit('open', current.value);
+	}
+	
+	function close() {
+		emit('close', current.value);
+		active.value = false;
+		current.value = -1;
+		contentStyle.value['zIndex'] = -1;
+		contentStyle.value['opacity'] = 0;
+		setTimeout(() => {
+			contentStyle.value['height'] = 0;
+		}, parseInt(props.duration.toString()));
+	}
+	
+	function menuClick(index: number) {
+		if (index < 0 || index >= menuList.value.length) return;
+		if (menuList.value[index].disabled) return;
+		if (index == current.value && props.closeOnClickSelf) {
+			close();
+			return;
+		}
+		open(index);
+	}
+	
+	function maskClick() {
+		if (!props.closeOnClickMask) return;
+		close();
+	}
+	
+	function highlight(index: number | null = null) {
+		if (index != null) {
+			let indexOf = highlightIndexList.value.indexOf(index);
+			if (indexOf == -1) {
+				highlightIndexList.value.push(index);
+			}
+		} else {
+			highlightIndexList.value = [];
+		}
+	}
+	
+	function getContentTextStyle(item: UPDropdownMenu, index: number) {
+		let style = {} as UTSJSONObject;
+		if (index == current.value || highlightIndexList.value.includes(index)) {
+			if (props.activeColor != '#2979ff') {
+				style['color'] = props.activeColor;
+			}
+		} else {
+			if (props.inactiveColor != '#606266') {
+				style['color'] = props.inactiveColor;
+			}
+		}
+		if (props.titleSize != 14) {
+			style['fontSize'] = addUnit(props.titleSize);
+		}
+		return style;
+	}
+	
+	function registerItem(item: UPDropdownMenu): number {
+		const idx = menuList.value.length;
+		menuList.value.push(item);
+		return idx;
+	}
+
+	function updateItemTitle(idx: number, title: string) {
+		if (idx >= 0 && idx < menuList.value.length) {
+			menuList.value[idx].title = title;
+		}
+	}
+
+	const dropdownProps = computed((): UTSJSONObject => {
+		return {
+			activeColor: props.activeColor,
+			inactiveColor: props.inactiveColor,
+			closeOnClickMask: props.closeOnClickMask,
+			closeOnClickSelf: props.closeOnClickSelf,
+			duration: props.duration,
+			height: props.height,
+			borderBottom: props.borderBottom,
+			titleSize: props.titleSize,
+			borderRadius: props.borderRadius,
+			menuIcon: props.menuIcon,
+			menuIconSize: props.menuIconSize
+		} as UTSJSONObject
+	});
+
+	provide('upDropdownProps', dropdownProps);
+	provide('upDropdownActive', active);
+	provide('upDropdownCurrent', current);
+	provide('upDropdownRegisterItem', registerItem);
+	provide('upDropdownUpdateItemTitle', updateItemTitle);
+	provide('upDropdownClose', close);
+
+	onMounted(() => {
+		getContentHeight();
+	});
+	
+	defineExpose({
+		highlight,
+		close,
+		open,
+		getContentHeight
+	});
+</script>
+
+<style scoped lang="scss">
+
+	.up-dropdown {
+		flex: none;
+		width: 100%;
+		position: relative;
+
+		&__menu {
+			@include flex;
+			position: relative;
+			z-index: 11;
+			height: 80rpx;
+
+			&__item {
+				flex: 1;
+				@include flex;
+				justify-content: center;
+				align-items: center;
+
+				&__text {
+					font-size: 28rpx;
+					color: $up-content-color;
+
+					&--active {
+						color: $up-primary;
+					}
+				}
+
+				&__arrow {
+					margin-left: 6rpx;
+					transition: transform .3s;
+					align-items: center;
+					@include flex;
+
+					&--rotate {
+						transform: rotate(180deg);
+					}
+				}
+			}
+		}
+
+		&__content {
+			border: 0px solid blue;
+			position: absolute;
+			z-index: 8;
+			width: 100%;
+			left: 0px;
+			bottom: 0;
+			top: 80rpx;
+			overflow: hidden;
+
+			&__mask {
+				position: absolute;
+				z-index: 9;
+				background: rgba(0, 0, 0, .3);
+				width: 100%;
+				left: 0;
+				top: 0;
+				bottom: 0;
+			}
+
+			&__popup {
+				position: relative;
+				z-index: 10;
+				transition: transform 0.3s;
+				transform: translate3d(0, -100%, 0);
+				overflow: hidden;
+			}
+		}
+	}
+
+	.up-flex-row {
+		display: flex;
+		flex-direction: row;
+	}
+</style>

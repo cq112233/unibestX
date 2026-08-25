@@ -1,0 +1,92 @@
+<template>
+    <view
+        class="up-index-item"
+		:id="'up-index-item-' + itemId"
+		:class="['up-index-item-' + itemId]"
+    >
+        <slot />
+    </view>
+</template>
+
+<script setup lang="uts">
+	import { ref, onMounted, getCurrentInstance } from 'vue'
+	import { sleep, error, upGetRect } from '../../libs/function/index'
+	import defProps from './indexItem.uts'
+	import { commonProps, useUltraUI } from '../../libs/composable/useUltraUI'
+	const { parent, getParent, getParentData } = useUltraUI()
+	
+	const instance = getCurrentInstance()!.proxy!
+
+	defineOptions({
+		name: 'up-index-item'
+	})
+	
+	// 定义 props
+	const props = defineProps({
+		text: {
+			type: [String, Number],
+			default: defProps.getString('indexItem.text')
+		}
+	})
+	
+	const emit = defineEmits([])
+	
+	const top = ref(0)
+	const height = ref(0)
+	const itemId = ref('')
+	const anchor = ref({})
+	
+	const getIndexItemRect = function(): Promise<NodeInfo> {
+		return new Promise((resolve) => {
+			// @ts-ignore
+			upGetRect('.up-index-item', false, instance).then((size: any) => {
+				resolve(size as NodeInfo)
+			})
+		}) 
+	}
+	
+	const init = function() {
+		// 此处会获取父组件实例，并赋值给实例的parent属性
+		// @ts-ignore
+		getParentData('up-index-list', instance, false)
+		if (parent.value == null) {
+			return error('up-index-item必须要搭配up-index-list组件使用')
+		}
+		sleep().then(() => {
+			getIndexItemRect().then((size: NodeInfo) => {
+				// 由于对象的引用特性，此处会同时生效到父组件的children数组的本实例的top属性中，供父组件判断读取
+				top.value = Math.ceil(size.top ?? 0)
+				height.value = Math.ceil(size.height ?? 0)
+			})
+		})
+	}
+	
+	onMounted(() => {
+		// 设置id，使用charCodeAt获取字符的ASCII码作为id，避免H5下特殊字符导致id选择器失效
+		if (props.text != '') {
+			itemId.value = props.text.toString().charCodeAt(0).toString()
+		}
+		init()
+	})
+
+	const setId = function(idPam: string) {
+		console.log(idPam)
+		itemId.value = idPam
+	}
+	
+	const getRefs = function() {
+		return {
+			height: height.value
+		}
+	}
+
+	defineExpose({
+		setId,
+		getRefs
+	})
+</script>
+
+<style lang="scss" scoped>
+	@import "../../libs/css/components.scss";
+	
+</style>

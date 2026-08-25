@@ -1,8 +1,10 @@
 <script setup lang="uts">
 import { checkDirectEntry } from './src/router/interceptor';
+import { loadFont } from '@/uni_modules/uview-ultra/index.uts';
 import { useAppStore } from './src/store';
 
 onLaunch(() => {
+  loadFont();
   // 提前实例化 App Store（含持久化还原），并初始化外观模式：跟随系统 / 浅色 / 深色
   useAppStore().initThemeMode();
   // #ifdef MP-WEIXIN
@@ -30,11 +32,14 @@ onShow((options?) => {
 </script>
 
 <style lang="scss">
+/* uni.scss */
+@import '@/uni_modules/uview-ultra/index.scss';
 @import './src/style/index.scss';
 
 /* #ifdef MP-WEIXIN */
 /* 微信小程序真机：在全局 app.wxss 中注册字体，确保组件内可用 */
 @import '@/uni_modules/uni-icons/components/uni-icons/uniicons_mp.css';
+@import '@/uni_modules/uview-ultra/components/up-icon/upicon_mp.css';
 /* #endif */
 /* #ifndef MP-WEIXIN */
 @import './main.css';

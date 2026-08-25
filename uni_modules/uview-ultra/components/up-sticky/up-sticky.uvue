@@ -1,0 +1,206 @@
+<template>
+	<!-- #ifdef APP -->
+	<view class="up-sticky" :id="elId" :style="wrapperStyle">
+		<view class="up-sticky__content" :style="contentStyle">
+			<slot />
+		</view>
+	</view>
+	<!-- #endif -->
+	<!-- #ifndef APP -->
+	<view
+		class="up-sticky"
+		:style="webMpStyle"
+	>
+		<slot />
+	</view>
+	<!-- #endif -->
+</template>
+
+<script setup lang="uts">
+import { computed, ref, watch, onMounted, getCurrentInstance } from 'vue'
+import defProps from './sticky.uts'
+import { addStyle, deepMerge, getPx, guid } from '../../libs/function/index.uts'
+import zIndexConfig from '../../libs/config/zIndex.uts'
+
+defineOptions({
+  name: 'up-sticky'
+})
+
+const props = defineProps({
+  offsetTop: {
+    type: [String, Number],
+    default: 0
+  },
+  customNavHeight: {
+    type: [String, Number],
+    default: 0
+  },
+  disabled: {
+    type: Boolean,
+    default: false
+  },
+  bgColor: {
+    type: String,
+    default: 'transparent'
+  },
+  zIndex: {
+    type: [String, Number],
+    default: ''
+  },
+  index: {
+    type: [String, Number],
+    default: ''
+  },
+  scrollTop: {
+    type: [String, Number],
+    default: 0
+  },
+  customStyle: {
+    type: Object,
+    default: () => ({})
+  }
+})
+
+const instance = getCurrentInstance()
+
+const uZindex = computed<number>(() => {
+  const zVal = props.zIndex
+  if (zVal != null && zVal.toString() != '') {
+    const parsed = parseInt(zVal.toString())
+    if (!isNaN(parsed)) {
+      return parsed
+    }
+  }
+  return (zIndexConfig['sticky'] as number ?? 999)
+})
+
+const webMpStyle = computed<UTSJSONObject>(() => {
+  const style = {} as UTSJSONObject
+  if (!props.disabled) {
+    style['position'] = 'sti' + 'cky'
+    const top = parseFloat(getPx(props.offsetTop))
+    style['top'] = top + 'px'
+    style['zIndex'] = uZindex.value
+  } else {
+    style['position'] = 'relative'
+  }
+  if (props.bgColor != '') {
+    style['backgroundColor'] = props.bgColor
+  }
+  return deepMerge(addStyle(props.customStyle), style) as UTSJSONObject
+})
+
+// #ifdef APP
+const elId = ref<string>('up-sticky-' + guid())
+const isFixed = ref<boolean>(false)
+const initialTop = ref<number>(0)
+const height = ref<number>(0)
+const left = ref<number>(0)
+const width = ref<number>(0)
+const isInit = ref<boolean>(false)
+
+const stickyTop = computed<number>(() => {
+  return parseFloat(getPx(props.offsetTop)) + parseFloat(getPx(props.customNavHeight))
+})
+
+const wrapperStyle = computed<UTSJSONObject>(() => {
+  const style = {} as UTSJSONObject
+  if (isFixed.value && height.value > 0) {
+    style['height'] = height.value + 'px'
+  }
+  return style
+})
+
+const contentStyle = computed<UTSJSONObject>(() => {
+  const style = {} as UTSJSONObject
+  if (!props.disabled && isFixed.value) {
+    style['position'] = 'fixed'
+    style['top'] = stickyTop.value + 'px'
+    style['left'] = left.value + 'px'
+    if (width.value > 0) {
+      style['width'] = width.value + 'px'
+    }
+    style['zIndex'] = uZindex.value
+  } else {
+    style['position'] = 'relative'
+  }
+  if (props.bgColor != '') {
+    style['backgroundColor'] = props.bgColor
+  }
+  return deepMerge(addStyle(props.customStyle), style) as UTSJSONObject
+})
+
+function getRect(): Promise<NodeInfo> {
+  return new Promise((resolve) => {
+    uni.createSelectorQuery().in(instance?.proxy).select('#' + elId.value).boundingClientRect().exec((ret) => {
+      resolve(ret[0] as NodeInfo)
+    })
+  })
+}
+
+function checkFixed(st: number) {
+  if (!isInit.value) {
+    init()
+    return
+  }
+  const currentY = initialTop.value - st
+  if (currentY <= stickyTop.value && initialTop.value > 0) {
+    if (!isFixed.value) {
+      getRect().then((res: NodeInfo) => {
+        if (res.width != null && res.width! > 0) {
+          width.value = res.width!
+        }
+        if (res.left != null) {
+          left.value = res.left!
+        }
+        if (res.height != null && res.height! > 0) {
+          height.value = res.height!
+        }
+      })
+    }
+    isFixed.value = true
+  } else {
+    isFixed.value = false
+  }
+}
+
+function init() {
+  getRect().then((res: NodeInfo) => {
+    if (res.height != null && res.height! > 0) {
+      height.value = res.height!
+    }
+    if (res.left != null) {
+      left.value = res.left!
+    }
+    if (res.width != null && res.width! > 0) {
+      width.value = res.width!
+    }
+    const currentTop = res.top ?? 0
+    const st = parseFloat(props.scrollTop.toString())
+    initialTop.value = currentTop + st
+    isInit.value = true
+    checkFixed(st)
+  })
+}
+
+watch((): any => props.scrollTop, (val: any) => {
+  if (props.disabled) return
+  const st = parseFloat(val.toString())
+  checkFixed(st)
+})
+
+onMounted(() => {
+  init()
+})
+// #endif
+</script>
+
+<style lang="scss" scoped>
+	.up-sticky {
+		width: 100%;
+		box-sizing: border-box;
+		&__content {
+			box-sizing: border-box;
+		}
+	}
+</style>

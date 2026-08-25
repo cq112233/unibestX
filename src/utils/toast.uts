@@ -1,45 +1,72 @@
+import type { ComponentPublicInstance } from 'vue';
+
+const toastStack = [] as ComponentPublicInstance[];
+
 /**
- * 调用全局 Toast 提示
+ * 注册当前页面的 toast 实例到全局栈中
+ */
+export function registerToast(toastInstance: ComponentPublicInstance) {
+  const index = toastStack.indexOf(toastInstance);
+  if (index != -1) {
+    toastStack.splice(index, 1);
+  }
+  toastStack.push(toastInstance);
+}
+
+/**
+ * 从全局栈中移除当前页面的 toast 实例
+ */
+export function unregisterToast(toastInstance: ComponentPublicInstance) {
+  const index = toastStack.indexOf(toastInstance);
+  if (index != -1) {
+    toastStack.splice(index, 1);
+  }
+}
+
+/**
+ * 调用当前最上层活跃页面的 toast 提示
  */
 export function showToast(options: UTSJSONObject) {
-  const msg = (options.message ?? options.title ?? '') as string;
-  const icon = (options.icon ?? 'none') as 'success' | 'loading' | 'error' | 'none';
-  const duration = (options.duration != null ? options.duration : 1500) as number;
+  if (toastStack.length > 0) {
+    try {
+      const activeToast = toastStack[toastStack.length - 1];
+      activeToast.$callMethod('show', options);
+      return;
+    }
+    catch (e) {
+      console.error('activeToast.$callMethod error:', e);
+    }
+  }
+  // 降级使用原生 uni.showToast
+  const msg = (options.message ?? '') as string;
   uni.showToast({
     title: msg,
-    icon,
-    duration
+    icon: 'none'
   });
 }
 
 /**
  * 快捷调用 toast
  */
-export function toast(message: string, _type: string = 'default') {
-  uni.showToast({
-    title: message,
-    icon: 'none'
-  });
+export function toast(message: string, type: string = 'default') {
+  showToast({
+    message,
+    type
+  } as UTSJSONObject);
 }
 
 export function toastSuccess(message: string) {
-  uni.showToast({
-    title: message,
-    icon: 'success'
-  });
+  toast(message, 'success');
 }
 
 export function toastError(message: string) {
-  uni.showToast({
-    title: message,
-    icon: 'error'
-  });
+  toast(message, 'error');
 }
 
 export function toastWarning(message: string) {
-  toast(message);
+  toast(message, 'warning');
 }
 
 export function toastPrimary(message: string) {
-  toast(message);
+  toast(message, 'primary');
 }

@@ -1,0 +1,257 @@
+<template>
+  <view class="up-virtual-list" :style="rootStyle" ref="container">
+    <scroll-view
+      class="virtual-scroll-container"
+      direction="vertical"
+      :scroll-top="scrollTop"
+      :style="{ height: '100%' }"
+      @scroll="handleScroll"
+    >
+      <view class="scroll-content">
+        <view :style="{ height: topPlaceholderHeight + 'px' }"></view>
+        
+        <view 
+          v-for="item in visibleItems" 
+          :key="getItemKey(item)"
+          class="list-item"
+          :style="{ height: itemHeight + 'px' }"
+        >
+          <slot :item="item" :index="getItemVirtualIndex(item)"></slot>
+        </view>
+        
+        <view :style="{ height: bottomPlaceholderHeight + 'px' }"></view>
+      </view>
+    </scroll-view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { ref, computed, watch, onMounted, nextTick, getCurrentInstance } from 'vue'
+import { addUnit, deepMerge } from '../../libs/function/index.uts'
+
+function createItem(item: UTSJSONObject, virtualIndex: number): UTSJSONObject {
+  return deepMerge(item, {
+    _virtualIndex: virtualIndex
+  } as UTSJSONObject)
+}
+
+function valueToString(value: any | null): string {
+  return value == null ? '' : value.toString()
+}
+
+defineOptions({
+  name: 'up-virtual-list'
+})
+
+const props = defineProps({
+  listData: {
+    type: Array as PropType<Array<UTSJSONObject>>,
+    default: () => [] as Array<UTSJSONObject>
+  },
+  itemHeight: {
+    type: Number,
+    default: 50
+  },
+  height: {
+    type: [String, Number],
+    default: '100%'
+  },
+  buffer: {
+    type: Number,
+    default: 4
+  },
+  keyField: {
+    type: String,
+    default: 'id'
+  },
+  scrollTop: {
+    type: Number,
+    default: 0
+  }
+})
+
+const emit = defineEmits(['update:scrollTop', 'scroll'])
+const instance = getCurrentInstance()
+
+const startIndex = ref<number>(0)
+const containerHeight = ref<number>(0)
+
+const remain = computed<number>(() => {
+  if (containerHeight.value <= 0) {
+    const defaultRemain = Math.ceil(500 / props.itemHeight)
+    return defaultRemain > 0 ? defaultRemain : 10
+  }
+  const calculated = Math.ceil(containerHeight.value / props.itemHeight)
+  return Math.max(1, calculated)
+})
+
+const visibleCount = computed<number>(() => {
+  return remain.value + props.buffer
+})
+
+const rootStyle = computed<UTSJSONObject>(() => {
+  const style = {} as UTSJSONObject
+  style['height'] = addUnit(props.height)
+  return style
+})
+
+const visibleItems = computed<Array<UTSJSONObject>>(() => {
+  const list = props.listData
+  const start = Math.max(0, startIndex.value - Math.floor(props.buffer / 2))
+  const end = Math.min(list.length, start + visibleCount.value)
+  const items = [] as Array<UTSJSONObject>
+  for (let i = start; i < end; i++) {
+    const item = list[i] as UTSJSONObject
+    items.push(createItem(item, i))
+  }
+  return items
+})
+
+const topPlaceholderHeight = computed<number>(() => {
+  const start = Math.max(0, startIndex.value - Math.floor(props.buffer / 2))
+  return start * props.itemHeight
+})
+
+const bottomPlaceholderHeight = computed<number>(() => {
+  const list = props.listData
+  const start = Math.max(0, startIndex.value - Math.floor(props.buffer / 2))
+  const end = Math.min(list.length, start + visibleCount.value)
+  return (list.length - end) * props.itemHeight
+})
+
+function getItemVirtualIndex(item: UTSJSONObject): number {
+  const index = item['_virtualIndex']
+  if (index == null) return 0
+  if (typeof index === 'number') return index as number
+  const parsed = parseInt(index.toString())
+  return isNaN(parsed) ? 0 : parsed
+}
+
+function getItemKey(item: UTSJSONObject): string {
+  const itemKey = item[props.keyField]
+  if (itemKey != null && valueToString(itemKey) != '') {
+    return valueToString(itemKey)
+  }
+  return getItemVirtualIndex(item).toString()
+}
+
+function updateVisibleItems(): void {
+  const index = Math.floor(props.scrollTop / props.itemHeight)
+  startIndex.value = Math.max(0, index)
+}
+
+function handleScroll(e: UniScrollEvent): void {
+  const st = e.detail.scrollTop
+  emit('update:scrollTop', st)
+  emit('scroll', st)
+}
+
+function getViewportHeight(): number {
+  // #ifdef H5
+  return window.innerHeight
+  // #endif
+
+  // #ifndef H5
+  try {
+    const res = uni.getSystemInfoSync()
+    return res.windowHeight
+  } catch (e) {
+    return 600
+  }
+  // #endif
+}
+
+function calculateDefaultHeight(): number {
+  const h = props.height
+  if (typeof h === 'number') {
+    return h as number
+  }
+  if (typeof h === 'string') {
+    const str = h as string
+    if (str.indexOf('px') >= 0) {
+      const parsed = parseInt(str)
+      return isNaN(parsed) ? 500 : parsed
+    }
+    if (str.indexOf('vh') >= 0) {
+      const vh = parseInt(str)
+      return isNaN(vh) ? 500 : (vh / 100) * getViewportHeight()
+    }
+    if (str.indexOf('%') >= 0) {
+      return 500
+    }
+    const num = parseInt(str)
+    return isNaN(num) ? 500 : num
+  }
+  return 500
+}
+
+function measureContainerHeight(): void {
+  nextTick(() => {
+    // #ifdef H5
+    const containerRef = instance?.proxy?.$refs['container'] as any
+    if (containerRef != null) {
+      const element = containerRef.$el != null ? containerRef.$el : containerRef
+      const offsetHeight = element.offsetHeight
+      containerHeight.value = offsetHeight != null ? offsetHeight as number : 500
+    }
+    // #endif
+
+    // #ifndef H5
+    const query = uni.createSelectorQuery().in(instance?.proxy)
+    query.select('.up-virtual-list').boundingClientRect((res: any) => {
+      const rect = res as NodeInfo | null
+      if (rect != null && rect.height != null) {
+        containerHeight.value = rect.height as number
+      } else {
+        containerHeight.value = calculateDefaultHeight()
+      }
+    }).exec()
+    // #endif
+  })
+}
+
+function getVisibleRange(): UTSJSONObject {
+  const list = props.listData
+  const start = Math.max(0, startIndex.value - Math.floor(props.buffer / 2))
+  const end = Math.min(list.length, start + visibleCount.value)
+  return {
+    start: start,
+    end: end
+  } as UTSJSONObject
+}
+
+watch(() => props.listData, () => {
+  updateVisibleItems()
+}, { immediate: true })
+
+watch(() => props.scrollTop, () => {
+  updateVisibleItems()
+})
+
+onMounted(() => {
+  measureContainerHeight()
+})
+
+defineExpose({
+  getVisibleRange,
+  measureContainerHeight
+})
+</script>
+
+<style scoped lang="scss">
+.up-virtual-list {
+  position: relative;
+  overflow: hidden;
+}
+
+.virtual-scroll-container {
+  height: 100%;
+}
+
+.scroll-content {
+  position: relative;
+}
+
+.list-item {
+}
+</style>

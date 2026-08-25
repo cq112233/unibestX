@@ -1,0 +1,116 @@
+<template>
+	<view class="up-collapse">
+		<up-line v-if="border"></up-line>
+		<slot />
+	</view>
+</template>
+
+<script setup lang="uts">
+	import { watch } from 'vue'
+	import defProps from './collapse.uts'
+	import { commonProps, useUltraUI } from '../../libs/composable/useUltraUI'
+	const { children, getChildren, addChild } = useUltraUI()
+	const instance = getCurrentInstance()!.proxy!
+	
+	defineOptions({
+		name: "up-collapse"
+	})
+	
+	// 定义 props
+	const props = defineProps({
+		value: {
+			type: [String, Number, Array],
+			default: () => defProps.getString('collapse.value')
+		},
+		accordion: {
+			type: Boolean,
+			default: defProps.getBoolean('collapse.accordion')
+		},
+		border: {
+			type: Boolean,
+			default: defProps.getBoolean('collapse.border')
+		}
+	})
+	
+	// 定义 emit
+	const emit = defineEmits(['change', 'open', 'close'])
+	
+	// 这里computed的变量，都是子组件up-collapse-item需要用到的，由于头条小程序的兼容性差异，子组件无法实时监听父组件参数的变化
+	// 所以需要手动通知子组件，这里返回一个parentDataSelf变量，供watch监听，在其中去通知每一个子组件
+	const parentDataSelf = computed((): UTSJSONObject => {
+		return {
+			accordion: props.accordion,
+			border: props.border,
+			value: props.value
+		};
+	});
+	
+	// 重新初始化一次内部的所有子元素
+	const init = function() {
+		// if (children.value != null) {
+			children.value?.map((child: ComponentPublicInstance) => {
+				child?.$callMethod('init')
+			})
+		// }
+	}
+	
+	/**
+	 * collapse-item被点击时触发，由collapse统一处理各子组件的状态
+	 * @param {Object} target 被操作的面板的实例
+	 */
+	const onChange = function(target: ComponentPublicInstance) {
+		const changeArr = [] as Array<UTSJSONObject>
+		// if (children.value != '') {
+			children.value?.map((child: ComponentPublicInstance, index: number) => {
+				// 如果是手风琴模式，将其他的折叠面板收起来
+				let childState = child.$callMethod('getInternalState') as UTSJSONObject
+				if (props.accordion) {
+					if(child !== target) {
+						child.$callMethod('setContentAnimate', false)
+					}
+				}
+				if(child === target) {
+					child.$callMethod('setContentAnimate', !(childState['expanded'] as boolean))
+				}
+				// 拼接change事件中，数组元素的状态
+				changeArr.push({
+					// 如果没有定义name属性，则默认返回组件的index索引
+					name: childState['name'] != null ? childState['name'].toString() : index.toString(),
+					status: childState['expanded'] as boolean ? 'open' : 'close'
+				} as UTSJSONObject)
+			})
+		// }
+
+		emit('change', changeArr)
+		let trgetState = target.$callMethod('getInternalState') as UTSJSONObject
+		// console.log('expanded', trgetState['expanded'])
+		const expand = trgetState['expanded'] as boolean
+		emit(expand ? 'open' : 'close', trgetState['name'] != null ? trgetState['name'] : '')
+	}
+	
+	// 监听 parentDataSelf 变化
+	watch(parentDataSelf, () => {
+		init()
+	}, { deep: true })
+	
+	const getProps = function(): UTSJSONObject {
+		return parentDataSelf.value
+	}
+	const getRefs = function() {
+		return {
+		}
+	}
+	
+	// 暴露方法给子组件
+	defineExpose({
+		onChange,
+		getChildren,
+		addChild,
+		getProps,
+		getRefs
+	})
+</script>
+
+<style lang="scss" scoped>
+	@import "../../libs/css/components.scss";
+</style>

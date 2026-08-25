@@ -7,6 +7,8 @@
     </scroll-view>
     <!-- 仅在当前页面为底部 Tabbar 页面时渲染自定义导航栏 -->
     <Tabbar v-if="isCurrentPageTabbar" />
+    <!-- 全局统一绑定的 Toast 轻提示弹窗组件 -->
+    <up-toast ref="uToastRef" />
   </view>
 </template>
 
@@ -14,8 +16,10 @@
 import Tabbar from '@/src/tabbar/index.uvue';
 import { useAppStore } from '@/src/store';
 import { isPageTabbar, syncCurIdxByCurrentPage } from '@/src/tabbar/store';
+import { registerToast, unregisterToast } from '@/src/utils/toast';
 import { applyNavbarTheme, getThemeTokens } from '@/src/utils/theme';
-import { computed, onBeforeMount, ref, watch } from 'vue';
+import type { ComponentPublicInstance } from 'vue';
+import { computed, nextTick, onBeforeMount, onMounted, onUnmounted, ref, watch } from 'vue';
 
 // 激活应用状态管理 Store
 const appStore = useAppStore();
@@ -35,6 +39,15 @@ const themeStyle = computed((): UTSJSONObject => {
 
 // 控制当前页面是否需要显示底部导航栏
 const isCurrentPageTabbar = ref(false);
+// 挂载全局 Toast 组件的 DOM/组件实例引用
+const uToastRef = ref<ComponentPublicInstance | null>(null);
+
+// 监听 uToastRef 变化，第一时间注册到全局 Toast 栈
+watch(uToastRef, (val: ComponentPublicInstance | null) => {
+  if (val != null) {
+    registerToast(val!);
+  }
+}, { immediate: true });
 
 // 页面显示钩子：解析当前路由，动态控制导航栏显示及同步选中索引
 onBeforeMount(() => {
@@ -51,10 +64,35 @@ onBeforeMount(() => {
       }
     }
   }
+  if (uToastRef.value != null) {
+    registerToast(uToastRef.value!);
+  }
+});
+
+// 组件挂载钩子：注册全局 Toast
+onMounted(() => {
+  if (uToastRef.value != null) {
+    registerToast(uToastRef.value!);
+  }
+  nextTick(() => {
+    if (uToastRef.value != null) {
+      registerToast(uToastRef.value!);
+    }
+  });
+});
+
+// 组件销毁钩子：反注册 Toast 以释放内存防内存泄漏
+onUnmounted(() => {
+  if (uToastRef.value != null) {
+    unregisterToast(uToastRef.value!);
+  }
 });
 
 // 每个页面切换都会触发：同步 H5 / 小程序原生导航栏主题
 onShow(() => {
+  if (uToastRef.value != null) {
+    registerToast(uToastRef.value!);
+  }
   applyNavbarTheme(appStore.state.isDark);
 });
 

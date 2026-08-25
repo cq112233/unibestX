@@ -1,0 +1,75 @@
+// #ifdef H5
+import upPopup from '@/uni_modules/uview-ultra/components/up-popup/up-popup.uvue';
+import upOverlay from '@/uni_modules/uview-ultra/components/up-overlay/up-overlay.uvue';
+import upTransition from '@/uni_modules/uview-ultra/components/up-transition/up-transition.uvue';
+import upIcon from '@/uni_modules/uview-ultra/components/up-icon/up-icon.uvue';
+import upStatusBar from '@/uni_modules/uview-ultra/components/up-status-bar/up-status-bar.uvue';
+import upSafeBottom from '@/uni_modules/uview-ultra/components/up-safe-bottom/up-safe-bottom.uvue';
+import upLoadingIcon from '@/uni_modules/uview-ultra/components/up-loading-icon/up-loading-icon.uvue';
+import upLine from '@/uni_modules/uview-ultra/components/up-line/up-line.uvue';
+import upNumberKeyboard from '@/uni_modules/uview-ultra/components/up-number-keyboard/up-number-keyboard.uvue';
+import upCarKeyboard from '@/uni_modules/uview-ultra/components/up-car-keyboard/up-car-keyboard.uvue';
+import upPicker from '@/uni_modules/uview-ultra/components/up-picker/up-picker.uvue';
+import upToolbar from '@/uni_modules/uview-ultra/components/up-toolbar/up-toolbar.uvue';
+import upButton from '@/uni_modules/uview-ultra/components/up-button/up-button.uvue';
+import upCalendar from '@/uni_modules/uview-ultra/components/up-calendar/up-calendar.uvue';
+import upSwiper from '@/uni_modules/uview-ultra/components/up-swiper/up-swiper.uvue';
+import upSwiperIndicator from '@/uni_modules/uview-ultra/components/up-swiper-indicator/up-swiper-indicator.uvue';
+import upNoticeBar from '@/uni_modules/uview-ultra/components/up-notice-bar/up-notice-bar.uvue';
+import upColumnNotice from '@/uni_modules/uview-ultra/components/up-column-notice/up-column-notice.uvue';
+import upRowNotice from '@/uni_modules/uview-ultra/components/up-row-notice/up-row-notice.uvue';
+import upCoupon from '@/uni_modules/uview-ultra/components/up-coupon/up-coupon.uvue';
+import upPdfReader from '@/uni_modules/uview-ultra/components/up-pdf-reader/up-pdf-reader.uvue';
+import upTree from '@/uni_modules/uview-ultra/components/up-tree/up-tree.uvue';
+import upBarcode from '@/uni_modules/uview-ultra/components/up-barcode/up-barcode.uvue';
+import upPoster from '@/uni_modules/uview-ultra/components/up-poster/up-poster.uvue';
+import upShortVideo from '@/uni_modules/uview-ultra/components/up-short-video/up-short-video.uvue';
+import upColorPicker from '@/uni_modules/uview-ultra/components/up-color-picker/up-color-picker.uvue';
+import upCropper from '@/uni_modules/uview-ultra/components/up-cropper/up-cropper.uvue';
+import upDragsort from '@/uni_modules/uview-ultra/components/up-dragsort/up-dragsort.uvue';
+import upSignature from '@/uni_modules/uview-ultra/components/up-signature/up-signature.uvue';
+import upTable2 from '@/uni_modules/uview-ultra/components/up-table2/up-table2.uvue';
+import upTitle from '@/uni_modules/uview-ultra/components/up-title/up-title.uvue';
+import upCascader from '@/uni_modules/uview-ultra/components/up-cascader/up-cascader.uvue';
+
+export function setupH5Components(app: any) {
+  app.component('up-popup', upPopup);
+  app.component('up-overlay', upOverlay);
+  app.component('up-transition', upTransition);
+  app.component('up-icon', upIcon);
+  app.component('up-status-bar', upStatusBar);
+  app.component('up-safe-bottom', upSafeBottom);
+  app.component('up-loading-icon', upLoadingIcon);
+  app.component('up-line', upLine);
+  app.component('up-number-keyboard', upNumberKeyboard);
+  app.component('up-car-keyboard', upCarKeyboard);
+  app.component('up-picker', upPicker);
+  app.component('up-toolbar', upToolbar);
+  app.component('up-button', upButton);
+  app.component('up-calendar', upCalendar);
+  app.component('up-swiper', upSwiper);
+  app.component('up-swiper-indicator', upSwiperIndicator);
+  app.component('up-notice-bar', upNoticeBar);
+  app.component('up-column-notice', upColumnNotice);
+  app.component('up-row-notice', upRowNotice);
+  app.component('up-coupon', upCoupon);
+  app.component('up-pdf-reader', upPdfReader);
+  app.component('up-tree', upTree);
+  app.component('up-barcode', upBarcode);
+  app.component('up-poster', upPoster);
+  app.component('up-short-video', upShortVideo);
+  app.component('up-color-picker', upColorPicker);
+  app.component('up-cropper', upCropper);
+  app.component('up-dragsort', upDragsort);
+  app.component('up-signature', upSignature);
+  app.component('up-table2', upTable2);
+  app.component('up-title', upTitle);
+  app.component('up-cascader', upCascader);
+}
+// #endif
+
+// #ifndef H5
+export function setupH5Components(app: any) {
+  // 非 H5 环境无需额外注册
+}
+// #endif

@@ -1,0 +1,30 @@
+<template>
+    <view class="up-title">
+        <slot name="prefix">
+            <view class="up-title-prefix">
+            </view>
+        </slot>
+        <slot></slot>
+    </view>
+</template>
+
+<script setup lang="uts">
+defineOptions({
+    name: 'up-title'
+})
+</script>
+
+<style scoped lang="scss">
+    .up-title {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+    }
+    .up-title-prefix {
+        width: 4px;
+        height: 18px;
+        border-radius: 2px;
+        background-color: $up-primary;
+        margin-right: 10px;
+    }
+</style>

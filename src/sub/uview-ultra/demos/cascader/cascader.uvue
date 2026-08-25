@@ -1,0 +1,368 @@
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
+    <NavBar title="up-cascader 级联选择器"></NavBar>
+    <view class="p-[16px]">
+      <!-- 1. 基础用法 -->
+      <view class="demo-block">
+        <up-title class="demo-title">
+          <text class="demo-title-text">基础用法（省市区）</text>
+        </up-title>
+        <up-button type="primary" text="选择地区" @click="openArea"></up-button>
+        <view class="demo-result">
+          <text class="demo-result-label">已选：</text>
+          <text class="demo-result-value">{{ getValueText(areaValue) }}</text>
+        </view>
+        <up-cascader
+          v-model:show="showArea"
+          v-model="areaValue"
+          :data="areaData"
+          @change="onAreaChange"
+          @confirm="onAreaConfirm"
+        ></up-cascader>
+      </view>
+
+      <!-- 2. 设置默认值 -->
+      <view class="demo-block mt-[12px]">
+        <up-title class="demo-title">
+          <text class="demo-title-text">设置默认值（v-model 默认选中「数码 → 电脑」）</text>
+        </up-title>
+        <up-button type="primary" text="选择商品分类" @click="openCategory"></up-button>
+        <view class="demo-result">
+          <text class="demo-result-label">已选：</text>
+          <text class="demo-result-value">{{ getValueText(categoryValue) }}</text>
+        </view>
+        <up-cascader
+          v-model:show="showCategory"
+          v-model="categoryValue"
+          :data="categoryData"
+          @confirm="onCategoryConfirm"
+        ></up-cascader>
+      </view>
+
+      <!-- 3. 自定义字段名 -->
+      <view class="demo-block mt-[12px]">
+        <up-title class="demo-title">
+          <text class="demo-title-text">自定义字段名（value-key / label-key / children-key）</text>
+        </up-title>
+        <up-button type="primary" text="选择组织架构" @click="openOrg"></up-button>
+        <view class="demo-result">
+          <text class="demo-result-label">已选：</text>
+          <text class="demo-result-value">{{ getValueText(orgValue) }}</text>
+        </view>
+        <up-cascader
+          v-model:show="showOrg"
+          v-model="orgValue"
+          :data="orgData"
+          value-key="id"
+          label-key="name"
+          children-key="childs"
+          @confirm="onOrgConfirm"
+        ></up-cascader>
+      </view>
+
+      <!-- 4. 垂直头部 + 单列 -->
+      <view class="demo-block mt-[12px]">
+        <up-title class="demo-title">
+          <text class="demo-title-text">垂直头部 + 单列（headerDirection="column"、optionsCols=1）</text>
+        </up-title>
+        <up-button type="primary" text="选择商品分类" @click="openColumn"></up-button>
+        <view class="demo-result">
+          <text class="demo-result-label">已选：</text>
+          <text class="demo-result-value">{{ getValueText(columnValue) }}</text>
+        </view>
+        <up-cascader
+          v-model:show="showColumn"
+          v-model="columnValue"
+          :data="categoryData"
+          headerDirection="column"
+          :optionsCols="1"
+          @confirm="onColumnConfirm"
+        ></up-cascader>
+      </view>
+
+      <!-- 5. 自动关闭 -->
+      <view class="demo-block mt-[12px]">
+        <up-title class="demo-title">
+          <text class="demo-title-text">自动关闭（auto-close 选中最后一级立即关闭并触发 confirm）</text>
+        </up-title>
+        <up-button type="primary" text="选择地区" @click="openAuto"></up-button>
+        <view class="demo-result">
+          <text class="demo-result-label">已选：</text>
+          <text class="demo-result-value">{{ getValueText(autoValue) }}</text>
+        </view>
+        <up-cascader
+          v-model:show="showAuto"
+          v-model="autoValue"
+          :data="areaData"
+          :auto-close="true"
+          @confirm="onAutoConfirm"
+        ></up-cascader>
+      </view>
+
+      <!-- 6. 说明 -->
+      <view class="demo-block mt-[12px]">
+        <up-title class="demo-title">
+          <text class="demo-title-text">说明</text>
+        </up-title>
+        <text class="demo-text">
+          up-cascader 支持无限级联，可通过 data 配置级联数据、v-model 绑定选中值、v-model:show 控制显示隐藏；value-key / label-key / children-key 可自定义数据字段名；headerDirection="column" 配合 optionsCols=1 适合长文案选项；auto-close 可在选中最后一级时自动关闭并触发 confirm；change / confirm / cancel 事件回调均返回选中值数组。
+        </text>
+      </view>
+
+      <view class="log-box mt-[10px]">
+        <text class="log-text">{{ eventLog }}</text>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { ref } from 'vue';
+
+definePage({
+  style: {
+    navigationStyle: 'custom',
+    navigationBarTitleText: 'up-cascader 级联选择器'
+  }
+});
+
+const showArea = ref<boolean>(false);
+const showCategory = ref<boolean>(false);
+const showOrg = ref<boolean>(false);
+const showColumn = ref<boolean>(false);
+const showAuto = ref<boolean>(false);
+
+const areaValue = ref<Array<any>>([] as Array<any>);
+const categoryValue = ref<Array<any>>(['2', '2-2'] as Array<any>);
+const orgValue = ref<Array<any>>([] as Array<any>);
+const columnValue = ref<Array<any>>([] as Array<any>);
+const autoValue = ref<Array<any>>([] as Array<any>);
+
+const eventLog = ref<string>('选择后 change / confirm 事件会返回选中的值数组');
+
+const areaData = ref<UTSJSONObject[]>([
+  {
+    label: '北京市',
+    value: '11',
+    children: [
+      {
+        label: '北京市',
+        value: '1101',
+        children: [
+          { label: '东城区', value: '110101' },
+          { label: '西城区', value: '110102' },
+          { label: '朝阳区', value: '110105' }
+        ]
+      }
+    ]
+  },
+  {
+    label: '广东省',
+    value: '44',
+    children: [
+      {
+        label: '广州市',
+        value: '4401',
+        children: [
+          { label: '天河区', value: '440106' },
+          { label: '越秀区', value: '440104' },
+          { label: '海珠区', value: '440105' }
+        ]
+      }
+    ]
+  },
+  {
+    label: '浙江省',
+    value: '33',
+    children: [
+      {
+        label: '杭州市',
+        value: '3301',
+        children: [
+          { label: '西湖区', value: '330106' },
+          { label: '滨江区', value: '330108' }
+        ]
+      }
+    ]
+  }
+] as UTSJSONObject[]);
+
+const categoryData = ref<UTSJSONObject[]>([
+  {
+    label: '服装',
+    value: '1',
+    children: [
+      {
+        label: '上装',
+        value: '1-1',
+        children: [
+          { label: 'T恤', value: '1-1-1' },
+          { label: '衬衫', value: '1-1-2' }
+        ]
+      }
+    ]
+  },
+  {
+    label: '数码',
+    value: '2',
+    children: [
+      {
+        label: '电脑',
+        value: '2-2',
+        children: [
+          { label: '笔记本', value: '2-2-1' },
+          { label: '台式机', value: '2-2-2' }
+        ]
+      }
+    ]
+  },
+  {
+    label: '食品',
+    value: '3',
+    children: [
+      {
+        label: '零食',
+        value: '3-3',
+        children: [
+          { label: '坚果', value: '3-3-1' },
+          { label: '饼干', value: '3-3-2' }
+        ]
+      }
+    ]
+  }
+] as UTSJSONObject[]);
+
+const orgData = ref<UTSJSONObject[]>([
+  {
+    name: '总部',
+    id: '1',
+    childs: [
+      {
+        name: '研发部',
+        id: '1-1',
+        childs: [
+          { name: '前端组', id: '1-1-1' },
+          { name: '后端组', id: '1-1-2' }
+        ]
+      },
+      {
+        name: '市场部',
+        id: '1-2',
+        childs: [
+          { name: '品牌组', id: '1-2-1' },
+          { name: '运营组', id: '1-2-2' }
+        ]
+      }
+    ]
+  }
+] as UTSJSONObject[]);
+
+function getValueText(value: Array<any>): string {
+  if (value.length == 0) {
+    return '未选择'
+  }
+  const texts = [] as string[]
+  for (let i = 0; i < value.length; i++) {
+    const item = value[i]
+    texts.push(item == null ? '' : item.toString())
+  }
+  return texts.join(' / ')
+}
+
+function openArea(): void {
+  showArea.value = true
+}
+
+function openCategory(): void {
+  showCategory.value = true
+}
+
+function openOrg(): void {
+  showOrg.value = true
+}
+
+function openColumn(): void {
+  showColumn.value = true
+}
+
+function openAuto(): void {
+  showAuto.value = true
+}
+
+function onAreaChange(value: Array<any>): void {
+  eventLog.value = '基础用法 change => ' + getValueText(value)
+}
+
+function onAreaConfirm(value: Array<any>): void {
+  eventLog.value = '基础用法 confirm => ' + getValueText(value)
+}
+
+function onCategoryConfirm(value: Array<any>): void {
+  eventLog.value = '默认值 confirm => ' + getValueText(value)
+}
+
+function onOrgConfirm(value: Array<any>): void {
+  eventLog.value = '自定义字段 confirm => ' + getValueText(value)
+}
+
+function onColumnConfirm(value: Array<any>): void {
+  eventLog.value = '垂直头部 confirm => ' + getValueText(value)
+}
+
+function onAutoConfirm(value: Array<any>): void {
+  eventLog.value = '自动关闭 confirm => ' + getValueText(value)
+}
+</script>
+
+<style lang="scss" scoped>
+.demo-block {
+  margin-bottom: 12px;
+  padding: 12px;
+  background-color: #ffffff;
+  border-radius: 8px;
+}
+
+.demo-title {
+  margin-bottom: 10px;
+}
+
+.demo-title-text {
+  font-size: 14px;
+  font-weight: bold;
+  color: #606266;
+}
+
+.demo-result {
+  display: flex;
+  flex-direction: row;
+  margin-top: 10px;
+}
+
+.demo-result-label {
+  font-size: 13px;
+  color: #64748b;
+}
+
+.demo-result-value {
+  font-size: 13px;
+  color: #2563eb;
+}
+
+.demo-text {
+  font-size: 13px;
+  line-height: 20px;
+  color: #64748b;
+}
+
+.log-box {
+  padding: 10px 12px;
+  background-color: #0f172a;
+  border-radius: 8px;
+}
+
+.log-text {
+  font-size: 12px;
+  line-height: 18px;
+  color: #93c5fd;
+}
+</style>

@@ -1,0 +1,147 @@
+<template>
+  <view class="up-tree-node" :style="{ paddingLeft: depth * 20 + 'px' }">
+    <view class="up-tree-node-content" @click="toggle">
+      <up-icon v-if="hasChildren" class="up-tree-node-toggle"
+       :name="isExpanded ? 'arrow-down-fill' : 'play-right-fill'" size="12" />
+      <up-checkbox
+        v-if="showCheckbox"
+        usedAlone
+        :size="12"
+        :checked="node['checked'] == true"
+        @change="toggleCheck"
+        style="margin-right: 10px;"
+      />
+      <slot :nodeData="node" :level="depth + 1">
+        <text>{{ node[props['label'] ?? 'label'] }}</text>
+      </slot>
+    </view>
+    <view v-if="hasChildren && isExpanded"
+      class="up-tree-node-children"
+      :style="{ paddingLeft: (depth + 1) * 20 + 'px' }">
+      <tree-node
+        v-for="child in (node[childrenKey] as UTSJSONObject[])"
+        :key="child[props['nodeKey'] ?? 'id']"
+        :node="child"
+        :props="props"
+        :show-checkbox="showCheckbox"
+        :check-strictly="checkStrictly"
+        :expand-on-click-node="expandOnClickNode"
+        :depth="depth + 1"
+        @node-click="$emit('node-click', $event)"
+        @check-change="$emit('check-change', $event)">
+        <template #default="{ nodeData, level }">
+            <slot name="default" :nodeData="nodeData" :level="level"></slot>
+        </template>
+      </tree-node>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed } from 'vue'
+
+function valueToString(value: any | null): string {
+  return value == null ? '' : value.toString()
+}
+
+defineOptions({
+  name: 'tree-node'
+})
+
+const props = defineProps({
+  node: {
+    type: Object as PropType<UTSJSONObject>,
+    required: true
+  },
+  props: {
+    type: Object as PropType<UTSJSONObject>,
+    required: true
+  },
+  showCheckbox: {
+    type: Boolean,
+    default: false
+  },
+  checkStrictly: {
+    type: Boolean,
+    default: false
+  },
+  expandOnClickNode: {
+    type: Boolean,
+    default: true
+  },
+  depth: {
+    type: Number,
+    default: 0
+  }
+})
+
+const emit = defineEmits(['node-click', 'check-change'])
+
+const childrenKey = computed<string>(() => {
+  const p = props.props
+  const ck = p['children']
+  return valueToString(ck) == '' ? 'children' : valueToString(ck)
+})
+
+const hasChildren = computed<boolean>(() => {
+  const n = props.node
+  const children = n[childrenKey.value] as UTSJSONObject[] | null
+  return Array.isArray(children) && children.length > 0
+})
+
+const isExpanded = computed<boolean>(() => {
+  const n = props.node
+  const expanded = n['expanded']
+  if (expanded == null) {
+    return false
+  }
+  return expanded as boolean
+})
+
+function toggle(): void {
+  const n = props.node
+  if (props.expandOnClickNode && hasChildren.value) {
+    const expanded = n['expanded']
+    n['expanded'] = expanded == null ? true : !(expanded as boolean)
+  }
+  emit('node-click', n)
+}
+
+function updateChildCheckStatus(n: UTSJSONObject, checked: boolean): void {
+  const children = n[childrenKey.value] as UTSJSONObject[] | null
+  if (!Array.isArray(children) || children.length == 0) {
+    return
+  }
+  for (let i = 0; i < children.length; i++) {
+    const child = children[i] as UTSJSONObject
+    child['checked'] = checked
+    updateChildCheckStatus(child, checked)
+  }
+}
+
+function toggleCheck(checked: boolean): void {
+  const n = props.node
+  n['checked'] = checked
+  if (!props.checkStrictly) {
+    updateChildCheckStatus(n, checked)
+  }
+  emit('check-change', n)
+}
+
+defineExpose({
+  toggle,
+  toggleCheck
+})
+</script>
+
+<style scoped>
+.up-tree-node-content {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding-left: 20px;
+}
+.up-tree-node-toggle {
+  margin-right: 5px;
+}
+</style>

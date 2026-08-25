@@ -1,0 +1,129 @@
+<template>
+	<scroll-view 
+		:direction="wrap ? 'vertical' : 'horizontal'" 
+		:class="['up-choose', wrap ? 'up-choose-wrap' : 'up-choose-nowrap']">
+        <template :key="index" v-for="(item, index) in options">
+            <view :style="{width: itemWidth, display: 'inline-block'}">
+                <slot :item="item" :index="index">
+                    <up-tag :type="index === currentIndex ? 'primary' : 'info'"
+                        size="large" :plain="index === currentIndex ? false : true"
+                        :class="currentIndex === index ? 'active': ''" :height="itemHeight"
+                        :style="{width: itemWidth, padding: itemPadding}"
+                        @click="change(index)">
+                        {{getItemLabel(item)}}
+                    </up-tag>
+                </slot>
+            </view>
+        </template>
+	</scroll-view>
+</template>
+
+<script setup lang="uts">
+import { ref, watch } from 'vue'
+
+defineOptions({
+    name: 'up-choose'
+})
+
+const props = defineProps({
+	options: {
+		type: Array as PropType<Array<any>>,
+		default: () => [] as Array<any>
+	},
+	modelValue: {
+		type: [Number, String, Array],
+		default: -1
+	},
+	type: {
+	    type: String,
+	    default: 'radio'
+	},
+	itemWidth: {
+	    type: String,
+	    default: 'auto'
+	},
+	itemHeight: {
+	    type: String,
+	    default: '50px'
+	},
+    itemPadding: {
+        type: String,
+	    default: '8px'
+    },
+	labelName: {
+	    type: String,
+	    default: 'title'
+	},
+	valueName: {
+	    type: String,
+	    default: 'value'
+	},
+	customClick: {
+	    type: Boolean,
+	    default: false
+	},
+	wrap: {
+		type: Boolean,
+		default: true
+	}
+})
+
+const emit = defineEmits(['update:modelValue', 'custom-click'])
+
+function normalizeIndex(value: any | null): number {
+	if (typeof value === 'number') {
+		return value as number
+	}
+	if (typeof value === 'string' && (value as string).length > 0) {
+		const parsed = parseInt(value as string)
+		if (!isNaN(parsed)) {
+			return parsed
+		}
+	}
+	return -1
+}
+
+const currentIndex = ref<number>(normalizeIndex(props.modelValue))
+
+watch(() => props.modelValue, (newVal: any) => {
+	currentIndex.value = normalizeIndex(newVal)
+})
+
+function getItemLabel(item: any | null): string {
+	if (item == null) {
+		return ''
+	}
+	const data = item as UTSJSONObject | null
+	if (data == null) {
+		return ''
+	}
+	const val = data[props.labelName]
+	if (val == null) {
+		return ''
+	}
+	return val.toString()
+}
+
+function change(index: number){
+	if (props.customClick) {
+		emit('custom-click', index)
+	} else {
+		currentIndex.value = index
+		emit('update:modelValue', index)
+	}
+}
+</script>
+
+<style scoped lang="scss">
+	.up-choose {
+		display: flex;
+	}
+	
+	.up-choose-wrap {
+		flex-wrap: wrap;
+	}
+	
+	.up-choose-nowrap {
+		flex-wrap: nowrap;
+	}
+</style>

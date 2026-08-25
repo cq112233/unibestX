@@ -284,23 +284,21 @@ function generatePagesJson(
   const files = scanUvueFiles(pagesDir, opts.exclude, projectRoot);
   files.sort();
 
-  const scanned: (PageConfig & { _hasMeta?: boolean })[] = [];
+  const scanned: PageConfig[] = [];
   for (let i = 0; i < files.length; i++) {
     const raw = fs.readFileSync(files[i], 'utf-8');
     const meta = parsePageMeta(raw);
     const pagePath = fileToPagePath(files[i], opts.dir, projectRoot);
 
-    const page: PageConfig & { _hasMeta?: boolean } = { path: pagePath };
+    const page: PageConfig = { path: pagePath };
     if (meta != null) {
       Object.assign(page, meta);
-      page._hasMeta = true;
     }
     else if (raw.includes('definePage(') || raw.includes('<route')) {
       // 临时语法错误时保留之前的配置，避免 pages.json 内容变动触发重载
       const old = existingPagesMap.get(pagePath);
       if (old != null) {
         Object.assign(page, old);
-        page._hasMeta = true;
       }
     }
     scanned.push(page);
@@ -320,24 +318,22 @@ function generatePagesJson(
     const subFiles = scanUvueFiles(absSubDir, opts.exclude, projectRoot);
     subFiles.sort();
 
-    const subPages: (PageConfig & { _hasMeta?: boolean })[] = [];
+    const subPages: PageConfig[] = [];
     for (let j = 0; j < subFiles.length; j++) {
       const raw = fs.readFileSync(subFiles[j], 'utf-8');
       const meta = parsePageMeta(raw);
       // 分包路径：去掉 subDir 前缀，如 src/sub/auth/login
       const relPath = path.relative(absSubDir, subFiles[j]).replace(/\\/g, '/').replace(/\.uvue$/, '');
 
-      const page: PageConfig & { _hasMeta?: boolean } = { path: relPath };
+      const page: PageConfig = { path: relPath };
       if (meta != null) {
         Object.assign(page, meta);
-        page._hasMeta = true;
       }
       else if (raw.includes('definePage(') || raw.includes('<route')) {
         const fullRel = `${subDir}/${relPath}`;
         const old = existingPagesMap.get(fullRel);
         if (old != null) {
           Object.assign(page, old);
-          page._hasMeta = true;
         }
       }
       subPages.push(page);
@@ -356,14 +352,14 @@ function generatePagesJson(
     for (let k = 0; k < subPages.length; k++) {
       const sp = subPages[k];
       const manual = existingMap.get(sp.path);
-      if (sp._hasMeta) {
-        // 页面中显式声明了 definePage 或 <route>，以页面内的声明为唯一真实数据源（支持删除字段）
-        mergedPages.push(sp);
-      }
-      else if (manual != null) {
+      if (manual != null) {
         mergedPages.push({
           ...manual,
-          path: sp.path
+          ...sp,
+          style: {
+            ...(manual.style || {}),
+            ...(sp.style || {})
+          }
         });
       }
       else {
@@ -393,14 +389,14 @@ function generatePagesJson(
   for (let k = 0; k < scanned.length; k++) {
     const sp = scanned[k];
     const manual = manualPagesMap.get(sp.path);
-    if (sp._hasMeta) {
-      // 页面中显式声明了 definePage 或 <route>，以页面内的声明为唯一真实数据源（支持删除字段）
-      finalPages.push(sp);
-    }
-    else if (manual != null) {
+    if (manual != null) {
       finalPages.push({
         ...manual,
-        path: sp.path
+        ...sp,
+        style: {
+          ...(manual.style || {}),
+          ...(sp.style || {})
+        }
       });
     }
     else {
@@ -432,15 +428,9 @@ function generatePagesJson(
 
   // 清理临时标记属性
   finalPages.forEach((p) => {
-    delete (p as any)._hasMeta;
     if ((p as any).type === 'home') {
       delete (p as any).type;
     }
-  });
-  scannedSubPkgs.forEach((pkg) => {
-    pkg.pages.forEach((p) => {
-      delete (p as any)._hasMeta;
-    });
   });
 
   // 6. 构建输出（pages 放第一位）
@@ -458,7 +448,7 @@ function generatePagesJson(
   }
 
   // 7. 写入 pages.json
-  const jsonStr = `${JSON.stringify(output, null, 2)}\n`;
+  const jsonStr = JSON.stringify(output, null, 2);
   let existing = '';
   if (fs.existsSync(outPath)) {
     existing = fs.readFileSync(outPath, 'utf-8');
@@ -509,7 +499,7 @@ function generatePagesJson(
     }
 
     if (configUpdated) {
-      const newConfigJson = `${JSON.stringify(currentConfig, null, 2)}\n`;
+      const newConfigJson = JSON.stringify(currentConfig, null, 2);
       if (newConfigJson !== currentConfigRaw) {
         fs.writeFileSync(configPath, newConfigJson, 'utf-8');
         console.log(`[uni-pages] Automatically synced changes into ${opts.configFile}`);
@@ -716,9 +706,15 @@ export default function uniPagesPlugin(options: UniPagesOptions = {}) {
         if (normalized === configPath.replace(/\\/g, '/') || normalized.includes('pages.config')) {
           debouncedGenerate();
         }
-        // 页面文件变化
+        // 页面文件变化（仅当包含 definePage 或 <route> 时才处理）
         if (isPageFile(filePath)) {
-          debouncedGenerate();
+          try {
+            const content = fs.readFileSync(filePath, 'utf-8');
+            if (content.includes('definePage(') || content.includes('<route')) {
+              debouncedGenerate();
+            }
+          }
+          catch {}
         }
       });
     }

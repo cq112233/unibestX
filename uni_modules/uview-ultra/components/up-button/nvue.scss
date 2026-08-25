@@ -1,0 +1,46 @@
+$up-button-active-opacity:0.75 !default;
+$up-button-loading-text-margin-left:4px !default;
+$up-button-text-color: #FFFFFF !default;
+$up-button-text-plain-error-color:$up-error !default;
+$up-button-text-plain-warning-color:$up-warning !default;
+$up-button-text-plain-success-color:$up-success !default;
+$up-button-text-plain-info-color:$up-info !default;
+$up-button-text-plain-primary-color:$up-primary !default;
+.up-button {
+	&--active {
+		opacity: $up-button-active-opacity;
+	}
+	
+	&--active--plain {
+		background-color: rgb(217, 217, 217);
+	}
+	
+	&__loading-text {
+		margin-left:$up-button-loading-text-margin-left;
+	}
+	
+	&__text,
+	&__loading-text {
+		color:$up-button-text-color;
+	}
+	
+	&__text--plain--error {
+		color:$up-button-text-plain-error-color;
+	}
+	
+	&__text--plain--warning {
+		color:$up-button-text-plain-warning-color;
+	}
+	
+	&__text--plain--success{
+		color:$up-button-text-plain-success-color;
+	}
+	
+	&__text--plain--info {
+		color:$up-button-text-plain-info-color;
+	}
+	
+	&__text--plain--primary {
+		color:$up-button-text-plain-primary-color;
+	}
+}
