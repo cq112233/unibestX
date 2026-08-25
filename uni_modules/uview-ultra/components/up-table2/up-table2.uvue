@@ -65,7 +65,26 @@
                     </view>
                 </view>
 
-                <view v-else class="up-table-empty">
+                <view v-if="showSummary && hasData" class="up-table-row up-table-footer-row" :style="{ height: rowHeightValue }">
+                    <view
+                        v-for="(col, colIndex) in columns"
+                        :key="'sum_' + getColumnKey(col, colIndex)"
+                        class="up-table-cell up-table-footer-cell"
+                        :class="[getCellAlignClass(col)]"
+                        :style="getHeaderCellStyle(col)"
+                    >
+                        <slot
+                            name="summary-cell"
+                            :column="col"
+                            :columnIndex="colIndex"
+                            :value="getSummaryValue(colIndex)"
+                        >
+                            <text class="up-table-footer-text" :style="{ textAlign: getCellAlignValue(col) }">{{ getSummaryValue(colIndex) }}</text>
+                        </slot>
+                    </view>
+                </view>
+
+                <view v-else-if="!hasData" class="up-table-empty">
                     <slot name="empty">
                         <text class="up-table-empty-text">{{ emptyText }}</text>
                     </slot>
@@ -134,6 +153,25 @@
                             </slot>
                         </template>
                     </view>
+                </view>
+            </view>
+
+            <view v-if="showSummary && hasData" class="up-table-row up-table-footer-row" :style="{ height: rowHeightValue }">
+                <view
+                    v-for="(col, fixedIndex) in fixedLeftColumns"
+                    :key="'fixed_sum_' + getColumnKey(col, fixedIndex)"
+                    class="up-table-cell up-table-footer-cell"
+                    :class="[getCellAlignClass(col)]"
+                    :style="getFixedHeaderCellStyle(col)"
+                >
+                    <slot
+                        name="summary-cell"
+                        :column="col"
+                        :columnIndex="getColumnIndex(col)"
+                        :value="getSummaryValue(getColumnIndex(col))"
+                    >
+                        <text class="up-table-footer-text" :style="{ textAlign: getCellAlignValue(col) }">{{ getSummaryValue(getColumnIndex(col)) }}</text>
+                    </slot>
                 </view>
             </view>
         </view>
@@ -211,6 +249,7 @@ type CellStyleCallback = (scope: UTSJSONObject) => UTSJSONObject | null
 type CellClassNameCallback = (row: UTSJSONObject, col: UTSJSONObject) => string
 type RowClassNameCallback = (row: UTSJSONObject, rowIndex: number) => string
 type HeaderCellClassNameCallback = (col: UTSJSONObject) => string
+type SummaryMethodCallback = (scope: UTSJSONObject) => string[] | null
 
 defineOptions({
     name: 'up-table2'
@@ -317,6 +356,18 @@ const props = defineProps({
     },
     headerCellClassName: {
         type: Function as PropType<HeaderCellClassNameCallback | null>,
+        default: null
+    },
+    showSummary: {
+        type: Boolean,
+        default: false
+    },
+    sumText: {
+        type: String,
+        default: '合计'
+    },
+    summaryMethod: {
+        type: Function as PropType<SummaryMethodCallback | null>,
         default: null
     }
 })
@@ -819,8 +870,88 @@ function getTableContentStyle(): UTSJSONObject {
 function getNaturalTableHeight(): string {
     const headerHeight = props.showHeader ? 44 : 0
     const rHeight = toNumber(props.rowHeight, 44)
-    const rows = hasData.value ? flatRows.value.length : 1
+    let rows = hasData.value ? flatRows.value.length : 1
+    if (props.showSummary && hasData.value) {
+        rows += 1
+    }
     return (headerHeight + rHeight * rows).toString() + 'px'
+}
+
+const summaryData = computed<string[]>(() => {
+    if (!props.showSummary) {
+        return createStringList()
+    }
+    const cols = props.columns
+    const rows = processedData.value
+    if (typeof props.summaryMethod == 'function' && props.summaryMethod != null) {
+        const callback = props.summaryMethod as SummaryMethodCallback
+        const result = callback({
+            columns: cols,
+            data: rows
+        } as UTSJSONObject)
+        if (result != null && Array.isArray(result)) {
+            const arr = result as string[]
+            const customList = createStringList()
+            for (let i = 0; i < arr.length; i++) {
+                customList.push(valueToString(arr[i]))
+            }
+            return customList
+        }
+    }
+    const sums = createStringList()
+    let isFirstCol = true
+    for (let i = 0; i < cols.length; i++) {
+        const col = cols[i] as UTSJSONObject
+        if (isSelectionColumn(col)) {
+            sums.push('')
+            continue
+        }
+        if (isFirstCol) {
+            sums.push(props.sumText != '' ? props.sumText : '合计')
+            isFirstCol = false
+            continue
+        }
+        const key = getColumnField(col)
+        if (key == '') {
+            sums.push('')
+            continue
+        }
+        let total: number = 0
+        let hasNumber = false
+        let isAllNumber = true
+        for (let j = 0; j < rows.length; j++) {
+            const row = rows[j] as UTSJSONObject
+            const val = row[key]
+            if (val != null) {
+                const strVal = valueToString(val).trim()
+                if (strVal != '') {
+                    const num = parseFloat(strVal)
+                    if (!isNaN(num)) {
+                        total += num
+                        hasNumber = true
+                    } else {
+                        isAllNumber = false
+                        break
+                    }
+                }
+            }
+        }
+        if (hasNumber && isAllNumber) {
+            const rounded = Math.round(total * 100) / 100
+            sums.push(rounded.toString())
+        } else {
+            sums.push('-')
+        }
+    }
+    return sums
+})
+
+function getSummaryValue(index: number): string {
+    const list = summaryData.value
+    if (index >= 0 && index < list.length) {
+        return list[index]
+    }
+    return ''
 }
 
 function getScrollStyle(): UTSJSONObject {
@@ -1224,6 +1355,26 @@ defineExpose({
 
 .up-table-header-row {
     background-color: #f5f7fa;
+}
+
+.up-table-footer-row {
+    background-color: #f8fafc;
+}
+
+.up-table-footer-cell {
+    border-top: 1px solid #ebeef5;
+    border-bottom: 1px solid #ebeef5;
+    background-color: #f8fafc;
+}
+
+.up-table-footer-text {
+    width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-size: 13px;
+    font-weight: bold;
+    color: #334155;
 }
 
 .up-table-body {

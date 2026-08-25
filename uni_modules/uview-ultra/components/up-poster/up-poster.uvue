@@ -505,13 +505,20 @@ function drawImageBox(item: PosterItem): Promise<void> {
 				}
 				const image = canvas.createImage()
 				image.onload = () => {
-					context.drawImage(image, x, y, width, height)
+					// #ifdef APP-ANDROID
+					context.drawImage(image as UniImageElementImpl, x, y, width, height)
+					// #endif
+					// #ifndef APP-ANDROID
+					context.drawImage(image as any, x, y, width, height)
+					// #endif
 					resolve()
 				}
-				image.onerror = () => {
+				// #ifdef WEB || MP-WEIXIN
+				(image as UTSJSONObject)['onerror'] = () => {
 					drawImageFallback(x, y, width, height, numberValue(css['radius'], 0))
 					resolve()
 				}
+				// #endif
 				image.src = res.path
 			},
 			fail: () => {

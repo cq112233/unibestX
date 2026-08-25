@@ -579,7 +579,13 @@ function drawCanvasText(context: CanvasRenderingContext2D, barcodeY: number, tex
   context.font = props.fontOptions.length > 0
     ? props.fontOptions + ' ' + props.fontSize.toString() + 'px ' + props.font
     : props.fontSize.toString() + 'px ' + props.font
-  context.textAlign = props.textAlign
+  const align = (props.textAlign == 'left' ? 'left' : (props.textAlign == 'right' ? 'right' : 'center'))
+  // #ifdef WEB
+  context.textAlign = align as CanvasTextAlign
+  // #endif
+  // #ifndef WEB
+  context.textAlign = align
+  // #endif
   context.fillText(txt, textX, textY)
 }
 

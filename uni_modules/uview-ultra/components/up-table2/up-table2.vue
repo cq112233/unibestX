@@ -110,6 +110,19 @@
                     </slot>
                     <view v-if="!$slots['empty']" class="up-table-empty">{{ emptyText }}</view>
                 </template>
+
+                <!-- 表尾合计行 -->
+                <view v-if="showSummary && data && data.length > 0" class="up-table-row up-table-footer-row" :style="{ minWidth: scrollWidth, height: rowHeight }">
+                    <view v-for="(col, colIndex) in columns" :key="'sum_' + (col.key || colIndex)" class="up-table-cell up-table-footer-cell"
+                        :class="[col.align ? 'up-text-' + col.align : 'up-text-center',
+                            getFixedClass(col)
+                        ]"
+                        :style="headerColStyle(col)">
+                        <slot name="summary-cell" :column="col" :columnIndex="colIndex" :value="summaryData[colIndex]">
+                            <text class="up-table-footer-text">{{ summaryData[colIndex] }}</text>
+                        </slot>
+                    </view>
+                </view>
             </view>
         </scroll-view>
         
@@ -217,6 +230,19 @@
                     </template>
                     <!-- #endif -->
                 </template>
+
+                <!-- 固定列表尾合计行 -->
+                <view v-if="showSummary && data && data.length > 0" class="up-table-row up-table-footer-row" :style="{ minWidth: scrollWidth, height: rowHeight }">
+                    <view v-for="(col, colIndex) in visibleFixedLeftColumns" :key="'fixed_sum_' + (col.key || colIndex)" class="up-table-cell up-table-footer-cell"
+                        :class="[col.headerAlign ? 'up-text-' + col.headerAlign : (col.align ? 'up-text-' + col.align : 'up-text-center'),
+                            getFixedClass(col)
+                        ]"
+                        :style="headerColStyle(col)">
+                        <slot name="summary-cell" :column="col" :columnIndex="colIndex" :value="summaryData[colIndex]">
+                            <text class="up-table-footer-text">{{ summaryData[colIndex] }}</text>
+                        </slot>
+                    </view>
+                </view>
             </view>
         </view>
     </view>
@@ -382,6 +408,18 @@ export default {
         spanMethod: {
             type: Function,
             default: null
+        },
+        showSummary: {
+            type: Boolean,
+            default: false
+        },
+        sumText: {
+            type: String,
+            default: '合计'
+        },
+        summaryMethod: {
+            type: Function,
+            default: null
         }
     },
     emits: [
@@ -505,6 +543,66 @@ export default {
             let mainCol = validColumns && validColumns.length > 0 ? validColumns[0].key : '';
             // console.log('mainCol', mainCol)
             return mainCol;
+        },
+        summaryData() {
+            if (!this.showSummary) return [];
+            const cols = this.columns;
+            const rows = this.sortedData;
+            if (typeof this.summaryMethod === 'function') {
+                const result = this.summaryMethod({
+                    columns: cols,
+                    data: rows
+                });
+                if (Array.isArray(result)) {
+                    return result;
+                }
+            }
+            const sums = [];
+            let isFirstCol = true;
+            for (let i = 0; i < cols.length; i++) {
+                const col = cols[i];
+                if (col.type === 'selection') {
+                    sums.push('');
+                    continue;
+                }
+                if (isFirstCol) {
+                    sums.push(this.sumText || '合计');
+                    isFirstCol = false;
+                    continue;
+                }
+                const key = col.key;
+                if (!key) {
+                    sums.push('');
+                    continue;
+                }
+                let total = 0;
+                let hasNumber = false;
+                let isAllNumber = true;
+                for (let j = 0; j < rows.length; j++) {
+                    const row = rows[j];
+                    const val = row[key];
+                    if (val !== undefined && val !== null) {
+                        const strVal = String(val).trim();
+                        if (strVal !== '') {
+                            const num = parseFloat(strVal);
+                            if (!isNaN(num)) {
+                                total += num;
+                                hasNumber = true;
+                            } else {
+                                isAllNumber = false;
+                                break;
+                            }
+                        }
+                    }
+                }
+                if (hasNumber && isAllNumber) {
+                    const rounded = Math.round(total * 100) / 100;
+                    sums.push(String(rounded));
+                } else {
+                    sums.push('-');
+                }
+            }
+            return sums;
         }
     },
     watch: {
@@ -800,6 +898,23 @@ export default {
         min-width: 100% !important;
         width: fit-content;
         position: relative;
+    }
+
+    .up-table-footer-row {
+        background-color: #f8fafc;
+        font-weight: bold;
+    }
+
+    .up-table-footer-cell {
+        border-top: 1px solid #ebeef5;
+        border-bottom: 1px solid #ebeef5;
+        background-color: #f8fafc;
+    }
+
+    .up-table-footer-text {
+        font-size: 13px;
+        font-weight: bold;
+        color: #334155;
     }
 
     .up-table-sticky {

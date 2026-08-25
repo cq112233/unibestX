@@ -114,13 +114,71 @@
         ></up-table2>
       </view>
 
-      <!-- 8. 说明 -->
+      <!-- 8. 表尾自动汇总（show-summary + sum-text） -->
       <view class="demo-block mt-[12px]">
         <up-title class="demo-title">
-          <text class="demo-title-text">说明</text>
+          <text class="demo-title-text">8. 表尾自动汇总（show-summary + sum-text）</text>
         </up-title>
-        <text class="demo-text">
-          up-table2 兼容 Element Plus 表格 API：支持斑马纹/边框、cellStyle/rowClassName 等样式回调、单选高亮、复选框选择、排序与筛选、树形结构、固定列与单元格合并；App 端（安卓/iOS/鸿蒙）基于原生 scroll-view 与 UTSJSONObject 实现，H5/小程序沿用原 .vue 实现。注意：小程序不支持直接传 Function 类型 props。
+        <up-table2
+          :data="salesData"
+          :columns="columnsSales"
+          border
+          show-summary
+          sum-text="总计"
+        ></up-table2>
+      </view>
+
+      <!-- 9. 自定义汇总计算（summary-method） -->
+      <view class="demo-block mt-[12px]">
+        <up-title class="demo-title">
+          <text class="demo-title-text">9. 自定义汇总计算（summary-method）</text>
+        </up-title>
+        <up-table2
+          :data="salesData"
+          :columns="columnsSales"
+          border
+          show-summary
+          :summary-method="customSummaryMethod"
+        ></up-table2>
+      </view>
+
+      <!-- 10. 行内动态汇总列（#cell 自定义计算） -->
+      <view class="demo-block mt-[12px]">
+        <up-title class="demo-title">
+          <text class="demo-title-text">10. 行内动态汇总列（#cell 动态求和）</text>
+        </up-title>
+        <up-table2
+          :data="scoreData"
+          :columns="columnsScore"
+          border
+          stripe
+        >
+          <template #cell="{ row, column }">
+            <text
+              v-if="(column as UTSJSONObject).key == 'total'"
+              class="custom-total-text"
+              style="line-height: 20px"
+            >
+              {{ calcScoreTotal(row as UTSJSONObject) }}
+            </text>
+            <text
+              v-else
+              class="custom-cell-text"
+              style="line-height: 20px"
+            >
+              {{ getLabel(row as UTSJSONObject, column as UTSJSONObject) }}
+            </text>
+          </template>
+        </up-table2>
+      </view>
+
+      <!-- 11. 说明 -->
+      <view class="demo-block mt-[12px]">
+        <up-title class="demo-title">
+          <text class="demo-title-text">多端与双模式兼容说明</text>
+        </up-title>
+        <text class="demo-text" style="line-height: 22px">
+          1. 支持开箱即用的 show-summary 表尾合计，自动对纯数值列求和，兼容安卓、鸿蒙、iOS、微信小程序与 H5（VDOM & Vapor 模式）。&#10;2. 支持 summary-method 自定义合计算法（如带货币单位、求平均值等）。&#10;3. 支持通过 #cell 插槽进行行内多列求和计算。&#10;4. 微信小程序平台双线程特性不支持跨线程传递 Function 类型 props，推荐使用内置 show-summary 或数据层响应式 computed 汇总。
         </text>
       </view>
 
@@ -343,6 +401,63 @@ function onFilterChange(filters: UTSJSONObject): void {
 function onExpandChange(keys: string[]): void {
   eventLog.value = `expand-change => 展开行 keys: ${keys.join(',')}`;
 }
+
+const salesData = ref<UTSJSONObject[]>([
+  { id: 1, name: '商品A', amount: 120, sales: 3600, rating: 4.8 },
+  { id: 2, name: '商品B', amount: 80, sales: 2400, rating: 4.6 },
+  { id: 3, name: '商品C', amount: 150, sales: 4500, rating: 4.9 },
+  { id: 4, name: '商品D', amount: 50, sales: 1500, rating: 4.5 }
+] as UTSJSONObject[]);
+
+const columnsSales = ref<UTSJSONObject[]>([
+  { title: '商品名称', key: 'name', width: '90px', align: 'center' },
+  { title: '销量(件)', key: 'amount', width: '80px', align: 'center' },
+  { title: '销售额(元)', key: 'sales', width: '90px', align: 'center' },
+  { title: '评分', key: 'rating', width: '70px', align: 'center' }
+] as UTSJSONObject[]);
+
+const scoreData = ref<UTSJSONObject[]>([
+  { id: 1, student: '小明', chinese: 88, math: 95, english: 92 },
+  { id: 2, student: '小红', chinese: 94, math: 90, english: 96 },
+  { id: 3, student: '小华', chinese: 82, math: 85, english: 80 }
+] as UTSJSONObject[]);
+
+const columnsScore = ref<UTSJSONObject[]>([
+  { title: '学生', key: 'student', width: '65px', align: 'center' },
+  { title: '语文', key: 'chinese', width: '55px', align: 'center' },
+  { title: '数学', key: 'math', width: '55px', align: 'center' },
+  { title: '英语', key: 'english', width: '55px', align: 'center' },
+  { title: '总分', key: 'total', width: '75px', align: 'center' }
+] as UTSJSONObject[]);
+
+function customSummaryMethod(scope: UTSJSONObject): string[] {
+  const rawData = scope.data as any[] | null;
+  const result: string[] = ['总汇', '0 件', '¥0', '均分 0'];
+  if (rawData == null || rawData.length == 0) {
+    return result;
+  }
+  let totalAmount: number = 0;
+  let totalSales: number = 0;
+  let totalRating: number = 0;
+  for (let i = 0; i < rawData.length; i++) {
+    const row = rawData[i] as UTSJSONObject;
+    totalAmount += toNumber(row.amount, 0);
+    totalSales += toNumber(row.sales, 0);
+    const r = parseFloat(valueToString(row.rating));
+    if (!isNaN(r)) {
+      totalRating += r;
+    }
+  }
+  const avgRating = Math.round((totalRating / rawData.length) * 10) / 10;
+  return ['总汇', `${totalAmount} 件`, `¥${totalSales}`, `均分 ${avgRating}`];
+}
+
+function calcScoreTotal(row: UTSJSONObject): string {
+  const c = toNumber(row.chinese, 0);
+  const m = toNumber(row.math, 0);
+  const e = toNumber(row.english, 0);
+  return `${c + m + e} 分`;
+}
 </script>
 
 <style lang="scss" scoped>
@@ -392,5 +507,11 @@ function onExpandChange(keys: string[]): void {
 
 .custom-cell-text {
   font-size: 13px;
+}
+
+.custom-total-text {
+  font-size: 13px;
+  font-weight: bold;
+  color: #0284c7;
 }
 </style>

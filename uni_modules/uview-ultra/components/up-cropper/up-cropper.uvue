@@ -226,7 +226,7 @@ let canvasContext: CanvasContext | null = null
 let exportCanvasContext: CanvasContext | null = null
 let ctx: CanvasRenderingContext2D | null = null
 let exportCtx: CanvasRenderingContext2D | null = null
-let imageElement: UniImageElement | null = null
+let imageElement: any | null = null
 const imagePath = ref<string>('')
 const imageWidth = ref<number>(0)
 const imageHeight = ref<number>(0)
@@ -447,7 +447,12 @@ function draw(): void {
 	context.fillRect(cropL, cropT, cropW, cropH)
 	context.translate(imgX + displayW / 2, imgY + displayH / 2)
 	context.rotate(rotateDeg.value * Math.PI / 180)
+	// #ifdef APP-ANDROID
 	context.drawImage(image as UniImageElementImpl, -displayW / 2, -displayH / 2, displayW, displayH)
+	// #endif
+	// #ifndef APP-ANDROID
+	context.drawImage(image as any, -displayW / 2, -displayH / 2, displayW, displayH)
+	// #endif
 	context.restore()
 	context.strokeStyle = '#ffffff'
 	context.lineWidth = 2
@@ -469,9 +474,11 @@ function createCanvasImage(path: string): void {
 		fitImage()
 		draw()
 	}
-	image.onerror = () => {
+	// #ifdef WEB || MP-WEIXIN
+	(image as UTSJSONObject)['onerror'] = () => {
 		emit('error', new Error('Image load failed'))
 	}
+	// #endif
 	image.src = path
 }
 
@@ -685,7 +692,12 @@ function drawPreview(): void {
 	const displayH = numberValue(displayHeight.value, 0)
 	context.translate(x + (imageX.value + displayW / 2 - cropL) * scaleX, y + (imageY.value + displayH / 2 - cropT) * scaleY)
 	context.rotate(rotateDeg.value * Math.PI / 180)
+	// #ifdef APP-ANDROID
 	context.drawImage(image as UniImageElementImpl, -displayW * scaleX / 2, -displayH * scaleY / 2, displayW * scaleX, displayH * scaleY)
+	// #endif
+	// #ifndef APP-ANDROID
+	context.drawImage(image as any, -displayW * scaleX / 2, -displayH * scaleY / 2, displayW * scaleX, displayH * scaleY)
+	// #endif
 	context.restore()
 	context.strokeStyle = '#ffffff'
 	context.lineWidth = 1
@@ -729,7 +741,12 @@ function confirm(): void {
 	context.scale(scaleX, scaleY)
 	context.translate(imgX + displayW / 2 - cropL, imgY + displayH / 2 - cropT)
 	context.rotate(rotateDeg.value * Math.PI / 180)
+	// #ifdef APP-ANDROID
 	context.drawImage(image as UniImageElementImpl, -displayW / 2, -displayH / 2, displayW, displayH)
+	// #endif
+	// #ifndef APP-ANDROID
+	context.drawImage(image as any, -displayW / 2, -displayH / 2, displayW, displayH)
+	// #endif
 	context.restore()
 	const quality = clamp(numberValue(props.quality, 1), 0, 1)
 	const path = canvas.toDataURL('image/png', quality)
