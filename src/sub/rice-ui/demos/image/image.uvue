@@ -1,10 +1,13 @@
 <template>
   <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
-    <NavBar title="Image 图片" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
+    <NavBar title="Image 图片" />
     <view class="p-[16px]">
       <!-- 基础用法 -->
       <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
-        <text class="text-[14px] font-bold text-[#334155] mb-[12px] pl-[6px] border-l-[3px] border-solid" :style="{ borderLeftColor: currentTheme }">基础用法</text>
+        <view class="flex-row items-center mb-[12px]">
+          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px]" :style="{ backgroundColor: currentTheme }" />
+          <text class="text-[14px] font-bold text-[#334155]">基础用法</text>
+        </view>
         <view class="flex-row items-center justify-around">
           <rice-image src="/static/logo.png" width="80px" height="80px" />
         </view>
@@ -12,7 +15,10 @@
 
       <!-- 圆角与圆形 -->
       <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
-        <text class="text-[14px] font-bold text-[#334155] mb-[12px] pl-[6px] border-l-[3px] border-solid" :style="{ borderLeftColor: currentTheme }">圆角与形状</text>
+        <view class="flex-row items-center mb-[12px]">
+          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px]" :style="{ backgroundColor: currentTheme }" />
+          <text class="text-[14px] font-bold text-[#334155]">圆角与形状</text>
+        </view>
         <view class="flex-row items-center justify-around">
           <view class="flex-col items-center">
             <rice-image src="/static/logo.png" width="70px" height="70px" radius="12px" />
@@ -27,7 +33,10 @@
 
       <!-- 填充模式 -->
       <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
-        <text class="text-[14px] font-bold text-[#334155] mb-[12px] pl-[6px] border-l-[3px] border-solid" :style="{ borderLeftColor: currentTheme }">填充模式 (Fit Mode)</text>
+        <view class="flex-row items-center mb-[12px]">
+          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px]" :style="{ backgroundColor: currentTheme }" />
+          <text class="text-[14px] font-bold text-[#334155]">填充模式 (Fit Mode)</text>
+        </view>
         <view class="flex-row items-center justify-around">
           <view class="flex-col items-center">
             <rice-image src="/static/logo.png" width="70px" height="70px" mode="scaleToFill" radius="6px" />
@@ -51,7 +60,13 @@
 import { useAppStore } from '@/src/store';
 import { computed } from 'vue';
 
+definePage({
+  style: {
+    navigationBarTitleText: 'Image 图片',
+    navigationStyle: 'custom'
+  }
+});
+
 const appStore = useAppStore();
 const currentTheme = computed((): string => appStore.state.theme);
 </script>
-

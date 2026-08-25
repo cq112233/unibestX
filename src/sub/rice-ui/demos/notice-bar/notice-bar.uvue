@@ -1,10 +1,13 @@
 <template>
   <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
-    <NavBar title="NoticeBar 公告栏" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
+    <NavBar title="NoticeBar 公告栏" />
     <view class="p-[16px]">
       <!-- 基础滚动公告 -->
       <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
-        <text class="text-[14px] font-bold text-[#334155] mb-[12px] pl-[6px] border-l-[3px] border-solid" :style="{ borderLeftColor: currentTheme }">基础滚动公告</text>
+        <view class="flex-row items-center mb-[12px]">
+          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px]" :style="{ backgroundColor: currentTheme }" />
+          <text class="text-[14px] font-bold text-[#334155]">基础滚动公告</text>
+        </view>
         <rice-notice-bar
           message="🎉 欢迎体验 unibestX 集成的 Rice UI 组件库，全端原生渲染，轻盈灵动！"
           :scrollable="true"
@@ -15,7 +18,10 @@
 
       <!-- 样式类型 -->
       <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
-        <text class="text-[14px] font-bold text-[#334155] mb-[12px] pl-[6px] border-l-[3px] border-solid" :style="{ borderLeftColor: currentTheme }">类型与通知</text>
+        <view class="flex-row items-center mb-[12px]">
+          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px]" :style="{ backgroundColor: currentTheme }" />
+          <text class="text-[14px] font-bold text-[#334155]">类型与通知</text>
+        </view>
         <view class="mb-[10px]">
           <rice-notice-bar type="primary" :color="currentTheme" message="系统已升级至最新版本，体验更佳。" />
         </view>
@@ -34,7 +40,13 @@
 import { useAppStore } from '@/src/store';
 import { computed } from 'vue';
 
+definePage({
+  style: {
+    navigationBarTitleText: 'NoticeBar 公告栏',
+    navigationStyle: 'custom'
+  }
+});
+
 const appStore = useAppStore();
 const currentTheme = computed((): string => appStore.state.theme);
 </script>
-

@@ -1,22 +1,31 @@
 <template>
   <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
-    <NavBar title="Divider 分割线" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
+    <NavBar title="Divider 分割线" />
     <view class="p-[16px]">
       <!-- 基础分割线 -->
       <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
-        <text class="text-[14px] font-bold text-[#334155] mb-[12px] pl-[6px] border-l-[3px] border-solid" :style="{ borderLeftColor: currentTheme }">基础用法</text>
+        <view class="flex-row items-center mb-[12px]">
+          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px]" :style="{ backgroundColor: currentTheme }" />
+          <text class="text-[14px] font-bold text-[#334155]">基础用法</text>
+        </view>
         <rice-divider />
       </view>
 
       <!-- 带文字分割线 -->
       <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
-        <text class="text-[14px] font-bold text-[#334155] mb-[12px] pl-[6px] border-l-[3px] border-solid" :style="{ borderLeftColor: currentTheme }">带文本分割线</text>
+        <view class="flex-row items-center mb-[12px]">
+          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px]" :style="{ backgroundColor: currentTheme }" />
+          <text class="text-[14px] font-bold text-[#334155]">带文本分割线</text>
+        </view>
         <rice-divider text="没有更多了" />
       </view>
 
       <!-- 虚线与自定义颜色 -->
       <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
-        <text class="text-[14px] font-bold text-[#334155] mb-[12px] pl-[6px] border-l-[3px] border-solid" :style="{ borderLeftColor: currentTheme }">虚线与颜色</text>
+        <view class="flex-row items-center mb-[12px]">
+          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px]" :style="{ backgroundColor: currentTheme }" />
+          <text class="text-[14px] font-bold text-[#334155]">虚线与颜色</text>
+        </view>
         <rice-divider text="猜你喜欢" :dashed="true" :line-color="currentTheme" :text-color="currentTheme" />
       </view>
     </view>
@@ -27,7 +36,13 @@
 import { useAppStore } from '@/src/store';
 import { computed } from 'vue';
 
+definePage({
+  style: {
+    navigationBarTitleText: 'Divider 分割线',
+    navigationStyle: 'custom'
+  }
+});
+
 const appStore = useAppStore();
 const currentTheme = computed((): string => appStore.state.theme);
 </script>
-

@@ -1,10 +1,13 @@
 <template>
   <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
-    <NavBar title="CodeInput 验证码" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
+    <NavBar title="CodeInput 验证码" />
     <view class="p-[16px]">
       <!-- 基础框状 -->
       <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
-        <text class="text-[14px] font-bold text-[#334155] mb-[12px] pl-[6px] border-l-[3px] border-solid" :style="{ borderLeftColor: currentTheme }">基础框状验证码 (Box)</text>
+        <view class="flex-row items-center mb-[12px]">
+          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px]" :style="{ backgroundColor: currentTheme }" />
+          <text class="text-[14px] font-bold text-[#334155]">基础框状验证码 (Box)</text>
+        </view>
         <view class="py-[10px] flex-row justify-center">
           <rice-code-input v-model="code1" :maxlength="4" :color="currentTheme" mode="box" />
         </view>
@@ -15,7 +18,10 @@
 
       <!-- 下划线状 -->
       <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
-        <text class="text-[14px] font-bold text-[#334155] mb-[12px] pl-[6px] border-l-[3px] border-solid" :style="{ borderLeftColor: currentTheme }">下划线模式 (Line)</text>
+        <view class="flex-row items-center mb-[12px]">
+          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px]" :style="{ backgroundColor: currentTheme }" />
+          <text class="text-[14px] font-bold text-[#334155]">下划线模式 (Line)</text>
+        </view>
         <view class="py-[10px] flex-row justify-center">
           <rice-code-input v-model="code2" :maxlength="6" :color="currentTheme" mode="line" />
         </view>
@@ -26,7 +32,10 @@
 
       <!-- 密文模式 -->
       <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
-        <text class="text-[14px] font-bold text-[#334155] mb-[12px] pl-[6px] border-l-[3px] border-solid" :style="{ borderLeftColor: currentTheme }">密文掩码模式 (Dot)</text>
+        <view class="flex-row items-center mb-[12px]">
+          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px]" :style="{ backgroundColor: currentTheme }" />
+          <text class="text-[14px] font-bold text-[#334155]">密文掩码模式 (Dot)</text>
+        </view>
         <view class="py-[10px] flex-row justify-center">
           <rice-code-input v-model="code3" :maxlength="4" :color="currentTheme" :dot="true" />
         </view>
@@ -39,6 +48,13 @@
 import { useAppStore } from '@/src/store';
 import { computed } from 'vue';
 
+definePage({
+  style: {
+    navigationBarTitleText: 'CodeInput 验证码',
+    navigationStyle: 'custom'
+  }
+});
+
 const appStore = useAppStore();
 const currentTheme = computed((): string => appStore.state.theme);
 
@@ -46,4 +62,3 @@ const code1 = ref('');
 const code2 = ref('123');
 const code3 = ref('8888');
 </script>
-

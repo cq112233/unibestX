@@ -1,10 +1,13 @@
 <template>
   <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
-    <NavBar title="ScrollX 横向滚动" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
+    <NavBar title="ScrollX 横向滚动" />
     <view class="p-[16px]">
       <!-- 基础横向滚动 -->
       <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
-        <text class="text-[14px] font-bold text-[#334155] mb-[12px] pl-[6px] border-l-[3px] border-solid" :style="{ borderLeftColor: currentTheme }">横向滚动列表与指示条</text>
+        <view class="flex-row items-center mb-[12px]">
+          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px]" :style="{ backgroundColor: currentTheme }" />
+          <text class="text-[14px] font-bold text-[#334155]">横向滚动列表与指示条</text>
+        </view>
         <rice-scroll-x :indicator-active-color="currentTheme">
           <view class="flex-row py-[10px]">
             <view v-for="item in 10" :key="item" class="w-[100px] h-[80px] rounded-[8px] flex flex-row items-center justify-center mr-[12px]" :style="{ backgroundColor: currentTheme }">
@@ -21,7 +24,13 @@
 import { useAppStore } from '@/src/store';
 import { computed } from 'vue';
 
+definePage({
+  style: {
+    navigationBarTitleText: 'ScrollX 横向滚动',
+    navigationStyle: 'custom'
+  }
+});
+
 const appStore = useAppStore();
 const currentTheme = computed((): string => appStore.state.theme);
 </script>
-

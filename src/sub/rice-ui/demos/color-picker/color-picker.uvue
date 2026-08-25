@@ -1,16 +1,19 @@
 <template>
   <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
-    <NavBar title="ColorPicker 颜色选择" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
+    <NavBar title="ColorPicker 颜色选择" />
     <view class="p-[16px]">
       <!-- 基础颜色选择器 -->
       <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
-        <text class="text-[14px] font-bold text-[#334155] mb-[12px] pl-[6px] border-l-[3px] border-solid" :style="{ borderLeftColor: currentTheme }">颜色选择器</text>
-        <view class="rounded-[8px] overflow-hidden border-width-[1px] border-solid border-color-[#e2e8f0]">
+        <view class="flex-row items-center mb-[12px]">
+          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px]" :style="{ backgroundColor: currentTheme }" />
+          <text class="text-[14px] font-bold text-[#334155]">颜色选择器</text>
+        </view>
+        <view class="rounded-[8px] overflow-hidden border border-solid border-[#e2e8f0]">
           <rice-color-picker v-model="selectedColor" :show-alpha="true" />
         </view>
         <view class="mt-[14px] flex-row items-center">
           <text class="text-[13px] text-[#64748b] mr-[8px]">当前颜色：{{ selectedColor }}</text>
-          <view class="w-[24px] h-[24px] rounded-[4px] border-width-[1px] border-solid border-color-[#cbd5e1]" :style="{ backgroundColor: selectedColor }" />
+          <view class="w-[24px] h-[24px] rounded-[4px] border border-solid border-[#cbd5e1]" :style="{ backgroundColor: selectedColor }" />
         </view>
       </view>
     </view>
@@ -21,6 +24,13 @@
 import { useAppStore } from '@/src/store';
 import { computed, watch } from 'vue';
 
+definePage({
+  style: {
+    navigationBarTitleText: 'ColorPicker 颜色选择',
+    navigationStyle: 'custom'
+  }
+});
+
 const appStore = useAppStore();
 const currentTheme = computed((): string => appStore.state.theme);
 
@@ -30,4 +40,3 @@ watch(currentTheme, (newVal: string) => {
   selectedColor.value = newVal;
 });
 </script>
-

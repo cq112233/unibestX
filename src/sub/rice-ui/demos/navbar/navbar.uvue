@@ -1,19 +1,25 @@
 <template>
   <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
-    <NavBar title="Navbar 导航栏" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
+    <NavBar title="Navbar 导航栏" />
     <view class="p-[16px]">
       <!-- 基础导航栏 -->
       <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
-        <text class="text-[14px] font-bold text-[#334155] mb-[12px] pl-[6px] border-l-[3px] border-solid" :style="{ borderLeftColor: currentTheme }">基础导航栏</text>
-        <view class="rounded-[8px] overflow-hidden border-width-[1px] border-solid border-color-[#e2e8f0]">
+        <view class="flex-row items-center mb-[12px]">
+          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px]" :style="{ backgroundColor: currentTheme }" />
+          <text class="text-[14px] font-bold text-[#334155]">基础导航栏</text>
+        </view>
+        <view class="rounded-[8px] overflow-hidden border border-solid border-[#e2e8f0]">
           <rice-navbar title="标题" :left-arrow="true" left-text="返回" :fixed="false" />
         </view>
       </view>
 
       <!-- 带右侧按钮导航栏 -->
       <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
-        <text class="text-[14px] font-bold text-[#334155] mb-[12px] pl-[6px] border-l-[3px] border-solid" :style="{ borderLeftColor: currentTheme }">带右侧操作</text>
-        <view class="rounded-[8px] overflow-hidden border-width-[1px] border-solid border-color-[#e2e8f0]">
+        <view class="flex-row items-center mb-[12px]">
+          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px]" :style="{ backgroundColor: currentTheme }" />
+          <text class="text-[14px] font-bold text-[#334155]">带右侧操作</text>
+        </view>
+        <view class="rounded-[8px] overflow-hidden border border-solid border-[#e2e8f0]">
           <rice-navbar
             title="商品详情"
             :left-arrow="true"
@@ -26,8 +32,11 @@
 
       <!-- 自定义背景导航栏 -->
       <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
-        <text class="text-[14px] font-bold text-[#334155] mb-[12px] pl-[6px] border-l-[3px] border-solid" :style="{ borderLeftColor: currentTheme }">自定义背景与颜色</text>
-        <view class="rounded-[8px] overflow-hidden border-width-[1px] border-solid border-color-[#e2e8f0]">
+        <view class="flex-row items-center mb-[12px]">
+          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px]" :style="{ backgroundColor: currentTheme }" />
+          <text class="text-[14px] font-bold text-[#334155]">自定义背景与颜色</text>
+        </view>
+        <view class="rounded-[8px] overflow-hidden border border-solid border-[#e2e8f0]">
           <rice-navbar
             title="品牌主页"
             :left-arrow="true"
@@ -49,6 +58,13 @@
 import { useAppStore } from '@/src/store';
 import { computed } from 'vue';
 
+definePage({
+  style: {
+    navigationBarTitleText: 'Navbar 导航栏',
+    navigationStyle: 'custom'
+  }
+});
+
 const appStore = useAppStore();
 const currentTheme = computed((): string => appStore.state.theme);
 
@@ -59,4 +75,3 @@ function onClickRight() {
   });
 }
 </script>
-

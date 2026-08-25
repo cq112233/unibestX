@@ -1,10 +1,13 @@
 <template>
   <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
-    <NavBar title="Subsection 分段器" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
+    <NavBar title="Subsection 分段器" />
     <view class="p-[16px]">
       <!-- 基础分段器 -->
       <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
-        <text class="text-[14px] font-bold text-[#334155] mb-[12px] pl-[6px] border-l-[3px] border-solid" :style="{ borderLeftColor: currentTheme }">基础分段器 (圆角)</text>
+        <view class="flex-row items-center mb-[12px]">
+          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px]" :style="{ backgroundColor: currentTheme }" />
+          <text class="text-[14px] font-bold text-[#334155]">基础分段器 (圆角)</text>
+        </view>
         <rice-subsection v-model="currentIndex1" :list="list1" :active-color="currentTheme" shape="round" />
         <view class="mt-[12px]">
           <text class="text-[13px] text-[#64748b]">当前选中：{{ list1[currentIndex1] }}</text>
@@ -13,7 +16,10 @@
 
       <!-- 方形分段器 -->
       <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
-        <text class="text-[14px] font-bold text-[#334155] mb-[12px] pl-[6px] border-l-[3px] border-solid" :style="{ borderLeftColor: currentTheme }">方形分段器 (Square)</text>
+        <view class="flex-row items-center mb-[12px]">
+          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px]" :style="{ backgroundColor: currentTheme }" />
+          <text class="text-[14px] font-bold text-[#334155]">方形分段器 (Square)</text>
+        </view>
         <rice-subsection v-model="currentIndex2" :list="list2" :active-color="currentTheme" shape="square" />
         <view class="mt-[12px]">
           <text class="text-[13px] text-[#64748b]">当前选中：{{ list2[currentIndex2] }}</text>
@@ -27,6 +33,13 @@
 import { useAppStore } from '@/src/store';
 import { computed } from 'vue';
 
+definePage({
+  style: {
+    navigationBarTitleText: 'Subsection 分段器',
+    navigationStyle: 'custom'
+  }
+});
+
 const appStore = useAppStore();
 const currentTheme = computed((): string => appStore.state.theme);
 
@@ -36,4 +49,3 @@ const currentIndex2 = ref(1);
 const list1 = ['全部', '待付款', '待收货', '已完成'];
 const list2 = ['日报', '周报', '月报'];
 </script>
-

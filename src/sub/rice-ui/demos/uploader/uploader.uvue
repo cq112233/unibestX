@@ -1,10 +1,13 @@
 <template>
   <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
-    <NavBar title="Uploader 上传" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
+    <NavBar title="Uploader 上传" />
     <view class="p-[16px]">
       <!-- 基础图片上传 -->
       <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
-        <text class="text-[14px] font-bold text-[#334155] mb-[12px] pl-[6px] border-l-[3px] border-solid" :style="{ borderLeftColor: currentTheme }">图片上传与预览</text>
+        <view class="flex-row items-center mb-[12px]">
+          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px]" :style="{ backgroundColor: currentTheme }" />
+          <text class="text-[14px] font-bold text-[#334155]">图片上传与预览</text>
+        </view>
         <rice-uploader
           :model-value="fileList"
           :max-count="3"
@@ -20,6 +23,13 @@ import { useAppStore } from '@/src/store';
 import type { UploaderFileItem } from '@/uni_modules/rice-ui';
 import { computed, ref } from 'vue';
 
+definePage({
+  style: {
+    navigationBarTitleText: 'Uploader 上传',
+    navigationStyle: 'custom'
+  }
+});
+
 const appStore = useAppStore();
 const currentTheme = computed((): string => appStore.state.theme);
 
@@ -33,4 +43,3 @@ function onUpdateFileList(files: UploaderFileItem[]) {
   fileList.value = files;
 }
 </script>
-

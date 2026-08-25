@@ -1,10 +1,13 @@
 <template>
   <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
-    <NavBar title="Grid 宫格" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
+    <NavBar title="Grid 宫格" />
     <view class="p-[16px]">
       <!-- 基础 4 宫格 -->
       <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
-        <text class="text-[14px] font-bold text-[#334155] mb-[12px] pl-[6px] border-l-[3px] border-solid" :style="{ borderLeftColor: currentTheme }">基础 4 宫格</text>
+        <view class="flex-row items-center mb-[12px]">
+          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px]" :style="{ backgroundColor: currentTheme }" />
+          <text class="text-[14px] font-bold text-[#334155]">基础 4 宫格</text>
+        </view>
         <rice-grid :column-num="4">
           <rice-grid-item icon="photo" :icon-color="currentTheme" text="相册" />
           <rice-grid-item icon="search" :icon-color="currentTheme" text="发现" />
@@ -15,7 +18,10 @@
 
       <!-- 3 宫格与点击事件 -->
       <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
-        <text class="text-[14px] font-bold text-[#334155] mb-[12px] pl-[6px] border-l-[3px] border-solid" :style="{ borderLeftColor: currentTheme }">3 宫格带角标</text>
+        <view class="flex-row items-center mb-[12px]">
+          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px]" :style="{ backgroundColor: currentTheme }" />
+          <text class="text-[14px] font-bold text-[#334155]">3 宫格带角标</text>
+        </view>
         <rice-grid :column-num="3">
           <rice-grid-item icon="volume" :icon-color="currentTheme" text="消息" badge="9+" />
           <rice-grid-item icon="user" :icon-color="currentTheme" text="个人中心" />
@@ -30,7 +36,13 @@
 import { useAppStore } from '@/src/store';
 import { computed } from 'vue';
 
+definePage({
+  style: {
+    navigationBarTitleText: 'Grid 宫格',
+    navigationStyle: 'custom'
+  }
+});
+
 const appStore = useAppStore();
 const currentTheme = computed((): string => appStore.state.theme);
 </script>
-

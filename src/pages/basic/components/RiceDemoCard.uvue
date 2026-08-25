@@ -1,0 +1,65 @@
+<template>
+  <Card title="rice-ui 组件库">
+    <view class="flex-col mb-[16px]">
+      <text class="text-[13px] text-[#64748b] leading-[18px] mb-[12px]">
+        rice-ui 是一款专为 uni-app X 设计的高品质 UI 组件库，高度适配 UTS 强类型系统与原生跨端开发，包含按钮、表单、反馈等丰富且精美的组件集。
+      </text>
+
+      <!-- 官网网址提示 -->
+      <view class="flex-row items-center bg-[#f1f5f9] p-[8px] rounded-[6px] mb-[12px]" @click="copyWebsiteUrl">
+        <text class="text-[12px] text-[#475569] font-medium mr-[4px]">官网：</text>
+        <text class="text-[12px] text-[#2563eb] underline flex-1">https://riceui.cn/</text>
+        <text class="text-[11px] text-[#94a3b8]">点击复制</text>
+      </view>
+
+      <!-- 亮点标签点缀 -->
+      <view class="flex-row items-center mb-[4px] flex-wrap">
+        <view class="mr-[6px] mb-[4px] px-[10px] py-[3px] rounded-[20px] bg-[#e0edff] border-[1px] border-solid border-[#bfdbfe]">
+          <text class="text-[11px] text-[#2563eb]">高品质组件</text>
+        </view>
+        <view class="mr-[6px] mb-[4px] px-[10px] py-[3px] rounded-[20px] bg-[#d1fae5] border-[1px] border-solid border-[#a7f3d0]">
+          <text class="text-[11px] text-[#059669]">原生 UTS 支持</text>
+        </view>
+        <view class="mb-[4px] px-[10px] py-[3px] rounded-[20px] bg-[#fef3c7] border-[1px] border-solid border-[#fde68a]">
+          <text class="text-[11px] text-[#d97706] ">跨端一致性</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 进入演示页面按钮 -->
+    <view
+      class="w-full h-[44px] rounded-[8px] bg-[#3b82f6] flex flex-row items-center justify-center"
+      @click="navigateToShowcase"
+    >
+      <text class="text-[#ffffff] text-[14px] font-bold">进入 rice-ui 示例</text>
+    </view>
+  </Card>
+</template>
+
+<script setup lang="uts">
+import Card from './Card.uvue';
+
+function copyWebsiteUrl() {
+  uni.setClipboardData({
+    data: 'https://riceui.cn/',
+    success: () => {
+      uni.showToast({
+        title: '官网网址已复制到剪贴板',
+        icon: 'none'
+      });
+    }
+  });
+}
+
+function navigateToShowcase() {
+  uni.navigateTo({
+    url: '/src/sub/rice-ui/rice-ui',
+    fail: (err) => {
+      console.error('navigateToShowcase fail:', err);
+    }
+  });
+}
+</script>
+
+<style>
+</style>

@@ -1,13 +1,16 @@
 <template>
   <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
-    <NavBar title="SwipeActions 滑动单元格" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
+    <NavBar title="SwipeActions 滑动单元格" />
     <view class="p-[16px]">
       <!-- 基础左滑操作 -->
       <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
-        <text class="text-[14px] font-bold text-[#334155] mb-[12px] pl-[6px] border-l-[3px] border-solid" :style="{ borderLeftColor: currentTheme }">向左滑动（基础右侧菜单）</text>
+        <view class="flex-row items-center mb-[12px]">
+          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px]" :style="{ backgroundColor: currentTheme }" />
+          <text class="text-[14px] font-bold text-[#334155]">向左滑动（基础右侧菜单）</text>
+        </view>
         <rice-swipe-actions>
           <rice-swipe-actions-item :right-menu="rightOptions" @click="onClickAction">
-            <view class="p-[16px] bg-white border-bottom-width-[1px] border-bottom-style-solid border-bottom-color-[#f1f5f9] flex-row items-center justify-between">
+            <view class="p-[16px] bg-white border-b border-solid border-[#f1f5f9] flex-row items-center justify-between">
               <view class="flex-col">
                 <text class="text-[14px] text-[#334155] font-medium">👈 向左滑动单元格 1</text>
                 <text class="text-[12px] text-[#94a3b8] mt-[4px]">支持收藏与删除操作</text>
@@ -29,7 +32,10 @@
 
       <!-- 双向滑动操作 -->
       <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
-        <text class="text-[14px] font-bold text-[#334155] mb-[12px] pl-[6px] border-l-[3px] border-solid" :style="{ borderLeftColor: currentTheme }">双向滑动（左右均有菜单）</text>
+        <view class="flex-row items-center mb-[12px]">
+          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px]" :style="{ backgroundColor: currentTheme }" />
+          <text class="text-[14px] font-bold text-[#334155]">双向滑动（左右均有菜单）</text>
+        </view>
         <rice-swipe-actions>
           <rice-swipe-actions-item :left-menu="leftOptions" :right-menu="rightOptions" @click="onClickAction">
             <view class="p-[16px] bg-white flex-row items-center justify-between">
@@ -49,6 +55,13 @@
 import { useAppStore } from '@/src/store';
 import type { SwipeActionsItemClick, SwipeActionsMenu } from '@/uni_modules/rice-ui';
 import { computed } from 'vue';
+
+definePage({
+  style: {
+    navigationBarTitleText: 'SwipeActions 滑动单元格',
+    navigationStyle: 'custom'
+  }
+});
 
 const appStore = useAppStore();
 const currentTheme = computed((): string => appStore.state.theme);
@@ -90,4 +103,3 @@ function onClickAction(e: SwipeActionsItemClick) {
   });
 }
 </script>
-

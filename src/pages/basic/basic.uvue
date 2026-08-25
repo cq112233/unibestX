@@ -2,7 +2,7 @@
   <view class="flex-col">
     <view class="flex-col">
       <!-- rice-ui 组件库入口 -->
-      <RiceUiDemoCard />
+      <RiceDemoCard />
 
       <!-- weapp-tailwindcss 样式引擎示例 -->
       <TailwindcssDemoCard />
@@ -38,7 +38,7 @@
 import ToastDemoCard from './components/ToastDemoCard.uvue';
 import PropsDemoCard from './components/PropsDemoCard.uvue';
 import IconDemoCard from './components/IconDemoCard.uvue';
-import RiceUiDemoCard from './components/RiceUiDemoCard.uvue';
+import RiceDemoCard from './components/RiceDemoCard.uvue';
 import LangSwitchCard from './components/LangSwitchCard.uvue';
 import ThemeSwitchCard from './components/ThemeSwitchCard.uvue';
 import RouterDemoCard from './components/RouterDemoCard.uvue';
@@ -51,7 +51,8 @@ import { handleBackPressExit } from '@/src/utils/backPress';
 definePage({
   layout: false,
   style: {
-    navigationBarTitleText: '基础'
+    navigationBarTitleText: '基础',
+    disableScroll: true
   }
 });
 

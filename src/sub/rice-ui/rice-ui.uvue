@@ -1,11 +1,6 @@
 <template>
   <view class=" pb-[50px]" :class="isDarkMode ? 'bg-[#121212]' : 'bg-[#f8fafc]'">
-    <NavBar
-      title="Rice UI 组件演示"
-      :auto-back="true"
-      :safe-area-inset-top="true"
-      :bg-color="isDarkMode ? '#1e1e1e' : '#ffffff'"
-    ></NavBar>
+    <NavBar title="Rice UI 组件演示" />
 
     <!-- 顶部 Banner -->
     <view
@@ -333,8 +328,8 @@
 
 <script setup lang="uts">
 import { useAppStore } from '@/src/store';
-import { isDark, setTheme } from '@/uni_modules/rice-ui';
-import { computed } from 'vue';
+import { setTheme } from '@/uni_modules/rice-ui';
+import { computed, watch } from 'vue';
 
 definePage({
   style: {
@@ -349,16 +344,22 @@ const currentTheme = computed((): string => {
 });
 
 const isDarkMode = computed((): boolean => {
-  return isDark.value;
+  return appStore.state.isDark;
 });
 
+// 监听全局暗黑模式变化，同步更新 rice-ui 内部主题
+watch(
+  (): boolean => appStore.state.isDark,
+  (dark: boolean) => {
+    setTheme(dark ? 'dark' : 'light');
+  },
+  { immediate: true }
+);
+
 function toggleTheme() {
-  if (isDarkMode.value) {
-    setTheme('light');
-  }
-  else {
-    setTheme('dark');
-  }
+  const nextMode = appStore.state.isDark ? 'light' : 'dark';
+  appStore.setThemeMode(nextMode);
+  setTheme(nextMode);
 }
 
 function goToDemo(page: string) {

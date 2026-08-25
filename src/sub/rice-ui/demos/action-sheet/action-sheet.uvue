@@ -1,10 +1,13 @@
 <template>
   <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
-    <NavBar title="ActionSheet 动作面板" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
+    <NavBar title="ActionSheet 动作面板" />
     <view class="p-[16px]">
       <!-- 基础动作面板 -->
       <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
-        <text class="text-[14px] font-bold text-[#334155] mb-[12px] pl-[6px] border-l-[3px] border-solid" :style="{ borderLeftColor: currentTheme }">基础用法</text>
+        <view class="flex-row items-center mb-[12px]">
+          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px]" :style="{ backgroundColor: currentTheme }" />
+          <text class="text-[14px] font-bold text-[#334155]">基础用法</text>
+        </view>
         <rice-button type="primary" :color="currentTheme" text="打开基础动作面板" @click="showActionSheet1 = true" />
         <rice-action-sheet
           v-model:show="showActionSheet1"
@@ -17,7 +20,10 @@
 
       <!-- 包含危险状态与副标题 -->
       <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
-        <text class="text-[14px] font-bold text-[#334155] mb-[12px] pl-[6px] border-l-[3px] border-solid" :style="{ borderLeftColor: currentTheme }">状态展示</text>
+        <view class="flex-row items-center mb-[12px]">
+          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px]" :style="{ backgroundColor: currentTheme }" />
+          <text class="text-[14px] font-bold text-[#334155]">状态展示</text>
+        </view>
         <rice-button type="warning" text="打开带描述动作面板" @click="showActionSheet2 = true" />
         <rice-action-sheet
           v-model:show="showActionSheet2"
@@ -34,6 +40,13 @@
 import { useAppStore } from '@/src/store';
 import type { ActionSheetAction } from '@/uni_modules/rice-ui';
 import { computed } from 'vue';
+
+definePage({
+  style: {
+    navigationBarTitleText: 'ActionSheet 动作面板',
+    navigationStyle: 'custom'
+  }
+});
 
 const appStore = useAppStore();
 const currentTheme = computed((): string => appStore.state.theme);
@@ -60,4 +73,3 @@ function onSelect(action: ActionSheetAction) {
   });
 }
 </script>
-

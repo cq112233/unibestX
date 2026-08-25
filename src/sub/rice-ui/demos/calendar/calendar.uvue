@@ -1,11 +1,14 @@
 <template>
   <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
-    <NavBar title="Calendar 日历" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
+    <NavBar title="Calendar 日历" />
     <view class="p-[16px]">
       <!-- 基础内联日历 -->
       <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
-        <text class="text-[14px] font-bold text-[#334155] mb-[12px] pl-[6px] border-l-[3px] border-solid" :style="{ borderLeftColor: currentTheme }">内嵌日历展示</text>
-        <view class="rounded-[8px] overflow-hidden border-width-[1px] border-solid border-color-[#e2e8f0]">
+        <view class="flex-row items-center mb-[12px]">
+          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px]" :style="{ backgroundColor: currentTheme }" />
+          <text class="text-[14px] font-bold text-[#334155]">内嵌日历展示</text>
+        </view>
+        <view class="rounded-[8px] overflow-hidden border border-solid border-[#e2e8f0]">
           <rice-calendar :use-popup="false" :show-title="true" :color="currentTheme" title="选择日期" @confirm="onDateConfirm" />
         </view>
         <view class="mt-[10px]">
@@ -15,7 +18,10 @@
 
       <!-- 弹窗式日历 -->
       <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
-        <text class="text-[14px] font-bold text-[#334155] mb-[12px] pl-[6px] border-l-[3px] border-solid" :style="{ borderLeftColor: currentTheme }">弹窗模式 (Popup)</text>
+        <view class="flex-row items-center mb-[12px]">
+          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px]" :style="{ backgroundColor: currentTheme }" />
+          <text class="text-[14px] font-bold text-[#334155]">弹窗模式 (Popup)</text>
+        </view>
         <rice-button type="primary" :color="currentTheme" text="打开弹窗日历" @click="showPopupCalendar = true" />
         <rice-calendar v-model:show="showPopupCalendar" :use-popup="true" :color="currentTheme" title="弹窗选择日期" @confirm="onPopupDateConfirm" />
         <view v-if="popupSelectedDate != ''" class="mt-[10px]">
@@ -29,6 +35,13 @@
 <script setup lang="uts">
 import { useAppStore } from '@/src/store';
 import { computed } from 'vue';
+
+definePage({
+  style: {
+    navigationBarTitleText: 'Calendar 日历',
+    navigationStyle: 'custom'
+  }
+});
 
 const appStore = useAppStore();
 const currentTheme = computed((): string => appStore.state.theme);
@@ -46,4 +59,3 @@ function onPopupDateConfirm(val: any) {
   showPopupCalendar.value = false;
 }
 </script>
-

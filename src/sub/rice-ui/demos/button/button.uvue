@@ -1,10 +1,13 @@
 <template>
   <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
-    <NavBar title="Button 按钮" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
+    <NavBar title="Button 按钮" />
     <view class="p-[16px]">
       <!-- 基础用法 -->
       <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
-        <text class="text-[14px] font-bold text-[#334155] mb-[12px] pl-[6px] border-l-[3px] border-solid" :style="{ borderLeftColor: currentTheme }">按钮类型</text>
+        <view class="flex-row items-center mb-[12px]">
+          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px]" :style="{ backgroundColor: currentTheme }" />
+          <text class="text-[14px] font-bold text-[#334155]">按钮类型</text>
+        </view>
         <view class="flex-col">
           <view class="mb-[10px]">
             <rice-button type="primary" :color="currentTheme" text="主要按钮" />
@@ -29,7 +32,10 @@
 
       <!-- 朴素按钮 -->
       <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
-        <text class="text-[14px] font-bold text-[#334155] mb-[12px] pl-[6px] border-l-[3px] border-solid" :style="{ borderLeftColor: currentTheme }">朴素按钮 (Plain)</text>
+        <view class="flex-row items-center mb-[12px]">
+          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px]" :style="{ backgroundColor: currentTheme }" />
+          <text class="text-[14px] font-bold text-[#334155]">朴素按钮 (Plain)</text>
+        </view>
         <view class="flex-row items-center flex-wrap">
           <view class="mr-[10px] mb-[10px]">
             <rice-button type="primary" :color="currentTheme" text="朴素主要" :plain="true" />
@@ -48,7 +54,10 @@
 
       <!-- 按钮尺寸 -->
       <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
-        <text class="text-[14px] font-bold text-[#334155] mb-[12px] pl-[6px] border-l-[3px] border-solid" :style="{ borderLeftColor: currentTheme }">按钮尺寸 (Size)</text>
+        <view class="flex-row items-center mb-[12px]">
+          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px]" :style="{ backgroundColor: currentTheme }" />
+          <text class="text-[14px] font-bold text-[#334155]">按钮尺寸 (Size)</text>
+        </view>
         <view class="flex-col">
           <view class="mb-[10px]">
             <rice-button type="primary" :color="currentTheme" text="大号按钮 (large)" size="large" />
@@ -67,7 +76,10 @@
 
       <!-- 图标与加载 -->
       <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
-        <text class="text-[14px] font-bold text-[#334155] mb-[12px] pl-[6px] border-l-[3px] border-solid" :style="{ borderLeftColor: currentTheme }">图标与加载状态</text>
+        <view class="flex-row items-center mb-[12px]">
+          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px]" :style="{ backgroundColor: currentTheme }" />
+          <text class="text-[14px] font-bold text-[#334155]">图标与加载状态</text>
+        </view>
         <view class="flex-row items-center flex-wrap">
           <view class="mr-[10px] mb-[10px]">
             <rice-button type="primary" :color="currentTheme" icon="search" text="搜索" />
@@ -86,7 +98,10 @@
 
       <!-- 形状与自定义颜色 -->
       <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
-        <text class="text-[14px] font-bold text-[#334155] mb-[12px] pl-[6px] border-l-[3px] border-solid" :style="{ borderLeftColor: currentTheme }">形状与自定义颜色</text>
+        <view class="flex-row items-center mb-[12px]">
+          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px]" :style="{ backgroundColor: currentTheme }" />
+          <text class="text-[14px] font-bold text-[#334155]">形状与自定义颜色</text>
+        </view>
         <view class="flex-row items-center flex-wrap">
           <view class="mr-[10px] mb-[10px]">
             <rice-button type="primary" :color="currentTheme" shape="round" text="圆形按钮" />
@@ -107,7 +122,13 @@
 import { useAppStore } from '@/src/store';
 import { computed } from 'vue';
 
+definePage({
+  style: {
+    navigationBarTitleText: 'Button 按钮',
+    navigationStyle: 'custom'
+  }
+});
+
 const appStore = useAppStore();
 const currentTheme = computed((): string => appStore.state.theme);
 </script>
-
