@@ -25,17 +25,21 @@
 > - 最好升级至最新 **HBuilderX 5.24 版本**，完整体验无虚拟 DOM 高性能原生渲染；
 > - 旧版本可切换 **VDOM 模式**（`manifest.json` 中 `"vapor": false`）稳定运行。
 
-> ⚡ **渲染模式说明**
+> ⚡ **渲染模式与组件库分支说明**
 >
-> 1. 🚀 **main 分支全面兼容 VDOM 模式与 Vapor 模式（默认 Vapor 蒸汽模式）**：
->    - `main` 分支现已全面兼通 Vue3 传统 **VDOM 模式** 与 **Vapor 模式**（蒸汽模式，无虚拟 DOM 高性能原生渲染）；
->    - **默认采用 Vapor 蒸汽模式**，开发者可在 `manifest.json` 中按需切换回 VDOM 模式。
-> 2. 🌟 **推荐分支：`uniX-rice-ui`（集成 Rice UI 组件库）**：
->    - 如需集成完整现代 UI 组件库（Rice UI 官方支持，团队持续更新，完美支持 VDOM 与 Vapor 模式），推荐切换使用 **`uniX-rice-ui`** 分支。
+> 1. 🚀 **main 主分支（纯净轻量底座，无内置 UI 库，默认 Vapor 蒸汽模式）**：
+>    - `main` 分支已去除内置第三方 UI 库，作为轻量纯净底座，方便开发者自由选型或基于 Tailwind CSS 灵活封装；
+>    - 全面兼容 Vue3 传统 **VDOM 模式** 与 **Vapor 模式**（蒸汽模式，无虚拟 DOM 高性能原生渲染），**默认采用 Vapor 蒸汽模式**，开发者可在 `manifest.json` 中按需切换回 VDOM 模式。
+> 2. 🌟 **想一键开箱即用的成套组件库？请选用以下专属分支**：
+>    - **`uniX-rice-ui` 分支（强烈推荐）**：集成 **Rice UI** 组件库（40 来个组件），由 Rice UI 官方团队**持续在维护**，完美兼容 VDOM 与 Vapor 模式；
+>    - **`uniX-uview-ultra` 分支**：集成 **uview-ultra** 组件库（80 来个组件），作者本人**不再做定制维护**，由 uview-ultra 官方维护，后续若有新需求可自行导入官方版本调试使用。
 >
 > ```bash
-> # 切换至 uniX-rice-ui 分支
+> # 切换至 Rice UI 官方支持分支（推荐）
 > git checkout uniX-rice-ui
+>
+> # 切换至 uview-ultra 分支
+> git checkout uniX-uview-ultra
 > ```
 
 > ⚠️ **三方组件库与插件修改说明**
@@ -76,26 +80,29 @@
 - **方式一：通过 `degit` 快速创建（推荐，无历史提交记录）**：
 
   ```bash
-  # 主分支（main，默认 Vapor 蒸汽模式，全面兼通 VDOM & Vapor）
+  # 1. 主分支（main，轻量纯净底座，无内置 UI 库，默认 Vapor 蒸汽模式）
   npx degit cq112233/unibestX my-project
 
-  # Rice UI 官方支持分支（强烈推荐，团队持续维护，支持 VDOM & Vapor 模式）
+  # 2. Rice UI 专属分支（强烈推荐，40+ 组件，团队持续维护，支持 VDOM & Vapor 模式）
   npx degit cq112233/unibestX#uniX-rice-ui my-project
+
+  # 3. uview-ultra 专属分支（80+ 组件，官方维护）
+  npx degit cq112233/unibestX#uniX-uview-ultra my-project
   ```
 
 - **方式二：通过 `git clone` 克隆**：
 
   ```bash
-  # GitHub
+  # 克隆主分支（main）
   git clone https://github.com/cq112233/unibestX.git
   cd unibestX
 
-  # Gitee（国内加速推荐）
-  git clone https://gitee.com/htwoO-cq/uni-best-x.git
-  cd uni-best-x
-
-  # 或克隆 Rice UI 官方支持分支（推荐）
+  # 克隆 Rice UI 专属分支（强烈推荐）
   git clone -b uniX-rice-ui https://github.com/cq112233/unibestX.git
+  cd unibestX
+
+  # 克隆 uview-ultra 专属分支
+  git clone -b uniX-uview-ultra https://github.com/cq112233/unibestX.git
   cd unibestX
   ```
 
@@ -196,20 +203,23 @@ pnpm build:h5
 - **H5 平台**：在 HBuilderX 中选择 `发行 → 网站-H5手机版`，打包后的文件在 `unpackage/dist/build/web`。
 - **微信小程序**：在 HBuilderX 中选择 `发行 → 小程序-微信`，然后通过微信开发者工具上传。
 
-## 📦 推荐的 UI 组件库
+## 📦 推荐的 UI 组件库与分支方案
 
-`unibestX` 提供了多分支与多种 UI 组件库选择，你可以根据项目架构与需求灵活选用：
+`unibestX` 提供了轻量底座主分支与成套开箱即用的 UI 组件库分支，开发者可按需选用：
 
-| 组件库 | 简介 | 推荐分支 / 官网地址 | 维护状态 |
-| :--- | :--- | :--- | :--- |
-| **Rice UI（强烈推荐）** | 专为 uni-app X 打造的现代 UI 组件库，**完美支持 Vapor 蒸汽模式与 VDOM 模式无缝切换**，由 Rice UI 官方团队持续维护与技术支持。 | **`uniX-rice-ui` 分支** / [https://riceui.cn/](https://riceui.cn/) | 团队持续维护与迭代 |
-| **TMUI** | 功能丰富、高度可定制的企业级组件库，提供完善的业务组件和主题系统。 | [https://tmui.design/](https://tmui.design/) | 社区维护 |
-| **Lime UI** | 社区活跃的 uni-app X 组件库，组件风格清新，覆盖常用移动端场景。 | [https://limex.qcoon.cn/](https://limex.qcoon.cn/) | 社区维护 |
+| 组件库 / 分支 | 组件数量 | 简介 | 推荐分支 / 官网地址 | 维护状态 |
+| :--- | :--- | :--- | :--- | :--- |
+| **纯净底座（main 分支）** | - | **去除了内置第三方 UI 库**，作为纯净轻量工程骨架，适合自由选型或基于 Tailwind CSS 灵活开发。 | **`main` 分支** | 作者持续维护 |
+| **Rice UI（强烈推荐）** | 40 来个 | 专为 uni-app X 打造的现代 UI 组件库，**完美支持 Vapor 蒸汽模式与 VDOM 模式无缝切换**。 | **`uniX-rice-ui` 分支** / [https://riceui.cn/](https://riceui.cn/) | Rice UI 官方团队在维护 |
+| **uview-ultra** | 80 来个 | 组件生态丰富全面，覆盖大量移动端业务场景。 | **`uniX-uview-ultra` 分支** / [https://uview-ultra.em2048.com/](https://uview-ultra.em2048.com/) | 官方维护（作者本人不再做定制维护，到时可导入官方版自行调试） |
+| **TMUI** | 50+ | 功能丰富、高度可定制的企业级组件库，提供完善的业务组件和主题系统。 | [https://tmui.design/](https://tmui.design/) | 社区维护 |
+| **Lime UI** | 30+ | 社区活跃的 uni-app X 组件库，组件风格清新，覆盖常用移动端场景。 | [https://limex.qcoon.cn/](https://limex.qcoon.cn/) | 社区维护 |
 
 > 💡 **选型与分支建议**：
 >
-> 1. **主分支（`main`）**：全面兼容 **VDOM 模式** 与 **Vapor 模式**（**默认采用 Vapor 蒸汽模式**）。轻量化底座，开发者可按需引入任意喜爱的组件库或采用 Tailwind CSS 自行封装。
-> 2. **`uniX-rice-ui` 分支（强烈推荐）**：集成了由 **Rice UI 官方团队持续维护** 的组件库，同样完美支持 VDOM 和 Vapor 模式。若需要开箱即用的成套组件库，强烈建议选用 **`uniX-rice-ui`** 分支。
+> 1. **主分支（`main`）**：纯净轻量底座，已**去除内置第三方 UI 库**。全面兼容 **VDOM 模式** 与 **Vapor 模式**（**默认采用 Vapor 蒸汽模式**），方便按需引入任意喜爱的组件库或采用 Tailwind CSS 自行封装。
+> 2. **`uniX-rice-ui` 分支（强烈推荐）**：集成了 **Rice UI**（40 来个组件），由 Rice UI 官方团队在**持续维护与技术支持**，完美兼通 VDOM 和 Vapor 模式。想一键开箱即用成套组件库，强烈推荐该分支！
+> 3. **`uniX-uview-ultra` 分支**：集成了 **uview-ultra**（80 来个组件）。作者本人不再做定制维护，由 uview-ultra 官方维护，如需使用可在该分支开发，后续若遇问题可直接导入官方最新版自行调试。
 
 ## ✨ 特性
 
@@ -541,6 +551,7 @@ uploadFile({
 | 框架      | uni-app X (VDOM / Vapor) | 下一代 uni-app，默认 Vapor 蒸汽模式渲染，全面兼容传统 VDOM 模式 |
 | 语言      | UTS                   | uni-app Type Script，编译为原生 Kotlin/Swift |
 | 前端框架    | Vue 3                 | Composition API                        |
+| UI 组件库  | 多分支选型方案        | main 分支无内置 UI 库（纯净底座）；开箱即用可选 `uniX-rice-ui`（Rice UI 40+）/ `uniX-uview-ultra`（uview-ultra 80+） |
 | 构建工具    | Vite 5                | 极速开发体验                                 |
 | CSS 引擎  | Tailwind CSS           | v4 + weapp-tailwindcss，方括号任意值语法          |
 | 分页组件    | z-paging-x            | 强大的下拉刷新 + 分页加载                         |
