@@ -40,28 +40,22 @@ description: uni-app X (UTS) 开发规范与踩坑避坑指南，适用于跨端
             ```
 *   **按钮样式限制 (Button Layout Restrictions)**：
     在 App 原生平台下，系统底层的 `<button>` 元素是作为一个专门的文本对齐控件实现的。
-    *   **重要限制**：**禁止**在原生 `<button>` 元素上直接使用 `flex` 相关的对齐属性（如 `justify-content`, `align-items` 以及 UnoCSS 的 `justify-center`, `items-center`），否则会触发编译报错：
+    *   **重要限制**：**禁止**在原生 `<button>` 元素上直接使用 `flex` 相关的对齐属性（如 `justify-content`, `align-items` 以及 Tailwind 的 `justify-center`, `items-center`），否则会触发编译报错：
         > `style property justify-content|align-items is only supported on <view>|<scroll-view>|<list-view>|<list-item>|<flow-item>|<swiper-item>|<navigator>`
     *   *解决办法*：移除 `<button>` 上的 `justify-content` 和 `align-items` 样式（文本对齐一般使用 `text-align`）。如需使用复杂的 Flex 布局或带图标的自定义按钮，建议使用 `<view>` 作为外层容器进行 Flex 排版，内层使用普通文本或其它元素，或使用 UI 库提供的组件。
 *   **文字颜色样式限制 (Color Property Restrictions)**：
-    在 App 原生平台下，`color` 属性仅支持在 `<text>`, `<button>`, `<input>`, `<textarea>` 元素上使用。
-    *   **重要限制**：**禁止**在 `<view>` 元素上直接使用 `color` 属性（包括在应用于 `<view>` 的 class 中定义 `color`），否则会触发编译报错：
+    在 App 原生平台下，`color` 属性（如 Tailwind 的 `text-[#1e293b]`、`text-primary`）仅支持在 `<text>`, `<button>`, `<input>`, `<textarea>` 元素上使用。
+    *   **重要限制**：**禁止**在 `<view>` 元素上直接使用文字颜色类名，否则会触发编译报错：
         > `style property color is only supported on <text>|<button>|<input>|<textarea>`
-    *   *解决办法*：将 `color` 属性移到子级的 `<text>` 元素上进行渲染控制，或者移除 `<view>` 标签上冗余/无效的 `color` 定义。
-*   **UnoCSS 边框设置 (Border Utilities)**：
-    在 uni-app X 中使用 UnoCSS 设置边框时，不能使用合并写法（如 `border`、`border-2`、`border-solid border-gray-200`），必须将边框拆分为三个独立的属性分别设置：
-    *   `border-width-{值}` — 边框宽度，如 `border-width-5px`、`border-width-1px`
-    *   `border-color-{值}` — 边框颜色，支持任意值语法，如 `border-color-[#ccc]`、`border-color-[#e5e7eb]`
-    *   `border-solid` — 边框样式（实线）
-    *   *错误示例*：`border border-gray-200`（合并简写在 uni-app X 原生平台不生效）
-    *   *正确做法*：`border-width-1px border-color-[#e5e7eb] border-solid`（三个属性分开写）
-
+    *   *解决办法*：将文字颜色类名移到子级的 `<text>` 元素上进行渲染控制。
+*   **Tailwind CSS 边框设置 (Border Utilities)**：
+    在 uni-app X 中使用 Tailwind CSS 设置边框时，推荐使用明确指定宽度、颜色与实线样式的类名组合：
     ```html
-    <view class="border-width-5px border-color-[#ccc] border-solid"></view>
+    <view class="border-[1px] border-solid border-[#e2e8f0] rounded-[12px] p-[16px]"></view>
     ```
 
-*   **UnoCSS 字体族设置限制 (Font Family Utilities)**：
-    在 uni-app X 中**禁止**使用 UnoCSS 的 `font-mono`、`font-sans`、`font-serif` 等字体族工具类。这些类生成的 CSS 会被原生平台的严格解析器当作 `font` 简写属性处理，因缺少必需的 `font-size` 而报错：`[parse-css-font] Missing required font-size.`
+*   **Tailwind CSS 字体族设置限制 (Font Family Utilities)**：
+    在 uni-app X 中**禁止**使用 `font-mono`、`font-sans`、`font-serif` 等字体族工具类。这些类生成的 CSS 会被原生平台的严格解析器当作 `font` 简写属性处理，因缺少必需的 `font-size` 而报错：`[parse-css-font] Missing required font-size.`
     *   *错误示例*：`font-mono`（触发编译报错）
     *   *正确做法*：通过内联 `style="font-family: monospace;"` 设置字体族
 
@@ -74,31 +68,28 @@ description: uni-app X (UTS) 开发规范与踩坑避坑指南，适用于跨端
         ```
     *   如需在鸿蒙端单独收窄行距，可配合条件编译或 `harmony:` 变体调整内联样式的取值（如 `line-height: 22px`）。
 
-*   **Display 属性与 UnoCSS 类名限制 (Display Property Restrictions)**：
-    原生平台仅支持 `display: flex` 和 `display: none`。**禁止**使用 `display: grid` 或 `display: list-item`。
-    *   **重要踩坑**：由于 UnoCSS 会对源码进行全局正则扫描匹配，如果在模板中写入 `class="grid"` 或 `class="list-item"`，UnoCSS 会自动为你生成包含不支持 display 属性的原子 CSS，从而导致编译崩溃。
-    *   *解决办法*：将此类容易触发静态解析的类名重命名，如把 `list-item` 改为 `index-list-cell`。
+*   **Display 属性与类名限制 (Display Property Restrictions)**：
+    原生平台仅支持 `display: flex` 和 `display: none`。**禁止**使用 `display: grid` 或 `inline-block`。推荐全面使用 Tailwind 的 Flex 布局类名（`flex-row`、`flex-col`、`flex-1`）。
 
 *   **Position 属性不支持 sticky (Position Sticky Restriction)**：
     原生平台仅支持 `relative`, `absolute`, `fixed`。**不支持** `position: sticky`。
-    *   **重要踩坑**：在代码中（如 js/ts 字符串里）直接写 `'sticky'` 也会被 UnoCSS 静态提取并生成 `.sticky { position: sticky; }` 从而导致编译崩溃。
-    *   *解决办法*：打破字符串字面量以避开提取，如改为 `'sti' + 'cky'`。
 
 *   **高度属性限制 (Height Units)**：
     原生平台不支持 `vh`, `vw` 等视口单位。`height` 仅支持 `number`|`pixel`|`percent`|`auto`。
     *   *错误示例*：`height: 100vh`
-    *   *正确做法*：使用 `height: 100%` 或 Flex 布局的 `flex: 1`。
+    *   *正确做法*：使用 `flex-1`、`h-full` 或 `uni.getWindowInfo().windowHeight`。
 
 *   **Flex 布局中子元素高度塌陷 (Flex Child Height Collapse)**：
-    在 Flex 布局中，如果父元素是通过 `flex: 1` 撑开剩余空间，而没有显式的固定高度像素值，此时给子元素设置 `height: 100%`，在原生 Android/iOS 的底层布局引擎中，这个 `100%` 往往会被解析为 `0`（因为 100% 乘以 auto(0) 等于 0），导致内容完全消失或空白。
-    *   *解决办法*：废弃 `height: 100%` 的旧思维，直接给需要占满父元素的子元素也使用 `flex: 1`。
+    在 Flex 布局中，如果父元素是通过 `flex-1` 撑开剩余空间，而没有显式的固定高度像素值，此时给子元素设置 `h-full` (100%)，在原生 Android/iOS 的底层布局引擎中，这个 `100%` 往往会被解析为 `0`（因为 100% 乘以 auto(0) 等于 0），导致内容完全消失或空白。
+    *   *解决办法*：直接给需要占满父元素的子元素也使用 `flex-1`。
 
-*   **UnoCSS 对齐值限制 (Alignment Values)**：
-	    uni-app X 原生平台不支持 `justify-content: start` 和 `align-self: start`，必须使用 `flex-start`。已在 `vite.config.ts` 中通过自定义 rules 覆盖：
-	    *   `justify-start` → `justify-content: flex-start`
-	    *   `self-start` → `align-self: flex-start`
+*   **Tailwind 安全区工具类 (Safe Area Utilities)**：
+    项目在 `tailwind.config.ts` 中扩展了安全区工具类：
+    *   `p-safe` — 四周安全区内边距
+    *   `pt-safe` — 顶部安全区（状态栏）内边距
+    *   `pb-safe` — 底部安全区（Home 条）内边距
 
-	*SCSS 变量的动态化覆盖**：
+*   **SCSS 变量的动态化覆盖**：
     在 `uni.scss` 中引入第三方组件库的 SCSS 变量后，如需将某些编译期 SCSS 变量转化为运行时的动态 CSS 变量，可在 `uni.scss` 引入之后重新赋值：
     ```scss
     $app-primary: var(--theme-color, #0957DE);
