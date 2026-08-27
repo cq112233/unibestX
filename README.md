@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://github.com/cq112233/unibestX">
-    <img width="160" src="https://uniappx.oss-cn-beijing.aliyuncs.com/logo.png" style="border-radius: 20px;" alt="unibestX Logo">
+    <img width="160" src="https://i.ibb.co/rhtd2V7/logo.png" style="border-radius: 20px;" alt="unibestX Logo">
   </a>
 </p>
 
@@ -53,7 +53,7 @@
 
 📱 **手机扫码体验**👇
 
-<img src="static/qr-code.png" width="160" alt="H5 演示二维码" />
+<img src="https://i.ibb.co/bjcVVxbV/qr-code.png" width="160" alt="H5 演示二维码" />
 
 📖 **官方文档地址**：[https://cq112233.github.io/unibestX/docs/](https://cq112233.github.io/unibestX/docs/)
 
@@ -189,6 +189,7 @@ pnpm build:h5
 - **微信小程序**：需在微信公众平台后台配置 request 合法域名。
 
 **服务器要求：**
+
 - 安装 HBuilderX 官方 **Linux 版**（常见安装目录 `/opt/hbuilderx/HBuilderX`，命令行工具为 `cli`），或设置环境变量指定路径：`export HBUILDERX_CLI_PATH=/opt/hbuilderx/HBuilderX/cli`。
 - macOS / Windows 本机打包同样支持，脚本会自动查找常见安装路径（macOS 为 `/Applications/HBuilderX.app/Contents/MacOS/cli`）。
 - 脚本在构建前后会自动备份并还原 `pages.json`，不会污染工作区。
@@ -246,11 +247,11 @@ pnpm build:h5
 ## 📱 各端首页截图
 
 <p align="center">
-  <img src="https://uniappx.oss-cn-beijing.aliyuncs.com/wxxcx.png?t=Math.random()" width="19%" alt="微信小程序" />
-  <img src="https://uniappx.oss-cn-beijing.aliyuncs.com/android.png?t=Math.random()" width="19%" alt="Android" />
-  <img src="https://uniappx.oss-cn-beijing.aliyuncs.com/h5.png?t=Math.random()" width="19%" alt="H5" />
-  <img src="https://uniappx.oss-cn-beijing.aliyuncs.com/ios.png?t=Math.random()" width="19%" alt="iOS" />
-  <img src="https://uniappx.oss-cn-beijing.aliyuncs.com/hm.png?t=Math.random()" width="19%" alt="鸿蒙" />
+  <img src="https://i.ibb.co/xS0ssKm9/wxxcx.png" width="19%" alt="微信小程序" />
+  <img src="https://i.ibb.co/cSJ8wPbn/android.png" width="19%" alt="Android" />
+  <img src="https://i.ibb.co/Fbzwbzsx/h5.png" width="19%" alt="H5" />
+  <img src="https://i.ibb.co/7dpytqFJ/ios.png" width="19%" alt="iOS" />
+  <img src="https://i.ibb.co/MxXrjGq9/hm.png" width="19%" alt="鸿蒙" />
 </p>
 
 <p align="center">
@@ -590,7 +591,7 @@ Copyright (c) 2026 HTwoO
 👥 **QQ 技术交流群**：扫一扫下方二维码，或搜索群号 `983313908` 加入群聊！
 
 <p align='center'>
-  <img src="static/qq_uniBestX.jpg" width="220" alt="QQ 技术交流群" />
+  <img src="https://i.ibb.co/fdkLsmTv/qq-uni-Best-X.png" width="220" alt="QQ 技术交流群" />
 </p>
 
 ## 请作者喝杯咖啡 ☕
@@ -598,4 +599,4 @@ Copyright (c) 2026 HTwoO
 如果你觉得这个项目好用，可以请作者喝杯咖啡 ☕
 
 <p align='center'>
-<img alt="微信收款码" src="https://uniappx.oss-cn-beijing.aliyuncs.com/wx.jpg" height="330" style="display:inline-block; height:330px;">
+<img alt="微信收款码" src="https://i.ibb.co/rKHkpcHP/wx.jpg" height="330" style="display:inline-block; height:330px;">
