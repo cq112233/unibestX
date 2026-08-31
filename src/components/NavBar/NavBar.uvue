@@ -1,47 +1,66 @@
 <template>
-  <!-- 直接使用官方 uni-nav-bar 组件并优雅代理插槽 -->
-  <uni-nav-bar
-    :title="title"
-    :hide-default-back="true"
-    :navigation-bar-text-style="effectiveTitleColor"
-    :style="{ backgroundColor: effectiveBgColor }"
-  >
-    <!-- 左侧区域：外部传 slot 则显示外部内容，未传则展示默认返回箭头 -->
-    <template #left>
-      <slot name="left">
-        <view
-          v-if="showBack"
-          style="width: 44px; height: 44px; justify-content: center; align-items: center;"
-          @click="handleBack"
-        >
-          <view
-            style="width: 12px; height: 12px; transform: rotate(45deg); border-left-width: 2px; border-left-style: solid; border-bottom-width: 2px; border-bottom-style: solid;"
-            :style="{ borderLeftColor: effectiveTitleColor, borderBottomColor: effectiveTitleColor }"
-          />
-        </view>
-      </slot>
-    </template>
+  <view class="navbar-root">
+    <!-- 导航栏外层容器：支持 fixed 固定与 border 细分割线 -->
+    <view
+      :class="fixed ? 'navbar-fixed' : ''"
+      :style="{
+        backgroundColor: effectiveBgColor,
+        borderBottomWidth: border ? '1px' : '0px',
+        borderBottomStyle: border ? 'solid' : 'none',
+        borderBottomColor: border ? '#e2e8f0' : 'transparent'
+      }"
+    >
+      <!-- 直接使用官方 uni-nav-bar 组件并优雅代理插槽 -->
+      <uni-nav-bar
+        :title="title"
+        :hide-default-back="true"
+        :navigation-bar-text-style="effectiveTitleColor"
+        :style="{ backgroundColor: 'transparent' }"
+      >
+        <!-- 左侧区域：外部传 slot 则显示外部内容，未传则展示默认返回箭头 -->
+        <template #left>
+          <slot name="left">
+            <view
+              v-if="showBack"
+              style="width: 44px; height: 44px; justify-content: center; align-items: center;"
+              @click="handleBack"
+            >
+              <view
+                style="width: 12px; height: 12px; transform: rotate(45deg); border-left-width: 2px; border-left-style: solid; border-bottom-width: 2px; border-bottom-style: solid;"
+                :style="{ borderLeftColor: effectiveTitleColor, borderBottomColor: effectiveTitleColor }"
+              />
+            </view>
+          </slot>
+        </template>
 
-    <!-- 中间区域：外部传 mid / default 插槽则展示，未传则展示标题 -->
-    <template #mid>
-      <slot name="mid">
-        <slot>
-          <text
-            v-if="title.length > 0"
-            class="title-text"
-            :style="{ color: effectiveTitleColor }"
-          >
-            {{ title }}
-          </text>
-        </slot>
-      </slot>
-    </template>
+        <!-- 中间区域：外部传 mid / default 插槽则展示，未传则展示标题 -->
+        <template #mid>
+          <slot name="mid">
+            <slot>
+              <text
+                v-if="title.length > 0"
+                class="title-text"
+                :style="{ color: effectiveTitleColor }"
+              >
+                {{ title }}
+              </text>
+            </slot>
+          </slot>
+        </template>
 
-    <!-- 右侧区域 -->
-    <template #right>
-      <slot name="right" />
-    </template>
-  </uni-nav-bar>
+        <!-- 右侧区域 -->
+        <template #right>
+          <slot name="right" />
+        </template>
+      </uni-nav-bar>
+    </view>
+
+    <!-- 占位垫高块：当 fixed 且开启 placeholder 时，防止页面内容被遮挡 -->
+    <view
+      v-if="fixed && placeholder"
+      style="padding-top: var(--status-bar-height); height: 44px; box-sizing: content-box;"
+    />
+  </view>
 </template>
 
 <script setup lang="uts">
@@ -68,6 +87,18 @@ const props = defineProps({
   showBack: {
     type: Boolean,
     default: true
+  },
+  fixed: {
+    type: Boolean,
+    default: true
+  },
+  placeholder: {
+    type: Boolean,
+    default: true
+  },
+  border: {
+    type: Boolean,
+    default: false
   }
 });
 
@@ -99,6 +130,18 @@ function handleBack() {
 </script>
 
 <style>
+.navbar-root {
+  width: 100%;
+}
+
+.navbar-fixed {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 999;
+}
+
 .title-text {
   font-size: 17px;
   font-weight: 600;
