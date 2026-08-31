@@ -1,6 +1,6 @@
 <template>
   <view class="page-container bg-[#f8fafc] flex flex-col flex-1 h-full">
-    <NavBar title="up-list 双列表嵌套" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
+    <!-- <NavBar title="up-list 双列表嵌套" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar> -->
 
     <!-- 嵌套滚动外层容器 -->
     <scroll-view type="nested" direction="vertical" class="flex-1 h-0">
@@ -55,12 +55,24 @@
 
 <script setup lang="uts">
 import { ref } from 'vue';
+import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/utils/refresh';
 
 definePage({
+  layout: 'navbar',
+  enablePullDownRefresh: false,
   style: {
     navigationStyle: 'custom',
     navigationBarTitleText: 'up-list 双列表嵌套'
   }
+});
+
+// 监听 navbar 自定义下拉刷新事件（在 enablePullDownRefresh: true 时生效）
+onNavbarPullDownRefresh(() => {
+  // 执行下拉刷新业务逻辑（如重新请求接口获取最新数据）
+  setTimeout(() => {
+    // 数据加载完毕后，手动停止下拉刷新动画状态
+    stopNavbarPullDownRefresh();
+  }, 1000);
 });
 
 const listItems = ref([
