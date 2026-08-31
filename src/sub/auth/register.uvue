@@ -15,6 +15,17 @@
 <script setup lang="uts">
 import { LOGIN_PAGE } from '../../router/config';
 
+definePage({
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
+  style: {
+    navigationBarTitleText: '注册',
+    navigationStyle: 'custom'
+  }
+});
+
 function doRegister() {
   uni.showToast({
     title: '注册成功',

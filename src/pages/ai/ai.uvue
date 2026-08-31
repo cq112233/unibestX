@@ -1,8 +1,5 @@
 <template>
-  <view class="page-root">
-    <!-- 自定义导航栏 -->
-    <NavBar title="AI 智能助手" :show-back="true" />
-
+  <view class="page-root flex-1 flex flex-col">
     <!-- 消息滚动区 -->
     <scroll-view
       class="flex-1 px-[15px] py-[10px]"
@@ -73,13 +70,14 @@
 </template>
 
 <script setup lang="uts">
-import NavBar from '@/src/components/NavBar/NavBar.uvue';
 import { safeAreaInsets } from '@/src/utils/systemInfo';
 
 definePage({
-  layout: false,
+  layout: 'navbar',
+  showBack: true,
   style: {
-    navigationBarTitleText: 'ai'
+    navigationBarTitleText: 'AI 智能助手',
+    navigationStyle: 'custom'
   }
 });
 

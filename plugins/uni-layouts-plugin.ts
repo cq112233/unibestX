@@ -160,17 +160,10 @@ export default function uniLayoutsPlugin(options: UniLayoutsOptions = {}) {
 
           const params: Record<string, any> = {};
           Object.keys(page).forEach((key) => {
-            if (key !== 'path' && key !== 'style' && key !== 'layout') {
+            if (key !== 'path' && key !== 'layout') {
               params[key] = page[key];
             }
           });
-          if (page.style) {
-            Object.keys(page.style).forEach((key) => {
-              if (key !== 'layout') {
-                params[key] = page.style[key];
-              }
-            });
-          }
 
           pageLayouts.set(normPath, { layout, params });
         });
@@ -197,17 +190,10 @@ export default function uniLayoutsPlugin(options: UniLayoutsOptions = {}) {
 
             const params: Record<string, any> = {};
             Object.keys(page).forEach((key) => {
-              if (key !== 'path' && key !== 'style' && key !== 'layout') {
+              if (key !== 'path' && key !== 'layout') {
                 params[key] = page[key];
               }
             });
-            if (page.style) {
-              Object.keys(page.style).forEach((key) => {
-                if (key !== 'layout') {
-                  params[key] = page.style[key];
-                }
-              });
-            }
 
             pageLayouts.set(combined, { layout, params });
           });
@@ -239,17 +225,25 @@ export default function uniLayoutsPlugin(options: UniLayoutsOptions = {}) {
     importPath: string;
   };
 
-  // 寻找布局文件，支持 .uvue 和 .vue 扩展名
+  // 寻找布局文件，支持 .uvue 和 .vue 扩展名及大小写兼容
   function resolveLayoutFile(layoutName: string): ResolvedLayout | null {
     const extensions = ['.uvue', '.vue'];
-    for (let j = 0; j < extensions.length; j++) {
-      const ext = extensions[j];
-      const filePath = path.join(layoutDir, `${layoutName}${ext}`);
-      if (fs.existsSync(filePath)) {
-        return {
-          fileName: `${layoutName}${ext}`,
-          importPath: `@/src/layouts/${layoutName}${ext}`
-        };
+    const candidates = Array.from(new Set([
+      layoutName,
+      layoutName.toLowerCase(),
+      kebabCase(layoutName),
+      layoutName.charAt(0).toUpperCase() + layoutName.slice(1)
+    ]));
+
+    for (const name of candidates) {
+      for (const ext of extensions) {
+        const filePath = path.join(layoutDir, `${name}${ext}`);
+        if (fs.existsSync(filePath)) {
+          return {
+            fileName: `${name}${ext}`,
+            importPath: `@/src/layouts/${name}${ext}`
+          };
+        }
       }
     }
     return null;
@@ -331,16 +325,7 @@ export default function uniLayoutsPlugin(options: UniLayoutsOptions = {}) {
             layoutName = definePageMeta.layout;
           }
           Object.keys(definePageMeta).forEach((key) => {
-            if (key === 'layout')
-              return;
-            if (key === 'style' && typeof definePageMeta.style === 'object' && definePageMeta.style !== null) {
-              Object.keys(definePageMeta.style).forEach((sk) => {
-                if (sk !== 'layout') {
-                  routeParams[sk] = definePageMeta.style[sk];
-                }
-              });
-            }
-            else {
+            if (key !== 'layout') {
               routeParams[key] = definePageMeta[key];
             }
           });
@@ -358,8 +343,8 @@ export default function uniLayoutsPlugin(options: UniLayoutsOptions = {}) {
         }
       }
 
-      // 合并 route 属性与 pages.json 里的 style 属性作为 props 传递
-      const mergedParams = {
+      // 合并 route 属性与 pages.json 里的属性作为 props 传递
+      const mergedParams: Record<string, any> = {
         ...(pageConfig ? pageConfig.params : {}),
         ...routeParams
       };
@@ -395,10 +380,10 @@ export default function uniLayoutsPlugin(options: UniLayoutsOptions = {}) {
         };
       }
 
-      // 7. 生成传给 Layout 的属性字符串（只传递基本标量类型，排除 style 对象以防产生 [object Object] 语法错误）
+      // 7. 生成传给 Layout 的属性字符串（标量与嵌套对象完整传递，不拍平）
       let attrs = '';
       Object.keys(mergedParams).forEach((key) => {
-        if (key === 'style' || key === 'layout')
+        if (key === 'layout')
           return;
         const val = mergedParams[key];
         if (typeof val === 'string') {
@@ -406,6 +391,11 @@ export default function uniLayoutsPlugin(options: UniLayoutsOptions = {}) {
         }
         else if (typeof val === 'number' || typeof val === 'boolean') {
           attrs += ` :${kebabCase(key)}="${val}"`;
+        }
+        else if (typeof val === 'object' && val !== null) {
+          // 为了避免与 Vue 原生 class/style 属性冲突，如果是 style 键映射为 page-style
+          const propName = key === 'style' ? 'page-style' : kebabCase(key);
+          attrs += ` :${propName}="${JSON.stringify(val).replace(/"/g, '\'')}"`;
         }
       });
 

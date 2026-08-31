@@ -25,7 +25,7 @@ import { ref } from 'vue';
 const copyText = ref('Hello unibestX!');
 
 function triggerVibration() {
-  // #ifdef APP || MP-WEIXIN || MP-ALIPAY
+  // #ifdef APP || MP-WEIXIN
   uni.vibrateShort({
     type: 'light',
     success: () => {
@@ -36,7 +36,7 @@ function triggerVibration() {
     }
   });
   // #endif
-  // #ifndef APP || MP-WEIXIN || MP-ALIPAY
+  // #ifndef APP || MP-WEIXIN
   uni.showToast({
     title: '当前环境不支持震动',
     icon: 'none'
