@@ -1,6 +1,5 @@
 <template>
   <view>
-    <NavBar title="首页" :show-back="false" />
     <view class="content-container">
       <image class="w-[100px] h-[100px] mx-auto mt-[20px] rounded-[20px]" src="/static/logo.png" />
       <text class="text-[26px] font-semibold mx-auto mt-[10px] text-[#d14328]">
@@ -117,14 +116,24 @@
 
 <script setup lang="uts">
 import { handleBackPressExit } from '../../utils/backPress.uts';
+import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '../../utils/refresh.uts';
 
 definePage({
   type: 'home',
-  layout: 'default',
+  layout: 'navbar',
+  showBack: false,
   style: {
     navigationBarTitleText: '首页',
-    navigationStyle: 'custom'
+    navigationStyle: 'custom',
+    enablePullDownRefresh: true
   }
+});
+
+onNavbarPullDownRefresh(() => {
+  // 执行下拉刷新业务逻辑（例如重新获取数据）
+  setTimeout(() => {
+    stopNavbarPullDownRefresh();
+  }, 1000);
 });
 
 onBackPress((options: OnBackPressOptions): boolean => {

@@ -3,6 +3,10 @@ import { checkDirectEntry } from './src/router/interceptor';
 import { useAppStore } from './src/store';
 
 onLaunch(() => {
+  // #ifndef MP-WEIXIN
+  uni.hideTabBar({ animation: false });
+  // #endif
+
   // 提前实例化 App Store（含持久化还原），并初始化外观模式：跟随系统 / 浅色 / 深色
   useAppStore().initThemeMode();
   // #ifdef MP-WEIXIN
@@ -22,11 +26,15 @@ onLaunch(() => {
   // #endif
 });
 
-// #ifndef APP
 onShow((options?) => {
+  // #ifndef MP-WEIXIN
+  uni.hideTabBar({ animation: false });
+  // #endif
+
+  // #ifndef APP
   checkDirectEntry(options);
+  // #endif
 });
-// #endif
 </script>
 
 <style lang="scss">

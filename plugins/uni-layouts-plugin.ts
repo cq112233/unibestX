@@ -239,17 +239,25 @@ export default function uniLayoutsPlugin(options: UniLayoutsOptions = {}) {
     importPath: string;
   };
 
-  // 寻找布局文件，支持 .uvue 和 .vue 扩展名
+  // 寻找布局文件，支持 .uvue 和 .vue 扩展名及大小写兼容
   function resolveLayoutFile(layoutName: string): ResolvedLayout | null {
     const extensions = ['.uvue', '.vue'];
-    for (let j = 0; j < extensions.length; j++) {
-      const ext = extensions[j];
-      const filePath = path.join(layoutDir, `${layoutName}${ext}`);
-      if (fs.existsSync(filePath)) {
-        return {
-          fileName: `${layoutName}${ext}`,
-          importPath: `@/src/layouts/${layoutName}${ext}`
-        };
+    const candidates = Array.from(new Set([
+      layoutName,
+      layoutName.toLowerCase(),
+      kebabCase(layoutName),
+      layoutName.charAt(0).toUpperCase() + layoutName.slice(1)
+    ]));
+
+    for (const name of candidates) {
+      for (const ext of extensions) {
+        const filePath = path.join(layoutDir, `${name}${ext}`);
+        if (fs.existsSync(filePath)) {
+          return {
+            fileName: `${name}${ext}`,
+            importPath: `@/src/layouts/${name}${ext}`
+          };
+        }
       }
     }
     return null;

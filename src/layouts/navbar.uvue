@@ -1,0 +1,168 @@
+<template>
+  <!-- NavBar 页面通用布局根容器 -->
+  <view class="navbar-layout flex-1 flex flex-col">
+    <!-- 顶部固定自定义导航栏：位于页面内容上方，不随下拉刷新位移 -->
+    <NavBar
+      :title="displayTitle"
+      :show-back="showBack"
+      :title-color="navTitleColor"
+      :bg-color="navBgColor"
+      :fixed="false"
+      :placeholder="false"
+      :border="border"
+    />
+
+    <!-- 当开启下拉刷新时：渲染支持 refresher 的独立滚动容器 -->
+    <scroll-view
+      v-if="enablePullDownRefresh"
+      direction="vertical"
+      class="flex-1"
+      :refresher-enabled="true"
+      :refresher-triggered="isTriggered"
+      :refresher-background="themeTokens.pageBg"
+      @refresherrefresh="handleRefresherRefresh"
+      @refresherrestore="handleRefresherRestore"
+    >
+      <slot />
+    </scroll-view>
+
+    <!-- 未开启下拉刷新时：渲染普通页面容器 -->
+    <scroll-view v-else class="flex-1 flex flex-col">
+      <slot />
+    </scroll-view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed, onMounted, onUnmounted, ref } from 'vue';
+import NavBar from '@/src/components/NavBar/NavBar.uvue';
+import { useAppStore } from '@/src/store';
+import { getThemeTokens } from '@/src/utils/theme';
+import type { ThemeTokens } from '@/src/utils/theme';
+
+/**
+ * 布局属性定义（由 uni-layouts-plugin 编译时自动从页面 definePage 或 pages.json 提取传入）
+ */
+const props = defineProps({
+  /** 导航栏标题（优先读取自 style.navigationBarTitleText） */
+  navigationBarTitleText: {
+    type: String,
+    default: ''
+  },
+  /** 导航栏备用标题（读取自 page.title） */
+  title: {
+    type: String,
+    default: ''
+  },
+  /** 是否显示左侧返回按钮（默认 true） */
+  showBack: {
+    type: Boolean,
+    default: true
+  },
+  /** 是否启用内容区域的下拉刷新（读取自 style.enablePullDownRefresh） */
+  enablePullDownRefresh: {
+    type: Boolean,
+    default: false
+  },
+  /** 导航栏背景色（读取自 style.navigationBarBackgroundColor） */
+  navigationBarBackgroundColor: {
+    type: String,
+    default: ''
+  },
+  /** 导航栏文字/按钮颜色（读取自 style.navigationBarTextStyle） */
+  navigationBarTextStyle: {
+    type: String,
+    default: ''
+  },
+  /** 导航栏备用背景色（读取自 page.bgColor） */
+  bgColor: {
+    type: String,
+    default: ''
+  },
+  /** 导航栏备用文字颜色（读取自 page.titleColor） */
+  titleColor: {
+    type: String,
+    default: ''
+  },
+  /** 导航栏底部是否显示 1px 细分割线 */
+  border: {
+    type: Boolean,
+    default: false
+  }
+});
+
+/** 下拉刷新状态控制：true 表示刷新中（展示 Loading），false 表示已复位收起 */
+const isTriggered = ref(false);
+
+/**
+ * 用户下拉触发刷新回调
+ */
+function handleRefresherRefresh() {
+  isTriggered.value = true;
+  // 向页面派发下拉刷新通知事件
+  uni.$emit('onPagePullDownRefresh');
+}
+
+/**
+ * 下拉刷新复位完成事件
+ */
+function handleRefresherRestore() {
+  isTriggered.value = false;
+}
+
+/**
+ * 接收页面业务层发出的停止刷新通知（stopNavbarPullDownRefresh）
+ */
+function onStopRefresh() {
+  isTriggered.value = false;
+}
+
+// 挂载时注册全局停止刷新事件监听
+onMounted(() => {
+  uni.$on('stopPagePullDownRefresh', onStopRefresh);
+});
+
+// 卸载时移除全局事件监听，避免内存泄漏
+onUnmounted(() => {
+  uni.$off('stopPagePullDownRefresh', onStopRefresh);
+});
+
+/**
+ * 计算最终生效的导航栏标题
+ */
+const displayTitle = computed((): string => {
+  if (props.navigationBarTitleText.length > 0) {
+    return props.navigationBarTitleText;
+  }
+  return props.title;
+});
+
+/**
+ * 计算最终生效的导航栏背景色
+ */
+const navBgColor = computed((): string => {
+  if (props.navigationBarBackgroundColor.length > 0) {
+    return props.navigationBarBackgroundColor;
+  }
+  return props.bgColor;
+});
+
+/**
+ * 计算最终生效的导航栏文字/图标颜色
+ */
+const navTitleColor = computed((): string => {
+  if (props.navigationBarTextStyle.length > 0) {
+    return props.navigationBarTextStyle;
+  }
+  return props.titleColor;
+});
+
+const themeTokens = computed((): ThemeTokens => {
+  return getThemeTokens(useAppStore().state.isDark);
+});
+</script>
+
+<style lang="scss" scoped>
+.navbar-layout {
+}
+</style>

@@ -1,0 +1,26 @@
+import { onMounted, onUnmounted } from 'vue';
+
+const EVENT_PULL_DOWN_REFRESH = 'onPagePullDownRefresh';
+const EVENT_STOP_PULL_DOWN_REFRESH = 'stopPagePullDownRefresh';
+
+/**
+ * 监听 NavBar 布局下拉刷新事件
+ */
+export function onNavbarPullDownRefresh(callback: () => void): void {
+  onMounted(() => {
+    uni.$on(EVENT_PULL_DOWN_REFRESH, callback);
+  });
+  onUnmounted(() => {
+    uni.$off(EVENT_PULL_DOWN_REFRESH, callback);
+  });
+}
+
+/**
+ * 停止 NavBar 布局下拉刷新状态
+ */
+export function stopNavbarPullDownRefresh(): void {
+  uni.$emit(EVENT_STOP_PULL_DOWN_REFRESH);
+  // #ifndef APP
+  uni.stopPullDownRefresh();
+  // #endif
+}

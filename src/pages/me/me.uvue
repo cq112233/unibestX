@@ -49,9 +49,12 @@ import { handleBackPressExit } from '@/src/utils/backPress';
 import { setCurIdxByPath } from '@/src/tabbar/store';
 
 definePage({
-  layout: false,
+  type: 'home',
+  layout: 'navbar',
+  showBack: false,
   style: {
-    navigationBarTitleText: '我的'
+    navigationBarTitleText: '我的',
+    navigationStyle: 'custom'
   }
 });
 

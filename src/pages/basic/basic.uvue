@@ -43,13 +43,23 @@ import TailwindcssDemoCard from './components/TailwindcssDemoCard.uvue';
 import SystemInfoDemoCard from './components/SystemInfoDemoCard.uvue';
 import { updateSystemInfo } from '@/src/utils/systemInfo';
 import { handleBackPressExit } from '@/src/utils/backPress';
+import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/utils/refresh';
 
 definePage({
-  layout: false,
+  type: 'home',
+  layout: 'navbar',
+  showBack: false,
   style: {
     navigationBarTitleText: '基础',
-    disableScroll: true
+    navigationStyle: 'custom',
+    enablePullDownRefresh: true
   }
+});
+
+onNavbarPullDownRefresh(() => {
+  setTimeout(() => {
+    stopNavbarPullDownRefresh();
+  }, 1000);
 });
 
 onBackPress((options: OnBackPressOptions): boolean => {

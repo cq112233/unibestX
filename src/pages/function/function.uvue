@@ -1,5 +1,5 @@
 <template>
-  <view class="flex-col pb-[100px]">
+  <view>
     <!-- 标题头 -->
     <view class="pt-[20px] px-[16px] pb-[10px]">
       <text class="text-[20px] font-bold text-[#1a202c]">设备系统信息</text>
@@ -56,9 +56,12 @@ import ZPagingDemoCard from './components/ZPagingDemoCard.uvue';
 import { handleBackPressExit } from '@/src/utils/backPress';
 
 definePage({
-  layout: false,
+  type: 'home',
+  layout: 'navbar',
+  showBack: false,
   style: {
-    navigationBarTitleText: '功能'
+    navigationBarTitleText: '功能',
+    navigationStyle: 'custom'
   }
 });
 

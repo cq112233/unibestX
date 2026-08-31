@@ -1,8 +1,5 @@
 <template>
   <view class="flex flex-col flex-1 h-full bg-[#f7fafc]">
-    <!-- 导航栏 -->
-    <NavBar title="分页加载 (z-paging-x)" :show-back="true" />
-
     <!-- 顶部过滤 Tabs (移到 z-paging-x 外部) -->
     <view class="bg-white py-[12px] px-[16px] border-b-[1px] border-bottom-style-solid border-bottom-color-[#f1f5f9]">
       <view class="flex-row bg-[#f1f5f9] rounded-[12px] p-[4px]">
@@ -60,6 +57,15 @@
 
 <script setup lang="uts">
 import { ref } from 'vue';
+
+definePage({
+  layout: 'navbar',
+  showBack: true,
+  style: {
+    navigationBarTitleText: '分页加载 (z-paging-x)',
+    navigationStyle: 'custom'
+  }
+});
 
 // 声明 ArticleItem 类型（使用 type 别名符合 UTS 强类型规范）
 type ArticleItem = {
