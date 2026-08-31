@@ -187,3 +187,50 @@ description: uni-app X (UTS) 开发规范与踩坑避坑指南，适用于跨端
 * **安全获取系统与应用语言 (Safe Access to System Locale)**：
   * 在原生 Android/iOS 平台上，`uni.getLocale()` 不被直接支持或编译时可能报错。
   * *正确做法*：在 App 端，使用 `uni.getSystemInfoSync().appLanguage`（应用当前语言）或 `uni.getDeviceInfo().osLanguage`（系统底层语言）来获取安全真实的语言。
+
+---
+
+## 7. 页面开发与 `definePage` 必须配置规范 (AI 新增页面必备)
+
+* **重要铁律**：新增任何 `.uvue` 页面时，**必须在 `<script setup lang="uts">` 顶部显式声明完整的 `definePage` 配置**，统一使用 `navbar` 布局接管。
+
+* **二级/分包页面标准模板（如 `src/sub/**`、普通详情页）**：
+
+  ```uts
+  <script setup lang="uts">
+  definePage({
+    layout: 'navbar',
+    showBack: true,
+    hideNavbar: false,
+    enablePullDownRefresh: false,
+    style: {
+      navigationBarTitleText: '页面标题',
+      navigationStyle: 'custom'
+    }
+  });
+  </script>
+  ```
+
+* **主包 TabBar 页面标准模板（`src/pages/**`）**：
+
+  ```uts
+  <script setup lang="uts">
+  definePage({
+    layout: 'navbar',
+    showBack: false,
+    hideNavbar: false,
+    enablePullDownRefresh: true,
+    style: {
+      navigationBarTitleText: '基础',
+      navigationStyle: 'custom'
+    }
+  });
+  </script>
+  ```
+
+  *(注：`type: 'home'` 仅限 `src/pages/index/index.uvue` 首页使用)*
+
+* **下拉刷新规范与优先级说明**：
+  * **自定义下拉刷新（✨推荐）**：配置在 `definePage` 的**顶层**（`enablePullDownRefresh: true`），由 `navbar` 布局的 `<scroll-view>` 容器驱动，搭配 `onNavbarPullDownRefresh` 与 `stopNavbarPullDownRefresh` 控制；
+  * **原生下拉刷新**：配置在 `definePage.style` **内部**（`style: { enablePullDownRefresh: true }`），由系统原生容器驱动；
+  * **优先级判定**：若两者同时配置，**系统优先采用原生下拉**，自动关闭自定义下拉以防双重冲突。**开发中强烈建议统一使用顶层自定义下拉刷新**。

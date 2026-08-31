@@ -271,10 +271,97 @@ let list: string[] = []
 
 ---
 
-## 4. 快速参考表
+## 4. 页面创建与 `definePage` 规范（AI 新增页面必填）
+
+在本项目中，页面统一采用 `uni-layouts-plugin` 自动包裹布局，导航栏统一采用 `uni_modules/uni-nav-bar-x` 驱动的自定义导航栏。
+
+**重要铁律**：AI 或开发者**新增任何 `.uvue` 页面时，必须在 `<script setup lang="uts">` 顶部显式声明完整的 `definePage` 配置**，严禁省略或配置为 `layout: false`（除非极特殊全屏需求）。
+
+### 4.1 二级页面 / 子包分包页面标准模板（如 `src/sub/**`、普通详情页）
+
+```uts
+<script setup lang="uts">
+definePage({
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
+  style: {
+    navigationBarTitleText: '页面标题',
+    navigationStyle: 'custom'
+  }
+});
+</script>
+```
+
+### 4.2 主包 TabBar 页面标准模板（`src/pages/**`）
+
+```uts
+<script setup lang="uts">
+definePage({
+  layout: 'navbar',
+  showBack: false, // TabBar 主页面不显示返回按钮
+  hideNavbar: false,
+  enablePullDownRefresh: true, // 首页/列表页按需开启
+  style: {
+    navigationBarTitleText: '基础',
+    navigationStyle: 'custom'
+  }
+});
+</script>
+```
+
+> **注意**：`type: 'home'` 为首页专属标识，仅在 [src/pages/index/index.uvue](file:///Users/chenqi/Documents/chenqi-front/unibestX/src/pages/index/index.uvue) 中配置，其他页面严禁添加。
+
+### 4.3 下拉刷新机制与最佳实践规范
+
+在 unibestX 体系中，下拉刷新分为**自定义下拉刷新**与**系统原生下拉刷新**：
+
+- **自定义下拉刷新（✨推荐）**：
+  - **配置方式**：在 `definePage` 的**顶层**配置 `enablePullDownRefresh: true`；
+  - **实现机制**：由 `navbar` 布局内的 `<scroll-view>` 容器驱动，支持跟随主题换肤、阻尼手势平滑顺畅，且与自定义顶部导航栏天然联动；
+  - **监听与控制**：使用 `onNavbarPullDownRefresh` 监听，使用 `stopNavbarPullDownRefresh` 关闭动画。
+- **系统原生下拉刷新**：
+  - **配置方式**：在 `definePage.style` **内部**配置 `style: { enablePullDownRefresh: true }`；
+  - **实现机制**：由系统底层原生窗口驱动（编译进 `pages.json`），使用 `onPullDownRefresh` 监听，使用 `uni.stopPullDownRefresh()` 关闭。
+- **优先级与规则**：
+  - 若**两者同时出现**，系统默认**原生下拉刷新优先**，`navbar` 布局会自动禁用自定义 `<scroll-view>` 下拉，杜绝双重菊花手势冲突；
+  - **最佳实践**：**强烈推荐统一使用顶层的自定义下拉刷新**，跨端表现更优美可控。
+
+#### 标准自定义下拉刷新代码示例
+
+```uts
+<script setup lang="uts">
+import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/utils/refresh';
+
+definePage({
+  layout: 'navbar',
+  showBack: false,
+  hideNavbar: false,
+  enablePullDownRefresh: true, // 👈 推荐：放在顶层开启自定义平滑下拉
+  style: {
+    navigationBarTitleText: '页面标题',
+    navigationStyle: 'custom'
+  }
+});
+
+onNavbarPullDownRefresh(() => {
+  // 1. 发起网络请求或加载业务数据
+  fetchData().then(() => {
+    // 2. 数据加载完毕后手动关闭刷新动画
+    stopNavbarPullDownRefresh();
+  });
+});
+</script>
+```
+
+---
+
+## 5. 快速参考表
 
 | 场景 / 报错 | 错误写法 | 正确写法 |
 | :--- | :--- | :--- |
+| **新增页面定义 (`definePage`)** | 缺少 `definePage` 或 `layout: false` | 必须包含 `layout: 'navbar'`, `showBack`, `hideNavbar`, `style: { navigationBarTitleText, navigationStyle: 'custom' }` |
 | 对象类型定义 (`UTS110111163`) | `interface User { id: string }` | `type User = { id: string }` |
 | 空值定义 (`UTS110111119`) | `let name: string \| undefined` | `let name: string \| null = null` |
 | 条件判断 (`UTS110111120`) | `if (user)` | `if (user != null)` |
@@ -291,8 +378,9 @@ let list: string[] = []
 
 ---
 
-## 5. 红线清单（停下来立即修正）
+## 6. 红线清单（停下来立即修正）
 
+- [ ] **新增 `.uvue` 页面缺少标准的 `definePage` 声明**（必须包含 `layout: 'navbar'`, `showBack`, `hideNavbar`, `style: { navigationBarTitleText, navigationStyle: 'custom' }`）
 - [ ] 使用了 `interface` 定义对象类型（必须改为 `type`）
 - [ ] 使用了 `undefined` 或未初始化变量（必须改为 `null` 并赋初始值）
 - [ ] 在 `if` / 三元运算符中使用了非布尔值（必须显式比较，如 `!= null`）
