@@ -73,12 +73,29 @@ declare global {
     type?: 'home' | string;
     /**
      * 页面使用的布局模版：
+     * - 'navbar': 使用 src/layouts/navbar.uvue（支持顶部导航栏、自定义下拉刷新）
      * - 'default': 使用 src/layouts/default.uvue
      * - 'empty': 使用 src/layouts/empty.uvue
      * - false: 禁用 layout 布局包裹
      * - string: 自定义 layout 名称（对应 src/layouts/[name].uvue）
      */
-    layout?: 'default' | 'empty' | (string & {}) | boolean;
+    layout?: 'navbar' | 'default' | 'empty' | (string & {}) | boolean;
+    /**
+     * 导航栏左侧是否显示返回箭头（配合 navbar 布局使用，默认 true）
+     */
+    showBack?: boolean;
+    /**
+     * 是否隐藏顶部导航栏（配合 navbar 布局使用，默认 false）
+     */
+    hideNavbar?: boolean;
+    /**
+     * 是否显示顶部导航栏（配合 navbar 布局使用，默认 true）
+     */
+    showNavbar?: boolean;
+    /**
+     * 是否开启自定义下拉刷新（配合 navbar 布局使用，由 scroll-view 驱动）
+     */
+    enablePullDownRefresh?: boolean;
     /**
      * 页面窗口表现样式配置（对应 pages.json 中的 style）
      */
