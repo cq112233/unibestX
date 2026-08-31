@@ -2,10 +2,24 @@
 import { checkDirectEntry } from './src/router/interceptor';
 import { useAppStore } from './src/store';
 
-onLaunch(() => {
+function safeHideTabBar(): void {
   // #ifndef MP-WEIXIN
-  uni.hideTabBar({ animation: false });
+  try {
+    uni.hideTabBar({
+      animation: false,
+      fail: (_err) => {
+        // 静默捕获在首屏或非 tabBar 页面触发的 fail 错误
+      }
+    });
+  }
+  catch {
+    // 忽略捕获
+  }
   // #endif
+}
+
+onLaunch(() => {
+  safeHideTabBar();
 
   // 提前实例化 App Store（含持久化还原），并初始化外观模式：跟随系统 / 浅色 / 深色
   useAppStore().initThemeMode();
@@ -27,9 +41,7 @@ onLaunch(() => {
 });
 
 onShow((options?) => {
-  // #ifndef MP-WEIXIN
-  uni.hideTabBar({ animation: false });
-  // #endif
+  safeHideTabBar();
 
   // #ifndef APP
   checkDirectEntry(options);
