@@ -119,20 +119,22 @@ import { handleBackPressExit } from '../../utils/backPress.uts';
 import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '../../utils/refresh.uts';
 
 definePage({
-  type: 'home',
-  layout: 'navbar',
-  showBack: false,
-  hideNavbar: false,
-  enablePullDownRefresh: true,
+  type: 'home', // 页面类型标识（仅首页配置 'home'，用于配合处理双击返回退出等特定逻辑）
+  layout: 'navbar', // 页面通用布局模板（采用 navbar 布局接管顶部导航与下拉滚动容器）
+  showBack: false, // 导航栏左侧是否显示返回箭头（TabBar 首页无需返回按钮）
+  hideNavbar: false, // 是否隐藏顶部导航栏（false 为正常显示）
+  enablePullDownRefresh: true, // 是否开启自定义下拉刷新（由 navbar 布局内的 scroll-view 驱动）
   style: {
-    navigationBarTitleText: '首页',
-    navigationStyle: 'custom'
+    navigationBarTitleText: '首页', // 页面与导航栏标题文本
+    navigationStyle: 'custom' // 导航栏样式设为自定义（隐藏系统原生导航栏）
   }
 });
 
+// 监听 navbar 自定义下拉刷新事件（在 enablePullDownRefresh: true 时生效）
 onNavbarPullDownRefresh(() => {
-  // 执行下拉刷新业务逻辑（例如重新获取数据）
+  // 执行下拉刷新业务逻辑（如重新请求接口获取最新数据）
   setTimeout(() => {
+    // 数据加载完毕后，手动停止下拉刷新动画状态
     stopNavbarPullDownRefresh();
   }, 1000);
 });
