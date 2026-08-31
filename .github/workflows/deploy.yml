@@ -17,6 +17,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v3
@@ -38,10 +40,24 @@ jobs:
       - name: Assemble publish directory
         run: |
           rm -rf publish
-          mkdir -p publish/docs
+          mkdir -p publish
+
+          # 1. 尝试从 gh-pages 分支提取上一次已发布的静态资源，保留上一次的 H5 演示站
+          if git fetch origin gh-pages:gh-pages 2>/dev/null; then
+            echo "Found remote gh-pages branch, extracting previous H5 build..."
+            git archive gh-pages | tar -x -C publish/ 2>/dev/null || true
+            # 清理旧的 docs 目录，由本次全新构建的 docs 替换
+            rm -rf publish/docs
+          fi
+
+          # 2. 如果本次工作区有最新的 unpackage/dist/build/web，覆盖更新根目录
           if [ -d unpackage/dist/build/web ]; then
+            echo "Found new unpackage/dist/build/web, updating root demo..."
             cp -r unpackage/dist/build/web/. publish/
           fi
+
+          # 3. 将本次最新构建的 VitePress 官网放到 publish/docs/
+          mkdir -p publish/docs
           cp -r docs/.vitepress/dist/. publish/docs/
 
       - name: Deploy to GitHub Pages
