@@ -260,9 +260,10 @@ let list: string[] = []
 
 - **规则**：监听 `@keyboardheightchange` 时，参数类型必须为 `UniInputKeyboardHeightChangeEvent`，不得声明为 `UniInputKeyboardHeightChangeEventDetail`。
 
-### 3.4 Easycom 自动导入
+### 3.4 组件库优先使用与 Easycom 自动导入 (Component Library First)
 
-- **规则**：`uni_modules` 中的组件由 `easycom` 规则自动引入，**严禁在 `<script>` 中手动 `import` 组件**。
+- **组件库优先原则**：编写 UI 页面时，若 `uni_modules` 中已有现成组件（如 `uni-icons`、`uni-badge-view`、`uni-rate-x`、`uni-number-box-x`、`uni-collapse-x`、`uni-fab-button`、`uni-link-x`、`uni-time-format`、`e-chart`、`z-paging-x`、`mp-html`、`sp-editor`、`lime-qrcode`、`lime-signature` 等），**必须优先使用组件库中的组件**，避免重复手写低效原生结构。
+- **Easycom 自动扫描**：`uni_modules` 中的组件由 `easycom` 规则自动引入，**严禁在 `<script>` 中手动 `import` 组件**，直接在 `<template>` 中使用标签即可。
 
 ### 3.5 平台差异 API 与语言获取
 
@@ -275,21 +276,33 @@ let list: string[] = []
 
 在本项目中，页面统一采用 `uni-layouts-plugin` 自动包裹布局，导航栏统一采用 `uni_modules/uni-nav-bar-x` 驱动的自定义导航栏。
 
-**重要铁律**：AI 或开发者**新增任何 `.uvue` 页面时，必须在 `<script setup lang="uts">` 顶部显式声明完整的 `definePage` 配置**，严禁省略或配置为 `layout: false`（除非极特殊全屏需求）。
+**重要铁律**：
+1. **显式声明 `definePage`**：AI 或开发者**新增任何 `.uvue` 页面时，必须在 `<script setup lang="uts">` 顶部显式声明完整的 `definePage` 配置**，严禁省略或配置为 `layout: false`（除非极特殊全屏需求）。
+2. **默认开启下拉刷新**：AI 生成的任何页面（二级/分包/主包页面），**`enablePullDownRefresh` 默认都设为 `true`**，并统一从 `src/utils/refresh.uts` 引入 `onNavbarPullDownRefresh` 和 `stopNavbarPullDownRefresh` 处理刷新逻辑。
+3. **优先使用组件库**：UI 布局中涉及图标、徽标、卡片、图表、折叠面板、分页等场景，优先采用项目已集成的组件库组件。
 
 ### 4.1 二级页面 / 子包分包页面标准模板（如 `src/sub/**`、普通详情页）
 
 ```uts
 <script setup lang="uts">
+import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/utils/refresh';
+
 definePage({
   layout: 'navbar',
   showBack: true,
   hideNavbar: false,
-  enablePullDownRefresh: false,
+  enablePullDownRefresh: true,
   style: {
     navigationBarTitleText: '页面标题',
     navigationStyle: 'custom'
   }
+});
+
+onNavbarPullDownRefresh(() => {
+  // 执行下拉刷新业务逻辑（例如重新获取数据）
+  setTimeout(() => {
+    stopNavbarPullDownRefresh();
+  }, 1000);
 });
 </script>
 ```
@@ -298,15 +311,24 @@ definePage({
 
 ```uts
 <script setup lang="uts">
+import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/utils/refresh';
+
 definePage({
   layout: 'navbar',
   showBack: false, // TabBar 主页面不显示返回按钮
   hideNavbar: false,
-  enablePullDownRefresh: true, // 首页/列表页按需开启
+  enablePullDownRefresh: true,
   style: {
     navigationBarTitleText: '基础',
     navigationStyle: 'custom'
   }
+});
+
+onNavbarPullDownRefresh(() => {
+  // 执行下拉刷新业务逻辑（例如重新获取数据）
+  setTimeout(() => {
+    stopNavbarPullDownRefresh();
+  }, 1000);
 });
 </script>
 ```
@@ -336,7 +358,7 @@ import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/utils/
 
 definePage({
   layout: 'navbar',
-  showBack: false,
+  showBack: true,
   hideNavbar: false,
   enablePullDownRefresh: true, // 👈 推荐：放在顶层开启自定义平滑下拉
   style: {

@@ -92,11 +92,14 @@ description: uni-app X (UTS) 开发规范与踩坑避坑指南，适用于跨端
 
 ---
 
-## 3. Easycom 与组件自动导入
+## 3. 组件库优先使用与 Easycom 自动导入
+*   **组件库优先原则 (Component Library First)**：
+    编写 UI 页面或业务功能时，若 `uni_modules` 中已有现成成熟组件（如 `uni-icons`、`uni-badge-view`、`uni-rate-x`、`uni-number-box-x`、`uni-collapse-x`、`uni-fab-button`、`uni-link-x`、`uni-time-format`、`e-chart`、`z-paging-x`、`mp-html`、`sp-editor`、`lime-qrcode`、`lime-signature` 等），**必须优先使用组件库中的组件**，避免重复手写低效原生结构。
 *   **免去手动 import**：
     在 `uni_modules` 中的组件，如其目录结构为 `uni_modules/[module-name]/components/[component-name]/[component-name].uvue`，uni-app X 的编译器会自动通过 `easycom` 规则加载，**无需且禁止在页面的 `<script>` 中手动 import 它们**。
     *   *错误示例*：`import myComponent from 'uni_modules/my-module/components/my-component/my-component.uvue'` (会导致模块加载失败或 App 平台报错)。
     *   *正确做法*：直接在 `<template>` 中写 `<my-component>`，并在 `pages.json` 中配置对应的 `easycom` 匹配规则。
+
 
 ---
 
@@ -193,20 +196,30 @@ description: uni-app X (UTS) 开发规范与踩坑避坑指南，适用于跨端
 ## 7. 页面开发与 `definePage` 必须配置规范 (AI 新增页面必备)
 
 * **重要铁律**：新增任何 `.uvue` 页面时，**必须在 `<script setup lang="uts">` 顶部显式声明完整的 `definePage` 配置**，统一使用 `navbar` 布局接管。
+* **默认开启下拉刷新**：AI 生成的任何页面（包括二级/分包页面与 TabBar 页面），**`enablePullDownRefresh` 默认都设为 `true`**，并且统一从 `src/utils/refresh.uts` 引入 `onNavbarPullDownRefresh` 和 `stopNavbarPullDownRefresh` 处理刷新逻辑。
 
-* **二级/分包页面标准模板（如 `src/sub/**`、普通详情页）**：
+* **二级/分包/主包通用页面标准模板（如 `src/pages/**`、`src/sub/**` 等带返回页）**：
 
   ```uts
   <script setup lang="uts">
+  import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '../../utils/refresh.uts';
+
   definePage({
     layout: 'navbar',
     showBack: true,
     hideNavbar: false,
-    enablePullDownRefresh: false,
+    enablePullDownRefresh: true,
     style: {
       navigationBarTitleText: '页面标题',
       navigationStyle: 'custom'
     }
+  });
+
+  onNavbarPullDownRefresh(() => {
+    // 执行下拉刷新业务逻辑（例如重新获取数据）
+    setTimeout(() => {
+      stopNavbarPullDownRefresh();
+    }, 1000);
   });
   </script>
   ```
@@ -215,6 +228,8 @@ description: uni-app X (UTS) 开发规范与踩坑避坑指南，适用于跨端
 
   ```uts
   <script setup lang="uts">
+  import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '../../utils/refresh.uts';
+
   definePage({
     layout: 'navbar',
     showBack: false,
@@ -225,6 +240,13 @@ description: uni-app X (UTS) 开发规范与踩坑避坑指南，适用于跨端
       navigationStyle: 'custom'
     }
   });
+
+  onNavbarPullDownRefresh(() => {
+    // 执行下拉刷新业务逻辑（例如重新获取数据）
+    setTimeout(() => {
+      stopNavbarPullDownRefresh();
+    }, 1000);
+  });
   </script>
   ```
 
@@ -234,3 +256,4 @@ description: uni-app X (UTS) 开发规范与踩坑避坑指南，适用于跨端
   * **自定义下拉刷新（✨推荐）**：配置在 `definePage` 的**顶层**（`enablePullDownRefresh: true`），由 `navbar` 布局的 `<scroll-view>` 容器驱动，搭配 `onNavbarPullDownRefresh` 与 `stopNavbarPullDownRefresh` 控制；
   * **原生下拉刷新**：配置在 `definePage.style` **内部**（`style: { enablePullDownRefresh: true }`），由系统原生容器驱动；
   * **优先级判定**：若两者同时配置，**系统优先采用原生下拉**，自动关闭自定义下拉以防双重冲突。**开发中强烈建议统一使用顶层自定义下拉刷新**。
+
