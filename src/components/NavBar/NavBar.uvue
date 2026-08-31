@@ -1,32 +1,51 @@
 <template>
-  <!-- 直接使用官方 uni-nav-bar 组件并按需转发插槽 -->
+  <!-- 直接使用官方 uni-nav-bar 组件并优雅代理插槽 -->
   <uni-nav-bar
     :title="title"
-    :hide-default-back="!showBack"
+    :hide-default-back="true"
     :navigation-bar-text-style="effectiveTitleColor"
     :style="{ backgroundColor: effectiveBgColor }"
   >
-    <!-- 仅当外部传入 left 插槽时才转发，否则保留默认返回箭头 -->
-    <template v-if="slots.left != null" #left>
-      <slot name="left" />
-    </template>
-
-    <!-- 仅当外部传入 mid / 默认插槽时才转发，否则保留默认文本标题 -->
-    <template v-if="slots.default != null || slots.mid != null" #mid>
-      <slot name="mid">
-        <slot />
+    <!-- 左侧区域：外部传 slot 则显示外部内容，未传则展示默认返回箭头 -->
+    <template #left>
+      <slot name="left">
+        <view
+          v-if="showBack"
+          style="width: 44px; height: 44px; justify-content: center; align-items: center;"
+          @click="handleBack"
+        >
+          <view
+            style="width: 12px; height: 12px; transform: rotate(45deg); border-left-width: 2px; border-left-style: solid; border-bottom-width: 2px; border-bottom-style: solid;"
+            :style="{ borderLeftColor: effectiveTitleColor, borderBottomColor: effectiveTitleColor }"
+          />
+        </view>
       </slot>
     </template>
 
-    <!-- 仅当外部传入 right 插槽时才转发 -->
-    <template v-if="slots.right != null" #right>
+    <!-- 中间区域：外部传 mid / default 插槽则展示，未传则展示标题 -->
+    <template #mid>
+      <slot name="mid">
+        <slot>
+          <text
+            v-if="title.length > 0"
+            class="title-text"
+            :style="{ color: effectiveTitleColor }"
+          >
+            {{ title }}
+          </text>
+        </slot>
+      </slot>
+    </template>
+
+    <!-- 右侧区域 -->
+    <template #right>
       <slot name="right" />
     </template>
   </uni-nav-bar>
 </template>
 
 <script setup lang="uts">
-import { computed, useSlots } from 'vue';
+import { computed } from 'vue';
 import UniNavBar from '@/uni_modules/uni-nav-bar-x/components/uni-nav-bar/uni-nav-bar.uvue';
 import { useAppStore } from '@/src/store';
 import { getThemeTokens } from '@/src/utils/theme';
@@ -52,8 +71,6 @@ const props = defineProps({
   }
 });
 
-const slots = useSlots();
-
 // 亮 / 暗主题 token（与 theme.json 同步）：未显式传色时跟随当前外观模式
 const themeTokens = computed((): ThemeTokens => {
   return getThemeTokens(useAppStore().state.isDark);
@@ -68,7 +85,23 @@ const effectiveBgColor = computed((): string => {
 const effectiveTitleColor = computed((): string => {
   return props.titleColor != '' ? props.titleColor : themeTokens.value.navText;
 });
+
+// 处理返回事件
+function handleBack() {
+  const pages = getCurrentPages();
+  if (pages.length > 1) {
+    uni.navigateBack({ delta: 1 });
+  }
+  else {
+    uni.reLaunch({ url: '/src/pages/index/index' });
+  }
+}
 </script>
 
 <style>
+.title-text {
+  font-size: 17px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+}
 </style>

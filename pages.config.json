@@ -1,13 +1,14 @@
 {
   "pages": [
     {
-      "path": "src/pages/basic/basic",
+      "path": "src/pages/index/index",
       "layout": "navbar",
       "showBack": false,
+      "hideNavbar": false,
+      "enablePullDownRefresh": true,
       "style": {
-        "navigationBarTitleText": "基础",
-        "navigationStyle": "custom",
-        "enablePullDownRefresh": true
+        "navigationBarTitleText": "首页",
+        "navigationStyle": "custom"
       }
     },
     {
@@ -20,28 +21,30 @@
       }
     },
     {
+      "path": "src/pages/basic/basic",
+      "layout": "navbar",
+      "showBack": false,
+      "enablePullDownRefresh": true,
+      "style": {
+        "navigationBarTitleText": "基础",
+        "navigationStyle": "custom"
+      }
+    },
+    {
       "path": "src/pages/function/function",
       "layout": "navbar",
       "showBack": false,
+      "enablePullDownRefresh": true,
       "style": {
         "navigationBarTitleText": "功能",
         "navigationStyle": "custom"
       }
     },
     {
-      "path": "src/pages/index/index",
-      "layout": "navbar",
-      "showBack": false,
-      "style": {
-        "navigationBarTitleText": "首页",
-        "navigationStyle": "custom",
-        "enablePullDownRefresh": true
-      }
-    },
-    {
       "path": "src/pages/me/me",
       "layout": "navbar",
       "showBack": false,
+      "enablePullDownRefresh": true,
       "style": {
         "navigationBarTitleText": "我的",
         "navigationStyle": "custom"
@@ -98,6 +101,8 @@
           "path": "auth/login",
           "layout": "navbar",
           "showBack": true,
+          "hideNavbar": false,
+          "enablePullDownRefresh": false,
           "style": {
             "navigationBarTitleText": "登录",
             "navigationStyle": "custom"
@@ -107,6 +112,8 @@
           "path": "auth/register",
           "layout": "navbar",
           "showBack": true,
+          "hideNavbar": false,
+          "enablePullDownRefresh": false,
           "style": {
             "navigationBarTitleText": "注册",
             "navigationStyle": "custom"
@@ -116,6 +123,8 @@
           "path": "paging/paging",
           "layout": "navbar",
           "showBack": true,
+          "hideNavbar": false,
+          "enablePullDownRefresh": false,
           "style": {
             "navigationBarTitleText": "分页加载 (z-paging-x)",
             "navigationStyle": "custom"
@@ -125,6 +134,8 @@
           "path": "tailwindcss/tailwindcss",
           "layout": "navbar",
           "showBack": true,
+          "hideNavbar": false,
+          "enablePullDownRefresh": false,
           "style": {
             "navigationBarTitleText": "weapp-tailwindcss 示例",
             "navigationStyle": "custom"
@@ -132,14 +143,24 @@
         },
         {
           "path": "test/test",
+          "layout": "navbar",
+          "showBack": true,
+          "hideNavbar": false,
+          "enablePullDownRefresh": false,
           "style": {
-            "navigationBarTitleText": "测试"
+            "navigationBarTitleText": "URL 参数测试",
+            "navigationStyle": "custom"
           }
         },
         {
           "path": "uiTest/uiTest",
+          "layout": "navbar",
+          "showBack": true,
+          "hideNavbar": false,
+          "enablePullDownRefresh": false,
           "style": {
-            "navigationBarTitleText": "UI 测试"
+            "navigationBarTitleText": "UI 测试",
+            "navigationStyle": "custom"
           }
         }
       ]

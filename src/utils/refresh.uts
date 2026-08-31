@@ -20,7 +20,5 @@ export function onNavbarPullDownRefresh(callback: () => void): void {
  */
 export function stopNavbarPullDownRefresh(): void {
   uni.$emit(EVENT_STOP_PULL_DOWN_REFRESH);
-  // #ifndef APP
   uni.stopPullDownRefresh();
-  // #endif
 }

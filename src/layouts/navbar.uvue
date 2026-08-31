@@ -3,6 +3,7 @@
   <view class="navbar-layout flex-1 flex flex-col">
     <!-- 顶部固定自定义导航栏：位于页面内容上方，不随下拉刷新位移 -->
     <NavBar
+      v-if="isNavbarVisible"
       :title="displayTitle"
       :show-back="showBack"
       :title-color="navTitleColor"
@@ -12,21 +13,21 @@
       :border="border"
     />
 
-    <!-- 当开启下拉刷新时：渲染支持 refresher 的独立滚动容器 -->
+    <!-- 当开启自定义下拉刷新时（原生未开启且当前布局开启） -->
     <scroll-view
-      v-if="enablePullDownRefresh"
+      v-if="useCustomRefresher"
       direction="vertical"
       class="flex-1"
       :refresher-enabled="true"
       :refresher-triggered="isTriggered"
-      :refresher-background="themeTokens.pageBg"
+      :refresher-background="themeTokens.bgContent"
       @refresherrefresh="handleRefresherRefresh"
       @refresherrestore="handleRefresherRestore"
     >
       <slot />
     </scroll-view>
 
-    <!-- 未开启下拉刷新时：渲染普通页面容器 -->
+    <!-- 未开启自定义下拉刷新时（包含开启原生下拉刷新时）：渲染普通滚动容器 -->
     <scroll-view v-else class="flex-1 flex flex-col">
       <slot />
     </scroll-view>
@@ -44,12 +45,12 @@ import type { ThemeTokens } from '@/src/utils/theme';
  * 布局属性定义（由 uni-layouts-plugin 编译时自动从页面 definePage 或 pages.json 提取传入）
  */
 const props = defineProps({
-  /** 导航栏标题（优先读取自 style.navigationBarTitleText） */
-  navigationBarTitleText: {
+  /** 页面顶层类型标识，如 'home' */
+  type: {
     type: String,
     default: ''
   },
-  /** 导航栏备用标题（读取自 page.title） */
+  /** 导航栏标题（读取自 page.title） */
   title: {
     type: String,
     default: ''
@@ -59,20 +60,10 @@ const props = defineProps({
     type: Boolean,
     default: true
   },
-  /** 是否启用内容区域的下拉刷新（读取自 style.enablePullDownRefresh） */
+  /** 是否启用内容区域的自定义下拉刷新 */
   enablePullDownRefresh: {
     type: Boolean,
     default: false
-  },
-  /** 导航栏背景色（读取自 style.navigationBarBackgroundColor） */
-  navigationBarBackgroundColor: {
-    type: String,
-    default: ''
-  },
-  /** 导航栏文字/按钮颜色（读取自 style.navigationBarTextStyle） */
-  navigationBarTextStyle: {
-    type: String,
-    default: ''
   },
   /** 导航栏备用背景色（读取自 page.bgColor） */
   bgColor: {
@@ -88,7 +79,59 @@ const props = defineProps({
   border: {
     type: Boolean,
     default: false
+  },
+  /** 页面 style 完整配置对象（未拍平，包含 navigationBarTitleText, enablePullDownRefresh, navigationBarBackgroundColor 等） */
+  pageStyle: {
+    type: Object,
+    default: () => ({})
+  },
+  /** 是否隐藏导航栏（默认 false） */
+  hideNavbar: {
+    type: Boolean,
+    default: false
+  },
+  hideNavBar: {
+    type: Boolean,
+    default: false
+  },
+  /** 是否显示导航栏（默认 true） */
+  showNavbar: {
+    type: Boolean,
+    default: true
+  },
+  showNavBar: {
+    type: Boolean,
+    default: true
+  },
+  /** 扁平兼容字段：导航栏标题 */
+  navigationBarTitleText: {
+    type: String,
+    default: ''
+  },
+  /** 扁平兼容字段：导航栏背景色 */
+  navigationBarBackgroundColor: {
+    type: String,
+    default: ''
+  },
+  /** 扁平兼容字段：导航栏文字颜色 */
+  navigationBarTextStyle: {
+    type: String,
+    default: ''
   }
+});
+
+console.log(props, 'props');
+
+/**
+ * 计算导航栏是否可见
+ * 1. 优先读取 props.hideNavbar / props.hideNavBar / props.showNavbar / props.showNavBar
+ * 2. 兜底读取 pageStyle 中的 hideNavbar / showNavbar
+ */
+const isNavbarVisible = computed((): boolean => {
+  if (props.hideNavbar || props.hideNavBar || !props.showNavbar || !props.showNavBar) {
+    return false;
+  }
+  return true;
 });
 
 /** 下拉刷新状态控制：true 表示刷新中（展示 Loading），false 表示已复位收起 */
@@ -128,9 +171,42 @@ onUnmounted(() => {
 });
 
 /**
+ * 获取 pageStyle 对象
+ */
+const pageStyleObj = computed((): UTSJSONObject => {
+  return (props.pageStyle ?? {}) as UTSJSONObject;
+});
+
+/**
+ * 判断当前页面是否开启了原生系统下拉刷新（读取 definePage.style.enablePullDownRefresh）
+ */
+const isNativePullDown = computed((): boolean => {
+  const psVal = pageStyleObj.value.enablePullDownRefresh;
+  if (psVal == true || psVal == 'true') {
+    return true;
+  }
+  return false;
+});
+
+/**
+ * 决定是否使用 NavBar 内部自定义下拉刷新：
+ * 若原生已开启下拉（style.enablePullDownRefresh），原生优先并关闭内部下拉；仅在原生未开启时才使用自定义下拉
+ */
+const useCustomRefresher = computed((): boolean => {
+  if (isNativePullDown.value) {
+    return false;
+  }
+  return props.enablePullDownRefresh;
+});
+
+/**
  * 计算最终生效的导航栏标题
  */
 const displayTitle = computed((): string => {
+  const titleFromStyle = (pageStyleObj.value.navigationBarTitleText as string | null) ?? '';
+  if (titleFromStyle.length > 0) {
+    return titleFromStyle;
+  }
   if (props.navigationBarTitleText.length > 0) {
     return props.navigationBarTitleText;
   }
@@ -141,6 +217,10 @@ const displayTitle = computed((): string => {
  * 计算最终生效的导航栏背景色
  */
 const navBgColor = computed((): string => {
+  const bgFromStyle = (pageStyleObj.value.navigationBarBackgroundColor as string | null) ?? '';
+  if (bgFromStyle.length > 0) {
+    return bgFromStyle;
+  }
   if (props.navigationBarBackgroundColor.length > 0) {
     return props.navigationBarBackgroundColor;
   }
@@ -151,6 +231,10 @@ const navBgColor = computed((): string => {
  * 计算最终生效的导航栏文字/图标颜色
  */
 const navTitleColor = computed((): string => {
+  const textStyleFromStyle = (pageStyleObj.value.navigationBarTextStyle as string | null) ?? '';
+  if (textStyleFromStyle.length > 0) {
+    return textStyleFromStyle;
+  }
   if (props.navigationBarTextStyle.length > 0) {
     return props.navigationBarTextStyle;
   }
