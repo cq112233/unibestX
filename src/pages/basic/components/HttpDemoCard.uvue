@@ -34,7 +34,7 @@
           </view>
           <text v-if="cloudLoading" class="text-[12px] text-[#0f766e]">正在连接云端服务...</text>
           <text v-else-if="hasCloudError" class="text-[12px] text-[#dc2626]">{{ cloudErrorMsg }}</text>
-          <text v-else class="text-[12px] text-[#334155]" style="line-height: 20px">{{ userInfo }}</text>
+          <text v-else class="text-[12px] text-[#334155] leading-[20px]">{{ userInfo }}</text>
 
           <view v-if="hasCloudError" class="mt-[10px] flex-row">
             <view class="h-[32px] px-[12px] rounded-[6px] bg-[#0f766e] items-center justify-center" @click="getUserInfo">

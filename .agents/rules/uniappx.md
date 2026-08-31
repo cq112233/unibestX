@@ -59,14 +59,9 @@ description: uni-app X (UTS) 开发规范与踩坑避坑指南，适用于跨端
     *   *错误示例*：`font-mono`（触发编译报错）
     *   *正确做法*：通过内联 `style="font-family: monospace;"` 设置字体族
 
-*   **鸿蒙 VDOM 模式行高限制 (HarmonyOS VDOM Line-Height Restrictions)**：
-    `<text>` 的行高**禁止**使用 Tailwind 的 `leading-[26px]` 等类名写法（如 `leading-[26px]` 不支持鸿蒙 VDOM 模式）。weapp-tailwindcss 的类名转换在鸿蒙 VDOM 下行为不可靠，曾出现 `line-height: 26px` 被映射为 `lineHeight: 52` 导致换行间距翻倍；且鸿蒙 ArkUI 渲染引擎在设置的 `lineHeight` 之上还会额外叠加字体自带的 ascent/descent 与系统行距补偿，实际行距会比预期更大。
-    *   *错误示例*：`class="text-[14px] leading-[26px]"`（鸿蒙 VDOM 下行高异常、换行间距过大）
-    *   *正确做法*：直接在 `<text>` 上用内联样式设置行高，绕开类名转换：
-        ```html
-        <text class="text-[14px]" style="line-height: 26px">...</text>
-        ```
-    *   如需在鸿蒙端单独收窄行距，可配合条件编译或 `harmony:` 变体调整内联样式的取值（如 `line-height: 22px`）。
+*   **文本行高支持 (Line-Height Utilities)**：
+    当前 `weapp-tailwindcss` 已完善支持 `leading-[26px]`、`leading-[20px]` 等原子化行高类名，推荐直接使用 Tailwind 的 `leading-[...]` 原子化类名控制行高。
+
 
 *   **Display 属性与类名限制 (Display Property Restrictions)**：
     原生平台仅支持 `display: flex` 和 `display: none`。**禁止**使用 `display: grid` 或 `inline-block`。推荐全面使用 Tailwind 的 Flex 布局类名（`flex-row`、`flex-col`、`flex-1`）。

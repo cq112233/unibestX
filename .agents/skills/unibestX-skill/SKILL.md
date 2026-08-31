@@ -210,14 +210,9 @@ let list: string[] = []
 - **布局推荐使用 Flex 类名**：`flex flex-row`、`flex-col`、`flex-1`、`items-center`、`justify-between`、`justify-center`。
 - **对齐支持**：Tailwind v4 原生输出 `flex-start`/`flex-end`，`justify-start`、`items-start`、`self-start` 可安全使用。
 
-### 2.6 鸿蒙 VDOM 行高限制
+### 2.6 文本行高支持
 
-- **铁律**：`<text>` 行高**禁止**使用 Tailwind 的 `leading-[26px]` 类名（weapp-tailwindcss 的转换在鸿蒙 VDOM 下会导致换行间距翻倍，且 ArkUI 会叠加系统行距）。
-- **规则**：使用内联样式设置行高：
-
-  ```html
-  <text class="text-[14px]" style="line-height: 26px">文本内容</text>
-  ```
+- `weapp-tailwindcss` 现已全面支持 `leading-[...]` 原子化类名（如 `leading-[26px]`、`leading-[20px]`），可直接在 `<text>` 等元素上使用原子化类名。
 
 ### 2.7 Tailwind 自定义配置与安全区适配
 
@@ -287,7 +282,6 @@ let list: string[] = []
 | 插槽变量传参 | `<text>{{ fn(item) }}</text>` | `<text>{{ fn(item as UTSJSONObject) }}</text>` |
 | 动态 `:style` 属性 | `:style="parent['style'] as UTSJSONObject"` | `:style="(parent['style'] ?? {}) as any"` |
 | Tailwind 边框 | `class="border border-gray-200"` | `class="border-[1px] border-solid border-[#e2e8f0]"` |
-| 鸿蒙文本行高 | `class="leading-[26px]"` | `style="line-height: 26px"` |
 | 等宽字体显示 | `class="font-mono"` | `style="font-family: monospace;"` |
 | `<button>` 水平居中 | `<button class="items-center justify-center">` | 用 `<view class="flex flex-row items-center justify-center">` 包裹 |
 | `<view>` 文本颜色 | `<view class="text-[#333]">` | `<text class="text-[#333]">` |
@@ -307,4 +301,3 @@ let list: string[] = []
 - [ ] 在 `<view>` 上直接定义了文字颜色样式类名（如 `text-[#1e293b]`、`text-primary`）
 - [ ] 在 Tailwind 中使用了 `font-mono` / `font-sans`（必须用内联 `style="font-family: monospace;"`）
 - [ ] 在 `.uvue` 模板的作用域插槽调用点缺少 `as` 类型断言
-- [ ] 在鸿蒙 VDOM 下对 `<text>` 使用了 `leading-[...]`（必须用内联 `style="line-height: ..."`）
