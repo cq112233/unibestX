@@ -25,6 +25,17 @@
 <script setup lang="uts">
 import logoImg from './images/logo.png';
 
+definePage({
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
+  style: {
+    navigationBarTitleText: 'UI 测试',
+    navigationStyle: 'custom'
+  }
+});
+
 const logoSrc = logoImg;
 </script>
 

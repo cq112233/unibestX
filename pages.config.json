@@ -2,7 +2,10 @@
   "pages": [
     {
       "path": "src/pages/index/index",
-      "layout": "default",
+      "layout": "navbar",
+      "showBack": false,
+      "hideNavbar": false,
+      "enablePullDownRefresh": true,
       "style": {
         "navigationBarTitleText": "首页",
         "navigationStyle": "custom"
@@ -10,31 +13,41 @@
     },
     {
       "path": "src/pages/ai/ai",
-      "layout": false,
+      "layout": "navbar",
+      "showBack": true,
       "style": {
-        "navigationBarTitleText": "ai"
+        "navigationBarTitleText": "AI 智能助手",
+        "navigationStyle": "custom"
       }
     },
     {
       "path": "src/pages/basic/basic",
-      "layout": false,
+      "layout": "navbar",
+      "showBack": false,
+      "enablePullDownRefresh": true,
       "style": {
         "navigationBarTitleText": "基础",
-        "disableScroll": true
+        "navigationStyle": "custom"
       }
     },
     {
       "path": "src/pages/function/function",
-      "layout": false,
+      "layout": "navbar",
+      "showBack": false,
+      "enablePullDownRefresh": true,
       "style": {
-        "navigationBarTitleText": "功能"
+        "navigationBarTitleText": "功能",
+        "navigationStyle": "custom"
       }
     },
     {
       "path": "src/pages/me/me",
-      "layout": false,
+      "layout": "navbar",
+      "showBack": false,
+      "enablePullDownRefresh": true,
       "style": {
-        "navigationBarTitleText": "我的"
+        "navigationBarTitleText": "我的",
+        "navigationStyle": "custom"
       }
     }
   ],
@@ -44,6 +57,8 @@
     "navigationBarBackgroundColor": "@navigationBarBackgroundColor",
     "backgroundColor": "@backgroundColor",
     "backgroundColorContent": "@backgroundColorContent",
+    "backgroundColorTop": "@backgroundColorTop",
+    "backgroundColorBottom": "@backgroundColorBottom",
     "backgroundTextStyle": "@backgroundTextStyle"
   },
   "tabBar": {
@@ -84,21 +99,35 @@
       "pages": [
         {
           "path": "auth/login",
+          "layout": "navbar",
+          "showBack": true,
+          "hideNavbar": false,
+          "enablePullDownRefresh": false,
           "style": {
-            "navigationBarTitleText": "登录"
+            "navigationBarTitleText": "登录",
+            "navigationStyle": "custom"
           }
         },
         {
           "path": "auth/register",
+          "layout": "navbar",
+          "showBack": true,
+          "hideNavbar": false,
+          "enablePullDownRefresh": false,
           "style": {
-            "navigationBarTitleText": "注册"
+            "navigationBarTitleText": "注册",
+            "navigationStyle": "custom"
           }
         },
         {
           "path": "paging/paging",
+          "layout": "navbar",
+          "showBack": true,
+          "hideNavbar": false,
+          "enablePullDownRefresh": false,
           "style": {
-            "navigationStyle": "custom",
-            "navigationBarTitleText": "分页加载"
+            "navigationBarTitleText": "分页加载 (z-paging-x)",
+            "navigationStyle": "custom"
           }
         },
         {
@@ -452,6 +481,10 @@
         },
         {
           "path": "tailwindcss/tailwindcss",
+          "layout": "navbar",
+          "showBack": true,
+          "hideNavbar": false,
+          "enablePullDownRefresh": false,
           "style": {
             "navigationBarTitleText": "weapp-tailwindcss 示例",
             "navigationStyle": "custom"
@@ -459,14 +492,24 @@
         },
         {
           "path": "test/test",
+          "layout": "navbar",
+          "showBack": true,
+          "hideNavbar": false,
+          "enablePullDownRefresh": false,
           "style": {
-            "navigationBarTitleText": "测试"
+            "navigationBarTitleText": "URL 参数测试",
+            "navigationStyle": "custom"
           }
         },
         {
           "path": "uiTest/uiTest",
+          "layout": "navbar",
+          "showBack": true,
+          "hideNavbar": false,
+          "enablePullDownRefresh": false,
           "style": {
-            "navigationBarTitleText": "UI 测试"
+            "navigationBarTitleText": "UI 测试",
+            "navigationStyle": "custom"
           }
         }
       ]

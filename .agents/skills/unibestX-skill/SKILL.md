@@ -210,14 +210,9 @@ let list: string[] = []
 - **布局推荐使用 Flex 类名**：`flex flex-row`、`flex-col`、`flex-1`、`items-center`、`justify-between`、`justify-center`。
 - **对齐支持**：Tailwind v4 原生输出 `flex-start`/`flex-end`，`justify-start`、`items-start`、`self-start` 可安全使用。
 
-### 2.6 鸿蒙 VDOM 行高限制
+### 2.6 文本行高支持
 
-- **铁律**：`<text>` 行高**禁止**使用 Tailwind 的 `leading-[26px]` 类名（weapp-tailwindcss 的转换在鸿蒙 VDOM 下会导致换行间距翻倍，且 ArkUI 会叠加系统行距）。
-- **规则**：使用内联样式设置行高：
-
-  ```html
-  <text class="text-[14px]" style="line-height: 26px">文本内容</text>
-  ```
+- `weapp-tailwindcss` 现已全面支持 `leading-[...]` 原子化类名（如 `leading-[26px]`、`leading-[20px]`），可直接在 `<text>` 等元素上使用原子化类名。
 
 ### 2.7 Tailwind 自定义配置与安全区适配
 
@@ -265,9 +260,10 @@ let list: string[] = []
 
 - **规则**：监听 `@keyboardheightchange` 时，参数类型必须为 `UniInputKeyboardHeightChangeEvent`，不得声明为 `UniInputKeyboardHeightChangeEventDetail`。
 
-### 3.4 Easycom 自动导入
+### 3.4 组件库优先使用与 Easycom 自动导入 (Component Library First)
 
-- **规则**：`uni_modules` 中的组件由 `easycom` 规则自动引入，**严禁在 `<script>` 中手动 `import` 组件**。
+- **组件库优先原则**：编写 UI 页面时，若 `uni_modules` 中已有现成组件（如 `uni-icons`、`uni-badge-view`、`uni-rate-x`、`uni-number-box-x`、`uni-collapse-x`、`uni-fab-button`、`uni-link-x`、`uni-time-format`、`e-chart`、`z-paging-x`、`mp-html`、`sp-editor`、`lime-qrcode`、`lime-signature` 等），**必须优先使用组件库中的组件**，避免重复手写低效原生结构。
+- **Easycom 自动扫描**：`uni_modules` 中的组件由 `easycom` 规则自动引入，**严禁在 `<script>` 中手动 `import` 组件**，直接在 `<template>` 中使用标签即可。
 
 ### 3.5 平台差异 API 与语言获取
 
@@ -276,10 +272,118 @@ let list: string[] = []
 
 ---
 
-## 4. 快速参考表
+## 4. 页面创建与 `definePage` 规范（AI 新增页面必填）
+
+在本项目中，页面统一采用 `uni-layouts-plugin` 自动包裹布局，导航栏统一采用 `uni_modules/uni-nav-bar-x` 驱动的自定义导航栏。
+
+**重要铁律**：
+1. **显式声明 `definePage`**：AI 或开发者**新增任何 `.uvue` 页面时，必须在 `<script setup lang="uts">` 顶部显式声明完整的 `definePage` 配置**，严禁省略或配置为 `layout: false`（除非极特殊全屏需求）。
+2. **默认开启下拉刷新**：AI 生成的任何页面（二级/分包/主包页面），**`enablePullDownRefresh` 默认都设为 `true`**，并统一从 `src/utils/refresh.uts` 引入 `onNavbarPullDownRefresh` 和 `stopNavbarPullDownRefresh` 处理刷新逻辑。
+3. **优先使用组件库**：UI 布局中涉及图标、徽标、卡片、图表、折叠面板、分页等场景，优先采用项目已集成的组件库组件。
+
+### 4.1 二级页面 / 子包分包页面标准模板（如 `src/sub/**`、普通详情页）
+
+```uts
+<script setup lang="uts">
+import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/utils/refresh';
+
+definePage({
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: true,
+  style: {
+    navigationBarTitleText: '页面标题',
+    navigationStyle: 'custom'
+  }
+});
+
+onNavbarPullDownRefresh(() => {
+  // 执行下拉刷新业务逻辑（例如重新获取数据）
+  setTimeout(() => {
+    stopNavbarPullDownRefresh();
+  }, 1000);
+});
+</script>
+```
+
+### 4.2 主包 TabBar 页面标准模板（`src/pages/**`）
+
+```uts
+<script setup lang="uts">
+import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/utils/refresh';
+
+definePage({
+  layout: 'navbar',
+  showBack: false, // TabBar 主页面不显示返回按钮
+  hideNavbar: false,
+  enablePullDownRefresh: true,
+  style: {
+    navigationBarTitleText: '基础',
+    navigationStyle: 'custom'
+  }
+});
+
+onNavbarPullDownRefresh(() => {
+  // 执行下拉刷新业务逻辑（例如重新获取数据）
+  setTimeout(() => {
+    stopNavbarPullDownRefresh();
+  }, 1000);
+});
+</script>
+```
+
+> **注意**：`type: 'home'` 为首页专属标识，仅在 [src/pages/index/index.uvue](file:///Users/chenqi/Documents/chenqi-front/unibestX/src/pages/index/index.uvue) 中配置，其他页面严禁添加。
+
+### 4.3 下拉刷新机制与最佳实践规范
+
+在 unibestX 体系中，下拉刷新分为**自定义下拉刷新**与**系统原生下拉刷新**：
+
+- **自定义下拉刷新（✨推荐）**：
+  - **配置方式**：在 `definePage` 的**顶层**配置 `enablePullDownRefresh: true`；
+  - **实现机制**：由 `navbar` 布局内的 `<scroll-view>` 容器驱动，支持跟随主题换肤、阻尼手势平滑顺畅，且与自定义顶部导航栏天然联动；
+  - **监听与控制**：使用 `onNavbarPullDownRefresh` 监听，使用 `stopNavbarPullDownRefresh` 关闭动画。
+- **系统原生下拉刷新**：
+  - **配置方式**：在 `definePage.style` **内部**配置 `style: { enablePullDownRefresh: true }`；
+  - **实现机制**：由系统底层原生窗口驱动（编译进 `pages.json`），使用 `onPullDownRefresh` 监听，使用 `uni.stopPullDownRefresh()` 关闭。
+- **优先级与规则**：
+  - 若**两者同时出现**，系统默认**原生下拉刷新优先**，`navbar` 布局会自动禁用自定义 `<scroll-view>` 下拉，杜绝双重菊花手势冲突；
+  - **最佳实践**：**强烈推荐统一使用顶层的自定义下拉刷新**，跨端表现更优美可控。
+
+#### 标准自定义下拉刷新代码示例
+
+```uts
+<script setup lang="uts">
+import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/utils/refresh';
+
+definePage({
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: true, // 👈 推荐：放在顶层开启自定义平滑下拉
+  style: {
+    navigationBarTitleText: '页面标题',
+    navigationStyle: 'custom'
+  }
+});
+
+onNavbarPullDownRefresh(() => {
+  // 1. 发起网络请求或加载业务数据
+  fetchData().then(() => {
+    // 2. 数据加载完毕后手动关闭刷新动画
+    stopNavbarPullDownRefresh();
+  });
+});
+</script>
+```
+
+---
+
+## 5. 快速参考表
 
 | 场景 / 报错 | 错误写法 | 正确写法 |
 | :--- | :--- | :--- |
+| **新增页面定义 (`definePage`)** | 缺少 `definePage` 或 `layout: false` | 必须包含 `layout: 'navbar'`, `showBack`, `hideNavbar`, `style: { navigationBarTitleText, navigationStyle: 'custom' }` |
 | 对象类型定义 (`UTS110111163`) | `interface User { id: string }` | `type User = { id: string }` |
 | 空值定义 (`UTS110111119`) | `let name: string \| undefined` | `let name: string \| null = null` |
 | 条件判断 (`UTS110111120`) | `if (user)` | `if (user != null)` |
@@ -287,7 +391,6 @@ let list: string[] = []
 | 插槽变量传参 | `<text>{{ fn(item) }}</text>` | `<text>{{ fn(item as UTSJSONObject) }}</text>` |
 | 动态 `:style` 属性 | `:style="parent['style'] as UTSJSONObject"` | `:style="(parent['style'] ?? {}) as any"` |
 | Tailwind 边框 | `class="border border-gray-200"` | `class="border-[1px] border-solid border-[#e2e8f0]"` |
-| 鸿蒙文本行高 | `class="leading-[26px]"` | `style="line-height: 26px"` |
 | 等宽字体显示 | `class="font-mono"` | `style="font-family: monospace;"` |
 | `<button>` 水平居中 | `<button class="items-center justify-center">` | 用 `<view class="flex flex-row items-center justify-center">` 包裹 |
 | `<view>` 文本颜色 | `<view class="text-[#333]">` | `<text class="text-[#333]">` |
@@ -297,8 +400,9 @@ let list: string[] = []
 
 ---
 
-## 5. 红线清单（停下来立即修正）
+## 6. 红线清单（停下来立即修正）
 
+- [ ] **新增 `.uvue` 页面缺少标准的 `definePage` 声明**（必须包含 `layout: 'navbar'`, `showBack`, `hideNavbar`, `style: { navigationBarTitleText, navigationStyle: 'custom' }`）
 - [ ] 使用了 `interface` 定义对象类型（必须改为 `type`）
 - [ ] 使用了 `undefined` 或未初始化变量（必须改为 `null` 并赋初始值）
 - [ ] 在 `if` / 三元运算符中使用了非布尔值（必须显式比较，如 `!= null`）
@@ -307,4 +411,3 @@ let list: string[] = []
 - [ ] 在 `<view>` 上直接定义了文字颜色样式类名（如 `text-[#1e293b]`、`text-primary`）
 - [ ] 在 Tailwind 中使用了 `font-mono` / `font-sans`（必须用内联 `style="font-family: monospace;"`）
 - [ ] 在 `.uvue` 模板的作用域插槽调用点缺少 `as` 类型断言
-- [ ] 在鸿蒙 VDOM 下对 `<text>` 使用了 `leading-[...]`（必须用内联 `style="line-height: ..."`）

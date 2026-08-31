@@ -26,7 +26,7 @@
       </view>
       <view class="h-[1px] bg-[#f1f5f9] mb-[12px]" />
       <scroll-view class="bg-[#0f172a] rounded-[8px] p-[12px] h-[180px]" direction="vertical">
-        <text class="text-[13px] text-[#38bdf8]" style="font-family: monospace;line-height: 20px;">{{ userInfoJson }}</text>
+        <text class="text-[13px] text-[#38bdf8] leading-[20px]" style="font-family: monospace;">{{ userInfoJson }}</text>
       </scroll-view>
     </view>
 
@@ -47,12 +47,23 @@ import { useTokenStore, useUserStore } from '../../store';
 import { LOGIN_PAGE } from '../../router/config';
 import { handleBackPressExit } from '@/src/utils/backPress';
 import { setCurIdxByPath } from '@/src/tabbar/store';
+import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '../../utils/refresh.uts';
 
 definePage({
-  layout: false,
+  layout: 'navbar',
+  showBack: false,
+  enablePullDownRefresh: true,
   style: {
-    navigationBarTitleText: '我的'
+    navigationBarTitleText: '我的',
+    navigationStyle: 'custom'
   }
+});
+
+onNavbarPullDownRefresh(() => {
+  // 执行下拉刷新业务逻辑（例如重新获取数据）
+  setTimeout(() => {
+    stopNavbarPullDownRefresh();
+  }, 1000);
 });
 
 onBackPress((options: OnBackPressOptions): boolean => {

@@ -25,6 +25,17 @@
 <script setup lang="uts">
 import { ref } from 'vue';
 
+definePage({
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
+  style: {
+    navigationBarTitleText: 'URL 参数测试',
+    navigationStyle: 'custom'
+  }
+});
+
 const optionKeys = ref<string[]>([]);
 const queryOptions = ref<UTSJSONObject | null>(null);
 

@@ -47,6 +47,17 @@ function setGlobalNum(num: number): void {
   globalNum.value = num;
 }
 
+definePage({
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
+  style: {
+    navigationBarTitleText: 'weapp-tailwindcss 示例',
+    navigationStyle: 'custom'
+  }
+});
+
 onLoad((): void => {
   console.log('欢迎使用 weapp-tailwindcss 模板');
 });
@@ -54,7 +65,6 @@ onLoad((): void => {
 
 <template>
   <view>
-    <NavBar title="weapp-tailwindcss 示例" :auto-back="true" :safe-area-inset-top="true"></NavBar>
     <view class="content" :class="{ dark: isDark }">
       <WeappTailwindcss />
       <BindClass />

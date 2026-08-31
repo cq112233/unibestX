@@ -5,6 +5,35 @@
 </template>
 
 <script setup lang="uts">
+const props = defineProps({
+  /** 页面顶层类型标识，如 'home' */
+  type: {
+    type: String,
+    default: ''
+  },
+  /** 是否显示左侧返回按钮（默认 true） */
+  showBack: {
+    type: Boolean,
+    default: true
+  },
+  /** 是否隐藏导航栏（默认 false） */
+  hideNavbar: {
+    type: Boolean,
+    default: false
+  },
+  /** 是否启用内容区域的自定义下拉刷新 */
+  enablePullDownRefresh: {
+    type: Boolean,
+    default: false
+  },
+  /** 页面 style 完整配置对象 */
+  pageStyle: {
+    type: Object,
+    default: () => ({})
+  }
+});
+
+console.log(props, 'default layout props');
 </script>
 
 <style lang="scss" scoped>

@@ -23,6 +23,17 @@ const tokenStore = useTokenStore();
 const userStore = useUserStore();
 const redirectUrl = ref<string>('');
 
+definePage({
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
+  style: {
+    navigationBarTitleText: '登录',
+    navigationStyle: 'custom'
+  }
+});
+
 onLoad((options: UTSJSONObject | null) => {
   if (options != null) {
     const redirect = options['redirect'] as string | null;
