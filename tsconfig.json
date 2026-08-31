@@ -19,8 +19,7 @@
     },
     "resolveJsonModule": true,
     "types": [
-      "@dcloudio/types",
-      "@uni-helper/uni-app-types"
+      "@dcloudio/types"
     ],
     "plugins": [
       {
@@ -50,12 +49,20 @@
     ]
   },
   "include": [
-    "src",
+    "src/**/*.ts",
+    "src/**/*.uts",
+    "src/**/*.uvue",
+    "src/**/*.vue",
+    "*.uvue",
+    "*.uts",
     "vite.config.ts"
   ],
   "exclude": [
     "node_modules",
     "unpackage",
-    "dist"
+    "dist",
+    "uni_modules",
+    ".hbuilderx",
+    "uniCloud-alipay"
   ]
 }
