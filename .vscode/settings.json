@@ -2,7 +2,7 @@
   "files.associations": {
     "*.dbclient-js": "javascript",
     "*.uvue": "vue",
-    "*.uts": "uts",
+    "*.uts": "typescript",
     "pages.json": "jsonc",
     "manifest.json": "jsonc"
   },
@@ -16,6 +16,23 @@
   // 代码规范与语法校验由 ESLint 负责
   "typescript.validate.enable": false,
   "javascript.validate.enable": false,
+  "typescript.suggest.paths": true,
+  "javascript.suggest.paths": true,
+
+  // 路径别名补全插件配置 (Path Intellisense / Path Autocomplete)
+  "path-intellisense.mappings": {
+    "@": "${workspaceFolder}",
+    "@img": "${workspaceFolder}/static"
+  },
+  "path-intellisense.autoSlashAfterDirectory": true,
+  "path-intellisense.extensionOnImport": true,
+  "path-intellisense.showHiddenFiles": false,
+  "path-autocomplete.pathMappings": {
+    "@": "${folder}",
+    "@img": "${folder}/static"
+  },
+  "path-autocomplete.extensionOnImport": true,
+  "path-autocomplete.includeExtension": true,
 
   "explorer.fileNesting.enabled": true,
   "explorer.fileNesting.expand": false,
