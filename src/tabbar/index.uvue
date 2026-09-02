@@ -26,6 +26,16 @@ const safeAreaBottom = computed<number>((): number => {
   return 0;
 });
 
+/** 占位块高度：App 和小程序端为 50 + 底部安全区，防止遮挡滚动内容；H5 端因框架已有视口内边距，特殊处理为 0 避免多出空白 */
+const tabbarPlaceholderHeight = computed<number>((): number => {
+  // #ifdef H5
+  return 0;
+  // #endif
+  // #ifndef H5
+  return TABBAR_HEIGHT + safeAreaBottom.value;
+  // #endif
+});
+
 /** 中间鼓包 tabbarItem 点击事件 */
 function handleClickBulge() {
   uni.navigateTo({
@@ -49,26 +59,49 @@ function handleClick(index: number) {
   uni.switchTab({ url });
 }
 
-// 首次挂载时同步索引
-onMounted(() => {
-  syncCurIdxByCurrentPage();
+/**
+ * 隐藏系统原生 TabBar 并适配 H5 底部高度
+ */
+function safeHideNativeTabBar(): void {
+  if (!needHideNativeTabbar) {
+    return;
+  }
 
-  if (needHideNativeTabbar) {
-    // #ifndef MP-WEIXIN
+  // #ifdef H5
+  try {
+    if (typeof document !== 'undefined' && document.getElementById('hide-native-tabbar-style') == null) {
+      const style = document.createElement('style');
+      style.id = 'hide-native-tabbar-style';
+      style.innerHTML = 'uni-tabbar { display: none !important; } :root { --window-bottom: 0px !important; } uni-page-wrapper { height: 100% !important; }';
+      document.head.appendChild(style);
+    }
+  }
+  catch {}
+  // #endif
+
+  // #ifndef MP-WEIXIN
+  try {
     uni.hideTabBar({
       animation: false,
       fail: (err: any) => {
         console.log('hideTabBar fail: ', err);
       }
     });
-    // #endif
   }
+  catch {}
+  // #endif
+}
+
+// 首次挂载时同步索引并隐藏原生 TabBar
+onMounted(() => {
+  syncCurIdxByCurrentPage();
+  safeHideNativeTabBar();
 });
 </script>
 
 <template>
-  <!-- 占位块：防止页面内容被固定底栏遮挡 -->
-  <view class="tabbar-placeholder" :style="{ height: `${TABBAR_HEIGHT + safeAreaBottom}px` }">
+  <!-- 占位块：防止页面内容被固定底栏遮挡（App/小程序占位50+安全区，H5设为0） -->
+  <view class="tabbar-placeholder" :style="{ height: `${tabbarPlaceholderHeight}px` }">
     <view
       class="tabbar-container"
       :style="{ height: `${TABBAR_CONTAINER_HEIGHT + safeAreaBottom}px` }"
@@ -100,8 +133,15 @@ onMounted(() => {
 
 <style>
 .tabbar-placeholder {
-  /* 高度通过 :style 动态绑定 */
+  /* 高度通过 :style 动态绑定，占据正常文档流防止遮挡页面内容 */
+  width: 100%;
 }
+
+/* #ifdef H5 */
+.tabbar-placeholder {
+  height: 0px !important;
+}
+/* #endif */
 
 /* 固定在底部的容器，内部级联展示三个层 */
 .tabbar-container {

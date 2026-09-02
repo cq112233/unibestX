@@ -15,4 +15,17 @@ uni-tabbar,
 .uni-tabbar__label {
   display: none !important;
 }
+
+// 重置 H5 原生 TabBar 预留的底部高度，消除多出来的空白区域
+:root {
+  --window-bottom: 0px !important;
+}
+
+uni-page-wrapper {
+  height: 100% !important;
+}
+
+uni-page-body {
+  padding-bottom: 0px !important;
+}
 /* #endif */

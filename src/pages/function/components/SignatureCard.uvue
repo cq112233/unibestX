@@ -1,14 +1,21 @@
 <template>
   <Card title="签名板 lime-signature">
     <!-- 签名画布区域 -->
-    <view class="rounded-[12px] mb-[16px] border-[1px] border-solid border-[#e2e8f0] overflow-hidden" style="width: 100%; height: 300px;">
+    <view
+      class="signature-wrapper rounded-[12px] mb-[16px] border-[1px] border-solid border-[#e2e8f0] overflow-hidden"
+      style="width: 100%; height: 300px;"
+      @touchstart="onCardTouchStart"
+      @touchend="onCardTouchEnd"
+      @touchcancel="onCardTouchEnd"
+      @touchmove.stop.prevent="preventScroll"
+    >
       <l-signature
         ref="sigRef"
         style="width: 100%; height: 100%;"
         :pen-color="penColor"
         :pen-size="penSize"
         :open-smooth="openSmooth"
-        disable-scroll
+        :disable-scroll="true"
         background-color="#ffffff"
       />
     </view>
@@ -98,8 +105,9 @@
 
 <script setup lang="uts">
 import Card from '../../basic/components/Card.uvue';
-import { ref } from 'vue';
+import { onUnmounted, ref } from 'vue';
 import type { LimeSignatureToFileSuccess, LimeSignatureToTempFilePathOptions } from '@/uni_modules/lime-signature';
+import { setPageScrollEnabled } from '@/src/utils/pageScroll.uts';
 
 const sigRef = ref<ComponentPublicInstance | null>(null);
 
@@ -110,6 +118,22 @@ const signUrl = ref('');
 
 const colorList = ['#ef4444', '#000000', '#3b82f6', '#10b981', '#f59e0b'];
 const penSizeOptions = [1, 3, 5, 8, 12];
+
+function onCardTouchStart(_e: UniTouchEvent) {
+  setPageScrollEnabled(false);
+}
+
+function onCardTouchEnd(_e: UniTouchEvent) {
+  setPageScrollEnabled(true);
+}
+
+function preventScroll(_e: UniTouchEvent) {
+  // 阻止滑动穿透到父级 scroll-view
+}
+
+onUnmounted(() => {
+  setPageScrollEnabled(true);
+});
 
 function onAction(type: string) {
   const el = sigRef.value;
@@ -146,4 +170,9 @@ function onAction(type: string) {
 </script>
 
 <style>
+/* #ifdef H5 */
+.signature-wrapper {
+  touch-action: none;
+}
+/* #endif */
 </style>

@@ -7,12 +7,7 @@ let redoStack : LimeSignatureLine[] = [];
 let lastX = 0;
 let lastY = 0;
 
-// #ifdef APP-ANDROID || APP-IOS
-type SignatureUniElement = UniElement
-type SignatureCanvasContext = DrawableContext
-// #endif
-
-// #ifdef APP-HARMONY
+// #ifdef APP
 type SignatureUniElement = UniCanvasElement
 type SignatureCanvasContext = CanvasRenderingContext2D
 // #endif
@@ -44,18 +39,16 @@ export class Signature {
 	change: ((isEmpty: boolean) => void)|null = null
 	constructor(el : SignatureUniElement) {
 		this.el = el
-		// #ifdef APP-ANDROID || APP-IOS
-		this.ctx = el.getDrawableContext() as DrawableContext
-		// #endif
-		
-		// #ifdef APP-HARMONY
+		// #ifdef APP
 		const dpr = uni.getDeviceInfo().devicePixelRatio ?? 1;
-		el.width = el.offsetWidth * dpr;
-		el.height = el.offsetHeight * dpr;
+		const rect = el.getBoundingClientRect();
+		const w = rect.width > 0 ? rect.width : 300;
+		const h = rect.height > 0 ? rect.height : 300;
+		el.width = w * dpr;
+		el.height = h * dpr;
 		
-		
-		this.ctx = el.getContext('2d')
-		this.ctx.scale(dpr, dpr); // 仅需调用一次，当调用 reset 方法后需要再次 scale
+		this.ctx = el.getContext('2d') as CanvasRenderingContext2D;
+		this.ctx.scale(dpr, dpr);
 		// #endif
 		this.init()
 	}
@@ -81,12 +74,12 @@ export class Signature {
 		this.options = options
 	}
 	disableScroll(event : UniTouchEvent) {
+		// #ifndef APP-ANDROID || APP-IOS
 		event.stopPropagation()
 		if (this.options.disableScroll) {
-			{
-				event.preventDefault()
-			}
+			event.preventDefault()
 		}
+		// #endif
 	}
 	getTouchLimeSignaturePoint(event : UniTouchEvent) : LimeSignaturePoint {
 		const rect = this.el.getBoundingClientRect()
@@ -150,17 +143,11 @@ export class Signature {
 		this._draw()
 	}
 	_clear() {
-		// #ifdef APP-ANDROID || APP-IOS
-		this.ctx.reset()
-		// #endif
-		// #ifdef APP-HARMONY
-		this.ctx.clearRect(0,0,100000,100000)
+		// #ifdef APP
+		this.ctx.clearRect(0, 0, 100000, 100000)
 		// #endif
 	}
 	_draw() {
-		// #ifdef APP-ANDROID || APP-IOS
-		this.ctx.update()
-		// #endif
 	}
 	// addHistory() { }
 	clear() {
