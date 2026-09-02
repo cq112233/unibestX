@@ -1,0 +1,81 @@
+import Card from '../../basic/components/Card.uvue';
+import { ref } from 'vue';
+
+
+const __sfc__ = defineComponent({
+  __name: 'HapticsCard',
+  setup(__props) {
+const __ins = getCurrentInstance()!;
+const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+const _cache = __ins.renderCache;
+
+const copyText = ref('Hello unibestX!');
+
+function triggerVibration() {
+
+  uni.vibrateShort({
+    type: 'light',
+    success: () => {
+      uni.showToast({ title: '已触发短震动', icon: 'none' });
+    },
+    fail: () => {
+      uni.showToast({ title: '震动触发失败', icon: 'none' });
+    }
+  });
+
+
+
+
+
+
+
+}
+
+function handleCopy() {
+  if (copyText.value === '')
+    return;
+  uni.setClipboardData({
+    data: copyText.value,
+    success: () => {
+      uni.showToast({
+        title: '复制成功',
+        icon: 'success'
+      });
+    }
+  });
+}
+
+return (): any | null => {
+
+  return _cV(unref(Card), _uM({ title: "触感与工具" }), _uM({
+    default: withSlotCtx((): any[] => [
+      _cE("view", _uM({ class: "wtu-1pqljrd-0 wtu-1nsrzwm-1 wtu-z7ly8f-2 wtu-cu4oh8-3 wtu-1ae0mn0-4 wtu-1dpq0lu-5" }), [
+        _cE("text", _uM({ class: "wtu-1e3pw8z-6 wtu-xlfis6-7 wtu-1174kp0-8" }), "剪贴板测试文本"),
+        _cE("input", _uM({
+          modelValue: copyText.value,
+          onInput: ($event: UniInputEvent) => {(copyText).value = $event.detail.value},
+          placeholder: "请输入要复制的文本",
+          class: "wtu-14leste-9 wtu-44c3cb-a wtu-rkq1ns-b wtu-3rena2-c wtu-cu4oh8-3 wtu-1ae0mn0-4 wtu-17e4xae-d wtu-wgd06p-e wtu-lwq7o6-f wtu-7zqqiz-g"
+        }), null, 40 /* PROPS, NEED_HYDRATION */, ["modelValue", "onInput"]),
+        _cE("view", _uM({
+          class: "wtu-1phhh09-h wtu-14leste-9 wtu-18u1qwy-i wtu-1km86q6-j wtu-snabsj-k wtu-1e9fgzq-l wtu-15f70xm-m wtu-1kekspa-n",
+          onClick: handleCopy
+        }), [
+          _cE("text", _uM({ class: "wtu-199nxoz-o wtu-wgd06p-e wtu-17exkt3-p" }), "复制测试文本")
+        ])
+      ]),
+      _cE("view", _uM({
+        class: "wtu-1phhh09-h wtu-1i30ucf-q wtu-18u1qwy-i wtu-nwcnqo-r wtu-snabsj-k wtu-1e9fgzq-l wtu-15f70xm-m wtu-1kekspa-n",
+        onClick: triggerVibration
+      }), [
+        _cE("text", _uM({ class: "wtu-199nxoz-o wtu-wgd06p-e wtu-17exkt3-p" }), "短震动反馈")
+      ])
+    ]),
+    _: 1 /* STABLE */
+  }))
+}
+}
+
+})
+export default __sfc__
+const GenSrcPagesFunctionComponentsHapticsCardStyles = [_uM([["wtu-1pqljrd-0", _pS(_uM([["borderTopLeftRadius", 12], ["borderTopRightRadius", 12], ["borderBottomRightRadius", 12], ["borderBottomLeftRadius", 12]]))], ["wtu-1nsrzwm-1", _pS(_uM([["paddingTop", 16], ["paddingRight", 16], ["paddingBottom", 16], ["paddingLeft", 16]]))], ["wtu-z7ly8f-2", _pS(_uM([["marginBottom", 16]]))], ["wtu-cu4oh8-3", _pS(_uM([["--tw-border-style", "solid"], ["borderTopStyle", "var(--tw-border-style)"], ["borderRightStyle", "var(--tw-border-style)"], ["borderBottomStyle", "var(--tw-border-style)"], ["borderLeftStyle", "var(--tw-border-style)"], ["borderTopWidth", 1], ["borderRightWidth", 1], ["borderBottomWidth", 1], ["borderLeftWidth", 1]]))], ["wtu-1ae0mn0-4", _pS(_uM([["--tw-border-style", "solid"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"]]))], ["wtu-1dpq0lu-5", _pS(_uM([["borderTopColor", "#e2e8f0"], ["borderRightColor", "#e2e8f0"], ["borderBottomColor", "#e2e8f0"], ["borderLeftColor", "#e2e8f0"]]))], ["wtu-1e3pw8z-6", _pS(_uM([["fontSize", 12]]))], ["wtu-xlfis6-7", _pS(_uM([["color", "#94a3b8"]]))], ["wtu-1174kp0-8", _pS(_uM([["marginBottom", 8]]))], ["wtu-14leste-9", _pS(_uM([["height", 38]]))], ["wtu-44c3cb-a", _pS(_uM([["backgroundColor", "#ffffff"]]))], ["wtu-rkq1ns-b", _pS(_uM([["borderTopLeftRadius", 6], ["borderTopRightRadius", 6], ["borderBottomRightRadius", 6], ["borderBottomLeftRadius", 6]]))], ["wtu-3rena2-c", _pS(_uM([["paddingLeft", 12], ["paddingRight", 12]]))], ["wtu-17e4xae-d", _pS(_uM([["borderTopColor", "#cbd5e1"], ["borderRightColor", "#cbd5e1"], ["borderBottomColor", "#cbd5e1"], ["borderLeftColor", "#cbd5e1"]]))], ["wtu-wgd06p-e", _pS(_uM([["fontSize", 14]]))], ["wtu-lwq7o6-f", _pS(_uM([["color", "#334155"]]))], ["wtu-7zqqiz-g", _pS(_uM([["marginBottom", 12]]))], ["wtu-1phhh09-h", _pS(_uM([["width", "100%"]]))], ["wtu-18u1qwy-i", _pS(_uM([["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["wtu-1km86q6-j", _pS(_uM([["backgroundColor", "#10b981"]]))], ["wtu-snabsj-k", _pS(_uM([["display", "flex"]]))], ["wtu-1e9fgzq-l", _pS(_uM([["flexDirection", "row"]]))], ["wtu-15f70xm-m", _pS(_uM([["alignItems", "center"]]))], ["wtu-1kekspa-n", _pS(_uM([["justifyContent", "center"]]))], ["wtu-199nxoz-o", _pS(_uM([["color", "#ffffff"]]))], ["wtu-17exkt3-p", _pS(_uM([["--tw-font-weight", "var(--font-weight-bold, 700)"], ["fontWeight", 700]]))], ["wtu-1i30ucf-q", _pS(_uM([["height", 44]]))], ["wtu-nwcnqo-r", _pS(_uM([["backgroundColor", "#f59e0b"]]))]])]

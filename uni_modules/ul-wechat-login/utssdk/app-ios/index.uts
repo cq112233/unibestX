@@ -1,0 +1,122 @@
+import { UIApplication } from "UIKit"
+import { NSUserActivity } from "Foundation"
+import {
+	WXApi,
+	WXApiDelegate,
+	SendAuthReq,
+	SendAuthResp,
+	BaseResp,
+	BaseReq
+} from 'WechatOpenSDK'
+
+import {
+	WechatLoginOptions,
+	WechatLoginSuccess,
+	RegisterWechat,
+	IsWechatInstalled,
+	WechatLogin
+} from '../interface.uts'
+
+import { WechatLoginFailImpl } from '../unierror'
+import { WX_APP_ID, WX_UNIVERSAL_LINK } from '../config.uts'
+
+let _registered = false
+let _pendingLoginOptions : WechatLoginOptions | null = null
+
+function _ensureRegistered() : void {
+	if (!_registered && WX_APP_ID.length > 0 && WX_UNIVERSAL_LINK.length > 0) {
+		WXApi.registerApp(WX_APP_ID, universalLink = WX_UNIVERSAL_LINK)
+		_registered = true
+	}
+}
+
+class WechatDelegate implements WXApiDelegate {
+	onReq(req : BaseReq) : void {}
+
+	onResp(resp : BaseResp) : void {
+		if (resp instanceof SendAuthResp) {
+			const authResp = resp as SendAuthResp
+			const options = _pendingLoginOptions
+			_pendingLoginOptions = null
+
+			if (authResp.errCode == 0) {
+				const code = authResp.code ?? ""
+				if (code.length > 0) {
+					const result : WechatLoginSuccess = { code: code }
+					options?.success?.(result)
+					options?.complete?.(result)
+				} else {
+					const fail = new WechatLoginFailImpl(9020003)
+					options?.fail?.(fail)
+					options?.complete?.(fail)
+				}
+			} else if (authResp.errCode == -2) {
+				const fail = new WechatLoginFailImpl(9020002)
+				options?.fail?.(fail)
+				options?.complete?.(fail)
+			} else {
+				const fail = new WechatLoginFailImpl(9020003)
+				options?.fail?.(fail)
+				options?.complete?.(fail)
+			}
+		}
+	}
+}
+
+const _delegate = new WechatDelegate()
+
+export class WechatLoginHookProxy implements UTSiOSHookProxy {
+	onCreate() {
+		_ensureRegistered()
+	}
+
+	applicationOpenURLOptions(
+		app : UIApplication | null,
+		url : URL,
+		options : Map<UIApplication.OpenURLOptionsKey, any> | null = null
+	) : boolean {
+		return WXApi.handleOpen(url, delegate = _delegate)
+	}
+
+	applicationContinueUserActivityRestorationHandler(
+		application : UIApplication | null,
+		userActivity : NSUserActivity | null,
+		restorationHandler : ((res : [any] | null) => void) | null = null
+	) : boolean {
+		if (userActivity != null) {
+			return WXApi.handleOpenUniversalLink(userActivity!, delegate = _delegate)
+		}
+		return false
+	}
+}
+
+export const registerWechat : RegisterWechat = function () : void {
+	_ensureRegistered()
+}
+
+export const isWechatInstalled : IsWechatInstalled = function () : boolean {
+	return WXApi.isWXAppInstalled()
+}
+
+export const wechatLogin : WechatLogin = function (options : WechatLoginOptions) : void {
+	if (!_registered) {
+		const fail = new WechatLoginFailImpl(9020004)
+		options.fail?.(fail)
+		options.complete?.(fail)
+		return
+	}
+
+	if (!WXApi.isWXAppInstalled()) {
+		const fail = new WechatLoginFailImpl(9020001)
+		options.fail?.(fail)
+		options.complete?.(fail)
+		return
+	}
+
+	_pendingLoginOptions = options
+
+	const req = new SendAuthReq()
+	req.scope = "snsapi_userinfo"
+	req.state = "wechat_login"
+	WXApi.send(req)
+}

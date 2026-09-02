@@ -1,0 +1,194 @@
+import { useTokenStore } from '../store/token';
+
+// ==========================================
+// 类型定义
+// ==========================================
+export type UploadFileOptions = {
+  url?: string;
+  filePath: string;
+  name?: string;
+  header?: UTSJSONObject;
+  formData?: UTSJSONObject;
+  ignoreAuth?: boolean;
+  onProgress?: (progress: number) => void;
+};
+
+/**
+ * 默认 OSS 上传基础域名与接口路径（支持直接在 .env 中配置 VITE_UPLOAD_BASEURL 与 VITE_UPLOAD_PATH）
+ */
+const DEFAULT_FALLBACK_BASE_URL: string = 'https://xxx.com';
+const DEFAULT_FALLBACK_UPLOAD_PATH: string = '/gateway/user/sys/oss/upload/xxx';
+
+export const DEFAULT_OSS_BASE_URL: string = `${import.meta.env.VITE_UPLOAD_BASEURL ?? DEFAULT_FALLBACK_BASE_URL}`;
+export const DEFAULT_OSS_UPLOAD_PATH: string = `${import.meta.env.VITE_UPLOAD_PATH ?? DEFAULT_FALLBACK_UPLOAD_PATH}`;
+export const DEFAULT_OSS_UPLOAD_URL: string = `${DEFAULT_OSS_BASE_URL}${DEFAULT_OSS_UPLOAD_PATH}`;
+
+/**
+ * 使用 uni.uploadFile 统一封装的文件上传函数（App / 小程序 / H5 全端通用）
+ * - 统一原生 uni.uploadFile 底层调用
+ * - 支持传入完整 URL 或仅传入相对路径（如 /gateway/... 自动拼接 base URL）
+ * - 自动携带 Token（可传 ignoreAuth: true 跳过）
+ * - 支持 onProgress 上传进度回调
+ * - 严格解析并校验返回值（兼容 code: 200 / "200" / success: true / 各种 url 结构）
+ *
+ * 使用示例：
+ * uni.chooseImage({
+ *   count: 1,
+ *   success: (res) => {
+ *     const filePath = res.tempFilePaths[0] as string;
+ *     uploadOssFile(filePath)
+ *       .then((url: string) => {
+ *         console.log('上传成功 OSS 地址:', url);
+ *       })
+ *       .catch((err: Error | null) => {
+ *         uni.showToast({ title: err?.message ?? '上传失败', icon: 'none' });
+ *       });
+ *   }
+ * });
+ */
+export function uploadFile(options: UploadFileOptions): Promise<string> {
+  return new Promise((resolve, reject) => {
+    let finalUrl = options.url ?? DEFAULT_OSS_UPLOAD_URL;
+    if (finalUrl.startsWith('/')) {
+      finalUrl = `${DEFAULT_OSS_BASE_URL}${finalUrl}`;
+    }
+    const header = options.header ?? ({} as UTSJSONObject);
+
+    // 自动携带 Token
+    if (options.ignoreAuth != true) {
+      const tokenStore = useTokenStore();
+      const token = tokenStore.getToken();
+      if (token != '') {
+        header.token = token;
+      }
+    }
+
+    const uploadTask = uni.uploadFile({
+      url: finalUrl,
+      filePath: options.filePath,
+      name: options.name ?? 'file',
+      header,
+      formData: options.formData ?? ({} as UTSJSONObject),
+      success: (res) => {
+        const statusCode = res.statusCode;
+        if (statusCode != 200) {
+          reject(new Error(`上传请求失败，HTTP 状态码: ${statusCode}`));
+          return;
+        }
+        try {
+          const url = parseUploadResult(res.data);
+          resolve(url);
+        }
+        catch (e: any) {
+          reject(e instanceof Error ? (e as Error) : new Error(`${e}`));
+        }
+      },
+      fail: (err) => {
+        console.error('uni.uploadFile fail:', err);
+        reject(new Error(err.errMsg ?? '文件上传失败'));
+      }
+    });
+
+    // 上传进度监听
+    if (options.onProgress != null) {
+      uploadTask.onProgressUpdate((res) => {
+        options.onProgress!(res.progress);
+      });
+    }
+  });
+}
+
+/**
+ * 上传 OSS 文件快捷函数
+ */
+export function uploadOssFile(
+  filePath: string,
+  formData: UTSJSONObject | null = null,
+  ignoreAuth: boolean = false
+): Promise<string> {
+  return uploadFile({
+    filePath,
+    formData: formData ?? ({} as UTSJSONObject),
+    ignoreAuth
+  } as UploadFileOptions);
+}
+
+/**
+ * 解析上传响应，提取 OSS 地址
+ * 支持：直接返回 http(s) 地址 / { success: true, code: "10000", data: { url } } / { code: 200, data: 'url' } 等
+ */
+function parseUploadResult(raw: string): string {
+  const trimmed = raw.trim();
+  if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+    return trimmed;
+  }
+
+  const obj = JSON.parseObject(trimmed);
+  if (obj == null) {
+    return trimmed;
+  }
+
+  // 1. 优先检查显式的 success 布尔值
+  const successVal = obj.getBoolean('success');
+  if (successVal == false) {
+    const msg = obj.getString('msg') ?? obj.getString('message') ?? '上传业务失败';
+    const code = obj.getString('code') ?? (obj.getNumber('code') != null ? `${obj.getNumber('code')}` : '');
+    throw new Error(`上传失败${code != '' ? `[${code}]` : ''}：${msg}`);
+  }
+
+  // 2. 检查 code 状态码（若 success 显式为 true 则视为成功；未提供 success 时按 code 白名单校验）
+  if (successVal != true) {
+    const numCode = obj.getNumber('code');
+    const strCode = obj.getString('code');
+    let isFailed = false;
+    let codeStr = '';
+
+    if (numCode != null) {
+      codeStr = `${numCode}`;
+      // 常见成功码：200, 0, 10000
+      if (numCode != 200 && numCode != 0 && numCode != 10000) {
+        isFailed = true;
+      }
+    }
+    else if (strCode != null) {
+      codeStr = strCode;
+      // 常见成功码：'200', '0', '10000', '000000', 'SUCCESS', 'OK'
+      if (strCode != '200' && strCode != '0' && strCode != '10000' && strCode != '000000' && strCode != 'SUCCESS' && strCode != 'OK') {
+        isFailed = true;
+      }
+    }
+
+    if (isFailed) {
+      const msg = obj.getString('msg') ?? obj.getString('message') ?? '上传失败';
+      throw new Error(`上传失败[${codeStr}]：${msg}`);
+    }
+  }
+
+  // 3. 提取 url（顶级 url 或嵌套 data.url / data.fileUrl 等）
+  const topUrl = obj.getString('url');
+  if (topUrl != null && topUrl != '') {
+    return topUrl;
+  }
+
+  const data = obj.get('data');
+  if (data != null) {
+    if (typeof data == 'string') {
+      const dataStr = (data as string).trim();
+      if (dataStr != '' && dataStr != 'null') {
+        return dataStr;
+      }
+    }
+    const dataObj = data as UTSJSONObject;
+    const dataUrl = dataObj.getString('url') ?? dataObj.getString('fileUrl') ?? dataObj.getString('ossUrl') ?? dataObj.getString('path') ?? dataObj.getString('link');
+    if (dataUrl != null && dataUrl != '') {
+      return dataUrl;
+    }
+  }
+
+  // 4. 若没有找到明确的 URL，且原内容不是 URL，抛出解析异常，避免将未知 JSON 当成 URL
+  if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
+    throw new Error('上传成功但未能从响应中解析出文件 URL 地址');
+  }
+
+  return trimmed;
+}

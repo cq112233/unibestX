@@ -1,0 +1,62 @@
+import { computed } from 'vue';
+import Card from './Card.uvue';
+import { useTokenStore } from '@/src/store/token';
+import { useUserStore } from '@/src/store/user';
+const __sfc__ = defineComponent({
+    __name: 'RouterDemoCard',
+    setup(__props) {
+        const __ins = getCurrentInstance()!;
+        const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+        const _cache = __ins.renderCache;
+        const tokenStore = useTokenStore();
+        const userStore = useUserStore();
+        const hasLogin = computed((): boolean => {
+            return tokenStore.hasValidLogin();
+        });
+        function jumpToTest() {
+            uni.navigateTo({
+                url: '/src/sub/test/test?id=999&name=UNIX'
+            });
+        }
+        function handleLogout() {
+            tokenStore.clearToken();
+            userStore.clearUserInfo();
+            uni.showToast({
+                title: '已清除登录状态',
+                icon: 'success'
+            });
+        }
+        return (): any | null => {
+            return _cV(unref(Card), _uM({ title: "路由拦截与传参测试" }), _uM({
+                default: withSlotCtx((): any[] => [
+                    _cE("view", _uM({ class: "wtu-1st5nxt-0 wtu-j0fle6-1 wtu-1v2ij9z-2 wtu-1p7g57o-3 wtu-xh5qwk-4 wtu-198xyh6-5" }), [
+                        _cE("view", _uM({ class: "wtu-1mii4ha-6 wtu-1bpud9-7 wtu-1rv0ode-8 wtu-2onxqk-9" }), [
+                            _cE("text", _uM({ class: "wtu-qv3lw9-a wtu-v3kjc2-b" }), "当前登录状态:"),
+                            _cE("text", _uM({
+                                style: _nS(_uM({ fontSize: '14px', fontWeight: 'bold', color: hasLogin.value ? '#10b981' : '#f43f5e' }))
+                            }), _tD(hasLogin.value ? '已登录' : '未登录'), 5 /* TEXT, STYLE */)
+                        ]),
+                        _cE("text", _uM({ class: "wtu-15y3kej-c wtu-15zxwf2-d wtu-16blrxy-e" }), " 测试场景说明：Test 页面属于需登录拦截页面。未登录时点击跳转将拦截并重定向到登录页，登录成功后会自动跳回 Test 页并解析 query 传参。 ")
+                    ]),
+                    _cE("view", _uM({ class: "wtu-1mii4ha-6 wtu-1bpud9-7" }), [
+                        _cE("view", _uM({
+                            class: "wtu-1b8tya1-f wtu-16axtl9-g wtu-1d89kne-h wtu-7mwwf1-i wtu-1h8vv6j-j wtu-1mii4ha-6 wtu-1rv0ode-8 wtu-1d05fpi-k",
+                            onClick: jumpToTest
+                        }), [
+                            _cE("text", _uM({ class: "wtu-gc256j-l wtu-qv3lw9-a" }), "跳转 Test 页 (传参)")
+                        ]),
+                        _cE("view", _uM({
+                            class: "wtu-1b8tya1-f wtu-1gwi2a9-m wtu-1echmqm-n wtu-1d89kne-h wtu-7mwwf1-i wtu-1h8vv6j-j wtu-1mii4ha-6 wtu-1rv0ode-8 wtu-1d05fpi-k",
+                            onClick: handleLogout
+                        }), [
+                            _cE("text", _uM({ class: "wtu-gc256j-l wtu-qv3lw9-a" }), "清除登录状态")
+                        ])
+                    ])
+                ]),
+                _: 1 /* STABLE */
+            }));
+        };
+    }
+});
+export default __sfc__;
+const GenSrcPagesBasicComponentsRouterDemoCardStyles = [_uM([["wtu-1st5nxt-0", _pS(_uM([["borderTopLeftRadius", 12], ["borderTopRightRadius", 12], ["borderBottomRightRadius", 12], ["borderBottomLeftRadius", 12]]))], ["wtu-j0fle6-1", _pS(_uM([["paddingTop", 16], ["paddingRight", 16], ["paddingBottom", 16], ["paddingLeft", 16]]))], ["wtu-1v2ij9z-2", _pS(_uM([["marginBottom", 16]]))], ["wtu-1p7g57o-3", _pS(_uM([["--tw-border-style", "solid"], ["borderTopStyle", "var(--tw-border-style)"], ["borderRightStyle", "var(--tw-border-style)"], ["borderBottomStyle", "var(--tw-border-style)"], ["borderLeftStyle", "var(--tw-border-style)"], ["borderTopWidth", 1], ["borderRightWidth", 1], ["borderBottomWidth", 1], ["borderLeftWidth", 1]]))], ["wtu-xh5qwk-4", _pS(_uM([["--tw-border-style", "solid"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"]]))], ["wtu-198xyh6-5", _pS(_uM([["borderTopColor", "#e2e8f0"], ["borderRightColor", "#e2e8f0"], ["borderBottomColor", "#e2e8f0"], ["borderLeftColor", "#e2e8f0"]]))], ["wtu-1mii4ha-6", _pS(_uM([["flexDirection", "row"]]))], ["wtu-1bpud9-7", _pS(_uM([["justifyContent", "space-between"]]))], ["wtu-1rv0ode-8", _pS(_uM([["alignItems", "center"]]))], ["wtu-2onxqk-9", _pS(_uM([["marginBottom", 8]]))], ["wtu-qv3lw9-a", _pS(_uM([["fontSize", 14]]))], ["wtu-v3kjc2-b", _pS(_uM([["color", "#64748b"]]))], ["wtu-15y3kej-c", _pS(_uM([["fontSize", 12]]))], ["wtu-15zxwf2-d", _pS(_uM([["color", "#94a3b8"]]))], ["wtu-16blrxy-e", _pS(_uM([["--tw-leading", "var(--leading-normal, 1.5)"], ["lineHeight", 1.5]]))], ["wtu-1b8tya1-f", _pS(_uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]]))], ["wtu-16axtl9-g", _pS(_uM([["backgroundColor", "#3182ce"]]))], ["wtu-1d89kne-h", _pS(_uM([["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["wtu-7mwwf1-i", _pS(_uM([["height", 42]]))], ["wtu-1h8vv6j-j", _pS(_uM([["display", "flex"]]))], ["wtu-1d05fpi-k", _pS(_uM([["justifyContent", "center"]]))], ["wtu-gc256j-l", _pS(_uM([["color", "#ffffff"]]))], ["wtu-1gwi2a9-m", _pS(_uM([["marginLeft", 12]]))], ["wtu-1echmqm-n", _pS(_uM([["backgroundColor", "#ef4444"]]))]])];

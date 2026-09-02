@@ -1,0 +1,60 @@
+function __uts_large_basic_fill_fill_1(__obj: UTSJSONObject): void {
+    __obj["iconDemoTitle"] = "Font Icon Demo";
+    __obj["svgAuthWarning"] = "SVG mode requires authorization & fee";
+    __obj["langTitle"] = "Language Settings";
+    __obj["langPreview"] = "Multi-language Preview";
+    __obj["themeTitle"] = "Theme Settings";
+    __obj["themePreview"] = "Theme Color Preview";
+    __obj["themeButton"] = "Theme Button";
+    __obj["themeSuccess"] = "Theme color updated successfully";
+    __obj["themeModeTitle"] = "Appearance";
+    __obj["themeModeAuto"] = "Follow System";
+    __obj["themeModeLight"] = "Light";
+    __obj["themeModeDark"] = "Dark";
+    __obj["themeModeSuccess"] = "Appearance updated";
+    __obj["echartTitle"] = "ECharts Chart Demo";
+    __obj["echartLine"] = "Line Chart";
+    __obj["echartBar"] = "Bar Chart";
+    __obj["echartPie"] = "Pie Chart";
+}
+function __uts_large_basic_build_0(): UTSJSONObject {
+    const __obj = {} as UTSJSONObject;
+    __uts_large_basic_fill_fill_1(__obj);
+    return __obj;
+}
+export const message = {
+    hello: "The world says {msg}!",
+    welcome: "Welcome to use unibestX!",
+    switch_success: "Switched to English"
+} as UTSJSONObject;
+export const tabbar = {
+    home: "Home",
+    basic: "Basic",
+    ai: "AI",
+    "function": "Function",
+    me: "Me"
+} as UTSJSONObject;
+export const basic = __uts_large_basic_build_0();
+export default {
+    message: message,
+    tabbar: tabbar,
+    basic: basic,
+    "function": {
+        sysInfoTitle: "Device System Info",
+        brand: "Brand",
+        model: "Model",
+        system: "OS",
+        platform: "Platform",
+        getSysInfoBtn: "Get System Info",
+        hapticsTitle: "Short Vibration Feedback",
+        vibrateBtn: "Short Vibration Feedback",
+        vibrateSuccess: "Vibration triggered",
+        copyBtn: "Copy Test Text",
+        copySuccess: "Copied successfully",
+        mediaTitle: "Camera & Media",
+        choosePhotoBtn: "Take Photo/Choose Image",
+        scanCodeBtn: "Scan Code Test",
+        scanResult: "Scan Result",
+        noData: "No data"
+    }
+} as UTSJSONObject;

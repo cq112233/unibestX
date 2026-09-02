@@ -1,0 +1,148 @@
+import { curIdx, setCurIdx, syncCurIdxByCurrentPage, tabbarList } from './store';
+import { needHideNativeTabbar } from './config';
+import TabbarItem from './TabbarItem.uvue';
+import { safeAreaInsets } from '../utils/systemInfo';
+import { useAppStore } from '@/src/store';
+import { getThemeTokens } from '@/src/utils/theme';
+import type { ThemeTokens } from '@/src/utils/theme';
+/** tabbar 白色底板高度（px） */
+
+const __sfc__ = defineComponent({
+  __name: 'index',
+  setup(__props) {
+const __ins = getCurrentInstance()!;
+const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+const _cache = __ins.renderCache;
+
+const TABBAR_HEIGHT: number = 50;
+
+/** tabbar 容器总高度（包含鼓包突出的部分） */
+const TABBAR_CONTAINER_HEIGHT: number = 80;
+
+// 亮 / 暗主题 token（与 theme.json tabBar 配置同步）
+const themeTokens = computed((): ThemeTokens => {
+  return getThemeTokens(useAppStore().state.isDark);
+});
+
+/** 安全区底部高度，从全局 systemInfo 工具中响应式读取 */
+const safeAreaBottom = computed<number>((): number => {
+  const insets = safeAreaInsets.value;
+  if (insets != null) {
+    return insets.bottom;
+  }
+  return 0;
+});
+
+/** 占位块高度：App 和小程序端为 50 + 底部安全区，防止遮挡滚动内容；H5 端因框架已有视口内边距，特殊处理为 0 避免多出空白 */
+const tabbarPlaceholderHeight = computed<number>((): number => {
+
+
+
+
+  return TABBAR_HEIGHT + safeAreaBottom.value;
+
+});
+
+/** 中间鼓包 tabbarItem 点击事件 */
+function handleClickBulge() {
+  uni.navigateTo({
+    url: '/src/pages/ai/ai'
+  });
+}
+
+/** 点击 tab 切换 */
+function handleClick(index: number) {
+  if (index == curIdx.value)
+    return;
+  const list = tabbarList;
+  if (list.length <= index)
+    return;
+  if (list[index].isBulge) {
+    handleClickBulge();
+    return;
+  }
+  const url = list[index].pagePath;
+  setCurIdx(index);
+  uni.switchTab({ url });
+}
+
+/**
+ * 隐藏系统原生 TabBar 并适配 H5 底部高度
+ */
+function safeHideNativeTabBar(): void {
+  if (!needHideNativeTabbar) {
+    return;
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  try {
+    uni.hideTabBar({
+      animation: false,
+      fail: (err: any) => {
+        console.log('hideTabBar fail: ', err);
+      }
+    });
+  }
+  catch {}
+
+}
+
+// 首次挂载时同步索引并隐藏原生 TabBar
+onMounted(() => {
+  syncCurIdxByCurrentPage();
+  safeHideNativeTabBar();
+});
+
+return (): any | null => {
+
+  return _cE("view", _uM({
+    class: "tabbar-placeholder",
+    style: _nS(_uM({ height: `${unref(tabbarPlaceholderHeight)}px` }))
+  }), [
+    _cE("view", _uM({
+      class: "tabbar-container",
+      style: _nS(_uM({ height: `${TABBAR_CONTAINER_HEIGHT + unref(safeAreaBottom)}px` }))
+    }), [
+      _cE("view", _uM({
+        class: "tabbar-bg",
+        style: _nS(_uM({ height: `${TABBAR_HEIGHT + unref(safeAreaBottom)}px`, backgroundColor: unref(themeTokens).tabBg, borderTopColor: unref(themeTokens).tabBorder }))
+      }), null, 4 /* STYLE */),
+      _cE("view", _uM({ class: "tabbar-inner" }), [
+        _cE(Fragment, null, RenderHelpers.renderList(unref(tabbarList), (item, index, __index, _cached): any => {
+          return _cE("view", _uM({
+            key: index,
+            class: _nC(["tabbar-item", _uM({ 'tabbar-item-bulge': item.isBulge })]),
+            onClick: () => {handleClick(index)}
+          }), [
+            _cV(unref(TabbarItem), _uM({
+              item: item,
+              index: index,
+              "is-bulge": item.isBulge
+            }), null, 8 /* PROPS */, ["item", "index", "is-bulge"])
+          ], 10 /* CLASS, PROPS */, ["onClick"])
+        }), 128 /* KEYED_FRAGMENT */)
+      ]),
+      _cE("view", _uM({
+        class: "safe-area-bg",
+        style: _nS(_uM({ height: `${unref(safeAreaBottom)}px`, backgroundColor: unref(themeTokens).tabBg }))
+      }), null, 4 /* STYLE */)
+    ], 4 /* STYLE */)
+  ], 4 /* STYLE */)
+}
+}
+
+})
+export default __sfc__
+const GenSrcTabbarIndexStyles = [_uM([["tabbar-placeholder", _pS(_uM([["width", "100%"]]))], ["tabbar-container", _pS(_uM([["position", "fixed"], ["bottom", 0], ["left", 0], ["right", 0], ["zIndex", 1], ["backgroundColor", "rgba(0,0,0,0)"], ["flexDirection", "column"]]))], ["tabbar-bg", _pS(_uM([["position", "absolute"], ["bottom", 0], ["left", 0], ["right", 0], ["borderTopWidth", "1rpx"], ["borderTopStyle", "solid"], ["zIndex", 1]]))], ["tabbar-inner", _pS(_uM([["flexDirection", "row"], ["height", 80], ["alignItems", "flex-end"], ["zIndex", 2]]))], ["tabbar-item", _pS(_uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["alignItems", "center"], ["justifyContent", "center"], ["height", 50]]))], ["tabbar-item-bulge", _pS(_uM([["height", 80]]))], ["safe-area-bg", _pS(_uM([["zIndex", 1]]))]])]

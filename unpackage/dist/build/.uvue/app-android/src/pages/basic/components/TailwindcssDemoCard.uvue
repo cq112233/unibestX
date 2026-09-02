@@ -1,0 +1,65 @@
+import Card from './Card.uvue';
+const __sfc__ = defineComponent({
+    __name: 'TailwindcssDemoCard',
+    setup(__props) {
+        const __ins = getCurrentInstance()!;
+        const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+        const _cache = __ins.renderCache;
+        function copyWebsiteUrl() {
+            uni.setClipboardData({
+                data: 'https://tw.icebreaker.top/zh-cn/',
+                success: () => {
+                    uni.showToast({
+                        title: '官网网址已复制到剪贴板',
+                        icon: 'none'
+                    });
+                }
+            });
+        }
+        function navigateToDemo() {
+            uni.navigateTo({
+                url: '/src/sub/tailwindcss/tailwindcss',
+                fail: (err) => {
+                    console.error('navigateToDemo fail:', err);
+                }
+            });
+        }
+        return (): any | null => {
+            return _cV(unref(Card), _uM({ title: "weapp-tailwindcss Demo" }), _uM({
+                default: withSlotCtx((): any[] => [
+                    _cE("view", _uM({ class: "wtu-10fxz8g-0 wtu-n07vof-1" }), [
+                        _cE("text", _uM({ class: "wtu-1swt5i6-2 wtu-7ut3h6-3 wtu-v1603q-4 wtu-1k2vr17-5" }), " 项目已接入 Tailwind CSS v4 + weapp-tailwindcss，支持方括号任意值（如 text-[14px]、mt-[12px]）、dark: 暗黑变体与多端平台变体，一套类名全端生效，写法与 Web 端完全一致。 "),
+                        _cE("view", _uM({
+                            class: "wtu-1ue8wuu-6 wtu-ugr1m2-7 wtu-64j6tc-8 wtu-7jd6f-9 wtu-ln8km0-a wtu-1k2vr17-5",
+                            onClick: copyWebsiteUrl
+                        }), [
+                            _cE("text", _uM({ class: "wtu-1jpdk37-b wtu-1lxv8cd-c wtu-p1t5tf-d wtu-pgoxso-e" }), "官网："),
+                            _cE("text", _uM({ class: "wtu-1jpdk37-b wtu-155roug-f wtu-1klokvc-g wtu-1vk0on5-h" }), "https://tw.icebreaker.top/zh-cn/"),
+                            _cE("text", _uM({ class: "wtu-9ng6ts-i wtu-17ue17q-j" }), "点击复制")
+                        ]),
+                        _cE("view", _uM({ class: "wtu-1ue8wuu-6 wtu-ugr1m2-7 wtu-8yh2zy-k" }), [
+                            _cE("view", _uM({ class: "wtu-3xj2e-l wtu-1s0c5bc-m wtu-1qnaxng-n wtu-1smlacz-o wtu-s74oky-p wtu-rwf26b-q wtu-6u6y64-r wtu-1rjkyp8-s wtu-9gow7j-t" }), [
+                                _cE("text", _uM({ class: "wtu-9ng6ts-i wtu-155roug-f wtu-p1t5tf-d" }), "Tailwind CSS v4")
+                            ]),
+                            _cE("view", _uM({ class: "wtu-3xj2e-l wtu-1s0c5bc-m wtu-1qnaxng-n wtu-1smlacz-o wtu-s74oky-p wtu-1796l3j-u wtu-6u6y64-r wtu-1rjkyp8-s wtu-173g5br-v" }), [
+                                _cE("text", _uM({ class: "wtu-9ng6ts-i wtu-itbynk-w wtu-p1t5tf-d" }), "方括号任意值")
+                            ]),
+                            _cE("view", _uM({ class: "wtu-1s0c5bc-m wtu-1qnaxng-n wtu-1smlacz-o wtu-s74oky-p wtu-1v1k4mz-x wtu-6u6y64-r wtu-1rjkyp8-s wtu-h6hcp8-y" }), [
+                                _cE("text", _uM({ class: "wtu-9ng6ts-i wtu-1cm941u-z wtu-p1t5tf-d" }), "dark: 暗黑变体")
+                            ])
+                        ])
+                    ]),
+                    _cE("view", _uM({
+                        class: "wtu-1bmc39l-10 wtu-1tf82vj-11 wtu-12wk9v6-12 wtu-13en0gu-13 wtu-vx8l1f-14 wtu-1ue8wuu-6 wtu-ugr1m2-7 wtu-xicm2m-15",
+                        onClick: navigateToDemo
+                    }), [
+                        _cE("text", _uM({ class: "wtu-jq9nhf-16 wtu-kasb8h-17 wtu-1w3ascn-18" }), "进入 weapp-tailwindcss 示例")
+                    ])
+                ]),
+                _: 1 /* STABLE */
+            }));
+        };
+    }
+});
+export default __sfc__;
+const GenSrcPagesBasicComponentsTailwindcssDemoCardStyles = [_uM([["wtu-10fxz8g-0", _pS(_uM([["flexDirection", "column"]]))], ["wtu-n07vof-1", _pS(_uM([["marginBottom", 16]]))], ["wtu-1swt5i6-2", _pS(_uM([["fontSize", 13]]))], ["wtu-7ut3h6-3", _pS(_uM([["color", "#64748b"]]))], ["wtu-v1603q-4", _pS(_uM([["--tw-leading", "18px"], ["lineHeight", "18px"]]))], ["wtu-1k2vr17-5", _pS(_uM([["marginBottom", 12]]))], ["wtu-1ue8wuu-6", _pS(_uM([["flexDirection", "row"]]))], ["wtu-ugr1m2-7", _pS(_uM([["alignItems", "center"]]))], ["wtu-64j6tc-8", _pS(_uM([["backgroundColor", "#f1f5f9"]]))], ["wtu-7jd6f-9", _pS(_uM([["paddingTop", 8], ["paddingRight", 8], ["paddingBottom", 8], ["paddingLeft", 8]]))], ["wtu-ln8km0-a", _pS(_uM([["borderTopLeftRadius", 6], ["borderTopRightRadius", 6], ["borderBottomRightRadius", 6], ["borderBottomLeftRadius", 6]]))], ["wtu-1jpdk37-b", _pS(_uM([["fontSize", 12]]))], ["wtu-1lxv8cd-c", _pS(_uM([["color", "#475569"]]))], ["wtu-p1t5tf-d", _pS(_uM([["--tw-font-weight", "var(--font-weight-medium, 500)"], ["fontWeight", 500]]))], ["wtu-pgoxso-e", _pS(_uM([["marginRight", 4]]))], ["wtu-155roug-f", _pS(_uM([["color", "#2563eb"]]))], ["wtu-1klokvc-g", _pS(_uM([["textDecorationLine", "underline"]]))], ["wtu-1vk0on5-h", _pS(_uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]]))], ["wtu-9ng6ts-i", _pS(_uM([["fontSize", 11]]))], ["wtu-17ue17q-j", _pS(_uM([["color", "#94a3b8"]]))], ["wtu-8yh2zy-k", _pS(_uM([["flexWrap", "wrap"]]))], ["wtu-3xj2e-l", _pS(_uM([["marginRight", 6]]))], ["wtu-1s0c5bc-m", _pS(_uM([["marginBottom", 4]]))], ["wtu-1qnaxng-n", _pS(_uM([["paddingLeft", 10], ["paddingRight", 10]]))], ["wtu-1smlacz-o", _pS(_uM([["paddingTop", 3], ["paddingBottom", 3]]))], ["wtu-s74oky-p", _pS(_uM([["borderTopLeftRadius", 20], ["borderTopRightRadius", 20], ["borderBottomRightRadius", 20], ["borderBottomLeftRadius", 20]]))], ["wtu-rwf26b-q", _pS(_uM([["backgroundColor", "#e0edff"]]))], ["wtu-6u6y64-r", _pS(_uM([["--tw-border-style", "solid"], ["borderTopStyle", "var(--tw-border-style)"], ["borderRightStyle", "var(--tw-border-style)"], ["borderBottomStyle", "var(--tw-border-style)"], ["borderLeftStyle", "var(--tw-border-style)"], ["borderTopWidth", 1], ["borderRightWidth", 1], ["borderBottomWidth", 1], ["borderLeftWidth", 1]]))], ["wtu-1rjkyp8-s", _pS(_uM([["--tw-border-style", "solid"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"]]))], ["wtu-9gow7j-t", _pS(_uM([["borderTopColor", "#bfdbfe"], ["borderRightColor", "#bfdbfe"], ["borderBottomColor", "#bfdbfe"], ["borderLeftColor", "#bfdbfe"]]))], ["wtu-1796l3j-u", _pS(_uM([["backgroundColor", "#d1fae5"]]))], ["wtu-173g5br-v", _pS(_uM([["borderTopColor", "#a7f3d0"], ["borderRightColor", "#a7f3d0"], ["borderBottomColor", "#a7f3d0"], ["borderLeftColor", "#a7f3d0"]]))], ["wtu-itbynk-w", _pS(_uM([["color", "#059669"]]))], ["wtu-1v1k4mz-x", _pS(_uM([["backgroundColor", "#fef3c7"]]))], ["wtu-h6hcp8-y", _pS(_uM([["borderTopColor", "#fde68a"], ["borderRightColor", "#fde68a"], ["borderBottomColor", "#fde68a"], ["borderLeftColor", "#fde68a"]]))], ["wtu-1cm941u-z", _pS(_uM([["color", "#d97706"]]))], ["wtu-1bmc39l-10", _pS(_uM([["width", "100%"]]))], ["wtu-1tf82vj-11", _pS(_uM([["height", 44]]))], ["wtu-12wk9v6-12", _pS(_uM([["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["wtu-13en0gu-13", _pS(_uM([["backgroundColor", "#3b82f6"]]))], ["wtu-vx8l1f-14", _pS(_uM([["display", "flex"]]))], ["wtu-xicm2m-15", _pS(_uM([["justifyContent", "center"]]))], ["wtu-jq9nhf-16", _pS(_uM([["color", "#ffffff"]]))], ["wtu-kasb8h-17", _pS(_uM([["fontSize", 14]]))], ["wtu-1w3ascn-18", _pS(_uM([["--tw-font-weight", "var(--font-weight-bold, 700)"], ["fontWeight", 700]]))]])];
