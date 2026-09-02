@@ -5,13 +5,14 @@
     <scroll-view direction="vertical" class="flex-1" style="flex: 1;">
       <slot></slot>
     </scroll-view>
-    <!-- 仅在当前页面为底部 Tabbar 页面时渲染自定义导航栏 -->
-    <Tabbar v-if="isCurrentPageTabbar" />
+    <!-- 仅在当前页面为底部 Tabbar 页面且策略为自定义 Tabbar 时渲染 -->
+    <Tabbar v-if="customTabbarEnable && isCurrentPageTabbar" />
   </view>
 </template>
 
 <script setup lang="uts">
 import Tabbar from '@/src/tabbar/index.uvue';
+import { customTabbarEnable } from '@/src/tabbar/config';
 import { useAppStore } from '@/src/store';
 import { isPageTabbar, syncCurIdxByCurrentPage } from '@/src/tabbar/store';
 import { applyNavbarTheme, getThemeTokens } from '@/src/utils/theme';

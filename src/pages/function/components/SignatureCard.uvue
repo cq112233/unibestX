@@ -3,7 +3,8 @@
     <!-- 签名画布区域 -->
     <view class="rounded-[12px] mb-[16px] border-[1px] border-solid border-[#e2e8f0] overflow-hidden" style="width: 100%; height: 300px;">
       <l-signature
-        :ref="onSigRef"
+        ref="sigRef"
+        style="width: 100%; height: 100%;"
         :pen-color="penColor"
         :pen-size="penSize"
         :open-smooth="openSmooth"
@@ -100,11 +101,7 @@ import Card from '../../basic/components/Card.uvue';
 import { ref } from 'vue';
 import type { LimeSignatureToFileSuccess, LimeSignatureToTempFilePathOptions } from '@/uni_modules/lime-signature';
 
-// 签名组件实例（通过回调 ref 获取，避免 ref<any>(null) 类型问题）
-let sigInstance: LSignatureComponentPublicInstance | null = null;
-function onSigRef(el: any) {
-  sigInstance = el as LSignatureComponentPublicInstance;
-}
+const sigRef = ref<ComponentPublicInstance | null>(null);
 
 const penColor = ref('red');
 const penSize = ref(4);
@@ -115,23 +112,23 @@ const colorList = ['#ef4444', '#000000', '#3b82f6', '#10b981', '#f59e0b'];
 const penSizeOptions = [1, 3, 5, 8, 12];
 
 function onAction(type: string) {
-  const el = sigInstance;
+  const el = sigRef.value;
   if (el == null) {
     uni.showToast({ title: '签名组件未就绪', icon: 'none' });
     return;
   }
   if (type === 'clear') {
-    el.clear();
+    el.$callMethod('clear');
     signUrl.value = '';
   }
   else if (type === 'undo') {
-    el.undo();
+    el.$callMethod('undo');
   }
   else if (type === 'redo') {
-    el.redo();
+    el.$callMethod('redo');
   }
   else if (type === 'save') {
-    el.canvasToTempFilePath({
+    el.$callMethod('canvasToTempFilePath', {
       success: (res: LimeSignatureToFileSuccess) => {
         if (res.isEmpty) {
           uni.showToast({ title: '请先签名', icon: 'none' });

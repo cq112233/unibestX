@@ -63,15 +63,19 @@ export class Signature {
 		this.change = cb
 	}
 	init() {
+		// #ifndef APP-ANDROID || APP-IOS
 		this.touchstartCallbackWrapper = this.el.addEventListener('touchstart', this.onTouchStart)
 		this.touchmoveCallbackWrapper = this.el.addEventListener('touchmove', this.onTouchMove)
 		this.touchendCallbackWrapper = this.el.addEventListener('touchend', this.onTouchEnd)
+		// #endif
 	}
 	remove() {
+		// #ifndef APP-ANDROID || APP-IOS
 		if(this.touchstartCallbackWrapper == null) return
 		this.el.removeEventListener('touchstart', this.touchstartCallbackWrapper!)
 		this.el.removeEventListener('touchmove', this.touchmoveCallbackWrapper!)
 		this.el.removeEventListener('touchend', this.touchendCallbackWrapper!)
+		// #endif
 	}
 	setOption(options : LimeSignatureOptions) {
 		this.options = options

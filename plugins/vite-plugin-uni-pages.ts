@@ -61,6 +61,27 @@ function matchGlob(filePath: string, pattern: string): boolean {
   return new RegExp(`^${regexStr}$`).test(filePath);
 }
 
+/** 读取 Tabbar 策略模式配置（0=无Tabbar, 1=原生Tabbar, 2=自定义Tabbar） */
+function getTabbarMode(projectRoot: string): string {
+  if (process.env.VITE_TABBAR_MODE != null && process.env.VITE_TABBAR_MODE !== '') {
+    return process.env.VITE_TABBAR_MODE.trim();
+  }
+  try {
+    const envPath = path.resolve(projectRoot, '.env');
+    if (fs.existsSync(envPath)) {
+      const content = fs.readFileSync(envPath, 'utf-8');
+      const match = content.match(/^VITE_TABBAR_MODE\s*=\s*['"]?([^'"\r\n]+)['"]?/m);
+      if (match != null && match[1] != null) {
+        return match[1].trim();
+      }
+    }
+  }
+  catch {
+    // 忽略异常
+  }
+  return '1';
+}
+
 /** 解析 <route> 块（JSON5 格式） */
 function parseRouteBlock(content: string): Record<string, any> | null {
   const regex = /<route[^>]*>([\s\S]*?)<\/route>/;
@@ -453,6 +474,23 @@ function generatePagesJson(
       output[k] = baseConfig[k];
     }
   }
+
+  // 根据 VITE_TABBAR_MODE 处理 Tabbar 模式（参考 unibest 策略：0=无Tabbar, 1=原生Tabbar, 2=自定义Tabbar）
+  const tabbarMode = getTabbarMode(projectRoot);
+  if (tabbarMode === '0' || tabbarMode === 'NO_TABBAR') {
+    delete output.tabBar;
+  }
+  else if (tabbarMode === '1' || tabbarMode === 'NATIVE_TABBAR') {
+    if (output.tabBar != null) {
+      delete output.tabBar.custom;
+    }
+  }
+  else if (tabbarMode === '2' || tabbarMode === 'CUSTOM_TABBAR') {
+    if (output.tabBar != null) {
+      output.tabBar.custom = true;
+    }
+  }
+
   if (scannedSubPkgs.length > 0) {
     output.subPackages = scannedSubPkgs;
   }
