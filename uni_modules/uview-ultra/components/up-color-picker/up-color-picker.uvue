@@ -12,17 +12,17 @@
 				<view class="up-color-picker__switch">
 					<view
 						class="up-color-picker__switch-item"
-						:class="{ 'up-color-picker__switch-item--active': colorTypeIndex == 0 }"
+						:style="getSwitchItemStyle(0)"
 						@click="changeColorType(0)"
 					>
-						<text class="up-color-picker__switch-text">纯色</text>
+						<text class="up-color-picker__switch-text" :style="getSwitchTextStyle(0)">纯色</text>
 					</view>
 					<view
 						class="up-color-picker__switch-item"
-						:class="{ 'up-color-picker__switch-item--active': colorTypeIndex == 1 }"
+						:style="getSwitchItemStyle(1)"
 						@click="changeColorType(1)"
 					>
-						<text class="up-color-picker__switch-text">渐变</text>
+						<text class="up-color-picker__switch-text" :style="getSwitchTextStyle(1)">渐变</text>
 					</view>
 				</view>
 
@@ -42,8 +42,8 @@
 						</view>
 					</view>
 					<view class="up-color-picker__gradient-controls">
-						<up-button type="primary" size="mini" plain class="up-color-picker__add-btn" @click="addGradientColor">添加颜色</up-button>
-						<up-button type="info" size="mini" plain class="up-color-picker__add-btn" @click="removeEditingGradientColor">删除当前</up-button>
+						<up-button type="primary" :color="confirmColor" size="mini" plain class="up-color-picker__add-btn" text="添加颜色" @click="addGradientColor"></up-button>
+						<up-button type="info" size="mini" plain class="up-color-picker__add-btn" text="删除当前" @click="removeEditingGradientColor"></up-button>
 					</view>
 					<view class="up-color-picker__gradient-direction">
 						<text class="up-color-picker__label">方向:</text>
@@ -118,8 +118,8 @@
 						<text class="up-color-picker__preview-text">{{ displayColor }}</text>
 					</view>
 					<view class="up-color-picker__actions">
-						<up-button type="primary" size="small" class="up-color-picker__btn" @click="confirm">确定</up-button>
-						<up-button type="info" size="small" class="up-color-picker__btn" @click="close">取消</up-button>
+						<up-button type="primary" :color="confirmColor" size="small" class="up-color-picker__btn" text="确定" @click="confirm"></up-button>
+						<up-button type="info" size="small" class="up-color-picker__btn" text="取消" @click="close"></up-button>
 					</view>
 				</view>
 			</view>
@@ -131,6 +131,7 @@
 import { ref, computed, watch, onMounted, getCurrentInstance, nextTick } from 'vue'
 import type { Ref } from 'vue'
 import { upGetRect } from '../../libs/function/index.uts'
+import { useAppStore } from '@/src/store'
 
 type Point = {
 	x: number,
@@ -278,6 +279,10 @@ const props = defineProps({
 	commonColors: {
 		type: Array as PropType<Array<string>>,
 		default: () => [] as Array<string>
+	},
+	confirmColor: {
+		type: String,
+		default: ''
 	}
 })
 
@@ -316,6 +321,36 @@ const normalizedCommonColors = computed<Array<string>>(() => {
 	}
 	return defaultColors()
 })
+
+const appStore = useAppStore()
+
+const confirmColorComputed = computed<string>((): string => {
+	if (props.confirmColor.length > 0) {
+		return props.confirmColor;
+	}
+	const theme = appStore.state.theme;
+	if (theme.length > 0) {
+		return theme;
+	}
+	return '#2979ff';
+});
+
+function getSwitchItemStyle(index: number): UTSJSONObject {
+	if (colorTypeIndex.value == index) {
+		return {
+			backgroundColor: confirmColorComputed.value
+		} as UTSJSONObject;
+	}
+	return {
+		backgroundColor: '#ffffff'
+	} as UTSJSONObject;
+}
+
+function getSwitchTextStyle(index: number): UTSJSONObject {
+	return {
+		color: colorTypeIndex.value == index ? '#ffffff' : '#303133'
+	} as UTSJSONObject;
+}
 
 const triggerStyle = computed<UTSJSONObject>(() => {
 	return {

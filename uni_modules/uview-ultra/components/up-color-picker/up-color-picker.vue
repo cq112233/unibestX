@@ -15,6 +15,7 @@
 					<up-subsection
 						:list="[{ name: '纯色' }, { name: '渐变' }]"
 						:current="colorTypeIndex"
+						:activeColor="confirmColor || '#2979ff'"
 						@change="changeColorType"
 						fontSize="14"
 					></up-subsection>
@@ -44,12 +45,13 @@
 					<view class="up-color-picker__gradient-controls">
 						<up-button 
 							type="primary" 
+							:color="confirmColor"
 							size="mini" 
 							plain 
+							text="添加颜色"
 							@click="addGradientColor"
 							class="up-color-picker__add-btn"
 						>
-							添加颜色
 						</up-button>
 					</view>
 					
@@ -144,19 +146,20 @@
 					<view class="up-color-picker__actions">
 						<up-button 
 							type="primary" 
+							:color="themePrimaryColor"
 							size="small" 
+							text="确定"
 							@click="confirm"
 							class="up-color-picker__btn"
 						>
-							确定
 						</up-button>
 						<up-button 
 							type="info" 
 							size="small" 
+							text="取消"
 							@click="close"
 							class="up-color-picker__btn"
 						>
-							取消
 						</up-button>
 					</view>
 				</view>
@@ -166,6 +169,8 @@
 </template>
 
 <script>
+import { useAppStore } from '@/src/store'
+
 export default {
 	name: 'up-color-picker',
 	props: {
@@ -179,6 +184,11 @@ export default {
 			type: Array,
 			default: () => [
             ]
+		},
+		// 确定按钮颜色
+		confirmColor: {
+			type: String,
+			default: ''
 		}
 	},
 	data() {
@@ -250,6 +260,19 @@ export default {
 			}
             console.log(this.editingGradientIndex)
 			return this.currentColor;
+		},
+		// 主题主色
+		themePrimaryColor() {
+			if (this.confirmColor && this.confirmColor.length > 0) {
+				return this.confirmColor;
+			}
+			try {
+				const store = useAppStore();
+				if (store && store.state && store.state.theme) {
+					return store.state.theme;
+				}
+			} catch (e) {}
+			return '#2979ff';
 		}
 	},
 	watch: {
