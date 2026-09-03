@@ -45,11 +45,13 @@ import RouterDemoCard from './components/RouterDemoCard.uvue';
 import HttpDemoCard from './components/HttpDemoCard.uvue';
 import TailwindcssDemoCard from './components/TailwindcssDemoCard.uvue';
 import SystemInfoDemoCard from './components/SystemInfoDemoCard.uvue';
+import { onMounted } from 'vue';
 import { updateSystemInfo } from '@/src/utils/systemInfo';
 import { handleBackPressExit } from '@/src/utils/backPress';
 import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/utils/refresh';
 
 definePage({
+  debug: false,
   layout: 'navbar',
   showBack: false,
   enablePullDownRefresh: true,
@@ -74,8 +76,13 @@ onBackPress((options: OnBackPressOptions): boolean => {
   return false;
 });
 
-onResize(() => {
+onMounted(() => {
   updateSystemInfo();
+  // #ifdef APP || H5 || MP-WEIXIN
+  uni.onWindowResize((_res) => {
+    updateSystemInfo();
+  });
+  // #endif
 });
 </script>
 

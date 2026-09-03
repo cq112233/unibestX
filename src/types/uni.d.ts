@@ -67,6 +67,18 @@ declare global {
 
   export interface DefinePageOptions {
     /**
+     * 沙盒独立调试模式标记：
+     * - true: 本地开发时仅编译此页面（及其关联的 debug 页面），跳过无关页面与 TabBar，极大提升编译速度
+     * - ⚠️ 提示: 调试完成后记得关闭（设为 false 或删除），以还原全量页面
+     */
+    debug?: boolean;
+    /**
+     * 沙盒调试模式启动首页标记：
+     * - true: 本地沙盒调试时，将当前页面显式指定为应用默认启动首页（排在 pages.json 第 1 位）
+     * - ⚠️ 提示: 全局仅允许 1 个页面设置为 true；调试完成后记得关闭（设为 false 或删除）
+     */
+    debugHome?: boolean;
+    /**
      * 页面类型标记：
      * - 'home': 标记当前页面为应用首页（自动排在 pages.json 第 1 位）
      */

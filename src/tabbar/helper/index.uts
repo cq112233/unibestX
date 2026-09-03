@@ -126,7 +126,15 @@ export function switchTabbar(url: string): void {
     uni.redirectTo({
       url,
       fail: (_err: any) => {
-        uni.navigateTo({ url });
+        uni.navigateTo({
+          url,
+          fail: () => {
+            uni.showToast({
+              title: '沙盒调试中：目标页面未编译',
+              icon: 'none'
+            });
+          }
+        });
       }
     });
   }
@@ -134,7 +142,15 @@ export function switchTabbar(url: string): void {
     uni.switchTab({
       url,
       fail: (_err: any) => {
-        uni.redirectTo({ url });
+        uni.redirectTo({
+          url,
+          fail: () => {
+            uni.showToast({
+              title: '沙盒调试中：目标页面未编译',
+              icon: 'none'
+            });
+          }
+        });
       }
     });
   }

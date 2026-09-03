@@ -21,7 +21,7 @@ import CustomCapsuleTabbar from '@/src/tabbar/custom/index.uvue';
 import { customTabbarEnable, isCapsuleTabbar, isPageTabbar, syncCurIdxByCurrentPage } from '@/src/tabbar/helper';
 import { useAppStore } from '@/src/store';
 import { applyNavbarTheme, getThemeTokens } from '@/src/utils/theme';
-import { computed, onBeforeMount, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 
 // 激活应用状态管理 Store
 const appStore = useAppStore();
@@ -42,26 +42,24 @@ const themeStyle = computed((): UTSJSONObject => {
 // 控制当前页面是否需要显示底部导航栏
 const isCurrentPageTabbar = ref(false);
 
-// 页面显示钩子：解析当前路由，动态控制导航栏显示及同步选中索引
-onBeforeMount(() => {
-  const pages = getCurrentPages();
-  if (pages.length > 0) {
-    const route = pages[pages.length - 1].route;
-    if (route != null && route.length > 0) {
-      const path = route.startsWith('/') ? route : `/${route}`;
-      const isTabbar = isPageTabbar(path);
-      isCurrentPageTabbar.value = isTabbar;
-      // 如果是 Tabbar 路由，同步底部导航的激活索引
-      if (isTabbar) {
-        syncCurIdxByCurrentPage();
+// 组件挂载时：同步 H5 / 小程序原生导航栏主题与路由状态
+onMounted(() => {
+  applyNavbarTheme(appStore.state.isDark);
+  try {
+    const pages = getCurrentPages();
+    if (pages.length > 0) {
+      const route = pages[pages.length - 1].route;
+      if (route != null && route.length > 0) {
+        const path = route.startsWith('/') ? route : `/${route}`;
+        const isTabbar = isPageTabbar(path);
+        isCurrentPageTabbar.value = isTabbar;
+        if (isTabbar) {
+          syncCurIdxByCurrentPage();
+        }
       }
     }
   }
-});
-
-// 每个页面切换都会触发：同步 H5 / 小程序原生导航栏主题
-onShow(() => {
-  applyNavbarTheme(appStore.state.isDark);
+  catch {}
 });
 
 // 主题模式 / 系统深浅色变化时，当前页面不切换也实时同步导航栏
