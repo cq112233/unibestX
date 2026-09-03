@@ -14,22 +14,53 @@ export type SystemInfoType = {
   windowHeight: number;
   statusBarHeight: number;
   pixelRatio: number;
+  compilerVersion: string;
+  uniCompileVersion: string;
+  isVapor: boolean;
+  compileMode: string;
 };
 
 export const systemInfo = ref(null as SystemInfoType | null);
 export const safeAreaInsets = ref(null as SystemSafeAreaInsets | null);
 
+/**
+ * 获取当前是否为 Vapor 渲染模式（全端从 import.meta.env 读取）
+ */
+export function isVaporMode(): boolean {
+  return `${import.meta.env.VITE_IS_VAPOR ?? 'false'}` == 'true';
+}
+
+/**
+ * 获取当前编译运行模式（如 "Vapor 模式 (开发)" / "VDOM 模式 (生产)"）
+ */
+export function getCompileMode(): string {
+  const isVapor = isVaporMode();
+  const modeName = isVapor ? 'Vapor 模式' : 'VDOM 模式';
+  const env = process.env.NODE_ENV == 'production' ? '生产' : '开发';
+  return `${modeName} (${env})`;
+}
+
 export function updateSystemInfo() {
   // #ifdef MP-WEIXIN
   // 微信小程序使用新的API
   const windowInfo = uni.getWindowInfo();
+  let compileVer = '';
+  try {
+    const appBaseInfo = uni.getAppBaseInfo() as any;
+    compileVer = `${appBaseInfo.appCompilerVersion ?? appBaseInfo.SDKVersion ?? ''}`;
+  }
+  catch {}
   systemInfo.value = {
     screenWidth: windowInfo.screenWidth,
     screenHeight: windowInfo.screenHeight,
     windowWidth: windowInfo.windowWidth,
     windowHeight: windowInfo.windowHeight,
     statusBarHeight: windowInfo.statusBarHeight,
-    pixelRatio: windowInfo.pixelRatio
+    pixelRatio: windowInfo.pixelRatio,
+    compilerVersion: compileVer,
+    uniCompileVersion: compileVer,
+    isVapor: isVaporMode(),
+    compileMode: getCompileMode()
   } as SystemInfoType;
   const safeArea = windowInfo.safeArea;
   if (safeArea != null) {
@@ -45,13 +76,30 @@ export function updateSystemInfo() {
   // #ifndef MP-WEIXIN
   // 其他平台继续使用uni API
   const sysInfo = uni.getSystemInfoSync();
+  let compileVer = sysInfo.uniCompileVersion ?? '';
+  // #ifdef H5
+  if (compileVer == '') {
+    try {
+      const g = globalThis as any;
+      const conf = g.__uniConfig as any;
+      if (conf != null && conf.compilerVersion != null) {
+        compileVer = `${conf.compilerVersion}`;
+      }
+    }
+    catch {}
+  }
+  // #endif
   systemInfo.value = {
     screenWidth: sysInfo.screenWidth,
     screenHeight: sysInfo.screenHeight,
     windowWidth: sysInfo.windowWidth,
     windowHeight: sysInfo.windowHeight,
     statusBarHeight: sysInfo.statusBarHeight,
-    pixelRatio: sysInfo.pixelRatio
+    pixelRatio: sysInfo.pixelRatio,
+    compilerVersion: compileVer,
+    uniCompileVersion: compileVer,
+    isVapor: isVaporMode(),
+    compileMode: getCompileMode()
   } as SystemInfoType;
   const safeArea = sysInfo.safeAreaInsets;
   if (safeArea != null) {
@@ -63,6 +111,30 @@ export function updateSystemInfo() {
     } as SystemSafeAreaInsets;
   }
   // #endif
+}
+
+/**
+ * 判断当前 HBuilderX / uni-app 编译器版本是否大于等于指定版本（如 '5.25' 或 '4.25'）
+ */
+export function isCompilerVersionGte(targetVersion: string): boolean {
+  const current = systemInfo.value?.compilerVersion ?? '';
+  if (current == '') {
+    return false;
+  }
+  const curParts = current.split('.');
+  const targetParts = targetVersion.split('.');
+  const len = Math.max(curParts.length, targetParts.length);
+  for (let i = 0; i < len; i++) {
+    const curNum = i < curParts.length ? parseInt(curParts[i], 10) : 0;
+    const targetNum = i < targetParts.length ? parseInt(targetParts[i], 10) : 0;
+    if (curNum > targetNum) {
+      return true;
+    }
+    if (curNum < targetNum) {
+      return false;
+    }
+  }
+  return true;
 }
 
 // 初始化获取一次

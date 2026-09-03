@@ -1,0 +1,297 @@
+<script setup lang="uts">
+import {
+  curIdx,
+  handleTabbarClick,
+  safeHideNativeTabBar,
+  syncCurIdxByCurrentPage,
+  tabbarList,
+  themeColor
+} from '../helper';
+import { $t } from '@/src/utils/i18n';
+import { useAppStore } from '@/src/store';
+import { getThemeTokens } from '@/src/utils/theme';
+import type { ThemeTokens } from '@/src/utils/theme';
+import { safeAreaInsets } from '@/src/utils/systemInfo';
+
+defineProps({
+  /** 悬浮 TabBar 容器高度（默认 64px） */
+  height: {
+    type: Number,
+    default: 64
+  },
+  /** 底部与屏幕边缘的间距（默认 12px） */
+  bottomOffset: {
+    type: Number,
+    default: 12
+  },
+  /** 是否渲染底部占位块（默认 false） */
+  showPlaceholder: {
+    type: Boolean,
+    default: false
+  }
+});
+
+const appStore = useAppStore();
+
+// 亮 / 暗主题 token（与 theme.json tabBar 配置同步）
+const themeTokens = computed((): ThemeTokens => {
+  return getThemeTokens(appStore.state.isDark);
+});
+
+/** 安全区底部高度 */
+const safeAreaBottom = computed<number>((): number => {
+  const insets = safeAreaInsets.value;
+  return insets != null ? insets.bottom : 0;
+});
+
+/** 当前激活的主题色 */
+const activeThemeColor = computed<string>((): string => {
+  return themeColor.value.length > 0 ? themeColor.value : appStore.state.theme;
+});
+
+/** 激活项的高亮胶囊底色（浅色时为主题色 10% 浅底，暗黑时为半透明白色） */
+const activeItemBgColor = computed<string>((): string => {
+  if (appStore.state.isDark) {
+    return 'rgba(255, 255, 255, 0.12)';
+  }
+  const color = activeThemeColor.value;
+  return `${color}18`;
+});
+
+// 挂载时同步激活索引并确保原生 TabBar 隐藏
+onMounted(() => {
+  syncCurIdxByCurrentPage();
+  safeHideNativeTabBar();
+});
+
+/** 处理 Tab 点击 */
+function onTabClick(index: number) {
+  handleTabbarClick(index);
+}
+
+/** 获取多语言翻译文本 */
+function getText(text: string): string {
+  return $t(text);
+}
+
+/** 获取胶囊项背景色 */
+function getItemBgColor(index: number): string {
+  return curIdx.value == index ? activeItemBgColor.value : 'transparent';
+}
+
+/** 获取图标字体名称 */
+function getItemIcon(index: number): string {
+  if (tabbarList.length <= index) {
+    return '';
+  }
+  const item = tabbarList[index];
+  if (curIdx.value == index && item.iconActive.length > 0) {
+    return item.iconActive;
+  }
+  return item.icon;
+}
+
+/** 获取图标图片路径 */
+function getItemIconPath(index: number): string {
+  if (tabbarList.length <= index) {
+    return '';
+  }
+  const item = tabbarList[index];
+  if (curIdx.value == index && item.selectedIconPath != null && item.selectedIconPath!.length > 0) {
+    return item.selectedIconPath!;
+  }
+  return item.iconPath != null ? item.iconPath! : '';
+}
+
+/** 获取图标颜色 */
+function getItemIconColor(index: number): string {
+  return curIdx.value == index ? activeThemeColor.value : themeTokens.value.tabColor;
+}
+
+/** 获取文字颜色 */
+function getItemTextColor(index: number): string {
+  return curIdx.value == index ? activeThemeColor.value : themeTokens.value.tabColor;
+}
+
+/** 获取文字字重 */
+function getItemFontWeight(index: number): string {
+  return curIdx.value == index ? '600' : 'normal';
+}
+</script>
+
+<template>
+  <view class="custom-capsule-wrapper">
+    <!-- 底部占位块：防止页面底部内容被悬浮 Tab 栏遮挡 -->
+    <view
+      v-if="showPlaceholder"
+      class="custom-capsule-placeholder"
+      :style="{ height: `${height + bottomOffset * 2 + safeAreaBottom}px` }"
+    />
+
+    <!-- 悬浮胶囊底座主容器 -->
+    <view
+      class="custom-capsule-container"
+      :style="{
+        bottom: `${bottomOffset + safeAreaBottom}px`,
+        height: `${height}px`,
+        backgroundColor: themeTokens.tabBg,
+        borderColor: themeTokens.tabBorder
+      }"
+    >
+      <view
+        v-for="(item, index) in tabbarList"
+        :key="index"
+        class="capsule-item-slot"
+        @click="onTabClick(index)"
+      >
+        <!-- 胶囊项背景包装块（激活时展示高亮底色背景） -->
+        <view
+          class="capsule-item-inner"
+          :style="{
+            backgroundColor: getItemBgColor(index)
+          }"
+        >
+          <!-- 图标与角标容器 -->
+          <view class="capsule-icon-wrap">
+            <!-- uni-icons 字体图标 -->
+            <uni-icons
+              v-if="item.iconType == 'icon'"
+              :type="getItemIcon(index)"
+              :size="20"
+              :color="getItemIconColor(index)"
+            />
+            <!-- 图片图标 -->
+            <image
+              v-else
+              :src="getItemIconPath(index)"
+              class="capsule-icon-image"
+            />
+
+            <!-- 小红点角标 -->
+            <view
+              v-if="item.badge != null && item.badge == 'dot'"
+              class="capsule-badge-dot"
+            />
+            <!-- 文本数字角标 -->
+            <view
+              v-else-if="item.badge != null && item.badge != 'dot'"
+              class="capsule-badge-text"
+            >
+              <text class="capsule-badge-label">{{ item.badge }}</text>
+            </view>
+          </view>
+
+          <!-- 标签文字（支持 i18n 翻译） -->
+          <text
+            class="capsule-item-text"
+            :style="{
+              color: getItemTextColor(index),
+              fontWeight: getItemFontWeight(index)
+            }"
+          >
+            {{ getText(item.text) }}
+          </text>
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<style>
+.custom-capsule-wrapper {
+  width: 100%;
+}
+
+/* 占位容器 */
+.custom-capsule-placeholder {
+  width: 100%;
+}
+
+/* 悬浮胶囊主底座 */
+.custom-capsule-container {
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  z-index: 999;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-around;
+  padding: 4px 6px;
+  border-width: 1px;
+  border-style: solid;
+  border-radius: 34px;
+  /* 柔和阴影，增强质感与悬浮立体感 */
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+/* 单个 Tab 格位 */
+.capsule-item-slot {
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+/* 选中项的胶囊高亮包裹块 */
+.capsule-item-inner {
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 90%;
+  height: 84%;
+  border-radius: 20px;
+  padding: 2px 0;
+  transition: background-color 0.2s ease;
+}
+
+/* 图标包裹器（含绝对定位徽标） */
+.capsule-icon-wrap {
+  position: relative;
+  align-items: center;
+  justify-content: center;
+  height: 22px;
+}
+
+.capsule-icon-image {
+  width: 20px;
+  height: 20px;
+}
+
+/* 标签文本 */
+.capsule-item-text {
+  font-size: 11px;
+  line-height: 14px;
+  margin-top: 2px;
+  transition: color 0.2s ease;
+}
+
+/* 徽标小红点 */
+.capsule-badge-dot {
+  position: absolute;
+  top: -2px;
+  right: -6px;
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background-color: #ef4444;
+}
+
+/* 徽标数字/文字胶囊 */
+.capsule-badge-text {
+  position: absolute;
+  top: -4px;
+  right: -12px;
+  padding: 0 4px;
+  height: 14px;
+  border-radius: 999px;
+  background-color: #ef4444;
+  align-items: center;
+  justify-content: center;
+}
+
+.capsule-badge-label {
+  color: #ffffff;
+  font-size: 9px;
+  font-weight: bold;
+}
+</style>

@@ -233,7 +233,7 @@ pnpm build:h5
 - 🛡️ **路由守卫** — 黑名单/白名单策略，灵活的登录拦截
 - 🌈 **动态主题** — CSS 变量驱动的主题切换
 - 📊 **ECharts** — 图表组件支持
-- 📱 **自定义 TabBar** — 支持凸起按钮和角标
+- 📱 **底部 TabBar 体系** — 支持 4 种策略模式（原生/带页面缓存自定义/纯自定义/无）、2 种视觉形态（悬浮胶囊 Dock 岛与标准凸起鼓包）、角标徽标与全端动态主题联动
 - 🔌 **请求封装** — 基于lime-request，支持多域名、Token 自动续期
 
 ## 平台兼容性
@@ -315,12 +315,16 @@ unibestX/
 │   │   ├── tailwindcss/      #   weapp-tailwindcss 演示页面
 │   │   ├── test/             #   页面间参数传递测试
 │   │   └── uiTest/           #   UI 测试与排版页面
-│   ├── tabbar/               # 自定义 TabBar
-│   │   ├── index.uvue        #   TabBar 底部容器
-│   │   ├── TabbarItem.uvue   #   单个 Tab 项与角标
-│   │   ├── config.uts        #   TabBar 图标与路由配置
-│   │   ├── store.uts         #   TabBar 选中状态管理
-│   │   └── types.uts         #   TabBar 类型定义
+│   ├── tabbar/               # 底部 TabBar 体系
+│   │   ├── custom/           #   悬浮胶囊 TabBar（悬空圆角 Dock 栏风格）
+│   │   │   └── index.uvue    #     悬浮胶囊组件
+│   │   ├── helper/           #   TabBar 状态与辅助工具
+│   │   │   ├── index.uts     #     TabBar 策略、安全路由跳转与主题 Token 辅助
+│   │   │   └── store.uts     #     TabBar 选中状态管理与响应式数据
+│   │   ├── TabbarItem.uvue   #   单个 Tab 项与角标（标准底座）
+│   │   ├── index.uvue        #   标准自定义 TabBar（带中间凸起鼓包 midButton）
+│   │   ├── config.uts        #   TabBar 统一配置（对齐 pages.json 规范，支持 type 风格切换）
+│   │   └── types.uts         #   TabBar 强类型定义
 │   ├── types/                # 全局 TypeScript / UTS 类型定义
 │   │   └── uni.d.ts          #   definePage 宏、Vue 宏与全局 API 类型补全
 │   └── utils/                # 全局工具函数
@@ -420,14 +424,39 @@ uni-app x 推出了新一代的 **蒸汽模式（Vapor）**。新版渲染引擎
 > - **注意切换风险**：一旦在 Vapor 模式下开发过，之后若再切换回 **VDOM 模式**，之前可正常编译的代码可能会报类型或语法错误（VDOM 模式编译检查更严格）；
 > - 最终选用哪种模式**看个人选择**：追求开发体验、少踩编译报错建议选 Vapor；追求最大兼容性与传统写法生态可保持 VDOM。
 
-### 自定义 TabBar
+### 底部 TabBar 体系
 
-内置自定义 TabBar 组件，支持：
+项目内置了成熟健壮、全端兼容的 **多策略 + 多形态** TabBar 体系：
 
-- 5 个 Tab 项配置
-- 中间凸起按钮（如 AI 入口）
-- 角标显示
-- 动态主题色
+#### 1. 底部 TabBar 策略模式（`.env` 中的 `VITE_TABBAR_MODE`）
+
+可在根目录 `.env` 中通过 `VITE_TABBAR_MODE` 自由切换 4 种底层运行策略：
+
+| 模式值 | 策略名称 | 页面缓存机制 | 底层路由实现 | 适用场景与特性说明 |
+| :---: | :--- | :---: | :---: | :--- |
+| **`2`** | **`CUSTOM_TABBAR_WITH_NATIVE`**（【推荐】带缓存自定义模式） | **支持缓存** | `uni.switchTab` | **【强烈推荐】**`pages.json` 生成原生底座并安全隐藏，**保留各 Tab 页面组件状态与滚动位置缓存**，切换时不重新请求刷新，全端体验最流畅。 |
+| **`3`** | **`CUSTOM_TABBAR_WITHOUT_NATIVE`**（纯自定义模式） | **不缓存** | `uni.redirectTo` | `pages.json` 中无 `tabBar` 节点，**每次切换重新触发页面生命周期与加载数据**。 |
+| **`1`** | **`NATIVE_TABBAR`**（纯原生 TabBar） | **支持缓存** | `uni.switchTab` | 纯原生 `pages.json` TabBar 渲染（⚠️ 原生 `midButton` 在微信小程序/鸿蒙端官方不支持）。 |
+| **`0`** | **`NO_TABBAR`**（无 TabBar） | 无 | 无 | 纯单页、登录页或不需要 TabBar 的应用场景。 |
+
+#### 2. TabBar 视觉呈现形态（`src/tabbar/config.uts`）
+
+在自定义模式（模式 2 或 模式 3）下，可通过 `src/tabbar/config.uts` 的 `type` 字段一键切换 UI 风格：
+
+- **`type: 'capsule'`（悬浮胶囊岛屿风格）**：
+  - 位于屏幕底部的悬空圆角 Dock 栏（`rounded-[34px]` + 柔和立体阴影）；
+  - 当前激活项呈现独立的高亮胶囊底色与平滑过渡效果；
+  - 完美适配亮色/暗黑主题模式与底部安全区（`safeAreaBottom`）。
+- **`type: 'default'`（标准贴底底座风格）**：
+  - 标准贴底容器，支持中间立体凸起鼓包按钮（`midButton`，如居中 AI 交互按钮）；
+  - 全端 100% 支持立体鼓包、字体图标、角标徽标（小红点 / 数字）。
+
+#### 3. 统一路由跳转与安全 API（`src/tabbar/helper`）
+
+- **`switchTabbar(url: string)`**：全局统一 TabBar 跳转方法，自动根据当前策略模式选择 `uni.switchTab` 或 `uni.redirectTo`，内置防连击节流与失败容错降级，自动同步激活索引；
+- **`syncCurIdxByCurrentPage()`**：自动从当前页面路由同步激活 Tab 项索引；
+- **`safeHideNativeTabBar()`**：安全跨端隐藏原生底板并消除视口多余空白；
+- **`initNativeMidButtonTap()`**：仅在原生模式且配置 `midButton` 时自动注册监听，无需在页面中硬编码。
 
 ### 主题切换（暗黑模式）
 

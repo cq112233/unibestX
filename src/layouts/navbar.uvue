@@ -16,11 +16,12 @@
     <!-- 当开启自定义下拉刷新时（原生未开启且当前布局开启） -->
     <scroll-view
       v-if="useCustomRefresher"
-      direction="vertical"
+      :direction="pageScrollDirection"
       class="flex-1"
-      :refresher-enabled="true"
+      :refresher-enabled="isRefresherEnabled"
       :refresher-triggered="isTriggered"
       :refresher-background="themeTokens.bgContent"
+      :nested-scroll-child="finalNestedScrollChild"
       @refresherrefresh="handleRefresherRefresh"
       @refresherrestore="handleRefresherRestore"
     >
@@ -28,7 +29,12 @@
     </scroll-view>
 
     <!-- 未开启自定义下拉刷新时（包含开启原生下拉刷新时）：渲染普通滚动容器 -->
-    <scroll-view v-else class="flex-1 flex flex-col">
+    <scroll-view
+      v-else
+      class="flex-1 flex flex-col"
+      :direction="pageScrollDirection"
+      :nested-scroll-child="finalNestedScrollChild"
+    >
       <slot />
     </scroll-view>
   </view>
@@ -40,6 +46,7 @@ import NavBar from '@/src/components/NavBar/NavBar.uvue';
 import { useAppStore } from '@/src/store';
 import { getThemeTokens } from '@/src/utils/theme';
 import type { ThemeTokens } from '@/src/utils/theme';
+import { isPageRefresherDisabled, isPageScrollDisabled } from '@/src/utils/pageScroll.uts';
 
 /**
  * 布局属性定义（由 uni-layouts-plugin 编译时自动从页面 definePage 或 pages.json 提取传入）
@@ -85,6 +92,11 @@ const props = defineProps({
     type: Object,
     default: () => ({})
   },
+  /** 嵌套滚动子元素 ID */
+  nestedScrollChild: {
+    type: String,
+    default: ''
+  },
   /** 是否隐藏导航栏（默认 false） */
   hideNavbar: {
     type: Boolean,
@@ -121,6 +133,29 @@ const props = defineProps({
 });
 
 console.log(props, 'props');
+
+/**
+ * 获取 pageStyle 对象
+ */
+const pageStyleObj = computed((): UTSJSONObject => {
+  return (props.pageStyle ?? {}) as UTSJSONObject;
+});
+
+const pageScrollDirection = computed((): string => {
+  return isPageScrollDisabled.value ? 'none' : 'vertical';
+});
+
+const isRefresherEnabled = computed((): boolean => {
+  return !isPageScrollDisabled.value && !isPageRefresherDisabled.value;
+});
+
+const finalNestedScrollChild = computed((): string => {
+  if (props.nestedScrollChild.length > 0) {
+    return props.nestedScrollChild;
+  }
+  const childFromStyle = (pageStyleObj.value.nestedScrollChild as string | null) ?? '';
+  return childFromStyle;
+});
 
 /**
  * 计算导航栏是否可见
@@ -168,13 +203,6 @@ onMounted(() => {
 // 卸载时移除全局事件监听，避免内存泄漏
 onUnmounted(() => {
   uni.$off('stopPagePullDownRefresh', onStopRefresh);
-});
-
-/**
- * 获取 pageStyle 对象
- */
-const pageStyleObj = computed((): UTSJSONObject => {
-  return (props.pageStyle ?? {}) as UTSJSONObject;
 });
 
 /**

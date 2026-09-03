@@ -46,10 +46,12 @@
       </view>
     </view>
 
-    <!-- 分页容器 -->
+    <!-- 分页列表组件 (使用原生下拉刷新，关闭自定义下拉) -->
     <z-paging-x
       ref="pagingX"
       list-is="scroll-view"
+      list-id="zpagingDemoScroll"
+      :custom-nested-scroll="true"
       :model-value="dataList"
       :default-page-size="10"
       :paging-style="{ height: '200px', border: '1px solid #edf2f7', borderTopWidth: '0px', borderBottomLeftRadius: '12px', borderBottomRightRadius: '12px', backgroundColor: '#f8fafc' }"
@@ -74,8 +76,8 @@
 </template>
 
 <script setup lang="uts">
-import { ref } from 'vue';
 import Card from '../../basic/components/Card.uvue';
+import { ref } from 'vue';
 
 type CompactArticleItem = {
   id: number;
