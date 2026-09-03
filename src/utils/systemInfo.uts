@@ -16,10 +16,29 @@ export type SystemInfoType = {
   pixelRatio: number;
   compilerVersion: string;
   uniCompileVersion: string;
+  isVapor: boolean;
+  compileMode: string;
 };
 
 export const systemInfo = ref(null as SystemInfoType | null);
 export const safeAreaInsets = ref(null as SystemSafeAreaInsets | null);
+
+/**
+ * 获取当前是否为 Vapor 渲染模式（全端从 import.meta.env 读取）
+ */
+export function isVaporMode(): boolean {
+  return `${import.meta.env.VITE_IS_VAPOR ?? 'false'}` == 'true';
+}
+
+/**
+ * 获取当前编译运行模式（如 "Vapor 模式 (开发)" / "VDOM 模式 (生产)"）
+ */
+export function getCompileMode(): string {
+  const isVapor = isVaporMode();
+  const modeName = isVapor ? 'Vapor 模式' : 'VDOM 模式';
+  const env = process.env.NODE_ENV == 'production' ? '生产' : '开发';
+  return `${modeName} (${env})`;
+}
 
 export function updateSystemInfo() {
   // #ifdef MP-WEIXIN
@@ -39,7 +58,9 @@ export function updateSystemInfo() {
     statusBarHeight: windowInfo.statusBarHeight,
     pixelRatio: windowInfo.pixelRatio,
     compilerVersion: compileVer,
-    uniCompileVersion: compileVer
+    uniCompileVersion: compileVer,
+    isVapor: isVaporMode(),
+    compileMode: getCompileMode()
   } as SystemInfoType;
   const safeArea = windowInfo.safeArea;
   if (safeArea != null) {
@@ -76,7 +97,9 @@ export function updateSystemInfo() {
     statusBarHeight: sysInfo.statusBarHeight,
     pixelRatio: sysInfo.pixelRatio,
     compilerVersion: compileVer,
-    uniCompileVersion: compileVer
+    uniCompileVersion: compileVer,
+    isVapor: isVaporMode(),
+    compileMode: getCompileMode()
   } as SystemInfoType;
   const safeArea = sysInfo.safeAreaInsets;
   if (safeArea != null) {
