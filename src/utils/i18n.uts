@@ -1,16 +1,20 @@
 import i18n from '../i18n/index.uts';
-import { tabbarList } from '../tabbar/store.uts';
+import { tabbarList } from '../tabbar/helper/index.uts';
 
 /**
- * 通用 i18n 翻译函数
+ * 通用 i18n 翻译函数（未找到翻译时自动回退返回原 key 字符串）
  * @param key 翻译的 key
  * @param named 命名参数
  */
 export function t(key: string, named: UTSJSONObject | null = null): string {
+  let res: string = '';
   if (named != null) {
-    return i18n.global.t(key, named);
+    res = i18n.global.t(key, named);
   }
-  return i18n.global.t(key);
+  else {
+    res = i18n.global.t(key);
+  }
+  return (res != null && res.length > 0) ? res : key;
 }
 
 export function $t(key: string, named: UTSJSONObject | null = null): string {
@@ -18,7 +22,7 @@ export function $t(key: string, named: UTSJSONObject | null = null): string {
 }
 
 /**
- * 获取 %xxx% 格式包装或普通 key 的多语言翻译文本
+ * 获取 %xxx% 格式包装或普通 key 的多语言翻译文本（未找到时自动回退返回原 key 字符串）
  * 例如：%basic.langTitle% 或 basic.langTitle
  * @param key 多语言 key
  */
@@ -27,7 +31,8 @@ export function getI18nText(key: string): string {
   if (cleanKey.startsWith('%') && cleanKey.endsWith('%') && cleanKey.length > 2) {
     cleanKey = cleanKey.substring(1, cleanKey.length - 1);
   }
-  return i18n.global.t(cleanKey);
+  const res = i18n.global.t(cleanKey);
+  return (res != null && res.length > 0) ? res : cleanKey;
 }
 
 /**

@@ -1,108 +1,17 @@
 <script setup lang="uts">
-import { curIdx, setCurIdx, syncCurIdxByCurrentPage, tabbarList } from './store';
-import { needHideNativeTabbar } from './config';
+import {
+  handleTabbarClick,
+  isVersionGte525,
+  safeAreaBottom,
+  safeHideNativeTabBar,
+  syncCurIdxByCurrentPage,
+  TABBAR_CONTAINER_HEIGHT,
+  TABBAR_HEIGHT,
+  tabbarList,
+  tabbarPlaceholderHeight,
+  themeTokens
+} from './helper';
 import TabbarItem from './TabbarItem.uvue';
-import { isCompilerVersionGte, safeAreaInsets } from '../utils/systemInfo';
-import { useAppStore } from '@/src/store';
-import { getThemeTokens } from '@/src/utils/theme';
-import type { ThemeTokens } from '@/src/utils/theme';
-
-/** tabbar 白色底板高度（px） */
-const TABBAR_HEIGHT: number = 50;
-
-/** tabbar 容器总高度（包含鼓包突出的部分） */
-const TABBAR_CONTAINER_HEIGHT: number = 80;
-
-// 亮 / 暗主题 token（与 theme.json tabBar 配置同步）
-const themeTokens = computed((): ThemeTokens => {
-  return getThemeTokens(useAppStore().state.isDark);
-});
-
-/** 安全区底部高度，从全局 systemInfo 工具中响应式读取 */
-const safeAreaBottom = computed<number>((): number => {
-  const insets = safeAreaInsets.value;
-  if (insets != null) {
-    return insets.bottom;
-  }
-  return 0;
-});
-
-/** 是否为 5.25 及以上版本编译器（仅在 5.25 及以上 H5 启用 absolute 脱离文档流） */
-const isVersionGte525 = computed<boolean>((): boolean => {
-  // #ifdef H5
-  return isCompilerVersionGte('5.25');
-  // #endif
-  // #ifndef H5
-  return false;
-  // #endif
-});
-
-/** 占位块高度：统一为 50 + 底部安全区，占据正常文档流防止遮挡滚动内容 */
-const tabbarPlaceholderHeight = computed<number>((): number => {
-  return TABBAR_HEIGHT + safeAreaBottom.value;
-});
-
-/** 中间鼓包 tabbarItem 点击事件 */
-function handleClickBulge() {
-  uni.navigateTo({
-    url: '/src/pages/ai/ai'
-  });
-}
-
-/** 点击 tab 切换 */
-function handleClick(index: number) {
-  if (index == curIdx.value)
-    return;
-  const list = tabbarList;
-  if (list.length <= index)
-    return;
-  if (list[index].isBulge) {
-    handleClickBulge();
-    return;
-  }
-  const url = list[index].pagePath;
-  setCurIdx(index);
-  uni.switchTab({ url });
-}
-
-/**
- * 隐藏系统原生 TabBar 并根据编译器版本动态适配 H5 底部容器
- */
-function safeHideNativeTabBar(): void {
-  if (!needHideNativeTabbar) {
-    return;
-  }
-
-  // #ifdef H5
-  try {
-    if (typeof document !== 'undefined' && document.getElementById('hide-native-tabbar-style') == null) {
-      const style = document.createElement('style');
-      style.id = 'hide-native-tabbar-style';
-      if (isCompilerVersionGte('5.25')) {
-        style.innerHTML = 'uni-tabbar, .uni-tabbar, .uni-tabbar-bottom, .uni-tabbar__icon, .uni-tabbar__label { display: none !important; } :root { --window-bottom: 0px !important; } uni-page-wrapper { height: 100% !important; } uni-page-body { padding-bottom: 0px !important; }';
-      }
-      else {
-        // 5.24 及以下版本（与 uniX-rice-ui 100% 相同原版逻辑）
-        style.innerHTML = 'uni-tabbar, .uni-tabbar, .uni-tabbar-bottom, .uni-tabbar__icon, .uni-tabbar__label { display: none !important; }';
-      }
-      document.head.appendChild(style);
-    }
-  }
-  catch {}
-  // #endif
-
-  // #ifndef MP-WEIXIN
-  try {
-    uni.hideTabBar({
-      animation: false,
-      fail: (err: any) => {
-        console.log('hideTabBar fail: ', err);
-      }
-    });
-  }
-  catch {}
-  // #endif
-}
 
 // 首次挂载时同步索引并隐藏原生 TabBar
 onMounted(() => {
@@ -122,26 +31,26 @@ onMounted(() => {
       class="tabbar-container"
       :style="{ height: `${TABBAR_CONTAINER_HEIGHT + safeAreaBottom}px` }"
     >
-      <!-- 【整体白色底板】覆盖「固定高度 + 安全区」的全部区域 -->
+      <!-- 【整体底板】覆盖「固定高度 + 安全区」的全部区域 -->
       <view
         class="tabbar-bg"
         :style="{ height: `${TABBAR_HEIGHT + safeAreaBottom}px`, backgroundColor: themeTokens.tabBg, borderTopColor: themeTokens.tabBorder }"
       ></view>
 
-      <!-- 【固定高度】tab 图标按鈕区 -->
+      <!-- 【固定高度】tab 图标按钮区 -->
       <view class="tabbar-inner">
         <view
           v-for="(item, index) in tabbarList"
           :key="index"
           class="tabbar-item"
           :class="{ 'tabbar-item-bulge': item.isBulge }"
-          @click="handleClick(index)"
+          @click="handleTabbarClick(index)"
         >
           <TabbarItem :item="item" :index="index" :is-bulge="item.isBulge" />
         </view>
       </view>
 
-      <!-- 【安全区】底部安全区白色填充块 -->
+      <!-- 【安全区】底部安全区填充块 -->
       <view class="safe-area-bg" :style="{ height: `${safeAreaBottom}px`, backgroundColor: themeTokens.tabBg }" />
     </view>
   </view>
@@ -171,7 +80,7 @@ onMounted(() => {
   flex-direction: column;
 }
 
-/* 【底板层】覆盖「固定高度 + 安全区」的白色底板，绑定高度动态设定 */
+/* 【底板层】覆盖「固定高度 + 安全区」的底板，绑定高度动态设定 */
 .tabbar-bg {
   position: absolute;
   bottom: 0;
@@ -182,7 +91,7 @@ onMounted(() => {
   z-index: 1;
 }
 
-/* 【固定高度层】tab 图标按鈕区，与底板同高；鼓包由 TabbarItem 内绝对定位向上突出 */
+/* 【固定高度层】tab 图标按钮区，与底板同高；鼓包由 TabbarItem 内绝对定位向上突出 */
 .tabbar-inner {
   flex-direction: row;
   height: 80px;
@@ -201,7 +110,7 @@ onMounted(() => {
   height: 80px;
 }
 
-/* 【安全区层】底部安全区白色填充，高度动态设定 */
+/* 【安全区层】底部安全区填充，高度动态设定 */
 .safe-area-bg {
   z-index: 1;
 }

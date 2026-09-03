@@ -1,103 +1,90 @@
-import type { CustomTabBarItem } from './types';
+import type { TabBarConfig } from './types';
 
 /**
- * Tabbar 策略映射结构类型
+ * Tabbar 对象完整配置（完全对齐 uni-app 官方 pages.json tabBar 节点规范）
+ * 包含 color、selectedColor、backgroundColor、borderStyle、midButton 以及 list 列表等
  */
-export type TabbarStrategyType = {
-  NO_TABBAR: number;
-  NATIVE_TABBAR: number;
-  CUSTOM_TABBAR: number;
+export const customTabbarConfig: TabBarConfig = {
+  /**
+   * 自定义 TabBar 呈现风格形态：
+   * - 'capsule': 悬浮胶囊岛屿样式（带平滑滑动滑块）
+   * - 'default': 标准贴底样式（支持中间凸起鼓包 midButton）
+   */
+  type: 'capsule',
+  color: '@tabBarColor',
+  selectedColor: '@tabBarSelectedColor',
+  backgroundColor: '@tabBarBackgroundColor',
+  borderStyle: '@tabBarBorderStyle',
+  /**
+   * 中间鼓包按钮 (midButton)
+   * ⚠️ 官方原生底层跨端兼容性提示：
+   * - Web: 4.0+ (支持)
+   * - 微信小程序: ❌ 不支持
+   * - HarmonyOS 鸿蒙: ❌ 不支持
+   * - iOS(Vapor): ❌ 不支持
+   * - iOS(VDOM) / Android(VDOM): √ 支持
+   *
+   * 💡 建议：若业务必须使用鼓包立体悬浮效果且需全端（含小程序/鸿蒙）兼容，
+   * 请在 .env 中配置 VITE_TABBAR_MODE=2（自定义 TabBar 模式），组件层支持 100% 全端一致渲染。
+   */
+  // midButton: {
+  //   width: '50px',
+  //   height: '50px',
+  //   text: 'tabbar.ai',
+  //   pagePath: 'src/pages/ai/ai',
+  //   iconType: 'icon',
+  //   icon: 'chatboxes',
+  //   iconActive: 'chatboxes-filled',
+  //   iconPath: 'static/tabbar/AI.png',
+  //   selectedIconPath: 'static/tabbar/AI_fill.png',
+  //   iconWidth: '24px',
+  //   badge: null,
+  //   isBulge: true
+  // },
+  list: [
+    {
+      text: 'tabbar.home',
+      pagePath: 'src/pages/index/index',
+      iconType: 'icon',
+      icon: 'home',
+      iconActive: 'home-filled',
+      iconPath: 'static/tabbar/home.png',
+      selectedIconPath: 'static/tabbar/home_fill.png',
+      badge: null,
+      isBulge: false
+    },
+    {
+      text: 'tabbar.basic',
+      pagePath: 'src/pages/basic/basic',
+      iconType: 'icon',
+      icon: 'tune',
+      iconActive: 'tune-filled',
+      iconPath: 'static/tabbar/tune.png',
+      selectedIconPath: 'static/tabbar/tune_fill.png',
+      badge: null,
+      isBulge: false
+    },
+    {
+      text: 'tabbar.function',
+      pagePath: 'src/pages/function/function',
+      iconType: 'icon',
+      icon: 'gear',
+      iconActive: 'gear-filled',
+      iconPath: 'static/tabbar/gear.png',
+      selectedIconPath: 'static/tabbar/gear_fill.png',
+      badge: null,
+      isBulge: false
+    },
+    {
+      text: 'tabbar.me',
+      pagePath: 'src/pages/me/me',
+      iconType: 'icon',
+      icon: 'person',
+      iconActive: 'person-filled',
+      iconPath: 'static/tabbar/people.png',
+      selectedIconPath: 'static/tabbar/people_fill.png',
+      badge: null,
+      isBulge: false
+    }
+  ]
 };
-
-/**
- * tabbar 选择的策略（参考 unibest）
- * 0: NO_TABBAR (无 tabbar)
- * 1: NATIVE_TABBAR (原生 tabbar)
- * 2: CUSTOM_TABBAR (自定义 tabbar)
- */
-export const TABBAR_STRATEGY_MAP: TabbarStrategyType = {
-  NO_TABBAR: 0,
-  NATIVE_TABBAR: 1,
-  CUSTOM_TABBAR: 2
-};
-
-/** 解析环境变量中的 Tabbar 模式 */
-function parseTabbarStrategy(): number {
-  const envMode: string = `${import.meta.env.VITE_TABBAR_MODE ?? '1'}`.trim();
-  if (envMode == '0' || envMode == 'NO_TABBAR') {
-    return TABBAR_STRATEGY_MAP.NO_TABBAR;
-  }
-  if (envMode == '2' || envMode == 'CUSTOM_TABBAR') {
-    return TABBAR_STRATEGY_MAP.CUSTOM_TABBAR;
-  }
-  return TABBAR_STRATEGY_MAP.NATIVE_TABBAR;
-}
-
-/** 当前激活的 Tabbar 策略 */
-export const selectedTabbarStrategy: number = parseTabbarStrategy();
-
-/** 是否启用 tabbar 缓存（原生或自定义模式下为 true，无 tabbar 时为 false） */
-export const tabbarCacheEnable: boolean = selectedTabbarStrategy != TABBAR_STRATEGY_MAP.NO_TABBAR;
-
-/** 是否启用自定义 tabbar（CUSTOM_TABBAR 为 true） */
-export const customTabbarEnable: boolean = selectedTabbarStrategy == TABBAR_STRATEGY_MAP.CUSTOM_TABBAR;
-
-/** 是否需要隐藏原生 tabbar（CUSTOM_TABBAR 为 true） */
-export const needHideNativeTabbar: boolean = selectedTabbarStrategy == TABBAR_STRATEGY_MAP.CUSTOM_TABBAR;
-
-/** 是否使用原生 tabbar（NATIVE_TABBAR 为 true） */
-export const isNativeTabbar: boolean = selectedTabbarStrategy == TABBAR_STRATEGY_MAP.NATIVE_TABBAR;
-
-/**
- * 自定义 tabbar 列表配置
- * pagePath 需要与 pages.json 中的 path 一致
- * text 使用 i18n key 以支持动态语言切换
- * iconType 改为 'icon' 以使用 uni-icons 字体图标
- */
-export const customTabbarList: CustomTabBarItem[] = [
-  {
-    text: 'tabbar.home',
-    pagePath: 'src/pages/index/index',
-    iconType: 'icon',
-    icon: 'home',
-    iconActive: 'home-filled',
-    badge: null,
-    isBulge: false
-  },
-  {
-    text: 'tabbar.basic',
-    pagePath: 'src/pages/basic/basic',
-    iconType: 'icon',
-    icon: 'tune',
-    iconActive: 'tune-filled',
-    badge: null,
-    isBulge: false
-  },
-  {
-    text: 'tabbar.ai',
-    pagePath: '',
-    iconType: 'icon',
-    icon: 'chatboxes',
-    iconActive: 'chatboxes-filled',
-    badge: null,
-    isBulge: true
-  },
-  {
-    text: 'tabbar.function',
-    pagePath: 'src/pages/function/function',
-    iconType: 'icon',
-    icon: 'gear',
-    iconActive: 'gear-filled',
-    badge: null,
-    isBulge: false
-  },
-  {
-    text: 'tabbar.me',
-    pagePath: 'src/pages/me/me',
-    iconType: 'icon',
-    icon: 'person',
-    iconActive: 'person-filled',
-    badge: null,
-    isBulge: false
-  }
-];

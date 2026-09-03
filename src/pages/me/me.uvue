@@ -46,7 +46,7 @@
 import { useTokenStore, useUserStore } from '../../store';
 import { LOGIN_PAGE } from '../../router/config';
 import { handleBackPressExit } from '@/src/utils/backPress';
-import { setCurIdxByPath } from '@/src/tabbar/store';
+import { switchTabbar } from '@/src/tabbar/helper';
 import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '../../utils/refresh.uts';
 
 definePage({
@@ -125,9 +125,7 @@ function handleLogout() {
         });
         // 退出后跳回首页（me 页需要登录，不能停留）
         setTimeout(() => {
-          const targetUrl = '/src/pages/index/index';
-          setCurIdxByPath(targetUrl);
-          uni.switchTab({ url: targetUrl });
+          switchTabbar('/src/pages/index/index');
         }, 0);
       }
     }

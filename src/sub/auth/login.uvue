@@ -17,7 +17,7 @@
 import { ref } from 'vue';
 import type { ISingleTokenRes, IUserInfo } from '../../store';
 import { useTokenStore, useUserStore } from '../../store';
-import { isPageTabbar, setCurIdxByPath } from '../../tabbar/store';
+import { isPageTabbar, switchTabbar } from '../../tabbar/helper';
 
 const tokenStore = useTokenStore();
 const userStore = useUserStore();
@@ -48,8 +48,7 @@ function doLogin() {
     if (redirectUrl.value !== '') {
       const targetUrl = decodeURIComponent(redirectUrl.value) ?? '';
       if (isPageTabbar(targetUrl)) {
-        setCurIdxByPath(targetUrl);
-        uni.switchTab({ url: targetUrl });
+        switchTabbar(targetUrl);
       }
       else {
         uni.redirectTo({ url: targetUrl });
@@ -83,8 +82,7 @@ function doLogin() {
     if (redirectUrl.value !== '') {
       const targetUrl = decodeURIComponent(redirectUrl.value) ?? '';
       if (isPageTabbar(targetUrl)) {
-        setCurIdxByPath(targetUrl);
-        uni.switchTab({ url: targetUrl });
+        switchTabbar(targetUrl);
       }
       else {
         uni.redirectTo({ url: targetUrl });

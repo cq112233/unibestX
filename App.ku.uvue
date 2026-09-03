@@ -5,16 +5,21 @@
     <scroll-view direction="vertical" class="flex-1" style="flex: 1;">
       <slot></slot>
     </scroll-view>
-    <!-- 仅在当前页面为底部 Tabbar 页面且策略为自定义 Tabbar 时渲染 -->
-    <Tabbar v-if="customTabbarEnable && isCurrentPageTabbar" />
+    <!-- 自定义 TabBar：根据 config.uts 中的 type 配置切换形态（胶囊或标准底座） -->
+    <template v-if="customTabbarEnable && isCurrentPageTabbar">
+      <!-- 悬浮胶囊风格 (type: 'capsule') -->
+      <CustomCapsuleTabbar v-if="isCapsuleTabbar" />
+      <!-- 标准底座风格 (type: 'default') -->
+      <Tabbar v-else />
+    </template>
   </view>
 </template>
 
 <script setup lang="uts">
 import Tabbar from '@/src/tabbar/index.uvue';
-import { customTabbarEnable } from '@/src/tabbar/config';
+import CustomCapsuleTabbar from '@/src/tabbar/custom/index.uvue';
+import { customTabbarEnable, isCapsuleTabbar, isPageTabbar, syncCurIdxByCurrentPage } from '@/src/tabbar/helper';
 import { useAppStore } from '@/src/store';
-import { isPageTabbar, syncCurIdxByCurrentPage } from '@/src/tabbar/store';
 import { applyNavbarTheme, getThemeTokens } from '@/src/utils/theme';
 import { computed, onBeforeMount, ref, watch } from 'vue';
 

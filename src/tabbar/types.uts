@@ -3,18 +3,110 @@ export type CustomTabBarItemBadge = number | 'dot';
 
 /** 自定义 tabbar 单项配置 */
 export type CustomTabBarItem = {
-  /** 显示文本 */
+  /** 显示文本（支持 i18n key，如 tabbar.home） */
   text: string;
   /** 页面路径（不带前导 /） */
   pagePath: string;
-  /** 图标类型，uni-app x 推荐使用 image */
+  /** 图标类型，'icon' 为 uni-icons 字体图标，'image' 为本地图片 */
   iconType: string;
-  /** 图标路径（image 模式下为图片路径） */
+  /** 字体图标名称（如 'home'）或图片路径 */
   icon: string;
-  /** 高亮图标路径 */
+  /** 高亮字体图标名称（如 'home-filled'）或高亮图片路径 */
   iconActive: string;
+  /** 原生 TabBar 图标路径（可选） */
+  iconPath?: string;
+  /** 原生 TabBar 高亮图标路径（可选） */
+  selectedIconPath?: string;
   /** badge */
   badge: CustomTabBarItemBadge | null;
   /** 是否是中间鼓包 tabbarItem */
   isBulge: boolean;
+};
+
+/** midButton 的 iconfont 字体图标配置 */
+export type TabBarMidButtonIconfont = {
+  /** 字体的 unicode 字符内容 */
+  text?: string;
+  /** 选中时的 unicode 字符内容 */
+  selectedText?: string;
+  /** 字体大小 */
+  fontSize?: string;
+  /** 字体颜色 */
+  color?: string;
+  /** 选中时的字体颜色 */
+  selectedColor?: string;
+};
+
+/** midButton 中间鼓包按钮配置（完全对齐 uni-app 原生 midButton 规范） */
+export type TabBarMidButton = {
+  /** 中间按钮的宽度，默认与其它项平分宽度（默认 "80px"） */
+  width?: string;
+  /** 中间按钮的高度，可以大于 tabBar 高度，达到中间凸起的效果（默认 "80px"） */
+  height?: string;
+  /** 中间按钮的文字 */
+  text?: string;
+  /** 中间按钮的图片路径 (ImageURIString) */
+  iconPath?: string;
+  /** 图标默认宽度（高度等比例缩放，默认 "24px"） */
+  iconWidth?: string;
+  /** 中间按钮的背景图片路径 */
+  backgroundImage?: string;
+  /** 字体图标，优先级高于 iconPath */
+  iconfont?: TabBarMidButtonIconfont;
+  /** 点击跳转路径（自定义模式使用） */
+  pagePath?: string;
+  /** 图标类型，'icon' 为 uni-icons 字体图标，'image' 为本地图片 */
+  iconType?: string;
+  /** 字体图标名称或图片路径 */
+  icon?: string;
+  /** 高亮字体图标名称或高亮图片路径 */
+  iconActive?: string;
+  /** 原生 TabBar 高亮图标路径 */
+  selectedIconPath?: string;
+  /** badge */
+  badge?: CustomTabBarItemBadge | null;
+  /** 是否是鼓包按钮 */
+  isBulge?: boolean;
+};
+
+/** Tabbar 完整对象配置（完全对齐 uni-app 原生 pages.json tabBar 配置项规范） */
+export type TabBarConfig = {
+  /** 自定义 TabBar 样式形态：'default'（标准贴底底座） | 'capsule'（悬浮胶囊岛屿） */
+  type?: string;
+  /** tab 上的文字默认颜色 */
+  color?: string;
+  /** tab 上的文字选中时的颜色 */
+  selectedColor?: string;
+  /** tab 的背景色 */
+  backgroundColor?: string;
+  /** tabbar 上边框的颜色，可选值 black、white */
+  borderStyle?: string;
+  /** tabbar 上边框的颜色（优先级高于 borderStyle） */
+  borderColor?: string;
+  /** 高斯模糊效果: 'dark' | 'extralight' | 'light' | 'none' */
+  blurEffect?: string;
+  /** 是否开启玻璃效果 tabBar */
+  glassEffect?: boolean;
+  /** tabbar 的位置，可选值 bottom、top */
+  position?: string;
+  /** 文字默认大小 */
+  fontSize?: string;
+  /** 图标默认宽度 */
+  iconWidth?: string;
+  /** 图标和文字的间距 */
+  spacing?: string;
+  /** tabBar 默认高度 */
+  height?: string;
+  /** 中间按钮配置（仅在 list 项为偶数时有效） */
+  midButton?: TabBarMidButton;
+  /** list 设置 iconfont 属性时，需要指定字体文件路径 */
+  iconfontSrc?: string;
+  /** 设置背景图片，优先级高于 backgroundColor */
+  backgroundImage?: string;
+  /** 设置标题栏的背景图平铺方式 */
+  backgroundRepeat?: string;
+  /** tabbar 上红点颜色 */
+  redDotColor?: string;
+  /** tab 列表配置（最少2个、最多5个） */
+  list: CustomTabBarItem[];
 };

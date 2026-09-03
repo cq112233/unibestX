@@ -1,0 +1,222 @@
+import { curIdx, setCurIdx, setCurIdxByPath, tabbarList } from './store';
+import { useAppStore } from '@/src/store';
+import { getThemeTokens } from '@/src/utils/theme';
+import type { ThemeTokens } from '@/src/utils/theme';
+import { isCompilerVersionGte, safeAreaInsets } from '@/src/utils/systemInfo';
+import { customTabbarConfig } from '../config';
+
+export * from './store';
+
+/** tabbar 白色底板高度（px） */
+export const TABBAR_HEIGHT: number = 50;
+
+/** tabbar 容器总高度（包含鼓包突出的部分，px） */
+export const TABBAR_CONTAINER_HEIGHT: number = 80;
+
+/**
+ * Tabbar 策略映射结构类型
+ */
+export type TabbarStrategyType = {
+  NO_TABBAR: number;
+  NATIVE_TABBAR: number;
+  CUSTOM_TABBAR_WITH_NATIVE: number;
+  CUSTOM_TABBAR_WITHOUT_NATIVE: number;
+  CUSTOM_TABBAR: number;
+};
+
+/**
+ * tabbar 选择的策略（支持 4 种模式）
+ * 0: NO_TABBAR (无 tabbar)
+ * 1: NATIVE_TABBAR (原生 tabbar，pages.json 自动生成配置，带页面状态缓存，使用 uni.switchTab)
+ * 2: CUSTOM_TABBAR_WITH_NATIVE (【带缓存】自定义 tabbar，pages.json custom:true，隐藏原生，保留页面状态缓存，使用 uni.switchTab)
+ * 3: CUSTOM_TABBAR_WITHOUT_NATIVE (【不缓存】纯自定义 tabbar，pages.json 无 tabBar 节点，使用 uni.redirectTo，每次切换重新加载页面)
+ */
+export const TABBAR_STRATEGY_MAP: TabbarStrategyType = {
+  NO_TABBAR: 0,
+  NATIVE_TABBAR: 1,
+  CUSTOM_TABBAR_WITH_NATIVE: 2,
+  CUSTOM_TABBAR_WITHOUT_NATIVE: 3,
+  CUSTOM_TABBAR: 2
+};
+
+/** 解析环境变量中的 Tabbar 模式 */
+export function parseTabbarStrategy(): number {
+  const envMode: string = `${import.meta.env.VITE_TABBAR_MODE ?? '1'}`.trim();
+  if (envMode == '0' || envMode == 'NO_TABBAR') {
+    return TABBAR_STRATEGY_MAP.NO_TABBAR;
+  }
+  if (envMode == '2' || envMode == 'CUSTOM_TABBAR' || envMode == 'CUSTOM_TABBAR_WITH_NATIVE') {
+    return TABBAR_STRATEGY_MAP.CUSTOM_TABBAR_WITH_NATIVE;
+  }
+  if (envMode == '3' || envMode == 'CUSTOM_TABBAR_WITHOUT_NATIVE') {
+    return TABBAR_STRATEGY_MAP.CUSTOM_TABBAR_WITHOUT_NATIVE;
+  }
+  return TABBAR_STRATEGY_MAP.NATIVE_TABBAR;
+}
+
+/** 当前激活的 Tabbar 策略 */
+export const selectedTabbarStrategy: number = parseTabbarStrategy();
+
+/** 是否启用 tabbar 缓存（原生或自定义模式下为 true，无 tabbar 时为 false） */
+export const tabbarCacheEnable: boolean = selectedTabbarStrategy != TABBAR_STRATEGY_MAP.NO_TABBAR;
+
+/** 是否启用自定义 tabbar（模式 2 或 模式 3 为 true） */
+export const customTabbarEnable: boolean = selectedTabbarStrategy == TABBAR_STRATEGY_MAP.CUSTOM_TABBAR_WITH_NATIVE || selectedTabbarStrategy == TABBAR_STRATEGY_MAP.CUSTOM_TABBAR_WITHOUT_NATIVE;
+
+/** 是否为无全局 TabBar 模式（模式 0 为 true） */
+export const isNoTabbar: boolean = selectedTabbarStrategy == TABBAR_STRATEGY_MAP.NO_TABBAR;
+
+/** 是否为悬浮胶囊风格 TabBar（根据 config.uts 中的 type 判定） */
+export const isCapsuleTabbar: boolean = customTabbarConfig.type == 'capsule';
+
+/** 是否需要隐藏原生 tabbar（模式 2 为 true） */
+export const needHideNativeTabbar: boolean = selectedTabbarStrategy == TABBAR_STRATEGY_MAP.CUSTOM_TABBAR_WITH_NATIVE;
+
+/** 是否使用原生 tabbar（模式 1 为 true） */
+export const isNativeTabbar: boolean = selectedTabbarStrategy == TABBAR_STRATEGY_MAP.NATIVE_TABBAR;
+
+/** 是否具有 pages.json 原生配置（模式 1 和 模式 2 为 true） */
+export const hasNativeTabbarConfig: boolean = selectedTabbarStrategy == TABBAR_STRATEGY_MAP.NATIVE_TABBAR || selectedTabbarStrategy == TABBAR_STRATEGY_MAP.CUSTOM_TABBAR_WITH_NATIVE;
+
+/** 亮 / 暗主题 token（与 theme.json tabBar 配置同步） */
+export const themeTokens = computed((): ThemeTokens => {
+  return getThemeTokens(useAppStore().state.isDark);
+});
+
+/** 安全区底部高度，从全局 systemInfo 工具中响应式读取 */
+export const safeAreaBottom = computed<number>((): number => {
+  const insets = safeAreaInsets.value;
+  if (insets != null) {
+    return insets.bottom;
+  }
+  return 0;
+});
+
+/** 是否为 5.25 及以上版本编译器（仅在 5.25 及以上 H5 启用 absolute 脱离文档流） */
+export const isVersionGte525 = computed<boolean>((): boolean => {
+  // #ifdef H5
+  return isCompilerVersionGte('5.25');
+  // #endif
+  // #ifndef H5
+  return false;
+  // #endif
+});
+
+/** 占位块高度：统一为 50 + 底部安全区，占据正常文档流防止遮挡滚动内容 */
+export const tabbarPlaceholderHeight = computed<number>((): number => {
+  return TABBAR_HEIGHT + safeAreaBottom.value;
+});
+
+/** 中间鼓包 tabbarItem 点击事件 */
+export function handleClickBulge(url: string = '/src/pages/ai/ai'): void {
+  uni.navigateTo({
+    url
+  });
+}
+
+/**
+ * 根据当前 TabBar 模式安全跳转到指定的 Tabbar 页面
+ * - 模式 1 / 模式 2 (具备原生底座配置)：调用 uni.switchTab，保留页面缓存
+ * - 模式 0 / 模式 3 (无原生配置)：调用 uni.redirectTo
+ * 内部自动同步激活索引
+ */
+export function switchTabbar(url: string): void {
+  setCurIdxByPath(url);
+  if (selectedTabbarStrategy == TABBAR_STRATEGY_MAP.CUSTOM_TABBAR_WITHOUT_NATIVE || selectedTabbarStrategy == TABBAR_STRATEGY_MAP.NO_TABBAR) {
+    uni.redirectTo({
+      url,
+      fail: (_err: any) => {
+        uni.navigateTo({ url });
+      }
+    });
+  }
+  else {
+    uni.switchTab({
+      url,
+      fail: (_err: any) => {
+        uni.redirectTo({ url });
+      }
+    });
+  }
+}
+
+/** 点击 tab 切换路由跳转逻辑 */
+export function handleTabbarClick(index: number): void {
+  if (index == curIdx.value) {
+    return;
+  }
+  const list = tabbarList;
+  if (list.length <= index) {
+    return;
+  }
+  if (list[index].isBulge) {
+    handleClickBulge(list[index].pagePath.length > 0 ? list[index].pagePath : '/src/pages/ai/ai');
+    return;
+  }
+  const url = list[index].pagePath;
+  setCurIdx(index);
+  switchTabbar(url);
+}
+
+/**
+ * 隐藏系统原生 TabBar 并根据编译器版本动态适配 H5 底部容器
+ */
+export function safeHideNativeTabBar(): void {
+  if (!needHideNativeTabbar) {
+    return;
+  }
+
+  // #ifdef H5
+  try {
+    if (typeof document !== 'undefined' && document.getElementById('hide-native-tabbar-style') == null) {
+      const style = document.createElement('style');
+      style.id = 'hide-native-tabbar-style';
+      if (isCompilerVersionGte('5.25')) {
+        style.innerHTML = 'uni-tabbar, .uni-tabbar, .uni-tabbar-bottom, .uni-tabbar__icon, .uni-tabbar__label { display: none !important; } :root { --window-bottom: 0px !important; } uni-page-wrapper { height: 100% !important; } uni-page-body { padding-bottom: 0px !important; }';
+      }
+      else {
+        // 5.24 及以下版本（与 uniX-rice-ui 100% 相同原版逻辑）
+        style.innerHTML = 'uni-tabbar, .uni-tabbar, .uni-tabbar-bottom, .uni-tabbar__icon, .uni-tabbar__label { display: none !important; }';
+      }
+      document.head.appendChild(style);
+    }
+  }
+  catch {}
+  // #endif
+
+  // #ifndef MP-WEIXIN
+  try {
+    uni.hideTabBar({
+      animation: false,
+      fail: (err: any) => {
+        console.log('hideTabBar fail: ', err);
+      }
+    });
+  }
+  catch {}
+  // #endif
+}
+
+/**
+ * 初始化原生 TabBar 中间按钮 (midButton) 点击监听
+ * 仅在原生 TabBar 模式 (模式 1) 且配置了 midButton 时自动注册
+ */
+export function initNativeMidButtonTap(): void {
+  if (!isNativeTabbar || customTabbarConfig.midButton == null) {
+    return;
+  }
+  // #ifndef MP-WEIXIN
+  try {
+    const mid = customTabbarConfig.midButton;
+    const targetUrl = (mid != null && mid.pagePath != null && mid.pagePath!.length > 0)
+      ? mid.pagePath!
+      : '/src/pages/ai/ai';
+    uni.onTabBarMidButtonTap(() => {
+      handleClickBulge(targetUrl);
+    });
+  }
+  catch (e) {
+    console.warn('onTabBarMidButtonTap registration error', e);
+  }
+  // #endif
+}

@@ -1,10 +1,15 @@
 <script setup lang="uts">
 import { checkDirectEntry } from './src/router/interceptor';
 import { useAppStore } from './src/store';
+import { initNativeMidButtonTap } from './src/tabbar/helper';
 
 onLaunch(() => {
   // 提前实例化 App Store（含持久化还原），并初始化外观模式：跟随系统 / 浅色 / 深色
   useAppStore().initThemeMode();
+
+  // 注册原生 TabBar 中间按钮监听（仅在原生模式且配置了 midButton 时生效）
+  initNativeMidButtonTap();
+
   // #ifdef MP-WEIXIN
   // 微信小程序真机 @font-face 不生效，使用 uni.loadFontFace 加载 uni-icons 字体
   uni.loadFontFace({

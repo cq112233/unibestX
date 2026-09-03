@@ -61,7 +61,15 @@
     "backgroundColorBottom": "@backgroundColorBottom",
     "backgroundTextStyle": "@backgroundTextStyle"
   },
+  "easycom": {
+    "autoscan": true,
+    "custom": {
+      "^NavBar$": "@/src/components/NavBar/NavBar.uvue",
+      "^e-chart$": "@/uni_modules/e-chart/components/e-chart/e-chart.uvue"
+    }
+  },
   "tabBar": {
+    "custom": true,
     "color": "@tabBarColor",
     "selectedColor": "@tabBarSelectedColor",
     "backgroundColor": "@tabBarBackgroundColor",
@@ -91,13 +99,15 @@
         "iconPath": "static/tabbar/people.png",
         "selectedIconPath": "static/tabbar/people_fill.png"
       }
-    ]
-  },
-  "easycom": {
-    "autoscan": true,
-    "custom": {
-      "^NavBar$": "@/src/components/NavBar/NavBar.uvue",
-      "^e-chart$": "@/uni_modules/e-chart/components/e-chart/e-chart.uvue"
+    ],
+    "iconWidth": "24px",
+    "height": "50px",
+    "midButton": {
+      "width": "50px",
+      "height": "50px",
+      "text": "AI",
+      "iconPath": "static/tabbar/AI.png",
+      "iconWidth": "24px"
     }
   },
   "subPackages": [
