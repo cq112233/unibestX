@@ -3,7 +3,6 @@
 	<view
 		class="l-signature"
 		:style="drawableStyle"
-		style="touch-action: none;"
 		@touchstart.stop.prevent="onAppTouchStart"
 		@touchmove.stop.prevent="onAppTouchMove"
 		@touchend.stop.prevent="onAppTouchEnd"
@@ -13,7 +12,7 @@
 			ref="signatureRef"
 			disable-scroll="true"
 			:disable-scroll="true"
-			style="width: 100%; height: 100%; touch-action: none;"
+			style="width: 100%; height: 100%;"
 			@touchstart.stop.prevent="onAppTouchStart"
 			@touchmove.stop.prevent="onAppTouchMove"
 			@touchend.stop.prevent="onAppTouchEnd"

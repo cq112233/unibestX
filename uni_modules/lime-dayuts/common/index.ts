@@ -911,16 +911,9 @@ export class Dayuts {
 	 *
 	 * @returns {string} 当前 dayuts 对象的 UTC 字符串表示。
 	 */
-	// #ifdef APP-ANDROID
-	override toString() : string {
+	toUTCString() : string {
 		return this.$d.toString();
 	}
-	// #endif
-	// #ifndef APP-ANDROID
-	toString() : string {
-		return this.$d.toString();
-	}
-	// #endif
 	/**
 	 * 计算给定日期在当年的第几天，或者设置给定日期为当年的第几天。
 	 * @param {number} [input] - 如果提供了输入值，则将日期设置为当年的第几天。如果没有提供输入值，则返回当前日期在当年的第几天。

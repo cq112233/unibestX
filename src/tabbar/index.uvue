@@ -2,10 +2,11 @@
 import { curIdx, setCurIdx, syncCurIdxByCurrentPage, tabbarList } from './store';
 import { needHideNativeTabbar } from './config';
 import TabbarItem from './TabbarItem.uvue';
-import { safeAreaInsets } from '../utils/systemInfo';
+import { isCompilerVersionGte, safeAreaInsets } from '../utils/systemInfo';
 import { useAppStore } from '@/src/store';
 import { getThemeTokens } from '@/src/utils/theme';
 import type { ThemeTokens } from '@/src/utils/theme';
+
 /** tabbar 白色底板高度（px） */
 const TABBAR_HEIGHT: number = 50;
 
@@ -26,14 +27,19 @@ const safeAreaBottom = computed<number>((): number => {
   return 0;
 });
 
-/** 占位块高度：App 和小程序端为 50 + 底部安全区，防止遮挡滚动内容；H5 端因框架已有视口内边距，特殊处理为 0 避免多出空白 */
-const tabbarPlaceholderHeight = computed<number>((): number => {
+/** 是否为 5.25 及以上版本编译器（仅在 5.25 及以上 H5 启用 absolute 脱离文档流） */
+const isVersionGte525 = computed<boolean>((): boolean => {
   // #ifdef H5
-  return 0;
+  return isCompilerVersionGte('5.25') || isCompilerVersionGte('4.25');
   // #endif
   // #ifndef H5
-  return TABBAR_HEIGHT + safeAreaBottom.value;
+  return false;
   // #endif
+});
+
+/** 占位块高度：统一为 50 + 底部安全区，占据正常文档流防止遮挡滚动内容 */
+const tabbarPlaceholderHeight = computed<number>((): number => {
+  return TABBAR_HEIGHT + safeAreaBottom.value;
 });
 
 /** 中间鼓包 tabbarItem 点击事件 */
@@ -60,7 +66,7 @@ function handleClick(index: number) {
 }
 
 /**
- * 隐藏系统原生 TabBar 并适配 H5 底部高度
+ * 隐藏系统原生 TabBar 并根据编译器版本动态适配 H5 底部容器
  */
 function safeHideNativeTabBar(): void {
   if (!needHideNativeTabbar) {
@@ -72,7 +78,7 @@ function safeHideNativeTabBar(): void {
     if (typeof document !== 'undefined' && document.getElementById('hide-native-tabbar-style') == null) {
       const style = document.createElement('style');
       style.id = 'hide-native-tabbar-style';
-      style.innerHTML = 'uni-tabbar { display: none !important; } :root { --window-bottom: 0px !important; } uni-page-wrapper { height: 100% !important; }';
+      style.innerHTML = 'uni-tabbar, .uni-tabbar, .uni-tabbar-bottom, .uni-tabbar__icon, .uni-tabbar__label { display: none !important; } :root { --window-bottom: 0px !important; } uni-page-wrapper { height: 100% !important; } uni-page-body { padding-bottom: 0px !important; }';
       document.head.appendChild(style);
     }
   }
@@ -100,8 +106,12 @@ onMounted(() => {
 </script>
 
 <template>
-  <!-- 占位块：防止页面内容被固定底栏遮挡（App/小程序占位50+安全区，H5设为0） -->
-  <view class="tabbar-placeholder" :style="{ height: `${tabbarPlaceholderHeight}px` }">
+  <!-- 占位块：仅在 5.25 及以上版本 H5 时使用 position: absolute，5.24及以下和App/小程序保持正常文档流占位 -->
+  <view
+    class="tabbar-placeholder"
+    :class="{ 'tabbar-placeholder-absolute': isVersionGte525 }"
+    :style="{ height: `${tabbarPlaceholderHeight}px` }"
+  >
     <view
       class="tabbar-container"
       :style="{ height: `${TABBAR_CONTAINER_HEIGHT + safeAreaBottom}px` }"
@@ -137,11 +147,12 @@ onMounted(() => {
   width: 100%;
 }
 
-/* #ifdef H5 */
-.tabbar-placeholder {
-  height: 0px !important;
+/* 仅在 5.25 及以上版本 H5 时脱离文档流 */
+.tabbar-placeholder-absolute {
+  /* #ifdef H5 */
+  position: absolute;
+  /* #endif */
 }
-/* #endif */
 
 /* 固定在底部的容器，内部级联展示三个层 */
 .tabbar-container {

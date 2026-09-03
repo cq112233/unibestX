@@ -14,6 +14,8 @@ export type SystemInfoType = {
   windowHeight: number;
   statusBarHeight: number;
   pixelRatio: number;
+  compilerVersion: string;
+  uniCompileVersion: string;
 };
 
 export const systemInfo = ref(null as SystemInfoType | null);
@@ -23,13 +25,21 @@ export function updateSystemInfo() {
   // #ifdef MP-WEIXIN
   // 微信小程序使用新的API
   const windowInfo = uni.getWindowInfo();
+  let compileVer = '';
+  try {
+    const appBaseInfo = uni.getAppBaseInfo() as any;
+    compileVer = `${appBaseInfo.appCompilerVersion ?? appBaseInfo.SDKVersion ?? ''}`;
+  }
+  catch {}
   systemInfo.value = {
     screenWidth: windowInfo.screenWidth,
     screenHeight: windowInfo.screenHeight,
     windowWidth: windowInfo.windowWidth,
     windowHeight: windowInfo.windowHeight,
     statusBarHeight: windowInfo.statusBarHeight,
-    pixelRatio: windowInfo.pixelRatio
+    pixelRatio: windowInfo.pixelRatio,
+    compilerVersion: compileVer,
+    uniCompileVersion: compileVer
   } as SystemInfoType;
   const safeArea = windowInfo.safeArea;
   if (safeArea != null) {
@@ -45,13 +55,28 @@ export function updateSystemInfo() {
   // #ifndef MP-WEIXIN
   // 其他平台继续使用uni API
   const sysInfo = uni.getSystemInfoSync();
+  let compileVer = sysInfo.uniCompileVersion ?? '';
+  // #ifdef H5
+  if (compileVer == '') {
+    try {
+      const g = globalThis as any;
+      const conf = g.__uniConfig as any;
+      if (conf != null && conf.compilerVersion != null) {
+        compileVer = `${conf.compilerVersion}`;
+      }
+    }
+    catch {}
+  }
+  // #endif
   systemInfo.value = {
     screenWidth: sysInfo.screenWidth,
     screenHeight: sysInfo.screenHeight,
     windowWidth: sysInfo.windowWidth,
     windowHeight: sysInfo.windowHeight,
     statusBarHeight: sysInfo.statusBarHeight,
-    pixelRatio: sysInfo.pixelRatio
+    pixelRatio: sysInfo.pixelRatio,
+    compilerVersion: compileVer,
+    uniCompileVersion: compileVer
   } as SystemInfoType;
   const safeArea = sysInfo.safeAreaInsets;
   if (safeArea != null) {
@@ -63,6 +88,30 @@ export function updateSystemInfo() {
     } as SystemSafeAreaInsets;
   }
   // #endif
+}
+
+/**
+ * 判断当前 HBuilderX / uni-app 编译器版本是否大于等于指定版本（如 '5.25' 或 '4.25'）
+ */
+export function isCompilerVersionGte(targetVersion: string): boolean {
+  const current = systemInfo.value?.compilerVersion ?? '';
+  if (current == '') {
+    return false;
+  }
+  const curParts = current.split('.');
+  const targetParts = targetVersion.split('.');
+  const len = Math.max(curParts.length, targetParts.length);
+  for (let i = 0; i < len; i++) {
+    const curNum = i < curParts.length ? parseInt(curParts[i], 10) : 0;
+    const targetNum = i < targetParts.length ? parseInt(targetParts[i], 10) : 0;
+    if (curNum > targetNum) {
+      return true;
+    }
+    if (curNum < targetNum) {
+      return false;
+    }
+  }
+  return true;
 }
 
 // 初始化获取一次
