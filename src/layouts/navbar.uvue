@@ -21,7 +21,6 @@
       :refresher-enabled="isRefresherEnabled"
       :refresher-triggered="isTriggered"
       :refresher-background="themeTokens.bgContent"
-      :nested-scroll-child="finalNestedScrollChild"
       @refresherrefresh="handleRefresherRefresh"
       @refresherrestore="handleRefresherRestore"
     >
@@ -33,7 +32,6 @@
       v-else
       class="flex-1 flex flex-col"
       :direction="pageScrollDirection"
-      :nested-scroll-child="finalNestedScrollChild"
     >
       <slot />
     </scroll-view>
@@ -92,11 +90,6 @@ const props = defineProps({
     type: Object,
     default: () => ({})
   },
-  /** 嵌套滚动子元素 ID */
-  nestedScrollChild: {
-    type: String,
-    default: ''
-  },
   /** 是否隐藏导航栏（默认 false） */
   hideNavbar: {
     type: Boolean,
@@ -147,14 +140,6 @@ const pageScrollDirection = computed((): string => {
 
 const isRefresherEnabled = computed((): boolean => {
   return !isPageScrollDisabled.value && !isPageRefresherDisabled.value;
-});
-
-const finalNestedScrollChild = computed((): string => {
-  if (props.nestedScrollChild.length > 0) {
-    return props.nestedScrollChild;
-  }
-  const childFromStyle = (pageStyleObj.value.nestedScrollChild as string | null) ?? '';
-  return childFromStyle;
 });
 
 /**
