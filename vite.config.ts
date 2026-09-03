@@ -36,8 +36,16 @@ catch (e) {
   console.error('[vite.config.ts] 读取 manifest.json 失败:', e);
 }
 
-// 注入环境变量，全端（App-Android Kotlin / iOS / H5 / 微信小程序）均可通过 import.meta.env.VITE_IS_VAPOR 安全访问
+// 注入环境变量，全端（App-Android Kotlin / iOS / H5 / 微信小程序）均可通过 import.meta.env 安全访问
 process.env.VITE_IS_VAPOR = String(isVapor);
+try {
+  const pkgRaw = fs.readFileSync(resolve(projectRoot, 'package.json'), 'utf-8');
+  const pkg = JSON.parse(pkgRaw);
+  process.env.VITE_APP_VERSION = pkg.version ?? '1.0.0';
+}
+catch {
+  process.env.VITE_APP_VERSION = '1.0.0';
+}
 
 const weappTailwindcssPlugins = WeappTailwindcss(
   uniAppX({

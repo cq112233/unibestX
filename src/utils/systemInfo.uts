@@ -8,20 +8,47 @@ export type SystemSafeAreaInsets = {
 };
 
 export type SystemInfoType = {
+  // 窗口与屏幕尺寸
   screenWidth: number;
   screenHeight: number;
   windowWidth: number;
   windowHeight: number;
   statusBarHeight: number;
   pixelRatio: number;
+  // 设备信息
+  brand: string;
+  model: string;
+  system: string;
+  // 编译引擎与平台信息
   compilerVersion: string;
   uniCompileVersion: string;
   isVapor: boolean;
   compileMode: string;
+  platformName: string;
+  // 应用与环境变量
+  appTitle: string;
+  appVersion: string;
+  apiBaseUrl: string;
+  env: string;
+  envName: string;
 };
 
 export const systemInfo = ref(null as SystemInfoType | null);
 export const safeAreaInsets = ref(null as SystemSafeAreaInsets | null);
+
+/**
+ * 获取当前应用名称（全端从 import.meta.env 读取）
+ */
+export function getAppTitle(): string {
+  return `${import.meta.env.VITE_APP_TITLE ?? 'unibestX'}`;
+}
+
+/**
+ * 获取接口 BaseURL 地址（全端从 import.meta.env 读取）
+ */
+export function getApiBaseUrl(): string {
+  return `${import.meta.env.VITE_SERVER_BASEURL ?? 'https://ukw0y1.laf.run'}`;
+}
 
 /**
  * 获取当前是否为 Vapor 渲染模式（全端从 import.meta.env 读取）
@@ -31,13 +58,106 @@ export function isVaporMode(): boolean {
 }
 
 /**
+ * 获取当前运行环境类型标识（'development' | 'test' | 'production'）
+ */
+export function getCurrentEnv(): string {
+  const buildEnvType = `${import.meta.env.VITE_ENV_TYPE ?? ''}`;
+  if (buildEnvType == 'test') {
+    return 'test';
+  }
+  return process.env.NODE_ENV == 'development' ? 'development' : 'production';
+}
+
+/**
+ * 获取当前运行环境中文名称（'开发环境' | '测试环境' | '生产环境'）
+ */
+export function getCurrentEnvName(): string {
+  const env = getCurrentEnv();
+  if (env == 'test') {
+    return '测试环境';
+  }
+  if (env == 'production') {
+    return '生产环境';
+  }
+  return '开发环境';
+}
+
+/**
+ * 获取当前应用版本号（优先从系统运行时获取，若为空从 VITE_APP_VERSION 或兜底 1.0.0）
+ */
+export function getAppVersion(): string {
+  try {
+    const sys = uni.getSystemInfoSync();
+    if ((sys.appVersion ?? '') != '') {
+      return `${sys.appVersion}`;
+    }
+  }
+  catch {}
+  // #ifdef MP-WEIXIN
+  try {
+    const appBaseInfo = uni.getAppBaseInfo() as any;
+    if ((appBaseInfo.appVersion ?? '') != '') {
+      return `${appBaseInfo.appVersion}`;
+    }
+  }
+  catch {}
+  // #endif
+  return `${import.meta.env.VITE_APP_VERSION ?? '1.0.0'}`;
+}
+
+/**
  * 获取当前编译运行模式（如 "Vapor 模式 (开发)" / "VDOM 模式 (生产)"）
  */
 export function getCompileMode(): string {
   const isVapor = isVaporMode();
   const modeName = isVapor ? 'Vapor 模式' : 'VDOM 模式';
-  const env = process.env.NODE_ENV == 'production' ? '生产' : '开发';
-  return `${modeName} (${env})`;
+  const envText = getCurrentEnv() == 'test' ? '测试' : (process.env.NODE_ENV == 'production' ? '生产' : '开发');
+  return `${modeName} (${envText})`;
+}
+
+/**
+ * 获取当前编译目标平台（如 "H5"、"Android"、"iOS"、"微信小程序" 等）
+ */
+export function getCompilePlatform(): string {
+  // #ifdef H5
+  return 'H5';
+  // #endif
+  // #ifdef APP-ANDROID
+  return 'Android';
+  // #endif
+  // #ifdef APP-IOS
+  return 'iOS';
+  // #endif
+  // #ifdef APP-HARMONY
+  return 'HarmonyOS';
+  // #endif
+  // #ifdef MP-WEIXIN
+  return '微信小程序';
+  // #endif
+  // #ifdef MP-ALIPAY
+  return '支付宝小程序';
+  // #endif
+  // #ifdef MP-BAIDU
+  return '百度小程序';
+  // #endif
+  // #ifdef MP-TOUTIAO
+  return '字节小程序';
+  // #endif
+  // #ifdef MP-KUAISHOU
+  return '快手小程序';
+  // #endif
+  // #ifdef MP-QQ
+  return 'QQ小程序';
+  // #endif
+  // #ifndef H5 || APP-ANDROID || APP-IOS || APP-HARMONY || MP-WEIXIN || MP-ALIPAY || MP-BAIDU || MP-TOUTIAO || MP-KUAISHOU || MP-QQ
+  try {
+    const sys = uni.getSystemInfoSync();
+    return sys.uniPlatform ?? '未知平台';
+  }
+  catch {
+    return '未知平台';
+  }
+  // #endif
 }
 
 export function updateSystemInfo() {
@@ -50,6 +170,20 @@ export function updateSystemInfo() {
     compileVer = `${appBaseInfo.appCompilerVersion ?? appBaseInfo.SDKVersion ?? ''}`;
   }
   catch {}
+  if (compileVer == '') {
+    compileVer = '1.0.0';
+  }
+  let brand = '';
+  let model = '';
+  let system = '';
+  try {
+    const sys = uni.getSystemInfoSync();
+    brand = sys.brand ?? '';
+    model = sys.model ?? '';
+    system = sys.system ?? '';
+  }
+  catch {}
+
   systemInfo.value = {
     screenWidth: windowInfo.screenWidth,
     screenHeight: windowInfo.screenHeight,
@@ -57,10 +191,19 @@ export function updateSystemInfo() {
     windowHeight: windowInfo.windowHeight,
     statusBarHeight: windowInfo.statusBarHeight,
     pixelRatio: windowInfo.pixelRatio,
+    brand,
+    model,
+    system,
     compilerVersion: compileVer,
     uniCompileVersion: compileVer,
     isVapor: isVaporMode(),
-    compileMode: getCompileMode()
+    compileMode: getCompileMode(),
+    platformName: getCompilePlatform(),
+    appTitle: getAppTitle(),
+    appVersion: getAppVersion(),
+    apiBaseUrl: getApiBaseUrl(),
+    env: getCurrentEnv(),
+    envName: getCurrentEnvName()
   } as SystemInfoType;
   const safeArea = windowInfo.safeArea;
   if (safeArea != null) {
@@ -89,6 +232,9 @@ export function updateSystemInfo() {
     catch {}
   }
   // #endif
+  if (compileVer == '') {
+    compileVer = '1.0.0';
+  }
   systemInfo.value = {
     screenWidth: sysInfo.screenWidth,
     screenHeight: sysInfo.screenHeight,
@@ -96,10 +242,19 @@ export function updateSystemInfo() {
     windowHeight: sysInfo.windowHeight,
     statusBarHeight: sysInfo.statusBarHeight,
     pixelRatio: sysInfo.pixelRatio,
+    brand: sysInfo.brand ?? '',
+    model: sysInfo.model ?? '',
+    system: sysInfo.system ?? '',
     compilerVersion: compileVer,
     uniCompileVersion: compileVer,
     isVapor: isVaporMode(),
-    compileMode: getCompileMode()
+    compileMode: getCompileMode(),
+    platformName: getCompilePlatform(),
+    appTitle: getAppTitle(),
+    appVersion: getAppVersion(),
+    apiBaseUrl: getApiBaseUrl(),
+    env: getCurrentEnv(),
+    envName: getCurrentEnvName()
   } as SystemInfoType;
   const safeArea = sysInfo.safeAreaInsets;
   if (safeArea != null) {

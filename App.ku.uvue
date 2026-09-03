@@ -53,18 +53,20 @@ watch(uToastRef, (val: ComponentPublicInstance | null) => {
   }
 }, { immediate: true });
 
-// 页面显示钩子：解析当前路由，动态控制导航栏显示及同步选中索引
-onBeforeMount(() => {
-  const pages = getCurrentPages();
-  if (pages.length > 0) {
-    const route = pages[pages.length - 1].route;
-    if (route != null && route.length > 0) {
-      const path = route.startsWith('/') ? route : `/${route}`;
-      const isTabbar = isPageTabbar(path);
-      isCurrentPageTabbar.value = isTabbar;
-      // 如果是 Tabbar 路由，同步底部导航的激活索引
-      if (isTabbar) {
-        syncCurIdxByCurrentPage();
+// 组件挂载时：同步 H5 / 小程序原生导航栏主题与路由状态
+onMounted(() => {
+  applyNavbarTheme(appStore.state.isDark);
+  try {
+    const pages = getCurrentPages();
+    if (pages.length > 0) {
+      const route = pages[pages.length - 1].route;
+      if (route != null && route.length > 0) {
+        const path = route.startsWith('/') ? route : `/${route}`;
+        const isTabbar = isPageTabbar(path);
+        isCurrentPageTabbar.value = isTabbar;
+        if (isTabbar) {
+          syncCurIdxByCurrentPage();
+        }
       }
     }
   }
