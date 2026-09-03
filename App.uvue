@@ -8,6 +8,9 @@ onLaunch(() => {
   // 提前实例化 App Store（含持久化还原），并初始化外观模式：跟随系统 / 浅色 / 深色
   useAppStore().initThemeMode();
 
+  // 加载 uview-ultra 图标字体
+  loadFont();
+
   // 注册原生 TabBar 中间按钮监听（仅在原生模式且配置了 midButton 时生效）
   initNativeMidButtonTap();
 

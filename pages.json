@@ -65,7 +65,9 @@
     "autoscan": true,
     "custom": {
       "^NavBar$": "@/src/components/NavBar/NavBar.uvue",
-      "^e-chart$": "@/uni_modules/e-chart/components/e-chart/e-chart.uvue"
+      "^e-chart$": "@/uni_modules/e-chart/components/e-chart/e-chart.uvue",
+      "^up-(.*)": "@/uni_modules/uview-ultra/components/up-$1/up-$1.uvue",
+      "^u-([^-].*)": "@/uni_modules/uview-plus/components/u-$1/u-$1.uvue"
     }
   },
   "tabBar": {
@@ -99,15 +101,15 @@
         "iconPath": "static/tabbar/people.png",
         "selectedIconPath": "static/tabbar/people_fill.png"
       }
-    ]
-  },
-  "easycom": {
-    "autoscan": true,
-    "custom": {
-      "^NavBar$": "@/src/components/NavBar/NavBar.uvue",
-      "^e-chart$": "@/uni_modules/e-chart/components/e-chart/e-chart.uvue",
-      "^up-(.*)": "@/uni_modules/uview-ultra/components/up-$1/up-$1.uvue",
-      "^u-([^-].*)": "@/uni_modules/uview-plus/components/u-$1/u-$1.uvue"
+    ],
+    "iconWidth": "24px",
+    "height": "50px",
+    "midButton": {
+      "width": "50px",
+      "height": "50px",
+      "text": "AI",
+      "iconPath": "static/tabbar/AI.png",
+      "iconWidth": "24px"
     }
   },
   "subPackages": [

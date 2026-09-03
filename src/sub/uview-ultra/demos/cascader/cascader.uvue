@@ -74,8 +74,8 @@
           v-model:show="showColumn"
           v-model="columnValue"
           :data="categoryData"
-          headerDirection="column"
-          :optionsCols="1"
+          header-direction="column"
+          :options-cols="1"
           @confirm="onColumnConfirm"
         ></up-cascader>
       </view>
@@ -259,58 +259,58 @@ const orgData = ref<UTSJSONObject[]>([
 
 function getValueText(value: Array<any>): string {
   if (value.length == 0) {
-    return '未选择'
+    return '未选择';
   }
-  const texts = [] as string[]
+  const texts = [] as string[];
   for (let i = 0; i < value.length; i++) {
-    const item = value[i]
-    texts.push(item == null ? '' : item.toString())
+    const item = value[i];
+    texts.push(item == null ? '' : item.toString());
   }
-  return texts.join(' / ')
+  return texts.join(' / ');
 }
 
 function openArea(): void {
-  showArea.value = true
+  showArea.value = true;
 }
 
 function openCategory(): void {
-  showCategory.value = true
+  showCategory.value = true;
 }
 
 function openOrg(): void {
-  showOrg.value = true
+  showOrg.value = true;
 }
 
 function openColumn(): void {
-  showColumn.value = true
+  showColumn.value = true;
 }
 
 function openAuto(): void {
-  showAuto.value = true
+  showAuto.value = true;
 }
 
 function onAreaChange(value: Array<any>): void {
-  eventLog.value = '基础用法 change => ' + getValueText(value)
+  eventLog.value = `基础用法 change => ${getValueText(value)}`;
 }
 
 function onAreaConfirm(value: Array<any>): void {
-  eventLog.value = '基础用法 confirm => ' + getValueText(value)
+  eventLog.value = `基础用法 confirm => ${getValueText(value)}`;
 }
 
 function onCategoryConfirm(value: Array<any>): void {
-  eventLog.value = '默认值 confirm => ' + getValueText(value)
+  eventLog.value = `默认值 confirm => ${getValueText(value)}`;
 }
 
 function onOrgConfirm(value: Array<any>): void {
-  eventLog.value = '自定义字段 confirm => ' + getValueText(value)
+  eventLog.value = `自定义字段 confirm => ${getValueText(value)}`;
 }
 
 function onColumnConfirm(value: Array<any>): void {
-  eventLog.value = '垂直头部 confirm => ' + getValueText(value)
+  eventLog.value = `垂直头部 confirm => ${getValueText(value)}`;
 }
 
 function onAutoConfirm(value: Array<any>): void {
-  eventLog.value = '自动关闭 confirm => ' + getValueText(value)
+  eventLog.value = `自动关闭 confirm => ${getValueText(value)}`;
 }
 </script>
 

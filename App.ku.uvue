@@ -21,6 +21,7 @@ import CustomCapsuleTabbar from '@/src/tabbar/custom/index.uvue';
 import { customTabbarEnable, isCapsuleTabbar, isPageTabbar, syncCurIdxByCurrentPage } from '@/src/tabbar/helper';
 import { useAppStore } from '@/src/store';
 import { applyNavbarTheme, getThemeTokens } from '@/src/utils/theme';
+import { registerToast, unregisterToast } from '@/src/utils/toast';
 import type { ComponentPublicInstance } from 'vue';
 import { computed, nextTick, onBeforeMount, onMounted, onUnmounted, ref, watch } from 'vue';
 
