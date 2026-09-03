@@ -9,7 +9,7 @@
         最好用的 uni-appX 开发模板
       </text>
       <!-- 编译运行环境状态卡片 -->
-      <view class="mx-[16px] mt-[16px] px-[6px] py-[10px] rounded-[14px] bg-[#f8fafc] border-[1px] border-solid border-[#e2e8f0] flex flex-row items-center justify-between">
+      <view class="mx-[16px] mt-[16px] px-[6px] py-[10px] rounded-[14px] border-[1px] border-solid border-[#e2e8f0] flex flex-row items-center justify-between">
         <!-- 运行平台 -->
         <view class="flex-1 items-center justify-center">
           <text class="text-[10px] text-[#94a3b8] mb-[2px]">编译平台</text>
@@ -69,16 +69,34 @@
           🧪 沙盒独立调试模式（Page Sandbox）：单页/模块秒级极速开发
         </text>
         <text class="text-[14px] text-[#666666] leading-[26px]">
-          　　大型项目或分包页面过多时，开启沙盒模式可仅编译指定目标页面（自动置为启动首页），跳过全量页面构建与 TabBar 启动开销，开发与热重载快如闪电。
+          　　大型项目或分包页面众多时，开启沙盒模式可仅编译指定目标页面（自动置为启动首页），跳过全量页面构建与 TabBar 启动开销，启动与热重载快如闪电。
         </text>
         <text class="text-[14px] text-[#475569] font-medium leading-[26px]">
-          　　• 方式一（代码级）：在任意页面头部声明 definePage({ debug: true }) 即可自动加入沙盒；配置 debugHome: true 可指定为沙盒启动首页；
+          　　• 方式一（代码级・推荐）：在任意页面的 definePage 中配置：
         </text>
-        <text class="text-[14px] text-[#475569] font-medium leading-[26px]">
-          　　• 方式二（环境级）：在 .env 中设置 VITE_DEV_SANDBOX=true，并通过 VITE_DEV_SANDBOX_PAGES 指定页面（支持多页面逗号分隔及通配符 如 src/sub/auth/*）；
+        <text class="text-[13px] text-[#64748b] leading-[24px] pl-[10px]">
+          　　  - debug: true（开启当前页面沙盒调试）
         </text>
-        <text class="text-[14px] text-[#666666] leading-[26px]">
-          　　纯内存构建接管，调试完毕设为 false 即可无缝恢复全量编译，不污染 pages.config.json 生产配置。
+        <text class="text-[13px] text-[#64748b] leading-[24px] pl-[10px]">
+          　　  - debugHome: true（将当前页面设为沙盒默认启动首页，排在第 1 位）
+        </text>
+        <text class="text-[13px] text-[#64748b] leading-[24px] pl-[10px]">
+          　　  - debug: false（拥有最高一票否决权，调试完成后改回 false 即可退出沙盒）
+        </text>
+        <text class="text-[14px] text-[#475569] font-medium leading-[26px] mt-[4px]">
+          　　• 方式二（环境级・批量）：在 .env 文件中配置：
+        </text>
+        <text class="text-[13px] text-[#64748b] leading-[24px] pl-[10px]">
+          　　  - VITE_DEV_SANDBOX=true（开启环境级沙盒）
+        </text>
+        <text class="text-[13px] text-[#64748b] leading-[24px] pl-[10px]">
+          　　  - VITE_DEV_SANDBOX_PAGES=src/sub/auth/login, src/sub/auth/*（指定单页/多页/通配符路径）
+        </text>
+        <text class="text-[13px] text-[#d97706] font-medium leading-[24px] pl-[10px]">
+          　　  ⭐ 优先级规则：.env 开启时拥有最高优先级，完全以 .env 指定的页面为主（自动覆盖代码内的 debug 声明）；.env 关闭时才回退按代码级 debug 独立调试。
+        </text>
+        <text class="text-[14px] text-[#7c3aed] font-medium leading-[26px] mt-[6px]">
+          　　🔒 安全保护：调试期间全内存路由接管，绝不修改与污染 pages.config.json 生产全量配置！
         </text>
       </view>
       <view class="mt-[15px] mx-[30px] px-[20px] py-[15px] rounded-[12px] bg-[#3182ce14]">
@@ -174,7 +192,9 @@ import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '../../utils/
 import { systemInfo } from '../../utils/systemInfo.uts';
 
 definePage({
-  type: 'home', // 页面类型标识（仅首页配置 'home'，用于配合处理双击返回退出等特定逻辑）
+  debug: false, // 是否开启当前页面沙盒独立调试（设为 true 可单独调试此页；⚠️ 调试完成后改回 false）
+  debugHome: false, // 沙盒调试模式下是否将当前页面指定为启动首页（全局仅允许 1 个页面设为 true，排在 pages[0]）
+  type: 'home', // 页面类型标识（仅首页配置 'home'，标记当前页面为应用全局启动首页，自动排在 pages[0]）
   layout: 'navbar', // 页面通用布局模板（采用 navbar 布局接管顶部导航与下拉滚动容器）
   showBack: false, // 导航栏左侧是否显示返回箭头（TabBar 首页无需返回按钮）
   hideNavbar: false, // 是否隐藏顶部导航栏（false 为正常显示）

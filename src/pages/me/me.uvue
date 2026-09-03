@@ -43,6 +43,7 @@
 </template>
 
 <script setup lang="uts">
+import { computed } from 'vue';
 import { useTokenStore, useUserStore } from '../../store';
 import { LOGIN_PAGE } from '../../router/config';
 import { handleBackPressExit } from '@/src/utils/backPress';
@@ -50,6 +51,7 @@ import { switchTabbar } from '@/src/tabbar/helper';
 import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '../../utils/refresh.uts';
 
 definePage({
+  debug: false,
   layout: 'navbar',
   showBack: false,
   enablePullDownRefresh: true,
