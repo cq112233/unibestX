@@ -80,7 +80,11 @@ function getItemBgColor(index: number): string {
 }
 
 /** 获取图标字体名称 */
-function getItemIcon(item: CustomTabBarItem, index: number): string {
+function getItemIcon(index: number): string {
+  if (tabbarList.length <= index) {
+    return '';
+  }
+  const item = tabbarList[index];
   if (curIdx.value == index && item.iconActive.length > 0) {
     return item.iconActive;
   }
@@ -88,11 +92,15 @@ function getItemIcon(item: CustomTabBarItem, index: number): string {
 }
 
 /** 获取图标图片路径 */
-function getItemIconPath(item: CustomTabBarItem, index: number): string {
+function getItemIconPath(index: number): string {
+  if (tabbarList.length <= index) {
+    return '';
+  }
+  const item = tabbarList[index];
   if (curIdx.value == index && item.selectedIconPath != null && item.selectedIconPath!.length > 0) {
     return item.selectedIconPath!;
   }
-  return item.iconPath;
+  return item.iconPath != null ? item.iconPath! : '';
 }
 
 /** 获取图标颜色 */
@@ -148,14 +156,14 @@ function getItemFontWeight(index: number): string {
             <!-- uni-icons 字体图标 -->
             <uni-icons
               v-if="item.iconType == 'icon'"
-              :type="getItemIcon(item, index)"
+              :type="getItemIcon(index)"
               :size="20"
               :color="getItemIconColor(index)"
             />
             <!-- 图片图标 -->
             <image
               v-else
-              :src="getItemIconPath(item, index)"
+              :src="getItemIconPath(index)"
               class="capsule-icon-image"
             />
 
