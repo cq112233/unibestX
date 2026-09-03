@@ -91,7 +91,7 @@ export function setCurIdxByPath(path: string) {
   cleanPath = parts[0];
   for (let i = 0; i < tabbarList.length; i++) {
     const tabPath = tabbarList[i].pagePath.startsWith('/') ? tabbarList[i].pagePath : `/${tabbarList[i].pagePath}`;
-    if (tabPath === cleanPath || tabPath.endsWith(cleanPath)) {
+    if (tabPath == cleanPath || tabPath.endsWith(cleanPath)) {
       setCurIdx(i);
       break;
     }
@@ -117,7 +117,7 @@ export function isPageTabbar(path: string): boolean {
   cleanPath = parts[0];
   for (let i = 0; i < tabbarList.length; i++) {
     const tabPath = tabbarList[i].pagePath.startsWith('/') ? tabbarList[i].pagePath : `/${tabbarList[i].pagePath}`;
-    if (tabPath === cleanPath || tabPath.endsWith(cleanPath)) {
+    if (tabPath == cleanPath || tabPath.endsWith(cleanPath)) {
       return true;
     }
   }

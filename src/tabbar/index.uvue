@@ -18,6 +18,11 @@ onMounted(() => {
   syncCurIdxByCurrentPage();
   safeHideNativeTabBar();
 });
+
+/** 处理 Tab 点击 */
+function onTabClick(index: number) {
+  handleTabbarClick(index);
+}
 </script>
 
 <template>
@@ -44,7 +49,7 @@ onMounted(() => {
           :key="index"
           class="tabbar-item"
           :class="{ 'tabbar-item-bulge': item.isBulge }"
-          @click="handleTabbarClick(index)"
+          @click="onTabClick(index)"
         >
           <TabbarItem :item="item" :index="index" :is-bulge="item.isBulge" />
         </view>

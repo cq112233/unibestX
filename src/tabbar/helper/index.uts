@@ -140,9 +140,12 @@ export function switchTabbar(url: string): void {
   }
 }
 
+/** 路由切换节流锁，防止快速连击导致原生视图切换重叠错乱 */
+let isSwitchingTab = false;
+
 /** 点击 tab 切换路由跳转逻辑 */
 export function handleTabbarClick(index: number): void {
-  if (index == curIdx.value) {
+  if (index == curIdx.value || isSwitchingTab) {
     return;
   }
   const list = tabbarList;
@@ -153,18 +156,22 @@ export function handleTabbarClick(index: number): void {
     handleClickBulge(list[index].pagePath.length > 0 ? list[index].pagePath : '/src/pages/ai/ai');
     return;
   }
+  isSwitchingTab = true;
   const url = list[index].pagePath;
   setCurIdx(index);
   switchTabbar(url);
+  setTimeout(() => {
+    isSwitchingTab = false;
+  }, 250);
 }
 
 /**
  * 隐藏系统原生 TabBar 并根据编译器版本动态适配 H5 底部容器
  */
 export function safeHideNativeTabBar(): void {
-  if (!needHideNativeTabbar) {
-    return;
-  }
+  // if (!needHideNativeTabbar) {
+  //   return;
+  // }
 
   // #ifdef H5
   try {

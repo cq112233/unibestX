@@ -2,6 +2,8 @@
 import {
   curIdx,
   handleTabbarClick,
+  safeHideNativeTabBar,
+  syncCurIdxByCurrentPage,
   tabbarList,
   themeColor
 } from '../helper';
@@ -55,6 +57,58 @@ const activeItemBgColor = computed<string>((): string => {
   const color = activeThemeColor.value;
   return `${color}18`;
 });
+
+// 挂载时同步激活索引并确保原生 TabBar 隐藏
+onMounted(() => {
+  syncCurIdxByCurrentPage();
+  safeHideNativeTabBar();
+});
+
+/** 处理 Tab 点击 */
+function onTabClick(index: number) {
+  handleTabbarClick(index);
+}
+
+/** 获取多语言翻译文本 */
+function getText(text: string): string {
+  return $t(text);
+}
+
+/** 获取胶囊项背景色 */
+function getItemBgColor(index: number): string {
+  return curIdx.value == index ? activeItemBgColor.value : 'transparent';
+}
+
+/** 获取图标字体名称 */
+function getItemIcon(item: CustomTabBarItem, index: number): string {
+  if (curIdx.value == index && item.iconActive.length > 0) {
+    return item.iconActive;
+  }
+  return item.icon;
+}
+
+/** 获取图标图片路径 */
+function getItemIconPath(item: CustomTabBarItem, index: number): string {
+  if (curIdx.value == index && item.selectedIconPath != null && item.selectedIconPath!.length > 0) {
+    return item.selectedIconPath!;
+  }
+  return item.iconPath;
+}
+
+/** 获取图标颜色 */
+function getItemIconColor(index: number): string {
+  return curIdx.value == index ? activeThemeColor.value : themeTokens.value.tabColor;
+}
+
+/** 获取文字颜色 */
+function getItemTextColor(index: number): string {
+  return curIdx.value == index ? activeThemeColor.value : themeTokens.value.tabColor;
+}
+
+/** 获取文字字重 */
+function getItemFontWeight(index: number): string {
+  return curIdx.value == index ? '600' : 'normal';
+}
 </script>
 
 <template>
@@ -80,13 +134,13 @@ const activeItemBgColor = computed<string>((): string => {
         v-for="(item, index) in tabbarList"
         :key="index"
         class="capsule-item-slot"
-        @click="handleTabbarClick(index)"
+        @click="onTabClick(index)"
       >
         <!-- 胶囊项背景包装块（激活时展示高亮底色背景） -->
         <view
           class="capsule-item-inner"
           :style="{
-            backgroundColor: curIdx == index ? activeItemBgColor : 'transparent'
+            backgroundColor: getItemBgColor(index)
           }"
         >
           <!-- 图标与角标容器 -->
@@ -94,14 +148,14 @@ const activeItemBgColor = computed<string>((): string => {
             <!-- uni-icons 字体图标 -->
             <uni-icons
               v-if="item.iconType == 'icon'"
-              :type="curIdx == index && item.iconActive.length > 0 ? item.iconActive : item.icon"
+              :type="getItemIcon(item, index)"
               :size="20"
-              :color="curIdx == index ? activeThemeColor : themeTokens.tabColor"
+              :color="getItemIconColor(index)"
             />
             <!-- 图片图标 -->
             <image
               v-else
-              :src="curIdx == index && (item.selectedIconPath != null && item.selectedIconPath!.length > 0) ? item.selectedIconPath : item.iconPath"
+              :src="getItemIconPath(item, index)"
               class="capsule-icon-image"
             />
 
@@ -123,11 +177,11 @@ const activeItemBgColor = computed<string>((): string => {
           <text
             class="capsule-item-text"
             :style="{
-              color: curIdx == index ? activeThemeColor : themeTokens.tabColor,
-              fontWeight: curIdx == index ? '600' : 'normal'
+              color: getItemTextColor(index),
+              fontWeight: getItemFontWeight(index)
             }"
           >
-            {{ $t(item.text) }}
+            {{ getText(item.text) }}
           </text>
         </view>
       </view>
