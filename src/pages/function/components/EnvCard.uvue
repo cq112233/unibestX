@@ -3,23 +3,23 @@
     <view class="rounded-[12px] p-[16px] border-[1px] border-solid border-[#e2e8f0]">
       <view class="flex-row justify-between mb-[10px]">
         <text class="text-[14px] text-[#718096]">应用名称</text>
-        <text class="text-[14px] font-bold text-[#334155]">{{ appTitle }}</text>
+        <text class="text-[14px] font-bold text-[#334155]">{{ systemInfo?.appTitle ?? 'unibestX' }}</text>
       </view>
       <view class="flex-row justify-between mb-[10px]">
         <text class="text-[14px] text-[#718096]">应用版本</text>
-        <text class="text-[14px] font-bold text-[#334155]">{{ appVersion }}</text>
+        <text class="text-[14px] font-bold text-[#334155]">v{{ systemInfo?.appVersion ?? '1.0.0' }}</text>
       </view>
       <view class="flex-row justify-between mb-[10px]">
         <text class="text-[14px] text-[#718096]">编译环境</text>
-        <text class="text-[14px] font-bold" :style="{ color: envColor }">{{ envLabel }}</text>
+        <text class="text-[14px] font-bold" :style="{ color: envColor }">{{ systemInfo?.envName ?? '开发环境' }}</text>
       </view>
       <view class="flex-row justify-between mb-[10px]">
         <text class="text-[14px] text-[#718096]">环境标识</text>
-        <text class="text-[12px] text-[#64748b]">{{ envTypeText }}</text>
+        <text class="text-[12px] text-[#64748b]">{{ systemInfo?.env ?? 'development' }}</text>
       </view>
       <view class="flex-row justify-between">
         <text class="text-[14px] text-[#718096]">接口地址</text>
-        <text class="text-[12px] text-[#64748b] flex-1 ml-[8px] text-right">{{ apiBaseUrl }}</text>
+        <text class="text-[12px] text-[#64748b] flex-1 ml-[8px] text-right">{{ systemInfo?.apiBaseUrl ?? '' }}</text>
       </view>
     </view>
   </Card>
@@ -27,40 +27,15 @@
 
 <script setup lang="uts">
 import Card from '../../basic/components/Card.uvue';
+import { systemInfo } from '../../../utils/systemInfo.uts';
 import { computed } from 'vue';
 
-// 应用名称 / 版本（.env 公用配置，全端读取）
-const appTitle: string = `${import.meta.env.VITE_APP_TITLE}`;
-const appVersion: string = `${import.meta.env.VITE_APP_VERSION}`;
-
-// 编译期环境识别（只读展示，运行期不支持切换）：
-// 全端（App / H5 / 微信小程序）均支持读取 .env 的 VITE_ENV_TYPE（development / test / production），
-// 与 src/http/request.uts 读取 VITE_SERVER_BASEURL 的方式一致
-type EnvType = 'development' | 'test' | 'production';
-
-const buildEnvType: string = `${import.meta.env.VITE_ENV_TYPE ?? ''}`;
-const systemEnv: EnvType = buildEnvType == 'test' ? 'test' : (process.env.NODE_ENV == 'development' ? 'development' : 'production');
-
-// 与 src/http/request.uts 保持一致的实际接口地址（全端读取 VITE_SERVER_BASEURL）
-const apiBaseUrl: string = `${import.meta.env.VITE_SERVER_BASEURL ?? 'https://ukw0y1.laf.run'}`;
-// 原始环境标识（用于核对当前构建产物属于哪个环境）
-const envTypeText: string = systemEnv;
-
-const envLabel = computed((): string => {
-  if (systemEnv === 'test') {
-    return '测试';
-  }
-  if (systemEnv === 'production') {
-    return '生产';
-  }
-  return '开发';
-});
-
 const envColor = computed((): string => {
-  if (systemEnv === 'test') {
+  const env = systemInfo.value?.env ?? '';
+  if (env == 'test') {
     return '#f59e0b';
   }
-  if (systemEnv === 'production') {
+  if (env == 'production') {
     return '#ef4444';
   }
   return '#10b981';

@@ -429,6 +429,17 @@ function generatePagesJson(
     }
   }
 
+  // 保留手动配置中、磁盘上真实存在但不在扫描目录内的页面（如 uni_modules 内置页面）
+  for (let k = 0; k < manualPages.length; k++) {
+    const mp = manualPages[k];
+    if (finalPages.some(p => p.path === mp.path)) {
+      continue;
+    }
+    if (fs.existsSync(path.resolve(projectRoot, `${mp.path}.uvue`))) {
+      finalPages.push(mp);
+    }
+  }
+
   // 5. 首页排最前（在 uni-app 中 pages.json 的第一项 pages[0] 即为应用默认启动首页）
   // 优先级：definePage type: 'home' / isHome: true（页面内显式声明最高）> opts.homePage（插件选项）> baseConfig.homePage（配置文件）
   let home = '';
@@ -821,20 +832,11 @@ export default function uniPagesPlugin(options: UniPagesOptions = {}) {
 
     /** 移除 definePage(...) 宏调用，避免运行时报错 */
     transform(code: string, id: string) {
-      const normalized = id.replace(/\\/g, '/');
-      if (!normalized.endsWith('.uvue') || normalized.includes('?')) {
+      if (!code.includes('definePage(')) {
         return null;
       }
-      // 只处理项目页面目录（主包 + 分包）内的 .uvue，避免误伤 uni_modules 等
-      const inPages = normalized.includes(`${opts.dir.replace(/\\/g, '/')}/`);
-      let inSub = false;
-      for (let s = 0; s < opts.subPackages.length; s++) {
-        if (normalized.includes(`${opts.subPackages[s].replace(/\\/g, '/')}/`)) {
-          inSub = true;
-          break;
-        }
-      }
-      if (!inPages && !inSub) {
+      const rawId = id.split('?')[0].replace(/\\/g, '/');
+      if (!rawId.endsWith('.uvue') && !rawId.endsWith('.vue')) {
         return null;
       }
 

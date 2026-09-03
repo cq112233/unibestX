@@ -232,7 +232,7 @@ function getItemFontWeight(index: number): string {
   height: 100%;
 }
 
-/* 选中项的胶囊高亮包裹块 */
+/* 选中项的胶囊高亮包裹块（禁用 transition 防止原生 Android 切页时动画中断导致底色残留） */
 .capsule-item-inner {
   flex-direction: column;
   align-items: center;
@@ -241,7 +241,6 @@ function getItemFontWeight(index: number): string {
   height: 84%;
   border-radius: 20px;
   padding: 2px 0;
-  transition: background-color 0.2s ease;
 }
 
 /* 图标包裹器（含绝对定位徽标） */
@@ -262,7 +261,6 @@ function getItemFontWeight(index: number): string {
   font-size: 11px;
   line-height: 14px;
   margin-top: 2px;
-  transition: color 0.2s ease;
 }
 
 /* 徽标小红点 */

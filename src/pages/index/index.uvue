@@ -8,15 +8,41 @@
       <text class="text-center text-[18px] text-[#334155] font-medium mt-[6px]">
         最好用的 uni-appX 开发模板
       </text>
-      <!-- 编译版本与编译模式 -->
-      <view class="flex flex-row items-center justify-center mt-[12px]">
-        <view class="flex flex-row items-center px-[10px] py-[4px] rounded-full bg-[#f1f5f9] border-[1px] border-solid border-[#e2e8f0] mr-[8px]">
-          <text class="text-[12px] text-[#64748b]">编译版本：</text>
-          <text class="text-[12px] font-semibold text-[#0f172a]">{{ compileVersion != '' ? compileVersion : '获取中...' }}</text>
+      <!-- 编译运行环境状态卡片 -->
+      <view class="mx-[16px] mt-[16px] px-[6px] py-[10px] rounded-[14px] bg-[#f8fafc] border-[1px] border-solid border-[#e2e8f0] flex flex-row items-center justify-between">
+        <!-- 运行平台 -->
+        <view class="flex-1 items-center justify-center">
+          <text class="text-[10px] text-[#94a3b8] mb-[2px]">编译平台</text>
+          <text class="text-[12px] font-bold text-[#4f46e5]">{{ systemInfo?.platformName ?? 'H5' }}</text>
         </view>
-        <view class="flex flex-row items-center px-[10px] py-[4px] rounded-full bg-[#ecfdf5] border-[1px] border-solid border-[#a7f3d0]">
-          <text class="text-[12px] text-[#059669]">编译模式：</text>
-          <text class="text-[12px] font-semibold text-[#047857]">{{ compileMode }}</text>
+        <view class="w-[1px] h-[20px] bg-[#e2e8f0]" />
+        <!-- 当前环境 -->
+        <view class="flex-1 items-center justify-center">
+          <text class="text-[10px] text-[#94a3b8] mb-[2px]">当前环境</text>
+          <text
+            class="text-[12px] font-bold"
+            :style="{ color: (systemInfo?.env == 'test' ? '#d97706' : (systemInfo?.env == 'production' ? '#dc2626' : '#059669')) }"
+          >
+            {{ systemInfo?.env == 'test' ? '测试' : (systemInfo?.env == 'production' ? '生产' : '开发') }}
+          </text>
+        </view>
+        <view class="w-[1px] h-[20px] bg-[#e2e8f0]" />
+        <!-- 渲染模式 -->
+        <view class="flex-1 items-center justify-center">
+          <text class="text-[10px] text-[#94a3b8] mb-[2px]">渲染模式</text>
+          <text class="text-[12px] font-bold text-[#059669]">{{ systemInfo?.isVapor == true ? 'Vapor' : 'VDOM' }}</text>
+        </view>
+        <view class="w-[1px] h-[20px] bg-[#e2e8f0]" />
+        <!-- 应用版本 -->
+        <view class="flex-1 items-center justify-center">
+          <text class="text-[10px] text-[#94a3b8] mb-[2px]">应用版本</text>
+          <text class="text-[12px] font-bold text-[#d97706]">v{{ systemInfo?.appVersion ?? '1.0.0' }}</text>
+        </view>
+        <view class="w-[1px] h-[20px] bg-[#e2e8f0]" />
+        <!-- 编译引擎版本 -->
+        <view class="flex-1 items-center justify-center">
+          <text class="text-[10px] text-[#94a3b8] mb-[2px]">编译引擎</text>
+          <text class="text-[12px] font-bold text-[#334155]">{{ (systemInfo?.compilerVersion ?? '') != '' ? systemInfo?.compilerVersion : '1.0.0' }}</text>
         </view>
       </view>
       <view>
@@ -36,6 +62,23 @@
         </text>
         <text class="text-[14px] text-[#666666] leading-[26px]">
           　　注意：Vapor 模式下开发过的代码，切换回 VDOM 模式可能因编译检查更严格而报类型或语法错误，请按需选择。
+        </text>
+      </view>
+      <view class="mt-[15px] mx-[30px] px-[20px] py-[15px] rounded-[12px] bg-[#8b5cf614]">
+        <text class="text-[14px] font-bold text-[#7c3aed]">
+          🧪 沙盒独立调试模式（Page Sandbox）：单页/模块秒级极速开发
+        </text>
+        <text class="text-[14px] text-[#666666] leading-[26px]">
+          　　大型项目或分包页面过多时，开启沙盒模式可仅编译指定目标页面（自动置为启动首页），跳过全量页面构建与 TabBar 启动开销，开发与热重载快如闪电。
+        </text>
+        <text class="text-[14px] text-[#475569] font-medium leading-[26px]">
+          　　• 方式一（代码级）：在任意页面头部声明 definePage({ debug: true }) 即可自动加入沙盒；配置 debugHome: true 可指定为沙盒启动首页；
+        </text>
+        <text class="text-[14px] text-[#475569] font-medium leading-[26px]">
+          　　• 方式二（环境级）：在 .env 中设置 VITE_DEV_SANDBOX=true，并通过 VITE_DEV_SANDBOX_PAGES 指定页面（支持多页面逗号分隔及通配符 如 src/sub/auth/*）；
+        </text>
+        <text class="text-[14px] text-[#666666] leading-[26px]">
+          　　纯内存构建接管，调试完毕设为 false 即可无缝恢复全量编译，不污染 pages.config.json 生产配置。
         </text>
       </view>
       <view class="mt-[15px] mx-[30px] px-[20px] py-[15px] rounded-[12px] bg-[#3182ce14]">
@@ -128,10 +171,11 @@
 <script setup lang="uts">
 import { handleBackPressExit } from '../../utils/backPress.uts';
 import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '../../utils/refresh.uts';
-import { getCompileMode } from '../../utils/systemInfo.uts';
-import { onMounted, ref } from 'vue';
+import { systemInfo } from '../../utils/systemInfo.uts';
 
 definePage({
+  // debug: false, // 是否开启当前页面沙盒独立调试（多页面均可设为 true；⚠️ 调试完成后记得关闭/改回 false）
+  // debugHome: false, // 沙盒调试模式下是否将当前页面指定为应用启动首页（⚠️ 全局仅允许 1 个页面设为 true，排在 pages.json 第 1 位；调试完成后记得关闭）
   type: 'home', // 页面类型标识（仅首页配置 'home'，用于配合处理双击返回退出等特定逻辑）
   layout: 'navbar', // 页面通用布局模板（采用 navbar 布局接管顶部导航与下拉滚动容器）
   showBack: false, // 导航栏左侧是否显示返回箭头（TabBar 首页无需返回按钮）
@@ -143,52 +187,8 @@ definePage({
   }
 });
 
-const compileVersion = ref('');
-const compileMode = ref('Vapor 模式');
-
-function fetchCompileInfo() {
-  try {
-    const sysInfo = uni.getSystemInfoSync();
-    let ver = sysInfo.uniCompileVersion ?? '';
-    // #ifdef MP-WEIXIN
-    if (ver == '') {
-      try {
-        const baseInfo = uni.getAppBaseInfo() as any;
-        ver = `${baseInfo.appCompilerVersion ?? baseInfo.SDKVersion ?? ''}`;
-      }
-      catch {}
-    }
-    // #endif
-    // #ifdef H5
-    if (ver == '') {
-      try {
-        const g = globalThis as any;
-        const conf = g.__uniConfig as any;
-        if (conf != null && conf.compilerVersion != null) {
-          ver = `${conf.compilerVersion}`;
-        }
-      }
-      catch {}
-    }
-    // #endif
-    compileVersion.value = ver != '' ? ver : '1.0.0';
-    compileMode.value = getCompileMode();
-  }
-  catch (err) {
-    console.error(err);
-    compileVersion.value = '1.0.0';
-    compileMode.value = 'Vapor 模式';
-  }
-}
-
-onMounted(() => {
-  fetchCompileInfo();
-});
-
 // 监听 navbar 自定义下拉刷新事件（在 enablePullDownRefresh: true 时生效）
 onNavbarPullDownRefresh(() => {
-  // 执行下拉刷新业务逻辑（如重新请求接口获取最新数据）
-  fetchCompileInfo();
   setTimeout(() => {
     // 数据加载完毕后，手动停止下拉刷新动画状态
     stopNavbarPullDownRefresh();

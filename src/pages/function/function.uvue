@@ -2,18 +2,12 @@
   <view>
     <!-- 标题头 -->
     <view class="pt-[20px] px-[16px] pb-[10px]">
-      <text class="text-[20px] font-bold text-[#1a202c]">设备系统信息</text>
-      <text class="text-[13px] text-[#718096] mt-[4px]">演示 iOS/Android 原生设备 API 调用与状态读取</text>
+      <text class="text-[20px] font-bold text-[#1a202c]">功能组件库演示</text>
+      <text class="text-[13px] text-[#718096] mt-[4px]">演示原生设备 API 调用、常用工具库与组件集成</text>
     </view>
-
-    <!-- 环境变量卡片（按打包环境只读展示） -->
-    <EnvCard />
 
     <!-- 数据分页列表示例组件 (z-paging-x) -->
     <ZPagingDemoCard />
-
-    <!-- 系统信息卡片 -->
-    <SystemInfoCard />
 
     <!-- 触感与工具卡片 -->
     <HapticsCard />
@@ -42,8 +36,6 @@
 </template>
 
 <script setup lang="uts">
-import EnvCard from './components/EnvCard.uvue';
-import SystemInfoCard from './components/SystemInfoCard.uvue';
 import HapticsCard from './components/HapticsCard.uvue';
 import ToastCard from './components/ToastCard.uvue';
 import MediaCard from './components/MediaCard.uvue';
@@ -60,6 +52,7 @@ import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/utils/
 definePage({
   layout: 'navbar',
   showBack: false,
+  debug: false,
   enablePullDownRefresh: true,
   style: {
     navigationBarTitleText: '功能',
