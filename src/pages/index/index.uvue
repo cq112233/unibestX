@@ -8,6 +8,17 @@
       <text class="text-center text-[18px] text-[#334155] font-medium mt-[6px]">
         最好用的 uni-appX 开发模板
       </text>
+      <!-- 编译版本与编译模式 -->
+      <view class="flex flex-row items-center justify-center mt-[12px]">
+        <view class="flex flex-row items-center px-[10px] py-[4px] rounded-full bg-[#f1f5f9] border-[1px] border-solid border-[#e2e8f0] mr-[8px]">
+          <text class="text-[12px] text-[#64748b]">编译版本：</text>
+          <text class="text-[12px] font-semibold text-[#0f172a]">{{ compileVersion != '' ? compileVersion : '获取中...' }}</text>
+        </view>
+        <view class="flex flex-row items-center px-[10px] py-[4px] rounded-full bg-[#ecfdf5] border-[1px] border-solid border-[#a7f3d0]">
+          <text class="text-[12px] text-[#059669]">编译模式：</text>
+          <text class="text-[12px] font-semibold text-[#047857]">{{ compileMode }}</text>
+        </view>
+      </view>
       <view>
         <text class="mt-[10px] px-[30px] text-[14px] text-[#475569] leading-[26px]">
           　　unibestX 是一个集成了多种工具与技术的 uni-appX 开发模板，由 uni-appX + Vue3 + Ts + weapp-tailwindcss + VSCode 构建，模板具有代码提示、自动格式化、统一配置、代码片段等功能，并内置了 ECharts 图表、主题配置、暗黑模式、加密方式配置等常用功能与基本组件，让你编写 uni-appX 拥有 best 体验。
@@ -117,6 +128,8 @@
 <script setup lang="uts">
 import { handleBackPressExit } from '../../utils/backPress.uts';
 import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '../../utils/refresh.uts';
+import { getCompileMode } from '../../utils/systemInfo.uts';
+import { onMounted, ref } from 'vue';
 
 definePage({
   type: 'home', // 页面类型标识（仅首页配置 'home'，用于配合处理双击返回退出等特定逻辑）
@@ -130,9 +143,52 @@ definePage({
   }
 });
 
+const compileVersion = ref('');
+const compileMode = ref('Vapor 模式');
+
+function fetchCompileInfo() {
+  try {
+    const sysInfo = uni.getSystemInfoSync();
+    let ver = sysInfo.uniCompileVersion ?? '';
+    // #ifdef MP-WEIXIN
+    if (ver == '') {
+      try {
+        const baseInfo = uni.getAppBaseInfo() as any;
+        ver = `${baseInfo.appCompilerVersion ?? baseInfo.SDKVersion ?? ''}`;
+      }
+      catch {}
+    }
+    // #endif
+    // #ifdef H5
+    if (ver == '') {
+      try {
+        const g = globalThis as any;
+        const conf = g.__uniConfig as any;
+        if (conf != null && conf.compilerVersion != null) {
+          ver = `${conf.compilerVersion}`;
+        }
+      }
+      catch {}
+    }
+    // #endif
+    compileVersion.value = ver != '' ? ver : '1.0.0';
+    compileMode.value = getCompileMode();
+  }
+  catch (err) {
+    console.error(err);
+    compileVersion.value = '1.0.0';
+    compileMode.value = 'Vapor 模式';
+  }
+}
+
+onMounted(() => {
+  fetchCompileInfo();
+});
+
 // 监听 navbar 自定义下拉刷新事件（在 enablePullDownRefresh: true 时生效）
 onNavbarPullDownRefresh(() => {
   // 执行下拉刷新业务逻辑（如重新请求接口获取最新数据）
+  fetchCompileInfo();
   setTimeout(() => {
     // 数据加载完毕后，手动停止下拉刷新动画状态
     stopNavbarPullDownRefresh();

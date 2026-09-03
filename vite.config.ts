@@ -11,11 +11,34 @@ import { UNI_EASYCOM_EXCLUDE } from '@dcloudio/uni-cli-shared';
 import uniModule from '@dcloudio/vite-plugin-uni';
 import { uniAppX } from 'weapp-tailwindcss/presets';
 import { WeappTailwindcss } from 'weapp-tailwindcss/vite';
+import fs from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import json5 from 'json5';
 
 const uni = (uniModule as typeof uniModule & { default?: typeof uniModule }).default ?? uniModule;
 const projectRoot = dirname(fileURLToPath(import.meta.url));
+
+// 读取 manifest.json，编译阶段拿到 vapor 配置
+const manifestPath = fs.existsSync(resolve(projectRoot, 'src/manifest.json'))
+  ? resolve(projectRoot, 'src/manifest.json')
+  : resolve(projectRoot, 'manifest.json');
+
+let isVapor = false;
+try {
+  if (fs.existsSync(manifestPath)) {
+    const manifestRaw = fs.readFileSync(manifestPath, 'utf-8');
+    const manifest = json5.parse(manifestRaw);
+    isVapor = manifest['uni-app-x']?.vapor ?? false;
+  }
+}
+catch (e) {
+  console.error('[vite.config.ts] 读取 manifest.json 失败:', e);
+}
+
+// 注入环境变量，全端（App-Android Kotlin / iOS / H5 / 微信小程序）均可通过 import.meta.env.VITE_IS_VAPOR 安全访问
+process.env.VITE_IS_VAPOR = String(isVapor);
+
 const weappTailwindcssPlugins = WeappTailwindcss(
   uniAppX({
     base: projectRoot,

@@ -1,7 +1,12 @@
 import { ref } from 'vue';
 
 export const isPageScrollDisabled = ref(false);
+export const isPageRefresherDisabled = ref(false);
 
 export function setPageScrollEnabled(enabled: boolean) {
   isPageScrollDisabled.value = !enabled;
+}
+
+export function setPageRefresherEnabled(enabled: boolean) {
+  isPageRefresherDisabled.value = !enabled;
 }
