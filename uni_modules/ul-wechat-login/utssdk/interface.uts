@@ -1,0 +1,31 @@
+/**
+ * ul-wechat-login
+ * 微信登录 UTS 插件接口定义
+ */
+
+export type WechatLoginSuccess = {
+	code : string
+}
+
+/**
+ * 错误码
+ * - 9020001 微信未安装
+ * - 9020002 用户取消授权
+ * - 9020003 授权失败
+ * - 9020004 SDK未注册
+ */
+export type WechatLoginErrorCode = 9020001 | 9020002 | 9020003 | 9020004;
+
+export interface WechatLoginFail extends IUniError {
+	errCode : WechatLoginErrorCode
+};
+
+export type WechatLoginOptions = {
+	success ?: (res : WechatLoginSuccess) => void
+	fail ?: (res : WechatLoginFail) => void
+	complete ?: (res : any) => void
+}
+
+export type RegisterWechat = () => void
+export type IsWechatInstalled = () => boolean
+export type WechatLogin = (options : WechatLoginOptions) => void

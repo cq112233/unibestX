@@ -61,6 +61,13 @@
     "backgroundColorBottom": "@backgroundColorBottom",
     "backgroundTextStyle": "@backgroundTextStyle"
   },
+  "easycom": {
+    "autoscan": true,
+    "custom": {
+      "^NavBar$": "@/src/components/NavBar/NavBar.uvue",
+      "^e-chart$": "@/uni_modules/e-chart/components/e-chart/e-chart.uvue"
+    }
+  },
   "tabBar": {
     "custom": true,
     "color": "@tabBarColor",
@@ -70,19 +77,27 @@
     "list": [
       {
         "pagePath": "src/pages/index/index",
-        "text": "首页"
+        "text": "首页",
+        "iconPath": "static/tabbar/home.png",
+        "selectedIconPath": "static/tabbar/home_fill.png"
       },
       {
         "pagePath": "src/pages/basic/basic",
-        "text": "基础"
+        "text": "基础",
+        "iconPath": "static/tabbar/tune.png",
+        "selectedIconPath": "static/tabbar/tune_fill.png"
       },
       {
         "pagePath": "src/pages/function/function",
-        "text": "功能"
+        "text": "功能",
+        "iconPath": "static/tabbar/gear.png",
+        "selectedIconPath": "static/tabbar/gear_fill.png"
       },
       {
         "pagePath": "src/pages/me/me",
-        "text": "我的"
+        "text": "我的",
+        "iconPath": "static/tabbar/people.png",
+        "selectedIconPath": "static/tabbar/people_fill.png"
       }
     ]
   },

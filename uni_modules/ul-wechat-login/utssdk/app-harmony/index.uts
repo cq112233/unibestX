@@ -1,0 +1,105 @@
+import * as wxopensdk from '@tencent/wechat_open_sdk';
+
+import {
+	WechatLoginOptions,
+	WechatLoginSuccess,
+	RegisterWechat,
+	IsWechatInstalled,
+	WechatLogin
+} from '../interface.uts';
+
+import { WechatLoginFailImpl } from '../unierror';
+import { WX_APP_ID } from '../config.uts';
+
+let _wxApi : wxopensdk.WXApi | null = null;
+let _registered = false;
+let _pendingLoginOptions : WechatLoginOptions | null = null;
+
+class WXEventHandlerImpl implements wxopensdk.WXApiEventHandler {
+	onReq(req : wxopensdk.BaseReq) : void {}
+
+	onResp(resp : wxopensdk.BaseResp) : void {
+		if (resp instanceof wxopensdk.SendAuthResp) {
+			const authResp = resp as wxopensdk.SendAuthResp;
+			const options = _pendingLoginOptions;
+			_pendingLoginOptions = null;
+
+			if (authResp.errCode == 0) {
+				const code = authResp.code ?? "";
+				if (code.length > 0) {
+					const result : WechatLoginSuccess = { code: code };
+					options?.success?.(result);
+					options?.complete?.(result);
+				} else {
+					const fail = new WechatLoginFailImpl(9020003);
+					options?.fail?.(fail);
+					options?.complete?.(fail);
+				}
+			} else if (authResp.errCode == -2) {
+				const fail = new WechatLoginFailImpl(9020002);
+				options?.fail?.(fail);
+				options?.complete?.(fail);
+			} else {
+				const fail = new WechatLoginFailImpl(9020003);
+				options?.fail?.(fail);
+				options?.complete?.(fail);
+			}
+		}
+	}
+}
+
+const _eventHandler = new WXEventHandlerImpl();
+
+function _ensureRegistered() : void {
+	if (_wxApi == null && WX_APP_ID.length > 0) {
+		_wxApi = wxopensdk.WXAPIFactory.createWXAPI(WX_APP_ID);
+		_registered = true;
+	}
+}
+
+UTSHarmony.onAppAbilityCreate((want, _launchParam) => {
+	_ensureRegistered();
+	_wxApi!.handleWant(want, _eventHandler);
+});
+
+UTSHarmony.onAppAbilityNewWant((want, _launchParam) => {
+	if (_wxApi != null) {
+		_wxApi!.handleWant(want, _eventHandler);
+	}
+});
+
+export const registerWechat : RegisterWechat = function () : void {
+	_ensureRegistered();
+}
+
+export const isWechatInstalled : IsWechatInstalled = function () : boolean {
+	if (_wxApi == null) {
+		return false;
+	}
+	return _wxApi!.isWXAppInstalled();
+}
+
+export const wechatLogin : WechatLogin = function (options : WechatLoginOptions) : void {
+	if (!_registered || _wxApi == null) {
+		const fail = new WechatLoginFailImpl(9020004);
+		options.fail?.(fail);
+		options.complete?.(fail);
+		return;
+	}
+
+	if (!_wxApi!.isWXAppInstalled()) {
+		const fail = new WechatLoginFailImpl(9020001);
+		options.fail?.(fail);
+		options.complete?.(fail);
+		return;
+	}
+
+	_pendingLoginOptions = options;
+
+	const req = new wxopensdk.SendAuthReq();
+	req.scope = "snsapi_userinfo";
+	req.state = "wechat_login";
+
+	const context = UTSHarmony.getUIAbilityContext();
+	_wxApi!.sendReq(context, req);
+}

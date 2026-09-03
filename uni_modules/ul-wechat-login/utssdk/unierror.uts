@@ -1,0 +1,25 @@
+import { WechatLoginErrorCode, WechatLoginFail } from "./interface.uts"
+
+export const UniErrorSubject = 'ul-wechat-login';
+
+/**
+ * @UniError
+ */
+export const WechatLoginErrors : Map<WechatLoginErrorCode, string> = new Map([
+	[9020001, '微信未安装'],
+	[9020002, '用户取消授权'],
+	[9020003, '授权失败'],
+	[9020004, 'SDK未注册'],
+]);
+
+export class WechatLoginFailImpl extends UniError implements WechatLoginFail {
+
+	override errCode : WechatLoginErrorCode
+
+	constructor(errCode : WechatLoginErrorCode) {
+		super();
+		this.errSubject = UniErrorSubject;
+		this.errCode = errCode;
+		this.errMsg = WechatLoginErrors.get(errCode) ?? "";
+	}
+}

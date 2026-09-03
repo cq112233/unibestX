@@ -1,17 +1,17 @@
 <template>
-  <view class="flex flex-col items-center px-[16px] py-[24px]">
+  <view class="flex flex-col items-center px-[16px] pt-[8px]">
     <!-- 头部卡片：用户头像及状态 -->
-    <view class="w-full bg-white rounded-[12px] px-[20px] py-[30px] mb-[20px] flex flex-col items-center">
-      <image class="w-[90px] h-[90px] rounded-[45px] mb-[16px] border-[3px] border-[#f1f5f9] border-solid" :src="avatarUrl" />
-      <text class="text-[20px] font-bold text-[#1e293b] mb-[4px]">
+    <view class="w-full bg-white rounded-[12px] px-[20px] py-[20px] mb-[16px] flex flex-col items-center">
+      <image class="w-[80px] h-[80px] rounded-[40px] mb-[12px] border-[3px] border-[#f1f5f9] border-solid" :src="avatarUrl" />
+      <text class="text-[18px] font-bold text-[#1e293b] mb-[4px]">
         {{ userStore.state.userInfo.username.length > 0 ? userStore.state.userInfo.username : '未登录用户' }}
       </text>
-      <text v-if="userStore.state.userInfo.username.length > 0" class="text-[14px] text-[#64748b] mb-[12px]">
+      <text v-if="userStore.state.userInfo.username.length > 0" class="text-[13px] text-[#64748b] mb-[10px]">
         {{ userStore.state.userInfo.nickname }}
       </text>
       <view class="flex flex-row">
         <text
-          class="text-[12px] px-[12px] py-[4px] rounded-[20px] font-medium overflow-hidden"
+          class="text-[12px] px-[12px] py-[3px] rounded-[20px] font-medium overflow-hidden"
           :class="tokenStore.hasValidLogin() ? 'bg-[#d1fae5] text-[#065f46]' : 'bg-[#f1f5f9] text-[#64748b]'"
         >
           {{ tokenStore.hasValidLogin() ? '已登录' : '未登录' }}
@@ -20,22 +20,22 @@
     </view>
 
     <!-- 信息区域：序列化数据展示 -->
-    <view class="w-full bg-white rounded-[12px] p-[20px] mb-[24px] flex flex-col">
+    <view class="w-full bg-white rounded-[12px] p-[16px] mb-[16px] flex flex-col">
       <view class="pb-[8px] flex flex-row">
-        <text class="text-[15px] font-semibold text-[#334155]">用户信息 (JSON)</text>
+        <text class="text-[14px] font-semibold text-[#334155]">用户信息 (JSON)</text>
       </view>
-      <view class="h-[1px] bg-[#f1f5f9] mb-[12px]" />
-      <scroll-view class="bg-[#0f172a] rounded-[8px] p-[12px] h-[180px]" direction="vertical">
-        <text class="text-[13px] text-[#38bdf8] leading-[20px]" style="font-family: monospace;">{{ userInfoJson }}</text>
+      <view class="h-[1px] bg-[#f1f5f9] mb-[10px]" />
+      <scroll-view class="bg-[#0f172a] rounded-[8px] p-[10px] h-[130px]" direction="vertical">
+        <text class="text-[12px] text-[#38bdf8] leading-[18px]" style="font-family: monospace;">{{ userInfoJson }}</text>
       </scroll-view>
     </view>
 
     <!-- 按钮区域 -->
-    <view class="w-full px-[8px] flex flex-col">
-      <view v-if="tokenStore.hasValidLogin()" class="w-full h-[48px] rounded-[8px] bg-[#ef4444] flex flex-row items-center justify-center" @click="handleLogout">
+    <view class="w-full px-[4px] flex flex-col">
+      <view v-if="tokenStore.hasValidLogin()" class="w-full h-[44px] rounded-[8px] bg-[#ef4444] flex flex-row items-center justify-center" @click="handleLogout">
         <text class="text-[#ffffff] text-[14px] font-bold">退出登录</text>
       </view>
-      <view v-else class="w-full h-[48px] rounded-[8px] bg-[#3b82f6] flex flex-row items-center justify-center" @click="handleLogin">
+      <view v-else class="w-full h-[44px] rounded-[8px] bg-[#3b82f6] flex flex-row items-center justify-center" @click="handleLogin">
         <text class="text-[#ffffff] text-[14px] font-bold">登录</text>
       </view>
     </view>
@@ -46,7 +46,7 @@
 import { useTokenStore, useUserStore } from '../../store';
 import { LOGIN_PAGE } from '../../router/config';
 import { handleBackPressExit } from '@/src/utils/backPress';
-import { setCurIdxByPath } from '@/src/tabbar/store';
+import { switchTabbar } from '@/src/tabbar/helper';
 import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '../../utils/refresh.uts';
 
 definePage({
@@ -125,9 +125,7 @@ function handleLogout() {
         });
         // 退出后跳回首页（me 页需要登录，不能停留）
         setTimeout(() => {
-          const targetUrl = '/src/pages/index/index';
-          setCurIdxByPath(targetUrl);
-          uni.switchTab({ url: targetUrl });
+          switchTabbar('/src/pages/index/index');
         }, 0);
       }
     }

@@ -61,6 +61,27 @@ function matchGlob(filePath: string, pattern: string): boolean {
   return new RegExp(`^${regexStr}$`).test(filePath);
 }
 
+/** 读取 Tabbar 策略模式配置（0=无Tabbar, 1=原生Tabbar, 2=自定义Tabbar） */
+function getTabbarMode(projectRoot: string): string {
+  if (process.env.VITE_TABBAR_MODE != null && process.env.VITE_TABBAR_MODE !== '') {
+    return process.env.VITE_TABBAR_MODE.trim();
+  }
+  try {
+    const envPath = path.resolve(projectRoot, '.env');
+    if (fs.existsSync(envPath)) {
+      const content = fs.readFileSync(envPath, 'utf-8');
+      const match = content.match(/^VITE_TABBAR_MODE\s*=\s*['"]?([^'"\r\n]+)['"]?/m);
+      if (match != null && match[1] != null) {
+        return match[1].trim();
+      }
+    }
+  }
+  catch {
+    // 忽略异常
+  }
+  return '1';
+}
+
 /** 解析 <route> 块（JSON5 格式） */
 function parseRouteBlock(content: string): Record<string, any> | null {
   const regex = /<route[^>]*>([\s\S]*?)<\/route>/;
@@ -453,6 +474,248 @@ function generatePagesJson(
       output[k] = baseConfig[k];
     }
   }
+
+  function parseCustomTabbarConfig(projectRoot: string): {
+    color?: string;
+    selectedColor?: string;
+    backgroundColor?: string;
+    borderStyle?: string;
+    borderColor?: string;
+    fontSize?: string;
+    iconWidth?: string;
+    spacing?: string;
+    height?: string;
+    list: Array<{ pagePath: string; text: string; iconPath: string; selectedIconPath: string }>;
+  } {
+    const configPath = path.resolve(projectRoot, 'src/tabbar/config.uts');
+    if (!fs.existsSync(configPath)) {
+      return { list: [] };
+    }
+    const content = fs.readFileSync(configPath, 'utf-8');
+
+    // 读取中文翻译字典
+    let zhDict: Record<string, any> = {};
+    const zhPath = path.resolve(projectRoot, 'src/i18n/locales/zh-CN.json');
+    if (fs.existsSync(zhPath)) {
+      try {
+        zhDict = JSON.parse(fs.readFileSync(zhPath, 'utf-8'));
+      }
+      catch {}
+    }
+
+    const colorMatch = content.match(/color\s*:\s*['"`](.*?)['"`]/);
+    const selectedColorMatch = content.match(/selectedColor\s*:\s*['"`](.*?)['"`]/);
+    const backgroundColorMatch = content.match(/backgroundColor\s*:\s*['"`](.*?)['"`]/);
+    const borderStyleMatch = content.match(/borderStyle\s*:\s*['"`](.*?)['"`]/);
+    const borderColorMatch = content.match(/borderColor\s*:\s*['"`](.*?)['"`]/);
+    const fontSizeMatch = content.match(/fontSize\s*:\s*['"`](.*?)['"`]/);
+    const iconWidthMatch = content.match(/iconWidth\s*:\s*['"`](.*?)['"`]/);
+    const spacingMatch = content.match(/spacing\s*:\s*['"`](.*?)['"`]/);
+    const heightMatch = content.match(/height\s*:\s*['"`](.*?)['"`]/);
+
+    const midButtonMatch = content.match(/midButton\s*:\s*\{([\s\S]*?)\}/);
+    let midButton: Record<string, string> | undefined;
+    if (midButtonMatch) {
+      const block = midButtonMatch[1];
+      const width = block.match(/width\s*:\s*['"`](.*?)['"`]/);
+      const height = block.match(/height\s*:\s*['"`](.*?)['"`]/);
+      const text = block.match(/text\s*:\s*['"`](.*?)['"`]/);
+      const iconPath = block.match(/iconPath\s*:\s*['"`](.*?)['"`]/);
+      const iconWidth = block.match(/iconWidth\s*:\s*['"`](.*?)['"`]/);
+      const backgroundImage = block.match(/backgroundImage\s*:\s*['"`](.*?)['"`]/);
+      const mb: Record<string, string> = {};
+      if (width && width[1].trim())
+        mb.width = width[1].trim();
+      if (height && height[1].trim())
+        mb.height = height[1].trim();
+      if (text && text[1].trim()) {
+        const textKey = text[1].trim();
+        let translatedText = textKey;
+        if (textKey.startsWith('tabbar.')) {
+          const subKey = textKey.replace('tabbar.', '');
+          translatedText = zhDict.tabbar?.[subKey] ?? textKey;
+        }
+        mb.text = translatedText;
+      }
+      if (iconPath && iconPath[1].trim())
+        mb.iconPath = iconPath[1].trim();
+      if (iconWidth && iconWidth[1].trim())
+        mb.iconWidth = iconWidth[1].trim();
+      if (backgroundImage && backgroundImage[1].trim())
+        mb.backgroundImage = backgroundImage[1].trim();
+
+      const iconfontMatch = block.match(/iconfont\s*:\s*\{([\s\S]*?)\}/);
+      if (iconfontMatch) {
+        const ifBlock = iconfontMatch[1];
+        const ifText = ifBlock.match(/text\s*:\s*['"`](.*?)['"`]/);
+        const ifSelectedText = ifBlock.match(/selectedText\s*:\s*['"`](.*?)['"`]/);
+        const ifFontSize = ifBlock.match(/fontSize\s*:\s*['"`](.*?)['"`]/);
+        const ifColor = ifBlock.match(/color\s*:\s*['"`](.*?)['"`]/);
+        const ifSelectedColor = ifBlock.match(/selectedColor\s*:\s*['"`](.*?)['"`]/);
+        const iconfontObj: Record<string, string> = {};
+        if (ifText && ifText[1].trim())
+          iconfontObj.text = ifText[1].trim();
+        if (ifSelectedText && ifSelectedText[1].trim())
+          iconfontObj.selectedText = ifSelectedText[1].trim();
+        if (ifFontSize && ifFontSize[1].trim())
+          iconfontObj.fontSize = ifFontSize[1].trim();
+        if (ifColor && ifColor[1].trim())
+          iconfontObj.color = ifColor[1].trim();
+        if (ifSelectedColor && ifSelectedColor[1].trim())
+          iconfontObj.selectedColor = ifSelectedColor[1].trim();
+        if (Object.keys(iconfontObj).length > 0) {
+          (mb as any).iconfont = iconfontObj;
+        }
+      }
+
+      if (Object.keys(mb).length > 0) {
+        midButton = mb;
+      }
+    }
+
+    // 匹配 list: [...] 或 customTabbarList = [...]
+    let itemsBlock = '';
+    const listBlockMatch = content.match(/list\s*:\s*\[([\s\S]*?)\]\s*(?:,|\})/);
+    if (listBlockMatch) {
+      itemsBlock = listBlockMatch[1];
+    }
+    else {
+      const arrayMatch = content.match(/export\s+const\s+customTabbarList\s*:\s*CustomTabBarItem\[\]\s*=\s*\[([\s\S]*?)\];/);
+      if (arrayMatch) {
+        itemsBlock = arrayMatch[1];
+      }
+    }
+
+    const itemRegex = /\{([\s\S]*?)\}/g;
+    const listResult: Array<{ pagePath: string; text: string; iconPath: string; selectedIconPath: string }> = [];
+
+    if (itemsBlock) {
+      for (const match of itemsBlock.matchAll(itemRegex)) {
+        const block = match[1];
+        const pagePathMatch = block.match(/pagePath\s*:\s*['"`](.*?)['"`]/);
+        const textMatch = block.match(/text\s*:\s*['"`](.*?)['"`]/);
+        const iconPathMatch = block.match(/iconPath\s*:\s*['"`](.*?)['"`]/);
+        const selectedIconPathMatch = block.match(/selectedIconPath\s*:\s*['"`](.*?)['"`]/);
+        const isBulgeMatch = block.match(/isBulge\s*:\s*(true|false)/);
+
+        const isBulge = isBulgeMatch ? isBulgeMatch[1] === 'true' : false;
+        const pagePath = pagePathMatch ? pagePathMatch[1].trim() : '';
+
+        if (!pagePath || isBulge) {
+          continue;
+        }
+
+        const textKey = textMatch ? textMatch[1].trim() : '';
+        let text = textKey;
+        if (textKey.startsWith('tabbar.')) {
+          const subKey = textKey.replace('tabbar.', '');
+          text = zhDict.tabbar?.[subKey] ?? subKey;
+        }
+
+        const iconPath = iconPathMatch ? iconPathMatch[1].trim() : '';
+        const selectedIconPath = selectedIconPathMatch ? selectedIconPathMatch[1].trim() : '';
+
+        listResult.push({
+          pagePath,
+          text,
+          iconPath,
+          selectedIconPath
+        });
+      }
+    }
+
+    return {
+      color: colorMatch ? colorMatch[1].trim() : '@tabBarColor',
+      selectedColor: selectedColorMatch ? selectedColorMatch[1].trim() : '@tabBarSelectedColor',
+      backgroundColor: backgroundColorMatch ? backgroundColorMatch[1].trim() : '@tabBarBackgroundColor',
+      borderStyle: borderStyleMatch ? borderStyleMatch[1].trim() : '@tabBarBorderStyle',
+      borderColor: borderColorMatch ? borderColorMatch[1].trim() : undefined,
+      fontSize: fontSizeMatch ? fontSizeMatch[1].trim() : undefined,
+      iconWidth: iconWidthMatch ? iconWidthMatch[1].trim() : undefined,
+      spacing: spacingMatch ? spacingMatch[1].trim() : undefined,
+      height: heightMatch ? heightMatch[1].trim() : undefined,
+      midButton,
+      list: listResult
+    };
+  }
+
+  // 根据 VITE_TABBAR_MODE 处理 Tabbar 模式（0=无Tabbar, 1=原生Tabbar, 2=带原生配置的自定义Tabbar, 3=无原生配置的纯自定义Tabbar）
+  const tabbarMode = getTabbarMode(projectRoot);
+  if (tabbarMode === '0' || tabbarMode === 'NO_TABBAR') {
+    delete output.tabBar;
+  }
+  else if (tabbarMode === '1' || tabbarMode === 'NATIVE_TABBAR') {
+    // 模式1（原生模式）：从 src/tabbar/config.uts 的 customTabbarConfig 动态提取生成原生 tabBar 配置
+    const parsedConfig = parseCustomTabbarConfig(projectRoot);
+    if (output.tabBar == null) {
+      output.tabBar = {
+        color: parsedConfig.color,
+        selectedColor: parsedConfig.selectedColor,
+        backgroundColor: parsedConfig.backgroundColor,
+        borderStyle: parsedConfig.borderStyle,
+        list: parsedConfig.list
+      };
+      if (parsedConfig.borderColor)
+        output.tabBar.borderColor = parsedConfig.borderColor;
+      if (parsedConfig.fontSize)
+        output.tabBar.fontSize = parsedConfig.fontSize;
+      if (parsedConfig.iconWidth)
+        output.tabBar.iconWidth = parsedConfig.iconWidth;
+      if (parsedConfig.spacing)
+        output.tabBar.spacing = parsedConfig.spacing;
+      if (parsedConfig.height)
+        output.tabBar.height = parsedConfig.height;
+      if (parsedConfig.midButton)
+        output.tabBar.midButton = parsedConfig.midButton;
+    }
+    else {
+      delete output.tabBar.custom;
+      if (parsedConfig.list.length > 0 && (output.tabBar.list == null || output.tabBar.list.length === 0)) {
+        output.tabBar.list = parsedConfig.list;
+      }
+      if (parsedConfig.midButton)
+        output.tabBar.midButton = parsedConfig.midButton;
+    }
+  }
+  else if (tabbarMode === '2' || tabbarMode === 'CUSTOM_TABBAR_WITH_NATIVE' || tabbarMode === 'CUSTOM_TABBAR') {
+    // 模式2（带原生配置的自定义 TabBar）：生成包含 custom: true 的 pages.json tabBar 配置，通过 switchTab 跳转
+    const parsedConfig = parseCustomTabbarConfig(projectRoot);
+    if (output.tabBar == null) {
+      output.tabBar = {
+        custom: true,
+        color: parsedConfig.color,
+        selectedColor: parsedConfig.selectedColor,
+        backgroundColor: parsedConfig.backgroundColor,
+        borderStyle: parsedConfig.borderStyle,
+        list: parsedConfig.list
+      };
+      if (parsedConfig.borderColor)
+        output.tabBar.borderColor = parsedConfig.borderColor;
+      if (parsedConfig.fontSize)
+        output.tabBar.fontSize = parsedConfig.fontSize;
+      if (parsedConfig.iconWidth)
+        output.tabBar.iconWidth = parsedConfig.iconWidth;
+      if (parsedConfig.spacing)
+        output.tabBar.spacing = parsedConfig.spacing;
+      if (parsedConfig.height)
+        output.tabBar.height = parsedConfig.height;
+      if (parsedConfig.midButton)
+        output.tabBar.midButton = parsedConfig.midButton;
+    }
+    else {
+      output.tabBar.custom = true;
+      if (parsedConfig.list.length > 0 && (output.tabBar.list == null || output.tabBar.list.length === 0)) {
+        output.tabBar.list = parsedConfig.list;
+      }
+      if (parsedConfig.midButton)
+        output.tabBar.midButton = parsedConfig.midButton;
+    }
+  }
+  else if (tabbarMode === '3' || tabbarMode === 'CUSTOM_TABBAR_WITHOUT_NATIVE') {
+    // 模式3（纯自定义 TabBar，无原生配置）：完全删除 pages.json 中的 tabBar，使用 redirectTo / reLaunch 自定义路由跳转
+    delete output.tabBar;
+  }
+
   if (scannedSubPkgs.length > 0) {
     output.subPackages = scannedSubPkgs;
   }
@@ -667,6 +930,7 @@ export default function uniPagesPlugin(options: UniPagesOptions = {}) {
       server = s;
       const pagesDir = path.resolve(projectRoot, opts.dir);
       const configPath = path.resolve(projectRoot, opts.configFile);
+      const tabbarConfigPath = path.resolve(projectRoot, 'src/tabbar/config.uts');
 
       if (fs.existsSync(pagesDir)) {
         server.watcher.add(pagesDir);
@@ -680,6 +944,9 @@ export default function uniPagesPlugin(options: UniPagesOptions = {}) {
       }
       if (fs.existsSync(configPath)) {
         server.watcher.add(configPath);
+      }
+      if (fs.existsSync(tabbarConfigPath)) {
+        server.watcher.add(tabbarConfigPath);
       }
 
       const isPageFile = (fp: string): boolean => {
@@ -713,7 +980,7 @@ export default function uniPagesPlugin(options: UniPagesOptions = {}) {
       server.watcher.on('change', (filePath: string) => {
         const normalized = filePath.replace(/\\/g, '/');
         // 配置文件变化
-        if (normalized === configPath.replace(/\\/g, '/') || normalized.includes('pages.config')) {
+        if (normalized === configPath.replace(/\\/g, '/') || normalized.includes('pages.config') || normalized.includes('tabbar/config')) {
           debouncedGenerate();
         }
         // 页面文件变化
@@ -721,6 +988,14 @@ export default function uniPagesPlugin(options: UniPagesOptions = {}) {
           debouncedGenerate();
         }
       });
+    },
+    transformIndexHtml(html: string) {
+      const mode = getTabbarMode(projectRoot);
+      if (mode === '2' || mode === 'CUSTOM_TABBAR_WITH_NATIVE' || mode === 'CUSTOM_TABBAR') {
+        const hideStyle = '<style id="uni-tabbar-hide-zero-flash">uni-tabbar, uni-tabbar *, .uni-tabbar, .uni-tabbar *, .uni-tabbar-bottom, .uni-tabbar-bottom *, .uni-tabbar__icon, .uni-tabbar__label { display: none !important; visibility: hidden !important; height: 0 !important; min-height: 0 !important; max-height: 0 !important; opacity: 0 !important; pointer-events: none !important; position: absolute !important; bottom: -9999px !important; }</style>';
+        return html.replace('</head>', `${hideStyle}\n</head>`);
+      }
+      return html;
     }
   };
 }

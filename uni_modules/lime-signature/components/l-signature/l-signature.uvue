@@ -1,11 +1,30 @@
 <template>
-	<view class="l-signature" ref="signatureRef" :style="[drawableStyle]">
-		<!-- #ifdef APP-ANDROID || APP-IOS -->
+	<!-- #ifdef APP-ANDROID || APP-IOS -->
+	<view
+		class="l-signature"
+		:style="drawableStyle"
+		@touchstart.stop.prevent="onAppTouchStart"
+		@touchmove.stop.prevent="onAppTouchMove"
+		@touchend.stop.prevent="onAppTouchEnd"
+	>
+		<canvas
+			id="l-signature-native"
+			ref="signatureRef"
+			disable-scroll="true"
+			:disable-scroll="true"
+			style="width: 100%; height: 100%;"
+			@touchstart.stop.prevent="onAppTouchStart"
+			@touchmove.stop.prevent="onAppTouchMove"
+			@touchend.stop.prevent="onAppTouchEnd"
+		></canvas>
 		<view class="l-signature-landscape" ref="signatureLandscapeRef" v-if="landscape"
 			:style="[landscapeStyle]">
 			<image class="l-signature-image" :style="[landscapeImageStyle]" :src="url"></image>
 		</view>
-		<!-- #endif -->
+	</view>
+	<!-- #endif -->
+	<!-- #ifndef APP-ANDROID || APP-IOS -->
+	<view class="l-signature" ref="signatureRef" :style="drawableStyle">
 		<!-- #ifdef APP-HARMONY -->
 		<canvas ref="signatureCanvasRef"  class="l-signature__canvas"></canvas>
 		<!-- #endif -->
@@ -15,6 +34,7 @@
 		</canvas>
 		<!-- #endif -->
 	</view>
+	<!-- #endif -->
 </template>
 <script lang="uts" setup>
 	// @ts-nocheck
@@ -121,11 +141,44 @@
 		return style
 	})
 
+	// #ifdef APP-ANDROID || APP-IOS
+	const signatureRef = ref<UniCanvasElement | null>(null)
+	// #endif
+	// #ifndef APP-ANDROID || APP-IOS
 	const signatureRef = ref<UniElement | null>(null)
+	// #endif
 	const signatureCanvasRef = ref<UniElement | null>(null)
 	let signatureLandscapeRef = ref<UniElement | null>(null)
 	let landscapeStyle = ref<Map<string, string>>(new Map())
 	let landscapeImageStyle = ref<Map<string, string>>(new Map())
+	// #ifdef APP-ANDROID || APP-IOS
+	const getNativeElement = () : UniCanvasElement | null => {
+		if (signatureRef.value != null) {
+			return signatureRef.value as UniCanvasElement;
+		}
+		try {
+			const el = uni.getElementById('l-signature-native') as UniCanvasElement | null
+			if (el != null) {
+				return el;
+			}
+		} catch (_e) {}
+		return null;
+	}
+	// #endif
+	// #ifndef APP-ANDROID || APP-IOS
+	const getNativeElement = () : UniElement | null => {
+		if (signatureRef.value != null) {
+			return signatureRef.value;
+		}
+		try {
+			const el = uni.getElementById('l-signature-native') as UniElement | null
+			if (el != null) {
+				return el;
+			}
+		} catch (_e) {}
+		return null;
+	}
+	// #endif
 	let isCanvasEmpty = true
 	let signature : Signature | null = null
 	let url = ref('')
@@ -184,6 +237,33 @@
 	}
 	// #endif
 
+	// #ifdef APP-ANDROID || APP-IOS
+	const onAppTouchStart = (event : UniTouchEvent) => {
+		try {
+			signature?.onTouchStart(event)
+		} catch (e : any) {
+			console.error('--- [l-signature] onAppTouchStart ERROR ---', e)
+		}
+	}
+	const onAppTouchMove = (event : UniTouchEvent) => {
+		try {
+			signature?.onTouchMove(event)
+		} catch (e : any) {
+			console.error('--- [l-signature] onAppTouchMove ERROR ---', e)
+		}
+	}
+	const onAppTouchEnd = (event : UniTouchEvent) => {
+		try {
+			signature?.onTouchEnd(event)
+			setTimeout(() => {
+				checkAndEmitEmptyStatus()
+			}, 0)
+		} catch (e : any) {
+			console.error('--- [l-signature] onAppTouchEnd ERROR ---', e)
+		}
+	}
+	// #endif
+
 	const clear = () => {
 		signature?.clear()
 		checkAndEmitEmptyStatus()  // 状态检查
@@ -202,7 +282,8 @@
 		const complete = options.complete// as SignatureToFileCompleteCallback | null
 		const format = options.format ?? 'png'
 		// #ifdef APP-ANDROID || APP-IOS
-		signatureRef.value?.takeSnapshot({
+		const targetEl = getNativeElement()
+		targetEl?.takeSnapshot({
 			format,
 			success: (res) => {
 				if (props.landscape) {
@@ -453,8 +534,10 @@
 	onMounted(() => {
 		nextTick(() => {
 			setTimeout(()=>{
-				const width = signatureRef.value?.offsetWidth
-				const height = signatureRef.value?.offsetHeight
+				const targetEl = getNativeElement()
+				const rect = targetEl?.getBoundingClientRect()
+				const width = rect?.width ?? 0
+				const height = rect?.height ?? 0
 				// #ifdef APP
 				landscapeStyle.value.set('width', `${height}px`)
 				landscapeStyle.value.set('height', `${width}px`)
@@ -462,7 +545,9 @@
 				landscapeImageStyle.value.set('height', `${height}px`)
 				landscapeImageStyle.value.set('transform', `rotate(-90deg) translateX(-${width}px)`)
 				// #ifdef APP-ANDROID || APP-IOS
-				signature = new Signature(signatureRef.value!)
+				if (targetEl != null) {
+					signature = new Signature(targetEl)
+				}
 				// #endif
 				// #ifndef APP-ANDROID || APP-IOS
 				signature = new Signature(signatureCanvasRef.value!)
@@ -488,8 +573,7 @@
 					// #endif
 				})
 				// #endif
-			},300)
-			
+			}, 300)
 		})
 	})
 
@@ -513,10 +597,8 @@
 	/* #endif */
 	.l-signature {
 		flex: 1;
-		/* #ifndef APP */
 		width: 100%;
 		height: 100%;
-		/* #endif */
 		&__canvas {
 			width: 100%;
 			height: 100%;

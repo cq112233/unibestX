@@ -1,8 +1,8 @@
 <template>
-  <view class="navbar-root">
-    <!-- 导航栏外层容器：支持 fixed 固定与 border 细分割线 -->
+  <view class="nav-bar">
+    <!-- 导航栏外层容器 -->
     <view
-      :class="fixed ? 'navbar-fixed' : ''"
+      :class="fixed ? 'navbar-container navbar-fixed' : 'navbar-container'"
       :style="{
         backgroundColor: effectiveBgColor,
         borderBottomWidth: border ? '1px' : '0px',
@@ -10,62 +10,44 @@
         borderBottomColor: border ? '#e2e8f0' : 'transparent'
       }"
     >
-      <!-- 直接使用官方 uni-nav-bar 组件并优雅代理插槽 -->
-      <uni-nav-bar
-        :title="title"
-        :hide-default-back="true"
-        :navigation-bar-text-style="effectiveTitleColor"
-        :style="{ backgroundColor: 'transparent' }"
-      >
-        <!-- 左侧区域：外部传 slot 则显示外部内容，未传则展示默认返回箭头 -->
-        <template #left>
+      <!-- 安全区域：状态栏占位高度 -->
+      <view :style="{ height: `${statusBarHeight}px` }"></view>
+
+      <!-- 导航栏内容区 -->
+      <view class="navbar-content">
+        <!-- 左侧返回按钮区域 -->
+        <view class="navbar-left">
           <slot name="left">
-            <view
-              v-if="showBack"
-              style="width: 44px; height: 44px; justify-content: center; align-items: center;"
-              @click="handleBack"
-            >
-              <view
-                style="width: 12px; height: 12px; transform: rotate(45deg); border-left-width: 2px; border-left-style: solid; border-bottom-width: 2px; border-bottom-style: solid;"
-                :style="{ borderLeftColor: effectiveTitleColor, borderBottomColor: effectiveTitleColor }"
-              />
+            <view v-if="showBack" class="back-btn-wrapper" @click="handleBack">
+              <view class="back-arrow" :style="{ borderLeftColor: effectiveTitleColor, borderBottomColor: effectiveTitleColor }"></view>
             </view>
           </slot>
-        </template>
+        </view>
 
-        <!-- 中间区域：外部传 mid / default 插槽则展示，未传则展示标题 -->
-        <template #mid>
+        <!-- 中间标题区域 -->
+        <view class="navbar-title">
           <slot name="mid">
             <slot>
-              <text
-                v-if="title.length > 0"
-                class="title-text"
-                :style="{ color: effectiveTitleColor }"
-              >
-                {{ title }}
-              </text>
+              <text v-if="title.length > 0" class="title-text" :style="{ color: effectiveTitleColor }">{{ title }}</text>
             </slot>
           </slot>
-        </template>
+        </view>
 
-        <!-- 右侧区域 -->
-        <template #right>
-          <slot name="right" />
-        </template>
-      </uni-nav-bar>
+        <!-- 右侧操作栏区域 -->
+        <view class="navbar-right">
+          <slot name="right"></slot>
+        </view>
+      </view>
     </view>
 
-    <!-- 占位垫高块：当 fixed 且开启 placeholder 时，防止页面内容被遮挡 -->
-    <view
-      v-if="fixed && placeholder"
-      style="padding-top: var(--status-bar-height); height: 44px; box-sizing: content-box;"
-    />
+    <!-- 占位垫高块：当固定在顶部时防内容遮挡 -->
+    <view v-if="fixed && placeholder" :style="{ height: `${statusBarHeight + 44}px` }"></view>
   </view>
 </template>
 
 <script setup lang="uts">
 import { computed } from 'vue';
-import UniNavBar from '@/uni_modules/uni-nav-bar-x/components/uni-nav-bar/uni-nav-bar.uvue';
+import { safeAreaInsets, systemInfo } from '@/src/utils/systemInfo';
 import { useAppStore } from '@/src/store';
 import { getThemeTokens } from '@/src/utils/theme';
 import type { ThemeTokens } from '@/src/utils/theme';
@@ -84,15 +66,15 @@ const props = defineProps({
     type: String,
     default: ''
   },
-  showBack: {
-    type: Boolean,
-    default: true
-  },
   fixed: {
     type: Boolean,
     default: true
   },
   placeholder: {
+    type: Boolean,
+    default: true
+  },
+  showBack: {
     type: Boolean,
     default: true
   },
@@ -117,21 +99,47 @@ const effectiveTitleColor = computed((): string => {
   return props.titleColor != '' ? props.titleColor : themeTokens.value.navText;
 });
 
+// 计算状态栏高度
+const statusBarHeight = computed<number>((): number => {
+  const insets = safeAreaInsets.value;
+  if (insets != null && insets.top > 0) {
+    return insets.top;
+  }
+  const info = systemInfo.value;
+  if (info != null && info.statusBarHeight > 0) {
+    return info.statusBarHeight;
+  }
+  return 0;
+});
+
 // 处理返回事件
 function handleBack() {
+  if (!props.showBack) {
+    return;
+  }
   const pages = getCurrentPages();
   if (pages.length > 1) {
-    uni.navigateBack({ delta: 1 });
+    uni.navigateBack({
+      delta: 1
+    });
   }
   else {
-    uni.reLaunch({ url: '/src/pages/index/index' });
+    uni.reLaunch({
+      url: '/src/pages/index/index'
+    });
   }
 }
 </script>
 
 <style>
-.navbar-root {
+.nav-bar {
   width: 100%;
+}
+
+.navbar-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .navbar-fixed {
@@ -142,9 +150,78 @@ function handleBack() {
   z-index: 999;
 }
 
+.navbar-content {
+  height: 44px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  width: 100%;
+}
+
+.navbar-left {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 60px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  z-index: 10;
+}
+
+.back-btn-wrapper {
+  padding: 10px 15px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.back-arrow {
+  width: 10px;
+  height: 10px;
+  border-left-width: 2px;
+  border-left-style: solid;
+  border-left-color: #1e293b;
+  border-bottom-width: 2px;
+  border-bottom-style: solid;
+  border-bottom-color: #1e293b;
+  transform: rotate(45deg);
+}
+
+.navbar-title {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  height: 100%;
+  padding-left: 60px;
+  padding-right: 60px;
+}
+
 .title-text {
+  /* 与原生导航栏标题统一：17px 系统 semibold */
   font-size: 17px;
   font-weight: 600;
   text-overflow: ellipsis;
+}
+
+.navbar-right {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 60px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+  z-index: 10;
+  padding-right: 15px;
 }
 </style>
