@@ -30,7 +30,7 @@ const safeAreaBottom = computed<number>((): number => {
 /** 是否为 5.25 及以上版本编译器（仅在 5.25 及以上 H5 启用 absolute 脱离文档流） */
 const isVersionGte525 = computed<boolean>((): boolean => {
   // #ifdef H5
-  return isCompilerVersionGte('5.25') || isCompilerVersionGte('4.25');
+  return isCompilerVersionGte('5.25');
   // #endif
   // #ifndef H5
   return false;
@@ -78,7 +78,13 @@ function safeHideNativeTabBar(): void {
     if (typeof document !== 'undefined' && document.getElementById('hide-native-tabbar-style') == null) {
       const style = document.createElement('style');
       style.id = 'hide-native-tabbar-style';
-      style.innerHTML = 'uni-tabbar, .uni-tabbar, .uni-tabbar-bottom, .uni-tabbar__icon, .uni-tabbar__label { display: none !important; } :root { --window-bottom: 0px !important; } uni-page-wrapper { height: 100% !important; } uni-page-body { padding-bottom: 0px !important; }';
+      if (isCompilerVersionGte('5.25')) {
+        style.innerHTML = 'uni-tabbar, .uni-tabbar, .uni-tabbar-bottom, .uni-tabbar__icon, .uni-tabbar__label { display: none !important; } :root { --window-bottom: 0px !important; } uni-page-wrapper { height: 100% !important; } uni-page-body { padding-bottom: 0px !important; }';
+      }
+      else {
+        // 5.24 及以下版本（与 uniX-rice-ui 100% 相同原版逻辑）
+        style.innerHTML = 'uni-tabbar, .uni-tabbar, .uni-tabbar-bottom, .uni-tabbar__icon, .uni-tabbar__label { display: none !important; }';
+      }
       document.head.appendChild(style);
     }
   }
