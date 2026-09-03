@@ -14,6 +14,15 @@
       );
     </script>
     <title></title>
+    <style>
+      /* 移除 H5 原生 TabBar 默认生成的 ::after 50px 伪元素占位，消除双重空白 */
+      uni-page-body::after,
+      uni-app.uni-app--showtabbar uni-page-body::after {
+        display: none !important;
+        height: 0px !important;
+        min-height: 0px !important;
+      }
+    </style>
     <!--preload-links-->
     <!--app-context-->
   </head>
