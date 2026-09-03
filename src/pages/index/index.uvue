@@ -174,8 +174,6 @@ import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '../../utils/
 import { systemInfo } from '../../utils/systemInfo.uts';
 
 definePage({
-  // debug: false, // 是否开启当前页面沙盒独立调试（多页面均可设为 true；⚠️ 调试完成后记得关闭/改回 false）
-  // debugHome: false, // 沙盒调试模式下是否将当前页面指定为应用启动首页（⚠️ 全局仅允许 1 个页面设为 true，排在 pages.json 第 1 位；调试完成后记得关闭）
   type: 'home', // 页面类型标识（仅首页配置 'home'，用于配合处理双击返回退出等特定逻辑）
   layout: 'navbar', // 页面通用布局模板（采用 navbar 布局接管顶部导航与下拉滚动容器）
   showBack: false, // 导航栏左侧是否显示返回箭头（TabBar 首页无需返回按钮）

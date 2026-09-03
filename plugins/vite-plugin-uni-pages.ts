@@ -100,15 +100,22 @@ function parseRouteBlock(content: string): Record<string, any> | null {
 
 /** 从源码中提取 definePage({...}) 的配置对象 */
 function parseDefinePage(content: string): Record<string, any> | null {
+  // 如果是 Vue/UVUE 文件，优先在 <script> 标签内解析，防止 <template> 文本中的说明文字被误识别
+  let targetContent = content;
+  const scriptMatch = content.match(/<script[^>]*>([\s\S]*?)<\/script>/);
+  if (scriptMatch != null && scriptMatch[1] != null) {
+    targetContent = scriptMatch[1];
+  }
+
   // 匹配 definePage( 开头
   const startRegex = /definePage\s*\(\s*\{/;
-  const match = content.match(startRegex);
+  const match = targetContent.match(startRegex);
   if (match == null || match.index == null) {
     return null;
   }
 
   // 从第一个 { 开始，追踪括号深度
-  const openParen = content.indexOf('(', match.index);
+  const openParen = targetContent.indexOf('(', match.index);
   if (openParen === -1) {
     return null;
   }
@@ -118,9 +125,9 @@ function parseDefinePage(content: string): Record<string, any> | null {
   let stringChar = '';
   let i = openParen + 1;
 
-  for (; i < content.length; i++) {
-    const ch = content[i];
-    const prev = i > 0 ? content[i - 1] : '';
+  for (; i < targetContent.length; i++) {
+    const ch = targetContent[i];
+    const prev = i > 0 ? targetContent[i - 1] : '';
 
     if (inString) {
       if (ch === stringChar && prev !== '\\') {
@@ -136,19 +143,19 @@ function parseDefinePage(content: string): Record<string, any> | null {
     }
 
     // 跳过注释
-    if (ch === '/' && i + 1 < content.length) {
-      if (content[i + 1] === '/') {
+    if (ch === '/' && i + 1 < targetContent.length) {
+      if (targetContent[i + 1] === '/') {
         // 单行注释，跳到行尾
-        const newline = content.indexOf('\n', i);
+        const newline = targetContent.indexOf('\n', i);
         if (newline === -1) {
           break;
         }
         i = newline;
         continue;
       }
-      if (content[i + 1] === '*') {
+      if (targetContent[i + 1] === '*') {
         // 多行注释
-        const end = content.indexOf('*/', i + 2);
+        const end = targetContent.indexOf('*/', i + 2);
         if (end === -1) {
           break;
         }
@@ -170,7 +177,7 @@ function parseDefinePage(content: string): Record<string, any> | null {
       depth--;
       if (depth < 0) {
         // 找到了 definePage 参数的结束位置
-        const arg = content.slice(openParen + 1, i).trim();
+        const arg = targetContent.slice(openParen + 1, i).trim();
         // 去掉外层花括号如果是对象形式
         if (arg.startsWith('{')) {
           try {
