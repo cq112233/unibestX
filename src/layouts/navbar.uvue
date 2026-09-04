@@ -3,7 +3,7 @@
   <view class="navbar-layout flex-1 flex flex-col">
     <!-- 顶部固定自定义导航栏：位于页面内容上方，不随下拉刷新位移 -->
     <NavBar
-      v-if="isNavbarVisible"
+      :is-navbar-visible="isNavbarVisible"
       :title="displayTitle"
       :show-back="showBack"
       :title-color="navTitleColor"
