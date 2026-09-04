@@ -387,6 +387,12 @@ export default function uniLayoutsPlugin(options: UniLayoutsOptions = {}) {
           return;
         const val = mergedParams[key];
         if (typeof val === 'string') {
+          if (key === 'class' || key === 'customClass') {
+            attrs += ` :custom-page-class="'${val.replace(/'/g, '\\\'')}'"`;
+          }
+          if (key === 'customStyle') {
+            attrs += ` :custom-page-style="'${val.replace(/'/g, '\\\'')}'"`;
+          }
           attrs += ` :${kebabCase(key)}="'${val.replace(/'/g, '\\\'')}'"`;
         }
         else if (typeof val === 'number' || typeof val === 'boolean') {
