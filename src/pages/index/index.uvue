@@ -192,14 +192,17 @@ import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '../../utils/
 import { systemInfo } from '../../utils/systemInfo.uts';
 
 definePage({
+  customPageClass: 'border-radius-12', // 页面根容器自定义类名（配合 layout 布局使用，支持配置全局样式类）
+  customPageStyle: 'background-color: transparent;', // 页面根容器自定义行内样式（穿透任何样式隔离，全端绝对生效）
   debug: false, // 是否开启当前页面沙盒独立调试（设为 true 可单独调试此页；⚠️ 调试完成后改回 false）
   debugHome: false, // 沙盒调试模式下是否将当前页面指定为启动首页（全局仅允许 1 个页面设为 true，排在 pages[0]）
   type: 'home', // 页面类型标识（仅首页配置 'home'，标记当前页面为应用全局启动首页，自动排在 pages[0]）
   layout: 'navbar', // 页面通用布局模板（采用 navbar 布局接管顶部导航与下拉滚动容器）
   showBack: false, // 导航栏左侧是否显示返回箭头（TabBar 首页无需返回按钮）
-  hideNavbar: false, // 是否隐藏顶部导航栏（false 为正常显示）
+  hideNavbar: true, // 是否隐藏顶部导航栏（false 为正常显示）
   enablePullDownRefresh: true, // 是否开启自定义下拉刷新（由 navbar 布局内的 scroll-view 驱动）
   style: {
+    navigationBarBackgroundColor: '#ffffff', // 导航栏背景颜色（十六进制颜色值）
     navigationBarTitleText: '首页', // 页面与导航栏标题文本
     navigationStyle: 'custom' // 导航栏样式设为自定义（隐藏系统原生导航栏）
   }

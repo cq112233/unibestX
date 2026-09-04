@@ -1,17 +1,18 @@
 <template>
-  <view class="nav-bar">
+  <view v-if="isNavbarVisible" class="nav-bar">
     <!-- 导航栏外层容器 -->
     <view
+
       :class="fixed ? 'navbar-container navbar-fixed' : 'navbar-container'"
       :style="{
         backgroundColor: effectiveBgColor,
-        borderBottomWidth: border ? '1px' : '0px',
-        borderBottomStyle: border ? 'solid' : 'none',
-        borderBottomColor: border ? '#e2e8f0' : 'transparent'
+        borderBottomWidth: (border && isNavbarVisible) ? '1px' : '0px',
+        borderBottomStyle: (border && isNavbarVisible) ? 'solid' : 'none',
+        borderBottomColor: (border && isNavbarVisible) ? '#e2e8f0' : 'transparent'
       }"
     >
       <!-- 安全区域：状态栏占位高度 -->
-      <view :style="{ height: `${statusBarHeight}px` }"></view>
+      <view class="status-bar" :style="{ height: `${statusBarHeight}px` }"></view>
 
       <!-- 导航栏内容区 -->
       <view class="navbar-content">
@@ -41,8 +42,9 @@
     </view>
 
     <!-- 占位垫高块：当固定在顶部时防内容遮挡 -->
-    <view v-if="fixed && placeholder" :style="{ height: `${statusBarHeight + 44}px` }"></view>
+    <view v-if="fixed && placeholder" :style="{ height: `${statusBarHeight + (isNavbarVisible ? 44 : 0)}px` }"></view>
   </view>
+  <view v-else class="status-bar" :style="{ height: `${statusBarHeight}px` }"></view>
 </template>
 
 <script setup lang="uts">
@@ -81,6 +83,10 @@ const props = defineProps({
   border: {
     type: Boolean,
     default: false
+  },
+  isNavbarVisible: {
+    type: Boolean,
+    default: true
   }
 });
 

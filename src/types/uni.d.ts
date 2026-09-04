@@ -109,6 +109,25 @@ declare global {
      */
     enablePullDownRefresh?: boolean;
     /**
+     * 页面布局根容器自定义 class 类名（配合 layout 布局使用，推荐使用全局原子类如 'bg-white'、'p-[16px]'）
+     */
+    customPageClass?: string;
+    /**
+     * 页面布局根容器自定义内联样式（全端绝对兼容，穿透任何样式隔离，如 'background-color: transparent;'）
+     */
+    customPageStyle?: string;
+    /**
+     * 兼容别名：自定义 class
+     */
+    class?: string;
+    customClass?: string;
+    layoutClass?: string;
+    /**
+     * 兼容别名：自定义 style
+     */
+    customStyle?: string;
+    layoutStyle?: string;
+    /**
      * 页面窗口表现样式配置（对应 pages.json 中的 style）
      */
     style?: PageStyle;

@@ -1,10 +1,12 @@
 <template>
-  <view class="default-layout">
+  <view :class="rootClass" :style="rootStyle">
     <slot />
   </view>
 </template>
 
 <script setup lang="uts">
+import { computed } from 'vue';
+
 const props = defineProps({
   /** 页面顶层类型标识，如 'home' */
   type: {
@@ -26,11 +28,67 @@ const props = defineProps({
     type: Boolean,
     default: false
   },
+  /** 页面根容器自定义类名（通过 definePage 或 pages.config.json 中的 customPageClass 传入） */
+  customPageClass: {
+    type: String,
+    default: ''
+  },
+  /** 兼容别名：自定义类名 */
+  customClass: {
+    type: String,
+    default: ''
+  },
+  layoutClass: {
+    type: String,
+    default: ''
+  },
+  /** 页面根容器自定义行内样式（通过 definePage 或 pages.config.json 中的 customPageStyle 传入） */
+  customPageStyle: {
+    type: String,
+    default: ''
+  },
+  /** 兼容别名：自定义行内样式 */
+  customStyle: {
+    type: String,
+    default: ''
+  },
+  layoutStyle: {
+    type: String,
+    default: ''
+  },
   /** 页面 style 完整配置对象 */
   pageStyle: {
     type: Object,
     default: () => ({})
   }
+});
+
+const rootClass = computed((): string => {
+  let cls = 'default-layout';
+  if (props.customPageClass.length > 0) {
+    cls += ` ${props.customPageClass}`;
+  }
+  if (props.customClass.length > 0) {
+    cls += ` ${props.customClass}`;
+  }
+  if (props.layoutClass.length > 0) {
+    cls += ` ${props.layoutClass}`;
+  }
+  return cls;
+});
+
+const rootStyle = computed((): string => {
+  let s = '';
+  if (props.customPageStyle.length > 0) {
+    s += props.customPageStyle;
+  }
+  if (props.customStyle.length > 0) {
+    s += (s.length > 0 ? ';' : '') + props.customStyle;
+  }
+  if (props.layoutStyle.length > 0) {
+    s += (s.length > 0 ? ';' : '') + props.layoutStyle;
+  }
+  return s;
 });
 
 console.log(props, 'default layout props');

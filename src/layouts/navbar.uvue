@@ -1,9 +1,9 @@
 <template>
   <!-- NavBar 页面通用布局根容器 -->
-  <view class="navbar-layout flex-1 flex flex-col">
+  <view :class="rootClass" :style="rootStyle">
     <!-- 顶部固定自定义导航栏：位于页面内容上方，不随下拉刷新位移 -->
     <NavBar
-      v-if="isNavbarVisible"
+      :is-navbar-visible="isNavbarVisible"
       :title="displayTitle"
       :show-back="showBack"
       :title-color="navTitleColor"
@@ -122,6 +122,34 @@ const props = defineProps({
   navigationBarTextStyle: {
     type: String,
     default: ''
+  },
+  /** 页面根容器自定义类名（通过 definePage 或 pages.config.json 中的 customPageClass 传入） */
+  customPageClass: {
+    type: String,
+    default: ''
+  },
+  /** 兼容别名：自定义类名 */
+  customClass: {
+    type: String,
+    default: ''
+  },
+  layoutClass: {
+    type: String,
+    default: ''
+  },
+  /** 页面根容器自定义行内样式（通过 definePage 或 pages.config.json 中的 customPageStyle 传入） */
+  customPageStyle: {
+    type: String,
+    default: ''
+  },
+  /** 兼容别名：自定义行内样式 */
+  customStyle: {
+    type: String,
+    default: ''
+  },
+  layoutStyle: {
+    type: String,
+    default: ''
   }
 });
 
@@ -140,6 +168,40 @@ const pageScrollDirection = computed((): string => {
 
 const isRefresherEnabled = computed((): boolean => {
   return !isPageScrollDisabled.value && !isPageRefresherDisabled.value;
+});
+
+/**
+ * 根容器样式类名：合并默认基础类名与自定义页面类名（customPageClass）
+ */
+const rootClass = computed((): string => {
+  let cls = 'navbar-layout flex-1 flex flex-col';
+  if (props.customPageClass.length > 0) {
+    cls += ` ${props.customPageClass}`;
+  }
+  if (props.customClass.length > 0) {
+    cls += ` ${props.customClass}`;
+  }
+  if (props.layoutClass.length > 0) {
+    cls += ` ${props.layoutClass}`;
+  }
+  return cls;
+});
+
+/**
+ * 根容器行内样式：合并自定义页面行内样式（customPageStyle）
+ */
+const rootStyle = computed((): string => {
+  let s = '';
+  if (props.customPageStyle.length > 0) {
+    s += props.customPageStyle;
+  }
+  if (props.customStyle.length > 0) {
+    s += (s.length > 0 ? ';' : '') + props.customStyle;
+  }
+  if (props.layoutStyle.length > 0) {
+    s += (s.length > 0 ? ';' : '') + props.layoutStyle;
+  }
+  return s;
 });
 
 /**
