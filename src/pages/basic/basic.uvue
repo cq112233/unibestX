@@ -78,11 +78,10 @@ onBackPress((options: OnBackPressOptions): boolean => {
 
 onMounted(() => {
   updateSystemInfo();
-  // #ifdef APP || H5 || MP-WEIXIN
-  uni.onWindowResize((_res) => {
-    updateSystemInfo();
-  });
-  // #endif
+});
+
+onResize(() => {
+  updateSystemInfo();
 });
 </script>
 

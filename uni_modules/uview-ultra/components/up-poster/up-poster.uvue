@@ -514,7 +514,7 @@ function drawImageBox(item: PosterItem): Promise<void> {
 					resolve()
 				}
 				// #ifdef WEB || MP-WEIXIN
-				(image as UTSJSONObject)['onerror'] = () => {
+				(image as any)['onerror'] = () => {
 					drawImageFallback(x, y, width, height, numberValue(css['radius'], 0))
 					resolve()
 				}

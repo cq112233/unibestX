@@ -475,7 +475,7 @@ function createCanvasImage(path: string): void {
 		draw()
 	}
 	// #ifdef WEB || MP-WEIXIN
-	(image as UTSJSONObject)['onerror'] = () => {
+	(image as any)['onerror'] = () => {
 		emit('error', new Error('Image load failed'))
 	}
 	// #endif

@@ -23,7 +23,7 @@ import { useAppStore } from '@/src/store';
 import { applyNavbarTheme, getThemeTokens } from '@/src/utils/theme';
 import { registerToast, unregisterToast } from '@/src/utils/toast';
 import type { ComponentPublicInstance } from 'vue';
-import { computed, nextTick, onBeforeMount, onMounted, onUnmounted, ref, watch } from 'vue';
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
 
 // 激活应用状态管理 Store
 const appStore = useAppStore();
@@ -69,6 +69,9 @@ onMounted(() => {
         }
       }
     }
+  }
+  catch (_e) {
+    // 捕获异常
   }
   if (uToastRef.value != null) {
     registerToast(uToastRef.value!);
