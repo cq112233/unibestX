@@ -337,37 +337,6 @@ export function isCompilerVersionGte(targetVersion: string): boolean {
 }
 
 /**
- * 计算页面视口内滚动容器的自适应剩余可用高度（单位 px）
- * @param topOffset 顶部占用高度（如自定义 Header、搜索框、Tabs 等，默认 0）
- * @param bottomOffset 底部占用高度（如自定义 TabBar、底部操作栏等，默认 0）
- * @param minusStatusBar 是否自动扣除系统状态栏高度（默认 true）
- * @returns 剩余可用视口高度（px）
- */
-export function getScrollHeight(
-  topOffset: number = 0,
-  bottomOffset: number = 0,
-  minusStatusBar: boolean = true
-): number {
-  const info = uni.getWindowInfo();
-  const statusBar = minusStatusBar ? info.statusBarHeight : 0;
-  return Math.max(0, info.windowHeight - topOffset - bottomOffset - statusBar);
-}
-
-/**
- * 实时获取当前窗口可用高度（单位 px）
- */
-export function getWindowHeight(): number {
-  return uni.getWindowInfo().windowHeight;
-}
-
-/**
- * 实时获取当前状态栏高度（单位 px）
- */
-export function getStatusBarHeight(): number {
-  return uni.getWindowInfo().statusBarHeight;
-}
-
-/**
  * TabBar 默认基准高度（单位 px，标准 50px）
  */
 export const TABBAR_BASE_HEIGHT: number = 50;
@@ -385,6 +354,57 @@ export function getTabBarHeight(includeSafeArea: boolean = false): number {
   const insets = safeAreaInsets.value;
   const bottomInset = insets != null ? insets.bottom : 0;
   return baseHeight + bottomInset;
+}
+
+/**
+ * 获取环境变量中配置的 TabBar 策略模式（0: 无, 1: 原生, 2: 带原生自定义, 3: 纯自定义）
+ */
+export function getTabBarMode(): string {
+  return `${import.meta.env.VITE_TABBAR_MODE ?? '1'}`.trim();
+}
+
+/**
+ * 判断当前是否为原生 TabBar 模式（VITE_TABBAR_MODE 为 1 或 NATIVE_TABBAR）
+ */
+export function isNativeTabBar(): boolean {
+  const mode = getTabBarMode();
+  return mode == '1' || mode == 'NATIVE_TABBAR';
+}
+
+/**
+ * 计算页面视口内滚动容器的自适应剩余可用高度（单位 px）
+ * - 自动检测环境变量中的 TabBar 模式，若为原生 TabBar 模式（VITE_TABBAR_MODE=1）则自动扣除 TabBar 高度
+ * @param topOffset 顶部占用高度（如自定义 Header、搜索框、Tabs 等，默认 0）
+ * @param bottomOffset 底部占用高度（如自定义 TabBar、底部操作栏等，默认 0）
+ * @param minusStatusBar 是否自动扣除系统状态栏高度（默认 true）
+ * @returns 剩余可用视口高度（px）
+ */
+export function getScrollHeight(
+  topOffset: number = 0,
+  bottomOffset: number = 0,
+  minusStatusBar: boolean = true
+): number {
+  const info = uni.getWindowInfo();
+  const statusBar = minusStatusBar ? (info.statusBarHeight ?? 0) : 0;
+  let tabBar = 0;
+  if (isNativeTabBar()) {
+    tabBar = getTabBarHeight(true);
+  }
+  return Math.max(0, info.windowHeight - topOffset - bottomOffset - statusBar - tabBar);
+}
+
+/**
+ * 实时获取当前窗口可用高度（单位 px）
+ */
+export function getWindowHeight(): number {
+  return uni.getWindowInfo().windowHeight;
+}
+
+/**
+ * 实时获取当前状态栏高度（单位 px）
+ */
+export function getStatusBarHeight(): number {
+  return uni.getWindowInfo().statusBarHeight;
 }
 
 // 初始化获取一次
