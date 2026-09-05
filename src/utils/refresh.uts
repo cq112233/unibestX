@@ -22,3 +22,6 @@ export function stopNavbarPullDownRefresh(): void {
   uni.$emit(EVENT_STOP_PULL_DOWN_REFRESH);
   uni.stopPullDownRefresh();
 }
+
+// 统一导出页面滚动与触底监听函数
+export { onNavbarPageScroll, onNavbarReachBottom } from './pageScroll.uts';
