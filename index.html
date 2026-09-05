@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <link rel="stylesheet" href="./assets/uni.cb2face4.css">
+
+    <meta charset="UTF-8" />
+    <script>
+      var coverSupport =
+        'CSS' in window &&
+        typeof CSS.supports === 'function' &&
+        (CSS.supports('top: env(a)') || CSS.supports('top: constant(a)'));
+      document.write(
+        '<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0' +
+          (coverSupport ? ', viewport-fit=cover' : '') +
+          '" />',
+      );
+    </script>
+    <title>unibestX</title>
+    <style>
+      /* 移除 H5 原生 TabBar 默认生成的 ::after 50px 伪元素占位，消除双重空白 */
+      uni-page-body::after,
+      uni-app.uni-app--showtabbar uni-page-body::after {
+        display: none !important;
+        height: 0px !important;
+        min-height: 0px !important;
+      }
+    </style>
+    <!--preload-links-->
+    <!--app-context-->
+    <script type="module" crossorigin src="./assets/index-C4ZF-XpF.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-BZNmIexf.css">
+  <style id="uni-tabbar-hide-zero-flash">uni-tabbar, uni-tabbar *, .uni-tabbar, .uni-tabbar *, .uni-tabbar-bottom, .uni-tabbar-bottom *, .uni-tabbar__icon, .uni-tabbar__label { display: none !important; visibility: hidden !important; height: 0 !important; min-height: 0 !important; max-height: 0 !important; opacity: 0 !important; pointer-events: none !important; position: absolute !important; bottom: -9999px !important; }</style>
+</head>
+  <body>
+    <div id="app"><!--app-html--></div>
+  </body>
+</html>
