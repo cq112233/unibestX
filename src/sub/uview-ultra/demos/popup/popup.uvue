@@ -2,34 +2,316 @@
   <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
     <NavBar title="up-popup 弹出层" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
     <view class="p-[16px]">
+      <!-- 1. 基础方向用法 -->
       <view class="demo-block">
-        <text class="demo-label">基础用法</text>
+        <text class="demo-label">基础方向用法</text>
+        <view class="flex-row items-center mb-[10px]">
+          <up-button type="primary" text="顶部弹出" size="mini" @click="openBasicPopup('top')"></up-button>
+          <view class="w-[8px]"></view>
+          <up-button type="primary" text="底部弹出" size="mini" @click="openBasicPopup('bottom')"></up-button>
+          <view class="w-[8px]"></view>
+          <up-button type="primary" text="居中弹出" size="mini" @click="openBasicPopup('center')"></up-button>
+        </view>
         <view class="flex-row items-center">
-          <up-button type="primary" text="顶部弹出" size="mini" @click="openPopup('top')"></up-button>
-          <view class="w-[10px]"></view>
-          <up-button type="primary" text="底部弹出" size="mini" @click="openPopup('bottom')"></up-button>
+          <up-button type="success" text="左侧弹出" size="mini" @click="openBasicPopup('left')"></up-button>
+          <view class="w-[8px]"></view>
+          <up-button type="success" text="右侧弹出" size="mini" @click="openBasicPopup('right')"></up-button>
         </view>
       </view>
+
+      <!-- 2. 各方向手势滑动关闭演示 (居中无手势) -->
       <view class="demo-block mt-[12px]">
-        <text class="demo-label">更多方向弹出</text>
+        <view class="flex-row items-center justify-between mb-[8px]">
+          <text class="demo-label !mb-0">各方向手势滑动关闭</text>
+          <text class="text-[11px] bg-[#eff6ff] text-[#2563eb] px-[6px] py-[1px] rounded-full font-medium">方向自适应</text>
+        </view>
+        <text class="text-[12px] text-[#64748b] leading-[18px] mb-[12px]">
+          顶部上滑关闭、底部下滑关闭、左侧左滑关闭、右侧右滑关闭；拖拽超过 40px 松手自动滑出关闭，居中不设手势。
+        </text>
+
+        <!-- 顶部上滑、底部下滑 -->
+        <view class="flex-row items-center mb-[10px]">
+          <up-button type="primary" text="顶部弹出 (上滑关闭)" size="mini" @click="openGesturePopup('top')"></up-button>
+          <view class="w-[8px]"></view>
+          <up-button type="primary" text="底部弹出 (下滑关闭)" size="mini" @click="openGesturePopup('bottom')"></up-button>
+        </view>
+
+        <!-- 左侧左滑、右侧右滑 -->
         <view class="flex-row items-center">
-          <up-button type="success" text="左侧弹出" size="mini" @click="openPopup('left')"></up-button>
+          <up-button type="success" text="左侧弹出 (左滑关闭)" size="mini" @click="openGesturePopup('left')"></up-button>
+          <view class="w-[8px]"></view>
+          <up-button type="success" text="右侧弹出 (右滑关闭)" size="mini" @click="openGesturePopup('right')"></up-button>
+        </view>
+      </view>
+
+      <!-- 3. 自定义滑动阈值演示 -->
+      <view class="demo-block mt-[12px]">
+        <view class="flex-row items-center justify-between mb-[8px]">
+          <text class="demo-label !mb-0">自定义阈值 (Threshold)</text>
+          <text class="text-[11px] bg-[#fef3c7] text-[#d97706] px-[6px] py-[1px] rounded-full font-medium">灵敏度控制</text>
+        </view>
+        <text class="text-[12px] text-[#64748b] leading-[18px] mb-[10px]">
+          通过 slide-down-threshold 调节灵敏度：默认 40px 快速响应；100px 防误触面板。
+        </text>
+        <view class="flex-row items-center">
+          <up-button type="primary" text="默认阈值 (40px)" size="mini" @click="showBasicPopup = true"></up-button>
           <view class="w-[10px]"></view>
-          <up-button type="success" text="右侧弹出" size="mini" @click="openPopup('right')"></up-button>
-          <view class="w-[10px]"></view>
-          <up-button type="success" text="居中弹出" size="mini" @click="openPopup('center')"></up-button>
+          <up-button type="warning" text="高阈值防误触 (100px)" size="mini" @click="showHighThresholdPopup = true"></up-button>
+        </view>
+      </view>
+
+      <!-- 4. 嵌套长列表防冲突 (z-paging-x 协同) -->
+      <view class="demo-block mt-[12px]">
+        <view class="flex-row items-center justify-between mb-[8px]">
+          <text class="demo-label !mb-0">嵌套分页列表 (z-paging-x 协同)</text>
+          <text class="text-[11px] bg-[#f3e8ff] text-[#7e22ce] px-[6px] py-[1px] rounded-full font-medium">防冲突 + 分页</text>
+        </view>
+        <text class="text-[12px] text-[#64748b] leading-[18px] mb-[10px]">
+          配置 scroll-id="popup-paging-scroll"。支持触底加载；仅当列表回顶时向下拉动触发弹窗下滑关闭。
+        </text>
+        <view class="flex-row items-center">
+          <up-button type="info" text="打开 z-paging-x 分页弹窗" size="mini" @click="showListPopup = true"></up-button>
         </view>
       </view>
     </view>
+
+    <!-- 1. 基础方向弹出层 (常规) -->
     <up-popup
-      :show="popupShow"
-      :mode="popupMode"
+      :show="basicShow"
+      :mode="basicMode"
       :closeable="true"
-      :round="10"
-      @close="onPopupClose"
+      :round="12"
+      @close="basicShow = false"
     >
-      <view class="p-[30px] items-center">
-        <text class="text-[16px] text-[#303133]">{{ popupMode }} 弹出层内容</text>
+      <view
+        class="px-[24px] py-[28px] flex flex-col items-center"
+        :class="basicMode == 'left' || basicMode == 'right' ? 'w-[260px] h-full justify-center' : ''"
+      >
+        <text class="text-[16px] font-bold text-[#1e293b] mb-[8px]">
+          {{ basicMode }} 弹出层
+        </text>
+        <text class="text-[13px] text-[#64748b] text-center mb-[18px]">
+          常规弹出层展示，可通过点击遮罩或右上角关闭图标收起。
+        </text>
+        <view
+          class="bg-[#0957de] py-[10px] px-[28px] rounded-[8px] active:opacity-80"
+          @click="basicShow = false"
+        >
+          <text class="text-white text-[14px] font-bold">我知道了</text>
+        </view>
+      </view>
+    </up-popup>
+
+    <!-- 2. 手势关闭弹出层 (顶部上滑、底部下滑、左侧左滑、右侧右滑) -->
+    <up-popup
+      :show="gestureShow"
+      :mode="gestureMode"
+      :closeable="true"
+      :round="16"
+      :close-on-slide-down="true"
+      :show-drag-bar="true"
+      :slide-down-threshold="40"
+      @close="gestureShow = false"
+    >
+      <view
+        class="px-[24px] py-[26px] flex flex-col items-center"
+        :class="gestureMode == 'left' || gestureMode == 'right' ? 'w-[260px] h-full justify-center' : ''"
+      >
+        <view class="w-[44px] h-[44px] rounded-full bg-[#eff6ff] flex items-center justify-center mb-[10px]">
+          <text class="text-[20px] text-[#2563eb]">
+            {{ gestureMode == 'top' ? '↑' : gestureMode == 'bottom' ? '↓' : gestureMode == 'left' ? '←' : '→' }}
+          </text>
+        </view>
+        <text class="text-[17px] font-bold text-[#0f172a] mb-[6px]">
+          {{ getGestureTitle(gestureMode) }}
+        </text>
+        <text class="text-[13px] text-[#64748b] text-center mb-[14px] leading-[20px]">
+          {{ getGestureDesc(gestureMode) }}
+        </text>
+        <view class="bg-[#f1f5f9] rounded-[10px] p-[12px] w-full mb-[16px]">
+          <text class="text-[12px] text-[#475569] leading-[18px]">
+            当前方向已开启手势滑动关闭与指示条。拖拽位移达到 40px 松手即可触发关闭；未达阈值弹性复位。
+          </text>
+        </view>
+        <view
+          class="bg-[#0957de] py-[10px] px-[32px] rounded-[10px] flex items-center justify-center active:opacity-80"
+          @click="gestureShow = false"
+        >
+          <text class="text-white text-[14px] font-bold">完成并收起</text>
+        </view>
+      </view>
+    </up-popup>
+
+    <!-- 3. 基础下滑关闭弹窗 (40px) -->
+    <up-popup
+      :show="showBasicPopup"
+      mode="bottom"
+      :round="16"
+      :close-on-slide-down="true"
+      :slide-down-threshold="40"
+      :show-drag-bar="true"
+      :closeable="true"
+      @close="showBasicPopup = false"
+    >
+      <view class="px-[20px] pb-[32px] pt-[8px] flex flex-col">
+        <text class="text-[18px] font-bold text-[#0f172a] text-center mb-[8px]">基础下滑关闭面板 (40px)</text>
+        <text class="text-[13px] text-[#64748b] text-center mb-[20px]">
+          拖动上方胶囊横条或面板空白区域向下滑动即可关闭
+        </text>
+
+        <view class="bg-[#f1f5f9] rounded-[12px] p-[16px] mb-[20px]">
+          <view class="flex flex-row items-center mb-[8px]">
+            <text class="text-[14px] font-bold text-[#334155]">功能特性：</text>
+          </view>
+          <text class="text-[13px] text-[#475569] leading-[22px]">
+            • 实时跟手位移，手指下移弹窗实时下移&#10;• 下拉超过 40px 松手自动滑出关闭&#10;• 下拉未达 40px 或松手前上推自动弹性复位
+          </text>
+        </view>
+
+        <view
+          class="bg-[#0957de] py-[12px] rounded-[10px] flex items-center justify-center active:opacity-80"
+          @click="showBasicPopup = false"
+        >
+          <text class="text-white text-[15px] font-bold">完成并收起</text>
+        </view>
+      </view>
+    </up-popup>
+
+    <!-- 4. 高阈值 (100px) 下滑关闭弹窗 -->
+    <up-popup
+      :show="showHighThresholdPopup"
+      mode="bottom"
+      :round="16"
+      :close-on-slide-down="true"
+      :slide-down-threshold="100"
+      :show-drag-bar="true"
+      :closeable="true"
+      @close="showHighThresholdPopup = false"
+    >
+      <view class="px-[20px] pb-[32px] pt-[8px] flex flex-col">
+        <text class="text-[18px] font-bold text-[#0f172a] text-center mb-[8px]">高阈值防误触面板 (100px)</text>
+        <text class="text-[13px] text-[#d97706] text-center mb-[18px]">
+          当前阈值设置为 100px（需要向下拖动较深距离才会关闭）
+        </text>
+
+        <view class="bg-[#fefce8] border-[1px] border-solid border-[#fde047] rounded-[12px] p-[16px] mb-[20px]">
+          <text class="text-[13px] text-[#854d0e] leading-[22px]">
+            轻微下拉（未满 100px）松手会立即回弹至完全展开状态，避免用户浏览时不小心误触关闭。
+          </text>
+        </view>
+
+        <view
+          class="bg-[#0f766e] py-[12px] rounded-[10px] flex items-center justify-center active:opacity-80"
+          @click="showHighThresholdPopup = false"
+        >
+          <text class="text-white text-[15px] font-bold">我知道了</text>
+        </view>
+      </view>
+    </up-popup>
+
+    <!-- 5. 嵌套长列表弹窗 (z-paging-x 协同与防冲突) -->
+    <up-popup
+      :show="showListPopup"
+      mode="bottom"
+      :round="16"
+      :close-on-slide-down="true"
+      :slide-down-threshold="50"
+      :show-drag-bar="true"
+      :closeable="true"
+      scroll-id="popup-paging-scroll"
+      @close="showListPopup = false"
+    >
+      <view class="px-[20px] pb-[24px] pt-[8px] flex flex-col">
+        <text class="text-[18px] font-bold text-[#0f172a] text-center mb-[6px]">z-paging-x 嵌套分页演示</text>
+        <text class="text-[12px] text-[#64748b] text-center mb-[12px]">
+          支持触底加载更多数据；当列表回顶时向下拉动，触发弹窗下滑关闭手势
+        </text>
+
+        <!-- Tab 切换栏 -->
+        <view class="flex flex-row bg-[#f1f5f9] p-[3px] rounded-[10px] mb-[12px]">
+          <view
+            v-for="(tab, index) in tabList"
+            :key="index"
+            class="flex-1 items-center justify-center py-[6px] rounded-[8px] active:opacity-80"
+            :class="currentTab == index ? 'bg-white shadow-xs' : 'bg-transparent'"
+            @click="onTabChange(index)"
+          >
+            <text
+              class="text-[13px] font-bold"
+              :class="currentTab == index ? 'text-[#7c3aed]' : 'text-[#64748b]'"
+            >
+              {{ tab }}
+            </text>
+          </view>
+        </view>
+
+        <!-- 统计与操作栏 -->
+        <view class="flex flex-row items-center justify-between mb-[10px] px-[4px]">
+          <view class="flex flex-row items-center">
+            <text class="text-[12px] text-[#475569] font-medium">当前分类：</text>
+            <text class="text-[12px] text-[#7c3aed] font-bold mr-[4px]">{{ tabList[currentTab] }}</text>
+            <text class="text-[12px] text-[#94a3b8]">({{ pagingList.length }}条)</text>
+          </view>
+          <view class="flex flex-row items-center">
+            <view
+              class="px-[10px] py-[3px] rounded-full bg-[#fee2e2] mr-[8px] active:opacity-70"
+              @click="clearPaging"
+            >
+              <text class="text-[12px] text-[#ef4444] font-medium">置为0条</text>
+            </view>
+            <view
+              class="px-[10px] py-[3px] rounded-full bg-[#f3e8ff] active:opacity-70"
+              @click="reloadPaging"
+            >
+              <text class="text-[12px] text-[#7c3aed] font-medium">重新加载</text>
+            </view>
+          </view>
+        </view>
+
+        <!-- z-paging-x 分页列表 -->
+        <view class="h-[360px] mb-[16px] rounded-[12px] overflow-hidden border-[1px] border-solid border-[#edf2f7] bg-[#f8fafc]">
+          <z-paging-x
+            ref="pagingRef"
+            list-is="scroll-view"
+            list-id="popup-paging-scroll"
+            :refresher-enabled="false"
+            :model-value="pagingList"
+            :default-page-size="6"
+            :paging-style="{ height: '360px' }"
+            @update:model-value="onUpdatePagingList"
+            @query="onQueryPaging"
+          >
+            <!-- 列表数据项 -->
+            <view v-if="pagingList.length > 0">
+              <view
+                v-for="item in pagingList"
+                :key="item.id"
+                class="bg-white p-[12px] mx-[10px] my-[6px] rounded-[10px] border-[1px] border-solid border-[#f1f5f9] flex flex-row items-center justify-between shadow-xs"
+              >
+                <view class="flex flex-col flex-1 mr-[10px]">
+                  <view class="flex flex-row items-center mb-[4px]">
+                    <text
+                      class="text-[10px] font-bold px-[6px] py-[1px] rounded-[4px] mr-[6px]"
+                      :class="item.tag == '热点' ? 'bg-[#fee2e2] text-[#ef4444]' : item.tag == '公告' ? 'bg-[#fef3c7] text-[#d97706]' : 'bg-[#eff6ff] text-[#2563eb]'"
+                    >
+                      {{ item.tag }}
+                    </text>
+                    <text class="text-[14px] font-bold text-[#1e293b]">{{ item.title }}</text>
+                  </view>
+                  <text class="text-[12px] text-[#64748b] leading-[18px]">{{ item.desc }}</text>
+                </view>
+                <text class="text-[11px] text-[#94a3b8]">{{ item.time }}</text>
+              </view>
+            </view>
+          </z-paging-x>
+        </view>
+
+        <view
+          class="bg-[#7c3aed] py-[12px] rounded-[10px] flex items-center justify-center active:opacity-80"
+          @click="showListPopup = false"
+        >
+          <text class="text-white text-[15px] font-bold">关闭弹窗</text>
+        </view>
       </view>
     </up-popup>
   </view>
@@ -38,22 +320,148 @@
 <script setup lang="uts">
 import { ref } from 'vue';
 
+type PopupPagingItem = {
+  id: number;
+  title: string;
+  desc: string;
+  tag: string;
+  time: string;
+};
+
 definePage({
+  debug: false,
   style: {
     navigationStyle: 'custom',
     navigationBarTitleText: 'up-popup 弹出层'
   }
 });
 
-const popupShow = ref(false);
-const popupMode = ref('bottom');
+// 1. 基础方向弹窗状态
+const basicShow = ref<boolean>(false);
+const basicMode = ref<string>('bottom');
 
-function openPopup(mode: string) {
-  popupMode.value = mode;
-  popupShow.value = true;
+function openBasicPopup(mode: string) {
+  basicMode.value = mode;
+  basicShow.value = true;
 }
-function onPopupClose() {
-  popupShow.value = false;
+
+// 2. 手势关闭弹窗状态 (顶部上滑、底部下滑、左侧左滑、右侧右滑)
+const gestureShow = ref<boolean>(false);
+const gestureMode = ref<string>('bottom');
+
+function openGesturePopup(mode: string) {
+  gestureMode.value = mode;
+  gestureShow.value = true;
+}
+
+function getGestureTitle(mode: string): string {
+  if (mode == 'top') {
+    return '顶部弹出 (上滑关闭)';
+  }
+  else if (mode == 'bottom') {
+    return '底部弹出 (下滑关闭)';
+  }
+  else if (mode == 'left') {
+    return '左侧弹出 (左滑关闭)';
+  }
+  else if (mode == 'right') {
+    return '右侧弹出 (右滑关闭)';
+  }
+  return '手势滑动关闭';
+}
+
+function getGestureDesc(mode: string): string {
+  if (mode == 'top') {
+    return '手指向【上】推拉滑动超过 40px，松手即可上滑关闭。';
+  }
+  else if (mode == 'bottom') {
+    return '手指向【下】拖拉滑动超过 40px，松手即可下滑关闭。';
+  }
+  else if (mode == 'left') {
+    return '手指向【左】拉动滑动超过 40px，松手即可左滑关闭。';
+  }
+  else if (mode == 'right') {
+    return '手指向【右】拉动滑动超过 40px，松手即可右滑关闭。';
+  }
+  return '手势滑动即可关闭。';
+}
+
+// 3. 阈值演示弹窗状态
+const showBasicPopup = ref<boolean>(false);
+const showHighThresholdPopup = ref<boolean>(false);
+const showListPopup = ref<boolean>(false);
+
+// Tab 栏分类配置
+const tabList: string[] = ['全部', '热点', '精选', '公告'];
+const currentTab = ref<number>(0);
+
+// z-paging-x 分页实例与数据
+const pagingRef = ref<ComponentPublicInstance | null>(null);
+const pagingList = ref<PopupPagingItem[]>([] as PopupPagingItem[]);
+
+function onUpdatePagingList(val: any[]) {
+  pagingList.value = val as PopupPagingItem[];
+}
+
+function onTabChange(index: number) {
+  if (currentTab.value == index) {
+    return;
+  }
+  currentTab.value = index;
+  if (pagingRef.value != null) {
+    pagingRef.value!.$callMethod('reload');
+  }
+}
+
+function reloadPaging() {
+  if (pagingRef.value != null) {
+    pagingRef.value!.$callMethod('reload');
+  }
+}
+
+function clearPaging() {
+  pagingList.value = [] as PopupPagingItem[];
+  if (pagingRef.value != null) {
+    pagingRef.value!.$callMethod('clear');
+  }
+}
+
+function onQueryPaging(pageNo: number, pageSize: number) {
+  const activeTab = tabList[currentTab.value];
+  setTimeout(() => {
+    // 「热点」分类模拟无数据，展示 z-paging-x 空状态
+    if (activeTab == '热点') {
+      if (pagingRef.value != null) {
+        pagingRef.value!.$callMethod('complete', [] as PopupPagingItem[]);
+      }
+      return;
+    }
+
+    const list = [] as PopupPagingItem[];
+    const start = (pageNo - 1) * pageSize;
+    const maxItems = activeTab == '公告' ? 8 : 20;
+
+    for (let i = 0; i < pageSize; i++) {
+      const id = start + i + 1;
+      if (id > maxItems) {
+        break;
+      }
+      let tag = activeTab;
+      if (activeTab == '全部') {
+        tag = (id % 3 == 0) ? '公告' : (id % 2 == 0 ? '热点' : '精选');
+      }
+      list.push({
+        id,
+        title: `[${tag}] 资讯条目 #${id}`,
+        desc: `当前分类：${tag}，由 z-paging-x 驱动分页，支持平滑滚动与触底加载。`,
+        tag,
+        time: `${id * 2}分钟前`
+      } as PopupPagingItem);
+    }
+    if (pagingRef.value != null) {
+      pagingRef.value!.$callMethod('complete', list);
+    }
+  }, 350);
 }
 </script>
 
