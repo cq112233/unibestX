@@ -21,8 +21,11 @@
       :refresher-enabled="isRefresherEnabled"
       :refresher-triggered="isTriggered"
       :refresher-background="themeTokens.bgContent"
+      :lower-threshold="50"
       @refresherrefresh="handleRefresherRefresh"
       @refresherrestore="handleRefresherRestore"
+      @scroll="handleScroll"
+      @scrolltolower="handleScrollToLower"
     >
       <slot />
     </scroll-view>
@@ -32,6 +35,9 @@
       v-else
       class="flex-1 flex flex-col"
       :direction="pageScrollDirection"
+      :lower-threshold="50"
+      @scroll="handleScroll"
+      @scrolltolower="handleScrollToLower"
     >
       <slot />
     </scroll-view>
@@ -251,6 +257,23 @@ onMounted(() => {
 onUnmounted(() => {
   uni.$off('stopPagePullDownRefresh', onStopRefresh);
 });
+
+/**
+ * 布局滚动容器滚动事件回调：统一向页面层派发 onNavbarPageScroll 事件
+ */
+function handleScroll(e: UniScrollEvent): void {
+  const scrollTop = e.detail.scrollTop;
+  uni.$emit('onNavbarPageScroll', {
+    scrollTop: Math.ceil(scrollTop)
+  } as UTSJSONObject);
+}
+
+/**
+ * 布局滚动容器触底事件回调：统一向页面层派发 onNavbarReachBottom 事件
+ */
+function handleScrollToLower(): void {
+  uni.$emit('onNavbarReachBottom');
+}
 
 /**
  * 判断当前页面是否开启了原生系统下拉刷新（读取 definePage.style.enablePullDownRefresh）

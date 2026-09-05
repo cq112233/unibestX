@@ -188,7 +188,7 @@
 
 <script setup lang="uts">
 import { handleBackPressExit } from '../../utils/backPress.uts';
-import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '../../utils/refresh.uts';
+import { onNavbarPageScroll, onNavbarPullDownRefresh, onNavbarReachBottom, stopNavbarPullDownRefresh } from '../../utils/refresh.uts';
 import { systemInfo } from '../../utils/systemInfo.uts';
 
 definePage({
@@ -199,7 +199,7 @@ definePage({
   type: 'home', // 页面类型标识（仅首页配置 'home'，标记当前页面为应用全局启动首页，自动排在 pages[0]）
   layout: 'navbar', // 页面通用布局模板（采用 navbar 布局接管顶部导航与下拉滚动容器）
   showBack: false, // 导航栏左侧是否显示返回箭头（TabBar 首页无需返回按钮）
-  hideNavbar: true, // 是否隐藏顶部导航栏（false 为正常显示）
+  hideNavbar: false, // 是否隐藏顶部导航栏（false 为正常显示）
   enablePullDownRefresh: true, // 是否开启自定义下拉刷新（由 navbar 布局内的 scroll-view 驱动）
   style: {
     navigationBarBackgroundColor: '#ffffff', // 导航栏背景颜色（十六进制颜色值）
@@ -214,6 +214,16 @@ onNavbarPullDownRefresh(() => {
     // 数据加载完毕后，手动停止下拉刷新动画状态
     stopNavbarPullDownRefresh();
   }, 1000);
+});
+
+// 1. 监听页面滚动（替代原生的 onPageScroll）
+onNavbarPageScroll(({ scrollTop }) => {
+  console.log('onNavbarPageScroll 触发，当前滚动距离:', scrollTop);
+});
+// 2. 监听页面触底（替代原生的 onReachBottom）
+onNavbarReachBottom(() => {
+  console.log('onNavbarReachBottom 触发，已滑动到底部');
+  // 执行分页加载下一页等业务逻辑...
 });
 
 onBackPress((options: OnBackPressOptions): boolean => {
