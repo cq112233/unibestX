@@ -59,6 +59,8 @@ const classes = ref<string>('')
 const currentDuration = ref<number>(0)
 let enterTimer: number | null = null
 let leaveTimer: number | null = null
+// 动画世代计数器：每次发起 enter/leave 时递增，异步恢复后检查是否已被更新的操作取代
+let animationId: number = 0
 
 function clearTimers(): void {
   if (enterTimer != null) {
@@ -187,7 +189,9 @@ function clickHandler() {
   emit('click')
 }
 
-function onTransitionEnd() {
+function onTransitionEnd(expectedId: number = -1) {
+  // 如果传入了 expectedId 且当前 animationId 已变化，说明有更新的 enter/leave 启动了，丢弃此回调
+  if (expectedId >= 0 && expectedId != animationId) return
   if (transitionEnded.value) return
   transitionEnded.value = true
   emit(status.value == 'leave' ? 'afterLeave' : 'afterEnter')
@@ -209,6 +213,7 @@ function applyCustomStyleToEl(el: UniElement, customStyle: any): void {
 
 async function vueEnter(): Promise<void> {
   clearTimers()
+  const myId = ++animationId
   transitionEnded.value = false
   const classNames = getClassNames(props.mode)
   status.value = 'enter'
@@ -220,10 +225,12 @@ async function vueEnter(): Promise<void> {
   currentDuration.value = 0
 
   await nextTick()
+  if (animationId != myId) return
 
   let el = upTransitionRef.value
   if (el == null) {
     await sleep(20)
+    if (animationId != myId) return
     el = upTransitionRef.value
   }
 
@@ -244,12 +251,13 @@ async function vueEnter(): Promise<void> {
       applyModeStyleToEl(el, props.mode, 'enter-to')
     }
     emit('enter')
-    onTransitionEnd()
+    onTransitionEnd(myId)
     return
   }
 
   // 等待 40ms 确保 Native 渲染引擎（Vapor 模式与 VDOM 模式）完成初始位置的首帧测量与绘制
   await sleep(40)
+  if (animationId != myId) return
 
   if (status.value != 'enter' || !props.show) {
     return
@@ -275,13 +283,14 @@ async function vueEnter(): Promise<void> {
   }
 
   enterTimer = setTimeout(() => {
-    onTransitionEnd()
+    onTransitionEnd(myId)
   }, durationMs)
 }
 
 async function vueLeave(): Promise<void> {
   if (!display.value) return
   clearTimers()
+  const myId = ++animationId
   transitionEnded.value = false
   const classNames = getClassNames(props.mode)
   status.value = 'leave'
@@ -294,6 +303,9 @@ async function vueLeave(): Promise<void> {
   viewStyle.value = getModeStyle(props.mode, 'leave')
 
   await nextTick()
+  // 关键：如果在 await 期间有新的 enter/leave 发起，当前操作已过时，必须丢弃
+  if (animationId != myId) return
+
   transitionEnded.value = false
   emit('leave')
 
@@ -305,7 +317,7 @@ async function vueLeave(): Promise<void> {
     if (el != null && el.style != null) {
       applyModeStyleToEl(el, props.mode, 'leave-to')
     }
-    onTransitionEnd()
+    onTransitionEnd(myId)
     return
   }
 
@@ -321,7 +333,7 @@ async function vueLeave(): Promise<void> {
   }
 
   leaveTimer = setTimeout(() => {
-    onTransitionEnd()
+    onTransitionEnd(myId)
   }, durationMs)
 }
 

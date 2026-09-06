@@ -320,7 +320,7 @@
 </template>
 
 <script setup lang="uts">
-import { nextTick, ref } from 'vue';
+import { ref } from 'vue';
 
 type PopupPagingItem = {
   id: number;
@@ -343,12 +343,7 @@ const basicShow = ref<boolean>(false);
 const basicMode = ref<string>('bottom');
 
 function openBasicPopup(mode: string) {
-  if (basicShow.value) {
-    basicShow.value = false;
-    nextTick(() => {
-      basicMode.value = mode;
-      basicShow.value = true;
-    });
+  if (basicShow.value && basicMode.value == mode) {
     return;
   }
   basicMode.value = mode;
@@ -360,12 +355,7 @@ const gestureShow = ref<boolean>(false);
 const gestureMode = ref<string>('bottom');
 
 function openGesturePopup(mode: string) {
-  if (gestureShow.value) {
-    gestureShow.value = false;
-    nextTick(() => {
-      gestureMode.value = mode;
-      gestureShow.value = true;
-    });
+  if (gestureShow.value && gestureMode.value == mode) {
     return;
   }
   gestureMode.value = mode;

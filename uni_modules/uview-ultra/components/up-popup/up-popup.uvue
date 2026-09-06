@@ -10,6 +10,7 @@
       @click="overlayClick"
     ></up-overlay>
     <up-transition
+      :key="pageInline ? 'inline' : position"
       :show="pageInline ? true : show"
       :custom-style="transitionStyle"
       :mode="pageInline ? 'none' : position"
