@@ -81,6 +81,7 @@
       :mode="basicMode"
       :closeable="true"
       :round="12"
+      @update:show="basicShow = $event"
       @close="basicShow = false"
     >
       <view
@@ -111,6 +112,7 @@
       :close-on-slide-down="true"
       :show-drag-bar="true"
       :slide-down-threshold="40"
+      @update:show="gestureShow = $event"
       @close="gestureShow = false"
     >
       <view
@@ -318,7 +320,7 @@
 </template>
 
 <script setup lang="uts">
-import { ref } from 'vue';
+import { nextTick, ref } from 'vue';
 
 type PopupPagingItem = {
   id: number;
@@ -329,7 +331,7 @@ type PopupPagingItem = {
 };
 
 definePage({
-  debug: false,
+  debug: true,
   style: {
     navigationStyle: 'custom',
     navigationBarTitleText: 'up-popup 弹出层'
@@ -341,6 +343,14 @@ const basicShow = ref<boolean>(false);
 const basicMode = ref<string>('bottom');
 
 function openBasicPopup(mode: string) {
+  if (basicShow.value) {
+    basicShow.value = false;
+    nextTick(() => {
+      basicMode.value = mode;
+      basicShow.value = true;
+    });
+    return;
+  }
   basicMode.value = mode;
   basicShow.value = true;
 }
@@ -350,6 +360,14 @@ const gestureShow = ref<boolean>(false);
 const gestureMode = ref<string>('bottom');
 
 function openGesturePopup(mode: string) {
+  if (gestureShow.value) {
+    gestureShow.value = false;
+    nextTick(() => {
+      gestureMode.value = mode;
+      gestureShow.value = true;
+    });
+    return;
+  }
   gestureMode.value = mode;
   gestureShow.value = true;
 }

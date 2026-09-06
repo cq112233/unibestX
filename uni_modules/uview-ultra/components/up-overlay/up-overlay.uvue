@@ -51,7 +51,8 @@ const overlayStyle = computed<any>(() => {
     right: 0,
     zIndex: props.zIndex,
     bottom: 0,
-    backgroundColor: `rgba(0, 0, 0, ${props.opacity})`
+    backgroundColor: `rgba(0, 0, 0, ${props.opacity})`,
+    pointerEvents: props.show ? 'auto' : 'none'
   }
   return deepMerge(style, addStyle(props.customStyle))
 })

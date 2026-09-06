@@ -109,5 +109,51 @@ $up-zoom-scale: scale(0.95);
 
 .up-zoom-enter,
 .up-zoom-leave-to {
-	transform: $up-zoom-scale
+	transform: $up-zoom-scale;
+}
+
+.up-fade-enter-to,
+.up-fade-leave {
+	opacity: 1;
+}
+
+.up-fade-zoom-enter-to,
+.up-fade-zoom-leave {
+	transform: scale(1);
+	opacity: 1;
+}
+
+.up-zoom-enter-to,
+.up-zoom-leave {
+	transform: scale(1);
+}
+
+.up-slide-up-enter-to,
+.up-slide-up-leave,
+.up-slide-down-enter-to,
+.up-slide-down-leave {
+	transform: translateY(0);
+}
+
+.up-slide-left-enter-to,
+.up-slide-left-leave,
+.up-slide-right-enter-to,
+.up-slide-right-leave {
+	transform: translateX(0);
+}
+
+.up-fade-up-enter-to,
+.up-fade-up-leave,
+.up-fade-down-enter-to,
+.up-fade-down-leave {
+	transform: translateY(0);
+	opacity: 1;
+}
+
+.up-fade-left-enter-to,
+.up-fade-left-leave,
+.up-fade-right-enter-to,
+.up-fade-right-leave {
+	transform: translateX(0);
+	opacity: 1;
 }
