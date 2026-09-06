@@ -10,7 +10,6 @@
       @click="overlayClick"
     ></up-overlay>
     <up-transition
-      :key="pageInline ? 'inline' : position"
       :show="pageInline ? true : show"
       :custom-style="transitionStyle"
       :mode="pageInline ? 'none' : position"
@@ -218,43 +217,34 @@ const position = computed<string>(() => {
 
 const transitionStyle = computed<UTSJSONObject>(() => {
   const style = {
-    display: 'flex',
-    top: 'auto',
-    bottom: 'auto',
-    left: 'auto',
-    right: 'auto'
+    display: 'flex'
   } as UTSJSONObject;
   if (!props.pageInline) {
     style['zIndex'] = parseInt(props.zIndex.toString()) + 1;
     style['position'] = 'fixed';
   }
-  if (props.mode == 'left') {
-    style['left'] = 0;
-    style['top'] = 0;
-    style['bottom'] = 0;
+  style[props.mode] = 0;
+  if (props.mode == 'left' || props.mode == 'right') {
+    return deepMerge(style, {
+      bottom: 0,
+      top: 0
+    }) as UTSJSONObject;
   }
-  else if (props.mode == 'right') {
-    style['right'] = 0;
-    style['top'] = 0;
-    style['bottom'] = 0;
-  }
-  else if (props.mode == 'top') {
-    style['top'] = 0;
-    style['left'] = 0;
-    style['right'] = 0;
-  }
-  else if (props.mode == 'bottom') {
-    style['bottom'] = 0;
-    style['left'] = 0;
-    style['right'] = 0;
+  else if (props.mode == 'top' || props.mode == 'bottom') {
+    return deepMerge(style, {
+      left: 0,
+      right: 0
+    }) as UTSJSONObject;
   }
   else if (props.mode == 'center') {
-    style['top'] = 0;
-    style['bottom'] = 0;
-    style['left'] = 0;
-    style['right'] = 0;
-    style['alignItems'] = 'center';
-    style['justifyContent'] = 'center';
+    return deepMerge(style, {
+      alignItems: 'center',
+      'justify-content': 'center',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0
+    }) as UTSJSONObject;
   }
   return style;
 });
@@ -296,7 +286,7 @@ const contentStyle = computed<UTSJSONObject>(() => {
 });
 
 const overlayDuration = computed<number>(() => {
-  return parseInt(props.duration.toString());
+  return parseInt(props.duration.toString()) + 50;
 });
 
 // DOM 元素引用
@@ -390,13 +380,7 @@ function resetDragState(startY: number, startX: number = 0): void {
   setContentTransitionDuration(0);
 }
 
-let dragCloseTimer: number | null = null;
-
 function resetContentTransform(): void {
-  if (dragCloseTimer != null) {
-    clearTimeout(dragCloseTimer!);
-    dragCloseTimer = null;
-  }
   setContentTransform('none', 0);
   // #ifndef APP
   dragTransform.value = '';
@@ -541,12 +525,8 @@ function onDragend(): void {
       setContentTransform('translateX(100%)');
     }
     close();
-    if (dragCloseTimer != null) {
-      clearTimeout(dragCloseTimer!);
-    }
-    dragCloseTimer = setTimeout(() => {
+    setTimeout(() => {
       resetContentTransform();
-      dragCloseTimer = null;
     }, durationMs);
   }
   else {
@@ -667,13 +647,6 @@ watch(
     if (newVal) {
       resetContentTransform();
     }
-  }
-);
-
-watch(
-  (): string => props.mode,
-  () => {
-    resetContentTransform();
   }
 );
 
