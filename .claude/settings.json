@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx tsc *)",
+      "Bash(node -e \"const c=require\\('./pages.config.json'\\); const s=c.subPackages[0].pages; console.log\\('JSON valid ✓'\\); console.log\\('子包页面数:', s.length\\); const l=s.find\\(p=>p.path==='layoutDemo/layoutDemo'\\); console.log\\(JSON.stringify\\(l,null,2\\)\\);\")",
+      "Bash(node -e \"const p=require\\('./pages.json'\\); const s=JSON.parse\\(require\\('fs'\\).readFileSync\\('./pages.json','utf8'\\)\\); const f=s.subPackages.find\\(x=>x.root==='src/sub'\\); console.log\\(JSON.stringify\\(f.pages.find\\(pg=>pg.path==='layoutDemo/layoutDemo'\\),null,2\\)\\)\")",
+      "Bash(node -e \"const p=JSON.parse\\(require\\('fs'\\).readFileSync\\('pages.json','utf8'\\)\\); console.log\\('tabBar:', JSON.stringify\\(p.tabBar?{...p.tabBar,list:\\(p.tabBar.list||[]\\).length}:null\\)\\); console.log\\('globalStyle.navigationStyle:', p.globalStyle?.navigationStyle\\); console.log\\('首页 style:', JSON.stringify\\(\\(p.pages[0]||{}\\).style||{}\\)\\);\")",
+      "Bash(echo \"=== tsc exit code: $? ===\")",
+      "Bash(grep -o \"rotate-45[^\\\\\"']*\\\\|rotate: \\\\\"[^\\\\\"']*\\\\\"\\\\|'rotate'[^;]\\\\{0,120\\\\}\" node_modules/tailwindcss/dist/lib.mjs)",
+      "Bash(echo \"exit=$?\")",
+      "Bash(grep -rnE \"\\\\{\\\\{[A-Z_]{2,}\\\\}|:style=\\\\\"\\\\{\\\\s*height: .*[A-Z_]{2,}|:height=\" src --include=\"*.uvue\")"
+    ]
+  }
+}

@@ -34,10 +34,9 @@
 
 <script setup lang="uts">
 import Card from '../../basic/components/Card.uvue';
-import { systemInfo, updateSystemInfo } from '../../../utils/systemInfo.uts';
+import { systemInfo } from '../../../utils/systemInfo.uts';
 
 function handleRefresh() {
-  updateSystemInfo();
   uni.showToast({
     title: '系统信息已刷新',
     icon: 'none'

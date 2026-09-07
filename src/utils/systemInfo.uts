@@ -1,4 +1,4 @@
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 
 export type SystemSafeAreaInsets = {
   top: number;
@@ -14,6 +14,9 @@ export type SystemInfoType = {
   windowWidth: number;
   windowHeight: number;
   statusBarHeight: number;
+  // 可用内容高度 = 窗口高度 - 状态栏高度
+  availableHeight: number;
+  navBarHeight: number;
   tabBarHeight: number;
   pixelRatio: number;
   // 设备信息
@@ -32,10 +35,27 @@ export type SystemInfoType = {
   apiBaseUrl: string;
   env: string;
   envName: string;
+  // 安全区域插入距离（同时独立挂一份到 safeAreaInsets ref 上）
+  safeAreaInsets: SystemSafeAreaInsets | null;
 };
 
 export const systemInfo = ref(null as SystemInfoType | null);
 export const safeAreaInsets = ref(null as SystemSafeAreaInsets | null);
+
+/** 便捷响应式：窗口/屏幕宽度（px），未初始化时为 0 */
+export const windowWidth = computed<number>((): number => systemInfo.value?.windowWidth ?? 0);
+/** 便捷响应式：窗口/屏幕高度（px），未初始化时为 0 */
+export const windowHeight = computed<number>((): number => systemInfo.value?.windowHeight ?? 0);
+/** 便捷响应式：屏幕宽度（px），未初始化时为 0 */
+export const screenWidth = computed<number>((): number => systemInfo.value?.screenWidth ?? 0);
+/** 便捷响应式：屏幕高度（px），未初始化时为 0 */
+export const screenHeight = computed<number>((): number => systemInfo.value?.screenHeight ?? 0);
+/** 便捷响应式：状态栏高度（px），未初始化时为 0 */
+export const statusBarHeight = computed<number>((): number => systemInfo.value?.statusBarHeight ?? 0);
+/** 便捷响应式：可用内容高度（px），= 窗口高度 - 状态栏高度，未初始化时为 0 */
+export const availableHeight = computed<number>((): number => systemInfo.value?.availableHeight ?? 0);
+/** 便捷响应式：底部安全区高度（px），未初始化时为 0 */
+export const safeAreaBottom = computed<number>((): number => systemInfo.value?.safeAreaInsets?.bottom ?? 0);
 
 /**
  * 获取当前应用名称（全端从 import.meta.env 读取）
@@ -161,30 +181,59 @@ export function getCompilePlatform(): string {
   // #endif
 }
 
+/**
+ * NavBar 内容区默认基准高度（不含状态栏，单位 px，标准 44px）
+ */
+export const NAVBAR_CONTENT_HEIGHT: number = 44;
+
+/**
+ * TabBar 默认基准高度（单位 px，标准 50px）
+ */
+export const TABBAR_BASE_HEIGHT: number = 50;
+
 export function updateSystemInfo() {
-  // #ifdef MP-WEIXIN
-  // 微信小程序使用新的API
+  // 窗口信息：所有平台统一从 uni.getWindowInfo() 读取
   const windowInfo = uni.getWindowInfo();
+
+  // ---- 编译器版本：各平台来源不同，互相兜底 ----
   let compileVer = '';
+  // #ifdef H5
   try {
-    const appBaseInfo = uni.getAppBaseInfo() as any;
-    compileVer = `${appBaseInfo.appCompilerVersion ?? appBaseInfo.SDKVersion ?? ''}`;
+    const conf = (globalThis as any).__uniConfig as any;
+    if (conf != null && conf.compilerVersion != null) {
+      compileVer = `${conf.compilerVersion}`;
+    }
   }
   catch {}
+  // #endif
+  if (compileVer == '') {
+    try {
+      const appBaseInfo = uni.getAppBaseInfo();
+      // #ifdef MP-WEIXIN
+      compileVer = `${(appBaseInfo as any).appCompilerVersion ?? (appBaseInfo as any).SDKVersion ?? ''}`;
+      // #endif
+      // #ifndef MP-WEIXIN
+      compileVer = appBaseInfo.appVersion ?? '';
+      // #endif
+    }
+    catch {}
+  }
   if (compileVer == '') {
     compileVer = '1.0.0';
   }
+
+  // ---- 品牌 / 型号 / 系统信息：getDeviceInfo 优先，缺失时回退 getSystemInfoSync ----
   let brand = '';
   let model = '';
   let system = '';
   try {
-    const dev = uni.getDeviceInfo() as any;
+    const dev = uni.getDeviceInfo();
     brand = `${dev.brand ?? ''}`;
     model = `${dev.model ?? ''}`;
   }
   catch {}
   try {
-    const sys = uni.getSystemInfoSync() as any;
+    const sys = uni.getSystemInfoSync();
     system = `${sys.system ?? ''}`;
     if (brand == '') {
       brand = `${sys.brand ?? ''}`;
@@ -195,119 +244,60 @@ export function updateSystemInfo() {
   }
   catch {}
 
-  console.log(windowInfo, 'windowInfo');
+  console.log(windowInfo.windowBottom, 111, 'windowInfo');
 
+  // ---- 写入公共系统信息 ----
   systemInfo.value = {
-    screenWidth: windowInfo.screenWidth,
-    screenHeight: windowInfo.screenHeight,
-    windowWidth: windowInfo.windowWidth,
-    windowHeight: windowInfo.windowHeight,
-    statusBarHeight: windowInfo.statusBarHeight,
-    tabBarHeight: 50,
-    pixelRatio: windowInfo.pixelRatio,
-    brand,
-    model,
-    system,
-    compilerVersion: compileVer,
-    uniCompileVersion: compileVer,
-    isVapor: isVaporMode(),
-    compileMode: getCompileMode(),
-    platformName: getCompilePlatform(),
-    appTitle: getAppTitle(),
-    appVersion: getAppVersion(),
-    apiBaseUrl: getApiBaseUrl(),
-    env: getCurrentEnv(),
-    envName: getCurrentEnvName()
+    screenWidth: windowInfo.screenWidth, // 屏幕宽度（px）
+    screenHeight: windowInfo.screenHeight, // 屏幕高度（px）
+    windowWidth: windowInfo.windowWidth, // 窗口可视宽度（px）
+    windowHeight: windowInfo.windowHeight, // 窗口可视高度（px）
+    statusBarHeight: windowInfo.statusBarHeight, // 状态栏高度（px）
+    availableHeight: windowInfo.windowHeight - windowInfo.statusBarHeight, // 可用内容高度（px，窗口高度 - 状态栏高度）
+    tabBarHeight: TABBAR_BASE_HEIGHT, // TabBar 默认基准高度（px）
+    navBarHeight: NAVBAR_CONTENT_HEIGHT, // 导航栏内容区默认基准高度（px）
+    pixelRatio: windowInfo.pixelRatio, // 像素比（dpr）
+    brand, // 设备品牌
+    model, // 设备型号
+    system, // 操作系统及版本
+    compilerVersion: compileVer, // 编译器 / SDK 版本
+    uniCompileVersion: compileVer, // uni 编译器版本（当前与 compilerVersion 同源）
+    isVapor: isVaporMode(), // 是否为 Vapor 渲染模式
+    compileMode: getCompileMode(), // 编译运行模式（Vapor / VDOM + 环境）
+    platformName: getCompilePlatform(), // 编译目标平台
+    appTitle: getAppTitle(), // 应用名称
+    appVersion: getAppVersion(), // 应用版本号
+    apiBaseUrl: getApiBaseUrl(), // 接口 BaseURL 地址
+    env: getCurrentEnv(), // 运行环境标识（development / test / production）
+    envName: getCurrentEnvName(), // 运行环境中文名称
+    safeAreaInsets: null // 安全区域插入距离（稍后单独赋值）
   } as SystemInfoType;
-  const safeArea = windowInfo.safeArea;
-  if (safeArea != null) {
-    safeAreaInsets.value = {
-      top: safeArea.top,
-      right: windowInfo.windowWidth - safeArea.right,
-      bottom: windowInfo.windowHeight - safeArea.bottom,
-      left: safeArea.left
+
+  // ---- 安全区：微信 safeArea 为绝对坐标矩形，其余平台为相对边界距离 ----
+  // #ifdef MP-WEIXIN
+  const safeAreaRect = windowInfo.safeArea;
+  if (safeAreaRect != null) {
+    const insets = {
+      top: safeAreaRect.top,
+      right: windowInfo.windowWidth - safeAreaRect.right,
+      bottom: windowInfo.windowHeight - safeAreaRect.bottom,
+      left: safeAreaRect.left
     } as SystemSafeAreaInsets;
+    safeAreaInsets.value = insets;
+    systemInfo.value.safeAreaInsets = insets;
   }
   // #endif
-
   // #ifndef MP-WEIXIN
-  // 其他平台继续使用uni API
-  const sysInfo = uni.getWindowInfo();
-  let compileVer = '';
-  // #ifdef H5
-  try {
-    const g = globalThis as any;
-    const conf = g.__uniConfig as any;
-    if (conf != null && conf.compilerVersion != null) {
-      compileVer = `${conf.compilerVersion}`;
-    }
-  }
-  catch {}
-  // #endif
-  if (compileVer == '') {
-    try {
-      const appBaseInfo = uni.getAppBaseInfo();
-      compileVer = appBaseInfo.appVersion ?? '';
-    }
-    catch {}
-  }
-  if (compileVer == '') {
-    compileVer = '1.0.0';
-  }
-
-  let brand = '';
-  let model = '';
-  let system = '';
-  try {
-    const dev = uni.getDeviceInfo();
-    brand = dev.brand ?? '';
-    model = dev.model ?? '';
-  }
-  catch {}
-  try {
-    const sys = uni.getSystemInfoSync();
-    system = sys.system ?? '';
-    if (brand == '') {
-      brand = sys.brand ?? '';
-    }
-    if (model == '') {
-      model = sys.model ?? '';
-    }
-  }
-  catch {}
-
-  console.log(sysInfo.windowBottom, 'sysInfo');
-
-  systemInfo.value = {
-    screenWidth: sysInfo.screenWidth,
-    screenHeight: sysInfo.screenHeight,
-    windowWidth: sysInfo.windowWidth,
-    windowHeight: sysInfo.windowHeight,
-    statusBarHeight: sysInfo.statusBarHeight,
-    tabBarHeight: 50,
-    pixelRatio: sysInfo.pixelRatio,
-    brand,
-    model,
-    system,
-    compilerVersion: compileVer,
-    uniCompileVersion: compileVer,
-    isVapor: isVaporMode(),
-    compileMode: getCompileMode(),
-    platformName: getCompilePlatform(),
-    appTitle: getAppTitle(),
-    appVersion: getAppVersion(),
-    apiBaseUrl: getApiBaseUrl(),
-    env: getCurrentEnv(),
-    envName: getCurrentEnvName()
-  } as SystemInfoType;
-  const safeArea = sysInfo.safeAreaInsets;
-  if (safeArea != null) {
-    safeAreaInsets.value = {
-      top: safeArea.top,
-      right: safeArea.right,
-      bottom: safeArea.bottom,
-      left: safeArea.left
+  const safeAreaInset = windowInfo.safeAreaInsets;
+  if (safeAreaInset != null) {
+    const insets = {
+      top: safeAreaInset.top,
+      right: safeAreaInset.right,
+      bottom: safeAreaInset.bottom,
+      left: safeAreaInset.left
     } as SystemSafeAreaInsets;
+    safeAreaInsets.value = insets;
+    systemInfo.value.safeAreaInsets = insets;
   }
   // #endif
 }
@@ -335,11 +325,6 @@ export function isCompilerVersionGte(targetVersion: string): boolean {
   }
   return true;
 }
-
-/**
- * TabBar 默认基准高度（单位 px，标准 50px）
- */
-export const TABBAR_BASE_HEIGHT: number = 50;
 
 /**
  * 实时获取当前 TabBar 高度（单位 px）

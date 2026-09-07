@@ -13,6 +13,9 @@
       <!-- 使用封装的多语言切换组件 -->
       <LangSwitchCard />
 
+      <!-- 布局页面示例组件 -->
+      <LayoutDemoCard />
+
       <!-- 使用封装的图标示例组件 -->
       <IconDemoCard />
 
@@ -36,13 +39,13 @@ import ToastDemoCard from './components/ToastDemoCard.uvue';
 import PropsDemoCard from './components/PropsDemoCard.uvue';
 import IconDemoCard from './components/IconDemoCard.uvue';
 import LangSwitchCard from './components/LangSwitchCard.uvue';
+import LayoutDemoCard from './components/LayoutDemoCard.uvue';
 import ThemeSwitchCard from './components/ThemeSwitchCard.uvue';
 import RouterDemoCard from './components/RouterDemoCard.uvue';
 import HttpDemoCard from './components/HttpDemoCard.uvue';
 import TailwindcssDemoCard from './components/TailwindcssDemoCard.uvue';
 import SystemInfoDemoCard from './components/SystemInfoDemoCard.uvue';
 import { onMounted } from 'vue';
-import { updateSystemInfo } from '@/src/utils/systemInfo';
 import { handleBackPressExit } from '@/src/utils/backPress';
 import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/utils/refresh';
 
@@ -73,7 +76,6 @@ onBackPress((options: OnBackPressOptions): boolean => {
 });
 
 onMounted(() => {
-  updateSystemInfo();
   // #ifdef APP || H5 || MP-WEIXIN
   uni.onWindowResize((_res) => {
     updateSystemInfo();

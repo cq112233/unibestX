@@ -254,6 +254,28 @@ declare global {
       fail?: (result: any) => void;
       complete?: (result: any) => void;
     }) => void;
+
+    /**
+     * 监听窗口尺寸变化（屏幕旋转、App 端键盘弹出等导致窗口大小变化时触发）
+     *
+     * 文档: http://uniapp.dcloud.io/api/ui/window
+     */
+    onWindowResize: (callback: (result: {
+      /** 变化后的窗口大小，单位 px */
+      size: {
+        /** 窗口宽度（px） */
+        windowWidth: number;
+        /** 窗口高度（px） */
+        windowHeight: number;
+      };
+      /** 变化后的设备方向 */
+      deviceOrientation?: 'landscape' | 'portrait';
+    }) => void) => void;
+
+    /**
+     * 取消监听窗口尺寸变化，callback 须传入与 onWindowResize 相同的函数引用
+     */
+    offWindowResize: (callback: (result: any) => void) => void;
   }
 }
 

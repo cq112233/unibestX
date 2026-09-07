@@ -3,6 +3,7 @@
   <view :class="rootClass" :style="rootStyle">
     <!-- 顶部固定自定义导航栏：位于页面内容上方，不随下拉刷新位移 -->
     <NavBar
+      v-if="isCustomNav"
       :is-navbar-visible="isNavbarVisible"
       :title="displayTitle"
       :show-back="showBack"
@@ -17,7 +18,7 @@
     <scroll-view
       v-if="useCustomRefresher"
       :direction="pageScrollDirection"
-      class="flex-1"
+      class="flex-1 flex flex-col"
       :refresher-enabled="isRefresherEnabled"
       :refresher-triggered="isTriggered"
       :refresher-background="themeTokens.bgContent"
@@ -51,6 +52,8 @@ import { useAppStore } from '@/src/store';
 import { getThemeTokens } from '@/src/utils/theme';
 import type { ThemeTokens } from '@/src/utils/theme';
 import { isPageRefresherDisabled, isPageScrollDisabled } from '@/src/utils/pageScroll.uts';
+import { availableHeight, systemInfo, updateSystemInfo } from '@/src/utils/systemInfo.uts';
+import { selectedTabbarStrategy } from '@/src/tabbar/helper/index.uts';
 
 /**
  * 布局属性定义（由 uni-layouts-plugin 编译时自动从页面 definePage 或 pages.json 提取传入）
@@ -158,8 +161,6 @@ const props = defineProps({
     default: ''
   }
 });
-
-console.log(props, 'props');
 
 /**
  * 获取 pageStyle 对象
@@ -339,8 +340,46 @@ const navTitleColor = computed((): string => {
   return props.titleColor;
 });
 
+const isCustomNav = computed((): boolean => {
+  const textStyleFromStyle = (pageStyleObj.value.navigationStyle as string | null) ?? '';
+  if (textStyleFromStyle.length > 0) {
+    if (textStyleFromStyle == 'custom') {
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
+  else {
+    return false;
+  }
+});
+
 const themeTokens = computed((): ThemeTokens => {
   return getThemeTokens(useAppStore().state.isDark);
+});
+
+onMounted(() => {
+  // 让App.ku.uvue先初始化
+  // setTimeout(() => {
+  updateSystemInfo();
+  console.log(selectedTabbarStrategy, isCustomNav?.value, 'selectedTabbarStrategy');
+  // 自定义导航栏（navigationStyle == 'custom'）场景：windowHeight 含状态栏区域，可用内容高度需扣除一次状态栏高度
+  if (selectedTabbarStrategy === 2 || selectedTabbarStrategy === 3) {
+    if (isCustomNav?.value) {
+      console.log('availableHeight =', systemInfo.value.statusBarHeight, systemInfo.value.navBarHeight - 50, 'px');
+      // #ifdef H5
+      systemInfo.value.availableHeight = systemInfo.value.windowHeight - systemInfo.value.statusBarHeight - systemInfo.value.navBarHeight;
+      // #endif
+      // #ifndef H5
+      systemInfo.value.availableHeight = systemInfo.value.windowHeight - systemInfo.value.statusBarHeight - systemInfo.value.navBarHeight;
+      // #endif
+    }
+    else {
+      systemInfo.value.availableHeight = systemInfo.value.windowHeight - systemInfo.value.statusBarHeight;
+    }
+  }
+  // }, 0);
 });
 </script>
 

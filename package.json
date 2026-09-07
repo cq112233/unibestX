@@ -13,6 +13,8 @@
     "build:h5": "node scripts/build-h5.mjs",
     "env:test": "node scripts/switch-env.mjs test",
     "env:prod": "node scripts/switch-env.mjs prod",
+    "build:test": "pnpm env:test && pnpm build:h5",
+    "build:prod": "pnpm env:prod && pnpm build:h5",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "docs:dev": "vitepress dev docs",
