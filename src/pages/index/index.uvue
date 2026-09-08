@@ -8,9 +8,11 @@
       <text class="text-center text-[18px] text-[#334155] font-medium mt-[6px]">
         最好用的 uni-appX 开发模板
       </text>
+
       <!-- 编译运行环境状态卡片 -->
       <view
-        class="mx-[16px] mt-[16px] px-[6px] py-[10px] rounded-[14px] border-[1px] border-solid border-[#e2e8f0] flex flex-row items-center justify-between">
+        class="mx-[16px] mt-[16px] px-[6px] py-[10px] rounded-[14px] border-[1px] border-solid border-[#e2e8f0] flex flex-row items-center justify-between"
+      >
         <!-- 运行平台 -->
         <view class="flex-1 items-center justify-center">
           <text class="text-[10px] text-[#94a3b8] mb-[2px]">编译平台</text>
@@ -20,8 +22,10 @@
         <!-- 当前环境 -->
         <view class="flex-1 items-center justify-center">
           <text class="text-[10px] text-[#94a3b8] mb-[2px]">当前环境</text>
-          <text class="text-[12px] font-bold"
-            :style="{ color: (systemInfo?.env == 'test' ? '#d97706' : (systemInfo?.env == 'production' ? '#dc2626' : '#059669')) }">
+          <text
+            class="text-[12px] font-bold"
+            :style="{ color: (systemInfo?.env == 'test' ? '#d97706' : (systemInfo?.env == 'production' ? '#dc2626' : '#059669')) }"
+          >
             {{ systemInfo?.env == 'test' ? '测试' : (systemInfo?.env == 'production' ? '生产' : '开发') }}
           </text>
         </view>

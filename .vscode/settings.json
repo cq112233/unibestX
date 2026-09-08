@@ -1,6 +1,7 @@
 {
   "files.associations": {
-    "*.dbclient-js": "javascript",
+    // *.uvue 关联为 "vue"，让 Volar 语言服务器处理
+    // Volar 内部在 lang="uts" 时会 fallback 到 ts，从而支持 import 路径跳转
     "*.uvue": "vue",
     "*.uts": "typescript",
     "pages.json": "jsonc",
@@ -12,8 +13,8 @@
     "uvue"
   ],
 
-  // 禁用内置 TS/JS 验证，避免对 .uvue/.uts 文件的扩展名相对路径产生假报错 ts(2307)
-  // 代码规范与语法校验由 ESLint 负责
+  // 禁用内置 TS/JS 验证，避免对 .uvue 文件产生大量假报错
+  // 真正的类型检查由 DCloud 语言服务插件和 ESLint 负责
   "typescript.validate.enable": false,
   "javascript.validate.enable": false,
   "typescript.suggest.paths": true,
@@ -52,9 +53,14 @@
   "typescript.tsdk": "node_modules/typescript/lib",
   "js/ts.tsdk.path": "node_modules/typescript/lib",
   "js/ts.tsdk.promptToUseWorkspaceVersion": true,
+  // 加载 Volar 的 TypeScript 服务器插件，让其处理 .uvue 文件中 lang="uts" 的 import 跳转定义
+  "typescript.tsserver.pluginPaths": [
+    "/Users/chenqi/.antigravity-ide/extensions/vue.volar-3.3.3-universal/dist"
+  ],
+  "editor.formatOnSave": true,
   "editor.tabSize": 2,
   "editor.detectIndentation": false,
-  "editor.formatOnSave": true,
+  "prettier.enable": false,
   "editor.quickSuggestions": {
     "other": "on",
     "comments": "off",
@@ -62,9 +68,6 @@
   },
   "windicss.enableCodeCompletion": false,
   "windicss.enableHover": false,
-  "prettier.enable": false,
-  "eslint.enable": true,
-  "eslint.run": "onSave",
   "editor.defaultFormatter": "dbaeumer.vscode-eslint",
   "eslint.format.enable": true,
 
@@ -96,7 +99,6 @@
     "typescriptreact",
     "vue",
     "uvue",
-    "uts",
     "html",
     "markdown",
     "json",
@@ -115,13 +117,12 @@
     "postcss"
   ],
   "[vue]": {
-    "editor.defaultFormatter": "Vue.volar"
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint",
+    "editor.diagnostics": false
   },
   "[uvue]": {
-    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
-  },
-  "[uts]": {
-    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint",
+    "editor.diagnostics": false
   },
   "i18n-ally.localesPaths": [
     "src/i18n/locales"
@@ -157,9 +158,6 @@
     "moduleResolution": "node",
     "skipLibCheck": true,
     "strict": false
-  },
-  "[typescript]": {
-    "editor.defaultFormatter": "vscode.typescript-language-features"
   },
   "cSpell.words": [
     "uvue",
@@ -250,5 +248,8 @@
     "volar",
     "vueuse",
     "antfu"
-  ]
+  ],
+  "[typescript]": {
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+  }
 }
