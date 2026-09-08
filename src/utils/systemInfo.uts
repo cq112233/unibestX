@@ -1,5 +1,8 @@
 import { computed, ref } from 'vue';
 
+// eslint-disable-next-line import/no-mutable-exports
+export let systemId: number = 0;
+
 export type SystemSafeAreaInsets = {
   top: number;
   right: number;
@@ -390,6 +393,270 @@ export function getWindowHeight(): number {
  */
 export function getStatusBarHeight(): number {
   return uni.getWindowInfo().statusBarHeight;
+}
+
+/**
+ * App.ku.uvue 页面 props 中参与可用高度计算的字段（由 autoRootPlugin 编译期全量注入）
+ */
+export type AppKuHeightProps = {
+  /** 是否隐藏导航栏（true 时可用高度不扣除导航栏高度 navBarHeight） */
+  hideNavbar: boolean;
+  /** 页面 style 完整配置对象（与 App.ku.uvue 的 pageStyle prop 同源，含 navigationStyle，可能为空） */
+  pageStyle: UTSJSONObject | null;
+  /** 页面布局模板标识：不是 'navbar'（如 default 等无导航布局）时状态栏与导航栏都不扣除；'navbar' 正常扣除 */
+  layout: string;
+};
+
+export function updateAvailableHeight(kuProps: AppKuHeightProps, selectedTabbarStrategy: number): void {
+  updateSystemInfo();
+  console.log(kuProps, selectedTabbarStrategy, systemInfo, 'selectedTabbarStrategy-0907');
+  // 非空收窄：局部 sys 固定为 SystemInfoType，避免对可空的 systemInfo.value 逐个 ?. / !! 处理（?. 得到 Number? 不能直接参与运算）
+  const sys = systemInfo.value;
+  if (sys == null) {
+    return;
+  }
+  const safeBottom: number = sys.safeAreaInsets?.bottom ?? 0;
+  const safeTop: number = sys.safeAreaInsets?.safeTop ?? 0;
+
+  // 是否自定义导航栏（navigationStyle == 'custom'）：由注入的 pageStyle 推导，与 App.ku.uvue 内 isCustomNav 判定同源
+  const kuPageStyle: UTSJSONObject | null = kuProps.pageStyle ?? null;
+  const navStyleText: string = kuPageStyle != null ? ((kuPageStyle.navigationStyle as string | null) ?? '') : '';
+  const isCustomNav: boolean = navStyleText == 'custom';
+  // 自定义导航栏（navigationStyle == 'custom'）场景：windowHeight 含状态栏区域，可用内容高度需扣除一次状态栏高度
+  if (selectedTabbarStrategy == 2 || selectedTabbarStrategy == 3) {
+    if (isCustomNav) {
+      // 布局不是 'navbar'（default 等无自定义导航布局）时，窗口内没有导航栏占位，状态栏与导航栏高度都不扣除
+      const isNoNavbarLayout: boolean = kuProps.layout != 'navbar';
+      const statusBarOffset: number = isNoNavbarLayout ? 0 : sys.statusBarHeight;
+      // hideNavbar 为 true（页面隐藏导航栏）或非 navbar 布局时，可用高度不扣除导航栏高度
+      const navBarOffset: number = (kuProps.hideNavbar || isNoNavbarLayout) ? 0 : sys.navBarHeight;
+
+      // #ifdef H5
+      console.log('H5😂', sys.windowHeight, sys.statusBarHeight, sys.navBarHeight, safeAreaBottom.value, safeBottom);
+      if (systemId == 0) {
+        sys.availableHeight = sys.windowHeight - statusBarOffset - navBarOffset;
+      }
+      else {
+        sys.availableHeight = sys.windowHeight - statusBarOffset - navBarOffset - sys.tabBarHeight;
+      }
+      systemId++;
+      // #endif
+
+      // #ifdef APP-ANDROID
+      if (isVaporMode()) {
+        //👌 695
+        console.log(`第${systemId}次`);
+        console.log('蒸汽安卓😂', sys.windowHeight, sys.statusBarHeight, sys.navBarHeight, safeAreaBottom.value, safeBottom);
+        sys.availableHeight = sys.windowHeight - statusBarOffset - navBarOffset - sys.tabBarHeight - safeBottom;
+      }
+      else {
+        console.log(`第${systemId}次`);
+        console.log('VDOM安卓😂', sys.windowHeight, sys.statusBarHeight, sys.navBarHeight, safeAreaBottom.value, safeBottom);
+        if (systemId == 0) {
+          sys.availableHeight = sys.windowHeight - navBarOffset - safeBottom;
+        }
+        else {
+          sys.availableHeight = sys.windowHeight - statusBarOffset - navBarOffset - sys.tabBarHeight - safeBottom;
+        }
+        systemId++;
+      }
+
+      // #endif
+
+      // #ifdef APP-IOS
+      if (isVaporMode()) {
+        //👌 852 670
+        console.log(`第${systemId}次`);
+        console.log('蒸汽-IOS😂');
+        console.log(`窗口windowHeight:${sys.windowHeight}`,852);
+        console.log(`状态栏statusBarHeight:${sys.statusBarHeight}`,54);
+        console.log(`导航栏navBarHeight:${sys.navBarHeight}`,44);
+        console.log(`tabBarHeight:${sys.tabBarHeight}`,50);
+        console.log(`safeBottom:${safeBottom}`,34);
+        console.log(`safeTop:${safeTop}`,0);
+        console.log('----', sys.windowHeight - sys.statusBarHeight - sys.navBarHeight - sys.tabBarHeight - safeBottom)
+        sys.availableHeight = sys.windowHeight - statusBarOffset - navBarOffset - sys.tabBarHeight - safeBottom;
+        console.log(`蒸汽模式-IOS-availableHeight: ${sys.availableHeight}`);
+
+      }
+      else {
+        console.log(`第${systemId}次`);
+        console.log('VDOM-IOS😂');
+        console.log(`窗口windowHeight:${sys.windowHeight}`);
+        console.log(`状态栏statusBarHeight:${sys.statusBarHeight}`);
+        console.log(`导航栏navBarHeight:${sys.navBarHeight}`);
+        console.log(`tabBarHeight:${sys.tabBarHeight}`);
+        console.log(`safeBottom:${safeBottom}`);
+        if (systemId <= 1) {
+          sys.availableHeight = sys.windowHeight - statusBarOffset - navBarOffset - safeBottom;
+          console.log(`availableHeight得到高度:${sys.availableHeight}`);
+        }
+        else {
+          sys.availableHeight = sys.windowHeight - statusBarOffset - navBarOffset - sys.tabBarHeight - safeBottom;
+          console.log(`availableHeight得到高度:${sys.availableHeight}`);
+        }
+        systemId++;
+      }
+      // #endif
+
+      // #ifdef APP-HARMONY
+      if (isVaporMode()) {
+        console.log(`第${systemId}次`);
+        console.log('蒸汽鸿蒙😂', systemId, sys.windowHeight, sys.statusBarHeight, sys.navBarHeight, sys.tabBarHeight, safeBottom);
+        if (systemId <= 1) {
+          console.log(sys.windowHeight, ' sys.windowHeight');
+          sys.availableHeight = sys.windowHeight - statusBarOffset - navBarOffset;
+        }
+        else {
+          sys.availableHeight = sys.windowHeight - statusBarOffset - navBarOffset - sys.tabBarHeight - safeBottom;
+        }
+        systemId++;
+      }
+      else {
+        console.log(`第${systemId}次`);
+        console.log('VDOM鸿蒙😂');
+        console.log(`窗口windowHeight:${sys.windowHeight}`);
+        console.log(`状态栏statusBarHeight:${sys.statusBarHeight}`);
+        console.log(`导航栏navBarHeight:${sys.navBarHeight}`);
+        console.log(`tabBarHeight:${sys.tabBarHeight}`);
+        console.log(`safeBottom:${safeBottom}`);
+        if (systemId <= 1) {
+          sys.availableHeight = sys.windowHeight - statusBarOffset - navBarOffset - sys.tabBarHeight - safeBottom;
+          console.log(`availableHeight得到高度:${sys.availableHeight}`);
+        }
+        else {
+          sys.availableHeight = sys.windowHeight - statusBarOffset - navBarOffset - sys.tabBarHeight - safeBottom;
+          console.log(`availableHeight得到高度:${sys.availableHeight}`);
+        }
+        systemId++;
+      }
+      // #endif
+
+      // #ifdef MP-WEIXIN
+      console.log('微信小程序😂', sys.windowHeight, sys.statusBarHeight, sys.navBarHeight, sys.tabBarHeight, safeBottom);
+      sys.availableHeight = sys.windowHeight - statusBarOffset - navBarOffset - sys.tabBarHeight - safeBottom;
+      // #endif
+    }
+    else {
+      // #ifdef H5
+      console.log('H5😂', sys.windowHeight, sys.statusBarHeight, sys.navBarHeight, safeAreaBottom.value, safeBottom);
+      if (systemId == 0) {
+        sys.availableHeight = sys.windowHeight - statusBarOffset - navBarOffset;
+      }
+      else {
+        sys.availableHeight = sys.windowHeight - statusBarOffset - navBarOffset - sys.tabBarHeight;
+      }
+      systemId++;
+      // #endif
+
+      // #ifdef APP-ANDROID
+      if (isVaporMode()) {
+        //👌 695
+        console.log(`第${systemId}次`);
+        console.log('蒸汽安卓😂', sys.windowHeight, sys.statusBarHeight, sys.navBarHeight, safeAreaBottom.value, safeBottom);
+        sys.availableHeight = sys.windowHeight - statusBarOffset - navBarOffset - sys.tabBarHeight - safeBottom;
+      }
+      else {
+        console.log(`第${systemId}次`);
+        console.log('VDOM安卓😂', sys.windowHeight, sys.statusBarHeight, sys.navBarHeight, safeAreaBottom.value, safeBottom);
+        if (systemId == 0) {
+          sys.availableHeight = sys.windowHeight - navBarOffset - safeBottom;
+        }
+        else {
+          sys.availableHeight = sys.windowHeight - statusBarOffset - navBarOffset - sys.tabBarHeight - safeBottom;
+        }
+        systemId++;
+      }
+      // #endif
+
+      // #ifdef APP-IOS
+      if (isVaporMode()) {
+        //👌 749 670
+        console.log(`第${systemId}次`);
+        console.log('蒸汽-IOS😂');
+        console.log(`窗口screenHeight:${sys.screenHeight}`,852);
+        console.log(`窗口windowHeight:${sys.windowHeight}`,749);
+        console.log(`状态栏statusBarHeight:${sys.statusBarHeight}`,54);
+        console.log(`导航栏navBarHeight:${sys.navBarHeight}`,44);
+        console.log(`tabBarHeight:${sys.tabBarHeight}`,50);
+        console.log(`safeBottom:${safeBottom}`,34);
+        console.log(`safeTop:${safeTop}`,0);
+        console.log('----', sys.screenHeight - sys.statusBarHeight - sys.navBarHeight - sys.tabBarHeight - safeBottom)
+        sys.availableHeight = sys.screenHeight - sys.navBarHeight - sys.statusBarHeight - sys.tabBarHeight - safeBottom;
+        console.log(`蒸汽模式-IOS-availableHeight: ${sys.availableHeight}`);
+      }
+      else {
+        console.log(`第${systemId}次`);
+        console.log('VDOM-IOS😂');
+        console.log(`窗口windowHeight:${sys.windowHeight}`);
+        console.log(`状态栏statusBarHeight:${sys.statusBarHeight}`);
+        console.log(`导航栏navBarHeight:${sys.navBarHeight}`);
+        console.log(`tabBarHeight:${sys.tabBarHeight}`);
+        console.log(`safeBottom:${safeBottom}`);
+        if (systemId <= 1) {
+          sys.availableHeight = sys.windowHeight - statusBarOffset - navBarOffset - safeBottom;
+          console.log(`availableHeight得到高度:${sys.availableHeight}`);
+        }
+        else {
+          sys.availableHeight = sys.windowHeight - statusBarOffset - navBarOffset - sys.tabBarHeight - safeBottom;
+          console.log(`availableHeight得到高度:${sys.availableHeight}`);
+        }
+        systemId++;
+      }
+      // #endif
+
+      // #ifdef APP-HARMONY
+      if (isVaporMode()) {
+        console.log(`第${systemId}次`);
+        console.log('蒸汽-鸿蒙😂');
+        console.log(`窗口screenHeight:${sys.screenHeight}`);
+        console.log(`窗口windowHeight:${sys.windowHeight}`,749);
+        console.log(`状态栏statusBarHeight:${sys.statusBarHeight}`,54);
+        console.log(`导航栏navBarHeight:${sys.navBarHeight}`,44);
+        console.log(`tabBarHeight:${sys.tabBarHeight}`,50);
+        console.log(`safeBottom:${safeBottom}`,34);
+        console.log(`safeTop:${safeTop}`,0);
+        console.log('----', sys.screenHeight - sys.statusBarHeight - sys.navBarHeight - sys.tabBarHeight - safeBottom)
+        if (systemId <= 1) {
+          sys.availableHeight = sys.windowHeight - sys.statusBarHeight - sys.navBarHeight;
+        }
+        else {
+          sys.availableHeight = sys.windowHeight -  sys.navBarHeight  - sys.navBarHeight - sys.tabBarHeight - safeBottom;
+        }
+        systemId++;
+      }
+      else {
+        console.log(`第${systemId}次`);
+        console.log('VDOM鸿蒙😂');
+        console.log(`窗口screenHeight:${sys.screenHeight}`);
+        console.log(`窗口windowHeight:${sys.windowHeight}`,749);
+        console.log(`状态栏statusBarHeight:${sys.statusBarHeight}`,54);
+        console.log(`导航栏navBarHeight:${sys.navBarHeight}`,44);
+        console.log(`tabBarHeight:${sys.tabBarHeight}`,50);
+        console.log(`safeBottom:${safeBottom}`,34);
+        console.log(`safeTop:${safeTop}`,0);
+        if (systemId <= 1) {
+          sys.availableHeight = sys.windowHeight - sys.statusBarHeight - sys.navBarHeight - sys.tabBarHeight - safeBottom;
+          console.log(`availableHeight得到高度:${sys.availableHeight}`);
+        }
+        else {
+          sys.availableHeight = sys.windowHeight - sys.statusBarHeight - sys.navBarHeight - sys.tabBarHeight - safeBottom;
+          console.log(`availableHeight得到高度:${sys.availableHeight}`);
+        }
+        systemId++;
+      }
+      // #endif
+
+      // #ifdef MP-WEIXIN
+      console.log('微信小程序😂', sys.windowHeight, sys.statusBarHeight, sys.navBarHeight, sys.tabBarHeight, safeBottom);
+      sys.availableHeight = sys.windowHeight - statusBarOffset - navBarOffset - sys.tabBarHeight - safeBottom;
+      // #endif
+    }
+  }
+  // if (selectedTabbarStrategy === 1) {
+
+  // }
+  console.log('AppKu:', sys.availableHeight, selectedTabbarStrategy, isCustomNav, 'selectedTabbarStrategy');
 }
 
 // 初始化获取一次

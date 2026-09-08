@@ -22,9 +22,61 @@ import { customTabbarEnable, isCapsuleTabbar, isPageTabbar, syncCurIdxByCurrentP
 import { useAppStore } from '@/src/store';
 import { applyNavbarTheme, getThemeTokens } from '@/src/utils/theme';
 import { computed, onMounted, ref, watch } from 'vue';
+import { updateAvailableHeight } from '@/src/utils/systemInfo.uts';
+import { selectedTabbarStrategy } from '@/src/tabbar/helper/index.uts';
+
+/**
+ * 页面参数 Props：由 autoRootPlugin 编译时从 pages.json 提取（与 LayoutComponent 同一套、全量注入），
+ * 每页一个 AppKu 实例，各自拿到自己页面的参数，供挂载阶段按页面做可用高度等计算。
+ * 注：layout 也随页面注入（default 布局不扣状态栏/导航栏）；type/debug 等 definePage 私有键不会写入 pages.json，收不到。
+ */
+const props = defineProps({
+  /** 是否显示左侧返回按钮（默认 true） */
+  showBack: {
+    type: Boolean,
+    default: true
+  },
+  /** 是否隐藏导航栏（默认 false） */
+  hideNavbar: {
+    type: Boolean,
+    default: false
+  },
+  /** 页面布局模板标识（非 navbar 布局按无导航处理，参与可用高度计算时不扣状态栏/导航栏） */
+  layout: {
+    type: String,
+    default: ''
+  },
+  /** 是否启用内容区域的自定义下拉刷新 */
+  enablePullDownRefresh: {
+    type: Boolean,
+    default: false
+  },
+  /** 页面根容器自定义类名（页面 customPageClass） */
+  customPageClass: {
+    type: String,
+    default: ''
+  },
+  /** 页面根容器自定义行内样式（页面 customPageStyle） */
+  customPageStyle: {
+    type: String,
+    default: ''
+  },
+  /** 页面 style 完整配置对象（未拍平：navigationStyle / navigationBarTitleText / navigationBarBackgroundColor 等） */
+  pageStyle: {
+    type: Object,
+    default: () => ({})
+  }
+});
 
 // 激活应用状态管理 Store
 const appStore = useAppStore();
+
+/**
+ * 获取 pageStyle 对象
+ */
+const pageStyleObj = computed((): UTSJSONObject => {
+  return (props.pageStyle ?? {}) as UTSJSONObject;
+});
 
 // 主题样式变量：亮 / 暗两套，跟随 appStore.state.isDark 响应式切换
 const themeStyle = computed((): UTSJSONObject => {
@@ -67,8 +119,29 @@ watch((): boolean => appStore.state.isDark, (newVal: boolean) => {
   applyNavbarTheme(newVal);
 });
 
+const isCustomNav = computed((): boolean => {
+  const textStyleFromStyle = (pageStyleObj.value.navigationStyle as string | null) ?? '';
+  if (textStyleFromStyle.length > 0) {
+    if (textStyleFromStyle == 'custom') {
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
+  else {
+    return false;
+  }
+});
+
 onShow(() => {
-  console.log(11, 'xxxxx');
+  console.log('AppKu:onShow');
+  // defineProps 生成的 props 类型（GenAppku）不能直接赋给 AppKuHeightProps 接口，按字段组装字面量传入
+  updateAvailableHeight({
+    hideNavbar: props.hideNavbar,
+    pageStyle: (props.pageStyle ?? {}) as UTSJSONObject,
+    layout: props.layout
+  }, selectedTabbarStrategy);
 });
 </script>
 
