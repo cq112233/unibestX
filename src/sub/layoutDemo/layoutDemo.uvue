@@ -1,12 +1,182 @@
 <template>
-  <!-- 布局页面示例：内容留空，由你自行编写测试布局效果 -->
-  <view class="p-[16px]">
-    <!-- TODO: 在此填写你的布局测试内容（flex / scroll / 组件等） -->
-    <text>布局页面示例</text>
+  <!-- 页面根容器：view + flex flex-col flex-1（flex-1 撑满开发高度）；所有内容放入内部自写的 scroll-view 滚动 -->
+  <view class="flex flex-col flex-1 items-center px-[16px] pt-[8px]">
+    <!-- 固定说明区（不随内容滚动） -->
+    <view class="w-full mb-[16px]" :style="{ maxWidth: '520px' }">
+      <view class="w-full bg-white rounded-[12px] p-[16px] flex flex-col">
+        <view class="flex-row items-center mb-[10px]">
+          <view class="w-[6px] h-[16px] rounded-[3px] bg-[#3b82f6] mr-[8px]" />
+          <text class="text-[16px] font-bold text-[#1e293b]">布局骨架示例</text>
+          <text class="text-[11px] text-[#94a3b8] ml-[8px] px-[6px] py-[2px] rounded-[4px] bg-[#f1f5f9]">说明</text>
+        </view>
+        <text class="text-[13px] text-[#64748b] leading-[19px]">
+          本页演示用 navbar / default 布局写一个能滚动的页面骨架：根容器用 view + flex-1，滚动区域在内部自写 scroll-view，内容高度直接用 computedAvailableHeight，其余交给框架。
+        </text>
+        <view class="flex-row flex-wrap mt-[12px]">
+          <view class="rounded-[6px] px-[8px] py-[4px] bg-[#eff6ff] mr-[8px] mb-[8px]">
+            <text class="text-[11px] text-[#1d4ed8]">① 根用 view</text>
+          </view>
+          <view class="rounded-[6px] px-[8px] py-[4px] bg-[#ecfdf5] mr-[8px] mb-[8px]">
+            <text class="text-[11px] text-[#065f46]">② 内部 scroll-view</text>
+          </view>
+          <view class="rounded-[6px] px-[8px] py-[4px] bg-[#fffbeb] mr-[8px] mb-[8px]">
+            <text class="text-[11px] text-[#92400e]">③ 高度抄 computedAvailableHeight</text>
+          </view>
+        </view>
+      </view>
+    </view>
+    <!-- 内部 scroll-view：居中列 + 整列滚动，@scroll / @scrolltolower 监听滚动与触底 -->
+    <scroll-view direction="vertical" class="w-full flex flex-col flex-1" :style="{ maxWidth: '520px' }"
+      :lower-threshold="50" @scroll="handleScroll" @scrolltolower="handleScrollToLower">
+      <view class="flex flex-col">
+        <!-- 小白三步：你只需要做到这几点 -->
+        <view class="w-full bg-white rounded-[12px] p-[16px] mb-[16px] flex flex-col">
+          <view class="pb-[8px]">
+            <text class="text-[14px] font-semibold text-[#334155]">你只需要三步</text>
+          </view>
+          <view class="h-[1px] bg-[#f1f5f9] mb-[10px]" />
+
+          <view class="flex-row items-start mb-[10px]">
+            <view
+              class="w-[20px] h-[20px] rounded-[5px] bg-[#dbeafe] flex items-center justify-center mr-[10px] flex-none">
+              <text class="text-[12px] font-bold text-[#1d4ed8]">1</text>
+            </view>
+            <view class="flex flex-row flex-wrap flex-1">
+              <text class="text-[13px] text-[#475569] leading-[20px]">根容器写 </text>
+              <text class="text-[13px] text-[#1d4ed8] leading-[20px]">view class="flex flex-col flex-1"</text>
+              <text class="text-[13px] text-[#475569] leading-[20px]">，撑满开发高度。</text>
+            </view>
+          </view>
+
+          <view class="flex-row items-start mb-[10px]">
+            <view
+              class="w-[20px] h-[20px] rounded-[5px] bg-[#dbeafe] flex items-center justify-center mr-[10px] flex-none">
+              <text class="text-[12px] font-bold text-[#1d4ed8]">2</text>
+            </view>
+            <view class="flex flex-row flex-wrap flex-1">
+              <text class="text-[13px] text-[#475569] leading-[20px]">要滚动的区域，在根里面自写一个 </text>
+              <text class="text-[13px] text-[#1d4ed8] leading-[20px]">scroll-view</text>
+              <text class="text-[13px] text-[#475569] leading-[20px]"> 即可。</text>
+            </view>
+          </view>
+
+          <view class="flex-row items-start">
+            <view
+              class="w-[20px] h-[20px] rounded-[5px] bg-[#dbeafe] flex items-center justify-center mr-[10px] flex-none">
+              <text class="text-[12px] font-bold text-[#1d4ed8]">3</text>
+            </view>
+            <view class="flex flex-row flex-wrap flex-1">
+              <text class="text-[13px] text-[#475569] leading-[20px]">内容高度直接绑定 </text>
+              <text class="text-[13px] text-[#1d4ed8] leading-[20px]">computedAvailableHeight</text>
+              <text class="text-[13px] text-[#475569] leading-[20px]">，其余交给框架。</text>
+            </view>
+          </view>
+        </view>
+
+        <!-- 约定细节：为什么这么做 -->
+        <view class="w-full bg-white rounded-[12px] p-[16px] mb-[16px] flex flex-col">
+          <view class="pb-[8px]">
+            <text class="text-[14px] font-semibold text-[#334155]">约定细节</text>
+          </view>
+          <view class="h-[1px] bg-[#f1f5f9] mb-[10px]" />
+
+          <view class="flex-row items-start mb-[10px]">
+            <view class="w-[6px] h-[6px] rounded-[3px] bg-[#3b82f6] mr-[8px] mt-[8px]" />
+            <view class="flex-1 flex-col">
+              <text class="text-[13px] text-[#475569] leading-[20px]">
+                根容器用 view，不要用 scroll-view 当根，否则和布局的滚动容器双重滚动冲突。
+              </text>
+            </view>
+          </view>
+          <view class="h-[1px] bg-[#f1f5f9] mb-[10px]" />
+
+          <view class="flex-row items-start mb-[10px]">
+            <view class="w-[6px] h-[6px] rounded-[3px] bg-[#10b981] mr-[8px] mt-[8px]" />
+            <view class="flex-1 flex-col">
+              <text class="text-[13px] text-[#475569] leading-[20px]">
+                可用高度 computedAvailableHeight 就是你要写的高度，状态栏/导航栏/tabbar 框架已算好。
+              </text>
+            </view>
+          </view>
+          <view class="h-[1px] bg-[#f1f5f9] mb-[10px]" />
+
+          <view class="flex-row items-start">
+            <view class="w-[6px] h-[6px] rounded-[3px] bg-[#f59e0b] mr-[8px] mt-[8px]" />
+            <view class="flex-1 flex-col">
+              <text class="text-[13px] text-[#475569] leading-[20px]">
+                VITE_TABBAR_MODE=1 时不包含底部 tabbar 区域（底部非编辑区，无需计入）。
+              </text>
+            </view>
+          </view>
+        </view>
+
+        <!-- 最小模板：可直接照抄 -->
+        <view class="w-full bg-white rounded-[12px] p-[16px] mb-[16px] flex flex-col">
+          <view class="pb-[8px]">
+            <text class="text-[14px] font-semibold text-[#334155]">最小模板</text>
+          </view>
+          <view class="h-[1px] bg-[#f1f5f9] mb-[10px]" />
+          <view class="w-full bg-[#0f172a] rounded-[8px] p-[12px]">
+            <text class="text-[11px] text-[#38bdf8] leading-[17px]" style="font-family: monospace;">{{ codeTemplate
+              }}</text>
+          </view>
+        </view>
+
+        <!-- 实时指标 -->
+        <view class="w-full bg-white rounded-[12px] p-[16px] mb-[16px] flex flex-col">
+          <view class="pb-[8px]">
+            <text class="text-[14px] font-semibold text-[#334155]">实时指标</text>
+          </view>
+          <view class="h-[1px] bg-[#f1f5f9] mb-[12px]" />
+          <view class="flex-row items-center justify-between">
+            <view class="flex-col flex-1 items-center">
+              <text class="text-[20px] font-bold text-[#3b82f6]">{{ computedAvailableHeight }}</text>
+              <text class="text-[12px] text-[#94a3b8] mt-[2px]">可用高度 px</text>
+            </view>
+            <view class="w-[1px] bg-[#f1f5f9]" />
+            <view class="flex-col flex-1 items-center">
+              <text class="text-[20px] font-bold text-[#10b981]">{{ scrollTop }}</text>
+              <text class="text-[12px] text-[#94a3b8] mt-[2px]">scrollTop</text>
+            </view>
+            <view class="w-[1px] bg-[#f1f5f9]" />
+            <view class="flex-col flex-1 items-center">
+              <text class="text-[20px] font-bold text-[#f59e0b]">{{ reachBottomCount }}</text>
+              <text class="text-[12px] text-[#94a3b8] mt-[2px]">触底</text>
+            </view>
+          </view>
+        </view>
+
+        <!-- 滚动演示列表 -->
+        <view v-for="(item, index) in demoItems" :key="index"
+          class="w-full bg-white rounded-[12px] p-[16px] mb-[16px] flex flex-col">
+          <view class="flex-row items-center mb-[10px]">
+            <view :style="{ backgroundColor: item.color }"
+              class="w-[44px] h-[44px] rounded-[22px] flex items-center justify-center mr-[12px] flex-none">
+              <text class="text-[18px] font-bold text-[#ffffff]">{{ item.avatar }}</text>
+            </view>
+            <view class="flex-col flex-1">
+              <text class="text-[15px] font-semibold text-[#1e293b]">{{ item.title }}</text>
+              <text class="text-[12px] text-[#64748b] mt-[2px]">{{ item.subtitle }}</text>
+            </view>
+            <view :style="{ backgroundColor: item.color }" class="rounded-[20px] px-[10px] py-[3px] flex-none">
+              <text class="text-[11px] text-[#ffffff]">{{ item.tag }}</text>
+            </view>
+          </view>
+          <text class="text-[13px] text-[#475569] leading-[19px]">{{ item.desc }}</text>
+        </view>
+
+        <view class="flex-col items-center py-[16px]">
+          <text class="text-[12px] text-[#94a3b8]">已触底 {{ reachBottomCount }} 次 · 内容结束</text>
+        </view>
+      </view>
+    </scroll-view>
   </view>
 </template>
 
 <script setup lang="uts">
+import { computed, ref } from 'vue';
+import { availableHeight } from '@/src/utils/systemInfo.uts';
+
 definePage({
   layout: 'navbar',
   showBack: true,
@@ -17,7 +187,54 @@ definePage({
     navigationStyle: 'custom'
   }
 });
+
+/**
+ * 开发者可写区域高度（框架已按当前布局算好，navbar / default 通用）
+ * 根容器 flex-1 即撑满该高度；此值用于需要显式定高/定位时绑定。
+ */
+const computedAvailableHeight = computed<number>((): number => availableHeight.value ?? 0);
+
+/** 最小模板（内部自写 scroll-view 的可照抄骨架） */
+const codeTemplate = `<view class="flex flex-col flex-1">
+  <!-- 顶部固定内容（可选） -->
+
+  <scroll-view direction="vertical" class="flex-1 flex flex-col"
+    @scroll="onScroll" @scrolltolower="onLower">
+    <!-- 滚动内容 -->
+  </scroll-view>
+</view>`;
+
+/** 滚动演示数据 */
+type DemoItem = {
+  title: string;
+  subtitle: string;
+  desc: string;
+  tag: string;
+  avatar: string;
+  color: string;
+};
+
+const demoItems: Array<DemoItem> = [
+  { title: '首页', subtitle: 'Home', desc: '根容器 flex-1 撑满开发高度，滚动区域在内部自写 scroll-view。', tag: '首页', avatar: '首', color: '#3b82f6' },
+  { title: '向下滑动', subtitle: 'Scroll me', desc: '此列表由内部 scroll-view 滚动，@scroll 会实时更新 scrollTop。', tag: '滚动', avatar: '滚', color: '#10b981' },
+  { title: '第三项', subtitle: 'Item 3', desc: '滚动超出后内部 scroll-view 接管、触底检测独立生效。', tag: '示例', avatar: '3', color: '#f59e0b' },
+  { title: '第四项', subtitle: 'Item 4', desc: '触底时触发 @scrolltolower，次数在上方指标卡累加。', tag: '触底', avatar: '4', color: '#ec4899' },
+  { title: '第五项', subtitle: 'Item 5', desc: '根容器必须为 view（非 scroll-view），避免与布局产生双重滚动冲突。', tag: '规范', avatar: '5', color: '#8b5cf6' },
+  { title: '第六项', subtitle: 'Item 6', desc: '可用高度 computedAvailableHeight 即你要写的高度，框架已算好。', tag: '高度', avatar: '6', color: '#06b6d4' },
+  { title: '第七项', subtitle: 'Item 7', desc: 'VITE_TABBAR_MODE=1 时不包含底部 tabbar 区域，底部非编辑区。', tag: '模式', avatar: '7', color: '#6366f1' },
+  { title: '第八项', subtitle: 'Item 8', desc: '按 H5 正常开发即可，无需再手算状态栏/导航栏/tabbar 偏移。', tag: 'H5', avatar: '8', color: '#0ea5e9' }
+];
+
+/** 当前滚动位置与触底计数（由内部 scroll-view 驱动） */
+const scrollTop = ref(0);
+const reachBottomCount = ref(0);
+
+function handleScroll(e: UniScrollEvent): void {
+  scrollTop.value = Math.ceil(e.detail.scrollTop);
+}
+function handleScrollToLower(): void {
+  reachBottomCount.value++;
+}
 </script>
 
-<style>
-</style>
+<style></style>

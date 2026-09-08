@@ -1,6 +1,6 @@
 <script lang="uts" setup>
-import { safeAreaInsets, systemInfo, updateSystemInfo, windowHeight } from '@/src/utils/systemInfo.uts';
-import { onMounted } from 'vue';
+import { safeAreaInsets, systemInfo, updateSystemInfo, windowHeight, availableHeight } from '@/src/utils/systemInfo.uts';
+import { computed, onMounted, watch } from 'vue';
 
 definePage({
   customPageClass: '.root-page', // 页面根容器自定义类名（配合 layout 布局使用，支持配置全局样式类）
@@ -11,12 +11,12 @@ definePage({
   layout: 'navbar', // 页面通用布局模板（采用 navbar 布局接管顶部导航与下拉滚动容器）
   showBack: false, // 导航栏左侧是否显示返回箭头（TabBar 首页无需返回按钮）
   hideNavbar: false, // 是否隐藏顶部导航栏（false 为正常显示）
-  enablePullDownRefresh: false, // 是否开启自定义下拉刷新（由 navbar 布局内的 scroll-view 驱动）
+  enablePullDownRefresh: true, // 是否开启自定义下拉刷新（由 navbar 布局内的 scroll-view 驱动）
   style: {
-    navigationBarTextStyle: '#000000',
+    navigationBarTextStyle: 'black',
     navigationBarBackgroundColor: '#ffffff', // 导航栏背景颜色（十六进制颜色值）
     navigationBarTitleText: '首页', // 页面与导航栏标题文本
-    // navigationStyle: 'custom' // 导航栏样式设为自定义（隐藏系统原生导航栏）
+    navigationStyle: 'custom' // 导航栏样式设为自定义（隐藏系统原生导航栏）
   }
 });
 
@@ -32,27 +32,27 @@ onMounted(() => {
   // });
 });
 
-const computedWindowHeight = computed(() => {
-  return systemInfo.value?.windowHeight;
-});
-const computedAvailableHeight = computed(() => {
-  return systemInfo.value?.availableHeight;
-});
-console.log(windowHeight.value, 'windowHeight.value');
+const computedWindowHeight = computed<number>((): number => systemInfo.value?.windowHeight ?? 0);
+const computedAvailableHeight = computed<number>((): number => availableHeight.value ?? 0);
+watch((): number => computedAvailableHeight.value, () => {
+  console.log(computedAvailableHeight.value, 'computedAvailableHeight.value-123');
+})
 </script>
 
 <template>
-  <view :style="{ height: `${computedAvailableHeight}px` }" class="bg-[red]">
-    <text>
-      {{ computedWindowHeight }}
-    </text>
-    <text>
-      {{ windowHeight }}
-    </text>
-    <text>
-      {{ computedAvailableHeight }}
-    </text>
-  </view>
+  <scroll-view direction="vertical" class="flex-1 flex-col flex bg-[red]">
+    <view :style="{ height: `${computedAvailableHeight + 1000}px` }" class="bg-[green]">
+      <text>
+        {{ computedWindowHeight }}
+      </text>
+      <text>
+        {{ windowHeight }}
+      </text>
+      <text>
+        {{ computedAvailableHeight }}
+      </text>
+    </view>
+  </scroll-view>
   <!-- <view class="flex flex-col flex-1">
     <view class="h-[100px] bg-[red]">
       <text>
@@ -83,6 +83,4 @@ console.log(windowHeight.value, 'windowHeight.value');
   </view> -->
 </template>
 
-<style lang="scss" scoped>
-//
-</style>
+<style lang="scss" scoped></style>

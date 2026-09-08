@@ -122,73 +122,42 @@ function getItemFontWeight(index: number): string {
 <template>
   <view class="custom-capsule-wrapper">
     <!-- 底部占位块：防止页面底部内容被悬浮 Tab 栏遮挡 -->
-    <view
-      v-if="showPlaceholder"
-      class="custom-capsule-placeholder"
-      :style="{ height: `${height + bottomOffset * 2 + safeAreaBottom}px` }"
-    />
+    <view v-if="showPlaceholder" class="custom-capsule-placeholder"
+      :style="{ height: `${height + bottomOffset * 2 + safeAreaBottom}px` }" />
 
     <!-- 悬浮胶囊底座主容器 -->
-    <view
-      class="custom-capsule-container"
-      :style="{
-        bottom: `${bottomOffset + safeAreaBottom}px`,
-        height: `${height}px`,
-        backgroundColor: themeTokens.tabBg,
-        borderColor: themeTokens.tabBorder
-      }"
-    >
-      <view
-        v-for="(item, index) in tabbarList"
-        :key="index"
-        class="capsule-item-slot"
-        @click="onTabClick(index)"
-      >
+    <view class="custom-capsule-container" :style="{
+      bottom: `${bottomOffset + safeAreaBottom}px`,
+      height: `${height}px`,
+      backgroundColor: themeTokens.tabBg,
+      borderColor: themeTokens.tabBorder
+    }">
+      <view v-for="(item, index) in tabbarList" :key="index" class="capsule-item-slot" @click="onTabClick(index)">
         <!-- 胶囊项背景包装块（激活时展示高亮底色背景） -->
-        <view
-          class="capsule-item-inner"
-          :style="{
-            backgroundColor: getItemBgColor(index)
-          }"
-        >
+        <view class="capsule-item-inner" :style="{
+          backgroundColor: getItemBgColor(index)
+        }">
           <!-- 图标与角标容器 -->
           <view class="capsule-icon-wrap">
             <!-- uni-icons 字体图标 -->
-            <uni-icons
-              v-if="item.iconType == 'icon'"
-              :type="getItemIcon(index)"
-              :size="20"
-              :color="getItemIconColor(index)"
-            />
+            <uni-icons v-if="item.iconType == 'icon'" :type="getItemIcon(index)" :size="20"
+              :color="getItemIconColor(index)" />
             <!-- 图片图标 -->
-            <image
-              v-else
-              :src="getItemIconPath(index)"
-              class="capsule-icon-image"
-            />
+            <image v-else :src="getItemIconPath(index)" class="capsule-icon-image" />
 
             <!-- 小红点角标 -->
-            <view
-              v-if="item.badge != null && item.badge == 'dot'"
-              class="capsule-badge-dot"
-            />
+            <view v-if="item.badge != null && item.badge == 'dot'" class="capsule-badge-dot" />
             <!-- 文本数字角标 -->
-            <view
-              v-else-if="item.badge != null && item.badge != 'dot'"
-              class="capsule-badge-text"
-            >
+            <view v-else-if="item.badge != null && item.badge != 'dot'" class="capsule-badge-text">
               <text class="capsule-badge-label">{{ item.badge }}</text>
             </view>
           </view>
 
           <!-- 标签文字（支持 i18n 翻译） -->
-          <text
-            class="capsule-item-text"
-            :style="{
-              color: getItemTextColor(index),
-              fontWeight: getItemFontWeight(index)
-            }"
-          >
+          <text class="capsule-item-text" :style="{
+            color: getItemTextColor(index),
+            fontWeight: getItemFontWeight(index)
+          }">
             {{ getText(item.text) }}
           </text>
         </view>

@@ -190,21 +190,21 @@ export function safeHideNativeTabBar(): void {
   // }
 
   // #ifdef H5
-  try {
-    if (typeof document !== 'undefined' && document.getElementById('hide-native-tabbar-style') == null) {
-      const style = document.createElement('style');
-      style.id = 'hide-native-tabbar-style';
-      if (isCompilerVersionGte('5.25')) {
-        style.innerHTML = 'uni-tabbar, .uni-tabbar, .uni-tabbar-bottom, .uni-tabbar__icon, .uni-tabbar__label { display: none !important; } :root { --window-bottom: 0px !important; } uni-page-wrapper { height: 100% !important; } uni-page-body { padding-bottom: 0px !important; }';
-      }
-      else {
-        // 5.24 及以下版本（与 uniX-rice-ui 100% 相同原版逻辑）
-        style.innerHTML = 'uni-tabbar, .uni-tabbar, .uni-tabbar-bottom, .uni-tabbar__icon, .uni-tabbar__label { display: none !important; }';
-      }
-      document.head.appendChild(style);
-    }
-  }
-  catch {}
+  // try {
+  //   if (typeof document !== 'undefined' && document.getElementById('hide-native-tabbar-style') == null) {
+  //     const style = document.createElement('style');
+  //     style.id = 'hide-native-tabbar-style';
+  //     if (isCompilerVersionGte('5.25')) {
+  //       style.innerHTML = 'uni-tabbar, .uni-tabbar, .uni-tabbar-bottom, .uni-tabbar__icon, .uni-tabbar__label { display: none !important; } :root { --window-bottom: 0px !important; } uni-page-wrapper { height: 100% !important; } uni-page-body { padding-bottom: 0px !important; }';
+  //     }
+  //     else {
+  //       // 5.24 及以下版本（与 uniX-rice-ui 100% 相同原版逻辑）
+  //       style.innerHTML = 'uni-tabbar, .uni-tabbar, .uni-tabbar-bottom, .uni-tabbar__icon, .uni-tabbar__label { display: none !important; }';
+  //     }
+  //     document.head.appendChild(style);
+  //   }
+  // }
+  catch { }
   // #endif
 
   // #ifndef MP-WEIXIN
@@ -216,7 +216,7 @@ export function safeHideNativeTabBar(): void {
       }
     });
   }
-  catch {}
+  catch { }
   // #endif
 }
 

@@ -1,6 +1,9 @@
 <template>
   <view class="flex-col">
     <view class="flex-col">
+      <!-- 布局页面示例组件 -->
+      <LayoutDemoCard />
+
       <!-- weapp-tailwindcss 样式引擎示例 -->
       <TailwindcssDemoCard />
 
@@ -12,9 +15,6 @@
 
       <!-- 使用封装的多语言切换组件 -->
       <LangSwitchCard />
-
-      <!-- 布局页面示例组件 -->
-      <LayoutDemoCard />
 
       <!-- 使用封装的图标示例组件 -->
       <IconDemoCard />
@@ -45,7 +45,6 @@ import RouterDemoCard from './components/RouterDemoCard.uvue';
 import HttpDemoCard from './components/HttpDemoCard.uvue';
 import TailwindcssDemoCard from './components/TailwindcssDemoCard.uvue';
 import SystemInfoDemoCard from './components/SystemInfoDemoCard.uvue';
-import { onMounted } from 'vue';
 import { handleBackPressExit } from '@/src/utils/backPress';
 import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/utils/refresh';
 
@@ -74,15 +73,6 @@ onBackPress((options: OnBackPressOptions): boolean => {
   // #endif
   return false;
 });
-
-onMounted(() => {
-  // #ifdef APP || H5 || MP-WEIXIN
-  uni.onWindowResize((_res) => {
-    updateSystemInfo();
-  });
-  // #endif
-});
 </script>
 
-<style>
-</style>
+<style></style>

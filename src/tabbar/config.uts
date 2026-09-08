@@ -10,14 +10,14 @@ export const customTabbarConfig: TabBarConfig = {
    * - 'capsule': 悬浮胶囊岛屿样式
    * - 'default': 标准贴底样式（支持中间凸起鼓包 midButton）
    */
-  type: 'default',
+  type: 'capsule',
   color: '@tabBarColor',
   selectedColor: '@tabBarSelectedColor',
   backgroundColor: '@tabBarBackgroundColor',
   borderStyle: '@tabBarBorderStyle',
   /**
-   * 中间鼓包按钮 (midButton)
-   * ⚠️ 官方原生底层跨端兼容性提示：
+   * ⚠️ 中间鼓包按钮 (midButton)
+   * 官方原生底层跨端兼容性提示：
    * - Web: 4.0+ (支持)
    * - 微信小程序: ❌ 不支持
    * - HarmonyOS 鸿蒙: ❌ 不支持
@@ -26,8 +26,9 @@ export const customTabbarConfig: TabBarConfig = {
    *
    * 💡 建议：若业务必须使用鼓包立体悬浮效果且需全端（含小程序/鸿蒙）兼容，
    * 请在 .env 中配置 VITE_TABBAR_MODE=2（自定义 TabBar 模式），组件层支持 100% 全端一致渲染。
+   * ⚠️ 不要midButton,请勿注释下面代码，还是会同步的，直接修改名字即可：比如：midButton1
    */
-  midButton: {
+  midButton1: {
     width: '50px',
     height: '50px',
     text: 'tabbar.ai',

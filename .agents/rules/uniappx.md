@@ -90,6 +90,31 @@ description: uni-app X (UTS) 开发规范与踩坑避坑指南，适用于跨端
     $app-primary: var(--theme-color, #0957DE);
     ```
 
+*   **页面骨架统一约定（view 根 + 开发高度 = computedAvailableHeight）**：
+    为保证 uni-app X 页面在 navbar / default 布局下高度计算正确、减少布局 bug，页面内容骨架遵循以下约定：
+    *   **根容器用 view，常用 `<view class="flex flex-col flex-1">`**：
+        ```html
+        <view class="flex flex-col flex-1">
+        ```
+        *   `flex-1` 即撑满开发高度（= `computedAvailableHeight`），是便捷写法，navbar / default 布局通用。
+        *   **为何根不用 scroll-view**：navbar / default 布局已用自身 `scroll-view`（`flex-1 flex flex-col`）包住页面 `<slot />`（见 `src/layouts/navbar.uvue`、`src/layouts/default.uvue`），页面若再用 scroll-view 当根会造成双重滚动冲突，根应为普通 `view`。
+    *   **滚动区域的两种写法**：
+        *   **内部自写 scroll-view（⭐ 常用）**：需要滚动的区域在 flex-1 根内自写一个 `scroll-view`，用其 `@scroll` / `@scrolltolower` 监听滚动与触底：
+            ```html
+            <scroll-view direction="vertical" class="flex-1 flex flex-col" @scroll="..." @scrolltolower="...">
+              <!-- 滚动内容 -->
+            </scroll-view>
+            ```
+        *   **整页按内容高度滚动**：根用 `<view class="flex flex-col">`（不加 flex-1），整页由布局 scroll-view 接管，页面用 `onNavbarPageScroll` / `onNavbarReachBottom`（见 `src/utils/pageScroll.uts`）监听，替代原生 `onPageScroll` / `onReachBottom`。
+    *   **内容可用高度用 `computedAvailableHeight`**（navbar / default 通用）：框架已按当前布局自动算好（状态栏 / 导航栏 / tabbar 均已扣除），开发者直接用这个值绑定高度即可，其余不用操心：
+        ```html
+        <view :style="{ height: `${computedAvailableHeight}px` }">
+          <!-- 这就是开发者要写的高度；tabbar 等扣除由框架处理，不用关心 -->
+        </view>
+        ```
+    *   **`VITE_TABBAR_MODE=1` 语义**：原生 TabBar 模式下 `availableHeight` 不含底部 tabbar 区域（底部非编辑区，无需计入）。
+    *   *错误做法*：页面根使用 scroll-view（与布局冲突）；手写 `100vh`/`100%` 硬算高度。
+
 ---
 
 ## 3. 组件库优先使用与 Easycom 自动导入
