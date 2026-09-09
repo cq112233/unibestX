@@ -3,7 +3,7 @@
     <view class="content-container">
       <image class="w-[100px] h-[100px] mx-auto mt-[20px] rounded-[20px]" src="/static/logo.png" />
       <text class="text-[26px] font-semibold mx-auto mt-[10px] text-[#d14328]">
-        unibestX
+        {{ systemInfo?.appTitle ?? '' }}
       </text>
       <text class="text-center text-[18px] text-[#334155] font-medium mt-[6px]">
         最好用的 uni-appX 开发模板
@@ -16,7 +16,7 @@
         <!-- 运行平台 -->
         <view class="flex-1 items-center justify-center">
           <text class="text-[10px] text-[#94a3b8] mb-[2px]">编译平台</text>
-          <text class="text-[12px] font-bold text-[#4f46e5]">{{ systemInfo?.platformName ?? 'H5' }}</text>
+          <text class="text-[12px] font-bold text-[#4f46e5]">{{ systemInfo?.platformName ?? '' }}</text>
         </view>
         <view class="w-[1px] h-[20px] bg-[#e2e8f0]" />
         <!-- 当前环境 -->
@@ -26,7 +26,7 @@
             class="text-[12px] font-bold"
             :style="{ color: (systemInfo?.env == 'test' ? '#d97706' : (systemInfo?.env == 'production' ? '#dc2626' : '#059669')) }"
           >
-            {{ systemInfo?.env == 'test' ? '测试' : (systemInfo?.env == 'production' ? '生产' : '开发') }}
+            {{ systemInfo?.envName ?? '' }}
           </text>
         </view>
         <view class="w-[1px] h-[20px] bg-[#e2e8f0]" />
@@ -39,15 +39,14 @@
         <!-- 应用版本 -->
         <view class="flex-1 items-center justify-center">
           <text class="text-[10px] text-[#94a3b8] mb-[2px]">应用版本</text>
-          <text class="text-[12px] font-bold text-[#d97706]">v{{ systemInfo?.appVersion ?? '1.0.0' }}</text>
+          <text class="text-[12px] font-bold text-[#d97706]">v{{ systemInfo?.appVersion ?? '' }}</text>
         </view>
         <view class="w-[1px] h-[20px] bg-[#e2e8f0]" />
         <!-- 编译引擎版本 -->
         <view class="flex-1 items-center justify-center">
           <text class="text-[10px] text-[#94a3b8] mb-[2px]">编译引擎</text>
           <text class="text-[12px] font-bold text-[#334155]">
-            {{ (systemInfo?.compilerVersion ?? '') != ''
-              ? systemInfo?.compilerVersion : '1.0.0' }}
+            {{ systemInfo?.compilerVersion ?? '' }}
           </text>
         </view>
       </view>
@@ -196,9 +195,14 @@
 </template>
 
 <script setup lang="uts">
+import { computed } from 'vue';
 import { handleBackPressExit } from '../../utils/backPress.uts';
 import { onNavbarPageScroll, onNavbarPullDownRefresh, onNavbarReachBottom, stopNavbarPullDownRefresh } from '../../utils/refresh.uts';
-import { systemInfo } from '../../utils/systemInfo.uts';
+import { systemInfo as systemInfoRef } from '../../utils/systemInfo.uts';
+import type { SystemInfoType } from '../../utils/systemInfo.uts';
+
+// 用计算属性承接模块级 systemInfo ref，保证模板中可正常自动解包
+const systemInfo = computed<SystemInfoType | null>((): SystemInfoType | null => systemInfoRef.value);
 
 definePage({
   customPageClass: 'border-radius-12', // 页面根容器自定义类名（配合 layout 布局使用，支持配置全局样式类）
