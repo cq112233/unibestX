@@ -5,25 +5,25 @@
       <view class="demo-block">
         <text class="demo-label">基础用法</text>
         <view class="flex-row items-center">
-          <up-badge type="error" :value="9" class="mr-[20px]"></up-badge>
-          <up-badge type="warning" :value="99" class="mr-[20px]"></up-badge>
-          <up-badge type="success" :value="100" max="99"></up-badge>
+          <UpBadge type="error" :value="9" class="mr-[20px]"></UpBadge>
+          <UpBadge type="warning" :value="99" class="mr-[20px]"></UpBadge>
+          <UpBadge type="success" :value="100" max="99"></UpBadge>
         </view>
       </view>
 
       <view class="demo-block mt-[12px]">
         <text class="demo-label">小圆点</text>
         <view class="flex-row items-center">
-          <up-badge type="error" :is-dot="true"></up-badge>
+          <UpBadge type="error" :is-dot="true"></UpBadge>
         </view>
       </view>
 
       <view class="demo-block mt-[12px]">
         <text class="demo-label">自定义颜色</text>
         <view class="flex-row items-center">
-          <up-badge value="新" bg-color="#8a2be2" color="#ffffff" class="mr-[20px]"></up-badge>
-          <up-badge value="热" bg-color="#ff9900" color="#ffffff" class="mr-[20px]"></up-badge>
-          <up-badge :is-dot="true" bg-color="#000000" class="mr-[20px]"></up-badge>
+          <UpBadge value="新" bg-color="#8a2be2" color="#ffffff" class="mr-[20px]"></UpBadge>
+          <UpBadge value="热" bg-color="#ff9900" color="#ffffff" class="mr-[20px]"></UpBadge>
+          <UpBadge :is-dot="true" bg-color="#000000" class="mr-[20px]"></UpBadge>
         </view>
       </view>
 
@@ -31,7 +31,7 @@
         <text class="demo-label">绝对定位</text>
         <view class="flex-row items-center">
           <view class="relative w-[40px] h-[40px] bg-[#e5e5e5] rounded-[4px]">
-            <up-badge type="error" :value="5" absolute :offset="[-10, -10]"></up-badge>
+            <UpBadge type="error" :value="5" absolute :offset="[-10, -10]"></UpBadge>
           </view>
         </view>
       </view>
@@ -40,6 +40,9 @@
 </template>
 
 <script setup lang="uts">
+import NavBar from '@/src/components/NavBar/NavBar.uvue';
+import UpBadge from '@/uni_modules/uview-ultra/components/up-badge/up-badge.uvue';
+
 definePage({
   style: {
     navigationStyle: 'custom',

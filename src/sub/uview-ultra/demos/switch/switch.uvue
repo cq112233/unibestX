@@ -5,7 +5,7 @@
       <view class="demo-block">
         <text class="demo-label">基础用法</text>
         <view class="flex-row items-center">
-          <up-switch v-model="switchValue1"></up-switch>
+          <UpSwitch v-model="switchValue1"></UpSwitch>
           <text class="text-[14px] ml-[10px]">{{ switchValue1 ? '已开启' : '已关闭' }}</text>
         </view>
       </view>
@@ -13,29 +13,29 @@
       <view class="demo-block mt-[12px]">
         <text class="demo-label">禁用状态</text>
         <view class="flex-row items-center">
-          <up-switch v-model="switchValue2" :disabled="true"></up-switch>
+          <UpSwitch v-model="switchValue2" :disabled="true"></UpSwitch>
         </view>
       </view>
 
       <view class="demo-block mt-[12px]">
         <text class="demo-label">加载状态</text>
         <view class="flex-row items-center">
-          <up-switch v-model="switchValue3" loading></up-switch>
+          <UpSwitch v-model="switchValue3" loading></UpSwitch>
         </view>
       </view>
 
       <view class="demo-block mt-[12px]">
         <text class="demo-label">自定义颜色</text>
         <view class="flex-row items-center">
-          <up-switch v-model="switchValue4" active-color="#fa3534" inactive-color="#f56c6c"></up-switch>
+          <UpSwitch v-model="switchValue4" active-color="#fa3534" inactive-color="#f56c6c"></UpSwitch>
         </view>
       </view>
 
       <view class="demo-block mt-[12px]">
         <text class="demo-label">不同尺寸</text>
         <view class="flex-row items-center">
-          <up-switch v-model="switchValue5" size="20" class="mr-[10px]"></up-switch>
-          <up-switch v-model="switchValue5" size="28"></up-switch>
+          <UpSwitch v-model="switchValue5" size="20" class="mr-[10px]"></UpSwitch>
+          <UpSwitch v-model="switchValue5" size="28"></UpSwitch>
         </view>
       </view>
     </view>
@@ -44,6 +44,8 @@
 
 <script setup lang="uts">
 import { ref } from 'vue';
+import NavBar from '@/src/components/NavBar/NavBar.uvue';
+import UpSwitch from '@/uni_modules/uview-ultra/components/up-switch/up-switch.uvue';
 
 definePage({
   style: {

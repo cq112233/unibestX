@@ -4,30 +4,30 @@
     <view class="p-[16px]">
       <view class="demo-block">
         <text class="demo-label">基础用法</text>
-        <up-tabbar :value="value1" :fixed="false" :safe-area-inset-bottom="false" @change="change1">
-          <up-tabbar-item text="首页" icon="home"></up-tabbar-item>
-          <up-tabbar-item text="放映厅" icon="photo"></up-tabbar-item>
-          <up-tabbar-item text="直播" icon="play-right"></up-tabbar-item>
-          <up-tabbar-item text="我的" icon="account"></up-tabbar-item>
-        </up-tabbar>
+        <UpTabbar :value="value1" :fixed="false" :safe-area-inset-bottom="false" @change="change1">
+          <UpTabbarItem text="首页" icon="home"></UpTabbarItem>
+          <UpTabbarItem text="放映厅" icon="photo"></UpTabbarItem>
+          <UpTabbarItem text="直播" icon="play-right"></UpTabbarItem>
+          <UpTabbarItem text="我的" icon="account"></UpTabbarItem>
+        </UpTabbar>
       </view>
 
       <view class="demo-block mt-[12px]">
         <text class="demo-label">徽标提示与小红点</text>
-        <up-tabbar :value="value2" :fixed="false" :safe-area-inset-bottom="false" @change="change2">
-          <up-tabbar-item text="首页" icon="home" badge="5"></up-tabbar-item>
-          <up-tabbar-item text="消息" icon="chat" :dot="true"></up-tabbar-item>
-          <up-tabbar-item text="我的" icon="account"></up-tabbar-item>
-        </up-tabbar>
+        <UpTabbar :value="value2" :fixed="false" :safe-area-inset-bottom="false" @change="change2">
+          <UpTabbarItem text="首页" icon="home" badge="5"></UpTabbarItem>
+          <UpTabbarItem text="消息" icon="chat" :dot="true"></UpTabbarItem>
+          <UpTabbarItem text="我的" icon="account"></UpTabbarItem>
+        </UpTabbar>
       </view>
 
       <view class="demo-block mt-[12px]">
         <text class="demo-label">自定义颜色</text>
-        <up-tabbar :value="value3" :fixed="false" :safe-area-inset-bottom="false" active-color="#fa3534" inactive-color="#909399" @change="change3">
-          <up-tabbar-item text="发现" icon="search"></up-tabbar-item>
-          <up-tabbar-item text="购物车" icon="shopping-cart"></up-tabbar-item>
-          <up-tabbar-item text="我的" icon="account"></up-tabbar-item>
-        </up-tabbar>
+        <UpTabbar :value="value3" :fixed="false" :safe-area-inset-bottom="false" active-color="#fa3534" inactive-color="#909399" @change="change3">
+          <UpTabbarItem text="发现" icon="search"></UpTabbarItem>
+          <UpTabbarItem text="购物车" icon="shopping-cart"></UpTabbarItem>
+          <UpTabbarItem text="我的" icon="account"></UpTabbarItem>
+        </UpTabbar>
       </view>
     </view>
   </view>
@@ -35,6 +35,9 @@
 
 <script setup lang="uts">
 import { ref } from 'vue';
+import NavBar from '@/src/components/NavBar/NavBar.uvue';
+import UpTabbar from '@/uni_modules/uview-ultra/components/up-tabbar/up-tabbar.uvue';
+import UpTabbarItem from '@/uni_modules/uview-ultra/components/up-tabbar-item/up-tabbar-item.uvue';
 
 definePage({
   style: {

@@ -290,7 +290,7 @@ const buttonRootStyle = computed((): UTSJSONObject => {
 });
 
 const loadingIconSize = computed((): string => {
-    return addUnit(props.loadingSize * 1.15)
+    return addUnit(props.loadingSize * 1.15) ?? ''
 });
 
 const textStyle = computed((): UTSJSONObject => {
@@ -301,7 +301,7 @@ const textStyle = computed((): UTSJSONObject => {
 });
 
 const iconSizeComputed = computed((): string => {
-    return addUnit(parseInt(getPx(textSize.value)) * 1.35)
+    return addUnit(parseInt(getPx(textSize.value)) * 1.35) ?? ''
 });
 
 const clickHandler = (): void => {

@@ -5,17 +5,17 @@
       <view class="demo-block">
         <text class="demo-label">基础图片</text>
         <view class="flex-row items-center">
-          <up-image src="/static/logo.png" width="60px" height="60px"></up-image>
+          <UpImage src="/static/logo.png" width="60px" height="60px"></UpImage>
           <view class="w-[15px]"></view>
-          <up-image src="/static/logo.png" width="60px" height="60px" shape="circle"></up-image>
+          <UpImage src="/static/logo.png" width="60px" height="60px" shape="circle"></UpImage>
         </view>
       </view>
       <view class="demo-block mt-[12px]">
         <text class="demo-label">不同裁切模式</text>
         <view class="flex-row items-center">
-          <up-image src="/static/logo.png" width="80px" height="60px" mode="aspectFit"></up-image>
+          <UpImage src="/static/logo.png" width="80px" height="60px" mode="aspectFit"></UpImage>
           <view class="w-[15px]"></view>
-          <up-image src="/static/logo.png" width="80px" height="60px" mode="scaleToFill"></up-image>
+          <UpImage src="/static/logo.png" width="80px" height="60px" mode="scaleToFill"></UpImage>
         </view>
       </view>
     </view>
@@ -23,6 +23,9 @@
 </template>
 
 <script setup lang="uts">
+import NavBar from '@/src/components/NavBar/NavBar.uvue';
+import UpImage from '@/uni_modules/uview-ultra/components/up-image/up-image.uvue';
+
 definePage({
   style: {
     navigationStyle: 'custom',

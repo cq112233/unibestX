@@ -262,16 +262,16 @@ const visibleCountNumber = computed<number>(() => {
 })
 
 const pickerViewHeight = computed<string>(() => {
-	return addUnit(visibleCountNumber.value * itemHeightNumber.value)
+	return addUnit(visibleCountNumber.value * itemHeightNumber.value) ?? ''
 })
 
 const indicatorTop = computed<string>(() => {
 	const topCount = Math.floor(visibleCountNumber.value / 2)
-	return addUnit(topCount * itemHeightNumber.value)
+	return addUnit(topCount * itemHeightNumber.value) ?? ''
 })
 
 const itemHeightUnit = computed((): string => {
-	return addUnit(itemHeightNumber.value)
+	return addUnit(itemHeightNumber.value) ?? ''
 })
 
 const indicatorStyle = computed((): UTSJSONObject => {

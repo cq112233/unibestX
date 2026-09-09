@@ -5,38 +5,38 @@
       <view class="demo-block">
         <text class="demo-label">基础用法</text>
         <view class="flex-row items-center">
-          <up-button type="primary" text="弹出面板" size="mini" @click="actionSheetShow = true"></up-button>
+          <UpButton type="primary" text="弹出面板" size="mini" @click="actionSheetShow = true"></UpButton>
         </view>
       </view>
       <view class="demo-block mt-[12px]">
         <text class="demo-label">显示取消按钮</text>
         <view class="flex-row items-center">
-          <up-button type="success" text="带取消按钮" size="mini" @click="actionSheetShow2 = true"></up-button>
+          <UpButton type="success" text="带取消按钮" size="mini" @click="actionSheetShow2 = true"></UpButton>
         </view>
       </view>
       <view class="demo-block mt-[12px]">
         <text class="demo-label">带描述信息与禁用项</text>
         <view class="flex-row items-center">
-          <up-button type="warning" text="复杂面板" size="mini" @click="actionSheetShow3 = true"></up-button>
+          <UpButton type="warning" text="复杂面板" size="mini" @click="actionSheetShow3 = true"></UpButton>
         </view>
       </view>
     </view>
-    <up-action-sheet
+    <UpActionSheet
       :show="actionSheetShow"
       :actions="actionList"
       title="请选择操作"
       @close="actionSheetShow = false"
       @select="onActionSelect"
-    ></up-action-sheet>
-    <up-action-sheet
+    ></UpActionSheet>
+    <UpActionSheet
       :show="actionSheetShow2"
       :actions="actionList"
       title="请选择操作"
       cancel-text="取消"
       @close="actionSheetShow2 = false"
       @select="onActionSelect"
-    ></up-action-sheet>
-    <up-action-sheet
+    ></UpActionSheet>
+    <UpActionSheet
       :show="actionSheetShow3"
       :actions="actionListComplex"
       title="请选择操作"
@@ -44,12 +44,15 @@
       cancel-text="取消"
       @close="actionSheetShow3 = false"
       @select="onActionSelect"
-    ></up-action-sheet>
+    ></UpActionSheet>
   </view>
 </template>
 
 <script setup lang="uts">
 import { ref } from 'vue';
+import NavBar from '@/src/components/NavBar/NavBar.uvue';
+import UpButton from '@/uni_modules/uview-ultra/components/up-button/up-button.uvue';
+import UpActionSheet from '@/uni_modules/uview-ultra/components/up-action-sheet/up-action-sheet.uvue';
 
 definePage({
   style: {

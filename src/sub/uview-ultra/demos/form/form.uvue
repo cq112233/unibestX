@@ -5,111 +5,111 @@
     <view class="p-[16px]">
       <view class="demo-block">
         <text class="demo-label">基础表单示例</text>
-        <up-form
+        <UpForm
           ref="uForm"
           :model="formModel"
           :rules="formRules"
           label-width="90px"
           error-type="toast"
         >
-          <up-form-item label="姓名" prop="name" :border-bottom="true" required>
-            <up-input v-model="formModel.name" placeholder="请输入姓名" border="none" clearable></up-input>
-          </up-form-item>
+          <UpFormItem label="姓名" prop="name" :border-bottom="true" required>
+            <UpInput v-model="formModel.name" placeholder="请输入姓名" border="none" clearable></UpInput>
+          </UpFormItem>
 
-          <up-form-item label="性别" prop="gender" :border-bottom="true" required @click="genderActionShow = true">
-            <up-input
+          <UpFormItem label="性别" prop="gender" :border-bottom="true" required @click="genderActionShow = true">
+            <UpInput
               v-model="formModel.gender"
               disabled
               disabled-color="#ffffff"
               placeholder="请选择性别"
               border="none"
-            ></up-input>
+            ></UpInput>
             <template #right>
-              <up-icon name="arrow-right" color="#c0c4cc" size="16"></up-icon>
+              <UpIcon name="arrow-right" color="#c0c4cc" size="16"></UpIcon>
             </template>
-          </up-form-item>
+          </UpFormItem>
 
-          <up-form-item label="出生日期" prop="birthday" :border-bottom="true" required @click="datetimePickerShow = true">
-            <up-input
+          <UpFormItem label="出生日期" prop="birthday" :border-bottom="true" required @click="datetimePickerShow = true">
+            <UpInput
               v-model="formModel.birthday"
               disabled
               disabled-color="#ffffff"
               placeholder="请选择出生日期"
               border="none"
-            ></up-input>
+            ></UpInput>
             <template #right>
-              <up-icon name="arrow-right" color="#c0c4cc" size="16"></up-icon>
+              <UpIcon name="arrow-right" color="#c0c4cc" size="16"></UpIcon>
             </template>
-          </up-form-item>
+          </UpFormItem>
 
-          <up-form-item label="国籍" prop="country" :border-bottom="true" @click="pickerShow = true">
-            <up-input
+          <UpFormItem label="国籍" prop="country" :border-bottom="true" @click="pickerShow = true">
+            <UpInput
               v-model="formModel.country"
               disabled
               disabled-color="#ffffff"
               placeholder="请选择国籍"
               border="none"
-            ></up-input>
+            ></UpInput>
             <template #right>
-              <up-icon name="arrow-right" color="#c0c4cc" size="16"></up-icon>
+              <UpIcon name="arrow-right" color="#c0c4cc" size="16"></UpIcon>
             </template>
-          </up-form-item>
+          </UpFormItem>
 
-          <up-form-item label="行程时间" prop="stayTime" :border-bottom="true" @click="calendarShow = true">
-            <up-input
+          <UpFormItem label="行程时间" prop="stayTime" :border-bottom="true" @click="calendarShow = true">
+            <UpInput
               v-model="formModel.stayTime"
               disabled
               disabled-color="#ffffff"
               placeholder="请选择日期范围"
               border="none"
-            ></up-input>
+            ></UpInput>
             <template #right>
-              <up-icon name="arrow-right" color="#c0c4cc" size="16"></up-icon>
+              <UpIcon name="arrow-right" color="#c0c4cc" size="16"></UpIcon>
             </template>
-          </up-form-item>
+          </UpFormItem>
 
-          <up-form-item label="水果最爱" prop="fruit" :border-bottom="true">
-            <up-radio-group v-model="formModel.fruit" placement="row">
-              <up-radio name="apple" label="苹果"></up-radio>
+          <UpFormItem label="水果最爱" prop="fruit" :border-bottom="true">
+            <UpRadioGroup v-model="formModel.fruit" placement="row">
+              <UpRadio name="apple" label="苹果"></UpRadio>
               <view class="w-[10px]"></view>
-              <up-radio name="banana" label="香蕉"></up-radio>
+              <UpRadio name="banana" label="香蕉"></UpRadio>
               <view class="w-[10px]"></view>
-              <up-radio name="orange" label="橘子"></up-radio>
-            </up-radio-group>
-          </up-form-item>
+              <UpRadio name="orange" label="橘子"></UpRadio>
+            </UpRadioGroup>
+          </UpFormItem>
 
-          <up-form-item label="兴趣爱好" prop="hobbies" :border-bottom="true">
-            <up-checkbox-group v-model="formModel.hobbies" placement="row">
-              <up-checkbox name="reading" label="阅读"></up-checkbox>
+          <UpFormItem label="兴趣爱好" prop="hobbies" :border-bottom="true">
+            <UpCheckboxGroup v-model="formModel.hobbies" placement="row">
+              <UpCheckbox name="reading" label="阅读"></UpCheckbox>
               <view class="w-[10px]"></view>
-              <up-checkbox name="sports" label="运动"></up-checkbox>
+              <UpCheckbox name="sports" label="运动"></UpCheckbox>
               <view class="w-[10px]"></view>
-              <up-checkbox name="music" label="音乐"></up-checkbox>
-            </up-checkbox-group>
-          </up-form-item>
+              <UpCheckbox name="music" label="音乐"></UpCheckbox>
+            </UpCheckboxGroup>
+          </UpFormItem>
 
-          <up-form-item label="通知开关" prop="notification" :border-bottom="true">
-            <up-switch v-model="formModel.notification" active-color="#2979ff"></up-switch>
-          </up-form-item>
+          <UpFormItem label="通知开关" prop="notification" :border-bottom="true">
+            <UpSwitch v-model="formModel.notification" active-color="#2979ff"></UpSwitch>
+          </UpFormItem>
 
-          <up-form-item label="服务评分" prop="rate" :border-bottom="true">
-            <up-rate v-model="formModel.rate" :count="5"></up-rate>
-          </up-form-item>
+          <UpFormItem label="服务评分" prop="rate" :border-bottom="true">
+            <UpRate v-model="formModel.rate" :count="5"></UpRate>
+          </UpFormItem>
 
-          <up-form-item label="购买数量" prop="count" :border-bottom="true">
-            <up-number-box v-model="formModel.count" :min="1" :max="100"></up-number-box>
-          </up-form-item>
+          <UpFormItem label="购买数量" prop="count" :border-bottom="true">
+            <UpNumberBox v-model="formModel.count" :min="1" :max="100"></UpNumberBox>
+          </UpFormItem>
 
-          <up-form-item label="满意度" prop="satisfaction" :border-bottom="true">
-            <up-slider v-model="formModel.satisfaction" :min="0" :max="100" :show-value="true" style="width: 100%;"></up-slider>
-          </up-form-item>
+          <UpFormItem label="满意度" prop="satisfaction" :border-bottom="true">
+            <UpSlider v-model="formModel.satisfaction" :min="0" :max="100" :show-value="true" style="width: 100%;"></UpSlider>
+          </UpFormItem>
 
-          <up-form-item label="个人简介" prop="intro" :border-bottom="true" label-position="top">
-            <up-textarea v-model="formModel.intro" placeholder="请输入个人简介" count :maxlength="100"></up-textarea>
-          </up-form-item>
+          <UpFormItem label="个人简介" prop="intro" :border-bottom="true" label-position="top">
+            <UpTextarea v-model="formModel.intro" placeholder="请输入个人简介" count :maxlength="100"></UpTextarea>
+          </UpFormItem>
 
-          <up-form-item label="相关照片" prop="photos" :border-bottom="true" label-position="top">
-            <up-upload
+          <UpFormItem label="相关照片" prop="photos" :border-bottom="true" label-position="top">
+            <UpUpload
               :file-list="uploadList"
               :multiple="true"
               :max-count="3"
@@ -117,53 +117,53 @@
               height="80px"
               @after-read="onUploadAfterRead"
               @delete="onUploadDelete"
-            ></up-upload>
-          </up-form-item>
-        </up-form>
+            ></UpUpload>
+          </UpFormItem>
+        </UpForm>
       </view>
 
       <view class="demo-block">
         <text class="demo-label">标签上方对齐</text>
-        <up-form :model="formModel2" label-position="top" label-width="100px">
-          <up-form-item label="活动名称" prop="name" :border-bottom="true">
-            <up-input v-model="formModel2.name" placeholder="请输入活动名称" border="none"></up-input>
-          </up-form-item>
-          <up-form-item label="活动详情" prop="detail" :border-bottom="true">
-            <up-textarea v-model="formModel2.detail" placeholder="请输入活动详情" border="none"></up-textarea>
-          </up-form-item>
-        </up-form>
+        <UpForm :model="formModel2" label-position="top" label-width="100px">
+          <UpFormItem label="活动名称" prop="name" :border-bottom="true">
+            <UpInput v-model="formModel2.name" placeholder="请输入活动名称" border="none"></UpInput>
+          </UpFormItem>
+          <UpFormItem label="活动详情" prop="detail" :border-bottom="true">
+            <UpTextarea v-model="formModel2.detail" placeholder="请输入活动详情" border="none"></UpTextarea>
+          </UpFormItem>
+        </UpForm>
       </view>
 
       <view class="mt-[20px] flex-row justify-between">
         <view class="flex-1 mr-[10px]">
-          <up-button type="primary" text="提交表单" @click="submitForm"></up-button>
+          <UpButton type="primary" text="提交表单" @click="submitForm"></UpButton>
         </view>
         <view class="flex-1 ml-[10px]">
-          <up-button type="info" text="重置表单" @click="resetForm"></up-button>
+          <UpButton type="info" text="重置表单" @click="resetForm"></UpButton>
         </view>
       </view>
     </view>
 
     <!-- 弹窗选择组件 -->
     <!-- Calendar 日历 -->
-    <up-calendar
+    <UpCalendar
       :show="calendarShow"
       mode="range"
       @confirm="onCalendarConfirm"
       @close="calendarShow = false"
-    ></up-calendar>
+    ></UpCalendar>
 
     <!-- Picker 国家选择 -->
-    <up-picker
+    <UpPicker
       :show="pickerShow"
       :columns="pickerColumns"
       @confirm="onPickerConfirm"
       @cancel="pickerShow = false"
       @close="pickerShow = false"
-    ></up-picker>
+    ></UpPicker>
 
     <!-- DatetimePicker 出生日期 -->
-    <up-datetime-picker
+    <UpDatetimePicker
       v-model="datetimePickerValue"
       :show="datetimePickerShow"
       mode="date"
@@ -171,21 +171,41 @@
       @confirm="onDatetimePickerConfirm"
       @cancel="datetimePickerShow = false"
       @close="datetimePickerShow = false"
-    ></up-datetime-picker>
+    ></UpDatetimePicker>
 
     <!-- ActionSheet 性别选择 -->
-    <up-action-sheet
+    <UpActionSheet
       :show="genderActionShow"
       :actions="genderActions"
       title="请选择性别"
       @select="onGenderSelect"
       @close="genderActionShow = false"
-    ></up-action-sheet>
+    ></UpActionSheet>
   </view>
 </template>
 
 <script setup lang="uts">
 import { reactive, ref } from 'vue';
+import NavBar from '@/src/components/NavBar/NavBar.uvue';
+import UpForm from '@/uni_modules/uview-ultra/components/up-form/up-form.uvue';
+import UpFormItem from '@/uni_modules/uview-ultra/components/up-form-item/up-form-item.uvue';
+import UpInput from '@/uni_modules/uview-ultra/components/up-input/up-input.uvue';
+import UpIcon from '@/uni_modules/uview-ultra/components/up-icon/up-icon.uvue';
+import UpRadioGroup from '@/uni_modules/uview-ultra/components/up-radio-group/up-radio-group.uvue';
+import UpRadio from '@/uni_modules/uview-ultra/components/up-radio/up-radio.uvue';
+import UpCheckboxGroup from '@/uni_modules/uview-ultra/components/up-checkbox-group/up-checkbox-group.uvue';
+import UpCheckbox from '@/uni_modules/uview-ultra/components/up-checkbox/up-checkbox.uvue';
+import UpSwitch from '@/uni_modules/uview-ultra/components/up-switch/up-switch.uvue';
+import UpRate from '@/uni_modules/uview-ultra/components/up-rate/up-rate.uvue';
+import UpNumberBox from '@/uni_modules/uview-ultra/components/up-number-box/up-number-box.uvue';
+import UpSlider from '@/uni_modules/uview-ultra/components/up-slider/up-slider.uvue';
+import UpTextarea from '@/uni_modules/uview-ultra/components/up-textarea/up-textarea.uvue';
+import UpUpload from '@/uni_modules/uview-ultra/components/up-upload/up-upload.uvue';
+import UpButton from '@/uni_modules/uview-ultra/components/up-button/up-button.uvue';
+import UpCalendar from '@/uni_modules/uview-ultra/components/up-calendar/up-calendar.uvue';
+import UpPicker from '@/uni_modules/uview-ultra/components/up-picker/up-picker.uvue';
+import UpDatetimePicker from '@/uni_modules/uview-ultra/components/up-datetime-picker/up-datetime-picker.uvue';
+import UpActionSheet from '@/uni_modules/uview-ultra/components/up-action-sheet/up-action-sheet.uvue';
 
 definePage({
   style: {

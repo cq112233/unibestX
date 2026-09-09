@@ -4,23 +4,26 @@
     <view class="p-[16px]">
       <view class="demo-block">
         <text class="demo-label">基本使用</text>
-        <up-link href="https://uniapp.dcloud.io/" text="打开 uni-app 官网"></up-link>
+        <UpLink href="https://uniapp.dcloud.io/" text="打开 uni-app 官网"></UpLink>
       </view>
 
       <view class="demo-block">
         <text class="demo-label">显示下划线</text>
-        <up-link href="https://uview-plus.jiangruyi.com/" text="带下划线的超链接" :under-line="true"></up-link>
+        <UpLink href="https://uview-plus.jiangruyi.com/" text="带下划线的超链接" :under-line="true"></UpLink>
       </view>
 
       <view class="demo-block">
         <text class="demo-label">自定义颜色与大小</text>
-        <up-link href="https://github.com" text="自定义绿色 16px" color="#19be6b" font-size="16"></up-link>
+        <UpLink href="https://github.com" text="自定义绿色 16px" color="#19be6b" font-size="16"></UpLink>
       </view>
     </view>
   </view>
 </template>
 
 <script setup lang="uts">
+import NavBar from '@/src/components/NavBar/NavBar.uvue';
+import UpLink from '@/uni_modules/uview-ultra/components/up-link/up-link.uvue';
+
 definePage({
   style: {
     navigationStyle: 'custom',

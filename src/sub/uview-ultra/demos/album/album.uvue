@@ -4,19 +4,19 @@
     <view class="p-[16px]">
       <view class="demo-block">
         <text class="demo-label">基础用法</text>
-        <up-album :urls="['https://cdn.uviewui.com/uview/album/1.jpg', 'https://cdn.uviewui.com/uview/album/2.jpg']"></up-album>
+        <UpAlbum :urls="['https://cdn.uviewui.com/uview/album/1.jpg', 'https://cdn.uviewui.com/uview/album/2.jpg']"></UpAlbum>
       </view>
       <view class="demo-block mt-[12px]">
         <text class="demo-label">单图模式</text>
-        <up-album :urls="['https://cdn.uviewui.com/uview/album/1.jpg']"></up-album>
+        <UpAlbum :urls="['https://cdn.uviewui.com/uview/album/1.jpg']"></UpAlbum>
       </view>
       <view class="demo-block mt-[12px]">
         <text class="demo-label">指定列数 (4列)</text>
-        <up-album :urls="albumUrls" max-count="8" :row-count="4"></up-album>
+        <UpAlbum :urls="albumUrls" max-count="8" :row-count="4"></UpAlbum>
       </view>
       <view class="demo-block mt-[12px]">
         <text class="demo-label">自定义圆角与间隔</text>
-        <up-album :urls="albumUrls" radius="8" space="10"></up-album>
+        <UpAlbum :urls="albumUrls" radius="8" space="10"></UpAlbum>
       </view>
     </view>
   </view>
@@ -24,6 +24,8 @@
 
 <script setup lang="uts">
 import { ref } from 'vue';
+import NavBar from '@/src/components/NavBar/NavBar.uvue';
+import UpAlbum from '@/uni_modules/uview-ultra/components/up-album/up-album.uvue';
 
 definePage({
   style: {

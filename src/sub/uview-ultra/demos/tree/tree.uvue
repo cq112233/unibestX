@@ -4,78 +4,78 @@
     <view class="p-[16px]">
       <!-- 1. 基础用法 -->
       <view class="demo-block">
-        <up-title class="demo-title">
+        <UpTitle class="demo-title">
           <text class="demo-title-text">基础用法（点击节点展开/收起）</text>
-        </up-title>
-        <up-tree :data="treeData"></up-tree>
+        </UpTitle>
+        <UpTree :data="treeData"></UpTree>
       </view>
 
       <!-- 2. 默认展开全部 -->
       <view class="demo-block mt-[12px]">
-        <up-title class="demo-title">
+        <UpTitle class="demo-title">
           <text class="demo-title-text">默认展开全部</text>
-        </up-title>
-        <up-tree :data="treeData" default-expand-all></up-tree>
+        </UpTitle>
+        <UpTree :data="treeData" default-expand-all></UpTree>
       </view>
 
       <!-- 3. 默认展开指定节点 + 高亮当前 -->
       <view class="demo-block mt-[12px]">
-        <up-title class="demo-title">
+        <UpTitle class="demo-title">
           <text class="demo-title-text">默认展开指定节点 + 高亮当前节点</text>
-        </up-title>
-        <up-tree
+        </UpTitle>
+        <UpTree
           :data="treeData"
           :default-expanded-keys="[1, 11]"
           :current-node-key="12"
           highlight-current
-        ></up-tree>
+        ></UpTree>
       </view>
 
       <!-- 4. 复选框（父子级联） -->
       <view class="demo-block mt-[12px]">
-        <up-title class="demo-title">
+        <UpTitle class="demo-title">
           <text class="demo-title-text">复选框（父子级联勾选）</text>
-        </up-title>
-        <up-tree :data="treeData" show-checkbox></up-tree>
+        </UpTitle>
+        <UpTree :data="treeData" show-checkbox></UpTree>
       </view>
 
       <!-- 5. 复选框（父子独立） -->
       <view class="demo-block mt-[12px]">
-        <up-title class="demo-title">
+        <UpTitle class="demo-title">
           <text class="demo-title-text">复选框（父子独立 checkStrictly）</text>
-        </up-title>
-        <up-tree :data="treeData" show-checkbox check-strictly></up-tree>
+        </UpTitle>
+        <UpTree :data="treeData" show-checkbox check-strictly></UpTree>
       </view>
 
       <!-- 6. 手风琴模式 -->
       <view class="demo-block mt-[12px]">
-        <up-title class="demo-title">
+        <UpTitle class="demo-title">
           <text class="demo-title-text">手风琴模式（同时只展开一个）</text>
-        </up-title>
-        <up-tree :data="treeData" accordion></up-tree>
+        </UpTitle>
+        <UpTree :data="treeData" accordion></UpTree>
       </view>
 
       <!-- 7. 自定义字段 -->
       <view class="demo-block mt-[12px]">
-        <up-title class="demo-title">
+        <UpTitle class="demo-title">
           <text class="demo-title-text">自定义字段（label/children/nodeKey/disabled）</text>
-        </up-title>
-        <up-tree :data="customData" :props="customTreeProps"></up-tree>
+        </UpTitle>
+        <UpTree :data="customData" :props="customTreeProps"></UpTree>
       </view>
 
       <!-- 8. 事件监听 -->
       <view class="demo-block mt-[12px]">
-        <up-title class="demo-title">
+        <UpTitle class="demo-title">
           <text class="demo-title-text">事件监听</text>
-        </up-title>
-        <up-tree
+        </UpTitle>
+        <UpTree
           :data="treeData"
           show-checkbox
           @node-click="onNodeClick"
           @node-expand="onNodeExpand"
           @node-collapse="onNodeCollapse"
           @check-change="onCheckChange"
-        ></up-tree>
+        ></UpTree>
         <view class="log-box mt-[10px]">
           <text class="log-text">{{ eventLog }}</text>
         </view>
@@ -83,14 +83,14 @@
 
       <!-- 9. ref 实例方法 -->
       <view class="demo-block mt-[12px]">
-        <up-title class="demo-title">
+        <UpTitle class="demo-title">
           <text class="demo-title-text">ref 实例方法</text>
-        </up-title>
-        <up-tree ref="treeRef" :data="treeData" show-checkbox default-expand-all></up-tree>
+        </UpTitle>
+        <UpTree ref="treeRef" :data="treeData" show-checkbox default-expand-all></UpTree>
         <view class="btn-row mt-[10px]">
-          <up-button text="setCheckedKeys" type="primary" size="small" class="demo-btn" @click="onSetCheckedKeys"></up-button>
-          <up-button text="getCheckedKeys" type="primary" size="small" class="demo-btn" @click="onGetCheckedKeys"></up-button>
-          <up-button text="setCurrentKey" type="primary" size="small" class="demo-btn" @click="onSetCurrentKey"></up-button>
+          <UpButton text="setCheckedKeys" type="primary" size="small" class="demo-btn" @click="onSetCheckedKeys"></UpButton>
+          <UpButton text="getCheckedKeys" type="primary" size="small" class="demo-btn" @click="onGetCheckedKeys"></UpButton>
+          <UpButton text="setCurrentKey" type="primary" size="small" class="demo-btn" @click="onSetCurrentKey"></UpButton>
         </view>
         <text class="log-text mt-[10px]">{{ apiLog }}</text>
       </view>
@@ -100,6 +100,10 @@
 
 <script setup lang="uts">
 import { ref } from 'vue';
+import NavBar from '@/src/components/NavBar/NavBar.uvue';
+import UpTitle from '@/uni_modules/uview-ultra/components/up-title/up-title.uvue';
+import UpTree from '@/uni_modules/uview-ultra/components/up-tree/up-tree.uvue';
+import UpButton from '@/uni_modules/uview-ultra/components/up-button/up-button.uvue';
 
 definePage({
   style: {

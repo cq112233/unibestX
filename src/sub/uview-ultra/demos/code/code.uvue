@@ -5,8 +5,8 @@
       <view class="demo-block">
         <text class="demo-label">基础用法</text>
         <view class="flex-row items-center justify-between mt-[10px]">
-          <up-code ref="uCodeRef" seconds="60" @change="codeChange"></up-code>
-          <up-button :text="tips" type="primary" size="small" @click="getCode"></up-button>
+          <UpCode ref="uCodeRef" seconds="60" @change="codeChange"></UpCode>
+          <UpButton :text="tips" type="primary" size="small" @click="getCode"></UpButton>
         </view>
       </view>
     </view>
@@ -15,6 +15,9 @@
 
 <script setup lang="uts">
 import { ref } from 'vue';
+import NavBar from '@/src/components/NavBar/NavBar.uvue';
+import UpCode from '@/uni_modules/uview-ultra/components/up-code/up-code.uvue';
+import UpButton from '@/uni_modules/uview-ultra/components/up-button/up-button.uvue';
 
 definePage({
   style: {

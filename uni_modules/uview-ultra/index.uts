@@ -40,7 +40,7 @@ export function loadFont() {
 // 快捷工具方法
 class UPUtils {
  	addUnit(val: any|null, unit: string|null = ''): string {
-		return index.addUnit(val, unit)
+		return index.addUnit(val, unit) ?? ''
 	}
 	addStyle(customStyle: any, target = 'object'): any {
 		return index.addStyle(customStyle, target)

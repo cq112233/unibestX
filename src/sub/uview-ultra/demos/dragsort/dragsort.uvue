@@ -4,10 +4,10 @@
     <view class="p-[16px]">
       <!-- 0. 无手柄（整项拖拽） -->
       <view class="demo-block">
-        <up-title class="demo-title">
+        <UpTitle class="demo-title">
           <text class="demo-title-text">无手柄（按住整项任意位置拖拽排序）</text>
-        </up-title>
-        <up-dragsort
+        </UpTitle>
+        <UpDragsort
           :initial-list="plainList"
           direction="vertical"
           @drag-end="onDragEnd"
@@ -18,15 +18,15 @@
               <text class="drag-item-index">{{ (index as number) + 1 }}</text>
             </view>
           </template>
-        </up-dragsort>
+        </UpDragsort>
       </view>
 
       <!-- 1. 垂直拖拽（右侧手柄） -->
       <view class="demo-block mt-[12px]">
-        <up-title class="demo-title">
+        <UpTitle class="demo-title">
           <text class="demo-title-text">垂直拖拽（按住右侧手柄排序）</text>
-        </up-title>
-        <up-dragsort
+        </UpTitle>
+        <UpDragsort
           :initial-list="verticalList"
           direction="vertical"
           handle-drag
@@ -34,7 +34,7 @@
         >
           <template #handler>
             <view class="drag-handler">
-              <up-icon name="list" color="#64748b" size="20" />
+              <UpIcon name="list" color="#64748b" size="20" />
             </view>
           </template>
           <template #default="{ item, index }">
@@ -43,15 +43,15 @@
               <text class="drag-item-index">{{ (index as number) + 1 }}</text>
             </view>
           </template>
-        </up-dragsort>
+        </UpDragsort>
       </view>
 
       <!-- 2. 垂直拖拽（左侧手柄） -->
       <view class="demo-block mt-[12px]">
-        <up-title class="demo-title">
+        <UpTitle class="demo-title">
           <text class="demo-title-text">垂直拖拽（按住左侧手柄排序）</text>
-        </up-title>
-        <up-dragsort
+        </UpTitle>
+        <UpDragsort
           :initial-list="leftHandleList"
           direction="vertical"
           handle-drag
@@ -60,7 +60,7 @@
         >
           <template #handler>
             <view class="drag-handler drag-handler--left">
-              <up-icon name="list" color="#64748b" size="20" />
+              <UpIcon name="list" color="#64748b" size="20" />
             </view>
           </template>
           <template #default="{ item, index }">
@@ -69,15 +69,15 @@
               <text class="drag-item-index">{{ (index as number) + 1 }}</text>
             </view>
           </template>
-        </up-dragsort>
+        </UpDragsort>
       </view>
 
       <!-- 3. 水平拖拽 -->
       <view class="demo-block mt-[12px]">
-        <up-title class="demo-title">
+        <UpTitle class="demo-title">
           <text class="demo-title-text">水平拖拽（按住右侧手柄左右拖动）</text>
-        </up-title>
-        <up-dragsort
+        </UpTitle>
+        <UpDragsort
           :initial-list="horizontalList"
           direction="horizontal"
           handle-drag
@@ -85,7 +85,7 @@
         >
           <template #handler>
             <view class="drag-handler-h">
-              <up-icon name="list" color="#2563eb" size="20" />
+              <UpIcon name="list" color="#2563eb" size="20" />
             </view>
           </template>
           <template #default="{ item }">
@@ -93,15 +93,15 @@
               <text class="drag-item-text">{{ getLabel(item as UTSJSONObject) }}</text>
             </view>
           </template>
-        </up-dragsort>
+        </UpDragsort>
       </view>
 
       <!-- 4. 九宫格拖拽 -->
       <view class="demo-block mt-[12px]">
-        <up-title class="demo-title">
+        <UpTitle class="demo-title">
           <text class="demo-title-text">九宫格拖拽（direction="all"、3 列，按住角标拖拽）</text>
-        </up-title>
-        <up-dragsort
+        </UpTitle>
+        <UpDragsort
           :initial-list="gridList"
           direction="all"
           :columns="3"
@@ -110,7 +110,7 @@
         >
           <template #handler>
             <view class="drag-handler-grid">
-              <up-icon name="list" color="#475569" size="14" />
+              <UpIcon name="list" color="#475569" size="14" />
             </view>
           </template>
           <template #default="{ item, index }">
@@ -119,15 +119,15 @@
               <text class="drag-item-grid-index">#{{ (index as number) + 1 }}</text>
             </view>
           </template>
-        </up-dragsort>
+        </UpDragsort>
       </view>
 
       <!-- 5. 部分项禁用 -->
       <view class="demo-block mt-[12px]">
-        <up-title class="demo-title">
+        <UpTitle class="demo-title">
           <text class="demo-title-text">部分项禁用拖拽（draggable: false）</text>
-        </up-title>
-        <up-dragsort
+        </UpTitle>
+        <UpDragsort
           :initial-list="disabledList"
           direction="vertical"
           handle-drag
@@ -135,7 +135,7 @@
         >
           <template #handler="{ item }">
             <view class="drag-handler" :class="getItemDisabled(item as UTSJSONObject) ? 'drag-handler--disabled' : ''">
-              <up-icon name="list" :color="getItemDisabled(item as UTSJSONObject) ? '#94a3b8' : '#64748b'" size="20" />
+              <UpIcon name="list" :color="getItemDisabled(item as UTSJSONObject) ? '#94a3b8' : '#64748b'" size="20" />
             </view>
           </template>
           <template #default="{ item }">
@@ -143,14 +143,14 @@
               <text class="drag-item-text">{{ getLabel(item as UTSJSONObject) }}</text>
             </view>
           </template>
-        </up-dragsort>
+        </UpDragsort>
       </view>
 
       <!-- 6. 说明 -->
       <view class="demo-block mt-[12px]">
-        <up-title class="demo-title">
+        <UpTitle class="demo-title">
           <text class="demo-title-text">说明</text>
-        </up-title>
+        </UpTitle>
         <text class="demo-text">
           up-dragsort 在 App 端（安卓/iOS/鸿蒙）使用原生 touch 手势实现，H5/小程序沿用 movable-view 原实现；不传 handler 插槽时按住整项任意位置即可拖拽排序，传入 handler 插槽并配合 handle-drag 属性则仅手柄可拖拽，handler-position 属性可控制手柄在左/右；支持 vertical / horizontal / all 三种方向，drag-end 事件返回排序后的列表。
         </text>
@@ -165,6 +165,10 @@
 
 <script setup lang="uts">
 import { ref } from 'vue';
+import NavBar from '@/src/components/NavBar/NavBar.uvue';
+import UpTitle from '@/uni_modules/uview-ultra/components/up-title/up-title.uvue';
+import UpDragsort from '@/uni_modules/uview-ultra/components/up-dragsort/up-dragsort.uvue';
+import UpIcon from '@/uni_modules/uview-ultra/components/up-icon/up-icon.uvue';
 
 definePage({
   style: {

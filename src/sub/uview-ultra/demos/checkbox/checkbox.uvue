@@ -4,33 +4,33 @@
     <view class="p-[16px]">
       <view class="demo-block">
         <text class="demo-label">基础用法</text>
-        <up-checkbox-group v-model="checkboxValue1" @change="checkboxChange">
-          <up-checkbox name="apple" label="苹果" class="mb-[10px] mr-[20px]"></up-checkbox>
-          <up-checkbox name="banana" label="香蕉" class="mb-[10px] mr-[20px]"></up-checkbox>
-        </up-checkbox-group>
+        <UpCheckboxGroup v-model="checkboxValue1" @change="checkboxChange">
+          <UpCheckbox name="apple" label="苹果" class="mb-[10px] mr-[20px]"></UpCheckbox>
+          <UpCheckbox name="banana" label="香蕉" class="mb-[10px] mr-[20px]"></UpCheckbox>
+        </UpCheckboxGroup>
       </view>
 
       <view class="demo-block mt-[12px]">
         <text class="demo-label">禁用状态</text>
-        <up-checkbox-group v-model="checkboxValue2">
-          <up-checkbox name="apple" label="苹果(禁用)" :disabled="true" class="mb-[10px] mr-[20px]"></up-checkbox>
-          <up-checkbox name="banana" label="香蕉(未禁用)" class="mb-[10px] mr-[20px]"></up-checkbox>
-        </up-checkbox-group>
+        <UpCheckboxGroup v-model="checkboxValue2">
+          <UpCheckbox name="apple" label="苹果(禁用)" :disabled="true" class="mb-[10px] mr-[20px]"></UpCheckbox>
+          <UpCheckbox name="banana" label="香蕉(未禁用)" class="mb-[10px] mr-[20px]"></UpCheckbox>
+        </UpCheckboxGroup>
       </view>
 
       <view class="demo-block mt-[12px]">
         <text class="demo-label">自定义形状与颜色</text>
-        <up-checkbox-group v-model="checkboxValue3">
-          <up-checkbox name="circle" label="圆形" shape="circle" active-color="#fa3534" class="mb-[10px] mr-[20px]"></up-checkbox>
-          <up-checkbox name="square" label="方形" shape="square" active-color="#ff9900" class="mb-[10px] mr-[20px]"></up-checkbox>
-        </up-checkbox-group>
+        <UpCheckboxGroup v-model="checkboxValue3">
+          <UpCheckbox name="circle" label="圆形" shape="circle" active-color="#fa3534" class="mb-[10px] mr-[20px]"></UpCheckbox>
+          <UpCheckbox name="square" label="方形" shape="square" active-color="#ff9900" class="mb-[10px] mr-[20px]"></UpCheckbox>
+        </UpCheckboxGroup>
       </view>
 
       <view class="demo-block mt-[12px]">
         <text class="demo-label">禁止点击标签切换</text>
-        <up-checkbox-group v-model="checkboxValue4">
-          <up-checkbox name="label" label="只能点框框" :label-disabled="true" class="mb-[10px] mr-[20px]"></up-checkbox>
-        </up-checkbox-group>
+        <UpCheckboxGroup v-model="checkboxValue4">
+          <UpCheckbox name="label" label="只能点框框" :label-disabled="true" class="mb-[10px] mr-[20px]"></UpCheckbox>
+        </UpCheckboxGroup>
       </view>
     </view>
   </view>
@@ -38,6 +38,9 @@
 
 <script setup lang="uts">
 import { ref } from 'vue';
+import NavBar from '@/src/components/NavBar/NavBar.uvue';
+import UpCheckboxGroup from '@/uni_modules/uview-ultra/components/up-checkbox-group/up-checkbox-group.uvue';
+import UpCheckbox from '@/uni_modules/uview-ultra/components/up-checkbox/up-checkbox.uvue';
 
 definePage({
   style: {

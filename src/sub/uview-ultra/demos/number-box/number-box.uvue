@@ -4,22 +4,22 @@
     <view class="p-[16px]">
       <view class="demo-block">
         <text class="demo-label">基础用法</text>
-        <up-number-box v-model="numberValue1"></up-number-box>
+        <UpNumberBox v-model="numberValue1"></UpNumberBox>
       </view>
 
       <view class="demo-block mt-[12px]">
         <text class="demo-label">指定步长</text>
-        <up-number-box v-model="numberValue2" :step="2"></up-number-box>
+        <UpNumberBox v-model="numberValue2" :step="2"></UpNumberBox>
       </view>
 
       <view class="demo-block mt-[12px]">
         <text class="demo-label">限制最大/最小值</text>
-        <up-number-box v-model="numberValue3" :min="5" :max="10"></up-number-box>
+        <UpNumberBox v-model="numberValue3" :min="5" :max="10"></UpNumberBox>
       </view>
 
       <view class="demo-block mt-[12px]">
         <text class="demo-label">禁用状态</text>
-        <up-number-box v-model="numberValue4" :disabled="true"></up-number-box>
+        <UpNumberBox v-model="numberValue4" :disabled="true"></UpNumberBox>
       </view>
     </view>
   </view>
@@ -27,6 +27,8 @@
 
 <script setup lang="uts">
 import { ref } from 'vue';
+import NavBar from '@/src/components/NavBar/NavBar.uvue';
+import UpNumberBox from '@/uni_modules/uview-ultra/components/up-number-box/up-number-box.uvue';
 
 definePage({
   style: {

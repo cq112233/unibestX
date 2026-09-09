@@ -41,7 +41,7 @@
         <text class="text-[14px] text-[#475569] font-medium">up-icon (uview-ultra)</text>
       </view>
       <view class="flex-row items-center">
-        <up-icon name="setting" size="24" style="color: #a855f7; margin-right: 8px;" />
+        <UpIcon name="setting" size="24" style="color: #a855f7; margin-right: 8px;" />
         <text class="text-[12px] text-[#94a3b8]">setting</text>
       </view>
     </view>
@@ -50,10 +50,11 @@
 
 <script setup lang="uts">
 import Card from './Card.uvue';
-import UniIcons from '@/uni_modules/uni-icons/components/uni-icons/uni-icons.uvue'
-import LIcon from '@/uni_modules/lime-icon/components/l-icon/l-icon.uvue'
+import UniIcons from '@/uni_modules/uni-icons/components/uni-icons/uni-icons.uvue';
+import LIcon from '@/uni_modules/lime-icon/components/l-icon/l-icon.uvue';
 import { computed } from 'vue';
 import { $t } from '@/src/utils/i18n';
+import UpIcon from '@/uni_modules/uview-ultra/components/up-icon/up-icon.uvue';
 
 const iconDemoTitle = computed((): string => $t('basic.iconDemoTitle'));
 const svgAuthWarning = computed((): string => $t('basic.svgAuthWarning'));

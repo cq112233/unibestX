@@ -4,7 +4,7 @@
     <view class="p-[16px]">
       <view class="demo-block">
         <text class="demo-label">基础轮播图</text>
-        <up-swiper
+        <UpSwiper
           :list="swiperList"
           key-name="image"
           :indicator="true"
@@ -14,11 +14,11 @@
           :interval="3000"
           height="180"
           :show-title="true"
-        ></up-swiper>
+        ></UpSwiper>
       </view>
       <view class="demo-block mt-[12px]">
         <text class="demo-label">卡片式轮播</text>
-        <up-swiper
+        <UpSwiper
           :list="swiperList"
           key-name="image"
           :indicator="true"
@@ -29,7 +29,7 @@
           :previous-margin="30"
           :next-margin="30"
           height="160"
-        ></up-swiper>
+        ></UpSwiper>
       </view>
     </view>
   </view>
@@ -37,6 +37,8 @@
 
 <script setup lang="uts">
 import { ref } from 'vue';
+import NavBar from '@/src/components/NavBar/NavBar.uvue';
+import UpSwiper from '@/uni_modules/uview-ultra/components/up-swiper/up-swiper.uvue';
 
 definePage({
   style: {

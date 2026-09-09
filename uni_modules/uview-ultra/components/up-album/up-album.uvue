@@ -282,24 +282,24 @@ function getImageStyle(index1: number, index2: number): UTSJSONObject {
 const imageWidth = computed(() => {
     return addUnit(
         props.urls.length == 1 ? singleWidth.value : props.multipleSize, props.unit
-    )
+    ) ?? ''
 })
 
 // 计算属性 - 图片高度
 const imageHeight = computed(() => {
     return addUnit(
         props.urls.length == 1 ? singleHeight.value : props.multipleSize, props.unit
-    )
+    ) ?? ''
 })
 
 // 计算属性 - 图片圆角
 const imageBorderRadius = computed((): string => {
-    return props.shape == 'circle' ? '10000px' : addUnit(props.radius)
+    return props.shape == 'circle' ? '10000px' : (addUnit(props.radius) ?? '')
 })
 
 // 计算属性 - 查看更多圆角
 const moreBorderRadius = computed((): string => {
-    return props.shape == 'circle' ? '50%' : addUnit(props.radius)
+    return props.shape == 'circle' ? '50%' : (addUnit(props.radius) ?? '')
 })
 
 // 计算属性 - 相册宽度

@@ -42,7 +42,7 @@ export const mixin = defineMixin({
     },
     methods: {
 		$upAddUnit(val: any|null, unit: string|null = ''): string {
-			return _addUnit(val, unit)
+			return _addUnit(val, unit) ?? ''
 		},
 		$upAddStyle(customStyle: any, target = 'object'): any {
 			return _addStyle(customStyle, target)

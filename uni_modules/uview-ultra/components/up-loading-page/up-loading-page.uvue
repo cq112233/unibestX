@@ -95,7 +95,7 @@ const imageSizeStyle = computed((): UTSJSONObject => {
 })
 
 const formattedIconSize = computed((): string => {
-  return addUnit(props.iconSize)
+  return addUnit(props.iconSize) ?? ''
 })
 
 const textStyle = computed((): UTSJSONObject => {

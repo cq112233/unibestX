@@ -137,7 +137,7 @@
 	})
 
 	const menuIconSizeUnit = computed((): string => {
-		return addUnit(props.menuIconSize)
+		return addUnit(props.menuIconSize) ?? ''
 	})
 
 	function getMenuIconColor(index: number): string {

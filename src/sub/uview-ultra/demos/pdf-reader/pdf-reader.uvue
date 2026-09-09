@@ -4,20 +4,20 @@
     <view class="p-[16px]">
       <!-- 基础用法：同一时刻只渲染一个 web-view，避免 Web/小程序端全屏覆盖 -->
       <view class="demo-block">
-        <up-title class="demo-title">
+        <UpTitle class="demo-title">
           <text class="demo-title-text">基础用法（web-view 加载 PDF）</text>
-        </up-title>
+        </UpTitle>
         <view class="height-switch">
-          <up-button text="高度 600px" type="primary" :plain="height != '600px'" size="mini" class="height-option" @click="setHeight('600px')"></up-button>
-          <up-button text="高度 400px" type="primary" :plain="height != '400px'" size="mini" class="height-option" @click="setHeight('400px')"></up-button>
+          <UpButton text="高度 600px" type="primary" :plain="height != '600px'" size="mini" class="height-option" @click="setHeight('600px')"></UpButton>
+          <UpButton text="高度 400px" type="primary" :plain="height != '400px'" size="mini" class="height-option" @click="setHeight('400px')"></UpButton>
         </view>
-        <up-pdf-reader :src="pdfUrl" :height="height"></up-pdf-reader>
+        <UpPdfReader :src="pdfUrl" :height="height"></UpPdfReader>
       </view>
 
       <view class="demo-block mt-[12px]">
-        <up-title class="demo-title">
+        <UpTitle class="demo-title">
           <text class="demo-title-text">说明</text>
-        </up-title>
+        </UpTitle>
         <text class="demo-text">
           up-pdf-reader 基于 web-view + pdf.js 渲染 PDF。Web/小程序端 web-view 会忽略宽高并全屏显示，且同一页面只能渲染一个；App 端可自由调整高度，内容在 web-view 内部滚动。若 PDF 区域空白，请更换为可达的 PDF 地址，或把 baseUrl 换成自部署的 pdf.js 路径。
         </text>
@@ -28,6 +28,10 @@
 
 <script setup lang="uts">
 import { ref } from 'vue';
+import NavBar from '@/src/components/NavBar/NavBar.uvue';
+import UpTitle from '@/uni_modules/uview-ultra/components/up-title/up-title.uvue';
+import UpButton from '@/uni_modules/uview-ultra/components/up-button/up-button.uvue';
+import UpPdfReader from '@/uni_modules/uview-ultra/components/up-pdf-reader/up-pdf-reader.uvue';
 
 definePage({
   style: {

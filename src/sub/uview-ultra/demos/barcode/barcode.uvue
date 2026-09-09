@@ -4,40 +4,40 @@
     <view class="p-[16px]">
       <!-- 1. 基础用法 -->
       <view class="demo-block">
-        <up-title class="demo-title">
+        <UpTitle class="demo-title">
           <text class="demo-title-text">基础用法（自动识别格式）</text>
-        </up-title>
+        </UpTitle>
         <view class="barcode-box">
-          <up-barcode value="123456789012"></up-barcode>
+          <UpBarcode value="123456789012"></UpBarcode>
         </view>
       </view>
 
       <!-- 2. 常用格式 -->
       <view class="demo-block mt-[12px]">
-        <up-title class="demo-title">
+        <UpTitle class="demo-title">
           <text class="demo-title-text">常用格式</text>
-        </up-title>
+        </UpTitle>
         <view class="barcode-box">
           <text class="barcode-name">EAN13</text>
-          <up-barcode value="6922233612192" format="EAN13"></up-barcode>
+          <UpBarcode value="6922233612192" format="EAN13"></UpBarcode>
         </view>
         <view class="barcode-box">
           <text class="barcode-name">CODE39</text>
-          <up-barcode value="UVIEW-ULTRA" format="CODE39"></up-barcode>
+          <UpBarcode value="UVIEW-ULTRA" format="CODE39"></UpBarcode>
         </view>
         <view class="barcode-box">
           <text class="barcode-name">UPCA</text>
-          <up-barcode value="012345678905" format="UPCA"></up-barcode>
+          <UpBarcode value="012345678905" format="UPCA"></UpBarcode>
         </view>
       </view>
 
       <!-- 3. 自定义样式 -->
       <view class="demo-block mt-[12px]">
-        <up-title class="demo-title">
+        <UpTitle class="demo-title">
           <text class="demo-title-text">自定义样式（颜色/尺寸/文字位置）</text>
-        </up-title>
+        </UpTitle>
         <view class="barcode-box">
-          <up-barcode
+          <UpBarcode
             value="20260820"
             format="CODE128"
             :width="260"
@@ -47,27 +47,27 @@
             line-color="#0957de"
             text-position="top"
             :font-size="12"
-          ></up-barcode>
+          ></UpBarcode>
         </view>
       </view>
 
       <!-- 4. ref 重新生成 + 事件 -->
       <view class="demo-block mt-[12px]">
-        <up-title class="demo-title">
+        <UpTitle class="demo-title">
           <text class="demo-title-text">ref 重新生成 + 事件</text>
-        </up-title>
+        </UpTitle>
         <view class="barcode-box">
-          <up-barcode
+          <UpBarcode
             ref="barcodeRef"
             :value="barcodeValue"
             format="CODE128"
             @rendered="onRendered"
             @error="onError"
-          ></up-barcode>
+          ></UpBarcode>
         </view>
         <view class="btn-row mt-[10px]">
-          <up-button text="重新生成" type="primary" size="small" class="demo-btn" @click="onRegenerate"></up-button>
-          <up-button text="换一个值" type="primary" size="small" class="demo-btn" @click="onChangeValue"></up-button>
+          <UpButton text="重新生成" type="primary" size="small" class="demo-btn" @click="onRegenerate"></UpButton>
+          <UpButton text="换一个值" type="primary" size="small" class="demo-btn" @click="onChangeValue"></UpButton>
         </view>
         <text class="log-text mt-[10px]">{{ eventLog }}</text>
       </view>
@@ -77,6 +77,10 @@
 
 <script setup lang="uts">
 import { ref } from 'vue';
+import NavBar from '@/src/components/NavBar/NavBar.uvue';
+import UpTitle from '@/uni_modules/uview-ultra/components/up-title/up-title.uvue';
+import UpBarcode from '@/uni_modules/uview-ultra/components/up-barcode/up-barcode.uvue';
+import UpButton from '@/uni_modules/uview-ultra/components/up-button/up-button.uvue';
 
 definePage({
   style: {

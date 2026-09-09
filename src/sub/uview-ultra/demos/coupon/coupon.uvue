@@ -4,95 +4,95 @@
     <view class="p-[16px]">
       <!-- 1. 基础用法 -->
       <view class="demo-block">
-        <up-title class="demo-title">
+        <UpTitle class="demo-title">
           <text class="demo-title-text">基础用法</text>
-        </up-title>
-        <up-coupon
+        </UpTitle>
+        <UpCoupon
           amount="50"
           title="新人专享优惠券"
           desc="满 100 元可用"
           time="有效期至 2026-12-31"
           action-text="立即领取"
           @click="onClick"
-        ></up-coupon>
+        ></UpCoupon>
       </view>
 
       <!-- 2. 不同形态 -->
       <view class="demo-block mt-[12px]">
-        <up-title class="demo-title">
+        <UpTitle class="demo-title">
           <text class="demo-title-text">不同形态（coupon / envelope / card）</text>
-        </up-title>
-        <up-coupon
+        </UpTitle>
+        <UpCoupon
           amount="20"
           title="信封样式"
           shape="envelope"
           @click="onClick"
-        ></up-coupon>
-        <up-coupon
+        ></UpCoupon>
+        <UpCoupon
           class="mt-[12px]"
           amount="30"
           title="卡片样式"
           desc="全场通用"
           shape="card"
           @click="onClick"
-        ></up-coupon>
+        ></UpCoupon>
       </view>
 
       <!-- 3. 不同尺寸 -->
       <view class="demo-block mt-[12px]">
-        <up-title class="demo-title">
+        <UpTitle class="demo-title">
           <text class="demo-title-text">不同尺寸（small / medium / large）</text>
-        </up-title>
-        <up-coupon
+        </UpTitle>
+        <UpCoupon
           amount="10"
           title="小型"
           size="small"
           @click="onClick"
-        ></up-coupon>
-        <up-coupon
+        ></UpCoupon>
+        <UpCoupon
           class="mt-[12px]"
           amount="10"
           title="中型"
           size="medium"
           @click="onClick"
-        ></up-coupon>
-        <up-coupon
+        ></UpCoupon>
+        <UpCoupon
           class="mt-[12px]"
           amount="10"
           title="大型"
           size="large"
           @click="onClick"
-        ></up-coupon>
+        ></UpCoupon>
       </view>
 
       <!-- 4. 禁用 + 自定义颜色 -->
       <view class="demo-block mt-[12px]">
-        <up-title class="demo-title">
+        <UpTitle class="demo-title">
           <text class="demo-title-text">禁用状态 / 自定义背景色</text>
-        </up-title>
-        <up-coupon
+        </UpTitle>
+        <UpCoupon
           amount="99"
           title="已失效优惠券"
           action-text="已过期"
           disabled
           @click="onClick"
-        ></up-coupon>
-        <up-coupon
+        ></UpCoupon>
+        <UpCoupon
           class="mt-[12px]"
           amount="15"
           title="自定义背景"
           bg-color="#eef7ff"
           action-text="去使用"
           @click="onClick"
-        ></up-coupon>
+        ></UpCoupon>
       </view>
 
       <!-- 5. 自定义操作插槽 -->
       <view class="demo-block mt-[12px]">
-        <up-title class="demo-title">
+        <UpTitle class="demo-title">
           <text class="demo-title-text">自定义操作插槽</text>
-        </up-title>
-        <up-coupon
+        </UpTitle>
+        <UpCoupon
           amount="88"
           title="大额优惠券"
           desc="自定义右侧按钮"
@@ -103,13 +103,13 @@
               <text class="custom-action-text">点击领取</text>
             </view>
           </template>
-        </up-coupon>
+        </UpCoupon>
       </view>
 
       <view class="demo-block mt-[12px]">
-        <up-title class="demo-title">
+        <UpTitle class="demo-title">
           <text class="demo-title-text">说明</text>
-        </up-title>
+        </UpTitle>
         <text class="demo-text">
           up-coupon 支持 coupon / envelope / card 三种形态、small / medium / large 三种尺寸，可自定义插槽与点击事件。
         </text>
@@ -124,6 +124,9 @@
 
 <script setup lang="uts">
 import { ref } from 'vue';
+import NavBar from '@/src/components/NavBar/NavBar.uvue';
+import UpTitle from '@/uni_modules/uview-ultra/components/up-title/up-title.uvue';
+import UpCoupon from '@/uni_modules/uview-ultra/components/up-coupon/up-coupon.uvue';
 
 definePage({
   style: {

@@ -4,10 +4,10 @@
     <view class="p-[16px]">
       <!-- 1. 基本用法 -->
       <view class="demo-block">
-        <up-title class="demo-title">
+        <UpTitle class="demo-title">
           <text class="demo-title-text">基本用法（带工具栏，可撤销/清空/调粗细/换颜色/导出）</text>
-        </up-title>
-        <up-signature
+        </UpTitle>
+        <UpSignature
           ref="sigRef1"
           :width="300"
           :height="200"
@@ -15,15 +15,15 @@
           @confirm="onConfirm"
           @error="onError"
           @clear="onClear"
-        ></up-signature>
+        ></UpSignature>
       </view>
 
       <!-- 2. 自定义样式（无工具栏） -->
       <view class="demo-block mt-[12px]">
-        <up-title class="demo-title">
+        <UpTitle class="demo-title">
           <text class="demo-title-text">自定义样式（红色笔、粗细 5、隐藏工具栏）</text>
-        </up-title>
-        <up-signature
+        </UpTitle>
+        <UpSignature
           ref="sigRef2"
           :width="300"
           :height="160"
@@ -33,26 +33,26 @@
           :show-toolbar="false"
           @confirm="onConfirm"
           @error="onError"
-        ></up-signature>
+        ></UpSignature>
         <view class="sig-actions">
-          <up-button text="清空" type="primary" plain size="small" class="sig-btn" @click="clearSig2"></up-button>
-          <up-button text="导出" type="primary" size="small" class="sig-btn" @click="exportSig2"></up-button>
+          <UpButton text="清空" type="primary" plain size="small" class="sig-btn" @click="clearSig2"></UpButton>
+          <UpButton text="导出" type="primary" size="small" class="sig-btn" @click="exportSig2"></UpButton>
         </view>
       </view>
 
       <!-- 3. 导出预览 -->
       <view v-if="exportPath != ''" class="demo-block mt-[12px]">
-        <up-title class="demo-title">
+        <UpTitle class="demo-title">
           <text class="demo-title-text">导出结果预览</text>
-        </up-title>
+        </UpTitle>
         <image :src="exportPath" class="preview-image" mode="aspectFit"></image>
       </view>
 
       <!-- 4. 说明 -->
       <view class="demo-block mt-[12px]">
-        <up-title class="demo-title">
+        <UpTitle class="demo-title">
           <text class="demo-title-text">说明</text>
-        </up-title>
+        </UpTitle>
         <text class="demo-text">
           up-signature 已适配 vdom/vapor 双模式：App 端（安卓/iOS）基于 DrawableContext 原生绘制，鸿蒙基于 canvas 组件，H5 支持触摸与鼠标绘制、小程序沿用 canvas 2d 实现；支持 undo / clearCanvas / redraw / exportSignature 实例方法，confirm 事件返回导出的图片路径，error 事件返回错误信息。
         </text>
@@ -67,6 +67,10 @@
 
 <script setup lang="uts">
 import { ref } from 'vue';
+import NavBar from '@/src/components/NavBar/NavBar.uvue';
+import UpTitle from '@/uni_modules/uview-ultra/components/up-title/up-title.uvue';
+import UpSignature from '@/uni_modules/uview-ultra/components/up-signature/up-signature.uvue';
+import UpButton from '@/uni_modules/uview-ultra/components/up-button/up-button.uvue';
 
 definePage({
   style: {

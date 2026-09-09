@@ -233,11 +233,11 @@ const canvasWrapStyle = computed<UTSJSONObject>(() => {
 })
 
 const penSizeLabel = computed<string>(() => {
-	return t('up.signature.penSize')
+	return t('up.signature.penSize', {} as UTSJSONObject)
 })
 
 const penColorLabel = computed<string>(() => {
-	return t('up.signature.penColor')
+	return t('up.signature.penColor', {} as UTSJSONObject)
 })
 
 function getColorStyle(col: string): UTSJSONObject {

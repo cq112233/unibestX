@@ -4,17 +4,22 @@
     <view class="p-[16px]">
       <view class="demo-block">
         <text class="demo-label">基础用法</text>
-        <up-grid :border="true">
-          <up-grid-item v-for="i in 4" :key="i">
-            <up-icon name="photo" :size="30"></up-icon><text style="margin-top:10px;font-size:14px;color:#333;">宫格</text>
-          </up-grid-item>
-        </up-grid>
+        <UpGrid :border="true">
+          <UpGridItem v-for="i in 4" :key="i">
+            <UpIcon name="photo" :size="30"></UpIcon><text style="margin-top:10px;font-size:14px;color:#333;">宫格</text>
+          </UpGridItem>
+        </UpGrid>
       </view>
     </view>
   </view>
 </template>
 
 <script setup lang="uts">
+import NavBar from '@/src/components/NavBar/NavBar.uvue';
+import UpGrid from '@/uni_modules/uview-ultra/components/up-grid/up-grid.uvue';
+import UpGridItem from '@/uni_modules/uview-ultra/components/up-grid-item/up-grid-item.uvue';
+import UpIcon from '@/uni_modules/uview-ultra/components/up-icon/up-icon.uvue';
+
 definePage({
   style: {
     navigationStyle: 'custom',

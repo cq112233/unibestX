@@ -5,26 +5,29 @@
       <view class="demo-block">
         <text class="demo-label">基础用法</text>
         <view class="flex-row items-center">
-          <up-button type="primary" text="成功提示" size="mini" @click="showToast('success')"></up-button>
+          <UpButton type="primary" text="成功提示" size="mini" @click="showToast('success')"></UpButton>
           <view class="w-[10px]"></view>
-          <up-button type="error" text="错误提示" size="mini" @click="showToast('error')"></up-button>
+          <UpButton type="error" text="错误提示" size="mini" @click="showToast('error')"></UpButton>
         </view>
       </view>
       <view class="demo-block mt-[12px]">
         <text class="demo-label">更多类型</text>
         <view class="flex-row items-center">
-          <up-button type="warning" text="警告提示" size="mini" @click="showToast('warning')"></up-button>
+          <UpButton type="warning" text="警告提示" size="mini" @click="showToast('warning')"></UpButton>
           <view class="w-[10px]"></view>
-          <up-button type="default" text="默认提示" size="mini" @click="showToast('default')"></up-button>
+          <UpButton type="default" text="默认提示" size="mini" @click="showToast('default')"></UpButton>
         </view>
       </view>
     </view>
-    <up-toast ref="uToast"></up-toast>
+    <UpToast ref="uToast"></UpToast>
   </view>
 </template>
 
 <script setup lang="uts">
 import { ref } from 'vue';
+import NavBar from '@/src/components/NavBar/NavBar.uvue';
+import UpButton from '@/uni_modules/uview-ultra/components/up-button/up-button.uvue';
+import UpToast from '@/uni_modules/uview-ultra/components/up-toast/up-toast.uvue';
 
 definePage({
   style: {

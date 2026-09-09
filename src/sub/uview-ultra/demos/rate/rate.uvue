@@ -4,27 +4,27 @@
     <view class="p-[16px]">
       <view class="demo-block">
         <text class="demo-label">基础用法</text>
-        <up-rate v-model="rateValue1" :count="5"></up-rate>
+        <UpRate v-model="rateValue1" :count="5"></UpRate>
       </view>
 
       <view class="demo-block mt-[12px]">
         <text class="demo-label">自定义图标与颜色</text>
-        <up-rate v-model="rateValue2" :count="5" active-icon="heart-fill" inactive-icon="heart" active-color="#fa3534"></up-rate>
+        <UpRate v-model="rateValue2" :count="5" active-icon="heart-fill" inactive-icon="heart" active-color="#fa3534"></UpRate>
       </view>
 
       <view class="demo-block mt-[12px]">
         <text class="demo-label">半星展示</text>
-        <up-rate v-model="rateValue3" :count="5" :allow-half="true"></up-rate>
+        <UpRate v-model="rateValue3" :count="5" :allow-half="true"></UpRate>
       </view>
 
       <view class="demo-block mt-[12px]">
         <text class="demo-label">只读状态</text>
-        <up-rate v-model="rateValue4" :count="5" :readonly="true"></up-rate>
+        <UpRate v-model="rateValue4" :count="5" :readonly="true"></UpRate>
       </view>
 
       <view class="demo-block mt-[12px]">
         <text class="demo-label">禁用状态</text>
-        <up-rate v-model="rateValue5" :count="5" :disabled="true"></up-rate>
+        <UpRate v-model="rateValue5" :count="5" :disabled="true"></UpRate>
       </view>
     </view>
   </view>
@@ -32,6 +32,8 @@
 
 <script setup lang="uts">
 import { ref } from 'vue';
+import NavBar from '@/src/components/NavBar/NavBar.uvue';
+import UpRate from '@/uni_modules/uview-ultra/components/up-rate/up-rate.uvue';
 
 definePage({
   style: {

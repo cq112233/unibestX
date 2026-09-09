@@ -4,15 +4,15 @@
     <view class="p-[16px]">
       <view class="demo-block">
         <text class="demo-label">基础用法</text>
-        <up-parse :content="content1"></up-parse>
+        <UpParse :content="content1"></UpParse>
       </view>
       <view class="demo-block mt-[12px]">
         <text class="demo-label">长按可复制 (selectable)</text>
-        <up-parse :content="content2" :selectable="true"></up-parse>
+        <UpParse :content="content2" :selectable="true"></UpParse>
       </view>
       <view class="demo-block mt-[12px]">
         <text class="demo-label">自定义样式 (tagStyle)</text>
-        <up-parse :content="content3" :tag-style="tagStyle"></up-parse>
+        <UpParse :content="content3" :tag-style="tagStyle"></UpParse>
       </view>
     </view>
   </view>
@@ -20,6 +20,8 @@
 
 <script setup lang="uts">
 import { ref } from 'vue';
+import NavBar from '@/src/components/NavBar/NavBar.uvue';
+import UpParse from '@/uni_modules/uview-ultra/components/up-parse/up-parse.uvue';
 
 definePage({
   style: {

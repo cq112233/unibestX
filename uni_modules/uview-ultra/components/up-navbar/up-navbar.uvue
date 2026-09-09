@@ -146,7 +146,7 @@ const emit = defineEmits(['leftClick', 'rightClick'])
 
 const placeholderHeight = computed<string>(() => {
   const statusBarHeight = uni.getSystemInfoSync().statusBarHeight
-  return addUnit(parseInt(getPx(props.height)) + statusBarHeight, 'px')
+  return addUnit(parseInt(getPx(props.height)) + statusBarHeight, 'px') ?? ''
 })
 
 const placeholderStyle = computed((): UTSJSONObject => {

@@ -4,63 +4,63 @@
     <view class="p-[16px]">
       <!-- 1. 基本使用 -->
       <view class="demo-block">
-        <up-title class="demo-title">
+        <UpTitle class="demo-title">
           <text class="demo-title-text">基本使用（默认前缀竖条）</text>
-        </up-title>
-        <up-title>
+        </UpTitle>
+        <UpTitle>
           <text class="title-text">这里是标题</text>
-        </up-title>
+        </UpTitle>
       </view>
 
       <!-- 2. 自定义前缀 -->
       <view class="demo-block mt-[12px]">
-        <up-title class="demo-title">
+        <UpTitle class="demo-title">
           <text class="demo-title-text">自定义前缀（prefix 插槽）</text>
-        </up-title>
-        <up-title>
+        </UpTitle>
+        <UpTitle>
           <template #prefix>
             <view class="custom-prefix" :style="{ backgroundColor: themeColor }">
               <text class="custom-prefix-text">◆</text>
             </view>
           </template>
           <text class="title-text">带自定义前缀的标题</text>
-        </up-title>
+        </UpTitle>
       </view>
 
       <!-- 3. 组合使用 -->
       <view class="demo-block mt-[12px]">
-        <up-title class="demo-title">
+        <UpTitle class="demo-title">
           <text class="demo-title-text">组合使用（搭配 up-icon）</text>
-        </up-title>
-        <up-title>
-          <up-icon name="bell" size="18" :color="themeColor"></up-icon>
+        </UpTitle>
+        <UpTitle>
+          <UpIcon name="bell" size="18" :color="themeColor"></UpIcon>
           <text class="title-text">带图标的标题</text>
-        </up-title>
+        </UpTitle>
       </view>
 
       <!-- 4. 多级标题样式 -->
       <view class="demo-block mt-[12px]">
-        <up-title class="demo-title">
+        <UpTitle class="demo-title">
           <text class="demo-title-text">多级标题样式（通过 class 定制字号）</text>
-        </up-title>
-        <up-title>
+        </UpTitle>
+        <UpTitle>
           <text class="title-text title-lg">大号标题</text>
-        </up-title>
+        </UpTitle>
         <view class="title-gap"></view>
-        <up-title>
+        <UpTitle>
           <text class="title-text">默认标题</text>
-        </up-title>
+        </UpTitle>
         <view class="title-gap"></view>
-        <up-title>
+        <UpTitle>
           <text class="title-text title-sm">小号标题</text>
-        </up-title>
+        </UpTitle>
       </view>
 
       <!-- 5. 说明 -->
       <view class="demo-block mt-[12px]">
-        <up-title class="demo-title">
+        <UpTitle class="demo-title">
           <text class="demo-title-text">说明</text>
-        </up-title>
+        </UpTitle>
         <text class="demo-text">
           up-title 已适配 vdom/vapor 双模式：无 props、无事件，仅通过默认插槽展示标题文本、通过 prefix 插槽自定义前缀；前缀竖条默认使用主题主色，可通过覆盖 .up-title 类定制整体样式，H5/小程序沿用原 .vue 实现。
         </text>
@@ -72,6 +72,9 @@
 <script setup lang="uts">
 import { computed } from 'vue';
 import { useAppStore } from '@/src/store/index.uts';
+import NavBar from '@/src/components/NavBar/NavBar.uvue';
+import UpTitle from '@/uni_modules/uview-ultra/components/up-title/up-title.uvue';
+import UpIcon from '@/uni_modules/uview-ultra/components/up-icon/up-icon.uvue';
 
 definePage({
   style: {

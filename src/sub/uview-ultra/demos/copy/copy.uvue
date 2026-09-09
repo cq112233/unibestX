@@ -4,15 +4,19 @@
     <view class="p-[16px]">
       <view class="demo-block">
         <text class="demo-label">up-copy</text>
-        <up-copy content="uview-ultra is great !" @success="onCopySuccess">
-          <up-button type="primary" text="点击复制文本" size="mini"></up-button>
-        </up-copy>
+        <UpCopy content="uview-ultra is great !" @success="onCopySuccess">
+          <UpButton type="primary" text="点击复制文本" size="mini"></UpButton>
+        </UpCopy>
       </view>
     </view>
   </view>
 </template>
 
 <script setup lang="uts">
+import NavBar from '@/src/components/NavBar/NavBar.uvue';
+import UpCopy from '@/uni_modules/uview-ultra/components/up-copy/up-copy.uvue';
+import UpButton from '@/uni_modules/uview-ultra/components/up-button/up-button.uvue';
+
 definePage({
   style: {
     navigationStyle: 'custom',

@@ -4,9 +4,9 @@
     <view class="p-[16px]">
       <!-- 1. 基础用法 -->
       <view class="demo-block">
-        <up-title class="demo-title">
+        <UpTitle class="demo-title">
           <text class="demo-title-text">基础用法（生成海报图片）</text>
-        </up-title>
+        </UpTitle>
         <view v-if="posterPath.length > 0" class="poster-preview">
           <image :src="posterPath" class="poster-image" mode="aspectFit"></image>
         </view>
@@ -14,33 +14,37 @@
           <text class="poster-placeholder-text">点击下方按钮生成海报</text>
         </view>
         <view class="btn-row mt-[10px]">
-          <up-button text="生成海报" type="primary" size="small" class="demo-btn" @click="onGenerate"></up-button>
-          <up-button text="切换样式" type="primary" plain size="small" class="demo-btn" @click="onSwitchJson"></up-button>
+          <UpButton text="生成海报" type="primary" size="small" class="demo-btn" @click="onGenerate"></UpButton>
+          <UpButton text="切换样式" type="primary" plain size="small" class="demo-btn" @click="onSwitchJson"></UpButton>
         </view>
         <text class="log-text mt-[10px]">{{ eventLog }}</text>
       </view>
 
       <view class="demo-block mt-[12px]">
-        <up-title class="demo-title">
+        <UpTitle class="demo-title">
           <text class="demo-title-text">说明</text>
-        </up-title>
+        </UpTitle>
         <text class="demo-text">
           up-poster 通过 :json 配置海报内容（背景/文本/图片/二维码），调用 exportImage() 生成图片并触发 export 事件返回临时路径。
         </text>
       </view>
     </view>
 
-    <up-poster
+    <UpPoster
       ref="posterRef"
       :json="posterJson"
       @export="onExport"
       @error="onError"
-    ></up-poster>
+    ></UpPoster>
   </view>
 </template>
 
 <script setup lang="uts">
 import { ref } from 'vue';
+import NavBar from '@/src/components/NavBar/NavBar.uvue';
+import UpTitle from '@/uni_modules/uview-ultra/components/up-title/up-title.uvue';
+import UpButton from '@/uni_modules/uview-ultra/components/up-button/up-button.uvue';
+import UpPoster from '@/uni_modules/uview-ultra/components/up-poster/up-poster.uvue';
 
 definePage({
   style: {

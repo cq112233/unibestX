@@ -4,15 +4,15 @@
     <view class="p-[16px]">
       <view class="demo-block">
         <text class="demo-label">up-code-input</text>
-        <up-code-input v-model="codeInputValue1" :maxlength="6" mode="box" @finish="onCodeInputFinish"></up-code-input>
+        <UpCodeInput v-model="codeInputValue1" :maxlength="6" mode="box" @finish="onCodeInputFinish"></UpCodeInput>
       </view>
       <view class="demo-block mt-[12px]">
         <text class="demo-label">横线模式</text>
-        <up-code-input v-model="codeInputValue2" :maxlength="4" mode="line"></up-code-input>
+        <UpCodeInput v-model="codeInputValue2" :maxlength="4" mode="line"></UpCodeInput>
       </view>
       <view class="demo-block mt-[12px]">
         <text class="demo-label">自定义间距与颜色</text>
-        <up-code-input v-model="codeInputValue3" :maxlength="4" mode="box" space="10" color="#2979ff" border-color="#2979ff"></up-code-input>
+        <UpCodeInput v-model="codeInputValue3" :maxlength="4" mode="box" space="10" color="#2979ff" border-color="#2979ff"></UpCodeInput>
       </view>
     </view>
   </view>
@@ -20,6 +20,8 @@
 
 <script setup lang="uts">
 import { ref } from 'vue';
+import NavBar from '@/src/components/NavBar/NavBar.uvue';
+import UpCodeInput from '@/uni_modules/uview-ultra/components/up-code-input/up-code-input.uvue';
 
 definePage({
   style: {

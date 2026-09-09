@@ -6,7 +6,7 @@
       <view class="demo-block">
         <text class="demo-label">完整时间</text>
         <view class="flex-row items-center justify-between">
-          <up-button type="primary" text="年月日时分" size="mini" @click="dtShow1 = true"></up-button>
+          <UpButton type="primary" text="年月日时分" size="mini" @click="dtShow1 = true"></UpButton>
           <text class="text-[13px] text-gray-500">{{ formatDate(dtValue1) }}</text>
         </view>
       </view>
@@ -14,7 +14,7 @@
       <view class="demo-block mt-[12px]">
         <text class="demo-label">仅选日期</text>
         <view class="flex-row items-center justify-between">
-          <up-button type="success" text="年月日" size="mini" @click="dtShow2 = true"></up-button>
+          <UpButton type="success" text="年月日" size="mini" @click="dtShow2 = true"></UpButton>
           <text class="text-[13px] text-gray-500">{{ formatDateOnly(dtValue2) }}</text>
         </view>
       </view>
@@ -22,7 +22,7 @@
       <view class="demo-block mt-[12px]">
         <text class="demo-label">年月选择</text>
         <view class="flex-row items-center justify-between">
-          <up-button type="warning" text="年月" size="mini" @click="dtShow3 = true"></up-button>
+          <UpButton type="warning" text="年月" size="mini" @click="dtShow3 = true"></UpButton>
           <text class="text-[13px] text-gray-500">{{ formatYearMonth(dtValue3) }}</text>
         </view>
       </view>
@@ -30,7 +30,7 @@
       <view class="demo-block mt-[12px]">
         <text class="demo-label">仅选时间</text>
         <view class="flex-row items-center justify-between">
-          <up-button type="error" text="时分" size="mini" @click="dtShow4 = true"></up-button>
+          <UpButton type="error" text="时分" size="mini" @click="dtShow4 = true"></UpButton>
           <text class="text-[13px] text-gray-500">{{ dtValue4 }}</text>
         </view>
       </view>
@@ -39,7 +39,7 @@
       <view class="demo-block mt-[12px]">
         <text class="demo-label">限制最大最小日期 (2026-08-01 ~ 2026-08-31)</text>
         <view class="flex-row items-center justify-between">
-          <up-button type="primary" text="选择当月日期" size="mini" @click="dtShowMinMaxDate = true"></up-button>
+          <UpButton type="primary" text="选择当月日期" size="mini" @click="dtShowMinMaxDate = true"></UpButton>
           <text class="text-[13px] text-gray-500">{{ formatDateOnly(dtValueMinMaxDate) }}</text>
         </view>
       </view>
@@ -48,7 +48,7 @@
       <view class="demo-block mt-[12px]">
         <text class="demo-label">限制工作时间 (09:00 ~ 18:00)</text>
         <view class="flex-row items-center justify-between">
-          <up-button type="warning" text="选择时分范围" size="mini" @click="dtShowMinMaxTime = true"></up-button>
+          <UpButton type="warning" text="选择时分范围" size="mini" @click="dtShowMinMaxTime = true"></UpButton>
           <text class="text-[13px] text-gray-500">{{ dtValueMinMaxTime }}</text>
         </view>
       </view>
@@ -59,14 +59,14 @@
         <view class="flex-row items-center justify-between mb-[8px]">
           <text class="text-[13px] text-gray-700">开始日期：</text>
           <view class="flex-row items-center">
-            <up-button type="primary" text="选择开始" size="mini" @click="dtShowStart = true"></up-button>
+            <UpButton type="primary" text="选择开始" size="mini" @click="dtShowStart = true"></UpButton>
             <text class="ml-[10px] text-[13px] text-gray-500">{{ formatDateOnly(dtValueStart) }}</text>
           </view>
         </view>
         <view class="flex-row items-center justify-between">
           <text class="text-[13px] text-gray-700">结束日期：</text>
           <view class="flex-row items-center">
-            <up-button type="success" text="选择结束" size="mini" @click="dtShowEnd = true"></up-button>
+            <UpButton type="success" text="选择结束" size="mini" @click="dtShowEnd = true"></UpButton>
             <text class="ml-[10px] text-[13px] text-gray-500">{{ formatDateOnly(dtValueEnd) }}</text>
           </view>
         </view>
@@ -74,13 +74,13 @@
     </view>
 
     <!-- 基础选择器 -->
-    <up-datetime-picker v-model="dtValue1" :show="dtShow1" mode="datetime" @confirm="onConfirm1" @cancel="dtShow1 = false"></up-datetime-picker>
-    <up-datetime-picker v-model="dtValue2" :show="dtShow2" mode="date" @confirm="onConfirm2" @cancel="dtShow2 = false"></up-datetime-picker>
-    <up-datetime-picker v-model="dtValue3" :show="dtShow3" mode="year-month" @confirm="onConfirm3" @cancel="dtShow3 = false"></up-datetime-picker>
-    <up-datetime-picker v-model="dtValue4" :show="dtShow4" mode="time" @confirm="onConfirm4" @cancel="dtShow4 = false"></up-datetime-picker>
+    <UpDatetimePicker v-model="dtValue1" :show="dtShow1" mode="datetime" @confirm="onConfirm1" @cancel="dtShow1 = false"></UpDatetimePicker>
+    <UpDatetimePicker v-model="dtValue2" :show="dtShow2" mode="date" @confirm="onConfirm2" @cancel="dtShow2 = false"></UpDatetimePicker>
+    <UpDatetimePicker v-model="dtValue3" :show="dtShow3" mode="year-month" @confirm="onConfirm3" @cancel="dtShow3 = false"></UpDatetimePicker>
+    <UpDatetimePicker v-model="dtValue4" :show="dtShow4" mode="time" @confirm="onConfirm4" @cancel="dtShow4 = false"></UpDatetimePicker>
 
     <!-- 最大最小日期限制 -->
-    <up-datetime-picker
+    <UpDatetimePicker
       v-model="dtValueMinMaxDate"
       :show="dtShowMinMaxDate"
       mode="date"
@@ -88,10 +88,10 @@
       :max-date="limitMaxDate"
       @confirm="onConfirmMinMaxDate"
       @cancel="dtShowMinMaxDate = false"
-    ></up-datetime-picker>
+    ></UpDatetimePicker>
 
     <!-- 最大最小时间限制 -->
-    <up-datetime-picker
+    <UpDatetimePicker
       v-model="dtValueMinMaxTime"
       :show="dtShowMinMaxTime"
       mode="time"
@@ -99,33 +99,36 @@
       :max-hour="18"
       @confirm="onConfirmMinMaxTime"
       @cancel="dtShowMinMaxTime = false"
-    ></up-datetime-picker>
+    ></UpDatetimePicker>
 
     <!-- 开始时间 (最大不能超过结束时间) -->
-    <up-datetime-picker
+    <UpDatetimePicker
       v-model="dtValueStart"
       :show="dtShowStart"
       mode="date"
       :max-date="dtValueEnd"
       @confirm="onConfirmStart"
       @cancel="dtShowStart = false"
-    ></up-datetime-picker>
+    ></UpDatetimePicker>
 
     <!-- 结束时间 (最小不能早于开始时间) -->
-    <up-datetime-picker
+    <UpDatetimePicker
       v-model="dtValueEnd"
       :show="dtShowEnd"
       mode="date"
       :min-date="dtValueStart"
       @confirm="onConfirmEnd"
       @cancel="dtShowEnd = false"
-    ></up-datetime-picker>
+    ></UpDatetimePicker>
   </view>
 </template>
 
 <script setup lang="uts">
 /* eslint-disable dot-notation */
 import { ref } from 'vue';
+import NavBar from '@/src/components/NavBar/NavBar.uvue';
+import UpButton from '@/uni_modules/uview-ultra/components/up-button/up-button.uvue';
+import UpDatetimePicker from '@/uni_modules/uview-ultra/components/up-datetime-picker/up-datetime-picker.uvue';
 
 definePage({
   style: {

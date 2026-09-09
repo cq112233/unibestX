@@ -4,24 +4,27 @@
     <view class="p-[16px]">
       <view class="demo-block">
         <text class="demo-label">基础类型</text>
-        <up-text text="主色文本" type="primary" class="mb-[10px]"></up-text>
-        <up-text text="成功文本" type="success" class="mb-[10px]"></up-text>
-        <up-text text="警告文本" type="warning" class="mb-[10px]"></up-text>
-        <up-text text="错误文本" type="error" class="mb-[10px]"></up-text>
-        <up-text text="常规文本" type="info"></up-text>
+        <UpText text="主色文本" type="primary" class="mb-[10px]"></UpText>
+        <UpText text="成功文本" type="success" class="mb-[10px]"></UpText>
+        <UpText text="警告文本" type="warning" class="mb-[10px]"></UpText>
+        <UpText text="错误文本" type="error" class="mb-[10px]"></UpText>
+        <UpText text="常规文本" type="info"></UpText>
       </view>
 
       <view class="demo-block">
         <text class="demo-label">文字脱敏</text>
-        <up-text text="13888888888" mode="phone" format="encrypt" class="mb-[10px]"></up-text>
-        <up-text text="张三疯" mode="name" format="encrypt" class="mb-[10px]"></up-text>
-        <up-text text="110105199001011234" mode="idcard" format="encrypt"></up-text>
+        <UpText text="13888888888" mode="phone" format="encrypt" class="mb-[10px]"></UpText>
+        <UpText text="张三疯" mode="name" format="encrypt" class="mb-[10px]"></UpText>
+        <UpText text="110105199001011234" mode="idcard" format="encrypt"></UpText>
       </view>
     </view>
   </view>
 </template>
 
 <script setup lang="uts">
+import NavBar from '@/src/components/NavBar/NavBar.uvue';
+import UpText from '@/uni_modules/uview-ultra/components/up-text/up-text.uvue';
+
 definePage({
   style: {
     navigationStyle: 'custom',

@@ -4,33 +4,33 @@
     <view class="p-[16px]">
       <!-- 1. 基础用法 -->
       <view class="demo-block">
-        <up-title class="demo-title">
+        <UpTitle class="demo-title">
           <text class="demo-title-text">基础用法（点击色块选择颜色）</text>
-        </up-title>
+        </UpTitle>
         <view class="flex-row items-center">
-          <up-color-picker v-model="color1"></up-color-picker>
+          <UpColorPicker v-model="color1"></UpColorPicker>
           <text class="demo-text ml-[12px]">当前颜色：{{ color1 }}</text>
         </view>
       </view>
 
       <!-- 2. 自定义常用颜色 -->
       <view class="demo-block mt-[12px]">
-        <up-title class="demo-title">
+        <UpTitle class="demo-title">
           <text class="demo-title-text">自定义常用颜色</text>
-        </up-title>
+        </UpTitle>
         <view class="flex-row items-center">
-          <up-color-picker v-model="color2" :common-colors="customColors"></up-color-picker>
+          <UpColorPicker v-model="color2" :common-colors="customColors"></UpColorPicker>
           <text class="demo-text ml-[12px]">当前颜色：{{ color2 }}</text>
         </view>
       </view>
 
       <!-- 3. 渐变模式 -->
       <view class="demo-block mt-[12px]">
-        <up-title class="demo-title">
+        <UpTitle class="demo-title">
           <text class="demo-title-text">渐变模式（默认值传入渐变字符串）</text>
-        </up-title>
+        </UpTitle>
         <view class="flex-row items-center">
-          <up-color-picker v-model="gradientColor"></up-color-picker>
+          <UpColorPicker v-model="gradientColor"></UpColorPicker>
           <text class="demo-text ml-[12px]">{{ gradientColor }}</text>
         </view>
         <view class="gradient-preview mt-[10px]" :style="{ background: gradientColor }"></view>
@@ -38,12 +38,12 @@
 
       <!-- 4. 通过 ref 调用 open -->
       <view class="demo-block mt-[12px]">
-        <up-title class="demo-title">
+        <UpTitle class="demo-title">
           <text class="demo-title-text">通过 ref 调用 open</text>
-        </up-title>
+        </UpTitle>
         <view class="flex-row items-center">
-          <up-color-picker ref="colorPickerRef" v-model="color3" @confirm="onConfirm"></up-color-picker>
-          <up-button text="打开选择器" type="primary" size="small" class="demo-btn ml-[12px]" @click="onOpenPicker"></up-button>
+          <UpColorPicker ref="colorPickerRef" v-model="color3" @confirm="onConfirm"></UpColorPicker>
+          <UpButton text="打开选择器" type="primary" size="small" class="demo-btn ml-[12px]" @click="onOpenPicker"></UpButton>
         </view>
         <text class="log-text mt-[10px]">{{ apiLog }}</text>
       </view>
@@ -53,6 +53,10 @@
 
 <script setup lang="uts">
 import { ref } from 'vue';
+import NavBar from '@/src/components/NavBar/NavBar.uvue';
+import UpTitle from '@/uni_modules/uview-ultra/components/up-title/up-title.uvue';
+import UpColorPicker from '@/uni_modules/uview-ultra/components/up-color-picker/up-color-picker.uvue';
+import UpButton from '@/uni_modules/uview-ultra/components/up-button/up-button.uvue';
 
 definePage({
   style: {

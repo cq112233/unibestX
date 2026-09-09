@@ -4,7 +4,7 @@
     <view class="p-[16px]">
       <view class="demo-block">
         <text class="demo-label">基础瀑布流 (2列)</text>
-        <up-waterfall v-model="list" :columns="2">
+        <UpWaterfall v-model="list" :columns="2">
           <template #column="{ colList }">
             <view v-for="(item, idx) in (colList as UTSJSONObject[])" :key="idx" class="p-[6px]">
               <view class="bg-[#f1f5f9] rounded-[8px] overflow-hidden p-[8px] mb-[8px]">
@@ -19,7 +19,7 @@
               </view>
             </view>
           </template>
-        </up-waterfall>
+        </UpWaterfall>
       </view>
     </view>
   </view>
@@ -27,6 +27,8 @@
 
 <script setup lang="uts">
 import { ref } from 'vue';
+import NavBar from '@/src/components/NavBar/NavBar.uvue';
+import UpWaterfall from '@/uni_modules/uview-ultra/components/up-waterfall/up-waterfall.uvue';
 
 definePage({
   style: {

@@ -9,7 +9,7 @@
         <view class="mock-input" @click="showNumber = true">
           <text :class="valNumber ? 'mock-input-text' : 'mock-input-placeholder'">{{ valNumber || '请点击输入数字' }}</text>
         </view>
-        <up-keyboard
+        <UpKeyboard
           mode="number"
           :show="showNumber"
           @change="onNumberChange"
@@ -17,7 +17,7 @@
           @close="showNumber = false"
           @cancel="showNumber = false"
           @confirm="showNumber = false"
-        ></up-keyboard>
+        ></UpKeyboard>
       </view>
 
       <!-- 2. 身份证键盘 -->
@@ -26,7 +26,7 @@
         <view class="mock-input" @click="showCard = true">
           <text :class="valCard ? 'mock-input-text' : 'mock-input-placeholder'">{{ valCard || '请点击输入身份证' }}</text>
         </view>
-        <up-keyboard
+        <UpKeyboard
           mode="card"
           :show="showCard"
           @change="onCardChange"
@@ -34,7 +34,7 @@
           @close="showCard = false"
           @cancel="showCard = false"
           @confirm="showCard = false"
-        ></up-keyboard>
+        ></UpKeyboard>
       </view>
 
       <!-- 3. 车牌号键盘 -->
@@ -43,7 +43,7 @@
         <view class="mock-input" @click="showCar = true">
           <text :class="valCar ? 'mock-input-text' : 'mock-input-placeholder'">{{ valCar || '请点击输入车牌号' }}</text>
         </view>
-        <up-keyboard
+        <UpKeyboard
           mode="car"
           :show="showCar"
           @change="onCarChange"
@@ -51,7 +51,7 @@
           @close="showCar = false"
           @cancel="showCar = false"
           @confirm="showCar = false"
-        ></up-keyboard>
+        ></UpKeyboard>
       </view>
     </view>
   </view>
@@ -59,6 +59,8 @@
 
 <script setup lang="uts">
 import { ref } from 'vue';
+import NavBar from '@/src/components/NavBar/NavBar.uvue';
+import UpKeyboard from '@/uni_modules/uview-ultra/components/up-keyboard/up-keyboard.uvue';
 
 definePage({
   style: {

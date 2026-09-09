@@ -6,7 +6,7 @@
       <view class="demo-block">
         <text class="demo-label">基础文本与排版</text>
         <view class="content-box">
-          <mp-html :content="content1" />
+          <MpHtml :content="content1" />
         </view>
       </view>
 
@@ -14,7 +14,7 @@
       <view class="demo-block mt-[12px]">
         <text class="demo-label">HTML 表格解析 (Table)</text>
         <view class="content-box">
-          <mp-html :content="contentTable" />
+          <MpHtml :content="contentTable" />
         </view>
       </view>
 
@@ -22,7 +22,7 @@
       <view class="demo-block mt-[12px]">
         <text class="demo-label">列表解析 (List)</text>
         <view class="content-box">
-          <mp-html :content="contentList" />
+          <MpHtml :content="contentList" />
         </view>
       </view>
 
@@ -30,7 +30,7 @@
       <view class="demo-block mt-[12px]">
         <text class="demo-label">代码块解析 (Code)</text>
         <view class="content-box">
-          <mp-html :content="contentCode" />
+          <MpHtml :content="contentCode" />
         </view>
       </view>
 
@@ -38,7 +38,7 @@
       <view class="demo-block mt-[12px]">
         <text class="demo-label">超链接与图片展示</text>
         <view class="content-box">
-          <mp-html :content="contentMedia" />
+          <MpHtml :content="contentMedia" />
         </view>
       </view>
     </view>
@@ -47,6 +47,8 @@
 
 <script setup lang="uts">
 import { ref } from 'vue';
+import NavBar from '@/src/components/NavBar/NavBar.uvue';
+import MpHtml from '@/uni_modules/mp-html/components/mp-html/mp-html.uvue';
 
 definePage({
   style: {

@@ -4,24 +4,24 @@
     <view class="p-[16px]">
       <!-- 1. 基础表格（斑马纹 + 边框） -->
       <view class="demo-block">
-        <up-title class="demo-title">
+        <UpTitle class="demo-title">
           <text class="demo-title-text">基础表格（斑马纹 + 边框）</text>
-        </up-title>
-        <up-table2
+        </UpTitle>
+        <UpTable2
           :data="tableData"
           :columns="columns"
           stripe
           border
           @row-click="handleRowClick"
-        ></up-table2>
+        ></UpTable2>
       </view>
 
       <!-- 2. 表格样式自定义 -->
       <view class="demo-block mt-[12px]">
-        <up-title class="demo-title">
+        <UpTitle class="demo-title">
           <text class="demo-title-text">表格样式自定义（cellStyle + 列 style）</text>
-        </up-title>
-        <up-table2
+        </UpTitle>
+        <UpTable2
           :data="tableData"
           :columns="columnsStyle"
           stripe
@@ -36,118 +36,118 @@
               {{ getLabel(row as UTSJSONObject, column as UTSJSONObject) }}
             </text>
           </template>
-        </up-table2>
+        </UpTable2>
       </view>
 
       <!-- 3. 单选高亮 -->
       <view class="demo-block mt-[12px]">
-        <up-title class="demo-title">
+        <UpTitle class="demo-title">
           <text class="demo-title-text">单选高亮（highlight-current-row）</text>
-        </up-title>
-        <up-table2
+        </UpTitle>
+        <UpTable2
           :data="tableData"
           :columns="columns"
           highlight-current-row
           :current-row-key="currentRowId"
           @row-click="handleRowClick"
           @current-change="onCurrentChange"
-        ></up-table2>
+        ></UpTable2>
       </view>
 
       <!-- 4. 复选框选择 -->
       <view class="demo-block mt-[12px]">
-        <up-title class="demo-title">
+        <UpTitle class="demo-title">
           <text class="demo-title-text">复选框选择（type: selection）</text>
-        </up-title>
-        <up-table2
+        </UpTitle>
+        <UpTable2
           :data="tableData"
           :columns="columnsCheck"
           row-key="id"
           @selection-change="onSelectionChange"
           @select="onSelect"
-        ></up-table2>
+        ></UpTable2>
       </view>
 
       <!-- 5. 排序与筛选 -->
       <view class="demo-block mt-[12px]">
-        <up-title class="demo-title">
+        <UpTitle class="demo-title">
           <text class="demo-title-text">排序与筛选（sortable + filters）</text>
-        </up-title>
+        </UpTitle>
         <view class="filter-bar">
-          <up-button text="全部" type="primary" :plain="!getFilterActive('')" size="mini" class="filter-btn" @click="changeFilter('')"></up-button>
-          <up-button text="筛选姓「张」" type="primary" :plain="!getFilterActive('张')" size="mini" class="filter-btn" @click="changeFilter('张')"></up-button>
+          <UpButton text="全部" type="primary" :plain="!getFilterActive('')" size="mini" class="filter-btn" @click="changeFilter('')"></UpButton>
+          <UpButton text="筛选姓「张」" type="primary" :plain="!getFilterActive('张')" size="mini" class="filter-btn" @click="changeFilter('张')"></UpButton>
         </view>
-        <up-table2
+        <UpTable2
           :data="tableData"
           :columns="columnsSort"
           sortable
           :filters="filtersValue"
           @sort-change="onSortChange"
           @filter-change="onFilterChange"
-        ></up-table2>
+        ></UpTable2>
       </view>
 
       <!-- 6. 树形结构 + 固定列 -->
       <view class="demo-block mt-[12px]">
-        <up-title class="demo-title">
+        <UpTitle class="demo-title">
           <text class="demo-title-text">树形结构 + 固定列（fixed: left）</text>
-        </up-title>
-        <up-table2
+        </UpTitle>
+        <UpTable2
           :data="treeData"
           :columns="columnsTree"
           :tree-props="treePropsValue"
           :expand-row-keys="expandKeys"
           @expand-change="onExpandChange"
-        ></up-table2>
+        ></UpTable2>
       </view>
 
       <!-- 7. 单元格合并 -->
       <view class="demo-block mt-[12px]">
-        <up-title class="demo-title">
+        <UpTitle class="demo-title">
           <text class="demo-title-text">单元格合并（span-method）</text>
-        </up-title>
-        <up-table2
+        </UpTitle>
+        <UpTable2
           :data="spanData"
           :columns="columnsSpan"
           :span-method="spanMethod"
           border
-        ></up-table2>
+        ></UpTable2>
       </view>
 
       <!-- 8. 表尾自动汇总（show-summary + sum-text） -->
       <view class="demo-block mt-[12px]">
-        <up-title class="demo-title">
+        <UpTitle class="demo-title">
           <text class="demo-title-text">8. 表尾自动汇总（show-summary + sum-text）</text>
-        </up-title>
-        <up-table2
+        </UpTitle>
+        <UpTable2
           :data="salesData"
           :columns="columnsSales"
           border
           show-summary
           sum-text="总计"
-        ></up-table2>
+        ></UpTable2>
       </view>
 
       <!-- 9. 自定义汇总计算（summary-method） -->
       <view class="demo-block mt-[12px]">
-        <up-title class="demo-title">
+        <UpTitle class="demo-title">
           <text class="demo-title-text">9. 自定义汇总计算（summary-method）</text>
-        </up-title>
-        <up-table2
+        </UpTitle>
+        <UpTable2
           :data="salesData"
           :columns="columnsSales"
           border
           show-summary
           :summary-method="customSummaryMethod"
-        ></up-table2>
+        ></UpTable2>
       </view>
 
       <!-- 10. 行内动态汇总列（#cell 自定义计算） -->
       <view class="demo-block mt-[12px]">
-        <up-title class="demo-title">
+        <UpTitle class="demo-title">
           <text class="demo-title-text">10. 行内动态汇总列（#cell 动态求和）</text>
-        </up-title>
-        <up-table2
+        </UpTitle>
+        <UpTable2
           :data="scoreData"
           :columns="columnsScore"
           border
@@ -169,14 +169,14 @@
               {{ getLabel(row as UTSJSONObject, column as UTSJSONObject) }}
             </text>
           </template>
-        </up-table2>
+        </UpTable2>
       </view>
 
       <!-- 11. 说明 -->
       <view class="demo-block mt-[12px]">
-        <up-title class="demo-title">
+        <UpTitle class="demo-title">
           <text class="demo-title-text">多端与双模式兼容说明</text>
-        </up-title>
+        </UpTitle>
         <text class="demo-text" style="line-height: 22px">
           1. 支持开箱即用的 show-summary 表尾合计，自动对纯数值列求和，兼容安卓、鸿蒙、iOS、微信小程序与 H5（VDOM & Vapor 模式）。&#10;2. 支持 summary-method 自定义合计算法（如带货币单位、求平均值等）。&#10;3. 支持通过 #cell 插槽进行行内多列求和计算。&#10;4. 微信小程序平台双线程特性不支持跨线程传递 Function 类型 props，推荐使用内置 show-summary 或数据层响应式 computed 汇总。
         </text>
@@ -191,6 +191,10 @@
 
 <script setup lang="uts">
 import { ref } from 'vue';
+import NavBar from '@/src/components/NavBar/NavBar.uvue';
+import UpTitle from '@/uni_modules/uview-ultra/components/up-title/up-title.uvue';
+import UpTable2 from '@/uni_modules/uview-ultra/components/up-table2/up-table2.uvue';
+import UpButton from '@/uni_modules/uview-ultra/components/up-button/up-button.uvue';
 
 definePage({
   style: {

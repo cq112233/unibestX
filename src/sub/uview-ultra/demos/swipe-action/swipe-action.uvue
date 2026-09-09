@@ -4,23 +4,23 @@
     <view class="p-[16px]">
       <view class="demo-block">
         <text class="demo-label">基础用法</text>
-        <up-swipe-action>
-          <up-swipe-action-item :options="options1">
+        <UpSwipeAction>
+          <UpSwipeActionItem :options="options1">
             <view class="p-[15px] bg-[#fff] rounded-[5px]">
               <text>操作选项</text>
             </view>
-          </up-swipe-action-item>
-        </up-swipe-action>
+          </UpSwipeActionItem>
+        </UpSwipeAction>
       </view>
       <view class="demo-block mt-[12px]">
         <text class="demo-label">多按钮</text>
-        <up-swipe-action>
-          <up-swipe-action-item :options="options2">
+        <UpSwipeAction>
+          <UpSwipeActionItem :options="options2">
             <view class="p-[15px] bg-[#fff] rounded-[5px]">
               <text>多按钮操作</text>
             </view>
-          </up-swipe-action-item>
-        </up-swipe-action>
+          </UpSwipeActionItem>
+        </UpSwipeAction>
       </view>
     </view>
   </view>
@@ -28,6 +28,9 @@
 
 <script setup lang="uts">
 import { ref } from 'vue';
+import NavBar from '@/src/components/NavBar/NavBar.uvue';
+import UpSwipeAction from '@/uni_modules/uview-ultra/components/up-swipe-action/up-swipe-action.uvue';
+import UpSwipeActionItem from '@/uni_modules/uview-ultra/components/up-swipe-action-item/up-swipe-action-item.uvue';
 
 definePage({
   style: {

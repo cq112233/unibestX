@@ -294,9 +294,9 @@ export function addUnit(pvalue: any|null, punit: string|null = ''): string {
     if (unit == '' || unit == null) {
      	unit = config['unit'] as string
     }
-    let valueStr = value.toString()
+    let valueStr = value.toString() ?? ''
     // 用uview-plus内置验证规则中的number判断是否为数值
-    return testNumber(valueStr) ? `${valueStr}${unit}` : valueStr
+    return (testNumber(valueStr) ? `${valueStr}${unit}` : valueStr) ?? ''
 }
 
 /**

@@ -7,11 +7,14 @@
         <text class="text-[12px] text-[#909399]">引入该组件即自动监听网络状态，断网时全屏展示遮罩提示。</text>
       </view>
     </view>
-    <up-no-network></up-no-network>
+    <UpNoNetwork></UpNoNetwork>
   </view>
 </template>
 
 <script setup lang="uts">
+import NavBar from '@/src/components/NavBar/NavBar.uvue';
+import UpNoNetwork from '@/uni_modules/uview-ultra/components/up-no-network/up-no-network.uvue';
+
 definePage({
   style: {
     navigationStyle: 'custom',

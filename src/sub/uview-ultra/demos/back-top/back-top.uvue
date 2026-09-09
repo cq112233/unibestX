@@ -32,18 +32,20 @@
     </scroll-view>
 
     <!-- 返回顶部组件 -->
-    <up-back-top
+    <UpBackTop
       :scroll-top="currentScrollTop"
       :top="100"
       :bottom="80"
       :right="20"
       @click="scrollToTop"
-    ></up-back-top>
+    ></UpBackTop>
   </view>
 </template>
 
 <script setup lang="uts">
 import { ref } from 'vue';
+import NavBar from '@/src/components/NavBar/NavBar.uvue';
+import UpBackTop from '@/uni_modules/uview-ultra/components/up-back-top/up-back-top.uvue';
 
 definePage({
   style: {

@@ -4,46 +4,52 @@
     <view class="p-[16px]">
       <view class="demo-block">
         <text class="demo-label">基础表格</text>
-        <up-table>
-          <up-tr>
-            <up-th text="学校"></up-th>
-            <up-th text="班级"></up-th>
-            <up-th text="年龄"></up-th>
-          </up-tr>
-          <up-tr>
-            <up-td text="浙江大学"></up-td>
-            <up-td text="二年级"></up-td>
-            <up-td text="22"></up-td>
-          </up-tr>
-          <up-tr>
-            <up-td text="清华大学"></up-td>
-            <up-td text="05班"></up-td>
-            <up-td text="24"></up-td>
-          </up-tr>
-        </up-table>
+        <UpTable>
+          <UpTr>
+            <UpTh text="学校"></UpTh>
+            <UpTh text="班级"></UpTh>
+            <UpTh text="年龄"></UpTh>
+          </UpTr>
+          <UpTr>
+            <UpTd text="浙江大学"></UpTd>
+            <UpTd text="二年级"></UpTd>
+            <UpTd text="22"></UpTd>
+          </UpTr>
+          <UpTr>
+            <UpTd text="清华大学"></UpTd>
+            <UpTd text="05班"></UpTd>
+            <UpTd text="24"></UpTd>
+          </UpTr>
+        </UpTable>
       </view>
       <view class="demo-block mt-[12px]">
         <text class="demo-label">无边框</text>
-        <up-table :border="false">
-          <up-tr>
-            <up-th text="名称"></up-th>
-            <up-th text="类型"></up-th>
-          </up-tr>
-          <up-tr>
-            <up-td text="uview-ultra"></up-td>
-            <up-td text="UI库"></up-td>
-          </up-tr>
-          <up-tr>
-            <up-td text="uni-app X"></up-td>
-            <up-td text="框架"></up-td>
-          </up-tr>
-        </up-table>
+        <UpTable :border="false">
+          <UpTr>
+            <UpTh text="名称"></UpTh>
+            <UpTh text="类型"></UpTh>
+          </UpTr>
+          <UpTr>
+            <UpTd text="uview-ultra"></UpTd>
+            <UpTd text="UI库"></UpTd>
+          </UpTr>
+          <UpTr>
+            <UpTd text="uni-app X"></UpTd>
+            <UpTd text="框架"></UpTd>
+          </UpTr>
+        </UpTable>
       </view>
     </view>
   </view>
 </template>
 
 <script setup lang="uts">
+import NavBar from '@/src/components/NavBar/NavBar.uvue';
+import UpTable from '@/uni_modules/uview-ultra/components/up-table/up-table.uvue';
+import UpTr from '@/uni_modules/uview-ultra/components/up-tr/up-tr.uvue';
+import UpTh from '@/uni_modules/uview-ultra/components/up-th/up-th.uvue';
+import UpTd from '@/uni_modules/uview-ultra/components/up-td/up-td.uvue';
+
 definePage({
   style: {
     navigationStyle: 'custom',

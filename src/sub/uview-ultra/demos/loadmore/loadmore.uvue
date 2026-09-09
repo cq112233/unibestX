@@ -4,29 +4,32 @@
     <view class="p-[16px]">
       <view class="demo-block">
         <text class="demo-label">基础用法</text>
-        <up-loadmore status="loadmore"></up-loadmore>
+        <UpLoadmore status="loadmore"></UpLoadmore>
       </view>
       <view class="demo-block mt-[12px]">
         <text class="demo-label">加载中</text>
-        <up-loadmore status="loading" loading-text="正在奋力加载中..."></up-loadmore>
+        <UpLoadmore status="loading" loading-text="正在奋力加载中..."></UpLoadmore>
       </view>
       <view class="demo-block mt-[12px]">
         <text class="demo-label">没有更多了</text>
-        <up-loadmore status="nomore" nomore-text="我是有底线的"></up-loadmore>
+        <UpLoadmore status="nomore" nomore-text="我是有底线的"></UpLoadmore>
       </view>
       <view class="demo-block mt-[12px]">
         <text class="demo-label">显示线条</text>
-        <up-loadmore status="nomore" :line="true"></up-loadmore>
+        <UpLoadmore status="nomore" :line="true"></UpLoadmore>
       </view>
       <view class="demo-block mt-[12px]">
         <text class="demo-label">自定义图标和颜色</text>
-        <up-loadmore status="loading" loading-icon="spinner" color="#fa3534" icon-color="#fa3534"></up-loadmore>
+        <UpLoadmore status="loading" loading-icon="spinner" color="#fa3534" icon-color="#fa3534"></UpLoadmore>
       </view>
     </view>
   </view>
 </template>
 
 <script setup lang="uts">
+import NavBar from '@/src/components/NavBar/NavBar.uvue';
+import UpLoadmore from '@/uni_modules/uview-ultra/components/up-loadmore/up-loadmore.uvue';
+
 definePage({
   style: {
     navigationStyle: 'custom',

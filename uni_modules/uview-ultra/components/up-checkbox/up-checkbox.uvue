@@ -271,13 +271,13 @@
 	// label大小
 	const elLabelSize = computed((): string => {
 		if (props.labelSize != null && props.labelSize!.toString() != '') {
-			return addUnit(props.labelSize!.toString())
+			return addUnit(props.labelSize!.toString()) ?? ''
 		}
 		const p = getParentVal('labelSize')
 		if (p != null && p.toString() != '') {
-			return addUnit(p.toString())
+			return addUnit(p.toString()) ?? ''
 		}
-		return addUnit('15')
+		return addUnit('15') ?? ''
 	})
 	
 	const elIconColor = computed((): string => {

@@ -1,7 +1,7 @@
 <template>
   <view class="page" :style="{ height: `${windowHeight}px` }">
     <view class="video-wrap">
-      <up-short-video
+      <UpShortVideo
         ref="shortVideoRef"
         :video-list="videoList"
         :current-tab="0"
@@ -14,17 +14,17 @@
         @collect="onCollect"
         @progress-change="onProgressChange"
         @go-next="onGoNext"
-      ></up-short-video>
+      ></UpShortVideo>
     </view>
 
-    <up-button
+    <UpButton
       text="返回"
       type="primary"
       size="small"
       color="rgba(0, 0, 0, 0.4)"
       class="back-btn"
       @click="onBack"
-    ></up-button>
+    ></UpButton>
 
     <view class="log-bar">
       <text class="log-text">{{ eventLog }}</text>
@@ -34,6 +34,8 @@
 
 <script setup lang="uts">
 import { ref } from 'vue';
+import UpShortVideo from '@/uni_modules/uview-ultra/components/up-short-video/up-short-video.uvue';
+import UpButton from '@/uni_modules/uview-ultra/components/up-button/up-button.uvue';
 
 definePage({
   style: {

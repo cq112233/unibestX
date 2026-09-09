@@ -82,11 +82,11 @@ const percent = computed<number>(() => {
 })
 
 const size = computed<string>(() => {
-	return addUnit(props.width)
+	return addUnit(props.width) ?? ''
 })
 
 const stroke = computed<string>(() => {
-	return addUnit(props.strokeWidth)
+	return addUnit(props.strokeWidth) ?? ''
 })
 
 const rootStyle = computed((): UTSJSONObject => {

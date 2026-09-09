@@ -6,16 +6,16 @@
       <view class="demo-block">
         <text class="demo-label">基础方向用法</text>
         <view class="flex-row items-center mb-[10px]">
-          <up-button type="primary" text="顶部弹出" size="mini" @click="openTopBasic"></up-button>
+          <UpButton type="primary" text="顶部弹出" size="mini" @click="openTopBasic"></UpButton>
           <view class="w-[8px]"></view>
-          <up-button type="primary" text="底部弹出" size="mini" @click="openBottomBasic"></up-button>
+          <UpButton type="primary" text="底部弹出" size="mini" @click="openBottomBasic"></UpButton>
           <view class="w-[8px]"></view>
-          <up-button type="primary" text="居中弹出" size="mini" @click="openCenterBasic"></up-button>
+          <UpButton type="primary" text="居中弹出" size="mini" @click="openCenterBasic"></UpButton>
         </view>
         <view class="flex-row items-center">
-          <up-button type="success" text="左侧弹出" size="mini" @click="openLeftBasic"></up-button>
+          <UpButton type="success" text="左侧弹出" size="mini" @click="openLeftBasic"></UpButton>
           <view class="w-[8px]"></view>
-          <up-button type="success" text="右侧弹出" size="mini" @click="openRightBasic"></up-button>
+          <UpButton type="success" text="右侧弹出" size="mini" @click="openRightBasic"></UpButton>
         </view>
       </view>
       <!-- 2. 各方向手势滑动关闭演示 (居中无手势) -->
@@ -28,14 +28,14 @@
           顶部上滑关闭、底部下滑关闭、左侧左滑关闭、右侧右滑关闭；拖拽超过 40px 松手自动滑出关闭，居中不设手势。
         </text>
         <view class="flex-row items-center mb-[10px]">
-          <up-button type="primary" text="顶部弹出 (上滑关闭)" size="mini" @click="openTopGesture"></up-button>
+          <UpButton type="primary" text="顶部弹出 (上滑关闭)" size="mini" @click="openTopGesture"></UpButton>
           <view class="w-[8px]"></view>
-          <up-button type="primary" text="底部弹出 (下滑关闭)" size="mini" @click="openBottomGesture"></up-button>
+          <UpButton type="primary" text="底部弹出 (下滑关闭)" size="mini" @click="openBottomGesture"></UpButton>
         </view>
         <view class="flex-row items-center">
-          <up-button type="success" text="左侧弹出 (左滑关闭)" size="mini" @click="openLeftGesture"></up-button>
+          <UpButton type="success" text="左侧弹出 (左滑关闭)" size="mini" @click="openLeftGesture"></UpButton>
           <view class="w-[8px]"></view>
-          <up-button type="success" text="右侧弹出 (右滑关闭)" size="mini" @click="openRightGesture"></up-button>
+          <UpButton type="success" text="右侧弹出 (右滑关闭)" size="mini" @click="openRightGesture"></UpButton>
         </view>
       </view>
       <!-- 3. 自定义滑动阈值演示 -->
@@ -48,9 +48,9 @@
           通过 slide-down-threshold 调节灵敏度：默认 40px 快速响应；100px 防误触面板。
         </text>
         <view class="flex-row items-center">
-          <up-button type="primary" text="默认阈值 (40px)" size="mini" @click="showBasicPopup = true"></up-button>
+          <UpButton type="primary" text="默认阈值 (40px)" size="mini" @click="showBasicPopup = true"></UpButton>
           <view class="w-[10px]"></view>
-          <up-button type="warning" text="高阈值防误触 (100px)" size="mini" @click="showHighThresholdPopup = true"></up-button>
+          <UpButton type="warning" text="高阈值防误触 (100px)" size="mini" @click="showHighThresholdPopup = true"></UpButton>
         </view>
       </view>
       <!-- 4. 嵌套长列表防冲突 (z-paging-x 协同) -->
@@ -63,13 +63,13 @@
           配置 scroll-id="popup-paging-scroll"。支持触底加载；仅当列表回顶时向下拉动触发弹窗下滑关闭。
         </text>
         <view class="flex-row items-center">
-          <up-button type="info" text="打开 z-paging-x 分页弹窗" size="mini" @click="showListPopup = true"></up-button>
+          <UpButton type="info" text="打开 z-paging-x 分页弹窗" size="mini" @click="showListPopup = true"></UpButton>
         </view>
       </view>
     </view>
     <!-- ========== 基础方向：每个方向独立弹窗实例 ========== -->
     <!-- 基础-top -->
-    <up-popup :show="basicTopShow" mode="top" :closeable="true" :round="12" @close="basicTopShow = false">
+    <UpPopup :show="basicTopShow" mode="top" :closeable="true" :round="12" @close="basicTopShow = false">
       <view class="px-[24px] py-[28px] flex flex-col items-center">
         <text class="text-[16px] font-bold text-[#1e293b] mb-[8px]">顶部弹出层</text>
         <text class="text-[13px] text-[#64748b] text-center mb-[18px]">常规弹出层展示，可通过点击遮罩或右上角关闭图标收起。</text>
@@ -77,9 +77,9 @@
           <text class="text-white text-[14px] font-bold">我知道了</text>
         </view>
       </view>
-    </up-popup>
+    </UpPopup>
     <!-- 基础-bottom -->
-    <up-popup :show="basicBottomShow" mode="bottom" :closeable="true" :round="12" @close="basicBottomShow = false">
+    <UpPopup :show="basicBottomShow" mode="bottom" :closeable="true" :round="12" @close="basicBottomShow = false">
       <view class="px-[24px] py-[28px] flex flex-col items-center">
         <text class="text-[16px] font-bold text-[#1e293b] mb-[8px]">底部弹出层</text>
         <text class="text-[13px] text-[#64748b] text-center mb-[18px]">常规弹出层展示，可通过点击遮罩或右上角关闭图标收起。</text>
@@ -87,9 +87,9 @@
           <text class="text-white text-[14px] font-bold">我知道了</text>
         </view>
       </view>
-    </up-popup>
+    </UpPopup>
     <!-- 基础-center -->
-    <up-popup :show="basicCenterShow" mode="center" :closeable="true" :round="12" @close="basicCenterShow = false">
+    <UpPopup :show="basicCenterShow" mode="center" :closeable="true" :round="12" @close="basicCenterShow = false">
       <view class="px-[24px] py-[28px] flex flex-col items-center">
         <text class="text-[16px] font-bold text-[#1e293b] mb-[8px]">居中弹出层</text>
         <text class="text-[13px] text-[#64748b] text-center mb-[18px]">常规弹出层展示，可通过点击遮罩或右上角关闭图标收起。</text>
@@ -97,9 +97,9 @@
           <text class="text-white text-[14px] font-bold">我知道了</text>
         </view>
       </view>
-    </up-popup>
+    </UpPopup>
     <!-- 基础-left -->
-    <up-popup :show="basicLeftShow" mode="left" :closeable="true" :round="12" @close="basicLeftShow = false">
+    <UpPopup :show="basicLeftShow" mode="left" :closeable="true" :round="12" @close="basicLeftShow = false">
       <view class="px-[24px] py-[28px] flex flex-col items-center w-[260px] h-full justify-center">
         <text class="text-[16px] font-bold text-[#1e293b] mb-[8px]">左侧弹出层</text>
         <text class="text-[13px] text-[#64748b] text-center mb-[18px]">常规弹出层展示，可通过点击遮罩或右上角关闭图标收起。</text>
@@ -107,9 +107,9 @@
           <text class="text-white text-[14px] font-bold">我知道了</text>
         </view>
       </view>
-    </up-popup>
+    </UpPopup>
     <!-- 基础-right -->
-    <up-popup :show="basicRightShow" mode="right" :closeable="true" :round="12" @close="basicRightShow = false">
+    <UpPopup :show="basicRightShow" mode="right" :closeable="true" :round="12" @close="basicRightShow = false">
       <view class="px-[24px] py-[28px] flex flex-col items-center w-[260px] h-full justify-center">
         <text class="text-[16px] font-bold text-[#1e293b] mb-[8px]">右侧弹出层</text>
         <text class="text-[13px] text-[#64748b] text-center mb-[18px]">常规弹出层展示，可通过点击遮罩或右上角关闭图标收起。</text>
@@ -117,10 +117,10 @@
           <text class="text-white text-[14px] font-bold">我知道了</text>
         </view>
       </view>
-    </up-popup>
+    </UpPopup>
     <!-- ========== 手势关闭：每个方向独立弹窗实例 ========== -->
     <!-- 手势-top -->
-    <up-popup
+    <UpPopup
       :show="gestureTopShow"
       mode="top"
       :closeable="true"
@@ -143,9 +143,9 @@
           <text class="text-white text-[14px] font-bold">完成并收起</text>
         </view>
       </view>
-    </up-popup>
+    </UpPopup>
     <!-- 手势-bottom -->
-    <up-popup
+    <UpPopup
       :show="gestureBottomShow"
       mode="bottom"
       :closeable="true"
@@ -168,9 +168,9 @@
           <text class="text-white text-[14px] font-bold">完成并收起</text>
         </view>
       </view>
-    </up-popup>
+    </UpPopup>
     <!-- 手势-left -->
-    <up-popup
+    <UpPopup
       :show="gestureLeftShow"
       mode="left"
       :closeable="true"
@@ -193,9 +193,9 @@
           <text class="text-white text-[14px] font-bold">完成并收起</text>
         </view>
       </view>
-    </up-popup>
+    </UpPopup>
     <!-- 手势-right -->
-    <up-popup
+    <UpPopup
       :show="gestureRightShow"
       mode="right"
       :closeable="true"
@@ -218,9 +218,9 @@
           <text class="text-white text-[14px] font-bold">完成并收起</text>
         </view>
       </view>
-    </up-popup>
+    </UpPopup>
     <!-- 3. 基础下滑关闭弹窗 (40px) -->
-    <up-popup
+    <UpPopup
       :show="showBasicPopup"
       mode="bottom"
       :round="16"
@@ -245,9 +245,9 @@
           <text class="text-white text-[15px] font-bold">完成并收起</text>
         </view>
       </view>
-    </up-popup>
+    </UpPopup>
     <!-- 4. 高阈值 (100px) 下滑关闭弹窗 -->
-    <up-popup
+    <UpPopup
       :show="showHighThresholdPopup"
       mode="bottom"
       :round="16"
@@ -267,9 +267,9 @@
           <text class="text-white text-[15px] font-bold">我知道了</text>
         </view>
       </view>
-    </up-popup>
+    </UpPopup>
     <!-- 5. 嵌套长列表弹窗 (z-paging-x 协同与防冲突) -->
-    <up-popup
+    <UpPopup
       :show="showListPopup"
       mode="bottom"
       :round="16"
@@ -312,7 +312,7 @@
           </view>
         </view>
         <view class="h-[360px] mb-[16px] rounded-[12px] overflow-hidden border-[1px] border-solid border-[#edf2f7] bg-[#f8fafc]">
-          <z-paging-x
+          <ZPagingX
             ref="pagingRef"
             list-is="scroll-view"
             list-id="popup-paging-scroll"
@@ -344,18 +344,22 @@
                 <text class="text-[11px] text-[#94a3b8]">{{ item.time }}</text>
               </view>
             </view>
-          </z-paging-x>
+          </ZPagingX>
         </view>
         <view class="bg-[#7c3aed] py-[12px] rounded-[10px] flex items-center justify-center active:opacity-80" @click="showListPopup = false">
           <text class="text-white text-[15px] font-bold">关闭弹窗</text>
         </view>
       </view>
-    </up-popup>
+    </UpPopup>
   </view>
 </template>
 
 <script setup lang="uts">
 import { ref } from 'vue';
+import NavBar from '@/src/components/NavBar/NavBar.uvue';
+import UpButton from '@/uni_modules/uview-ultra/components/up-button/up-button.uvue';
+import UpPopup from '@/uni_modules/uview-ultra/components/up-popup/up-popup.uvue';
+import ZPagingX from '@/uni_modules/z-paging-x/components/z-paging-x/z-paging-x.uvue';
 
 type PopupPagingItem = {
   id: number;
@@ -365,7 +369,7 @@ type PopupPagingItem = {
   time: string;
 };
 definePage({
-  debug: true,
+  debug: false,
   style: {
     navigationStyle: 'custom',
     navigationBarTitleText: 'up-popup 弹出层'
@@ -373,24 +377,24 @@ definePage({
 });
 // ---------------- 基础方向弹窗（每个方向独立状态） ----------------
 const basicTopShow = ref(false);
-const openTopBasic = () => basicTopShow.value = true;
+const openTopBasic = () => { basicTopShow.value = true; };
 const basicBottomShow = ref(false);
-const openBottomBasic = () => basicBottomShow.value = true;
+const openBottomBasic = () => { basicBottomShow.value = true; };
 const basicCenterShow = ref(false);
-const openCenterBasic = () => basicCenterShow.value = true;
+const openCenterBasic = () => { basicCenterShow.value = true; };
 const basicLeftShow = ref(false);
-const openLeftBasic = () => basicLeftShow.value = true;
+const openLeftBasic = () => { basicLeftShow.value = true; };
 const basicRightShow = ref(false);
-const openRightBasic = () => basicRightShow.value = true;
+const openRightBasic = () => { basicRightShow.value = true; };
 // ---------------- 手势弹窗（每个方向独立状态） ----------------
 const gestureTopShow = ref(false);
-const openTopGesture = () => gestureTopShow.value = true;
+const openTopGesture = () => { gestureTopShow.value = true; };
 const gestureBottomShow = ref(false);
-const openBottomGesture = () => gestureBottomShow.value = true;
+const openBottomGesture = () => { gestureBottomShow.value = true; };
 const gestureLeftShow = ref(false);
-const openLeftGesture = () => gestureLeftShow.value = true;
+const openLeftGesture = () => { gestureLeftShow.value = true; };
 const gestureRightShow = ref(false);
-const openRightGesture = () => gestureRightShow.value = true;
+const openRightGesture = () => { gestureRightShow.value = true; };
 // ---------------- 阈值、列表弹窗 ----------------
 const showBasicPopup = ref<boolean>(false);
 const showHighThresholdPopup = ref<boolean>(false);

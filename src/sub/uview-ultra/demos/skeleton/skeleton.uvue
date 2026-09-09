@@ -4,18 +4,21 @@
     <view class="p-[16px]">
       <view class="demo-block">
         <text class="demo-label">基础用法</text>
-        <up-skeleton :loading="true" :animate="true" :rows="3" title></up-skeleton>
+        <UpSkeleton :loading="true" :animate="true" :rows="3" title></UpSkeleton>
       </view>
 
       <view class="demo-block">
         <text class="demo-label">带头像</text>
-        <up-skeleton :loading="true" :animate="true" :rows="2" title avatar></up-skeleton>
+        <UpSkeleton :loading="true" :animate="true" :rows="2" title avatar></UpSkeleton>
       </view>
     </view>
   </view>
 </template>
 
 <script setup lang="uts">
+import NavBar from '@/src/components/NavBar/NavBar.uvue';
+import UpSkeleton from '@/uni_modules/uview-ultra/components/up-skeleton/up-skeleton.uvue';
+
 definePage({
   style: {
     navigationStyle: 'custom',

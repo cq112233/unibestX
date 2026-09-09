@@ -4,22 +4,22 @@
     <view class="p-[16px]">
       <view class="demo-block">
         <text class="demo-label">基础用法</text>
-        <up-textarea v-model="textValue1" placeholder="请输入内容" count :maxlength="100"></up-textarea>
+        <UpTextarea v-model="textValue1" placeholder="请输入内容" count :maxlength="100"></UpTextarea>
       </view>
 
       <view class="demo-block mt-[12px]">
         <text class="demo-label">自动增高</text>
-        <up-textarea v-model="textValue2" placeholder="输入文字会自动撑开高度" auto-height></up-textarea>
+        <UpTextarea v-model="textValue2" placeholder="输入文字会自动撑开高度" auto-height></UpTextarea>
       </view>
 
       <view class="demo-block mt-[12px]">
         <text class="demo-label">下划线模式</text>
-        <up-textarea v-model="textValue3" placeholder="下划线输入" border="bottom"></up-textarea>
+        <UpTextarea v-model="textValue3" placeholder="下划线输入" border="bottom"></UpTextarea>
       </view>
 
       <view class="demo-block mt-[12px]">
         <text class="demo-label">禁用状态</text>
-        <up-textarea v-model="textValue4" placeholder="禁止输入内容" :disabled="true"></up-textarea>
+        <UpTextarea v-model="textValue4" placeholder="禁止输入内容" :disabled="true"></UpTextarea>
       </view>
     </view>
   </view>
@@ -27,6 +27,8 @@
 
 <script setup lang="uts">
 import { ref } from 'vue';
+import NavBar from '@/src/components/NavBar/NavBar.uvue';
+import UpTextarea from '@/uni_modules/uview-ultra/components/up-textarea/up-textarea.uvue';
 
 definePage({
   style: {

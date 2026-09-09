@@ -4,22 +4,22 @@
     <view class="p-[16px]">
       <view class="demo-block">
         <text class="demo-label">基础用法</text>
-        <up-collapse :value="collapseValue" :accordion="true">
-          <up-collapse-item title="第一项" name="1">
+        <UpCollapse :value="collapseValue" :accordion="true">
+          <UpCollapseItem title="第一项" name="1">
             <text class="collapse-text">uview-ultra 是基于 uview-plus 修改的 uni-app-x 版本</text>
-          </up-collapse-item>
-          <up-collapse-item title="第二项" name="2">
+          </UpCollapseItem>
+          <UpCollapseItem title="第二项" name="2">
             <text class="collapse-text">支持 iOS、Android、H5、小程序等多端</text>
-          </up-collapse-item>
-        </up-collapse>
+          </UpCollapseItem>
+        </UpCollapse>
       </view>
       <view class="demo-block mt-[12px]">
         <text class="demo-label">自定义图标</text>
-        <up-collapse :value="['1']">
-          <up-collapse-item title="第一项" name="1" icon="star">
+        <UpCollapse :value="['1']">
+          <UpCollapseItem title="第一项" name="1" icon="star">
             <text class="collapse-text">带有星星图标的面板</text>
-          </up-collapse-item>
-        </up-collapse>
+          </UpCollapseItem>
+        </UpCollapse>
       </view>
     </view>
   </view>
@@ -27,6 +27,9 @@
 
 <script setup lang="uts">
 import { ref } from 'vue';
+import NavBar from '@/src/components/NavBar/NavBar.uvue';
+import UpCollapse from '@/uni_modules/uview-ultra/components/up-collapse/up-collapse.uvue';
+import UpCollapseItem from '@/uni_modules/uview-ultra/components/up-collapse-item/up-collapse-item.uvue';
 
 definePage({
   style: {

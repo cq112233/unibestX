@@ -7,10 +7,10 @@
         <text class="demo-label">基础用法</text>
         <view class="flex flex-row items-center flex-wrap">
           <view class="mr-[12px] mb-[8px]">
-            <up-tooltip text="长按此处复制文本" direction="top"></up-tooltip>
+            <UpTooltip text="长按此处复制文本" direction="top"></UpTooltip>
           </view>
           <view class="mb-[8px]">
-            <up-tooltip text="长按显示操作" direction="top" :show-copy="false" :buttons="tooltipButtons" @click="handleBtnClick"></up-tooltip>
+            <UpTooltip text="长按显示操作" direction="top" :show-copy="false" :buttons="tooltipButtons" @click="handleBtnClick"></UpTooltip>
           </view>
         </view>
       </view>
@@ -20,10 +20,10 @@
         <text class="demo-label">弹出方向</text>
         <view class="flex flex-row items-center flex-wrap">
           <view class="mr-[16px] mb-[8px]">
-            <up-tooltip text="长按文本，上方提示" direction="top"></up-tooltip>
+            <UpTooltip text="长按文本，上方提示" direction="top"></UpTooltip>
           </view>
           <view class="mb-[8px]">
-            <up-tooltip text="长按文本，下方提示" direction="bottom"></up-tooltip>
+            <UpTooltip text="长按文本，下方提示" direction="bottom"></UpTooltip>
           </view>
         </view>
       </view>
@@ -32,7 +32,7 @@
       <view class="demo-block mt-[12px]">
         <text class="demo-label">高亮选中文本背景色</text>
         <view class="flex flex-row items-center">
-          <up-tooltip text="长按文本，显示背景色" bg-color="#d1fae5" direction="top"></up-tooltip>
+          <UpTooltip text="长按文本，显示背景色" bg-color="#d1fae5" direction="top"></UpTooltip>
         </view>
       </view>
 
@@ -40,7 +40,7 @@
       <view class="demo-block mt-[12px]">
         <text class="demo-label">扩展按钮</text>
         <view class="flex flex-row items-center">
-          <up-tooltip text="显示多个扩展按钮" :show-copy="true" :buttons="multiButtons" @click="handleBtnClick"></up-tooltip>
+          <UpTooltip text="显示多个扩展按钮" :show-copy="true" :buttons="multiButtons" @click="handleBtnClick"></UpTooltip>
         </view>
       </view>
 
@@ -49,14 +49,14 @@
         <text class="demo-label">自定义触发器 (Slot)</text>
         <view class="flex flex-row items-center">
           <view class="mr-[16px]">
-            <up-tooltip :show-copy="false" :buttons="['设置', '赞']" direction="top" @click="handleBtnClick">
-              <up-button type="primary" size="small" text="点击/长按触发"></up-button>
-            </up-tooltip>
+            <UpTooltip :show-copy="false" :buttons="['设置', '赞']" direction="top" @click="handleBtnClick">
+              <UpButton type="primary" size="small" text="点击/长按触发"></UpButton>
+            </UpTooltip>
           </view>
           <view>
-            <up-tooltip :show-copy="true" :buttons="['自定义操作']" direction="bottom" @click="handleBtnClick">
-              <up-button type="warning" size="small" text="下方弹出"></up-button>
-            </up-tooltip>
+            <UpTooltip :show-copy="true" :buttons="['自定义操作']" direction="bottom" @click="handleBtnClick">
+              <UpButton type="warning" size="small" text="下方弹出"></UpButton>
+            </UpTooltip>
           </view>
         </view>
       </view>
@@ -66,6 +66,9 @@
 
 <script setup lang="uts">
 import { ref } from 'vue';
+import NavBar from '@/src/components/NavBar/NavBar.uvue';
+import UpTooltip from '@/uni_modules/uview-ultra/components/up-tooltip/up-tooltip.uvue';
+import UpButton from '@/uni_modules/uview-ultra/components/up-button/up-button.uvue';
 
 definePage({
   style: {

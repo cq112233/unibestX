@@ -170,11 +170,11 @@ function getTextStyle(item: UTSJSONObject): UTSJSONObject {
 
 function getOptionIconSize(item: UTSJSONObject): any {
 	if (item['iconSize'] != null) {
-		return addUnit(item['iconSize'])
+		return addUnit(item['iconSize']) ?? ''
 	}
 	const style = getOptionStyle(item)
 	if (style != null && style['fontSize'] != null) {
-		return addUnit(style['fontSize'])
+		return addUnit(style['fontSize']) ?? ''
 	}
 	return 17
 }

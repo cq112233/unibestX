@@ -4,22 +4,22 @@
     <view class="p-[16px]">
       <view class="demo-block">
         <text class="demo-label">基础用法</text>
-        <up-slider v-model="sliderValue1" :min="0" :max="100"></up-slider>
+        <UpSlider v-model="sliderValue1" :min="0" :max="100"></UpSlider>
       </view>
 
       <view class="demo-block mt-[12px]">
         <text class="demo-label">指定步长</text>
-        <up-slider v-model="sliderValue2" :step="10"></up-slider>
+        <UpSlider v-model="sliderValue2" :step="10"></UpSlider>
       </view>
 
       <view class="demo-block mt-[12px]">
         <text class="demo-label">自定义颜色</text>
-        <up-slider v-model="sliderValue3" active-color="#fa3534" inactive-color="#f56c6c"></up-slider>
+        <UpSlider v-model="sliderValue3" active-color="#fa3534" inactive-color="#f56c6c"></UpSlider>
       </view>
 
       <view class="demo-block mt-[12px]">
         <text class="demo-label">禁用状态</text>
-        <up-slider v-model="sliderValue4" :disabled="true"></up-slider>
+        <UpSlider v-model="sliderValue4" :disabled="true"></UpSlider>
       </view>
     </view>
   </view>
@@ -27,6 +27,8 @@
 
 <script setup lang="uts">
 import { ref } from 'vue';
+import NavBar from '@/src/components/NavBar/NavBar.uvue';
+import UpSlider from '@/uni_modules/uview-ultra/components/up-slider/up-slider.uvue';
 
 definePage({
   style: {
