@@ -254,6 +254,7 @@ declare global {
       fail?: (result: any) => void;
       complete?: (result: any) => void;
     }) => void;
+
   }
 }
 

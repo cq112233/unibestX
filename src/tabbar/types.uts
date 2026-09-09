@@ -99,6 +99,8 @@ export type TabBarConfig = {
   height?: string;
   /** 中间按钮配置（仅在 list 项为偶数时有效） */
   midButton?: TabBarMidButton;
+  /** 中间按钮配置（兼容 Vapor / 小程序 / 鸿蒙，原生 midButton 不支持以上端，故更名为 midButton1 使用） */
+  midButton1?: TabBarMidButton;
   /** list 设置 iconfont 属性时，需要指定字体文件路径 */
   iconfontSrc?: string;
   /** 设置背景图片，优先级高于 backgroundColor */

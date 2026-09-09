@@ -1,10 +1,33 @@
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
+import { customTabbarConfig } from '../tabbar/config.uts';
+
+/**
+ * NavBar 内容区默认基准高度（不含状态栏，单位 px，标准 44px）
+ */
+export const NAVBAR_CONTENT_HEIGHT: number = 44;
+
+/**
+ * TabBar 默认基准高度（单位 px，标准 50px）
+ */
+export const TABBAR_BASE_HEIGHT: number = 50;
+
+// eslint-disable-next-line import/no-mutable-exports
+export let systemId: number = 0;
 
 export type SystemSafeAreaInsets = {
   top: number;
   right: number;
   bottom: number;
   left: number;
+};
+
+export type SystemSafeArea = {
+  top: number;
+  right: number;
+  bottom: number;
+  left: number;
+  width: number;
+  height: number;
 };
 
 export type SystemInfoType = {
@@ -14,6 +37,9 @@ export type SystemInfoType = {
   windowWidth: number;
   windowHeight: number;
   statusBarHeight: number;
+  // 可用内容高度 = 窗口高度 - 状态栏高度
+  availableHeight: number;
+  navBarHeight: number;
   tabBarHeight: number;
   pixelRatio: number;
   // 设备信息
@@ -32,10 +58,36 @@ export type SystemInfoType = {
   apiBaseUrl: string;
   env: string;
   envName: string;
+  // 安全区域插入距离（同时独立挂一份到 safeAreaInsets ref 上）
+  safeAreaInsets: SystemSafeAreaInsets | null;
+  safeArea: SystemSafeArea | null;
 };
 
 export const systemInfo = ref(null as SystemInfoType | null);
 export const safeAreaInsets = ref(null as SystemSafeAreaInsets | null);
+
+/** 便捷响应式：窗口/屏幕宽度（px），未初始化时为 0 */
+export const windowWidth = computed<number>((): number => systemInfo.value?.windowWidth ?? 0);
+/** 便捷响应式：窗口/屏幕高度（px），未初始化时为 0 */
+export const windowHeight = computed<number>((): number => systemInfo.value?.windowHeight ?? 0);
+/** 便捷响应式：屏幕宽度（px），未初始化时为 0 */
+export const screenWidth = computed<number>((): number => systemInfo.value?.screenWidth ?? 0);
+/** 便捷响应式：屏幕高度（px），未初始化时为 0 */
+export const screenHeight = computed<number>((): number => systemInfo.value?.screenHeight ?? 0);
+/** 便捷响应式：状态栏高度（px），未初始化时为 0 */
+export const statusBarHeight = computed<number>((): number => systemInfo.value?.statusBarHeight ?? 0);
+/** 便捷响应式：可用内容高度（px），= 窗口高度 - 状态栏高度，未初始化时为 0 */
+export const availableHeight = computed<number>((): number => {
+  if (customTabbarConfig.type == 'default') {
+    return systemInfo.value?.availableHeight ?? 0;
+  }
+  else {
+    const ah: number = systemInfo.value?.availableHeight ?? 0;
+    return ah ? ah + TABBAR_BASE_HEIGHT : 0;
+  }
+});
+/** 便捷响应式：底部安全区高度（px），未初始化时为 0 */
+export const safeAreaBottom = computed<number>((): number => systemInfo.value?.safeAreaInsets?.bottom ?? 0);
 
 /**
  * 获取当前应用名称（全端从 import.meta.env 读取）
@@ -52,10 +104,15 @@ export function getApiBaseUrl(): string {
 }
 
 /**
- * 获取当前是否为 Vapor 渲染模式（全端从 import.meta.env 读取）
+ * 获取当前是否为 Vapor 渲染模式（使用 uni-app X 原生编译条件 VUE3-VAPOR 判定）
  */
 export function isVaporMode(): boolean {
-  return `${import.meta.env.VITE_IS_VAPOR ?? 'false'}` == 'true';
+  // #ifdef VUE3-VAPOR
+  return true;
+  // #endif
+  // #ifndef VUE3-VAPOR
+  return false;
+  // #endif
 }
 
 /**
@@ -73,14 +130,12 @@ export function getCurrentEnv(): string {
  * 获取当前运行环境中文名称（'开发环境' | '测试环境' | '生产环境'）
  */
 export function getCurrentEnvName(): string {
-  const env = getCurrentEnv();
-  if (env == 'test') {
-    return '测试环境';
+  // 优先从环境变量读取中文名称（.env.* 中配置 VITE_ENV_NAME）
+  const envName = `${import.meta.env.VITE_ENV_NAME ?? ''}`;
+  if (envName != '') {
+    return envName;
   }
-  if (env == 'production') {
-    return '生产环境';
-  }
-  return '开发环境';
+  return '';
 }
 
 /**
@@ -93,7 +148,7 @@ export function getAppVersion(): string {
       return `${sys.appVersion}`;
     }
   }
-  catch {}
+  catch { }
   // #ifdef MP-WEIXIN
   try {
     const appBaseInfo = uni.getAppBaseInfo() as any;
@@ -101,7 +156,7 @@ export function getAppVersion(): string {
       return `${appBaseInfo.appVersion}`;
     }
   }
-  catch {}
+  catch { }
   // #endif
   return `${import.meta.env.VITE_APP_VERSION ?? '1.0.0'}`;
 }
@@ -162,29 +217,59 @@ export function getCompilePlatform(): string {
 }
 
 export function updateSystemInfo() {
-  // #ifdef MP-WEIXIN
-  // 微信小程序使用新的API
+  // 窗口信息：所有平台统一从 uni.getWindowInfo() 读取
   const windowInfo = uni.getWindowInfo();
+  // ---- 编译器版本：各平台来源不同，互相兜底 ----
   let compileVer = '';
+  // #ifdef H5
   try {
-    const appBaseInfo = uni.getAppBaseInfo() as any;
-    compileVer = `${appBaseInfo.appCompilerVersion ?? appBaseInfo.SDKVersion ?? ''}`;
+    const conf = (globalThis as any).__uniConfig as any;
+    if (conf != null && conf.compilerVersion != null) {
+      compileVer = `${conf.compilerVersion}`;
+    }
   }
-  catch {}
+  catch { }
+
+  // #endif
+  // 非 H5：优先 uni.getSystemInfoSync().uniCompileVersion（全端通用 uni 编译版本，已验证 App 可取）
+  if (compileVer == '') {
+    try {
+      const sysInfo = uni.getSystemInfoSync();
+      const uniCompileVersion = `${sysInfo.uniCompileVersion ?? ''}`;
+      compileVer = uniCompileVersion;
+    }
+    catch {
+    }
+  }
+  // 兜底：getAppBaseInfo 版本字段（微信小程序用 appCompilerVersion/SDKVersion，其余用 version 引擎号）
+  if (compileVer == '') {
+    try {
+      const appBaseInfo = uni.getAppBaseInfo();
+      // #ifdef MP-WEIXIN
+      compileVer = `${(appBaseInfo as any).appCompilerVersion ?? (appBaseInfo as any).SDKVersion ?? ''}`;
+      // #endif
+      // #ifndef MP-WEIXIN
+      compileVer = `${appBaseInfo.version ?? ''}`;
+      // #endif
+    }
+    catch { }
+  }
   if (compileVer == '') {
     compileVer = '1.0.0';
   }
+
+  // ---- 品牌 / 型号 / 系统信息：getDeviceInfo 优先，缺失时回退 getSystemInfoSync ----
   let brand = '';
   let model = '';
   let system = '';
   try {
-    const dev = uni.getDeviceInfo() as any;
+    const dev = uni.getDeviceInfo();
     brand = `${dev.brand ?? ''}`;
     model = `${dev.model ?? ''}`;
   }
-  catch {}
+  catch { }
   try {
-    const sys = uni.getSystemInfoSync() as any;
+    const sys = uni.getSystemInfoSync();
     system = `${sys.system ?? ''}`;
     if (brand == '') {
       brand = `${sys.brand ?? ''}`;
@@ -193,121 +278,85 @@ export function updateSystemInfo() {
       model = `${sys.model ?? ''}`;
     }
   }
-  catch {}
+  catch { }
 
-  console.log(windowInfo, 'windowInfo');
-
+  // ---- 写入公共系统信息 ----
   systemInfo.value = {
-    screenWidth: windowInfo.screenWidth,
-    screenHeight: windowInfo.screenHeight,
-    windowWidth: windowInfo.windowWidth,
-    windowHeight: windowInfo.windowHeight,
-    statusBarHeight: windowInfo.statusBarHeight,
-    tabBarHeight: 50,
-    pixelRatio: windowInfo.pixelRatio,
-    brand,
-    model,
-    system,
-    compilerVersion: compileVer,
-    uniCompileVersion: compileVer,
-    isVapor: isVaporMode(),
-    compileMode: getCompileMode(),
-    platformName: getCompilePlatform(),
-    appTitle: getAppTitle(),
-    appVersion: getAppVersion(),
-    apiBaseUrl: getApiBaseUrl(),
-    env: getCurrentEnv(),
-    envName: getCurrentEnvName()
+    screenWidth: windowInfo.screenWidth, // 屏幕宽度（px）
+    screenHeight: windowInfo.screenHeight, // 屏幕高度（px）
+    windowWidth: windowInfo.windowWidth, // 窗口可视宽度（px）
+    windowHeight: windowInfo.windowHeight, // 窗口可视高度（px）
+    statusBarHeight: windowInfo.statusBarHeight, // 状态栏高度（px）
+    availableHeight: windowInfo.windowHeight - windowInfo.statusBarHeight, // 可用内容高度（px，窗口高度 - 状态栏高度）
+    tabBarHeight: TABBAR_BASE_HEIGHT, // TabBar 默认基准高度（px）
+    navBarHeight: NAVBAR_CONTENT_HEIGHT, // 导航栏内容区默认基准高度（px）
+    pixelRatio: windowInfo.pixelRatio, // 像素比（dpr）
+    brand, // 设备品牌
+    model, // 设备型号
+    system, // 操作系统及版本
+    compilerVersion: compileVer, // 编译器 / SDK 版本
+    uniCompileVersion: compileVer, // uni 编译器版本（当前与 compilerVersion 同源）
+    isVapor: isVaporMode(), // 是否为 Vapor 渲染模式
+    compileMode: getCompileMode(), // 编译运行模式（Vapor / VDOM + 环境）
+    platformName: getCompilePlatform(), // 编译目标平台
+    appTitle: getAppTitle(), // 应用名称
+    appVersion: getAppVersion(), // 应用版本号
+    apiBaseUrl: getApiBaseUrl(), // 接口 BaseURL 地址
+    env: getCurrentEnv(), // 运行环境标识（development / test / production）
+    envName: getCurrentEnvName(), // 运行环境中文名称
+    safeAreaInsets: null, // 安全区域插入距离（稍后单独赋值）
+    safeArea: null
   } as SystemInfoType;
+
+  // ---- 安全区：微信 safeArea 为绝对坐标矩形，其余平台为相对边界距离 ----
+  // #ifdef MP-WEIXIN
+  const safeAreaInset = windowInfo.safeAreaInsets;
+  console.log('wx windowInfo.safeArea:', safeAreaInset);
+  console.log('wx windowInfo.safeAreaInsets:', windowInfo.safeAreaInsets);
+  if (safeAreaInset != null) {
+    const insets = {
+      top: safeAreaInset.top,
+      right: safeAreaInset.right,
+      bottom: safeAreaInset.bottom,
+      left: safeAreaInset.left
+    } as SystemSafeAreaInsets;
+    safeAreaInsets.value = insets;
+    systemInfo.value.safeAreaInsets = insets;
+  }
   const safeArea = windowInfo.safeArea;
   if (safeArea != null) {
-    safeAreaInsets.value = {
-      top: safeArea.top,
-      right: windowInfo.windowWidth - safeArea.right,
-      bottom: windowInfo.windowHeight - safeArea.bottom,
-      left: safeArea.left
-    } as SystemSafeAreaInsets;
-  }
-  // #endif
-
-  // #ifndef MP-WEIXIN
-  // 其他平台继续使用uni API
-  const sysInfo = uni.getWindowInfo();
-  let compileVer = '';
-  // #ifdef H5
-  try {
-    const g = globalThis as any;
-    const conf = g.__uniConfig as any;
-    if (conf != null && conf.compilerVersion != null) {
-      compileVer = `${conf.compilerVersion}`;
-    }
-  }
-  catch {}
-  // #endif
-  if (compileVer == '') {
-    try {
-      const appBaseInfo = uni.getAppBaseInfo();
-      compileVer = appBaseInfo.appVersion ?? '';
-    }
-    catch {}
-  }
-  if (compileVer == '') {
-    compileVer = '1.0.0';
-  }
-
-  let brand = '';
-  let model = '';
-  let system = '';
-  try {
-    const dev = uni.getDeviceInfo();
-    brand = dev.brand ?? '';
-    model = dev.model ?? '';
-  }
-  catch {}
-  try {
-    const sys = uni.getSystemInfoSync();
-    system = sys.system ?? '';
-    if (brand == '') {
-      brand = sys.brand ?? '';
-    }
-    if (model == '') {
-      model = sys.model ?? '';
-    }
-  }
-  catch {}
-
-  console.log(sysInfo.windowBottom, 'sysInfo');
-
-  systemInfo.value = {
-    screenWidth: sysInfo.screenWidth,
-    screenHeight: sysInfo.screenHeight,
-    windowWidth: sysInfo.windowWidth,
-    windowHeight: sysInfo.windowHeight,
-    statusBarHeight: sysInfo.statusBarHeight,
-    tabBarHeight: 50,
-    pixelRatio: sysInfo.pixelRatio,
-    brand,
-    model,
-    system,
-    compilerVersion: compileVer,
-    uniCompileVersion: compileVer,
-    isVapor: isVaporMode(),
-    compileMode: getCompileMode(),
-    platformName: getCompilePlatform(),
-    appTitle: getAppTitle(),
-    appVersion: getAppVersion(),
-    apiBaseUrl: getApiBaseUrl(),
-    env: getCurrentEnv(),
-    envName: getCurrentEnvName()
-  } as SystemInfoType;
-  const safeArea = sysInfo.safeAreaInsets;
-  if (safeArea != null) {
-    safeAreaInsets.value = {
+    systemInfo.value.safeArea = {
       top: safeArea.top,
       right: safeArea.right,
       bottom: safeArea.bottom,
-      left: safeArea.left
+      left: safeArea.left,
+      width: safeArea.width,
+      height: safeArea.height
+    } as SystemSafeArea;
+  }
+  // #endif
+  // #ifndef MP-WEIXIN
+  const safeAreaInset = windowInfo.safeAreaInsets;
+  if (safeAreaInset != null) {
+    const insets = {
+      top: safeAreaInset.top,
+      right: safeAreaInset.right,
+      bottom: safeAreaInset.bottom,
+      left: safeAreaInset.left
     } as SystemSafeAreaInsets;
+    safeAreaInsets.value = insets;
+    systemInfo.value.safeAreaInsets = insets;
+  }
+  const safeArea = windowInfo.safeArea;
+  if (safeArea != null) {
+    systemInfo.value.safeArea = {
+      top: safeArea.top,
+      right: safeArea.right,
+      bottom: safeArea.bottom,
+      left: safeArea.left,
+      width: safeArea.width,
+      height: safeArea.height
+    } as SystemSafeArea;
   }
   // #endif
 }
@@ -335,11 +384,6 @@ export function isCompilerVersionGte(targetVersion: string): boolean {
   }
   return true;
 }
-
-/**
- * TabBar 默认基准高度（单位 px，标准 50px）
- */
-export const TABBAR_BASE_HEIGHT: number = 50;
 
 /**
  * 实时获取当前 TabBar 高度（单位 px）
@@ -405,6 +449,1243 @@ export function getWindowHeight(): number {
  */
 export function getStatusBarHeight(): number {
   return uni.getWindowInfo().statusBarHeight;
+}
+
+/**
+ * App.ku.uvue 页面 props 中参与可用高度计算的字段（由 autoRootPlugin 编译期全量注入）
+ */
+export type AppKuHeightProps = {
+  /** 是否隐藏导航栏（true 时可用高度不扣除导航栏高度 navBarHeight） */
+  hideNavbar: boolean;
+  /** 页面 style 完整配置对象（与 App.ku.uvue 的 pageStyle prop 同源，含 navigationStyle，可能为空） */
+  pageStyle: UTSJSONObject | null;
+  /** 页面布局模板标识：不是 'navbar'（如 default 等无导航布局）时状态栏与导航栏都不扣除；'navbar' 正常扣除 */
+  layout: string;
+};
+
+// 参考这个计算得出 https://doc.dcloud.net.cn/uni-app-x/api/get-window-info.html#%E8%BF%94%E5%9B%9E%E5%80%BC
+export function updateAvailableHeight(kuProps: AppKuHeightProps, selectedTabbarStrategy: number): void {
+  updateSystemInfo();
+  // 非空收窄：局部 sys 固定为 SystemInfoType，避免对可空的 systemInfo.value 逐个 ?. / !! 处理（?. 得到 Number? 不能直接参与运算）
+  const sys = systemInfo.value;
+  if (sys == null) {
+    return;
+  }
+  const safeBottom: number = sys.safeAreaInsets?.bottom ?? 0;
+  const safeTop: number = sys.safeAreaInsets?.top ?? 0;
+  const safeAreaBottom: number = sys.safeArea?.bottom ?? 0;
+
+  // 是否自定义导航栏（navigationStyle == 'custom'）：由注入的 pageStyle 推导，与 App.ku.uvue 内 isCustomNav 判定同源
+  const kuPageStyle: UTSJSONObject | null = kuProps.pageStyle ?? null;
+  const navStyleText: string = kuPageStyle != null ? ((kuPageStyle.navigationStyle as string | null) ?? '') : '';
+  const isCustomNav: boolean = navStyleText == 'custom';
+  // 布局不是 'navbar'（default 等无自定义导航布局）时，窗口内没有导航栏占位，状态栏与导航栏高度都不扣除
+  const isNoNavbarLayout: boolean = kuProps.layout != 'navbar';
+  // hideNavbar 为 true（页面隐藏导航栏）或非 navbar 布局时，可用高度不扣除导航栏高度
+
+  // 自定义状态栏高度
+  let statusBarOffset: number = 0;
+  if (isNoNavbarLayout) {
+    statusBarOffset = isCustomNav ? 0 : safeTop;
+  }
+  else {
+    statusBarOffset = kuProps.hideNavbar ? safeTop : safeTop;
+  }
+
+  // 自定义导航栏高度
+  let navBarOffset: number = 0;
+  if (isNoNavbarLayout) {
+    navBarOffset = isCustomNav ? 0 : sys.navBarHeight;
+  }
+  else {
+    if (isCustomNav) {
+      navBarOffset = kuProps.hideNavbar ? 0 : sys.navBarHeight;
+    }
+    else {
+      navBarOffset = sys.navBarHeight;
+    }
+  }
+
+  // console.log(isNoNavbarLayout ? '不是navbar' : '是navbar');
+  // console.log(kuProps.hideNavbar ? '隐藏了导航栏' : '没有隐藏导航栏');
+  // console.log(isCustomNav ? '自定义导航栏' : '没有自定义导航栏');
+  // console.log(navBarOffset, 'navBarOffset');
+  // console.log(statusBarOffset, 'statusBarOffset');
+
+  if (selectedTabbarStrategy == 2 || selectedTabbarStrategy == 3 || selectedTabbarStrategy == 1) {
+    if (isNoNavbarLayout) {
+      if (isCustomNav) {
+        // #ifdef H5
+        console.log('H5😂');
+        console.log(`窗口screenHeight:${sys.screenHeight}`, 812);
+        console.log(`窗口windowHeight:${sys.windowHeight}`, 812);
+        console.log(`状态栏statusBarHeight:${sys.statusBarHeight}`, 0);
+        console.log(`导航栏navBarHeight:${sys.navBarHeight}`, 44);
+        console.log(`tabBarHeight:${sys.tabBarHeight}`, 50);
+        console.log(`safeBottom:${safeBottom}`, 0);
+        console.log(`safeAreaBottom:${safeAreaBottom}`, 812);
+        console.log(`safeTop:${safeTop}`, 0);
+        sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset - sys.tabBarHeight;
+        console.log(`H5-availableHeight: ${sys.availableHeight}`);
+        systemId++;
+        // #endif
+
+        // #ifdef APP-ANDROID
+        if (isVaporMode()) {
+          // 👌 651 合格
+          console.log(`第${systemId}次`);
+          console.log('蒸汽-安卓😂');
+          console.log(`窗口screenHeight:${sys.screenHeight}`, 780);
+          console.log(`窗口windowHeight:${sys.windowHeight}`, 651);
+          console.log(`状态栏statusBarHeight:${sys.statusBarHeight}`, 35);
+          console.log(`导航栏navBarHeight:${sys.navBarHeight}`, 44);
+          console.log(`tabBarHeight:${sys.tabBarHeight}`, 50);
+          console.log(`safeBottom:${safeBottom}`, 0);
+          console.log(`safeAreaBottom:${safeAreaBottom}`, 780);
+          console.log(`safeTop:${safeTop}`, 35);
+          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset - sys.tabBarHeight;
+          systemId++;
+        }
+        else {
+          // 👌 651 合格
+          console.log(`第${systemId}次`);
+          console.log('VDOM-安卓😂');
+          console.log(`窗口screenHeight:${sys.screenHeight}`, 780);
+          console.log(`窗口windowHeight:${sys.windowHeight}`, 780);
+          console.log(`状态栏statusBarHeight:${sys.statusBarHeight}`, 35);
+          console.log(`导航栏navBarHeight:${sys.navBarHeight}`, 44);
+          console.log(`tabBarHeight:${sys.tabBarHeight}`, 50);
+          console.log(`safeBottom:${safeBottom}`, 0);
+          console.log(`safeAreaBottom:${safeAreaBottom}`, 780);
+          console.log(`safeTop:${safeTop}`, 35);
+          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset - sys.tabBarHeight;
+          console.log(`vDOM-安卓-availableHeight: ${sys.availableHeight}`);
+          systemId++;
+        }
+
+        // #endif
+
+        // #ifdef APP-IOS
+        if (isVaporMode()) {
+          // 👌 852 670
+          console.log(`第${systemId}次`);
+          console.log('蒸汽-IOS😂');
+          console.log(`窗口screenHeight:${sys.screenHeight}`, 852);
+          console.log(`窗口windowHeight:${sys.windowHeight}`, 749);
+          console.log(`状态栏statusBarHeight:${sys.statusBarHeight}`, 54);
+          console.log(`导航栏navBarHeight:${sys.navBarHeight}`, 44);
+          console.log(`tabBarHeight:${sys.tabBarHeight}`, 50);
+          console.log(`safeBottom:${safeBottom}`, 34);
+          console.log(`safeAreaBottom:${safeAreaBottom}`, 818);
+          console.log(`safeTop:${safeTop}`, 59);
+          console.log('----', sys.screenHeight - sys.statusBarHeight - sys.navBarHeight - sys.tabBarHeight - safeBottom);
+          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset - sys.tabBarHeight;
+          console.log(`蒸汽模式-IOS-availableHeight: ${sys.availableHeight}`);
+        }
+        else {
+          // 👌 665 合格
+          console.log(`第${systemId}次`);
+          console.log('VDOM-IOS😂');
+          console.log(`窗口screenHeight:${sys.screenHeight}`, 816);
+          console.log(`窗口windowHeight:${sys.windowHeight}`, 730);
+          console.log(`状态栏statusBarHeight:${sys.statusBarHeight}`, 42);
+          console.log(`导航栏navBarHeight:${sys.navBarHeight}`, 44);
+          console.log(`tabBarHeight:${sys.tabBarHeight}`, 50);
+          console.log(`safeBottom:${safeBottom}`, 28);
+          console.log(`safeAreaBottom:${safeAreaBottom}`, 788);
+          console.log(`safeTop:${safeTop}`, 59);
+          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset - sys.tabBarHeight;
+          console.log(`availableHeight得到高度:${sys.availableHeight}`);
+          systemId++;
+        }
+        // #endif
+
+        // #ifdef APP-HARMONY
+        if (isVaporMode()) {
+          // 👌 652 合格
+          console.log(`第${systemId}次`);
+          console.log('蒸汽-鸿蒙😂');
+          console.log(`窗口screenHeight:${sys.screenHeight}`, 816);
+          console.log(`窗口windowHeight:${sys.windowHeight}`, 730);
+          console.log(`状态栏statusBarHeight:${sys.statusBarHeight}`, 42);
+          console.log(`导航栏navBarHeight:${sys.navBarHeight}`, 44);
+          console.log(`tabBarHeight:${sys.tabBarHeight}`, 50);
+          console.log(`safeBottom:${safeBottom}`, 28);
+          console.log(`safeAreaBottom:${safeAreaBottom}`, 788);
+          console.log(`safeTop:${safeTop}`, 42);
+          console.log('----', sys.screenHeight - sys.statusBarHeight - sys.navBarHeight - sys.tabBarHeight - safeBottom);
+          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset - sys.tabBarHeight;
+          console.log(sys.availableHeight, 'sys.availableHeight');
+          systemId++;
+        }
+        else {
+          // 👌 655 合格
+          console.log(`第${systemId}次`);
+          console.log('VDOM鸿蒙😂');
+          console.log(`窗口screenHeight:${sys.screenHeight}`, 816);
+          console.log(`窗口windowHeight:${sys.windowHeight}`, 733);
+          console.log(`状态栏statusBarHeight:${sys.statusBarHeight}`, 39);
+          console.log(`导航栏navBarHeight:${sys.navBarHeight}`, 44);
+          console.log(`tabBarHeight:${sys.tabBarHeight}`, 50);
+          console.log(`safeBottom:${safeBottom}`, 28);
+          console.log(`safeAreaBottom:${safeAreaBottom}`, 788);
+          console.log(`safeTop:${safeTop}`, 39);
+          console.log('----', sys.windowHeight - sys.statusBarHeight - sys.navBarHeight - sys.tabBarHeight - safeBottom);
+          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset - sys.tabBarHeight;
+          console.log(sys.availableHeight, 'sys.availableHeight');
+          systemId++;
+        }
+        // #endif
+
+        // #ifdef MP-WEIXIN
+        console.log(`第${systemId}次`);
+        console.log('微信小程序😂');
+        console.log(`窗口screenHeight:${sys.screenHeight}`, 812);
+        console.log(`窗口windowHeight:${sys.windowHeight}`, 812);
+        console.log(`状态栏statusBarHeight:${sys.statusBarHeight}`, 44);
+        console.log(`导航栏navBarHeight:${sys.navBarHeight}`, 44);
+        console.log(`tabBarHeight:${sys.tabBarHeight}`, 50);
+        console.log(`safeBottom:${safeBottom}`, 34);
+        console.log(`safeAreaBottom:${safeAreaBottom}`, 778);
+        console.log(`safeTop:${safeTop}`, 44);
+        console.log(`偏移量导航栏navBarOffset:${navBarOffset}`, 0);
+        console.log(`偏移量状态栏statusBarOffset:${statusBarOffset}`, 0);
+
+        console.log('----', sys.windowHeight - sys.statusBarHeight - sys.navBarHeight - sys.tabBarHeight - safeBottom);
+        sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset - sys.tabBarHeight;
+        console.log(sys.availableHeight, 'sys.availableHeight');
+        systemId++;
+        // #endif
+      }
+      else {
+        // #ifdef H5
+        console.log('H5😂');
+        console.log(`窗口screenHeight:${sys.screenHeight}`, 812);
+        console.log(`窗口windowHeight:${sys.windowHeight}`, 812);
+        console.log(`状态栏statusBarHeight:${sys.statusBarHeight}`, 0);
+        console.log(`导航栏navBarHeight:${sys.navBarHeight}`, 44);
+        console.log(`tabBarHeight:${sys.tabBarHeight}`, 50);
+        console.log(`safeBottom:${safeBottom}`, 0);
+        console.log(`safeAreaBottom:${safeAreaBottom}`, 812);
+        console.log(`safeTop:${safeTop}`, 0);
+        sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset - sys.tabBarHeight;
+        console.log(`H5-availableHeight: ${sys.availableHeight}`);
+        systemId++;
+        // #endif
+
+        // #ifdef APP-ANDROID
+
+        if (isVaporMode()) {
+          // 👌 651 合格
+          console.log(`第${systemId}次`);
+          console.log('蒸汽-安卓😂');
+          console.log(`窗口screenHeight:${sys.screenHeight}`, 780);
+          console.log(`窗口windowHeight:${sys.windowHeight}`, 651);
+          console.log(`状态栏statusBarHeight:${sys.statusBarHeight}`, 35);
+          console.log(`导航栏navBarHeight:${sys.navBarHeight}`, 44);
+          console.log(`tabBarHeight:${sys.tabBarHeight}`, 50);
+          console.log(`safeBottom:${safeBottom}`, 0);
+          console.log(`safeAreaBottom:${safeAreaBottom}`, 780);
+          console.log(`safeTop:${safeTop}`, 0);
+          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset - sys.tabBarHeight;
+          systemId++;
+        }
+        else {
+          // 👌 651 合格
+          console.log(`第${systemId}次`);
+          console.log('VDOM-安卓😂');
+          console.log(`窗口screenHeight:${sys.screenHeight}`, 780);
+          console.log(`窗口windowHeight:${sys.windowHeight}`, 780);
+          console.log(`状态栏statusBarHeight:${sys.statusBarHeight}`, 35);
+          console.log(`导航栏navBarHeight:${sys.navBarHeight}`, 44);
+          console.log(`tabBarHeight:${sys.tabBarHeight}`, 50);
+          console.log(`safeBottom:${safeBottom}`, 0);
+          console.log(`safeAreaBottom:${safeAreaBottom}`, 780);
+          console.log(`safeTop:${safeTop}`, 0);
+          console.log(`偏移量导航栏navBarOffset:${navBarOffset}`, 0);
+          console.log(`偏移量状态栏statusBarOffset:${statusBarOffset}`, 0);
+          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset - sys.tabBarHeight;
+          systemId++;
+        }
+        // #endif
+
+        // #ifdef APP-IOS
+        if (isVaporMode()) {
+          // 👌 665 合格
+          console.log(`第${systemId}次`);
+          console.log('蒸汽-IOS😂');
+          console.log(`窗口screenHeight:${sys.screenHeight}`, 852);
+          console.log(`窗口windowHeight:${sys.windowHeight}`, 749);
+          console.log(`状态栏statusBarHeight:${sys.statusBarHeight}`, 54);
+          console.log(`导航栏navBarHeight:${sys.navBarHeight}`, 44);
+          console.log(`tabBarHeight:${sys.tabBarHeight}`, 50);
+          console.log(`safeBottom:${safeBottom}`, 34);
+          console.log(`safeAreaBottom:${safeAreaBottom}`, 818);
+          console.log(`safeTop:${safeTop}`, 59);
+          console.log(`偏移量导航栏navBarOffset:${navBarOffset}`, 0);
+          console.log(`偏移量状态栏statusBarOffset:${statusBarOffset}`, 0);
+          console.log('----', sys.screenHeight - sys.statusBarHeight - sys.navBarHeight - sys.tabBarHeight - safeBottom);
+          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset - sys.tabBarHeight;
+          console.log(`蒸汽模式-IOS-availableHeight: ${sys.availableHeight}`);
+          systemId++;
+        }
+        else {
+          // 👌 665 合格
+          console.log(`第${systemId}次`);
+          console.log('VDOM-IOS😂');
+          console.log(`窗口screenHeight:${sys.screenHeight}`, 852);
+          console.log(`窗口windowHeight:${sys.windowHeight}`, 749);
+          console.log(`状态栏statusBarHeight:${sys.statusBarHeight}`, 54);
+          console.log(`导航栏navBarHeight:${sys.navBarHeight}`, 44);
+          console.log(`tabBarHeight:${sys.tabBarHeight}`, 50);
+          console.log(`safeBottom:${safeBottom}`, 34);
+          console.log(`safeAreaBottom:${safeAreaBottom}`, 818);
+          console.log(`safeTop:${safeTop}`, 59);
+          console.log(`偏移量导航栏navBarOffset:${navBarOffset}`, 0);
+          console.log(`偏移量状态栏statusBarOffset:${statusBarOffset}`, 0);
+          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset - sys.tabBarHeight;
+          console.log(`availableHeight得到高度:${sys.availableHeight}`);
+          systemId++;
+        }
+        // #endif
+
+        // #ifdef APP-HARMONY
+        if (isVaporMode()) {
+          // 👌 652 合格
+          console.log(`第${systemId}次`);
+          console.log('蒸汽-鸿蒙😂');
+          console.log(`窗口screenHeight:${sys.screenHeight}`, 816);
+          console.log(`窗口windowHeight:${sys.windowHeight}`, 730);
+          console.log(`状态栏statusBarHeight:${sys.statusBarHeight}`, 42);
+          console.log(`导航栏navBarHeight:${sys.navBarHeight}`, 44);
+          console.log(`tabBarHeight:${sys.tabBarHeight}`, 50);
+          console.log(`safeBottom:${safeBottom}`, 28);
+          console.log(`safeAreaBottom:${safeAreaBottom}`, 788);
+          console.log(`safeTop:${safeTop}`, 42);
+          console.log('----', sys.screenHeight - sys.statusBarHeight - sys.navBarHeight - sys.tabBarHeight - safeBottom);
+          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset - sys.tabBarHeight;
+          console.log(sys.availableHeight, 'sys.availableHeight');
+          systemId++;
+        }
+        else {
+          // 👌 655 合格
+          console.log(`第${systemId}次`);
+          console.log('VDOM鸿蒙😂');
+          console.log(`窗口screenHeight:${sys.screenHeight}`, 816);
+          console.log(`窗口windowHeight:${sys.windowHeight}`, 733);
+          console.log(`状态栏statusBarHeight:${sys.statusBarHeight}`, 39);
+          console.log(`导航栏navBarHeight:${sys.navBarHeight}`, 44);
+          console.log(`tabBarHeight:${sys.tabBarHeight}`, 50);
+          console.log(`safeBottom:${safeBottom}`, 28);
+          console.log(`safeAreaBottom:${safeAreaBottom}`, 788);
+          console.log(`safeTop:${safeTop}`, 39);
+          console.log('----', sys.windowHeight - sys.statusBarHeight - sys.navBarHeight - sys.tabBarHeight - safeBottom);
+          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset - sys.tabBarHeight;
+          console.log(sys.availableHeight, 'sys.availableHeight');
+          systemId++;
+        }
+        // #endif
+
+        // #ifdef MP-WEIXIN
+        console.log(`第${systemId}次`);
+        console.log('微信小程序😂');
+        console.log(`窗口screenHeight:${sys.screenHeight}`, 816);
+        console.log(`窗口windowHeight:${sys.windowHeight}`, 733);
+        console.log(`状态栏statusBarHeight:${sys.statusBarHeight}`, 39);
+        console.log(`导航栏navBarHeight:${sys.navBarHeight}`, 44);
+        console.log(`tabBarHeight:${sys.tabBarHeight}`, 50);
+        console.log(`safeBottom:${safeBottom}`, 28);
+        console.log(`safeAreaBottom:${safeAreaBottom}`, 788);
+        console.log(`safeTop:${safeTop}`, 39);
+        console.log(`偏移量导航栏navBarOffset:${navBarOffset}`, 0);
+        console.log(`偏移量状态栏statusBarOffset:${statusBarOffset}`, 0);
+
+        console.log('----', sys.windowHeight - sys.statusBarHeight - sys.navBarHeight - sys.tabBarHeight - safeBottom);
+        sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset - sys.tabBarHeight;
+        console.log(sys.availableHeight, 'sys.availableHeight');
+        systemId++;
+        // #endif
+      }
+    }
+    else {
+      if (isCustomNav) {
+        // #ifdef H5
+        console.log('H5😂');
+        console.log(`窗口screenHeight:${sys.screenHeight}`, 812);
+        console.log(`窗口windowHeight:${sys.windowHeight}`, 812);
+        console.log(`状态栏statusBarHeight:${sys.statusBarHeight}`, 0);
+        console.log(`导航栏navBarHeight:${sys.navBarHeight}`, 44);
+        console.log(`tabBarHeight:${sys.tabBarHeight}`, 50);
+        console.log(`safeBottom:${safeBottom}`, 0);
+        console.log(`safeAreaBottom:${safeAreaBottom}`, 812);
+        console.log(`safeTop:${safeTop}`, 0);
+        sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset - sys.tabBarHeight;
+        console.log(`H5-availableHeight: ${sys.availableHeight}`);
+        systemId++;
+        // #endif
+
+        // #ifdef APP-ANDROID
+        if (isVaporMode()) {
+          // 👌 651 合格
+          console.log(`第${systemId}次`);
+          console.log('navbar-蒸汽-安卓😂');
+          console.log(`窗口screenHeight:${sys.screenHeight}`, 780);
+          console.log(`窗口windowHeight:${sys.windowHeight}`, 730);
+          console.log(`状态栏statusBarHeight:${sys.statusBarHeight}`, 35);
+          console.log(`导航栏navBarHeight:${sys.navBarHeight}`, 44);
+          console.log(`tabBarHeight:${sys.tabBarHeight}`, 50);
+          console.log(`safeBottom:${safeBottom}`, 0);
+          console.log(`safeAreaBottom:${safeAreaBottom}`, 780);
+          console.log(`safeTop:${safeTop}`, 35);
+          console.log(`偏移量导航栏navBarOffset:${navBarOffset}`, 44);
+          console.log(`偏移量状态栏statusBarOffset:${statusBarOffset}`, 44);
+          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset - sys.tabBarHeight;
+          systemId++;
+        }
+        else {
+          // 👌 651 合格
+          console.log(`第${systemId}次`);
+          console.log('VDOM-安卓😂');
+          console.log(`窗口screenHeight:${sys.screenHeight}`, 780);
+          console.log(`窗口windowHeight:${sys.windowHeight}`, 780);
+          console.log(`状态栏statusBarHeight:${sys.statusBarHeight}`, 35);
+          console.log(`导航栏navBarHeight:${sys.navBarHeight}`, 44);
+          console.log(`tabBarHeight:${sys.tabBarHeight}`, 50);
+          console.log(`safeBottom:${safeBottom}`, 0);
+          console.log(`safeAreaBottom:${safeAreaBottom}`, 780);
+          console.log(`safeTop:${safeTop}`, 35);
+          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset - sys.tabBarHeight;
+          console.log(`vDOM-安卓-availableHeight: ${sys.availableHeight}`);
+          systemId++;
+        }
+
+        // #endif
+
+        // #ifdef APP-IOS
+        if (isVaporMode()) {
+          // 👌 852 670
+          console.log(`第${systemId}次`);
+          console.log('蒸汽-IOS😂');
+          console.log(`窗口screenHeight:${sys.screenHeight}`, 852);
+          console.log(`窗口windowHeight:${sys.windowHeight}`, 749);
+          console.log(`状态栏statusBarHeight:${sys.statusBarHeight}`, 54);
+          console.log(`导航栏navBarHeight:${sys.navBarHeight}`, 44);
+          console.log(`tabBarHeight:${sys.tabBarHeight}`, 50);
+          console.log(`safeBottom:${safeBottom}`, 34);
+          console.log(`safeAreaBottom:${safeAreaBottom}`, 818);
+          console.log(`safeTop:${safeTop}`, 59);
+          console.log('----', sys.screenHeight - sys.statusBarHeight - sys.navBarHeight - sys.tabBarHeight - safeBottom);
+          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset - sys.tabBarHeight;
+          console.log(`蒸汽模式-IOS-availableHeight: ${sys.availableHeight}`);
+        }
+        else {
+          // 👌 665 合格
+          console.log(`第${systemId}次`);
+          console.log('VDOM-IOS😂');
+          console.log(`窗口screenHeight:${sys.screenHeight}`, 816);
+          console.log(`窗口windowHeight:${sys.windowHeight}`, 730);
+          console.log(`状态栏statusBarHeight:${sys.statusBarHeight}`, 42);
+          console.log(`导航栏navBarHeight:${sys.navBarHeight}`, 44);
+          console.log(`tabBarHeight:${sys.tabBarHeight}`, 50);
+          console.log(`safeBottom:${safeBottom}`, 28);
+          console.log(`safeAreaBottom:${safeAreaBottom}`, 788);
+          console.log(`safeTop:${safeTop}`, 59);
+          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset - sys.tabBarHeight;
+          console.log(`availableHeight得到高度:${sys.availableHeight}`);
+          systemId++;
+        }
+        // #endif
+
+        // #ifdef APP-HARMONY
+        if (isVaporMode()) {
+          // 👌 652 合格
+          console.log(`第${systemId}次`);
+          console.log('蒸汽-鸿蒙😂');
+          console.log(`窗口screenHeight:${sys.screenHeight}`, 816);
+          console.log(`窗口windowHeight:${sys.windowHeight}`, 730);
+          console.log(`状态栏statusBarHeight:${sys.statusBarHeight}`, 42);
+          console.log(`导航栏navBarHeight:${sys.navBarHeight}`, 44);
+          console.log(`tabBarHeight:${sys.tabBarHeight}`, 50);
+          console.log(`safeBottom:${safeBottom}`, 28);
+          console.log(`safeAreaBottom:${safeAreaBottom}`, 788);
+          console.log(`safeTop:${safeTop}`, 42);
+          console.log('----', sys.screenHeight - sys.statusBarHeight - sys.navBarHeight - sys.tabBarHeight - safeBottom);
+          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset - sys.tabBarHeight;
+          console.log(sys.availableHeight, 'sys.availableHeight');
+          systemId++;
+        }
+        else {
+          // 👌 655 合格
+          console.log(`第${systemId}次`);
+          console.log('VDOM鸿蒙😂');
+          console.log(`窗口screenHeight:${sys.screenHeight}`, 816);
+          console.log(`窗口windowHeight:${sys.windowHeight}`, 733);
+          console.log(`状态栏statusBarHeight:${sys.statusBarHeight}`, 39);
+          console.log(`导航栏navBarHeight:${sys.navBarHeight}`, 44);
+          console.log(`tabBarHeight:${sys.tabBarHeight}`, 50);
+          console.log(`safeBottom:${safeBottom}`, 28);
+          console.log(`safeAreaBottom:${safeAreaBottom}`, 788);
+          console.log(`safeTop:${safeTop}`, 39);
+          console.log('----', sys.windowHeight - sys.statusBarHeight - sys.navBarHeight - sys.tabBarHeight - safeBottom);
+          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset - sys.tabBarHeight;
+          console.log(sys.availableHeight, 'sys.availableHeight');
+          systemId++;
+        }
+        // #endif
+
+        // #ifdef MP-WEIXIN
+        console.log(`第${systemId}次`);
+        console.log('微信小程序😂');
+        console.log(`窗口screenHeight:${sys.screenHeight}`, 812);
+        console.log(`窗口windowHeight:${sys.windowHeight}`, 812);
+        console.log(`状态栏statusBarHeight:${sys.statusBarHeight}`, 44);
+        console.log(`导航栏navBarHeight:${sys.navBarHeight}`, 44);
+        console.log(`tabBarHeight:${sys.tabBarHeight}`, 50);
+        console.log(`safeBottom:${safeBottom}`, 34);
+        console.log(`safeAreaBottom:${safeAreaBottom}`, 778);
+        console.log(`safeTop:${safeTop}`, 44);
+        console.log('----', sys.windowHeight - sys.statusBarHeight - sys.navBarHeight - sys.tabBarHeight - safeBottom);
+        sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset - sys.tabBarHeight;
+        console.log(sys.availableHeight, 'sys.availableHeight');
+        systemId++;
+        // #endif
+      }
+      else {
+        // #ifdef H5
+        console.log('H5😂');
+        console.log(`窗口screenHeight:${sys.screenHeight}`, 812);
+        console.log(`窗口windowHeight:${sys.windowHeight}`, 812);
+        console.log(`状态栏statusBarHeight:${sys.statusBarHeight}`, 0);
+        console.log(`导航栏navBarHeight:${sys.navBarHeight}`, 44);
+        console.log(`tabBarHeight:${sys.tabBarHeight}`, 50);
+        console.log(`safeBottom:${safeBottom}`, 0);
+        console.log(`safeAreaBottom:${safeAreaBottom}`, 812);
+        console.log(`safeTop:${safeTop}`, 0);
+        sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset - sys.tabBarHeight;
+        console.log(`H5-availableHeight: ${sys.availableHeight}`);
+        systemId++;
+        // #endif
+
+        // #ifdef APP-ANDROID
+
+        if (isVaporMode()) {
+          // 👌 651 合格
+          console.log(`第${systemId}次`);
+          console.log('navbar-蒸汽-安卓😂');
+          console.log(`窗口screenHeight:${sys.screenHeight}`, 780);
+          console.log(`窗口windowHeight:${sys.windowHeight}`, 730);
+          console.log(`状态栏statusBarHeight:${sys.statusBarHeight}`, 35);
+          console.log(`导航栏navBarHeight:${sys.navBarHeight}`, 44);
+          console.log(`tabBarHeight:${sys.tabBarHeight}`, 50);
+          console.log(`safeBottom:${safeBottom}`, 0);
+          console.log(`safeAreaBottom:${safeAreaBottom}`, 780);
+          console.log(`safeTop:${safeTop}`, 35);
+          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset - sys.tabBarHeight;
+          systemId++;
+        }
+        else {
+          // 👌 651 合格
+          console.log(`第${systemId}次`);
+          console.log('VDOM-安卓😂');
+          console.log(`窗口screenHeight:${sys.screenHeight}`, 780);
+          console.log(`窗口windowHeight:${sys.windowHeight}`, 780);
+          console.log(`状态栏statusBarHeight:${sys.statusBarHeight}`, 35);
+          console.log(`导航栏navBarHeight:${sys.navBarHeight}`, 44);
+          console.log(`tabBarHeight:${sys.tabBarHeight}`, 50);
+          console.log(`safeBottom:${safeBottom}`, 0);
+          console.log(`safeAreaBottom:${safeAreaBottom}`, 780);
+          console.log(`safeTop:${safeTop}`, 0);
+          console.log(`偏移量导航栏navBarOffset:${navBarOffset}`, 0);
+          console.log(`偏移量状态栏statusBarOffset:${statusBarOffset}`, 0);
+          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset - sys.tabBarHeight;
+          systemId++;
+        }
+        // #endif
+
+        // #ifdef APP-IOS
+        if (isVaporMode()) {
+          // 👌 665 合格
+          console.log(`第${systemId}次`);
+          console.log('蒸汽-IOS😂');
+          console.log(`窗口screenHeight:${sys.screenHeight}`, 852);
+          console.log(`窗口windowHeight:${sys.windowHeight}`, 749);
+          console.log(`状态栏statusBarHeight:${sys.statusBarHeight}`, 54);
+          console.log(`导航栏navBarHeight:${sys.navBarHeight}`, 44);
+          console.log(`tabBarHeight:${sys.tabBarHeight}`, 50);
+          console.log(`safeBottom:${safeBottom}`, 34);
+          console.log(`safeAreaBottom:${safeAreaBottom}`, 818);
+          console.log(`safeTop:${safeTop}`, 59);
+          console.log(`偏移量导航栏navBarOffset:${navBarOffset}`, 0);
+          console.log(`偏移量状态栏statusBarOffset:${statusBarOffset}`, 0);
+          console.log('----', sys.screenHeight - sys.statusBarHeight - sys.navBarHeight - sys.tabBarHeight - safeBottom);
+          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset - sys.tabBarHeight;
+          console.log(`蒸汽模式-IOS-availableHeight: ${sys.availableHeight}`);
+          systemId++;
+        }
+        else {
+          // 👌 665 合格
+          console.log(`第${systemId}次`);
+          console.log('VDOM-IOS😂');
+          console.log(`窗口screenHeight:${sys.screenHeight}`, 852);
+          console.log(`窗口windowHeight:${sys.windowHeight}`, 749);
+          console.log(`状态栏statusBarHeight:${sys.statusBarHeight}`, 54);
+          console.log(`导航栏navBarHeight:${sys.navBarHeight}`, 44);
+          console.log(`tabBarHeight:${sys.tabBarHeight}`, 50);
+          console.log(`safeBottom:${safeBottom}`, 34);
+          console.log(`safeAreaBottom:${safeAreaBottom}`, 818);
+          console.log(`safeTop:${safeTop}`, 59);
+          console.log(`偏移量导航栏navBarOffset:${navBarOffset}`, 0);
+          console.log(`偏移量状态栏statusBarOffset:${statusBarOffset}`, 0);
+          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset - sys.tabBarHeight;
+          console.log(`availableHeight得到高度:${sys.availableHeight}`);
+          systemId++;
+        }
+        // #endif
+
+        // #ifdef APP-HARMONY
+        if (isVaporMode()) {
+          // 👌 652 合格
+          console.log(`第${systemId}次`);
+          console.log('蒸汽-鸿蒙😂');
+          console.log(`窗口screenHeight:${sys.screenHeight}`, 816);
+          console.log(`窗口windowHeight:${sys.windowHeight}`, 730);
+          console.log(`状态栏statusBarHeight:${sys.statusBarHeight}`, 42);
+          console.log(`导航栏navBarHeight:${sys.navBarHeight}`, 44);
+          console.log(`tabBarHeight:${sys.tabBarHeight}`, 50);
+          console.log(`safeBottom:${safeBottom}`, 28);
+          console.log(`safeAreaBottom:${safeAreaBottom}`, 788);
+          console.log(`safeTop:${safeTop}`, 42);
+          console.log('----', sys.screenHeight - sys.statusBarHeight - sys.navBarHeight - sys.tabBarHeight - safeBottom);
+          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset - sys.tabBarHeight;
+          console.log(sys.availableHeight, 'sys.availableHeight');
+          systemId++;
+        }
+        else {
+          // 👌 655 合格
+          console.log(`第${systemId}次`);
+          console.log('VDOM鸿蒙😂');
+          console.log(`窗口screenHeight:${sys.screenHeight}`, 816);
+          console.log(`窗口windowHeight:${sys.windowHeight}`, 733);
+          console.log(`状态栏statusBarHeight:${sys.statusBarHeight}`, 39);
+          console.log(`导航栏navBarHeight:${sys.navBarHeight}`, 44);
+          console.log(`tabBarHeight:${sys.tabBarHeight}`, 50);
+          console.log(`safeBottom:${safeBottom}`, 28);
+          console.log(`safeAreaBottom:${safeAreaBottom}`, 788);
+          console.log(`safeTop:${safeTop}`, 39);
+          console.log('----', sys.windowHeight - sys.statusBarHeight - sys.navBarHeight - sys.tabBarHeight - safeBottom);
+          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset - sys.tabBarHeight;
+          console.log(sys.availableHeight, 'sys.availableHeight');
+          systemId++;
+        }
+        // #endif
+
+        // #ifdef MP-WEIXIN
+        console.log(`第${systemId}次`);
+        console.log('微信小程序😂');
+        console.log(`窗口screenHeight:${sys.screenHeight}`, 816);
+        console.log(`窗口windowHeight:${sys.windowHeight}`, 733);
+        console.log(`状态栏statusBarHeight:${sys.statusBarHeight}`, 39);
+        console.log(`导航栏navBarHeight:${sys.navBarHeight}`, 44);
+        console.log(`tabBarHeight:${sys.tabBarHeight}`, 50);
+        console.log(`safeBottom:${safeBottom}`, 28);
+        console.log(`safeAreaBottom:${safeAreaBottom}`, 788);
+        console.log(`safeTop:${safeTop}`, 39);
+        console.log('----', sys.windowHeight - sys.statusBarHeight - sys.navBarHeight - sys.tabBarHeight - safeBottom);
+        sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset - sys.tabBarHeight;
+        console.log(sys.availableHeight, 'sys.availableHeight');
+        systemId++;
+        // #endif
+      }
+    }
+  }
+  // 全屏高度 - 安全区域高度
+  if (selectedTabbarStrategy == 0) {
+    if (isNoNavbarLayout) {
+      if (isCustomNav) {
+        // #ifdef H5
+        console.log('H5😂');
+        console.log(`窗口screenHeight:${sys.screenHeight}`, 812);
+        console.log(`窗口windowHeight:${sys.windowHeight}`, 812);
+        console.log(`状态栏statusBarHeight:${sys.statusBarHeight}`, 0);
+        console.log(`导航栏navBarHeight:${sys.navBarHeight}`, 44);
+        console.log(`tabBarHeight:${sys.tabBarHeight}`, 50);
+        console.log(`safeBottom:${safeBottom}`, 0);
+        console.log(`safeAreaBottom:${safeAreaBottom}`, 812);
+        console.log(`safeTop:${safeTop}`, 0);
+        sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeBottom;
+        console.log(`H5-availableHeight: ${sys.availableHeight}`);
+        systemId++;
+        // #endif
+
+        // #ifdef APP-ANDROID
+        if (isVaporMode()) {
+          // 👌 651 合格
+          console.log(`第${systemId}次`);
+          console.log('蒸汽-安卓😂');
+          console.log(`窗口screenHeight:${sys.screenHeight}`, 780);
+          console.log(`窗口windowHeight:${sys.windowHeight}`, 651);
+          console.log(`状态栏statusBarHeight:${sys.statusBarHeight}`, 35);
+          console.log(`导航栏navBarHeight:${sys.navBarHeight}`, 44);
+          console.log(`tabBarHeight:${sys.tabBarHeight}`, 50);
+          console.log(`safeBottom:${safeBottom}`, 0);
+          console.log(`safeAreaBottom:${safeAreaBottom}`, 780);
+          console.log(`safeTop:${safeTop}`, 35);
+          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeBottom;
+          systemId++;
+        }
+        else {
+          // 👌 651 合格
+          console.log(`第${systemId}次`);
+          console.log('VDOM-安卓😂');
+          console.log(`窗口screenHeight:${sys.screenHeight}`, 780);
+          console.log(`窗口windowHeight:${sys.windowHeight}`, 780);
+          console.log(`状态栏statusBarHeight:${sys.statusBarHeight}`, 35);
+          console.log(`导航栏navBarHeight:${sys.navBarHeight}`, 44);
+          console.log(`tabBarHeight:${sys.tabBarHeight}`, 50);
+          console.log(`safeBottom:${safeBottom}`, 0);
+          console.log(`safeAreaBottom:${safeAreaBottom}`, 780);
+          console.log(`safeTop:${safeTop}`, 35);
+          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeBottom;
+          console.log(`vDOM-安卓-availableHeight: ${sys.availableHeight}`);
+          systemId++;
+        }
+
+        // #endif
+
+        // #ifdef APP-IOS
+        if (isVaporMode()) {
+          // 👌 852 670
+          console.log(`第${systemId}次`);
+          console.log('蒸汽-IOS😂');
+          console.log(`窗口screenHeight:${sys.screenHeight}`, 852);
+          console.log(`窗口windowHeight:${sys.windowHeight}`, 749);
+          console.log(`状态栏statusBarHeight:${sys.statusBarHeight}`, 54);
+          console.log(`导航栏navBarHeight:${sys.navBarHeight}`, 44);
+          console.log(`tabBarHeight:${sys.tabBarHeight}`, 50);
+          console.log(`safeBottom:${safeBottom}`, 34);
+          console.log(`safeAreaBottom:${safeAreaBottom}`, 818);
+          console.log(`safeTop:${safeTop}`, 59);
+          console.log('----', sys.screenHeight - sys.statusBarHeight - sys.navBarHeight - sys.tabBarHeight - safeBottom);
+          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeBottom;
+          console.log(`蒸汽模式-IOS-availableHeight: ${sys.availableHeight}`);
+        }
+        else {
+          // 👌 665 合格
+          console.log(`第${systemId}次`);
+          console.log('VDOM-IOS😂');
+          console.log(`窗口screenHeight:${sys.screenHeight}`, 816);
+          console.log(`窗口windowHeight:${sys.windowHeight}`, 730);
+          console.log(`状态栏statusBarHeight:${sys.statusBarHeight}`, 42);
+          console.log(`导航栏navBarHeight:${sys.navBarHeight}`, 44);
+          console.log(`tabBarHeight:${sys.tabBarHeight}`, 50);
+          console.log(`safeBottom:${safeBottom}`, 28);
+          console.log(`safeAreaBottom:${safeAreaBottom}`, 788);
+          console.log(`safeTop:${safeTop}`, 59);
+          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeBottom;
+          console.log(`availableHeight得到高度:${sys.availableHeight}`);
+          systemId++;
+        }
+        // #endif
+
+        // #ifdef APP-HARMONY
+        if (isVaporMode()) {
+          // 👌 652 合格
+          console.log(`第${systemId}次`);
+          console.log('蒸汽-鸿蒙😂');
+          console.log(`窗口screenHeight:${sys.screenHeight}`, 816);
+          console.log(`窗口windowHeight:${sys.windowHeight}`, 730);
+          console.log(`状态栏statusBarHeight:${sys.statusBarHeight}`, 42);
+          console.log(`导航栏navBarHeight:${sys.navBarHeight}`, 44);
+          console.log(`tabBarHeight:${sys.tabBarHeight}`, 50);
+          console.log(`safeBottom:${safeBottom}`, 28);
+          console.log(`safeAreaBottom:${safeAreaBottom}`, 788);
+          console.log(`safeTop:${safeTop}`, 42);
+          console.log('----', sys.screenHeight - sys.statusBarHeight - sys.navBarHeight - sys.tabBarHeight - safeBottom);
+          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeBottom;
+          console.log(sys.availableHeight, 'sys.availableHeight');
+          systemId++;
+        }
+        else {
+          // 👌 655 合格
+          console.log(`第${systemId}次`);
+          console.log('VDOM鸿蒙😂');
+          console.log(`窗口screenHeight:${sys.screenHeight}`, 816);
+          console.log(`窗口windowHeight:${sys.windowHeight}`, 733);
+          console.log(`状态栏statusBarHeight:${sys.statusBarHeight}`, 39);
+          console.log(`导航栏navBarHeight:${sys.navBarHeight}`, 44);
+          console.log(`tabBarHeight:${sys.tabBarHeight}`, 50);
+          console.log(`safeBottom:${safeBottom}`, 28);
+          console.log(`safeAreaBottom:${safeAreaBottom}`, 788);
+          console.log(`safeTop:${safeTop}`, 39);
+          console.log('----', sys.windowHeight - sys.statusBarHeight - sys.navBarHeight - sys.tabBarHeight - safeBottom);
+          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeBottom;
+          console.log(sys.availableHeight, 'sys.availableHeight');
+          systemId++;
+        }
+        // #endif
+
+        // #ifdef MP-WEIXIN
+        console.log(`第${systemId}次`);
+        console.log('微信小程序😂');
+        console.log(`窗口screenHeight:${sys.screenHeight}`, 812);
+        console.log(`窗口windowHeight:${sys.windowHeight}`, 812);
+        console.log(`状态栏statusBarHeight:${sys.statusBarHeight}`, 44);
+        console.log(`导航栏navBarHeight:${sys.navBarHeight}`, 44);
+        console.log(`tabBarHeight:${sys.tabBarHeight}`, 50);
+        console.log(`safeBottom:${safeBottom}`, 34);
+        console.log(`safeAreaBottom:${safeAreaBottom}`, 778);
+        console.log(`safeTop:${safeTop}`, 44);
+        console.log(`偏移量导航栏navBarOffset:${navBarOffset}`, 0);
+        console.log(`偏移量状态栏statusBarOffset:${statusBarOffset}`, 0);
+
+        console.log('----', sys.windowHeight - sys.statusBarHeight - sys.navBarHeight - sys.tabBarHeight - safeBottom);
+        sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeBottom;
+        console.log(sys.availableHeight, 'sys.availableHeight');
+        systemId++;
+        // #endif
+      }
+      else {
+        // #ifdef H5
+        console.log('H5😂');
+        console.log(`窗口screenHeight:${sys.screenHeight}`, 812);
+        console.log(`窗口windowHeight:${sys.windowHeight}`, 812);
+        console.log(`状态栏statusBarHeight:${sys.statusBarHeight}`, 0);
+        console.log(`导航栏navBarHeight:${sys.navBarHeight}`, 44);
+        console.log(`tabBarHeight:${sys.tabBarHeight}`, 50);
+        console.log(`safeBottom:${safeBottom}`, 0);
+        console.log(`safeAreaBottom:${safeAreaBottom}`, 812);
+        console.log(`safeTop:${safeTop}`, 0);
+        sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeBottom;
+        console.log(`H5-availableHeight: ${sys.availableHeight}`);
+        systemId++;
+        // #endif
+
+        // #ifdef APP-ANDROID
+
+        if (isVaporMode()) {
+          // 👌 651 合格
+          console.log(`第${systemId}次`);
+          console.log('蒸汽-安卓😂');
+          console.log(`窗口screenHeight:${sys.screenHeight}`, 780);
+          console.log(`窗口windowHeight:${sys.windowHeight}`, 651);
+          console.log(`状态栏statusBarHeight:${sys.statusBarHeight}`, 35);
+          console.log(`导航栏navBarHeight:${sys.navBarHeight}`, 44);
+          console.log(`tabBarHeight:${sys.tabBarHeight}`, 50);
+          console.log(`safeBottom:${safeBottom}`, 0);
+          console.log(`safeAreaBottom:${safeAreaBottom}`, 780);
+          console.log(`safeTop:${safeTop}`, 0);
+          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeBottom;
+          systemId++;
+        }
+        else {
+          // 👌 651 合格
+          console.log(`第${systemId}次`);
+          console.log('VDOM-安卓😂');
+          console.log(`窗口screenHeight:${sys.screenHeight}`, 780);
+          console.log(`窗口windowHeight:${sys.windowHeight}`, 780);
+          console.log(`状态栏statusBarHeight:${sys.statusBarHeight}`, 35);
+          console.log(`导航栏navBarHeight:${sys.navBarHeight}`, 44);
+          console.log(`tabBarHeight:${sys.tabBarHeight}`, 50);
+          console.log(`safeBottom:${safeBottom}`, 0);
+          console.log(`safeAreaBottom:${safeAreaBottom}`, 780);
+          console.log(`safeTop:${safeTop}`, 0);
+          console.log(`偏移量导航栏navBarOffset:${navBarOffset}`, 0);
+          console.log(`偏移量状态栏statusBarOffset:${statusBarOffset}`, 0);
+          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeBottom;
+          systemId++;
+        }
+        // #endif
+
+        // #ifdef APP-IOS
+        if (isVaporMode()) {
+          // 👌 665 合格
+          console.log(`第${systemId}次`);
+          console.log('蒸汽-IOS😂');
+          console.log(`窗口screenHeight:${sys.screenHeight}`, 852);
+          console.log(`窗口windowHeight:${sys.windowHeight}`, 749);
+          console.log(`状态栏statusBarHeight:${sys.statusBarHeight}`, 54);
+          console.log(`导航栏navBarHeight:${sys.navBarHeight}`, 44);
+          console.log(`tabBarHeight:${sys.tabBarHeight}`, 50);
+          console.log(`safeBottom:${safeBottom}`, 34);
+          console.log(`safeAreaBottom:${safeAreaBottom}`, 818);
+          console.log(`safeTop:${safeTop}`, 59);
+          console.log(`偏移量导航栏navBarOffset:${navBarOffset}`, 0);
+          console.log(`偏移量状态栏statusBarOffset:${statusBarOffset}`, 0);
+          console.log('----', sys.screenHeight - sys.statusBarHeight - sys.navBarHeight - sys.tabBarHeight - safeBottom);
+          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeBottom;
+          console.log(`蒸汽模式-IOS-availableHeight: ${sys.availableHeight}`);
+          systemId++;
+        }
+        else {
+          // 👌 665 合格
+          console.log(`第${systemId}次`);
+          console.log('VDOM-IOS😂');
+          console.log(`窗口screenHeight:${sys.screenHeight}`, 852);
+          console.log(`窗口windowHeight:${sys.windowHeight}`, 749);
+          console.log(`状态栏statusBarHeight:${sys.statusBarHeight}`, 54);
+          console.log(`导航栏navBarHeight:${sys.navBarHeight}`, 44);
+          console.log(`tabBarHeight:${sys.tabBarHeight}`, 50);
+          console.log(`safeBottom:${safeBottom}`, 34);
+          console.log(`safeAreaBottom:${safeAreaBottom}`, 818);
+          console.log(`safeTop:${safeTop}`, 59);
+          console.log(`偏移量导航栏navBarOffset:${navBarOffset}`, 0);
+          console.log(`偏移量状态栏statusBarOffset:${statusBarOffset}`, 0);
+          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeBottom;
+          console.log(`availableHeight得到高度:${sys.availableHeight}`);
+          systemId++;
+        }
+        // #endif
+
+        // #ifdef APP-HARMONY
+        if (isVaporMode()) {
+          // 👌 652 合格
+          console.log(`第${systemId}次`);
+          console.log('蒸汽-鸿蒙😂');
+          console.log(`窗口screenHeight:${sys.screenHeight}`, 816);
+          console.log(`窗口windowHeight:${sys.windowHeight}`, 730);
+          console.log(`状态栏statusBarHeight:${sys.statusBarHeight}`, 42);
+          console.log(`导航栏navBarHeight:${sys.navBarHeight}`, 44);
+          console.log(`tabBarHeight:${sys.tabBarHeight}`, 50);
+          console.log(`safeBottom:${safeBottom}`, 28);
+          console.log(`safeAreaBottom:${safeAreaBottom}`, 788);
+          console.log(`safeTop:${safeTop}`, 42);
+          console.log('----', sys.screenHeight - sys.statusBarHeight - sys.navBarHeight - sys.tabBarHeight - safeBottom);
+          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeBottom;
+          console.log(sys.availableHeight, 'sys.availableHeight');
+          systemId++;
+        }
+        else {
+          // 👌 655 合格
+          console.log(`第${systemId}次`);
+          console.log('VDOM鸿蒙😂');
+          console.log(`窗口screenHeight:${sys.screenHeight}`, 816);
+          console.log(`窗口windowHeight:${sys.windowHeight}`, 733);
+          console.log(`状态栏statusBarHeight:${sys.statusBarHeight}`, 39);
+          console.log(`导航栏navBarHeight:${sys.navBarHeight}`, 44);
+          console.log(`tabBarHeight:${sys.tabBarHeight}`, 50);
+          console.log(`safeBottom:${safeBottom}`, 28);
+          console.log(`safeAreaBottom:${safeAreaBottom}`, 788);
+          console.log(`safeTop:${safeTop}`, 39);
+          console.log('----', sys.windowHeight - sys.statusBarHeight - sys.navBarHeight - sys.tabBarHeight - safeBottom);
+          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeBottom;
+          console.log(sys.availableHeight, 'sys.availableHeight');
+          systemId++;
+        }
+        // #endif
+
+        // #ifdef MP-WEIXIN
+        console.log(`第${systemId}次`);
+        console.log('微信小程序😂');
+        console.log(`窗口screenHeight:${sys.screenHeight}`, 816);
+        console.log(`窗口windowHeight:${sys.windowHeight}`, 733);
+        console.log(`状态栏statusBarHeight:${sys.statusBarHeight}`, 39);
+        console.log(`导航栏navBarHeight:${sys.navBarHeight}`, 44);
+        console.log(`tabBarHeight:${sys.tabBarHeight}`, 50);
+        console.log(`safeBottom:${safeBottom}`, 28);
+        console.log(`safeAreaBottom:${safeAreaBottom}`, 788);
+        console.log(`safeTop:${safeTop}`, 39);
+        console.log(`偏移量导航栏navBarOffset:${navBarOffset}`, 0);
+        console.log(`偏移量状态栏statusBarOffset:${statusBarOffset}`, 0);
+
+        console.log('----', sys.windowHeight - sys.statusBarHeight - sys.navBarHeight - sys.tabBarHeight - safeBottom);
+        sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeBottom;
+        console.log(sys.availableHeight, 'sys.availableHeight');
+        systemId++;
+        // #endif
+      }
+    }
+    else {
+      if (isCustomNav) {
+        // #ifdef H5
+        console.log('H5😂');
+        console.log(`窗口screenHeight:${sys.screenHeight}`, 812);
+        console.log(`窗口windowHeight:${sys.windowHeight}`, 812);
+        console.log(`状态栏statusBarHeight:${sys.statusBarHeight}`, 0);
+        console.log(`导航栏navBarHeight:${sys.navBarHeight}`, 44);
+        console.log(`tabBarHeight:${sys.tabBarHeight}`, 50);
+        console.log(`safeBottom:${safeBottom}`, 0);
+        console.log(`safeAreaBottom:${safeAreaBottom}`, 812);
+        console.log(`safeTop:${safeTop}`, 0);
+        sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeBottom;
+        console.log(`H5-availableHeight: ${sys.availableHeight}`);
+        systemId++;
+        // #endif
+
+        // #ifdef APP-ANDROID
+        if (isVaporMode()) {
+          // 👌 651 合格
+          console.log(`第${systemId}次`);
+          console.log('navbar-蒸汽-安卓😂');
+          console.log(`窗口screenHeight:${sys.screenHeight}`, 780);
+          console.log(`窗口windowHeight:${sys.windowHeight}`, 730);
+          console.log(`状态栏statusBarHeight:${sys.statusBarHeight}`, 35);
+          console.log(`导航栏navBarHeight:${sys.navBarHeight}`, 44);
+          console.log(`tabBarHeight:${sys.tabBarHeight}`, 50);
+          console.log(`safeBottom:${safeBottom}`, 0);
+          console.log(`safeAreaBottom:${safeAreaBottom}`, 780);
+          console.log(`safeTop:${safeTop}`, 35);
+          console.log(`偏移量导航栏navBarOffset:${navBarOffset}`, 44);
+          console.log(`偏移量状态栏statusBarOffset:${statusBarOffset}`, 44);
+          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeBottom;
+          systemId++;
+        }
+        else {
+          // 👌 651 合格
+          console.log(`第${systemId}次`);
+          console.log('VDOM-安卓😂');
+          console.log(`窗口screenHeight:${sys.screenHeight}`, 780);
+          console.log(`窗口windowHeight:${sys.windowHeight}`, 780);
+          console.log(`状态栏statusBarHeight:${sys.statusBarHeight}`, 35);
+          console.log(`导航栏navBarHeight:${sys.navBarHeight}`, 44);
+          console.log(`tabBarHeight:${sys.tabBarHeight}`, 50);
+          console.log(`safeBottom:${safeBottom}`, 0);
+          console.log(`safeAreaBottom:${safeAreaBottom}`, 780);
+          console.log(`safeTop:${safeTop}`, 35);
+          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeBottom;
+          console.log(`vDOM-安卓-availableHeight: ${sys.availableHeight}`);
+          systemId++;
+        }
+
+        // #endif
+
+        // #ifdef APP-IOS
+        if (isVaporMode()) {
+          // 👌 852 670
+          console.log(`第${systemId}次`);
+          console.log('蒸汽-IOS😂');
+          console.log(`窗口screenHeight:${sys.screenHeight}`, 852);
+          console.log(`窗口windowHeight:${sys.windowHeight}`, 749);
+          console.log(`状态栏statusBarHeight:${sys.statusBarHeight}`, 54);
+          console.log(`导航栏navBarHeight:${sys.navBarHeight}`, 44);
+          console.log(`tabBarHeight:${sys.tabBarHeight}`, 50);
+          console.log(`safeBottom:${safeBottom}`, 34);
+          console.log(`safeAreaBottom:${safeAreaBottom}`, 818);
+          console.log(`safeTop:${safeTop}`, 59);
+          console.log('----', sys.screenHeight - sys.statusBarHeight - sys.navBarHeight - sys.tabBarHeight - safeBottom);
+          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeBottom;
+          console.log(`蒸汽模式-IOS-availableHeight: ${sys.availableHeight}`);
+        }
+        else {
+          // 👌 665 合格
+          console.log(`第${systemId}次`);
+          console.log('VDOM-IOS😂');
+          console.log(`窗口screenHeight:${sys.screenHeight}`, 816);
+          console.log(`窗口windowHeight:${sys.windowHeight}`, 730);
+          console.log(`状态栏statusBarHeight:${sys.statusBarHeight}`, 42);
+          console.log(`导航栏navBarHeight:${sys.navBarHeight}`, 44);
+          console.log(`tabBarHeight:${sys.tabBarHeight}`, 50);
+          console.log(`safeBottom:${safeBottom}`, 28);
+          console.log(`safeAreaBottom:${safeAreaBottom}`, 788);
+          console.log(`safeTop:${safeTop}`, 59);
+          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeBottom;
+          console.log(`availableHeight得到高度:${sys.availableHeight}`);
+          systemId++;
+        }
+        // #endif
+
+        // #ifdef APP-HARMONY
+        if (isVaporMode()) {
+          // 👌 652 合格
+          console.log(`第${systemId}次`);
+          console.log('蒸汽-鸿蒙😂');
+          console.log(`窗口screenHeight:${sys.screenHeight}`, 816);
+          console.log(`窗口windowHeight:${sys.windowHeight}`, 730);
+          console.log(`状态栏statusBarHeight:${sys.statusBarHeight}`, 42);
+          console.log(`导航栏navBarHeight:${sys.navBarHeight}`, 44);
+          console.log(`tabBarHeight:${sys.tabBarHeight}`, 50);
+          console.log(`safeBottom:${safeBottom}`, 28);
+          console.log(`safeAreaBottom:${safeAreaBottom}`, 788);
+          console.log(`safeTop:${safeTop}`, 42);
+          console.log('----', sys.screenHeight - sys.statusBarHeight - sys.navBarHeight - sys.tabBarHeight - safeBottom);
+          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeBottom;
+          console.log(sys.availableHeight, 'sys.availableHeight');
+          systemId++;
+        }
+        else {
+          // 👌 655 合格
+          console.log(`第${systemId}次`);
+          console.log('VDOM鸿蒙😂');
+          console.log(`窗口screenHeight:${sys.screenHeight}`, 816);
+          console.log(`窗口windowHeight:${sys.windowHeight}`, 733);
+          console.log(`状态栏statusBarHeight:${sys.statusBarHeight}`, 39);
+          console.log(`导航栏navBarHeight:${sys.navBarHeight}`, 44);
+          console.log(`tabBarHeight:${sys.tabBarHeight}`, 50);
+          console.log(`safeBottom:${safeBottom}`, 28);
+          console.log(`safeAreaBottom:${safeAreaBottom}`, 788);
+          console.log(`safeTop:${safeTop}`, 39);
+          console.log('----', sys.windowHeight - sys.statusBarHeight - sys.navBarHeight - sys.tabBarHeight - safeBottom);
+          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeBottom;
+          console.log(sys.availableHeight, 'sys.availableHeight');
+          systemId++;
+        }
+        // #endif
+
+        // #ifdef MP-WEIXIN
+        console.log(`第${systemId}次`);
+        console.log('微信小程序😂');
+        console.log(`窗口screenHeight:${sys.screenHeight}`, 812);
+        console.log(`窗口windowHeight:${sys.windowHeight}`, 812);
+        console.log(`状态栏statusBarHeight:${sys.statusBarHeight}`, 44);
+        console.log(`导航栏navBarHeight:${sys.navBarHeight}`, 44);
+        console.log(`tabBarHeight:${sys.tabBarHeight}`, 50);
+        console.log(`safeBottom:${safeBottom}`, 34);
+        console.log(`safeAreaBottom:${safeAreaBottom}`, 778);
+        console.log(`safeTop:${safeTop}`, 44);
+        console.log('----', sys.windowHeight - sys.statusBarHeight - sys.navBarHeight - sys.tabBarHeight - safeBottom);
+        sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeBottom;
+        console.log(sys.availableHeight, 'sys.availableHeight');
+        systemId++;
+        // #endif
+      }
+      else {
+        // #ifdef H5
+        console.log('H5😂');
+        console.log(`窗口screenHeight:${sys.screenHeight}`, 812);
+        console.log(`窗口windowHeight:${sys.windowHeight}`, 812);
+        console.log(`状态栏statusBarHeight:${sys.statusBarHeight}`, 0);
+        console.log(`导航栏navBarHeight:${sys.navBarHeight}`, 44);
+        console.log(`tabBarHeight:${sys.tabBarHeight}`, 50);
+        console.log(`safeBottom:${safeBottom}`, 0);
+        console.log(`safeAreaBottom:${safeAreaBottom}`, 812);
+        console.log(`safeTop:${safeTop}`, 0);
+        sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeBottom;
+        console.log(`H5-availableHeight: ${sys.availableHeight}`);
+        systemId++;
+        // #endif
+
+        // #ifdef APP-ANDROID
+
+        if (isVaporMode()) {
+          // 👌 651 合格
+          console.log(`第${systemId}次`);
+          console.log('navbar-蒸汽-安卓😂');
+          console.log(`窗口screenHeight:${sys.screenHeight}`, 780);
+          console.log(`窗口windowHeight:${sys.windowHeight}`, 730);
+          console.log(`状态栏statusBarHeight:${sys.statusBarHeight}`, 35);
+          console.log(`导航栏navBarHeight:${sys.navBarHeight}`, 44);
+          console.log(`tabBarHeight:${sys.tabBarHeight}`, 50);
+          console.log(`safeBottom:${safeBottom}`, 0);
+          console.log(`safeAreaBottom:${safeAreaBottom}`, 780);
+          console.log(`safeTop:${safeTop}`, 35);
+          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeBottom;
+          systemId++;
+        }
+        else {
+          // 👌 651 合格
+          console.log(`第${systemId}次`);
+          console.log('VDOM-安卓😂');
+          console.log(`窗口screenHeight:${sys.screenHeight}`, 780);
+          console.log(`窗口windowHeight:${sys.windowHeight}`, 780);
+          console.log(`状态栏statusBarHeight:${sys.statusBarHeight}`, 35);
+          console.log(`导航栏navBarHeight:${sys.navBarHeight}`, 44);
+          console.log(`tabBarHeight:${sys.tabBarHeight}`, 50);
+          console.log(`safeBottom:${safeBottom}`, 0);
+          console.log(`safeAreaBottom:${safeAreaBottom}`, 780);
+          console.log(`safeTop:${safeTop}`, 0);
+          console.log(`偏移量导航栏navBarOffset:${navBarOffset}`, 0);
+          console.log(`偏移量状态栏statusBarOffset:${statusBarOffset}`, 0);
+          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeBottom;
+          systemId++;
+        }
+        // #endif
+
+        // #ifdef APP-IOS
+        if (isVaporMode()) {
+          // 👌 665 合格
+          console.log(`第${systemId}次`);
+          console.log('蒸汽-IOS😂');
+          console.log(`窗口screenHeight:${sys.screenHeight}`, 852);
+          console.log(`窗口windowHeight:${sys.windowHeight}`, 749);
+          console.log(`状态栏statusBarHeight:${sys.statusBarHeight}`, 54);
+          console.log(`导航栏navBarHeight:${sys.navBarHeight}`, 44);
+          console.log(`tabBarHeight:${sys.tabBarHeight}`, 50);
+          console.log(`safeBottom:${safeBottom}`, 34);
+          console.log(`safeAreaBottom:${safeAreaBottom}`, 818);
+          console.log(`safeTop:${safeTop}`, 59);
+          console.log(`偏移量导航栏navBarOffset:${navBarOffset}`, 0);
+          console.log(`偏移量状态栏statusBarOffset:${statusBarOffset}`, 0);
+          console.log('----', sys.screenHeight - sys.statusBarHeight - sys.navBarHeight - sys.tabBarHeight - safeBottom);
+          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeBottom;
+          console.log(`蒸汽模式-IOS-availableHeight: ${sys.availableHeight}`);
+          systemId++;
+        }
+        else {
+          // 👌 665 合格
+          console.log(`第${systemId}次`);
+          console.log('VDOM-IOS😂');
+          console.log(`窗口screenHeight:${sys.screenHeight}`, 852);
+          console.log(`窗口windowHeight:${sys.windowHeight}`, 749);
+          console.log(`状态栏statusBarHeight:${sys.statusBarHeight}`, 54);
+          console.log(`导航栏navBarHeight:${sys.navBarHeight}`, 44);
+          console.log(`tabBarHeight:${sys.tabBarHeight}`, 50);
+          console.log(`safeBottom:${safeBottom}`, 34);
+          console.log(`safeAreaBottom:${safeAreaBottom}`, 818);
+          console.log(`safeTop:${safeTop}`, 59);
+          console.log(`偏移量导航栏navBarOffset:${navBarOffset}`, 0);
+          console.log(`偏移量状态栏statusBarOffset:${statusBarOffset}`, 0);
+          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeBottom;
+          console.log(`availableHeight得到高度:${sys.availableHeight}`);
+          systemId++;
+        }
+        // #endif
+
+        // #ifdef APP-HARMONY
+        if (isVaporMode()) {
+          // 👌 652 合格
+          console.log(`第${systemId}次`);
+          console.log('蒸汽-鸿蒙😂');
+          console.log(`窗口screenHeight:${sys.screenHeight}`, 816);
+          console.log(`窗口windowHeight:${sys.windowHeight}`, 730);
+          console.log(`状态栏statusBarHeight:${sys.statusBarHeight}`, 42);
+          console.log(`导航栏navBarHeight:${sys.navBarHeight}`, 44);
+          console.log(`tabBarHeight:${sys.tabBarHeight}`, 50);
+          console.log(`safeBottom:${safeBottom}`, 28);
+          console.log(`safeAreaBottom:${safeAreaBottom}`, 788);
+          console.log(`safeTop:${safeTop}`, 42);
+          console.log('----', sys.screenHeight - sys.statusBarHeight - sys.navBarHeight - sys.tabBarHeight - safeBottom);
+          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeBottom;
+          console.log(sys.availableHeight, 'sys.availableHeight');
+          systemId++;
+        }
+        else {
+          // 👌 655 合格
+          console.log(`第${systemId}次`);
+          console.log('VDOM鸿蒙😂');
+          console.log(`窗口screenHeight:${sys.screenHeight}`, 816);
+          console.log(`窗口windowHeight:${sys.windowHeight}`, 733);
+          console.log(`状态栏statusBarHeight:${sys.statusBarHeight}`, 39);
+          console.log(`导航栏navBarHeight:${sys.navBarHeight}`, 44);
+          console.log(`tabBarHeight:${sys.tabBarHeight}`, 50);
+          console.log(`safeBottom:${safeBottom}`, 28);
+          console.log(`safeAreaBottom:${safeAreaBottom}`, 788);
+          console.log(`safeTop:${safeTop}`, 39);
+          console.log('----', sys.windowHeight - sys.statusBarHeight - sys.navBarHeight - sys.tabBarHeight - safeBottom);
+          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeBottom;
+          console.log(sys.availableHeight, 'sys.availableHeight');
+          systemId++;
+        }
+        // #endif
+
+        // #ifdef MP-WEIXIN
+        console.log(`第${systemId}次`);
+        console.log('微信小程序😂');
+        console.log(`窗口screenHeight:${sys.screenHeight}`, 816);
+        console.log(`窗口windowHeight:${sys.windowHeight}`, 733);
+        console.log(`状态栏statusBarHeight:${sys.statusBarHeight}`, 39);
+        console.log(`导航栏navBarHeight:${sys.navBarHeight}`, 44);
+        console.log(`tabBarHeight:${sys.tabBarHeight}`, 50);
+        console.log(`safeBottom:${safeBottom}`, 28);
+        console.log(`safeAreaBottom:${safeAreaBottom}`, 788);
+        console.log(`safeTop:${safeTop}`, 39);
+        console.log('----', sys.windowHeight - sys.statusBarHeight - sys.navBarHeight - sys.tabBarHeight - safeBottom);
+        sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeBottom;
+        console.log(sys.availableHeight, 'sys.availableHeight');
+        systemId++;
+        // #endif
+      }
+    }
+  }
+  console.log('AppKu:', sys.availableHeight, selectedTabbarStrategy, isCustomNav, 'selectedTabbarStrategy');
 }
 
 // 初始化获取一次

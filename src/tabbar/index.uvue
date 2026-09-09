@@ -48,7 +48,7 @@ function onTabClick(index: number) {
           v-for="(item, index) in tabbarList"
           :key="index"
           class="tabbar-item"
-          :class="{ 'tabbar-item-bulge': item.isBulge }"
+          :style="{ height: `${item.isBulge ? TABBAR_CONTAINER_HEIGHT : TABBAR_HEIGHT}px` }"
           @click="onTabClick(index)"
         >
           <TabbarItem :item="item" :index="index" :is-bulge="item.isBulge" />
@@ -104,15 +104,11 @@ function onTabClick(index: number) {
   z-index: 2;
 }
 
+/* 单个 tab 项：flex 平分宽度；高度通过 :style 动态绑定（普通项 TABBAR_HEIGHT / 鼓包项 TABBAR_CONTAINER_HEIGHT） */
 .tabbar-item {
   flex: 1;
   align-items: center;
   justify-content: center;
-  height: 50px;
-}
-
-.tabbar-item-bulge {
-  height: 80px;
 }
 
 /* 【安全区层】底部安全区填充，高度动态设定 */

@@ -50,7 +50,7 @@ const defaultAppState: IAppState = {
   theme: '#37c2bc',
   locale: getSystemLocale(),
   themeMode: 'auto',
-  isDark: false
+  isDark: getSystemTheme() == 'dark'
 };
 
 // ==========================================
@@ -63,7 +63,7 @@ export class AppStore extends PiniaStoreBase {
     theme: '#37c2bc',
     locale: getSystemLocale(),
     themeMode: 'auto',
-    isDark: false
+    isDark: getSystemTheme() == 'dark'
   });
 
   // 是否已注册全局主题监听（防止重复注册）
@@ -81,6 +81,7 @@ export class AppStore extends PiniaStoreBase {
     const docEl = document.documentElement;
     if (docEl != null) {
       docEl.style.setProperty('--theme-color', this.state.theme);
+      docEl.setAttribute('data-theme', this.state.isDark ? 'dark' : 'light');
     }
     // #endif
 

@@ -1,7 +1,7 @@
 <template>
   <Card :title="echartTitle">
     <view class="w-full h-[280px] mt-[10px]">
-      <e-chart ref="echartRef" height="280px" class="w-full h-full" @ready="initEchart" />
+      <EChart ref="echartRef" height="280px" class="w-full h-full" @ready="initEchart" />
     </view>
     <view class="flex-row justify-between mt-[15px]">
       <view class="flex-1 mr-[8px]">
@@ -55,6 +55,7 @@ import Card from '../../basic/components/Card.uvue';
 import { computed, ref, watch } from 'vue';
 import { systemInfo } from '@/src/utils/systemInfo';
 import { $t } from '@/src/utils/i18n';
+import EChart from '@/uni_modules/e-chart/components/e-chart/e-chart.uvue'
 
 const echartTitle = computed((): string => $t('basic.echartTitle'));
 const echartLineText = computed((): string => $t('basic.echartLine'));

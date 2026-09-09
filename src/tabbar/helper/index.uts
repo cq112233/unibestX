@@ -2,13 +2,13 @@ import { curIdx, setCurIdx, setCurIdxByPath, tabbarList } from './store';
 import { useAppStore } from '@/src/store';
 import { getThemeTokens } from '@/src/utils/theme';
 import type { ThemeTokens } from '@/src/utils/theme';
-import { isCompilerVersionGte, safeAreaInsets } from '@/src/utils/systemInfo';
+import { isCompilerVersionGte, safeAreaInsets, TABBAR_BASE_HEIGHT } from '@/src/utils/systemInfo';
 import { customTabbarConfig } from '../config';
 
 export * from './store';
 
-/** tabbar 白色底板高度（px） */
-export const TABBAR_HEIGHT: number = 50;
+/** tabbar 白色底板高度（px），基准值统一引用 systemInfo 中的 TABBAR_BASE_HEIGHT */
+export const TABBAR_HEIGHT: number = TABBAR_BASE_HEIGHT;
 
 /** tabbar 容器总高度（包含鼓包突出的部分，px） */
 export const TABBAR_CONTAINER_HEIGHT: number = 80;
@@ -185,10 +185,6 @@ export function handleTabbarClick(index: number): void {
  * 隐藏系统原生 TabBar 并根据编译器版本动态适配 H5 底部容器
  */
 export function safeHideNativeTabBar(): void {
-  // if (!needHideNativeTabbar) {
-  //   return;
-  // }
-
   // #ifdef H5
   try {
     if (typeof document !== 'undefined' && document.getElementById('hide-native-tabbar-style') == null) {
@@ -204,7 +200,7 @@ export function safeHideNativeTabBar(): void {
       document.head.appendChild(style);
     }
   }
-  catch {}
+  catch { }
   // #endif
 
   // #ifndef MP-WEIXIN
@@ -216,7 +212,7 @@ export function safeHideNativeTabBar(): void {
       }
     });
   }
-  catch {}
+  catch { }
   // #endif
 }
 
