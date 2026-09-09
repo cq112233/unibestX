@@ -1,5 +1,5 @@
 <template>
-	<up-transition
+	<UpTransition
 		mode="fade"
 		:show="show"
 		style="display: flex;"
@@ -21,12 +21,12 @@
 							:src="icon"
 							:style="imgStyle"
 						></image>
-						<up-icon
+						<UpIcon
 							v-else
 							:color="elIconColor"
 							:name="icon"
 							:size="iconSize"
-						></up-icon>
+						></UpIcon>
 					</view>
 				</slot>
 				<slot>
@@ -46,17 +46,19 @@
 				@tap.stop="closeHandler"
 				:style="closeStyle"
 			>
-				<up-icon
+				<UpIcon
 					name="close"
 					:size="closeSize"
 					color="#ffffff"
-				></up-icon>
+				></UpIcon>
 			</view>
 		</view>
-	</up-transition>
+	</UpTransition>
 </template>
 
 <script setup lang="uts">
+import UpIcon from '../up-icon/up-icon.uvue'
+import UpTransition from '../up-transition/up-transition.uvue'
 import { computed } from 'vue'
 import { image as testImage } from '../../libs/function/test.uts'
 import { deepMerge } from '../../libs/function/index.uts'

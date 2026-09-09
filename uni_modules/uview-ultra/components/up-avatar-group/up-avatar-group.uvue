@@ -8,12 +8,12 @@
 				marginLeft: getItemMarginLeft(index)
 			}"
 		>
-			<up-avatar
+			<UpAvatar
 			    :size="size"
 			    :shape="shape"
 			    :mode="mode"
 			    :src="src(item)"
-			></up-avatar>
+			></UpAvatar>
 			<view
 			    class="up-avatar-group__item__show-more"
 			    v-if="showMore && index == showUrl.length - 1
@@ -21,19 +21,21 @@
 					|| parseInt(extraValue.toString()) > 0)"
 				@tap="clickHandler"
 			>
-				<up-text
+				<UpText
 				    color="#ffffff"
 				    :size="parseInt(size.toString()) * 0.4"
 				    :text="textStr"
 					align="center"
 					:style="{justifyContent: 'center'}"
-				></up-text>
+				></UpText>
 			</view>
 		</view>
 	</view>
 </template>
 
 <script setup lang="uts">
+import UpAvatar from '../up-avatar/up-avatar.uvue'
+import UpText from '../up-text/up-text.uvue'
 import { computed } from 'vue'
 import { addUnit } from '../../libs/function/index'
 

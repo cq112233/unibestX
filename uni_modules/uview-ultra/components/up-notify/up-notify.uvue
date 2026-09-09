@@ -1,5 +1,5 @@
 <template>
-	<up-transition
+	<UpTransition
 		mode="slide-down"
 		:customStyle="containerStyle"
 		:show="open"
@@ -9,16 +9,16 @@
 			:class="[`up-notify--${tmpConfig['type']}`]"
 			:style="notifyStyle"
 		>
-			<up-status-bar v-if="tmpConfig['safeAreaInsetTop']"></up-status-bar>
+			<UpStatusBar v-if="tmpConfig['safeAreaInsetTop']"></UpStatusBar>
 			<view class="up-notify__warpper">
 				<slot name="icon">
-					<up-icon
+					<UpIcon
 						v-if="isIconVisible"
 						:name="tmpConfig['icon']"
 						:color="tmpConfig['color']"
 						:size="iconSize"
 						:customStyle="iconCustomStyle"
-					></up-icon>
+					></UpIcon>
 				</slot>
 				<text
 					class="up-notify__warpper__text"
@@ -26,10 +26,13 @@
 				>{{ tmpConfig['message'] }}</text>
 			</view>
 		</view>
-	</up-transition>
+	</UpTransition>
 </template>
 
 <script setup lang="uts">
+import UpIcon from '../up-icon/up-icon.uvue'
+import UpStatusBar from '../up-status-bar/up-status-bar.uvue'
+import UpTransition from '../up-transition/up-transition.uvue'
 import { computed, ref, onBeforeUnmount } from 'vue'
 import { addUnit, addStyle, deepMerge, getPx } from '../../libs/function/index.uts'
 

@@ -44,11 +44,11 @@
 					v-else-if="activeIcon != '' || inactiveIcon != ''"
 					class="up-steps-item__wrapper__icon"
 				>
-					<up-icon
+					<UpIcon
 						:name="stepIndex <= currentStep ? (activeIcon != '' ? activeIcon : inactiveIcon) : (inactiveIcon != '' ? inactiveIcon : activeIcon)"
 						:size="iconSize"
 						:color="stepIndex <= currentStep ? (activeColor != '' ? activeColor : '#3c9cff') : inactiveColor"
-					></up-icon>
+					></UpIcon>
 				</view>
 				<!-- 默认序号 / 勾选圆圈模式 -->
 				<view
@@ -61,12 +61,12 @@
 						class="up-steps-item__wrapper__circle__text"
 						:style="circleTextStyle"
 					>{{ stepIndex + 1 }}</text>
-					<up-icon
+					<UpIcon
 						v-else
 						:color="statusClass == 'error' ? '#f56c6c' : (activeColor != '' ? activeColor : '#3c9cff')"
 						size="12"
 						:name="statusClass == 'error' ? 'close' : 'checkmark'"
-					></up-icon>
+					></UpIcon>
 				</view>
 			</slot>
 		</view>
@@ -90,6 +90,7 @@
 </template>
 
 <script setup lang="uts">
+import UpIcon from '../up-icon/up-icon.uvue'
 import { computed, inject, ref, onMounted } from 'vue'
 import type { Ref, ComputedRef } from 'vue'
 

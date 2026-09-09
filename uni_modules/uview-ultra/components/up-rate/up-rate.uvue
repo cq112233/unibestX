@@ -19,7 +19,7 @@
                     class="up-rate__content__item__icon-wrap"
                     @click.stop="clickHandler($event, index + 1)"
                 >
-                    <up-icon
+                    <UpIcon
                         :name="
                             Math.floor(parseFloat(activeIndex.toString())) > index
                                 ? activeIcon
@@ -34,7 +34,7 @@
                         "
                         :custom-style="iconPaddingStyle"
                         :size="size"
-                    ></up-icon>
+                    ></UpIcon>
                 </view>
                 <view
                     v-if="allowHalf"
@@ -42,7 +42,7 @@
                     class="up-rate__content__item__icon-wrap up-rate__content__item__icon-wrap--half"
                     :style="halfWidthStyle"
                 >
-                    <up-icon
+                    <UpIcon
                         :name="
 							Math.floor(parseFloat(activeIndex.toString())) > index
                                 ? activeIcon
@@ -57,7 +57,7 @@
                         "
                         :custom-style="iconPaddingStyle"
                         :size="size"
-                    ></up-icon>
+                    ></UpIcon>
                 </view>
             </view>
         </view>
@@ -65,6 +65,7 @@
 </template>
 
 <script setup lang="uts">
+import UpIcon from '../up-icon/up-icon.uvue'
 import { computed, ref, watch, onMounted, getCurrentInstance } from 'vue'
 import { addUnit, addStyle, guid, sleep, range, os, upGetRect } from '../../libs/function/index.uts'
 

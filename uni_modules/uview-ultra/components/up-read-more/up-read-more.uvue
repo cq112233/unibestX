@@ -23,19 +23,19 @@
 				    class="up-read-more__toggle__text"
 				    @tap="toggleReadMore"
 				>
-					<up-text
+					<UpText
 					    :text="status === 'close' ? closeText : openText"
 					    :color="color"
 					    :size="fontSize"
 					    :lineHeight="fontSize"
 					    margin="0 5px 0 0"
-					></up-text>
+					></UpText>
 					<view class="up-read-more__toggle__icon">
-						<up-icon
+						<UpIcon
 						    :color="color"
 						    :size="parseInt(getPx(fontSize)) + 2"
 						    :name="status === 'close' ? 'arrow-down' : 'arrow-up'"
-						></up-icon>
+						></UpIcon>
 					</view>
 				</view>
 			</slot>
@@ -44,6 +44,8 @@
 </template>
 
 <script setup lang="uts">
+import UpIcon from '../up-icon/up-icon.uvue'
+import UpText from '../up-text/up-text.uvue'
 import { computed, ref, onMounted, getCurrentInstance } from 'vue'
 import { addUnit, guid, getPx, sleep, upGetRect } from '../../libs/function/index'
 

@@ -1,5 +1,5 @@
 <template>
-	<up-overlay
+	<UpOverlay
 	    :show="!isConnected"
 		:zIndex="zIndex"
 	    @touchmove.stop.prevent="noop"
@@ -12,12 +12,12 @@
 		<view
 		    class="up-no-network"
 		>
-			<up-icon
+			<UpIcon
 			    :name="image"
 			    size="150"
 			    imgMode="widthFit"
 			    class="up-no-network__error-icon"
-			></up-icon>
+			></UpIcon>
 			<text class="up-no-network__tips">{{tips}}</text>
 			<!-- #ifdef APP-PLUS -->
 			<view class="up-no-network__app">
@@ -29,19 +29,22 @@
 			</view>
 			<!-- #endif -->
 			<view class="up-no-network__retry">
-				<up-button
+				<UpButton
 				    size="mini"
 				    :text="t('up.common.retry')"
 				    type="primary"
 					plain
 				    @click="retry"
-				></up-button>
+				></UpButton>
 			</view>
 		</view>
-	</up-overlay>
+	</UpOverlay>
 </template>
 
 <script setup lang="uts">
+import UpButton from '../up-button/up-button.uvue'
+import UpIcon from '../up-icon/up-icon.uvue'
+import UpOverlay from '../up-overlay/up-overlay.uvue'
 import { ref, onMounted } from 'vue'
 import { toast, getDeviceInfo } from '../../libs/function/index'
 import { t as i18nT } from '../../libs/i18n/index.uts'

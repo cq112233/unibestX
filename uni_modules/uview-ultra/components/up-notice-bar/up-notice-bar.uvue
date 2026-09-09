@@ -5,7 +5,7 @@
 		:style="noticeBarStyle"
 	>
 		<template v-if="direction == 'column' || (direction == 'row' && step)">
-			<up-column-notice
+			<UpColumnNotice
 				:color="color"
 				:bgColor="bgColor"
 				:text="text"
@@ -17,10 +17,10 @@
 				:duration="duration"
 				@close="close"
 				@click="click"
-			></up-column-notice>
+			></UpColumnNotice>
 		</template>
 		<template v-else>
-			<up-row-notice
+			<UpRowNotice
 				:color="color"
 				:bgColor="bgColor"
 				:text="text"
@@ -32,12 +32,14 @@
 				:icon="icon"
 				@close="close"
 				@click="click"
-			></up-row-notice>
+			></UpRowNotice>
 		</template>
 	</view>
 </template>
 
 <script setup lang="uts">
+import UpRowNotice from '../up-row-notice/up-row-notice.uvue'
+import UpColumnNotice from '../up-column-notice/up-column-notice.uvue'
 import { ref, computed } from 'vue'
 import { addStyle, deepMerge } from '../../libs/function/index.uts'
 

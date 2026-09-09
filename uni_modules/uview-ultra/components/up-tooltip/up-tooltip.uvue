@@ -3,11 +3,11 @@
 		class="up-tooltip"
 		:style="[rootStyle]"
 	>
-		<up-overlay
+		<UpOverlay
 			:show="overlayShow"
 			:opacity="0"
 			@click="overlayClickHandler"
-		></up-overlay>
+		></UpOverlay>
 		<view class="up-tooltip__wrapper">
 			<text
 				v-if="hasText"
@@ -31,7 +31,7 @@
 					<slot></slot>
 				</slot>
 			</view>
-			<up-transition
+			<UpTransition
 				mode="fade"
 				:show="displayShow"
 				duration="300"
@@ -61,12 +61,12 @@
 									class="up-tooltip__wrapper__popup__list__btn__text"
 								>复制</text>
 							</view>
-							<up-line
+							<UpLine
 								direction="column"
 								color="#8d8e90"
 								v-if="showCopyLine"
 								length="18"
-							></up-line>
+							></UpLine>
 							<template v-for="(item, index) in buttonItems" :key="index">
 								<view
 									class="up-tooltip__wrapper__popup__list__btn"
@@ -77,22 +77,25 @@
 										class="up-tooltip__wrapper__popup__list__btn__text"
 									>{{ item }}</text>
 								</view>
-								<up-line
+								<UpLine
 									direction="column"
 									color="#8d8e90"
 									v-if="index < buttonCount - 1"
 									length="18"
-								></up-line>
+								></UpLine>
 							</template>
 						</view>
 					</slot>
 				</view>
-			</up-transition>
+			</UpTransition>
 		</view>
 	</view>
 </template>
 
 <script setup lang="uts">
+import UpLine from '../up-line/up-line.uvue'
+import UpOverlay from '../up-overlay/up-overlay.uvue'
+import UpTransition from '../up-transition/up-transition.uvue'
 import { ref, computed, watch, onMounted, getCurrentInstance, nextTick } from 'vue'
 import { addStyle, addUnit, guid, toast, sleep, sys, upGetRect } from '../../libs/function/index.uts'
 

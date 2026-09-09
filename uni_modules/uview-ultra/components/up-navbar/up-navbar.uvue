@@ -6,10 +6,10 @@
 			:style="placeholderStyle"
 		></view>
 		<view :class="[fixed ? 'up-navbar--fixed' : '']">
-			<up-status-bar
+			<UpStatusBar
 				v-if="safeAreaInsetTop"
 				:bgColor="bgColor"
-			></up-status-bar>
+			></UpStatusBar>
 			<view
 				class="up-navbar__content"
 				:class="[border ? 'up-border-bottom' : '']"
@@ -22,12 +22,12 @@
 					@tap="leftClick"
 				>
 					<slot name="left">
-						<up-icon
+						<UpIcon
 							v-if="leftIcon != ''"
 							:name="leftIcon"
 							:size="leftIconSize"
 							:color="leftIconColor"
-						></up-icon>
+						></UpIcon>
 						<text
 							v-if="leftText != ''"
 							:style="leftTextStyle"
@@ -47,11 +47,11 @@
 					@tap="rightClick"
 				>
 					<slot name="right">
-						<up-icon
+						<UpIcon
 							v-if="rightIcon != ''"
 							:name="rightIcon"
 							size="20"
-						></up-icon>
+						></UpIcon>
 						<text
 							v-if="rightText != ''"
 							class="up-navbar__content__right__text"
@@ -64,6 +64,8 @@
 </template>
 
 <script setup lang="uts">
+import UpIcon from '../up-icon/up-icon.uvue'
+import UpStatusBar from '../up-status-bar/up-status-bar.uvue'
 import { computed } from 'vue'
 import { addUnit, addStyle, getPx, deepMerge } from '../../libs/function/index.uts'
 

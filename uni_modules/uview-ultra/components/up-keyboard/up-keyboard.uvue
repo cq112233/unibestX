@@ -1,5 +1,5 @@
 <template>
-	<up-popup
+	<UpPopup
 		:overlay="overlay"
 		:closeOnClickOverlay="closeOnClickOverlay"
 		mode="bottom"
@@ -47,27 +47,30 @@
 				</view>
 			</view>
 			<template v-if="mode == 'number' || mode == 'card'">
-				<up-number-keyboard
+				<UpNumberKeyboard
 					:random="random"
 					@backspace="keyboardBackspace"
 					@change="keyboardChange"
 					:mode="mode"
 					:dotDisabled="dotDisabled"
-				></up-number-keyboard>
+				></UpNumberKeyboard>
 			</template>
 			<template v-else>
-				<up-car-keyboard
+				<UpCarKeyboard
 					:random="random"
 					:autoChange="autoChange"
 					@backspace="keyboardBackspace"
 					@change="keyboardChange"
-				></up-car-keyboard>
+				></UpCarKeyboard>
 			</template>
 		</view>
-	</up-popup>
+	</UpPopup>
 </template>
 
 <script setup lang="uts">
+import UpCarKeyboard from '../up-car-keyboard/up-car-keyboard.uvue'
+import UpNumberKeyboard from '../up-number-keyboard/up-number-keyboard.uvue'
+import UpPopup from '../up-popup/up-popup.uvue'
 defineOptions({
 	name: "up-keyboard"
 })

@@ -31,13 +31,13 @@
 					    borderRadius: moreBorderRadius,
 				    }"
                 >
-                    <up-text
+                    <UpText
                         :text="`+${urls.length - parseInt(maxCount.toString())}`"
                         color="#fff"
                         :size="parseInt(multipleSize.toString()) * 0.3"
                         align="center"
                         customStyle="justify-content: center"
-                    ></up-text>
+                    ></UpText>
                 </view>
             </view>
         </view>
@@ -45,6 +45,7 @@
 </template>
 
 <script setup lang="uts">
+import UpText from '../up-text/up-text.uvue'
 import type { PropType } from 'vue'
 import { ref, computed, watch, getCurrentInstance } from 'vue'
 // import { propsAlbum } from './props'

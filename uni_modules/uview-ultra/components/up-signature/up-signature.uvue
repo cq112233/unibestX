@@ -36,32 +36,32 @@
 		<view v-if="showToolbar" class="up-signature__toolbar">
 			<view class="up-signature__toolbar-icons">
 				<view class="up-signature__toolbar-icon" @click="undo">
-				<up-icon name="arrow-left" size="22" :color="pathCount == 0 ? '#ccc' : '#999'"></up-icon>
+				<UpIcon name="arrow-left" size="22" :color="pathCount == 0 ? '#ccc' : '#999'"></UpIcon>
 				</view>
 				<view class="up-signature__toolbar-icon" @click="clearCanvas">
-					<up-icon name="trash" size="25" color="#999"></up-icon>
+					<UpIcon name="trash" size="25" color="#999"></UpIcon>
 				</view>
 				<view class="up-signature__toolbar-icon" @click="toggleBrushSettings">
-					<up-icon name="edit-pen" size="25" color="#999"></up-icon>
+					<UpIcon name="edit-pen" size="25" color="#999"></UpIcon>
 				</view>
 				<view class="up-signature__toolbar-icon" @click="toggleColorSettings">
-					<up-icon name="grid" size="24" color="#999"></up-icon>
+					<UpIcon name="grid" size="24" color="#999"></UpIcon>
 				</view>
 				<view class="up-signature__toolbar-icon" @click="exportSignature">
-					<up-icon name="checkmark" size="25" :color="isEmpty ? '#ccc' : '#999'"></up-icon>
+					<UpIcon name="checkmark" size="25" :color="isEmpty ? '#ccc' : '#999'"></UpIcon>
 				</view>
 			</view>
 
 			<view v-if="showBrushSettings" class="up-signature__brush-settings">
 				<view class="up-signature__progress">
 					<text class="up-signature__progress-label">{{ penSizeLabel }}:</text>
-					<up-slider
+					<UpSlider
 						v-model="lineWidth"
 						:min="1"
 						:max="20"
 						:step="1"
 						:value-show="lineWidth"
-					></up-slider>
+					></UpSlider>
 				</view>
 			</view>
 
@@ -85,6 +85,8 @@
 </template>
 
 <script setup lang="uts">
+import UpIcon from '../up-icon/up-icon.uvue'
+import UpSlider from '../up-slider/up-slider.uvue'
 import { ref, computed, watch, onMounted, nextTick, getCurrentInstance } from 'vue'
 import { t } from '../../libs/i18n/index.uts'
 

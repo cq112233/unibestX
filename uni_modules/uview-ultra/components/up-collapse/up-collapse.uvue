@@ -1,11 +1,12 @@
 <template>
 	<view class="up-collapse">
-		<up-line v-if="border"></up-line>
+		<UpLine v-if="border"></UpLine>
 		<slot />
 	</view>
 </template>
 
 <script setup lang="uts">
+import UpLine from '../up-line/up-line.uvue'
 	import { watch } from 'vue'
 	import defProps from './collapse.uts'
 	import { commonProps, useUltraUI } from '../../libs/composable/useUltraUI'

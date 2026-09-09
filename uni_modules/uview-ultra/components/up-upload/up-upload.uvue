@@ -26,19 +26,19 @@
 						    @tap="onClickPreview(item, index)"
 							:style="itemDimensionStyle"
 						/>
-						<up-icon
+						<UpIcon
 							v-else
 						    color="#80CBF9"
 						    size="26"
 						    :name="item.isVideo || (item.type != null && item.type == 'video') ? 'movie' : 'file-text'"
-						></up-icon>
+						></UpIcon>
 						<view v-if="item.status == 'success'"
 							class="up-upload__wrap__play"
 							@tap="onClickPreview(item, index)">
 							<slot name="playIcon"></slot>
-							<up-icon v-if="$slots['playIcon'] == null"
+							<UpIcon v-if="$slots['playIcon'] == null"
 								class="up-upload__wrap__play__icon"
-								name="play-right" size="22px"></up-icon>
+								name="play-right" size="22px"></UpIcon>
 						</view>
 					</view>
 					<view
@@ -47,11 +47,11 @@
 						@tap="onClickPreview(item, index)"
 						:style="itemDimensionStyle"
 					>
-						<up-icon
+						<UpIcon
 						    color="#80CBF9"
 						    size="26"
 						    :name="item.isVideo || (item.type != null && item.type == 'video') ? 'movie' : 'folder'"
-						></up-icon>
+						></UpIcon>
 						<text class="up-upload__wrap__preview__other__text">
 							{{ getOtherItemText(item) }}
 						</text>
@@ -61,13 +61,13 @@
 					    v-if="item.status == 'uploading' || item.status == 'failed'"
 					>
 						<view class="up-upload__status__icon">
-							<up-icon
+							<UpIcon
 							    v-if="item.status == 'failed'"
 							    name="close-circle"
 							    color="#ffffff"
 							    size="25"
 							/>
-							<up-loading-icon
+							<UpLoadingIcon
 							    size="22"
 							    mode="circle"
 							    v-else
@@ -77,8 +77,8 @@
 						    v-if="item.message != null && item.message != ''"
 						    class="up-upload__status__message"
 						>{{ item.message }}</text>
-						<up-gap class="up-upload__progress" height="3px"
-							:style="getProgressStyle(item)"></up-gap>
+						<UpGap class="up-upload__progress" height="3px"
+							:style="getProgressStyle(item)"></UpGap>
 					</view>
 					<view
 					    class="up-upload__deletable"
@@ -86,11 +86,11 @@
 					    @tap.stop="deleteItem(index)"
 					>
 						<view class="up-upload__deletable__icon">
-							<up-icon
+							<UpIcon
 							    name="close"
 							    color="#ffffff"
 							    size="10"
-							></up-icon>
+							></UpIcon>
 						</view>
 					</view>
 					<slot name="success">
@@ -99,11 +99,11 @@
 							v-if="item.status == 'success'"
 						>
 							<view class="up-upload__success__icon">
-								<up-icon
+								<UpIcon
 									name="checkmark"
 									color="#ffffff"
 									size="12"
-								></up-icon>
+								></UpIcon>
 							</view>
 						</view>
 					</slot>
@@ -131,11 +131,11 @@
 				    :class="[disabled ? 'up-upload__button--disabled' : '']"
 					:style="itemDimensionStyle"
 				>
-					<up-icon
+					<UpIcon
 					    :name="uploadIcon"
 					    size="26"
 					    :color="uploadIconColor"
-					></up-icon>
+					></UpIcon>
 					<text
 					    v-if="uploadText != ''"
 					    class="up-upload__button__text"
@@ -143,7 +143,7 @@
 				</view>
 			</template>
 		</view>
-		<up-popup
+		<UpPopup
 			mode="center"
 			v-model:show="popupShow">
 			<video id="myVideo" v-if="popupShow"
@@ -154,11 +154,15 @@
 				:autoplay="true" auto-pause-if-open-native
 				:initial-time='0.1'>
 			</video>
-		</up-popup>
+		</UpPopup>
 	</view>
 </template>
 
 <script setup lang="uts">
+import UpPopup from '../up-popup/up-popup.uvue'
+import UpGap from '../up-gap/up-gap.uvue'
+import UpIcon from '../up-icon/up-icon.uvue'
+import UpLoadingIcon from '../up-loading-icon/up-loading-icon.uvue'
 import { ref, watch } from 'vue'
 import { chooseFile } from './utils.uts'
 import { addStyle, addUnit, toast } from '../../libs/function/index.uts'

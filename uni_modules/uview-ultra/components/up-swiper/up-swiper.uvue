@@ -7,7 +7,7 @@
 			class="up-swiper__loading"
 			v-if="loading"
 		>
-			<up-loading-icon mode="circle"></up-loading-icon>
+			<UpLoadingIcon mode="circle"></UpLoadingIcon>
 		</view>
 		<swiper
 			v-else
@@ -62,20 +62,22 @@
 		</swiper>
 		<view class="up-swiper__indicator" :style="customIndicatorStyle">
 			<slot name="indicator">
-				<up-swiper-indicator
+				<UpSwiperIndicator
 					v-if="!loading && indicator && !showTitle"
 					:indicatorActiveColor="indicatorActiveColor"
 					:indicatorInactiveColor="indicatorInactiveColor"
 					:length="list.length"
 					:current="currentIndex"
 					:indicatorMode="indicatorMode"
-				></up-swiper-indicator>
+				></UpSwiperIndicator>
 			</slot>
 		</view>
 	</view>
 </template>
 
 <script setup lang="uts">
+import UpLoadingIcon from '../up-loading-icon/up-loading-icon.uvue'
+import UpSwiperIndicator from '../up-swiper-indicator/up-swiper-indicator.uvue'
 import { computed, ref, watch } from 'vue'
 import defProps from './swiper.uts'
 import { addUnit, addStyle, error } from '../../libs/function/index.uts'

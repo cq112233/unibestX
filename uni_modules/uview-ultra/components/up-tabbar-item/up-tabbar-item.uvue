@@ -11,12 +11,12 @@
 		>
 			<view class="up-tabbar-item--mid-button-cover" v-if="isMidButton">
 			</view>
-			<up-icon
+			<UpIcon
 			    v-if="icon != ''"
 			    :name="icon"
 			    :color="isActive ? activeColor : inactiveColor"
 			    :size="isMidButton ? 26 : 20"
-			></up-icon>
+			></UpIcon>
 			<template v-else>
 				<slot
 				    v-if="isActive"
@@ -27,14 +27,14 @@
 				    name="inactive-icon"
 				/>
 			</template>
-			<up-badge
+			<UpBadge
 				absolute
 				:offset="[0, dot ? '34rpx' : (badge != null && parseInt(badge.toString()) > 9 ? '14rpx' : '20rpx')]"
 			    :customStyle="customBadgeStyle"
 			    :isDot="dot"
 			    :value="badge != null ? (dot ? 1 : badge) : 0"
 			    :show="dot ? true : (badge != null ? parseInt(badge.toString()) > 0 : false)"
-			></up-badge>
+			></UpBadge>
 		</view>
 		
 		<slot name="text">
@@ -49,6 +49,8 @@
 </template>
 
 <script setup lang="uts">
+import UpBadge from '../up-badge/up-badge.uvue'
+import UpIcon from '../up-icon/up-icon.uvue'
 import { computed, inject, ref, onMounted } from 'vue'
 import type { ComputedRef } from 'vue'
 import { addStyle } from '../../libs/function/index.uts'

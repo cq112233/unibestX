@@ -20,13 +20,13 @@
 		    :class="{'up-number-box__minus--disabled': isDisabled('minus') }"
 		    :style="buttonStyle('minus')"
 		>
-			<up-icon
+			<UpIcon
 			    name="minus"
 			    :color="isDisabled('minus') ? '#c8c9cc' : '#323233'"
 			    size="15"
 			    bold
 				:customStyle="iconStyle"
-			></up-icon>
+			></UpIcon>
 		</view>
 
 		<template v-if="!hideMinus">
@@ -81,18 +81,19 @@
 		    :class="{ 'up-number-box__minus--disabled': isDisabled('plus') }"
 		    :style="buttonStyle('plus')"
 		>
-			<up-icon
+			<UpIcon
 			    name="plus"
 			    :color="isDisabled('plus') ? '#c8c9cc' : '#323233'"
 			    size="15"
 			    bold
 				:customStyle="iconStyle"
-			></up-icon>
+			></UpIcon>
 		</view>
 	</view>
 </template>
 
 <script setup lang="uts">
+import UpIcon from '../up-icon/up-icon.uvue'
 import { computed, ref, watch, onMounted, nextTick } from 'vue'
 import { getPx, addUnit } from '../../libs/function/index.uts'
 

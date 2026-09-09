@@ -55,11 +55,11 @@
 					hover-class="up-hover-class"
 					:hover-stay-time="200"
 				>
-					<up-icon
+					<UpIcon
 						size="28"
 						name="backspace"
 						color="#303133"
-					></up-icon>
+					></UpIcon>
 				</view>
 			</view>
 		</view>
@@ -67,6 +67,7 @@
 </template>
 
 <script setup lang="uts">
+import UpIcon from '../up-icon/up-icon.uvue'
 import type { PropType } from 'vue'
 import { computed, ref } from 'vue'
 import { commonProps, useUltraUI } from '../../libs/composable/useUltraUI';

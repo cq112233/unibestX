@@ -5,13 +5,13 @@
         <template :key="index" v-for="(item, index) in options">
             <view :style="{width: itemWidth, display: 'inline-block'}">
                 <slot :item="item" :index="index">
-                    <up-tag :type="index === currentIndex ? 'primary' : 'info'"
+                    <UpTag :type="index === currentIndex ? 'primary' : 'info'"
                         size="large" :plain="index === currentIndex ? false : true"
                         :class="currentIndex === index ? 'active': ''" :height="itemHeight"
                         :style="{width: itemWidth, padding: itemPadding}"
                         @click="change(index)">
                         {{getItemLabel(item)}}
-                    </up-tag>
+                    </UpTag>
                 </slot>
             </view>
         </template>
@@ -19,6 +19,7 @@
 </template>
 
 <script setup lang="uts">
+import UpTag from '../up-tag/up-tag.uvue'
 import { ref, watch } from 'vue'
 
 defineOptions({

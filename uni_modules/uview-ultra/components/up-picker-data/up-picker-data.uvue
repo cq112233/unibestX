@@ -2,16 +2,16 @@
 	<view class="up-picker-data">
 		<view class="up-picker-data__trigger">
 			<slot name="trigger"></slot>
-			<up-input
+			<UpInput
 				:model-value="current"
 				disabled
 				disabled-color="#ffffff"
 				:placeholder="title"
 				border="none"
-			></up-input>
+			></UpInput>
 			<view class="up-picker-data__trigger__cover" @click="show = true"></view>
 		</view>
-		<up-picker
+		<UpPicker
 			:show="show"
 			:columns="columns"
 			:key-name="labelKey"
@@ -19,11 +19,13 @@
 			@confirm="confirm"
 			@cancel="cancel"
 			@close="close"
-		></up-picker>
+		></UpPicker>
 	</view>
 </template>
 
 <script setup lang="uts">
+import UpInput from '../up-input/up-input.uvue'
+import UpPicker from '../up-picker/up-picker.uvue'
 import { ref, computed, watch } from 'vue'
 
 function stringValue(value: any | null): string {

@@ -34,11 +34,11 @@
 			<!-- 右侧操作区域 -->
 			<view class="up-coupon__action up-padding-right-20">
 				<slot name="action" :actionText="actionText" :circle="circle">
-                    <up-tag type="error" :text="actionText"
+                    <UpTag type="error" :text="actionText"
                         :bgColor="hasType() ? 'transparent' : '#eb433d'"
                         :borderColor="hasType() ? '#eee' : '#eb433d'" borderRadius="6px"
                         size="medium" class="up-coupon__action-text"
-                        :shape="circle ? 'circle' : 'square'"></up-tag>
+                        :shape="circle ? 'circle' : 'square'"></UpTag>
 				</slot>
 			</view>
 		</view>
@@ -52,6 +52,7 @@
 </template>
 
 <script setup lang="uts">
+import UpTag from '../up-tag/up-tag.uvue'
 import { computed } from 'vue'
 
 defineOptions({

@@ -13,14 +13,14 @@
         @tap="handleNodeClick(item)"
       >
         <view class="up-tree-node__switcher" @tap.stop="handleExpandClick(item)">
-          <up-icon
+          <UpIcon
             v-if="getItemHasChildren(item)"
             :name="getItemExpanded(item) ? collapseIcon : expandIcon"
             :size="iconSize"
             :color="switcherColor"
           />
         </view>
-        <up-checkbox
+        <UpCheckbox
           v-if="showCheckbox"
           class="up-tree-node__checkbox"
           usedAlone
@@ -53,6 +53,8 @@
 </template>
 
 <script setup lang="uts">
+import UpCheckbox from '../up-checkbox/up-checkbox.uvue'
+import UpIcon from '../up-icon/up-icon.uvue'
 import { ref, computed, watch } from 'vue'
 import { deepClone } from '../../libs/function/index.uts'
 

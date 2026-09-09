@@ -28,17 +28,18 @@
 				@touchstart.stop="backspaceClick"
 				@touchend="clearTimer"
 			>
-				<up-icon
+				<UpIcon
 					name="backspace"
 					color="#303133"
 					size="28"
-				></up-icon>
+				></UpIcon>
 			</view>
 		</view>
 	</view>
 </template>
 
 <script setup lang="uts">
+import UpIcon from '../up-icon/up-icon.uvue'
 import { ref, computed } from 'vue'
 import { randomArray } from '../../libs/function/index'
 

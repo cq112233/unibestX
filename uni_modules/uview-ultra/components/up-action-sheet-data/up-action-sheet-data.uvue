@@ -2,27 +2,29 @@
 	<view class="up-action-sheet-data">
 		<view class="up-action-sheet-data__trigger">
 			<slot name="trigger"></slot>
-			<up-input
+			<UpInput
 				:model-value="current"
 				disabled
 				disabled-color="#ffffff"
 				:placeholder="title"
 				border="none"
-			></up-input>
+			></UpInput>
 			<view class="up-action-sheet-data__trigger__cover" @click="show = true"></view>
 		</view>
-		<up-action-sheet
+		<UpActionSheet
 			:show="show"
 			:actions="options"
 			:title="title"
 			:description="description"
 			@close="show = false"
 			@select="select"
-		></up-action-sheet>
+		></UpActionSheet>
 	</view>
 </template>
 
 <script setup lang="uts">
+import UpActionSheet from '../up-action-sheet/up-action-sheet.uvue'
+import UpInput from '../up-input/up-input.uvue'
 import { ref, watch } from 'vue'
 
 defineOptions({

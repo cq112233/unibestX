@@ -8,7 +8,7 @@
       @click="prev"
     >
       <text v-if="prevText != ''" class="up-pagination-text">{{ prevText }}</text>
-      <up-icon v-else name="arrow-left" size="14"></up-icon>
+      <UpIcon v-else name="arrow-left" size="14"></UpIcon>
     </view>
 
     <!-- 页码列表 -->
@@ -37,12 +37,13 @@
       @click="next"
     >
       <text v-if="nextText != ''" class="up-pagination-text">{{ nextText }}</text>
-      <up-icon v-else name="arrow-right" size="14"></up-icon>
+      <UpIcon v-else name="arrow-right" size="14"></UpIcon>
     </view>
   </view>
 </template>
 
 <script setup lang="uts">
+import UpIcon from '../up-icon/up-icon.uvue'
 import { computed } from 'vue'
 
 defineOptions({

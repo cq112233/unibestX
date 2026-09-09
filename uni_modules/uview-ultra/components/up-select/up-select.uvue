@@ -11,11 +11,11 @@
 					</text>
 				</slot>
 				<slot name="icon">
-					<up-icon name="arrow-down" :size="iconSize" :color="iconColor"></up-icon>
+					<UpIcon name="arrow-down" :size="iconSize" :color="iconColor"></UpIcon>
 				</slot>
 			</view>
-			<up-overlay :show="isOpen" @click="overlayClick" v-if="overlay" :zIndex="zIndex" :duration="duration + 50"
-				:customStyle="overlayStyle" :opacity="overlayOpacity" @touchmove.stop.prevent="noop"></up-overlay>
+			<UpOverlay :show="isOpen" @click="overlayClick" v-if="overlay" :zIndex="zIndex" :duration="duration + 50"
+				:customStyle="overlayStyle" :opacity="overlayOpacity" @touchmove.stop.prevent="noop"></UpOverlay>
 			<view class="up-select__options__wrap"
 				:style="optionsWrapStyle">
 				<view class="up-select__options" v-if="isOpen">
@@ -36,6 +36,8 @@
 </template>
 
 <script setup lang="uts">
+import UpIcon from '../up-icon/up-icon.uvue'
+import UpOverlay from '../up-overlay/up-overlay.uvue'
 import { ref, computed, onMounted, getCurrentInstance, nextTick } from 'vue'
 import { getWindowInfo, upGetRect } from '../../libs/function/index'
 

@@ -1,5 +1,5 @@
 <template>
-	<up-code-input
+	<UpCodeInput
 		:maxlength="maxlength"
 		:dot="dotFill"
 		:mode="codeInputMode"
@@ -14,10 +14,11 @@
 		@change="onChange"
 		@finish="onFinish"
 		@update:modelValue="onModelValueUpdate"
-	></up-code-input>
+	></UpCodeInput>
 </template>
 
 <script setup lang="uts">
+import UpCodeInput from '../up-code-input/up-code-input.uvue'
 import { computed } from 'vue'
 
 defineOptions({

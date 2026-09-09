@@ -1,5 +1,5 @@
 <template>
-	<up-transition
+	<UpTransition
 	    :show="show"
 	    custom-class="up-overlay"
 	    :duration="duration"
@@ -7,10 +7,11 @@
 	    @click="clickHandler"
 	>
 		<slot></slot>
-	</up-transition>
+	</UpTransition>
 </template>
 
 <script setup lang="uts">
+import UpTransition from '../up-transition/up-transition.uvue'
 import { computed } from 'vue'
 import { addStyle, deepMerge } from '../../libs/function/index'
 

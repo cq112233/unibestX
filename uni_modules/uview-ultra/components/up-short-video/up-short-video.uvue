@@ -3,11 +3,11 @@
 		<view class="up-short-video__header">
 			<slot name="menu">
 				<view class="up-short-video__header__menu">
-					<up-icon name="grid" size="24"></up-icon>
+					<UpIcon name="grid" size="24"></UpIcon>
 				</view>
 			</slot>
 			
-			<up-tabs 
+			<UpTabs 
 				:list="tabsList" 
 				:current="currentTab"
                 lineColor="#ddd"
@@ -22,11 +22,11 @@
                 }"
 				@change="handleTabChange"
 				class="up-short-video__header__tabs"
-			></up-tabs>
+			></UpTabs>
 			
 			<slot name="search">
 				<view class="up-short-video__header__search">
-					<up-icon name="search" size="24"></up-icon>
+					<UpIcon name="search" size="24"></UpIcon>
 				</view>
 			</slot>
 		</view>
@@ -64,33 +64,33 @@
 					
 					<view class="up-short-video__content__author">
 						<view class="up-short-video__content__author__avatar">
-							<up-avatar :src="getAuthorAvatar(item)" size="50px"></up-avatar>
+							<UpAvatar :src="getAuthorAvatar(item)" size="50px"></UpAvatar>
 						</view>
 						<view class="up-short-video__content__author__info">
 							<text class="up-short-video__content__author__name">{{ getAuthorName(item) }}</text>
 							<text class="up-short-video__content__author__desc">{{ getAuthorDesc(item) }}</text>
 						</view>
 						<view class="up-short-video__content__author__follow">
-							<up-button type="primary" size="mini">Follow</up-button>
+							<UpButton type="primary" size="mini">Follow</UpButton>
 						</view>
 					</view>
 					
 					<view class="up-short-video__content__actions">
 						<slot name="actions" :item="item" :index="index">
 							<view class="up-short-video__content__actions__item" @click="handleLike(item, index)">
-								<up-icon color="#eee" :name="isLiked(item) ? 'thumb-up-fill' : 'thumb-up'" size="32px"></up-icon>
+								<UpIcon color="#eee" :name="isLiked(item) ? 'thumb-up-fill' : 'thumb-up'" size="32px"></UpIcon>
 								<text class="up-short-video__content__actions__text">{{ getCountText(item, 'likeCount') }}</text>
 							</view>
 							<view class="up-short-video__content__actions__item" @click="handleComment(item, index)">
-								<up-icon color="#eee" name="chat" size="32px"></up-icon>
+								<UpIcon color="#eee" name="chat" size="32px"></UpIcon>
 								<text class="up-short-video__content__actions__text">{{ getCountText(item, 'commentCount') }}</text>
 							</view>
 							<view class="up-short-video__content__actions__item" @click="handleShare(item, index)">
-								<up-icon color="#eee" name="share" size="32px"></up-icon>
+								<UpIcon color="#eee" name="share" size="32px"></UpIcon>
 								<text class="up-short-video__content__actions__text">{{ getCountText(item, 'shareCount') }}</text>
 							</view>
 							<view class="up-short-video__content__actions__item" @click="handleCollect(item, index)">
-								<up-icon color="#eee" :name="isCollected(item) ? 'bookmark-fill' : 'bookmark'" size="32px"></up-icon>
+								<UpIcon color="#eee" :name="isCollected(item) ? 'bookmark-fill' : 'bookmark'" size="32px"></UpIcon>
 								<text class="up-short-video__content__actions__text">{{ getCountText(item, 'collectCount') }}</text>
 							</view>
 						</slot>
@@ -99,17 +99,17 @@
 			</swiper-item>
 		</swiper>
 		
-		<up-action-sheet
+		<UpActionSheet
 			:show="showSpeedSheet"
 			:actions="speedOptions"
 			title="Playback speed"
 			@close="showSpeedSheet = false"
 			@select="selectSpeed"
-		></up-action-sheet>
+		></UpActionSheet>
 		
 		<view class="up-short-video__footer">
 			<view class="up-short-video__progress" style="z-index: 999;">
-				<up-slider 
+				<UpSlider 
 					:model-value="currentProgress" 
 					:min="0" 
 					:max="100" 
@@ -124,42 +124,50 @@
 					height="1px"
 					@changing="onProgressChanging"
 					@change="onProgressChange"
-				></up-slider>
+				></UpSlider>
 			</view>
 			
 			<slot name="tabbar">
-				<up-tabbar
+				<UpTabbar
                     :fixed="true"
                     :placeholder="true"
                     :safeAreaInsetBottom="true"
                     borderColor="rgba(255,255,255,0.25) !important"
                     backgroundColor="rgba(255,255,255,0.05)"
                 >
-					<up-tabbar-item
+					<UpTabbarItem
 						@click="goNext()"
 						text="Home"
 						icon="home"
 					>
-					</up-tabbar-item>
-					<up-tabbar-item
+					</UpTabbarItem>
+					<UpTabbarItem
 						text="Discover"
 						icon="photo"
-					></up-tabbar-item>
-					<up-tabbar-item
+					></UpTabbarItem>
+					<UpTabbarItem
 						text="Live"
 						icon="play-right"
-					></up-tabbar-item>
-					<up-tabbar-item
+					></UpTabbarItem>
+					<UpTabbarItem
 						text="Mine"
 						icon="account"
-					></up-tabbar-item>
-				</up-tabbar>
+					></UpTabbarItem>
+				</UpTabbar>
 			</slot>
 		</view>
 	</view>
 </template>
 
 <script setup lang="uts">
+import UpActionSheet from '../up-action-sheet/up-action-sheet.uvue'
+import UpAvatar from '../up-avatar/up-avatar.uvue'
+import UpButton from '../up-button/up-button.uvue'
+import UpIcon from '../up-icon/up-icon.uvue'
+import UpSlider from '../up-slider/up-slider.uvue'
+import UpTabbar from '../up-tabbar/up-tabbar.uvue'
+import UpTabbarItem from '../up-tabbar-item/up-tabbar-item.uvue'
+import UpTabs from '../up-tabs/up-tabs.uvue'
 import { ref, computed, watch, nextTick, getCurrentInstance } from 'vue'
 
 function createSpeedOptions(): Array<UTSJSONObject> {

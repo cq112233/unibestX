@@ -19,7 +19,7 @@
       >
         <view class="refresh-content">
           <view class="refresh-indicator">
-            <up-icon name="arrow-downward" size="26px"></up-icon>
+            <UpIcon name="arrow-downward" size="26px"></UpIcon>
           </view>
           <text class="refresh-text">下拉刷新</text>
         </view>
@@ -33,7 +33,7 @@
       >
         <view class="refresh-content">
           <view class="refresh-indicator">
-            <up-icon name="arrow-upward" size="26px"></up-icon>
+            <UpIcon name="arrow-upward" size="26px"></UpIcon>
           </view>
           <text class="refresh-text">释放刷新</text>
         </view>
@@ -68,7 +68,7 @@
       >
         <slot></slot>
 
-        <up-loadmore
+        <UpLoadmore
           v-if="showLoadmore"
           v-bind="loadmoreProps"
         />
@@ -77,7 +77,7 @@
       <view v-else>
         <slot></slot>
 
-        <up-loadmore
+        <UpLoadmore
           v-if="showLoadmore"
           v-bind="loadmoreProps"
         />
@@ -87,6 +87,8 @@
 </template>
 
 <script setup lang="uts">
+import UpIcon from '../up-icon/up-icon.uvue'
+import UpLoadmore from '../up-loadmore/up-loadmore.uvue'
 import { ref, watch } from 'vue'
 
 defineOptions({

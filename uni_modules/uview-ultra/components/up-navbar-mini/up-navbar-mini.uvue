@@ -1,9 +1,9 @@
 <template>
 	<view class="up-navbar-mini" :class="[customClass]">
 		<view class="up-navbar-mini__inner" :class="[fixed ? 'up-navbar-mini--fixed' : '']">
-			<up-status-bar
+			<UpStatusBar
 				v-if="safeAreaInsetTop"
-			></up-status-bar>
+			></UpStatusBar>
 			<view
 				class="up-navbar-mini__content"
 				:style="contentStyle"
@@ -15,20 +15,20 @@
 					@tap="leftClick"
 				>
 					<slot name="left">
-						<up-icon
+						<UpIcon
 							:name="leftIcon"
 							:size="iconSize"
 							:color="iconColor"
-						></up-icon>
+						></UpIcon>
 					</slot>
 				</view>
 				<view style="padding: 10px 10px;">
-					<up-line direction="col" color="#fff" length="16px"></up-line>
+					<UpLine direction="col" color="#fff" length="16px"></UpLine>
 				</view>
                 <view
 					class="up-navbar-mini__content__center" @tap="homeClick">
                     <slot name="center">
-                        <up-icon name="home" :size="iconSize" :color="iconColor"></up-icon>
+                        <UpIcon name="home" :size="iconSize" :color="iconColor"></UpIcon>
                     </slot>
                 </view>
 			</view>
@@ -37,6 +37,9 @@
 </template>
 
 <script setup lang="uts">
+import UpIcon from '../up-icon/up-icon.uvue'
+import UpLine from '../up-line/up-line.uvue'
+import UpStatusBar from '../up-status-bar/up-status-bar.uvue'
 import { computed } from 'vue'
 import { addUnit } from '../../libs/function/index'
 

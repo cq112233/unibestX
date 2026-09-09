@@ -3,7 +3,7 @@
 		<view class="up-color-picker__trigger" :style="triggerStyle" @click="open">
 			<slot></slot>
 		</view>
-		<up-popup :show="show" mode="bottom" round="10" @close="close" @open="onPopupOpen" :closeOnClickOverlay="true">
+		<UpPopup :show="show" mode="bottom" round="10" @close="close" @open="onPopupOpen" :closeOnClickOverlay="true">
 			<view class="up-color-picker__content">
 				<view class="up-color-picker__header">
 					<text class="up-color-picker__title">选择颜色</text>
@@ -42,8 +42,8 @@
 						</view>
 					</view>
 					<view class="up-color-picker__gradient-controls">
-						<up-button type="primary" :color="confirmColor" size="mini" plain class="up-color-picker__add-btn" text="添加颜色" @click="addGradientColor"></up-button>
-						<up-button type="info" size="mini" plain class="up-color-picker__add-btn" text="删除当前" @click="removeEditingGradientColor"></up-button>
+						<UpButton type="primary" :color="confirmColor" size="mini" plain class="up-color-picker__add-btn" text="添加颜色" @click="addGradientColor"></UpButton>
+						<UpButton type="info" size="mini" plain class="up-color-picker__add-btn" text="删除当前" @click="removeEditingGradientColor"></UpButton>
 					</view>
 					<view class="up-color-picker__gradient-direction">
 						<text class="up-color-picker__label">方向:</text>
@@ -118,16 +118,18 @@
 						<text class="up-color-picker__preview-text">{{ displayColor }}</text>
 					</view>
 					<view class="up-color-picker__actions">
-						<up-button type="primary" :color="confirmColor" size="small" class="up-color-picker__btn" text="确定" @click="confirm"></up-button>
-						<up-button type="info" size="small" class="up-color-picker__btn" text="取消" @click="close"></up-button>
+						<UpButton type="primary" :color="confirmColor" size="small" class="up-color-picker__btn" text="确定" @click="confirm"></UpButton>
+						<UpButton type="info" size="small" class="up-color-picker__btn" text="取消" @click="close"></UpButton>
 					</view>
 				</view>
 			</view>
-		</up-popup>
+		</UpPopup>
 	</view>
 </template>
 
 <script setup lang="uts">
+import UpButton from '../up-button/up-button.uvue'
+import UpPopup from '../up-popup/up-popup.uvue'
 import { ref, computed, watch, onMounted, getCurrentInstance, nextTick } from 'vue'
 import type { Ref } from 'vue'
 import { upGetRect } from '../../libs/function/index.uts'

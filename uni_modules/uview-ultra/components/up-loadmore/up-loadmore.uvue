@@ -3,13 +3,13 @@
 	    class="up-loadmore"
 	    :style="loadmoreStyle"
 	>
-		<up-line
+		<UpLine
 		    length="140rpx"
 		    :color="lineColor"
 		    :hairline="false"
 			:dashed="dashed"
 			v-if="line"
-		></up-line>
+		></UpLine>
 		<view
 		    :class="status == 'loadmore' || status == 'nomore' ? 'up-more' : ''"
 		    class="up-loadmore__content"
@@ -18,11 +18,11 @@
 			    class="up-loadmore__content__icon-wrap"
 			    v-if="status == 'loading' && icon"
 			>
-				<up-loading-icon
+				<UpLoadingIcon
 				    :color="iconColor"
 				    :size="iconSize"
 				    :mode="loadingIcon"
-				></up-loading-icon>
+				></UpLoadingIcon>
 			</view>
 			<text
 			    class="up-line-11"
@@ -31,17 +31,19 @@
 			    @tap="loadMore"
 			>{{ showText }}</text>
 		</view>
-		<up-line
+		<UpLine
 		    length="140rpx"
 		    :color="lineColor"
 			:hairline="false"
 			:dashed="dashed"
 			v-if="line"
-		></up-line>
+		></UpLine>
 	</view>
 </template>
 
 <script setup lang="uts">
+import UpLine from '../up-line/up-line.uvue'
+import UpLoadingIcon from '../up-loading-icon/up-loading-icon.uvue'
 import { computed } from 'vue'
 import { addUnit, addStyle, deepMerge } from '../../libs/function/index.uts'
 

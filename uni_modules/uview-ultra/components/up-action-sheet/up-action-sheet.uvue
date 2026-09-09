@@ -1,5 +1,5 @@
 <template>
-	<up-popup
+	<UpPopup
 	    :show="show"
 	    mode="bottom"
 	    @close="closeHandler"
@@ -16,12 +16,12 @@
 			        class="up-action-sheet__header__icon-wrap"
 			        @tap.stop="cancel"
 			    >
-			        <up-icon
+			        <UpIcon
 			            name="close"
 			            size="17"
 			            color="#c8c9cc"
 			            bold
-			        ></up-icon>
+			        ></UpIcon>
 			    </view>
 			</view>
 			<text
@@ -32,7 +32,7 @@
 			    v-if="description"
 			>{{description}}</text>
 			<slot>
-				<up-line v-if="description"></up-line>
+				<UpLine v-if="description"></UpLine>
 				<scroll-view direction="vertical" class="up-action-sheet__item-wrap" :style="{maxHeight: wrapMaxHeight}">
 					<view :key="index" v-for="(item, index) in actions">
 						<!-- #ifdef MP -->
@@ -62,7 +62,7 @@
 							    :hover-class="item['disabled'] != true && item['loading'] != true ? 'up-action-sheet--hover' : ''"
 							    :hover-stay-time="150"
 							>
-								<up-loading-icon
+								<UpLoadingIcon
 								    v-if="item['loading']"
 								    custom-class="van-action-sheet__loading"
 								    size="18"
@@ -82,15 +82,15 @@
 							<!-- #ifdef MP -->
 						</button>
 						<!-- #endif -->
-						<up-line v-if="index !== actions.length - 1"></up-line>
+						<UpLine v-if="index !== actions.length - 1"></UpLine>
 					</view>
 				</scroll-view>
 			</slot>
-			<up-gap
+			<UpGap
 			    bgColor="#eaeaec"
 			    height="6"
 			    v-if="cancelText"
-			></up-gap>
+			></UpGap>
 			<view class="up-action-sheet__item-wrap__item up-action-sheet__cancel"
 				hover-class="up-action-sheet--hover" @tap="cancel" v-if="cancelText">
 				<text
@@ -100,10 +100,15 @@
 				>{{cancelText}}</text>
 			</view>
 		</view>
-	</up-popup>
+	</UpPopup>
 </template>
 
 <script setup lang="uts">
+import UpGap from '../up-gap/up-gap.uvue'
+import UpIcon from '../up-icon/up-icon.uvue'
+import UpLine from '../up-line/up-line.uvue'
+import UpLoadingIcon from '../up-loading-icon/up-loading-icon.uvue'
+import UpPopup from '../up-popup/up-popup.uvue'
 import type { PropType } from 'vue'
 import { computed, onBeforeUnmount, getCurrentInstance } from 'vue'
 // import { propsActionSheet } from './props'

@@ -3,7 +3,7 @@
         <view @click="open">
             <slot name="trigger"></slot>
         </view>
-        <up-popup
+        <UpPopup
             v-model:show="show"
             mode="bottom"
             :closeable="pageInline ? false : closeable"
@@ -53,32 +53,35 @@
                     <view class="up-goods-sku__content__count">
                         <view class="up-goods-sku__content__count__title"><text class="up-goods-sku__content__count__title-text">购买数量</text></view>
                         <view class="up-goods-sku__content__count__control">
-                            <up-number-box 
+                            <UpNumberBox 
                                 v-model="buyNum" 
                                 :min="1" 
                                 :max="maxBuyNum"
                                 :disabled="!canBuy"
                                 @change="onNumChange"
-                            ></up-number-box>
+                            ></UpNumberBox>
                         </view>
                     </view>
                 </scroll-view>
                 
                 <view class="up-goods-sku__footer">
-                    <up-button 
+                    <UpButton 
                         type="primary" 
                         :disabled="!canBuy" 
                         @click="onConfirm"
                     >
                         {{ confirmText }}
-                    </up-button>
+                    </UpButton>
                 </view>
             </view>
-        </up-popup>
+        </UpPopup>
     </view>
 </template>
 
 <script setup lang="uts">
+import UpButton from '../up-button/up-button.uvue'
+import UpNumberBox from '../up-number-box/up-number-box.uvue'
+import UpPopup from '../up-popup/up-popup.uvue'
 import { ref, computed, onMounted } from 'vue'
 
 function emptySkuList(): Array<UTSJSONObject> {

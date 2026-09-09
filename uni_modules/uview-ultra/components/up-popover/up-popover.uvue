@@ -1,6 +1,6 @@
 <template>
 	<view class="up-popover">
-		<up-tooltip
+		<UpTooltip
 			ref="tooltip"
 			:text="textValue"
 			:color="color"
@@ -26,11 +26,12 @@
 					</slot>
 				</view>
 			</template>
-		</up-tooltip>
+		</UpTooltip>
 	</view>
 </template>
 
 <script setup lang="uts">
+import UpTooltip from '../up-tooltip/up-tooltip.uvue'
 import { ref, computed } from 'vue'
 
 defineOptions({

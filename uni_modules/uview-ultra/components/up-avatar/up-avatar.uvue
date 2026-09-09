@@ -7,20 +7,20 @@
 	>
 		<slot>
 			<template v-if="icon != ''">
-				<up-icon
+				<UpIcon
 					:name="icon"
 					:size="fontSize"
 					:color="color"
-				></up-icon>
+				></UpIcon>
 			</template>
 			<template v-else-if="text != ''">
-				<up-text
+				<UpText
 					:text="text"
 					:size="fontSize"
 					:color="color"
 					align="center"
 					:style="{justifyContent: 'center'}"
-				></up-text>
+				></UpText>
 			</template>
 			<template v-else>
 				<image
@@ -37,6 +37,8 @@
 </template>
 
 <script setup lang="uts">
+import UpText from '../up-text/up-text.uvue'
+import UpIcon from '../up-icon/up-icon.uvue'
 import { ref, computed, watch, onMounted } from 'vue'
 import { addStyle, addUnit, random, deepMerge } from '../../libs/function/index'
 

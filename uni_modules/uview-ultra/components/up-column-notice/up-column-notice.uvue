@@ -8,11 +8,11 @@
 				class="up-notice__left-icon"
 				v-if="icon"
 			>
-				<up-icon
+				<UpIcon
 					:name="icon"
 					:color="color"
 					size="19"
-				></up-icon>
+				></UpIcon>
 			</view>
 		</slot>
 		<swiper
@@ -39,24 +39,25 @@
 			class="up-notice__right-icon"
 			v-if="['link', 'closable'].includes(mode)"
 		>
-			<up-icon
+			<UpIcon
 				v-if="mode === 'link'"
 				name="arrow-right"
 				:size="17"
 				:color="color"
-			></up-icon>
-			<up-icon
+			></UpIcon>
+			<UpIcon
 				v-if="mode === 'closable'"
 				name="close"
 				:size="16"
 				:color="color"
 				@click="close"
-			></up-icon>
+			></UpIcon>
 		</view>
 	</view>
 </template>
 
 <script setup lang="uts">
+import UpIcon from '../up-icon/up-icon.uvue'
 import type { PropType } from 'vue'
 import { computed, reactive } from 'vue';
 import defProps from './columnNotice';

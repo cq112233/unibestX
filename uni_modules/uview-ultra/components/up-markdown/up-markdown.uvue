@@ -1,14 +1,15 @@
 <template>
   <view class="up-markdown" :class="theme" :style="markdownStyle">
-    <up-parse
+    <UpParse
       :content="parsedContent"
       :previewImg="previewImg"
       :tag-style="markdownTagStyle"
-    ></up-parse>
+    ></UpParse>
   </view>
 </template>
 
 <script setup lang="uts">
+import UpParse from '../up-parse/up-parse.uvue'
 import { ref, computed, watch } from 'vue'
 import { useMarked } from '../../libs/marked-uts/common/marked'
 

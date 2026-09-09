@@ -15,12 +15,12 @@
 				</slot>
 			</template>
 			<view class="up-search__content__icon">
-				<up-icon
+				<UpIcon
 					@tap="clickIcon"
 				    :size="searchIconSize"
 				    :name="searchIcon"
 				    :color="searchIconColor != '' ? searchIconColor : color"
-				></up-icon>
+				></UpIcon>
 			</view>
 			<input
 			    confirm-type="search"
@@ -46,12 +46,12 @@
 			    v-if="isShowClear"
 			    @click="clear"
 			>
-				<up-icon
+				<UpIcon
 				    name="close"
 				    size="11"
 				    color="#ffffff"
 					customStyle="line-height: 12px"
-				></up-icon>
+				></UpIcon>
 			</view>
             <slot name="inputRight"></slot>
 		</view>
@@ -65,6 +65,7 @@
 </template>
 
 <script setup lang="uts">
+import UpIcon from '../up-icon/up-icon.uvue'
 import { ref, computed, watch, onMounted, nextTick } from 'vue'
 import { addUnit, addStyle, deepMerge } from '../../libs/function/index.uts'
 

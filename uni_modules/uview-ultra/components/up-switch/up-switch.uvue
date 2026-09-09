@@ -21,7 +21,7 @@
 			:class="[modelValue == activeValue ? 'up-switch__node--on' : '']"
 		    :style="nodeStyle"
 		>
-			<up-loading-icon
+			<UpLoadingIcon
 			    :show="loading"
 			    mode="circle"
 			    timingFunction='linear'
@@ -33,6 +33,7 @@
 </template>
 
 <script setup lang="uts">
+import UpLoadingIcon from '../up-loading-icon/up-loading-icon.uvue'
 import { computed, nextTick } from 'vue'
 import { addStyle, getPx, addUnit, deepMerge } from '../../libs/function/index.uts'
 import config from '../../libs/config/config'

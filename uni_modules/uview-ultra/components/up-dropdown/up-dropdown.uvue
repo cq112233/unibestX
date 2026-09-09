@@ -11,9 +11,9 @@
 					<view class="up-dropdown__menu__item__arrow" :class="{
 						'up-dropdown__menu__item__arrow--rotate': index == current
 					}">
-						<up-icon :custom-style="{display: 'flex'}" :name="props.menuIcon"
+						<UpIcon :custom-style="{display: 'flex'}" :name="props.menuIcon"
 							:size="menuIconSizeUnit"
-							:color="getMenuIconColor(index)"></up-icon>
+							:color="getMenuIconColor(index)"></UpIcon>
 					</view>
 				</view>
 			</view>
@@ -29,6 +29,7 @@
 </template>
 
 <script setup lang="uts">
+import UpIcon from '../up-icon/up-icon.uvue'
 	import { computed, ref, watch, onMounted, getCurrentInstance, provide } from 'vue'
 	import { addUnit, getWindowInfo, upGetRect, deepMerge } from '../../libs/function/index.uts';
 	import { UPDropdownMenu } from './types.uts';

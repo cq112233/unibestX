@@ -33,10 +33,10 @@
 								:keyName="keyName" :index="index"></slot>
 							<template v-else>
 								<view class="up-tabs__wrapper__nav__item__prefix-icon" v-if="item['icon'] != null">
-									<up-icon
+									<UpIcon
 										:name="item['icon']"
 										:customStyle="iconCustomStyle"
-									></up-icon>
+									></UpIcon>
 								</view>
 							</template>
 							<slot name="content" v-if="$slots['content'] != null"
@@ -48,7 +48,7 @@
 								class="up-tabs__wrapper__nav__item__text"
 								:style="textStyle(index)"
 							>{{ item[keyName] }}</text>
-							<up-badge
+							<UpBadge
 								:show="getShowValue(item)"
 								:isDot="getBadgePropValue(item, 'isDot')"
 								:value="getBadgePropValue(item, 'value')"
@@ -61,7 +61,7 @@
 								:numberType="getBadgePropValue(item, 'numberType')"
 								:inverted="getBadgePropValue(item, 'inverted')"
 								customStyle="margin-left: 4px;"
-							></up-badge>
+							></UpBadge>
 						</view>
 						<view
 							class="up-tabs__wrapper__nav__line"
@@ -78,6 +78,8 @@
 </template>
 
 <script setup lang="uts">
+import UpBadge from '../up-badge/up-badge.uvue'
+import UpIcon from '../up-icon/up-icon.uvue'
 import { ref, computed, watch, onMounted, getCurrentInstance, nextTick } from 'vue'
 import badgeProps from '../../components/up-badge/badge'
 import { addUnit, addStyle, deepMerge, getPx, sleep, getWindowInfo, upGetRect } from '../../libs/function/index.uts'

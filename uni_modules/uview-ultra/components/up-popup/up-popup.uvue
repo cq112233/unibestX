@@ -1,6 +1,6 @@
 <template>
   <view class="up-popup" :class="[customClass]">
-    <up-overlay
+    <UpOverlay
       v-if="overlay && !pageInline"
       :show="show && !pageInline"
       :z-index="zIndex"
@@ -8,8 +8,8 @@
       :custom-style="overlayStyle"
       :opacity="overlayOpacity"
       @click="overlayClick"
-    ></up-overlay>
-    <up-transition
+    ></UpOverlay>
+    <UpTransition
       :show="pageInline ? true : show"
       :custom-style="transitionStyle"
       :mode="pageInline ? 'none' : position"
@@ -41,7 +41,7 @@
             <view class="up-popup__drag__bar" :class="dragBarClass"></view>
           </slot>
         </view>
-        <up-status-bar v-if="safeAreaInsetTop"></up-status-bar>
+        <UpStatusBar v-if="safeAreaInsetTop"></UpStatusBar>
         <slot></slot>
         <!-- top 模式底部拖拽条 -->
         <view
@@ -65,20 +65,25 @@
           hover-stay-time="150"
           @tap.stop="close"
         >
-          <up-icon
+          <UpIcon
             name="close"
             color="#909399"
             size="18"
             bold
-          ></up-icon>
+          ></UpIcon>
         </view>
-        <up-safe-bottom v-if="safeAreaInsetBottom"></up-safe-bottom>
+        <UpSafeBottom v-if="safeAreaInsetBottom"></UpSafeBottom>
       </view>
-    </up-transition>
+    </UpTransition>
   </view>
 </template>
 
 <script setup lang="uts">
+import UpIcon from '../up-icon/up-icon.uvue'
+import UpOverlay from '../up-overlay/up-overlay.uvue'
+import UpSafeBottom from '../up-safe-bottom/up-safe-bottom.uvue'
+import UpStatusBar from '../up-status-bar/up-status-bar.uvue'
+import UpTransition from '../up-transition/up-transition.uvue'
 import { computed, ref, shallowRef, watch } from 'vue';
 import { addStyle, addUnit, deepMerge } from '../../libs/function/index';
 

@@ -1,6 +1,6 @@
 <template>
     <view class="up-agreement">
-        <up-modal v-model:show="show" showCancelButton @confirm="confirm" @cancel="close" confirmText="阅读并同意">
+        <UpModal v-model:show="show" showCancelButton @confirm="confirm" @cancel="close" confirmText="阅读并同意">
             <view class="agreement-content">
                 <slot>
                     <text class="agreement-text">
@@ -14,11 +14,12 @@
                     </text>
                 </slot>
             </view>
-        </up-modal>
+        </UpModal>
     </view>
 </template>
 
 <script setup lang="uts">
+import UpModal from '../up-modal/up-modal.uvue'
 import { ref } from 'vue'
 
 defineOptions({

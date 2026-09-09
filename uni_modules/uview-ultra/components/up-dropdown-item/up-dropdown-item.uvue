@@ -4,18 +4,18 @@
 		<template v-if="$slots['default'] == null && $slots['$default'] == null">
 			<view class="up-dropdown-item__scroll" :style="scrollHeightStyle">
 				<view class="up-dropdown-item__options">
-					<up-cell-group>
-						<up-cell @click="cellClick(item['value'])" :arrow="false"
+					<UpCellGroup>
+						<UpCell @click="cellClick(item['value'])" :arrow="false"
 							v-for="(item, index) in props.options" :key="index">
 							<template #title>
 								<text class="up-dropdown-item__text" :class="{
 									'up-dropdown-item__text--active': isItemActive(item) && activeColor == '#2979ff'
 								}" :style="getItemTextStyle(item)">{{ item['label'] != null ? item['label']!.toString() : '' }}</text>
 							</template>
-							<up-icon v-if="isItemActive(item)"
-								name="checkbox-mark" :color="activeColor == '#2979ff' ? 'primary' : activeColor" size="18"></up-icon>
-						</up-cell>
-					</up-cell-group>
+							<UpIcon v-if="isItemActive(item)"
+								name="checkbox-mark" :color="activeColor == '#2979ff' ? 'primary' : activeColor" size="18"></UpIcon>
+						</UpCell>
+					</UpCellGroup>
 				</view>
 			</view>
 		</template>
@@ -26,6 +26,9 @@
 </template>
 
 <script setup lang="uts">
+import UpIcon from '../up-icon/up-icon.uvue'
+import UpCell from '../up-cell/up-cell.uvue'
+import UpCellGroup from '../up-cell-group/up-cell-group.uvue'
 	import type { Ref, ComputedRef, PropType } from 'vue'
 	import { computed, ref, watch, onMounted, inject } from 'vue'
 	import { addUnit } from '../../libs/function/index.uts';

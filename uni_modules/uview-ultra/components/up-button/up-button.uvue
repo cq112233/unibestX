@@ -5,24 +5,24 @@
 		:hover-class="!disabled && !loading ? 'up-button--active' : ''"
 		:class="bemClass">
 		<template v-if="loading">
-		    <up-loading-icon
+		    <UpLoadingIcon
 		        :mode="loadingMode"
 		        :size="loadingIconSize"
 		        :color="loadingColor"
-		    ></up-loading-icon>
+		    ></UpLoadingIcon>
 		    <text
 		        class="up-button__text up-button__loading-text"
 		        :style="textStyle"
 		    >{{ loadingText != '' ? loadingText : text }}</text>
 		</template>
 		<template v-else>
-		    <up-icon
+		    <UpIcon
 		        v-if="icon != ''"
 		        :name="icon"
 		        :color="iconColorCom"
 		        :size="iconSizeComputed"
 		        :customStyle="{ marginRight: '2px' }"
-		    ></up-icon>
+		    ></UpIcon>
 		    <slot>
 		        <text
 		            class="up-button__text"
@@ -60,6 +60,8 @@
 </template>
 
 <script setup lang="uts">
+import UpIcon from '../up-icon/up-icon.uvue'
+import UpLoadingIcon from '../up-loading-icon/up-loading-icon.uvue'
 import { computed } from 'vue'
 import { addStyle, addUnit, getPx, bem, deepMerge } from '../../libs/function/index'
 import { throttle } from '../../libs/function/throttle'

@@ -6,11 +6,11 @@
 	    @click="backToTop"
 	>
 		<slot>
-			<up-icon
+			<UpIcon
 			    :name="icon"
 			    size="22"
 			    color="#2563eb"
-			></up-icon>
+			></UpIcon>
 			<text
 			    v-if="text != ''"
 			    class="up-back-top__text"
@@ -20,6 +20,7 @@
 </template>
 
 <script setup lang="uts">
+import UpIcon from '../up-icon/up-icon.uvue'
 import { computed } from 'vue'
 import { addStyle, deepMerge } from '../../libs/function/index'
 

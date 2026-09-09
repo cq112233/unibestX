@@ -18,13 +18,14 @@
                 :style="iconStyle"
             ></image>
             <view v-if="showLoading && loading" class="up-qrcode__loading">
-                <up-loading-icon vertical :text="loadingText" textSize="14px"></up-loading-icon>
+                <UpLoadingIcon vertical :text="loadingText" textSize="14px"></UpLoadingIcon>
             </view>
         </view>
     </view>
 </template>
 
 <script setup lang="uts">
+import UpLoadingIcon from '../up-loading-icon/up-loading-icon.uvue'
 import { ref, computed, watch, onMounted, getCurrentInstance, nextTick } from 'vue'
 import { createQrCells, getQrRenderCountWithQuietZone } from './qrcode.uts'
 

@@ -1,6 +1,6 @@
 <template>
 	<view class="up-collapse-item">
-		<up-cell
+		<UpCell
 			:title="titleCpu"
 			:value="value"
 			:label="label"
@@ -36,13 +36,13 @@
 			</template>
 			<template #right-icon>
 				<template v-if="showRight">
-					<up-icon v-if="$slots['right-icon'] != null" :size="16"
-						name="arrow-right"></up-icon>
+					<UpIcon v-if="$slots['right-icon'] != null" :size="16"
+						name="arrow-right"></UpIcon>
 					<slot name="right-icon">
 					</slot>
 				</template>
 			</template>
-		</up-cell>
+		</UpCell>
 		<view
 			class="up-collapse-item__content"
 			:style="contentHeightStyle"
@@ -53,11 +53,14 @@
 				:ref="elId"
 			><slot /></view>
 		</view>
-		<up-line v-if="parentData['border'] != null && (parentData['border'] as boolean)"></up-line>
+		<UpLine v-if="parentData['border'] != null && (parentData['border'] as boolean)"></UpLine>
 	</view>
 </template>
 
 <script setup lang="uts">
+import UpIcon from '../up-icon/up-icon.uvue'
+import UpLine from '../up-line/up-line.uvue'
+import UpCell from '../up-cell/up-cell.uvue'
 	import { nextTick, ref, watch, computed, onMounted, getCurrentInstance } from 'vue'
 	import { guid, sleep, upGetRect, error, addUnit } from '../../libs/function/index'
 	import { array as testArray } from '../../libs/function/test'

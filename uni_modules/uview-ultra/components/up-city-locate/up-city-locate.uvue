@@ -1,6 +1,6 @@
 <template>
 	<view class="up-city-locate">
-		<up-index-list :indexList="indexList">
+		<UpIndexList :indexList="indexList">
 			<template #header>
 				<view class="up-current-city-wrap">
 					<view class="up-current-city-title"><text class="up-current-city-title-text">定位城市</text></view>
@@ -11,10 +11,10 @@
 			</template>
 			<template :key="index" v-for="(item, index) in cityList">
 				<!-- #ifdef APP-NVUE -->
-				<up-index-anchor :text="getIndexText(index)"></up-index-anchor>
+				<UpIndexAnchor :text="getIndexText(index)"></UpIndexAnchor>
 				<!-- #endif -->
-				<up-index-item>
-					<up-index-anchor :text="getIndexText(index)"></up-index-anchor>
+				<UpIndexItem>
+					<UpIndexAnchor :text="getIndexText(index)"></UpIndexAnchor>
 					<view class="hot-city-list" v-if="index == 0">
 						<view class="" v-for="(item1, index1) in getCityGroup(item)" :key="index1" @tap="selectedCity(item1)">
 							<view class="hot-city-item"><text class="hot-city-item-text">{{ getCityName(item1) }}</text></view>
@@ -24,20 +24,24 @@
 						<view class="list__item" @tap="selectedCity(item1)">
 							<text class="list__item__city-name">{{getCityName(item1)}}</text>
 						</view>
-						<up-line></up-line>
+						<UpLine></UpLine>
 					</view>
-				</up-index-item>
+				</UpIndexItem>
 			</template>
 			<template #footer>
 				<view class="up-safe-area-inset--bottom">
 					<text class="list__footer"></text>
 				</view>
 			</template>
-		</up-index-list>
+		</UpIndexList>
 	</view>
 </template>
 
 <script setup lang="uts">
+import UpIndexAnchor from '../up-index-anchor/up-index-anchor.uvue'
+import UpIndexItem from '../up-index-item/up-index-item.uvue'
+import UpLine from '../up-line/up-line.uvue'
+import UpIndexList from '../up-index-list/up-index-list.uvue'
 import { ref, watch, onMounted } from 'vue'
 
 defineOptions({

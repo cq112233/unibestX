@@ -9,9 +9,9 @@
 					v-if="$slots['icon'] != null || icon != ''">
 					<slot name="icon" v-if="$slots['icon'] != null">
 					</slot>
-					<up-icon v-else :name="icon"
+					<UpIcon v-else :name="icon"
 						:custom-style="iconStyle"
-						:size="size == 'large' ? '22px' : '18px'"></up-icon>
+						:size="size == 'large' ? '22px' : '18px'"></UpIcon>
 				</view>
 				<view class="up-cell__title">
 					<slot name="title" v-if="$slots['title'] != null && title == ''">
@@ -38,9 +38,9 @@
 				v-if="$slots['right-icon'] != null || isLink"
 				:class="[`up-cell__right-icon-wrap--${arrowDirection}`]">
 				<slot name="right-icon">
-					<up-icon v-if="rightIcon != ''" :name="rightIcon"
+					<UpIcon v-if="rightIcon != ''" :name="rightIcon"
 						:custom-style="rightIconStyle" :color="disabled ? '#c8c9cc' : 'info'"
-						:size="size == 'large' ? '18px' : '16px'"></up-icon>
+						:size="size == 'large' ? '18px' : '16px'"></UpIcon>
 				</slot>
 			</view>
 			<view class="up-cell__right-icon-wrap" v-if="$slots['righticon'] != null"
@@ -49,11 +49,13 @@
 				</slot>
 			</view>
 		</view>
-		<up-line v-if="border"></up-line>
+		<UpLine v-if="border"></UpLine>
 	</view>
 </template>
 
 <script setup lang="uts">
+import UpIcon from '../up-icon/up-icon.uvue'
+import UpLine from '../up-line/up-line.uvue'
 	import { computed } from 'vue'
 	import defProps from './cell'
 	import { addStyle } from '../../libs/function/index'

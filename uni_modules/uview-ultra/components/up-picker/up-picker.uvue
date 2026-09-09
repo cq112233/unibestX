@@ -11,14 +11,14 @@
         </view>
       </slot>
     </view>
-    <up-popup
+    <UpPopup
       :show="pageInline || show || (hasInput && showByClickInput)"
       :mode="popupMode"
       :pageInline="pageInline"
       @close="closeHandler"
     >
       <view class="up-picker">
-        <up-toolbar
+        <UpToolbar
           v-if="showToolbar"
           :cancelColor="cancelColor"
           :confirmColor="confirmColor"
@@ -32,7 +32,7 @@
           <template #right>
             <slot name="toolbar-right"></slot>
           </template>
-        </up-toolbar>
+        </UpToolbar>
         <view v-if="toolbarBottomSlot">
           <slot name="toolbar-bottom"></slot>
         </view>
@@ -136,14 +136,17 @@
           v-if="loading"
           class="up-picker--loading"
         >
-          <up-loading-icon mode="circle"></up-loading-icon>
+          <UpLoadingIcon mode="circle"></UpLoadingIcon>
         </view>
       </view>
-    </up-popup>
+    </UpPopup>
   </view>
 </template>
 
 <script setup lang="uts">
+import UpLoadingIcon from '../up-loading-icon/up-loading-icon.uvue'
+import UpPopup from '../up-popup/up-popup.uvue'
+import UpToolbar from '../up-toolbar/up-toolbar.uvue'
 import { ref, computed, watch, nextTick } from 'vue'
 import { addUnit } from '../../libs/function/index'
 

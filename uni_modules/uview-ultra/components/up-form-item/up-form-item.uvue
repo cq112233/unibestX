@@ -24,10 +24,10 @@
 							class="up-form-item__body__left__content__icon"
 							v-if="leftIcon != ''"
 						>
-							<up-icon
+							<UpIcon
 								:name="leftIcon"
 								:custom-style="leftIconStyle"
-							></up-icon>
+							></UpIcon>
 						</view>
 						<view
 							class="up-form-item__body__left__content__label"
@@ -62,15 +62,17 @@
 				:style="messageStyle"
 			>{{ message }}</text>
 		</slot>
-		<up-line
+		<UpLine
 			v-if="borderBottom"
 			:color="lineColor"
 			:customStyle="lineStyle"
-		></up-line>
+		></UpLine>
 	</view>
 </template>
 
 <script setup lang="uts">
+import UpIcon from '../up-icon/up-icon.uvue'
+import UpLine from '../up-line/up-line.uvue'
 	import type { PropType } from 'vue'
 	import { getCurrentInstance, ref, reactive, computed, onMounted, watch } from 'vue'
 	import defProps from './formItem.uts'

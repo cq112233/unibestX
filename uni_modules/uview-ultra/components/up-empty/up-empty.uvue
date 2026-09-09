@@ -4,13 +4,13 @@
 	    :style="mergedEmptyStyle"
 	    v-if="show"
 	>
-		<up-icon
+		<UpIcon
 			v-if="!isSrc"
 			:name="mode === 'message' ? 'chat' : `empty-${mode}`"
 			:size="iconSize"
 			:color="iconColor"
 			margin-top="14"
-		></up-icon>
+		></UpIcon>
 		<image
 			v-else
 			:style="imageDimensionStyle"
@@ -28,6 +28,7 @@
 </template>
 
 <script setup lang="uts">
+import UpIcon from '../up-icon/up-icon.uvue'
 import { computed, getCurrentInstance } from 'vue'
 import { mpSharedMpOptions } from '../../libs/composable/useMp'
 import { commonProps, useUltraUI } from '../../libs/composable/useUltraUI'

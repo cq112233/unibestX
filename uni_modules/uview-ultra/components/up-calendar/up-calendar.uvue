@@ -1,5 +1,5 @@
 <template>
-	<up-popup
+	<UpPopup
 		:show="show"
 		mode="bottom"
 		closeable
@@ -90,7 +90,7 @@
 			</view>
 			<slot name="footer" v-if="showConfirm">
 				<view class="up-calendar__confirm">
-					<up-button
+					<UpButton
 						shape="circle"
 						:text="
                             buttonDisabled ? elConfirmDisabledText : elConfirmText
@@ -100,14 +100,16 @@
 						@click="confirm"
 						:disabled="buttonDisabled"
 						customStyle="min-width:120px;"
-					></up-button>
+					></UpButton>
 				</view>
 			</slot>
 		</view>
-	</up-popup>
+	</UpPopup>
 </template>
 
 <script setup lang="uts">
+import UpButton from '../up-button/up-button.uvue'
+import UpPopup from '../up-popup/up-popup.uvue'
 import { ref, computed, watch, onMounted, nextTick } from 'vue'
 import uHeader from './header.uvue'
 import uMonth from './month.uvue'

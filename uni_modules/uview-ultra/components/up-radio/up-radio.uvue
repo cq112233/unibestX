@@ -12,7 +12,7 @@
 		    :style="[iconWrapStyle]"
 		>
 			<slot name="icon">
-				<up-icon
+				<UpIcon
 				    class="up-radio__icon-wrap__icon"
 				    name="checkbox-mark"
 				    :size="elIconSize"
@@ -36,6 +36,7 @@
 </template>
 
 <script setup lang="uts">
+import UpIcon from '../up-icon/up-icon.uvue'
 	import { computed, inject, ref, getCurrentInstance } from 'vue'
 	import type { ComputedRef } from 'vue'
 	import defProps from './radio.uts'

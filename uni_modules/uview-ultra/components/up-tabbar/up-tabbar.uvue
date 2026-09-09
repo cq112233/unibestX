@@ -9,7 +9,7 @@
 			<view class="up-tabbar__content__item-wrapper">
 				<slot />
 			</view>
-			<up-safe-bottom v-if="safeAreaInsetBottom"></up-safe-bottom>
+			<UpSafeBottom v-if="safeAreaInsetBottom"></UpSafeBottom>
 		</view>
 		<view
 		    class="up-tabbar__placeholder"
@@ -22,6 +22,7 @@
 </template>
 
 <script setup lang="uts">
+import UpSafeBottom from '../up-safe-bottom/up-safe-bottom.uvue'
 import { computed, ref, watch, provide, onMounted, getCurrentInstance } from 'vue'
 import { addStyle, deepMerge, sleep, upGetRect } from '../../libs/function/index.uts'
 

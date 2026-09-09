@@ -12,7 +12,7 @@
 		    :style="[iconWrapStyle]"
 		>
 			<slot name="icon">
-				<up-icon
+				<UpIcon
 				    class="up-checkbox__icon-wrap__icon"
 				    name="checkbox-mark"
 				    :size="elIconSize"
@@ -34,6 +34,7 @@
 </template>
 
 <script setup lang="uts">
+import UpIcon from '../up-icon/up-icon.uvue'
 	import { computed, ref, watch, onMounted, inject, getCurrentInstance } from 'vue'
 	import type { ComputedRef } from 'vue'
 	import { addStyle, addUnit, deepMerge, formValidate, error } from '../../libs/function/index'

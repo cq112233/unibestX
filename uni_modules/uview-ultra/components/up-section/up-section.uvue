@@ -22,18 +22,19 @@
 					class="up-section__right__text"
 					:style="subTitleStyle"
 				>{{ subTitle }}</text>
-				<up-icon
+				<UpIcon
 					v-if="arrow"
 					name="arrow-right"
 					:color="subColor"
 					size="12"
-				></up-icon>
+				></UpIcon>
 			</slot>
 		</view>
 	</view>
 </template>
 
 <script setup lang="uts">
+import UpIcon from '../up-icon/up-icon.uvue'
 import { computed } from 'vue'
 import { addStyle, addUnit } from '../../libs/function/index.uts'
 

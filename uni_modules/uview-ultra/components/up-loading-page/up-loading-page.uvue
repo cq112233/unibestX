@@ -1,5 +1,5 @@
 <template>
-    <up-transition
+    <UpTransition
         :show="loading"
         :custom-style="transitionStyle"
     >
@@ -13,12 +13,12 @@
                         mode="widthFix"
 						:style="imageSizeStyle"
                     ></image>
-                    <up-loading-icon
+                    <UpLoadingIcon
                         v-else
                         :mode="loadingMode"
                         :size="formattedIconSize"
                         :color="loadingColor"
-                    ></up-loading-icon>
+                    ></UpLoadingIcon>
                 </view>
                 <slot>
                     <text
@@ -29,10 +29,12 @@
                 </slot>
             </view>
         </view>
-    </up-transition>
+    </UpTransition>
 </template>
 
 <script setup lang="uts">
+import UpLoadingIcon from '../up-loading-icon/up-loading-icon.uvue'
+import UpTransition from '../up-transition/up-transition.uvue'
 import { computed } from 'vue'
 import { addUnit, deepMerge, addStyle } from '../../libs/function/index'
 

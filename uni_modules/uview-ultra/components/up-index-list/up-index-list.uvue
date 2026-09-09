@@ -6,7 +6,7 @@
 			class="up-index-list__sticky-header"
 			style="position: absolute; top: 0; left: 0; right: 0; z-index: 2;"
 		>
-			<up-index-anchor :text="keyVal(uIndexList[activeIndex])" />
+			<UpIndexAnchor :text="keyVal(uIndexList[activeIndex])" />
 		</view>
 		<scroll-view
 			:scroll-top="scrollTop"
@@ -49,7 +49,7 @@
 				>{{ keyVal(item) }}</text>
 			</view>
 		</view>
-		<up-transition
+		<UpTransition
 			mode="fade"
 			:show="touching"
 			:customStyle="indicatorTransitionStyle"
@@ -63,11 +63,13 @@
 					{{ activeIndex >= 0 ? keyVal(uIndexList[activeIndex]) : '' }}
 				</text>
 			</view>
-		</up-transition>
+		</UpTransition>
 	</view>
 </template>
 
 <script setup lang="uts">
+import UpIndexAnchor from '../up-index-anchor/up-index-anchor.uvue'
+import UpTransition from '../up-transition/up-transition.uvue'
 	import type { PropType } from 'vue'
 	import { ref, computed, watch, onMounted, getCurrentInstance } from 'vue'
 	import { addUnit, getWindowInfo, sleep, getPx, random, upGetRect } from '../../libs/function/index'

@@ -9,13 +9,14 @@
 			</slot>
         </view>
         <view class="up-cell-group__wrapper">
-			<up-line v-if="border"></up-line>
+			<UpLine v-if="border"></UpLine>
             <slot />
         </view>
     </view>
 </template>
 
 <script setup lang="uts">
+import UpLine from '../up-line/up-line.uvue'
 	import { computed } from 'vue'
 	import { addStyle } from '../../libs/function/index'
 	import defProps from './cellGroup'
@@ -72,4 +73,3 @@
 		}
     }
 </style>
-

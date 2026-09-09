@@ -1,5 +1,5 @@
 <template>
-	<up-popup
+	<UpPopup
 		:show="popupShow"
 		mode="bottom"
 		:overlay="true"
@@ -10,24 +10,24 @@
 		@close="close"
 	>
 		<view class="up-cascader__header up-cascader__header--column" v-if="headerDirection == 'column'">
-			<up-steps v-if="popupShow" dot direction="column" :current="tabsIndex">
-				<up-steps-item
+			<UpSteps v-if="popupShow" dot direction="column" :current="tabsIndex">
+				<UpStepsItem
 					v-for="(item, index) in genTabsList"
 					:key="index"
 					:index="index"
 					:title="getTabName(item)"
 					@click="stepClick(index)"
-				></up-steps-item>
-			</up-steps>
+				></UpStepsItem>
+			</UpSteps>
 		</view>
 		<view class="up-cascader__header up-cascader__header--row" v-else>
-			<up-tabs
+			<UpTabs
 				v-if="popupShow"
 				:list="genTabsList"
 				:scrollable="true"
 				v-model:current="tabsIndex"
 				@change="tabsChange"
-			></up-tabs>
+			></UpTabs>
 		</view>
 		<view class="area-box">
 			<view class="area-box__levels" :class="{ 'change': isChange }" :style="levelWrapStyle">
@@ -39,22 +39,22 @@
 					>
 						<view class="area-item__panel">
 							<scroll-view direction="vertical" class="area-item__scroll">
-								<up-cell-group v-if="canShowLevel(levelIndex)">
-									<up-cell
+								<UpCellGroup v-if="canShowLevel(levelIndex)">
+									<UpCell
 										v-for="(item, index) in levelData"
 										:key="index"
 										:title="getItemLabel(item)"
 										@click="levelChange(levelIndex, index)"
 									>
 										<template #right-icon>
-											<up-icon
+											<UpIcon
 												v-if="isSelected(levelIndex, index)"
 												size="17"
 												name="checkbox-mark"
-											></up-icon>
+											></UpIcon>
 										</template>
-									</up-cell>
-								</up-cell-group>
+									</UpCell>
+								</UpCellGroup>
 							</scroll-view>
 						</view>
 					</view>
@@ -63,22 +63,30 @@
 		</view>
 		<view class="up-cascader-action">
 			<view class="up-cascader-action__btn">
-				<up-button
+				<UpButton
 					@click="handleCancel"
 					type="default"
 					:customStyle="{ backgroundColor: '#f5f6f7' }"
 				>
 					<text class="up-cascader-action__cancel-text">{{ cancelText }}</text>
-				</up-button>
+				</UpButton>
 			</view>
 			<view class="up-cascader-action__btn">
-				<up-button @click="handleConfirm" type="primary" :text="confirmText"></up-button>
+				<UpButton @click="handleConfirm" type="primary" :text="confirmText"></UpButton>
 			</view>
 		</view>
-	</up-popup>
+	</UpPopup>
 </template>
 
 <script setup lang="uts">
+import UpButton from '../up-button/up-button.uvue'
+import UpCell from '../up-cell/up-cell.uvue'
+import UpCellGroup from '../up-cell-group/up-cell-group.uvue'
+import UpIcon from '../up-icon/up-icon.uvue'
+import UpPopup from '../up-popup/up-popup.uvue'
+import UpSteps from '../up-steps/up-steps.uvue'
+import UpStepsItem from '../up-steps-item/up-steps-item.uvue'
+import UpTabs from '../up-tabs/up-tabs.uvue'
 import { ref, computed, watch } from 'vue'
 import { t } from '../../libs/i18n'
 

@@ -25,7 +25,7 @@
             }"
         >
             <slot :showList="showList">
-                <up-icon class="cursor-pointer" :class="{ 'show-list': showList }" name="plus" :color="color"></up-icon>
+                <UpIcon class="cursor-pointer" :class="{ 'show-list': showList }" name="plus" :color="color"></UpIcon>
             </slot>
         </view>
         <view
@@ -42,7 +42,7 @@
                         :style="getItemStyle(item)"
                         @click="itemClick(item, index)"
                     >
-                        <up-icon :name="getItemName(item)" :color="getItemColor(item)"></up-icon>
+                        <UpIcon :name="getItemName(item)" :color="getItemColor(item)"></UpIcon>
                     </view>
                 </template>
             </slot>
@@ -51,6 +51,7 @@
 </template>
 
 <script setup lang="uts">
+import UpIcon from '../up-icon/up-icon.uvue'
 import { ref } from 'vue'
 
 defineOptions({

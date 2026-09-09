@@ -1,9 +1,9 @@
 <template>
   <view class="up-tree-node" :style="{ paddingLeft: depth * 20 + 'px' }">
     <view class="up-tree-node-content" @click="toggle">
-      <up-icon v-if="hasChildren" class="up-tree-node-toggle"
+      <UpIcon v-if="hasChildren" class="up-tree-node-toggle"
        :name="isExpanded ? 'arrow-down-fill' : 'play-right-fill'" size="12" />
-      <up-checkbox
+      <UpCheckbox
         v-if="showCheckbox"
         usedAlone
         :size="12"
@@ -38,6 +38,8 @@
 </template>
 
 <script setup lang="uts">
+import UpCheckbox from '../up-checkbox/up-checkbox.uvue'
+import UpIcon from '../up-icon/up-icon.uvue'
 import { computed } from 'vue'
 
 function valueToString(value: any | null): string {

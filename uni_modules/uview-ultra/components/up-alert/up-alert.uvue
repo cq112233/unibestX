@@ -1,5 +1,5 @@
 <template>
-	<up-transition
+	<UpTransition
 	    mode="fade"
 	    :show="show"
 	>
@@ -13,11 +13,11 @@
 			    class="up-alert__icon"
 			    v-if="showIcon"
 			>
-				<up-icon
+				<UpIcon
 				    :name="iconName"
 				    size="18"
 				    :color="iconColor"
-				></up-icon>
+				></UpIcon>
 			</view>
 			<view
 			    class="up-alert__content"
@@ -43,17 +43,19 @@
 			    v-if="closable"
 			    @tap.stop="closeHandler"
 			>
-				<up-icon
+				<UpIcon
 				    name="close"
 				    :color="iconColor"
 				    size="15"
-				></up-icon>
+				></UpIcon>
 			</view>
 		</view>
-	</up-transition>
+	</UpTransition>
 </template>
 
 <script setup lang="uts">
+import UpIcon from '../up-icon/up-icon.uvue'
+import UpTransition from '../up-transition/up-transition.uvue'
 import { computed, ref } from 'vue'
 import { mpSharedMpOptions } from '../../libs/composable/useMp'
 import { addUnit, addStyle } from '../../libs/function/index'

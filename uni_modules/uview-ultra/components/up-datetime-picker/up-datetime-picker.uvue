@@ -3,14 +3,14 @@
         <view v-if="hasInput" class="up-datetime-picker__has-input"
 			@click="changeShow"
         >
-            <up-input
+            <UpInput
                 :placeholder="placeholder"
                 :readonly="!!showByClickInput"
                 border="surround"
                 v-model="inputValue"
-            ></up-input>
+            ></UpInput>
         </view>
-        <up-picker
+        <UpPicker
             ref="picker"
             :show="pageInline || show || (hasInput && showByClickInput)"
             :pageInline="pageInline"
@@ -40,11 +40,13 @@
                 <slot name="toolbar-bottom">
                 </slot>
             </template>
-        </up-picker>
+        </UpPicker>
     </view>
 </template>
 
 <script setup lang="uts">
+import UpInput from '../up-input/up-input.uvue'
+import UpPicker from '../up-picker/up-picker.uvue'
 	// 导入ref
 	import type { PropType } from 'vue'
 	import { ref, watch, nextTick, onMounted } from 'vue';

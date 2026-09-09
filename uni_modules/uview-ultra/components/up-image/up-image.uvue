@@ -19,11 +19,11 @@
 			:style="loadingStyle"
 		>
 			<slot name="loading">
-				<up-icon
+				<UpIcon
 					:name="loadingIcon"
 					:width="width"
 					:height="height"
-				></up-icon>
+				></UpIcon>
 			</slot>
 		</view>
 		<view
@@ -32,17 +32,18 @@
 			:style="errorStyle"
 		>
 			<slot name="error">
-				<up-icon
+				<UpIcon
 					:name="errorIcon"
 					:width="width"
 					:height="height"
-				></up-icon>
+				></UpIcon>
 			</slot>
 		</view>
 	</view>
 </template>
 
 <script setup lang="uts">
+import UpIcon from '../up-icon/up-icon.uvue'
 	import { nextTick, ref, computed, onMounted, watch } from 'vue'
 	import { addUnit, addStyle, deepMerge } from '../../libs/function/index'
 	import defProps from './image'

@@ -1,6 +1,6 @@
 <template>
 	<view class="up-toast">
-		<up-overlay
+		<UpOverlay
 			:show="isShow"
 			:zIndex="tmpConfig['zIndex']"
 			:custom-style="overlayStyle"
@@ -10,36 +10,40 @@
 				:style="[contentStyle]"
 				:class="['up-type-' + tmpConfig['type'], (tmpConfig['type'] === 'loading' || tmpConfig['loading'] as boolean) ?  'up-toast__content--loading' : '']"
 			>
-				<up-loading-icon
+				<UpLoadingIcon
 					v-if="tmpConfig['type'] === 'loading'"
 					mode="circle"
 					color="rgb(255, 255, 255)"
 					inactiveColor="rgb(120, 120, 120)"
 					size="25"
-				></up-loading-icon>
-				<up-icon
+				></UpLoadingIcon>
+				<UpIcon
 					v-else-if="tmpConfig['type'] !== 'defalut' && iconName != ''"
 					:name="iconName"
 					size="17"
 					:color="tmpConfig['type']"
 					:customStyle="iconStyle"
-				></up-icon>
-				<up-gap
+				></UpIcon>
+				<UpGap
 					v-if="tmpConfig['type'] === 'loading' || tmpConfig['loading'] as boolean"
 					height="12"
 					bgColor="transparent"
-				></up-gap>
+				></UpGap>
 				<text
 					class="up-toast__content__text"
 					:class="['up-toast__content__text--' + tmpConfig['type']]"
 					style="max-width: 400rpx;"
 				>{{ tmpConfig['message'] }}</text>
 			</view>
-		</up-overlay>
+		</UpOverlay>
 	</view>
 </template>
 
 <script setup lang="uts">
+import UpGap from '../up-gap/up-gap.uvue'
+import UpIcon from '../up-icon/up-icon.uvue'
+import UpLoadingIcon from '../up-loading-icon/up-loading-icon.uvue'
+import UpOverlay from '../up-overlay/up-overlay.uvue'
 import { computed, ref, onBeforeUnmount } from 'vue'
 import { os, getWindowInfo, deepMerge, type2icon } from '../../libs/function/index'
 import color from '../../libs/config/color'

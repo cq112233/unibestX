@@ -16,18 +16,18 @@
             >￥</text
         >
         <view class="up-text__prefix-icon" v-if="prefixIcon != ''">
-            <up-icon
+            <UpIcon
                 :name="prefixIcon"
                 :customStyle="customIconStyle"
-            ></up-icon>
+            ></UpIcon>
         </view>
-        <up-link
+        <UpLink
             v-if="mode === 'link'" class="up-text__value"
             :style="{fontWeight: valueStyle['fontWeight'], wordWrap: valueStyle['wordWrap'], fontSize: valueStyle['fontSize']}"
             :class="[`up-text__value--${type}`,	`up-line-${lines}`]" :text="value"
             :href="href"
             underLine
-        ></up-link>
+        ></UpLink>
         <template v-else-if="openType != '' && isMp">
             <button
                 class="up-reset-button up-text__value"
@@ -62,15 +62,17 @@
             >{{ value }}</text
         >
         <view class="up-text__suffix-icon" v-if="suffixIcon != ''">
-            <up-icon
+            <UpIcon
                 :name="suffixIcon"
                 :customStyle="customIconStyle"
-            ></up-icon>
+            ></UpIcon>
         </view>
     </view>
 </template>
 
 <script setup lang="uts">
+import UpIcon from '../up-icon/up-icon.uvue'
+import UpLink from '../up-link/up-link.uvue'
 import { computed } from 'vue'
 import { addStyle, addUnit, deepMerge, error, priceFormat, timeFormat } from '../../libs/function/index'
 import { date as testDate, url as testUrl } from '../../libs/function/test'

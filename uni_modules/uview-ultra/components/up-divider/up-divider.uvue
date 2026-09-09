@@ -4,12 +4,12 @@
 	    :style="customDividerStyle"
 		@tap="clickHandler"
 	>
-		<up-line
+		<UpLine
 		    :color="lineColor"
 		    :customStyle="leftLineStyle"
 		    :hairline="hairline"
 			:dashed="dashed"
-		></up-line>
+		></UpLine>
 		<text
 		    v-if="dot"
 		    class="up-divider__dot"
@@ -19,16 +19,17 @@
 		    class="up-divider__text"
 		    :style="textStyle"
 		>{{text}}</text>
-		<up-line
+		<UpLine
 		    :color="lineColor"
 		    :customStyle="rightLineStyle"
 		    :hairline="hairline"
 			:dashed="dashed"
-		></up-line>
+		></UpLine>
 	</view>
 </template>
 
 <script lang="uts" setup>
+import UpLine from '../up-line/up-line.uvue'
 	import { computed } from 'vue'
 	import defProps from './divider'
 	import { addStyle, addUnit } from '../../libs/function/index.uts'
