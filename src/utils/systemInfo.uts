@@ -221,7 +221,6 @@ export function updateSystemInfo() {
   const windowInfo = uni.getWindowInfo();
   // ---- 编译器版本：各平台来源不同，互相兜底 ----
   let compileVer = '';
-  console.log('compileVer', compileVer);
   // #ifdef H5
   try {
     const conf = (globalThis as any).__uniConfig as any;
@@ -232,20 +231,14 @@ export function updateSystemInfo() {
   catch { }
 
   // #endif
-  console.log('compileVer', 1);
   // 非 H5：优先 uni.getSystemInfoSync().uniCompileVersion（全端通用 uni 编译版本，已验证 App 可取）
   if (compileVer == '') {
     try {
-      console.log('compileVer', 2);
       const sysInfo = uni.getSystemInfoSync();
-
-      console.log(sysInfo.uniCompileVersion, 'uniCompileVersion');
       const uniCompileVersion = `${sysInfo.uniCompileVersion ?? ''}`;
-
       compileVer = uniCompileVersion;
     }
     catch {
-      console.log('compileVer', 3);
     }
   }
   // 兜底：getAppBaseInfo 版本字段（微信小程序用 appCompilerVersion/SDKVersion，其余用 version 引擎号）
