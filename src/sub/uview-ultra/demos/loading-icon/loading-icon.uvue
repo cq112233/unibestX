@@ -4,13 +4,67 @@
     <view class="p-[16px]">
       <view class="demo-block">
         <text class="demo-label">基础用法</text>
-        <UpLoadingIcon class="my-[10px]"></UpLoadingIcon>
+        <view class="flex-row items-center mb-[10px]">
+          <UpLoadingIcon class="mr-[10px]"></UpLoadingIcon>
+          <text class="demo-desc">默认 Loading（spinner）</text>
+        </view>
       </view>
 
       <view class="demo-block">
         <text class="demo-label">其他模式</text>
-        <UpLoadingIcon mode="circle" class="my-[10px]"></UpLoadingIcon>
-        <UpLoadingIcon mode="semicircle" class="my-[10px]"></UpLoadingIcon>
+        <view class="flex-row items-center mb-[10px]">
+          <UpLoadingIcon mode="circle" class="mr-[10px]"></UpLoadingIcon>
+          <text class="demo-desc">circle 圆环</text>
+        </view>
+        <view class="flex-row items-center">
+          <UpLoadingIcon mode="semicircle" class="mr-[10px]"></UpLoadingIcon>
+          <text class="demo-desc">semicircle 半圆</text>
+        </view>
+      </view>
+
+      <view class="demo-block">
+        <text class="demo-label">自定义颜色</text>
+        <view class="flex-row items-center mb-[10px]">
+          <UpLoadingIcon color="#2979ff" class="mr-[10px]"></UpLoadingIcon>
+          <text class="demo-desc">主题色 #2979ff</text>
+        </view>
+        <view class="flex-row items-center mb-[10px]">
+          <UpLoadingIcon mode="circle" color="#19be6b" inactive-color="#e8f7f0" class="mr-[10px]"></UpLoadingIcon>
+          <text class="demo-desc">circle 成功色</text>
+        </view>
+        <view class="flex-row items-center">
+          <UpLoadingIcon mode="semicircle" color="#f90" class="mr-[10px]"></UpLoadingIcon>
+          <text class="demo-desc">semicircle 橙色</text>
+        </view>
+      </view>
+
+      <view class="demo-block">
+        <text class="demo-label">自定义尺寸</text>
+        <view class="flex-row items-center mb-[10px]">
+          <UpLoadingIcon :size="18" class="mr-[14px]"></UpLoadingIcon>
+          <text class="demo-desc">18px</text>
+        </view>
+        <view class="flex-row items-center mb-[10px]">
+          <UpLoadingIcon :size="32" class="mr-[8px]"></UpLoadingIcon>
+          <text class="demo-desc">32px</text>
+        </view>
+        <view class="flex-row items-center">
+          <UpLoadingIcon :size="44" class="mr-[4px]"></UpLoadingIcon>
+          <text class="demo-desc">44px</text>
+        </view>
+      </view>
+
+      <view class="demo-block">
+        <text class="demo-label">带文字 / 垂直排列</text>
+        <view class="flex-row items-center mb-[10px]">
+          <UpLoadingIcon text="加载中..." color="#2979ff" class="mr-[10px]"></UpLoadingIcon>
+        </view>
+        <view class="flex-col items-center mb-[10px]">
+          <UpLoadingIcon text="垂直排列" text-color="#2979ff" :vertical="true" :size="32"></UpLoadingIcon>
+        </view>
+        <view class="flex-row items-center">
+          <UpLoadingIcon mode="circle" text="加载中..." :vertical="true" color="#19be6b" text-color="#19be6b"></UpLoadingIcon>
+        </view>
       </view>
     </view>
   </view>
@@ -44,5 +98,9 @@ definePage({
   border-left-width: 3px;
   border-left-style: solid;
   border-left-color: $up-primary;
+}
+.demo-desc {
+  font-size: 13px;
+  color: #909399;
 }
 </style>
