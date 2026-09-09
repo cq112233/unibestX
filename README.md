@@ -47,6 +47,13 @@
 > 本项目内置的 **`z-paging-x`** 分页组件（如 [z-paging-x.uvue](file:///Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/z-paging-x/components/z-paging-x/z-paging-x.uvue)）已由作者进行了**深度定制修改与修复**，专门用于兼容 `uni-app X` 各端平台（特别针对 Android 原生嵌套手势协商、`type="nested"` 架构支持以及各端 CSS 解析限制等进行了优化）。
 > **提示**：请勿直接从官方插件市场重新下载覆盖。若从官方重新下载安装，可能会导致多端兼容性与手势机制失效，届时请务必重新测试与调试！
 
+> ⚠️ **组件导入规范（Vapor 蒸汽模式必须手动 import）**
+>
+> - **问题**：在 **Android Vapor 蒸汽模式**下，凡是 `<template>` 中依赖 **easycom 自动导入**的组件（如直接写小写标签 `<uni-icons>` 而不手动 import），**HBuilderX 运行到真机开发调试时正常，但云端打包发布安装后组件全部失效 / 渲染空白**（组件未被打进出包产物）；
+> - **根因**：Vapor 蒸汽模式打包时，easycom 自动引入的组件不会打进最终产物，导致运行时组件丢失；
+> - **解决**：**所有页面中对用到的组件一律手动 `import`**（`uni_modules` 组件 + `src/components` 自定义组件），且 **import 名与组件标签均用大驼峰（PascalCase）并保持一致**——切勿使用小写标签或短横线写法（如 `<uni-icons>` 应改为 `import UniIcons from '@/uni_modules/.../uni-icons.uvue'` 后再用 `<UniIcons>`）；
+> - **保留 `pages.json` 的 easycom 配置，不要删**：`autoscan: true` 是 uni_modules 内部互相引用（如 `z-paging-x` → `z-paging-x-empty`）所必需，自定义规则（`^NavBar$`、`^e-chart$`）也保留；只要在 src 里对用到的组件手动 import，即可覆盖 easycom、正确打进产物。
+
 `unibestX` —— 最好的 `uni-app X` 开发模板，由 `uni-app X` + `Vue3` + `UTS` + `Vite5` + `Tailwind CSS` + `z-paging-x` 构成，使用了下一代 uni-app 原生开发技术栈，通过 `HBuilderX` 运行 `Android`、`iOS`、`鸿蒙`、`H5` 和 `小程序` 等多端平台。
 
 👉 **在线 H5 演示体验**：[https://cq112233.github.io/unibestX/](https://cq112233.github.io/unibestX/)

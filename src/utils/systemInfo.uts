@@ -1112,7 +1112,7 @@ export function updateAvailableHeight(kuProps: AppKuHeightProps, selectedTabbarS
         console.log(`safeBottom:${safeBottom}`, 0);
         console.log(`safeAreaBottom:${safeAreaBottom}`, 812);
         console.log(`safeTop:${safeTop}`, 0);
-        sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeAreaBottom;
+        sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeBottom;
         console.log(`H5-availableHeight: ${sys.availableHeight}`);
         systemId++;
         // #endif
@@ -1130,7 +1130,7 @@ export function updateAvailableHeight(kuProps: AppKuHeightProps, selectedTabbarS
           console.log(`safeBottom:${safeBottom}`, 0);
           console.log(`safeAreaBottom:${safeAreaBottom}`, 780);
           console.log(`safeTop:${safeTop}`, 35);
-          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeAreaBottom;
+          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeBottom;
           systemId++;
         }
         else {
@@ -1145,7 +1145,7 @@ export function updateAvailableHeight(kuProps: AppKuHeightProps, selectedTabbarS
           console.log(`safeBottom:${safeBottom}`, 0);
           console.log(`safeAreaBottom:${safeAreaBottom}`, 780);
           console.log(`safeTop:${safeTop}`, 35);
-          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeAreaBottom;
+          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeBottom;
           console.log(`vDOM-安卓-availableHeight: ${sys.availableHeight}`);
           systemId++;
         }
@@ -1166,7 +1166,7 @@ export function updateAvailableHeight(kuProps: AppKuHeightProps, selectedTabbarS
           console.log(`safeAreaBottom:${safeAreaBottom}`, 818);
           console.log(`safeTop:${safeTop}`, 59);
           console.log('----', sys.screenHeight - sys.statusBarHeight - sys.navBarHeight - sys.tabBarHeight - safeBottom);
-          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeAreaBottom;
+          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeBottom;
           console.log(`蒸汽模式-IOS-availableHeight: ${sys.availableHeight}`);
         }
         else {
@@ -1181,7 +1181,7 @@ export function updateAvailableHeight(kuProps: AppKuHeightProps, selectedTabbarS
           console.log(`safeBottom:${safeBottom}`, 28);
           console.log(`safeAreaBottom:${safeAreaBottom}`, 788);
           console.log(`safeTop:${safeTop}`, 59);
-          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeAreaBottom;
+          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeBottom;
           console.log(`availableHeight得到高度:${sys.availableHeight}`);
           systemId++;
         }
@@ -1201,7 +1201,7 @@ export function updateAvailableHeight(kuProps: AppKuHeightProps, selectedTabbarS
           console.log(`safeAreaBottom:${safeAreaBottom}`, 788);
           console.log(`safeTop:${safeTop}`, 42);
           console.log('----', sys.screenHeight - sys.statusBarHeight - sys.navBarHeight - sys.tabBarHeight - safeBottom);
-          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeAreaBottom;
+          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeBottom;
           console.log(sys.availableHeight, 'sys.availableHeight');
           systemId++;
         }
@@ -1218,7 +1218,7 @@ export function updateAvailableHeight(kuProps: AppKuHeightProps, selectedTabbarS
           console.log(`safeAreaBottom:${safeAreaBottom}`, 788);
           console.log(`safeTop:${safeTop}`, 39);
           console.log('----', sys.windowHeight - sys.statusBarHeight - sys.navBarHeight - sys.tabBarHeight - safeBottom);
-          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeAreaBottom;
+          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeBottom;
           console.log(sys.availableHeight, 'sys.availableHeight');
           systemId++;
         }
@@ -1239,7 +1239,7 @@ export function updateAvailableHeight(kuProps: AppKuHeightProps, selectedTabbarS
         console.log(`偏移量状态栏statusBarOffset:${statusBarOffset}`, 0);
 
         console.log('----', sys.windowHeight - sys.statusBarHeight - sys.navBarHeight - sys.tabBarHeight - safeBottom);
-        sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeAreaBottom;
+        sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeBottom;
         console.log(sys.availableHeight, 'sys.availableHeight');
         systemId++;
         // #endif
@@ -1255,7 +1255,7 @@ export function updateAvailableHeight(kuProps: AppKuHeightProps, selectedTabbarS
         console.log(`safeBottom:${safeBottom}`, 0);
         console.log(`safeAreaBottom:${safeAreaBottom}`, 812);
         console.log(`safeTop:${safeTop}`, 0);
-        sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeAreaBottom;
+        sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeBottom;
         console.log(`H5-availableHeight: ${sys.availableHeight}`);
         systemId++;
         // #endif
@@ -1274,7 +1274,7 @@ export function updateAvailableHeight(kuProps: AppKuHeightProps, selectedTabbarS
           console.log(`safeBottom:${safeBottom}`, 0);
           console.log(`safeAreaBottom:${safeAreaBottom}`, 780);
           console.log(`safeTop:${safeTop}`, 0);
-          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeAreaBottom;
+          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeBottom;
           systemId++;
         }
         else {
@@ -1291,7 +1291,7 @@ export function updateAvailableHeight(kuProps: AppKuHeightProps, selectedTabbarS
           console.log(`safeTop:${safeTop}`, 0);
           console.log(`偏移量导航栏navBarOffset:${navBarOffset}`, 0);
           console.log(`偏移量状态栏statusBarOffset:${statusBarOffset}`, 0);
-          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeAreaBottom;
+          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeBottom;
           systemId++;
         }
         // #endif
@@ -1312,7 +1312,7 @@ export function updateAvailableHeight(kuProps: AppKuHeightProps, selectedTabbarS
           console.log(`偏移量导航栏navBarOffset:${navBarOffset}`, 0);
           console.log(`偏移量状态栏statusBarOffset:${statusBarOffset}`, 0);
           console.log('----', sys.screenHeight - sys.statusBarHeight - sys.navBarHeight - sys.tabBarHeight - safeBottom);
-          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeAreaBottom;
+          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeBottom;
           console.log(`蒸汽模式-IOS-availableHeight: ${sys.availableHeight}`);
           systemId++;
         }
@@ -1330,7 +1330,7 @@ export function updateAvailableHeight(kuProps: AppKuHeightProps, selectedTabbarS
           console.log(`safeTop:${safeTop}`, 59);
           console.log(`偏移量导航栏navBarOffset:${navBarOffset}`, 0);
           console.log(`偏移量状态栏statusBarOffset:${statusBarOffset}`, 0);
-          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeAreaBottom;
+          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeBottom;
           console.log(`availableHeight得到高度:${sys.availableHeight}`);
           systemId++;
         }
@@ -1350,7 +1350,7 @@ export function updateAvailableHeight(kuProps: AppKuHeightProps, selectedTabbarS
           console.log(`safeAreaBottom:${safeAreaBottom}`, 788);
           console.log(`safeTop:${safeTop}`, 42);
           console.log('----', sys.screenHeight - sys.statusBarHeight - sys.navBarHeight - sys.tabBarHeight - safeBottom);
-          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeAreaBottom;
+          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeBottom;
           console.log(sys.availableHeight, 'sys.availableHeight');
           systemId++;
         }
@@ -1367,7 +1367,7 @@ export function updateAvailableHeight(kuProps: AppKuHeightProps, selectedTabbarS
           console.log(`safeAreaBottom:${safeAreaBottom}`, 788);
           console.log(`safeTop:${safeTop}`, 39);
           console.log('----', sys.windowHeight - sys.statusBarHeight - sys.navBarHeight - sys.tabBarHeight - safeBottom);
-          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeAreaBottom;
+          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeBottom;
           console.log(sys.availableHeight, 'sys.availableHeight');
           systemId++;
         }
@@ -1388,7 +1388,7 @@ export function updateAvailableHeight(kuProps: AppKuHeightProps, selectedTabbarS
         console.log(`偏移量状态栏statusBarOffset:${statusBarOffset}`, 0);
 
         console.log('----', sys.windowHeight - sys.statusBarHeight - sys.navBarHeight - sys.tabBarHeight - safeBottom);
-        sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeAreaBottom;
+        sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeBottom;
         console.log(sys.availableHeight, 'sys.availableHeight');
         systemId++;
         // #endif
@@ -1406,7 +1406,7 @@ export function updateAvailableHeight(kuProps: AppKuHeightProps, selectedTabbarS
         console.log(`safeBottom:${safeBottom}`, 0);
         console.log(`safeAreaBottom:${safeAreaBottom}`, 812);
         console.log(`safeTop:${safeTop}`, 0);
-        sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeAreaBottom;
+        sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeBottom;
         console.log(`H5-availableHeight: ${sys.availableHeight}`);
         systemId++;
         // #endif
@@ -1426,7 +1426,7 @@ export function updateAvailableHeight(kuProps: AppKuHeightProps, selectedTabbarS
           console.log(`safeTop:${safeTop}`, 35);
           console.log(`偏移量导航栏navBarOffset:${navBarOffset}`, 44);
           console.log(`偏移量状态栏statusBarOffset:${statusBarOffset}`, 44);
-          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeAreaBottom;
+          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeBottom;
           systemId++;
         }
         else {
@@ -1441,7 +1441,7 @@ export function updateAvailableHeight(kuProps: AppKuHeightProps, selectedTabbarS
           console.log(`safeBottom:${safeBottom}`, 0);
           console.log(`safeAreaBottom:${safeAreaBottom}`, 780);
           console.log(`safeTop:${safeTop}`, 35);
-          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeAreaBottom;
+          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeBottom;
           console.log(`vDOM-安卓-availableHeight: ${sys.availableHeight}`);
           systemId++;
         }
@@ -1462,7 +1462,7 @@ export function updateAvailableHeight(kuProps: AppKuHeightProps, selectedTabbarS
           console.log(`safeAreaBottom:${safeAreaBottom}`, 818);
           console.log(`safeTop:${safeTop}`, 59);
           console.log('----', sys.screenHeight - sys.statusBarHeight - sys.navBarHeight - sys.tabBarHeight - safeBottom);
-          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeAreaBottom;
+          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeBottom;
           console.log(`蒸汽模式-IOS-availableHeight: ${sys.availableHeight}`);
         }
         else {
@@ -1477,7 +1477,7 @@ export function updateAvailableHeight(kuProps: AppKuHeightProps, selectedTabbarS
           console.log(`safeBottom:${safeBottom}`, 28);
           console.log(`safeAreaBottom:${safeAreaBottom}`, 788);
           console.log(`safeTop:${safeTop}`, 59);
-          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeAreaBottom;
+          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeBottom;
           console.log(`availableHeight得到高度:${sys.availableHeight}`);
           systemId++;
         }
@@ -1497,7 +1497,7 @@ export function updateAvailableHeight(kuProps: AppKuHeightProps, selectedTabbarS
           console.log(`safeAreaBottom:${safeAreaBottom}`, 788);
           console.log(`safeTop:${safeTop}`, 42);
           console.log('----', sys.screenHeight - sys.statusBarHeight - sys.navBarHeight - sys.tabBarHeight - safeBottom);
-          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeAreaBottom;
+          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeBottom;
           console.log(sys.availableHeight, 'sys.availableHeight');
           systemId++;
         }
@@ -1514,7 +1514,7 @@ export function updateAvailableHeight(kuProps: AppKuHeightProps, selectedTabbarS
           console.log(`safeAreaBottom:${safeAreaBottom}`, 788);
           console.log(`safeTop:${safeTop}`, 39);
           console.log('----', sys.windowHeight - sys.statusBarHeight - sys.navBarHeight - sys.tabBarHeight - safeBottom);
-          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeAreaBottom;
+          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeBottom;
           console.log(sys.availableHeight, 'sys.availableHeight');
           systemId++;
         }
@@ -1532,7 +1532,7 @@ export function updateAvailableHeight(kuProps: AppKuHeightProps, selectedTabbarS
         console.log(`safeAreaBottom:${safeAreaBottom}`, 778);
         console.log(`safeTop:${safeTop}`, 44);
         console.log('----', sys.windowHeight - sys.statusBarHeight - sys.navBarHeight - sys.tabBarHeight - safeBottom);
-        sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeAreaBottom;
+        sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeBottom;
         console.log(sys.availableHeight, 'sys.availableHeight');
         systemId++;
         // #endif
@@ -1548,7 +1548,7 @@ export function updateAvailableHeight(kuProps: AppKuHeightProps, selectedTabbarS
         console.log(`safeBottom:${safeBottom}`, 0);
         console.log(`safeAreaBottom:${safeAreaBottom}`, 812);
         console.log(`safeTop:${safeTop}`, 0);
-        sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeAreaBottom;
+        sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeBottom;
         console.log(`H5-availableHeight: ${sys.availableHeight}`);
         systemId++;
         // #endif
@@ -1567,7 +1567,7 @@ export function updateAvailableHeight(kuProps: AppKuHeightProps, selectedTabbarS
           console.log(`safeBottom:${safeBottom}`, 0);
           console.log(`safeAreaBottom:${safeAreaBottom}`, 780);
           console.log(`safeTop:${safeTop}`, 35);
-          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeAreaBottom;
+          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeBottom;
           systemId++;
         }
         else {
@@ -1584,7 +1584,7 @@ export function updateAvailableHeight(kuProps: AppKuHeightProps, selectedTabbarS
           console.log(`safeTop:${safeTop}`, 0);
           console.log(`偏移量导航栏navBarOffset:${navBarOffset}`, 0);
           console.log(`偏移量状态栏statusBarOffset:${statusBarOffset}`, 0);
-          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeAreaBottom;
+          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeBottom;
           systemId++;
         }
         // #endif
@@ -1605,7 +1605,7 @@ export function updateAvailableHeight(kuProps: AppKuHeightProps, selectedTabbarS
           console.log(`偏移量导航栏navBarOffset:${navBarOffset}`, 0);
           console.log(`偏移量状态栏statusBarOffset:${statusBarOffset}`, 0);
           console.log('----', sys.screenHeight - sys.statusBarHeight - sys.navBarHeight - sys.tabBarHeight - safeBottom);
-          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeAreaBottom;
+          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeBottom;
           console.log(`蒸汽模式-IOS-availableHeight: ${sys.availableHeight}`);
           systemId++;
         }
@@ -1623,7 +1623,7 @@ export function updateAvailableHeight(kuProps: AppKuHeightProps, selectedTabbarS
           console.log(`safeTop:${safeTop}`, 59);
           console.log(`偏移量导航栏navBarOffset:${navBarOffset}`, 0);
           console.log(`偏移量状态栏statusBarOffset:${statusBarOffset}`, 0);
-          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeAreaBottom;
+          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeBottom;
           console.log(`availableHeight得到高度:${sys.availableHeight}`);
           systemId++;
         }
@@ -1643,7 +1643,7 @@ export function updateAvailableHeight(kuProps: AppKuHeightProps, selectedTabbarS
           console.log(`safeAreaBottom:${safeAreaBottom}`, 788);
           console.log(`safeTop:${safeTop}`, 42);
           console.log('----', sys.screenHeight - sys.statusBarHeight - sys.navBarHeight - sys.tabBarHeight - safeBottom);
-          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeAreaBottom;
+          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeBottom;
           console.log(sys.availableHeight, 'sys.availableHeight');
           systemId++;
         }
@@ -1660,7 +1660,7 @@ export function updateAvailableHeight(kuProps: AppKuHeightProps, selectedTabbarS
           console.log(`safeAreaBottom:${safeAreaBottom}`, 788);
           console.log(`safeTop:${safeTop}`, 39);
           console.log('----', sys.windowHeight - sys.statusBarHeight - sys.navBarHeight - sys.tabBarHeight - safeBottom);
-          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeAreaBottom;
+          sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeBottom;
           console.log(sys.availableHeight, 'sys.availableHeight');
           systemId++;
         }
@@ -1678,7 +1678,7 @@ export function updateAvailableHeight(kuProps: AppKuHeightProps, selectedTabbarS
         console.log(`safeAreaBottom:${safeAreaBottom}`, 788);
         console.log(`safeTop:${safeTop}`, 39);
         console.log('----', sys.windowHeight - sys.statusBarHeight - sys.navBarHeight - sys.tabBarHeight - safeBottom);
-        sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeAreaBottom;
+        sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeBottom;
         console.log(sys.availableHeight, 'sys.availableHeight');
         systemId++;
         // #endif
