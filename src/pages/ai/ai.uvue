@@ -62,7 +62,7 @@
           @confirm="sendMessage"
         />
         <view class="w-[32px] h-[32px] rounded-[16px] bg-[#2563eb] items-center justify-center ml-[8px]" @click="sendMessage">
-          <uni-icons type="paperplane-filled" size="18" color="#ffffff"></uni-icons>
+          <UniIcons type="paperplane-filled" size="18" color="#ffffff"></UniIcons>
         </view>
       </view>
     </view>
@@ -71,6 +71,7 @@
 
 <script setup lang="uts">
 import { safeAreaInsets } from '@/src/utils/systemInfo';
+import UniIcons from '@/uni_modules/uni-icons/components/uni-icons/uni-icons.uvue'
 
 definePage({
   layout: 'navbar',

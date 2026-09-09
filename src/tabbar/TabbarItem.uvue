@@ -5,6 +5,7 @@ import { $t } from '@/src/utils/i18n';
 import { useAppStore } from '@/src/store';
 import { getThemeTokens } from '@/src/utils/theme';
 import type { ThemeTokens } from '@/src/utils/theme';
+import UniIcons from '@/uni_modules/uni-icons/components/uni-icons/uni-icons.uvue';
 
 const props = defineProps({
   item: {
@@ -100,11 +101,11 @@ function getText(): string {
         class="icon-normal"
         style="align-items: center; justify-content: center;"
       >
-        <uni-icons
+        <UniIcons
           :type="getIcon()"
           :size="24"
           :color="getActiveColor()"
-        ></uni-icons>
+        ></UniIcons>
       </view>
 
       <!-- 文本（包含 i18n 翻译，支持动态语言切换） -->

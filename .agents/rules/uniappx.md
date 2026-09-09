@@ -117,13 +117,32 @@ description: uni-app X (UTS) 开发规范与踩坑避坑指南，适用于跨端
 
 ---
 
-## 3. 组件库优先使用与 Easycom 自动导入
+## 3. 组件库优先使用 + 组件必须手动 import（禁用 easycom 自动导入）
+
 *   **组件库优先原则 (Component Library First)**：
-    编写 UI 页面或业务功能时，若 `uni_modules` 中已有现成成熟组件（如 `uni-icons`、`uni-badge-view`、`uni-rate-x`、`uni-number-box-x`、`uni-collapse-x`、`uni-fab-button`、`uni-link-x`、`uni-time-format`、`e-chart`、`z-paging-x`、`mp-html`、`sp-editor`、`lime-qrcode`、`lime-signature` 等），**必须优先使用组件库中的组件**，避免重复手写低效原生结构。
-*   **免去手动 import**：
-    在 `uni_modules` 中的组件，如其目录结构为 `uni_modules/[module-name]/components/[component-name]/[component-name].uvue`，uni-app X 的编译器会自动通过 `easycom` 规则加载，**无需且禁止在页面的 `<script>` 中手动 import 它们**。
-    *   *错误示例*：`import myComponent from 'uni_modules/my-module/components/my-component/my-component.uvue'` (会导致模块加载失败或 App 平台报错)。
-    *   *正确做法*：直接在 `<template>` 中写 `<my-component>`，并在 `pages.json` 中配置对应的 `easycom` 匹配规则。
+    编写 UI 页面或业务功能时，若 `uni_modules` 中已有现成成熟组件（如 `uni-icons`、`lime-icon`、`e-chart`、`lime-signature`、`uni-rate-x`、`uni-collapse-x`、`uni-badge-view`、`uni-number-box-x`、`uni-link-x`、`uni-fab-button`、`uni-time-format`、`z-paging-x`、`mp-html`、`sp-editor`、`lime-qrcode` 等），**必须优先使用组件库中的组件**，避免重复手写低效原生结构。
+*   **⚠️ 必须手动 import，禁止依赖 easycom 自动导入**：
+    凡是在 `<template>` 中使用的组件（`uni_modules` 组件 + `src/components` 自定义组件），**必须在 `<script>` 中手动 `import`**。依赖 `easycom` 自动导入时，**蒸汽(云)打包不会把组件打进出包产物，运行后组件丢失/白屏**（AI 新手最易踩：直接写 `<uni-icons>` 等小写标签却不 import）。
+    *   *错误示例*：直接写 `<uni-icons type="..." />`，页面里却不手动 import，依赖 easycom 自动加载 → 蒸汽模式打包后组件丢失。
+    *   *正确做法*：`import UniIcons from '@/uni_modules/uni-icons/components/uni-icons/uni-icons.uvue'`，再用 `<UniIcons type="..." />`。
+*   **import 名与标签均用 PascalCase 且保持一致**：`import UniIcons → <UniIcons>`。不要写小写标签 `<uni-icons>`，避免命中 easycom 自定义规则（如 `^e-chart$`）导致混用、打包异常。
+
+    ```ts
+    import UniIcons    from '@/uni_modules/uni-icons/components/uni-icons/uni-icons.uvue'
+    import LIcon       from '@/uni_modules/lime-icon/components/l-icon/l-icon.uvue'
+    import EChart      from '@/uni_modules/e-chart/components/e-chart/e-chart.uvue'
+    import LSignature  from '@/uni_modules/lime-signature/components/l-signature/l-signature.uvue'
+    import ZPagingX    from '@/uni_modules/z-paging-x/components/z-paging-x/z-paging-x.uvue'
+    ```
+
+*   **保留 pages.json 的 easycom 配置，不要删**：`autoscan: true` 是 uni_modules 内部互相引用（如 `z-paging-x` → `z-paging-x-empty`）所必需的；自定义规则（`^NavBar$`、`^e-chart$`）也保留。只要在 src 里对用到的组件手动 import，即可覆盖 easycom、正确打进产物。
+*   **检查**：src 里不允许残留小写 easycom 标签：
+
+    ```bash
+    rg -n --glob '*.uvue' '<(uni-icons|l-icon|e-chart|z-paging-x|l-signature)\b' src   # 期望为空
+    ```
+
+    每写一个 `.uvue`，用了组件就先检查该文件是否已手动 import，没有就补上。
 
 
 ---
