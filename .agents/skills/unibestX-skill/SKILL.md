@@ -270,6 +270,39 @@ let list: string[] = []
 - **条件编译**：非全平台支持的 API 必须使用条件编译（如 `// #ifndef APP` 或 `// #ifdef MP-WEIXIN`）。
 - **应用语言**：App 端不支持 `uni.getLocale()`，应使用 `uni.getSystemInfoSync().appLanguage` 或 `uni.getDeviceInfo().osLanguage`。
 
+### 3.6 VDOM / Android VDOM / Vapor 渲染模式与编译兼容避坑
+
+- **渲染模式判定**：用编译条件 `#ifdef VUE3-VAPOR` / `#ifndef VUE3-VAPOR`，不要依赖环境变量或读取 manifest 的运行时 API（无 `VUE3-VAPOR` 之外可靠来源）。
+
+  ```ts
+  export function isVaporMode(): boolean {
+    // #ifdef VUE3-VAPOR
+    return true;
+    // #endif
+    // #ifndef VUE3-VAPOR
+    return false;
+    // #endif
+  }
+  ```
+
+- **TabBar `midButton` 不支持 Vapor / 小程序 / 鸿蒙**：这些端原生 `midButton` 不可用，重命名为 `midButton1`，并同步在 `TabBarConfig` type 中新增 `midButton1?: TabBarMidButton`（否则报 `No parameter with name 'midButton1' found`）。
+
+- **动态读取类型上未声明、但运行时存在的字段（如 `uniCompileVersion`）**：禁止 `(obj as any).field` 点访问（触发 error18 `找不到名称` / Unresolved reference），改用 `UTSJSONObject.getString('field')`：
+
+  ```ts
+  const sysInfo = uni.getSystemInfoSync() as UTSJSONObject;
+  const v = sysInfo.getString('uniCompileVersion') ?? '';
+  ```
+
+- **可空对象属性参与算术**：`systemInfo.value?.availableHeight + 1` 报 `Operator call is prohibited on a nullable receiver`。先取到非空局部变量再运算：
+
+  ```ts
+  const ah: number = systemInfo.value?.availableHeight ?? 0;
+  return ah ? ah + TABBAR_BASE_HEIGHT : 0;
+  ```
+
+- **编译引擎版本字段来源**（全端兜底链）：H5 用 `__uniConfig.compilerVersion`；App 用 `uni.getSystemInfoSync()` 的 `uniCompileVersion`（经 `UTSJSONObject.getString` 读取）；微信小程序用 `appCompilerVersion` / `SDKVersion`；其余用 `appBaseInfo.version`。
+
 ---
 
 ## 4. 页面创建与 `definePage` 规范（AI 新增页面必填）
@@ -411,3 +444,11 @@ onNavbarPullDownRefresh(() => {
 - [ ] 在 `<view>` 上直接定义了文字颜色样式类名（如 `text-[#1e293b]`、`text-primary`）
 - [ ] 在 Tailwind 中使用了 `font-mono` / `font-sans`（必须用内联 `style="font-family: monospace;"`）
 - [ ] 在 `.uvue` 模板的作用域插槽调用点缺少 `as` 类型断言
+
+---
+
+## 7. 案例同步规范（AI 每次修复必须执行）
+
+- **自动同步**：每次修复与本 skill 相关的 VDOM / Android VDOM / Vapor 编译兼容问题后，**必须同步回写本文件**，将修复案例（错误码、错误写法、正确写法）新增到对应章节或**快速参考表**。
+- **已存在则加强**：若该案例已存在于本 skill，则**加重其提示词**（如标记 `⚠️ 高并发高频坑`、突出错误码、补充适用平台范围），确保下次更容易被命中与踩坑。
+- **更新红线清单**：若案例属于「一犯就编译失败」的硬约束，必须同步加入第 6 节红线清单。[ ]
