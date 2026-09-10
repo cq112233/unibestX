@@ -19,6 +19,12 @@
 					class="up-loading-icon__dot"
 					:style="getSpinnerDotStyle(index)"
 				>
+					<!-- 原生端不支持 :before 伪元素，用内层子 view 承载那根小竖条 -->
+					<view
+						class="up-loading-icon__dot-bar"
+						:style="dotBarStyle"
+					>
+					</view>
 				</view>
 			</template>
 		</view>
@@ -145,9 +151,17 @@ const textStyle = computed((): UTSJSONObject => {
   } as UTSJSONObject
 })
 
+// 小竖条的颜色（原生端用内层 view 代替 :before 伪元素，颜色挂在这里）
+const dotBarStyle = computed((): UTSJSONObject => {
+  return {
+    backgroundColor: props.color
+  } as UTSJSONObject
+})
+
 function getSpinnerDotStyle(index: number): UTSJSONObject {
   const style = {} as UTSJSONObject
-  style['backgroundColor'] = props.color
+  // 注意：颜色不在这里设置，旋转盒必须保持满尺寸且自身透明，
+  // 否则整块都会被染色，旋转起来是一块方形色块而不是一根细条
   style['transform'] = `rotate(${((index + 1) * 30).toString()}deg)`
   style['opacity'] = 1 - 0.0625 * index
   return style
@@ -332,9 +346,17 @@ onBeforeUnmount(() => {
 
 		&__dot {
 			position: absolute;
+			top: $up-loading-icon-dot-top;
+			left: $up-loading-icon-dot-left;
 			width: $up-loading-icon-dot-width;
 			height: $up-loading-icon-dot-height;
+			display: flex;
+			flex-direction: row;
+			justify-content: center;
+			align-items: flex-start;
+		}
 
+		&__dot-bar {
 			width: $up-loading-icon-dot-before-width;
 			height: $up-loading-icon-dot-before-height;
 			background-color: $up-loading-icon-dot-before-background-color;
