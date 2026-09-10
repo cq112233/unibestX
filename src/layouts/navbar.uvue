@@ -3,6 +3,7 @@
   <view :class="rootClass" :style="rootStyle">
     <!-- 顶部固定自定义导航栏：位于页面内容上方，不随下拉刷新位移 -->
     <NavBar
+      v-if="isCustomNav"
       :is-navbar-visible="isNavbarVisible"
       :title="displayTitle"
       :show-back="showBack"
@@ -17,7 +18,7 @@
     <scroll-view
       v-if="useCustomRefresher"
       :direction="pageScrollDirection"
-      class="flex-1"
+      class="flex-1 flex flex-col"
       :refresher-enabled="isRefresherEnabled"
       :refresher-triggered="isTriggered"
       :refresher-background="themeTokens.bgContent"
@@ -158,8 +159,6 @@ const props = defineProps({
     default: ''
   }
 });
-
-console.log(props, 'props');
 
 /**
  * 获取 pageStyle 对象
@@ -337,6 +336,21 @@ const navTitleColor = computed((): string => {
     return props.navigationBarTextStyle;
   }
   return props.titleColor;
+});
+
+const isCustomNav = computed((): boolean => {
+  const textStyleFromStyle = (pageStyleObj.value.navigationStyle as string | null) ?? '';
+  if (textStyleFromStyle.length > 0) {
+    if (textStyleFromStyle == 'custom') {
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
+  else {
+    return false;
+  }
 });
 
 const themeTokens = computed((): ThemeTokens => {

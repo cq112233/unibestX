@@ -3,6 +3,8 @@
     <view class="flex-col">
       <!-- rice-ui 组件库入口 -->
       <RiceDemoCard />
+      <!-- 布局页面示例组件 -->
+      <LayoutDemoCard />
 
       <!-- weapp-tailwindcss 样式引擎示例 -->
       <TailwindcssDemoCard />
@@ -40,13 +42,12 @@ import PropsDemoCard from './components/PropsDemoCard.uvue';
 import IconDemoCard from './components/IconDemoCard.uvue';
 import RiceDemoCard from './components/RiceDemoCard.uvue';
 import LangSwitchCard from './components/LangSwitchCard.uvue';
+import LayoutDemoCard from './components/LayoutDemoCard.uvue';
 import ThemeSwitchCard from './components/ThemeSwitchCard.uvue';
 import RouterDemoCard from './components/RouterDemoCard.uvue';
 import HttpDemoCard from './components/HttpDemoCard.uvue';
 import TailwindcssDemoCard from './components/TailwindcssDemoCard.uvue';
 import SystemInfoDemoCard from './components/SystemInfoDemoCard.uvue';
-import { onMounted } from 'vue';
-import { updateSystemInfo } from '@/src/utils/systemInfo';
 import { handleBackPressExit } from '@/src/utils/backPress';
 import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/utils/refresh';
 
@@ -75,16 +76,6 @@ onBackPress((options: OnBackPressOptions): boolean => {
   // #endif
   return false;
 });
-
-onMounted(() => {
-  updateSystemInfo();
-  // #ifdef APP || H5 || MP-WEIXIN
-  uni.onWindowResize((_res) => {
-    updateSystemInfo();
-  });
-  // #endif
-});
 </script>
 
-<style>
-</style>
+<style></style>

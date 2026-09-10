@@ -90,15 +90,53 @@ description: uni-app X (UTS) 开发规范与踩坑避坑指南，适用于跨端
     $app-primary: var(--theme-color, #0957DE);
     ```
 
+*   **页面骨架统一约定（view 根 + 开发高度 = computedAvailableHeight）**：
+    为保证 uni-app X 页面在 navbar / default 布局下高度计算正确、减少布局 bug，页面内容骨架遵循以下约定：
+    *   **根容器用 view，常用 `<view class="flex flex-col flex-1">`**：
+        ```html
+        <view class="flex flex-col flex-1">
+        ```
+        *   `flex-1` 即撑满开发高度（= `computedAvailableHeight`），是便捷写法，navbar / default 布局通用。
+        *   **为何根不用 scroll-view**：navbar / default 布局已用自身 `scroll-view`（`flex-1 flex flex-col`）包住页面 `<slot />`（见 `src/layouts/navbar.uvue`、`src/layouts/default.uvue`），页面若再用 scroll-view 当根会造成双重滚动冲突，根应为普通 `view`。
+    *   **滚动区域的两种写法**：
+        *   **内部自写 scroll-view（⭐ 常用）**：需要滚动的区域在 flex-1 根内自写一个 `scroll-view`，用其 `@scroll` / `@scrolltolower` 监听滚动与触底：
+            ```html
+            <scroll-view direction="vertical" class="flex-1 flex flex-col" @scroll="..." @scrolltolower="...">
+              <!-- 滚动内容 -->
+            </scroll-view>
+            ```
+        *   **整页按内容高度滚动**：根用 `<view class="flex flex-col">`（不加 flex-1），整页由布局 scroll-view 接管，页面用 `onNavbarPageScroll` / `onNavbarReachBottom`（见 `src/utils/pageScroll.uts`）监听，替代原生 `onPageScroll` / `onReachBottom`。
+    *   **内容可用高度用 `computedAvailableHeight`**（navbar / default 通用）：框架已按当前布局自动算好（状态栏 / 导航栏 / tabbar 均已扣除），开发者直接用这个值绑定高度即可，其余不用操心：
+        ```html
+        <view :style="{ height: `${computedAvailableHeight}px` }">
+          <!-- 这就是开发者要写的高度；tabbar 等扣除由框架处理，不用关心 -->
+        </view>
+        ```
+    *   **`VITE_TABBAR_MODE=1` 语义**：原生 TabBar 模式下 `availableHeight` 不含底部 tabbar 区域（底部非编辑区，无需计入）。
+    *   *错误做法*：页面根使用 scroll-view（与布局冲突）；手写 `100vh`/`100%` 硬算高度。
+
 ---
 
-## 3. 组件库优先使用与 Easycom 自动导入
+## 3. 组件库优先使用 + 组件走 easycom 自动导入
+
 *   **组件库优先原则 (Component Library First)**：
-    编写 UI 页面或业务功能时，若 `uni_modules` 中已有现成成熟组件（如 `uni-icons`、`uni-badge-view`、`uni-rate-x`、`uni-number-box-x`、`uni-collapse-x`、`uni-fab-button`、`uni-link-x`、`uni-time-format`、`e-chart`、`z-paging-x`、`mp-html`、`sp-editor`、`lime-qrcode`、`lime-signature` 等），**必须优先使用组件库中的组件**，避免重复手写低效原生结构。
-*   **免去手动 import**：
-    在 `uni_modules` 中的组件，如其目录结构为 `uni_modules/[module-name]/components/[component-name]/[component-name].uvue`，uni-app X 的编译器会自动通过 `easycom` 规则加载，**无需且禁止在页面的 `<script>` 中手动 import 它们**。
-    *   *错误示例*：`import myComponent from 'uni_modules/my-module/components/my-component/my-component.uvue'` (会导致模块加载失败或 App 平台报错)。
-    *   *正确做法*：直接在 `<template>` 中写 `<my-component>`，并在 `pages.json` 中配置对应的 `easycom` 匹配规则。
+    编写 UI 页面或业务功能时，若 `uni_modules` 中已有现成成熟组件（如 `uni-icons`、`lime-icon`、`e-chart`、`lime-signature`、`uni-rate-x`、`uni-collapse-x`、`uni-badge-view`、`uni-number-box-x`、`uni-link-x`、`uni-fab-button`、`uni-time-format`、`z-paging-x`、`mp-html`、`sp-editor`、`lime-qrcode` 等），**必须优先使用组件库中的组件**，避免重复手写低效原生结构。
+*   **✅ 组件直接用短横线小写标签，由 easycom 自动导入，不要手动 import**：
+    `uni_modules/*/components/` 与 `src/components/` 下的组件，模板里直接写 `<uni-icons type="..." />`、`<e-chart />`、`<z-paging-x />` 即可，**无需 `import`**。
+    *   *正确做法*：`<uni-icons type="info" size="28" color="#cbd5e1" />`
+    *   *错误做法*：`import UniIcons from '@/uni_modules/uni-icons/components/uni-icons/uni-icons.uvue'` 再用 `<UniIcons />` —— 多余的样板代码，标签还被迫改成 PascalCase。
+*   **⚠️ 前提：`vite.config.ts` 里的 easycom 插件必须全平台生效**：
+
+    ```ts
+    // 必须无条件加入，不能只限 web/h5 —— App 端也要靠它把 _resolveComponent 转成静态 import
+    uniEasycomPlugin({ exclude: UNI_EASYCOM_EXCLUDE }),
+    ```
+
+    该插件内部名为 `uni:app-easycom`。蒸汽模式 + `vapor-render-target: "bytecode"` 下，只有进入模块 import 图的 `.uvue` 才会生成 `bytes/*.bytes` 视图层字节码；插件若在 App 端被 `UNI_PLATFORM` 条件排除，easycom 组件就不生成 bytecode，**云打包安装后组件不渲染**。历史上正是这个条件被误设，才误导出「必须手动 import」的错误结论。
+*   **例外：不在 easycom 扫描范围内的组件仍需手动 import**：
+    easycom 只自动扫描项目根的 `components/组件名/组件名.uvue` 与 `uni_modules/*/components/`。放在页面目录下的私有组件（如 `src/pages/*/components/ToastDemoCard.uvue`）不会被扫描，**必须手动 import**。
+*   **保留 pages.json 的 easycom 配置，不要删**：`autoscan: true` 是 uni_modules 内部互相引用（如 `z-paging-x` → `z-paging-x-empty`）所必需的；自定义规则（如 `^NavBar$`、`^e-chart$`）也保留。
+*   **排查用**：判断某次构建是否真的编译了 easycom 组件，**数构建日志里的 `正在编译uni_modules/...` 行数**最可靠；`unpackage/dist/build/*/bytes/` 是中间目录，构建间不会可靠清理，可能残留上一轮文件造成误判。
 
 
 ---

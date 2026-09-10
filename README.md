@@ -47,6 +47,20 @@
 > 本项目内置的 **`z-paging-x`** 分页组件（如 [z-paging-x.uvue](file:///Users/chenqi/Documents/chenqi-front/unibestX/uni_modules/z-paging-x/components/z-paging-x/z-paging-x.uvue)）已由作者进行了**深度定制修改与修复**，专门用于兼容 `uni-app X` 各端平台（特别针对 Android 原生嵌套手势协商、`type="nested"` 架构支持以及各端 CSS 解析限制等进行了优化）。
 > **提示**：请勿直接从官方插件市场重新下载覆盖。若从官方重新下载安装，可能会导致多端兼容性与手势机制失效，届时请务必重新测试与调试！
 
+> 🧩 **组件导入规范（easycom 自动导入）**
+>
+> - **用法**：`uni_modules` 组件与 `src/components` 组件**直接在模板里写短横线小写标签即可**，如 `<uni-icons />`、`<e-chart />`、`<z-paging-x />`，由 easycom 自动解析，**无需手动 `import`**；
+> - **例外**：放在页面目录下的私有组件（如 `src/pages/*/components/` 内的组件）不在 easycom 扫描范围内，仍需手动 `import`；
+> - **⚠️ 前提：`vite.config.ts` 中的 easycom 插件必须全平台生效**：
+>
+>   ```ts
+>   // 必须无条件加入，不能只限 web/h5
+>   uniEasycomPlugin({ exclude: UNI_EASYCOM_EXCLUDE }),
+>   ```
+>
+>   该插件内部名为 `uni:app-easycom`，负责把模板里的 easycom 标签转成静态 `import`。Vapor 蒸汽模式 + `vapor-render-target: "bytecode"` 下，只有进入模块 import 图的 `.uvue` 才会生成 `bytes/*.bytes` 视图层字节码——**插件若被 `UNI_PLATFORM` 条件限制在 web/h5，App 端 easycom 组件不生成字节码，云端打包安装后组件全部失效 / 渲染空白**；
+> - **保留 `pages.json` 的 easycom 配置，不要删**：`autoscan: true` 是 uni_modules 内部互相引用（如 `z-paging-x` → `z-paging-x-empty`）所必需，自定义规则（`^NavBar$`、`^e-chart$`）也保留。
+
 `unibestX` —— 最好的 `uni-app X` 开发模板，由 `uni-app X` + `Vue3` + `UTS` + `Vite5` + `Tailwind CSS` + `z-paging-x` 构成，使用了下一代 uni-app 原生开发技术栈，通过 `HBuilderX` 运行 `Android`、`iOS`、`鸿蒙`、`H5` 和 `小程序` 等多端平台。
 
 👉 **在线 H5 演示体验**：[https://cq112233.github.io/unibestX/](https://cq112233.github.io/unibestX/)

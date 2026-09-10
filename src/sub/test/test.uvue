@@ -1,21 +1,65 @@
 <template>
-  <view class="p-[5px] min-h-screen bg-[#f8fafc]">
-    <view class="bg-white rounded-lg p-[5px] shadow-sm border-[1px] border-solid border-[#e2e8f0]">
-      <text class="text-[20px] font-bold text-[#1e293b]">URL Query 页面参数获取测试</text>
-      <text class="text-[12px] text-[#94a3b8] mt-[2px]">本页面用于展示并测试如何获取 URL 中携带的 query 参数。</text>
-
-      <view class="mt-[4px] border-t-[1px] border-top-style-solid border-top-color-[#f1f5f9] pt-[4px]">
-        <view class="mb-[4px]">
-          <text class="text-[14px] font-bold text-[#64748b]">解析到的参数详情：</text>
+  <view class="flex flex-col flex-1 bg-[#f8fafc]">
+    <view class="m-[16px]">
+      <!-- 顶部概览卡片 -->
+      <view class="bg-white rounded-[16px] p-[20px] mb-[16px] border-[1px] border-solid border-[#e2e8f0] shadow-sm">
+        <!-- 标题区：图标徽章 + 标题 -->
+        <view class="flex flex-row items-center mb-[16px]">
+          <view class="w-[42px] h-[42px] rounded-[12px] bg-[#ebf4ff] items-center justify-center mr-[12px]">
+            <uni-icons type="link" size="22" color="#3182ce" />
+          </view>
+          <view class="flex-col flex-1">
+            <text class="text-[18px] font-bold text-[#1e293b]">URL 参数解析</text>
+            <text class="text-[12px] text-[#94a3b8] mt-[2px]">展示当前页面携带的 query 参数</text>
+          </view>
         </view>
 
-        <view v-for="key in optionKeys" :key="key" class="flex flex-row justify-between items-center py-[2px] border-b-[1px] border-bottom-style-solid border-bottom-color-[#f8fafc]">
-          <text class="text-[14px] text-[#64748b] font-medium">{{ key }}:</text>
+        <!-- 统计区 -->
+        <view class="flex flex-row items-center justify-between bg-[#f8fafc] rounded-[12px] p-[12px]">
+          <view class="flex-col">
+            <text class="text-[12px] text-[#64748b]">解析参数数量</text>
+            <text class="text-[20px] font-bold text-[#1e293b] mt-[2px]">{{ optionKeys.length }}</text>
+          </view>
+          <view class="flex-row items-center">
+            <view class="bg-[#3182ce] rounded-[20px] px-[14px] py-[6px]">
+              <text class="text-[13px] font-medium text-white">{{ countLabel }}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 参数详情卡片 -->
+      <view class="bg-white rounded-[16px] p-[20px] border-[1px] border-solid border-[#e2e8f0] shadow-sm">
+        <view class="flex flex-row items-center mb-[8px]">
+          <view class="w-[4px] h-[16px] bg-[#3182ce] rounded-[2px] mr-[8px]" />
+          <text class="text-[16px] font-bold text-[#1e293b]">参数详情</text>
+        </view>
+
+        <!-- 参数列表 -->
+        <view
+          v-for="key in optionKeys"
+          :key="key"
+          class="flex flex-row items-center justify-between py-[12px] border-b-[1px] border-bottom-style-solid border-bottom-color-[#f1f5f9]"
+        >
+          <view class="flex-row items-center mr-[12px]">
+            <view class="w-[6px] h-[6px] rounded-[3px] bg-[#3182ce] mr-[8px]" />
+            <text class="text-[14px] text-[#64748b] font-medium">{{ key }}</text>
+          </view>
           <text class="text-[14px] text-[#334155] font-semibold">{{ getOptionValue(key) }}</text>
         </view>
 
-        <view v-if="optionKeys.length == 0" class="py-[4px] text-center">
-          <text class="text-[14px] text-[#94a3b8]">暂无任何 query 参数</text>
+        <!-- 空态 -->
+        <view v-if="optionKeys.length == 0" class="flex flex-col items-center py-[32px]">
+          <view class="w-[56px] h-[56px] rounded-[16px] bg-[#f8fafc] items-center justify-center">
+            <uni-icons type="info" size="28" color="#cbd5e1" />
+          </view>
+          <text class="text-[14px] text-[#94a3b8] mt-[12px]">暂无任何 query 参数</text>
+          <text class="text-[12px] text-[#cbd5e1] mt-[4px]">请携带参数访问本页面</text>
+        </view>
+
+        <!-- 底部提示 -->
+        <view class="mt-[12px] bg-[#fffbeb] rounded-[10px] border-[1px] border-solid border-[#fef3c7] p-[10px]">
+          <text class="text-[12px] text-[#b45309] leading-[18px]">提示：返回时可在页面路径后追加 ?key=value 以测试参数解析效果。</text>
         </view>
       </view>
     </view>
@@ -23,13 +67,14 @@
 </template>
 
 <script setup lang="uts">
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
+import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/utils/refresh';
 
 definePage({
   layout: 'navbar',
   showBack: true,
   hideNavbar: false,
-  enablePullDownRefresh: false,
+  enablePullDownRefresh: true,
   style: {
     navigationBarTitleText: 'URL 参数测试',
     navigationStyle: 'custom'
@@ -39,12 +84,22 @@ definePage({
 const optionKeys = ref<string[]>([]);
 const queryOptions = ref<UTSJSONObject | null>(null);
 
+const countLabel = computed((): string => {
+  return optionKeys.value.length > 0 ? '已解析' : '待解析';
+});
+
 onLoad((options: UTSJSONObject | null) => {
   console.log('test page onLoad options:', options);
   if (options != null) {
     queryOptions.value = options;
     optionKeys.value = UTSJSONObject.keys(options);
   }
+});
+
+onNavbarPullDownRefresh(() => {
+  setTimeout(() => {
+    stopNavbarPullDownRefresh();
+  }, 800);
 });
 
 function getOptionValue(key: string): string {

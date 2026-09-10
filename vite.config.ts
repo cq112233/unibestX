@@ -14,30 +14,11 @@ import { WeappTailwindcss } from 'weapp-tailwindcss/vite';
 import fs from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import json5 from 'json5';
 
 const uni = (uniModule as typeof uniModule & { default?: typeof uniModule }).default ?? uniModule;
 const projectRoot = dirname(fileURLToPath(import.meta.url));
 
-// 读取 manifest.json，编译阶段拿到 vapor 配置
-const manifestPath = fs.existsSync(resolve(projectRoot, 'src/manifest.json'))
-  ? resolve(projectRoot, 'src/manifest.json')
-  : resolve(projectRoot, 'manifest.json');
-
-let isVapor = false;
-try {
-  if (fs.existsSync(manifestPath)) {
-    const manifestRaw = fs.readFileSync(manifestPath, 'utf-8');
-    const manifest = json5.parse(manifestRaw);
-    isVapor = manifest['uni-app-x']?.vapor ?? false;
-  }
-}
-catch (e) {
-  console.error('[vite.config.ts] 读取 manifest.json 失败:', e);
-}
-
-// 注入环境变量，全端（App-Android Kotlin / iOS / H5 / 微信小程序）均可通过 import.meta.env 安全访问
-process.env.VITE_IS_VAPOR = String(isVapor);
+// 读取 package.json，编译阶段注入应用版本号供 import.meta.env 全端安全访问
 try {
   const pkgRaw = fs.readFileSync(resolve(projectRoot, 'package.json'), 'utf-8');
   const pkg = JSON.parse(pkgRaw);
@@ -100,10 +81,12 @@ export default defineConfig({
       dir: 'src/pages',
       subPackages: ['src/sub']
     }),
-    // 手动补充 easycom 插件（仅在 Web/H5 平台生效，避免影响 App 原生编译）
-    (process.env.UNI_PLATFORM === 'web' || process.env.UNI_PLATFORM === 'h5' || !process.env.UNI_PLATFORM)
-      ? uniEasycomPlugin({ exclude: UNI_EASYCOM_EXCLUDE })
-      : null,
+    // 手动补充 easycom 插件（必须全平台生效，含 App）
+    // 该插件内部名为 uni:app-easycom，负责把模板里的 _resolveComponent("rice-button")
+    // 转成静态 import；蒸汽模式 + vapor-render-target:bytecode 下，只有进入 import 图的
+    // 组件才会生成 bytes/*.bytes 视图层字节码。若在 App 端关闭，uni_modules 下的
+    // easycom 组件（rice-* 等）不会生成 bytecode，云打包安装后组件不渲染。
+    uniEasycomPlugin({ exclude: UNI_EASYCOM_EXCLUDE }),
     uniLayoutsPlugin(), // 仿照 vite-plugin-uni-layouts 的跨端 Layout 布局插件
     autoRootPlugin(), // 自动给页面套上 App.ku.uvue 根包裹组件
     uni(),
