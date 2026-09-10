@@ -1,7 +1,5 @@
 <template>
   <view class=" pb-[50px]" :class="isDarkMode ? 'bg-[#121212]' : 'bg-[#f8fafc]'">
-    <NavBar title="Rice UI 组件演示" />
-
     <!-- 顶部 Banner -->
     <view
       class="p-[16px] mb-[12px] shadow-xs flex-row items-center justify-between"
@@ -332,7 +330,12 @@ import { setTheme } from '@/uni_modules/rice-ui';
 import { computed, watch } from 'vue';
 
 definePage({
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
   style: {
+    navigationBarTitleText: 'Rice UI 组件演示',
     navigationStyle: 'custom'
   }
 });

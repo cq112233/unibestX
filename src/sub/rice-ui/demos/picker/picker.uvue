@@ -1,6 +1,5 @@
 <template>
   <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
-    <NavBar title="Picker 选择器" />
     <view class="p-[16px]">
       <!-- 基础选择器 -->
       <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
@@ -30,6 +29,10 @@ import type { PickerEvent, PickerOption } from '@/uni_modules/rice-ui';
 import { computed } from 'vue';
 
 definePage({
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
   style: {
     navigationBarTitleText: 'Picker 选择器',
     navigationStyle: 'custom'

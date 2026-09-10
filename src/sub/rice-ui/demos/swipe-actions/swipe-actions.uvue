@@ -1,6 +1,5 @@
 <template>
   <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
-    <NavBar title="SwipeActions 滑动单元格" />
     <view class="p-[16px]">
       <!-- 基础左滑操作 -->
       <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
@@ -57,6 +56,10 @@ import type { SwipeActionsItemClick, SwipeActionsMenu } from '@/uni_modules/rice
 import { computed } from 'vue';
 
 definePage({
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
   style: {
     navigationBarTitleText: 'SwipeActions 滑动单元格',
     navigationStyle: 'custom'

@@ -1,6 +1,5 @@
 <template>
   <view class="page-container bg-[#f8fafc] min-h-screen pb-[60px]">
-    <NavBar title="BackTop 返回顶部" />
     <view class="p-[16px]">
       <!-- 功能说明与控制面板 -->
       <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
@@ -100,6 +99,10 @@ import { useAppStore } from '@/src/store';
 import { computed, ref } from 'vue';
 
 definePage({
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
   style: {
     navigationBarTitleText: 'BackTop 返回顶部',
     navigationStyle: 'custom'

@@ -1,6 +1,5 @@
 <template>
   <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
-    <NavBar title="Stepper 步进器" />
     <view class="p-[16px]">
       <!-- 基础用法 -->
       <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
@@ -46,6 +45,10 @@ import { useAppStore } from '@/src/store';
 import { computed } from 'vue';
 
 definePage({
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
   style: {
     navigationBarTitleText: 'Stepper 步进器',
     navigationStyle: 'custom'

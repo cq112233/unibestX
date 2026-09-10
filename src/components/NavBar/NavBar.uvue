@@ -55,6 +55,10 @@ import { useAppStore } from '@/src/store';
 import { getThemeTokens } from '@/src/utils/theme';
 import type { ThemeTokens } from '@/src/utils/theme';
 
+defineOptions({
+  name: 'NavBar',
+  styleIsolation: 'app-and-page'
+});
 // 定义组件参数类型
 const props = defineProps({
   title: {

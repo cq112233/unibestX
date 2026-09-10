@@ -1,6 +1,5 @@
 <template>
   <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
-    <NavBar title="CountDown 倒计时" />
     <view class="p-[16px]">
       <!-- 基础倒计时 -->
       <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
@@ -43,6 +42,10 @@ import { useAppStore } from '@/src/store';
 import { computed } from 'vue';
 
 definePage({
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
   style: {
     navigationBarTitleText: 'CountDown 倒计时',
     navigationStyle: 'custom'
