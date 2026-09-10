@@ -22,15 +22,11 @@ import CustomCapsuleTabbar from '@/src/tabbar/custom/index.uvue';
 import { customTabbarEnable, isCapsuleTabbar, isPageTabbar, syncCurIdxByCurrentPage } from '@/src/tabbar/helper';
 import { useAppStore } from '@/src/store';
 import { applyNavbarTheme, getThemeTokens } from '@/src/utils/theme';
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
 import { updateAvailableHeight } from '@/src/utils/systemInfo.uts';
 import { selectedTabbarStrategy } from '@/src/tabbar/helper/index.uts';
 import { registerToast, unregisterToast } from '@/src/utils/toast';
 import type { ComponentPublicInstance } from 'vue';
-import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
-import { registerToast, unregisterToast } from '@/src/utils/toast';
-import type { ComponentPublicInstance } from 'vue';
-import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
 
 /**
  * 页面参数 Props：由 autoRootPlugin 编译时从 pages.json 提取（与 LayoutComponent 同一套、全量注入），

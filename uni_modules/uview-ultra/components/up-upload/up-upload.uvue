@@ -409,10 +409,10 @@ function getOtherItemText(item: UPUploadListItem): string {
 	const isVid = item.isVideo || (item.type != null && item.type == 'video')
 	if (isVid) {
 		if (item.name != null && (item.name as string) != '') return item.name as string
-		return $t("up.common.video")
+		return $t("up.common.video", {} as UTSJSONObject)
 	}
 	if (item.name != null && (item.name as string) != '') return item.name as string
-	return $t("up.common.file")
+	return $t("up.common.file", {} as UTSJSONObject)
 }
 
 function onAfterRead(file: Array<UPUploadFileChoosed | null>) {
