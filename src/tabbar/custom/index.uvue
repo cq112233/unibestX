@@ -12,7 +12,6 @@ import { useAppStore } from '@/src/store';
 import { getThemeTokens } from '@/src/utils/theme';
 import type { ThemeTokens } from '@/src/utils/theme';
 import { safeAreaInsets } from '@/src/utils/systemInfo';
-import UniIcons from '@/uni_modules/uni-icons/components/uni-icons/uni-icons.uvue';
 
 defineProps({
   /** 悬浮 TabBar 容器高度（默认 64px） */
@@ -141,7 +140,7 @@ function getItemFontWeight(index: number): string {
           <!-- 图标与角标容器 -->
           <view class="capsule-icon-wrap">
             <!-- uni-icons 字体图标 -->
-            <UniIcons v-if="item.iconType == 'icon'" :type="getItemIcon(index)" :size="20"
+            <uni-icons v-if="item.iconType == 'icon'" :type="getItemIcon(index)" :size="20"
               :color="getItemIconColor(index)" />
             <!-- 图片图标 -->
             <image v-else :src="getItemIconPath(index)" class="capsule-icon-image" />

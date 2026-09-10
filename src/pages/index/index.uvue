@@ -146,17 +146,6 @@
           　　注意：pages.json 为自动构建产物，切勿直接在 pages.json 中修改！
         </text>
       </view>
-      <view class="mt-[15px] mx-[30px] px-[20px] py-[15px] rounded-[12px] bg-[#dc262614]">
-        <text class="text-[14px] font-bold text-[#dc2626]">
-          ⚠️ 组件导入规范（安卓 Vapor 蒸汽模式必须手动 import）
-        </text>
-        <text class="text-[14px] text-[#666666] leading-[26px]">
-          　　在安卓 Vapor 蒸汽模式下，开发时 HBuilderX 运行到真机一切正常，但凡是依赖 easycom 自动导入的组件（直接写小写标签 &lt;uni-icons&gt; 而不手动 import），打包发布安装后组件会全部失效 / 渲染白屏（未被打进出包产物）。
-        </text>
-        <text class="text-[14px] text-[#dc2626] font-medium leading-[26px]">
-          　　建议：所有页面中对用到的组件一律手动 import，且 import 名与组件标签均用大驼峰（PascalCase）并保持一致，切勿使用小写标签或短横线写法。
-        </text>
-      </view>
       <view class="mt-[15px] mx-[30px] px-[20px] py-[15px] rounded-[12px] bg-[#37c2bc14] mb-[30px]">
         <text class="text-[14px] text-[#666666] leading-[26px]">
           📄 文件路由 — 自动扫描路由，通过 pages.config.json / definePage 统一配置
