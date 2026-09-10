@@ -146,15 +146,18 @@
           　　注意：pages.json 为自动构建产物，切勿直接在 pages.json 中修改！
         </text>
       </view>
-      <view class="mt-[15px] mx-[30px] px-[20px] py-[15px] rounded-[12px] bg-[#dc262614]">
-        <text class="text-[14px] font-bold text-[#dc2626]">
-          ⚠️ 组件导入规范（安卓 Vapor 蒸汽模式必须手动 import）
+      <view class="mt-[15px] mx-[30px] px-[20px] py-[15px] rounded-[12px] bg-[#6366f114]">
+        <text class="text-[14px] font-bold text-[#4f46e5]">
+          🧩 组件导入规范（easycom 自动导入）
         </text>
         <text class="text-[14px] text-[#666666] leading-[26px]">
-          　　在安卓 Vapor 蒸汽模式下，开发时 HBuilderX 运行到真机一切正常，但凡是依赖 easycom 自动导入的组件（直接写小写标签 &lt;uni-icons&gt; 而不手动 import），打包发布安装后组件会全部失效 / 渲染白屏（未被打进出包产物）。
+          　　`uni_modules` 组件与 `src/components` 组件直接在模板里写短横线小写标签即可，如 &lt;uni-icons /&gt;、&lt;e-chart /&gt;、&lt;z-paging-x /&gt;，由 easycom 自动解析，无需手动 import。
         </text>
-        <text class="text-[14px] text-[#dc2626] font-medium leading-[26px]">
-          　　建议：所有页面中对用到的组件一律手动 import，且 import 名与组件标签均用大驼峰（PascalCase）并保持一致，切勿使用小写标签或短横线写法。
+        <text class="text-[14px] text-[#666666] leading-[26px]">
+          　　放在页面目录下的私有组件（如 src/pages/*/components/ 内的组件）不在 easycom 扫描范围内，仍需手动 import。
+        </text>
+        <text class="text-[14px] text-[#4f46e5] font-medium leading-[26px]">
+          　　⚠️ 注意：App 端依赖 vite.config.ts 中的 uniEasycomPlugin 全平台生效。该插件（内部名 uni:app-easycom）负责把 easycom 标签转成静态 import；蒸汽模式的 bytecode 只编译进入 import 图的组件，插件若被限制在 web/h5，云打包后组件会不渲染。
         </text>
       </view>
       <view class="mt-[15px] mx-[30px] px-[20px] py-[15px] rounded-[12px] bg-[#37c2bc14] mb-[30px]">

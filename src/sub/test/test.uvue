@@ -6,7 +6,7 @@
         <!-- 标题区：图标徽章 + 标题 -->
         <view class="flex flex-row items-center mb-[16px]">
           <view class="w-[42px] h-[42px] rounded-[12px] bg-[#ebf4ff] items-center justify-center mr-[12px]">
-            <UniIcons type="link" size="22" color="#3182ce" />
+            <uni-icons type="link" size="22" color="#3182ce" />
           </view>
           <view class="flex-col flex-1">
             <text class="text-[18px] font-bold text-[#1e293b]">URL 参数解析</text>
@@ -51,7 +51,7 @@
         <!-- 空态 -->
         <view v-if="optionKeys.length == 0" class="flex flex-col items-center py-[32px]">
           <view class="w-[56px] h-[56px] rounded-[16px] bg-[#f8fafc] items-center justify-center">
-            <UniIcons type="info" size="28" color="#cbd5e1" />
+            <uni-icons type="info" size="28" color="#cbd5e1" />
           </view>
           <text class="text-[14px] text-[#94a3b8] mt-[12px]">暂无任何 query 参数</text>
           <text class="text-[12px] text-[#cbd5e1] mt-[4px]">请携带参数访问本页面</text>
@@ -68,7 +68,6 @@
 
 <script setup lang="uts">
 import { ref, computed } from 'vue';
-import UniIcons from '@/uni_modules/uni-icons/components/uni-icons/uni-icons.uvue'
 import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/utils/refresh';
 
 definePage({

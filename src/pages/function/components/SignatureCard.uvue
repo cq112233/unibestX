@@ -9,7 +9,7 @@
       @touchcancel="onCardTouchEnd"
       @touchmove.stop.prevent="preventScroll"
     >
-      <LSignature
+      <l-signature
         ref="sigRef"
         style="width: 100%; height: 100%;"
         :pen-color="penColor"
@@ -106,7 +106,6 @@
 <script setup lang="uts">
 import Card from '../../basic/components/Card.uvue';
 import { onUnmounted, ref } from 'vue';
-import LSignature from '@/uni_modules/lime-signature/components/l-signature/l-signature.uvue'
 import type { LimeSignatureToFileSuccess, LimeSignatureToTempFilePathOptions } from '@/uni_modules/lime-signature';
 import { setPageScrollEnabled } from '@/src/utils/pageScroll.uts';
 

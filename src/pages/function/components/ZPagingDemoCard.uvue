@@ -65,7 +65,7 @@
       - :show-back-to-top 开启内置「回到顶部」按钮，滚动超过 threshold 后浮现。
       - v-if="showList"：有数据时渲染 ZPagingX；无数据时整个卸载，由下方 v-else 空白层接管。
     -->
-    <ZPagingX
+    <z-paging-x
       v-if="showList"
       ref="pagingX"
       list-is="list-view"
@@ -92,7 +92,7 @@
           <text class="text-[12px] text-[#64748b] leading-[16px]">{{ item.summary }}</text>
         </view>
       </list-item>
-    </ZPagingX>
+    </z-paging-x>
 
     <!--
       手动空/空白状态：无数据时用 v-else 替换掉 ZPagingX，展示自己的空白 UI。
@@ -122,9 +122,6 @@
 <script setup lang="uts">
 import Card from '../../basic/components/Card.uvue';
 import { ref } from 'vue';
-// 组件必须手动 import（不能用 easycom 自动导入），否则蒸汽(云)打包后组件丢失/白屏。
-// 标签用与 import 名一致的 PascalCase：ZPagingX。
-import ZPagingX from '@/uni_modules/z-paging-x/components/z-paging-x/z-paging-x.uvue'
 
 // 列表项数据结构：用 type 别名声明，符合 UTS 强类型规范。
 type CompactArticleItem = {
