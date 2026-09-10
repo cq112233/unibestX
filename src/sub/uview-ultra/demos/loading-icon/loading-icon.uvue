@@ -3,21 +3,105 @@
     <view class="p-[16px]">
       <view class="demo-block">
         <text class="demo-label">基础用法</text>
-        <up-loading-icon class="my-[10px]"></up-loading-icon>
+        <view class="flex-row flex-wrap items-center">
+          <up-loading-icon class="mr-[20px] my-[10px]"></up-loading-icon>
+        </view>
       </view>
 
-      <view class="demo-block">
+      <view class="demo-block mt-[12px]">
         <text class="demo-label">其他模式</text>
-        <up-loading-icon mode="circle" class="my-[10px]"></up-loading-icon>
-        <up-loading-icon mode="semicircle" class="my-[10px]"></up-loading-icon>
+        <view class="flex-row flex-wrap items-center">
+          <up-loading-icon mode="circle" class="mr-[20px] my-[10px]"></up-loading-icon>
+          <up-loading-icon mode="semicircle" class="mr-[20px] my-[10px]"></up-loading-icon>
+        </view>
+      </view>
+
+      <view class="demo-block mt-[12px]">
+        <text class="demo-label">自定义大小</text>
+        <view class="flex-row flex-wrap items-center">
+          <up-loading-icon size="16" class="mr-[20px] my-[10px]"></up-loading-icon>
+          <up-loading-icon size="24" class="mr-[20px] my-[10px]"></up-loading-icon>
+          <up-loading-icon size="40" class="mr-[20px] my-[10px]"></up-loading-icon>
+          <up-loading-icon size="60" class="mr-[20px] my-[10px]"></up-loading-icon>
+        </view>
+      </view>
+
+      <view class="demo-block mt-[12px]">
+        <text class="demo-label">自定义颜色</text>
+        <view class="flex-row flex-wrap items-center">
+          <up-loading-icon color="#2979ff" class="mr-[20px] my-[10px]"></up-loading-icon>
+          <up-loading-icon color="#19be6b" class="mr-[20px] my-[10px]"></up-loading-icon>
+          <up-loading-icon color="#fa3534" class="mr-[20px] my-[10px]"></up-loading-icon>
+          <up-loading-icon color="#ff9900" mode="circle" class="mr-[20px] my-[10px]"></up-loading-icon>
+        </view>
+      </view>
+
+      <view class="demo-block mt-[12px]">
+        <text class="demo-label">带提示文字</text>
+        <view class="flex-row flex-wrap items-center">
+          <up-loading-icon text="加载中..." class="mr-[24px] my-[10px]"></up-loading-icon>
+          <up-loading-icon text="正在提交" color="#2979ff" class="mr-[24px] my-[10px]"></up-loading-icon>
+          <up-loading-icon text="请求失败" color="#fa3534" mode="circle" class="mr-[24px] my-[10px]"></up-loading-icon>
+        </view>
+      </view>
+
+      <view class="demo-block mt-[12px]">
+        <text class="demo-label">文字与图标垂直排列</text>
+        <view class="flex-row flex-wrap items-center">
+          <up-loading-icon vertical text="加载中" class="mr-[30px] my-[10px]"></up-loading-icon>
+          <up-loading-icon vertical text="请稍候" color="#19be6b" mode="circle" class="mr-[30px] my-[10px]"></up-loading-icon>
+          <up-loading-icon vertical text="拼命加载中" color="#ff9900" size="36" class="mr-[30px] my-[10px]"></up-loading-icon>
+        </view>
+      </view>
+
+      <view class="demo-block mt-[12px]">
+        <text class="demo-label">自定义文字颜色与字号</text>
+        <view class="flex-row flex-wrap items-center">
+          <up-loading-icon text="大号文字" text-size="20" text-color="#2979ff" class="mr-[24px] my-[10px]"></up-loading-icon>
+          <up-loading-icon text="小号文字" text-size="12" text-color="#909193" class="mr-[24px] my-[10px]"></up-loading-icon>
+        </view>
+      </view>
+
+      <view class="demo-block mt-[12px]">
+        <text class="demo-label">自定义圆环暗边颜色（仅 circle 模式生效）</text>
+        <view class="flex-row flex-wrap items-center">
+          <up-loading-icon mode="circle" color="#fa3534" inactive-color="#fbd6d8" class="mr-[20px] my-[10px]"></up-loading-icon>
+          <up-loading-icon mode="circle" color="#2979ff" inactive-color="#d4e2fd" class="mr-[20px] my-[10px]"></up-loading-icon>
+        </view>
+      </view>
+
+      <view class="demo-block mt-[12px]">
+        <text class="demo-label">自定义动画速度（duration，单位 ms）</text>
+        <view class="flex-row flex-wrap items-center">
+          <up-loading-icon duration="600" text="快 600" class="mr-[24px] my-[10px]"></up-loading-icon>
+          <up-loading-icon duration="1200" text="标准 1200" class="mr-[24px] my-[10px]"></up-loading-icon>
+          <up-loading-icon duration="2400" text="慢 2400" class="mr-[24px] my-[10px]"></up-loading-icon>
+        </view>
+      </view>
+
+      <view class="demo-block mt-[12px]">
+        <text class="demo-label">显示与隐藏（show）</text>
+        <view class="flex-row items-center h-[40px]">
+          <up-loading-icon :show="loadingShow" text="切换下方按钮查看效果" color="#2979ff"></up-loading-icon>
+        </view>
+        <view class="mt-[12px]">
+          <up-button
+            type="primary"
+            size="mini"
+            :text="loadingShow ? '隐藏加载动画' : '显示加载动画'"
+            @click="loadingShow = !loadingShow"
+          ></up-button>
+        </view>
       </view>
     </view>
   </view>
 </template>
 
 <script setup lang="uts">
+import { ref } from 'vue';
+
 definePage({
-  debug: true,
+  debug: false,
   layout: 'navbar',
   showBack: true,
   hideNavbar: false,
@@ -27,6 +111,8 @@ definePage({
     navigationStyle: 'custom'
   }
 });
+
+const loadingShow = ref(true);
 </script>
 
 <style lang="scss" scoped>

@@ -145,8 +145,12 @@ const spinnerStyle = computed((): UTSJSONObject => {
 })
 
 const textStyle = computed((): UTSJSONObject => {
+  const textSizeNumber = parseInt(getPx(props.textSize))
   return {
     fontSize: addUnit(props.textSize),
+    // 行高必须跟着字号走：样式表里写死的 20px 只适配默认字号，
+    // 字号一旦超过它，安卓原生会把超出等宽行盒的字形上沿裁掉
+    lineHeight: addUnit(textSizeNumber > 0 ? Math.round(textSizeNumber * 1.4) : 20),
     color: props.textColor
   } as UTSJSONObject
 })
