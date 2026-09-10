@@ -1,6 +1,5 @@
 <template>
   <view class="page-container bg-[#f8fafc]" :style="{ height: `${windowHeight}px` }">
-    <NavBar title="IndexList 索引列表" :auto-back="true" />
     <view class="flex-1 relative" style="flex: 1;">
       <up-index-list style="flex: 1" :index-list="indexList">
         <template v-for="(item, index) in itemArr" :key="index">
@@ -20,9 +19,13 @@
 import { ref } from 'vue';
 
 definePage({
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
   style: {
-    navigationStyle: 'custom',
-    navigationBarTitleText: 'IndexList 索引列表'
+    navigationBarTitleText: 'IndexList 索引列表',
+    navigationStyle: 'custom'
   }
 });
 

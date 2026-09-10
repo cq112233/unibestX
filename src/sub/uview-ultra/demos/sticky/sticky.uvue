@@ -1,7 +1,5 @@
 <template>
   <view class="page-container bg-[#f8fafc]" :style="{ height: `${windowHeight}px` }">
-    <NavBar title="Sticky 吸顶" :auto-back="true" />
-
     <scroll-view
       style="flex: 1; padding: 16px;"
       direction="vertical"
@@ -44,9 +42,13 @@ import { computed, ref } from 'vue';
 import { safeAreaInsets, systemInfo } from '@/src/utils/systemInfo';
 
 definePage({
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
   style: {
-    navigationStyle: 'custom',
-    navigationBarTitleText: 'Sticky 吸顶'
+    navigationBarTitleText: 'Sticky 吸顶',
+    navigationStyle: 'custom'
   }
 });
 

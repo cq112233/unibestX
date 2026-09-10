@@ -1,6 +1,5 @@
 <template>
   <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
-    <NavBar title="up-notice-bar 滚动通知" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
     <view class="p-[16px]">
       <view class="demo-block">
         <text class="demo-label">基础用法</text>
@@ -24,9 +23,13 @@
 
 <script setup lang="uts">
 definePage({
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
   style: {
-    navigationStyle: 'custom',
-    navigationBarTitleText: 'up-notice-bar 滚动通知'
+    navigationBarTitleText: 'up-notice-bar 滚动通知',
+    navigationStyle: 'custom'
   }
 });
 </script>

@@ -1,6 +1,5 @@
 <template>
   <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
-    <NavBar title="Tabs 标签页" :auto-back="true" />
     <view class="p-[16px]">
       <!-- 1. 超长横向滚动标签栏 -->
       <view class="demo-block">
@@ -79,9 +78,13 @@
 import { ref } from 'vue';
 
 definePage({
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
   style: {
-    navigationStyle: 'custom',
-    navigationBarTitleText: 'Tabs 标签页'
+    navigationBarTitleText: 'Tabs 标签页',
+    navigationStyle: 'custom'
   }
 });
 

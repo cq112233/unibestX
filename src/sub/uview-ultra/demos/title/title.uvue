@@ -1,6 +1,5 @@
 <template>
   <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
-    <NavBar title="up-title 标题"></NavBar>
     <view class="p-[16px]">
       <!-- 1. 基本使用 -->
       <view class="demo-block">
@@ -74,9 +73,13 @@ import { computed } from 'vue';
 import { useAppStore } from '@/src/store/index.uts';
 
 definePage({
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
   style: {
-    navigationStyle: 'custom',
-    navigationBarTitleText: 'up-title 标题'
+    navigationBarTitleText: 'up-title 标题',
+    navigationStyle: 'custom'
   }
 });
 

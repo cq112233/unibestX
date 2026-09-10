@@ -1,6 +1,5 @@
 <template>
   <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
-    <NavBar title="Keyboard 键盘" :auto-back="true" />
     <view class="p-[16px]">
       <!-- 1. 数字键盘 -->
       <view class="demo-block">
@@ -61,9 +60,13 @@
 import { ref } from 'vue';
 
 definePage({
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
   style: {
-    navigationStyle: 'custom',
-    navigationBarTitleText: 'Keyboard 键盘'
+    navigationBarTitleText: 'Keyboard 键盘',
+    navigationStyle: 'custom'
   }
 });
 

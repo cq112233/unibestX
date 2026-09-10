@@ -1,6 +1,5 @@
 <template>
   <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
-    <NavBar title="mp-html 富文本组件" :auto-back="true" />
     <view class="p-[16px]">
       <!-- 1. 基础文本与标题 -->
       <view class="demo-block">
@@ -49,9 +48,13 @@
 import { ref } from 'vue';
 
 definePage({
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
   style: {
-    navigationStyle: 'custom',
-    navigationBarTitleText: 'mp-html 富文本组件'
+    navigationBarTitleText: 'mp-html 富文本组件',
+    navigationStyle: 'custom'
   }
 });
 

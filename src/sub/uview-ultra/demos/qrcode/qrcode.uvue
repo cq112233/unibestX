@@ -1,6 +1,5 @@
 <template>
   <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
-    <NavBar title="Qrcode 二维码" :auto-back="true" />
     <view class="p-[16px]">
       <view class="demo-block flex-col items-center">
         <text class="demo-label w-full">基础用法</text>
@@ -20,9 +19,13 @@
 
 <script setup lang="uts">
 definePage({
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
   style: {
-    navigationStyle: 'custom',
-    navigationBarTitleText: 'Qrcode 二维码'
+    navigationBarTitleText: 'Qrcode 二维码',
+    navigationStyle: 'custom'
   }
 });
 </script>

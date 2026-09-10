@@ -1,6 +1,5 @@
 <template>
   <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
-    <NavBar title="Table 表格" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
     <view class="p-[16px]">
       <view class="demo-block">
         <text class="demo-label">基础表格</text>
@@ -45,9 +44,13 @@
 
 <script setup lang="uts">
 definePage({
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
   style: {
-    navigationStyle: 'custom',
-    navigationBarTitleText: 'Table 表格'
+    navigationBarTitleText: 'Table 表格',
+    navigationStyle: 'custom'
   }
 });
 </script>

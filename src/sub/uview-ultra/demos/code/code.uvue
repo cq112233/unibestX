@@ -1,6 +1,5 @@
 <template>
   <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
-    <NavBar title="Code 验证码倒计时" :auto-back="true" />
     <view class="p-[16px]">
       <view class="demo-block">
         <text class="demo-label">基础用法</text>
@@ -17,9 +16,13 @@
 import { ref } from 'vue';
 
 definePage({
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
   style: {
-    navigationStyle: 'custom',
-    navigationBarTitleText: 'Code 验证码倒计时'
+    navigationBarTitleText: 'Code 验证码倒计时',
+    navigationStyle: 'custom'
   }
 });
 

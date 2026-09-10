@@ -1,6 +1,5 @@
 <template>
   <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
-    <NavBar title="Grid 宫格" :auto-back="true" />
     <view class="p-[16px]">
       <view class="demo-block">
         <text class="demo-label">基础用法</text>
@@ -16,9 +15,13 @@
 
 <script setup lang="uts">
 definePage({
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
   style: {
-    navigationStyle: 'custom',
-    navigationBarTitleText: 'Grid 宫格'
+    navigationBarTitleText: 'Grid 宫格',
+    navigationStyle: 'custom'
   }
 });
 </script>

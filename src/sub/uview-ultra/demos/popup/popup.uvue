@@ -1,6 +1,5 @@
 <template>
   <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
-    <NavBar title="up-popup 弹出层" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
     <view class="p-[16px]">
       <!-- 1. 基础方向用法 -->
       <view class="demo-block">
@@ -365,10 +364,14 @@ type PopupPagingItem = {
   time: string;
 };
 definePage({
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
   debug: false,
   style: {
-    navigationStyle: 'custom',
-    navigationBarTitleText: 'up-popup 弹出层'
+    navigationBarTitleText: 'up-popup 弹出层',
+    navigationStyle: 'custom'
   }
 });
 // ---------------- 基础方向弹窗（每个方向独立状态） ----------------

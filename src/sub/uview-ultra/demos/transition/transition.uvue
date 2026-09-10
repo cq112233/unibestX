@@ -1,6 +1,5 @@
 <template>
   <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
-    <NavBar title="Transition 动画" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
     <view class="p-[16px]">
       <view class="demo-block">
         <text class="demo-label">内置过渡动画</text>
@@ -49,9 +48,13 @@
 import { ref } from 'vue';
 
 definePage({
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
   style: {
-    navigationStyle: 'custom',
-    navigationBarTitleText: 'Transition 动画'
+    navigationBarTitleText: 'Transition 动画',
+    navigationStyle: 'custom'
   }
 });
 

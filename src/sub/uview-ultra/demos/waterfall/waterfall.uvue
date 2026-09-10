@@ -1,6 +1,5 @@
 <template>
   <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
-    <NavBar title="Waterfall 瀑布流" :auto-back="true" />
     <view class="p-[16px]">
       <view class="demo-block">
         <text class="demo-label">基础瀑布流 (2列)</text>
@@ -29,9 +28,13 @@
 import { ref } from 'vue';
 
 definePage({
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
   style: {
-    navigationStyle: 'custom',
-    navigationBarTitleText: 'Waterfall 瀑布流'
+    navigationBarTitleText: 'Waterfall 瀑布流',
+    navigationStyle: 'custom'
   }
 });
 

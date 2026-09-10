@@ -1,6 +1,5 @@
 <template>
   <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
-    <NavBar title="up-pdf-reader PDF 阅读"></NavBar>
     <view class="p-[16px]">
       <!-- 基础用法：同一时刻只渲染一个 web-view，避免 Web/小程序端全屏覆盖 -->
       <view class="demo-block">
@@ -30,9 +29,13 @@
 import { ref } from 'vue';
 
 definePage({
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
   style: {
-    navigationStyle: 'custom',
-    navigationBarTitleText: 'up-pdf-reader PDF 阅读'
+    navigationBarTitleText: 'up-pdf-reader PDF 阅读',
+    navigationStyle: 'custom'
   }
 });
 

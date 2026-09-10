@@ -1,7 +1,5 @@
 <template>
   <view class="page-container bg-[#f8fafc] flex flex-col flex-1 h-full">
-    <!-- <NavBar title="up-list 双列表嵌套" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar> -->
-
     <!-- 嵌套滚动外层容器 -->
     <scroll-view type="nested" direction="vertical" class="flex-1 h-0">
       <!-- 列表 1：nested-scroll-header 1 (调高高度至 380px) -->
@@ -59,10 +57,12 @@ import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/utils/
 
 definePage({
   layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
   enablePullDownRefresh: false,
   style: {
-    navigationStyle: 'custom',
-    navigationBarTitleText: 'up-list 双列表嵌套'
+    navigationBarTitleText: 'up-list 双列表嵌套',
+    navigationStyle: 'custom'
   }
 });
 

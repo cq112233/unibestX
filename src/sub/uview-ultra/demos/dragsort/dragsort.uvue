@@ -1,6 +1,5 @@
 <template>
   <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
-    <NavBar title="up-dragsort 拖拽排序"></NavBar>
     <view class="p-[16px]">
       <!-- 0. 无手柄（整项拖拽） -->
       <view class="demo-block">
@@ -167,9 +166,13 @@
 import { ref } from 'vue';
 
 definePage({
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
   style: {
-    navigationStyle: 'custom',
-    navigationBarTitleText: 'up-dragsort 拖拽排序'
+    navigationBarTitleText: 'up-dragsort 拖拽排序',
+    navigationStyle: 'custom'
   }
 });
 

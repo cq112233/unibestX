@@ -1,6 +1,5 @@
 <template>
   <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
-    <NavBar title="Tabbar 底部导航" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff" />
     <view class="p-[16px]">
       <view class="demo-block">
         <text class="demo-label">基础用法</text>
@@ -37,9 +36,13 @@
 import { ref } from 'vue';
 
 definePage({
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
   style: {
-    navigationStyle: 'custom',
-    navigationBarTitleText: 'Tabbar 底部导航'
+    navigationBarTitleText: 'Tabbar 底部导航',
+    navigationStyle: 'custom'
   }
 });
 

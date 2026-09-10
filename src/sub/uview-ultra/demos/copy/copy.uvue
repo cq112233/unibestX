@@ -1,6 +1,5 @@
 <template>
   <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
-    <NavBar title="Copy 复制" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
     <view class="p-[16px]">
       <view class="demo-block">
         <text class="demo-label">up-copy</text>
@@ -14,9 +13,13 @@
 
 <script setup lang="uts">
 definePage({
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
   style: {
-    navigationStyle: 'custom',
-    navigationBarTitleText: 'Copy 复制'
+    navigationBarTitleText: 'Copy 复制',
+    navigationStyle: 'custom'
   }
 });
 

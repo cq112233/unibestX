@@ -1,6 +1,5 @@
 <template>
   <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
-    <NavBar title="Link 超链接" :auto-back="true" />
     <view class="p-[16px]">
       <view class="demo-block">
         <text class="demo-label">基本使用</text>
@@ -22,9 +21,13 @@
 
 <script setup lang="uts">
 definePage({
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
   style: {
-    navigationStyle: 'custom',
-    navigationBarTitleText: 'Link 超链接'
+    navigationBarTitleText: 'Link 超链接',
+    navigationStyle: 'custom'
   }
 });
 </script>

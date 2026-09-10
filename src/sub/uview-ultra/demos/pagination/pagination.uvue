@@ -1,6 +1,5 @@
 <template>
   <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
-    <NavBar title="Pagination 分页器" :auto-back="true" :safe-area-inset-top="true" bg-color="#ffffff"></NavBar>
     <view class="p-[16px]">
       <view class="demo-block">
         <text class="demo-label">up-pagination</text>
@@ -20,9 +19,13 @@
 import { ref } from 'vue';
 
 definePage({
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
   style: {
-    navigationStyle: 'custom',
-    navigationBarTitleText: 'Pagination 分页器'
+    navigationBarTitleText: 'Pagination 分页器',
+    navigationStyle: 'custom'
   }
 });
 
