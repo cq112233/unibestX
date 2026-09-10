@@ -365,7 +365,7 @@ type PopupPagingItem = {
   time: string;
 };
 definePage({
-  debug: true,
+  debug: false,
   style: {
     navigationStyle: 'custom',
     navigationBarTitleText: 'up-popup 弹出层'
@@ -373,24 +373,24 @@ definePage({
 });
 // ---------------- 基础方向弹窗（每个方向独立状态） ----------------
 const basicTopShow = ref(false);
-const openTopBasic = () => basicTopShow.value = true;
+function openTopBasic() { basicTopShow.value = true; }
 const basicBottomShow = ref(false);
-const openBottomBasic = () => basicBottomShow.value = true;
+function openBottomBasic() { basicBottomShow.value = true; }
 const basicCenterShow = ref(false);
-const openCenterBasic = () => basicCenterShow.value = true;
+function openCenterBasic() { basicCenterShow.value = true; }
 const basicLeftShow = ref(false);
-const openLeftBasic = () => basicLeftShow.value = true;
+function openLeftBasic() { basicLeftShow.value = true; }
 const basicRightShow = ref(false);
-const openRightBasic = () => basicRightShow.value = true;
+function openRightBasic() { basicRightShow.value = true; }
 // ---------------- 手势弹窗（每个方向独立状态） ----------------
 const gestureTopShow = ref(false);
-const openTopGesture = () => gestureTopShow.value = true;
+function openTopGesture() { gestureTopShow.value = true; }
 const gestureBottomShow = ref(false);
-const openBottomGesture = () => gestureBottomShow.value = true;
+function openBottomGesture() { gestureBottomShow.value = true; }
 const gestureLeftShow = ref(false);
-const openLeftGesture = () => gestureLeftShow.value = true;
+function openLeftGesture() { gestureLeftShow.value = true; }
 const gestureRightShow = ref(false);
-const openRightGesture = () => gestureRightShow.value = true;
+function openRightGesture() { gestureRightShow.value = true; }
 // ---------------- 阈值、列表弹窗 ----------------
 const showBasicPopup = ref<boolean>(false);
 const showHighThresholdPopup = ref<boolean>(false);
