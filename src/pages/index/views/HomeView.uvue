@@ -4,61 +4,85 @@
     <text class="text-[24px] font-semibold mx-auto mt-[8px] text-[#d14328]">
       {{ systemInfo?.appTitle ?? '' }}
     </text>
-    <text class="text-center text-[15px] text-[#475569] font-medium mt-[4px]">
+    <text
+      class="text-center text-[15px] font-medium mt-[4px]"
+      :class="isDark ? 'text-[#94a3b8]' : 'text-[#475569]'"
+    >
       最好用的 uni-appX 开发模板
     </text>
 
     <!-- 运行环境状态卡片 -->
     <view
-      class="mx-[16px] mt-[14px] px-[6px] py-[10px] rounded-[12px] border-[1px] border-solid border-[#e2e8f0] bg-[#ffffff] flex flex-row items-center justify-between"
+      class="mx-[16px] mt-[14px] px-[6px] py-[10px] rounded-[12px] border-[1px] border-solid flex flex-row items-center justify-between"
+      :class="isDark ? 'border-[#334155] bg-[#1e293b]' : 'border-[#e2e8f0] bg-[#ffffff]'"
     >
       <view class="flex-1 items-center justify-center">
         <text class="text-[10px] text-[#94a3b8] mb-[2px]">编译平台</text>
         <text class="text-[12px] font-bold text-[#4f46e5]">{{ systemInfo?.platformName ?? '' }}</text>
       </view>
-      <view class="w-[1px] h-[18px] bg-[#e2e8f0]" />
+      <view class="w-[1px] h-[18px]" :class="isDark ? 'bg-[#334155]' : 'bg-[#e2e8f0]'" />
       <view class="flex-1 items-center justify-center">
         <text class="text-[10px] text-[#94a3b8] mb-[2px]">当前环境</text>
         <text
           class="text-[12px] font-bold"
-          :style="{ color: (systemInfo?.env == 'test' ? '#d97706' : (systemInfo?.env == 'production' ? '#dc2626' : '#059669')) }"
+          :style="{ color: (systemInfo?.env == 'test' ? '#d97706' : (systemInfo?.env == 'production' ? '#dc2626' : (isDark ? '#34d399' : '#059669'))) }"
         >
           {{ systemInfo?.envName ?? '' }}
         </text>
       </view>
-      <view class="w-[1px] h-[18px] bg-[#e2e8f0]" />
+      <view class="w-[1px] h-[18px]" :class="isDark ? 'bg-[#334155]' : 'bg-[#e2e8f0]'" />
       <view class="flex-1 items-center justify-center">
         <text class="text-[10px] text-[#94a3b8] mb-[2px]">渲染模式</text>
-        <text class="text-[12px] font-bold text-[#059669]">{{ systemInfo?.isVapor == true ? 'Vapor' : 'VDOM' }}</text>
+        <text
+          class="text-[12px] font-bold"
+          :class="isDark ? 'text-[#34d399]' : 'text-[#059669]'"
+        >
+          {{ systemInfo?.isVapor == true ? 'Vapor' : 'VDOM' }}
+        </text>
       </view>
-      <view class="w-[1px] h-[18px] bg-[#e2e8f0]" />
+      <view class="w-[1px] h-[18px]" :class="isDark ? 'bg-[#334155]' : 'bg-[#e2e8f0]'" />
       <view class="flex-1 items-center justify-center">
         <text class="text-[10px] text-[#94a3b8] mb-[2px]">应用版本</text>
         <text class="text-[12px] font-bold text-[#d97706]">v{{ systemInfo?.appVersion ?? '' }}</text>
       </view>
-      <view class="w-[1px] h-[18px] bg-[#e2e8f0]" />
+      <view class="w-[1px] h-[18px]" :class="isDark ? 'bg-[#334155]' : 'bg-[#e2e8f0]'" />
       <view class="flex-1 items-center justify-center">
         <text class="text-[10px] text-[#94a3b8] mb-[2px]">编译引擎</text>
-        <text class="text-[12px] font-bold text-[#334155]">
+        <text
+          class="text-[12px] font-bold"
+          :class="isDark ? 'text-[#cbd5e1]' : 'text-[#334155]'"
+        >
           {{ systemInfo?.compilerVersion ?? '' }}
         </text>
       </view>
     </view>
 
     <!-- 模板介绍文案卡片 -->
-    <view class="mt-[14px] mx-[16px] p-[14px] rounded-[12px] bg-[#f8fafc] border-[1px] border-solid border-[#e2e8f0]">
+    <view
+      class="mt-[14px] mx-[16px] p-[14px] rounded-[12px] border-[1px] border-solid"
+      :class="isDark ? 'bg-[#1e293b]/70 border-[#334155]' : 'bg-[#f8fafc] border-[#e2e8f0]'"
+    >
       <view class="flex flex-row items-center justify-between mb-[8px]">
         <view class="flex flex-row items-center">
-          <text class="text-[13px] font-bold text-[#1e293b]">📖 模板简介</text>
-          <text class="text-[10px] font-medium text-[#4f46e5] px-[6px] py-[2px] rounded-[4px] bg-[#6366f114] ml-[6px]">
+          <text class="text-[13px] font-bold" :class="isDark ? 'text-[#f1f5f9]' : 'text-[#1e293b]'">📖 模板简介</text>
+          <text
+            class="text-[10px] font-medium px-[6px] py-[2px] rounded-[4px] ml-[6px]"
+            :class="isDark ? 'text-[#818cf8] bg-[#6366f126]' : 'text-[#4f46e5] bg-[#6366f114]'"
+          >
             作者: cq112233
           </text>
         </view>
-        <text class="text-[10px] font-medium text-[#059669] px-[6px] py-[2px] rounded-[4px] bg-[#10b98114]">
+        <text
+          class="text-[10px] font-medium px-[6px] py-[2px] rounded-[4px]"
+          :class="isDark ? 'text-[#34d399] bg-[#10b98126]' : 'text-[#059669] bg-[#10b98114]'"
+        >
           官方开箱即用
         </text>
       </view>
-      <text class="text-[12px] text-[#475569] leading-[22px]">
+      <text
+        class="text-[12px] leading-[22px]"
+        :class="isDark ? 'text-[#94a3b8]' : 'text-[#475569]'"
+      >
         unibestX 是一个集成了多种工具与技术的 uni-appX 开发模板，由 cq112233 开发，基于 uni-appX + Vue3 + UTS + weapp-tailwindcss + VSCode 构建，完美兼容 vapor / vdom 双模式，模板具有代码提示、自动格式化、统一配置、代码片段等功能，并内置了 ECharts 图表、主题配置、暗黑模式、加密方式配置等常用功能与基本组件，让你开发 uni-appX 拥有极致的体验。
       </text>
     </view>
@@ -66,53 +90,77 @@
     <!-- 核心特性（2列紧凑卡片网格） -->
     <view class="mt-[16px] mx-[16px]">
       <view class="flex flex-row items-center justify-between mb-[10px]">
-        <text class="text-[14px] font-bold text-[#1e293b]">⚡ 核心特性</text>
+        <text class="text-[14px] font-bold" :class="isDark ? 'text-[#f1f5f9]' : 'text-[#1e293b]'">⚡ 核心特性</text>
         <text class="text-[11px] text-[#94a3b8]">Vue3 + UTS + Vite</text>
       </view>
 
       <view class="flex flex-row flex-wrap justify-between">
         <!-- 单页 TabBar -->
-        <view class="w-[48.5%] p-[12px] mb-[10px] rounded-[10px] bg-[#10b9810f] border-[1px] border-solid border-[#10b98126]">
-          <text class="text-[13px] font-bold text-[#059669]">🚀 单页 TabBar</text>
-          <text class="text-[11px] text-[#64748b] mt-[4px] leading-[16px]">0ms 秒切保活・零白屏</text>
+        <view
+          class="w-[48.5%] p-[12px] mb-[10px] rounded-[10px] border-[1px] border-solid"
+          :class="isDark ? 'bg-[#10b98118] border-[#10b98133]' : 'bg-[#10b9810f] border-[#10b98126]'"
+        >
+          <text class="text-[13px] font-bold" :class="isDark ? 'text-[#34d399]' : 'text-[#059669]'">🚀 单页 TabBar</text>
+          <text class="text-[11px] mt-[4px] leading-[16px]" :class="isDark ? 'text-[#94a3b8]' : 'text-[#64748b]'">0ms 秒切保活・零白屏</text>
         </view>
 
         <!-- 沙盒调试 -->
-        <view class="w-[48.5%] p-[12px] mb-[10px] rounded-[10px] bg-[#8b5cf60f] border-[1px] border-solid border-[#8b5cf626]">
-          <text class="text-[13px] font-bold text-[#7c3aed]">🧪 沙盒独立调试</text>
-          <text class="text-[11px] text-[#64748b] mt-[4px] leading-[16px]">单页秒级编译・极速开发</text>
+        <view
+          class="w-[48.5%] p-[12px] mb-[10px] rounded-[10px] border-[1px] border-solid"
+          :class="isDark ? 'bg-[#8b5cf618] border-[#8b5cf633]' : 'bg-[#8b5cf60f] border-[#8b5cf626]'"
+        >
+          <text class="text-[13px] font-bold" :class="isDark ? 'text-[#a78bfa]' : 'text-[#7c3aed]'">🧪 沙盒独立调试</text>
+          <text class="text-[11px] mt-[4px] leading-[16px]" :class="isDark ? 'text-[#94a3b8]' : 'text-[#64748b]'">单页秒级编译・极速开发</text>
         </view>
 
         <!-- Vapor 渲染 -->
-        <view class="w-[48.5%] p-[12px] mb-[10px] rounded-[10px] bg-[#0284c70f] border-[1px] border-solid border-[#0284c726]">
-          <text class="text-[13px] font-bold text-[#0284c7]">⚡ Vapor 蒸汽渲染</text>
-          <text class="text-[11px] text-[#64748b] mt-[4px] leading-[16px]">无虚拟 DOM 原生高性能</text>
+        <view
+          class="w-[48.5%] p-[12px] mb-[10px] rounded-[10px] border-[1px] border-solid"
+          :class="isDark ? 'bg-[#0284c718] border-[#0284c733]' : 'bg-[#0284c70f] border-[#0284c726]'"
+        >
+          <text class="text-[13px] font-bold" :class="isDark ? 'text-[#38bdf8]' : 'text-[#0284c7]'">⚡ Vapor 蒸汽渲染</text>
+          <text class="text-[11px] mt-[4px] leading-[16px]" :class="isDark ? 'text-[#94a3b8]' : 'text-[#64748b]'">无虚拟 DOM 原生高性能</text>
         </view>
 
         <!-- Tailwind CSS -->
-        <view class="w-[48.5%] p-[12px] mb-[10px] rounded-[10px] bg-[#0d94880f] border-[1px] border-solid border-[#0d948826]">
-          <text class="text-[13px] font-bold text-[#0d9488]">🎨 Tailwind CSS</text>
-          <text class="text-[11px] text-[#64748b] mt-[4px] leading-[16px]">原子化样式・全端自适应</text>
+        <view
+          class="w-[48.5%] p-[12px] mb-[10px] rounded-[10px] border-[1px] border-solid"
+          :class="isDark ? 'bg-[#0d948818] border-[#0d948833]' : 'bg-[#0d94880f] border-[#0d948826]'"
+        >
+          <text class="text-[13px] font-bold" :class="isDark ? 'text-[#2dd4bf]' : 'text-[#0d9488]'">🎨 Tailwind CSS</text>
+          <text class="text-[11px] mt-[4px] leading-[16px]" :class="isDark ? 'text-[#94a3b8]' : 'text-[#64748b]'">原子化样式・全端自适应</text>
         </view>
 
         <!-- 自动文件路由 -->
-        <view class="w-[48.5%] p-[12px] mb-[10px] rounded-[10px] bg-[#f59e0b0f] border-[1px] border-solid border-[#f59e0b26]">
-          <text class="text-[13px] font-bold text-[#d97706]">📄 自动文件路由</text>
-          <text class="text-[11px] text-[#64748b] mt-[4px] leading-[16px]">自动扫描与配置同步</text>
+        <view
+          class="w-[48.5%] p-[12px] mb-[10px] rounded-[10px] border-[1px] border-solid"
+          :class="isDark ? 'bg-[#f59e0b18] border-[#f59e0b33]' : 'bg-[#f59e0b0f] border-[#f59e0b26]'"
+        >
+          <text class="text-[13px] font-bold" :class="isDark ? 'text-[#fbbf24]' : 'text-[#d97706]'">📄 自动文件路由</text>
+          <text class="text-[11px] mt-[4px] leading-[16px]" :class="isDark ? 'text-[#94a3b8]' : 'text-[#64748b]'">自动扫描与配置同步</text>
         </view>
 
         <!-- 丰富生态 -->
-        <view class="w-[48.5%] p-[12px] mb-[10px] rounded-[10px] bg-[#6366f10f] border-[1px] border-solid border-[#6366f126]">
-          <text class="text-[13px] font-bold text-[#4f46e5]">🛠️ 完善配套能力</text>
-          <text class="text-[11px] text-[#64748b] mt-[4px] leading-[16px]">图表/分页/加密/i18n</text>
+        <view
+          class="w-[48.5%] p-[12px] mb-[10px] rounded-[10px] border-[1px] border-solid"
+          :class="isDark ? 'bg-[#6366f118] border-[#6366f133]' : 'bg-[#6366f10f] border-[#6366f126]'"
+        >
+          <text class="text-[13px] font-bold" :class="isDark ? 'text-[#818cf8]' : 'text-[#4f46e5]'">🛠️ 完善配套能力</text>
+          <text class="text-[11px] mt-[4px] leading-[16px]" :class="isDark ? 'text-[#94a3b8]' : 'text-[#64748b]'">图表/分页/加密/i18n</text>
         </view>
       </view>
     </view>
 
     <!-- 底部提示 -->
-    <view class="mx-[16px] mt-[4px] mb-[24px] px-[14px] py-[10px] rounded-[10px] bg-[#f8fafc] border-[1px] border-solid border-[#e2e8f0] flex flex-row items-center">
+    <view
+      class="mx-[16px] mt-[4px] mb-[24px] px-[14px] py-[10px] rounded-[10px] border-[1px] border-solid flex flex-row items-center"
+      :class="isDark ? 'bg-[#1e293b]/70 border-[#334155]' : 'bg-[#f8fafc] border-[#e2e8f0]'"
+    >
       <text class="text-[14px] mr-[8px]">💡</text>
-      <text class="text-[11px] text-[#64748b] leading-[18px] flex-1">
+      <text
+        class="text-[11px] leading-[18px] flex-1"
+        :class="isDark ? 'text-[#94a3b8]' : 'text-[#64748b]'"
+      >
         详细配置与开发指引请查阅项目根目录 README.md 文档
       </text>
     </view>
@@ -121,9 +169,12 @@
 
 <script setup lang="uts">
 import { computed } from 'vue';
+import { useAppStore } from '@/src/store';
 import { systemInfo as systemInfoRef } from '@/src/utils/systemInfo.uts';
 import type { SystemInfoType } from '@/src/utils/systemInfo.uts';
 
+const appStore = useAppStore();
+const isDark = computed((): boolean => appStore.state.isDark);
 const systemInfo = computed<SystemInfoType | null>((): SystemInfoType | null => systemInfoRef.value);
 </script>
 
