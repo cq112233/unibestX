@@ -1,0 +1,194 @@
+import _easycom_up_loading_icon from '@/uni_modules/uview-ultra/components/up-loading-icon/up-loading-icon.uvue'
+import { computed, nextTick } from 'vue'
+	import { addStyle, getPx, addUnit, deepMerge } from '../../libs/function/index.uts'
+	import config from '../../libs/config/config'
+	import type { SwitchProps } from './type.uts'
+
+	
+const __sfc__ = defineComponent({
+  __name: 'up-switch',
+name: 'up-switch',
+  props: {
+    loading: { type: Boolean, required: false, default: false },
+    disabled: { type: Boolean, required: false, default: false },
+    size: { type: [String, Number], required: false, default: 25 },
+    activeColor: { type: String, required: false, default: '#2979ff' },
+    inactiveColor: { type: String, required: false, default: '#ffffff' },
+    modelValue: { type: [String, Number, Boolean], required: false, default: false },
+    activeValue: { type: [String, Number, Boolean], required: false, default: true },
+    inactiveValue: { type: [String, Number, Boolean], required: false, default: false },
+    asyncChange: { type: Boolean, required: false, default: false },
+    space: { type: [String, Number], required: false, default: 0 },
+    customStyle: { type: UTSJSONObject, required: false, default: () : UTSJSONObject => ({}) }
+  },
+  emits: ['update:modelValue', 'change'],
+  setup(__props) {
+const __ins = getCurrentInstance()!;
+const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+const _cache = __ins.renderCache;
+
+	
+
+	// 默认值与重构前 defineProps 内联默认值逐字一致
+	const props = __props
+
+	function emit(event: string, ...do_not_transform_spread: Array<any | null>) {
+__ins.emit(event, ...do_not_transform_spread)
+}
+
+	/**
+	 * size / space 可能是 string 也可能是 number，统一收敛为 number，
+	 * 消除 `parseInt(props.x.toString())` 的字符串往返。
+	 * `?? ''` 封口：UTS 中对 any|null 调 .toString() 返回 String?。
+	 */
+	function toNum(value : any | null, fallback : number) : number {
+		if (value == null) return fallback
+		const n = parseInt(value.toString() ?? '')
+		return isNaN(n) ? fallback : n
+	}
+
+	const isActive = computed<boolean>(() => {
+	  return props.modelValue == props.activeValue
+	})
+
+	const customInactiveColor = computed<boolean>(() => {
+	  return props.inactiveColor != '#fff' && props.inactiveColor != '#ffffff'
+	})
+
+	const loadingIconSize = computed((): number => {
+	  return parseInt(getPx(props.size)) * 0.6
+	})
+
+	const loadingColor = computed((): string => {
+	  if (isActive.value) {
+	    if (props.activeColor != '' && props.activeColor != '#2979ff') {
+	      return props.activeColor
+	    }
+	    return config.getString('color.up-primary') as string
+	  }
+	  return '#AAABAD'
+	})
+
+	const switchClass = computed<string>(() => {
+	  let classes = ['up-switch', 'wtu-abh7w1-0']
+	  if (props.disabled) {
+	    classes.push('up-switch--disabled')
+	  }
+	  if (isActive.value) {
+	    classes.push('up-switch--on')
+	  } else {
+	    classes.push('up-switch--off')
+	  }
+	  return classes.join(' ')
+	})
+
+	const switchStyle = computed<UTSJSONObject>(() => {
+	  let style = {} as UTSJSONObject
+	  const sizeNum = toNum(props.size, 25)
+	  if (sizeNum != 25) {
+	    style['width'] = addUnit(sizeNum * 2 + 2)
+	    style['height'] = addUnit(sizeNum + 2)
+	  }
+	  if (isActive.value) {
+	    style['borderColor'] = 'rgba(0, 0, 0, 0)'
+	  } else {
+	    if (customInactiveColor.value) {
+	      style['borderColor'] = 'rgba(0, 0, 0, 0)'
+	    } else {
+	      style['borderColor'] = 'rgba(0, 0, 0, 0.12)'
+	    }
+	  }
+	  return style
+	})
+
+	const mergedSwitchStyle = computed((): UTSJSONObject => {
+	  return deepMerge(switchStyle.value, addStyle(props.customStyle)) as UTSJSONObject
+	})
+
+	const bgActiveStyle = computed<UTSJSONObject>(() => {
+	  let style = {} as UTSJSONObject
+	  const sizeNum = toNum(props.size, 25)
+	  style['width'] = addUnit(sizeNum * 2 + 2)
+	  style['height'] = addUnit(sizeNum + 2)
+	  if (props.activeColor != '#2979ff') {
+	    style['backgroundColor'] = props.activeColor
+	  }
+	  return style
+	})
+
+	const nodeStyle = computed<UTSJSONObject>(() => {
+	  let style = {} as UTSJSONObject
+	  const sizeVal = toNum(props.size, 25)
+	  const spaceVal = toNum(props.space, 0)
+	  style['width'] = addUnit(sizeVal - spaceVal)
+	  style['height'] = addUnit(sizeVal - spaceVal)
+	  const translateX = isActive.value ? addUnit(props.space) : addUnit(props.size)
+	  style['transform'] = `translateX(-${translateX})`
+	  return style
+	})
+
+	const bgStyle = computed<UTSJSONObject>(() => {
+	  let style = {} as UTSJSONObject
+	  const sizeNum = toNum(props.size, 25)
+	  style['width'] = addUnit(sizeNum * 2)
+	  style['height'] = addUnit(sizeNum)
+	  style['backgroundColor'] = props.inactiveColor
+	  style['transform'] = `scale(${isActive.value ? 0 : 1})`
+	  return style
+	})
+
+	function clickHandler() {
+	  if (!props.disabled && !props.loading) {
+	    const oldValue = isActive.value ? props.inactiveValue : props.activeValue
+	    if (!props.asyncChange) {
+	      emit('update:modelValue', oldValue)
+	    }
+	    nextTick(() => {
+	      emit('change', oldValue)
+	    })
+	  }
+	}
+
+return (): any | null => {
+
+const _component_up_loading_icon = resolveEasyComponent("up-loading-icon",_easycom_up_loading_icon)
+
+  return _cE("view", _uM({
+    class: _nC(["weapp-tw-border", switchClass.value]),
+    style: _nS(mergedSwitchStyle.value),
+    onClick: clickHandler
+  }), [
+    isTrue(isActive.value)
+      ? _cE("view", _uM({
+          key: 0,
+          class: "weapp-tw-border up-switch__bg-active",
+          style: _nS(bgActiveStyle.value)
+        }), null, 4 /* STYLE */)
+      : _cC("v-if", true),
+    isTrue(!isActive.value)
+      ? _cE("view", _uM({
+          key: 1,
+          class: "weapp-tw-border up-switch__bg",
+          style: _nS(bgStyle.value)
+        }), null, 4 /* STYLE */)
+      : _cC("v-if", true),
+    _cE("view", _uM({
+      class: _nC(["weapp-tw-border up-switch__node", [_ctx.modelValue == _ctx.activeValue ? 'up-switch__node--on' : '']]),
+      style: _nS(nodeStyle.value)
+    }), [
+      _cV(_component_up_loading_icon, _uM({
+        show: _ctx.loading,
+        mode: "circle",
+        timingFunction: "linear",
+        color: loadingColor.value,
+        size: loadingIconSize.value
+      }), null, 8 /* PROPS */, ["show", "color", "size"])
+    ], 6 /* CLASS, STYLE */)
+  ], 6 /* CLASS, STYLE */)
+}
+}
+
+})
+export default __sfc__
+export type UpSwitchComponentPublicInstance = InstanceType<typeof __sfc__>;
+const GenUniModulesUviewUltraComponentsUpSwitchUpSwitchStyles = [_uM([["weapp-tw-border", _pS(_uM([["borderTopWidth", 0], ["borderRightWidth", 0], ["borderBottomWidth", 0], ["borderLeftWidth", 0]]))], ["up-switch", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["position", "relative"], ["backgroundColor", "rgba(0,0,0,0)"], ["borderTopWidth", 1], ["borderRightWidth", 1], ["borderBottomWidth", 1], ["borderLeftWidth", 1], ["borderTopLeftRadius", 100], ["borderTopRightRadius", 100], ["borderBottomRightRadius", 100], ["borderBottomLeftRadius", 100], ["transitionProperty", "backgroundColor"], ["transitionDuration", "0.4s"], ["borderTopColor", "rgba(0,0,0,0.12)"], ["borderRightColor", "rgba(0,0,0,0.12)"], ["borderBottomColor", "rgba(0,0,0,0.12)"], ["borderLeftColor", "rgba(0,0,0,0.12)"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["justifyContent", "flex-end"], ["alignItems", "center"], ["overflow", "hidden"], ["width", 52], ["height", 27]]))], ["up-switch__bg-active", _pS(_uM([["position", "absolute"], ["top", -1], ["left", -1], ["borderTopLeftRadius", 100], ["borderTopRightRadius", 100], ["borderBottomRightRadius", 100], ["borderBottomLeftRadius", 100], ["backgroundColor", "var(--theme-color)"], ["width", 52], ["height", 27]]))], ["up-switch__node", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["justifyContent", "center"], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", 100], ["borderTopRightRadius", 100], ["borderBottomRightRadius", 100], ["borderBottomLeftRadius", 100], ["boxShadow", "1px 1px 1px 0 rgba(0, 0, 0, 0.25)"], ["transitionProperty", "transform"], ["transitionDuration", "0.4s"], ["transitionTimingFunction", "cubic-bezier(0.3,1.05,0.4,1.05)"]]))], ["up-switch__bg", _pS(_uM([["position", "absolute"], ["borderTopLeftRadius", 0], ["borderTopRightRadius", 100], ["borderBottomRightRadius", 100], ["borderBottomLeftRadius", 0], ["backgroundColor", "#FFFFFF"], ["transitionProperty", "transform"], ["transitionDuration", "0.4s"], ["transitionTimingFunction", "ease"]]))], ["up-switch--disabled", _pS(_uM([["opacity", 0.6]]))], ["wtu-abh7w1-0", _pS(_uM([["cursor", "pointer"]]))], ["@TRANSITION", _uM([["up-switch", _uM([["property", "backgroundColor"], ["duration", "0.4s"]])], ["up-switch__node", _uM([["property", "transform"], ["duration", "0.4s"], ["timingFunction", "cubic-bezier(0.3,1.05,0.4,1.05)"]])], ["up-switch__bg", _uM([["property", "transform"], ["duration", "0.4s"], ["timingFunction", "ease"]])]])]])]

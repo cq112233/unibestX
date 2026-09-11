@@ -2,6 +2,7 @@
 	<view
 	    class="up-radio-group"
 	    :class="bemClass"
+	    :style="groupStyle"
 	>
 		<slot></slot>
 	</view>
@@ -38,23 +39,19 @@
 
 	const emit = defineEmits(['update:modelValue', 'change'])
 
-	// 可写 computed：既是下发给子组件的响应式源，也承担 v-model 回写
-	const modelValue = computed<RadioValue>({
-		get(): RadioValue {
-			return props.modelValue
-		},
-		set(v : RadioValue) {
-			emit('update:modelValue', v)
-		}
-	})
+	// 只读 computed：仅作为下发给子组件的响应式源。
+	// 不要写 computed({ get, set }) —— uni-app X 运行时不支持该对象字面量形式，会在运行期抛
+	// ClassCastException: UTSJSONObject cannot be cast to WritableComputedOptions，编译期无任何告警。
+	// v-model 回写一律在下方直接 emit。
+	const modelValue = computed<RadioValue>((): RadioValue => props.modelValue)
 
 	const select = (name : RadioValue) => {
 		if (name == null) {
-			modelValue.value = ''
+			emit('update:modelValue', '')
 			emit('change', '')
 			return
 		}
-		modelValue.value = name
+		emit('update:modelValue', name)
 		emit('change', name)
 	}
 
@@ -79,22 +76,31 @@
 	const bemClass = computed(() => {
 		return bem('radio-group', [props.placement], [])
 	})
+
+	const groupStyle = computed<UTSJSONObject>((): UTSJSONObject => {
+		const style = {} as UTSJSONObject
+		style['display'] = 'flex'
+		style['flexDirection'] = props.placement == 'column' ? 'column' : 'row'
+		style['flexWrap'] = 'wrap'
+		style['alignItems'] = 'center'
+		return style
+	})
 </script>
 
 <style lang="scss" scoped>
-	@import "../../libs/css/components.scss";
-
 	.up-radio-group {
 		flex: 1;
+	}
 
-		&--row {
-			display: flex;
-			flex-flow: row wrap;
-		}
+	.up-radio-group--row {
+		display: flex;
+		flex-direction: row;
+		flex-wrap: wrap;
+		align-items: center;
+	}
 
-		&--column {
-			display: flex;
-			flex-direction: column;
-		}
+	.up-radio-group--column {
+		display: flex;
+		flex-direction: column;
 	}
 </style>

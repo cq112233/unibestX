@@ -266,23 +266,18 @@ export const RADIO_GROUP_KEY = 'upRadioGroup'
 
 	const emit = defineEmits(['update:modelValue', 'change'])
 
-	// 可写 computed：既是下发给子组件的响应式源，也承担 v-model 回写
-	const modelValue = computed<RadioValue>({
-		get(): RadioValue {
-			return props.modelValue
-		},
-		set(v : RadioValue) {
-			emit('update:modelValue', v)
-		}
-	})
+	// 只读 computed：仅作为下发给子组件的响应式源。
+	// 不要写 computed({ get, set }) —— uni-app X 运行时不支持该对象字面量形式，会在运行期抛
+	// ClassCastException: UTSJSONObject cannot be cast to WritableComputedOptions，编译期无任何告警。
+	const modelValue = computed<RadioValue>((): RadioValue => props.modelValue)
 
 	const select = (name : RadioValue) => {
 		if (name == null) {
-			modelValue.value = ''
+			emit('update:modelValue', '')
 			emit('change', '')
 			return
 		}
-		modelValue.value = name
+		emit('update:modelValue', name)
 		emit('change', name)
 	}
 
@@ -928,15 +923,10 @@ export const CHECKBOX_GROUP_KEY = 'upCheckboxGroup'
 
 	const emit = defineEmits(['update:modelValue', 'change'])
 
-	// 可写 computed：既是下发给子组件的响应式源，也承担 v-model 回写
-	const modelValue = computed<any[]>({
-		get(): any[] {
-			return props.modelValue
-		},
-		set(v : any[]) {
-			emit('update:modelValue', v)
-		}
-	})
+	// 只读 computed：仅作为下发给子组件的响应式源。
+	// 不要写 computed({ get, set }) —— uni-app X 运行时不支持该对象字面量形式，会在运行期抛
+	// ClassCastException: UTSJSONObject cannot be cast to WritableComputedOptions，编译期无任何告警。
+	const modelValue = computed<any[]>((): any[] => props.modelValue)
 
 	/**
 	 * 按值查找索引 → push / splice。与重构前 toggleCheckbox 语义逐行一致。
@@ -2262,8 +2252,8 @@ export type PickerProps = {
 	toolbarBottomSlot ?: boolean,
 	/** 标题 */
 	title ?: string,
-	/** 各列的数据 */
-	columns ?: any[],
+	/** 各列的数据：外层是「列」，内层是每列的选项。与重构前 PropType<Array<Array<any>>> 一致 */
+	columns ?: Array<Array<any>>,
 	/** 是否显示加载中 */
 	loading ?: boolean,
 	/** 每项的高度，单位 px */
@@ -2330,7 +2320,7 @@ export type PickerConfirmEvent = {
 		toolbarRightSlot: false,
 		toolbarBottomSlot: false,
 		title: '',
-		columns: () : any[] => [],
+		columns: () : Array<Array<any>> => [],
 		loading: false,
 		itemHeight: 44,
 		cancelText: '取消',

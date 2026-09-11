@@ -97,13 +97,7 @@ export function bem(name: string, fixed: Array<string>, change: Array<Array<any>
 			  // : (delete classes[prefix + item[0]])
 		  })
 	  }
-	  // #ifdef APP
 	  return UTSJSONObject.keys(classes).join(' ')
-	  // #endif
-	  // #ifdef WEB || MP
-	  return UTSJSONObject.keys(classes).join(' ')
-	  // #endif
-	  // 支付宝，头条小程序无法动态绑定一个数组类名，否则解析出来的结果会带有","，而导致失效
 }
 
 /**

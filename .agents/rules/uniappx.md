@@ -228,6 +228,15 @@ description: uni-app X (UTS) 开发规范与踩坑避坑指南，适用于跨端
 * **安全获取系统与应用语言 (Safe Access to System Locale)**：
   * 在原生 Android/iOS 平台上，`uni.getLocale()` 不被直接支持或编译时可能报错。
   * *正确做法*：在 App 端，使用 `uni.getSystemInfoSync().appLanguage`（应用当前语言）或 `uni.getDeviceInfo().osLanguage`（系统底层语言）来获取安全真实的语言。
+* **`computed` 只允许单参 getter 形式 (Computed: Getter-Only)**：
+  * 禁止在 `<script setup>` 顶层写带显式泛型的可写 computed：`computed<T>({ get() {...}, set() {...} })`。它**能通过编译**——`cli publish` 与 IDE 编译均无任何告警——但运行期必抛 `java.lang.ClassCastException: UTSJSONObject cannot be cast to WritableComputedOptions`（UTS 把该对象字面量落实为 `UTSJSONObject`，而非运行时期望的 `WritableComputedOptions`）。实测于 2026-09-11 `up-radio-group` / `up-checkbox-group`。
+  * *正确做法*：只读用途写 `const modelValue = computed<RadioValue>((): RadioValue => props.modelValue)`；需要回写的场景（v-model 等）在业务函数里直接 `emit('update:modelValue', v)`，不要绕经 setter。
+  * *错误示例*：`const modelValue = computed<RadioValue>({ get(): RadioValue { return props.modelValue }, set(v : RadioValue) { emit('update:modelValue', v) } })`
+  * **注意适用范围**：同样的对象字面量形式出现在 `uni_modules/lime-i18n/common/composer.uts`（赋值给已声明类型的类字段）时**并未崩溃**——类型上下文能纠正字面量。所以本条的实测结论限定于「`<script setup>` 顶层 + 显式泛型」这一形态，不要据此去改 lime-i18n。
+* **`<script setup>` 顶层 `const` 必须先声明后使用 (No Forward References)**：
+  * UTS 编译到 Kotlin 后，局部 `val` 不允许前向引用——**即使引用发生在箭头函数体内**（`computed` / `watch` 的回调正是这种情况），编译期也会报 `找不到名称 xxx`。
+  * *正确做法*：凡被 `computed` / `watch` 回调引用的 `const`，其声明必须写在引用它的那条语句之前；类名、样式等派生 computed 尤其容易踩到。
+  * *错误示例*：`const style = computed(() => placementClass.value)` 写在 `const placementClass = computed(() => ...)` 之前。
 
 ---
 

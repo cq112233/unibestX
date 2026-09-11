@@ -1,0 +1,60 @@
+import type { Ref } from 'vue';
+/** radio / radio-group 绑定的值 */
+export type RadioValue = string | number | boolean;
+/** up-radio-group 的 props 契约（默认值见 up-radio-group.uvue 的 withDefaults） */
+export type RadioGroupProps = {
+    /** 标识符 */
+    name?: string;
+    /** 绑定的值，通过 v-model 传入 */
+    modelValue?: RadioValue;
+    /** 形状，circle-圆形，square-方形 */
+    shape?: string;
+    /** 是否禁用全部 radio */
+    disabled?: boolean;
+    /** 选中状态下的颜色 */
+    activeColor?: string;
+    /** 未选中的颜色 */
+    inactiveColor?: string;
+    /** 整个组件的尺寸，单位 px */
+    size?: string | number;
+    /** 布局方式，row-横向，column-纵向 */
+    placement?: string;
+    /** label 的字体大小，单位 px */
+    labelSize?: string | number;
+    /** label 的字体颜色 */
+    labelColor?: string;
+    /** 是否禁止点击文本操作 */
+    labelDisabled?: boolean;
+    /** 图标颜色 */
+    iconColor?: string;
+    /** 图标的大小，单位 px */
+    iconSize?: string | number;
+    /** 勾选图标的对齐方式，left-左边，right-右边 */
+    iconPlacement?: string;
+    /** placement 为 column 时，是否显示下边框 */
+    borderBottom?: boolean;
+};
+/**
+ * up-radio-group 通过 provide 下发给 up-radio 的响应式契约。
+ * 协议由 group 拥有，up-radio 反向 import 本类型。
+ */
+export type RadioGroupProvide = {
+    modelValue: Ref<RadioValue>;
+    shape: Ref<string>;
+    disabled: Ref<boolean>;
+    activeColor: Ref<string>;
+    inactiveColor: Ref<string>;
+    size: Ref<string | number>;
+    placement: Ref<string>;
+    labelSize: Ref<string | number>;
+    labelColor: Ref<string>;
+    labelDisabled: Ref<boolean>;
+    iconColor: Ref<string>;
+    iconSize: Ref<string | number>;
+    iconPlacement: Ref<string>;
+    borderBottom: Ref<boolean>;
+    /** up-radio 选中时回调；由 group 更新 modelValue 并派发 change */
+    select: (name: RadioValue) => void;
+};
+/** provider / inject 之间唯一的协议标识 */
+export const RADIO_GROUP_KEY = 'upRadioGroup';

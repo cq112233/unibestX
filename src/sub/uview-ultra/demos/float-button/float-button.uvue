@@ -1,0 +1,165 @@
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
+    <view class="p-[16px]">
+      <view class="demo-block">
+        <text class="demo-label">组件说明</text>
+        <text class="demo-text">up-float-button 通过 position: fixed 固定在屏幕上，常用于承载「回到顶部 / 客服 / 快速入口」这类全局操作。isMenu 为 true 时，点击主按钮会展开 list 里的子按钮。</text>
+      </view>
+
+      <view class="demo-block mt-[12px]">
+        <text class="demo-label">1. 基础用法（top 定位）</text>
+        <text class="demo-text">不传 isMenu 时点击只触发 click 事件。本例用 top 而不是 bottom 指定位置，按钮在右上角。</text>
+        <text class="demo-text mt-[6px]">click 次数：{{ basicClickCount }}</text>
+      </view>
+
+      <view class="demo-block mt-[12px]">
+        <text class="demo-label">2. 菜单模式（isMenu + list）</text>
+        <text class="demo-text">点击主按钮展开 / 收起，主按钮上的 plus 图标会旋转 45° 变成关闭样式。子项点击触发 item-click，载荷是原对象的浅拷贝并附加 index。</text>
+      </view>
+
+      <view class="demo-block mt-[12px]">
+        <text class="demo-label">3. 自定义尺寸与配色</text>
+        <text class="demo-text">width / height / backgroundColor / color 可整体改外观，默认插槽可以换成任意内容（这里放了一个 edit-pen 图标）。</text>
+        <text class="demo-text mt-[6px]">注意：borderColor 只写入 border-color，组件未设置 border-width / border-style，所以单传 borderColor 不会出现边框。</text>
+      </view>
+
+      <view class="demo-block mt-[12px]">
+        <text class="demo-label">4. 可拖动（draggable）</text>
+        <text class="demo-text">打开 draggable 后，按住主按钮可以拖到屏幕任意位置，自动夹在窗口内。初始位置仍然由 top / right / bottom 换算而来，拖过一次之后就归用户了。</text>
+        <text class="demo-text mt-[6px]">橙色那个就是。拖动会抑制 click —— 位移超过 8px 就当成拖动，不再触发 click / 不展开菜单。</text>
+      </view>
+
+      <view class="demo-block mt-[12px]">
+        <text class="demo-label">事件日志</text>
+        <view class="log-box mt-[10px]">
+          <text class="log-text">{{ eventLog }}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 1. 基础用法：top + right 定位，非菜单模式 -->
+    <up-float-button top="150px" right="30px" @click="onBasicClick"></up-float-button>
+
+    <!-- 2. 菜单模式：点击展开 list 中的子按钮 -->
+    <up-float-button
+      bottom="190px"
+      right="30px"
+      :is-menu="true"
+      :list="menuList"
+      @click="onMenuClick"
+      @item-click="onItemClick"
+    ></up-float-button>
+
+    <!-- 3. 自定义尺寸与配色 + 默认插槽 -->
+    <up-float-button
+      bottom="40px"
+      right="30px"
+      background-color="#19be6b"
+      color="#ffffff"
+      width="60px"
+      height="60px"
+      @click="onCustomClick"
+    >
+      <up-icon name="edit-pen" color="#ffffff" size="26"></up-icon>
+    </up-float-button>
+
+    <!-- 4. 可拖动：初始落在 top 300px / right 30px，之后跟着手指走 -->
+    <up-float-button
+      top="300px"
+      right="30px"
+      background-color="#f59e0b"
+      color="#ffffff"
+      :draggable="true"
+      @click="onDragButtonClick"
+    >
+      <up-icon name="pushpin" color="#ffffff" size="24"></up-icon>
+    </up-float-button>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { ref } from 'vue';
+
+definePage({
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
+  style: {
+    navigationBarTitleText: 'up-float-button 悬浮按钮',
+    navigationStyle: 'custom'
+  }
+});
+
+const basicClickCount = ref(0);
+const eventLog = ref<string>('点击任意悬浮按钮，事件会打印在这里');
+
+// 菜单项：name 为图标名，未指定的 backgroundColor / color 会退回组件自身的同名属性
+const menuList = ref<UTSJSONObject[]>([
+  { name: 'star-fill', backgroundColor: '#ff9900', color: '#ffffff' },
+  { name: 'chat-fill', backgroundColor: '#3c9cff', color: '#ffffff' },
+  { name: 'share-fill', backgroundColor: '#19be6b', color: '#ffffff' }
+] as UTSJSONObject[]);
+
+function log(message: string): void {
+  eventLog.value = message;
+}
+
+function onBasicClick(): void {
+  basicClickCount.value = basicClickCount.value + 1;
+  log(`click => 基础按钮被点击，第 ${basicClickCount.value} 次`);
+}
+
+function onMenuClick(): void {
+  log('click => 菜单按钮展开 / 收起');
+}
+
+function onCustomClick(): void {
+  log('click => 自定义样式按钮被点击');
+}
+
+function onDragButtonClick(): void {
+  log('click => 可拖动按钮被点击（拖动不会触发这一条）');
+}
+
+// item-click 的载荷是原对象浅拷贝 + index，直接用 UTSJSONObject 的取值方法，别走 any
+function onItemClick(item: UTSJSONObject): void {
+  const index = item.getNumber('index') ?? 0;
+  const name = item.getString('name') ?? '';
+  log(`item-click => index=${index} name=${name}`);
+}
+</script>
+
+<style lang="scss" scoped>
+.demo-block {
+  margin-bottom: 12px;
+  padding: 12px;
+  background-color: #ffffff;
+  border-radius: 8px;
+}
+.demo-label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #606266;
+  margin-bottom: 10px;
+  padding-left: 4px;
+  border-left-width: 3px;
+  border-left-style: solid;
+  border-left-color: $up-primary;
+}
+.demo-text {
+  font-size: 13px;
+  color: #475569;
+  line-height: 20px;
+}
+.log-box {
+  padding: 10px;
+  background-color: #f1f5f9;
+  border-radius: 8px;
+}
+.log-text {
+  font-size: 13px;
+  color: #475569;
+  line-height: 20px;
+}
+</style>

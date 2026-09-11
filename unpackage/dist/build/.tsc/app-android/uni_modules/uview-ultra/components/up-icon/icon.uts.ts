@@ -1,0 +1,33 @@
+/*
+ * @Author       : jry
+ * @Description  :
+ * @version      : 4.0
+ * @Date         : 2024-04-22 16:44:21
+ * @LastAuthor   : jry
+ * @lastTime     : 2024-08-28 18:00:14
+ * @FilePath     : /uview-ultra/libs/config/props/icon.js
+ */
+import config from '../../libs/config/config.uts'
+
+export default {
+    // icon组件
+    icon: {
+        name: '',
+        color: config.getString('color.up-content-color'),
+        size: '16px',
+        bold: false,
+        index: '',
+        hoverClass: '',
+        customPrefix: 'upicon',
+        label: '',
+        labelPos: 'right',
+        labelSize: '15px',
+        labelColor: config.getString('color.up-content-color'),
+        space: '3px',
+        imgMode: '',
+        width: '',
+        height: '',
+        top: '0',
+        stop: false
+    }
+} as UTSJSONObject

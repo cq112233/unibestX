@@ -34,6 +34,7 @@
 <script setup lang="uts">
 	import { computed, inject, ref } from 'vue'
 	import { addUnit, addStyle, os, deepMerge, error } from '../../libs/function/index'
+	import config from '../../libs/config/config'
 	import { RADIO_GROUP_KEY } from '../up-radio-group/type.uts'
 	import type { RadioGroupProvide } from '../up-radio-group/type.uts'
 	import type { RadioProps } from './type.uts'
@@ -128,8 +129,18 @@
 		return pick(props.iconSize, fromGroup('iconSize'), '12')
 	})
 
+	const primaryColor = computed((): string => {
+		const colorMap = config['color'] as UTSJSONObject
+		const cfg = colorMap['up-primary'] as string | null
+		return cfg != null && cfg != '' && cfg != '#2979ff' && cfg != '#3c9cff' ? cfg : '#37c2bc'
+	})
+
 	const elActiveColor = computed<string>((): string => {
-		return pick(props.activeColor, fromGroup('activeColor'), '#2979ff')
+		const c = pick(props.activeColor, fromGroup('activeColor'), '')
+		if (c != '' && c != '#2979ff') {
+			return c
+		}
+		return primaryColor.value
 	})
 
 	const elInactiveColor = computed<string>((): string => {
@@ -165,7 +176,7 @@
 		if (isChecked.value && elDisabled.value) {
 			classes.push('up-radio__icon-wrap--disabled--checked')
 		}
-		if (isChecked.value && !elDisabled.value && elActiveColor.value == '#2979ff') {
+		if (isChecked.value && !elDisabled.value) {
 			classes.push('up-radio__icon-wrap--active')
 		}
 		return classes.join(' ')
@@ -173,20 +184,34 @@
 
 	const iconWrapStyle = computed<UTSJSONObject>((): UTSJSONObject => {
 		const style = {} as UTSJSONObject
+		const size = addUnit(elSize.value)
+		style['width'] = size
+		style['height'] = size
+		style['borderWidth'] = '1px'
+		style['borderStyle'] = 'solid'
+		style['borderRadius'] = elShape.value == 'square' ? '3px' : '100px'
+		style['display'] = 'flex'
+		style['flexDirection'] = 'row'
+		style['alignItems'] = 'center'
+		style['justifyContent'] = 'center'
+		style['flexShrink'] = 0
+
 		if (isChecked.value && !elDisabled.value) {
-			if (elActiveColor.value != '#2979ff') {
-				style['backgroundColor'] = elActiveColor.value
-				style['borderColor'] = elActiveColor.value
-			}
+			style['backgroundColor'] = elActiveColor.value
+			style['borderColor'] = elActiveColor.value
+		} else if (elDisabled.value) {
+			style['backgroundColor'] = '#ebedf0'
+			style['borderColor'] = elInactiveColor.value
 		} else {
 			style['backgroundColor'] = '#ffffff'
 			style['borderColor'] = elInactiveColor.value
 		}
-		style['width'] = addUnit(elSize.value)
-		style['height'] = addUnit(elSize.value)
+
 		const parentPlacement = fromGroup('iconPlacement')
 		if (parentPlacement != null && parentPlacement.toString() == 'right') {
-			style['marginRight'] = 0
+			style['marginRight'] = '0px'
+		} else {
+			style['marginRight'] = '6px'
 		}
 		return style
 	})
@@ -195,23 +220,11 @@
 		const style = {} as UTSJSONObject
 		style['color'] = elDisabled.value ? elInactiveColor.value : elLabelColor.value
 		style['fontSize'] = elLabelSize.value
-		style['lineHeight'] = elLabelSize.value
 		return style
 	})
 
-	const radioStyle = computed<UTSJSONObject>((): UTSJSONObject => {
-		const style = {} as UTSJSONObject
-		const borderBottom = fromGroup('borderBottom')
-		const placement = fromGroup('placement')
-		if (borderBottom != null && borderBottom.toString() == 'true' && placement != null && placement.toString() == 'row') {
-			error('检测到您将borderBottom设置为true，需要同时将up-radio-group的placement设置为column才有效')
-		}
-		if (borderBottom != null && borderBottom.toString() == 'true' && placement != null && placement.toString() == 'column') {
-			style['paddingBottom'] = os() == 'ios' ? '12px' : '8px'
-		}
-		return deepMerge(style, addStyle(props.customStyle)) as UTSJSONObject
-	})
-
+	// 必须在 radioStyle 之前声明：UTS 编译到 Kotlin 后不允许局部 val 前向引用，
+	// 被 radioStyle 的箭头函数捕获时会报「找不到名称 iconPlacementClass」。
 	const iconPlacementClass = computed<string>((): string => {
 		const p = fromGroup('iconPlacement')
 		if (p != null && p.toString() != '') {
@@ -227,6 +240,24 @@
 			return 'up-border-bottom'
 		}
 		return ''
+	})
+
+	const radioStyle = computed<UTSJSONObject>((): UTSJSONObject => {
+		const style = {} as UTSJSONObject
+		style['display'] = 'flex'
+		style['flexDirection'] = iconPlacementClass.value == 'up-radio-label--right' ? 'row-reverse' : 'row'
+		style['alignItems'] = 'center'
+		style['marginTop'] = '5px'
+		style['marginBottom'] = '5px'
+		const borderBottom = fromGroup('borderBottom')
+		const placement = fromGroup('placement')
+		if (borderBottom != null && borderBottom.toString() == 'true' && placement != null && placement.toString() == 'row') {
+			error('检测到您将borderBottom设置为true，需要同时将up-radio-group的placement设置为column才有效')
+		}
+		if (borderBottom != null && borderBottom.toString() == 'true' && placement != null && placement.toString() == 'column') {
+			style['paddingBottom'] = os() == 'ios' ? '12px' : '8px'
+		}
+		return deepMerge(style, addStyle(props.customStyle)) as UTSJSONObject
 	})
 
 	function emitEvent() {
@@ -284,96 +315,71 @@
 </script>
 
 <style lang="scss" scoped>
-	@import "../../libs/css/components.scss";
-	$up-radio-wrap-margin-right:6px !default;
-	$up-radio-wrap-font-size:20px !default;
-	$up-radio-wrap-border-width:1px !default;
-	$up-radio-wrap-border-color: #c8c9cc !default;
-	$up-radio-line-height:0 !default;
-	$up-radio-circle-border-radius:50px !default;
-	$up-radio-square-border-radius:3px !default;
-	$up-radio-checked-color:#fff !default;
-	$up-radio-checked-background-color:red !default;
-	$up-radio-checked-border-color: #2979ff !default;
-	$up-radio-disabled-background-color:#ebedf0 !default;
-	$up-radio-disabled--checked-color:#c8c9cc !default;
-	$up-radio-label-margin-left: 5px !default;
-	$up-radio-label-margin-right:12px !default;
-	$up-radio-label-color:$up-content-color !default;
-	$up-radio-label-font-size:15px !default;
-	$up-radio-label-disabled-color:#c8c9cc !default;
-
 	.up-radio {
 		display: flex;
-		flex-direction: row;
-		overflow: hidden;
 		flex-direction: row;
 		align-items: center;
 		margin-bottom: 5px;
 		margin-top: 5px;
+	}
 
-		&-label--left {
-			flex-direction: row;
-		}
+	.up-radio-label--left {
+		flex-direction: row;
+	}
 
-		&-label--right {
-			flex-direction: row-reverse;
-			justify-content: space-between;
-		}
+	.up-radio-label--right {
+		flex-direction: row-reverse;
+		justify-content: space-between;
+	}
 
-		&__icon-wrap {
-			/* #ifndef APP */
-			box-sizing: border-box;
-			transition-property: border-color, background-color, color;
-			transition-duration: 0.2s;
-			/* #endif */
-			display: flex;
-			flex-direction: row;
-			align-items: center;
-			justify-content: center;
-			margin-right: $up-radio-wrap-margin-right;
-			border-width: $up-radio-wrap-border-width;
-			border-color: $up-radio-wrap-border-color;
-			border-style: solid;
+	.up-radio__icon-wrap {
+		/* #ifndef APP */
+		box-sizing: border-box;
+		transition-property: border-color, background-color, color;
+		transition-duration: 0.2s;
+		/* #endif */
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		justify-content: center;
+		margin-right: 6px;
+		border-width: 1px;
+		border-color: #c8c9cc;
+		border-style: solid;
+	}
 
-			/* #ifdef MP-TOUTIAO */
-			&__icon {
-				line-height: $up-radio-line-height;
-			}
-			/* #endif */
+	.up-radio__icon-wrap--circle {
+		border-radius: 100px;
+	}
 
-			&--circle {
-				border-radius: $up-radio-circle-border-radius;
-			}
+	.up-radio__icon-wrap--square {
+		border-radius: 3px;
+	}
 
-			&--square {
-				border-radius: $up-radio-square-border-radius;
-			}
+	.up-radio__icon-wrap--checked {
+		background-color: red;
+		border-color: #2979ff;
+	}
 
-			&--checked {
-				background-color: $up-radio-checked-background-color;
-				border-color: $up-radio-checked-border-color;
-			}
+	.up-radio__icon-wrap--active {
+		background-color: #2979ff;
+		border-color: #2979ff;
+	}
 
-			&--active {
-				background-color: $up-primary;
-				border-color: $up-primary;
-			}
+	.up-radio__icon-wrap--disabled {
+		background-color: #ebedf0;
+	}
 
-			&--disabled {
-				background-color: $up-radio-disabled-background-color !important;
-			}
-		}
+	.up-radio__icon-wrap--disabled--checked {
+		color: #c8c9cc;
+	}
 
-		&__label {
-			margin-left: $up-radio-label-margin-left;
-			margin-right: $up-radio-label-margin-right;
-			color: $up-radio-label-color;
-			font-size: $up-radio-label-font-size;
+	.up-radio__label {
+		color: #606266;
+		font-size: 15px;
+	}
 
-			&--disabled {
-				color: $up-radio-label-disabled-color;
-			}
-		}
+	.up-radio__label--disabled {
+		color: #c8c9cc;
 	}
 </style>

@@ -1,0 +1,91 @@
+import App from './App.uvue'; // 导入应用根组件 App.uvue
+import { createSSRApp } from 'vue'; // 导入 Vue 的 SSR 应用创建方法
+import pinia from './src/store'; // 导入 Pinia 状态管理实例（在 App-Android 平台上强制进行顶层定义约束）
+import i18n from './src/i18n'; // 导入 i18n 国际化配置实例
+import ultraUI from '@/uni_modules/uview-ultra/index.uts'; // 导入 uview-ultra 跨端 UI 组件库
+import { installRouteInterceptor } from './src/router/interceptor'; // 导入全局路由拦截器安装函数
+
+import { setupH5Components } from './src/utils/h5-components.uts';
+
+/**
+ * 创建应用实例的入口函数
+ */
+export function createApp() {
+  // 安装全局路由拦截器
+  installRouteInterceptor();
+
+  // 创建 Vue 应用程序实例，传入根组件 App
+  const app = createSSRApp(App);
+
+  // 注册 Pinia 状态管理
+  app.use(pinia);
+
+  // 可选配置：将 pinia 实例挂载到 Vue 全局属性中，以便于在 Options API 模板中使用 this.$pinia 访问
+  app.config.globalProperties.$pinia = pinia;
+
+  // 注册 i18n 国际化插件
+  app.use(i18n);
+
+  // 注册 uview-ultra UI 组件库并传入自定义初始化配置项
+  app.use(ultraUI, () => {
+    return {
+      options: {
+        config: {
+          // 开启只加载一次字体图标的优化，避免重复加载
+          loadFontOnce: true
+        }
+      }
+    };
+  });
+
+  // 临时修复 H5 生产环境 easycom 失效导致内置组件不渲染的问题
+  setupH5Components(app);
+
+  // 返回创建好的应用实例对象，供系统挂载运行
+  return {
+    app
+  };
+}
+
+export function main(app: IApp) {
+    enableStyleIsolation();
+    definePageRoutes();
+    defineAppConfig();
+    (createApp()['app'] as VueApp).mount(app, GenUniApp());
+}
+
+export class UniAppConfig extends io.dcloud.uniapp.appframe.AppConfig {
+    override name: string = "unibestX"
+    override appid: string = "__UNI__B120614"
+    override versionName: string = "1.0.0"
+    override versionCode: string = "100"
+    override uniCompilerVersion: string = "5.24"
+    
+    constructor() { super() }
+}
+
+import GenSrcSubUviewUltraDemosFormFormClass from './src/sub/uview-ultra/demos/form/form.uvue'
+function definePageRoutes() {
+__uniRoutes.push({ path: "src/sub/uview-ultra/demos/form/form", component: GenSrcSubUviewUltraDemosFormFormClass, meta: { isQuit: true } as UniPageMeta, style: _uM([["navigationBarTitleText","Form 表单"],["navigationStyle","custom"]]) } as UniPageRoute)
+}
+const __uniTabBar: Map<string, any | null> | null = null
+const __uniLaunchPage: Map<string, any | null> = _uM([["url","src/sub/uview-ultra/demos/form/form"],["style",_uM([["navigationBarTitleText","Form 表单"],["navigationStyle","custom"]])]])
+function defineAppConfig(){
+  __uniConfig.entryPagePath = '/src/sub/uview-ultra/demos/form/form'
+  __uniConfig.globalStyle = _uM([["navigationBarTextStyle","@navigationBarTextStyle"],["navigationBarTitleText","uni-app x"],["navigationBarBackgroundColor","@navigationBarBackgroundColor"],["backgroundColor","@backgroundColor"],["backgroundColorContent","@backgroundColorContent"],["backgroundColorTop","@backgroundColorTop"],["backgroundColorBottom","@backgroundColorBottom"],["backgroundTextStyle","@backgroundTextStyle"]])
+  __uniConfig.getTabBarConfig = ():Map<string, any> | null =>  null
+  __uniConfig.tabBar = __uniConfig.getTabBarConfig()
+  __uniConfig.conditionUrl = ''
+  __uniConfig.uniIdRouter = new Map()
+  __uniConfig.themeConfig = _uM([["light",_uM([["backgroundColor","#f8fafc"],["backgroundColorBottom","#f8fafc"],["backgroundColorContent","#f8fafc"],["backgroundColorTop","#f8fafc"],["backgroundTextStyle","dark"],["navigationBarBackgroundColor","#ffffff"],["navigationBarTextStyle","black"],["tabBarBackgroundColor","#ffffff"],["tabBarBorderStyle","black"],["tabBarColor","#515151"],["tabBarSelectedColor","#0957de"]])],["dark",_uM([["backgroundColor","#0f172a"],["backgroundColorBottom","#0f172a"],["backgroundColorContent","#0f172a"],["backgroundColorTop","#0f172a"],["backgroundTextStyle","light"],["navigationBarBackgroundColor","#0f172a"],["navigationBarTextStyle","white"],["tabBarBackgroundColor","#0f172a"],["tabBarBorderStyle","black"],["tabBarColor","#515151"],["tabBarSelectedColor","#0957de"]])]])
+  __uniConfig.ready = true
+}
+
+export class UniCloudConfig extends io.dcloud.unicloud.InternalUniCloudConfig {
+    override isDev : boolean = false
+    override spaceList : string = "[{\"provider\":\"alipay\",\"spaceName\":\"unibest-x\",\"spaceId\":\"env-00jy6p9vat6w\",\"spaceAppId\":\"2021006189647783\",\"accessKey\":\"v1hNSO9cKet13BIZ\",\"secretKey\":\"KCHJ9hiSZqvmd8Yx\",\"endpoint\":\"https://env-00jy6p9vat6w.api-hz.cloudbasefunction.cn\",\"failoverEndpoint\":\"\"}]"
+    override debuggerInfo ?: string = null
+    override secureNetworkEnable : boolean = false
+    override secureNetworkConfig ?: string = "[]"
+    constructor() { super() }
+}

@@ -2,6 +2,7 @@
 	<view
 	    class="up-checkbox-group"
 	    :class="bemClass"
+	    :style="groupStyle"
 	>
 		<slot></slot>
 	</view>
@@ -38,15 +39,11 @@
 
 	const emit = defineEmits(['update:modelValue', 'change'])
 
-	// 可写 computed：既是下发给子组件的响应式源，也承担 v-model 回写
-	const modelValue = computed<any[]>({
-		get(): any[] {
-			return props.modelValue
-		},
-		set(v : any[]) {
-			emit('update:modelValue', v)
-		}
-	})
+	// 只读 computed：仅作为下发给子组件的响应式源。
+	// 不要写 computed({ get, set }) —— uni-app X 运行时不支持该对象字面量形式，会在运行期抛
+	// ClassCastException: UTSJSONObject cannot be cast to WritableComputedOptions，编译期无任何告警。
+	// v-model 回写一律在下方直接 emit。
+	const modelValue = computed<any[]>((): any[] => props.modelValue)
 
 	/**
 	 * 按值查找索引 → push / splice。与重构前 toggleCheckbox 语义逐行一致。
@@ -74,7 +71,7 @@
 				currentValues.splice(foundIndex, 1)
 			}
 		}
-		modelValue.value = currentValues
+		emit('update:modelValue', currentValues)
 		emit('change', currentValues)
 	}
 
@@ -99,21 +96,31 @@
 	const bemClass = computed(() => {
 		return bem('checkbox-group', [props.placement], [])
 	})
+
+	const groupStyle = computed<UTSJSONObject>((): UTSJSONObject => {
+		const style = {} as UTSJSONObject
+		style['display'] = 'flex'
+		style['flexDirection'] = props.placement == 'column' ? 'column' : 'row'
+		style['flexWrap'] = 'wrap'
+		style['alignItems'] = 'center'
+		return style
+	})
 </script>
 
 <style lang="scss" scoped>
-	@import "../../libs/css/components.scss";
-
 	.up-checkbox-group {
+		flex: 1;
+	}
 
-		&--row {
-			display: flex;
-			flex-flow: row wrap;
-		}
+	.up-checkbox-group--row {
+		display: flex;
+		flex-direction: row;
+		flex-wrap: wrap;
+		align-items: center;
+	}
 
-		&--column {
-			display: flex;
-			flex-direction: column;
-		}
+	.up-checkbox-group--column {
+		display: flex;
+		flex-direction: column;
 	}
 </style>

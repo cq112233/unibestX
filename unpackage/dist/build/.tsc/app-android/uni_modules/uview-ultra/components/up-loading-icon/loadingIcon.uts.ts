@@ -1,0 +1,28 @@
+/*
+ * @Author       : jry
+ * @Description  :
+ * @version      : 4.0
+ * @Date         : 2024-04-22 16:44:21
+ * @LastAuthor   : jry
+ * @lastTime     : 2024-08-28 11:45:47
+ * @FilePath     : /uview-ultra/libs/config/props/loadingIcon.js
+ */
+import config from '../../libs/config/config.uts'
+// let color = config['color'] as UTSJSONObject
+
+export default {
+    // loading-icon加载中图标组件
+    loadingIcon: {
+        show: true,
+        color: config.getString('color.up-tips-color'),
+        textColor: config.getString('color.up-tips-color'),
+        vertical: false,
+        mode: 'spinner',
+        size: '24',
+        textSize: '15',
+        text: '',
+        timingFunction: 'ease-in-out',
+        duration: 1200,
+        inactiveColor: ''
+    }
+} as UTSJSONObject

@@ -1,0 +1,123 @@
+import { computed, provide } from 'vue'
+	import { bem } from '../../libs/function/index'
+	import { CHECKBOX_GROUP_KEY } from './type.uts'
+	import type { CheckboxGroupProps, CheckboxGroupProvide } from './type.uts'
+
+	
+const __sfc__ = defineComponent({
+  __name: 'up-checkbox-group',
+name: 'up-checkbox-group',
+  props: {
+    name: { type: String, required: false, default: '' },
+    modelValue: { type: Array as PropType<any[]>, required: false, default: () : any[] => [] },
+    shape: { type: String, required: false, default: 'square' },
+    disabled: { type: Boolean, required: false, default: false },
+    activeColor: { type: String, required: false, default: '#2979ff' },
+    inactiveColor: { type: String, required: false, default: '#c8c9cc' },
+    size: { type: [String, Number], required: false, default: 18 },
+    placement: { type: String, required: false, default: 'row' },
+    labelSize: { type: [String, Number], required: false, default: 14 },
+    labelColor: { type: String, required: false, default: '#303133' },
+    labelDisabled: { type: Boolean, required: false, default: false },
+    iconColor: { type: String, required: false, default: '#ffffff' },
+    iconSize: { type: [String, Number], required: false, default: 12 },
+    iconPlacement: { type: String, required: false, default: 'left' },
+    borderBottom: { type: Boolean, required: false, default: false }
+  },
+  emits: ['update:modelValue', 'change'],
+  setup(__props) {
+const __ins = getCurrentInstance()!;
+const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+const _cache = __ins.renderCache;
+
+	
+
+	// 默认值逐字对齐 components/up-checkbox-group/checkboxGroup.uts，勿改
+	const props = __props
+
+	function emit(event: string, ...do_not_transform_spread: Array<any | null>) {
+__ins.emit(event, ...do_not_transform_spread)
+}
+
+	// 只读 computed：仅作为下发给子组件的响应式源。
+	// 不要写 computed({ get, set }) —— uni-app X 运行时不支持该对象字面量形式，会在运行期抛
+	// ClassCastException: UTSJSONObject cannot be cast to WritableComputedOptions，编译期无任何告警。
+	// v-model 回写一律在下方直接 emit。
+	const modelValue = computed<any[]>((): any[] => props.modelValue)
+
+	/**
+	 * 按值查找索引 → push / splice。与重构前 toggleCheckbox 语义逐行一致。
+	 * childName 是 up-checkbox 传下来的 name.toString()。
+	 */
+	function toggle(name : string, checked : boolean) {
+		let currentValues : any[] = []
+		if (props.modelValue != null) {
+			const rawArr = props.modelValue as any[]
+			currentValues = rawArr.slice()
+		}
+		let foundIndex = -1
+		for (let i = 0; i < currentValues.length; i++) {
+			if (currentValues[i] != null && currentValues[i].toString() == name.toString()) {
+				foundIndex = i
+				break
+			}
+		}
+		if (checked) {
+			if (foundIndex == -1) {
+				currentValues.push(name)
+			}
+		} else {
+			if (foundIndex != -1) {
+				currentValues.splice(foundIndex, 1)
+			}
+		}
+		emit('update:modelValue', currentValues)
+		emit('change', currentValues)
+	}
+
+	provide(CHECKBOX_GROUP_KEY, {
+		modelValue,
+		shape: computed(() => props.shape),
+		disabled: computed(() => props.disabled),
+		activeColor: computed(() => props.activeColor),
+		inactiveColor: computed(() => props.inactiveColor),
+		size: computed(() => props.size),
+		placement: computed(() => props.placement),
+		labelSize: computed(() => props.labelSize),
+		labelColor: computed(() => props.labelColor),
+		labelDisabled: computed(() => props.labelDisabled),
+		iconColor: computed(() => props.iconColor),
+		iconSize: computed(() => props.iconSize),
+		iconPlacement: computed(() => props.iconPlacement),
+		borderBottom: computed(() => props.borderBottom),
+		toggle
+	} as CheckboxGroupProvide)
+
+	const bemClass = computed(() => {
+		return bem('checkbox-group', [props.placement], [])
+	})
+
+	const groupStyle = computed<UTSJSONObject>((): UTSJSONObject => {
+		const style = {} as UTSJSONObject
+		style['display'] = 'flex'
+		style['flexDirection'] = props.placement == 'column' ? 'column' : 'row'
+		style['flexWrap'] = 'wrap'
+		style['alignItems'] = 'center'
+		return style
+	})
+
+return (): any | null => {
+
+  return _cE("view", _uM({
+    class: _nC(["weapp-tw-border up-checkbox-group", bemClass.value]),
+    style: _nS(groupStyle.value)
+  }), [
+    renderSlot(_ctx.$slots, "default")
+  ], 6 /* CLASS, STYLE */)
+}
+}
+
+})
+export default __sfc__
+export type UpCheckboxGroupComponentPublicInstance = InstanceType<typeof __sfc__>;
+const GenUniModulesUviewUltraComponentsUpCheckboxGroupUpCheckboxGroupStyles = [_uM([["weapp-tw-border", _pS(_uM([["borderTopWidth", 0], ["borderRightWidth", 0], ["borderBottomWidth", 0], ["borderLeftWidth", 0]]))], ["up-checkbox-group", _pS(_uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]]))], ["up-checkbox-group--row", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["flexWrap", "wrap"], ["alignItems", "center"]]))], ["up-checkbox-group--column", _pS(_uM([["display", "flex"], ["flexDirection", "column"]]))]])]
