@@ -59,7 +59,22 @@ UTS 编译器**每次只暴露部分错误**。如果逐行试错，每次 3 分
 以下两条在**改动前的干净代码树**上就存在：
 
 1. `lime-i18n/common/composer-class.uts (4:9): "ComputedRefImpl" is not exported by .../types.uts` — 与本次重构无关。
-2. `[plugin:uni:app-uvue-css] WARNING: cursor is not a standard property name` — 出现在 `up-subsection.uvue` / `up-radio.uvue:64` / `up-tag.uvue`，由 tailwind 的 `cursor-pointer` 经 weapp-tailwindcss 注入 `.wtu-*` 类触发。**本计划会把 up-radio / up-checkbox 的 `cursor-pointer` 归入 `#ifdef WEB`，这两条警告应当消失**——这是本次重构附带的正向证据。
+2. `[plugin:uni:app-uvue-css] WARNING: cursor is not a standard property name (may not be supported)` — 共 9 条，由 tailwind 的 `cursor-pointer` 经 weapp-tailwindcss 生成 `.wtu-*` 工具类并**内联进组件的 scoped style** 触发：
+
+   ```
+   at uni_modules/uview-ultra/components/up-radio/up-radio.uvue:64:3
+   62 |  }
+   63 |  .wtu-dmb0mx-0 {
+   64 |    cursor: pointer;
+   ```
+
+   **本次重构不处理它，也不要试图用 `#ifdef WEB` 处理它。**
+
+   > **实测结论（2026-09-11，已验证）**：把 `cursor-pointer` 从模板类名挪进 `#ifdef WEB` 包裹的 computed **完全无效**。原因是 weapp-tailwindcss 扫描的是 `.uvue` 的**源文本**，不区分模板还是脚本——只要 `'cursor-pointer'` 这个字符串还出现在文件里（哪怕是 `#ifdef WEB` 分支内），工具类照旧生成。这是实测证伪，不是推测。
+   >
+   > 该告警是**构建期提示**（native 不支持 `cursor` 属性），不影响组件功能，重构前即存在。根治点在于 tailwind / weapp-tailwindcss 配置（让 native 端不生成 `cursor` 工具类），属于独立于本次重构的另一件事。
+   >
+   > 因此：**保持 `cursor-pointer` 原样**（`class="up-radio cursor-pointer"` 这种静态写法），不动一个字。
 
 ### 0.5 命名冲突红线（来自实测踩坑）
 
@@ -360,14 +375,14 @@ export type RadioProps = {
 ```vue
 <template>
 	<view
-	    class="up-radio"
-	    :class="[iconPlacementClass, borderBottomClass, cursorClass]"
+	    class="up-radio cursor-pointer"
+	    :class="[iconPlacementClass, borderBottomClass]"
 	    :style="radioStyle"
 	    @tap.stop="wrapperClickHandler"
 	>
 		<view
-		    class="up-radio__icon-wrap"
-		    :class="[iconClasses, cursorClass]"
+		    class="up-radio__icon-wrap cursor-pointer"
+		    :class="iconClasses"
 		    :style="iconWrapStyle"
 		    @tap.stop="iconClickHandler"
 		>
@@ -585,16 +600,6 @@ export type RadioProps = {
 		return ''
 	})
 
-	/** cursor: pointer 仅 Web 有意义，原生端无指针设备（见 0.4） */
-	const cursorClass = computed<string>((): string => {
-		// #ifdef WEB
-		return 'cursor-pointer'
-		// #endif
-		// #ifndef WEB
-		return ''
-		// #endif
-	})
-
 	function emitEvent() {
 		if (!isChecked.value) {
 			emit('change', props.name)
@@ -761,14 +766,18 @@ export type RadioProps = {
 运行 0.2 的构建命令（`LOG=/tmp/task1-build.log`）。
 预期：`EXIT=0`，`grep -c "编译成功"` 输出 `1`。
 
-额外核对（本次重构的正向证据）：
+额外核对：确认本次改动没有引入新的告警。
 
 ```bash
-grep -c "up-radio" /tmp/task1-build.log
-grep -c "cursor.*not a standard property" /tmp/task1-build.log
+tr '\r' '\n' < /tmp/task1-build.log | sed 's/\x1b\[[0-9;]*m//g' \
+  | grep -E "正在编译.*components/|not a standard property" \
+  | awk '/正在编译/{f=$0; sub(/.*components\//,"",f); sub(/\.\.\..*/,"",f)} /not a standard property/{print f}' \
+  | sort | uniq -c
 ```
 
-预期第二条输出为 `0` 或至少**不含 `up-radio.uvue`**——`cursor-pointer` 已归入 `#ifdef WEB`。
+预期：列出了 `up-radio` / `up-checkbox` / `up-switch` / `up-rate` / `up-picker` 等组件及其 cursor 告警条数——**这是既有的、与本次重构无关的告警（见 0.4），不做处理，只要条数没变多即可**。
+
+> 不要尝试消除它。已实测证伪：把 `cursor-pointer` 挪进 `#ifdef WEB` 无效，详见 0.4。
 
 若失败：`grep -E "错误：|Build failed" -A 3 /tmp/task1-build.log`，按 0.3 一次性修复所有同源问题后重建，不要逐行试错。
 
@@ -1047,14 +1056,14 @@ export type CheckboxProps = {
 ```vue
 <template>
 	<view
-	    class="up-checkbox"
-	    :class="[iconPlacementClass, borderBottomClass, cursorClass]"
+	    class="up-checkbox cursor-pointer"
+	    :class="[iconPlacementClass, borderBottomClass]"
 	    :style="checkboxStyle"
 	    @tap.stop="wrapperClickHandler"
 	>
 		<view
-		    class="up-checkbox__icon-wrap"
-		    :class="[iconClasses, cursorClass]"
+		    class="up-checkbox__icon-wrap cursor-pointer"
+		    :class="iconClasses"
 		    @tap.stop="iconClickHandler"
 		    :style="iconWrapStyle"
 		>
@@ -1279,16 +1288,6 @@ export type CheckboxProps = {
 			return 'up-border-bottom'
 		}
 		return ''
-	})
-
-	/** cursor: pointer 仅 Web 有意义，原生端无指针设备（见 0.4） */
-	const cursorClass = computed<string>((): string => {
-		// #ifdef WEB
-		return 'cursor-pointer'
-		// #endif
-		// #ifndef WEB
-		return ''
-		// #endif
 	})
 
 	/**
@@ -1641,11 +1640,7 @@ export type SwitchProps = {
 	})
 
 	const switchClass = computed<string>(() => {
-	  let classes = ['up-switch']
-	  // cursor: pointer 仅 Web 有意义（见 0.4）
-	  // #ifdef WEB
-	  classes.push('cursor-pointer')
-	  // #endif
+	  let classes = ['up-switch', 'cursor-pointer']
 	  if (props.disabled) {
 	    classes.push('up-switch--disabled')
 	  }
@@ -1824,7 +1819,7 @@ git commit -m "refactor(up-switch): 类型化 props 并收敛尺寸解析
 
 新增 type.uts 声明 SwitchProps/SwitchValue；
 size/space 的 parseInt(x.toString()) 往返收敛为 toNum 助手。
-cursor-pointer 归入 #ifdef WEB，@include flex 改为字面 CSS。
+@include flex 改为字面 CSS。
 对外 API 与交互行为不变。"
 ```
 
@@ -1876,25 +1871,9 @@ export type RateProps = {
 
 - [ ] **步骤 2：重写 `up-rate/up-rate.uvue`**
 
-模板只改一处——把静态的 `cursor-pointer` 拆出来做成条件类。原文件是：
+**模板完全不动。** 包括 `class="up-rate__content__item cursor-pointer"` 里的 `cursor-pointer`——见 0.4，它是 tailwind 扫源文本生成的，动它无效且只会让 diff 变大。
 
-```vue
-	            class="up-rate__content__item cursor-pointer"
-	            v-for="(_, index) in parseInt(count.toString())"
-	            :key="index"
-	            :class="[elClass]"
-```
-
-改为：
-
-```vue
-	            class="up-rate__content__item"
-	            :class="[elClass, cursorClass]"
-	            v-for="(_, index) in parseInt(count.toString())"
-	            :key="index"
-```
-
-> 其余模板内容（两个 `up-icon` 分支及其 `Math.floor` / `Math.ceil` / `activeColor == '#FA3534'` 表达式、`halfWidthStyle`、`customRateStyle`）**逐字不动**。
+> 两个 `up-icon` 分支及其 `Math.floor` / `Math.ceil` / `activeColor == '#FA3534'` 表达式、`halfWidthStyle`、`customRateStyle` 同样逐字不动。
 
 `<script setup>` 整体替换为：
 
@@ -1934,16 +1913,6 @@ export type RateProps = {
 	const activeIndex = ref<number>(0)
 	const rateWidth = ref<number>(0)
 	const moving = ref<boolean>(false)
-
-	/** cursor: pointer 仅 Web 有意义，原生端无指针设备（见 0.4） */
-	const cursorClass = computed<string>((): string => {
-		// #ifdef WEB
-		return 'cursor-pointer'
-		// #endif
-		// #ifndef WEB
-		return ''
-		// #endif
-	})
 
 	const customRateStyle = computed((): UTSJSONObject => {
 	  return addStyle(props.customStyle) as UTSJSONObject
@@ -2195,7 +2164,7 @@ git commit -m "refactor(up-rate): 类型化 props 并修正 === 违规
 
 新增 type.uts 声明 RateProps；
 os() === 'ios' 修正为 ==，符合项目规范 §6。
-cursor-pointer 归入 #ifdef WEB，@include flex 改为字面 CSS。
+@include flex 改为字面 CSS。
 半星计算与 DOM 测量逻辑保持不变。"
 ```
 
@@ -2257,7 +2226,7 @@ up-picker.uvue 从未引用。删除前已 grep 复验零引用。"
 
 ## 任务 6：`up-picker` 类型化（档 1：类型化 + 清死代码）
 
-**严格限定改动面**：只动 props 声明、取值助手、事件载荷类型、`@include flex`、`cursor-pointer`。
+**严格限定改动面**：只动 props 声明、取值助手、事件载荷类型、`@include flex`。
 
 **不动**：双渲染路径（`#ifdef APP` 的 `scroll-view` 滚轮 / `#ifndef APP` 的 `picker-view`）、滚动同步逻辑、7 个 `defineExpose` 命令式方法、`keyName` 动态键机制。
 
@@ -2525,43 +2494,9 @@ export type PickerConfirmEvent = {
 
 > **回退**：若 UTS 对 `as PickerChangeEvent` / `as PickerConfirmEvent` 报错，改回 `as UTSJSONObject` 即可——运行期载荷完全一致，只是失去编译期字段校验。这是规格 4.3 同款回退策略。
 
-- [ ] **步骤 6：模板中 `cursor-pointer` 条件化**
+> **已取消的步骤**：原计划此处有一条「把模板里 `up-picker-input` 的 `cursor-pointer` 条件化」。**实测证伪，已取消**——`up-picker` 的 `cursor-pointer` 保持原样不动。理由见 0.4。
 
-把模板开头的：
-
-```vue
-	    <view
-	      v-if="hasInput"
-	      class="up-picker-input cursor-pointer"
-	      @click="showByClickInput = !showByClickInput"
-	    >
-```
-
-改为：
-
-```vue
-	    <view
-	      v-if="hasInput"
-	      class="up-picker-input"
-	      :class="cursorClass"
-	      @click="showByClickInput = !showByClickInput"
-	    >
-```
-
-并在 `<script setup>` 中（`showByClickInput` 附近）新增：
-
-```uts
-	const cursorClass = computed<string>((): string => {
-		// #ifdef WEB
-		return 'cursor-pointer'
-		// #endif
-		// #ifndef WEB
-		return ''
-		// #endif
-	})
-```
-
-- [ ] **步骤 7：`@include flex` 改为字面 CSS**
+- [ ] **步骤 6：`@include flex` 改为字面 CSS**
 
 `<style>` 中五处替换：
 
@@ -2582,7 +2517,7 @@ export type PickerConfirmEvent = {
 
 缩进对齐该规则块内已有属性。**`&__column { flex: 1 }` 与 `&__view__column { flex: 1 }` 保持不动**（见 0.9）。
 
-- [ ] **步骤 8：构建验证**
+- [ ] **步骤 7：构建验证**
 
 ```bash
 cd /Users/chenqi/Documents/chenqi-front/unibestX
@@ -2596,7 +2531,7 @@ grep -c "编译成功" "$LOG"
 
 预期：`EXIT=0`，`grep -c` 输出 `1`。
 
-- [ ] **步骤 9：Commit**
+- [ ] **步骤 8：Commit**
 
 ```bash
 cd /Users/chenqi/Documents/chenqi-front/unibestX
@@ -2607,7 +2542,7 @@ git commit -m "refactor(up-picker): 类型化 props 与事件载荷
 新增 type.uts 声明 PickerProps/PickerChangeEvent/PickerConfirmEvent；
 事件载荷由 as UTSJSONObject 改为强类型，字段名与结构不变。
 动态键取值收敛为单点 getKeyedText 助手，保留 keyName 契约与硬编码 id。
-cursor-pointer 归入 #ifdef WEB，@include flex 改为字面 CSS。
+@include flex 改为字面 CSS。
 双渲染路径与 7 个 defineExpose 方法均未改动。"
 ```
 
@@ -2692,11 +2627,16 @@ git status --short
 
 ```bash
 cd /Users/chenqi/Documents/chenqi-front/unibestX
-grep -n "cursor.*not a standard property" /tmp/task1-build.log /tmp/task6-build.log
-grep -n "up-radio\|up-checkbox\|up-switch\|up-rate\|up-picker" /tmp/task6-build.log | grep -i "error\|错误" || echo "无本组组件的编译错误"
+for f in /tmp/task1-build.log /tmp/task6-build.log; do
+  echo "=== $f ==="
+  tr '\r' '\n' < "$f" | sed 's/\x1b\[[0-9;]*m//g' | grep -c "not a standard property"
+  tr '\r' '\n' < "$f" | sed 's/\x1b\[[0-9;]*m//g' | grep -i "error\|错误：" || echo "无编译错误"
+done
 ```
 
-预期：`cursor is not a standard property` 的命中里**不再包含本组五个组件**（见 0.4）。
+预期：两次构建的 cursor 告警**条数都不超过基线（9 条）**，且无编译错误。
+
+> **不要期待它归零**——见 0.4，本计划不处理该告警，只要求「没变多」。
 
 - [ ] **步骤 7：人工真机确认（不可省略）**
 
@@ -2729,7 +2669,7 @@ grep -n "up-radio\|up-checkbox\|up-switch\|up-rate\|up-picker" /tmp/task6-build.
 | 5.1 `pick()` 助手 | 0.8 统一定义，任务 1 步骤 4、任务 2 步骤 4 |
 | 5.7 样式：`:style` 数组改单对象 | 任务 1 步骤 4、任务 2 步骤 4 |
 | 5.7 `@include flex` 改字面 CSS | 任务 1/2/3/4/6 各 style 步骤 |
-| 6 条件编译（cursor 归 `#ifdef WEB`） | 任务 1/2/3/4/6 的 `cursorClass` |
+| 6 条件编译 | **已按实测收缩**：原规格要求把 `cursor-pointer` 归入 `#ifdef WEB`，实测证伪（见 0.4），本计划不实现该条。其余条件编译仅在确有差异处添加 |
 | 7.1 删除 `up-picker-column` | 任务 5 |
 | 7.2 删除 `$callMethod` 机制与空 `formValidate` | 任务 1 步骤 4、任务 2 步骤 4 |
 | 8 验证（Vapor / VDOM / flex 产物） | 任务 7 |
