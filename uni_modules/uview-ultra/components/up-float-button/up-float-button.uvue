@@ -298,20 +298,17 @@ function copyObject(item: UTSJSONObject): UTSJSONObject {
 }
 
 function getItemBackgroundColor(item: UTSJSONObject): string {
-    const raw = item as any
-    const value = stringValue(raw['backgroundColor'] ?? raw['background-color'])
+    const value = stringValue(item['backgroundColor'] ?? item['background-color'])
     return value == '' ? props.backgroundColor : value
 }
 
 function getItemColor(item: UTSJSONObject): string {
-    const raw = item as any
-    const value = stringValue(raw['color'])
+    const value = stringValue(item['color'])
     return value == '' ? props.color : value
 }
 
 function getItemBorderColor(item: UTSJSONObject): string {
-    const raw = item as any
-    const value = stringValue(raw['borderColor'] ?? raw['border-color'])
+    const value = stringValue(item['borderColor'] ?? item['border-color'])
     return value == '' ? props.borderColor : value
 }
 
@@ -344,8 +341,7 @@ const displayList = computed((): UTSJSONObject[] => {
 })
 
 function getItemName(item: UTSJSONObject): string {
-    const raw = item as any
-    return stringValue(raw['name'])
+    return stringValue(item['name'])
 }
 
 function getItemStyle(item: UTSJSONObject): UTSJSONObject {

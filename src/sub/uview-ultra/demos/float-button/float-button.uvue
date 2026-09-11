@@ -95,7 +95,6 @@
 import { ref } from 'vue';
 
 definePage({
-  debug: true,
   layout: 'navbar',
   showBack: true,
   hideNavbar: false,
@@ -138,8 +137,8 @@ function onDragButtonClick(): void {
 }
 
 function onItemClick(item: UTSJSONObject): void {
-  const index = item['index'] != null ? parseInt(item['index']!.toString()) : 0;
-  const name = item['name'] != null ? item['name']!.toString() : '';
+  const index = item.index != null ? parseInt(item.index!.toString()) : 0;
+  const name = item.name != null ? item.name!.toString() : '';
   log(`item-click => index=${index} name=${name}`);
 }
 </script>
