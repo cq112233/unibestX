@@ -1099,7 +1099,7 @@ export function updateAvailableHeight(kuProps: AppKuHeightProps, selectedTabbarS
     }
   }
   // 全屏高度 - 安全区域高度
-  if (selectedTabbarStrategy == 0) {
+  if (selectedTabbarStrategy == 0 || selectedTabbarStrategy == 4) {
     if (isNoNavbarLayout) {
       if (isCustomNav) {
         // #ifdef H5

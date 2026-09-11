@@ -1,0 +1,584 @@
+<template>
+  <view class="flex flex-col flex-1 h-full" :class="isDark ? 'bg-[#0f172a]' : 'bg-[#f8fafc]'">
+    <!-- 顶部多场景示例切换栏 -->
+    <view
+      class="px-[14px] py-[10px] flex flex-row items-center border-b-[1px] border-solid"
+      :class="isDark ? 'bg-[#1e293b] border-[#334155]' : 'bg-white border-[#e2e8f0]'"
+    >
+      <view
+        v-for="(demo, dIdx) in demoTabs"
+        :key="dIdx"
+        class="flex-1 py-[7px] mx-[2px] rounded-[8px] items-center justify-center flex flex-row"
+        :style="{
+          backgroundColor: activeDemoTab === dIdx ? (isDark ? '#334155' : '#0957de14') : 'transparent'
+        }"
+        @click="switchDemoTab(dIdx)"
+      >
+        <text
+          class="text-[12px] font-bold"
+          :class="activeDemoTab === dIdx ? (isDark ? 'text-[#38bdf8]' : 'text-[#0957de]') : (isDark ? 'text-[#94a3b8]' : 'text-[#64748b]')"
+        >
+          {{ demo }}
+        </text>
+      </view>
+    </view>
+
+    <!-- ======================================================= -->
+    <!-- 场景一：嵌套滚动综合资讯（带 nested-scroll-header 头部卡片） -->
+    <!-- ======================================================= -->
+    <view v-if="activeDemoTab === 0" class="flex-1 flex flex-col relative">
+      <NestedScroll
+        ref="articleScrollRef"
+        v-model:refreshing="articleRefreshing"
+        v-model:loading="articleLoading"
+        :finished="articleFinished"
+        :empty="articleList.length === 0"
+        @refresh="onArticleRefresh"
+        @load-more="onArticleLoadMore"
+      >
+        <!-- 嵌套头部插槽 -->
+        <template #header>
+          <view
+            class="m-[14px] p-[16px] rounded-[14px] border-[1px] border-solid"
+            :class="isDark ? 'bg-[#1e293b] border-[#334155]' : 'bg-[#e0e7ff] border-[#c7d2fe]'"
+          >
+            <view class="flex flex-row items-center justify-between mb-[6px]">
+              <text
+                class="text-[15px] font-bold"
+                :class="isDark ? 'text-[#f1f5f9]' : 'text-[#1e293b]'"
+              >
+                ⚡ 嵌套滚动头部 (nested-scroll-header)
+              </text>
+              <text class="text-[10px] font-bold text-[#4f46e5] px-[6px] py-[2px] rounded-[4px] bg-[#6366f11f]">
+                原生联动
+              </text>
+            </view>
+            <text
+              class="text-[12px] leading-[18px]"
+              :class="isDark ? 'text-[#94a3b8]' : 'text-[#4338ca]'"
+            >
+              向上滚动时此卡片随外层平滑滚走收起；下滑时外层与内层手势无缝衔接，杜绝事件卡死与双重滚动条死锁。
+            </text>
+          </view>
+        </template>
+
+        <!-- 列表内容 -->
+        <list-item v-for="item in articleList" :key="item.id">
+          <view
+            class="mx-[14px] my-[6px] p-[14px] rounded-[12px] border-[1px] border-solid flex flex-col"
+            :class="isDark ? 'bg-[#1e293b] border-[#334155]' : 'bg-white border-[#e2e8f0]'"
+          >
+            <view class="flex flex-row items-center justify-between mb-[6px]">
+              <view
+                class="px-[8px] py-[2px] rounded-[4px]"
+                :style="{ backgroundColor: item.categoryBg }"
+              >
+                <text class="text-[10px] font-bold" :style="{ color: item.categoryColor }">
+                  {{ item.category }}
+                </text>
+              </view>
+              <text class="text-[11px] text-[#94a3b8]">{{ item.time }}</text>
+            </view>
+            <text
+              class="text-[14px] font-bold mb-[4px]"
+              :class="isDark ? 'text-[#f1f5f9]' : 'text-[#1e293b]'"
+            >
+              {{ item.title }}
+            </text>
+            <text
+              class="text-[12px] leading-[17px]"
+              :class="isDark ? 'text-[#94a3b8]' : 'text-[#64748b]'"
+            >
+              {{ item.summary }}
+            </text>
+          </view>
+        </list-item>
+      </NestedScroll>
+    </view>
+
+    <!-- ======================================================= -->
+    <!-- 场景二：电商商品列表（带营销 Banner 头部，多页加载） -->
+    <!-- ======================================================= -->
+    <view v-else-if="activeDemoTab === 1" class="flex-1 flex flex-col relative">
+      <NestedScroll
+        ref="productScrollRef"
+        v-model:refreshing="productRefreshing"
+        v-model:loading="productLoading"
+        :finished="productFinished"
+        :empty="productList.length === 0"
+        @refresh="onProductRefresh"
+        @load-more="onProductLoadMore"
+      >
+        <template #header>
+          <view class="m-[14px] p-[16px] rounded-[14px] bg-[#0957de] flex flex-col">
+            <text class="text-[16px] font-bold text-white mb-[4px]">🔥 年中精选数码特惠</text>
+            <text class="text-[12px] text-[#bfdbfe] leading-[16px]">全场正品自营保障，触底加载更多超值好物</text>
+          </view>
+        </template>
+
+        <list-item v-for="item in productList" :key="item.id">
+          <view
+            class="mx-[14px] my-[6px] p-[12px] rounded-[12px] border-[1px] border-solid flex flex-row items-center"
+            :class="isDark ? 'bg-[#1e293b] border-[#334155]' : 'bg-white border-[#e2e8f0]'"
+          >
+            <view class="w-[52px] h-[52px] rounded-[8px] bg-[#f1f5f9] items-center justify-center mr-[12px]">
+              <text class="text-[24px]">{{ item.icon }}</text>
+            </view>
+            <view class="flex-1 flex flex-col">
+              <view class="flex flex-row items-center justify-between">
+                <text
+                  class="text-[14px] font-bold"
+                  :class="isDark ? 'text-[#f1f5f9]' : 'text-[#1e293b]'"
+                >
+                  {{ item.name }}
+                </text>
+                <text class="text-[10px] text-[#94a3b8]">已售 {{ item.sales }}</text>
+              </view>
+              <text
+                class="text-[11px] mt-[2px]"
+                :class="isDark ? 'text-[#94a3b8]' : 'text-[#64748b]'"
+              >
+                {{ item.desc }}
+              </text>
+              <view class="flex flex-row items-center justify-between mt-[6px]">
+                <text class="text-[14px] font-bold text-[#ef4444]">¥{{ item.price }}</text>
+                <view class="px-[8px] py-[2px] rounded-[4px] bg-[#0957de]">
+                  <text class="text-[10px] text-white font-medium">购买</text>
+                </view>
+              </view>
+            </view>
+          </view>
+        </list-item>
+      </NestedScroll>
+    </view>
+
+    <!-- ======================================================= -->
+    <!-- 场景三：纯长列表模式（无头部插槽，极简高性能下拉上拉） -->
+    <!-- ======================================================= -->
+    <view v-else-if="activeDemoTab === 2" class="flex-1 flex flex-col relative">
+      <NestedScroll
+        ref="simpleScrollRef"
+        v-model:refreshing="simpleRefreshing"
+        v-model:loading="simpleLoading"
+        :finished="simpleFinished"
+        :empty="simpleList.length === 0"
+        @refresh="onSimpleRefresh"
+        @load-more="onSimpleLoadMore"
+      >
+        <list-item v-for="item in simpleList" :key="item.id">
+          <view
+            class="mx-[14px] my-[6px] p-[14px] rounded-[10px] border-[1px] border-solid flex flex-row items-center justify-between"
+            :class="isDark ? 'bg-[#1e293b] border-[#334155]' : 'bg-white border-[#e2e8f0]'"
+          >
+            <view class="flex flex-row items-center">
+              <text class="text-[14px] mr-[10px]">📋</text>
+              <text
+                class="text-[13px] font-medium"
+                :class="isDark ? 'text-[#f1f5f9]' : 'text-[#1e293b]'"
+              >
+                {{ item.title }}
+              </text>
+            </view>
+            <text class="text-[11px] text-[#94a3b8]">#{{ item.id }}</text>
+          </view>
+        </list-item>
+      </NestedScroll>
+    </view>
+
+    <!-- ======================================================= -->
+    <!-- 场景四：状态演练（模拟加载错误重试、空数据兜底展示） -->
+    <!-- ======================================================= -->
+    <view v-else class="flex-1 flex flex-col relative">
+      <view
+        class="p-[12px] mx-[14px] my-[8px] rounded-[12px] border-[1px] border-solid"
+        :class="isDark ? 'bg-[#1e293b] border-[#334155]' : 'bg-white border-[#e2e8f0]'"
+      >
+        <text
+          class="text-[12px] font-bold mb-[8px]"
+          :class="isDark ? 'text-[#f1f5f9]' : 'text-[#1e293b]'"
+        >
+          🛠️ 异常与状态演练控制面板
+        </text>
+        <view class="flex flex-row">
+          <view
+            class="flex-1 py-[6px] mr-[6px] rounded-[6px] bg-[#fee2e2] items-center justify-center"
+            @click="triggerStateError"
+          >
+            <text class="text-[11px] text-[#dc2626] font-bold">模拟失败</text>
+          </view>
+          <view
+            class="flex-1 py-[6px] mr-[6px] rounded-[6px] bg-[#fef3c7] items-center justify-center"
+            @click="triggerStateEmpty"
+          >
+            <text class="text-[11px] text-[#d97706] font-bold">清空数据</text>
+          </view>
+          <view
+            class="flex-1 py-[6px] rounded-[6px] bg-[#dcfce7] items-center justify-center"
+            @click="triggerStateReset"
+          >
+            <text class="text-[11px] text-[#16a34a] font-bold">恢复正常</text>
+          </view>
+        </view>
+      </view>
+
+      <NestedScroll
+        ref="stateScrollRef"
+        v-model:refreshing="stateRefreshing"
+        v-model:loading="stateLoading"
+        :finished="stateFinished"
+        :error="stateError"
+        :empty="stateList.length === 0"
+        @refresh="onStateRefresh"
+        @load-more="onStateLoadMore"
+      >
+        <list-item v-for="item in stateList" :key="item.id">
+          <view
+            class="mx-[14px] my-[6px] p-[12px] rounded-[10px] border-[1px] border-solid flex flex-row items-center justify-between"
+            :class="isDark ? 'bg-[#1e293b] border-[#334155]' : 'bg-white border-[#e2e8f0]'"
+          >
+            <text
+              class="text-[13px]"
+              :class="isDark ? 'text-[#cbd5e1]' : 'text-[#334155]'"
+            >
+              {{ item.title }}
+            </text>
+            <text class="text-[11px] text-[#059669] font-medium">✓ 状态正常</text>
+          </view>
+        </list-item>
+      </NestedScroll>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed, onMounted, onUnmounted, ref } from 'vue';
+import NestedScroll from '@/src/components/NestedScroll/NestedScroll.uvue';
+import { useAppStore } from '@/src/store';
+import { setPageScrollEnabled } from '@/src/utils/pageScroll.uts';
+
+definePage({
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
+  style: {
+    navigationBarTitleText: 'NestedScroll 自研嵌套滚动',
+    navigationStyle: 'custom'
+  }
+});
+
+const appStore = useAppStore();
+const isDark = computed((): boolean => appStore.state.isDark);
+
+// 挂载时禁用外层通用滚动，交由 NestedScroll 组件全屏独立接管
+onMounted(() => {
+  setPageScrollEnabled(false);
+});
+
+onUnmounted(() => {
+  setPageScrollEnabled(true);
+});
+
+// Tab 切换
+const demoTabs: string[] = ['⚡ 嵌套资讯', '🛍️ 电商列表', '📋 纯长列表', '🧪 状态演练'];
+const activeDemoTab = ref<number>(0);
+
+function switchDemoTab(index: number): void {
+  activeDemoTab.value = index;
+}
+
+// -------------------------------------------------------------
+// 场景一：嵌套资讯
+// -------------------------------------------------------------
+type ArticleItem = {
+  id: number;
+  title: string;
+  summary: string;
+  category: string;
+  categoryBg: string;
+  categoryColor: string;
+  time: string;
+};
+
+const articleScrollRef = ref<ComponentPublicInstance | null>(null);
+const articleList = ref<ArticleItem[]>([]);
+const articleRefreshing = ref<boolean>(false);
+const articleLoading = ref<boolean>(false);
+const articleFinished = ref<boolean>(false);
+let articlePage = 1;
+
+function generateArticles(page: number): ArticleItem[] {
+  const list: ArticleItem[] = [];
+  const start = (page - 1) * 8 + 1;
+  const categories = ['原生渲染', '性能调优', '工程化', 'UTS深度解析'];
+  const bgs = ['#e0e7ff', '#fef3c7', '#dcfce7', '#f3e8ff'];
+  const colors = ['#4338ca', '#d97706', '#16a34a', '#7e22ce'];
+
+  for (let i = start; i < start + 8; i++) {
+    const cIdx = i % 4;
+    list.push({
+      id: i,
+      title: `uni-app X 极速体验与架构实践 (${i})`,
+      summary: '彻底解决原生多层滚动死锁问题，手势平滑通透，支持超高刷流畅滑动。',
+      category: categories[cIdx],
+      categoryBg: bgs[cIdx],
+      categoryColor: colors[cIdx],
+      time: '10分钟前'
+    } as ArticleItem);
+  }
+  return list;
+}
+
+// 初始化加载第一页
+articleList.value = generateArticles(1);
+
+function onArticleRefresh(): void {
+  setTimeout(() => {
+    articlePage = 1;
+    articleList.value = generateArticles(1);
+    articleFinished.value = false;
+    articleRefreshing.value = false;
+    if (articleScrollRef.value != null) {
+      articleScrollRef.value!.$callMethod('endRefresh');
+    }
+  }, 600);
+}
+
+function onArticleLoadMore(): void {
+  if (articleLoading.value || articleFinished.value) {
+    return;
+  }
+  articleLoading.value = true;
+  setTimeout(() => {
+    articlePage++;
+    if (articlePage > 4) {
+      articleFinished.value = true;
+    }
+    else {
+      const nextData = generateArticles(articlePage);
+      for (let i = 0; i < nextData.length; i++) {
+        articleList.value.push(nextData[i]);
+      }
+    }
+    articleLoading.value = false;
+    if (articleScrollRef.value != null) {
+      articleScrollRef.value!.$callMethod('endLoadMore');
+    }
+  }, 800);
+}
+
+// -------------------------------------------------------------
+// 场景二：电商商品
+// -------------------------------------------------------------
+type ProductItem = {
+  id: number;
+  name: string;
+  desc: string;
+  price: string;
+  sales: number;
+  icon: string;
+};
+
+const productScrollRef = ref<ComponentPublicInstance | null>(null);
+const productList = ref<ProductItem[]>([]);
+const productRefreshing = ref<boolean>(false);
+const productLoading = ref<boolean>(false);
+const productFinished = ref<boolean>(false);
+let productPage = 1;
+
+function generateProducts(page: number): ProductItem[] {
+  const list: ProductItem[] = [];
+  const start = (page - 1) * 8 + 1;
+  const icons = ['📱', '💻', '🎧', '⌚'];
+
+  for (let i = start; i < start + 8; i++) {
+    list.push({
+      id: i,
+      name: `高性能智享数码旗舰 (${i})`,
+      desc: '旗舰强芯超薄机身，满血性能释放，次日极速达。',
+      price: `${(i * 128 + 99).toString()}`,
+      sales: i * 88,
+      icon: icons[i % 4]
+    } as ProductItem);
+  }
+  return list;
+}
+
+productList.value = generateProducts(1);
+
+function onProductRefresh(): void {
+  setTimeout(() => {
+    productPage = 1;
+    productList.value = generateProducts(1);
+    productFinished.value = false;
+    productRefreshing.value = false;
+    if (productScrollRef.value != null) {
+      productScrollRef.value!.$callMethod('endRefresh');
+    }
+  }, 600);
+}
+
+function onProductLoadMore(): void {
+  if (productLoading.value || productFinished.value) {
+    return;
+  }
+  productLoading.value = true;
+  setTimeout(() => {
+    productPage++;
+    if (productPage > 3) {
+      productFinished.value = true;
+    }
+    else {
+      const nextData = generateProducts(productPage);
+      for (let i = 0; i < nextData.length; i++) {
+        productList.value.push(nextData[i]);
+      }
+    }
+    productLoading.value = false;
+    if (productScrollRef.value != null) {
+      productScrollRef.value!.$callMethod('endLoadMore');
+    }
+  }, 800);
+}
+
+// -------------------------------------------------------------
+// 场景三：纯长列表
+// -------------------------------------------------------------
+type SimpleItem = {
+  id: number;
+  title: string;
+};
+
+const simpleScrollRef = ref<ComponentPublicInstance | null>(null);
+const simpleList = ref<SimpleItem[]>([]);
+const simpleRefreshing = ref<boolean>(false);
+const simpleLoading = ref<boolean>(false);
+const simpleFinished = ref<boolean>(false);
+let simplePage = 1;
+
+function generateSimpleList(page: number): SimpleItem[] {
+  const list: SimpleItem[] = [];
+  const start = (page - 1) * 12 + 1;
+  for (let i = start; i < start + 12; i++) {
+    list.push({
+      id: i,
+      title: `极简纯净原生数据条目 #${i}`
+    } as SimpleItem);
+  }
+  return list;
+}
+
+simpleList.value = generateSimpleList(1);
+
+function onSimpleRefresh(): void {
+  setTimeout(() => {
+    simplePage = 1;
+    simpleList.value = generateSimpleList(1);
+    simpleFinished.value = false;
+    simpleRefreshing.value = false;
+    if (simpleScrollRef.value != null) {
+      simpleScrollRef.value!.$callMethod('endRefresh');
+    }
+  }, 600);
+}
+
+function onSimpleLoadMore(): void {
+  if (simpleLoading.value || simpleFinished.value) {
+    return;
+  }
+  simpleLoading.value = true;
+  setTimeout(() => {
+    simplePage++;
+    if (simplePage > 5) {
+      simpleFinished.value = true;
+    }
+    else {
+      const nextData = generateSimpleList(simplePage);
+      for (let i = 0; i < nextData.length; i++) {
+        simpleList.value.push(nextData[i]);
+      }
+    }
+    simpleLoading.value = false;
+    if (simpleScrollRef.value != null) {
+      simpleScrollRef.value!.$callMethod('endLoadMore');
+    }
+  }, 800);
+}
+
+// -------------------------------------------------------------
+// 场景四：异常状态演练
+// -------------------------------------------------------------
+const stateScrollRef = ref<ComponentPublicInstance | null>(null);
+const stateList = ref<SimpleItem[]>([]);
+const stateRefreshing = ref<boolean>(false);
+const stateLoading = ref<boolean>(false);
+const stateFinished = ref<boolean>(false);
+const stateError = ref<boolean>(false);
+
+function triggerStateError(): void {
+  stateError.value = true;
+  stateFinished.value = false;
+  uni.showToast({ title: '已进入失败态，点击底部重试', icon: 'none' });
+}
+
+function triggerStateEmpty(): void {
+  stateList.value = [];
+  stateError.value = false;
+  stateFinished.value = true;
+  uni.showToast({ title: '已清空数据，触发空态兜底', icon: 'none' });
+}
+
+function triggerStateReset(): void {
+  stateError.value = false;
+  stateFinished.value = false;
+  const initialData: SimpleItem[] = [];
+  for (let i = 1; i <= 6; i++) {
+    initialData.push({ id: i, title: `正常状态条目 #${i}` } as SimpleItem);
+  }
+  stateList.value = initialData;
+  uni.showToast({ title: '已重置恢复正常', icon: 'success' });
+}
+
+triggerStateReset();
+
+function onStateRefresh(): void {
+  setTimeout(() => {
+    stateRefreshing.value = false;
+    if (stateError.value) {
+      stateError.value = false;
+      triggerStateReset();
+    }
+    if (stateScrollRef.value != null) {
+      stateScrollRef.value!.$callMethod('endRefresh');
+    }
+  }, 600);
+}
+
+function onStateLoadMore(): void {
+  if (stateError.value) {
+    stateError.value = false;
+    uni.showToast({ title: '重试成功，继续加载', icon: 'none' });
+  }
+  stateLoading.value = true;
+  setTimeout(() => {
+    if (stateList.value.length >= 15) {
+      stateFinished.value = true;
+    }
+    else {
+      const currentLen = stateList.value.length;
+      for (let i = 1; i <= 4; i++) {
+        stateList.value.push({
+          id: currentLen + i,
+          title: `后续加载追加数据条目 #${currentLen + i}`
+        } as SimpleItem);
+      }
+    }
+    stateLoading.value = false;
+    if (stateScrollRef.value != null) {
+      stateScrollRef.value!.$callMethod('endLoadMore');
+    }
+  }, 800);
+}
+</script>
+
+<style scoped></style>

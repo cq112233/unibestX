@@ -136,7 +136,6 @@ const isCustomNav = computed((): boolean => {
 onShow(() => {
   console.log('AppKu:onShow');
   // defineProps 生成的 props 类型（GenAppku）不能直接赋给 AppKuHeightProps 接口，按字段组装字面量传入
-  // #ifdef MP-WEIXIN
   setTimeout(() => {
     updateAvailableHeight({
       hideNavbar: props.hideNavbar,
@@ -144,16 +143,6 @@ onShow(() => {
       layout: props.layout
     }, selectedTabbarStrategy);
   }, 150);
-  // #endif
-  // #ifndef MP-WEIXIN
-  setTimeout(() => {
-    updateAvailableHeight({
-      hideNavbar: props.hideNavbar,
-      pageStyle: (props.pageStyle ?? {}) as UTSJSONObject,
-      layout: props.layout
-    }, selectedTabbarStrategy);
-  }, 150);
-  // #endif
 });
 </script>
 

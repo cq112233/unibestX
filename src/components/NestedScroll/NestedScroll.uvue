@@ -1,0 +1,341 @@
+<template>
+  <view class="nested-scroll-container flex-1 flex flex-col w-full h-full">
+    <!-- #ifdef APP -->
+    <!-- App 原生平台：使用 uni-app X 官方 scroll-view type="nested" 嵌套滚动引擎 -->
+    <scroll-view
+      class="flex-1 flex flex-col w-full h-full"
+      type="nested"
+      direction="vertical"
+      :bounces="bounces"
+      :show-scrollbar="showScrollbar"
+      :refresher-enabled="enablePullDown"
+      :refresher-triggered="innerRefreshing"
+      @refresherrefresh="handleRefresherRefresh"
+      @refresherrestore="handleRefresherRestore"
+      @refresherabort="handleRefresherRestore"
+    >
+      <!-- 嵌套顶部区域（仅可包含一个根节点） -->
+      <nested-scroll-header v-if="hasHeaderSlot">
+        <view class="nested-header-wrap">
+          <slot name="header" />
+        </view>
+      </nested-scroll-header>
+
+      <!-- 嵌套滚动主体区域（关联 nested-scroll-view 实现流畅联动） -->
+      <nested-scroll-body style="height: 100%;">
+        <list-view
+          class="flex-1 flex flex-col w-full h-full"
+          :bounces="bounces"
+          :scroll-y="true"
+          :show-scrollbar="showScrollbar"
+          :custom-nested-scroll="true"
+          associative-container="nested-scroll-view"
+          @scrolltolower="handleScrollToLower"
+        >
+          <!-- 默认插槽：列表数据项 -->
+          <slot />
+
+          <!-- 空数据状态 -->
+          <list-item v-if="empty && !loading && !innerRefreshing">
+            <slot name="empty">
+              <view class="py-[48px] items-center justify-center">
+                <text class="text-[36px] mb-[8px]">📭</text>
+                <text
+                  class="text-[13px]"
+                  :class="isDark ? 'text-[#64748b]' : 'text-[#94a3b8]'"
+                >
+                  {{ emptyText }}
+                </text>
+              </view>
+            </slot>
+          </list-item>
+
+          <!-- 底部加载更多状态条 -->
+          <list-item v-if="!empty && enableLoadMore">
+            <slot
+              name="footer"
+              :loading="loading"
+              :finished="finished"
+              :error="error"
+            >
+              <view class="py-[16px] items-center justify-center flex flex-row">
+                <!-- 加载中 -->
+                <template v-if="loading">
+                  <text
+                    class="text-[12px] font-medium"
+                    :class="isDark ? 'text-[#94a3b8]' : 'text-[#64748b]'"
+                  >
+                    {{ loadingText }}
+                  </text>
+                </template>
+
+                <!-- 加载失败重试 -->
+                <template v-else-if="error">
+                  <view class="flex flex-row items-center" @click="handleRetry">
+                    <text class="text-[12px] text-[#ef4444] font-medium mr-[4px]">
+                      {{ errorText }}
+                    </text>
+                    <text class="text-[12px] text-[#4f46e5] font-bold">
+                      点击重试
+                    </text>
+                  </view>
+                </template>
+
+                <!-- 没有更多数据了 -->
+                <template v-else-if="finished">
+                  <text
+                    class="text-[12px]"
+                    :class="isDark ? 'text-[#475569]' : 'text-[#cbd5e1]'"
+                  >
+                    {{ finishedText }}
+                  </text>
+                </template>
+              </view>
+            </slot>
+          </list-item>
+        </list-view>
+      </nested-scroll-body>
+    </scroll-view>
+    <!-- #endif -->
+
+    <!-- #ifndef APP -->
+    <!-- Web / H5 / 小程序平台：平滑降级为标准高性能滚动容器 -->
+    <scroll-view
+      class="flex-1 flex flex-col w-full h-full"
+      direction="vertical"
+      :show-scrollbar="showScrollbar"
+      :refresher-enabled="enablePullDown"
+      :refresher-triggered="innerRefreshing"
+      @refresherrefresh="handleRefresherRefresh"
+      @refresherrestore="handleRefresherRestore"
+      @refresherabort="handleRefresherRestore"
+      @scrolltolower="handleScrollToLower"
+    >
+      <slot v-if="hasHeaderSlot" name="header" />
+      <slot />
+
+      <!-- 空数据状态 -->
+      <view v-if="empty && !loading && !innerRefreshing">
+        <slot name="empty">
+          <view class="py-[48px] items-center justify-center">
+            <text class="text-[36px] mb-[8px]">📭</text>
+            <text
+              class="text-[13px]"
+              :class="isDark ? 'text-[#64748b]' : 'text-[#94a3b8]'"
+            >
+              {{ emptyText }}
+            </text>
+          </view>
+        </slot>
+      </view>
+
+      <!-- 底部加载更多状态条 -->
+      <view v-if="!empty && enableLoadMore">
+        <slot
+          name="footer"
+          :loading="loading"
+          :finished="finished"
+          :error="error"
+        >
+          <view class="py-[16px] items-center justify-center flex flex-row">
+            <template v-if="loading">
+              <text
+                class="text-[12px] font-medium"
+                :class="isDark ? 'text-[#94a3b8]' : 'text-[#64748b]'"
+              >
+                {{ loadingText }}
+              </text>
+            </template>
+            <template v-else-if="error">
+              <view class="flex flex-row items-center" @click="handleRetry">
+                <text class="text-[12px] text-[#ef4444] font-medium mr-[4px]">
+                  {{ errorText }}
+                </text>
+                <text class="text-[12px] text-[#4f46e5] font-bold">
+                  点击重试
+                </text>
+              </view>
+            </template>
+            <template v-else-if="finished">
+              <text
+                class="text-[12px]"
+                :class="isDark ? 'text-[#475569]' : 'text-[#cbd5e1]'"
+              >
+                {{ finishedText }}
+              </text>
+            </template>
+          </view>
+        </slot>
+      </view>
+    </scroll-view>
+    <!-- #endif -->
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed, ref, useSlots, watch } from 'vue';
+import { useAppStore } from '@/src/store';
+
+const props = defineProps({
+  /** 是否开启下拉刷新 */
+  enablePullDown: {
+    type: Boolean,
+    default: true
+  },
+  /** 是否开启上拉触底加载 */
+  enableLoadMore: {
+    type: Boolean,
+    default: true
+  },
+  /** 下拉刷新状态（支持 v-model:refreshing） */
+  refreshing: {
+    type: Boolean,
+    default: false
+  },
+  /** 上拉加载状态（支持 v-model:loading） */
+  loading: {
+    type: Boolean,
+    default: false
+  },
+  /** 是否已加载完所有数据（没有更多了） */
+  finished: {
+    type: Boolean,
+    default: false
+  },
+  /** 是否加载失败（展示重试按钮） */
+  error: {
+    type: Boolean,
+    default: false
+  },
+  /** 是否空数据状态 */
+  empty: {
+    type: Boolean,
+    default: false
+  },
+  /** 空状态文案 */
+  emptyText: {
+    type: String,
+    default: '暂无数据'
+  },
+  /** 上拉加载中文案 */
+  loadingText: {
+    type: String,
+    default: '正在加载中...'
+  },
+  /** 没有更多数据文案 */
+  finishedText: {
+    type: String,
+    default: '— 没有更多了 —'
+  },
+  /** 加载失败文案 */
+  errorText: {
+    type: String,
+    default: '加载失败'
+  },
+  /** 是否显示滚动条 */
+  showScrollbar: {
+    type: Boolean,
+    default: false
+  },
+  /** 是否开启回弹效果 */
+  bounces: {
+    type: Boolean,
+    default: true
+  }
+});
+
+const emit = defineEmits<{
+  (e: 'refresh'): void;
+  (e: 'loadMore'): void;
+  (e: 'update:refreshing', val: boolean): void;
+  (e: 'update:loading', val: boolean): void;
+}>();
+
+const slots = useSlots();
+const hasHeaderSlot = computed((): boolean => {
+  // eslint-disable-next-line dot-notation
+  return slots['header'] != null;
+});
+
+const appStore = useAppStore();
+const isDark = computed((): boolean => appStore.state.isDark);
+
+const innerRefreshing = ref<boolean>(props.refreshing);
+let refreshTimeoutId: number | null = null;
+
+/** 结束下拉刷新 */
+function endRefresh(): void {
+  if (refreshTimeoutId != null) {
+    clearTimeout(refreshTimeoutId!);
+    refreshTimeoutId = null;
+  }
+  innerRefreshing.value = false;
+  emit('update:refreshing', false);
+}
+
+/** 结束上拉加载 */
+function endLoadMore(): void {
+  emit('update:loading', false);
+}
+
+watch(
+  (): boolean => props.refreshing,
+  (val: boolean) => {
+    innerRefreshing.value = val;
+    if (!val && refreshTimeoutId != null) {
+      clearTimeout(refreshTimeoutId!);
+      refreshTimeoutId = null;
+    }
+  }
+);
+
+// 触发下拉刷新
+function handleRefresherRefresh() {
+  innerRefreshing.value = true;
+  emit('update:refreshing', true);
+  emit('refresh');
+
+  if (refreshTimeoutId != null) {
+    clearTimeout(refreshTimeoutId!);
+  }
+  // 6秒防卡死保底复位，避免外部异常导致无限转圈
+  refreshTimeoutId = setTimeout(() => {
+    endRefresh();
+  }, 6000);
+}
+
+// 下拉刷新恢复
+function handleRefresherRestore() {
+  endRefresh();
+}
+
+// 触底加载更多
+function handleScrollToLower() {
+  if (!props.enableLoadMore || props.loading || props.finished || props.error) {
+    return;
+  }
+  emit('update:loading', true);
+  emit('loadMore');
+}
+
+// 失败点击重试
+function handleRetry() {
+  emit('update:loading', true);
+  emit('loadMore');
+}
+
+defineExpose({
+  endRefresh,
+  endLoadMore
+});
+</script>
+
+<style scoped>
+.nested-scroll-container {
+  width: 100%;
+  height: 100%;
+}
+.nested-header-wrap {
+  width: 100%;
+}
+</style>
