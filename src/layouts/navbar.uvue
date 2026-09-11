@@ -52,6 +52,8 @@ import { useAppStore } from '@/src/store';
 import { getThemeTokens } from '@/src/utils/theme';
 import type { ThemeTokens } from '@/src/utils/theme';
 import { isPageRefresherDisabled, isPageScrollDisabled } from '@/src/utils/pageScroll.uts';
+import { curIdx, isSinglePageTabbar, tabbarList } from '@/src/tabbar/helper';
+import { $t } from '@/src/utils/i18n';
 
 /**
  * 布局属性定义（由 uni-layouts-plugin 编译时自动从页面 definePage 或 pages.json 提取传入）
@@ -300,6 +302,11 @@ const useCustomRefresher = computed((): boolean => {
  * 计算最终生效的导航栏标题
  */
 const displayTitle = computed((): string => {
+  if (isSinglePageTabbar && props.type == 'home') {
+    if (curIdx.value >= 0 && curIdx.value < tabbarList.length) {
+      return $t(tabbarList[curIdx.value].text);
+    }
+  }
   const titleFromStyle = (pageStyleObj.value.navigationBarTitleText as string | null) ?? '';
   if (titleFromStyle.length > 0) {
     return titleFromStyle;
