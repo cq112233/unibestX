@@ -1,50 +1,9 @@
 <template>
-  <view class="flex-col">
-    <view class="flex-col">
-      <!-- 布局页面示例组件 -->
-      <LayoutDemoCard />
-
-      <!-- weapp-tailwindcss 样式引擎示例 -->
-      <TailwindcssDemoCard />
-
-      <!-- 使用封装的主题切换组件 -->
-      <ThemeSwitchCard />
-
-      <!-- 使用路由拦截与传参演示组件 -->
-      <RouterDemoCard />
-
-      <!-- 使用封装的多语言切换组件 -->
-      <LangSwitchCard />
-
-      <!-- 使用封装的图标示例组件 -->
-      <IconDemoCard />
-
-      <!-- HTTP 请求 Demo 组件 -->
-      <HttpDemoCard />
-
-      <!-- 全局 Toast 轻提示演示组件 -->
-      <ToastDemoCard />
-
-      <!-- 父子组件传参 & 具名插槽演示组件 -->
-      <PropsDemoCard />
-
-      <!-- 系统与安全区域信息组件 -->
-      <SystemInfoDemoCard />
-    </view>
-  </view>
+  <BasicView />
 </template>
 
 <script setup lang="uts">
-import ToastDemoCard from './components/ToastDemoCard.uvue';
-import PropsDemoCard from './components/PropsDemoCard.uvue';
-import IconDemoCard from './components/IconDemoCard.uvue';
-import LangSwitchCard from './components/LangSwitchCard.uvue';
-import LayoutDemoCard from './components/LayoutDemoCard.uvue';
-import ThemeSwitchCard from './components/ThemeSwitchCard.uvue';
-import RouterDemoCard from './components/RouterDemoCard.uvue';
-import HttpDemoCard from './components/HttpDemoCard.uvue';
-import TailwindcssDemoCard from './components/TailwindcssDemoCard.uvue';
-import SystemInfoDemoCard from './components/SystemInfoDemoCard.uvue';
+import BasicView from './views/BasicView.uvue';
 import { handleBackPressExit } from '@/src/utils/backPress';
 import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/utils/refresh';
 

@@ -1,54 +1,11 @@
 <template>
-  <view class="flex flex-col flex-1 items-center px-[16px] pt-[8px]">
-    <!-- 头部卡片：用户头像及状态 -->
-    <view class="w-full bg-white rounded-[12px] px-[20px] py-[20px] mb-[16px] flex flex-col items-center">
-      <image class="w-[80px] h-[80px] rounded-[40px] mb-[12px] border-[3px] border-[#f1f5f9] border-solid" :src="avatarUrl" />
-      <text class="text-[18px] font-bold text-[#1e293b] mb-[4px]">
-        {{ userStore.state.userInfo.username.length > 0 ? userStore.state.userInfo.username : '未登录用户' }}
-      </text>
-      <text v-if="userStore.state.userInfo.username.length > 0" class="text-[13px] text-[#64748b] mb-[10px]">
-        {{ userStore.state.userInfo.nickname }}
-      </text>
-      <view class="flex flex-row">
-        <text
-          class="text-[12px] px-[12px] py-[3px] rounded-[20px] font-medium overflow-hidden"
-          :class="tokenStore.hasValidLogin() ? 'bg-[#d1fae5] text-[#065f46]' : 'bg-[#f1f5f9] text-[#64748b]'"
-        >
-          {{ tokenStore.hasValidLogin() ? '已登录' : '未登录' }}
-        </text>
-      </view>
-    </view>
-
-    <!-- 信息区域：序列化数据展示 -->
-    <view class="w-full bg-white rounded-[12px] p-[16px] mb-[16px] flex flex-col">
-      <view class="pb-[8px] flex flex-row">
-        <text class="text-[14px] font-semibold text-[#334155]">用户信息 (JSON)</text>
-      </view>
-      <view class="h-[1px] bg-[#f1f5f9] mb-[10px]" />
-      <scroll-view class="bg-[#0f172a] rounded-[8px] p-[10px] h-[130px]" direction="vertical">
-        <text class="text-[12px] text-[#38bdf8] leading-[18px]" style="font-family: monospace;">{{ userInfoJson }}</text>
-      </scroll-view>
-    </view>
-
-    <!-- 按钮区域 -->
-    <view class="w-full px-[4px] flex flex-col">
-      <view v-if="tokenStore.hasValidLogin()" class="w-full h-[44px] rounded-[8px] bg-[#ef4444] flex flex-row items-center justify-center" @click="handleLogout">
-        <text class="text-[#ffffff] text-[14px] font-bold">退出登录</text>
-      </view>
-      <view v-else class="w-full h-[44px] rounded-[8px] bg-[#3b82f6] flex flex-row items-center justify-center" @click="handleLogin">
-        <text class="text-[#ffffff] text-[14px] font-bold">登录</text>
-      </view>
-    </view>
-  </view>
+  <MeView />
 </template>
 
 <script setup lang="uts">
-import { computed } from 'vue';
-import { useTokenStore, useUserStore } from '../../store';
-import { LOGIN_PAGE } from '../../router/config';
+import MeView from './views/MeView.uvue';
 import { handleBackPressExit } from '@/src/utils/backPress';
-import { switchTabbar } from '@/src/tabbar/helper';
-import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '../../utils/refresh.uts';
+import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/utils/refresh';
 
 definePage({
   debug: false,
@@ -76,64 +33,6 @@ onBackPress((options: OnBackPressOptions): boolean => {
   // #endif
   return false;
 });
-
-const userStore = useUserStore();
-const tokenStore = useTokenStore();
-
-// 计算头像
-const avatarUrl = computed((): string => {
-  if (userStore.state.userInfo.avatar.length > 0) {
-    return userStore.state.userInfo.avatar;
-  }
-  return '/static/logo.png';
-});
-
-// 序列化用户信息为 JSON
-const userInfoJson = computed((): string => {
-  const info = {
-    userId: userStore.state.userInfo.userId,
-    username: userStore.state.userInfo.username,
-    nickname: userStore.state.userInfo.nickname,
-    avatar: userStore.state.userInfo.avatar
-  };
-  return JSON.stringify(info, null, 2);
-});
-
-onShow(() => {
-  console.log('All storage keys:', uni.getStorageInfoSync().keys);
-  console.log('pinia:token:', uni.getStorageSync('pinia:token'));
-  console.log('pinia:user:', uni.getStorageSync('pinia:user'));
-});
-
-// 登录
-function handleLogin() {
-  uni.navigateTo({
-    url: LOGIN_PAGE
-  });
-}
-
-// 退出登录
-function handleLogout() {
-  uni.showModal({
-    title: '提示',
-    content: '确定要退出登录吗？',
-    success: (res) => {
-      if (res.confirm) {
-        tokenStore.clearToken();
-        userStore.clearUserInfo();
-        uni.showToast({
-          title: '退出登录成功',
-          icon: 'success'
-        });
-        // 退出后跳回首页（me 页需要登录，不能停留）
-        setTimeout(() => {
-          switchTabbar('/src/pages/index/index');
-        }, 0);
-      }
-    }
-  });
-}
 </script>
 
-<style scoped lang="scss">
-</style>
+<style scoped lang="scss"></style>

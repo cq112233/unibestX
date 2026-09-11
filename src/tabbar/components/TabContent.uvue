@@ -1,12 +1,16 @@
 <template>
   <view v-if="hasRendered" :style="rootStyle" class="tab-content-wrapper">
-    <slot />
+    <scroll-view direction="vertical" class="flex-1 flex flex-col" style="flex: 1;">
+      <view class="flex flex-col" :style="{ paddingBottom: `${tabbarPlaceholderHeight}px` }">
+        <slot />
+      </view>
+    </scroll-view>
   </view>
 </template>
 
 <script setup lang="uts">
 import { computed, onMounted, ref, watch } from 'vue';
-import { curIdx } from '@/src/tabbar/helper';
+import { curIdx, tabbarPlaceholderHeight } from '@/src/tabbar/helper';
 
 const props = defineProps({
   /** 对应的 TabBar 索引（0, 1, 2, 3 等） */
