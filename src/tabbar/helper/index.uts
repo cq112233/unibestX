@@ -203,12 +203,12 @@ export function handleTabbarClick(index: number): void {
   if (list.length <= index) {
     return;
   }
-  if (list[index].isBulge) {
-    handleClickBulge(list[index].pagePath.length > 0 ? list[index].pagePath : '/src/pages/ai/ai');
-    return;
-  }
   if (isSinglePageTabbar) {
     setCurIdx(index);
+    return;
+  }
+  if (list[index].isBulge) {
+    handleClickBulge(list[index].pagePath.length > 0 ? list[index].pagePath : '/src/pages/ai/ai');
     return;
   }
   isSwitchingTab = true;

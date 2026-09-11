@@ -2,20 +2,8 @@
   <view class="flex flex-col flex-1 relative overflow-hidden" style="flex: 1; height: 100%;">
     <!-- 模式 4：单页面 TabBar 容器模式 (零闪烁、0ms 秒切、Tab 状态常驻保活) -->
     <template v-if="isSinglePageTabbar">
-      <view class="flex-1 relative" style="flex: 1; position: relative;">
-        <TabContent :content-index="0">
-          <HomeView />
-        </TabContent>
-        <TabContent :content-index="1">
-          <BasicView />
-        </TabContent>
-        <TabContent :content-index="2">
-          <FunctionView />
-        </TabContent>
-        <TabContent :content-index="3">
-          <MeView />
-        </TabContent>
-      </view>
+      <!-- 自动挂载各 Tab 视图容器（由插件配合 config.uts 自动生成） -->
+      <TabViews />
       <!-- 底部常驻 TabBar (同页渲染免路由跳转) -->
       <Tabbar />
     </template>
@@ -27,10 +15,7 @@
 
 <script setup lang="uts">
 import HomeView from './views/HomeView.uvue';
-import BasicView from '../basic/views/BasicView.uvue';
-import FunctionView from '../function/views/FunctionView.uvue';
-import MeView from '../me/views/MeView.uvue';
-import TabContent from '@/src/tabbar/components/TabContent.uvue';
+import TabViews from '@/src/tabbar/components/TabViews.uvue';
 import Tabbar from '@/src/tabbar/tabbar.uvue';
 import { isSinglePageTabbar } from '@/src/tabbar';
 import { handleBackPressExit } from '@/src/utils/backPress.uts';

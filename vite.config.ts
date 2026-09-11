@@ -76,12 +76,43 @@ export default defineConfig({
     sourcemap: false // 关闭 sourcemap，警告直接消失
   },
   plugins: [
-    // 自动生成 pages.json（基于 pages.config.json 手动配置 + 页面内 <route>/definePage 声明）
+    // 自动扫描与路由生成插件（基于 pages.config.json + 页面内 <route>/definePage 声明）
     uniPagesPlugin({
+      // 【总控开关】：是否启用插件自动扫描与 pages.json 生成（设为 false 则完全失效，不扫描、不写入 pages.json、不监听文件变化）
+      enabled: true,
+
+      // 【主包扫描目录】：主包页面根目录（相对于项目根目录），默认 'src/pages'
       dir: 'src/pages',
+
+      // 【分包扫描目录】：分包根目录数组，不能是主包目录的子目录，默认 []
       subPackages: ['src/sub'],
-      // 页面排除规则：支持排除 components、views 等子目录，防止被扫描生成页面
-      exclude: ['**/components/**/*.*', '**/views/**/*.*']
+
+      // 【排除扫描规则】：Glob 匹配规则数组，匹配到的文件/目录不会被当作页面路由扫描
+      exclude: ['**/components/**/*.*', '**/views/**/*.*'],
+
+      // 【输出文件路径】：生成并同步的 pages.json 相对路径，默认 'pages.json'
+      outFile: 'pages.json',
+
+      // 【基础配置文件】：用于继承 globalStyle、tabBar、easycom 等静态配置的基准文件，默认 'pages.config.json'
+      configFile: 'pages.config.json',
+
+      // 【强制指定首页】：若指定则优先以该路由为主包第一个首页；留空时默认取 pages.config.json 首项或扫描的第一项
+      homePage: '',
+
+      // 【TabBar 专属配置】：收敛所有与 TabBar / 单页面切换相关的配置（配有此项默认自动开启生成单页面）
+      tabbar: {
+        // 【单页 TabBar 容器自动生成】：在自定义 TabBar 模式下，是否自动根据 config.uts 生成 src/tabbar/components/TabViews.uvue 调度组件
+        autoTabViews: true,
+
+        // 【视图组件脚手架自动生成】：当 TabBar 页面缺失 views 目录或对应视图组件时，是否自动以 v3c 规范创建规范的 views/*View.uvue
+        autoCreateViews: true,
+
+        // 【残留异名视图自动清理】：从其他页面目录复制粘贴时，是否自动清理旧模块遗留的废弃 View 文件以避免视图冲突
+        cleanCopiedViews: true,
+
+        // 【TabBar 配置文件路径】：相对于项目根路径，默认 'src/tabbar/config.uts'
+        configFile: 'src/tabbar/config.uts'
+      }
     }),
     // 手动补充 easycom 插件（必须全平台生效，含 App）
     // 该插件内部名为 uni:app-easycom，负责把模板里的 _resolveComponent("rice-button")
