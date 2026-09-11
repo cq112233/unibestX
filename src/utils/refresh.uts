@@ -71,5 +71,32 @@ export function resetNavbarVisible(): void {
   uni.$emit(EVENT_RESET_NAVBAR_VISIBLE);
 }
 
+export const EVENT_SET_STATUS_BAR_VISIBLE = 'setStatusBarVisible';
+export const EVENT_SET_HIDE_STATUS_BAR = 'setHideStatusBar';
+export const EVENT_RESET_STATUS_BAR_VISIBLE = 'resetStatusBarVisible';
+
+/**
+ * 动态控制是否隐藏状态栏占位高度
+ * @param hide 是否隐藏状态栏占位（true 隐藏，false 显示）
+ */
+export function setHideStatusBar(hide: boolean): void {
+  uni.$emit(EVENT_SET_HIDE_STATUS_BAR, hide);
+}
+
+/**
+ * 动态控制状态栏占位高度是否可见
+ * @param visible 是否显示状态栏占位（true 显示，false 隐藏）
+ */
+export function setStatusBarVisible(visible: boolean): void {
+  uni.$emit(EVENT_SET_STATUS_BAR_VISIBLE, visible);
+}
+
+/**
+ * 重置状态栏显隐为页面初始配置
+ */
+export function resetStatusBarVisible(): void {
+  uni.$emit(EVENT_RESET_STATUS_BAR_VISIBLE);
+}
+
 // 统一导出页面滚动与触底监听函数
 export { onNavbarPageScroll, onNavbarReachBottom } from './pageScroll.uts';

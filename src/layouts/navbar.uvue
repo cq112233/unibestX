@@ -5,6 +5,7 @@
     <NavBar
       v-if="isCustomNav"
       :is-navbar-visible="isNavbarVisible"
+      :hide-status-bar="!isStatusBarVisible"
       :title="displayTitle"
       :show-back="showBack"
       :title-color="navTitleColor"
@@ -46,7 +47,7 @@
 </template>
 
 <script setup lang="uts">
-import { computed, onMounted, onUnmounted, ref } from 'vue';
+import { computed, onUnmounted, ref } from 'vue';
 import NavBar from '@/src/components/NavBar/NavBar.uvue';
 import { useAppStore } from '@/src/store';
 import { getThemeTokens } from '@/src/utils/theme';
@@ -98,6 +99,11 @@ const props = defineProps({
   pageStyle: {
     type: Object,
     default: () => ({})
+  },
+  /** 是否隐藏状态栏占位高度（默认 false，为 true 时不占用状态栏空间） */
+  hideStatusBar: {
+    type: Boolean,
+    default: false
   },
   /** 是否隐藏导航栏（默认 false） */
   hideNavbar: {
@@ -211,6 +217,38 @@ const rootStyle = computed((): string => {
   return s;
 });
 
+/** 动态控制状态栏显隐（优先级高于配置项，null 表示采取默认配置） */
+const dynamicHideStatusBar = ref<boolean | null>(null);
+
+/**
+  * 计算状态栏是否可见
+  */
+const isStatusBarVisible = computed((): boolean => {
+  if (dynamicHideStatusBar.value != null) {
+    return dynamicHideStatusBar.value == false;
+  }
+  if (props.hideStatusBar) {
+    return false;
+  }
+  return true;
+});
+
+function onSetStatusBarVisible(visible: any): void {
+  if (typeof visible == 'boolean') {
+    dynamicHideStatusBar.value = !(visible as boolean);
+  }
+}
+
+function onSetHideStatusBar(hide: any): void {
+  if (typeof hide == 'boolean') {
+    dynamicHideStatusBar.value = hide as boolean;
+  }
+}
+
+function onResetStatusBarVisible(): void {
+  dynamicHideStatusBar.value = null;
+}
+
 /** 动态控制导航栏显隐（优先级高于配置项，null 表示采取默认配置） */
 const dynamicHideNavbar = ref<boolean | null>(null);
 
@@ -302,8 +340,9 @@ function onSetNavbarTitle(title: any | null): void {
     }
     else {
       const obj = title as UTSJSONObject;
-      const t = obj.getString('title');
-      if (t != null) {
+      // eslint-disable-next-line dot-notation
+      const t = obj['title'] != null ? `${obj['title']}` : null;
+      if (t != null && t.length > 0) {
         setNavbarTitle(t);
       }
     }
@@ -314,15 +353,16 @@ function onResetNavbarTitle(): void {
   resetNavbarTitle();
 }
 
-// 挂载时注册全局停止刷新与标题修改事件监听
-onMounted(() => {
-  uni.$on('stopPagePullDownRefresh', onStopRefresh);
-  uni.$on('setNavbarTitle', onSetNavbarTitle);
-  uni.$on('resetNavbarTitle', onResetNavbarTitle);
-  uni.$on('setNavbarVisible', onSetNavbarVisible);
-  uni.$on('setHideNavbar', onSetHideNavbar);
-  uni.$on('resetNavbarVisible', onResetNavbarVisible);
-});
+// 在 setup 执行期立即注册全局事件监听，确保子组件 onMounted 触发事件能够被可靠接收
+uni.$on('stopPagePullDownRefresh', onStopRefresh);
+uni.$on('setNavbarTitle', onSetNavbarTitle);
+uni.$on('resetNavbarTitle', onResetNavbarTitle);
+uni.$on('setNavbarVisible', onSetNavbarVisible);
+uni.$on('setHideNavbar', onSetHideNavbar);
+uni.$on('resetNavbarVisible', onResetNavbarVisible);
+uni.$on('setStatusBarVisible', onSetStatusBarVisible);
+uni.$on('setHideStatusBar', onSetHideStatusBar);
+uni.$on('resetStatusBarVisible', onResetStatusBarVisible);
 
 // 卸载时移除全局事件监听，避免内存泄漏
 onUnmounted(() => {
@@ -332,6 +372,9 @@ onUnmounted(() => {
   uni.$off('setNavbarVisible', onSetNavbarVisible);
   uni.$off('setHideNavbar', onSetHideNavbar);
   uni.$off('resetNavbarVisible', onResetNavbarVisible);
+  uni.$off('setStatusBarVisible', onSetStatusBarVisible);
+  uni.$off('setHideStatusBar', onSetHideStatusBar);
+  uni.$off('resetStatusBarVisible', onResetStatusBarVisible);
 });
 
 /**

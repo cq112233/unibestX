@@ -14,7 +14,7 @@ function kebabCase(str: string): string {
  * 注入键永远 ⊆ 声明键：避免页面新参数未声明时被注入到 AppKu 导致编译报错；
  * 未来新增页面参数键需三处同步：definePage / pages.config.json → 本白名单 → App.ku.uvue defineProps。
  */
-const APP_KU_PROP_KEYS: string[] = ['layout', 'showBack', 'hideNavbar', 'enablePullDownRefresh', 'customPageClass', 'customPageStyle', 'style'];
+const APP_KU_PROP_KEYS: string[] = ['layout', 'showBack', 'hideNavbar', 'hideStatusBar', 'enablePullDownRefresh', 'customPageClass', 'customPageStyle', 'style'];
 
 /**
  * 根据页面参数生成传给包裹组件的 props 属性字符串。

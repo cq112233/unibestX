@@ -1,5 +1,9 @@
 <template>
-  <view class="content-container flex flex-col">
+  <scroll-view class="content-container flex flex-col">
+    <view class="bg-[#cccccc]" :style="{ height: `${availableHeight}px` }">
+      <text class="text-[18px] font-bold text-[#1d4ed8]">{{ availableHeight }}</text>
+    </view>
+    <LayoutDemoCard />
     <image class="w-[90px] h-[90px] mx-auto mt-[16px] rounded-[18px]" src="/static/logo.png" />
     <text class="text-[24px] font-semibold mx-auto mt-[8px] text-[#d14328]">
       {{ systemInfo?.appTitle ?? '' }}
@@ -164,14 +168,15 @@
         详细配置与开发指引请查阅项目根目录 README.md 文档
       </text>
     </view>
-  </view>
+  </scroll-view>
 </template>
 
 <script setup lang="uts">
 import { computed } from 'vue';
 import { useAppStore } from '@/src/store';
-import { systemInfo as systemInfoRef } from '@/src/utils/systemInfo.uts';
+import { availableHeight, systemInfo as systemInfoRef } from '@/src/utils/systemInfo.uts';
 import type { SystemInfoType } from '@/src/utils/systemInfo.uts';
+import LayoutDemoCard from '@/src/pages/basic/components/LayoutDemoCard.uvue';
 
 const appStore = useAppStore();
 const isDark = computed((): boolean => appStore.state.isDark);

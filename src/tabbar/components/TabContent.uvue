@@ -12,7 +12,7 @@
 import { computed, onMounted, ref, watch } from 'vue';
 import { curIdx, tabbarList, tabbarPlaceholderHeight } from '@/src/tabbar/helper';
 import { $t } from '@/src/utils/i18n';
-import { setHideNavbar, setNavbarTitle } from '@/src/utils/refresh.uts';
+import { setHideNavbar, setHideStatusBar, setNavbarTitle } from '@/src/utils/refresh.uts';
 
 const props = defineProps({
   /** 对应的 TabBar 索引（0, 1, 2, 3 等） */
@@ -29,6 +29,11 @@ const props = defineProps({
   hideNavbar: {
     type: Boolean,
     default: false
+  },
+  /** 当前 Tab 是否隐藏状态栏占位（默认 false，true 隐藏不占空间，完全沉浸式） */
+  hideStatusBar: {
+    type: Boolean,
+    default: false
   }
 });
 
@@ -36,6 +41,7 @@ const hasRendered = ref(false);
 const isActive = computed<boolean>((): boolean => curIdx.value == props.contentIndex);
 const contentTitle = computed((): string => props.title);
 const shouldHideNavbar = computed((): boolean => props.hideNavbar);
+const shouldHideStatusBar = computed((): boolean => props.hideStatusBar);
 
 const rootStyle = computed<UTSJSONObject>((): UTSJSONObject => {
   return {
@@ -69,6 +75,7 @@ function updateNavbarTitle(): void {
 function syncNavbarState(): void {
   updateNavbarTitle();
   setHideNavbar(props.hideNavbar);
+  setHideStatusBar(props.hideStatusBar);
 }
 
 onMounted(() => {
@@ -99,6 +106,12 @@ watch(contentTitle, (newTitle: string) => {
 watch(shouldHideNavbar, (newVal: boolean) => {
   if (isActive.value) {
     setHideNavbar(newVal);
+  }
+});
+
+watch(shouldHideStatusBar, (newVal: boolean) => {
+  if (isActive.value) {
+    setHideStatusBar(newVal);
   }
 });
 

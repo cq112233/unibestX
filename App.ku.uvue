@@ -40,6 +40,11 @@ const props = defineProps({
     type: Boolean,
     default: false
   },
+  /** 是否隐藏状态栏占位（默认 false，为 true 时不占用状态栏空间） */
+  hideStatusBar: {
+    type: Boolean,
+    default: false
+  },
   /** 页面布局模板标识（非 navbar 布局按无导航处理，参与可用高度计算时不扣状态栏/导航栏） */
   layout: {
     type: String,
@@ -118,31 +123,57 @@ watch((): boolean => appStore.state.isDark, (newVal: boolean) => {
   applyNavbarTheme(newVal);
 });
 
-const isCustomNav = computed((): boolean => {
-  const textStyleFromStyle = (pageStyleObj.value.navigationStyle as string | null) ?? '';
-  if (textStyleFromStyle.length > 0) {
-    if (textStyleFromStyle == 'custom') {
-      return true;
-    }
-    else {
-      return false;
-    }
+
+let activeHideNavbar: boolean = props.hideNavbar;
+let activeHideStatusBar: boolean = props.hideStatusBar;
+
+/**
+ * 执行可用高度重新计算
+ */
+function doUpdateHeight(overrideHideNavbar: boolean | null = null, overrideHideStatusBar: boolean | null = null): void {
+  if (overrideHideNavbar != null) {
+    activeHideNavbar = overrideHideNavbar as boolean;
   }
-  else {
-    return false;
+  if (overrideHideStatusBar != null) {
+    activeHideStatusBar = overrideHideStatusBar as boolean;
+  }
+  updateAvailableHeight({
+    hideNavbar: activeHideNavbar,
+    hideStatusBar: activeHideStatusBar,
+    pageStyle: (props.pageStyle ?? {}) as UTSJSONObject,
+    layout: props.layout
+  }, selectedTabbarStrategy);
+}
+
+// 挂载时立即执行一次可用高度计算
+onShow(() => {
+  setTimeout(() => {
+    doUpdateHeight();
+  }, 100);
+});
+
+// 监听 props.hideStatusBar 变化自动重新计算
+watch((): boolean => props.hideStatusBar, (newVal: boolean) => {
+  doUpdateHeight(null, newVal);
+});
+
+// 监听 props.hideNavbar 变化自动重新计算
+watch((): boolean => props.hideNavbar, (newVal: boolean) => {
+  doUpdateHeight(newVal, null);
+});
+
+// 监听单页 TabBar 切换或全局发出的 setHideStatusBar 事件
+uni.$on('setHideStatusBar', (hide: any) => {
+  if (typeof hide == 'boolean') {
+    doUpdateHeight(null, hide as boolean);
   }
 });
 
-onShow(() => {
-  console.log('AppKu:onShow');
-  // defineProps 生成的 props 类型（GenAppku）不能直接赋给 AppKuHeightProps 接口，按字段组装字面量传入
-  setTimeout(() => {
-    updateAvailableHeight({
-      hideNavbar: props.hideNavbar,
-      pageStyle: (props.pageStyle ?? {}) as UTSJSONObject,
-      layout: props.layout
-    }, selectedTabbarStrategy);
-  }, 150);
+// 监听单页 TabBar 切换或全局发出的 setHideNavbar 事件
+uni.$on('setHideNavbar', (hide: any) => {
+  if (typeof hide == 'boolean') {
+    doUpdateHeight(hide as boolean, null);
+  }
 });
 </script>
 

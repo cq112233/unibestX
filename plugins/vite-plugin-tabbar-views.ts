@@ -207,8 +207,9 @@ onNavbarPullDownRefresh(() => {
       }
     }
 
-    // 读取对应页面文件中的 definePage 配置（如 hideNavbar）
+    // 读取对应页面文件中的 definePage 配置（如 hideNavbar / hideStatusBar）
     let hideNavbar = false;
+    let hideStatusBar = false;
     const absPageFile = path.resolve(projectRoot, rawPath.endsWith('.uvue') ? rawPath : `${rawPath}.uvue`);
     watchedTabPages.add(absPageFile);
 
@@ -219,6 +220,11 @@ onNavbarPullDownRefresh(() => {
         const mHide = pageCode.match(/hideNavbar\s*:\s*(true|false)/i);
         if (mHide) {
           hideNavbar = mHide[1].toLowerCase() === 'true';
+        }
+        // 提取 hideStatusBar: true / false
+        const mStatus = pageCode.match(/hideStatusBar\s*:\s*(true|false)/i);
+        if (mStatus) {
+          hideStatusBar = mStatus[1].toLowerCase() === 'true';
         }
       }
       catch {}
@@ -234,7 +240,8 @@ onNavbarPullDownRefresh(() => {
     viewsEntries.push({
       importName: finalCompName,
       importPath: `@/${actualRelPath.replace(/\\/g, '/')}`,
-      hideNavbar
+      hideNavbar,
+      hideStatusBar
     });
   }
 
@@ -250,8 +257,9 @@ onNavbarPullDownRefresh(() => {
 
   const contentBlocks = viewsEntries
     .map((item, index) => {
-      const hideAttr = item.hideNavbar ? ' :hide-navbar="true"' : '';
-      return `    <TabContent :content-index="${index}"${hideAttr}>\n      <${item.importName} />\n    </TabContent>`;
+      const hideNavAttr = item.hideNavbar ? ' :hide-navbar="true"' : '';
+      const hideStatusAttr = item.hideStatusBar ? ' :hide-status-bar="true"' : '';
+      return `    <TabContent :content-index="${index}"${hideNavAttr}${hideStatusAttr}>\n      <${item.importName} />\n    </TabContent>`;
     })
     .join('\n');
 

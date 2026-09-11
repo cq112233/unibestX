@@ -1,5 +1,5 @@
 <template>
-  <view class="flex flex-col flex-1 relative overflow-hidden" style="flex: 1; height: 100%;">
+  <view class="flex flex-col">
     <!-- 模式 4：单页面 TabBar 容器模式 (零闪烁、0ms 秒切、Tab 状态常驻保活) -->
     <template v-if="isSinglePageTabbar">
       <!-- 自动挂载各 Tab 视图容器（由插件配合 config.uts 自动生成） -->
@@ -14,7 +14,7 @@
 </template>
 
 <script setup lang="uts">
-import HomeView from './views/HomeView.uvue';
+import HomeView from './views/IndexView.uvue';
 import TabViews from '@/src/tabbar/components/TabViews.uvue';
 import Tabbar from '@/src/tabbar/tabbar.uvue';
 import { isSinglePageTabbar } from '@/src/tabbar';
@@ -29,7 +29,8 @@ definePage({
   type: 'home', // 页面类型标识（仅首页配置 'home'，标记当前页面为应用全局启动首页，自动排在 pages[0]）
   layout: 'navbar', // 页面通用布局模板（采用 navbar 布局接管顶部导航与下拉滚动容器）
   showBack: false, // 导航栏左侧是否显示返回箭头（TabBar 首页无需返回按钮）
-  hideNavbar: false, // 是否隐藏顶部导航栏（false 为正常显示）
+  hideStatusBar: true, // 是否隐藏状态栏（true 为隐藏）
+  hideNavbar: true, // 是否隐藏顶部导航栏（false 为正常显示）
   enablePullDownRefresh: true, // 是否开启自定义下拉刷新（由 navbar 布局内的 scroll-view 驱动）
   style: {
     navigationBarTitleText: '首页', // 页面与导航栏标题文本

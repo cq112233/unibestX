@@ -1,15 +1,15 @@
 <template>
   <view class="flex-1 relative" style="flex: 1; position: relative;">
-    <TabContent :content-index="0">
-      <HomeView />
+    <TabContent :content-index="0" :hide-navbar="true" :hide-status-bar="true">
+      <IndexView />
     </TabContent>
-    <TabContent :content-index="1" :hide-navbar="true">
+    <TabContent :content-index="1">
       <BasicView />
     </TabContent>
-    <TabContent :content-index="2">
+    <TabContent :content-index="2" :hide-status-bar="true">
       <FunctionView />
     </TabContent>
-    <TabContent :content-index="3">
+    <TabContent :content-index="3" :hide-navbar="true">
       <MeView />
     </TabContent>
   </view>
@@ -18,7 +18,7 @@
 <script setup lang="uts">
 import BasicView from '@/src/pages/basic/views/BasicView.uvue';
 import FunctionView from '@/src/pages/function/views/FunctionView.uvue';
-import HomeView from '@/src/pages/index/views/HomeView.uvue';
+import IndexView from '@/src/pages/index/views/IndexView.uvue';
 import MeView from '@/src/pages/me/views/MeView.uvue';
 import TabContent from './TabContent.uvue';
 </script>

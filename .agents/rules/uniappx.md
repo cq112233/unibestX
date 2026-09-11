@@ -66,6 +66,11 @@ description: uni-app X (UTS) 开发规范与踩坑避坑指南，适用于跨端
 *   **Display 属性与类名限制 (Display Property Restrictions)**：
     原生平台仅支持 `display: flex` 和 `display: none`。**禁止**使用 `display: grid` 或 `inline-block`。推荐全面使用 Tailwind 的 Flex 布局类名（`flex-row`、`flex-col`、`flex-1`）。
 
+*   **Align-Items 属性与类名限制 (Align-Items Restrictions)**：
+    原生平台对于 `align-items` 仅支持 `center`、`flex-start`、`flex-end`、`stretch`。**禁止使用 `items-baseline`（`align-items: baseline`）**，否则会触发原生 CSS 编译器报错：`property value baseline is not supported for align-items`。
+    *   *错误示例*：`class="items-baseline"`
+    *   *正确做法*：使用 `items-end`（配合微调 `mb-[1px]` 等）或 `items-center`
+
 *   **Position 属性不支持 sticky (Position Sticky Restriction)**：
     原生平台仅支持 `relative`, `absolute`, `fixed`。**不支持** `position: sticky`。
 
