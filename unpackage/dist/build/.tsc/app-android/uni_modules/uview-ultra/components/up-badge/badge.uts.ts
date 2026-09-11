@@ -1,0 +1,27 @@
+/*
+ * @Author       : jry
+ * @Description  :
+ * @version      : 4.0
+ * @Date         : 2024-04-22 16:44:21
+ * @LastAuthor   : jry
+ * @lastTime     : 2024-08-20 14:20:58
+ * @FilePath     : /uview-ultra/libs/config/props/badge
+ */
+export default {
+    // 徽标数组件
+    badge: {
+        isDot: false,
+        value: '',
+        show: true,
+        max: 999,
+        type: 'error',
+        showZero: false,
+        bgColor: '',
+        color: '',
+        shape: 'circle',
+        numberType: 'overflow',
+        offset: [] as number[],
+        inverted: false,
+        absolute: false
+    }
+} as UTSJSONObject

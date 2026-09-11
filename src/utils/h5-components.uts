@@ -31,8 +31,10 @@ import upSignature from '@/uni_modules/uview-ultra/components/up-signature/up-si
 import upTable2 from '@/uni_modules/uview-ultra/components/up-table2/up-table2.uvue';
 import upTitle from '@/uni_modules/uview-ultra/components/up-title/up-title.uvue';
 import upCascader from '@/uni_modules/uview-ultra/components/up-cascader/up-cascader.uvue';
+import upFloatButton from '@/uni_modules/uview-ultra/components/up-float-button/up-float-button.uvue';
 
 export function setupH5Components(app: any) {
+  app.component('up-float-button', upFloatButton);
   app.component('up-popup', upPopup);
   app.component('up-overlay', upOverlay);
   app.component('up-transition', upTransition);

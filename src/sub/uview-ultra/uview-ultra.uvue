@@ -79,6 +79,11 @@
             <up-icon name="list" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
           </template>
         </up-cell>
+        <up-cell title="FloatButton 悬浮按钮" is-link @click="goToDemo('float-button')">
+          <template #icon>
+            <up-icon name="plus-circle" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
       </up-cell-group>
     </view>
 
@@ -445,6 +450,11 @@
             <up-icon name="arrow-upward" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
           </template>
         </up-cell>
+        <up-cell title="FloatButton 悬浮按钮" is-link @click="goToDemo('float-button')">
+          <template #icon>
+            <up-icon name="plus-circle" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
+          </template>
+        </up-cell>
         <up-cell title="Tabbar 底部导航" is-link @click="goToDemo('tabbar')">
           <template #icon>
             <up-icon name="list" :color="themeColor" size="20" class="mr-[8px]"></up-icon>
@@ -492,7 +502,7 @@ definePage({
 
 const appStore = useAppStore();
 const themeColor = computed<string>(() => appStore.state.theme);
-const demoCount: number = 85;
+const demoCount: number = 86;
 
 function goToDemo(page: string): void {
   uni.navigateTo({

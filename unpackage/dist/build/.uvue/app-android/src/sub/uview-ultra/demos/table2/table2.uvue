@@ -1,0 +1,486 @@
+import _easycom_up_title from '@/uni_modules/uview-ultra/components/up-title/up-title.uvue';
+import _easycom_up_table2 from '@/uni_modules/uview-ultra/components/up-table2/up-table2.uvue';
+import _easycom_up_button from '@/uni_modules/uview-ultra/components/up-button/up-button.uvue';
+import AppKu from '@/App.ku.uvue';
+import LayoutComponent from '@/src/layouts/navbar.uvue';
+import { ref } from 'vue';
+const __sfc__ = defineComponent({
+    __name: 'table2',
+    setup(__props) {
+        const __ins = getCurrentInstance()!;
+        const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+        const _cache = __ins.renderCache;
+        ;
+        const eventLog = ref<string>('点击行 / 勾选 / 排序 / 筛选 / 展开等操作日志将显示在这里');
+        const currentRowId = ref<string>('');
+        const tableData = ref<UTSJSONObject[]>([
+            { id: 1, name: '张三', age: 25, city: '北京' },
+            { id: 2, name: '李四', age: 30, city: '上海' },
+            { id: 3, name: '王五', age: 28, city: '广州' },
+            { id: 4, name: '赵六', age: 35, city: '深圳' },
+            { id: 5, name: '张三丰', age: 22, city: '成都' }
+        ] as UTSJSONObject[]);
+        const columns = ref<UTSJSONObject[]>([
+            { title: '姓名', key: 'name', width: '100px', align: 'center' },
+            { title: '年龄', key: 'age', width: '80px', align: 'center' },
+            { title: '城市', key: 'city', width: '100px', align: 'center' }
+        ] as UTSJSONObject[]);
+        const columnsStyle = ref<UTSJSONObject[]>([
+            { title: '姓名', key: 'name', width: '100px', align: 'center' },
+            {
+                align: 'center',
+                title: '年龄',
+                key: 'age',
+                width: '80px',
+                style: { 'background': '#eef2ff', 'color': '#4f46e5', 'justify-content': 'center' } as UTSJSONObject
+            },
+            { title: '城市', key: 'city', width: '100px', align: 'center' }
+        ] as UTSJSONObject[]);
+        const columnsCheck = ref<UTSJSONObject[]>([
+            { type: 'selection', width: '60px' },
+            { title: '姓名', key: 'name', width: '100px' },
+            { title: '年龄', key: 'age', width: '80px' },
+            { title: '城市', key: 'city', width: '100px' }
+        ] as UTSJSONObject[]);
+        const columnsSort = ref<UTSJSONObject[]>([
+            { title: '姓名', key: 'name', sortable: true, width: '100px' },
+            { title: '年龄', key: 'age', sortable: true, width: '80px' },
+            { title: '城市', key: 'city', width: '100px' }
+        ] as UTSJSONObject[]);
+        const filtersValue = ref<UTSJSONObject>({ name: '' } as UTSJSONObject);
+        const treeData = ref<UTSJSONObject[]>([
+            {
+                id: 1,
+                name: '部门A',
+                dept: '研发部',
+                age: 0,
+                children: [
+                    { id: 2, name: '员工1', dept: '前端组', age: 22 },
+                    { id: 3, name: '员工2', dept: '后端组', age: 24 }
+                ]
+            },
+            { id: 4, name: '部门B', dept: '产品部', age: 0 },
+            {
+                id: 5,
+                name: '部门C',
+                dept: '设计部',
+                age: 0,
+                children: [
+                    { id: 6, name: '员工3', dept: 'UI组', age: 26 },
+                    { id: 7, name: '员工4', dept: '交互组', age: 27 }
+                ]
+            }
+        ] as UTSJSONObject[]);
+        const columnsTree = ref<UTSJSONObject[]>([
+            { title: '名称', key: 'name', fixed: 'left', width: '110px' },
+            { title: '部门', key: 'dept', width: '110px' },
+            { title: '年龄', key: 'age', width: '80px' }
+        ] as UTSJSONObject[]);
+        const treePropsValue = ref<UTSJSONObject>({ children: 'children' } as UTSJSONObject);
+        const expandKeys = ref<string[]>(['1', '5']);
+        const spanData = ref<UTSJSONObject[]>([
+            { id: 1, name: '苹果', amount: 10, date: '2023-01-01' },
+            { id: 2, name: '苹果', amount: 15, date: '2023-01-01' },
+            { id: 3, name: '香蕉', amount: 8, date: '2023-01-02' },
+            { id: 4, name: '香蕉', amount: 12, date: '2023-01-02' }
+        ] as UTSJSONObject[]);
+        const columnsSpan = ref<UTSJSONObject[]>([
+            { title: 'ID', key: 'id', width: '60px' },
+            { title: '姓名', key: 'name', width: '90px' },
+            { title: '数量', key: 'amount', width: '80px' },
+            { title: '日期', key: 'date', width: '120px' }
+        ] as UTSJSONObject[]);
+        function getLabel(row: UTSJSONObject, column: UTSJSONObject): string {
+            const key = column["key"];
+            if (key == null) {
+                return '';
+            }
+            const value = row[key.toString()];
+            return value == null ? '-' : value.toString();
+        }
+        function getCellTextStyle(column: UTSJSONObject, row: UTSJSONObject): UTSJSONObject {
+            const style = {} as UTSJSONObject;
+            const key = column["key"];
+            if (key != null && key.toString() == 'age' && row["age"] != null && row["age"].toString() == '25') {
+                style["color"] = '#4f46e5';
+                style["fontWeight"] = 'bold';
+            }
+            return style;
+        }
+        function cellStyleFunc(scope: UTSJSONObject): UTSJSONObject {
+            const style = {} as UTSJSONObject;
+            const column = scope["column"] as UTSJSONObject | null;
+            const row = scope["row"] as UTSJSONObject | null;
+            if (column != null && row != null && column["key"] != null && column["key"].toString() == 'age' && row["age"] != null && row["age"].toString() == '25') {
+                style["backgroundColor"] = '#eef2ff';
+            }
+            return style;
+        }
+        function toNumber(value: any | null, fallback: number = 0): number {
+            if (value == null) {
+                return fallback;
+            }
+            const parsed = parseInt(value.toString());
+            return isNaN(parsed) ? fallback : parsed;
+        }
+        function spanMethod(scope: UTSJSONObject): any | null {
+            const rowIndex = toNumber(scope["rowIndex"], 0);
+            const columnIndex = toNumber(scope["columnIndex"], 0);
+            if (columnIndex == 1) {
+                if (rowIndex == 0 || rowIndex == 1) {
+                    return rowIndex == 0 ? ([2, 1] as number[]) : ([0, 0] as number[]);
+                }
+                if (rowIndex == 2 || rowIndex == 3) {
+                    return rowIndex == 2 ? ([2, 1] as number[]) : ([0, 0] as number[]);
+                }
+            }
+            if (columnIndex == 3) {
+                if (rowIndex == 0 || rowIndex == 1) {
+                    return rowIndex == 0 ? ([2, 1] as number[]) : ([0, 0] as number[]);
+                }
+                if (rowIndex == 2 || rowIndex == 3) {
+                    return rowIndex == 2 ? ([2, 1] as number[]) : ([0, 0] as number[]);
+                }
+            }
+            return null;
+        }
+        function valueToString(value: any | null): string {
+            return value == null ? '' : value.toString();
+        }
+        function getRowText(row: UTSJSONObject): string {
+            const id = row["id"] == null ? '' : row["id"].toString();
+            const name = row["name"] == null ? '' : row["name"].toString();
+            return `#${id} ${name}`;
+        }
+        function getFilterActive(value: string): boolean {
+            return filtersValue.value["name"] != null && filtersValue.value["name"].toString() == value;
+        }
+        function changeFilter(value: string): void {
+            filtersValue.value = { name: value } as UTSJSONObject;
+        }
+        function handleRowClick(row: UTSJSONObject): void {
+            currentRowId.value = row["id"] == null ? '' : row["id"].toString();
+            eventLog.value = `row-click => ${getRowText(row)}`;
+        }
+        function onCurrentChange(row: UTSJSONObject): void {
+            eventLog.value = `current-change => ${getRowText(row)}`;
+        }
+        function onSelectionChange(selection: UTSJSONObject[]): void {
+            eventLog.value = `selection-change => 已选 ${selection.length} 行`;
+        }
+        function onSelect(row: UTSJSONObject, selected: boolean): void {
+            eventLog.value = `select => ${getRowText(row)} ${selected ? '勾选' : '取消'}`;
+        }
+        function onSortChange(conditions: UTSJSONObject[]): void {
+            if (conditions.length == 0) {
+                eventLog.value = 'sort-change => 取消排序';
+                return;
+            }
+            const item = conditions[0] as UTSJSONObject;
+            eventLog.value = `sort-change => ${valueToString(item["key"])} ${valueToString(item["order"])}`;
+        }
+        function onFilterChange(filters: UTSJSONObject): void {
+            eventLog.value = `filter-change => 筛选 name = "${valueToString(filters["name"])}"`;
+        }
+        function onExpandChange(keys: string[]): void {
+            eventLog.value = `expand-change => 展开行 keys: ${keys.join(',')}`;
+        }
+        const salesData = ref<UTSJSONObject[]>([
+            { id: 1, name: '商品A', amount: 120, sales: 3600, rating: 4.8 },
+            { id: 2, name: '商品B', amount: 80, sales: 2400, rating: 4.6 },
+            { id: 3, name: '商品C', amount: 150, sales: 4500, rating: 4.9 },
+            { id: 4, name: '商品D', amount: 50, sales: 1500, rating: 4.5 }
+        ] as UTSJSONObject[]);
+        const columnsSales = ref<UTSJSONObject[]>([
+            { title: '商品名称', key: 'name', width: '90px', align: 'center' },
+            { title: '销量(件)', key: 'amount', width: '80px', align: 'center' },
+            { title: '销售额(元)', key: 'sales', width: '90px', align: 'center' },
+            { title: '评分', key: 'rating', width: '70px', align: 'center' }
+        ] as UTSJSONObject[]);
+        const scoreData = ref<UTSJSONObject[]>([
+            { id: 1, student: '小明', chinese: 88, math: 95, english: 92 },
+            { id: 2, student: '小红', chinese: 94, math: 90, english: 96 },
+            { id: 3, student: '小华', chinese: 82, math: 85, english: 80 }
+        ] as UTSJSONObject[]);
+        const columnsScore = ref<UTSJSONObject[]>([
+            { title: '学生', key: 'student', width: '65px', align: 'center' },
+            { title: '语文', key: 'chinese', width: '55px', align: 'center' },
+            { title: '数学', key: 'math', width: '55px', align: 'center' },
+            { title: '英语', key: 'english', width: '55px', align: 'center' },
+            { title: '总分', key: 'total', width: '75px', align: 'center' }
+        ] as UTSJSONObject[]);
+        function customSummaryMethod(scope: UTSJSONObject): string[] {
+            const rawData = scope["data"] as any[] | null;
+            const result: string[] = ['总汇', '0 件', '¥0', '均分 0'];
+            if (rawData == null || rawData.length == 0) {
+                return result;
+            }
+            let totalAmount: number = 0;
+            let totalSales: number = 0;
+            let totalRating: number = 0;
+            for (let i = 0; i < rawData.length; i++) {
+                const row = rawData[i] as UTSJSONObject;
+                totalAmount += toNumber(row["amount"], 0);
+                totalSales += toNumber(row["sales"], 0);
+                const r = parseFloat(valueToString(row["rating"]));
+                if (!isNaN(r)) {
+                    totalRating += r;
+                }
+            }
+            const avgRating = Math.round((totalRating / rawData.length) * 10) / 10;
+            return ['总汇', `${totalAmount} 件`, `¥${totalSales}`, `均分 ${avgRating}`];
+        }
+        function calcScoreTotal(row: UTSJSONObject): string {
+            const c = toNumber(row["chinese"], 0);
+            const m = toNumber(row["math"], 0);
+            const e = toNumber(row["english"], 0);
+            return `${c + m + e} 分`;
+        }
+        return (): any | null => {
+            const _component_up_title = resolveEasyComponent("up-title", _easycom_up_title);
+            const _component_up_table2 = resolveEasyComponent("up-table2", _easycom_up_table2);
+            const _component_up_button = resolveEasyComponent("up-button", _easycom_up_button);
+            return _cV(unref(AppKu), _uM({
+                layout: 'navbar',
+                "show-back": true,
+                "hide-navbar": false,
+                "enable-pull-down-refresh": false,
+                "page-style": { 'navigationBarTitleText': 'up-table2 表格', 'navigationStyle': 'custom' }
+            }), _uM({
+                default: withSlotCtx((): any[] => [
+                    _cV(unref(LayoutComponent), _uM({
+                        "show-back": true,
+                        "hide-navbar": false,
+                        "enable-pull-down-refresh": false,
+                        "page-style": { 'navigationBarTitleText': 'up-table2 表格', 'navigationStyle': 'custom' }
+                    }), _uM({
+                        default: withSlotCtx((): any[] => [
+                            _cE("view", _uM({ class: "weapp-tw-border page-container bg-_b_hf8fafc_B min-h-screen pb-_b30px_B" }), [
+                                _cE("view", _uM({ class: "weapp-tw-border p-_b16px_B" }), [
+                                    _cE("view", _uM({ class: "weapp-tw-border demo-block" }), [
+                                        _cV(_component_up_title, _uM({ class: "demo-title" }), _uM({
+                                            default: withSlotCtx((): any[] => [
+                                                _cE("text", _uM({ class: "weapp-tw-border demo-title-text" }), "基础表格（斑马纹 + 边框）")
+                                            ]),
+                                            _: 1 /* STABLE */
+                                        })),
+                                        _cV(_component_up_table2, _uM({
+                                            data: tableData.value,
+                                            columns: columns.value,
+                                            stripe: "",
+                                            border: "",
+                                            onRowClick: handleRowClick
+                                        }), null, 8 /* PROPS */, ["data", "columns"])
+                                    ]),
+                                    _cE("view", _uM({ class: "weapp-tw-border demo-block mt-_b12px_B" }), [
+                                        _cV(_component_up_title, _uM({ class: "demo-title" }), _uM({
+                                            default: withSlotCtx((): any[] => [
+                                                _cE("text", _uM({ class: "weapp-tw-border demo-title-text" }), "表格样式自定义（cellStyle + 列 style）")
+                                            ]),
+                                            _: 1 /* STABLE */
+                                        })),
+                                        _cV(_component_up_table2, _uM({
+                                            data: tableData.value,
+                                            columns: columnsStyle.value,
+                                            stripe: "",
+                                            border: "",
+                                            "cell-style": cellStyleFunc
+                                        }), _uM({
+                                            cell: withScopedSlotCtx((slotProps: Record<string, any | null>): any[] => {
+                                                const row = slotProps["row"];
+                                                const column = slotProps["column"];
+                                                return [
+                                                    _cE("text", _uM({
+                                                        class: "weapp-tw-border custom-cell-text",
+                                                        style: _nS(getCellTextStyle(column as UTSJSONObject, row as UTSJSONObject))
+                                                    }), _tD(getLabel(row as UTSJSONObject, column as UTSJSONObject)), 5 /* TEXT, STYLE */)
+                                                ];
+                                            }),
+                                            _: 1 /* STABLE */
+                                        }), 8 /* PROPS */, ["data", "columns"])
+                                    ]),
+                                    _cE("view", _uM({ class: "weapp-tw-border demo-block mt-_b12px_B" }), [
+                                        _cV(_component_up_title, _uM({ class: "demo-title" }), _uM({
+                                            default: withSlotCtx((): any[] => [
+                                                _cE("text", _uM({ class: "weapp-tw-border demo-title-text" }), "单选高亮（highlight-current-row）")
+                                            ]),
+                                            _: 1 /* STABLE */
+                                        })),
+                                        _cV(_component_up_table2, _uM({
+                                            data: tableData.value,
+                                            columns: columns.value,
+                                            "highlight-current-row": "",
+                                            "current-row-key": currentRowId.value,
+                                            onRowClick: handleRowClick,
+                                            onCurrentChange: onCurrentChange
+                                        }), null, 8 /* PROPS */, ["data", "columns", "current-row-key"])
+                                    ]),
+                                    _cE("view", _uM({ class: "weapp-tw-border demo-block mt-_b12px_B" }), [
+                                        _cV(_component_up_title, _uM({ class: "demo-title" }), _uM({
+                                            default: withSlotCtx((): any[] => [
+                                                _cE("text", _uM({ class: "weapp-tw-border demo-title-text" }), "复选框选择（type: selection）")
+                                            ]),
+                                            _: 1 /* STABLE */
+                                        })),
+                                        _cV(_component_up_table2, _uM({
+                                            data: tableData.value,
+                                            columns: columnsCheck.value,
+                                            "row-key": "id",
+                                            onSelectionChange: onSelectionChange,
+                                            onSelect: onSelect
+                                        }), null, 8 /* PROPS */, ["data", "columns"])
+                                    ]),
+                                    _cE("view", _uM({ class: "weapp-tw-border demo-block mt-_b12px_B" }), [
+                                        _cV(_component_up_title, _uM({ class: "demo-title" }), _uM({
+                                            default: withSlotCtx((): any[] => [
+                                                _cE("text", _uM({ class: "weapp-tw-border demo-title-text" }), "排序与筛选（sortable + filters）")
+                                            ]),
+                                            _: 1 /* STABLE */
+                                        })),
+                                        _cE("view", _uM({ class: "weapp-tw-border filter-bar" }), [
+                                            _cV(_component_up_button, _uM({
+                                                text: "全部",
+                                                type: "primary",
+                                                plain: !getFilterActive(''),
+                                                size: "mini",
+                                                class: "filter-btn",
+                                                onClick: () => { changeFilter(''); }
+                                            }), null, 8 /* PROPS */, ["plain", "onClick"]),
+                                            _cV(_component_up_button, _uM({
+                                                text: "筛选姓「张」",
+                                                type: "primary",
+                                                plain: !getFilterActive('张'),
+                                                size: "mini",
+                                                class: "filter-btn",
+                                                onClick: () => { changeFilter('张'); }
+                                            }), null, 8 /* PROPS */, ["plain", "onClick"])
+                                        ]),
+                                        _cV(_component_up_table2, _uM({
+                                            data: tableData.value,
+                                            columns: columnsSort.value,
+                                            sortable: "",
+                                            filters: filtersValue.value,
+                                            onSortChange: onSortChange,
+                                            onFilterChange: onFilterChange
+                                        }), null, 8 /* PROPS */, ["data", "columns", "filters"])
+                                    ]),
+                                    _cE("view", _uM({ class: "weapp-tw-border demo-block mt-_b12px_B" }), [
+                                        _cV(_component_up_title, _uM({ class: "demo-title" }), _uM({
+                                            default: withSlotCtx((): any[] => [
+                                                _cE("text", _uM({ class: "weapp-tw-border demo-title-text" }), "树形结构 + 固定列（fixed: left）")
+                                            ]),
+                                            _: 1 /* STABLE */
+                                        })),
+                                        _cV(_component_up_table2, _uM({
+                                            data: treeData.value,
+                                            columns: columnsTree.value,
+                                            "tree-props": treePropsValue.value,
+                                            "expand-row-keys": expandKeys.value,
+                                            onExpandChange: onExpandChange
+                                        }), null, 8 /* PROPS */, ["data", "columns", "tree-props", "expand-row-keys"])
+                                    ]),
+                                    _cE("view", _uM({ class: "weapp-tw-border demo-block mt-_b12px_B" }), [
+                                        _cV(_component_up_title, _uM({ class: "demo-title" }), _uM({
+                                            default: withSlotCtx((): any[] => [
+                                                _cE("text", _uM({ class: "weapp-tw-border demo-title-text" }), "单元格合并（span-method）")
+                                            ]),
+                                            _: 1 /* STABLE */
+                                        })),
+                                        _cV(_component_up_table2, _uM({
+                                            data: spanData.value,
+                                            columns: columnsSpan.value,
+                                            "span-method": spanMethod,
+                                            border: ""
+                                        }), null, 8 /* PROPS */, ["data", "columns"])
+                                    ]),
+                                    _cE("view", _uM({ class: "weapp-tw-border demo-block mt-_b12px_B" }), [
+                                        _cV(_component_up_title, _uM({ class: "demo-title" }), _uM({
+                                            default: withSlotCtx((): any[] => [
+                                                _cE("text", _uM({ class: "weapp-tw-border demo-title-text" }), "8. 表尾自动汇总（show-summary + sum-text）")
+                                            ]),
+                                            _: 1 /* STABLE */
+                                        })),
+                                        _cV(_component_up_table2, _uM({
+                                            data: salesData.value,
+                                            columns: columnsSales.value,
+                                            border: "",
+                                            "show-summary": "",
+                                            "sum-text": "总计"
+                                        }), null, 8 /* PROPS */, ["data", "columns"])
+                                    ]),
+                                    _cE("view", _uM({ class: "weapp-tw-border demo-block mt-_b12px_B" }), [
+                                        _cV(_component_up_title, _uM({ class: "demo-title" }), _uM({
+                                            default: withSlotCtx((): any[] => [
+                                                _cE("text", _uM({ class: "weapp-tw-border demo-title-text" }), "9. 自定义汇总计算（summary-method）")
+                                            ]),
+                                            _: 1 /* STABLE */
+                                        })),
+                                        _cV(_component_up_table2, _uM({
+                                            data: salesData.value,
+                                            columns: columnsSales.value,
+                                            border: "",
+                                            "show-summary": "",
+                                            "summary-method": customSummaryMethod
+                                        }), null, 8 /* PROPS */, ["data", "columns"])
+                                    ]),
+                                    _cE("view", _uM({ class: "weapp-tw-border demo-block mt-_b12px_B" }), [
+                                        _cV(_component_up_title, _uM({ class: "demo-title" }), _uM({
+                                            default: withSlotCtx((): any[] => [
+                                                _cE("text", _uM({ class: "weapp-tw-border demo-title-text" }), "10. 行内动态汇总列（#cell 动态求和）")
+                                            ]),
+                                            _: 1 /* STABLE */
+                                        })),
+                                        _cV(_component_up_table2, _uM({
+                                            data: scoreData.value,
+                                            columns: columnsScore.value,
+                                            border: "",
+                                            stripe: ""
+                                        }), _uM({
+                                            cell: withScopedSlotCtx((slotProps: Record<string, any | null>): any[] => {
+                                                const row = slotProps["row"];
+                                                const column = slotProps["column"];
+                                                return [
+                                                    (column as UTSJSONObject)["key"] == 'total'
+                                                        ? _cE("text", _uM({
+                                                            key: 0,
+                                                            class: "weapp-tw-border custom-total-text",
+                                                            style: _nS(_uM({ "line-height": "20px" }))
+                                                        }), _tD(calcScoreTotal(row as UTSJSONObject)), 5 /* TEXT, STYLE */)
+                                                        : _cE("text", _uM({
+                                                            key: 1,
+                                                            class: "weapp-tw-border custom-cell-text",
+                                                            style: _nS(_uM({ "line-height": "20px" }))
+                                                        }), _tD(getLabel(row as UTSJSONObject, column as UTSJSONObject)), 5 /* TEXT, STYLE */)
+                                                ];
+                                            }),
+                                            _: 1 /* STABLE */
+                                        }), 8 /* PROPS */, ["data", "columns"])
+                                    ]),
+                                    _cE("view", _uM({ class: "weapp-tw-border demo-block mt-_b12px_B" }), [
+                                        _cV(_component_up_title, _uM({ class: "demo-title" }), _uM({
+                                            default: withSlotCtx((): any[] => [
+                                                _cE("text", _uM({ class: "weapp-tw-border demo-title-text" }), "多端与双模式兼容说明")
+                                            ]),
+                                            _: 1 /* STABLE */
+                                        })),
+                                        _cE("text", _uM({
+                                            class: "weapp-tw-border demo-text",
+                                            style: _nS(_uM({ "line-height": "22px" }))
+                                        }), " 1. 支持开箱即用的 show-summary 表尾合计，自动对纯数值列求和，兼容安卓、鸿蒙、iOS、微信小程序与 H5（VDOM & Vapor 模式）。 2. 支持 summary-method 自定义合计算法（如带货币单位、求平均值等）。 3. 支持通过 #cell 插槽进行行内多列求和计算。 4. 微信小程序平台双线程特性不支持跨线程传递 Function 类型 props，推荐使用内置 show-summary 或数据层响应式 computed 汇总。 ", 4 /* STYLE */)
+                                    ]),
+                                    _cE("view", _uM({ class: "weapp-tw-border log-box mt-_b10px_B" }), [
+                                        _cE("text", _uM({ class: "weapp-tw-border log-text" }), _tD(eventLog.value), 1 /* TEXT */)
+                                    ])
+                                ])
+                            ])
+                        ]),
+                        _: 1 /* STABLE */
+                    }))
+                ]),
+                _: 1 /* STABLE */
+            }));
+        };
+    }
+});
+export default __sfc__;
+const GenSrcSubUviewUltraDemosTable2Table2Styles = [_uM([["weapp-tw-border", _pS(_uM([["borderTopWidth", 0], ["borderRightWidth", 0], ["borderBottomWidth", 0], ["borderLeftWidth", 0]]))], ["demo-block", _pS(_uM([["marginBottom", 12], ["paddingTop", 12], ["paddingRight", 12], ["paddingBottom", 12], ["paddingLeft", 12], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["demo-title", _pS(_uM([["marginBottom", 10]]))], ["demo-title-text", _pS(_uM([["fontSize", 14], ["fontWeight", "bold"], ["color", "#606266"]]))], ["demo-text", _pS(_uM([["fontSize", 13], ["lineHeight", "20px"], ["color", "#64748b"]]))], ["log-box", _pS(_uM([["paddingTop", 10], ["paddingRight", 12], ["paddingBottom", 10], ["paddingLeft", 12], ["backgroundColor", "#0f172a"], ["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["log-text", _pS(_uM([["fontSize", 12], ["lineHeight", "18px"], ["color", "#93c5fd"]]))], ["filter-bar", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["marginBottom", 10]]))], ["filter-btn", _pS(_uM([["marginRight", 10]]))], ["custom-cell-text", _pS(_uM([["fontSize", 13]]))], ["custom-total-text", _pS(_uM([["fontSize", 13], ["fontWeight", "bold"], ["color", "#0284c7"]]))]])];

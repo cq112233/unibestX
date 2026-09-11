@@ -1,0 +1,95 @@
+import _easycom_up_lazy_load from '@/uni_modules/uview-ultra/components/up-lazy-load/up-lazy-load.uvue'
+import AppKu from '@/App.ku.uvue'
+import LayoutComponent from '@/src/layouts/navbar.uvue';
+
+const __sfc__ = defineComponent({
+  __name: 'lazy-load',
+  setup(__props) {
+const __ins = getCurrentInstance()!;
+const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+const _cache = __ins.renderCache;
+
+
+return (): any | null => {
+
+const _component_up_lazy_load = resolveEasyComponent("up-lazy-load",_easycom_up_lazy_load)
+
+  return _cV(unref(AppKu), _uM({
+    layout: 'navbar',
+    "show-back": true,
+    "hide-navbar": false,
+    "enable-pull-down-refresh": false,
+    "page-style": {'navigationBarTitleText':'Lazy Load 懒加载','navigationStyle':'custom'}
+  }), _uM({
+    default: withSlotCtx((): any[] => [
+      _cV(unref(LayoutComponent), _uM({
+        "show-back": true,
+        "hide-navbar": false,
+        "enable-pull-down-refresh": false,
+        "page-style": {'navigationBarTitleText':'Lazy Load 懒加载','navigationStyle':'custom'}
+      }), _uM({
+        default: withSlotCtx((): any[] => [
+          _cE("view", _uM({ class: "weapp-tw-border page-container bg-_b_hf8fafc_B min-h-screen pb-_b30px_B" }), [
+            _cE("view", _uM({ class: "weapp-tw-border p-_b16px_B" }), [
+              _cE("view", _uM({ class: "weapp-tw-border demo-block" }), [
+                _cE("text", _uM({ class: "weapp-tw-border demo-label" }), "基础用法"),
+                _cE("view", _uM({
+                  class: "weapp-tw-border",
+                  style: _nS(_uM({"height":"200px","width":"100%"}))
+                }), [
+                  _cV(_component_up_lazy_load, _uM({ image: "https://cdn.uviewui.com/uview/swiper/1.jpg" }))
+                ], 4 /* STYLE */)
+              ]),
+              _cE("view", _uM({ class: "weapp-tw-border demo-block mt-_b12px_B" }), [
+                _cE("text", _uM({ class: "weapp-tw-border demo-label" }), "图片淡入动画 (is-effect)"),
+                _cE("view", _uM({
+                  class: "weapp-tw-border",
+                  style: _nS(_uM({"height":"200px","width":"100%"}))
+                }), [
+                  _cV(_component_up_lazy_load, _uM({
+                    image: "https://cdn.uviewui.com/uview/swiper/2.jpg",
+                    "is-effect": true,
+                    duration: "300"
+                  }))
+                ], 4 /* STYLE */)
+              ]),
+              _cE("view", _uM({ class: "weapp-tw-border demo-block mt-_b12px_B" }), [
+                _cE("text", _uM({ class: "weapp-tw-border demo-label" }), "圆角和特定大小"),
+                _cE("view", _uM({
+                  class: "weapp-tw-border",
+                  style: _nS(_uM({"height":"200px","width":"100%","display":"flex","justify-content":"center"}))
+                }), [
+                  _cV(_component_up_lazy_load, _uM({
+                    image: "https://cdn.uviewui.com/uview/swiper/3.jpg",
+                    "border-radius": "20",
+                    height: "150",
+                    width: "200"
+                  }))
+                ], 4 /* STYLE */)
+              ]),
+              _cE("view", _uM({ class: "weapp-tw-border demo-block mt-_b12px_B" }), [
+                _cE("text", _uM({ class: "weapp-tw-border demo-label" }), "加载失败占位图"),
+                _cE("view", _uM({
+                  class: "weapp-tw-border",
+                  style: _nS(_uM({"height":"200px","width":"100%"}))
+                }), [
+                  _cV(_component_up_lazy_load, _uM({
+                    image: "https://error.url/not-found.jpg",
+                    "error-img": "https://cdn.uviewui.com/uview/empty/error.png"
+                  }))
+                ], 4 /* STYLE */)
+              ])
+            ])
+          ])
+        ]),
+        _: 1 /* STABLE */
+      }))
+    ]),
+    _: 1 /* STABLE */
+  }))
+}
+}
+
+})
+export default __sfc__
+const GenSrcSubUviewUltraDemosLazyLoadLazyLoadStyles = [_uM([["weapp-tw-border", _pS(_uM([["borderTopWidth", 0], ["borderRightWidth", 0], ["borderBottomWidth", 0], ["borderLeftWidth", 0]]))], ["demo-block", _pS(_uM([["marginBottom", 12], ["paddingTop", 12], ["paddingRight", 12], ["paddingBottom", 12], ["paddingLeft", 12], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["demo-label", _pS(_uM([["fontSize", 14], ["fontWeight", "bold"], ["color", "#606266"], ["marginBottom", 10], ["paddingLeft", 4], ["borderLeftWidth", 3], ["borderLeftStyle", "solid"], ["borderLeftColor", "var(--theme-color, #0957de)"]]))]])]

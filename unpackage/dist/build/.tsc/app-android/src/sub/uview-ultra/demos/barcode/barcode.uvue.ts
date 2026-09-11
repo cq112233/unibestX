@@ -1,0 +1,177 @@
+import _easycom_up_title from '@/uni_modules/uview-ultra/components/up-title/up-title.uvue'
+import _easycom_up_barcode from '@/uni_modules/uview-ultra/components/up-barcode/up-barcode.uvue'
+import _easycom_up_button from '@/uni_modules/uview-ultra/components/up-button/up-button.uvue'
+import AppKu from '@/App.ku.uvue'
+import LayoutComponent from '@/src/layouts/navbar.uvue'
+import { ref } from 'vue';
+
+const __sfc__ = defineComponent({
+  __name: 'barcode',
+  setup(__props) {
+const __ins = getCurrentInstance()!;
+const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+const _cache = __ins.renderCache;
+
+;
+
+const barcodeValue = ref<string>('123456789012');
+const eventLog = ref<string>('');
+
+const barcodeRef = ref(null as ComponentPublicInstance | null);
+
+function onRendered(event: UTSJSONObject) {
+  const format = event.format;
+  eventLog.value = `rendered => format: ${format == null ? '' : format.toString()}`;
+}
+
+function onError(event: UTSJSONObject) {
+  const message = event.message;
+  eventLog.value = `error => ${message == null ? '' : message.toString()}`;
+}
+
+function onRegenerate() {
+  const barcode = barcodeRef.value;
+  if (barcode != null) {
+    barcode.$callMethod('generateBarcode');
+    eventLog.value = '已调用 generateBarcode()';
+  }
+}
+
+function onChangeValue() {
+  barcodeValue.value = barcodeValue.value == '123456789012' ? '987654321098' : '123456789012';
+  eventLog.value = `value 已改为 ${barcodeValue.value}`;
+}
+
+return (): any | null => {
+
+const _component_up_title = resolveEasyComponent("up-title",_easycom_up_title)
+const _component_up_barcode = resolveEasyComponent("up-barcode",_easycom_up_barcode)
+const _component_up_button = resolveEasyComponent("up-button",_easycom_up_button)
+
+  return _cV(unref(AppKu), _uM({
+    layout: 'navbar',
+    "show-back": true,
+    "hide-navbar": false,
+    "enable-pull-down-refresh": false,
+    "page-style": {'navigationBarTitleText':'up-barcode 条形码','navigationStyle':'custom'}
+  }), _uM({
+    default: withSlotCtx((): any[] => [
+      _cV(unref(LayoutComponent), _uM({
+        "show-back": true,
+        "hide-navbar": false,
+        "enable-pull-down-refresh": false,
+        "page-style": {'navigationBarTitleText':'up-barcode 条形码','navigationStyle':'custom'}
+      }), _uM({
+        default: withSlotCtx((): any[] => [
+          _cE("view", _uM({ class: "weapp-tw-border page-container bg-_b_hf8fafc_B min-h-screen pb-_b30px_B" }), [
+            _cE("view", _uM({ class: "weapp-tw-border p-_b16px_B" }), [
+              _cE("view", _uM({ class: "weapp-tw-border demo-block" }), [
+                _cV(_component_up_title, _uM({ class: "demo-title" }), _uM({
+                  default: withSlotCtx((): any[] => [
+                    _cE("text", _uM({ class: "weapp-tw-border demo-title-text" }), "基础用法（自动识别格式）")
+                  ]),
+                  _: 1 /* STABLE */
+                })),
+                _cE("view", _uM({ class: "weapp-tw-border barcode-box" }), [
+                  _cV(_component_up_barcode, _uM({ value: "123456789012" }))
+                ])
+              ]),
+              _cE("view", _uM({ class: "weapp-tw-border demo-block mt-_b12px_B" }), [
+                _cV(_component_up_title, _uM({ class: "demo-title" }), _uM({
+                  default: withSlotCtx((): any[] => [
+                    _cE("text", _uM({ class: "weapp-tw-border demo-title-text" }), "常用格式")
+                  ]),
+                  _: 1 /* STABLE */
+                })),
+                _cE("view", _uM({ class: "weapp-tw-border barcode-box" }), [
+                  _cE("text", _uM({ class: "weapp-tw-border barcode-name" }), "EAN13"),
+                  _cV(_component_up_barcode, _uM({
+                    value: "6922233612192",
+                    format: "EAN13"
+                  }))
+                ]),
+                _cE("view", _uM({ class: "weapp-tw-border barcode-box" }), [
+                  _cE("text", _uM({ class: "weapp-tw-border barcode-name" }), "CODE39"),
+                  _cV(_component_up_barcode, _uM({
+                    value: "UVIEW-ULTRA",
+                    format: "CODE39"
+                  }))
+                ]),
+                _cE("view", _uM({ class: "weapp-tw-border barcode-box" }), [
+                  _cE("text", _uM({ class: "weapp-tw-border barcode-name" }), "UPCA"),
+                  _cV(_component_up_barcode, _uM({
+                    value: "012345678905",
+                    format: "UPCA"
+                  }))
+                ])
+              ]),
+              _cE("view", _uM({ class: "weapp-tw-border demo-block mt-_b12px_B" }), [
+                _cV(_component_up_title, _uM({ class: "demo-title" }), _uM({
+                  default: withSlotCtx((): any[] => [
+                    _cE("text", _uM({ class: "weapp-tw-border demo-title-text" }), "自定义样式（颜色/尺寸/文字位置）")
+                  ]),
+                  _: 1 /* STABLE */
+                })),
+                _cE("view", _uM({ class: "weapp-tw-border barcode-box" }), [
+                  _cV(_component_up_barcode, _uM({
+                    value: "20260820",
+                    format: "CODE128",
+                    width: 260,
+                    height: 90,
+                    margin: 12,
+                    background: "#f0f9ff",
+                    "line-color": "#0957de",
+                    "text-position": "top",
+                    "font-size": 12
+                  }))
+                ])
+              ]),
+              _cE("view", _uM({ class: "weapp-tw-border demo-block mt-_b12px_B" }), [
+                _cV(_component_up_title, _uM({ class: "demo-title" }), _uM({
+                  default: withSlotCtx((): any[] => [
+                    _cE("text", _uM({ class: "weapp-tw-border demo-title-text" }), "ref 重新生成 + 事件")
+                  ]),
+                  _: 1 /* STABLE */
+                })),
+                _cE("view", _uM({ class: "weapp-tw-border barcode-box" }), [
+                  _cV(_component_up_barcode, _uM({
+                    ref_key: "barcodeRef",
+                    ref: barcodeRef,
+                    value: barcodeValue.value,
+                    format: "CODE128",
+                    onRendered: onRendered,
+                    onError: onError
+                  }), null, 8 /* PROPS */, ["value"])
+                ]),
+                _cE("view", _uM({ class: "weapp-tw-border btn-row mt-_b10px_B" }), [
+                  _cV(_component_up_button, _uM({
+                    text: "重新生成",
+                    type: "primary",
+                    size: "small",
+                    class: "demo-btn",
+                    onClick: onRegenerate
+                  })),
+                  _cV(_component_up_button, _uM({
+                    text: "换一个值",
+                    type: "primary",
+                    size: "small",
+                    class: "demo-btn",
+                    onClick: onChangeValue
+                  }))
+                ]),
+                _cE("text", _uM({ class: "weapp-tw-border log-text mt-_b10px_B" }), _tD(eventLog.value), 1 /* TEXT */)
+              ])
+            ])
+          ])
+        ]),
+        _: 1 /* STABLE */
+      }))
+    ]),
+    _: 1 /* STABLE */
+  }))
+}
+}
+
+})
+export default __sfc__
+const GenSrcSubUviewUltraDemosBarcodeBarcodeStyles = [_uM([["weapp-tw-border", _pS(_uM([["borderTopWidth", 0], ["borderRightWidth", 0], ["borderBottomWidth", 0], ["borderLeftWidth", 0]]))], ["demo-block", _pS(_uM([["marginBottom", 12], ["paddingTop", 12], ["paddingRight", 12], ["paddingBottom", 12], ["paddingLeft", 12], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["demo-title", _pS(_uM([["marginBottom", 10]]))], ["demo-title-text", _pS(_uM([["fontSize", 14], ["fontWeight", "bold"], ["color", "#606266"]]))], ["barcode-box", _pS(_uM([["marginBottom", 10]]))], ["barcode-name", _pS(_uM([["fontSize", 12], ["color", "#909399"], ["marginBottom", 6]]))], ["log-text", _pS(_uM([["fontSize", 13], ["color", "#475569"], ["lineHeight", "20px"]]))], ["btn-row", _pS(_uM([["display", "flex"], ["flexDirection", "row"]]))], ["demo-btn", _pS(_uM([["marginRight", 10]]))]])]

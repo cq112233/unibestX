@@ -1,0 +1,87 @@
+import _easycom_up_code_input from '@/uni_modules/uview-ultra/components/up-code-input/up-code-input.uvue'
+import AppKu from '@/App.ku.uvue'
+import LayoutComponent from '@/src/layouts/navbar.uvue'
+import { ref } from 'vue';
+
+const __sfc__ = defineComponent({
+  __name: 'code-input',
+  setup(__props) {
+const __ins = getCurrentInstance()!;
+const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+const _cache = __ins.renderCache;
+
+;
+
+const codeInputValue1 = ref('');
+const codeInputValue2 = ref('');
+const codeInputValue3 = ref('');
+function onCodeInputFinish(val: string): void {
+  uni.showToast({ title: `输入的验证码为: ${val}`, icon: 'none' });
+}
+
+return (): any | null => {
+
+const _component_up_code_input = resolveEasyComponent("up-code-input",_easycom_up_code_input)
+
+  return _cV(unref(AppKu), _uM({
+    layout: 'navbar',
+    "show-back": true,
+    "hide-navbar": false,
+    "enable-pull-down-refresh": false,
+    "page-style": {'navigationBarTitleText':'CodeInput 验证码','navigationStyle':'custom'}
+  }), _uM({
+    default: withSlotCtx((): any[] => [
+      _cV(unref(LayoutComponent), _uM({
+        "show-back": true,
+        "hide-navbar": false,
+        "enable-pull-down-refresh": false,
+        "page-style": {'navigationBarTitleText':'CodeInput 验证码','navigationStyle':'custom'}
+      }), _uM({
+        default: withSlotCtx((): any[] => [
+          _cE("view", _uM({ class: "weapp-tw-border page-container bg-_b_hf8fafc_B min-h-screen pb-_b30px_B" }), [
+            _cE("view", _uM({ class: "weapp-tw-border p-_b16px_B" }), [
+              _cE("view", _uM({ class: "weapp-tw-border demo-block" }), [
+                _cE("text", _uM({ class: "weapp-tw-border demo-label" }), "up-code-input"),
+                _cV(_component_up_code_input, _uM({
+                  modelValue: codeInputValue1.value,
+                  "onUpdate:modelValue": $event => {(codeInputValue1).value = $event},
+                  maxlength: 6,
+                  mode: "box",
+                  onFinish: onCodeInputFinish
+                }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
+              ]),
+              _cE("view", _uM({ class: "weapp-tw-border demo-block mt-_b12px_B" }), [
+                _cE("text", _uM({ class: "weapp-tw-border demo-label" }), "横线模式"),
+                _cV(_component_up_code_input, _uM({
+                  modelValue: codeInputValue2.value,
+                  "onUpdate:modelValue": $event => {(codeInputValue2).value = $event},
+                  maxlength: 4,
+                  mode: "line"
+                }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
+              ]),
+              _cE("view", _uM({ class: "weapp-tw-border demo-block mt-_b12px_B" }), [
+                _cE("text", _uM({ class: "weapp-tw-border demo-label" }), "自定义间距与颜色"),
+                _cV(_component_up_code_input, _uM({
+                  modelValue: codeInputValue3.value,
+                  "onUpdate:modelValue": $event => {(codeInputValue3).value = $event},
+                  maxlength: 4,
+                  mode: "box",
+                  space: "10",
+                  color: "#2979ff",
+                  "border-color": "#2979ff"
+                }), null, 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
+              ])
+            ])
+          ])
+        ]),
+        _: 1 /* STABLE */
+      }))
+    ]),
+    _: 1 /* STABLE */
+  }))
+}
+}
+
+})
+export default __sfc__
+const GenSrcSubUviewUltraDemosCodeInputCodeInputStyles = [_uM([["weapp-tw-border", _pS(_uM([["borderTopWidth", 0], ["borderRightWidth", 0], ["borderBottomWidth", 0], ["borderLeftWidth", 0]]))], ["demo-block", _pS(_uM([["marginBottom", 12], ["paddingTop", 12], ["paddingRight", 12], ["paddingBottom", 12], ["paddingLeft", 12], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["demo-label", _pS(_uM([["fontSize", 14], ["fontWeight", "bold"], ["color", "#606266"], ["marginBottom", 10], ["paddingLeft", 4], ["borderLeftWidth", 3], ["borderLeftStyle", "solid"], ["borderLeftColor", "var(--theme-color, #0957de)"]]))]])]

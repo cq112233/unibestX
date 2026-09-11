@@ -1,0 +1,217 @@
+import _easycom_z_paging_x from '@/uni_modules/z-paging-x/components/z-paging-x/z-paging-x.uvue';
+import Card from '../../basic/components/Card.uvue';
+import { ref } from 'vue';
+// 列表项数据结构：用 type 别名声明，符合 UTS 强类型规范。
+type CompactArticleItem = {
+    id: number;
+    title: string;
+    summary: string;
+    tag: string;
+    tagBgColor: string;
+    tagColor: string;
+};
+// showList：控制 ZPagingX 是否挂载。初始为 true，首次挂载会走 onMounted -> reload() 自动加载。
+// 清空/出错时置 false，配合模板 v-else 显示空白层；刷新时置 true 重新挂载并自动加载。
+const __sfc__ = defineComponent({
+    __name: 'ZPagingDemoCard',
+    setup(__props) {
+        const __ins = getCurrentInstance()!;
+        const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+        const _cache = __ins.renderCache;
+        const showList = ref<boolean>(true);
+        // loadFailed：区分空白层的「暂无数据(false) / 加载失败(true)」两种文案与按钮。
+        const loadFailed = ref<boolean>(false);
+        // 顶部过滤分类
+        const tabList = ['全部', '技术', '设计'];
+        const tabIndex = ref<number>(0);
+        // z-paging-x 组件引用（通过 ref="pagingX" 拿到实例，用于调用 $callMethod）
+        const pagingX = ref<ComponentPublicInstance | null>(null);
+        // 列表数据，与模板 v-for 绑定；由 @update:model-value 从 z-paging-x 回填
+        const dataList = ref<CompactArticleItem[]>([]);
+        // 空白层文案
+        const emptyText = '暂无数据 ~';
+        const emptyErrorText = '加载失败，请点击重试';
+        // z-paging-x 通过 @update:model-value 把最新列表回传，这里手动同步到 dataList。
+        // 手动处理可避免 compiler 产生 union types 的问题。
+        function onUpdateModelValue(val: any[]) {
+            dataList.value = val as CompactArticleItem[];
+        }
+        // 切换顶部过滤分类：重置状态并重新加载。
+        // reload() 会触发 @query；若当前处于空白层（showList=false），则先置 true 重新挂载，
+        // 让 ZPagingX 的 onMounted 自动触发一次加载。
+        function tabChange(index: number) {
+            tabIndex.value = index;
+            loadFailed.value = false;
+            showList.value = true;
+            if (pagingX.value != null) {
+                pagingX.value!.$callMethod('reload');
+            }
+        }
+        // 模拟加载错误：清空数据 + 标记失败，卸载 ZPagingX，展示「加载失败 + 重试」空白层。
+        function triggerError() {
+            dataList.value = [];
+            loadFailed.value = true;
+            showList.value = false;
+        }
+        // 清空数据：清空列表 + 标记为非失败，卸载 ZPagingX，展示「暂无数据 + 刷新」空白层。
+        function triggerClear() {
+            dataList.value = [];
+            loadFailed.value = false;
+            showList.value = false;
+        }
+        // 空白层按钮点击：重新挂载 ZPagingX，其 onMounted 会自动重新请求数据。
+        function onEmptyReload() {
+            loadFailed.value = false;
+            showList.value = true;
+        }
+        // 生成模拟分页数据：pageNo 从 1 开始，pageSize 为一页条数。
+        // 控 12 条上限以演示「没有更多数据」。
+        function getMockArticles(category: string, pageNo: number, pageSize: number): CompactArticleItem[] {
+            const list = [] as CompactArticleItem[];
+            const start = (pageNo - 1) * pageSize;
+            for (let i = 0; i < pageSize; i++) {
+                const itemId = start + i + 1;
+                if (itemId > 12) {
+                    break;
+                }
+                let tag = category;
+                if (category == '全部') {
+                    tag = itemId % 2 == 0 ? '技术' : '设计';
+                }
+                let tagBgColor = '#e0f2fe';
+                let tagColor = '#0284c7';
+                if (tag == '设计') {
+                    tagBgColor = '#f3e8ff';
+                    tagColor = '#7c3aed';
+                }
+                list.push({
+                    id: itemId,
+                    title: `${tag}动态 · 原生探索第 ${itemId} 篇`,
+                    summary: `卡片演示中的 ${tag} 文章，支持局部滚动加载数据。`,
+                    tag,
+                    tagBgColor,
+                    tagColor
+                } as CompactArticleItem);
+            }
+            return list;
+        }
+        // @query 数据加载回调：拿到 pageNo/pageSize 后发起请求，完成后调用 complete 结束加载。
+        // 模拟 600ms 网络延时；失败时若有需要可用 $callMethod('completeByError') 进入错误态。
+        function onQuery(pageNo: number, pageSize: number) {
+            const currentCategory = tabList[tabIndex.value];
+            setTimeout(() => {
+                loadFailed.value = false;
+                const data = getMockArticles(currentCategory, pageNo, pageSize);
+                if (pagingX.value != null) {
+                    pagingX.value!.$callMethod('complete', data);
+                }
+            }, 600);
+        }
+        return (): any | null => {
+            const _component_z_paging_x = resolveEasyComponent("z-paging-x", _easycom_z_paging_x);
+            return _cV(unref(Card), _uM({ title: "数据分页列表 (z-paging-x)" }), _uM({
+                default: withSlotCtx((): any[] => [
+                    _cE("view", _uM({ class: "weapp-tw-border wtu-363vo5-0 wtu-1yjgjtw-1" }), [
+                        _cE("text", _uM({ class: "weapp-tw-border wtu-1shi4c1-2 wtu-k196jf-3 wtu-ipjkxr-4 wtu-1qa8yup-5" }), " 在卡片中直接体验实时分页，支持触底加载、下拉刷新以及各种状态切换。 "),
+                        _cE("view", _uM({ class: "weapp-tw-border wtu-13t3cxb-6 wtu-1yjgjtw-1" }), [
+                            _cE("view", _uM({ class: "weapp-tw-border wtu-13lz6jk-7 wtu-dqdach-8" }), [
+                                _cE("view", _uM({
+                                    class: "weapp-tw-border wtu-1q4uxtw-9 wtu-1wj5rfx-a wtu-118m6zx-b wtu-11r5j79-c wtu-cab7ja-d wtu-13t3cxb-6 wtu-99t06f-e wtu-1a6bk3r-f",
+                                    onClick: triggerError
+                                }), [
+                                    _cE("text", _uM({ class: "weapp-tw-border wtu-1q1c76l-g wtu-a0x5no-h wtu-vbfg4k-i" }), "模拟加载错误")
+                                ])
+                            ]),
+                            _cE("view", _uM({ class: "weapp-tw-border wtu-13lz6jk-7" }), [
+                                _cE("view", _uM({
+                                    class: "weapp-tw-border wtu-1q4uxtw-9 wtu-1wj5rfx-a wtu-118m6zx-b wtu-1vy0ete-j wtu-cab7ja-d wtu-13t3cxb-6 wtu-99t06f-e wtu-1a6bk3r-f",
+                                    onClick: triggerClear
+                                }), [
+                                    _cE("text", _uM({ class: "weapp-tw-border wtu-12jt6bz-k wtu-a0x5no-h wtu-vbfg4k-i" }), "清空数据")
+                                ])
+                            ])
+                        ])
+                    ]),
+                    _cE("view", _uM({
+                        class: "weapp-tw-border wtu-1vo8z52-l wtu-1qagzpp-m wtu-unk8et-n wtu-1n43ppt-o wtu-5jnqzp-p wtu-1s5dir1-q wtu-wquw4l-r",
+                        style: _nS(_uM({ "border-top-left-radius": "12px", "border-top-right-radius": "12px" }))
+                    }), [
+                        _cE("view", _uM({ class: "weapp-tw-border wtu-13t3cxb-6 wtu-9b5i85-s wtu-118m6zx-b wtu-mhanxm-t" }), [
+                            _cE(Fragment, null, RenderHelpers.renderList(tabList, (tab, index, __index, _cached): any => {
+                                return _cE("view", _uM({
+                                    key: index,
+                                    class: _nC(["weapp-tw-border wtu-13lz6jk-7 wtu-99t06f-e wtu-1a6bk3r-f wtu-1to6p8f-u wtu-5shwin-v", tabIndex.value === index ? 'wtu-1vo8z52-l' : 'wtu-9b5i85-s']),
+                                    onClick: () => { tabChange(index); }
+                                }), [
+                                    _cE("text", _uM({
+                                        class: _nC(["weapp-tw-border wtu-a0x5no-h wtu-vbfg4k-i", tabIndex.value === index ? 'wtu-1vqo4p2-w' : 'wtu-k196jf-3'])
+                                    }), _tD(tab), 3 /* TEXT, CLASS */)
+                                ], 10 /* CLASS, PROPS */, ["onClick"]);
+                            }), 64 /* STABLE_FRAGMENT */)
+                        ])
+                    ], 4 /* STYLE */),
+                    isTrue(showList.value)
+                        ? _cV(_component_z_paging_x, _uM({
+                            key: 0,
+                            ref_key: "pagingX",
+                            ref: pagingX,
+                            "list-is": "list-view",
+                            "list-id": "zpagingDemoList",
+                            "custom-nested-scroll": true,
+                            "model-value": dataList.value,
+                            "default-page-size": 10,
+                            "show-back-to-top": true,
+                            "back-to-top-threshold": 60,
+                            "paging-style": { height: '200px', border: '1px solid #edf2f7', borderTopWidth: '0px', borderBottomLeftRadius: '12px', borderBottomRightRadius: '12px', backgroundColor: '#f8fafc' },
+                            "onUpdate:modelValue": onUpdateModelValue,
+                            onQuery: onQuery
+                        }), _uM({
+                            default: withSlotCtx((): any[] => [
+                                _cE(Fragment, null, RenderHelpers.renderList(dataList.value, (item, __key, __index, _cached): any => {
+                                    return _cE("list-item", _uM({
+                                        key: item.id
+                                    }), [
+                                        _cE("view", _uM({ class: "weapp-tw-border wtu-d1mip6-x wtu-1nrqtt4-y wtu-r4yzsb-z wtu-1vo8z52-l wtu-118m6zx-b wtu-1n43ppt-o wtu-5jnqzp-p wtu-1s5dir1-q" }), [
+                                            _cE("view", _uM({ class: "weapp-tw-border wtu-13t3cxb-6 wtu-1d8uwje-10 wtu-99t06f-e wtu-1qnpy9n-11" }), [
+                                                _cE("view", _uM({
+                                                    class: "weapp-tw-border",
+                                                    style: _nS(_uM({ backgroundColor: item.tagBgColor, padding: '1px 6px', borderRadius: '4px' }))
+                                                }), [
+                                                    _cE("text", _uM({
+                                                        class: "weapp-tw-border",
+                                                        style: _nS(_uM({ color: item.tagColor, fontSize: '9px', fontWeight: 'bold' }))
+                                                    }), _tD(item.tag), 5 /* TEXT, STYLE */)
+                                                ], 4 /* STYLE */),
+                                                _cE("text", _uM({ class: "weapp-tw-border wtu-tfarvr-12 wtu-1oi0tuv-13" }), "#" + _tD(item.id), 1 /* TEXT */)
+                                            ]),
+                                            _cE("text", _uM({ class: "weapp-tw-border wtu-s0l2i6-14 wtu-vbfg4k-i wtu-fw3sss-15 wtu-10ykoyt-16" }), _tD(item.title), 1 /* TEXT */),
+                                            _cE("text", _uM({ class: "weapp-tw-border wtu-a0x5no-h wtu-k196jf-3 wtu-fbtvf1-17" }), _tD(item.summary), 1 /* TEXT */)
+                                        ])
+                                    ]);
+                                }), 128 /* KEYED_FRAGMENT */)
+                            ]),
+                            _: 1 /* STABLE */
+                        }), 8 /* PROPS */, ["model-value"])
+                        : _cE("view", _uM({
+                            key: 1,
+                            class: "weapp-tw-border wtu-cab7ja-d wtu-363vo5-0 wtu-99t06f-e wtu-1a6bk3r-f",
+                            style: _nS(_uM({ "height": "200px", "background-color": "#f8fafc", "border": "1px solid #edf2f7", "border-top-width": "0px", "border-bottom-left-radius": "12px", "border-bottom-right-radius": "12px" }))
+                        }), [
+                            _cE("text", _uM({ class: "weapp-tw-border wtu-1g95nuf-18 wtu-19vg9w2-19" }), _tD(loadFailed.value ? '😓' : '📭'), 1 /* TEXT */),
+                            _cE("text", _uM({ class: "weapp-tw-border wtu-1shi4c1-2 wtu-1oi0tuv-13 wtu-hi0epa-1a" }), _tD(loadFailed.value ? emptyErrorText : emptyText), 1 /* TEXT */),
+                            _cE("view", _uM({
+                                class: "weapp-tw-border wtu-1weq3bl-1b wtu-o763ll-1c wtu-118m6zx-b wtu-cab7ja-d wtu-13t3cxb-6 wtu-99t06f-e wtu-1a6bk3r-f",
+                                style: _nS(_uM({ "background-color": "#37c2bc" })),
+                                onClick: onEmptyReload
+                            }), [
+                                _cE("text", _uM({ class: "weapp-tw-border wtu-a0x5no-h wtu-1cgqaq-1d wtu-vbfg4k-i" }), _tD(loadFailed.value ? '点击重试' : '点击刷新'), 1 /* TEXT */)
+                            ], 4 /* STYLE */)
+                        ], 4 /* STYLE */)
+                ]),
+                _: 1 /* STABLE */
+            }));
+        };
+    }
+});
+export default __sfc__;
+const GenSrcPagesFunctionComponentsZPagingDemoCardStyles = [_uM([["weapp-tw-border", _pS(_uM([["borderTopWidth", 0], ["borderRightWidth", 0], ["borderBottomWidth", 0], ["borderLeftWidth", 0]]))], ["wtu-363vo5-0", _pS(_uM([["flexDirection", "column"]]))], ["wtu-1yjgjtw-1", _pS(_uM([["marginBottom", 12]]))], ["wtu-1shi4c1-2", _pS(_uM([["fontSize", 13]]))], ["wtu-k196jf-3", _pS(_uM([["color", "#64748b"]]))], ["wtu-ipjkxr-4", _pS(_uM([["--tw-leading", "18px"], ["lineHeight", "18px"]]))], ["wtu-1qa8yup-5", _pS(_uM([["marginBottom", 8]]))], ["wtu-13t3cxb-6", _pS(_uM([["flexDirection", "row"]]))], ["wtu-13lz6jk-7", _pS(_uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]]))], ["wtu-dqdach-8", _pS(_uM([["marginRight", 8]]))], ["wtu-1q4uxtw-9", _pS(_uM([["width", "100%"]]))], ["wtu-1wj5rfx-a", _pS(_uM([["height", 36]]))], ["wtu-118m6zx-b", _pS(_uM([["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["wtu-11r5j79-c", _pS(_uM([["backgroundColor", "#fee2e2"]]))], ["wtu-cab7ja-d", _pS(_uM([["display", "flex"]]))], ["wtu-99t06f-e", _pS(_uM([["alignItems", "center"]]))], ["wtu-1a6bk3r-f", _pS(_uM([["justifyContent", "center"]]))], ["wtu-1q1c76l-g", _pS(_uM([["color", "#dc2626"]]))], ["wtu-a0x5no-h", _pS(_uM([["fontSize", 12]]))], ["wtu-vbfg4k-i", _pS(_uM([["--tw-font-weight", "var(--font-weight-bold, 700)"], ["fontWeight", 700]]))], ["wtu-1vy0ete-j", _pS(_uM([["backgroundColor", "#fef3c7"]]))], ["wtu-12jt6bz-k", _pS(_uM([["color", "#d97706"]]))], ["wtu-1vo8z52-l", _pS(_uM([["backgroundColor", "#ffffff"]]))], ["wtu-1qagzpp-m", _pS(_uM([["paddingTop", 8], ["paddingBottom", 8]]))], ["wtu-unk8et-n", _pS(_uM([["paddingLeft", 12], ["paddingRight", 12]]))], ["wtu-1n43ppt-o", _pS(_uM([["--tw-border-style", "solid"], ["borderTopStyle", "var(--tw-border-style)"], ["borderRightStyle", "var(--tw-border-style)"], ["borderBottomStyle", "var(--tw-border-style)"], ["borderLeftStyle", "var(--tw-border-style)"], ["borderTopWidth", 1], ["borderRightWidth", 1], ["borderBottomWidth", 1], ["borderLeftWidth", 1]]))], ["wtu-5jnqzp-p", _pS(_uM([["--tw-border-style", "solid"], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"]]))], ["wtu-1s5dir1-q", _pS(_uM([["borderTopColor", "#edf2f7"], ["borderRightColor", "#edf2f7"], ["borderBottomColor", "#edf2f7"], ["borderLeftColor", "#edf2f7"]]))], ["wtu-wquw4l-r", _pS(_uM([["--tw-border-style", "solid"], ["borderBottomStyle", "var(--tw-border-style)"], ["borderBottomWidth", 0]]))], ["wtu-9b5i85-s", _pS(_uM([["backgroundColor", "#f1f5f9"]]))], ["wtu-mhanxm-t", _pS(_uM([["paddingTop", 2], ["paddingRight", 2], ["paddingBottom", 2], ["paddingLeft", 2]]))], ["wtu-1to6p8f-u", _pS(_uM([["paddingTop", 6], ["paddingBottom", 6]]))], ["wtu-5shwin-v", _pS(_uM([["borderTopLeftRadius", 6], ["borderTopRightRadius", 6], ["borderBottomRightRadius", 6], ["borderBottomLeftRadius", 6]]))], ["wtu-1vqo4p2-w", _pS(_uM([["color", "#37c2bc"]]))], ["wtu-d1mip6-x", _pS(_uM([["marginLeft", 12], ["marginRight", 12]]))], ["wtu-1nrqtt4-y", _pS(_uM([["marginTop", 8], ["marginBottom", 8]]))], ["wtu-r4yzsb-z", _pS(_uM([["paddingTop", 12], ["paddingRight", 12], ["paddingBottom", 12], ["paddingLeft", 12]]))], ["wtu-1d8uwje-10", _pS(_uM([["justifyContent", "space-between"]]))], ["wtu-1qnpy9n-11", _pS(_uM([["marginBottom", 6]]))], ["wtu-tfarvr-12", _pS(_uM([["fontSize", 11]]))], ["wtu-1oi0tuv-13", _pS(_uM([["color", "#94a3b8"]]))], ["wtu-s0l2i6-14", _pS(_uM([["fontSize", 14]]))], ["wtu-fw3sss-15", _pS(_uM([["color", "#1e293b"]]))], ["wtu-10ykoyt-16", _pS(_uM([["marginBottom", 4]]))], ["wtu-fbtvf1-17", _pS(_uM([["--tw-leading", "16px"], ["lineHeight", "16px"]]))], ["wtu-1g95nuf-18", _pS(_uM([["fontSize", 28]]))], ["wtu-19vg9w2-19", _pS(_uM([["marginBottom", 10]]))], ["wtu-hi0epa-1a", _pS(_uM([["marginBottom", 14]]))], ["wtu-1weq3bl-1b", _pS(_uM([["height", 32]]))], ["wtu-o763ll-1c", _pS(_uM([["paddingLeft", 16], ["paddingRight", 16]]))], ["wtu-1cgqaq-1d", _pS(_uM([["color", "#ffffff"]]))]])];

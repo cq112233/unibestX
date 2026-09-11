@@ -1,0 +1,640 @@
+import _easycom_up_button from '@/uni_modules/uview-ultra/components/up-button/up-button.uvue'
+import _easycom_up_popup from '@/uni_modules/uview-ultra/components/up-popup/up-popup.uvue'
+import _easycom_z_paging_x from '@/uni_modules/z-paging-x/components/z-paging-x/z-paging-x.uvue'
+import AppKu from '@/App.ku.uvue'
+import LayoutComponent from '@/src/layouts/navbar.uvue'
+import { ref } from 'vue';
+
+type PopupPagingItem = {
+  id: number;
+  title: string;
+  desc: string;
+  tag: string;
+  time: string;
+};
+const __sfc__ = defineComponent({
+  __name: 'popup',
+  setup(__props) {
+const __ins = getCurrentInstance()!;
+const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+const _cache = __ins.renderCache;
+
+;
+// ---------------- 基础方向弹窗（每个方向独立状态） ----------------
+const basicTopShow = ref(false);
+function openTopBasic() { basicTopShow.value = true; }
+const basicBottomShow = ref(false);
+function openBottomBasic() { basicBottomShow.value = true; }
+const basicCenterShow = ref(false);
+function openCenterBasic() { basicCenterShow.value = true; }
+const basicLeftShow = ref(false);
+function openLeftBasic() { basicLeftShow.value = true; }
+const basicRightShow = ref(false);
+function openRightBasic() { basicRightShow.value = true; }
+// ---------------- 手势弹窗（每个方向独立状态） ----------------
+const gestureTopShow = ref(false);
+function openTopGesture() { gestureTopShow.value = true; }
+const gestureBottomShow = ref(false);
+function openBottomGesture() { gestureBottomShow.value = true; }
+const gestureLeftShow = ref(false);
+function openLeftGesture() { gestureLeftShow.value = true; }
+const gestureRightShow = ref(false);
+function openRightGesture() { gestureRightShow.value = true; }
+// ---------------- 阈值、列表弹窗 ----------------
+const showBasicPopup = ref<boolean>(false);
+const showHighThresholdPopup = ref<boolean>(false);
+const showListPopup = ref<boolean>(false);
+const tabList: string[] = ['全部', '热点', '精选', '公告'];
+const currentTab = ref<number>(0);
+const pagingRef = ref<ComponentPublicInstance | null>(null);
+const pagingList = ref<PopupPagingItem[]>([] as PopupPagingItem[]);
+function onUpdatePagingList(val: any[]) {
+  pagingList.value = val as PopupPagingItem[];
+}
+function onTabChange(index: number) {
+  if (currentTab.value == index)
+    return;
+  currentTab.value = index;
+  if (pagingRef.value != null) {
+    pagingRef.value!.$callMethod('reload');
+  }
+}
+function reloadPaging() {
+  if (pagingRef.value != null) {
+    pagingRef.value!.$callMethod('reload');
+  }
+}
+function clearPaging() {
+  pagingList.value = [] as PopupPagingItem[];
+  if (pagingRef.value != null) {
+    pagingRef.value!.$callMethod('clear');
+  }
+}
+function onQueryPaging(pageNo: number, pageSize: number) {
+  const activeTab = tabList[currentTab.value];
+  setTimeout(() => {
+    if (activeTab == '热点') {
+      if (pagingRef.value != null) {
+        pagingRef.value!.$callMethod('complete', [] as PopupPagingItem[]);
+      }
+      return;
+    }
+    const list = [] as PopupPagingItem[];
+    const start = (pageNo - 1) * pageSize;
+    const maxItems = activeTab == '公告' ? 8 : 20;
+    for (let i = 0; i < pageSize; i++) {
+      const id = start + i + 1;
+      if (id > maxItems)
+        break;
+      let tag = activeTab;
+      if (activeTab == '全部') {
+        tag = (id % 3 == 0) ? '公告' : (id % 2 == 0 ? '热点' : '精选');
+      }
+      list.push({
+        id,
+        title: `[${tag}] 资讯条目 #${id}`,
+        desc: `当前分类：${tag}，由 z-paging-x 驱动分页，支持平滑滚动与触底加载。`,
+        tag,
+        time: `${id * 2}分钟前`
+      } as PopupPagingItem);
+    }
+    if (pagingRef.value != null) {
+      pagingRef.value!.$callMethod('complete', list);
+    }
+  }, 350);
+}
+
+return (): any | null => {
+
+const _component_up_button = resolveEasyComponent("up-button",_easycom_up_button)
+const _component_up_popup = resolveEasyComponent("up-popup",_easycom_up_popup)
+const _component_z_paging_x = resolveEasyComponent("z-paging-x",_easycom_z_paging_x)
+
+  return _cV(unref(AppKu), _uM({
+    layout: 'navbar',
+    "show-back": true,
+    "hide-navbar": false,
+    "enable-pull-down-refresh": false,
+    "page-style": {'navigationBarTitleText':'up-popup 弹出层','navigationStyle':'custom'}
+  }), _uM({
+    default: withSlotCtx((): any[] => [
+      _cV(unref(LayoutComponent), _uM({
+        "show-back": true,
+        "hide-navbar": false,
+        "enable-pull-down-refresh": false,
+        "page-style": {'navigationBarTitleText':'up-popup 弹出层','navigationStyle':'custom'}
+      }), _uM({
+        default: withSlotCtx((): any[] => [
+          _cE("view", _uM({ class: "weapp-tw-border page-container bg-_b_hf8fafc_B min-h-screen pb-_b30px_B" }), [
+            _cE("view", _uM({ class: "weapp-tw-border p-_b16px_B" }), [
+              _cE("view", _uM({ class: "weapp-tw-border demo-block" }), [
+                _cE("text", _uM({ class: "weapp-tw-border demo-label" }), "基础方向用法"),
+                _cE("view", _uM({ class: "weapp-tw-border flex-row items-center mb-_b10px_B" }), [
+                  _cV(_component_up_button, _uM({
+                    type: "primary",
+                    text: "顶部弹出",
+                    size: "mini",
+                    onClick: openTopBasic
+                  })),
+                  _cE("view", _uM({ class: "weapp-tw-border w-_b8px_B" })),
+                  _cV(_component_up_button, _uM({
+                    type: "primary",
+                    text: "底部弹出",
+                    size: "mini",
+                    onClick: openBottomBasic
+                  })),
+                  _cE("view", _uM({ class: "weapp-tw-border w-_b8px_B" })),
+                  _cV(_component_up_button, _uM({
+                    type: "primary",
+                    text: "居中弹出",
+                    size: "mini",
+                    onClick: openCenterBasic
+                  }))
+                ]),
+                _cE("view", _uM({ class: "weapp-tw-border flex-row items-center" }), [
+                  _cV(_component_up_button, _uM({
+                    type: "success",
+                    text: "左侧弹出",
+                    size: "mini",
+                    onClick: openLeftBasic
+                  })),
+                  _cE("view", _uM({ class: "weapp-tw-border w-_b8px_B" })),
+                  _cV(_component_up_button, _uM({
+                    type: "success",
+                    text: "右侧弹出",
+                    size: "mini",
+                    onClick: openRightBasic
+                  }))
+                ])
+              ]),
+              _cE("view", _uM({ class: "weapp-tw-border demo-block mt-_b12px_B" }), [
+                _cE("view", _uM({ class: "weapp-tw-border flex-row items-center justify-between mb-_b8px_B" }), [
+                  _cE("text", _uM({ class: "weapp-tw-border demo-label _emb-0" }), "各方向手势滑动关闭"),
+                  _cE("text", _uM({ class: "weapp-tw-border text-_b11px_B bg-_b_heff6ff_B text-_b_h2563eb_B px-_b6px_B py-_b1px_B rounded-full font-medium" }), "方向自适应")
+                ]),
+                _cE("text", _uM({ class: "weapp-tw-border text-_b12px_B text-_b_h64748b_B leading-_b18px_B mb-_b12px_B" }), " 顶部上滑关闭、底部下滑关闭、左侧左滑关闭、右侧右滑关闭；拖拽超过 40px 松手自动滑出关闭，居中不设手势。 "),
+                _cE("view", _uM({ class: "weapp-tw-border flex-row items-center mb-_b10px_B" }), [
+                  _cV(_component_up_button, _uM({
+                    type: "primary",
+                    text: "顶部弹出 (上滑关闭)",
+                    size: "mini",
+                    onClick: openTopGesture
+                  })),
+                  _cE("view", _uM({ class: "weapp-tw-border w-_b8px_B" })),
+                  _cV(_component_up_button, _uM({
+                    type: "primary",
+                    text: "底部弹出 (下滑关闭)",
+                    size: "mini",
+                    onClick: openBottomGesture
+                  }))
+                ]),
+                _cE("view", _uM({ class: "weapp-tw-border flex-row items-center" }), [
+                  _cV(_component_up_button, _uM({
+                    type: "success",
+                    text: "左侧弹出 (左滑关闭)",
+                    size: "mini",
+                    onClick: openLeftGesture
+                  })),
+                  _cE("view", _uM({ class: "weapp-tw-border w-_b8px_B" })),
+                  _cV(_component_up_button, _uM({
+                    type: "success",
+                    text: "右侧弹出 (右滑关闭)",
+                    size: "mini",
+                    onClick: openRightGesture
+                  }))
+                ])
+              ]),
+              _cE("view", _uM({ class: "weapp-tw-border demo-block mt-_b12px_B" }), [
+                _cE("view", _uM({ class: "weapp-tw-border flex-row items-center justify-between mb-_b8px_B" }), [
+                  _cE("text", _uM({ class: "weapp-tw-border demo-label _emb-0" }), "自定义阈值 (Threshold)"),
+                  _cE("text", _uM({ class: "weapp-tw-border text-_b11px_B bg-_b_hfef3c7_B text-_b_hd97706_B px-_b6px_B py-_b1px_B rounded-full font-medium" }), "灵敏度控制")
+                ]),
+                _cE("text", _uM({ class: "weapp-tw-border text-_b12px_B text-_b_h64748b_B leading-_b18px_B mb-_b10px_B" }), " 通过 slide-down-threshold 调节灵敏度：默认 40px 快速响应；100px 防误触面板。 "),
+                _cE("view", _uM({ class: "weapp-tw-border flex-row items-center" }), [
+                  _cV(_component_up_button, _uM({
+                    type: "primary",
+                    text: "默认阈值 (40px)",
+                    size: "mini",
+                    onClick: () => {showBasicPopup.value = true}
+                  }), null, 8 /* PROPS */, ["onClick"]),
+                  _cE("view", _uM({ class: "weapp-tw-border w-_b10px_B" })),
+                  _cV(_component_up_button, _uM({
+                    type: "warning",
+                    text: "高阈值防误触 (100px)",
+                    size: "mini",
+                    onClick: () => {showHighThresholdPopup.value = true}
+                  }), null, 8 /* PROPS */, ["onClick"])
+                ])
+              ]),
+              _cE("view", _uM({ class: "weapp-tw-border demo-block mt-_b12px_B" }), [
+                _cE("view", _uM({ class: "weapp-tw-border flex-row items-center justify-between mb-_b8px_B" }), [
+                  _cE("text", _uM({ class: "weapp-tw-border demo-label _emb-0" }), "嵌套分页列表 (z-paging-x 协同)"),
+                  _cE("text", _uM({ class: "weapp-tw-border text-_b11px_B bg-_b_hf3e8ff_B text-_b_h7e22ce_B px-_b6px_B py-_b1px_B rounded-full font-medium" }), "防冲突 + 分页")
+                ]),
+                _cE("text", _uM({ class: "weapp-tw-border text-_b12px_B text-_b_h64748b_B leading-_b18px_B mb-_b10px_B" }), " 配置 scroll-id=\"popup-paging-scroll\"。支持触底加载；仅当列表回顶时向下拉动触发弹窗下滑关闭。 "),
+                _cE("view", _uM({ class: "weapp-tw-border flex-row items-center" }), [
+                  _cV(_component_up_button, _uM({
+                    type: "info",
+                    text: "打开 z-paging-x 分页弹窗",
+                    size: "mini",
+                    onClick: () => {showListPopup.value = true}
+                  }), null, 8 /* PROPS */, ["onClick"])
+                ])
+              ])
+            ]),
+            _cV(_component_up_popup, _uM({
+              show: basicTopShow.value,
+              mode: "top",
+              closeable: true,
+              round: 12,
+              onClose: () => {basicTopShow.value = false}
+            }), _uM({
+              default: withSlotCtx((): any[] => [
+                _cE("view", _uM({ class: "weapp-tw-border px-_b24px_B py-_b28px_B flex flex-col items-center" }), [
+                  _cE("text", _uM({ class: "weapp-tw-border text-_b16px_B font-bold text-_b_h1e293b_B mb-_b8px_B" }), "顶部弹出层"),
+                  _cE("text", _uM({ class: "weapp-tw-border text-_b13px_B text-_b_h64748b_B text-center mb-_b18px_B" }), "常规弹出层展示，可通过点击遮罩或右上角关闭图标收起。"),
+                  _cE("view", _uM({
+                    class: "weapp-tw-border bg-_b_h0957de_B py-_b10px_B px-_b28px_B rounded-_b8px_B active_copacity-80",
+                    onClick: () => {basicTopShow.value = false}
+                  }), [
+                    _cE("text", _uM({ class: "weapp-tw-border text-white text-_b14px_B font-bold" }), "我知道了")
+                  ], 8 /* PROPS */, ["onClick"])
+                ])
+              ]),
+              _: 1 /* STABLE */
+            }), 8 /* PROPS */, ["show", "onClose"]),
+            _cV(_component_up_popup, _uM({
+              show: basicBottomShow.value,
+              mode: "bottom",
+              closeable: true,
+              round: 12,
+              onClose: () => {basicBottomShow.value = false}
+            }), _uM({
+              default: withSlotCtx((): any[] => [
+                _cE("view", _uM({ class: "weapp-tw-border px-_b24px_B py-_b28px_B flex flex-col items-center" }), [
+                  _cE("text", _uM({ class: "weapp-tw-border text-_b16px_B font-bold text-_b_h1e293b_B mb-_b8px_B" }), "底部弹出层"),
+                  _cE("text", _uM({ class: "weapp-tw-border text-_b13px_B text-_b_h64748b_B text-center mb-_b18px_B" }), "常规弹出层展示，可通过点击遮罩或右上角关闭图标收起。"),
+                  _cE("view", _uM({
+                    class: "weapp-tw-border bg-_b_h0957de_B py-_b10px_B px-_b28px_B rounded-_b8px_B active_copacity-80",
+                    onClick: () => {basicBottomShow.value = false}
+                  }), [
+                    _cE("text", _uM({ class: "weapp-tw-border text-white text-_b14px_B font-bold" }), "我知道了")
+                  ], 8 /* PROPS */, ["onClick"])
+                ])
+              ]),
+              _: 1 /* STABLE */
+            }), 8 /* PROPS */, ["show", "onClose"]),
+            _cV(_component_up_popup, _uM({
+              show: basicCenterShow.value,
+              mode: "center",
+              closeable: true,
+              round: 12,
+              onClose: () => {basicCenterShow.value = false}
+            }), _uM({
+              default: withSlotCtx((): any[] => [
+                _cE("view", _uM({ class: "weapp-tw-border px-_b24px_B py-_b28px_B flex flex-col items-center" }), [
+                  _cE("text", _uM({ class: "weapp-tw-border text-_b16px_B font-bold text-_b_h1e293b_B mb-_b8px_B" }), "居中弹出层"),
+                  _cE("text", _uM({ class: "weapp-tw-border text-_b13px_B text-_b_h64748b_B text-center mb-_b18px_B" }), "常规弹出层展示，可通过点击遮罩或右上角关闭图标收起。"),
+                  _cE("view", _uM({
+                    class: "weapp-tw-border bg-_b_h0957de_B py-_b10px_B px-_b28px_B rounded-_b8px_B active_copacity-80",
+                    onClick: () => {basicCenterShow.value = false}
+                  }), [
+                    _cE("text", _uM({ class: "weapp-tw-border text-white text-_b14px_B font-bold" }), "我知道了")
+                  ], 8 /* PROPS */, ["onClick"])
+                ])
+              ]),
+              _: 1 /* STABLE */
+            }), 8 /* PROPS */, ["show", "onClose"]),
+            _cV(_component_up_popup, _uM({
+              show: basicLeftShow.value,
+              mode: "left",
+              closeable: true,
+              round: 12,
+              onClose: () => {basicLeftShow.value = false}
+            }), _uM({
+              default: withSlotCtx((): any[] => [
+                _cE("view", _uM({ class: "weapp-tw-border px-_b24px_B py-_b28px_B flex flex-col items-center w-_b260px_B h-full justify-center" }), [
+                  _cE("text", _uM({ class: "weapp-tw-border text-_b16px_B font-bold text-_b_h1e293b_B mb-_b8px_B" }), "左侧弹出层"),
+                  _cE("text", _uM({ class: "weapp-tw-border text-_b13px_B text-_b_h64748b_B text-center mb-_b18px_B" }), "常规弹出层展示，可通过点击遮罩或右上角关闭图标收起。"),
+                  _cE("view", _uM({
+                    class: "weapp-tw-border bg-_b_h0957de_B py-_b10px_B px-_b28px_B rounded-_b8px_B active_copacity-80",
+                    onClick: () => {basicLeftShow.value = false}
+                  }), [
+                    _cE("text", _uM({ class: "weapp-tw-border text-white text-_b14px_B font-bold" }), "我知道了")
+                  ], 8 /* PROPS */, ["onClick"])
+                ])
+              ]),
+              _: 1 /* STABLE */
+            }), 8 /* PROPS */, ["show", "onClose"]),
+            _cV(_component_up_popup, _uM({
+              show: basicRightShow.value,
+              mode: "right",
+              closeable: true,
+              round: 12,
+              onClose: () => {basicRightShow.value = false}
+            }), _uM({
+              default: withSlotCtx((): any[] => [
+                _cE("view", _uM({ class: "weapp-tw-border px-_b24px_B py-_b28px_B flex flex-col items-center w-_b260px_B h-full justify-center" }), [
+                  _cE("text", _uM({ class: "weapp-tw-border text-_b16px_B font-bold text-_b_h1e293b_B mb-_b8px_B" }), "右侧弹出层"),
+                  _cE("text", _uM({ class: "weapp-tw-border text-_b13px_B text-_b_h64748b_B text-center mb-_b18px_B" }), "常规弹出层展示，可通过点击遮罩或右上角关闭图标收起。"),
+                  _cE("view", _uM({
+                    class: "weapp-tw-border bg-_b_h0957de_B py-_b10px_B px-_b28px_B rounded-_b8px_B active_copacity-80",
+                    onClick: () => {basicRightShow.value = false}
+                  }), [
+                    _cE("text", _uM({ class: "weapp-tw-border text-white text-_b14px_B font-bold" }), "我知道了")
+                  ], 8 /* PROPS */, ["onClick"])
+                ])
+              ]),
+              _: 1 /* STABLE */
+            }), 8 /* PROPS */, ["show", "onClose"]),
+            _cV(_component_up_popup, _uM({
+              show: gestureTopShow.value,
+              mode: "top",
+              closeable: true,
+              round: 16,
+              "close-on-slide-down": true,
+              "show-drag-bar": true,
+              "slide-down-threshold": 40,
+              onClose: () => {gestureTopShow.value = false}
+            }), _uM({
+              default: withSlotCtx((): any[] => [
+                _cE("view", _uM({ class: "weapp-tw-border px-_b24px_B py-_b26px_B flex flex-col items-center" }), [
+                  _cE("view", _uM({ class: "weapp-tw-border w-_b44px_B h-_b44px_B rounded-full bg-_b_heff6ff_B flex items-center justify-center mb-_b10px_B" }), [
+                    _cE("text", _uM({ class: "weapp-tw-border text-_b20px_B text-_b_h2563eb_B" }), "↑")
+                  ]),
+                  _cE("text", _uM({ class: "weapp-tw-border text-_b17px_B font-bold text-_b_h0f172a_B mb-_b6px_B" }), "顶部弹出 (上滑关闭)"),
+                  _cE("text", _uM({ class: "weapp-tw-border text-_b13px_B text-_b_h64748b_B text-center mb-_b14px_B leading-_b20px_B" }), "手指向【上】推拉滑动超过 40px，松手即可上滑关闭。"),
+                  _cE("view", _uM({ class: "weapp-tw-border bg-_b_hf1f5f9_B rounded-_b10px_B p-_b12px_B w-full mb-_b16px_B" }), [
+                    _cE("text", _uM({ class: "weapp-tw-border text-_b12px_B text-_b_h475569_B leading-_b18px_B" }), "当前方向已开启手势滑动关闭与指示条。拖拽位移达到 40px 松手即可触发关闭；未达阈值弹性复位。")
+                  ]),
+                  _cE("view", _uM({
+                    class: "weapp-tw-border bg-_b_h0957de_B py-_b10px_B px-_b32px_B rounded-_b10px_B flex items-center justify-center active_copacity-80",
+                    onClick: () => {gestureTopShow.value = false}
+                  }), [
+                    _cE("text", _uM({ class: "weapp-tw-border text-white text-_b14px_B font-bold" }), "完成并收起")
+                  ], 8 /* PROPS */, ["onClick"])
+                ])
+              ]),
+              _: 1 /* STABLE */
+            }), 8 /* PROPS */, ["show", "onClose"]),
+            _cV(_component_up_popup, _uM({
+              show: gestureBottomShow.value,
+              mode: "bottom",
+              closeable: true,
+              round: 16,
+              "close-on-slide-down": true,
+              "show-drag-bar": true,
+              "slide-down-threshold": 40,
+              onClose: () => {gestureBottomShow.value = false}
+            }), _uM({
+              default: withSlotCtx((): any[] => [
+                _cE("view", _uM({ class: "weapp-tw-border px-_b24px_B py-_b26px_B flex flex-col items-center" }), [
+                  _cE("view", _uM({ class: "weapp-tw-border w-_b44px_B h-_b44px_B rounded-full bg-_b_heff6ff_B flex items-center justify-center mb-_b10px_B" }), [
+                    _cE("text", _uM({ class: "weapp-tw-border text-_b20px_B text-_b_h2563eb_B" }), "↓")
+                  ]),
+                  _cE("text", _uM({ class: "weapp-tw-border text-_b17px_B font-bold text-_b_h0f172a_B mb-_b6px_B" }), "底部弹出 (下滑关闭)"),
+                  _cE("text", _uM({ class: "weapp-tw-border text-_b13px_B text-_b_h64748b_B text-center mb-_b14px_B leading-_b20px_B" }), "手指向【下】拖拉滑动超过 40px，松手即可下滑关闭。"),
+                  _cE("view", _uM({ class: "weapp-tw-border bg-_b_hf1f5f9_B rounded-_b10px_B p-_b12px_B w-full mb-_b16px_B" }), [
+                    _cE("text", _uM({ class: "weapp-tw-border text-_b12px_B text-_b_h475569_B leading-_b18px_B" }), "当前方向已开启手势滑动关闭与指示条。拖拽位移达到 40px 松手即可触发关闭；未达阈值弹性复位。")
+                  ]),
+                  _cE("view", _uM({
+                    class: "weapp-tw-border bg-_b_h0957de_B py-_b10px_B px-_b32px_B rounded-_b10px_B flex items-center justify-center active_copacity-80",
+                    onClick: () => {gestureBottomShow.value = false}
+                  }), [
+                    _cE("text", _uM({ class: "weapp-tw-border text-white text-_b14px_B font-bold" }), "完成并收起")
+                  ], 8 /* PROPS */, ["onClick"])
+                ])
+              ]),
+              _: 1 /* STABLE */
+            }), 8 /* PROPS */, ["show", "onClose"]),
+            _cV(_component_up_popup, _uM({
+              show: gestureLeftShow.value,
+              mode: "left",
+              closeable: true,
+              round: 16,
+              "close-on-slide-down": true,
+              "show-drag-bar": true,
+              "slide-down-threshold": 40,
+              onClose: () => {gestureLeftShow.value = false}
+            }), _uM({
+              default: withSlotCtx((): any[] => [
+                _cE("view", _uM({ class: "weapp-tw-border px-_b24px_B py-_b26px_B flex flex-col items-center w-_b260px_B h-full justify-center" }), [
+                  _cE("view", _uM({ class: "weapp-tw-border w-_b44px_B h-_b44px_B rounded-full bg-_b_heff6ff_B flex items-center justify-center mb-_b10px_B" }), [
+                    _cE("text", _uM({ class: "weapp-tw-border text-_b20px_B text-_b_h2563eb_B" }), "←")
+                  ]),
+                  _cE("text", _uM({ class: "weapp-tw-border text-_b17px_B font-bold text-_b_h0f172a_B mb-_b6px_B" }), "左侧弹出 (左滑关闭)"),
+                  _cE("text", _uM({ class: "weapp-tw-border text-_b13px_B text-_b_h64748b_B text-center mb-_b14px_B leading-_b20px_B" }), "手指向【左】拉动滑动超过 40px，松手即可左滑关闭。"),
+                  _cE("view", _uM({ class: "weapp-tw-border bg-_b_hf1f5f9_B rounded-_b10px_B p-_b12px_B w-full mb-_b16px_B" }), [
+                    _cE("text", _uM({ class: "weapp-tw-border text-_b12px_B text-_b_h475569_B leading-_b18px_B" }), "当前方向已开启手势滑动关闭与指示条。拖拽位移达到 40px 松手即可触发关闭；未达阈值弹性复位。")
+                  ]),
+                  _cE("view", _uM({
+                    class: "weapp-tw-border bg-_b_h0957de_B py-_b10px_B px-_b32px_B rounded-_b10px_B flex items-center justify-center active_copacity-80",
+                    onClick: () => {gestureLeftShow.value = false}
+                  }), [
+                    _cE("text", _uM({ class: "weapp-tw-border text-white text-_b14px_B font-bold" }), "完成并收起")
+                  ], 8 /* PROPS */, ["onClick"])
+                ])
+              ]),
+              _: 1 /* STABLE */
+            }), 8 /* PROPS */, ["show", "onClose"]),
+            _cV(_component_up_popup, _uM({
+              show: gestureRightShow.value,
+              mode: "right",
+              closeable: true,
+              round: 16,
+              "close-on-slide-down": true,
+              "show-drag-bar": true,
+              "slide-down-threshold": 40,
+              onClose: () => {gestureRightShow.value = false}
+            }), _uM({
+              default: withSlotCtx((): any[] => [
+                _cE("view", _uM({ class: "weapp-tw-border px-_b24px_B py-_b26px_B flex flex-col items-center w-_b260px_B h-full justify-center" }), [
+                  _cE("view", _uM({ class: "weapp-tw-border w-_b44px_B h-_b44px_B rounded-full bg-_b_heff6ff_B flex items-center justify-center mb-_b10px_B" }), [
+                    _cE("text", _uM({ class: "weapp-tw-border text-_b20px_B text-_b_h2563eb_B" }), "→")
+                  ]),
+                  _cE("text", _uM({ class: "weapp-tw-border text-_b17px_B font-bold text-_b_h0f172a_B mb-_b6px_B" }), "右侧弹出 (右滑关闭)"),
+                  _cE("text", _uM({ class: "weapp-tw-border text-_b13px_B text-_b_h64748b_B text-center mb-_b14px_B leading-_b20px_B" }), "手指向【右】拉动滑动超过 40px，松手即可右滑关闭。"),
+                  _cE("view", _uM({ class: "weapp-tw-border bg-_b_hf1f5f9_B rounded-_b10px_B p-_b12px_B w-full mb-_b16px_B" }), [
+                    _cE("text", _uM({ class: "weapp-tw-border text-_b12px_B text-_b_h475569_B leading-_b18px_B" }), "当前方向已开启手势滑动关闭与指示条。拖拽位移达到 40px 松手即可触发关闭；未达阈值弹性复位。")
+                  ]),
+                  _cE("view", _uM({
+                    class: "weapp-tw-border bg-_b_h0957de_B py-_b10px_B px-_b32px_B rounded-_b10px_B flex items-center justify-center active_copacity-80",
+                    onClick: () => {gestureRightShow.value = false}
+                  }), [
+                    _cE("text", _uM({ class: "weapp-tw-border text-white text-_b14px_B font-bold" }), "完成并收起")
+                  ], 8 /* PROPS */, ["onClick"])
+                ])
+              ]),
+              _: 1 /* STABLE */
+            }), 8 /* PROPS */, ["show", "onClose"]),
+            _cV(_component_up_popup, _uM({
+              show: showBasicPopup.value,
+              mode: "bottom",
+              round: 16,
+              "close-on-slide-down": true,
+              "slide-down-threshold": 40,
+              "show-drag-bar": true,
+              closeable: true,
+              onClose: () => {showBasicPopup.value = false}
+            }), _uM({
+              default: withSlotCtx((): any[] => [
+                _cE("view", _uM({ class: "weapp-tw-border px-_b20px_B pb-_b32px_B pt-_b8px_B flex flex-col" }), [
+                  _cE("text", _uM({ class: "weapp-tw-border text-_b18px_B font-bold text-_b_h0f172a_B text-center mb-_b8px_B" }), "基础下滑关闭面板 (40px)"),
+                  _cE("text", _uM({ class: "weapp-tw-border text-_b13px_B text-_b_h64748b_B text-center mb-_b20px_B" }), "拖动上方胶囊横条或面板空白区域向下滑动即可关闭"),
+                  _cE("view", _uM({ class: "weapp-tw-border bg-_b_hf1f5f9_B rounded-_b12px_B p-_b16px_B mb-_b20px_B" }), [
+                    _cE("view", _uM({ class: "weapp-tw-border flex flex-row items-center mb-_b8px_B" }), [
+                      _cE("text", _uM({ class: "weapp-tw-border text-_b14px_B font-bold text-_b_h334155_B" }), "功能特性：")
+                    ]),
+                    _cE("text", _uM({ class: "weapp-tw-border text-_b13px_B text-_b_h475569_B leading-_b22px_B" }), " • 实时跟手位移，手指下移弹窗实时下移 • 下拉超过 40px 松手自动滑出关闭 • 下拉未达 40px 或松手前上推自动弹性复位 ")
+                  ]),
+                  _cE("view", _uM({
+                    class: "weapp-tw-border bg-_b_h0957de_B py-_b12px_B rounded-_b10px_B flex items-center justify-center active_copacity-80",
+                    onClick: () => {showBasicPopup.value = false}
+                  }), [
+                    _cE("text", _uM({ class: "weapp-tw-border text-white text-_b15px_B font-bold" }), "完成并收起")
+                  ], 8 /* PROPS */, ["onClick"])
+                ])
+              ]),
+              _: 1 /* STABLE */
+            }), 8 /* PROPS */, ["show", "onClose"]),
+            _cV(_component_up_popup, _uM({
+              show: showHighThresholdPopup.value,
+              mode: "bottom",
+              round: 16,
+              "close-on-slide-down": true,
+              "slide-down-threshold": 100,
+              "show-drag-bar": true,
+              closeable: true,
+              onClose: () => {showHighThresholdPopup.value = false}
+            }), _uM({
+              default: withSlotCtx((): any[] => [
+                _cE("view", _uM({ class: "weapp-tw-border px-_b20px_B pb-_b32px_B pt-_b8px_B flex flex-col" }), [
+                  _cE("text", _uM({ class: "weapp-tw-border text-_b18px_B font-bold text-_b_h0f172a_B text-center mb-_b8px_B" }), "高阈值防误触面板 (100px)"),
+                  _cE("text", _uM({ class: "weapp-tw-border text-_b13px_B text-_b_hd97706_B text-center mb-_b18px_B" }), "当前阈值设置为 100px（需要向下拖动较深距离才会关闭）"),
+                  _cE("view", _uM({ class: "weapp-tw-border bg-_b_hfefce8_B border-_b1px_B border-solid border-_b_hfde047_B rounded-_b12px_B p-_b16px_B mb-_b20px_B" }), [
+                    _cE("text", _uM({ class: "weapp-tw-border text-_b13px_B text-_b_h854d0e_B leading-_b22px_B" }), "轻微下拉（未满 100px）松手会立即回弹至完全展开状态，避免用户浏览时不小心误触关闭。")
+                  ]),
+                  _cE("view", _uM({
+                    class: "weapp-tw-border bg-_b_h0f766e_B py-_b12px_B rounded-_b10px_B flex items-center justify-center active_copacity-80",
+                    onClick: () => {showHighThresholdPopup.value = false}
+                  }), [
+                    _cE("text", _uM({ class: "weapp-tw-border text-white text-_b15px_B font-bold" }), "我知道了")
+                  ], 8 /* PROPS */, ["onClick"])
+                ])
+              ]),
+              _: 1 /* STABLE */
+            }), 8 /* PROPS */, ["show", "onClose"]),
+            _cV(_component_up_popup, _uM({
+              show: showListPopup.value,
+              mode: "bottom",
+              round: 16,
+              "close-on-slide-down": true,
+              "slide-down-threshold": 50,
+              "show-drag-bar": true,
+              closeable: true,
+              "scroll-id": "popup-paging-scroll",
+              onClose: () => {showListPopup.value = false}
+            }), _uM({
+              default: withSlotCtx((): any[] => [
+                _cE("view", _uM({ class: "weapp-tw-border px-_b20px_B pb-_b24px_B pt-_b8px_B flex flex-col" }), [
+                  _cE("text", _uM({ class: "weapp-tw-border text-_b18px_B font-bold text-_b_h0f172a_B text-center mb-_b6px_B" }), "z-paging-x 嵌套分页演示"),
+                  _cE("text", _uM({ class: "weapp-tw-border text-_b12px_B text-_b_h64748b_B text-center mb-_b12px_B" }), "支持触底加载更多数据；当列表回顶时向下拉动，触发弹窗下滑关闭手势"),
+                  _cE("view", _uM({ class: "weapp-tw-border flex flex-row bg-_b_hf1f5f9_B p-_b3px_B rounded-_b10px_B mb-_b12px_B" }), [
+                    _cE(Fragment, null, RenderHelpers.renderList(tabList, (tab, index, __index, _cached): any => {
+                      return _cE("view", _uM({
+                        key: index,
+                        class: _nC(["weapp-tw-border flex-1 items-center justify-center py-_b6px_B rounded-_b8px_B active_copacity-80", currentTab.value == index ? 'bg-white shadow-xs' : 'bg-transparent']),
+                        onClick: () => {onTabChange(index)}
+                      }), [
+                        _cE("text", _uM({
+                          class: _nC(["weapp-tw-border text-_b13px_B font-bold", currentTab.value == index ? 'text-_b_h7c3aed_B' : 'text-_b_h64748b_B'])
+                        }), _tD(tab), 3 /* TEXT, CLASS */)
+                      ], 10 /* CLASS, PROPS */, ["onClick"])
+                    }), 64 /* STABLE_FRAGMENT */)
+                  ]),
+                  _cE("view", _uM({ class: "weapp-tw-border flex flex-row items-center justify-between mb-_b10px_B px-_b4px_B" }), [
+                    _cE("view", _uM({ class: "weapp-tw-border flex flex-row items-center" }), [
+                      _cE("text", _uM({ class: "weapp-tw-border text-_b12px_B text-_b_h475569_B font-medium" }), "当前分类："),
+                      _cE("text", _uM({ class: "weapp-tw-border text-_b12px_B text-_b_h7c3aed_B font-bold mr-_b4px_B" }), _tD(tabList[currentTab.value]), 1 /* TEXT */),
+                      _cE("text", _uM({ class: "weapp-tw-border text-_b12px_B text-_b_h94a3b8_B" }), "(" + _tD(pagingList.value.length) + "条)", 1 /* TEXT */)
+                    ]),
+                    _cE("view", _uM({ class: "weapp-tw-border flex flex-row items-center" }), [
+                      _cE("view", _uM({
+                        class: "weapp-tw-border px-_b10px_B py-_b3px_B rounded-full bg-_b_hfee2e2_B mr-_b8px_B active_copacity-70",
+                        onClick: clearPaging
+                      }), [
+                        _cE("text", _uM({ class: "weapp-tw-border text-_b12px_B text-_b_hef4444_B font-medium" }), "置为0条")
+                      ]),
+                      _cE("view", _uM({
+                        class: "weapp-tw-border px-_b10px_B py-_b3px_B rounded-_b12px_B bg-_b_hf3e8ff_B active_copacity-70",
+                        onClick: reloadPaging
+                      }), [
+                        _cE("text", _uM({ class: "weapp-tw-border text-_b12px_B text-_b_h7c3aed_B font-medium" }), "重新加载")
+                      ])
+                    ])
+                  ]),
+                  _cE("view", _uM({ class: "weapp-tw-border h-_b360px_B mb-_b16px_B rounded-_b12px_B overflow-hidden border-_b1px_B border-solid border-_b_hedf2f7_B bg-_b_hf8fafc_B" }), [
+                    _cV(_component_z_paging_x, _uM({
+                      ref_key: "pagingRef",
+                      ref: pagingRef,
+                      "list-is": "scroll-view",
+                      "list-id": "popup-paging-scroll",
+                      "refresher-enabled": false,
+                      "model-value": pagingList.value,
+                      "default-page-size": 6,
+                      "paging-style": { height: '360px' },
+                      "onUpdate:modelValue": onUpdatePagingList,
+                      onQuery: onQueryPaging
+                    }), _uM({
+                      default: withSlotCtx((): any[] => [
+                        pagingList.value.length > 0
+                          ? _cE("view", _uM({
+                              key: 0,
+                              class: "weapp-tw-border"
+                            }), [
+                              _cE(Fragment, null, RenderHelpers.renderList(pagingList.value, (item, __key, __index, _cached): any => {
+                                return _cE("view", _uM({
+                                  key: item.id,
+                                  class: "weapp-tw-border bg-white p-_b12px_B mx-_b10px_B my-_b6px_B rounded-_b10px_B border-_b1px_B border-solid border-_b_hf1f5f9_B flex flex-row items-center justify-between shadow-xs"
+                                }), [
+                                  _cE("view", _uM({ class: "weapp-tw-border flex flex-col flex-1 mr-_b10px_B" }), [
+                                    _cE("view", _uM({ class: "weapp-tw-border flex flex-row items-center mb-_b4px_B" }), [
+                                      _cE("text", _uM({
+                                        class: _nC(["weapp-tw-border text-_b10px_B font-bold px-_b6px_B py-_b1px_B rounded-_b4px_B mr-_b6px_B", item.tag == '热点' ? 'bg-_b_hfee2e2_B text-_b_hef4444_B' : item.tag == '公告' ? 'bg-_b_hfef3c7_B text-_b_hd97706_B' : 'bg-_b_heff6ff_B text-_b_h2563eb_B'])
+                                      }), _tD(item.tag), 3 /* TEXT, CLASS */),
+                                      _cE("text", _uM({ class: "weapp-tw-border text-_b14px_B font-bold text-_b_h1e293b_B" }), _tD(item.title), 1 /* TEXT */)
+                                    ]),
+                                    _cE("text", _uM({ class: "weapp-tw-border text-_b12px_B text-_b_h64748b_B leading-_b18px_B" }), _tD(item.desc), 1 /* TEXT */)
+                                  ]),
+                                  _cE("text", _uM({ class: "weapp-tw-border text-_b11px_B text-_b_h94a3b8_B" }), _tD(item.time), 1 /* TEXT */)
+                                ])
+                              }), 128 /* KEYED_FRAGMENT */)
+                            ])
+                          : _cC("v-if", true)
+                      ]),
+                      _: 1 /* STABLE */
+                    }), 8 /* PROPS */, ["model-value"])
+                  ]),
+                  _cE("view", _uM({
+                    class: "weapp-tw-border bg-_b_h7c3aed_B py-_b12px_B rounded-_b10px_B flex items-center justify-center active_copacity-80",
+                    onClick: () => {showListPopup.value = false}
+                  }), [
+                    _cE("text", _uM({ class: "weapp-tw-border text-white text-_b15px_B font-bold" }), "关闭弹窗")
+                  ], 8 /* PROPS */, ["onClick"])
+                ])
+              ]),
+              _: 1 /* STABLE */
+            }), 8 /* PROPS */, ["show", "onClose"])
+          ])
+        ]),
+        _: 1 /* STABLE */
+      }))
+    ]),
+    _: 1 /* STABLE */
+  }))
+}
+}
+
+})
+export default __sfc__
+const GenSrcSubUviewUltraDemosPopupPopupStyles = [_uM([["weapp-tw-border", _pS(_uM([["borderTopWidth", 0], ["borderRightWidth", 0], ["borderBottomWidth", 0], ["borderLeftWidth", 0]]))], ["demo-block", _pS(_uM([["marginBottom", 12], ["paddingTop", 12], ["paddingRight", 12], ["paddingBottom", 12], ["paddingLeft", 12], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["demo-label", _pS(_uM([["fontSize", 14], ["fontWeight", "bold"], ["color", "#606266"], ["marginBottom", 10], ["paddingLeft", 4], ["borderLeftWidth", 3], ["borderLeftStyle", "solid"], ["borderLeftColor", "var(--theme-color, #0957de)"]]))]])]

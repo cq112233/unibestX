@@ -564,10 +564,10 @@ open class GenUniModulesUviewUltraComponentsUpFormUpForm : VueComponent {
         var props = _nP(_uM("customStyle" to _uM("type" to _uA(
             "Object",
             "String"
-        ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "model" to _uM("default" to default__21.getArray("form.model")), "rules" to _uM("type" to "Object", "default" to default__21.getArray("form.rules")), "errorType" to _uM("type" to "String", "default" to default__21.getString("form.errorType")), "borderBottom" to _uM("type" to "Boolean", "default" to default__21.getBoolean("form.borderBottom")), "labelPosition" to _uM("type" to "String", "default" to default__21.getString("form.labelPosition")), "labelWidth" to _uM("type" to _uA(
+        ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "model" to _uM("default" to default__38.getArray("form.model")), "rules" to _uM("type" to "Object", "default" to default__38.getArray("form.rules")), "errorType" to _uM("type" to "String", "default" to default__38.getString("form.errorType")), "borderBottom" to _uM("type" to "Boolean", "default" to default__38.getBoolean("form.borderBottom")), "labelPosition" to _uM("type" to "String", "default" to default__38.getString("form.labelPosition")), "labelWidth" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to default__21.getNumber("form.labelWidth")), "labelAlign" to _uM("type" to "String", "default" to default__21.getString("form.labelAlign")), "labelStyle" to _uM("type" to "Object", "default" to default__21.getArray("form.labelStyle"))))
+        ), "default" to default__38.getNumber("form.labelWidth")), "labelAlign" to _uM("type" to "String", "default" to default__38.getString("form.labelAlign")), "labelStyle" to _uM("type" to "Object", "default" to default__38.getArray("form.labelStyle"))))
         var propsNeedCastKeys = _uA(
             "customStyle",
             "customClass",

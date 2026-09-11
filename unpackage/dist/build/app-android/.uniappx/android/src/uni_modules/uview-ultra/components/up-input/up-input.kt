@@ -400,41 +400,41 @@ open class GenUniModulesUviewUltraComponentsUpInputUpInput : VueComponent {
         ), "customClass" to _uM("type" to "String", "default" to ""), "modelValue" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to default__16.getString("input.value")), "type" to _uM("type" to "String", "default" to default__16.getString("input.type")), "fixed" to _uM("type" to "Boolean", "default" to default__16.getBoolean("input.fixed")), "disabled" to _uM("type" to "Boolean", "default" to default__16.getBoolean("input.disabled")), "disabledColor" to _uM("type" to "String", "default" to default__16.getString("input.disabledColor")), "clearable" to _uM("type" to "Boolean", "default" to default__16.getBoolean("input.clearable")), "password" to _uM("type" to "Boolean", "default" to default__16.getBoolean("input.password")), "maxlength" to _uM("type" to _uA(
+        ), "default" to default__32.getString("input.value")), "type" to _uM("type" to "String", "default" to default__32.getString("input.type")), "fixed" to _uM("type" to "Boolean", "default" to default__32.getBoolean("input.fixed")), "disabled" to _uM("type" to "Boolean", "default" to default__32.getBoolean("input.disabled")), "disabledColor" to _uM("type" to "String", "default" to default__32.getString("input.disabledColor")), "clearable" to _uM("type" to "Boolean", "default" to default__32.getBoolean("input.clearable")), "password" to _uM("type" to "Boolean", "default" to default__32.getBoolean("input.password")), "maxlength" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to default__16.getNumber("input.maxlength")), "placeholder" to _uM("type" to "String", "default" to default__16.getString("input.placeholder")), "placeholderClass" to _uM("type" to "String", "default" to default__16.getString("input.placeholderClass")), "placeholderStyle" to _uM("type" to _uA(
+        ), "default" to default__32.getNumber("input.maxlength")), "placeholder" to _uM("type" to "String", "default" to default__32.getString("input.placeholder")), "placeholderClass" to _uM("type" to "String", "default" to default__32.getString("input.placeholderClass")), "placeholderStyle" to _uM("type" to _uA(
             "String",
             "Object"
-        ), "default" to default__16.getString("input.placeholderStyle")), "showWordLimit" to _uM("type" to "Boolean", "default" to default__16.getBoolean("input.showWordLimit")), "confirmType" to _uM("type" to "String", "default" to default__16.getString("input.confirmType")), "confirmHold" to _uM("type" to "Boolean", "default" to default__16.getBoolean("input.confirmHold")), "holdKeyboard" to _uM("type" to "Boolean", "default" to default__16.getBoolean("input.holdKeyboard")), "focus" to _uM("type" to "Boolean", "default" to default__16.getBoolean("input.focus")), "autoBlur" to _uM("type" to "Boolean", "default" to default__16.getBoolean("input.autoBlur")), "disableDefaultPadding" to _uM("type" to "Boolean", "default" to default__16.getBoolean("input.disableDefaultPadding")), "cursor" to _uM("type" to _uA(
+        ), "default" to default__32.getString("input.placeholderStyle")), "showWordLimit" to _uM("type" to "Boolean", "default" to default__32.getBoolean("input.showWordLimit")), "confirmType" to _uM("type" to "String", "default" to default__32.getString("input.confirmType")), "confirmHold" to _uM("type" to "Boolean", "default" to default__32.getBoolean("input.confirmHold")), "holdKeyboard" to _uM("type" to "Boolean", "default" to default__32.getBoolean("input.holdKeyboard")), "focus" to _uM("type" to "Boolean", "default" to default__32.getBoolean("input.focus")), "autoBlur" to _uM("type" to "Boolean", "default" to default__32.getBoolean("input.autoBlur")), "disableDefaultPadding" to _uM("type" to "Boolean", "default" to default__32.getBoolean("input.disableDefaultPadding")), "cursor" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to default__16.getNumber("input.cursor")), "cursorSpacing" to _uM("type" to _uA(
+        ), "default" to default__32.getNumber("input.cursor")), "cursorSpacing" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to default__16.getNumber("input.cursorSpacing")), "selectionStart" to _uM("type" to _uA(
+        ), "default" to default__32.getNumber("input.cursorSpacing")), "selectionStart" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to default__16.getNumber("input.selectionStart")), "selectionEnd" to _uM("type" to _uA(
+        ), "default" to default__32.getNumber("input.selectionStart")), "selectionEnd" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to default__16.getNumber("input.selectionEnd")), "adjustPosition" to _uM("type" to "Boolean", "default" to default__16.getBoolean("input.adjustPosition")), "inputAlign" to _uM("type" to "String", "default" to default__16.getString("input.inputAlign")), "fontSize" to _uM("type" to _uA(
+        ), "default" to default__32.getNumber("input.selectionEnd")), "adjustPosition" to _uM("type" to "Boolean", "default" to default__32.getBoolean("input.adjustPosition")), "inputAlign" to _uM("type" to "String", "default" to default__32.getString("input.inputAlign")), "fontSize" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to default__16.getString("input.fontSize")), "color" to _uM("type" to "String", "default" to default__16.getString("input.color")), "prefixIcon" to _uM("type" to "String", "default" to default__16.getString("input.prefixIcon")), "prefixIconStyle" to _uM("type" to _uA(
+        ), "default" to default__32.getString("input.fontSize")), "color" to _uM("type" to "String", "default" to default__32.getString("input.color")), "prefixIcon" to _uM("type" to "String", "default" to default__32.getString("input.prefixIcon")), "prefixIconStyle" to _uM("type" to _uA(
             "String",
             "Object"
-        ), "default" to default__16.getString("input.prefixIconStyle")), "suffixIcon" to _uM("type" to "String", "default" to default__16.getString("input.suffixIcon")), "suffixIconStyle" to _uM("type" to _uA(
+        ), "default" to default__32.getString("input.prefixIconStyle")), "suffixIcon" to _uM("type" to "String", "default" to default__32.getString("input.suffixIcon")), "suffixIconStyle" to _uM("type" to _uA(
             "String",
             "Object"
-        ), "default" to default__16.getString("input.suffixIconStyle")), "border" to _uM("type" to "String", "default" to default__16.getString("input.border")), "readonly" to _uM("type" to "Boolean", "default" to default__16.getBoolean("input.readonly")), "shape" to _uM("type" to "String", "default" to default__16.getString("input.shape")), "formatter" to _uM("type" to _uA(
+        ), "default" to default__32.getString("input.suffixIconStyle")), "border" to _uM("type" to "String", "default" to default__32.getString("input.border")), "readonly" to _uM("type" to "Boolean", "default" to default__32.getBoolean("input.readonly")), "shape" to _uM("type" to "String", "default" to default__32.getString("input.shape")), "formatter" to _uM("type" to _uA(
             "Function"
         ), "default" to fun(): (`val`: Any) -> Any {
             return fun(kVal: Any): Any {
                 return kVal
             }
         }
-        ), "ignoreCompositionEvent" to _uM("type" to "Boolean", "default" to default__16.getBoolean("input.ignoreCompositionEvent"))))
+        ), "ignoreCompositionEvent" to _uM("type" to "Boolean", "default" to default__32.getBoolean("input.ignoreCompositionEvent"))))
         var propsNeedCastKeys = _uA(
             "url",
             "linkType",

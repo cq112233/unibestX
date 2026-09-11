@@ -1,0 +1,938 @@
+import _easycom_up_button from '@/uni_modules/uview-ultra/components/up-button/up-button.uvue'
+import _easycom_up_popup from '@/uni_modules/uview-ultra/components/up-popup/up-popup.uvue'
+import { ref, computed, watch, onMounted, getCurrentInstance, nextTick } from 'vue'
+import type { Ref } from 'vue'
+import { upGetRect } from '../../libs/function/index.uts'
+import { useAppStore } from '@/src/store'
+
+type Point = {
+	x: number,
+	y: number
+}
+
+type GradientColor = {
+	color: string,
+	percent: number
+}
+
+type PickerRect = {
+	left: number,
+	top: number,
+	width: number,
+	height: number
+}
+
+
+const __sfc__ = defineComponent({
+  __name: 'up-color-picker',
+name: 'up-color-picker',
+  props: {
+	modelValue: {
+		type: String,
+		default: '#ff0000'
+	},
+	commonColors: {
+		type: Array as PropType<Array<string>>,
+		default: () => [] as Array<string>
+	},
+	confirmColor: {
+		type: String,
+		default: ''
+	}
+},
+  emits: ['update:modelValue', 'confirm', 'close'],
+  setup(__props, __setupCtx: SetupContext) {
+const __expose = __setupCtx.expose
+const __ins = getCurrentInstance()!;
+const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+const _cache = __ins.renderCache;
+
+function defaultColors(): Array<string> {
+	return [
+		'#ff0000',
+		'#ff9900',
+		'#ffff00',
+		'#00ff00',
+		'#00ffff',
+		'#0000ff',
+		'#9900ff',
+		'#ffffff',
+		'#000000'
+	] as Array<string>
+}
+
+function clamp(value: number, min: number, max: number): number {
+	return Math.max(min, Math.min(max, value))
+}
+
+function touchPoint(e: UniTouchEvent): UniTouch | null {
+	if (e.touches.length > 0) return e.touches[0]
+	if (e.changedTouches.length > 0) return e.changedTouches[0]
+	return null
+}
+
+function round255(value: number): number {
+	return Math.round(value * 255)
+}
+
+function parseHexPair(value: string, index: number): number {
+	return parseInt(value.substring(index, index + 2), 16)
+}
+
+function rgbToHsl(r: number, g: number, b: number): UTSJSONObject {
+	const rn = r / 255
+	const gn = g / 255
+	const bn = b / 255
+	const max = Math.max(rn, Math.max(gn, bn))
+	const min = Math.min(rn, Math.min(gn, bn))
+	let h = 0
+	let s = 0
+	const l = (max + min) / 2
+	if (max != min) {
+		const d = max - min
+		s = l > 0.5 ? d / (2 - max - min) : d / (max + min)
+		if (max == rn) {
+			h = (gn - bn) / d + (gn < bn ? 6 : 0)
+		} else if (max == gn) {
+			h = (bn - rn) / d + 2
+		} else {
+			h = (rn - gn) / d + 4
+		}
+		h = h / 6
+	}
+	return {
+		h: Math.round(h * 360),
+		s: s * 100,
+		l: l * 100
+	} as UTSJSONObject
+}
+
+function hueToRgb(p: number, q: number, t: number): number {
+	let value = t
+	if (value < 0) value += 1
+	if (value > 1) value -= 1
+	if (value < 1 / 6) return p + (q - p) * 6 * value
+	if (value < 1 / 2) return q
+	if (value < 2 / 3) return p + (q - p) * (2 / 3 - value) * 6
+	return p
+}
+
+function hslToRgba(hue: number, saturation: number, lightness: number, alpha: number): string {
+	let h = hue / 360
+	let s = saturation / 100
+	let l = lightness / 100
+	let r = l
+	let g = l
+	let b = l
+	if (s != 0) {
+		const q = l < 0.5 ? l * (1 + s) : l + s - l * s
+		const p = 2 * l - q
+		r = hueToRgb(p, q, h + 1 / 3)
+		g = hueToRgb(p, q, h)
+		b = hueToRgb(p, q, h - 1 / 3)
+	}
+	return 'rgba(' + round255(r).toString() + ', ' + round255(g).toString() + ', ' + round255(b).toString() + ', ' + alpha.toFixed(2) + ')'
+}
+
+function parseSolidColorToState(color: string): UTSJSONObject {
+	if (color.startsWith('#') && (color.length == 7 || color.length == 4)) {
+		let r = 0
+		let g = 0
+		let b = 0
+		if (color.length == 7) {
+			r = parseHexPair(color, 1)
+			g = parseHexPair(color, 3)
+			b = parseHexPair(color, 5)
+		} else {
+			r = parseInt(color.substring(1, 2) + color.substring(1, 2), 16)
+			g = parseInt(color.substring(2, 3) + color.substring(2, 3), 16)
+			b = parseInt(color.substring(3, 4) + color.substring(3, 4), 16)
+		}
+		return rgbToHsl(r, g, b)
+	}
+	return {
+		h: 0,
+		s: 100,
+		l: 50
+	} as UTSJSONObject
+}
+
+function createGradientColor(color: string, percent: number): GradientColor {
+	return {
+		color,
+		percent
+	} as GradientColor
+}
+
+
+
+const props = __props
+
+function emit(event: string, ...do_not_transform_spread: Array<any | null>) {
+__ins.emit(event, ...do_not_transform_spread)
+}
+const instance = getCurrentInstance()
+
+const show = ref<boolean>(false)
+const colorTypeIndex = ref<number>(0)
+const hue = ref<number>(0)
+const saturation = ref<number>(100)
+const lightness = ref<number>(50)
+const alpha = ref<number>(1)
+const saturationPosition = ref<Point>({ x: 150, y: 0 } as Point)
+const huePosition = ref<number>(0)
+const alphaPosition = ref<number>(300)
+const gradientColors = ref<Array<GradientColor>>([
+	createGradientColor('#ff0000', 0),
+	createGradientColor('#0000ff', 1)
+] as Array<GradientColor>)
+const currentDirectionValue = ref<string>('to right')
+const currentColor = ref<string>('#ff0000')
+const draggingPointerIndex = ref<number>(-1)
+const directionPointer = ref<Point>({ x: 40, y: 20 } as Point)
+const editingGradientIndex = ref<number>(-1)
+const previewType = ref<string>('solid')
+const gradientTrackRect = ref<PickerRect>({ left: 0, top: 0, width: 0, height: 0 } as PickerRect)
+const saturationRect = ref<PickerRect>({ left: 0, top: 0, width: 0, height: 0 } as PickerRect)
+const hueRect = ref<PickerRect>({ left: 0, top: 0, width: 0, height: 0 } as PickerRect)
+const alphaRect = ref<PickerRect>({ left: 0, top: 0, width: 0, height: 0 } as PickerRect)
+const directionCircleRect = ref<PickerRect>({ left: 0, top: 0, width: 0, height: 0 } as PickerRect)
+
+const normalizedCommonColors = computed<Array<string>>(() => {
+	const colors = props.commonColors
+	if (colors.length > 0) {
+		return colors
+	}
+	return defaultColors()
+})
+
+const appStore = useAppStore()
+
+const confirmColorComputed = computed<string>((): string => {
+	if (props.confirmColor.length > 0) {
+		return props.confirmColor;
+	}
+	const theme = appStore.state.theme;
+	if (theme.length > 0) {
+		return theme;
+	}
+	return '#2979ff';
+});
+
+function getSwitchItemStyle(index: number): UTSJSONObject {
+	if (colorTypeIndex.value == index) {
+		return {
+			backgroundColor: confirmColorComputed.value
+		} as UTSJSONObject;
+	}
+	return {
+		backgroundColor: '#ffffff'
+	} as UTSJSONObject;
+}
+
+function getSwitchTextStyle(index: number): UTSJSONObject {
+	return {
+		color: colorTypeIndex.value == index ? '#ffffff' : '#303133'
+	} as UTSJSONObject;
+}
+
+const triggerStyle = computed<UTSJSONObject>(() => {
+	return {
+		background: props.modelValue,
+		backgroundColor: props.modelValue
+	} as UTSJSONObject
+})
+
+function gradientStyleText(): string {
+	let colors = ''
+	const gColors = gradientColors.value
+	for (let i = 0; i < gColors.length; i++) {
+		if (i > 0) colors += ', '
+		colors += gColors[i].color
+	}
+	return 'linear-gradient(' + currentDirectionValue.value + ', ' + colors + ')'
+}
+
+const displayColor = computed<string>(() => {
+	if (previewType.value == 'gradient') {
+		return gradientStyleText()
+	}
+	if (previewType.value == 'gradient-point' && editingGradientIndex.value >= 0 && editingGradientIndex.value < gradientColors.value.length) {
+		return gradientColors.value[editingGradientIndex.value].color
+	}
+	return currentColor.value
+})
+
+const previewStyle = computed<UTSJSONObject>(() => {
+	return {
+		background: displayColor.value,
+		backgroundColor: displayColor.value
+	} as UTSJSONObject
+})
+
+const saturationStyle = computed<UTSJSONObject>(() => {
+	return {
+		backgroundColor: hslToRgba(hue.value, 100, 50, 1)
+	} as UTSJSONObject
+})
+
+const saturationPointerStyle = computed<UTSJSONObject>(() => {
+	return {
+		left: saturationPosition.value.x.toString() + 'px',
+		top: saturationPosition.value.y.toString() + 'px'
+	} as UTSJSONObject
+})
+
+const huePointerStyle = computed<UTSJSONObject>(() => {
+	return {
+		left: huePosition.value.toString() + 'px'
+	} as UTSJSONObject
+})
+
+const alphaPointerStyle = computed<UTSJSONObject>(() => {
+	return {
+		left: alphaPosition.value.toString() + 'px'
+	} as UTSJSONObject
+})
+
+const gradientTrackStyle = computed<UTSJSONObject>(() => {
+	return {
+		background: gradientStyleText()
+	} as UTSJSONObject
+})
+
+const directionPointerStyle = computed<UTSJSONObject>(() => {
+	return {
+		left: directionPointer.value.x.toString() + 'px',
+		top: directionPointer.value.y.toString() + 'px'
+	} as UTSJSONObject
+})
+
+function getGradientPointerStyle(item: GradientColor): UTSJSONObject {
+	return {
+		left: (item.percent * 300).toString() + 'px'
+	} as UTSJSONObject
+}
+
+function getGradientPointerInnerStyle(item: GradientColor): UTSJSONObject {
+	return {
+		backgroundColor: item.color
+	} as UTSJSONObject
+}
+
+function getColorStyle(color: string): UTSJSONObject {
+	return {
+		backgroundColor: color
+	} as UTSJSONObject
+}
+
+function parseSolidColor(color: string): void {
+	const state = parseSolidColorToState(color)
+	hue.value = state['h'] as number
+	saturation.value = state['s'] as number
+	lightness.value = state['l'] as number
+	alpha.value = 1
+	huePosition.value = hue.value / 360 * 300
+	saturationPosition.value = {
+		x: saturation.value / 100 * 300,
+		y: (100 - lightness.value) / 100 * 150
+	} as Point
+	alphaPosition.value = 300
+	currentColor.value = color
+}
+
+function parseGradientColor(gradient: string): void {
+	const colors = [] as Array<GradientColor>
+	const firstHash = gradient.indexOf('#')
+	if (firstHash >= 0 && gradient.length >= firstHash + 7) {
+		const firstColor = gradient.substring(firstHash, firstHash + 7)
+		currentColor.value = firstColor
+		colors.push(createGradientColor(firstColor, 0))
+	}
+	const secondHash = gradient.indexOf('#', firstHash + 1)
+	if (secondHash >= 0 && gradient.length >= secondHash + 7) {
+		colors.push(createGradientColor(gradient.substring(secondHash, secondHash + 7), 1))
+	}
+	if (colors.length >= 2) {
+		gradientColors.value = colors
+	}
+}
+
+function getDirectionAngle(direction: string): number {
+	if (direction == 'to bottom') return 90
+	if (direction == 'to left') return 180
+	if (direction == 'to top') return 270
+	if (direction == 'to bottom right') return 45
+	if (direction == 'to bottom left') return 135
+	if (direction == 'to top left') return 225
+	if (direction == 'to top right') return 315
+	return 0
+}
+
+function setDirectionPointerByAngle(angle: number): void {
+	const radius = 20
+	const radian = angle * Math.PI / 180
+	directionPointer.value = {
+		x: radius * Math.cos(radian) + 20,
+		y: radius * Math.sin(radian) + 20
+	} as Point
+}
+
+function initColor(color: string): void {
+	if (color.includes('linear-gradient')) {
+		colorTypeIndex.value = 1
+		parseGradientColor(color)
+		previewType.value = 'gradient'
+	} else {
+		colorTypeIndex.value = 0
+		parseSolidColor(color)
+		previewType.value = 'solid'
+	}
+	setDirectionPointerByAngle(getDirectionAngle(currentDirectionValue.value))
+}
+
+function toPickerRect(res: NodeInfo): PickerRect {
+	return {
+		left: res.left ?? 0,
+		top: res.top ?? 0,
+		width: res.width ?? 0,
+		height: res.height ?? 0
+	} as PickerRect
+}
+
+function loadRects(): void {
+	upGetRect('.up-color-picker__gradient-track', false, instance?.proxy).then((res: NodeInfo) => {
+		gradientTrackRect.value = toPickerRect(res)
+	})
+	upGetRect('.up-color-picker__saturation', false, instance?.proxy).then((res: NodeInfo) => {
+		saturationRect.value = toPickerRect(res)
+	})
+	upGetRect('.up-color-picker__hue', false, instance?.proxy).then((res: NodeInfo) => {
+		hueRect.value = toPickerRect(res)
+	})
+	upGetRect('.up-color-picker__alpha', false, instance?.proxy).then((res: NodeInfo) => {
+		alphaRect.value = toPickerRect(res)
+	})
+	upGetRect('.up-color-picker__direction-circle', false, instance?.proxy).then((res: NodeInfo) => {
+		directionCircleRect.value = toPickerRect(res)
+	})
+}
+
+function refreshRect(target: Ref<PickerRect>, selector: string, done: ((rect: PickerRect) => void) | null): void {
+	upGetRect(selector, false, instance?.proxy).then((res: NodeInfo) => {
+		const rect = toPickerRect(res)
+		target.value = rect
+		if (done != null) {
+			done(rect)
+		}
+	})
+}
+
+function onPopupOpen(): void {
+	loadRects()
+}
+
+function open(): void {
+	initColor(props.modelValue)
+	show.value = true
+	nextTick(() => {
+		loadRects()
+	})
+	setTimeout(() => {
+		loadRects()
+	}, 400)
+}
+
+function close(): void {
+	show.value = false
+	emit('close')
+}
+
+function confirm(): void {
+	const color = colorTypeIndex.value == 1 ? gradientStyleText() : currentColor.value
+	emit('update:modelValue', color)
+	emit('confirm', color)
+	show.value = false
+	editingGradientIndex.value = -1
+	previewType.value = colorTypeIndex.value == 0 ? 'solid' : 'gradient'
+	emit('close')
+}
+
+function changeColorType(index: number): void {
+	colorTypeIndex.value = index
+	previewType.value = index == 0 ? 'solid' : 'gradient'
+	if (index == 0 && currentColor.value.includes('linear-gradient')) {
+		currentColor.value = gradientColors.value[0].color
+		parseSolidColor(currentColor.value)
+	}
+	nextTick(() => {
+		loadRects()
+	})
+}
+
+function selectCommonColor(color: string): void {
+	if (colorTypeIndex.value == 1 && editingGradientIndex.value >= 0 && editingGradientIndex.value < gradientColors.value.length) {
+		gradientColors.value[editingGradientIndex.value].color = color
+		currentColor.value = color
+		previewType.value = 'gradient-point'
+	} else {
+		parseSolidColor(color)
+		previewType.value = 'solid'
+	}
+}
+
+function openColorPickerForGradient(index: number): void {
+	if (index < 0 || index >= gradientColors.value.length) return
+	editingGradientIndex.value = index
+	currentColor.value = gradientColors.value[index].color
+	parseSolidColor(currentColor.value)
+	colorTypeIndex.value = 1
+	previewType.value = 'gradient-point'
+}
+
+function sortGradientColors(): void {
+	const gColors = gradientColors.value
+	for (let i = 0; i < gColors.length - 1; i++) {
+		for (let j = i + 1; j < gColors.length; j++) {
+			if (gColors[i].percent > gColors[j].percent) {
+				const temp = gColors[i]
+				gColors[i] = gColors[j]
+				gColors[j] = temp
+			}
+		}
+	}
+}
+
+function addGradientColor(): void {
+	if (gradientColors.value.length >= 5) return
+	gradientColors.value.push(createGradientColor(currentColor.value, 1))
+	sortGradientColors()
+}
+
+function removeEditingGradientColor(): void {
+	if (gradientColors.value.length <= 2) return
+	if (editingGradientIndex.value < 0 || editingGradientIndex.value >= gradientColors.value.length) return
+	gradientColors.value.splice(editingGradientIndex.value, 1)
+	editingGradientIndex.value = -1
+	previewType.value = 'gradient'
+}
+
+function applyTrackPercent(clientX: number, rect: PickerRect): void {
+	if (rect.width <= 0) return
+	const index = draggingPointerIndex.value
+	if (index < 0 || index >= gradientColors.value.length) return
+	const percent = clamp((clientX - rect.left) / rect.width, 0, 1)
+	gradientColors.value[index].percent = percent
+	sortGradientColors()
+	for (let i = 0; i < gradientColors.value.length; i++) {
+		if (Math.abs(gradientColors.value[i].percent - percent) < 0.0001) {
+			draggingPointerIndex.value = i
+			editingGradientIndex.value = i
+			break
+		}
+	}
+}
+
+function onPointerTouchStart(index: number): void {
+	draggingPointerIndex.value = index
+	editingGradientIndex.value = index
+	currentColor.value = gradientColors.value[index].color
+	previewType.value = 'gradient-point'
+	refreshRect(gradientTrackRect, '.up-color-picker__gradient-track', null)
+}
+
+function onPointerTouchMove(e: UniTouchEvent): void {
+	if (draggingPointerIndex.value < 0 || draggingPointerIndex.value >= gradientColors.value.length) return
+	const touch = touchPoint(e)
+	if (touch == null) return
+	applyTrackPercent(touch.clientX, gradientTrackRect.value)
+}
+
+function onPointerTouchEnd(): void {
+	draggingPointerIndex.value = -1
+}
+
+function updateSolidColor(): void {
+	const color = hslToRgba(hue.value, saturation.value, lightness.value, alpha.value)
+	if (colorTypeIndex.value == 1 && editingGradientIndex.value >= 0 && editingGradientIndex.value < gradientColors.value.length) {
+		gradientColors.value[editingGradientIndex.value].color = color
+		currentColor.value = color
+		previewType.value = 'gradient-point'
+	} else {
+		currentColor.value = color
+		previewType.value = 'solid'
+	}
+}
+
+function applySaturationPosition(clientX: number, clientY: number, rect: PickerRect): void {
+	if (rect.width <= 0 || rect.height <= 0) return
+	const x = clamp(clientX - rect.left, 0, rect.width)
+	const y = clamp(clientY - rect.top, 0, rect.height)
+	saturationPosition.value = { x, y } as Point
+	saturation.value = x / rect.width * 100
+	lightness.value = 100 - y / rect.height * 100
+	updateSolidColor()
+}
+
+function onSaturationTouchStart(e: UniTouchEvent): void {
+	const touch = touchPoint(e)
+	if (touch == null) return
+	const clientX = touch.clientX
+	const clientY = touch.clientY
+	refreshRect(saturationRect, '.up-color-picker__saturation', (rect: PickerRect) => {
+		applySaturationPosition(clientX, clientY, rect)
+	})
+}
+
+function onSaturationTouchMove(e: UniTouchEvent): void {
+	const touch = touchPoint(e)
+	if (touch == null) return
+	applySaturationPosition(touch.clientX, touch.clientY, saturationRect.value)
+}
+
+function onSaturationTouchEnd(e: UniTouchEvent): void {
+	const touch = touchPoint(e)
+	if (touch == null) return
+	applySaturationPosition(touch.clientX, touch.clientY, saturationRect.value)
+}
+
+function applyHuePosition(clientX: number, rect: PickerRect): void {
+	if (rect.width <= 0) return
+	const x = clamp(clientX - rect.left, 0, rect.width)
+	huePosition.value = x
+	hue.value = Math.round(x / rect.width * 360)
+	updateSolidColor()
+}
+
+function onHueTouchStart(e: UniTouchEvent): void {
+	const touch = touchPoint(e)
+	if (touch == null) return
+	const clientX = touch.clientX
+	refreshRect(hueRect, '.up-color-picker__hue', (rect: PickerRect) => {
+		applyHuePosition(clientX, rect)
+	})
+}
+
+function onHueTouchMove(e: UniTouchEvent): void {
+	const touch = touchPoint(e)
+	if (touch == null) return
+	applyHuePosition(touch.clientX, hueRect.value)
+}
+
+function onHueTouchEnd(e: UniTouchEvent): void {
+	const touch = touchPoint(e)
+	if (touch == null) return
+	applyHuePosition(touch.clientX, hueRect.value)
+}
+
+function applyAlphaPosition(clientX: number, rect: PickerRect): void {
+	if (rect.width <= 0) return
+	const x = clamp(clientX - rect.left, 0, rect.width)
+	alphaPosition.value = x
+	alpha.value = x / rect.width
+	updateSolidColor()
+}
+
+function onAlphaTouchStart(e: UniTouchEvent): void {
+	const touch = touchPoint(e)
+	if (touch == null) return
+	const clientX = touch.clientX
+	refreshRect(alphaRect, '.up-color-picker__alpha', (rect: PickerRect) => {
+		applyAlphaPosition(clientX, rect)
+	})
+}
+
+function onAlphaTouchMove(e: UniTouchEvent): void {
+	const touch = touchPoint(e)
+	if (touch == null) return
+	applyAlphaPosition(touch.clientX, alphaRect.value)
+}
+
+function onAlphaTouchEnd(e: UniTouchEvent): void {
+	const touch = touchPoint(e)
+	if (touch == null) return
+	applyAlphaPosition(touch.clientX, alphaRect.value)
+}
+
+function updateGradientDirection(angle: number): void {
+	if (angle >= 315 || angle < 45) {
+		currentDirectionValue.value = 'to right'
+	} else if (angle >= 45 && angle < 135) {
+		currentDirectionValue.value = 'to bottom'
+	} else if (angle >= 135 && angle < 225) {
+		currentDirectionValue.value = 'to left'
+	} else {
+		currentDirectionValue.value = 'to top'
+	}
+}
+
+function applyDirectionPosition(clientX: number, clientY: number, rect: PickerRect): void {
+	if (rect.width <= 0 || rect.height <= 0) return
+	const centerX = rect.left + rect.width / 2
+	const centerY = rect.top + rect.height / 2
+	const x = clientX - centerX
+	const y = clientY - centerY
+	const distance = Math.sqrt(x * x + y * y)
+	const radius = rect.width / 2
+	const ratio = distance > radius ? radius / distance : 1
+	directionPointer.value = {
+		x: x * ratio + rect.width / 2,
+		y: y * ratio + rect.height / 2
+	} as Point
+	let angle = Math.atan2(y, x) * 180 / Math.PI
+	if (angle < 0) angle += 360
+	updateGradientDirection(angle)
+}
+
+function onDirectionTouchStart(e: UniTouchEvent): void {
+	const touch = touchPoint(e)
+	if (touch == null) return
+	const clientX = touch.clientX
+	const clientY = touch.clientY
+	refreshRect(directionCircleRect, '.up-color-picker__direction-circle', (rect: PickerRect) => {
+		applyDirectionPosition(clientX, clientY, rect)
+	})
+}
+
+function onDirectionTouchMove(e: UniTouchEvent): void {
+	const touch = touchPoint(e)
+	if (touch == null) return
+	applyDirectionPosition(touch.clientX, touch.clientY, directionCircleRect.value)
+}
+
+function onDirectionTouchEnd(e: UniTouchEvent): void {
+	const touch = touchPoint(e)
+	if (touch == null) return
+	applyDirectionPosition(touch.clientX, touch.clientY, directionCircleRect.value)
+}
+
+watch((): string => props.modelValue, (newVal: string) => {
+	if (!show.value) {
+		initColor(newVal)
+	}
+})
+
+onMounted(() => {
+	initColor(props.modelValue)
+})
+
+__expose({
+	open,
+	close,
+	confirm
+})
+
+return (): any | null => {
+
+const _component_up_button = resolveEasyComponent("up-button",_easycom_up_button)
+const _component_up_popup = resolveEasyComponent("up-popup",_easycom_up_popup)
+
+  return _cE("view", _uM({ class: "weapp-tw-border up-color-picker" }), [
+    _cE("view", _uM({
+      class: "weapp-tw-border up-color-picker__trigger",
+      style: _nS(triggerStyle.value),
+      onClick: open
+    }), [
+      renderSlot(_ctx.$slots, "default")
+    ], 4 /* STYLE */),
+    _cV(_component_up_popup, _uM({
+      show: show.value,
+      mode: "bottom",
+      round: "10",
+      onClose: close,
+      onOpen: onPopupOpen,
+      closeOnClickOverlay: true
+    }), _uM({
+      default: withSlotCtx((): any[] => [
+        _cE("view", _uM({ class: "weapp-tw-border up-color-picker__content" }), [
+          _cE("view", _uM({ class: "weapp-tw-border up-color-picker__header" }), [
+            _cE("text", _uM({ class: "weapp-tw-border up-color-picker__title" }), "选择颜色")
+          ]),
+          _cE("view", _uM({ class: "weapp-tw-border up-color-picker__switch" }), [
+            _cE("view", _uM({
+              class: "weapp-tw-border up-color-picker__switch-item",
+              style: _nS(getSwitchItemStyle(0)),
+              onClick: () => {changeColorType(0)}
+            }), [
+              _cE("text", _uM({
+                class: "weapp-tw-border up-color-picker__switch-text",
+                style: _nS(getSwitchTextStyle(0))
+              }), "纯色", 4 /* STYLE */)
+            ], 12 /* STYLE, PROPS */, ["onClick"]),
+            _cE("view", _uM({
+              class: "weapp-tw-border up-color-picker__switch-item",
+              style: _nS(getSwitchItemStyle(1)),
+              onClick: () => {changeColorType(1)}
+            }), [
+              _cE("text", _uM({
+                class: "weapp-tw-border up-color-picker__switch-text",
+                style: _nS(getSwitchTextStyle(1))
+              }), "渐变", 4 /* STYLE */)
+            ], 12 /* STYLE, PROPS */, ["onClick"])
+          ]),
+          colorTypeIndex.value == 1
+            ? _cE("view", _uM({
+                key: 0,
+                class: "weapp-tw-border up-color-picker__gradient"
+              }), [
+                _cE("view", _uM({
+                  class: "weapp-tw-border up-color-picker__gradient-track",
+                  style: _nS(gradientTrackStyle.value)
+                }), [
+                  _cE(Fragment, null, RenderHelpers.renderList(gradientColors.value, (item, index, __index, _cached): any => {
+                    return _cE("view", _uM({
+                      key: index,
+                      class: "weapp-tw-border up-color-picker__gradient-pointer",
+                      style: _nS(getGradientPointerStyle(item)),
+                      onTouchstart: () => {onPointerTouchStart(index)},
+                      onTouchmove: onPointerTouchMove,
+                      onTouchend: onPointerTouchEnd,
+                      onClick: () => {openColorPickerForGradient(index)}
+                    }), [
+                      _cE("view", _uM({
+                        class: "weapp-tw-border up-color-picker__gradient-pointer-inner",
+                        style: _nS(getGradientPointerInnerStyle(item))
+                      }), null, 4 /* STYLE */)
+                    ], 44 /* STYLE, PROPS, NEED_HYDRATION */, ["onTouchstart", "onClick"])
+                  }), 128 /* KEYED_FRAGMENT */)
+                ], 4 /* STYLE */),
+                _cE("view", _uM({ class: "weapp-tw-border up-color-picker__gradient-controls" }), [
+                  _cV(_component_up_button, _uM({
+                    type: "primary",
+                    color: _ctx.confirmColor,
+                    size: "mini",
+                    plain: "",
+                    class: "up-color-picker__add-btn",
+                    text: "添加颜色",
+                    onClick: addGradientColor
+                  }), null, 8 /* PROPS */, ["color"]),
+                  _cV(_component_up_button, _uM({
+                    type: "info",
+                    size: "mini",
+                    plain: "",
+                    class: "up-color-picker__add-btn",
+                    text: "删除当前",
+                    onClick: removeEditingGradientColor
+                  }))
+                ]),
+                _cE("view", _uM({ class: "weapp-tw-border up-color-picker__gradient-direction" }), [
+                  _cE("text", _uM({ class: "weapp-tw-border up-color-picker__label" }), "方向:"),
+                  _cE("view", _uM({
+                    class: "weapp-tw-border up-color-picker__direction-circle",
+                    onTouchstart: onDirectionTouchStart,
+                    onTouchmove: onDirectionTouchMove,
+                    onTouchend: onDirectionTouchEnd
+                  }), [
+                    _cE("view", _uM({
+                      class: "weapp-tw-border up-color-picker__direction-pointer",
+                      style: _nS(directionPointerStyle.value)
+                    }), null, 4 /* STYLE */)
+                  ], 32 /* NEED_HYDRATION */)
+                ])
+              ])
+            : _cC("v-if", true),
+          _cE("view", _uM({ class: "weapp-tw-border up-color-picker__solid" }), [
+            _cE("view", _uM({
+              class: "weapp-tw-border up-color-picker__saturation",
+              style: _nS(saturationStyle.value),
+              onTouchstart: onSaturationTouchStart,
+              onTouchmove: onSaturationTouchMove,
+              onTouchend: onSaturationTouchEnd
+            }), [
+              _cE("view", _uM({ class: "weapp-tw-border up-color-picker__saturation-white" })),
+              _cE("view", _uM({ class: "weapp-tw-border up-color-picker__saturation-black" })),
+              _cE("view", _uM({
+                class: "weapp-tw-border up-color-picker__saturation-pointer",
+                style: _nS(saturationPointerStyle.value)
+              }), null, 4 /* STYLE */)
+            ], 36 /* STYLE, NEED_HYDRATION */),
+            _cE("view", _uM({
+              class: "weapp-tw-border up-color-picker__hue",
+              onTouchstart: onHueTouchStart,
+              onTouchmove: onHueTouchMove,
+              onTouchend: onHueTouchEnd
+            }), [
+              _cE("view", _uM({ class: "weapp-tw-border up-color-picker__hue-segment up-color-picker__hue-segment--1" })),
+              _cE("view", _uM({ class: "weapp-tw-border up-color-picker__hue-segment up-color-picker__hue-segment--2" })),
+              _cE("view", _uM({ class: "weapp-tw-border up-color-picker__hue-segment up-color-picker__hue-segment--3" })),
+              _cE("view", _uM({ class: "weapp-tw-border up-color-picker__hue-segment up-color-picker__hue-segment--4" })),
+              _cE("view", _uM({ class: "weapp-tw-border up-color-picker__hue-segment up-color-picker__hue-segment--5" })),
+              _cE("view", _uM({ class: "weapp-tw-border up-color-picker__hue-segment up-color-picker__hue-segment--6" })),
+              _cE("view", _uM({
+                class: "weapp-tw-border up-color-picker__hue-pointer",
+                style: _nS(huePointerStyle.value)
+              }), null, 4 /* STYLE */)
+            ], 32 /* NEED_HYDRATION */),
+            colorTypeIndex.value == 0
+              ? _cE("view", _uM({
+                  key: 0,
+                  class: "weapp-tw-border up-color-picker__alpha",
+                  onTouchstart: onAlphaTouchStart,
+                  onTouchmove: onAlphaTouchMove,
+                  onTouchend: onAlphaTouchEnd
+                }), [
+                  _cE("view", _uM({ class: "weapp-tw-border up-color-picker__alpha-bg" })),
+                  _cE("view", _uM({ class: "weapp-tw-border up-color-picker__alpha-mask" })),
+                  _cE("view", _uM({
+                    class: "weapp-tw-border up-color-picker__alpha-pointer",
+                    style: _nS(alphaPointerStyle.value)
+                  }), null, 4 /* STYLE */)
+                ], 32 /* NEED_HYDRATION */)
+              : _cC("v-if", true)
+          ]),
+          normalizedCommonColors.value.length > 0
+            ? _cE("view", _uM({
+                key: 1,
+                class: "weapp-tw-border up-color-picker__common"
+              }), [
+                _cE("text", _uM({ class: "weapp-tw-border up-color-picker__common-title" }), "常用颜色"),
+                _cE("view", _uM({ class: "weapp-tw-border up-color-picker__common-list" }), [
+                  _cE(Fragment, null, RenderHelpers.renderList(normalizedCommonColors.value, (color, index, __index, _cached): any => {
+                    return _cE("view", _uM({
+                      key: index,
+                      class: "weapp-tw-border up-color-picker__common-item",
+                      style: _nS(getColorStyle(color)),
+                      onClick: () => {selectCommonColor(color)}
+                    }), null, 12 /* STYLE, PROPS */, ["onClick"])
+                  }), 128 /* KEYED_FRAGMENT */)
+                ])
+              ])
+            : _cC("v-if", true),
+          _cE("view", _uM({ class: "weapp-tw-border up-color-picker__footer" }), [
+            _cE("view", _uM({ class: "weapp-tw-border up-color-picker__preview" }), [
+              _cE("view", _uM({
+                class: "weapp-tw-border up-color-picker__preview-color",
+                style: _nS(previewStyle.value)
+              }), null, 4 /* STYLE */),
+              _cE("text", _uM({ class: "weapp-tw-border up-color-picker__preview-text" }), _tD(displayColor.value), 1 /* TEXT */)
+            ]),
+            _cE("view", _uM({ class: "weapp-tw-border up-color-picker__actions" }), [
+              _cV(_component_up_button, _uM({
+                type: "primary",
+                color: _ctx.confirmColor,
+                size: "small",
+                class: "up-color-picker__btn",
+                text: "确定",
+                onClick: confirm
+              }), null, 8 /* PROPS */, ["color"]),
+              _cV(_component_up_button, _uM({
+                type: "info",
+                size: "small",
+                class: "up-color-picker__btn",
+                text: "取消",
+                onClick: close
+              }))
+            ])
+          ])
+        ])
+      ]),
+      _: 1 /* STABLE */
+    }), 8 /* PROPS */, ["show"])
+  ])
+}
+}
+
+})
+export default __sfc__
+export type UpColorPickerComponentPublicInstance = InstanceType<typeof __sfc__>;
+const GenUniModulesUviewUltraComponentsUpColorPickerUpColorPickerStyles = [_uM([["weapp-tw-border", _pS(_uM([["borderTopWidth", 0], ["borderRightWidth", 0], ["borderBottomWidth", 0], ["borderLeftWidth", 0]]))], ["up-color-picker__trigger", _pS(_uM([["width", 32], ["height", 32], ["borderTopLeftRadius", 4], ["borderTopRightRadius", 4], ["borderBottomRightRadius", 4], ["borderBottomLeftRadius", 4], ["borderTopWidth", 1], ["borderRightWidth", 1], ["borderBottomWidth", 1], ["borderLeftWidth", 1], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e5e5e5"], ["borderRightColor", "#e5e5e5"], ["borderBottomColor", "#e5e5e5"], ["borderLeftColor", "#e5e5e5"]]))], ["up-color-picker__content", _pS(_uM([["width", "100%"], ["paddingTop", 20], ["paddingRight", 20], ["paddingBottom", 20], ["paddingLeft", 20], ["backgroundColor", "#ffffff"]]))], ["up-color-picker__header", _pS(_uM([["alignItems", "center"], ["marginBottom", 16]]))], ["up-color-picker__title", _pS(_uM([["fontSize", 18], ["fontWeight", "bold"], ["color", "#333333"]]))], ["up-color-picker__switch", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["marginBottom", 18], ["borderTopWidth", 1], ["borderRightWidth", 1], ["borderBottomWidth", 1], ["borderLeftWidth", 1], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e5e5e5"], ["borderRightColor", "#e5e5e5"], ["borderBottomColor", "#e5e5e5"], ["borderLeftColor", "#e5e5e5"], ["borderTopLeftRadius", 6], ["borderTopRightRadius", 6], ["borderBottomRightRadius", 6], ["borderBottomLeftRadius", 6], ["overflow", "hidden"]]))], ["up-color-picker__switch-item", _pS(_uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["height", 34], ["alignItems", "center"], ["justifyContent", "center"], ["backgroundColor", "#ffffff"]]))], ["up-color-picker__switch-item--active", _pS(_uM([["backgroundColor", "#2979ff"]]))], ["up-color-picker__switch-text", _pS(_uM([["fontSize", 14], ["color", "#303133"]]))], ["up-color-picker__gradient", _pS(_uM([["marginBottom", 12]]))], ["up-color-picker__gradient-track", _pS(_uM([["position", "relative"], ["width", 300], ["height", 32], ["borderTopLeftRadius", 4], ["borderTopRightRadius", 4], ["borderBottomRightRadius", 4], ["borderBottomLeftRadius", 4], ["marginBottom", 15]]))], ["up-color-picker__gradient-pointer", _pS(_uM([["position", "absolute"], ["top", -10], ["width", 20], ["height", 52], ["transform", "translateX(-10px)"], ["alignItems", "center"]]))], ["up-color-picker__gradient-pointer-inner", _pS(_uM([["width", 20], ["height", 20], ["borderTopLeftRadius", 10], ["borderTopRightRadius", 10], ["borderBottomRightRadius", 10], ["borderBottomLeftRadius", 10], ["borderTopWidth", 2], ["borderRightWidth", 2], ["borderBottomWidth", 2], ["borderLeftWidth", 2], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#ffffff"], ["borderRightColor", "#ffffff"], ["borderBottomColor", "#ffffff"], ["borderLeftColor", "#ffffff"], ["boxShadow", "0 0 2px rgba(0, 0, 0, 0.5)"]]))], ["up-color-picker__gradient-controls", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["flexWrap", "wrap"], ["marginBottom", 15]]))], ["up-color-picker__add-btn", _pS(_uM([["marginRight", 10]]))], ["up-color-picker__gradient-direction", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["marginTop", 10], ["marginRight", 0], ["marginBottom", 10], ["marginLeft", 0]]))], ["up-color-picker__label", _pS(_uM([["fontSize", 14], ["color", "#606266"], ["marginRight", 12]]))], ["up-color-picker__direction-circle", _pS(_uM([["width", 40], ["height", 40], ["borderTopLeftRadius", 20], ["borderTopRightRadius", 20], ["borderBottomRightRadius", 20], ["borderBottomLeftRadius", 20], ["backgroundColor", "#f5f7fa"], ["position", "relative"], ["borderTopWidth", 2], ["borderRightWidth", 2], ["borderBottomWidth", 2], ["borderLeftWidth", 2], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#eeeeee"], ["borderRightColor", "#eeeeee"], ["borderBottomColor", "#eeeeee"], ["borderLeftColor", "#eeeeee"]]))], ["up-color-picker__direction-pointer", _pS(_uM([["position", "absolute"], ["width", 8], ["height", 8], ["backgroundColor", "#ffffff"], ["borderTopWidth", 2], ["borderRightWidth", 2], ["borderBottomWidth", 2], ["borderLeftWidth", 2], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#333333"], ["borderRightColor", "#333333"], ["borderBottomColor", "#333333"], ["borderLeftColor", "#333333"], ["borderTopLeftRadius", 4], ["borderTopRightRadius", 4], ["borderBottomRightRadius", 4], ["borderBottomLeftRadius", 4], ["transform", "translate(-4px, -4px)"]]))], ["up-color-picker__solid", _pS(_uM([["marginBottom", 10]]))], ["up-color-picker__saturation", _pS(_uM([["position", "relative"], ["width", 300], ["height", 150], ["borderTopLeftRadius", 4], ["borderTopRightRadius", 4], ["borderBottomRightRadius", 4], ["borderBottomLeftRadius", 4], ["marginBottom", 15], ["overflow", "hidden"]]))], ["up-color-picker__saturation-white", _pS(_uM([["position", "absolute"], ["left", 0], ["right", 0], ["top", 0], ["bottom", 0], ["backgroundImage", "linear-gradient(to right, #ffffff, rgba(255, 255, 255, 0))"], ["backgroundColor", "rgba(0,0,0,0)"]]))], ["up-color-picker__saturation-black", _pS(_uM([["position", "absolute"], ["left", 0], ["right", 0], ["top", 0], ["bottom", 0], ["backgroundImage", "linear-gradient(to top, #000000, rgba(0, 0, 0, 0))"], ["backgroundColor", "rgba(0,0,0,0)"]]))], ["up-color-picker__saturation-pointer", _pS(_uM([["position", "absolute"], ["width", 12], ["height", 12], ["borderTopWidth", 2], ["borderRightWidth", 2], ["borderBottomWidth", 2], ["borderLeftWidth", 2], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#ffffff"], ["borderRightColor", "#ffffff"], ["borderBottomColor", "#ffffff"], ["borderLeftColor", "#ffffff"], ["borderTopLeftRadius", 6], ["borderTopRightRadius", 6], ["borderBottomRightRadius", 6], ["borderBottomLeftRadius", 6], ["transform", "translate(-6px, -6px)"], ["boxShadow", "0 0 2px rgba(0, 0, 0, 0.5)"]]))], ["up-color-picker__hue", _pS(_uM([["position", "relative"], ["width", 300], ["height", 12], ["borderTopLeftRadius", 6], ["borderTopRightRadius", 6], ["borderBottomRightRadius", 6], ["borderBottomLeftRadius", 6], ["marginBottom", 15], ["flexDirection", "row"]]))], ["up-color-picker__alpha", _pS(_uM([["position", "relative"], ["width", 300], ["height", 12], ["borderTopLeftRadius", 6], ["borderTopRightRadius", 6], ["borderBottomRightRadius", 6], ["borderBottomLeftRadius", 6], ["marginBottom", 15], ["overflow", "hidden"], ["backgroundColor", "#eeeeee"]]))], ["up-color-picker__hue-segment", _pS(_uM([["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"], ["height", 12]]))], ["up-color-picker__hue-segment--1", _pS(_uM([["borderTopLeftRadius", 6], ["borderBottomLeftRadius", 6], ["backgroundImage", "linear-gradient(to right, #ff0000, #ffff00)"]]))], ["up-color-picker__hue-segment--2", _pS(_uM([["backgroundImage", "linear-gradient(to right, #ffff00, #00ff00)"]]))], ["up-color-picker__hue-segment--3", _pS(_uM([["backgroundImage", "linear-gradient(to right, #00ff00, #00ffff)"]]))], ["up-color-picker__hue-segment--4", _pS(_uM([["backgroundImage", "linear-gradient(to right, #00ffff, #0000ff)"]]))], ["up-color-picker__hue-segment--5", _pS(_uM([["backgroundImage", "linear-gradient(to right, #0000ff, #ff00ff)"]]))], ["up-color-picker__hue-segment--6", _pS(_uM([["borderTopRightRadius", 6], ["borderBottomRightRadius", 6], ["backgroundImage", "linear-gradient(to right, #ff00ff, #ff0000)"]]))], ["up-color-picker__alpha-bg", _pS(_uM([["position", "absolute"], ["left", 0], ["right", 0], ["top", 0], ["bottom", 0]]))], ["up-color-picker__alpha-mask", _pS(_uM([["position", "absolute"], ["left", 0], ["right", 0], ["top", 0], ["bottom", 0], ["backgroundImage", "linear-gradient(to right, rgba(255, 255, 255, 0), white)"], ["backgroundColor", "rgba(0,0,0,0)"]]))], ["up-color-picker__hue-pointer", _pS(_uM([["position", "absolute"], ["width", 4], ["height", 16], ["backgroundColor", "#ffffff"], ["borderTopWidth", 1], ["borderRightWidth", 1], ["borderBottomWidth", 1], ["borderLeftWidth", 1], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#cccccc"], ["borderRightColor", "#cccccc"], ["borderBottomColor", "#cccccc"], ["borderLeftColor", "#cccccc"], ["borderTopLeftRadius", 2], ["borderTopRightRadius", 2], ["borderBottomRightRadius", 2], ["borderBottomLeftRadius", 2], ["transform", "translateX(-2px)"], ["top", -2], ["boxShadow", "0 0 2px rgba(0, 0, 0, 0.5)"]]))], ["up-color-picker__alpha-pointer", _pS(_uM([["position", "absolute"], ["width", 4], ["height", 16], ["backgroundColor", "#ffffff"], ["borderTopWidth", 1], ["borderRightWidth", 1], ["borderBottomWidth", 1], ["borderLeftWidth", 1], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#cccccc"], ["borderRightColor", "#cccccc"], ["borderBottomColor", "#cccccc"], ["borderLeftColor", "#cccccc"], ["borderTopLeftRadius", 2], ["borderTopRightRadius", 2], ["borderBottomRightRadius", 2], ["borderBottomLeftRadius", 2], ["transform", "translateX(-2px)"], ["top", -2], ["boxShadow", "0 0 2px rgba(0, 0, 0, 0.5)"]]))], ["up-color-picker__common", _pS(_uM([["marginTop", 16]]))], ["up-color-picker__common-title", _pS(_uM([["marginBottom", 10], ["fontSize", 14], ["color", "#666666"]]))], ["up-color-picker__common-list", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["flexWrap", "wrap"]]))], ["up-color-picker__common-item", _pS(_uM([["width", 24], ["height", 24], ["borderTopLeftRadius", 12], ["borderTopRightRadius", 12], ["borderBottomRightRadius", 12], ["borderBottomLeftRadius", 12], ["marginRight", 10], ["marginBottom", 10], ["borderTopWidth", 1], ["borderRightWidth", 1], ["borderBottomWidth", 1], ["borderLeftWidth", 1], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#eeeeee"], ["borderRightColor", "#eeeeee"], ["borderBottomColor", "#eeeeee"], ["borderLeftColor", "#eeeeee"]]))], ["up-color-picker__footer", _pS(_uM([["marginTop", 20]]))], ["up-color-picker__preview", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["alignItems", "center"], ["marginBottom", 15]]))], ["up-color-picker__preview-color", _pS(_uM([["width", 40], ["height", 40], ["borderTopLeftRadius", 4], ["borderTopRightRadius", 4], ["borderBottomRightRadius", 4], ["borderBottomLeftRadius", 4], ["borderTopWidth", 1], ["borderRightWidth", 1], ["borderBottomWidth", 1], ["borderLeftWidth", 1], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#eeeeee"], ["borderRightColor", "#eeeeee"], ["borderBottomColor", "#eeeeee"], ["borderLeftColor", "#eeeeee"], ["marginRight", 10]]))], ["up-color-picker__preview-text", _pS(_uM([["fontSize", 14], ["color", "#333333"], ["flexGrow", 1], ["flexShrink", 1], ["flexBasis", "0%"]]))], ["up-color-picker__actions", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "flex-end"]]))], ["up-color-picker__btn", _pS(_uM([["marginLeft", 10]]))]])]

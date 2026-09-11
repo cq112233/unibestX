@@ -1,0 +1,145 @@
+import _easycom_uni_icons from '@/uni_modules/uni-icons/components/uni-icons/uni-icons.uvue'
+import AppKu from '@/App.ku.uvue'
+import LayoutComponent from '@/src/layouts/navbar.uvue'
+import { ref, computed } from 'vue';
+import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/utils/refresh';
+
+const __sfc__ = defineComponent({
+  __name: 'test',
+  setup(__props) {
+const __ins = getCurrentInstance()!;
+const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+const _cache = __ins.renderCache;
+
+;
+
+const optionKeys = ref<string[]>([]);
+const queryOptions = ref<UTSJSONObject | null>(null);
+
+const countLabel = computed((): string => {
+  return optionKeys.value.length > 0 ? '已解析' : '待解析';
+});
+
+onLoad((options: UTSJSONObject | null) => {
+  console.log('test page onLoad options:', options);
+  if (options != null) {
+    queryOptions.value = options;
+    optionKeys.value = UTSJSONObject.keys(options);
+  }
+});
+
+onNavbarPullDownRefresh(() => {
+  setTimeout(() => {
+    stopNavbarPullDownRefresh();
+  }, 800);
+});
+
+function getOptionValue(key: string): string {
+  const options = queryOptions.value;
+  if (options != null) {
+    const val = options[key];
+    if (val != null) {
+      return `${val}`;
+    }
+  }
+  return '';
+}
+
+return (): any | null => {
+
+const _component_uni_icons = resolveEasyComponent("uni-icons",_easycom_uni_icons)
+
+  return _cV(unref(AppKu), _uM({
+    layout: 'navbar',
+    "show-back": true,
+    "hide-navbar": false,
+    "enable-pull-down-refresh": true,
+    "page-style": {'navigationBarTitleText':'URL 参数测试','navigationStyle':'custom'}
+  }), _uM({
+    default: withSlotCtx((): any[] => [
+      _cV(unref(LayoutComponent), _uM({
+        "show-back": true,
+        "hide-navbar": false,
+        "enable-pull-down-refresh": true,
+        "page-style": {'navigationBarTitleText':'URL 参数测试','navigationStyle':'custom'}
+      }), _uM({
+        default: withSlotCtx((): any[] => [
+          _cE("view", _uM({ class: "weapp-tw-border flex flex-col flex-1 bg-_b_hf8fafc_B" }), [
+            _cE("view", _uM({ class: "weapp-tw-border m-_b16px_B" }), [
+              _cE("view", _uM({ class: "weapp-tw-border bg-white rounded-_b16px_B p-_b20px_B mb-_b16px_B border-_b1px_B border-solid border-_b_he2e8f0_B shadow-sm" }), [
+                _cE("view", _uM({ class: "weapp-tw-border flex flex-row items-center mb-_b16px_B" }), [
+                  _cE("view", _uM({ class: "weapp-tw-border w-_b42px_B h-_b42px_B rounded-_b12px_B bg-_b_hebf4ff_B items-center justify-center mr-_b12px_B" }), [
+                    _cV(_component_uni_icons, _uM({
+                      type: "link",
+                      size: "22",
+                      color: "#3182ce"
+                    }))
+                  ]),
+                  _cE("view", _uM({ class: "weapp-tw-border flex-col flex-1" }), [
+                    _cE("text", _uM({ class: "weapp-tw-border text-_b18px_B font-bold text-_b_h1e293b_B" }), "URL 参数解析"),
+                    _cE("text", _uM({ class: "weapp-tw-border text-_b12px_B text-_b_h94a3b8_B mt-_b2px_B" }), "展示当前页面携带的 query 参数")
+                  ])
+                ]),
+                _cE("view", _uM({ class: "weapp-tw-border flex flex-row items-center justify-between bg-_b_hf8fafc_B rounded-_b12px_B p-_b12px_B" }), [
+                  _cE("view", _uM({ class: "weapp-tw-border flex-col" }), [
+                    _cE("text", _uM({ class: "weapp-tw-border text-_b12px_B text-_b_h64748b_B" }), "解析参数数量"),
+                    _cE("text", _uM({ class: "weapp-tw-border text-_b20px_B font-bold text-_b_h1e293b_B mt-_b2px_B" }), _tD(optionKeys.value.length), 1 /* TEXT */)
+                  ]),
+                  _cE("view", _uM({ class: "weapp-tw-border flex-row items-center" }), [
+                    _cE("view", _uM({ class: "weapp-tw-border bg-_b_h3182ce_B rounded-_b20px_B px-_b14px_B py-_b6px_B" }), [
+                      _cE("text", _uM({ class: "weapp-tw-border text-_b13px_B font-medium text-white" }), _tD(countLabel.value), 1 /* TEXT */)
+                    ])
+                  ])
+                ])
+              ]),
+              _cE("view", _uM({ class: "weapp-tw-border bg-white rounded-_b16px_B p-_b20px_B border-_b1px_B border-solid border-_b_he2e8f0_B shadow-sm" }), [
+                _cE("view", _uM({ class: "weapp-tw-border flex flex-row items-center mb-_b8px_B" }), [
+                  _cE("view", _uM({ class: "weapp-tw-border w-_b4px_B h-_b16px_B bg-_b_h3182ce_B rounded-_b2px_B mr-_b8px_B" })),
+                  _cE("text", _uM({ class: "weapp-tw-border text-_b16px_B font-bold text-_b_h1e293b_B" }), "参数详情")
+                ]),
+                _cE(Fragment, null, RenderHelpers.renderList(optionKeys.value, (key, __key, __index, _cached): any => {
+                  return _cE("view", _uM({
+                    key: key,
+                    class: "weapp-tw-border flex flex-row items-center justify-between py-_b12px_B border-b-_b1px_B border-bottom-style-solid border-bottom-color-_b_hf1f5f9_B"
+                  }), [
+                    _cE("view", _uM({ class: "weapp-tw-border flex-row items-center mr-_b12px_B" }), [
+                      _cE("view", _uM({ class: "weapp-tw-border w-_b6px_B h-_b6px_B rounded-_b3px_B bg-_b_h3182ce_B mr-_b8px_B" })),
+                      _cE("text", _uM({ class: "weapp-tw-border text-_b14px_B text-_b_h64748b_B font-medium" }), _tD(key), 1 /* TEXT */)
+                    ]),
+                    _cE("text", _uM({ class: "weapp-tw-border text-_b14px_B text-_b_h334155_B font-semibold" }), _tD(getOptionValue(key)), 1 /* TEXT */)
+                  ])
+                }), 128 /* KEYED_FRAGMENT */),
+                optionKeys.value.length == 0
+                  ? _cE("view", _uM({
+                      key: 0,
+                      class: "weapp-tw-border flex flex-col items-center py-_b32px_B"
+                    }), [
+                      _cE("view", _uM({ class: "weapp-tw-border w-_b56px_B h-_b56px_B rounded-_b16px_B bg-_b_hf8fafc_B items-center justify-center" }), [
+                        _cV(_component_uni_icons, _uM({
+                          type: "info",
+                          size: "28",
+                          color: "#cbd5e1"
+                        }))
+                      ]),
+                      _cE("text", _uM({ class: "weapp-tw-border text-_b14px_B text-_b_h94a3b8_B mt-_b12px_B" }), "暂无任何 query 参数"),
+                      _cE("text", _uM({ class: "weapp-tw-border text-_b12px_B text-_b_hcbd5e1_B mt-_b4px_B" }), "请携带参数访问本页面")
+                    ])
+                  : _cC("v-if", true),
+                _cE("view", _uM({ class: "weapp-tw-border mt-_b12px_B bg-_b_hfffbeb_B rounded-_b10px_B border-_b1px_B border-solid border-_b_hfef3c7_B p-_b10px_B" }), [
+                  _cE("text", _uM({ class: "weapp-tw-border text-_b12px_B text-_b_hb45309_B leading-_b18px_B" }), "提示：返回时可在页面路径后追加 ?key=value 以测试参数解析效果。")
+                ])
+              ])
+            ])
+          ])
+        ]),
+        _: 1 /* STABLE */
+      }))
+    ]),
+    _: 1 /* STABLE */
+  }))
+}
+}
+
+})
+export default __sfc__
+const GenSrcSubTestTestStyles = [_uM([["weapp-tw-border", _pS(_uM([["borderTopWidth", 0], ["borderRightWidth", 0], ["borderBottomWidth", 0], ["borderLeftWidth", 0]]))]])]

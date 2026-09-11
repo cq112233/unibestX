@@ -1,0 +1,174 @@
+import _easycom_up_title from '@/uni_modules/uview-ultra/components/up-title/up-title.uvue'
+import _easycom_up_signature from '@/uni_modules/uview-ultra/components/up-signature/up-signature.uvue'
+import _easycom_up_button from '@/uni_modules/uview-ultra/components/up-button/up-button.uvue'
+import AppKu from '@/App.ku.uvue'
+import LayoutComponent from '@/src/layouts/navbar.uvue'
+import { ref } from 'vue';
+
+const __sfc__ = defineComponent({
+  __name: 'signature',
+  setup(__props) {
+const __ins = getCurrentInstance()!;
+const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+const _cache = __ins.renderCache;
+
+;
+
+const bgColor = ref<string>('#ffffff');
+
+const sigRef1 = ref(null as ComponentPublicInstance | null);
+const sigRef2 = ref(null as ComponentPublicInstance | null);
+const exportPath = ref<string>('');
+const eventLog = ref<string>('绘制完成后点击工具栏对勾导出，confirm 事件返回图片路径');
+
+function onConfirm(path: string) {
+  exportPath.value = path;
+  eventLog.value = `confirm => ${path}`;
+}
+
+function onError(msg: any | null) {
+  const text = msg == null ? 'unknown' : msg.toString();
+  eventLog.value = `error => ${text}`;
+}
+
+function onClear() {
+  eventLog.value = 'clear => 已清空';
+}
+
+function clearSig2() {
+  const sig = sigRef2.value;
+  if (sig != null) {
+    sig.$callMethod('clearCanvas');
+    eventLog.value = 'clear => 第二块签名已清空';
+  }
+}
+
+function exportSig2() {
+  const sig = sigRef2.value;
+  if (sig != null) {
+    sig.$callMethod('exportSignature');
+  }
+}
+
+return (): any | null => {
+
+const _component_up_title = resolveEasyComponent("up-title",_easycom_up_title)
+const _component_up_signature = resolveEasyComponent("up-signature",_easycom_up_signature)
+const _component_up_button = resolveEasyComponent("up-button",_easycom_up_button)
+
+  return _cV(unref(AppKu), _uM({
+    layout: 'navbar',
+    "show-back": true,
+    "hide-navbar": false,
+    "enable-pull-down-refresh": false,
+    "page-style": {'navigationBarTitleText':'up-signature 签名','navigationStyle':'custom'}
+  }), _uM({
+    default: withSlotCtx((): any[] => [
+      _cV(unref(LayoutComponent), _uM({
+        "show-back": true,
+        "hide-navbar": false,
+        "enable-pull-down-refresh": false,
+        "page-style": {'navigationBarTitleText':'up-signature 签名','navigationStyle':'custom'}
+      }), _uM({
+        default: withSlotCtx((): any[] => [
+          _cE("view", _uM({ class: "weapp-tw-border page-container bg-_b_hf8fafc_B min-h-screen pb-_b30px_B" }), [
+            _cE("view", _uM({ class: "weapp-tw-border p-_b16px_B" }), [
+              _cE("view", _uM({ class: "weapp-tw-border demo-block" }), [
+                _cV(_component_up_title, _uM({ class: "demo-title" }), _uM({
+                  default: withSlotCtx((): any[] => [
+                    _cE("text", _uM({ class: "weapp-tw-border demo-title-text" }), "基本用法（带工具栏，可撤销/清空/调粗细/换颜色/导出）")
+                  ]),
+                  _: 1 /* STABLE */
+                })),
+                _cV(_component_up_signature, _uM({
+                  ref_key: "sigRef1",
+                  ref: sigRef1,
+                  width: 300,
+                  height: 200,
+                  "bg-color": bgColor.value,
+                  onConfirm: onConfirm,
+                  onError: onError,
+                  onClear: onClear
+                }), null, 8 /* PROPS */, ["bg-color"])
+              ]),
+              _cE("view", _uM({ class: "weapp-tw-border demo-block mt-_b12px_B" }), [
+                _cV(_component_up_title, _uM({ class: "demo-title" }), _uM({
+                  default: withSlotCtx((): any[] => [
+                    _cE("text", _uM({ class: "weapp-tw-border demo-title-text" }), "自定义样式（红色笔、粗细 5、隐藏工具栏）")
+                  ]),
+                  _: 1 /* STABLE */
+                })),
+                _cV(_component_up_signature, _uM({
+                  ref_key: "sigRef2",
+                  ref: sigRef2,
+                  width: 300,
+                  height: 160,
+                  "bg-color": "#fff7e6",
+                  color: "#ff4d4f",
+                  thickness: 5,
+                  "show-toolbar": false,
+                  onConfirm: onConfirm,
+                  onError: onError
+                }), null, 512 /* NEED_PATCH */),
+                _cE("view", _uM({ class: "weapp-tw-border sig-actions" }), [
+                  _cV(_component_up_button, _uM({
+                    text: "清空",
+                    type: "primary",
+                    plain: "",
+                    size: "small",
+                    class: "sig-btn",
+                    onClick: clearSig2
+                  })),
+                  _cV(_component_up_button, _uM({
+                    text: "导出",
+                    type: "primary",
+                    size: "small",
+                    class: "sig-btn",
+                    onClick: exportSig2
+                  }))
+                ])
+              ]),
+              exportPath.value != ''
+                ? _cE("view", _uM({
+                    key: 0,
+                    class: "weapp-tw-border demo-block mt-_b12px_B"
+                  }), [
+                    _cV(_component_up_title, _uM({ class: "demo-title" }), _uM({
+                      default: withSlotCtx((): any[] => [
+                        _cE("text", _uM({ class: "weapp-tw-border demo-title-text" }), "导出结果预览")
+                      ]),
+                      _: 1 /* STABLE */
+                    })),
+                    _cE("image", _uM({
+                      src: exportPath.value,
+                      class: "preview-image",
+                      mode: "aspectFit"
+                    }), null, 8 /* PROPS */, ["src"])
+                  ])
+                : _cC("v-if", true),
+              _cE("view", _uM({ class: "weapp-tw-border demo-block mt-_b12px_B" }), [
+                _cV(_component_up_title, _uM({ class: "demo-title" }), _uM({
+                  default: withSlotCtx((): any[] => [
+                    _cE("text", _uM({ class: "weapp-tw-border demo-title-text" }), "说明")
+                  ]),
+                  _: 1 /* STABLE */
+                })),
+                _cE("text", _uM({ class: "weapp-tw-border demo-text" }), " up-signature 已适配 vdom/vapor 双模式：App 端（安卓/iOS）基于 DrawableContext 原生绘制，鸿蒙基于 canvas 组件，H5 支持触摸与鼠标绘制、小程序沿用 canvas 2d 实现；支持 undo / clearCanvas / redraw / exportSignature 实例方法，confirm 事件返回导出的图片路径，error 事件返回错误信息。 ")
+              ]),
+              _cE("view", _uM({ class: "weapp-tw-border log-box mt-_b10px_B" }), [
+                _cE("text", _uM({ class: "weapp-tw-border log-text" }), _tD(eventLog.value), 1 /* TEXT */)
+              ])
+            ])
+          ])
+        ]),
+        _: 1 /* STABLE */
+      }))
+    ]),
+    _: 1 /* STABLE */
+  }))
+}
+}
+
+})
+export default __sfc__
+const GenSrcSubUviewUltraDemosSignatureSignatureStyles = [_uM([["weapp-tw-border", _pS(_uM([["borderTopWidth", 0], ["borderRightWidth", 0], ["borderBottomWidth", 0], ["borderLeftWidth", 0]]))], ["demo-block", _pS(_uM([["marginBottom", 12], ["paddingTop", 12], ["paddingRight", 12], ["paddingBottom", 12], ["paddingLeft", 12], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["demo-title", _pS(_uM([["marginBottom", 10]]))], ["demo-title-text", _pS(_uM([["fontSize", 14], ["fontWeight", "bold"], ["color", "#606266"]]))], ["demo-text", _pS(_uM([["fontSize", 13], ["color", "#475569"], ["lineHeight", "20px"]]))], ["sig-actions", _pS(_uM([["display", "flex"], ["flexDirection", "row"], ["justifyContent", "flex-end"], ["marginTop", 10]]))], ["sig-btn", _pS(_uM([["marginLeft", 10]]))], ["preview-image", _pS(_uM([["width", "100%"], ["height", 160], ["backgroundColor", "#f8fafc"], ["borderTopWidth", 1], ["borderRightWidth", 1], ["borderBottomWidth", 1], ["borderLeftWidth", 1], ["borderTopStyle", "solid"], ["borderRightStyle", "solid"], ["borderBottomStyle", "solid"], ["borderLeftStyle", "solid"], ["borderTopColor", "#e2e8f0"], ["borderRightColor", "#e2e8f0"], ["borderBottomColor", "#e2e8f0"], ["borderLeftColor", "#e2e8f0"], ["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["log-box", _pS(_uM([["paddingTop", 10], ["paddingRight", 10], ["paddingBottom", 10], ["paddingLeft", 10], ["backgroundColor", "#f1f5f9"], ["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["log-text", _pS(_uM([["fontSize", 13], ["color", "#475569"], ["lineHeight", "20px"]]))]])]

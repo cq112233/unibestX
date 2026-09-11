@@ -1,57 +1,62 @@
 <template>
     <view
         class="up-float-button"
-        :style="{
-            position: 'fixed',
-            top: top,
-            bottom: bottom,
-            right: right,
-        }"
+        :style="containerStyle"
     >
+        <!-- 当菜单向上展开时（bottom 定位），列表渲染在主按钮上方 -->
+        <view
+            v-if="!isTopLayout && showList"
+            class="up-float-button__list up-float-button__list--bottom"
+        >
+            <view
+                v-for="(item, index) in displayList"
+                :key="index"
+                class="up-float-button__item"
+                :style="getItemStyle(item)"
+                @click.stop="itemClick(item, index)"
+            >
+                <up-icon :name="getItemName(item)" :color="getItemColor(item)"></up-icon>
+            </view>
+            <slot name="list"></slot>
+        </view>
+
+        <!-- 主按钮 -->
         <view
             class="up-float-button__main"
+            @touchstart="onTouchStart"
+            @touchmove.stop="onTouchMove"
+            @touchend="onTouchEnd"
+            @touchcancel="onTouchEnd"
             @click="clickHandler"
-            :style="{
-                backgroundColor: backgroundColor,
-                display: 'flex',
-                flexDirection: 'row',
-                justifyContent: 'center',
-                alignItems: 'center',
-                width: width,
-                height: height,
-                borderRadius: '50%',
-                borderColor: borderColor,
-                overflow: 'visible',
-            }"
+            :style="mainButtonStyle"
         >
             <slot :showList="showList">
                 <up-icon class="cursor-pointer" :class="{ 'show-list': showList }" name="plus" :color="color"></up-icon>
             </slot>
         </view>
+
+        <!-- 当菜单向下展开时（top 定位），列表渲染在主按钮下方 -->
         <view
-            v-if="showList"
-            class="up-float-button__list"
-            :style="{
-                bottom: height
-            }"
+            v-if="isTopLayout && showList"
+            class="up-float-button__list up-float-button__list--top"
         >
-            <slot name="list">
-                <template :key="index" v-for="(item, index) in list">
-                    <view
-                        class="up-float-button__item"
-                        :style="getItemStyle(item)"
-                        @click="itemClick(item, index)"
-                    >
-                        <up-icon :name="getItemName(item)" :color="getItemColor(item)"></up-icon>
-                    </view>
-                </template>
-            </slot>
+            <view
+                v-for="(item, index) in displayList"
+                :key="index"
+                class="up-float-button__item"
+                :style="getItemStyle(item)"
+                @click.stop="itemClick(item, index)"
+            >
+                <up-icon :name="getItemName(item)" :color="getItemColor(item)"></up-icon>
+            </view>
+            <slot name="list"></slot>
         </view>
     </view>
 </template>
 
 <script setup lang="uts">
-import { ref } from 'vue'
+import { ref, computed, onMounted, nextTick, getCurrentInstance } from 'vue'
+import { addUnit, upGetRect, getWindowInfo } from '../../libs/function/index'
 
 defineOptions({
     name: 'up-float-button'
@@ -82,6 +87,10 @@ const props = defineProps({
         type: [String, Number],
         default: '30px'
     },
+    left: {
+        type: [String, Number],
+        default: ''
+    },
     top: {
         type: [String, Number],
         default: ''
@@ -89,6 +98,10 @@ const props = defineProps({
     bottom: {
         type: [String, Number],
         default: ''
+    },
+    draggable: {
+        type: Boolean,
+        default: false
     },
     isMenu: {
         type: Boolean,
@@ -101,8 +114,175 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['click', 'item-click'])
+const instance = getCurrentInstance()
 
 const showList = ref<boolean>(false)
+const hasDragged = ref<boolean>(false)
+const posX = ref<number>(0)
+const posY = ref<number>(0)
+const measuredLeft = ref<number>(0)
+const measuredTop = ref<number>(0)
+
+const touchStartX = ref<number>(0)
+const touchStartY = ref<number>(0)
+const btnStartX = ref<number>(0)
+const btnStartY = ref<number>(0)
+const isMoving = ref<boolean>(false)
+const dragSuppressedClick = ref<boolean>(false)
+
+function parseUnit(val: any | null, fallback: number): number {
+    if (val == null) return fallback
+    const s = val.toString().trim()
+    const n = parseFloat(s)
+    return isNaN(n) ? fallback : n
+}
+
+function initPosition(): void {
+    const win = getWindowInfo()
+    const winW = win.windowWidth
+    const winH = win.windowHeight
+    const btnW = parseUnit(props.width, 50)
+    const btnH = parseUnit(props.height, 50)
+
+    let l = 0
+    let t = 0
+
+    if (props.left != null && props.left.toString() != '') {
+        l = parseUnit(props.left, 0)
+    } else if (props.right != null && props.right.toString() != '') {
+        l = winW - parseUnit(props.right, 30) - btnW
+    } else {
+        l = winW - 30 - btnW
+    }
+
+    if (props.top != null && props.top.toString() != '') {
+        t = parseUnit(props.top, 0)
+    } else if (props.bottom != null && props.bottom.toString() != '') {
+        t = winH - parseUnit(props.bottom, 30) - btnH
+    } else {
+        t = winH - 30 - btnH
+    }
+
+    measuredLeft.value = l
+    measuredTop.value = t
+}
+
+const isTopLayout = computed((): boolean => {
+    return props.top != null && props.top.toString() != '' && (props.bottom == null || props.bottom.toString() == '')
+})
+
+const containerStyle = computed((): UTSJSONObject => {
+    const s = {} as UTSJSONObject
+    s['position'] = 'fixed'
+    s['display'] = 'flex'
+    s['flexDirection'] = 'column'
+    s['alignItems'] = 'center'
+    s['zIndex'] = 999
+    if (hasDragged.value) {
+        s['left'] = `${posX.value}px`
+        s['top'] = `${posY.value}px`
+        s['right'] = 'auto'
+        s['bottom'] = 'auto'
+    } else {
+        if (props.left != null && props.left.toString() != '') {
+            s['left'] = addUnit(props.left)
+        } else if (props.right != null && props.right.toString() != '') {
+            s['right'] = addUnit(props.right)
+        }
+        if (props.top != null && props.top.toString() != '') {
+            s['top'] = addUnit(props.top)
+        } else if (props.bottom != null && props.bottom.toString() != '') {
+            s['bottom'] = addUnit(props.bottom)
+        }
+    }
+    return s
+})
+
+const mainButtonStyle = computed((): UTSJSONObject => {
+    const s = {} as UTSJSONObject
+    s['backgroundColor'] = props.backgroundColor
+    s['display'] = 'flex'
+    s['flexDirection'] = 'row'
+    s['justifyContent'] = 'center'
+    s['alignItems'] = 'center'
+    s['width'] = addUnit(props.width)
+    s['height'] = addUnit(props.height)
+    s['borderRadius'] = '999px'
+    s['overflow'] = 'hidden'
+    s['borderColor'] = props.borderColor
+    return s
+})
+
+function getTouchPoint(e: UniTouchEvent): number[] {
+    if (e.touches.length > 0) {
+        return [e.touches[0].clientX, e.touches[0].clientY]
+    }
+    if (e.changedTouches.length > 0) {
+        return [e.changedTouches[0].clientX, e.changedTouches[0].clientY]
+    }
+    return [0, 0]
+}
+
+function onTouchStart(e: UniTouchEvent): void {
+    if (!props.draggable) return
+    const pt = getTouchPoint(e)
+    touchStartX.value = pt[0]
+    touchStartY.value = pt[1]
+    isMoving.value = false
+    dragSuppressedClick.value = false
+
+    if (hasDragged.value) {
+        btnStartX.value = posX.value
+        btnStartY.value = posY.value
+    } else {
+        btnStartX.value = measuredLeft.value
+        btnStartY.value = measuredTop.value
+    }
+}
+
+function onTouchMove(e: UniTouchEvent): void {
+    if (!props.draggable) return
+    const pt = getTouchPoint(e)
+    const dx = pt[0] - touchStartX.value
+    const dy = pt[1] - touchStartY.value
+
+    if (!isMoving.value) {
+        if (Math.abs(dx) > 8 || Math.abs(dy) > 8) {
+            isMoving.value = true
+            dragSuppressedClick.value = true
+        }
+    }
+
+    if (isMoving.value) {
+        const win = getWindowInfo()
+        const winW = win.windowWidth
+        const winH = win.windowHeight
+        const btnW = parseUnit(props.width, 50)
+        const btnH = parseUnit(props.height, 50)
+
+        let nextX = btnStartX.value + dx
+        let nextY = btnStartY.value + dy
+
+        if (nextX < 0) nextX = 0
+        if (nextX > winW - btnW) nextX = winW - btnW
+        if (nextY < 0) nextY = 0
+        if (nextY > winH - btnH) nextY = winH - btnH
+
+        posX.value = nextX
+        posY.value = nextY
+        hasDragged.value = true
+    }
+}
+
+function onTouchEnd(e: UniTouchEvent): void {
+    if (!props.draggable) return
+    if (isMoving.value) {
+        isMoving.value = false
+        setTimeout(() => {
+            dragSuppressedClick.value = false
+        }, 200)
+    }
+}
 
 function stringValue(value: any | null): string {
     return value == null ? '' : value.toString()
@@ -118,22 +298,54 @@ function copyObject(item: UTSJSONObject): UTSJSONObject {
 }
 
 function getItemBackgroundColor(item: UTSJSONObject): string {
-    const value = stringValue(item['backgroundColor'])
+    const raw = item as any
+    const value = stringValue(raw['backgroundColor'] ?? raw['background-color'])
     return value == '' ? props.backgroundColor : value
 }
 
 function getItemColor(item: UTSJSONObject): string {
-    const value = stringValue(item['color'])
+    const raw = item as any
+    const value = stringValue(raw['color'])
     return value == '' ? props.color : value
 }
 
 function getItemBorderColor(item: UTSJSONObject): string {
-    const value = stringValue(item['borderColor'])
+    const raw = item as any
+    const value = stringValue(raw['borderColor'] ?? raw['border-color'])
     return value == '' ? props.borderColor : value
 }
 
+const isMenuComputed = computed((): boolean => {
+    // #ifdef H5
+    const raw = props as any
+    const m = raw['isMenu'] ?? raw['is-menu']
+    if (m == true || m == 'true') {
+        return true
+    }
+    // #endif
+    return props.isMenu == true
+})
+
+const displayList = computed((): UTSJSONObject[] => {
+    // #ifdef H5
+    const raw = props.list as any
+    if (raw == null) {
+        return [] as UTSJSONObject[]
+    }
+    // 兼容父组件传入 RefImpl 的情况，解包其 .value
+    if (raw['value'] != null && Array.isArray(raw['value'])) {
+        return raw['value'] as UTSJSONObject[]
+    }
+    if (Array.isArray(raw)) {
+        return raw as UTSJSONObject[]
+    }
+    // #endif
+    return props.list
+})
+
 function getItemName(item: UTSJSONObject): string {
-    return stringValue(item['name'])
+    const raw = item as any
+    return stringValue(raw['name'])
 }
 
 function getItemStyle(item: UTSJSONObject): UTSJSONObject {
@@ -143,15 +355,20 @@ function getItemStyle(item: UTSJSONObject): UTSJSONObject {
     style['flexDirection'] = 'row'
     style['justifyContent'] = 'center'
     style['alignItems'] = 'center'
-    style['width'] = props.width
-    style['height'] = props.height
-    style['borderRadius'] = '50%'
+    style['width'] = addUnit(props.width)
+    style['height'] = addUnit(props.height)
+    style['borderRadius'] = '999px'
+    style['overflow'] = 'hidden'
     style['borderColor'] = getItemBorderColor(item)
     return style
 }
 
 function clickHandler(e: UniPointerEvent): void {
-    if (props.isMenu) {
+    if (dragSuppressedClick.value) {
+        dragSuppressedClick.value = false
+        return
+    }
+    if (isMenuComputed.value) {
         showList.value = !showList.value
     }
     emit('click', e)
@@ -162,24 +379,69 @@ function itemClick(item: UTSJSONObject, index: number): void {
     payload['index'] = index
     emit('item-click', payload)
 }
+
+onMounted(() => {
+    initPosition()
+    nextTick(() => {
+        upGetRect('.up-float-button', false, instance?.proxy).then((res) => {
+            const rect = res as NodeInfo
+            if (rect.left != null && rect.top != null && rect.left! >= 0 && rect.top! >= 0) {
+                measuredLeft.value = rect.left!
+                measuredTop.value = rect.top!
+            }
+        })
+    })
+})
 </script>
 
 <style lang="scss" scoped>
 .up-float-button {
+    position: fixed;
     z-index: 999;
+    user-select: none;
+
+    &__main {
+        position: relative;
+        cursor: pointer;
+        transition: transform 0.15s ease;
+        z-index: 1000;
+
+        &:active {
+            transform: scale(0.95);
+        }
+    }
 
     &__list {
-        position: absolute;
-        bottom: 0px;
-        left: 0;
         display: flex;
         flex-direction: column;
-        z-index: 999;
         align-items: center;
+
+        &--bottom {
+            margin-bottom: 12px;
+        }
+
+        &--top {
+            margin-top: 12px;
+        }
+    }
+
+    &__item {
+        margin-bottom: 10px;
+        cursor: pointer;
+        transition: transform 0.15s ease;
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+
+        &:active {
+            transform: scale(0.92);
+        }
     }
 }
 
 .show-list {
     transform: rotate(45deg);
+    transition: transform 0.25s ease;
 }
 </style>

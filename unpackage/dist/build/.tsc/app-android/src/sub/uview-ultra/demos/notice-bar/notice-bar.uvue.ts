@@ -1,0 +1,78 @@
+import _easycom_up_notice_bar from '@/uni_modules/uview-ultra/components/up-notice-bar/up-notice-bar.uvue'
+import AppKu from '@/App.ku.uvue'
+import LayoutComponent from '@/src/layouts/navbar.uvue';
+
+const __sfc__ = defineComponent({
+  __name: 'notice-bar',
+  setup(__props) {
+const __ins = getCurrentInstance()!;
+const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+const _cache = __ins.renderCache;
+
+
+return (): any | null => {
+
+const _component_up_notice_bar = resolveEasyComponent("up-notice-bar",_easycom_up_notice_bar)
+
+  return _cV(unref(AppKu), _uM({
+    layout: 'navbar',
+    "show-back": true,
+    "hide-navbar": false,
+    "enable-pull-down-refresh": false,
+    "page-style": {'navigationBarTitleText':'up-notice-bar 滚动通知','navigationStyle':'custom'}
+  }), _uM({
+    default: withSlotCtx((): any[] => [
+      _cV(unref(LayoutComponent), _uM({
+        "show-back": true,
+        "hide-navbar": false,
+        "enable-pull-down-refresh": false,
+        "page-style": {'navigationBarTitleText':'up-notice-bar 滚动通知','navigationStyle':'custom'}
+      }), _uM({
+        default: withSlotCtx((): any[] => [
+          _cE("view", _uM({ class: "weapp-tw-border page-container bg-_b_hf8fafc_B min-h-screen pb-_b30px_B" }), [
+            _cE("view", _uM({ class: "weapp-tw-border p-_b16px_B" }), [
+              _cE("view", _uM({ class: "weapp-tw-border demo-block" }), [
+                _cE("text", _uM({ class: "weapp-tw-border demo-label" }), "基础用法"),
+                _cV(_component_up_notice_bar, _uM({
+                  text: "uview-ultra 是一款专为 uni-app X 设计的高品质 UI 组件库",
+                  mode: "link"
+                }))
+              ]),
+              _cE("view", _uM({ class: "weapp-tw-border demo-block mt-_b12px_B" }), [
+                _cE("text", _uM({ class: "weapp-tw-border demo-label" }), "不同主题"),
+                _cV(_component_up_notice_bar, _uM({
+                  text: "通知：系统将于今晚 24:00 进行维护更新。",
+                  type: "warning"
+                })),
+                _cE("view", _uM({ class: "weapp-tw-border h-_b10px_B" })),
+                _cV(_component_up_notice_bar, _uM({
+                  text: "成功：数据已经成功备份到云端。",
+                  type: "success"
+                })),
+                _cE("view", _uM({ class: "weapp-tw-border h-_b10px_B" })),
+                _cV(_component_up_notice_bar, _uM({
+                  text: "错误：网络连接失败，请检查设置。",
+                  type: "error"
+                }))
+              ]),
+              _cE("view", _uM({ class: "weapp-tw-border demo-block mt-_b12px_B" }), [
+                _cE("text", _uM({ class: "weapp-tw-border demo-label" }), "竖向步进滚动"),
+                _cV(_component_up_notice_bar, _uM({
+                  text: ['第一条重要通知', '第二条重要通知', '第三条重要通知'],
+                  direction: "column"
+                }))
+              ])
+            ])
+          ])
+        ]),
+        _: 1 /* STABLE */
+      }))
+    ]),
+    _: 1 /* STABLE */
+  }))
+}
+}
+
+})
+export default __sfc__
+const GenSrcSubUviewUltraDemosNoticeBarNoticeBarStyles = [_uM([["weapp-tw-border", _pS(_uM([["borderTopWidth", 0], ["borderRightWidth", 0], ["borderBottomWidth", 0], ["borderLeftWidth", 0]]))], ["demo-block", _pS(_uM([["marginBottom", 12], ["paddingTop", 12], ["paddingRight", 12], ["paddingBottom", 12], ["paddingLeft", 12], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["demo-label", _pS(_uM([["fontSize", 14], ["fontWeight", "bold"], ["color", "#606266"], ["marginBottom", 10], ["paddingLeft", 4], ["borderLeftWidth", 3], ["borderLeftStyle", "solid"], ["borderLeftColor", "var(--theme-color, #0957de)"]]))]])]

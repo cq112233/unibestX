@@ -166,16 +166,16 @@ open class GenUniModulesUviewUltraComponentsUpGapUpGap : VueComponent {
         var props = _nP(_uM("customStyle" to _uM("type" to _uA(
             "Object",
             "String"
-        ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "bgColor" to _uM("type" to "String", "default" to default__20.getString("gap.bgColor")), "height" to _uM("type" to _uA(
+        ), "default" to _uO()), "customClass" to _uM("type" to "String", "default" to ""), "url" to _uM("type" to "String", "default" to ""), "linkType" to _uM("type" to "String", "default" to "navigateTo"), "bgColor" to _uM("type" to "String", "default" to default__21.getString("gap.bgColor")), "height" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to default__20.getNumber("gap.height")), "marginTop" to _uM("type" to _uA(
+        ), "default" to default__21.getNumber("gap.height")), "marginTop" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to default__20.getNumber("gap.marginTop")), "marginBottom" to _uM("type" to _uA(
+        ), "default" to default__21.getNumber("gap.marginTop")), "marginBottom" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to default__20.getNumber("gap.marginBottom"))))
+        ), "default" to default__21.getNumber("gap.marginBottom"))))
         var propsNeedCastKeys = _uA(
             "customStyle",
             "customClass",

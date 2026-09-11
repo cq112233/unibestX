@@ -1,0 +1,120 @@
+import _easycom_up_upload from '@/uni_modules/uview-ultra/components/up-upload/up-upload.uvue'
+import _easycom_up_button from '@/uni_modules/uview-ultra/components/up-button/up-button.uvue'
+import AppKu from '@/App.ku.uvue'
+import LayoutComponent from '@/src/layouts/navbar.uvue'
+import { ref } from 'vue';
+
+const __sfc__ = defineComponent({
+  __name: 'upload',
+  setup(__props) {
+const __ins = getCurrentInstance()!;
+const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+const _cache = __ins.renderCache;
+
+;
+
+const fileList1 = ref([] as UTSJSONObject[]);
+const fileList2 = ref([] as UTSJSONObject[]);
+
+async function uploadFilePromise(url: string): Promise<string> {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      resolve(url);
+    }, 1000);
+  });
+}
+
+async function afterRead(event: UTSJSONObject) {
+  const fileData = event.get('file');
+  const lists = (Array.isArray(fileData) ? fileData : [fileData]) as UTSJSONObject[];
+  let fileListLen = fileList1.value.length;
+  lists.forEach((item) => {
+    fileList1.value.push({
+      ...item,
+      status: 'uploading',
+      message: '上传中'
+    } as UTSJSONObject);
+  });
+  for (let i = 0; i < lists.length; i++) {
+    const url = lists[i].getString('url') as string;
+    const result = await uploadFilePromise(url);
+    const item = fileList1.value[fileListLen];
+    fileList1.value.splice(fileListLen, 1, Object.assign(item, {
+      status: 'success',
+      message: '',
+      url: result
+    }) as UTSJSONObject);
+    fileListLen++;
+  }
+}
+
+function deletePic(event: UTSJSONObject) {
+  fileList1.value.splice(event.getNumber('index') as number, 1);
+}
+
+return (): any | null => {
+
+const _component_up_upload = resolveEasyComponent("up-upload",_easycom_up_upload)
+const _component_up_button = resolveEasyComponent("up-button",_easycom_up_button)
+
+  return _cV(unref(AppKu), _uM({
+    layout: 'navbar',
+    "show-back": true,
+    "hide-navbar": false,
+    "enable-pull-down-refresh": false,
+    "page-style": {'navigationBarTitleText':'up-upload 上传','navigationStyle':'custom'}
+  }), _uM({
+    default: withSlotCtx((): any[] => [
+      _cV(unref(LayoutComponent), _uM({
+        "show-back": true,
+        "hide-navbar": false,
+        "enable-pull-down-refresh": false,
+        "page-style": {'navigationBarTitleText':'up-upload 上传','navigationStyle':'custom'}
+      }), _uM({
+        default: withSlotCtx((): any[] => [
+          _cE("view", _uM({ class: "weapp-tw-border page-container bg-_b_hf8fafc_B min-h-screen pb-_b30px_B" }), [
+            _cE("view", _uM({ class: "weapp-tw-border p-_b16px_B" }), [
+              _cE("view", _uM({ class: "weapp-tw-border demo-block" }), [
+                _cE("text", _uM({ class: "weapp-tw-border demo-label" }), "基础用法"),
+                _cV(_component_up_upload, _uM({
+                  "file-list": fileList1.value,
+                  name: "1",
+                  multiple: "",
+                  "max-count": 3,
+                  onAfterRead: afterRead,
+                  onDelete: deletePic
+                }), null, 8 /* PROPS */, ["file-list"])
+              ]),
+              _cE("view", _uM({ class: "weapp-tw-border demo-block mt-_b12px_B" }), [
+                _cE("text", _uM({ class: "weapp-tw-border demo-label" }), "自定义上传按钮"),
+                _cV(_component_up_upload, _uM({
+                  "file-list": fileList2.value,
+                  name: "2",
+                  multiple: "",
+                  "max-count": 3
+                }), _uM({
+                  default: withSlotCtx((): any[] => [
+                    _cV(_component_up_button, _uM({
+                      type: "success",
+                      text: "选择文件",
+                      icon: "plus",
+                      size: "mini"
+                    }))
+                  ]),
+                  _: 1 /* STABLE */
+                }), 8 /* PROPS */, ["file-list"])
+              ])
+            ])
+          ])
+        ]),
+        _: 1 /* STABLE */
+      }))
+    ]),
+    _: 1 /* STABLE */
+  }))
+}
+}
+
+})
+export default __sfc__
+const GenSrcSubUviewUltraDemosUploadUploadStyles = [_uM([["weapp-tw-border", _pS(_uM([["borderTopWidth", 0], ["borderRightWidth", 0], ["borderBottomWidth", 0], ["borderLeftWidth", 0]]))], ["demo-block", _pS(_uM([["marginBottom", 12], ["paddingTop", 12], ["paddingRight", 12], ["paddingBottom", 12], ["paddingLeft", 12], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["demo-label", _pS(_uM([["fontSize", 14], ["fontWeight", "bold"], ["color", "#606266"], ["marginBottom", 10], ["paddingLeft", 4], ["borderLeftWidth", 3], ["borderLeftStyle", "solid"], ["borderLeftColor", "var(--theme-color, #0957de)"]]))]])]

@@ -1,0 +1,91 @@
+import _easycom_up_waterfall from '@/uni_modules/uview-ultra/components/up-waterfall/up-waterfall.uvue'
+import AppKu from '@/App.ku.uvue'
+import LayoutComponent from '@/src/layouts/navbar.uvue'
+import { ref } from 'vue';
+
+const __sfc__ = defineComponent({
+  __name: 'waterfall',
+  setup(__props) {
+const __ins = getCurrentInstance()!;
+const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+const _cache = __ins.renderCache;
+
+;
+
+const list = ref<UTSJSONObject[]>([
+  { title: 'uview-ultra 核心UI组件', desc: '轻量级UI框架', price: 129, imgHeight: '80px' } as UTSJSONObject,
+  { title: '高性能 UniAppX 跨端套件', desc: '支持原生Android/iOS', price: 299, imgHeight: '160px' } as UTSJSONObject,
+  { title: '智能瀑布流弹性排版', desc: '自动适配列高', price: 89, imgHeight: '110px' } as UTSJSONObject,
+  { title: '极速渲染流畅体验', desc: '零延迟丝滑滚动', price: 199, imgHeight: '200px' } as UTSJSONObject,
+  { title: '炫彩主题切换系统', desc: '一键换肤体验', price: 49, imgHeight: '90px' } as UTSJSONObject,
+  { title: '全套内置工程级图标库', desc: '上百款高清矢量图标', price: 159, imgHeight: '140px' } as UTSJSONObject,
+  { title: '响应式页面布局容器', desc: '完美适配屏幕', price: 79, imgHeight: '180px' } as UTSJSONObject,
+  { title: '开箱即用多端示例', desc: '快速构建产品原型', price: 99, imgHeight: '120px' } as UTSJSONObject
+]);
+
+return (): any | null => {
+
+const _component_up_waterfall = resolveEasyComponent("up-waterfall",_easycom_up_waterfall)
+
+  return _cV(unref(AppKu), _uM({
+    layout: 'navbar',
+    "show-back": true,
+    "hide-navbar": false,
+    "enable-pull-down-refresh": false,
+    "page-style": {'navigationBarTitleText':'Waterfall 瀑布流','navigationStyle':'custom'}
+  }), _uM({
+    default: withSlotCtx((): any[] => [
+      _cV(unref(LayoutComponent), _uM({
+        "show-back": true,
+        "hide-navbar": false,
+        "enable-pull-down-refresh": false,
+        "page-style": {'navigationBarTitleText':'Waterfall 瀑布流','navigationStyle':'custom'}
+      }), _uM({
+        default: withSlotCtx((): any[] => [
+          _cE("view", _uM({ class: "weapp-tw-border page-container bg-_b_hf8fafc_B min-h-screen pb-_b30px_B" }), [
+            _cE("view", _uM({ class: "weapp-tw-border p-_b16px_B" }), [
+              _cE("view", _uM({ class: "weapp-tw-border demo-block" }), [
+                _cE("text", _uM({ class: "weapp-tw-border demo-label" }), "基础瀑布流 (2列)"),
+                _cV(_component_up_waterfall, _uM({
+                  modelValue: list.value,
+                  "onUpdate:modelValue": $event => {(list).value = $event},
+                  columns: 2
+                }), _uM({
+                  column: withScopedSlotCtx((slotProps: Record<string, any | null>): any[] => {
+                  const colList = slotProps["colList"]
+                  return [
+                    _cE(Fragment, null, RenderHelpers.renderList((colList as UTSJSONObject[]), (item, idx, __index, _cached): any => {
+                      return _cE("view", _uM({
+                        key: idx,
+                        class: "weapp-tw-border p-_b6px_B"
+                      }), [
+                        _cE("view", _uM({ class: "weapp-tw-border bg-_b_hf1f5f9_B rounded-_b8px_B overflow-hidden p-_b8px_B mb-_b8px_B" }), [
+                          _cE("image", _uM({
+                            src: "/static/logo.png",
+                            mode: "aspectFit",
+                            style: _nS(_uM({ width: '100%', height: (item as UTSJSONObject).getString('imgHeight') ?? '100px', borderRadius: '6px', backgroundColor: '#ffffff' }))
+                          }), null, 4 /* STYLE */),
+                          _cE("text", _uM({ class: "weapp-tw-border text-_b14px_B font-bold text-_b_h334155_B mt-_b6px_B" }), _tD((item as UTSJSONObject).getString('title')), 1 /* TEXT */),
+                          _cE("text", _uM({ class: "weapp-tw-border text-_b12px_B text-_b_h94a3b8_B mt-_b2px_B" }), _tD((item as UTSJSONObject).getString('desc')), 1 /* TEXT */),
+                          _cE("text", _uM({ class: "weapp-tw-border text-_b14px_B text-_b_he11d48_B mt-_b4px_B font-bold" }), "￥" + _tD((item as UTSJSONObject).getNumber('price')), 1 /* TEXT */)
+                        ])
+                      ])
+                    }), 128 /* KEYED_FRAGMENT */)
+                  ]}),
+                  _: 1 /* STABLE */
+                }), 8 /* PROPS */, ["modelValue", "onUpdate:modelValue"])
+              ])
+            ])
+          ])
+        ]),
+        _: 1 /* STABLE */
+      }))
+    ]),
+    _: 1 /* STABLE */
+  }))
+}
+}
+
+})
+export default __sfc__
+const GenSrcSubUviewUltraDemosWaterfallWaterfallStyles = [_uM([["weapp-tw-border", _pS(_uM([["borderTopWidth", 0], ["borderRightWidth", 0], ["borderBottomWidth", 0], ["borderLeftWidth", 0]]))], ["demo-block", _pS(_uM([["marginBottom", 12], ["paddingTop", 12], ["paddingRight", 12], ["paddingBottom", 12], ["paddingLeft", 12], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["demo-label", _pS(_uM([["fontSize", 14], ["fontWeight", "bold"], ["color", "#606266"], ["marginBottom", 10], ["paddingLeft", 4], ["borderLeftWidth", 3], ["borderLeftStyle", "solid"], ["borderLeftColor", "var(--theme-color, #0957de)"]]))]])]

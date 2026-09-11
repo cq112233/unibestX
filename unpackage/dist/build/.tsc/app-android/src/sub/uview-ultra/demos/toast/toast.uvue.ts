@@ -1,0 +1,109 @@
+import _easycom_up_button from '@/uni_modules/uview-ultra/components/up-button/up-button.uvue'
+import _easycom_up_toast from '@/uni_modules/uview-ultra/components/up-toast/up-toast.uvue'
+import AppKu from '@/App.ku.uvue'
+import LayoutComponent from '@/src/layouts/navbar.uvue'
+import { ref } from 'vue';
+
+const __sfc__ = defineComponent({
+  __name: 'toast',
+  setup(__props) {
+const __ins = getCurrentInstance()!;
+const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+const _cache = __ins.renderCache;
+
+;
+
+const uToast = ref(null as ComponentPublicInstance | null);
+function showToast(type: string) {
+  const toast = uToast.value;
+  if (toast != null) {
+    const configs = {
+      success: { message: '操作成功！', type: 'success' },
+      error: { message: '操作失败！', type: 'error' },
+      warning: { message: '请注意风险！', type: 'warning' },
+      default: { message: '这是一条提示', type: 'default' }
+    } as UTSJSONObject;
+    const config = configs[type] as UTSJSONObject;
+    toast.$callMethod('show', {
+      message: config.message as string,
+      type: config.type as string
+    });
+  }
+}
+
+return (): any | null => {
+
+const _component_up_button = resolveEasyComponent("up-button",_easycom_up_button)
+const _component_up_toast = resolveEasyComponent("up-toast",_easycom_up_toast)
+
+  return _cV(unref(AppKu), _uM({
+    layout: 'navbar',
+    "show-back": true,
+    "hide-navbar": false,
+    "enable-pull-down-refresh": false,
+    "page-style": {'navigationBarTitleText':'up-toast 消息提示','navigationStyle':'custom'}
+  }), _uM({
+    default: withSlotCtx((): any[] => [
+      _cV(unref(LayoutComponent), _uM({
+        "show-back": true,
+        "hide-navbar": false,
+        "enable-pull-down-refresh": false,
+        "page-style": {'navigationBarTitleText':'up-toast 消息提示','navigationStyle':'custom'}
+      }), _uM({
+        default: withSlotCtx((): any[] => [
+          _cE("view", _uM({ class: "weapp-tw-border page-container bg-_b_hf8fafc_B min-h-screen pb-_b30px_B" }), [
+            _cE("view", _uM({ class: "weapp-tw-border p-_b16px_B" }), [
+              _cE("view", _uM({ class: "weapp-tw-border demo-block" }), [
+                _cE("text", _uM({ class: "weapp-tw-border demo-label" }), "基础用法"),
+                _cE("view", _uM({ class: "weapp-tw-border flex-row items-center" }), [
+                  _cV(_component_up_button, _uM({
+                    type: "primary",
+                    text: "成功提示",
+                    size: "mini",
+                    onClick: () => {showToast('success')}
+                  }), null, 8 /* PROPS */, ["onClick"]),
+                  _cE("view", _uM({ class: "weapp-tw-border w-_b10px_B" })),
+                  _cV(_component_up_button, _uM({
+                    type: "error",
+                    text: "错误提示",
+                    size: "mini",
+                    onClick: () => {showToast('error')}
+                  }), null, 8 /* PROPS */, ["onClick"])
+                ])
+              ]),
+              _cE("view", _uM({ class: "weapp-tw-border demo-block mt-_b12px_B" }), [
+                _cE("text", _uM({ class: "weapp-tw-border demo-label" }), "更多类型"),
+                _cE("view", _uM({ class: "weapp-tw-border flex-row items-center" }), [
+                  _cV(_component_up_button, _uM({
+                    type: "warning",
+                    text: "警告提示",
+                    size: "mini",
+                    onClick: () => {showToast('warning')}
+                  }), null, 8 /* PROPS */, ["onClick"]),
+                  _cE("view", _uM({ class: "weapp-tw-border w-_b10px_B" })),
+                  _cV(_component_up_button, _uM({
+                    type: "default",
+                    text: "默认提示",
+                    size: "mini",
+                    onClick: () => {showToast('default')}
+                  }), null, 8 /* PROPS */, ["onClick"])
+                ])
+              ])
+            ]),
+            _cV(_component_up_toast, _uM({
+              ref_key: "uToast",
+              ref: uToast
+            }), null, 512 /* NEED_PATCH */)
+          ])
+        ]),
+        _: 1 /* STABLE */
+      }))
+    ]),
+    _: 1 /* STABLE */
+  }))
+}
+}
+
+})
+export default __sfc__
+const GenSrcSubUviewUltraDemosToastToastStyles = [_uM([["weapp-tw-border", _pS(_uM([["borderTopWidth", 0], ["borderRightWidth", 0], ["borderBottomWidth", 0], ["borderLeftWidth", 0]]))], ["demo-block", _pS(_uM([["marginBottom", 12], ["paddingTop", 12], ["paddingRight", 12], ["paddingBottom", 12], ["paddingLeft", 12], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["demo-label", _pS(_uM([["fontSize", 14], ["fontWeight", "bold"], ["color", "#606266"], ["marginBottom", 10], ["paddingLeft", 4], ["borderLeftWidth", 3], ["borderLeftStyle", "solid"], ["borderLeftColor", "var(--theme-color, #0957de)"]]))]])]

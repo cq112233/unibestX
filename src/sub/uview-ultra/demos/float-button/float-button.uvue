@@ -3,57 +3,83 @@
     <view class="p-[16px]">
       <view class="demo-block">
         <text class="demo-label">组件说明</text>
-        <text class="demo-text">up-float-button 通过 position: fixed 固定在屏幕上，常用于承载「回到顶部 / 客服 / 快速入口」这类全局操作。isMenu 为 true 时，点击主按钮会展开 list 里的子按钮。</text>
+        <text class="demo-text">up-float-button 通过 position: fixed 固定在屏幕上。页面右侧常驻了 4 个不同配置的悬浮按钮：</text>
+        <view class="mt-[8px] flex flex-col gap-[6px]">
+          <text class="demo-text text-[#475569]">⚫ 【深灰·置顶】右上角 top:120px ➔ 基础点击</text>
+          <text class="demo-text text-[#f59e0b]">🟠 【橙色·图钉】右上偏下 top:200px ➔ 可随意拖拽</text>
+          <text class="demo-text text-[#2979ff] font-bold">🔵 【蓝色·加号】右下角 bottom:100px ➔ 菜单模式（点此展开菜单！）</text>
+          <text class="demo-text text-[#19be6b]">🟢 【绿色·编辑】右下底部 bottom:25px ➔ 自定义大尺寸</text>
+        </view>
       </view>
 
       <view class="demo-block mt-[12px]">
-        <text class="demo-label">1. 基础用法（top 定位）</text>
-        <text class="demo-text">不传 isMenu 时点击只触发 click 事件。本例用 top 而不是 bottom 指定位置，按钮在右上角。</text>
-        <text class="demo-text mt-[6px]">click 次数：{{ basicClickCount }}</text>
+        <text class="demo-label">1. 基础用法（右上角深灰按钮）</text>
+        <text class="demo-text">不传 isMenu 时点击仅触发 click 事件。点击右上角深灰置顶按钮查看效果：</text>
+        <text class="demo-text mt-[6px] font-bold text-[#475569]">click 累计次数：{{ basicClickCount }}</text>
       </view>
 
       <view class="demo-block mt-[12px]">
-        <text class="demo-label">2. 菜单模式（isMenu + list）</text>
-        <text class="demo-text">点击主按钮展开 / 收起，主按钮上的 plus 图标会旋转 45° 变成关闭样式。子项点击触发 item-click，载荷是原对象的浅拷贝并附加 index。</text>
+        <text class="demo-label">2. 菜单模式（右下角蓝色加号按钮 ⭐）</text>
+        <text class="demo-text">传 isMenu 且绑定 list。点击右下角蓝色【+】按钮展开/收起：主按钮上的加号会旋转 45° 变成叉号关闭样式，上方展开【收藏、聊天、分享】三个子按钮。点击子项触发 item-click。</text>
       </view>
 
       <view class="demo-block mt-[12px]">
-        <text class="demo-label">3. 自定义尺寸与配色</text>
-        <text class="demo-text">width / height / backgroundColor / color 可整体改外观，默认插槽可以换成任意内容（这里放了一个 edit-pen 图标）。</text>
-        <text class="demo-text mt-[6px]">注意：borderColor 只写入 border-color，组件未设置 border-width / border-style，所以单传 borderColor 不会出现边框。</text>
+        <text class="demo-label">3. 可拖动（橙色图钉按钮）</text>
+        <text class="demo-text">打开 draggable 后，按住橙色图钉按钮可以在屏幕任意位置拖拽，自动限制在窗口内部。拖动位移超过 8px 时会自动抑制 click 事件，防止误触。</text>
       </view>
 
       <view class="demo-block mt-[12px]">
-        <text class="demo-label">4. 可拖动（draggable）</text>
-        <text class="demo-text">打开 draggable 后，按住主按钮可以拖到屏幕任意位置，自动夹在窗口内。初始位置仍然由 top / right / bottom 换算而来，拖过一次之后就归用户了。</text>
-        <text class="demo-text mt-[6px]">橙色那个就是。拖动会抑制 click —— 位移超过 8px 就当成拖动，不再触发 click / 不展开菜单。</text>
+        <text class="demo-label">4. 自定义尺寸与插槽（右下角底部绿色按钮）</text>
+        <text class="demo-text">支持自定义 width / height / backgroundColor / color，默认插槽可传入任意内容（如 edit-pen 编辑笔图标）。</text>
       </view>
 
       <view class="demo-block mt-[12px]">
-        <text class="demo-label">事件日志</text>
+        <text class="demo-label">事件交互日志</text>
         <view class="log-box mt-[10px]">
           <text class="log-text">{{ eventLog }}</text>
         </view>
       </view>
     </view>
 
-    <!-- 1. 基础用法：top + right 定位，非菜单模式 -->
-    <up-float-button top="150px" right="30px" @click="onBasicClick"></up-float-button>
-
-    <!-- 2. 菜单模式：点击展开 list 中的子按钮 -->
+    <!-- 1. 基础用法：深灰置顶图标，仅触发点击 -->
     <up-float-button
-      bottom="190px"
-      right="30px"
+      top="120px"
+      right="20px"
+      background-color="#475569"
+      color="#ffffff"
+      @click="onBasicClick"
+    >
+      <up-icon name="arrow-up" color="#ffffff" size="22"></up-icon>
+    </up-float-button>
+
+    <!-- 2. 可拖动：橙色图钉图标，可随手势拖动 -->
+    <up-float-button
+      top="200px"
+      right="20px"
+      background-color="#f59e0b"
+      color="#ffffff"
+      :draggable="true"
+      @click="onDragButtonClick"
+    >
+      <up-icon name="pushpin" color="#ffffff" size="22"></up-icon>
+    </up-float-button>
+
+    <!-- 3. 菜单模式：经典蓝色加号，点击展开/收起菜单 -->
+    <up-float-button
+      bottom="100px"
+      right="20px"
+      background-color="#2979ff"
+      color="#ffffff"
       :is-menu="true"
       :list="menuList"
       @click="onMenuClick"
       @item-click="onItemClick"
     ></up-float-button>
 
-    <!-- 3. 自定义尺寸与配色 + 默认插槽 -->
+    <!-- 4. 自定义尺寸与配色 + 默认插槽：绿色编辑图标 -->
     <up-float-button
-      bottom="40px"
-      right="30px"
+      bottom="25px"
+      right="20px"
       background-color="#19be6b"
       color="#ffffff"
       width="60px"
@@ -62,18 +88,6 @@
     >
       <up-icon name="edit-pen" color="#ffffff" size="26"></up-icon>
     </up-float-button>
-
-    <!-- 4. 可拖动：初始落在 top 300px / right 30px，之后跟着手指走 -->
-    <up-float-button
-      top="300px"
-      right="30px"
-      background-color="#f59e0b"
-      color="#ffffff"
-      :draggable="true"
-      @click="onDragButtonClick"
-    >
-      <up-icon name="pushpin" color="#ffffff" size="24"></up-icon>
-    </up-float-button>
   </view>
 </template>
 
@@ -81,6 +95,7 @@
 import { ref } from 'vue';
 
 definePage({
+  debug: true,
   layout: 'navbar',
   showBack: true,
   hideNavbar: false,
@@ -122,10 +137,9 @@ function onDragButtonClick(): void {
   log('click => 可拖动按钮被点击（拖动不会触发这一条）');
 }
 
-// item-click 的载荷是原对象浅拷贝 + index，直接用 UTSJSONObject 的取值方法，别走 any
 function onItemClick(item: UTSJSONObject): void {
-  const index = item.getNumber('index') ?? 0;
-  const name = item.getString('name') ?? '';
+  const index = item['index'] != null ? parseInt(item['index']!.toString()) : 0;
+  const name = item['name'] != null ? item['name']!.toString() : '';
   log(`item-click => index=${index} name=${name}`);
 }
 </script>

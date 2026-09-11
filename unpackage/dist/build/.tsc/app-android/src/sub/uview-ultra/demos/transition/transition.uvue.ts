@@ -1,0 +1,150 @@
+import _easycom_up_transition from '@/uni_modules/uview-ultra/components/up-transition/up-transition.uvue'
+import _easycom_up_button from '@/uni_modules/uview-ultra/components/up-button/up-button.uvue'
+import AppKu from '@/App.ku.uvue'
+import LayoutComponent from '@/src/layouts/navbar.uvue'
+import { ref } from 'vue';
+
+const __sfc__ = defineComponent({
+  __name: 'transition',
+  setup(__props) {
+const __ins = getCurrentInstance()!;
+const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+const _cache = __ins.renderCache;
+
+;
+
+const transitionShow = ref(true);
+
+const slideMode = ref('slide-up');
+const slideShow = ref(false);
+
+function triggerSlide(mode: string) {
+  slideMode.value = mode;
+  slideShow.value = true;
+  setTimeout(() => {
+    slideShow.value = false;
+  }, 1500);
+}
+
+return (): any | null => {
+
+const _component_up_transition = resolveEasyComponent("up-transition",_easycom_up_transition)
+const _component_up_button = resolveEasyComponent("up-button",_easycom_up_button)
+
+  return _cV(unref(AppKu), _uM({
+    layout: 'navbar',
+    "show-back": true,
+    "hide-navbar": false,
+    "enable-pull-down-refresh": false,
+    "page-style": {'navigationBarTitleText':'Transition 动画','navigationStyle':'custom'}
+  }), _uM({
+    default: withSlotCtx((): any[] => [
+      _cV(unref(LayoutComponent), _uM({
+        "show-back": true,
+        "hide-navbar": false,
+        "enable-pull-down-refresh": false,
+        "page-style": {'navigationBarTitleText':'Transition 动画','navigationStyle':'custom'}
+      }), _uM({
+        default: withSlotCtx((): any[] => [
+          _cE("view", _uM({ class: "weapp-tw-border page-container bg-_b_hf8fafc_B min-h-screen pb-_b30px_B" }), [
+            _cE("view", _uM({ class: "weapp-tw-border p-_b16px_B" }), [
+              _cE("view", _uM({ class: "weapp-tw-border demo-block" }), [
+                _cE("text", _uM({ class: "weapp-tw-border demo-label" }), "内置过渡动画"),
+                _cE("view", _uM({ class: "weapp-tw-border transition-demo-wrapper" }), [
+                  _cV(_component_up_transition, _uM({
+                    show: transitionShow.value,
+                    mode: "fade"
+                  }), _uM({
+                    default: withSlotCtx((): any[] => [
+                      _cE("view", _uM({ class: "weapp-tw-border transition-demo-box transition-demo-blue" }), [
+                        _cE("text", _uM({ class: "weapp-tw-border text-_b14px_B text-white font-_b500_B" }), "fade 淡入淡出")
+                      ])
+                    ]),
+                    _: 1 /* STABLE */
+                  }), 8 /* PROPS */, ["show"]),
+                  _cE("view", _uM({ class: "weapp-tw-border mt-_b10px_B" }), [
+                    _cV(_component_up_button, _uM({
+                      type: "primary",
+                      text: transitionShow.value ? '隐藏动画' : '显示动画',
+                      size: "mini",
+                      onClick: () => {transitionShow.value = !transitionShow.value}
+                    }), null, 8 /* PROPS */, ["text", "onClick"])
+                  ])
+                ])
+              ]),
+              _cE("view", _uM({ class: "weapp-tw-border demo-block mt-_b12px_B" }), [
+                _cE("text", _uM({ class: "weapp-tw-border demo-label" }), "缩放动画"),
+                _cE("view", _uM({ class: "weapp-tw-border transition-demo-wrapper" }), [
+                  _cV(_component_up_transition, _uM({
+                    show: transitionShow.value,
+                    mode: "zoom"
+                  }), _uM({
+                    default: withSlotCtx((): any[] => [
+                      _cE("view", _uM({ class: "weapp-tw-border transition-demo-box bg-_b_h19be6b_B" }), [
+                        _cE("text", _uM({ class: "weapp-tw-border text-_b14px_B text-white font-_b500_B" }), "zoom 缩放")
+                      ])
+                    ]),
+                    _: 1 /* STABLE */
+                  }), 8 /* PROPS */, ["show"])
+                ])
+              ]),
+              _cE("view", _uM({ class: "weapp-tw-border demo-block mt-_b12px_B" }), [
+                _cE("text", _uM({ class: "weapp-tw-border demo-label" }), "滑动动画"),
+                _cE("view", _uM({ class: "weapp-tw-border transition-demo-wrapper" }), [
+                  _cV(_component_up_transition, _uM({
+                    show: slideShow.value,
+                    mode: slideMode.value
+                  }), _uM({
+                    default: withSlotCtx((): any[] => [
+                      _cE("view", _uM({ class: "weapp-tw-border transition-demo-box bg-_b_hf56c6c_B" }), [
+                        _cE("text", _uM({ class: "weapp-tw-border text-_b14px_B text-white font-_b500_B" }), "slide 滑动")
+                      ])
+                    ]),
+                    _: 1 /* STABLE */
+                  }), 8 /* PROPS */, ["show", "mode"])
+                ]),
+                _cE("view", _uM({ class: "weapp-tw-border flex-row items-center justify-around mt-_b10px_B" }), [
+                  _cV(_component_up_button, _uM({
+                    type: "primary",
+                    text: "上滑",
+                    size: "mini",
+                    "custom-style": "margin: 0 4px;",
+                    onClick: () => {triggerSlide('slide-up')}
+                  }), null, 8 /* PROPS */, ["onClick"]),
+                  _cV(_component_up_button, _uM({
+                    type: "success",
+                    text: "下滑",
+                    size: "mini",
+                    "custom-style": "margin: 0 4px;",
+                    onClick: () => {triggerSlide('slide-down')}
+                  }), null, 8 /* PROPS */, ["onClick"]),
+                  _cV(_component_up_button, _uM({
+                    type: "warning",
+                    text: "左滑",
+                    size: "mini",
+                    "custom-style": "margin: 0 4px;",
+                    onClick: () => {triggerSlide('slide-left')}
+                  }), null, 8 /* PROPS */, ["onClick"]),
+                  _cV(_component_up_button, _uM({
+                    type: "error",
+                    text: "右滑",
+                    size: "mini",
+                    "custom-style": "margin: 0 4px;",
+                    onClick: () => {triggerSlide('slide-right')}
+                  }), null, 8 /* PROPS */, ["onClick"])
+                ])
+              ])
+            ])
+          ])
+        ]),
+        _: 1 /* STABLE */
+      }))
+    ]),
+    _: 1 /* STABLE */
+  }))
+}
+}
+
+})
+export default __sfc__
+const GenSrcSubUviewUltraDemosTransitionTransitionStyles = [_uM([["weapp-tw-border", _pS(_uM([["borderTopWidth", 0], ["borderRightWidth", 0], ["borderBottomWidth", 0], ["borderLeftWidth", 0]]))], ["demo-block", _pS(_uM([["marginBottom", 12], ["paddingTop", 12], ["paddingRight", 12], ["paddingBottom", 12], ["paddingLeft", 12], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["demo-label", _pS(_uM([["fontSize", 14], ["fontWeight", "bold"], ["color", "#606266"], ["marginBottom", 10], ["paddingLeft", 4], ["borderLeftWidth", 3], ["borderLeftStyle", "solid"], ["borderLeftColor", "var(--theme-color, #0957de)"]]))], ["transition-demo-wrapper", _pS(_uM([["display", "flex"], ["flexDirection", "column"], ["alignItems", "center"], ["justifyContent", "center"], ["paddingTop", 20], ["paddingRight", 0], ["paddingBottom", 20], ["paddingLeft", 0]]))], ["transition-demo-box", _pS(_uM([["width", 120], ["height", 120], ["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8], ["display", "flex"], ["alignItems", "center"], ["justifyContent", "center"], ["marginBottom", 15]]))], ["transition-demo-blue", _pS(_uM([["backgroundColor", "#2979ff"]]))]])]

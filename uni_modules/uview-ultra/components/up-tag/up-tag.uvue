@@ -98,6 +98,10 @@ const props = defineProps({
     type: String,
     default: ''
   },
+  borderRadius: {
+    type: String,
+    default: ''
+  },
   closeColor: {
     type: String,
     default: '#C6C7CB'
@@ -145,21 +149,30 @@ const style = computed<UTSJSONObject>(() => {
   if (props.borderColor != '') {
     s['borderColor'] = props.borderColor
   }
+  if (props.borderRadius != '') {
+    s['borderRadius'] = props.borderRadius
+  }
   return s
 })
 
 const tagMergedStyle = computed<UTSJSONObject>(() => {
-  const marginObj = {
+  const baseObj = {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     marginRight: props.closable ? '10px' : '0px',
     marginTop: props.closable ? '10px' : '0px'
   } as UTSJSONObject
-  return deepMerge(marginObj, style.value) as UTSJSONObject
+  return deepMerge(baseObj, style.value) as UTSJSONObject
 })
 
 const textColor = computed<UTSJSONObject>(() => {
   const s = {} as UTSJSONObject
   if (props.color != '') {
     s['color'] = props.color
+  } else if (!props.plain && (props.bgColor == '#eb433d' || props.type == 'error' || props.type == 'primary')) {
+    s['color'] = '#ffffff'
   }
   return s
 })
@@ -233,17 +246,17 @@ function clickHandler(): void {
 		&__text {
 			&--mini {
 				font-size: 12px;
-				line-height: 12px;
+				line-height: 16px;
 			}
 
 			&--medium {
 				font-size: 13px;
-				line-height: 13px;
+				line-height: 18px;
 			}
 
 			&--large {
 				font-size: 15px;
-				line-height: 15px;
+				line-height: 20px;
 			}
 		}
 

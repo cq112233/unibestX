@@ -1,0 +1,128 @@
+import _easycom_up_button from '@/uni_modules/uview-ultra/components/up-button/up-button.uvue'
+import _easycom_up_action_sheet from '@/uni_modules/uview-ultra/components/up-action-sheet/up-action-sheet.uvue'
+import AppKu from '@/App.ku.uvue'
+import LayoutComponent from '@/src/layouts/navbar.uvue'
+import { ref } from 'vue';
+
+const __sfc__ = defineComponent({
+  __name: 'action-sheet',
+  setup(__props) {
+const __ins = getCurrentInstance()!;
+const _ctx = __ins.proxy as InstanceType<typeof __sfc__>;
+const _cache = __ins.renderCache;
+
+;
+
+const actionSheetShow = ref(false);
+const actionSheetShow2 = ref(false);
+const actionSheetShow3 = ref(false);
+const actionList = ref([
+  { name: '拍照' },
+  { name: '从相册选择' }
+]);
+const actionListComplex = ref([
+  { name: '着色选项', color: '#ffaa33' },
+  { name: '禁用选项', disabled: true },
+  { name: '带副标题选项', subname: '我是副标题' }
+]);
+
+function onActionSelect(e: UTSJSONObject) {
+  console.log('action select', e);
+  actionSheetShow.value = false;
+  actionSheetShow2.value = false;
+  actionSheetShow3.value = false;
+}
+
+return (): any | null => {
+
+const _component_up_button = resolveEasyComponent("up-button",_easycom_up_button)
+const _component_up_action_sheet = resolveEasyComponent("up-action-sheet",_easycom_up_action_sheet)
+
+  return _cV(unref(AppKu), _uM({
+    layout: 'navbar',
+    "show-back": true,
+    "hide-navbar": false,
+    "enable-pull-down-refresh": false,
+    "page-style": {'navigationBarTitleText':'up-action-sheet 动作面板','navigationStyle':'custom'}
+  }), _uM({
+    default: withSlotCtx((): any[] => [
+      _cV(unref(LayoutComponent), _uM({
+        "show-back": true,
+        "hide-navbar": false,
+        "enable-pull-down-refresh": false,
+        "page-style": {'navigationBarTitleText':'up-action-sheet 动作面板','navigationStyle':'custom'}
+      }), _uM({
+        default: withSlotCtx((): any[] => [
+          _cE("view", _uM({ class: "weapp-tw-border page-container bg-_b_hf8fafc_B min-h-screen pb-_b30px_B" }), [
+            _cE("view", _uM({ class: "weapp-tw-border p-_b16px_B" }), [
+              _cE("view", _uM({ class: "weapp-tw-border demo-block" }), [
+                _cE("text", _uM({ class: "weapp-tw-border demo-label" }), "基础用法"),
+                _cE("view", _uM({ class: "weapp-tw-border flex-row items-center" }), [
+                  _cV(_component_up_button, _uM({
+                    type: "primary",
+                    text: "弹出面板",
+                    size: "mini",
+                    onClick: () => {actionSheetShow.value = true}
+                  }), null, 8 /* PROPS */, ["onClick"])
+                ])
+              ]),
+              _cE("view", _uM({ class: "weapp-tw-border demo-block mt-_b12px_B" }), [
+                _cE("text", _uM({ class: "weapp-tw-border demo-label" }), "显示取消按钮"),
+                _cE("view", _uM({ class: "weapp-tw-border flex-row items-center" }), [
+                  _cV(_component_up_button, _uM({
+                    type: "success",
+                    text: "带取消按钮",
+                    size: "mini",
+                    onClick: () => {actionSheetShow2.value = true}
+                  }), null, 8 /* PROPS */, ["onClick"])
+                ])
+              ]),
+              _cE("view", _uM({ class: "weapp-tw-border demo-block mt-_b12px_B" }), [
+                _cE("text", _uM({ class: "weapp-tw-border demo-label" }), "带描述信息与禁用项"),
+                _cE("view", _uM({ class: "weapp-tw-border flex-row items-center" }), [
+                  _cV(_component_up_button, _uM({
+                    type: "warning",
+                    text: "复杂面板",
+                    size: "mini",
+                    onClick: () => {actionSheetShow3.value = true}
+                  }), null, 8 /* PROPS */, ["onClick"])
+                ])
+              ])
+            ]),
+            _cV(_component_up_action_sheet, _uM({
+              show: actionSheetShow.value,
+              actions: actionList.value,
+              title: "请选择操作",
+              onClose: () => {actionSheetShow.value = false},
+              onSelect: onActionSelect
+            }), null, 8 /* PROPS */, ["show", "actions", "onClose"]),
+            _cV(_component_up_action_sheet, _uM({
+              show: actionSheetShow2.value,
+              actions: actionList.value,
+              title: "请选择操作",
+              "cancel-text": "取消",
+              onClose: () => {actionSheetShow2.value = false},
+              onSelect: onActionSelect
+            }), null, 8 /* PROPS */, ["show", "actions", "onClose"]),
+            _cV(_component_up_action_sheet, _uM({
+              show: actionSheetShow3.value,
+              actions: actionListComplex.value,
+              title: "请选择操作",
+              description: "这是一段描述信息",
+              "cancel-text": "取消",
+              onClose: () => {actionSheetShow3.value = false},
+              onSelect: onActionSelect
+            }), null, 8 /* PROPS */, ["show", "actions", "onClose"])
+          ])
+        ]),
+        _: 1 /* STABLE */
+      }))
+    ]),
+    _: 1 /* STABLE */
+  }))
+}
+}
+
+})
+export default __sfc__
+const GenSrcSubUviewUltraDemosActionSheetActionSheetStyles = [_uM([["weapp-tw-border", _pS(_uM([["borderTopWidth", 0], ["borderRightWidth", 0], ["borderBottomWidth", 0], ["borderLeftWidth", 0]]))], ["demo-block", _pS(_uM([["marginBottom", 12], ["paddingTop", 12], ["paddingRight", 12], ["paddingBottom", 12], ["paddingLeft", 12], ["backgroundColor", "#ffffff"], ["borderTopLeftRadius", 8], ["borderTopRightRadius", 8], ["borderBottomRightRadius", 8], ["borderBottomLeftRadius", 8]]))], ["demo-label", _pS(_uM([["fontSize", 14], ["fontWeight", "bold"], ["color", "#606266"], ["marginBottom", 10], ["paddingLeft", 4], ["borderLeftWidth", 3], ["borderLeftStyle", "solid"], ["borderLeftColor", "var(--theme-color, #0957de)"]]))]])]

@@ -125,14 +125,17 @@ description: uni-app X (UTS) 开发规范与踩坑避坑指南，适用于跨端
     `uni_modules/*/components/` 与 `src/components/` 下的组件，模板里直接写 `<uni-icons type="..." />`、`<e-chart />`、`<z-paging-x />` 即可，**无需 `import`**。
     *   *正确做法*：`<uni-icons type="info" size="28" color="#cbd5e1" />`
     *   *错误做法*：`import UniIcons from '@/uni_modules/uni-icons/components/uni-icons/uni-icons.uvue'` 再用 `<UniIcons />` —— 多余的样板代码，标签还被迫改成 PascalCase。
-*   **⚠️ 前提：`vite.config.ts` 里的 easycom 插件必须全平台生效**：
+*   **⚠️ 前提：`vite.config.ts` 里的 easycom 插件必须对 App 端与 Web/H5 端生效（排除小程序端）**：
 
     ```ts
-    // 必须无条件加入，不能只限 web/h5 —— App 端也要靠它把 _resolveComponent 转成静态 import
-    uniEasycomPlugin({ exclude: UNI_EASYCOM_EXCLUDE }),
+    // 服务于 App 端与 Web/H5 端（不能只限 web/h5 —— App 端也要靠它把 _resolveComponent 转成静态 import）；
+    // 小程序端（mp-*）由官方 mp-compiler 原生 usingComponents 处理，必须排除，否则会向 uni-mp-vue 注入缺失的 resolveDynamicComponent 导致编译报错
+    ...(!process.env.UNI_PLATFORM?.startsWith('mp-')
+      ? [uniEasycomPlugin({ exclude: UNI_EASYCOM_EXCLUDE })]
+      : []),
     ```
 
-    该插件内部名为 `uni:app-easycom`。蒸汽模式 + `vapor-render-target: "bytecode"` 下，只有进入模块 import 图的 `.uvue` 才会生成 `bytes/*.bytes` 视图层字节码；插件若在 App 端被 `UNI_PLATFORM` 条件排除，easycom 组件就不生成 bytecode，**云打包安装后组件不渲染**。历史上正是这个条件被误设，才误导出「必须手动 import」的错误结论。
+    该插件内部名为 `uni:app-easycom`。蒸汽模式 + `vapor-render-target: "bytecode"` 下，只有进入模块 import 图的 `.uvue` 才会生成 `bytes/*.bytes` 视图层字节码；插件若在 App 端被条件排除，easycom 组件就不生成 bytecode，**云打包安装后组件不渲染**。但该插件内嵌的转换代码依赖 `vue` 的 `resolveDynamicComponent`，小程序端 `@dcloudio/uni-mp-vue` 未导出该 API，因此必须仅在非小程序端加载。
 *   **例外：不在 easycom 扫描范围内的组件仍需手动 import**：
     easycom 只自动扫描项目根的 `components/组件名/组件名.uvue` 与 `uni_modules/*/components/`。放在页面目录下的私有组件（如 `src/pages/*/components/ToastDemoCard.uvue`）不会被扫描，**必须手动 import**。
 *   **保留 pages.json 的 easycom 配置，不要删**：`autoscan: true` 是 uni_modules 内部互相引用（如 `z-paging-x` → `z-paging-x-empty`）所必需的；自定义规则（如 `^NavBar$`、`^e-chart$`）也保留。

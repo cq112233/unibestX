@@ -362,8 +362,8 @@ const switchNextYearDisabled = computed<boolean>(() => {
 	return monthIndex.value + 12 > months.value.length - 1
 })
 
-const buttonDisabled = computed<boolean>(() => {
-	if (props.mode === 'range') {
+const buttonDisabled = computed<boolean>((): boolean => {
+	if (props.mode == 'range') {
 		return selected.value.length <= 1
 	}
 	return false
@@ -382,11 +382,11 @@ function monthSelectedM(e: Array<string>, scene: string) {
 	selected.value = e
 	if (!props.showConfirm) {
 		if (
-			props.mode === 'multiple' ||
-			props.mode === 'single' ||
-			(props.mode === 'range' && selected.value.length >= 2)
+			props.mode == 'multiple' ||
+			props.mode == 'single' ||
+			(props.mode == 'range' && selected.value.length >= 2)
 		) {
-			if (scene === 'tap') {
+			if (scene == 'tap') {
 				emit('confirm', getConfirmValue())
 			}
 		}
@@ -412,7 +412,7 @@ function getDefaultMonthIndex(): number {
 	}
 	const idx = months.value.findIndex(({ year, month }): boolean => {
 		month = padZero(month)
-		return `${year}-${month}` === sel
+		return `${year}-${month}` == sel
 	})
 	return idx == -1 ? 0 : idx
 }
@@ -520,14 +520,18 @@ function onScroll(event: UniScrollEvent) {
 	const curScrollTop = Math.max(0, event.detail.scrollTop)
 	for (let i = 0; i < months.value.length; i++) {
 		if (curScrollTop >= (months.value[i].top > 0 ? months.value[i].top : listHeight.value)) {
-			monthIndex.value = i
+			if (monthIndex.value != i) {
+				monthIndex.value = i
+			}
 		}
 	}
 }
 
 function init() {
 	listHeight.value = parseInt(props.rowHeight.toString()) * (props.monthSwitch ? 6 : 5) + 30
-	setMonth()
+	if (months.value.length == 0) {
+		setMonth()
+	}
 	inited.value = true
 }
 
@@ -568,6 +572,17 @@ function nextYear() {
 watch((): boolean => props.show, (nval: boolean) => {
 	if (nval) {
 		init()
+		nextTick(() => {
+			let sel = dayuts().format("YYYY-MM")
+			if (props.defaultDate != null) {
+				if (!testArray(props.defaultDate)) {
+					sel = dayuts(props.defaultDate as any).format("YYYY-MM")
+				} else if ((props.defaultDate as Array<any>).length > 0) {
+					sel = dayuts((props.defaultDate as Array<any>)[0] as any).format("YYYY-MM")
+				}
+			}
+			scrollIntoDefaultMonth(sel)
+		})
 	} else {
 		scrollIntoView.value = ''
 	}

@@ -1,0 +1,972 @@
+/**
+ * unix-crypto 加密解密工具库（uni-app X 跨端纯 UTS 插件）
+ *
+ * 全平台支持：App (Android / iOS / 鸿蒙) / H5 / 微信小程序等全端
+ * 提供：
+ * 1. Base64 编码与解码
+ * 2. MD5 摘要计算
+ * 3. SHA-256 摘要计算
+ * 4. HMAC-SHA1 签名
+ * 5. AES-128 加解密（ECB / PKCS7 / Hex 密文）
+ * 6. DES 加解密（ECB / PKCS7 / Hex 密文）
+ * 7. RSA 密钥对生成、公钥加密、私钥解密、SHA-256 签名与验签
+ */
+
+import { rsaEncryptUts, rsaDecryptUts, rsaSignUts, rsaVerifyUts, rsaGenerateKeyPairUts } from './rsa'
+
+// ---- 通用工具：字节、文本、Base64 与十六进制互转 ----
+
+/**
+ * 字符串转 UTF-8 字节数组
+ * @param text 原始字符串
+ * @returns UTF-8 编码的字节数组
+ */
+function textToBytes(text: string): Uint8Array {
+  return new TextEncoder().encode(text)
+}
+
+/**
+ * UTF-8 字节数组转字符串
+ * @param bytes UTF-8 编码的字节数组
+ * @returns 解码后的字符串
+ */
+function bytesToText(bytes: Uint8Array): string {
+  return new TextDecoder().decode(bytes)
+}
+
+/**
+ * 字节数组转 Base64 字符串
+ * @param bytes 字节数组
+ * @returns Base64 字符串
+ */
+function bytesToBase64(bytes: Uint8Array): string {
+  return uni.arrayBufferToBase64(bytes.buffer as ArrayBuffer)
+}
+
+/**
+ * Base64 字符串转字节数组
+ * @param b64 Base64 字符串
+ * @returns 字节数组
+ */
+function base64ToBytes(b64: string): Uint8Array {
+  return new Uint8Array(uni.base64ToArrayBuffer(b64))
+}
+
+/**
+ * 字节数组转十六进制字符串（小写）
+ * @param bytes 字节数组
+ * @returns 十六进制字符串
+ */
+function bytesToHex(bytes: Uint8Array): string {
+  let result = ''
+  for (let i = 0; i < bytes.length; i++) {
+    const b = bytes[i] | 0
+    result += (b < 16 ? '0' : '') + b.toString(16)
+  }
+  return result
+}
+
+/**
+ * 十六进制字符串转字节数组
+ * @param hex 十六进制字符串（偶数长度）
+ * @returns 字节数组
+ */
+function hexToBytes(hex: string): Uint8Array {
+  const len = hex.length / 2
+  const bytes = new Uint8Array(len)
+  for (let i = 0; i < len; i++) {
+    bytes[i] = parseInt(hex.substring(i * 2, i * 2 + 2), 16)
+  }
+  return bytes
+}
+
+/**
+ * 复制字节数组到目标数组的指定位置
+ * @param src 源字节数组
+ * @param dst 目标字节数组
+ * @param dstOff 目标起始偏移
+ */
+function copyBytes(src: Uint8Array, dst: Uint8Array, dstOff: number): void {
+  for (let i = 0; i < src.length; i++) {
+    dst[dstOff + i] = src[i]
+  }
+}
+
+/**
+ * 截取字节数组的子区间
+ * @param bytes 原始字节数组
+ * @param start 起始下标（含）
+ * @param end 结束下标（不含）
+ * @returns 子区间字节数组
+ */
+function subBytes(bytes: Uint8Array, start: number, end: number): Uint8Array {
+  const len = end - start
+  const out = new Uint8Array(len)
+  for (let i = 0; i < len; i++) {
+    out[i] = bytes[start + i]
+  }
+  return out
+}
+
+/**
+ * 大端序读取 32 位无符号整数
+ * @param bytes 字节数组
+ * @param off 起始偏移
+ * @returns 32 位无符号整数
+ */
+function readUint32BE(bytes: Uint8Array, off: number): number {
+  return ((((bytes[off] | 0) << 24) | ((bytes[off + 1] | 0) << 16) | ((bytes[off + 2] | 0) << 8) | (bytes[off + 3] | 0))) >>> 0
+}
+
+/**
+ * 大端序写入 32 位无符号整数
+ * @param out 目标字节数组
+ * @param off 起始偏移
+ * @param v 32 位无符号整数
+ */
+function writeUint32BE(out: Uint8Array, off: number, v: number): void {
+  out[off] = (v >>> 24) & 0xff
+  out[off + 1] = (v >>> 16) & 0xff
+  out[off + 2] = (v >>> 8) & 0xff
+  out[off + 3] = v & 0xff
+}
+
+/**
+ * 小端序读取 32 位无符号整数
+ * @param bytes 字节数组
+ * @param off 起始偏移
+ * @returns 32 位无符号整数
+ */
+function readUint32LE(bytes: Uint8Array, off: number): number {
+  return (((bytes[off] | 0) | ((bytes[off + 1] | 0) << 8) | ((bytes[off + 2] | 0) << 16) | ((bytes[off + 3] | 0) << 24))) >>> 0
+}
+
+/**
+ * 小端序写入 32 位无符号整数
+ * @param out 目标字节数组
+ * @param off 起始偏移
+ * @param v 32 位无符号整数
+ */
+function writeUint32LE(out: Uint8Array, off: number, v: number): void {
+  out[off] = v & 0xff
+  out[off + 1] = (v >>> 8) & 0xff
+  out[off + 2] = (v >>> 16) & 0xff
+  out[off + 3] = (v >>> 24) & 0xff
+}
+
+/**
+ * 32 位循环左移
+ * @param x 原始值
+ * @param c 左移位数
+ * @returns 循环左移结果
+ */
+function rotl32(x: number, c: number): number {
+  return ((x << c) | (x >>> (32 - c))) >>> 0
+}
+
+/**
+ * 32 位循环右移
+ * @param x 原始值
+ * @param n 右移位数
+ * @returns 循环右移结果
+ */
+function rotr32(x: number, n: number): number {
+  return ((x >>> n) | (x << (32 - n))) >>> 0
+}
+
+// ---- MD5 ----
+
+const MD5_K: number[] = [
+  0xd76aa478, 0xe8c7b756, 0x242070db, 0xc1bdceee,
+  0xf57c0faf, 0x4787c62a, 0xa8304613, 0xfd469501,
+  0x698098d8, 0x8b44f7af, 0xffff5bb1, 0x895cd7be,
+  0x6b901122, 0xfd987193, 0xa679438e, 0x49b40821,
+  0xf61e2562, 0xc040b340, 0x265e5a51, 0xe9b6c7aa,
+  0xd62f105d, 0x02441453, 0xd8a1e681, 0xe7d3fbc8,
+  0x21e1cde6, 0xc33707d6, 0xf4d50d87, 0x455a14ed,
+  0xa9e3e905, 0xfcefa3f8, 0x676f02d9, 0x8d2a4c8a,
+  0xfffa3942, 0x8771f681, 0x6d9d6122, 0xfde5380c,
+  0xa4beea44, 0x4bdecfa9, 0xf6bb4b60, 0xbebfbc70,
+  0x289b7ec6, 0xeaa127fa, 0xd4ef3085, 0x04881d05,
+  0xd9d4d039, 0xe6db99e5, 0x1fa27cf8, 0xc4ac5665,
+  0xf4292244, 0x432aff97, 0xab9423a7, 0xfc93a039,
+  0x655b59c3, 0x8f0ccc92, 0xffeff47d, 0x85845dd1,
+  0x6fa87e4f, 0xfe2ce6e0, 0xa3014314, 0x4e0811a1,
+  0xf7537e82, 0xbd3af235, 0x2ad7d2bb, 0xeb86d391,
+]
+
+const MD5_S: number[] = [
+  7, 12, 17, 22,  7, 12, 17, 22,  7, 12, 17, 22,  7, 12, 17, 22,
+  5,  9, 14, 20,  5,  9, 14, 20,  5,  9, 14, 20,  5,  9, 14, 20,
+  4, 11, 16, 23,  4, 11, 16, 23,  4, 11, 16, 23,  4, 11, 16, 23,
+  6, 10, 15, 21,  6, 10, 15, 21,  6, 10, 15, 21,  6, 10, 15, 21,
+]
+
+function md5Bytes(data: Uint8Array): string {
+  const origLen = data.length
+  const bitLen = origLen * 8
+  const padLen = (origLen % 64 < 56) ? (56 - origLen % 64) : (120 - origLen % 64)
+  const totalLen = origLen + padLen + 8
+  const msg = new Uint8Array(totalLen)
+  copyBytes(data, msg, 0)
+  msg[origLen] = 0x80
+  const lowBits = (bitLen >>> 0)
+  const highBits = Math.floor(bitLen / 0x100000000)
+  writeUint32LE(msg, totalLen - 8, lowBits)
+  writeUint32LE(msg, totalLen - 4, highBits)
+
+  let a0 = 0x67452301
+  let b0 = 0xefcdab89
+  let c0 = 0x98badcfe
+  let d0 = 0x10325476
+
+  for (let off = 0; off < totalLen; off += 64) {
+    const M: number[] = []
+    for (let j = 0; j < 16; j++) {
+      M.push(readUint32LE(msg, off + j * 4))
+    }
+    let A = a0
+    let B = b0
+    let C = c0
+    let D = d0
+    for (let i = 0; i < 64; i++) {
+      let F: number = 0
+      let g: number = 0
+      if (i < 16) {
+        F = (B & C) | ((~B) & D)
+        g = i
+      }
+      else if (i < 32) {
+        F = (D & B) | ((~D) & C)
+        g = (5 * i + 1) % 16
+      }
+      else if (i < 48) {
+        F = B ^ C ^ D
+        g = (3 * i + 5) % 16
+      }
+      else {
+        F = C ^ (B | (~D))
+        g = (7 * i) % 16
+      }
+      const dTemp = D
+      D = C
+      C = B
+      const sum = (A + F + MD5_K[i] + M[g]) >>> 0
+      B = (B + rotl32(sum, MD5_S[i])) >>> 0
+      A = dTemp
+    }
+    a0 = (a0 + A) >>> 0
+    b0 = (b0 + B) >>> 0
+    c0 = (c0 + C) >>> 0
+    d0 = (d0 + D) >>> 0
+  }
+
+  const out = new Uint8Array(16)
+  writeUint32LE(out, 0, a0)
+  writeUint32LE(out, 4, b0)
+  writeUint32LE(out, 8, c0)
+  writeUint32LE(out, 12, d0)
+  return bytesToHex(out)
+}
+
+// ---- SHA-1 ----
+
+function sha1Bytes(data: Uint8Array): string {
+  const origLen = data.length
+  const bitLen = origLen * 8
+  const padLen = (origLen % 64 < 56) ? (56 - origLen % 64) : (120 - origLen % 64)
+  const totalLen = origLen + padLen + 8
+  const msg = new Uint8Array(totalLen)
+  copyBytes(data, msg, 0)
+  msg[origLen] = 0x80
+  const highBits = Math.floor(bitLen / 0x100000000)
+  const lowBits = (bitLen >>> 0)
+  writeUint32BE(msg, totalLen - 8, highBits)
+  writeUint32BE(msg, totalLen - 4, lowBits)
+
+  let h0 = 0x67452301
+  let h1 = 0xefcdab89
+  let h2 = 0x98badcfe
+  let h3 = 0x10325476
+  let h4 = 0xc3d2e1f0
+
+  for (let off = 0; off < totalLen; off += 64) {
+    const w: number[] = []
+    for (let i = 0; i < 16; i++) {
+      w.push(readUint32BE(msg, off + i * 4))
+    }
+    for (let i = 16; i < 80; i++) {
+      w.push(rotl32(w[i - 3] ^ w[i - 8] ^ w[i - 14] ^ w[i - 16], 1))
+    }
+    let a = h0
+    let b = h1
+    let c = h2
+    let d = h3
+    let e = h4
+    for (let i = 0; i < 80; i++) {
+      let f: number = 0
+      let k: number = 0
+      if (i < 20) {
+        f = (b & c) | ((~b) & d)
+        k = 0x5a827999
+      }
+      else if (i < 40) {
+        f = b ^ c ^ d
+        k = 0x6ed9eba1
+      }
+      else if (i < 60) {
+        f = (b & c) | (b & d) | (c & d)
+        k = 0x8f1bbcdc
+      }
+      else {
+        f = b ^ c ^ d
+        k = 0xca62c1d6
+      }
+      const temp = (rotl32(a, 5) + f + e + k + w[i]) >>> 0
+      e = d
+      d = c
+      c = rotl32(b, 30)
+      b = a
+      a = temp
+    }
+    h0 = (h0 + a) >>> 0
+    h1 = (h1 + b) >>> 0
+    h2 = (h2 + c) >>> 0
+    h3 = (h3 + d) >>> 0
+    h4 = (h4 + e) >>> 0
+  }
+
+  const out = new Uint8Array(20)
+  writeUint32BE(out, 0, h0)
+  writeUint32BE(out, 4, h1)
+  writeUint32BE(out, 8, h2)
+  writeUint32BE(out, 12, h3)
+  writeUint32BE(out, 16, h4)
+  return bytesToHex(out)
+}
+
+// ---- SHA-256 ----
+
+const SHA256_K: number[] = [
+  0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
+  0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
+  0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da,
+  0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7, 0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967,
+  0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13, 0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85,
+  0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070,
+  0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3,
+  0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2,
+]
+
+function sha256Bytes(data: Uint8Array): string {
+  const origLen = data.length
+  const bitLen = origLen * 8
+  const padLen = (origLen % 64 < 56) ? (56 - origLen % 64) : (120 - origLen % 64)
+  const totalLen = origLen + padLen + 8
+  const msg = new Uint8Array(totalLen)
+  copyBytes(data, msg, 0)
+  msg[origLen] = 0x80
+  const highBits = Math.floor(bitLen / 0x100000000)
+  const lowBits = (bitLen >>> 0)
+  writeUint32BE(msg, totalLen - 8, highBits)
+  writeUint32BE(msg, totalLen - 4, lowBits)
+
+  let h0 = 0x6a09e667
+  let h1 = 0xbb67ae85
+  let h2 = 0x3c6ef372
+  let h3 = 0xa54ff53a
+  let h4 = 0x510e527f
+  let h5 = 0x9b05688c
+  let h6 = 0x1f83d9ab
+  let h7 = 0x5be0cd19
+
+  for (let off = 0; off < totalLen; off += 64) {
+    const w: number[] = []
+    for (let i = 0; i < 16; i++) {
+      w.push(readUint32BE(msg, off + i * 4))
+    }
+    for (let i = 16; i < 64; i++) {
+      const s0 = rotr32(w[i - 15], 7) ^ rotr32(w[i - 15], 18) ^ (w[i - 15] >>> 3)
+      const s1 = rotr32(w[i - 2], 17) ^ rotr32(w[i - 2], 19) ^ (w[i - 2] >>> 10)
+      w.push((w[i - 16] + s0 + w[i - 7] + s1) >>> 0)
+    }
+    let a = h0
+    let b = h1
+    let c = h2
+    let d = h3
+    let e = h4
+    let f = h5
+    let g = h6
+    let h = h7
+    for (let i = 0; i < 64; i++) {
+      const S1 = rotr32(e, 6) ^ rotr32(e, 11) ^ rotr32(e, 25)
+      const ch = (e & f) ^ ((~e) & g)
+      const temp1 = (h + S1 + ch + SHA256_K[i] + w[i]) >>> 0
+      const S0 = rotr32(a, 2) ^ rotr32(a, 13) ^ rotr32(a, 22)
+      const maj = (a & b) ^ (a & c) ^ (b & c)
+      const temp2 = (S0 + maj) >>> 0
+      h = g
+      g = f
+      f = e
+      e = (d + temp1) >>> 0
+      d = c
+      c = b
+      b = a
+      a = (temp1 + temp2) >>> 0
+    }
+    h0 = (h0 + a) >>> 0
+    h1 = (h1 + b) >>> 0
+    h2 = (h2 + c) >>> 0
+    h3 = (h3 + d) >>> 0
+    h4 = (h4 + e) >>> 0
+    h5 = (h5 + f) >>> 0
+    h6 = (h6 + g) >>> 0
+    h7 = (h7 + h) >>> 0
+  }
+
+  const out = new Uint8Array(32)
+  writeUint32BE(out, 0, h0)
+  writeUint32BE(out, 4, h1)
+  writeUint32BE(out, 8, h2)
+  writeUint32BE(out, 12, h3)
+  writeUint32BE(out, 16, h4)
+  writeUint32BE(out, 20, h5)
+  writeUint32BE(out, 24, h6)
+  writeUint32BE(out, 28, h7)
+  return bytesToHex(out)
+}
+
+// ---- HMAC-SHA1 ----
+
+function hmacSha1Bytes(text: string, key: string): string {
+  const blockSize: number = 64
+  const msg = textToBytes(text)
+  let keyBytes = textToBytes(key)
+  if (keyBytes.length > blockSize) keyBytes = hexToBytes(sha1Bytes(keyBytes))
+  const ipad = new Uint8Array(blockSize)
+  const opad = new Uint8Array(blockSize)
+  for (let i = 0; i < blockSize; i++) {
+    const kb: number = i < keyBytes.length ? (keyBytes[i] | 0) : 0
+    ipad[i] = kb ^ 0x36
+    opad[i] = kb ^ 0x5c
+  }
+  const inner = new Uint8Array(blockSize + msg.length)
+  copyBytes(ipad, inner, 0)
+  copyBytes(msg, inner, blockSize)
+  const innerHash = hexToBytes(sha1Bytes(inner))
+  const outer = new Uint8Array(blockSize + 20)
+  copyBytes(opad, outer, 0)
+  copyBytes(innerHash, outer, blockSize)
+  return sha1Bytes(outer)
+}
+
+// ---- AES-128 ECB ----
+
+const AES_SBOX: number[] = []
+const AES_INV_SBOX: number[] = []
+const AES_SUB_MIX: Array<Array<number>> = [[] as number[], [] as number[], [] as number[], [] as number[]]
+const AES_INV_SUB_MIX: Array<Array<number>> = [[] as number[], [] as number[], [] as number[], [] as number[]]
+const AES_RCON: number[] = [0x00, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36]
+
+function aesBuildTables(): void {
+  const d: number[] = []
+  for (let i = 0; i < 256; i++) {
+    d.push(i < 128 ? i << 1 : (i << 1) ^ 0x11b)
+    AES_SBOX.push(0)
+    AES_INV_SBOX.push(0)
+    for (let j = 0; j < 4; j++) {
+      AES_SUB_MIX[j].push(0)
+      AES_INV_SUB_MIX[j].push(0)
+    }
+  }
+  let x: number = 0
+  let xi: number = 0
+  for (let i = 0; i < 256; i++) {
+    let sx: number = xi ^ (xi << 1) ^ (xi << 2) ^ (xi << 3) ^ (xi << 4)
+    sx = (sx >>> 8) ^ (sx & 0xff) ^ 0x63
+    AES_SBOX[x] = sx
+    AES_INV_SBOX[sx] = x
+    const x2 = d[x]
+    const x4 = d[x2]
+    const x8 = d[x4]
+    let t = (d[sx] * 0x101) ^ (sx * 0x1010100)
+    AES_SUB_MIX[0][x] = (t << 24) | (t >>> 8)
+    AES_SUB_MIX[1][x] = (t << 16) | (t >>> 16)
+    AES_SUB_MIX[2][x] = (t << 8) | (t >>> 24)
+    AES_SUB_MIX[3][x] = t
+    t = (x8 * 0x1010101) ^ (x4 * 0x10001) ^ (x2 * 0x101) ^ (x * 0x1010100)
+    AES_INV_SUB_MIX[0][sx] = (t << 24) | (t >>> 8)
+    AES_INV_SUB_MIX[1][sx] = (t << 16) | (t >>> 16)
+    AES_INV_SUB_MIX[2][sx] = (t << 8) | (t >>> 24)
+    AES_INV_SUB_MIX[3][sx] = t
+    if (x == 0) {
+      x = 1
+      xi = 1
+    }
+    else {
+      x = x2 ^ d[d[d[x8 ^ x2]]]
+      xi ^= d[d[xi]]
+    }
+  }
+}
+aesBuildTables()
+
+function aesExpandKeyWords(key: Uint8Array): number[] {
+  const keySchedule: number[] = []
+  for (let i = 0; i < 4; i++) {
+    keySchedule.push(((key[i * 4] | 0) << 24) | ((key[i * 4 + 1] | 0) << 16) | ((key[i * 4 + 2] | 0) << 8) | (key[i * 4 + 3] | 0))
+  }
+  for (let ksRow = 4; ksRow < 44; ksRow++) {
+    let t: number = keySchedule[ksRow - 1]
+    if (ksRow % 4 == 0) {
+      t = (t << 8) | (t >>> 24)
+      t = (AES_SBOX[t >>> 24] << 24) | (AES_SBOX[(t >>> 16) & 0xff] << 16) | (AES_SBOX[(t >>> 8) & 0xff] << 8) | AES_SBOX[t & 0xff]
+      t ^= AES_RCON[Math.floor(ksRow / 4)] << 24
+    }
+    keySchedule.push(keySchedule[ksRow - 4] ^ t)
+  }
+  return keySchedule
+}
+
+function aesInvExpandKeyWords(keySchedule: number[]): number[] {
+  const invKeySchedule: number[] = []
+  const ksRows = 44
+  for (let invKsRow = 0; invKsRow < ksRows; invKsRow++) {
+    const ksRow = ksRows - invKsRow
+    const t: number = (invKsRow % 4 != 0) ? keySchedule[ksRow] : keySchedule[ksRow - 4]
+    if (invKsRow < 4 || ksRow <= 4) {
+      invKeySchedule.push(t)
+    }
+    else {
+      const v = (
+        AES_INV_SUB_MIX[0][AES_SBOX[t >>> 24]] ^
+        AES_INV_SUB_MIX[1][AES_SBOX[(t >>> 16) & 0xff]] ^
+        AES_INV_SUB_MIX[2][AES_SBOX[(t >>> 8) & 0xff]] ^
+        AES_INV_SUB_MIX[3][AES_SBOX[t & 0xff]]
+      ) >>> 0
+      invKeySchedule.push(v)
+    }
+  }
+  return invKeySchedule
+}
+
+function aesDoCryptBlock(
+  M: number[],
+  offset: number,
+  keySchedule: number[],
+  SUB_MIX_0: number[],
+  SUB_MIX_1: number[],
+  SUB_MIX_2: number[],
+  SUB_MIX_3: number[],
+  SBOX: number[],
+): void {
+  let s0 = M[offset] ^ keySchedule[0]
+  let s1 = M[offset + 1] ^ keySchedule[1]
+  let s2 = M[offset + 2] ^ keySchedule[2]
+  let s3 = M[offset + 3] ^ keySchedule[3]
+  let ksRows = 4
+  for (let round = 1; round < 10; round++) {
+    const t0 = (SUB_MIX_0[s0 >>> 24] ^ SUB_MIX_1[(s1 >>> 16) & 0xff] ^ SUB_MIX_2[(s2 >>> 8) & 0xff] ^ SUB_MIX_3[s3 & 0xff] ^ keySchedule[ksRows++]) >>> 0
+    const t1 = (SUB_MIX_0[s1 >>> 24] ^ SUB_MIX_1[(s2 >>> 16) & 0xff] ^ SUB_MIX_2[(s3 >>> 8) & 0xff] ^ SUB_MIX_3[s0 & 0xff] ^ keySchedule[ksRows++]) >>> 0
+    const t2 = (SUB_MIX_0[s2 >>> 24] ^ SUB_MIX_1[(s3 >>> 16) & 0xff] ^ SUB_MIX_2[(s0 >>> 8) & 0xff] ^ SUB_MIX_3[s1 & 0xff] ^ keySchedule[ksRows++]) >>> 0
+    const t3 = (SUB_MIX_0[s3 >>> 24] ^ SUB_MIX_1[(s0 >>> 16) & 0xff] ^ SUB_MIX_2[(s1 >>> 8) & 0xff] ^ SUB_MIX_3[s2 & 0xff] ^ keySchedule[ksRows++]) >>> 0
+    s0 = t0
+    s1 = t1
+    s2 = t2
+    s3 = t3
+  }
+  const u0 = (((SBOX[s0 >>> 24] << 24) | (SBOX[(s1 >>> 16) & 0xff] << 16) | (SBOX[(s2 >>> 8) & 0xff] << 8) | SBOX[s3 & 0xff]) ^ keySchedule[ksRows++]) >>> 0
+  const u1 = (((SBOX[s1 >>> 24] << 24) | (SBOX[(s2 >>> 16) & 0xff] << 16) | (SBOX[(s3 >>> 8) & 0xff] << 8) | SBOX[s0 & 0xff]) ^ keySchedule[ksRows++]) >>> 0
+  const u2 = (((SBOX[s2 >>> 24] << 24) | (SBOX[(s3 >>> 16) & 0xff] << 16) | (SBOX[(s0 >>> 8) & 0xff] << 8) | SBOX[s1 & 0xff]) ^ keySchedule[ksRows++]) >>> 0
+  const u3 = (((SBOX[s3 >>> 24] << 24) | (SBOX[(s0 >>> 16) & 0xff] << 16) | (SBOX[(s1 >>> 8) & 0xff] << 8) | SBOX[s2 & 0xff]) ^ keySchedule[ksRows++]) >>> 0
+  M[offset] = u0
+  M[offset + 1] = u1
+  M[offset + 2] = u2
+  M[offset + 3] = u3
+}
+
+function aesBytesToWords(bytes: Uint8Array, off: number): number[] {
+  const w: number[] = []
+  for (let i = 0; i < 4; i++) {
+    w.push(((bytes[off + i * 4] | 0) << 24) | ((bytes[off + i * 4 + 1] | 0) << 16) | ((bytes[off + i * 4 + 2] | 0) << 8) | (bytes[off + i * 4 + 3] | 0))
+  }
+  return w
+}
+
+function aesWordsToBytes(words: number[]): Uint8Array {
+  const out = new Uint8Array(16)
+  for (let i = 0; i < 4; i++) {
+    out[i * 4] = (words[i] >>> 24) & 0xff
+    out[i * 4 + 1] = (words[i] >>> 16) & 0xff
+    out[i * 4 + 2] = (words[i] >>> 8) & 0xff
+    out[i * 4 + 3] = words[i] & 0xff
+  }
+  return out
+}
+
+function aesEncryptBlock(block: Uint8Array, off: number, keySchedule: number[]): Uint8Array {
+  const words = aesBytesToWords(block, off)
+  aesDoCryptBlock(words, 0, keySchedule, AES_SUB_MIX[0], AES_SUB_MIX[1], AES_SUB_MIX[2], AES_SUB_MIX[3], AES_SBOX)
+  return aesWordsToBytes(words)
+}
+
+function aesDecryptBlock(block: Uint8Array, off: number, invKeySchedule: number[]): Uint8Array {
+  const words = aesBytesToWords(block, off)
+  let t: number = words[1]
+  words[1] = words[3]
+  words[3] = t
+  aesDoCryptBlock(words, 0, invKeySchedule, AES_INV_SUB_MIX[0], AES_INV_SUB_MIX[1], AES_INV_SUB_MIX[2], AES_INV_SUB_MIX[3], AES_INV_SBOX)
+  t = words[1]
+  words[1] = words[3]
+  words[3] = t
+  return aesWordsToBytes(words)
+}
+
+function aesCipher(text: string, key: string, decrypt: boolean): string {
+  const pt = decrypt ? hexToBytes(text) : textToBytes(text)
+  const paddedLen: number = decrypt ? pt.length : Math.ceil((pt.length + 1) / 16) * 16
+  const block = new Uint8Array(paddedLen)
+  copyBytes(pt, block, 0)
+  if (!decrypt) {
+    for (let i = pt.length; i < paddedLen; i++) block[i] = paddedLen - pt.length
+  }
+  const keyBytes = textToBytes(key)
+  if (keyBytes.length != 16) throw new Error('AES 密钥必须为 16 字节（16 个 ASCII 字符）')
+  const schedule = decrypt ? aesInvExpandKeyWords(aesExpandKeyWords(keyBytes)) : aesExpandKeyWords(keyBytes)
+  const out = new Uint8Array(paddedLen)
+  for (let off = 0; off < paddedLen; off += 16) {
+    const res = decrypt ? aesDecryptBlock(block, off, schedule) : aesEncryptBlock(block, off, schedule)
+    for (let j = 0; j < 16; j++) out[off + j] = res[j]
+  }
+  if (!decrypt) return bytesToHex(out)
+  const pad: number = out[out.length - 1] | 0
+  if (pad < 1 || pad > 16) throw new Error('AES 解密填充无效')
+  return bytesToText(subBytes(out, 0, out.length - pad))
+}
+
+// ---- DES-ECB ----
+
+const DES_IP: number[] = [58,50,42,34,26,18,10,2,60,52,44,36,28,20,12,4,62,54,46,38,30,22,14,6,64,56,48,40,32,24,16,8,57,49,41,33,25,17,9,1,59,51,43,35,27,19,11,3,61,53,45,37,29,21,13,5,63,55,47,39,31,23,15,7]
+const DES_FP: number[] = [40,8,48,16,56,24,64,32,39,7,47,15,55,23,63,31,38,6,46,14,54,22,62,30,37,5,45,13,53,21,61,29,36,4,44,12,52,20,60,28,35,3,43,11,51,19,59,27,34,2,42,10,50,18,58,26,33,1,41,9,49,17,57,25]
+const DES_E: number[] = [32,1,2,3,4,5,4,5,6,7,8,9,8,9,10,11,12,13,12,13,14,15,16,17,16,17,18,19,20,21,20,21,22,23,24,25,24,25,26,27,28,29,28,29,30,31,32,1]
+const DES_P: number[] = [16,7,20,21,29,12,28,17,1,15,23,26,5,18,31,10,2,8,24,14,32,27,3,9,19,13,30,6,22,11,4,25]
+const DES_PC1: number[] = [57,49,41,33,25,17,9,1,58,50,42,34,26,18,10,2,59,51,43,35,27,19,11,3,60,52,44,36,63,55,47,39,31,23,15,7,62,54,46,38,30,22,14,6,61,53,45,37,29,21,13,5,28,20,12,4]
+const DES_PC2: number[] = [14,17,11,24,1,5,3,28,15,6,21,10,23,19,12,4,26,8,16,7,27,20,13,2,41,52,31,37,47,55,30,40,51,45,33,48,44,49,39,56,34,53,46,42,50,36,29,32]
+const DES_SHIFTS: number[] = [1,1,2,2,2,2,2,2,1,2,2,2,2,2,2,1]
+const DES_SBOX: Array<Array<number>> = [
+  [14,4,13,1,2,15,11,8,3,10,6,12,5,9,0,7,0,15,7,4,14,2,13,1,10,6,12,11,9,5,3,8,4,1,14,8,13,6,2,11,15,12,9,7,3,10,5,0,15,12,8,2,4,9,1,7,5,11,3,14,10,0,6,13],
+  [15,1,8,14,6,11,3,4,9,7,2,13,12,0,5,10,3,13,4,7,15,2,8,14,12,0,1,10,6,9,11,5,0,14,7,11,10,4,13,1,5,8,12,6,9,3,2,15,13,8,10,1,3,15,4,2,11,6,7,12,0,5,14,9],
+  [10,0,9,14,6,3,15,5,1,13,12,7,11,4,2,8,13,7,0,9,3,4,6,10,2,8,5,14,12,11,15,1,13,6,4,9,8,15,3,0,11,1,2,12,5,10,14,7,1,10,13,0,6,9,8,7,4,15,14,3,11,5,2,12],
+  [7,13,14,3,0,6,9,10,1,2,8,5,11,12,4,15,13,8,11,5,6,15,0,3,4,7,2,12,1,10,14,9,10,6,9,0,12,11,7,13,15,1,3,14,5,2,8,4,3,15,0,6,10,1,13,8,9,4,5,11,12,7,2,14],
+  [2,12,4,1,7,10,11,6,8,5,3,15,13,0,14,9,14,11,2,12,4,7,13,1,5,0,15,10,3,9,8,6,4,2,1,11,10,13,7,8,15,9,12,5,6,3,0,14,11,8,12,7,1,14,2,13,6,15,0,9,10,4,5,3],
+  [12,1,10,15,9,2,6,8,0,13,3,4,14,7,5,11,10,15,4,2,7,12,9,5,6,1,13,14,0,11,3,8,9,14,15,5,2,8,12,3,7,0,4,10,1,13,11,6,4,3,2,12,9,5,15,10,11,14,1,7,6,0,8,13],
+  [4,11,2,14,15,0,8,13,3,12,9,7,5,10,6,1,13,0,11,7,4,9,1,10,14,3,5,12,2,15,8,6,1,4,11,13,12,3,7,14,10,15,6,8,0,5,9,2,6,11,13,8,1,4,10,7,9,5,0,15,14,2,3,12],
+  [13,2,8,4,6,15,11,1,10,9,3,14,5,0,12,7,1,15,13,8,10,3,7,4,12,5,6,11,0,14,9,2,7,11,4,1,9,12,14,2,0,6,10,13,15,3,5,8,2,1,14,7,4,10,8,13,15,12,9,0,3,5,6,11],
+]
+
+function desBytesToBits(bytes: Uint8Array): number[] {
+  const bits: number[] = []
+  for (let i = 0; i < bytes.length; i++) {
+    const b = bytes[i] | 0
+    for (let j = 7; j >= 0; j--) bits.push((b >> j) & 1)
+  }
+  return bits
+}
+
+function desBitsToBytes(bits: number[]): Uint8Array {
+  const out = new Uint8Array(bits.length / 8)
+  for (let i = 0; i < out.length; i++) {
+    let v: number = 0
+    for (let j = 0; j < 8; j++) v = (v << 1) | bits[i * 8 + j]
+    out[i] = v
+  }
+  return out
+}
+
+function desPermute(bits: number[], table: number[]): number[] {
+  const out: number[] = []
+  for (let i = 0; i < table.length; i++) out.push(bits[table[i] - 1])
+  return out
+}
+
+function desRotateLeft(bits: number[], shift: number): number[] {
+  return bits.slice(shift).concat(bits.slice(0, shift))
+}
+
+function desBitsToNum(bits: number[]): number {
+  let v: number = 0
+  for (let i = 0; i < bits.length; i++) v = ((v << 1) | bits[i]) >>> 0
+  return v
+}
+
+function desSubKeys(key: Uint8Array): Array<Array<number>> {
+  let cd: number[] = desPermute(desBytesToBits(key), DES_PC1)
+  const subkeys: Array<Array<number>> = []
+  for (let i = 0; i < 16; i++) {
+    const c = desRotateLeft(cd.slice(0, 28), DES_SHIFTS[i])
+    const d = desRotateLeft(cd.slice(28), DES_SHIFTS[i])
+    cd = c.concat(d)
+    subkeys.push(desPermute(cd, DES_PC2))
+  }
+  return subkeys
+}
+
+function desFeistel(rBits: number[], subkey: number[]): number[] {
+  const expanded = desPermute(rBits, DES_E)
+  const xored: number[] = []
+  for (let i = 0; i < 48; i++) xored.push(expanded[i] ^ subkey[i])
+  let sboxOut: number[] = []
+  for (let i = 0; i < 8; i++) {
+    const group = xored.slice(i * 6, i * 6 + 6)
+    const row = (group[0] << 1) | group[5]
+    const col = desBitsToNum(group.slice(1, 5))
+    const val = DES_SBOX[i][row * 16 + col]
+    sboxOut = sboxOut.concat([(val >> 3) & 1, (val >> 2) & 1, (val >> 1) & 1, val & 1])
+  }
+  return desPermute(sboxOut, DES_P)
+}
+
+function desProcessBlock(block: Uint8Array, off: number, subkeys: Array<Array<number>>): Uint8Array {
+  const blockBits: number[] = []
+  for (let i = 0; i < 8; i++) {
+    const b = block[off + i] | 0
+    for (let j = 7; j >= 0; j--) blockBits.push((b >> j) & 1)
+  }
+  let bits: number[] = desPermute(blockBits, DES_IP)
+  let l: number[] = bits.slice(0, 32)
+  let r: number[] = bits.slice(32)
+  for (let i = 0; i < 16; i++) {
+    const f = desFeistel(r, subkeys[i])
+    const nr: number[] = []
+    for (let j = 0; j < 32; j++) nr.push(l[j] ^ f[j])
+    l = r
+    r = nr
+  }
+  return desBitsToBytes(desPermute(r.concat(l), DES_FP))
+}
+
+function desCipher(text: string, key: string, decrypt: boolean): string {
+  const pt = decrypt ? hexToBytes(text) : textToBytes(text)
+  const paddedLen: number = decrypt ? pt.length : Math.ceil((pt.length + 1) / 8) * 8
+  const block = new Uint8Array(paddedLen)
+  copyBytes(pt, block, 0)
+  if (!decrypt) {
+    for (let i = pt.length; i < paddedLen; i++) block[i] = paddedLen - pt.length
+  }
+  const keyBytes = textToBytes(key)
+  if (keyBytes.length != 8) throw new Error('DES 密钥必须为 8 字节（8 个 ASCII 字符）')
+  const subkeys = desSubKeys(keyBytes)
+  if (decrypt) subkeys.reverse()
+  const out = new Uint8Array(paddedLen)
+  for (let off = 0; off < paddedLen; off += 8) {
+    const res = desProcessBlock(block, off, subkeys)
+    for (let j = 0; j < 8; j++) out[off + j] = res[j]
+  }
+  if (!decrypt) return bytesToHex(out)
+  const pad: number = out[out.length - 1] | 0
+  if (pad < 1 || pad > 8) throw new Error('DES 解密填充无效')
+  return bytesToText(subBytes(out, 0, out.length - pad))
+}
+
+// ---- 对外导出 ----
+
+export function base64Encode(text: string): Promise<string> {
+  return new Promise<string>((resolve, reject) => {
+    try {
+      resolve(bytesToBase64(textToBytes(text)))
+    }
+    catch (e: any) {
+      reject(e)
+    }
+  })
+}
+
+export function base64Decode(base64: string): Promise<string> {
+  return new Promise<string>((resolve, reject) => {
+    try {
+      resolve(bytesToText(base64ToBytes(base64)))
+    }
+    catch (e: any) {
+      reject(e)
+    }
+  })
+}
+
+export function md5(text: string): Promise<string> {
+  return new Promise<string>((resolve, reject) => {
+    try {
+      resolve(md5Bytes(textToBytes(text)))
+    }
+    catch (e: any) {
+      reject(e)
+    }
+  })
+}
+
+export function sha256(text: string): Promise<string> {
+  return new Promise<string>((resolve, reject) => {
+    try {
+      resolve(sha256Bytes(textToBytes(text)))
+    }
+    catch (e: any) {
+      reject(e)
+    }
+  })
+}
+
+export function hmacSha1(text: string, key: string): Promise<string> {
+  return new Promise<string>((resolve, reject) => {
+    try {
+      resolve(hmacSha1Bytes(text, key))
+    }
+    catch (e: any) {
+      reject(e)
+    }
+  })
+}
+
+export function aesEncrypt(text: string, key: string): Promise<string> {
+  return new Promise<string>((resolve, reject) => {
+    try {
+      resolve(aesCipher(text, key, false))
+    }
+    catch (e: any) {
+      reject(e)
+    }
+  })
+}
+
+export function aesDecrypt(hex: string, key: string): Promise<string> {
+  return new Promise<string>((resolve, reject) => {
+    try {
+      resolve(aesCipher(hex, key, true))
+    }
+    catch (e: any) {
+      reject(e)
+    }
+  })
+}
+
+export function desEncrypt(text: string, key: string): Promise<string> {
+  return new Promise<string>((resolve, reject) => {
+    try {
+      resolve(desCipher(text, key, false))
+    }
+    catch (e: any) {
+      reject(e)
+    }
+  })
+}
+
+export function desDecrypt(hex: string, key: string): Promise<string> {
+  return new Promise<string>((resolve, reject) => {
+    try {
+      resolve(desCipher(hex, key, true))
+    }
+    catch (e: any) {
+      reject(e)
+    }
+  })
+}
+
+export function rsaGenerateKeyPair(bits: number): Promise<string> {
+  return new Promise<string>((resolve, reject) => {
+    try {
+      resolve(rsaGenerateKeyPairUts(bits))
+    }
+    catch (e: any) {
+      reject(e)
+    }
+  })
+}
+
+export function rsaEncrypt(text: string, publicKey: string): Promise<string> {
+  return new Promise<string>((resolve, reject) => {
+    try {
+      resolve(rsaEncryptUts(text, publicKey))
+    }
+    catch (e: any) {
+      reject(e)
+    }
+  })
+}
+
+export function rsaDecrypt(hex: string, privateKey: string): Promise<string> {
+  return new Promise<string>((resolve, reject) => {
+    try {
+      resolve(rsaDecryptUts(hex, privateKey))
+    }
+    catch (e: any) {
+      reject(e)
+    }
+  })
+}
+
+function hashHex(data: Uint8Array, hashType: string): string {
+  if (hashType == 'MD5') {
+    return md5Bytes(data)
+  }
+  if (hashType == 'SHA-1' || hashType == 'SHA1') {
+    return sha1Bytes(data)
+  }
+  return sha256Bytes(data)
+}
+
+export function rsaSign(text: string, privateKey: string, hashType: string): Promise<string> {
+  return new Promise<string>((resolve, reject) => {
+    try {
+      resolve(rsaSignUts(hashHex(textToBytes(text), hashType), hashType, privateKey))
+    }
+    catch (e: any) {
+      reject(e)
+    }
+  })
+}
+
+export function rsaVerify(text: string, publicKey: string, sigHex: string, hashType: string): Promise<boolean> {
+  return new Promise<boolean>((resolve, reject) => {
+    try {
+      resolve(rsaVerifyUts(hashHex(textToBytes(text), hashType), hashType, publicKey, sigHex))
+    }
+    catch (e: any) {
+      reject(e)
+    }
+  })
+}
+
+/**
+ * 生成符合 RFC 4122 标准的 UUID v4 字符串
+ * @returns 36 位 UUID 字符串
+ */
+export function generateUUID(): string {
+
+  try {
+    return java.util.UUID.randomUUID().toString()
+  }
+  catch (_e) {}
+
+
+  const hexDigits = '0123456789abcdef'
+  let s = ''
+  for (let i = 0; i < 36; i++) {
+    if (i == 8 || i == 13 || i == 18 || i == 23) {
+      s += '-'
+    }
+    else if (i == 14) {
+      s += '4'
+    }
+    else {
+      const r = Math.floor(Math.random() * 16)
+      const val = (i == 19) ? ((r & 0x3) | 0x8) : r
+      s += hexDigits.charAt(val)
+    }
+  }
+  return s
+}
+
+/**
+ * 别名：uuid()
+ */
+export function uuid(): string {
+  return generateUUID()
+}

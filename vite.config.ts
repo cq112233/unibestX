@@ -81,12 +81,10 @@ export default defineConfig({
       dir: 'src/pages',
       subPackages: ['src/sub']
     }),
-    // 手动补充 easycom 插件（必须全平台生效，含 App）
-    // 该插件内部名为 uni:app-easycom，负责把模板里的 _resolveComponent("rice-button")
-    // 转成静态 import；蒸汽模式 + vapor-render-target:bytecode 下，只有进入 import 图的
-    // 组件才会生成 bytes/*.bytes 视图层字节码。若在 App 端关闭，uni_modules 下的
-    // easycom 组件（rice-* 等）不会生成 bytecode，云打包安装后组件不渲染。
-    uniEasycomPlugin({ exclude: UNI_EASYCOM_EXCLUDE }),
+    // 手动补充 easycom 插件（服务于 App 端与 Web/H5 端，小程序端由 mp-compiler 原生 usingComponents 处理，若混入会导致注入 uni-mp-vue 缺失的 resolveDynamicComponent 编译报错）
+    ...(!process.env.UNI_PLATFORM?.startsWith('mp-')
+      ? [uniEasycomPlugin({ exclude: UNI_EASYCOM_EXCLUDE })]
+      : []),
     uniLayoutsPlugin(), // 仿照 vite-plugin-uni-layouts 的跨端 Layout 布局插件
     autoRootPlugin(), // 自动给页面套上 App.ku.uvue 根包裹组件
     uni(),

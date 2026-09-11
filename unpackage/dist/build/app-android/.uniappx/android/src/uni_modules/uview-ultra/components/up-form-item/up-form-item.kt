@@ -300,7 +300,7 @@ open class GenUniModulesUviewUltraComponentsUpFormItemUpFormItem : VueComponent 
                 return if (message.value != "" && errorType == "border-bottom") {
                     (color["error"] as String)
                 } else {
-                    ((default__17["color"] ?: "#d6d7d9") as String)
+                    ((default__20["color"] ?: "#d6d7d9") as String)
                 }
             }
             )
@@ -459,19 +459,19 @@ open class GenUniModulesUviewUltraComponentsUpFormItemUpFormItem : VueComponent 
         ), "default" to fun(): UTSJSONObject {
             return (_uO())
         }
-        ), "customClass" to _uM("type" to "String", "default" to ""), "label" to _uM("type" to "String", "default" to default__18.getString("formItem.label")), "prop" to _uM("type" to "String", "default" to default__18.getString("formItem.prop")), "rules" to _uM("type" to _uA(
+        ), "customClass" to _uM("type" to "String", "default" to ""), "label" to _uM("type" to "String", "default" to default__37.getString("formItem.label")), "prop" to _uM("type" to "String", "default" to default__37.getString("formItem.prop")), "rules" to _uM("type" to _uA(
             "UTSJSONObject",
             "Array"
-        ), "default" to default__18.getAny("formItem.rules") as UTSJSONObject), "borderBottom" to _uM("type" to _uA(
+        ), "default" to default__37.getAny("formItem.rules") as UTSJSONObject), "borderBottom" to _uM("type" to _uA(
             "String",
             "Boolean"
-        ), "default" to default__18.getString("formItem.borderBottom")), "labelPosition" to _uM("type" to "String", "default" to default__18.getString("formItem.labelPosition")), "labelWidth" to _uM("type" to _uA(
+        ), "default" to default__37.getString("formItem.borderBottom")), "labelPosition" to _uM("type" to "String", "default" to default__37.getString("formItem.labelPosition")), "labelWidth" to _uM("type" to _uA(
             "String",
             "Number"
-        ), "default" to default__18.getString("formItem.labelWidth")), "rightIcon" to _uM("type" to "String", "default" to default__18.getString("formItem.rightIcon")), "leftIcon" to _uM("type" to "String", "default" to default__18.getString("formItem.leftIcon")), "required" to _uM("type" to "Boolean", "default" to default__18.getBoolean("formItem.required")), "leftIconStyle" to _uM("type" to _uA(
+        ), "default" to default__37.getString("formItem.labelWidth")), "rightIcon" to _uM("type" to "String", "default" to default__37.getString("formItem.rightIcon")), "leftIcon" to _uM("type" to "String", "default" to default__37.getString("formItem.leftIcon")), "required" to _uM("type" to "Boolean", "default" to default__37.getBoolean("formItem.required")), "leftIconStyle" to _uM("type" to _uA(
             "String",
             "UTSJSONObject"
-        ), "default" to default__18.getString("formItem.leftIconStyle"))))
+        ), "default" to default__37.getString("formItem.leftIconStyle"))))
         var propsNeedCastKeys = _uA(
             "url",
             "linkType",
