@@ -26,9 +26,16 @@ const tabbarItem = computed((): CustomTabBarItem => {
   return props.item as CustomTabBarItem;
 });
 
+const appStore = useAppStore();
+
 // 亮 / 暗主题 token（与 theme.json tabBar 配置同步）
 const themeTokens = computed((): ThemeTokens => {
-  return getThemeTokens(useAppStore().state.isDark);
+  return getThemeTokens(appStore.state.isDark);
+});
+
+/** 当前激活的主题色（优先取响应式 themeColor，保底取 appStore.state.theme） */
+const activeThemeColor = computed<string>((): string => {
+  return themeColor.value.length > 0 ? themeColor.value : appStore.state.theme;
 });
 
 /** 根据选中状态返回对应图标 */
@@ -47,14 +54,14 @@ function getIconPath(): string {
   return tabbarItem.value.iconPath ?? '';
 }
 
-/** 动态计算文本颜色（显式绑定 style 规避原生 view 的 color 编译限制） */
+/** 动态计算文本颜色（跟随全局主题色，显式绑定 style 规避原生 view 的 color 编译限制） */
 const textColor = computed((): string => {
-  return curIdx.value == props.index ? themeTokens.value.tabSelected : themeTokens.value.tabColor;
+  return curIdx.value == props.index ? activeThemeColor.value : themeTokens.value.tabColor;
 });
 
-/** 动态计算图标颜色 */
+/** 动态计算图标颜色（跟随全局主题色） */
 const iconColor = computed((): string => {
-  return curIdx.value == props.index ? themeTokens.value.tabSelected : themeTokens.value.tabColor;
+  return curIdx.value == props.index ? activeThemeColor.value : themeTokens.value.tabColor;
 });
 
 /** 计算徽标展示文本 */
@@ -85,7 +92,7 @@ function getText(text: string): string {
 <template>
   <!-- 中间鼓包特殊样式：绝对定位向上突起（Bulge midButton） -->
   <view v-if="isBulge" class="bulge-item-container">
-    <view class="bulge-circle" :style="{ backgroundColor: themeColor }">
+    <view class="bulge-circle" :style="{ backgroundColor: activeThemeColor }">
       <!-- uni-icons 字体图标 -->
       <uni-icons
         v-if="tabbarItem.iconType == 'icon'"

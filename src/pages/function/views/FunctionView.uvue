@@ -1,5 +1,8 @@
 <template>
   <view>
+    <view class="bg-[#cccccc]" :style="{ height: `${availableHeight}px` }">
+      <text class="text-[18px] font-bold text-[#1d4ed8]">{{ availableHeight }}</text>
+    </view>
     <LayoutDemoCard />
     <!-- 标题头 -->
     <view class="pt-[20px] px-[16px] pb-[10px]">
@@ -49,6 +52,7 @@ import ZPagingDemoCard from '../components/ZPagingDemoCard.uvue';
 import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/utils/refresh.uts';
 import { curIdx, onTabShow } from '@/src/tabbar';
 import LayoutDemoCard from '@/src/pages/basic/components/LayoutDemoCard.uvue';
+import { availableHeight, systemInfo as systemInfoRef } from '@/src/utils/systemInfo.uts';
 
 // 页面数据加载/刷新方法
 function refreshData(): void {

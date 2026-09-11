@@ -98,9 +98,11 @@ import {
   TABBAR_HEIGHT,
   tabbarList,
   tabbarPlaceholderHeight,
+  themeColor,
   themeTokens
 } from '@/src/tabbar';
 import type { CustomTabBarItem } from '@/src/tabbar';
+import { useAppStore } from '@/src/store';
 import { $t } from '@/src/utils/i18n';
 
 // ==========================================
@@ -121,6 +123,13 @@ defineProps({
     type: Boolean,
     default: true
   }
+});
+
+const appStore = useAppStore();
+
+/** 当前激活的主题色（优先取响应式 themeColor，保底取 appStore.state.theme） */
+const activeThemeColor = computed<string>((): string => {
+  return themeColor.value.length > 0 ? themeColor.value : appStore.state.theme;
 });
 
 // ==========================================
@@ -148,12 +157,12 @@ function onTabClick(index: number): void {
 }
 
 /**
- * 动态计算当前 Tab 项高亮或常态文本/图标色彩
+ * 动态计算当前 Tab 项高亮或常态文本/图标色彩（高亮跟随全局主题色）
  * @param index 目标项索引
  * @returns 对应主题配置下的 HEX 颜色代码
  */
 function getItemColor(index: number): string {
-  return curIdx.value == index ? themeTokens.value.tabSelected : themeTokens.value.tabColor;
+  return curIdx.value == index ? activeThemeColor.value : themeTokens.value.tabColor;
 }
 
 /**

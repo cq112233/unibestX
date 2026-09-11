@@ -1,5 +1,8 @@
 <template>
-  <view class="flex flex-col flex-1 items-center px-[16px] pt-[8px]">
+  <view class="flex flex-col items-center px-[16px] pt-[8px]">
+    <view class="bg-[#cccccc] w-full" :style="{ height: `${availableHeight}px` }">
+      <text class="text-[18px] font-bold text-[#1d4ed8]">{{ availableHeight }}</text>
+    </view>
     <!-- 布局页面示例组件 -->
     <LayoutDemoCard />
     <!-- 头部卡片：用户头像及状态 -->
@@ -50,6 +53,7 @@ import { useTokenStore, useUserStore } from '@/src/store';
 import { LOGIN_PAGE } from '@/src/router/config';
 import { switchTabbar } from '@/src/tabbar/helper';
 import LayoutDemoCard from '@/src/pages/basic/components/LayoutDemoCard.uvue';
+import { availableHeight, systemInfo as systemInfoRef } from '@/src/utils/systemInfo.uts';
 
 const userStore = useUserStore();
 const tokenStore = useTokenStore();
