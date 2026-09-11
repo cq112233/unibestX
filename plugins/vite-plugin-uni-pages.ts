@@ -988,8 +988,8 @@ function generatePagesJson(
           output.tabBar.midButton = parsedConfig.midButton;
       }
     }
-    else if (tabbarMode === '3' || tabbarMode === 'CUSTOM_TABBAR_WITHOUT_NATIVE') {
-      // 模式3（纯自定义 TabBar，无原生配置）：完全删除 pages.json 中的 tabBar，使用 redirectTo / reLaunch 自定义路由跳转
+    else if (tabbarMode === '3' || tabbarMode === 'CUSTOM_TABBAR_WITHOUT_NATIVE' || tabbarMode === '4' || tabbarMode === 'SINGLE_PAGE_TABBAR') {
+      // 模式3（纯自定义 TabBar，无原生配置）与 模式4（单页面 TabBar 容器模式）：完全删除 pages.json 中的 tabBar
       delete output.tabBar;
     }
   }
