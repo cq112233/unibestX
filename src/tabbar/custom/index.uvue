@@ -13,7 +13,7 @@ import { getThemeTokens } from '@/src/utils/theme';
 import type { ThemeTokens } from '@/src/utils/theme';
 import { safeAreaInsets } from '@/src/utils/systemInfo';
 
-defineProps({
+const props = defineProps({
   /** 悬浮 TabBar 容器高度（默认 64px） */
   height: {
     type: Number,
@@ -58,20 +58,54 @@ const activeItemBgColor = computed<string>((): string => {
   return `${color}18`;
 });
 
+/** 外层容器是否被按下（控制外层容器整体的 iOS 弹性放大） */
+const isContainerPressing = ref<boolean>(false);
+
+/** 外层容器按下 */
+function onContainerTouchStart() {
+  isContainerPressing.value = true;
+}
+
+/** 外层容器松开 */
+function onContainerTouchEnd() {
+  setTimeout(() => {
+    isContainerPressing.value = false;
+  }, 100);
+}
+
 /** 当前正在按下的 Tab 索引（-1 表示无按压） */
 const pressingIndex = ref<number>(-1);
 
 /** 按下开始：记录当前按压索引 */
 function onTouchStart(index: number) {
   pressingIndex.value = index;
+  isContainerPressing.value = true;
 }
 
 /** 按下结束：平滑恢复按压状态 */
 function onTouchEnd() {
   setTimeout(() => {
     pressingIndex.value = -1;
+    isContainerPressing.value = false;
   }, 100);
 }
+
+/** 胶囊外层容器整体样式（支持按下弹性放大与清晰精致的外边框） */
+const capsuleContainerStyle = computed<UTSJSONObject>((): UTSJSONObject => {
+  const isPressing = isContainerPressing.value || pressingIndex.value != -1;
+  const scaleVal = isPressing ? 1.03 : 1.0;
+  const borderColorVal = appStore.state.isDark ? '#334155' : '#cbd5e1';
+
+  return {
+    height: `${props.height}px`,
+    backgroundColor: themeTokens.value.tabBg,
+    borderColor: borderColorVal,
+    transform: `scale(${scaleVal})`,
+    transitionProperty: 'transform, border-color',
+    transitionDuration: isPressing ? '120ms' : '260ms',
+    transitionTimingFunction: 'cubic-bezier(0.34, 1.56, 0.64, 1)'
+  } as UTSJSONObject;
+});
 
 /** 滑块单项宽度占比（百分比） */
 const sliderWidthPercent = computed<number>((): number => {
@@ -114,10 +148,10 @@ function getItemInnerStyle(index: number): UTSJSONObject {
 
   let scaleVal = 1.0;
   if (isPressing) {
-    scaleVal = 1.18; // 按下时呈现明显的 iOS 弹性放大触感
+    scaleVal = 1.14; // 按下时呈现细腻的 iOS 弹性放大触感
   }
   else if (isSelected) {
-    scaleVal = 1.04; // 选中状态轻微放大凸显
+    scaleVal = 1.02; // 选中状态轻微放大凸显
   }
 
   return {
@@ -187,61 +221,78 @@ function getItemFontWeight(index: number): string {
 <template>
   <view class="custom-capsule-wrapper">
     <!-- 底部占位块：防止页面底部内容被悬浮 Tab 栏遮挡 -->
-    <view v-if="showPlaceholder" class="custom-capsule-placeholder"
-      :style="{ height: `${height + bottomOffset * 2 + safeAreaBottom}px` }" />
+    <view
+      v-if="showPlaceholder"
+      class="custom-capsule-placeholder"
+      :style="{ height: `${height + bottomOffset * 2 + safeAreaBottom}px` }"
+    />
 
-    <!-- 悬浮胶囊底座主容器 -->
-    <view class="custom-capsule-container" :style="{
-      bottom: `${bottomOffset + safeAreaBottom}px`,
-      height: `${height}px`,
-      backgroundColor: themeTokens.tabBg,
-      borderColor: themeTokens.tabBorder
-    }">
-      <!-- 动态滑动滑块：在各 Tab 底部平滑移动 (Animated Slider Pill) -->
-      <view class="capsule-slider-track">
-        <view class="capsule-slider" :style="sliderStyle">
-          <view class="capsule-slider-pill" :style="pillStyle" />
-        </view>
-      </view>
-
-      <!-- 各 Tab 交互格位 -->
+    <!-- 固定的外层定位条（负责整屏居中与对称边距，彻底防止右侧截断） -->
+    <view class="custom-capsule-fixed-bar" :style="{ bottom: `${bottomOffset + safeAreaBottom}px` }">
+      <!-- 悬浮胶囊外层主容器（支持按压整体 iOS 放大回弹与清晰精致的外边框） -->
       <view
-        v-for="(item, index) in tabbarList"
-        :key="index"
-        class="capsule-item-slot"
-        @click="onTabClick(index)"
-        @touchstart="onTouchStart(index)"
-        @touchend="onTouchEnd"
-        @touchcancel="onTouchEnd"
-        @mousedown="onTouchStart(index)"
-        @mouseup="onTouchEnd"
-        @mouseleave="onTouchEnd"
+        class="custom-capsule-container"
+        :style="capsuleContainerStyle"
+        @touchstart="onContainerTouchStart"
+        @touchend="onContainerTouchEnd"
+        @touchcancel="onContainerTouchEnd"
+        @mousedown="onContainerTouchStart"
+        @mouseup="onContainerTouchEnd"
+        @mouseleave="onContainerTouchEnd"
       >
-        <!-- 胶囊项包装块（按下时产生明显的 iOS 弹性放大效果） -->
-        <view class="capsule-item-inner" :style="getItemInnerStyle(index)">
-          <!-- 图标与角标容器 -->
-          <view class="capsule-icon-wrap">
-            <!-- uni-icons 字体图标 -->
-            <uni-icons v-if="item.iconType == 'icon'" :type="getItemIcon(index)" :size="20"
-              :color="getItemIconColor(index)" />
-            <!-- 图片图标 -->
-            <image v-else :src="getItemIconPath(index)" class="capsule-icon-image" />
-
-            <!-- 小红点角标 -->
-            <view v-if="item.badge != null && `${item.badge}` == 'dot'" class="capsule-badge-dot" />
-            <!-- 文本数字角标 -->
-            <view v-else-if="item.badge != null && `${item.badge}` != 'dot'" class="capsule-badge-text">
-              <text class="capsule-badge-label">{{ item.badge }}</text>
-            </view>
+        <!-- 动态滑动滑块：在各 Tab 底部平滑移动 (Animated Slider Pill) -->
+        <view class="capsule-slider-track">
+          <view class="capsule-slider" :style="sliderStyle">
+            <view class="capsule-slider-pill" :style="pillStyle" />
           </view>
+        </view>
 
-          <!-- 标签文字（支持 i18n 翻译） -->
-          <text class="capsule-item-text" :style="{
-            color: getItemTextColor(index),
-            fontWeight: getItemFontWeight(index)
-          }">
-            {{ getText(item.text) }}
-          </text>
+        <!-- 各 Tab 交互格位 -->
+        <view
+          v-for="(item, index) in tabbarList"
+          :key="index"
+          class="capsule-item-slot"
+          @click="onTabClick(index)"
+          @touchstart="onTouchStart(index)"
+          @touchend="onTouchEnd"
+          @touchcancel="onTouchEnd"
+          @mousedown="onTouchStart(index)"
+          @mouseup="onTouchEnd"
+          @mouseleave="onTouchEnd"
+        >
+          <!-- 胶囊项包装块（按下时产生明显的 iOS 弹性放大效果） -->
+          <view class="capsule-item-inner" :style="getItemInnerStyle(index)">
+            <!-- 图标与角标容器 -->
+            <view class="capsule-icon-wrap">
+              <!-- uni-icons 字体图标 -->
+              <uni-icons
+                v-if="item.iconType == 'icon'"
+                :type="getItemIcon(index)"
+                :size="20"
+                :color="getItemIconColor(index)"
+              />
+              <!-- 图片图标 -->
+              <image v-else :src="getItemIconPath(index)" class="capsule-icon-image" />
+
+              <!-- 小红点角标 -->
+              <view v-if="item.badge != null && `${item.badge}` == 'dot'" class="capsule-badge-dot" />
+              <!-- 文本数字角标 -->
+              <view v-else-if="item.badge != null && `${item.badge}` != 'dot'" class="capsule-badge-text">
+                <text class="capsule-badge-label">{{ item.badge }}</text>
+              </view>
+            </view>
+
+            <!-- 标签文字（支持 i18n 翻译） -->
+            <text
+              class="capsule-item-text"
+              :style="{
+                color: getItemTextColor(index),
+                fontWeight: getItemFontWeight(index)
+              }"
+            >
+              {{ getText(item.text) }}
+            </text>
+          </view>
         </view>
       </view>
     </view>
@@ -258,21 +309,36 @@ function getItemFontWeight(index: number): string {
   width: 100%;
 }
 
-/* 悬浮胶囊主底座 */
-.custom-capsule-container {
+/* 固定的外层定位条（负责整屏居中与对称边距，保证两边绝不溢出或被截断） */
+.custom-capsule-fixed-bar {
   position: fixed;
-  left: 16px;
-  right: 16px;
+  left: 0;
+  right: 0;
   z-index: 999;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding-left: 16px;
+  padding-right: 16px;
+  box-sizing: border-box;
+  pointer-events: none;
+}
+
+/* 悬浮胶囊主底座外容器 */
+.custom-capsule-container {
+  width: 100%;
+  max-width: 500px;
+  pointer-events: auto;
+  box-sizing: border-box;
   flex-direction: row;
   align-items: center;
   justify-content: space-around;
   padding: 4px 6px;
-  border-width: 1px;
+  border-width: 1.5px;
   border-style: solid;
   border-radius: 34px;
-  /* 柔和阴影，增强质感与悬浮立体感 */
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  /* 柔和立体多重阴影，增强质感与悬浮感 */
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.04);
 }
 
 /* 动态滑块滑动轨道（与外层 4px 6px padding 区域对齐） */
