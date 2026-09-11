@@ -1,0 +1,52 @@
+<template>
+  <view v-if="hasRendered" :style="rootStyle" class="tab-content-wrapper">
+    <slot />
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed, onMounted, ref, watch } from 'vue';
+import { curIdx } from '@/src/tabbar/helper';
+
+const props = defineProps({
+  /** 对应的 TabBar 索引（0, 1, 2, 3 等） */
+  contentIndex: {
+    type: Number,
+    required: true
+  }
+});
+
+const hasRendered = ref(false);
+const isActive = computed<boolean>((): boolean => curIdx.value == props.contentIndex);
+
+const rootStyle = computed<UTSJSONObject>((): UTSJSONObject => {
+  return {
+    visibility: isActive.value ? 'visible' : 'hidden',
+    display: isActive.value ? 'flex' : 'none',
+    zIndex: isActive.value ? 1 : 0
+  } as UTSJSONObject;
+});
+
+onMounted(() => {
+  if (curIdx.value == props.contentIndex) {
+    hasRendered.value = true;
+  }
+});
+
+watch(isActive, (newVal: boolean) => {
+  if (newVal && !hasRendered.value) {
+    hasRendered.value = true;
+  }
+});
+</script>
+
+<style scoped>
+.tab-content-wrapper {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  flex-direction: column;
+}
+</style>
