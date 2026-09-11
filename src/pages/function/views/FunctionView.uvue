@@ -36,15 +36,40 @@
 </template>
 
 <script setup lang="uts">
-import HapticsCard from './HapticsCard.uvue';
-import ToastCard from './ToastCard.uvue';
-import MediaCard from './MediaCard.uvue';
-import LodashDemoCard from './LodashDemoCard.uvue';
-import CryptoDemoCard from './CryptoDemoCard.uvue';
-import TimeDemoCard from './TimeDemoCard.uvue';
-import SignatureCard from './SignatureCard.uvue';
-import EchartsDemoCard from './EchartsDemoCard.uvue';
-import ZPagingDemoCard from './ZPagingDemoCard.uvue';
+import CryptoDemoCard from '../components/CryptoDemoCard.uvue';
+import EchartsDemoCard from '../components/EchartsDemoCard.uvue';
+import HapticsCard from '../components/HapticsCard.uvue';
+import LodashDemoCard from '../components/LodashDemoCard.uvue';
+import MediaCard from '../components/MediaCard.uvue';
+import SignatureCard from '../components/SignatureCard.uvue';
+import TimeDemoCard from '../components/TimeDemoCard.uvue';
+import ToastCard from '../components/ToastCard.uvue';
+import ZPagingDemoCard from '../components/ZPagingDemoCard.uvue';
+import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/utils/refresh.uts';
+import { curIdx, onTabShow } from '@/src/tabbar';
+
+// 页面数据加载/刷新方法
+function refreshData(): void {
+  console.log('功能页面刷新中...');
+  setTimeout(() => {
+    console.log('功能页面刷新成功');
+    // 数据加载完毕后，手动停止下拉刷新动画状态
+    stopNavbarPullDownRefresh();
+  }, 1000);
+}
+
+// 监听 Tab 切换到当前功能页（索引 2）时触发刷新
+onTabShow(2, () => {
+  console.log('切换到了功能 Tab');
+  refreshData();
+});
+
+// 监听 navbar 自定义下拉刷新事件（在 enablePullDownRefresh: true 且处于当前 Tab 时生效）
+onNavbarPullDownRefresh(() => {
+  if (curIdx.value == 2) {
+    refreshData();
+  }
+});
 </script>
 
 <style scoped></style>

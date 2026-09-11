@@ -249,6 +249,29 @@ function onStopRefresh() {
   isTriggered.value = false;
 }
 
+/**
+ * 动态自定义标题（优先级高于配置项）
+ * 注意：UTS 会把 <script setup> 里的 function 降级为「声明点之后才可见」的局部量，
+ * 因此必须声明在 onSetNavbarTitle / onResetNavbarTitle 之前；否则调用会落空，
+ * 同名时还会被 utils/refresh.uts 里的包级函数悄悄接管（导致事件自触发死循环）。
+ */
+const customTitle = ref<string | null>(null);
+
+/**
+ * 动态修改/设置当前导航栏标题
+ * @param title 新的导航栏标题
+ */
+function setNavbarTitle(title: string): void {
+  customTitle.value = title;
+}
+
+/**
+ * 重置导航栏标题为初始配置标题
+ */
+function resetNavbarTitle(): void {
+  customTitle.value = null;
+}
+
 function onSetNavbarTitle(title: any | null): void {
   if (title != null) {
     if (typeof title == 'string') {
@@ -320,24 +343,6 @@ const useCustomRefresher = computed((): boolean => {
   }
   return props.enablePullDownRefresh;
 });
-
-/** 动态自定义标题（优先级高于配置项） */
-const customTitle = ref<string | null>(null);
-
-/**
- * 动态修改/设置当前导航栏标题
- * @param title 新的导航栏标题
- */
-function setNavbarTitle(title: string): void {
-  customTitle.value = title;
-}
-
-/**
- * 重置导航栏标题为初始配置标题
- */
-function resetNavbarTitle(): void {
-  customTitle.value = null;
-}
 
 /**
  * 计算最终生效的导航栏标题

@@ -79,7 +79,9 @@ export default defineConfig({
     // 自动生成 pages.json（基于 pages.config.json 手动配置 + 页面内 <route>/definePage 声明）
     uniPagesPlugin({
       dir: 'src/pages',
-      subPackages: ['src/sub']
+      subPackages: ['src/sub'],
+      // 页面排除规则：支持排除 components、views 等子目录，防止被扫描生成页面
+      exclude: ['**/components/**/*.*', '**/views/**/*.*']
     }),
     // 手动补充 easycom 插件（必须全平台生效，含 App）
     // 该插件内部名为 uni:app-easycom，负责把模板里的 _resolveComponent("rice-button")

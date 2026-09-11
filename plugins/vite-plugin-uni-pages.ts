@@ -52,6 +52,9 @@ function matchGlob(filePath: string, pattern: string): boolean {
   if (pattern === '**/components/**/*.*' || pattern.includes('components')) {
     return filePath.includes('/components/') || filePath.startsWith('components/');
   }
+  if (pattern === '**/views/**/*.*' || pattern.includes('views')) {
+    return filePath.includes('/views/') || filePath.startsWith('views/');
+  }
   const regexStr = pattern
     .replace(/[.+^${}()|[\]\\]/g, '\\$&')
     .replace(/\*\*\/\*/g, '.*')
@@ -263,7 +266,7 @@ function scanUvueFiles(dir: string, excludes: string[] = [], projectRoot: string
     return results;
   }
 
-  const defaultExcludes = ['**/components/**/*.*'];
+  const defaultExcludes = ['**/components/**/*.*', '**/views/**/*.*'];
   const allExcludes = [...defaultExcludes, ...excludes];
 
   const entries = fs.readdirSync(dir, { withFileTypes: true });
@@ -272,8 +275,8 @@ function scanUvueFiles(dir: string, excludes: string[] = [], projectRoot: string
     const fullPath = path.join(dir, entry.name);
 
     if (entry.isDirectory()) {
-      // 跳过默认的 components 目录
-      if (entry.name === 'components') {
+      // 跳过默认的 components 和 views 目录
+      if (entry.name === 'components' || entry.name === 'views') {
         continue;
       }
       results.push(...scanUvueFiles(fullPath, excludes, projectRoot));
@@ -1266,6 +1269,14 @@ export default function uniPagesPlugin(options: UniPagesOptions = {}) {
         const n = fp.replace(/\\/g, '/');
         if (!n.endsWith('.uvue') || n.includes('?')) {
           return false;
+        }
+        // 检查是否被 exclude（如 components、views 等）
+        const allExcludes = ['**/components/**/*.*', '**/views/**/*.*', ...opts.exclude];
+        const relPath = projectRoot ? path.relative(projectRoot, fp).replace(/\\/g, '/') : n;
+        for (let e = 0; e < allExcludes.length; e++) {
+          if (matchGlob(relPath, allExcludes[e])) {
+            return false;
+          }
         }
         // 带 / 边界匹配，避免 src/pages 误匹配 src/pages-xxx
         if (n.includes(`${opts.dir.replace(/\\/g, '/')}/`)) {

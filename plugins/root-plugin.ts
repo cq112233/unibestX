@@ -136,9 +136,15 @@ export default function autoRootPlugin() {
       if (!normalizedId.endsWith('.uvue') && !normalizedId.endsWith('.vue')) {
         return null;
       }
-      // 只处理 src/pages 和 src/sub 下的非组件 uvue 页面，排除 App.uvue、App.ku.uvue 以及组件目录
+      // 只处理 src/pages 和 src/sub 下的非组件 uvue 页面，排除 App.uvue、App.ku.uvue 以及组件/视图子目录
       const isPage = normalizedId.includes('src/pages/') || normalizedId.includes('src/sub/');
-      if (!isPage || normalizedId.includes('/components/') || normalizedId.includes('App.ku.uvue') || normalizedId.includes('/src/layouts/')) {
+      if (
+        !isPage
+        || normalizedId.includes('/components/')
+        || normalizedId.includes('/views/')
+        || normalizedId.includes('App.ku.uvue')
+        || normalizedId.includes('/src/layouts/')
+      ) {
         return null;
       }
 

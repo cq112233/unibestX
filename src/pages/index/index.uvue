@@ -26,12 +26,12 @@
 </template>
 
 <script setup lang="uts">
-import HomeView from './components/HomeView.uvue';
-import BasicView from '../basic/components/BasicView.uvue';
-import FunctionView from '../function/components/FunctionView.uvue';
-import MeView from '../me/components/MeView.uvue';
+import HomeView from './views/HomeView.uvue';
+import BasicView from '../basic/views/BasicView.uvue';
+import FunctionView from '../function/views/FunctionView.uvue';
+import MeView from '../me/views/MeView.uvue';
 import TabContent from '@/src/tabbar/components/TabContent.uvue';
-import Tabbar from '@/src/tabbar/index.uvue';
+import Tabbar from '@/src/tabbar/tabbar.uvue';
 import { isSinglePageTabbar } from '@/src/tabbar';
 import { handleBackPressExit } from '@/src/utils/backPress.uts';
 import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/utils/refresh.uts';
@@ -45,7 +45,7 @@ definePage({
   layout: 'navbar', // 页面通用布局模板（采用 navbar 布局接管顶部导航与下拉滚动容器）
   showBack: false, // 导航栏左侧是否显示返回箭头（TabBar 首页无需返回按钮）
   hideNavbar: false, // 是否隐藏顶部导航栏（false 为正常显示）
-  enablePullDownRefresh: false, // 是否开启自定义下拉刷新（由 navbar 布局内的 scroll-view 驱动）
+  enablePullDownRefresh: true, // 是否开启自定义下拉刷新（由 navbar 布局内的 scroll-view 驱动）
   style: {
     navigationBarTitleText: '首页', // 页面与导航栏标题文本
     navigationStyle: 'custom' // 导航栏样式设为自定义（隐藏系统原生导航栏）
@@ -54,7 +54,9 @@ definePage({
 
 // 监听 navbar 自定义下拉刷新事件（在 enablePullDownRefresh: true 时生效）
 onNavbarPullDownRefresh(() => {
+  console.log('刷新中');
   setTimeout(() => {
+    console.log('刷新成功');
     // 数据加载完毕后，手动停止下拉刷新动画状态
     stopNavbarPullDownRefresh();
   }, 1000);
