@@ -1,15 +1,15 @@
 <template>
 	<view
 	    class="up-radio cursor-pointer"
-		@tap.stop="wrapperClickHandler"
-	    :style="[radioStyle]"
 	    :class="[iconPlacementClass, borderBottomClass]"
+	    :style="radioStyle"
+	    @tap.stop="wrapperClickHandler"
 	>
 		<view
 		    class="up-radio__icon-wrap cursor-pointer"
-		    @tap.stop="iconClickHandler"
 		    :class="iconClasses"
-		    :style="[iconWrapStyle]"
+		    :style="iconWrapStyle"
+		    @tap.stop="iconClickHandler"
 		>
 			<slot name="icon">
 				<up-icon
@@ -24,266 +24,140 @@
 			<text
 				class="up-radio__label"
 				:class="[elDisabled ? 'up-radio__label--disabled' : '']"
+				:style="labelStyle"
 				@tap.stop="labelClickHandler"
-				:style="{
-					color: elDisabled ? elInactiveColor : elLabelColor,
-					fontSize: elLabelSize,
-					lineHeight: elLabelSize
-				}"
 			>{{label}}</text>
 		</slot>
 	</view>
 </template>
 
 <script setup lang="uts">
-	import { computed, inject, ref, getCurrentInstance } from 'vue'
-	import type { ComputedRef } from 'vue'
-	import defProps from './radio.uts'
-	import { addUnit, addStyle, os, deepMerge, formValidate, error } from '../../libs/function/index'
-
-	const instance = getCurrentInstance()?.proxy
+	import { computed, inject, ref } from 'vue'
+	import { addUnit, addStyle, os, deepMerge, error } from '../../libs/function/index'
+	import { RADIO_GROUP_KEY } from '../up-radio-group/type.uts'
+	import type { RadioGroupProvide } from '../up-radio-group/type.uts'
+	import type { RadioProps } from './type.uts'
 
 	defineOptions({
 		name: "up-radio"
 	})
 
-	const props = defineProps({
-		// radio的名称
-		name: {
-			type: [String, Number, Boolean],
-			default: defProps.getString('radio.name')
-		},
-		// 形状，square为方形，circle为圆型
-		shape: {
-			type: String,
-			default: defProps.getString('radio.shape')
-		},
-		// 是否禁用
-		disabled: {
-			type: [String, Boolean],
-			default: defProps.getString('radio.disabled')
-		},
-		// 是否禁止点击提示语选中单选框
-		labelDisabled: {
-			type: [String, Boolean],
-			default: defProps.getString('radio.labelDisabled')
-		},
-		// 选中状态下的颜色，如设置此值，将会覆盖parent的activeColor值
-		activeColor: {
-			type: String,
-			default: defProps.getString('radio.activeColor')
-		},
-		// 未选中的颜色
-		inactiveColor: {
-			type: String,
-			default: defProps.getString('radio.inactiveColor')
-		},
-		// 图标的大小，单位px
-		iconSize: {
-			type: [String, Number],
-			default: defProps.getString('radio.iconSize')
-		},
-		// label的字体大小，px单位
-		labelSize: {
-			type: [String, Number],
-			default: defProps.getString('radio.labelSize')
-		},
-		// label提示文字，因为nvue下，直接slot进来的文字，由于特殊的结构，无法修改样式
-		label: {
-			type: [String, Number],
-			default: defProps.getString('radio.label')
-		},
-		// 整体的大小
-		size: {
-			type: [String, Number],
-			default: defProps.getString('radio.size')
-		},
-		// 图标颜色
-		iconColor: {
-			type: String,
-			default: defProps.getString('radio.iconColor')
-		},
-		// label的颜色
-		labelColor: {
-			type: String,
-			default: defProps.getString('radio.labelColor')
-		},
-		// 定义需要用到的外部样式
-		customStyle: {
-			type: Object,
-			default: () => ({})
-		},
-		// 是否独立使用
-		usedAlone: {
-			type: Boolean,
-			default: false
-		}
+	// 默认值逐字对齐 components/up-radio/radio.uts。空串表示「未设置，向 group 取值」，
+	// 不要把 disabled / labelDisabled 改成 false —— false.toString() 是 'false' 而非 ''，
+	// 会让组件不再向 group 取值，父子联动静默失效。
+	const props = withDefaults(defineProps<RadioProps>(), {
+		name: '',
+		shape: '',
+		disabled: '',
+		labelDisabled: '',
+		activeColor: '',
+		inactiveColor: '',
+		iconSize: '',
+		labelSize: '',
+		label: '',
+		size: '',
+		iconColor: '',
+		labelColor: '',
+		customStyle: () : UTSJSONObject => ({}),
+		usedAlone: false
 	})
 
 	const emit = defineEmits(['change', 'update:checked'])
 
-	const parentProps = inject<ComputedRef<UTSJSONObject> | null>('upRadioGroupProps', null)
-	const parentChange = inject<((name: any | null) => void) | null>('upRadioGroupChange', null)
+	const group = inject<RadioGroupProvide | null>(RADIO_GROUP_KEY, null)
 
+	/** 未处于 group 内时的本地选中态（usedAlone 场景） */
 	const selfChecked = ref<boolean>(false)
 
-	const isChecked = computed((): boolean => {
-		if (!props.usedAlone && parentProps != null && parentProps!.value != null) {
-			const parentVal = parentProps!.value['modelValue']
-			if (parentVal != null && props.name != null) {
-				return parentVal.toString() == props.name!.toString()
-			}
-			return false
-		}
-		return selfChecked.value
+	/**
+	 * prop 优先，其次取 group 下发值，最后回落默认值。
+	 * 空串与 null 一律视为「未设置」。
+	 * `?? ''` 是必需的封口：UTS 中对 any|null 调 .toString() 返回 String?，
+	 * 不封口会把可空性传播到调用方。
+	 */
+	function pick(own : any | null, parent : any | null, fallback : string) : string {
+		const o = own == null ? '' : (own.toString() ?? '')
+		if (o != '') return o
+		const p = parent == null ? '' : (parent.toString() ?? '')
+		if (p != '') return p
+		return fallback
+	}
+
+	/** group 存在且非独立使用时，读取 group 的某个字段 */
+	function fromGroup(key : string) : any | null {
+		if (props.usedAlone || group == null) return null
+		if (key == 'modelValue') return group!.modelValue.value
+		if (key == 'shape') return group!.shape.value
+		if (key == 'disabled') return group!.disabled.value
+		if (key == 'activeColor') return group!.activeColor.value
+		if (key == 'inactiveColor') return group!.inactiveColor.value
+		if (key == 'size') return group!.size.value
+		if (key == 'placement') return group!.placement.value
+		if (key == 'labelSize') return group!.labelSize.value
+		if (key == 'labelColor') return group!.labelColor.value
+		if (key == 'labelDisabled') return group!.labelDisabled.value
+		if (key == 'iconColor') return group!.iconColor.value
+		if (key == 'iconSize') return group!.iconSize.value
+		if (key == 'iconPlacement') return group!.iconPlacement.value
+		if (key == 'borderBottom') return group!.borderBottom.value
+		return null
+	}
+
+	const isChecked = computed<boolean>((): boolean => {
+		if (props.usedAlone || group == null) return selfChecked.value
+		const parentVal = group!.modelValue.value
+		if (parentVal == null || props.name == null) return false
+		return parentVal.toString() == props.name!.toString()
 	})
 
-	const elDisabled = computed((): boolean => {
-		const disabledVal = props.disabled
-		if (disabledVal != null && disabledVal.toString() != '') {
-			return disabledVal.toString() == 'true'
-		}
-		if (!props.usedAlone && parentProps != null && parentProps!.value != null) {
-			const parentDisabled = parentProps!.value['disabled']
-			if (parentDisabled != null) {
-				return parentDisabled as boolean
-			}
-		}
-		return false
+	const elDisabled = computed<boolean>((): boolean => {
+		const v = pick(props.disabled, fromGroup('disabled'), 'false')
+		return v == 'true'
 	})
 
-	const elLabelDisabled = computed((): boolean => {
-		const labelDisabledVal = props.labelDisabled
-		if (labelDisabledVal != null && labelDisabledVal.toString() != '') {
-			return labelDisabledVal.toString() == 'true'
-		}
-		if (!props.usedAlone && parentProps != null && parentProps!.value != null) {
-			const parentLabelDisabled = parentProps!.value['labelDisabled']
-			if (parentLabelDisabled != null) {
-				return parentLabelDisabled as boolean
-			}
-		}
-		return false
+	const elLabelDisabled = computed<boolean>((): boolean => {
+		const v = pick(props.labelDisabled, fromGroup('labelDisabled'), 'false')
+		return v == 'true'
 	})
 
-	const elSize = computed((): string => {
-		const sizeVal = props.size
-		if (sizeVal != null && sizeVal.toString() != '') {
-			return sizeVal.toString()
-		}
-		if (!props.usedAlone && parentProps != null && parentProps!.value != null) {
-			const parentSize = parentProps!.value['size']
-			if (parentSize != null && parentSize.toString() != '') {
-				return parentSize.toString()
-			}
-		}
-		return '21'
+	const elSize = computed<string>((): string => {
+		return pick(props.size, fromGroup('size'), '21')
 	})
 
-	const elIconSize = computed((): string => {
-		const iconSizeVal = props.iconSize
-		if (iconSizeVal != null && iconSizeVal.toString() != '') {
-			return iconSizeVal.toString()
-		}
-		if (!props.usedAlone && parentProps != null && parentProps!.value != null) {
-			const parentIconSize = parentProps!.value['iconSize']
-			if (parentIconSize != null && parentIconSize.toString() != '') {
-				return parentIconSize.toString()
-			}
-		}
-		return '12'
+	const elIconSize = computed<string>((): string => {
+		return pick(props.iconSize, fromGroup('iconSize'), '12')
 	})
 
-	const elActiveColor = computed((): string => {
-		const activeColorVal = props.activeColor
-		if (activeColorVal != null && activeColorVal.toString() != '') {
-			return activeColorVal.toString()
-		}
-		if (!props.usedAlone && parentProps != null && parentProps!.value != null) {
-			const parentActiveColor = parentProps!.value['activeColor']
-			if (parentActiveColor != null && parentActiveColor.toString() != '') {
-				return parentActiveColor.toString()
-			}
-		}
-		return '#2979ff'
+	const elActiveColor = computed<string>((): string => {
+		return pick(props.activeColor, fromGroup('activeColor'), '#2979ff')
 	})
 
-	const elInactiveColor = computed((): string => {
-		const inactiveColorVal = props.inactiveColor
-		if (inactiveColorVal != null && inactiveColorVal.toString() != '') {
-			return inactiveColorVal.toString()
-		}
-		if (!props.usedAlone && parentProps != null && parentProps!.value != null) {
-			const parentInactiveColor = parentProps!.value['inactiveColor']
-			if (parentInactiveColor != null && parentInactiveColor.toString() != '') {
-				return parentInactiveColor.toString()
-			}
-		}
-		return '#c8c9cc'
+	const elInactiveColor = computed<string>((): string => {
+		return pick(props.inactiveColor, fromGroup('inactiveColor'), '#c8c9cc')
 	})
 
-	const elLabelColor = computed((): string => {
-		const labelColorVal = props.labelColor
-		if (labelColorVal != null && labelColorVal.toString() != '') {
-			return labelColorVal.toString()
-		}
-		if (!props.usedAlone && parentProps != null && parentProps!.value != null) {
-			const parentLabelColor = parentProps!.value['labelColor']
-			if (parentLabelColor != null && parentLabelColor.toString() != '') {
-				return parentLabelColor.toString()
-			}
-		}
-		return '#606266'
+	const elLabelColor = computed<string>((): string => {
+		return pick(props.labelColor, fromGroup('labelColor'), '#606266')
 	})
 
-	const elShape = computed((): string => {
-		const shapeVal = props.shape
-		if (shapeVal != null && shapeVal.toString() != '') {
-			return shapeVal.toString()
-		}
-		if (!props.usedAlone && parentProps != null && parentProps!.value != null) {
-			const parentShape = parentProps!.value['shape']
-			if (parentShape != null && parentShape.toString() != '') {
-				return parentShape.toString()
-			}
-		}
-		return 'circle'
+	const elShape = computed<string>((): string => {
+		return pick(props.shape, fromGroup('shape'), 'circle')
 	})
 
-	const elLabelSize = computed((): string => {
-		const labelSizeVal = props.labelSize
-		if (labelSizeVal != null && labelSizeVal.toString() != '') {
-			return addUnit(labelSizeVal)
-		}
-		if (!props.usedAlone && parentProps != null && parentProps!.value != null) {
-			const parentLabelSize = parentProps!.value['labelSize']
-			if (parentLabelSize != null && parentLabelSize.toString() != '') {
-				return addUnit(parentLabelSize)
-			}
-		}
-		return addUnit('15')
+	const elLabelSize = computed<string>((): string => {
+		return addUnit(pick(props.labelSize, fromGroup('labelSize'), '15'))
 	})
 
-	const elIconColor = computed((): string => {
-		let iconColorStr = '#ffffff'
-		const iconColorVal = props.iconColor
-		if (iconColorVal != null && iconColorVal.toString() != '') {
-			iconColorStr = iconColorVal.toString()
-		} else if (!props.usedAlone && parentProps != null && parentProps!.value != null) {
-			const parentIconColor = parentProps!.value['iconColor']
-			if (parentIconColor != null && parentIconColor.toString() != '') {
-				iconColorStr = parentIconColor.toString()
-			}
-		}
+	const elIconColor = computed<string>((): string => {
+		const iconColorStr = pick(props.iconColor, fromGroup('iconColor'), '#ffffff')
 		if (elDisabled.value) {
 			return isChecked.value ? elInactiveColor.value : 'transparent'
-		} else {
-			return isChecked.value ? iconColorStr : 'transparent'
 		}
+		return isChecked.value ? iconColorStr : 'transparent'
 	})
 
-	const iconClasses = computed((): string => {
-		let classes: string[] = []
+	const iconClasses = computed<string>((): string => {
+		let classes : string[] = []
 		classes.push('up-radio__icon-wrap--' + elShape.value)
 		if (elDisabled.value) {
 			classes.push('up-radio__icon-wrap--disabled')
@@ -297,7 +171,7 @@
 		return classes.join(' ')
 	})
 
-	const iconWrapStyle = computed((): UTSJSONObject => {
+	const iconWrapStyle = computed<UTSJSONObject>((): UTSJSONObject => {
 		const style = {} as UTSJSONObject
 		if (isChecked.value && !elDisabled.value) {
 			if (elActiveColor.value != '#2979ff') {
@@ -310,47 +184,47 @@
 		}
 		style['width'] = addUnit(elSize.value)
 		style['height'] = addUnit(elSize.value)
-		if (!props.usedAlone && parentProps != null && parentProps!.value != null) {
-			const parentPlacement = parentProps!.value['iconPlacement']
-			if (parentPlacement != null && parentPlacement.toString() == 'right') {
-				style['marginRight'] = 0
-			}
+		const parentPlacement = fromGroup('iconPlacement')
+		if (parentPlacement != null && parentPlacement.toString() == 'right') {
+			style['marginRight'] = 0
 		}
 		return style
 	})
 
-	const radioStyle = computed((): UTSJSONObject => {
+	const labelStyle = computed<UTSJSONObject>((): UTSJSONObject => {
 		const style = {} as UTSJSONObject
-		if (!props.usedAlone && parentProps != null && parentProps!.value != null) {
-			const borderBottom = parentProps!.value['borderBottom']
-			const placement = parentProps!.value['placement']
-			if (borderBottom != null && borderBottom.toString() == 'true' && placement != null && placement.toString() == 'row') {
-				error('检测到您将borderBottom设置为true，需要同时将up-radio-group的placement设置为column才有效')
-			}
-			if (borderBottom != null && borderBottom.toString() == 'true' && placement != null && placement.toString() == 'column') {
-				style['paddingBottom'] = os() == 'ios' ? '12px' : '8px'
-			}
+		style['color'] = elDisabled.value ? elInactiveColor.value : elLabelColor.value
+		style['fontSize'] = elLabelSize.value
+		style['lineHeight'] = elLabelSize.value
+		return style
+	})
+
+	const radioStyle = computed<UTSJSONObject>((): UTSJSONObject => {
+		const style = {} as UTSJSONObject
+		const borderBottom = fromGroup('borderBottom')
+		const placement = fromGroup('placement')
+		if (borderBottom != null && borderBottom.toString() == 'true' && placement != null && placement.toString() == 'row') {
+			error('检测到您将borderBottom设置为true，需要同时将up-radio-group的placement设置为column才有效')
+		}
+		if (borderBottom != null && borderBottom.toString() == 'true' && placement != null && placement.toString() == 'column') {
+			style['paddingBottom'] = os() == 'ios' ? '12px' : '8px'
 		}
 		return deepMerge(style, addStyle(props.customStyle)) as UTSJSONObject
 	})
 
-	const iconPlacementClass = computed((): string => {
-		if (!props.usedAlone && parentProps != null && parentProps!.value != null) {
-			const p = parentProps!.value['iconPlacement']
-			if (p != null && p.toString() != '') {
-				return 'up-radio-label--' + p.toString()
-			}
+	const iconPlacementClass = computed<string>((): string => {
+		const p = fromGroup('iconPlacement')
+		if (p != null && p.toString() != '') {
+			return 'up-radio-label--' + p.toString()
 		}
 		return 'up-radio-label--left'
 	})
 
-	const borderBottomClass = computed((): string => {
-		if (!props.usedAlone && parentProps != null && parentProps!.value != null) {
-			const borderBottom = parentProps!.value['borderBottom']
-			const placement = parentProps!.value['placement']
-			if (borderBottom != null && borderBottom.toString() == 'true' && placement != null && placement.toString() == 'column') {
-				return 'up-border-bottom'
-			}
+	const borderBottomClass = computed<string>((): string => {
+		const borderBottom = fromGroup('borderBottom')
+		const placement = fromGroup('placement')
+		if (borderBottom != null && borderBottom.toString() == 'true' && placement != null && placement.toString() == 'column') {
+			return 'up-border-bottom'
 		}
 		return ''
 	})
@@ -361,41 +235,33 @@
 			if (props.usedAlone) {
 				emit('update:checked', true)
 			}
-			setTimeout(() => {
-				if (instance != null) {
-					formValidate(instance!, 'change')
-				}
-			}, 10)
 		}
 	}
 
 	function setRadioCheckedStatus() {
 		emitEvent()
-		if (!props.usedAlone && parentChange != null) {
-			parentChange(props.name)
+		if (!props.usedAlone && group != null) {
+			group!.select(props.name)
 		} else {
 			selfChecked.value = true
 		}
 	}
 
-	function iconClickHandler(e: UniEvent) {
+	function iconClickHandler(e : UniEvent) {
 		e.stopPropagation()
 		if (!elDisabled.value) {
 			setRadioCheckedStatus()
 		}
 	}
 
-	function wrapperClickHandler(e: UniEvent) {
-		if (!props.usedAlone && parentProps != null && parentProps!.value != null) {
-			const p = parentProps!.value['iconPlacement']
-			if (p != null && p.toString() == 'right') {
-				iconClickHandler(e)
-				return
-			}
+	function wrapperClickHandler(e : UniEvent) {
+		const p = fromGroup('iconPlacement')
+		if (p != null && p.toString() == 'right') {
+			iconClickHandler(e)
 		}
 	}
 
-	function labelClickHandler(e: UniEvent) {
+	function labelClickHandler(e : UniEvent) {
 		e.stopPropagation()
 		if (!elLabelDisabled.value && !elDisabled.value) {
 			setRadioCheckedStatus()
@@ -403,7 +269,8 @@
 	}
 
 	const init = function() {}
-	const getInternalState = (): UTSJSONObject => {
+
+	const getInternalState = () : UTSJSONObject => {
 		return {
 			name: props.name,
 			isChecked: isChecked.value
@@ -435,15 +302,16 @@
 	$up-radio-label-color:$up-content-color !default;
 	$up-radio-label-font-size:15px !default;
 	$up-radio-label-disabled-color:#c8c9cc !default;
-	
+
 	.up-radio {
-		@include flex(row);
+		display: flex;
+		flex-direction: row;
 		overflow: hidden;
 		flex-direction: row;
 		align-items: center;
 		margin-bottom: 5px;
 		margin-top: 5px;
-		
+
 		&-label--left {
 			flex-direction: row;
 		}
@@ -459,7 +327,8 @@
 			transition-property: border-color, background-color, color;
 			transition-duration: 0.2s;
 			/* #endif */
-			@include flex;
+			display: flex;
+			flex-direction: row;
 			align-items: center;
 			justify-content: center;
 			margin-right: $up-radio-wrap-margin-right;
