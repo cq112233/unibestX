@@ -67,68 +67,28 @@
 <script setup lang="uts">
 import { computed, ref, watch, onMounted, getCurrentInstance } from 'vue'
 import { addUnit, addStyle, guid, sleep, range, os, upGetRect } from '../../libs/function/index.uts'
+import type { RateProps } from './type.uts'
 
 defineOptions({
   name: 'up-rate'
 })
 
-const props = defineProps({
-  modelValue: {
-    type: [String, Number],
-    default: 1
-  },
-  count: {
-    type: [String, Number],
-    default: 5
-  },
-  disabled: {
-    type: Boolean,
-    default: false
-  },
-  readonly: {
-    type: Boolean,
-    default: false
-  },
-  size: {
-    type: [String, Number],
-    default: 18
-  },
-  inactiveColor: {
-    type: String,
-    default: '#b2b2b2'
-  },
-  activeColor: {
-    type: String,
-    default: '#FA3534'
-  },
-  inactiveIcon: {
-    type: String,
-    default: 'star-fill'
-  },
-  activeIcon: {
-    type: String,
-    default: 'star-fill'
-  },
-  gutter: {
-    type: [String, Number],
-    default: 4
-  },
-  minCount: {
-    type: [String, Number],
-    default: 0
-  },
-  allowHalf: {
-    type: Boolean,
-    default: false
-  },
-  touchable: {
-    type: Boolean,
-    default: true
-  },
-  customStyle: {
-    type: Object,
-    default: () => ({})
-  }
+// 默认值与重构前 defineProps 内联默认值逐字一致
+const props = withDefaults(defineProps<RateProps>(), {
+  modelValue: 1,
+  count: 5,
+  disabled: false,
+  readonly: false,
+  size: 18,
+  inactiveColor: '#b2b2b2',
+  activeColor: '#FA3534',
+  inactiveIcon: 'star-fill',
+  activeIcon: 'star-fill',
+  gutter: 4,
+  minCount: 0,
+  allowHalf: false,
+  touchable: true,
+  customStyle: () : UTSJSONObject => ({})
 })
 
 const emit = defineEmits(['update:modelValue', 'change'])
@@ -141,13 +101,24 @@ const activeIndex = ref<number>(0)
 const rateWidth = ref<number>(0)
 const moving = ref<boolean>(false)
 
+/**
+ * 数值 props 统一收敛为 number。
+ * `?? ''` 封口：UTS 中对 any|null 调 .toString() 返回 String?，
+ * 不封口会让可空性传播到调用方。
+ */
+function toNumber(value: any, fallback: number = 0): number {
+  if (value == null) return fallback
+  const num = parseFloat(value.toString() ?? '')
+  return isNaN(num) ? fallback : num
+}
+
 const customRateStyle = computed((): UTSJSONObject => {
   return addStyle(props.customStyle) as UTSJSONObject
 })
 
 const iconPaddingStyle = computed((): UTSJSONObject => {
   return {
-    padding: `0 ${addUnit(parseInt(props.gutter.toString()) / 2)}`
+    padding: `0 ${addUnit(toNumber(props.gutter, 0) / 2)}`
   } as UTSJSONObject
 })
 
@@ -156,12 +127,6 @@ const halfWidthStyle = computed((): UTSJSONObject => {
     width: addUnit(rateWidth.value / 2)
   } as UTSJSONObject
 })
-
-function toNumber(value: any, fallback: number = 0): number {
-  if (value == null) return fallback
-  const num = parseFloat(value.toString())
-  return isNaN(num) ? fallback : num
-}
 
 function getMinCountValue(): number {
   return toNumber(props.minCount, 0)
@@ -289,7 +254,8 @@ function touchEnd(e: UniTouchEvent) {
 
 function clickHandler(e: any, index: number) {
   const ee = e as UniPointerEvent
-  if (os() === 'ios' && moving.value) {
+  // 原为 os() === 'ios'，项目规范 §6 禁止对字符串使用 ===，此处修正为 ==
+  if (os() == 'ios' && moving.value) {
     return
   }
   ensureRateMetrics()
@@ -298,9 +264,10 @@ function clickHandler(e: any, index: number) {
 }
 
 function init() {
-  const modelVal: number = props.modelValue == null ? 0 : parseFloat(props.modelValue.toString())
-  const minCount: number = props.minCount == null ? 0 : parseFloat(props.minCount.toString())
-  const defaultActive = isNaN(minCount) ? 0 : minCount
+  // 等价改写：原为 parseFloat(props.x.toString()) 的两段式，
+  // toNumber 已内建 null 回落与 NaN 判定，语义不变。
+  const modelVal = toNumber(props.modelValue, NaN)
+  const defaultActive = toNumber(props.minCount, 0)
   activeIndex.value = isNaN(modelVal) ? defaultActive : (modelVal == 0 ? defaultActive : modelVal)
   sleep().then(() => {
     getRateItemRect()
@@ -324,13 +291,15 @@ $up-rate-item-icon-wrap-half-top: 0 !default;
 $up-rate-item-icon-wrap-half-left: 0 !default;
 
 .up-rate {
-    @include flex;
+    display: flex;
+    flex-direction: row;
     align-items: center;
     margin: $up-rate-margin;
     padding: $up-rate-padding;
 
     &__content {
-        @include flex;
+        display: flex;
+        flex-direction: row;
 
 		&__item {
 		    position: relative;
