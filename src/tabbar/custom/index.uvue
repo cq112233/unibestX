@@ -58,6 +58,21 @@ const activeItemBgColor = computed<string>((): string => {
   return `${color}18`;
 });
 
+/** 当前正在按下的 Tab 索引（-1 表示无按压） */
+const pressingIndex = ref<number>(-1);
+
+/** 按下开始：记录当前按压索引 */
+function onTouchStart(index: number) {
+  pressingIndex.value = index;
+}
+
+/** 按下结束：平滑恢复按压状态 */
+function onTouchEnd() {
+  setTimeout(() => {
+    pressingIndex.value = -1;
+  }, 100);
+}
+
 /** 滑块单项宽度占比（百分比） */
 const sliderWidthPercent = computed<number>((): number => {
   if (tabbarList.length == 0) {
@@ -78,6 +93,40 @@ const sliderStyle = computed<UTSJSONObject>((): UTSJSONObject => {
     transitionTimingFunction: 'cubic-bezier(0.25, 1, 0.5, 1)'
   } as UTSJSONObject;
 });
+
+/** 滑块胶囊本身的按压放大回弹样式 */
+const pillStyle = computed<UTSJSONObject>((): UTSJSONObject => {
+  const isPressingCurrent = pressingIndex.value == curIdx.value;
+  const scaleVal = isPressingCurrent ? 1.08 : 1.0;
+  return {
+    backgroundColor: activeItemBgColor.value,
+    transform: `scale(${scaleVal})`,
+    transitionProperty: 'transform',
+    transitionDuration: isPressingCurrent ? '120ms' : '260ms',
+    transitionTimingFunction: 'cubic-bezier(0.34, 1.56, 0.64, 1)'
+  } as UTSJSONObject;
+});
+
+/** 获取每个 Tab 内容项在按下或选中时的 iOS 弹性放大样式 */
+function getItemInnerStyle(index: number): UTSJSONObject {
+  const isPressing = pressingIndex.value == index;
+  const isSelected = curIdx.value == index;
+
+  let scaleVal = 1.0;
+  if (isPressing) {
+    scaleVal = 1.18; // 按下时呈现明显的 iOS 弹性放大触感
+  }
+  else if (isSelected) {
+    scaleVal = 1.04; // 选中状态轻微放大凸显
+  }
+
+  return {
+    transform: `scale(${scaleVal})`,
+    transitionProperty: 'transform',
+    transitionDuration: isPressing ? '120ms' : '280ms',
+    transitionTimingFunction: 'cubic-bezier(0.34, 1.56, 0.64, 1)'
+  } as UTSJSONObject;
+}
 
 // 挂载时同步激活索引并确保原生 TabBar 隐藏
 onMounted(() => {
@@ -151,13 +200,25 @@ function getItemFontWeight(index: number): string {
       <!-- 动态滑动滑块：在各 Tab 底部平滑移动 (Animated Slider Pill) -->
       <view class="capsule-slider-track">
         <view class="capsule-slider" :style="sliderStyle">
-          <view class="capsule-slider-pill" :style="{ backgroundColor: activeItemBgColor }" />
+          <view class="capsule-slider-pill" :style="pillStyle" />
         </view>
       </view>
 
-      <view v-for="(item, index) in tabbarList" :key="index" class="capsule-item-slot" @click="onTabClick(index)">
-        <!-- 胶囊项包装块 -->
-        <view class="capsule-item-inner">
+      <!-- 各 Tab 交互格位 -->
+      <view
+        v-for="(item, index) in tabbarList"
+        :key="index"
+        class="capsule-item-slot"
+        @click="onTabClick(index)"
+        @touchstart="onTouchStart(index)"
+        @touchend="onTouchEnd"
+        @touchcancel="onTouchEnd"
+        @mousedown="onTouchStart(index)"
+        @mouseup="onTouchEnd"
+        @mouseleave="onTouchEnd"
+      >
+        <!-- 胶囊项包装块（按下时产生明显的 iOS 弹性放大效果） -->
+        <view class="capsule-item-inner" :style="getItemInnerStyle(index)">
           <!-- 图标与角标容器 -->
           <view class="capsule-icon-wrap">
             <!-- uni-icons 字体图标 -->
