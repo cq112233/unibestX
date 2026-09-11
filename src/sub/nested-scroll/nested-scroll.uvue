@@ -1,21 +1,22 @@
 <template>
-  <view class="flex flex-col flex-1 h-full" :class="isDark ? 'bg-[#0f172a]' : 'bg-[#f8fafc]'">
+  <view class="flex flex-col flex-1" :class="isDark ? 'bg-[#0f172a]' : 'bg-[#f8fafc]'">
     <!-- 核心嵌套滚动场景（基于验证无误的标准容器结构） -->
     <view class="flex-1 flex flex-col relative">
       <NestedScroll
         ref="articleScrollRef"
         v-model:refreshing="articleRefreshing"
         v-model:loading="articleLoading"
+        :sticky-header="true"
         :finished="articleFinished"
         :error="articleError"
         :empty="articleList.length === 0"
         @refresh="onArticleRefresh"
         @load-more="onArticleLoadMore"
       >
-        <!-- 嵌套头部插槽：全生命周期模拟演练卡片与操作面板 -->
-        <template #header>
+        <!-- 粘性吸顶头部插槽：全生命周期模拟演练卡片与操作面板（向上滑动时吸附在顶部不滚出） -->
+        <template #sticky>
           <view
-            class="m-[14px] p-[16px] rounded-[14px] border-[1px] border-solid"
+            class="m-[14px] p-[16px] rounded-[14px] border-[1px] border-solid shadow-xs"
             :class="isDark ? 'bg-[#1e293b] border-[#334155]' : 'bg-[#e0e7ff] border-[#c7d2fe]'"
           >
             <view class="flex flex-row items-center justify-between mb-[6px]">
@@ -103,8 +104,8 @@
           </view>
         </template>
 
-        <!-- 列表内容：完全沿用场景一验证无误的标准 list-item 架构 -->
-        <list-item v-for="item in articleList" :key="item.id">
+        <!-- 列表内容：采用全端统一的标准弹性容器组件 -->
+        <view v-for="item in articleList" :key="item.id" class="w-full">
           <view
             class="mx-[14px] my-[6px] p-[14px] rounded-[12px] border-[1px] border-solid flex flex-col"
             :class="isDark ? 'bg-[#1e293b] border-[#334155]' : 'bg-white border-[#e2e8f0]'"
@@ -133,12 +134,12 @@
               {{ item.summary }}
             </text>
           </view>
-        </list-item>
+        </view>
 
         <!-- 2. 自定义正在加载中插槽演示 -->
         <template #loading>
           <view
-            class="w-full my-[10px] p-[12px] rounded-[10px] border-[1px] border-dashed flex flex-row items-center justify-center"
+            class="mx-[14px] my-[10px] p-[14px] rounded-[12px] border-[1px] border-dashed flex flex-row items-center justify-center shadow-xs"
             :class="isDark ? 'bg-[#1e293b]/70 border-[#38bdf866]' : 'bg-[#eff6ff] border-[#93c5fd]'"
           >
             <text class="text-[14px] mr-[6px]">⚡</text>
@@ -154,7 +155,7 @@
         <!-- 3. 自定义加载报错与重试插槽演示 -->
         <template #error>
           <view
-            class="w-full my-[8px] p-[12px] rounded-[12px] border-[1px] border-solid flex flex-row items-center justify-between"
+            class="mx-[14px] my-[8px] p-[12px] rounded-[12px] border-[1px] border-solid flex flex-row items-center justify-between shadow-xs"
             :class="isDark ? 'bg-[#450a0a]/50 border-[#7f1d1d]' : 'bg-[#fef2f2] border-[#fecaca]'"
           >
             <view class="flex flex-row items-center flex-1 mr-[10px]">
@@ -215,13 +216,13 @@ const appStore = useAppStore();
 const isDark = computed((): boolean => appStore.state.isDark);
 
 // 挂载时禁用外层通用滚动，交由 NestedScroll 组件全屏独立接管
-// onMounted(() => {
-//   setPageScrollEnabled(false);
-// });
+onMounted(() => {
+  setPageScrollEnabled(false);
+});
 
-// onUnmounted(() => {
-//   setPageScrollEnabled(true);
-// });
+onUnmounted(() => {
+  setPageScrollEnabled(true);
+});
 
 // -------------------------------------------------------------
 // 数据模型定义（遵守规范，严禁使用 interface，全部使用 type）
@@ -279,17 +280,18 @@ function autoLoadFillScreen(): void {
   setTimeout(() => {
     // 追加 6 条数据，累计达到 8 条（总高度逾 1000px，页面已铺满并超出底部）
     const nextData = generateArticlesData(3, 6, '自动补齐数据');
-    for (let i = 0; i < nextData.length; i++) {
-      articleList.value.push(nextData[i]);
+    const combined: ArticleItem[] = [];
+    for (let i = 0; i < articleList.value.length; i++) {
+      combined.push(articleList.value[i]);
     }
+    for (let i = 0; i < nextData.length; i++) {
+      combined.push(nextData[i]);
+    }
+    articleList.value = combined;
     articleLoading.value = false;
     simStep.value = 3;
     simStatusText.value = '【第 2 步完成】数据已超出屏幕！请向上滑动触底，第3次加载将模拟报错(500)';
-
-    if (articleScrollRef.value != null) {
-      articleScrollRef.value!.$callMethod('endLoadMore');
-    }
-  }, 800);
+  }, 1000);
 }
 
 // 上拉加载更多 / 错误重试处理函数
@@ -311,9 +313,6 @@ function onArticleLoadMore(): void {
         title: '模拟接口异常：500 Internal Error',
         icon: 'none'
       });
-      if (articleScrollRef.value != null) {
-        articleScrollRef.value!.$callMethod('endLoadMore');
-      }
     }, 700);
     return;
   }
@@ -328,9 +327,14 @@ function onArticleLoadMore(): void {
     setTimeout(() => {
       // 成功拉取最后 2 条终态数据
       const finalItems = generateArticlesData(9, 2, '终态数据');
-      for (let i = 0; i < finalItems.length; i++) {
-        articleList.value.push(finalItems[i]);
+      const combined: ArticleItem[] = [];
+      for (let i = 0; i < articleList.value.length; i++) {
+        combined.push(articleList.value[i]);
       }
+      for (let i = 0; i < finalItems.length; i++) {
+        combined.push(finalItems[i]);
+      }
+      articleList.value = combined;
       articleLoading.value = false;
       articleFinished.value = true;
       simStep.value = 5;
@@ -340,10 +344,6 @@ function onArticleLoadMore(): void {
         title: '重试成功！数据已全部加载',
         icon: 'success'
       });
-
-      if (articleScrollRef.value != null) {
-        articleScrollRef.value!.$callMethod('endLoadMore');
-      }
     }, 800);
     return;
   }
@@ -352,9 +352,6 @@ function onArticleLoadMore(): void {
   articleLoading.value = true;
   setTimeout(() => {
     articleLoading.value = false;
-    if (articleScrollRef.value != null) {
-      articleScrollRef.value!.$callMethod('endLoadMore');
-    }
   }, 600);
 }
 
@@ -367,19 +364,14 @@ function startFullSimulation(): void {
   // 首次仅加载 2 条数据（未超出底部）
   articleList.value = generateArticlesData(1, 2, '首批数据');
   simStep.value = 1;
-  simStatusText.value = '【第 1 步】首批仅返回 2 条数据（未超出底部），800ms后将自动掉接口补齐...';
+  simStatusText.value = '【第 1 步】首批返回 2 条数据（未超出底部），正在启动自动补齐...';
 
-  if (articleScrollRef.value != null) {
-    articleScrollRef.value!.$callMethod('endRefresh');
-    articleScrollRef.value!.$callMethod('endLoadMore');
-  }
-
-  // 800ms 后自动触发第 2 步掉接口补齐
+  // 400ms 后自动触发第 2 步展示 loading UI 并掉接口补齐
   setTimeout(() => {
     if (simStep.value == 1) {
       autoLoadFillScreen();
     }
-  }, 800);
+  }, 400);
 }
 
 // 下拉刷新：重新再来一遍完整模拟
@@ -391,28 +383,24 @@ function onArticleRefresh(): void {
   simStep.value = 1;
   simStatusText.value = '【下拉刷新中】正在极速吞吐拉取首批数据...';
 
-  // 模拟真实的接口请求耗时（800ms），给予流畅的下拉刷新视觉与回弹反馈
+  // 模拟真实的接口请求耗时（700ms），给予流畅的下拉刷新视觉与回弹反馈
   setTimeout(() => {
     // 1. 重新生成并赋值首批 2 条数据
     articleList.value = generateArticlesData(1, 2, '首批数据');
 
     // 2. 结束下拉刷新，收起动画
     articleRefreshing.value = false;
-    if (articleScrollRef.value != null) {
-      articleScrollRef.value!.$callMethod('endRefresh');
-      articleScrollRef.value!.$callMethod('endLoadMore');
-    }
 
-    simStatusText.value = '【第 1 步】首批仅返回 2 条数据（未超出底部），800ms后将自动掉接口补齐...';
-    uni.showToast({ title: '刷新成功，重新开始模拟', icon: 'success' });
+    simStatusText.value = '【第 1 步】首批仅返回 2 条数据（未超出底部），正在自动补齐...';
+    uni.showToast({ title: '刷新成功，正在追加数据', icon: 'none' });
 
-    // 3. 800ms 后自动触发第 2 步补齐超出底部
+    // 3. 400ms 后自动触发第 2 步展示 loading UI 补齐超出底部
     setTimeout(() => {
       if (simStep.value == 1) {
         autoLoadFillScreen();
       }
-    }, 800);
-  }, 800);
+    }, 400);
+  }, 700);
 }
 
 // 辅助手动操作

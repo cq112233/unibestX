@@ -269,7 +269,7 @@ export function initNativeMidButtonTap(): void {
     const targetUrl = (mid != null && mid.pagePath != null && mid.pagePath!.length > 0)
       ? mid.pagePath!
       : '/src/pages/ai/ai';
-    uni.onTabBarMidButtonTap(() => {
+    uni.onTabBarMidButtonTap((_res: any) => {
       handleClickBulge(targetUrl);
     });
   }
