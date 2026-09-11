@@ -249,14 +249,37 @@ function onStopRefresh() {
   isTriggered.value = false;
 }
 
-// 挂载时注册全局停止刷新事件监听
+function onSetNavbarTitle(title: any | null): void {
+  if (title != null) {
+    if (typeof title == 'string') {
+      setNavbarTitle(title as string);
+    }
+    else {
+      const obj = title as UTSJSONObject;
+      const t = obj.getString('title');
+      if (t != null) {
+        setNavbarTitle(t);
+      }
+    }
+  }
+}
+
+function onResetNavbarTitle(): void {
+  resetNavbarTitle();
+}
+
+// 挂载时注册全局停止刷新与标题修改事件监听
 onMounted(() => {
   uni.$on('stopPagePullDownRefresh', onStopRefresh);
+  uni.$on('setNavbarTitle', onSetNavbarTitle);
+  uni.$on('resetNavbarTitle', onResetNavbarTitle);
 });
 
 // 卸载时移除全局事件监听，避免内存泄漏
 onUnmounted(() => {
   uni.$off('stopPagePullDownRefresh', onStopRefresh);
+  uni.$off('setNavbarTitle', onSetNavbarTitle);
+  uni.$off('resetNavbarTitle', onResetNavbarTitle);
 });
 
 /**
@@ -298,10 +321,31 @@ const useCustomRefresher = computed((): boolean => {
   return props.enablePullDownRefresh;
 });
 
+/** 动态自定义标题（优先级高于配置项） */
+const customTitle = ref<string | null>(null);
+
+/**
+ * 动态修改/设置当前导航栏标题
+ * @param title 新的导航栏标题
+ */
+function setNavbarTitle(title: string): void {
+  customTitle.value = title;
+}
+
+/**
+ * 重置导航栏标题为初始配置标题
+ */
+function resetNavbarTitle(): void {
+  customTitle.value = null;
+}
+
 /**
  * 计算最终生效的导航栏标题
  */
 const displayTitle = computed((): string => {
+  if (customTitle.value != null) {
+    return customTitle.value!;
+  }
   if (isSinglePageTabbar && props.type == 'home') {
     if (curIdx.value >= 0 && curIdx.value < tabbarList.length) {
       return $t(tabbarList[curIdx.value].text);
@@ -362,6 +406,12 @@ const isCustomNav = computed((): boolean => {
 
 const themeTokens = computed((): ThemeTokens => {
   return getThemeTokens(useAppStore().state.isDark);
+});
+
+defineExpose({
+  resetNavbarTitle,
+  setNavbarTitle,
+  setTitle: setNavbarTitle
 });
 </script>
 

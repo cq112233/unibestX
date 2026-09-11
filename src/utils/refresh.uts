@@ -15,6 +15,27 @@ export function onNavbarPullDownRefresh(callback: () => void): void {
   });
 }
 
+export const EVENT_SET_NAVBAR_TITLE = 'setNavbarTitle';
+export const EVENT_RESET_NAVBAR_TITLE = 'resetNavbarTitle';
+
+/**
+ * 动态设置/修改 NavBar 布局及原生导航栏标题
+ * @param title 新的导航栏标题文本
+ */
+export function setNavbarTitle(title: string): void {
+  uni.$emit(EVENT_SET_NAVBAR_TITLE, title);
+  uni.setNavigationBarTitle({
+    title
+  } as SetNavigationBarTitleOptions);
+}
+
+/**
+ * 重置 NavBar 布局的导航栏标题为初始配置标题
+ */
+export function resetNavbarTitle(): void {
+  uni.$emit(EVENT_RESET_NAVBAR_TITLE);
+}
+
 /**
  * 停止 NavBar 布局下拉刷新状态
  */
