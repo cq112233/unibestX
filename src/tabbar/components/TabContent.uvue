@@ -12,7 +12,7 @@
 import { computed, onMounted, ref, watch } from 'vue';
 import { curIdx, tabbarList, tabbarPlaceholderHeight } from '@/src/tabbar/helper';
 import { $t } from '@/src/utils/i18n';
-import { setNavbarTitle } from '@/src/utils/refresh.uts';
+import { setHideNavbar, setNavbarTitle } from '@/src/utils/refresh.uts';
 
 const props = defineProps({
   /** 对应的 TabBar 索引（0, 1, 2, 3 等） */
@@ -24,12 +24,18 @@ const props = defineProps({
   title: {
     type: String,
     default: ''
+  },
+  /** 当前 Tab 是否隐藏顶部导航栏（各 Tab 独立控制显隐，true 隐藏，false 显示） */
+  hideNavbar: {
+    type: Boolean,
+    default: false
   }
 });
 
 const hasRendered = ref(false);
 const isActive = computed<boolean>((): boolean => curIdx.value == props.contentIndex);
 const contentTitle = computed((): string => props.title);
+const shouldHideNavbar = computed((): boolean => props.hideNavbar);
 
 const rootStyle = computed<UTSJSONObject>((): UTSJSONObject => {
   return {
@@ -40,7 +46,7 @@ const rootStyle = computed<UTSJSONObject>((): UTSJSONObject => {
 });
 
 /**
- * 设置/同步当前激活 Tab 的导航栏标题（同时支持自定义 NavBar 与原生系统 NavigationBar）
+ * 设置/同步当前激活 Tab 的导航栏标题与显隐状态
  */
 function updateNavbarTitle(): void {
   let targetTitle = '';
@@ -60,10 +66,15 @@ function updateNavbarTitle(): void {
   }
 }
 
+function syncNavbarState(): void {
+  updateNavbarTitle();
+  setHideNavbar(props.hideNavbar);
+}
+
 onMounted(() => {
   if (curIdx.value == props.contentIndex) {
     hasRendered.value = true;
-    updateNavbarTitle();
+    syncNavbarState();
   }
 });
 
@@ -72,7 +83,7 @@ watch(isActive, (newVal: boolean) => {
     if (!hasRendered.value) {
       hasRendered.value = true;
     }
-    updateNavbarTitle();
+    syncNavbarState();
   }
 });
 
@@ -85,8 +96,15 @@ watch(contentTitle, (newTitle: string) => {
   }
 });
 
+watch(shouldHideNavbar, (newVal: boolean) => {
+  if (isActive.value) {
+    setHideNavbar(newVal);
+  }
+});
+
 defineExpose({
-  updateNavbarTitle
+  updateNavbarTitle,
+  syncNavbarState
 });
 </script>
 

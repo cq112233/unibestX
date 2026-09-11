@@ -28,29 +28,6 @@ type BaseConfig = {
   [key: string]: any;
 };
 
-export type UniPagesTabbarOptions = {
-  /**
-   * 是否在自定义 TabBar 模式下自动生成 src/tabbar/components/TabViews.uvue 调度组件
-   * @default true
-   */
-  autoTabViews?: boolean;
-  /**
-   * 当检测到 TabBar 页面缺失 views 目录或视图组件时，是否自动创建规范的 views/*View.uvue
-   * @default true
-   */
-  autoCreateViews?: boolean;
-  /**
-   * 复制粘贴页面目录时，是否自动清理旧模块残留的同级视图文件（防止视图冲突）
-   * @default true
-   */
-  cleanCopiedViews?: boolean;
-  /**
-   * TabBar 配置文件路径（相对于项目根路径）
-   * @default 'src/tabbar/config.uts'
-   */
-  configFile?: string;
-};
-
 export type UniPagesOptions = {
   /**
    * 是否启用插件扫描与 pages.json 自动生成总开关
@@ -70,27 +47,6 @@ export type UniPagesOptions = {
   configFile?: string;
   /** 首页路径 */
   homePage?: string;
-
-  /**
-   * TabBar 相关配置（配置此项默认自动开启生成单页面 TabViews 与 views 视图）
-   */
-  tabbar?: UniPagesTabbarOptions | boolean;
-
-  /**
-   * 是否在自定义 TabBar 模式下自动生成 src/tabbar/components/TabViews.uvue 调度组件
-   * @default true
-   */
-  autoTabViews?: boolean;
-  /**
-   * 当检测到 TabBar 页面缺失 views 目录或视图组件时，是否自动创建规范的 views/*View.uvue
-   * @default true
-   */
-  autoCreateViews?: boolean;
-  /**
-   * 复制粘贴页面目录时，是否自动清理旧模块残留的同级视图文件（防止视图冲突）
-   * @default true
-   */
-  cleanCopiedViews?: boolean;
 };
 
 // ==========================================
@@ -1152,227 +1108,6 @@ function generatePagesJson(
       }
     }
   }
-
-  // 9. 单页面 TabBar 容器与视图组件自动生成
-  if (opts.autoTabViews !== false) {
-    const tabbarMode = getTabbarMode(projectRoot);
-    if (tabbarMode !== '0' && tabbarMode !== 'NO_TABBAR') {
-      try {
-        generateTabViewsComponent(opts, projectRoot);
-      }
-      catch (e) {
-        console.error('[uni-pages] 生成 TabViews 失败:', e);
-      }
-    }
-  }
-}
-
-/**
- * 自动生成单页 TabBar 调度容器 TabViews.uvue 以及补全缺失的 views 视图组件
- */
-function generateTabViewsComponent(opts: any, projectRoot: string): void {
-  const configPath = path.resolve(projectRoot, 'src/tabbar/config.uts');
-  if (!fs.existsSync(configPath)) {
-    return;
-  }
-  const rawContent = fs.readFileSync(configPath, 'utf-8');
-  // 过滤多行注释与单行注释，避免注释项被解析
-  const content = rawContent
-    .replace(/\/\*[\s\S]*?\*\//g, '')
-    .replace(/\/\/.*$/gm, '');
-
-  const listMatch = content.match(/list\s*:\s*\[([\s\S]*?)\]/);
-  if (!listMatch) {
-    return;
-  }
-
-  const listBlock = listMatch[1];
-  const itemRegex = /\{([\s\S]*?)\}/g;
-  let m = itemRegex.exec(listBlock);
-  const tabPages: string[] = [];
-
-  while (m !== null) {
-    const itemBlock = m[1];
-    const pagePathMatch = itemBlock.match(/pagePath\s*:\s*['"`](.*?)['"`]/);
-    if (pagePathMatch) {
-      tabPages.push(pagePathMatch[1].trim().replace(/^\//, ''));
-    }
-    m = itemRegex.exec(listBlock);
-  }
-
-  // 解析 midButton（鼓包也是属于 tabbar 的一部分）
-  const midButtonMatch = content.match(/midButton\s*:\s*\{([\s\S]*?)\}/);
-  let midButtonPagePath: string | null = null;
-  if (midButtonMatch) {
-    const block = midButtonMatch[1];
-    const pagePathMatch = block.match(/pagePath\s*:\s*['"`](.*?)['"`]/);
-    if (pagePathMatch && pagePathMatch[1].trim()) {
-      midButtonPagePath = pagePathMatch[1].trim().replace(/^\//, '');
-    }
-  }
-
-  // 与 tabbar 底层 buildFullTabbarList 保持严格一致的排序规则（midButton 居中插入）
-  const fullTabPages: string[] = [];
-  if (midButtonPagePath) {
-    const half = Math.floor(tabPages.length / 2);
-    for (let i = 0; i < tabPages.length; i++) {
-      if (i === half) {
-        fullTabPages.push(midButtonPagePath);
-      }
-      fullTabPages.push(tabPages[i]);
-    }
-    if (half >= tabPages.length) {
-      fullTabPages.push(midButtonPagePath);
-    }
-  }
-  else {
-    for (let i = 0; i < tabPages.length; i++) {
-      fullTabPages.push(tabPages[i]);
-    }
-  }
-
-  if (fullTabPages.length === 0) {
-    return;
-  }
-
-  const viewsEntries: Array<{ importName: string; importPath: string }> = [];
-  const usedNames = new Set<string>();
-
-  for (let idx = 0; idx < fullTabPages.length; idx++) {
-    const rawPath = fullTabPages[idx];
-    const cleanPath = rawPath.replace(/^src\//, '');
-    const pageDirRel = path.dirname(cleanPath);
-    const absPageDir = path.resolve(projectRoot, 'src', pageDirRel);
-    const dirName = path.basename(absPageDir);
-    const pascalDirName = dirName.charAt(0).toUpperCase() + dirName.slice(1);
-    const expectedCompName = `${pascalDirName}View`;
-
-    const viewsDir = path.resolve(absPageDir, 'views');
-    const expectedViewFile = path.resolve(viewsDir, `${expectedCompName}.uvue`);
-
-    let actualCompName = expectedCompName;
-    let actualRelPath = `src/${pageDirRel}/views/${expectedCompName}.uvue`;
-
-    if (fs.existsSync(absPageDir)) {
-      if (!fs.existsSync(viewsDir)) {
-        if (opts.autoCreateViews !== false) {
-          fs.mkdirSync(viewsDir, { recursive: true });
-        }
-      }
-
-      // 检查 views 目录下是否已经存在视图组件
-      let existingViews: string[] = [];
-      if (fs.existsSync(viewsDir)) {
-        try {
-          existingViews = fs.readdirSync(viewsDir).filter((f: string) => f.endsWith('.uvue'));
-        }
-        catch {}
-      }
-
-      if (existingViews.length > 0) {
-        // 已有视图组件：优先匹配 HomeView（针对 index 目录），其次匹配 expectedCompName，最后取第一个已有组件
-        const matchedView = (dirName === 'index' && existingViews.includes('HomeView.uvue'))
-          ? 'HomeView.uvue'
-          : (existingViews.find((f: string) => f === `${expectedCompName}.uvue`) ?? existingViews[0]);
-
-        const baseName = matchedView.replace(/\.uvue$/, '');
-        actualCompName = baseName;
-        actualRelPath = `src/${pageDirRel}/views/${matchedView}`;
-      }
-      else if (opts.autoCreateViews !== false) {
-        // 没有任何视图组件时，才自动创建规范的 View.uvue
-        const viewTemplate = `<script lang="uts" setup>
-defineOptions({
-  name: '${expectedCompName}',
-  styleIsolation: 'isolated'
-});
-
-import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/utils/refresh.uts';
-import { curIdx, onTabShow } from '@/src/tabbar';
-
-// 页面数据加载/刷新方法
-function refreshData(): void {
-  console.log('${expectedCompName} 刷新中...');
-  setTimeout(() => {
-    console.log('${expectedCompName} 刷新成功');
-    // 数据加载完毕后，手动停止下拉刷新动画状态
-    stopNavbarPullDownRefresh();
-  }, 1000);
-}
-
-// 监听 Tab 切换到当前功能页（索引 ${idx}）时触发刷新
-onTabShow(${idx}, () => {
-  console.log('切换到了 ${expectedCompName} Tab');
-  refreshData();
-});
-
-// 监听 navbar 自定义下拉刷新事件（在处于当前 Tab 时生效）
-onNavbarPullDownRefresh(() => {
-  if (curIdx.value == ${idx}) {
-    refreshData();
-  }
-});
-</script>
-
-<template>
-  <view class="flex flex-col flex-1 p-[16px]">
-    <text class="text-[18px] font-bold text-[#1e293b]">${expectedCompName}</text>
-    <text class="text-[13px] text-[#64748b] mt-[6px]">当前为单页面 TabBar 视图组件</text>
-  </view>
-</template>
-
-<style lang="scss" scoped></style>
-`;
-        fs.writeFileSync(expectedViewFile, viewTemplate, 'utf-8');
-        console.log(`[uni-pages] 自动为 TabBar 单页生成视图组件: ${path.relative(projectRoot, expectedViewFile)}`);
-      }
-    }
-
-    // 防止相同名称冲突
-    let finalCompName = actualCompName;
-    if (usedNames.has(finalCompName)) {
-      finalCompName = `${pascalDirName}${actualCompName}`;
-    }
-    usedNames.add(finalCompName);
-
-    viewsEntries.push({
-      importName: finalCompName,
-      importPath: `@/${actualRelPath.replace(/\\/g, '/')}`
-    });
-  }
-
-  // 4. 生成 TabViews.uvue 内容
-  const tabViewsFilePath = path.resolve(projectRoot, 'src/tabbar/components/TabViews.uvue');
-  const sortedImports = [...viewsEntries].sort((a, b) => a.importName.localeCompare(b.importName));
-  const importLines = sortedImports
-    .map(item => `import ${item.importName} from '${item.importPath}';`)
-    .join('\n');
-
-  const contentBlocks = viewsEntries
-    .map((item, index) => `    <TabContent :content-index="${index}">\n      <${item.importName} />\n    </TabContent>`)
-    .join('\n');
-
-  const tabViewsContent = `<template>
-  <view class="flex-1 relative" style="flex: 1; position: relative;">
-${contentBlocks}
-  </view>
-</template>
-
-<script setup lang="uts">
-${importLines}
-import TabContent from './TabContent.uvue';
-</script>
-`;
-
-  let existingContent = '';
-  if (fs.existsSync(tabViewsFilePath)) {
-    existingContent = fs.readFileSync(tabViewsFilePath, 'utf-8');
-  }
-
-  if (existingContent !== tabViewsContent) {
-    fs.writeFileSync(tabViewsFilePath, tabViewsContent, 'utf-8');
-    console.log('[uni-pages] 自动同步更新 TabViews.uvue 调度组件');
-  }
 }
 
 // ==========================================
@@ -1380,15 +1115,6 @@ import TabContent from './TabContent.uvue';
 // ==========================================
 
 export default function uniPagesPlugin(options: UniPagesOptions = {}) {
-  // 检查是否有配置 tabbar 选项（有此配置对象，默认自动开启生成单页面 TabViews 与 views）
-  const hasTabbarOpt = options.tabbar !== undefined && options.tabbar !== false;
-  const tabbarObj = typeof options.tabbar === 'object' && options.tabbar !== null ? options.tabbar : {};
-
-  const autoTabViews = tabbarObj.autoTabViews ?? options.autoTabViews ?? hasTabbarOpt;
-  const autoCreateViews = tabbarObj.autoCreateViews ?? options.autoCreateViews ?? hasTabbarOpt;
-  const cleanCopiedViews = tabbarObj.cleanCopiedViews ?? options.cleanCopiedViews ?? hasTabbarOpt;
-  const tabbarConfigFile = tabbarObj.configFile ?? 'src/tabbar/config.uts';
-
   const opts = {
     enabled: options.enabled ?? true,
     dir: options.dir ?? 'src/pages',
@@ -1396,17 +1122,7 @@ export default function uniPagesPlugin(options: UniPagesOptions = {}) {
     exclude: options.exclude ?? [],
     outFile: options.outFile ?? 'pages.json',
     configFile: options.configFile ?? 'pages.config.json',
-    homePage: options.homePage ?? '',
-    tabbar: {
-      autoTabViews,
-      autoCreateViews,
-      cleanCopiedViews,
-      configFile: tabbarConfigFile
-    },
-    autoTabViews,
-    autoCreateViews,
-    cleanCopiedViews,
-    tabbarConfigFile
+    homePage: options.homePage ?? ''
   };
 
   let projectRoot = process.cwd();

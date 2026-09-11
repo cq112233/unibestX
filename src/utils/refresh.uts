@@ -44,5 +44,32 @@ export function stopNavbarPullDownRefresh(): void {
   uni.stopPullDownRefresh();
 }
 
+export const EVENT_SET_NAVBAR_VISIBLE = 'setNavbarVisible';
+export const EVENT_SET_HIDE_NAVBAR = 'setHideNavbar';
+export const EVENT_RESET_NAVBAR_VISIBLE = 'resetNavbarVisible';
+
+/**
+ * 动态控制 NavBar 布局导航栏的显示或隐藏
+ * @param visible 是否显示导航栏（true 显示，false 隐藏）
+ */
+export function setNavbarVisible(visible: boolean): void {
+  uni.$emit(EVENT_SET_NAVBAR_VISIBLE, visible);
+}
+
+/**
+ * 动态控制是否隐藏 NavBar 布局导航栏
+ * @param hide 是否隐藏导航栏（true 隐藏，false 显示）
+ */
+export function setHideNavbar(hide: boolean): void {
+  uni.$emit(EVENT_SET_HIDE_NAVBAR, hide);
+}
+
+/**
+ * 重置 NavBar 布局导航栏显隐为页面初始配置
+ */
+export function resetNavbarVisible(): void {
+  uni.$emit(EVENT_RESET_NAVBAR_VISIBLE);
+}
+
 // 统一导出页面滚动与触底监听函数
 export { onNavbarPageScroll, onNavbarReachBottom } from './pageScroll.uts';

@@ -1,10 +1,86 @@
 <template>
-  <Card title="布局页面示例">
-    <view class="flex-col mb-[16px]">
+  <Card title="页面布局与系统度量">
+    <view class="flex-col mb-[14px]">
       <text class="text-[13px] text-[#64748b] leading-[18px]">
-        演示基于 definePage + navbar 布局模板的页面骨架。点击进入后可在示例页中自行编写内容，测试
-        navbar 顶部导航栏、showBack 返回、hideNavbar、下拉刷新等布局表现。
+        基于 definePage + navbar 布局模板的页面骨架。框架依靠底层 systemInfo 自动计算各端可用高度，免去手动硬算安全区与状态栏的烦恼。
       </text>
+    </view>
+
+    <!-- 系统度量与布局高度信息面板 -->
+    <view class="rounded-[12px] p-[14px] mb-[14px] bg-[#f8fafc] border-[1px] border-solid border-[#e2e8f0]">
+      <view class="flex-row items-center justify-between mb-[8px]">
+        <view class="flex-row items-center">
+          <text class="text-[14px] mr-[6px]">📐</text>
+          <text class="text-[13px] font-bold text-[#1e293b]">systemInfo 布局度量指标</text>
+        </view>
+        <view class="px-[6px] py-[2px] rounded-[4px] bg-[#eff6ff]">
+          <text class="text-[10px] font-bold text-[#1d4ed8]">ref(systemInfo)</text>
+        </view>
+      </view>
+
+      <text class="text-[11px] text-[#64748b] leading-[16px] mb-[12px]">
+        定义在 src/utils/systemInfo.uts 中，用于在全端统一管理窗口大小、状态栏、安全区及可用内容高度（computedAvailableHeight）。
+      </text>
+
+      <!-- 核心尺寸网格看板 -->
+      <view class="flex-row flex-wrap justify-between">
+        <!-- 窗口大小 -->
+        <view class="w-[48%] p-[10px] mb-[8px] rounded-[8px] bg-white border-[1px] border-solid border-[#e2e8f0] flex-col">
+          <text class="text-[11px] text-[#64748b]">窗口尺寸 (W×H)</text>
+          <text class="text-[12px] font-bold text-[#1e293b] mt-[3px]">{{ windowWidth }} × {{ windowHeight }} px</text>
+        </view>
+
+        <!-- 状态栏高度 -->
+        <view class="w-[48%] p-[10px] mb-[8px] rounded-[8px] bg-white border-[1px] border-solid border-[#e2e8f0] flex-col">
+          <text class="text-[11px] text-[#64748b]">状态栏 (statusBar)</text>
+          <text class="text-[13px] font-bold text-[#1e293b] mt-[3px]">{{ statusBarHeight }} px</text>
+        </view>
+
+        <!-- 导航栏高度 -->
+        <view class="w-[48%] p-[10px] mb-[8px] rounded-[8px] bg-white border-[1px] border-solid border-[#e2e8f0] flex-col">
+          <text class="text-[11px] text-[#64748b]">导航栏 (navBar)</text>
+          <text class="text-[13px] font-bold text-[#1e293b] mt-[3px]">{{ NAVBAR_CONTENT_HEIGHT }} px</text>
+        </view>
+
+        <!-- 底部安全区 -->
+        <view class="w-[48%] p-[10px] mb-[8px] rounded-[8px] bg-white border-[1px] border-solid border-[#e2e8f0] flex-col">
+          <text class="text-[11px] text-[#64748b]">底部安全区 (Home条)</text>
+          <text class="text-[13px] font-bold text-[#1e293b] mt-[3px]">{{ safeAreaBottom }} px</text>
+        </view>
+      </view>
+
+      <!-- 当前可用内容高度条目 -->
+      <view class="p-[10px] rounded-[8px] bg-[#eff6ff] border-[1px] border-solid border-[#bfdbfe] flex-row items-center justify-between mt-[2px]">
+        <view class="flex-1 flex-col mr-[10px]">
+          <text class="text-[12px] font-bold text-[#1e40af]">可用高度 (availableHeight)</text>
+          <text class="text-[10px] text-[#3b82f6] mt-[2px] leading-[14px]">实际开发高度，已自动适配状态栏与布局</text>
+        </view>
+        <view class="flex-row items-baseline flex-none">
+          <text class="text-[18px] font-bold text-[#1d4ed8]">{{ availableHeight }}</text>
+          <text class="text-[11px] font-bold text-[#3b82f6] ml-[2px]">px</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 可用高度与布局加回机制解析卡片 -->
+    <view class="rounded-[10px] p-[12px] mb-[14px] bg-[#eff6ff] border-[1px] border-solid border-[#bfdbfe] flex-col">
+      <view class="flex-row items-center mb-[6px]">
+        <text class="text-[13px] font-bold text-[#1e40af]">💡 可用高度推导机制（真正开发高度）</text>
+      </view>
+      <text class="text-[12px] text-[#334155] leading-[18px] mb-[6px]">
+        可用高度是开发页面真正能利用的可视高度。框架会根据当前页面声明的 layout 自动扣除或加回对应高度：
+      </text>
+      <view class="flex-col pl-[4px]">
+        <text class="text-[11px] text-[#475569] leading-[17px] mb-[3px]">
+          • 默认 navbar 布局：自动扣除 statusBar(状态栏) + 44px(NavBar) + 50px(TabBar)；
+        </text>
+        <text class="text-[11px] text-[#475569] leading-[17px] mb-[3px]">
+          • 声明 hideNavbar: true：导航栏隐藏，44px 空间会自动加回给页面作为可用高度；
+        </text>
+        <text class="text-[11px] text-[#1d4ed8] leading-[17px]">
+          • 开发者在任何页面只需根容器写 flex-1（或绑定 computedAvailableHeight），其余交给框架全自动处理。
+        </text>
+      </view>
     </view>
 
     <!-- 进入示例页面按钮 -->
@@ -12,13 +88,21 @@
       class="w-full h-[44px] rounded-[8px] bg-[#3b82f6] flex flex-row items-center justify-center"
       @click="navigateToDemo"
     >
-      <text class="text-[#ffffff] text-[14px] font-bold">进入布局页面示例</text>
+      <text class="text-[#ffffff] text-[14px] font-bold">进入布局页面骨架实测</text>
     </view>
   </Card>
 </template>
 
 <script setup lang="uts">
 import Card from './Card.uvue';
+import {
+  availableHeight,
+  NAVBAR_CONTENT_HEIGHT,
+  safeAreaBottom,
+  statusBarHeight,
+  windowHeight,
+  windowWidth
+} from '@/src/utils/systemInfo.uts';
 
 function navigateToDemo() {
   uni.navigateTo({

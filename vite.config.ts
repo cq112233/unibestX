@@ -3,6 +3,7 @@ import { defineConfig } from 'vite';
 import uniLayoutsPlugin from './plugins/uni-layouts-plugin';
 import autoRootPlugin from './plugins/root-plugin';
 import uniPagesPlugin from './plugins/vite-plugin-uni-pages';
+import tabbarViewsPlugin from './plugins/vite-plugin-tabbar-views';
 
 // 修复 uni-app x web端/h5端 丢掉 easycom 导入的官方 bug
 import { uniEasycomPlugin } from '@dcloudio/uni-cli-shared/dist/vite/plugins/easycom.js';
@@ -97,22 +98,13 @@ export default defineConfig({
       configFile: 'pages.config.json',
 
       // 【强制指定首页】：若指定则优先以该路由为主包第一个首页；留空时默认取 pages.config.json 首项或扫描的第一项
-      homePage: '',
-
-      // 【TabBar 专属配置】：收敛所有与 TabBar / 单页面切换相关的配置（配有此项默认自动开启生成单页面）
-      tabbar: {
-        // 【单页 TabBar 容器自动生成】：在自定义 TabBar 模式下，是否自动根据 config.uts 生成 src/tabbar/components/TabViews.uvue 调度组件
-        autoTabViews: true,
-
-        // 【视图组件脚手架自动生成】：当 TabBar 页面缺失 views 目录或对应视图组件时，是否自动以 v3c 规范创建规范的 views/*View.uvue
-        autoCreateViews: true,
-
-        // 【残留异名视图自动清理】：从其他页面目录复制粘贴时，是否自动清理旧模块遗留的废弃 View 文件以避免视图冲突
-        cleanCopiedViews: true,
-
-        // 【TabBar 配置文件路径】：相对于项目根路径，默认 'src/tabbar/config.uts'
-        configFile: 'src/tabbar/config.uts'
-      }
+      homePage: ''
+    }),
+    // 单页 TabBar 基础脚手架与视图组件辅助生成插件（按需根据 src/tabbar/config.uts 辅助创建基础 TabViews）
+    tabbarViewsPlugin({
+      enabled: true,
+      autoCreateViews: true,
+      configFile: 'src/tabbar/config.uts'
     }),
     // 手动补充 easycom 插件（必须全平台生效，含 App）
     // 该插件内部名为 uni:app-easycom，负责把模板里的 _resolveComponent("rice-button")
