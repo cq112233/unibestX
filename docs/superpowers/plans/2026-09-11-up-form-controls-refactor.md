@@ -4,7 +4,7 @@
 
 **目标：** 把 `up-radio` / `up-checkbox` / `up-switch` / `up-rate` / `up-picker` 及其 group 从 `UTSJSONObject` 字符串下标协议重构为强类型契约架构，对外保持 uview-plus API 零破坏，Vapor 与 VDOM 双模式均可编译。
 
-**架构：** 每个组件新增 `type.uts` 声明 Props / Provide 契约；group 用 `toRef` 组装强类型 provide 对象并下发，item 用 `inject<T | null>(KEY, null)` 读取；无 group 时降级为本地 `ref`。样式保留 uview 的 BEM 类名与 `$up-` 变量，仅把 `@include flex(...)` 展开为字面 CSS。
+**架构：** 每个组件新增 `type.uts` 声明 Props / Provide 契约；group 用 `computed` 组装强类型 provide 对象并下发，item 用 `inject<T | null>(KEY, null)` 读取；无 group 时降级为本地 `ref`。样式保留 uview 的 BEM 类名与 `$up-` 变量，仅把 `@include flex(...)` 展开为字面 CSS。
 
 **技术栈：** uni-app X、UTS、Vue 3 `<script setup lang="uts">`、HBuilderX CLI 5.24
 
@@ -124,7 +124,9 @@ flex-direction: $direction;
 
 ## 任务 1：`up-radio-group` + `up-radio`（架构探针，必须最先做）
 
-本任务验证整套架构假设：`defineProps<T>()` 的联合类型能否编译、`toRef(() => props.x)` 能否组装出 `Ref<T>`、typed `inject` 能否跨组件工作。
+本任务验证整套架构假设：`defineProps<T>()` 的联合类型能否编译、`computed(() => props.x)` 能否作为 `Ref<T>` 下发、typed `inject` 能否跨组件工作。
+
+> **为什么用 `computed` 而不是 `toRef(() => props.x)`**：group 下发的这些字段对 item 全是**只读**的，`computed` 完全够用，且返回的 `ComputedRef<T>` 可直接赋给 `Ref<T>`，契约类型无需改动。`toRef` 的 getter 重载是 Vue 3.3+ 才有的，uni-app X 运行时是否支持没有任何证据，用它是不必要的赌注。同理也在任务 2 适用。
 
 **若本任务构建失败于联合类型**，按规格 4.3 回退：把 `type.uts` 中的 `string | number | boolean` 改为 `any`，`string | number` 改为 `any`，其余结构不变，再构建。
 
@@ -219,7 +221,7 @@ export const RADIO_GROUP_KEY = 'upRadioGroup'
 </template>
 
 <script setup lang="uts">
-	import { computed, provide, toRef } from 'vue'
+	import { computed, provide } from 'vue'
 	import { bem } from '../../libs/function/index'
 	import { RADIO_GROUP_KEY } from './type.uts'
 	import type { RadioGroupProps, RadioGroupProvide, RadioValue } from './type.uts'
@@ -271,19 +273,19 @@ export const RADIO_GROUP_KEY = 'upRadioGroup'
 
 	provide(RADIO_GROUP_KEY, {
 		modelValue,
-		shape: toRef(() => props.shape),
-		disabled: toRef(() => props.disabled),
-		activeColor: toRef(() => props.activeColor),
-		inactiveColor: toRef(() => props.inactiveColor),
-		size: toRef(() => props.size),
-		placement: toRef(() => props.placement),
-		labelSize: toRef(() => props.labelSize),
-		labelColor: toRef(() => props.labelColor),
-		labelDisabled: toRef(() => props.labelDisabled),
-		iconColor: toRef(() => props.iconColor),
-		iconSize: toRef(() => props.iconSize),
-		iconPlacement: toRef(() => props.iconPlacement),
-		borderBottom: toRef(() => props.borderBottom),
+		shape: computed(() => props.shape),
+		disabled: computed(() => props.disabled),
+		activeColor: computed(() => props.activeColor),
+		inactiveColor: computed(() => props.inactiveColor),
+		size: computed(() => props.size),
+		placement: computed(() => props.placement),
+		labelSize: computed(() => props.labelSize),
+		labelColor: computed(() => props.labelColor),
+		labelDisabled: computed(() => props.labelDisabled),
+		iconColor: computed(() => props.iconColor),
+		iconSize: computed(() => props.iconSize),
+		iconPlacement: computed(() => props.iconPlacement),
+		borderBottom: computed(() => props.borderBottom),
 		select
 	} as RadioGroupProvide)
 
@@ -781,7 +783,7 @@ git add uni_modules/uview-ultra/components/up-radio-group/type.uts \
 git commit -m "refactor(up-radio): 迁移到强类型 provide/inject 契约
 
 新增 type.uts 声明 RadioGroupProps/RadioGroupProvide，
-group 以 toRef 组装响应式 provide，item 以 typed inject 读取。
+group 以 computed 组装响应式 provide，item 以 typed inject 读取。
 删除 useUltraUI/\$callMethod/unCheckedOther 遗留链与空函数 formValidate 调用。
 @include flex 改为字面 CSS。对外 API 不变。"
 ```
@@ -887,7 +889,7 @@ export const CHECKBOX_GROUP_KEY = 'upCheckboxGroup'
 </template>
 
 <script setup lang="uts">
-	import { computed, provide, toRef } from 'vue'
+	import { computed, provide } from 'vue'
 	import { bem } from '../../libs/function/index'
 	import { CHECKBOX_GROUP_KEY } from './type.uts'
 	import type { CheckboxGroupProps, CheckboxGroupProvide } from './type.uts'
@@ -959,19 +961,19 @@ export const CHECKBOX_GROUP_KEY = 'upCheckboxGroup'
 
 	provide(CHECKBOX_GROUP_KEY, {
 		modelValue,
-		shape: toRef(() => props.shape),
-		disabled: toRef(() => props.disabled),
-		activeColor: toRef(() => props.activeColor),
-		inactiveColor: toRef(() => props.inactiveColor),
-		size: toRef(() => props.size),
-		placement: toRef(() => props.placement),
-		labelSize: toRef(() => props.labelSize),
-		labelColor: toRef(() => props.labelColor),
-		labelDisabled: toRef(() => props.labelDisabled),
-		iconColor: toRef(() => props.iconColor),
-		iconSize: toRef(() => props.iconSize),
-		iconPlacement: toRef(() => props.iconPlacement),
-		borderBottom: toRef(() => props.borderBottom),
+		shape: computed(() => props.shape),
+		disabled: computed(() => props.disabled),
+		activeColor: computed(() => props.activeColor),
+		inactiveColor: computed(() => props.inactiveColor),
+		size: computed(() => props.size),
+		placement: computed(() => props.placement),
+		labelSize: computed(() => props.labelSize),
+		labelColor: computed(() => props.labelColor),
+		labelDisabled: computed(() => props.labelDisabled),
+		iconColor: computed(() => props.iconColor),
+		iconSize: computed(() => props.iconSize),
+		iconPlacement: computed(() => props.iconPlacement),
+		borderBottom: computed(() => props.borderBottom),
 		toggle
 	} as CheckboxGroupProvide)
 
@@ -1491,7 +1493,7 @@ git add uni_modules/uview-ultra/components/up-checkbox-group/type.uts \
 git commit -m "refactor(up-checkbox): 迁移到强类型 provide/inject 契约
 
 新增 type.uts 声明 CheckboxGroupProps/CheckboxGroupProvide，
-group 以 toRef 组装响应式 provide，item 以 typed inject 读取。
+group 以 computed 组装响应式 provide，item 以 typed inject 读取。
 数组型 modelValue 的增删语义与 change 事件时机保持不变。
 删除 useUltraUI/\$callMethod/unCheckedOther/watch+init 遗留链。
 @include flex 改为字面 CSS。对外 API 不变。"
