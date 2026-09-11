@@ -217,8 +217,13 @@ const hideMinus = computed<boolean>(() => {
   return currentValue.value.toString() == '0' && props.miniMode == true
 })
 
-const getCursorSpacing = computed<string>(() => {
-  return getPx(props.cursorSpacing)
+const getCursorSpacing = computed<number>(() => {
+  const val = props.cursorSpacing
+  if (typeof val == 'number') {
+    return val as number
+  }
+  const n = parseFloat(val.toString())
+  return isNaN(n) ? 0 : n
 })
 
 const inputStyle = computed<UTSJSONObject>(() => {

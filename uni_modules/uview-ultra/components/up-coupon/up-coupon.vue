@@ -34,10 +34,23 @@
 			<!-- 右侧操作区域 -->
 			<view class="up-coupon__action up-padding-right-20">
 				<slot name="action" :actionText="actionText" :circle="circle">
-                    <up-tag type="error" :bgColor="type ? 'transparent' : '#eb433d'"
-                        :borderColor="type ? '#eee' : '#eb433d'" borderRadius="6px"
-                        size="medium" class="up-coupon__action-text"
-                        :shape="circle ? 'circle': 'circle'">{{ actionText }}</up-tag>
+					<view
+						class="up-coupon__action-btn"
+						:class="[
+							(circle || actionText == '使用') ? 'up-coupon__action-btn--circle' : 'up-coupon__action-btn--square',
+							type ? 'up-coupon__action-btn--plain' : 'up-coupon__action-btn--solid'
+						]"
+						:style="[actionBtnStyle]"
+						@click.stop="handleClick"
+					>
+						<text
+							class="up-coupon__action-btn-text"
+							:class="[
+								type ? 'up-coupon__action-btn-text--plain' : 'up-coupon__action-btn-text--solid'
+							]"
+							:style="[actionBtnTextStyle]"
+						>{{ actionText }}</text>
+					</view>
 				</slot>
 			</view>
 		</view>
@@ -136,6 +149,31 @@
 				if (this.bgColor) style.background = this.bgColor;
 				if (this.color) style.color = this.color;
 				return style;
+			},
+			actionBtnStyle() {
+				const s = {};
+				if (this.type) {
+					s.backgroundColor = 'transparent';
+					s.borderColor = '#eb433d';
+				} else {
+					s.backgroundColor = '#eb433d';
+					s.borderColor = '#eb433d';
+				}
+				if (this.circle || this.actionText === '使用') {
+					s.borderRadius = '999px';
+				} else {
+					s.borderRadius = '12rpx';
+				}
+				return s;
+			},
+			actionBtnTextStyle() {
+				const s = {};
+				if (this.type) {
+					s.color = '#eb433d';
+				} else {
+					s.color = '#ffffff';
+				}
+				return s;
 			},
 			dotCount() {
 				// 根据尺寸计算锯齿数量
@@ -299,6 +337,48 @@
             flex-direction: row;
 			align-items: center;
 			justify-content: center;
+		}
+
+		&__action-btn {
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			justify-content: center;
+			padding: 10rpx 22rpx;
+			border-width: 1px;
+			border-style: solid;
+
+			&--circle {
+				border-radius: 999px;
+			}
+
+			&--square {
+				border-radius: 12rpx;
+			}
+
+			&--solid {
+				background-color: #eb433d;
+				border-color: #eb433d;
+			}
+
+			&--plain {
+				background-color: transparent;
+				border-color: #eb433d;
+			}
+		}
+
+		&__action-btn-text {
+			font-size: 24rpx;
+			font-weight: bold;
+			line-height: 32rpx;
+
+			&--solid {
+				color: #ffffff;
+			}
+
+			&--plain {
+				color: #eb433d;
+			}
 		}
 		
 		&__dots {

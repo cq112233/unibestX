@@ -34,11 +34,23 @@
 			<!-- 右侧操作区域 -->
 			<view class="up-coupon__action up-padding-right-20">
 				<slot name="action" :actionText="actionText" :circle="circle">
-                    <up-tag type="error" :text="actionText"
-                        :bgColor="hasType() ? 'transparent' : '#eb433d'"
-                        :borderColor="hasType() ? '#eee' : '#eb433d'" borderRadius="6px"
-                        size="medium" class="up-coupon__action-text"
-                        :shape="circle ? 'circle' : 'square'"></up-tag>
+					<view
+						class="up-coupon__action-btn"
+						:class="[
+							(circle || actionText == '使用') ? 'up-coupon__action-btn--circle' : 'up-coupon__action-btn--square',
+							hasType() ? 'up-coupon__action-btn--plain' : 'up-coupon__action-btn--solid'
+						]"
+						:style="[actionBtnStyle]"
+						@click.stop="handleClick"
+					>
+						<text
+							class="up-coupon__action-btn-text"
+							:class="[
+								hasType() ? 'up-coupon__action-btn-text--plain' : 'up-coupon__action-btn-text--solid'
+							]"
+							:style="[actionBtnTextStyle]"
+						>{{ actionText }}</text>
+					</view>
 				</slot>
 			</view>
 		</view>
@@ -127,6 +139,33 @@ const couponStyle = computed<UTSJSONObject>(() => {
 	const style = {} as UTSJSONObject
 	if (props.bgColor.length > 0) style['backgroundColor'] = props.bgColor
 	return style
+})
+
+const actionBtnStyle = computed<UTSJSONObject>(() => {
+	const s = {} as UTSJSONObject
+	if (hasType()) {
+		s['backgroundColor'] = 'transparent'
+		s['borderColor'] = '#eb433d'
+	} else {
+		s['backgroundColor'] = '#eb433d'
+		s['borderColor'] = '#eb433d'
+	}
+	if (props.circle || props.actionText == '使用') {
+		s['borderRadius'] = '999px'
+	} else {
+		s['borderRadius'] = '12rpx'
+	}
+	return s
+})
+
+const actionBtnTextStyle = computed<UTSJSONObject>(() => {
+	const s = {} as UTSJSONObject
+	if (hasType()) {
+		s['color'] = '#eb433d'
+	} else {
+		s['color'] = '#ffffff'
+	}
+	return s
 })
 
 function hasType(): boolean {
@@ -254,6 +293,48 @@ function handleClick() {
 			flex-direction: row;
 			align-items: center;
 			justify-content: center;
+		}
+
+		&__action-btn {
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			justify-content: center;
+			padding: 10rpx 22rpx;
+			border-width: 1px;
+			border-style: solid;
+
+			&--circle {
+				border-radius: 999px;
+			}
+
+			&--square {
+				border-radius: 12rpx;
+			}
+
+			&--solid {
+				background-color: #eb433d;
+				border-color: #eb433d;
+			}
+
+			&--plain {
+				background-color: transparent;
+				border-color: #eb433d;
+			}
+		}
+
+		&__action-btn-text {
+			font-size: 24rpx;
+			font-weight: bold;
+			line-height: 32rpx;
+
+			&--solid {
+				color: #ffffff;
+			}
+
+			&--plain {
+				color: #eb433d;
+			}
 		}
 		
 		&__rope {

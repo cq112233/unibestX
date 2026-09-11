@@ -171,8 +171,8 @@
 				return this.currentValue == 0 && this.miniMode == true
 			},
 			getCursorSpacing() {
-				// 判断传入的单位，如果为px单位，需要转成px
-				return getPx(this.cursorSpacing)
+				const n = parseFloat(this.cursorSpacing)
+				return isNaN(n) ? 0 : n
 			},
 			// 按钮的样式
 			buttonStyle() {
