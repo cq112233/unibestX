@@ -146,100 +146,36 @@
 <script setup lang="uts">
 import { ref, computed, watch, nextTick } from 'vue'
 import { addUnit } from '../../libs/function/index'
+import type { PickerProps, PickerChangeEvent, PickerConfirmEvent } from './type.uts'
 
 defineOptions({
 	name: 'up-picker'
 })
 
-const props = defineProps({
-	modelValue: {
-		type: Array as PropType<Array<any>>,
-		default: () => [] as Array<any>
-	},
-	hasInput: {
-		type: Boolean,
-		default: false
-	},
-	placeholder: {
-		type: String,
-		default: '请选择'
-	},
-	show: {
-		type: Boolean,
-		default: false
-	},
-	popupMode: {
-		type: String,
-		default: 'bottom'
-	},
-	pageInline: {
-		type: Boolean,
-		default: false
-	},
-	showToolbar: {
-		type: Boolean,
-		default: true
-	},
-	toolbarRightSlot: {
-		type: Boolean,
-		default: false
-	},
-	toolbarBottomSlot: {
-		type: Boolean,
-		default: false
-	},
-	title: {
-		type: String,
-		default: ''
-	},
-	columns: {
-		type: Array as PropType<Array<Array<any>>>,
-		default: () => [] as Array<Array<any>>
-	},
-	loading: {
-		type: Boolean,
-		default: false
-	},
-	itemHeight: {
-		type: [String, Number],
-		default: 44
-	},
-	cancelText: {
-		type: String,
-		default: '取消'
-	},
-	confirmText: {
-		type: String,
-		default: '确定'
-	},
-	cancelColor: {
-		type: String,
-		default: '#909193'
-	},
-	confirmColor: {
-		type: String,
-		default: '#3c9cff'
-	},
-	visibleItemCount: {
-		type: [String, Number],
-		default: 5
-	},
-	keyName: {
-		type: String,
-		default: 'text'
-	},
-	closeOnClickOverlay: {
-		type: Boolean,
-		default: false
-	},
-	defaultIndex: {
-		type: Array as PropType<Array<number>>,
-		default: () => [] as Array<number>
-	},
-	immediateChange: {
-		type: Boolean,
-		default: true
-	}
+// 默认值逐字对齐 components/up-picker/picker.uts 与重构前的内联默认值
+const props = withDefaults(defineProps<PickerProps>(), {
+	modelValue: () : any[] => [],
+	hasInput: false,
+	placeholder: '请选择',
+	show: false,
+	popupMode: 'bottom',
+	pageInline: false,
+	showToolbar: true,
+	toolbarRightSlot: false,
+	toolbarBottomSlot: false,
+	title: '',
+	columns: () : any[] => [],
+	loading: false,
+	itemHeight: 44,
+	cancelText: '取消',
+	confirmText: '确定',
+	cancelColor: '#909193',
+	confirmColor: '#3c9cff',
+	visibleItemCount: 5,
+	keyName: 'text',
+	closeOnClickOverlay: false,
+	defaultIndex: () : number[] => [],
+	immediateChange: true
 })
 
 const emit = defineEmits(['close', 'cancel', 'confirm', 'change', 'update:modelValue'])
@@ -251,14 +187,36 @@ const columnIndex = ref<number>(0)
 const showByClickInput = ref<boolean>(false)
 const columnScrollTops = ref<number[]>([])
 
+/**
+ * itemHeight / visibleItemCount 可能是 string 也可能是 number，统一收敛为 number。
+ * `?? ''` 封口：UTS 中对 any|null 调 .toString() 返回 String?。
+ */
+function toNumber(value : any | null, fallback : number) : number {
+	if (value == null) return fallback
+	const n = parseInt(value.toString() ?? '')
+	return isNaN(n) ? fallback : n
+}
+
+/**
+ * 取选项对象某个键的文本值。
+ * 强类型无法表达 `props.keyName` 这样的动态键——这是保留 uview-plus API 契约的
+ * 必要代价。全文件仅此一处出现 `(x as UTSJSONObject)[key]` 下标访问，便于审查。
+ */
+function getKeyedText(element : any, key : string) : string | null {
+	if (element == null || typeof element != 'object') return null
+	const v = (element as UTSJSONObject)[key]
+	if (v == null) return null
+	return v.toString()
+}
+
 const itemHeightNumber = computed<number>(() => {
-	const h = parseInt(props.itemHeight.toString())
-	return isNaN(h) || h <= 0 ? 44 : h
+	const h = toNumber(props.itemHeight, 44)
+	return h <= 0 ? 44 : h
 })
 
 const visibleCountNumber = computed<number>(() => {
-	const c = parseInt(props.visibleItemCount.toString())
-	return isNaN(c) || c <= 0 ? 5 : c
+	const c = toNumber(props.visibleItemCount, 5)
+	return c <= 0 ? 5 : c
 })
 
 const pickerViewHeight = computed<string>(() => {
@@ -296,14 +254,14 @@ const inputLabel = computed<string[]>(() => {
 		}
 	})
 	let res: string[] = []
-	items.forEach(element => {
+	items.forEach((element : any) => {
 		if (typeof element == 'object' && element != null) {
-			let ele1 = (element as UTSJSONObject)[props.keyName]
-			if (ele1 != null) {
-				res.push(ele1.toString())
+			const t = getKeyedText(element, props.keyName)
+			if (t != null) {
+				res.push(t!)
 			}
 		} else if (element != null) {
-			res.push(element.toString())
+			res.push(element.toString() ?? '')
 		}
 	})
 	return res
@@ -318,26 +276,22 @@ const inputValue = computed<string[]>(() => {
 		}
 	})
 	let res: string[] = []
-	items.forEach(element => {
-		if (typeof element == 'object' && element != null) {
-			let ele1 = (element as UTSJSONObject)['id']
-			if (ele1 != null) {
-				res.push(ele1.toString())
-			}
+	items.forEach((element : any) => {
+		// 保留硬编码的 'id'：这是既有的对外 API 行为，不随 keyName 变化
+		const t = getKeyedText(element, 'id')
+		if (t != null) {
+			res.push(t!)
 		}
 	})
 	return res
 })
 
-function getItemText(item: any): string {
+function getItemText(item : any) : string {
 	if (typeof item == 'object' && item != null) {
-		let ele1 = (item as UTSJSONObject)[props.keyName]
-		if (ele1 != null) {
-			return ele1.toString()
-		}
-		return ''
+		const t = getKeyedText(item, props.keyName)
+		return t != null ? t! : ''
 	}
-	return item != null ? item.toString() : ''
+	return item != null ? (item.toString() ?? '') : ''
 }
 
 function isItemSelected(colIdx: number, itemIdx: number): boolean {
@@ -403,9 +357,9 @@ function notifyChange(colIdx: number, changedItemIdx: number): void {
 		value: valueOrigin,
 		index: changedItemIdx,
 		indexs: innerIndex.value,
-		values,
+		values: values as any[],
 		columnIndex: colIdx
-	} as UTSJSONObject)
+	} as PickerChangeEvent)
 }
 
 function onColumnScroll(e: any, colIndex: number): void {
@@ -468,9 +422,9 @@ function changeHandler(e: any): void {
 		value: valueOrigin,
 		index,
 		indexs: val,
-		values: innerColumns.value,
+		values: innerColumns.value as any[],
 		columnIndex: colIdx
-	} as UTSJSONObject)
+	} as PickerChangeEvent)
 }
 
 function closeHandler(): void {
@@ -505,8 +459,8 @@ function confirm(): void {
 	emit('confirm', {
 		indexs: innerIndex.value,
 		value: confirmValues,
-		values: innerColumns.value
-	} as UTSJSONObject)
+		values: innerColumns.value as any[]
+	} as PickerConfirmEvent)
 }
 
 function setColumnValues(colIdx: number, values: Array<any>): void {
@@ -633,7 +587,8 @@ defineExpose({
 	}
 
 	&__columns {
-		@include flex;
+		display: flex;
+		flex-direction: row;
 		flex-direction: row;
 		height: 100%;
 		width: 100%;
@@ -645,7 +600,8 @@ defineExpose({
 	}
 
 	&__item {
-		@include flex;
+		display: flex;
+		flex-direction: row;
 		justify-content: center;
 		align-items: center;
 		text-align: center;
@@ -661,12 +617,14 @@ defineExpose({
 		width: 100%;
 
 		&__column {
-			@include flex;
+			display: flex;
+			flex-direction: row;
 			flex: 1;
 			justify-content: center;
 
 			&__item {
-				@include flex;
+				display: flex;
+				flex-direction: row;
 				justify-content: center;
 				align-items: center;
 				width: 100%;
@@ -686,7 +644,8 @@ defineExpose({
 		right: 0;
 		left: 0;
 		bottom: 0;
-		@include flex;
+		display: flex;
+		flex-direction: row;
 		justify-content: center;
 		align-items: center;
 		background-color: rgba(255, 255, 255, 0.87);
