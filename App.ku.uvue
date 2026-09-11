@@ -1,25 +1,23 @@
 <template>
   <!-- 应用全局骨架与皮肤容器，通过 CSS 变量绑定响应式主题色 / 暗黑模式 -->
-  <view class="root-container flex flex-col flex-1" style="flex: 1; display: flex; flex-direction: column;"
-    :class="{ dark: appStore.state.isDark }" :style="themeStyle">
+  <view
+    class="root-container flex flex-col flex-1"
+    style="flex: 1; display: flex; flex-direction: column;"
+    :class="{ dark: appStore.state.isDark }"
+    :style="themeStyle"
+  >
     <!-- 页面内容滚动容器 -->
     <scroll-view direction="vertical" class="flex-1" style="flex: 1;">
       <slot></slot>
     </scroll-view>
     <!-- 自定义 TabBar：根据 config.uts 中的 type 配置切换形态（胶囊或标准底座） -->
-    <template v-if="customTabbarEnable && isCurrentPageTabbar">
-      <!-- 悬浮胶囊风格 (type: 'capsule') -->
-      <CustomCapsuleTabbar v-if="isCapsuleTabbar" />
-      <!-- 标准底座风格 (type: 'default') -->
-      <Tabbar v-else />
-    </template>
+    <Tabbar v-if="customTabbarEnable && isCurrentPageTabbar" />
   </view>
 </template>
 
 <script setup lang="uts">
 import Tabbar from '@/src/tabbar/index.uvue';
-import CustomCapsuleTabbar from '@/src/tabbar/custom/index.uvue';
-import { customTabbarEnable, isCapsuleTabbar, isPageTabbar, syncCurIdxByCurrentPage } from '@/src/tabbar/helper';
+import { customTabbarEnable, isPageTabbar, syncCurIdxByCurrentPage } from '@/src/tabbar';
 import { useAppStore } from '@/src/store';
 import { applyNavbarTheme, getThemeTokens } from '@/src/utils/theme';
 import { computed, onMounted, ref, watch } from 'vue';

@@ -75,8 +75,11 @@ export const isSinglePageTabbar: boolean = selectedTabbarStrategy == TABBAR_STRA
 /** 是否为无全局 TabBar 模式（模式 0 为 true） */
 export const isNoTabbar: boolean = selectedTabbarStrategy == TABBAR_STRATEGY_MAP.NO_TABBAR;
 
-/** 是否为悬浮胶囊风格 TabBar（根据 config.uts 中的 type 判定） */
-export const isCapsuleTabbar: boolean = customTabbarConfig.type == 'capsule';
+/** 当前配置的 TabBar UI 风格形态（如 'capsule' | 'default'，从 config.uts 中读取） */
+export const tabbarType: string = customTabbarConfig.type ?? 'default';
+
+/** 是否为悬浮胶囊风格 TabBar（向后兼容保留） */
+export const isCapsuleTabbar: boolean = tabbarType == 'capsule';
 
 /** 是否需要隐藏原生 tabbar（模式 2 为 true） */
 export const needHideNativeTabbar: boolean = selectedTabbarStrategy == TABBAR_STRATEGY_MAP.CUSTOM_TABBAR_WITH_NATIVE;
@@ -141,7 +144,8 @@ export function switchTabbar(url: string): void {
           return;
         }
       }
-    } catch { }
+    }
+    catch { }
     uni.redirectTo({
       url: '/src/pages/index/index',
       fail: (_err: any) => {

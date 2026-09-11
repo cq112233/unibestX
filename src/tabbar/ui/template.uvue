@@ -1,0 +1,229 @@
+<!--
+  TabBar 自定义 UI 模板组件 (Custom TabBar UI Template)
+  开发者可在本文件基础上直接修改、拓展个性化样式（例如毛玻璃、动效、异形、悬浮卡片等）
+-->
+<template>
+  <view class="template-tabbar-wrapper">
+    <!-- 1. 底部占位高度块：防止页面底层内容被固定定位的 TabBar 遮挡 -->
+    <view
+      v-if="showPlaceholder"
+      class="template-tabbar-placeholder"
+      :style="{ height: `${tabbarPlaceholderHeight}px` }"
+    />
+
+    <!-- 2. 底部固定定位容器：包含安全区适配 -->
+    <view
+      class="template-tabbar-fixed"
+      :style="{
+        height: `${height + safeAreaBottom}px`,
+        backgroundColor: themeTokens.tabBg,
+        borderTopColor: themeTokens.tabBorder
+      }"
+    >
+      <!-- 主交互区域 -->
+      <view class="template-tabbar-content" :style="{ height: `${height}px` }">
+        <view
+          v-for="(item, index) in tabbarList"
+          :key="index"
+          class="template-tabbar-item"
+          @click="onTabClick(index)"
+        >
+          <!-- 图标与角标区域 -->
+          <view class="item-icon-box">
+            <!-- 字体图标形式 -->
+            <uni-icons
+              v-if="item.iconType == 'icon'"
+              :type="getItemIcon(item, index)"
+              :size="22"
+              :color="getItemColor(index)"
+            />
+            <!-- 图片图标形式 -->
+            <image
+              v-else
+              :src="getItemIconPath(item, index)"
+              class="item-icon-img"
+            />
+
+            <!-- 徽标：小红点 (dot) -->
+            <view v-if="item.badge == 'dot'" class="badge-dot" />
+            <!-- 徽标：数字角标 (number) -->
+            <view v-else-if="typeof item.badge == 'number'" class="badge-num">
+              <text class="badge-num-text">{{ item.badge }}</text>
+            </view>
+          </view>
+
+          <!-- 文本标签（支持多语言翻译） -->
+          <text
+            class="item-text"
+            :style="{
+              color: getItemColor(index),
+              fontWeight: curIdx == index ? '600' : 'normal'
+            }"
+          >
+            {{ $t(item.text) }}
+          </text>
+        </view>
+      </view>
+
+      <!-- 底部安全区垫高 -->
+      <view :style="{ height: `${safeAreaBottom}px` }" />
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { onMounted } from 'vue';
+import {
+  curIdx,
+  handleTabbarClick,
+  safeAreaBottom,
+  safeHideNativeTabBar,
+  syncCurIdxByCurrentPage,
+  TABBAR_HEIGHT,
+  tabbarList,
+  tabbarPlaceholderHeight,
+  themeTokens
+} from '@/src/tabbar';
+import type { CustomTabBarItem } from '@/src/tabbar';
+import { $t } from '@/src/utils/i18n';
+
+defineProps({
+  /** 自定义 TabBar 高度（不含底部安全区，默认取全局基准 TABBAR_HEIGHT） */
+  height: {
+    type: Number,
+    default: TABBAR_HEIGHT
+  },
+  /** 是否开启底部占位块防遮挡（默认 true） */
+  showPlaceholder: {
+    type: Boolean,
+    default: true
+  }
+});
+
+// 组件挂载时自动同步当前页面路由索引并安全隐藏系统原生 TabBar
+onMounted(() => {
+  syncCurIdxByCurrentPage();
+  safeHideNativeTabBar();
+});
+
+/** 点击 Tab 触发标准路由跳转与状态切换 */
+function onTabClick(index: number): void {
+  handleTabbarClick(index);
+}
+
+/** 获取对应项文本/图标高亮或非高亮颜色 */
+function getItemColor(index: number): string {
+  return curIdx.value == index ? themeTokens.value.tabSelected : themeTokens.value.tabColor;
+}
+
+/** 获取选中或未选中的字体图标名称 */
+function getItemIcon(item: CustomTabBarItem, index: number): string {
+  if (curIdx.value == index && item.iconActive.length > 0) {
+    return item.iconActive;
+  }
+  return item.icon;
+}
+
+/** 获取选中或未选中的图片路径 */
+function getItemIconPath(item: CustomTabBarItem, index: number): string {
+  if (curIdx.value == index && item.selectedIconPath != null && item.selectedIconPath!.length > 0) {
+    return item.selectedIconPath!;
+  }
+  return item.iconPath ?? '';
+}
+</script>
+
+<style scoped>
+.template-tabbar-wrapper {
+  width: 100%;
+}
+
+.template-tabbar-placeholder {
+  width: 100%;
+}
+
+/* 固定贴底容器 */
+.template-tabbar-fixed {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 999;
+  border-top-width: 1px;
+  border-top-style: solid;
+  flex-direction: column;
+}
+
+/* 主内容行 */
+.template-tabbar-content {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-around;
+  width: 100%;
+}
+
+/* 单个 Tab 格位 */
+.template-tabbar-item {
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+/* 图标容器 */
+.item-icon-box {
+  position: relative;
+  width: 28px;
+  height: 28px;
+  align-items: center;
+  justify-content: center;
+}
+
+.item-icon-img {
+  width: 22px;
+  height: 22px;
+}
+
+/* 文本 */
+.item-text {
+  font-size: 10px;
+  margin-top: 2px;
+  line-height: 12px;
+}
+
+/* 红点角标 */
+.badge-dot {
+  position: absolute;
+  top: 1px;
+  right: 2px;
+  width: 8px;
+  height: 8px;
+  border-radius: 4px;
+  background-color: #ef4444;
+}
+
+/* 数字角标 */
+.badge-num {
+  position: absolute;
+  top: -2px;
+  right: -6px;
+  background-color: #ef4444;
+  border-radius: 9px;
+  min-width: 16px;
+  height: 16px;
+  padding-left: 4px;
+  padding-right: 4px;
+  align-items: center;
+  justify-content: center;
+  border-width: 1px;
+  border-style: solid;
+  border-color: #ffffff;
+}
+
+.badge-num-text {
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: bold;
+  line-height: 12px;
+}
+</style>

@@ -6,7 +6,7 @@ import {
   syncCurIdxByCurrentPage,
   tabbarList,
   themeColor
-} from '../helper';
+} from '../../helper';
 import { $t } from '@/src/utils/i18n';
 import { useAppStore } from '@/src/store';
 import { getThemeTokens } from '@/src/utils/theme';
@@ -187,16 +187,20 @@ function getItemFontWeight(index: number): string {
 <template>
   <view class="custom-capsule-wrapper">
     <!-- 底部占位块：防止页面底部内容被悬浮 Tab 栏遮挡 -->
-    <view v-if="showPlaceholder" class="custom-capsule-placeholder"
-      :style="{ height: `${height + bottomOffset * 2 + safeAreaBottom}px` }" />
+    <view
+      v-if="showPlaceholder" class="custom-capsule-placeholder"
+      :style="{ height: `${height + bottomOffset * 2 + safeAreaBottom}px` }"
+    />
 
     <!-- 悬浮胶囊底座主容器 -->
-    <view class="custom-capsule-container" :style="{
-      bottom: `${bottomOffset + safeAreaBottom}px`,
-      height: `${height}px`,
-      backgroundColor: themeTokens.tabBg,
-      borderColor: themeTokens.tabBorder
-    }">
+    <view
+      class="custom-capsule-container" :style="{
+        bottom: `${bottomOffset + safeAreaBottom}px`,
+        height: `${height}px`,
+        backgroundColor: themeTokens.tabBg,
+        borderColor: themeTokens.tabBorder
+      }"
+    >
       <!-- 动态滑动滑块：在各 Tab 底部平滑移动 (Animated Slider Pill) -->
       <view class="capsule-slider-track">
         <view class="capsule-slider" :style="sliderStyle">
@@ -222,8 +226,10 @@ function getItemFontWeight(index: number): string {
           <!-- 图标与角标容器 -->
           <view class="capsule-icon-wrap">
             <!-- uni-icons 字体图标 -->
-            <uni-icons v-if="item.iconType == 'icon'" :type="getItemIcon(index)" :size="20"
-              :color="getItemIconColor(index)" />
+            <uni-icons
+              v-if="item.iconType == 'icon'" :type="getItemIcon(index)" :size="20"
+              :color="getItemIconColor(index)"
+            />
             <!-- 图片图标 -->
             <image v-else :src="getItemIconPath(index)" class="capsule-icon-image" />
 
@@ -236,10 +242,12 @@ function getItemFontWeight(index: number): string {
           </view>
 
           <!-- 标签文字（支持 i18n 翻译） -->
-          <text class="capsule-item-text" :style="{
-            color: getItemTextColor(index),
-            fontWeight: getItemFontWeight(index)
-          }">
+          <text
+            class="capsule-item-text" :style="{
+              color: getItemTextColor(index),
+              fontWeight: getItemFontWeight(index)
+            }"
+          >
             {{ getText(item.text) }}
           </text>
         </view>
