@@ -58,6 +58,27 @@ const activeItemBgColor = computed<string>((): string => {
   return `${color}18`;
 });
 
+/** 滑块单项宽度占比（百分比） */
+const sliderWidthPercent = computed<number>((): number => {
+  if (tabbarList.length == 0) {
+    return 25;
+  }
+  return 100 / tabbarList.length;
+});
+
+/** 动态滑块平移动画样式 */
+const sliderStyle = computed<UTSJSONObject>((): UTSJSONObject => {
+  const widthPct = sliderWidthPercent.value;
+  const offsetPct = curIdx.value * 100;
+  return {
+    width: `${widthPct}%`,
+    transform: `translateX(${offsetPct}%)`,
+    transitionProperty: 'transform',
+    transitionDuration: '280ms',
+    transitionTimingFunction: 'cubic-bezier(0.25, 1, 0.5, 1)'
+  } as UTSJSONObject;
+});
+
 // 挂载时同步激活索引并确保原生 TabBar 隐藏
 onMounted(() => {
   syncCurIdxByCurrentPage();
@@ -72,11 +93,6 @@ function onTabClick(index: number) {
 /** 获取多语言翻译文本 */
 function getText(text: string): string {
   return $t(text);
-}
-
-/** 获取胶囊项背景色 */
-function getItemBgColor(index: number): string {
-  return curIdx.value == index ? activeItemBgColor.value : 'transparent';
 }
 
 /** 获取图标字体名称 */
@@ -132,11 +148,16 @@ function getItemFontWeight(index: number): string {
       backgroundColor: themeTokens.tabBg,
       borderColor: themeTokens.tabBorder
     }">
+      <!-- 动态滑动滑块：在各 Tab 底部平滑移动 (Animated Slider Pill) -->
+      <view class="capsule-slider-track">
+        <view class="capsule-slider" :style="sliderStyle">
+          <view class="capsule-slider-pill" :style="{ backgroundColor: activeItemBgColor }" />
+        </view>
+      </view>
+
       <view v-for="(item, index) in tabbarList" :key="index" class="capsule-item-slot" @click="onTabClick(index)">
-        <!-- 胶囊项背景包装块（激活时展示高亮底色背景） -->
-        <view class="capsule-item-inner" :style="{
-          backgroundColor: getItemBgColor(index)
-        }">
+        <!-- 胶囊项包装块 -->
+        <view class="capsule-item-inner">
           <!-- 图标与角标容器 -->
           <view class="capsule-icon-wrap">
             <!-- uni-icons 字体图标 -->
@@ -146,9 +167,9 @@ function getItemFontWeight(index: number): string {
             <image v-else :src="getItemIconPath(index)" class="capsule-icon-image" />
 
             <!-- 小红点角标 -->
-            <view v-if="item.badge != null && item.badge == 'dot'" class="capsule-badge-dot" />
+            <view v-if="item.badge != null && `${item.badge}` == 'dot'" class="capsule-badge-dot" />
             <!-- 文本数字角标 -->
-            <view v-else-if="item.badge != null && item.badge != 'dot'" class="capsule-badge-text">
+            <view v-else-if="item.badge != null && `${item.badge}` != 'dot'" class="capsule-badge-text">
               <text class="capsule-badge-label">{{ item.badge }}</text>
             </view>
           </view>
@@ -193,15 +214,43 @@ function getItemFontWeight(index: number): string {
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
 }
 
+/* 动态滑块滑动轨道（与外层 4px 6px padding 区域对齐） */
+.capsule-slider-track {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  left: 6px;
+  right: 6px;
+  z-index: 1;
+  pointer-events: none;
+  flex-direction: row;
+}
+
+/* 动态滑块单元（负责平移动画） */
+.capsule-slider {
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 动态滑块本体胶囊（高亮背景） */
+.capsule-slider-pill {
+  width: 90%;
+  height: 84%;
+  border-radius: 20px;
+}
+
 /* 单个 Tab 格位 */
 .capsule-item-slot {
+  position: relative;
+  z-index: 2;
   flex: 1;
   align-items: center;
   justify-content: center;
   height: 100%;
 }
 
-/* 选中项的胶囊高亮包裹块（禁用 transition 防止原生 Android 切页时动画中断导致底色残留） */
+/* 胶囊内容项 */
 .capsule-item-inner {
   flex-direction: column;
   align-items: center;
@@ -230,6 +279,8 @@ function getItemFontWeight(index: number): string {
   font-size: 11px;
   line-height: 14px;
   margin-top: 2px;
+  transition-property: color;
+  transition-duration: 200ms;
 }
 
 /* 徽标小红点 */
