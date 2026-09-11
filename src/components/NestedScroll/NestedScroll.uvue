@@ -10,10 +10,18 @@
       :show-scrollbar="showScrollbar"
       :refresher-enabled="enablePullDown"
       :refresher-triggered="innerRefreshing"
+      :refresher-threshold="refresherThreshold"
+      :refresher-default-style="hasRefresherSlot ? 'none' : 'black'"
+      :refresher-background="refresherBackground"
       @refresherrefresh="handleRefresherRefresh"
       @refresherrestore="handleRefresherRestore"
       @refresherabort="handleRefresherRestore"
     >
+      <!-- 自定义下拉刷新插槽 -->
+      <view v-if="hasRefresherSlot" slot="refresher" class="w-full">
+        <slot name="refresher" :refreshing="innerRefreshing" />
+      </view>
+
       <!-- 嵌套顶部区域（仅可包含一个根节点） -->
       <nested-scroll-header v-if="hasHeaderSlot">
         <view class="nested-header-wrap">
@@ -61,34 +69,40 @@
               <view class="py-[16px] items-center justify-center flex flex-row">
                 <!-- 加载中 -->
                 <template v-if="loading">
-                  <text
-                    class="text-[12px] font-medium"
-                    :class="isDark ? 'text-[#94a3b8]' : 'text-[#64748b]'"
-                  >
-                    {{ loadingText }}
-                  </text>
+                  <slot name="loading">
+                    <text
+                      class="text-[12px] font-medium"
+                      :class="isDark ? 'text-[#94a3b8]' : 'text-[#64748b]'"
+                    >
+                      {{ loadingText }}
+                    </text>
+                  </slot>
                 </template>
 
                 <!-- 加载失败重试 -->
                 <template v-else-if="error">
-                  <view class="flex flex-row items-center" @click="handleRetry">
-                    <text class="text-[12px] text-[#ef4444] font-medium mr-[4px]">
-                      {{ errorText }}
-                    </text>
-                    <text class="text-[12px] text-[#4f46e5] font-bold">
-                      点击重试
-                    </text>
-                  </view>
+                  <slot name="error">
+                    <view class="flex flex-row items-center" @click="handleRetry">
+                      <text class="text-[12px] text-[#ef4444] font-medium mr-[4px]">
+                        {{ errorText }}
+                      </text>
+                      <text class="text-[12px] text-[#4f46e5] font-bold">
+                        点击重试
+                      </text>
+                    </view>
+                  </slot>
                 </template>
 
                 <!-- 没有更多数据了 -->
                 <template v-else-if="finished">
-                  <text
-                    class="text-[12px]"
-                    :class="isDark ? 'text-[#475569]' : 'text-[#cbd5e1]'"
-                  >
-                    {{ finishedText }}
-                  </text>
+                  <slot name="finished">
+                    <text
+                      class="text-[12px]"
+                      :class="isDark ? 'text-[#475569]' : 'text-[#cbd5e1]'"
+                    >
+                      {{ finishedText }}
+                    </text>
+                  </slot>
                 </template>
               </view>
             </slot>
@@ -106,11 +120,19 @@
       :show-scrollbar="showScrollbar"
       :refresher-enabled="enablePullDown"
       :refresher-triggered="innerRefreshing"
+      :refresher-threshold="refresherThreshold"
+      :refresher-default-style="hasRefresherSlot ? 'none' : 'black'"
+      :refresher-background="refresherBackground"
       @refresherrefresh="handleRefresherRefresh"
       @refresherrestore="handleRefresherRestore"
       @refresherabort="handleRefresherRestore"
       @scrolltolower="handleScrollToLower"
     >
+      <!-- 自定义下拉刷新插槽 -->
+      <view v-if="hasRefresherSlot" slot="refresher" class="w-full">
+        <slot name="refresher" :refreshing="innerRefreshing" />
+      </view>
+
       <slot v-if="hasHeaderSlot" name="header" />
       <slot />
 
@@ -139,30 +161,36 @@
         >
           <view class="py-[16px] items-center justify-center flex flex-row">
             <template v-if="loading">
-              <text
-                class="text-[12px] font-medium"
-                :class="isDark ? 'text-[#94a3b8]' : 'text-[#64748b]'"
-              >
-                {{ loadingText }}
-              </text>
+              <slot name="loading">
+                <text
+                  class="text-[12px] font-medium"
+                  :class="isDark ? 'text-[#94a3b8]' : 'text-[#64748b]'"
+                >
+                  {{ loadingText }}
+                </text>
+              </slot>
             </template>
             <template v-else-if="error">
-              <view class="flex flex-row items-center" @click="handleRetry">
-                <text class="text-[12px] text-[#ef4444] font-medium mr-[4px]">
-                  {{ errorText }}
-                </text>
-                <text class="text-[12px] text-[#4f46e5] font-bold">
-                  点击重试
-                </text>
-              </view>
+              <slot name="error">
+                <view class="flex flex-row items-center" @click="handleRetry">
+                  <text class="text-[12px] text-[#ef4444] font-medium mr-[4px]">
+                    {{ errorText }}
+                  </text>
+                  <text class="text-[12px] text-[#4f46e5] font-bold">
+                    点击重试
+                  </text>
+                </view>
+              </slot>
             </template>
             <template v-else-if="finished">
-              <text
-                class="text-[12px]"
-                :class="isDark ? 'text-[#475569]' : 'text-[#cbd5e1]'"
-              >
-                {{ finishedText }}
-              </text>
+              <slot name="finished">
+                <text
+                  class="text-[12px]"
+                  :class="isDark ? 'text-[#475569]' : 'text-[#cbd5e1]'"
+                >
+                  {{ finishedText }}
+                </text>
+              </slot>
             </template>
           </view>
         </slot>
@@ -241,12 +269,23 @@ const props = defineProps({
   bounces: {
     type: Boolean,
     default: true
+  },
+  /** 下拉刷新阈值，单位 px */
+  refresherThreshold: {
+    type: Number,
+    default: 60
+  },
+  /** 下拉刷新区域背景颜色 */
+  refresherBackground: {
+    type: String,
+    default: 'transparent'
   }
 });
 
 const emit = defineEmits<{
   (e: 'refresh'): void;
   (e: 'loadMore'): void;
+  (e: 'load-more'): void;
   (e: 'update:refreshing', val: boolean): void;
   (e: 'update:loading', val: boolean): void;
 }>();
@@ -255,6 +294,11 @@ const slots = useSlots();
 const hasHeaderSlot = computed((): boolean => {
   // eslint-disable-next-line dot-notation
   return slots['header'] != null;
+});
+
+const hasRefresherSlot = computed((): boolean => {
+  // eslint-disable-next-line dot-notation
+  return slots['refresher'] != null;
 });
 
 const appStore = useAppStore();
@@ -306,7 +350,12 @@ function handleRefresherRefresh() {
 
 // 下拉刷新恢复
 function handleRefresherRestore() {
-  endRefresh();
+  if (refreshTimeoutId != null) {
+    clearTimeout(refreshTimeoutId!);
+    refreshTimeoutId = null;
+  }
+  innerRefreshing.value = false;
+  emit('update:refreshing', false);
 }
 
 // 触底加载更多
@@ -316,12 +365,14 @@ function handleScrollToLower() {
   }
   emit('update:loading', true);
   emit('loadMore');
+  emit('load-more');
 }
 
 // 失败点击重试
 function handleRetry() {
   emit('update:loading', true);
   emit('loadMore');
+  emit('load-more');
 }
 
 defineExpose({
