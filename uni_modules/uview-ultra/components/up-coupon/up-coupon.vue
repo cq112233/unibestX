@@ -32,12 +32,12 @@
 			</view>
 			
 			<!-- 右侧操作区域 -->
-			<view class="up-coupon__action up-padding-right-20">
+			<view class="up-coupon__action">
 				<slot name="action" :actionText="actionText" :circle="circle">
 					<view
 						class="up-coupon__action-btn"
 						:class="[
-							(circle || actionText == '使用') ? 'up-coupon__action-btn--circle' : 'up-coupon__action-btn--square',
+							circle ? 'up-coupon__action-btn--circle' : 'up-coupon__action-btn--square',
 							type ? 'up-coupon__action-btn--plain' : 'up-coupon__action-btn--solid'
 						]"
 						:style="[actionBtnStyle]"
@@ -159,11 +159,13 @@
 					s.backgroundColor = '#eb433d';
 					s.borderColor = '#eb433d';
 				}
-				if (this.circle || this.actionText === '使用') {
+				if (this.circle) {
 					s.borderRadius = '999px';
 				} else {
-					s.borderRadius = '12rpx';
+					s.borderRadius = '10rpx';
 				}
+				s.height = '52rpx';
+				s.minWidth = '96rpx';
 				return s;
 			},
 			actionBtnTextStyle() {
@@ -173,6 +175,8 @@
 				} else {
 					s.color = '#ffffff';
 				}
+				s.fontSize = '26rpx';
+				s.lineHeight = '26rpx';
 				return s;
 			},
 			dotCount() {
@@ -344,16 +348,19 @@
 			flex-direction: row;
 			align-items: center;
 			justify-content: center;
-			padding: 10rpx 22rpx;
+			height: 52rpx;
+			min-width: 96rpx;
+			padding: 0 20rpx;
 			border-width: 1px;
 			border-style: solid;
+			box-sizing: border-box;
 
 			&--circle {
 				border-radius: 999px;
 			}
 
 			&--square {
-				border-radius: 12rpx;
+				border-radius: 10rpx;
 			}
 
 			&--solid {
@@ -368,9 +375,10 @@
 		}
 
 		&__action-btn-text {
-			font-size: 24rpx;
-			font-weight: bold;
-			line-height: 32rpx;
+			font-size: 26rpx;
+			font-weight: normal;
+			line-height: 26rpx;
+			text-align: center;
 
 			&--solid {
 				color: #ffffff;
