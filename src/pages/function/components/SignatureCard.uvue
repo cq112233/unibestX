@@ -3,10 +3,11 @@
     <!-- 签名画布区域 -->
     <view
       class="signature-wrapper rounded-[12px] mb-[16px] border-[1px] border-solid border-[#e2e8f0] overflow-hidden"
-      style="width: 100%; height: 300px;touch-action: none;"
+      style="width: 100%; height: 300px;"
       @touchstart="onCardTouchStart"
       @touchend="onCardTouchEnd"
       @touchcancel="onCardTouchEnd"
+      @touchmove.stop.prevent="preventScroll"
     >
       <l-signature
         ref="sigRef"
@@ -110,7 +111,7 @@ import { setPageScrollEnabled } from '@/src/utils/pageScroll.uts';
 
 const sigRef = ref<ComponentPublicInstance | null>(null);
 
-const penColor = ref('#ef4444');
+const penColor = ref('red');
 const penSize = ref(4);
 const openSmooth = ref(true);
 const signUrl = ref('');
@@ -126,18 +127,13 @@ function onCardTouchEnd(_e: UniTouchEvent) {
   setPageScrollEnabled(true);
 }
 
+function preventScroll(_e: UniTouchEvent) {
+  // 阻止滑动穿透到父级 scroll-view
+}
+
 onUnmounted(() => {
   setPageScrollEnabled(true);
 });
-
-function callSigMethod(el: ComponentPublicInstance, name: string, arg: any | null = null) {
-  try {
-    el.$callMethod(name, arg);
-  }
-  catch {
-    // 忽略调用失败
-  }
-}
 
 function onAction(type: string) {
   const el = sigRef.value;
@@ -146,17 +142,17 @@ function onAction(type: string) {
     return;
   }
   if (type === 'clear') {
-    callSigMethod(el, 'clear');
+    el.$callMethod('clear');
     signUrl.value = '';
   }
   else if (type === 'undo') {
-    callSigMethod(el, 'undo');
+    el.$callMethod('undo');
   }
   else if (type === 'redo') {
-    callSigMethod(el, 'redo');
+    el.$callMethod('redo');
   }
   else if (type === 'save') {
-    callSigMethod(el, 'canvasToTempFilePath', {
+    el.$callMethod('canvasToTempFilePath', {
       success: (res: LimeSignatureToFileSuccess) => {
         if (res.isEmpty) {
           uni.showToast({ title: '请先签名', icon: 'none' });
