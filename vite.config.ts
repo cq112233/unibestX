@@ -106,7 +106,9 @@ export default defineConfig({
       autoCreateViews: true,
       configFile: 'src/tabbar/config.uts'
     }),
-    uniEasycomPlugin({ exclude: UNI_EASYCOM_EXCLUDE }),
+    ...(!process.env.UNI_PLATFORM?.startsWith('mp-')
+      ? [uniEasycomPlugin({ exclude: UNI_EASYCOM_EXCLUDE })]
+      : []),
     // 手动补充 easycom 插件（限制非小程序端生效，含 App 与 Web）
     // 该插件内部名为 uni:app-easycom，负责在 App 蒸汽模式与 Web 端把模板里的 easycom 标签转成静态 import；
     // 小程序端（mp-*）由官方编译器基于 usingComponents 原生处理，挂载该插件会导致组件被转为未知动态组件并报错 resolveDynamicComponent。

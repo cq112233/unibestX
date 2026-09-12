@@ -28,14 +28,15 @@
     <TimeDemoCard />
 
     <!-- 签名板 lime-signature 示例组件 -->
-    <SignatureCard />
+    <SignatureCard v-if="isSignatureReady" />
 
     <!-- ECharts 图表示例组件 -->
-    <EchartsDemoCard />
+    <EchartsDemoCard v-if="isEchartReady" />
   </view>
 </template>
 
 <script setup lang="uts">
+import { onMounted, ref } from 'vue';
 import CryptoDemoCard from '../components/CryptoDemoCard.uvue';
 import EchartsDemoCard from '../components/EchartsDemoCard.uvue';
 import HapticsCard from '../components/HapticsCard.uvue';
@@ -48,6 +49,9 @@ import ZPagingDemoCard from '../components/ZPagingDemoCard.uvue';
 import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/utils/refresh.uts';
 import { curIdx, onTabShow } from '@/src/tabbar';
 
+const isSignatureReady = ref(false);
+const isEchartReady = ref(false);
+
 // 页面数据加载/刷新方法
 function refreshData(): void {
   console.log('功能页面刷新中...');
@@ -58,10 +62,30 @@ function refreshData(): void {
   }, 1000);
 }
 
-// 监听 Tab 切换到当前功能页（索引 2）时触发刷新
+// 监听 Tab 切换到当前功能页（索引 2）时触发
 onTabShow(2, () => {
   console.log('切换到了功能 Tab');
   refreshData();
+  if (!isSignatureReady.value) {
+    setTimeout(() => {
+      isSignatureReady.value = true;
+    }, 100);
+  }
+  if (!isEchartReady.value) {
+    setTimeout(() => {
+      isEchartReady.value = true;
+    }, 100);
+  }
+}, true);
+
+onMounted(() => {
+  // 独立页面模式或作为首屏激活 Tab 时的挂载兜底
+  if (curIdx.value < 0 || curIdx.value == 2) {
+    setTimeout(() => {
+      isSignatureReady.value = true;
+      isEchartReady.value = true;
+    }, 200);
+  }
 });
 
 // 监听 navbar 自定义下拉刷新事件（在 enablePullDownRefresh: true 且处于当前 Tab 时生效）
