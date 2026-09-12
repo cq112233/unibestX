@@ -49,6 +49,15 @@ import ZPagingDemoCard from '../components/ZPagingDemoCard.uvue';
 import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/utils/refresh.uts';
 import { curIdx, onTabShow } from '@/src/tabbar';
 
+/**
+ * Canvas 画布组件（签名板、ECharts）按需加载标记：
+ * 【原因说明】：
+ * 1. 在单页面 TabBar 容器（模式 4）下，非首屏 Tab 初始处于非激活隐藏态（如 left: -9999px 或排版未完成）。
+ * 2. 微信小程序与跨端底层在节点隐藏或尺寸未稳定时初始化 Canvas，createSelectorQuery() 获取到的物理宽高可能为 0px，
+ *    从而导致图表渲染不全、变形、白屏，或签名板初始化报尺寸计算错误。
+ * 3. 故默认设为 false，仅在用户首次切换进入当前 Tab 且容器物理布局就绪后挂载 Canvas 节点；
+ * 4. 挂载后状态保持为 true（组件保活），后续切 Tab 不会重复销毁/重建，既保留画板笔迹，又避免重复创建的性能开销。
+ */
 const isSignatureReady = ref(false);
 const isEchartReady = ref(false);
 
@@ -66,6 +75,8 @@ function refreshData(): void {
 onTabShow(2, () => {
   console.log('切换到了功能 Tab');
   refreshData();
+
+  // 延迟 100ms 挂载：确保微信小程序与各端渲染线程（WebView/原生容器）已将视图移入可视区并完成物理像素排版
   if (!isSignatureReady.value) {
     setTimeout(() => {
       isSignatureReady.value = true;
@@ -79,7 +90,10 @@ onTabShow(2, () => {
 }, true);
 
 onMounted(() => {
-  // 独立页面模式或作为首屏激活 Tab 时的挂载兜底
+  // 挂载兜底兼容：
+  // 1. 独立页面访问模式（非 TabBar 容器场景，curIdx 为 -1）
+  // 2. 项目配置当前功能页为首屏默认激活 Tab（curIdx 为 2）
+  // 在视图节点初次渲染就绪后延迟激活 Canvas 组件
   if (curIdx.value < 0 || curIdx.value == 2) {
     setTimeout(() => {
       isSignatureReady.value = true;
