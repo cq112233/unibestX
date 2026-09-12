@@ -168,13 +168,13 @@ let list: string[] = []
 
   <!-- ✅ 正确 -->
   <view class="w-full h-[36px] rounded-[8px] bg-primary flex flex-row items-center justify-center">
-    <text class="text-white text-[14px] font-medium">确认提交</text>
+    <text class="text-[#ffffff] text-[14px] font-medium">确认提交</text>
   </view>
   ```
 
 ### 2.3 `color` 属性仅支持特定文本元素
 
-- **铁律**：Tailwind 的文本颜色类（如 `text-[#1e293b]`、`text-primary`、`text-white`）底层对应的 `color` 属性**仅支持**在 `<text>`、`<button>`、`<input>`、`<textarea>` 上使用，**禁止**在 `<view>` 上直接定义文字颜色。
+- **铁律**：Tailwind 的文本颜色类（如 `text-[#1e293b]`、`text-primary`、`text-[#ffffff]`）底层对应的 `color` 属性**仅支持**在 `<text>`、`<button>`、`<input>`、`<textarea>` 上使用，**禁止**在 `<view>` 上直接定义文字颜色。
 - **规则**：将字体颜色类名挂载到内部的 `<text>` 标签上：
 
   ```html
@@ -189,7 +189,30 @@ let list: string[] = []
   </view>
   ```
 
-### 2.4 Tailwind CSS 边框书写规范
+### 2.4 颜色值规范：一律强制使用十六进制格式（如 `#ffffff`），严禁使用英文命名颜色（如 `bg-[red]`）
+
+- **铁律**：**颜色必须使用十六进制格式（如 `#ffffff`、`#ef4444`），严禁使用英文单词命名颜色（如 `bg-[red]`、`text-[red]`、`border-[blue]`）**。
+- **原因**：
+  1. uni-app X 在原生平台（Android Kotlin、iOS Swift、鸿蒙 ArkTS / VDOM）下对 CSS 英文命名颜色（named colors）的支持和解析极不一致，极易导致颜色失效或触发原生解析异常。
+  2. 预设类名（如 `text-white`、`bg-white`）在底层可能编译为依赖 CSS 变量的形式。在鸿蒙 VDOM 或组件插槽中，CSS 变量继承可能会丢失，从而退化为系统默认黑色。
+- **规则与最佳实践**：
+  - **背景色**：使用 `bg-[#ffffff]`、`bg-[#ef4444]`，禁止使用 `bg-[red]` 或 `bg-red`。
+  - **文字色**：使用 `text-[#ffffff]`、`text-[#1e293b]`，禁止使用 `text-[red]`、`text-[black]`。
+  - **鸿蒙 VDOM 双重防护**：在插槽（如 slot、返回顶部按钮、弹窗等）内的文本白色，强烈建议使用 `class="text-[#ffffff]"` 并叠加 `:style="{ color: '#ffffff' }"`，确保在鸿蒙等全平台 100% 稳定呈现白色。
+
+```html
+<!-- ❌ 错误：使用英文命名颜色，原生解析不可靠 -->
+<view class="bg-[red] p-[10px]">
+  <text class="text-[white]">提示文字</text>
+</view>
+
+<!-- ✅ 正确：全部使用标准十六进制色值 -->
+<view class="bg-[#ef4444] p-[10px]">
+  <text class="text-[#ffffff] text-[14px]" style="color: #ffffff;">提示文字</text>
+</view>
+```
+
+### 2.5 Tailwind CSS 边框书写规范
 
 - **铁律**：原生平台解析器要求明确指定边框宽度、颜色与实线样式，推荐使用带明确属性的 Tailwind 类名组合：
 
@@ -198,7 +221,7 @@ let list: string[] = []
   <view class="border-[1px] border-solid border-[#e2e8f0] rounded-[12px] p-[16px]"></view>
   ```
 
-### 2.5 禁用字体族与 Display 限制
+### 2.6 禁用字体族与 Display 限制
 
 - **禁止 `font-mono` / `font-sans`**：缺少 `font-size` 会导致原生解析器报错 `[parse-css-font] Missing required font-size.`。如需等宽字体，请使用内联样式：
 
@@ -210,11 +233,11 @@ let list: string[] = []
 - **布局推荐使用 Flex 类名**：`flex flex-row`、`flex-col`、`flex-1`、`items-center`、`justify-between`、`justify-center`。
 - **对齐支持**：Tailwind v4 原生输出 `flex-start`/`flex-end`，`justify-start`、`items-start`、`self-start` 可安全使用。
 
-### 2.6 文本行高支持
+### 2.7 文本行高支持
 
 - `weapp-tailwindcss` 现已全面支持 `leading-[...]` 原子化类名（如 `leading-[26px]`、`leading-[20px]`），可直接在 `<text>` 等元素上使用原子化类名。
 
-### 2.7 Tailwind 自定义配置与安全区适配
+### 2.8 Tailwind 自定义配置与安全区适配
 
 - **安全区工具类**（通过 `tailwind.config.ts` 插件提供）：
   - `.p-safe`：四周安全区 padding
@@ -228,12 +251,12 @@ let list: string[] = []
 - **暗黑模式**：
   - 支持 `dark:` 变体，例如 `class="bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100"`
 
-### 2.8 高度与 Flex 布局子元素高度塌陷
+### 2.9 高度与 Flex 布局子元素高度塌陷
 
 - **视口单位**：原生不支持 `vh` / `vw`，使用 `flex-1`、`h-full` 或 `uni.getWindowInfo().windowHeight`。
 - **Flex 塌陷**：当父容器为 `flex-1` 且无显式像素高度时，子元素设置 `h-full` (100%) 在原生端会被解析为 0。子元素也必须使用 `flex-1`。
 
-### 2.9 标签自闭合规范
+### 2.10 标签自闭合规范
 
 - 模板中的 Void 元素（如 `<input />`、`<image />`）必须显式自闭合。
 

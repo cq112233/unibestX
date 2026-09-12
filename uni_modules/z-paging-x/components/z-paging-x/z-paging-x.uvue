@@ -686,6 +686,9 @@ by ZXLee
     _cleanRefresherCompleteDelayTimer()
     _cleanRefresherEndAnimateTimer()
     pageNo.value = props.defaultPageNo;
+    customNoMore.value = -1;
+    loadMoreStatus.value = Enum.More.Default;
+    isLoadFailed.value = false;
     forceHideLoadMore.value = true;
     if (props.showRefresherWhenReload) {
       nextTick(() => {
@@ -748,6 +751,8 @@ by ZXLee
       // 如果customNoMore等于1 或者 customNoMore不是0并且新增数组长度为0(也就是不是明确的还有更多数据并且新增的数组长度为0)，则没有更多数据了
       if (customNoMore.value == 1 || (customNoMore.value != 0 && finalData.length == 0)) {
         loadMoreStatus.value = Enum.More.NoMore;
+      } else {
+        loadMoreStatus.value = Enum.More.Default;
       }
     } else {
       // 如果新增的数据数组长度为0 或者 新增的数组长度小于默认的pageSize，则没有更多数据了
@@ -799,9 +804,12 @@ by ZXLee
       completeByNoMore(data, nomore);
     })
   }
-  // 请求结束(失败)调用此方法，将自动展示失败页面
+  // 请求结束(失败)调用此方法，将自动展示失败页面或底部加载失败状态
   const completeByError = () => {
     isLoadFailed.value = true;
+    if (!isFirstPage.value) {
+      loadMoreStatus.value = Enum.More.Fail;
+    }
     endRefresh();
   }
   // 刷新列表数据，pageNo和pageSize不会重置，列表数据会重新从服务端获取
@@ -872,9 +880,12 @@ by ZXLee
   // 处理加载更多数据
   const _handleLoadMore = () => {
     if (!props.loadMoreEnabled || isLoading.value || loadMoreStatus.value === Enum.More.NoMore) return;
+    const isRetry = loadMoreStatus.value === Enum.More.Fail;
     // 将底部加载更多状态设置为加载中
     loadMoreStatus.value = Enum.More.Loading;
-    pageNo.value ++;
+    if (!isRetry) {
+      pageNo.value ++;
+    }
     queryFrom.value = Enum.QueryFrom.LoadMore;
     _emitQuery(pageNo.value, props.defaultPageSize);
   }

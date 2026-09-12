@@ -1,0 +1,86 @@
+<template>
+  <view>
+    <!-- 标题头 -->
+    <view class="pt-[20px] px-[16px] pb-[10px]">
+      <text class="text-[20px] font-bold text-[#1a202c]">功能组件库演示</text>
+      <text class="text-[13px] text-[#718096] mt-[4px]">演示原生设备 API 调用、常用工具库与组件集成</text>
+    </view>
+
+    <!-- 数据分页列表示例组件 (z-paging-x) -->
+    <ZPagingDemoCard />
+
+    <!-- 实用工具库与系统能力独立演示入口卡片 -->
+    <UtilsNavCard />
+
+    <!-- 签名板 lime-signature 示例组件 -->
+    <SignatureCard v-if="isCanvasReady" />
+
+    <!-- ECharts 图表示例组件 -->
+    <EchartsDemoCard v-if="isCanvasReady" />
+  </view>
+</template>
+
+<script setup lang="uts">
+import { onMounted, ref } from 'vue';
+import EchartsDemoCard from '../components/EchartsDemoCard.uvue';
+import SignatureCard from '../components/SignatureCard.uvue';
+import UtilsNavCard from '../components/UtilsNavCard.uvue';
+import ZPagingDemoCard from '../components/ZPagingDemoCard.uvue';
+import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/utils/refresh.uts';
+import { curIdx, onTabShow } from '@/src/tabbar';
+
+/**
+ * Canvas 画布组件（签名板、ECharts）按需加载标记：
+ * 【原因说明】：
+ * 1. 在单页面 TabBar 容器（模式 4）下，非首屏 Tab 初始处于非激活隐藏态（如 left: -9999px 或排版未完成）。
+ * 2. 微信小程序与跨端底层在节点隐藏或尺寸未稳定时初始化 Canvas，createSelectorQuery() 获取到的物理宽高可能为 0px，
+ *    从而导致图表渲染不全、变形、白屏，或签名板初始化报尺寸计算错误。
+ * 3. 故默认设为 false，仅在用户首次切换进入当前 Tab 且容器物理布局就绪后挂载 Canvas 节点；
+ * 4. 挂载后状态保持为 true（组件保活），后续切 Tab 不会重复销毁/重建，既保留画板笔迹，又避免重复创建的性能开销。
+ */
+const isCanvasReady = ref(false);
+
+// 页面数据加载/刷新方法
+function refreshData(): void {
+  console.log('功能页面刷新中...');
+  setTimeout(() => {
+    console.log('功能页面刷新成功');
+    // 数据加载完毕后，手动停止下拉刷新动画状态
+    stopNavbarPullDownRefresh();
+  }, 1000);
+}
+
+// 监听 Tab 切换到当前功能页（索引 2）时触发
+onTabShow(2, () => {
+  console.log('切换到了功能 Tab');
+  refreshData();
+
+  // 延迟 100ms 挂载：确保微信小程序与各端渲染线程（WebView/原生容器）已将视图移入可视区并完成物理像素排版
+  if (!isCanvasReady.value) {
+    setTimeout(() => {
+      isCanvasReady.value = true;
+    }, 100);
+  }
+}, true);
+
+onMounted(() => {
+  // 挂载兜底兼容：
+  // 1. 独立页面访问模式（非 TabBar 容器场景，curIdx 为 -1）
+  // 2. 项目配置当前功能页为首屏默认激活 Tab（curIdx 为 2）
+  // 在视图节点初次渲染就绪后延迟激活 Canvas 组件
+  if (curIdx.value < 0 || curIdx.value == 2) {
+    setTimeout(() => {
+      isCanvasReady.value = true;
+    }, 200);
+  }
+});
+
+// 监听 navbar 自定义下拉刷新事件（在 enablePullDownRefresh: true 且处于当前 Tab 时生效）
+onNavbarPullDownRefresh(() => {
+  if (curIdx.value == 2) {
+    refreshData();
+  }
+});
+</script>
+
+<style scoped></style>

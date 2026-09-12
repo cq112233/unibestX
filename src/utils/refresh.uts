@@ -15,12 +15,87 @@ export function onNavbarPullDownRefresh(callback: () => void): void {
   });
 }
 
+export const EVENT_SET_NAVBAR_TITLE = 'setNavbarTitle';
+export const EVENT_RESET_NAVBAR_TITLE = 'resetNavbarTitle';
+
+/**
+ * 动态设置/修改 NavBar 布局及原生导航栏标题
+ * @param title 新的导航栏标题文本
+ */
+export function setNavbarTitle(title: string): void {
+  uni.$emit(EVENT_SET_NAVBAR_TITLE, title);
+  uni.setNavigationBarTitle({
+    title
+  } as SetNavigationBarTitleOptions);
+}
+
+/**
+ * 重置 NavBar 布局的导航栏标题为初始配置标题
+ */
+export function resetNavbarTitle(): void {
+  uni.$emit(EVENT_RESET_NAVBAR_TITLE);
+}
+
 /**
  * 停止 NavBar 布局下拉刷新状态
  */
 export function stopNavbarPullDownRefresh(): void {
   uni.$emit(EVENT_STOP_PULL_DOWN_REFRESH);
   uni.stopPullDownRefresh();
+}
+
+export const EVENT_SET_NAVBAR_VISIBLE = 'setNavbarVisible';
+export const EVENT_SET_HIDE_NAVBAR = 'setHideNavbar';
+export const EVENT_RESET_NAVBAR_VISIBLE = 'resetNavbarVisible';
+
+/**
+ * 动态控制 NavBar 布局导航栏的显示或隐藏
+ * @param visible 是否显示导航栏（true 显示，false 隐藏）
+ */
+export function setNavbarVisible(visible: boolean): void {
+  uni.$emit(EVENT_SET_NAVBAR_VISIBLE, visible);
+}
+
+/**
+ * 动态控制是否隐藏 NavBar 布局导航栏
+ * @param hide 是否隐藏导航栏（true 隐藏，false 显示）
+ */
+export function setHideNavbar(hide: boolean): void {
+  uni.$emit(EVENT_SET_HIDE_NAVBAR, hide);
+}
+
+/**
+ * 重置 NavBar 布局导航栏显隐为页面初始配置
+ */
+export function resetNavbarVisible(): void {
+  uni.$emit(EVENT_RESET_NAVBAR_VISIBLE);
+}
+
+export const EVENT_SET_STATUS_BAR_VISIBLE = 'setStatusBarVisible';
+export const EVENT_SET_HIDE_STATUS_BAR = 'setHideStatusBar';
+export const EVENT_RESET_STATUS_BAR_VISIBLE = 'resetStatusBarVisible';
+
+/**
+ * 动态控制是否隐藏状态栏占位高度
+ * @param hide 是否隐藏状态栏占位（true 隐藏，false 显示）
+ */
+export function setHideStatusBar(hide: boolean): void {
+  uni.$emit(EVENT_SET_HIDE_STATUS_BAR, hide);
+}
+
+/**
+ * 动态控制状态栏占位高度是否可见
+ * @param visible 是否显示状态栏占位（true 显示，false 隐藏）
+ */
+export function setStatusBarVisible(visible: boolean): void {
+  uni.$emit(EVENT_SET_STATUS_BAR_VISIBLE, visible);
+}
+
+/**
+ * 重置状态栏显隐为页面初始配置
+ */
+export function resetStatusBarVisible(): void {
+  uni.$emit(EVENT_RESET_STATUS_BAR_VISIBLE);
 }
 
 // 统一导出页面滚动与触底监听函数

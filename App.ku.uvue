@@ -1,25 +1,23 @@
 <template>
   <!-- 应用全局骨架与皮肤容器，通过 CSS 变量绑定响应式主题色 / 暗黑模式 -->
-  <view class="root-container flex flex-col flex-1" style="flex: 1; display: flex; flex-direction: column;"
-    :class="{ dark: appStore.state.isDark }" :style="themeStyle">
+  <view
+    class="root-container flex flex-col flex-1"
+    style="flex: 1; display: flex; flex-direction: column;"
+    :class="{ dark: appStore.state.isDark }"
+    :style="themeStyle"
+  >
     <!-- 页面内容滚动容器 -->
     <scroll-view direction="vertical" class="flex-1" style="flex: 1;">
       <slot></slot>
     </scroll-view>
     <!-- 自定义 TabBar：根据 config.uts 中的 type 配置切换形态（胶囊或标准底座） -->
-    <template v-if="customTabbarEnable && isCurrentPageTabbar">
-      <!-- 悬浮胶囊风格 (type: 'capsule') -->
-      <CustomCapsuleTabbar v-if="isCapsuleTabbar" />
-      <!-- 标准底座风格 (type: 'default') -->
-      <Tabbar v-else />
-    </template>
+    <Tabbar v-if="customTabbarEnable && isCurrentPageTabbar" />
   </view>
 </template>
 
 <script setup lang="uts">
-import Tabbar from '@/src/tabbar/index.uvue';
-import CustomCapsuleTabbar from '@/src/tabbar/custom/index.uvue';
-import { customTabbarEnable, isCapsuleTabbar, isPageTabbar, syncCurIdxByCurrentPage } from '@/src/tabbar/helper';
+import Tabbar from '@/src/tabbar/tabbar.uvue';
+import { customTabbarEnable, isPageTabbar, syncCurIdxByCurrentPage } from '@/src/tabbar';
 import { useAppStore } from '@/src/store';
 import { applyNavbarTheme, getThemeTokens } from '@/src/utils/theme';
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
@@ -41,6 +39,11 @@ const props = defineProps({
   },
   /** 是否隐藏导航栏（默认 false） */
   hideNavbar: {
+    type: Boolean,
+    default: false
+  },
+  /** 是否隐藏状态栏占位（默认 false，为 true 时不占用状态栏空间） */
+  hideStatusBar: {
     type: Boolean,
     default: false
   },
@@ -163,42 +166,56 @@ watch((): boolean => appStore.state.isDark, (newVal: boolean) => {
   applyNavbarTheme(newVal);
 });
 
-const isCustomNav = computed((): boolean => {
-  const textStyleFromStyle = (pageStyleObj.value.navigationStyle as string | null) ?? '';
-  if (textStyleFromStyle.length > 0) {
-    if (textStyleFromStyle == 'custom') {
-      return true;
-    }
-    else {
-      return false;
-    }
+let activeHideNavbar: boolean = props.hideNavbar;
+let activeHideStatusBar: boolean = props.hideStatusBar;
+
+/**
+ * 执行可用高度重新计算
+ */
+function doUpdateHeight(overrideHideNavbar: boolean | null = null, overrideHideStatusBar: boolean | null = null): void {
+  if (overrideHideNavbar != null) {
+    activeHideNavbar = overrideHideNavbar as boolean;
   }
-  else {
-    return false;
+  if (overrideHideStatusBar != null) {
+    activeHideStatusBar = overrideHideStatusBar as boolean;
+  }
+  updateAvailableHeight({
+    hideNavbar: activeHideNavbar,
+    hideStatusBar: activeHideStatusBar,
+    pageStyle: (props.pageStyle ?? {}) as UTSJSONObject,
+    layout: props.layout
+  }, selectedTabbarStrategy);
+}
+
+// 挂载时立即执行一次可用高度计算
+onShow(() => {
+  setTimeout(() => {
+    doUpdateHeight();
+  }, 100);
+});
+
+// 监听 props.hideStatusBar 变化自动重新计算
+watch((): boolean => props.hideStatusBar, (newVal: boolean) => {
+  doUpdateHeight(null, newVal);
+});
+
+// 监听 props.hideNavbar 变化自动重新计算
+watch((): boolean => props.hideNavbar, (newVal: boolean) => {
+  doUpdateHeight(newVal, null);
+});
+
+// 监听单页 TabBar 切换或全局发出的 setHideStatusBar 事件
+uni.$on('setHideStatusBar', (hide: any) => {
+  if (typeof hide == 'boolean') {
+    doUpdateHeight(null, hide as boolean);
   }
 });
 
-onShow(() => {
-  console.log('AppKu:onShow');
-  // defineProps 生成的 props 类型（GenAppku）不能直接赋给 AppKuHeightProps 接口，按字段组装字面量传入
-  // #ifdef MP-WEIXIN
-  setTimeout(() => {
-    updateAvailableHeight({
-      hideNavbar: props.hideNavbar,
-      pageStyle: (props.pageStyle ?? {}) as UTSJSONObject,
-      layout: props.layout
-    }, selectedTabbarStrategy);
-  }, 150);
-  // #endif
-  // #ifndef MP-WEIXIN
-  setTimeout(() => {
-    updateAvailableHeight({
-      hideNavbar: props.hideNavbar,
-      pageStyle: (props.pageStyle ?? {}) as UTSJSONObject,
-      layout: props.layout
-    }, selectedTabbarStrategy);
-  }, 150);
-  // #endif
+// 监听单页 TabBar 切换或全局发出的 setHideNavbar 事件
+uni.$on('setHideNavbar', (hide: any) => {
+  if (typeof hide == 'boolean') {
+    doUpdateHeight(hide as boolean, null);
+  }
 });
 </script>
 

@@ -1,3 +1,4 @@
+import { watch } from 'vue';
 import { curIdx, setCurIdx, setCurIdxByPath, tabbarList } from './store';
 import { useAppStore } from '@/src/store';
 import { getThemeTokens } from '@/src/utils/theme';
@@ -21,21 +22,24 @@ export type TabbarStrategyType = {
   NATIVE_TABBAR: number;
   CUSTOM_TABBAR_WITH_NATIVE: number;
   CUSTOM_TABBAR_WITHOUT_NATIVE: number;
+  SINGLE_PAGE_TABBAR: number;
   CUSTOM_TABBAR: number;
 };
 
 /**
- * tabbar 选择的策略（支持 4 种模式）
+ * tabbar 选择的策略（支持 5 种模式）
  * 0: NO_TABBAR (无 tabbar)
  * 1: NATIVE_TABBAR (原生 tabbar，pages.json 自动生成配置，带页面状态缓存，使用 uni.switchTab)
  * 2: CUSTOM_TABBAR_WITH_NATIVE (【带缓存】自定义 tabbar，pages.json custom:true，隐藏原生，保留页面状态缓存，使用 uni.switchTab)
  * 3: CUSTOM_TABBAR_WITHOUT_NATIVE (【不缓存】纯自定义 tabbar，pages.json 无 tabBar 节点，使用 uni.redirectTo，每次切换重新加载页面)
+ * 4: SINGLE_PAGE_TABBAR (【单页保活零闪烁】单页面容器切换 TabBar：无跨页面路由跳转，零闪烁，页面状态天然保活，参考 rice-ui)
  */
 export const TABBAR_STRATEGY_MAP: TabbarStrategyType = {
   NO_TABBAR: 0,
   NATIVE_TABBAR: 1,
   CUSTOM_TABBAR_WITH_NATIVE: 2,
   CUSTOM_TABBAR_WITHOUT_NATIVE: 3,
+  SINGLE_PAGE_TABBAR: 4,
   CUSTOM_TABBAR: 2
 };
 
@@ -51,23 +55,32 @@ export function parseTabbarStrategy(): number {
   if (envMode == '3' || envMode == 'CUSTOM_TABBAR_WITHOUT_NATIVE') {
     return TABBAR_STRATEGY_MAP.CUSTOM_TABBAR_WITHOUT_NATIVE;
   }
+  if (envMode == '4' || envMode == 'SINGLE_PAGE_TABBAR') {
+    return TABBAR_STRATEGY_MAP.SINGLE_PAGE_TABBAR;
+  }
   return TABBAR_STRATEGY_MAP.NATIVE_TABBAR;
 }
 
 /** 当前激活的 Tabbar 策略 */
 export const selectedTabbarStrategy: number = parseTabbarStrategy();
 
-/** 是否启用 tabbar 缓存（原生或自定义模式下为 true，无 tabbar 时为 false） */
+/** 是否启用 tabbar 缓存（原生或自定义或单页模式下为 true，无 tabbar 时为 false） */
 export const tabbarCacheEnable: boolean = selectedTabbarStrategy != TABBAR_STRATEGY_MAP.NO_TABBAR;
 
 /** 是否启用自定义 tabbar（模式 2 或 模式 3 为 true） */
 export const customTabbarEnable: boolean = selectedTabbarStrategy == TABBAR_STRATEGY_MAP.CUSTOM_TABBAR_WITH_NATIVE || selectedTabbarStrategy == TABBAR_STRATEGY_MAP.CUSTOM_TABBAR_WITHOUT_NATIVE;
 
+/** 是否为单页面容器 TabBar 模式（模式 4 为 true） */
+export const isSinglePageTabbar: boolean = selectedTabbarStrategy == TABBAR_STRATEGY_MAP.SINGLE_PAGE_TABBAR;
+
 /** 是否为无全局 TabBar 模式（模式 0 为 true） */
 export const isNoTabbar: boolean = selectedTabbarStrategy == TABBAR_STRATEGY_MAP.NO_TABBAR;
 
-/** 是否为悬浮胶囊风格 TabBar（根据 config.uts 中的 type 判定） */
-export const isCapsuleTabbar: boolean = customTabbarConfig.type == 'capsule';
+/** 当前配置的 TabBar UI 风格形态（如 'capsule' | 'default'，从 config.uts 中读取） */
+export const tabbarType: string = customTabbarConfig.type ?? 'default';
+
+/** 是否为悬浮胶囊风格 TabBar（向后兼容保留） */
+export const isCapsuleTabbar: boolean = tabbarType == 'capsule';
 
 /** 是否需要隐藏原生 tabbar（模式 2 为 true） */
 export const needHideNativeTabbar: boolean = selectedTabbarStrategy == TABBAR_STRATEGY_MAP.CUSTOM_TABBAR_WITH_NATIVE;
@@ -122,6 +135,28 @@ export function handleClickBulge(url: string = '/src/pages/ai/ai'): void {
  */
 export function switchTabbar(url: string): void {
   setCurIdxByPath(url);
+  if (isSinglePageTabbar) {
+    try {
+      const pages = getCurrentPages();
+      if (pages.length > 0) {
+        const currentRoute = pages[pages.length - 1].route;
+        const normalizedRoute = currentRoute.startsWith('/') ? currentRoute : `/${currentRoute}`;
+        if (normalizedRoute == '/pages/index/index' || normalizedRoute == '/src/pages/index/index') {
+          return;
+        }
+      }
+    }
+    catch { }
+    uni.redirectTo({
+      url: '/src/pages/index/index',
+      fail: (_err: any) => {
+        uni.reLaunch({
+          url: '/src/pages/index/index'
+        });
+      }
+    });
+    return;
+  }
   if (selectedTabbarStrategy == TABBAR_STRATEGY_MAP.CUSTOM_TABBAR_WITHOUT_NATIVE || selectedTabbarStrategy == TABBAR_STRATEGY_MAP.NO_TABBAR) {
     uni.redirectTo({
       url,
@@ -166,6 +201,10 @@ export function handleTabbarClick(index: number): void {
   }
   const list = tabbarList;
   if (list.length <= index) {
+    return;
+  }
+  if (isSinglePageTabbar) {
+    setCurIdx(index);
     return;
   }
   if (list[index].isBulge) {
@@ -238,4 +277,21 @@ export function initNativeMidButtonTap(): void {
     console.warn('onTabBarMidButtonTap registration error', e);
   }
   // #endif
+}
+
+/**
+ * 监听指定 Tab 激活显示（当单页面模式切换到该 Tab 时触发，可用于刷新数据或重新请求接口）
+ * @param index 对应 Tab 索引（0: 首页, 1: 基础, 2: 功能, 3: 我的）
+ * @param callback 激活显示时的回调函数
+ * @param immediate 若首次加载时当前 Tab 正好处于激活状态，是否立即执行一次（默认 false）
+ */
+export function onTabShow(index: number, callback: () => void, immediate: boolean = false): void {
+  if (immediate && curIdx.value == index) {
+    callback();
+  }
+  watch(curIdx, (newVal: number, oldVal: number) => {
+    if (newVal == index && oldVal != index) {
+      callback();
+    }
+  });
 }

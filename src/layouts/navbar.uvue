@@ -5,6 +5,7 @@
     <NavBar
       v-if="isCustomNav"
       :is-navbar-visible="isNavbarVisible"
+      :hide-status-bar="!isStatusBarVisible"
       :title="displayTitle"
       :show-back="showBack"
       :title-color="navTitleColor"
@@ -46,12 +47,14 @@
 </template>
 
 <script setup lang="uts">
-import { computed, onMounted, onUnmounted, ref } from 'vue';
+import { computed, onUnmounted, ref } from 'vue';
 import NavBar from '@/src/components/NavBar/NavBar.uvue';
 import { useAppStore } from '@/src/store';
 import { getThemeTokens } from '@/src/utils/theme';
 import type { ThemeTokens } from '@/src/utils/theme';
 import { isPageRefresherDisabled, isPageScrollDisabled } from '@/src/utils/pageScroll.uts';
+import { curIdx, isSinglePageTabbar, tabbarList } from '@/src/tabbar/helper';
+import { $t } from '@/src/utils/i18n';
 
 /**
  * 布局属性定义（由 uni-layouts-plugin 编译时自动从页面 definePage 或 pages.json 提取传入）
@@ -96,6 +99,11 @@ const props = defineProps({
   pageStyle: {
     type: Object,
     default: () => ({})
+  },
+  /** 是否隐藏状态栏占位高度（默认 false，为 true 时不占用状态栏空间） */
+  hideStatusBar: {
+    type: Boolean,
+    default: false
   },
   /** 是否隐藏导航栏（默认 false） */
   hideNavbar: {
@@ -209,17 +217,72 @@ const rootStyle = computed((): string => {
   return s;
 });
 
+/** 动态控制状态栏显隐（优先级高于配置项，null 表示采取默认配置） */
+const dynamicHideStatusBar = ref<boolean | null>(null);
+
+/**
+ * 计算状态栏是否可见
+ */
+const isStatusBarVisible = computed((): boolean => {
+  if (dynamicHideStatusBar.value != null) {
+    return dynamicHideStatusBar.value == false;
+  }
+  if (props.hideStatusBar) {
+    return false;
+  }
+  return true;
+});
+
+function onSetStatusBarVisible(visible: any): void {
+  if (typeof visible == 'boolean') {
+    dynamicHideStatusBar.value = !(visible as boolean);
+  }
+}
+
+function onSetHideStatusBar(hide: any): void {
+  if (typeof hide == 'boolean') {
+    dynamicHideStatusBar.value = hide as boolean;
+  }
+}
+
+function onResetStatusBarVisible(): void {
+  dynamicHideStatusBar.value = null;
+}
+
+/** 动态控制导航栏显隐（优先级高于配置项，null 表示采取默认配置） */
+const dynamicHideNavbar = ref<boolean | null>(null);
+
 /**
  * 计算导航栏是否可见
- * 1. 优先读取 props.hideNavbar / props.hideNavBar / props.showNavbar / props.showNavBar
- * 2. 兜底读取 pageStyle 中的 hideNavbar / showNavbar
+ * 1. 优先读取动态设置 dynamicHideNavbar
+ * 2. 其次读取 props.hideNavbar / props.hideNavBar / props.showNavbar / props.showNavBar
+ * 3. 兜底读取 pageStyle 中的 hideNavbar / showNavbar
  */
 const isNavbarVisible = computed((): boolean => {
+  if (dynamicHideNavbar.value != null) {
+    return dynamicHideNavbar.value == false;
+  }
   if (props.hideNavbar || props.hideNavBar || !props.showNavbar || !props.showNavBar) {
     return false;
   }
   return true;
 });
+
+function onSetNavbarVisible(visible: any): void {
+  if (typeof visible == 'boolean') {
+    dynamicHideNavbar.value = !(visible as boolean);
+  }
+}
+
+function onSetHideNavbar(hide: any): void {
+  if (typeof hide == 'boolean') {
+    dynamicHideNavbar.value = hide as boolean;
+  }
+}
+
+function onResetNavbarVisible(): void {
+  dynamicHideNavbar.value = null;
+}
 
 /** 下拉刷新状态控制：true 表示刷新中（展示 Loading），false 表示已复位收起 */
 const isTriggered = ref(false);
@@ -247,14 +310,71 @@ function onStopRefresh() {
   isTriggered.value = false;
 }
 
-// 挂载时注册全局停止刷新事件监听
-onMounted(() => {
-  uni.$on('stopPagePullDownRefresh', onStopRefresh);
-});
+/**
+ * 动态自定义标题（优先级高于配置项）
+ * 注意：UTS 会把 <script setup> 里的 function 降级为「声明点之后才可见」的局部量，
+ * 因此必须声明在 onSetNavbarTitle / onResetNavbarTitle 之前；否则调用会落空，
+ * 同名时还会被 utils/refresh.uts 里的包级函数悄悄接管（导致事件自触发死循环）。
+ */
+const customTitle = ref<string | null>(null);
+
+/**
+ * 动态修改/设置当前导航栏标题
+ * @param title 新的导航栏标题
+ */
+function setNavbarTitle(title: string): void {
+  customTitle.value = title;
+}
+
+/**
+ * 重置导航栏标题为初始配置标题
+ */
+function resetNavbarTitle(): void {
+  customTitle.value = null;
+}
+
+function onSetNavbarTitle(title: any | null): void {
+  if (title != null) {
+    if (typeof title == 'string') {
+      setNavbarTitle(title as string);
+    }
+    else {
+      const obj = title as UTSJSONObject;
+      // eslint-disable-next-line dot-notation
+      const t = obj['title'] != null ? `${obj['title']}` : null;
+      if (t != null && t.length > 0) {
+        setNavbarTitle(t);
+      }
+    }
+  }
+}
+
+function onResetNavbarTitle(): void {
+  resetNavbarTitle();
+}
+
+// 在 setup 执行期立即注册全局事件监听，确保子组件 onMounted 触发事件能够被可靠接收
+uni.$on('stopPagePullDownRefresh', onStopRefresh);
+uni.$on('setNavbarTitle', onSetNavbarTitle);
+uni.$on('resetNavbarTitle', onResetNavbarTitle);
+uni.$on('setNavbarVisible', onSetNavbarVisible);
+uni.$on('setHideNavbar', onSetHideNavbar);
+uni.$on('resetNavbarVisible', onResetNavbarVisible);
+uni.$on('setStatusBarVisible', onSetStatusBarVisible);
+uni.$on('setHideStatusBar', onSetHideStatusBar);
+uni.$on('resetStatusBarVisible', onResetStatusBarVisible);
 
 // 卸载时移除全局事件监听，避免内存泄漏
 onUnmounted(() => {
   uni.$off('stopPagePullDownRefresh', onStopRefresh);
+  uni.$off('setNavbarTitle', onSetNavbarTitle);
+  uni.$off('resetNavbarTitle', onResetNavbarTitle);
+  uni.$off('setNavbarVisible', onSetNavbarVisible);
+  uni.$off('setHideNavbar', onSetHideNavbar);
+  uni.$off('resetNavbarVisible', onResetNavbarVisible);
+  uni.$off('setStatusBarVisible', onSetStatusBarVisible);
+  uni.$off('setHideStatusBar', onSetHideStatusBar);
+  uni.$off('resetStatusBarVisible', onResetStatusBarVisible);
 });
 
 /**
@@ -300,6 +420,14 @@ const useCustomRefresher = computed((): boolean => {
  * 计算最终生效的导航栏标题
  */
 const displayTitle = computed((): string => {
+  if (customTitle.value != null) {
+    return customTitle.value!;
+  }
+  if (isSinglePageTabbar && props.type == 'home') {
+    if (curIdx.value >= 0 && curIdx.value < tabbarList.length) {
+      return $t(tabbarList[curIdx.value].text);
+    }
+  }
   const titleFromStyle = (pageStyleObj.value.navigationBarTitleText as string | null) ?? '';
   if (titleFromStyle.length > 0) {
     return titleFromStyle;
@@ -355,6 +483,12 @@ const isCustomNav = computed((): boolean => {
 
 const themeTokens = computed((): ThemeTokens => {
   return getThemeTokens(useAppStore().state.isDark);
+});
+
+defineExpose({
+  resetNavbarTitle,
+  setNavbarTitle,
+  setTitle: setNavbarTitle
 });
 </script>
 

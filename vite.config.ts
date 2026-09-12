@@ -3,6 +3,7 @@ import { defineConfig } from 'vite';
 import uniLayoutsPlugin from './plugins/uni-layouts-plugin';
 import autoRootPlugin from './plugins/root-plugin';
 import uniPagesPlugin from './plugins/vite-plugin-uni-pages';
+import tabbarViewsPlugin from './plugins/vite-plugin-tabbar-views';
 
 // 修复 uni-app x web端/h5端 丢掉 easycom 导入的官方 bug
 import { uniEasycomPlugin } from '@dcloudio/uni-cli-shared/dist/vite/plugins/easycom.js';
@@ -75,16 +76,70 @@ export default defineConfig({
   build: {
     sourcemap: false // 关闭 sourcemap，警告直接消失
   },
+  css: {
+    postcss: {
+      plugins: [
+        {
+          postcssPlugin: 'strip-unsupported-sticky',
+          Declaration(decl: any) {
+            if (decl.prop === 'position' && decl.value === 'sticky') {
+              decl.value = 'relative';
+            }
+          }
+        }
+      ]
+    }
+  },
   plugins: [
-    // 自动生成 pages.json（基于 pages.config.json 手动配置 + 页面内 <route>/definePage 声明）
+    // 拦截并自动将原生 CSS 编译器不支持的 position: sticky 修正为 position: relative，杜绝 App 平台编译报错
+    {
+      name: 'vite-plugin-strip-sticky',
+      enforce: 'pre',
+      transform(code: string, id: string) {
+        if ((id.endsWith('.uvue') || id.endsWith('.css') || id.endsWith('.scss') || id.includes('type=style')) && code.includes('sticky')) {
+          return {
+            code: code.replace(/position\s*:\s*sticky\s*;?/g, 'position: relative;')
+          };
+        }
+        return null;
+      }
+    },
+    // 自动扫描与路由生成插件（基于 pages.config.json + 页面内 <route>/definePage 声明）
     uniPagesPlugin({
+      // 【总控开关】：是否启用插件自动扫描与 pages.json 生成（设为 false 则完全失效，不扫描、不写入 pages.json、不监听文件变化）
+      enabled: true,
+
+      // 【主包扫描目录】：主包页面根目录（相对于项目根目录），默认 'src/pages'
       dir: 'src/pages',
-      subPackages: ['src/sub']
+
+      // 【分包扫描目录】：分包根目录数组，不能是主包目录的子目录，默认 []
+      subPackages: ['src/sub'],
+
+      // 【排除扫描规则】：Glob 匹配规则数组，匹配到的文件/目录不会被当作页面路由扫描
+      exclude: ['**/components/**/*.*', '**/views/**/*.*'],
+
+      // 【输出文件路径】：生成并同步的 pages.json 相对路径，默认 'pages.json'
+      outFile: 'pages.json',
+
+      // 【基础配置文件】：用于继承 globalStyle、tabBar、easycom 等静态配置的基准文件，默认 'pages.config.json'
+      configFile: 'pages.config.json',
+
+      // 【强制指定首页】：若指定则优先以该路由为主包第一个首页；留空时默认取 pages.config.json 首项或扫描的第一项
+      homePage: ''
     }),
-    // 手动补充 easycom 插件（服务于 App 端与 Web/H5 端，小程序端由 mp-compiler 原生 usingComponents 处理，若混入会导致注入 uni-mp-vue 缺失的 resolveDynamicComponent 编译报错）
+    // 单页 TabBar 基础脚手架与视图组件辅助生成插件（按需根据 src/tabbar/config.uts 辅助创建基础 TabViews）
+    tabbarViewsPlugin({
+      enabled: true,
+      autoCreateViews: true,
+      configFile: 'src/tabbar/config.uts'
+    }),
     ...(!process.env.UNI_PLATFORM?.startsWith('mp-')
       ? [uniEasycomPlugin({ exclude: UNI_EASYCOM_EXCLUDE })]
       : []),
+    // 手动补充 easycom 插件（限制非小程序端生效，含 App 与 Web）
+    // 该插件内部名为 uni:app-easycom，负责在 App 蒸汽模式与 Web 端把模板里的 easycom 标签转成静态 import；
+    // 小程序端（mp-*）由官方编译器基于 usingComponents 原生处理，挂载该插件会导致组件被转为未知动态组件并报错 resolveDynamicComponent。
+    // ...(process.env.UNI_PLATFORM?.startsWith('mp-') ? [] : [uniEasycomPlugin({ exclude: UNI_EASYCOM_EXCLUDE })]),
     uniLayoutsPlugin(), // 仿照 vite-plugin-uni-layouts 的跨端 Layout 布局插件
     autoRootPlugin(), // 自动给页面套上 App.ku.uvue 根包裹组件
     uni(),

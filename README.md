@@ -501,18 +501,19 @@ uni-app x 推出了新一代的 **蒸汽模式（Vapor）**。新版渲染引擎
 
 #### 1. 底部 TabBar 策略模式（`.env` 中的 `VITE_TABBAR_MODE`）
 
-可在根目录 `.env` 中通过 `VITE_TABBAR_MODE` 自由切换 4 种底层运行策略：
+可在根目录 `.env` 中通过 `VITE_TABBAR_MODE` 自由切换 5 种底层运行策略：
 
 | 模式值 | 策略名称 | 页面缓存机制 | 底层路由实现 | 适用场景与特性说明 |
 | :---: | :--- | :---: | :---: | :--- |
-| **`2`** | **`CUSTOM_TABBAR_WITH_NATIVE`**（【推荐】带缓存自定义模式） | **支持缓存** | `uni.switchTab` | **【强烈推荐】**`pages.json` 生成原生底座并安全隐藏，**保留各 Tab 页面组件状态与滚动位置缓存**，切换时不重新请求刷新，全端体验最流畅。 |
-| **`3`** | **`CUSTOM_TABBAR_WITHOUT_NATIVE`**（纯自定义模式） | **不缓存** | `uni.redirectTo` | `pages.json` 中无 `tabBar` 节点，**每次切换重新触发页面生命周期与加载数据**。 |
+| **`4`** | **`SINGLE_PAGE_TABBAR`**（【当前默认・首推】单页面容器保活模式） | **天然终极保活** | **单页面视图显隐（免路由跳转）** | **【强烈推荐・体验最佳】** 全部 Tab 页面作为子视图挂载于 `TabViews.uvue` 容器中，**0ms 秒级平滑切换、零白屏、零闪烁**，输入框内容、长列表滚动位置天然保活不丢失。 |
+| **`2`** | **`CUSTOM_TABBAR_WITH_NATIVE`**（带缓存多页面自定义模式） | **支持缓存** | `uni.switchTab` | `pages.json` 生成原生底座并安全隐藏，**保留各 Tab 独立页面组件状态与滚动位置缓存**，通过原生 switchTab 驱动。 |
+| **`3`** | **`CUSTOM_TABBAR_WITHOUT_NATIVE`**（纯多页面自定义模式） | **不缓存** | `uni.redirectTo` | `pages.json` 中无 `tabBar` 节点，**每次切换重新触发页面生命周期与重新请求接口**。 |
 | **`1`** | **`NATIVE_TABBAR`**（纯原生 TabBar） | **支持缓存** | `uni.switchTab` | 纯原生 `pages.json` TabBar 渲染（⚠️ 原生 `midButton` 在微信小程序/鸿蒙端官方不支持）。 |
 | **`0`** | **`NO_TABBAR`**（无 TabBar） | 无 | 无 | 纯单页、登录页或不需要 TabBar 的应用场景。 |
 
 #### 2. TabBar 视觉呈现形态（`src/tabbar/config.uts`）
 
-在自定义模式（模式 2 或 模式 3）下，可通过 `src/tabbar/config.uts` 的 `type` 字段一键切换 UI 风格：
+在自定义模式（模式 2、3 或 模式 4）下，可通过 `src/tabbar/config.uts` 的 `type` 字段一键切换 UI 风格：
 
 - **`type: 'capsule'`（悬浮胶囊岛屿风格）**：
   - 位于屏幕底部的悬空圆角 Dock 栏（`rounded-[34px]` + 柔和立体阴影）；
@@ -522,9 +523,41 @@ uni-app x 推出了新一代的 **蒸汽模式（Vapor）**。新版渲染引擎
   - 标准贴底容器，支持中间立体凸起鼓包按钮（`midButton`，如居中 AI 交互按钮）；
   - 全端 100% 支持立体鼓包、字体图标、角标徽标（小红点 / 数字）。
 
-#### 3. 统一路由跳转与安全 API（`src/tabbar/helper`）
+#### 3. 单页面 TabBar 自动化脚手架与 Vite 插件配置（`vite.config.ts`）
 
-- **`switchTabbar(url: string)`**：全局统一 TabBar 跳转方法，自动根据当前策略模式选择 `uni.switchTab` 或 `uni.redirectTo`，内置防连击节流与失败容错降级，自动同步激活索引；
+`unibestX` 独创性地将页面路由扫描与 TabBar 单页面调度深度结合。在 `vite.config.ts` 中已将 TabBar 相关功能完全收敛：
+
+```ts
+// vite.config.ts
+uniPagesPlugin({
+  // 【总控开关】：设为 false 时完全禁用自动扫描与 pages.json 覆写
+  enabled: true,
+
+  // 【TabBar 专属配置】：配置此项默认自动开启生成单页面 TabViews 与视图组件
+  tabbar: {
+    // 【单页 TabBar 容器自动生成】：根据 config.uts 自动生成 src/tabbar/components/TabViews.uvue（默认 true）
+    autoTabViews: true,
+
+    // 【视图组件脚手架自动生成】：检测到 Tab 缺失视图时自动按 v3c 规范创建 views/*View.uvue（默认 true）
+    autoCreateViews: true,
+
+    // 【残留异名视图自动清理】：复制粘贴页面目录时，自动清理旧模块残留的废弃 View 文件（默认 true）
+    cleanCopiedViews: true,
+
+    // 【TabBar 配置文件路径】：默认为 'src/tabbar/config.uts'
+    configFile: 'src/tabbar/config.uts'
+  }
+})
+```
+
+- **鼓包按钮（`midButton`）智能融合**：中间凸起鼓包按钮（如 AI 助手）自动作为居中 Tab 成员，与单页面容器 `TabViews` 索引 100% 对应，点击在同一页面内秒切至 `AiView`，绝不跳出单页面容器；
+- **注释即排除**：若不需要 `midButton`，直接在 `src/tabbar/config.uts` 中用 `//` 注释即可，插件自动过滤注释，不会生成到 `pages.json` 或 `TabViews` 中；
+- **视图组件规范 (`v3c`)**：自动补全的视图组件预置了 `onTabShow(index, callback)` 切换监听与自定义下拉刷新联动机制。
+
+#### 4. 统一路由跳转与安全 API（`src/tabbar/helper`）
+
+- **`switchTabbar(url: string)`**：全局统一 TabBar 跳转方法，单页面模式下直接切换索引，多页面模式下自动调度 switchTab 或 redirectTo；
+- **`onTabShow(index: number, callback: () => void)`**：监听特定 Tab 项激活显示（单页面模式下切换到该 Tab 时触发数据重新请求与刷新）；
 - **`syncCurIdxByCurrentPage()`**：自动从当前页面路由同步激活 Tab 项索引；
 - **`safeHideNativeTabBar()`**：安全跨端隐藏原生底板并消除视口多余空白；
 - **`initNativeMidButtonTap()`**：仅在原生模式且配置 `midButton` 时自动注册监听，无需在页面中硬编码。

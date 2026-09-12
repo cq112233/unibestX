@@ -1,0 +1,292 @@
+<!--
+  ========================================================================
+  TabBar 自定义 UI 模板组件 (Custom TabBar UI Template)
+  作者：cq112233
+  ========================================================================
+  定位与作用：
+  1. 作为全端通用的 TabBar 骨架模板，供开发者在此基础上自由克隆、扩展全新的 UI 形态
+     （例如：毛玻璃磨砂效果、居中凹陷/鼓包动效、悬浮胶囊卡片、半圆弧异形底座等）；
+  2. 深度适配 uni-app X 原生渲染引擎（Android Kotlin / iOS Swift / Web / 小程序），
+     内置了底部安全区（Home条）动态计算、页面占位防遮挡、国际化多语言翻译以及徽标（Badge）渲染。
+-->
+<template>
+  <view class="template-tabbar-wrapper">
+    <!-- ================================================================== -->
+    <!-- 1. 底部占位高度块 (Placeholder)                                     -->
+    <!-- 目的：当底部 TabBar 采用 position: fixed 定位脱离文档流时，             -->
+    <!-- 此占位块在文档流中撑开相同高度，防止列表滚动到底部时被 TabBar 遮挡内容。   -->
+    <!-- ================================================================== -->
+    <view
+      v-if="showPlaceholder"
+      class="template-tabbar-placeholder"
+      :style="{ height: `${tabbarPlaceholderHeight}px` }"
+    />
+
+    <!-- ================================================================== -->
+    <!-- 2. 底部固定定位主容器 (Fixed Bar)                                   -->
+    <!-- 包含主交互按钮行与底部 iPhone/Android 全面屏安全区填充垫高。           -->
+    <!-- ================================================================== -->
+    <view
+      class="template-tabbar-fixed"
+      :style="{
+        height: `${height + safeAreaBottom}px`,
+        backgroundColor: themeTokens.tabBg,
+        borderTopColor: themeTokens.tabBorder
+      }"
+    >
+      <!-- 主内容交互行（高度固定为 props.height） -->
+      <view class="template-tabbar-content" :style="{ height: `${height}px` }">
+        <!-- 遍历 Tab 列表项（tabbarList 自动包含标准配置与居中 midButton 鼓包项） -->
+        <view
+          v-for="(item, index) in tabbarList"
+          :key="index"
+          class="template-tabbar-item"
+          @click="onTabClick(index)"
+        >
+          <!-- 图标与徽标容器（相对定位，作为角标 absolute 的基准父级） -->
+          <view class="item-icon-box">
+            <!-- 形式 A：uni-icons 字体矢量图标 -->
+            <uni-icons
+              v-if="item.iconType == 'icon'"
+              :type="getItemIcon(item, index)"
+              :size="22"
+              :color="getItemColor(index)"
+            />
+            <!-- 形式 B：本地图片/静态资源图标 -->
+            <image
+              v-else
+              :src="getItemIconPath(item, index)"
+              class="item-icon-img"
+            />
+
+            <!-- 徽标状态 1：纯圆点小红点 (badge === 'dot') -->
+            <view v-if="item.badge == 'dot'" class="badge-dot" />
+
+            <!-- 徽标状态 2：带具体数值的数字角标 (badge === number) -->
+            <view v-else-if="typeof item.badge == 'number'" class="badge-num">
+              <text class="badge-num-text">{{ item.badge }}</text>
+            </view>
+          </view>
+
+          <!-- Tab 文本标签（内置 $t 国际化翻译转换，根据选中态自适应粗细与高亮颜色） -->
+          <text
+            class="item-text"
+            :style="{
+              color: getItemColor(index),
+              fontWeight: curIdx == index ? '600' : 'normal'
+            }"
+          >
+            {{ $t(item.text) }}
+          </text>
+        </view>
+      </view>
+
+      <!-- 底部安全区垫高填充块（高度为 safeAreaBottom，背景与 TabBar 保持一致） -->
+      <view :style="{ height: `${safeAreaBottom}px` }" />
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { onMounted } from 'vue';
+import {
+  curIdx,
+  handleTabbarClick,
+  safeAreaBottom,
+  safeHideNativeTabBar,
+  syncCurIdxByCurrentPage,
+  TABBAR_HEIGHT,
+  tabbarList,
+  tabbarPlaceholderHeight,
+  themeColor,
+  themeTokens
+} from '@/src/tabbar';
+import type { CustomTabBarItem } from '@/src/tabbar';
+import { useAppStore } from '@/src/store';
+import { $t } from '@/src/utils/i18n';
+
+// ==========================================
+// Props 组件属性定义
+// ==========================================
+defineProps({
+  /**
+   * 自定义 TabBar 高度（纯内容区高度，不含底部全面屏安全区，默认取全局基准 TABBAR_HEIGHT = 50px）
+   */
+  height: {
+    type: Number,
+    default: TABBAR_HEIGHT
+  },
+  /**
+   * 是否在文档流中渲染占位块（默认 true，若页面最外层使用 flex 布局且已有高度控制，可传 false）
+   */
+  showPlaceholder: {
+    type: Boolean,
+    default: true
+  }
+});
+
+const appStore = useAppStore();
+
+/** 当前激活的主题色（优先取响应式 themeColor，保底取 appStore.state.theme） */
+const activeThemeColor = computed<string>((): string => {
+  return themeColor.value.length > 0 ? themeColor.value : appStore.state.theme;
+});
+
+// ==========================================
+// 生命周期与初始同步
+// ==========================================
+onMounted(() => {
+  // 1. 根据当前页面路由路径自动校准激活索引（避免因直接跳转页面导致高亮不对齐）
+  syncCurIdxByCurrentPage();
+  // 2. 全端安全隐藏系统底层原生 TabBar（消除原生控件重叠与闪烁）
+  safeHideNativeTabBar();
+});
+
+// ==========================================
+// 核心交互与计算方法
+// ==========================================
+
+/**
+ * 处理用户点击单个 Tab 项交互
+ * - 在单页面模式下：直接触发 setCurIdx(index) 秒切视图，零闪烁保活；
+ * - 在原生跨端页面模式下：自动根据当前策略调用 switchTab 或 redirectTo 进行路由导航。
+ * @param index 当前被点击项的索引值
+ */
+function onTabClick(index: number): void {
+  handleTabbarClick(index);
+}
+
+/**
+ * 动态计算当前 Tab 项高亮或常态文本/图标色彩（高亮跟随全局主题色）
+ * @param index 目标项索引
+ * @returns 对应主题配置下的 HEX 颜色代码
+ */
+function getItemColor(index: number): string {
+  return curIdx.value == index ? activeThemeColor.value : themeTokens.value.tabColor;
+}
+
+/**
+ * 获取当前项应当渲染的图标字体名称（选中时优先使用 iconActive 激活态图标）
+ * @param item 当前 Tab 项数据实体
+ * @param index 目标项索引
+ * @returns uni-icons 图标标识符
+ */
+function getItemIcon(item: CustomTabBarItem, index: number): string {
+  if (curIdx.value == index && item.iconActive.length > 0) {
+    return item.iconActive;
+  }
+  return item.icon;
+}
+
+/**
+ * 获取当前项应当渲染的图片路径（选中时优先使用 selectedIconPath 激活态图片）
+ * @param item 当前 Tab 项数据实体
+ * @param index 目标项索引
+ * @returns 图片资源相对或绝对路径
+ */
+function getItemIconPath(item: CustomTabBarItem, index: number): string {
+  if (curIdx.value == index && item.selectedIconPath != null && item.selectedIconPath!.length > 0) {
+    return item.selectedIconPath!;
+  }
+  return item.iconPath ?? '';
+}
+</script>
+
+<style scoped>
+/* 整个 TabBar 最外层容器 */
+.template-tabbar-wrapper {
+  width: 100%;
+}
+
+/* 占位填充块样式（纯透明，仅撑开物理高度） */
+.template-tabbar-placeholder {
+  width: 100%;
+}
+
+/* 底部固定定位容器：悬浮于屏幕最底端，拥有极高的层级保证可见性 */
+.template-tabbar-fixed {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 999;
+  border-top-width: 1px;
+  border-top-style: solid;
+  flex-direction: column;
+}
+
+/* 主交互区域排版：横向均匀分布 */
+.template-tabbar-content {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-around;
+  width: 100%;
+}
+
+/* 单个 Tab 格位：等宽均分剩余横向空间，居中对齐图标与文字 */
+.template-tabbar-item {
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+/* 图标包裹盒：固定基准尺寸，为右上方徽标（Badge）提供定位参照点 */
+.item-icon-box {
+  position: relative;
+  width: 28px;
+  height: 28px;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 本地图片图标统一大小 */
+.item-icon-img {
+  width: 22px;
+  height: 22px;
+}
+
+/* 底部描述文本样式：小巧精炼，具备清晰的行高 */
+.item-text {
+  font-size: 10px;
+  margin-top: 2px;
+  line-height: 12px;
+}
+
+/* 小红点徽标：右上角醒目圆点 */
+.badge-dot {
+  position: absolute;
+  top: 1px;
+  right: 2px;
+  width: 8px;
+  height: 8px;
+  border-radius: 4px;
+  background-color: #ef4444;
+}
+
+/* 数字角标：支持多位数胶囊形自适应伸缩，搭配白色微边框凸显层级 */
+.badge-num {
+  position: absolute;
+  top: -2px;
+  right: -6px;
+  background-color: #ef4444;
+  border-radius: 9px;
+  min-width: 16px;
+  height: 16px;
+  padding-left: 4px;
+  padding-right: 4px;
+  align-items: center;
+  justify-content: center;
+  border-width: 1px;
+  border-style: solid;
+  border-color: #ffffff;
+}
+
+/* 数字角标内部文本样式 */
+.badge-num-text {
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: bold;
+  line-height: 12px;
+}
+</style>

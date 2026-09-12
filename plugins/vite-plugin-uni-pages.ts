@@ -7,18 +7,18 @@ import JSON5 from 'json5';
 // 类型定义
 // ==========================================
 
-interface PageConfig {
+type PageConfig = {
   path: string;
   style?: Record<string, any>;
   [key: string]: any;
-}
+};
 
-interface SubPackageConfig {
+type SubPackageConfig = {
   root: string;
   pages: PageConfig[];
-}
+};
 
-interface BaseConfig {
+type BaseConfig = {
   homePage?: string;
   pages?: PageConfig[];
   subPackages?: SubPackageConfig[];
@@ -26,14 +26,20 @@ interface BaseConfig {
   tabBar?: Record<string, any>;
   easycom?: Record<string, any>;
   [key: string]: any;
-}
+};
 
-interface UniPagesOptions {
+export type UniPagesOptions = {
+  /**
+   * 是否启用插件扫描与 pages.json 自动生成总开关
+   * @default true
+   * @description 设为 false 时完全禁用自动扫描、页面路由生成与 watcher 监听，保留开发者完全手动维护 pages.json 的能力
+   */
+  enabled?: boolean;
   /** 主包页面扫描目录，默认 'src/pages' */
   dir?: string;
-  /** 分包扫描目录列表，如 ['src/pages-demo']，不能是主包 dir 的子目录 */
+  /** 分包扫描目录列表，如 ['src/sub']，不能是主包 dir 的子目录 */
   subPackages?: string[];
-  /** 排除的 glob 模式，默认会排除 components 目录 */
+  /** 排除的 glob 模式，默认会排除 components 与 views 目录 */
   exclude?: string[];
   /** 输出的 pages.json 路径，默认项目根目录 */
   outFile?: string;
@@ -41,7 +47,7 @@ interface UniPagesOptions {
   configFile?: string;
   /** 首页路径 */
   homePage?: string;
-}
+};
 
 // ==========================================
 // 工具函数
@@ -51,6 +57,9 @@ interface UniPagesOptions {
 function matchGlob(filePath: string, pattern: string): boolean {
   if (pattern === '**/components/**/*.*' || pattern.includes('components')) {
     return filePath.includes('/components/') || filePath.startsWith('components/');
+  }
+  if (pattern === '**/views/**/*.*' || pattern.includes('views')) {
+    return filePath.includes('/views/') || filePath.startsWith('views/');
   }
   const regexStr = pattern
     .replace(/[.+^${}()|[\]\\]/g, '\\$&')
@@ -263,7 +272,7 @@ function scanUvueFiles(dir: string, excludes: string[] = [], projectRoot: string
     return results;
   }
 
-  const defaultExcludes = ['**/components/**/*.*'];
+  const defaultExcludes = ['**/components/**/*.*', '**/views/**/*.*'];
   const allExcludes = [...defaultExcludes, ...excludes];
 
   const entries = fs.readdirSync(dir, { withFileTypes: true });
@@ -272,8 +281,8 @@ function scanUvueFiles(dir: string, excludes: string[] = [], projectRoot: string
     const fullPath = path.join(dir, entry.name);
 
     if (entry.isDirectory()) {
-      // 跳过默认的 components 目录
-      if (entry.name === 'components') {
+      // 跳过默认的 components 和 views 目录
+      if (entry.name === 'components' || entry.name === 'views') {
         continue;
       }
       results.push(...scanUvueFiles(fullPath, excludes, projectRoot));
@@ -725,7 +734,11 @@ function generatePagesJson(
     if (!fs.existsSync(configPath)) {
       return { list: [] };
     }
-    const content = fs.readFileSync(configPath, 'utf-8');
+    const rawContent = fs.readFileSync(configPath, 'utf-8');
+    // 过滤多行注释与单行注释，避免注释掉的属性（如 midButton 等）被误解析
+    const content = rawContent
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/\/\/.*$/gm, '');
 
     // 读取中文翻译字典
     let zhDict: Record<string, any> = {};
@@ -988,8 +1001,8 @@ function generatePagesJson(
           output.tabBar.midButton = parsedConfig.midButton;
       }
     }
-    else if (tabbarMode === '3' || tabbarMode === 'CUSTOM_TABBAR_WITHOUT_NATIVE') {
-      // 模式3（纯自定义 TabBar，无原生配置）：完全删除 pages.json 中的 tabBar，使用 redirectTo / reLaunch 自定义路由跳转
+    else if (tabbarMode === '3' || tabbarMode === 'CUSTOM_TABBAR_WITHOUT_NATIVE' || tabbarMode === '4' || tabbarMode === 'SINGLE_PAGE_TABBAR') {
+      // 模式3（纯自定义 TabBar，无原生配置）与 模式4（单页面 TabBar 容器模式）：完全删除 pages.json 中的 tabBar
       delete output.tabBar;
     }
   }
@@ -1103,6 +1116,7 @@ function generatePagesJson(
 
 export default function uniPagesPlugin(options: UniPagesOptions = {}) {
   const opts = {
+    enabled: options.enabled ?? true,
     dir: options.dir ?? 'src/pages',
     subPackages: options.subPackages ?? [],
     exclude: options.exclude ?? [],
@@ -1139,6 +1153,9 @@ export default function uniPagesPlugin(options: UniPagesOptions = {}) {
     },
 
     buildStart() {
+      if (!opts.enabled) {
+        return;
+      }
       generatePagesJson(opts, projectRoot, isProduction, server);
     },
 
@@ -1236,6 +1253,9 @@ export default function uniPagesPlugin(options: UniPagesOptions = {}) {
     },
 
     configureServer(s: any) {
+      if (!opts.enabled) {
+        return;
+      }
       server = s;
       const pagesDir = path.resolve(projectRoot, opts.dir);
       const configPath = path.resolve(projectRoot, opts.configFile);
@@ -1266,6 +1286,14 @@ export default function uniPagesPlugin(options: UniPagesOptions = {}) {
         const n = fp.replace(/\\/g, '/');
         if (!n.endsWith('.uvue') || n.includes('?')) {
           return false;
+        }
+        // 检查是否被 exclude（如 components、views 等）
+        const allExcludes = ['**/components/**/*.*', '**/views/**/*.*', ...opts.exclude];
+        const relPath = projectRoot ? path.relative(projectRoot, fp).replace(/\\/g, '/') : n;
+        for (let e = 0; e < allExcludes.length; e++) {
+          if (matchGlob(relPath, allExcludes[e])) {
+            return false;
+          }
         }
         // 带 / 边界匹配，避免 src/pages 误匹配 src/pages-xxx
         if (n.includes(`${opts.dir.replace(/\\/g, '/')}/`)) {

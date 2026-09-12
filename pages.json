@@ -2,14 +2,14 @@
   "pages": [
     {
       "path": "src/pages/index/index",
-      "customPageClass": "border-radius-12",
+      "customPageClass": "init-page",
       "customPageStyle": "background-color: transparent;",
       "layout": "navbar",
       "showBack": false,
+      "hideStatusBar": false,
       "hideNavbar": false,
       "enablePullDownRefresh": true,
       "style": {
-        "navigationBarBackgroundColor": "#ffffff",
         "navigationBarTitleText": "首页",
         "navigationStyle": "custom"
       }
@@ -28,6 +28,8 @@
       "layout": "navbar",
       "showBack": false,
       "enablePullDownRefresh": true,
+      "hideStatusBar": false,
+      "hideNavbar": false,
       "style": {
         "navigationBarTitleText": "基础",
         "navigationStyle": "custom"
@@ -38,6 +40,8 @@
       "layout": "navbar",
       "showBack": false,
       "enablePullDownRefresh": true,
+      "hideStatusBar": false,
+      "hideNavbar": false,
       "style": {
         "navigationBarTitleText": "功能",
         "navigationStyle": "custom"
@@ -48,6 +52,8 @@
       "layout": "navbar",
       "showBack": false,
       "enablePullDownRefresh": true,
+      "hideStatusBar": false,
+      "hideNavbar": false,
       "style": {
         "navigationBarTitleText": "我的",
         "navigationStyle": "custom"
@@ -69,41 +75,6 @@
     "custom": {
       "^e-chart$": "@/uni_modules/e-chart/components/e-chart/e-chart.uvue"
     }
-  },
-  "tabBar": {
-    "custom": true,
-    "color": "@tabBarColor",
-    "selectedColor": "@tabBarSelectedColor",
-    "backgroundColor": "@tabBarBackgroundColor",
-    "borderStyle": "@tabBarBorderStyle",
-    "list": [
-      {
-        "pagePath": "src/pages/index/index",
-        "text": "首页",
-        "iconPath": "static/tabbar/home.png",
-        "selectedIconPath": "static/tabbar/home_fill.png"
-      },
-      {
-        "pagePath": "src/pages/basic/basic",
-        "text": "基础",
-        "iconPath": "static/tabbar/tune.png",
-        "selectedIconPath": "static/tabbar/tune_fill.png"
-      },
-      {
-        "pagePath": "src/pages/function/function",
-        "text": "功能",
-        "iconPath": "static/tabbar/gear.png",
-        "selectedIconPath": "static/tabbar/gear_fill.png"
-      },
-      {
-        "pagePath": "src/pages/me/me",
-        "text": "我的",
-        "iconPath": "static/tabbar/people.png",
-        "selectedIconPath": "static/tabbar/people_fill.png"
-      }
-    ],
-    "iconWidth": "24px",
-    "height": "50px"
   },
   "subPackages": [
     {
@@ -132,6 +103,28 @@
           }
         },
         {
+          "path": "crypto/crypto",
+          "layout": "navbar",
+          "showBack": true,
+          "hideNavbar": false,
+          "enablePullDownRefresh": true,
+          "style": {
+            "navigationBarTitleText": "Crypto 加密解密",
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "device/device",
+          "layout": "navbar",
+          "showBack": true,
+          "hideNavbar": false,
+          "enablePullDownRefresh": true,
+          "style": {
+            "navigationBarTitleText": "原生设备能力",
+            "navigationStyle": "custom"
+          }
+        },
+        {
           "path": "layoutDemo/layoutDemo",
           "layout": "navbar",
           "showBack": true,
@@ -139,6 +132,28 @@
           "enablePullDownRefresh": false,
           "style": {
             "navigationBarTitleText": "布局页面示例",
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "lodash/lodash",
+          "layout": "navbar",
+          "showBack": true,
+          "hideNavbar": false,
+          "enablePullDownRefresh": true,
+          "style": {
+            "navigationBarTitleText": "Lodash 工具库",
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "nested-scroll/nested-scroll",
+          "layout": "navbar",
+          "showBack": true,
+          "hideNavbar": false,
+          "enablePullDownRefresh": false,
+          "style": {
+            "navigationBarTitleText": "NestedScroll 自研嵌套滚动",
             "navigationStyle": "custom"
           }
         },
@@ -165,6 +180,17 @@
           }
         },
         {
+          "path": "time/time",
+          "layout": "navbar",
+          "showBack": true,
+          "hideNavbar": false,
+          "enablePullDownRefresh": true,
+          "style": {
+            "navigationBarTitleText": "时间日期操作",
+            "navigationStyle": "custom"
+          }
+        },
+        {
           "path": "uiTest/uiTest",
           "layout": "navbar",
           "showBack": true,
@@ -172,6 +198,17 @@
           "enablePullDownRefresh": false,
           "style": {
             "navigationBarTitleText": "UI 测试",
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "zpaging/zpaging",
+          "layout": "navbar",
+          "showBack": true,
+          "hideNavbar": false,
+          "enablePullDownRefresh": false,
+          "style": {
+            "navigationBarTitleText": "z-paging-x 原生分页",
             "navigationStyle": "custom"
           }
         },

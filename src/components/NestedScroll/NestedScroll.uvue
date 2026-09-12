@@ -1,0 +1,434 @@
+<template>
+  <view class="nested-scroll-container flex-1 flex flex-col w-full relative">
+    <!-- 粘性吸顶头部区域：当启用 affix-header 或使用 #affix 插槽时在顶部吸附展示 -->
+    <view
+      v-if="hasAffixSlot || (affixHeader && hasHeaderSlot)"
+      class="nested-affix-bar w-full z-10 shrink-0"
+    >
+      <slot v-if="hasAffixSlot" name="affix" />
+      <slot v-else name="header" />
+    </view>
+
+    <!-- 核心滚动容器：全端全平台（Android / iOS / 鸿蒙 VDOM / Web / 小程序）统一采用标准高性能容器 -->
+    <scroll-view
+      class="flex-1 flex flex-col w-full"
+      direction="vertical"
+      :scroll-top="scrollTop"
+      :scroll-with-animation="innerScrollWithAnimation"
+      :show-scrollbar="showScrollbar"
+      :refresher-enabled="enablePullDown"
+      :refresher-triggered="innerRefreshing"
+      :refresher-threshold="refresherThreshold"
+      :refresher-default-style="refresherDefaultStyle"
+      :refresher-background="refresherBackground"
+      @refresherrefresh="handleRefresherRefresh"
+      @refresherrestore="handleRefresherRestore"
+      @refresherabort="handleRefresherRestore"
+      @scrolltolower="handleScrollToLower"
+      @scroll="handleScroll"
+    >
+      <!-- 普通滚动随动头部（非吸顶模式下随列表滚动） -->
+      <slot v-if="hasHeaderSlot && !affixHeader" name="header" />
+
+      <!-- 列表数据默认插槽 -->
+      <slot />
+
+      <!-- 空数据状态 -->
+      <view v-if="empty && !loading && !innerRefreshing" class="w-full">
+        <slot v-if="hasEmptySlot" name="empty" />
+        <view v-else class="py-[48px] items-center justify-center">
+          <text class="text-[36px] mb-[8px]">📭</text>
+          <text
+            class="text-[13px]"
+            :class="isDark ? 'text-[#64748b]' : 'text-[#94a3b8]'"
+          >
+            {{ emptyText }}
+          </text>
+        </view>
+      </view>
+
+      <!-- 底部加载更多状态条：仅在有对应状态或整体 footer 插槽时渲染，杜绝空白占位 -->
+      <template v-if="hasFooterSlot">
+        <slot
+          name="footer"
+          :loading="loading"
+          :finished="finished"
+          :error="error"
+        />
+      </template>
+      <view
+        v-else-if="!empty && enableLoadMore && (loading || error || finished)"
+        class="py-[16px] items-center justify-center flex flex-row"
+      >
+        <!-- 加载中 -->
+        <template v-if="loading">
+          <slot v-if="hasLoadingSlot" name="loading" />
+          <text
+            v-else
+            class="text-[12px] font-medium"
+            :class="isDark ? 'text-[#94a3b8]' : 'text-[#64748b]'"
+          >
+            {{ loadingText }}
+          </text>
+        </template>
+
+        <!-- 加载失败重试 -->
+        <template v-else-if="error">
+          <slot v-if="hasErrorSlot" name="error" />
+          <view v-else class="flex flex-row items-center" @click="handleRetry">
+            <text class="text-[12px] text-[#ef4444] font-medium mr-[4px]">
+              {{ errorText }}
+            </text>
+            <text class="text-[12px] text-[#4f46e5] font-bold">
+              点击重试
+            </text>
+          </view>
+        </template>
+
+        <!-- 没有更多数据了 -->
+        <template v-else-if="finished">
+          <slot v-if="hasFinishedSlot" name="finished" />
+          <text
+            v-else
+            class="text-[12px]"
+            :class="isDark ? 'text-[#475569]' : 'text-[#cbd5e1]'"
+          >
+            {{ finishedText }}
+          </text>
+        </template>
+      </view>
+
+      <!-- 自定义下拉刷新插槽：根据 uni-app x 官方规范，鸿蒙平台自定义下拉刷新元素必须放在最后一个子元素的位置，否则其后的元素上方会出现空白区域 -->
+      <view v-if="hasRefresherSlot" slot="refresher" class="w-full">
+        <slot name="refresher" :refreshing="innerRefreshing" />
+      </view>
+    </scroll-view>
+
+    <!-- 一键返回顶部按钮 -->
+    <view
+      v-if="showBackToTop && showBackToTopBtn"
+      class="nested-back-to-top"
+      :style="{ bottom: `${backToTopBottom}px`, right: `${backToTopRight}px` }"
+      @click="scrollToTop(true)"
+    >
+      <slot v-if="hasBackToTopSlot" name="backToTop" />
+      <view
+        v-else
+        class="w-[42px] h-[42px] rounded-full items-center justify-center flex flex-row border-[1px] border-solid"
+        :class="isDark ? 'bg-[#1e293b] border-[#334155]' : 'bg-white border-[#e2e8f0]'"
+      >
+        <uni-icons type="top" size="20" :color="isDark ? '#cbd5e1' : '#475569'" />
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed, nextTick, onMounted, ref, useSlots, watch } from 'vue';
+import { useAppStore } from '@/src/store';
+
+const props = defineProps({
+  /** 是否开启下拉刷新 */
+  enablePullDown: {
+    type: Boolean,
+    default: true
+  },
+  /** 是否开启上拉触底加载 */
+  enableLoadMore: {
+    type: Boolean,
+    default: true
+  },
+  /** 下拉刷新状态（支持 v-model:refreshing） */
+  refreshing: {
+    type: Boolean,
+    default: false
+  },
+  /** 上拉加载状态（支持 v-model:loading） */
+  loading: {
+    type: Boolean,
+    default: false
+  },
+  /** 是否已加载完所有数据（没有更多了） */
+  finished: {
+    type: Boolean,
+    default: false
+  },
+  /** 是否加载失败（展示重试按钮） */
+  error: {
+    type: Boolean,
+    default: false
+  },
+  /** 是否空数据状态 */
+  empty: {
+    type: Boolean,
+    default: false
+  },
+  /** 空状态文案 */
+  emptyText: {
+    type: String,
+    default: '暂无数据'
+  },
+  /** 上拉加载中文案 */
+  loadingText: {
+    type: String,
+    default: '正在加载中...'
+  },
+  /** 没有更多数据文案 */
+  finishedText: {
+    type: String,
+    default: '— 没有更多了 —'
+  },
+  /** 加载失败文案 */
+  errorText: {
+    type: String,
+    default: '加载失败'
+  },
+  /** 是否显示滚动条 */
+  showScrollbar: {
+    type: Boolean,
+    default: false
+  },
+  /** 是否开启回弹效果 */
+  bounces: {
+    type: Boolean,
+    default: true
+  },
+  /** 下拉刷新阈值，单位 px */
+  refresherThreshold: {
+    type: Number,
+    default: 60
+  },
+  /** 下拉刷新区域背景颜色 */
+  refresherBackground: {
+    type: String,
+    default: 'transparent'
+  },
+  /** 头部是否粘性吸顶（为 true 时 header 插槽将在顶部固定吸附，不随列表滚出） */
+  affixHeader: {
+    type: Boolean,
+    default: false
+  },
+  /** 是否显示一键返回顶部按钮 */
+  showBackToTop: {
+    type: Boolean,
+    default: true
+  },
+  /** 返回顶部按钮显示/隐藏的滚动距离阈值，单位 px */
+  backToTopThreshold: {
+    type: Number,
+    default: 300
+  },
+  /** 返回顶部按钮距离底部的距离，单位 px（支持自定义高度，默认 100px 避免底部遮挡） */
+  backToTopBottom: {
+    type: Number,
+    default: 100
+  },
+  /** 返回顶部按钮距离右侧的距离，单位 px */
+  backToTopRight: {
+    type: Number,
+    default: 20
+  },
+  /** 返回顶部是否启用平滑动画滚动 */
+  scrollWithAnimation: {
+    type: Boolean,
+    default: true
+  }
+});
+
+const emit = defineEmits<{
+  (e: 'refresh'): void;
+  (e: 'loadMore'): void;
+  (e: 'load-more'): void;
+  (e: 'update:refreshing', val: boolean): void;
+  (e: 'update:loading', val: boolean): void;
+  (e: 'scroll', event: UniScrollEvent): void;
+  (e: 'backToTop'): void;
+  (e: 'back-to-top'): void;
+}>();
+
+const slots = useSlots();
+const hasHeaderSlot = computed((): boolean => {
+  // eslint-disable-next-line dot-notation
+  return slots['header'] != null;
+});
+
+const hasAffixSlot = computed((): boolean => {
+  // eslint-disable-next-line dot-notation
+  return slots['affix'] != null;
+});
+
+const hasRefresherSlot = computed((): boolean => {
+  // eslint-disable-next-line dot-notation
+  return slots['refresher'] != null;
+});
+
+const hasBackToTopSlot = computed((): boolean => {
+  // eslint-disable-next-line dot-notation
+  return slots['backToTop'] != null;
+});
+
+const hasEmptySlot = computed((): boolean => {
+  // eslint-disable-next-line dot-notation
+  return slots['empty'] != null;
+});
+
+const hasFooterSlot = computed((): boolean => {
+  // eslint-disable-next-line dot-notation
+  return slots['footer'] != null;
+});
+
+const hasLoadingSlot = computed((): boolean => {
+  // eslint-disable-next-line dot-notation
+  return slots['loading'] != null;
+});
+
+const hasErrorSlot = computed((): boolean => {
+  // eslint-disable-next-line dot-notation
+  return slots['error'] != null;
+});
+
+const hasFinishedSlot = computed((): boolean => {
+  // eslint-disable-next-line dot-notation
+  return slots['finished'] != null;
+});
+
+const refresherDefaultStyle = computed((): string => {
+  return hasRefresherSlot.value ? 'none' : 'black';
+});
+
+const appStore = useAppStore();
+const isDark = computed((): boolean => appStore.state.isDark);
+
+const innerRefreshing = ref<boolean>(props.refreshing);
+const scrollTop = ref<number>(0);
+const oldScrollTop = ref<number>(0);
+const showBackToTopBtn = ref<boolean>(false);
+const innerScrollWithAnimation = ref<boolean>(props.scrollWithAnimation);
+let refreshTimeoutId: number | null = null;
+let isMountedReady = false;
+
+onMounted(() => {
+  // 挂载400ms后才允许手势下拉触发，杜绝鸿蒙等平台初次测绘时自动误发射refresherrefresh事件
+  setTimeout(() => {
+    isMountedReady = true;
+  }, 400);
+});
+
+/** 结束下拉刷新 */
+function endRefresh(): void {
+  if (refreshTimeoutId != null) {
+    clearTimeout(refreshTimeoutId!);
+    refreshTimeoutId = null;
+  }
+  innerRefreshing.value = false;
+  emit('update:refreshing', false);
+}
+
+/** 结束上拉加载 */
+function endLoadMore(): void {
+  emit('update:loading', false);
+}
+
+watch(
+  (): boolean => props.refreshing,
+  (val: boolean) => {
+    innerRefreshing.value = val;
+    if (!val && refreshTimeoutId != null) {
+      clearTimeout(refreshTimeoutId!);
+      refreshTimeoutId = null;
+    }
+  }
+);
+
+// 触发下拉刷新
+function handleRefresherRefresh() {
+  if (!isMountedReady) {
+    endRefresh();
+    return;
+  }
+  innerRefreshing.value = true;
+  emit('update:refreshing', true);
+  emit('refresh');
+
+  if (refreshTimeoutId != null) {
+    clearTimeout(refreshTimeoutId!);
+  }
+  // 6秒防卡死保底复位，避免外部异常导致无限转圈
+  refreshTimeoutId = setTimeout(() => {
+    endRefresh();
+  }, 6000);
+}
+
+// 下拉刷新恢复
+function handleRefresherRestore() {
+  if (refreshTimeoutId != null) {
+    clearTimeout(refreshTimeoutId!);
+    refreshTimeoutId = null;
+  }
+  innerRefreshing.value = false;
+  emit('update:refreshing', false);
+}
+
+// 滚动容器滚动监听
+function handleScroll(e: UniScrollEvent) {
+  const currentY = e.detail.scrollTop;
+  oldScrollTop.value = currentY;
+  emit('scroll', e);
+
+  if (props.showBackToTop) {
+    showBackToTopBtn.value = currentY > props.backToTopThreshold;
+  }
+}
+
+/** 一键平滑滚动返回顶部 */
+function scrollToTop(animate: boolean = true) {
+  innerScrollWithAnimation.value = animate;
+  scrollTop.value = oldScrollTop.value;
+  nextTick(() => {
+    scrollTop.value = 0;
+  });
+  emit('backToTop');
+  emit('back-to-top');
+}
+
+// 触底加载更多
+function handleScrollToLower() {
+  if (!props.enableLoadMore || props.loading || props.finished || props.error) {
+    return;
+  }
+  emit('update:loading', true);
+  emit('loadMore');
+  emit('load-more');
+}
+
+// 失败点击重试
+function handleRetry() {
+  emit('update:loading', true);
+  emit('loadMore');
+  emit('load-more');
+}
+
+defineExpose({
+  endRefresh,
+  endLoadMore,
+  scrollToTop
+});
+</script>
+
+<style scoped>
+.nested-scroll-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+.nested-header-wrap {
+  width: 100%;
+}
+.nested-affix-bar {
+  width: 100%;
+}
+.nested-back-to-top {
+  position: absolute;
+  z-index: 99;
+}
+</style>
