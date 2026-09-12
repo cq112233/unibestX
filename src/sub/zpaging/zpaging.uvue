@@ -129,7 +129,7 @@
               class="px-[16px] py-[8px] rounded-[8px] bg-[#0957de] items-center justify-center"
               @click="triggerReset"
             >
-              <text class="text-[12px] text-white font-bold">重新加载数据</text>
+              <text class="text-[12px] text-[#ffffff] font-bold" style="color: #ffffff;">重新加载数据</text>
             </view>
           </view>
         </template>
@@ -203,7 +203,7 @@
               class="px-[12px] py-[6px] rounded-[6px] bg-[#dc2626] items-center justify-center"
               @click="onRetryLoad"
             >
-              <text class="text-[11px] font-bold text-white">立即重试</text>
+              <text class="text-[11px] font-bold text-[#ffffff]" style="color: #ffffff;">立即重试</text>
             </view>
           </view>
 
@@ -394,6 +394,9 @@ function startFullSimulation(): void {
 
 // 错误点击「立即重试」处理
 function onRetryLoad(): void {
+  if (isLoadMoreLoading.value) {
+    return;
+  }
   isLoadMoreError.value = false;
   isLoadMoreLoading.value = true;
   simStep.value = 4;
@@ -431,27 +434,32 @@ function onQuery(pageNo: number, _pageSize: number): void {
     return;
   }
 
-  // 场景 A：第 3 步触底，模拟 500 接口异常
-  if (simStep.value == 3 && !isLoadMoreError.value) {
+  // 场景 1：如果当前处于错误态，严格禁止手势上拉/触底自动触发重试（必须手动点击「立即重试」按钮）
+  if (isLoadMoreError.value) {
+    pagingRef.value?.$callMethod('completeByError');
+    return;
+  }
+
+  // 场景 2：正在加载中或已经加载完成，忽略重复触底触发
+  if (isLoadMoreLoading.value || isLoadMoreFinished.value || simStep.value == 4) {
+    return;
+  }
+
+  // 场景 3：第 3 步触底，模拟 500 接口异常
+  if (simStep.value == 3) {
     isLoadMoreLoading.value = true;
     simStatusText.value = '【第 3 步进行中】正在发起第 3 次请求... 模拟网络 500 异常';
 
     setTimeout(() => {
       isLoadMoreLoading.value = false;
       isLoadMoreError.value = true;
-      simStatusText.value = '【第 3 步报错】模拟 500 接口异常！请点击底部「点击重试」再次加载';
+      simStatusText.value = '【第 3 步报错】模拟 500 接口异常！请点击底部「立即重试」再次加载';
       pagingRef.value?.$callMethod('completeByError');
       uni.showToast({
         title: '模拟接口异常：500 Internal Error',
         icon: 'none'
       });
     }, 700);
-    return;
-  }
-
-  // 场景 B：第 4 步重试中
-  if (simStep.value == 4 || isLoadMoreError.value) {
-    onRetryLoad();
     return;
   }
 
