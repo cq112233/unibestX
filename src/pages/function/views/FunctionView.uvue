@@ -28,10 +28,10 @@
     <TimeDemoCard />
 
     <!-- 签名板 lime-signature 示例组件 -->
-    <SignatureCard v-if="isSignatureReady" />
+    <SignatureCard v-if="isCanvasReady" />
 
     <!-- ECharts 图表示例组件 -->
-    <EchartsDemoCard v-if="isEchartReady" />
+    <EchartsDemoCard v-if="isCanvasReady" />
   </view>
 </template>
 
@@ -58,8 +58,7 @@ import { curIdx, onTabShow } from '@/src/tabbar';
  * 3. 故默认设为 false，仅在用户首次切换进入当前 Tab 且容器物理布局就绪后挂载 Canvas 节点；
  * 4. 挂载后状态保持为 true（组件保活），后续切 Tab 不会重复销毁/重建，既保留画板笔迹，又避免重复创建的性能开销。
  */
-const isSignatureReady = ref(false);
-const isEchartReady = ref(false);
+const isCanvasReady = ref(false);
 
 // 页面数据加载/刷新方法
 function refreshData(): void {
@@ -77,14 +76,9 @@ onTabShow(2, () => {
   refreshData();
 
   // 延迟 100ms 挂载：确保微信小程序与各端渲染线程（WebView/原生容器）已将视图移入可视区并完成物理像素排版
-  if (!isSignatureReady.value) {
+  if (!isCanvasReady.value) {
     setTimeout(() => {
-      isSignatureReady.value = true;
-    }, 100);
-  }
-  if (!isEchartReady.value) {
-    setTimeout(() => {
-      isEchartReady.value = true;
+      isCanvasReady.value = true;
     }, 100);
   }
 }, true);
@@ -96,8 +90,7 @@ onMounted(() => {
   // 在视图节点初次渲染就绪后延迟激活 Canvas 组件
   if (curIdx.value < 0 || curIdx.value == 2) {
     setTimeout(() => {
-      isSignatureReady.value = true;
-      isEchartReady.value = true;
+      isCanvasReady.value = true;
     }, 200);
   }
 });
