@@ -1,11 +1,12 @@
 <template>
   <view class="nested-scroll-container flex-1 flex flex-col w-full relative">
-    <!-- 粘性吸顶头部区域：当启用 sticky-header 或使用 #sticky 插槽时在顶部吸附展示 -->
+    <!-- 粘性吸顶头部区域：当启用 affix-header / sticky-header 或使用 #affix / #sticky 插槽时在顶部吸附展示 -->
     <view
-      v-if="hasStickySlot || (stickyHeader && hasHeaderSlot)"
+      v-if="hasAffixSlot || hasStickySlot || ((affixHeader || stickyHeader) && hasHeaderSlot)"
       class="nested-sticky-bar w-full z-10 shrink-0"
     >
-      <slot v-if="hasStickySlot" name="sticky" />
+      <slot v-if="hasAffixSlot" name="affix" />
+      <slot v-else-if="hasStickySlot" name="sticky" />
       <slot v-else name="header" />
     </view>
 
@@ -204,6 +205,10 @@ const props = defineProps({
     default: 'transparent'
   },
   /** 头部是否粘性吸顶（为 true 时 header 插槽将在顶部固定吸附，不随列表滚出） */
+  affixHeader: {
+    type: Boolean,
+    default: false
+  },
   stickyHeader: {
     type: Boolean,
     default: false
@@ -250,6 +255,11 @@ const slots = useSlots();
 const hasHeaderSlot = computed((): boolean => {
   // eslint-disable-next-line dot-notation
   return slots['header'] != null;
+});
+
+const hasAffixSlot = computed((): boolean => {
+  // eslint-disable-next-line dot-notation
+  return slots['affix'] != null;
 });
 
 const hasStickySlot = computed((): boolean => {

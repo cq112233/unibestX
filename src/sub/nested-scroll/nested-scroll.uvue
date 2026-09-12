@@ -6,7 +6,7 @@
         ref="articleScrollRef"
         v-model:refreshing="articleRefreshing"
         v-model:loading="articleLoading"
-        :sticky-header="true"
+        :affix-header="true"
         :finished="articleFinished"
         :error="articleError"
         :empty="articleList.length === 0"
@@ -19,7 +19,7 @@
         @back-to-top="onBackToTop"
       >
         <!-- 粘性吸顶头部插槽：全生命周期模拟演练卡片与操作面板（向上滑动时吸附在顶部不滚出） -->
-        <template #sticky>
+        <template #affix>
           <view
             class="m-[14px] p-[16px] rounded-[14px] border-[1px] border-solid shadow-xs"
             :class="isDark ? 'bg-[#1e293b] border-[#334155]' : 'bg-[#e0e7ff] border-[#c7d2fe]'"

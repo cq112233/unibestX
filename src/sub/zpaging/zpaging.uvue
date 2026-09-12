@@ -134,38 +134,40 @@
           </view>
         </template>
 
-        <!-- 列表内容：与 nested-scroll 一致的标准卡片列表 -->
-        <view v-for="item in articleList" :key="item.id" class="w-full">
-          <view
-            class="mx-[14px] my-[6px] p-[14px] rounded-[12px] border-[1px] border-solid flex flex-col"
-            :class="isDark ? 'bg-[#1e293b] border-[#334155]' : 'bg-white border-[#e2e8f0]'"
-          >
-            <view class="flex flex-row items-center justify-between mb-[6px]">
-              <view
-                class="px-[8px] py-[2px] rounded-[4px]"
-                :style="{ backgroundColor: item.categoryBg }"
-              >
-                <text class="text-[10px] font-bold" :style="{ color: item.categoryColor }">
-                  {{ item.category }}
-                </text>
-              </view>
-              <text class="text-[11px] text-[#94a3b8]">{{ item.time }}</text>
-            </view>
-            <text
-              class="text-[14px] font-bold mb-[4px] leading-[20px]"
-              :class="isDark ? 'text-[#f1f5f9]' : 'text-[#1e293b]'"
+        <!-- 列表内容：与 nested-scroll 一致的标准卡片列表（清空数据状态下强制不渲染） -->
+        <template v-if="!isSimEmpty">
+          <view v-for="item in articleList" :key="item.id" class="w-full">
+            <view
+              class="mx-[14px] my-[6px] p-[14px] rounded-[12px] border-[1px] border-solid flex flex-col"
+              :class="isDark ? 'bg-[#1e293b] border-[#334155]' : 'bg-white border-[#e2e8f0]'"
             >
-              {{ item.title }}
-            </text>
-            <text class="text-[12px] leading-[18px] text-[#64748b] mb-[8px]">
-              {{ item.summary }}
-            </text>
-            <view class="flex flex-row items-center justify-between pt-[6px] border-t-[1px] border-solid border-[#f1f5f9]">
-              <text class="text-[11px] text-[#94a3b8]">z-paging-x 触底自动追加</text>
-              <text class="text-[11px] font-bold text-[#0957de]">序号 #{{ item.id }} ➜</text>
+              <view class="flex flex-row items-center justify-between mb-[6px]">
+                <view
+                  class="px-[8px] py-[2px] rounded-[4px]"
+                  :style="{ backgroundColor: item.categoryBg }"
+                >
+                  <text class="text-[10px] font-bold" :style="{ color: item.categoryColor }">
+                    {{ item.category }}
+                  </text>
+                </view>
+                <text class="text-[11px] text-[#94a3b8]">{{ item.time }}</text>
+              </view>
+              <text
+                class="text-[14px] font-bold mb-[4px] leading-[20px]"
+                :class="isDark ? 'text-[#f1f5f9]' : 'text-[#1e293b]'"
+              >
+                {{ item.title }}
+              </text>
+              <text class="text-[12px] leading-[18px] text-[#64748b] mb-[8px]">
+                {{ item.summary }}
+              </text>
+              <view class="flex flex-row items-center justify-between pt-[6px] border-t-[1px] border-solid border-[#f1f5f9]">
+                <text class="text-[11px] text-[#94a3b8]">z-paging-x 触底自动追加</text>
+                <text class="text-[11px] font-bold text-[#0957de]">序号 #{{ item.id }} ➜</text>
+              </view>
             </view>
           </view>
-        </view>
+        </template>
 
         <!-- 自定义底部加载状态：完全对齐 nested-scroll 演示逻辑与视觉 -->
         <template #loadMore>
@@ -320,6 +322,9 @@ const refresherStatusText = computed((): string => {
 
 function onRefresherStatusChange(status: string): void {
   refresherStatus.value = status;
+  if (status == 'loading' && isSimEmpty.value) {
+    isSimEmpty.value = false;
+  }
 }
 
 function onUpdateList(val: any[]): void {
@@ -387,6 +392,31 @@ function startFullSimulation(): void {
   }, 400);
 }
 
+// 错误点击「立即重试」处理
+function onRetryLoad(): void {
+  isLoadMoreError.value = false;
+  isLoadMoreLoading.value = true;
+  simStep.value = 4;
+  simStatusText.value = '【第 4 步】已发起重试请求，正在重新拉取接口数据...';
+
+  setTimeout(() => {
+    // 成功拉取最后 2 条终态数据
+    const finalItems = generateArticlesData(9, 2, '终态数据');
+    isLoadMoreLoading.value = false;
+    isLoadMoreFinished.value = true;
+    simStep.value = 5;
+    simStatusText.value = '【全部完成】🎉 重试成功！没有更多数据了（下拉列表可重新再来一遍）';
+
+    // 告知 z-paging-x 没有更多数据了 (nomore = true)
+    pagingRef.value?.$callMethod('completeByNoMore', finalItems as any[], true);
+
+    uni.showToast({
+      title: '重试成功！数据已全部加载',
+      icon: 'success'
+    });
+  }, 800);
+}
+
 // z-paging-x query 事件响应
 function onQuery(pageNo: number, _pageSize: number): void {
   // 处于空数据演示状态
@@ -429,31 +459,6 @@ function onQuery(pageNo: number, _pageSize: number): void {
   pagingRef.value?.$callMethod('completeByNoMore', [] as any[], true);
 }
 
-// 错误点击「立即重试」处理
-function onRetryLoad(): void {
-  isLoadMoreError.value = false;
-  isLoadMoreLoading.value = true;
-  simStep.value = 4;
-  simStatusText.value = '【第 4 步】已发起重试请求，正在重新拉取接口数据...';
-
-  setTimeout(() => {
-    // 成功拉取最后 2 条终态数据
-    const finalItems = generateArticlesData(9, 2, '终态数据');
-    isLoadMoreLoading.value = false;
-    isLoadMoreFinished.value = true;
-    simStep.value = 5;
-    simStatusText.value = '【全部完成】🎉 重试成功！没有更多数据了（下拉列表可重新再来一遍）';
-
-    // 告知 z-paging-x 没有更多数据了 (nomore = true)
-    pagingRef.value?.$callMethod('completeByNoMore', finalItems as any[], true);
-
-    uni.showToast({
-      title: '重试成功！数据已全部加载',
-      icon: 'success'
-    });
-  }, 800);
-}
-
 // 控制操作栏动作函数
 function triggerEmpty(): void {
   isSimEmpty.value = true;
@@ -463,7 +468,7 @@ function triggerEmpty(): void {
   isLoadMoreLoading.value = false;
   simStep.value = 5;
   simStatusText.value = '【已清空数据】触发空列表缺省兜底展示';
-  pagingRef.value?.$callMethod('complete', [] as any[]);
+  pagingRef.value?.$callMethod('reload');
   uni.showToast({ title: '已清空数据，触发空态兜底', icon: 'none' });
 }
 

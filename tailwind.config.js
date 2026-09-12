@@ -44,7 +44,9 @@ export default {
             'env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)'
         },
         '.pt-safe': { 'padding-top': 'env(safe-area-inset-top)' },
-        '.pb-safe': { 'padding-bottom': 'env(safe-area-inset-bottom)' }
+        '.pb-safe': { 'padding-bottom': 'env(safe-area-inset-bottom)' },
+        // 原生 uni-app X 仅支持 relative|absolute|fixed，覆写 .sticky 为 relative 避免原生 CSS 编译器报错
+        '.sticky': { position: 'relative' }
       });
     }
   ],
