@@ -507,7 +507,7 @@ uni-app x 推出了新一代的 **蒸汽模式（Vapor）**。新版渲染引擎
 
 ### 底部 TabBar 体系
 
-项目内置了成熟健壮、全端兼容的 **多策略 + 多形态** TabBar 体系：
+项目内置了成熟健壮、全端兼容的 **多策略 + 多形态** TabBar 体系，彻底解决了传统 uni-app 项目在多端（尤其是 App-Android/iOS、鸿蒙、微信小程序）下原生 TabBar 白屏闪烁、状态丢失、鼓包兼容差等痛点：
 
 #### 1. 底部 TabBar 策略模式（`.env` 中的 `VITE_TABBAR_MODE`）
 
@@ -526,50 +526,73 @@ uni-app x 推出了新一代的 **蒸汽模式（Vapor）**。新版渲染引擎
 在自定义模式（模式 2、3 或 模式 4）下，可通过 `src/tabbar/config.uts` 的 `type` 字段一键切换 UI 风格：
 
 - **`type: 'capsule'`（悬浮胶囊岛屿风格）**：
-  - 位于屏幕底部的悬空圆角 Dock 栏（`rounded-[34px]` + 柔和立体阴影）；
-  - 当前激活项呈现独立的高亮胶囊底色与平滑过渡效果；
+  - 位于屏幕底部的悬空圆角 Dock 栏（`rounded-[34px]` + 柔和立体微阴影）；
+  - 配备带贝塞尔弹性曲线（`cubic-bezier(0.25, 1, 0.5, 1)`）的滑块胶囊（`Animated Slider Pill`），切换时平滑穿梭；
+  - 按下时具备 iOS 灵动触感反馈（整体微弹放大，松开回弹缩回）；
   - 完美适配亮色/暗黑主题模式与底部安全区（`safeAreaBottom`）。
 - **`type: 'default'`（标准贴底底座风格）**：
-  - 标准贴底容器，支持中间立体凸起鼓包按钮（`midButton`，如居中 AI 交互按钮）；
-  - 全端 100% 支持立体鼓包、字体图标、角标徽标（小红点 / 数字）。
+  - 采用清晰的三层层叠结构（`tabbar-bg` 底板层 + `tabbar-inner` 图标层 + `safe-area-bg` 安全区层）；
+  - 全端 100% 支持立体凸起鼓包按钮（`midButton`，如居中 AI 交互按钮）、字体图标与小红点/数字徽标。
 
-#### 3. 单页面 TabBar 自动化脚手架与 Vite 插件配置（`vite.config.ts`）
+#### 3. 单页面 TabBar 自动化脚手架与 Vite 插件（`vite.config.ts`）
 
-`unibestX` 独创性地将页面路由扫描与 TabBar 单页面调度深度结合。在 `vite.config.ts` 中已将 TabBar 相关功能完全收敛：
+`unibestX` 独创性地将页面路由扫描与 TabBar 单页面调度深度结合。在 `vite.config.ts` 中通过专门的 `tabbarViewsPlugin` 实现了全自动脚手架闭环：
 
 ```ts
 // vite.config.ts
-uniPagesPlugin({
-  // 【总控开关】：设为 false 时完全禁用自动扫描与 pages.json 覆写
-  enabled: true,
+import tabbarViewsPlugin from './plugins/vite-plugin-tabbar-views';
 
-  // 【TabBar 专属配置】：配置此项默认自动开启生成单页面 TabViews 与视图组件
-  tabbar: {
-    // 【单页 TabBar 容器自动生成】：根据 config.uts 自动生成 src/tabbar/components/TabViews.uvue（默认 true）
-    autoTabViews: true,
-
-    // 【视图组件脚手架自动生成】：检测到 Tab 缺失视图时自动按 v3c 规范创建 views/*View.uvue（默认 true）
-    autoCreateViews: true,
-
-    // 【残留异名视图自动清理】：复制粘贴页面目录时，自动清理旧模块残留的废弃 View 文件（默认 true）
-    cleanCopiedViews: true,
-
-    // 【TabBar 配置文件路径】：默认为 'src/tabbar/config.uts'
-    configFile: 'src/tabbar/config.uts'
-  }
-})
+export default defineConfig({
+  plugins: [
+    // 单页 TabBar 基础脚手架与视图组件辅助生成插件（按需根据 src/tabbar/config.uts 辅助创建基础 TabViews）
+    tabbarViewsPlugin({
+      enabled: true,            // 【总控开关】：默认 true
+      configFile: 'src/tabbar/config.uts', // 【TabBar 配置文件路径】
+      autoCreateViews: true,    // 【视图脚手架自动生成】：检测到缺失视图时自动按规范创建 views/*View.uvue
+      syncNavbarConfig: true    // 【导航栏状态自动同步】：自动感知各 Tab 页面 definePage 的 hideNavbar / hideStatusBar
+    }),
+    // ... 其他插件
+  ]
+});
 ```
 
-- **鼓包按钮（`midButton`）智能融合**：中间凸起鼓包按钮（如 AI 助手）自动作为居中 Tab 成员，与单页面容器 `TabViews` 索引 100% 对应，点击在同一页面内秒切至 `AiView`，绝不跳出单页面容器；
-- **注释即排除**：若不需要 `midButton`，直接在 `src/tabbar/config.uts` 中用 `//` 注释即可，插件自动过滤注释，不会生成到 `pages.json` 或 `TabViews` 中；
-- **视图组件规范 (`v3c`)**：自动补全的视图组件预置了 `onTabShow(index, callback)` 切换监听与自定义下拉刷新联动机制。
+#### 4. 自动化生成机制与开发工作流（`VITE_TABBAR_MODE=4`）
 
-#### 4. 统一路由跳转与安全 API（`src/tabbar/helper`）
+当 `.env` 中设置 `VITE_TABBAR_MODE=4` 且插件开启时，开发者**只需要维护 [`src/tabbar/config.uts`](file:///Users/chenqi/Desktop/unibestX/src/tabbar/config.uts) 一份配置文件**，所有底层的调度容器与视图组件全由插件自动生成与热同步：
 
-- **`switchTabbar(url: string)`**：全局统一 TabBar 跳转方法，单页面模式下直接切换索引，多页面模式下自动调度 switchTab 或 redirectTo；
-- **`onTabShow(index: number, callback: () => void)`**：监听特定 Tab 项激活显示（单页面模式下切换到该 Tab 时触发数据重新请求与刷新）；
+```text
+src/tabbar/config.uts (唯一样本源)
+         │
+         ├── 1. 自动生成调度容器 ──────> src/tabbar/components/TabViews.uvue
+         │
+         └── 2. 缺失视图时自动生成脚手架 ──> src/pages/*/views/*View.uvue
+```
+
+##### 自动生成的文件与职责
+
+1. **调度总容器（`src/tabbar/components/TabViews.uvue`）**：
+   - 插件解析 `config.uts` 的 `list` 与 `midButton`，自动完成导入语句（`import *View from '@/src/pages/*/views/*View.uvue'`）；
+   - 自动生成 `<TabContent :content-index="...">` 块，并自动感知各 Tab 页面的 `definePage`，若配置了 `hideNavbar` 或 `hideStatusBar` 会自动注入同步属性。
+2. **业务子视图脚手架（`src/pages/<模块>/views/<模块>View.uvue`）**：
+   - 当在 `config.uts` 中添加了一个新的 Tab 项（例如 `src/pages/order/order`），若该目录下尚未存在 `views/OrderView.uvue`，插件会自动生成一份符合规范的基础组件；
+   - 自动生成的组件预置了 UTS `defineOptions` 隔离、`onTabShow` 激活刷新钩子、`onNavbarPullDownRefresh` 自定义下拉刷新联动机制，开箱即用。
+
+##### 开发者新增或调整 Tab 的极简心智流程
+
+- **新增 Tab**：
+  1. 在 `src/tabbar/config.uts` 的 `list` 数组中添加一项（指定 `text`、`icon`、`pagePath` 等）；
+  2. 保存后，插件自动生成对应的 `views/*View.uvue` 脚手架，并自动更新 `TabViews.uvue`；
+  3. 开发者直接在生成的 `views/*View.uvue` 中编写业务代码，无需手写任何路由容器与挂载代码。
+- **中间鼓包按钮（`midButton`）按需启停**：
+  - **启用鼓包**：解开 `midButton` 注释，插件自动按居中索引插入并挂载 `AiView`；
+  - **禁用鼓包**：直接用 `//` 注释 `midButton`，插件自动清洗注释并从调度容器中剔除。
+
+#### 5. 统一路由跳转与安全 API（`src/tabbar/helper`）
+
+- **`switchTabbar(url: string)`**：全局统一 TabBar 跳转方法，单页面模式下直接切换索引，多页面模式下自动调度 switchTab 或 redirectTo（内置 250ms 节流锁，防止快速连击卡死）；
+- **`onTabShow(index: number, callback: () => void, immediate: boolean = false)`**：监听特定 Tab 项激活显示，完美解决单页面模式下子视图没有原生 `onShow` 的问题（可在切换回该 Tab 时触发数据重新请求与刷新）；
 - **`syncCurIdxByCurrentPage()`**：自动从当前页面路由同步激活 Tab 项索引；
-- **`safeHideNativeTabBar()`**：安全跨端隐藏原生底板并消除视口多余空白；
+- **`safeHideNativeTabBar()`**：全端安全隐藏原生底板，并在 H5 平台注入动态样式清除视口多余空白；
 - **`initNativeMidButtonTap()`**：仅在原生模式且配置 `midButton` 时自动注册监听，无需在页面中硬编码。
 
 ### 主题切换（暗黑模式）
