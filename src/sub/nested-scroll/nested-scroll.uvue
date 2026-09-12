@@ -377,24 +377,6 @@ function onArticleRefresh(): void {
   }, 700);
 }
 
-// 辅助手动操作
-function triggerError(): void {
-  simStep.value = 3;
-  articleError.value = true;
-  articleFinished.value = false;
-  simStatusText.value = '【已手动触发报错】请轻触底部「点击重试」按钮';
-  uni.showToast({ title: '已进入失败态，点击底部重试', icon: 'none' });
-}
-
-function triggerFinished(): void {
-  articleError.value = false;
-  articleLoading.value = false;
-  articleFinished.value = true;
-  simStep.value = 5;
-  simStatusText.value = '【已手动标记完成】展示「没有更多数据了」';
-  uni.showToast({ title: '已进入没有更多数据状态', icon: 'none' });
-}
-
 function triggerEmpty(): void {
   articleList.value = [];
   articleError.value = false;

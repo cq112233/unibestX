@@ -1,0 +1,115 @@
+<template>
+  <Card title="实用工具库与系统能力">
+    <view class="flex flex-col mb-[12px]">
+      <text class="text-[13px] text-[#64748b] leading-[18px]">
+        集成原生设备能力、Lodash 工具库、Crypto 密码学套件与 DayUTS 时间处理，独立分包页面高效呈现。
+      </text>
+    </view>
+
+    <!-- 原生设备能力入口 -->
+    <view
+      class="rounded-[12px] p-[14px] mb-[10px] border-[1px] border-solid border-[#e2e8f0] bg-white flex flex-row items-center justify-between shadow-xs"
+      @click="navigateToDevice"
+    >
+      <view class="flex flex-row items-center flex-1 mr-[10px]">
+        <view class="w-[40px] h-[40px] rounded-[10px] bg-[#10b98114] flex flex-row items-center justify-center mr-[12px]">
+          <text class="text-[20px]">📱</text>
+        </view>
+        <view class="flex flex-col flex-1">
+          <text class="text-[14px] font-bold text-[#1e293b] mb-[2px]">原生设备能力演示</text>
+          <text class="text-[11px] text-[#64748b]">震动反馈、系统剪贴板、相机相册、条码扫描</text>
+        </view>
+      </view>
+      <view class="px-[10px] py-[5px] rounded-[6px] bg-[#10b981] flex flex-row items-center">
+        <text class="text-[11px] text-white font-bold">查看 ➜</text>
+      </view>
+    </view>
+
+    <!-- Lodash 工具库入口 -->
+    <view
+      class="rounded-[12px] p-[14px] mb-[10px] border-[1px] border-solid border-[#e2e8f0] bg-white flex flex-row items-center justify-between shadow-xs"
+      @click="navigateToLodash"
+    >
+      <view class="flex flex-row items-center flex-1 mr-[10px]">
+        <view class="w-[40px] h-[40px] rounded-[10px] bg-[#0957de14] flex flex-row items-center justify-center mr-[12px]">
+          <text class="text-[20px]">🛠️</text>
+        </view>
+        <view class="flex flex-col flex-1">
+          <text class="text-[14px] font-bold text-[#1e293b] mb-[2px]">Lodash 工具库演示</text>
+          <text class="text-[11px] text-[#64748b]">数组切片去重、深拷贝、驼峰转换、函数防抖</text>
+        </view>
+      </view>
+      <view class="px-[10px] py-[5px] rounded-[6px] bg-[#0957de] flex flex-row items-center">
+        <text class="text-[11px] text-white font-bold">查看 ➜</text>
+      </view>
+    </view>
+
+    <!-- Crypto 加解密工具入口 -->
+    <view
+      class="rounded-[12px] p-[14px] mb-[10px] border-[1px] border-solid border-[#e2e8f0] bg-white flex flex-row items-center justify-between shadow-xs"
+      @click="navigateToCrypto"
+    >
+      <view class="flex flex-row items-center flex-1 mr-[10px]">
+        <view class="w-[40px] h-[40px] rounded-[10px] bg-[#8b5cf614] flex flex-row items-center justify-center mr-[12px]">
+          <text class="text-[20px]">🔐</text>
+        </view>
+        <view class="flex flex-col flex-1">
+          <text class="text-[14px] font-bold text-[#1e293b] mb-[2px]">Crypto 加密解密演示</text>
+          <text class="text-[11px] text-[#64748b]">Base64、MD5、SHA-256、HMAC、AES、DES</text>
+        </view>
+      </view>
+      <view class="px-[10px] py-[5px] rounded-[6px] bg-[#7c3aed] flex flex-row items-center">
+        <text class="text-[11px] text-white font-bold">查看 ➜</text>
+      </view>
+    </view>
+
+    <!-- Time 时间日期操作入口 -->
+    <view
+      class="rounded-[12px] p-[14px] border-[1px] border-solid border-[#e2e8f0] bg-white flex flex-row items-center justify-between shadow-xs"
+      @click="navigateToTime"
+    >
+      <view class="flex flex-row items-center flex-1 mr-[10px]">
+        <view class="w-[40px] h-[40px] rounded-[10px] bg-[#0ea5e914] flex flex-row items-center justify-center mr-[12px]">
+          <text class="text-[20px]">⏱️</text>
+        </view>
+        <view class="flex flex-col flex-1">
+          <text class="text-[14px] font-bold text-[#1e293b] mb-[2px]">时间日期操作 (lime-dayuts)</text>
+          <text class="text-[11px] text-[#64748b]">格式化、时间增减加减计算、差异比较、Unix时间戳</text>
+        </view>
+      </view>
+      <view class="px-[10px] py-[5px] rounded-[6px] bg-[#0284c7] flex flex-row items-center">
+        <text class="text-[11px] text-white font-bold">查看 ➜</text>
+      </view>
+    </view>
+  </Card>
+</template>
+
+<script setup lang="uts">
+import Card from '../../basic/components/Card.uvue';
+
+function navigateToDevice() {
+  uni.navigateTo({
+    url: '/src/sub/device/device'
+  });
+}
+
+function navigateToLodash() {
+  uni.navigateTo({
+    url: '/src/sub/lodash/lodash'
+  });
+}
+
+function navigateToCrypto() {
+  uni.navigateTo({
+    url: '/src/sub/crypto/crypto'
+  });
+}
+
+function navigateToTime() {
+  uni.navigateTo({
+    url: '/src/sub/time/time'
+  });
+}
+</script>
+
+<style scoped></style>
