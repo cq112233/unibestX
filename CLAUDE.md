@@ -42,6 +42,9 @@ Skills 位于 `.claude/skills/` 目录，每个 skill 有独立的 `SKILL.md` �
 如果你认为哪怕只有 1% 的可能性某个 skill 适用于你正在做的事情，你必须调用该 skill 检查。
 <!-- superpowers-zh:end -->
 
-## 项目规则
+## 项目规则与专属 Skills
 
+- **AI / Agent 必读铁律**：所有参与本项目开发的 AI、Agent 在进行任何编码、重构、修 bug 或新增页面任务前，**必须首先完整阅读并严格遵循 `unibestX-skill`**（`.claude/skills/unibestX-skill/SKILL.md`）。
+- **VDOM 与 Vapor 差异自动分类回写机制**：在开发或调试排错过程中，若遇到任何 UTS 语法、组件属性、生命周期、CSS 样式（如阴影、布局等）在 **VDOM 模式与 Vapor 模式不通用 / 存在渲染与表现差异** 的情况，AI / Agent **必须主动根据四维分类（语法规范、样式限制、运行时约束、快速对照表与红线清单）自动追加并同步到 `unibestX-skill/SKILL.md` 中**，严禁遗漏！
 - **必须遵守** `.agents/rules/uniappx.md` 中的 uni-app X 开发规范。每次会话开始时先 Read 该文件，并在编写 `.uvue`、`.uts`、`.ts`、`.scss` 文件时严格遵循其中的规则。
+- **一律禁止使用 `interface`**：在本项目中定义任何对象结构、状态、参数或返回值类型时，**一律禁止使用 `interface`**，**必须全部统一使用 `type`（类型别名）**，避免触发 UTS 底层对对象字面量赋值的 `UTS110111163` 编译错误。
