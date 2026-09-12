@@ -50,32 +50,6 @@
             <!-- 控制操作按钮排 -->
             <view class="flex flex-row">
               <view
-                class="flex-1 py-[7px] mr-[4px] rounded-[6px] bg-[#0957de] items-center justify-center shadow-xs"
-                @click="startFullSimulation"
-              >
-                <text class="text-[10px] text-white font-bold">🎬 重新模拟</text>
-              </view>
-              <view
-                v-if="simStep == 3 && !articleError"
-                class="flex-1 py-[7px] mr-[4px] rounded-[6px] bg-[#fee2e2] items-center justify-center animate-pulse"
-                @click="onArticleLoadMore"
-              >
-                <text class="text-[10px] text-[#dc2626] font-bold">👇 模拟触底报错</text>
-              </view>
-              <view
-                v-else
-                class="flex-1 py-[7px] mr-[4px] rounded-[6px] bg-[#fee2e2] items-center justify-center"
-                @click="triggerError"
-              >
-                <text class="text-[10px] text-[#dc2626] font-bold">模拟报错</text>
-              </view>
-              <view
-                class="flex-1 py-[7px] mr-[4px] rounded-[6px] bg-[#f3e8ff] items-center justify-center"
-                @click="triggerFinished"
-              >
-                <text class="text-[10px] text-[#7e22ce] font-bold">没有更多</text>
-              </view>
-              <view
                 class="flex-1 py-[7px] mr-[4px] rounded-[6px] bg-[#fef3c7] items-center justify-center"
                 @click="triggerEmpty"
               >
