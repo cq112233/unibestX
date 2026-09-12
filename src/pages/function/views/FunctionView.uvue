@@ -12,9 +12,6 @@
     <!-- 实用工具库与系统能力独立演示入口卡片 -->
     <UtilsNavCard />
 
-    <!-- 签名板 lime-signature 示例组件 -->
-    <SignatureCard v-if="isCanvasReady" />
-
     <!-- ECharts 图表示例组件 -->
     <EchartsDemoCard v-if="isCanvasReady" />
   </view>
@@ -23,7 +20,6 @@
 <script setup lang="uts">
 import { onMounted, ref } from 'vue';
 import EchartsDemoCard from '../components/EchartsDemoCard.uvue';
-import SignatureCard from '../components/SignatureCard.uvue';
 import UtilsNavCard from '../components/UtilsNavCard.uvue';
 import ZPagingDemoCard from '../components/ZPagingDemoCard.uvue';
 import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/utils/refresh.uts';
