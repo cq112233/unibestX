@@ -221,8 +221,8 @@ const rootStyle = computed((): string => {
 const dynamicHideStatusBar = ref<boolean | null>(null);
 
 /**
-  * 计算状态栏是否可见
-  */
+ * 计算状态栏是否可见
+ */
 const isStatusBarVisible = computed((): boolean => {
   if (dynamicHideStatusBar.value != null) {
     return dynamicHideStatusBar.value == false;

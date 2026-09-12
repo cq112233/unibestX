@@ -3,7 +3,7 @@
     <!-- 签名画布区域 -->
     <view
       class="signature-wrapper rounded-[12px] mb-[16px] border-[1px] border-solid border-[#e2e8f0] overflow-hidden"
-      style="width: 100%; height: 300px;"
+      style="width: 100%; height: 300px;touch-action: none;"
       @touchstart="onCardTouchStart"
       @touchend="onCardTouchEnd"
       @touchcancel="onCardTouchEnd"
@@ -110,7 +110,7 @@ import { setPageScrollEnabled } from '@/src/utils/pageScroll.uts';
 
 const sigRef = ref<ComponentPublicInstance | null>(null);
 
-const penColor = ref('red');
+const penColor = ref('#ef4444');
 const penSize = ref(4);
 const openSmooth = ref(true);
 const signUrl = ref('');
@@ -130,6 +130,15 @@ onUnmounted(() => {
   setPageScrollEnabled(true);
 });
 
+function callSigMethod(el: ComponentPublicInstance, name: string, arg: any | null = null) {
+  try {
+    el.$callMethod(name, arg);
+  }
+  catch {
+    // 忽略调用失败
+  }
+}
+
 function onAction(type: string) {
   const el = sigRef.value;
   if (el == null) {
@@ -137,17 +146,17 @@ function onAction(type: string) {
     return;
   }
   if (type === 'clear') {
-    el.$callMethod('clear');
+    callSigMethod(el, 'clear');
     signUrl.value = '';
   }
   else if (type === 'undo') {
-    el.$callMethod('undo');
+    callSigMethod(el, 'undo');
   }
   else if (type === 'redo') {
-    el.$callMethod('redo');
+    callSigMethod(el, 'redo');
   }
   else if (type === 'save') {
-    el.$callMethod('canvasToTempFilePath', {
+    callSigMethod(el, 'canvasToTempFilePath', {
       success: (res: LimeSignatureToFileSuccess) => {
         if (res.isEmpty) {
           uni.showToast({ title: '请先签名', icon: 'none' });

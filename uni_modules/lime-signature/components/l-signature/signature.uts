@@ -37,18 +37,26 @@ export class Signature {
 	touchmoveCallbackWrapper: UniCallbackWrapper|null= null
 	touchendCallbackWrapper: UniCallbackWrapper|null= null
 	change: ((isEmpty: boolean) => void)|null = null
-	constructor(el : SignatureUniElement) {
+	constructor(el : SignatureUniElement | null) {
+		if (el == null) {
+			return
+		}
 		this.el = el
 		// #ifdef APP
 		const dpr = uni.getDeviceInfo().devicePixelRatio ?? 1;
 		const rect = el.getBoundingClientRect();
-		const w = rect.width > 0 ? rect.width : 300;
-		const h = rect.height > 0 ? rect.height : 300;
+		const w = (rect != null && rect.width > 0) ? rect.width : 300;
+		const h = (rect != null && rect.height > 0) ? rect.height : 300;
+		// #ifdef APP-HARMONY
 		el.width = w * dpr;
 		el.height = h * dpr;
+		// #endif
 		
-		this.ctx = el.getContext('2d') as CanvasRenderingContext2D;
-		this.ctx.scale(dpr, dpr);
+		const ctx2d = el.getContext('2d') as CanvasRenderingContext2D | null;
+		if (ctx2d != null) {
+			this.ctx = ctx2d;
+			this.ctx.scale(dpr, dpr);
+		}
 		// #endif
 		this.init()
 	}
@@ -82,14 +90,17 @@ export class Signature {
 		// #endif
 	}
 	getTouchLimeSignaturePoint(event : UniTouchEvent) : LimeSignaturePoint {
-		const rect = this.el.getBoundingClientRect()
-		const touche = event.touches[0];
+		const rect = this.el?.getBoundingClientRect()
+		const touches = event.touches.length > 0 ? event.touches : event.changedTouches
+		if (touches.length == 0) {
+			return { x: 0, y: 0 } as LimeSignaturePoint
+		}
+		const touche = touches[0];
 		const x = touche.clientX
 		const y = touche.clientY
-		// const force = touche.force
 		return {
-			x: x - rect.left,
-			y: y - rect.top
+			x: x - (rect?.left ?? 0),
+			y: y - (rect?.top ?? 0)
 		} as LimeSignaturePoint
 	}
 	onTouchStart: (event : UniTouchEvent) => void = (event : UniTouchEvent) =>{
@@ -129,6 +140,7 @@ export class Signature {
 		this.change?.(this.isEmpty);
 	}
 	drawLine(point : LimeSignaturePoint, last : LimeSignaturePoint, lineWidth : number, strokeStyle : string) {
+		if (this.ctx == null) return
 		const ctx = this.ctx
 		ctx.lineWidth = lineWidth
 		ctx.strokeStyle = strokeStyle
@@ -144,7 +156,9 @@ export class Signature {
 	}
 	_clear() {
 		// #ifdef APP
-		this.ctx.clearRect(0, 0, 100000, 100000)
+		if (this.ctx != null) {
+			this.ctx.clearRect(0, 0, 100000, 100000)
+		}
 		// #endif
 	}
 	_draw() {
