@@ -58,6 +58,7 @@ export function setNavigationBarTitle(titleKey: string): void {
   uni.setNavigationBarTitle({
     title
   } as SetNavigationBarTitleOptions);
+  uni.$emit('setNavbarTitle', title);
 }
 
 /**

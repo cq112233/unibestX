@@ -11,7 +11,7 @@
       }"
     >
       <!-- 安全区域：状态栏占位高度 -->
-      <view class="status-bar" :style="{ height: `${statusBarHeight}px` }">
+      <view v-if="!hideStatusBar" class="status-bar" :style="{ height: `${statusBarHeight}px` }">
         <slot name="statusBar"></slot>
       </view>
 
@@ -43,9 +43,9 @@
     </view>
 
     <!-- 占位垫高块：当固定在顶部时防内容遮挡 -->
-    <view v-if="fixed && placeholder" :style="{ height: `${statusBarHeight + (isNavbarVisible ? NAVBAR_CONTENT_HEIGHT : 0)}px` }"></view>
+    <view v-if="fixed && placeholder" :style="{ height: `${(hideStatusBar ? 0 : statusBarHeight) + (isNavbarVisible ? NAVBAR_CONTENT_HEIGHT : 0)}px` }"></view>
   </view>
-  <view v-else class="status-bar" :style="{ height: `${statusBarHeight}px` }"></view>
+  <view v-else-if="!hideStatusBar" class="status-bar" :style="{ height: `${statusBarHeight}px` }"></view>
 </template>
 
 <script setup lang="uts">
@@ -92,6 +92,11 @@ const props = defineProps({
   isNavbarVisible: {
     type: Boolean,
     default: true
+  },
+  /** 是否隐藏状态栏占位高度（默认 false，若为 true 则状态栏占位高度为 0，实现完全沉浸全屏） */
+  hideStatusBar: {
+    type: Boolean,
+    default: false
   }
 });
 

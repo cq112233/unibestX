@@ -26,22 +26,22 @@ export const customTabbarConfig: TabBarConfig = {
    *
    * 💡 建议：若业务必须使用鼓包立体悬浮效果且需全端（含小程序/鸿蒙）兼容，
    * 请在 .env 中配置 VITE_TABBAR_MODE=2（自定义 TabBar 模式），组件层支持 100% 全端一致渲染。
-   * ⚠️ 不要midButton,请勿注释下面代码，还是会同步的，直接修改名字即可：比如：midButton1
+   * 💡 提示：若不需要 midButton，直接用行注释（//）或块注释把该属性包起来即可，插件已自动过滤注释，不会同步到 pages.json
    */
-  midButton1: {
-    width: '50px',
-    height: '50px',
-    text: 'tabbar.ai',
-    pagePath: 'src/pages/ai/ai',
-    iconType: 'icon',
-    icon: 'chatboxes',
-    iconActive: 'chatboxes-filled',
-    iconPath: 'static/tabbar/AI.png',
-    selectedIconPath: 'static/tabbar/AI_fill.png',
-    iconWidth: '24px',
-    badge: null,
-    isBulge: true
-  },
+  // midButton: {
+  //   width: '50px',
+  //   height: '50px',
+  //   text: 'tabbar.ai',
+  //   pagePath: 'src/pages/ai/ai',
+  //   iconType: 'icon',
+  //   icon: 'chatboxes',
+  //   iconActive: 'chatboxes-filled',
+  //   iconPath: 'static/tabbar/AI.png',
+  //   selectedIconPath: 'static/tabbar/AI_fill.png',
+  //   iconWidth: '24px',
+  //   badge: null,
+  //   isBulge: true
+  // },
   list: [
     {
       text: 'tabbar.home',

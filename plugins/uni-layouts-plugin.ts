@@ -274,6 +274,7 @@ export default function uniLayoutsPlugin(options: UniLayoutsOptions = {}) {
         || normalizedId.includes('App.uvue')
         || normalizedId.includes('App.ku.uvue')
         || normalizedId.includes('/components/')
+        || normalizedId.includes('/views/')
       ) {
         return null;
       }

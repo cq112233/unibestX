@@ -1,0 +1,30 @@
+<template>
+  <!-- 悬浮胶囊风格 (type: 'capsule') -->
+  <CapsuleTabbar v-if="activeType == 'capsule'" />
+  <!-- 标准底座风格 (type: 'default') -->
+  <DefaultTabbar v-else-if="activeType == 'default'" />
+  <!-- 兜底使用标准底座风格（若扩展了其他自定义风格，可在此继续添加分支） -->
+  <DefaultTabbar v-else />
+</template>
+
+<script setup lang="uts">
+import { computed } from 'vue';
+import CapsuleTabbar from './ui/capsule/index.uvue';
+import DefaultTabbar from './ui/default/index.uvue';
+import { tabbarType } from './helper';
+
+const props = defineProps({
+  /** 自定义 TabBar 风格形态（若不指定则默认读取 config.uts 中的 type） */
+  type: {
+    type: String,
+    default: ''
+  }
+});
+
+const activeType = computed((): string => {
+  if (props.type != '') {
+    return props.type;
+  }
+  return tabbarType;
+});
+</script>

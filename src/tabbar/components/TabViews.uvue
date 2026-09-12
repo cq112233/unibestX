@@ -1,0 +1,24 @@
+<template>
+  <view class="flex-1 relative" style="flex: 1; position: relative;">
+    <TabContent :content-index="0">
+      <IndexView />
+    </TabContent>
+    <TabContent :content-index="1">
+      <BasicView />
+    </TabContent>
+    <TabContent :content-index="2">
+      <FunctionView />
+    </TabContent>
+    <TabContent :content-index="3">
+      <MeView />
+    </TabContent>
+  </view>
+</template>
+
+<script setup lang="uts">
+import BasicView from '@/src/pages/basic/views/BasicView.uvue';
+import FunctionView from '@/src/pages/function/views/FunctionView.uvue';
+import IndexView from '@/src/pages/index/views/IndexView.uvue';
+import MeView from '@/src/pages/me/views/MeView.uvue';
+import TabContent from './TabContent.uvue';
+</script>

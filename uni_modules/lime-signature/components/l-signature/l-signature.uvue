@@ -10,7 +10,6 @@
 		<canvas
 			id="l-signature-native"
 			ref="signatureRef"
-			disable-scroll="true"
 			:disable-scroll="true"
 			style="width: 100%; height: 100%;"
 			@touchstart.stop.prevent="onAppTouchStart"
@@ -23,16 +22,16 @@
 		</view>
 	</view>
 	<!-- #endif -->
-	<!-- #ifndef APP-ANDROID || APP-IOS -->
+	<!-- #ifdef APP-HARMONY -->
 	<view class="l-signature" ref="signatureRef" :style="drawableStyle">
-		<!-- #ifdef APP-HARMONY -->
-		<canvas ref="signatureCanvasRef"  class="l-signature__canvas"></canvas>
-		<!-- #endif -->
-		<!-- #ifndef APP -->
+		<canvas ref="signatureCanvasRef" class="l-signature__canvas"></canvas>
+	</view>
+	<!-- #endif -->
+	<!-- #ifndef APP -->
+	<view class="l-signature" ref="signatureRef" :style="drawableStyle">
 		<canvas id="l-signature" class="l-signature__canvas" @touchstart="touchstart" @touchmove.stop="touchmove"
 			@touchend="touchend">
 		</canvas>
-		<!-- #endif -->
 	</view>
 	<!-- #endif -->
 </template>
@@ -531,6 +530,7 @@
 	})
 	// #endif
 
+	// #ifdef APP
 	onMounted(() => {
 		nextTick(() => {
 			setTimeout(()=>{
@@ -538,7 +538,6 @@
 				const rect = targetEl?.getBoundingClientRect()
 				const width = rect?.width ?? 0
 				const height = rect?.height ?? 0
-				// #ifdef APP
 				landscapeStyle.value.set('width', `${height}px`)
 				landscapeStyle.value.set('height', `${width}px`)
 				landscapeImageStyle.value.set('width', `${width}px`)
@@ -565,17 +564,15 @@
 						maxWidthDiffRate: props.maxWidthDiffRate,
 						maxHistoryLength: props.maxHistoryLength
 					}
-					// #ifdef APP
 					signature?.setOption(options)
 					signature?.onChange((_isEmpty: boolean)=>{
 						checkAndEmitEmptyStatus()
 					})
-					// #endif
 				})
-				// #endif
 			}, 300)
 		})
 	})
+	// #endif
 
 	onUnmounted(() => {
 		// #ifdef WEB

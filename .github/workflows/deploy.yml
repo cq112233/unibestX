@@ -29,10 +29,9 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: pnpm
 
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --no-frozen-lockfile
 
       - name: Build VitePress site (官网)
         run: pnpm run docs:build
@@ -59,6 +58,9 @@ jobs:
           # 3. 将本次最新构建的 VitePress 官网放到 publish/docs/
           mkdir -p publish/docs
           cp -r docs/.vitepress/dist/. publish/docs/
+
+          # 4. 创建 .nojekyll，防止 GitHub Pages 过滤带下划线的前端静态资源与 JSON
+          touch publish/.nojekyll
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4

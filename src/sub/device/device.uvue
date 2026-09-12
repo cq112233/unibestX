@@ -1,0 +1,140 @@
+<template>
+  <view class="flex flex-col p-[16px]" :class="isDark ? 'bg-[#0f172a]' : 'bg-[#f8fafc]'">
+    <!-- 触感与工具卡片 -->
+    <view class="mb-[16px]">
+      <Card title="触感与工具">
+        <view class="rounded-[12px] p-[16px] mb-[16px] border-[1px] border-solid border-[#e2e8f0]">
+          <text class="text-[12px] text-[#94a3b8] mb-[8px]">剪贴板测试文本</text>
+          <input
+            v-model="copyText"
+            placeholder="请输入要复制的文本"
+            class="h-[38px] bg-white rounded-[6px] px-[12px] border-[1px] border-solid border-[#cbd5e1] text-[14px] text-[#334155] mb-[12px]"
+          />
+          <view class="w-full h-[38px] rounded-[8px] bg-[#10b981] flex flex-row items-center justify-center" @click="handleCopy">
+            <text class="text-[#ffffff] text-[14px] font-bold">复制测试文本</text>
+          </view>
+        </view>
+
+        <view class="w-full h-[44px] rounded-[8px] bg-[#f59e0b] flex flex-row items-center justify-center" @click="triggerVibration">
+          <text class="text-[#ffffff] text-[14px] font-bold">短震动反馈</text>
+        </view>
+      </Card>
+    </view>
+
+    <!-- 相机与多媒体卡片 -->
+    <Card title="相机与多媒体">
+      <view class="rounded-[12px] p-[16px] mb-[16px] border-[1px] border-solid border-[#e2e8f0] items-center justify-center">
+        <text v-if="photoUrl === ''" class="text-[14px] text-[#94a3b8]">未选择照片</text>
+        <image v-else :src="photoUrl" class="w-[150px] h-[150px] rounded-[8px]" mode="aspectFill" />
+      </view>
+      <view class="w-full h-[44px] rounded-[8px] bg-[#3b82f6] mb-[12px] flex flex-row items-center justify-center" @click="chooseImage">
+        <text class="text-[#ffffff] text-[14px] font-bold">拍摄/选择照片</text>
+      </view>
+
+      <!-- 扫码测试 -->
+      <view class="rounded-[12px] p-[16px] mb-[16px] border-[1px] border-solid border-[#e2e8f0]">
+        <text class="text-[12px] text-[#94a3b8] mb-[8px]">扫码结果</text>
+        <text class="text-[14px] font-bold text-[#334155]">{{ scanResult !== '' ? scanResult : '暂无数据' }}</text>
+      </view>
+      <view class="w-full h-[44px] rounded-[8px] bg-[#10b981] flex flex-row items-center justify-center" @click="scanCode">
+        <text class="text-[#ffffff] text-[14px] font-bold">扫码测试</text>
+      </view>
+    </Card>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed, ref } from 'vue';
+import Card from '@/src/pages/basic/components/Card.uvue';
+import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/utils/refresh.uts';
+import { useAppStore } from '@/src/store';
+
+definePage({
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: true,
+  style: {
+    navigationBarTitleText: '原生设备能力',
+    navigationStyle: 'custom'
+  }
+});
+
+const appStore = useAppStore();
+const isDark = computed((): boolean => appStore.state.isDark);
+
+// 剪贴板与触感
+const copyText = ref('Hello unibestX!');
+
+function triggerVibration() {
+  // #ifdef APP || MP-WEIXIN
+  uni.vibrateShort({
+    type: 'light',
+    success: () => {
+      uni.showToast({ title: '已触发短震动', icon: 'none' });
+    },
+    fail: () => {
+      uni.showToast({ title: '震动触发失败', icon: 'none' });
+    }
+  });
+  // #endif
+  // #ifndef APP || MP-WEIXIN
+  uni.showToast({
+    title: '当前环境不支持震动',
+    icon: 'none'
+  });
+  // #endif
+}
+
+function handleCopy() {
+  if (copyText.value === '')
+    return;
+  uni.setClipboardData({
+    data: copyText.value,
+    success: () => {
+      uni.showToast({
+        title: '复制成功',
+        icon: 'success'
+      });
+    }
+  });
+}
+
+// 相机与扫码
+const photoUrl = ref('');
+const scanResult = ref('');
+
+function chooseImage() {
+  uni.chooseImage({
+    count: 1,
+    success: (res) => {
+      const paths = res.tempFilePaths;
+      if (paths.length > 0) {
+        photoUrl.value = paths[0];
+      }
+    },
+    fail: (err) => {
+      console.error(err);
+    }
+  });
+}
+
+function scanCode() {
+  uni.scanCode({
+    success: (res) => {
+      scanResult.value = res.result;
+    },
+    fail: (err) => {
+      console.error(err);
+    }
+  });
+}
+
+onNavbarPullDownRefresh(() => {
+  setTimeout(() => {
+    stopNavbarPullDownRefresh();
+  }, 800);
+});
+</script>
+
+<style scoped></style>

@@ -350,7 +350,8 @@ async function getUserInfo() {
 
   try {
     const res = await uniCloud.importObject('user').getUserInfo();
-    userInfo.value = JSON.stringify(res.data);
+    // eslint-disable-next-line dot-notation
+    userInfo.value = JSON.stringify((res as UTSJSONObject)['data'] ?? res);
     console.log('res', res);
   }
   catch (err) {
@@ -462,7 +463,7 @@ function previewUploadedImage() {
 // 页面挂载时自动加载 Mock 数据
 onMounted(() => {
   loadMockData();
-  getUserInfo();
+  // getUserInfo();
 });
 </script>
 

@@ -1,6 +1,6 @@
 <template>
   <!-- 页面根容器：view + flex flex-col flex-1（flex-1 撑满开发高度）；所有内容放入内部自写的 scroll-view 滚动 -->
-  <view class="flex flex-col flex-1 items-center px-[16px] pt-[8px]">
+  <view class="flex flex-col items-center px-[16px] pt-[8px]">
     <!-- 固定说明区（不随内容滚动） -->
     <view class="w-full mb-[16px]" :style="{ maxWidth: '520px' }">
       <view class="w-full bg-white rounded-[12px] p-[16px] flex flex-col">
@@ -26,8 +26,10 @@
       </view>
     </view>
     <!-- 内部 scroll-view：居中列 + 整列滚动，@scroll / @scrolltolower 监听滚动与触底 -->
-    <scroll-view direction="vertical" class="w-full flex flex-col flex-1" :style="{ maxWidth: '520px' }"
-      :lower-threshold="50" @scroll="handleScroll" @scrolltolower="handleScrollToLower">
+    <scroll-view
+      direction="vertical" class="w-full flex flex-col flex-1" :style="{ maxWidth: '520px' }"
+      :lower-threshold="50" @scroll="handleScroll" @scrolltolower="handleScrollToLower"
+    >
       <view class="flex flex-col">
         <!-- 小白三步：你只需要做到这几点 -->
         <view class="w-full bg-white rounded-[12px] p-[16px] mb-[16px] flex flex-col">
@@ -38,7 +40,8 @@
 
           <view class="flex-row items-start mb-[10px]">
             <view
-              class="w-[20px] h-[20px] rounded-[5px] bg-[#dbeafe] flex items-center justify-center mr-[10px] flex-none">
+              class="w-[20px] h-[20px] rounded-[5px] bg-[#dbeafe] flex items-center justify-center mr-[10px] flex-none"
+            >
               <text class="text-[12px] font-bold text-[#1d4ed8]">1</text>
             </view>
             <view class="flex flex-row flex-wrap flex-1">
@@ -50,7 +53,8 @@
 
           <view class="flex-row items-start mb-[10px]">
             <view
-              class="w-[20px] h-[20px] rounded-[5px] bg-[#dbeafe] flex items-center justify-center mr-[10px] flex-none">
+              class="w-[20px] h-[20px] rounded-[5px] bg-[#dbeafe] flex items-center justify-center mr-[10px] flex-none"
+            >
               <text class="text-[12px] font-bold text-[#1d4ed8]">2</text>
             </view>
             <view class="flex flex-row flex-wrap flex-1">
@@ -62,7 +66,8 @@
 
           <view class="flex-row items-start">
             <view
-              class="w-[20px] h-[20px] rounded-[5px] bg-[#dbeafe] flex items-center justify-center mr-[10px] flex-none">
+              class="w-[20px] h-[20px] rounded-[5px] bg-[#dbeafe] flex items-center justify-center mr-[10px] flex-none"
+            >
               <text class="text-[12px] font-bold text-[#1d4ed8]">3</text>
             </view>
             <view class="flex flex-row flex-wrap flex-1">
@@ -117,8 +122,10 @@
           </view>
           <view class="h-[1px] bg-[#f1f5f9] mb-[10px]" />
           <view class="w-full bg-[#0f172a] rounded-[8px] p-[12px]">
-            <text class="text-[11px] text-[#38bdf8] leading-[17px]" style="font-family: monospace;">{{ codeTemplate
-              }}</text>
+            <text class="text-[11px] text-[#38bdf8] leading-[17px]" style="font-family: monospace;">
+              {{ codeTemplate
+              }}
+            </text>
           </view>
         </view>
 
@@ -147,11 +154,15 @@
         </view>
 
         <!-- 滚动演示列表 -->
-        <view v-for="(item, index) in demoItems" :key="index"
-          class="w-full bg-white rounded-[12px] p-[16px] mb-[16px] flex flex-col">
+        <view
+          v-for="(item, index) in demoItems" :key="index"
+          class="w-full bg-white rounded-[12px] p-[16px] mb-[16px] flex flex-col"
+        >
           <view class="flex-row items-center mb-[10px]">
-            <view :style="{ backgroundColor: item.color }"
-              class="w-[44px] h-[44px] rounded-[22px] flex items-center justify-center mr-[12px] flex-none">
+            <view
+              :style="{ backgroundColor: item.color }"
+              class="w-[44px] h-[44px] rounded-[22px] flex items-center justify-center mr-[12px] flex-none"
+            >
               <text class="text-[18px] font-bold text-[#ffffff]">{{ item.avatar }}</text>
             </view>
             <view class="flex-col flex-1">

@@ -1,0 +1,132 @@
+<template>
+  <view v-if="hasRendered" :style="rootStyle" class="tab-content-wrapper">
+    <scroll-view direction="vertical" class="flex-1 flex flex-col" style="flex: 1;">
+      <view class="flex flex-col" :style="{ paddingBottom: `${tabbarPlaceholderHeight}px` }">
+        <slot />
+      </view>
+    </scroll-view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed, onMounted, ref, watch } from 'vue';
+import { curIdx, tabbarList, tabbarPlaceholderHeight } from '@/src/tabbar/helper';
+import { $t } from '@/src/utils/i18n';
+import { setHideNavbar, setHideStatusBar, setNavbarTitle } from '@/src/utils/refresh.uts';
+
+const props = defineProps({
+  /** 对应的 TabBar 索引（0, 1, 2, 3 等） */
+  contentIndex: {
+    type: Number,
+    required: true
+  },
+  /** 可选的自定义导航栏标题（若未指定，默认读取当前 TabBar 对应项的多语言文本） */
+  title: {
+    type: String,
+    default: ''
+  },
+  /** 当前 Tab 是否隐藏顶部导航栏（各 Tab 独立控制显隐，true 隐藏，false 显示） */
+  hideNavbar: {
+    type: Boolean,
+    default: false
+  },
+  /** 当前 Tab 是否隐藏状态栏占位（默认 false，true 隐藏不占空间，完全沉浸式） */
+  hideStatusBar: {
+    type: Boolean,
+    default: false
+  }
+});
+
+const hasRendered = ref(false);
+const isActive = computed<boolean>((): boolean => curIdx.value == props.contentIndex);
+const contentTitle = computed((): string => props.title);
+const shouldHideNavbar = computed((): boolean => props.hideNavbar);
+const shouldHideStatusBar = computed((): boolean => props.hideStatusBar);
+
+const rootStyle = computed<UTSJSONObject>((): UTSJSONObject => {
+  return {
+    left: isActive.value ? '0px' : '-9999px',
+    visibility: isActive.value ? 'visible' : 'hidden',
+    zIndex: isActive.value ? 1 : 0
+  } as UTSJSONObject;
+});
+
+/**
+ * 设置/同步当前激活 Tab 的导航栏标题与显隐状态
+ */
+function updateNavbarTitle(): void {
+  let targetTitle = '';
+  if (props.title.length > 0) {
+    targetTitle = props.title;
+  }
+  else if (props.contentIndex >= 0 && props.contentIndex < tabbarList.length) {
+    const item = tabbarList[props.contentIndex];
+    targetTitle = $t(item.text);
+  }
+
+  if (targetTitle.length > 0) {
+    setNavbarTitle(targetTitle);
+    uni.setNavigationBarTitle({
+      title: targetTitle
+    } as SetNavigationBarTitleOptions);
+  }
+}
+
+function syncNavbarState(): void {
+  updateNavbarTitle();
+  setHideNavbar(props.hideNavbar);
+  setHideStatusBar(props.hideStatusBar);
+}
+
+onMounted(() => {
+  if (curIdx.value == props.contentIndex) {
+    hasRendered.value = true;
+    syncNavbarState();
+  }
+});
+
+watch(isActive, (newVal: boolean) => {
+  if (newVal) {
+    if (!hasRendered.value) {
+      hasRendered.value = true;
+    }
+    syncNavbarState();
+  }
+});
+
+watch(contentTitle, (newTitle: string) => {
+  if (isActive.value && newTitle.length > 0) {
+    setNavbarTitle(newTitle);
+    uni.setNavigationBarTitle({
+      title: newTitle
+    } as SetNavigationBarTitleOptions);
+  }
+});
+
+watch(shouldHideNavbar, (newVal: boolean) => {
+  if (isActive.value) {
+    setHideNavbar(newVal);
+  }
+});
+
+watch(shouldHideStatusBar, (newVal: boolean) => {
+  if (isActive.value) {
+    setHideStatusBar(newVal);
+  }
+});
+
+defineExpose({
+  updateNavbarTitle,
+  syncNavbarState
+});
+</script>
+
+<style scoped>
+.tab-content-wrapper {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  flex-direction: column;
+}
+</style>

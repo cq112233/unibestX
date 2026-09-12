@@ -48,6 +48,11 @@ description: uni-app X (UTS) 开发规范与踩坑避坑指南，适用于跨端
     *   **重要限制**：**禁止**在 `<view>` 元素上直接使用文字颜色类名，否则会触发编译报错：
         > `style property color is only supported on <text>|<button>|<input>|<textarea>`
     *   *解决办法*：将文字颜色类名移到子级的 `<text>` 元素上进行渲染控制。
+*   **颜色值必须使用十六进制（严禁使用 `bg-[red]` 等命名颜色）**：
+    在 uni-app X 跨端编译环境中（特别是在鸿蒙 VDOM、Android Kotlin 与 iOS Swift 原生渲染引擎下）：
+    *   **重要限制**：**严禁使用英文单词命名颜色**（如 `bg-[red]`、`text-[red]`、`border-[blue]` 等）。原生渲染层对 CSS 命名颜色（named colors）的支持与解析不一致，极易导致颜色失效或发生原生解析异常。
+    *   **强制规范**：**颜色必须全部统一使用标准十六进制色值**（如 `text-[#ffffff]`、`bg-[#ffffff]`、`bg-[#ef4444]`、`border-[#e2e8f0]`）。
+    *   **鸿蒙 VDOM 与原生插槽文本白色防护**：在作用域插槽（如 slot、z-paging 回顶、悬浮按钮等）中，避免单独使用 `text-white`（底层可能依赖 CSS 变量，在鸿蒙或部分原生组件中易丢失继承降级为黑色文本），推荐显式书写 `text-[#ffffff]`，必要时叠加行内样式 `:style="{ color: '#ffffff' }"` 确保 100% 稳定呈现白色。
 *   **Tailwind CSS 边框设置 (Border Utilities)**：
     在 uni-app X 中使用 Tailwind CSS 设置边框时，推荐使用明确指定宽度、颜色与实线样式的类名组合：
     ```html
@@ -65,6 +70,11 @@ description: uni-app X (UTS) 开发规范与踩坑避坑指南，适用于跨端
 
 *   **Display 属性与类名限制 (Display Property Restrictions)**：
     原生平台仅支持 `display: flex` 和 `display: none`。**禁止**使用 `display: grid` 或 `inline-block`。推荐全面使用 Tailwind 的 Flex 布局类名（`flex-row`、`flex-col`、`flex-1`）。
+
+*   **Align-Items 属性与类名限制 (Align-Items Restrictions)**：
+    原生平台对于 `align-items` 仅支持 `center`、`flex-start`、`flex-end`、`stretch`。**禁止使用 `items-baseline`（`align-items: baseline`）**，否则会触发原生 CSS 编译器报错：`property value baseline is not supported for align-items`。
+    *   *错误示例*：`class="items-baseline"`
+    *   *正确做法*：使用 `items-end`（配合微调 `mb-[1px]` 等）或 `items-center`
 
 *   **Position 属性不支持 sticky (Position Sticky Restriction)**：
     原生平台仅支持 `relative`, `absolute`, `fixed`。**不支持** `position: sticky`。

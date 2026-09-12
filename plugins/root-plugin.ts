@@ -14,7 +14,7 @@ function kebabCase(str: string): string {
  * 注入键永远 ⊆ 声明键：避免页面新参数未声明时被注入到 AppKu 导致编译报错；
  * 未来新增页面参数键需三处同步：definePage / pages.config.json → 本白名单 → App.ku.uvue defineProps。
  */
-const APP_KU_PROP_KEYS: string[] = ['layout', 'showBack', 'hideNavbar', 'enablePullDownRefresh', 'customPageClass', 'customPageStyle', 'style'];
+const APP_KU_PROP_KEYS: string[] = ['layout', 'showBack', 'hideNavbar', 'hideStatusBar', 'enablePullDownRefresh', 'customPageClass', 'customPageStyle', 'style'];
 
 /**
  * 根据页面参数生成传给包裹组件的 props 属性字符串。
@@ -136,9 +136,15 @@ export default function autoRootPlugin() {
       if (!normalizedId.endsWith('.uvue') && !normalizedId.endsWith('.vue')) {
         return null;
       }
-      // 只处理 src/pages 和 src/sub 下的非组件 uvue 页面，排除 App.uvue、App.ku.uvue 以及组件目录
+      // 只处理 src/pages 和 src/sub 下的非组件 uvue 页面，排除 App.uvue、App.ku.uvue 以及组件/视图子目录
       const isPage = normalizedId.includes('src/pages/') || normalizedId.includes('src/sub/');
-      if (!isPage || normalizedId.includes('/components/') || normalizedId.includes('App.ku.uvue') || normalizedId.includes('/src/layouts/')) {
+      if (
+        !isPage
+        || normalizedId.includes('/components/')
+        || normalizedId.includes('/views/')
+        || normalizedId.includes('App.ku.uvue')
+        || normalizedId.includes('/src/layouts/')
+      ) {
         return null;
       }
 

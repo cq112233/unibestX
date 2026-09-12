@@ -1,119 +1,74 @@
 <template>
-  <Card title="数据分页列表 (z-paging-x)">
-    <!--
-      本卡片是 z-paging-x 分页组件的完整用法示例，覆盖以下几块：
-      1. 列表渲染：list-view + list-item 显示分页数据
-      2. 数据加载：@query 回调里模拟请求，用 $callMethod('complete') 结束加载
-      3. 顶部过滤 / 手动切换：tabChange 里调用 $callMethod('reload') 重新加载
-      4. 空状态：无数据时 v-else 换成自己的空白层（不依赖 z-paging-x 内置空状态）
-      5. 回到顶部：show-back-to-top 内置按钮
-    -->
-
-    <!-- 顶部描述文案 -->
+  <Card title="数据分页列表 (z-paging-x & NestedScroll)">
+    <!-- 顶部描述与特性标签 -->
     <view class="flex-col mb-[12px]">
-      <text class="text-[13px] text-[#64748b] leading-[18px] mb-[8px]">
-        在卡片中直接体验实时分页，支持触底加载、下拉刷新以及各种状态切换。
+      <text class="text-[13px] text-[#64748b] leading-[18px] mb-[10px]">
+        集成了下拉刷新、触底平滑加载、异常重试与空状态兜底等完整能力，适配移动端原生顶级高刷性能。
       </text>
 
-      <!-- 快捷操作栏：演示「加载失败」和「清空数据」两种状态 -->
-      <view class="flex-row mb-[12px]">
-        <view class="flex-1 mr-[8px]">
-          <view
-            class="w-full h-[36px] rounded-[8px] bg-[#fee2e2] flex flex-row items-center justify-center"
-            @click="triggerError"
-          >
-            <text class="text-[#dc2626] text-[12px] font-bold">模拟加载错误</text>
-          </view>
+      <!-- 特性矩阵徽章 -->
+      <view class="flex flex-row flex-wrap justify-between mb-[12px]">
+        <view class="w-[48.5%] p-[8px] mb-[6px] rounded-[8px] bg-[#0957de0f] border-[1px] border-solid border-[#0957de26] flex flex-row items-center">
+          <text class="text-[14px] mr-[6px]">🚀</text>
+          <text class="text-[11px] font-bold text-[#0957de]">120Hz 极速分页</text>
         </view>
-        <view class="flex-1">
-          <view
-            class="w-full h-[36px] rounded-[8px] bg-[#fef3c7] flex flex-row items-center justify-center"
-            @click="triggerClear"
-          >
-            <text class="text-[#d97706] text-[12px] font-bold">清空数据</text>
-          </view>
+        <view class="w-[48.5%] p-[8px] mb-[6px] rounded-[8px] bg-[#10b9810f] border-[1px] border-solid border-[#10b98126] flex flex-row items-center">
+          <text class="text-[14px] mr-[6px]">🔄</text>
+          <text class="text-[11px] font-bold text-[#059669]">原生阻尼下拉</text>
         </view>
-      </view>
-    </view>
-
-    <!-- 顶部 Tab 过滤 (移到 z-paging-x 外部)：点击切换分类，通过 reload() 重新请求 -->
-    <view class="bg-white py-[8px] px-[12px] border-[1px] border-solid border-[#edf2f7] border-b-0" style="border-top-left-radius: 12px; border-top-right-radius: 12px;">
-      <view class="flex-row bg-[#f1f5f9] rounded-[8px] p-[2px]">
-        <view
-          v-for="(tab, index) in tabList"
-          :key="index"
-          class="flex-1 items-center justify-center py-[6px] rounded-[6px]"
-          :class="tabIndex === index ? 'bg-white' : 'bg-[#f1f5f9]'"
-          @click="tabChange(index)"
-        >
-          <text
-            class="text-[12px] font-bold"
-            :class="tabIndex === index ? 'text-[#37c2bc]' : 'text-[#64748b]'"
-          >
-            {{ tab }}
-          </text>
+        <view class="w-[48.5%] p-[8px] rounded-[8px] bg-[#f59e0b0f] border-[1px] border-solid border-[#f59e0b26] flex flex-row items-center">
+          <text class="text-[14px] mr-[6px]">⚡</text>
+          <text class="text-[11px] font-bold text-[#d97706]">触底平滑追加</text>
+        </view>
+        <view class="w-[48.5%] p-[8px] rounded-[8px] bg-[#8b5cf60f] border-[1px] border-solid border-[#8b5cf626] flex flex-row items-center">
+          <text class="text-[14px] mr-[6px]">🛡️</text>
+          <text class="text-[11px] font-bold text-[#7c3aed]">空态/异常兜底</text>
         </view>
       </view>
     </view>
 
-    <!--
-      分页列表组件。基础使用要点：
-      - @query 为数据请求回调(pageNo, pageSize)，首次挂载、下拉刷新、触底加载、reload 都会触发它。
-        注意：不要在模板里手动调用 onQuery，需要刷新时用 $callMethod('reload')。
-      - :model-value + @update:model-value 实现 v-model = dataList 的双向绑定。
-      - list-is = 'list-view' 时，列表项必须用 list-item 包裹（uni-app X 原生列表约束）。
-      - :show-back-to-top 开启内置「回到顶部」按钮，滚动超过 threshold 后浮现。
-      - v-if="showList"：有数据时渲染 ZPagingX；无数据时整个卸载，由下方 v-else 空白层接管。
-    -->
-    <z-paging-x
-      v-if="showList"
-      ref="pagingX"
-      list-is="list-view"
-      list-id="zpagingDemoList"
-      :custom-nested-scroll="true"
-      :model-value="dataList"
-      :default-page-size="10"
-      :show-back-to-top="true"
-      :back-to-top-threshold="60"
-      :paging-style="{ height: '200px', border: '1px solid #edf2f7', borderTopWidth: '0px', borderBottomLeftRadius: '12px', borderBottomRightRadius: '12px', backgroundColor: '#f8fafc' }"
-      @update:model-value="onUpdateModelValue"
-      @query="onQuery"
-    >
-      <!-- 列表数据项 (list-view 模式下每项必须用 list-item)。items 来自 dataList，由 @update:model-value 同步。 -->
-      <list-item v-for="item in dataList" :key="item.id">
-        <view class="mx-[12px] my-[8px] p-[12px] bg-white rounded-[8px] border-[1px] border-solid border-[#edf2f7]">
-          <view class="flex-row justify-between items-center mb-[6px]">
-            <view :style="{ backgroundColor: item.tagBgColor, padding: '1px 6px', borderRadius: '4px' }">
-              <text :style="{ color: item.tagColor, fontSize: '9px', fontWeight: 'bold' }">{{ item.tag }}</text>
-            </view>
-            <text class="text-[11px] text-[#94a3b8]">#{{ item.id }}</text>
-          </view>
-          <text class="text-[14px] font-bold text-[#1e293b] mb-[4px]">{{ item.title }}</text>
-          <text class="text-[12px] text-[#64748b] leading-[16px]">{{ item.summary }}</text>
-        </view>
-      </list-item>
-    </z-paging-x>
+    <!-- 静态数据样例预览（自适应高度，无局部滚动条，彻底避免嵌套手势死锁） -->
+    <view class="rounded-[12px] p-[12px] bg-[#f8fafc] border-[1px] border-solid border-[#e2e8f0] mb-[14px]">
+      <view class="flex flex-row items-center justify-between mb-[8px]">
+        <text class="text-[12px] font-bold text-[#1e293b]">📋 数据项预览</text>
+        <text class="text-[10px] text-[#94a3b8]">独立页面完美分页</text>
+      </view>
 
-    <!--
-      手动空/空白状态：无数据时用 v-else 替换掉 ZPagingX，展示自己的空白 UI。
-      - v-else 与上方 v-if="showList" 互斥：showList 为 false 时不挂载 ZPagingX，直接渲染这里。
-      - 之所以不用 z-paging-x 内置空状态（showEmpty / #empty / z-paging-x-empty）：原生 list-view 的
-        内置空状态图片/文案无法被干净地关闭，会出现问题时选择自己写空白层更可控。
-      - loadFailed 区分「暂无数据 / 加载失败」，点击按钮重新挂载 ZPagingX 触发重新加载。
-    -->
-    <view
-      v-else
-      class="flex flex-col items-center justify-center"
-      style="height: 200px; background-color: #f8fafc; border: 1px solid #edf2f7; border-top-width: 0px; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px;"
-    >
-      <text class="text-[28px] mb-[10px]">{{ loadFailed ? '😓' : '📭' }}</text>
-      <text class="text-[13px] text-[#94a3b8] mb-[14px]">{{ loadFailed ? emptyErrorText : emptyText }}</text>
       <view
-        class="h-[32px] px-[16px] rounded-[8px] flex flex-row items-center justify-center"
-        style="background-color: #37c2bc;"
-        @click="onEmptyReload"
+        v-for="item in previewItems"
+        :key="item.id"
+        class="p-[10px] mb-[8px] bg-white rounded-[8px] border-[1px] border-solid border-[#edf2f7]"
       >
-        <text class="text-[12px] text-[#ffffff] font-bold">{{ loadFailed ? '点击重试' : '点击刷新' }}</text>
+        <view class="flex-row justify-between items-center mb-[4px]">
+          <view
+            class="px-[6px] py-[1px] rounded-[4px]"
+            :style="{ backgroundColor: item.tagBgColor }"
+          >
+            <text class="text-[9px] font-bold" :style="{ color: item.tagColor }">{{ item.tag }}</text>
+          </view>
+          <text class="text-[10px] text-[#94a3b8]">#{{ item.id }}</text>
+        </view>
+        <text class="text-[13px] font-bold text-[#1e293b] mb-[2px]">{{ item.title }}</text>
+        <text class="text-[11px] text-[#64748b] leading-[15px]">{{ item.summary }}</text>
+      </view>
+    </view>
+
+    <!-- 双按钮导航：分别提供 z-paging-x 与自研 NestedScroll 独立演示 -->
+    <view class="flex flex-col">
+      <view
+        class="w-full h-[42px] rounded-[10px] bg-[#0957de] flex flex-row items-center justify-center shadow-sm mb-[8px]"
+        @click="navigateToZPaging"
+      >
+        <text class="text-[13px] text-white font-bold mr-[6px]">🚀 进入 z-paging-x 原生分页独立演示</text>
+        <text class="text-[13px] text-white font-bold">→</text>
+      </view>
+
+      <view
+        class="w-full h-[42px] rounded-[10px] bg-[#4f46e5] flex flex-row items-center justify-center shadow-sm"
+        @click="navigateToNestedScroll"
+      >
+        <text class="text-[13px] text-white font-bold mr-[6px]">⚡ 进入 NestedScroll 自研嵌套滚动演示</text>
+        <text class="text-[13px] text-white font-bold">→</text>
       </view>
     </view>
   </Card>
@@ -121,10 +76,8 @@
 
 <script setup lang="uts">
 import Card from '../../basic/components/Card.uvue';
-import { ref } from 'vue';
 
-// 列表项数据结构：用 type 别名声明，符合 UTS 强类型规范。
-type CompactArticleItem = {
+type PreviewItem = {
   id: number;
   title: string;
   summary: string;
@@ -133,113 +86,36 @@ type CompactArticleItem = {
   tagColor: string;
 };
 
-// showList：控制 ZPagingX 是否挂载。初始为 true，首次挂载会走 onMounted -> reload() 自动加载。
-// 清空/出错时置 false，配合模板 v-else 显示空白层；刷新时置 true 重新挂载并自动加载。
-const showList = ref<boolean>(true);
-// loadFailed：区分空白层的「暂无数据(false) / 加载失败(true)」两种文案与按钮。
-const loadFailed = ref<boolean>(false);
-
-// 顶部过滤分类
-const tabList = ['全部', '技术', '设计'];
-const tabIndex = ref<number>(0);
-
-// z-paging-x 组件引用（通过 ref="pagingX" 拿到实例，用于调用 $callMethod）
-const pagingX = ref<ComponentPublicInstance | null>(null);
-// 列表数据，与模板 v-for 绑定；由 @update:model-value 从 z-paging-x 回填
-const dataList = ref<CompactArticleItem[]>([]);
-
-// 空白层文案
-const emptyText = '暂无数据 ~';
-const emptyErrorText = '加载失败，请点击重试';
-
-// z-paging-x 通过 @update:model-value 把最新列表回传，这里手动同步到 dataList。
-// 手动处理可避免 compiler 产生 union types 的问题。
-function onUpdateModelValue(val: any[]) {
-  dataList.value = val as CompactArticleItem[];
-}
-
-// 切换顶部过滤分类：重置状态并重新加载。
-// reload() 会触发 @query；若当前处于空白层（showList=false），则先置 true 重新挂载，
-// 让 ZPagingX 的 onMounted 自动触发一次加载。
-function tabChange(index: number) {
-  tabIndex.value = index;
-  loadFailed.value = false;
-  showList.value = true;
-  if (pagingX.value != null) {
-    pagingX.value!.$callMethod('reload');
+const previewItems: PreviewItem[] = [
+  {
+    id: 1,
+    title: '深入解析 uni-app X 跨端高性能分页实践',
+    summary: '基于 UTS 强类型系统与原生渲染管道构建的高性能架构。',
+    tag: 'z-paging-x',
+    tagBgColor: '#0957de14',
+    tagColor: '#0957de'
+  },
+  {
+    id: 2,
+    title: '嵌套滚动 nested-scroll 与触底加载设计规范',
+    summary: '自研组件原生手势联通与平滑衔接，彻底消除双重滚动冲突。',
+    tag: 'NestedScroll',
+    tagBgColor: '#6366f114',
+    tagColor: '#4f46e5'
   }
+];
+
+function navigateToZPaging(): void {
+  uni.navigateTo({
+    url: '/src/sub/zpaging/zpaging'
+  });
 }
 
-// 模拟加载错误：清空数据 + 标记失败，卸载 ZPagingX，展示「加载失败 + 重试」空白层。
-function triggerError() {
-  dataList.value = [];
-  loadFailed.value = true;
-  showList.value = false;
-}
-
-// 清空数据：清空列表 + 标记为非失败，卸载 ZPagingX，展示「暂无数据 + 刷新」空白层。
-function triggerClear() {
-  dataList.value = [];
-  loadFailed.value = false;
-  showList.value = false;
-}
-
-// 空白层按钮点击：重新挂载 ZPagingX，其 onMounted 会自动重新请求数据。
-function onEmptyReload() {
-  loadFailed.value = false;
-  showList.value = true;
-}
-
-// 生成模拟分页数据：pageNo 从 1 开始，pageSize 为一页条数。
-// 控 12 条上限以演示「没有更多数据」。
-function getMockArticles(category: string, pageNo: number, pageSize: number): CompactArticleItem[] {
-  const list = [] as CompactArticleItem[];
-  const start = (pageNo - 1) * pageSize;
-
-  for (let i = 0; i < pageSize; i++) {
-    const itemId = start + i + 1;
-    if (itemId > 12) {
-      break;
-    }
-
-    let tag = category;
-    if (category == '全部') {
-      tag = itemId % 2 == 0 ? '技术' : '设计';
-    }
-
-    let tagBgColor = '#e0f2fe';
-    let tagColor = '#0284c7';
-    if (tag == '设计') {
-      tagBgColor = '#f3e8ff';
-      tagColor = '#7c3aed';
-    }
-
-    list.push({
-      id: itemId,
-      title: `${tag}动态 · 原生探索第 ${itemId} 篇`,
-      summary: `卡片演示中的 ${tag} 文章，支持局部滚动加载数据。`,
-      tag,
-      tagBgColor,
-      tagColor
-    } as CompactArticleItem);
-  }
-  return list;
-}
-
-// @query 数据加载回调：拿到 pageNo/pageSize 后发起请求，完成后调用 complete 结束加载。
-// 模拟 600ms 网络延时；失败时若有需要可用 $callMethod('completeByError') 进入错误态。
-function onQuery(pageNo: number, pageSize: number) {
-  const currentCategory = tabList[tabIndex.value];
-
-  setTimeout(() => {
-    loadFailed.value = false;
-    const data = getMockArticles(currentCategory, pageNo, pageSize);
-    if (pagingX.value != null) {
-      pagingX.value!.$callMethod('complete', data);
-    }
-  }, 600);
+function navigateToNestedScroll(): void {
+  uni.navigateTo({
+    url: '/src/sub/nested-scroll/nested-scroll'
+  });
 }
 </script>
 
-<style>
-</style>
+<style scoped></style>
