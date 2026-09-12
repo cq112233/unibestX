@@ -1,16 +1,14 @@
 <template>
   <view v-if="hasRendered" :style="rootStyle" class="tab-content-wrapper">
     <scroll-view direction="vertical" class="flex-1 flex flex-col" style="flex: 1;">
-      <view class="flex flex-col" :style="{ paddingBottom: `${tabbarPlaceholderHeight}px` }">
-        <slot />
-      </view>
+      <slot />
     </scroll-view>
   </view>
 </template>
 
 <script setup lang="uts">
 import { computed, onMounted, ref, watch } from 'vue';
-import { curIdx, tabbarList, tabbarPlaceholderHeight } from '@/src/tabbar/helper';
+import { curIdx, tabbarList } from '@/src/tabbar/helper';
 import { $t } from '@/src/utils/i18n';
 import { setHideNavbar, setHideStatusBar, setNavbarTitle } from '@/src/utils/refresh.uts';
 
