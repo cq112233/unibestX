@@ -1,125 +1,141 @@
 <template>
-  <view class="flex flex-col flex-1 h-full" :class="isDark ? 'bg-[#0f172a]' : 'bg-[#f8fafc]'">
-    <!-- 顶部多场景示例切换栏 -->
-    <view
-      class="px-[6px] py-[8px] flex flex-row items-center border-b-[1px] border-solid"
-      :class="isDark ? 'bg-[#1e293b] border-[#334155]' : 'bg-white border-[#e2e8f0]'"
-    >
-      <view
-        v-for="(tab, tIdx) in demoTabs"
-        :key="tIdx"
-        class="flex-1 py-[6px] mx-[1px] rounded-[6px] items-center justify-center flex flex-row"
-        :style="{
-          backgroundColor: activeTab == tIdx ? (isDark ? '#334155' : '#0957de14') : 'transparent'
-        }"
-        @click="switchDemoTab(tIdx)"
-      >
-        <text
-          class="text-[11px] font-bold"
-          :class="activeTab == tIdx ? (isDark ? 'text-[#38bdf8]' : 'text-[#0957de]') : (isDark ? 'text-[#94a3b8]' : 'text-[#64748b]')"
-        >
-          {{ tab }}
-        </text>
-      </view>
-    </view>
-
-    <!-- ======================================================= -->
-    <!-- 场景一：z-paging-x 基础分页图文列表（自定义暗黑模式下拉刷新） -->
-    <!-- ======================================================= -->
-    <view v-if="activeTab === 0" class="flex-1 flex flex-col relative">
-      <ZPagingX
-        ref="basicPagingRef"
-        list-is="list-view"
-        list-id="basicPagingList"
-        :model-value="basicList"
+  <view class="flex flex-col flex-1" :class="isDark ? 'bg-[#0f172a]' : 'bg-[#f8fafc]'">
+    <!-- 核心分页滚动场景 -->
+    <view class="flex-1 flex flex-col relative">
+      <z-paging-x
+        ref="pagingRef"
+        :model-value="articleList"
         :default-page-size="10"
         :show-back-to-top="true"
-        :back-to-top-threshold="100"
+        :back-to-top-threshold="200"
+        :back-to-top-style="backToTopStyle"
         :refresher-threshold="70"
-        :refresher-complete-delay="350"
+        :refresher-complete-delay="300"
         :refresher-background="isDark ? '#0f172a' : '#f8fafc'"
-        :paging-style="{ flex: 1, backgroundColor: isDark ? '#0f172a' : '#f8fafc' }"
-        @update:model-value="onUpdateBasicList"
-        @refresher-status-change="onBasicRefresherStatusChange"
-        @query="queryBasicList"
+        :paging-style="{ flex: 1, position: 'relative', backgroundColor: isDark ? '#0f172a' : '#f8fafc' }"
+        @update:model-value="onUpdateList"
+        @refresher-status-change="onRefresherStatusChange"
+        @query="onQuery"
       >
-        <!-- 自定义炫酷下拉刷新插槽，深度适配暗黑模式 -->
-        <template #refresher>
-          <view
-            class="w-full py-[14px] flex flex-row items-center justify-center border-b-[1px] border-solid"
-            :class="isDark ? 'bg-[#0f172a] border-[#1e293b]' : 'bg-[#f8fafc] border-[#e2e8f0]'"
-          >
-            <!-- 左侧状态图标徽章 -->
-            <view
-              class="w-[38px] h-[38px] rounded-full flex flex-row items-center justify-center mr-[12px]"
-              :class="refresherBadgeClass"
-            >
-              <text class="text-[18px]">{{ refresherIcon }}</text>
-            </view>
-
-            <!-- 右侧文案指示与时间戳 -->
-            <view class="flex flex-col">
-              <view class="flex flex-row items-center">
-                <text
-                  class="text-[13px] font-bold"
-                  :class="refresherTitleColorClass"
-                >
-                  {{ refresherStatusText }}
-                </text>
-                <view
-                  v-if="basicRefresherStatus == 'release-to-refresh'"
-                  class="ml-[6px] px-[6px] py-[1px] rounded-[4px] border-[1px] border-solid"
-                  :class="isDark ? 'bg-[#38bdf81f] border-[#38bdf84d]' : 'bg-[#0957de14] border-[#0957de33]'"
-                >
-                  <text
-                    class="text-[9px] font-bold"
-                    :class="isDark ? 'text-[#38bdf8]' : 'text-[#0957de]'"
-                  >
-                    松手触发
-                  </text>
-                </view>
-              </view>
-              <text
-                class="text-[10px] mt-[2px]"
-                :class="isDark ? 'text-[#94a3b8]' : 'text-[#64748b]'"
-              >
-                {{ refresherTipText }}
-              </text>
-            </view>
-          </view>
-        </template>
-
-        <!-- 顶部功能提示说明卡片 -->
+        <!-- 顶部演练操作面板（吸附在顶部） -->
         <template #top>
           <view
-            class="mx-[14px] mt-[10px] mb-[6px] p-[12px] rounded-[10px] border-[1px] border-solid flex flex-row items-center justify-between"
+            class="m-[14px] p-[16px] rounded-[14px] border-[1px] border-solid shadow-xs"
             :class="isDark ? 'bg-[#1e293b] border-[#334155]' : 'bg-[#e0e7ff] border-[#c7d2fe]'"
           >
-            <view class="flex flex-row items-center flex-1 mr-[8px]">
-              <text class="text-[16px] mr-[8px]">💡</text>
+            <view class="flex flex-row items-center justify-between mb-[6px]">
               <text
-                class="text-[11px] leading-[16px]"
-                :class="isDark ? 'text-[#cbd5e1]' : 'text-[#3730a3]'"
+                class="text-[15px] font-bold"
+                :class="isDark ? 'text-[#f1f5f9]' : 'text-[#1e293b]'"
               >
-                尝试向下拉动列表，体验专为暗黑模式打造的“松开立即刷新”自定义指示器。
+                🎨 全生命周期模拟演练
+              </text>
+              <text class="text-[10px] font-bold text-[#4f46e5] px-[6px] py-[2px] rounded-[4px] bg-[#6366f11f]">
+                z-paging-x 原生分页
               </text>
             </view>
+
+            <!-- 实时步骤状态条 -->
             <view
-              class="px-[8px] py-[3px] rounded-[6px]"
-              :class="isDark ? 'bg-[#0f172a]' : 'bg-white'"
+              class="p-[8px] rounded-[8px] my-[8px] flex flex-row items-center border-[1px] border-solid"
+              :class="isDark ? 'bg-[#0f172a]/60 border-[#334155]' : 'bg-white/80 border-[#c7d2fe]'"
             >
-              <text
-                class="text-[10px] font-bold"
-                :class="isDark ? 'text-[#38bdf8]' : 'text-[#0957de]'"
-              >
-                {{ basicRefresherStatus == 'release-to-refresh' ? '已就绪' : '支持下拉' }}
+              <text class="text-[14px] mr-[6px]">
+                {{ simStep == 1 || simStep == 2 ? '⏳' : (simStep == 3 ? (isLoadMoreError ? '🚨' : '⚡') : (simStep >= 4 ? '🎉' : '💡')) }}
               </text>
+              <text
+                class="text-[11px] font-medium leading-[16px] flex-1"
+                :class="isLoadMoreError ? 'text-[#dc2626]' : (simStep >= 4 ? 'text-[#16a34a]' : (isDark ? 'text-[#38bdf8]' : 'text-[#4338ca]'))"
+              >
+                {{ simStatusText }}
+              </text>
+            </view>
+
+            <!-- 控制操作按钮排 -->
+            <view class="flex flex-row">
+              <view
+                class="flex-1 py-[7px] mr-[4px] rounded-[6px] bg-[#fef3c7] items-center justify-center"
+                @click="triggerEmpty"
+              >
+                <text class="text-[10px] text-[#d97706] font-bold">清空数据</text>
+              </view>
+              <view
+                class="flex-1 py-[7px] mr-[4px] rounded-[6px] bg-[#dcfce7] items-center justify-center"
+                @click="triggerReset"
+              >
+                <text class="text-[10px] text-[#16a34a] font-bold">恢复重置</text>
+              </view>
+              <view
+                class="flex-1 py-[7px] rounded-[6px] bg-[#e0e7ff] items-center justify-center"
+                @click="triggerScrollToTop"
+              >
+                <text class="text-[10px] text-[#4338ca] font-bold">一键回顶</text>
+              </view>
+            </view>
+
+            <!-- 回顶位置调节行 -->
+            <view
+              class="flex flex-row items-center justify-between mt-[8px] pt-[6px] border-t-[1px] border-solid"
+              :class="isDark ? 'border-[#334155]' : 'border-[#c7d2fe]'"
+            >
+              <text class="text-[11px]" :class="isDark ? 'text-[#94a3b8]' : 'text-[#475569]'">
+                回顶按钮底部边距: <text class="font-bold text-[#3b82f6]">{{ customBottom }}px</text>
+              </text>
+              <view
+                class="px-[8px] py-[3px] rounded-[4px] bg-[#3b82f61a] active:opacity-75"
+                @click="toggleBottomPosition"
+              >
+                <text class="text-[10px] font-bold text-[#2563eb]">切换高度 ⇄</text>
+              </view>
             </view>
           </view>
         </template>
 
-        <!-- 列表数据项 -->
-        <list-item v-for="item in basicList" :key="item.id">
+        <!-- 自定义下拉刷新插槽 -->
+        <template #refresher>
+          <view class="w-full py-[16px] flex flex-row items-center justify-center">
+            <text class="text-[16px] mr-[8px]">{{ refresherIcon }}</text>
+            <text
+              class="text-[12px] font-bold"
+              :class="isDark ? 'text-[#38bdf8]' : 'text-[#0957de]'"
+            >
+              {{ refresherStatusText }}
+            </text>
+          </view>
+        </template>
+
+        <!-- 自定义一键返回顶部插槽 -->
+        <template #backToTop>
+          <view
+            class="px-[12px] py-[8px] rounded-full flex flex-row items-center border-[1px] border-solid shadow-md active:opacity-75"
+            :class="isDark ? 'bg-[#0284c7] border-[#38bdf8]' : 'bg-[#0957de] border-[#1d4ed8]'"
+          >
+            <uni-icons type="top" size="14" color="#ffffff" />
+            <text class="text-[12px] text-white font-bold ml-[4px]">回顶</text>
+          </view>
+        </template>
+
+        <!-- 空数据兜底插槽 -->
+        <template #empty>
+          <view class="py-[48px] items-center justify-center flex flex-col">
+            <text class="text-[40px] mb-[10px]">📭</text>
+            <text
+              class="text-[13px] font-bold mb-[14px]"
+              :class="isDark ? 'text-[#64748b]' : 'text-[#94a3b8]'"
+            >
+              暂无分页数据（空状态演示）
+            </text>
+            <view
+              class="px-[16px] py-[8px] rounded-[8px] bg-[#0957de] items-center justify-center"
+              @click="triggerReset"
+            >
+              <text class="text-[12px] text-white font-bold">重新加载数据</text>
+            </view>
+          </view>
+        </template>
+
+        <!-- 列表内容：与 nested-scroll 一致的标准卡片列表 -->
+        <view v-for="item in articleList" :key="item.id" class="w-full">
           <view
             class="mx-[14px] my-[6px] p-[14px] rounded-[12px] border-[1px] border-solid flex flex-col"
             :class="isDark ? 'bg-[#1e293b] border-[#334155]' : 'bg-white border-[#e2e8f0]'"
@@ -127,418 +143,93 @@
             <view class="flex flex-row items-center justify-between mb-[6px]">
               <view
                 class="px-[8px] py-[2px] rounded-[4px]"
-                :style="{ backgroundColor: item.tagBg }"
+                :style="{ backgroundColor: item.categoryBg }"
               >
-                <text class="text-[10px] font-bold" :style="{ color: item.tagColor }">
-                  {{ item.tag }}
+                <text class="text-[10px] font-bold" :style="{ color: item.categoryColor }">
+                  {{ item.category }}
                 </text>
               </view>
               <text class="text-[11px] text-[#94a3b8]">{{ item.time }}</text>
             </view>
             <text
-              class="text-[14px] font-bold mb-[4px]"
+              class="text-[14px] font-bold mb-[4px] leading-[20px]"
               :class="isDark ? 'text-[#f1f5f9]' : 'text-[#1e293b]'"
             >
               {{ item.title }}
             </text>
-            <text
-              class="text-[12px] leading-[17px]"
-              :class="isDark ? 'text-[#94a3b8]' : 'text-[#64748b]'"
-            >
+            <text class="text-[12px] leading-[18px] text-[#64748b] mb-[8px]">
               {{ item.summary }}
             </text>
+            <view class="flex flex-row items-center justify-between pt-[6px] border-t-[1px] border-solid border-[#f1f5f9]">
+              <text class="text-[11px] text-[#94a3b8]">z-paging-x 触底自动追加</text>
+              <text class="text-[11px] font-bold text-[#0957de]">序号 #{{ item.id }} ➜</text>
+            </view>
           </view>
-        </list-item>
-      </ZPagingX>
-    </view>
+        </view>
 
-    <!-- ======================================================= -->
-    <!-- 场景二：分类 Tab 切换与自动 reload 联动                 -->
-    <!-- ======================================================= -->
-    <view v-else-if="activeTab === 1" class="flex-1 flex flex-col relative">
-      <ZPagingX
-        ref="tabPagingRef"
-        list-is="list-view"
-        list-id="tabPagingList"
-        :model-value="categoryList"
-        :default-page-size="12"
-        :clean-list-when-reload="true"
-        :show-back-to-top="true"
-        :refresher-background="isDark ? '#0f172a' : '#f8fafc'"
-        :paging-style="{ flex: 1, backgroundColor: isDark ? '#0f172a' : '#f8fafc' }"
-        @update:model-value="onUpdateCategoryList"
-        @query="queryCategoryList"
-      >
-        <!-- 固定在顶部的分类选项卡 -->
-        <template #top>
+        <!-- 自定义底部加载状态：完全对齐 nested-scroll 演示逻辑与视觉 -->
+        <template #loadMore>
+          <!-- 1. 自定义正在加载中插槽演示 -->
           <view
-            class="px-[14px] py-[10px] flex flex-row items-center border-b-[1px] border-solid"
-            :class="isDark ? 'bg-[#1e293b] border-[#334155]' : 'bg-white border-[#e2e8f0]'"
+            v-if="isLoadMoreLoading"
+            class="mx-[14px] my-[10px] p-[14px] rounded-[12px] border-[1px] border-dashed flex flex-row items-center justify-center shadow-xs"
+            :class="isDark ? 'bg-[#1e293b]/70 border-[#38bdf866]' : 'bg-[#eff6ff] border-[#93c5fd]'"
           >
-            <view
-              v-for="(cat, cIdx) in categories"
-              :key="cIdx"
-              class="px-[12px] py-[6px] mr-[6px] rounded-[16px] flex flex-row items-center"
-              :style="{
-                backgroundColor: currentCatIdx == cIdx ? '#0957de' : (isDark ? '#334155' : '#f1f5f9')
-              }"
-              @click="changeCategory(cIdx)"
+            <text class="text-[14px] mr-[6px]">⚡</text>
+            <text
+              class="text-[12px] font-semibold"
+              :class="isDark ? 'text-[#38bdf8]' : 'text-[#0957de]'"
             >
+              自定义加载中：z-paging-x 正在流式计算数据...
+            </text>
+          </view>
+
+          <!-- 2. 自定义加载报错与重试插槽演示 -->
+          <view
+            v-else-if="isLoadMoreError"
+            class="mx-[14px] my-[8px] p-[12px] rounded-[12px] border-[1px] border-solid flex flex-row items-center justify-between shadow-xs"
+            :class="isDark ? 'bg-[#450a0a]/50 border-[#7f1d1d]' : 'bg-[#fef2f2] border-[#fecaca]'"
+          >
+            <view class="flex flex-row items-center flex-1 mr-[10px]">
+              <text class="text-[18px] mr-[8px]">🚨</text>
+              <view class="flex flex-col">
+                <text class="text-[12px] font-bold text-[#dc2626]">自定义报错：服务连接暂时中断</text>
+                <text class="text-[10px] text-[#ef4444] mt-[2px]">请检查网络环境或轻触右侧按钮重新拉取</text>
+              </view>
+            </view>
+            <view
+              class="px-[12px] py-[6px] rounded-[6px] bg-[#dc2626] items-center justify-center"
+              @click="onRetryLoad"
+            >
+              <text class="text-[11px] font-bold text-white">立即重试</text>
+            </view>
+          </view>
+
+          <!-- 3. 自定义没有更多数据插槽演示 -->
+          <view
+            v-else-if="isLoadMoreFinished"
+            class="w-full py-[18px] flex flex-row items-center justify-center"
+          >
+            <view class="w-[36px] h-[1px]" :class="isDark ? 'bg-[#334155]' : 'bg-[#cbd5e1]'" />
+            <view class="mx-[10px] flex flex-row items-center">
+              <text class="text-[12px] mr-[4px]">🎉</text>
               <text
                 class="text-[12px] font-medium"
-                :class="currentCatIdx == cIdx ? 'text-white' : (isDark ? 'text-[#cbd5e1]' : 'text-[#475569]')"
+                :class="isDark ? 'text-[#64748b]' : 'text-[#94a3b8]'"
               >
-                {{ cat }}
+                已展示完全部数据内容
               </text>
             </view>
-          </view>
-
-          <!-- 当前分类规则说明条 -->
-          <view
-            class="mx-[14px] mt-[10px] mb-[6px] p-[10px] rounded-[8px] border-[1px] border-solid flex flex-row items-center"
-            :class="isDark ? 'bg-[#1e293b] border-[#334155]' : 'bg-[#eff6ff] border-[#bfdbfe]'"
-          >
-            <text class="text-[14px] mr-[6px]">📌</text>
-            <text
-              class="text-[11px] leading-[16px]"
-              :class="isDark ? 'text-[#93c5fd]' : 'text-[#1e40af]'"
-            >
-              {{ currentCatDesc }}
-            </text>
+            <view class="w-[36px] h-[1px]" :class="isDark ? 'bg-[#334155]' : 'bg-[#cbd5e1]'" />
           </view>
         </template>
-
-        <!-- 列表数据项 -->
-        <list-item v-for="item in categoryList" :key="item.id">
-          <view
-            class="mx-[14px] my-[6px] p-[13px] rounded-[12px] border-[1px] border-solid flex flex-col"
-            :class="isDark ? 'bg-[#1e293b] border-[#334155]' : 'bg-white border-[#e2e8f0]'"
-          >
-            <view class="flex flex-row items-center justify-between mb-[6px]">
-              <view
-                class="px-[7px] py-[2px] rounded-[4px]"
-                :style="{ backgroundColor: item.tagBg }"
-              >
-                <text class="text-[10px] font-bold" :style="{ color: item.tagColor }">
-                  {{ item.category }}
-                </text>
-              </view>
-              <text class="text-[11px] text-[#94a3b8]">条目 #{{ item.id }}</text>
-            </view>
-            <text
-              class="text-[14px] font-bold mb-[3px]"
-              :class="isDark ? 'text-[#f1f5f9]' : 'text-[#1e293b]'"
-            >
-              {{ item.title }}
-            </text>
-            <text
-              class="text-[11px] leading-[16px]"
-              :class="isDark ? 'text-[#94a3b8]' : 'text-[#64748b]'"
-            >
-              {{ item.desc }}
-            </text>
-          </view>
-        </list-item>
-      </ZPagingX>
-    </view>
-
-    <!-- ======================================================= -->
-    <!-- 场景三：电商商品图文分页卡片                           -->
-    <!-- ======================================================= -->
-    <view v-else-if="activeTab === 2" class="flex-1 flex flex-col relative">
-      <ZPagingX
-        ref="productPagingRef"
-        list-is="list-view"
-        list-id="productPagingList"
-        :model-value="productList"
-        :default-page-size="8"
-        :show-back-to-top="true"
-        :refresher-background="isDark ? '#0f172a' : '#f8fafc'"
-        :paging-style="{ flex: 1, backgroundColor: isDark ? '#0f172a' : '#f8fafc' }"
-        @update:model-value="onUpdateProductList"
-        @query="queryProductList"
-      >
-        <list-item v-for="item in productList" :key="item.id">
-          <view
-            class="mx-[14px] my-[6px] p-[12px] rounded-[12px] border-[1px] border-solid flex flex-row items-center"
-            :class="isDark ? 'bg-[#1e293b] border-[#334155]' : 'bg-white border-[#e2e8f0]'"
-          >
-            <view class="w-[52px] h-[52px] rounded-[8px] bg-[#f1f5f9] items-center justify-center mr-[12px]">
-              <text class="text-[24px]">{{ item.icon }}</text>
-            </view>
-            <view class="flex-1 flex flex-col">
-              <view class="flex flex-row items-center justify-between">
-                <text
-                  class="text-[14px] font-bold"
-                  :class="isDark ? 'text-[#f1f5f9]' : 'text-[#1e293b]'"
-                >
-                  {{ item.name }}
-                </text>
-                <text class="text-[10px] text-[#94a3b8]">已售 {{ item.sales }}</text>
-              </view>
-              <text
-                class="text-[11px] mt-[2px]"
-                :class="isDark ? 'text-[#94a3b8]' : 'text-[#64748b]'"
-              >
-                {{ item.desc }}
-              </text>
-              <view class="flex flex-row items-center justify-between mt-[6px]">
-                <text class="text-[14px] font-bold text-[#ef4444]">¥{{ item.price }}</text>
-                <view class="px-[8px] py-[2px] rounded-[4px] bg-[#0957de]">
-                  <text class="text-[10px] text-white font-medium">购买</text>
-                </view>
-              </view>
-            </view>
-          </view>
-        </list-item>
-      </ZPagingX>
-    </view>
-
-    <!-- ======================================================= -->
-    <!-- 场景四：第二页触底加载失败演示 (第一页正常，第二页失败可重试) -->
-    <!-- ======================================================= -->
-    <view v-else-if="activeTab === 3" class="flex-1 flex flex-col relative">
-      <!-- 顶部实战提示与重置卡片 -->
-      <view
-        class="mx-[14px] mt-[10px] mb-[6px] p-[12px] rounded-[10px] border-[1px] border-solid flex flex-col"
-        :class="isDark ? 'bg-[#1e293b] border-[#eab3084d]' : 'bg-[#fef3c7] border-[#fde68a]'"
-      >
-        <view class="flex flex-row items-center justify-between mb-[6px]">
-          <view class="flex flex-row items-center">
-            <text class="text-[14px] mr-[6px]">⚠️</text>
-            <text
-              class="text-[13px] font-bold"
-              :class="isDark ? 'text-[#fde047]' : 'text-[#854d0e]'"
-            >
-              边界演练：首页成功，第二页触底失败
-            </text>
-          </view>
-          <view
-            class="px-[8px] py-[3px] rounded-[6px] bg-[#eab30826] border-[1px] border-solid border-[#eab3084d]"
-            @click="resetSecondPageDemo"
-          >
-            <text class="text-[10px] font-bold text-[#eab308]">重新演练</text>
-          </view>
-        </view>
-        <text
-          class="text-[11px] leading-[16px]"
-          :class="isDark ? 'text-[#cbd5e1]' : 'text-[#713f12]'"
-        >
-          第 1 页已正常拉取。向上滑到底部触发第 2 页时，接口将故意模拟异常，底部展示“加载失败，点击重新加载”；轻触重试后即可恢复！
-        </text>
-      </view>
-
-      <ZPagingX
-        ref="secondPagePagingRef"
-        list-is="list-view"
-        list-id="secondPageFailList"
-        :model-value="secondPageList"
-        :default-page-size="6"
-        :clean-list-when-reload="true"
-        load-more-fail-text="⚠️ 加载失败，轻触此区域重新加载"
-        :refresher-background="isDark ? '#0f172a' : '#f8fafc'"
-        :paging-style="{ flex: 1, backgroundColor: isDark ? '#0f172a' : '#f8fafc' }"
-        @update:model-value="onUpdateSecondPageList"
-        @query="querySecondPageList"
-      >
-        <list-item v-for="item in secondPageList" :key="item.id">
-          <view
-            class="mx-[14px] my-[6px] p-[12px] rounded-[10px] border-[1px] border-solid flex flex-row items-center justify-between"
-            :class="isDark ? 'bg-[#1e293b] border-[#334155]' : 'bg-white border-[#e2e8f0]'"
-          >
-            <view class="flex flex-row items-center flex-1 mr-[8px]">
-              <view
-                class="w-[28px] h-[28px] rounded-full flex flex-row items-center justify-center mr-[10px]"
-                :class="item.page == 1 ? (isDark ? 'bg-[#0957de26]' : 'bg-[#e0e7ff]') : (isDark ? 'bg-[#10b98126]' : 'bg-[#dcfce7]')"
-              >
-                <text
-                  class="text-[11px] font-bold"
-                  :class="item.page == 1 ? (isDark ? 'text-[#38bdf8]' : 'text-[#0957de]') : (isDark ? 'text-[#34d399]' : 'text-[#059669]')"
-                >
-                  P{{ item.page }}
-                </text>
-              </view>
-              <view class="flex flex-col flex-1">
-                <text
-                  class="text-[13px] font-medium"
-                  :class="isDark ? 'text-[#f1f5f9]' : 'text-[#1e293b]'"
-                >
-                  {{ item.title }}
-                </text>
-                <text class="text-[11px] text-[#94a3b8] mt-[2px]">{{ item.desc }}</text>
-              </view>
-            </view>
-            <text
-              class="text-[10px] font-bold"
-              :class="item.page == 1 ? 'text-[#0957de]' : 'text-[#059669]'"
-            >
-              {{ item.page == 1 ? '第 1 页' : '重试成功' }}
-            </text>
-          </view>
-        </list-item>
-      </ZPagingX>
-    </view>
-
-    <!-- ======================================================= -->
-    <!-- 场景五：数据超屏·上拉过程中失败演示                     -->
-    <!-- ======================================================= -->
-    <view v-else-if="activeTab == 4" class="flex-1 flex flex-col relative">
-      <!-- 顶部实战提示与重置卡片 -->
-      <view
-        class="mx-[14px] mt-[10px] mb-[6px] p-[12px] rounded-[10px] border-[1px] border-solid flex flex-col"
-        :class="isDark ? 'bg-[#1e293b] border-[#eab3084d]' : 'bg-[#fef3c7] border-[#fde68a]'"
-      >
-        <view class="flex flex-row items-center justify-between mb-[6px]">
-          <view class="flex flex-row items-center">
-            <text class="text-[14px] mr-[6px]">🧗</text>
-            <text
-              class="text-[13px] font-bold"
-              :class="isDark ? 'text-[#fde047]' : 'text-[#854d0e]'"
-            >
-              超屏实操：长列表上拉过程失败
-            </text>
-          </view>
-          <view
-            class="px-[8px] py-[3px] rounded-[6px] bg-[#eab30826] border-[1px] border-solid border-[#eab3084d]"
-            @click="resetPullUpDemo"
-          >
-            <text class="text-[10px] font-bold text-[#eab308]">重新演练</text>
-          </view>
-        </view>
-        <text
-          class="text-[11px] leading-[16px]"
-          :class="isDark ? 'text-[#cbd5e1]' : 'text-[#713f12]'"
-        >
-          首屏加载了 15 条长列表数据（高度远远超出单屏），请向上滑动屏幕到底部；在触底上拉加载第 2 页的过程中将故意模拟失败，支持点击底部快速重试！
-        </text>
-      </view>
-
-      <ZPagingX
-        ref="pullUpPagingRef"
-        list-is="list-view"
-        list-id="pullUpFailList"
-        :model-value="pullUpList"
-        :default-page-size="15"
-        :clean-list-when-reload="true"
-        load-more-fail-text="⚠️ 上拉加载失败，轻触此区域重新加载"
-        :refresher-background="isDark ? '#0f172a' : '#f8fafc'"
-        :paging-style="{ flex: 1, backgroundColor: isDark ? '#0f172a' : '#f8fafc' }"
-        @update:model-value="onUpdatePullUpList"
-        @query="queryPullUpList"
-      >
-        <list-item v-for="item in pullUpList" :key="item.id">
-          <view
-            class="mx-[14px] my-[6px] p-[12px] rounded-[10px] border-[1px] border-solid flex flex-row items-center justify-between"
-            :class="isDark ? 'bg-[#1e293b] border-[#334155]' : 'bg-white border-[#e2e8f0]'"
-          >
-            <view class="flex flex-row items-center flex-1 mr-[8px]">
-              <view
-                class="w-[32px] h-[32px] rounded-full flex flex-row items-center justify-center mr-[10px]"
-                :class="item.page == 1 ? (isDark ? 'bg-[#0957de26]' : 'bg-[#e0e7ff]') : (isDark ? 'bg-[#10b98126]' : 'bg-[#dcfce7]')"
-              >
-                <text
-                  class="text-[11px] font-bold"
-                  :class="item.page == 1 ? (isDark ? 'text-[#38bdf8]' : 'text-[#0957de]') : (isDark ? 'text-[#34d399]' : 'text-[#059669]')"
-                >
-                  {{ item.id }}
-                </text>
-              </view>
-              <view class="flex flex-col flex-1">
-                <text
-                  class="text-[13px] font-medium"
-                  :class="isDark ? 'text-[#f1f5f9]' : 'text-[#1e293b]'"
-                >
-                  {{ item.title }}
-                </text>
-                <text class="text-[11px] text-[#94a3b8] mt-[2px]">{{ item.desc }}</text>
-              </view>
-            </view>
-            <view
-              class="px-[6px] py-[2px] rounded-[4px]"
-              :class="item.page == 1 ? (isDark ? 'bg-[#334155]' : 'bg-[#f1f5f9]') : (isDark ? 'bg-[#10b98126]' : 'bg-[#dcfce7]')"
-            >
-              <text
-                class="text-[10px] font-bold"
-                :class="item.page == 1 ? (isDark ? 'text-[#94a3b8]' : 'text-[#64748b]') : 'text-[#059669]'"
-              >
-                {{ item.page == 1 ? '首屏超高' : '重试成功' }}
-              </text>
-            </view>
-          </view>
-        </list-item>
-      </ZPagingX>
-    </view>
-
-    <!-- ======================================================= -->
-    <!-- 场景六：空状态与加载错误重试演练                       -->
-    <!-- ======================================================= -->
-    <view v-else class="flex-1 flex flex-col relative">
-      <view
-        class="p-[12px] mx-[14px] my-[8px] rounded-[12px] border-[1px] border-solid"
-        :class="isDark ? 'bg-[#1e293b] border-[#334155]' : 'bg-white border-[#e2e8f0]'"
-      >
-        <text
-          class="text-[12px] font-bold mb-[8px]"
-          :class="isDark ? 'text-[#f1f5f9]' : 'text-[#1e293b]'"
-        >
-          🛠️ 接口调试：模拟异常与空数据
-        </text>
-        <view class="flex flex-row">
-          <view
-            class="flex-1 py-[6px] mr-[6px] rounded-[6px] bg-[#fee2e2] items-center justify-center"
-            @click="triggerError"
-          >
-            <text class="text-[11px] text-[#dc2626] font-bold">模拟请求失败</text>
-          </view>
-          <view
-            class="flex-1 py-[6px] mr-[6px] rounded-[6px] bg-[#fef3c7] items-center justify-center"
-            @click="triggerEmpty"
-          >
-            <text class="text-[11px] text-[#d97706] font-bold">模拟空列表</text>
-          </view>
-          <view
-            class="flex-1 py-[6px] rounded-[6px] bg-[#dcfce7] items-center justify-center"
-            @click="triggerReset"
-          >
-            <text class="text-[11px] text-[#16a34a] font-bold">恢复正常</text>
-          </view>
-        </view>
-      </view>
-
-      <ZPagingX
-        ref="statePagingRef"
-        list-is="list-view"
-        list-id="statePagingList"
-        :model-value="stateList"
-        :default-page-size="10"
-        :refresher-background="isDark ? '#0f172a' : '#f8fafc'"
-        empty-text="暂无数据，请下拉或点击刷新"
-        :paging-style="{ flex: 1, backgroundColor: isDark ? '#0f172a' : '#f8fafc' }"
-        @update:model-value="onUpdateStateList"
-        @query="queryStateList"
-      >
-        <list-item v-for="item in stateList" :key="item.id">
-          <view
-            class="mx-[14px] my-[6px] p-[12px] rounded-[10px] border-[1px] border-solid flex flex-row items-center justify-between"
-            :class="isDark ? 'bg-[#1e293b] border-[#334155]' : 'bg-white border-[#e2e8f0]'"
-          >
-            <text
-              class="text-[13px]"
-              :class="isDark ? 'text-[#cbd5e1]' : 'text-[#334155]'"
-            >
-              {{ item.title }}
-            </text>
-            <text class="text-[11px] text-[#059669] font-medium">✓ 数据正常</text>
-          </view>
-        </list-item>
-      </ZPagingX>
+      </z-paging-x>
     </view>
   </view>
 </template>
 
 <script setup lang="uts">
 import { computed, onMounted, onUnmounted, ref } from 'vue';
-import ZPagingX from '@/uni_modules/z-paging-x/components/z-paging-x/z-paging-x.uvue';
 import { useAppStore } from '@/src/store';
 import { setPageScrollEnabled } from '@/src/utils/pageScroll.uts';
 
@@ -556,7 +247,7 @@ definePage({
 const appStore = useAppStore();
 const isDark = computed((): boolean => appStore.state.isDark);
 
-// 挂载时禁用外层通用滚动，由内部 z-paging-x 全屏独立接管
+// 挂载时禁用外层通用滚动，交由 z-paging-x 独立接管
 onMounted(() => {
   setPageScrollEnabled(false);
 });
@@ -565,554 +256,239 @@ onUnmounted(() => {
   setPageScrollEnabled(true);
 });
 
-// Tab 切换
-const demoTabs: string[] = ['📰 基础', '🏷️ 联动', '🛍️ 电商', '⚠️ 二页失败', '🧗 上拉失败', '🧪 异常演练'];
-const activeTab = ref<number>(0);
-
-function switchDemoTab(index: number): void {
-  activeTab.value = index;
-}
-
-// -------------------------------------------------------------
-// 场景一：基础资讯（自定义暗黑模式下拉刷新指示器）
-// -------------------------------------------------------------
-const basicRefresherStatus = ref<string>('default');
-
-function onBasicRefresherStatusChange(status: string): void {
-  basicRefresherStatus.value = status;
-}
-
-const refresherIcon = computed((): string => {
-  if (basicRefresherStatus.value == 'release-to-refresh') {
-    return '⚡';
-  }
-  if (basicRefresherStatus.value == 'loading') {
-    return '🔄';
-  }
-  if (basicRefresherStatus.value == 'complete') {
-    return '✨';
-  }
-  return '👇';
-});
-
-const refresherStatusText = computed((): string => {
-  if (basicRefresherStatus.value == 'release-to-refresh') {
-    return '松开立即刷新';
-  }
-  if (basicRefresherStatus.value == 'loading') {
-    return '正在极速刷新中...';
-  }
-  if (basicRefresherStatus.value == 'complete') {
-    return '刷新完成';
-  }
-  return '下拉即可刷新';
-});
-
-const refresherTipText = computed((): string => {
-  if (basicRefresherStatus.value == 'release-to-refresh') {
-    return '释放手势立即获取最新数据';
-  }
-  if (basicRefresherStatus.value == 'loading') {
-    return '正在同步最新内容，请稍候';
-  }
-  if (basicRefresherStatus.value == 'complete') {
-    return '数据已更新至最新状态';
-  }
-  return '继续下拉至阈值后松手更新';
-});
-
-const refresherBadgeClass = computed((): string => {
-  if (basicRefresherStatus.value == 'release-to-refresh') {
-    return isDark.value
-      ? 'bg-[#38bdf826] border-[1px] border-solid border-[#38bdf8]'
-      : 'bg-[#0957de1a] border-[1px] border-solid border-[#0957de]';
-  }
-  if (basicRefresherStatus.value == 'loading') {
-    return isDark.value
-      ? 'bg-[#6366f126] border-[1px] border-solid border-[#818cf8]'
-      : 'bg-[#4f46e51a] border-[1px] border-solid border-[#4f46e5]';
-  }
-  if (basicRefresherStatus.value == 'complete') {
-    return isDark.value
-      ? 'bg-[#10b98126] border-[1px] border-solid border-[#34d399]'
-      : 'bg-[#10b9811a] border-[1px] border-solid border-[#10b981]';
-  }
-  return isDark.value
-    ? 'bg-[#1e293b] border-[1px] border-solid border-[#334155]'
-    : 'bg-[#e2e8f0] border-[1px] border-solid border-[#cbd5e1]';
-});
-
-const refresherTitleColorClass = computed((): string => {
-  if (basicRefresherStatus.value == 'release-to-refresh') {
-    return isDark.value ? 'text-[#38bdf8]' : 'text-[#0957de]';
-  }
-  if (basicRefresherStatus.value == 'loading') {
-    return isDark.value ? 'text-[#818cf8]' : 'text-[#4f46e5]';
-  }
-  if (basicRefresherStatus.value == 'complete') {
-    return isDark.value ? 'text-[#34d399]' : 'text-[#059669]';
-  }
-  return isDark.value ? 'text-[#f1f5f9]' : 'text-[#1e293b]';
-});
-
-type BasicArticle = {
+// 数据模型定义（遵循规范：严格使用 type，禁止 interface）
+type ArticleItem = {
   id: number;
   title: string;
   summary: string;
-  tag: string;
-  tagBg: string;
-  tagColor: string;
+  category: string;
+  categoryBg: string;
+  categoryColor: string;
   time: string;
 };
 
-const basicPagingRef = ref<ComponentPublicInstance | null>(null);
-const basicList = ref<BasicArticle[]>([]);
+const pagingRef = ref<ComponentPublicInstance | null>(null);
+const articleList = ref<ArticleItem[]>([]);
+const isSimEmpty = ref<boolean>(false);
+const customBottom = ref<number>(120);
 
-function onUpdateBasicList(val: any[]): void {
-  basicList.value = val as BasicArticle[];
-}
-
-function queryBasicList(pageNo: number, pageSize: number): void {
-  setTimeout(() => {
-    const list: BasicArticle[] = [];
-    const maxItems = 30; // 模拟总共 30 条数据
-    const start = (pageNo - 1) * pageSize + 1;
-    const end = Math.min(start + pageSize, maxItems + 1);
-
-    if (start <= maxItems) {
-      for (let i = start; i < end; i++) {
-        list.push({
-          id: i,
-          title: `z-paging-x 跨端分页最佳实战 (#${i})`,
-          summary: '内置原生 120Hz 高刷 list-view 性能优化，支持下拉刷新、触底平滑加载。',
-          tag: i % 2 == 0 ? '官方推荐' : '热门资讯',
-          tagBg: i % 2 == 0 ? '#0957de14' : '#10b98114',
-          tagColor: i % 2 == 0 ? '#0957de' : '#059669',
-          time: '刚刚'
-        } as BasicArticle);
-      }
-    }
-
-    if (basicPagingRef.value != null) {
-      basicPagingRef.value!.$callMethod('complete', list as any[]);
-    }
-  }, 600);
-}
-
-// -------------------------------------------------------------
-// 场景二：分类联动
-// -------------------------------------------------------------
-type CategoryItem = {
-  id: number;
-  title: string;
-  desc: string;
-  category: string;
-  tagBg: string;
-  tagColor: string;
-};
-
-const tabPagingRef = ref<ComponentPublicInstance | null>(null);
-const categoryList = ref<CategoryItem[]>([]);
-const categories: string[] = ['全部', '科技', '设计', '职场'];
-const currentCatIdx = ref<number>(0);
-
-const currentCatDesc = computed((): string => {
-  if (currentCatIdx.value == 1) {
-    return '【科技分类】暂无数据（0 条），自动唤起 z-paging-x 原生空态图与兜底提示。';
-  }
-  if (currentCatIdx.value == 2) {
-    return '【设计分类】仅 3 条数据（不足一页），直接呈现，底部自动显示“没有更多了”。';
-  }
-  if (currentCatIdx.value == 3) {
-    return '【职场分类】共 20 条分页数据，可向上滑动到底部加载更多页。';
-  }
-  return '【全部分类】聚合多领域共 38 条丰富内容，首屏高度超屏，支持完整多页触底分页。';
+// 回顶样式：解除原生 76rpx (38px) 宽高的死限制，允许胶囊自然伸展并支持动态响应 bottom
+const backToTopStyle = computed((): UTSJSONObject => {
+  return {
+    width: 'auto',
+    height: 'auto',
+    bottom: `${customBottom.value}px`,
+    right: '20px'
+  } as UTSJSONObject;
 });
 
-function onUpdateCategoryList(val: any[]): void {
-  categoryList.value = val as CategoryItem[];
-}
+// 状态机核心控制变量（完全对齐 nested-scroll：1=首批不足一屏, 2=自动调接口补齐中, 3=铺满待触底报错, 4=报错重试中, 5=全部加载完成）
+const simStep = ref<number>(1);
+const simStatusText = ref<string>('【第 1 步】首次加载 2 条数据（未超出底部），800ms后将自动调接口补齐...');
+const isLoadMoreLoading = ref<boolean>(false);
+const isLoadMoreError = ref<boolean>(false);
+const isLoadMoreFinished = ref<boolean>(false);
 
-function changeCategory(index: number): void {
-  currentCatIdx.value = index;
-  categoryList.value = [];
-  if (tabPagingRef.value != null) {
-    tabPagingRef.value!.$callMethod('scrollToTop', false);
-    tabPagingRef.value!.$callMethod('reload');
+// 下拉刷新状态跟踪
+const refresherStatus = ref<string>('default');
+
+const refresherIcon = computed((): string => {
+  if (refresherStatus.value == 'release-to-refresh') {
+    return '🚀';
   }
-}
-
-function queryCategoryList(pageNo: number, pageSize: number): void {
-  setTimeout(() => {
-    // 1. 科技分类：数据为空
-    if (currentCatIdx.value == 1) {
-      if (tabPagingRef.value != null) {
-        tabPagingRef.value!.$callMethod('complete', [] as any[]);
-      }
-      return;
-    }
-
-    // 2. 设计分类：就三条数据（不足一页，不分页）
-    if (currentCatIdx.value == 2) {
-      const designList: CategoryItem[] = [
-        {
-          id: 1,
-          title: '移动端体验设计：暗黑模式色彩对比准则',
-          desc: '深入探索高对比度色彩层级与低光照环境下的可读性优化。',
-          category: '设计',
-          tagBg: isDark.value ? '#f59e0b26' : '#fef3c7',
-          tagColor: isDark.value ? '#fbbf24' : '#d97706'
-        } as CategoryItem,
-        {
-          id: 2,
-          title: '原生高刷手势交互：从 60Hz 到 120Hz 极速调优',
-          desc: '针对原生渲染引擎的滚动惯性与回弹阻尼进行深度调优。',
-          category: '设计',
-          tagBg: isDark.value ? '#f59e0b26' : '#fef3c7',
-          tagColor: isDark.value ? '#fbbf24' : '#d97706'
-        } as CategoryItem,
-        {
-          id: 3,
-          title: '微质感设计系统：FormPilot 视觉组件架构剖析',
-          desc: '打造极简轻量、柔和质感与现代视觉规范的前端组件生态。',
-          category: '设计',
-          tagBg: isDark.value ? '#f59e0b26' : '#fef3c7',
-          tagColor: isDark.value ? '#fbbf24' : '#d97706'
-        } as CategoryItem
-      ];
-      if (tabPagingRef.value != null) {
-        tabPagingRef.value!.$callMethod('completeByTotal', designList as any[], 3);
-      }
-      return;
-    }
-
-    // 3. 职场分类：总共 20 条，分页加载
-    if (currentCatIdx.value == 3) {
-      const totalCount = 20;
-      const list: CategoryItem[] = [];
-      const start = (pageNo - 1) * pageSize + 1;
-      const end = Math.min(start + pageSize, totalCount + 1);
-
-      if (start <= totalCount) {
-        for (let i = start; i < end; i++) {
-          list.push({
-            id: i,
-            title: `职场晋升与团队效能管理方案 (#${i})`,
-            desc: `探索现代化敏捷研发协同工作流与工程师晋升路径实战第 ${i} 篇。`,
-            category: '职场',
-            tagBg: isDark.value ? '#10b98126' : '#dcfce7',
-            tagColor: isDark.value ? '#34d399' : '#059669'
-          } as CategoryItem);
-        }
-      }
-
-      if (tabPagingRef.value != null) {
-        tabPagingRef.value!.$callMethod('completeByTotal', list as any[], totalCount);
-      }
-      return;
-    }
-
-    // 4. 全部：总共 38 条（首屏 12 条高度超屏，支持完整多页翻页）
-    const totalCount = 38;
-    const list: CategoryItem[] = [];
-    const start = (pageNo - 1) * pageSize + 1;
-    const end = Math.min(start + pageSize, totalCount + 1);
-
-    if (start <= totalCount) {
-      for (let i = start; i < end; i++) {
-        const isDesign = i % 3 == 0;
-        const catName = isDesign ? '设计' : '职场';
-        list.push({
-          id: i,
-          title: isDesign ? `【设计探索】高保真交互条目 (#${i})` : `【职场效能】团队协同精进指南 (#${i})`,
-          desc: `包含丰富的业务说明文字与详细信息，本条数据为第 ${pageNo} 页条目，保证首屏充足超屏。`,
-          category: catName,
-          tagBg: isDesign ? (isDark.value ? '#f59e0b26' : '#fef3c7') : (isDark.value ? '#10b98126' : '#dcfce7'),
-          tagColor: isDesign ? (isDark.value ? '#fbbf24' : '#d97706') : (isDark.value ? '#34d399' : '#059669')
-        } as CategoryItem);
-      }
-    }
-
-    if (tabPagingRef.value != null) {
-      tabPagingRef.value!.$callMethod('completeByTotal', list as any[], totalCount);
-    }
-  }, 500);
-}
-
-// -------------------------------------------------------------
-// 场景三：电商商品
-// -------------------------------------------------------------
-type ShopProduct = {
-  id: number;
-  name: string;
-  desc: string;
-  price: string;
-  sales: number;
-  icon: string;
-};
-
-const productPagingRef = ref<ComponentPublicInstance | null>(null);
-const productList = ref<ShopProduct[]>([]);
-
-function onUpdateProductList(val: any[]): void {
-  productList.value = val as ShopProduct[];
-}
-
-function queryProductList(pageNo: number, pageSize: number): void {
-  setTimeout(() => {
-    const list: ShopProduct[] = [];
-    const icons = ['📱', '💻', '🎧', '📷', '⌨️'];
-    const start = (pageNo - 1) * pageSize + 1;
-    const maxItems = 24;
-
-    if (start <= maxItems) {
-      for (let i = start; i < Math.min(start + pageSize, maxItems + 1); i++) {
-        list.push({
-          id: i,
-          name: `智选数码新品极速版 (${i})`,
-          desc: '旗舰配置超长续航，自营正品极速配送。',
-          price: `${(i * 120 + 89).toString()}`,
-          sales: i * 36,
-          icon: icons[i % 5]
-        } as ShopProduct);
-      }
-    }
-
-    if (productPagingRef.value != null) {
-      productPagingRef.value!.$callMethod('complete', list as any[]);
-    }
-  }, 600);
-}
-
-// -------------------------------------------------------------
-// 场景四：第二页触底加载失败演示 (第 1 页成功，第 2 页失败可点击重试)
-// -------------------------------------------------------------
-type SecondPageItem = {
-  id: number;
-  page: number;
-  title: string;
-  desc: string;
-};
-
-const secondPagePagingRef = ref<ComponentPublicInstance | null>(null);
-const secondPageList = ref<SecondPageItem[]>([]);
-const hasSimulatedFail = ref<boolean>(false);
-
-function onUpdateSecondPageList(val: any[]): void {
-  secondPageList.value = val as SecondPageItem[];
-}
-
-function resetSecondPageDemo(): void {
-  hasSimulatedFail.value = false;
-  secondPageList.value = [];
-  if (secondPagePagingRef.value != null) {
-    secondPagePagingRef.value!.$callMethod('scrollToTop', false);
-    secondPagePagingRef.value!.$callMethod('reload');
+  if (refresherStatus.value == 'loading') {
+    return '⏳';
   }
-  uni.showToast({ title: '已重置到第1页', icon: 'none' });
-}
-
-function querySecondPageList(pageNo: number, _pageSize: number): void {
-  setTimeout(() => {
-    if (pageNo == 1) {
-      // 第 1 页正常拉取 6 条数据
-      const list: SecondPageItem[] = [];
-      for (let i = 1; i <= 6; i++) {
-        list.push({
-          id: i,
-          page: 1,
-          title: `首屏正常业务数据条目 #${i}`,
-          desc: '第 1 页已顺畅返回，请向上滑动到底部触发触底加载'
-        } as SecondPageItem);
-      }
-      if (secondPagePagingRef.value != null) {
-        secondPagePagingRef.value!.$callMethod('complete', list as any[]);
-      }
-      return;
-    }
-
-    if (pageNo == 2 && !hasSimulatedFail.value) {
-      // 首次加载第 2 页：故意模拟网络失败
-      hasSimulatedFail.value = true;
-      if (secondPagePagingRef.value != null) {
-        secondPagePagingRef.value!.$callMethod('completeByError');
-      }
-      uni.showToast({ title: '模拟第 2 页加载失败，请轻触底部重试', icon: 'none' });
-      return;
-    }
-
-    // 第 2 页重试 或 后续页：正常恢复成功加载
-    const list: SecondPageItem[] = [];
-    const maxItems = 18; // 演示共 18 条
-    const start = (pageNo - 1) * 6 + 1;
-    for (let i = start; i < Math.min(start + 6, maxItems + 1); i++) {
-      list.push({
-        id: i,
-        page: pageNo,
-        title: `重试成功恢复追加数据 #${i}`,
-        desc: `第 ${pageNo} 页已成功拉取，触底重试逻辑完美闭环`
-      } as SecondPageItem);
-    }
-
-    if (secondPagePagingRef.value != null) {
-      secondPagePagingRef.value!.$callMethod('completeByTotal', list as any[], maxItems);
-    }
-  }, 650);
-}
-
-// -------------------------------------------------------------
-// 场景五：数据超屏·上拉加载失败演示 (首屏 15 条长列表超屏，上拉触发失败可重试)
-// -------------------------------------------------------------
-type PullUpFailItem = {
-  id: number;
-  page: number;
-  title: string;
-  desc: string;
-};
-
-const pullUpPagingRef = ref<ComponentPublicInstance | null>(null);
-const pullUpList = ref<PullUpFailItem[]>([]);
-const hasPullUpSimulatedFail = ref<boolean>(false);
-
-function onUpdatePullUpList(val: any[]): void {
-  pullUpList.value = val as PullUpFailItem[];
-}
-
-function resetPullUpDemo(): void {
-  hasPullUpSimulatedFail.value = false;
-  pullUpList.value = [];
-  if (pullUpPagingRef.value != null) {
-    pullUpPagingRef.value!.$callMethod('scrollToTop', false);
-    pullUpPagingRef.value!.$callMethod('reload');
+  if (refresherStatus.value == 'complete') {
+    return '✅';
   }
-  uni.showToast({ title: '已重置超屏演练列表', icon: 'none' });
-}
+  return '⚓';
+});
 
-function queryPullUpList(pageNo: number, pageSize: number): void {
-  setTimeout(() => {
-    if (pageNo == 1) {
-      // 第 1 页返回 15 条数据，卡片内容丰富，高度远远超过屏幕
-      const list: PullUpFailItem[] = [];
-      for (let i = 1; i <= pageSize; i++) {
-        list.push({
-          id: i,
-          page: 1,
-          title: `超屏长列表业务项 (#${i})`,
-          desc: `这是第 1 页的第 ${i} 条数据，内容充足且高度超屏，请向上滑动手势体验触底上拉。`
-        } as PullUpFailItem);
-      }
-      if (pullUpPagingRef.value != null) {
-        pullUpPagingRef.value!.$callMethod('complete', list as any[]);
-      }
-      return;
-    }
-
-    if (pageNo == 2 && !hasPullUpSimulatedFail.value) {
-      // 首次加载第 2 页：在向上滑动到底部上拉时，模拟接口失败
-      hasPullUpSimulatedFail.value = true;
-      if (pullUpPagingRef.value != null) {
-        pullUpPagingRef.value!.$callMethod('completeByError');
-      }
-      uni.showToast({ title: '上拉加载第 2 页失败，请轻触底部重试', icon: 'none' });
-      return;
-    }
-
-    // 第 2 页重试或后续页：恢复成功加载
-    const list: PullUpFailItem[] = [];
-    const totalCount = 25; // 总共 25 条 (15 + 10)
-    const start = (pageNo - 1) * pageSize + 1;
-    const end = Math.min(start + 10, totalCount + 1);
-
-    if (start <= totalCount) {
-      for (let i = start; i < end; i++) {
-        list.push({
-          id: i,
-          page: pageNo,
-          title: `上拉重试成功追加项 (#${i})`,
-          desc: `第 ${pageNo} 页已成功拉取，触底上拉重试逻辑完美闭环。`
-        } as PullUpFailItem);
-      }
-    }
-
-    if (pullUpPagingRef.value != null) {
-      pullUpPagingRef.value!.$callMethod('completeByTotal', list as any[], totalCount);
-    }
-  }, 650);
-}
-
-// -------------------------------------------------------------
-// 场景六：异常状态演练
-// -------------------------------------------------------------
-type StateItem = {
-  id: number;
-  title: string;
-};
-
-const statePagingRef = ref<ComponentPublicInstance | null>(null);
-const stateList = ref<StateItem[]>([]);
-const simulateError = ref<boolean>(false);
-const simulateEmpty = ref<boolean>(false);
-
-function onUpdateStateList(val: any[]): void {
-  stateList.value = val as StateItem[];
-}
-
-function triggerError(): void {
-  simulateError.value = true;
-  simulateEmpty.value = false;
-  if (statePagingRef.value != null) {
-    statePagingRef.value!.$callMethod('reload');
+const refresherStatusText = computed((): string => {
+  if (refresherStatus.value == 'release-to-refresh') {
+    return '松开手指立即开始极速刷新...';
   }
-  uni.showToast({ title: '已模拟接口失败', icon: 'none' });
+  if (refresherStatus.value == 'loading') {
+    return '自定义下拉中：数据正在极速吞吐...';
+  }
+  if (refresherStatus.value == 'complete') {
+    return '刷新成功，数据已更新！';
+  }
+  return '松开手指立即触发自定义刷新';
+});
+
+function onRefresherStatusChange(status: string): void {
+  refresherStatus.value = status;
 }
 
+function onUpdateList(val: any[]): void {
+  articleList.value = val as ArticleItem[];
+}
+
+// 辅助函数：生成标准文章数据项
+function generateArticlesData(start: number, count: number, stageName: string): ArticleItem[] {
+  const list: ArticleItem[] = [];
+  const categories = ['原生渲染', '性能调优', '工程化', 'UTS深度解析'];
+  const bgs = ['#e0e7ff', '#fef3c7', '#dcfce7', '#f3e8ff'];
+  const colors = ['#4338ca', '#d97706', '#16a34a', '#7e22ce'];
+
+  for (let i = start; i < start + count; i++) {
+    const cIdx = i % 4;
+    list.push({
+      id: i,
+      title: `uni-app X 极速体验与架构实践 #${i}（${stageName}）`,
+      summary: `流式数据单元 #${i}，手势平滑通透，支持超高刷流畅滑动，无缝流式分页。`,
+      category: categories[cIdx],
+      categoryBg: bgs[cIdx],
+      categoryColor: colors[cIdx],
+      time: '刚刚'
+    } as ArticleItem);
+  }
+  return list;
+}
+
+// 第 2 步：自动调用接口补齐数据（超出底部一屏）
+function autoLoadFillScreen(): void {
+  simStep.value = 2;
+  isLoadMoreLoading.value = true;
+  simStatusText.value = '【第 2 步】检测到数据未超出底部，正在自动调用接口追加数据...';
+
+  setTimeout(() => {
+    // 追加 6 条数据，累计达到 8 条（总高度逾 1000px，页面已铺满并超出底部）
+    const nextData = generateArticlesData(3, 6, '自动补齐数据');
+    isLoadMoreLoading.value = false;
+    simStep.value = 3;
+    simStatusText.value = '【第 2 步完成】数据已超出屏幕！请向上滑动触底，第3次加载将模拟报错(500)';
+
+    // 调用 z-paging-x completeByNoMore 追加这 6 条数据，告知仍有更多数据
+    pagingRef.value?.$callMethod('completeByNoMore', nextData as any[], false);
+  }, 1000);
+}
+
+// 启动完整生命周期演示
+function startFullSimulation(): void {
+  isSimEmpty.value = false;
+  isLoadMoreError.value = false;
+  isLoadMoreFinished.value = false;
+  isLoadMoreLoading.value = false;
+  simStep.value = 1;
+  simStatusText.value = '【第 1 步】首批返回 2 条数据（未超出底部），正在启动自动补齐...';
+
+  // 首批生成 2 条数据并送给 z-paging-x
+  const initialData = generateArticlesData(1, 2, '首批数据');
+  pagingRef.value?.$callMethod('completeByNoMore', initialData as any[], false);
+
+  // 400ms 后自动触发第 2 步展示 loading UI 补齐超出底部
+  setTimeout(() => {
+    if (simStep.value == 1) {
+      autoLoadFillScreen();
+    }
+  }, 400);
+}
+
+// z-paging-x query 事件响应
+function onQuery(pageNo: number, _pageSize: number): void {
+  // 处于空数据演示状态
+  if (isSimEmpty.value) {
+    pagingRef.value?.$callMethod('complete', [] as any[]);
+    return;
+  }
+
+  // 第一页初次拉取或重置
+  if (pageNo == 1) {
+    startFullSimulation();
+    return;
+  }
+
+  // 场景 A：第 3 步触底，模拟 500 接口异常
+  if (simStep.value == 3 && !isLoadMoreError.value) {
+    isLoadMoreLoading.value = true;
+    simStatusText.value = '【第 3 步进行中】正在发起第 3 次请求... 模拟网络 500 异常';
+
+    setTimeout(() => {
+      isLoadMoreLoading.value = false;
+      isLoadMoreError.value = true;
+      simStatusText.value = '【第 3 步报错】模拟 500 接口异常！请点击底部「点击重试」再次加载';
+      pagingRef.value?.$callMethod('completeByError');
+      uni.showToast({
+        title: '模拟接口异常：500 Internal Error',
+        icon: 'none'
+      });
+    }, 700);
+    return;
+  }
+
+  // 场景 B：第 4 步重试中
+  if (simStep.value == 4 || isLoadMoreError.value) {
+    onRetryLoad();
+    return;
+  }
+
+  // 兜底完成
+  pagingRef.value?.$callMethod('completeByNoMore', [] as any[], true);
+}
+
+// 错误点击「立即重试」处理
+function onRetryLoad(): void {
+  isLoadMoreError.value = false;
+  isLoadMoreLoading.value = true;
+  simStep.value = 4;
+  simStatusText.value = '【第 4 步】已发起重试请求，正在重新拉取接口数据...';
+
+  setTimeout(() => {
+    // 成功拉取最后 2 条终态数据
+    const finalItems = generateArticlesData(9, 2, '终态数据');
+    isLoadMoreLoading.value = false;
+    isLoadMoreFinished.value = true;
+    simStep.value = 5;
+    simStatusText.value = '【全部完成】🎉 重试成功！没有更多数据了（下拉列表可重新再来一遍）';
+
+    // 告知 z-paging-x 没有更多数据了 (nomore = true)
+    pagingRef.value?.$callMethod('completeByNoMore', finalItems as any[], true);
+
+    uni.showToast({
+      title: '重试成功！数据已全部加载',
+      icon: 'success'
+    });
+  }, 800);
+}
+
+// 控制操作栏动作函数
 function triggerEmpty(): void {
-  simulateError.value = false;
-  simulateEmpty.value = true;
-  if (statePagingRef.value != null) {
-    statePagingRef.value!.$callMethod('reload');
-  }
-  uni.showToast({ title: '已模拟空数据', icon: 'none' });
+  isSimEmpty.value = true;
+  articleList.value = [];
+  isLoadMoreError.value = false;
+  isLoadMoreFinished.value = true;
+  isLoadMoreLoading.value = false;
+  simStep.value = 5;
+  simStatusText.value = '【已清空数据】触发空列表缺省兜底展示';
+  pagingRef.value?.$callMethod('complete', [] as any[]);
+  uni.showToast({ title: '已清空数据，触发空态兜底', icon: 'none' });
 }
 
 function triggerReset(): void {
-  simulateError.value = false;
-  simulateEmpty.value = false;
-  if (statePagingRef.value != null) {
-    statePagingRef.value!.$callMethod('reload');
-  }
-  uni.showToast({ title: '已重置恢复正常', icon: 'success' });
+  isSimEmpty.value = false;
+  pagingRef.value?.$callMethod('reload');
+  uni.showToast({ title: '已重新开始完整流程模拟', icon: 'success' });
 }
 
-function queryStateList(pageNo: number, pageSize: number): void {
-  setTimeout(() => {
-    if (simulateError.value) {
-      if (statePagingRef.value != null) {
-        statePagingRef.value!.$callMethod('completeByError');
-      }
-      return;
-    }
+function triggerScrollToTop(): void {
+  pagingRef.value?.$callMethod('scrollToTop', true);
+  uni.showToast({ title: '已平滑滚动返回顶部', icon: 'none' });
+}
 
-    if (simulateEmpty.value) {
-      if (statePagingRef.value != null) {
-        statePagingRef.value!.$callMethod('complete', [] as any[]);
-      }
-      return;
-    }
-
-    const list: StateItem[] = [];
-    const start = (pageNo - 1) * pageSize + 1;
-    for (let i = start; i < start + pageSize; i++) {
-      list.push({
-        id: i,
-        title: `正常加载演练数据条目 #${i}`
-      } as StateItem);
-    }
-
-    if (statePagingRef.value != null) {
-      statePagingRef.value!.$callMethod('complete', list as any[]);
-    }
-  }, 600);
+function toggleBottomPosition(): void {
+  if (customBottom.value == 120) {
+    customBottom.value = 160;
+  }
+  else {
+    customBottom.value = 120;
+  }
+  uni.showToast({
+    title: `回顶按钮底部边距设为 ${customBottom.value}px`,
+    icon: 'none'
+  });
 }
 </script>
 
