@@ -12,6 +12,8 @@
         :empty="articleList.length === 0"
         :show-back-to-top="true"
         :back-to-top-threshold="200"
+        :back-to-top-bottom="customBottom"
+        :back-to-top-right="20"
         @refresh="onArticleRefresh"
         @load-more="onArticleLoadMore"
         @back-to-top="onBackToTop"
@@ -71,6 +73,19 @@
                 <text class="text-[10px] text-[#4338ca] font-bold">一键回顶</text>
               </view>
             </view>
+
+            <!-- 回顶位置调节行 -->
+            <view class="flex flex-row items-center justify-between mt-[8px] pt-[6px] border-t-[1px] border-solid" :class="isDark ? 'border-[#334155]' : 'border-[#c7d2fe]'">
+              <text class="text-[11px]" :class="isDark ? 'text-[#94a3b8]' : 'text-[#475569]'">
+                回顶按钮底部边距: <text class="font-bold text-[#3b82f6]">{{ customBottom }}px</text>
+              </text>
+              <view
+                class="px-[8px] py-[3px] rounded-[4px] bg-[#3b82f61a] active:opacity-75"
+                @click="toggleBottomPosition"
+              >
+                <text class="text-[10px] font-bold text-[#2563eb]">切换高度 ⇄</text>
+              </view>
+            </view>
           </view>
         </template>
 
@@ -84,6 +99,17 @@
             >
               {{ articleRefreshing ? '自定义下拉中：数据正在极速吞吐...' : '松开手指立即触发自定义刷新' }}
             </text>
+          </view>
+        </template>
+
+        <!-- 2. 自定义一键返回顶部插槽演示 -->
+        <template #backToTop>
+          <view
+            class="px-[12px] py-[8px] rounded-full flex flex-row items-center border-[1px] border-solid shadow-md active:opacity-75"
+            :class="isDark ? 'bg-[#0284c7] border-[#38bdf8]' : 'bg-[#0957de] border-[#1d4ed8]'"
+          >
+            <uni-icons type="top" size="14" color="#ffffff" />
+            <text class="text-[12px] text-white font-bold ml-[4px]">回顶</text>
           </view>
         </template>
 
@@ -398,6 +424,21 @@ function triggerEmpty(): void {
 function triggerReset(): void {
   startFullSimulation();
   uni.showToast({ title: '已重新开始完整流程模拟', icon: 'success' });
+}
+
+const customBottom = ref<number>(120);
+
+function toggleBottomPosition(): void {
+  if (customBottom.value == 120) {
+    customBottom.value = 160;
+  }
+  else {
+    customBottom.value = 120;
+  }
+  uni.showToast({
+    title: `回顶按钮底部边距设为 ${customBottom.value}px`,
+    icon: 'none'
+  });
 }
 
 function triggerScrollToTop(): void {
