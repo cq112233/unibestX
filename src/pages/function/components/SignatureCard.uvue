@@ -3,11 +3,10 @@
     <!-- 签名画布区域 -->
     <view
       class="signature-wrapper rounded-[12px] mb-[16px] border-[1px] border-solid border-[#e2e8f0] overflow-hidden"
-      style="width: 100%; height: 300px;"
+      style="width: 100%; height: 300px; touch-action: none;"
       @touchstart="onCardTouchStart"
       @touchend="onCardTouchEnd"
       @touchcancel="onCardTouchEnd"
-      @touchmove.stop.prevent="preventScroll"
     >
       <l-signature
         ref="sigRef"
@@ -125,10 +124,6 @@ function onCardTouchStart(_e: UniTouchEvent) {
 
 function onCardTouchEnd(_e: UniTouchEvent) {
   setPageScrollEnabled(true);
-}
-
-function preventScroll(_e: UniTouchEvent) {
-  // 阻止滑动穿透到父级 scroll-view
 }
 
 onUnmounted(() => {

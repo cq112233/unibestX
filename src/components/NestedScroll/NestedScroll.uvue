@@ -17,18 +17,13 @@
       :refresher-enabled="enablePullDown"
       :refresher-triggered="innerRefreshing"
       :refresher-threshold="refresherThreshold"
-      :refresher-default-style="hasRefresherSlot ? 'none' : 'black'"
+      :refresher-default-style="refresherDefaultStyle"
       :refresher-background="refresherBackground"
       @refresherrefresh="handleRefresherRefresh"
       @refresherrestore="handleRefresherRestore"
       @refresherabort="handleRefresherRestore"
       @scrolltolower="handleScrollToLower"
     >
-      <!-- 自定义下拉刷新插槽：全平台原生支持 -->
-      <view v-if="hasRefresherSlot" slot="refresher" class="w-full">
-        <slot name="refresher" :refreshing="innerRefreshing" />
-      </view>
-
       <!-- 普通滚动随动头部（非吸顶模式下随列表滚动） -->
       <slot v-if="hasHeaderSlot && !stickyHeader && !hasStickySlot" name="header" />
 
@@ -36,68 +31,73 @@
       <slot />
 
       <!-- 空数据状态 -->
-      <view v-if="empty && !loading && !innerRefreshing">
-        <slot name="empty">
-          <view class="py-[48px] items-center justify-center">
-            <text class="text-[36px] mb-[8px]">📭</text>
-            <text
-              class="text-[13px]"
-              :class="isDark ? 'text-[#64748b]' : 'text-[#94a3b8]'"
-            >
-              {{ emptyText }}
-            </text>
-          </view>
-        </slot>
+      <view v-if="empty && !loading && !innerRefreshing" class="w-full">
+        <slot v-if="hasEmptySlot" name="empty" />
+        <view v-else class="py-[48px] items-center justify-center">
+          <text class="text-[36px] mb-[8px]">📭</text>
+          <text
+            class="text-[13px]"
+            :class="isDark ? 'text-[#64748b]' : 'text-[#94a3b8]'"
+          >
+            {{ emptyText }}
+          </text>
+        </view>
       </view>
 
-      <!-- 底部加载更多状态条 -->
-      <view v-if="!empty && enableLoadMore">
+      <!-- 底部加载更多状态条：仅在有对应状态或整体 footer 插槽时渲染，杜绝空白占位 -->
+      <template v-if="hasFooterSlot">
         <slot
           name="footer"
           :loading="loading"
           :finished="finished"
           :error="error"
-        >
-          <view class="py-[16px] items-center justify-center flex flex-row">
-            <!-- 加载中 -->
-            <template v-if="loading">
-              <slot name="loading">
-                <text
-                  class="text-[12px] font-medium"
-                  :class="isDark ? 'text-[#94a3b8]' : 'text-[#64748b]'"
-                >
-                  {{ loadingText }}
-                </text>
-              </slot>
-            </template>
+        />
+      </template>
+      <view
+        v-else-if="!empty && enableLoadMore && (loading || error || finished)"
+        class="py-[16px] items-center justify-center flex flex-row"
+      >
+        <!-- 加载中 -->
+        <template v-if="loading">
+          <slot v-if="hasLoadingSlot" name="loading" />
+          <text
+            v-else
+            class="text-[12px] font-medium"
+            :class="isDark ? 'text-[#94a3b8]' : 'text-[#64748b]'"
+          >
+            {{ loadingText }}
+          </text>
+        </template>
 
-            <!-- 加载失败重试 -->
-            <template v-else-if="error">
-              <slot name="error">
-                <view class="flex flex-row items-center" @click="handleRetry">
-                  <text class="text-[12px] text-[#ef4444] font-medium mr-[4px]">
-                    {{ errorText }}
-                  </text>
-                  <text class="text-[12px] text-[#4f46e5] font-bold">
-                    点击重试
-                  </text>
-                </view>
-              </slot>
-            </template>
-
-            <!-- 没有更多数据了 -->
-            <template v-else-if="finished">
-              <slot name="finished">
-                <text
-                  class="text-[12px]"
-                  :class="isDark ? 'text-[#475569]' : 'text-[#cbd5e1]'"
-                >
-                  {{ finishedText }}
-                </text>
-              </slot>
-            </template>
+        <!-- 加载失败重试 -->
+        <template v-else-if="error">
+          <slot v-if="hasErrorSlot" name="error" />
+          <view v-else class="flex flex-row items-center" @click="handleRetry">
+            <text class="text-[12px] text-[#ef4444] font-medium mr-[4px]">
+              {{ errorText }}
+            </text>
+            <text class="text-[12px] text-[#4f46e5] font-bold">
+              点击重试
+            </text>
           </view>
-        </slot>
+        </template>
+
+        <!-- 没有更多数据了 -->
+        <template v-else-if="finished">
+          <slot v-if="hasFinishedSlot" name="finished" />
+          <text
+            v-else
+            class="text-[12px]"
+            :class="isDark ? 'text-[#475569]' : 'text-[#cbd5e1]'"
+          >
+            {{ finishedText }}
+          </text>
+        </template>
+      </view>
+
+      <!-- 自定义下拉刷新插槽：根据 uni-app x 官方规范，鸿蒙平台自定义下拉刷新元素必须放在最后一个子元素的位置，否则其后的元素上方会出现空白区域 -->
+      <view v-if="hasRefresherSlot" slot="refresher" class="w-full">
+        <slot name="refresher" :refreshing="innerRefreshing" />
       </view>
     </scroll-view>
   </view>
@@ -212,6 +212,35 @@ const hasStickySlot = computed((): boolean => {
 const hasRefresherSlot = computed((): boolean => {
   // eslint-disable-next-line dot-notation
   return slots['refresher'] != null;
+});
+
+const hasEmptySlot = computed((): boolean => {
+  // eslint-disable-next-line dot-notation
+  return slots['empty'] != null;
+});
+
+const hasFooterSlot = computed((): boolean => {
+  // eslint-disable-next-line dot-notation
+  return slots['footer'] != null;
+});
+
+const hasLoadingSlot = computed((): boolean => {
+  // eslint-disable-next-line dot-notation
+  return slots['loading'] != null;
+});
+
+const hasErrorSlot = computed((): boolean => {
+  // eslint-disable-next-line dot-notation
+  return slots['error'] != null;
+});
+
+const hasFinishedSlot = computed((): boolean => {
+  // eslint-disable-next-line dot-notation
+  return slots['finished'] != null;
+});
+
+const refresherDefaultStyle = computed((): string => {
+  return hasRefresherSlot.value ? 'none' : 'black';
 });
 
 const appStore = useAppStore();
