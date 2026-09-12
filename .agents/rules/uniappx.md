@@ -59,6 +59,10 @@ description: uni-app X (UTS) 开发规范与踩坑避坑指南，适用于跨端
     <view class="border-[1px] border-solid border-[#e2e8f0] rounded-[12px] p-[16px]"></view>
     ```
 
+*   **阴影使用限制（严禁过度依赖阴影）**：
+    在安卓原生端，**VDOM 渲染模式与 Vapor 模式对阴影的底层渲染机制存在明显差异**（如 Elevation 高度映射、扩散模糊度与裁切表现不一致），极易导致同一界面在不同编译模式或不同安卓基座版本下显示效果不一致，甚至可能导致局部卡片边缘绘制异常或掉帧。
+    *   *规范要求*：**严禁过度依赖深重阴影**（如 `shadow-lg`、`box-shadow`）。界面层级与卡片质感优先采用**浅色细腻边框**（如 `border-[1px] border-solid border-[#e2e8f0]`）结合**浅色背景微反差**（如 `bg-[#f8fafc]`、`bg-[#ffffff]`）进行区分。若确需投影，仅可使用极其轻微的弱阴影。
+
 *   **Tailwind CSS 字体族设置限制 (Font Family Utilities)**：
     在 uni-app X 中**禁止**使用 `font-mono`、`font-sans`、`font-serif` 等字体族工具类。这些类生成的 CSS 会被原生平台的严格解析器当作 `font` 简写属性处理，因缺少必需的 `font-size` 而报错：`[parse-css-font] Missing required font-size.`
     *   *错误示例*：`font-mono`（触发编译报错）
