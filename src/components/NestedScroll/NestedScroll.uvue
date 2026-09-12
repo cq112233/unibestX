@@ -1,5 +1,5 @@
 <template>
-  <view class="nested-scroll-container flex-1 flex flex-col w-full">
+  <view class="nested-scroll-container flex-1 flex flex-col w-full relative">
     <!-- 粘性吸顶头部区域：当启用 sticky-header 或使用 #sticky 插槽时在顶部吸附展示 -->
     <view
       v-if="hasStickySlot || (stickyHeader && hasHeaderSlot)"
@@ -13,6 +13,8 @@
     <scroll-view
       class="flex-1 flex flex-col w-full"
       direction="vertical"
+      :scroll-top="scrollTop"
+      :scroll-with-animation="innerScrollWithAnimation"
       :show-scrollbar="showScrollbar"
       :refresher-enabled="enablePullDown"
       :refresher-triggered="innerRefreshing"
@@ -23,6 +25,7 @@
       @refresherrestore="handleRefresherRestore"
       @refresherabort="handleRefresherRestore"
       @scrolltolower="handleScrollToLower"
+      @scroll="handleScroll"
     >
       <!-- 普通滚动随动头部（非吸顶模式下随列表滚动） -->
       <slot v-if="hasHeaderSlot && !stickyHeader && !hasStickySlot" name="header" />
@@ -100,11 +103,28 @@
         <slot name="refresher" :refreshing="innerRefreshing" />
       </view>
     </scroll-view>
+
+    <!-- 一键返回顶部按钮 -->
+    <view
+      v-if="showBackToTop && showBackToTopBtn"
+      class="nested-back-to-top"
+      :style="{ bottom: `${backToTopBottom}px`, right: `${backToTopRight}px` }"
+      @click="scrollToTop(true)"
+    >
+      <slot v-if="hasBackToTopSlot" name="backToTop" />
+      <view
+        v-else
+        class="w-[42px] h-[42px] rounded-full items-center justify-center flex flex-row border-[1px] border-solid"
+        :class="isDark ? 'bg-[#1e293b] border-[#334155]' : 'bg-white border-[#e2e8f0]'"
+      >
+        <uni-icons type="top" size="20" :color="isDark ? '#cbd5e1' : '#475569'" />
+      </view>
+    </view>
   </view>
 </template>
 
 <script setup lang="uts">
-import { computed, onMounted, ref, useSlots, watch } from 'vue';
+import { computed, nextTick, onMounted, ref, useSlots, watch } from 'vue';
 import { useAppStore } from '@/src/store';
 
 const props = defineProps({
@@ -187,6 +207,31 @@ const props = defineProps({
   stickyHeader: {
     type: Boolean,
     default: false
+  },
+  /** 是否显示一键返回顶部按钮 */
+  showBackToTop: {
+    type: Boolean,
+    default: true
+  },
+  /** 返回顶部按钮显示/隐藏的滚动距离阈值，单位 px */
+  backToTopThreshold: {
+    type: Number,
+    default: 300
+  },
+  /** 返回顶部按钮距离底部的距离，单位 px */
+  backToTopBottom: {
+    type: Number,
+    default: 30
+  },
+  /** 返回顶部按钮距离右侧的距离，单位 px */
+  backToTopRight: {
+    type: Number,
+    default: 20
+  },
+  /** 返回顶部是否启用平滑动画滚动 */
+  scrollWithAnimation: {
+    type: Boolean,
+    default: true
   }
 });
 
@@ -196,6 +241,9 @@ const emit = defineEmits<{
   (e: 'load-more'): void;
   (e: 'update:refreshing', val: boolean): void;
   (e: 'update:loading', val: boolean): void;
+  (e: 'scroll', event: UniScrollEvent): void;
+  (e: 'backToTop'): void;
+  (e: 'back-to-top'): void;
 }>();
 
 const slots = useSlots();
@@ -212,6 +260,11 @@ const hasStickySlot = computed((): boolean => {
 const hasRefresherSlot = computed((): boolean => {
   // eslint-disable-next-line dot-notation
   return slots['refresher'] != null;
+});
+
+const hasBackToTopSlot = computed((): boolean => {
+  // eslint-disable-next-line dot-notation
+  return slots['backToTop'] != null;
 });
 
 const hasEmptySlot = computed((): boolean => {
@@ -247,6 +300,10 @@ const appStore = useAppStore();
 const isDark = computed((): boolean => appStore.state.isDark);
 
 const innerRefreshing = ref<boolean>(props.refreshing);
+const scrollTop = ref<number>(0);
+const oldScrollTop = ref<number>(0);
+const showBackToTopBtn = ref<boolean>(false);
+const innerScrollWithAnimation = ref<boolean>(props.scrollWithAnimation);
 let refreshTimeoutId: number | null = null;
 let isMountedReady = false;
 
@@ -312,6 +369,28 @@ function handleRefresherRestore() {
   emit('update:refreshing', false);
 }
 
+// 滚动容器滚动监听
+function handleScroll(e: UniScrollEvent) {
+  const currentY = e.detail.scrollTop;
+  oldScrollTop.value = currentY;
+  emit('scroll', e);
+
+  if (props.showBackToTop) {
+    showBackToTopBtn.value = currentY > props.backToTopThreshold;
+  }
+}
+
+/** 一键平滑滚动返回顶部 */
+function scrollToTop(animate: boolean = true) {
+  innerScrollWithAnimation.value = animate;
+  scrollTop.value = oldScrollTop.value;
+  nextTick(() => {
+    scrollTop.value = 0;
+  });
+  emit('backToTop');
+  emit('back-to-top');
+}
+
 // 触底加载更多
 function handleScrollToLower() {
   if (!props.enableLoadMore || props.loading || props.finished || props.error) {
@@ -331,7 +410,8 @@ function handleRetry() {
 
 defineExpose({
   endRefresh,
-  endLoadMore
+  endLoadMore,
+  scrollToTop
 });
 </script>
 
@@ -339,11 +419,16 @@ defineExpose({
 .nested-scroll-container {
   width: 100%;
   height: 100%;
+  position: relative;
 }
 .nested-header-wrap {
   width: 100%;
 }
 .nested-sticky-bar {
   width: 100%;
+}
+.nested-back-to-top {
+  position: absolute;
+  z-index: 99;
 }
 </style>

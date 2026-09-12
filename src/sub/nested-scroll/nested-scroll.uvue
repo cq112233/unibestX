@@ -10,8 +10,11 @@
         :finished="articleFinished"
         :error="articleError"
         :empty="articleList.length === 0"
+        :show-back-to-top="true"
+        :back-to-top-threshold="200"
         @refresh="onArticleRefresh"
         @load-more="onArticleLoadMore"
+        @back-to-top="onBackToTop"
       >
         <!-- 粘性吸顶头部插槽：全生命周期模拟演练卡片与操作面板（向上滑动时吸附在顶部不滚出） -->
         <template #sticky>
@@ -56,10 +59,16 @@
                 <text class="text-[10px] text-[#d97706] font-bold">清空数据</text>
               </view>
               <view
-                class="flex-1 py-[7px] rounded-[6px] bg-[#dcfce7] items-center justify-center"
+                class="flex-1 py-[7px] mr-[4px] rounded-[6px] bg-[#dcfce7] items-center justify-center"
                 @click="triggerReset"
               >
                 <text class="text-[10px] text-[#16a34a] font-bold">恢复重置</text>
+              </view>
+              <view
+                class="flex-1 py-[7px] rounded-[6px] bg-[#e0e7ff] items-center justify-center"
+                @click="triggerScrollToTop"
+              >
+                <text class="text-[10px] text-[#4338ca] font-bold">一键回顶</text>
               </view>
             </view>
           </view>
@@ -389,6 +398,14 @@ function triggerEmpty(): void {
 function triggerReset(): void {
   startFullSimulation();
   uni.showToast({ title: '已重新开始完整流程模拟', icon: 'success' });
+}
+
+function triggerScrollToTop(): void {
+  articleScrollRef.value?.$callMethod('scrollToTop', true);
+}
+
+function onBackToTop(): void {
+  uni.showToast({ title: '已平滑滚动返回顶部', icon: 'none' });
 }
 
 // 页面初次进入，立即执行首次模拟
