@@ -54,6 +54,11 @@
 
 <img src="https://i.ibb.co/bjcVVxbV/qr-code.png" width="160" alt="H5 演示二维码" />
 
+🤖 **Android 安装包下载体验（蓝奏云）**：
+
+- **uniBestX-vdom.apk**（传统 VDOM 原生渲染）：[https://wwbsy.lanzoue.com/il6Aj483qv9c](https://wwbsy.lanzoue.com/il6Aj483qv9c) （密码：`bben`）
+- **uniBestX-vapor.apk**（新一代 Vapor 蒸汽模式）：[https://wwbsy.lanzoue.com/iyC2T483qwnc](https://wwbsy.lanzoue.com/iyC2T483qwnc) （密码：`be02`）
+
 📖 **官方文档地址**：[https://cq112233.github.io/unibestX/docs/](https://cq112233.github.io/unibestX/docs/)
 
 🐙 **GitHub 仓库地址**：[https://github.com/cq112233/unibestX](https://github.com/cq112233/unibestX)
@@ -494,6 +499,11 @@ uni-app x 推出了新一代的 **蒸汽模式（Vapor）**。新版渲染引擎
 > - **推荐优先使用 Vapor 模式**：Android 端语法要求不会那么严格，许多 UTS 强类型检查会更宽松，开发调试更省心；
 > - **注意切换风险**：一旦在 Vapor 模式下开发过，之后若再切换回 **VDOM 模式**，之前可正常编译的代码可能会报类型或语法错误（VDOM 模式编译检查更严格）；
 > - 最终选用哪种模式**看个人选择**：追求开发体验、少踩编译报错建议选 Vapor；追求最大兼容性与传统写法生态可保持 VDOM。
+>
+> 📲 **真机双模式 APK 下载对比体验（蓝奏云）**：
+>
+> - **VDOM 模式**：[uniBestX-vdom.apk](https://wwbsy.lanzoue.com/il6Aj483qv9c)（提取密码：`bben`）
+> - **Vapor 模式**：[uniBestX-vapor.apk](https://wwbsy.lanzoue.com/iyC2T483qwnc)（提取密码：`be02`）
 
 ### 底部 TabBar 体系
 
