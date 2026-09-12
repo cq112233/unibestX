@@ -113,7 +113,7 @@ function onLoadMore() {
   <template #backToTop>
     <view class="px-[12px] py-[8px] rounded-full flex flex-row items-center bg-[#0957de] shadow-md active:opacity-75">
       <uni-icons type="top" size="14" color="#ffffff" />
-      <text class="text-[12px] text-white font-bold ml-[4px]">回顶</text>
+      <text class="text-[12px] text-[#ffffff] font-bold ml-[4px]">回顶</text>
     </view>
   </template>
 
