@@ -39,8 +39,18 @@
 <script setup lang="uts">
 import { computed, ref, watch, onMounted, onBeforeUnmount } from 'vue'
 import defProps from './loadingIcon.uts'
-import { addUnit, addStyle, getPx } from '../../libs/function/index'
+import { addStyle, getPx } from '../../libs/function/index'
 import { colorGradient } from '../../libs/function/colorGradient'
+
+function addUnit(value: any | null, unit: string = 'px'): string {
+	if (value == null) return ''
+	const str = value.toString().trim()
+	if (str.length == 0) return ''
+	if (str.endsWith('%') || str.endsWith('px') || str.endsWith('rpx') || str.endsWith('upx') || str.endsWith('vh') || str.endsWith('vw') || str.endsWith('rem')) {
+		return str
+	}
+	return !isNaN(parseFloat(str)) ? `${str}${unit}` : str
+}
 
 defineOptions({
   name: 'up-loading-icon'

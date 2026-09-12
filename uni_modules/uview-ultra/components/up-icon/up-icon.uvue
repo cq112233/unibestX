@@ -29,12 +29,22 @@
 
 <script setup lang="uts">
 	import icons from './icons.uts'
-	import { addUnit, addStyle, deepMerge } from '../../libs/function/index'
+	import { addStyle, deepMerge } from '../../libs/function/index'
 	import { commonProps, useUltraUI } from '../../libs/composable/useUltraUI'
 	import config from '../../libs/config/config';
 	import defProps from './icon'
 	import { computed } from 'vue'
 	const { preventEvent } = useUltraUI()
+
+	function addUnit(value: any | null, unit: string = 'px'): string {
+		if (value == null) return ''
+		const str = value.toString().trim()
+		if (str.length == 0) return ''
+		if (str.endsWith('%') || str.endsWith('px') || str.endsWith('rpx') || str.endsWith('upx') || str.endsWith('vh') || str.endsWith('vw') || str.endsWith('rem')) {
+			return str
+		}
+		return !isNaN(parseFloat(str)) ? `${str}${unit}` : str
+	}
 	
 	// 定义props
 	const props = defineProps({
