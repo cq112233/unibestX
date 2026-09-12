@@ -76,7 +76,34 @@ export default defineConfig({
   build: {
     sourcemap: false // 关闭 sourcemap，警告直接消失
   },
+  css: {
+    postcss: {
+      plugins: [
+        {
+          postcssPlugin: 'strip-unsupported-sticky',
+          Declaration(decl: any) {
+            if (decl.prop === 'position' && decl.value === 'sticky') {
+              decl.value = 'relative';
+            }
+          }
+        }
+      ]
+    }
+  },
   plugins: [
+    // 拦截并自动将原生 CSS 编译器不支持的 position: sticky 修正为 position: relative，杜绝 App 平台编译报错
+    {
+      name: 'vite-plugin-strip-sticky',
+      enforce: 'pre',
+      transform(code: string, id: string) {
+        if ((id.endsWith('.uvue') || id.endsWith('.css') || id.endsWith('.scss') || id.includes('type=style')) && code.includes('sticky')) {
+          return {
+            code: code.replace(/position\s*:\s*sticky\s*;?/g, 'position: relative;')
+          };
+        }
+        return null;
+      }
+    },
     // 自动扫描与路由生成插件（基于 pages.config.json + 页面内 <route>/definePage 声明）
     uniPagesPlugin({
       // 【总控开关】：是否启用插件自动扫描与 pages.json 生成（设为 false 则完全失效，不扫描、不写入 pages.json、不监听文件变化）

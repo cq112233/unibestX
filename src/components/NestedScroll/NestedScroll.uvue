@@ -1,12 +1,11 @@
 <template>
   <view class="nested-scroll-container flex-1 flex flex-col w-full relative">
-    <!-- 粘性吸顶头部区域：当启用 affix-header / sticky-header 或使用 #affix / #sticky 插槽时在顶部吸附展示 -->
+    <!-- 粘性吸顶头部区域：当启用 affix-header 或使用 #affix 插槽时在顶部吸附展示 -->
     <view
-      v-if="hasAffixSlot || hasStickySlot || ((affixHeader || stickyHeader) && hasHeaderSlot)"
-      class="nested-sticky-bar w-full z-10 shrink-0"
+      v-if="hasAffixSlot || (affixHeader && hasHeaderSlot)"
+      class="nested-affix-bar w-full z-10 shrink-0"
     >
       <slot v-if="hasAffixSlot" name="affix" />
-      <slot v-else-if="hasStickySlot" name="sticky" />
       <slot v-else name="header" />
     </view>
 
@@ -29,7 +28,7 @@
       @scroll="handleScroll"
     >
       <!-- 普通滚动随动头部（非吸顶模式下随列表滚动） -->
-      <slot v-if="hasHeaderSlot && !stickyHeader && !hasStickySlot" name="header" />
+      <slot v-if="hasHeaderSlot && !affixHeader" name="header" />
 
       <!-- 列表数据默认插槽 -->
       <slot />
@@ -209,10 +208,6 @@ const props = defineProps({
     type: Boolean,
     default: false
   },
-  stickyHeader: {
-    type: Boolean,
-    default: false
-  },
   /** 是否显示一键返回顶部按钮 */
   showBackToTop: {
     type: Boolean,
@@ -260,11 +255,6 @@ const hasHeaderSlot = computed((): boolean => {
 const hasAffixSlot = computed((): boolean => {
   // eslint-disable-next-line dot-notation
   return slots['affix'] != null;
-});
-
-const hasStickySlot = computed((): boolean => {
-  // eslint-disable-next-line dot-notation
-  return slots['sticky'] != null;
 });
 
 const hasRefresherSlot = computed((): boolean => {
@@ -434,7 +424,7 @@ defineExpose({
 .nested-header-wrap {
   width: 100%;
 }
-.nested-sticky-bar {
+.nested-affix-bar {
   width: 100%;
 }
 .nested-back-to-top {
