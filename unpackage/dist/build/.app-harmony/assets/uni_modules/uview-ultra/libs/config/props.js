@@ -1,1 +1,0 @@
-UTSJSONObject.assign(new UTSJSONObject({}));
