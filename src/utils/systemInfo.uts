@@ -540,7 +540,7 @@ export function updateAvailableHeight(kuProps: AppKuHeightProps, selectedTabbarS
     }
   }
 
-  console.log(`[updateAvailableHeight] hideStatusBar:${kuProps.hideStatusBar}, hideNavbar:${kuProps.hideNavbar}, statusBarOffset:${statusBarOffset}, navBarOffset:${navBarOffset}`);
+  // console.log(`[updateAvailableHeight] hideStatusBar:${kuProps.hideStatusBar}, hideNavbar:${kuProps.hideNavbar}, statusBarOffset:${statusBarOffset}, navBarOffset:${navBarOffset}`);
 
   // 根据当前选中的 TabBar 策略计算可用高度：
   // 1 / 2 / 3（标准内嵌/固定/原生 TabBar）：从安全区底部扣除导航栏、状态栏及 TabBar 高度
@@ -553,7 +553,7 @@ export function updateAvailableHeight(kuProps: AppKuHeightProps, selectedTabbarS
   }
 
   systemId++;
-  console.log('AppKu:', sys.availableHeight, selectedTabbarStrategy, isCustomNav, 'selectedTabbarStrategy');
+  // console.log('AppKu:', sys.availableHeight, selectedTabbarStrategy, isCustomNav, 'selectedTabbarStrategy');
 }
 
 // 初始化获取一次
