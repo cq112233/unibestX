@@ -320,17 +320,10 @@ export function getScrollHeight(
 }
 
 /**
- * 实时获取当前窗口可用高度（单位 px）
+ * 实时获取当前导航栏内容区高度（单位 px，默认 44px）
  */
-export function getWindowHeight(): number {
-  return uni.getWindowInfo().windowHeight;
-}
-
-/**
- * 实时获取当前状态栏高度（单位 px）
- */
-export function getStatusBarHeight(): number {
-  return uni.getWindowInfo().statusBarHeight;
+export function getNavBarHeight(): number {
+  return systemInfo.value?.navBarHeight ?? NAVBAR_CONTENT_HEIGHT;
 }
 
 /**
@@ -407,41 +400,6 @@ export function updateAvailableHeight(kuProps: AppKuHeightProps, selectedTabbarS
   // console.log('AppKu:', sys.availableHeight, selectedTabbarStrategy, isCustomNav, 'selectedTabbarStrategy');
 }
 
-/**
- * 实时获取当前导航栏内容区高度（单位 px，默认 44px）
- */
-export function getNavBarHeight(): number {
-  return systemInfo.value?.navBarHeight ?? NAVBAR_CONTENT_HEIGHT;
-}
-
-/**
- * 实时获取当前屏幕宽度（单位 px）
- */
-export function getScreenWidth(): number {
-  return systemInfo.value?.screenWidth ?? uni.getWindowInfo().screenWidth;
-}
-
-/**
- * 实时获取当前屏幕高度（单位 px）
- */
-export function getScreenHeight(): number {
-  return systemInfo.value?.screenHeight ?? uni.getWindowInfo().screenHeight;
-}
-
-/**
- * 实时获取当前可用内容高度（单位 px）
- */
-export function getAvailableHeight(): number {
-  return availableHeight.value;
-}
-
-/**
- * 实时获取当前底部安全区高度（单位 px）
- */
-export function getSafeAreaBottom(): number {
-  return safeAreaBottom.value;
-}
-
 // 初始化获取一次
 updateSystemInfo();
 
@@ -456,12 +414,12 @@ updateSystemInfo();
  *
  * @example
  * ```uts
- * // 方式 1：标准具名导入
- * import { getNavBarHeight, getStatusBarHeight, windowWidth } from '@/src/utils/systemInfo.uts';
+ * // 方式 1：标准具名导入（响应式计算属性）
+ * import { windowWidth, windowHeight, statusBarHeight } from '@/src/utils/systemInfo.uts';
  *
  * // 方式 2：对象单例导入（一目了然）
  * import { systemUtils, sys } from '@/src/utils/systemInfo.uts';
- * console.log(systemUtils.getNavBarHeight());
+ * console.log(systemUtils.getNavBarHeight(), sys.windowHeight.value);
  * ```
  */
 export class SystemUtils {
@@ -515,22 +473,22 @@ export class SystemUtils {
 
   /** 实时获取状态栏高度（px） */
   getStatusBarHeight(): number {
-    return getStatusBarHeight();
+    return statusBarHeight.value;
   }
 
   /** 实时获取窗口可视高度（px） */
   getWindowHeight(): number {
-    return getWindowHeight();
+    return windowHeight.value;
   }
 
   /** 实时获取屏幕宽度（px） */
   getScreenWidth(): number {
-    return getScreenWidth();
+    return screenWidth.value;
   }
 
   /** 实时获取屏幕高度（px） */
   getScreenHeight(): number {
-    return getScreenHeight();
+    return screenHeight.value;
   }
 
   /** 实时获取导航栏总高度（px，状态栏 + 内容区高度） */
@@ -545,12 +503,12 @@ export class SystemUtils {
 
   /** 实时获取当前页面可用内容高度（px） */
   getAvailableHeight(): number {
-    return getAvailableHeight();
+    return availableHeight.value;
   }
 
   /** 实时获取底部安全区高度（px） */
   getSafeAreaBottom(): number {
-    return getSafeAreaBottom();
+    return safeAreaBottom.value;
   }
 
   /** 计算页面视口内滚动容器的自适应剩余可用高度（px） */
