@@ -16,10 +16,7 @@
 
 ```
 src/store/
-├── index.uts           # 条件编译门面：根据编译平台与 Vapor 模式自动导出 pinia 实例
-├── app.uts             # 条件编译门面：导出 useAppStore、IAppState 等
-├── user.uts            # 条件编译门面：导出 useUserStore、IUserState、IUserInfo 等
-├── token.uts           # 条件编译门面：导出 useTokenStore、ITokenState 等
+├── index.uts           # 统一入口门面：根据编译平台与 Vapor 模式自动导出 pinia 实例与所有 stores
 ├── vapor/              # 🌟 官方 Pinia 实现（Vapor / Web / iOS / Harmony / 小程序）
 │   ├── index.ts        # createPinia() + createPersistedState()
 │   ├── app.ts          # 基于 vapor pinia 的 useAppStore
@@ -82,27 +79,27 @@ export default pinia;
 ### 3.2 Android VDOM 实现 (`src/store/vdom/`)
 保持现有生产级 `x-pinia-s` 的完整实现不变，移至 `src/store/vdom/` 目录下。
 
-### 3.3 门面文件设计 (`src/store/*.uts`)
-各顶层门面文件仅负责根据条件编译转发生效实现：
+### 3.3 统一门面设计 (`src/store/index.uts`)
+无需冗余的子文件，所有 Pinia 实例与 Store 集中在 `src/store/index.uts` 中统一由条件编译分发：
 ```uts
 // #ifndef APP-ANDROID && !VUE3-VAPOR
 import pinia from './vapor/index';
+
+export default pinia;
+
+export * from './vapor/app';
+export * from './vapor/token';
+export * from './vapor/user';
 // #endif
 
 // #ifdef APP-ANDROID && !VUE3-VAPOR
 import pinia from './vdom/index.uts';
+
 export default pinia;
+
 export * from './vdom/app.uts';
 export * from './vdom/token.uts';
 export * from './vdom/user.uts';
-// #endif
-
-// #ifndef APP-ANDROID && !VUE3-VAPOR
-import pinia from './official/index';
-export default pinia;
-export * from './official/app';
-export * from './official/token';
-export * from './official/user';
 // #endif
 ```
 

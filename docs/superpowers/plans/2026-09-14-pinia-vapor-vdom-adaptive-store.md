@@ -7,7 +7,7 @@
 **架构：**
 - `src/store/vapor/`：存放基于官方 Pinia 与 `pinia-plugin-persistedstate` 的组合式实现（`index.ts`, `app.ts`, `user.ts`, `token.ts`）；
 - `src/store/vdom/`：存放 Android VDOM 专用的 `x-pinia-s` class 风格实现（`index.uts`, `app.uts`, `user.uts`, `token.uts`）；
-- `src/store/*.uts`：门面层通过条件编译指令（`#ifdef APP-ANDROID && !VUE3-VAPOR` / `#ifndef APP-ANDROID && !VUE3-VAPOR`）自动匹配并重导出对应实现。
+- `src/store/index.uts`：统一门面层通过条件编译指令（`#ifdef APP-ANDROID && !VUE3-VAPOR` / `#ifndef APP-ANDROID && !VUE3-VAPOR`）自动匹配并重导出对应实现与所有 stores。
 
 **技术栈：** uni-app X, UTS, Vue 3, Pinia 3.0.4, pinia-plugin-persistedstate 4.7.1, x-pinia-s.
 
@@ -17,7 +17,8 @@
 
 - **创建：** `src/store/vdom/index.uts`、`app.uts`、`user.uts`、`token.uts` — 封装 Android VDOM (x-pinia-s) 模式实现。
 - **创建：** `src/store/vapor/index.ts`、`app.ts`、`user.ts`、`token.ts` — 封装官方 Pinia (Vapor / Web / iOS / Harmony / 小程序) 模式实现。
-- **修改：** `src/store/index.uts`、`app.uts`、`user.uts`、`token.uts` — 门面层条件编译自动分发。
+- **修改：** `src/store/index.uts` — 统一入口条件编译自动分发。
+- **移除：** 移除冗余的 `src/store/app.uts`、`user.uts`、`token.uts`，由 `index.uts` 单点分发，避免双份维护。
 - **规格参考：** `docs/superpowers/specs/2026-09-14-pinia-vapor-vdom-adaptive-store-design.md`
 
 ---
@@ -55,13 +56,14 @@
 
 ---
 
-### 任务 3：构建门面层条件编译分发 (`src/store/*.uts`)
+### 任务 3：构建单一门面层条件编译分发 (`src/store/index.uts`)
 
 - [x] **步骤 1：重构 `src/store/index.uts`**
-  - `#ifdef APP-ANDROID && !VUE3-VAPOR` 导入 `vdom`
-  - `#ifndef APP-ANDROID && !VUE3-VAPOR` 导入 `vapor`
-- [x] **步骤 2：重构 `src/store/app.uts`、`user.uts`、`token.uts`**
-  - 条件编译分别重导出类型与 `useXxxStore` 方法
+  - `#ifdef APP-ANDROID && !VUE3-VAPOR` 导入并导出 `vdom`
+  - `#ifndef APP-ANDROID && !VUE3-VAPOR` 导入并导出 `vapor`
+- [x] **步骤 2：删除冗余的 `src/store/app.uts`、`user.uts`、`token.uts`**
+  - 全局统一从 `src/store` 导入，消灭重复代码和重复条件判断
+
 
 ---
 
