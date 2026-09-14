@@ -334,9 +334,9 @@ function getLength(str: string | null): number {
 - **陷阱**：在 Options API 组件中，若局部方法与声明的 `emits` 事件同名（如模板中 `@change="change"` 且在 `methods` 中声明 `change(e)`），Android 编译器会将方法解析为事件回调属性而非实例方法，导致事件处理函数无法被触发。
 - **解决规范**：重命名局部方法加前缀区分，如 `keyboardChange`、`onSelectorChange`。
 
-#### 1.3.3 键盘高度变化事件类型声明
+#### 1.3.3 键盘高度变化事件类型声明与全局监听解绑规范
 
-- **规范**：监听 `@keyboardheightchange` 事件时，事件回调的入参类型必须声明为 `UniInputKeyboardHeightChangeEvent`，严禁声明为 `UniInputKeyboardHeightChangeEventDetail`（否则 Android 端会发生 ClassCastException 崩溃）。
+- **模板事件入参类型**：监听 `@keyboardheightchange` 事件时，事件回调的入参类型必须声明为 `UniInputKeyboardHeightChangeEvent`，严禁声明为 `UniInputKeyboardHeightChangeEventDetail`（否则 Android 端会发生 ClassCastException 崩溃）。
 
   ```uts
   function onKeyboardHeightChange(event: UniInputKeyboardHeightChangeEvent): void {
@@ -344,7 +344,16 @@ function getLength(str: string | null): number {
   }
   ```
 
-#### 1.3.4 VDOM / Android VDOM / Vapor 渲染模式与编译兼容避坑
+- **全局监听与解绑规范**：
+  - 调用 `uni.onKeyboardHeightChange` 注册全局监听时，回调函数入参类型必须声明为 `(res: OnKeyboardHeightChangeCallbackResult) => void`，其返回值为一个 `number` 类型的监听器 ID（如 `keyboardListenerId`）；
+  - **重要限制**：解绑全局监听时，**必须调用 `uni.offKeyboardHeightChange(keyboardListenerId)` 并传入监听器 ID（`number`）**，严禁传入回调函数自身（否则 Kotlin 编译报错：`参数类型不匹配：实际类型为 'KFunction1<...>'，预期类型为 'Number?'`）。
+
+#### 1.3.4 原生文档预览 API (openDocument) 参数限制
+
+- **限制**：在 uni-app X 原生平台（Android / iOS）中，`uni.openDocument` 的选项类型定义中**不支持 `showMenu` 参数**（仅支持 `filePath`, `fileType`, `success`, `fail`, `complete`）。若传入 `showMenu: true`，Kotlin 编译器会直接报错：`error: No parameter with name 'showMenu' found`。
+- **正确做法**：调用 `uni.openDocument` 时仅传递 `filePath`、`fileType` 及回调函数。
+
+#### 1.3.5 VDOM / Android VDOM / Vapor 渲染模式与编译兼容避坑
 
 - **渲染模式判断**：使用条件编译 `#ifdef VUE3-VAPOR` / `#ifndef VUE3-VAPOR`，禁止依赖运行时环境变量或读取 manifest：
 
@@ -807,6 +816,8 @@ onNavbarPullDownRefresh(() => {
 | **组件库使用** | `import UniIcons from '...'` | 无需 import，模板直接使用 `<uni-icons>` |
 | **安全区底部适配** | 内联计算 paddingBottom | `class="pb-safe"` |
 | **对象字面量包含函数导出** | `export const env = { getApiBaseUrl }`（Kotlin 编译报 `Function invocation expected`） | 统一使用标准具名函数导出 `export function getApiBaseUrl()`，使用方 `import { getApiBaseUrl }` |
+| **文档预览参数 (openDocument)** | `uni.openDocument({ showMenu: true })`（Kotlin 报错 `No parameter with name 'showMenu' found`） | 移除 `showMenu`，仅传 `filePath` 与 `fileType` |
+| **键盘全局监听解绑** | `uni.offKeyboardHeightChange(callback)`（Kotlin 报错 `预期类型为 'Number?'`） | 保存 `listenerId = uni.onKeyboardHeightChange(...)`，通过 `uni.offKeyboardHeightChange(listenerId)` 解绑 |
 
 ---
 
@@ -831,6 +842,8 @@ onNavbarPullDownRefresh(() => {
 - [ ] **15. 模板作用域插槽调用点必须显式添加 `as` 类型断言**（避免触发 `error17`）
 - [ ] **16. 组件库组件严禁在 `<script>` 中手动 import**（统一使用 easycom 短横线标签自动导入）
 - [ ] **17. 严禁导出包裹了顶层函数的对象字面量**（如 `export const env = { fn }`，会触发 Android Kotlin 编译崩溃 `Function invocation expected`，统一使用标准具名函数导出）
+- [ ] **18. 严禁在 `uni.openDocument` 中传递 `showMenu` 参数**（uni-app X 原生 Kotlin 不支持该字段，会触发编译报错 `No parameter with name 'showMenu' found`）
+- [ ] **19. 全局键盘监听解绑必须使用 `listenerId: number`**（`uni.offKeyboardHeightChange` 入参为数字 ID 而非回调函数）
 
 ---
 

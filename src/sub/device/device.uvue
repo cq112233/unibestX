@@ -314,7 +314,6 @@ function handleOpenSelectedDoc(): void {
   }
   uni.openDocument({
     filePath: selectedFilePath.value,
-    showMenu: true,
     success: () => {
       console.log('文档打开成功');
     },
@@ -334,7 +333,6 @@ function handleDownloadAndOpenSampleDoc(): void {
         uni.openDocument({
           filePath: res.tempFilePath,
           fileType: 'pdf',
-          showMenu: true,
           success: () => {
             uni.showToast({ title: '文档已打开', icon: 'success' });
           },
@@ -357,17 +355,10 @@ function handleDownloadAndOpenSampleDoc(): void {
 // ==================== 3. 键盘感知与避让 ====================
 const keyboardInputText = ref<string>('');
 const keyboardHeight = ref<number>(0);
+let keyboardListenerId: number = -1;
 
 function handleKeyboardHeightChange(event: UniInputKeyboardHeightChangeEvent): void {
   keyboardHeight.value = Math.ceil(event.detail.height);
-}
-
-type KeyboardHeightEventRes = {
-  height: number;
-};
-
-function onGlobalKeyboardHeightChange(res: KeyboardHeightEventRes): void {
-  keyboardHeight.value = Math.ceil(res.height);
 }
 
 function handleHideKeyboard(): void {
@@ -375,11 +366,20 @@ function handleHideKeyboard(): void {
 }
 
 onMounted(() => {
-  uni.onKeyboardHeightChange(onGlobalKeyboardHeightChange);
+  // #ifdef APP || MP-WEIXIN
+  keyboardListenerId = uni.onKeyboardHeightChange((res: OnKeyboardHeightChangeCallbackResult) => {
+    keyboardHeight.value = Math.ceil(res.height);
+  });
+  // #endif
 });
 
 onUnmounted(() => {
-  uni.offKeyboardHeightChange(onGlobalKeyboardHeightChange);
+  // #ifdef APP || MP-WEIXIN
+  if (keyboardListenerId != -1) {
+    uni.offKeyboardHeightChange(keyboardListenerId);
+    keyboardListenerId = -1;
+  }
+  // #endif
 });
 
 // ==================== 4. 触感与震动 ====================
