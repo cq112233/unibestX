@@ -319,9 +319,12 @@ function getLength(str: string | null): number {
 
 ### 1.3 跨端运行时与渲染模式约束
 
-#### 1.3.1 `Map` 转 `UTSJSONObject` 的 ClassCastException 与 `:style` 类型安全
+#### 1.3.1 `Map` / 原生 SDK 对象转 `UTSJSONObject` 的 ClassCastException 与 `:style` 类型安全
 
-- **ClassCastException 陷阱**：在 Android (Kotlin) 端，从 Vue props 或动态对象传递过来的样式/属性在底层是 Kotlin `LinkedHashMap`，而不是 `UTSJSONObject`。如果直接执行 `as UTSJSONObject` 会触发运行时崩溃：`java.lang.ClassCastException: LinkedHashMap cannot be cast to UTSJSONObject`。
+- **ClassCastException 陷阱**：
+  1. 在 Android (Kotlin) 端，从 Vue props 或动态对象传递过来的样式/属性在底层是 Kotlin `LinkedHashMap`，而不是 `UTSJSONObject`。如果直接执行 `as UTSJSONObject` 会触发运行时崩溃：`java.lang.ClassCastException: LinkedHashMap cannot be cast to UTSJSONObject`；
+  2. 原生系统 API（如 `uni.chooseFile`）回调入参在 Android 原生端是 SDK 具体强类型类实例（如 `uts.sdk.modules.DCloudUniMedia.ChooseFileSuccess`），**严禁执行 `res as UTSJSONObject`**，否则会触发致命崩溃：`java.lang.ClassCastException: ChooseFileSuccess cannot be cast to UTSJSONObject`。
+- **正确做法**：直接利用编译期类型推断访问其原生属性（如 `res.tempFiles`、`res.tempFilePaths`），严禁非法强转为 `UTSJSONObject`。
 - **Nullable 编译报错**：模板中通过下标访问 `parentData['styleKey']` 返回的是 `Any?`，若直接赋给 `:style` 会报：`参数类型不匹配：实际类型为 'Any?'，预期类型为 'Any'`。
 - **通用解决方案**：使用 `?? {}` 空兜底并强转为 `as any`：
 
@@ -818,6 +821,7 @@ onNavbarPullDownRefresh(() => {
 | **对象字面量包含函数导出** | `export const env = { getApiBaseUrl }`（Kotlin 编译报 `Function invocation expected`） | 统一使用标准具名函数导出 `export function getApiBaseUrl()`，使用方 `import { getApiBaseUrl }` |
 | **文档预览参数 (openDocument)** | `uni.openDocument({ showMenu: true })`（Kotlin 报错 `No parameter with name 'showMenu' found`） | 移除 `showMenu`，仅传 `filePath` 与 `fileType` |
 | **键盘全局监听解绑** | `uni.offKeyboardHeightChange(callback)`（Kotlin 报错 `预期类型为 'Number?'`） | 保存 `listenerId = uni.onKeyboardHeightChange(...)`，通过 `uni.offKeyboardHeightChange(listenerId)` 解绑 |
+| **原生回调参数访问** | `(res as UTSJSONObject).tempFiles`（Kotlin 运行时崩溃 `ChooseFileSuccess cannot be cast to UTSJSONObject`） | 直接利用原生类型推断访问 `res.tempFiles` / `res.tempFilePaths`，严禁强转 `UTSJSONObject` |
 
 ---
 
@@ -844,6 +848,7 @@ onNavbarPullDownRefresh(() => {
 - [ ] **17. 严禁导出包裹了顶层函数的对象字面量**（如 `export const env = { fn }`，会触发 Android Kotlin 编译崩溃 `Function invocation expected`，统一使用标准具名函数导出）
 - [ ] **18. 严禁在 `uni.openDocument` 中传递 `showMenu` 参数**（uni-app X 原生 Kotlin 不支持该字段，会触发编译报错 `No parameter with name 'showMenu' found`）
 - [ ] **19. 全局键盘监听解绑必须使用 `listenerId: number`**（`uni.offKeyboardHeightChange` 入参为数字 ID 而非回调函数）
+- [ ] **20. 严禁将系统 API 回调原生结果对象强转为 `UTSJSONObject`**（如 `chooseFile` 的 `res as UTSJSONObject`，会触发 Android Kotlin 运行时 `ClassCastException` 崩溃，应直接访问对象属性）
 
 ---
 

@@ -281,17 +281,18 @@ function handleChooseFile(): void {
     uni.chooseFile({
       count: 1,
       type: 'all',
-      success: (res: any) => {
-        const tempFiles = (res as UTSJSONObject).tempFiles as Array<any> | null;
-        if (tempFiles != null && tempFiles.length > 0) {
-          const fileObj = tempFiles[0] as UTSJSONObject;
-          const name = fileObj.name != null ? `${fileObj.name}` : '已选文件';
-          const size = fileObj.size != null ? (fileObj.size as number) : 0;
-          const path = fileObj.path != null ? `${fileObj.path}` : '';
-
-          selectedFileName.value = name;
-          selectedFileSizeText.value = formatFileSize(size);
-          selectedFilePath.value = path;
+      success: (res) => {
+        const tempFiles = res.tempFiles;
+        if (tempFiles.length > 0) {
+          const fileObj = tempFiles[0];
+          selectedFileName.value = fileObj.name;
+          selectedFileSizeText.value = formatFileSize(fileObj.size);
+          selectedFilePath.value = fileObj.path;
+          uni.showToast({ title: '文件选择成功', icon: 'success' });
+        }
+        else if (res.tempFilePaths.length > 0) {
+          selectedFilePath.value = res.tempFilePaths[0];
+          selectedFileName.value = '已选文件';
           uni.showToast({ title: '文件选择成功', icon: 'success' });
         }
       },
