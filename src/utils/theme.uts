@@ -1,5 +1,61 @@
-import themeJson from '../../theme.json';
 import { nextTick } from 'vue';
+import themeJson from '../../theme.json';
+
+/**
+ * 外观模式类型：'auto'（跟随系统） | 'light'（浅色） | 'dark'（深色）
+ */
+export type ThemeMode = 'auto' | 'light' | 'dark';
+
+/**
+ * 支持的外观模式常量列表
+ */
+export const THEME_MODES: string[] = ['auto', 'light', 'dark'];
+
+/**
+ * 预置常用主题主色调色盘列表
+ */
+export const THEME_COLOR_PRESETS: string[] = [
+  '#37c2bc',
+  '#0957DE',
+  '#10b981',
+  '#f43f5e',
+  '#f97316'
+];
+
+/**
+ * 自定义 NavBar / TabBar 等组件使用的主题色板
+ *
+ * 说明：uts 支持直接 import JSON（HBuilderX 4.25+，项目内 i18n 已有先例），
+ * 因此这里以根目录 theme.json 为单源，与 pages.json 的亮 / 暗配置保持一致。
+ * navigationBarTextStyle / tabBarBorderStyle 为 black / white 枚举：
+ * - navigationBarTextStyle：black / white 直接映射为 #000000 / #ffffff
+ * - tabBarBorderStyle：black 表示显示分割线（浅色模式浅灰、深色模式深灰），
+ *   white 映射为 #ffffff；theme.json 的 @ 变量仅用于 pages.json。
+ */
+export type ThemeTokens = {
+  /** 页面内容背景色（backgroundColorContent） */
+  bgContent: string;
+  /** 导航栏背景色（navigationBarBackgroundColor） */
+  navBg: string;
+  /** 导航栏文字 / 返回箭头颜色（navigationBarTextStyle，black / white 映射为具体色值） */
+  navText: string;
+  /** tabbar 背景色（tabBarBackgroundColor） */
+  tabBg: string;
+  /** tabbar 顶部边框颜色（tabBarBorderStyle，black / white 按主题映射为分割线色） */
+  tabBorder: string;
+  /** tabbar 未选中颜色（tabBarColor） */
+  tabColor: string;
+  /** tabbar 选中颜色（tabBarSelectedColor） */
+  tabSelected: string;
+};
+
+/**
+ * 获取默认主题主色调（全端从 import.meta.env.VITE_DEFAULT_THEME 读取，未配置时兜底 #37c2bc）
+ */
+export function getDefaultTheme(): string {
+  const envTheme = `${import.meta.env.VITE_DEFAULT_THEME ?? ''}`.trim();
+  return envTheme.length > 0 ? envTheme : '#37c2bc';
+}
 
 /**
  * 获取当前系统 / 宿主主题
@@ -15,7 +71,7 @@ export function getSystemTheme(): string {
   try {
     theme = uni.getDeviceInfo().osTheme ?? 'light';
   }
-  catch (e) {
+  catch {
     // ignore
   }
   // #endif
@@ -25,7 +81,7 @@ export function getSystemTheme(): string {
   try {
     theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
   }
-  catch (e) {
+  catch {
     // ignore
   }
   // #endif
@@ -36,7 +92,7 @@ export function getSystemTheme(): string {
   try {
     theme = uni.getAppBaseInfo().hostTheme ?? 'light';
   }
-  catch (e) {
+  catch {
     // ignore
   }
   // #endif
@@ -46,45 +102,18 @@ export function getSystemTheme(): string {
 }
 
 /**
- * 自定义 NavBar / TabBar 等组件使用的主题色板
- *
- * 说明：uts 支持直接 import JSON（HBuilderX 4.25+，项目内 i18n 已有先例），
- * 因此这里以根目录 theme.json 为单源，与 pages.json 的亮 / 暗配置保持一致。
- * navigationBarTextStyle / tabBarBorderStyle 为 black / white 枚举：
- * - navigationBarTextStyle：black / white 直接映射为 #000000 / #ffffff
- * - tabBarBorderStyle：black 表示显示分割线（浅色模式浅灰、深色模式深灰），
- *   white 映射为 #ffffff；theme.json 的 @ 变量仅用于 pages.json。
+ * 根据当前选择的外观模式与系统亮暗状态，计算实际是否生效为暗色模式
+ * @param mode 外观模式：'auto' | 'light' | 'dark'
+ * @param systemTheme 当前系统深浅色（默认读取 getSystemTheme()）
  */
-export type ThemeTokens = {
-  /** 导航栏背景色（navigationBarBackgroundColor） */
-  navBg: string;
-  /** 导航栏文字 / 返回箭头颜色（navigationBarTextStyle，black / white 映射为具体色值） */
-  navText: string;
-  /** tabbar 背景色（tabBarBackgroundColor） */
-  tabBg: string;
-  /** tabbar 未选中颜色（tabBarColor） */
-  tabColor: string;
-  /** tabbar 选中颜色（tabBarSelectedColor） */
-  tabSelected: string;
-  /** tabbar 顶部边框颜色（tabBarBorderStyle，black / white 按主题映射为分割线色） */
-  tabBorder: string;
-  /** 页面内容背景色（backgroundColorContent） */
-  bgContent: string;
-};
-
-/** 获取亮 / 暗模式对应的主题色板（直接读取 theme.json，单源） */
-export function getThemeTokens(isDark: boolean): ThemeTokens {
-  const themeData = themeJson as UTSJSONObject;
-  const scheme = (isDark ? themeData.dark : themeData.light) as UTSJSONObject;
-  return {
-    navBg: scheme.navigationBarBackgroundColor as string,
-    navText: mapNavTextStyle(scheme.navigationBarTextStyle as string),
-    tabBg: scheme.tabBarBackgroundColor as string,
-    tabColor: scheme.tabBarColor as string,
-    tabSelected: scheme.tabBarSelectedColor as string,
-    tabBorder: mapTabBorderStyle(scheme.tabBarBorderStyle as string, isDark),
-    bgContent: scheme.backgroundColorContent as string
-  } as ThemeTokens;
+export function isDarkMode(mode: string, systemTheme: string = getSystemTheme()): boolean {
+  if (mode == 'light') {
+    return false;
+  }
+  if (mode == 'dark') {
+    return true;
+  }
+  return systemTheme == 'dark';
 }
 
 /** 导航栏文字颜色：black / white 枚举映射为具体色值 */
@@ -108,6 +137,86 @@ function mapTabBorderStyle(value: string, isDark: boolean): string {
     return '#ffffff';
   }
   return value;
+}
+
+/**
+ * 获取亮 / 暗模式对应的主题色板（直接读取 theme.json，单源）
+ */
+export function getThemeTokens(isDark: boolean): ThemeTokens {
+  const themeData = themeJson as UTSJSONObject;
+  const scheme = (isDark ? themeData.dark : themeData.light) as UTSJSONObject;
+  return {
+    bgContent: scheme.backgroundColorContent as string,
+    navBg: scheme.navigationBarBackgroundColor as string,
+    navText: mapNavTextStyle(scheme.navigationBarTextStyle as string),
+    tabBg: scheme.tabBarBackgroundColor as string,
+    tabBorder: mapTabBorderStyle(scheme.tabBarBorderStyle as string, isDark),
+    tabColor: scheme.tabBarColor as string,
+    tabSelected: scheme.tabBarSelectedColor as string
+  } as ThemeTokens;
+}
+
+/**
+ * 获取全局根容器的主题 CSS 变量样式对象
+ * 用于绑定在根组件 :style 上，实现全平台主题变量响应式传递
+ * @param themeColor 当前主题色
+ * @param isDark 当前是否为暗黑模式
+ */
+export function getRootThemeStyle(themeColor: string, isDark: boolean): UTSJSONObject {
+  return {
+    '--bg-color': getThemeTokens(isDark).bgContent,
+    '--border-color': isDark ? '#334155' : '#e2e8f0',
+    '--card-bg': isDark ? '#1e293b' : '#ffffff',
+    '--text-color': isDark ? '#e2e8f0' : '#1e293b',
+    '--text-secondary': isDark ? '#94a3b8' : '#64748b',
+    '--theme-color': themeColor
+  } as UTSJSONObject;
+}
+
+/**
+ * 应用主题主色调到运行环境（如 H5 端 CSS 变量 --theme-color）
+ * @param color 十六进制主题色值（如 '#37c2bc'）
+ */
+export function applyThemeColor(color: string): void {
+  // #ifdef H5
+  try {
+    const docEl = document.documentElement;
+    if (docEl != null) {
+      docEl.style.setProperty('--theme-color', color);
+    }
+  }
+  catch {
+    // ignore
+  }
+  // #endif
+}
+
+/**
+ * 应用外观模式（更新 H5 html 根节点 data-theme，以及 App 端 setAppTheme）
+ * @param mode 'auto' | 'light' | 'dark'
+ * @param isDark 当前实际生效是否为暗色
+ */
+export function applyThemeMode(mode: string, isDark: boolean): void {
+  // #ifdef APP
+  try {
+    uni.setAppTheme({ theme: mode as 'light' | 'dark' | 'auto' });
+  }
+  catch {
+    // ignore
+  }
+  // #endif
+
+  // #ifdef H5
+  try {
+    const docEl = document.documentElement;
+    if (docEl != null) {
+      docEl.setAttribute('data-theme', isDark ? 'dark' : 'light');
+    }
+  }
+  catch {
+    // ignore
+  }
+  // #endif
 }
 
 /**
@@ -154,7 +263,7 @@ export function applyNavbarTheme(isDark: boolean): void {
       }
     });
   }
-  catch (e) {
+  catch {
     // 页面未就绪时忽略
   }
   // #endif
@@ -164,13 +273,133 @@ export function applyNavbarTheme(isDark: boolean): void {
   // 微信小程序：调用官方 API（frontColor 仅支持 #ffffff / #000000，theme.json 已映射）
   try {
     uni.setNavigationBarColor({
-      frontColor: tokens.navText,
-      backgroundColor: tokens.navBg
+      backgroundColor: tokens.navBg,
+      frontColor: tokens.navText
     });
   }
-  catch (e) {
+  catch {
     // 平台不支持或页面未就绪时忽略
   }
   // #endif
   // #endif
 }
+
+/**
+ * 监听深浅色外观模式变化（跨端：App、H5、小程序）
+ * 当系统或宿主主题发生改变时触发回调
+ * @param callback 主题发生变化时的回调
+ */
+export function watchThemeChange(callback: () => void): void {
+  // #ifdef APP
+  try {
+    uni.onAppThemeChange((_res: AppThemeChangeResult) => {
+      callback();
+    });
+    uni.onOsThemeChange((_res: OsThemeChangeResult) => {
+      callback();
+    });
+  }
+  catch {
+    // ignore
+  }
+  // #endif
+
+  // #ifdef H5
+  try {
+    const darkMql = window.matchMedia('(prefers-color-scheme: dark)');
+    darkMql.addEventListener('change', () => {
+      callback();
+    });
+  }
+  catch {
+    // ignore
+  }
+  // #endif
+
+  // #ifndef APP
+  // #ifndef H5
+  try {
+    uni.onHostThemeChange((_res: OnHostThemeChangeCallbackResult) => {
+      callback();
+    });
+  }
+  catch {
+    // ignore
+  }
+  // #endif
+  // #endif
+}
+
+// ==========================================
+// 主题工具聚合类（全端一目了然速查与单例）
+// ==========================================
+
+/**
+ * 主题工具聚合类
+ *
+ * 集中呈现主题、深浅色模式与导航栏配色处理方法，一目了然；同时支持面向对象式 `theme.xxx()` 调用。
+ *
+ * @example
+ * ```uts
+ * // 方式 1：标准具名导入
+ * import { isDarkMode, getThemeTokens } from '@/src/utils/theme.uts';
+ *
+ * // 方式 2：对象单例导入（一目了然）
+ * import { theme } from '@/src/utils/theme.uts';
+ * console.log(theme.isDarkMode('auto'));
+ * ```
+ */
+export class ThemeUtils {
+  /** 获取默认主题主色调 */
+  getDefaultTheme(): string {
+    return getDefaultTheme();
+  }
+
+  /** 获取当前系统 / 宿主主题（'dark' | 'light'） */
+  getSystemTheme(): string {
+    return getSystemTheme();
+  }
+
+  /** 根据当前选择的外观模式与系统亮暗状态，计算实际是否生效为暗色模式 */
+  isDarkMode(mode: string, systemTheme: string = getSystemTheme()): boolean {
+    return isDarkMode(mode, systemTheme);
+  }
+
+  /** 获取亮 / 暗模式对应的主题色板（直接读取 theme.json，单源） */
+  getThemeTokens(isDark: boolean): ThemeTokens {
+    return getThemeTokens(isDark);
+  }
+
+  /** 获取全局根容器的主题 CSS 变量样式对象 */
+  getRootThemeStyle(themeColor: string, isDark: boolean): UTSJSONObject {
+    return getRootThemeStyle(themeColor, isDark);
+  }
+
+  /** 应用主题主色调到运行环境（如 H5 端 CSS 变量 --theme-color） */
+  applyThemeColor(color: string): void {
+    applyThemeColor(color);
+  }
+
+  /** 应用外观模式（更新 H5 html 根节点 data-theme，以及 App 端 setAppTheme） */
+  applyThemeMode(mode: string, isDark: boolean): void {
+    applyThemeMode(mode, isDark);
+  }
+
+  /** 全局同步原生导航栏主题（H5 / 微信小程序） */
+  applyNavbarTheme(isDark: boolean): void {
+    applyNavbarTheme(isDark);
+  }
+
+  /** 监听深浅色外观模式变化（跨端：App、H5、小程序） */
+  watchThemeChange(callback: () => void): void {
+    watchThemeChange(callback);
+  }
+}
+
+/** 主题工具全局单例 */
+export const theme = new ThemeUtils();
+
+/** 别名导出 */
+export const themeUtils = theme;
+
+export default theme;

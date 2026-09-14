@@ -1,8 +1,10 @@
 import { Request } from '@/uni_modules/lime-request';
 import type { LimeRequestConfig, LimeRequestFail, LimeRequestResponse } from '@/uni_modules/lime-request';
 import { useTokenStore } from '../store/token';
-import { toLoginPage } from '../utils/toLoginPage';
+import { toLoginPage } from '../router/toLoginPage';
 import { ContentTypeEnum, ResultEnum, ShowMessage } from './tools/enum';
+
+import { getApiBaseUrl, getApiSecondaryUrl, getH5UseProxy } from '../utils/env.uts';
 
 // ==========================================
 // 域名配置（所有端统一从 Vite 环境变量读取）
@@ -11,12 +13,12 @@ import { ContentTypeEnum, ResultEnum, ShowMessage } from './tools/enum';
 // 小程序 / App：固定直连，不支持 /api，误配时回退默认完整域名
 
 const DEFAULT_API_URL: string = 'https://ukw0y1.laf.run';
-const directBaseUrl: string = `${import.meta.env.VITE_SERVER_BASEURL ?? DEFAULT_API_URL}`;
-const directSecondaryUrl: string = `${import.meta.env.VITE_SERVER_BASEURL_SECONDARY ?? DEFAULT_API_URL}`;
+const directBaseUrl: string = getApiBaseUrl();
+const directSecondaryUrl: string = getApiSecondaryUrl();
 
 // #ifdef H5
 // H5：VITE_H5_USE_PROXY=true 时走 /api 反向代理
-const useH5Proxy: boolean = `${import.meta.env.VITE_H5_USE_PROXY ?? 'false'}` == 'true';
+const useH5Proxy: boolean = getH5UseProxy();
 const defaultUrl: string = useH5Proxy ? '/api' : directBaseUrl;
 const secondaryUrl: string = useH5Proxy ? '/api' : directSecondaryUrl;
 // #endif

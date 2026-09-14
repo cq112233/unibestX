@@ -1,7 +1,14 @@
 import { defineStore, PiniaStoreBase } from '@/uni_modules/x-pinia-s';
 import { themeColor } from '@/src/tabbar/helper';
 import i18n from '@/src/i18n/index.uts';
-import { getSystemTheme } from '@/src/utils/theme.uts';
+import {
+  applyThemeColor,
+  applyThemeMode,
+  getDefaultTheme,
+  getSystemTheme,
+  isDarkMode
+} from '@/src/utils/theme.uts';
+import { getDefaultLocale } from '@/src/utils/env.uts';
 
 // ==========================================
 // 类型定义
@@ -14,28 +21,11 @@ export type IAppState = {
   isDark: boolean; // 实际生效的亮/暗（auto 模式下跟随系统/宿主主题）
 };
 
-function getSystemLocale(): string {
-  try {
-    const sysInfo = uni.getSystemInfoSync();
-    const appLang = sysInfo.appLanguage;
-    if (appLang != null && appLang.toLowerCase().includes('zh')) {
-      return 'zh-CN';
-    }
-    if (appLang != null && appLang.toLowerCase().includes('en')) {
-      return 'en-US';
-    }
-  }
-  catch {
-    // ignore
-  }
-  return 'zh-CN';
-}
-
 const defaultAppState: IAppState = {
-  theme: '#37c2bc',
-  locale: getSystemLocale(),
+  theme: getDefaultTheme(),
+  locale: getDefaultLocale(),
   themeMode: 'auto',
-  isDark: getSystemTheme() == 'dark'
+  isDark: isDarkMode('auto')
 };
 
 // ==========================================
@@ -45,10 +35,10 @@ const defaultAppState: IAppState = {
 export class AppStore extends PiniaStoreBase {
   // 1. 响应式状态
   state: IAppState = reactive<IAppState>({
-    theme: '#37c2bc',
-    locale: getSystemLocale(),
+    theme: getDefaultTheme(),
+    locale: getDefaultLocale(),
     themeMode: 'auto',
-    isDark: getSystemTheme() == 'dark'
+    isDark: isDarkMode('auto')
   });
 
   // 是否已注册全局主题监听（防止重复注册）
@@ -61,13 +51,9 @@ export class AppStore extends PiniaStoreBase {
     // 从持久化或默认状态中同步一次到全局
     themeColor.value = this.state.theme;
 
-    // #ifdef H5
-    const docEl = document.documentElement;
-    if (docEl != null) {
-      docEl.style.setProperty('--theme-color', this.state.theme);
-      docEl.setAttribute('data-theme', this.state.isDark ? 'dark' : 'light');
-    }
-    // #endif
+    // 应用主题主色调与外观模式
+    applyThemeColor(this.state.theme);
+    applyThemeMode(this.state.themeMode, this.state.isDark);
 
     // 同步语言到 i18n
     i18n.global.locale.value = this.state.locale;
@@ -84,13 +70,7 @@ export class AppStore extends PiniaStoreBase {
     this.state.isDark = defaultAppState.isDark;
 
     themeColor.value = defaultAppState.theme;
-
-    // #ifdef H5
-    const docEl = document.documentElement;
-    if (docEl != null) {
-      docEl.style.setProperty('--theme-color', defaultAppState.theme);
-    }
-    // #endif
+    applyThemeColor(defaultAppState.theme);
     i18n.global.locale.value = defaultAppState.locale;
 
     // 重新应用外观模式（App 端同步 setAppTheme）
@@ -102,13 +82,7 @@ export class AppStore extends PiniaStoreBase {
       const colorVal = _data.theme as string;
       this.state.theme = colorVal;
       themeColor.value = colorVal;
-
-      // #ifdef H5
-      const docEl = document.documentElement;
-      if (docEl != null) {
-        docEl.style.setProperty('--theme-color', colorVal);
-      }
-      // #endif
+      applyThemeColor(colorVal);
     }
     if (_data.locale != null) {
       const localeVal = _data.locale as string;
@@ -149,13 +123,7 @@ export class AppStore extends PiniaStoreBase {
   setTheme(theme: string): void {
     this.state.theme = theme;
     themeColor.value = theme;
-
-    // #ifdef H5
-    const docEl = document.documentElement;
-    if (docEl != null) {
-      docEl.style.setProperty('--theme-color', theme);
-    }
-    // #endif
+    applyThemeColor(theme);
   }
 
   /**
@@ -249,13 +217,7 @@ export class AppStore extends PiniaStoreBase {
       this.state.isDark = getSystemTheme() == 'dark';
     }
 
-    // #ifdef H5
-    // H5：同步 html 根节点 data-theme，方便 CSS 选择器与调试
-    const docEl = document.documentElement;
-    if (docEl != null) {
-      docEl.setAttribute('data-theme', this.state.isDark ? 'dark' : 'light');
-    }
-    // #endif
+    applyThemeMode(mode, this.state.isDark);
   }
 
   /**

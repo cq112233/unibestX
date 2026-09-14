@@ -19,7 +19,7 @@
 import Tabbar from '@/src/tabbar/tabbar.uvue';
 import { customTabbarEnable, isPageTabbar, syncCurIdxByCurrentPage } from '@/src/tabbar';
 import { useAppStore } from '@/src/store';
-import { applyNavbarTheme, getThemeTokens } from '@/src/utils/theme';
+import { applyNavbarTheme, getRootThemeStyle } from '@/src/utils/theme';
 import { computed, onMounted, ref, watch } from 'vue';
 import { updateAvailableHeight } from '@/src/utils/systemInfo.uts';
 import { selectedTabbarStrategy } from '@/src/tabbar/helper/index.uts';
@@ -78,21 +78,13 @@ const appStore = useAppStore();
 /**
  * 获取 pageStyle 对象
  */
-const pageStyleObj = computed((): UTSJSONObject => {
+const _pageStyleObj = computed((): UTSJSONObject => {
   return (props.pageStyle ?? {}) as UTSJSONObject;
 });
 
 // 主题样式变量：亮 / 暗两套，跟随 appStore.state.isDark 响应式切换
 const themeStyle = computed((): UTSJSONObject => {
-  const dark = appStore.state.isDark;
-  return {
-    '--theme-color': appStore.state.theme,
-    '--bg-color': getThemeTokens(dark).bgContent,
-    '--text-color': dark ? '#e2e8f0' : '#1e293b',
-    '--text-secondary': dark ? '#94a3b8' : '#64748b',
-    '--card-bg': dark ? '#1e293b' : '#ffffff',
-    '--border-color': dark ? '#334155' : '#e2e8f0'
-  } as UTSJSONObject;
+  return getRootThemeStyle(appStore.state.theme, appStore.state.isDark);
 });
 
 // 控制当前页面是否需要显示底部导航栏

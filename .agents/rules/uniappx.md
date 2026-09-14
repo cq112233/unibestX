@@ -119,7 +119,7 @@ description: uni-app X (UTS) 开发规范与踩坑避坑指南，适用于跨端
               <!-- 滚动内容 -->
             </scroll-view>
             ```
-        *   **整页按内容高度滚动**：根用 `<view class="flex flex-col">`（不加 flex-1），整页由布局 scroll-view 接管，页面用 `onNavbarPageScroll` / `onNavbarReachBottom`（见 `src/utils/pageScroll.uts`）监听，替代原生 `onPageScroll` / `onReachBottom`。
+        *   **整页按内容高度滚动**：根用 `<view class="flex flex-col">`（不加 flex-1），整页由布局 scroll-view 接管，页面用 `onNavbarPageScroll` / `onNavbarReachBottom`（见 `src/utils/refresh.uts`）监听，替代原生 `onPageScroll` / `onReachBottom`。
     *   **内容可用高度用 `computedAvailableHeight`**（navbar / default 通用）：框架已按当前布局自动算好（状态栏 / 导航栏 / tabbar 均已扣除），开发者直接用这个值绑定高度即可，其余不用操心：
         ```html
         <view :style="{ height: `${computedAvailableHeight}px` }">
@@ -242,6 +242,10 @@ description: uni-app X (UTS) 开发规范与踩坑避坑指南，适用于跨端
 * **安全获取系统与应用语言 (Safe Access to System Locale)**：
   * 在原生 Android/iOS 平台上，`uni.getLocale()` 不被直接支持或编译时可能报错。
   * *正确做法*：在 App 端，使用 `uni.getSystemInfoSync().appLanguage`（应用当前语言）或 `uni.getDeviceInfo().osLanguage`（系统底层语言）来获取安全真实的语言。
+* **严禁在对象字面量（UTSJSONObject）中放入顶层函数导出 (No Functions in Object Literals)**：
+  * 在 UTS 跨端编译中，严禁写出如 `export const env = { getApiBaseUrl }` 这类包裹了函数的对象字面量导出。
+  * **原因**：UTS 将对象字面量编译为 Kotlin 的 `_uO("getApiBaseUrl" to getApiBaseUrl)`。在 Kotlin 原生语法中，顶层函数名不能作为表达式裸露赋值给 Map，会导致 Kotlin 编译器直接报 `error: Function invocation 'xxx()' expected.` 编译崩溃；且 `UTSJSONObject` 在强类型原生端无法动态调用方法。
+  * *正确做法*：所有工具函数全部统一使用标准 ES 模块具名函数导出（`export function getApiBaseUrl(): string { ... }`），业务方按需具名导入（`import { getApiBaseUrl } from '@/src/utils/env.uts'`）。
 
 ---
 
