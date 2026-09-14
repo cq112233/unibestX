@@ -1,39 +1,63 @@
 <template>
   <Card :title="langTitle">
     <!-- 当前语言预览 -->
-    <view class="rounded-[12px] p-[16px] mb-[16px] border-[1px] border-solid border-[#e2e8f0]">
-      <text class="text-[12px] text-[#94a3b8] mb-[6px]">{{ langPreview }}</text>
+    <view
+      class="rounded-[12px] p-[16px] mb-[16px] border-[1px] border-solid"
+      :style="{ borderColor: 'var(--border-color, #e2e8f0)' }"
+    >
+      <text
+        class="text-[12px] mb-[6px]"
+        :style="{ color: 'var(--text-secondary, #94a3b8)' }"
+      >
+        {{ langPreview }}
+      </text>
 
-      <text class="text-[16px] font-bold text-[#1e293b]">
+      <text
+        class="text-[16px] font-bold"
+        :style="{ color: 'var(--text-color, #1e293b)' }"
+      >
         {{ welcomeText }}
       </text>
 
-      <text class="text-[14px] text-[#475569] mt-[8px]">
+      <text
+        class="text-[14px] mt-[8px]"
+        :style="{ color: 'var(--text-secondary, #475569)' }"
+      >
         {{ helloText }}
       </text>
     </view>
 
     <!-- 选项列表 -->
-    <!-- 简体中文 -->
-    <view class="flex-row items-center justify-between py-[12px]" @click="switchLanguage('zh-CN')">
-      <view class="flex-row items-center">
-        <text class="text-[15px] text-[#334155] font-medium">简体中文</text>
+    <view
+      v-for="(item, index) in languageOptions"
+      :key="index"
+    >
+      <view
+        class="flex-row items-center justify-between py-[12px]"
+        @click="switchLanguage(item.value)"
+      >
+        <view class="flex-row items-center">
+          <text
+            class="text-[15px] font-medium"
+            :style="{ color: currentLocale == item.value ? 'var(--theme-color, #3b82f6)' : 'var(--text-color, #334155)' }"
+          >
+            {{ item.label }}
+          </text>
+        </view>
+        <view class="flex-row items-center">
+          <uni-icons
+            v-if="currentLocale == item.value"
+            type="checkmarkempty"
+            size="20"
+            :color="appStore.state.theme"
+          />
+        </view>
       </view>
-      <view class="flex-row items-center">
-        <uni-icons v-if="isZhCN" type="checkmarkempty" size="20" style="color: #3b82f6;" />
-      </view>
-    </view>
-
-    <view class="h-[1px] bg-[#f1f5f9]" />
-
-    <!-- English -->
-    <view class="flex-row items-center justify-between py-[12px]" @click="switchLanguage('en-US')">
-      <view class="flex-row items-center">
-        <text class="text-[15px] text-[#334155] font-medium">English</text>
-      </view>
-      <view class="flex-row items-center">
-        <uni-icons v-if="isEnUS" type="checkmarkempty" size="20" style="color: #3b82f6;" />
-      </view>
+      <view
+        v-if="index < languageOptions.length - 1"
+        class="h-[1px]"
+        :style="{ backgroundColor: 'var(--border-color, #f1f5f9)' }"
+      />
     </view>
   </Card>
 </template>
@@ -41,8 +65,14 @@
 <script setup lang="uts">
 import Card from './Card.uvue';
 import { computed } from 'vue';
-import { useAppStore } from '@/src/store/index.uts';
+import { useAppStore } from '@/src/store';
 import { $t, setTabbarItem } from '@/src/utils/i18n';
+import { toast } from '@/src/utils/toast.uts';
+
+type LanguageOption = {
+  label: string;
+  value: string;
+};
 
 const appStore = useAppStore();
 
@@ -51,30 +81,16 @@ const langPreview = computed((): string => $t('basic.langPreview'));
 const welcomeText = computed((): string => $t('message.welcome'));
 const helloText = computed((): string => $t('message.hello', { msg: 'hi' }));
 
-// 使用 computed 响应式获取当前 i18n 对象的语言环境
-const currentLocale = computed((): string => {
-  return appStore.state.locale;
-});
+const currentLocale = computed((): string => appStore.state.locale);
 
-const isZhCN = computed((): boolean => {
-  return currentLocale.value == 'zh-CN';
-});
-
-const isEnUS = computed((): boolean => {
-  return currentLocale.value == 'en-US';
-});
+const languageOptions: LanguageOption[] = [
+  { label: '简体中文', value: 'zh-CN' },
+  { label: 'English', value: 'en-US' }
+];
 
 function switchLanguage(lang: string) {
   appStore.setLocale(lang);
   setTabbarItem();
-
-  uni.showToast({
-    title: $t('message.switch_success'),
-    icon: 'none',
-    duration: 1500
-  });
+  toast($t('message.switch_success'));
 }
 </script>
-
-<style>
-</style>

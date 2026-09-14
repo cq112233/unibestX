@@ -17,10 +17,10 @@
       <!-- 父组件主动修改数据操作组 -->
       <view class="flex-row items-center">
         <view class="bg-[#2563eb] rounded-[6px] px-[10px] h-[30px] flex-row items-center justify-center mr-[8px]" @click="addFiveFromParent">
-          <text class="text-white text-[12px]">父组件直接 Count + 5</text>
+          <text class="text-[#ffffff] text-[12px]">父组件直接 Count + 5</text>
         </view>
         <view class="bg-[#64748b] rounded-[6px] px-[10px] h-[30px] flex-row items-center justify-center" @click="resetParent">
-          <text class="text-white text-[12px]">父组件重置状态</text>
+          <text class="text-[#ffffff] text-[12px]">父组件重置状态</text>
         </view>
       </view>
     </view>
@@ -37,7 +37,12 @@
       <!-- 1. 具名头部插槽 #header -->
       <template #header>
         <view class="flex-row items-center justify-between">
-          <text class="text-[14px] font-bold text-[#1e293b]">🏷️ 父组件填入的具名 Header 插槽</text>
+          <text
+            class="text-[14px] font-bold"
+            :style="{ color: 'var(--text-color, #1e293b)' }"
+          >
+            🏷️ 父组件填入的具名 Header 插槽
+          </text>
           <text class="text-[11px] text-[#3b82f6] bg-[#dbeafe] px-[6px] py-[2px] rounded-[4px]">自定义 Header</text>
         </view>
       </template>
@@ -54,7 +59,12 @@
       <!-- 3. 具名底部插槽 #footer -->
       <template #footer>
         <view class="flex-row items-center justify-between py-[2px]">
-          <text class="text-[12px] text-[#64748b]">📌 父组件填入的具名 Footer 插槽</text>
+          <text
+            class="text-[12px]"
+            :style="{ color: 'var(--text-secondary, #64748b)' }"
+          >
+            📌 父组件填入的具名 Footer 插槽
+          </text>
           <text class="text-[11px] text-[#059669] bg-[#ecfdf5] px-[6px] py-[2px] rounded-[4px] font-medium">双向通信验证成功</text>
         </view>
       </template>

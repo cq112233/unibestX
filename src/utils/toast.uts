@@ -43,3 +43,64 @@ export function toastWarning(message: string) {
 export function toastPrimary(message: string) {
   toast(message);
 }
+
+// ==========================================
+// 消息提示工具聚合类（全端一目了然速查与单例）
+// ==========================================
+
+/**
+ * 消息提示工具聚合类
+ *
+ * 集中呈现各类 Toast 提示方法，一目了然；同时支持面向对象式 `toastUtils.xxx()` 调用。
+ *
+ * @example
+ * ```uts
+ * // 方式 1：标准具名导入
+ * import { toast, toastSuccess, toastError } from '@/src/utils/toast.uts';
+ *
+ * // 方式 2：对象单例导入（一目了然）
+ * import { toastUtils } from '@/src/utils/toast.uts';
+ * toastUtils.success('操作成功');
+ * ```
+ */
+export class ToastUtils {
+  /** 调用原生 showToast 底层方法 */
+  showToast(options: UTSJSONObject): void {
+    showToast(options);
+  }
+
+  /** 普通文本提示（无图标） */
+  toast(message: string, type: string = 'default'): void {
+    toast(message, type);
+  }
+
+  /** 普通文本提示（别名 info） */
+  info(message: string): void {
+    toast(message);
+  }
+
+  /** 成功提示（带成功图标） */
+  success(message: string): void {
+    toastSuccess(message);
+  }
+
+  /** 错误提示（带错误图标） */
+  error(message: string): void {
+    toastError(message);
+  }
+
+  /** 警告提示 */
+  warning(message: string): void {
+    toastWarning(message);
+  }
+
+  /** 主要强调提示 */
+  primary(message: string): void {
+    toastPrimary(message);
+  }
+}
+
+/** 消息提示工具全局单例 */
+export const toastUtils = new ToastUtils();
+
+export default toastUtils;

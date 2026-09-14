@@ -168,6 +168,23 @@ function getLength(str: string | null): number {
 - **继承要求**：子类继承必须显式声明 `constructor()` 并调用 `super()` (`UTS110111131`)。
 - **禁止传递 Class**：Class 仅作为类型使用，禁止赋值给变量或作为普通对象传递，需使用工厂函数 (`UTS110111151`)。
 
+#### 1.1.10 严禁在对象字面量（UTSJSONObject）中放入顶层函数作为聚合对象导出
+
+- **报错现象**：Android (Kotlin) 编译失败，报错：`error: Function invocation 'xxx()' expected. at src/utils/xxx.uts`
+- **底层原理**：UTS 在 Android 端将对象字面量 `{ getApiBaseUrl }` 编译为 Kotlin 的 `_uO("getApiBaseUrl" to getApiBaseUrl)`。在 Kotlin 语法中，顶层函数名 `getApiBaseUrl` 不能作为裸值赋值给键值对，编译器会强行要求函数调用 `getApiBaseUrl()`；且 `UTSJSONObject` 在强类型原生端无法动态调用方法。
+- **强制规范**：
+  1. 所有工具库必须使用标准 ES 模块具名函数导出：`export function getApiBaseUrl(): string { ... }`；
+  2. 业务方统一按需具名解构导入：`import { getApiBaseUrl } from '@/src/utils/env.uts'`；
+  3. **一律严禁**写出如 `export const env = { getApiBaseUrl, ... }` 或 `export default { ... }` 这种包裹函数的对象字面量导出。
+
+#### 1.1.11 严禁顶层函数与同名属性采用 Getter 命名冲突（Kotlin 平台声明冲突导致 NoSuchMethodError）
+
+- **报错现象**：Android 运行时崩溃：`error: java.lang.NoSuchMethodError: No static method getWindowHeight()Lio/dcloud/uniapp/vue/ComputedRef; in class Luni/.../IndexKt;`
+- **底层原理**：在 Kotlin 原生编译中，包顶层属性 `val windowHeight = computed(...)` 会被 Kotlin 编译器自动生成静态 getter：`public static final ComputedRef getWindowHeight()`。若同文件在顶层还显式导出了同名顶层函数 `export function getWindowHeight(): number`，在 JVM 字节码层面上会产生方法签名冲突（Platform Declaration Clash），函数的返回类型覆盖挤占了响应式属性的 getter。当 Vue 模板在执行 `{{ windowHeight }}` 时，因找不到匹配的 getter 而在运行时直接崩溃。
+- **强制规范**：
+  1. 顶层若已导出属性 `export const windowHeight = computed(...)`，**严禁在顶层额外导出 `export function getWindowHeight()`**；
+  2. 若需面向对象风格的调用，封装在独立 class 的实例方法中（如 `systemUtils.getWindowHeight()`），因为类实例方法编译为类成员虚拟方法，绝不会干扰包顶层的静态方法签名。
+
 ---
 
 ### 1.2 样式 (CSS & Tailwind CSS) 与原生渲染铁律
@@ -558,7 +575,7 @@ onNavbarPullDownRefresh(() => {
 
 ### 2.4 标杆案例 4：整页按内容高度自然滚动
 
-> 真实参考源：[src/utils/pageScroll.uts](file:///Users/chenqi/Desktop/unibestX/src/utils/pageScroll.uts)
+> 真实参考源：[src/utils/refresh.uts](file:///Users/chenqi/Desktop/unibestX/src/utils/refresh.uts)
 
 **设计要点**：
 
@@ -568,7 +585,7 @@ onNavbarPullDownRefresh(() => {
 
 ```uts
 <script setup lang="uts">
-import { onNavbarPageScroll, onNavbarReachBottom, PageScrollDetail } from '@/src/utils/pageScroll.uts';
+import { onNavbarPageScroll, onNavbarReachBottom, PageScrollDetail } from '@/src/utils/refresh.uts';
 
 definePage({
   layout: 'navbar',
@@ -789,6 +806,7 @@ onNavbarPullDownRefresh(() => {
 | **键盘高度事件类型** | `(e: UniInputKeyboardHeightChangeEventDetail)` | `(e: UniInputKeyboardHeightChangeEvent)` |
 | **组件库使用** | `import UniIcons from '...'` | 无需 import，模板直接使用 `<uni-icons>` |
 | **安全区底部适配** | 内联计算 paddingBottom | `class="pb-safe"` |
+| **对象字面量包含函数导出** | `export const env = { getApiBaseUrl }`（Kotlin 编译报 `Function invocation expected`） | 统一使用标准具名函数导出 `export function getApiBaseUrl()`，使用方 `import { getApiBaseUrl }` |
 
 ---
 
@@ -812,6 +830,7 @@ onNavbarPullDownRefresh(() => {
 - [ ] **14. 严禁过度依赖深重阴影**（安卓端 VDOM 与 Vapor 模式阴影渲染不一致，优先使用浅边框与底色反差划分层级）
 - [ ] **15. 模板作用域插槽调用点必须显式添加 `as` 类型断言**（避免触发 `error17`）
 - [ ] **16. 组件库组件严禁在 `<script>` 中手动 import**（统一使用 easycom 短横线标签自动导入）
+- [ ] **17. 严禁导出包裹了顶层函数的对象字面量**（如 `export const env = { fn }`，会触发 Android Kotlin 编译崩溃 `Function invocation expected`，统一使用标准具名函数导出）
 
 ---
 

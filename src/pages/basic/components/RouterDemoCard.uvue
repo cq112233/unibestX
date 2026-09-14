@@ -1,24 +1,34 @@
 <template>
   <Card title="路由拦截与传参测试">
     <!-- 状态展示 -->
-    <view class="rounded-[12px] p-[16px] mb-[16px] border-[1px] border-solid border-[#e2e8f0]">
+    <view
+      class="rounded-[12px] p-[16px] mb-[16px] border-[1px] border-solid"
+      :style="{ borderColor: 'var(--border-color, #e2e8f0)' }"
+    >
       <view class="flex-row justify-between items-center mb-[8px]">
-        <text class="text-[14px] text-[#64748b]">当前登录状态:</text>
+        <text class="text-[14px]" :style="{ color: 'var(--text-secondary, #64748b)' }">当前登录状态:</text>
         <text :style="{ fontSize: '14px', fontWeight: 'bold', color: hasLogin ? '#10b981' : '#f43f5e' }">
           {{ hasLogin ? '已登录' : '未登录' }}
         </text>
       </view>
-      <text class="text-[12px] text-[#94a3b8] leading-normal">
+      <text class="text-[12px] leading-normal" :style="{ color: 'var(--text-secondary, #94a3b8)' }">
         测试场景说明：Test 页面属于需登录拦截页面。未登录时点击跳转将拦截并重定向到登录页，登录成功后会自动跳回 Test 页并解析 query 传参。
       </text>
     </view>
 
     <!-- 操作按钮区 -->
     <view class="flex-row justify-between">
-      <view class="flex-1 bg-[#3182ce] rounded-[8px] h-[42px] flex flex-row items-center justify-center" @click="jumpToTest">
+      <view
+        class="flex-1 rounded-[8px] h-[42px] flex flex-row items-center justify-center"
+        :style="{ backgroundColor: 'var(--theme-color, #3182ce)' }"
+        @click="jumpToTest"
+      >
         <text class="text-[#ffffff] text-[14px]">跳转 Test 页 (传参)</text>
       </view>
-      <view class="flex-1 ml-[12px] bg-[#ef4444] rounded-[8px] h-[42px] flex flex-row items-center justify-center" @click="handleLogout">
+      <view
+        class="flex-1 ml-[12px] bg-[#ef4444] rounded-[8px] h-[42px] flex flex-row items-center justify-center"
+        @click="handleLogout"
+      >
         <text class="text-[#ffffff] text-[14px]">清除登录状态</text>
       </view>
     </view>
@@ -28,8 +38,8 @@
 <script setup lang="uts">
 import { computed } from 'vue';
 import Card from './Card.uvue';
-import { useTokenStore } from '@/src/store/token';
-import { useUserStore } from '@/src/store/user';
+import { useTokenStore, useUserStore } from '@/src/store';
+import { toastSuccess } from '@/src/utils/toast.uts';
 
 const tokenStore = useTokenStore();
 const userStore = useUserStore();
@@ -47,9 +57,6 @@ function jumpToTest() {
 function handleLogout() {
   tokenStore.clearToken();
   userStore.clearUserInfo();
-  uni.showToast({
-    title: '已清除登录状态',
-    icon: 'success'
-  });
+  toastSuccess('已清除登录状态');
 }
 </script>

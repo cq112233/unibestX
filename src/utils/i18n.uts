@@ -70,3 +70,59 @@ export function testI18n(): void {
     content: t('message.welcome', null)
   } as ShowModalOptions);
 }
+
+// ==========================================
+// 国际化多语言工具聚合类（全端一目了然速查与单例）
+// ==========================================
+
+/**
+ * 国际化多语言工具聚合类
+ *
+ * 集中呈现国际化翻译与标题设置方法，一目了然；同时支持面向对象式 `i18nUtils.xxx()` 调用。
+ *
+ * @example
+ * ```uts
+ * // 方式 1：标准具名导入
+ * import { t, getI18nText } from '@/src/utils/i18n.uts';
+ *
+ * // 方式 2：对象单例导入（一目了然）
+ * import { i18nUtils } from '@/src/utils/i18n.uts';
+ * console.log(i18nUtils.t('app.name'));
+ * ```
+ */
+export class I18nUtils {
+  /** 通用 i18n 翻译函数（未找到翻译时自动回退返回原 key 字符串） */
+  t(key: string, named: UTSJSONObject | null = null): string {
+    return t(key, named);
+  }
+
+  /** 通用 i18n 翻译快捷函数 */
+  $t(key: string, named: UTSJSONObject | null = null): string {
+    return $t(key, named);
+  }
+
+  /** 获取 %xxx% 格式包装或普通 key 的多语言翻译文本 */
+  getI18nText(key: string): string {
+    return getI18nText(key);
+  }
+
+  /** 设置原生 TabBar 各项的多语言文本 */
+  setTabbarItem(): void {
+    setTabbarItem();
+  }
+
+  /** 设置原生/当前页面 NavigationBar (导航栏) 标题的多语言文本 */
+  setNavigationBarTitle(titleKey: string): void {
+    setNavigationBarTitle(titleKey);
+  }
+
+  /** 非 vue / uvue 文件中使用 i18n 测试示例 */
+  testI18n(): void {
+    testI18n();
+  }
+}
+
+/** 国际化多语言工具全局单例 */
+export const i18nUtils = new I18nUtils();
+
+export default i18nUtils;

@@ -5,7 +5,7 @@
  /___|    | .__/ \__,_|\__, |_|_| |_|\__, |
           |_|          |___/         |___/ -X
 
-v0.4.0 (2026-06-11)
+v1.0.1 (2026-09-14)
 by ZXLee
 -->
 <!-- 文档地址：https://ext.dcloud.net.cn/plugin?name=z-paging-x -->
@@ -18,97 +18,148 @@ by ZXLee
     <!-- 顶部固定的slot -->
     <slot name="top" />
     <!-- 因使用component :is的时候设置的list-view在web端无法正常渲染，且不支持微信小程序，因此目前只能先写死list-view和scroll-view节点，通过v-if切换 -->
-    <list-view v-if="listIs === 'list-view'" ref="zpxList" class="zpx-list-view zpx-flex1"
-    :id="listId" :refresher-enabled="refresherEnabled" :refresher-threshold="finalRefresherThreshold" :refresher-triggered="refresherTriggered" :refresher-default-style="useCustomRefresher ? 'none' : 'black'" :custom-nested-scroll="customNestedScroll" :refresher-background="refresherBackground"
-    :rebound="rebound" :scroll-top="scrollTop" :show-scrollbar="showScrollbar" :scroll-with-animation="finalScrollWithAnimation"
+    <!-- 聊天记录模式下列表通过transform倒置(chatRecordRotateStyle)，此时数组第0项显示在底部，滚动到物理底部(视觉顶部)加载更多历史消息 -->
+    <list-view v-if="listIs === 'list-view'" ref="zpxList" class="zpx-list-view zpx-flex1" :style="[chatRecordRotateStyle]"
+    <!-- #ifdef APP -->
+    :associative-container="associativeContainer"
+    <!-- #endif -->
+    :id="listId" :refresher-enabled="refresherEnabled" :refresher-threshold="finalRefresherThreshold" :refresher-max-drag-distance="finalRefresherMaxDragDistance" :refresher-triggered="refresherTriggered" :refresher-default-style="useCustomRefresher ? 'none' : 'black'" :custom-nested-scroll="customNestedScroll" :refresher-background="refresherBackground"
+    :bounces="rebound" :scroll-top="scrollTop" :show-scrollbar="showScrollbar" :scroll-with-animation="finalScrollWithAnimation"
     @refresherpulling="_onRefresherpulling" @refresherrefresh="_onRefresherrefresh" @refresherrestore="_onRefresherrestore" @refresherabort="_onRefresherabort" @scrolltolower="_onScrolltolower" @scrolltoupper="_onScrolltoupper" @scroll="_onScroll"
-    @startnestedscroll="_onStartNestedScroll" @nestedprescroll="_onNestedPreScroll">
+    @startnestedscroll="_onStartNestedScroll" @nestedprescroll="_onNestedPreScroll" @touchstart="_onListTouchstart">
       <slot />
-      <list-item>
-        <template v-if="showLoadMore">
-          <slot v-if="$slots['loadMore']" :loadMoreStatus="loadMoreStatus" name="loadMore" />
-          <z-paging-load-more v-else :status="loadMoreStatus" :default-text="loadMoreDefaultText" :loading-text="loadMoreLoadingText" :no-more-text="loadMoreNoMoreText" :fail-text="loadMoreFailText" @clickMore="_handleLoadMore"/>
-        </template>
+      <!-- 聊天记录模式：加载更多(历史消息)，列表倒置后位于视觉顶部，内容需再倒置回来 -->
+      <list-item v-if="showChatLoadMore" :style="[chatRecordRotateStyle]">
+        <slot v-if="isChatNoMore" name="chatNoMore" />
+        <slot v-else-if="$slots['chatLoading']" :loadingMoreStatus="loadMoreStatus" name="chatLoading" />
+        <z-paging-load-more v-else :status="chatLoadMoreStatus" :default-text="loadMoreDefaultText" :loading-text="loadMoreLoadingText" :no-more-text="loadMoreNoMoreText" :fail-text="loadMoreFailText" :theme-style="finalLoadingMoreThemeStyle" :is-chat="true" @clickMore="_handleLoadMore"/>
+      </list-item>
+      <!-- web端list-view为虚拟列表，内容为空的list-item会按默认item高度估算占位，因此无内容时不渲染该list-item -->
+      <list-item v-if="showLoadMore">
+        <slot v-if="$slots['loadMore']" :loadMoreStatus="loadMoreStatus" name="loadMore" />
+        <z-paging-load-more v-else :status="loadMoreStatus" :default-text="loadMoreDefaultText" :loading-text="loadMoreLoadingText" :no-more-text="loadMoreNoMoreText" :fail-text="loadMoreFailText" :theme-style="finalLoadingMoreThemeStyle" @clickMore="_handleLoadMore"/>
       </list-item>
       <!-- 这里微信小程序不支持component，但是如果直接使用list-item在web中无法显示下拉刷新，因此需要分开处理 -->
       <!-- #ifdef WEB -->
       <component :is="listItemIs" slot="refresher">
-        <view ref="zpxListRefresher" class="zpx-list-refresher" :style="{ width: contentWidth + 'px' }">
-          <slot v-if="$slots['refresher']" :refresherStatus="refresherStatus" name="refresher" />
-          <z-paging-refresher v-else ref="commonRefresher" :default-text="refresherDefaultText" :pulling-text="refresherPullingText" :refreshing-text="refresherRefreshingText" :complete-text="refresherCompleteText" :status="refresherStatus" :show-update-time="showRefresherUpdateTime" :update-time-key="refresherUpdateTimeKey" :time-text-timestamp="refresherTimeTextTimestamp"/>
-        </view>
-      </component>
       <!-- #endif -->
       <!-- #ifndef WEB -->
       <list-item slot="refresher">
+      <!-- #endif -->
         <view ref="zpxListRefresher" class="zpx-list-refresher" :style="{ width: contentWidth + 'px' }">
-          <slot v-if="$slots['refresher']" :refresherStatus="refresherStatus" name="refresher" />
-          <z-paging-refresher v-else ref="commonRefresher" :default-text="refresherDefaultText" :pulling-text="refresherPullingText" :refreshing-text="refresherRefreshingText" :complete-text="refresherCompleteText" :status="refresherStatus" :show-update-time="showRefresherUpdateTime" :update-time-key="refresherUpdateTimeKey" :time-text-timestamp="refresherTimeTextTimestamp"/>
+          <!-- 松手进入二楼状态且设置了slot=refresherF2时展示该slot -->
+          <slot v-if="$slots['refresherF2'] && isRefresherGoF2" name="refresherF2" />
+          <slot v-else-if="$slots['refresher']" :refresherStatus="refresherStatus" name="refresher" />
+          <z-paging-refresher v-else ref="commonRefresher" :default-text="refresherDefaultText" :pulling-text="refresherPullingText" :refreshing-text="refresherRefreshingText" :complete-text="refresherCompleteText" :go-f2-text="refresherGoF2Text" :status="refresherStatus" :show-update-time="showRefresherUpdateTime" :update-time-key="refresherUpdateTimeKey" :time-text-timestamp="refresherTimeTextTimestamp" :theme-style="finalRefresherThemeStyle" :default-img="refresherDefaultImg" :pulling-img="refresherPullingImg" :refreshing-img="refresherRefreshingImg" :complete-img="refresherCompleteImg" :refreshing-animated="refresherRefreshingAnimated" :img-style="refresherImgStyle" :title-style="refresherTitleStyle" :update-time-style="refresherUpdateTimeStyle"/>
         </view>
+      <!-- #ifdef WEB -->
+      </component>
+      <!-- #endif -->
+      <!-- #ifndef WEB -->
       </list-item>
       <!-- #endif -->
 
       <!-- #ifdef WEB -->
-      <component :is="listItemIs" :class="showEmpty ? 'zpx-flex1' : ''">
+      <component :is="listItemIs" v-if="showEmpty || showLoading" :class="showEmpty ? 'zpx-flex1' : ''" :style="[chatRecordRotateStyle]">
+      <!-- #endif -->
+      <!-- #ifndef WEB -->
+      <list-item v-if="showEmpty || showLoading" :class="showEmpty ? 'zpx-flex1' : ''" :style="[chatRecordRotateStyle]">
+      <!-- #endif -->
         <template v-if="showEmpty">
+          <!-- 蒸汽模式下list-item不参与flex布局且忽略自身高度，web端list-view为虚拟列表同样无法通过flex:1撑满，因此用内层view按UniResizeObserver监听到的列表高度撑满 -->
+          <!-- #ifdef VUE3-VAPOR || WEB -->
+          <view class="zpx-empty-fill" :style="{ height: listHeight > 0 ? listHeight + 'px' : 'auto' }">
+          <!-- #endif -->
           <slot v-if="$slots['empty']" :isLoadFailed="isLoadFailed" name="empty" />
           <z-paging-x-empty v-else :empty-text="!isLoadFailed ? emptyText : emptyErrorText" :empty-img="!isLoadFailed ? emptyImg : emptyErrorImg" :is-load-failed="isLoadFailed" :show-empty-reload="isLoadFailed" @reload="reload"/>
+          <!-- #ifdef VUE3-VAPOR || WEB -->
+          </view>
+          <!-- #endif -->
         </template>
         <slot v-if="showLoading" name="loading" />
+      <!-- #ifdef WEB -->
       </component>
       <!-- #endif -->
       <!-- #ifndef WEB -->
-      <list-item :class="showEmpty ? 'zpx-flex1' : ''">
-        <template v-if="showEmpty">
-          <slot v-if="$slots['empty']" :isLoadFailed="isLoadFailed" name="empty" />
-          <z-paging-x-empty v-else :empty-text="!isLoadFailed ? emptyText : emptyErrorText" :empty-img="!isLoadFailed ? emptyImg : emptyErrorImg" :is-load-failed="isLoadFailed" :show-empty-reload="isLoadFailed" @reload="reload"/>
-        </template>
-        <slot v-if="showLoading" name="loading" />
       </list-item>
       <!-- #endif -->
     </list-view>
-    <scroll-view v-else ref="zpxList" class="zpx-list-view zpx-flex1"
-    :id="listId" direction="vertical" :refresher-enabled="refresherEnabled" :refresher-threshold="finalRefresherThreshold" :refresher-triggered="refresherTriggered" :refresher-default-style="useCustomRefresher ? 'none' : 'black'" :refresher-background="refresherBackground"
-    :scroll-top="scrollTop" :show-scrollbar="showScrollbar" :scroll-with-animation="finalScrollWithAnimation"
+    <scroll-view v-else ref="zpxList" class="zpx-list-view zpx-flex1" :style="[chatRecordRotateStyle]"
+    <!-- #ifdef APP -->
+    :associative-container="associativeContainer"
+    <!-- #endif -->
+    :id="listId" :refresher-enabled="refresherEnabled" :refresher-threshold="finalRefresherThreshold" :refresher-max-drag-distance="finalRefresherMaxDragDistance" :refresher-triggered="refresherTriggered" :refresher-default-style="useCustomRefresher ? 'none' : 'black'" :refresher-background="refresherBackground"
+    <!-- #ifndef VUE3-VAPOR -->
+    :custom-nested-scroll="customNestedScroll"
+    <!-- #endif -->
+    <!-- #ifdef APP && !VUE3-VAPOR -->
+    :nested-scroll-child="nestedScrollChild"
+    <!-- #endif -->
+    :bounces="rebound" :scroll-top="scrollTop" :show-scrollbar="showScrollbar" :scroll-with-animation="finalScrollWithAnimation"
     @refresherpulling="_onRefresherpulling" @refresherrefresh="_onRefresherrefresh" @refresherrestore="_onRefresherrestore" @refresherabort="_onRefresherabort" @scrolltolower="_onScrolltolower" @scrolltoupper="_onScrolltoupper" @scroll="_onScroll"
-    @startnestedscroll="_onStartNestedScroll" @nestedprescroll="_onNestedPreScroll">
+    @startnestedscroll="_onStartNestedScroll" @nestedprescroll="_onNestedPreScroll" @touchstart="_onListTouchstart">
       <slot />
+      <!-- 聊天记录模式：加载更多(历史消息)，列表倒置后位于视觉顶部，内容需再倒置回来 -->
+      <view v-if="showChatLoadMore" :style="[chatRecordRotateStyle]">
+        <slot v-if="isChatNoMore" name="chatNoMore" />
+        <slot v-else-if="$slots['chatLoading']" :loadingMoreStatus="loadMoreStatus" name="chatLoading" />
+        <z-paging-load-more v-else :status="chatLoadMoreStatus" :default-text="loadMoreDefaultText" :loading-text="loadMoreLoadingText" :no-more-text="loadMoreNoMoreText" :fail-text="loadMoreFailText" :theme-style="finalLoadingMoreThemeStyle" :is-chat="true" @clickMore="_handleLoadMore"/>
+      </view>
       <view>
         <template v-if="showLoadMore">
           <slot v-if="$slots['loadMore']" :loadMoreStatus="loadMoreStatus" name="loadMore" />
-          <z-paging-load-more v-else :status="loadMoreStatus" :default-text="loadMoreDefaultText" :loading-text="loadMoreLoadingText" :no-more-text="loadMoreNoMoreText" :fail-text="loadMoreFailText" @clickMore="_handleLoadMore"/>
+          <z-paging-load-more v-else :status="loadMoreStatus" :default-text="loadMoreDefaultText" :loading-text="loadMoreLoadingText" :no-more-text="loadMoreNoMoreText" :fail-text="loadMoreFailText" :theme-style="finalLoadingMoreThemeStyle" @clickMore="_handleLoadMore"/>
         </template>
       </view>
+      <!-- 这里微信小程序不支持component，但是如果直接使用view在web中无法显示下拉刷新，因此需要分开处理 -->
       <!-- #ifdef WEB -->
       <component :is="listItemIs" slot="refresher">
-        <view ref="zpxListRefresher" class="zpx-list-refresher" :style="{ width: contentWidth + 'px' }">
-          <slot v-if="$slots['refresher']" :refresherStatus="refresherStatus" name="refresher" />
-          <z-paging-refresher v-else ref="commonRefresher" :default-text="refresherDefaultText" :pulling-text="refresherPullingText" :refreshing-text="refresherRefreshingText" :complete-text="refresherCompleteText" :status="refresherStatus" :show-update-time="showRefresherUpdateTime" :update-time-key="refresherUpdateTimeKey" :time-text-timestamp="refresherTimeTextTimestamp"/>
-        </view>
-      </component>
       <!-- #endif -->
       <!-- #ifndef WEB -->
       <view slot="refresher">
+      <!-- #endif -->
         <view ref="zpxListRefresher" class="zpx-list-refresher" :style="{ width: contentWidth + 'px' }">
-          <slot v-if="$slots['refresher']" :refresherStatus="refresherStatus" name="refresher" />
-          <z-paging-refresher v-else ref="commonRefresher" :default-text="refresherDefaultText" :pulling-text="refresherPullingText" :refreshing-text="refresherRefreshingText" :complete-text="refresherCompleteText" :status="refresherStatus" :show-update-time="showRefresherUpdateTime" :update-time-key="refresherUpdateTimeKey" :time-text-timestamp="refresherTimeTextTimestamp"/>
+          <!-- 松手进入二楼状态且设置了slot=refresherF2时展示该slot -->
+          <slot v-if="$slots['refresherF2'] && isRefresherGoF2" name="refresherF2" />
+          <slot v-else-if="$slots['refresher']" :refresherStatus="refresherStatus" name="refresher" />
+          <z-paging-refresher v-else ref="commonRefresher" :default-text="refresherDefaultText" :pulling-text="refresherPullingText" :refreshing-text="refresherRefreshingText" :complete-text="refresherCompleteText" :go-f2-text="refresherGoF2Text" :status="refresherStatus" :show-update-time="showRefresherUpdateTime" :update-time-key="refresherUpdateTimeKey" :time-text-timestamp="refresherTimeTextTimestamp" :theme-style="finalRefresherThemeStyle" :default-img="refresherDefaultImg" :pulling-img="refresherPullingImg" :refreshing-img="refresherRefreshingImg" :complete-img="refresherCompleteImg" :refreshing-animated="refresherRefreshingAnimated" :img-style="refresherImgStyle" :title-style="refresherTitleStyle" :update-time-style="refresherUpdateTimeStyle"/>
         </view>
+      <!-- #ifdef WEB -->
+      </component>
+      <!-- #endif -->
+      <!-- #ifndef WEB -->
       </view>
       <!-- #endif -->
-      <view :class="showEmpty ? 'zpx-flex1' : ''">
+      <view :class="showEmpty ? 'zpx-flex1' : ''" :style="[chatRecordRotateStyle]">
         <template v-if="showEmpty">
+          <!-- #ifdef VUE3-VAPOR || WEB -->
+          <view class="zpx-empty-fill" :style="{ height: listHeight > 0 ? listHeight + 'px' : 'auto' }">
+          <!-- #endif -->
           <slot v-if="$slots['empty']" :isLoadFailed="isLoadFailed" name="empty" />
           <z-paging-x-empty v-else :empty-text="!isLoadFailed ? emptyText : emptyErrorText" :empty-img="!isLoadFailed ? emptyImg : emptyErrorImg" :is-load-failed="isLoadFailed" :show-empty-reload="isLoadFailed" @reload="reload"/>
+          <!-- #ifdef VUE3-VAPOR || WEB -->
+          </view>
+          <!-- #endif -->
         </template>
         <slot v-if="showLoading" name="loading" />
       </view>
     </scroll-view>
-    <!-- 底部固定的slot -->
-    <slot name="bottom" />
+    <!-- 底部固定的slot及其下方的安全区域/键盘占位，背景色由bottom-bg-color控制 -->
+    <view :style="[bottomContainerStyle]">
+      <slot name="bottom" />
+      <!-- 底部安全区域占位 -->
+      <view v-if="finalSafeAreaBottom > 0" :style="{ height: finalSafeAreaBottom + 'px' }" />
+      <!-- 聊天记录模式：键盘弹出时的占位，使slot=bottom(输入框)跟随键盘上移 -->
+      <view v-if="chatKeyboardPlaceholderHeight > 0" :style="{ height: chatKeyboardPlaceholderHeight + 'px' }" />
+    </view>
     <!-- 点击返回顶部view -->
     <view v-if="showBackToTopClass" :class="backToTopClass" :style="[backToTopStyle]" @click.stop="_onBackToTopClick">
       <slot v-if="$slots['backToTop']" name="backToTop" />
       <image v-else class="zpx-back-to-top-img" :src="backToTopImg.length > 0 ? backToTopImg : base64BackToTopImg" />
+    </view>
+    <!-- 二楼，覆盖在z-paging-x上方，通过translateY从顶部滑入/滑出 -->
+    <view v-if="showF2 && showRefresherF2" class="zpx-f2-content" :style="[f2Style]">
+      <slot name="f2" />
     </view>
   </view>
 </template>
@@ -147,7 +198,7 @@ by ZXLee
    *   }
    * }
    */
-  import { ref, computed, watch, onMounted, nextTick, useSlots } from 'vue'
+  import { ref, computed, watch, onMounted, onBeforeUnmount, nextTick, useSlots } from 'vue'
   import zPagingRefresher from './components/z-paging-refresher.uvue'
   import zPagingLoadMore from './components/z-paging-load-more.uvue'
   import zPagingXEmpty from '../z-paging-x-empty/z-paging-x-empty.uvue'
@@ -229,6 +280,46 @@ by ZXLee
       default: gc<string>('refresher-complete-text', '刷新完成')
     },
     /**
+     * @description 自定义继续下拉进入二楼状态下的文字
+     * @default 松手进入二楼
+     */
+    refresherGoF2Text: {
+      type: String,
+      default: gc<string>('refresher-go-f2-text', '松手进入二楼')
+    },
+    /**
+     * @description 是否开启下拉进入二楼功能
+     * @default false
+     */
+    refresherF2Enabled: {
+      type: Boolean,
+      default: gc<boolean>('refresher-f2-enabled', false)
+    },
+    /**
+     * @description 下拉进入二楼阈值，单位为px
+     * @default 100
+     */
+    refresherF2Threshold: {
+      type: Number,
+      default: gc<number>('refresher-f2-threshold', 100)
+    },
+    /**
+     * @description 下拉进入二楼动画时间，单位为毫秒
+     * @default 200
+     */
+    refresherF2Duration: {
+      type: Number,
+      default: gc<number>('refresher-f2-duration', 200)
+    },
+    /**
+     * @description 下拉进入二楼状态松手后是否弹出二楼(slot=f2)，设置为false时仅触发@refresherF2Change事件，由使用者自行处理
+     * @default true
+     */
+    showRefresherF2: {
+      type: Boolean,
+      default: gc<boolean>('show-refresher-f2', true)
+    },
+    /**
      * @description 自定义下拉刷新结束以后延迟回弹的时间，单位为毫秒
      * @default 0
      */
@@ -251,6 +342,91 @@ by ZXLee
     refresherBackground: {
       type: String,
       default: gc<string>('refresher-background', '#FFF')
+    },
+    /**
+     * @description loading(下拉刷新、上拉加载更多)的主题样式，支持black，white
+     * @default black
+     */
+    defaultThemeStyle: {
+      type: String,
+      default: gc<string>('default-theme-style', 'black')
+    },
+    /**
+     * @description 下拉刷新的主题样式，支持black，white，未设置时使用default-theme-style
+     * @default ''
+     */
+    refresherThemeStyle: {
+      type: String,
+      default: gc<string>('refresher-theme-style', '')
+    },
+    /**
+     * @description 自定义下拉刷新默认状态下的图片
+     * @default ''
+     */
+    refresherDefaultImg: {
+      type: String,
+      default: gc<string>('refresher-default-img', '')
+    },
+    /**
+     * @description 自定义下拉刷新松手立即刷新状态下的图片，默认与refresher-default-img一致
+     * @default ''
+     */
+    refresherPullingImg: {
+      type: String,
+      default: gc<string>('refresher-pulling-img', '')
+    },
+    /**
+     * @description 自定义下拉刷新刷新中状态下的图片
+     * @default ''
+     */
+    refresherRefreshingImg: {
+      type: String,
+      default: gc<string>('refresher-refreshing-img', '')
+    },
+    /**
+     * @description 自定义下拉刷新刷新结束状态下的图片
+     * @default ''
+     */
+    refresherCompleteImg: {
+      type: String,
+      default: gc<string>('refresher-complete-img', '')
+    },
+    /**
+     * @description 自定义下拉刷新刷新中状态下是否展示旋转动画
+     * @default true
+     */
+    refresherRefreshingAnimated: {
+      type: Boolean,
+      default: gc<boolean>('refresher-refreshing-animated', true)
+    },
+    /**
+     * @description 自定义下拉刷新中左侧图标的样式
+     */
+    refresherImgStyle: {
+      type: Object,
+      default: gc<object>('refresher-img-style', {})
+    },
+    /**
+     * @description 自定义下拉刷新中右侧状态描述文字的样式
+     */
+    refresherTitleStyle: {
+      type: Object,
+      default: gc<object>('refresher-title-style', {})
+    },
+    /**
+     * @description 自定义下拉刷新中右侧最后更新时间文字的样式(show-refresher-update-time为true时有效)
+     */
+    refresherUpdateTimeStyle: {
+      type: Object,
+      default: gc<object>('refresher-update-time-style', {})
+    },
+    /**
+     * @description 底部加载更多的主题样式，支持black，white，未设置时使用default-theme-style
+     * @default ''
+     */
+    loadingMoreThemeStyle: {
+      type: String,
+      default: gc<string>('loading-more-theme-style', '')
     },
     /**
      * @description 是否使用自定义的下拉刷新，设置为false即代表使用uni-app x自带的下拉刷新
@@ -429,41 +605,49 @@ by ZXLee
       default: gc<string>('list-is', 'scroll-view'),
     },
     /**
-     * @description list的id
-     * @default ''
-     */
+      * @description list的id
+      * @default ''
+      */
     listId: {
       type: String,
       default: gc<string>('list-id', ''),
     },
     /**
-     * @description 控制是否出现滚动条
-     * @default true
-     */
+      * @description 控制是否出现滚动条
+      * @default true
+      */
     showScrollbar: {
       type: Boolean,
       default: gc<boolean>('show-scrollbar', true),
     },
     /**
-     * @description 控制是否回弹效果
-     * @default true
-     */
+      * @description 控制是否回弹效果
+      * @default true
+      */
     rebound: {
       type: Boolean,
       default: gc<boolean>('rebound', true),
     },
     /**
-     * @description (子元素中使用)子元素是否开启嵌套滚动，将滚动事件与父元素协商处理
-     * @default true
-     */
+      * @description (子元素中使用)子元素是否开启嵌套滚动，将滚动事件与父元素协商处理
+      * @default true
+      */
     customNestedScroll: {
       type: Boolean,
       default: gc<boolean>('custom-nested-scroll', true),
     },
     /**
-     * @description (仅listIs = scroll-view有效，父元素中使用)是否与子元素开启滚动协商
-     * @default true
-     */
+      * @description (子元素中使用，仅App)关联的滚动容器，设置为nested-scroll-view后与外层滚动容器开启嵌套模式。蒸汽模式(Vapor)不支持nested-scroll滚动协商，需使用此属性替代custom-nested-scroll
+      * @default ''
+      */
+    associativeContainer: {
+      type: String,
+      default: gc<string>('associative-container', ''),
+    },
+    /**
+      * @description (仅listIs = scroll-view有效，父元素中使用)是否与子元素开启滚动协商
+      * @default true
+      */
     startNestedScroll: {
       type: Boolean,
       default: gc<boolean>('start-nested-scroll', true),
@@ -484,6 +668,78 @@ by ZXLee
       type: Boolean,
       default: gc<boolean>('layout-only', false),
     },
+    /**
+     * @description 是否开启底部安全区域适配，开启后在列表(及slot=bottom)下方自动添加底部安全区域占位
+     * @default false
+     */
+    safeAreaInsetBottom: {
+      type: Boolean,
+      default: gc<boolean>('safe-area-inset-bottom', false),
+    },
+    /**
+     * @description slot="bottom"容器(含底部安全区域及键盘占位)的背景色
+     * @default ''
+     */
+    bottomBgColor: {
+      type: String,
+      default: gc<string>('bottom-bg-color', ''),
+    },
+    /**
+     * @description 使用聊天记录模式。开启后列表倒置，数组第0项(最新消息)显示在底部，滚动到视觉顶部自动加载更多历史消息(通过@query，from为load-more)。complete传入的数据应为服务端返回的“新→旧”顺序。列表项需绑定@cellStyleChange回传的样式以倒置回正常方向
+     * @default false
+     */
+    useChatRecordMode: {
+      type: Boolean,
+      default: gc<boolean>('use-chat-record-mode', false),
+    },
+    /**
+     * @description 使用聊天记录模式时是否自动隐藏键盘：在用户触摸列表时自动隐藏键盘
+     * @default true
+     */
+    autoHideKeyboardWhenChat: {
+      type: Boolean,
+      default: gc<boolean>('auto-hide-keyboard-when-chat', true),
+    },
+    /**
+     * @description 使用聊天记录模式中键盘弹出时是否自动调整slot="bottom"高度(在其下方添加键盘高度的占位)，仅App
+     * @default true
+     */
+    autoAdjustPositionWhenChat: {
+      type: Boolean,
+      default: gc<boolean>('auto-adjust-position-when-chat', true),
+    },
+    /**
+     * @description 使用聊天记录模式中键盘弹出时占位高度偏移距离，单位px
+     * @default 0
+     */
+    chatAdjustPositionOffset: {
+      type: Number,
+      default: gc<number>('chat-adjust-position-offset', 0),
+    },
+    /**
+     * @description 使用聊天记录模式中键盘弹出时是否自动滚动到底部
+     * @default false
+     */
+    autoToBottomWhenChat: {
+      type: Boolean,
+      default: gc<boolean>('auto-to-bottom-when-chat', false),
+    },
+    /**
+     * @description 使用聊天记录模式中reload时是否显示chatLoading
+     * @default false
+     */
+    showChatLoadingWhenReload: {
+      type: Boolean,
+      default: gc<boolean>('show-chat-loading-when-reload', false),
+    },
+    /**
+     * @description 在聊天记录模式中滑动到顶部状态为默认状态时，以加载中的状态展示。若设置为false，则默认会显示【点击加载更多】，然后才会显示loading
+     * @default true
+     */
+    chatLoadingMoreDefaultAsLoading: {
+      type: Boolean,
+      default: gc<boolean>('chat-loading-more-default-as-loading', true),
+    },
   })
 
   const emit = defineEmits<{
@@ -497,11 +753,15 @@ by ZXLee
     (e: 'refresherrestore', event: RefresherEvent): void
     (e: 'refresherabort', event: RefresherEvent): void
     (e: 'onRefresh'): void
-    (e: 'Refresh'): void
+    (e: 'refresh'): void
     (e: 'scrolltolower', event: ScrollToLowerEvent): void
     (e: 'scrolltoupper', event: ScrollToUpperEvent): void
     (e: 'scroll', event: ScrollEvent): void
     (e: 'backToTopClick', callback: (toTop: boolean) => void): void
+    (e: 'keyboardHeightChange', height: number): void
+    (e: 'hidedKeyboard'): void
+    (e: 'cellStyleChange', cellStyle: UTSJSONObject): void
+    (e: 'refresherF2Change', type: string): void
   }>()
 
   const slots = useSlots()
@@ -537,6 +797,11 @@ by ZXLee
   const forceHideLoadMore = ref(false)
   // 内容宽度
   const contentWidth = ref(0)
+  // #ifdef VUE3-VAPOR || WEB
+  // 列表(list-view/scroll-view)可视高度，蒸汽模式及web端用于撑满空数据图容器，由UniResizeObserver监听列表尺寸变化自动更新
+  const listHeight = ref(0)
+  let listResizeObserver: UniResizeObserver | null = null
+  // #endif
 
   // 是否是加载中状态
   const isLoading = ref(true)
@@ -561,6 +826,25 @@ by ZXLee
   // z-paging-x内部判断的滚动是否有动画效果，-1代表采取默认状态，1代表有动画效果，0代表没有动画效果
   const privateScrollWithAnimation = ref(-1)
 
+  // 聊天记录模式：是否第一页就已经没有更多数据(此时不显示顶部加载更多)
+  const isFirstPageAndNoMore = ref(false)
+  // 聊天记录模式：键盘高度(含chatAdjustPositionOffset)，用于slot=bottom下方占位
+  const keyboardHeight = ref(0)
+  // 底部安全区域高度
+  const safeAreaBottom = ref(0)
+  // 二楼是否展示中
+  const showF2 = ref(false)
+  // 二楼的transform，通过translateY动画从顶部滑入/滑出
+  const f2Transform = ref('translateY(0px)')
+  // z-paging-x根节点高度，二楼高度与之一致
+  const contentHeight = ref(0)
+  // 二楼关闭动画结束后隐藏的定时器
+  let f2CloseTimer: number = -1
+  // #ifdef APP
+  // 键盘高度变化监听id，-1代表未监听
+  let keyboardListenerId: number = -1
+  // #endif
+
   const isFirstPage = computed((): boolean => {
     return pageNo.value === props.defaultPageNo;
   })
@@ -570,6 +854,26 @@ by ZXLee
       return 0
     }
     return props.refresherThreshold > 0 ? props.refresherThreshold : refresherNodeHeight.value > 0 ? refresherNodeHeight.value : 40
+  })
+  // 下拉最大拖拽距离：list-view默认为下拉刷新控件高度的2.5倍，开启下拉进入二楼时需保证能拖拽超过进入二楼阈值
+  const finalRefresherMaxDragDistance = computed((): number => {
+    const defaultDistance = finalRefresherThreshold.value * 2.5;
+    if (!props.refresherF2Enabled) {
+      return defaultDistance;
+    }
+    return Math.max(defaultDistance, props.refresherF2Threshold + 60);
+  })
+  // 是否处于松手进入二楼状态
+  const isRefresherGoF2 = computed((): boolean => {
+    return refresherStatus.value === Enum.Refresher.GoF2;
+  })
+  // 二楼样式
+  const f2Style = computed((): UTSJSONObject => {
+    return {
+      transform: f2Transform.value,
+      height: `${contentHeight.value}px`,
+      transitionDuration: `${props.refresherF2Duration}ms`
+    };
   })
   const showEmpty = computed((): boolean => {
     // layoutOnly时强制隐藏空数据图
@@ -586,11 +890,66 @@ by ZXLee
     return slots['loading'] != null && isLoading.value && totalData.value.length == 0
   })
   const showLoadMore = computed((): boolean => {
-    // layoutOnly时隐藏加载更多
-    if (props.layoutOnly) {
+    // layoutOnly时隐藏加载更多；聊天记录模式加载更多显示在顶部，不显示底部加载更多
+    if (props.layoutOnly || props.useChatRecordMode) {
       return false
     }
     return props.loadMoreEnabled && !forceHideLoadMore.value && (!isLoading.value || totalData.value.length > 0) && !showEmpty.value;
+  })
+  // 聊天记录模式：是否显示顶部加载更多(历史消息)
+  const showChatLoadMore = computed((): boolean => {
+    if (!props.useChatRecordMode || props.layoutOnly || !props.loadMoreEnabled || isFirstPageAndNoMore.value) {
+      return false
+    }
+    const hasData = totalData.value.length > 0
+    const notNoMoreOrHasSlot = loadMoreStatus.value !== Enum.More.NoMore || slots['chatNoMore'] != null
+    return totalData.value.length >= props.defaultPageSize && notNoMoreOrHasSlot && (hasData || (props.showChatLoadingWhenReload && showLoading.value));
+  })
+  // 聊天记录模式：是否没有更多历史消息
+  const isChatNoMore = computed((): boolean => {
+    return loadMoreStatus.value === Enum.More.NoMore;
+  })
+  // 聊天记录模式：顶部加载更多展示状态，默认状态按chatLoadingMoreDefaultAsLoading决定是否以加载中展示
+  const chatLoadMoreStatus = computed((): string => {
+    if (loadMoreStatus.value === Enum.More.Default && props.chatLoadingMoreDefaultAsLoading) {
+      return Enum.More.Loading;
+    }
+    return loadMoreStatus.value;
+  })
+  // 聊天记录模式：列表是否倒置。数据不满一页(第一页就没有更多)时不倒置，使消息从顶部开始排列
+  const isChatRecordModeAndInversion = computed((): boolean => {
+    return props.useChatRecordMode && !isFirstPageAndNoMore.value;
+  })
+  // 聊天记录模式：倒置样式，作用于列表本身，同时通过@cellStyleChange回传给使用者绑定到每个列表项上以倒置回来
+  const chatRecordRotateStyle = computed((): UTSJSONObject => {
+    return isChatRecordModeAndInversion.value ? { transform: 'scale(1, -1)' } : {};
+  })
+  // slot=bottom容器样式
+  const bottomContainerStyle = computed((): UTSJSONObject => {
+    return props.bottomBgColor.length > 0 ? { backgroundColor: props.bottomBgColor } : {};
+  })
+  // 聊天记录模式：键盘弹出时slot=bottom下方的占位高度
+  const chatKeyboardPlaceholderHeight = computed((): number => {
+    return props.useChatRecordMode && props.autoAdjustPositionWhenChat ? keyboardHeight.value : 0;
+  })
+  // 底部安全区域占位高度：键盘弹出时不再占位(Android键盘高度不含底部安全区域，仍需占位)
+  const finalSafeAreaBottom = computed((): number => {
+    if (!props.safeAreaInsetBottom) {
+      return 0;
+    }
+    let keyboardShowing = keyboardHeight.value > 0;
+    // #ifdef APP-ANDROID
+    keyboardShowing = false;
+    // #endif
+    return keyboardShowing ? 0 : safeAreaBottom.value;
+  })
+  // 下拉刷新最终主题样式，未单独设置时使用defaultThemeStyle
+  const finalRefresherThemeStyle = computed((): string => {
+    return props.refresherThemeStyle.length > 0 ? props.refresherThemeStyle : props.defaultThemeStyle;
+  })
+  // 底部加载更多最终主题样式，未单独设置时使用defaultThemeStyle
+  const finalLoadingMoreThemeStyle = computed((): string => {
+    return props.loadingMoreThemeStyle.length > 0 ? props.loadingMoreThemeStyle : props.defaultThemeStyle;
   })
   const finalScrollWithAnimation = computed((): boolean => {
     if (privateScrollWithAnimation.value != -1) {
@@ -618,6 +977,12 @@ by ZXLee
   watch(loadMoreStatus, (newVal: string) => {
     emit('loadMoreStatusChange', newVal);
   })
+  // 聊天记录模式：列表倒置状态变化时，将需要绑定到每个列表项上的样式回传给使用者
+  watch(isChatRecordModeAndInversion, (_: boolean) => {
+    if (props.useChatRecordMode) {
+      emit('cellStyleChange', chatRecordRotateStyle.value);
+    }
+  }, { immediate: true })
 
   //判断是否要显示返回顶部按钮
   const _checkShouldShowBackToTop = (scrollTopValue: number) => {
@@ -650,13 +1015,21 @@ by ZXLee
       scrollTop.value = y;
     })
   }
-  // 滚动到顶部
+  // 滚动到顶部(聊天记录模式列表倒置时，视觉顶部为物理底部)
   const scrollToTop = (animate: boolean) => {
+    if (isChatRecordModeAndInversion.value) {
+      scrollToY(99999999, animate);
+      return;
+    }
     scrollToY(0, animate);
     _checkShouldShowBackToTop(0);
   }
-  // 滚动到底部
+  // 滚动到底部(聊天记录模式列表倒置时，视觉底部为物理顶部)
   const scrollToBottom = (animate: boolean) => {
+    if (isChatRecordModeAndInversion.value) {
+      scrollToY(0, animate);
+      return;
+    }
     scrollToY(99999999, animate);
   }
   // emit query事件
@@ -699,7 +1072,8 @@ by ZXLee
     if (props.cleanListWhenReload) {
       totalData.value = [];
     }
-    if (props.scrollToTopWhenReload) {
+    // 聊天记录模式下reload后由complete滚动到底部(最新消息)，此处不滚动
+    if (props.scrollToTopWhenReload && !props.useChatRecordMode) {
       scrollToTop(false);
     }
     queryFrom.value = Enum.QueryFrom.Reload;
@@ -716,6 +1090,47 @@ by ZXLee
     isLoading.value = false;
   }
 
+  // 聊天记录模式：首屏数据渲染后滚动到底部，多次触发以避免list-item尚未渲染完毕导致位置不正确
+  const _chatScrollToBottomDelayed = () => {
+    nextTick(() => {
+      scrollToBottom(false);
+      setTimeout(() => {
+        scrollToBottom(false);
+        setTimeout(() => {
+          scrollToBottom(false);
+        }, 50)
+      }, 50)
+    })
+  }
+  // 聊天记录模式处理请求结果：数据保持服务端返回的“新→旧”顺序，列表倒置后第0项显示在底部；加载更多的历史消息拼接到数组末尾(视觉顶部)，因此不会引起当前可视区域跳动。
+  // 若第一页就没有更多数据(不满一页)，则列表不倒置，此时数组需反转为“旧→新”并滚动到底部，使消息从顶部开始排列(与z-paging一致)
+  const _chatComplete = (currentData: any[]) => {
+    if (isFirstPage.value) {
+      isFirstPageAndNoMore.value = loadMoreStatus.value === Enum.More.NoMore;
+      totalData.value = isFirstPageAndNoMore.value ? [...currentData].reverse() : currentData;
+      _chatScrollToBottomDelayed();
+      return;
+    }
+    totalData.value = totalData.value.concat(currentData);
+  }
+  // 聊天记录模式：添加聊天记录(显示在列表底部)。data可为单条或数组(数组按传入顺序从上到下展示)，toBottom为是否滚动到底部，toBottomWithAnimate为滚动到底部是否有动画
+  // 箭头函数不支持参数默认值(Kotlin限制)，此处使用function声明
+  function addChatRecordData(data: any, toBottom: boolean = true, toBottomWithAnimate: boolean = true) {
+    if (!props.useChatRecordMode) return;
+    const list: any[] = Array.isArray(data) ? (data as any[]) : [data];
+    if (isChatRecordModeAndInversion.value) {
+      // 列表倒置：新消息插入到数组头部，多条时反转以保证按传入顺序从上到下展示
+      totalData.value = [...list].reverse().concat(totalData.value);
+    } else {
+      // 列表未倒置(不满一页)：追加到数组末尾
+      totalData.value = totalData.value.concat(list);
+    }
+    if (toBottom) {
+      nextTick(() => {
+        scrollToBottom(toBottomWithAnimate);
+      })
+    }
+  }
   // 请求结束(成功)调用此方法，将请求的结果数组传递给z-paging-x处理
   const complete = (data: null | any[]) => {
     const finalData: any[] = data === null ? [] : data;
@@ -762,16 +1177,20 @@ by ZXLee
         loadMoreStatus.value = Enum.More.Default;
       }
     }
-    // 如果是第一页，则覆盖当前数据；如果是加载更多，则拼接数据
-    if (isFirstPage.value) {
-      totalData.value = currentData;
-      if (props.showRefresherUpdateTime) {
-        // 更新数据刷新时间
-        updateRefesrherTime(props.refresherUpdateTimeKey);
-        refresherTimeTextTimestamp.value = getTime();
-      }
+    if (props.useChatRecordMode) {
+      _chatComplete(currentData);
     } else {
-      totalData.value = totalData.value.concat(currentData);
+      // 如果是第一页，则覆盖当前数据；如果是加载更多，则拼接数据
+      if (isFirstPage.value) {
+        totalData.value = currentData;
+      } else {
+        totalData.value = totalData.value.concat(currentData);
+      }
+    }
+    if (isFirstPage.value && props.showRefresherUpdateTime) {
+      // 更新数据刷新时间
+      updateRefesrherTime(props.refresherUpdateTimeKey);
+      refresherTimeTextTimestamp.value = getTime();
     }
     nextTick(() => {
       setTimeout(() => {
@@ -779,6 +1198,30 @@ by ZXLee
       }, 100)
     })
   }
+  // 聊天记录模式：用户触摸列表时自动隐藏键盘
+  const _onListTouchstart = (_: UniTouchEvent) => {
+    if (props.useChatRecordMode && props.autoHideKeyboardWhenChat && keyboardHeight.value > 0) {
+      uni.hideKeyboard();
+      emit('hidedKeyboard');
+    }
+  }
+  // #ifdef APP
+  // 聊天记录模式：键盘高度变化
+  const _handleKeyboardHeightChange = (height: number) => {
+    emit('keyboardHeightChange', height);
+    if (props.autoAdjustPositionWhenChat) {
+      keyboardHeight.value = height > 0 ? height + props.chatAdjustPositionOffset : 0;
+    }
+    if (props.autoToBottomWhenChat && height > 0) {
+      nextTick(() => {
+        scrollToBottom(false);
+        setTimeout(() => {
+          scrollToBottom(false);
+        }, 50)
+      })
+    }
+  }
+  // #endif
   //【自行判断是否有更多数据】请求成功调用此方法，将请求的结果传递给z-paging-x处理，第一个参数为请求结果数组，第二个参数为是否没有更多数据
   const completeByNoMore = (data: null | any[], nomore: boolean) => {
     customNoMore.value = nomore == true ? 1 : 0;
@@ -810,9 +1253,10 @@ by ZXLee
     if (!isFirstPage.value) {
       loadMoreStatus.value = Enum.More.Fail;
     }
+    forceHideLoadMore.value = false;
     endRefresh();
   }
-  // 刷新列表数据，pageNo和pageSize不会重置，列表数据会重新从服务端获取
+  // 刷新列表数据，pageNo and pageSize不会重置，列表数据会重新从服务端获取
   // 调用此方法时会自动触发queryList，pageNo=1，pageSize=总条数（前N页的总量）
   // 刷新完成后继续滚动到底部，pageNo会继续累加
   const refresh = () => {
@@ -828,6 +1272,7 @@ by ZXLee
     pageNo.value = props.defaultPageNo;
     // 触发query事件，from为refresh
     queryFrom.value = Enum.QueryFrom.Refresh;
+    customNoMore.value = -1;
     _emitQuery(props.defaultPageNo, targetTotal);
   }
   // (仅listIs = scroll-view有效)子元素开始滚动时触发, return true表示与子元素开启滚动协商
@@ -842,10 +1287,59 @@ by ZXLee
   }
   // 下拉刷新控件被下拉事件
   const _onRefresherpulling = (e: RefresherEvent) => {
-    emit('refresherpulling', e.detail.dy);
+    const dy = e.detail.dy;
+    emit('refresherpulling', dy);
     if (!isLoading.value) {
-      refresherStatus.value = e.detail.dy < finalRefresherThreshold.value ? Enum.Refresher.Default : Enum.Refresher.ReleaseToRefresh;
+      if (dy < finalRefresherThreshold.value) {
+        refresherStatus.value = Enum.Refresher.Default;
+      } else if (props.refresherF2Enabled && dy >= props.refresherF2Threshold) {
+        // 开启了下拉进入二楼且下拉距离超过进入二楼阈值，则为松手进入二楼状态
+        refresherStatus.value = Enum.Refresher.GoF2;
+      } else {
+        refresherStatus.value = Enum.Refresher.ReleaseToRefresh;
+      }
     }
+  }
+  // 处理进入二楼
+  const _handleGoF2 = () => {
+    if (showF2.value || !props.refresherF2Enabled) return;
+    emit('refresherF2Change', 'go');
+    if (!props.showRefresherF2) return;
+    if (f2CloseTimer != -1) {
+      clearTimeout(f2CloseTimer);
+      f2CloseTimer = -1;
+    }
+    const zPagingXEle = zPagingX.value;
+    if (zPagingXEle === null) return;
+    // 二楼高度与z-paging-x根节点一致，先移出到顶部外，渲染后再滑入
+    zPagingXEle.getBoundingClientRectAsync()!.then((rect : DOMRect) => {
+      contentHeight.value = rect.height;
+      f2Transform.value = `translateY(-${rect.height}px)`;
+      showF2.value = true;
+      setTimeout(() => {
+        f2Transform.value = 'translateY(0px)';
+      }, 100)
+    })
+  }
+  // 处理退出二楼
+  const _handleCloseF2 = () => {
+    if (!showF2.value || !props.refresherF2Enabled) return;
+    emit('refresherF2Change', 'close');
+    if (!props.showRefresherF2) return;
+    f2Transform.value = `translateY(-${contentHeight.value}px)`;
+    // 滑出动画结束后再隐藏
+    f2CloseTimer = setTimeout(() => {
+      showF2.value = false;
+      f2CloseTimer = -1;
+    }, props.refresherF2Duration)
+  }
+  // 进入二楼
+  const goF2 = () => {
+    _handleGoF2();
+  }
+  // 关闭二楼
+  const closeF2 = () => {
+    _handleCloseF2();
   }
   // 处理用户下拉刷新
   const _handleRefresh = () => {
@@ -856,13 +1350,24 @@ by ZXLee
     refresherTriggered.value = true;
     pageNo.value = props.defaultPageNo;
     queryFrom.value = Enum.QueryFrom.UserPullDown;
+    customNoMore.value = -1;
     _emitQuery(pageNo.value, props.defaultPageSize);
   }
   // 下拉刷新被触发事件
   const _onRefresherrefresh = (e: RefresherEvent) => {
+    // 松手进入二楼状态下松手：进入二楼并结束下拉刷新，不触发刷新
+    if (refresherStatus.value === Enum.Refresher.GoF2) {
+      _handleGoF2();
+      // 需先置为true再置为false，list-view的refresher才会收回
+      refresherTriggered.value = true;
+      nextTick(() => {
+        endRefresh();
+      })
+      return;
+    }
     emit('refresherrefresh', e);
     emit('onRefresh');
-    emit('Refresh');
+    emit('refresh');
     _handleRefresh();
   }
   // 下拉刷新被复位事件
@@ -889,7 +1394,12 @@ by ZXLee
     queryFrom.value = Enum.QueryFrom.LoadMore;
     _emitQuery(pageNo.value, props.defaultPageSize);
   }
-  // 滚动到底部事件
+  // 聊天记录模式：手动触发滚动到顶部加载更多
+  const doChatRecordLoadMore = () => {
+    if (!props.useChatRecordMode) return;
+    _handleLoadMore();
+  }
+  // 滚动到底部事件(聊天记录模式列表倒置后，物理底部即视觉顶部，同样在此触发加载更多历史消息)
   const _onScrolltolower = (e: ScrollToLowerEvent) => {
     _handleLoadMore();
     emit('scrolltolower', e);
@@ -933,6 +1443,17 @@ by ZXLee
     if (props.layoutOnly) {
       endRefresh();
     }
+    if (props.safeAreaInsetBottom) {
+      safeAreaBottom.value = uni.getWindowInfo().safeAreaInsets.bottom;
+    }
+    // #ifdef APP
+    // 聊天记录模式监听键盘高度变化
+    if (props.useChatRecordMode) {
+      keyboardListenerId = uni.onKeyboardHeightChange((res: OnKeyboardHeightChangeCallbackResult) => {
+        _handleKeyboardHeightChange(res.height);
+      });
+    }
+    // #endif
     // 更新缓存的refresher高度
     nextTick(() => {
       if (props.refresherEnabled) {
@@ -951,8 +1472,43 @@ by ZXLee
           contentWidth.value = rect.width;
         })
       }
+
+      // #ifdef VUE3-VAPOR || WEB
+      // 监听列表尺寸变化，保证空数据图容器高度始终与列表可视高度一致
+      const listEle = zpxList.value;
+      if (listEle !== null) {
+        listEle.getBoundingClientRectAsync()!.then((rect : DOMRect) => {
+          listHeight.value = rect.height;
+        })
+        listResizeObserver = new UniResizeObserver((entries : Array<UniResizeObserverEntry>) => {
+          entries.forEach((entry : UniResizeObserverEntry) => {
+            listHeight.value = entry.contentRect.height;
+          })
+        })
+        listResizeObserver!.observe(listEle);
+      }
+      // #endif
     })
 
+  })
+
+  onBeforeUnmount(() => {
+    // #ifdef VUE3-VAPOR || WEB
+    if (listResizeObserver !== null) {
+      listResizeObserver!.disconnect();
+      listResizeObserver = null;
+    }
+    // #endif
+    // #ifdef APP
+    if (keyboardListenerId != -1) {
+      uni.offKeyboardHeightChange(keyboardListenerId);
+      keyboardListenerId = -1;
+    }
+    // #endif
+    if (f2CloseTimer != -1) {
+      clearTimeout(f2CloseTimer);
+      f2CloseTimer = -1;
+    }
   })
 
   defineExpose({
@@ -965,7 +1521,11 @@ by ZXLee
     endRefresh,
     scrollToTop,
     scrollToBottom,
-    scrollToY
+    scrollToY,
+    addChatRecordData,
+    doChatRecordLoadMore,
+    goF2,
+    closeF2
   })
 </script>
 

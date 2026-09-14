@@ -1,3 +1,17 @@
+## 1.0.1（2026-09-14）
+1.`新增` 适配蒸汽模式(Vapor)：全局配置`setZPXConfig`在蒸汽模式下生效；空数据图在蒸汽模式及web端正确铺满居中；修复蒸汽模式下下拉刷新箭头与loading动画失效的问题；移除蒸汽模式已废弃的`rebound`、`custom-nested-scroll`、`space`等属性的使用。  
+2.`新增` 聊天记录模式：props：`use-chat-record-mode`、`auto-hide-keyboard-when-chat`、`auto-adjust-position-when-chat`、`chat-adjust-position-offset`、`auto-to-bottom-when-chat`、`show-chat-loading-when-reload`、`chat-loading-more-default-as-loading`；方法：`addChatRecordData`、`doChatRecordLoadMore`；events：`@cellStyleChange`、`@keyboardHeightChange`、`@hidedKeyboard`；slots：`chatLoading`、`chatNoMore`。  
+3.`新增` props：`default-theme-style`、`refresher-theme-style`、`loading-more-theme-style`，支持black、white主题。  
+4.`新增` props：`refresher-default-img`、`refresher-pulling-img`、`refresher-refreshing-img`、`refresher-complete-img`、`refresher-refreshing-animated`，支持自定义下拉刷新各状态图片。  
+5.`新增` props：`refresher-img-style`、`refresher-title-style`、`refresher-update-time-style`，支持自定义下拉刷新图标及文字样式。  
+6.`新增` props：`safe-area-inset-bottom`、`bottom-bg-color`，支持底部安全区域适配及`slot="bottom"`容器背景色。  
+7.`新增` props：`associative-container`，蒸汽模式下用于替代`custom-nested-scroll`与外层滚动容器开启嵌套模式。  
+8.`新增` 下拉进入二楼：props：`refresher-f2-enabled`、`refresher-f2-threshold`、`refresher-f2-duration`、`show-refresher-f2`、`refresher-go-f2-text`；方法：`goF2`、`closeF2`；events：`@refresherF2Change`；slots：`f2`、`refresherF2`。  
+9.`新增` demo：`chat-demo`聊天记录模式演示、`f2-demo`下拉进入二楼演示。  
+10.`优化` 下拉刷新箭头、成功图标及loading改为svg绘制，颜色随主题变化。  
+11.`优化` demo全部改为组合式API写法，移除`common-setup-demo`。  
+12.`优化` 底部加载更多在没有内容时不再渲染，修复web端列表底部多出空白的问题。  
+13.`优化` 事件`@refresh`与`@onRefresh`等价，修复蒸汽模式下事件名大小写警告。
 ## 0.4.0（2026-06-11）
 1.`新增` props：`refresher-complete-text`、`refresher-complete-delay`、`refresher-complete-duration`，支持下拉刷新结束状态(complete状态)。  
 2.`新增` props：`layout-only`，是否只使用基础布局，设置为true后将关闭mounted自动请求数据、关闭下拉刷新和滚动到底部加载更多，强制隐藏空数据图。  

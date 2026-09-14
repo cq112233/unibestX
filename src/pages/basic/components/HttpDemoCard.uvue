@@ -15,7 +15,7 @@
             <text class="text-[12px] font-bold text-[#0f766e]">UC</text>
           </view>
           <view>
-            <text class="text-[14px] font-bold text-[#1e293b]">uniCloud 云对象</text>
+            <text class="text-[14px] font-bold" :style="{ color: 'var(--text-color, #1e293b)' }">uniCloud 云对象</text>
             <text class="text-[11px] text-[#64748b] mt-[2px]">user.getUserInfo</text>
           </view>
         </view>
@@ -38,7 +38,7 @@
 
           <view v-if="hasCloudError" class="mt-[10px] flex-row">
             <view class="h-[32px] px-[12px] rounded-[6px] bg-[#0f766e] items-center justify-center" @click="getUserInfo">
-              <text class="text-[12px] text-white">重新获取</text>
+              <text class="text-[12px] text-[#ffffff]">重新获取</text>
             </view>
           </view>
         </view>
@@ -47,12 +47,12 @@
 
     <!-- Mock 数据区域 -->
     <view class="mb-[16px]">
-      <text class="text-[14px] font-bold text-[#2d3748] mb-[10px]">Mock 数据列表（ID 为任意类型）</text>
+      <text class="text-[14px] font-bold mb-[10px]" :style="{ color: 'var(--text-color, #2d3748)' }">Mock 数据列表（ID 为任意类型）</text>
       <view v-for="(item, index) in mockList" :key="index" class="flex-row items-center py-[10px] px-[12px] bg-[#f1f5f9] rounded-[8px] mt-[8px]">
         <view class="w-[28px] h-[28px] rounded-[14px] bg-[#3182ce] justify-center items-center mr-[10px]">
-          <text class="text-[12px] text-white font-bold">{{ item.id }}</text>
+          <text class="text-[12px] text-[#ffffff] font-bold">{{ item.id }}</text>
         </view>
-        <text class="text-[14px] text-[#334155]">{{ item.name }}</text>
+        <text class="text-[14px]" :style="{ color: 'var(--text-color, #334155)' }">{{ item.name }}</text>
       </view>
     </view>
 
@@ -64,8 +64,12 @@
           <text class="text-[12px]" :class="statusTextClass">{{ statusText }}</text>
         </view>
       </view>
-      <view v-if="hasResponseData" class="bg-white rounded-[8px] p-[10px] border-[1px] border-solid border-[#e2e8f0]">
-        <text class="text-[12px] text-[#475569]">{{ responseText }}</text>
+      <view
+        v-if="hasResponseData"
+        class="rounded-[8px] p-[10px] border-[1px] border-solid"
+        :style="{ backgroundColor: 'var(--card-bg, #ffffff)', borderColor: 'var(--border-color, #e2e8f0)' }"
+      >
+        <text class="text-[12px]" :style="{ color: 'var(--text-secondary, #475569)' }">{{ responseText }}</text>
       </view>
       <view v-if="hasErrorMsg" class="bg-[#fff5f5] rounded-[8px] p-[10px] border-[1px] border-solid border-[#fecaca] mt-[6px]">
         <text class="text-[12px] text-[#ef4444]">错误：{{ errorMsg }}</text>
@@ -121,7 +125,10 @@
           <text v-else-if="hasUploadError" class="text-[12px] text-[#dc2626]">{{ uploadError }}</text>
           <view v-else-if="hasUploadResult">
             <!-- 上：图片居中预览（支持点击放大） -->
-            <view class="items-center justify-center py-[10px] bg-white rounded-[8px] border-[1px] border-solid border-[#e2e8f0]">
+            <view
+              class="items-center justify-center py-[10px] rounded-[8px] border-[1px] border-solid"
+              :style="{ backgroundColor: 'var(--card-bg, #ffffff)', borderColor: 'var(--border-color, #e2e8f0)' }"
+            >
               <image
                 :src="uploadResultText"
                 class="w-[120px] h-[120px] rounded-[8px]"
@@ -132,21 +139,25 @@
             </view>
 
             <!-- 下：OSS 链接美化展示卡片（支持一键复制） -->
-            <view class="mt-[10px] p-[10px] bg-[#f8fafc] rounded-[8px] border-[1px] border-solid border-[#e2e8f0]">
+            <view
+              class="mt-[10px] p-[10px] rounded-[8px] border-[1px] border-solid"
+              :style="{ backgroundColor: 'var(--bg-color, #f8fafc)', borderColor: 'var(--border-color, #e2e8f0)' }"
+            >
               <view class="flex-row items-center justify-between mb-[6px]">
                 <view class="flex-row items-center">
                   <view class="w-[3px] h-[12px] bg-[#f97316] rounded-[2px] mr-[6px]" />
-                  <text class="text-[11px] font-bold text-[#475569]">OSS 链接地址</text>
+                  <text class="text-[11px] font-bold" :style="{ color: 'var(--text-color, #475569)' }">OSS 链接地址</text>
                 </view>
                 <view
                   class="px-[8px] py-[3px] rounded-[4px] bg-[#ea580c] flex-row items-center"
                   @click="copyUploadUrl"
                 >
-                  <text class="text-[10px] text-white font-medium">复制链接</text>
+                  <text class="text-[10px] text-[#ffffff] font-medium">复制链接</text>
                 </view>
               </view>
               <text
-                class="oss-url-text text-[11px] text-[#334155] leading-[18px]"
+                class="oss-url-text text-[11px] leading-[18px]"
+                :style="{ color: 'var(--text-color, #334155)' }"
                 :selectable="true"
               >
                 {{ uploadResultText }}
@@ -175,6 +186,7 @@ import Card from './Card.uvue';
 import { foo, FOO_UPLOAD_PATH, getFooList, uploadFooFile } from '@/src/api/foo';
 import type { IFoo } from '@/src/api/foo';
 import { DEFAULT_OSS_BASE_URL } from '@/src/utils/upload';
+import { toast, toastSuccess } from '@/src/utils/toast.uts';
 
 // ==========================================
 // 响应式状态
@@ -368,10 +380,7 @@ async function getUserInfo() {
 async function uploadFileByPath(filePath: string) {
   if (DEFAULT_OSS_BASE_URL == '' || DEFAULT_OSS_BASE_URL.includes('xxx') || uploadPath.value == '' || uploadPath.value.includes('xxx')) {
     uploadError.value = '请在对应环境的 .env 文件中配置真实的 VITE_UPLOAD_BASEURL 与 VITE_UPLOAD_PATH';
-    uni.showToast({
-      title: '请先在 .env 中配置真实上传地址',
-      icon: 'none'
-    });
+    toast('请先在 .env 中配置真实上传地址');
     return;
   }
   uploadLoading.value = true;
@@ -442,7 +451,7 @@ function copyUploadUrl() {
     data: url,
     showToast: false,
     success: () => {
-      uni.showToast({ title: '链接已复制', icon: 'success' });
+      toastSuccess('链接已复制');
     }
   });
 }

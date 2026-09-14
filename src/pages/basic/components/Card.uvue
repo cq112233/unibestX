@@ -8,7 +8,10 @@
   >
     <!-- 标题区域 -->
     <view class="flex flex-row items-center mb-[16px]">
-      <view class="w-[4px] h-[16px] bg-[#3182ce] rounded-[2px] mr-[8px]" />
+      <view
+        class="w-[4px] h-[16px] rounded-[2px] mr-[8px]"
+        :style="{ backgroundColor: 'var(--theme-color, #3182ce)' }"
+      />
       <slot name="title">
         <text class="text-[16px] font-bold" :style="{ color: 'var(--text-color, #2d3748)' }">{{ title }}</text>
       </slot>

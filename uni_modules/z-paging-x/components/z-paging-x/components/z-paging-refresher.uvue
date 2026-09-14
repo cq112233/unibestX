@@ -1,19 +1,20 @@
 <!-- [z-paging-x]下拉刷新view -->
 <template name="z-paging-refresher">
   <view class="zpx-r-container" :style="{height: showUpdateTime ? '60px' : '40px'}">
-    <z-paging-loading v-if="isLoading"/>
-    <image v-else class="zpx-r-image" :class="getLeftImageClass" :src="getLeftImageSrc" />
+    <!-- 箭头旋转通过内联style设置transform触发transition(蒸汽模式下通过切换class触发transition不可靠) -->
+    <z-paging-loading v-if="isLoading" :color="indicatorColor" :src="refreshingImg" :animated="refreshingAnimated" :img-style="imgStyle" />
+    <image v-else class="zpx-r-image" :style="[{ transform: getLeftImageTransform }, imgStyle]" :src="getLeftImageSrc" />
     <view class="zpx-r-text-container" :style="{marginLeft: showRefresherTimeText ? '25rpx' : '10rpx'}">
-      <text class="zpx-r-text">{{statusText}}</text>
-      <text v-if="showRefresherTimeText" class="zpx-r-text zpx-r-time-text">
+      <text class="zpx-r-text" :style="[{ color: titleColor }, titleStyle]">{{statusText}}</text>
+      <text v-if="showRefresherTimeText" class="zpx-r-text zpx-r-time-text" :style="[{ color: titleColor }, updateTimeStyle]">
         {{refresherTimeText}}
       </text>
     </view>
   </view>
 </template>
 <script setup lang="uts">
-  import { ref, computed } from 'vue'
-  import { base64Arrow, base64Flower, base64Success } from '../static/index.uts'
+  import { computed } from 'vue'
+  import { getArrowSvg, getSuccessSvg } from '../static/index.uts'
   import zPagingLoading from '../components/z-paging-loading.uvue'
   import Enum from '../enums/index.uts'
   import { getRefesrherFormatTimeByKey } from '../utils/index.uts'
@@ -48,6 +49,11 @@
       type: String,
       default: '刷新完成'
     },
+    // 自定义继续下拉进入二楼状态下的文字
+    goF2Text: {
+      type: String,
+      default: '松手进入二楼'
+    },
     // 是否显示最后更新时间，默认为否
     showUpdateTime: {
       type: Boolean,
@@ -63,11 +69,76 @@
       type: Number,
       default: 0
     },
+    // 主题样式，支持black，white
+    themeStyle: {
+      type: String,
+      default: 'black'
+    },
+    // 自定义默认状态下的图片
+    defaultImg: {
+      type: String,
+      default: ''
+    },
+    // 自定义松手立即刷新状态下的图片，默认与defaultImg一致
+    pullingImg: {
+      type: String,
+      default: ''
+    },
+    // 自定义刷新中状态下的图片
+    refreshingImg: {
+      type: String,
+      default: ''
+    },
+    // 自定义刷新结束状态下的图片
+    completeImg: {
+      type: String,
+      default: ''
+    },
+    // 刷新中状态下是否展示旋转动画
+    refreshingAnimated: {
+      type: Boolean,
+      default: true
+    },
+    // 左侧图标的样式
+    imgStyle: {
+      type: Object,
+      default: (): UTSJSONObject => ({})
+    },
+    // 右侧状态描述文字的样式
+    titleStyle: {
+      type: Object,
+      default: (): UTSJSONObject => ({})
+    },
+    // 右侧最后更新时间文字的样式
+    updateTimeStyle: {
+      type: Object,
+      default: (): UTSJSONObject => ({})
+    },
   })
 
-  const base64ArrowImg = ref(base64Arrow)
-  const base64FlowerImg = ref(base64Flower)
-  const base64SuccessImg = ref(base64Success)
+  // 与z-paging的zTheme保持一致
+  const isWhiteTheme = computed((): boolean => {
+    return props.themeStyle === 'white';
+  })
+  // 箭头、成功图标颜色
+  const iconColor = computed((): string => {
+    return isWhiteTheme.value ? '#ffffff' : '#515151';
+  })
+  // loading颜色
+  const indicatorColor = computed((): string => {
+    return isWhiteTheme.value ? '#ffffff' : '#949494';
+  })
+  // 文字颜色
+  const titleColor = computed((): string => {
+    return isWhiteTheme.value ? '#efefef' : '#555555';
+  })
+
+  const arrowSvg = computed((): string => {
+    return getArrowSvg(iconColor.value);
+  })
+  const successSvg = computed((): string => {
+    return getSuccessSvg(iconColor.value);
+  })
 
   const isDefault = computed((): boolean => {
     return props.status === Enum.Refresher.Default;
@@ -81,30 +152,28 @@
   const isComplete = computed((): boolean => {
     return props.status === Enum.Refresher.Complete;
   })
-
-  // 获取左侧图片样式class
-  const getLeftImageClass = computed((): string => {
-    if (isDefault.value) {
-      return 'zpx-r-arrow-down';
-    } else if (isReleaseToRefresh.value) {
-      return 'zpx-r-arrow-top';
-    }
-    // complete和loading状态不需要额外class
-    return '';
+  const isGoF2 = computed((): boolean => {
+    return props.status === Enum.Refresher.GoF2;
   })
 
-  // 获取左侧图片src
-  const getLeftImageSrc = computed((): string => {
+  // 获取左侧图片的transform：默认状态箭头(原图向上)旋转180度朝下，松手刷新状态恢复朝上
+  const getLeftImageTransform = computed((): string => {
     if (isDefault.value) {
-      return base64ArrowImg.value;
-    } else if (isReleaseToRefresh.value) {
-      return base64ArrowImg.value;
-    } else if (isLoading.value) {
-      return base64FlowerImg.value;
-    } else if (isComplete.value) {
-      return base64SuccessImg.value;
+      return 'rotate(180deg)';
     }
-    return base64ArrowImg.value;
+    // release-to-refresh/complete/go-f2状态不旋转
+    return 'rotate(0deg)';
+  })
+
+  // 获取左侧图片src，优先使用自定义图片
+  const getLeftImageSrc = computed((): string => {
+    if (isComplete.value) {
+      return props.completeImg.length > 0 ? props.completeImg : successSvg.value;
+    }
+    if (isReleaseToRefresh.value && props.pullingImg.length > 0) {
+      return props.pullingImg;
+    }
+    return props.defaultImg.length > 0 ? props.defaultImg : arrowSvg.value;
   })
 
   // 状态文字
@@ -117,6 +186,8 @@
       return props.refreshingText;
     } else if (isComplete.value) {
       return props.completeText;
+    } else if (isGoF2.value) {
+      return props.goF2Text;
     } else {
       return '';
     }
@@ -142,17 +213,10 @@
   .zpx-r-image {
     width: 34rpx;
     height: 34rpx;
-    transition-duration: .2s;
+    /* transform由模板内联style设置，初始值需写在transition-property之前，避免初始渲染触发过渡 */
+    transform: rotate(0deg);
     transition-property: transform;
-    transform: rotate(0deg);
-  }
-
-  .zpx-r-arrow-top {
-    transform: rotate(0deg);
-  }
-
-  .zpx-r-arrow-down {
-    transform: rotate(180deg);
+    transition-duration: .2s;
   }
 
   .zpx-r-text-container {
@@ -161,7 +225,6 @@
   }
 
   .zpx-r-text {
-    color: grey;
     font-size: 28rpx;
   }
 

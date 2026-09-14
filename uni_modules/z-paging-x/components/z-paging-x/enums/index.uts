@@ -10,6 +10,7 @@ type Refresher = {
   ReleaseToRefresh: string;
   Loading: string;
   Complete: string;
+  GoF2: string;
 }
 
 type More = {
@@ -45,12 +46,13 @@ export default {
     Refresher: 'refresher',
     LoadMore: 'load-more'
   },
-  // 下拉刷新状态 default:默认状态 release-to-refresh:松手立即刷新 loading:刷新中 complete:刷新结束
+  // 下拉刷新状态 default:默认状态 release-to-refresh:松手立即刷新 loading:刷新中 complete:刷新结束 go-f2:松手进入二楼
   Refresher: {
     Default: 'default',
     ReleaseToRefresh: 'release-to-refresh',
     Loading: 'loading',
     Complete: 'complete',
+    GoF2: 'go-f2',
   },
   // 底部加载更多状态 default:默认状态 loading:加载中 no-more:没有更多数据 fail:加载失败
   More: {

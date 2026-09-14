@@ -8,6 +8,11 @@
   flex: 1;
 }
 
+/* (蒸汽模式、web端)空数据图容器，高度由UniResizeObserver监听的列表高度决定，见z-paging-x.uvue */
+.zpx-empty-fill {
+  width: 100%;
+}
+
 .zpx-back-to-top {
   width: 76rpx;
   height: 76rpx;
@@ -31,4 +36,15 @@
   width: 100%;
   height: 100%;
   z-index: 999;
+}
+/* 二楼容器，覆盖在z-paging-x上方，高度与z-paging-x一致，transform由脚本控制 */
+.zpx-f2-content {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background-color: white;
+  transition-property: transform;
+  transition-timing-function: linear;
 }

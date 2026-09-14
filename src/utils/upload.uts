@@ -1,4 +1,5 @@
 import { useTokenStore } from '../store/token';
+import { getOssBaseUrl, getOssUploadPath, getOssUploadUrl } from './env.uts';
 
 // ==========================================
 // 类型定义
@@ -16,12 +17,9 @@ export type UploadFileOptions = {
 /**
  * 默认 OSS 上传基础域名与接口路径（支持直接在 .env 中配置 VITE_UPLOAD_BASEURL 与 VITE_UPLOAD_PATH）
  */
-const DEFAULT_FALLBACK_BASE_URL: string = 'https://xxx.com';
-const DEFAULT_FALLBACK_UPLOAD_PATH: string = '/gateway/user/sys/oss/upload/xxx';
-
-export const DEFAULT_OSS_BASE_URL: string = `${import.meta.env.VITE_UPLOAD_BASEURL ?? DEFAULT_FALLBACK_BASE_URL}`;
-export const DEFAULT_OSS_UPLOAD_PATH: string = `${import.meta.env.VITE_UPLOAD_PATH ?? DEFAULT_FALLBACK_UPLOAD_PATH}`;
-export const DEFAULT_OSS_UPLOAD_URL: string = `${DEFAULT_OSS_BASE_URL}${DEFAULT_OSS_UPLOAD_PATH}`;
+export const DEFAULT_OSS_BASE_URL: string = getOssBaseUrl();
+export const DEFAULT_OSS_UPLOAD_PATH: string = getOssUploadPath();
+export const DEFAULT_OSS_UPLOAD_URL: string = getOssUploadUrl();
 
 /**
  * 使用 uni.uploadFile 统一封装的文件上传函数（App / 小程序 / H5 全端通用）
@@ -192,3 +190,46 @@ function parseUploadResult(raw: string): string {
 
   return trimmed;
 }
+
+// ==========================================
+// 上传工具聚合类（全端一目了然速查与单例）
+// ==========================================
+
+/**
+ * 文件上传工具聚合类
+ *
+ * 集中呈现文件上传相关方法，一目了然；同时支持面向对象式 `upload.xxx()` 调用。
+ *
+ * @example
+ * ```uts
+ * // 方式 1：标准具名导入
+ * import { uploadFile, uploadOssFile } from '@/src/utils/upload.uts';
+ *
+ * // 方式 2：对象单例导入（一目了然）
+ * import { upload } from '@/src/utils/upload.uts';
+ * upload.uploadOssFile(filePath);
+ * ```
+ */
+export class UploadUtils {
+  /** 使用 uni.uploadFile 统一封装的文件上传函数（App / 小程序 / H5 全端通用） */
+  uploadFile(options: UploadFileOptions): Promise<string> {
+    return uploadFile(options);
+  }
+
+  /** 上传 OSS 文件快捷函数 */
+  uploadOssFile(
+    filePath: string,
+    formData: UTSJSONObject | null = null,
+    ignoreAuth: boolean = false
+  ): Promise<string> {
+    return uploadOssFile(filePath, formData, ignoreAuth);
+  }
+}
+
+/** 上传工具全局单例 */
+export const upload = new UploadUtils();
+
+/** 别名导出 */
+export const uploadUtils = upload;
+
+export default upload;
