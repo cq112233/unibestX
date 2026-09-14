@@ -1,0 +1,192 @@
+<template>
+  <view class="flex flex-col items-center flex-1 px-[16px] pt-[8px]">
+    <!-- 输出不断变长，用内部 scroll-view 承载，避免撑破页面 -->
+    <scroll-view direction="vertical" class="w-full flex flex-col flex-1" :style="{ maxWidth: '520px' }">
+      <!-- w-full 必需：根容器是 items-center，不拉伸子元素；不给宽度 Card 会按内容宽度收缩，文字失去换行依据而横向溢出 -->
+      <view class="w-full flex flex-col">
+        <Card title="rxjs 流式演示">
+          <text class="text-[12px] text-[#64748b] leading-[19px] mb-[12px]">
+            点击按钮，数据分块到达 → scan 累积成完整 Markdown → 实时解析渲染。
+          </text>
+
+          <view class="w-full rounded-[8px] bg-[#ffffff] border-[1px] border-solid border-[#e2e8f0] p-[12px] min-h-[110px] flex-col">
+            <text class="text-[10px] text-[#94a3b8] mb-[8px]">流式输出（Markdown）</text>
+            <text v-if="streamTextEmpty" class="text-[12px] text-[#64748b]">还没开始…</text>
+            <view v-else class="flex-col">
+              <MpHtml :content="streamHtml" />
+            </view>
+          </view>
+
+          <view
+            class="bg-[#7c3aed] rounded-[8px] h-[42px] w-full flex flex-row items-center justify-center mt-[12px]"
+            @click="start"
+          >
+            <text class="text-[#ffffff] text-[14px]">开始流式接收</text>
+          </view>
+        </Card>
+      </view>
+    </scroll-view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed, onUnmounted, ref, watch } from 'vue';
+import Card from '@/src/pages/basic/components/Card.uvue';
+import { simulateStream } from '@/src/http/stream.uts';
+import type { StreamChunk } from '@/src/http/stream.uts';
+import type { Subscription } from '@/src/utils/rxjs-lite.uts';
+import { scan } from '@/src/utils/rxjs-lite.uts';
+// 渲染链路：kux-marked（UTS 版 marked）解析 → mp-html.uvue 原生渲染。
+// MpHtml 显式写全路径，绕开 easycom 里 zero-markdown-view 自带的同名 mp-html.vue。
+// marked 刻意 import common 实现而非包根：包根在安卓端会拉 JSReg3.jar 导致编译中断，见 skill 1.3.10。
+import MpHtml from '@/uni_modules/mp-html/components/mp-html/mp-html.uvue';
+import { useMarked } from '@/uni_modules/kux-marked/common/marked.uts';
+import type { I_Marked, TokensList } from '@/uni_modules/kux-marked/utssdk/interface.uts';
+
+definePage({
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  style: {
+    navigationBarTitleText: 'rxjs 流式演示',
+    navigationStyle: 'custom'
+  }
+});
+
+// ==========================================
+// 常量
+// ==========================================
+/**
+ * 分块吐出的演示文本（Markdown 源文）。
+ * 覆盖中文、行内格式、列表、引用、表格、图片、视频、代码块与 HTML 实体。
+ */
+const DEMO_TEXT: string = '## 流式 Markdown 渲染\n'
+  + '\n'
+  + '数据被切成小块陆续到达，**每到达一块就立即重新解析并渲染**，这就是 AI 对话「打字机效果」的底层原理。\n'
+  + '\n'
+  // 六级标题：确认 6 级字号层级（px 单位，原生端不支持 em，见 skill 1.2.13）
+  + '# 一级标题\n'
+  + '## 二级标题\n'
+  + '### 三级标题\n'
+  + '#### 四级标题\n'
+  + '##### 五级标题\n'
+  + '###### 六级标题\n'
+  + '\n'
+  // 行内格式：粗斜体靠 chainClass 沿行内元素链累加才能保住两层效果
+  + '**加粗**、*斜体*、***粗斜体***、~~删除线~~、`行内代码`，还有[一条链接](https://doc.dcloud.net.cn/uni-app-x/)。\n'
+  + '\n'
+  + '### 关键角色\n'
+  + '\n'
+  + '- `Observable`：把分块到达的数据抽象成流\n'
+  + '- `scan`：在流上做累积，把碎片拼成完整文本\n'
+  + '- `unsubscribe`：取消订阅，停止接收\n'
+  + '\n'
+  + '1. 数据分块到达\n'
+  + '2. 累积成完整文本\n'
+  + '3. 解析成 HTML 并渲染\n'
+  + '\n'
+  + '> uni-app X 的 App 端没有 JS 引擎，\n'
+  + '> 所以这里的 rxjs 与 markdown 解析器都是 UTS 实现。\n'
+  + '>\n'
+  // 引用里的第二段：验证块级容器能摊平多段
+  + '> 流式场景下，每到达一块都要重新解析一次全文。\n'
+  + '\n'
+  + '### 三个阶段\n'
+  + '\n'
+  // 表格：每格都用短词（原生端无 word-break，长英文 token 会顶宽整列，见 skill 1.2.12）；分隔行覆盖三种对齐写法
+  + '| 阶段 | 作用 | 实现 |\n'
+  + '| :--- | :---: | ---: |\n'
+  + '| 数据源 | 模拟分块到达 | 本地模拟流 |\n'
+  + '| 累积 | 碎片拼成全文 | scan |\n'
+  + '| 渲染 | 文档转成视图 | marked |\n'
+  + '\n'
+  + '```ts\n'
+  + 'const sub = stream\n'
+  + '  .pipe(scan((acc, c) => acc + c.text, \'\'))\n'
+  + '  .subscribe((markdown) => { render(markdown); });\n'
+  + '```\n'
+  + '\n'
+  // 第二个围栏换 json：字符串 / 数字 / 布尔三类着色都用得上
+  + '```json\n'
+  + '{ "name": "unibestX", "steam": true, "stars": 1024 }\n'
+  + '```\n'
+  + '\n'
+  + '![unibestX logo](/static/logo.png)\n'
+  + '\n'
+  // 视频：原生 <video> 标签，由 mp-html.uvue 的 video 分支渲染。
+  // DCloud 示例视频（远程 URL，static 里没有视频素材）；不写 autoplay —— 安卓不允许无用户手势的自动播放。
+  + '<video src="https://qiniu-web-assets.dcloud.net.cn/unidoc/zh/2minute-demo.mp4" controls></video>\n'
+  + '\n'
+  // HTML 实体：&amp; 需要解码、&nbsp; 不该被折叠掉、&deg; / &copy; 是命名符号
+  + '实体解码：AT&amp;T、1&nbsp;000、10&deg;C、&copy; 2026\n'
+  + '\n'
+  // 行尾两个空格 = 硬换行（<br>），验证模板 br 分支输出的是真换行
+  + '第一行（行尾有两个空格）  \n'
+  + '第二行\n'
+  + '\n'
+  + '***\n'
+  + '\n'
+  + '全文就是这样一块一块拼出来的。\n';
+
+// ==========================================
+// 状态
+// ==========================================
+const streamText = ref<string>('');
+const streamHtml = ref<string>('');
+
+/** 当前订阅（非响应式，仅用于取消） */
+let streamSub: Subscription | null = null;
+
+// ==========================================
+// Markdown 渲染
+// ==========================================
+const markdownRenderer: I_Marked = useMarked();
+
+/**
+ * 累积文本 → HTML。
+ * 走 lexer + parser 而非 parse()：前者同步，后者返回 string | Promise<string>，
+ * 同步解析才能保证打字机效果不会因 Promise 竞态而乱序。
+ */
+watch(streamText, (text: string): void => {
+  const tokens: TokensList = markdownRenderer.lexer(text, null);
+  streamHtml.value = markdownRenderer.parser(tokens.tokens, null);
+});
+
+const streamTextEmpty = computed((): boolean => {
+  return streamText.value.length == 0;
+});
+
+// ==========================================
+// 流式接收
+// ==========================================
+// 不能叫 stop：Vue 的 @vue/reactivity 全局导出了 stop(runner: ReactiveEffectRunner)，
+// 同名局部函数会被解析成 Vue 那个，Kotlin 端报「No value passed for parameter 'runner'」。
+// 且必须定义在 start() 之前：script setup 里的函数是局部函数，Kotlin 局部声明不提升，
+// 先调用后定义会报 error18 找不到名称。
+function stopStream(): void {
+  const sub = streamSub;
+  if (sub != null) {
+    sub.unsubscribe();
+    streamSub = null;
+  }
+}
+
+/** 开始接收：先取消上一次订阅，避免两个流同时写入界面 */
+function start(): void {
+  stopStream();
+  streamText.value = '';
+  streamSub = simulateStream(DEMO_TEXT, 6, 90)
+    .pipe(scan((acc: string, chunk: StreamChunk): string => acc + chunk.text, ''))
+    .subscribe((full: string): void => {
+      streamText.value = full;
+    });
+}
+
+// 页面卸载时取消订阅，避免定时器继续跑
+onUnmounted(() => {
+  stopStream();
+});
+</script>
+
+<style scoped>
+</style>

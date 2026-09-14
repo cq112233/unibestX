@@ -1,0 +1,562 @@
+<template>
+  <!-- 页面根容器：view + flex flex-col flex-1（flex-1 撑满开发高度） -->
+  <view class="flex flex-col items-center flex-1 px-[16px] pt-[8px]">
+    <!-- 固定说明区（不随内容滚动） -->
+    <view class="w-full mb-[16px]" :style="{ maxWidth: '520px' }">
+      <view class="w-full bg-white rounded-[12px] p-[16px] flex flex-col">
+        <view class="flex-row items-center mb-[10px]">
+          <view class="w-[6px] h-[16px] rounded-[3px] bg-[#0f766e] mr-[8px]" />
+          <text class="text-[16px] font-bold text-[#1e293b]">HTTP 请求 Demo</text>
+          <text class="text-[11px] text-[#94a3b8] ml-[8px] px-[6px] py-[2px] rounded-[4px] bg-[#f1f5f9]">独立页</text>
+        </view>
+        <text class="text-[13px] text-[#64748b] leading-[19px]">
+          基于 lime-request 封装的 http 请求演示，包含 Mock 数据、真实接口请求、uniCloud 云对象与 OSS 文件上传四种模式。
+        </text>
+        <view class="flex-row flex-wrap mt-[12px]">
+          <view class="rounded-[6px] px-[8px] py-[4px] bg-[#eff6ff] mr-[8px] mb-[8px]">
+            <text class="text-[11px] text-[#1d4ed8]">Mock 数据</text>
+          </view>
+          <view class="rounded-[6px] px-[8px] py-[4px] bg-[#ecfdf5] mr-[8px] mb-[8px]">
+            <text class="text-[11px] text-[#065f46]">真实 API</text>
+          </view>
+          <view class="rounded-[6px] px-[8px] py-[4px] bg-[#f0fdfa] mr-[8px] mb-[8px]">
+            <text class="text-[11px] text-[#0f766e]">uniCloud</text>
+          </view>
+          <view class="rounded-[6px] px-[8px] py-[4px] bg-[#fff7ed] mr-[8px] mb-[8px]">
+            <text class="text-[11px] text-[#c2410c]">文件上传</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 内部 scroll-view：居中列 + 整列滚动 -->
+    <scroll-view
+      direction="vertical" class="w-full flex flex-col flex-1" :style="{ maxWidth: '520px' }"
+      :lower-threshold="50" @scroll="handleScroll" @scrolltolower="handleScrollToLower"
+    >
+      <view class="flex flex-col">
+        <!-- ============ 1. uniCloud 云对象 ============ -->
+        <Card title="uniCloud 云对象">
+          <view class="mb-[16px]">
+            <view class="flex-row items-center justify-between mb-[10px]">
+              <view class="flex-row items-center">
+                <view class="w-[32px] h-[32px] rounded-[8px] bg-[#e6fffb] border-[1px] border-solid border-[#99f6e4] items-center justify-center mr-[10px]">
+                  <text class="text-[12px] font-bold text-[#0f766e]">UC</text>
+                </view>
+                <view>
+                  <text class="text-[14px] font-bold" :style="{ color: 'var(--text-color, #1e293b)' }">uniCloud 云对象</text>
+                  <text class="text-[11px] text-[#64748b] mt-[2px]">user.getUserInfo</text>
+                </view>
+              </view>
+              <view class="flex-row items-center px-[8px] py-[4px] rounded-[10px]" :class="cloudStatusBgClass">
+                <view class="w-[6px] h-[6px] rounded-[3px] mr-[5px]" :class="cloudStatusDotClass" />
+                <text class="text-[11px]" :class="cloudStatusTextClass">{{ cloudStatusText }}</text>
+              </view>
+            </view>
+
+            <view class="rounded-[8px] bg-[#f8fafc] border-[1px] border-solid border-[#cbd5e1] overflow-hidden">
+              <view class="h-[3px] bg-[#14b8a6]" />
+              <view class="p-[12px]">
+                <view class="flex-row items-center justify-between mb-[8px]">
+                  <text class="text-[11px] text-[#64748b]">响应数据</text>
+                  <text class="text-[10px] text-[#94a3b8]">JSON</text>
+                </view>
+                <text v-if="cloudLoading" class="text-[12px] text-[#0f766e]">正在连接云端服务...</text>
+                <text v-else-if="hasCloudError" class="text-[12px] text-[#dc2626]">{{ cloudErrorMsg }}</text>
+                <text v-else class="text-[12px] text-[#334155] leading-[20px]">{{ userInfo }}</text>
+
+                <view v-if="hasCloudError" class="mt-[10px] flex-row">
+                  <view class="h-[32px] px-[12px] rounded-[6px] bg-[#0f766e] items-center justify-center" @click="getUserInfo">
+                    <text class="text-[12px] text-[#ffffff]">重新获取</text>
+                  </view>
+                </view>
+              </view>
+            </view>
+          </view>
+        </Card>
+
+        <!-- ============ 2. Mock 数据列表 ============ -->
+        <Card title="Mock 数据列表（ID 为任意类型）">
+          <text class="text-[12px] text-[#64748b] leading-[19px] mb-[4px]">
+            在 src/api/foo.uts 中定义，由 getFooList() 直接返回，无需网络即可演示列表渲染。
+          </text>
+          <view v-for="(item, index) in mockList" :key="index" class="flex-row items-center py-[10px] px-[12px] bg-[#f1f5f9] rounded-[8px] mt-[8px]">
+            <view class="w-[28px] h-[28px] rounded-[14px] bg-[#3182ce] justify-center items-center mr-[10px]">
+              <text class="text-[12px] text-[#ffffff] font-bold">{{ item.id }}</text>
+            </view>
+            <text class="text-[14px]" :style="{ color: 'var(--text-color, #334155)' }">{{ item.name }}</text>
+          </view>
+        </Card>
+
+        <!-- ============ 3. 真实接口请求状态 ============ -->
+        <Card title="真实 API 请求（拦截器 + 错误处理）">
+          <view class="rounded-[10px] p-[12px] mb-[16px] border-[1px] border-solid border-[#e2e8f0]">
+            <view class="flex-row justify-between items-center mb-[6px]">
+              <text class="text-[13px] text-[#64748b]">接口请求状态:</text>
+              <view class="px-[8px] py-[2px] rounded-[10px]" :class="statusBgClass">
+                <text class="text-[12px]" :class="statusTextClass">{{ statusText }}</text>
+              </view>
+            </view>
+            <view
+              v-if="hasResponseData"
+              class="rounded-[8px] p-[10px] border-[1px] border-solid"
+              :style="{ backgroundColor: 'var(--card-bg, #ffffff)', borderColor: 'var(--border-color, #e2e8f0)' }"
+            >
+              <text class="text-[12px]" :style="{ color: 'var(--text-secondary, #475569)' }">{{ responseText }}</text>
+            </view>
+            <view v-if="hasErrorMsg" class="bg-[#fff5f5] rounded-[8px] p-[10px] border-[1px] border-solid border-[#fecaca] mt-[6px]">
+              <text class="text-[12px] text-[#ef4444]">错误：{{ errorMsg }}</text>
+            </view>
+          </view>
+
+          <!-- 操作按钮：用 margin-right 代替 gap -->
+          <view class="flex-row">
+            <view class="flex-1 mr-[10px]">
+              <view
+                class="bg-[#3182ce] rounded-[8px] h-[42px] w-full flex flex-row items-center justify-center"
+                @click="loadMockData"
+              >
+                <text class="text-[#ffffff] text-[14px]">加载 Mock 数据</text>
+              </view>
+            </view>
+            <view class="flex-1">
+              <view
+                class="bg-[#10b981] rounded-[8px] h-[42px] w-full flex flex-row items-center justify-center"
+                @click="fetchRealApi"
+              >
+                <text class="text-[#ffffff] text-[14px]">{{ loading ? '请求中...' : '真实 API 请求' }}</text>
+              </view>
+            </view>
+          </view>
+        </Card>
+
+        <!-- ============ 4. 文件上传 ============ -->
+        <Card title="文件上传（uploadFooFile → uni.uploadFile）">
+          <view class="mb-[16px]">
+            <view class="flex-row items-center mb-[10px]">
+              <view class="w-[32px] h-[32px] rounded-[8px] bg-[#fff7ed] border-[1px] border-solid border-[#fdba74] items-center justify-center mr-[10px]">
+                <text class="text-[12px] font-bold text-[#c2410c]">UP</text>
+              </view>
+              <view class="flex-1">
+                <text class="text-[14px] font-bold text-[#1e293b]">文件上传</text>
+                <text class="text-[11px] text-[#64748b] mt-[2px]">{{ uploadPath }}</text>
+              </view>
+            </view>
+
+            <view class="flex-row items-center bg-[#fff7ed] p-[8px] rounded-[6px] mb-[10px] border-[1px] border-solid border-[#ffedd5]">
+              <text class="text-[11px] text-[#c2410c] leading-[16px] flex-1">
+                💡 上传 OSS 接口地址支持直接在 .env 环境变量中配置（VITE_UPLOAD_BASEURL / VITE_UPLOAD_PATH）
+              </text>
+            </view>
+
+            <view class="rounded-[8px] bg-[#f8fafc] border-[1px] border-solid border-[#cbd5e1] overflow-hidden">
+              <view class="h-[3px] bg-[#f97316]" />
+              <view class="p-[12px]">
+                <view class="flex-row items-center justify-between mb-[8px]">
+                  <text class="text-[11px] text-[#64748b]">上传结果</text>
+                  <text class="text-[10px] text-[#94a3b8]">POST</text>
+                </view>
+                <text v-if="uploadLoading" class="text-[12px] text-[#c2410c]">正在上传...</text>
+                <text v-else-if="hasUploadError" class="text-[12px] text-[#dc2626]">{{ uploadError }}</text>
+                <view v-else-if="hasUploadResult">
+                  <!-- 上：图片居中预览（支持点击放大） -->
+                  <view
+                    class="items-center justify-center py-[10px] rounded-[8px] border-[1px] border-solid"
+                    :style="{ backgroundColor: 'var(--card-bg, #ffffff)', borderColor: 'var(--border-color, #e2e8f0)' }"
+                  >
+                    <image
+                      :src="uploadResultText"
+                      class="w-[120px] h-[120px] rounded-[8px]"
+                      mode="aspectFill"
+                      @click="previewUploadedImage"
+                    />
+                    <text class="text-[10px] text-[#94a3b8] mt-[6px]">点击查看大图</text>
+                  </view>
+
+                  <!-- 下：OSS 链接美化展示卡片（支持一键复制） -->
+                  <view
+                    class="mt-[10px] p-[10px] rounded-[8px] border-[1px] border-solid"
+                    :style="{ backgroundColor: 'var(--bg-color, #f8fafc)', borderColor: 'var(--border-color, #e2e8f0)' }"
+                  >
+                    <view class="flex-row items-center justify-between mb-[6px]">
+                      <view class="flex-row items-center">
+                        <view class="w-[3px] h-[12px] bg-[#f97316] rounded-[2px] mr-[6px]" />
+                        <text class="text-[11px] font-bold" :style="{ color: 'var(--text-color, #475569)' }">OSS 链接地址</text>
+                      </view>
+                      <view
+                        class="px-[8px] py-[3px] rounded-[4px] bg-[#ea580c] flex-row items-center"
+                        @click="copyUploadUrl"
+                      >
+                        <text class="text-[10px] text-[#ffffff] font-medium">复制链接</text>
+                      </view>
+                    </view>
+                    <text
+                      class="oss-url-text text-[11px] leading-[18px]"
+                      :style="{ color: 'var(--text-color, #334155)' }"
+                      :selectable="true"
+                    >
+                      {{ uploadResultText }}
+                    </text>
+                  </view>
+                </view>
+                <text v-else class="text-[12px] text-[#94a3b8]">未选择文件</text>
+              </view>
+            </view>
+
+            <view class="mt-[10px]">
+              <view
+                class="bg-[#f97316] rounded-[8px] h-[42px] w-full flex flex-row items-center justify-center"
+                @click="chooseAndUpload"
+              >
+                <text class="text-[#ffffff] text-[14px]">{{ uploadLoading ? '上传中...' : '选择图片并上传' }}</text>
+              </view>
+            </view>
+          </view>
+        </Card>
+
+        <view class="flex-col items-center py-[16px]">
+          <text class="text-[12px] text-[#94a3b8]">已触底 {{ reachBottomCount }} 次 · 内容结束</text>
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed, ref } from 'vue';
+import Card from '@/src/pages/basic/components/Card.uvue';
+import { foo, FOO_UPLOAD_PATH, getFooList, uploadFooFile } from '@/src/api/foo';
+import type { IFoo } from '@/src/api/foo';
+import { DEFAULT_OSS_BASE_URL } from '@/src/utils/upload';
+import { toast, toastSuccess } from '@/src/utils/toast.uts';
+import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/utils/refresh.uts';
+
+definePage({
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: true,
+  style: {
+    navigationBarTitleText: 'HTTP 请求 Demo',
+    navigationStyle: 'custom'
+  }
+});
+
+// ==========================================
+// 响应式状态
+// ==========================================
+const mockList = ref<IFoo[]>([]);
+const loading = ref<boolean>(false);
+const requestStatus = ref<string>('idle'); // idle | loading | success | error
+const responseData = ref<IFoo | null>(null);
+const errorMsg = ref<string>('');
+const userInfo = ref<string>('');
+const cloudLoading = ref<boolean>(false);
+const cloudErrorMsg = ref<string>('');
+const uploadPath = ref<string>(FOO_UPLOAD_PATH);
+const uploadLoading = ref<boolean>(false);
+const uploadResult = ref<string>('');
+const uploadError = ref<string>('');
+const reachBottomCount = ref<number>(0);
+
+// ==========================================
+// 计算属性
+// ==========================================
+const statusText = computed((): string => {
+  switch (requestStatus.value) {
+    case 'loading': return '请求中';
+    case 'success': return '请求成功';
+    case 'error': return '请求失败';
+    default: return '待请求';
+  }
+});
+
+const statusTextClass = computed((): string => {
+  switch (requestStatus.value) {
+    case 'loading': return 'text-[#d97706]';
+    case 'success': return 'text-[#059669]';
+    case 'error': return 'text-[#dc2626]';
+    default: return 'text-[#94a3b8]';
+  }
+});
+
+const statusBgClass = computed((): string => {
+  switch (requestStatus.value) {
+    case 'loading': return 'bg-[#fef9c3]';
+    case 'success': return 'bg-[#d1fae5]';
+    case 'error': return 'bg-[#fee2e2]';
+    default: return 'bg-[#f1f5f9]';
+  }
+});
+
+// 用显式 boolean 计算属性替换模板里的 != null / != '' 条件判断
+const hasResponseData = computed((): boolean => {
+  return responseData.value != null;
+});
+
+const hasErrorMsg = computed((): boolean => {
+  return errorMsg.value.length > 0;
+});
+
+const responseText = computed((): string => {
+  const data = responseData.value;
+  if (data == null)
+    return '';
+  return `id: ${data.id}, name: ${data.name}`;
+});
+
+const hasCloudError = computed((): boolean => {
+  return cloudErrorMsg.value.length > 0;
+});
+
+const cloudStatusText = computed((): string => {
+  if (cloudLoading.value)
+    return '连接中';
+  if (hasCloudError.value)
+    return '连接失败';
+  return '已连接';
+});
+
+const cloudStatusBgClass = computed((): string => {
+  if (cloudLoading.value)
+    return 'bg-[#fef9c3]';
+  if (hasCloudError.value)
+    return 'bg-[#fee2e2]';
+  return 'bg-[#ccfbf1]';
+});
+
+const cloudStatusDotClass = computed((): string => {
+  if (cloudLoading.value)
+    return 'bg-[#d97706]';
+  if (hasCloudError.value)
+    return 'bg-[#dc2626]';
+  return 'bg-[#0d9488]';
+});
+
+const cloudStatusTextClass = computed((): string => {
+  if (cloudLoading.value)
+    return 'text-[#a16207]';
+  if (hasCloudError.value)
+    return 'text-[#b91c1c]';
+  return 'text-[#0f766e]';
+});
+
+const hasUploadError = computed((): boolean => {
+  return uploadError.value.length > 0;
+});
+
+const hasUploadResult = computed((): boolean => {
+  return uploadResult.value.length > 0;
+});
+
+const uploadResultText = computed((): string => {
+  return uploadResult.value;
+});
+
+// ==========================================
+// 方法
+// ==========================================
+
+/**
+ * 加载 Mock 数据（本地，无需网络）
+ */
+async function loadMockData() {
+  try {
+    const list = await getFooList();
+    mockList.value = list;
+    // toastSuccess(`加载了 ${list.length} 条数据`)
+  }
+  catch (err) {
+    console.error('loadMockData error:', err);
+  }
+}
+
+/**
+ * 发起真实 API 请求（演示拦截器与错误处理）
+ * 使用 async/await 与 try/catch，这在 UTS 中类型推导更稳定
+ */
+async function fetchRealApi() {
+  loading.value = true;
+  requestStatus.value = 'loading';
+  responseData.value = null;
+  errorMsg.value = '';
+
+  try {
+    const res = await foo();
+    responseData.value = res;
+    requestStatus.value = 'success';
+  }
+  catch (err) {
+    console.log(err, 'err');
+    requestStatus.value = 'error';
+    let msg = '请求失败';
+    if (err instanceof Error) {
+      msg = (err as Error).message;
+    }
+    else if (err instanceof UTSJSONObject) {
+      const errMsg = (err as UTSJSONObject).getString('message') ?? (err as UTSJSONObject).getString('msg') ?? (err as UTSJSONObject).getString('errMsg');
+      if (errMsg != null) {
+        msg = errMsg;
+      }
+      else {
+        msg = JSON.stringify(err);
+      }
+    }
+    else if (err != null) {
+      msg = `${err}`;
+    }
+    errorMsg.value = msg;
+  }
+
+  loading.value = false;
+}
+
+async function getUserInfo() {
+  cloudLoading.value = true;
+  cloudErrorMsg.value = '';
+
+  try {
+    const res = await uniCloud.importObject('user').getUserInfo();
+    // eslint-disable-next-line dot-notation
+    userInfo.value = JSON.stringify((res as UTSJSONObject)['data'] ?? res);
+    console.log('res', res);
+  }
+  catch (err) {
+    cloudErrorMsg.value = '云端数据获取失败，请检查 uniCloud 配置后重试';
+    console.error('getUserInfo error:', err);
+  }
+
+  cloudLoading.value = false;
+}
+
+/**
+ * 执行上传并展示结果
+ */
+async function uploadFileByPath(filePath: string) {
+  if (DEFAULT_OSS_BASE_URL == '' || DEFAULT_OSS_BASE_URL.includes('xxx') || uploadPath.value == '' || uploadPath.value.includes('xxx')) {
+    uploadError.value = '请在对应环境的 .env 文件中配置真实的 VITE_UPLOAD_BASEURL 与 VITE_UPLOAD_PATH';
+    toast('请先在 .env 中配置真实上传地址');
+    return;
+  }
+  uploadLoading.value = true;
+  uploadError.value = '';
+  uploadResult.value = '';
+
+  try {
+    const ossUrl = await uploadFooFile(filePath, true, uploadPath.value);
+    uploadResult.value = ossUrl;
+  }
+  catch (err) {
+    let msg = '上传失败';
+    if (err instanceof Error) {
+      msg = (err as Error).message;
+    }
+    else if (err != null) {
+      msg = `${err}`;
+    }
+    uploadError.value = msg;
+  }
+
+  uploadLoading.value = false;
+}
+
+/**
+ * 选择图片并上传（uploadFooFile → utils/upload.uts → uni.uploadFile）
+ */
+function chooseAndUpload() {
+  if (uploadLoading.value) {
+    return;
+  }
+  uploadError.value = '';
+  uni.chooseImage({
+    count: 1,
+    sourceType: ['album', 'camera'],
+    success: (res) => {
+      const paths = res.tempFilePaths;
+      if (paths.length <= 0) {
+        uploadError.value = '未选择文件';
+        return;
+      }
+      uploadFileByPath(paths[0] as string);
+    },
+    fail: (err) => {
+      console.log('chooseImage fail:', err);
+      let errMsg = '';
+      if (err != null && err.errMsg != null) {
+        errMsg = `${err.errMsg}`;
+      }
+      // 用户主动取消时不显示为错误
+      if (errMsg.includes('cancel')) {
+        return;
+      }
+      uploadError.value = errMsg != '' ? `选择文件失败: ${errMsg}` : '选择文件失败';
+    }
+  });
+}
+
+/**
+ * 复制 OSS 链接到剪贴板
+ */
+function copyUploadUrl() {
+  const url = uploadResult.value;
+  if (url == '') {
+    return;
+  }
+  uni.setClipboardData({
+    data: url,
+    showToast: false,
+    success: () => {
+      toastSuccess('链接已复制');
+    }
+  });
+}
+
+/**
+ * 点击查看图片大图
+ */
+function previewUploadedImage() {
+  const url = uploadResult.value;
+  if (url == '') {
+    return;
+  }
+  uni.previewImage({
+    urls: [url]
+  });
+}
+
+// ==========================================
+// 滚动与下拉刷新
+// ==========================================
+function handleScroll(e: UniScrollEvent): void {
+  // 预留：可用于吸顶 / 滚动进度等交互
+  const top = Math.ceil(e.detail.scrollTop);
+  if (top < 0) {
+    console.log('scrollTop:', top);
+  }
+}
+
+function handleScrollToLower(): void {
+  reachBottomCount.value++;
+}
+
+onNavbarPullDownRefresh(() => {
+  loadMockData();
+  setTimeout(() => {
+    stopNavbarPullDownRefresh();
+  }, 600);
+});
+
+// 页面挂载时自动加载 Mock 数据
+onMounted(() => {
+  loadMockData();
+  // getUserInfo();
+});
+</script>
+
+<style scoped>
+/* #ifdef H5 || MP-WEIXIN */
+.oss-url-text {
+  word-break: break-all;
+}
+/* #endif */
+</style>
