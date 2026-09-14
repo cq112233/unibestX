@@ -54,22 +54,31 @@
             <!-- 控制操作按钮排 -->
             <view class="flex flex-row">
               <view
-                class="flex-1 py-[7px] mr-[4px] rounded-[6px] bg-[#fef3c7] items-center justify-center"
+                class="flex-1 py-[7px] mr-[4px] rounded-[6px] bg-[#fef3c7] items-center justify-center active:opacity-75"
                 @click="triggerEmpty"
               >
                 <text class="text-[10px] text-[#d97706] font-bold">清空数据</text>
               </view>
               <view
-                class="flex-1 py-[7px] mr-[4px] rounded-[6px] bg-[#dcfce7] items-center justify-center"
+                class="flex-1 py-[7px] mr-[4px] rounded-[6px] bg-[#dcfce7] items-center justify-center active:opacity-75"
                 @click="triggerReset"
               >
                 <text class="text-[10px] text-[#16a34a] font-bold">恢复重置</text>
               </view>
               <view
-                class="flex-1 py-[7px] rounded-[6px] bg-[#e0e7ff] items-center justify-center"
+                class="flex-1 py-[7px] mr-[4px] rounded-[6px] bg-[#e0e7ff] items-center justify-center active:opacity-75"
                 @click="triggerScrollToTop"
               >
                 <text class="text-[10px] text-[#4338ca] font-bold">一键回顶</text>
+              </view>
+              <view
+                class="flex-1 py-[7px] rounded-[6px] items-center justify-center active:opacity-75"
+                :class="isHideBottomState ? 'bg-[#f1f5f9]' : 'bg-[#fce7f3]'"
+                @click="toggleHideBottomState"
+              >
+                <text class="text-[10px] font-bold" :class="isHideBottomState ? 'text-[#64748b]' : 'text-[#db2777]'">
+                  {{ isHideBottomState ? '🙈 隐藏中(没了)' : '显示底部状态' }}
+                </text>
               </view>
             </view>
 
@@ -171,59 +180,61 @@
 
         <!-- 自定义底部加载状态：完全对齐 nested-scroll 演示逻辑与视觉 -->
         <template #loadMore>
-          <!-- 1. 自定义正在加载中插槽演示 -->
-          <view
-            v-if="isLoadMoreLoading"
-            class="mx-[14px] my-[10px] p-[14px] rounded-[12px] border-[1px] border-dashed flex flex-row items-center justify-center shadow-xs"
-            :class="isDark ? 'bg-[#1e293b]/70 border-[#38bdf866]' : 'bg-[#eff6ff] border-[#93c5fd]'"
-          >
-            <text class="text-[14px] mr-[6px]">⚡</text>
-            <text
-              class="text-[12px] font-semibold"
-              :class="isDark ? 'text-[#38bdf8]' : 'text-[#0957de]'"
-            >
-              自定义加载中：z-paging-x 正在流式计算数据...
-            </text>
-          </view>
-
-          <!-- 2. 自定义加载报错与重试插槽演示 -->
-          <view
-            v-else-if="isLoadMoreError"
-            class="mx-[14px] my-[8px] p-[12px] rounded-[12px] border-[1px] border-solid flex flex-row items-center justify-between shadow-xs"
-            :class="isDark ? 'bg-[#450a0a]/50 border-[#7f1d1d]' : 'bg-[#fef2f2] border-[#fecaca]'"
-          >
-            <view class="flex flex-row items-center flex-1 mr-[10px]">
-              <text class="text-[18px] mr-[8px]">🚨</text>
-              <view class="flex flex-col">
-                <text class="text-[12px] font-bold text-[#dc2626]">自定义报错：服务连接暂时中断</text>
-                <text class="text-[10px] text-[#ef4444] mt-[2px]">请检查网络环境或轻触右侧按钮重新拉取</text>
-              </view>
-            </view>
+          <template v-if="!isHideBottomState">
+            <!-- 1. 自定义正在加载中插槽演示 -->
             <view
-              class="px-[12px] py-[6px] rounded-[6px] bg-[#dc2626] items-center justify-center"
-              @click="onRetryLoad"
+              v-if="isLoadMoreLoading"
+              class="mx-[14px] my-[10px] p-[14px] rounded-[12px] border-[1px] border-dashed flex flex-row items-center justify-center shadow-xs"
+              :class="isDark ? 'bg-[#1e293b]/70 border-[#38bdf866]' : 'bg-[#eff6ff] border-[#93c5fd]'"
             >
-              <text class="text-[11px] font-bold text-[#ffffff]" style="color: #ffffff;">立即重试</text>
-            </view>
-          </view>
-
-          <!-- 3. 自定义没有更多数据插槽演示 -->
-          <view
-            v-else-if="isLoadMoreFinished"
-            class="w-full py-[18px] flex flex-row items-center justify-center"
-          >
-            <view class="w-[36px] h-[1px]" :class="isDark ? 'bg-[#334155]' : 'bg-[#cbd5e1]'" />
-            <view class="mx-[10px] flex flex-row items-center">
-              <text class="text-[12px] mr-[4px]">🎉</text>
+              <text class="text-[14px] mr-[6px]">⚡</text>
               <text
-                class="text-[12px] font-medium"
-                :class="isDark ? 'text-[#64748b]' : 'text-[#94a3b8]'"
+                class="text-[12px] font-semibold"
+                :class="isDark ? 'text-[#38bdf8]' : 'text-[#0957de]'"
               >
-                已展示完全部数据内容
+                自定义加载中：z-paging-x 正在流式计算数据...
               </text>
             </view>
-            <view class="w-[36px] h-[1px]" :class="isDark ? 'bg-[#334155]' : 'bg-[#cbd5e1]'" />
-          </view>
+
+            <!-- 2. 自定义加载报错与重试插槽演示 -->
+            <view
+              v-else-if="isLoadMoreError"
+              class="mx-[14px] my-[8px] p-[12px] rounded-[12px] border-[1px] border-solid flex flex-row items-center justify-between shadow-xs"
+              :class="isDark ? 'bg-[#450a0a]/50 border-[#7f1d1d]' : 'bg-[#fef2f2] border-[#fecaca]'"
+            >
+              <view class="flex flex-row items-center flex-1 mr-[10px]">
+                <text class="text-[18px] mr-[8px]">🚨</text>
+                <view class="flex flex-col">
+                  <text class="text-[12px] font-bold text-[#dc2626]">自定义报错：服务连接暂时中断</text>
+                  <text class="text-[10px] text-[#ef4444] mt-[2px]">请检查网络环境或轻触右侧按钮重新拉取</text>
+                </view>
+              </view>
+              <view
+                class="px-[12px] py-[6px] rounded-[6px] bg-[#dc2626] items-center justify-center active:opacity-75"
+                @click="onRetryLoad"
+              >
+                <text class="text-[11px] font-bold text-[#ffffff]" style="color: #ffffff;">立即重试</text>
+              </view>
+            </view>
+
+            <!-- 3. 自定义没有更多数据插槽演示 -->
+            <view
+              v-else-if="isLoadMoreFinished"
+              class="w-full py-[18px] flex flex-row items-center justify-center"
+            >
+              <view class="w-[36px] h-[1px]" :class="isDark ? 'bg-[#334155]' : 'bg-[#cbd5e1]'" />
+              <view class="mx-[10px] flex flex-row items-center">
+                <text class="text-[12px] mr-[4px]">🎉</text>
+                <text
+                  class="text-[12px] font-medium"
+                  :class="isDark ? 'text-[#64748b]' : 'text-[#94a3b8]'"
+                >
+                  已展示完全部数据内容
+                </text>
+              </view>
+              <view class="w-[36px] h-[1px]" :class="isDark ? 'bg-[#334155]' : 'bg-[#cbd5e1]'" />
+            </view>
+          </template>
         </template>
       </z-paging-x>
     </view>
@@ -290,6 +301,7 @@ const simStatusText = ref<string>('【第 1 步】首次加载 2 条数据（未
 const isLoadMoreLoading = ref<boolean>(false);
 const isLoadMoreError = ref<boolean>(false);
 const isLoadMoreFinished = ref<boolean>(false);
+const isHideBottomState = ref<boolean>(false);
 
 // 下拉刷新状态跟踪
 const refresherStatus = ref<string>('default');
@@ -500,6 +512,14 @@ function toggleBottomPosition(): void {
   }
   uni.showToast({
     title: `回顶按钮底部边距设为 ${customBottom.value}px`,
+    icon: 'none'
+  });
+}
+
+function toggleHideBottomState(): void {
+  isHideBottomState.value = !isHideBottomState.value;
+  uni.showToast({
+    title: isHideBottomState.value ? '已开启「底态隐藏(没了)」模式' : '已恢复显示底部状态',
     icon: 'none'
   });
 }

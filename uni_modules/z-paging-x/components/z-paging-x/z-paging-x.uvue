@@ -602,55 +602,55 @@ by ZXLee
      */
     listIs: {
       type: String,
-      default: gc<string>('list-is', 'list-view'),
+      default: gc<string>('list-is', 'scroll-view'),
     },
     /**
-     * @description list的id
-     * @default ''
-     */
+      * @description list的id
+      * @default ''
+      */
     listId: {
       type: String,
       default: gc<string>('list-id', ''),
     },
     /**
-     * @description 控制是否出现滚动条
-     * @default true
-     */
+      * @description 控制是否出现滚动条
+      * @default true
+      */
     showScrollbar: {
       type: Boolean,
       default: gc<boolean>('show-scrollbar', true),
     },
     /**
-     * @description 控制是否回弹效果
-     * @default true
-     */
+      * @description 控制是否回弹效果
+      * @default true
+      */
     rebound: {
       type: Boolean,
       default: gc<boolean>('rebound', true),
     },
     /**
-     * @description (子元素中使用)子元素是否开启嵌套滚动，将滚动事件与父元素协商处理
-     * @default false
-     */
+      * @description (子元素中使用)子元素是否开启嵌套滚动，将滚动事件与父元素协商处理
+      * @default true
+      */
     customNestedScroll: {
       type: Boolean,
-      default: gc<boolean>('custom-nested-scroll', false),
+      default: gc<boolean>('custom-nested-scroll', true),
     },
     /**
-     * @description (子元素中使用，仅App)关联的滚动容器，设置为nested-scroll-view后与外层滚动容器开启嵌套模式。蒸汽模式(Vapor)不支持nested-scroll滚动协商，需使用此属性替代custom-nested-scroll
-     * @default ''
-     */
+      * @description (子元素中使用，仅App)关联的滚动容器，设置为nested-scroll-view后与外层滚动容器开启嵌套模式。蒸汽模式(Vapor)不支持nested-scroll滚动协商，需使用此属性替代custom-nested-scroll
+      * @default ''
+      */
     associativeContainer: {
       type: String,
       default: gc<string>('associative-container', ''),
     },
     /**
-     * @description (仅listIs = scroll-view有效，父元素中使用)是否与子元素开启滚动协商
-     * @default false
-     */
+      * @description (仅listIs = scroll-view有效，父元素中使用)是否与子元素开启滚动协商
+      * @default true
+      */
     startNestedScroll: {
       type: Boolean,
-      default: gc<boolean>('start-nested-scroll', false),
+      default: gc<boolean>('start-nested-scroll', true),
     },
     /**
      * @description (仅listIs = scroll-view有效)嵌套滚动子元素的id属性，不支持ref，scroll-view惯性滚动时会让对应id元素视图进行滚动，子元素滚动时会触发scroll-view的nestedprescroll事件，嵌套子元素需要设置custom-nested-scroll = true
@@ -1059,8 +1059,10 @@ by ZXLee
     _cleanRefresherCompleteDelayTimer()
     _cleanRefresherEndAnimateTimer()
     pageNo.value = props.defaultPageNo;
-    forceHideLoadMore.value = true;
     customNoMore.value = -1;
+    loadMoreStatus.value = Enum.More.Default;
+    isLoadFailed.value = false;
+    forceHideLoadMore.value = true;
     if (props.showRefresherWhenReload) {
       nextTick(() => {
         refresherTriggered.value = true;
@@ -1245,9 +1247,13 @@ by ZXLee
       completeByNoMore(data, nomore);
     })
   }
-  // 请求结束(失败)调用此方法，将自动展示失败页面
+  // 请求结束(失败)调用此方法，将自动展示失败页面或底部加载失败状态
   const completeByError = () => {
     isLoadFailed.value = true;
+    if (!isFirstPage.value) {
+      loadMoreStatus.value = Enum.More.Fail;
+    }
+    forceHideLoadMore.value = false;
     endRefresh();
   }
   // 刷新列表数据，pageNo and pageSize不会重置，列表数据会重新从服务端获取
@@ -1269,9 +1275,9 @@ by ZXLee
     customNoMore.value = -1;
     _emitQuery(props.defaultPageNo, targetTotal);
   }
-  // (仅listIs = scroll-view有效)子元素开始滚动时触发, return ture表示与子元素开启滚动协商
+  // (仅listIs = scroll-view有效)子元素开始滚动时触发, return true表示与子元素开启滚动协商
   const _onStartNestedScroll = (_: StartNestedScrollEvent): boolean => {
-    return props.startNestedScroll;
+    return true;
   }
   // (仅listIs = scroll-view有效)子元素滚动时触发，可执行event.consumed(x,y)告知子元素deltaX、deltaY各消耗多少。子元素将执行差值后的deltaX、deltaY滚动距离
   const _onNestedPreScroll = (event: NestedPreScrollEvent) => {
@@ -1379,9 +1385,12 @@ by ZXLee
   // 处理加载更多数据
   const _handleLoadMore = () => {
     if (!props.loadMoreEnabled || isLoading.value || loadMoreStatus.value === Enum.More.NoMore) return;
+    const isRetry = loadMoreStatus.value === Enum.More.Fail;
     // 将底部加载更多状态设置为加载中
     loadMoreStatus.value = Enum.More.Loading;
-    pageNo.value ++;
+    if (!isRetry) {
+      pageNo.value ++;
+    }
     queryFrom.value = Enum.QueryFrom.LoadMore;
     _emitQuery(pageNo.value, props.defaultPageSize);
   }
