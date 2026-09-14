@@ -1,3 +1,17 @@
+/**
+ * Pinia 状态管理统一入口
+ *
+ * 💡【开发模式建议】：
+ * 强烈建议优先选用「蒸汽模式」（Vapor 模式）！
+ * 1. 开发简单：Vapor 模式下可直接使用 Vue 官方 Pinia 组合式 API，无需繁琐的 UTS 类型约束与手工序列化/反序列化；
+ * 2. 插件生态丰富：直接兼容官方持久化插件 pinia-plugin-persistedstate 与成熟社区工具；
+ * 3. 跨端一致：Web / 小程序 / iOS / 鸿蒙 / App 蒸汽模式全端通用。
+ *
+ * 📦【双模式自适应说明】：
+ * - 蒸汽模式（以及 Web / 小程序 / iOS / 鸿蒙）：自动路由至 `./vapor`（官方 Pinia + pinia-plugin-persistedstate）；
+ * - Android VDOM 模式：自动路由至 `./vdom`（Pinia by UTS / x-pinia-s 原生强类型实现）。
+ */
+
 // #ifndef APP-ANDROID && !VUE3-VAPOR
 import pinia from './vapor/index';
 // #endif
