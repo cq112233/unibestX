@@ -1,8 +1,142 @@
 <template>
   <view class="flex flex-col p-[16px]" :class="isDark ? 'bg-[#0f172a]' : 'bg-[#f8fafc]'">
-    <!-- 触感与工具卡片 -->
+    <!-- 1. 通信与系统分享卡片 -->
+    <view class="mb-[16px]">
+      <Card title="通信与系统分享">
+        <!-- 拨号 -->
+        <view class="rounded-[12px] p-[16px] mb-[16px] border-[1px] border-solid border-[#e2e8f0]">
+          <view class="flex flex-row items-center mb-[8px]">
+            <text class="text-[14px] font-bold text-[#1e293b]">拨打电话 (makePhoneCall)</text>
+          </view>
+          <text class="text-[12px] text-[#94a3b8] mb-[8px]">输入要拨打的电话号码</text>
+          <input
+            v-model="phoneNumber"
+            type="number"
+            placeholder="请输入电话号码"
+            class="h-[38px] bg-white rounded-[6px] px-[12px] border-[1px] border-solid border-[#cbd5e1] text-[14px] text-[#334155] mb-[12px]"
+          />
+          <view class="w-full h-[38px] rounded-[8px] bg-[#3b82f6] flex flex-row items-center justify-center" @click="handleMakePhoneCall">
+            <text class="text-[#ffffff] text-[14px] font-bold">一键拨打电话</text>
+          </view>
+        </view>
+
+        <!-- 系统分享 -->
+        <view class="rounded-[12px] p-[16px] border-[1px] border-solid border-[#e2e8f0]">
+          <view class="flex flex-row items-center mb-[8px]">
+            <text class="text-[14px] font-bold text-[#1e293b]">系统分享 (shareWithSystem)</text>
+          </view>
+          <text class="text-[12px] text-[#94a3b8] mb-[6px]">分享摘要内容</text>
+          <input
+            v-model="shareSummary"
+            placeholder="请输入分享摘要"
+            class="h-[38px] bg-white rounded-[6px] px-[12px] border-[1px] border-solid border-[#cbd5e1] text-[14px] text-[#334155] mb-[10px]"
+          />
+          <text class="text-[12px] text-[#94a3b8] mb-[6px]">分享链接 (URL)</text>
+          <input
+            v-model="shareHref"
+            placeholder="请输入分享网址"
+            class="h-[38px] bg-white rounded-[6px] px-[12px] border-[1px] border-solid border-[#cbd5e1] text-[14px] text-[#334155] mb-[12px]"
+          />
+          <view class="w-full h-[38px] rounded-[8px] bg-[#8b5cf6] flex flex-row items-center justify-center" @click="handleShareWithSystem">
+            <text class="text-[#ffffff] text-[14px] font-bold">调起系统分享面板</text>
+          </view>
+        </view>
+      </Card>
+    </view>
+
+    <!-- 2. 文件与文档预览卡片 -->
+    <view class="mb-[16px]">
+      <Card title="文件与文档预览">
+        <!-- 选文件 -->
+        <view class="rounded-[12px] p-[16px] mb-[16px] border-[1px] border-solid border-[#e2e8f0]">
+          <view class="flex flex-row items-center mb-[8px]">
+            <text class="text-[14px] font-bold text-[#1e293b]">本地选文件 (chooseFile)</text>
+          </view>
+          <text class="text-[12px] text-[#94a3b8] mb-[12px]">选择设备中的文档、压缩包或其他文件</text>
+
+          <view class="w-full h-[38px] rounded-[8px] bg-[#0ea5e9] flex flex-row items-center justify-center mb-[12px]" @click="handleChooseFile">
+            <text class="text-[#ffffff] text-[14px] font-bold">从手机/本地选择文件</text>
+          </view>
+
+          <!-- 选中文件详情展示 -->
+          <view class="rounded-[8px] p-[12px] bg-[#f8fafc] border-[1px] border-solid border-[#e2e8f0]">
+            <view class="flex flex-row items-center justify-between mb-[6px]">
+              <text class="text-[12px] text-[#64748b]">文件名：</text>
+              <text class="text-[12px] font-medium text-[#1e293b]">{{ selectedFileName != '' ? selectedFileName : '未选择' }}</text>
+            </view>
+            <view class="flex flex-row items-center justify-between mb-[6px]">
+              <text class="text-[12px] text-[#64748b]">大小：</text>
+              <text class="text-[12px] font-medium text-[#1e293b]">{{ selectedFileSizeText != '' ? selectedFileSizeText : '-' }}</text>
+            </view>
+            <view class="flex flex-col">
+              <text class="text-[12px] text-[#64748b] mb-[2px]">临时路径：</text>
+              <text class="text-[11px] text-[#94a3b8] leading-[16px]" style="font-family: monospace;">{{ selectedFilePath != '' ? selectedFilePath : '-' }}</text>
+            </view>
+          </view>
+        </view>
+
+        <!-- 打开文档 -->
+        <view class="rounded-[12px] p-[16px] border-[1px] border-solid border-[#e2e8f0]">
+          <view class="flex flex-row items-center mb-[8px]">
+            <text class="text-[14px] font-bold text-[#1e293b]">文档原生预览 (openDocument)</text>
+          </view>
+          <text class="text-[12px] text-[#94a3b8] mb-[12px]">使用系统内置阅读器打开 PDF、Word、Excel 等文档</text>
+
+          <!-- 打开已选文档按钮 -->
+          <view
+            class="w-full h-[38px] rounded-[8px] flex flex-row items-center justify-center mb-[10px]"
+            :class="selectedFilePath != '' ? 'bg-[#10b981]' : 'bg-[#cbd5e1]'"
+            @click="handleOpenSelectedDoc"
+          >
+            <text class="text-[#ffffff] text-[14px] font-bold">打开已选择的文件</text>
+          </view>
+
+          <!-- 下载并打开在线示例文档 -->
+          <view class="w-full h-[38px] rounded-[8px] bg-[#6366f1] flex flex-row items-center justify-center" @click="handleDownloadAndOpenSampleDoc">
+            <text class="text-[#ffffff] text-[14px] font-bold">下载并打开在线示例 PDF 文档</text>
+          </view>
+        </view>
+      </Card>
+    </view>
+
+    <!-- 3. 键盘感知与高度避让卡片 -->
+    <view class="mb-[16px]">
+      <Card title="键盘感知与避让">
+        <view
+          class="rounded-[12px] p-[16px] border-[1px] border-solid border-[#e2e8f0]"
+          :style="{ paddingBottom: `${keyboardHeight > 0 ? keyboardHeight + 8 : 16}px` }"
+        >
+          <view class="flex flex-row items-center justify-between mb-[8px]">
+            <text class="text-[14px] font-bold text-[#1e293b]">键盘高度动态避让</text>
+            <view class="px-[8px] py-[3px] rounded-[6px] bg-[#e0f2fe] flex flex-row items-center">
+              <text class="text-[12px] font-bold text-[#0284c7]">
+                高度: {{ keyboardHeight }} px
+              </text>
+            </view>
+          </view>
+          <text class="text-[12px] text-[#64748b] leading-[18px] mb-[12px]">
+            监听软键盘弹起高度变化，演练容器根据高度动态增加内边距防止遮挡内容。
+          </text>
+
+          <input
+            v-model="keyboardInputText"
+            placeholder="点击此输入框触发键盘弹起与避让"
+            :adjust-position="false"
+            class="h-[40px] bg-white rounded-[6px] px-[12px] border-[1px] border-solid border-[#cbd5e1] text-[14px] text-[#334155] mb-[12px]"
+            @keyboardheightchange="handleKeyboardHeightChange"
+          />
+
+          <view class="w-full h-[38px] rounded-[8px] bg-[#64748b] flex flex-row items-center justify-center" @click="handleHideKeyboard">
+            <text class="text-[#ffffff] text-[14px] font-bold">收起软键盘 (hideKeyboard)</text>
+          </view>
+        </view>
+      </Card>
+    </view>
+
+    <!-- 4. 触感与震动工具卡片 -->
     <view class="mb-[16px]">
       <Card title="触感与工具">
+        <!-- 剪贴板 -->
         <view class="rounded-[12px] p-[16px] mb-[16px] border-[1px] border-solid border-[#e2e8f0]">
           <text class="text-[12px] text-[#94a3b8] mb-[8px]">剪贴板测试文本</text>
           <input
@@ -11,20 +145,34 @@
             class="h-[38px] bg-white rounded-[6px] px-[12px] border-[1px] border-solid border-[#cbd5e1] text-[14px] text-[#334155] mb-[12px]"
           />
           <view class="w-full h-[38px] rounded-[8px] bg-[#10b981] flex flex-row items-center justify-center" @click="handleCopy">
-            <text class="text-[#ffffff] text-[14px] font-bold">复制测试文本</text>
+            <text class="text-[#ffffff] text-[14px] font-bold">复制测试文本到剪贴板</text>
           </view>
         </view>
 
-        <view class="w-full h-[44px] rounded-[8px] bg-[#f59e0b] flex flex-row items-center justify-center" @click="triggerVibration">
-          <text class="text-[#ffffff] text-[14px] font-bold">短震动反馈</text>
+        <!-- 震动反馈（短震 / 长震） -->
+        <view class="rounded-[12px] p-[16px] border-[1px] border-solid border-[#e2e8f0]">
+          <text class="text-[14px] font-bold text-[#1e293b] mb-[8px]">硬件震动反馈</text>
+          <text class="text-[12px] text-[#94a3b8] mb-[12px]">提供短震动与长震动两种物理触感梯度</text>
+          <view class="flex flex-row">
+            <view class="flex-1 mr-[8px]">
+              <view class="w-full h-[40px] rounded-[8px] bg-[#f59e0b] flex flex-row items-center justify-center" @click="triggerShortVibration">
+                <text class="text-[#ffffff] text-[13px] font-bold">短震动反馈</text>
+              </view>
+            </view>
+            <view class="flex-1">
+              <view class="w-full h-[40px] rounded-[8px] bg-[#ea580c] flex flex-row items-center justify-center" @click="triggerLongVibration">
+                <text class="text-[#ffffff] text-[13px] font-bold">长震动反馈</text>
+              </view>
+            </view>
+          </view>
         </view>
       </Card>
     </view>
 
-    <!-- 相机与多媒体卡片 -->
+    <!-- 5. 相机与多媒体卡片 -->
     <Card title="相机与多媒体">
       <view class="rounded-[12px] p-[16px] mb-[16px] border-[1px] border-solid border-[#e2e8f0] items-center justify-center">
-        <text v-if="photoUrl === ''" class="text-[14px] text-[#94a3b8]">未选择照片</text>
+        <text v-if="photoUrl == ''" class="text-[14px] text-[#94a3b8]">未选择照片</text>
         <image v-else :src="photoUrl" class="w-[150px] h-[150px] rounded-[8px]" mode="aspectFill" />
       </view>
       <view class="w-full h-[44px] rounded-[8px] bg-[#3b82f6] mb-[12px] flex flex-row items-center justify-center" @click="chooseImage">
@@ -34,7 +182,7 @@
       <!-- 扫码测试 -->
       <view class="rounded-[12px] p-[16px] mb-[16px] border-[1px] border-solid border-[#e2e8f0]">
         <text class="text-[12px] text-[#94a3b8] mb-[8px]">扫码结果</text>
-        <text class="text-[14px] font-bold text-[#334155]">{{ scanResult !== '' ? scanResult : '暂无数据' }}</text>
+        <text class="text-[14px] font-bold text-[#334155]">{{ scanResult != '' ? scanResult : '暂无数据' }}</text>
       </view>
       <view class="w-full h-[44px] rounded-[8px] bg-[#10b981] flex flex-row items-center justify-center" @click="scanCode">
         <text class="text-[#ffffff] text-[14px] font-bold">扫码测试</text>
@@ -44,7 +192,7 @@
 </template>
 
 <script setup lang="uts">
-import { computed, ref } from 'vue';
+import { computed, onMounted, onUnmounted, ref } from 'vue';
 import Card from '@/src/pages/basic/components/Card.uvue';
 import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/utils/refresh.uts';
 import { useAppStore } from '@/src/store';
@@ -63,18 +211,189 @@ definePage({
 const appStore = useAppStore();
 const isDark = computed((): boolean => appStore.state.isDark);
 
-// 剪贴板与触感
-const copyText = ref('Hello unibestX!');
+// ==================== 1. 通信与分享 ====================
+const phoneNumber = ref<string>('10086');
+const shareSummary = ref<string>('unibestX - 高性能跨端原生开发框架');
+const shareHref = ref<string>('https://unibestx.com');
 
-function triggerVibration() {
+function handleMakePhoneCall(): void {
+  if (phoneNumber.value == '') {
+    uni.showToast({ title: '请输入电话号码', icon: 'none' });
+    return;
+  }
+  uni.makePhoneCall({
+    phoneNumber: phoneNumber.value,
+    success: () => {
+      console.log('拨号成功');
+    },
+    fail: () => {
+      uni.showToast({ title: '已取消或拨号失败', icon: 'none' });
+    }
+  });
+}
+
+function handleShareWithSystem(): void {
+  // #ifdef APP || MP-WEIXIN
+  uni.shareWithSystem({
+    summary: shareSummary.value,
+    href: shareHref.value,
+    success: () => {
+      uni.showToast({ title: '分享调用成功', icon: 'success' });
+    },
+    fail: () => {
+      uni.showToast({ title: '已取消或分享失败', icon: 'none' });
+    }
+  });
+  // #endif
+  // #ifndef APP || MP-WEIXIN
+  uni.setClipboardData({
+    data: `${shareSummary.value} ${shareHref.value}`,
+    success: () => {
+      uni.showToast({ title: '链接已复制到剪贴板', icon: 'none' });
+    }
+  });
+  // #endif
+}
+
+// ==================== 2. 文件与文档 ====================
+const selectedFileName = ref<string>('');
+const selectedFileSizeText = ref<string>('');
+const selectedFilePath = ref<string>('');
+
+function formatFileSize(bytes: number): string {
+  if (bytes <= 0) {
+    return '0 B';
+  }
+  if (bytes < 1024) {
+    return `${bytes} B`;
+  }
+  if (bytes < 1024 * 1024) {
+    const kb = (bytes / 1024.0).toFixed(1);
+    return `${kb} KB`;
+  }
+  const mb = (bytes / (1024.0 * 1024.0)).toFixed(1);
+  return `${mb} MB`;
+}
+
+function handleChooseFile(): void {
+  // #ifdef H5 || MP-WEIXIN || APP
+  try {
+    uni.chooseFile({
+      count: 1,
+      type: 'all',
+      success: (res: any) => {
+        const tempFiles = (res as UTSJSONObject).tempFiles as Array<any> | null;
+        if (tempFiles != null && tempFiles.length > 0) {
+          const fileObj = tempFiles[0] as UTSJSONObject;
+          const name = fileObj.name != null ? `${fileObj.name}` : '已选文件';
+          const size = fileObj.size != null ? (fileObj.size as number) : 0;
+          const path = fileObj.path != null ? `${fileObj.path}` : '';
+
+          selectedFileName.value = name;
+          selectedFileSizeText.value = formatFileSize(size);
+          selectedFilePath.value = path;
+          uni.showToast({ title: '文件选择成功', icon: 'success' });
+        }
+      },
+      fail: () => {
+        uni.showToast({ title: '已取消选择文件', icon: 'none' });
+      }
+    });
+  }
+  catch (_e: any) {
+    console.error(_e);
+    uni.showToast({ title: '当前环境不支持选文件', icon: 'none' });
+  }
+  // #endif
+}
+
+function handleOpenSelectedDoc(): void {
+  if (selectedFilePath.value == '') {
+    uni.showToast({ title: '请先选择文档文件', icon: 'none' });
+    return;
+  }
+  uni.openDocument({
+    filePath: selectedFilePath.value,
+    showMenu: true,
+    success: () => {
+      console.log('文档打开成功');
+    },
+    fail: () => {
+      uni.showToast({ title: '文档预览失败，请检查文件格式', icon: 'none' });
+    }
+  });
+}
+
+function handleDownloadAndOpenSampleDoc(): void {
+  uni.showLoading({ title: '下载示例文档中...' });
+  uni.downloadFile({
+    url: 'https://raw.githubusercontent.com/mozilla/pdf.js/master/examples/learning/helloworld.pdf',
+    success: (res) => {
+      uni.hideLoading();
+      if (res.statusCode == 200 && res.tempFilePath != '') {
+        uni.openDocument({
+          filePath: res.tempFilePath,
+          fileType: 'pdf',
+          showMenu: true,
+          success: () => {
+            uni.showToast({ title: '文档已打开', icon: 'success' });
+          },
+          fail: () => {
+            uni.showToast({ title: '系统暂无法打开该格式文档', icon: 'none' });
+          }
+        });
+      }
+      else {
+        uni.showToast({ title: '文档下载失败', icon: 'none' });
+      }
+    },
+    fail: () => {
+      uni.hideLoading();
+      uni.showToast({ title: '下载示例文档超时或失败', icon: 'none' });
+    }
+  });
+}
+
+// ==================== 3. 键盘感知与避让 ====================
+const keyboardInputText = ref<string>('');
+const keyboardHeight = ref<number>(0);
+
+function handleKeyboardHeightChange(event: UniInputKeyboardHeightChangeEvent): void {
+  keyboardHeight.value = Math.ceil(event.detail.height);
+}
+
+type KeyboardHeightEventRes = {
+  height: number;
+};
+
+function onGlobalKeyboardHeightChange(res: KeyboardHeightEventRes): void {
+  keyboardHeight.value = Math.ceil(res.height);
+}
+
+function handleHideKeyboard(): void {
+  uni.hideKeyboard();
+}
+
+onMounted(() => {
+  uni.onKeyboardHeightChange(onGlobalKeyboardHeightChange);
+});
+
+onUnmounted(() => {
+  uni.offKeyboardHeightChange(onGlobalKeyboardHeightChange);
+});
+
+// ==================== 4. 触感与震动 ====================
+const copyText = ref<string>('Hello unibestX!');
+
+function triggerShortVibration(): void {
   // #ifdef APP || MP-WEIXIN
   uni.vibrateShort({
     type: 'light',
     success: () => {
-      uni.showToast({ title: '已触发短震动', icon: 'none' });
+      uni.showToast({ title: '已触发短震动反馈', icon: 'none' });
     },
     fail: () => {
-      uni.showToast({ title: '震动触发失败', icon: 'none' });
+      uni.showToast({ title: '短震动触发失败', icon: 'none' });
     }
   });
   // #endif
@@ -86,8 +405,27 @@ function triggerVibration() {
   // #endif
 }
 
-function handleCopy() {
-  if (copyText.value === '')
+function triggerLongVibration(): void {
+  // #ifdef APP || MP-WEIXIN
+  uni.vibrateLong({
+    success: () => {
+      uni.showToast({ title: '已触发长震动反馈', icon: 'none' });
+    },
+    fail: () => {
+      uni.showToast({ title: '长震动触发失败', icon: 'none' });
+    }
+  });
+  // #endif
+  // #ifndef APP || MP-WEIXIN
+  uni.showToast({
+    title: '当前环境不支持长震动',
+    icon: 'none'
+  });
+  // #endif
+}
+
+function handleCopy(): void {
+  if (copyText.value == '')
     return;
   uni.setClipboardData({
     data: copyText.value,
@@ -100,11 +438,11 @@ function handleCopy() {
   });
 }
 
-// 相机与扫码
-const photoUrl = ref('');
-const scanResult = ref('');
+// ==================== 5. 相机与多媒体 ====================
+const photoUrl = ref<string>('');
+const scanResult = ref<string>('');
 
-function chooseImage() {
+function chooseImage(): void {
   uni.chooseImage({
     count: 1,
     success: (res) => {
@@ -119,7 +457,7 @@ function chooseImage() {
   });
 }
 
-function scanCode() {
+function scanCode(): void {
   uni.scanCode({
     success: (res) => {
       scanResult.value = res.result;
