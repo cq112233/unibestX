@@ -1,33 +1,88 @@
 <!-- [z-paging-x]loading -->
 <template name="z-paging-loading">
-  <image class="zpx-loading-img" id="z-paging-loading-img" :src="base64FlowerImg" @transitionend="doRotate"></image>
+  <!-- #ifndef VUE3-VAPOR -->
+  <image ref="loadingImg" class="zpx-loading-img" :style="[imgStyle]" :src="finalSrc" @transitionend="doRotate"></image>
+  <!-- #endif -->
+  <!-- #ifdef VUE3-VAPOR -->
+  <!-- 蒸汽模式下基于transition的图片旋转在Android上会随节点复用失效，改为定时器按30度步进设置transform(不使用transition) -->
+  <image class="zpx-loading-img-vapor" :style="[{ transform: 'rotate(' + rotateDeg + 'deg)' }, imgStyle]" :src="finalSrc"></image>
+  <!-- #endif -->
 </template>
 
 <script setup lang="uts">
-  import { ref, onMounted, nextTick } from 'vue'
-  import { base64Flower } from '../static/index.uts'
+  import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
+  import { getLoadingSvg } from '../static/index.uts'
 
+  const props = defineProps({
+    // loading颜色
+    color: {
+      type: String,
+      default: '#949494'
+    },
+    // 自定义loading图片，为空时使用内置loading
+    src: {
+      type: String,
+      default: ''
+    },
+    // 是否展示旋转动画
+    animated: {
+      type: Boolean,
+      default: true
+    },
+    // loading样式
+    imgStyle: {
+      type: Object,
+      default: (): UTSJSONObject => ({})
+    }
+  })
+
+  const finalSrc = computed((): string => {
+    return props.src.length > 0 ? props.src : getLoadingSvg(props.color);
+  })
+
+  // #ifndef VUE3-VAPOR
   const times = ref(0)
-  const element = ref<UniElement | null>(null)
-  const base64FlowerImg = ref(base64Flower)
+  // 通过模板ref获取当前实例的图片元素，避免多个loading实例共用固定id时只有一个能旋转
+  const loadingImg = ref<UniElement | null>(null)
 
   // 旋转动画执行
   const doRotate = () => {
-    if (element.value !== null) {
+    if (!props.animated) return;
+    if (loadingImg.value !== null) {
       times.value = times.value + 1;
-      element.value!.style.setProperty('transform', 'rotate(' + times.value * 360 + 'deg)');
-      element.value!.style.setProperty('transition-duration', '1000ms');
+      loadingImg.value!.style.setProperty('transform', 'rotate(' + times.value * 360 + 'deg)');
+      loadingImg.value!.style.setProperty('transition-duration', '1000ms');
     }
   }
 
   onMounted(() => {
     nextTick(() => {
       setTimeout(() => {
-        element.value = uni.getElementById('z-paging-loading-img');
         doRotate();
       }, 10)
     })
   })
+  // #endif
+
+  // #ifdef VUE3-VAPOR
+  // 当前旋转角度，每秒转一圈，每步30度(与内置loading的12根线条对应)
+  const rotateDeg = ref(0)
+  let rotateTimer: number = -1
+
+  onMounted(() => {
+    if (!props.animated) return;
+    rotateTimer = setInterval(() => {
+      rotateDeg.value = (rotateDeg.value + 30) % 360;
+    }, 1000 / 12);
+  })
+
+  onBeforeUnmount(() => {
+    if (rotateTimer != -1) {
+      clearInterval(rotateTimer);
+      rotateTimer = -1;
+    }
+  })
+  // #endif
 </script>
 
 <style>
@@ -38,5 +93,11 @@
     transition-property: transform;
     transition-timing-function: linear;
     transform: rotate(0deg);
+  }
+
+  /* 蒸汽模式下不设置transition，由定时器步进旋转 */
+  .zpx-loading-img-vapor {
+    width: 34rpx;
+    height: 34rpx;
   }
 </style>

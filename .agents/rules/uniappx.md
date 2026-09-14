@@ -119,7 +119,7 @@ description: uni-app X (UTS) 开发规范与踩坑避坑指南，适用于跨端
               <!-- 滚动内容 -->
             </scroll-view>
             ```
-        *   **整页按内容高度滚动**：根用 `<view class="flex flex-col">`（不加 flex-1），整页由布局 scroll-view 接管，页面用 `onNavbarPageScroll` / `onNavbarReachBottom`（见 `src/utils/pageScroll.uts`）监听，替代原生 `onPageScroll` / `onReachBottom`。
+        *   **整页按内容高度滚动**：根用 `<view class="flex flex-col">`（不加 flex-1），整页由布局 scroll-view 接管，页面用 `onNavbarPageScroll` / `onNavbarReachBottom`（见 `src/utils/refresh.uts`）监听，替代原生 `onPageScroll` / `onReachBottom`。
     *   **内容可用高度用 `computedAvailableHeight`**（navbar / default 通用）：框架已按当前布局自动算好（状态栏 / 导航栏 / tabbar 均已扣除），开发者直接用这个值绑定高度即可，其余不用操心：
         ```html
         <view :style="{ height: `${computedAvailableHeight}px` }">
@@ -245,6 +245,14 @@ description: uni-app X (UTS) 开发规范与踩坑避坑指南，适用于跨端
 * **安全获取系统与应用语言 (Safe Access to System Locale)**：
   * 在原生 Android/iOS 平台上，`uni.getLocale()` 不被直接支持或编译时可能报错。
   * *正确做法*：在 App 端，使用 `uni.getSystemInfoSync().appLanguage`（应用当前语言）或 `uni.getDeviceInfo().osLanguage`（系统底层语言）来获取安全真实的语言。
+* **严禁在对象字面量（UTSJSONObject）中放入顶层函数导出 (No Functions in Object Literals)**：
+  * 在 UTS 跨端编译中，严禁写出如 `export const env = { getApiBaseUrl }` 这类包裹了函数的对象字面量导出。
+  * **原因**：UTS 将对象字面量编译为 Kotlin 的 `_uO("getApiBaseUrl" to getApiBaseUrl)`。在 Kotlin 原生语法中，顶层函数名不能作为表达式裸露赋值给 Map，会导致 Kotlin 编译器直接报 `error: Function invocation 'xxx()' expected.` 编译崩溃；且 `UTSJSONObject` 在强类型原生端无法动态调用方法。
+  * *正确做法*：所有工具函数全部统一使用标准 ES 模块具名函数导出（`export function getApiBaseUrl(): string { ... }`），业务方按需具名导入（`import { getApiBaseUrl } from '@/src/utils/env.uts'`）。
+* **严禁顶层函数与顶层属性使用同名 Getter 命名 (No Conflicting Getter Functions for Top-level Properties)**：
+  * 在同一个 `.uts` 文件顶层，若导出了属性（如 `export const windowHeight = computed(...)`），**严禁在顶层额外导出一个同名的 Getter 函数（如 `export function getWindowHeight(): number`）**。
+  * **原因**：在 Kotlin 原生编译中，属性 `val windowHeight` 会由 Kotlin 编译器自动生成静态 getter：`public static final ComputedRef getWindowHeight()`。若同文件还显式导出了同名顶层函数 `fun getWindowHeight(): Number`，两者在 JVM 字节码签名上发生声明冲突（Platform Declaration Clash），函数的返回类型会挤占破坏属性原本的 getter。当 Vue 模板在执行 `{{ windowHeight }}` 时，因找不到匹配的 getter 而在运行时直接崩溃报：`java.lang.NoSuchMethodError: No static method getWindowHeight()Lio/dcloud/uniapp/vue/ComputedRef; in class ...`。
+  * *正确做法*：顶层仅保留属性本身（`export const windowHeight = computed(...)`），不要在顶层额外导出一个同名 getter。若需面向对象式调用，将其封装在 class 实例方法中（如 `systemUtils.getWindowHeight()`），避免污染包顶层静态命名空间。
 * **`computed` 只允许单参 getter 形式 (Computed: Getter-Only)**：
   * 禁止在 `<script setup>` 顶层写带显式泛型的可写 computed：`computed<T>({ get() {...}, set() {...} })`。它**能通过编译**——`cli publish` 与 IDE 编译均无任何告警——但运行期必抛 `java.lang.ClassCastException: UTSJSONObject cannot be cast to WritableComputedOptions`（UTS 把该对象字面量落实为 `UTSJSONObject`，而非运行时期望的 `WritableComputedOptions`）。实测于 2026-09-11 `up-radio-group` / `up-checkbox-group`。
   * *正确做法*：只读用途写 `const modelValue = computed<RadioValue>((): RadioValue => props.modelValue)`；需要回写的场景（v-model 等）在业务函数里直接 `emit('update:modelValue', v)`，不要绕经 setter。
@@ -256,6 +264,7 @@ description: uni-app X (UTS) 开发规范与踩坑避坑指南，适用于跨端
   * *错误示例*：`const style = computed(() => placementClass.value)` 写在 `const placementClass = computed(() => ...)` 之前。
 
 ---
+
 
 ## 7. 页面开发与 `definePage` 必须配置规范 (AI 新增页面必备)
 

@@ -1,34 +1,42 @@
 <template>
   <Card :title="themeTitle">
     <!-- 预览区域 -->
-    <view class="rounded-[12px] p-[16px] mb-[16px] border-[1px] border-solid border-[#e2e8f0] items-center">
-      <text class="text-[12px] text-[#94a3b8] mb-[8px]">{{ themePreview }}</text>
+    <view
+      class="rounded-[12px] p-[16px] mb-[16px] border-[1px] border-solid items-center"
+      :style="{ borderColor: 'var(--border-color, #e2e8f0)' }"
+    >
+      <text
+        class="text-[12px] mb-[8px]"
+        :style="{ color: 'var(--text-secondary, #94a3b8)' }"
+      >
+        {{ themePreview }}
+      </text>
 
       <view
         class="mt-[10px] mx-auto w-[200px] h-[44px] rounded-[8px] flex flex-row items-center justify-center"
         :style="{ backgroundColor: currentTheme }"
       >
-        <text class="text-[#ffffff] text-[14px]">{{ themeButton }}</text>
+        <text class="text-[#ffffff] text-[14px] font-medium">{{ themeButton }}</text>
       </view>
     </view>
 
     <!-- 颜色选择区 -->
-    <view class="flex-row justify-between py-[10px]">
+    <view class="flex flex-row justify-between py-[10px]">
       <view
-        v-for="(item, index) in colorOptions"
+        v-for="(item, index) in THEME_COLOR_PRESETS"
         :key="index"
         class="w-[40px] h-[40px] rounded-[20px] items-center justify-center"
         :style="{
           backgroundColor: item,
           borderWidth: currentTheme == item ? '3px' : '0px',
           borderStyle: 'solid',
-          borderColor: '#1e293b'
+          borderColor: appStore.state.isDark ? '#ffffff' : '#1e293b'
         }"
         @click="changeTheme(item)"
       >
         <text
           v-if="currentTheme == item"
-          class="text-[16px] text-white font-bold"
+          class="text-[16px] text-[#ffffff] font-bold"
         >
           ✓
         </text>
@@ -36,10 +44,15 @@
     </view>
 
     <!-- 外观模式：跟随系统 / 浅色 / 深色 -->
-    <view class="flex-row justify-between items-center mt-[10px] pt-[10px]">
-      <text class="text-[14px] text-[#2d3748]">{{ themeModeLabel }}</text>
+    <view class="flex flex-row justify-between items-center mt-[10px] pt-[10px]">
+      <text
+        class="text-[14px]"
+        :style="{ color: 'var(--text-color, #2d3748)' }"
+      >
+        {{ themeModeLabel }}
+      </text>
       <view
-        class="flex-row rounded-[8px] overflow-hidden"
+        class="flex flex-row rounded-[8px] overflow-hidden"
         :style="{
           borderWidth: '1px',
           borderStyle: 'solid',
@@ -51,14 +64,14 @@
           :key="index"
           class="px-[14px] py-[8px]"
           :style="{
-            backgroundColor: appStore.state.themeMode == item.value ? appStore.state.theme : 'transparent'
+            backgroundColor: currentMode == item.value ? currentTheme : 'transparent'
           }"
           @click="changeThemeMode(item.value)"
         >
           <text
             class="text-[12px]"
             :style="{
-              color: appStore.state.themeMode == item.value ? '#ffffff' : 'var(--text-secondary, #64748b)'
+              color: currentMode == item.value ? '#ffffff' : 'var(--text-secondary, #64748b)'
             }"
           >
             {{ item.label }}
@@ -72,13 +85,15 @@
 <script setup lang="uts">
 import Card from './Card.uvue';
 import { computed } from 'vue';
-import { useAppStore } from '@/src/store/index.uts';
+import { useAppStore } from '@/src/store';
 import { $t } from '@/src/utils/i18n';
+import { THEME_COLOR_PRESETS } from '@/src/utils/theme.uts';
+import { toast } from '@/src/utils/toast.uts';
 
 // 外观模式选项：auto（跟随系统）/ light（浅色）/ dark（深色）
 type ThemeModeOption = {
-  value: string;
   label: string;
+  value: string;
 };
 
 const appStore = useAppStore();
@@ -88,46 +103,24 @@ const themePreview = computed((): string => $t('basic.themePreview'));
 const themeButton = computed((): string => $t('basic.themeButton'));
 const themeModeLabel = computed((): string => $t('basic.themeModeTitle'));
 
+const currentTheme = computed((): string => appStore.state.theme);
+const currentMode = computed((): string => appStore.state.themeMode);
+
 const themeModeOptions = computed((): ThemeModeOption[] => {
   return [
-    { value: 'auto', label: $t('basic.themeModeAuto') },
-    { value: 'light', label: $t('basic.themeModeLight') },
-    { value: 'dark', label: $t('basic.themeModeDark') }
+    { label: $t('basic.themeModeAuto'), value: 'auto' },
+    { label: $t('basic.themeModeLight'), value: 'light' },
+    { label: $t('basic.themeModeDark'), value: 'dark' }
   ];
 });
 
-const currentTheme = computed((): string => {
-  return appStore.state.theme;
-});
-
-const colorOptions = [
-  '#37c2bc',
-  '#0957DE',
-  '#10b981',
-  '#f43f5e',
-  '#f97316'
-];
-
 function changeTheme(color: string) {
   appStore.setTheme(color);
-
-  uni.showToast({
-    title: $t('basic.themeSuccess'),
-    icon: 'none',
-    duration: 1500
-  });
+  toast($t('basic.themeSuccess'));
 }
 
 function changeThemeMode(value: string) {
   appStore.setThemeMode(value);
-
-  uni.showToast({
-    title: $t('basic.themeModeSuccess'),
-    icon: 'none',
-    duration: 1500
-  });
+  toast($t('basic.themeModeSuccess'));
 }
 </script>
-
-<style>
-</style>
