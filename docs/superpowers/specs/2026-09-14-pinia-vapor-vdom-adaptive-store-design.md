@@ -20,11 +20,11 @@ src/store/
 ├── app.uts             # 条件编译门面：导出 useAppStore、IAppState 等
 ├── user.uts            # 条件编译门面：导出 useUserStore、IUserState、IUserInfo 等
 ├── token.uts           # 条件编译门面：导出 useTokenStore、ITokenState 等
-├── official/           # 🌟 官方 Pinia 实现（Vapor / Web / iOS / Harmony / 小程序）
+├── vapor/              # 🌟 官方 Pinia 实现（Vapor / Web / iOS / Harmony / 小程序）
 │   ├── index.ts        # createPinia() + createPersistedState()
-│   ├── app.ts          # 基于 official pinia 的 useAppStore
-│   ├── user.ts         # 基于 official pinia 的 useUserStore
-│   └── token.ts        # 基于 official pinia 的 useTokenStore
+│   ├── app.ts          # 基于 vapor pinia 的 useAppStore
+│   ├── user.ts         # 基于 vapor pinia 的 useUserStore
+│   └── token.ts        # 基于 vapor pinia 的 useTokenStore
 └── vdom/               # 🛡️ Android VDOM 原生实现（x-pinia-s）
     ├── index.uts       # x-pinia-s 的 createPinia() + createPersistPlugin()
     ├── app.uts         # AppStore (extends PiniaStoreBase)
@@ -39,15 +39,15 @@ src/store/
   只引入并编译 `src/store/vdom/`，绝不引用 npm 模块 `pinia`，保证 Android 原生 Kotlin 编译 100% 成功。
 - **官方 Pinia 分支**：
   `#ifndef APP-ANDROID && !VUE3-VAPOR`（包含 `VUE3-VAPOR`、`H5`、`WEB`、`MP`、`APP-IOS`、`APP-HARMONY`）
-  引入 `src/store/official/`，使用官方 `pinia` 与 `pinia-plugin-persistedstate`。
+  引入 `src/store/vapor/`，使用官方 `pinia` 与 `pinia-plugin-persistedstate`。
 
 ---
 
 ## 3. 详细实现设计
 
-### 3.1 官方 Pinia 实现 (`src/store/official/`)
+### 3.1 官方 Pinia 实现 (`src/store/vapor/`)
 
-#### 3.1.1 插件初始化 (`official/index.ts`)
+#### 3.1.1 插件初始化 (`vapor/index.ts`)
 ```ts
 import { createPinia, setActivePinia } from 'pinia';
 import { createPersistedState } from 'pinia-plugin-persistedstate';
@@ -85,7 +85,10 @@ export default pinia;
 ### 3.3 门面文件设计 (`src/store/*.uts`)
 各顶层门面文件仅负责根据条件编译转发生效实现：
 ```uts
-// src/store/index.uts
+// #ifndef APP-ANDROID && !VUE3-VAPOR
+import pinia from './vapor/index';
+// #endif
+
 // #ifdef APP-ANDROID && !VUE3-VAPOR
 import pinia from './vdom/index.uts';
 export default pinia;
