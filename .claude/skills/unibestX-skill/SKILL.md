@@ -185,6 +185,58 @@ function getLength(str: string | null): number {
   1. 顶层若已导出属性 `export const windowHeight = computed(...)`，**严禁在顶层额外导出 `export function getWindowHeight()`**；
   2. 若需面向对象风格的调用，封装在独立 class 的实例方法中（如 `systemUtils.getWindowHeight()`），因为类实例方法编译为类成员虚拟方法，绝不会干扰包顶层的静态方法签名。
 
+#### 1.1.12 严禁多层 / 重复 `export *` 星号重导出同一顶层符号（Kotlin 端符号被改名 `xxx__1`）
+
+- **报错现象（一错两态，同一根因）**：
+  1. **编译期**：`.uts` 文件引用处报 `error18 找不到名称"useTokenStore"`（`参考: compiler-known-issues.html#error18`）；
+  2. **运行期**：`.uvue` 页面调用处崩溃 `java.lang.NoSuchMethodError: No static method getUseAppStore()Lkotlin/jvm/functions/Function0; in class Luni/UNIB120614/IndexKt`。
+- **底层原理**：UTS 在 Android 端会把**多个 `.uts` 源文件合并**生成同一个 Kotlin 文件（如 `unpackage/cache/.app-android/src/index.kt`，Kotlin 类名 `IndexKt`）。当同一个顶层符号（如 `useAppStore`）被 **两层门面重复 `export *` 转发**（例如 `src/store/index.uts` → `./vdom/app.uts`，同时 `src/store/vdom/index.uts` 也 → `./app`），合并后会产生重名声明，UTS 编译器将后者**自动改名为 `useAppStore__1`**：
+  - `.uts` 文件内的调用点会被**同步改写**为 `useTokenStore__1()`，因此 `.uts` 之间可能"看起来正常"；
+  - `.uvue` 页面编译为**独立的 Kotlin 文件**（如 `App.ku.kt`），其调用点不会同步改写，仍写 `useAppStore()` → Kotlin 按顶层属性生成 getter 访问 `IndexKt.getUseAppStore()` → 该静态方法不存在 → 编译期 or 运行期崩溃。
+- **强制规范**：
+  1. 一个顶层符号**只允许在一层门面中 `export *` 转发**；门面链严禁套娃（`index.uts` 再 `export *` 一个同样做 `export *` 的 `index.uts`）；
+  2. 本项目 `src/store/index.uts` 是**唯一**门面，`src/store/vdom/index.uts`、`src/store/vapor/index.ts` 只负责创建并默认导出 pinia 实例，**严禁再 `export *` 转发 stores**；
+  3. 同理，新增聚合门面（如 `src/tabbar/index.uts`、`src/router/index.uts`）时，被聚合的子模块自身不得再对外做整包重导出，避免形成两层转发。
+- **排查方法（人工定位）**：直接检查生成的 Kotlin 产物，若出现 `useXxx__1`、`val useAppStore__1 =` 字样即命中：
+
+  ```bash
+  grep -n "val use" unpackage/cache/.app-android/src/index.kt
+  ```
+
+- **错误示例**（两层 `export *` 转发同一 store，导致 `useAppStore__1`）：
+
+```uts
+// ❌ src/store/vdom/index.uts —— 子模块内部又转发一次
+export default pinia;
+export * from './app';
+export * from './token';
+export * from './user';
+
+// ❌ src/store/index.uts —— 门面再次转发，形成两层重导出
+export * from './vdom/app.uts';
+export * from './vdom/token.uts';
+export * from './vdom/user.uts';
+```
+
+```uts
+// ✅ src/store/vdom/index.uts —— 只创建并默认导出 pinia 实例
+export default pinia;
+```
+
+```uts
+// ✅ src/store/index.uts —— 唯一门面，单层转发到具体实现文件
+// #ifdef !VUE3-VAPOR
+import pinia from './vdom/index.uts';
+// #endif
+export default pinia;
+
+// #ifdef !VUE3-VAPOR
+export * from './vdom/app.uts';
+export * from './vdom/token.uts';
+export * from './vdom/user.uts';
+// #endif
+```
+
 ---
 
 ### 1.2 样式 (CSS & Tailwind CSS) 与原生渲染铁律
@@ -822,6 +874,7 @@ onNavbarPullDownRefresh(() => {
 | **文档预览参数 (openDocument)** | `uni.openDocument({ showMenu: true })`（Kotlin 报错 `No parameter with name 'showMenu' found`） | 移除 `showMenu`，仅传 `filePath` 与 `fileType` |
 | **键盘全局监听解绑** | `uni.offKeyboardHeightChange(callback)`（Kotlin 报错 `预期类型为 'Number?'`） | 保存 `listenerId = uni.onKeyboardHeightChange(...)`，通过 `uni.offKeyboardHeightChange(listenerId)` 解绑 |
 | **原生回调参数访问** | `(res as UTSJSONObject).tempFiles`（Kotlin 运行时崩溃 `ChooseFileSuccess cannot be cast to UTSJSONObject`） | 直接利用原生类型推断访问 `res.tempFiles` / `res.tempFilePaths`，严禁强转 `UTSJSONObject` |
+| **多层 `export *` 重导出（`error18 找不到名称"useXxxStore"` / 运行期 `NoSuchMethodError: getUseXxxStore()`）** | 子模块 `vdom/index.uts` 与门面 `store/index.uts` 对同一符号各 `export *` 转发一次（生成 `useXxxStore__1`） | 同一顶层符号只在一层门面中 `export *`；子模块 `index.uts` 只创建并默认导出实例，严禁再转发 |
 
 ---
 
@@ -849,6 +902,7 @@ onNavbarPullDownRefresh(() => {
 - [ ] **18. 严禁在 `uni.openDocument` 中传递 `showMenu` 参数**（uni-app X 原生 Kotlin 不支持该字段，会触发编译报错 `No parameter with name 'showMenu' found`）
 - [ ] **19. 全局键盘监听解绑必须使用 `listenerId: number`**（`uni.offKeyboardHeightChange` 入参为数字 ID 而非回调函数）
 - [ ] **20. 严禁将系统 API 回调原生结果对象强转为 `UTSJSONObject`**（如 `chooseFile` 的 `res as UTSJSONObject`，会触发 Android Kotlin 运行时 `ClassCastException` 崩溃，应直接访问对象属性）
+- [ ] **21. 严禁多层 / 重复 `export *` 转发同一顶层符号**（会导致 Kotlin 端符号被改名为 `useXxxStore__1`，`.uts` 编译报 `error18 找不到名称`、`.uvue` 运行期报 `NoSuchMethodError: getUseXxxStore()`；同一符号只允许在一层门面中转发，子模块 `index.uts` 不得再整包重导出）
 
 ---
 

@@ -1,0 +1,111 @@
+<template>
+  <Card title="状态管理与 src/store 模式演示">
+    <!-- 模式与状态展示 -->
+    <view
+      class="rounded-[12px] p-[16px] mb-[16px] border-[1px] border-solid"
+      :style="{ borderColor: 'var(--border-color, #e2e8f0)' }"
+    >
+      <view class="flex-row justify-between items-center mb-[8px]">
+        <text class="text-[14px]" :style="{ color: 'var(--text-secondary, #64748b)' }">Store 实现模式:</text>
+        <text class="text-[14px] font-bold" :style="{ color: storeModeColor }">
+          {{ storeImplementation }}
+        </text>
+      </view>
+
+      <view class="flex-row justify-between items-center mb-[8px]">
+        <text class="text-[14px]" :style="{ color: 'var(--text-secondary, #64748b)' }">编译运行模式:</text>
+        <text class="text-[14px]" :style="{ color: 'var(--text-color, #2d3748)' }">{{ compileMode }}</text>
+      </view>
+
+      <view class="flex-row justify-between items-center mb-[8px]">
+        <text class="text-[14px]" :style="{ color: 'var(--text-secondary, #64748b)' }">appStore 主题 / 语言:</text>
+        <text class="text-[14px]" :style="{ color: 'var(--text-color, #2d3748)' }">{{ appSummary }}</text>
+      </view>
+
+      <view class="flex-row justify-between items-center mb-[8px]">
+        <text class="text-[14px]" :style="{ color: 'var(--text-secondary, #64748b)' }">userStore 用户信息:</text>
+        <text class="text-[14px]" :style="{ color: 'var(--text-color, #2d3748)' }">{{ userSummary }}</text>
+      </view>
+
+      <view class="flex-row justify-between items-center">
+        <text class="text-[14px]" :style="{ color: 'var(--text-secondary, #64748b)' }">tokenStore 登录状态:</text>
+        <text class="text-[14px] font-bold" :style="{ color: hasLogin ? '#10b981' : '#f43f5e' }">
+          {{ tokenSummary }}
+        </text>
+      </view>
+
+      <text class="text-[12px] leading-normal mt-[10px]" :style="{ color: 'var(--text-secondary, #94a3b8)' }">
+        说明：三个 store 统一从门面 @/src/store 导出，编译期按 VUE3-VAPOR 条件自动切换「Vapor 官方 Pinia」与「VDOM x-pinia-s」，业务调用写法完全一致；写入的数据会持久化到本地 Storage，重启后仍在。
+      </text>
+    </view>
+
+    <!-- 操作按钮区 -->
+    <view class="flex-row justify-between">
+      <view
+        class="flex-1 rounded-[8px] h-[42px] flex flex-row items-center justify-center"
+        :style="{ backgroundColor: 'var(--theme-color, #3182ce)' }"
+        @click="mockLogin"
+      >
+        <text class="text-[#ffffff] text-[14px]">模拟登录写入</text>
+      </view>
+      <view
+        class="flex-1 ml-[12px] bg-[#ef4444] rounded-[8px] h-[42px] flex flex-row items-center justify-center"
+        @click="mockLogout"
+      >
+        <text class="text-[#ffffff] text-[14px]">退出并重置</text>
+      </view>
+    </view>
+  </Card>
+</template>
+
+<script setup lang="uts">
+import Card from './Card.uvue';
+import { computed } from 'vue';
+import type { ISingleTokenRes, IUserInfo } from '@/src/store';
+import { useAppStore, useTokenStore, useUserStore } from '@/src/store';
+import { getCompileMode } from '@/src/utils/env.uts';
+import { toastSuccess } from '@/src/utils/toast.uts';
+
+const appStore = useAppStore();
+const userStore = useUserStore();
+const tokenStore = useTokenStore();
+
+const storeImplementation = computed((): string => appStore.state.mode == 'vapor' ? 'Vapor 官方 Pinia' : 'VDOM x-pinia-s');
+const storeModeColor = computed((): string => appStore.state.mode == 'vapor' ? '#10b981' : '#3b82f6');
+const compileMode = computed((): string => getCompileMode());
+const appSummary = computed((): string => `${appStore.state.theme} / ${appStore.state.locale}`);
+
+const userSummary = computed((): string => {
+  const info = userStore.state.userInfo;
+  if (info.userId < 0) {
+    return '未写入';
+  }
+  const name = info.nickname != '' ? info.nickname : info.username;
+  return `${name} (id: ${info.userId})`;
+});
+
+const hasLogin = computed((): boolean => tokenStore.hasValidLogin());
+const tokenSummary = computed((): string => tokenStore.hasValidLogin() ? '已登录（token 有效）' : '未登录');
+
+function mockLogin() {
+  tokenStore.setSingleToken({
+    token: 'mock-token-UNIBESTX-0001',
+    expiresIn: 7200
+  } as ISingleTokenRes);
+
+  userStore.setUserInfo({
+    userId: 1001,
+    username: 'UNIBESTX',
+    nickname: 'unibestX 演示用户',
+    avatar: '/static/logo.png'
+  } as IUserInfo);
+
+  toastSuccess('已写入 userStore / tokenStore');
+}
+
+function mockLogout() {
+  tokenStore.clearToken();
+  userStore.clearUserInfo();
+  toastSuccess('已重置 userStore / tokenStore');
+}
+</script>

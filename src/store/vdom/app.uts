@@ -19,13 +19,15 @@ export type IAppState = {
   locale: string;
   themeMode: string; // 'auto'（跟随系统）| 'light' | 'dark'
   isDark: boolean; // 实际生效的亮/暗（auto 模式下跟随系统/宿主主题）
+  mode: string; // 当前 Store 实现模式：'vdom'（x-pinia-s）| 'vapor'（官方 Pinia）
 };
 
 const defaultAppState: IAppState = {
   theme: getDefaultTheme(),
   locale: getDefaultLocale(),
   themeMode: 'auto',
-  isDark: isDarkMode('auto')
+  isDark: isDarkMode('auto'),
+  mode: 'vdom'
 };
 
 // ==========================================
@@ -38,7 +40,8 @@ export class AppStore extends PiniaStoreBase {
     theme: getDefaultTheme(),
     locale: getDefaultLocale(),
     themeMode: 'auto',
-    isDark: isDarkMode('auto')
+    isDark: isDarkMode('auto'),
+    mode: 'vdom'
   });
 
   // 是否已注册全局主题监听（防止重复注册）
@@ -68,6 +71,7 @@ export class AppStore extends PiniaStoreBase {
     this.state.locale = defaultAppState.locale;
     this.state.themeMode = defaultAppState.themeMode;
     this.state.isDark = defaultAppState.isDark;
+    this.state.mode = defaultAppState.mode;
 
     themeColor.value = defaultAppState.theme;
     applyThemeColor(defaultAppState.theme);

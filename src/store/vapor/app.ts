@@ -20,6 +20,7 @@ export type IAppState = {
   locale: string;
   themeMode: string; // 'auto'（跟随系统）| 'light' | 'dark'
   isDark: boolean; // 实际生效的亮/暗
+  mode: string; // 当前 Store 实现模式：'vapor'（官方 Pinia）| 'vdom'（x-pinia-s）
 };
 
 export const useAppStore = defineStore('app', () => {
@@ -28,7 +29,8 @@ export const useAppStore = defineStore('app', () => {
     theme: getDefaultTheme(),
     locale: getDefaultLocale(),
     themeMode: 'auto',
-    isDark: isDarkMode('auto')
+    isDark: isDarkMode('auto'),
+    mode: 'vapor'
   });
 
   let _themeModeInited = false;
