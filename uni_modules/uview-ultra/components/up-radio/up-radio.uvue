@@ -33,7 +33,7 @@
 
 <script setup lang="uts">
 	import { computed, inject, ref } from 'vue'
-	import { addUnit, addStyle, os, deepMerge, error } from '../../libs/function/index'
+	import { addUnit, addStyle, os, deepMerge, error } from '../../libs/function/index.uts'
 	import config from '../../libs/config/config'
 	import { RADIO_GROUP_KEY } from '../up-radio-group/type.uts'
 	import type { RadioGroupProvide } from '../up-radio-group/type.uts'
@@ -156,7 +156,7 @@
 	})
 
 	const elLabelSize = computed<string>((): string => {
-		return addUnit(pick(props.labelSize, fromGroup('labelSize'), '15'))
+		return addUnit(pick(props.labelSize, fromGroup('labelSize'), '15')) ?? ''
 	})
 
 	const elIconColor = computed<string>((): string => {

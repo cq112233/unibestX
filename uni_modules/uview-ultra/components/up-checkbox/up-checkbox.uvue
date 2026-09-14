@@ -33,7 +33,7 @@
 
 <script setup lang="uts">
 	import { computed, inject, ref, watch } from 'vue'
-	import { addStyle, addUnit, deepMerge, error } from '../../libs/function/index'
+	import { addStyle, addUnit, deepMerge, error } from '../../libs/function/index.uts'
 	import config from '../../libs/config/config'
 	import { CHECKBOX_GROUP_KEY } from '../up-checkbox-group/type.uts'
 	import type { CheckboxGroupProvide } from '../up-checkbox-group/type.uts'
@@ -167,7 +167,7 @@
 	})
 
 	const elLabelSize = computed<string>((): string => {
-		return addUnit(pick(props.labelSize, fromGroup('labelSize'), '15'))
+		return addUnit(pick(props.labelSize, fromGroup('labelSize'), '15')) ?? ''
 	})
 
 	const elIconColor = computed<string>((): string => {

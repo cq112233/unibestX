@@ -35,7 +35,7 @@
 
 <script setup lang="uts">
 import { computed } from 'vue'
-import { addUnit } from '../../libs/function/index'
+import { addUnit } from '../../libs/function/index.uts'
 
 defineOptions({
   name: 'up-avatar-group'
@@ -87,7 +87,7 @@ const showUrl = computed<Array<any>>(() => {
 })
 
 function getItemMarginLeft(index: number): string {
-    return index == 0 ? '0px' : addUnit(0 - parseFloat(props.size.toString()) * parseFloat(props.gap.toString()))
+    return index == 0 ? '0px' : (addUnit(0 - parseFloat(props.size.toString()) * parseFloat(props.gap.toString())) ?? '')
 }
 
 const textStr = computed<string>(() => {

@@ -140,9 +140,8 @@ const rowsArray = computed<Array<UTSJSONObject>>(() => {
 })
 
 const uTitleWidth = computed<string>(() => {
-  let tWidth = '0px'
-  tWidth = addUnit(props.titleWidth)
-  return addUnit(tWidth)
+  const tWidth = addUnit(props.titleWidth) ?? '0px'
+  return addUnit(tWidth) ?? ''
 })
 
 const avatarStyle = computed((): UTSJSONObject => {

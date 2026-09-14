@@ -113,7 +113,7 @@ let contentObserver: any | null = null
 
 // 计算属性：图片高度，可能为auto，带%，或者直接数值
 const imgHeight = computed(() => {
-    return addUnit(props.height)
+    return addUnit(props.height) ?? ''
 })
 
 // 计算属性：wrap 样式

@@ -34,7 +34,7 @@
 
 <script setup lang="uts">
 import { computed } from 'vue'
-import { addUnit, deepMerge, addStyle } from '../../libs/function/index'
+import { addUnit, deepMerge, addStyle } from '../../libs/function/index.uts'
 
 defineOptions({
   name: 'up-loading-page'
@@ -95,7 +95,7 @@ const imageSizeStyle = computed((): UTSJSONObject => {
 })
 
 const formattedIconSize = computed((): string => {
-  return addUnit(props.iconSize)
+  return addUnit(props.iconSize) ?? ''
 })
 
 const textStyle = computed((): UTSJSONObject => {
