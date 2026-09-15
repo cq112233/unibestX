@@ -8,7 +8,7 @@
  * 用法（参数必须显式给出；不认识的参数一律报错退出）：
  *   node scripts/check-tabbar-surface.mjs              # 打印当前导出面并与基线比对
  *   node scripts/check-tabbar-surface.mjs --write      # 写入基线文件
- *   node scripts/check-tabbar-surface.mjs --expect 32  # 断言符号集与符号数，不符则退出码 1
+ *   node scripts/check-tabbar-surface.mjs --expect 32  # 断言符号数，且不得出现新增符号（被移除者的身份需人工核对 `已移除：` 行）
  *
  * 解析策略：先剥注释，再逐行白名单 —— 不静默计数
  *   读入文件后先剥掉块注释（含跨行）与行尾注释（用等长空格替换，保持行号对齐），
@@ -28,8 +28,13 @@
  *     `export const { a, b } = obj`（解构）等等。
  *   宁可让检查变红，也不产出一份看起来正确、实则残缺的导出面。
  *
- * 已知残余限制（刻意接受的取舍）：多行模板字符串里独占一行的 `export` 仍会被误判成导出
- * 语句。这属于「误报」而非「静默漏计」—— 检查会变红、错误信息里带着原始行，人看得见。
+ * 已知残余限制（刻意接受的取舍）：
+ *   1. 注释剥离是基于正则的近似实现，不解析字符串与模板串。若块注释起始符出现在字符串
+ *      或行注释里，它会一路吞到其后第一个块注释收尾符，把中间的真实导出行整行抹掉。已用
+ *      「只剥合法块注释」与「真实剥离」的导出行计数守卫兜住这一最危险的后果（静默少算
+ *      导出面）：两者行数不等即报错退出、不再继续扫描；
+ *   2. 多行模板字符串里独占一行的 `export` 仍会被误判成导出语句。
+ *   以上残余影响均为「误报」（可见、变红），而非静默漏计，符合本脚本「宁可变红」的取舍。
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -89,6 +94,8 @@ function resolveModule(fromFile, spec) {
 }
 
 let parseError = false;
+/** 基线「存在但读不了」时置位：调用方据此不再补一句误导性的「不存在」 */
+let baselineReadError = false;
 const visited = new Set();
 const found = new Map();
 
@@ -97,10 +104,40 @@ function walk(file) {
   if (visited.has(abs))
     return;
   visited.add(abs);
-  const raw = fs.readFileSync(abs, 'utf8');
+
+  let raw;
+  try {
+    raw = fs.readFileSync(abs, 'utf8');
+  }
+  catch (error) {
+    console.error(`✗ 无法读取文件：${abs}（${error.message}）`);
+    parseError = true;
+    return;
+  }
+
   const rel = path.relative(ROOT, abs);
   const rawLines = raw.split('\n');
   const lines = stripComments(raw).split('\n');
+
+  // 守卫：正则剥离不解析字符串与行注释。若「块注释起始符」其实出现在字符串或行注释里，
+  // 它会一路吞到其后第一个收尾符，把中间的真实导出行整行抹成空格 —— 静默少算导出面 = 假绿。
+  // 但合法块注释里本来就可能写着 export 字样（那是注释不是导出），所以不能拿「原始全文」
+  // 当基准。基准取「只剥合法块注释」的结果：两者导出行数一旦不等，即说明有真实导出行被
+  // 过度吞掉，立即中止本文件（parseError 随之阻止任何写盘）。
+  const countExportLines = ls => ls.filter(l => EXPORT_LINE.test(l.trim())).length;
+  const legitStripped = raw.replace(/\/\*[\s\S]*?\*\//g, (comment, offset) => {
+    const linePrefix = raw.slice(raw.lastIndexOf('\n', offset) + 1, offset);
+    const isRealComment = !linePrefix.includes('//') && !/['"`]/.test(linePrefix);
+    return isRealComment ? comment.replace(/[^\n]/g, ' ') : comment;
+  });
+  const exportsKept = countExportLines(legitStripped.split('\n'));
+  const exportsAfterStrip = countExportLines(lines);
+  if (exportsAfterStrip < exportsKept) {
+    console.error(`✗ 剥注释时疑似吞掉了 ${exportsKept - exportsAfterStrip} 行导出语句：${abs}`);
+    console.error('  常见原因：字符串或行注释里出现了未配对的块注释起始符');
+    parseError = true;
+    return;
+  }
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i].trim();
@@ -111,6 +148,7 @@ function walk(file) {
     if (shape === undefined) {
       console.error(`✗ 第 ${i + 1} 行是无法识别的导出写法：${rawLines[i].trim()}`);
       console.error(`  来自 ${rel}，请更新本脚本的 EXPORT_SHAPES 后再继续`);
+      console.error(`  本脚本支持：${EXPORT_SHAPES.map(s => s.name).join(' / ')}`);
       parseError = true;
       return;
     }
@@ -164,7 +202,8 @@ if (usageError == null) {
     walk(FACADE);
   }
   catch (error) {
-    console.error(`✗ 无法读取文件：${FACADE}（${error.message}）`);
+    // 兜底：具体是哪个文件读不了已由 walk 内部用真实 abs 报出，这里不再宣称路径
+    console.error(`✗ 解析导出面失败：${error.message}`);
     parseError = true;
   }
 }
@@ -172,7 +211,7 @@ if (usageError == null) {
 const names = [...found.keys()].sort();
 const baselineRel = path.relative(ROOT, BASELINE);
 
-/** 读取基线；文件不存在时返回 null */
+/** 读取基线；「不存在」返回 null，「存在但读不了」额外置 baselineReadError 后返回 null */
 function readBaseline() {
   if (!fs.existsSync(BASELINE))
     return null;
@@ -180,8 +219,8 @@ function readBaseline() {
     return fs.readFileSync(BASELINE, 'utf8').split('\n').map(s => s.trim()).filter(s => s !== '');
   }
   catch (error) {
-    console.error(`✗ 无法读取文件：${BASELINE}（${error.message}）`);
-    process.exitCode = 1;
+    console.error(`✗ 无法读取基线文件：${BASELINE}（${error.message}）`);
+    baselineReadError = true;
     return null;
   }
 }
@@ -222,19 +261,25 @@ else if (wantWrite && wantExpect) {
 }
 else if (wantWrite) {
   const prev = readBaseline();
-  if (prev != null) {
-    const diff = diffAgainst(prev);
-    if (diff.removed.length > 0 || diff.added.length > 0) {
-      const parts = [];
-      if (diff.removed.length > 0)
-        parts.push(`已移除 ${diff.removed.join(', ')}`);
-      if (diff.added.length > 0)
-        parts.push(`新增 ${formatAdded(diff.added)}`);
-      console.log(`与现有基线不同，即将覆盖：${parts.join('；')}`);
-    }
+  if (baselineReadError) {
+    // 旧基线读不出来就不要覆盖它（EACCES 下写同样会失败，别把好文件写坏）
+    process.exitCode = 1;
   }
-  fs.writeFileSync(BASELINE, `${names.join('\n')}\n`);
-  console.log(`已写入基线：${baselineRel}（${names.length} 个符号）`);
+  else {
+    if (prev != null) {
+      const diff = diffAgainst(prev);
+      if (diff.removed.length > 0 || diff.added.length > 0) {
+        const parts = [];
+        if (diff.removed.length > 0)
+          parts.push(`已移除 ${diff.removed.join(', ')}`);
+        if (diff.added.length > 0)
+          parts.push(`新增 ${formatAdded(diff.added)}`);
+        console.log(`与现有基线不同，即将覆盖：${parts.join('；')}`);
+      }
+    }
+    fs.writeFileSync(BASELINE, `${names.join('\n')}\n`);
+    console.log(`已写入基线：${baselineRel}（${names.length} 个符号）`);
+  }
 }
 else if (wantExpect) {
   const expected = Number(expectRaw);
@@ -246,7 +291,9 @@ else if (wantExpect) {
   else {
     const baseline = readBaseline();
     if (baseline == null) {
-      console.error(`✗ 基线文件不存在：${baselineRel}，请先运行 --write`);
+      // 读失败时 readBaseline 已打印过真实原因，别再补一句误导性的「不存在」
+      if (!baselineReadError)
+        console.error(`✗ 基线文件不存在：${baselineRel}，请先运行 --write`);
       process.exitCode = 1;
     }
     else {
@@ -271,8 +318,11 @@ else if (wantExpect) {
 else {
   const baseline = readBaseline();
   if (baseline == null) {
-    console.log(names.join('\n'));
-    console.error(`✗ 基线文件不存在：${baselineRel}，请先运行 --write`);
+    // 读失败时 readBaseline 已打印过真实原因，别再补一句误导性的「不存在」
+    if (!baselineReadError) {
+      console.log(names.join('\n'));
+      console.error(`✗ 基线文件不存在：${baselineRel}，请先运行 --write`);
+    }
     process.exitCode = 1;
   }
   else {
