@@ -64,7 +64,9 @@
 
 各文件导出符号：
 
-- **`strategy.uts`**：`TabbarStrategyType`、`TABBAR_STRATEGY_MAP`、`parseTabbarStrategy`、`selectedTabbarStrategy`、`isSinglePageTabbar`、`isNativeTabbar`、`needHideNativeTabbar`、`tabbarType`。其中 `tabbarCacheEnable`、`customTabbarEnable`、`hasNativeTabbarConfig`、`isNoTabbar`、`isCapsuleTabbar` 改为**非导出**。
+- **`strategy.uts`**：`TabbarStrategyType`、`TABBAR_STRATEGY_MAP`、`parseTabbarStrategy`、`selectedTabbarStrategy`、`isSinglePageTabbar`、`isNativeTabbar`、`needHideNativeTabbar`、`tabbarType`。`tabbarCacheEnable`、`customTabbarEnable`、`hasNativeTabbarConfig`、`isNoTabbar`、`isCapsuleTabbar` 这 5 个零引用派生态**直接删除**（原表述为「收回非导出」）。
+
+  **为什么是删除而非保留为私有**：保留为私有常量只会产出 5 条 `unused-imports/no-unused-vars` 警告（已用探针实测：是 warning 不是 error），而本项目把构建警告当缺陷看（见 `unibestX-skill` 1.1.4）。策略矩阵的语义已完整保留在 `TABBAR_STRATEGY_MAP` 的文档注释与 `config.uts` 的说明里，派生一行的布尔值任何人都能就地重算。若使用者希望恢复这些语义的对外可见性，把它们改回 `export const` 即可。
 - **`metrics.uts`**：`TABBAR_HEIGHT`、`TABBAR_CONTAINER_HEIGHT`、`themeTokens`、`safeAreaBottom`、`isVersionGte525`、`tabbarPlaceholderHeight`。
 - **`state.uts`**：`tabbarList`、`curIdx`、`setCurIdx`、`setCurIdxByPath`、`syncCurIdxByCurrentPage`、`isPageTabbar`、`onTabShow`、`setTabbarItemBadge`。其中 `buildFullTabbarList`、`customTabbarList` 改为**非导出**。
 - **`navigate.uts`**：`switchTabbar`、`handleTabbarClick`、`initNativeMidButtonTap`。其中 `handleClickBulge` 与节流锁 `isSwitchingTab` 改为**非导出**。
@@ -94,7 +96,9 @@ export * from './helper/native.uts';
 export const themeColor = ref(getDefaultTheme());
 ```
 
-`src/store/vapor/app.ts` 与 `src/store/vdom/app.uts` 改从该处 import。迁移后依赖方向变为单向：`theme ← store`、`theme ← tabbar`、`store ← tabbar`。
+`src/store/vapor/app.ts` 与 `src/store/vdom/app.uts` 改从该处 import。迁移后 `store → tabbar` 的**直接**依赖边被消除，依赖方向变为单向：`theme ← store`、`theme ← tabbar`、`store ← tabbar`。
+
+**⚠️ 准确表述：间接环仍然存在**。另有一条改造前就有的链路 `store/*/app` → `utils/i18n` → `tabbar/helper` → `store`（`src/store/vapor/app.ts:4` 与 `src/store/vdom/app.uts:3` 导入 i18n；`src/utils/i18n/index.uts:2` 导入 `tabbarList`；而 tabbar 的 `themeTokens` 反过来 `useAppStore()`）。本次**只解直接边**，该间接环不动——它改造前即存在且当前工作正常。要彻底切断需把暗色标志也上移主题域，属独立改动。
 
 **已验证不受红线 1.1.11 影响**：该文件顶层不存在 `getThemeColor` 函数，不会与新增 `themeColor` 在 Kotlin 端生成的静态 getter 撞名。同文件 `getRootThemeStyle(themeColor: string, ...)` 中的 `themeColor` 是函数参数，不构成冲突。
 
@@ -132,7 +136,7 @@ export const themeColor = ref(getDefaultTheme());
 
 ## 5. 已知取舍
 
-1. **破坏性变更**：本仓库是模板项目（unibestX），收回 5 个策略布尔对已克隆并使用了它们的下游构成破坏性变更。用户已确认接受。
+1. **破坏性变更**：本仓库是模板项目（unibestX），删除 5 个策略布尔（详见 §3.1）与收回 3 个内部函数（`buildFullTabbarList`、`customTabbarList`、`handleClickBulge`），对已克隆并使用了它们的下游构成破坏性变更。用户已确认接受。
 2. **`initNativeMidButtonTap` 全项目零调用**：原生中间按钮点击监听实际从未注册。按"面向开发者的预留钩子"保留而非删除；若后续确认废弃，另行清理。
 3. **`setCurIdxByPath` 与 `initNativeMidButtonTap` 会被门面的 `export *` 转发出去**：前者被 `navigate.uts` 跨文件使用，后者是预留钩子，两者均保留在对外面上，不做进一步隐藏。
 
