@@ -233,7 +233,10 @@ function handleMakePhoneCall(): void {
 }
 
 function handleShareWithSystem(): void {
-  // #ifdef APP || MP-WEIXIN
+  // shareWithSystem 是 App 专有 API，小程序端为 x（且小程序不允许 API 调起分享，
+  // 只能由用户点 <button open-type="share"> 触发）—— 这里不能带上 MP-WEIXIN，
+  // 否则小程序产物会编译进一个不存在的 API 并在点击时报 TypeError。
+  // #ifdef APP
   uni.shareWithSystem({
     summary: shareSummary.value,
     href: shareHref.value,
@@ -245,7 +248,7 @@ function handleShareWithSystem(): void {
     }
   });
   // #endif
-  // #ifndef APP || MP-WEIXIN
+  // #ifndef APP
   uni.setClipboardData({
     data: `${shareSummary.value} ${shareHref.value}`,
     success: () => {
