@@ -315,13 +315,19 @@ unibestX/
 │   │   ├── test/             #   页面间参数传递测试
 │   │   └── uiTest/           #   UI 测试与排版页面
 │   ├── tabbar/               # 底部 TabBar 体系
-│   │   ├── custom/           #   悬浮胶囊 TabBar（悬空圆角 Dock 栏风格）
-│   │   │   └── index.uvue    #     悬浮胶囊组件
-│   │   ├── helper/           #   TabBar 状态与辅助工具
-│   │   │   ├── index.uts     #     TabBar 策略、安全路由跳转与主题 Token 辅助
-│   │   │   └── store.uts     #     TabBar 选中状态管理与响应式数据
-│   │   ├── TabbarItem.uvue   #   单个 Tab 项与角标（标准底座）
-│   │   ├── index.uvue        #   标准自定义 TabBar（带中间凸起鼓包 midButton）
+│   │   ├── internal/         #   模块内部实现（不对消费者暴露，请走 index.uts 门面）
+│   │   │   ├── strategy.uts  #     策略枚举与模式判定
+│   │   │   ├── metrics.uts   #     尺寸常量与视口 / 主题计算
+│   │   │   ├── state.uts     #     列表与激活状态、路径匹配、激活订阅
+│   │   │   ├── navigate.uts  #     跳转行为与原生中间按钮监听
+│   │   │   └── native.uts    #     平台桥接（隐藏原生 tabbar）
+│   │   ├── ui/               #   TabBar 视图层
+│   │   │   ├── capsule/      #     悬浮胶囊风格
+│   │   │   ├── default/      #     标准贴底风格（含 midButton 鼓包）
+│   │   │   └── template.uvue #     TabBar 视图模板
+│   │   ├── components/       #   容器与调度组件（TabViews、TabContent）
+│   │   ├── tabbar.uvue       #   TabBar 入口组件
+│   │   ├── index.uts         #   模块唯一门面（单层 export *）
 │   │   ├── config.uts        #   TabBar 统一配置（对齐 pages.json 规范，支持 type 风格切换）
 │   │   └── types.uts         #   TabBar 强类型定义
 │   ├── types/                # 全局 TypeScript / UTS 类型定义
