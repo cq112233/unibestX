@@ -51,9 +51,13 @@ const HANDWRITTEN = new Set(['systemInfo']);
  * 判据是「有没有被 `.ts` / `.uvue` 以 `xxx.uts` 形式导入」：只要被导入，
  * 缺配套声明文件 IDE 就会报 `Cannot find module '...xxx.uts'`
  * （`src/store/types.uts` 即属此类 —— 它被 `src/store/vapor/*.ts` 导入）。
+ *
+ * 同理，`src/i18n/index.uts` 被 `src/store/vapor/app.ts`、`src/store/vdom/app.uts` 导入，
+ * 而它不在 `src/utils/` 下，不补进来就会一直报同一个 `Cannot find module` 警告。
  */
 const EXTRA_SOURCES = [
   path.join(ROOT, 'src/store/types.uts'),
+  path.join(ROOT, 'src/i18n/index.uts'),
 ];
 
 const args = new Set(process.argv.slice(2));
@@ -311,6 +315,42 @@ function genConst(src, m, start, constTypes) {
   return { text: `export declare const ${name}: ${type};`, end: semicolon };
 }
 
+/**
+ * 为「未 `export` 的顶层 `const`，但被 `export default <name>` 引用」补一条声明。
+ *
+ * 典型形态（`src/i18n/index.uts`）：
+ *   const i18n = createI18n({ ... });
+ *   export default i18n;
+ * 这里 `i18n` 不是 `export const`，走不到 `genConst`，产物里就只有一句
+ * `export default i18n;` —— 标识符无任何声明，TS 会报 `Cannot find name 'i18n'`，
+ * 比原来的 `Cannot find module` 更难定位。故在此兜底：推断不出类型时降级 `any` 并告警。
+ */
+function genLocalConst(src, m, name, constTypes) {
+  const hit = new RegExp(`^const\\s+${name}\\b`, 'm').exec(m);
+  if (!hit)
+    return null;
+
+  const nameEnd = hit.index + hit[0].length;
+  const eq = assignIndex(m, nameEnd);
+  const semicolon = statementEnd(m, eq);
+  const init = src.slice(eq + 1, semicolon);
+  const annotation = m.slice(nameEnd, eq).trim();
+
+  let type = null;
+  if (annotation.startsWith(':')) {
+    type = annotation.slice(1).trim();
+  }
+  else {
+    type = inferType(init, constTypes);
+    if (!type) {
+      warnings.push(`${name}: 默认导出引用的顶层 const 无法推断类型（初始值 ${JSON.stringify(init.trim().slice(0, 40))}），已生成 any —— 请手工补`);
+      type = 'any';
+    }
+  }
+  constTypes.set(name, type);
+  return `declare const ${name}: ${type};`;
+}
+
 function genType(src, m, start) {
   const end = statementEnd(m, start);
   const raw = src.slice(start, end + 1);
@@ -415,6 +455,8 @@ function generate(src, moduleName, fileName = 'index.uts') {
   const m = mask(src);
   const constTypes = new Map();
   const parts = [];
+  /** `export default <identifier>` 里的标识符，循环后校验它是否有声明 */
+  let defaultIdent = null;
 
   for (const start of topLevelExports(m)) {
     const head = m.slice(start);
@@ -436,6 +478,10 @@ function generate(src, moduleName, fileName = 'index.uts') {
     else if (/^export\s+default\b/.test(head)) {
       const end = statementEnd(m, start);
       out = { text: src.slice(start, end + 1), end };
+      // 记录裸标识符形态的默认导出（`export default i18n;`），字面量/表达式的不管
+      const dm = /^export\s+default\s+([A-Za-z_$][\w$]*)\s*;?$/.exec(out.text.trim());
+      if (dm)
+        defaultIdent = dm[1];
     }
     else if (/^export\s+\{/.test(head)) {
       const end = statementEnd(m, start);
@@ -449,6 +495,19 @@ function generate(src, moduleName, fileName = 'index.uts') {
     if (!out)
       continue;
     parts.push(doc ? `${doc}\n${out.text}` : out.text);
+  }
+
+  // `export default Foo;` 的 Foo 若在产物里没有任何声明，TS 会报 `Cannot find name`，
+  // 比「找不到模块」更难定位 —— 这里补一条兜底声明（见 genLocalConst）。
+  if (defaultIdent != null) {
+    const declared = new RegExp(`\\b(?:declare\\s+)?(?:const|let|var|function|class)\\s+${defaultIdent}\\b`).test(parts.join('\n\n'));
+    if (!declared) {
+      const decl = genLocalConst(src, m, defaultIdent, constTypes);
+      if (decl != null)
+        parts.unshift(decl); // 放在 `export default` 之前，读起来更顺
+      else
+        warnings.push(`${moduleName}: 默认导出 \`${defaultIdent}\` 在源码中找不到顶层 const 声明，产物会引用未声明标识符 —— 请手工补`);
+    }
   }
 
   const body = parts.join('\n\n');
@@ -559,6 +618,9 @@ function main() {
 
   if (CHECK_ONLY) {
     console.log(stale === 0 ? '\n全部声明文件与源码同步 ✅' : `\n有 ${stale} 个模块不同步 ❌`);
+    // 用法里承诺「不同步则退出码 1」，供 CI / hooks 拦截，这里必须落实
+    if (stale > 0)
+      process.exitCode = 1;
   }
   else {
     console.log(`\n完成：更新 ${generated} 个，共扫描 ${targets.length} 个模块`);

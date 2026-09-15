@@ -1042,7 +1042,83 @@ grep -ao '\$persist' unpackage/dist/dev/mp-weixin/common/vendor.js   # 官方持
 [plugin:uts] ENOENT: no such file or directory, open '.../unpackage/cache/.mp-weixin/.uts2js/cache/uts_<hash>/code/cache_/<hash>'
 ```
 
-**报错点每次都落在不同的、与本次改动无关的文件上**（本项目实测两次分别指向 `NavBar.uvue:1:0` 与 `me.uvue:1:0`），且 `rm -rf unpackage/cache/.mp-weixin` 也压不住。**这是并发共享缓存的竞态，不是代码缺陷** —— 判据是「同一份代码换一次运行报错文件就变」。要干净的 CLI 验证就先关掉 IDE 的编译/监听；否则以产物内容为准，不要以 `已停止运行...` 为准（该行在**原始未改动代码**上同样会出现）。
+**报错点每次都落在不同的、与本次改动无关的文件上**（本项目实测多次分别指向 `NavBar.uvue:1:0`、`me.uvue:1:0`、`register.uvue:1:0`、`kux-marked/marked.uts:1:0`、`IndexView.uvue:1:0`），且 `rm -rf unpackage/cache/.mp-weixin` 也压不住。**这是并发共享缓存的竞态，不是代码缺陷** —— 判据是「同一份代码换一次运行报错文件就变」。要干净的 CLI 验证就先关掉 IDE 的编译/监听；否则以产物内容为准，不要以 `已停止运行...` 为准（该行在**原始未改动代码**上同样会出现）。
+
+**根因已定位（2026-09-15）**：HBuilderX IDE 开着时会常驻一整套 `uni.js` 监听进程，**它们也写同一份 `unpackage/cache/.mp-weixin`**：
+
+```bash
+ps -eo pid,etime,command | grep -E "uniapp-cli-vite.*uni\.js" | grep -v grep
+#  … uni.js -p app        ← IDE 的 App 监听
+#  … uni.js -p mp-weixin  ← 与 CLI 抢 cache 的就是它
+#  … uni.js -p h5
+```
+
+**实测结论：什么代码都不用改，直接重试就能过。** 本项目在**同一份代码**上先失败、`rm -rf` 后重试第 1 次即 `项目 unibestX 编译成功。`，产物齐全。所以遇到这个 ENOENT **不要回头改代码**，重跑一次即可（必要时循环重试几次抓一个干净窗口）。
+
+**⚠️ CLI 的退出码在这个场景下不可信**：编译被竞态打断时 `cli launch mp-weixin --compile true` **依然返回 exit 0**，同时日志里是 `已停止运行...` 且产物目录为空/缺失。**判据必须落到产物上**：
+
+```bash
+test -d unpackage/dist/dev/mp-weixin/src/store && echo 产物在，才算真的过
+```
+
+---
+
+#### 1.3.19 被 `.ts` / `.uvue` 导入的 `.uts` **必须**有同目录同名的 `<name>.d.uts.ts`，否则 IDE 一直报 `Cannot find module`
+
+**报错现象**（HBuilderX / VSCode 的 tsserver 面板，本项目实测）：
+
+```text
+warning: Cannot find module '../types.uts' or its corresponding type declarations.
+  at src/store/vapor/app.ts:14:31
+warning: Cannot find module '@/src/i18n/index.uts' or its corresponding type declarations.
+  at src/store/vapor/app.ts:4:17
+```
+
+**机制**：`tsconfig.json` 里的 `allowArbitraryExtensions: true` 是 TS 能把 `./index.uts` 解析到同目录 `index.d.uts.ts` 的**前提**（**同名同目录，不能改名、不能挪走**）。没有这个文件就只剩 `Cannot find module`，该 `.uts` 的导出在 IDE 里全变 `any`、补全全丢。
+
+- **判据：任何 `.uts` 只要被 `.ts` / `.uvue` 以 `xxx.uts` 字面路径导入，就必须有配套声明。** `.uts` 导入 `.uts` 不需要（走的是 UTS 自己那条链路）。
+- **本项目由脚本统一生成**：`node scripts/gen-uts-dts.mjs`；校验 `node scripts/gen-uts-dts.mjs --check`（**不同步时退出码 1**，可挂 CI / hook）。产物头部写明「自动生成，请勿手工编辑」。
+- **脚本默认只扫 `src/utils/<模块>/index.uts`**。位于别处的 `.uts` 必须显式登记到脚本的 `EXTRA_SOURCES`，本项目已登记这两处：
+
+  | 文件 | 谁导入它 |
+  | --- | --- |
+  | `src/store/types.uts` | `src/store/vapor/*.ts` |
+  | `src/i18n/index.uts` | `src/store/vapor/app.ts`、`src/store/vdom/app.uts` |
+
+  **漏登记的后果就是上面那条 `Cannot find module` 一直挂着** —— 而且它只出现在 IDE 面板里，**不影响任何构建**（H5 / mp-weixin 都照样编译成功），所以极易被当噪音忽略。
+- 需要人工维护类型的模块登记在 `HANDWRITTEN`（脚本跳过，`--all` 可强制重生成）；本项目当前只有 `systemInfo`（含 `computed()`，无法静态推断）。
+- **`export default <标识符>` 的坑（脚本本次已修）**：若该标识符是**未 `export` 的顶层 `const`**（典型：`src/i18n/index.uts` 的 `const i18n = createI18n({...}); export default i18n;`），旧版脚本会原样拷一句 `export default i18n;` 却**不产出 `declare const i18n`** —— TS 于是改报 `Cannot find name 'i18n'`，**比原来的「找不到模块」更难定位**。现在脚本会补一条兜底声明，推断不出类型时降级 `any` 并打印告警要求人工确认：
+
+  ```ts
+  declare const i18n: any;
+
+  export default i18n;
+  ```
+
+- **`--check` 曾经是假绿**：用法里承诺「不同步则退出码 1」，但代码从未设置 `process.exitCode`，**CI 里永远通过**。已修（`if (stale > 0) process.exitCode = 1`）。
+
+**怎么确认修好了（不要只看 IDE 是否还红）**：用项目自身 `tsconfig` 复现 tsserver 的解析，一次覆盖全部导入点：
+
+```js
+// 脚本必须放在项目根目录跑，否则 require('typescript') 解析不到
+const ts = require('typescript');
+const raw = ts.readConfigFile('tsconfig.json', ts.sys.readFile);
+const parsed = ts.parseJsonConfigFileContent(raw.config, ts.sys, process.cwd());
+const host = ts.createCompilerHost(parsed.options);
+console.log(ts.resolveModuleName('../types.uts', 'src/store/vapor/app.ts', parsed.options, host).resolvedModule);
+// → { resolvedFileName: '<项目>/src/store/types.d.uts.ts', extension: '.d.uts.ts' }
+//   undefined ⇒ 仍缺声明
+```
+
+**产物影响：只有一行 `"use strict";` 的空壳，无害但会出现在小程序 dev 产物里**
+
+`<name>.d.uts.ts` 是编译路径下的 `.ts` 文件，小程序 dev 产物照吐一份 `<name>.d.uts.js`：
+
+```bash
+cat unpackage/dist/dev/mp-weixin/src/i18n/index.d.uts.js   # → "use strict";
+```
+
+**这是本项目既有行为**（`src/utils/*/index.d.uts.js` 共 9 份同样存在），内容只有 `"use strict";`，且**没有任何产物 require 它**，可以不管。H5 发行产物（`unpackage/dist/build/web`）里**不会**出现 `*.d.uts.*`。
 
 ---
 
@@ -1497,7 +1573,8 @@ onNavbarPullDownRefresh(() => {
 | **H5 / 微信小程序没走到预期的蒸汽（Vapor）分支** | 门面只用 `#ifdef VUE3-VAPOR` 分流（该宏**只在 App 蒸汽模式**成立；且框架对 web/小程序**强制删除** `UNI_APP_X_DOM2`，所以 `manifest.json` 里写 `vapor: true` 对它们**毫无作用**，二者双双落进 VDOM 分支） | 分流条件显式并列平台：`#ifdef VUE3-VAPOR \|\| H5 \|\| WEB \|\| MP`（`MP` 覆盖全部小程序；`H5` 已蕴含 `WEB`）；注意 `#ifndef A \|\| B` 语义是 `!(A \|\| B)`（见 1.3.18） |
 | **UTS 编译抛 `Error: Unbalanced right delimiter found in string at position N`** | 在 `/** */` 块注释里写了**带斜杠前缀**的条件编译标记名（形如 `// #ifdef` / `// #endif`）—— 普通斜杠散文不会触发，只有斜杠**紧跟**标记名时才炸，极难肉眼发现 | 注释里提到这些标记只写标记本身、不带前缀斜杠；定位用报错的字符偏移直接切片看上下文（见 1.3.12） |
 | **小程序报 `[plugin:uts] "ISingleTokenRes" is not exported by ".../store/index.uts"`** | 门面 `export * from './vapor/token'` 从 **`.ts`** 文件转发纯类型（补成 `./vapor/token.ts` 也**无效**，报错一字不变） | 跨分支共享类型抽到只含 `type` 的 **`.uts`** 叶子文件（如 `src/store/types.uts`），门面**无条件** `export * from './types.uts'`，两分支实现各自 `import type` 且不再 `export type` 同名类型（见 1.3.18） |
-| **CLI 编译 mp-weixin 报 `ENOENT ... .uts2js/cache/...` 且报错文件每次都不同** | 以为是代码缺陷，改源码 / 反复 `rm -rf unpackage/cache/.mp-weixin` | 这是**开着的 HBuilderX IDE 与 CLI 抢 `unpackage/cache` 的竞态**（判据：同一份代码换次运行报错文件就变）。要干净验证先关 IDE 编译/监听；否则以产物内容为准（`已停止运行...` 在原始未改动代码上同样出现，见 1.3.18） |
+| **CLI 编译 mp-weixin 报 `ENOENT ... .uts2js/cache/...` 且报错文件每次都不同** | 以为是代码缺陷，改源码 / 反复 `rm -rf unpackage/cache/.mp-weixin` | 这是**开着的 HBuilderX IDE 与 CLI 抢 `unpackage/cache` 的竞态**（判据：同一份代码换次运行报错文件就变）。**同一份代码直接重试即可通过**；注意 CLI **被打断时仍返回 exit 0**，必须 `test -d unpackage/dist/dev/mp-weixin/src/store` 看产物才算数（见 1.3.18） |
+| **IDE 报 `Cannot find module '../types.uts' or its corresponding type declarations`，但构建全绿** | 当成噪音忽略 / 手工补一个声明文件 | 凡被 `.ts` / `.uvue` 以 `xxx.uts` 导入的 `.uts` 都必须有**同目录同名** `<name>.d.uts.ts`（靠 `allowArbitraryExtensions`）。跑 `node scripts/gen-uts-dts.mjs`；不在 `src/utils/*/` 下的要登记进脚本的 `EXTRA_SOURCES`（见 1.3.19） |
 
 ---
 
@@ -1543,6 +1620,9 @@ onNavbarPullDownRefresh(() => {
 - [ ] **36. 跨分支共享的纯类型严禁放在 `.ts` 实现文件里经 `export *` 转发**（微信小程序 uts2js 链路拿不到 `.ts` 经 `export *` 转发的类型，业务侧 `import type` 直接报 `"[X]" is not exported by ".../store/index.uts"`；补 `.ts` 扩展名无效。必须抽到只含 `type` 的 `.uts` 叶子文件，由门面**无条件**转发，见 1.3.18）
 - [ ] **37. `.uts` 里 `#ifdef` / `#ifndef` / `#endif` 三个词任何时候都不要带前缀斜杠书写**（行首会当真标记、块注释里带斜杠前缀则直接抛 `Unbalanced right delimiter` 中断 UTS 编译；注释里只写标记本身，见 1.3.12）
 - [ ] **38. 带条件编译（`#ifdef` 分段）的 `.uts` 文件严禁套用「导入/导出排序」类自动格式化**（排序会跨过 `#endif` 把语句挪出条件块，导致两个平台分支的 `export *` 在**所有平台同时生效** —— 命中 `useXxxStore__1` 红线并触发 1.1.12 的 `NoSuchMethodError`；发现语句顺序异常先 `git diff` 复原，见 1.3.18）
+- [ ] **39. 新增 / 移动任何被 `.ts`、`.uvue` 导入的 `.uts` 后，必须跑一次 `node scripts/gen-uts-dts.mjs`**（缺配套 `<name>.d.uts.ts` 就会在 IDE 里挂 `Cannot find module`；不在 `src/utils/*/` 下的还要先登记进 `EXTRA_SOURCES`。这条**不影响构建**、只在 IDE 面板出现，最容易被漏掉，见 1.3.19）
+- [ ] **40. 严禁手工编辑 `<name>.d.uts.ts`**（由脚本生成，会被下次运行覆盖；确需人工维护的模块登记进脚本的 `HANDWRITTEN`，见 1.3.19）
+- [ ] **41. 遇到 `ENOENT ... .uts2js/cache/...` 时严禁怀疑 / 修改业务代码**（那是 IDE 常驻 `uni.js -p mp-weixin` 与 CLI 抢 `unpackage/cache` 的竞态，**同一份代码重试即可通过**；且 CLI 被打断时仍返回 exit 0，判定必须落到产物目录是否存在，见 1.3.18）
 
 ---
 
