@@ -22,7 +22,7 @@ import { fileURLToPath } from 'node:url';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const SRC_DIR = path.join(ROOT, 'scripts/router-guard-test');
 const OUT = path.join(SRC_DIR, '.build');
-const PLUGIN_LIB = path.join(ROOT, 'uni_modules/uni-router-guard/lib');
+const PLUGIN_LIB = path.join(ROOT, 'uni_modules/unix-router-guard/lib');
 
 /** 需要从 .uts 转成 .ts 的插件模块 */
 const UTS_SOURCES = ['types.uts', 'url.uts', 'guard.uts'];

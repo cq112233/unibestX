@@ -1,4 +1,4 @@
-# uni-router-guard
+# unix-router-guard
 
 uni-app X 的导航守卫运行时。零业务依赖：只依赖 `uni` 全局，不引 Pinia、不读项目配置。
 
@@ -6,11 +6,11 @@ uni-app X 的导航守卫运行时。零业务依赖：只依赖 `uni` 全局，
 
 ## 安装
 
-把 `uni-router-guard` 放进 `uni_modules/`，在 `main.uts` 里创建一次：
+把 `unix-router-guard` 放进 `uni_modules/`，在 `main.uts` 里创建一次：
 
 ```uts
-import { createRouter } from '@/uni_modules/uni-router-guard';
-import type { RouteTarget } from '@/uni_modules/uni-router-guard';
+import { createRouter } from '@/uni_modules/unix-router-guard';
+import type { RouteTarget } from '@/uni_modules/unix-router-guard';
 
 const router = createRouter({ debug: false });
 

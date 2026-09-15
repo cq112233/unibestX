@@ -1,14 +1,14 @@
-# uni-router-guard 导航拦截插件 实现计划
+# unix-router-guard 导航拦截插件 实现计划
 
 > **面向 AI 代理的工作者：** 必需子技能：使用 superpowers:subagent-driven-development（推荐）或 superpowers:executing-plans 逐任务实现此计划。步骤使用复选框（`- [ ]`）语法来跟踪进度。
 
-**目标：** 在 `uni_modules/uni-router-guard/` 从零实现一个与业务零耦合的导航拦截插件：`createRouter()` 装配、`beforeEach((to, from, next) => {})` / `afterEach((to, from) => {})` 的 vue-router 3 同签名守卫链、`push/replace/relaunch/switchTab/back` 跳转门面，裁决 API 为 `next()` / `next('/x')` / `next(false)`。
+**目标：** 在 `uni_modules/unix-router-guard/` 从零实现一个与业务零耦合的导航拦截插件：`createRouter()` 装配、`beforeEach((to, from, next) => {})` / `afterEach((to, from) => {})` 的 vue-router 3 同签名守卫链、`push/replace/relaunch/switchTab/back` 跳转门面，裁决 API 为 `next()` / `next('/x')` / `next(false)`。
 
 **架构：** `lib/types.uts` 是零依赖叶子；`lib/url.uts` 与 `lib/guard.uts` 是纯函数与纯执行器（不碰 `uni` 全局，可在 node 里跑决策矩阵）；`lib/interceptor.uts` 独占 `uni.addInterceptor` 安装/卸载与裁决派发；`lib/router.uts` 用工厂函数把它们组装成 `Router` 对象字面量（UTS 禁止传递 Class 实例，见 `UTS110111151`）；根 `index.uts` 做**单层** `export *` 门面。
 
 **技术栈：** uni-app X / UTS (`.uts`)；node 22 的 TS 类型剥离（`node xxx.ts`）跑 harness，**不引入任何测试框架**；验证依赖真机 Android 构建（必须出现 `编译为android class`）。
 
-**规格：** `docs/superpowers/specs/2026-09-15-uni-router-guard-plugin-design.md`
+**规格：** `docs/superpowers/specs/2026-09-15-unix-router-guard-plugin-design.md`
 
 ## 执行状态：✅ 全部任务已完成（2026-09-15）
 
@@ -41,7 +41,7 @@
 
 ```uts
 if (redirectDepth > maxRedirectDepth) {
-  console.warn(`[uni-router-guard] 重定向链深度超过 ${maxRedirectDepth}，已放弃本次改跳：${url}`);
+  console.warn(`[unix-router-guard] 重定向链深度超过 ${maxRedirectDepth}，已放弃本次改跳：${url}`);
   redirectDepth = 0;   // ← 计划外补入：放弃即这条链结束，必须归零
   return;
 }
@@ -119,14 +119,14 @@ grep -aE "error:|kotlin编译失败" <log> # 0 命中
 
 | 文件 | 职责 |
 | --- | --- |
-| `uni_modules/uni-router-guard/package.json` | 插件元信息，`main: "index.uts"`，`dcloudext.type: "uts"` |
-| `uni_modules/uni-router-guard/index.uts` | 唯一门面：单层 `export *`（types / url / router 三个），不放任何实现 |
-| `uni_modules/uni-router-guard/lib/types.uts` | 全部公开类型 + 3 个默认值常量。零依赖叶子 |
-| `uni_modules/uni-router-guard/lib/url.uts` | URL 解析、规范化、相对路径解析、query 读写、`any` 入参归一。**纯函数，不碰 `uni`** |
-| `uni_modules/uni-router-guard/lib/guard.uts` | 守卫注册表与同步执行器。**纯逻辑，不碰 `uni`** |
-| `uni_modules/uni-router-guard/lib/interceptor.uts` | 唯一碰 `uni.addInterceptor` 的文件：安装/卸载/裁决派发/递归保护 |
-| `uni_modules/uni-router-guard/lib/router.uts` | `createRouter()` 工厂，组装成 `Router` 对象字面量 |
-| `uni_modules/uni-router-guard/readme.md`、`changelog.md` | 用法、与 vue-router 的差异、与 `src/router` 二选一 |
+| `uni_modules/unix-router-guard/package.json` | 插件元信息，`main: "index.uts"`，`dcloudext.type: "uts"` |
+| `uni_modules/unix-router-guard/index.uts` | 唯一门面：单层 `export *`（types / url / router 三个），不放任何实现 |
+| `uni_modules/unix-router-guard/lib/types.uts` | 全部公开类型 + 3 个默认值常量。零依赖叶子 |
+| `uni_modules/unix-router-guard/lib/url.uts` | URL 解析、规范化、相对路径解析、query 读写、`any` 入参归一。**纯函数，不碰 `uni`** |
+| `uni_modules/unix-router-guard/lib/guard.uts` | 守卫注册表与同步执行器。**纯逻辑，不碰 `uni`** |
+| `uni_modules/unix-router-guard/lib/interceptor.uts` | 唯一碰 `uni.addInterceptor` 的文件：安装/卸载/裁决派发/递归保护 |
+| `uni_modules/unix-router-guard/lib/router.uts` | `createRouter()` 工厂，组装成 `Router` 对象字面量 |
+| `uni_modules/unix-router-guard/readme.md`、`changelog.md` | 用法、与 vue-router 的差异、与 `src/router` 二选一 |
 | `scripts/router-guard-test/build.mjs` | 把纯 `.uts` 转成 `.ts`、并把 harness 自身一起搬进 `.build/`（补 `.ts` 后缀、加 `{"type":"module"}`） |
 | `scripts/router-guard-test/cases.ts` | 断言（决策矩阵） |
 | `scripts/router-guard-test/run.ts` | 执行器：逐条跑断言，失败即 `process.exitCode = 1` |
@@ -185,13 +185,13 @@ grep -aE "error:|kotlin编译失败" <log> # 0 命中
 
 - [x] **步骤 1：清掉遗留目录**
 
-`uni_modules/uni-router-guard/` 下有一个**未被 git 跟踪**的空 `.build`（`feat/router-guard` 分支的遗留产物，本分支没有该插件的任何文件）。
+`uni_modules/unix-router-guard/` 下有一个**未被 git 跟踪**的空 `.build`（`feat/router-guard` 分支的遗留产物，本分支没有该插件的任何文件）。
 
-运行：`ls -la uni_modules/uni-router-guard/test/.build`
+运行：`ls -la uni_modules/unix-router-guard/test/.build`
 预期：目录存在但为空。
 
-运行：`rm -rf uni_modules/uni-router-guard/test`
-预期：`uni_modules/uni-router-guard/` 变成空目录。
+运行：`rm -rf uni_modules/unix-router-guard/test`
+预期：`uni_modules/unix-router-guard/` 变成空目录。
 
 - [x] **步骤 2：写探针页**
 
@@ -363,13 +363,13 @@ git commit -m "test(router-guard): 新增 UTS 探针页，验证函数类型剩�
 ## 任务 1：types.uts（零依赖叶子）
 
 **文件：**
-- 创建：`uni_modules/uni-router-guard/lib/types.uts`
+- 创建：`uni_modules/unix-router-guard/lib/types.uts`
 
 - [x] **步骤 1：写类型定义**
 
 ```uts
 /**
- * uni-router-guard 公开类型定义
+ * unix-router-guard 公开类型定义
  *
  * ⚠️ 本文件必须保持零依赖：插件内部各模块与使用方都从这里取类型。
  * ⚠️ 一律禁止 interface：UTS 不允许把对象字面量赋给 interface（UTS110111163）。
@@ -466,8 +466,8 @@ export const DEFAULT_MAX_REDIRECT_DEPTH: number = 5;
 - [x] **步骤 2：Commit**
 
 ```bash
-git add uni_modules/uni-router-guard/lib/types.uts
-git commit -m "feat(uni-router-guard): 新增公开类型与默认值常量"
+git add uni_modules/unix-router-guard/lib/types.uts
+git commit -m "feat(unix-router-guard): 新增公开类型与默认值常量"
 ```
 
 ---
@@ -518,7 +518,7 @@ import { fileURLToPath } from 'node:url';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const SRC_DIR = path.join(ROOT, 'scripts/router-guard-test');
 const OUT = path.join(SRC_DIR, '.build');
-const PLUGIN_LIB = path.join(ROOT, 'uni_modules/uni-router-guard/lib');
+const PLUGIN_LIB = path.join(ROOT, 'uni_modules/unix-router-guard/lib');
 
 /** 需要从 .uts 转成 .ts 的插件模块 */
 const UTS_SOURCES = ['types.uts', 'url.uts'];
@@ -682,7 +682,7 @@ if (failures.length > 0) {
 - [x] **步骤 6：跑一次，确认红灯**
 
 运行：`node scripts/router-guard-test/build.mjs`
-预期：**exit 1**，输出 `✗ 缺少源文件：uni_modules/uni-router-guard/lib/url.uts` 与 `1 个文件缺失，构建中止`。
+预期：**exit 1**，输出 `✗ 缺少源文件：uni_modules/unix-router-guard/lib/url.uts` 与 `1 个文件缺失，构建中止`。
 
 运行：`node scripts/router-guard-test/.build/run.ts; echo "exit=$?"`
 预期：因 `.build/` 里只有 `package.json`，报模块解析失败 + `exit=1`。
@@ -699,7 +699,7 @@ git commit -m "test(router-guard): 新增 node harness 骨架与 URL 决策矩�
 ## 任务 3：url.uts（纯函数）
 
 **文件：**
-- 创建：`uni_modules/uni-router-guard/lib/url.uts`
+- 创建：`uni_modules/unix-router-guard/lib/url.uts`
 
 - [x] **步骤 1：实现**
 
@@ -922,8 +922,8 @@ export function parseUrl(url: string, currentPagePath: string, api: string): Rou
 - [x] **步骤 4：Commit**
 
 ```bash
-git add uni_modules/uni-router-guard/lib/url.uts
-git commit -m "feat(uni-router-guard): 新增 url 纯函数模块（URL 决策矩阵全绿）"
+git add uni_modules/unix-router-guard/lib/url.uts
+git commit -m "feat(unix-router-guard): 新增 url 纯函数模块（URL 决策矩阵全绿）"
 ```
 
 ---
@@ -1111,7 +1111,7 @@ if (failures.length > 0) {
 - [x] **步骤 4：跑一次，确认红灯**
 
 运行：`node scripts/router-guard-test/build.mjs; echo "exit=$?"`
-预期：**exit=1** + `✗ 缺少源文件：uni_modules/uni-router-guard/lib/guard.uts` + `1 个文件缺失，构建中止`。
+预期：**exit=1** + `✗ 缺少源文件：uni_modules/unix-router-guard/lib/guard.uts` + `1 个文件缺失，构建中止`。
 
 - [x] **步骤 5：Commit**
 
@@ -1125,7 +1125,7 @@ git commit -m "test(router-guard): 追加 next 裁决表与守卫链用例（此
 ## 任务 5：guard.uts（守卫注册表 + 同步执行器）
 
 **文件：**
-- 创建：`uni_modules/uni-router-guard/lib/guard.uts`
+- 创建：`uni_modules/unix-router-guard/lib/guard.uts`
 
 - [x] **步骤 1：实现**
 
@@ -1162,7 +1162,7 @@ export function setGuardDebug(enabled: boolean): void {
 
 function log(message: string): void {
   if (debugEnabled) {
-    console.log(`[uni-router-guard] ${message}`);
+    console.log(`[unix-router-guard] ${message}`);
   }
 }
 
@@ -1213,7 +1213,7 @@ export function runBeforeGuards(to: RouteTarget, from: RouteTarget): GuardOutcom
 
     const next: Next = (...args: Array<any>): void => {
       if (called) {
-        console.warn('[uni-router-guard] 同一个守卫内重复调用了 next，后续调用被忽略');
+        console.warn('[unix-router-guard] 同一个守卫内重复调用了 next，后续调用被忽略');
         return;
       }
       called = true;
@@ -1247,7 +1247,7 @@ export function runBeforeGuards(to: RouteTarget, from: RouteTarget): GuardOutcom
     guard(to, from, next);
 
     if (invalid) {
-      console.warn(`[uni-router-guard] 守卫返回值非法（只接受 null / true / false / 非空字符串），已按中止处理：${to.fullPath}`);
+      console.warn(`[unix-router-guard] 守卫返回值非法（只接受 null / true / false / 非空字符串），已按中止处理：${to.fullPath}`);
       return { pass: false, redirect: null, missingNext: false } as GuardOutcome;
     }
     if (target != null) {
@@ -1259,7 +1259,7 @@ export function runBeforeGuards(to: RouteTarget, from: RouteTarget): GuardOutcom
       return { pass: false, redirect: null, missingNext: false } as GuardOutcome;
     }
     if (!called) {
-      console.warn(`[uni-router-guard] 守卫未调用 next，已按中止处理（vue-router 会挂起导航，同步形态不能挂）：${to.fullPath}`);
+      console.warn(`[unix-router-guard] 守卫未调用 next，已按中止处理（vue-router 会挂起导航，同步形态不能挂）：${to.fullPath}`);
       return { pass: false, redirect: null, missingNext: true } as GuardOutcome;
     }
   }
@@ -1291,8 +1291,8 @@ export function runAfterHooks(to: RouteTarget, from: RouteTarget): void {
 - [x] **步骤 4：Commit**
 
 ```bash
-git add uni_modules/uni-router-guard/lib/guard.uts
-git commit -m "feat(uni-router-guard): 新增守卫注册表与同步执行器（next 裁决表全绿）"
+git add uni_modules/unix-router-guard/lib/guard.uts
+git commit -m "feat(unix-router-guard): 新增守卫注册表与同步执行器（next 裁决表全绿）"
 ```
 
 ---
@@ -1300,7 +1300,7 @@ git commit -m "feat(uni-router-guard): 新增守卫注册表与同步执行器�
 ## 任务 6：interceptor.uts（唯一碰 uni 全局的运行时）
 
 **文件：**
-- 创建：`uni_modules/uni-router-guard/lib/interceptor.uts`
+- 创建：`uni_modules/unix-router-guard/lib/interceptor.uts`
 
 - [x] **步骤 1：实现**
 
@@ -1338,7 +1338,7 @@ let debugEnabled: boolean = false;
 
 function log(message: string): void {
   if (debugEnabled) {
-    console.log(`[uni-router-guard] ${message}`);
+    console.log(`[unix-router-guard] ${message}`);
   }
 }
 
@@ -1402,7 +1402,7 @@ function dispatchRedirect(url: string | null): void {
 
   redirectDepth = redirectDepth + 1;
   if (redirectDepth > maxRedirectDepth) {
-    console.warn(`[uni-router-guard] 重定向链深度超过 ${maxRedirectDepth}，已放弃本次改跳：${url}`);
+    console.warn(`[unix-router-guard] 重定向链深度超过 ${maxRedirectDepth}，已放弃本次改跳：${url}`);
     return;
   }
 
@@ -1502,8 +1502,8 @@ export function configureInterceptor(options: RouterOptions): void {
 - [x] **步骤 3：Commit**
 
 ```bash
-git add uni_modules/uni-router-guard/lib/interceptor.uts
-git commit -m "feat(uni-router-guard): 新增拦截器安装、卸载与裁决派发"
+git add uni_modules/unix-router-guard/lib/interceptor.uts
+git commit -m "feat(unix-router-guard): 新增拦截器安装、卸载与裁决派发"
 ```
 
 ---
@@ -1511,9 +1511,9 @@ git commit -m "feat(uni-router-guard): 新增拦截器安装、卸载与裁决�
 ## 任务 7：router.uts + index.uts + package.json
 
 **文件：**
-- 创建：`uni_modules/uni-router-guard/lib/router.uts`
-- 创建：`uni_modules/uni-router-guard/index.uts`
-- 创建：`uni_modules/uni-router-guard/package.json`
+- 创建：`uni_modules/unix-router-guard/lib/router.uts`
+- 创建：`uni_modules/unix-router-guard/index.uts`
+- 创建：`uni_modules/unix-router-guard/package.json`
 
 - [x] **步骤 1：实现 router.uts**
 
@@ -1548,7 +1548,7 @@ function navigateBy(api: string, url: string): Promise<any> | null {
 function resolveUrl(to: any): string | null {
   const url = normalizeLocation(to);
   if (url == '') {
-    console.warn('[uni-router-guard] 跳转入参为空，已忽略');
+    console.warn('[unix-router-guard] 跳转入参为空，已忽略');
     return null;
   }
   return url;
@@ -1610,7 +1610,7 @@ export function createRouter(options: RouterOptions | null = null): Router {
 
 ```uts
 /**
- * uni-router-guard 统一入口。
+ * unix-router-guard 统一入口。
  *
  * ⚠️ 全插件只有本文件做 `export *`，且是**单层**：被转发的模块自身不再对外 `export *`，
  *    否则 UTS 在 Android 端会把符号改名成 xxx__1（红线 1.1.12）。
@@ -1626,8 +1626,8 @@ export * from './lib/url.uts';
 
 ```json
 {
-  "id": "uni-router-guard",
-  "displayName": "uni-router-guard 导航拦截",
+  "id": "unix-router-guard",
+  "displayName": "unix-router-guard 导航拦截",
   "version": "1.0.0",
   "main": "index.uts",
   "description": "uni-app X 的导航守卫运行时：vue-router 风格的 beforeEach/afterEach 与 next 裁决，拦截 uni.navigateTo 等 5 个跳转 API，零业务依赖。",
@@ -1673,8 +1673,8 @@ export * from './lib/url.uts';
 - [x] **步骤 4：Commit**
 
 ```bash
-git add uni_modules/uni-router-guard/lib/router.uts uni_modules/uni-router-guard/index.uts uni_modules/uni-router-guard/package.json
-git commit -m "feat(uni-router-guard): 新增 createRouter 工厂与插件门面"
+git add uni_modules/unix-router-guard/lib/router.uts uni_modules/unix-router-guard/index.uts uni_modules/unix-router-guard/package.json
+git commit -m "feat(unix-router-guard): 新增 createRouter 工厂与插件门面"
 ```
 
 ---
@@ -1701,8 +1701,8 @@ git commit -m "feat(uni-router-guard): 新增 createRouter 工厂与插件门面
 - [x] **步骤 4：Commit（若步骤 3 有改动）**
 
 ```bash
-git add -A uni_modules/uni-router-guard scripts/router-guard-test
-git commit -m "chore(uni-router-guard): 修掉 lint 报出的问题"
+git add -A uni_modules/unix-router-guard scripts/router-guard-test
+git commit -m "chore(unix-router-guard): 修掉 lint 报出的问题"
 ```
 
 ### ✅ 执行结果（2026-09-15，步骤 1-4 已完成）
@@ -1720,8 +1720,8 @@ git commit -m "chore(uni-router-guard): 修掉 lint 报出的问题"
   已按仓库既有 stroustrup 风格（`}` 与 `else` 分行，见 `scripts/gen-uts-dts.mjs`）与单引号约定修掉。修后：
   - `npx eslint scripts/router-guard-test` → **0 error / 7 warning**（warning 全是 `unused-imports/no-unused-vars`，命中的是守卫签名里刻意保留的 `to/from/next` 形参，属计划允许的「新增 warning」）。
   - `npx eslint .` → **19 problems (3 error, 16 warning)**，3 个 error 全部落在**本次未改动**的既存文件，与基线一致。
-  - `uni_modules/uni-router-guard/**` 命中 **0**（`uni_modules` 在 eslint 忽略列表内）。
-- **步骤 4 Commit**：`chore(uni-router-guard): 修掉 harness 脚本的 lint 报错`。
+  - `uni_modules/unix-router-guard/**` 命中 **0**（`uni_modules` 在 eslint 忽略列表内）。
+- **步骤 4 Commit**：`chore(unix-router-guard): 修掉 harness 脚本的 lint 报错`。
 - **补充证据**：修完 harness 脚本后重跑 `node scripts/router-guard-test/build.mjs && node scripts/router-guard-test/.build/run.ts` → `✅ 全部通过`（52 条用例：url 32 + guard 20）。
 
 ---
@@ -1735,8 +1735,8 @@ git commit -m "chore(uni-router-guard): 修掉 lint 报出的问题"
 修改 `main.uts`：把任务 0 的探针页 import 换成本插件的导入，并临时装配一次（**任务 10 结束后整段还原**）：
 
 ```uts
-import { createRouter } from './uni_modules/uni-router-guard';
-import type { RouteTarget } from './uni_modules/uni-router-guard';
+import { createRouter } from './uni_modules/unix-router-guard';
+import type { RouteTarget } from './uni_modules/unix-router-guard';
 
 // TODO(临时): 真机验证用，任务 10 结束后删除
 const probeRouter = createRouter({ debug: true });
@@ -1777,7 +1777,7 @@ probeRouter.afterEach((to: RouteTarget, from: RouteTarget): void => {
 
 - [x] **步骤 3：确认 Kotlin 产物里真的有插件代码**
 
-运行：`grep -c "uni-router-guard\|installInterceptors" unpackage/cache/.app-android/src/index.kt`
+运行：`grep -c "unix-router-guard\|installInterceptors" unpackage/cache/.app-android/src/index.kt`
 
 > 路径以实际产物为准（`unpackage/cache/.app-android/` 下的 `.kt` 文件）。预期：**≥ 1**。
 > 若为 0 说明代码根本没进 Kotlin 编译（例如被摇树掉），必须回头检查 `main.uts` 的临时接线是否生效。
@@ -1794,7 +1794,7 @@ probeRouter.afterEach((to: RouteTarget, from: RouteTarget): void => {
   - **VDOM/Kotlin 通道**（临时删掉 `manifest.json` 的 `vapor` / `vapor-render-target`）：`编译为android class` 出现（≥1）、编译阶段 `error:` / `编译失败` **0 命中**、`项目 unibestX 编译成功。`
   - **蒸汽/字节码通道**（`manifest.json` 还原后）：`编译成功`，应用真机启动正常。
   - 这轮暴露并修掉 **3 处只在 Kotlin 阶段报错**的写法（详见任务 12 执行结果）：`Router.back` 的剩余参数（抽成顶层 `BackFn` 别名）、`decodeURIComponent` 的可空返回（判空兜底）、跳转门面返回类型（`any | null`）。
-- **步骤 3 Kotlin 产物**：`grep -c "uni-router-guard\|installInterceptors" unpackage/cache/.app-android/src/index.kt` → **18**（≥1）。产物里的 `UTSSourceMapPosition` 指回 `uni_modules/uni-router-guard/lib/types.uts`、`guard.uts`、`interceptor.uts`、`router.uts`，且 `installInterceptors` / `uninstallInterceptors` 是顶层函数 —— 插件确实进了 Kotlin 编译。
+- **步骤 3 Kotlin 产物**：`grep -c "unix-router-guard\|installInterceptors" unpackage/cache/.app-android/src/index.kt` → **18**（≥1）。产物里的 `UTSSourceMapPosition` 指回 `uni_modules/unix-router-guard/lib/types.uts`、`guard.uts`、`interceptor.uts`、`router.uts`，且 `installInterceptors` / `uninstallInterceptors` 是顶层函数 —— 插件确实进了 Kotlin 编译。
 - **步骤 4 `__1` 改名**：`grep -rn "installInterceptors__1\|createRouter__1" unpackage/cache/.app-android/src/` → **0 命中**（未触发红线 1.1.12 的多层 `export *` 改名）。
 - **注销的函数相等语义**（下方 ⚠️ 标注的待验风险）：VDOM/Kotlin 真机实测**成立** —— 注册 A、B 后注销 B，日志里只剩 A；也没有出现「注销一个把两个都干掉」。**不需要**改用自增 id 注册表，`guard.uts` 的 `filter((item) => item != guard)` 保持原样。
 
@@ -1917,7 +1917,7 @@ git checkout -- main.uts
 
 ```bash
 git add -A
-git commit -m "test(uni-router-guard): 完成真机回归矩阵并移除临时验证页"
+git commit -m "test(unix-router-guard): 完成真机回归矩阵并移除临时验证页"
 ```
 
 ### ✅ 执行结果（2026-09-15 真机实测，步骤 1-6 已完成）
@@ -1934,27 +1934,27 @@ git commit -m "test(uni-router-guard): 完成真机回归矩阵并移除临时�
 | S3 | `push('/src/sub/test/test')` | `api=navigateTo fullPath=/src/sub/test/test` + `afterEach`；紧接着项目自带拦截器把它改跳到 `/src/sub/auth/login?redirect=%2Fsrc%2Fsub%2Ftest%2Ftest` | 跳转正常；**两套拦截器（插件 + `src/router/interceptor.uts`）同存不冲突** —— 这正是规格 §「二选一」要提醒的组合 |
 | S4 | `back()` | `api=navigateBack fullPath=/src/sub/time/time from=/src/sub/auth/login` + `afterEach`，真的退回上一页 | `navigateBack` 分支（无 url，目标取页栈上一页）行为正确 |
 | S5 | `push({ path, query: { id: 1, tags: ['a','b'] } })` | `fullPath=/src/sub/test/test?id=1&tags=a%2Cb`、`queryId=1` | 对象形态 + 数组查询值序列化正确 |
-| S6 | 无限改跳 `push('/probe-loop-a')` | 连续 loop-a/loop-b 数轮后 `[uni-router-guard] 重定向链深度超过 5，已放弃本次改跳：/probe-loop-a`（interceptor.uts:98）；`afterEach /probe-loop*` **0 命中** | 达到深度上限会放弃并告警，**不会误放行、不崩溃、不死循环** |
-| S7 | 守卫漏调 `next` | `[uni-router-guard] 守卫未调用 next，已按中止处理（…）：/src/sub/lodash/lodash`（guard.uts:130）；`afterEach /src/sub/lodash` **0 命中** | fail-safe 中止生效，页面不跳转 |
+| S6 | 无限改跳 `push('/probe-loop-a')` | 连续 loop-a/loop-b 数轮后 `[unix-router-guard] 重定向链深度超过 5，已放弃本次改跳：/probe-loop-a`（interceptor.uts:98）；`afterEach /probe-loop*` **0 命中** | 达到深度上限会放弃并告警，**不会误放行、不崩溃、不死循环** |
+| S7 | 守卫漏调 `next` | `[unix-router-guard] 守卫未调用 next，已按中止处理（…）：/src/sub/lodash/lodash`（guard.uts:130）；`afterEach /src/sub/lodash` **0 命中** | fail-safe 中止生效，页面不跳转 |
 | S8 | `uninstall()` 后再 `push` | 之后**再无任何 `[probe-guard]` 日志** | 拦截器确实被移除（`uni.removeInterceptor(api, null)` 生效） |
 
 - **关于 `error: java.lang.NoSuchFieldError: No field curIdx … IndexKt`**：首现于 `17:22:15`，在 `编译成功`（17:23:01）与 `编译为android class` **之后**、应用启动之后，是既存的**运行时**增量编译缓存与基座不匹配问题，**不是插件编译错误**；本轮编译阶段 `编译失败` **0 命中**、`项目 unibestX 编译成功。` 命中 3 次。
 - **步骤 4 清理**：移除 `main.uts` / `App.uvue` 的全部临时接线，删除 `src/sub/routerGuardProbe/` 整目录，移除 `pages.json` 与 `pages.config.json` 里的探针页登记，还原 `manifest.json`（`git diff manifest.json` 为空）。`grep -rn routerGuardProbe`（排除 `unpackage` / `docs`）→ **0 命中**。
 - **步骤 5 清理后编译**：✅ `项目 unibestX 编译成功。` + `✅ H5 打包成功，产物目录：unpackage/dist/build/web`（插件本体此时不被任何页面引用，构建不受影响）。
-- **步骤 6 Commit**：`test(uni-router-guard): 完成真机回归矩阵并移除临时验证页`。
+- **步骤 6 Commit**：`test(unix-router-guard): 完成真机回归矩阵并移除临时验证页`。
 
 ---
 
 ## 任务 11：readme 与 changelog
 
 **文件：**
-- 创建：`uni_modules/uni-router-guard/readme.md`
-- 创建：`uni_modules/uni-router-guard/changelog.md`
+- 创建：`uni_modules/unix-router-guard/readme.md`
+- 创建：`uni_modules/unix-router-guard/changelog.md`
 
 - [x] **步骤 1：写 readme（必须包含以下全部小节与代码）**
 
 ````markdown
-# uni-router-guard
+# unix-router-guard
 
 uni-app X 的导航守卫运行时。零业务依赖：只依赖 `uni` 全局，不引 Pinia、不读项目配置。
 
@@ -1962,11 +1962,11 @@ uni-app X 的导航守卫运行时。零业务依赖：只依赖 `uni` 全局，
 
 ## 安装
 
-把 `uni-router-guard` 放进 `uni_modules/`，在 `main.uts` 里创建一次：
+把 `unix-router-guard` 放进 `uni_modules/`，在 `main.uts` 里创建一次：
 
 ```uts
-import { createRouter } from '@/uni_modules/uni-router-guard';
-import type { RouteTarget } from '@/uni_modules/uni-router-guard';
+import { createRouter } from '@/uni_modules/unix-router-guard';
+import type { RouteTarget } from '@/uni_modules/unix-router-guard';
 
 const router = createRouter({ debug: false });
 
@@ -2049,8 +2049,8 @@ const router = createRouter({
 - [x] **步骤 3：Commit**
 
 ```bash
-git add uni_modules/uni-router-guard/readme.md uni_modules/uni-router-guard/changelog.md
-git commit -m "docs(uni-router-guard): 补充 readme 与 changelog"
+git add uni_modules/unix-router-guard/readme.md uni_modules/unix-router-guard/changelog.md
+git commit -m "docs(unix-router-guard): 补充 readme 与 changelog"
 ```
 
 ---
@@ -2091,7 +2091,7 @@ git commit -m "docs(uni-router-guard): 补充 readme 与 changelog"
 
 ```bash
 git add .agents/skills/unibestX-skill/SKILL.md .claude/skills/unibestX-skill/SKILL.md
-git commit -m "docs(skill): 回写 uni-router-guard 实现中暴露的 UTS 约束"
+git commit -m "docs(skill): 回写 unix-router-guard 实现中暴露的 UTS 约束"
 ```
 
 ### ✅ 执行结果（2026-09-15，已回写）
@@ -2149,7 +2149,7 @@ git commit -m "docs(skill): 回写 uni-router-guard 实现中暴露的 UTS 约�
 
 ## 执行交接
 
-计划已完成并保存到 `docs/superpowers/plans/2026-09-15-uni-router-guard-plugin.md`。两种执行方式：
+计划已完成并保存到 `docs/superpowers/plans/2026-09-15-unix-router-guard-plugin.md`。两种执行方式：
 
 **1. 子代理驱动（推荐）** —— 每个任务调度一个新的子代理，任务间进行审查，快速迭代
 

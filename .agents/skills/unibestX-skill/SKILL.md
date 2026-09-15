@@ -314,7 +314,7 @@ export * from './vdom/user.uts';
 
 #### 1.1.15 遍历「值类型为 `any` 的 Map」时，**给回调参数显式标注 `any`** 会炸 —— 去掉标注或改用 `UTSJSONObject.keys()`；且 `map.keys()` 在 Kotlin 里是属性不是函数
 
-- **报错现象**（本项目实测，uni-router-guard 任务 0 探针，真机 VDOM/Kotlin 通道）：
+- **报错现象**（本项目实测，unix-router-guard 任务 0 探针，真机 VDOM/Kotlin 通道）：
 
   ```text
   error: 参数类型不匹配：实际类型为 'Function2<Any, String, Unit>'，预期类型为 'Function1<Map.Entry<String, Any?>, Unit>'。
@@ -396,12 +396,12 @@ export * from './vdom/user.uts';
 
 #### 1.1.17 Kotlin 下**剩余参数不能写在对象类型的属性上** —— `back: (...args: Array<number>) => void` 报 `Function type parameters cannot have modifiers.`
 
-- **报错现象**（本项目实测，uni-router-guard 任务 9，真机 VDOM/Kotlin 通道）：
+- **报错现象**（本项目实测，unix-router-guard 任务 9，真机 VDOM/Kotlin 通道）：
 
   ```text
   [plugin:uni:app-uts] kotlin编译失败
   error: Function type parameters cannot have modifiers.
-  at uni_modules/uni-router-guard/lib/types.uts:75:9
+  at uni_modules/unix-router-guard/lib/types.uts:75:9
   74 |    /** 返回；back() 等价 back(1) */
   75 |    back: (...args: Array<number>) => void;
      |           ^
@@ -429,11 +429,11 @@ export * from './vdom/user.uts';
 
 #### 1.1.18 内置 `decodeURIComponent` 在 UTS 里返回 `string?` —— 直接 `return` 给 `: string` 报 `error1 返回类型不匹配`
 
-- **报错现象**（本项目实测，uni-router-guard 任务 9，真机 VDOM/Kotlin 通道）：
+- **报错现象**（本项目实测，unix-router-guard 任务 9，真机 VDOM/Kotlin 通道）：
 
   ```text
   error: 返回类型不匹配：预期类型为 'String'，实际类型为 'String?'。错误详情链接: https://doc.dcloud.net.cn/uni-app-x/uts/uts-optimize.html#error1
-  at uni_modules/uni-router-guard/lib/url.uts:65:11
+  at uni_modules/unix-router-guard/lib/url.uts:65:11
   64 |    try {
   65 |      return decodeURIComponent(value);
      |             ^
@@ -463,7 +463,7 @@ export * from './vdom/user.uts';
 
 #### 1.1.19 uni 跳转 API 的 Promise **收不进 `Promise<any> | null`** —— UTS 泛型不协变且 `any` 等价非空 Kotlin `Any`，只能写 `any | null`
 
-- **报错现象**（本项目实测，uni-router-guard 任务 9，真机 VDOM/Kotlin 通道；同一处代码按提示改一轮换一种错）：
+- **报错现象**（本项目实测，unix-router-guard 任务 9，真机 VDOM/Kotlin 通道；同一处代码按提示改一轮换一种错）：
 
   ```text
   # 第一轮：声明 Promise<any> | null

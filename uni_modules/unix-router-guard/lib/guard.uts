@@ -30,7 +30,7 @@ export function setGuardDebug(enabled: boolean): void {
 
 function log(message: string): void {
   if (debugEnabled) {
-    console.log(`[uni-router-guard] ${message}`);
+    console.log(`[unix-router-guard] ${message}`);
   }
 }
 
@@ -81,7 +81,7 @@ export function runBeforeGuards(to: RouteTarget, from: RouteTarget): GuardOutcom
 
     const next: Next = (...args: Array<any>): void => {
       if (called) {
-        console.warn('[uni-router-guard] 同一个守卫内重复调用了 next，后续调用被忽略');
+        console.warn('[unix-router-guard] 同一个守卫内重复调用了 next，后续调用被忽略');
         return;
       }
       called = true;
@@ -115,7 +115,7 @@ export function runBeforeGuards(to: RouteTarget, from: RouteTarget): GuardOutcom
     guard(to, from, next);
 
     if (invalid) {
-      console.warn(`[uni-router-guard] 守卫返回值非法（只接受 null / true / false / 非空字符串），已按中止处理：${to.fullPath}`);
+      console.warn(`[unix-router-guard] 守卫返回值非法（只接受 null / true / false / 非空字符串），已按中止处理：${to.fullPath}`);
       return { pass: false, redirect: null, missingNext: false } as GuardOutcome;
     }
     if (target != null) {
@@ -127,7 +127,7 @@ export function runBeforeGuards(to: RouteTarget, from: RouteTarget): GuardOutcom
       return { pass: false, redirect: null, missingNext: false } as GuardOutcome;
     }
     if (!called) {
-      console.warn(`[uni-router-guard] 守卫未调用 next，已按中止处理（vue-router 会挂起导航，同步形态不能挂）：${to.fullPath}`);
+      console.warn(`[unix-router-guard] 守卫未调用 next，已按中止处理（vue-router 会挂起导航，同步形态不能挂）：${to.fullPath}`);
       return { pass: false, redirect: null, missingNext: true } as GuardOutcome;
     }
   }

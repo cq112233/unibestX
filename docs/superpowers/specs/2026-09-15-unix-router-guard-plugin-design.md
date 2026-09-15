@@ -1,4 +1,4 @@
-# uni-router-guard 导航拦截插件设计规格 (2026-09-15)
+# unix-router-guard 导航拦截插件设计规格 (2026-09-15)
 
 ## 1. 概述
 
@@ -8,9 +8,9 @@
 
 另有一份 [2026-09-14-router-guard-design.md](./2026-09-14-router-guard-design.md) 规划了 `src/router` 内部的**工厂式守卫重构**，那仍然是在业务工程内的改造，不属于本规格范围。
 
-`feat/router-guard` 分支（2026-09-15 上午）曾实现过一版同类插件，但它的公开形态是 `installRouterGuard({ guards, dispatch })` + 守卫对象数组、且要求宿主注入 `RouterDispatch` 才能跳 TabBar 页。本规格**不沿用**那一版，改为 `createRouter()` + `beforeEach(fn)` 的注册式形态（更贴 vue-router），并把 TabBar 的差异收敛为**可选**的 `resolveRedirectApi` 回调。该分支的 `uni_modules/uni-router-guard/` 与本规格产出的同名目录**不共存**：当前分支 `refactor/tabbar-helper-split` 上没有该目录，本规格从零创建。
+`feat/router-guard` 分支（2026-09-15 上午）曾实现过一版同类插件，但它的公开形态是 `installRouterGuard({ guards, dispatch })` + 守卫对象数组、且要求宿主注入 `RouterDispatch` 才能跳 TabBar 页。本规格**不沿用**那一版，改为 `createRouter()` + `beforeEach(fn)` 的注册式形态（更贴 vue-router），并把 TabBar 的差异收敛为**可选**的 `resolveRedirectApi` 回调。该分支的 `uni_modules/unix-router-guard/` 与本规格产出的同名目录**不共存**：当前分支 `refactor/tabbar-helper-split` 上没有该目录，本规格从零创建。
 
-本规格新增一个 **与业务零耦合** 的 uni_modules 插件 `uni-router-guard`：只提供「导航拦截 + 守卫链 + 跳转门面」，**不含任何业务规则**（不做登录判断、不依赖 Pinia / store / 项目 utils）。
+本规格新增一个 **与业务零耦合** 的 uni_modules 插件 `unix-router-guard`：只提供「导航拦截 + 守卫链 + 跳转门面」，**不含任何业务规则**（不做登录判断、不依赖 Pinia / store / 项目 utils）。
 
 ### 1.2 目标
 
@@ -61,7 +61,7 @@
 ### 3.1 创建与选项
 
 ```uts
-import { createRouter } from '@/uni_modules/uni-router-guard'
+import { createRouter } from '@/uni_modules/unix-router-guard'
 
 const router = createRouter({
   apis: ['navigateTo', 'redirectTo', 'reLaunch', 'switchTab', 'navigateBack'],
@@ -230,7 +230,7 @@ router.uninstall()   // 移除全部已安装拦截器
 ## 4. 架构与文件结构
 
 ```
-uni_modules/uni-router-guard/
+uni_modules/unix-router-guard/
 ├── package.json          # main: "index.uts"，dcloudext.type: "uts"
 ├── readme.md
 ├── changelog.md
@@ -410,13 +410,13 @@ pass  → 返回 true，放行
 
 | 文件 | 动作 |
 | --- | --- |
-| `uni_modules/uni-router-guard/package.json` | 新增（`main: "index.uts"`，`dcloudext.type: "uts"`） |
-| `uni_modules/uni-router-guard/index.uts` | 新增（单层门面） |
-| `uni_modules/uni-router-guard/lib/types.uts` | 新增 |
-| `uni_modules/uni-router-guard/lib/url.uts` | 新增 |
-| `uni_modules/uni-router-guard/lib/guard.uts` | 新增 |
-| `uni_modules/uni-router-guard/lib/interceptor.uts` | 新增 |
-| `uni_modules/uni-router-guard/lib/router.uts` | 新增 |
-| `uni_modules/uni-router-guard/readme.md` | 新增（用法、与 vue-router 的差异、与 `src/router` 二选一） |
-| `uni_modules/uni-router-guard/changelog.md` | 新增 |
+| `uni_modules/unix-router-guard/package.json` | 新增（`main: "index.uts"`，`dcloudext.type: "uts"`） |
+| `uni_modules/unix-router-guard/index.uts` | 新增（单层门面） |
+| `uni_modules/unix-router-guard/lib/types.uts` | 新增 |
+| `uni_modules/unix-router-guard/lib/url.uts` | 新增 |
+| `uni_modules/unix-router-guard/lib/guard.uts` | 新增 |
+| `uni_modules/unix-router-guard/lib/interceptor.uts` | 新增 |
+| `uni_modules/unix-router-guard/lib/router.uts` | 新增 |
+| `uni_modules/unix-router-guard/readme.md` | 新增（用法、与 vue-router 的差异、与 `src/router` 二选一） |
+| `uni_modules/unix-router-guard/changelog.md` | 新增 |
 | `scripts/router-guard-test/` | 新增（node harness，不参与主工程编译） |
