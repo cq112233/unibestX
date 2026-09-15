@@ -1,10 +1,9 @@
 import { curIdx, setCurIdx, setCurIdxByPath, tabbarList } from './state.uts';
-import { isCompilerVersionGte } from '@/src/utils/systemInfo/index.uts';
-import { customTabbarConfig } from '../config';
 import { isNativeTabbar, isSinglePageTabbar, selectedTabbarStrategy, TABBAR_STRATEGY_MAP } from './strategy.uts';
+import { customTabbarConfig } from '../config.uts';
 
 /** 中间鼓包 tabbarItem 点击事件 */
-export function handleClickBulge(url: string = '/src/pages/ai/ai'): void {
+function handleClickBulge(url: string = '/src/pages/ai/ai'): void {
   uni.navigateTo({
     url
   });
@@ -101,41 +100,6 @@ export function handleTabbarClick(index: number): void {
   setTimeout(() => {
     isSwitchingTab = false;
   }, 250);
-}
-
-/**
- * 隐藏系统原生 TabBar 并根据编译器版本动态适配 H5 底部容器
- */
-export function safeHideNativeTabBar(): void {
-  // #ifdef H5
-  try {
-    if (typeof document !== 'undefined' && document.getElementById('hide-native-tabbar-style') == null) {
-      const style = document.createElement('style');
-      style.id = 'hide-native-tabbar-style';
-      if (isCompilerVersionGte('5.25')) {
-        style.innerHTML = 'uni-tabbar, .uni-tabbar, .uni-tabbar-bottom, .uni-tabbar__icon, .uni-tabbar__label { display: none !important; } :root { --window-bottom: 0px !important; } uni-page-wrapper { height: 100% !important; } uni-page-body { padding-bottom: 0px !important; }';
-      }
-      else {
-        // 5.24 及以下版本（与 uniX-rice-ui 100% 相同原版逻辑）
-        style.innerHTML = 'uni-tabbar, .uni-tabbar, .uni-tabbar-bottom, .uni-tabbar__icon, .uni-tabbar__label { display: none !important; }';
-      }
-      document.head.appendChild(style);
-    }
-  }
-  catch { }
-  // #endif
-
-  // #ifndef MP-WEIXIN
-  try {
-    uni.hideTabBar({
-      animation: false,
-      fail: (err: any) => {
-        console.log('hideTabBar fail: ', err);
-      }
-    });
-  }
-  catch { }
-  // #endif
 }
 
 /**
