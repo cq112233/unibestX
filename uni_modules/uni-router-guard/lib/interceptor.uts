@@ -96,6 +96,10 @@ function dispatchRedirect(url: string | null): void {
   redirectDepth = redirectDepth + 1;
   if (redirectDepth > maxRedirectDepth) {
     console.warn(`[uni-router-guard] 重定向链深度超过 ${maxRedirectDepth}，已放弃本次改跳：${url}`);
+    // 放弃即意味着这条链到此结束：必须归零，否则计数会停在超限值上，
+    // 之后每一次「被拦截 → 改跳」都会静默失效（invoke 返回 false 且不跳转），
+    // 直到某次导航放行才恢复。真机复现见 edge 探针。
+    redirectDepth = 0;
     return;
   }
 
