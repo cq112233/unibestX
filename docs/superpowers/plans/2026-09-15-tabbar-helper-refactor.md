@@ -772,7 +772,11 @@ export const tabbarType: string = customTabbarConfig.type ?? 'default';
 
 - [ ] **步骤 2：从 `src/tabbar/helper/index.uts` 摘掉整段策略代码**
 
-删除从 `/** Tabbar 策略映射结构类型 */` 起、到 `export const tabbarType: string = customTabbarConfig.type ?? 'default';` 止的**全部内容**（含 `TabbarStrategyType`、`TABBAR_STRATEGY_MAP`、`parseTabbarStrategy`、`selectedTabbarStrategy`、`tabbarCacheEnable`、`customTabbarEnable`、`isSinglePageTabbar`、`isNoTabbar`、`tabbarType`、`isCapsuleTabbar`、`needHideNativeTabbar`、`isNativeTabbar`、`hasNativeTabbarConfig`）。
+删除从 `/** Tabbar 策略映射结构类型 */` 起、到 `export const hasNativeTabbarConfig: boolean = ...;` 止的**全部内容**（含 `TabbarStrategyType`、`TABBAR_STRATEGY_MAP`、`parseTabbarStrategy`、`selectedTabbarStrategy`、`tabbarCacheEnable`、`customTabbarEnable`、`isSinglePageTabbar`、`isNoTabbar`、`tabbarType`、`isCapsuleTabbar`、`needHideNativeTabbar`、`isNativeTabbar`、`hasNativeTabbarConfig`）。
+
+> ⚠️ **摘除范围的准确边界（改造前实测行号）：第 17 行 `/** Tabbar 策略映射结构类型 */` 至第 92 行 `export const hasNativeTabbarConfig` 止，共 13 个 `export`。**
+>
+> 初版此处把终点写成「到 `tabbarType` 止」是**错的**——`isCapsuleTabbar`(83)、`needHideNativeTabbar`(86)、`isNativeTabbar`(89)、`hasNativeTabbarConfig`(92) 都在 `tabbarType`(80) **之后**。照那个锚点做会留下半截：这几个派生态仍在引用已被删掉的 `TABBAR_STRATEGY_MAP`，**直接编译失败**。以上面枚举的 13 个符号为准，不要用行号锚点。
 
 **然后补上该文件残留代码所需的新导入**。摘掉策略段后，文件里剩下的跳转与桥接代码（`switchTabbar`、`handleTabbarClick`、`initNativeMidButtonTap`）仍在引用策略符号，必须改从新文件导入——**漏掉这一步会直接编译失败**。在 import 区新增：
 
