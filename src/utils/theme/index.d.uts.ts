@@ -56,8 +56,8 @@ export type ThemeTokens = {
 export declare function getDefaultTheme(): string;
 
 /**
- * 全局主题色（响应式）：由 app store 在主题变更时写入，TabBar / NavBar 等 UI 组件读取。
- * 原先寄居在 src/tabbar/helper/store.uts，迁入主题域后 store 不再反向依赖 tabbar。
+ * 全局主题色（响应式）：由 app store 在主题变更时写入，TabBar 各 UI 组件读取。
+ * 迁入主题域后 store 不再反向依赖 tabbar。
  */
 export declare const themeColor: any;
 
