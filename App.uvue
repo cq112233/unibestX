@@ -1,7 +1,7 @@
 <script setup lang="uts">
 import { checkDirectEntry } from './src/router/interceptor';
 import { useAppStore } from './src/store';
-import { initNativeMidButtonTap } from './src/tabbar/helper';
+import { initNativeMidButtonTap } from '@/src/tabbar';
 
 onLaunch(() => {
   // 提前实例化 App Store（含持久化还原），并初始化外观模式：跟随系统 / 浅色 / 深色
