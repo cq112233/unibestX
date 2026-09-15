@@ -1,0 +1,203 @@
+/**
+ * URL 解析与规范化。
+ *
+ * ⚠️ 本文件是**纯函数**：不调用 getCurrentPages()、不碰 uni 全局，也不做任何日志。
+ *    「当前页路径」一律作为入参传入，这样整套规则能在 node 里跑决策矩阵
+ *    （scripts/router-guard-test）。
+ *
+ * ⚠️ UTS 约束：下标读取的边界判断必须与读取同时发生（Kotlin 越界会抛异常）；
+ *    数字/数组必须显式标注类型；空值用 null，不用 undefined。
+ */
+import type { RouteTarget } from './types.uts';
+
+/** 规范化路径：补前导斜杠（'src/pages/x' → '/src/pages/x'），空串原样返回 */
+export function normalizePath(path: string): string {
+  if (path == '') {
+    return '';
+  }
+  if (path.startsWith('/')) {
+    return path;
+  }
+  return `/${path}`;
+}
+
+/** 是否协议链接（plugin:// / http:// / https://） */
+export function isProtocolUrl(path: string): boolean {
+  if (path.startsWith('plugin://')) {
+    return true;
+  }
+  if (path.startsWith('http://')) {
+    return true;
+  }
+  return path.startsWith('https://');
+}
+
+/**
+ * 相对路径解析：把 'subpage' 解析为「当前页所在目录」下的绝对路径。
+ * - 已带前导 / 或协议链接 → 原样返回
+ * - currentPagePath 为空（页栈为空，如冷启动首个页面）→ 原样返回，不做拼接
+ */
+export function resolveRelativePath(path: string, currentPagePath: string): string {
+  if (path == '' || path.startsWith('/')) {
+    return path;
+  }
+  if (isProtocolUrl(path)) {
+    return path;
+  }
+  if (currentPagePath == '') {
+    return path;
+  }
+  const base = normalizePath(currentPagePath);
+  const slashIdx = base.lastIndexOf('/');
+  if (slashIdx < 0) {
+    return path;
+  }
+  const dir = base.substring(0, slashIdx);
+  return `${dir}/${path}`;
+}
+
+/** URL 解码；'%' 转义非法时原样返回，不抛异常 */
+export function decodeValue(value: string): string {
+  if (!value.includes('%')) {
+    return value;
+  }
+  try {
+    return decodeURIComponent(value);
+  }
+  catch (e) {
+    return value;
+  }
+}
+
+/** 解析 query 串为 Map（值做 URL 解码） */
+export function parseQuery(queryStr: string): Map<string, string> {
+  const query = new Map<string, string>();
+  if (queryStr == '') {
+    return query;
+  }
+  const pairs = queryStr.split('&');
+  for (let i = 0; i < pairs.length; i++) {
+    const pair = pairs[i];
+    if (pair == '') {
+      continue;
+    }
+    const eqIdx = pair.indexOf('=');
+    if (eqIdx < 0) {
+      query.set(decodeValue(pair), '');
+    }
+    else {
+      query.set(pair.substring(0, eqIdx), decodeValue(pair.substring(eqIdx + 1)));
+    }
+  }
+  return query;
+}
+
+/** query 值的字符串化：string/number/boolean 直转，数组用 , 连接，对象用 JSON */
+export function stringifyQueryValue(value: any): string {
+  if (isArray(value)) {
+    const items: Array<string> = [];
+    const arr = value as Array<any>;
+    for (let i = 0; i < arr.length; i++) {
+      items.push(stringifyQueryValue(arr[i]));
+    }
+    return items.join(',');
+  }
+  const valueType = typeof value;
+  if (valueType == 'string') {
+    return value as string;
+  }
+  if (valueType == 'number') {
+    return (value as number).toString();
+  }
+  if (valueType == 'boolean') {
+    return (value as boolean) ? 'true' : 'false';
+  }
+  if (valueType == 'object') {
+    return JSON.stringify(value) ?? '';
+  }
+  return '';
+}
+
+/**
+ * 把 `{ path, query }` 里的 query 序列化为 query 串（值来自 UTSJSONObject 字面量）。
+ * null 值按「忽略该键」处理。
+ *
+ * ⚠️ 键遍历必须用本写法（任务 0 真机实测）：`UTSJSONObject.keys()` + `getAny()`。
+ *    禁用 `query.toMap().forEach((value: any, key: string) => {})` —— 显式标注 any 会在 Kotlin 报 error17。
+ */
+export function serializeQuery(query: UTSJSONObject | null): string {
+  if (query == null) {
+    return '';
+  }
+  const parts: Array<string> = [];
+  const keys = UTSJSONObject.keys(query);
+  keys.forEach((key: string): void => {
+    const value = query.getAny(key);
+    if (value == null) {
+      return;
+    }
+    parts.push(`${key}=${encodeURIComponent(stringifyQueryValue(value))}`);
+  });
+  return parts.join('&');
+}
+
+/**
+ * 把 push/replace 的入参归一为 url 字符串。支持两种形态（与 vue-router 一致）：
+ * 字符串，以及 `{ path, query }` 对象字面量。
+ *
+ * ⚠️ 对象形态必须是**字面量**：字面量在 UTS 里编译为 UTSJSONObject；
+ *    若使用者先声明成带 type 标注的变量再传，会编译成 Kotlin data class，
+ *    这里 `as UTSJSONObject` 就会抛 ClassCastException（H5/node 正常、只在真机崩）。
+ *    插件因此**不导出**对象形态的类型别名，避免诱导出那种写法。
+ */
+export function normalizeLocation(to: any): string {
+  if (to == null) {
+    return '';
+  }
+  if (typeof to == 'string') {
+    return to as string;
+  }
+  const obj = to as UTSJSONObject;
+  const path = obj.getString('path') ?? '';
+  if (path == '') {
+    return '';
+  }
+  const queryStr = serializeQuery(obj.getJSON('query'));
+  if (queryStr == '') {
+    return path;
+  }
+  return `${path}?${queryStr}`;
+}
+
+/**
+ * 把 url 解析为 RouteTarget。
+ *
+ * @param url 原始 url（可含 query、可为相对路径）
+ * @param currentPagePath 当前页路径（getCurrentPages() 栈顶的 route）；页栈为空传 ''
+ * @param api 触发本次导航的 uni API 名
+ */
+export function parseUrl(url: string, currentPagePath: string, api: string): RouteTarget {
+  const queryIdx = url.indexOf('?');
+  const rawPath = queryIdx >= 0 ? url.substring(0, queryIdx) : url;
+  const queryStr = queryIdx >= 0 ? url.substring(queryIdx + 1) : '';
+
+  let path = rawPath;
+  if (path != '' && !path.startsWith('/') && !isProtocolUrl(path)) {
+    if (path.startsWith('src/')) {
+      path = `/${path}`;
+    }
+    else {
+      path = resolveRelativePath(path, currentPagePath);
+    }
+  }
+
+  const query = parseQuery(queryStr);
+  return {
+    url: url,
+    path: path,
+    fullPath: queryStr == '' ? path : `${path}?${queryStr}`,
+    query: query,
+    params: new Map<string, string>(),
+    api: api
+  } as RouteTarget;
+}
