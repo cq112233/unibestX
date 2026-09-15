@@ -50,6 +50,10 @@
 5. **不要改 `scripts/check-tabbar-surface.mjs`**（任务 0 已定稿并复审通过）。任务 0 复审记录的改进项一律不在本次范围。
 6. **同一次 `pnpm build:h5` 会重写 `unpackage/` 下约 55 个文件**。这是预期噪声，**不要**试图 revert 它们，也**不要**把它们加进任何 commit。
 
+   > **任务 3 后实测补充**：`unpackage/` 下共 **470** 个被跟踪文件，**全部**在 `dist/build/` 里；`dist/dev/` 与 `cache/` 被 `.gitignore` 忽略（`.gitignore:6`、`:2`），所以那底下 8 个仍含旧 `src/tabbar/helper` 路径的陈旧产物目录 **git 完全看不见**，无需处理。
+   >
+   > 但 `dist/build/` 里有**两个已跟踪文件仍嵌着旧路径**：`unpackage/dist/build/app-android/app-service.js` 与 `unpackage/dist/build/app-ios/app-service.js`（内容是编译进去的日志串 `at src/tabbar/helper/index.uts:250`）。它们只有等任务 8 重建 App 端才会更新，**而按本条规则又不该提交**——所以任务 8 结束时这两个文件显示为 ` M` 是**预期状态，不是遗漏**。不要手工去改它们，也不要为了「让它们干净」而 commit。
+
 ## 文件结构
 
 **创建：**
