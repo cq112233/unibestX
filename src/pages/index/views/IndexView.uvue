@@ -176,6 +176,8 @@ import type { SystemInfoType } from '@/src/utils/systemInfo/index.uts';
 const appStore = useAppStore();
 const isDark = computed((): boolean => appStore.state.isDark);
 const systemInfo = computed<SystemInfoType | null>((): SystemInfoType | null => systemInfoRef.value);
+
+console.log(systemInfo.value?.env, 111);
 </script>
 
 <style scoped>
