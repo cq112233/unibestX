@@ -587,7 +587,7 @@ src/tabbar/config.uts (唯一样本源)
   - **启用鼓包**：解开 `midButton` 注释，插件自动按居中索引插入并挂载 `AiView`；
   - **禁用鼓包**：直接用 `//` 注释 `midButton`，插件自动清洗注释并从调度容器中剔除。
 
-#### 5. 统一路由跳转与安全 API（`src/tabbar/helper`）
+#### 5. 统一路由跳转与安全 API（`src/tabbar`）
 
 - **`switchTabbar(url: string)`**：全局统一 TabBar 跳转方法，单页面模式下直接切换索引，多页面模式下自动调度 switchTab 或 redirectTo（内置 250ms 节流锁，防止快速连击卡死）；
 - **`onTabShow(index: number, callback: () => void, immediate: boolean = false)`**：监听特定 Tab 项激活显示，完美解决单页面模式下子视图没有原生 `onShow` 的问题（可在切换回该 Tab 时触发数据重新请求与刷新）；
