@@ -1,0 +1,146 @@
+/**
+ * 守卫注册表与同步执行器。
+ *
+ * ⚠️ 守卫只能是同步的：uni.addInterceptor 的 invoke 必须同步返回 boolean，
+ *    因此 vue-router 里 `await userStore.getUserInfo()` 那类异步守卫写不出来。
+ *    需要异步校验时的模式是「先 next(false) 拦下，异步完成后再自己跳」。
+ *
+ * ⚠️ 不碰 uni 全局：本文件必须能在 node 里跑（scripts/router-guard-test）。
+ */
+import type { AfterNavigationHook, NavigationGuard, Next, RouteTarget } from './types.uts';
+
+/** 前置守卫链的执行结果 */
+export type GuardOutcome = {
+  /** 是否放行 */
+  pass: boolean;
+  /** 拦截时的改跳目标；null 表示静默拦截 */
+  redirect: string | null;
+  /** 是否有守卫未调用 next（仅用于日志排查） */
+  missingNext: boolean;
+};
+
+let beforeGuards: Array<NavigationGuard> = [];
+let afterHooks: Array<AfterNavigationHook> = [];
+let debugEnabled: boolean = false;
+
+/** 开关链路日志 */
+export function setGuardDebug(enabled: boolean): void {
+  debugEnabled = enabled;
+}
+
+function log(message: string): void {
+  if (debugEnabled) {
+    console.log(`[uni-router-guard] ${message}`);
+  }
+}
+
+/** 清空全部守卫（测试与热重载用） */
+export function resetGuards(): void {
+  beforeGuards = [];
+  afterHooks = [];
+}
+
+/** 注册前置守卫，返回注销函数 */
+export function registerBeforeGuard(guard: NavigationGuard): () => void {
+  beforeGuards.push(guard);
+  return (): void => {
+    beforeGuards = beforeGuards.filter((item: NavigationGuard): boolean => item != guard);
+  };
+}
+
+/** 注册后置钩子，返回注销函数 */
+export function registerAfterHook(hook: AfterNavigationHook): () => void {
+  afterHooks.push(hook);
+  return (): void => {
+    afterHooks = afterHooks.filter((item: AfterNavigationHook): boolean => item != hook);
+  };
+}
+
+/**
+ * 执行前置守卫链，语义对齐 vue-router 3：
+ *
+ *   next()                   放行，链条继续
+ *   next(null) / next(true)  放行
+ *   next('/x')               立即短路：中止本次导航并改跳
+ *   next(false)              立即短路：中止本次导航且不跳转
+ *   非法值 / 未调用 next      立即短路 + 中止（fail-safe，不静默放行）
+ */
+export function runBeforeGuards(to: RouteTarget, from: RouteTarget): GuardOutcome {
+  const total = beforeGuards.length;
+  for (let i = 0; i < total; i++) {
+    // 守卫在链上可能把自己或别人注销掉，数组会变短；边界判断必须紧贴读取（红线 1.3.16）
+    if (i >= beforeGuards.length) {
+      break;
+    }
+    const guard = beforeGuards[i];
+
+    let called = false;
+    let aborted = false;
+    let target: string | null = null;
+    let invalid = false;
+
+    const next: Next = (...args: Array<any>): void => {
+      if (called) {
+        console.warn('[uni-router-guard] 同一个守卫内重复调用了 next，后续调用被忽略');
+        return;
+      }
+      called = true;
+      if (args.length == 0) {
+        return;
+      }
+      const value = args[0];
+      if (value == null) {
+        return;
+      }
+      const valueType = typeof value;
+      if (valueType == 'boolean') {
+        if ((value as boolean) == false) {
+          aborted = true;
+        }
+        return;
+      }
+      if (valueType == 'string') {
+        const url = value as string;
+        if (url == '') {
+          aborted = true;
+        }
+        else {
+          target = url;
+        }
+        return;
+      }
+      invalid = true;
+    };
+
+    guard(to, from, next);
+
+    if (invalid) {
+      console.warn(`[uni-router-guard] 守卫返回值非法（只接受 null / true / false / 非空字符串），已按中止处理：${to.fullPath}`);
+      return { pass: false, redirect: null, missingNext: false } as GuardOutcome;
+    }
+    if (target != null) {
+      log(`守卫改跳：${to.fullPath} → ${target}`);
+      return { pass: false, redirect: target, missingNext: false } as GuardOutcome;
+    }
+    if (aborted) {
+      log(`守卫中止导航：${to.fullPath}`);
+      return { pass: false, redirect: null, missingNext: false } as GuardOutcome;
+    }
+    if (!called) {
+      console.warn(`[uni-router-guard] 守卫未调用 next，已按中止处理（vue-router 会挂起导航，同步形态不能挂）：${to.fullPath}`);
+      return { pass: false, redirect: null, missingNext: true } as GuardOutcome;
+    }
+  }
+  return { pass: true, redirect: null, missingNext: false } as GuardOutcome;
+}
+
+/** 执行全部后置钩子：不参与裁决、不影响导航结果 */
+export function runAfterHooks(to: RouteTarget, from: RouteTarget): void {
+  const total = afterHooks.length;
+  for (let i = 0; i < total; i++) {
+    if (i >= afterHooks.length) {
+      break;
+    }
+    afterHooks[i](to, from);
+  }
+}

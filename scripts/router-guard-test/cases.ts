@@ -1,4 +1,5 @@
-import type { Next, RouteTarget } from './types.ts';
+import type { NavigationGuard, Next, RouteTarget } from './types.ts';
+import { registerAfterHook, registerBeforeGuard, resetGuards, runAfterHooks, runBeforeGuards } from './guard.ts';
 import {
   normalizeLocation,
   normalizePath,
@@ -67,4 +68,131 @@ export function runUrlCases(): void {
   console.log('\n[url] serializeQuery');
   check('null 得到空串', serializeQuery(null), '');
   check('空对象得到空串', serializeQuery({}), '');
+}
+
+/** 注册单个守卫后跑一次前置链，返回裁决（顺带隔离上一条用例的注册状态） */
+function outcomeOf(guard: NavigationGuard) {
+  resetGuards();
+  registerBeforeGuard(guard);
+  const to = parseUrl('/a/b?id=1', '', 'navigateTo') as RouteTarget;
+  const from = parseUrl('/c/d', '', 'navigateTo') as RouteTarget;
+  return runBeforeGuards(to, from);
+}
+
+/** 捕获「守卫是否被调用」的辅助变量容器 */
+type Probe = { hit: number };
+
+export function runGuardCases(): void {
+  console.log('\n[guard] next 裁决表');
+  const pass0 = outcomeOf((to: RouteTarget, from: RouteTarget, next: Next): void => {
+    next();
+  });
+  check('next() 放行', pass0.pass, true);
+  check('next() 无改跳', pass0.redirect, null);
+
+  check('next(null) 放行', outcomeOf((to: RouteTarget, from: RouteTarget, next: Next): void => {
+    next(null);
+  }).pass, true);
+
+  check('next(true) 放行', outcomeOf((to: RouteTarget, from: RouteTarget, next: Next): void => {
+    next(true);
+  }).pass, true);
+
+  const redirected = outcomeOf((to: RouteTarget, from: RouteTarget, next: Next): void => {
+    next('/login?redirect=%2Fa');
+  });
+  check('next(url) 拦截', redirected.pass, false);
+  check('next(url) 带去重定向目标', redirected.redirect, '/login?redirect=%2Fa');
+
+  const aborted = outcomeOf((to: RouteTarget, from: RouteTarget, next: Next): void => {
+    next(false);
+  });
+  check('next(false) 拦截', aborted.pass, false);
+  check('next(false) 不改跳', aborted.redirect, null);
+
+  check('next(空串) 按中止处理', outcomeOf((to: RouteTarget, from: RouteTarget, next: Next): void => {
+    next('');
+  }).pass, false);
+
+  check('next(非法值) fail-safe 中止', outcomeOf((to: RouteTarget, from: RouteTarget, next: Next): void => {
+    next(123);
+  }).pass, false);
+
+  const forgot = outcomeOf((to: RouteTarget, from: RouteTarget, next: Next): void => {
+    // 故意不调用 next
+  });
+  check('未调用 next 时中止', forgot.pass, false);
+  check('未调用 next 时打标 missingNext', forgot.missingNext, true);
+
+  const twice = outcomeOf((to: RouteTarget, from: RouteTarget, next: Next): void => {
+    next('/first');
+    next();
+  });
+  check('重复调用 next 只认第一次', twice.redirect, '/first');
+
+  console.log('\n[guard] 守卫链');
+  const order: Array<string> = [];
+  check('两个守卫都放行 → 放行', outcomeOf2(
+    (to: RouteTarget, from: RouteTarget, next: Next): void => {
+      order.push('g1');
+      next();
+    },
+    (to: RouteTarget, from: RouteTarget, next: Next): void => {
+      order.push('g2');
+      next();
+    }
+  ).pass, true);
+  check('守卫按注册顺序执行', order.join(','), 'g1,g2');
+
+  const shortCircuit: Array<string> = [];
+  const sc = outcomeOf2(
+    (to: RouteTarget, from: RouteTarget, next: Next): void => {
+      shortCircuit.push('g1');
+      next('/login');
+    },
+    (to: RouteTarget, from: RouteTarget, next: Next): void => {
+      shortCircuit.push('g2');
+      next();
+    }
+  );
+  check('前一守卫改跳时短路', sc.redirect, '/login');
+  check('短路后第二个守卫不执行', shortCircuit.join(','), 'g1');
+
+  const probe: Probe = { hit: 0 };
+  resetGuards();
+  const unregister = registerBeforeGuard((to: RouteTarget, from: RouteTarget, next: Next): void => {
+    probe.hit = probe.hit + 1;
+    next();
+  });
+  registerBeforeGuard((to: RouteTarget, from: RouteTarget, next: Next): void => {
+    next();
+  });
+  unregister();
+  runBeforeGuards(parseUrl('/a/b', '', 'navigateTo') as RouteTarget, parseUrl('/c/d', '', 'navigateTo') as RouteTarget);
+  check('注销函数能移除该守卫', probe.hit, 0);
+
+  console.log('\n[guard] 后置钩子');
+  const afterOrder: Array<string> = [];
+  resetGuards();
+  registerAfterHook((to: RouteTarget, from: RouteTarget): void => {
+    afterOrder.push('h1');
+  });
+  const unregisterAfter = registerAfterHook((to: RouteTarget, from: RouteTarget): void => {
+    afterOrder.push('h2');
+  });
+  runAfterHooks(parseUrl('/a/b', '', 'navigateTo') as RouteTarget, parseUrl('/c/d', '', 'navigateTo') as RouteTarget);
+  check('后置钩子按注册顺序执行', afterOrder.join(','), 'h1,h2');
+  unregisterAfter();
+  runAfterHooks(parseUrl('/a/b', '', 'navigateTo') as RouteTarget, parseUrl('/c/d', '', 'navigateTo') as RouteTarget);
+  check('注销后不再执行', afterOrder.join(','), 'h1,h2,h1');
+}
+
+/** 注册两个守卫后跑一次前置链 */
+function outcomeOf2(guard1: NavigationGuard, guard2: NavigationGuard) {
+  resetGuards();
+  registerBeforeGuard(guard1);
+  registerBeforeGuard(guard2);
+  const to = parseUrl('/a/b', '', 'navigateTo') as RouteTarget;
+  const from = parseUrl('/c/d', '', 'navigateTo') as RouteTarget;
+  return runBeforeGuards(to, from);
 }

@@ -25,7 +25,7 @@ const OUT = path.join(SRC_DIR, '.build');
 const PLUGIN_LIB = path.join(ROOT, 'uni_modules/uni-router-guard/lib');
 
 /** 需要从 .uts 转成 .ts 的插件模块 */
-const UTS_SOURCES = ['types.uts', 'url.uts'];
+const UTS_SOURCES = ['types.uts', 'url.uts', 'guard.uts'];
 
 /** 原样搬进 .build/ 的 harness 文件 */
 const HARNESS_FILES = ['shim.ts', 'cases.ts', 'run.ts'];

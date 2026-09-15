@@ -1690,6 +1690,12 @@ probeRouter.afterEach((to: RouteTarget, from: RouteTarget): void => {
 });
 ```
 
+> **⚠️ 除上面这段外，真机必须额外验一个任务 5 遗留风险：注销函数的函数相等语义。**
+> `guard.uts` 的注销走 `beforeGuards.filter((item: NavigationGuard): boolean => item != guard)`，即依赖**函数引用相等**。node harness 里天然成立，但 Kotlin/Swift 侧函数类型的 `!=` 走 `equals`，未必等同引用比较。
+> **用例**：注册 A、B 两个守卫（各自 `console.log` 自己的名字）→ 调用 B 的注销函数 → 再 push 一次，日志里**应当只有 A**。
+> **两种失败表现都要留意**：① 注销无效（A、B 都还在）；② 注销一个把两个都干掉（`filter` 把「所有函数都相等」判成真）。
+> **退路**：把注册表从 `Array<NavigationGuard>` 换成 `Array<{ id: number, guard: NavigationGuard }>`，用自增 id 注销（改动只在 `guard.uts` + 用例）。
+
 - [ ] **步骤 2：真机构建**
 
 运行：
