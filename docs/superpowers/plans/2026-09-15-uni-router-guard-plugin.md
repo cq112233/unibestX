@@ -10,6 +10,46 @@
 
 **规格：** `docs/superpowers/specs/2026-09-15-uni-router-guard-plugin-design.md`
 
+## 执行状态：✅ 全部任务已完成（2026-09-15）
+
+任务 0-12 全部执行完毕，计划里的复选框已全部置为 `[x]`。每个任务的「✅ 执行结果」小节记录了实测证据；任务 0 / 8 / 9 / 10 / 12 的结果小节里还写明了与计划原文的偏差。
+
+| 任务 | 产出 | Commit |
+| --- | --- | --- |
+| 0 | UTS 探针页 + 三项地基地层实测 + 验证通道修正 | `1573a7706` |
+| 1 | `lib/types.uts`（零依赖叶子） | `9dbcd4519` |
+| 2 + 3 | node harness 骨架 + `lib/url.uts`（32 条用例） | `3a037bbe3` |
+| 4 + 5 | `lib/guard.uts`（next 裁决 + 守卫链，20 条用例） | `261d18d04` |
+| 6 + 7 | `lib/interceptor.uts`、`lib/router.uts`、`index.uts`、`package.json` | `46c6af8d2` |
+| 8 | H5 构建 + lint（修掉 harness 新增的 4 个 error） | 本任务单独提交 |
+| 9 | 真机 VDOM/Kotlin + 蒸汽/字节码双通道；修掉 3 处只在 Kotlin 暴露的写法 | 含在 `46c6af8d2` + 任务 9 执行结果 |
+| 10 | 真机 8 条回归矩阵 + 临时物清理 | 本任务单独提交 |
+| 11 | `readme.md` / `changelog.md` | 含在 `46c6af8d2` |
+| 12 | SKILL.md 四维回写（两批：1.1.15-1.1.16 + 1.3.20 + 红线 42-45；1.1.17-1.1.19 + 红线 46-48） | `9dbcd4519` + 本任务单独提交 |
+
+**最终验证汇总：**
+
+- node harness：`52 条用例 ✅ 全部通过`（url 32 + guard 20）
+- 真机 VDOM/Kotlin：`编译为android class` 出现、编译阶段 `error` 0 命中、`编译成功`；插件代码进入 `unpackage/cache/.app-android/src/index.kt`（命中 18 处）、无 `__1` 改名
+- 真机运行：8 条场景全部符合预期（含 `switchTab` / `reLaunch` / `navigateBack` 的 App 端强转、无限改跳深度上限、漏调 `next` 的 fail-safe、`uninstall` 卸载）
+- 静态回归：`pnpm build:h5` ✅；`npx eslint .` 与基线一致（3 error 全在既有文件），插件与 harness **0 error**
+- 临时物：`main.uts` / `App.uvue` / `pages.json` / `pages.config.json` / `manifest.json` 全部还原，`src/sub/routerGuardProbe/` 已删除，`grep -rn routerGuardProbe` 0 命中
+
+### 计划外发现并修掉的一个真实缺陷：重定向计数被污染
+
+计划文本里 `dispatchRedirect` 在**超限放弃时没有归零** `redirectDepth`，后果是：一旦某次改跳撞过上限，计数就停在 `maxRedirectDepth + 1`，此后**每一次**「被拦截 → 改跳」都会被立刻判定超限、静默丢弃（`invoke` 返回 false 且不跳转），直到中间插入一次放行导航才自愈。只有「守卫无条件改跳」才能触发，但触发后表现为「守卫还在跑、页面就是不跳」这种极难定位的故障。
+
+```uts
+if (redirectDepth > maxRedirectDepth) {
+  console.warn(`[uni-router-guard] 重定向链深度超过 ${maxRedirectDepth}，已放弃本次改跳：${url}`);
+  redirectDepth = 0;   // ← 计划外补入：放弃即这条链结束，必须归零
+  return;
+}
+```
+
+- **node 行为探针**：修前「上限之后再改跳 5 次」→ 派发 0 次 / 告警 5 次；修后 → 派发 5 次 / 告警 0 次；上限截断本身未被削弱（仍是派发 5 次 + 告警 1 次）。
+- **真机 Kotlin 复验（本任务补做，日志 `/tmp/e2e-recover.log`）**：`L1 push('/probe-loop-a')` → 连续 6 轮 loop-a/loop-b 后**恰好 1 次**告警、loop 页 `afterEach` **0 命中**；`L2` 紧接着 `push('/probe-redirect-me')` → 守卫 `next('/src/sub/time/time')` **派发成功**（出现 time 页的 `beforeEach` + `afterEach`），证明计数已归零、后续改跳不再被吞。该轮 `编译为android class` 出现、`编译失败` **0 命中**。
+
 ---
 
 ## 前置事实（已实测，实施者无需重新验证）
@@ -325,7 +365,7 @@ git commit -m "test(router-guard): 新增 UTS 探针页，验证函数类型剩�
 **文件：**
 - 创建：`uni_modules/uni-router-guard/lib/types.uts`
 
-- [ ] **步骤 1：写类型定义**
+- [x] **步骤 1：写类型定义**
 
 ```uts
 /**
@@ -423,7 +463,7 @@ export const DEFAULT_REDIRECT_API: string = 'navigateTo';
 export const DEFAULT_MAX_REDIRECT_DEPTH: number = 5;
 ```
 
-- [ ] **步骤 2：Commit**
+- [x] **步骤 2：Commit**
 
 ```bash
 git add uni_modules/uni-router-guard/lib/types.uts
@@ -440,7 +480,7 @@ git commit -m "feat(uni-router-guard): 新增公开类型与默认值常量"
 - 创建：`scripts/router-guard-test/cases.ts`
 - 创建：`scripts/router-guard-test/run.ts`
 
-- [ ] **步骤 1：忽略 harness 运行目录**
+- [x] **步骤 1：忽略 harness 运行目录**
 
 在 `.gitignore` 末尾追加：
 
@@ -449,7 +489,7 @@ git commit -m "feat(uni-router-guard): 新增公开类型与默认值常量"
 scripts/router-guard-test/.build/
 ```
 
-- [ ] **步骤 2：写转换脚本**
+- [x] **步骤 2：写转换脚本**
 
 `scripts/router-guard-test/build.mjs`：
 
@@ -529,7 +569,7 @@ if (missing > 0) {
 }
 ```
 
-- [ ] **步骤 3：写 node 侧全局垫片**
+- [x] **步骤 3：写 node 侧全局垫片**
 
 `scripts/router-guard-test/shim.ts`（UTS 内置的 `isArray` 在 node 里不存在，必须补）：
 
@@ -542,7 +582,7 @@ g.isArray = Array.isArray;
 export {};
 ```
 
-- [ ] **步骤 4：写断言集（URL 部分）**
+- [x] **步骤 4：写断言集（URL 部分）**
 
 `scripts/router-guard-test/cases.ts`：
 
@@ -619,7 +659,7 @@ export function runUrlCases(): void {
 }
 ```
 
-- [ ] **步骤 5：写执行器**
+- [x] **步骤 5：写执行器**
 
 `scripts/router-guard-test/run.ts`：
 
@@ -639,7 +679,7 @@ if (failures.length > 0) {
 }
 ```
 
-- [ ] **步骤 6：跑一次，确认红灯**
+- [x] **步骤 6：跑一次，确认红灯**
 
 运行：`node scripts/router-guard-test/build.mjs`
 预期：**exit 1**，输出 `✗ 缺少源文件：uni_modules/uni-router-guard/lib/url.uts` 与 `1 个文件缺失，构建中止`。
@@ -647,7 +687,7 @@ if (failures.length > 0) {
 运行：`node scripts/router-guard-test/.build/run.ts; echo "exit=$?"`
 预期：因 `.build/` 里只有 `package.json`，报模块解析失败 + `exit=1`。
 
-- [ ] **步骤 7：Commit**
+- [x] **步骤 7：Commit**
 
 ```bash
 git add scripts/router-guard-test .gitignore
@@ -661,7 +701,7 @@ git commit -m "test(router-guard): 新增 node harness 骨架与 URL 决策矩�
 **文件：**
 - 创建：`uni_modules/uni-router-guard/lib/url.uts`
 
-- [ ] **步骤 1：实现**
+- [x] **步骤 1：实现**
 
 ```uts
 /**
@@ -869,17 +909,17 @@ export function parseUrl(url: string, currentPagePath: string, api: string): Rou
 }
 ```
 
-- [ ] **步骤 2：跑测试**
+- [x] **步骤 2：跑测试**
 
 运行：`node scripts/router-guard-test/build.mjs && node scripts/router-guard-test/.build/run.ts; echo "exit=$?"`
 预期：`✅ 全部通过` 与 `exit=0`。
 
-- [ ] **步骤 3：确认测试真的会红（红线 28）**
+- [x] **步骤 3：确认测试真的会红（红线 28）**
 
 把 `resolveRelativePath` 里的 `return \`${dir}/${path}\`;` 临时改成 `return path;`，重跑步骤 2。
 预期：至少 1 条失败 + `exit=1`。确认后**改回来**再重跑一次确认全绿。
 
-- [ ] **步骤 4：Commit**
+- [x] **步骤 4：Commit**
 
 ```bash
 git add uni_modules/uni-router-guard/lib/url.uts
@@ -895,7 +935,7 @@ git commit -m "feat(uni-router-guard): 新增 url 纯函数模块（URL 决策�
 - 修改：`scripts/router-guard-test/cases.ts`（追加 `runGuardCases`）
 - 修改：`scripts/router-guard-test/run.ts`（调用 `runGuardCases`）
 
-- [ ] **步骤 1：把 guard.uts 纳入转换**
+- [x] **步骤 1：把 guard.uts 纳入转换**
 
 修改 `scripts/router-guard-test/build.mjs`：
 
@@ -907,7 +947,7 @@ const UTS_SOURCES = ['types.uts', 'url.uts'];
 const UTS_SOURCES = ['types.uts', 'url.uts', 'guard.uts'];
 ```
 
-- [ ] **步骤 2：追加守卫用例**
+- [x] **步骤 2：追加守卫用例**
 
 在 `scripts/router-guard-test/cases.ts` 顶部把 import 补全：
 
@@ -1047,7 +1087,7 @@ function outcomeOf2(guard1: NavigationGuard, guard2: NavigationGuard) {
 }
 ```
 
-- [ ] **步骤 3：执行器接入**
+- [x] **步骤 3：执行器接入**
 
 `scripts/router-guard-test/run.ts` 改为：
 
@@ -1068,12 +1108,12 @@ if (failures.length > 0) {
 }
 ```
 
-- [ ] **步骤 4：跑一次，确认红灯**
+- [x] **步骤 4：跑一次，确认红灯**
 
 运行：`node scripts/router-guard-test/build.mjs; echo "exit=$?"`
 预期：**exit=1** + `✗ 缺少源文件：uni_modules/uni-router-guard/lib/guard.uts` + `1 个文件缺失，构建中止`。
 
-- [ ] **步骤 5：Commit**
+- [x] **步骤 5：Commit**
 
 ```bash
 git add scripts/router-guard-test
@@ -1087,7 +1127,7 @@ git commit -m "test(router-guard): 追加 next 裁决表与守卫链用例（此
 **文件：**
 - 创建：`uni_modules/uni-router-guard/lib/guard.uts`
 
-- [ ] **步骤 1：实现**
+- [x] **步骤 1：实现**
 
 ```uts
 /**
@@ -1238,17 +1278,17 @@ export function runAfterHooks(to: RouteTarget, from: RouteTarget): void {
 }
 ```
 
-- [ ] **步骤 2：跑测试**
+- [x] **步骤 2：跑测试**
 
 运行：`node scripts/router-guard-test/build.mjs && node scripts/router-guard-test/.build/run.ts; echo "exit=$?"`
 预期：`✅ 全部通过` + `exit=0`。
 
-- [ ] **步骤 3：确认会红（红线 28）**
+- [x] **步骤 3：确认会红（红线 28）**
 
 把 `runBeforeGuards` 里 `if (!called)` 那一整段删除，重跑步骤 2。
 预期：`未调用 next 时中止` 与 `未调用 next 时打标 missingNext` 两条失败 + `exit=1`。确认后**改回来**并重跑确认全绿。
 
-- [ ] **步骤 4：Commit**
+- [x] **步骤 4：Commit**
 
 ```bash
 git add uni_modules/uni-router-guard/lib/guard.uts
@@ -1262,7 +1302,7 @@ git commit -m "feat(uni-router-guard): 新增守卫注册表与同步执行器�
 **文件：**
 - 创建：`uni_modules/uni-router-guard/lib/interceptor.uts`
 
-- [ ] **步骤 1：实现**
+- [x] **步骤 1：实现**
 
 ```uts
 /**
@@ -1454,12 +1494,12 @@ export function configureInterceptor(options: RouterOptions): void {
 }
 ```
 
-- [ ] **步骤 2：H5 编译确认语法**
+- [x] **步骤 2：H5 编译确认语法**
 
 运行：`pnpm build:h5`
 预期：`项目 unibestX 编译成功。`（此任务的产物还没被任何页面导入，编译不会覆盖它，先过一遍语法关即可。）
 
-- [ ] **步骤 3：Commit**
+- [x] **步骤 3：Commit**
 
 ```bash
 git add uni_modules/uni-router-guard/lib/interceptor.uts
@@ -1475,7 +1515,7 @@ git commit -m "feat(uni-router-guard): 新增拦截器安装、卸载与裁决�
 - 创建：`uni_modules/uni-router-guard/index.uts`
 - 创建：`uni_modules/uni-router-guard/package.json`
 
-- [ ] **步骤 1：实现 router.uts**
+- [x] **步骤 1：实现 router.uts**
 
 ```uts
 /**
@@ -1566,7 +1606,7 @@ export function createRouter(options: RouterOptions | null = null): Router {
 
 > 若 UTS 报 `Promise<NavigateToSuccess>` 与 `Promise<any> | null` 不兼容，把 `navigateBy` 的返回类型改成 `any`，其余不动（方法签名里的 `Promise<any> | null` 保留，它只是给使用者的文档）。
 
-- [ ] **步骤 2：实现门面 index.uts**
+- [x] **步骤 2：实现门面 index.uts**
 
 ```uts
 /**
@@ -1582,7 +1622,7 @@ export * from './lib/router.uts';
 export * from './lib/url.uts';
 ```
 
-- [ ] **步骤 3：写 package.json**
+- [x] **步骤 3：写 package.json**
 
 ```json
 {
@@ -1630,7 +1670,7 @@ export * from './lib/url.uts';
 
 > `harmony` 与 `weixin` 标 `x` 是**如实声明**：本计划只做了 Android 真机验证，其余端未验证。readme 里同步写明。
 
-- [ ] **步骤 4：Commit**
+- [x] **步骤 4：Commit**
 
 ```bash
 git add uni_modules/uni-router-guard/lib/router.uts uni_modules/uni-router-guard/index.uts uni_modules/uni-router-guard/package.json
@@ -1643,27 +1683,46 @@ git commit -m "feat(uni-router-guard): 新增 createRouter 工厂与插件门面
 
 **文件：** 无（只跑命令）
 
-- [ ] **步骤 1：记录基线**
+- [x] **步骤 1：记录基线**
 
 运行：`git stash list; pnpm lint 2>&1 | tail -5`
 预期：记下改造前的 `✖ N problems (E errors, W warnings)` 数字，作为对照基线。
 
-- [ ] **步骤 2：H5 构建**
+- [x] **步骤 2：H5 构建**
 
 运行：`pnpm build:h5`
 预期：`项目 unibestX 编译成功。` + `✅ H5 打包成功`。
 
-- [ ] **步骤 3：lint 不得新增 error**
+- [x] **步骤 3：lint 不得新增 error**
 
 运行：`pnpm lint 2>&1 | tail -5`
 预期：errors 数**与步骤 1 的基线相同**（新增 warning 可以接受，新增 error 不可以）。若新增 error，按提示修掉后重跑。
 
-- [ ] **步骤 4：Commit（若步骤 3 有改动）**
+- [x] **步骤 4：Commit（若步骤 3 有改动）**
 
 ```bash
 git add -A uni_modules/uni-router-guard scripts/router-guard-test
 git commit -m "chore(uni-router-guard): 修掉 lint 报出的问题"
 ```
+
+### ✅ 执行结果（2026-09-15，步骤 1-4 已完成）
+
+- **步骤 1 基线**：本次未改动的既有 lint 文件即为基线 —— `scripts/gen-uts-dts.mjs`(E1)、`src/store/vapor/token.ts`(E1,W1)、`src/store/vdom/token.uts`(E1,W1)、`src/layouts/default.uvue`(W4)、`src/pages/function/components/EchartsDemoCard.uvue`(W1)、`src/router/interceptor.uts`(W1)、`src/utils/backPress/index.uts`(W1)；即**全仓 3 个 error**。
+- **步骤 2 H5 构建**：✅ `项目 unibestX 编译成功。` + `✅ H5 打包成功，产物目录：unpackage/dist/build/web`。
+  - 日志里另有大量既存 `error TS2305: Module '"@dcloudio/uni-app"' has no exported member 'resolveEasycom'`（H5 侧固有噪音，构建仍判成功），与本插件无关。
+- **步骤 3 lint**：首轮实测发现 **harness 自己新增了 4 个 error**（早前交接摘要里「0 命中」的说法**有误**，已在此更正）：
+
+  | 文件 | 规则 |
+  | --- | --- |
+  | `scripts/router-guard-test/build.mjs` | `regexp/no-unused-capturing-group`（第 47 行）、`style/quotes`（52）、`style/brace-style`（71） |
+  | `scripts/router-guard-test/run.ts` | `style/brace-style`（12） |
+
+  已按仓库既有 stroustrup 风格（`}` 与 `else` 分行，见 `scripts/gen-uts-dts.mjs`）与单引号约定修掉。修后：
+  - `npx eslint scripts/router-guard-test` → **0 error / 7 warning**（warning 全是 `unused-imports/no-unused-vars`，命中的是守卫签名里刻意保留的 `to/from/next` 形参，属计划允许的「新增 warning」）。
+  - `npx eslint .` → **19 problems (3 error, 16 warning)**，3 个 error 全部落在**本次未改动**的既存文件，与基线一致。
+  - `uni_modules/uni-router-guard/**` 命中 **0**（`uni_modules` 在 eslint 忽略列表内）。
+- **步骤 4 Commit**：`chore(uni-router-guard): 修掉 harness 脚本的 lint 报错`。
+- **补充证据**：修完 harness 脚本后重跑 `node scripts/router-guard-test/build.mjs && node scripts/router-guard-test/.build/run.ts` → `✅ 全部通过`（52 条用例：url 32 + guard 20）。
 
 ---
 
@@ -1671,7 +1730,7 @@ git commit -m "chore(uni-router-guard): 修掉 lint 报出的问题"
 
 **文件：** 无（只跑命令）
 
-- [ ] **步骤 1：把插件接进 App 入口（临时）**
+- [x] **步骤 1：把插件接进 App 入口（临时）**
 
 修改 `main.uts`：把任务 0 的探针页 import 换成本插件的导入，并临时装配一次（**任务 10 结束后整段还原**）：
 
@@ -1696,7 +1755,7 @@ probeRouter.afterEach((to: RouteTarget, from: RouteTarget): void => {
 > **两种失败表现都要留意**：① 注销无效（A、B 都还在）；② 注销一个把两个都干掉（`filter` 把「所有函数都相等」判成真）。
 > **退路**：把注册表从 `Array<NavigationGuard>` 换成 `Array<{ id: number, guard: NavigationGuard }>`，用自增 id 注销（改动只在 `guard.uts` + 用例）。
 
-- [ ] **步骤 2：真机构建**
+- [x] **步骤 2：真机构建**
 
 运行：
 
@@ -1716,17 +1775,28 @@ probeRouter.afterEach((to: RouteTarget, from: RouteTarget): void => {
 1. **VDOM/Kotlin**（去掉 `vapor` 键）—— 唯一能暴露 Kotlin 禁区的通道，判据如上。
 2. **蒸汽/字节码**（`manifest.json` 还原后）—— 项目默认运行方式，预期 `编译成功` 且真机无红字报错。
 
-- [ ] **步骤 3：确认 Kotlin 产物里真的有插件代码**
+- [x] **步骤 3：确认 Kotlin 产物里真的有插件代码**
 
 运行：`grep -c "uni-router-guard\|installInterceptors" unpackage/cache/.app-android/src/index.kt`
 
 > 路径以实际产物为准（`unpackage/cache/.app-android/` 下的 `.kt` 文件）。预期：**≥ 1**。
 > 若为 0 说明代码根本没进 Kotlin 编译（例如被摇树掉），必须回头检查 `main.uts` 的临时接线是否生效。
 
-- [ ] **步骤 4：确认没有 `__1` 改名**
+- [x] **步骤 4：确认没有 `__1` 改名**
 
 运行：`grep -rn "installInterceptors__1\|createRouter__1" unpackage/cache/.app-android/src/ | head`
 预期：**无输出**（有输出即命中红线 1.1.12 的多层 `export *` 改名）。
+
+### ✅ 执行结果（2026-09-15 真机实测，步骤 1-4 已完成）
+
+- **步骤 1 临时接线**：`main.uts` 顶部装配 `createRouter({ debug: true })` + 两个 `beforeEach`（A / B，用于验注销语义）+ 一个 `afterEach`。
+- **步骤 2 真机构建**（设备 `JTK5T19928025722`，Huawei TAS-AL00）：
+  - **VDOM/Kotlin 通道**（临时删掉 `manifest.json` 的 `vapor` / `vapor-render-target`）：`编译为android class` 出现（≥1）、编译阶段 `error:` / `编译失败` **0 命中**、`项目 unibestX 编译成功。`
+  - **蒸汽/字节码通道**（`manifest.json` 还原后）：`编译成功`，应用真机启动正常。
+  - 这轮暴露并修掉 **3 处只在 Kotlin 阶段报错**的写法（详见任务 12 执行结果）：`Router.back` 的剩余参数（抽成顶层 `BackFn` 别名）、`decodeURIComponent` 的可空返回（判空兜底）、跳转门面返回类型（`any | null`）。
+- **步骤 3 Kotlin 产物**：`grep -c "uni-router-guard\|installInterceptors" unpackage/cache/.app-android/src/index.kt` → **18**（≥1）。产物里的 `UTSSourceMapPosition` 指回 `uni_modules/uni-router-guard/lib/types.uts`、`guard.uts`、`interceptor.uts`、`router.uts`，且 `installInterceptors` / `uninstallInterceptors` 是顶层函数 —— 插件确实进了 Kotlin 编译。
+- **步骤 4 `__1` 改名**：`grep -rn "installInterceptors__1\|createRouter__1" unpackage/cache/.app-android/src/` → **0 命中**（未触发红线 1.1.12 的多层 `export *` 改名）。
+- **注销的函数相等语义**（下方 ⚠️ 标注的待验风险）：VDOM/Kotlin 真机实测**成立** —— 注册 A、B 后注销 B，日志里只剩 A；也没有出现「注销一个把两个都干掉」。**不需要**改用自增 id 注册表，`guard.uts` 的 `filter((item) => item != guard)` 保持原样。
 
 ---
 
@@ -1738,7 +1808,7 @@ probeRouter.afterEach((to: RouteTarget, from: RouteTarget): void => {
 - 删除：`src/sub/routerGuardProbe/routerGuardProbe.uvue`
 - 还原：`main.uts`
 
-- [ ] **步骤 1：换成按路径分流的临时守卫**
+- [x] **步骤 1：换成按路径分流的临时守卫**
 
 把 `main.uts` 里任务 9 的临时守卫改成：
 
@@ -1774,7 +1844,7 @@ probeRouter.afterEach((to: RouteTarget, from: RouteTarget): void => {
 });
 ```
 
-- [ ] **步骤 2：给探针页加触发按钮**
+- [x] **步骤 2：给探针页加触发按钮**
 
 在探针页 `<template>` 里加按钮，并加对应方法：
 
@@ -1814,7 +1884,7 @@ function goBack(): void {
 
 > `probeRouter` 需要在这个页面里可见：把 `main.uts` 里的临时 `probeRouter` 改成 `src/sub/routerGuardProbe/probe.ts` 导出的单例，页面 `import` 它。这是**临时接线**，任务结束随临时文件一起删除。
 
-- [ ] **步骤 3：逐条核对（真机 + 控制台日志）**
+- [x] **步骤 3：逐条核对（真机 + 控制台日志）**
 
 | # | 操作 | 预期日志 / 现象 |
 | --- | --- | --- |
@@ -1827,7 +1897,7 @@ function goBack(): void {
 | 7 | 点「7 返回」 | `beforeEach api=navigateBack`，`from` 是当前页，随后正常返回 |
 | 8 | 临时把分流守卫里的两个 `next()` 删掉一个，再点「1」 | 出现 `守卫未调用 next，已按中止处理` 警告，且**页面不跳转** |
 
-- [ ] **步骤 4：清理临时物**
+- [x] **步骤 4：清理临时物**
 
 运行：
 
@@ -1838,17 +1908,40 @@ git checkout -- main.uts
 
 预期：`git status --short` 中不再出现 `main.uts` 与 `src/sub/routerGuardProbe/`。
 
-- [ ] **步骤 5：确认清理后仍能编译**
+- [x] **步骤 5：确认清理后仍能编译**
 
 运行：`pnpm build:h5`
 预期：`项目 unibestX 编译成功。`（插件本体不被任何页面引用，构建不受影响。）
 
-- [ ] **步骤 6：Commit**
+- [x] **步骤 6：Commit**
 
 ```bash
 git add -A
 git commit -m "test(uni-router-guard): 完成真机回归矩阵并移除临时验证页"
 ```
+
+### ✅ 执行结果（2026-09-15 真机实测，步骤 1-6 已完成）
+
+> **与计划原文的一处偏差（已用等价手段覆盖，覆盖面不减）**：步骤 1/2 原设计是「探针页加 7 个按钮 + 按路径分流的守卫」**人工点击**。实际改为**在 `main.uts` 里用 `setTimeout` 依次驱动 8 个场景**（守卫链与跳转门面完全同一套，只是触发源从点击换成定时器），因为设备是无人值守远程操作、点击无法自动化。步骤 3 的核对项因此按「场景」重排如下表。
+
+- **步骤 1-2 驱动**：`createRouter({ debug: true })` + 一个 `beforeEach`（内嵌 `/probe-loop-a` ⇄ `/probe-loop-b` 两个改跳分支）+ 一个 `afterEach`；8 个场景各一个导出函数，由 `createApp` 的 `setTimeout` 在 3s / 7s / 11s / 15s / 19s / 23s / 27s / 31s 依次触发。
+- **步骤 3 真机核对（设备 `JTK5T19928025722`，VDOM/Kotlin 通道，日志 `/tmp/e2e-matrix.log`）—— 8 条全部通过**：
+
+| # | 场景 | 实测日志 | 结论 |
+| --- | --- | --- | --- |
+| S1 | `switchTab('/pages/index/index')` | `beforeEach api=switchTab fullPath=/pages/index/index` → `afterEach /pages/index/index` | **`SwitchTabOptions` 强转未抛 ClassCastException**。日志里另有一条 `error: UniError(errSubject='uni-switchTab' …)`，是项目本就没配 `tabBar`、API 自身拒绝，与拦截器无关 |
+| S2 | `relaunch('/src/sub/time/time')` | `api=reLaunch fullPath=/src/sub/time/time` + `afterEach` | `ReLaunchOptions` 强转与守卫链正常 |
+| S3 | `push('/src/sub/test/test')` | `api=navigateTo fullPath=/src/sub/test/test` + `afterEach`；紧接着项目自带拦截器把它改跳到 `/src/sub/auth/login?redirect=%2Fsrc%2Fsub%2Ftest%2Ftest` | 跳转正常；**两套拦截器（插件 + `src/router/interceptor.uts`）同存不冲突** —— 这正是规格 §「二选一」要提醒的组合 |
+| S4 | `back()` | `api=navigateBack fullPath=/src/sub/time/time from=/src/sub/auth/login` + `afterEach`，真的退回上一页 | `navigateBack` 分支（无 url，目标取页栈上一页）行为正确 |
+| S5 | `push({ path, query: { id: 1, tags: ['a','b'] } })` | `fullPath=/src/sub/test/test?id=1&tags=a%2Cb`、`queryId=1` | 对象形态 + 数组查询值序列化正确 |
+| S6 | 无限改跳 `push('/probe-loop-a')` | 连续 loop-a/loop-b 数轮后 `[uni-router-guard] 重定向链深度超过 5，已放弃本次改跳：/probe-loop-a`（interceptor.uts:98）；`afterEach /probe-loop*` **0 命中** | 达到深度上限会放弃并告警，**不会误放行、不崩溃、不死循环** |
+| S7 | 守卫漏调 `next` | `[uni-router-guard] 守卫未调用 next，已按中止处理（…）：/src/sub/lodash/lodash`（guard.uts:130）；`afterEach /src/sub/lodash` **0 命中** | fail-safe 中止生效，页面不跳转 |
+| S8 | `uninstall()` 后再 `push` | 之后**再无任何 `[probe-guard]` 日志** | 拦截器确实被移除（`uni.removeInterceptor(api, null)` 生效） |
+
+- **关于 `error: java.lang.NoSuchFieldError: No field curIdx … IndexKt`**：首现于 `17:22:15`，在 `编译成功`（17:23:01）与 `编译为android class` **之后**、应用启动之后，是既存的**运行时**增量编译缓存与基座不匹配问题，**不是插件编译错误**；本轮编译阶段 `编译失败` **0 命中**、`项目 unibestX 编译成功。` 命中 3 次。
+- **步骤 4 清理**：移除 `main.uts` / `App.uvue` 的全部临时接线，删除 `src/sub/routerGuardProbe/` 整目录，移除 `pages.json` 与 `pages.config.json` 里的探针页登记，还原 `manifest.json`（`git diff manifest.json` 为空）。`grep -rn routerGuardProbe`（排除 `unpackage` / `docs`）→ **0 命中**。
+- **步骤 5 清理后编译**：✅ `项目 unibestX 编译成功。` + `✅ H5 打包成功，产物目录：unpackage/dist/build/web`（插件本体此时不被任何页面引用，构建不受影响）。
+- **步骤 6 Commit**：`test(uni-router-guard): 完成真机回归矩阵并移除临时验证页`。
 
 ---
 
@@ -1858,7 +1951,7 @@ git commit -m "test(uni-router-guard): 完成真机回归矩阵并移除临时�
 - 创建：`uni_modules/uni-router-guard/readme.md`
 - 创建：`uni_modules/uni-router-guard/changelog.md`
 
-- [ ] **步骤 1：写 readme（必须包含以下全部小节与代码）**
+- [x] **步骤 1：写 readme（必须包含以下全部小节与代码）**
 
 ````markdown
 # uni-router-guard
@@ -1941,7 +2034,7 @@ const router = createRouter({
 - `navigateBack` 被拦截时，`to` 取「上一页」；多级返回（`delta > 1`）一律按上一页处理。
 ````
 
-- [ ] **步骤 2：写 changelog**
+- [x] **步骤 2：写 changelog**
 
 ```markdown
 ## 1.0.0（2026-09-15）
@@ -1953,7 +2046,7 @@ const router = createRouter({
 - 自带 node harness（`scripts/router-guard-test/`）
 ```
 
-- [ ] **步骤 3：Commit**
+- [x] **步骤 3：Commit**
 
 ```bash
 git add uni_modules/uni-router-guard/readme.md uni_modules/uni-router-guard/changelog.md
@@ -1970,7 +2063,7 @@ git commit -m "docs(uni-router-guard): 补充 readme 与 changelog"
 - 修改：`.agents/skills/unibestX-skill/SKILL.md`
 - 修改：`.claude/skills/unibestX-skill/SKILL.md`（跨 agent 工具链同步，规格 3.5 要求）
 
-- [ ] **步骤 1：判断是否需要写**
+- [x] **步骤 1：判断是否需要写**
 
 若任务 0 的探针全部一次通过、且实现过程没有再踩到新坑 → **本任务无内容，直接勾掉并说明「无新增」**。
 
@@ -1983,23 +2076,44 @@ git commit -m "docs(uni-router-guard): 补充 readme 与 changelog"
 3. **运行时/工程层（1.3 追加，或并入 1.3.15）**：`manifest.json` 的 `uni-app-x.vapor = true` + `vapor-render-target = "bytecode"` 下，真机运行走蒸汽/字节码，**`编译为android class` 恒为 0、UTS 只经 uts2js，完全跳过 Kotlin**。要验证 Kotlin 必须先删 `vapor` 键（VDOM 模式）。这条直接补强 1.3.15 的「假绿」清单 —— 它给出了第三个假绿来源，而且这个来自项目自身配置，比命令选择更隐蔽。
 4. **3.3 快速排查表 / 3.4 红线清单**：同步上述 3 条。
 
-- [ ] **步骤 2：按四维分类归位**
+- [x] **步骤 2：按四维分类归位**
 
 - 语法/类型层 → 追加到 **1.1 语法核心铁律**（新编号 1.1.15 起）
 - 样式层 → **1.2**
 - 运行时层 → **1.3**（新编号 1.3.20 起）
 - 同步更新 **3.3 快速排查表** 与 **3.4 红线清单**
 
-- [ ] **步骤 3：两个文件同步**
+- [x] **步骤 3：两个文件同步**
 
 `.agents/skills/unibestX-skill/SKILL.md` 与 `.claude/skills/unibestX-skill/SKILL.md` 内容必须一致（规格 3.5 第 3 条）。
 
-- [ ] **步骤 4：Commit**
+- [x] **步骤 4：Commit**
 
 ```bash
 git add .agents/skills/unibestX-skill/SKILL.md .claude/skills/unibestX-skill/SKILL.md
 git commit -m "docs(skill): 回写 uni-router-guard 实现中暴露的 UTS 约束"
 ```
+
+### ✅ 执行结果（2026-09-15，已回写）
+
+**第一批（任务 0 探针，随任务 1 一并提交）：**
+
+- **1.1.15**：`obj.toMap().forEach((value: any, key: string) => {})` 显式标注 `any` 值参数在 Kotlin 报 error17；`map.keys()` 在 Kotlin 是 `MutableSet` 属性、不能按函数调用。替代写法 `UTSJSONObject.keys(obj)` + `getAny(key)`。
+- **1.1.16**：Kotlin 下局部函数不能当值传递（`setTimeout(localFn, 1200)` 报 error18 `找不到名称`），必须包 `() => { localFn(); }`；在对象字面量回调里引用外层 `<script setup>` 局部函数同理。
+- **1.3.20**：`manifest.json` 的 `vapor: true` + `vapor-render-target: "bytecode"` 会让整轮真机运行跳过 Kotlin（`编译为android class` 恒为 0、UTS 只经 `uts2js`），是**第三个「假绿」来源**，且来自项目自身配置、比命令选择更隐蔽。
+- **3.3 排查表 + 3.4 红线 42-45**：同步上述三条。
+
+**第二批（任务 9 真机才暴露的三条，本次补写）：**
+
+| 编号 | 内容 | 触发写法 |
+| --- | --- | --- |
+| **1.1.17** | 剩余参数**不能写在对象类型的属性上**（`Function type parameters cannot have modifiers.`） | `back: (...args: Array<number>) => void` → 抽成顶层 `BackFn` 别名 |
+| **1.1.18** | 内置 `decodeURIComponent` 返回 `string?`，直接 `return` 给 `: string` 报 `error1`（`try/catch` 挡不住类型层可空） | 先判空兜底再 `return` |
+| **1.1.19** | uni 跳转 API 的 Promise **收不进 `Promise<any> \| null`**（UTS 泛型不协变 + `any` 映射成非空 Kotlin `Any`） | 声明与被调用方统一写 `any \| null` |
+
+- **3.3 排查表**追加对应 3 行；**3.4 红线**追加 46 / 47 / 48。
+- **两份文件一致性**：`diff -q .agents/skills/unibestX-skill/SKILL.md .claude/skills/unibestX-skill/SKILL.md` → 无输出。
+- **本次未纳入**：「注销依赖函数引用相等、在 Kotlin 上成立」属**正面结论**（无报错、无排查需求），按「只写差异与禁区」的定位不写进 SKILL.md；证据留在任务 9 执行结果里。
 
 ---
 
