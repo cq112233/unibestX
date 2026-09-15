@@ -27,11 +27,13 @@
 
 1. **门面套娃**：`src/tabbar/index.uts` → `export * from './helper'` → `export * from './store'`，同一顶层符号经历两层星号转发。这正是 `unibestX-skill` 1.1.12 与红线 21 点名的形态（"被聚合的子模块自身不得再对外做整包重导出"）。
 2. **store ↔ tabbar 双向依赖**：`helper/index.uts` 顶层 `import { useAppStore } from '@/src/store'`；而 `src/store/vapor/app.ts`、`src/store/vdom/app.uts` 又 `import { themeColor } from '@/src/tabbar/helper'`，且 `app.ts` 在模块体即写 `themeColor.value`，初始化顺序敏感。`themeColor` 语义上属于主题域，寄居在 tabbar 里属职责错位。
-3. **导出面一半是内部细节**：`tabbarCacheEnable`、`customTabbarEnable`、`hasNativeTabbarConfig`、`isNoTabbar`、`isCapsuleTabbar` 全项目零引用；`buildFullTabbarList`、`customTabbarList`、`handleClickBulge` 仅文件内使用。
+3. **导出面一半是内部细节**：`tabbarCacheEnable`、`hasNativeTabbarConfig`、`isNoTabbar`、`isCapsuleTabbar` 全项目零引用；`customTabbarEnable` 则**有且仅有一处引用**——根组件 `App.ku.uvue:14` 的模板 `v-if="customTabbarEnable && isCurrentPageTabbar"`（第 20 行导入），它是自定义 TabBar 的渲染开关，**必须保留**。此外 `buildFullTabbarList`、`customTabbarList`、`handleClickBulge` 仅文件内使用。
+
+   > 📌 本项在实施阶段修正过一次：原表述把这 5 个布尔一律判为「零引用」，但 `customTabbarEnable` 的引用点写在根组件的**模板表达式**里，纯靠 grep 符号名扫 `.ts`/`.uts` 会漏掉。删除数因此从 5 降为 4。
 
 ### 1.4 附带问题
 
-消费者 import 路径有四种写法混用：`@/src/tabbar/helper`、`../../tabbar/helper`、`../tabbar/helper/index.uts`、`@/src/tabbar`。
+消费者 import 路径有四种写法混用：`@/src/tabbar/helper`、`../../tabbar/helper`、`../tabbar/helper/index.uts`、`@/src/tabbar`。此外根组件 `App.uvue` 与 `App.ku.uvue` 还各自用了 `./src/tabbar/helper` 与 `@/src/tabbar/helper/index.uts` 两种更深的写法，这两处在最初梳理时被漏掉（见 §3.4 注）。
 
 ## 2. 目标与非目标
 
@@ -64,9 +66,9 @@
 
 各文件导出符号：
 
-- **`strategy.uts`**：`TabbarStrategyType`、`TABBAR_STRATEGY_MAP`、`parseTabbarStrategy`、`selectedTabbarStrategy`、`isSinglePageTabbar`、`isNativeTabbar`、`needHideNativeTabbar`、`tabbarType`。`tabbarCacheEnable`、`customTabbarEnable`、`hasNativeTabbarConfig`、`isNoTabbar`、`isCapsuleTabbar` 这 5 个零引用派生态**直接删除**（原表述为「收回非导出」）。
+- **`strategy.uts`**：`TabbarStrategyType`、`TABBAR_STRATEGY_MAP`、`parseTabbarStrategy`、`selectedTabbarStrategy`、`isSinglePageTabbar`、`isNativeTabbar`、`needHideNativeTabbar`、`tabbarType`、`customTabbarEnable`。`tabbarCacheEnable`、`hasNativeTabbarConfig`、`isNoTabbar`、`isCapsuleTabbar` 这 **4** 个零引用派生态**直接删除**（原表述为「收回非导出」）；`customTabbarEnable` 被 `App.ku.uvue` 的模板引用，**保留为导出**（详见 §1.3.3）。
 
-  **为什么是删除而非保留为私有**：保留为私有常量只会产出 5 条 `unused-imports/no-unused-vars` 警告（已用探针实测：是 warning 不是 error），而本项目把构建警告当缺陷看（见 `unibestX-skill` 1.1.4）。策略矩阵的语义已完整保留在 `TABBAR_STRATEGY_MAP` 的文档注释与 `config.uts` 的说明里，派生一行的布尔值任何人都能就地重算。若使用者希望恢复这些语义的对外可见性，把它们改回 `export const` 即可。
+  **为什么是删除而非保留为私有**：保留为私有常量只会产出 4 条 `unused-imports/no-unused-vars` 警告（已用探针实测：是 warning 不是 error），而本项目把构建警告当缺陷看（见 `unibestX-skill` 1.1.4）。策略矩阵的语义已完整保留在 `TABBAR_STRATEGY_MAP` 的文档注释与 `config.uts` 的说明里，派生一行的布尔值任何人都能就地重算。若使用者希望恢复这些语义的对外可见性，把它们改回 `export const` 即可。
 - **`metrics.uts`**：`TABBAR_HEIGHT`、`TABBAR_CONTAINER_HEIGHT`、`themeTokens`、`safeAreaBottom`、`isVersionGte525`、`tabbarPlaceholderHeight`。
 - **`state.uts`**：`tabbarList`、`curIdx`、`setCurIdx`、`setCurIdxByPath`、`syncCurIdxByCurrentPage`、`isPageTabbar`、`onTabShow`、`setTabbarItemBadge`。其中 `buildFullTabbarList`、`customTabbarList` 改为**非导出**。
 - **`navigate.uts`**：`switchTabbar`、`handleTabbarClick`、`initNativeMidButtonTap`。其中 `handleClickBulge` 与节流锁 `isSwitchingTab` 改为**非导出**。
@@ -106,23 +108,36 @@ export const themeColor = ref(getDefaultTheme());
 
 全部统一为 `@/src/tabbar`（themeColor 除外，指向 `@/src/utils/theme/index.uts`）。
 
+**需改路径的 12 处：**
+
 | 文件 | 现状 | 改为 |
 | --- | --- | --- |
-| `src/layouts/navbar.uvue` | `@/src/tabbar/helper` | `@/src/tabbar` |
-| `src/sub/auth/login.uvue` | `../../tabbar/helper` | `@/src/tabbar` |
-| `src/pages/me/views/MeView.uvue` | `@/src/tabbar/helper` | `@/src/tabbar` |
-| `src/router/interceptor.uts` | `../tabbar/helper/index.uts` | `@/src/tabbar` |
-| `src/utils/i18n/index.uts` | `../../tabbar/helper/index.uts` | `@/src/tabbar` |
-| `src/store/vapor/app.ts` | `@/src/tabbar/helper`（themeColor） | `@/src/utils/theme/index.uts` |
-| `src/store/vdom/app.uts` | `@/src/tabbar/helper`（themeColor） | `@/src/utils/theme/index.uts` |
-| `src/tabbar/tabbar.uvue` | `./helper` | `@/src/tabbar` |
-| `src/tabbar/components/TabContent.uvue` | `@/src/tabbar/helper` | `@/src/tabbar` |
-| `src/tabbar/ui/default/index.uvue` | `../../helper` | `@/src/tabbar` |
-| `src/tabbar/ui/default/TabbarItem.uvue` | `../../helper` | `@/src/tabbar` + themeColor 走 theme |
-| `src/tabbar/ui/capsule/index.uvue` | `../../helper` | `@/src/tabbar` + themeColor 走 theme |
-| `src/tabbar/ui/template.uvue` | 入口已正确 | 仅 themeColor 改走 theme |
+| `App.uvue:4` | `./src/tabbar/helper` | `@/src/tabbar` |
+| `App.ku.uvue:25` | `@/src/tabbar/helper/index.uts` | `@/src/tabbar` |
+| `src/layouts/navbar.uvue:56` | `@/src/tabbar/helper` | `@/src/tabbar` |
+| `src/sub/auth/login.uvue:20` | `../../tabbar/helper` | `@/src/tabbar` |
+| `src/pages/me/views/MeView.uvue:49` | `@/src/tabbar/helper` | `@/src/tabbar` |
+| `src/router/interceptor.uts:2` | `../tabbar/helper/index.uts` | `@/src/tabbar` |
+| `src/utils/i18n/index.uts:2` | `../../tabbar/helper/index.uts` | `@/src/tabbar` |
+| `src/tabbar/tabbar.uvue:14` | `./helper` | `@/src/tabbar` |
+| `src/tabbar/components/TabContent.uvue:11` | `@/src/tabbar/helper` | `@/src/tabbar` |
+| `src/tabbar/ui/default/index.uvue:13` | `../../helper` | `@/src/tabbar` |
+| `src/tabbar/ui/default/TabbarItem.uvue:3` | `../../helper` | `@/src/tabbar` |
+| `src/tabbar/ui/capsule/index.uvue:14` | `../../helper` | `@/src/tabbar` |
+
+> 📌 **`App.uvue` 与 `App.ku.uvue` 是本表在实施阶段补入的两处。** 原先的梳理只覆盖了 `src/` 目录，两个根组件不在扫描范围内，而它们恰好用了最深、最不显眼的两种相对写法。漏掉它们的后果是：删除 `helper/index.uts` 后根组件直接编译失败。
+
+**另需改 themeColor 来源的 3 处**（入口本就是 `@/src/tabbar`，仅把 `themeColor` 改从主题域导入，属 §3.3 的范围，不在本表重复计数）：
+
+| 文件 | 改为 |
+| --- | --- |
+| `src/store/vapor/app.ts` | `themeColor` 改从 `@/src/utils/theme/index.uts` 导入 |
+| `src/store/vdom/app.uts` | 同上 |
+| `src/tabbar/ui/template.uvue` | 同上（另两个 UI 组件 `TabbarItem.uvue`、`capsule/index.uvue` 的 themeColor 随本表改路径时一并调整） |
 
 `src/pages/index/index.uvue` 与 `src/pages/function/views/FunctionView.uvue` 已是 `@/src/tabbar`，无需改动。
+
+**归一必须排在所有符号搬迁之前**：路径归一不改变导出面（纯字符串替换），但符号一搬迁，任何仍走深路径的消费者都会立刻编译失败。实施顺序见计划文档「任务 2」。
 
 ## 4. 约束与红线（本次适用）
 
@@ -136,7 +151,7 @@ export const themeColor = ref(getDefaultTheme());
 
 ## 5. 已知取舍
 
-1. **破坏性变更**：本仓库是模板项目（unibestX），删除 5 个策略布尔（详见 §3.1）与收回 3 个内部函数（`buildFullTabbarList`、`customTabbarList`、`handleClickBulge`），对已克隆并使用了它们的下游构成破坏性变更。用户已确认接受。
+1. **破坏性变更**：本仓库是模板项目（unibestX），删除 4 个策略布尔（详见 §3.1）与收回 3 个内部函数（`buildFullTabbarList`、`customTabbarList`、`handleClickBulge`），对已克隆并使用了它们的下游构成破坏性变更。用户已确认接受。
 2. **`initNativeMidButtonTap` 全项目零调用**：原生中间按钮点击监听实际从未注册。按"面向开发者的预留钩子"保留而非删除；若后续确认废弃，另行清理。
 3. **`setCurIdxByPath` 与 `initNativeMidButtonTap` 会被门面的 `export *` 转发出去**：前者被 `navigate.uts` 跨文件使用，后者是预留钩子，两者均保留在对外面上，不做进一步隐藏。
 
@@ -165,5 +180,5 @@ grep -nE "^export function get[A-Z]" src/utils/theme/index.uts
 - `helper/` 下 5 个文件，各自职责单一，无 `index.uts` / `store.uts`。
 - `src/tabbar/index.uts` 为单层门面，无两层星号转发。
 - `themeColor` 位于 `src/utils/theme/index.uts`，`src/store` 不再被 tabbar 反向引用。
-- 全部 13 处消费者 import 归一。
+- 全部 12 处消费者 import 归一为 `@/src/tabbar`（另 3 处 `themeColor` 来源改走主题域）。
 - 上述四步验证全部通过，且该模块对外行为与改造前完全一致。

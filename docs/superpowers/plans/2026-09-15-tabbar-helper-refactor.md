@@ -2,7 +2,7 @@
 
 > **面向 AI 代理的工作者：** 必需子技能：使用 superpowers:subagent-driven-development（推荐）或 superpowers:executing-plans 逐任务实现此计划。步骤使用复选框（`- [ ]`）语法来跟踪进度。
 
-**目标：** 把 `src/tabbar/helper/` 从「两个文件装八种职责」拆成 5 个单一职责的叶子文件，把模块对外导出收敛为单层门面、收回 9 个不该外露的符号，并把 `themeColor` 迁到主题域以解开 `store ↔ tabbar` 双向依赖——全程不改变任何运行时行为。
+**目标：** 把 `src/tabbar/helper/` 从「两个文件装八种职责」拆成 5 个单一职责的叶子文件，把模块对外导出收敛为单层门面、收回 8 个不该外露的符号（导出面 41 → 33），并把 `themeColor` 迁到主题域以解开 `store ↔ tabbar` 双向依赖——全程不改变任何运行时行为。
 
 **架构：** `src/tabbar/index.uts` 是模块唯一对外门面，对 5 个叶子文件做**单层** `export *`（不使用无先例的具名再导出语法）。叶子文件按职责划分：`strategy`（策略判定）、`metrics`（尺寸/视口计算）、`state`（列表与激活状态）、`navigate`（跳转行为）、`native`（平台桥接）。`themeColor` 上移到 `src/utils/theme/index.uts`，`store → tabbar` 的直接依赖边随之消除；经 `i18n` 中介的间接环是改造前既有状况，本次不动（详见下表后的说明）。
 
@@ -28,6 +28,21 @@
 
 > **关于「解开双向依赖」的准确表述**：任务 1 解开的是 `store → tabbar` 的**直接**边（`themeColor`）。经 `i18n` 中介的间接环**本次不动**——它改造前就存在且当前工作正常。若要彻底切断，做法与 `themeColor` 同构：把暗色标志也上移到主题域（新增 `isDark` ref，由 app store 写入），`themeTokens` 改读它而不再 `useAppStore()`。那属于独立改动，不在本计划范围，需要时另开规格。
 
+## 🚨 全局硬性约束（每个任务都适用，实施者动手前先读这一节）
+
+1. **禁止 `git add -A` / `git add .` / `git add -A <dir>`**。本仓库跟踪着约 55 个 H5 构建产物（`unpackage/dist/build/web/`，每次 `pnpm build:h5` 都会重写），且 `src/tabbar/types.uts` 有**用户未提交的改动**。任何一次 `-A` 都会把这些一并扫进提交。**每个 commit 都必须逐个写出改动文件的明确路径。**
+2. **本分支有另一条并行会话在活动**（uni-router-guard 特性线，近期提交 `261d18d04`、`3a037bbe3`、`9dbcd4519`、`1573a7706`）。**不要** `rebase`、**不要** `amend`、**不要** `push --force`，**不要**顺手修复工作区里不属于本重构的改动。
+3. **单文件 eslint 必须在清掉 `VSCODE_PID` 之后跑**，否则 @antfu/eslint-config 会走编辑器分支、静默关掉部分规则，得到**假绿**：
+
+   ```bash
+   env -u VSCODE_PID -u VSCODE_CWD -u VSCODE_ESM_ENTRYPOINT pnpm eslint <单个文件>
+   ```
+
+   **只对本次改动的单文件跑**，绝不跑 `pnpm lint:fix` 或 `eslint . --fix`（会全仓改写）。
+4. **`--expect` 存在假绿通道**：脚本只校验「总数」与「是否有新增」，**不校验「移除的是不是预期的那几个」**。所以每个任务的导出面断言都必须**额外肉眼核对输出的 `已移除：` 行集合**，光看 `✓ 导出面符号数符合预期` 不算通过。
+5. **不要改 `scripts/check-tabbar-surface.mjs`**（任务 0 已定稿并复审通过）。任务 0 复审记录的改进项一律不在本次范围。
+6. **同一次 `pnpm build:h5` 会重写 `unpackage/` 下约 55 个文件**。这是预期噪声，**不要**试图 revert 它们，也**不要**把它们加进任何 commit。
+
 ## 文件结构
 
 **创建：**
@@ -35,7 +50,7 @@
 | 文件 | 职责 |
 | --- | --- |
 | `scripts/check-tabbar-surface.mjs` | 静态解析 `src/tabbar/index.uts` 的 `export *` 图，输出/断言门面导出面 |
-| `src/tabbar/helper/strategy.uts` | 策略枚举与模式判定（`TABBAR_STRATEGY_MAP`、`parseTabbarStrategy`、`isSinglePageTabbar`、`isNativeTabbar`、`needHideNativeTabbar`、`tabbarType`） |
+| `src/tabbar/helper/strategy.uts` | 策略枚举与模式判定（`TABBAR_STRATEGY_MAP`、`parseTabbarStrategy`、`selectedTabbarStrategy`、`isSinglePageTabbar`、`isNativeTabbar`、`needHideNativeTabbar`、`tabbarType`、`customTabbarEnable`） |
 | `src/tabbar/helper/metrics.uts` | 尺寸常量与视口/主题计算（`TABBAR_HEIGHT`、`TABBAR_CONTAINER_HEIGHT`、`themeTokens`、`safeAreaBottom`、`isVersionGte525`、`tabbarPlaceholderHeight`） |
 | `src/tabbar/helper/state.uts` | 列表与激活状态（`tabbarList`、`curIdx`、`setCurIdx`、`setCurIdxByPath`、`syncCurIdxByCurrentPage`、`isPageTabbar`、`setTabbarItemBadge`、`onTabShow`） |
 | `src/tabbar/helper/navigate.uts` | 跳转行为（`switchTabbar`、`handleTabbarClick`、`initNativeMidButtonTap`） |
@@ -50,13 +65,17 @@
 | `src/store/vapor/app.ts`、`src/store/vdom/app.uts` | `themeColor` 改从主题域导入 |
 | `src/tabbar/helper/index.uts` | 逐任务掏空后删除 |
 | `src/tabbar/helper/store.uts` | 迁为 `state.uts` 后删除 |
-| 11 处消费者 | import 路径归一为 `@/src/tabbar` |
+| 12 处消费者 | import 路径归一为 `@/src/tabbar` |
 
 **删除：** `src/tabbar/helper/index.uts`、`src/tabbar/helper/store.uts`
 
-**消费者 import 归一清单（11 处，规格 §3.4 的 13 处中，2 处仅换 `themeColor` 来源、入口本已正确，已在任务 1 处理）：**
+**消费者 import 归一清单（12 处，即任务 2 的归一表）：**
 
-`src/layouts/navbar.uvue:56`、`src/sub/auth/login.uvue:20`、`src/pages/me/views/MeView.uvue:49`、`src/router/interceptor.uts:2`、`src/utils/i18n/index.uts:2`、`src/tabbar/tabbar.uvue:14`、`src/tabbar/components/TabContent.uvue:11`、`src/tabbar/ui/default/index.uvue:13`、`src/tabbar/ui/default/TabbarItem.uvue:3`、`src/tabbar/ui/capsule/index.uvue:15`、`src/tabbar/ui/template.uvue`（此项入口已是 `@/src/tabbar`，只需确认）
+`App.uvue:4`、`App.ku.uvue:25`、`src/layouts/navbar.uvue:56`、`src/sub/auth/login.uvue:20`、`src/pages/me/views/MeView.uvue:49`、`src/router/interceptor.uts:2`、`src/utils/i18n/index.uts:2`、`src/tabbar/tabbar.uvue:14`、`src/tabbar/components/TabContent.uvue:11`、`src/tabbar/ui/default/index.uvue:13`、`src/tabbar/ui/default/TabbarItem.uvue:3`、`src/tabbar/ui/capsule/index.uvue:14`
+
+> 🚨 **`App.uvue` 与 `App.ku.uvue` 是规格 §3.4 表里漏掉的两处**（原表只扫了 `src/` 目录，两个根组件不在扫描范围内）。它们用的是最深、最不显眼的两种相对写法，靠肉眼搜 `@/src/tabbar/helper` 根本搜不到，必须显式列入，否则任务 6 删掉 `helper/index.uts` 后根组件直接编译失败。规格 §3.4 已同步补入。
+
+**无需改动**（入口已是 `@/src/tabbar`）：`src/pages/index/index.uvue`、`src/pages/function/views/FunctionView.uvue`、`src/tabbar/ui/template.uvue`（后者另在任务 1 已把 `themeColor` 改走主题域）。
 
 ---
 
@@ -508,7 +527,7 @@ git commit -m "test: 添加 tabbar 门面导出面快照检查与改造前基线
 
 1. **重复符号被静默去重**（`found.set(name, rel)`，脚本 221/225 行）：同一符号被两个叶子文件导出时，后者覆盖前者，数量少 1 且丢失来源归属。这是本次重构最关心的 `xxx__1` 改名风险的静态对应物。之所以可接受：仓库现实路径下它几乎总会因数量不符先变红（被搬走的符号若在旧文件残留，数量不会按阶梯下降）。**若它真的触发，症状是「数量比预期少 1」而非「多 1」，排查时优先怀疑重名而非真丢符号。**
 2. `--expect` 数量不符的报错未带「预期 vs 实际」（359 行），失败时需在屏幕二次对账。
-3. 默认模式下有新差异仍 `exit 0`（383-385 行）——这是计划刻意要求的（任务 7 期望「9 个移除」时退出码必须为 0），但意味着「8 个预期移除 + 1 个意外新增」这种组合只能靠肉眼读输出。**这正是每个任务都必须手工核对 `已移除：` 行集合的原因。**
+3. 默认模式下有新差异仍 `exit 0`（383-385 行）——这是计划刻意要求的（任务 7 期望「8 个移除」时退出码必须为 0），但意味着「8 个预期移除 + 1 个意外新增」这种组合只能靠肉眼读输出。**这正是每个任务都必须手工核对 `已移除：` 行集合的原因。**
 4. 基线装载失败的处理在三个分支里近乎逐字重复（314-319 / 344-350 / 371-379 行）。
 5. 输出图标用 `✗ / ✓ / ⚠`，与仓库既有脚本（`scripts/switch-env.mjs`、`scripts/build-h5.mjs`、`scripts/gen-uts-dts.mjs`）的 `❌ / ✅ / ⚠️` 不一致。
 6. 未在 `package.json` 加 `check:tabbar-surface` 别名（同类脚本 `check:uts-dts` 已有先例）。计划内全部调用点都直接写 `node scripts/check-tabbar-surface.mjs`，不依赖别名。
@@ -690,7 +709,99 @@ return themeColor.value.length > 0 ? themeColor.value : appStore.state.theme;
 
 ---
 
-### 任务 2：拆出 `helper/strategy.uts`
+### 任务 2：消费者 import 路径归一（**前置**，原任务 6）
+
+> 🚨 **本任务由原「任务 6」前置而来。** 它必须在**任何符号搬出 `helper/index.uts` 之前**完成，否则后续每一步的「H5 编译通过」断言都无法成立。
+
+**为什么必须前置**：`src/tabbar/helper/index.uts` 被多处**深引用**。一旦某个符号搬进 `helper/` 下的新叶子文件，指向 `helper` 的深引用立刻断掉。而导出面脚本只遍历门面的 `export *` 图，**完全看不见深引用**，所以它一直是绿的——这个洞是实测出来的，不是推测。
+
+实测证据（把任务 3 的改动应用后跑 `pnpm build:h5`）：
+
+```text
+[uts] .../src/tabbar/tabbar.uvue: "tabbarType" is not exported by ".../src/tabbar/helper/index.uts"
+项目 unibestX 编译失败。
+```
+
+同一份改动在**基线**（未搬家）上 exit 0、0 条非噪声 error；搬家后新增 4 条 error。原计划把归一排在最后，等于让任务 3、4、5、6 各自带着一个编译不过的中间态。
+
+**为什么前置是安全的**：门面 `src/tabbar/index.uts` 当前 `export *` 了 `./config`、`./helper`、`./types`，下表**全部 12 处**所需的符号现在就能从门面拿到。归一化只改 import 路径字符串、不动具名导入列表，因此**对门面导出面零影响**——阶梯值 41 → 40 保持不变。
+
+**文件：** 见下方清单，全部改为 `@/src/tabbar`
+
+- [ ] **步骤 1：逐个替换 import 路径**
+
+| 文件 | 现状 | 改为 |
+| --- | --- | --- |
+| `App.uvue:4` | `from './src/tabbar/helper'` | `from '@/src/tabbar'` |
+| `App.ku.uvue:25` | `from '@/src/tabbar/helper/index.uts'` | `from '@/src/tabbar'` |
+| `src/layouts/navbar.uvue:56` | `from '@/src/tabbar/helper'` | `from '@/src/tabbar'` |
+| `src/sub/auth/login.uvue:20` | `from '../../tabbar/helper'` | `from '@/src/tabbar'` |
+| `src/pages/me/views/MeView.uvue:49` | `from '@/src/tabbar/helper'` | `from '@/src/tabbar'` |
+| `src/router/interceptor.uts:2` | `from '../tabbar/helper/index.uts'` | `from '@/src/tabbar'` |
+| `src/utils/i18n/index.uts:2` | `from '../../tabbar/helper/index.uts'` | `from '@/src/tabbar'` |
+| `src/tabbar/tabbar.uvue:14` | `from './helper'` | `from '@/src/tabbar'` |
+| `src/tabbar/components/TabContent.uvue:11` | `from '@/src/tabbar/helper'` | `from '@/src/tabbar'` |
+| `src/tabbar/ui/default/index.uvue:13` | `from '../../helper'` | `from '@/src/tabbar'` |
+| `src/tabbar/ui/default/TabbarItem.uvue:3` | `from '../../helper'` | `from '@/src/tabbar'` |
+| `src/tabbar/ui/capsule/index.uvue:14` | `from '../../helper'` | `from '@/src/tabbar'` |
+
+只改路径字符串，**不要动具名导入列表**。
+
+> `App.uvue` 与 `App.ku.uvue` 是仓库根目录的**手工维护、已被 git 跟踪**的源文件（不是生成物），且都**不在**原规格 §3.4 的归一化表里——本表已补上。`App.uvue` 原本清一色用 `./src/...` 相对路径，这里改成 `@/` 是为了统一；根目录文件用 `@/src/tabbar` 有现成先例（`App.ku.uvue:20`、`src/pages/index/index.uvue:20` 都是这么写的，且构建通过）。
+>
+> `src/tabbar/ui/template.uvue` 的入口本就是 `@/src/tabbar`，无需改动。
+
+- [ ] **步骤 2：确认已无残留旧路径**
+
+运行：
+
+```bash
+grep -rn "tabbar/helper\|from './helper'\|from '../../helper'" src/ App.uvue App.ku.uvue --include='*.uts' --include='*.uvue' --include='*.ts'
+```
+
+预期：**唯一命中是 `src/tabbar/index.uts` 的 `export * from './helper';`**。那是门面自身的聚合行，要到任务 6 才移除，**本步骤不要动它**。除此之外不应有任何输出。
+
+> **已全仓扫过、确认无需改动、也不要顺手改的两处**（实施前用 `grep -rn "tabbar" --include='*.uts' --include='*.uvue' --include='*.ts'` 排除 `node_modules/`、`unpackage/` 复核过）：
+>
+> - `plugins/vite-plugin-tabbar-views.ts:170` 的 `import { curIdx, onTabShow } from '@/src/tabbar';`——它在一段**模板字符串**里（插件用反引号拼出的 `viewTemplate`），是自动生成 `View.uvue` 时写进产出文件的代码，不是插件自身的导入语句。路径本就是门面路径，**正确，勿动**。
+> - `src/utils/systemInfo/index.uts:2` 的 `import { customTabbarConfig } from '../../tabbar/config.uts';`——指向 `config.uts`，本次**不搬家**（规格 §2 明确把这条同模块环形依赖列为非目标）。**勿动**。
+>
+> `src/pages/index/index.uvue:18-19` 直接导入 `TabViews.uvue` 与 `tabbar.uvue` 这两个**组件**，与导出面无关，同样勿动。
+
+- [ ] **步骤 3：确认导出面一个符号都没变**
+
+运行：`node scripts/check-tabbar-surface.mjs --expect 40; echo "exit=$?"`
+预期：`✓ 导出面符号数符合预期` + `exit=0`，且 `已移除：` 行仍恰为 `themeColor` 一个符号。
+
+**归一是纯路径改动，导出面必须纹丝不动**。若数量变了，说明你误改了具名导入列表；若 `已移除：` 集合变了，说明门面被动了。
+
+- [ ] **步骤 4：H5 编译验证**
+
+运行：`pnpm build:h5 2>&1 | grep -aE "编译成功|打包成功|编译失败"`
+预期：`项目 unibestX 编译成功。` + `✅ H5 打包成功`。既存的 `TS2305 resolveEasycom` 属噪声，只要数量与基线相当即可
+
+- [ ] **步骤 5：Lint 无新增问题**
+
+对上面 12 个文件逐个跑（或一次列出全部 12 个路径），**不要跑 `pnpm lint` / `eslint .` 这类全仓命令**。⚠️ 本环境设了 `VSCODE_PID`/`VSCODE_CWD`，antfu 配置会进 editor 分支关掉部分规则导致假绿，必须带 `env -u` 前缀：
+
+```bash
+env -u VSCODE_PID -u VSCODE_CWD -u VSCODE_ESM_ENTRYPOINT pnpm eslint <12 个文件路径>
+```
+
+预期：exit 0。若出现 `unused-imports/no-unused-vars` 指向本次改动的文件，说明某处导入已失效，需清理
+
+- [ ] **步骤 6：Commit**
+
+```bash
+git add App.uvue App.ku.uvue src/layouts/navbar.uvue src/sub/auth/login.uvue src/pages/me/views/MeView.uvue src/router/interceptor.uts src/utils/i18n/index.uts src/tabbar/tabbar.uvue src/tabbar/components/TabContent.uvue src/tabbar/ui/default/index.uvue src/tabbar/ui/default/TabbarItem.uvue src/tabbar/ui/capsule/index.uvue
+git commit -m "refactor: 统一 tabbar 模块对外导入入口为 @/src/tabbar"
+```
+
+> ⚠️ **不要写 `git add -A src`**（那是原任务 6 的写法，已废弃）：`src/tabbar/types.uts` 有用户未提交的改动，`-A` 会把它一并扫进提交。必须逐个写出上表 12 条路径。
+
+---
+
+### 任务 3：拆出 `helper/strategy.uts`
 
 **文件：**
 - 创建：`src/tabbar/helper/strategy.uts`
@@ -763,12 +874,17 @@ export const needHideNativeTabbar: boolean = selectedTabbarStrategy == TABBAR_ST
 
 /** 当前配置的 TabBar UI 风格形态（如 'capsule' | 'default'，从 config.uts 中读取） */
 export const tabbarType: string = customTabbarConfig.type ?? 'default';
+
+/** 是否启用了自定义 TabBar（模式 2 或 3 为 true）——根组件 App.ku.uvue 用它决定是否渲染 <Tabbar> */
+export const customTabbarEnable: boolean = selectedTabbarStrategy == TABBAR_STRATEGY_MAP.CUSTOM_TABBAR_WITH_NATIVE || selectedTabbarStrategy == TABBAR_STRATEGY_MAP.CUSTOM_TABBAR_WITHOUT_NATIVE;
 ```
 
-> **⚠️ 有意删除的 5 个符号（规格 §3.1 的「收回非导出」在此落地为「删除」）**：
-> `tabbarCacheEnable`、`customTabbarEnable`、`hasNativeTabbarConfig`、`isNoTabbar`、`isCapsuleTabbar`。
-> 全项目零引用；保留为非导出常量只会产出 5 条 `unused-imports/no-unused-vars` 警告（已实测为 warning 而非 error），而本项目把构建警告当缺陷看。策略矩阵的语义仍完整保留在 `TABBAR_STRATEGY_MAP` 的文档注释与 `config.uts` 的说明里。
-> **若使用者希望保留这些语义的对外可见性，这是本计划中唯一一处需要回退的决定**：把它们恢复为 `export const` 即可，任务 6 的期望符号数相应变为 37。
+> 🚨 **`customTabbarEnable` 必须保留为导出，不要删。** 原规格 §1.3.3 称这 5 个布尔「全项目零引用」——**该判断有误**：`App.ku.uvue`（仓库根目录手工维护、已被 git 跟踪的根组件）在第 14 行模板里用 `v-if="customTabbarEnable && isCurrentPageTabbar"`，第 20 行从门面具名导入它。实测删掉它会直接编译失败。已实测确认只有它一个有引用，其余 4 个确实零引用。
+>
+> **有意删除的 4 个符号（规格 §3.1 的「收回非导出」在此落地为「删除」）**：
+> `tabbarCacheEnable`、`hasNativeTabbarConfig`、`isNoTabbar`、`isCapsuleTabbar`。
+> 全项目零引用（已逐个 grep 实测）；保留为非导出常量只会产出 4 条 `unused-imports/no-unused-vars` 警告（已实测为 warning 而非 error），而本项目把构建警告当缺陷看。策略矩阵的语义仍完整保留在 `TABBAR_STRATEGY_MAP` 的文档注释与 `config.uts` 的说明里。
+> **若使用者希望保留这些语义的对外可见性，这是本计划中唯一一处需要回退的决定**：把它们恢复为 `export const` 即可，后续各步的期望符号数各 +4（最终 37）。
 
 - [ ] **步骤 2：从 `src/tabbar/helper/index.uts` 摘掉整段策略代码**
 
@@ -789,7 +905,7 @@ import { isNativeTabbar, isSinglePageTabbar, selectedTabbarStrategy, TABBAR_STRA
 > - `switchTabbar` → `isSinglePageTabbar`、`selectedTabbarStrategy`、`TABBAR_STRATEGY_MAP`
 > - `handleTabbarClick` → `isSinglePageTabbar`
 >
-> `import { watch } from 'vue';` 与 `import { customTabbarConfig } from '../config';` **本步骤不要删**：前者供仍在文件内的 `onTabShow` 使用（任务 4 才迁走），后者供 `initNativeMidButtonTap` 读取 `midButton`。
+> `import { watch } from 'vue';` 与 `import { customTabbarConfig } from '../config';` **本步骤不要删**：前者供仍在文件内的 `onTabShow` 使用（**任务 5** 才随 `onTabShow` 一并迁入 `state.uts`，届时本文件的 `watch` 导入才可删），后者供 `initNativeMidButtonTap` 读取 `midButton`。
 
 - [ ] **步骤 3：门面加一行**
 
@@ -806,8 +922,10 @@ export * from './types';
 
 - [ ] **步骤 4：断言导出面只少 5 个符号**
 
-运行：`node scripts/check-tabbar-surface.mjs --expect 35; echo "exit=$?"`
-预期：`✓ 导出面符号数符合预期` + `exit=0`；并核对 `已移除：` 行恰为以下集合（累计口径——含任务 1 已迁出的 `themeColor`，顺序以脚本输出为准）：`tabbarCacheEnable`、`customTabbarEnable`、`hasNativeTabbarConfig`、`isNoTabbar`、`isCapsuleTabbar`、`themeColor`
+运行：`node scripts/check-tabbar-surface.mjs --expect 36; echo "exit=$?"`
+预期：`✓ 导出面符号数符合预期` + `exit=0`；并核对 `已移除：` 行恰为以下集合（**累计**口径——含任务 1 已迁出的 `themeColor`，共 5 个，顺序以脚本输出为准）：`hasNativeTabbarConfig`、`isCapsuleTabbar`、`isNoTabbar`、`tabbarCacheEnable`、`themeColor`
+
+> `customTabbarEnable` **不在**这个集合里——它被保留为导出。
 
 - [ ] **步骤 5：H5 编译验证**
 
@@ -818,12 +936,12 @@ export * from './types';
 
 ```bash
 git add src/tabbar/helper/strategy.uts src/tabbar/helper/index.uts src/tabbar/index.uts
-git commit -m "refactor: 拆出 tabbar 策略判定为独立叶子文件，删除 5 个零引用派生死常量"
+git commit -m "refactor: 拆出 tabbar 策略判定为独立叶子文件，删除 4 个零引用派生死常量"
 ```
 
 ---
 
-### 任务 3：拆出 `helper/metrics.uts`
+### 任务 4：拆出 `helper/metrics.uts`
 
 **文件：**
 - 创建：`src/tabbar/helper/metrics.uts`
@@ -905,8 +1023,8 @@ export * from './types';
 
 - [ ] **步骤 4：断言导出面数量不变**
 
-运行：`node scripts/check-tabbar-surface.mjs --expect 35; echo "exit=$?"`
-预期：`✓ 导出面符号数符合预期` + `exit=0`；并核对 `已移除：` 行恰为以下集合（**累计口径，与任务 2 相同**——本步不收回任何符号，故 `已移除：` 行仍然存在且为这 6 个，**不是空**；顺序以脚本输出为准）：`tabbarCacheEnable`、`customTabbarEnable`、`hasNativeTabbarConfig`、`isNoTabbar`、`isCapsuleTabbar`、`themeColor`；且 `新增：` 一行不出现
+运行：`node scripts/check-tabbar-surface.mjs --expect 36; echo "exit=$?"`
+预期：`✓ 导出面符号数符合预期` + `exit=0`；并核对 `已移除：` 行恰为以下集合（**累计口径，与任务 3 相同**——本步不收回任何符号，故 `已移除：` 行仍然存在且为这 5 个，**不是空**；顺序以脚本输出为准）：`hasNativeTabbarConfig`、`isCapsuleTabbar`、`isNoTabbar`、`tabbarCacheEnable`、`themeColor`；且 `新增：` 一行不出现
 
 - [ ] **步骤 5：H5 编译验证**
 
@@ -922,7 +1040,7 @@ git commit -m "refactor: 拆出 tabbar 尺寸与视口计算为独立叶子文�
 
 ---
 
-### 任务 4：`store.uts` 迁为 `state.uts`
+### 任务 5：`store.uts` 迁为 `state.uts`
 
 **文件：**
 - 创建：`src/tabbar/helper/state.uts`
@@ -1118,12 +1236,12 @@ export * from './types';
 运行：`grep -rn "helper/store\|from './store'" src/ --include='*.uts' --include='*.uvue' --include='*.ts'`
 预期：无输出
 
-> 此处**不要**把 `tabbar/helper` 一并放进检查模式：消费者此时仍走 `@/src/tabbar/helper`，而 `helper/index.uts` 要到任务 5 才删除，此刻它依然有效。入口统一在任务 6 才做，`tabbar/helper` 的残留检查属于任务 6 步骤 2。
+> 此处**不要**把 `tabbar/helper` 一并放进检查模式：消费者在任务 2 就已全部改走 `@/src/tabbar`，此刻残留的 `tabbar/helper` 字样**只剩门面自身那一行 `export * from './helper';`**（以及本文件为了兼容而保留的 `./state.uts` 导入）。`helper/index.uts` 本身要到**任务 6** 才删除，那一刻才做 `tabbar/helper` 的残留检查，属任务 6 步骤 2 的范围。
 
 - [ ] **步骤 6：断言导出面少 2 个符号**
 
-运行：`node scripts/check-tabbar-surface.mjs --expect 33; echo "exit=$?"`
-预期：`✓ 导出面符号数符合预期` + `exit=0`（`buildFullTabbarList`、`customTabbarList` 已收回）；并核对 `已移除：` 行恰为以下集合（累计口径，顺序以脚本输出为准）：`buildFullTabbarList`、`customTabbarList`、`tabbarCacheEnable`、`customTabbarEnable`、`hasNativeTabbarConfig`、`isNoTabbar`、`isCapsuleTabbar`、`themeColor`
+运行：`node scripts/check-tabbar-surface.mjs --expect 34; echo "exit=$?"`
+预期：`✓ 导出面符号数符合预期` + `exit=0`（`buildFullTabbarList`、`customTabbarList` 已收回）；并核对 `已移除：` 行恰为以下集合（**累计**口径，共 7 个，顺序以脚本输出为准）：`buildFullTabbarList`、`customTabbarList`、`hasNativeTabbarConfig`、`isCapsuleTabbar`、`isNoTabbar`、`tabbarCacheEnable`、`themeColor`
 
 - [ ] **步骤 7：H5 编译验证**
 
@@ -1133,13 +1251,13 @@ export * from './types';
 - [ ] **步骤 8：Commit**
 
 ```bash
-git add -A src/tabbar
+git add src/tabbar/helper/state.uts src/tabbar/helper/store.uts src/tabbar/helper/index.uts src/tabbar/index.uts
 git commit -m "refactor: store.uts 迁为 state.uts 并收拢列表派生内部化"
 ```
 
 ---
 
-### 任务 5：拆出 `navigate.uts` 与 `native.uts`，删除 `helper/index.uts`
+### 任务 6：拆出 `navigate.uts` 与 `native.uts`，删除 `helper/index.uts`
 
 **文件：**
 - 创建：`src/tabbar/helper/navigate.uts`、`src/tabbar/helper/native.uts`
@@ -1355,8 +1473,8 @@ export * from './types';
 
 - [ ] **步骤 5：断言导出面少 1 个符号**
 
-运行：`node scripts/check-tabbar-surface.mjs --expect 32; echo "exit=$?"`
-预期：`✓ 导出面符号数符合预期` + `exit=0`（`handleClickBulge` 已收回为文件私有）；并核对 `已移除：` 行恰为以下集合（累计口径，顺序以脚本输出为准，共 9 个）：`buildFullTabbarList`、`customTabbarList`、`handleClickBulge`、`tabbarCacheEnable`、`customTabbarEnable`、`hasNativeTabbarConfig`、`isNoTabbar`、`isCapsuleTabbar`、`themeColor`
+运行：`node scripts/check-tabbar-surface.mjs --expect 33; echo "exit=$?"`
+预期：`✓ 导出面符号数符合预期` + `exit=0`（`handleClickBulge` 已收回为文件私有）；并核对 `已移除：` 行恰为以下集合（**累计**口径，顺序以脚本输出为准，共 8 个）：`buildFullTabbarList`、`customTabbarList`、`handleClickBulge`、`hasNativeTabbarConfig`、`isCapsuleTabbar`、`isNoTabbar`、`tabbarCacheEnable`、`themeColor`
 
 - [ ] **步骤 6：H5 编译验证**
 
@@ -1366,60 +1484,8 @@ export * from './types';
 - [ ] **步骤 7：Commit**
 
 ```bash
-git add -A src/tabbar
+git add src/tabbar/helper/navigate.uts src/tabbar/helper/native.uts src/tabbar/helper/index.uts src/tabbar/index.uts
 git commit -m "refactor: 拆出跳转与平台桥接叶子文件，删除 helper 聚合层"
-```
-
----
-
-### 任务 6：消费者 import 路径归一
-
-**文件：** 见下方清单，全部改为 `@/src/tabbar`
-
-- [ ] **步骤 1：逐个替换 import 路径**
-
-| 文件 | 现状 | 改为 |
-| --- | --- | --- |
-| `src/layouts/navbar.uvue:56` | `from '@/src/tabbar/helper'` | `from '@/src/tabbar'` |
-| `src/sub/auth/login.uvue:20` | `from '../../tabbar/helper'` | `from '@/src/tabbar'` |
-| `src/pages/me/views/MeView.uvue:49` | `from '@/src/tabbar/helper'` | `from '@/src/tabbar'` |
-| `src/router/interceptor.uts:2` | `from '../tabbar/helper/index.uts'` | `from '@/src/tabbar'` |
-| `src/utils/i18n/index.uts:2` | `from '../../tabbar/helper/index.uts'` | `from '@/src/tabbar'` |
-| `src/tabbar/tabbar.uvue:14` | `from './helper'` | `from '@/src/tabbar'` |
-| `src/tabbar/components/TabContent.uvue:11` | `from '@/src/tabbar/helper'` | `from '@/src/tabbar'` |
-| `src/tabbar/ui/default/index.uvue:13` | `from '../../helper'` | `from '@/src/tabbar'` |
-| `src/tabbar/ui/default/TabbarItem.uvue:3` | `from '../../helper'` | `from '@/src/tabbar'` |
-| `src/tabbar/ui/capsule/index.uvue:15` | `from '../../helper'` | `from '@/src/tabbar'` |
-
-只改路径字符串，**不要动具名导入列表**。
-
-- [ ] **步骤 2：确认已无残留旧路径**
-
-运行：`grep -rn "tabbar/helper\|from './helper'\|from '../../helper'" src/ --include='*.uts' --include='*.uvue' --include='*.ts'`
-预期：无输出
-
-- [ ] **步骤 3：确认所有消费者都能从门面拿到它需要的符号**
-
-运行：`node scripts/check-tabbar-surface.mjs`
-预期：`基线 41 个，当前 32 个` / `已移除：` 行恰为以下集合（**累计**口径、顺序以脚本输出为准，共 9 个）：`buildFullTabbarList`、`customTabbarList`、`handleClickBulge`、`tabbarCacheEnable`、`customTabbarEnable`、`hasNativeTabbarConfig`、`isNoTabbar`、`isCapsuleTabbar`、`themeColor` / **`新增：`一行不出现**。
-
-> 这 9 个正是本次计划有意收回/迁出的符号（5 个零引用派生死常量 + 2 个列表派生内部函数 + 1 个文件私有跳转辅助 + 1 个迁往主题域的 ref）。若「已移除」集合（忽略顺序）与此不符，停止并核对。
-
-- [ ] **步骤 4：H5 编译验证**
-
-运行：`pnpm build:h5 2>&1 | tail -5`
-预期：`项目 unibestX 编译成功。` + `✅ H5 打包成功`
-
-- [ ] **步骤 5：Lint 无新增问题**
-
-运行：`pnpm lint 2>&1 | tail -15`
-预期：无 `error`。若出现 `unused-imports/no-unused-vars` 指向本次改动的文件，说明某处导入已失效，需清理
-
-- [ ] **步骤 6：Commit**
-
-```bash
-git add -A src
-git commit -m "refactor: 统一 tabbar 模块对外导入入口为 @/src/tabbar"
 ```
 
 ---
@@ -1515,11 +1581,16 @@ grep -nE "kotlin编译失败|error:|编译成功" /tmp/tabbar-refactor-android.l
 - [ ] **步骤 7：Commit（若步骤 5 捞出的警告带来修复）**
 
 ```bash
-git add -A src
+# 逐个写出步骤 5 实际改动的文件路径（不要用 -A / . 通配）
+git add <改动文件 1> <改动文件 2>
 git commit -m "fix: 处理 tabbar 重构后 Kotlin 阶段新增警告"
 ```
 
-> **严禁 `git add -A`（不带路径）**：`unpackage/dist/build/web/` 的 H5 产物被本仓库跟踪，每次 `pnpm build:h5` 都会重写它们（旧 hash 文件变为删除、新 hash 文件变为未跟踪，约 55 个文件）。那属于构建噪声，不应混进重构 commit。本计划所有 commit 都用带路径的 `git add`。
+> 🚨 **本步骤极易误用 `git add -A src`。严禁。** 两个理由：
+> 1. `unpackage/dist/build/web/` 的 H5 产物被本仓库跟踪，任务 7 全程会跑 `pnpm build:h5`，产物早被重写（旧 hash 文件变删除、新 hash 文件变未跟踪，约 55 个文件）——`-A` 会把它们全扫进来；
+> 2. `src/tabbar/types.uts` 有**用户未提交的改动**，`-A src` 同样会扫进来，污染用户的工作区。
+>
+> 只 `git add` 步骤 5 里真正改过的那几个文件。
 
 若步骤 5 无新增警告，则本步骤跳过，直接进入验收。
 
@@ -1529,7 +1600,7 @@ git commit -m "fix: 处理 tabbar 重构后 Kotlin 阶段新增警告"
 
 - [ ] `src/tabbar/helper/` 下只有 5 个文件：`strategy.uts`、`metrics.uts`、`state.uts`、`navigate.uts`、`native.uts`；`index.uts` 与 `store.uts` 均已删除
 - [ ] `src/tabbar/index.uts` 为单层 `export *`，无 `export * from './helper'` 这类二次转发
-- [ ] `node scripts/check-tabbar-surface.mjs` 报告「已移除」恰好 9 个预期符号、「新增」为空
+- [ ] `node scripts/check-tabbar-surface.mjs` 报告「已移除」恰好 8 个预期符号、「新增」为空
 - [ ] `grep -rn "tabbar/helper" src/` 无输出
 - [ ] `grep -rn "themeColor" src/tabbar/` 只在新位置（`@/src/utils/theme/index.uts`）的导入行出现
 - [ ] `src/store` 下不再有任何对 `src/tabbar` 的导入
@@ -1549,11 +1620,11 @@ git commit -m "fix: 处理 tabbar 重构后 Kotlin 阶段新增警告"
 | H5 日志里的 `TS2305 resolveEasycom` 被误当成新错误 | 该错误在基线中已存在 | 以任务 0 记录的基线噪声为对照；只关注 `src/tabbar/**` 相关的新错误 |
 | 真机构建被 IDE 抢占而中断 | 日志十几秒即 `已停止运行`，无 `编译成功` | skill 1.3.15：重跑，或先停掉 IDE 里的运行 |
 
-**整体回退**：本次改动按任务分 6 个 commit，每个 commit 都能独立编译通过。回退到改造前状态：
+**整体回退**：本次改动按任务分 7 个 commit（任务 1-7，每个任务一个 commit），每个 commit 都能独立编译通过。回退到改造前状态：
 
 ```bash
 git log --oneline            # 找到「test: 添加 tabbar 门面导出面快照检查与改造前基线」之前的一个 commit
 git revert --no-commit <各个 refactor commit>   # 或逐个 revert
 ```
 
-若只想放弃某一项决定（例如恢复 5 个策略常量），按任务 2 步骤 1 的说明把 `export const` 加回 `strategy.uts` 即可，门面会自动重新转发。
+若只想放弃某一项决定（例如恢复那 4 个被删除的策略常量），按**任务 3 步骤 1** 的说明把 `export const` 加回 `strategy.uts` 即可，门面会自动重新转发。
