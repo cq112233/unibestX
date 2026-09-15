@@ -1,36 +1,7 @@
 import { reactive } from 'vue';
 import { defineStore } from 'pinia';
-
-// ==========================================
-// 类型定义
-// ==========================================
-
-export type ILoginForm = {
-  username: string;
-  password: string;
-};
-
-export type ISingleTokenRes = {
-  token: string;
-  expiresIn: number;
-};
-
-export type IDoubleTokenRes = {
-  accessToken: string;
-  accessExpiresIn: number;
-  refreshToken: string;
-  refreshExpiresIn: number;
-};
-
-export type ITokenState = {
-  token: string;
-  expiresIn: number;
-  accessToken: string;
-  accessExpiresIn: number;
-  refreshToken: string;
-  refreshExpiresIn: number;
-  tokenExpireTime: number;
-};
+// 类型统一来自 src/store/types.uts（唯一真源），本文件严禁再 export type 同名类型
+import type { ILoginForm, ISingleTokenRes, IDoubleTokenRes, ITokenState } from '../types.uts';
 
 export const useTokenStore = defineStore('token', () => {
   // 1. 响应式状态

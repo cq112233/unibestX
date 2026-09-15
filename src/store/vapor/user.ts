@@ -1,20 +1,7 @@
 import { reactive } from 'vue';
 import { defineStore } from 'pinia';
-
-// ==========================================
-// 类型定义
-// ==========================================
-
-export type IUserInfo = {
-  userId: number;
-  username: string;
-  nickname: string;
-  avatar: string;
-};
-
-export type IUserState = {
-  userInfo: IUserInfo;
-};
+// 类型统一来自 src/store/types.uts（唯一真源），本文件严禁再 export type 同名类型
+import type { IUserInfo, IUserState } from '../types.uts';
 
 const DEFAULT_AVATAR = '/static/logo.png';
 

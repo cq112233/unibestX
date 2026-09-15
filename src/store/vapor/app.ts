@@ -10,18 +10,8 @@ import {
   isDarkMode
 } from '@/src/utils/theme/index.uts';
 import { getDefaultLocale } from '@/src/utils/env/index.uts';
-
-// ==========================================
-// 类型定义
-// ==========================================
-
-export type IAppState = {
-  theme: string;
-  locale: string;
-  themeMode: string; // 'auto'（跟随系统）| 'light' | 'dark'
-  isDark: boolean; // 实际生效的亮/暗
-  mode: string; // 当前 Store 实现模式：'vapor'（官方 Pinia）| 'vdom'（x-pinia-s）
-};
+// 类型统一来自 src/store/types.uts（唯一真源），本文件严禁再 export type 同名类型
+import type { IAppState } from '../types.uts';
 
 export const useAppStore = defineStore('app', () => {
   // 1. 响应式状态（与 x-pinia-s 的 state 结构完全一致，保证双向兼容）

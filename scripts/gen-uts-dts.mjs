@@ -45,6 +45,17 @@ const UTILS_DIR = path.join(ROOT, 'src/utils');
 /** 手工维护、不参与自动生成的模块（含 computed() 等无法静态推断的类型） */
 const HANDWRITTEN = new Set(['systemInfo']);
 
+/**
+ * 除 `src/utils/<模块>/index.uts` 外，额外纳入生成的 `.uts` 源文件。
+ *
+ * 判据是「有没有被 `.ts` / `.uvue` 以 `xxx.uts` 形式导入」：只要被导入，
+ * 缺配套声明文件 IDE 就会报 `Cannot find module '...xxx.uts'`
+ * （`src/store/types.uts` 即属此类 —— 它被 `src/store/vapor/*.ts` 导入）。
+ */
+const EXTRA_SOURCES = [
+  path.join(ROOT, 'src/store/types.uts'),
+];
+
 const args = new Set(process.argv.slice(2));
 const CHECK_ONLY = args.has('--check');
 const INCLUDE_ALL = args.has('--all');
@@ -399,7 +410,8 @@ function genClass(src, m, start) {
 
 // ────────────────────────────── 主流程 ──────────────────────────────
 
-function generate(src, moduleName) {
+function generate(src, moduleName, fileName = 'index.uts') {
+  const dtsBase = `${fileName.replace(/\.uts$/, '')}.d.uts.ts`;
   const m = mask(src);
   const constTypes = new Map();
   const parts = [];
@@ -451,11 +463,11 @@ function generate(src, moduleName) {
   const header = `/**
  * 本文件由 \`scripts/gen-uts-dts.mjs\` 自动生成，请勿手工编辑。
  *
- * 它声明 \`./index.uts\` 的导出面，供 TS / IDE 解析类型与补全。
- * tsconfig 的 \`allowArbitraryExtensions\` 把 \`./index.uts\` 解析到同目录的
- * \`index.d.uts.ts\`，因此本文件必须与 \`index.uts\` **同目录同名**，不能挪走。
+ * 它声明 \`./${fileName}\` 的导出面，供 TS / IDE 解析类型与补全。
+ * tsconfig 的 \`allowArbitraryExtensions\` 把 \`./${fileName}\` 解析到同目录的
+ * \`${dtsBase}\`，因此本文件必须与 \`${fileName}\` **同目录同名**，不能挪走。
  *
- * 修改 \`index.uts\` 的导出后，重新执行：node scripts/gen-uts-dts.mjs
+ * 修改 \`${fileName}\` 的导出后，重新执行：node scripts/gen-uts-dts.mjs
  * 校验是否已同步：node scripts/gen-uts-dts.mjs --check
  */`;
 
@@ -467,30 +479,52 @@ function generate(src, moduleName) {
 }
 
 function main() {
-  const dirs = fs.readdirSync(UTILS_DIR, { withFileTypes: true })
+  // src/utils/<模块>/index.uts
+  const utilsTargets = fs.readdirSync(UTILS_DIR, { withFileTypes: true })
     .filter(d => d.isDirectory())
     .map(d => d.name)
     .filter(name => fs.existsSync(path.join(UTILS_DIR, name, 'index.uts')))
-    .sort();
+    .sort()
+    .map((name) => {
+      const srcPath = path.join(UTILS_DIR, name, 'index.uts');
+      return {
+        label: name,
+        srcPath,
+        fileName: 'index.uts',
+        dtsPath: path.join(UTILS_DIR, name, 'index.d.uts.ts'),
+        handwritten: HANDWRITTEN.has(name)
+      };
+    });
+
+  // EXTRA_SOURCES 里的独立 .uts 文件
+  const extraTargets = EXTRA_SOURCES.map((srcPath) => {
+    const fileName = path.basename(srcPath);
+    return {
+      label: path.relative(ROOT, srcPath),
+      srcPath,
+      fileName,
+      dtsPath: srcPath.replace(/\.uts$/, '.d.uts.ts'),
+      handwritten: false
+    };
+  });
+
+  const targets = [...utilsTargets, ...extraTargets];
 
   let generated = 0;
   let stale = 0;
 
-  for (const name of dirs) {
-    const srcPath = path.join(UTILS_DIR, name, 'index.uts');
-    const dtsPath = path.join(UTILS_DIR, name, 'index.d.uts.ts');
-
-    if (HANDWRITTEN.has(name) && !INCLUDE_ALL) {
-      console.log(`⏭  ${name}  手工维护，跳过（--all 可强制重新生成）`);
+  for (const { label, srcPath, fileName, dtsPath, handwritten } of targets) {
+    if (handwritten && !INCLUDE_ALL) {
+      console.log(`⏭  ${label}  手工维护，跳过（--all 可强制重新生成）`);
       continue;
     }
 
     let out;
     try {
-      out = generate(fs.readFileSync(srcPath, 'utf8'), name);
+      out = generate(fs.readFileSync(srcPath, 'utf8'), label, fileName);
     }
     catch (e) {
-      console.error(`❌ ${name}  生成失败：${e.message}`);
+      console.error(`❌ ${label}  生成失败：${e.message}`);
       process.exitCode = 1;
       continue;
     }
@@ -499,21 +533,21 @@ function main() {
 
     if (CHECK_ONLY) {
       if (prev === out) {
-        console.log(`✅ ${name}  已同步`);
+        console.log(`✅ ${label}  已同步`);
       }
       else {
-        console.error(`❌ ${name}  声明文件与 index.uts 不同步，请运行 node scripts/gen-uts-dts.mjs`);
+        console.error(`❌ ${label}  声明文件与 ${fileName} 不同步，请运行 node scripts/gen-uts-dts.mjs`);
         stale++;
       }
       continue;
     }
 
     if (prev === out) {
-      console.log(`=  ${name}  无变化`);
+      console.log(`=  ${label}  无变化`);
     }
     else {
       fs.writeFileSync(dtsPath, out);
-      console.log(`${prev === null ? '＋' : '✎'}  ${name}  ${prev === null ? '新建' : '已更新'} index.d.uts.ts`);
+      console.log(`${prev === null ? '＋' : '✎'}  ${label}  ${prev === null ? '新建' : '已更新'} ${path.basename(dtsPath)}`);
       generated++;
     }
   }
@@ -527,7 +561,7 @@ function main() {
     console.log(stale === 0 ? '\n全部声明文件与源码同步 ✅' : `\n有 ${stale} 个模块不同步 ❌`);
   }
   else {
-    console.log(`\n完成：更新 ${generated} 个，共扫描 ${dirs.length} 个模块`);
+    console.log(`\n完成：更新 ${generated} 个，共扫描 ${targets.length} 个模块`);
   }
 }
 

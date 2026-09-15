@@ -751,7 +751,30 @@ export * from './vdom/user.uts';
 - **修法**：
   1. 纯属「消 Kotlin 警告」的注解直接删（去掉不影响任何行为），要留说明就写普通注释；
   2. 两边统一「先判长度、再取下标」：`const isMatch5Or6 = (match.length > 5 && match[5] != null) || (match.length > 6 && match[6] != null)`。Kotlin 侧不会越界；JS 侧未参与匹配的捕获组是 `undefined`，而 `undefined != null` 恰好也是 `false`，语义与 Kotlin 的 null 判断一致。
-- **附带发现（同一个坑的另一面）**：条件编译标记只认行首，所以**注释里不要让 `#ifdef` / `#ifndef` / `#endif` 出现在行首**（包括 `// #ifdef` 后面跟散文的写法）——那会被预处理器当成真标记，缺配对的 `#endif` 时可能把文件后半段整段吞掉。要在注释里提这些标记，就放在行中间（本项目 `rules.uts` 与 `Tokenizer.uts` 的注释都是这个写法）。
+- **附带发现（同一个坑的另一面）**：条件编译标记只认行首，所以**注释里不要让 `#ifdef` / `#ifndef` / `#endif` 出现在行首**（包括带前缀斜杠的写法）——那会被预处理器当成真标记，缺配对的 `#endif` 时可能把文件后半段整段吞掉。要在注释里提这些标记，就放在行中间（本项目 `rules.uts` 与 `Tokenizer.uts` 的注释都是这个写法）。
+
+- **⚠️ 同族第二坑：块注释里写「带斜杠前缀的条件编译标记」会让预处理器直接抛错**（本项目实测，`src/store/index.uts`）。在 `/** ... */` 块注释里写了一个斜杠前缀的标记名（形如 `// #ifdef` / `// #endif` 这种），整个 UTS 编译立即中断：
+
+  ```text
+  Error: Unbalanced right delimiter found in string at position 1774
+      at XRegExp.matchRecursive (.../xregexp/lib/addons/matchrecursive.js:237)
+      at matchReplacePass (.../@dcloudio/uni-cli-shared/lib/preprocess/lib/preprocess.js:311)
+  ```
+
+  - **根因**：预处理器用 xregexp 的 `matchRecursive` 做注释/标记的分隔符配对。块注释内出现「斜杠 + 标记名」的组合时，配对被打乱，抛出 `Unbalanced right delimiter`。注意**普通 `//` 散文（如引用源码里的 `// 如果是 web 和小程序……`）不会触发**，只有斜杠前缀**紧跟**标记名时才炸 —— 所以这坑极难靠肉眼发现。
+  - **修法**：注释里提到这些标记时**只写标记本身、不要带前缀斜杠**（写成 `` `#ifdef` `` 而不是带斜杠的形式）。本项目 `src/store/index.uts` 的注释即按此写法。
+  - **定位手法**：报错给的 `position N` 是**字符偏移**，直接切片看上下文即可，不用通读全文：
+
+    ```bash
+    python3 -c "
+    src=open('src/store/index.uts',encoding='utf-8').read()
+    p=1774
+    print(repr(src[p-60:p+60]))
+    print('line:', src[:p].count('\n')+1)
+    "
+    ```
+
+  - **红线**：`#ifdef` / `#ifndef` / `#endif` 这三个词，在 `.uts` 文件里**任何时候都不要带前缀斜杠写**，无论是在行首还是行中间、在块注释还是行注释里。
 - **排查手法（grep 产物，不要猜）**：
 
   ```bash
@@ -917,6 +940,109 @@ export * from './vdom/user.uts';
 - **一次性把这一族扫完（本项目已落地，`/tmp/km/_tok.ts`）**：拿**真实词法器输出**逐 token 对账「Parser 做了非空断言的字段，词法器是否真的给了」，把缺失字段与已知清单比对 —— 多出一项就是新的未判空断言。本项目实测结论：`html.token` 两个，**只有行内那个缺 `pre`**，全项目这一族仅此一处；`heading.depth`、`list.ordered` / `list.loose` 在 Tokenizer 里都是无条件赋值，安全。
 - **红线**：对**可能缺失的字段**做 `as` 非空断言前必须先判空；尤其 `Tokenizer` / `Parser` 这种"构造方与消费方分离"的代码 —— 消费方不能假定构造方永远给全字段。
 - **类型层面的证据（说明这个判空是类型正确的，不是打补丁）**：`utssdk/Tokens.interface.uts` 里 `NodesToken` 把 `pre` / `block` 声明为 **`boolean | null`**（Parser 里 `as NodesToken` 的目标类型就是它），所以赋 `null` 合法；而同一文件的 `HTML` 类型把它们声明成**非空** `boolean`。也就是说**行内分支造出来的 token 根本不满足 `HTML` 类型的契约** —— 消费方按 `HTML` 的严格语义去断言，就崩在这里。
+
+#### 1.3.18 多平台门面分流：`VUE3-VAPOR` 只代表「App 蒸汽模式」，**不覆盖 H5 / 小程序**；且小程序（uts2js）**不能从 `.ts` 文件经 `export *` 转发纯类型**
+
+本项目的 `src/store/index.uts` 是「Vapor（官方 Pinia） / VDOM（x-pinia-s）」双实现的**唯一编译期门面**。它同时踩到两颗雷，都会以「明明代码没问题却编译失败 / 平台走错分支」的形式出现。
+
+**雷一：`VUE3-VAPOR` 的语义范围被想当然放大 —— 且 `manifest.json` 的 `vapor` 开关对 Web / 小程序**完全无效**
+
+- `VUE3-VAPOR` 宏由 `uni-cli-shared` 依据 `process.env.UNI_APP_X_DOM2 === 'true'` 写入条件编译上下文（`dist/preprocess/context.js`：`uvueContext.VUE3_VAPOR = process.env.UNI_APP_X_DOM2 === 'true'`）。**它只在 App 蒸汽模式下成立。**
+- **关键事实（本项目已核实到框架源码）**：`uni-cli-shared/dist/hbx/alias.js` 对 web / 小程序**强制清除**该变量：
+
+  ```js
+  // 如果是 web 和小盘序，目前强制非蒸汽。
+  if (isWebOrMpPlatform(utsPlatform) || isWebOrMpPlatform(uniPlatform)) {
+      delete process.env.UNI_APP_X_DOM2;
+      delete process.env.UNI_APP_X_DOM2_DYNAMIC;
+  }
+  // isWebOrMpPlatform = (p === 'h5' || p === 'web' || p.startsWith('mp-'))
+  ```
+
+  ⇒ **`manifest.json` 里 `uni-app-x.vapor: true` 对 H5 / 全部小程序平台不产生任何效果**，这些平台的 `VUE3-VAPOR` 恒为 `false`。「在 manifest 开了 steam 就该全端走 vapor」这个直觉在 Web / 小程序上是**不成立**的 —— 只能靠代码里按平台名显式放行。
+- 因此「只按 `VUE3-VAPOR` 分流」的门面，会把 **H5 与全部小程序甩到 VDOM 分支**（这正是本项目此前的真实状态），而不是设计文档里写的「Web / 小程序也走蒸汽模式」。
+- **`#ifndef A || B` 的语义是 `!(A || B)`**，不是 `!(A) || B`。往 `#ifndef` 里追加平台要格外小心，写反了一端分支会整段消失。
+- **平台宏怎么选**（`context.js` 的 `initScopedPreContext()` 实测）：
+  - `platform.startsWith('mp-')` ⇒ `MP = true`，**且** `normalizeKey(platform) = true`（如 `MP_WEIXIN`、`MP_ALIPAY`）；
+  - `platform === 'h5'` ⇒ `WEB = true` **且** `H5 = true`（两者都成立）；
+  - App 端 ⇒ `APP = true` + `APP_ANDROID` / `APP_IOS` / `APP_HARMONY`。
+  - 所以「Web + 全部小程序」只需 `H5 || WEB || MP`（`H5` 已蕴含 `WEB`，都写上更直观）；只想放行某一个端才用 `MP-WEIXIN` 这种具体名。
+- **正确写法**（本项目已落地：manifest 开了蒸汽 ⇒ App 全端 + Web + 全部小程序都走官方 Pinia）：
+
+  ```uts
+  // #ifdef VUE3-VAPOR || H5 || WEB || MP
+  import pinia from './vapor/index.ts';
+  // #endif
+
+  // #ifndef VUE3-VAPOR || H5 || WEB || MP
+  import pinia from './vdom/index.uts';
+  // #endif
+  ```
+
+- **验证手段（不要靠肉眼看 `#ifdef`）**：直接用框架自带的预处理器对源文件求值，一次跑满全部目标平台上下文。本项目脚本 `/tmp/chg/check-pre.cjs`：
+
+  ```js
+  const { preprocess } = require('<项目>/node_modules/@dcloudio/uni-cli-shared/lib/preprocess/lib/preprocess.js');
+  const out = preprocess(src, ctx, { type: 'js' });   // ctx 逐个开关 H5 / WEB / MP / MP_WEIXIN / MP_ALIPAY / VUE3_VAPOR ...
+  ```
+
+  再 `matchAll` 出 `^import pinia from '...'` 与 `^export \* from '...'` 断言分支归属。**这比编译快一个数量级，且能一次覆盖 App-IOS / 鸿蒙 / 各小程序等当前跑不了或跑得慢的目标。**
+
+**雷二：微信小程序链路（uts2js）拿不到 `.ts` 文件里经 `export *` 转发的纯类型**
+
+- **报错现象**（本项目实测）：
+
+  ```text
+  [plugin:uts] "ISingleTokenRes" is not exported by ".../src/store/index.uts",
+    imported by ".../src/sub/auth/login.uvue?vue&type=script&setup=true&lang.uts".
+  at src/sub/auth/login.uvue:10:0
+    10: import type { ISingleTokenRes, IUserInfo } from '../../store';
+  ```
+
+- **根因**：门面用 `export * from './vapor/token'` 转发时，目标文件是 **`.ts`**；小程序侧的类型信息在 `.ts` 这条链路上丢失。**改写成 `./vapor/token.ts`（补扩展名）完全无效，报错一字不变** —— 所以这不是"扩展名没写全"，而是「`.ts` 经 `export *` 转发纯类型」这条组合在小程序链路不成立。反过来 `./vdom/token.uts`（`.uts` → `.uts`）一直好用。
+- **修法（本项目已落地）**：**把跨分支共享类型抽到一个只含 `type` 的 `.uts` 叶子文件，由门面无条件转发**，两个实现分支各自 `import type` 使用，**不再 `export type` 同名类型**：
+
+  ```uts
+  // src/store/types.uts  —— 唯一真源，只放 type，不放运行时代码
+  export type ISingleTokenRes = { token: string; expiresIn: number };
+  ```
+
+  ```uts
+  // src/store/index.uts —— 恒定向外转发，必须放在所有 #ifdef 之外
+  export * from './types.uts';
+  ```
+
+  两个分支的实现文件：
+
+  ```uts
+  // src/store/vapor/token.ts 与 src/store/vdom/token.uts 都这样写
+  import type { ILoginForm, ISingleTokenRes, IDoubleTokenRes, ITokenState } from '../types.uts';
+  ```
+
+- **为什么必须无条件转发**：类型与平台无关，两个分支共用同一套。放进 `#ifdef` 必然漏掉另一端；而 `.ts` / `.uts` 两种后缀的实现文件都要能拿到它。
+- **为什么不能让实现文件继续 `export type`**：门面会同时从 `./types.uts` 与 `./vapor/token` 收到同名类型，形成重复导出。
+- **本雷与 1.1.12 的关系**：**类型转发也是转发**。抽出的 `types.uts` 是叶子（不再往下星号导出），门面是唯一转发层 —— 依然满足「同一顶层符号只允许在一层门面 `export *`」的红线，不会产生 `useXxxStore__1`。
+- **本雷的连带修正**：`src/store/vapor/index.ts` 原本还写了 `export * from './app' | './token' | './user'`，与门面构成**两层转发**（正是 1.1.12 判定的 `__1` 改名场景）。该文件只应 `createPinia()` + 注册插件 + `export default pinia`，转发一律交给门面。
+
+**验证 mp-weixin 到底走了哪一支（看产物，不要看源码）**
+
+```bash
+ls unpackage/dist/dev/mp-weixin/src/store/            # 期望：index.js types.js vapor/  且【没有】vdom/
+grep -ao 'mode: *"vapor"' unpackage/dist/dev/mp-weixin/src/store/vapor/app.js
+grep -ao 'createPinia'    unpackage/dist/dev/mp-weixin/src/store/vapor/index.js
+grep -rl 'PiniaStoreBase\|x-pinia-s' unpackage/dist/dev/mp-weixin/   # 期望：只剩 StoreDemoCard 的展示文案
+grep -ao '\$persist' unpackage/dist/dev/mp-weixin/common/vendor.js   # 官方持久化插件已随包
+```
+
+**⚠️ CLI 编译 mp-weixin 会与开着的 HBuilderX IDE 抢 `unpackage/cache`**
+
+若 HBuilderX IDE 同时开着（尤其还挂着 `cli launch web` 开发服务），`cli launch mp-weixin --compile true` 会在编译尾声随机报：
+
+```text
+[plugin:uts] ENOENT: no such file or directory, open '.../unpackage/cache/.mp-weixin/.uts2js/cache/uts_<hash>/code/cache_/<hash>'
+```
+
+**报错点每次都落在不同的、与本次改动无关的文件上**（本项目实测两次分别指向 `NavBar.uvue:1:0` 与 `me.uvue:1:0`），且 `rm -rf unpackage/cache/.mp-weixin` 也压不住。**这是并发共享缓存的竞态，不是代码缺陷** —— 判据是「同一份代码换一次运行报错文件就变」。要干净的 CLI 验证就先关掉 IDE 的编译/监听；否则以产物内容为准，不要以 `已停止运行...` 为准（该行在**原始未改动代码**上同样会出现）。
 
 ---
 
@@ -1368,6 +1494,10 @@ onNavbarPullDownRefresh(() => {
 | **真机 `IndexOutOfBoundsException` 但 H5/单测一切正常** | `const next = arr[i + 1];` 写在循环外，边界判断 `i + 1 < arr.length` 写在下一行（JS 越界给 `undefined` 且被 `&&` 短路挡住，Kotlin 直接抛） | 把边界判断与读取写进**同一个** `&&`、判断在前：`while (i + 1 < arr.length && arr[i + 1].type == 'text')`（见 1.3.16） |
 | **原生端某条 CSS 只报警告、样式却没了（如 `vertical-align`）** | 看到 `is not a standard property name (may not be supported)` 就当噪音放过（`<sub>` / `<sup>` 实际只有字号生效、没有上下标偏移） | 这类警告一律回头确认该项样式是否真的生效 —— 原生端不认的属性全是「警告 + 静默失效」，同 1.2.13 / 1.2.14（见 1.2.18） |
 | **真机 `NullPointerException: null cannot be cast to non-null type kotlin.Boolean`** | 对可能缺失的字段做非空断言 `pre: token.pre as boolean`（行内 html token 根本没给 `pre`；JS 里 `null as boolean` 是空操作，所以 H5/小程序都好） | 判空后再断言：`token.pre == null ? null : (token.pre as boolean)`（见 1.3.17） |
+| **H5 / 微信小程序没走到预期的蒸汽（Vapor）分支** | 门面只用 `#ifdef VUE3-VAPOR` 分流（该宏**只在 App 蒸汽模式**成立；且框架对 web/小程序**强制删除** `UNI_APP_X_DOM2`，所以 `manifest.json` 里写 `vapor: true` 对它们**毫无作用**，二者双双落进 VDOM 分支） | 分流条件显式并列平台：`#ifdef VUE3-VAPOR \|\| H5 \|\| WEB \|\| MP`（`MP` 覆盖全部小程序；`H5` 已蕴含 `WEB`）；注意 `#ifndef A \|\| B` 语义是 `!(A \|\| B)`（见 1.3.18） |
+| **UTS 编译抛 `Error: Unbalanced right delimiter found in string at position N`** | 在 `/** */` 块注释里写了**带斜杠前缀**的条件编译标记名（形如 `// #ifdef` / `// #endif`）—— 普通斜杠散文不会触发，只有斜杠**紧跟**标记名时才炸，极难肉眼发现 | 注释里提到这些标记只写标记本身、不带前缀斜杠；定位用报错的字符偏移直接切片看上下文（见 1.3.12） |
+| **小程序报 `[plugin:uts] "ISingleTokenRes" is not exported by ".../store/index.uts"`** | 门面 `export * from './vapor/token'` 从 **`.ts`** 文件转发纯类型（补成 `./vapor/token.ts` 也**无效**，报错一字不变） | 跨分支共享类型抽到只含 `type` 的 **`.uts`** 叶子文件（如 `src/store/types.uts`），门面**无条件** `export * from './types.uts'`，两分支实现各自 `import type` 且不再 `export type` 同名类型（见 1.3.18） |
+| **CLI 编译 mp-weixin 报 `ENOENT ... .uts2js/cache/...` 且报错文件每次都不同** | 以为是代码缺陷，改源码 / 反复 `rm -rf unpackage/cache/.mp-weixin` | 这是**开着的 HBuilderX IDE 与 CLI 抢 `unpackage/cache` 的竞态**（判据：同一份代码换次运行报错文件就变）。要干净验证先关 IDE 编译/监听；否则以产物内容为准（`已停止运行...` 在原始未改动代码上同样出现，见 1.3.18） |
 
 ---
 
@@ -1409,6 +1539,10 @@ onNavbarPullDownRefresh(() => {
 - [ ] **32. 严禁用 `launch app-android --compile true` 或 `compile app-android --file` 充当 UTS 编译验证**（两者都**不执行**「编译为android class」，对本项目故意写坏的代码同样报"编译成功"；必须用不带 `--compile` 的真机构建，并先确认日志里 `编译为android class` 出现 ≥ 1 次，见 1.3.15）
 - [ ] **33. 数组 / 列表下标读取，边界判断必须与读取写在同一个短路表达式内、且判断在前**（严禁"先在上方或循环外读可能越界的下标，再在下方判边界"：JS 只给 `undefined` 且常被 `&&` 挡住，Kotlin 直接抛 `IndexOutOfBoundsException` —— 真机必崩而 H5 与 node 单测全绿，见 1.3.16）
 - [ ] **34. 对可能缺失的字段做 `as` 非空断言前必须先判空**（Kotlin 的 `as T` 不允许 null、直接抛 NPE，JS 侧却是空操作 ⇒ 只在真机崩；尤其构造方与消费方分离的代码，如 `Tokenizer` → `Parser`，见 1.3.17）
+- [ ] **35. 多平台门面分流严禁只用 `VUE3-VAPOR`**（该宏只代表 **App 蒸汽模式**；且框架在 `hbx/alias.js` 里对 web/小程序**强制删除** `UNI_APP_X_DOM2`，**`manifest.json` 的 `vapor: true` 对它们完全无效** —— 只按它分流会把 Web 与全部小程序错误甩进 VDOM 分支；必须并列平台：`#ifdef VUE3-VAPOR || H5 || WEB || MP`，并牢记 `#ifndef A || B` 语义是 `!(A || B)`，见 1.3.18）
+- [ ] **36. 跨分支共享的纯类型严禁放在 `.ts` 实现文件里经 `export *` 转发**（微信小程序 uts2js 链路拿不到 `.ts` 经 `export *` 转发的类型，业务侧 `import type` 直接报 `"[X]" is not exported by ".../store/index.uts"`；补 `.ts` 扩展名无效。必须抽到只含 `type` 的 `.uts` 叶子文件，由门面**无条件**转发，见 1.3.18）
+- [ ] **37. `.uts` 里 `#ifdef` / `#ifndef` / `#endif` 三个词任何时候都不要带前缀斜杠书写**（行首会当真标记、块注释里带斜杠前缀则直接抛 `Unbalanced right delimiter` 中断 UTS 编译；注释里只写标记本身，见 1.3.12）
+- [ ] **38. 带条件编译（`#ifdef` 分段）的 `.uts` 文件严禁套用「导入/导出排序」类自动格式化**（排序会跨过 `#endif` 把语句挪出条件块，导致两个平台分支的 `export *` 在**所有平台同时生效** —— 命中 `useXxxStore__1` 红线并触发 1.1.12 的 `NoSuchMethodError`；发现语句顺序异常先 `git diff` 复原，见 1.3.18）
 
 ---
 

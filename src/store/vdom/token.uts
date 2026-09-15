@@ -1,50 +1,6 @@
 import { defineStore, PiniaStoreBase } from '@/uni_modules/x-pinia-s';
-
-// ==========================================
-// 类型定义
-// ==========================================
-
-/**
- * 登录表单参数
- */
-export type ILoginForm = {
-  username: string;
-  password: string;
-};
-
-/**
- * 单 Token 模式返回值
- */
-export type ISingleTokenRes = {
-  token: string;
-  expiresIn: number;
-};
-
-/**
- * 双 Token 模式返回值
- */
-export type IDoubleTokenRes = {
-  accessToken: string;
-  accessExpiresIn: number;
-  refreshToken: string;
-  refreshExpiresIn: number;
-};
-
-/**
- * Token 信息联合类型（为保持 UTS 严格类型，使用单一 state 结构）
- */
-export type ITokenState = {
-  /** 单 token 模式 */
-  token: string;
-  expiresIn: number;
-  /** 双 token 模式 */
-  accessToken: string;
-  accessExpiresIn: number;
-  refreshToken: string;
-  refreshExpiresIn: number;
-  /** Token 过期时间戳 (ms) */
-  tokenExpireTime: number;
-};
+// 类型统一来自 src/store/types.uts（唯一真源），本文件严禁再 export type 同名类型
+import type { ILoginForm, ISingleTokenRes, IDoubleTokenRes, ITokenState } from '../types.uts';
 
 // ==========================================
 // Store 实现
