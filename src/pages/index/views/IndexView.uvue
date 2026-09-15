@@ -172,12 +172,19 @@ import { computed } from 'vue';
 import { useAppStore } from '@/src/store';
 import { systemInfo as systemInfoRef } from '@/src/utils/systemInfo/index.uts';
 import type { SystemInfoType } from '@/src/utils/systemInfo/index.uts';
+import { curIdx, onTabShow } from '@/src/tabbar/index.uts';
 
 const appStore = useAppStore();
 const isDark = computed((): boolean => appStore.state.isDark);
 const systemInfo = computed<SystemInfoType | null>((): SystemInfoType | null => systemInfoRef.value);
 
-console.log(systemInfo.value?.env, 111);
+
+// 监听 Tab 切换到当前功能页（索引 0）时触发
+onTabShow(0, () => {
+  console.log('切换到了首页 Tab');
+}, true);
+
+
 </script>
 
 <style scoped>
