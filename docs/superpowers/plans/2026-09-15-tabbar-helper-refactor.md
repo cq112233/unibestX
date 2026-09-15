@@ -1688,14 +1688,29 @@ grep -c "tabbarList" unpackage/dist/dev/mp-weixin/src/tabbar/internal/state.js
 /Applications/HBuilderX.app/Contents/MacOS/cli launch app-android --project /Users/chenqi/Desktop/unibestX --deviceId <上一步列出的序列号> 2>&1 | tee /tmp/tabbar-refactor-android.log | tail -20
 ```
 
-判定（缺一不可）：
+判定：
 
 ```bash
-grep -c "编译为android class" /tmp/tabbar-refactor-android.log   # 必须 >= 1
+grep -nE "编译器版本|编译目标" /tmp/tabbar-refactor-android.log   # 先确认当前编译模式
+grep -c "编译为android class" /tmp/tabbar-refactor-android.log   # VDOM 模式判据：必须 >= 1
 grep -nE "kotlin编译失败|error:|编译成功" /tmp/tabbar-refactor-android.log
 ```
 
-预期：第一个数字 ≥ 1，且出现 `项目 unibestX 编译成功。`，不出现 `kotlin编译失败`。
+预期（**按编译模式分开判定**）：
+
+- **VDOM 模式**（`当前视图层编译目标` 为 Kotlin 类）：`编译为android class` ≥ 1，且出现 `项目 unibestX 编译成功。`，不出现 `kotlin编译失败`。
+- **蒸汽模式（Vapor + 字节码）**：日志**不会**出现 `编译为android class`——该行只属于 VDOM→Kotlin 链路。此时判据改为「`项目 unibestX 编译成功。` + 不出现 `kotlin编译失败` + 真机运行时日志中出现指向 `src/tabbar/internal/<新文件>.uts` 的行」。
+
+> **2026-09-15 实测注记（任务 8 执行时补入）**：本仓库当时处于 `编译器版本：5.24（uni-app x）蒸汽模式` + `当前视图层编译目标：字节码`，`grep -c "编译为android class"` 命中 **0**——原判据在本模式下是**假阴性**，不代表验证落空。真机运行时日志给出了更强的证据，证明重构后的文件确实被编译进 App 并执行：
+>
+> ```text
+> hideTabBar fail: ...,  hideTabBar:fail tabBar is not exist at src/tabbar/internal/native.uts:30
+> 切换到了功能 Tab at src/pages/function/views/FunctionView.uvue:56
+> 功能页面刷新中... at src/pages/function/views/FunctionView.uvue:46
+> 功能页面刷新成功 at src/pages/function/views/FunctionView.uvue:48
+> ```
+>
+> 第一行来自任务 7 新建的 `native.uts`，sourcemap 路径指向**新文件**而非旧的 `helper/index.uts`，证明设备上跑的是重构后的代码而非缓存里的旧产物；后三行是 `onTabShow` 的回调，而 `onTabShow` 正是任务 6 迁入 `state.uts` 的符号。此后在本仓库做真机验证，判据一律以「运行时行指向的新文件路径」为准，不要以 `编译为android class` 是否出现为准。
 
 > 若日志只跑了十几秒就 `已停止运行`、且既无 `编译成功` 也无 `编译为android class`，那是被 IDE 里正在跑的真机/预览抢占了（skill 1.3.15），不是代码问题，重跑即可。
 >
@@ -1798,7 +1813,7 @@ git commit -m "docs: README 目录树同步 tabbar 模块拆分后的结构"
 - [ ] `pnpm check:uts-dts` 退出码 0
 - [ ] `pnpm build:h5` 输出 `编译成功` + `打包成功`
 - [ ] 微信小程序产物目录存在，且 `src/tabbar/internal/` 下 5 个 `.js` 齐全
-- [ ] 真机构建日志含 `编译为android class`（≥ 1 次）与 `项目 unibestX 编译成功。`
+- [ ] 真机构建日志含 `项目 unibestX 编译成功。`，且按模式取判据：VDOM 模式下另需 `编译为android class` ≥ 1 次；蒸汽模式下改为含指向 `src/tabbar/internal/<新文件>.uts` 的运行时行
 - [ ] 任务 8 步骤 6 的 5 项行为抽查全部通过
 
 ## 风险与回退
