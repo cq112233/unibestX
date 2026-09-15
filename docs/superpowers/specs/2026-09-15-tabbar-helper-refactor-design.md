@@ -39,7 +39,7 @@
 
 ### 目标
 
-- helper/ 内部按职责归位，每个文件可独立理解。
+- helper/ 内部按职责归位，每个文件可独立理解；该层目录更名为 `internal/`，名副其实。
 - 模块对外只保留一层门面，导出面收敛到真实契约。
 - 解开 store ↔ tabbar 的双向依赖。
 - 消费者 import 路径归一。
@@ -47,22 +47,22 @@
 ### 非目标（明确不做）
 
 - **不改任何运行时行为**。本次是纯搬家 + 导出面收敛。
-- 不重命名 `helper/` 目录、不动 `ui/` 与 `components/` 的布局。
+- 不动 `ui/` 与 `components/` 的布局。（原「不重命名 `helper/` 目录」一条在用户评审时被推翻：该目录更名为 `internal/`，见 §3.5。）
 - 不处理 `src/utils/systemInfo/index.uts` 反向 import `src/tabbar/config.uts` 这一处同模块内的环形依赖（记录备查，不在本次范围）。
 
 ## 3. 目标结构
 
-### 3.1 helper/ 内部拆为 5 个叶子文件
+### 3.1 internal/ 内部拆为 5 个叶子文件
 
 | 文件 | 职责 | 承接自 |
 | --- | --- | --- |
-| `helper/strategy.uts` | 策略枚举与模式判定 | index.uts 20-92 行 |
-| `helper/metrics.uts` | 尺寸常量与视口 / 主题计算 | index.uts 12-15、95-121 行 |
-| `helper/state.uts` | 列表与激活状态、路径匹配、激活订阅 | store.uts 全部 + index.uts 288-297 行 |
-| `helper/navigate.uts` | 跳转行为、中间按钮点击与原生监听 | index.uts 136-221、258-280 行 |
-| `helper/native.uts` | 平台桥接（隐藏原生 tabbar） | index.uts 226-256 行 |
+| `internal/strategy.uts` | 策略枚举与模式判定 | index.uts 20-92 行 |
+| `internal/metrics.uts` | 尺寸常量与视口 / 主题计算 | index.uts 12-15、95-121 行 |
+| `internal/state.uts` | 列表与激活状态、路径匹配、激活订阅 | store.uts 全部 + index.uts 288-297 行 |
+| `internal/navigate.uts` | 跳转行为、中间按钮点击与原生监听 | index.uts 136-221、258-280 行 |
+| `internal/native.uts` | 平台桥接（隐藏原生 tabbar） | index.uts 226-256 行 |
 
-`helper/index.uts` 与 `helper/store.uts` 删除。
+`helper/index.uts` 与 `helper/store.uts` 先随目录更名移至 `internal/`（§3.5），再由后续任务掏空并删除。
 
 各文件导出符号：
 
@@ -81,11 +81,11 @@
 ```uts
 export * from './config';
 export * from './types';
-export * from './helper/strategy.uts';
-export * from './helper/metrics.uts';
-export * from './helper/state.uts';
-export * from './helper/navigate.uts';
-export * from './helper/native.uts';
+export * from './internal/strategy.uts';
+export * from './internal/metrics.uts';
+export * from './internal/state.uts';
+export * from './internal/navigate.uts';
+export * from './internal/native.uts';
 ```
 
 **为什么用 `export *` 而不是显式具名再导出**：`export { x } from './y.uts'` 在本项目内无任何先例，属未验证语法；而单层 `export *` 是修好后的 `src/store/index.uts` 已经验证过的写法。在 UTS 的诸多已知陷阱面前，选择已验证形态优于语法优雅。
@@ -125,7 +125,7 @@ export const themeColor = ref(getDefaultTheme());
 | `src/tabbar/ui/default/TabbarItem.uvue:3` | `../../helper` | `@/src/tabbar` |
 | `src/tabbar/ui/capsule/index.uvue:14` | `../../helper` | `@/src/tabbar` |
 
-> 📌 **`App.uvue` 与 `App.ku.uvue` 是本表在实施阶段补入的两处。** 原先的梳理只覆盖了 `src/` 目录，两个根组件不在扫描范围内，而它们恰好用了最深、最不显眼的两种相对写法。漏掉它们的后果是：删除 `helper/index.uts` 后根组件直接编译失败。
+> 📌 **`App.uvue` 与 `App.ku.uvue` 是本表在实施阶段补入的两处。** 原先的梳理只覆盖了 `src/` 目录，两个根组件不在扫描范围内，而它们恰好用了最深、最不显眼的两种相对写法。漏掉它们的后果是：删除内层聚合 `index.uts` 后根组件直接编译失败。
 
 **另需改 themeColor 来源的 3 处**（入口本就是 `@/src/tabbar`，仅把 `themeColor` 改从主题域导入，属 §3.3 的范围，不在本表重复计数）：
 
@@ -138,6 +138,18 @@ export const themeColor = ref(getDefaultTheme());
 `src/pages/index/index.uvue` 与 `src/pages/function/views/FunctionView.uvue` 已是 `@/src/tabbar`，无需改动。
 
 **归一必须排在所有符号搬迁之前**：路径归一不改变导出面（纯字符串替换），但符号一搬迁，任何仍走深路径的消费者都会立刻编译失败。实施顺序见计划文档「任务 2」。
+
+### 3.5 目录更名为 `internal/`
+
+`src/tabbar/helper/` → `src/tabbar/internal/`，门面的聚合行同步由 `export * from './helper';` 改为 `export * from './internal';`。
+
+**为什么更名**：`src/tabbar/helper` 是**全项目唯一的 `helper/` 目录**（已 `find` 全仓确认），所以更名不破坏任何既有惯例。而 §3.1 拆出的 5 个叶子文件装的是 tabbar 模块的**实现主体**（策略判定、尺寸计算、状态、跳转、原生桥接），不是「辅助工具」，`helper` 名不副实。`internal` 明说「这是模块内部实现、请走门面」，与本次「把 8 个符号从对外面收回」的目标同构。
+
+**为什么不叫 `utils`**：项目已有全局 `src/utils/`（9 个子模块）。再设 `src/tabbar/utils/` 会让叶子文件里出现「utils 引用 `@/src/utils/…`」这种读起来含糊的导入。
+
+**为什么排在所有搬家之前**：改完 §3.4 的路径归一后，全仓对 `./helper` 的引用只剩门面那一行，此刻更名就是一次 `git mv` 加一行改动；若等搬完再改，`helper/` 与 `internal/` 会同时存在，中间态更乱。目录层级不变，两个文件里的相对导入（`./store`、`../config`、`../types`）全部继续有效，无需改动。
+
+**更名对导出面必须完全透明**：导出面检查脚本按门面的 `export *` 动态解析模块路径、没有硬编码任何目录名，因此更名前后符号数应纹丝不动（40 个）。
 
 ## 4. 约束与红线（本次适用）
 
@@ -177,7 +189,7 @@ grep -nE "^export function get[A-Z]" src/utils/theme/index.uts
 
 ## 7. 完成标准
 
-- `helper/` 下 5 个文件，各自职责单一，无 `index.uts` / `store.uts`。
+- `internal/` 下 5 个文件，各自职责单一，无 `index.uts` / `store.uts`。
 - `src/tabbar/index.uts` 为单层门面，无两层星号转发。
 - `themeColor` 位于 `src/utils/theme/index.uts`，`src/store` 不再被 tabbar 反向引用。
 - 全部 12 处消费者 import 归一为 `@/src/tabbar`（另 3 处 `themeColor` 来源改走主题域）。
