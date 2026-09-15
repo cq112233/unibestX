@@ -80,19 +80,31 @@
  * 静态解析 src/tabbar/index.uts 的 `export *` 图，列出可经 `@/src/tabbar` 导入的全部顶层
  * 符号。用于重构期间证明「对外契约只减不增、且减少的正是预期的那几个」。
  *
- * 用法：
+ * 用法（参数必须显式给出；不认识的参数一律报错退出）：
  *   node scripts/check-tabbar-surface.mjs              # 打印当前导出面并与基线比对
  *   node scripts/check-tabbar-surface.mjs --write      # 写入基线文件
  *   node scripts/check-tabbar-surface.mjs --expect 32  # 断言符号集与符号数，不符则退出码 1
  *
- * 解析器覆盖范围（刻意的设计取舍）：
- *   只静态识别以下已验证的导出写法，遇到其它写法一律报错退出，绝不静默计数 ——
- *     1. `export * from '…'`                    —— 递归遍历目标文件
- *     2. `export const|function|class|type|let|var|enum|interface <name>`
- *     3. 本地 `export { a, b }` / `export type { a, b }` —— 只记名字，不遍历
- *   命中 `export default`、`export * as ns from`、带 `from` 的 `export { … } from` 时，
- *   直接打印错误并以退出码 1 中止（`--write` 也不会写盘）。宁可让检查失败，也不产出一份
- *   看起来正确、实则残缺的导出面。
+ * 解析策略：先剥注释，再逐行白名单 —— 不静默计数
+ *   读入文件后先剥掉块注释（含跨行）与行尾注释（用等长空格替换，保持行号对齐），
+ *   然后逐行扫描：任何匹配 `^\s*export\b` 的行都必须落在 EXPORT_SHAPES 这张形态表里，
+ *   否则直接报错并以退出码 1 中止（`--write` 也不会写盘，避免把残缺的面写成新基线）。
+ *   形态表是校验与计数的唯一事实来源，两者共用同一处定义，不会脱钩。
+ *
+ *   已支持的形态：
+ *     1. `export * from '…'`                                    —— 递归遍历目标文件
+ *     2. `export { a, b }` / `export type { a, b }`（不带 from） —— 只记名字，不遍历
+ *     3. `export const|let|var|function|class|type|enum|interface <标识符>`
+ *
+ *   故意 **不支持**、命中即报错的写法（白名单之外的一切）：
+ *     `export default`、`export * as ns from`、带 `from` 的 `export { … } from`、
+ *     `export async function`、`export function*`、`export declare …`、
+ *     `export abstract class`、`export namespace …`、`export = …`、
+ *     `export const { a, b } = obj`（解构）等等。
+ *   宁可让检查变红，也不产出一份看起来正确、实则残缺的导出面。
+ *
+ * 已知残余限制（刻意接受的取舍）：多行模板字符串里独占一行的 `export` 仍会被误判成导出
+ * 语句。这属于「误报」而非「静默漏计」—— 检查会变红、错误信息里带着原始行，人看得见。
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -102,6 +114,41 @@ import { fileURLToPath } from 'node:url';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const FACADE = path.join(ROOT, 'src/tabbar/index.uts');
 const BASELINE = path.join(ROOT, 'docs/superpowers/plans/tabbar-surface-baseline.txt');
+const USAGE = '用法：node scripts/check-tabbar-surface.mjs [--write | --expect <数量>]';
+
+/**
+ * 导出形态表：唯一的事实来源，同时驱动「逐行白名单校验」与「符号计数」。
+ * name 用于报错文案；re 匹配已 trim 的整行；kind 决定如何取名字。
+ * 第 3 条用 `\b` 收尾，因此 `export const {`（解构）、`export function*`（生成器）、
+ * `export async function` / `export declare` / `export abstract class` / `export namespace`
+ * / `export =` 都会被挡在白名单之外，走报错路径。
+ */
+const EXPORT_SHAPES = [
+  {
+    name: 'export * from \'<spec>\'',
+    re: /^export\s+\*\s+from\s+['"]([^'"]+)['"]\s*;?$/,
+    kind: 'reexport'
+  },
+  {
+    name: 'export { … } / export type { … }（不带 from）',
+    re: /^export\s+(?:type\s+)?\{([^}]*)\}\s*;?$/,
+    kind: 'names'
+  },
+  {
+    name: 'export const|let|var|function|class|type|enum|interface <标识符>',
+    re: /^export\s+(?:const|let|var|function|class|type|enum|interface)\s+([A-Za-z_$][\w$]*)\b.*$/,
+    kind: 'name'
+  }
+];
+
+const EXPORT_LINE = /^export\b/;
+
+/** 剥掉块注释与行尾注释；块注释用等长空格替换，保持行号与行内偏移不漂移 */
+function stripComments(src) {
+  return src
+    .replace(/\/\*[\s\S]*?\*\//g, m => m.replace(/[^\n]/g, ' '))
+    .replace(/\/\/[^\n]*/g, '');
+}
 
 /** 解析模块路径，依次尝试：原样、补 .uts、补 .ts、补 /index.uts、补 /index.ts */
 function resolveModule(fromFile, spec) {
@@ -116,13 +163,6 @@ function resolveModule(fromFile, spec) {
   return null;
 }
 
-/** 本脚本无法可靠解析的导出写法：命中即报错中止，不静默漏计 */
-const UNSUPPORTED_EXPORTS = [
-  /^[ \t]*export\s+default\b.*$/m,
-  /^[ \t]*export\s+\*\s+as\s+[\w$]+\s+from\b.*$/m,
-  /^[ \t]*export\s+(?:type\s+)?\{[^}]*\}[ \t]*from\b.*$/m
-];
-
 let parseError = false;
 const visited = new Set();
 const found = new Map();
@@ -132,49 +172,93 @@ function walk(file) {
   if (visited.has(abs))
     return;
   visited.add(abs);
-  const src = fs.readFileSync(abs, 'utf8');
+  const raw = fs.readFileSync(abs, 'utf8');
   const rel = path.relative(ROOT, abs);
+  const rawLines = raw.split('\n');
+  const lines = stripComments(raw).split('\n');
 
-  for (const pattern of UNSUPPORTED_EXPORTS) {
-    const bad = src.match(pattern);
-    if (bad != null) {
-      console.error(`✗ 遇到无法可靠解析的导出写法：${bad[0].trim()}（来自 ${rel}），请更新本脚本后再继续`);
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (!EXPORT_LINE.test(line))
+      continue;
+
+    const shape = EXPORT_SHAPES.find(s => s.re.test(line));
+    if (shape === undefined) {
+      console.error(`✗ 第 ${i + 1} 行是无法识别的导出写法：${rawLines[i].trim()}`);
+      console.error(`  来自 ${rel}，请更新本脚本的 EXPORT_SHAPES 后再继续`);
       parseError = true;
       return;
     }
-  }
 
-  for (const m of src.matchAll(/^\s*export\s+\*\s+from\s+['"]([^'"]+)['"]/gm)) {
-    const target = resolveModule(abs, m[1]);
-    if (target == null) {
-      console.error(`✗ 无法解析重导出目标：${m[1]}（来自 ${rel}）`);
-      parseError = true;
-      continue;
+    const m = line.match(shape.re);
+    if (shape.kind === 'reexport') {
+      const target = resolveModule(abs, m[1]);
+      if (target == null) {
+        console.error(`✗ 无法解析重导出目标：${m[1]}（来自 ${rel}，第 ${i + 1} 行）`);
+        parseError = true;
+        continue;
+      }
+      walk(target);
     }
-    walk(target);
-  }
-  for (const m of src.matchAll(/^\s*export\s+(?:const|function|class|type|let|var|enum|interface)\s+([A-Za-z_$][\w$]*)/gm))
-    found.set(m[1], rel);
-  for (const m of src.matchAll(/^\s*export\s+(?:type\s+)?\{([^}]*)\}/gm)) {
-    for (const raw of m[1].split(',')) {
-      const name = raw.trim().split(/\s+as\s+/).pop()?.trim();
-      if (name != null && name !== '')
-        found.set(name, rel);
+    else if (shape.kind === 'names') {
+      for (const part of m[1].split(',')) {
+        const name = part.trim().split(/\s+as\s+/).pop()?.trim();
+        if (name != null && name !== '')
+          found.set(name, rel);
+      }
+    }
+    else {
+      found.set(m[1], rel);
     }
   }
 }
 
-walk(FACADE);
+const args = process.argv.slice(2);
+let wantWrite = false;
+let wantExpect = false;
+let expectRaw;
+let usageError = null;
+
+for (let i = 0; i < args.length; i++) {
+  const arg = args[i];
+  if (arg === '--write') {
+    wantWrite = true;
+  }
+  else if (arg === '--expect') {
+    wantExpect = true;
+    expectRaw = args[++i];
+  }
+  else if (usageError == null) {
+    // 只报第一个不认识的 token：这通常就是拼错的那个，后续 token 多是它的连带参数
+    usageError = `✗ 无法识别的参数：${arg}`;
+  }
+}
+
+if (usageError == null) {
+  try {
+    walk(FACADE);
+  }
+  catch (error) {
+    console.error(`✗ 无法读取文件：${FACADE}（${error.message}）`);
+    parseError = true;
+  }
+}
 
 const names = [...found.keys()].sort();
-const args = process.argv.slice(2);
 const baselineRel = path.relative(ROOT, BASELINE);
 
 /** 读取基线；文件不存在时返回 null */
 function readBaseline() {
   if (!fs.existsSync(BASELINE))
     return null;
-  return fs.readFileSync(BASELINE, 'utf8').split('\n').map(s => s.trim()).filter(s => s !== '');
+  try {
+    return fs.readFileSync(BASELINE, 'utf8').split('\n').map(s => s.trim()).filter(s => s !== '');
+  }
+  catch (error) {
+    console.error(`✗ 无法读取文件：${BASELINE}（${error.message}）`);
+    process.exitCode = 1;
+    return null;
+  }
 }
 
 /** 与基线做差集：removed 保基线序，added 保当前面序（来源文件取自 found） */
@@ -198,15 +282,20 @@ function printDiff(baseline, diff) {
     console.log(`新增：${formatAdded(diff.added)}`);
 }
 
-if (parseError) {
+if (usageError != null) {
+  console.error(usageError);
+  console.error(USAGE);
+  process.exitCode = 1;
+}
+else if (parseError) {
   console.error('✗ 导出面解析失败，已中止本次检查（未写入任何文件）');
   process.exitCode = 1;
 }
-else if (args.includes('--write') && args.includes('--expect')) {
+else if (wantWrite && wantExpect) {
   console.error('✗ --write 与 --expect 不能同时使用');
   process.exitCode = 1;
 }
-else if (args.includes('--write')) {
+else if (wantWrite) {
   const prev = readBaseline();
   if (prev != null) {
     const diff = diffAgainst(prev);
@@ -222,11 +311,11 @@ else if (args.includes('--write')) {
   fs.writeFileSync(BASELINE, `${names.join('\n')}\n`);
   console.log(`已写入基线：${baselineRel}（${names.length} 个符号）`);
 }
-else if (args.includes('--expect')) {
-  const raw = args[args.indexOf('--expect') + 1];
-  const expected = Number(raw);
-  if (raw === undefined || !Number.isInteger(expected) || expected < 0) {
-    console.error(`✗ 无效的 --expect 参数：${raw}`);
+else if (wantExpect) {
+  const expected = Number(expectRaw);
+  if (expectRaw === undefined || String(expectRaw).trim() === '' || !Number.isInteger(expected) || expected < 0) {
+    console.error(`✗ 无效的 --expect 参数：${expectRaw === undefined ? '(缺失)' : expectRaw}`);
+    console.error(USAGE);
     process.exitCode = 1;
   }
   else {
@@ -295,6 +384,11 @@ else {
 运行：`node scripts/check-tabbar-surface.mjs --write --expect 41; echo "exit=$?"`
 预期：`✗ --write 与 --expect 不能同时使用` + `exit=1`
 
+运行：`node scripts/check-tabbar-surface.mjs --expect=41; echo "exit=$?"`
+预期：`✗ 无法识别的参数：--expect=41` + `用法：node scripts/check-tabbar-surface.mjs [--write | --expect <数量>]` + `exit=1`（`--expect` 必须写成空格分隔的 `--expect 41`；`--expect ""`、拼错的 `--expct`、`-e`、其它未知参数同样 exit 1）
+
+> 参数必须显式给出：任何不认识的 token 一律报错退出，**绝不静默落进默认模式**——否则一个等号（`--expect=41`）就能得到「什么都没断言」的绿灯。
+>
 > `--expect` 同时断言**符号数**与**符号集**：删掉一个已有符号、再塞进一个凑数的假符号，总数虽不变，也会因「新增」非空而变红。本重构的不变式是「对外契约只减不增」，任何新增都必须立即失败。
 
 - [ ] **步骤 5：Commit**
@@ -426,7 +520,7 @@ grep -nE "^export function get[A-Z]" src/utils/theme/index.uts
 - [ ] **步骤 8：断言导出面减少 1 个符号**
 
 运行：`node scripts/check-tabbar-surface.mjs --expect 40; echo "exit=$?"`
-预期：`✓ 导出面符号数符合预期` + `exit=0`（`themeColor` 已不在 tabbar 门面上）
+预期：`✓ 导出面符号数符合预期` + `exit=0`（`themeColor` 已不在 tabbar 门面上）；并核对 `已移除：` 行恰为以下集合（基线始终是改造前的 41 个符号，故 `已移除` 是**累计**口径，顺序以脚本输出为准）：`themeColor`
 
 - [ ] **步骤 9：H5 编译验证**
 
@@ -555,7 +649,7 @@ export * from './types';
 - [ ] **步骤 4：断言导出面只少 5 个符号**
 
 运行：`node scripts/check-tabbar-surface.mjs --expect 35; echo "exit=$?"`
-预期：`✓ 导出面符号数符合预期` + `exit=0`
+预期：`✓ 导出面符号数符合预期` + `exit=0`；并核对 `已移除：` 行恰为以下集合（累计口径——含任务 1 已迁出的 `themeColor`，顺序以脚本输出为准）：`tabbarCacheEnable`、`customTabbarEnable`、`hasNativeTabbarConfig`、`isNoTabbar`、`isCapsuleTabbar`、`themeColor`
 
 - [ ] **步骤 5：H5 编译验证**
 
@@ -654,7 +748,7 @@ export * from './types';
 - [ ] **步骤 4：断言导出面数量不变**
 
 运行：`node scripts/check-tabbar-surface.mjs --expect 35; echo "exit=$?"`
-预期：`✓ 导出面符号数符合预期` + `exit=0`
+预期：`✓ 导出面符号数符合预期` + `exit=0`；并核对 `已移除：` 行恰为以下集合（**累计口径，与任务 2 相同**——本步不收回任何符号，故 `已移除：` 行仍然存在且为这 6 个，**不是空**；顺序以脚本输出为准）：`tabbarCacheEnable`、`customTabbarEnable`、`hasNativeTabbarConfig`、`isNoTabbar`、`isCapsuleTabbar`、`themeColor`；且 `新增：` 一行不出现
 
 - [ ] **步骤 5：H5 编译验证**
 
@@ -871,7 +965,7 @@ export * from './types';
 - [ ] **步骤 6：断言导出面少 2 个符号**
 
 运行：`node scripts/check-tabbar-surface.mjs --expect 33; echo "exit=$?"`
-预期：`✓ 导出面符号数符合预期` + `exit=0`（`buildFullTabbarList`、`customTabbarList` 已收回）
+预期：`✓ 导出面符号数符合预期` + `exit=0`（`buildFullTabbarList`、`customTabbarList` 已收回）；并核对 `已移除：` 行恰为以下集合（累计口径，顺序以脚本输出为准）：`buildFullTabbarList`、`customTabbarList`、`tabbarCacheEnable`、`customTabbarEnable`、`hasNativeTabbarConfig`、`isNoTabbar`、`isCapsuleTabbar`、`themeColor`
 
 - [ ] **步骤 7：H5 编译验证**
 
@@ -1104,7 +1198,7 @@ export * from './types';
 - [ ] **步骤 5：断言导出面少 1 个符号**
 
 运行：`node scripts/check-tabbar-surface.mjs --expect 32; echo "exit=$?"`
-预期：`✓ 导出面符号数符合预期` + `exit=0`（`handleClickBulge` 已收回为文件私有）
+预期：`✓ 导出面符号数符合预期` + `exit=0`（`handleClickBulge` 已收回为文件私有）；并核对 `已移除：` 行恰为以下集合（累计口径，顺序以脚本输出为准，共 9 个）：`buildFullTabbarList`、`customTabbarList`、`handleClickBulge`、`tabbarCacheEnable`、`customTabbarEnable`、`hasNativeTabbarConfig`、`isNoTabbar`、`isCapsuleTabbar`、`themeColor`
 
 - [ ] **步骤 6：H5 编译验证**
 
@@ -1149,9 +1243,9 @@ git commit -m "refactor: 拆出跳转与平台桥接叶子文件，删除 helper
 - [ ] **步骤 3：确认所有消费者都能从门面拿到它需要的符号**
 
 运行：`node scripts/check-tabbar-surface.mjs`
-预期：`基线 41 个，当前 32 个` / `已移除：buildFullTabbarList, customTabbarList, handleClickBulge, hasNativeTabbarConfig, isCapsuleTabbar, isNoTabbar, tabbarCacheEnable, customTabbarEnable, themeColor` / **`新增：`一行不出现**。
+预期：`基线 41 个，当前 32 个` / `已移除：` 行恰为以下集合（**累计**口径、顺序以脚本输出为准，共 9 个）：`buildFullTabbarList`、`customTabbarList`、`handleClickBulge`、`tabbarCacheEnable`、`customTabbarEnable`、`hasNativeTabbarConfig`、`isNoTabbar`、`isCapsuleTabbar`、`themeColor` / **`新增：`一行不出现**。
 
-> 这 9 个正是本次计划有意收回/迁出的符号（5 个零引用派生死常量 + 2 个列表派生内部函数 + 1 个文件私有跳转辅助 + 1 个迁往主题域的 ref）。若「已移除」清单与此不符，停止并核对。
+> 这 9 个正是本次计划有意收回/迁出的符号（5 个零引用派生死常量 + 2 个列表派生内部函数 + 1 个文件私有跳转辅助 + 1 个迁往主题域的 ref）。若「已移除」集合（忽略顺序）与此不符，停止并核对。
 
 - [ ] **步骤 4：H5 编译验证**
 
