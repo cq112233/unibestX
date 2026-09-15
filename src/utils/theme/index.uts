@@ -1,5 +1,5 @@
 import { nextTick } from 'vue';
-import themeJson from '../../theme.json';
+import themeJson from '../../../theme.json';
 
 /**
  * 外观模式类型：'auto'（跟随系统） | 'light'（浅色） | 'dark'（深色）
@@ -342,10 +342,10 @@ export function watchThemeChange(callback: () => void): void {
  * @example
  * ```uts
  * // 方式 1：标准具名导入
- * import { isDarkMode, getThemeTokens } from '@/src/utils/theme.uts';
+ * import { isDarkMode, getThemeTokens } from '@/src/utils/theme/index.uts';
  *
  * // 方式 2：对象单例导入（一目了然）
- * import { theme } from '@/src/utils/theme.uts';
+ * import { theme } from '@/src/utils/theme/index.uts';
  * console.log(theme.isDarkMode('auto'));
  * ```
  */

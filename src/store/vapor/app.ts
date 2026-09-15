@@ -8,8 +8,8 @@ import {
   getDefaultTheme,
   getSystemTheme,
   isDarkMode
-} from '@/src/utils/theme.uts';
-import { getDefaultLocale } from '@/src/utils/env.uts';
+} from '@/src/utils/theme/index.uts';
+import { getDefaultLocale } from '@/src/utils/env/index.uts';
 
 // ==========================================
 // 类型定义

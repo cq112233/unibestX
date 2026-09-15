@@ -7,8 +7,8 @@ import {
   getDefaultTheme,
   getSystemTheme,
   isDarkMode
-} from '@/src/utils/theme.uts';
-import { getDefaultLocale } from '@/src/utils/env.uts';
+} from '@/src/utils/theme/index.uts';
+import { getDefaultLocale } from '@/src/utils/env/index.uts';
 
 // ==========================================
 // 类型定义
@@ -217,7 +217,7 @@ export class AppStore extends PiniaStoreBase {
       this.state.isDark = true;
     }
     else {
-      // auto：跟随系统 / 宿主主题（App 读 osTheme，H5 用 matchMedia，小程序读 hostTheme，见 src/utils/theme.uts）
+      // auto：跟随系统 / 宿主主题（App 读 osTheme，H5 用 matchMedia，小程序读 hostTheme，见 src/utils/theme/index.uts）
       this.state.isDark = getSystemTheme() == 'dark';
     }
 

@@ -10,7 +10,7 @@
  * @example
  * ```uts
  * import { requestStream, simulateStream } from '@/src/http/stream.uts';
- * import { scan, takeUntil } from '@/src/utils/rxjs-lite.uts';
+ * import { scan, takeUntil } from '@/src/utils/rxjs-lite/index.uts';
  *
  * const source = requestStream(url, body, null, 60000);
  * const sub = source
@@ -19,8 +19,8 @@
  * ```
  */
 
-import { Observable } from '@/src/utils/rxjs-lite.uts';
-import type { Subscriber, TeardownFn } from '@/src/utils/rxjs-lite.uts';
+import { Observable } from '@/src/utils/rxjs-lite/index.uts';
+import type { Subscriber, TeardownFn } from '@/src/utils/rxjs-lite/index.uts';
 
 // ==========================================
 // 类型定义（禁止 interface，统一使用 type）

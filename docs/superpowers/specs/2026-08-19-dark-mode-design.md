@@ -63,10 +63,10 @@ initThemeMode(): void {
 ```
 
 - `setThemeMode(mode)`：写 `themeMode`，App 端调用 `uni.setAppTheme`，再 `refreshIsDark()`
-- `refreshIsDark()`：`light` / `dark` 直接赋值；`auto` 时调用 `getSystemTheme()`（`src/utils/theme.uts`，App 读 `osTheme`，H5 用 `matchMedia`，小程序读 `hostTheme`）；H5 同步 `html[data-theme]`
+- `refreshIsDark()`：`light` / `dark` 直接赋值；`auto` 时调用 `getSystemTheme()`（`src/utils/theme/index.uts`，App 读 `osTheme`，H5 用 `matchMedia`，小程序读 `hostTheme`）；H5 同步 `html[data-theme]`
 - `_doReset` / `_hydrate` 沿用 x-pinia 持久化钩子，无额外依赖
 
-### 2. 工具函数：`src/utils/theme.uts`
+### 2. 工具函数：`src/utils/theme/index.uts`
 
 「获取系统/宿主主题」收敛到 utils，store 不直接触碰平台 API：
 
@@ -183,7 +183,7 @@ const themeStyle = computed((): UTSJSONObject => {
 
 ### 9. 自定义 NavBar / TabBar 跟随 theme.json
 
-uvue 组件运行时无法读取 `theme.json`（该文件仅供 pages.json 使用），因此将 theme.json 的亮 / 暗色值镜像到 `src/utils/theme.uts` 的 `getThemeTokens(isDark)`：
+uvue 组件运行时无法读取 `theme.json`（该文件仅供 pages.json 使用），因此将 theme.json 的亮 / 暗色值镜像到 `src/utils/theme/index.uts` 的 `getThemeTokens(isDark)`：
 
 - `NavBar`：`bgColor` / `titleColor` 默认改为空串，未显式传色时取 `tokens.navBg` / `tokens.navText`；显式传色（如 uview-ultra demo 页 `bg-color="#ffffff"`）仍优先
 - `TabBar`（`src/tabbar/index.uvue` + `TabbarItem.uvue`）：底板 / 安全区背景、顶部边框、未选中 / 选中颜色分别取 `tokens.tabBg` / `tokens.tabBorder` / `tokens.tabColor` / `tokens.tabSelected`

@@ -609,11 +609,11 @@ src/tabbar/config.uts (唯一样本源)
 
 - 根目录 `theme.json` 定义 `light` / `dark` 两套色板（导航栏、TabBar、页面背景等）；
 - `pages.json` 通过 `@` 变量引用（如 `"navigationBarBackgroundColor": "@navigationBarBackgroundColor"`），驱动原生导航栏 / TabBar / 页面背景；
-- 自定义组件（NavBar、TabBar、全局容器）通过 `src/utils/theme.uts` 的 `getThemeTokens()` 读取同一份色板，保证与原生配置一致。
+- 自定义组件（NavBar、TabBar、全局容器）通过 `src/utils/theme/index.uts` 的 `getThemeTokens()` 读取同一份色板，保证与原生配置一致。
 
 > 💡 **修改 `light` / `dark` 主题配色，请统一在根目录 `theme.json` 中配置**（单源维护，`pages.json` 与自定义组件自动同步生效，勿在页面或组件中写死颜色）。
 
-> 💡 **全局导航栏如何跟随主题**：uni-app X 没有「运行时全局 navbar 配置」API，原生导航栏样式属于**编译期静态配置**（`pages.json` 的 `@变量`）。运行时切换主题时，由 `src/utils/theme.uts` 的 `applyNavbarTheme()` 同步（挂载在全局根包裹组件 `App.ku.uvue` 的 `onShow` 与主题监听上，每个页面切换都会触发）：H5 直接修改 `uni-page-head` 的 DOM 样式（背景 / 文字 / 按钮色）；微信小程序无 DOM，走官方 `uni.setNavigationBarColor`；App 端由 `uni.setAppTheme` 系统级切换，自动跟随。`navigationStyle: custom` 的页面没有 `uni-page-head`，H5 自动跳过。
+> 💡 **全局导航栏如何跟随主题**：uni-app X 没有「运行时全局 navbar 配置」API，原生导航栏样式属于**编译期静态配置**（`pages.json` 的 `@变量`）。运行时切换主题时，由 `src/utils/theme/index.uts` 的 `applyNavbarTheme()` 同步（挂载在全局根包裹组件 `App.ku.uvue` 的 `onShow` 与主题监听上，每个页面切换都会触发）：H5 直接修改 `uni-page-head` 的 DOM 样式（背景 / 文字 / 按钮色）；微信小程序无 DOM，走官方 `uni.setNavigationBarColor`；App 端由 `uni.setAppTheme` 系统级切换，自动跟随。`navigationStyle: custom` 的页面没有 `uni-page-head`，H5 自动跳过。
 
 ⚠️ **平台限制说明**：
 
@@ -640,7 +640,7 @@ src/tabbar/config.uts (唯一样本源)
 
 ### 文件上传
 
-基于原生 `uni.uploadFile` 统一封装的高性能跨端文件上传模块（位于 `src/utils/upload.uts`）：
+基于原生 `uni.uploadFile` 统一封装的高性能跨端文件上传模块（位于 `src/utils/upload/index.uts`）：
 
 - **跨端原生适配**：全端通用（App Android / iOS / HarmonyOS、微信小程序、H5）。
 - **统一鉴权**：自动从 `TokenStore` 注入 `header.token`（支持 `ignoreAuth: true` 跳过鉴权）。
@@ -658,12 +658,12 @@ VITE_UPLOAD_BASEURL=https://xxx.com                     # 上传基础域名
 VITE_UPLOAD_PATH=/gateway/user/sys/oss/upload/xxx       # 上传接口路由
 ```
 
-底层 [`src/utils/upload.uts`](src/utils/upload.uts) 会自动从 `import.meta.env` 读取当前环境的配置，无需改动源码。
+底层 [`src/utils/upload/index.uts`](src/utils/upload/index.uts) 会自动从 `import.meta.env` 读取当前环境的配置，无需改动源码。
 
 #### 调用示例
 
 ```uts
-import { uploadOssFile, uploadFile } from '@/src/utils/upload';
+import { uploadOssFile, uploadFile } from '@/src/utils/upload/index.uts';
 
 // 1. 快捷上传图片到 OSS
 uploadOssFile(filePath)

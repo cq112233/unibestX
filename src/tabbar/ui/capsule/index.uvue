@@ -13,11 +13,11 @@ import {
   tabbarList,
   themeColor
 } from '../../helper';
-import { $t } from '@/src/utils/i18n';
+import { $t } from '@/src/utils/i18n/index.uts';
 import { useAppStore } from '@/src/store';
-import { getThemeTokens } from '@/src/utils/theme';
-import type { ThemeTokens } from '@/src/utils/theme';
-import { safeAreaInsets } from '@/src/utils/systemInfo';
+import { getThemeTokens } from '@/src/utils/theme/index.uts';
+import type { ThemeTokens } from '@/src/utils/theme/index.uts';
+import { safeAreaInsets } from '@/src/utils/systemInfo/index.uts';
 
 defineProps({
   /** 悬浮 TabBar 容器高度（默认 64px） */

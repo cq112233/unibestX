@@ -227,9 +227,9 @@ import { computed, ref } from 'vue';
 import Card from '@/src/pages/basic/components/Card.uvue';
 import { foo, FOO_UPLOAD_PATH, getFooList, uploadFooFile } from '@/src/api/foo';
 import type { IFoo } from '@/src/api/foo';
-import { DEFAULT_OSS_BASE_URL } from '@/src/utils/upload';
-import { toast, toastSuccess } from '@/src/utils/toast.uts';
-import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/utils/refresh.uts';
+import { DEFAULT_OSS_BASE_URL } from '@/src/utils/upload/index.uts';
+import { toast, toastSuccess } from '@/src/utils/toast/index.uts';
+import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/utils/refresh/index.uts';
 
 definePage({
   layout: 'navbar',
@@ -461,7 +461,7 @@ async function uploadFileByPath(filePath: string) {
 }
 
 /**
- * 选择图片并上传（uploadFooFile → utils/upload.uts → uni.uploadFile）
+ * 选择图片并上传（uploadFooFile → utils/upload/index.uts → uni.uploadFile）
  */
 function chooseAndUpload() {
   if (uploadLoading.value) {

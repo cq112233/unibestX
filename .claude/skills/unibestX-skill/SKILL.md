@@ -176,7 +176,7 @@ function getLength(str: string | null): number {
 - **静态初始化**：禁止静态块 `static {}`，使用私有静态方法 `private static initData()` 初始化 (`UTS110111130`)。
 - **继承要求**：子类继承必须显式声明 `constructor()` 并调用 `super()` (`UTS110111131`)。
 - **禁止传递 Class**：Class 仅作为类型使用，禁止赋值给变量或作为普通对象传递，需使用工厂函数 (`UTS110111151`)。
-- **`super(...)` 构造实参中不能引用 `this`**：Kotlin 端父类构造先于子类字段初始化执行，`super(...)` 的实参里引用 `this` 会编译失败。需要把「子类自己的状态」交给父类构造时（典型如 `class Subject extends Observable`），**改用组合而非继承**：让 `Subject` 持有一个私有 `_observers` 数组，并额外提供 `asObservable(): Observable<T>` 返回一个由 `this` 闭包驱动的 `Observable` 供下游 `.pipe()` 使用。本项目实现见 `src/utils/rxjs-lite.uts` 的 `Subject`。
+- **`super(...)` 构造实参中不能引用 `this`**：Kotlin 端父类构造先于子类字段初始化执行，`super(...)` 的实参里引用 `this` 会编译失败。需要把「子类自己的状态」交给父类构造时（典型如 `class Subject extends Observable`），**改用组合而非继承**：让 `Subject` 持有一个私有 `_observers` 数组，并额外提供 `asObservable(): Observable<T>` 返回一个由 `this` 闭包驱动的 `Observable` 供下游 `.pipe()` 使用。本项目实现见 `src/utils/rxjs-lite/index.uts` 的 `Subject`。
 
 #### 1.1.10 严禁在对象字面量（UTSJSONObject）中放入顶层函数作为聚合对象导出
 
@@ -184,7 +184,7 @@ function getLength(str: string | null): number {
 - **底层原理**：UTS 在 Android 端将对象字面量 `{ getApiBaseUrl }` 编译为 Kotlin 的 `_uO("getApiBaseUrl" to getApiBaseUrl)`。在 Kotlin 语法中，顶层函数名 `getApiBaseUrl` 不能作为裸值赋值给键值对，编译器会强行要求函数调用 `getApiBaseUrl()`；且 `UTSJSONObject` 在强类型原生端无法动态调用方法。
 - **强制规范**：
   1. 所有工具库必须使用标准 ES 模块具名函数导出：`export function getApiBaseUrl(): string { ... }`；
-  2. 业务方统一按需具名解构导入：`import { getApiBaseUrl } from '@/src/utils/env.uts'`；
+  2. 业务方统一按需具名解构导入：`import { getApiBaseUrl } from '@/src/utils/env/index.uts'`；
   3. **一律严禁**写出如 `export const env = { getApiBaseUrl, ... }` 或 `export default { ... }` 这种包裹函数的对象字面量导出。
 
 #### 1.1.11 严禁顶层函数与同名属性采用 Getter 命名冲突（Kotlin 平台声明冲突导致 NoSuchMethodError）
@@ -194,6 +194,21 @@ function getLength(str: string | null): number {
 - **强制规范**：
   1. 顶层若已导出属性 `export const windowHeight = computed(...)`，**严禁在顶层额外导出 `export function getWindowHeight()`**；
   2. 若需面向对象风格的调用，封装在独立 class 的实例方法中（如 `systemUtils.getWindowHeight()`），因为类实例方法编译为类成员虚拟方法，绝不会干扰包顶层的静态方法签名。
+- **⚠️ 极易漏判**：冲突的判定只取决于**名字形状**（`foo` ↔ `getFoo`），与两个声明的**业务语义是否相关无关**。只要顶层有 `export const tabBarHeight = computed(...)`，那么同文件的顶层 `export function getTabBarHeight(includeSafeArea: boolean)` 就必然冲突 —— 哪怕它带参数、语义上看着是"另一个函数"。**同理，顶层 `export function getScrollHeight()` 与顶层 `export const scrollHeight = computed(...)` 也会撞**。
+- **⚠️ 为什么 H5 / 本地开发期发现不了**：H5 编译目标是 JS，不产生 Kotlin 静态 getter；`launch app-android --compile true` 也**不到 Kotlin 阶段**。所以本项目 `pnpm build:h5` 全绿、真机才炸，**不能用 H5 构建通过来证明这条规则没被违反**。
+- **本项目真实案例（2026-09-15，`src/utils/systemInfo/index.uts` 重构）**：该文件同时存在顶层 `export const tabBarHeight = computed(...)` 与顶层 `export function getTabBarHeight(includeSafeArea)`，正好命中此坑。处置方式：
+  - 顶层 `getTabBarHeight(includeSafeArea)` → 改名为**私有** `calcTabBarHeight(includeSafeArea)`（去掉 `export`，且主动避开 `get` 前缀）；
+  - 顶层 `getNavBarHeight()` → **直接删除**（它只是 `navBarHeight.value` 的转发，无独立逻辑）；
+  - 两个带参数的对外入口统一收敛到 `SystemUtils` 类的实例方法 `getNavBarHeight()` / `getTabBarHeight(includeSafeArea)`；
+  - 同轮把可写 `ref`（`menuRect`）改为「私有 `menuRectRef` + 对外只读 `computed`」，让对外导出面里**没有可写 ref**，顺带消掉一类"外部误写状态"的隐患。
+- **自查命令（改完 `.uts` 导出面后跑一次）**：
+
+  ```bash
+  # 1) 列出顶层属性/computed —— 每个名字都隐含一个 get<Name>() Kotlin 静态 getter
+  grep -nE "^export const [A-Za-z_]" src/utils/xxx/index.uts
+  # 2) 顶层若出现 get* 函数，逐个与上一步的名字比对；命中即违规
+  grep -nE "^export function get[A-Z]" src/utils/xxx/index.uts
+  ```
 
 #### 1.1.12 严禁多层 / 重复 `export *` 星号重导出同一顶层符号（Kotlin 端符号被改名 `xxx__1`）
 
@@ -970,7 +985,7 @@ export * from './vdom/user.uts';
 
 <script setup lang="uts">
 import { computed, ref } from 'vue';
-import { availableHeight } from '@/src/utils/systemInfo.uts';
+import { availableHeight } from '@/src/utils/systemInfo/index.uts';
 
 definePage({
   layout: 'navbar',
@@ -1022,12 +1037,12 @@ function handleScrollToLower(): void {
 
 - `definePage` 中 `showBack: false`（主 TabBar 页面无需返回箭头）；
 - 顶层配置 `enablePullDownRefresh: true` 开启自定义平滑下拉刷新；
-- 统一从 `@/src/utils/refresh.uts` 引入 `onNavbarPullDownRefresh` 与 `stopNavbarPullDownRefresh`；
+- 统一从 `@/src/utils/refresh/index.uts` 引入 `onNavbarPullDownRefresh` 与 `stopNavbarPullDownRefresh`；
 - （仅限首页配置 `type: 'home'`，其余 TabBar 页面不填）。
 
 ```uts
 <script setup lang="uts">
-import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/utils/refresh.uts';
+import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/utils/refresh/index.uts';
 
 definePage({
   layout: 'navbar',
@@ -1079,7 +1094,7 @@ onNavbarPullDownRefresh(() => {
 </template>
 
 <script setup lang="uts">
-import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/utils/refresh.uts';
+import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/utils/refresh/index.uts';
 
 definePage({
   layout: 'navbar',
@@ -1104,7 +1119,7 @@ onNavbarPullDownRefresh(() => {
 
 ### 2.4 标杆案例 4：整页按内容高度自然滚动
 
-> 真实参考源：[src/utils/refresh.uts](file:///Users/chenqi/Desktop/unibestX/src/utils/refresh.uts)
+> 真实参考源：[src/utils/refresh/index.uts](file:///Users/chenqi/Desktop/unibestX/src/utils/refresh/index.uts)
 
 **设计要点**：
 
@@ -1114,7 +1129,7 @@ onNavbarPullDownRefresh(() => {
 
 ```uts
 <script setup lang="uts">
-import { onNavbarPageScroll, onNavbarReachBottom, PageScrollDetail } from '@/src/utils/refresh.uts';
+import { onNavbarPageScroll, onNavbarReachBottom, PageScrollDetail } from '@/src/utils/refresh/index.uts';
 
 definePage({
   layout: 'navbar',
@@ -1232,7 +1247,7 @@ graph TD
 
 <script setup lang="uts">
 import { ref } from 'vue';
-import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/utils/refresh.uts';
+import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/utils/refresh/index.uts';
 
 // 1. 显式声明页面布局与导航栏配置
 definePage({
@@ -1287,7 +1302,7 @@ function handleScrollToLower(): void {
 </template>
 
 <script setup lang="uts">
-import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/utils/refresh.uts';
+import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/utils/refresh/index.uts';
 
 definePage({
   layout: 'navbar',

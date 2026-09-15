@@ -63,8 +63,8 @@ import Card from './Card.uvue';
 import { computed } from 'vue';
 import type { ISingleTokenRes, IUserInfo } from '@/src/store';
 import { useAppStore, useTokenStore, useUserStore } from '@/src/store';
-import { getCompileMode } from '@/src/utils/env.uts';
-import { toastSuccess } from '@/src/utils/toast.uts';
+import { getCompileMode } from '@/src/utils/env/index.uts';
+import { toastSuccess } from '@/src/utils/toast/index.uts';
 
 const appStore = useAppStore();
 const userStore = useUserStore();

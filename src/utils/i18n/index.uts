@@ -1,5 +1,5 @@
-import i18n from '../i18n/index.uts';
-import { tabbarList } from '../tabbar/helper/index.uts';
+import i18n from '../../i18n/index.uts';
+import { tabbarList } from '../../tabbar/helper/index.uts';
 
 /**
  * 通用 i18n 翻译函数（未找到翻译时自动回退返回原 key 字符串）
@@ -83,10 +83,10 @@ export function testI18n(): void {
  * @example
  * ```uts
  * // 方式 1：标准具名导入
- * import { t, getI18nText } from '@/src/utils/i18n.uts';
+ * import { t, getI18nText } from '@/src/utils/i18n/index.uts';
  *
  * // 方式 2：对象单例导入（一目了然）
- * import { i18nUtils } from '@/src/utils/i18n.uts';
+ * import { i18nUtils } from '@/src/utils/i18n/index.uts';
  * console.log(i18nUtils.t('app.name'));
  * ```
  */

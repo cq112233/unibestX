@@ -1,9 +1,9 @@
 import { watch } from 'vue';
 import { curIdx, setCurIdx, setCurIdxByPath, tabbarList } from './store';
 import { useAppStore } from '@/src/store';
-import { getThemeTokens } from '@/src/utils/theme';
-import type { ThemeTokens } from '@/src/utils/theme';
-import { isCompilerVersionGte, safeAreaInsets, TABBAR_BASE_HEIGHT } from '@/src/utils/systemInfo';
+import { getThemeTokens } from '@/src/utils/theme/index.uts';
+import type { ThemeTokens } from '@/src/utils/theme/index.uts';
+import { isCompilerVersionGte, safeAreaInsets, TABBAR_BASE_HEIGHT } from '@/src/utils/systemInfo/index.uts';
 import { customTabbarConfig } from '../config';
 
 export * from './store';

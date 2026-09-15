@@ -19,7 +19,9 @@
     "lint:fix": "eslint . --fix",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
-    "docs:preview": "vitepress preview docs"
+    "docs:preview": "vitepress preview docs",
+    "gen:uts-dts": "node scripts/gen-uts-dts.mjs",
+    "check:uts-dts": "node scripts/gen-uts-dts.mjs --check"
   },
   "dependencies": {
     "@dcloudio/uni-app": "3.0.0-5020420260813002",

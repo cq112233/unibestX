@@ -106,7 +106,7 @@ export function allow(): GuardResult;
 export function block(redirect: string | null = null): GuardResult;
 ```
 
-> `type` 含函数字段在本项目已有先例：[src/utils/upload.uts](../../../src/utils/upload.uts) 的 `onProgress?: (progress: number) => void`。
+> `type` 含函数字段在本项目已有先例：[src/utils/upload/index.uts](../../../src/utils/upload/index.uts) 的 `onProgress?: (progress: number) => void`。
 
 ### 3.3 守卫链执行语义（`guard/index.uts`）
 

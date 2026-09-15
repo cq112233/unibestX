@@ -34,8 +34,8 @@ import { computed, onUnmounted, ref, watch } from 'vue';
 import Card from '@/src/pages/basic/components/Card.uvue';
 import { simulateStream } from '@/src/http/stream.uts';
 import type { StreamChunk } from '@/src/http/stream.uts';
-import type { Subscription } from '@/src/utils/rxjs-lite.uts';
-import { scan } from '@/src/utils/rxjs-lite.uts';
+import type { Subscription } from '@/src/utils/rxjs-lite/index.uts';
+import { scan } from '@/src/utils/rxjs-lite/index.uts';
 // 渲染链路：kux-marked（UTS 版 marked）解析 → mp-html.uvue 原生渲染。
 // MpHtml 显式写全路径，绕开 easycom 里 zero-markdown-view 自带的同名 mp-html.vue。
 // marked 刻意 import common 实现而非包根：包根在安卓端会拉 JSReg3.jar 导致编译中断，见 skill 1.3.10。

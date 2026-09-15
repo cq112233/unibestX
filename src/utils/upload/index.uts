@@ -1,5 +1,5 @@
 import { useTokenStore } from '@/src/store';
-import { getOssBaseUrl, getOssUploadPath, getOssUploadUrl } from './env.uts';
+import { getOssBaseUrl, getOssUploadPath, getOssUploadUrl } from '../env/index.uts';
 
 // ==========================================
 // 类型定义
@@ -203,10 +203,10 @@ function parseUploadResult(raw: string): string {
  * @example
  * ```uts
  * // 方式 1：标准具名导入
- * import { uploadFile, uploadOssFile } from '@/src/utils/upload.uts';
+ * import { uploadFile, uploadOssFile } from '@/src/utils/upload/index.uts';
  *
  * // 方式 2：对象单例导入（一目了然）
- * import { upload } from '@/src/utils/upload.uts';
+ * import { upload } from '@/src/utils/upload/index.uts';
  * upload.uploadOssFile(filePath);
  * ```
  */

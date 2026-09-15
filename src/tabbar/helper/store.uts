@@ -1,7 +1,7 @@
 import type { CustomTabBarItem, CustomTabBarItemBadge, TabBarConfig } from '../types';
 import { customTabbarConfig } from '../config';
-import { getDefaultTheme } from '@/src/utils/theme.uts';
-import { cleanPath, getCurrentPath, isSamePath } from '@/src/utils/route.uts';
+import { getDefaultTheme } from '@/src/utils/theme/index.uts';
+import { cleanPath, getCurrentPath, isSamePath } from '@/src/utils/route/index.uts';
 
 /** 组合 list 与 midButton 供自定义 TabBar 渲染（自动将 midButton 插入居中位置） */
 export function buildFullTabbarList(config: TabBarConfig): CustomTabBarItem[] {

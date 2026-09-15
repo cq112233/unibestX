@@ -50,10 +50,10 @@
 
 <script setup lang="uts">
 import { computed } from 'vue';
-import { NAVBAR_CONTENT_HEIGHT, safeAreaInsets, systemInfo } from '@/src/utils/systemInfo';
+import { NAVBAR_CONTENT_HEIGHT, safeAreaInsets, systemInfo } from '@/src/utils/systemInfo/index.uts';
 import { useAppStore } from '@/src/store';
-import { getThemeTokens } from '@/src/utils/theme';
-import type { ThemeTokens } from '@/src/utils/theme';
+import { getThemeTokens } from '@/src/utils/theme/index.uts';
+import type { ThemeTokens } from '@/src/utils/theme/index.uts';
 
 // 定义组件参数类型
 const props = defineProps({
