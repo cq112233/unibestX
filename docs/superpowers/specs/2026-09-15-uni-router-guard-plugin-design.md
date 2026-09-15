@@ -152,9 +152,9 @@ export type AfterNavigationHook = (to: RouteTarget, from: RouteTarget) => void
 ### 3.4 跳转门面
 
 ```uts
-router.push('/src/sub/user/detail?id=1')          // 字符串形态
+router.push('/src/sub/user/detail?id=1')                         // 字符串形态
 router.push({ path: '/src/sub/user/detail', query: { id: 1 } })  // 对象形态
-router.replace('/src/sub/auth/login')
+router.replace({ path: '/src/sub/auth/login' })
 router.relaunch('/src/pages/index/index')
 router.switchTab('/src/pages/me/me')
 router.back()      // 等价 back(1)
@@ -178,6 +178,39 @@ export type Router = {
 - `back` 同样用剩余参数，`router.back()` 与 `router.back(2)` 都合法（默认退 1 层）。
 - 返回值与底层 uni API 一致（`Promise<...> | null`）；导航被守卫拦截时返回 `null`。
 - 跳转门面是**薄封装**：守卫挂在 `uni.addInterceptor` 上，因此业务代码直接调 `uni.navigateTo` 同样会被拦截，门面只为写法一致与便于测试。
+
+#### 3.4.1 对象形态的内部读取方式
+
+`any` 位置的对象字面量在 UTS 里编译为 **`UTSJSONObject`**（`_uO(...)`，见红线 1.1.10 的编译产物说明），因此内部用 `getString('path')` / `getJSON('query')` 读取，**绝不对它做 `as SomeType` 强转** —— `as` 是 Kotlin 非空转换，`UTSJSONObject` → data class 会直接抛 `ClassCastException`（红线 1.3.1 / 1.3.17）。
+
+嵌套对象字面量 + `getJSON` 在本项目已有实证：`uni_modules/lime-i18n/common/composer.uts:60` 读的正是字面量里的嵌套对象。
+
+**由此产生一条必须写进 readme 的使用约束**：对象形态**只能直接传字面量**，不能先声明成变量再传。
+
+```uts
+// ✅ 正确：直接传字面量 → 编译为 UTSJSONObject，内部按 Json 读取
+router.push({ path: '/src/sub/user/detail', query: { id: 1 } })
+
+// ❌ 错误：变量带显式 type 标注 → 编译为 Kotlin data class，内部按 UTSJSONObject 读取时抛异常
+type MyLoc = { path: string }
+const loc: MyLoc = { path: '/src/sub/user/detail' }
+router.push(loc)
+```
+
+因此插件**不导出** `RouteLocation` 之类的对象类型 —— 导出它反而会诱导使用者写出上面那条错误写法。
+
+#### 3.4.2 query 值的序列化规则
+
+URL 是唯一跨页面通道，值最终只能是字符串：
+
+| 值类型 | 序列化结果 |
+| --- | --- |
+| `string` / `number` / `boolean` | 转字符串后 `encodeURIComponent` |
+| 数组 | 元素转字符串后用 `,` 连接（`{ ids: [1, 2] }` → `?ids=1,2`） |
+| 对象 | `JSON.stringify` 后再编码 |
+| `null` | 忽略该键 |
+
+类型判定用 `typeof` 与 `isArray()`，键遍历用 `UTSJSONObject.toMap()`（两者在本项目均有实证：`uni_modules/lime-i18n/common/util.uts:141`、`uni_modules/lime-i18n/common/composer.uts:99`）。
 
 ### 3.5 卸载
 
@@ -310,6 +343,7 @@ pass  → 返回 true，放行
 | --- | --- | --- |
 | `afterEach` 触发时机与 vue-router 语义不同 | 使用者在「导航失败」时也会收到 afterEach | 已写入 readme 与本文档 5.4；真机验证后可切换 |
 | `next` / `to` 使用 `any` | 失去该处的静态类型提示 | UTS 联合类型限制所致，无替代方案；类型说明写进 readme |
+| 对象形态**只能直接传字面量**（见 3.4.1） | 使用者若先把 `{ path, query }` 存进带类型标注的变量再传，App 端会抛 `ClassCastException`（H5/node 却正常，只在真机暴露） | 不导出对象类型以消除诱导；约束写进 readme；8.3 回归矩阵里加一条「变量承载对象形态」的用例 |
 | 自定义 API 只能走 `UTSJSONObject` 分支 | App 端自定义 API 的 options 需自身可被当作 `UTSJSONObject` 读取 | 文档明确；内置 5 个 API 不受影响 |
 | 相对路径解析依赖页栈 | 页栈为空（如冷启动首个页面）时解析结果可能不符预期 | 页栈为空时保持原样不做拼接，并要求使用绝对路径 |
 | 插件与 `src/router/` 同时安装 | 两条守卫链同时生效、重复重定向 | readme 明确「二选一」；本期不改造 `src/router/` |
@@ -347,6 +381,8 @@ pass  → 返回 true，放行
 - `next()` 放行 → 导航正常发生，`afterEach` 触发；
 - `next('/x')` → 原导航取消、跳到 `/x`，链条不继续；
 - `next(false)` → 无任何跳转；
+- `push({ path: '/xxx', query: { id: 1 } })` 对象形态 → 拼出 `/xxx?id=1` 并正常跳转；query 值覆盖 `string` / `number` / `boolean` / 数组四种类型（见 3.4.2）；
+- 「把对象形态存进带类型标注的变量再传」→ 记录真机实际表现，确认与 3.4.1 描述的边界一致；
 - 未调用 `next` → 导航取消 + 警告日志；
 - 5 个 API（`navigateTo` / `redirectTo` / `reLaunch` / `switchTab` / `navigateBack`）各自触发拦截；
 - 相对路径 `'subpage?id=1'` → 解析为当前页同目录的绝对路径；
