@@ -193,5 +193,5 @@ grep -nE "^export function get[A-Z]" src/utils/theme/index.uts
 - `src/tabbar/index.uts` 为单层门面，无两层星号转发。
 - `themeColor` 位于 `src/utils/theme/index.uts`，`src/store` 不再被 tabbar 反向引用。
 - 全部 12 处消费者 import 归一为 `@/src/tabbar`（另 3 处 `themeColor` 来源改走主题域）。
-- `README.md` 不再引用已不存在的 `src/tabbar/helper` 路径。
+- `README.md` 的**正文**不再引用已不存在的 `src/tabbar/helper` 路径（第 590 行小节标题已在任务 3 改掉）。**第 320 行的目录树条目不在任务 3 范围**——该目录树在本次重构前就已整体过时（它列出的 `custom/`、顶层 `TabbarItem.uvue`、顶层 `index.uvue` 均不存在，`src/utils/` 一段还把子目录写成了扁平文件），而任务 4-7 会立刻再次改变 `internal/` 的形态，此刻重写必然作废。故该树留到结构定型后由**任务 8 步骤 8** 一次性更新。
 - 上述四步验证全部通过，且该模块对外行为与改造前完全一致。

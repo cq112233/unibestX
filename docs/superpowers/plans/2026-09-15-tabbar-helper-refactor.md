@@ -1718,6 +1718,64 @@ git commit -m "fix: 处理 tabbar 重构后 Kotlin 阶段新增警告"
 
 若步骤 5 无新增警告，则本步骤跳过，直接进入验收。
 
+- [ ] **步骤 8：同步 README 的 `src/tabbar/` 目录树**
+
+**为什么放在这里而不是任务 3**：README 的目录树（`README.md` 第 317-328 行）在本次重构**之前就已整体过时**——它列出的 `tabbar/custom/`、顶层 `tabbar/TabbarItem.uvue`、顶层 `tabbar/index.uvue` 三个条目**都不存在**。而任务 4-7 会立刻再次改变 `internal/` 的形态，在任务 3 改写必然作废。现在（任务 7 已完成、结构定型）是唯一不会白做的时机。
+
+**只改 `src/tabbar/` 那一段。** 紧随其后的 `src/utils/` 一段（第 329-335 行）同样过时（实际全是子目录 `backPress/`、`env/`、`i18n/`、`refresh/`、`route/`、`rxjs-lite/`、`systemInfo/`、`theme/`、`toast/`、`upload/`，树里却写成扁平文件），但那与本重构无关，**不在本次范围，不要顺手改**。
+
+把 `README.md` 第 317-328 行这一段：
+
+```text
+│   ├── tabbar/               # 底部 TabBar 体系
+│   │   ├── custom/           #   悬浮胶囊 TabBar（悬空圆角 Dock 栏风格）
+│   │   │   └── index.uvue    #     悬浮胶囊组件
+│   │   ├── helper/           #   TabBar 状态与辅助工具
+│   │   │   ├── index.uts     #     TabBar 策略、安全路由跳转与主题 Token 辅助
+│   │   │   └── store.uts     #     TabBar 选中状态管理与响应式数据
+│   │   ├── TabbarItem.uvue   #   单个 Tab 项与角标（标准底座）
+│   │   ├── index.uvue        #   标准自定义 TabBar（带中间凸起鼓包 midButton）
+│   │   ├── config.uts        #   TabBar 统一配置（对齐 pages.json 规范，支持 type 风格切换）
+│   │   └── types.uts         #   TabBar 强类型定义
+```
+
+替换为（**执行前先跑 `find src/tabbar -type f | sort` 核对，若与实际不符以实际为准**）：
+
+```text
+│   ├── tabbar/               # 底部 TabBar 体系
+│   │   ├── internal/         #   模块内部实现（不对消费者暴露，请走 index.uts 门面）
+│   │   │   ├── strategy.uts  #     策略枚举与模式判定
+│   │   │   ├── metrics.uts   #     尺寸常量与视口 / 主题计算
+│   │   │   ├── state.uts     #     列表与激活状态、路径匹配、激活订阅
+│   │   │   ├── navigate.uts  #     跳转行为与原生中间按钮监听
+│   │   │   └── native.uts    #     平台桥接（隐藏原生 tabbar）
+│   │   ├── ui/               #   TabBar 视图层
+│   │   │   ├── capsule/      #     悬浮胶囊风格
+│   │   │   ├── default/      #     标准贴底风格（含 midButton 鼓包）
+│   │   │   └── template.uvue #     TabBar 视图模板
+│   │   ├── components/       #   容器与调度组件（TabViews、TabContent）
+│   │   ├── tabbar.uvue       #   TabBar 入口组件
+│   │   ├── index.uts         #   模块唯一门面（单层 export *）
+│   │   ├── config.uts        #   TabBar 统一配置（对齐 pages.json 规范，支持 type 风格切换）
+│   │   └── types.uts         #   TabBar 强类型定义
+```
+
+**验证**：
+
+```bash
+grep -n "helper/" README.md          # 预期：只剩 src/utils 无关命中（若有），无 tabbar 相关
+grep -n "internal/" README.md        # 预期：命中上面新增的那一行
+```
+
+**提交**：
+
+```bash
+git add README.md
+git commit -m "docs: README 目录树同步 tabbar 模块拆分后的结构"
+```
+
+> 🚨 只 `git add README.md`。不要 `git add -A`——本步骤前后跑过多次构建，`unpackage/` 下约 55 个已跟踪产物早被重写；`src/tabbar/types.uts` 也仍有用户未提交的改动。
+
 ---
 
 ## 验收标准
