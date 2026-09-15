@@ -8,6 +8,8 @@
 
 另有一份 [2026-09-14-router-guard-design.md](./2026-09-14-router-guard-design.md) 规划了 `src/router` 内部的**工厂式守卫重构**，那仍然是在业务工程内的改造，不属于本规格范围。
 
+`feat/router-guard` 分支（2026-09-15 上午）曾实现过一版同类插件，但它的公开形态是 `installRouterGuard({ guards, dispatch })` + 守卫对象数组、且要求宿主注入 `RouterDispatch` 才能跳 TabBar 页。本规格**不沿用**那一版，改为 `createRouter()` + `beforeEach(fn)` 的注册式形态（更贴 vue-router），并把 TabBar 的差异收敛为**可选**的 `resolveRedirectApi` 回调。该分支的 `uni_modules/uni-router-guard/` 与本规格产出的同名目录**不共存**：当前分支 `refactor/tabbar-helper-split` 上没有该目录，本规格从零创建。
+
 本规格新增一个 **与业务零耦合** 的 uni_modules 插件 `uni-router-guard`：只提供「导航拦截 + 守卫链 + 跳转门面」，**不含任何业务规则**（不做登录判断、不依赖 Pinia / store / 项目 utils）。
 
 ### 1.2 目标
@@ -50,6 +52,7 @@
 
 1. `to.params` 恒为 `{}`（无路由表 ⇒ 无动态段）。保留该字段只为让 vue-router 使用者的读取代码不用改。
 2. `afterEach` 在**放行时同步触发**，不是在「导航确认成功后」。理由见 5.4。
+3. `to.query` / `to.params` 是 `Map<string, string>` 而非对象，读法为 `to.query.get('id')` 而非 `to.query.id`。理由见 3.2（UTS 无法动态构造 `UTSJSONObject`）。
 
 **一个刻意的补充**：`to.api` / `from.api` 是本插件新增字段，值为触发本次导航的 uni API 名（`navigateTo` / `switchTab` …）。vue-router 没有这个概念，但排查「谁触发了这次跳转」时是刚需；放在 `to` 上而不是加第 4 个守卫参数，是为了让守卫签名与 vue-router **逐字相同**，使用者可以直接照搬 vue-router 的守卫写法。
 
@@ -78,6 +81,8 @@ export type RouterOptions = {
   maxRedirectDepth ?: number
   /** 打印拦截链路日志；不传用 false */
   debug ?: boolean
+  /** 裁决重定向时按 url 决定用哪个跳转 API（如「是 TabBar 页就 switchTab」）；不传则恒用 redirectApi */
+  resolveRedirectApi ?: (url: string) => string
 }
 ```
 
@@ -118,9 +123,9 @@ export type RouteTarget = {
   /** path + query 的完整形式 */
   fullPath: string
   /** 查询参数键值对，值恒为 string（URL 是唯一跨页面传参通道） */
-  query: UTSJSONObject
-  /** 与 vue-router 形态对齐：本插件无路由表，恒为空对象 */
-  params: UTSJSONObject
+  query: Map<string, string>
+  /** 与 vue-router 形态对齐：本插件无路由表，恒为空 Map */
+  params: Map<string, string>
   /** 本插件扩展字段：触发本次导航的 uni API 名（navigateTo / redirectTo / reLaunch / switchTab / navigateBack） */
   api: string
 }
@@ -131,6 +136,10 @@ export type Next = (...args: Array<any>) => void
 export type NavigationGuard = (to: RouteTarget, from: RouteTarget, next: Next) => void
 export type AfterNavigationHook = (to: RouteTarget, from: RouteTarget) => void
 ```
+
+**`query` 为什么是 `Map<string, string>` 而不是对象**：`to.query` 必须由 url 字符串**动态构造**，而 UTS 的 `UTSJSONObject` 只提供静态的 `assign` / `keys`，没有可用的动态写入接口（本项目对它的用法全是「读」，见 `uni_modules/lime-i18n/common/composer.uts`）。`Map` 则是本项目既有形态 —— `src/router/interceptor.uts:141` 的 `UrlObj.query` 就是 `Map<string, string>`。
+
+代价是读法从 vue-router 的 `to.query.id` 变成 `to.query.get('id')`，这条差异写进 readme。
 
 **`Next` 为什么用 `...args: Array<any>`**：[.agents/rules/uniappx.md:215](../../../.agents/rules/uniappx.md) 规定「UTS 的联合类型目前仅支持与 `null` 的联合，`string | number` 这类需声明为 `any`」。而 vue-router 的 `next()` / `next('/x')` / `next(false)` 三种形态的**参数个数与类型都不同**，只有剩余参数能同时容纳它们并保持零参数调用合法。剩余参数在本项目已有实证（`uni_modules/lime-i18n/common/util.uts:139` 的 `parseArgs(...args: Array<any>)`）。
 
@@ -304,9 +313,16 @@ function extractUrl(api: string, options: any): string {
 
 ```
 pass  → 返回 true，放行
-改跳  → 短路并调用 redirectApi 对应的 uni API；返回 false（取消原导航）
+改跳  → 短路并按下方规则选 API 调用；返回 false（取消原导航）
 中止  → 返回 false，不做任何跳转
 ```
+
+**改跳用哪个 uni API**，按两步决定：
+
+1. 传了 `resolveRedirectApi` → 用它按 url 逐个决定（如「是 TabBar 页就返回 `switchTab`」）；
+2. 没传 → 恒用 `redirectApi`（默认 `navigateTo`）。
+
+第 1 步存在的必要性：改跳目标若是 TabBar 页面，`uni.navigateTo` 会**直接失败**（uni 规定 TabBar 页只能用 `switchTab`）。插件对宿主的 TabBar 清单零知识，所以这里只留一个**可选**的纯函数钩子 —— 不传也能用，传了就能处理 TabBar 改跳，且不引入任何项目内依赖。
 
 重定向派发会**再次触发拦截器**（这是预期行为，也是「登录页放行」这类写法能终止链条的原因）。防死循环用**递增 + 放行归零**策略：
 
@@ -344,6 +360,8 @@ pass  → 返回 true，放行
 | `afterEach` 触发时机与 vue-router 语义不同 | 使用者在「导航失败」时也会收到 afterEach | 已写入 readme 与本文档 5.4；真机验证后可切换 |
 | `next` / `to` 使用 `any` | 失去该处的静态类型提示 | UTS 联合类型限制所致，无替代方案；类型说明写进 readme |
 | 对象形态**只能直接传字面量**（见 3.4.1） | 使用者若先把 `{ path, query }` 存进带类型标注的变量再传，App 端会抛 `ClassCastException`（H5/node 却正常，只在真机暴露） | 不导出对象类型以消除诱导；约束写进 readme；8.3 回归矩阵里加一条「变量承载对象形态」的用例 |
+| `to.query` 是 `Map` 而非对象（见 3.2） | 与 vue-router 读法不一致 | UTS 无法动态构造 `UTSJSONObject`，无替代方案；差异写进 readme |
+| 改跳目标是 TabBar 页时必须配 `resolveRedirectApi` | 不配则该次改跳失败（`uni.navigateTo` 不支持 TabBar 页） | 插件零知识宿主的 TabBar 清单，只能靠可选钩子；readme 给出配置示例 |
 | 自定义 API 只能走 `UTSJSONObject` 分支 | App 端自定义 API 的 options 需自身可被当作 `UTSJSONObject` 读取 | 文档明确；内置 5 个 API 不受影响 |
 | 相对路径解析依赖页栈 | 页栈为空（如冷启动首个页面）时解析结果可能不符预期 | 页栈为空时保持原样不做拼接，并要求使用绝对路径 |
 | 插件与 `src/router/` 同时安装 | 两条守卫链同时生效、重复重定向 | readme 明确「二选一」；本期不改造 `src/router/` |
