@@ -44,7 +44,9 @@ Skills 位于 `.claude/skills/` 目录，每个 skill 有独立的 `SKILL.md` �
 
 ## 项目规则与专属 Skills
 
-- **AI / Agent 必读铁律**：所有参与本项目开发的 AI、Agent 在进行任何编码、重构、修 bug 或新增页面任务前，**必须首先完整阅读并严格遵循 `unibestX-skill`**（`.claude/skills/unibestX-skill/SKILL.md`）。
-- **VDOM 与 Vapor 差异自动分类回写机制**：在开发或调试排错过程中，若遇到任何 UTS 语法、组件属性、生命周期、CSS 样式（如阴影、布局等）在 **VDOM 模式与 Vapor 模式不通用 / 存在渲染与表现差异** 的情况，AI / Agent **必须主动根据四维分类（语法规范、样式限制、运行时约束、快速对照表与红线清单）自动追加并同步到 `unibestX-skill/SKILL.md` 中**，严禁遗漏！
+- **AI / Agent 必读铁律**：所有参与本项目开发的 AI、Agent 在进行任何编码、重构、修 bug 或新增页面任务前，**必须首先完整阅读并严格遵循 `unibestX-skill`**（`.claude/skills/unibestX-skill/SKILL.md`）。该 Skill 为**「1 个入口 + 7 个分册」**结构：入口 `SKILL.md` 只常驻「概述 + 分册导航 + 3.3 对照表 + 3.4 红线清单」，正文细节在 `references/` 下的 7 个分册（`1.1-uts-syntax` / `1.2-styling` / `1.3-runtime` / `2-examples` / `3-codegen` / `4-utils` / `5-infra`）；命中导航或速查表条目时，**必须继续 Read 对应分册**核对完整正反例，不得只看入口结论就改代码。
+- **内置工具优先复用**：动手实现任何通用能力（取路由与路径、取主题色、读环境变量、多语言文案、提示弹窗、返回键接管、下拉刷新与导航栏控制、文件上传、系统与安全区尺寸、防抖节流与流式处理）之前，**必须先查 `unibestX-skill/references/4-utils.md`**，`src/utils/` 下已有 10 个现成模块可直接调用，严禁重复造轮子（如自己写 `uni.getSystemInfoSync()`、裸写 `setInterval` 做防抖、直接读 `import.meta.env.VITE_XXX`）。
+- **基础设施按既有配置走**：发起接口请求（**严禁自己写 `uni.request`**，鉴权头 / 业务码判定 / 401 跳登录都在 `src/http/request.uts` 的拦截器里）、做 SSE 打字机输出、改登录拦截与登录策略、**选页面 `layout` 或配 `definePage` 导航栏字段**、增改多语言文案之前，**必须先查 `unibestX-skill/references/5-infra.md`**。特别注意：**任何 `layout: 'navbar'` 的页面，`style.navigationStyle` 必须显式写 `'custom'`**，漏写会让导航栏、返回箭头、状态栏占位**静默消失且不报错**。
+- **VDOM 与 Vapor 差异自动分类回写机制**：在开发或调试排错过程中，若遇到任何 UTS 语法、组件属性、生命周期、CSS 样式（如阴影、布局等）在 **VDOM 模式与 Vapor 模式不通用 / 存在渲染与表现差异** 的情况，AI / Agent **必须主动根据四维分类自动追加到 `unibestX-skill/references/` 下的对应分册中**（语法规范 → `1.1-uts-syntax.md`；样式限制 → `1.2-styling.md`；运行时约束 → `1.3-runtime.md`；快速对照表与红线清单 → 入口 `SKILL.md` 的 3.3 / 3.4），并将 `.claude/skills/unibestX-skill/` 与 `.agents/skills/unibestX-skill/` 两份副本同步一致，严禁遗漏！
 - **必须遵守** `.agents/rules/uniappx.md` 中的 uni-app X 开发规范。每次会话开始时先 Read 该文件，并在编写 `.uvue`、`.uts`、`.ts`、`.scss` 文件时严格遵循其中的规则。
 - **一律禁止使用 `interface`**：在本项目中定义任何对象结构、状态、参数或返回值类型时，**一律禁止使用 `interface`**，**必须全部统一使用 `type`（类型别名）**，避免触发 UTS 底层对对象字面量赋值的 `UTS110111163` 编译错误。
