@@ -9,6 +9,7 @@ runGuardCases();
 if (failures.length > 0) {
   console.error(`\n❌ ${failures.length} 条失败`);
   process.exitCode = 1;
-} else {
+}
+else {
   console.log('\n✅ 全部通过');
 }

@@ -44,12 +44,12 @@ for (const name of UTS_SOURCES) {
     continue;
   }
   const src = fs.readFileSync(file, 'utf8');
-  if (/#\s*(ifdef|ifndef|endif)/.test(src)) {
+  if (/#\s*(?:ifdef|ifndef|endif)/.test(src)) {
     console.error(`✗ ${name} 里出现了条件编译标记：纯逻辑模块不应有平台分支`);
     process.exitCode = 1;
     continue;
   }
-  const out = src.replace(/from '(\.\/[^']+)\.uts'/g, "from '$1.ts'");
+  const out = src.replace(/from '(\.\/[^']+)\.uts'/g, 'from \'$1.ts\'');
   fs.writeFileSync(path.join(OUT, name.replace(/\.uts$/, '.ts')), out);
   console.log(`✓ ${name} → .build/${name.replace(/\.uts$/, '.ts')}`);
 }
@@ -68,6 +68,7 @@ for (const name of HARNESS_FILES) {
 if (missing > 0) {
   console.error(`\n${missing} 个文件缺失，构建中止`);
   process.exitCode = 1;
-} else {
+}
+else {
   console.log('\n构建完成，运行：node scripts/router-guard-test/.build/run.ts');
 }
