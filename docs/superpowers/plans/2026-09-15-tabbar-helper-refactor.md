@@ -23,6 +23,7 @@
 | 未使用私有常量只是 **warning**，不阻断 `pnpm lint` | 探针实测：`warning 'unusedPrivateFlag' is assigned a value but never used` + `eslint exit=0` |
 | 项目内**无** `export { x } from '...'` 先例 | 全仓 grep 无命中。故门面一律用已验证的单层 `export *` |
 | 项目内**无** `src/tabbar/index.d.uts.ts`，但 `@/src/tabbar` 已被 3 个 `.uvue` 正常导入 | 无扩展名的目录路径不需要配套声明文件；红线 39 只约束「以字面 `xxx.uts` 路径导入」的情形 |
+| `unpackage/dist/build/web/` 的 H5 产物**被 git 跟踪**，每次 `pnpm build:h5` 会重写约 55 个文件 | 建立基线时跑过一次构建，`git status` 随即出现大量 ` D`（旧 hash js）+ `??`（新 hash js） |
 | 存在一条**改造前就有**的间接依赖环：`store/*/app` → `utils/i18n` → `tabbar/helper` → `store` | `src/store/vapor/app.ts:4` 与 `src/store/vdom/app.uts:3` 均 `import i18n from '@/src/i18n/index.uts'`；`src/utils/i18n/index.uts:2` `import { tabbarList } from '../../tabbar/helper/index.uts'`；而 tabbar 的 `themeTokens` 反过来 `import { useAppStore } from '@/src/store'` |
 
 > **关于「解开双向依赖」的准确表述**：任务 1 解开的是 `store → tabbar` 的**直接**边（`themeColor`）。经 `i18n` 中介的间接环**本次不动**——它改造前就存在且当前工作正常。若要彻底切断，做法与 `themeColor` 同构：把暗色标志也上移到主题域（新增 `isDark` ref，由 app store 写入），`themeTokens` 改读它而不再 `useAppStore()`。那属于独立改动，不在本计划范围，需要时另开规格。
@@ -1160,9 +1161,11 @@ grep -nE "kotlin编译失败|error:|编译成功" /tmp/tabbar-refactor-android.l
 - [ ] **步骤 7：Commit（若步骤 5 捞出的警告带来修复）**
 
 ```bash
-git add -A
+git add -A src
 git commit -m "fix: 处理 tabbar 重构后 Kotlin 阶段新增警告"
 ```
+
+> **严禁 `git add -A`（不带路径）**：`unpackage/dist/build/web/` 的 H5 产物被本仓库跟踪，每次 `pnpm build:h5` 都会重写它们（旧 hash 文件变为删除、新 hash 文件变为未跟踪，约 55 个文件）。那属于构建噪声，不应混进重构 commit。本计划所有 commit 都用带路径的 `git add`。
 
 若步骤 5 无新增警告，则本步骤跳过，直接进入验收。
 
