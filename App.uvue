@@ -27,9 +27,32 @@ onLaunch(() => {
   // #endif
 });
 
+// TODO(临时): UTS 探针页自动打开，任务 10 结束后删除
+let probeTryCount: number = 0;
+function openProbePage(): void {
+  probeTryCount++;
+  uni.navigateTo({
+    url: '/src/sub/routerGuardProbe/routerGuardProbe',
+    fail: () => {
+      if (probeTryCount < 8) {
+        setTimeout(() => {
+          openProbePage();
+        }, 800);
+      }
+    }
+  });
+}
+
 onShow((options?) => {
   // #ifndef APP
   checkDirectEntry(options);
+  // #endif
+
+  // TODO(临时): UTS 探针页自动打开，任务 10 结束后删除
+  // #ifdef APP-ANDROID
+  setTimeout(() => {
+    openProbePage();
+  }, 1200);
   // #endif
 });
 </script>

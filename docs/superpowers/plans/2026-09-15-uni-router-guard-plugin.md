@@ -19,15 +19,59 @@
 | UTS **不支持任意类型联合**，`string \| number` 这类必须声明 `any` | `.agents/rules/uniappx.md:215` |
 | UTS **支持剩余参数** `(...args: Array<any>)` | `uni_modules/lime-i18n/common/util.uts:139` 的 `parseArgs` |
 | UTS 支持可选字段 `a ?: A` | `src/utils/upload/index.uts:14` 的 `onProgress?: (progress: number) => void` |
-| `UTSJSONObject` **有** `getString/getJSON/getArray/getAny/toMap`，**没有**可用的动态写入接口 | `node_modules` 外的框架声明：`.../uni-uts-v1/lib/uts/types/uts/common/UTSJSONObject.d.ts` 的 `toMap(): Map<string, any>`（616 行）、`getJSON(key)`（396 行）、`keys(item)`（710 行，静态） |
-| 嵌套对象字面量 + `getJSON` + `toMap()` 在本项目可用 | `uni_modules/lime-i18n/common/composer.uts:60`、`:99` |
+| `UTSJSONObject` **有** `getString/getJSON/getArray/getAny/toMap`，**没有**可用的动态写入接口 | 框架声明：`/Applications/HBuilderX.app/Contents/HBuilderX/plugins/uniapp-uts-v1/node_modules/@dcloudio/uni-uts-v1/lib/uts/types/uts/common/UTSJSONObject.d.ts` 的 `toMap(): Map<string, any>`（616 行）、`getJSON(key)`（396 行）、`getAny(key)`（108 行）、`keys(item): Array<string>`（710 行，声明在 `UTSJSONObjectConstructor` 上，按 `UTSJSONObject.keys(obj)` 调用） |
+| 键遍历**两种写法**已实测可过 Kotlin：① `UTSJSONObject.keys(obj)` + `getAny()`；② `obj.toMap().forEach((value, key) => {})`（**不写类型标注**） | 任务 0 探针真机实测（见下节「Kotlin 禁区」） |
+| ⚠️ `obj.toMap().forEach((value: any, key: string) => {})`（**显式标注 any**）会在 Kotlin 报 error17；`map.keys()` 会在 Kotlin 报「`keys` 是 `MutableSet` 属性不是函数」 | 任务 0 探针真机实测 |
 | `isArray()` 是本项目可用的全局判定 | `uni_modules/lime-i18n/common/util.uts:141` |
-| `type X = (...args: Array<any>) => void` 作为**函数类型字段**能否过 Kotlin 编译 —— **未经证实** | 项目内只有普通函数形式的剩余参数先例，故列为任务 0 的探针项 |
+| `type X = (...args: Array<any>) => void` 作为**函数类型字段**能过 Kotlin 编译，且 `next()` 可**无参调用** | 任务 0 探针真机实测通过（VDOM/Kotlin 通道，0 error） |
 | `node` v22.22.2 可直接执行 `.ts`（类型剥离），无需 tsx/esbuild | 本机实测：`node main.ts` 打印 `ok`（`import type` + `as` + 类型标注均通过） |
 | `uni.addInterceptor` / `removeInterceptor` 的真实签名 | 框架声明 `.../uni-interceptor/utssdk/interface.d.ts`：`addInterceptor(name, interceptor)`；`removeInterceptor(name, interceptor \| null)` |
 | 各跳转 API 的 options 在 App 端是**不同的 Kotlin 类**，必须按 API 分别强转 | 既有代码 `src/router/interceptor.uts:177-245` 的四个 interceptor 对象 |
 | 本项目 UTS 被 `.ts`/`.uvue` 导入时需要配套 `*.d.uts.ts`；但 **uni_modules 下的 `.uts` 不需要** | 全仓 `find uni_modules -name "*.d.uts.ts"` 为 0 命中；`tsconfig.json` 的 `exclude` 含 `uni_modules` |
 | `main.uts` / `App.uvue` 是全局入口，可临时接线做真机验证 | `main.uts` 调用 `createApp()`；`App.uvue` 的 `onShow` 里已调 `checkDirectEntry` |
+
+## UTS→Kotlin 验证通道（任务 0 实测修正，**实施者必读**）
+
+`manifest.json` 的 `uni-app-x` 当前是 `{ "vapor": true, "vapor-render-target": "bytecode" }`。**在这个配置下，真机运行走「蒸汽模式 + 字节码」，完全跳过 Kotlin 阶段**：
+
+```
+编译器版本：5.24（uni-app x）蒸汽模式
+当前视图层编译目标：字节码
+```
+
+因此 `grep -c "编译为android class" <log>` 恒为 `0`（实测两轮 mock 均如此），SKILL.md 1.3.15 那条判据**在当前配置下永远无法满足** —— 不是代码有问题，是通道没进 Kotlin。UTS 逻辑层此模式下走 `uts2js`（`unpackage/cache/vapor/.app-android/.uts2js/`），所以「只测字节码」等于**没测 Kotlin**。
+
+**要进 Kotlin 阶段，必须临时把 `uni-app-x` 里的 `vapor` 键去掉**（回到 VDOM 模式），再跑不带 `--compile` 的真机构建：
+
+```bash
+# 1) 临时改 manifest.json：  "uni-app-x": { "styleIsolationVersion": "2" }   ← 删掉 vapor / vapor-render-target
+# 2) 真机构建（唯一可信通道）
+/Applications/HBuilderX.app/Contents/MacOS/cli launch app-android \
+  --project /Users/chenqi/Desktop/unibestX --deviceId <序列号>
+# 3) 判据（两个都要满足）
+grep -c "编译为android class" <log>   # ≥ 1（实测 VDOM 模式为 89）
+grep -aE "error:|kotlin编译失败" <log> # 0 命中
+# 4) 跑完把 manifest.json 还原
+```
+
+- **设备**：`adb devices` 实测可用设备 `JTK5T19928025722`（Huawei TAS-AL00）。
+- **本轮实测**：VDOM 模式 `编译为android class` ×89、`编译成功`、`error:` 0 命中、探针 4 行结果全部正确。
+- **两种模式都要跑**：字节码（vapor）模式是项目默认，Kotlin（VDOM）模式才暴露 Kotlin 禁区。任务 9 要求两者都过。
+
+### Kotlin 禁区（任务 0 真机证伪，**实现时一律避开**）
+
+| 写法 | 字节码(vapor) | Kotlin(VDOM) |
+| --- | --- | --- |
+| `obj.toMap().forEach((value: any, key: string) => {})` | ✅ | ❌ error17：实际 `Function2<Any, String, Unit>`，预期 `Function1<Map.Entry<String, Any?>, Unit>` |
+| `map.keys()` | ✅ | ❌ `Expression 'keys' of type 'MutableSet<String>' cannot be invoked as a function` |
+| `obj.toMap().forEach((value, key) => {})`（不写标注） | ✅ | ✅ |
+| `UTSJSONObject.keys(obj)` + `obj.getAny(key)` | ✅ | ✅ |
+| `obj.toMap().forEach((entry: any) => {})`（单参） | ✅ | ✅ |
+| `Map<string, string>.forEach((value: string, key: string) => {})` | ✅ | ✅ |
+| `setTimeout(localFn, 1200)`（局部函数当值传递） | ✅ | ❌ error18 `找不到名称"localFn"`，须写 `setTimeout(() => { localFn(); }, 1200)` |
+| 在对象字面量的回调里引用外层 `<script setup>` 的局部函数 | ✅ | ❌ 同上 error18（把函数体内联进 lambda 即可） |
+
+---
 
 ## 文件结构
 
@@ -68,11 +112,38 @@
 
 这一步是整个计划里唯一「可能推翻设计」的地方：有三种 UTS 写法是设计的地基，项目里都没有先例。**在写任何实现代码之前先把它们编译过一遍**，免得实现完才发现地基不成立。
 
+### ✅ 执行结果（2026-09-15 真机实测，步骤 1-6 已完成）
+
+**判据达成**：VDOM/Kotlin 通道 `编译为android class` ×89、`项目 unibestX 编译成功。`、`error:` **0 命中**；设备 `JTK5T19928025722`（Huawei TAS-AL00）。
+
+真机 `console.log` 原样输出（`src/sub/routerGuardProbe/routerGuardProbe.uvue:138-141`）：
+
+```
+[probe] A: next('/x?y=1')=true next(false)=true next()=true
+[probe] B: name=p depth=5 resolve=false
+[probe] C: /src/pages/index/index?C1[id=1;tags=a,b;] C2[entry=tags=a,b;] C3[id=1;tags=a,b;]
+[probe] D: id:1;
+```
+
+| 探针 | 结论 | 对设计的影响 |
+| --- | --- | --- |
+| A：函数类型字段 + 剩余参数 | ✅ **通过**。`type Next = (...args: Array<any>) => void` 能过 Kotlin，且 `next()` / `next(false)` / `next('/x?y=1')` 三种调用真机全部正确 | 规格 §3.3 的 `next` 形态**无需退回**，与 vue-router 的 `next()` 写法可以保持一致 |
+| B：可选字段 + `??` | ✅ 通过 | 无需改动 |
+| C：对象字面量 → `any` → `UTSJSONObject` → `Map<string,string>` | ⚠️ **原写法被证伪**：`toMap().forEach((value: any, key: string) => {})` 在 Kotlin 报 error17；`map.keys()` 在 Kotlin 报「属性不是函数」。**替代写法 C1（`UTSJSONObject.keys()` + `getAny()`）与 C3（不写类型标注的 `toMap().forEach`）均通过** | 任务 3 的 `url.uts` 已按 C1 改写（见任务 3） |
+| D：`Map<string,string>.forEach` | ✅ 通过 | 无需改动 |
+| 附加（临时衔接代码暴露） | ❌ `setTimeout(localFn, 1200)` 与「对象字面量回调里引用外层局部函数」在 Kotlin 报 error18 | 已记入上方「Kotlin 禁区」表；插件实现不得依赖这两写法 |
+
+> **探针页相对计划原文的两处调整**（都保留在文件里，任务 10 整页删除）：
+> 1. `runAll()` 末尾追加 4 行 `console.log('[probe] ' + lineN.value)` —— 用 `adb`/CLI 日志取证，替代「肉眼确认」。
+> 2. 探针 C 改成三写法对照（C1/C2/C3），并把 `readLocation` 的返回串改为拼接三者结果。
+
+> **额外临时改动（计划原文未列，任务 10 一并还原）**：`App.uvue` 加了 `// #ifdef APP-ANDROID` 内的一段自动 `uni.navigateTo` 到探针页（带最多 8 次重试）—— 否则无法在无人值守下打开探针页；`manifest.json` 为进 Kotlin 阶段临时删过 `vapor` 键，**已还原**。
+
 **文件：**
 - 创建：`src/sub/routerGuardProbe/routerGuardProbe.uvue`
 - 修改：`main.uts`（临时，导入探针里定义的符号，逼编译器编译）
 
-- [ ] **步骤 1：清掉遗留目录**
+- [x] **步骤 1：清掉遗留目录**
 
 `uni_modules/uni-router-guard/` 下有一个**未被 git 跟踪**的空 `.build`（`feat/router-guard` 分支的遗留产物，本分支没有该插件的任何文件）。
 
@@ -82,9 +153,12 @@
 运行：`rm -rf uni_modules/uni-router-guard/test`
 预期：`uni_modules/uni-router-guard/` 变成空目录。
 
-- [ ] **步骤 2：写探针页**
+- [x] **步骤 2：写探针页**
 
 创建 `src/sub/routerGuardProbe/routerGuardProbe.uvue`（本项目二级/分包页标准模板，`definePage` 必须显式声明）：
+
+> ⚠️ **下面是计划初稿，实际落盘的文件已按任务 0 结论改过两处**（`runAll()` 追加 4 行 `console.log`、探针 C 改为 C1/C2/C3 三写法对照）。以磁盘上的 `src/sub/routerGuardProbe/routerGuardProbe.uvue` 为准，勿按本代码块回退覆盖。
+> 其中探针 C 的 `query!.toMap().forEach((value: any, key: string): void => {})` 已被真机证伪（Kotlin error17），保留在此仅作失败样本留档。
 
 ```html
 <template>
@@ -195,7 +269,7 @@ runAll();
 </style>
 ```
 
-- [ ] **步骤 3：逼编译器真的编译这些类型**
+- [x] **步骤 3：逼编译器真的编译这些类型**
 
 `src/sub/**` 的页面会被自研 vite 插件扫描并写进 `pages.json`，但探针里的类型是页面**内部**的，只要页面被编译就够；不过为了确保编译发生在 Kotlin 阶段而不是被摇树掉，在 `main.uts` 顶部临时加一行导入：
 
@@ -206,12 +280,12 @@ runAll();
 import './src/sub/routerGuardProbe/routerGuardProbe.uvue';
 ```
 
-- [ ] **步骤 4：跑 H5（快，先排除语法错）**
+- [x] **步骤 4：跑 H5（快，先排除语法错）**
 
 运行：`pnpm build:h5`
 预期：出现 `项目 unibestX 编译成功。` 与 `✅ H5 打包成功`。既有噪声 `error TS2305 ... resolveEasycom` 属正常，不作为失败判据。
 
-- [ ] **步骤 5：跑真机构建（关键判据）**
+- [x] **步骤 5：跑真机构建（关键判据）**
 
 运行：
 
@@ -222,7 +296,7 @@ import './src/sub/routerGuardProbe/routerGuardProbe.uvue';
 
 预期：日志中 **`编译为android class` 出现 ≥ 1 次**，且最终出现 `项目 unibestX 编译成功。`
 
-- [ ] **步骤 6：真机肉眼确认 4 行结果**
+- [x] **步骤 6：真机肉眼确认 4 行结果**
 
 在设备上打开「UTS 探针」页，预期：
 
@@ -237,7 +311,7 @@ D: id:1;
 
 **若 A 行编译不过**（函数类型字段里的剩余参数不被支持）：退回「`next` 入参必填」方案 —— 把 `Next` 改成 `(value: any) => void`，放行写 `next(null)`，并在规格 §3.3 与 readme 里如实记录这条与 vue-router 的差异。**此时必须先停下来告知用户，不要自行改设计。**
 
-- [ ] **步骤 7：Commit**
+- [x] **步骤 7：Commit**
 
 ```bash
 git add src/sub/routerGuardProbe/routerGuardProbe.uvue main.uts
@@ -713,13 +787,18 @@ export function stringifyQueryValue(value: any): string {
 /**
  * 把 `{ path, query }` 里的 query 序列化为 query 串（值来自 UTSJSONObject 字面量）。
  * null 值按「忽略该键」处理。
+ *
+ * ⚠️ 键遍历必须用本写法（任务 0 真机实测）：`UTSJSONObject.keys()` + `getAny()`。
+ *    禁用 `query.toMap().forEach((value: any, key: string) => {})` —— 显式标注 any 会在 Kotlin 报 error17。
  */
 export function serializeQuery(query: UTSJSONObject | null): string {
   if (query == null) {
     return '';
   }
   const parts: Array<string> = [];
-  query.toMap().forEach((value: any, key: string): void => {
+  const keys = UTSJSONObject.keys(query);
+  keys.forEach((key: string): void => {
+    const value = query.getAny(key);
     if (value == null) {
       return;
     }
@@ -1620,7 +1699,16 @@ probeRouter.afterEach((to: RouteTarget, from: RouteTarget): void => {
   --project /Users/chenqi/Desktop/unibestX --deviceId <序列号>
 ```
 
-预期：日志中 **`编译为android class` 出现 ≥ 1 次**，最终 `项目 unibestX 编译成功。`
+> ⚠️ **必须先关掉 vapor，否则这轮是假绿**：项目 `manifest.json` 的 `uni-app-x` 默认是 `{ "vapor": true, "vapor-render-target": "bytecode" }`，真机运行走**蒸汽模式 + 字节码**，`编译为android class` 恒为 0、UTS 只经 `uts2js`，**根本不进 Kotlin**。
+>
+> 跑之前把该块临时改成 `"uni-app-x": { "styleIsolationVersion": "2" }`（删掉 `vapor` / `vapor-render-target`），跑完**立即还原**。详见上方「UTS→Kotlin 验证通道」一节。
+
+预期：日志中 **`编译为android class` 出现 ≥ 1 次**（任务 0 实测 VDOM 模式为 89 次），`error:` **0 命中**，最终 `项目 unibestX 编译成功。`
+
+**两种模式都要跑、都要过**：
+
+1. **VDOM/Kotlin**（去掉 `vapor` 键）—— 唯一能暴露 Kotlin 禁区的通道，判据如上。
+2. **蒸汽/字节码**（`manifest.json` 还原后）—— 项目默认运行方式，预期 `编译成功` 且真机无红字报错。
 
 - [ ] **步骤 3：确认 Kotlin 产物里真的有插件代码**
 
@@ -1879,6 +1967,15 @@ git commit -m "docs(uni-router-guard): 补充 readme 与 changelog"
 - [ ] **步骤 1：判断是否需要写**
 
 若任务 0 的探针全部一次通过、且实现过程没有再踩到新坑 → **本任务无内容，直接勾掉并说明「无新增」**。
+
+> ✅ **任务 0 已判定：本任务必做，且内容已确定。** 探针在 VDOM/Kotlin 与 Vapor/字节码两条通道下表现不同，命中触发条件。
+
+**待回写的 4 条（任务 0 真机实测，证据见「Kotlin 禁区」表）：**
+
+1. **语法层（1.1 追加）**：`obj.toMap().forEach((value: any, key: string) => {})` —— 显式给 `any` 值参数标注类型，在 Kotlin 报 error17（实际 `Function2<Any, String, Unit>` / 预期 `Function1<Map.Entry<String, Any?>, Unit>`），而**不写标注**或改用 `UTSJSONObject.keys(obj)` + `getAny(key)` 均可过。同族：`map.keys()` 在 Kotlin 里是 `MutableSet` 属性，不能按函数调用。
+2. **语法层（1.1 追加）**：Kotlin 下**不能把外层局部函数当值传递**（`setTimeout(localFn, 1200)` 报 error18 `找不到名称`），必须包一层 lambda；且在对象字面量的回调里引用外层 `<script setup>` 局部函数同样报 error18。与既有 1.1.4 的「局部声明在自身初始化表达式内不可见」同族。
+3. **运行时/工程层（1.3 追加，或并入 1.3.15）**：`manifest.json` 的 `uni-app-x.vapor = true` + `vapor-render-target = "bytecode"` 下，真机运行走蒸汽/字节码，**`编译为android class` 恒为 0、UTS 只经 uts2js，完全跳过 Kotlin**。要验证 Kotlin 必须先删 `vapor` 键（VDOM 模式）。这条直接补强 1.3.15 的「假绿」清单 —— 它给出了第三个假绿来源，而且这个来自项目自身配置，比命令选择更隐蔽。
+4. **3.3 快速排查表 / 3.4 红线清单**：同步上述 3 条。
 
 - [ ] **步骤 2：按四维分类归位**
 

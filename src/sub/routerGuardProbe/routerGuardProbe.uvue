@@ -1,0 +1,150 @@
+<template>
+  <view class="flex-1 flex flex-col p-[16px]">
+    <text class="text-[#16a34a]">{{ line1 }}</text>
+    <text class="text-[#16a34a]">{{ line2 }}</text>
+    <text class="text-[#16a34a]">{{ line3 }}</text>
+    <text class="text-[#16a34a]">{{ line4 }}</text>
+    <button @click="runAll">重新执行探针</button>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/utils/refresh/index.uts';
+
+definePage({
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: true,
+  style: {
+    navigationBarTitleText: 'UTS 探针',
+    navigationStyle: 'custom'
+  }
+});
+
+// ── 探针 A：函数类型字段 + 剩余参数，next() 可以无参调用 ──
+type ProbeNext = (...args: Array<any>) => void;
+type ProbeGuard = (to: string, next: ProbeNext) => void;
+
+const guardA: ProbeGuard = (to: string, next: ProbeNext): void => {
+  if (to == 'redirect') {
+    next('/x?y=1');
+    return;
+  }
+  if (to == 'abort') {
+    next(false);
+    return;
+  }
+  next();
+};
+
+// ── 探针 B：可选字段 + 函数类型可选字段 + ?? 取值 ──
+type ProbeOptions = {
+  name ?: string;
+  resolve ?: (url: string) => string;
+  depth ?: number;
+};
+
+// ── 探针 C：对象字面量 → any → UTSJSONObject → Map<string,string> ──
+// 已被 Kotlin 证伪的写法（勿用）：
+//   1. query.toMap().forEach((value: any, key: string) => {}) → error17（Function2 不匹配 Function1<Map.Entry>）
+//   2. m.keys()  → Kotlin 里 keys 是 MutableSet 属性，不是函数
+// 下面两种写法已通过 Kotlin 编译：
+function dumpMap(m: Map<string, string>): string {
+  let s = '';
+  m.forEach((value: string, key: string): void => {
+    s += `${key}=${value};`;
+  });
+  return s;
+}
+
+// C1：UTSJSONObject.keys() + getAny()
+function toStrMapByJsonKeys(query: UTSJSONObject): Map<string, string> {
+  const out = new Map<string, string>();
+  const ks = UTSJSONObject.keys(query);
+  ks.forEach((key: string): void => {
+    out.set(key, `${query.getAny(key)}`);
+  });
+  return out;
+}
+
+// C2：toMap().forEach 单参（entry）形式
+function toStrMapByEntry(query: UTSJSONObject): Map<string, string> {
+  const out = new Map<string, string>();
+  query.toMap().forEach((entry: any): void => {
+    out.set('entry', `${entry}`);
+  });
+  return out;
+}
+
+// C3：toMap().forEach 双参但**不带类型标注**（对照 lime-i18n/common/composer.uts 的既有写法）
+function toStrMapByPlainForEach(query: UTSJSONObject): Map<string, string> {
+  const out = new Map<string, string>();
+  query.toMap().forEach((value, key) => {
+    out.set(key, `${value}`);
+  });
+  return out;
+}
+
+function readLocation(to: any): string {
+  const obj = to as UTSJSONObject;
+  const path = obj.getString('path') ?? '';
+  const query = obj.getJSON('query');
+  if (query == null) {
+    return `${path}?`;
+  }
+  const s = `C1[${dumpMap(toStrMapByJsonKeys(query!))}] C2[${dumpMap(toStrMapByEntry(query!))}] C3[${dumpMap(toStrMapByPlainForEach(query!))}]`;
+  return `${path}?${s}`;
+}
+
+const line1 = ref('A: 未执行');
+const line2 = ref('B: 未执行');
+const line3 = ref('C: 未执行');
+const line4 = ref('D: 未执行');
+
+function runAll(): void {
+  // A：三种 next 形态都要能调用（能走到这里就说明编译通过）
+  let called1 = false;
+  let called2 = false;
+  let called3 = false;
+  guardA('redirect', (...args: Array<any>): void => { called1 = args.length > 0 && (args[0] as string) == '/x?y=1'; });
+  guardA('abort', (...args: Array<any>): void => { called2 = args.length > 0 && (args[0] as boolean) == false; });
+  guardA('pass', (...args: Array<any>): void => { called3 = args.length == 0; });
+  line1.value = `A: next('/x?y=1')=${called1} next(false)=${called2} next()=${called3}`;
+
+  // B：可选字段
+  const opts: ProbeOptions = { name: 'p' };
+  const name = opts.name ?? '(空)';
+  const depth = opts.depth ?? 5;
+  const hasResolve = opts.resolve != null;
+  line2.value = `B: name=${name} depth=${depth} resolve=${hasResolve}`;
+
+  // C：对象字面量 → any → UTSJSONObject
+  line3.value = `C: ${readLocation({ path: '/src/pages/index/index', query: { id: 1, tags: ['a', 'b'] } })}`;
+
+  // D：Map 遍历 + 边界判断
+  const m = new Map<string, string>();
+  m.set('id', '1');
+  let acc = '';
+  m.forEach((value: string, key: string): void => { acc += `${key}:${value};`; });
+  line4.value = `D: ${acc}`;
+
+  // 供 adb logcat 取证（本页为临时探针，验证后整页删除）
+  console.log('[probe] ' + line1.value);
+  console.log('[probe] ' + line2.value);
+  console.log('[probe] ' + line3.value);
+  console.log('[probe] ' + line4.value);
+}
+
+onNavbarPullDownRefresh(() => {
+  runAll();
+  setTimeout(() => {
+    stopNavbarPullDownRefresh();
+  }, 500);
+});
+
+runAll();
+</script>
+
+<style lang="scss" scoped>
+</style>
