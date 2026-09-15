@@ -23,7 +23,7 @@ import EchartsDemoCard from '../components/EchartsDemoCard.uvue';
 import UtilsNavCard from '../components/UtilsNavCard.uvue';
 import ZPagingDemoCard from '../components/ZPagingDemoCard.uvue';
 import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/utils/refresh/index.uts';
-import { curIdx, onTabShow } from '@/src/tabbar/index.uts';
+import { curIdx, onTabPageShow, onTabShow } from '@/src/tabbar/index.uts';
 
 /**
  * Canvas 画布组件（签名板、ECharts）按需加载标记：
@@ -48,9 +48,7 @@ function refreshData(): void {
 
 // 监听 Tab 切换到当前功能页（索引 2）时触发
 onTabShow(2, () => {
-  console.log('切换到了功能 Tab');
   refreshData();
-
   // 延迟 100ms 挂载：确保微信小程序与各端渲染线程（WebView/原生容器）已将视图移入可视区并完成物理像素排版
   if (!isCanvasReady.value) {
     setTimeout(() => {
@@ -76,6 +74,24 @@ onNavbarPullDownRefresh(() => {
   if (curIdx.value == 2) {
     refreshData();
   }
+});
+
+// 监听 Tab 切换到当前功能页（索引 2）时触发
+onTabShow(2, () => {
+  console.log('onTabShow 功能 Tab 显示');
+}, true);
+
+// 监听功能 Tab 页面显示（切 Tab、从子页面返回、前台恢复都会触发）
+onTabPageShow(2, () => {
+  console.log('onTabPageShow 功能 Tab 显示');
+}, true);
+
+onMounted(() => {
+  console.log('功能 Tab 挂载了');
+});
+
+onUnmounted(() => {
+  console.log('功能 Tab 卸载了');
 });
 </script>
 

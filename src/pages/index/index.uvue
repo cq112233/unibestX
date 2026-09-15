@@ -17,7 +17,7 @@
 import HomeView from './views/IndexView.uvue';
 import TabViews from '@/src/tabbar/components/TabViews.uvue';
 import Tabbar from '@/src/tabbar/tabbar.uvue';
-import { isSinglePageTabbar } from '@/src/tabbar/index.uts';
+import { isSinglePageTabbar, notifyPageHide, notifyPageShow } from '@/src/tabbar/index.uts';
 import { handleBackPressExit } from '@/src/utils/backPress/index.uts';
 import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/utils/refresh/index.uts';
 
@@ -36,6 +36,15 @@ definePage({
     navigationBarTitleText: '首页', // 页面与导航栏标题文本
     navigationStyle: 'custom' // 导航栏样式设为自定义（隐藏系统原生导航栏）
   }
+});
+
+// 把页面 onShow / onHide 桥接给 TabBar：onTabPageShow 靠它覆盖「从子页面返回 / 前台恢复」
+onShow(() => {
+  notifyPageShow();
+});
+
+onHide(() => {
+  notifyPageHide();
 });
 
 // 监听 navbar 自定义下拉刷新事件（在 enablePullDownRefresh: true 时生效）

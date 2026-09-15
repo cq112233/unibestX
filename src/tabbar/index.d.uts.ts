@@ -16,6 +16,48 @@ import type { ComputedRef, Ref } from 'vue';
  */
 export declare const customTabbarConfig: TabBarConfig;
 
+/**
+ * 当前页面是否处于显示状态
+ *
+ * 由页面的 onShow / onHide 经 notifyPageShow() / notifyPageHide() 维护。
+ * 模式 4（单页面 TabBar）已在容器页 `src/pages/index/index.uvue` 内置桥接；
+ * 模式 0-3 若也需要「从子页面返回时触发」，请在对应 Tab 页面里同样调用这两个方法。
+ */
+export declare const isPageVisible: Ref<boolean>;
+
+/** 页面累计显示次数，> 0 表示页面至少显示过一次（供 onTabPageShow 的 immediate 判定补发时机） */
+export declare const pageShowTimes: Ref<number>;
+
+/**
+ * 通知「当前页面已显示」：请在页面（Tab 容器页）的 onShow 中调用
+ *
+ * 与 onTabShow 的 curIdx 监听互补，负责覆盖「页面回来了」这一半场景：
+ * 从子页面 navigateBack 返回、App 从后台回到前台、页面重新可见。
+ */
+export declare function notifyPageShow(): void;
+
+/**
+ * 通知「当前页面已隐藏」：请在页面（Tab 容器页）的 onHide 中调用
+ *
+ * 置为隐藏后，切换 Tab 的通知会被抑制，避免「在子页面里切 Tab，回调却在容器页
+ * 尚不可见时提前跑掉」；等页面真的回来时，再由 notifyPageShow() 补发一次。
+ */
+export declare function notifyPageHide(): void;
+
+/**
+ * 监听指定 Tab 页面显示（在「页面可见」且「当前激活 Tab 命中」时触发）
+ *
+ * 相比 onTabShow 只盯 curIdx，本方法额外要求页面可见，因此能覆盖两类时机：
+ * 1. 切换 Tab 到该页（curIdx 变化）——与 onTabShow 相同；
+ * 2. 页面重新显示（原生 onShow：从子页面返回、App 回前台）——onTabShow 覆盖不到。
+ *
+ * @param index 对应 Tab 索引（0: 首页, 1: 基础, 2: 功能, 3: 我的）
+ * @param callback 页面显示时的回调函数
+ * @param immediate 若注册时页面已经显示过且当前 Tab 正好激活，是否立即补发一次
+ *                  （首次进入页面时不会再重复触发：那一次由紧随其后的 onShow 通知负责）
+ */
+export declare function onTabPageShow(index: number, callback: () => void, immediate: boolean = false): void;
+
 /** tabbar 白色底板高度（px），基准值统一引用 systemInfo 中的 TABBAR_BASE_HEIGHT */
 export declare const TABBAR_HEIGHT: number;
 

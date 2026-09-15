@@ -597,7 +597,9 @@ src/tabbar/config.uts (唯一样本源)
 
 - **`switchTabbar(url: string)`**：全局统一 TabBar 跳转方法，单页面模式下直接切换索引，多页面模式下自动调度 switchTab 或 redirectTo（内置 250ms 节流锁，防止快速连击卡死）；
 - **`onTabShow(index: number, callback: () => void, immediate: boolean = false)`**：监听特定 Tab 项激活显示，完美解决单页面模式下子视图没有原生 `onShow` 的问题（可在切换回该 Tab 时触发数据重新请求与刷新）；
+- **`onTabPageShow(index: number, callback: () => void, immediate: boolean = false)`**：监听特定 Tab **页面显示**（要求「页面可见」且「当前激活 Tab 命中」），是 `onTabShow` 的超集 —— 除切换 Tab 外，还覆盖 `onTabShow` 够不到的「页面回来了」：从子页面 `navigateBack` 返回、App 从后台回到前台。它同时修掉 `onTabShow` 的一个时序坑：在子页面里调 `switchTabbar` 时 `curIdx` 立刻变化，`onTabShow` 会在容器页仍不可见时提前回调，而 `onTabPageShow` 会抑制这次并推迟到页面真正返回时再补发一次；
 - **`syncCurIdxByCurrentPage()`**：自动从当前页面路由同步激活 Tab 项索引；
+- **`notifyPageShow()` / `notifyPageHide()`**：页面可见性桥接，模式 4 已在容器页 `src/pages/index/index.uvue` 的 `onShow` / `onHide` 中内置；模式 0-3 若也要「从子页面返回时触发」，在对应 Tab 页面的 `onShow` / `onHide` 里各加一行即可（完全未桥接时 `onTabPageShow` 自动退化为 `onTabShow` 的语义，不会静默失效）；
 - **`safeHideNativeTabBar()`**：全端安全隐藏原生底板，并在 H5 平台注入动态样式清除视口多余空白；
 - **`initNativeMidButtonTap()`**：仅在原生模式且配置 `midButton` 时自动注册监听，无需在页面中硬编码。
 

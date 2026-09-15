@@ -46,7 +46,7 @@
 import { computed } from 'vue';
 import { useTokenStore, useUserStore } from '@/src/store';
 import { LOGIN_PAGE } from '@/src/router/config';
-import { switchTabbar } from '@/src/tabbar/index.uts';
+import { onTabPageShow, onTabShow, switchTabbar } from '@/src/tabbar/index.uts';
 
 const userStore = useUserStore();
 const tokenStore = useTokenStore();
@@ -98,6 +98,24 @@ function handleLogout() {
     }
   });
 }
+
+// 监听 Tab 切换到当前功能页（索引 3）时触发
+onTabShow(3, () => {
+  console.log('onTabShow 我 Tab 显示');
+}, true);
+
+// 监听我 Tab 页面显示（切 Tab、从子页面返回、前台恢复都会触发）
+onTabPageShow(3, () => {
+  console.log('onTabPageShow 我 Tab 显示');
+}, true);
+
+onMounted(() => {
+  console.log('我 Tab 挂载了');
+});
+
+onUnmounted(() => {
+  console.log('我 Tab 卸载了');
+});
 </script>
 
 <style scoped lang="scss"></style>
