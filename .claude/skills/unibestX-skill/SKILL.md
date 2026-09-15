@@ -311,6 +311,89 @@ export * from './vdom/user.uts';
 
 ---
 
+
+#### 1.1.15 遍历「值类型为 `any` 的 Map」时，**给回调参数显式标注 `any`** 会炸 —— 去掉标注或改用 `UTSJSONObject.keys()`；且 `map.keys()` 在 Kotlin 里是属性不是函数
+
+- **报错现象**（本项目实测，uni-router-guard 任务 0 探针，真机 VDOM/Kotlin 通道）：
+
+  ```text
+  error: 参数类型不匹配：实际类型为 'Function2<Any, String, Unit>'，预期类型为 'Function1<Map.Entry<String, Any?>, Unit>'。
+  参考: https://doc.dcloud.net.cn/uni-app-x/uts/compiler-known-issues.html#error17
+  at src/sub/routerGuardProbe/routerGuardProbe.uvue:60:27
+  60 |      query!.toMap().forEach((value: any, key: string): void => {
+  ```
+
+  同一次编译里的同族报错：
+
+  ```text
+  error: Expression 'keys' of type 'MutableSet<String>' cannot be invoked as a function. Function 'invoke()' is not found.
+  at src/sub/routerGuardProbe/routerGuardProbe.uvue:67:15
+  67 |    const ks = m.keys();
+  ```
+
+- **根因**：`UTSJSONObject.toMap()` 的值类型是 `any`（即 Kotlin 的 `Any?`）。Kotlin 侧 `Map.forEach` 的真实签名只有 `(Map.Entry<K, V>) -> Unit` 一个；UTS **显式标注** `(value: any, key: string)` 时会按「双参函数」去匹配，生成 `Function2<Any, String, Unit>` 对不上 `Function1<Map.Entry<...>>`。**不写标注**让编译器自行推导就能对上。而 `keys` 在 UTS 的类型声明里是方法、编译到 Kotlin 却是 `Map.keys` **属性**（`MutableSet<String>`），因此不能带括号调用。
+
+- **修法（两种都真机验过，Kotlin 编译 0 error）**：
+
+  ```uts
+  // ✅ 写法 1（推荐）：UTSJSONObject.keys() + getAny()
+  const keys = UTSJSONObject.keys(query);   // query: UTSJSONObject
+  keys.forEach((key: string): void => {
+    const value = query.getAny(key);
+    if (value == null) { return; }
+    parts.push(`${key}=${encodeURIComponent(`${value}`)}`);
+  });
+
+  // ✅ 写法 2：双参 forEach，但**不写类型标注**
+  query.toMap().forEach((value, key) => {
+    parts.push(`${key}=${value}`);
+  });
+  ```
+
+  ```uts
+  // ❌ 禁：给 any 值参数显式标注 → error17
+  query.toMap().forEach((value: any, key: string): void => { ... });
+  // ❌ 禁：map.keys() → Kotlin 报「属性不能当函数调用」
+  const ks = map.keys();
+  ```
+
+- **对照（重要）**：本条**只在 Kotlin 阶段暴露**。同一份代码在**蒸汽 / 字节码模式**（本项目 `manifest.json` 默认配置，见 1.3.20）下完全正常。本项目 `uni_modules/lime-i18n/common/composer.uts` 就写着双参 `toMap().forEach((value, key) => ...)` —— 它能跑正是因为**没写类型标注**；一旦「好心」补上 `: any` 就会在 Kotlin 端炸。
+- **范围界定**：`Array.forEach` 带标注没问题（`keys.forEach((key: string): void => {})` 实测可用）；`Map<string, string>.forEach((value: string, key: string) => {})` 也实测可用。**只有「值类型为 `any` 的 Map」**命中此坑。
+
+---
+
+#### 1.1.16 Kotlin 下**局部函数不能当值传递** —— `setTimeout(localFn, 100)` 报 `error18`，必须包一层 lambda
+
+- **报错现象**（本项目实测，`App.uvue` 真机 VDOM/Kotlin 通道）：
+
+  ```text
+  error: 找不到名称"openProbePage"。参考: https://doc.dcloud.net.cn/uni-app-x/uts/compiler-known-issues.html#error18
+  at App.uvue:38:19
+  36 |      fail: () => {
+  37 |        if (probeTryCount < 8) {
+  38 |          setTimeout(openProbePage, 800);
+  ```
+
+  两个触发点，同一次编译都报：① 把局部函数名**直接当实参**传给 `setTimeout`；② 在**对象字面量的回调**里引用外层 `<script setup>` 的局部函数（同一个函数在 `uni.navigateTo({ fail: () => { ... } })` 的 `fail` 里也报）。
+
+- **根因**：`<script setup lang="uts">` 的顶层代码会被装进 setup 函数，函数声明随之变成 Kotlin 的**局部函数**。Kotlin 的局部函数是语句级声明，**不能作为函数值直接传递**，在嵌套 lambda / 局部类（对象字面量编译产物）里也可能解析不到。
+- **修法**：统一包一层 lambda 再传：
+
+  ```uts
+  // ❌ Kotlin 报 error18
+  setTimeout(openProbePage, 1200);
+
+  // ✅
+  setTimeout(() => {
+    openProbePage();
+  }, 1200);
+  ```
+
+- **与 1.1.14 的关系**：同属「Kotlin 里局部声明的可见域比 JS 窄」这一族 —— 1.1.14 是「在其自身初始化表达式内不可见」，本条是「不能当值传递 / 嵌套作用域内可能不可见」。1.3.14 与 3.4 第 30 条的「局部函数必须定义在调用点之前」是同一族的第三种表现。
+- **只在 Kotlin 阶段暴露**：字节码 / 蒸汽模式与 H5 都正常。
+
+---
+
 ### 1.2 样式 (CSS & Tailwind CSS) 与原生渲染铁律
 
 #### 1.2.1 CSS 变量动态换肤与原生控件限制
@@ -849,6 +932,7 @@ export * from './vdom/user.uts';
   | ✅ `cli launch app-android --project unibestX --deviceId <序列号>`（**不带** `--compile`） | ✅ 是 | 真机运行流程会进 Kotlin 阶段 |
 
 - **关键澄清**：`--compile true` 的语义是"仅编译代码"（不装机），**恰恰少了 Kotlin 那一段**；`--compile` 不是"更彻底的编译"，而是"不装机的编译"。
+- **⚠️ 补充：还有第三个假绿来源，而且在「配置」侧（2026-09-15 实测）** —— 即使命令选对了（不带 `--compile` 的真机 `launch app-android`），只要 `manifest.json` 的 `uni-app-x.vapor-render-target` 仍是 `"bytecode"`，整轮就走蒸汽 / 字节码、**一条 Kotlin 报错都拿不到**（实测 `编译为android class` = 0、`[plugin:uni:app-uts]` 整段不出现，而同一份代码切到 VDOM 立刻报出 3 条 error）。判定前务必先 `grep -c "编译为android class" <log>` ≥ 1，为 0 就先按 **1.3.20** 临时删掉 `vapor` 两个键。
 - **判定方法（唯一可信）**：每轮构建后先数这一行，**`< 1` 就直接作废，不许宣称通过**：
 
   ```bash
@@ -1121,6 +1205,36 @@ cat unpackage/dist/dev/mp-weixin/src/i18n/index.d.uts.js   # → "use strict";
 **这是本项目既有行为**（`src/utils/*/index.d.uts.js` 共 9 份同样存在），内容只有 `"use strict";`，且**没有任何产物 require 它**，可以不管。H5 发行产物（`unpackage/dist/build/web`）里**不会**出现 `*.d.uts.*`。
 
 ---
+
+#### 1.3.20 `manifest.json` 的 `vapor-render-target: "bytecode"` 会让真机运行**跳过 Kotlin 阶段** —— 1.3.15 之外的**第三个假绿来源**（更隐蔽：它是项目自身配置，不是命令选择）
+
+- **实测证据（本项目，2026-09-15，同一份代码只改 `manifest.json` 一处）**：
+
+  | `uni-app-x` 配置 | 日志特征 | `grep -c "编译为android class"` | Kotlin 报错 | 结论 |
+  | :--- | :--- | :--- | :--- | :--- |
+  | `{ "styleIsolationVersion": "2", "vapor": true, "vapor-render-target": "bytecode" }`（**HEAD 默认**） | `编译器版本：5.24（uni-app x）蒸汽模式` + `当前视图层编译目标：字节码` | **0** | 一条都没有（`[plugin:uni:app-uts]` 整段不出现） | 假绿：含 Kotlin 必炸代码也报「编译成功」，真机照跑 |
+  | `{ "styleIsolationVersion": "2" }`（临时删掉 `vapor`） | `编译器版本：5.24（uni-app x）VDOM模式` | **89** | 3 条真实 error（见 1.1.15 / 1.1.16） | ✅ 唯一可信的 Kotlin 通道 |
+
+- **机理**：`vapor + bytecode` 下**整个应用走蒸汽模式**，视图层编译成字节码、UTS 逻辑层走 `uts2js`（产物在 `unpackage/cache/vapor/.app-android/.uts2js/`），**完全不进 Kotlin 编译阶段**。此时「编译成功」只代表字节码/JS 链路没报错。
+- **判定方法**：真机构建后先数那行，**`< 1` 就说明这轮没进 Kotlin，任何「编译成功」都不作数**：
+
+  ```bash
+  grep -c "编译为android class" <log>      # 蒸汽/字节码模式 = 0；VDOM/Kotlin 模式 ≈ 页面数×N
+  grep -aE "error:|kotlin编译失败" <log>   # Kotlin 模式才可能出现
+  ```
+- **要验证 Kotlin，必须临时改配置**（跑完立即还原）：
+
+  ```jsonc
+  // manifest.json —— 跑 Kotlin 验证时临时把 vapor 两个键都删掉
+  "uni-app-x": {
+    "styleIsolationVersion": "2"
+  }
+  ```
+- **两种模式都要跑**：蒸汽/字节码是**项目默认运行方式**（改回去才是真实开发体验），VDOM/Kotlin 是**唯一能暴露 Kotlin 禁令**的通道。只跑一种都会漏。
+- **与 1.3.15 的关系**：1.3.15 讲的是「**命令选错**」（`--compile true` / `compile --file`）导致假绿；本条讲的是「**配置导致**」—— 即使命令选对了（不带 `--compile` 的真机 `launch app-android`），只要 `vapor-render-target` 还是 `bytecode`，照样一条 Kotlin 报错都拿不到。
+
+---
+
 
 ## 二、项目正确案例
 
@@ -1575,6 +1689,10 @@ onNavbarPullDownRefresh(() => {
 | **小程序报 `[plugin:uts] "ISingleTokenRes" is not exported by ".../store/index.uts"`** | 门面 `export * from './vapor/token'` 从 **`.ts`** 文件转发纯类型（补成 `./vapor/token.ts` 也**无效**，报错一字不变） | 跨分支共享类型抽到只含 `type` 的 **`.uts`** 叶子文件（如 `src/store/types.uts`），门面**无条件** `export * from './types.uts'`，两分支实现各自 `import type` 且不再 `export type` 同名类型（见 1.3.18） |
 | **CLI 编译 mp-weixin 报 `ENOENT ... .uts2js/cache/...` 且报错文件每次都不同** | 以为是代码缺陷，改源码 / 反复 `rm -rf unpackage/cache/.mp-weixin` | 这是**开着的 HBuilderX IDE 与 CLI 抢 `unpackage/cache` 的竞态**（判据：同一份代码换次运行报错文件就变）。**同一份代码直接重试即可通过**；注意 CLI **被打断时仍返回 exit 0**，必须 `test -d unpackage/dist/dev/mp-weixin/src/store` 看产物才算数（见 1.3.18） |
 | **IDE 报 `Cannot find module '../types.uts' or its corresponding type declarations`，但构建全绿** | 当成噪音忽略 / 手工补一个声明文件 | 凡被 `.ts` / `.uvue` 以 `xxx.uts` 导入的 `.uts` 都必须有**同目录同名** `<name>.d.uts.ts`（靠 `allowArbitraryExtensions`）。跑 `node scripts/gen-uts-dts.mjs`；不在 `src/utils/*/` 下的要登记进脚本的 `EXTRA_SOURCES`（见 1.3.19） |
+| **遍历值类型为 `any` 的 Map 报 `error17`**（`实际类型为 'Function2<Any, String, Unit>'，预期类型为 'Function1<Map.Entry<String, Any?>, Unit>'`） | `query.toMap().forEach((value: any, key: string): void => {})`（给值参数显式标注 `any`） | 去掉标注写 `query.toMap().forEach((value, key) => {})`，或改用 `UTSJSONObject.keys(query)` + `query.getAny(key)`（见 1.1.15） |
+| **Kotlin 报 `Expression 'keys' of type 'MutableSet<String>' cannot be invoked as a function`** | `map.keys()`（UTS 声明里是方法，Kotlin 侧是属性） | 改用 `UTSJSONObject.keys(obj)`；只取已知键时直接 `getString` / `getAny`，不要遍历 Map（见 1.1.15） |
+| **`error18 找不到名称"someLocalFn"`，但函数就在同一个文件里** | `setTimeout(someLocalFn, 1000)`；或在对象字面量的回调里引用外层局部函数 | 包一层 lambda：`setTimeout(() => { someLocalFn(); }, 1000)`（见 1.1.16） |
+| **真机运行日志里 `编译为android class` 恒为 0，却报「编译成功」** | 把这种「编译成功」当成 UTS 已过 Kotlin 编译 | 这是 `manifest.json` 的 `vapor-render-target: "bytecode"` 让整轮跳过 Kotlin 阶段；临时删掉 `vapor` 两个键改走 VDOM 模式再验（见 1.3.20） |
 
 ---
 
@@ -1623,6 +1741,10 @@ onNavbarPullDownRefresh(() => {
 - [ ] **39. 新增 / 移动任何被 `.ts`、`.uvue` 导入的 `.uts` 后，必须跑一次 `node scripts/gen-uts-dts.mjs`**（缺配套 `<name>.d.uts.ts` 就会在 IDE 里挂 `Cannot find module`；不在 `src/utils/*/` 下的还要先登记进 `EXTRA_SOURCES`。这条**不影响构建**、只在 IDE 面板出现，最容易被漏掉，见 1.3.19）
 - [ ] **40. 严禁手工编辑 `<name>.d.uts.ts`**（由脚本生成，会被下次运行覆盖；确需人工维护的模块登记进脚本的 `HANDWRITTEN`，见 1.3.19）
 - [ ] **41. 遇到 `ENOENT ... .uts2js/cache/...` 时严禁怀疑 / 修改业务代码**（那是 IDE 常驻 `uni.js -p mp-weixin` 与 CLI 抢 `unpackage/cache` 的竞态，**同一份代码重试即可通过**；且 CLI 被打断时仍返回 exit 0，判定必须落到产物目录是否存在，见 1.3.18）
+- [ ] **42. 遍历值类型为 `any` 的 `Map` 时，严禁给回调参数显式标注 `any`**（`query.toMap().forEach((value: any, key: string) => {})` 报 `error17` —— `Function2<Any, String, Unit>` 对不上 `Function1<Map.Entry<String, Any?>, Unit>`；去掉标注或改用 `UTSJSONObject.keys()` + `getAny()`，见 1.1.15）
+- [ ] **43. 严禁按方法调用 `map.keys()`**（UTS 声明是方法、Kotlin 侧是 `MutableSet` 属性，报 `cannot be invoked as a function`；改用 `UTSJSONObject.keys(obj)`，见 1.1.15）
+- [ ] **44. `<script setup>` 里的局部函数严禁当值传递、也严禁在对象字面量回调里引用**（`setTimeout(localFn, 1000)` 报 `error18 找不到名称`，必须包 `() => { localFn(); }`，见 1.1.16）
+- [ ] **45. 见到「编译成功」前必须先确认这轮真的进了 Kotlin 阶段**（`manifest.json` 的 `vapor-render-target: "bytecode"` 会让整轮走字节码 / `uts2js`，`grep -c "编译为android class"` 恒为 0；此时的「编译成功」不代表 UTS 过了 Kotlin，见 1.3.20）
 
 ---
 
