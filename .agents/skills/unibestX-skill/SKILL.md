@@ -394,6 +394,113 @@ export * from './vdom/user.uts';
 
 ---
 
+#### 1.1.17 Kotlin 下**剩余参数不能写在对象类型的属性上** —— `back: (...args: Array<number>) => void` 报 `Function type parameters cannot have modifiers.`
+
+- **报错现象**（本项目实测，uni-router-guard 任务 9，真机 VDOM/Kotlin 通道）：
+
+  ```text
+  [plugin:uni:app-uts] kotlin编译失败
+  error: Function type parameters cannot have modifiers.
+  at uni_modules/uni-router-guard/lib/types.uts:75:9
+  74 |    /** 返回；back() 等价 back(1) */
+  75 |    back: (...args: Array<number>) => void;
+     |           ^
+  ```
+
+- **关键对照**：同样的 `...args` 写在**顶层 `type` 别名**里是合法的 —— 同一文件的 `export type Next = (...args: Array<any>) => void;` 没报错，只有放进**对象类型的属性**才被拒。
+- **修法**：抽成顶层别名再引用：
+
+  ```uts
+  // ❌ 对象类型属性里直接写剩余参数
+  export type Router = {
+    back: (...args: Array<number>) => void;
+  };
+
+  // ✅ 顶层别名（剩余参数合法），属性处只引用别名
+  export type BackFn = (...args: Array<number>) => void;
+  export type Router = {
+    back: BackFn;
+  };
+  ```
+
+- **只在 Kotlin 阶段暴露**：蒸汽 / 字节码模式与 H5 都放行，`pnpm lint` / node harness 也不报。
+
+---
+
+#### 1.1.18 内置 `decodeURIComponent` 在 UTS 里返回 `string?` —— 直接 `return` 给 `: string` 报 `error1 返回类型不匹配`
+
+- **报错现象**（本项目实测，uni-router-guard 任务 9，真机 VDOM/Kotlin 通道）：
+
+  ```text
+  error: 返回类型不匹配：预期类型为 'String'，实际类型为 'String?'。错误详情链接: https://doc.dcloud.net.cn/uni-app-x/uts/uts-optimize.html#error1
+  at uni_modules/uni-router-guard/lib/url.uts:65:11
+  64 |    try {
+  65 |      return decodeURIComponent(value);
+     |             ^
+  66 |    }
+  ```
+
+- **根因**：UTS 的 `decodeURIComponent` 声明为**可空返回**（转义非法时给 null），而函数签名是 `: string` 非空；外层 `try/catch` 只在运行时兜底，挡不住类型层的可空。
+- **修法**：显式判空兜底，行为与 `catch` 分支保持一致：
+
+  ```uts
+  try {
+    const decoded = decodeURIComponent(value);
+    if (decoded == null) {
+      return value;
+    }
+    return decoded;
+  }
+  catch (e) {
+    return value;
+  }
+  ```
+
+- **同族情形**：任何声明为 `T?` 的标准库 / 内置 API 直接 `return` 给非空签名都会撞 `error1`。
+- **只在 Kotlin 阶段暴露**：蒸汽 / 字节码模式与 H5 都放行。
+
+---
+
+#### 1.1.19 uni 跳转 API 的 Promise **收不进 `Promise<any> | null`** —— UTS 泛型不协变且 `any` 等价非空 Kotlin `Any`，只能写 `any | null`
+
+- **报错现象**（本项目实测，uni-router-guard 任务 9，真机 VDOM/Kotlin 通道；同一处代码按提示改一轮换一种错）：
+
+  ```text
+  # 第一轮：声明 Promise<any> | null
+  error: Return type mismatch: expected 'UTSPromise<Any>?', actual 'UTSPromise<AsyncApiSuccessResult>?'.   ×3
+
+  # 第二轮：按第一轮提示把返回类型改成 any
+  error: Return type mismatch: expected 'Any', actual 'UTSPromise<AsyncApiSuccessResult>?'.                ×4
+  error: Return type mismatch: expected 'UTSPromise<Any>?', actual 'Any'.
+
+  # 第三轮：改成 any | null → 项目 unibestX 编译成功。
+  ```
+
+- **根因两条**：① UTS 泛型**不协变** —— `UTSPromise<AsyncApiSuccessResult>?` 不能当 `UTSPromise<Any>?` 用（`AsyncApiSuccessResult` 是各跳转 API 的真实返回类型）；② UTS 的 `any` 映射到 Kotlin **非空** `Any`，接不住 `uni.navigateTo` 这类**可空**返回。两条叠加后，唯一可用的写法是 `any | null`。
+- **修法**：跳转门面用具名函数派发时，**函数与被调用方都写 `any | null`**（`null` 表示入参为空、什么都没做）：
+
+  ```uts
+  function navigateBy(api: string, url: string): any | null {
+    if (api == 'redirectTo') {
+      return uni.redirectTo({ url: url });
+    }
+    return uni.navigateTo({ url: url });
+  }
+
+  push: (to: any): any | null => {
+    const url = resolveUrl(to);
+    if (url == null) {
+      return null;
+    }
+    return navigateBy('navigateTo', url);
+  },
+  ```
+
+- **代价**：调用方拿到的是 `any`，链式 `await` 的类型提示会丢失；「返回的是该 uni API 的 Promise」只能靠 JSDoc 说明。
+- **只在 Kotlin 阶段暴露**：蒸汽 / 字节码模式与 H5 都放行（这也正是「必须先用 `grep -c "编译为android class"` 确认进了 Kotlin 阶段」的原因，见 1.3.20）。
+
+---
+
 ### 1.2 样式 (CSS & Tailwind CSS) 与原生渲染铁律
 
 #### 1.2.1 CSS 变量动态换肤与原生控件限制
@@ -1694,6 +1801,10 @@ onNavbarPullDownRefresh(() => {
 | **`error18 找不到名称"someLocalFn"`，但函数就在同一个文件里** | `setTimeout(someLocalFn, 1000)`；或在对象字面量的回调里引用外层局部函数 | 包一层 lambda：`setTimeout(() => { someLocalFn(); }, 1000)`（见 1.1.16） |
 | **真机运行日志里 `编译为android class` 恒为 0，却报「编译成功」** | 把这种「编译成功」当成 UTS 已过 Kotlin 编译 | 这是 `manifest.json` 的 `vapor-render-target: "bytecode"` 让整轮跳过 Kotlin 阶段；临时删掉 `vapor` 两个键改走 VDOM 模式再验（见 1.3.20） |
 
+| **Kotlin 报 `error: Function type parameters cannot have modifiers.`** | 把剩余参数写进对象类型的属性：`back: (...args: Array<number>) => void` | 抽成顶层别名 `export type BackFn = (...args: Array<number>) => void;` 再 `back: BackFn`（顶层别名里写 `...args` 合法，对象类型属性里不合法，见 1.1.17） |
+| **Kotlin 报 `error1 返回类型不匹配：预期类型为 'String'，实际类型为 'String?'`** | `return decodeURIComponent(value);`（包在 `try/catch` 里也不行） | 先判空再返回：`const decoded = decodeURIComponent(value); if (decoded == null) { return value; } return decoded;`（见 1.1.18） |
+| **Kotlin 先报 `expected 'UTSPromise<Any>?', actual 'UTSPromise<AsyncApiSuccessResult>?'`，按提示改成 `any` 后又报 `expected 'Any'`** | 给 uni 跳转 API 的返回值标 `Promise<any> | null`，或听提示只写 `any` | 声明与被调用方统一写 `any | null`（UTS 泛型不协变 + `any` 是非空 Kotlin `Any`，见 1.1.19） |
+
 ---
 
 ### 3.4 代码生成红线清单 (Redlines Checklist)
@@ -1745,6 +1856,9 @@ onNavbarPullDownRefresh(() => {
 - [ ] **43. 严禁按方法调用 `map.keys()`**（UTS 声明是方法、Kotlin 侧是 `MutableSet` 属性，报 `cannot be invoked as a function`；改用 `UTSJSONObject.keys(obj)`，见 1.1.15）
 - [ ] **44. `<script setup>` 里的局部函数严禁当值传递、也严禁在对象字面量回调里引用**（`setTimeout(localFn, 1000)` 报 `error18 找不到名称`，必须包 `() => { localFn(); }`，见 1.1.16）
 - [ ] **45. 见到「编译成功」前必须先确认这轮真的进了 Kotlin 阶段**（`manifest.json` 的 `vapor-render-target: "bytecode"` 会让整轮走字节码 / `uts2js`，`grep -c "编译为android class"` 恒为 0；此时的「编译成功」不代表 UTS 过了 Kotlin，见 1.3.20）
+- [ ] **46. 对象类型的属性里严禁写剩余参数**（`back: (...args: Array<number>) => void` 报 `Function type parameters cannot have modifiers.`；抽成顶层 `type` 别名再引用即可，见 1.1.17）
+- [ ] **47. 自带可空返回的内置 API 严禁直接 `return` 给非空签名**（`return decodeURIComponent(value);` 在 `: string` 函数里报 `error1 返回类型不匹配`，`try/catch` 挡不住；先判空兜底再返回，见 1.1.18）
+- [ ] **48. uni 跳转 API 的返回值严禁标 `Promise<any> | null`、也不要只写 `any`**（前者报 `expected 'UTSPromise<Any>?'`，后者报 `expected 'Any'`；统一写 `any | null`，见 1.1.19）
 
 ---
 
