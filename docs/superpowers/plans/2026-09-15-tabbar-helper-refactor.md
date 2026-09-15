@@ -32,6 +32,13 @@
 
 1. **禁止 `git add -A` / `git add .` / `git add -A <dir>`**。本仓库跟踪着约 55 个 H5 构建产物（`unpackage/dist/build/web/`，每次 `pnpm build:h5` 都会重写），且 `src/tabbar/types.uts` 有**用户未提交的改动**。任何一次 `-A` 都会把这些一并扫进提交。**每个 commit 都必须逐个写出改动文件的明确路径。**
 2. **本分支有另一条并行会话在活动**（uni-router-guard 特性线，近期提交 `261d18d04`、`3a037bbe3`、`9dbcd4519`、`1573a7706`）。**不要** `rebase`、**不要** `amend`、**不要** `push --force`，**不要**顺手修复工作区里不属于本重构的改动。
+
+   **该会话会实时改动工作区，以下是会实际撞到的四件事**（任务 2 实施与审查期间实测）：
+
+   - `main.uts` 被插入十几行 `console.log('[probe-guard] …')` 探针，`manifest.json` 被摘掉 `"vapor": true` 与 `"vapor-render-target": "bytecode"`（切到 VDOM 模式做真机 Kotlin 验证）。**这两个文件当前是脏的，不是你造成的，不要还原、不要提交、不要"修好"它们。**
+   - 有常驻 `uni.js` 进程（`-p h5` / `-p app` / `-p mp-weixin`），HBuilderX 开着本项目 watch。
+   - 因此 **`pnpm build:h5` 的编译本身照常成功**（`项目 unibestX 编译成功。` 会正常打出），但收尾的 `scripts/build-h5.mjs` `restorePages()` 可能因 `.pages.json.bak` 被并发构建删掉而抛 `copyfile ENOENT`，脚本以 exit 1 结束。**这不算你的失败**——判据是**编译结论行**，不是脚本 exit code。撞上时补做一件事：`git diff --name-only pages.json` 应为空，确认 `pages.json` 没被留在损坏状态。
+   - **提交前先看 `git diff --cached --name-only`**。若输出非空，说明并行会话正在准备提交，**此时不要 add**（你的 add 会把它的暂存内容一并卷进你的提交）。等几分钟重试。
 3. **单文件 eslint 必须在清掉 `VSCODE_PID` 之后跑**，否则 @antfu/eslint-config 会走编辑器分支、静默关掉部分规则，得到**假绿**：
 
    ```bash
