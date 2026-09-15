@@ -2,7 +2,7 @@
 
 ## 1. 概述
 
-当前 [src/router/interceptor.uts](../../../src/router/interceptor.uts) 把 URL 解析、路径规范化、相对路径解析、Token 校验、白/黑名单裁决、登录页重定向等全部逻辑塞在单个 `doIntercept()` 里，四个跳转 API 各自薄薄包一层。任何新增一条路由规则都要改动这个 260 行的单体函数，且无法单测。
+当前 [src/router/interceptor.uts](https://github.com/cq112233/unibestX/blob/main/src/router/interceptor.uts) 把 URL 解析、路径规范化、相对路径解析、Token 校验、白/黑名单裁决、登录页重定向等全部逻辑塞在单个 `doIntercept()` 里，四个跳转 API 各自薄薄包一层。任何新增一条路由规则都要改动这个 260 行的单体函数，且无法单测。
 
 本设计参照 `/Users/chenqi/Documents/qizhi-front/qizhi-h5/src/router/guard` 的**工厂式守卫模式**（一个关切一个文件，`createXxx(router)` 工厂 + `setupRouterGuard(router)` 统一安装），把 `doIntercept()` 拆解为可插拔的守卫链。
 
@@ -106,7 +106,7 @@ export function allow(): GuardResult;
 export function block(redirect: string | null = null): GuardResult;
 ```
 
-> `type` 含函数字段在本项目已有先例：[src/utils/upload/index.uts](../../../src/utils/upload/index.uts) 的 `onProgress?: (progress: number) => void`。
+> `type` 含函数字段在本项目已有先例：[src/utils/upload/index.uts](https://github.com/cq112233/unibestX/blob/main/src/utils/upload/index.uts) 的 `onProgress?: (progress: number) => void`。
 
 ### 3.3 守卫链执行语义（`guard/index.uts`）
 
@@ -150,7 +150,7 @@ export function runPendingAfterGuards(): void;   // 取出并清空暂存，再�
 
 从 `ctx.to.query` 取 `accessToken`，非空则调用 `useTokenStore().setSingleToken(...)`。
 
-**约束**：tokenStore 只有 `setSingleToken(res)` / `setDoubleToken(res)`，**没有裸 token 的 setter**（见 [token.uts:122](../../../src/store/vdom/token.uts#L122)）。因此复用既有的 `setSingleToken`：
+**约束**：tokenStore 只有 `setSingleToken(res)` / `setDoubleToken(res)`，**没有裸 token 的 setter**（见 [token.uts:122](https://github.com/cq112233/unibestX/blob/main/src/store/vdom/token.uts#L122)）。因此复用既有的 `setSingleToken`：
 
 ```uts
 setSingleToken({ token: accessToken, expiresIn: EXTERNAL_TOKEN_TTL_SECONDS } as ISingleTokenRes);
@@ -199,7 +199,7 @@ function dispatchRedirect(url: string | null, api: string): void {
 
 **与现有实现的等价性**：原 `doIntercept` 在重定向时同样一律使用 `uni.navigateTo`（仅 TabBar 页面改走 `switchTabbar`），不区分是哪个 API 触发的。本次保持该行为不变，`api` 参数仅作日志用途。
 
-`installRouteInterceptor()` 内部先调 `setupRouterGuard()` 再 `uni.addInterceptor(...)`，因此 [main.uts](../../../main.uts) **无需改动**。
+`installRouteInterceptor()` 内部先调 `setupRouterGuard()` 再 `uni.addInterceptor(...)`，因此 [main.uts](https://github.com/cq112233/unibestX/blob/main/main.uts) **无需改动**。
 
 ---
 

@@ -4,7 +4,7 @@
 
 ### 1.1 背景
 
-项目现有 [src/router/interceptor.uts](../../../src/router/interceptor.uts) 已经实现了导航拦截，但它**与业务强绑定**：登录策略常量（`LOGIN_PAGE`、`EXCLUDE_LOGIN_PATH_LIST`）、token 校验（`useTokenStore`）、TabBar 选中态（`src/tabbar/helper`）全部内联在 `doIntercept()` 里，无法作为通用能力复用，也无法独立分发。
+项目现有 [src/router/interceptor.uts](https://github.com/cq112233/unibestX/blob/main/src/router/interceptor.uts) 已经实现了导航拦截，但它**与业务强绑定**：登录策略常量（`LOGIN_PAGE`、`EXCLUDE_LOGIN_PATH_LIST`）、token 校验（`useTokenStore`）、TabBar 选中态（`src/tabbar/helper`）全部内联在 `doIntercept()` 里，无法作为通用能力复用，也无法独立分发。
 
 另有一份 [2026-09-14-router-guard-design.md](./2026-09-14-router-guard-design.md) 规划了 `src/router` 内部的**工厂式守卫重构**，那仍然是在业务工程内的改造，不属于本规格范围。
 
@@ -86,7 +86,7 @@ export type RouterOptions = {
 }
 ```
 
-（`?:` 是本项目已在用的可选字段写法，见 [src/utils/upload/index.uts](../../../src/utils/upload/index.uts) 的 `onProgress?: (progress: number) => void`；因此 `createRouter()` 与 `createRouter({ debug: true })` 都合法。）
+（`?:` 是本项目已在用的可选字段写法，见 [src/utils/upload/index.uts](https://github.com/cq112233/unibestX/blob/main/src/utils/upload/index.uts) 的 `onProgress?: (progress: number) => void`；因此 `createRouter()` 与 `createRouter({ debug: true })` 都合法。）
 
 `createRouter()` 内部完成 `uni.addInterceptor` 安装（幂等：重复调用先卸载上一次）。
 
@@ -141,7 +141,7 @@ export type AfterNavigationHook = (to: RouteTarget, from: RouteTarget) => void
 
 代价是读法从 vue-router 的 `to.query.id` 变成 `to.query.get('id')`，这条差异写进 readme。
 
-**`Next` 为什么用 `...args: Array<any>`**：[.agents/rules/uniappx.md:215](../../../.agents/rules/uniappx.md) 规定「UTS 的联合类型目前仅支持与 `null` 的联合，`string | number` 这类需声明为 `any`」。而 vue-router 的 `next()` / `next('/x')` / `next(false)` 三种形态的**参数个数与类型都不同**，只有剩余参数能同时容纳它们并保持零参数调用合法。剩余参数在本项目已有实证（`uni_modules/lime-i18n/common/util.uts:139` 的 `parseArgs(...args: Array<any>)`）。
+**`Next` 为什么用 `...args: Array<any>`**：[.agents/rules/uniappx.md:215](https://github.com/cq112233/unibestX/blob/main/.agents/rules/uniappx.md#L215) 规定「UTS 的联合类型目前仅支持与 `null` 的联合，`string | number` 这类需声明为 `any`」。而 vue-router 的 `next()` / `next('/x')` / `next(false)` 三种形态的**参数个数与类型都不同**，只有剩余参数能同时容纳它们并保持零参数调用合法。剩余参数在本项目已有实证（`uni_modules/lime-i18n/common/util.uts:139` 的 `parseArgs(...args: Array<any>)`）。
 
 守卫链**同步**执行：`router.beforeEach` 注册顺序即执行顺序。
 
@@ -258,7 +258,7 @@ types.uts ──> url.uts ──> guard.uts ──> router.uts ──> index.uts
 
 ### 5.1 RouteTarget 构建（`url.uts`）
 
-沿用 [src/router/interceptor.uts](../../../src/router/interceptor.uts) 已验证的规则，一条都不能少：
+沿用 [src/router/interceptor.uts](https://github.com/cq112233/unibestX/blob/main/src/router/interceptor.uts) 已验证的规则，一条都不能少：
 
 1. 按 `?` 切分 url，前段为 path，后段按 `&` / `=` 解析为 query（值做 `decodeURIComponent`）；
 2. 补前导 `/`（`src/pages/x` → `/src/pages/x`）；
