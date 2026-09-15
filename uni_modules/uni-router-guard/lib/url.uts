@@ -62,7 +62,12 @@ export function decodeValue(value: string): string {
     return value;
   }
   try {
-    return decodeURIComponent(value);
+    // decodeURIComponent 在 UTS 里返回 string?，与声明的 string 不兼容（真机 error1），显式兜底
+    const decoded = decodeURIComponent(value);
+    if (decoded == null) {
+      return value;
+    }
+    return decoded;
   }
   catch (e) {
     return value;

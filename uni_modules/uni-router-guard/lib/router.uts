@@ -1,0 +1,91 @@
+/**
+ * createRouter：把守卫注册表、拦截器与跳转门面组装成一个 Router 对象。
+ *
+ * ⚠️ 用工厂函数 + 类型化对象字面量，**不用 class**：UTS 禁止把 Class 实例赋值给变量
+ *    或作为普通对象传递（UTS110111151），而 Router 必须能被使用者拿着到处传。
+ */
+import type { AfterNavigationHook, NavigationGuard, Router, RouterOptions } from './types.uts';
+import { DEFAULT_APIS } from './types.uts';
+import { registerAfterHook, registerBeforeGuard } from './guard.uts';
+import { configureInterceptor, installInterceptors, uninstallInterceptors } from './interceptor.uts';
+import { normalizeLocation } from './url.uts';
+
+/**
+ * 按 API 名派发一次跳转；返回值与底层 uni API 一致。
+ *
+ * ⚠️ 返回类型必须是 `any | null`（真机实测，任务 9）：各 API 返回的是
+ *    `UTSPromise<AsyncApiSuccessResult>?`，UTS 泛型不协变，写成 `Promise<any> | null`
+ *    会被 Kotlin 通道判为返回类型不匹配；而只写 `any` 也不行——UTS 的 `any` 等价非空
+ *    Kotlin `Any`，接不住可空返回值。
+ */
+function navigateBy(api: string, url: string): any | null {
+  if (api == 'redirectTo') {
+    return uni.redirectTo({ url: url });
+  }
+  if (api == 'reLaunch') {
+    return uni.reLaunch({ url: url });
+  }
+  if (api == 'switchTab') {
+    return uni.switchTab({ url: url });
+  }
+  return uni.navigateTo({ url: url });
+}
+
+/** 把跳转入参归一为 url；为空时返回 null，调用方据此直接返回 null */
+function resolveUrl(to: any): string | null {
+  const url = normalizeLocation(to);
+  if (url == '') {
+    console.warn('[uni-router-guard] 跳转入参为空，已忽略');
+    return null;
+  }
+  return url;
+}
+
+/** 创建路由器实例；内部完成拦截器安装（幂等） */
+export function createRouter(options: RouterOptions | null = null): Router {
+  const opts = options ?? ({} as RouterOptions);
+  configureInterceptor(opts);
+  installInterceptors(opts.apis ?? DEFAULT_APIS);
+
+  const router: Router = {
+    beforeEach: (guard: NavigationGuard): () => void => registerBeforeGuard(guard),
+    afterEach: (hook: AfterNavigationHook): () => void => registerAfterHook(hook),
+    push: (to: any): any | null => {
+      const url = resolveUrl(to);
+      if (url == null) {
+        return null;
+      }
+      return navigateBy('navigateTo', url);
+    },
+    replace: (to: any): any | null => {
+      const url = resolveUrl(to);
+      if (url == null) {
+        return null;
+      }
+      return navigateBy('redirectTo', url);
+    },
+    relaunch: (to: any): any | null => {
+      const url = resolveUrl(to);
+      if (url == null) {
+        return null;
+      }
+      return navigateBy('reLaunch', url);
+    },
+    switchTab: (to: any): any | null => {
+      const url = resolveUrl(to);
+      if (url == null) {
+        return null;
+      }
+      return navigateBy('switchTab', url);
+    },
+    back: (...args: Array<number>): void => {
+      const delta = args.length > 0 ? args[0] : 1;
+      uni.navigateBack({ delta: delta });
+    },
+    uninstall: (): void => {
+      uninstallInterceptors();
+    }
+  };
+
+  return router;
+}

@@ -1,0 +1,11 @@
+/**
+ * uni-router-guard 统一入口。
+ *
+ * ⚠️ 全插件只有本文件做 `export *`，且是**单层**：被转发的模块自身不再对外 `export *`，
+ *    否则 UTS 在 Android 端会把符号改名成 xxx__1（红线 1.1.12）。
+ * ⚠️ 不转发 lib/interceptor.uts 与 lib/guard.uts：它们是内部机制，
+ *    对外能力已由 Router 实例的 beforeEach / afterEach 暴露。
+ */
+export * from './lib/types.uts';
+export * from './lib/router.uts';
+export * from './lib/url.uts';

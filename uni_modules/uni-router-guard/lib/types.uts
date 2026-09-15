@@ -43,6 +43,15 @@ export type NavigationGuard = (to: RouteTarget, from: RouteTarget, next: Next) =
 /** 后置钩子：签名与 vue-router 3 的全局后置钩子逐字相同 */
 export type AfterNavigationHook = (to: RouteTarget, from: RouteTarget) => void;
 
+/**
+ * Router.back 的签名：back() 等价 back(1)。
+ *
+ * ⚠️ 必须抽成顶层类型别名：真机实测（任务 9）把剩余参数直接写在对象类型的属性上会被
+ *    Kotlin 通道拒绝（error: Function type parameters cannot have modifiers），
+ *    而同样的写法放在顶层 `type` 别名里（如上面的 Next）是合法的。
+ */
+export type BackFn = (...args: Array<number>) => void;
+
 /** createRouter 选项 */
 export type RouterOptions = {
   /** 需要拦截的 API 名；不传用 DEFAULT_APIS */
@@ -63,16 +72,23 @@ export type Router = {
   beforeEach: (guard: NavigationGuard) => () => void;
   /** 注册后置钩子，返回注销函数 */
   afterEach: (hook: AfterNavigationHook) => () => void;
-  /** 新页面入栈 */
-  push: (to: any) => Promise<any> | null;
-  /** 替换当前页 */
-  replace: (to: any) => Promise<any> | null;
-  /** 关闭所有页面再打开 */
-  relaunch: (to: any) => Promise<any> | null;
-  /** 跳转到 TabBar 页面 */
-  switchTab: (to: any) => Promise<any> | null;
+  /**
+   * 新页面入栈。
+   *
+   * ⚠️ 返回类型标 `any | null`（真机实测，任务 9）：uni 的这些 API 返回
+   *    `UTSPromise<AsyncApiSuccessResult>?`，而 UTS 泛型不协变、`Promise<any> | null`
+   *    又不等同可空——写成 Promise<any> | null 会被 Kotlin 通道判为类型不匹配。
+   *    实际返回的就是该 uni API 的 Promise；入参为空时返回 null。
+   */
+  push: (to: any) => any | null;
+  /** 替换当前页；返回类型同 push */
+  replace: (to: any) => any | null;
+  /** 关闭所有页面再打开；返回类型同 push */
+  relaunch: (to: any) => any | null;
+  /** 跳转到 TabBar 页面；返回类型同 push */
+  switchTab: (to: any) => any | null;
   /** 返回；back() 等价 back(1) */
-  back: (...args: Array<number>) => void;
+  back: BackFn;
   /** 卸载全部已安装的拦截器 */
   uninstall: () => void;
 };
