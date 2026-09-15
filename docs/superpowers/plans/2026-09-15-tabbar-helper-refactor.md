@@ -591,13 +591,11 @@ import { getDefaultTheme } from '@/src/utils/theme/index.uts';
 
 - [ ] **步骤 5：改三个 tabbar UI 组件的 `themeColor` 来源**
 
-三处都是在已有的 import 列表中把 `themeColor` 移出、改从主题域引入：
+三处都是在已有的 import 列表中把 `themeColor` 移出、改从主题域引入。
 
-`src/tabbar/ui/template.uvue`：从 `@/src/tabbar` 的具名导入列表中删除 `themeColor,` 一行，并新增：
+⚠️ **不要另起一行新增 `import { themeColor } from '@/src/utils/theme/index.uts';`** —— 这三个文件本来就已从 `@/src/utils/theme/index.uts` 导入其它符号（`isDarkMode` / `getThemeTokens` 等），另起一行会触发 eslint 的 `import/no-duplicates`（实测 4 个文件各 2 处 error）。**正确做法是把 `themeColor` 并入已有那条主题域导入列表**，语义完全等价且 lint 干净。
 
-```uts
-import { themeColor } from '@/src/utils/theme/index.uts';
-```
+`src/tabbar/ui/template.uvue`：从 `@/src/tabbar` 的具名导入列表中删除 `themeColor,` 一行，并把 `themeColor` 并入已有的主题域导入列表（形如 `import { isDarkMode, themeColor } from '@/src/utils/theme/index.uts';`）。
 
 `src/tabbar/ui/default/TabbarItem.uvue` 第 3 行：
 
@@ -609,19 +607,24 @@ import { curIdx, themeColor } from '../../helper';
 
 ```uts
 import { curIdx } from '../../helper';
-import { themeColor } from '@/src/utils/theme/index.uts';
 ```
 
-`src/tabbar/ui/capsule/index.uvue` 第 8-15 行的具名导入列表中删除 `themeColor` 一项（注意上一行 `handleTabbarClick,` 的尾逗号处理），并新增：
+再把 `themeColor` 并入已有的主题域导入列表。
 
-```uts
-import { themeColor } from '@/src/utils/theme/index.uts';
-```
+`src/tabbar/ui/capsule/index.uvue` 第 8-15 行的具名导入列表中删除 `themeColor` 一项（注意上一行 `handleTabbarClick,` 的尾逗号处理），再把 `themeColor` 并入已有的主题域导入列表。
 
 - [ ] **步骤 6：重生成类型声明并验证同步**
 
 运行：`pnpm gen:uts-dts && pnpm check:uts-dts; echo "exit=$?"`
 预期：`exit=0`，且 `git diff src/utils/theme/index.d.uts.ts` 显示新增了 `themeColor` 声明
+
+> ⚠️ **已实测的既知结果：生成的声明是 `export declare const themeColor: any;`，不是 `Ref<string>`。**
+>
+> 原因：`gen-uts-dts.mjs` 的推断规则只覆盖 `ref(<字面量>)` / `new Foo()` / 纯标识符，`ref(getDefaultTheme())` 是函数调用，推断不出，按设计降级 `any` 并打印「请手工补」告警（见该脚本头部「生成策略」）。生成器里 `HANDWRITTEN` 只列了 `systemInfo`，`theme` 不在其中。
+>
+> **处置：接受 `any`，不手工补、不改生成器。** 依据有三：（1）红线 40 严禁手工编辑 `.d.uts.ts`；（2）`src/i18n/index.d.uts.ts:11` 有同类先例；（3）改造前 `themeColor` 走 `@/src/tabbar/helper` 这条**目录路径**、根本没有配套声明文件，TS 侧解析不到类型，`any` 严格优于「解析失败」。项目无 `ref<T>()` 显式泛型先例，按既定取舍「已验证形态优于语法优雅」不引入未验证语法。
+>
+> 代价：`.ts` / `.uvue` 侧读 `themeColor.value` 无 IDE 补全。若日后要修，正确方向是**增强 `gen-uts-dts.mjs` 让它能从函数声明的返回类型推断**（`getDefaultTheme(): string` 就在同文件 55 行），而不是手改产物。
 
 - [ ] **步骤 7：检查红线 1.1.11（getter 撞名）**
 
@@ -632,7 +635,15 @@ grep -nE "^export const [A-Za-z_]" src/utils/theme/index.uts
 grep -nE "^export function get[A-Z]" src/utils/theme/index.uts
 ```
 
-预期：第二条命令**无输出**（顶层不存在 `get*` 函数）。若出现 `getThemeColor` 形状的命中，立即停止并上报——那会在 Kotlin 端与 `themeColor` 生成的静态 getter 冲突。
+预期：第二条命令**会列出 4 个既有函数**（`getDefaultTheme` / `getSystemTheme` / `getThemeTokens` / `getRootThemeStyle`），它们在改造前就存在、且本次改动前后逐一对齐（只是整体下移了几行）。**红线 1.1.11 的真正判据不是「无输出」，而是：**
+
+1. 新增的 `themeColor` 必须在第一条命令的输出里（它生成 Kotlin 静态 getter `getThemeColor()`）；
+2. 第二条命令的输出里**不得出现 `getThemeColor`**（否则与之撞名）；
+3. 第二组函数数量与改造前一致（本次不新增任何 `get*`）。
+
+> ⚠️ 原计划此处写的是「第二条命令无输出」——**该预期本身是错的**，改造前就不成立。以本节的三条判据为准。
+>
+> 另注：`getRootThemeStyle(themeColor: string, ...)` 里的 `themeColor` 是**函数参数**，与顶层 `themeColor` 不是一回事，不构成冲突。
 
 - [ ] **步骤 8：断言导出面减少 1 个符号**
 
