@@ -103,13 +103,22 @@
  *     `export const { a, b } = obj`（解构）等等。
  *   宁可让检查变红，也不产出一份看起来正确、实则残缺的导出面。
  *
- * 已知残余限制（刻意接受的取舍）：
- *   1. 注释剥离是基于正则的近似实现，不解析字符串与模板串。若块注释起始符出现在字符串
- *      或行注释里，它会一路吞到其后第一个块注释收尾符，把中间的真实导出行整行抹掉。已用
- *      「只剥合法块注释」与「真实剥离」的导出行计数守卫兜住这一最危险的后果（静默少算
- *      导出面）：两者行数不等即报错退出、不再继续扫描；
- *   2. 多行模板字符串里独占一行的 `export` 仍会被误判成导出语句。
- *   以上残余影响均为「误报」（可见、变红），而非静默漏计，符合本脚本「宁可变红」的取舍。
+ * 已知残余限制（如实陈述 —— 请勿把吞行守卫当成「导出面已被证明完好」的依据）：
+ *   1. 注释剥离是正则近似实现，不解析字符串、模板串与正则字面量。「块注释起始符出现在
+ *      字符串或行注释里」时会一路吞到其后第一个块注释收尾符，把中间的真实导出行整行抹掉。
+ *      吞行守卫只覆盖其中「同行前缀含 `//`，或含未闭合（奇数个）引号」的这一类；
+ *   2. 守卫 **覆盖不到** 同行前缀干净的过度吞并 —— 例如跨行模板串里独占一行的块注释起始
+ *      符、正则字面量里的块注释起始符。这类仍会 **静默少算导出面**，而守卫不会报错：
+ *      被吞掉的符号会以「已移除：」的面目出现，与「真的被收回」无法区分；此时若执行
+ *      `--write`，残缺的面会被直接写成语义上的新基线，锚点从此被污染。这是已知的假绿通道；
+ *   3. 守卫的基准与 `stripComments` **共用同一份块注释正则**，两者会一起漂移：只改其中
+ *      一处而漏改另一处，守卫的前提会静默失效。因此守卫 **不是** 独立的第二意见 ——
+ *      「守卫没报错」推不出「导出面完整」；
+ *   4. 反向残余（假红）：同行前缀形如 `"it's" ` 再接块注释起始符时，引号计数为奇数，
+ *      合法注释会被判脏而报错。已用报错里的「差异行号 + 原始行文本」缓解 —— 看行号
+ *      即可在 1 秒内判断真假；
+ *   5. 多行模板字符串里独占一行的 `export` 仍会被误判成导出语句（假红方向，可见）。
+ *   早先版本曾声称「其余影响是误报、不会静默漏计」，该说法已被反例证伪，故删除。
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -148,11 +157,41 @@ const EXPORT_SHAPES = [
 
 const EXPORT_LINE = /^export\b/;
 
+/**
+ * 块注释正则：`stripComments` 与吞行守卫共用同一处定义，避免「只改一处」让对方静默失效。
+ * 两处都只经 String.replace 使用 —— 不要在这份共享的带 g 正则上调用 test/exec，
+ * 那会污染 lastIndex。
+ */
+const BLOCK_COMMENT = /\/\*[\s\S]*?\*\//g;
+const blankOut = comment => comment.replace(/[^\n]/g, ' ');
+
 /** 剥掉块注释与行尾注释；块注释用等长空格替换，保持行号与行内偏移不漂移 */
 function stripComments(src) {
-  return src
-    .replace(/\/\*[\s\S]*?\*\//g, m => m.replace(/[^\n]/g, ' '))
-    .replace(/\/\/[^\n]*/g, '');
+  return src.replace(BLOCK_COMMENT, blankOut).replace(/\/\/[^\n]*/g, '');
+}
+
+/**
+ * 同行前缀是否像「真注释」的位置。判脏（不像）的条件：前缀含 `//`，或三种引号里任一种
+ * 出现**奇数**次（即未闭合）。反斜杠转义的引号不计入。
+ * 这是启发式而非词法分析 —— 残余假红见头注释的「已知残余限制」第 4 条。
+ */
+function looksLikeRealComment(prefix) {
+  if (prefix.includes('//'))
+    return false;
+  for (const quote of ['\'', '"', '`']) {
+    let count = 0;
+    for (let i = 0; i < prefix.length; i++) {
+      if (prefix[i] === '\\') {
+        i++;
+        continue;
+      }
+      if (prefix[i] === quote)
+        count++;
+    }
+    if (count % 2 === 1)
+      return false;
+  }
+  return true;
 }
 
 /** 解析模块路径，依次尝试：原样、补 .uts、补 .ts、补 /index.uts、补 /index.ts */
@@ -194,22 +233,28 @@ function walk(file) {
   const rawLines = raw.split('\n');
   const lines = stripComments(raw).split('\n');
 
-  // 守卫：正则剥离不解析字符串与行注释。若「块注释起始符」其实出现在字符串或行注释里，
-  // 它会一路吞到其后第一个收尾符，把中间的真实导出行整行抹成空格 —— 静默少算导出面 = 假绿。
-  // 但合法块注释里本来就可能写着 export 字样（那是注释不是导出），所以不能拿「原始全文」
-  // 当基准。基准取「只剥合法块注释」的结果：两者导出行数一旦不等，即说明有真实导出行被
-  // 过度吞掉，立即中止本文件（parseError 随之阻止任何写盘）。
-  const countExportLines = ls => ls.filter(l => EXPORT_LINE.test(l.trim())).length;
-  const legitStripped = raw.replace(/\/\*[\s\S]*?\*\//g, (comment, offset) => {
+  // 守卫：正则剥离不解析字符串/模板串/正则字面量。若「块注释起始符」其实出现在字符串或
+  // 行注释里，它会一路吞到其后第一个收尾符，把中间的真实导出行整行抹成空格 —— 静默少算
+  // 导出面 = 假绿。合法块注释里本来就可能写着 export 字样（那是注释不是导出），所以基准
+  // 取「只剥真注释」的结果，再逐行比出「基准里是导出、真实剥离后不是」的行。
+  // 注意：基准与生产线共用同一份块注释正则，故守卫只覆盖「脏前缀」这一类，见头注释。
+  const legitStripped = raw.replace(BLOCK_COMMENT, (comment, offset) => {
     const linePrefix = raw.slice(raw.lastIndexOf('\n', offset) + 1, offset);
-    const isRealComment = !linePrefix.includes('//') && !/['"`]/.test(linePrefix);
-    return isRealComment ? comment.replace(/[^\n]/g, ' ') : comment;
+    return looksLikeRealComment(linePrefix) ? blankOut(comment) : comment;
   });
-  const exportsKept = countExportLines(legitStripped.split('\n'));
-  const exportsAfterStrip = countExportLines(lines);
-  if (exportsAfterStrip < exportsKept) {
-    console.error(`✗ 剥注释时疑似吞掉了 ${exportsKept - exportsAfterStrip} 行导出语句：${abs}`);
-    console.error('  常见原因：字符串或行注释里出现了未配对的块注释起始符');
+  const legitLines = legitStripped.split('\n');
+  const swallowed = [];
+  for (let i = 0; i < lines.length; i++) {
+    if (EXPORT_LINE.test(lines[i].trim()))
+      continue;
+    if (EXPORT_LINE.test((legitLines[i] ?? '').trim()))
+      swallowed.push(i + 1);
+  }
+  if (swallowed.length > 0) {
+    console.error(`✗ 剥注释时疑似吞掉了 ${swallowed.length} 行导出语句：${abs}`);
+    for (const lineNo of swallowed)
+      console.error(`  差异行：第 ${lineNo} 行 ${rawLines[lineNo - 1].trim()}`);
+    console.error('  可能原因：字符串/行注释里出现了未配对的块注释起始符（本工具确实吞了真实代码）；或本工具误判了同行前缀（该块注释其实合法）。请核对上面列出的行。');
     parseError = true;
     return;
   }
@@ -338,6 +383,7 @@ else if (wantWrite) {
   const prev = readBaseline();
   if (baselineReadError) {
     // 旧基线读不出来就不要覆盖它（EACCES 下写同样会失败，别把好文件写坏）
+    console.error('✗ 基线不可读，未写入任何文件');
     process.exitCode = 1;
   }
   else {
