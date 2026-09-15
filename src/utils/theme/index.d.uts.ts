@@ -56,6 +56,12 @@ export type ThemeTokens = {
 export declare function getDefaultTheme(): string;
 
 /**
+ * 全局主题色（响应式）：由 app store 在主题变更时写入，TabBar / NavBar 等 UI 组件读取。
+ * 原先寄居在 src/tabbar/helper/store.uts，迁入主题域后 store 不再反向依赖 tabbar。
+ */
+export declare const themeColor: any;
+
+/**
  * 获取当前系统 / 宿主主题
  * - App（Android / iOS / 鸿蒙）：读取系统主题 osTheme（Android 10+ / iOS 13+ 可感知深色）
  * - H5：通过 prefers-color-scheme 媒体查询判断系统深浅色

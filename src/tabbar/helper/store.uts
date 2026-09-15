@@ -1,6 +1,5 @@
 import type { CustomTabBarItem, CustomTabBarItemBadge, TabBarConfig } from '../types';
 import { customTabbarConfig } from '../config';
-import { getDefaultTheme } from '@/src/utils/theme/index.uts';
 import { cleanPath, getCurrentPath, isSamePath } from '@/src/utils/route/index.uts';
 
 /** 组合 list 与 midButton 供自定义 TabBar 渲染（自动将 midButton 插入居中位置） */
@@ -69,9 +68,6 @@ export const tabbarList = reactive(normalizeList());
  * 当前选中的 tab 索引（持久化到 storage）
  */
 export const curIdx = ref(0);
-
-/** 全局主题色，供主题设置和 Tabbar 联动使用 */
-export const themeColor = ref(getDefaultTheme());
 
 /** 设置当前索引并持久化 */
 export function setCurIdx(idx: number) {
