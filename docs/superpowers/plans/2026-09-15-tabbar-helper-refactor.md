@@ -66,6 +66,7 @@
 | `src/tabbar/helper/index.uts` | 任务 3 随目录更名移至 `internal/`，此后逐任务掏空，任务 7 删除 |
 | `src/tabbar/helper/store.uts` | 任务 3 随目录更名移至 `internal/`，任务 6 迁为 `state.uts` 后删除 |
 | 12 处消费者 | import 路径归一为 `@/src/tabbar` |
+| `README.md:590` | 任务 3 把小节标题里的 `src/tabbar/helper` 改为 `src/tabbar`（文档里唯一引用旧目录名的位置） |
 
 **移动：** `src/tabbar/helper/` → `src/tabbar/internal/`（任务 3）
 
@@ -824,6 +825,9 @@ git commit -m "refactor: 统一 tabbar 模块对外导入入口为 @/src/tabbar"
 **文件：**
 - 移动：`src/tabbar/helper/` → `src/tabbar/internal/`（其中含 `index.uts`、`store.uts`）
 - 修改：`src/tabbar/index.uts`（门面那一行）
+- 修改：`README.md:590`（文档小节标题引用了旧目录名）
+
+> 📌 **已确认：没有任何构建配置硬编码 `tabbar/helper`**（任务 3 派发前实测）。`tsconfig.json`、`vite.config.ts`、`package.json`、`pages.json`、`manifest.json`、`plugins/`、`scripts/` 中**一次 `helper` 都没有出现**（`package.json` 的 `@uni-helper/*` 与 `eslint.config.mjs` 的 `uniHelper` 是 npm scope，非路径）。全仓对 `tabbar/helper` 的其余命中只有三类：构建产物里的源码路径日志串（下次构建即重写）、`docs/` 下本次重构自己的文档、以及 `README.md:590`。**所以更名不会静默打断任何构建链路**，实施者无需重新验证这一点。
 
 - [ ] **步骤 1：移动目录**
 
@@ -849,17 +853,35 @@ export * from './internal';
 export * from './types';
 ```
 
-- [ ] **步骤 3：确认旧路径已彻底消失**
+- [ ] **步骤 3：同步 README 里的小节标题**
+
+`README.md:590` 现为：
+
+```markdown
+#### 5. 统一路由跳转与安全 API（`src/tabbar/helper`）
+```
+
+改为：
+
+```markdown
+#### 5. 统一路由跳转与安全 API（`src/tabbar`）
+```
+
+> 这里写门面路径而不是 `internal`：该小节列举的 5 个 API 是**对使用者公开的入口**，消费者本就该从 `@/src/tabbar` 导入。写成 `internal` 反而在文档里暗示「请深入模块内部引用」，与本次「收回内部实现、只留门面」的目标相悖。
+
+- [ ] **步骤 4：确认旧路径已彻底消失**
 
 运行：
 
 ```bash
-grep -rn "tabbar/helper\|from './helper'\|from '../../helper'" src/ App.uvue App.ku.uvue --include='*.uts' --include='*.uvue' --include='*.ts'
+grep -rn "tabbar/helper\|from './helper'\|from '../../helper'" src/ App.uvue App.ku.uvue README.md --include='*.uts' --include='*.uvue' --include='*.ts' --include='*.md'
 ```
 
-预期：**无输出**。（任务 2 之后唯一残留的门面聚合行，已在步骤 2 改掉，所以这次连一行命中都不该有。）
+预期：**无输出**。（任务 2 之后唯一残留的门面聚合行已在步骤 2 改掉，README 那处在步骤 3 改掉，所以这次连一行命中都不该有。）
 
-- [ ] **步骤 4：确认导出面一个符号都没变**
+> 扫描范围含 `README.md`：步骤 3 的改动就是为堵住这个漏网之鱼，若不把它纳入本步骤的 grep，这条检查就证不了「旧路径已彻底消失」。
+
+- [ ] **步骤 5：确认导出面一个符号都没变**
 
 运行：`node scripts/check-tabbar-surface.mjs --expect 40; echo "exit=$?"`
 预期：`✓ 导出面符号数符合预期` + `exit=0`，且**肉眼核对** `已移除：` 行仍恰为 `themeColor` 一个符号。
@@ -868,12 +890,12 @@ grep -rn "tabbar/helper\|from './helper'\|from '../../helper'" src/ App.uvue App
 >
 > ⚠️ 老规矩：脚本只校验「总数」与「是否有新增」，**不校验移除的是不是预期的那几个**。光看 `✓` 不算通过。
 
-- [ ] **步骤 5：H5 编译验证**
+- [ ] **步骤 6：H5 编译验证**
 
 运行：`pnpm build:h5 2>&1 | grep -aE "编译成功|打包成功|编译失败"`
 预期：`项目 unibestX 编译成功。` + `✅ H5 打包成功`。既存的 `TS2305 resolveEasycom` 属基线噪声，数量与基线相当即可。
 
-- [ ] **步骤 6：Lint 无新增问题**
+- [ ] **步骤 7：Lint 无新增问题**
 
 ```bash
 env -u VSCODE_PID -u VSCODE_CWD -u VSCODE_ESM_ENTRYPOINT pnpm eslint src/tabbar/index.uts src/tabbar/internal/index.uts src/tabbar/internal/store.uts
@@ -881,12 +903,12 @@ env -u VSCODE_PID -u VSCODE_CWD -u VSCODE_ESM_ENTRYPOINT pnpm eslint src/tabbar/
 
 预期：exit 0
 
-- [ ] **步骤 7：Commit**
+- [ ] **步骤 8：Commit**
 
-`git mv` 已自动暂存了目录改名，只需补上步骤 2 改过的门面文件：
+`git mv` 已自动暂存了目录改名，只需补上步骤 2、步骤 3 改过的两个文件：
 
 ```bash
-git add src/tabbar/index.uts
+git add src/tabbar/index.uts README.md
 git commit -m "refactor: 把 tabbar 内部实现目录 helper 更名为 internal"
 ```
 

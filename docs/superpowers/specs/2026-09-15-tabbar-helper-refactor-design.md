@@ -193,4 +193,5 @@ grep -nE "^export function get[A-Z]" src/utils/theme/index.uts
 - `src/tabbar/index.uts` 为单层门面，无两层星号转发。
 - `themeColor` 位于 `src/utils/theme/index.uts`，`src/store` 不再被 tabbar 反向引用。
 - 全部 12 处消费者 import 归一为 `@/src/tabbar`（另 3 处 `themeColor` 来源改走主题域）。
+- `README.md` 不再引用已不存在的 `src/tabbar/helper` 路径。
 - 上述四步验证全部通过，且该模块对外行为与改造前完全一致。
