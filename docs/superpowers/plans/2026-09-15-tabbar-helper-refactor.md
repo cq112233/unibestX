@@ -548,13 +548,17 @@ import { nextTick, ref } from 'vue';
 
 ```uts
 /**
- * 全局主题色（响应式）：由 app store 在主题变更时写入，TabBar / NavBar 等 UI 组件读取。
- * 原先寄居在 src/tabbar/helper/store.uts，迁入主题域后 store 不再反向依赖 tabbar。
+ * 全局主题色（响应式）：由 app store 在主题变更时写入，TabBar 各 UI 组件读取。
+ * 迁入主题域后 store 不再反向依赖 tabbar。
  */
 export const themeColor = ref(getDefaultTheme());
 ```
 
 **必须放在 `getDefaultTheme` 定义之后**，避免依赖顶层声明的求值顺序。
+
+> ⚠️ **这段 JSDoc 会被 `gen-uts-dts` 原样拷进公开声明 `src/utils/theme/index.d.uts.ts`**，所以措辞错误等于固化进对外契约。初版写的是「TabBar / NavBar 等 UI 组件读取」，**事实有误**：全仓只有 3 个 TabBar 组件读 `themeColor`（`ui/template.uvue`、`ui/default/TabbarItem.uvue`、`ui/capsule/index.uvue`），`src/components/NavBar/NavBar.uvue` 走的是 `getThemeTokens()`、从不读它。已改为「TabBar 各 UI 组件读取」。
+>
+> 同时删掉了「原先寄居在 `src/tabbar/helper/store.uts`」这个文件指针：`store.uts` 会在任务 5 被删除，指针必成死链；且迁移史对 d.ts 的消费者毫无意义。保留的是不变量（store 不再反向依赖 tabbar）。
 
 - [ ] **步骤 3：改 store 两个分支的导入**
 
@@ -661,6 +665,28 @@ grep -nE "^export function get[A-Z]" src/utils/theme/index.uts
 git add src/utils/theme/index.uts src/utils/theme/index.d.uts.ts src/store/vapor/app.ts src/store/vdom/app.uts src/tabbar/helper/store.uts src/tabbar/ui/template.uvue src/tabbar/ui/default/TabbarItem.uvue src/tabbar/ui/capsule/index.uvue
 git commit -m "refactor: themeColor 迁入主题域，解开 store 与 tabbar 的双向依赖"
 ```
+
+---
+
+#### 任务 1 复审留档（已记录，本次**不实施**）
+
+规格审查与代码质量审查均已通过。质量审查发现一处**本次重构范围之外**的既有问题，记录备查，**不要在任务 2-7 里顺手处理**（本重构的硬性非目标是「不改任何运行时行为」）：
+
+**「当前激活主题色」的三份重复且兜底分支不可达。**
+
+`src/tabbar/ui/template.uvue:132`、`ui/default/TabbarItem.uvue:38`、`ui/capsule/index.uvue:54` 三处字面完全相同：
+
+```uts
+return themeColor.value.length > 0 ? themeColor.value : appStore.state.theme;
+```
+
+三点使它构成实质问题而非无害重复：
+
+1. 已经在漂移——三份的说明注释已不一致（前两处是完整描述，`capsule` 那份只剩「当前激活的主题色」）。
+2. **兜底分支实际不可达**：`getDefaultTheme()` 永不为空（`src/utils/theme/index.uts` 内有 `'#37c2bc'` 兜底），且写入方向成对出现（`store/vapor/app.ts` 与 `store/vdom/app.uts` 每次写 `themeColor.value` 都同步写 `state.theme`），故 `themeColor.value` 与 `state.theme` 恒等；能让它进兜底分支的条件（`themeColor.value` 为空串）成立时兜底值同样是空串。
+3. 于是三份都是「重复的死逻辑」。
+
+**建议的收敛方向**（若日后要做）：在主题域导出一个 `activeThemeColor` 的 `computed<string>`，三处消费方收敛为一次导入，顺带删掉不可达兜底。改动落在 `src/utils/theme/index.uts` + 3 个组件，规模与任务 1 相当。**不要**把它做成 `ThemeUtils` 类的 getter——该类门面其余方法一律返回值类型（`string` / `boolean`），返回 `Ref` 会破坏其一致性。
 
 ---
 
