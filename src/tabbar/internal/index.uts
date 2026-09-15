@@ -1,10 +1,7 @@
-import { watch } from 'vue';
-import { curIdx, setCurIdx, setCurIdxByPath, tabbarList } from './store';
+import { curIdx, setCurIdx, setCurIdxByPath, tabbarList } from './state.uts';
 import { isCompilerVersionGte } from '@/src/utils/systemInfo/index.uts';
 import { customTabbarConfig } from '../config';
 import { isNativeTabbar, isSinglePageTabbar, selectedTabbarStrategy, TABBAR_STRATEGY_MAP } from './strategy.uts';
-
-export * from './store';
 
 /** 中间鼓包 tabbarItem 点击事件 */
 export function handleClickBulge(url: string = '/src/pages/ai/ai'): void {
@@ -163,21 +160,4 @@ export function initNativeMidButtonTap(): void {
     console.warn('onTabBarMidButtonTap registration error', e);
   }
   // #endif
-}
-
-/**
- * 监听指定 Tab 激活显示（当单页面模式切换到该 Tab 时触发，可用于刷新数据或重新请求接口）
- * @param index 对应 Tab 索引（0: 首页, 1: 基础, 2: 功能, 3: 我的）
- * @param callback 激活显示时的回调函数
- * @param immediate 若首次加载时当前 Tab 正好处于激活状态，是否立即执行一次（默认 false）
- */
-export function onTabShow(index: number, callback: () => void, immediate: boolean = false): void {
-  if (immediate && curIdx.value == index) {
-    callback();
-  }
-  watch(curIdx, (newVal: number, oldVal: number) => {
-    if (newVal == index && oldVal != index) {
-      callback();
-    }
-  });
 }

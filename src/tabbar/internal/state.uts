@@ -1,9 +1,10 @@
-import type { CustomTabBarItem, CustomTabBarItemBadge, TabBarConfig } from '../types';
-import { customTabbarConfig } from '../config';
+import { watch } from 'vue';
+import type { CustomTabBarItem, CustomTabBarItemBadge, TabBarConfig } from '../types.uts';
+import { customTabbarConfig } from '../config.uts';
 import { cleanPath, getCurrentPath, isSamePath } from '@/src/utils/route/index.uts';
 
 /** 组合 list 与 midButton 供自定义 TabBar 渲染（自动将 midButton 插入居中位置） */
-export function buildFullTabbarList(config: TabBarConfig): CustomTabBarItem[] {
+function buildFullTabbarList(config: TabBarConfig): CustomTabBarItem[] {
   const result: CustomTabBarItem[] = [];
   const list = config.list;
   const mid = config.midButton;
@@ -39,8 +40,8 @@ export function buildFullTabbarList(config: TabBarConfig): CustomTabBarItem[] {
   return result;
 }
 
-/** 快捷导出供自定义 Tabbar 组件渲染的完整列表 */
-export const customTabbarList: CustomTabBarItem[] = buildFullTabbarList(customTabbarConfig);
+/** 完整 TabBar 列表（含中间鼓包项），仅本文件内部使用 */
+const customTabbarList: CustomTabBarItem[] = buildFullTabbarList(customTabbarConfig);
 
 /**
  * tabbar 响应式列表（统一加前导 /）
@@ -62,7 +63,7 @@ function normalizeList(): CustomTabBarItem[] {
   return result;
 }
 
-export const tabbarList = reactive(normalizeList());
+export const tabbarList: CustomTabBarItem[] = reactive(normalizeList());
 
 /**
  * 当前选中的 tab 索引（持久化到 storage）
@@ -70,20 +71,20 @@ export const tabbarList = reactive(normalizeList());
 export const curIdx = ref(0);
 
 /** 设置当前索引并持久化 */
-export function setCurIdx(idx: number) {
+export function setCurIdx(idx: number): void {
   curIdx.value = idx;
   uni.setStorageSync('app-tabbar-index', idx);
 }
 
 /** 设置某项的 badge */
-export function setTabbarItemBadge(idx: number, badge: CustomTabBarItemBadge) {
+export function setTabbarItemBadge(idx: number, badge: CustomTabBarItemBadge): void {
   if (tabbarList.length > idx) {
     tabbarList[idx].badge = badge;
   }
 }
 
 /** 根据给定的页面路径手动同步索引 */
-export function setCurIdxByPath(path: string) {
+export function setCurIdxByPath(path: string): void {
   const targetPath = cleanPath(path);
   for (let i = 0; i < tabbarList.length; i++) {
     if (isSamePath(tabbarList[i].pagePath, targetPath)) {
@@ -94,7 +95,7 @@ export function setCurIdxByPath(path: string) {
 }
 
 /** 根据当前页面路径自动同步索引 */
-export function syncCurIdxByCurrentPage() {
+export function syncCurIdxByCurrentPage(): void {
   const currentPath = getCurrentPath();
   if (currentPath.length == 0) {
     return;
@@ -111,4 +112,21 @@ export function isPageTabbar(path: string): boolean {
     }
   }
   return false;
+}
+
+/**
+ * 监听指定 Tab 激活显示（当单页面模式切换到该 Tab 时触发，可用于刷新数据或重新请求接口）
+ * @param index 对应 Tab 索引（0: 首页, 1: 基础, 2: 功能, 3: 我的）
+ * @param callback 激活显示时的回调函数
+ * @param immediate 若首次加载时当前 Tab 正好处于激活状态，是否立即执行一次（默认 false）
+ */
+export function onTabShow(index: number, callback: () => void, immediate: boolean = false): void {
+  if (immediate && curIdx.value == index) {
+    callback();
+  }
+  watch(curIdx, (newVal: number, oldVal: number) => {
+    if (newVal == index && oldVal != index) {
+      callback();
+    }
+  });
 }
