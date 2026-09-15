@@ -54,10 +54,16 @@ const HANDWRITTEN = new Set(['systemInfo']);
  *
  * 同理，`src/i18n/index.uts` 被 `src/store/vapor/app.ts`、`src/store/vdom/app.uts` 导入，
  * 而它不在 `src/utils/` 下，不补进来就会一直报同一个 `Cannot find module` 警告。
+ *
+ * `src/tabbar/index.uts` 是纯 `export *` 门面（7 行全是再导出），跟随展开由
+ * `collectParts` 里的 `export *` 分支负责 —— 它被 `src/tabbar/tabbar.uvue`、
+ * `src/layouts/navbar.uvue`、`src/router/interceptor.uts` 等 13 处以
+ * `@/src/tabbar/index.uts` 形式导入。
  */
 const EXTRA_SOURCES = [
   path.join(ROOT, 'src/store/types.uts'),
   path.join(ROOT, 'src/i18n/index.uts'),
+  path.join(ROOT, 'src/tabbar/index.uts')
 ];
 
 const args = new Set(process.argv.slice(2));
@@ -218,6 +224,17 @@ function inferType(init, constTypes) {
     const arg = refMatch[1].trim();
     const inner = inferLiteralType(arg) ?? inferType(arg, constTypes);
     return inner ? `Ref<${inner}>` : null;
+  }
+
+  // computed<T>(...)  →  ComputedRef<T>
+  // 只认基本类型实参：产物里不会为跨模块的类型名生成 import，硬写 T 会退化成
+  // `Cannot find name`（比 any 更难排查）；那种情况返回 null，交给上层打 warning。
+  if (/^computed\s*[<(]/.test(s)) {
+    // 泛型实参单独匹配：`<([^<>]+)>\(` 里的 `[^<>]` 啃不掉 `>`，边界唯一，
+    // 不会像带 `\s*` 的写法那样产生多项式回溯
+    const generic = /^computed<([^<>]+)>\(/.exec(s)?.[1]?.trim();
+    const PRIMITIVES = new Set(['number', 'string', 'boolean', 'void', 'null', 'undefined', 'any', 'unknown']);
+    return generic != null && PRIMITIVES.has(generic) ? `ComputedRef<${generic}>` : null;
   }
 
   // new Foo(...)  →  Foo
@@ -450,10 +467,25 @@ function genClass(src, m, start) {
 
 // ────────────────────────────── 主流程 ──────────────────────────────
 
-function generate(src, moduleName, fileName = 'index.uts') {
-  const dtsBase = `${fileName.replace(/\.uts$/, '')}.d.uts.ts`;
+/**
+ * 把 `export * from './x'` 的说明符解析成磁盘上的真实文件。
+ * 依次尝试原样、补 `.uts`、补 `.ts`、当作目录取 `index.uts`。
+ */
+function resolveUts(spec, fromPath) {
+  const base = path.resolve(path.dirname(fromPath), spec);
+  const candidates = [base, `${base}.uts`, `${base}.ts`, path.join(base, 'index.uts')];
+  return candidates.find(p => fs.existsSync(p) && fs.statSync(p).isFile()) ?? null;
+}
+
+/**
+ * 收集单个 `.uts` 文件的导出声明片段。
+ *
+ * `export * from './x'` 会被递归跟随（门面文件即靠这条展开成完整导出面）。
+ * 注意 `export *` **不转发 `default`**，所以递归进来的子文件只取具名导出，
+ * 它的 `defaultIdent` 直接丢弃。`seen` 记录已展开的绝对路径，防住互相 `export *` 的环。
+ */
+function collectParts(src, srcPath, moduleName, constTypes, seen) {
   const m = mask(src);
-  const constTypes = new Map();
   const parts = [];
   /** `export default <identifier>` 里的标识符，循环后校验它是否有声明 */
   let defaultIdent = null;
@@ -487,6 +519,23 @@ function generate(src, moduleName, fileName = 'index.uts') {
       const end = statementEnd(m, start);
       out = { text: src.slice(start, end + 1), end };
     }
+    else if (/^export\s+\*\s+from\b/.test(head)) {
+      // 说明符要从**原始 src** 取：mask() 把字符串字面量抹成了空白，
+      // 在 head 上匹配只会得到一串空格
+      const end = statementEnd(m, start);
+      const spec = /^export\s+\*\s+from\s+['"]([^'"]+)['"]/.exec(src.slice(start, end + 1))?.[1];
+      const target = spec != null && srcPath != null ? resolveUts(spec, srcPath) : null;
+      if (target == null) {
+        warnings.push(`${moduleName}: 无法解析 \`export * from '${spec}'\` 的目标文件，其导出未纳入声明`);
+        continue;
+      }
+      if (seen.has(target))
+        continue;
+      seen.add(target);
+      const sub = collectParts(fs.readFileSync(target, 'utf8'), target, path.relative(ROOT, target), constTypes, seen);
+      parts.push(...sub.parts);
+      continue;
+    }
     else {
       warnings.push(`${moduleName}: 跳过无法识别的导出 → ${head.split('\n')[0]}`);
       continue;
@@ -496,6 +545,17 @@ function generate(src, moduleName, fileName = 'index.uts') {
       continue;
     parts.push(doc ? `${doc}\n${out.text}` : out.text);
   }
+
+  return { parts, defaultIdent };
+}
+
+function generate(src, moduleName, fileName = 'index.uts', srcPath = null) {
+  const dtsBase = `${fileName.replace(/\.uts$/, '')}.d.uts.ts`;
+  const m = mask(src);
+  const constTypes = new Map();
+  // 根文件先入 seen，避免它被自己的间接 `export *` 兜回来
+  const seen = new Set(srcPath != null ? [path.resolve(srcPath)] : []);
+  const { parts, defaultIdent } = collectParts(src, srcPath, moduleName, constTypes, seen);
 
   // `export default Foo;` 的 Foo 若在产物里没有任何声明，TS 会报 `Cannot find name`，
   // 比「找不到模块」更难定位 —— 这里补一条兜底声明（见 genLocalConst）。
@@ -518,6 +578,7 @@ function generate(src, moduleName, fileName = 'index.uts') {
     imports.push('ComputedRef');
   if (/\bShallowRef</.test(body))
     imports.push('ShallowRef');
+  imports.sort(); // 满足 perfectionist/sort-named-imports
 
   const header = `/**
  * 本文件由 \`scripts/gen-uts-dts.mjs\` 自动生成，请勿手工编辑。
@@ -580,7 +641,7 @@ function main() {
 
     let out;
     try {
-      out = generate(fs.readFileSync(srcPath, 'utf8'), label, fileName);
+      out = generate(fs.readFileSync(srcPath, 'utf8'), label, fileName, srcPath);
     }
     catch (e) {
       console.error(`❌ ${label}  生成失败：${e.message}`);
