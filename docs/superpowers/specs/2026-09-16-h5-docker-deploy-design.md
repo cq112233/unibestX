@@ -64,13 +64,49 @@ Dockerfile (runner 阶段)
     └─ nginx:alpine + 静态产物 + envsubst 模板 ──► 监听 80
 ```
 
+### 3.2 架构约束（Mac 本地与 x86_64 服务器双端可构建）
+
+这是本设计最硬的约束，直接决定了 Dockerfile 的写法。
+
+**事实**：
+
+| 项 | 结论 |
+| :--- | :--- |
+| HBuilderX Linux 包 | **只有 `linux_full_x64`**，正式版（5.24）与 alpha 版（5.26）均**无 ARM64 版本**（已核 `release.json` / `alpha.json`） |
+| 开发机 | Apple M5，**arm64** |
+| 部署服务器 | 阿里云 ECS，**x86_64** |
+| 两侧诉求 | Mac 本地要能构建验证，服务器上也要能原生构建 |
+
+**Mac 上的直接后果**：`FROM ubuntu:20.04` 在 Apple Silicon 上默认拉 **arm64** 镜像，塞进去的 `linux_x64` 二进制会直接 `Exec format error`。
+
+**解法 —— 只把 builder 阶段钉死在 amd64**：
+
+```dockerfile
+FROM --platform=linux/amd64 ubuntu:20.04 AS builder   # 钉死：HBuilderX 只有 x64 包
+...
+FROM nginx:alpine                                     # 不钉：跟随宿主架构
+```
+
+为什么 runner 阶段**不**钉：
+
+- 产物是纯静态文件，**与 CPU 架构无关**，跨平台 `COPY --from` 完全合法
+- Mac 上最终跑的是原生 arm64 的 nginx，**运行时零模拟开销**
+- 服务器上两边都是原生 x86_64，无任何差异
+
+**Mac 构建的前置条件**：Docker Desktop 必须开启
+`Settings → General → ☑ Use Rosetta for x86/amd64 emulation`。
+不开则退回全量 QEMU 模拟，HBuilderX（1.76GB 大型应用）的构建耗时可能长到不可用。
+
+> 注：Mac 上日常开发 H5 用 `pnpm dev:web` 即可，**不需要**每次都走 Docker 构建。Docker 构建只在需要验证「完整生产产物」时使用。
+
 ## 4. Dockerfile 设计
 
 ### 4.1 两个阶段
 
 ```dockerfile
 # ---------- Stage 1: builder ----------
-FROM ubuntu:20.04 AS builder          # 官方 Linux CLI 唯一验证过的发行版
+# --platform 必须写死 amd64：HBuilderX 只有 linux_x64 包，见 3.2
+FROM --platform=linux/amd64 ubuntu:20.04 AS builder   # 官方 Linux CLI 唯一验证过的发行版
 ARG APP_ENV=prod
 ARG HBX_VERSION=5.24.2026081301       # 已实测可下载（HTTP 200）
 
@@ -102,8 +138,10 @@ COPY --from=builder /app/unpackage/dist/build/web /usr/share/nginx/html
    正确做法：`cli open` → 等待就绪 → 构建 → `cli app quit` 串在同一条 `RUN` 中。
    同时 `cli open` 返回后 HBuilderX 未必**立即**可用，需轮询就绪（如反复 `cli project list` 探测）而非裸 `sleep` 固定秒数。
 
-3. **builder 必须用 `ubuntu:20.04`**
-   官方明确「仅在 Ubuntu 20.04 LTS 上测试过」。换其他发行版属未验证行为，不冒这个险。
+3. **builder 必须用 `ubuntu:20.04` 且钉死 `linux/amd64`**
+   前者：官方明确「仅在 Ubuntu 20.04 LTS 上测试过」，换发行版属未验证行为。
+   后者：HBuilderX 无 ARM64 包，arm64 宿主（含 M5 Mac）不钉平台会直接 `Exec format error`。详见 3.2。
+   对应的 runner 阶段**不要**钉平台，以保留 Mac 本地的原生运行速度。
 
 ### 4.3 复用而非改动现有脚本
 
@@ -223,8 +261,9 @@ docker compose --env-file deploy/.env.prod up -d --build h5-prod
 | 风险 | 说明 | 缓解 |
 | :--- | :--- | :--- |
 | **容器内 HBuilderX 能否启动未经验证** | 官方文档只保证 Linux 服务器的 headless 用法，**未提供任何 Docker 化先例**；full 包若依赖 X11/GTK 等系统库，`cli open` 可能起不来 | **实现阶段第一步就是打通这个最小验证**（见 9.1），失败则补装系统库或引入 Xvfb；此路不通需回到方案讨论 |
+| **Mac 侧构建需 amd64 模拟** | M5 是 arm64，builder 钉 `linux/amd64` 后靠 Rosetta / QEMU 执行；HBuilderX 是 1.76GB 大型应用，可能慢到不可用 | 开 Rosetta（接近原生）；**9.1 判据 3 实测耗时**；实在不行 Mac 侧只写代码、构建交给 x86_64 服务器 |
 | builder 层约 5GB | 1.76GB 压缩包 + 解压后体积 | 多阶段，最终镜像不含；层缓存复用 |
-| 首次构建 5–10 分钟 | 需下载 1.76GB | 一次性成本，后续构建走缓存 |
+| 首次构建 5–10 分钟（服务器原生） | 需下载 1.76GB | 一次性成本，后续构建走缓存 |
 | 官方仅验证 Ubuntu 20.04 | 其他发行版未测 | builder 固定 20.04 |
 | 依赖版本不锁定 | `pnpm-lock.yaml` 被 `.gitignore` 排除 | 沿用项目现状，本次不引入新问题 |
 | HBuilderX 版本写死 | `ARG HBX_VERSION` 固定 `5.24.2026081301` | 升级时改一个 ARG；可用 `--build-arg` 覆盖 |
@@ -233,18 +272,26 @@ docker compose --env-file deploy/.env.prod up -d --build h5-prod
 
 ## 9. 验收标准
 
-### 9.1 第零步：最小可行性验证（必须先做）
+### 9.1 第零步：最小可行性验证（必须先做，未过则方案不成立）
 
-整个方案的地基是「HBuilderX Linux CLI 能在容器里跑通」这件事，而**官方没有提供任何 Docker 先例**。因此在写完整 Dockerfile 之前，先用一个最小容器验证：
+整个方案的地基是「HBuilderX Linux CLI 能在容器里跑通」，而**官方没有提供任何 Docker 先例**；叠加 Mac 上是 amd64 模拟执行，不确定性更高。因此在写完整 Dockerfile 之前先做最小验证：
 
 ```bash
-docker run --rm -it ubuntu:20.04 bash
-# 容器内：装 curl/tar → 下载解压 HBuilderX → ./cli open → ./cli ver
+# 前置：Docker Desktop 开启 Rosetta for x86/amd64 emulation
+time docker run --rm -it --platform=linux/amd64 ubuntu:20.04 bash
+# 容器内：装 curl/tar/ca-certificates
+#        → 下载解压 HBuilderX → ./cli open → ./cli ver
 ```
 
-**判据**：`cli ver` 能打印版本号。若失败，按报错补装系统库（GTK/X11 相关）或引入 `xvfb-run` 重试。
+**三道判据，全过才算通**：
 
-这一步不通，则本设计的多阶段方案不成立，需要回到方案讨论（退回「宿主机构建 + 镜像只托管」）。**不要跳过这一步直接写完整 Dockerfile** —— 否则会先花 10 分钟下载再去撞同一堵墙。
+1. `cli ver` 能打印版本号 —— 证明容器内能跑起来
+2. 途中**未因缺 X11/GTK 等系统库而报错** —— 若报错，补装系统库或改用 `xvfb-run` 重试
+3. **记录实际耗时** —— 这是 Mac 本地构建可用性的关键数据。若 `cli open` 一项就超过约 5 分钟，说明 Rosetta 路径不实用，Mac 侧应改为「只写代码、构建交给服务器」，需回到方案讨论
+
+若判据 1 或 2 无法通过，则本设计的多阶段方案不成立，退回「宿主机构建 + 镜像只托管」。
+
+**不要跳过这一步直接写完整 Dockerfile** —— 否则会先花 10 分钟下载 1.76GB，再去撞同一堵墙。
 
 ### 9.2 完整验收
 
