@@ -13,23 +13,37 @@
 
 ```mermaid
 graph TD
-    A[确定页面类型] --> B{是否为 TabBar 页面?}
-    B -->|是| C1[配置 showBack: false]
+    A[确定页面类型] --> B{是否为 TabBar/首页?}
+    B -->|是| C1[配置 showBack: false, 首页配置 type: 'home']
     B -->|否| C2[配置 showBack: true]
-    C1 --> D[声明 definePage 顶层 enablePullDownRefresh: true]
+    C1 --> D[配置完整标准 definePage 结构]
     C2 --> D
-    D --> E[引入 refresh.uts 注册下拉刷新闭环]
-    E --> F[搭建页面根容器: view + flex flex-col flex-1]
-    F --> G[在内部自写 scroll-view 实现滚动]
-    G --> H[组件库优先: 匹配并优先使用 uni_modules 成熟组件]
-    H --> I[红线自检: 检查 interface/undefined/color on view/过度阴影]
+    D --> E{是否需要下拉刷新?}
+    E -->|是| F1[enablePullDownRefresh: true, 引入 refresh.uts 闭环]
+    E -->|否| F2[enablePullDownRefresh: false]
+    F1 --> G[搭建页面根容器: view + flex flex-col flex-1]
+    F2 --> G
+    G --> H[在内部自写 scroll-view 实现滚动]
+    H --> I[组件库优先: 匹配并优先使用 uni_modules 成熟组件]
+    I --> J[红线自检: 检查 interface/undefined/color on view/过度阴影]
 ```
 
 ### 必须要素清单
 
-1. **显式 `definePage` 声明**：每一个 `.uvue` 页面必须在 `<script setup lang="uts">` 最顶部显式书写 `definePage({...})`，统一使用 `navbar` 布局接管；
-2. **默认开启自定义下拉刷新**：顶层显式设置 `enablePullDownRefresh: true`，严禁在 `style` 内部开原生下拉；
-3. **闭环刷新逻辑**：引入 `onNavbarPullDownRefresh` 与 `stopNavbarPullDownRefresh`，在数据拉取结束后必须调用 `stopNavbarPullDownRefresh()`；
+1. **显式标准 `definePage` 声明**：每一个 `.uvue` 页面必须在 `<script setup lang="uts">` 最顶部显式书写标准完整的 `definePage({...})`，统一使用 `navbar` 布局接管；必须包含规范注释与默认字段：
+   - `customPageClass`: 页面根容器自定义类名（配合 layout 布局使用，支持配置全局样式类，如 `'init-page'` 或 `'page-container'`）
+   - `customPageStyle`: 页面根容器自定义行内样式（如 `'background-color: transparent;'`，穿透样式隔离，全端绝对生效）
+   - `debug`: `false`，是否开启当前页面沙盒独立调试（设为 true 可单独调试此页；⚠️ 调试完成后改回 false）
+   - `debugHome`: `false`，沙盒调试模式下是否将当前页面指定为启动首页（全局仅允许 1 个页面设为 true，排在 pages[0]）
+   - `type`: 页面类型标识（仅首页配置 `'home'`，标记当前页面为应用全局启动首页，自动排在 pages[0]；普通二级页不配置）
+   - `layout`: `'navbar'`，页面通用布局模板（采用 navbar 布局接管顶部导航与下拉滚动容器）
+   - `showBack`: 导航栏左侧是否显示返回箭头（TabBar 首页设为 `false`，普通二级页设为 `true`）
+   - `hideStatusBar`: `false`，是否隐藏状态栏（`true` 为隐藏，`false` 为正常显示）
+   - `hideNavbar`: `false`，是否隐藏顶部导航栏（`false` 为正常显示）
+   - `enablePullDownRefresh`: `false`，是否开启自定义下拉刷新（默认 `false`，由 navbar 布局内的 scroll-view 驱动；若需下拉刷新则显式设为 `true` 并配套闭环逻辑）
+   - `style`: 必须包含 `navigationBarTitleText`（页面与导航栏标题文本）和 `navigationStyle: 'custom'`（导航栏样式设为自定义，隐藏系统原生导航栏）
+2. **自定义下拉刷新控制**：`enablePullDownRefresh` 默认设为 `false`；若业务需要下拉刷新，显式设为 `true`，严禁在 `style` 内部开原生下拉；
+3. **闭环刷新逻辑**：当开启 `enablePullDownRefresh: true` 时，必须引入 `onNavbarPullDownRefresh` 与 `stopNavbarPullDownRefresh`，在数据拉取结束后必须调用 `stopNavbarPullDownRefresh()`；
 4. **根容器骨架铁律**：页面根节点一律为 `<view class="flex flex-col flex-1">`，严禁使用 `<scroll-view>` 作为页面根；
 5. **滚动区域实现**：需要滚动的区域在根内自写 `<scroll-view direction="vertical" class="flex-1 flex flex-col">`；
 6. **组件库优先**：若需求功能与 `uni_modules/` 下已有组件/库匹配（如图标使用 `<uni-icons>`/`<lime-icon>`，图表使用 `<e-chart>`，分页列表使用 `<z-paging-x>`，富文本使用 `<mp-html>`，富文本编辑器使用 `<sp-editor>`，二维码使用 `<lime-qrcode>`，签名使用 `<lime-signature>`，折叠面板使用 `<uni-collapse-x>`，评分使用 `<uni-rate-x>` 等），必须优先使用已有组件，严禁脱离生态手写重复且低效的原生结构；且模板中直接使用短横线标签调用，严禁手动 import easycom 范围内的组件。
@@ -76,17 +90,21 @@ graph TD
 
 <script setup lang="uts">
 import { ref } from 'vue';
-import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/utils/refresh/index.uts';
 
-// 1. 显式声明页面布局与导航栏配置
+// 1. 显式声明页面布局与导航栏配置（标准二级页面）
 definePage({
-  layout: 'navbar',
-  showBack: true,
-  hideNavbar: false,
-  enablePullDownRefresh: true, // 开启自定义下拉刷新
+  customPageClass: 'page-container', // 页面根容器自定义类名（配合 layout 布局使用，支持配置全局样式类）
+  customPageStyle: 'background-color: transparent;', // 页面根容器自定义行内样式（穿透任何样式隔离，全端绝对生效）
+  debug: false, // 是否开启当前页面沙盒独立调试（设为 true 可单独调试此页；⚠️ 调试完成后改回 false）
+  debugHome: false, // 沙盒调试模式下是否将当前页面指定为启动首页（全局仅允许 1 个页面设为 true，排在 pages[0]）
+  layout: 'navbar', // 页面通用布局模板（采用 navbar 布局接管顶部导航与下拉滚动容器）
+  showBack: true, // 导航栏左侧是否显示返回箭头（普通二级页设为 true）
+  hideStatusBar: false, // 是否隐藏状态栏（true 为隐藏）
+  hideNavbar: false, // 是否隐藏顶部导航栏（false 为正常显示）
+  enablePullDownRefresh: false, // 是否开启自定义下拉刷新（默认 false，按需开启）
   style: {
-    navigationBarTitleText: '页面标题',
-    navigationStyle: 'custom'
+    navigationBarTitleText: '页面标题', // 页面与导航栏标题文本
+    navigationStyle: 'custom' // 导航栏样式设为自定义（隐藏系统原生导航栏）
   }
 });
 
@@ -94,15 +112,7 @@ definePage({
 const dataList = ref<Array<string>>(['数据项 1', '数据项 2', '数据项 3']);
 const scrollTop = ref<number>(0);
 
-// 3. 注册下拉刷新
-onNavbarPullDownRefresh(() => {
-  // 执行刷新请求
-  setTimeout(() => {
-    stopNavbarPullDownRefresh();
-  }, 1000);
-});
-
-// 4. 滚动事件监听
+// 3. 滚动事件监听
 function handleScroll(e: UniScrollEvent): void {
   scrollTop.value = Math.ceil(e.detail.scrollTop);
 }
@@ -115,7 +125,7 @@ function handleScrollToLower(): void {
 <style></style>
 ```
 
-### 模板 2：TabBar 主页面模板
+### 模板 2：TabBar 主页面 / 启动首页模板（真实标杆：src/pages/index/index.uvue）
 
 ```uts
 <template>
@@ -131,23 +141,22 @@ function handleScrollToLower(): void {
 </template>
 
 <script setup lang="uts">
-import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/utils/refresh/index.uts';
-
+// 默认标准 definePage 声明（真实标杆：src/pages/index/index.uvue）
 definePage({
-  layout: 'navbar',
-  showBack: false, // 👈 TabBar 页面无返回按钮
-  hideNavbar: false,
-  enablePullDownRefresh: true,
+  customPageClass: 'init-page', // 页面根容器自定义类名（配合 layout 布局使用，支持配置全局样式类）
+  customPageStyle: 'background-color: transparent;', // 页面根容器自定义行内样式（穿透任何样式隔离，全端绝对生效）
+  debug: false, // 是否开启当前页面沙盒独立调试（设为 true 可单独调试此页；⚠️ 调试完成后改回 false）
+  debugHome: false, // 沙盒调试模式下是否将当前页面指定为启动首页（全局仅允许 1 个页面设为 true，排在 pages[0]）
+  type: 'home', // 页面类型标识（仅首页配置 'home'，标记当前页面为应用全局启动首页，自动排在 pages[0]）
+  layout: 'navbar', // 页面通用布局模板（采用 navbar 布局接管顶部导航与下拉滚动容器）
+  showBack: false, // 导航栏左侧是否显示返回箭头（TabBar 首页无需返回按钮）
+  hideStatusBar: false, // 是否隐藏状态栏（true 为隐藏）
+  hideNavbar: false, // 是否隐藏顶部导航栏（false 为正常显示）
+  enablePullDownRefresh: false, // 是否开启自定义下拉刷新（由 navbar 布局内的 scroll-view 驱动）
   style: {
-    navigationBarTitleText: '首页模块',
-    navigationStyle: 'custom'
+    navigationBarTitleText: '首页', // 页面与导航栏标题文本
+    navigationStyle: 'custom' // 导航栏样式设为自定义（隐藏系统原生导航栏）
   }
-});
-
-onNavbarPullDownRefresh(() => {
-  setTimeout(() => {
-    stopNavbarPullDownRefresh();
-  }, 1000);
 });
 </script>
 

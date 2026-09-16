@@ -57,7 +57,7 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 
 | 场景 / 报错现象 | 错误写法 | 正确规范写法 |
 | :--- | :--- | :--- |
-| **新增页面定义** | 缺少 `definePage`；或把该用 navbar 的页面写成 `layout: false`（`false` 本身合法，但会连顶栏与滚动容器一起失去，见 5.4） | 顶部声明 `layout: 'navbar'` + `style.navigationStyle: 'custom'` —— **这两项硬性必需**（漏 `navigationStyle` 顶栏静默消失）；再按需补 `showBack`（默认 `true`，TabBar 页/首页写 `false`）、`enablePullDownRefresh: true`、`style.navigationBarTitleText` |
+| **新增页面定义** | 缺少 `definePage`；或把该用 navbar 的页面写成 `layout: false`（`false` 本身合法，但会连顶栏与滚动容器一起失去，见 5.4） | 顶部声明标准完整 `definePage`（`customPageClass`, `customPageStyle`, `debug: false`, `debugHome: false`, `layout: 'navbar'`, `style.navigationStyle: 'custom'` 等）；按需配置 `showBack`（默认 `true`，TabBar 首页写 `false`）、`enablePullDownRefresh`（默认 `false`，按需设为 `true`）、`style.navigationBarTitleText` |
 | **页面根容器** | 根用 `<scroll-view>` 导致双重滚动冲突 | 根用 `<view class="flex flex-col flex-1">`，内部需要滚动自写 `<scroll-view>` |
 | **可用视口高度** | 手写 `100vh` 或手算状态栏/TabBar | 直接使用 `computedAvailableHeight`（基于 `availableHeight.value ?? 0`） |
 | **对象类型定义 (`UTS110111163`)** | `interface User { id: string }` | `type User = { id: string }` |
@@ -120,7 +120,7 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 
 在生成任何 `.uvue`、`.uts` 代码并宣告完成前，必须逐条自检：
 
-- [ ] **1. 新增页面顶层显式声明 `definePage`**（包含 `layout: 'navbar'`, `showBack`, `enablePullDownRefresh: true`, `navigationStyle: 'custom'`）
+- [ ] **1. 新增页面顶层显式声明完整 `definePage`**（包含 `customPageClass`, `customPageStyle`, `debug: false`, `debugHome: false`, `layout: 'navbar'`, `showBack`, `hideStatusBar: false`, `hideNavbar: false`, `enablePullDownRefresh: false`（按需开启设为 `true`）, `navigationStyle: 'custom'`）
 - [ ] **2. 页面根容器为 `view` 而非 `scroll-view`**（杜绝与布局双重滚动冲突）
 - [ ] **3. 视口可用高度直接采用 `computedAvailableHeight`**（严禁写 `100vh` 或手工扣除 TabBar）
 - [ ] **4. 严禁使用 `interface`**（所有数据模型统一使用 `type`）
