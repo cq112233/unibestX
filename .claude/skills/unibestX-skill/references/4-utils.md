@@ -497,6 +497,10 @@ const canUseAbsoluteTabbar = isCompilerVersionGte('5.25')
 - ⚠️ **`safeArea` 存在跨端语义差异**：微信下是绝对坐标矩形，其余平台是相对边界距离（源码注释明确）。跨端直接读 `systemInfo.value.safeArea` 要留意；统一语义的是 `safeAreaInsets`。
 - ⚠️ `availableHeight` **不是简单减状态栏**：它按当前 TabBar 策略二次修正（策略 0/4 直接返回基准值；策略 2/3 且 `customTabbarConfig.type != 'default'` 时额外加回 `TABBAR_BASE_HEIGHT + safeAreaInsets.top`）。**不要自己手算，直接用这个值。**
 - `getScrollHeight(topOffset, bottomOffset, minusStatusBar)` 默认 `minusStatusBar = true`（自动扣状态栏）；当 `isNativeTabBar()` 为真（`VITE_TABBAR_MODE=1`）时**会再自动扣掉 `TABBAR_BASE_HEIGHT + 底部安全区`**，所以**不要重复扣 TabBar 高度**；返回值已用 `Math.max(0, ...)` 夹紧，不会为负。
+- ⚠️ **严禁滥用 `getScrollHeight` 做页面高度计算（Flex-1 绝对优先）**：
+  - 在标准页面布局中，凡能通过原生 Flex 弹性盒模型（父容器 `flex flex-col flex-1`，子级 `scroll-view` / `swiper` 使用 `flex-1 flex flex-col`）天然撑满剩余空间的，**必须一律使用 `flex-1`，严禁滥用 JS/UTS 动态计算绑定 `:style="{ height: ... }"`**；
+  - 滥用 JS 算高的严重缺陷：硬编码偏移量（如写死 48px）极其脆弱、首帧响应式计算未就绪时容易高度为 0 导致空白或闪烁、不同模式下容易重复扣除 TabBar 导致高度异常变短；
+  - `getScrollHeight` **仅作为极少数第三方老旧组件或特殊 Canvas 必须强制传入具体像素值且 Flex 无法生效时的最后兜底手段**，日常页面开发严禁滥用。
 - `isCompilerVersionGte('5.25')`：版本比较是**逐段 parseInt 的数字比较**（`'5.25'` vs `'5.10'` 不会被当字符串比），且当 `compilerVersion` 为空字符串时**直接返回 false**。真实用例见 `src/tabbar/internal/native.uts` 与 `src/tabbar/internal/metrics.uts`（后者用 `#ifdef H5` 包裹，非 H5 恒为 false）。
 - `compilerVersion` 是多平台兜底得到的：H5 走 `globalThis.__uniConfig.compilerVersion`，其余优先 `uni.getSystemInfoSync().uniCompileVersion`，再兜 `uni.getAppBaseInfo()`，**全部失败时兜底 `'1.0.0'`**。
 - `updateAvailableHeight(kuProps, selectedTabbarStrategy)` 是给 `App.ku.uvue` **编译期自动注入的 props** 用的（`AppKuHeightProps` 由 autoRootPlugin 全量注入），其 `pageStyle` 真实类型是 `UTSJSONObject | null`（纯 TS 声明文件里用 `Record<string, any>` 近似）。

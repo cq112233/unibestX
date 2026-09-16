@@ -255,4 +255,5 @@ onMounted((): void => {
 - [ ] **2. 严禁组件拆分超过 3 层**：层级截止于 `Module/components/Leaf.uvue`，严禁在叶子组件内再开 `components/` 目录；
 - [ ] **3. 严禁在纯展示组件中调用接口**：`components/common/` 以及 `A/components/`、`B/components/` 内部**严禁出现任何 `http` 调用、`fetch*` 函数或异步定时器**；
 - [ ] **4. 严禁在组件内硬编码假数据**：模拟数据必须统一在当前页面 `mock.uts` 中使用 `type` 声明，并以返回 `Promise<T>` 的接口函数暴露；
-- [ ] **5. 单向数据流动**：数据自容器通过 Props 向下灌入，子组件事件通过 Emits 向上通知，子组件禁止直接修改 Props 数据。
+- [ ] **5. 单向数据流动**：数据自容器通过 Props 向下灌入，子组件事件通过 Emits 向上通知，子组件禁止直接修改 Props 数据；
+- [ ] **6. 严禁滥用 JS 动态计算高度（Flex-1 绝对优先）**：页面与模块滚动区域一律使用原生 Flex 弹性盒模型（`flex flex-col flex-1`）自适应撑满，严禁在页面与组件中滥用 `getScrollHeight()` 动态绑定 `:style="{ height: ... }"`。
