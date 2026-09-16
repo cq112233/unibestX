@@ -1,307 +1,132 @@
-# H5 端 Docker 部署（测试服 + 生产）设计文档
+# H5 端 Docker 部署设计文档（重构版：宿主机构建 + Nginx 轻量容器）
 
 - 日期：2026-09-16
-- 状态：待实现
-- 相关技能：无（本次为部署基建，不产出 `.uvue` / `.uts` / `.scss`，不触碰 `unibestX-skill` 的分册约束）
+- 状态：已批准
+- 架构分类：部署基建（不涉及 `.uvue` / `.uts`，不触碰 `unibestX-skill` 分册约束）
 
-## 1. 背景
+---
 
-项目 H5 端的打包链路**已经存在且可用**，本次不新建平台能力，只补齐「交付形态」：
+## 1. 背景与重构动因
 
-| 已有资产 | 现状 |
-| :--- | :--- |
-| [scripts/build-h5.mjs](../../../scripts/build-h5.mjs) | 调 HBuilderX CLI（`cli publish --platform h5`）出包到 `unpackage/dist/build/web` |
-| [deploy/nginx.conf](../../../deploy/nginx.conf) | 一份「手工拷到服务器」的裸 nginx 配置，非容器化 |
-| `.env` 的 `VITE_H5_USE_PROXY` | 控制 H5 是否走 `/api` 反向代理，当前为 `false` |
-| 环境切换 | `pnpm env:test` / `pnpm env:prod` 增删 `.env.production.local` |
+### 1.1 历史方案回顾与废弃原因
+原方案试图在 Docker 容器内通过 `ubuntu:20.04` 下载并安装 HBuilderX Linux 官方桌面完整包（1.76GB 压缩包，解压后 3.7GB），并在容器内执行 `cli publish --platform h5`。
 
-**缺口**：没有任何 Docker 交付物。运维部署依赖「在服务器上装 Node + HBuilderX + 手工 nginx」，环境不可复现，测试服与生产无统一交付标准。
+经过探针验证与实测，确认该方案存在以下严重工程硬伤，予以推翻重构：
+1. **软件属性与容器哲学违背**：HBuilderX 为 Qt5 桌面 GUI 应用，官方未提供无头（headless）编译器。容器内必须后台运行 GUI 守护进程，其 `cli open` 进程会继承 stdout 占满 BuildKit 日志管道导致构建卡死，且 CLI 错误退出码恒为 0，错误捕获极脆弱。
+2. **架构模拟性能极差**：DCloud 官方仅提供 x86_64 包，无 ARM64 版本。在 Apple Silicon (Mac M 系列) 开发机上必须通过 Rosetta 2 模拟，光探针启动即耗时 8 分 28 秒；若包含 npm 依赖安装与项目编译，单次构建预计高达 15~30 分钟，极不实用。
+3. **外部网络单点故障**：构建阶段强依赖从 DCloud 官网实时拉取 1.76GB 大包，官方版本迭代或网络限速会导致构建直接失败。
+
+### 1.2 现代化前端部署标准
+行业标准前端 SPA / H5 容器化实践：
+> **「编译归编译，运行归运行」**：在具备完整编译环境（Node.js + 本地 HBuilderX CLI）的宿主机或 CI 节点执行构建，Docker 镜像仅作为轻量运行时（`nginx:alpine`），仅包含静态产物与 Nginx 配置。
+
+---
 
 ## 2. 目标与范围
 
-### 2.1 交付目标
+### 2.1 核心目标
+1. **轻量与秒级打包**：Docker 镜像仅基于 `nginx:alpine`，构建时间由原来的 15~30 分钟降低至 **1~2 秒**，镜像体积由数 GB 降低至 **约 25MB**。
+2. **多架构零损耗（Multi-Arch）**：原生支持 `linux/amd64` 与 `linux/arm64`，Mac 本地无指令集转译损耗，生产 Linux 服务器原生高效运行。
+3. **环境隔离与动态反代**：
+   - 区分测试服 (`test`) 与生产 (`prod`) 静态构建产物；
+   - Nginx 使用官方 `templates` + `envsubst` 机制，在容器启动时动态注入后端 API 反代上游地址 `${API_UPSTREAM}`。
+4. **统一开发与运维体验 (DX)**：
+   - 一份 `docker-compose.yml` 编排 `h5-test` 与 `h5-prod`；
+   - `package.json` 整合一键式命令，串联环境切换、前端打包与镜像构建。
 
-1. 用**一套 Dockerfile**，通过 build ARG 产出 `test` / `prod` 两个镜像
-2. 构建在**容器内完成**（多阶段），最终镜像只含 nginx + 静态文件
-3. 一份 `docker-compose.yml` 编排两套环境，可同机不同端口，也可异机各自起
-4. nginx 负责静态托管 + hash 路由兜底 + 资源长缓存，并**预留 `/api` 反代能力**
+### 2.2 明确非目标（YAGNI）
+- 不在容器内执行 HBuilderX 安装与编译；
+- 容器内不处理 HTTPS 证书（由外层网关/阿里云 SLB/CDN 统一负责 TLS 终止，容器仅监听 80 端口）；
+- 不侵入修改现有核心业务与页面代码。
 
-### 2.2 明确不做（YAGNI）
+---
 
-- **不做容器内 HTTPS 终止** —— 由阿里云（SLB / CDN + SSL 证书）在外层终止 TLS，容器只监听 80
-- **不做后端服务容器化** —— 后端是 `https://ukw0y1.laf.run` 云函数，不在本仓库
-- **不做 CI/CD 流水线** —— 本次只交付可手工执行的构建与部署物
-- **不修改 `scripts/build-h5.mjs` 与 `deploy/nginx.conf`** —— 前者直接复用（其 `findCli()` 已含容器内路径），后者保留给非容器部署场景
-- 不引入 Compose 之外的编排工具（K8s / Swarm）
-
-## 3. 文件清单
-
-| 文件 | 类型 | 职责 |
-| :--- | :--- | :--- |
-| `Dockerfile` | 新增 | 多阶段：builder（ubuntu:20.04 + HBuilderX）→ runner（nginx:alpine） |
-| `.dockerignore` | 新增 | 收缩构建上下文，隔离宿主机残留 |
-| `docker-compose.yml` | 新增 | `h5-test` / `h5-prod` 两个 service |
-| `deploy/nginx.docker.conf.template` | 新增 | 容器内 nginx 配置（envsubst 模板） |
-| `deploy/.env.test` / `deploy/.env.prod` | 新增 | compose 变量（端口、API 上游） |
-| `docs/guide/docker-deploy.md` | 新增 | 部署操作手册 |
-| `README.md` | 修改 | 「打包与发布」章节补一节 Docker 部署短链 |
-
-### 3.1 数据流
+## 3. 架构与数据流设计
 
 ```text
-Dockerfile (builder 阶段)
-    │
-    ├─ ① 装系统依赖 + Node 20 + pnpm
-    ├─ ② 下载解压 HBuilderX Linux 包  ──► /opt/hbuilderx/HBuilderX
-    ├─ ③ cli open（起 HBuilderX 进程，后续命令的前提）
-    ├─ ④ COPY 项目源码 + pnpm install
-    ├─ ⑤ pnpm env:${APP_ENV}（生成/删除 .env.production.local）
-    ├─ ⑥ pnpm build:h5 ──► scripts/build-h5.mjs ──► cli publish
-    └─ ⑦ cli app quit
-                │
-                ▼  unpackage/dist/build/web
-Dockerfile (runner 阶段)
-    └─ nginx:alpine + 静态产物 + envsubst 模板 ──► 监听 80
+[阶段 1: 宿主机 / CI 构建]
+  pnpm build:test / pnpm build:prod
+      │
+      ├─ switch-env.mjs 切换环境变量 (.env.production.local)
+      └─ build-h5.mjs 触发本地 HBuilderX CLI 原生秒级编译
+      │
+      ▼ 产物落盘
+  unpackage/dist/build/web/ (index.html, assets/, static/)
+
+[阶段 2: Docker 打包 (约 1-2 秒)]
+  docker build -t unibestx-h5:prod .
+      │
+      ├─ 基于 nginx:alpine (~25MB)
+      ├─ 检查产物防空校验 (test -f unpackage/dist/build/web/index.html)
+      ├─ COPY unpackage/dist/build/web/ -> /usr/share/nginx/html
+      └─ COPY deploy/nginx.conf.template -> /etc/nginx/templates/default.conf.template
+
+[阶段 3: 容器运行时编排]
+  docker compose up -d
+      │
+      ├─ Nginx 官方 entrypoint 自动 envsubst 替换 ${API_UPSTREAM}
+      ├─ 静态资源 30 天缓存与 Gzip 压缩
+      ├─ Hash 路由 try_files 兜底
+      └─ /api 请求透明代理至对应后端服务
 ```
 
-### 3.2 架构约束（Mac 本地与 x86_64 服务器双端可构建）
+---
 
-这是本设计最硬的约束，直接决定了 Dockerfile 的写法。
+## 4. 文件与目录结构
 
-**事实**：
-
-| 项 | 结论 |
-| :--- | :--- |
-| HBuilderX Linux 包 | **只有 `linux_full_x64`**，正式版（5.24）与 alpha 版（5.26）均**无 ARM64 版本**（已核 `release.json` / `alpha.json`） |
-| 开发机 | Apple M5，**arm64** |
-| 部署服务器 | 阿里云 ECS，**x86_64** |
-| 两侧诉求 | Mac 本地要能构建验证，服务器上也要能原生构建 |
-
-**Mac 上的直接后果**：`FROM ubuntu:20.04` 在 Apple Silicon 上默认拉 **arm64** 镜像，塞进去的 `linux_x64` 二进制会直接 `Exec format error`。
-
-**解法 —— 只把 builder 阶段钉死在 amd64**：
-
-```dockerfile
-FROM --platform=linux/amd64 ubuntu:20.04 AS builder   # 钉死：HBuilderX 只有 x64 包
-...
-FROM nginx:alpine                                     # 不钉：跟随宿主架构
-```
-
-为什么 runner 阶段**不**钉：
-
-- 产物是纯静态文件，**与 CPU 架构无关**，跨平台 `COPY --from` 完全合法
-- Mac 上最终跑的是原生 arm64 的 nginx，**运行时零模拟开销**
-- 服务器上两边都是原生 x86_64，无任何差异
-
-**Mac 构建的前置条件**：Docker Desktop 必须开启
-`Settings → General → ☑ Use Rosetta for x86/amd64 emulation`。
-不开则退回全量 QEMU 模拟，HBuilderX（1.76GB 大型应用）的构建耗时可能长到不可用。
-
-> 注：Mac 上日常开发 H5 用 `pnpm dev:web` 即可，**不需要**每次都走 Docker 构建。Docker 构建只在需要验证「完整生产产物」时使用。
-
-## 4. Dockerfile 设计
-
-### 4.1 两个阶段
-
-```dockerfile
-# ---------- Stage 1: builder ----------
-# --platform 必须写死 amd64：HBuilderX 只有 linux_x64 包，见 3.2
-FROM --platform=linux/amd64 ubuntu:20.04 AS builder   # 官方 Linux CLI 唯一验证过的发行版
-ARG APP_ENV=prod
-ARG HBX_VERSION=5.24.2026081301       # 已实测可下载（HTTP 200）
-
-RUN ...装 curl/tar/ca-certificates + Node 20 + pnpm
-RUN curl -fL HBuilderX.${HBX_VERSION}.linux_x64.full.tar.gz | tar -xz -C /opt
-
-COPY . /app
-RUN pnpm install
-
-# ⚠️ 以下三件事必须写在同一个 RUN 里 —— 见 4.2 约束 2
-RUN /opt/hbuilderx/HBuilderX/cli open \
- && <等待 HBuilderX 就绪> \
- && pnpm env:${APP_ENV} && pnpm build:h5 \
- && /opt/hbuilderx/HBuilderX/cli app quit
-
-# ---------- Stage 2: runner ----------
-FROM nginx:alpine
-COPY deploy/nginx.docker.conf.template /etc/nginx/templates/
-COPY --from=builder /app/unpackage/dist/build/web /usr/share/nginx/html
-```
-
-### 4.2 三个必须遵守的约束
-
-1. **HBuilderX 下载层必须在 `COPY` 源码之前**
-   该层约 1.76GB（`release.json` 中 `linux_full_x64` 实测 1762.05M）。放在前面，改业务代码时不会触发重下。
-
-2. **`cli open` 必须和 `pnpm build:h5` 在同一个 `RUN` 指令内**
-   Docker 的每条 `RUN` 都是一个**独立的临时容器**，进程不会跨层存活。若按「`RUN cli open` → `RUN pnpm build:h5`」拆开写，第二层启动时 HBuilderX 进程早已随第一层容器销毁，`build-h5.mjs` 里的 `project open` / `publish` 会直接失败。
-   正确做法：`cli open` → 等待就绪 → 构建 → `cli app quit` 串在同一条 `RUN` 中。
-   同时 `cli open` 返回后 HBuilderX 未必**立即**可用，需轮询就绪（如反复 `cli project list` 探测）而非裸 `sleep` 固定秒数。
-
-3. **builder 必须用 `ubuntu:20.04` 且钉死 `linux/amd64`**
-   前者：官方明确「仅在 Ubuntu 20.04 LTS 上测试过」，换发行版属未验证行为。
-   后者：HBuilderX 无 ARM64 包，arm64 宿主（含 M5 Mac）不钉平台会直接 `Exec format error`。详见 3.2。
-   对应的 runner 阶段**不要**钉平台，以保留 Mac 本地的原生运行速度。
-
-### 4.3 复用而非改动现有脚本
-
-[scripts/build-h5.mjs](../../../scripts/build-h5.mjs) 的 `findCli()` 候选列表中已包含 `/opt/hbuilderx/HBuilderX/cli`，与 Dockerfile 的安装路径天然吻合，**无需修改脚本**。同理，脚本自带的 `pages.json` 备份/还原逻辑在容器内照常生效。
-
-## 5. 环境切换机制
-
-沿用现有机制，不新造轮子：`pnpm env:${APP_ENV}` → `pnpm build:h5`。
-
-- `APP_ENV=test` → `pnpm env:test` 生成 `.env.production.local`
-- `APP_ENV=prod` → `pnpm env:prod` 删除 `.env.production.local`
-
-### 5.1 关键正确性要求
-
-**`.dockerignore` 必须排除 `.env.production.local`。**
-
-理由：该文件在 `.gitignore` 中（由 `switch-env.mjs` 生成）。若开发者宿主机恰好在跑过 `pnpm env:test` 后执行 `docker build`，该残留会进入构建上下文被 `COPY` 进镜像，与容器内 `pnpm env:${APP_ENV}` 的生成结果产生覆盖顺序歧义，最终可能打出一个「标称生产、实为测试」的包。排除它是零成本的确定性保障。
-
-同时排除：`node_modules/`、`unpackage/`、`dist/`、`.git/`、`docs/.vitepress/`（缩小上下文并避免宿主机旧产物混入）。
-
-> 注：`.gitignore` 中 `unpackage/dist/build/web` 被显式跟踪，但这与 `.dockerignore` 无关 —— 容器内会重新构建产物，宿主机产物一律不得进入上下文。
-
-## 6. nginx 容器配置
-
-采用 nginx 官方镜像内置的 envsubst 模板机制：`/etc/nginx/templates/*.template` 经 entrypoint 渲染后输出到 `/etc/nginx/conf.d/`。
-
-```nginx
-server {
-    listen 80;
-    root /usr/share/nginx/html;
-    index index.html;
-
-    location / {
-        try_files $uri $uri/ /index.html;          # hash 路由：兜底防刷新 404
-    }
-
-    location /assets/ {
-        expires 30d;
-        add_header Cache-Control "public, immutable";
-    }
-
-    location /api/ {
-        proxy_pass ${API_UPSTREAM};
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-}
-```
-
-### 6.1 两个必须处理的坑
-
-**坑 1：envsubst 默认会吃掉 nginx 自己的变量。**
-
-entrypoint 的 envsubst 若不限定范围，会把 `$uri`、`$host`、`$remote_addr`、`$scheme` 一并替换成空字符串，nginx 配置直接报废（且**不报错**，只是行为诡异）。
-
-必须在 Dockerfile 中限定替换白名单：
-
-```dockerfile
-ENV NGINX_ENVSUBST_FILTER=API_UPSTREAM
-```
-
-**坑 2：`proxy_pass` 使用字面域名是「启动时解析」。**
-
-nginx 对 `proxy_pass https://host;` 这种字面量，在**进程启动时**完成 DNS 解析。解析失败则 nginx 无法启动，容器陷入反复重启。因此：
-
-- `API_UPSTREAM` **不设空值**，默认填 `https://ukw0y1.laf.run`（当前真实后端，可解析）
-- 空值会让 nginx 直接启动失败
-
-### 6.2 关于 `/api` 反代当前是否生效
-
-当前 `.env` 中 `VITE_H5_USE_PROXY=false`，前端直连完整域名，**不会发出 `/api` 请求**，因此该 location 目前是「已就绪但未被命中」的预留能力。
-
-一旦把 `VITE_H5_USE_PROXY` 改为 `true`，只需在 `deploy/.env.{test,prod}` 中设置 `API_UPSTREAM` 指向后端，**无需重建镜像**。
-
-## 7. compose 编排
-
-```yaml
-services:
-  h5-test:
-    build:
-      context: .
-      args:
-        APP_ENV: test
-    image: unibestx-h5:test
-    ports:
-      - "${H5_TEST_PORT:-8081}:80"
-    environment:
-      API_UPSTREAM: ${API_UPSTREAM:-https://ukw0y1.laf.run}
-    restart: unless-stopped
-
-  h5-prod:
-    build:
-      context: .
-      args:
-        APP_ENV: prod
-    image: unibestx-h5:prod
-    ports:
-      - "${H5_PROD_PORT:-8080}:80"
-    environment:
-      API_UPSTREAM: ${API_UPSTREAM:-https://ukw0y1.laf.run}
-    restart: unless-stopped
-```
-
-**部署用法**（`--env-file` 指定环境变量，显式指定 service 名避免误起另一个）：
-
-```bash
-docker compose --env-file deploy/.env.test up -d --build h5-test
-docker compose --env-file deploy/.env.prod up -d --build h5-prod
-```
-
-同机部署时两个 service 端口不同（8081 / 8080）可并存；异机部署时各服务器只 `up` 自己那一个 service。
-
-## 8. 已知取舍与风险
-
-| 风险 | 说明 | 缓解 |
+| 文件路径 | 变更类型 | 职责描述 |
 | :--- | :--- | :--- |
-| **容器内 HBuilderX 能否启动未经验证** | 官方文档只保证 Linux 服务器的 headless 用法，**未提供任何 Docker 化先例**；full 包若依赖 X11/GTK 等系统库，`cli open` 可能起不来 | **实现阶段第一步就是打通这个最小验证**（见 9.1），失败则补装系统库或引入 Xvfb；此路不通需回到方案讨论 |
-| **Mac 侧构建需 amd64 模拟** | M5 是 arm64，builder 钉 `linux/amd64` 后靠 Rosetta / QEMU 执行；HBuilderX 是 1.76GB 大型应用，可能慢到不可用 | 开 Rosetta（接近原生）；**9.1 判据 3 实测耗时**；实在不行 Mac 侧只写代码、构建交给 x86_64 服务器 |
-| builder 层约 5GB | 1.76GB 压缩包 + 解压后体积 | 多阶段，最终镜像不含；层缓存复用 |
-| 首次构建 5–10 分钟（服务器原生） | 需下载 1.76GB | 一次性成本，后续构建走缓存 |
-| 官方仅验证 Ubuntu 20.04 | 其他发行版未测 | builder 固定 20.04 |
-| 依赖版本不锁定 | `pnpm-lock.yaml` 被 `.gitignore` 排除 | 沿用项目现状，本次不引入新问题 |
-| HBuilderX 版本写死 | `ARG HBX_VERSION` 固定 `5.24.2026081301` | 升级时改一个 ARG；可用 `--build-arg` 覆盖 |
-| 容器不做 TLS | 只监听 80 | **由阿里云 SLB / CDN 在外层终止 HTTPS** |
-| 静态资源缓存头较激进 | `/assets/` 设 30d immutable | 产物文件名带 hash，构建变更即换名，安全 |
+| `Dockerfile` | **新增** | 基于 `nginx:alpine` 的极简运行时镜像，拷贝静态产物和配置模板 |
+| `.dockerignore` | **新增** | 构建上下文排除机制，白名单仅保留构建产物和 deploy 配置 |
+| `deploy/nginx.conf.template` | **新增** | 支持 `envsubst` 的 Nginx 生产级配置模板（含 gzip、缓存、路由重定向、反向代理） |
+| `docker-compose.yml` | **新增** | 容器编排文件，支持 `h5-test` 与 `h5-prod` 两个服务 |
+| `deploy/.env.test` | **新增** | 测试环境 compose 配置（端口映射如 8081、测试 API 代理地址） |
+| `deploy/.env.prod` | **新增** | 生产环境 compose 配置（端口映射如 8080、生产 API 代理地址） |
+| `package.json` | **修改** | 注入快捷命令：`docker:build:test`, `docker:build:prod`, `docker:up:test`, `docker:up:prod` |
+| `docs/guide/docker-deploy.md` | **新增** | 完备的 Docker 部署操作手册（本地调试、生产部署、反向代理配置） |
+| `deploy/probe/` | **清理** | 废弃旧版 HBuilderX 容器探针目录，保持仓库整洁 |
 
-## 9. 验收标准
+---
 
-### 9.1 第零步：最小可行性验证（必须先做，未过则方案不成立）
+## 5. 详细技术规范
 
-整个方案的地基是「HBuilderX Linux CLI 能在容器里跑通」，而**官方没有提供任何 Docker 先例**；叠加 Mac 上是 amd64 模拟执行，不确定性更高。因此在写完整 Dockerfile 之前先做最小验证：
+### 5.1 Dockerfile 设计
+```dockerfile
+FROM nginx:alpine
 
-```bash
-# 前置：Docker Desktop 开启 Rosetta for x86/amd64 emulation
-time docker run --rm -it --platform=linux/amd64 ubuntu:20.04 bash
-# 容器内：装 curl/tar/ca-certificates
-#        → 下载解压 HBuilderX → ./cli open → ./cli ver
+# 1. 注入 nginx 配置模板，nginx 官方镜像启动时会自动用环境变量替换并生成 default.conf
+COPY deploy/nginx.conf.template /etc/nginx/templates/default.conf.template
+
+# 2. 拷贝静态文件
+COPY unpackage/dist/build/web /usr/share/nginx/html
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
 ```
 
-**三道判据，全过才算通**：
+### 5.2 `.dockerignore` 设计
+```gitignore
+*
+!deploy/
+!deploy/nginx.conf.template
+!unpackage/dist/build/web/
+!unpackage/dist/build/web/**
+```
+仅将打包产物和 nginx 模板送入 Docker 构建上下文，使得 `transferring context` 小于 1MB，瞬间完成。
 
-1. `cli ver` 能打印版本号 —— 证明容器内能跑起来
-2. 途中**未因缺 X11/GTK 等系统库而报错** —— 若报错，补装系统库或改用 `xvfb-run` 重试
-3. **记录实际耗时** —— 这是 Mac 本地构建可用性的关键数据。若 `cli open` 一项就超过约 5 分钟，说明 Rosetta 路径不实用，Mac 侧应改为「只写代码、构建交给服务器」，需回到方案讨论
+### 5.3 Nginx 配置规范 (`deploy/nginx.conf.template`)
+- **Gzip 压缩**：开启常用文本与 JS/CSS 压缩；
+- **Hash 路由容错**：`try_files $uri $uri/ /index.html;`；
+- **静态资源缓存**：`/assets/` 设置 30 天缓存与 immutable；
+- **动态反向代理**：配置 `location /api/ { proxy_pass ${API_UPSTREAM}; ... }`。
 
-若判据 1 或 2 无法通过，则本设计的多阶段方案不成立，退回「宿主机构建 + 镜像只托管」。
+---
 
-**不要跳过这一步直接写完整 Dockerfile** —— 否则会先花 10 分钟下载 1.76GB，再去撞同一堵墙。
-
-### 9.2 完整验收
-
-以下 5 条全部通过才算完成，每条都需实际执行并留存输出：
-
-1. `docker build --build-arg APP_ENV=prod -t unibestx-h5:prod .` 成功退出
-2. `docker run -d -p 8080:80 unibestx-h5:prod` 后，`http://localhost:8080` 首页正常渲染
-3. 直接访问深层路由（如 `http://localhost:8080/#/pages/basic/basic`）并刷新，不出现 404
-4. 产物内环境标识确认为 **`生产环境`**（`.env.production` 中 `VITE_ENV_NAME` 的字面量），且**不含 `测试环境`** —— 证实 `APP_ENV` 透传生效，而非拿到宿主机残留的测试配置
-   > 为什么不用接口域名当判据：`.env.test` 与 `.env.production` 的 `VITE_SERVER_BASEURL` **完全相同**（都是 `https://ukw0y1.laf.run`），域名无法区分环境。`VITE_ENV_NAME`（源码 [src/utils/env/index.uts](../../../src/utils/env/index.uts) 的 `getCurrentEnvName()` 读取并内联）是唯一可靠的环境标记。
-5. `docker images unibestx-h5:prod` 体积 **< 100MB** —— 这是多阶段构建真正生效的硬证据（若达 GB 级说明 builder 层漏进最终镜像）
-
-另需对 `APP_ENV=test` 重复第 1、4 条，证实双环境隔离成立。
+## 6. 验证方案
+1. **前置构建验证**：运行 `pnpm build:prod`，确认本地生成 `unpackage/dist/build/web/index.html`。
+2. **镜像打包验证**：运行 `docker build -t unibestx-h5:prod .`，耗时在 3 秒以内，镜像大小 < 40MB。
+3. **容器运行验证**：启动容器，使用 curl 验证：
+   - 根路径 `GET /` 返回 200 及 HTML；
+   - 静态资源 `GET /assets/...` 返回对应缓存响应头；
+   - API 代理路径转发预期。
