@@ -42,7 +42,7 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 | 分册文件 | 收录内容 | 何时 Read |
 | :--- | :--- | :--- |
 | [references/1.1-uts-syntax.md](references/1.1-uts-syntax.md) | **1.1 UTS 强类型系统与语法核心铁律**（19 条） | 定义对象结构与类型标注、写 `export` / `class` / 闭包 / 定时器回调 / 集合遍历；遇 `UTS110111163`、`UTS110111119`、`UTS110111120`、`error1`、`error17`、`error18`、`NoSuchMethodError` |
-| [references/1.2-styling.md](references/1.2-styling.md) | **1.2 样式 (CSS & Tailwind) 与原生渲染铁律**（18 条） | 写 `.scss` / Tailwind 工具类；处理按钮与文本排版、安全区、高度单位、阴影边框、字号字重、行内嵌套样式、样式不生效或表现不一致 |
+| [references/1.2-styling.md](references/1.2-styling.md) | **1.2 样式 (CSS & Tailwind) 与原生渲染铁律**（19 条） | 写 `.scss` / Tailwind 工具类；处理按钮与文本排版、安全区、高度单位、阴影边框、字号字重、行内嵌套样式、样式不生效或表现不一致 |
 | [references/1.3-runtime.md](references/1.3-runtime.md) | **1.3 跨端运行时与渲染模式约束**（20 条） | VDOM / Android VDOM / Vapor 差异、多平台门面分流与条件编译、UTS 插件与自定义基座、Markdown 渲染、真机与 Kotlin 报错、编译验证命令选择 |
 | [references/2-examples.md](references/2-examples.md) | **二、项目正确案例**（5 个生产级标杆案例） | 新建页面、搭「上固定 + 下滚动」骨架、算可用高度、写 TabBar 页与下拉刷新、写二级 / 子包页、用 Easycom 引组件 —— **优先照抄，不要自创结构** |
 | [references/3-codegen.md](references/3-codegen.md) | **3.1 新增页面生成流程**、**3.2 页面代码标准模板**、**3.5 VDOM/Vapor 差异回写维护机制** | 生成新页面 / 组件前走流程、需要复制标准页面模板、需要按四维分类回写本 Skill |
@@ -112,6 +112,7 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 | **`uni.addInterceptor` 加了拦截器却没拦住跳转** | `invoke` 里没写 `return false`（返回 `undefined` / 不写 `return` 一律视为放行） | 只有**显式返回 `false`** 才取消本次跳转；且 `uni.addInterceptor` 是**追加**语义，注册必须收敛到 `main.uts` 一处（见 5.3） |
 | **切了语言，原生 TabBar / 当前页导航栏标题还是旧语言** | 只调了 `appStore.setLocale(lang)` 就以为完事 | 切完还要调 4.4 的 `setTabbarItem()` 刷 TabBar 文案、4.7 的 `setNavigationBarTitle()` 刷标题（见 5.5） |
 | **H5 Docker 部署模式** | 在 Docker 容器内下载安装 3.7GB Linux 版 HBuilderX 桌面端做全流程构建（构建耗时 15~30 分钟、Mac M 芯片转译卡死、BuildKit 日志管道堵塞） | 宿主机/CI 执行 `pnpm build:test` / `pnpm build:prod`，Docker 仅基于 `nginx:alpine` 轻量镜像承载静态文件与 `${API_UPSTREAM}` 动态反代（镜像仅 ~25MB，打包 1~2 秒，详见 `docs/guide/docker-deploy.md`） |
+| **App 端动画卡顿 / 顿挫（Transition / Transform）** | 将 `transitionProperty` / `duration` 写在动态 `:style` 中；对带深阴影的元素做 `scale` 缩放；切换时改 `fontWeight` 触发文本 `requestLayout()`；用 `setTimeout` 延迟挂载来掩盖卡顿 | `transition` 规则写在静态 CSS class 中走原生 GPU 硬件加速；动态 `:style` 只传单一 `transform` 变化；避免带深阴影缩放与频繁改变 `fontWeight`；保持同步状态，严禁使用 `setTimeout` 掩盖动画性能缺陷（见 1.2.19） |
 
 ---
 
@@ -173,3 +174,5 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 - [ ] **51. 运行时改导航栏 / 状态栏严禁改 `definePage` 或 props**（`definePage` 是编译期数据、布局 props 只在渲染时读一次；必须走 4.7 的 `set*` 广播，且只有 `layout: 'navbar'` 会响应，见 5.4）
 - [ ] **52. H5 Docker 部署严禁在容器内安装 HBuilderX 桌面端做全流程构建**（必须使用宿主机/CI `pnpm build:h5` + `nginx:alpine` 轻量镜像交付，镜像仅 ~25MB，详见 `docs/guide/docker-deploy.md`）
 - [ ] **53. 需求功能与 `uni_modules` 匹配时严禁重复造轮子**（在编写 UI 界面或实现业务功能前，必须优先检索 `uni_modules/` 目录；若需求功能与 `uni_modules` 下已有成熟组件或插件匹配，如 `uni-icons`、`lime-icon`、`e-chart`、`z-paging-x`、`mp-html`、`sp-editor`、`lime-qrcode`、`lime-signature`、`uni-rate-x`、`uni-collapse-x`、`uni-badge-view`、`uni-number-box-x`、`uni-link-x`、`uni-fab-button`、`uni-time-format` 等，**必须优先使用现有组件/库**，严禁重复手写低效原生结构；且模板中直接使用标签，严禁在 `<script>` 中手动 import）
+- [ ] **54. App 端 `transition` 动画属性严禁写在动态 `:style` 中，严禁使用 `setTimeout` 错峰掩盖性能缺陷**（`transitionProperty` / `transitionDuration` / `transitionTimingFunction` 必须声明在静态 CSS 类中走硬件加速，动态 `:style` 只传单一 `transform` 变化；避免对带深阴影容器做缩放动画；严禁在外部容器使用 `setTimeout` 延迟挂载来掩盖组件自身的动画性能问题，见 1.2.19）
+
