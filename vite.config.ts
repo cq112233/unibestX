@@ -104,6 +104,36 @@ export default defineConfig({
         return null;
       }
     },
+    // 修复 H5 模式下外部或 AI 修改 .uvue/.uts 时 Tailwind CSS v4 样式热更新丢失的补丁插件
+    // 原理：当 .uvue/.uts 变动引入新原子类时，防抖触发 main.css 的更新时间戳并让模块失效，驱动 Vite 与 Tailwind 重新生成样式并推送到浏览器
+    {
+      name: 'vite-plugin-tailwind-uvue-hmr',
+      apply: 'serve',
+      handleHotUpdate({ file, server }) {
+        if (
+          (file.endsWith('.uvue') || file.endsWith('.uts'))
+          && !file.endsWith('main.css')
+          && !file.includes('node_modules')
+          && !file.includes('unpackage')
+        ) {
+          const mainCssPath = resolve(projectRoot, 'main.css');
+          clearTimeout((globalThis as any).__tailwind_hmr_timer);
+          (globalThis as any).__tailwind_hmr_timer = setTimeout(() => {
+            try {
+              const now = new Date();
+              fs.utimesSync(mainCssPath, now, now);
+              const mod = server.moduleGraph.getModuleById(mainCssPath);
+              if (mod) {
+                server.moduleGraph.invalidateModule(mod);
+              }
+            }
+            catch (e) {
+              console.warn('[tailwind-hmr] touch main.css failed:', e);
+            }
+          }, 80);
+        }
+      }
+    },
     // 自动扫描与路由生成插件（基于 pages.config.json + 页面内 <route>/definePage 声明）
     uniPagesPlugin({
       // 【总控开关】：是否启用插件自动扫描与 pages.json 生成（设为 false 则完全失效，不扫描、不写入 pages.json、不监听文件变化）
