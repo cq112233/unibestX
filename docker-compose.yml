@@ -10,9 +10,7 @@ services:
     env_file:
       - deploy/.env.test
     ports:
-      - "${PORT:-8081}:80"
-    environment:
-      - API_UPSTREAM=${API_UPSTREAM:-https://ukw0y1.laf.run}
+      - "${H5_TEST_PORT:-8081}:80"
 
   # 生产环境服务
   h5-prod:
@@ -25,6 +23,4 @@ services:
     env_file:
       - deploy/.env.prod
     ports:
-      - "${PORT:-8080}:80"
-    environment:
-      - API_UPSTREAM=${API_UPSTREAM:-https://ukw0y1.laf.run}
+      - "${H5_PROD_PORT:-8080}:80"
