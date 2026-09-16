@@ -300,7 +300,8 @@ time docker run --rm -it --platform=linux/amd64 ubuntu:20.04 bash
 1. `docker build --build-arg APP_ENV=prod -t unibestx-h5:prod .` 成功退出
 2. `docker run -d -p 8080:80 unibestx-h5:prod` 后，`http://localhost:8080` 首页正常渲染
 3. 直接访问深层路由（如 `http://localhost:8080/#/pages/basic/basic`）并刷新，不出现 404
-4. 产物内接口域名确认为**生产域名**，证实 `APP_ENV` 透传生效（而非拿到宿主机残留的测试配置）
+4. 产物内环境标识确认为 **`生产环境`**（`.env.production` 中 `VITE_ENV_NAME` 的字面量），且**不含 `测试环境`** —— 证实 `APP_ENV` 透传生效，而非拿到宿主机残留的测试配置
+   > 为什么不用接口域名当判据：`.env.test` 与 `.env.production` 的 `VITE_SERVER_BASEURL` **完全相同**（都是 `https://ukw0y1.laf.run`），域名无法区分环境。`VITE_ENV_NAME`（源码 [src/utils/env/index.uts](../../../src/utils/env/index.uts) 的 `getCurrentEnvName()` 读取并内联）是唯一可靠的环境标记。
 5. `docker images unibestx-h5:prod` 体积 **< 100MB** —— 这是多阶段构建真正生效的硬证据（若达 GB 级说明 builder 层漏进最终镜像）
 
 另需对 `APP_ENV=test` 重复第 1、4 条，证实双环境隔离成立。
