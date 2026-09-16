@@ -59,7 +59,7 @@
       ├─ 基于 nginx:alpine (~25MB)
       ├─ 检查产物防空校验 (test -f unpackage/dist/build/web/index.html)
       ├─ COPY unpackage/dist/build/web/ -> /usr/share/nginx/html
-      └─ COPY deploy/nginx.conf.template -> /etc/nginx/templates/default.conf.template
+      └─ COPY deploy/nginx.conf -> /etc/nginx/templates/default.conf.template
 
 [阶段 3: 容器运行时编排]
   docker compose up -d
@@ -78,7 +78,7 @@
 | :--- | :--- | :--- |
 | `Dockerfile` | **新增** | 基于 `nginx:alpine` 的极简运行时镜像，拷贝静态产物和配置模板 |
 | `.dockerignore` | **新增** | 构建上下文排除机制，白名单仅保留构建产物和 deploy 配置 |
-| `deploy/nginx.conf.template` | **新增** | 支持 `envsubst` 的 Nginx 生产级配置模板（含 gzip、缓存、路由重定向、反向代理） |
+| `deploy/nginx.conf` | **新增** | 支持 `envsubst` 的 Nginx 生产级配置模板（含 gzip、缓存、路由重定向、反向代理） |
 | `docker-compose.yml` | **新增** | 容器编排文件，支持 `h5-test` 与 `h5-prod` 两个服务 |
 | `deploy/.env.test` | **新增** | 测试环境 compose 配置（端口映射如 8081、测试 API 代理地址） |
 | `deploy/.env.prod` | **新增** | 生产环境 compose 配置（端口映射如 8080、生产 API 代理地址） |
@@ -95,7 +95,7 @@
 FROM nginx:alpine
 
 # 1. 注入 nginx 配置模板，nginx 官方镜像启动时会自动用环境变量替换并生成 default.conf
-COPY deploy/nginx.conf.template /etc/nginx/templates/default.conf.template
+COPY deploy/nginx.conf /etc/nginx/templates/default.conf.template
 
 # 2. 拷贝静态文件
 COPY unpackage/dist/build/web /usr/share/nginx/html
@@ -109,13 +109,13 @@ CMD ["nginx", "-g", "daemon off;"]
 ```gitignore
 *
 !deploy/
-!deploy/nginx.conf.template
+!deploy/nginx.conf
 !unpackage/dist/build/web/
 !unpackage/dist/build/web/**
 ```
 仅将打包产物和 nginx 模板送入 Docker 构建上下文，使得 `transferring context` 小于 1MB，瞬间完成。
 
-### 5.3 Nginx 配置规范 (`deploy/nginx.conf.template`)
+### 5.3 Nginx 配置规范 (`deploy/nginx.conf`)
 - **Gzip 压缩**：开启常用文本与 JS/CSS 压缩；
 - **Hash 路由容错**：`try_files $uri $uri/ /index.html;`；
 - **静态资源缓存**：`/assets/` 设置 30 天缓存与 immutable；

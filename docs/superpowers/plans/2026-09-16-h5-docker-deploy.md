@@ -26,7 +26,7 @@
 | `deploy/probe/` | 删除 | 移除废弃的 HBuilderX 容器内探针 |
 | `docs/superpowers/plans/docker-build-baseline.txt` | 删除 | 移除废弃的探针基线记录 |
 | `.dockerignore` | 新增 | 极致收缩构建上下文（仅将 `unpackage/dist/build/web` 和 `deploy/` 送入构建） |
-| `deploy/nginx.conf.template` | 新增 | 生产级 Nginx 配置模板（Gzip、静态长缓存、Hash 路由重定向、envsubst 反代） |
+| `deploy/nginx.conf` | 新增 | 生产级 Nginx 配置模板（Gzip、静态长缓存、Hash 路由重定向、envsubst 反代） |
 | `Dockerfile` | 新增 | 基于 `nginx:alpine` 的极简运行时镜像定义 |
 | `deploy/.env.test` | 新增 | 测试环境 compose 配置（端口、测试 API 上游） |
 | `deploy/.env.prod` | 新增 | 生产环境 compose 配置（端口、生产 API 上游） |
@@ -82,7 +82,7 @@ git commit -m "chore(deploy): 清理废弃的 HBuilderX 容器探针及基线文
 
 # 仅放行 Nginx 模板配置
 !deploy
-!deploy/nginx.conf.template
+!deploy/nginx.conf
 
 # 仅放行 H5 静态打包产物
 !unpackage
@@ -105,16 +105,16 @@ git commit -m "feat(deploy): 新增 .dockerignore 上下文白名单配置"
 
 ---
 
-## 任务 3：编写 Nginx 生产配置模板 `deploy/nginx.conf.template`
+## 任务 3：编写 Nginx 生产配置模板 `deploy/nginx.conf`
 
 **目的：** 提供生产级 Web 服务配置，兼容 SPA Hash 路由、静态资源长期缓存，并通过 `${API_UPSTREAM}` 变量支持动态反代后端的 `/api/` 接口。
 
 **文件：**
-- 创建：`deploy/nginx.conf.template`
+- 创建：`deploy/nginx.conf`
 
 - [ ] **步骤 1：编写模板配置**
 
-创建 `deploy/nginx.conf.template`，内容如下：
+创建 `deploy/nginx.conf`，内容如下：
 ```nginx
 server {
     listen 80;
@@ -168,7 +168,7 @@ server {
 - [ ] **步骤 2：Commit**
 
 ```bash
-git add deploy/nginx.conf.template
+git add deploy/nginx.conf
 git commit -m "feat(deploy): 新增支持 envsubst 的生产级 Nginx 配置模板"
 ```
 
@@ -191,7 +191,7 @@ LABEL maintainer="unibestX"
 LABEL description="unibestX H5 生产部署轻量容器"
 
 # 拷贝 Nginx 模板，官方镜像启动入口自动通过 envsubst 解析生成 /etc/nginx/conf.d/default.conf
-COPY deploy/nginx.conf.template /etc/nginx/templates/default.conf.template
+COPY deploy/nginx.conf /etc/nginx/templates/default.conf.template
 
 # 拷贝前端构建产物
 # 提示：构建前必须先在宿主机运行 pnpm build:test 或 pnpm build:prod
