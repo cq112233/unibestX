@@ -76,35 +76,60 @@ export type SystemMenuRect = {
 };
 
 export type SystemInfoType = {
-  // 窗口与屏幕尺寸
+  // ---- 窗口与屏幕尺寸（单位均为 px）----
+  /** 屏幕宽度（物理屏宽） */
   screenWidth: number;
+  /** 屏幕高度（物理屏高） */
   screenHeight: number;
+  /** 窗口可视宽度 */
   windowWidth: number;
+  /** 窗口可视高度（含状态栏占位） */
   windowHeight: number;
+  /** 状态栏高度 */
   statusBarHeight: number;
+  /** 可用内容高度 = windowHeight - statusBarHeight，⚠️ 不叠加 TabBar */
   availableHeight: number;
+  /** 导航栏内容区默认基准高度，恒为 NAVBAR_CONTENT_HEIGHT（44），⚠️ 不是当前页实际导航栏高度 */
   navBarHeight: number;
+  /** TabBar 默认基准高度，恒为 TABBAR_BASE_HEIGHT（50），⚠️ 不含底部安全区 */
   tabBarHeight: number;
+  /** 设备像素比（dpr） */
   pixelRatio: number;
-  // 设备信息
+  // ---- 设备信息（getDeviceInfo 优先，缺失字段回退 getSystemInfoSync，都取不到则为 ''）----
+  /** 设备品牌（如 'Apple'） */
   brand: string;
+  /** 设备型号（如 'iPhone 15 Pro'） */
   model: string;
+  /** 操作系统及版本（如 'iOS 17.4'），⚠️ 只来自 getSystemInfoSync */
   system: string;
-  // 编译引擎与平台信息
+  // ---- 编译引擎与平台信息 ----
+  /** 编译器 / SDK 版本（各平台来源不同互相兜底，最终兜底 '1.0.0'） */
   compilerVersion: string;
+  /** uni 编译器版本，⚠️ 当前与 compilerVersion 同源，不是独立值 */
   uniCompileVersion: string;
+  /** 是否为 Vapor 渲染模式（VDOM 模式为 false） */
   isVapor: boolean;
+  /** 编译运行模式（Vapor / VDOM + 环境） */
   compileMode: string;
+  /** 编译目标平台 */
   platformName: string;
-  // 应用与环境变量
+  // ---- 应用与环境变量 ----
+  /** 应用名称 */
   appTitle: string;
+  /** 应用版本号 */
   appVersion: string;
+  /** 接口 BaseURL 地址（来自环境变量） */
   apiBaseUrl: string;
+  /** 运行环境标识：development / test / production */
   env: string;
+  /** 运行环境中文名称 */
   envName: string;
-  // 安全区与胶囊
+  // ---- 安全区与胶囊（在整体赋值之后被单独二次写入）----
+  /** 安全区域插入距离（距离语义，可直接当 padding 用；与 safeAreaInsets ref 是同一对象），取不到时 null */
   safeAreaInsets: SystemSafeAreaInsets | null;
+  /** 安全区绝对坐标矩形（含 width / height），取不到时 null */
   safeArea: SystemSafeArea | null;
+  /** 小程序胶囊按钮布局信息（与 menuRect ref 是同一对象），仅微信小程序有值，其余平台恒为 null */
   menuRect: SystemMenuRect | null;
 };
 
@@ -130,40 +155,40 @@ export type AppKuHeightProps = {
 // 响应式状态
 // ==========================================
 
-/** 系统信息全局响应式 ref */
+/** 系统信息全局响应式 ref（全 App 单例，初始 null，由 updateSystemInfo 写入） */
 export declare const systemInfo: Ref<SystemInfoType | null>;
 
-/** 安全区信息全局响应式 ref */
+/** 安全区信息全局响应式 ref（与 systemInfo.value.safeAreaInsets 为同一对象） */
 export declare const safeAreaInsets: Ref<SystemSafeAreaInsets | null>;
 
-/** 便捷响应式：小程序胶囊按钮矩形（仅微信小程序有值，其余平台恒为 null） */
+/** 便捷响应式：小程序胶囊按钮矩形，⚠️ 仅微信小程序有值，其余平台恒为 null（不会退化成 0） */
 export declare const menuRect: ComputedRef<SystemMenuRect | null>;
 
-/** 便捷响应式：窗口宽度（px） */
+/** 便捷响应式：窗口可视宽度（px），未初始化时为 0 */
 export declare const windowWidth: ComputedRef<number>;
 
-/** 便捷响应式：窗口高度（px） */
+/** 便捷响应式：窗口可视高度（px），未初始化时为 0 */
 export declare const windowHeight: ComputedRef<number>;
 
-/** 便捷响应式：屏幕宽度（px） */
+/** 便捷响应式：屏幕宽度（px），未初始化时为 0 */
 export declare const screenWidth: ComputedRef<number>;
 
-/** 便捷响应式：屏幕高度（px） */
+/** 便捷响应式：屏幕高度（px），未初始化时为 0 */
 export declare const screenHeight: ComputedRef<number>;
 
-/** 便捷响应式：状态栏高度（px） */
+/** 便捷响应式：状态栏高度（px），未初始化时为 0 */
 export declare const statusBarHeight: ComputedRef<number>;
 
-/** 便捷响应式：导航栏内容区高度（px），未初始化时为 NAVBAR_CONTENT_HEIGHT（44） */
+/** 便捷响应式：导航栏内容区高度（px），未初始化时为 44（NAVBAR_CONTENT_HEIGHT）而非 0 */
 export declare const navBarHeight: ComputedRef<number>;
 
-/** 便捷响应式：TabBar 高度（px），未初始化时为 TABBAR_BASE_HEIGHT（50） */
+/** 便捷响应式：TabBar 高度（px，不含底部安全区），未初始化时为 50（TABBAR_BASE_HEIGHT）而非 0 */
 export declare const tabBarHeight: ComputedRef<number>;
 
-/** 便捷响应式：可用内容高度（px） */
+/** 便捷响应式：可用内容高度（px，已按当前 tabbar 策略修正过），未初始化时为 0 */
 export declare const availableHeight: ComputedRef<number>;
 
-/** 便捷响应式：底部安全区高度（px） */
+/** 便捷响应式：底部安全区高度（px），未初始化时为 0 */
 export declare const safeAreaBottom: ComputedRef<number>;
 
 // ==========================================
@@ -206,40 +231,40 @@ export declare class SystemUtils {
   /** TabBar 默认基准高度（50px） */
   readonly TABBAR_BASE_HEIGHT: number;
 
-  /** 系统信息全局响应式 ref */
+  /** 系统信息全局响应式 ref（与顶层具名导出的 systemInfo 是同一个 ref 实例） */
   readonly systemInfo: Ref<SystemInfoType | null>;
 
-  /** 安全区信息全局响应式 ref */
+  /** 安全区信息全局响应式 ref（与 systemInfo.value.safeAreaInsets 为同一对象） */
   readonly safeAreaInsets: Ref<SystemSafeAreaInsets | null>;
 
-  /** 小程序胶囊按钮矩形响应式 computed（仅微信小程序有值） */
+  /** 小程序胶囊按钮矩形响应式 computed，⚠️ 仅微信小程序有值，其余平台恒为 null */
   readonly menuRect: ComputedRef<SystemMenuRect | null>;
 
-  /** 窗口宽度响应式 computed */
+  /** 窗口可视宽度响应式 computed（px），未初始化时为 0 */
   readonly windowWidth: ComputedRef<number>;
 
-  /** 窗口高度响应式 computed */
+  /** 窗口可视高度响应式 computed（px），未初始化时为 0 */
   readonly windowHeight: ComputedRef<number>;
 
-  /** 屏幕宽度响应式 computed */
+  /** 屏幕宽度响应式 computed（px），未初始化时为 0 */
   readonly screenWidth: ComputedRef<number>;
 
-  /** 屏幕高度响应式 computed */
+  /** 屏幕高度响应式 computed（px），未初始化时为 0 */
   readonly screenHeight: ComputedRef<number>;
 
-  /** 状态栏高度响应式 computed */
+  /** 状态栏高度响应式 computed（px），未初始化时为 0 */
   readonly statusBarHeight: ComputedRef<number>;
 
-  /** 导航栏内容区高度响应式 computed */
+  /** 导航栏内容区高度响应式 computed（px），未初始化时为 44 而非 0 */
   readonly navBarHeight: ComputedRef<number>;
 
-  /** TabBar 高度响应式 computed */
+  /** TabBar 高度响应式 computed（px，不含底部安全区），未初始化时为 50 而非 0 */
   readonly tabBarHeight: ComputedRef<number>;
 
-  /** 页面可用内容高度响应式 computed */
+  /** 页面可用内容高度响应式 computed（px，已按 tabbar 策略修正），未初始化时为 0 */
   readonly availableHeight: ComputedRef<number>;
 
-  /** 底部安全区高度响应式 computed */
+  /** 底部安全区高度响应式 computed（px），未初始化时为 0 */
   readonly safeAreaBottom: ComputedRef<number>;
 
   /** 刷新并更新系统全局信息响应式状态 */

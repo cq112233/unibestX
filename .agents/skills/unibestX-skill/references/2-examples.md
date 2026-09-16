@@ -238,15 +238,21 @@ onNavbarReachBottom(() => {
 
 ---
 
-## 2.5 标杆案例 5：组件库 Easycom 优先导入范式
+## 2.5 标杆案例 5：组件与生态库优先原则（Component Library First）
 
 > 真实参考源：[src/pages/function/views/FunctionView.uvue](file:///Users/chenqi/Desktop/unibestX/src/pages/function/views/FunctionView.uvue)
 
-**设计要点**：
+**设计要点与优先原则**：
 
-- 优先使用 `uni_modules` 中的成熟组件（`uni-icons`、`e-chart`、`z-paging-x`、`uni-badge-view` 等）；
-- 模板中直接以短横线形式使用组件，**严禁在 `<script>` 中手动 `import`**；
-- 避免手写繁琐的原生结构，提高跨端渲染一致性。
+1. **功能匹配优先采用原则**：编写 UI 页面或实现业务需求时，若需求功能与 `uni_modules/` 下已内置的成熟组件/插件匹配，**必须优先使用**，严禁脱离生态手写重复且低效的原生结构。
+   - **图标库**：`<uni-icons>`、`<lime-icon>`
+   - **图表展示**：`<e-chart>`
+   - **下拉刷新与分页/虚拟列表**：`<z-paging-x>`、`<uni-refresh-box>`
+   - **富文本展示与富文本编辑**：`<mp-html>`、`<sp-editor>`
+   - **二维码生成与手写签名**：`<lime-qrcode>`、`<lime-signature>`
+   - **常用基础组件**：`<uni-rate-x>`（评分）、`<uni-collapse-x>`（折叠面板）、`<uni-badge-view>`（角标）、`<uni-number-box-x>`（数字步进器）、`<uni-link-x>`（超链接）、`<uni-fab-button>`（悬浮按钮）、`<uni-time-format>`（时间格式化）等
+2. **Easycom 自动导入规范**：模板中直接以短横线小写标签（如 `<uni-icons>`、`<e-chart>`）调用，**严禁在 `<script>` 中手动 `import`**。
+3. **避免手写繁琐原生结构**，保证全平台（Android、iOS、Web、微信小程序）的高性能与渲染一致性。
 
 ```html
 <template>
