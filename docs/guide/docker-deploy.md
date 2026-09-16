@@ -64,6 +64,15 @@ pnpm docker:up:prod
 ### 3. 停止与清理容器
 
 ```bash
+# 单独停止服务（不删除容器）
+pnpm docker:stop:test   # 停止测试服容器
+pnpm docker:stop:prod   # 停止生产服容器
+
+# 单独停止并删除指定容器
+pnpm docker:down:test   # 下线测试服容器
+pnpm docker:down:prod   # 下线生产服容器
+
+# 全部停止并销毁网络与容器
 pnpm docker:down
 ```
 
