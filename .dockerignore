@@ -1,0 +1,18 @@
+# ==========================================
+# Docker 构建上下文白名单规则
+# 严格限制仅将必要构建产物和部署模板送入 Docker daemon
+# ==========================================
+
+# 默认忽略所有文件
+*
+
+# 仅放行 Nginx 配置文件
+!deploy/
+!deploy/nginx.conf
+
+# 仅放行 H5 静态产物
+!unpackage/
+!unpackage/dist/
+!unpackage/dist/build/
+!unpackage/dist/build/web/
+!unpackage/dist/build/web/**
