@@ -1,0 +1,116 @@
+import { onUnmounted, ref, watch } from 'vue';
+import { curIdx } from './state.uts';
+
+/** 页面显示事件订阅项 */
+type PageShowSubscriber = {
+  /** 订阅序号（注销时按序号匹配，避免依赖对象相等语义） */
+  id: number;
+  /** 关注的 Tab 索引 */
+  index: number;
+  /** 页面显示时的回调 */
+  callback: () => void;
+};
+
+/**
+ * 当前页面是否处于显示状态
+ *
+ * 由页面的 onShow / onHide 经 notifyPageShow() / notifyPageHide() 维护。
+ * 模式 4（单页面 TabBar）已在容器页 `src/pages/index/index.uvue` 内置桥接；
+ * 模式 0-3 若也需要「从子页面返回时触发」，请在对应 Tab 页面里同样调用这两个方法。
+ */
+export const isPageVisible = ref(false);
+
+/** 页面累计显示次数，> 0 表示页面至少显示过一次（供 onTabPageShow 的 immediate 判定补发时机） */
+export const pageShowTimes = ref(0);
+
+let subscriberSeq: number = 0;
+const subscribers: PageShowSubscriber[] = [];
+
+/**
+ * 是否需要对回调做「页面可见」门控
+ *
+ * 页面若从未桥接过 onShow / onHide（pageShowTimes 恒为 0），说明当前模式/当前页面
+ * 拿不到可见性信号，此时自动退化为不门控（等价 onTabShow 的语义），不做误伤。
+ */
+function shouldGateByVisibility(): boolean {
+  return pageShowTimes.value > 0;
+}
+
+/** 逐一通知关注指定 Tab 索引的订阅者 */
+function notifySubscribers(index: number): void {
+  for (let i = 0; i < subscribers.length; i++) {
+    const subscriber = subscribers[i];
+    if (subscriber.index == index) {
+      subscriber.callback();
+    }
+  }
+}
+
+/**
+ * 通知「当前页面已显示」：请在页面（Tab 容器页）的 onShow 中调用
+ *
+ * 与 onTabShow 的 curIdx 监听互补，负责覆盖「页面回来了」这一半场景：
+ * 从子页面 navigateBack 返回、App 从后台回到前台、页面重新可见。
+ */
+export function notifyPageShow(): void {
+  isPageVisible.value = true;
+  pageShowTimes.value++;
+  notifySubscribers(curIdx.value);
+}
+
+/**
+ * 通知「当前页面已隐藏」：请在页面（Tab 容器页）的 onHide 中调用
+ *
+ * 置为隐藏后，切换 Tab 的通知会被抑制，避免「在子页面里切 Tab，回调却在容器页
+ * 尚不可见时提前跑掉」；等页面真的回来时，再由 notifyPageShow() 补发一次。
+ */
+export function notifyPageHide(): void {
+  isPageVisible.value = false;
+}
+
+/**
+ * 监听指定 Tab 页面显示（在「页面可见」且「当前激活 Tab 命中」时触发）
+ *
+ * 相比 onTabShow 只盯 curIdx，本方法额外要求页面可见，因此能覆盖两类时机：
+ * 1. 切换 Tab 到该页（curIdx 变化）——与 onTabShow 相同；
+ * 2. 页面重新显示（原生 onShow：从子页面返回、App 回前台）——onTabShow 覆盖不到。
+ *
+ * @param index 对应 Tab 索引（0: 首页, 1: 基础, 2: 功能, 3: 我的）
+ * @param callback 页面显示时的回调函数
+ * @param immediate 若注册时页面已经显示过且当前 Tab 正好激活，是否立即补发一次
+ *                  （首次进入页面时不会再重复触发：那一次由紧随其后的 onShow 通知负责）
+ */
+export function onTabPageShow(index: number, callback: () => void, immediate: boolean = false): void {
+  const id = subscriberSeq;
+  subscriberSeq++;
+  const subscriber: PageShowSubscriber = {
+    id,
+    index,
+    callback
+  };
+  subscribers.push(subscriber);
+
+  onUnmounted(() => {
+    for (let i = 0; i < subscribers.length; i++) {
+      if (subscribers[i].id == id) {
+        subscribers.splice(i, 1);
+        break;
+      }
+    }
+  });
+
+  watch(curIdx, (newVal: number, oldVal: number) => {
+    if (newVal != index || oldVal == index) {
+      return;
+    }
+    if (shouldGateByVisibility() && !isPageVisible.value) {
+      // 页面不可见时切 Tab 不通知，等 notifyPageShow() 时再补发
+      return;
+    }
+    callback();
+  });
+
+  if (immediate && pageShowTimes.value > 0 && isPageVisible.value && curIdx.value == index) {
+    callback();
+  }
+}

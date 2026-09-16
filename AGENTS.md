@@ -12,7 +12,7 @@
 
 ## 可用 Skills
 
-Skills 位于 `.Codex/skills/` 目录，每个 skill 有独立的 `SKILL.md` 文件。
+Skills 位于 `.agents/skills/` 目录，每个 skill 有独立的 `SKILL.md` 文件。
 
 - **brainstorming**: 在任何创造性工作之前必须使用此技能——创建功能、构建组件、添加功能或修改行为。在实现之前先探索用户意图、需求和设计。
 - **chinese-code-review**: 中文 review 沟通参考——话术模板、分级标注（必须修复/建议修改/仅供参考）、国内团队常见反模式应对。仅在用户显式 /chinese-code-review 时调用，不要根据上下文自动触发。

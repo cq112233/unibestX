@@ -1,0 +1,191 @@
+/**
+ * uni.addInterceptor 的安装、卸载与裁决派发。
+ *
+ * ⚠️ 这是插件里唯一直接操作 uni 全局的运行时文件（另一个是 router.uts 的跳转门面）。
+ *    纯逻辑一律留在 url.uts / guard.uts，那样才能进 node harness。
+ */
+import type { RouteTarget, RouterOptions } from './types.uts';
+import { DEFAULT_MAX_REDIRECT_DEPTH, DEFAULT_REDIRECT_API } from './types.uts';
+import { runAfterHooks, runBeforeGuards, setGuardDebug } from './guard.uts';
+import { parseUrl } from './url.uts';
+
+// #ifndef APP
+/**
+ * H5 / 小程序侧没有框架注入的 Interceptor 类型，这里补一个结构等价的最小定义。
+ * App 原生端由框架提供同名类型，故必须用条件编译隔离（既有做法见 src/router/interceptor.uts）。
+ */
+export type Interceptor = {
+  invoke: (options: any) => boolean;
+  success?: (res: any) => void;
+  fail?: (err: any) => void;
+  complete?: (res: any) => void;
+};
+// #endif
+
+let installedApis: Array<string> = [];
+let redirectDepth: number = 0;
+let redirectApiName: string = DEFAULT_REDIRECT_API;
+let maxRedirectDepth: number = DEFAULT_MAX_REDIRECT_DEPTH;
+let resolveRedirectApi: ((url: string) => string) | null = null;
+let debugEnabled: boolean = false;
+
+function log(message: string): void {
+  if (debugEnabled) {
+    console.log(`[unix-router-guard] ${message}`);
+  }
+}
+
+/** 当前页（页栈顶）的路径；页栈为空时返回 '' */
+export function getCurrentPagePath(): string {
+  const pages = getCurrentPages();
+  let currentPath = '';
+  if (pages.length > 0) {
+    currentPath = pages[pages.length - 1].route;
+  }
+  return currentPath;
+}
+
+/** 上一页（页栈倒数第二个）的路径；不足两页时返回 '' */
+export function getPreviousPagePath(): string {
+  const pages = getCurrentPages();
+  let previousPath = '';
+  if (pages.length > 1) {
+    previousPath = pages[pages.length - 2].route;
+  }
+  return previousPath;
+}
+
+/**
+ * 从各跳转 API 的 options 中取 url。
+ *
+ * ⚠️ App 原生端每个 API 的 options 是**不同的 Kotlin 类**，必须按 API 分别强转；
+ *    混用会抛 ClassCastException（`as` 是非空转换，红线 1.3.17）。因此只在 API 名命中时强转。
+ * ⚠️ 使用方通过 apis 追加的自定义 API 不走 App 分支 —— 插件不可能知道它的 options 类型。
+ */
+export function extractUrl(api: string, options: any): string {
+  if (options == null) {
+    return '';
+  }
+  // #ifdef APP
+  if (api == 'navigateTo') {
+    return (options as NavigateToOptions).url;
+  }
+  if (api == 'redirectTo') {
+    return (options as RedirectToOptions).url;
+  }
+  if (api == 'reLaunch') {
+    return (options as ReLaunchOptions).url;
+  }
+  if (api == 'switchTab') {
+    return (options as SwitchTabOptions).url;
+  }
+  return '';
+  // #endif
+  // #ifndef APP
+  const optionsObj = options as UTSJSONObject;
+  return (optionsObj.url != null) ? (optionsObj.url as string) : '';
+  // #endif
+}
+
+/** 派发改跳；url 为 null/空表示静默拦截，不做任何跳转 */
+function dispatchRedirect(url: string | null): void {
+  if (url == null || url == '') {
+    return;
+  }
+
+  redirectDepth = redirectDepth + 1;
+  if (redirectDepth > maxRedirectDepth) {
+    console.warn(`[unix-router-guard] 重定向链深度超过 ${maxRedirectDepth}，已放弃本次改跳：${url}`);
+    // 放弃即意味着这条链到此结束：必须归零，否则计数会停在超限值上，
+    // 之后每一次「被拦截 → 改跳」都会静默失效（invoke 返回 false 且不跳转），
+    // 直到某次导航放行才恢复。真机复现见 edge 探针。
+    redirectDepth = 0;
+    return;
+  }
+
+  const api = resolveRedirectApi != null ? resolveRedirectApi!(url) : redirectApiName;
+  log(`派发改跳（${api}）：${url}`);
+
+  if (api == 'switchTab') {
+    uni.switchTab({ url: url });
+  }
+  else if (api == 'reLaunch') {
+    uni.reLaunch({ url: url });
+  }
+  else if (api == 'redirectTo') {
+    uni.redirectTo({ url: url });
+  }
+  else {
+    uni.navigateTo({ url: url });
+  }
+}
+
+/** 单次导航的统一处理：建上下文 → 跑守卫链 → 派发裁决 */
+function handleInvoke(api: string, options: any): boolean {
+  const url = extractUrl(api, options);
+  const currentPath = getCurrentPagePath();
+
+  let targetUrl = url;
+  if (api == 'navigateBack') {
+    // 返回没有 url：目标取「上一页」，页栈不足两页时退回当前页。
+    // 不读 delta：多级返回一律按上一页处理，是一条已记录的近似。
+    const previousPath = getPreviousPagePath();
+    targetUrl = previousPath == '' ? currentPath : previousPath;
+  }
+
+  const to = parseUrl(targetUrl, currentPath, api);
+  const from = parseUrl(currentPath, currentPath, api);
+  const outcome = runBeforeGuards(to, from);
+
+  if (!outcome.pass) {
+    dispatchRedirect(outcome.redirect);
+    return false;
+  }
+
+  // 放行即把重定向链计数归零：只有连续改跳才会累加
+  redirectDepth = 0;
+  // afterEach 在放行时同步触发，不依赖未验证的 interceptor success 回调（规格 5.4）
+  runAfterHooks(to, from);
+  return true;
+}
+
+function createInterceptor(api: string): Interceptor {
+  return {
+    invoke: (options: any): boolean => handleInvoke(api, options)
+  } as Interceptor;
+}
+
+/** 安装拦截器；幂等 —— 会先卸载上一次安装的 */
+export function installInterceptors(apis: Array<string>): void {
+  uninstallInterceptors();
+  for (let i = 0; i < apis.length; i++) {
+    const api = apis[i];
+    uni.addInterceptor(api, createInterceptor(api));
+    installedApis.push(api);
+  }
+  log(`已安装拦截器：${installedApis.join(',')}`);
+}
+
+/**
+ * 卸载拦截器。
+ *
+ * ⚠️ 只能按 API 名整条移除：uni.removeInterceptor 的粒度就是「某个 API 上的拦截器」，
+ *    因此使用方若自己也为同一个 API 装过拦截器，会被一并移除。这是 uni 的能力边界，
+ *    已写进 readme。
+ */
+export function uninstallInterceptors(): void {
+  for (let i = 0; i < installedApis.length; i++) {
+    uni.removeInterceptor(installedApis[i], null);
+  }
+  installedApis = [];
+}
+
+/** 应用 createRouter 传入的选项 */
+export function configureInterceptor(options: RouterOptions): void {
+  redirectApiName = options.redirectApi ?? DEFAULT_REDIRECT_API;
+  maxRedirectDepth = options.maxRedirectDepth ?? DEFAULT_MAX_REDIRECT_DEPTH;
+  resolveRedirectApi = options.resolveRedirectApi ?? null;
+  debugEnabled = options.debug ?? false;
+  setGuardDebug(debugEnabled);
+  redirectDepth = 0;
+}

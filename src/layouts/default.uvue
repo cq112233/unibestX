@@ -35,10 +35,10 @@
 <script setup lang="uts">
 import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { useAppStore } from '@/src/store';
-import { getThemeTokens } from '@/src/utils/theme';
-import type { ThemeTokens } from '@/src/utils/theme';
-import { isPageRefresherDisabled, isPageScrollDisabled } from '@/src/utils/refresh.uts';
-import { updateSystemInfo } from '@/src/utils/systemInfo.uts';
+import { getThemeTokens } from '@/src/utils/theme/index.uts';
+import type { ThemeTokens } from '@/src/utils/theme/index.uts';
+import { isPageRefresherDisabled, isPageScrollDisabled } from '@/src/utils/refresh/index.uts';
+import { updateSystemInfo } from '@/src/utils/systemInfo/index.uts';
 
 /**
  * 布局属性定义（由 uni-layouts-plugin 编译时自动从页面 definePage 或 pages.json 提取传入）

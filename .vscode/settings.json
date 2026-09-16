@@ -41,7 +41,10 @@
     "docker.md": "Dockerfile,docker*.md,nginx*,.dockerignore",
     "pages.config.ts": "manifest.config.ts,openapi-ts-request.config.ts",
     "package.json": "tsconfig.json,pnpm-lock.yaml,pnpm-workspace.yaml,LICENSE,.gitattributes,.gitignore,.gitpod.yml,CNAME,.npmrc,.browserslistrc",
-    "eslint.config.mjs": ".commitlintrc.*,.prettier*,.editorconfig,.commitlint.cjs,.eslint*"
+    "eslint.config.mjs": ".commitlintrc.*,.prettier*,.editorconfig,.commitlint.cjs,.eslint*",
+    // 把 .uts 的类型声明文件折叠到 .uts 下面，避免两行同名文件造成混淆
+    // （声明文件必须与 .uts 同目录同名，由 scripts/gen-uts-dts.mjs 生成）
+    "*.uts": "${capture}.d.uts.ts"
   },
 
   "stylelint.enable": false,
@@ -198,6 +201,8 @@
     "refreshertriggered",
     "refresherdefaultstyle",
     "tabbar",
+    "weixin",
+    "WEIXIN",
     "definePage",
     "defineProps",
     "defineEmits",

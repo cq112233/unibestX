@@ -36,7 +36,7 @@
         class="text-[11px] leading-[16px] mb-[12px]"
         :style="{ color: 'var(--text-secondary, #64748b)' }"
       >
-        定义在 src/utils/systemInfo.uts 中，用于在全端统一管理窗口大小、状态栏、安全区及可用内容高度（computedAvailableHeight）。
+        定义在 src/utils/systemInfo/index.uts 中，用于在全端统一管理窗口大小、状态栏、安全区、小程序胶囊及可用内容高度（computedAvailableHeight）。
       </text>
 
       <!-- 核心尺寸网格看板 -->
@@ -101,6 +101,36 @@
           <text class="text-[11px] font-bold text-[#3b82f6] ml-[2px] mb-[1px]">px</text>
         </view>
       </view>
+
+      <!-- 微信小程序胶囊按钮：仅微信小程序提供，其余平台 menuRect 恒为 null -->
+      <view class="p-[10px] rounded-[8px] bg-[#f5f3ff] border-[1px] border-solid border-[#ddd6fe] flex-col mt-[8px]">
+        <view class="flex-row items-center justify-between mb-[6px]">
+          <view class="flex-row items-center">
+            <text class="text-[12px] font-bold text-[#6d28d9]">📱 微信小程序胶囊 (menuRect)</text>
+          </view>
+          <view class="px-[6px] py-[2px] rounded-[4px] bg-[#ede9fe]">
+            <text class="text-[10px] font-bold text-[#7c3aed]">{{ capsuleSourceLabel }}</text>
+          </view>
+        </view>
+
+        <!-- 有值：展示胶囊原始矩形；无值：说明 null 的成因。⚠️ v-if 与 v-else 必须紧邻，中间不能插入任何节点（注释或元素都不行），否则 eslint-plugin-vue 报 v-else has no adjacent v-if -->
+        <view v-if="isCapsuleAvailable" class="flex-row flex-wrap justify-between">
+          <view class="w-[48%] p-[8px] rounded-[6px] bg-[#ffffff] border-[1px] border-solid border-[#ddd6fe] flex-col">
+            <text class="text-[11px] text-[#7c3aed]">胶囊尺寸 (W×H)</text>
+            <text class="text-[12px] font-bold text-[#5b21b6] mt-[3px]">{{ capsuleWidth }} × {{ capsuleHeight }} px</text>
+          </view>
+          <view class="w-[48%] p-[8px] rounded-[6px] bg-[#ffffff] border-[1px] border-solid border-[#ddd6fe] flex-col">
+            <text class="text-[11px] text-[#7c3aed]">纵向 (top，距屏幕顶边)</text>
+            <text class="text-[12px] font-bold text-[#5b21b6] mt-[3px]">{{ capsuleTop }} px</text>
+          </view>
+          <view class="w-full p-[8px] mt-[8px] rounded-[6px] bg-[#ffffff] border-[1px] border-solid border-[#ddd6fe] flex-col">
+            <text class="text-[11px] text-[#7c3aed]">横向 (left → right，均为距屏幕左边的 x 坐标)</text>
+            <text class="text-[12px] font-bold text-[#5b21b6] mt-[3px]">{{ capsuleLeft }} → {{ capsuleRight }} px</text>
+          </view>
+        </view>
+        <text v-else class="text-[11px] leading-[16px] text-[#7c3aed]">menuRect 为 null：该矩形仅在微信小程序（MP-WEIXIN）条件编译分支下由 uni.getMenuButtonBoundingClientRect() 写入，其余平台恒为 null；微信下若页面尚未就绪导致该 API 抛错，同样会保持 null。</text>
+        <text class="text-[10px] leading-[15px] text-[#8b5cf6] mt-[6px]">left / right / top / bottom 都是视口坐标（原点在屏幕左上角），与 CSS 的 right、bottom 语义相反：right 是「距屏幕左边」而不是「距屏幕右边」。</text>
+      </view>
     </view>
 
     <!-- 可用高度与布局加回机制解析卡片 -->
@@ -136,15 +166,43 @@
 </template>
 
 <script setup lang="uts">
+import { computed } from 'vue';
 import Card from './Card.uvue';
 import {
   availableHeight,
+  menuRect,
   NAVBAR_CONTENT_HEIGHT,
   safeAreaBottom,
   statusBarHeight,
   windowHeight,
   windowWidth
-} from '@/src/utils/systemInfo.uts';
+} from '@/src/utils/systemInfo/index.uts';
+
+/** 是否已拿到胶囊矩形（仅微信小程序下由 uni.getMenuButtonBoundingClientRect() 写入） */
+const isCapsuleAvailable = computed<boolean>((): boolean => menuRect.value != null);
+
+/** 胶囊数据来源标签（用于区分「非微信小程序」与「微信下未取到胶囊」两类 null） */
+const capsuleSourceLabel = computed<string>((): string => (menuRect.value != null ? 'MP-WEIXIN' : '未提供'));
+
+/** 胶囊宽度（px），无胶囊数据时为 0 */
+const capsuleWidth = computed<number>((): number => menuRect.value?.width ?? 0);
+
+/** 胶囊高度（px），无胶囊数据时为 0 */
+const capsuleHeight = computed<number>((): number => menuRect.value?.height ?? 0);
+
+/** 胶囊上边缘的 y 坐标（距屏幕顶边，px），无胶囊数据时为 0 */
+const capsuleTop = computed<number>((): number => menuRect.value?.top ?? 0);
+
+/** 胶囊左边缘的 x 坐标（距屏幕左边，px），无胶囊数据时为 0 */
+const capsuleLeft = computed<number>((): number => menuRect.value?.left ?? 0);
+
+/** 胶囊右边缘的 x 坐标（距屏幕左边，px），无胶囊数据时为 0 */
+const capsuleRight = computed<number>((): number => menuRect.value?.right ?? 0);
+
+// TODO(调试用)：确认微信端胶囊真实数据后删除这段探针
+setTimeout(() => {
+  console.log(menuRect.value, 'menuRect.value');
+}, 3000);
 
 function navigateToDemo() {
   uni.navigateTo({

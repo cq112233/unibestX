@@ -1,7 +1,7 @@
 import { API_DOMAINS, http } from '../http/request';
 import type { LimeRequestConfig } from '@/uni_modules/lime-request';
-import { DEFAULT_OSS_UPLOAD_PATH, uploadFile } from '../utils/upload.uts';
-import type { UploadFileOptions } from '../utils/upload.uts';
+import { DEFAULT_OSS_UPLOAD_PATH, uploadFile } from '../utils/upload/index.uts';
+import type { UploadFileOptions } from '../utils/upload/index.uts';
 
 export const FOO_UPLOAD_PATH: string = DEFAULT_OSS_UPLOAD_PATH;
 
@@ -105,7 +105,7 @@ export function deleteFoo(id: number): Promise<any> {
 }
 
 /**
- * 上传文件示例 —— 使用 utils/upload.uts
+ * 上传文件示例 —— 使用 utils/upload/index.uts
  * 上传成功返回 OSS 地址
  * @param filePath 本地文件路径
  * @param ignoreAuth 是否跳过鉴权（默认 true 用于演示接口）

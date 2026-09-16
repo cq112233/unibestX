@@ -1,0 +1,621 @@
+import { Other, EditObject, NoopTest, BlockNormal, BlockGfm, BlockPedantic, InlineNormal, InlinePedantic, InlineGfm, InlineBreaks, Block, Inline } from '../utssdk/interface';
+// ↓↓↓【本项目的改动】原为仅 `#ifdef APP-ANDROID` 的 import，现再收窄到 uniVersion < 4.72。
+// 原因：本文件里所有 callJSReg 的使用点本来就在 < 4.72 里，但 import 本身在安卓端是无条件拉取的，
+// 于是会牵扯到 utssdk/app-android/index.uts 顶层那句 `import JSReg from 'io.dcloud.uts.jsreg.JSReg'`，
+// 而标准基座不带 JSReg3.jar，导致「Could not resolve "io.dcloud.uts.jsreg.JSReg"」整个项目编译中断。
+// uni-app X 4.72+ 安卓端已原生支持正则字面量（见下方 `#ifdef uniVersion >= 4.72` 分支），jar 属老版本遗留。
+// 详见 unibestX-skill 1.3.10。
+// #ifdef uniVersion < 4.72
+// #ifdef APP-ANDROID
+import { callJSReg } from '../utssdk/app-android';
+// #endif
+// #endif
+
+const noopTest = {
+	exec: () => { }
+} as NoopTest;
+
+// ↓↓↓【本项目的改动】把 7 处 `\p{...}` Unicode 属性转义换成显式字符区间。
+//
+// 原因：`\p{L}` 这类属性转义只在 `u` 标记下合法，而 **App 逻辑层的 JS 引擎不支持它**，运行时报：
+//   SyntaxError: Invalid regular expression: /[\p{L}\p{N}]/u: Invalid property name in character class
+// 出错点是「模块级对象的字面量」（下面 other 里的 unicodeAlphaNumeric，以及文件后段的 _punctuation 系列），
+// 于是 app-service.js 求值到这一行就整体中断，App 端页面逻辑全部失效；H5 端的引擎支持该语法，
+// 所以这问题只在 App 复现。详见 unibestX-skill 1.3.11。
+//
+// 下面两个字符类是等价替代（不含 `\p`、不依赖 `u` 标记，任何 JS 引擎都能跑）：
+// - RE_ALNUM_CLASS ≈ `\p{L}\p{N}`：ASCII + 拉丁扩展/IPA + 希腊/西里尔/希伯来/阿拉伯/天城文
+//                   + 假名 + 汉字 + 谚文 + 全角字母数字；
+// - RE_PUNCT_CLASS ≈ `\p{P}\p{S}`：ASCII 标点 + Latin-1 标点/符号 + 通用标点 + 上下标运算符
+//                   + 货币/字母式/箭头/数学/几何/装饰 + CJK 标点 + 全角标点。
+// 两者都**不含空白**（` `、` `、`　` 均不在区间内），
+// 所以「标点或空白」的组合仍由 `\s` 承担，语义与原来一致。
+// 区间取值是拿 `\p` 逐码位扫全 BMP 比对后定的（验证方法见 unibestX-skill 1.3.11）：
+// 常用区（ASCII / Latin-1 / 拉丁扩展 / 通用标点 / CJK 标点 / 全角）精确等同于 `\p`；
+// 冷僻符号块（货币、几何、装饰等）按整块覆盖，块内个别未分配码位会被多判，不影响实际排版。
+// 两点已知近似：① 不在上列脚本内的文字（亚美尼亚文、泰文、埃塞俄比亚文等）会被当成非字母数字；
+// ② 星平面字符（emoji 等）既不算字母数字也不算标点。二者都只影响「特殊字符紧邻强调符」的
+// 边界情况，本项目的中英混排内容用不到。
+const RE_ALNUM_CLASS: string = '0-9A-Za-z'
+	+ '\\u00AA\\u00B2\\u00B3\\u00B5\\u00B9\\u00BA\\u00BC-\\u00BE\\u00C0-\\u00D6\\u00D8-\\u00F6\\u00F8-\\u02C1'
+	+ '\\u02C6-\\u02D1\\u02E0-\\u02E4\\u02EC\\u02EE'
+	+ '\\u0370-\\u03FF\\u0400-\\u04FF\\u0590-\\u06FF\\u0900-\\u097F'
+	+ '\\u3040-\\u30FF\\u3400-\\u4DBF\\u4E00-\\u9FFF\\uAC00-\\uD7AF'
+	+ '\\uFF10-\\uFF19\\uFF21-\\uFF3A\\uFF41-\\uFF5A'
+
+const RE_PUNCT_CLASS: string = '\\u0021-\\u002F\\u003A-\\u0040\\u005B-\\u0060\\u007B-\\u007E'
+	+ '\\u00A1-\\u00A9\\u00AB-\\u00AC\\u00AE-\\u00B1\\u00B4\\u00B6-\\u00B8\\u00BB\\u00BF\\u00D7\\u00F7'
+	+ '\\u2010-\\u2027\\u2030-\\u205E\\u207A-\\u207E\\u208A-\\u208E'
+	+ '\\u20A0-\\u20C1\\u2100-\\u214F\\u2190-\\u23FF\\u249C-\\u24E9\\u25A0-\\u27BF\\u2B00-\\u2BFF'
+	+ '\\u3001-\\u3004\\u3008-\\u3020\\u3030\\u3036-\\u3037\\u303D-\\u303F\\uFE30-\\uFE4F'
+	+ '\\uFF01-\\uFF0F\\uFF1A-\\uFF20\\uFF3B-\\uFF40\\uFF5B-\\uFF65'
+
+const RE_ALNUM = new RegExp('[' + RE_ALNUM_CLASS + ']')
+const RE_PUNCT = new RegExp('[' + RE_PUNCT_CLASS + ']')
+const RE_PUNCT_OR_SPACE = new RegExp('[\\s' + RE_PUNCT_CLASS + ']')
+const RE_NOT_PUNCT_OR_SPACE = new RegExp('[^\\s' + RE_PUNCT_CLASS + ']')
+const RE_PUNCT_GFM = new RegExp('(?!~)[' + RE_PUNCT_CLASS + ']')
+const RE_PUNCT_OR_SPACE_GFM = new RegExp('(?!~)[\\s' + RE_PUNCT_CLASS + ']')
+const RE_NOT_PUNCT_OR_SPACE_GFM = new RegExp('(?:[^\\s' + RE_PUNCT_CLASS + ']|~)')
+
+export const other = {
+	// #ifdef uniVersion >= 4.72
+	codeRemoveIndent: /^(?: {1,4}| {0,3}\t)/gm,
+	indentCodeCompensation: /^(\s+)(?:```)/,
+	blockquoteSetextReplace: /\n {0,3}((?:=+|-+) *)(?=\n|$)/g,
+	blockquoteSetextReplace2: /^ {0,3}>[ \t]?/gm,
+	listReplaceNesting: /^ {1,4}(?=( {4})*[^ ])/g,
+	escapeTestNoEncode: /[<>"']|&(?!(#\d{1,7}|#[Xx][a-fA-F0-9]{1,6}|\w+);)/,
+	escapeReplaceNoEncode: /[<>"']|&(?!(#\d{1,7}|#[Xx][a-fA-F0-9]{1,6}|\w+);)/g,
+	unescapeTest: /&(#(?:\d+)|(?:#x[0-9A-Fa-f]+)|(?:\w+));?/ig,
+	// #endif
+	// #ifdef uniVersion < 4.72
+	// #ifdef APP-ANDROID
+	codeRemoveIndent: callJSReg(/^(?: {1,4}| {0,3}\t)/gm),
+	indentCodeCompensation: callJSReg(/^(\s+)(?:```)/),
+	blockquoteSetextReplace: callJSReg(/\n {0,3}((?:=+|-+) *)(?=\n|$)/g),
+	blockquoteSetextReplace2: callJSReg(/^ {0,3}>[ \t]?/gm),
+	listReplaceNesting: callJSReg(/^ {1,4}(?=( {4})*[^ ])/g),
+	escapeTestNoEncode: callJSReg(/[<>"']|&(?!(#\d{1,7}|#[Xx][a-fA-F0-9]{1,6}|\w+);)/),
+	escapeReplaceNoEncode: callJSReg(/[<>"']|&(?!(#\d{1,7}|#[Xx][a-fA-F0-9]{1,6}|\w+);)/g),
+	unescapeTest: callJSReg(/&(#(?:\d+)|(?:#x[0-9A-Fa-f]+)|(?:\w+));?/ig),
+	// #endif
+	// #endif
+	outputLinkReplace: /\\([\[\]])/g,
+	beginningSpace: /^\s+/,
+	endingHash: /#$/,
+	startingSpaceChar: /^ /,
+	endingSpaceChar: / $/,
+	nonSpaceChar: /[^ ]/,
+	newLineCharGlobal: /\n/g,
+	tabCharGlobal: /\t/g,
+	multipleSpaceGlobal: /\s+/g,
+	blankLine: /^[ \t]*$/,
+	doubleBlankLine: /\n[ \t]*\n[ \t]*$/,
+	blockquoteStart: /^ {0,3}>/,
+	listReplaceTabs: /^\t+/,
+	listIsTask: /^\[[ xX]\] /,
+	listReplaceTask: /^\[[ xX]\] +/,
+	anyLine: /\n.*\n/,
+	hrefBrackets: /^<(.*)>$/,
+	tableDelimiter: /[:|]/,
+	tableAlignChars: /^\||\| *$/g,
+	tableRowBlankLine: /\n[ \t]*$/,
+	tableAlignRight: /^ *-+: *$/,
+	tableAlignCenter: /^ *:-+: *$/,
+	tableAlignLeft: /^ *:-+ *$/,
+	startATag: /^<a /i,
+	endATag: /^<\/a>/i,
+	startPreScriptTag: /^<(pre|code|kbd|script)(\s|>)/i,
+	endPreScriptTag: /^<\/(pre|code|kbd|script)(\s|>)/i,
+	startAngleBracket: /^</,
+	endAngleBracket: />$/,
+	pedanticHrefTitle: /^([^'"]*[^\s])\s+(['"])(.*)\2/,
+	// ↓↓↓【本项目的改动】原为 `/[\p{L}\p{N}]/u`，App 逻辑层引擎不支持 `\p{...}`，见文件顶部说明
+	unicodeAlphaNumeric: RE_ALNUM,
+	escapeTest: /[&<>"']/,
+	escapeReplace: /[&<>"']/g,
+	caret: /(^|[^\[])\^/g,
+	percentDecode: /%25/g,
+	findPipe: /\|/g,
+	splitPipe: / \|/,
+	slashPipe: /\\\|/g,
+	carriageReturn: /\r\n|\r/g,
+	spaceLine: /^ +$/gm,
+	notSpaceStart: /^\S*/,
+	endingNewline: /\n$/,
+	listItemRegex: (bull : string) => new RegExp(`^( {0,3}${bull})((?:[\t ][^\\n]*)?(?:\\n|$))`),
+	nextBulletRegex: (indent : number) => new RegExp(`^ {0,${Math.min(3, indent - 1)}}(?:[*+-]|\\d{1,9}[.)])((?:[ \t][^\\n]*)?(?:\\n|$))`),
+	hrRegex: (indent : number) => new RegExp(`^ {0,${Math.min(3, indent - 1)}}((?:- *){3,}|(?:_ *){3,}|(?:\\* *){3,})(?:\\n+|$)`),
+	fencesBeginRegex: (indent : number) => new RegExp(`^ {0,${Math.min(3, indent - 1)}}(?:\`\`\`|~~~)`),
+	headingBeginRegex: (indent : number) => new RegExp(`^ {0,${Math.min(3, indent - 1)}}#`),
+	htmlBeginRegex: (indent : number) => new RegExp(`^ {0,${Math.min(3, indent - 1)}}<(?:[a-z].*>|!--)`, 'i'),
+} as Other;
+
+function edit(regex : string | RegExp, opt = '') : EditObject {
+	let source = typeof regex === 'string' ? regex : regex.source;
+	let obj : EditObject | null = null;
+	obj = {
+		replace: (name : string | RegExp, val : string | RegExp) => {
+			let valSource = typeof val === 'string' ? val : val.source;
+			valSource = valSource.replace(other.caret, '$1');
+			if (typeof name === 'string') {
+				source = source.replace(name as string, valSource);
+			} else {
+				source = source.replace(name as RegExp, valSource);
+			}
+			return obj!;
+		},
+		getRegex: () => {
+			return new RegExp(source, opt);
+		},
+	} as EditObject;
+	return obj;
+}
+
+/**
+ * Block-Level Grammar
+ */
+const newline = /^(?:[ \t]*(?:\n|$))+/;
+const blockCode = /^((?: {4}| {0,3}\t)[^\n]+(?:\n(?:[ \t]*(?:\n|$))*)?)+/;
+const fences = /^ {0,3}(`{3,}(?=[^`\n]*(?:\n|$))|~{3,})([^\n]*)(?:\n|$)(?:|([\s\S]*?)(?:\n|$))(?: {0,3}\1[~`]* *(?=\n|$)|$)/;
+const hr = /^ {0,3}((?:-[\t ]*){3,}|(?:_[ \t]*){3,}|(?:\*[ \t]*){3,})(?:\n+|$)/;
+const heading = /^ {0,3}(#{1,6})(?=\s|$)(.*)(?:\n+|$)/;
+
+// #ifdef uniVersion >= 4.72
+const bullet = /(?:[*+-]|\d{1,9}[.)])/;
+const blockCodeRegex = /(?: {4}| {0,3}\t)/;
+const htmlRegex = / {0,3}<[^\n>]+>\n/;
+const tableRegexGfm = / {0,3}\|?(?:[:\- ]*\|)+[\:\- ]*\n/;
+// #endif
+// #ifdef uniVersion < 4.72
+// #ifdef APP-ANDROID
+const bullet = callJSReg(/(?:[*+-]|\d{1,9}[.)])/);
+const blockCodeRegex = callJSReg(/(?: {4}| {0,3}\t)/);
+const htmlRegex = callJSReg(/ {0,3}<[^\n>]+>\n/);
+const tableRegexGfm = callJSReg(/ {0,3}\|?(?:[:\- ]*\|)+[\:\- ]*\n/);
+// #endif
+// #endif
+const lheadingCore = /^(?!bull |blockCode|fences|blockquote|heading|html|table)((?:.|\n(?!\s*?\n|bull |blockCode|fences|blockquote|heading|html|table))+?)\n {0,3}(=+|-+) *(?:\n+|$)/;
+const lheading = edit(lheadingCore)
+	.replace(/bull/g, bullet) // lists can interrupt
+	.replace(/blockCode/g, blockCodeRegex) // indented code blocks can interrupt
+	.replace(/fences/g, / {0,3}(?:`{3,}|~{3,})/) // fenced code blocks can interrupt
+	.replace(/blockquote/g, / {0,3}>/) // blockquote can interrupt
+	.replace(/heading/g, / {0,3}#{1,6}/) // ATX heading can interrupt
+	.replace(/html/g, htmlRegex) // block html can interrupt
+	.replace(/\|table/g, '') // table not in commonmark
+	.getRegex();
+const lheadingGfm = edit(lheadingCore)
+	.replace(/bull/g, bullet) // lists can interrupt
+	.replace(/blockCode/g, blockCodeRegex) // indented code blocks can interrupt
+	.replace(/fences/g, / {0,3}(?:`{3,}|~{3,})/) // fenced code blocks can interrupt
+	.replace(/blockquote/g, / {0,3}>/) // blockquote can interrupt
+	.replace(/heading/g, / {0,3}#{1,6}/) // ATX heading can interrupt
+	.replace(/html/g, htmlRegex) // block html can interrupt
+	.replace(/table/g, tableRegexGfm) // table can interrupt
+	.getRegex();
+const _paragraph = /^([^\n]+(?:\n(?!hr|heading|lheading|blockquote|fences|list|html|table| +\n)[^\n]+)*)/;
+const blockText = /^[^\n]+/;
+
+// #ifdef uniVersion >= 4.72
+const _blockLabel = /(?!\s*\])(?:\\.|[^\[\]\\])+/;
+// #endif
+// #ifdef uniVersion < 4.72
+// #ifdef APP-ANDROID
+const _blockLabel = callJSReg(/(?!\s*\])(?:\\.|[^\[\]\\])+/);
+// #endif
+// #endif
+const def = edit(/^ {0,3}\[(label)\]: *(?:\n[ \t]*)?([^<\s][^\s]*|<.*?>)(?:(?: +(?:\n[ \t]*)?| *\n[ \t]*)(title))? *(?:\n+|$)/)
+	.replace('label', _blockLabel)
+	.replace('title', /(?:"(?:\\"?|[^"\\])*"|'[^'\n]*(?:\n[^'\n]+)*\n?'|\([^()]*\))/)
+	.getRegex();
+
+const list = edit(/^( {0,3}bull)([ \t][^\n]+?)?(?:\n|$)/)
+	.replace(/bull/g, bullet)
+	.getRegex();
+
+const _tag = 'address|article|aside|base|basefont|blockquote|body|caption'
+	+ '|center|col|colgroup|dd|details|dialog|dir|div|dl|dt|fieldset|figcaption'
+	+ '|figure|footer|form|frame|frameset|h[1-6]|head|header|hr|html|iframe'
+	+ '|legend|li|link|main|menu|menuitem|meta|nav|noframes|ol|optgroup|option'
+	+ '|p|param|search|section|summary|table|tbody|td|tfoot|th|thead|title'
+	+ '|tr|track|ul';
+
+// #ifdef uniVersion >= 4.72
+const _comment = /<!--(?:-?>|[\s\S]*?(?:-->|$))/;
+// #endif
+// #ifdef uniVersion < 4.72
+// #ifdef APP-ANDROID
+const _comment = callJSReg(/<!--(?:-?>|[\s\S]*?(?:-->|$))/);
+// #endif
+// #endif
+const html = edit(
+	'^ {0,3}(?:' // optional indentation
+	+ '<(script|pre|style|textarea)[\\s>][\\s\\S]*?(?:</\\1>[^\\n]*\\n+|$)' // (1)
+	+ '|comment[^\\n]*(\\n+|$)' // (2)
+	+ '|<\\?[\\s\\S]*?(?:\\?>\\n*|$)' // (3)
+	+ '|<![A-Z][\\s\\S]*?(?:>\\n*|$)' // (4)
+	+ '|<!\\[CDATA\\[[\\s\\S]*?(?:\\]\\]>\\n*|$)' // (5)
+	+ '|</?(tag)(?: +|\\n|/?>)[\\s\\S]*?(?:(?:\\n[ \t]*)+\\n|$)' // (6)
+	+ '|<(?!script|pre|style|textarea)([a-z][\\w-]*)(?:attribute)*? */?>(?=[ \\t]*(?:\\n|$))[\\s\\S]*?(?:(?:\\n[ \t]*)+\\n|$)' // (7) open tag
+	+ '|</(?!script|pre|style|textarea)[a-z][\\w-]*\\s*>(?=[ \\t]*(?:\\n|$))[\\s\\S]*?(?:(?:\\n[ \t]*)+\\n|$)' // (7) closing tag
+	+ ')')
+	.replace('comment', _comment)
+	.replace('tag', _tag)
+	// #ifdef uniVersion < 4.72
+	// #ifdef APP-ANDROID
+	.replace('attribute', callJSReg(/ +[a-zA-Z:_][\w.:-]*(?: *= *"[^"\n]*"| *= *'[^'\n]*'| *= *[^\s"'=<>`]+)?/))
+	// #endif
+	// #endif
+	// #ifdef uniVersion >= 4.72
+	.replace('attribute', / +[a-zA-Z:_][\w.:-]*(?: *= *"[^"\n]*"| *= *'[^'\n]*'| *= *[^\s"'=<>`]+)?/)
+	// #endif
+	.getRegex();
+
+const paragraph = edit(_paragraph)
+	.replace('hr', hr)
+	.replace('heading', ' {0,3}#{1,6}(?:\\s|$)')
+	.replace('|lheading', '') // setext headings don't interrupt commonmark paragraphs
+	.replace('|table', '')
+	.replace('blockquote', ' {0,3}>')
+	.replace('fences', ' {0,3}(?:`{3,}(?=[^`\\n]*\\n)|~{3,})[^\\n]*\\n')
+	.replace('list', ' {0,3}(?:[*+-]|1[.)]) ') // only lists starting from 1 can interrupt
+	.replace('html', '</?(?:tag)(?: +|\\n|/?>)|<(?:script|pre|style|textarea|!--)')
+	.replace('tag', _tag) // pars can be interrupted by type (6) html blocks
+	.getRegex();
+
+const blockquote = edit(/^( {0,3}> ?(paragraph|[^\n]*)(?:\n|$))+/)
+	.replace('paragraph', paragraph)
+	.getRegex();
+
+/**
+ * Normal Block Grammar
+ */
+const blockNormal = {
+	blockquote,
+	code: blockCode,
+	def,
+	fences,
+	heading,
+	hr,
+	html,
+	lheading,
+	list,
+	newline,
+	paragraph,
+	table: noopTest,
+	text: blockText,
+} as BlockNormal;
+
+/**
+ * GFM Block Grammar
+ */
+const gfmTable = edit(
+	'^ *([^\\n ].*)\\n' // Header
+	+ ' {0,3}((?:\\| *)?:?-+:? *(?:\\| *:?-+:? *)*(?:\\| *)?)' // Align
+	+ '(?:\\n((?:(?! *\\n|hr|heading|blockquote|code|fences|list|html).*(?:\\n|$))*)\\n*|$)') // Cells
+	.replace('hr', hr)
+	.replace('heading', ' {0,3}#{1,6}(?:\\s|$)')
+	.replace('blockquote', ' {0,3}>')
+	.replace('code', '(?: {4}| {0,3}\t)[^\\n]')
+	.replace('fences', ' {0,3}(?:`{3,}(?=[^`\\n]*\\n)|~{3,})[^\\n]*\\n')
+	.replace('list', ' {0,3}(?:[*+-]|1[.)]) ') // only lists starting from 1 can interrupt
+	.replace('html', '</?(?:tag)(?: +|\\n|/?>)|<(?:script|pre|style|textarea|!--)')
+	.replace('tag', _tag) // tables can be interrupted by type (6) html blocks
+	.getRegex();
+
+const blockGfm = {
+	blockquote,
+	code: blockCode,
+	def,
+	fences,
+	heading,
+	hr,
+	html,
+	list,
+	newline,
+	text: blockText,
+	lheading: lheadingGfm,
+	table: gfmTable,
+	paragraph: edit(_paragraph)
+		.replace('hr', hr)
+		.replace('heading', ' {0,3}#{1,6}(?:\\s|$)')
+		.replace('|lheading', '') // setext headings don't interrupt commonmark paragraphs
+		.replace('table', gfmTable) // interrupt paragraphs with table
+		.replace('blockquote', ' {0,3}>')
+		.replace('fences', ' {0,3}(?:`{3,}(?=[^`\\n]*\\n)|~{3,})[^\\n]*\\n')
+		.replace('list', ' {0,3}(?:[*+-]|1[.)]) ') // only lists starting from 1 can interrupt
+		.replace('html', '</?(?:tag)(?: +|\\n|/?>)|<(?:script|pre|style|textarea|!--)')
+		.replace('tag', _tag) // pars can be interrupted by type (6) html blocks
+		.getRegex(),
+} as BlockGfm;
+
+/**
+ * Pedantic grammar (original John Gruber's loose markdown specification)
+ */
+const blockPedantic = {
+	blockquote,
+	code: blockCode,
+	hr,
+	list,
+	newline,
+	table: noopTest,
+	text: blockText,
+	html: edit(
+		'^ *(?:comment *(?:\\n|\\s*$)'
+		+ '|<(tag)[\\s\\S]+?</\\1> *(?:\\n{2,}|\\s*$)' // closed tag
+		+ '|<tag(?:"[^"]*"|\'[^\']*\'|\\s[^\'"/>\\s]*)*?/?> *(?:\\n{2,}|\\s*$))')
+		.replace('comment', _comment)
+		.replace(/tag/g, '(?!(?:'
+			+ 'a|em|strong|small|s|cite|q|dfn|abbr|data|time|code|var|samp|kbd|sub'
+			+ '|sup|i|b|u|mark|ruby|rt|rp|bdi|bdo|span|br|wbr|ins|del|img)'
+			+ '\\b)\\w+(?!:|[^\\w\\s@]*@)\\b')
+		.getRegex(),
+	def: /^ *\[([^\]]+)\]: *<?([^\s>]+)>?(?: +(["(][^\n]+[")]))? *(?:\n+|$)/,
+	heading: /^(#{1,6})(.*)(?:\n+|$)/,
+	fences: noopTest, // fences not supported
+	lheading: /^(.+?)\n {0,3}(=+|-+) *(?:\n+|$)/,
+	paragraph: edit(_paragraph)
+		.replace('hr', hr)
+		.replace('heading', ' *#{1,6} *[^\n]')
+		.replace('lheading', lheading)
+		.replace('|table', '')
+		.replace('blockquote', ' {0,3}>')
+		.replace('|fences', '')
+		.replace('|list', '')
+		.replace('|html', '')
+		.replace('|tag', '')
+		.getRegex(),
+} as BlockPedantic;
+
+/**
+ * Inline-Level Grammar
+ */
+const escape = /^\\([!"#$%&'()*+,\-./:;<=>?@\[\]\\^_`{|}~])/;
+const inlineCode = /^(`+)([^`]|[^`][\s\S]*?[^`])\1(?!`)/;
+const br = /^( {2,}|\\)\n(?!\s*$)/;
+const inlineText = /^(`+|[^`])(?:(?= {2,}\n)|[\s\S]*?(?:(?=[\\<!\[`*_]|\b_|$)|[^ ](?= {2,}\n)))/;
+
+// list of unicode punctuation marks, plus any missing characters from CommonMark spec
+// ↓↓↓【本项目的改动】以下 5 处原为 `[\p{P}\p{S}]` 系（带 `u` 标记），换成显式字符区间，
+// 原因见文件顶部说明。注意「或空白」的三个变体仍保留 `\s` —— 新的标点区间不含空白，
+// 不能省掉 `\s`，否则空格的判定会反转。
+const _punctuation = RE_PUNCT;
+const _punctuationOrSpace = RE_PUNCT_OR_SPACE;
+const _notPunctuationOrSpace = RE_NOT_PUNCT_OR_SPACE;
+const punctuation = edit(/^((?![*_])punctSpace)/, 'u')
+	.replace(/punctSpace/g, _punctuationOrSpace).getRegex();
+
+// GFM allows ~ inside strong and em for strikethrough
+const _punctuationGfmStrongEm = RE_PUNCT_GFM;
+const _punctuationOrSpaceGfmStrongEm = RE_PUNCT_OR_SPACE_GFM;
+const _notPunctuationOrSpaceGfmStrongEm = RE_NOT_PUNCT_OR_SPACE_GFM;
+
+// sequences em should skip over [title](link), `code`, <html>
+// #ifdef uniVersion >= 4.72
+const blockSkip = /\[[^[\]]*?\]\((?:\\.|[^\\\(\)]|\((?:\\.|[^\\\(\)])*\))*\)|`[^`]*?`|<[^<>]*?>/g;
+// #endif
+// #ifdef uniVersion < 4.72
+// #ifdef APP-ANDROID
+const blockSkip = callJSReg(/\[[^[\]]*?\]\((?:\\.|[^\\\(\)]|\((?:\\.|[^\\\(\)])*\))*\)|`[^`]*?`|<[^<>]*?>/g);
+// #endif
+// #endif
+
+const emStrongLDelimCore = /^(?:\*+(?:((?!\*)punct)|[^\s*]))|^_+(?:((?!_)punct)|([^\s_]))/;
+
+const emStrongLDelim = edit(emStrongLDelimCore, 'u')
+	.replace(/punct/g, _punctuation)
+	.getRegex();
+
+const emStrongLDelimGfm = edit(emStrongLDelimCore, 'u')
+	.replace(/punct/g, _punctuationGfmStrongEm)
+	.getRegex();
+
+const emStrongRDelimAstCore =
+	'^[^_*]*?__[^_*]*?\\*[^_*]*?(?=__)' // Skip orphan inside strong
+	+ '|[^*]+(?=[^*])' // Consume to delim
+	+ '|(?!\\*)punct(\\*+)(?=[\\s]|$)' // (1) #*** can only be a Right Delimiter
+	+ '|notPunctSpace(\\*+)(?!\\*)(?=punctSpace|$)' // (2) a***#, a*** can only be a Right Delimiter
+	+ '|(?!\\*)punctSpace(\\*+)(?=notPunctSpace)' // (3) #***a, ***a can only be Left Delimiter
+	+ '|[\\s](\\*+)(?!\\*)(?=punct)' // (4) ***# can only be Left Delimiter
+	+ '|(?!\\*)punct(\\*+)(?!\\*)(?=punct)' // (5) #***# can be either Left or Right Delimiter
+	+ '|notPunctSpace(\\*+)(?=notPunctSpace)'; // (6) a***a can be either Left or Right Delimiter
+
+const emStrongRDelimAst = edit(emStrongRDelimAstCore, 'gu')
+	.replace(/notPunctSpace/g, _notPunctuationOrSpace)
+	.replace(/punctSpace/g, _punctuationOrSpace)
+	.replace(/punct/g, _punctuation)
+	.getRegex();
+
+const emStrongRDelimAstGfm = edit(emStrongRDelimAstCore, 'gu')
+	.replace(/notPunctSpace/g, _notPunctuationOrSpaceGfmStrongEm)
+	.replace(/punctSpace/g, _punctuationOrSpaceGfmStrongEm)
+	.replace(/punct/g, _punctuationGfmStrongEm)
+	.getRegex();
+
+// (6) Not allowed for _
+const emStrongRDelimUnd = edit(
+	'^[^_*]*?\\*\\*[^_*]*?_[^_*]*?(?=\\*\\*)' // Skip orphan inside strong
+	+ '|[^_]+(?=[^_])' // Consume to delim
+	+ '|(?!_)punct(_+)(?=[\\s]|$)' // (1) #___ can only be a Right Delimiter
+	+ '|notPunctSpace(_+)(?!_)(?=punctSpace|$)' // (2) a___#, a___ can only be a Right Delimiter
+	+ '|(?!_)punctSpace(_+)(?=notPunctSpace)' // (3) #___a, ___a can only be Left Delimiter
+	+ '|[\\s](_+)(?!_)(?=punct)' // (4) ___# can only be Left Delimiter
+	+ '|(?!_)punct(_+)(?!_)(?=punct)', 'gu') // (5) #___# can be either Left or Right Delimiter
+	.replace(/notPunctSpace/g, _notPunctuationOrSpace)
+	.replace(/punctSpace/g, _punctuationOrSpace)
+	.replace(/punct/g, _punctuation)
+	.getRegex();
+
+const anyPunctuation = edit(/\\(punct)/, 'gu')
+	.replace(/punct/g, _punctuation)
+	.getRegex();
+
+const autolink = edit(/^<(scheme:[^\s\x00-\x1f<>]*|email)>/)
+	.replace('scheme', /[a-zA-Z][a-zA-Z0-9+.-]{1,31}/)
+	.replace('email', /[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+(@)[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+(?![-_])/)
+	.getRegex();
+
+const _inlineComment = edit(_comment).replace('(?:-->|$)', '-->').getRegex();
+const tag = edit(
+	'^comment'
+	+ '|^</[a-zA-Z][\\w:-]*\\s*>' // self-closing tag
+	+ '|^<[a-zA-Z][\\w-]*(?:attribute)*?\\s*/?>' // open tag
+	+ '|^<\\?[\\s\\S]*?\\?>' // processing instruction, e.g. <?php ?>
+	+ '|^<![a-zA-Z]+\\s[\\s\\S]*?>' // declaration, e.g. <!DOCTYPE html>
+	+ '|^<!\\[CDATA\\[[\\s\\S]*?\\]\\]>') // CDATA section
+	.replace('comment', _inlineComment)
+	.replace('attribute', /\s+[a-zA-Z:_][\w.:-]*(?:\s*=\s*"[^"]*"|\s*=\s*'[^']*'|\s*=\s*[^\s"'=<>`]+)?/)
+	.getRegex();
+
+const _inlineLabel = /(?:\[(?:\\.|[^\[\]\\])*\]|\\.|`[^`]*`|[^\[\]\\`])*?/;
+
+const link = edit(/^!?\[(label)\]\(\s*(href)(?:\s+(title))?\s*\)/)
+	.replace('label', _inlineLabel)
+	.replace('href', /<(?:\\.|[^\n<>\\])+>|[^\s\x00-\x1f]*/)
+	.replace('title', /"(?:\\"?|[^"\\])*"|'(?:\\'?|[^'\\])*'|\((?:\\\)?|[^)\\])*\)/)
+	.getRegex();
+
+const reflink = edit(/^!?\[(label)\]\[(ref)\]/)
+	.replace('label', _inlineLabel)
+	.replace('ref', _blockLabel)
+	.getRegex();
+
+const nolink = edit(/^!?\[(ref)\](?:\[\])?/)
+	.replace('ref', _blockLabel)
+	.getRegex();
+
+const reflinkSearch = edit('reflink|nolink(?!\\()', 'g')
+	.replace('reflink', reflink)
+	.replace('nolink', nolink)
+	.getRegex();
+
+/**
+ * Normal Inline Grammar
+ */
+const inlineNormal = {
+	_backpedal: noopTest, // only used for GFM url
+	anyPunctuation,
+	autolink,
+	blockSkip,
+	br,
+	code: inlineCode,
+	del: noopTest,
+	emStrongLDelim,
+	emStrongRDelimAst,
+	emStrongRDelimUnd,
+	escape,
+	link,
+	nolink,
+	punctuation,
+	reflink,
+	reflinkSearch,
+	tag,
+	text: inlineText,
+	url: noopTest,
+} as InlineNormal;
+
+/**
+ * Pedantic Inline Grammar
+ */
+const inlinePedantic = {
+	_backpedal: noopTest, // only used for GFM url
+	anyPunctuation,
+	autolink,
+	blockSkip,
+	br,
+	code: inlineCode,
+	del: noopTest,
+	emStrongLDelim,
+	emStrongRDelimAst,
+	emStrongRDelimUnd,
+	escape,
+	nolink,
+	punctuation,
+	reflinkSearch,
+	tag,
+	text: inlineText,
+	url: noopTest,
+	link: edit(/^!?\[(label)\]\((.*?)\)/)
+		.replace('label', _inlineLabel)
+		.getRegex(),
+	reflink: edit(/^!?\[(label)\]\s*\[([^\]]*)\]/)
+		.replace('label', _inlineLabel)
+		.getRegex(),
+} as InlinePedantic;
+
+/**
+ * GFM Inline Grammar
+ */
+const inlineGfm = {
+	anyPunctuation,
+	autolink,
+	blockSkip,
+	br,
+	code: inlineCode,
+	emStrongRDelimUnd,
+	escape,
+	link,
+	nolink,
+	punctuation,
+	reflink,
+	reflinkSearch,
+	tag,
+	emStrongRDelimAst: emStrongRDelimAstGfm,
+	emStrongLDelim: emStrongLDelimGfm,
+	url: edit(/^((?:ftp|https?):\/\/|www\.)(?:[a-zA-Z0-9\-]+\.?)+[^\s<]*|^email/, 'i')
+		.replace('email', /[A-Za-z0-9._+-]+(@)[a-zA-Z0-9-_]+(?:\.[a-zA-Z0-9-_]*[a-zA-Z0-9])+(?![-_])/)
+		.getRegex(),
+	_backpedal: /(?:[^?!.,:;*_'"~()&]+|\([^)]*\)|&(?![a-zA-Z0-9]+;$)|[?!.,:;*_'"~)]+(?!$))+/,
+	del: /^(~~?)(?=[^\s~])((?:\\.|[^\\])*?(?:\\.|[^\s~\\]))\1(?=[^~]|$)/,
+	text: /^([`~]+|[^`~])(?:(?= {2,}\n)|(?=[a-zA-Z0-9.!#$%&'*+\/=?_`{\|}~-]+@)|[\s\S]*?(?:(?=[\\<!\[`*~_]|\b_|https?:\/\/|ftp:\/\/|www\.|$)|[^ ](?= {2,}\n)|[^a-zA-Z0-9.!#$%&'*+\/=?_`{\|}~-](?=[a-zA-Z0-9.!#$%&'*+\/=?_`{\|}~-]+@)))/,
+} as InlineGfm;
+
+/**
+ * GFM + Line Breaks Inline Grammar
+ */
+const inlineBreaks = {
+	anyPunctuation,
+	autolink,
+	blockSkip,
+	code: inlineCode,
+	emStrongRDelimUnd,
+	escape,
+	link,
+	nolink,
+	punctuation,
+	reflink,
+	reflinkSearch,
+	tag,
+	emStrongRDelimAst: emStrongRDelimAstGfm,
+	emStrongLDelim: emStrongLDelimGfm,
+	url: edit(/^((?:ftp|https?):\/\/|www\.)(?:[a-zA-Z0-9\-]+\.?)+[^\s<]*|^email/, 'i')
+		.replace('email', /[A-Za-z0-9._+-]+(@)[a-zA-Z0-9-_]+(?:\.[a-zA-Z0-9-_]*[a-zA-Z0-9])+(?![-_])/)
+		.getRegex(),
+	_backpedal: /(?:[^?!.,:;*_'"~()&]+|\([^)]*\)|&(?![a-zA-Z0-9]+;$)|[?!.,:;*_'"~)]+(?!$))+/,
+	del: /^(~~?)(?=[^\s~])((?:\\.|[^\\])*?(?:\\.|[^\s~\\]))\1(?=[^~]|$)/,
+	br: edit(br).replace('{2,}', '*').getRegex(),
+	text: edit(inlineGfm.text)
+		.replace('\\b_', '\\b_| {2,}\\n')
+		.replace(/\{2,\}/g, '*')
+		.getRegex(),
+} as InlineBreaks;
+
+/**
+ * exports
+ */
+export const block = {
+	normal: blockNormal,
+	gfm: blockGfm,
+	pedantic: blockPedantic,
+} as Block;
+
+export const inline = {
+	normal: inlineNormal,
+	gfm: inlineGfm,
+	breaks: inlineBreaks,
+	pedantic: inlinePedantic,
+} as Inline;
+
+export const inlineGrammer = inline;

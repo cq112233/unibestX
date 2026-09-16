@@ -11,7 +11,7 @@ description: 当你有一份书面实现计划需要在单独的会话中执行�
 
 **开始时宣布：** "我正在使用 executing-plans 技能来实现此计划。"
 
-**注意：** 告诉你的人类伙伴，Superpowers 在有子代理支持时效果好得多。如果在支持子代理的平台上运行（如 Codex 或 Codex），其工作质量会显著提高。如果子代理可用，请使用 superpowers:subagent-driven-development 而非此技能。
+**注意：** 告诉你的人类伙伴，Superpowers 在有子代理支持时效果好得多。如果在支持子代理的平台上运行（如 Claude Code 或 Codex），其工作质量会显著提高。如果子代理可用，请使用 superpowers:subagent-driven-development 而非此技能。
 
 ## 流程
 

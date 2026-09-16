@@ -1,0 +1,109 @@
+/**
+ * unix-router-guard 公开类型定义
+ *
+ * ⚠️ 本文件必须保持零依赖：插件内部各模块与使用方都从这里取类型。
+ * ⚠️ 一律禁止 interface：UTS 不允许把对象字面量赋给 interface（UTS110111163）。
+ * ⚠️ 禁止 undefined：空值一律 null，联合类型仅限 `T | null`。
+ */
+
+/**
+ * 路由目标：一次导航的目标或来源。
+ *
+ * 与 vue-router 的 to/from 形态对齐，但有两处确定差异：
+ * - params 恒为空（无路由表 ⇒ 无动态段）
+ * - query 是 Map 而非对象（UTS 无法动态构造 UTSJSONObject）
+ */
+export type RouteTarget = {
+  /** 原始 url 字符串（保留 query 原文） */
+  url: string;
+  /** 规范化路径：带前导 /、不含 query */
+  path: string;
+  /** path + 原始 query 串 */
+  fullPath: string;
+  /** 查询参数，值恒为 string */
+  query: Map<string, string>;
+  /** 恒为空，仅为与 vue-router 形态一致 */
+  params: Map<string, string>;
+  /** 触发本次导航的 uni API 名 */
+  api: string;
+};
+
+/**
+ * next 回调。
+ *
+ * ⚠️ 用剩余参数而非 `(value: any) => void`：vue-router 的 next() / next('/x') /
+ *    next(false) 三种形态**参数个数**都不同，UTS 只支持与 null 的联合类型，
+ *    剩余参数是唯一能同时容纳它们的写法（依据见计划的「前置事实」表）。
+ */
+export type Next = (...args: Array<any>) => void;
+
+/** 前置守卫：签名与 vue-router 3 的全局前置守卫逐字相同 */
+export type NavigationGuard = (to: RouteTarget, from: RouteTarget, next: Next) => void;
+
+/** 后置钩子：签名与 vue-router 3 的全局后置钩子逐字相同 */
+export type AfterNavigationHook = (to: RouteTarget, from: RouteTarget) => void;
+
+/**
+ * Router.back 的签名：back() 等价 back(1)。
+ *
+ * ⚠️ 必须抽成顶层类型别名：真机实测（任务 9）把剩余参数直接写在对象类型的属性上会被
+ *    Kotlin 通道拒绝（error: Function type parameters cannot have modifiers），
+ *    而同样的写法放在顶层 `type` 别名里（如上面的 Next）是合法的。
+ */
+export type BackFn = (...args: Array<number>) => void;
+
+/** createRouter 选项 */
+export type RouterOptions = {
+  /** 需要拦截的 API 名；不传用 DEFAULT_APIS */
+  apis ?: Array<string>;
+  /** 裁决改跳时统一使用的跳转 API；不传用 'navigateTo' */
+  redirectApi ?: string;
+  /** 改跳时按 url 决定跳转 API（如「是 TabBar 页就 switchTab」）；不传则恒用 redirectApi */
+  resolveRedirectApi ?: (url: string) => string;
+  /** 同一次导航的重定向链深度上限；不传用 5 */
+  maxRedirectDepth ?: number;
+  /** 打印拦截链路日志；不传用 false */
+  debug ?: boolean;
+};
+
+/** createRouter 返回的路由器实例 */
+export type Router = {
+  /** 注册前置守卫，返回注销函数 */
+  beforeEach: (guard: NavigationGuard) => () => void;
+  /** 注册后置钩子，返回注销函数 */
+  afterEach: (hook: AfterNavigationHook) => () => void;
+  /**
+   * 新页面入栈。
+   *
+   * ⚠️ 返回类型标 `any | null`（真机实测，任务 9）：uni 的这些 API 返回
+   *    `UTSPromise<AsyncApiSuccessResult>?`，而 UTS 泛型不协变、`Promise<any> | null`
+   *    又不等同可空——写成 Promise<any> | null 会被 Kotlin 通道判为类型不匹配。
+   *    实际返回的就是该 uni API 的 Promise；入参为空时返回 null。
+   */
+  push: (to: any) => any | null;
+  /** 替换当前页；返回类型同 push */
+  replace: (to: any) => any | null;
+  /** 关闭所有页面再打开；返回类型同 push */
+  relaunch: (to: any) => any | null;
+  /** 跳转到 TabBar 页面；返回类型同 push */
+  switchTab: (to: any) => any | null;
+  /** 返回；back() 等价 back(1) */
+  back: BackFn;
+  /** 卸载全部已安装的拦截器 */
+  uninstall: () => void;
+};
+
+/** 默认拦截的 5 个导航 API */
+export const DEFAULT_APIS: Array<string> = [
+  'navigateTo',
+  'redirectTo',
+  'reLaunch',
+  'switchTab',
+  'navigateBack'
+];
+
+/** 默认的改跳 API */
+export const DEFAULT_REDIRECT_API: string = 'navigateTo';
+
+/** 默认的重定向链深度上限 */
+export const DEFAULT_MAX_REDIRECT_DEPTH: number = 5;

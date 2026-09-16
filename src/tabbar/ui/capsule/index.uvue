@@ -10,16 +10,15 @@ import {
   handleTabbarClick,
   safeHideNativeTabBar,
   syncCurIdxByCurrentPage,
-  tabbarList,
-  themeColor
-} from '../../helper';
-import { $t } from '@/src/utils/i18n';
+  tabbarList
+} from '@/src/tabbar/index.uts';
+import { $t } from '@/src/utils/i18n/index.uts';
 import { useAppStore } from '@/src/store';
-import { getThemeTokens } from '@/src/utils/theme';
-import type { ThemeTokens } from '@/src/utils/theme';
-import { safeAreaInsets } from '@/src/utils/systemInfo';
+import { getThemeTokens, themeColor } from '@/src/utils/theme/index.uts';
+import type { ThemeTokens } from '@/src/utils/theme/index.uts';
+import { safeAreaInsets } from '@/src/utils/systemInfo/index.uts';
 
-defineProps({
+const props = defineProps({
   /** 悬浮 TabBar 容器高度（默认 64px） */
   height: {
     type: Number,
@@ -139,6 +138,16 @@ function getItemTextColor(index: number): string {
 function getItemFontWeight(index: number): string {
   return curIdx.value == index ? '600' : 'normal';
 }
+
+/** 适配 iOS 和 Android 底部安全区高度，iOS 默认 -12px */
+const bottom = computed(() => {
+  // 0 代表没有获取到安全区高度，直接使用 props.bottomOffset
+  if (safeAreaBottom.value == 0) {
+    return `${props.bottomOffset}`;
+  }
+  // 12px 是悬浮胶囊底座和底部内容的间距
+  return `${props.bottomOffset + safeAreaBottom.value - 12}`;
+});
 </script>
 
 <template>
@@ -156,7 +165,7 @@ function getItemFontWeight(index: number): string {
       :hover-start-time="0"
       :hover-stay-time="120"
       :style="{
-        bottom: `${bottomOffset + safeAreaBottom}px`,
+        bottom: `${bottom}px`,
         height: `${height}px`,
         backgroundColor: themeTokens.tabBg,
         borderColor: themeTokens.tabBorder

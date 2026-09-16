@@ -1,10 +1,10 @@
 import { Request } from '@/uni_modules/lime-request';
 import type { LimeRequestConfig, LimeRequestFail, LimeRequestResponse } from '@/uni_modules/lime-request';
-import { useTokenStore } from '../store/token';
+import { useTokenStore } from '@/src/store';
 import { toLoginPage } from '../router/toLoginPage';
 import { ContentTypeEnum, ResultEnum, ShowMessage } from './tools/enum';
 
-import { getApiBaseUrl, getApiSecondaryUrl, getH5UseProxy } from '../utils/env.uts';
+import { getApiBaseUrl, getApiSecondaryUrl, getH5UseProxy } from '../utils/env/index.uts';
 
 // ==========================================
 // 域名配置（所有端统一从 Vite 环境变量读取）

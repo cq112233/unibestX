@@ -1,0 +1,94 @@
+/**
+ * Pinia 状态管理 —— 跨模式共享类型单一真源
+ *
+ * 【为什么单独抽出本文件】
+ * 同一套 store 在 Vapor 分支（`./vapor/*.ts`，官方 Pinia）与 VDOM 分支
+ * （`./vdom/*.uts`，x-pinia-s）中各有一份实现，但对外暴露的类型必须完全一致。
+ * 若类型分别定义在两个分支的实现文件里，会带来两个问题：
+ *
+ * 1. **小程序端类型丢失**：`src/store/index.uts` 门面通过 `export * from './vapor/token'`
+ *    转发 `.ts` 文件中的 `export type` 时，微信小程序（uts2js）链路拿不到这些纯类型导出，
+ *    业务侧 `import type { ISingleTokenRes } from '@/src/store'` 会直接编译失败：
+ *    `[plugin:uts] "ISingleTokenRes" is not exported by ".../src/store/index.uts"`；
+ *    `.uts` → `.uts` 的类型转发则稳定可用。
+ * 2. **双份定义漂移**：两个分支各写一遍同名类型，改一处漏一处。
+ *
+ * 因此：**所有对外类型一律只在本文件定义**，`./vapor/*`、`./vdom/*` 只 `import type`
+ * 使用（严禁再 `export type` 同名类型，否则门面会收到重复导出）。
+ *
+ * ⚠️ 本文件只放类型（`type`），不放任何运行时代码。
+ * ⚠️ 项目红线：一律禁止 `interface`，统一使用 `type`。
+ */
+
+// ==========================================
+// app store
+// ==========================================
+
+export type IAppState = {
+  theme: string;
+  locale: string;
+  themeMode: string; // 'auto'（跟随系统）| 'light' | 'dark'
+  isDark: boolean; // 实际生效的亮/暗（auto 模式下跟随系统/宿主主题）
+  mode: string; // 当前 Store 实现模式：'vapor'（官方 Pinia）| 'vdom'（x-pinia-s）
+};
+
+// ==========================================
+// token store
+// ==========================================
+
+/**
+ * 登录表单参数
+ */
+export type ILoginForm = {
+  username: string;
+  password: string;
+};
+
+/**
+ * 单 Token 模式返回值
+ */
+export type ISingleTokenRes = {
+  token: string;
+  expiresIn: number;
+};
+
+/**
+ * 双 Token 模式返回值
+ */
+export type IDoubleTokenRes = {
+  accessToken: string;
+  accessExpiresIn: number;
+  refreshToken: string;
+  refreshExpiresIn: number;
+};
+
+/**
+ * Token 信息联合类型（为保持 UTS 严格类型，使用单一 state 结构）
+ */
+export type ITokenState = {
+  /** 单 token 模式 */
+  token: string;
+  expiresIn: number;
+  /** 双 token 模式 */
+  accessToken: string;
+  accessExpiresIn: number;
+  refreshToken: string;
+  refreshExpiresIn: number;
+  /** Token 过期时间戳 (ms) */
+  tokenExpireTime: number;
+};
+
+// ==========================================
+// user store
+// ==========================================
+
+export type IUserInfo = {
+  userId: number;
+  username: string;
+  nickname: string;
+  avatar: string;
+};
+
+export type IUserState = {
+  userInfo: IUserInfo;
+};

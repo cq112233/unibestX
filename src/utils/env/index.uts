@@ -1,0 +1,413 @@
+/**
+ * 环境变量与运行环境工具库
+ * 统一收敛所有 import.meta.env 读取、环境类型判断、平台与编译模式获取方法
+ */
+
+/**
+ * 获取当前应用名称（全端从 import.meta.env 读取）
+ */
+export function getAppTitle(): string {
+  return `${import.meta.env.VITE_APP_TITLE ?? 'unibestX'}`;
+}
+
+/**
+ * 获取当前应用版本号（优先从系统运行时获取，若为空从 VITE_APP_VERSION 或兜底 1.0.0）
+ */
+export function getAppVersion(): string {
+  try {
+    const sys = uni.getSystemInfoSync();
+    if ((sys.appVersion ?? '') != '') {
+      return `${sys.appVersion}`;
+    }
+  }
+  catch { }
+  // #ifdef MP-WEIXIN
+  try {
+    const appBaseInfo = uni.getAppBaseInfo() as any;
+    if ((appBaseInfo.appVersion ?? '') != '') {
+      return `${appBaseInfo.appVersion}`;
+    }
+  }
+  catch { }
+  // #endif
+  return `${import.meta.env.VITE_APP_VERSION ?? '1.0.0'}`;
+}
+
+/**
+ * 获取接口 BaseURL 地址（全端从 import.meta.env 读取）
+ */
+export function getApiBaseUrl(): string {
+  return `${import.meta.env.VITE_SERVER_BASEURL ?? 'https://ukw0y1.laf.run'}`;
+}
+
+/**
+ * 获取备用接口 BaseURL 地址（全端从 import.meta.env 读取）
+ */
+export function getApiSecondaryUrl(): string {
+  return `${import.meta.env.VITE_SERVER_BASEURL_SECONDARY ?? 'https://ukw0y1.laf.run'}`;
+}
+
+/**
+ * 获取 H5 是否开启反向代理（VITE_H5_USE_PROXY 开关：true 走 /api，false 直连）
+ */
+export function getH5UseProxy(): boolean {
+  return `${import.meta.env.VITE_H5_USE_PROXY ?? 'false'}` == 'true';
+}
+
+/**
+ * 获取默认主题主色调（全端从 import.meta.env 读取）
+ */
+export function getDefaultTheme(): string {
+  const envTheme = `${import.meta.env.VITE_DEFAULT_THEME ?? ''}`.trim();
+  return envTheme.length > 0 ? envTheme : '#37c2bc';
+}
+
+/**
+ * 获取默认国际化语言（全端从 import.meta.env 读取，未配置时自动识别系统语言，最后兜底 zh-CN）
+ */
+export function getDefaultLocale(): string {
+  const envLocale = `${import.meta.env.VITE_DEFAULT_LOCALE ?? ''}`.trim();
+  if (envLocale.length > 0) {
+    return envLocale;
+  }
+  try {
+    const sysInfo = uni.getSystemInfoSync();
+    const appLang = sysInfo.appLanguage;
+    if (appLang != null && appLang.toLowerCase().includes('zh')) {
+      return 'zh-CN';
+    }
+    if (appLang != null && appLang.toLowerCase().includes('en')) {
+      return 'en-US';
+    }
+  }
+  catch {
+    // ignore
+  }
+  return 'zh-CN';
+}
+
+/**
+ * 获取流式演示接口地址（VITE_STREAM_URL）
+ *
+ * 支持两种写法：
+ * - 相对路径（如 /stream/chat）：自动拼接 getApiBaseUrl() 成为完整地址
+ * - 完整域名（https://...）：直接使用
+ *
+ * 配置为空时返回空字符串，此时演示页会自动使用本地模拟流。
+ */
+export function getStreamUrl(): string {
+  const raw = `${import.meta.env.VITE_STREAM_URL ?? ''}`.trim();
+  if (raw == '') {
+    return '';
+  }
+  if (raw.startsWith('http://') || raw.startsWith('https://')) {
+    return raw;
+  }
+  return `${getApiBaseUrl()}${raw}`;
+}
+
+/**
+ * 获取 OSS 上传基础域名（VITE_UPLOAD_BASEURL）
+ */
+export function getOssBaseUrl(): string {
+  return `${import.meta.env.VITE_UPLOAD_BASEURL ?? 'https://xxx.com'}`;
+}
+
+/**
+ * 获取 OSS 上传接口路径（VITE_UPLOAD_PATH）
+ */
+export function getOssUploadPath(): string {
+  return `${import.meta.env.VITE_UPLOAD_PATH ?? '/gateway/user/sys/oss/upload/xxx'}`;
+}
+
+/**
+ * 获取 OSS 上传完整接口地址
+ */
+export function getOssUploadUrl(): string {
+  return `${getOssBaseUrl()}${getOssUploadPath()}`;
+}
+
+/**
+ * 获取环境变量中配置的 TabBar 策略模式（0: 无, 1: 原生, 2: 带原生自定义, 3: 纯自定义, 4: 单页保活）
+ */
+export function getTabBarMode(): string {
+  return `${import.meta.env.VITE_TABBAR_MODE ?? '1'}`.trim();
+}
+
+/**
+ * 解析并获取当前环境变量中配置的 TabBar 策略模式数值（0:无, 1:原生, 2:带原生自定义, 3:纯自定义, 4:单页TabBar）
+ */
+export function getTabbarStrategyNum(): number {
+  const envMode = getTabBarMode();
+  if (envMode == '0' || envMode == 'NO_TABBAR') {
+    return 0;
+  }
+  if (envMode == '2' || envMode == 'CUSTOM_TABBAR' || envMode == 'CUSTOM_TABBAR_WITH_NATIVE') {
+    return 2;
+  }
+  if (envMode == '3' || envMode == 'CUSTOM_TABBAR_WITHOUT_NATIVE') {
+    return 3;
+  }
+  if (envMode == '4' || envMode == 'SINGLE_PAGE_TABBAR') {
+    return 4;
+  }
+  return 1;
+}
+
+/**
+ * 判断当前是否为原生 TabBar 模式（VITE_TABBAR_MODE 为 1 或 NATIVE_TABBAR）
+ */
+export function isNativeTabBar(): boolean {
+  const mode = getTabBarMode();
+  return mode == '1' || mode == 'NATIVE_TABBAR';
+}
+
+/**
+ * 获取当前是否为 Vapor 渲染模式（使用 uni-app X 原生编译条件 VUE3-VAPOR 判定）
+ */
+export function isVaporMode(): boolean {
+  // #ifdef VUE3-VAPOR
+  return true;
+  // #endif
+  // #ifndef VUE3-VAPOR
+  return false;
+  // #endif
+}
+
+/**
+ * 获取当前运行环境类型标识（'development' | 'test' | 'production'）
+ */
+export function getCurrentEnv(): string {
+  const buildEnvType = `${import.meta.env.VITE_ENV_TYPE ?? ''}`;
+  if (buildEnvType == 'test') {
+    return 'test';
+  }
+  return process.env.NODE_ENV == 'development' ? 'development' : 'production';
+}
+
+/**
+ * 获取当前运行环境中文名称（'开发环境' | '测试环境' | '生产环境'）
+ */
+export function getCurrentEnvName(): string {
+  // 优先从环境变量读取中文名称（.env.* 中配置 VITE_ENV_NAME）
+  const envName = `${import.meta.env.VITE_ENV_NAME ?? ''}`;
+  if (envName != '') {
+    return envName;
+  }
+  return '';
+}
+
+/**
+ * 便捷判断：是否为开发环境
+ */
+export function isDev(): boolean {
+  return getCurrentEnv() == 'development';
+}
+
+/**
+ * 便捷判断：是否为测试环境
+ */
+export function isTest(): boolean {
+  return getCurrentEnv() == 'test';
+}
+
+/**
+ * 便捷判断：是否为生产环境
+ */
+export function isProd(): boolean {
+  return getCurrentEnv() == 'production';
+}
+
+/**
+ * 获取当前编译目标平台（如 "H5"、"Android"、"iOS"、"微信小程序" 等）
+ */
+export function getCompilePlatform(): string {
+  // #ifdef H5
+  return 'H5';
+  // #endif
+  // #ifdef APP-ANDROID
+  return 'Android';
+  // #endif
+  // #ifdef APP-IOS
+  return 'iOS';
+  // #endif
+  // #ifdef APP-HARMONY
+  return 'HarmonyOS';
+  // #endif
+  // #ifdef MP-WEIXIN
+  return '微信小程序';
+  // #endif
+  // #ifdef MP-ALIPAY
+  return '支付宝小程序';
+  // #endif
+  // #ifdef MP-BAIDU
+  return '百度小程序';
+  // #endif
+  // #ifdef MP-TOUTIAO
+  return '字节小程序';
+  // #endif
+  // #ifdef MP-KUAISHOU
+  return '快手小程序';
+  // #endif
+  // #ifdef MP-QQ
+  return 'QQ小程序';
+  // #endif
+  // #ifndef H5 || APP-ANDROID || APP-IOS || APP-HARMONY || MP-WEIXIN || MP-ALIPAY || MP-BAIDU || MP-TOUTIAO || MP-KUAISHOU || MP-QQ
+  try {
+    const sys = uni.getSystemInfoSync();
+    return sys.uniPlatform ?? '未知平台';
+  }
+  catch {
+    return '未知平台';
+  }
+  // #endif
+}
+
+/**
+ * 获取当前编译运行模式（如 "Vapor 模式 (开发)" / "VDOM 模式 (生产)"）
+ */
+export function getCompileMode(): string {
+  const isVapor = isVaporMode();
+  const modeName = isVapor ? 'Vapor 模式' : 'VDOM 模式';
+  const envText = getCurrentEnv() == 'test' ? '测试' : (process.env.NODE_ENV == 'production' ? '生产' : '开发');
+  return `${modeName} (${envText})`;
+}
+
+// ==========================================
+// 环境变量与运行环境工具聚合类（全端一目了然速查与单例）
+// ==========================================
+
+/**
+ * 环境变量与运行环境工具聚合类
+ *
+ * 集中呈现所有环境变量与运行模式获取方法，一目了然；同时支持面向对象式 `env.xxx()` 调用。
+ *
+ * @example
+ * ```uts
+ * // 方式 1：标准具名导入
+ * import { getApiBaseUrl, isDev } from '@/src/utils/env/index.uts';
+ *
+ * // 方式 2：对象单例导入（一目了然）
+ * import { env } from '@/src/utils/env/index.uts';
+ * console.log(env.getApiBaseUrl());
+ * ```
+ */
+export class EnvUtils {
+  /** 获取当前应用名称（全端从 import.meta.env 读取） */
+  getAppTitle(): string {
+    return getAppTitle();
+  }
+
+  /** 获取当前应用版本号（优先从系统运行时获取，若为空从 VITE_APP_VERSION 或兜底 1.0.0） */
+  getAppVersion(): string {
+    return getAppVersion();
+  }
+
+  /** 获取接口 BaseURL 地址（全端从 import.meta.env 读取） */
+  getApiBaseUrl(): string {
+    return getApiBaseUrl();
+  }
+
+  /** 获取备用接口 BaseURL 地址（全端从 import.meta.env 读取） */
+  getApiSecondaryUrl(): string {
+    return getApiSecondaryUrl();
+  }
+
+  /** 获取 H5 是否开启反向代理（VITE_H5_USE_PROXY 开关：true 走 /api，false 直连） */
+  getH5UseProxy(): boolean {
+    return getH5UseProxy();
+  }
+
+  /** 获取默认主题主色调（全端从 import.meta.env 读取） */
+  getDefaultTheme(): string {
+    return getDefaultTheme();
+  }
+
+  /** 获取默认国际化语言（全端从 import.meta.env 读取，未配置时自动识别系统语言，最后兜底 zh-CN） */
+  getDefaultLocale(): string {
+    return getDefaultLocale();
+  }
+
+  /** 获取流式演示接口地址（VITE_STREAM_URL，相对路径会自动拼接 baseURL） */
+  getStreamUrl(): string {
+    return getStreamUrl();
+  }
+
+  /** 获取 OSS 上传基础域名（VITE_UPLOAD_BASEURL） */
+  getOssBaseUrl(): string {
+    return getOssBaseUrl();
+  }
+
+  /** 获取 OSS 上传接口路径（VITE_UPLOAD_PATH） */
+  getOssUploadPath(): string {
+    return getOssUploadPath();
+  }
+
+  /** 获取 OSS 上传完整接口地址 */
+  getOssUploadUrl(): string {
+    return getOssUploadUrl();
+  }
+
+  /** 获取环境变量中配置的 TabBar 策略模式（0: 无, 1: 原生, 2: 带原生自定义, 3: 纯自定义, 4: 单页保活） */
+  getTabBarMode(): string {
+    return getTabBarMode();
+  }
+
+  /** 解析并获取当前环境变量中配置的 TabBar 策略模式数值（0:无, 1:原生, 2:带原生自定义, 3:纯自定义, 4:单页TabBar） */
+  getTabbarStrategyNum(): number {
+    return getTabbarStrategyNum();
+  }
+
+  /** 判断当前是否为原生 TabBar 模式（VITE_TABBAR_MODE 为 1 或 NATIVE_TABBAR） */
+  isNativeTabBar(): boolean {
+    return isNativeTabBar();
+  }
+
+  /** 获取当前是否为 Vapor 渲染模式（使用 uni-app X 原生编译条件 VUE3-VAPOR 判定） */
+  isVaporMode(): boolean {
+    return isVaporMode();
+  }
+
+  /** 获取当前运行环境类型标识（'development' | 'test' | 'production'） */
+  getCurrentEnv(): string {
+    return getCurrentEnv();
+  }
+
+  /** 获取当前运行环境中文名称（'开发环境' | '测试环境' | '生产环境'） */
+  getCurrentEnvName(): string {
+    return getCurrentEnvName();
+  }
+
+  /** 便捷判断：是否为开发环境 */
+  isDev(): boolean {
+    return isDev();
+  }
+
+  /** 便捷判断：是否为测试环境 */
+  isTest(): boolean {
+    return isTest();
+  }
+
+  /** 便捷判断：是否为生产环境 */
+  isProd(): boolean {
+    return isProd();
+  }
+
+  /** 获取当前编译目标平台（如 "H5"、"Android"、"iOS"、"微信小程序" 等） */
+  getCompilePlatform(): string {
+    return getCompilePlatform();
+  }
+
+  /** 获取当前编译运行模式（如 "Vapor 模式 (开发)" / "VDOM 模式 (生产)"） */
+  getCompileMode(): string {
+    return getCompileMode();
+  }
+}
+
+/** 环境变量与运行环境工具全局单例 */
+export const env = new EnvUtils();
+
+/** 别名导出 */
+export const envUtils = env;
+
+export default env;

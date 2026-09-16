@@ -1,0 +1,788 @@
+/**
+ * rxjs-lite —— 面向 uni-app X 的极简响应式流库（纯 UTS 实现，全端通用）
+ *
+ * 为什么不用 npm 上的 rxjs？
+ * uni-app X 的 App 端（Android 编译 Kotlin / iOS 编译 Swift）**没有 JS 引擎**，
+ * 因此无法引入任何纯 JS 库（rxjs、lodash 等）。本库用 UTS 重新实现了 rxjs 的核心
+ * 概念与常用操作符，API 语义对齐 rxjs，可在 Android / iOS / H5 / 小程序全端一致运行。
+ *
+ * 核心概念：
+ * - Observable：可被订阅的数据流
+ * - Subscriber：订阅者（承载 next / error / complete 三个回调）
+ * - Subscription：订阅凭证，调用 unsubscribe() 即可取消订阅并触发清理
+ * - Subject：既是 Observable（可被订阅）又是 Observer（可 next/error/complete）的多播源
+ * - Operator：操作符，通过 stream.pipe(op) 串联
+ *
+ * @example
+ * ```uts
+ * import { Subject, interval, map, filter, debounceTime, takeUntil } from '@/src/utils/rxjs-lite/index.uts';
+ *
+ * // 1. 输入防抖
+ * const keyword$ = new Subject<string>();
+ * const sub = keyword$.asObservable()
+ *   .pipe(debounceTime(300))
+ *   .pipe(filter((kw: string): boolean => kw != ''))
+ *   .subscribe((kw: string): void => {
+ *     console.log('搜索关键词:', kw);
+ *   });
+ * sub.unsubscribe(); // 页面卸载时务必取消订阅，避免内存泄漏
+ *
+ * // 2. 定时流 + 停止信号
+ * const stop$ = new Subject<void>();
+ * interval(120).pipe(takeUntil(stop$.asObservable())).subscribe(
+ *   (i: number): void => { console.log('tick', i); },
+ *   null,
+ *   (): void => { console.log('流已结束'); }
+ * );
+ * stop$.next(); // 停止
+ * ```
+ */
+
+// ==========================================
+// 基础回调类型（必须位于文件顶层作用域）
+// ==========================================
+
+/** 数据回调 */
+export type NextFn<T> = (value: T) => void;
+/** 错误回调 */
+export type ErrorFn = (error: any) => void;
+/** 完成回调 */
+export type CompleteFn = () => void;
+/** 清理回调：取消订阅、流完成或出错时触发（等价于 rxjs 的 teardown） */
+export type TeardownFn = () => void;
+
+// ==========================================
+// Subscriber —— 订阅者
+// ==========================================
+
+/**
+ * 订阅者：承载 next / error / complete 三个回调。
+ *
+ * 刻意设计为 class 而非对象字面量 —— UTS 在 Android 端将对象字面量中的函数字段
+ * 编译为 Kotlin Map，存在函数类型字段的编译/运行风险，class 更稳妥。
+ */
+export class Subscriber<T> {
+  /** 数据回调 */
+  private _nextFn: NextFn<T> | null = null;
+  /** 错误回调 */
+  private _errorFn: ErrorFn | null = null;
+  /** 完成回调 */
+  private _completeFn: CompleteFn | null = null;
+
+  constructor(
+    nextFn: NextFn<T> | null = null,
+    errorFn: ErrorFn | null = null,
+    completeFn: CompleteFn | null = null
+  ) {
+    this._nextFn = nextFn;
+    this._errorFn = errorFn;
+    this._completeFn = completeFn;
+  }
+
+  /** 推送一个数据 */
+  next(value: T): void {
+    const fn = this._nextFn;
+    if (fn != null) {
+      fn(value);
+    }
+  }
+
+  /** 推送一个错误 */
+  error(error: any): void {
+    const fn = this._errorFn;
+    if (fn != null) {
+      fn(error);
+    }
+  }
+
+  /** 通知流已正常结束 */
+  complete(): void {
+    const fn = this._completeFn;
+    if (fn != null) {
+      fn();
+    }
+  }
+}
+
+// ==========================================
+// Subscription —— 订阅凭证
+// ==========================================
+
+/**
+ * 订阅凭证：collect 该次订阅的所有清理逻辑。
+ * 调用 unsubscribe() 后，上游的所有定时器 / 网络请求 / 事件监听都会被释放。
+ */
+export class Subscription {
+  /** 是否已关闭 */
+  private _closed: boolean = false;
+  /** 待执行的清理回调集合 */
+  private _teardowns: Array<TeardownFn> = [];
+
+  /** 当前订阅是否已关闭 */
+  isClosed(): boolean {
+    return this._closed;
+  }
+
+  /** 追加一个清理回调；若订阅已关闭则立即执行该回调 */
+  add(teardown: TeardownFn | null): void {
+    if (teardown == null) {
+      return;
+    }
+    if (this._closed) {
+      teardown();
+      return;
+    }
+    this._teardowns.push(teardown);
+  }
+
+  /** 取消订阅：执行全部清理回调（幂等，重复调用无副作用） */
+  unsubscribe(): void {
+    if (this._closed) {
+      return;
+    }
+    this._closed = true;
+    const list = this._teardowns;
+    this._teardowns = [];
+    const len = list.length;
+    for (let i: number = 0; i < len; i++) {
+      list[i]();
+    }
+  }
+}
+
+// ==========================================
+// Observable —— 可订阅的数据流
+// ==========================================
+
+/** 订阅逻辑：接收订阅者，返回清理函数 */
+export type SubscribeFn<T> = (subscriber: Subscriber<T>) => TeardownFn | null;
+
+/**
+ * 可观察对象：一段可被多次订阅的数据流定义。
+ *
+ * 订阅时传入的三个回调均可省略（传 null），若只想监听完成事件，
+ * 可写 `stream.subscribe(null, null, () => { ... })`。
+ */
+export class Observable<T> {
+  /** 该流的订阅逻辑 */
+  private _subscribeFn: SubscribeFn<T>;
+
+  constructor(subscribeFn: SubscribeFn<T>) {
+    this._subscribeFn = subscribeFn;
+  }
+
+  /**
+   * 订阅该流
+   * @param nextFn 数据回调，不需要时传 null
+   * @param errorFn 错误回调，不需要时传 null
+   * @param completeFn 完成回调，不需要时传 null
+   * @returns 订阅凭证，调用 unsubscribe() 取消订阅
+   */
+  subscribe(
+    nextFn: NextFn<T> | null = null,
+    errorFn: ErrorFn | null = null,
+    completeFn: CompleteFn | null = null
+  ): Subscription {
+    const subscription = new Subscription();
+    // 流正常结束或出错时，自动关闭订阅并释放资源（对齐 rxjs 语义）
+    const subscriber = new Subscriber<T>(
+      nextFn,
+      (err: any): void => {
+        if (errorFn != null) {
+          errorFn(err);
+        }
+        subscription.unsubscribe();
+      },
+      (): void => {
+        if (completeFn != null) {
+          completeFn();
+        }
+        subscription.unsubscribe();
+      }
+    );
+
+    try {
+      subscription.add(this._subscribeFn(subscriber));
+    }
+    catch (err) {
+      subscriber.error(err);
+    }
+
+    return subscription;
+  }
+
+  /**
+   * 串联一个操作符。
+   * UTS 的重载与变参泛型支持有限，因此这里只接收单个操作符，
+   * 多个操作符请链式调用：`stream.pipe(op1).pipe(op2)`。
+   */
+  pipe<R>(operator: Operator<T, R>): Observable<R> {
+    return operator(this);
+  }
+}
+
+/** 操作符：把上游流变换为下游流 */
+export type Operator<T, R> = (source: Observable<T>) => Observable<R>;
+
+// ==========================================
+// Subject —— 多播源（同时是 Observable 与 Observer）
+// ==========================================
+
+/**
+ * 主题：既可以作为数据源被订阅，也可以主动 push 数据。
+ * 常用于把「用户输入」「按钮点击」等命令式事件转成声明式流。
+ *
+ * 注意：刻意不继承 Observable —— Kotlin 的 super(...) 构造参数中无法引用 this，
+ * 因此采用组合（asObservable()）替代继承，规避原生端编译限制。
+ */
+export class Subject<T> {
+  /** 当前已注册的订阅者 */
+  private _observers: Array<Subscriber<T>> = [];
+  /** 与 _observers 一一对应的令牌，用于精确移除（避免依赖对象引用比较） */
+  private _tokens: Array<number> = [];
+  /** 令牌自增计数器 */
+  private _tokenSeed: number = 0;
+  /** 是否已终止（complete / error 之后不再接收新数据） */
+  private _stopped: boolean = false;
+
+  /** 转换为可订阅的 Observable */
+  asObservable(): Observable<T> {
+    return new Observable<T>((subscriber: Subscriber<T>): TeardownFn | null => {
+      if (this._stopped) {
+        subscriber.complete();
+        return null;
+      }
+      this._tokenSeed = this._tokenSeed + 1;
+      const token: number = this._tokenSeed;
+      this._observers.push(subscriber);
+      this._tokens.push(token);
+      return (): void => {
+        this._remove(token);
+      };
+    });
+  }
+
+  /** 按令牌移除订阅者 */
+  private _remove(token: number): void {
+    const idx = this._tokens.indexOf(token);
+    if (idx >= 0) {
+      this._tokens.splice(idx, 1);
+      this._observers.splice(idx, 1);
+    }
+  }
+
+  /** 向所有订阅者推送一个数据 */
+  next(value: T): void {
+    if (this._stopped) {
+      return;
+    }
+    // 复制一份快照，避免订阅者在回调中取消订阅导致遍历错乱
+    const snapshot = this._observers.slice();
+    const len = snapshot.length;
+    for (let i: number = 0; i < len; i++) {
+      snapshot[i].next(value);
+    }
+  }
+
+  /** 向所有订阅者推送错误，并终止该流 */
+  error(err: any): void {
+    if (this._stopped) {
+      return;
+    }
+    this._stopped = true;
+    const snapshot = this._observers.slice();
+    this._observers = [];
+    this._tokens = [];
+    const len = snapshot.length;
+    for (let i: number = 0; i < len; i++) {
+      snapshot[i].error(err);
+    }
+  }
+
+  /** 通知所有订阅者流已结束 */
+  complete(): void {
+    if (this._stopped) {
+      return;
+    }
+    this._stopped = true;
+    const snapshot = this._observers.slice();
+    this._observers = [];
+    this._tokens = [];
+    const len = snapshot.length;
+    for (let i: number = 0; i < len; i++) {
+      snapshot[i].complete();
+    }
+  }
+
+  /** 当前订阅者数量 */
+  observerCount(): number {
+    return this._observers.length;
+  }
+}
+
+// ==========================================
+// 创建类（Creation Operators）
+// ==========================================
+
+/** 从数组同步创建流，逐个发出元素后完成 */
+export function fromArray<T>(values: Array<T>): Observable<T> {
+  return new Observable<T>((subscriber: Subscriber<T>): TeardownFn | null => {
+    const len = values.length;
+    for (let i: number = 0; i < len; i++) {
+      subscriber.next(values[i]);
+    }
+    subscriber.complete();
+    return null;
+  });
+}
+
+/** 定时流：每隔 period 毫秒发出一个从 0 开始的递增序号（不自动结束，需配合 take/takeUntil） */
+export function interval(period: number): Observable<number> {
+  return new Observable<number>((subscriber: Subscriber<number>): TeardownFn | null => {
+    let count: number = 0;
+    const timerId = setInterval((): void => {
+      const current: number = count;
+      count = count + 1;
+      subscriber.next(current);
+    }, period);
+    return (): void => {
+      clearInterval(timerId);
+    };
+  });
+}
+
+/** 延时流：delay 毫秒后发出 value 并完成 */
+export function timer<T>(delay: number, value: T): Observable<T> {
+  return new Observable<T>((subscriber: Subscriber<T>): TeardownFn | null => {
+    const timerId = setTimeout((): void => {
+      subscriber.next(value);
+      subscriber.complete();
+    }, delay);
+    return (): void => {
+      clearTimeout(timerId);
+    };
+  });
+}
+
+/** 出错流：立即向下游推送一个错误（用于演示 catchError 降级） */
+export function throwError<T>(err: any): Observable<T> {
+  return new Observable<T>((subscriber: Subscriber<T>): TeardownFn | null => {
+    subscriber.error(err);
+    return null;
+  });
+}
+
+// ==========================================
+// 转换类操作符（Transformation Operators）
+// ==========================================
+
+/** 映射：把上游每个值通过 project 转换成新值 */
+export function map<T, R>(project: (value: T) => R): Operator<T, R> {
+  return (source: Observable<T>): Observable<R> => {
+    return new Observable<R>((subscriber: Subscriber<R>): TeardownFn | null => {
+      const sub = source.subscribe(
+        (value: T): void => {
+          subscriber.next(project(value));
+        },
+        (err: any): void => {
+          subscriber.error(err);
+        },
+        (): void => {
+          subscriber.complete();
+        }
+      );
+      return (): void => {
+        sub.unsubscribe();
+      };
+    });
+  };
+}
+
+/** 扫描：类似 Array.reduce，把流上的值依次累积（常用来构建「已接收内容」） */
+export function scan<T, R>(accumulator: (acc: R, value: T) => R, seed: R): Operator<T, R> {
+  return (source: Observable<T>): Observable<R> => {
+    return new Observable<R>((subscriber: Subscriber<R>): TeardownFn | null => {
+      let acc: R = seed;
+      const sub = source.subscribe(
+        (value: T): void => {
+          acc = accumulator(acc, value);
+          subscriber.next(acc);
+        },
+        (err: any): void => {
+          subscriber.error(err);
+        },
+        (): void => {
+          subscriber.complete();
+        }
+      );
+      return (): void => {
+        sub.unsubscribe();
+      };
+    });
+  };
+}
+
+/** 缓冲：把上游的值累积成数组后再展开（常用于把零散 chunk 合并成数组结构） */
+export function toArray<T>(): Operator<T, Array<T>> {
+  return (source: Observable<T>): Observable<Array<T>> => {
+    return new Observable<Array<T>>((subscriber: Subscriber<Array<T>>): TeardownFn | null => {
+      const buffer: Array<T> = [];
+      const sub = source.subscribe(
+        (value: T): void => {
+          buffer.push(value);
+        },
+        (err: any): void => {
+          subscriber.error(err);
+        },
+        (): void => {
+          subscriber.next(buffer);
+          subscriber.complete();
+        }
+      );
+      return (): void => {
+        sub.unsubscribe();
+      };
+    });
+  };
+}
+
+// ==========================================
+// 过滤类操作符（Filtering Operators）
+// ==========================================
+
+/** 过滤：仅放行满足 predicate 的值 */
+export function filter<T>(predicate: (value: T) => boolean): Operator<T, T> {
+  return (source: Observable<T>): Observable<T> => {
+    return new Observable<T>((subscriber: Subscriber<T>): TeardownFn | null => {
+      const sub = source.subscribe(
+        (value: T): void => {
+          if (predicate(value)) {
+            subscriber.next(value);
+          }
+        },
+        (err: any): void => {
+          subscriber.error(err);
+        },
+        (): void => {
+          subscriber.complete();
+        }
+      );
+      return (): void => {
+        sub.unsubscribe();
+      };
+    });
+  };
+}
+
+/** 去重：仅在上游值与上一次不同时才放行 */
+export function distinctUntilChanged<T>(comparator: ((prev: T, curr: T) => boolean) | null = null): Operator<T, T> {
+  return (source: Observable<T>): Observable<T> => {
+    return new Observable<T>((subscriber: Subscriber<T>): TeardownFn | null => {
+      let hasPrev: boolean = false;
+      let prevValue: any = null;
+      const sub = source.subscribe(
+        (value: T): void => {
+          let isSame = false;
+          if (hasPrev) {
+            if (comparator != null) {
+              isSame = comparator(prevValue as T, value);
+            }
+            else {
+              isSame = (prevValue as T) == value;
+            }
+          }
+          if (!isSame) {
+            hasPrev = true;
+            prevValue = value as any;
+            subscriber.next(value);
+          }
+        },
+        (err: any): void => {
+          subscriber.error(err);
+        },
+        (): void => {
+          subscriber.complete();
+        }
+      );
+      return (): void => {
+        sub.unsubscribe();
+      };
+    });
+  };
+}
+
+/** 防抖：上游静默 due 毫秒后才放行最后一个值（输入联想场景标配） */
+export function debounceTime<T>(due: number): Operator<T, T> {
+  return (source: Observable<T>): Observable<T> => {
+    return new Observable<T>((subscriber: Subscriber<T>): TeardownFn | null => {
+      let timerId: number = -1;
+      let hasTimer: boolean = false;
+      const sub = source.subscribe(
+        (value: T): void => {
+          if (hasTimer) {
+            clearTimeout(timerId);
+          }
+          hasTimer = true;
+          timerId = setTimeout((): void => {
+            hasTimer = false;
+            subscriber.next(value);
+          }, due);
+        },
+        (err: any): void => {
+          subscriber.error(err);
+        },
+        (): void => {
+          subscriber.complete();
+        }
+      );
+      return (): void => {
+        if (hasTimer) {
+          clearTimeout(timerId);
+          hasTimer = false;
+        }
+        sub.unsubscribe();
+      };
+    });
+  };
+}
+
+/** 节流：due 毫秒内最多放行一个值 */
+export function throttleTime<T>(due: number): Operator<T, T> {
+  return (source: Observable<T>): Observable<T> => {
+    return new Observable<T>((subscriber: Subscriber<T>): TeardownFn | null => {
+      let lastEmitTime: number = 0;
+      const sub = source.subscribe(
+        (value: T): void => {
+          const now: number = Date.now();
+          if (lastEmitTime == 0 || now - lastEmitTime >= due) {
+            lastEmitTime = now;
+            subscriber.next(value);
+          }
+        },
+        (err: any): void => {
+          subscriber.error(err);
+        },
+        (): void => {
+          subscriber.complete();
+        }
+      );
+      return (): void => {
+        sub.unsubscribe();
+      };
+    });
+  };
+}
+
+/** 取前 count 个值后自动完成 */
+export function take<T>(count: number): Operator<T, T> {
+  return (source: Observable<T>): Observable<T> => {
+    return new Observable<T>((subscriber: Subscriber<T>): TeardownFn | null => {
+      const state = new Subscription();
+      let emitted: number = 0;
+      const sub = source.subscribe(
+        (value: T): void => {
+          if (emitted >= count) {
+            return;
+          }
+          emitted = emitted + 1;
+          subscriber.next(value);
+          if (emitted >= count) {
+            subscriber.complete();
+            state.unsubscribe();
+          }
+        },
+        (err: any): void => {
+          subscriber.error(err);
+        },
+        (): void => {
+          subscriber.complete();
+        }
+      );
+      state.add((): void => {
+        sub.unsubscribe();
+      });
+      return (): void => {
+        state.unsubscribe();
+      };
+    });
+  };
+}
+
+/**
+ * 直到 notifier 发出值时，取消对上游的订阅。
+ * 是页面卸载时「一键停止所有流」的核心手段。
+ */
+export function takeUntil<T>(notifier: Observable<any>): Operator<T, T> {
+  return (source: Observable<T>): Observable<T> => {
+    return new Observable<T>((subscriber: Subscriber<T>): TeardownFn | null => {
+      const state = new Subscription();
+      let stopped: boolean = false;
+
+      const notifierSub = notifier.subscribe(
+        (_value: any): void => {
+          stopped = true;
+          subscriber.complete();
+          state.unsubscribe();
+        }
+      );
+
+      const sourceSub = source.subscribe(
+        (value: T): void => {
+          if (!stopped) {
+            subscriber.next(value);
+          }
+        },
+        (err: any): void => {
+          if (!stopped) {
+            subscriber.error(err);
+          }
+        },
+        (): void => {
+          if (!stopped) {
+            subscriber.complete();
+          }
+        }
+      );
+
+      state.add((): void => {
+        notifierSub.unsubscribe();
+      });
+      state.add((): void => {
+        sourceSub.unsubscribe();
+      });
+
+      return (): void => {
+        stopped = true;
+        state.unsubscribe();
+      };
+    });
+  };
+}
+
+// ==========================================
+// 副作用与错误处理操作符（Utility Operators）
+// ==========================================
+
+/** 副作用：不改变值，仅用于在流的某个节点插入日志 / 状态更新 */
+export function tap<T>(callback: (value: T) => void): Operator<T, T> {
+  return (source: Observable<T>): Observable<T> => {
+    return new Observable<T>((subscriber: Subscriber<T>): TeardownFn | null => {
+      const sub = source.subscribe(
+        (value: T): void => {
+          callback(value);
+          subscriber.next(value);
+        },
+        (err: any): void => {
+          subscriber.error(err);
+        },
+        (): void => {
+          subscriber.complete();
+        }
+      );
+      return (): void => {
+        sub.unsubscribe();
+      };
+    });
+  };
+}
+
+/** 起始值：订阅后先同步发出 value，再转发上游 */
+export function startWith<T>(value: T): Operator<T, T> {
+  return (source: Observable<T>): Observable<T> => {
+    return new Observable<T>((subscriber: Subscriber<T>): TeardownFn | null => {
+      subscriber.next(value);
+      const sub = source.subscribe(
+        (v: T): void => {
+          subscriber.next(v);
+        },
+        (err: any): void => {
+          subscriber.error(err);
+        },
+        (): void => {
+          subscriber.complete();
+        }
+      );
+      return (): void => {
+        sub.unsubscribe();
+      };
+    });
+  };
+}
+
+/**
+ * 错误降级：上游出错时切换到 handler 返回的备用流。
+ * 是「流式请求失败后回退到本地模拟」的关键操作符。
+ */
+export function catchError<T>(handler: (error: any) => Observable<T>): Operator<T, T> {
+  return (source: Observable<T>): Observable<T> => {
+    return new Observable<T>((subscriber: Subscriber<T>): TeardownFn | null => {
+      let fallbackSub: Subscription | null = null;
+
+      const sub = source.subscribe(
+        (value: T): void => {
+          subscriber.next(value);
+        },
+        (err: any): void => {
+          const fallback: Observable<T> = handler(err);
+          fallbackSub = fallback.subscribe(
+            (value: T): void => {
+              subscriber.next(value);
+            },
+            (innerErr: any): void => {
+              subscriber.error(innerErr);
+            },
+            (): void => {
+              subscriber.complete();
+            }
+          );
+        },
+        (): void => {
+          subscriber.complete();
+        }
+      );
+
+      return (): void => {
+        sub.unsubscribe();
+        const fs = fallbackSub;
+        if (fs != null) {
+          fs.unsubscribe();
+        }
+      };
+    });
+  };
+}
+
+/**
+ * 收尾：无论流是正常完成、出错还是被取消订阅，都会执行一次 callback。
+ * 常用来复位 loading 状态、关闭定时器。
+ */
+export function finalize<T>(callback: TeardownFn): Operator<T, T> {
+  return (source: Observable<T>): Observable<T> => {
+    return new Observable<T>((subscriber: Subscriber<T>): TeardownFn | null => {
+      const sub = source.subscribe(
+        (value: T): void => {
+          subscriber.next(value);
+        },
+        (err: any): void => {
+          subscriber.error(err);
+        },
+        (): void => {
+          subscriber.complete();
+        }
+      );
+      return (): void => {
+        sub.unsubscribe();
+        callback();
+      };
+    });
+  };
+}
+
+/** 便捷函数：批量取消订阅（页面 onUnmounted 一键清理） */
+export function unsubscribeAll(subscriptions: Array<Subscription>): void {
+  const len = subscriptions.length;
+  for (let i: number = 0; i < len; i++) {
+    subscriptions[i].unsubscribe();
+  }
+  subscriptions.splice(0, subscriptions.length);
+}

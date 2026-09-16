@@ -1,0 +1,274 @@
+import { onMounted, onUnmounted, ref } from 'vue';
+
+// ==========================================
+// 1. 页面滚动与触底控制（原 pageScroll.uts）
+// ==========================================
+
+/** 页面滚动禁用响应式开关 */
+export const isPageScrollDisabled = ref(false);
+/** 页面下拉刷新禁用响应式开关 */
+export const isPageRefresherDisabled = ref(false);
+
+/**
+ * 动态启用/禁用页面滚动
+ * @param enabled true 为启用，false 为禁用
+ */
+export function setPageScrollEnabled(enabled: boolean) {
+  isPageScrollDisabled.value = !enabled;
+}
+
+/**
+ * 动态启用/禁用页面下拉刷新
+ * @param enabled true 为启用，false 为禁用
+ */
+export function setPageRefresherEnabled(enabled: boolean) {
+  isPageRefresherDisabled.value = !enabled;
+}
+
+/** 页面滚动事件参数类型 */
+export type PageScrollDetail = {
+  scrollTop: number;
+};
+
+export const EVENT_PAGE_SCROLL: string = 'onNavbarPageScroll';
+export const EVENT_REACH_BOTTOM: string = 'onNavbarReachBottom';
+
+/**
+ * 监听 NavBar 布局内的页面滚动事件（在页面采用了 navbar 布局时替代原生的 onPageScroll）
+ */
+export function onNavbarPageScroll(callback: (e: PageScrollDetail) => void): void {
+  const handler = (data: any | null): void => {
+    if (data != null) {
+      const obj = data as UTSJSONObject;
+      // eslint-disable-next-line dot-notation
+      const topVal = obj['scrollTop'];
+      const st = topVal != null ? (topVal as number) : 0;
+      callback({ scrollTop: st } as PageScrollDetail);
+    }
+    else {
+      callback({ scrollTop: 0 } as PageScrollDetail);
+    }
+  };
+  onMounted(() => {
+    uni.$on(EVENT_PAGE_SCROLL, handler);
+  });
+  onUnmounted(() => {
+    uni.$off(EVENT_PAGE_SCROLL, handler);
+  });
+}
+
+/**
+ * 监听 NavBar 布局内的触底事件（在页面采用了 navbar 布局时替代原生的 onReachBottom）
+ */
+export function onNavbarReachBottom(callback: () => void): void {
+  onMounted(() => {
+    uni.$on(EVENT_REACH_BOTTOM, callback);
+  });
+  onUnmounted(() => {
+    uni.$off(EVENT_REACH_BOTTOM, callback);
+  });
+}
+
+// ==========================================
+// 2. 下拉刷新控制
+// ==========================================
+
+const EVENT_PULL_DOWN_REFRESH = 'onPagePullDownRefresh';
+const EVENT_STOP_PULL_DOWN_REFRESH = 'stopPagePullDownRefresh';
+
+/**
+ * 监听 NavBar 布局下拉刷新事件
+ */
+export function onNavbarPullDownRefresh(callback: () => void): void {
+  onMounted(() => {
+    uni.$on(EVENT_PULL_DOWN_REFRESH, callback);
+  });
+  onUnmounted(() => {
+    uni.$off(EVENT_PULL_DOWN_REFRESH, callback);
+  });
+}
+
+/**
+ * 停止 NavBar 布局下拉刷新状态
+ */
+export function stopNavbarPullDownRefresh(): void {
+  uni.$emit(EVENT_STOP_PULL_DOWN_REFRESH);
+  uni.stopPullDownRefresh();
+}
+
+// ==========================================
+// 3. 导航栏标题控制
+// ==========================================
+
+export const EVENT_SET_NAVBAR_TITLE = 'setNavbarTitle';
+export const EVENT_RESET_NAVBAR_TITLE = 'resetNavbarTitle';
+
+/**
+ * 动态设置/修改 NavBar 布局及原生导航栏标题
+ * @param title 新的导航栏标题文本
+ */
+export function setNavbarTitle(title: string): void {
+  uni.$emit(EVENT_SET_NAVBAR_TITLE, title);
+  uni.setNavigationBarTitle({
+    title
+  } as SetNavigationBarTitleOptions);
+}
+
+/**
+ * 重置 NavBar 布局的导航栏标题为初始配置标题
+ */
+export function resetNavbarTitle(): void {
+  uni.$emit(EVENT_RESET_NAVBAR_TITLE);
+}
+
+// ==========================================
+// 4. 导航栏与状态栏显隐控制
+// ==========================================
+
+export const EVENT_SET_NAVBAR_VISIBLE = 'setNavbarVisible';
+export const EVENT_SET_HIDE_NAVBAR = 'setHideNavbar';
+export const EVENT_RESET_NAVBAR_VISIBLE = 'resetNavbarVisible';
+
+/**
+ * 动态控制 NavBar 布局导航栏的显示或隐藏
+ * @param visible 是否显示导航栏（true 显示，false 隐藏）
+ */
+export function setNavbarVisible(visible: boolean): void {
+  uni.$emit(EVENT_SET_NAVBAR_VISIBLE, visible);
+}
+
+/**
+ * 动态控制是否隐藏 NavBar 布局导航栏
+ * @param hide 是否隐藏导航栏（true 隐藏，false 显示）
+ */
+export function setHideNavbar(hide: boolean): void {
+  uni.$emit(EVENT_SET_HIDE_NAVBAR, hide);
+}
+
+/**
+ * 重置 NavBar 布局导航栏显隐为页面初始配置
+ */
+export function resetNavbarVisible(): void {
+  uni.$emit(EVENT_RESET_NAVBAR_VISIBLE);
+}
+
+export const EVENT_SET_STATUS_BAR_VISIBLE = 'setStatusBarVisible';
+export const EVENT_SET_HIDE_STATUS_BAR = 'setHideStatusBar';
+export const EVENT_RESET_STATUS_BAR_VISIBLE = 'resetStatusBarVisible';
+
+/**
+ * 动态控制是否隐藏状态栏占位高度
+ * @param hide 是否隐藏状态栏占位（true 隐藏，false 显示）
+ */
+export function setHideStatusBar(hide: boolean): void {
+  uni.$emit(EVENT_SET_HIDE_STATUS_BAR, hide);
+}
+
+/**
+ * 动态控制状态栏占位高度是否可见
+ * @param visible 是否显示状态栏占位（true 显示，false 隐藏）
+ */
+export function setStatusBarVisible(visible: boolean): void {
+  uni.$emit(EVENT_SET_STATUS_BAR_VISIBLE, visible);
+}
+
+/**
+ * 重置状态栏显隐为页面初始配置
+ */
+export function resetStatusBarVisible(): void {
+  uni.$emit(EVENT_RESET_STATUS_BAR_VISIBLE);
+}
+
+// ==========================================
+// 页面与导航栏事件控制聚合类（全端一目了然速查与单例）
+// ==========================================
+
+/**
+ * 页面滚动、下拉刷新与导航栏事件控制聚合类
+ *
+ * 集中呈现页面与导航栏控制方法，一目了然；同时支持面向对象式 `refresh.xxx()` 调用。
+ *
+ * @example
+ * ```uts
+ * // 方式 1：标准具名导入
+ * import { stopNavbarPullDownRefresh, setNavbarTitle } from '@/src/utils/refresh/index.uts';
+ *
+ * // 方式 2：对象单例导入（一目了然）
+ * import { refresh } from '@/src/utils/refresh/index.uts';
+ * refresh.stopNavbarPullDownRefresh();
+ * ```
+ */
+export class RefreshUtils {
+  /** 动态启用/禁用页面滚动 */
+  setPageScrollEnabled(enabled: boolean): void {
+    setPageScrollEnabled(enabled);
+  }
+
+  /** 动态启用/禁用页面下拉刷新 */
+  setPageRefresherEnabled(enabled: boolean): void {
+    setPageRefresherEnabled(enabled);
+  }
+
+  /** 监听 NavBar 布局内的页面滚动事件 */
+  onNavbarPageScroll(callback: (e: PageScrollDetail) => void): void {
+    onNavbarPageScroll(callback);
+  }
+
+  /** 监听 NavBar 布局内的触底事件 */
+  onNavbarReachBottom(callback: () => void): void {
+    onNavbarReachBottom(callback);
+  }
+
+  /** 监听 NavBar 布局下拉刷新触发事件 */
+  onNavbarPullDownRefresh(callback: () => void): void {
+    onNavbarPullDownRefresh(callback);
+  }
+
+  /** 停止 NavBar 布局下拉刷新状态 */
+  stopNavbarPullDownRefresh(): void {
+    stopNavbarPullDownRefresh();
+  }
+
+  /** 动态修改 NavBar 布局的导航栏标题 */
+  setNavbarTitle(title: string): void {
+    setNavbarTitle(title);
+  }
+
+  /** 重置 NavBar 布局导航栏标题为默认 */
+  resetNavbarTitle(): void {
+    resetNavbarTitle();
+  }
+
+  /** 动态控制当前页面导航栏显隐 */
+  setNavbarVisible(visible: boolean): void {
+    setNavbarVisible(visible);
+  }
+
+  /** 动态隐藏/显示导航栏 */
+  setHideNavbar(hide: boolean): void {
+    setHideNavbar(hide);
+  }
+
+  /** 恢复导航栏默认显隐状态 */
+  resetNavbarVisible(): void {
+    resetNavbarVisible();
+  }
+
+  /** 动态控制系统状态栏显隐 */
+  setStatusBarVisible(visible: boolean): void {
+    setStatusBarVisible(visible);
+  }
+
+  /** 恢复显示系统状态栏 */
+  resetStatusBarVisible(): void {
+    resetStatusBarVisible();
+  }
+}
+
+/** 页面与导航栏控制工具全局单例 */
+export const refresh = new RefreshUtils();
+
+/** 别名导出 */
+export const refreshUtils = refresh;
+
+export default refresh;
