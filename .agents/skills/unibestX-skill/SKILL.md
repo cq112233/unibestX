@@ -13,13 +13,14 @@ description: Use when developing, compiling, refactoring, or troubleshooting uni
 uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直接编译为原生代码（Android 编译为 Kotlin，iOS 插件编译为 Swift，鸿蒙插件编译为 ArkTS，Web/小程序编译为 JS）。  
 与宽容的 TypeScript/JavaScript 不同，UTS 采用**名义强类型系统（Nominal Strong Typing）**与**原生渲染规范**。
 
-本文档按五大维度组织，采用 **「1 个入口 + 7 个分册」** 结构：
+本文档按六大维度组织，采用 **「1 个入口 + 8 个分册」** 结构：
 
 1. **UTS 与原生规范**：语法与严格类型（分册 1.1）、CSS / Tailwind 样式引擎限制（分册 1.2）、跨端运行时铁律（分册 1.3）；
 2. **项目正确案例**：来自本项目的生产级标杆案例（分册 2）——页面骨架、TabBar、二级详情页、滚动与下拉刷新、组件与生态库优先范式；
 3. **项目代码生成规范**：生成流程与模板（分册 3）、本文件常驻的 3.3 对照表与 3.4 红线清单、回写维护机制（分册 3 的 3.5）；
 4. **项目内置工具库**：`src/utils/` 下 10 个现成模块的 API 与用法（分册 4）——**动手造轮子前先查这里**；
-5. **页面与应用基础设施**：`src/http/`（请求与流式）、`src/router/`（路由拦截）、`src/layouts/`（页面布局）、`src/i18n/`（语言装配）四套配置与装配层（分册 5）——**定策略 / 选骨架 / 改配置前先查这里**。
+5. **页面与应用基础设施**：`src/http/`（请求与流式）、`src/router/`（路由拦截）、`src/layouts/`（页面布局）、`src/i18n/`（语言装配）、`src/api/`（业务请求与 Mock）（分册 5）——**定策略 / 选骨架 / 改配置前先查这里**；
+6. **AI 页面层级与组件设计规范**：页面高内聚自包含、最多三级封顶、容器与纯展示解耦、Mock 接口契约化（分册 6）——**AI 生成复杂页面与拆分组件前必读**。
 
 ---
 
@@ -36,7 +37,7 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 
 ## 文档结构（分册导航 —— 命中即必须 Read）
 
-> ⚠️ **本 Skill 为分册式组织：下表的 7 个分册文件不会自动加载**，需要时用 Read 工具打开。
+> ⚠️ **本 Skill 为分册式组织：下表的 8 个分册文件不会自动加载**，需要时用 Read 工具打开。
 > **硬性要求**：对照表（3.3）或红线清单（3.4）命中某条时，**必须打开其标注的分册核对完整正反例与实测结论**，不得只凭本文件的一行结论就改代码 —— 每条铁律的「为什么会炸」「反例长什么样」都在分册里。
 
 | 分册文件 | 收录内容 | 何时 Read |
@@ -48,6 +49,7 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 | [references/3-codegen.md](references/3-codegen.md) | **3.1 新增页面生成流程**、**3.2 页面代码标准模板**、**3.5 VDOM/Vapor 差异回写维护机制** | 生成新页面 / 组件前走流程、需要复制标准页面模板、需要按四维分类回写本 Skill |
 | [references/4-utils.md](references/4-utils.md) | **四、项目内置工具库**（`src/utils/` 10 个模块：route / theme / env / i18n / toast / backPress / refresh / upload / systemInfo / rxjs-lite） | **动手实现任何通用能力前先查这里**：取路由与路径、取主题色、读环境变量、多语言、提示弹窗、返回键接管、下拉刷新与导航栏控制、文件上传、系统与安全区尺寸、防抖节流与流式处理 |
 | [references/5-infra.md](references/5-infra.md) | **五、页面与应用基础设施**：5.1 请求（http/request）、5.2 流式请求（http/stream）、5.3 路由与拦截器（router）、5.4 页面布局（layouts）、5.5 国际化配置（i18n）、**5.6 业务 API 与 Mock 接口化（src/api/）** | 发起接口请求 / 处理错误与 401、做 SSE 打字机输出、改登录拦截与登录策略、**选 `layout` 或配 `definePage` 导航栏字段**、增改多语言文案、**抽离 Mock 模拟数据为后端接口函数** |
+| [references/6-page-component-spec.md](references/6-page-component-spec.md) | **六、AI 页面层级与组件设计规范**（页面高内聚 · 三级防过度拆分 · 容器/视图分离 · Mock 接口契约化） | 规划新页面结构、拆分复杂页面组件、组织页面内 `components/common/` 与模块私有视图、放置与编写页面级 `mock.uts` 时必读 |
 
 > 📌 **3.3 快速排查对照表**与 **3.4 代码生成红线清单** 因使用频率最高，常驻在本文件下方，无需额外 Read。
 
@@ -178,3 +180,5 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 - [ ] **53. 需求功能与 `uni_modules` 匹配时严禁重复造轮子**（在编写 UI 界面或实现业务功能前，必须优先检索 `uni_modules/` 目录；若需求功能与 `uni_modules` 下已有成熟组件或插件匹配，如 `uni-icons`、`lime-icon`、`e-chart`、`z-paging-x`、`mp-html`、`sp-editor`、`lime-qrcode`、`lime-signature`、`uni-rate-x`、`uni-collapse-x`、`uni-badge-view`、`uni-number-box-x`、`uni-link-x`、`uni-fab-button`、`uni-time-format` 等，**必须优先使用现有组件/库**，严禁重复手写低效原生结构；且模板中直接使用标签，严禁在 `<script>` 中手动 import）
 - [ ] **54. App 端 `transition` 动画属性严禁写在动态 `:style` 中，严禁使用 `setTimeout` 错峰掩盖性能缺陷**（`transitionProperty` / `transitionDuration` / `transitionTimingFunction` 必须声明在静态 CSS 类中走硬件加速，动态 `:style` 只传单一 `transform` 变化；避免对带深阴影容器做缩放动画；严禁在外部容器使用 `setTimeout` 延迟挂载来掩盖组件自身的动画性能问题，见 1.2.19）
 - [ ] **55. 严禁在页面/组件内直接硬编码 Mock 模拟数据，必须抽离为 `src/api/` 标准后端接口函数**（模拟数据必须在 `src/api/` 下集中管理，定义强类型 `type` 并封装为返回 `Promise<T>` 的接口函数如 `Promise.resolve(MOCK_DATA)`，页面一律通过异步 API 函数拉取；对接真实接口时仅需在 API 模块内将 `Promise.resolve` 替换为 `http.get/post`，实现页面业务层零改动无缝切换，见 5.6）
+- [ ] **56. 页面内聚与组件拆分三级封顶，严禁在展示组件与 common 组件内调用接口**（页面尽量不要用外部公共组件，所有私有组件收归当前页面 `components/` 目录下；拆分严格限制为 Page ➔ Module A/B ➔ Leaf A-1/A-2 最多 3 级，严禁无限嵌套；`components/common/` 与私有叶子组件只负责纯视图排版，严禁编写业务逻辑与调用接口，业务逻辑与数据请求全部收敛在 L1 模块容器中，见分册 6）
+
