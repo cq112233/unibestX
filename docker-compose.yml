@@ -1,0 +1,30 @@
+services:
+  # 测试环境服务
+  h5-test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: unibestx-h5:test
+    container_name: unibestx-h5-test
+    restart: always
+    env_file:
+      - deploy/.env.test
+    ports:
+      - "${PORT:-8081}:80"
+    environment:
+      - API_UPSTREAM=${API_UPSTREAM:-https://ukw0y1.laf.run}
+
+  # 生产环境服务
+  h5-prod:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: unibestx-h5:prod
+    container_name: unibestx-h5-prod
+    restart: always
+    env_file:
+      - deploy/.env.prod
+    ports:
+      - "${PORT:-8080}:80"
+    environment:
+      - API_UPSTREAM=${API_UPSTREAM:-https://ukw0y1.laf.run}
