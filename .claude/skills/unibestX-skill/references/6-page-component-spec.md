@@ -8,7 +8,7 @@
 
 ---
 
-## 6.1 核心设计哲学与四大铁律
+## 6.1 核心设计哲学与六大铁律
 
 ```mermaid
 graph TD
@@ -60,6 +60,38 @@ graph TD
 - 页面私有模拟数据统一收敛在 `src/pages/<page>/mock.uts`（如 `src/pages/ai/mock.uts`）或全局 `src/api/`；
 - 模拟数据必须使用 `type` 定义强类型契约，并封装为**返回 `Promise<T>` 的标准接口函数**（如 `Promise.resolve(MOCK_DATA)`）；
 - 容器组件调用 `mock.uts` 与调用真实后端接口写法 100% 一致。后期后端接口就绪时，页面业务逻辑层 0 改动，仅需在数据层无缝切换为真实 `http.get/post`。
+
+### 铁律 5：生成的代码，逻辑代码必须全部加上清晰中文注释
+
+- **所有生成的业务逻辑代码，必须附带结构清晰的中文注释**：
+  - **响应式状态（ref / computed）**：必须注明该状态的业务含义（如：`// 是否处于下拉刷新状态`、`// 当前选中的分类 key`）；
+  - **业务逻辑与异步函数**：必须使用 JSDoc 或单行注释说明其职责、入参及调用时序（如：`/** 加载本模块商品列表，支持分页追加 */`）；
+  - **核心分支与边界处理**：`if-else` 兜底、错误捕获（`catch`）、事件回调的执行逻辑必须有明确意图说明；
+  - **组件属性与通信声明**：`defineProps` 与 `defineEmits` 的每个字段与事件必须附带中文说明；
+- 严禁生成毫无注释的“裸逻辑”代码，确保代码资产具备工业级的可维护性与易读性。
+
+### 铁律 6：生态工具与模块方法优先（Utils & uni_modules First）
+
+- **在实现任何业务功能或页面交互时，凡是 `src/utils/` 和 `uni_modules/` 中已有现成方法或能力的，必须绝对优先使用，严禁自行重复造轮子**：
+  - **基础与业务工具（`src/utils/`）**：
+    - 路由跳转与传参：优先使用 `src/utils/route/index.uts`（`router.push`、`router.replace`、`router.back`）；
+    - 主题色读取与切换：优先使用 `src/utils/theme/index.uts`（`themeColor`、`setTheme`）；
+    - 弹窗与交互反馈：优先使用 `src/utils/toast/index.uts`（`showSuccess`、`showError`、`showLoading` 等）；
+    - 国际化文案读取：优先使用 `src/utils/i18n/index.uts`（`$t`、`t`）；
+    - 视口与安全区尺寸：优先使用 `src/utils/systemInfo/index.uts`（`availableHeight`、`systemInfo`）；
+    - 下拉刷新与触底：优先使用 `src/utils/refresh/index.uts`（`onNavbarPullDownRefresh`、`stopNavbarPullDownRefresh`）；
+    - 物理返回键接管：优先使用 `src/utils/backPress/index.uts`（`handleBackPressExit`）；
+    - 文件/图片上传：优先使用 `src/utils/upload/index.uts`（`uploadFile`）；
+    - 防抖/节流与响应式流：优先使用 `src/utils/rxjs-lite/index.uts`；
+  - **组件库生态（`uni_modules/`）**：
+    - 图标：优先使用 `<uni-icons>` 或 `<lime-icon>`；
+    - 标签与滑动列表：优先使用 `<up-tabs>`、`<up-scroll-list>`；
+    - 复杂图表：优先使用 `<e-chart>`；
+    - 分页下拉/触底：优先使用 `<z-paging-x>`；
+    - 富文本渲染与编辑：优先使用 `<mp-html>` 与 `<sp-editor>`；
+    - 二维码与手写签名：优先使用 `<lime-qrcode>` 与 `<lime-signature>`；
+    - 折叠面板与评分：优先使用 `<uni-collapse-x>` 与 `<uni-rate-x>`。
+- 严禁脱离项目现成成熟资产去手写原生重复实现或引入未经兼容性验证的外部库。
 
 ---
 
@@ -256,4 +288,6 @@ onMounted((): void => {
 - [ ] **3. 严禁在纯展示组件中调用接口**：`components/common/` 以及 `A/components/`、`B/components/` 内部**严禁出现任何 `http` 调用、`fetch*` 函数或异步定时器**；
 - [ ] **4. 严禁在组件内硬编码假数据**：模拟数据必须统一在当前页面 `mock.uts` 中使用 `type` 声明，并以返回 `Promise<T>` 的接口函数暴露；
 - [ ] **5. 单向数据流动**：数据自容器通过 Props 向下灌入，子组件事件通过 Emits 向上通知，子组件禁止直接修改 Props 数据；
-- [ ] **6. 严禁滥用 JS 动态计算高度（Flex-1 绝对优先）**：页面与模块滚动区域一律使用原生 Flex 弹性盒模型（`flex flex-col flex-1`）自适应撑满，严禁在页面与组件中滥用 `getScrollHeight()` 动态绑定 `:style="{ height: ... }"`。
+- [ ] **6. 严禁滥用 JS 动态计算高度（Flex-1 绝对优先）**：页面与模块滚动区域一律使用原生 Flex 弹性盒模型（`flex flex-col flex-1`）自适应撑满，严禁在页面与组件中滥用 `getScrollHeight()` 动态绑定 `:style="{ height: ... }"`；
+- [ ] **7. 逻辑代码必须附带完整中文注释**：所有状态定义（ref/computed）、业务函数、异步请求链路、事件回调与组件 Props/Emits 必须全部附带清晰中文注释，严禁生成无注释逻辑代码；
+- [ ] **8. 必须优先使用 utils 和 uni_modules 现成方法与组件**：凡是 `src/utils/`（路由/主题/弹窗/国际化/安全区/刷新）与 `uni_modules/`（图标/标签/图表/分页/富文本等）中已有能力的，严禁脱离现有体系手写重复轮子。
