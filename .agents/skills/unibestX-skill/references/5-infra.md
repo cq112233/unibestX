@@ -1,8 +1,8 @@
-# 五、页面与应用基础设施（http · router · layouts · i18n）
+# 五、页面与应用基础设施（http · router · layouts · i18n · api）
 
-> **本文件是 `unibestX-skill` 的参考分册**，由 [SKILL.md](../SKILL.md) 按需引用，收录 `src/http/`、`src/router/`、`src/layouts/`、`src/i18n/` 四个基础设施目录的对外 API 与使用规范。
+> **本文件是 `unibestX-skill` 的参考分册**，由 [SKILL.md](../SKILL.md) 按需引用，收录 `src/http/`、`src/router/`、`src/layouts/`、`src/i18n/`、`src/api/` 五个基础设施目录的对外 API、规范与使用指南。
 >
-> **何时读本文件**：发起 HTTP 请求或做流式（SSE / 打字机）输出之前、要改路由拦截与登录跳转之前、要选页面布局或改导航栏 / 状态栏之前、要增改多语言文案之前。
+> **何时读本文件**：发起 HTTP 请求或做流式（SSE / 打字机）输出之前、要改路由拦截与登录跳转之前、要选页面布局或改导航栏 / 状态栏之前、要增改多语言文案之前、**组织业务 API 与处理 Mock 模拟数据之前**。
 >
 > **回写规则**：这四个目录新增导出、改变调用姿势或新增跨端限制时，同步追加到本文件对应小节，编号续接 `5.6`、`5.7`…；若新增了整个基础设施目录，另起 `5.6` 并按同一结构撰写。同时更新 [SKILL.md](../SKILL.md) 的导航表。
 
@@ -405,3 +405,138 @@ useAppStore().setLocale('en-US')
 - **lime-i18n 还支持本项目未启用的选项**：`numberFormats` / `datetimeFormats` / `tabBars` / `inheritLocale` / `formatter`。其中 **`tabBars` 是内建的 TabBar 多语言方案**（配了之后语言变化时自动 `setTabBarItems`），本项目**没用**，走的是 4.4 的 `setTabbarItem()` 手动刷新。**两套不要同时上**，否则 tabbar 文案会被写两遍。
 - ⚠️ **语言包覆盖是部分的**：现有 key 只覆盖 `basic` / `function` / `message` / `tabbar` 四个命名空间。登录页 `src/sub/auth/login.uvue`、`RouterDemoCard.uvue` 等**仍写死中文，切英文不会变**。新增页面要接入多语言，得自己往两个语言包里加 key。
 - **`createI18n` / `useI18n` 只在 `#ifdef UNI-APP-X` 下导出**（`uni_modules/lime-i18n/index.uts` 的 `#ifndef UNI-APP-X` 分支是空的）——非 uni-app X 目标里 import 会拿不到符号。
+
+---
+
+## 5.6 业务 API 模块化与 Mock 数据接口化规范（src/api/）
+
+**一句话定位**：`src/api/` 是整个项目所有业务数据请求与契约定义的**唯一收口目录**。所有接口数据模型（`type`）、真实请求函数以及**模拟数据（Mock 数据）**必须全部按业务模块组织在此目录下，**严禁在页面与组件内直接硬编码模拟数据**。
+
+**何时用**：编写任何需要获取业务数据、渲染列表/卡片/图表的页面时；后端接口尚未就绪需要本地 Mock 模拟数据时；需要对接或封装 HTTP REST 接口时。
+
+### 1. 为什么模拟数据（Mock）必须抽离成后端接口方式？
+
+在常规前端开发中，开发者容易为了图一时省事，直接在 `.uvue` 页面组件的 `<script setup>` 中通过 `ref([...])` 或局部变量硬编码假数据（如写死一组包含若干对象字面量的列表）。在 `uni-app X` 强类型原生编译架构下，这种做法会带来三大严重弊端：
+1. **重构成本极高，违背关注点分离**：
+   - 当后端接口开发完成联调时，必须深入到各个 `.uvue` 页面的内部模板、响应式状态及逻辑中大改特改，造成大量不必要的 Git Diff，极易引发回归 Bug；
+   - 抽离成 API 函数后，页面自始至终只依赖 `getXxxList().then(...)` 或 `await getXxxList()`。对接真实接口时，**只需在 `src/api/xxx.uts` 中将内部由 `Promise.resolve(MOCK_DATA)` 改为 `http.get('/xxx')`，页面业务逻辑层 0 改动、无缝平滑切换**。
+2. **提前锁定接口契约（Contract First）与规避强类型深坑**：
+   - 在 API 模块中，开发者被迫提前根据接口协议定义强类型（`type`，牢记**严禁使用 `interface`**）；
+   - 在 API 模块内统一完成如 `data.getString('name')`、`UTSJSONObject` 转换与类型断言，将纯净强类型的 DTO 返回给页面，杜绝了页面在模板中处理弱类型数据触发 `UTS110111163`、`error17` 或 `ClassCastException` 原生崩溃。
+3. **真实模拟网络异步时序与生命周期**：
+   - 页面中的加载态（`loading = true`）、骨架屏（Skeleton）、空状态（Empty）、下拉刷新与触底分页，必须在真实的异步 Promise 时序下才能得到有效验证；直接在组件内写死同步变量会掩盖异步时序下的生命周期竞争与边界异常。
+
+### 2. 标准架构与代码模式（以 `src/api/foo.uts` 为标杆范式）
+
+一个标准的 `src/api/<模块>.uts` 文件必须包含以下三大区块：
+
+```uts
+import { API_DOMAINS, http } from '../http/request';
+import type { LimeRequestConfig } from '@/uni_modules/lime-request';
+
+// ==========================================
+// 1. 类型定义（全部使用 type，严禁 interface！）
+// ==========================================
+
+export type IFoo = {
+  id: any | null;
+  name: string;
+};
+
+export type IFooListQuery = {
+  keyword?: string | null;
+  page: number;
+  pageSize: number;
+};
+
+// ==========================================
+// 2. Mock 数据定义（私有常量，统一集中管理）
+// ==========================================
+
+const MOCK_FOO_LIST: IFoo[] = [
+  { id: 1, name: 'unix' },
+  { id: 2, name: 'UnibestX' },
+  { id: 3, name: 'lime-request' }
+];
+
+// ==========================================
+// 3. API 函数（统一返回 Promise<T>）
+// ==========================================
+
+/**
+ * 获取 Foo 列表（模拟后端接口方式，返回 Promise）
+ */
+export function getFooList(_params: UTSJSONObject | null = null): Promise<IFoo[]> {
+  // 模拟接口返回 Promise
+  return Promise.resolve(MOCK_FOO_LIST);
+}
+
+/**
+ * 获取单个 Foo 详情（模拟后端接口方式）
+ */
+export function getFooById(id: number): Promise<IFoo | null> {
+  const found = MOCK_FOO_LIST.find((item: IFoo): boolean => item.id === id);
+  return Promise.resolve(found ?? null);
+}
+
+/**
+ * 真实后端接口请求示例
+ * 当后端服务就绪时，只需将上方的 Mock 函数替换为如下真实 http 调用
+ */
+export function foo(): Promise<IFoo> {
+  return http.get<UTSJSONObject>('/foo', {
+    params: {
+      name: 'unix',
+      page: 1,
+      pageSize: 10
+    } as UTSJSONObject,
+    baseURL: API_DOMAINS.SECONDARY,
+    extra: {
+      ignoreAuth: true
+    } as UTSJSONObject
+  } as LimeRequestConfig).then((data: UTSJSONObject): IFoo => {
+    return {
+      id: (data.get('id') ?? '') as any,
+      name: data.getString('name') ?? ''
+    } as IFoo;
+  });
+}
+```
+
+### 3. 页面调用标准姿势
+
+在页面的 `<script setup lang="uts">` 中，像消费真实接口一样导入并调用，杜绝任何数据硬编码：
+
+```uts
+<script setup lang="uts">
+import { ref, onMounted } from 'vue';
+import { getFooList } from '@/src/api/foo';
+import type { IFoo } from '@/src/api/foo';
+
+const loading = ref<boolean>(false);
+const list = ref<IFoo[]>([]);
+
+function loadData(): void {
+  loading.value = true;
+  getFooList().then((res: IFoo[]): void => {
+    list.value = res;
+  }).catch((err: any): void => {
+    console.error('加载失败', err);
+  }).finally((): void => {
+    loading.value = false;
+  });
+}
+
+onMounted((): void => {
+  loadData();
+});
+</script>
+```
+
+### 4. 模拟数据（Mock）抽离四项铁律
+
+1. **严禁在页面/组件内部硬编码定义大段列表或业务实体数据**；
+2. **所有 Mock 数据必须收敛在 `src/api/` 对应的业务模块中**，并使用 `type` 进行严格类型约束；
+3. **Mock 函数必须封装为标准的 `Promise<T>` 返回**（如 `Promise.resolve(...)`），保持与真实网络请求相同的异步契约与签名；
+4. **后期上线或联调时，严禁修改页面调用代码**，仅允许在 `src/api/` 中将 Mock 实现切换为 `http.get/post`。
+
