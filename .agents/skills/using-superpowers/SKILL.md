@@ -19,11 +19,11 @@ description: 在开始任何对话时使用——确立如何查找和使用技�
 
 Superpowers 技能覆盖默认系统提示行为，但**用户指令始终具有最高优先级**：
 
-1. **用户的明确指令**（AGENTS.md、GEMINI.md、AGENTS.md、直接请求）——最高优先级
+1. **用户的明确指令**（CLAUDE.md、GEMINI.md、AGENTS.md、直接请求）——最高优先级
 2. **Superpowers 技能** ——在冲突处覆盖默认系统行为
 3. **默认系统提示** ——最低优先级
 
-如果 AGENTS.md、GEMINI.md 或 AGENTS.md 说"不要使用 TDD"，而某个技能说"始终使用 TDD"，遵循用户的指令。用户拥有控制权。
+如果 CLAUDE.md、GEMINI.md 或 AGENTS.md 说"不要使用 TDD"，而某个技能说"始终使用 TDD"，遵循用户的指令。用户拥有控制权。
 
 ## 如何访问技能
 
@@ -39,7 +39,7 @@ Superpowers 技能覆盖默认系统提示行为，但**用户指令始终具有
 
 ## 平台适配
 
-技能使用 Codex 的工具名称。非 CC 平台：查看 `references/copilot-tools.md`（Copilot CLI）、`references/hermes-tools.md`（Hermes Agent）、`references/codex-tools.md`（Codex）、`references/qoder-tools.md`（Qoder）了解工具对应关系。Gemini CLI 用户通过 GEMINI.md 自动获得工具映射。
+技能使用 Claude Code 的工具名称。非 CC 平台：查看 `references/copilot-tools.md`（Copilot CLI）、`references/hermes-tools.md`（Hermes Agent）、`references/codex-tools.md`（Codex）、`references/qoder-tools.md`（Qoder）了解工具对应关系。Gemini CLI 用户通过 GEMINI.md 自动获得工具映射。
 
 # 使用技能
 
