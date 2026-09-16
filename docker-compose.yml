@@ -10,7 +10,7 @@ services:
     env_file:
       - deploy/.env.test
     ports:
-      - "${H5_TEST_PORT:-8081}:80"
+      - "${H5_PROD_PORT:-8080}:80"
 
   # 生产环境服务
   h5-prod:
