@@ -1,0 +1,127 @@
+import { curIdx, setCurIdx, setCurIdxByPath, tabbarList } from './state.uts';
+import { isNativeTabbar, isSinglePageTabbar, selectedTabbarStrategy, TABBAR_STRATEGY_MAP } from './strategy.uts';
+import { customTabbarConfig } from '../config.uts';
+
+/** 中间鼓包 tabbarItem 点击事件 */
+function handleClickBulge(url: string = '/src/pages/ai/ai'): void {
+  uni.navigateTo({
+    url
+  });
+}
+
+/**
+ * 根据当前 TabBar 模式安全跳转到指定的 Tabbar 页面
+ * - 模式 1 / 模式 2 (具备原生底座配置)：调用 uni.switchTab，保留页面缓存
+ * - 模式 0 / 模式 3 (无原生配置)：调用 uni.redirectTo
+ * 内部自动同步激活索引
+ */
+export function switchTabbar(url: string): void {
+  setCurIdxByPath(url);
+  if (isSinglePageTabbar) {
+    try {
+      const pages = getCurrentPages();
+      if (pages.length > 0) {
+        const currentRoute = pages[pages.length - 1].route;
+        const normalizedRoute = currentRoute.startsWith('/') ? currentRoute : `/${currentRoute}`;
+        if (normalizedRoute == '/pages/index/index' || normalizedRoute == '/src/pages/index/index') {
+          return;
+        }
+      }
+    }
+    catch { }
+    uni.redirectTo({
+      url: '/src/pages/index/index',
+      fail: (_err: any) => {
+        uni.reLaunch({
+          url: '/src/pages/index/index'
+        });
+      }
+    });
+    return;
+  }
+  if (selectedTabbarStrategy == TABBAR_STRATEGY_MAP.CUSTOM_TABBAR_WITHOUT_NATIVE || selectedTabbarStrategy == TABBAR_STRATEGY_MAP.NO_TABBAR) {
+    uni.redirectTo({
+      url,
+      fail: (_err: any) => {
+        uni.navigateTo({
+          url,
+          fail: () => {
+            uni.showToast({
+              title: '沙盒调试中：目标页面未编译',
+              icon: 'none'
+            });
+          }
+        });
+      }
+    });
+  }
+  else {
+    uni.switchTab({
+      url,
+      fail: (_err: any) => {
+        uni.redirectTo({
+          url,
+          fail: () => {
+            uni.showToast({
+              title: '沙盒调试中：目标页面未编译',
+              icon: 'none'
+            });
+          }
+        });
+      }
+    });
+  }
+}
+
+/** 路由切换节流锁，防止快速连击导致原生视图切换重叠错乱 */
+let isSwitchingTab = false;
+
+/** 点击 tab 切换路由跳转逻辑 */
+export function handleTabbarClick(index: number): void {
+  if (index == curIdx.value || isSwitchingTab) {
+    return;
+  }
+  const list = tabbarList;
+  if (list.length <= index) {
+    return;
+  }
+  if (isSinglePageTabbar) {
+    setCurIdx(index);
+    return;
+  }
+  if (list[index].isBulge) {
+    handleClickBulge(list[index].pagePath.length > 0 ? list[index].pagePath : '/src/pages/ai/ai');
+    return;
+  }
+  isSwitchingTab = true;
+  const url = list[index].pagePath;
+  setCurIdx(index);
+  switchTabbar(url);
+  setTimeout(() => {
+    isSwitchingTab = false;
+  }, 250);
+}
+
+/**
+ * 初始化原生 TabBar 中间按钮 (midButton) 点击监听
+ * 仅在原生 TabBar 模式 (模式 1) 且配置了 midButton 时自动注册
+ */
+export function initNativeMidButtonTap(): void {
+  if (!isNativeTabbar || customTabbarConfig.midButton == null) {
+    return;
+  }
+  // #ifndef MP-WEIXIN
+  try {
+    const mid = customTabbarConfig.midButton;
+    const targetUrl = (mid != null && mid.pagePath != null && mid.pagePath!.length > 0)
+      ? mid.pagePath!
+      : '/src/pages/ai/ai';
+    uni.onTabBarMidButtonTap(() => {
+      handleClickBulge(targetUrl);
+    });
+  }
+  catch (e) {
+    console.warn('onTabBarMidButtonTap registration error', e);
+  }
+  // #endif
+}

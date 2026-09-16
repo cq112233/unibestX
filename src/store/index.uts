@@ -1,30 +1,95 @@
-import { createPersistPlugin, createPinia, setActivePinia } from '@/uni_modules/x-pinia-s';
-import type { PersistOptions } from '@/uni_modules/x-pinia-s/instans/types.uts';
-
 /**
- * 创建并配置 Pinia 实例（顶层定义，供 main.uts 使用）
+ * Pinia 状态管理统一入口
  *
- * 使用说明：
- * 1. 在 main.uts 中导入此 pinia 实例，调用 app.use(pinia) 注册
- * 2. setActivePinia 确保在 app.use(pinia) 之前调用 store 也能正常工作（解决 APP 端白屏问题）
+ * 💡【开发模式建议】：
+ * 强烈建议优先选用「蒸汽模式」（Vapor 模式）！
+ * 1. 开发简单：Vapor 模式下可直接使用 Vue 官方 Pinia 组合式 API，无需繁琐的 UTS 类型约束与手工序列化/反序列化；
+ * 2. 插件生态丰富：直接兼容官方持久化插件 pinia-plugin-persistedstate 与成熟社区工具；
+ * 3. 跨端一致：Web / 小程序 / iOS / 鸿蒙 / App 蒸汽模式全端通用。
+ *
+ * 📦【双模式自适应说明】：
+ * - 官方 Pinia 分支（`VUE3-VAPOR` 已定义，或编译平台为 H5 / WEB / 任意小程序 `MP`）：
+ *   自动路由至 `./vapor`（官方 Pinia + pinia-plugin-persistedstate）；
+ * - x-pinia-s 分支（其余平台，即**未开启**蒸汽模式的 App 原生端，如 Android VDOM）：
+ *   自动路由至 `./vdom`（Pinia by UTS / x-pinia-s 原生强类型实现）。
+ *
+ * ⚠️【为什么 Web / 小程序要手写平台名，而不能只判断 `VUE3-VAPOR`】：
+ * `VUE3-VAPOR` 由 `uni-cli-shared` 依据 `process.env.UNI_APP_X_DOM2 === 'true'` 求值，
+ * 而框架在 `uni-cli-shared/dist/hbx/alias.js` 里对 web / 小程序**强制清除**该环境变量：
+ *
+ *   // 如果是 web 和小程序，目前强制非蒸汽。
+ *   if (isWebOrMpPlatform(utsPlatform) || isWebOrMpPlatform(uniPlatform)) {
+ *     delete process.env.UNI_APP_X_DOM2;
+ *   }
+ *   // isWebOrMpPlatform = (p === 'h5' || p === 'web' || p.startsWith('mp-'))
+ *
+ * 也就是说：**`manifest.json` 里 `uni-app-x.vapor: true` 对 Web / 小程序不产生任何效果**，
+ * 这两类平台的 `VUE3-VAPOR` 永远是 false。想让它们走官方 Pinia，只能在本文件按平台名
+ * 显式放行。App 端（Android / iOS / 鸿蒙）则确实由 manifest 的 `vapor` 开关经
+ * `VUE3-VAPOR` 控制，无需在此列举。
+ *
+ * 💡 因此本文件的判据是「manifest 开了蒸汽 ⇒ App 全端走 vapor；Web 与全部小程序平台
+ *    本就是 JS 运行时、无需 x-pinia-s 的 UTS 强类型实现，也一并走官方 Pinia」，
+ *    持久化插件（pinia-plugin-persistedstate）全端复用。
+ *
+ * ⚠️【重导出红线】：同一个顶层符号（useAppStore / useTokenStore / useUserStore）
+ * 只允许在本文件这一层门面中 `export *` 转发。`./vdom/index.uts`、`./vapor/index.ts`
+ * 只创建并默认导出 pinia 实例，**严禁再对外 `export *` 转发 stores**。
+ * 否则 UTS 在 Android 端合并生成 Kotlin 时会把重名符号改名为 `useXxxStore__1`，
+ * 表现为 `.uts` 编译报 `error18 找不到名称"useXxxStore"`、`.uvue` 运行期报
+ * `NoSuchMethodError: No static method getUseXxxStore()`。
+ *
+ * 🚨【本文件请勿使用「导入/导出排序」类自动格式化】：
+ * 本文件靠行首的条件编译标记（`#ifdef` / `#endif` 那种写法）切分平台分支，
+ * 一旦被「按字母序重排 export」的格式化器处理（HBuilderX 保存时格式化 /
+ * ESLint sort-exports / Prettier 插件等），排序会**跨过 `#endif` 把语句挪出条件块**，
+ * 导致 `./vapor/*` 与 `./vdom/*` 在**所有平台同时被导出** —— 直接命中上面那条
+ * `useXxxStore__1` 红线，且在 H5 / 小程序上还会因 `.ts` 类型无法经 `export *`
+ * 转发而编译失败。若发现本文件语句顺序与缩进异常，先 `git diff` 确认，
+ * 再按下面的结构手工复原。
+ *
+ * 🚨【注释里不要书写带斜杠前缀的条件编译标记】：预处理器做分隔符配对时会被注释中
+ * 的斜杠序列带偏，直接抛 `Error: Unbalanced right delimiter found in string`，
+ * 整个 UTS 编译中断。要在注释里提到这些标记，就写标记本身、不要带前缀斜杠
+ * （本注释即按此写法）。
  */
 
-const pinia = createPinia();
+// ==========================================
+// 1. 共享类型：与平台无关，恒定向外转发（唯一真源见 ./types.uts）
+// ==========================================
+// ⚠️ 必须是 `.uts` 且必须放在 `#ifdef` 之外：
+//    a) 小程序（uts2js）链路无法从 `.ts` 文件经 `export *` 转发纯类型，
+//       否则业务侧 `import type { ISingleTokenRes } from '@/src/store'` 会报
+//       `"ISingleTokenRes" is not exported by ".../src/store/index.uts"`；
+//    b) 两个分支（vapor / vdom）共用同一套类型，放条件编译里必然漏掉一端。
+// ==========================================
+// 2. Pinia 实例：按平台路由到对应实现
+// ==========================================
 
-// 持久化插件配置
-pinia.use(createPersistPlugin({
-  keyPrefix: 'pinia:',
-  includeStores: ['token', 'user', 'app'], // 持久化 token, user 和 app store
-  excludeStores: [] as string[],
-  serializer: null
-} as PersistOptions));
+// #ifdef VUE3-VAPOR || H5 || WEB || MP
+import pinia from './vapor/index.ts';
+// #endif
 
-// 立即激活 Pinia 实例
-setActivePinia(pinia);
+// #ifndef VUE3-VAPOR || H5 || WEB || MP
+import pinia from './vdom/index.uts';
+// #endif
+
+export * from './types.uts';
 
 export default pinia;
 
-export * from './app';
-// 模块统一导出
-export * from './token';
-export * from './user';
+// ==========================================
+// 3. Store 实现：按平台路由（只转发 store，不再转发类型）
+// ==========================================
+
+// #ifdef VUE3-VAPOR || H5 || WEB || MP
+export * from './vapor/app.ts';
+export * from './vapor/token.ts';
+export * from './vapor/user.ts';
+// #endif
+
+// #ifndef VUE3-VAPOR || H5 || WEB || MP
+export * from './vdom/app.uts';
+export * from './vdom/token.uts';
+export * from './vdom/user.uts';
+// #endif

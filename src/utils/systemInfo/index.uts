@@ -1,0 +1,615 @@
+import { computed, ref } from 'vue';
+import { customTabbarConfig } from '../../tabbar/config.uts';
+import {
+  getApiBaseUrl,
+  getAppTitle,
+  getAppVersion,
+  getCompileMode,
+  getCompilePlatform,
+  getCurrentEnv,
+  getCurrentEnvName,
+  getTabbarStrategyNum,
+  isNativeTabBar,
+  isVaporMode
+} from '../env/index.uts';
+
+/**
+ * NavBar 内容区默认基准高度（不含状态栏，单位 px，标准 44px）
+ */
+export const NAVBAR_CONTENT_HEIGHT: number = 44;
+
+/**
+ * TabBar 默认基准高度（单位 px，标准 50px）
+ */
+export const TABBAR_BASE_HEIGHT: number = 50;
+
+// eslint-disable-next-line import/no-mutable-exports
+export let systemId: number = 0;
+
+export type SystemSafeAreaInsets = {
+  top: number;
+  right: number;
+  bottom: number;
+  left: number;
+};
+
+export type SystemSafeArea = {
+  top: number;
+  right: number;
+  bottom: number;
+  left: number;
+  width: number;
+  height: number;
+};
+
+/**
+ * 小程序胶囊菜单按钮的布局位置信息
+ *
+ * ⚠️ 仅微信小程序（MP-WEIXIN）提供，其余平台恒为 null。
+ *    典型用途：自定义导航栏时让标题栏与右上角胶囊垂直居中对齐。
+ *
+ * ⚠️ 六个字段全部是「视口坐标」，原点为屏幕左上角（与 DOM getBoundingClientRect() 一致），
+ *    与 CSS 的 right / bottom **语义相反** —— 它们不是「距右/下边缘的距离」：
+ *    · right = 胶囊右边缘的 x 坐标（距**屏幕左边**），right 越大越靠右；
+ *    · bottom = 胶囊下边缘的 y 坐标（距**屏幕顶边**），bottom 越大越靠下。
+ *    所以「胶囊距屏幕右边的距离」要自己算：screenWidth - right。
+ */
+export type SystemMenuRect = {
+  /** 胶囊宽度（px） */
+  width: number;
+  /** 胶囊高度（px） */
+  height: number;
+  /** 胶囊上边缘的 y 坐标（距屏幕顶边的 px） */
+  top: number;
+  /** 胶囊右边缘的 x 坐标（距屏幕左边的 px），⚠️ 不是距屏幕右边的距离 */
+  right: number;
+  /** 胶囊下边缘的 y 坐标（距屏幕顶边的 px），⚠️ 不是距屏幕底边的距离 */
+  bottom: number;
+  /** 胶囊左边缘的 x 坐标（距屏幕左边的 px） */
+  left: number;
+};
+
+export type SystemInfoType = {
+  // 窗口与屏幕尺寸
+  screenWidth: number;
+  screenHeight: number;
+  windowWidth: number;
+  windowHeight: number;
+  statusBarHeight: number;
+  // 可用内容高度 = 窗口高度 - 状态栏高度
+  availableHeight: number;
+  navBarHeight: number;
+  tabBarHeight: number;
+  pixelRatio: number;
+  // 设备信息
+  brand: string;
+  model: string;
+  system: string;
+  // 编译引擎与平台信息
+  compilerVersion: string;
+  uniCompileVersion: string;
+  isVapor: boolean;
+  compileMode: string;
+  platformName: string;
+  // 应用与环境变量
+  appTitle: string;
+  appVersion: string;
+  apiBaseUrl: string;
+  env: string;
+  envName: string;
+  // 安全区域插入距离（同时独立挂一份到 safeAreaInsets ref 上）
+  safeAreaInsets: SystemSafeAreaInsets | null;
+  safeArea: SystemSafeArea | null;
+  // 小程序胶囊按钮布局信息（同时独立挂一份到 menuRect ref 上）
+  menuRect: SystemMenuRect | null;
+};
+
+export const systemInfo = ref(null as SystemInfoType | null);
+export const safeAreaInsets = ref(null as SystemSafeAreaInsets | null);
+
+/**
+ * 小程序胶囊按钮布局信息的内部可写 ref（仅本模块 updateSystemInfo 写入）
+ * 对外只暴露下面同名的只读 computed `menuRect`
+ */
+const menuRectRef = ref(null as SystemMenuRect | null);
+
+/** 便捷响应式：小程序胶囊按钮矩形（仅微信小程序有值，其余平台恒为 null） */
+export const menuRect = computed<SystemMenuRect | null>((): SystemMenuRect | null => menuRectRef.value);
+
+/** 便捷响应式：窗口/屏幕宽度（px），未初始化时为 0 */
+export const windowWidth = computed<number>((): number => systemInfo.value?.windowWidth ?? 0);
+/** 便捷响应式：窗口/屏幕高度（px），未初始化时为 0 */
+export const windowHeight = computed<number>((): number => systemInfo.value?.windowHeight ?? 0);
+/** 便捷响应式：屏幕宽度（px），未初始化时为 0 */
+export const screenWidth = computed<number>((): number => systemInfo.value?.screenWidth ?? 0);
+/** 便捷响应式：屏幕高度（px），未初始化时为 0 */
+export const screenHeight = computed<number>((): number => systemInfo.value?.screenHeight ?? 0);
+/** 便捷响应式：状态栏高度（px），未初始化时为 0 */
+export const statusBarHeight = computed<number>((): number => systemInfo.value?.statusBarHeight ?? 0);
+/** 便捷响应式：导航栏内容区高度（px），未初始化时为 NAVBAR_CONTENT_HEIGHT（44） */
+export const navBarHeight = computed<number>((): number => systemInfo.value?.navBarHeight ?? NAVBAR_CONTENT_HEIGHT);
+/** 便捷响应式：TabBar 高度（px），未初始化时为 TABBAR_BASE_HEIGHT（50） */
+export const tabBarHeight = computed<number>((): number => systemInfo.value?.tabBarHeight ?? TABBAR_BASE_HEIGHT);
+
+/** 便捷响应式：可用内容高度（px），未初始化时为 0 */
+export const availableHeight = computed<number>((): number => {
+  const baseAh: number = systemInfo.value?.availableHeight ?? 0;
+  const strategy: number = getTabbarStrategyNum();
+  // 模式 0 和 模式 4：直接是 systemInfo.value?.availableHeight
+  if (strategy == 0 || strategy == 4) {
+    return baseAh;
+  }
+  // 模式 2 和 模式 3：default 样式不用加 TABBAR_BASE_HEIGHT，其他样式加 TABBAR_BASE_HEIGHT 与 safeAreaInsets.top
+  if (strategy == 2 || strategy == 3) {
+    if (customTabbarConfig.type == 'default') {
+      return baseAh;
+    }
+    else {
+      const topSafe: number = systemInfo.value?.safeAreaInsets?.top ?? 0;
+      return baseAh > 0 ? baseAh + TABBAR_BASE_HEIGHT + topSafe : 0;
+    }
+  }
+  // 其它模式（如模式 1 原生 TabBar）
+  return baseAh;
+});
+/** 便捷响应式：底部安全区高度（px），未初始化时为 0 */
+export const safeAreaBottom = computed<number>((): number => systemInfo.value?.safeAreaInsets?.bottom ?? 0);
+
+export function updateSystemInfo() {
+  // 窗口信息：所有平台统一从 uni.getWindowInfo() 读取
+  const windowInfo = uni.getWindowInfo();
+  // ---- 编译器版本：各平台来源不同，互相兜底 ----
+  let compileVer = '';
+  // #ifdef H5
+  try {
+    const conf = (globalThis as any).__uniConfig as any;
+    if (conf != null && conf.compilerVersion != null) {
+      compileVer = `${conf.compilerVersion}`;
+    }
+  }
+  catch { }
+
+  // #endif
+  // 非 H5：优先 uni.getSystemInfoSync().uniCompileVersion（全端通用 uni 编译版本，已验证 App 可取）
+  if (compileVer == '') {
+    try {
+      const sysInfo = uni.getSystemInfoSync();
+      const uniCompileVersion = `${sysInfo.uniCompileVersion ?? ''}`;
+      compileVer = uniCompileVersion;
+    }
+    catch {
+    }
+  }
+  // 兜底：getAppBaseInfo 版本字段（微信小程序用 appCompilerVersion/SDKVersion，其余用 version 引擎号）
+  if (compileVer == '') {
+    try {
+      const appBaseInfo = uni.getAppBaseInfo();
+      // #ifdef MP-WEIXIN
+      compileVer = `${(appBaseInfo as any).appCompilerVersion ?? (appBaseInfo as any).SDKVersion ?? ''}`;
+      // #endif
+      // #ifndef MP-WEIXIN
+      compileVer = `${appBaseInfo.version ?? ''}`;
+      // #endif
+    }
+    catch { }
+  }
+  if (compileVer == '') {
+    compileVer = '1.0.0';
+  }
+
+  // ---- 品牌 / 型号 / 系统信息：getDeviceInfo 优先，缺失时回退 getSystemInfoSync ----
+  let brand = '';
+  let model = '';
+  let system = '';
+  try {
+    const dev = uni.getDeviceInfo();
+    brand = `${dev.brand ?? ''}`;
+    model = `${dev.model ?? ''}`;
+  }
+  catch { }
+  try {
+    const sys = uni.getSystemInfoSync();
+    system = `${sys.system ?? ''}`;
+    if (brand == '') {
+      brand = `${sys.brand ?? ''}`;
+    }
+    if (model == '') {
+      model = `${sys.model ?? ''}`;
+    }
+  }
+  catch { }
+
+  // ---- 写入公共系统信息 ----
+  systemInfo.value = {
+    screenWidth: windowInfo.screenWidth, // 屏幕宽度（px）
+    screenHeight: windowInfo.screenHeight, // 屏幕高度（px）
+    windowWidth: windowInfo.windowWidth, // 窗口可视宽度（px）
+    windowHeight: windowInfo.windowHeight, // 窗口可视高度（px）
+    statusBarHeight: windowInfo.statusBarHeight, // 状态栏高度（px）
+    availableHeight: windowInfo.windowHeight - windowInfo.statusBarHeight, // 可用内容高度（px，窗口高度 - 状态栏高度）
+    tabBarHeight: TABBAR_BASE_HEIGHT, // TabBar 默认基准高度（px）
+    navBarHeight: NAVBAR_CONTENT_HEIGHT, // 导航栏内容区默认基准高度（px）
+    pixelRatio: windowInfo.pixelRatio, // 像素比（dpr）
+    brand, // 设备品牌
+    model, // 设备型号
+    system, // 操作系统及版本
+    compilerVersion: compileVer, // 编译器 / SDK 版本
+    uniCompileVersion: compileVer, // uni 编译器版本（当前与 compilerVersion 同源）
+    isVapor: isVaporMode(), // 是否为 Vapor 渲染模式
+    compileMode: getCompileMode(), // 编译运行模式（Vapor / VDOM + 环境）
+    platformName: getCompilePlatform(), // 编译目标平台
+    appTitle: getAppTitle(), // 应用名称
+    appVersion: getAppVersion(), // 应用版本号
+    apiBaseUrl: getApiBaseUrl(), // 接口 BaseURL 地址
+    env: getCurrentEnv(), // 运行环境标识（development / test / production）
+    envName: getCurrentEnvName(), // 运行环境中文名称
+    safeAreaInsets: null, // 安全区域插入距离（稍后单独赋值）
+    safeArea: null,
+    menuRect: null // 小程序胶囊按钮布局信息（仅微信小程序，稍后单独赋值）
+  } as SystemInfoType;
+
+  // ---- 安全区：微信 safeArea 为绝对坐标矩形，其余平台为相对边界距离 ----
+  // #ifdef MP-WEIXIN
+  const safeAreaInset = windowInfo.safeAreaInsets;
+  console.log('wx windowInfo.safeArea:', safeAreaInset);
+  console.log('wx windowInfo.safeAreaInsets:', windowInfo.safeAreaInsets);
+  if (safeAreaInset != null) {
+    const insets = {
+      top: safeAreaInset.top,
+      right: safeAreaInset.right,
+      bottom: safeAreaInset.bottom,
+      left: safeAreaInset.left
+    } as SystemSafeAreaInsets;
+    safeAreaInsets.value = insets;
+    systemInfo.value.safeAreaInsets = insets;
+  }
+  const safeArea = windowInfo.safeArea;
+  if (safeArea != null) {
+    systemInfo.value.safeArea = {
+      top: safeArea.top,
+      right: safeArea.right,
+      bottom: safeArea.bottom,
+      left: safeArea.left,
+      width: safeArea.width,
+      height: safeArea.height
+    } as SystemSafeArea;
+  }
+  // #endif
+  // #ifndef MP-WEIXIN
+  const safeAreaInset = windowInfo.safeAreaInsets;
+  if (safeAreaInset != null) {
+    const insets = {
+      top: safeAreaInset.top,
+      right: safeAreaInset.right,
+      bottom: safeAreaInset.bottom,
+      left: safeAreaInset.left
+    } as SystemSafeAreaInsets;
+    safeAreaInsets.value = insets;
+    systemInfo.value.safeAreaInsets = insets;
+  }
+  const safeArea = windowInfo.safeArea;
+  if (safeArea != null) {
+    systemInfo.value.safeArea = {
+      top: safeArea.top,
+      right: safeArea.right,
+      bottom: safeArea.bottom,
+      left: safeArea.left,
+      width: safeArea.width,
+      height: safeArea.height
+    } as SystemSafeArea;
+  }
+  // #endif
+
+  // ---- 小程序胶囊按钮位置：仅微信小程序提供，其余平台保持 null ----
+  // 用于自定义导航栏时让标题区与右上角胶囊垂直居中对齐。
+  // #ifdef MP-WEIXIN
+  try {
+    const menu = uni.getMenuButtonBoundingClientRect();
+    const rect = {
+      width: menu.width,
+      height: menu.height,
+      top: menu.top,
+      right: menu.right,
+      bottom: menu.bottom,
+      left: menu.left
+    } as SystemMenuRect;
+    menuRectRef.value = rect;
+    systemInfo.value.menuRect = rect;
+    console.log('胶囊位置信息:', rect);
+  }
+  catch {
+    // 胶囊信息取不到时不阻断 systemInfo 整体初始化（页面未就绪时调用可能抛错）
+  }
+  // #endif
+}
+
+/**
+ * 判断当前 HBuilderX / uni-app 编译器版本是否大于等于指定版本（如 '5.25' 或 '4.25'）
+ */
+export function isCompilerVersionGte(targetVersion: string): boolean {
+  const current = systemInfo.value?.compilerVersion ?? '';
+  if (current == '') {
+    return false;
+  }
+  const curParts = current.split('.');
+  const targetParts = targetVersion.split('.');
+  const len = Math.max(curParts.length, targetParts.length);
+  for (let i = 0; i < len; i++) {
+    const curNum = i < curParts.length ? parseInt(curParts[i], 10) : 0;
+    const targetNum = i < targetParts.length ? parseInt(targetParts[i], 10) : 0;
+    if (curNum > targetNum) {
+      return true;
+    }
+    if (curNum < targetNum) {
+      return false;
+    }
+  }
+  return true;
+}
+
+/**
+ * 计算 TabBar 高度（单位 px，模块内部使用）
+ *
+ * ⚠️ 刻意不叫 getTabBarHeight：顶层 computed `tabBarHeight` 会被 Kotlin 编译器
+ * 生成同名静态 getter `getTabBarHeight()`，两者并存会触发平台声明冲突，导致
+ * Android 运行时 NoSuchMethodError（见 SKILL 1.1.11）。
+ * 需要对外调用请用类方法 `systemUtils.getTabBarHeight()`。
+ *
+ * @param includeSafeArea 是否包含底部安全区高度（默认 false）
+ * @returns TabBar 高度（px）
+ */
+function calcTabBarHeight(includeSafeArea: boolean = false): number {
+  if (!includeSafeArea) {
+    return TABBAR_BASE_HEIGHT;
+  }
+  const insets = safeAreaInsets.value;
+  const bottomInset = insets != null ? insets.bottom : 0;
+  return TABBAR_BASE_HEIGHT + bottomInset;
+}
+
+/**
+ * 计算页面视口内滚动容器的自适应剩余可用高度（单位 px）
+ * - 自动检测环境变量中的 TabBar 模式，若为原生 TabBar 模式（VITE_TABBAR_MODE=1）则自动扣除 TabBar 高度
+ * @param topOffset 顶部占用高度（如自定义 Header、搜索框、Tabs 等，默认 0）
+ * @param bottomOffset 底部占用高度（如自定义 TabBar、底部操作栏等，默认 0）
+ * @param minusStatusBar 是否自动扣除系统状态栏高度（默认 true）
+ * @returns 剩余可用视口高度（px）
+ */
+export function getScrollHeight(
+  topOffset: number = 0,
+  bottomOffset: number = 0,
+  minusStatusBar: boolean = true
+): number {
+  const info = uni.getWindowInfo();
+  const statusBar = minusStatusBar ? (info.statusBarHeight ?? 0) : 0;
+  let tabBar = 0;
+  if (isNativeTabBar()) {
+    tabBar = calcTabBarHeight(true);
+  }
+  return Math.max(0, info.windowHeight - topOffset - bottomOffset - statusBar - tabBar);
+}
+
+/**
+ * App.ku.uvue 页面 props 中参与可用高度计算的字段（由 autoRootPlugin 编译期全量注入）
+ */
+export type AppKuHeightProps = {
+  /** 是否隐藏导航栏（true 时可用高度不扣除导航栏高度 navBarHeight） */
+  hideNavbar: boolean;
+  /** 是否隐藏状态栏（true 时可用高度不扣除状态栏高度 safeTop） */
+  hideStatusBar: boolean;
+  /** 页面 style 完整配置对象（与 App.ku.uvue 的 pageStyle prop 同源，含 navigationStyle，可能为空） */
+  pageStyle: UTSJSONObject | null;
+  /** 页面布局模板标识：不是 'navbar'（如 default 等无导航布局）时状态栏与导航栏都不扣除；'navbar' 正常扣除 */
+  layout: string;
+};
+
+// 参考这个计算得出 https://doc.dcloud.net.cn/uni-app-x/api/get-window-info.html#%E8%BF%94%E5%9B%9E%E5%80%BC
+export function updateAvailableHeight(kuProps: AppKuHeightProps, selectedTabbarStrategy: number): void {
+  updateSystemInfo();
+  // 非空收窄：局部 sys 固定为 SystemInfoType，避免对可空的 systemInfo.value 逐个 ?. / !! 处理（?. 得到 Number? 不能直接参与运算）
+  const sys = systemInfo.value;
+  if (sys == null) {
+    return;
+  }
+  const safeBottom: number = sys.safeAreaInsets?.bottom ?? 0;
+  const safeTop: number = sys.safeAreaInsets?.top ?? 0;
+  const safeAreaBottom: number = sys.safeArea?.bottom ?? 0;
+
+  // 是否自定义导航栏（navigationStyle == 'custom'）：由注入的 pageStyle 推导，与 App.ku.uvue 内 isCustomNav 判定同源
+  const kuPageStyle: UTSJSONObject | null = kuProps.pageStyle ?? null;
+  // eslint-disable-next-line dot-notation
+  const navStyleText: string = (kuPageStyle != null && kuPageStyle['navigationStyle'] != null) ? `${kuPageStyle['navigationStyle']}` : '';
+  const isCustomNav: boolean = navStyleText == 'custom';
+  // 布局不是 'navbar'（default 等无自定义导航布局）时，窗口内没有导航栏占位，状态栏与导航栏高度都不扣除
+  const isNoNavbarLayout: boolean = kuProps.layout != 'navbar';
+  // hideNavbar 为 true（页面隐藏导航栏）或非 navbar 布局时，可用高度不扣除导航栏高度
+
+  // 自定义状态栏高度
+  let statusBarOffset: number = 0;
+  if (isNoNavbarLayout) {
+    statusBarOffset = isCustomNav ? 0 : (kuProps.hideStatusBar ? 0 : safeTop);
+  }
+  else {
+    statusBarOffset = kuProps.hideStatusBar ? 0 : safeTop;
+  }
+
+  // 自定义导航栏高度
+  let navBarOffset: number = 0;
+  if (isNoNavbarLayout) {
+    navBarOffset = isCustomNav ? 0 : sys.navBarHeight;
+  }
+  else {
+    if (isCustomNav) {
+      navBarOffset = kuProps.hideNavbar ? 0 : sys.navBarHeight;
+    }
+    else {
+      navBarOffset = sys.navBarHeight;
+    }
+  }
+
+  // console.log(`[updateAvailableHeight] hideStatusBar:${kuProps.hideStatusBar}, hideNavbar:${kuProps.hideNavbar}, statusBarOffset:${statusBarOffset}, navBarOffset:${navBarOffset}`);
+
+  // 根据当前选中的 TabBar 策略计算可用高度：
+  // 1 / 2 / 3（标准内嵌/固定/原生 TabBar）：从安全区底部扣除导航栏、状态栏及 TabBar 高度
+  // 0 / 4（全屏模式 / 悬浮 TabBar）：不扣除 TabBar 高度，并补偿 safeBottom
+  if (selectedTabbarStrategy == 0 || selectedTabbarStrategy == 4) {
+    sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset + safeBottom;
+  }
+  else {
+    sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset - sys.tabBarHeight;
+  }
+
+  systemId++;
+  // console.log('AppKu:', sys.availableHeight, selectedTabbarStrategy, isCustomNav, 'selectedTabbarStrategy');
+}
+
+// 初始化获取一次
+updateSystemInfo();
+
+// ==========================================
+// 系统与屏幕信息工具聚合类（全端一目了然速查与单例）
+// ==========================================
+
+/**
+ * 系统与屏幕信息工具聚合类
+ *
+ * 集中呈现系统信息、屏幕尺寸、导航与安全区高度及响应式状态，一目了然；同时支持面向对象式 `systemUtils.xxx()` 调用。
+ *
+ * @example
+ * ```uts
+ * // 方式 1：标准具名导入（响应式计算属性）
+ * import { windowWidth, windowHeight, statusBarHeight } from '@/src/utils/systemInfo/index.uts';
+ *
+ * // 方式 2：对象单例导入（一目了然）
+ * import { systemUtils, sys } from '@/src/utils/systemInfo/index.uts';
+ * console.log(systemUtils.getNavBarHeight(), sys.windowHeight.value);
+ * ```
+ */
+export class SystemUtils {
+  /** 导航栏默认基准高度（44px） */
+  readonly NAVBAR_CONTENT_HEIGHT: number = NAVBAR_CONTENT_HEIGHT;
+
+  /** TabBar 默认基准高度（50px） */
+  readonly TABBAR_BASE_HEIGHT: number = TABBAR_BASE_HEIGHT;
+
+  /** 系统信息全局响应式 ref */
+  readonly systemInfo = systemInfo;
+
+  /** 安全区信息全局响应式 ref */
+  readonly safeAreaInsets = safeAreaInsets;
+
+  /** 小程序胶囊按钮布局信息全局响应式 ref（仅微信小程序有值） */
+  readonly menuRect = menuRect;
+
+  /** 窗口宽度响应式 computed */
+  readonly windowWidth = windowWidth;
+
+  /** 窗口高度响应式 computed */
+  readonly windowHeight = windowHeight;
+
+  /** 屏幕宽度响应式 computed */
+  readonly screenWidth = screenWidth;
+
+  /** 屏幕高度响应式 computed */
+  readonly screenHeight = screenHeight;
+
+  /** 状态栏高度响应式 computed */
+  readonly statusBarHeight = statusBarHeight;
+
+  /** 导航栏内容区高度响应式 computed */
+  readonly navBarHeight = navBarHeight;
+
+  /** TabBar 高度响应式 computed */
+  readonly tabBarHeight = tabBarHeight;
+
+  /** 页面可用内容高度响应式 computed */
+  readonly availableHeight = availableHeight;
+
+  /** 底部安全区高度响应式 computed */
+  readonly safeAreaBottom = safeAreaBottom;
+
+  /** 刷新并更新系统全局信息响应式状态 */
+  updateSystemInfo(): void {
+    updateSystemInfo();
+  }
+
+  /** 获取当前系统信息快照对象 */
+  getInfo(): SystemInfoType | null {
+    return systemInfo.value;
+  }
+
+  /** 判断当前 HBuilderX / uni-app 编译器版本是否大于等于指定版本（如 '5.25' 或 '4.25'） */
+  isCompilerVersionGte(targetVersion: string): boolean {
+    return isCompilerVersionGte(targetVersion);
+  }
+
+  /** 实时获取状态栏高度（px） */
+  getStatusBarHeight(): number {
+    return statusBarHeight.value;
+  }
+
+  /** 实时获取窗口可视高度（px） */
+  getWindowHeight(): number {
+    return windowHeight.value;
+  }
+
+  /** 实时获取屏幕宽度（px） */
+  getScreenWidth(): number {
+    return screenWidth.value;
+  }
+
+  /** 实时获取屏幕高度（px） */
+  getScreenHeight(): number {
+    return screenHeight.value;
+  }
+
+  /** 实时获取导航栏内容区高度（px） */
+  getNavBarHeight(): number {
+    return navBarHeight.value;
+  }
+
+  /** 实时获取 TabBar 高度（px，可选叠加底部安全区） */
+  getTabBarHeight(includeSafeArea: boolean = false): number {
+    return calcTabBarHeight(includeSafeArea);
+  }
+
+  /** 实时获取当前页面可用内容高度（px） */
+  getAvailableHeight(): number {
+    return availableHeight.value;
+  }
+
+  /** 实时获取底部安全区高度（px） */
+  getSafeAreaBottom(): number {
+    return safeAreaBottom.value;
+  }
+
+  /**
+   * 实时获取小程序胶囊按钮布局信息
+   * @returns 胶囊矩形；非微信小程序平台恒为 null
+   */
+  getMenuRect(): SystemMenuRect | null {
+    return menuRect.value;
+  }
+
+  /** 计算页面视口内滚动容器的自适应剩余可用高度（px） */
+  getScrollHeight(
+    topOffset: number = 0,
+    bottomOffset: number = 0,
+    minusStatusBar: boolean = true
+  ): number {
+    return getScrollHeight(topOffset, bottomOffset, minusStatusBar);
+  }
+
+  /** 更新页面可用高度 */
+  updateAvailableHeight(kuProps: AppKuHeightProps, selectedTabbarStrategy: number): void {
+    updateAvailableHeight(kuProps, selectedTabbarStrategy);
+  }
+}
+
+/** 系统与屏幕信息工具全局单例 */
+export const systemUtils = new SystemUtils();
+
+/** 别名导出 */
+export const sys = systemUtils;
+
+export default systemUtils;

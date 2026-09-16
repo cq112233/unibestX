@@ -53,8 +53,8 @@
 <script setup lang="uts">
 import Card from '../../basic/components/Card.uvue';
 import { computed, ref, watch } from 'vue';
-import { systemInfo } from '@/src/utils/systemInfo';
-import { $t } from '@/src/utils/i18n';
+import { systemInfo } from '@/src/utils/systemInfo/index.uts';
+import { $t } from '@/src/utils/i18n/index.uts';
 
 const echartTitle = computed((): string => $t('basic.echartTitle'));
 const echartLineText = computed((): string => $t('basic.echartLine'));

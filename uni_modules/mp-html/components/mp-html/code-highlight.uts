@@ -1,0 +1,251 @@
+/**
+ * 极简代码高亮（纯 UTS 字符扫描实现，全平台通用）
+ *
+ * 为什么自己写、而不是用现成的：
+ * 1. mp-html 官方的 highlight 插件依赖 prismjs，那是纯 JS，**App 原生端跑不了**；
+ *    官方 node.uvue 的 pre/code 分支也只给了等宽字体 + 底色，没有 token 级着色。
+ * 2. 这里刻意**不使用正则**（uni-app X 4.72+ 才原生支持正则字面量，且 kux-marked 那类
+ *    插件为了兼容老版本还牵扯原生 jar）。逐字符扫描 + 字符串 indexOf 判断字符类别，
+ *    不依赖任何版本特性，也就不可能引入平台差异。
+ * 3. 只做「关键字 / 字符串 / 注释 / 数字」四类着色 —— 覆盖 ts/js/json 演示足够，
+ *    且规则简单到不会误判（真正的语法分析不该塞进渲染组件里）。
+ *
+ * 输出结构：`Array<一行, 一行, ...>`，每行是若干 `CodeSeg`。
+ * 之所以按「行 → 段」两级返回，是因为 uni-app X 的 <text> 只能包含一个纯文本节点
+ * （见 unibestX-skill 1.2.4），多色文本只能用「同级兄弟 <text>」拼，
+ * 而兄弟 text 必须放在 flex 行里才能并排 —— 所以「一行代码」正好对应「一个 flex 行」，
+ * 行内的各个着色片段就是那一行里的兄弟 <text>。这样换行结构不会被打乱。
+ */
+
+/** 一段着色文本。禁止 interface，统一用 type */
+export type CodeSeg = {
+  /** 片段文本（可能含换行，由拆分阶段处理） */
+  text: string
+  /** 该片段的 CSS 片段（只含 color，字体/空白等由模板统一给） */
+  style: string
+}
+
+const COLOR_KEYWORD: string = 'color:#7c3aed;'
+const COLOR_STRING: string = 'color:#16a34a;'
+const COLOR_NUMBER: string = 'color:#d97706;'
+const COLOR_COMMENT: string = 'color:#94a3b8;'
+const COLOR_PLAIN: string = 'color:#334155;'
+
+/**
+ * 关键字表。刻意包含各语言的常见词，让 ts/js/json 之外（如 `select`/`from`）
+ * 也能有点效果，代价只是极少数变量名被误着色。
+ */
+const KEYWORDS = new Set<string>([
+  // 声明与类型
+  'const', 'let', 'var', 'function', 'class', 'extends', 'implements', 'type', 'interface',
+  'enum', 'public', 'private', 'protected', 'static', 'readonly', 'as', 'is', 'keyof', 'infer',
+  // 控制流
+  'if', 'else', 'for', 'while', 'do', 'switch', 'case', 'default', 'break', 'continue',
+  'return', 'throw', 'try', 'catch', 'finally', 'yield',
+  // 模块与异步
+  'import', 'from', 'export', 'async', 'await', 'new', 'delete', 'typeof', 'instanceof',
+  'in', 'of', 'this', 'super', 'void',
+  // 字面量
+  'null', 'undefined', 'true', 'false', 'NaN', 'Infinity',
+  // 常见 SQL（演示里偶尔会写）
+  'select', 'insert', 'update', 'delete', 'where', 'order', 'group', 'limit'
+])
+
+const IDENT_START: string = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_$'
+const DIGITS: string = '0123456789'
+
+/**
+ * 字符类别判断。
+ * 刻意用 `indexOf(c) >= 0` 而不是 `c >= 'a' && c <= 'z'`：
+ * UTS 承自 Kotlin，字符串的大小比较行为不像 JS 那样可以随便用，值比较更稳妥。
+ */
+function isDigit(c: string): boolean {
+  return DIGITS.indexOf(c) >= 0
+}
+
+function isIdentStart(c: string): boolean {
+  return IDENT_START.indexOf(c) >= 0
+}
+
+function isIdentPart(c: string): boolean {
+  return isIdentStart(c) || isDigit(c)
+}
+
+/** 把一段文本切成若干着色片段（不做换行处理，片段里可以含 '\n'） */
+function tokenize(code: string): Array<CodeSeg> {
+  const out: Array<CodeSeg> = []
+  const len: number = code.length
+  let i: number = 0
+  // 连续的非着色字符先攒着，最后合并成一个片段，避免每个字符一个 text 节点
+  let plain: string = ''
+
+  const flushPlain = (): void => {
+    if (plain.length > 0) {
+      out.push({ text: plain, style: COLOR_PLAIN } as CodeSeg)
+      plain = ''
+    }
+  }
+
+  while (i < len) {
+    const c: string = code.charAt(i)
+    const c1: string = i + 1 < len ? code.charAt(i + 1) : ''
+
+    // ---- 行注释 ----
+    if (c == '/' && c1 == '/') {
+      flushPlain()
+      let j: number = i
+      while (j < len && code.charAt(j) != '\n') {
+        j = j + 1
+      }
+      out.push({ text: code.substring(i, j), style: COLOR_COMMENT } as CodeSeg)
+      i = j
+      continue
+    }
+
+    // ---- 块注释（可以跨行，\n 留给后面按行拆） ----
+    if (c == '/' && c1 == '*') {
+      flushPlain()
+      const close: number = code.indexOf('*/', i + 2)
+      const end: number = close == -1 ? len : close + 2
+      out.push({ text: code.substring(i, end), style: COLOR_COMMENT } as CodeSeg)
+      i = end
+      continue
+    }
+
+    // ---- 字符串：' " ` （反引号顺带覆盖模板串） ----
+    if (c == "'" || c == '"' || c == '`') {
+      flushPlain()
+      let j: number = i + 1
+      while (j < len) {
+        const cj: string = code.charAt(j)
+        if (cj == '\\') {
+          // 转义：连字符一起跳过，避免 \" 被当成结束引号
+          j = j + 2
+          continue
+        }
+        j = j + 1
+        if (cj == c) {
+          break
+        }
+      }
+      const end: number = j > len ? len : j
+      out.push({ text: code.substring(i, end), style: COLOR_STRING } as CodeSeg)
+      i = end
+      continue
+    }
+
+    // ---- 数字 ----
+    if (isDigit(c)) {
+      flushPlain()
+      let j: number = i
+      while (j < len) {
+        const cj: string = code.charAt(j)
+        if (isDigit(cj) || cj == '.') {
+          j = j + 1
+          continue
+        }
+        break
+      }
+      out.push({ text: code.substring(i, j), style: COLOR_NUMBER } as CodeSeg)
+      i = j
+      continue
+    }
+
+    // ---- 标识符 / 关键字 ----
+    if (isIdentStart(c)) {
+      let j: number = i
+      while (j < len && isIdentPart(code.charAt(j))) {
+        j = j + 1
+      }
+      const word: string = code.substring(i, j)
+      if (KEYWORDS.has(word)) {
+        flushPlain()
+        out.push({ text: word, style: COLOR_KEYWORD } as CodeSeg)
+      } else {
+        plain = plain + word
+      }
+      i = j
+      continue
+    }
+
+    // ---- 其余字符（空白、运算符、标点） ----
+    plain = plain + c
+    i = i + 1
+  }
+
+  flushPlain()
+  return out
+}
+
+/**
+ * 缩进保护：把行首空格换成不换行空格 U+00A0。
+ *
+ * 为什么要多这一步：行内空格是否被折叠取决于 `white-space:pre` 能否生效，
+ * 而原生端对该属性的支持并没有 H5 那样确定。U+00A0 在任何引擎、任何 white-space
+ * 取值下都不会被折叠，所以用它兜住「缩进」这一最要紧的部分 ——
+ * 万一 `white-space:pre` 在原生端不生效，代码也不会全贴到左边（顶多行内多余空格被压缩）。
+ */
+function protectIndent(line: Array<CodeSeg>): void {
+  if (line.length == 0) return
+  const first: CodeSeg = line[0]
+  const t: string = first.text
+  if (t.length == 0 || t.charAt(0) != ' ') return
+
+  let k: number = 0
+  while (k < t.length && t.charAt(k) == ' ') {
+    k = k + 1
+  }
+  let nbsp: string = ''
+  for (let m: number = 0; m < k; m++) {
+    nbsp = nbsp + '\u00A0'
+  }
+  line[0] = { text: nbsp + t.substring(k), style: first.style } as CodeSeg
+}
+
+/**
+ * 收尾一行。空行必须给个占位：flex 行的子元素为空时高度为 0，那一行会直接「消失」。
+ * 用不换行空格 U+00A0 而不是普通空格 —— 它不会被任何引擎折叠掉，高度才有保证。
+ */
+function pushLine(lines: Array<Array<CodeSeg>>, line: Array<CodeSeg>): void {
+  if (line.length == 0) {
+    line.push({ text: '\u00A0', style: COLOR_PLAIN } as CodeSeg)
+  }
+  protectIndent(line)
+  lines.push(line)
+}
+
+/**
+ * 把整段代码高亮成「行 → 段」两级结构。
+ *
+ * 做法：先整体分词（块注释、模板串这类跨行 token 才能正确识别），
+ * 再把每个片段按 '\n' 炸开分配到各行 —— 顺序不能反，
+ * 先按行拆再分词的话，跨行的注释/字符串会被切断误判。
+ */
+export function highlightCode(code: string): Array<Array<CodeSeg>> {
+  // marked 给出的代码块文本通常以 '\n' 收尾，那表示「代码到此结束」而不是代码里的空行；
+  // 不去掉这一个换行的话，代码卡片底部会凭空多出一行空白
+  const endsWithNewline: boolean = code.length > 0 && code.charAt(code.length - 1) == '\n'
+  const src: string = endsWithNewline ? code.substring(0, code.length - 1) : code
+
+  const lines: Array<Array<CodeSeg>> = []
+  const segs: Array<CodeSeg> = tokenize(src)
+  let line: Array<CodeSeg> = []
+
+  for (let s: number = 0; s < segs.length; s++) {
+    const seg: CodeSeg = segs[s]
+    const parts: Array<string> = seg.text.split('\n')
+    for (let p: number = 0; p < parts.length; p++) {
+      if (p > 0) {
+        pushLine(lines, line)
+        line = []
+      }
+      const piece: string = parts[p]
+      if (piece.length > 0) {
+        line.push({ text: piece, style: seg.style } as CodeSeg)
+      }
+    }
+  }
+
+  pushLine(lines, line)
+  return lines
+}

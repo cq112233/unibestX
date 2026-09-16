@@ -1,0 +1,21 @@
+import { createPersistPlugin, createPinia, setActivePinia } from '@/uni_modules/x-pinia-s';
+import type { PersistOptions } from '@/uni_modules/x-pinia-s/instans/types.uts';
+
+console.log('vdom----pinia启动');
+/**
+ * Android VDOM 模式 Pinia 实例（基于 x-pinia-s）
+ */
+const pinia = createPinia();
+
+// 持久化插件配置
+pinia.use(createPersistPlugin({
+  keyPrefix: 'pinia:',
+  includeStores: ['token', 'user', 'app'],
+  excludeStores: [] as string[],
+  serializer: null
+} as PersistOptions));
+
+// 立即激活 Pinia 实例
+setActivePinia(pinia);
+
+export default pinia;

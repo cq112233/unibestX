@@ -30,7 +30,7 @@
 
 ## 文件上传 (Upload)
 
-基于官方原生 `uni.uploadFile` 封装的文件上传模块（位于 `src/utils/upload.uts`）：
+基于官方原生 `uni.uploadFile` 封装的文件上传模块（位于 `src/utils/upload/index.uts`）：
 
 * **全端通用**：全平台原生支持（App Android / iOS / HarmonyOS、微信小程序、H5）。
 * **Token 自动注入**：自动在 header 携带 Token（支持 `ignoreAuth: true` 跳过）。

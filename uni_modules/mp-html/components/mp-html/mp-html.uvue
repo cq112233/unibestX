@@ -1,38 +1,88 @@
 <template>
   <view class="_mp_root">
+    <!--
+      本项目对上游 mp-html 的改动（详情见 unibestX-skill 1.3.9）：
+      1) <image> 由 max-width:750px 改为固定 width:110px + border-radius:8px。
+         上游只写 max-width 而没给 width，导致图片按自然宽度渲染、宽图会溢出卡片；
+         固定 110px 缩略图尺寸后，任何素材都不会撑破容器。
+      2) 表格单元格由 flex:1 改为等分百分比宽度 + border-box，列表改为单个 text。
+         上游写法在 App 原生端会横向溢出（最右一列被裁切），原因见 cellStyle 注释。
+      3) 文本补上 HTML 实体解码（decodeEntities）：marked 会把 `>` `'` `&` 转义成
+         `&gt;` `&#39;` `&amp;`，不解码就会把转义原样显示出来。
+      4) <pre> 由「等宽 + 底色」升级为「底色卡片 + 逐行语法高亮」（code-highlight.uts）。
+         官方 mp-html 在 App 端给不了高亮 —— 它的 highlight 插件依赖 prismjs（纯 Web）。
+      5) 标题与小字号的单位由 em/smaller 改为 px：原生端不支持相对字号，
+         字号会塌成 0、整行标题看不见（H5 却正常）。详见 unibestX-skill 1.2.13。
+      6) 行内样式里的 text-decoration 简写改为 text-decoration-line 长属性：
+         App 端不支持该简写，写了等于没写 —— 删除线/下划线在 H5 有、原生端整条消失。
+         详见 unibestX-skill 1.2.14。
+      7) 行内节点改为 chainClass(node) 沿「纯行内元素链」累加 class：
+         原先「本节点样式 + flatText 摊平」会把内层标签的样式一并丢掉，
+         于是 ***粗斜体***（<em><strong>）只剩斜体。详见 unibestX-skill 1.2.15。
+         ⚠️ 有个前提：parseHtml 的行内分支**不能**再 stripAllTags 摊平子节点，
+         否则 <strong> 在解析阶段就没了、chainClass 第一跳即 break，等于白改。
+         这条一开始漏了，真机上粗斜体依旧不加粗 —— 见该分支处的注释。
+      8) 行内样式由动态 :style 改为静态 class（.mp-* 一组规则）：
+         属于风格统一，**不是**修复 —— 曾以为"动态 :style 里的 font-weight 在 App 端不生效"，
+         但真机四种写法并排对照后已证伪（静态 class 与动态 :style 的 700/bold 都同样生效），
+         详见 unibestX-skill 1.2.16。字重丢失的真因是嵌套行内样式被摊平，见上面第 7 条。
+      9) 新增 <video> 分支（顶层 + 嵌套各一条）渲染成原生播放器。
+         两条分支缺一不可，且 src 要等 URL 完整才渲染，原因见 videoSrc 与嵌套分支的注释。
+    -->
     <!-- 渲染节点树 -->
     <template v-for="(n, i) in localNodes" :key="i">
       <text v-if="n.type == 'text'">{{ n.text }}</text>
-      <text v-else-if="n.name == 'br'">\n</text>
-      <image v-else-if="n.name == 'img'" :src="(n.attrs != null ? (n.attrs!['src'] as string) ?? '' : '')" style="max-width:750px" mode="widthFix" />
+      <!-- br 必须用插值写：模板文本节点里的 `\n` 会被当成两个字面字符原样显示。
+           flatText 里那条 br → '\n' 是真正的 JS 转义，所以块级分支里的换行本来是好的，
+           只有「行内兄弟节点」这条路径需要修。 -->
+      <text v-else-if="n.name == 'br'">{{ '\n' }}</text>
+      <image v-else-if="n.name == 'img'" :src="(n.attrs != null ? (n.attrs!['src'] as string) ?? '' : '')" style="width:110px;border-radius:8px" mode="widthFix" />
       <text v-else-if="n.name == 'a'" class="mp-a" @tap="onLinkTap(n)">{{ flatText(n) }}</text>
-      <text v-else-if="isInline(n.name ?? '')" :style="inlineStyle(n.name ?? '')">{{ flatText(n) }}</text>
-      <text v-else-if="n.name == 'h1' || n.name == 'h2' || n.name == 'h3' || n.name == 'h4' || n.name == 'h5' || n.name == 'h6'" :style="headingStyle(n.name ?? '')">{{ flatText(n) }}</text>
-      <text v-else-if="n.name == 'pre' || n.name == 'code'" style="font-family:monospace;white-space:pre-wrap">{{ flatText(n) }}</text>
+      <text v-else-if="isInline(n.name ?? '')" :class="chainClass(n)">{{ flatText(n) }}</text>
+      <text v-else-if="n.name == 'h1' || n.name == 'h2' || n.name == 'h3' || n.name == 'h4' || n.name == 'h5' || n.name == 'h6'" class="mp-b" :style="headingStyle(n.name ?? '')">{{ flatText(n) }}</text>
+      <!-- 代码块：语法高亮后逐行渲染。
+           外层 view 承担底色/圆角/内边距（<text> 上不适合挂这些），
+           一行代码 = 一个 flex 行，行内各着色片段是「同级兄弟 <text>」——
+           不能写成嵌套 <text>，原生端一个 text 只能有一个文本节点（见 unibestX-skill 1.2.4）。
+           行内 code 走 isInline 分支，不在这里。 -->
+      <view v-else-if="n.name == 'pre'" style="display:flex;flex-direction:column;background-color:#f8fafc;border-radius:6px;padding:8px 10px;border-width:1px;border-color:#e2e8f0;border-style:solid">
+        <view v-for="(line, li) in codeLines(n)" :key="li" style="display:flex;flex-direction:row;flex-wrap:wrap">
+          <text v-for="(seg, si) in line" :key="si" :style="'font-family:monospace;white-space:pre;font-size:12px;' + seg.style">{{ seg.text }}</text>
+        </view>
+      </view>
       <view v-else-if="n.name == 'hr'" style="height:1px;background-color:#e0e0e0;margin:10px 0" />
-      <!-- 表格 -->
-      <view v-else-if="n.name == 'table'" style="display:flex;flex-direction:column">
-        <view v-for="(row, ri) in (n.children ?? [])" :key="ri" style="display:flex;flex-direction:row">
-          <view v-for="(cell, ci) in (row.children ?? [])" :key="ci" :style="(cell.name == 'th' ? 'background-color:#f5f5f5;' : '') + 'flex:1;padding:4px 8px;border-width:1px;border-color:#d0d0d0;border-style:solid'">
-            <text :style="cell.name == 'th' ? 'font-weight:bold;' : ''">{{ flatText(cell) }}</text>
+      <!-- 视频：uni-app X 的 <video> 组件（安卓 3.9+ / iOS 4.11+ / Web 4.0）。
+           只在 src 看起来完整时才渲染，半截 URL 交给它只会得到一个报错的黑色方块，见 videoSrc。
+           poster 没接：官方文档说它要「图片网络资源地址」，本地 /static 路径在 App 端不一定生效。 -->
+      <view v-else-if="n.name == 'video' && videoSrc(n) != ''" style="display:flex;flex-direction:column;width:100%">
+        <video :src="videoSrc(n)" :controls="true" style="width:100%;height:180px;border-radius:8px" />
+      </view>
+      <!-- 表格：单元格宽度按「列数等分百分比」算，不用 flex:1（原因见 cellStyle 注释） -->
+      <view v-else-if="n.name == 'table'" style="display:flex;flex-direction:column;width:100%">
+        <view v-for="(row, ri) in (n.children ?? [])" :key="ri" style="display:flex;flex-direction:row;width:100%">
+          <view v-for="(cell, ci) in (row.children ?? [])" :key="ci" :style="cellStyle(cell, (row.children ?? []).length)">
+            <text :class="cell.name == 'th' ? 'mp-b' : ''">{{ flatText(cell) }}</text>
           </view>
         </view>
       </view>
-      <!-- 列表 -->
+      <!-- 列表：项目符号并进同一个 text，避免 flex 行内的 text 按固有宽度排版而横向溢出 -->
       <view v-else-if="n.name == 'ul' || n.name == 'ol'" style="padding-left:20px">
-        <view v-for="(li, lii) in (n.children ?? [])" :key="lii" style="flex-direction:row">
-          <text>{{ n.name == 'ol' ? (lii + 1).toString() + '. ' : '• ' }}</text>
-          <text>{{ flatText(li) }}</text>
-        </view>
+        <text v-for="(li, lii) in (n.children ?? [])" :key="lii">{{ (n.name == 'ol' ? (lii + 1).toString() + '. ' : '• ') + flatText(li) }}</text>
       </view>
       <!-- 块级容器 -->
       <view v-else>
         <template v-for="(cn, ci) in (n.children ?? [])" :key="ci">
           <text v-if="cn.type == 'text'">{{ cn.text }}</text>
-          <text v-else-if="cn.name == 'br'">\n</text>
-          <image v-else-if="cn.name == 'img'" :src="(cn.attrs != null ? (cn.attrs!['src'] as string) ?? '' : '')" style="max-width:750px" mode="widthFix" />
+          <text v-else-if="cn.name == 'br'">{{ '\n' }}</text>
+          <image v-else-if="cn.name == 'img'" :src="(cn.attrs != null ? (cn.attrs!['src'] as string) ?? '' : '')" style="width:110px;border-radius:8px" mode="widthFix" />
           <text v-else-if="cn.name == 'a'" class="mp-a" @tap="onLinkTap(cn)">{{ flatText(cn) }}</text>
-          <text v-else-if="isInline(cn.name ?? '')" :style="inlineStyle(cn.name ?? '')">{{ flatText(cn) }}</text>
+          <!-- video 这条必须在嵌套分支里也来一份：marked 把 video 归在**行内**标签表，
+               单独的 `<video>` 行会被它包进段落（产物是 `<p><video …></video></p>`），
+               于是视频节点是块级容器的子节点，只走顶层分支的话会渲染成空。 -->
+          <view v-else-if="cn.name == 'video' && videoSrc(cn) != ''" style="display:flex;flex-direction:column;width:100%">
+            <video :src="videoSrc(cn)" :controls="true" style="width:100%;height:180px;border-radius:8px" />
+          </view>
+          <text v-else-if="isInline(cn.name ?? '')" :class="chainClass(cn)">{{ flatText(cn) }}</text>
           <text v-else>{{ flatText(cn) }}</text>
         </template>
       </view>
@@ -42,6 +92,8 @@
 
 <script setup lang="uts">
 import { ref, watch, onMounted } from 'vue'
+import { highlightCode } from './code-highlight.uts'
+import type { CodeSeg } from './code-highlight.uts'
 
 type HtmlNode = {
   name?: string
@@ -81,11 +133,92 @@ function isHeading(name: string): boolean {
   return name.length == 2 && name.charAt(0) == 'h' && name.charAt(1) >= '1' && name.charAt(1) <= '6'
 }
 
+/**
+ * 具名 HTML 实体表。
+ *
+ * 取值刻意用 `UTSJSONObject.getString()` 而不是下标 + 强转：
+ * `map['amp'] as string` 得到的是 `Any?`，键不存在时强转到非空 string 在原生端有崩的风险
+ * （同类坑见 unibestX-skill 1.3.1 / 1.3.5）；getString 直接返回 `string | null`，天然处理缺失。
+ */
+const ENTITIES: UTSJSONObject = {
+  amp: '&', lt: '<', gt: '>', quot: '"', apos: "'",
+  nbsp: '\u00A0', ensp: '\u2002', emsp: '\u2003', thinsp: '\u2009',
+  copy: '©', reg: '®', trade: '™', deg: '°',
+  plusmn: '±', times: '×', divide: '÷', middot: '·',
+  bull: '•', hellip: '…', ndash: '–', mdash: '—',
+  lsquo: '‘', rsquo: '’', ldquo: '“', rdquo: '”',
+  laquo: '«', raquo: '»', larr: '←', uarr: '↑',
+  rarr: '→', darr: '↓', harr: '↔', permil: '‰',
+  sect: '§', para: '¶', dagger: '†', Dagger: '‡',
+  prime: '′', Prime: '″', infin: '∞', ne: '≠',
+  le: '≤', ge: '≥', asymp: '≈', equiv: '≡',
+  sum: '∑', prod: '∏', radic: '√', micro: 'µ',
+  euro: '€', pound: '£', yen: '¥', cent: '¢',
+  // 标点类（marked 转义标点时偶尔会产出）
+  semi: ';', colon: ':', quest: '?', excl: '!', num: '#', dollar: '$',
+  percnt: '%', ast: '*', plus: '+', comma: ',', period: '.', sol: '/',
+  lsqb: '[', rsqb: ']', lowbar: '_', grave: '`', lcub: '{', rcub: '}',
+  vert: '|', tilde: '~', equal: '=', hyphen: '‐', minus: '−',
+}
+
+/**
+ * HTML 实体解码：把 `&gt;` `&#39;` `&amp;` 这类写法还原成 `>` `'` `&`。
+ *
+ * 为什么必须做：marked 的转义器会把正文里的 `>` `'` `&` 转成实体写进 HTML，
+ * 而本项目这个轻量渲染器是按 `<` `>` 切标签的，切完剩下的文本不会再解实体 ——
+ * 不解码，用户就会在界面上看见 `&gt;` 本身。
+ *
+ * 解码发生在「标签已经切完」之后，所以解出 `<` `>` 不会凭空造出新标签。
+ * 只解一层：`&amp;lt;` 解成 `&lt;`（与浏览器一致），不会连解成 `<`。
+ */
+function decodeEntities(s: string): string {
+  if (s.indexOf('&') == -1) return s
+
+  let r: string = s
+  let i: number = r.indexOf('&')
+  while (i != -1) {
+    const j: number = r.indexOf(';', i + 1)
+    // 实体名最长不过 32 字符：没有分号、或隔得太远，就认为这个 & 不属于实体
+    if (j == -1 || j - i > 32) {
+      i = r.indexOf('&', i + 1)
+      continue
+    }
+
+    const body: string = r.substring(i + 1, j)
+    let decoded: string | null = null
+
+    if (body.length > 0 && body.charAt(0) == '#') {
+      // 数字实体：&#123; 十进制 / &#x1F600; 十六进制
+      const isHex: boolean = body.length > 1 && (body.charAt(1) == 'x' || body.charAt(1) == 'X')
+      const digits: string = body.substring(isHex ? 2 : 1)
+      if (digits.length > 0 && digits.length <= 8) {
+        const code: number = isHex ? parseInt(digits, 16) : parseInt(digits, 10)
+        if (!isNaN(code) && code > 0) {
+          decoded = String.fromCharCode(code)
+        }
+      }
+    } else {
+      decoded = ENTITIES.getString(body)
+    }
+
+    if (decoded != null) {
+      r = r.substring(0, i) + decoded! + r.substring(j + 1)
+      // 从插入内容之后继续扫，避免把刚解出来的 & 再解一次
+      i = r.indexOf('&', i + decoded!.length)
+    } else {
+      i = r.indexOf('&', i + 1)
+    }
+  }
+  return r
+}
+
 function cleanText(s: string): string {
+  // 先解实体再压空白：`&nbsp;` 解出的是 U+00A0，不在下面的压空白字符集里，因此不会被压掉
+  const src = decodeEntities(s)
   let r = ''
   let lastSpace = false
-  for (let i = 0; i < s.length; i++) {
-    const c2 = s.charAt(i)
+  for (let i = 0; i < src.length; i++) {
+    const c2 = src.charAt(i)
     if (c2 == ' ' || c2 == '\t' || c2 == '\n' || c2 == '\r') {
       if (!lastSpace && r.length > 0) { r += ' '; lastSpace = true }
     } else {
@@ -121,23 +254,135 @@ function flatText(n: HtmlNode): string {
   return t
 }
 
-function inlineStyle(name: string): string {
-  if (name == 'b' || name == 'strong') return 'font-weight:bold'
-  if (name == 'i' || name == 'em') return 'font-style:italic'
-  if (name == 'u' || name == 'ins') return 'text-decoration:underline'
-  if (name == 'del' || name == 's' || name == 'strike') return 'text-decoration:line-through'
-  if (name == 'code') return 'font-family:monospace'
-  if (name == 'sub') return 'font-size:smaller;vertical-align:sub'
-  if (name == 'sup') return 'font-size:smaller;vertical-align:super'
-  if (name == 'small') return 'font-size:0.8em'
-  if (name == 'big') return 'font-size:1.2em'
-  if (name == 'mark') return 'background-color:yellow'
+/**
+ * 行内节点映射到静态 class（见文件末尾 <style> 里的说明）。
+ *
+ * 为什么是 class 而不是动态 style 字符串：`font-weight` 写在动态 `:style` 里在 App 端不生效，
+ * 关键字 `bold` 与数值 `700` 都试过；而同一属性写成静态 class 在整个工程里都正常。
+ * 顺带把 text-decoration-line 也一并搬进 class —— 它必须写长属性，
+ * 官方文档明确「app 平台暂不支持 text-decoration 简写样式，仅支持 text-decoration-line」，
+ * 且 App 端只支持 underline / line-through 两个值、不支持继承（Vapor 模式安卓需 5.21+，本项目 5.24）。
+ */
+function inlineClass(name: string): string {
+  if (name == 'b' || name == 'strong') return 'mp-b'
+  if (name == 'i' || name == 'em') return 'mp-i'
+  if (name == 'u' || name == 'ins') return 'mp-u'
+  if (name == 'del' || name == 's' || name == 'strike') return 'mp-del'
+  if (name == 'code') return 'mp-code'
+  if (name == 'sub') return 'mp-sub'
+  if (name == 'sup') return 'mp-sup'
+  if (name == 'small') return 'mp-small'
+  if (name == 'big') return 'mp-big'
+  if (name == 'mark') return 'mp-mark'
   return ''
 }
 
+/**
+ * 行内节点 class：把「纯行内元素链」上每一层的 class 累加起来。
+ *
+ * 为什么需要累加而不是只看当前节点：
+ * marked 对 `***粗斜体***` 输出的是**嵌套**结构 `<em><strong>粗斜体</strong></em>`。
+ * 而本文件渲染行内节点的写法是「当前节点样式 + flatText(子树)」——
+ * flatText 会把内层 <strong> 连标签带样式一起摊平丢掉，结果只剩最外层的斜体、内层加粗没了。
+ * 删除线套代码、加粗套链接（`~~**x**~~`）同理，都只保留最外层。
+ * 所以这里沿链向下走，把每一层行内元素的 class 拼起来，交给同一个 <text> 渲染。
+ *
+ * 只在「单链」时继续下探：一旦某层子节点不止一个（如 `<em>前<strong>后</strong></em>`），
+ * 就不再往下钻 —— 那种情形本来也无法用一个 text 表达，剩下的交给 flatText 摊平即可。
+ * 这里始终只产出「一个 <text> 包一个文本节点」，不触碰原生端「一个 text 只能有一个文本节点」
+ * 的限制（见 unibestX-skill 1.2.4）。
+ */
+function chainClass(n: HtmlNode): string {
+  let cls = inlineClass(n.name ?? '')
+  let cur: HtmlNode = n
+  while (true) {
+    const kids: HtmlNode[] | null = cur.children ?? null
+    if (kids == null || kids.length != 1) break
+    const only: HtmlNode = kids[0]
+    if (only.type == 'text') break
+    if (!isInline(only.name ?? '')) break
+    const c: string = inlineClass(only.name ?? '')
+    if (c != '') cls += (cls != '' ? ' ' : '') + c
+    cur = only
+  }
+  return cls
+}
+
+/**
+ * 取 `<video>` 的 src，且只在它「看起来完整」时才返回，否则返回空串。
+ *
+ * 流式渲染下这个判断是必需的：原文是 `<video src="https://…/demo.mp4" controls>`，
+ * 分块到达时 src 会先出现半截（`https://qiniu-web-assets`、`https://…/demo.`），
+ * 若照原样交给 <video>，播放器会先渲染成一个报错的黑色方块。
+ * 判据取「含 `://`」且「以合法视频扩展名结尾」—— 扩展名到齐时 URL 也刚好完整。
+ * 扩展名列表取自官方 video 组件文档的安卓支持格式。
+ */
+function videoSrc(n: HtmlNode): string {
+  // 读 attrs 用下标访问（与本文件 img / a 分支一致，它们读的是同一个 parseAttrs 产物、已跑通），
+  // 但**不能**像那两个分支那样直接 `as string`：那两处取的是「一定有值」的属性，
+  // 而 src 在流式过程中经常还没到（半截标签），缺键时强转在原生端有崩的风险（见 ENTITIES 的说明）。
+  // 所以先判空再断言 —— 取不到就是空串，走「不渲染」的分支。
+  let raw: string = ''
+  const attrs = n.attrs
+  if (attrs != null) {
+    const v = attrs['src']
+    if (v != null) raw = v as string
+  }
+  if (raw.indexOf('://') < 0) return ''
+  const exts: string[] = ['.mp4', '.m4v', '.mov', '.3gp', '.webm', '.m3u8', '.avi']
+  const lower = raw.toLowerCase()
+  for (let i = 0; i < exts.length; i++) {
+    const e: string = exts[i]
+    if (lower.length >= e.length && lower.substring(lower.length - e.length) == e) return raw
+  }
+  return ''
+}
+
+/**
+ * 标题字号（一律 px）。
+ *
+ * 为什么不用上游那套 `2em / 1.5em / 1.17em / 1em / 0.83em / 0.67em`：
+ * **App 原生端不支持相对单位与关键字** —— 官方 CSS 文档「font-size」页明确列出
+ * 「不支持百分比的单位、不支持基于用户默认字体大小的绝对大小关键字（small、medium、large 等）、
+ * 不支持 em、rem、ex 等单位」，且原生端**没有样式继承**，font-size 只作用于当前 text 组件。
+ * 于是 em 在原生端没有可依父级字号，字号会塌成 0，**整行标题直接不可见**
+ * （实测：H5 正常，安卓上 h2/h3 那两行消失，而正文/列表/引用/表格/代码块都在 ——
+ * 因为 demo 文本里只有标题用了 em）。改成 px 后两端一致。
+ * 详见 unibestX-skill 1.2.13。
+ */
 function headingStyle(name: string): string {
-  const sz: UTSJSONObject = { h1: '2em', h2: '1.5em', h3: '1.17em', h4: '1em', h5: '0.83em', h6: '0.67em' }
-  return 'font-size:' + ((sz[name] as string) ?? '1em') + ';font-weight:bold'
+  const sz: UTSJSONObject = { h1: '24px', h2: '20px', h3: '18px', h4: '16px', h5: '14px', h6: '13px' }
+  // 只给字号：粗体交给模板上的静态 class="mp-b"（理由见 <style> 里的说明）
+  return 'font-size:' + ((sz[name] as string) ?? '16px')
+}
+
+/**
+ * 表格单元格样式：按列数等分百分比 + border-box。
+ *
+ * 为什么不用 `flex:1`（上游 mp-html 的写法）：原生端与 Web 端对 flex 的解析不一致，
+ * App 实测表现为**三列宽度不相等、且整行被长内容撑出容器、最右一列被裁切**。
+ * 根因是 flex item 的宽度下限是内容的 min-content —— `simulateStream` 这类长英文
+ * token 不可断行，就会把那一列顶宽，把整行挤出父容器；而 `word-break: break-all`
+ * 在本项目里是 H5 / 小程序专用（src/sub 下的页面都把它包在 `#ifdef H5 || MP-WEIXIN` 里），
+ * 原生端没有断词兜底，所以只能从「宽度本身」保证不溢出。
+ *
+ * 改成显式百分比后，N 列总宽恒为 100%（列数只在渲染时才知道，故不能写死在模板里），
+ * 无论内容多长都不可能横向溢出父容器。
+ */
+/**
+ * pre 节点的代码文本 → 「行 → 着色片段」结构，供模板逐行渲染。
+ *
+ * 取文本走 flatText：parseHtml 在 pre 分支里已经把内层 <code> 的标签剥掉、
+ * 只留一个 text 子节点，所以这里拿到的是纯代码文本（实体也已解码）。
+ */
+function codeLines(n: HtmlNode): Array<Array<CodeSeg>> {
+  return highlightCode(flatText(n))
+}
+
+function cellStyle(cell: HtmlNode, colCount: number): string {
+  const pct: number = colCount > 0 ? Math.round(10000 / colCount) / 100 : 100
+  const bg: string = cell.name == 'th' ? 'background-color:#f5f5f5;' : ''
+  return bg + 'box-sizing:border-box;width:' + pct.toString() + '%;padding:4px 8px;border-width:1px;border-color:#d0d0d0;border-style:solid'
 }
 
 function parseAttrs(tag: string): UTSJSONObject {
@@ -321,6 +566,11 @@ function parseHtml(html: string): HtmlNode[] {
     if (name == 'br') { result.push({ name: 'br' } as HtmlNode); continue }
     if (name == 'hr') { result.push({ name: 'hr' } as HtmlNode); continue }
     if (name == 'img') { result.push({ name: 'img', attrs } as HtmlNode); continue }
+    // video 必须在这里单独接住，同样只带 attrs、不解析子节点。
+    // 否则会落到下方的兜底分支被**改名为 div**（第 539-542 行），模板里那条 name == 'video'
+    // 的分支就永远命中不了，视频会被当成普通块级容器渲染成一堆文字。
+    // 写成 `<video ...></video>` 也没问题：`</video>` 会在闭合标签分支里被安全跳过。
+    if (name == 'video') { result.push({ name: 'video', attrs } as HtmlNode); continue }
 
     const closeStr = '</' + name + '>'
     const closePos = findMatchingClose(html, i, name)
@@ -334,8 +584,18 @@ function parseHtml(html: string): HtmlNode[] {
       node.children = parseTable(inner)
     } else if (name == 'ul' || name == 'ol') {
       node.children = parseList(inner)
-    } else if (name == 'a' || isInline(name) || isHeading(name) || name == 'pre' || name == 'code') {
+    } else if (name == 'pre' || name == 'code') {
+      // pre 与「行内 code」的内容必须是**纯文本**，不能有子节点：
+      // 前者交给 codeLines() 逐行着色，后者是等宽内联片段；
+      // 里面的 < > 是 marked 转义过的实体，不需要也不应该再被解析成标签。
       node.children = [{ type: 'text', text: stripAllTags(inner) } as HtmlNode]
+    } else if (name == 'a' || isInline(name) || isHeading(name)) {
+      // 行内节点必须**保留子节点结构**，不能在这里 stripAllTags 摊平：
+      // 否则 <em><strong>x</strong></em> 里的 <strong> 在解析阶段就消失了，
+      // chainClass 沿「纯行内元素链」下探时第一跳就撞上纯文本节点而 break，
+      // 内层样式静默丢失 —— 表现为 ***粗斜体*** 只剩斜体（见 chainClass 的注释）。
+      // 文本仍由 flatText 递归摊平取得，所以渲染结果不变、只是树形正确了。
+      node.children = parseHtml(inner)
     } else if (name == 'p' || name == 'div' || name == 'section' || name == 'blockquote' || name == 'li' || name == 'article' || name == 'aside' || name == 'header' || name == 'footer' || name == 'nav' || name == 'main') {
       node.children = parseHtml(inner)
       node.name = 'div'
@@ -389,4 +649,41 @@ defineExpose({
 <style>
 ._mp_root { padding: 1px 0; }
 .mp-a { color: #366092; }
+/*
+  行内样式一律写成静态 class，动态 `:style` 只留字号。
+
+  ⚠️ 这是**风格统一**，不是某个 bug 的修复 —— 别被注释误导：
+  曾以为「动态 `:style` 里的 `font-weight` 在 App 端不生效」（关键字 `bold` 与数值 `700` 都试过），
+  后用真机对照证伪：静态 class、动态 `:style` 的 `700`、动态 `:style` 的 `bold`，
+  **四种写法都同样能显示为粗体**。`***粗斜体***` 看不出加粗的真因是嵌套行内样式被摊平
+  （见上面第 7 条的 chainClass），与 `font-weight` 的写法无关。
+  详见 unibestX-skill 1.2.16（已记为一则反面教材）。
+
+  之所以仍然全部走 class：与 1.2.13（动态 `:style` 里的 `em` 字号塌成 0）、
+  1.2.14（`text-decoration` 简写被整个忽略）保持同一种防御姿态 ——
+  **动态样式串里的值，构建期是看不见的**，写成静态 class 至少能在构建期被 CSS 校验兜住。
+*/
+.mp-b { font-weight: 700; }
+.mp-i { font-style: italic; }
+.mp-u { text-decoration-line: underline; }
+.mp-del { text-decoration-line: line-through; }
+.mp-code { font-family: monospace; background-color: #f1f5f9; }
+.mp-mark { background-color: #ffff00; }
+/* 字号一律 px，不用 em/smaller 这类相对单位，见 1.2.13 */
+/* 上下标：vertical-align 原生端不支持（编译期只吐 [plugin:uni:app-uvue-css] 警告、
+   样式静默失效，见 skill 1.2.18），故只在 Web 保留；原生端仅剩 font-size 的小号效果。 */
+.mp-sub {
+  font-size: 12px;
+  /* #ifdef WEB */
+  vertical-align: sub;
+  /* #endif */
+}
+.mp-sup {
+  font-size: 12px;
+  /* #ifdef WEB */
+  vertical-align: super;
+  /* #endif */
+}
+.mp-small { font-size: 13px; }
+.mp-big { font-size: 19px; }
 </style>

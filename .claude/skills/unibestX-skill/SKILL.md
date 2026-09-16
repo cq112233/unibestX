@@ -7,17 +7,19 @@ description: Use when developing, compiling, refactoring, or troubleshooting uni
 
 ## 概述
 
-> 🚨 **AI / Agent 必读铁律**：所有参与本项目开发的 AI、Agent 在进行任何编码、重构、修 bug 或新增页面任务前，**必须首先完整阅读并严格遵循本 Skill**。  
-> 🔄 **VDOM 与 Vapor 差异自动回写机制**：若在开发或排错过程中，遇到任何 UTS 语法、组件属性、生命周期、CSS 样式在 **VDOM 模式与 Vapor 模式不通用 / 存在渲染差异** 的问题，AI / Agent **必须主动根据分类（1.1 语法规范、1.2 样式限制、1.3 运行时约束、3.3 对照表及 3.4 红线清单）自动追加并同步到本 Skill**，严禁遗漏！
+> 🚨 **AI / Agent 必读铁律**：所有参与本项目开发的 AI、Agent 在进行任何编码、重构、修 bug 或新增页面任务前，**必须首先完整阅读本文件，并按其命中的分册继续 Read 对应参考文件**。只看本文件（入口）而不读分册就动手，视为未遵守本 Skill。
+> 🔄 **VDOM 与 Vapor 差异自动回写机制**：若在开发或排错过程中，遇到任何 UTS 语法、组件属性、生命周期、CSS 样式在 **VDOM 模式与 Vapor 模式不通用 / 存在渲染差异** 的问题，AI / Agent **必须主动按四维分类追加到对应分册**（见 3.5），严禁遗漏！
 
 uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直接编译为原生代码（Android 编译为 Kotlin，iOS 插件编译为 Swift，鸿蒙插件编译为 ArkTS，Web/小程序编译为 JS）。  
 与宽容的 TypeScript/JavaScript 不同，UTS 采用**名义强类型系统（Nominal Strong Typing）**与**原生渲染规范**。
 
-本文档按照以下三大维度结构化组织：
+本文档按五大维度组织，采用 **「1 个入口 + 7 个分册」** 结构：
 
-1. **UTS 与原生规范**：语法、严格类型、CSS / Tailwind 样式引擎限制与跨端运行时铁律；
-2. **项目正确案例**：来自本项目的生产级标杆案例（页面骨架、TabBar、二级详情页、滚动与下拉刷新）；
-3. **项目代码生成规范**：智能体与开发者新增页面、生成组件、调用组件库的流程、模板与红线自检清单。
+1. **UTS 与原生规范**：语法与严格类型（分册 1.1）、CSS / Tailwind 样式引擎限制（分册 1.2）、跨端运行时铁律（分册 1.3）；
+2. **项目正确案例**：来自本项目的生产级标杆案例（分册 2）——页面骨架、TabBar、二级详情页、滚动与下拉刷新；
+3. **项目代码生成规范**：生成流程与模板（分册 3）、本文件常驻的 3.3 对照表与 3.4 红线清单、回写维护机制（分册 3 的 3.5）；
+4. **项目内置工具库**：`src/utils/` 下 10 个现成模块的 API 与用法（分册 4）——**动手造轮子前先查这里**；
+5. **页面与应用基础设施**：`src/http/`（请求与流式）、`src/router/`（路由拦截）、`src/layouts/`（页面布局）、`src/i18n/`（语言装配）四套配置与装配层（分册 5）——**定策略 / 选骨架 / 改配置前先查这里**。
 
 ---
 
@@ -32,762 +34,30 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 
 ---
 
-## 一、UTS 核心规范与原生渲染限制
+## 文档结构（分册导航 —— 命中即必须 Read）
 
-### 1.1 UTS 强类型系统与语法核心铁律
+> ⚠️ **本 Skill 为分册式组织：下表的 7 个分册文件不会自动加载**，需要时用 Read 工具打开。
+> **硬性要求**：对照表（3.3）或红线清单（3.4）命中某条时，**必须打开其标注的分册核对完整正反例与实测结论**，不得只凭本文件的一行结论就改代码 —— 每条铁律的「为什么会炸」「反例长什么样」都在分册里。
 
-#### 1.1.1 一律禁止使用 `interface`，全面统一使用 `type`
+| 分册文件 | 收录内容 | 何时 Read |
+| :--- | :--- | :--- |
+| [references/1.1-uts-syntax.md](references/1.1-uts-syntax.md) | **1.1 UTS 强类型系统与语法核心铁律**（19 条） | 定义对象结构与类型标注、写 `export` / `class` / 闭包 / 定时器回调 / 集合遍历；遇 `UTS110111163`、`UTS110111119`、`UTS110111120`、`error1`、`error17`、`error18`、`NoSuchMethodError` |
+| [references/1.2-styling.md](references/1.2-styling.md) | **1.2 样式 (CSS & Tailwind) 与原生渲染铁律**（18 条） | 写 `.scss` / Tailwind 工具类；处理按钮与文本排版、安全区、高度单位、阴影边框、字号字重、行内嵌套样式、样式不生效或表现不一致 |
+| [references/1.3-runtime.md](references/1.3-runtime.md) | **1.3 跨端运行时与渲染模式约束**（20 条） | VDOM / Android VDOM / Vapor 差异、多平台门面分流与条件编译、UTS 插件与自定义基座、Markdown 渲染、真机与 Kotlin 报错、编译验证命令选择 |
+| [references/2-examples.md](references/2-examples.md) | **二、项目正确案例**（5 个生产级标杆案例） | 新建页面、搭「上固定 + 下滚动」骨架、算可用高度、写 TabBar 页与下拉刷新、写二级 / 子包页、用 Easycom 引组件 —— **优先照抄，不要自创结构** |
+| [references/3-codegen.md](references/3-codegen.md) | **3.1 新增页面生成流程**、**3.2 页面代码标准模板**、**3.5 VDOM/Vapor 差异回写维护机制** | 生成新页面 / 组件前走流程、需要复制标准页面模板、需要按四维分类回写本 Skill |
+| [references/4-utils.md](references/4-utils.md) | **四、项目内置工具库**（`src/utils/` 10 个模块：route / theme / env / i18n / toast / backPress / refresh / upload / systemInfo / rxjs-lite） | **动手实现任何通用能力前先查这里**：取路由与路径、取主题色、读环境变量、多语言、提示弹窗、返回键接管、下拉刷新与导航栏控制、文件上传、系统与安全区尺寸、防抖节流与流式处理 |
+| [references/5-infra.md](references/5-infra.md) | **五、页面与应用基础设施**：5.1 请求（http/request）、5.2 流式请求（http/stream）、5.3 路由与拦截器（router）、5.4 页面布局（layouts）、5.5 国际化配置（i18n） | 发起接口请求 / 处理错误与 401、做 SSE 打字机输出、改登录拦截与登录策略、**选 `layout` 或配 `definePage` 导航栏字段**、增改多语言文案与语言包 |
 
-- **错误码**：`UTS110111163: Object literals only support object types defined by construction type, and do not support interfaces`
-- **底层原理**：UTS 将 `interface` 严格映射为底层面向对象纯接口，禁止将对象字面量（如 `{ name: 'foo' }`）、Mock 数据或 API 返回值赋值给 `interface`。
-- **强制规范**：定义任何对象结构、状态、参数或返回值类型时，**一律禁止使用 `interface`，全部统一使用 `type`（类型别名）**。
-
-```ts
-// ❌ 错误：触发 UTS110111163 编译崩溃
-interface UserInfo {
-  name: string
-  age: number
-}
-const user: UserInfo = { name: "Tom", age: 18 }
-
-// ✅ 正确：统一使用 type
-type UserInfo = {
-  name: string
-  age: number
-}
-const user: UserInfo = { name: "Tom", age: 18 }
-```
-
-#### 1.1.2 不支持 `undefined`，必须初始化为 `null`
-
-- **错误码**：`UTS110111119`
-- **规范**：UTS 语言不支持 `undefined`。所有变量必须被初始化；表示空值必须使用 `null`，且联合类型目前**仅支持与 `null` 的联合**（`Type | null`）。
-
-```ts
-// ❌ 错误
-let value: string | undefined
-function test(param?: string): void {}
-
-// ✅ 正确
-let value: string | null = null
-function test(param: string | null): void {}
-```
-
-#### 1.1.3 条件语句必须为显式布尔表达式
-
-- **错误码**：`UTS110111120`
-- **规范**：严禁使用 JS 中的 truthy / falsy 隐式转换（如 `if (str)` 或 `arr || []`），必须显式与 `null`、空字符串或数值进行布尔比较。
-
-```ts
-// ❌ 错误
-if (obj) {}
-if (str) {}
-const list = arr || []
-
-// ✅ 正确
-if (obj != null) {}
-if (str != null && str != "") {}
-const list = arr != null ? arr : []
-```
-
-#### 1.1.4 等值比较使用 `==` / `!=`，禁止对基础类型使用 `===` / `!==`
-
-- **底层原理**：在 Kotlin (Android) 原生端，`===` 会编译为引用/身份比较（Identity Equality）。对于字符串，比较的是内存地址而非文本内容；对于数值/布尔值，隐式装箱（Implicit Boxing）会导致不同包装对象的引用比较返回 `false`。
-- **规范**：对 `string`、`number`、`boolean` 一律使用值比较运算符 `==` 和 `!=`。
-
-```ts
-// ❌ 错误：在 Android 原生端即使内容相同也可能判断为 false
-if (statusCode === 200) {}
-if (routePath === '/home') {}
-
-// ✅ 正确：安全的值比较
-if (statusCode == 200) {}
-if (routePath == '/home') {}
-```
-
-#### 1.1.5 数字与数组必须显式声明类型
-
-- **规范**：除 `string` 和 `boolean` 可以依据字面量可靠推导外，**`number` 和 `Array` 必须显式注明类型**，避免不同原生平台（如 Kotlin Int/Double 差异）下的推导歧义。
-
-```ts
-// ❌ 错误
-let count = 0
-let list = []
-
-// ✅ 正确
-let count: number = 0
-let list: Array<string> = []
-// 或
-let list: string[] = []
-```
-
-#### 1.1.6 函数参数、返回值类型与安全调用运算符 `?.`
-
-- **规范**：所有函数参数及返回值必须显式声明类型；无返回值函数必须明确声明为 `:void`。对可空类型调用属性或方法时必须使用安全调用运算符 `?.`。
-
-```ts
-// ❌ 错误
-function calculate(score) {
-  return score * 2
-}
-
-// ✅ 正确
-function calculate(score: number): number {
-  return score * 2
-}
-function getLength(str: string | null): number {
-  return str?.length ?? 0
-}
-```
-
-#### 1.1.7 类型定义必须在文件顶层作用域
-
-- **错误码**：`UTS100006`（type）、`UTS110111166`（interface）
-- **规范**：`type` 严禁声明在函数或代码块内部，必须提取到文件最顶层作用域。
-
-#### 1.1.8 作用域插槽解构变量推断为 `Any?`
-
-- **错误码**：`error17: 参数类型不匹配：实际类型为 'Any?'，预期类型为 'UTSJSONObject'`
-- **规范**：在 `.uvue` 模板中，作用域插槽（如 `#default="{ item, index }"`）解构出的属性会被推导为 `Any?`。传参给强类型函数时必须在模板调用点显式使用 `as` 进行类型断言收窄。
-
-```html
-<!-- ❌ 错误：item 为 Any?，导致编译失败 -->
-<text>{{ formatItem(item) }}</text>
-<text>{{ index + 1 }}</text>
-
-<!-- ✅ 正确：在模板调用点显式断言 -->
-<text>{{ formatItem(item as UTSJSONObject) }}</text>
-<text>{{ (index as number) + 1 }}</text>
-```
-
-#### 1.1.9 Class 语法使用约束
-
-- **私有属性**：禁止使用 `#prop`，统一使用 `private prop` (`UTS110111128`)。
-- **下标访问**：Class 实例禁止 `obj[key]` 下标访问，必须用点操作符 `obj.prop` (`UTS110111129`)。
-- **静态初始化**：禁止静态块 `static {}`，使用私有静态方法 `private static initData()` 初始化 (`UTS110111130`)。
-- **继承要求**：子类继承必须显式声明 `constructor()` 并调用 `super()` (`UTS110111131`)。
-- **禁止传递 Class**：Class 仅作为类型使用，禁止赋值给变量或作为普通对象传递，需使用工厂函数 (`UTS110111151`)。
-
-#### 1.1.10 严禁在对象字面量（UTSJSONObject）中放入顶层函数作为聚合对象导出
-
-- **报错现象**：Android (Kotlin) 编译失败，报错：`error: Function invocation 'xxx()' expected. at src/utils/xxx.uts`
-- **底层原理**：UTS 在 Android 端将对象字面量 `{ getApiBaseUrl }` 编译为 Kotlin 的 `_uO("getApiBaseUrl" to getApiBaseUrl)`。在 Kotlin 语法中，顶层函数名 `getApiBaseUrl` 不能作为裸值赋值给键值对，编译器会强行要求函数调用 `getApiBaseUrl()`；且 `UTSJSONObject` 在强类型原生端无法动态调用方法。
-- **强制规范**：
-  1. 所有工具库必须使用标准 ES 模块具名函数导出：`export function getApiBaseUrl(): string { ... }`；
-  2. 业务方统一按需具名解构导入：`import { getApiBaseUrl } from '@/src/utils/env.uts'`；
-  3. **一律严禁**写出如 `export const env = { getApiBaseUrl, ... }` 或 `export default { ... }` 这种包裹函数的对象字面量导出。
-
-#### 1.1.11 严禁顶层函数与同名属性采用 Getter 命名冲突（Kotlin 平台声明冲突导致 NoSuchMethodError）
-
-- **报错现象**：Android 运行时崩溃：`error: java.lang.NoSuchMethodError: No static method getWindowHeight()Lio/dcloud/uniapp/vue/ComputedRef; in class Luni/.../IndexKt;`
-- **底层原理**：在 Kotlin 原生编译中，包顶层属性 `val windowHeight = computed(...)` 会被 Kotlin 编译器自动生成静态 getter：`public static final ComputedRef getWindowHeight()`。若同文件在顶层还显式导出了同名顶层函数 `export function getWindowHeight(): number`，在 JVM 字节码层面上会产生方法签名冲突（Platform Declaration Clash），函数的返回类型覆盖挤占了响应式属性的 getter。当 Vue 模板在执行 `{{ windowHeight }}` 时，因找不到匹配的 getter 而在运行时直接崩溃。
-- **强制规范**：
-  1. 顶层若已导出属性 `export const windowHeight = computed(...)`，**严禁在顶层额外导出 `export function getWindowHeight()`**；
-  2. 若需面向对象风格的调用，封装在独立 class 的实例方法中（如 `systemUtils.getWindowHeight()`），因为类实例方法编译为类成员虚拟方法，绝不会干扰包顶层的静态方法签名。
+> 📌 **3.3 快速排查对照表**与 **3.4 代码生成红线清单** 因使用频率最高，常驻在本文件下方，无需额外 Read。
 
 ---
 
-### 1.2 样式 (CSS & Tailwind CSS) 与原生渲染铁律
-
-#### 1.2.1 CSS 变量动态换肤与原生控件限制
-
-- **根节点绑定**：为了保证 App 原生平台下 CSS 变量跟随 JS 变量动态更新，**必须在根元素（如 layout 根 `view`）上内联绑定该变量**：
-
-  ```html
-  <view :style="{ '--theme-color': appStore.state.theme }">
-    <slot></slot>
-  </view>
-  ```
-
-- **iOS 原生控件换肤限制**：对于底层映射为系统原生控件的元素（如 iOS `<button>` 映射为原生 `UIButton`），原生控件无法自动继承重绘 CSS 变量。
-  - **正确做法**：在 `<button>` 等原生控件上，通过 Vue 响应式行内样式直接绑定具体变量值：
-
-    ```html
-    <button :style="{ backgroundColor: appStore.state.theme }">按钮</button>
-    ```
-
-#### 1.2.2 原生 `<button>` 布局对齐限制
-
-- **铁律**：**禁止**在原生 `<button>` 元素上直接使用 flex 布局对齐类名（如 `items-center`、`justify-center`、`justify-content`、`align-items`）。原生平台的 `<button>` 仅作为文本控件实现。
-- **正确做法**：使用 `<view>` 作为外层 Flex 容器进行排版，内层使用普通文本或自定义组件：
-
-  ```html
-  <!-- ❌ 错误：触发编译报错 style property justify-content|align-items is only supported on view... -->
-  <button class="flex flex-row items-center justify-center">按钮</button>
-
-  <!-- ✅ 正确：用 view 容器做 Flex 居中排版 -->
-  <view class="w-full h-[36px] rounded-[8px] bg-primary flex flex-row items-center justify-center">
-    <text class="text-[#ffffff] text-[14px] font-medium">确认提交</text>
-  </view>
-  ```
-
-#### 1.2.3 `color` 属性仅支持特定文本元素
-
-- **铁律**：原生平台中 `color` 属性（Tailwind 的 `text-[#1e293b]`、`text-primary`）**仅支持在 `<text>`, `<button>`, `<input>`, `<textarea>`** 元素上使用。**禁止**在 `<view>` 上直接挂载文字颜色类名，否则编译报错：`style property color is only supported on <text>|<button>|<input>|<textarea>`。
-- **正确做法**：将文字颜色类名挂载到内部的 `<text>` 标签上：
-
-  ```html
-  <!-- ❌ 错误 -->
-  <view class="text-[#334155]">
-    <text>内容</text>
-  </view>
-
-  <!-- ✅ 正确 -->
-  <view>
-    <text class="text-[#334155] text-[14px]">内容</text>
-  </view>
-  ```
-
-#### 1.2.4 `<text>` 元素只能包含单个文本节点
-
-- **铁律**：uni-app X 原生渲染引擎要求**一个 `<text>` 元素内部只能包含一个纯文本节点**。严禁在 `<text>` 内混合「裸文本 + 嵌套 `<text>` + 裸文本」，否则编译报错：`A <text> element can only contain one text node`。
-- **正确做法**：内联多色/高亮文本排版，使用外层 `flex flex-row flex-wrap` 容器包裹多个同级的兄弟 `<text>`：
-
-  ```html
-  <!-- ❌ 错误 -->
-  <text class="text-[13px] text-[#475569]">
-    根容器 <text class="text-[#1d4ed8]">view</text> 撑满高度
-  </text>
-
-  <!-- ✅ 正确：兄弟 text 节点组合 -->
-  <view class="flex flex-row flex-wrap items-center">
-    <text class="text-[13px] text-[#475569]">根容器 </text>
-    <text class="text-[13px] text-[#1d4ed8]">view</text>
-    <text class="text-[13px] text-[#475569]"> 撑满高度</text>
-  </view>
-  ```
-
-#### 1.2.5 颜色值一律强制十六进制，严禁使用英文命名颜色
-
-- **铁律**：**颜色必须全部统一使用标准十六进制色值（如 `#ffffff`、`#ef4444`、`#1e293b`），严禁使用英文单词命名颜色（如 `bg-[red]`、`text-[red]`、`border-[blue]`）**。
-- **原因**：原生平台对 CSS 命名颜色的解析不一致，极易失效；且预设类名（如 `text-white`）在鸿蒙 VDOM 或作用域插槽中可能丢失 CSS 变量继承退化为黑色。
-- **鸿蒙 VDOM 白色双重防护**：在插槽（slot）、下拉刷新、悬浮按钮等容器内的白色文字，强烈建议使用 `class="text-[#ffffff]"` 并叠加内联样式 `:style="{ color: '#ffffff' }"` 确保 100% 稳定呈现白色。
-
-```html
-<!-- ❌ 错误：使用英文命名颜色 -->
-<view class="bg-[red] p-[10px]">
-  <text class="text-[white]">提示</text>
-</view>
-
-<!-- ✅ 正确：全部标准十六进制 + 关键白色双重防护 -->
-<view class="bg-[#ef4444] p-[10px]">
-  <text class="text-[#ffffff] text-[14px]" style="color: #ffffff;">提示</text>
-</view>
-```
-
-#### 1.2.6 Tailwind CSS 边框书写规范
-
-- **规范**：原生平台解析器要求明确指定边框宽度、颜色与实线样式，推荐使用带明确属性的组合类名：
-
-  ```html
-  <view class="border-[1px] border-solid border-[#e2e8f0] rounded-[12px] p-[16px]"></view>
-  ```
-
-#### 1.2.7 禁用字体族工具类
-
-- **铁律**：**严禁**使用 `font-mono`、`font-sans`、`font-serif` 等字体族工具类。这些类生成的 CSS 会被原生平台的严格解析器当作 `font` 简写属性处理，因缺少 `font-size` 报错：`[parse-css-font] Missing required font-size.`。
-- **正确做法**：通过内联样式指定字体族：
-
-  ```html
-  <text class="text-[13px] text-[#334155]" style="font-family: monospace;">127.0.0.1</text>
-  ```
-
-#### 1.2.8 原生平台 Display / Align-Items / Position 限制
-
-- **Display 限制**：原生平台仅支持 `display: flex` 和 `display: none`。**严禁**使用 `display: grid` 或 `inline-block`。
-- **Align-Items 限制**：原生平台仅支持 `center`、`flex-start`、`flex-end`、`stretch`。**严禁使用 `items-baseline` (`align-items: baseline`)**，否则编译报错：`property value baseline is not supported for align-items`。需对齐底部时使用 `items-end` 或 `items-center` 配合微调。
-- **Position 限制**：原生平台仅支持 `relative`、`absolute`、`fixed`，**不支持 `position: sticky`**。
-- **布局推荐 Flex 类名**：`flex flex-row`、`flex-col`、`flex-1`、`items-center`、`justify-between`、`justify-center`。
-
-#### 1.2.9 高度单位与 Flex 布局子元素高度塌陷
-
-- **视口单位限制**：原生平台不支持 `vh`、`vw`，高度仅支持数字、px、百分比或 `auto`。
-- **Flex 子元素塌陷陷阱**：在 Flex 布局中，如果父元素是通过 `flex-1` 撑开剩余空间而无固定像素高度，子元素设置 `h-full` (100%) 在原生底层会被解析为 `0`（`100% * auto(0) = 0`），导致内容完全空白消失。
-- **解决方案**：子元素也直接使用 `flex-1` 占满剩余空间。
-
-#### 1.2.10 模板 Void 元素自闭合规范
-
-- 在 `.uvue` 模板中，HTML Void 元素（如 `<input />`、`<image />`）必须显式自闭合，否则报错 `Element is missing end tag`。
-
-#### 1.2.11 阴影使用限制（严禁过度依赖阴影）
-
-- **铁律**：**严禁过度依赖阴影（`box-shadow` 或 Tailwind `shadow-*` 类名）**。
-- **原因**：在安卓原生端，**VDOM 渲染模式与 Vapor 模式对阴影的底层渲染机制存在明显差异**（如 Elevation 高度映射、扩散模糊度与裁切表现不一致），极易导致同一界面在不同编译模式或不同安卓基座版本下显示效果不一致，甚至可能导致部分卡片边缘渲染异常或掉帧。
-- **正确做法**：界面层级与卡片质感优先采用**浅色细腻边框**（如 `border-[1px] border-solid border-[#e2e8f0]` 或 `border-[#f1f5f9]`）结合**浅色背景微反差**（如 `bg-[#f8fafc]`、`bg-[#ffffff]`）进行区分。若确需投影，仅可使用极其轻微的弱阴影，避免深重大面积阴影。
-
----
-
-### 1.3 跨端运行时与渲染模式约束
-
-#### 1.3.1 `Map` 转 `UTSJSONObject` 的 ClassCastException 与 `:style` 类型安全
-
-- **ClassCastException 陷阱**：在 Android (Kotlin) 端，从 Vue props 或动态对象传递过来的样式/属性在底层是 Kotlin `LinkedHashMap`，而不是 `UTSJSONObject`。如果直接执行 `as UTSJSONObject` 会触发运行时崩溃：`java.lang.ClassCastException: LinkedHashMap cannot be cast to UTSJSONObject`。
-- **Nullable 编译报错**：模板中通过下标访问 `parentData['styleKey']` 返回的是 `Any?`，若直接赋给 `:style` 会报：`参数类型不匹配：实际类型为 'Any?'，预期类型为 'Any'`。
-- **通用解决方案**：使用 `?? {}` 空兜底并强转为 `as any`：
-
-  ```html
-  <view :style="(parentData['labelStyle'] ?? {}) as any"></view>
-  ```
-
-#### 1.3.2 Options API 组件方法名与自定义事件同名冲突
-
-- **陷阱**：在 Options API 组件中，若局部方法与声明的 `emits` 事件同名（如模板中 `@change="change"` 且在 `methods` 中声明 `change(e)`），Android 编译器会将方法解析为事件回调属性而非实例方法，导致事件处理函数无法被触发。
-- **解决规范**：重命名局部方法加前缀区分，如 `keyboardChange`、`onSelectorChange`。
-
-#### 1.3.3 键盘高度变化事件类型声明
-
-- **规范**：监听 `@keyboardheightchange` 事件时，事件回调的入参类型必须声明为 `UniInputKeyboardHeightChangeEvent`，严禁声明为 `UniInputKeyboardHeightChangeEventDetail`（否则 Android 端会发生 ClassCastException 崩溃）。
-
-  ```uts
-  function onKeyboardHeightChange(event: UniInputKeyboardHeightChangeEvent): void {
-    const height: number = event.detail.height;
-  }
-  ```
-
-#### 1.3.4 VDOM / Android VDOM / Vapor 渲染模式与编译兼容避坑
-
-- **渲染模式判断**：使用条件编译 `#ifdef VUE3-VAPOR` / `#ifndef VUE3-VAPOR`，禁止依赖运行时环境变量或读取 manifest：
-
-  ```ts
-  export function isVaporMode(): boolean {
-    // #ifdef VUE3-VAPOR
-    return true;
-    // #endif
-    // #ifndef VUE3-VAPOR
-    return false;
-    // #endif
-  }
-  ```
-
-- **TabBar `midButton1` 命名**：原生 `midButton` 在 Vapor / 小程序 / 鸿蒙端不可用，统一使用 `midButton1`，并在 `TabBarConfig` type 中显式声明 `midButton1?: TabBarMidButton`。
-- **动态读取类型未声明但运行时存在的属性**：禁止 `(obj as any).field` 点操作（触发 `error18 找不到名称`），改用 `UTSJSONObject.getString('field')`：
-
-  ```ts
-  const sysInfo = uni.getSystemInfoSync() as UTSJSONObject;
-  const compilerVer: string = sysInfo.getString('uniCompileVersion') ?? '';
-  ```
-
-- **可空对象属性运算**：禁止对可空属性直接做算术运算（触发 `Operator call is prohibited on a nullable receiver`）。先解构出局部非空变量再运算：
-
-  ```ts
-  const ah: number = systemInfo.value?.availableHeight ?? 0;
-  const total: number = ah > 0 ? ah + TABBAR_BASE_HEIGHT : 0;
-  ```
-
----
-
-## 二、项目正确案例
-
-以下案例均源自 unibestX 本地工程中已验证、可直接编译运行的真实生产级代码。
-
-### 2.1 标杆案例 1：标准“上固定 + 下滚动”骨架与可用高度
-
-> 真实参考源：[src/sub/layoutDemo/layoutDemo.uvue](file:///Users/chenqi/Desktop/unibestX/src/sub/layoutDemo/layoutDemo.uvue)
-
-**设计要点**：
-
-- 页面根容器为 `view` + `flex flex-col flex-1`，自动撑满可用高度；
-- 严禁以 `scroll-view` 作为页面根，避免与 `navbar` 布局外层滚动容器发生手势冲突；
-- 顶部固定说明卡片拥有天然高度，不随列表滚动；
-- 内部自写 `<scroll-view>` 挂载 `flex-1 flex flex-col` 弹性撑满剩余空间，并通过 `@scroll` 与 `@scrolltolower` 独立响应滚动与触底；
-- 可用视口高度直接通过 `computedAvailableHeight` 消费框架系统变量。
-
-```html
-<template>
-  <!-- 1. 页面根容器：普通 view + flex-1，撑满开发高度 -->
-  <view class="flex flex-col items-center px-[16px] pt-[8px]">
-
-    <!-- 2. 顶部固定说明区（各自天然高度，不随列表滚动） -->
-    <view class="w-full mb-[16px]" :style="{ maxWidth: '520px' }">
-      <view class="w-full bg-white rounded-[12px] p-[16px] flex flex-col">
-        <view class="flex-row items-center mb-[10px]">
-          <view class="w-[6px] h-[16px] rounded-[3px] bg-[#3b82f6] mr-[8px]" />
-          <text class="text-[16px] font-bold text-[#1e293b]">布局骨架演示</text>
-        </view>
-        <text class="text-[13px] text-[#64748b] leading-[19px]">
-          根容器用 view + flex-1，滚动区域在内部自写 scroll-view，内容高度直接用 computedAvailableHeight。
-        </text>
-      </view>
-    </view>
-
-    <!-- 3. 内部自写 scroll-view：弹性占满剩余视口 -->
-    <scroll-view
-      direction="vertical"
-      class="w-full flex flex-col flex-1"
-      :style="{ maxWidth: '520px' }"
-      :lower-threshold="50"
-      @scroll="handleScroll"
-      @scrolltolower="handleScrollToLower"
-    >
-      <view class="flex flex-col">
-        <!-- 滚动内容列表项 -->
-        <view
-          v-for="(item, index) in demoItems"
-          :key="index"
-          class="w-full bg-white rounded-[12px] p-[16px] mb-[12px] flex flex-col"
-        >
-          <text class="text-[15px] font-semibold text-[#1e293b]">{{ item.title }}</text>
-          <text class="text-[13px] text-[#475569] leading-[19px] mt-[4px]">{{ item.desc }}</text>
-        </view>
-
-        <view class="flex-col items-center py-[16px]">
-          <text class="text-[12px] text-[#94a3b8]">已触底 {{ reachBottomCount }} 次 · 内容结束</text>
-        </view>
-      </view>
-    </scroll-view>
-
-  </view>
-</template>
-
-<script setup lang="uts">
-import { computed, ref } from 'vue';
-import { availableHeight } from '@/src/utils/systemInfo.uts';
-
-definePage({
-  layout: 'navbar',
-  showBack: true,
-  hideNavbar: false,
-  enablePullDownRefresh: false,
-  style: {
-    navigationBarTitleText: '布局页面示例',
-    navigationStyle: 'custom'
-  }
-});
-
-/**
- * 开发者可用视口高度（框架已扣除状态栏、导航栏、底部 TabBar，navbar / default 通用）
- */
-const computedAvailableHeight = computed<number>((): number => availableHeight.value ?? 0);
-
-type DemoItem = {
-  title: string;
-  desc: string;
-};
-
-const demoItems: Array<DemoItem> = [
-  { title: '规则 1', desc: '根容器用 view，禁止用 scroll-view 当根' },
-  { title: '规则 2', desc: '要滚动的区域在根内自写 scroll-view' },
-  { title: '规则 3', desc: '内容高度直接使用 computedAvailableHeight' }
-];
-
-const scrollTop = ref<number>(0);
-const reachBottomCount = ref<number>(0);
-
-function handleScroll(e: UniScrollEvent): void {
-  scrollTop.value = Math.ceil(e.detail.scrollTop);
-}
-
-function handleScrollToLower(): void {
-  reachBottomCount.value++;
-}
-</script>
-```
-
----
-
-### 2.2 标杆案例 2：主包 TabBar 页面与自定义平滑下拉刷新
-
-> 真实参考源：[src/pages/basic/basic.uvue](file:///Users/chenqi/Desktop/unibestX/src/pages/basic/basic.uvue) / [src/pages/index/index.uvue](file:///Users/chenqi/Desktop/unibestX/src/pages/index/index.uvue)
-
-**设计要点**：
-
-- `definePage` 中 `showBack: false`（主 TabBar 页面无需返回箭头）；
-- 顶层配置 `enablePullDownRefresh: true` 开启自定义平滑下拉刷新；
-- 统一从 `@/src/utils/refresh.uts` 引入 `onNavbarPullDownRefresh` 与 `stopNavbarPullDownRefresh`；
-- （仅限首页配置 `type: 'home'`，其余 TabBar 页面不填）。
-
-```uts
-<script setup lang="uts">
-import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/utils/refresh.uts';
-
-definePage({
-  layout: 'navbar',
-  showBack: false, // 👈 TabBar 页面不展示返回箭头
-  hideNavbar: false,
-  enablePullDownRefresh: true, // 👈 顶层开启由 navbar 驱动的自定义下拉刷新
-  style: {
-    navigationBarTitleText: '基础功能',
-    navigationStyle: 'custom'
-  }
-});
-
-onNavbarPullDownRefresh(() => {
-  // 1. 发起网络请求或刷新数据
-  console.log('执行 TabBar 页面刷新数据');
-
-  // 2. 数据获取完毕后手动停止刷新动画
-  setTimeout(() => {
-    stopNavbarPullDownRefresh();
-  }, 1000);
-});
-</script>
-```
-
----
-
-### 2.3 标杆案例 3：二级页面 / 子包分包页面标准实现
-
-> 真实参考源：[src/sub/time/time.uvue](file:///Users/chenqi/Desktop/unibestX/src/sub/time/time.uvue) / [src/sub/device/device.uvue](file:///Users/chenqi/Desktop/unibestX/src/sub/device/device.uvue)
-
-**设计要点**：
-
-- `definePage` 中 `showBack: true` 自动渲染返回按钮与手势返回；
-- 页面内部滚动通过自写 `scroll-view` 完成；
-- 刷新事件响应与关闭机制严密闭环。
-
-```uts
-<template>
-  <view class="flex flex-col flex-1 px-[16px] pt-[12px]">
-    <scroll-view direction="vertical" class="flex-1 flex flex-col">
-      <view class="flex flex-col">
-        <view class="bg-white rounded-[12px] p-[16px] mb-[12px]">
-          <text class="text-[14px] font-semibold text-[#1e293b]">详情页内容卡片</text>
-          <text class="text-[12px] text-[#64748b] mt-[4px]">二级页面支持点击返回导航</text>
-        </view>
-      </view>
-    </scroll-view>
-  </view>
-</template>
-
-<script setup lang="uts">
-import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/utils/refresh.uts';
-
-definePage({
-  layout: 'navbar',
-  showBack: true, // 👈 开启返回上一页按钮
-  hideNavbar: false,
-  enablePullDownRefresh: true,
-  style: {
-    navigationBarTitleText: '功能详情',
-    navigationStyle: 'custom'
-  }
-});
-
-onNavbarPullDownRefresh(() => {
-  setTimeout(() => {
-    stopNavbarPullDownRefresh();
-  }, 1000);
-});
-</script>
-```
-
----
-
-### 2.4 标杆案例 4：整页按内容高度自然滚动
-
-> 真实参考源：[src/utils/refresh.uts](file:///Users/chenqi/Desktop/unibestX/src/utils/refresh.uts)
-
-**设计要点**：
-
-- 页面根容器使用 `<view class="flex flex-col">`（**不加 `flex-1`**）；
-- 滚动完全由 `navbar` 布局的外层 `scroll-view` 容器接管；
-- 监听滚动与触底必须使用框架封装的 `onNavbarPageScroll` 与 `onNavbarReachBottom`，替代原生 `onPageScroll` / `onReachBottom`。
-
-```uts
-<script setup lang="uts">
-import { onNavbarPageScroll, onNavbarReachBottom, PageScrollDetail } from '@/src/utils/refresh.uts';
-
-definePage({
-  layout: 'navbar',
-  showBack: true,
-  hideNavbar: false,
-  enablePullDownRefresh: true,
-  style: {
-    navigationBarTitleText: '整页滚动',
-    navigationStyle: 'custom'
-  }
-});
-
-onNavbarPageScroll((e: PageScrollDetail) => {
-  console.log('整页滚动位置 scrollTop:', e.scrollTop);
-});
-
-onNavbarReachBottom(() => {
-  console.log('整页触底，触发上拉加载');
-});
-</script>
-```
-
----
-
-### 2.5 标杆案例 5：组件库 Easycom 优先导入范式
-
-> 真实参考源：[src/pages/function/views/FunctionView.uvue](file:///Users/chenqi/Desktop/unibestX/src/pages/function/views/FunctionView.uvue)
-
-**设计要点**：
-
-- 优先使用 `uni_modules` 中的成熟组件（`uni-icons`、`e-chart`、`z-paging-x`、`uni-badge-view` 等）；
-- 模板中直接以短横线形式使用组件，**严禁在 `<script>` 中手动 `import`**；
-- 避免手写繁琐的原生结构，提高跨端渲染一致性。
-
-```html
-<template>
-  <view class="flex flex-row items-center p-[12px] bg-white rounded-[8px]">
-    <!-- ✅ 直接使用 Easycom 自动导入的 uni-icons 组件，无需 import -->
-    <uni-icons type="info" size="20" color="#3b82f6" />
-    <text class="text-[14px] text-[#1e293b] ml-[8px]">组件库优先示例</text>
-  </view>
-</template>
-```
-
----
-
-## 三、项目代码生成规范
-
-当 AI 助手或开发者在项目中**创建新页面、生成新组件或修改既有业务代码**时，必须严格遵照本生成规范执行。
-
-### 3.1 新增页面的生成流程与必须要素
-
-```mermaid
-graph TD
-    A[确定页面类型] --> B{是否为 TabBar 页面?}
-    B -->|是| C1[配置 showBack: false]
-    B -->|否| C2[配置 showBack: true]
-    C1 --> D[声明 definePage 顶层 enablePullDownRefresh: true]
-    C2 --> D
-    D --> E[引入 refresh.uts 注册下拉刷新闭环]
-    E --> F[搭建页面根容器: view + flex flex-col flex-1]
-    F --> G[在内部自写 scroll-view 实现滚动]
-    G --> H[组件库优先: 引用 uni-icons 等成熟组件]
-    H --> I[红线自检: 检查 interface/undefined/color on view/过度阴影]
-```
-
-#### 必须要素清单
-
-1. **显式 `definePage` 声明**：每一个 `.uvue` 页面必须在 `<script setup lang="uts">` 最顶部显式书写 `definePage({...})`，统一使用 `navbar` 布局接管；
-2. **默认开启自定义下拉刷新**：顶层显式设置 `enablePullDownRefresh: true`，严禁在 `style` 内部开原生下拉；
-3. **闭环刷新逻辑**：引入 `onNavbarPullDownRefresh` 与 `stopNavbarPullDownRefresh`，在数据拉取结束后必须调用 `stopNavbarPullDownRefresh()`；
-4. **根容器骨架铁律**：页面根节点一律为 `<view class="flex flex-col flex-1">`，严禁使用 `<scroll-view>` 作为页面根；
-5. **滚动区域实现**：需要滚动的区域在根内自写 `<scroll-view direction="vertical" class="flex-1 flex flex-col">`；
-6. **组件库优先**：界面图标使用 `<uni-icons>`，分页列表使用 `<z-paging-x>`，折叠面板使用 `<uni-collapse-x>`，严禁手动 import easycom 范围内的组件。
-
----
-
-### 3.2 页面代码生成标准模板
-
-#### 模板 1：标准二级/子包/功能页面（常用模板，直接复制落地）
-
-```uts
-<template>
-  <!-- 页面根容器：view + flex-1 弹性撑满可用高度 -->
-  <view class="flex flex-col flex-1 px-[16px] pt-[12px]">
-
-    <!-- 顶部固定区域（可选） -->
-    <view class="w-full mb-[12px] bg-white rounded-[12px] p-[16px]">
-      <text class="text-[15px] font-semibold text-[#1e293b]">顶部标题区</text>
-      <text class="text-[12px] text-[#64748b] mt-[2px]">说明文本</text>
-    </view>
-
-    <!-- 内部自写 scroll-view 弹性占满剩余空间 -->
-    <scroll-view
-      direction="vertical"
-      class="flex-1 flex flex-col"
-      :lower-threshold="50"
-      @scroll="handleScroll"
-      @scrolltolower="handleScrollToLower"
-    >
-      <view class="flex flex-col">
-        <!-- 列表或主要内容区域 -->
-        <view
-          v-for="(item, index) in dataList"
-          :key="index"
-          class="w-full bg-white rounded-[8px] p-[12px] mb-[8px] flex flex-col"
-        >
-          <text class="text-[14px] text-[#334155]">{{ item }}</text>
-        </view>
-      </view>
-    </scroll-view>
-
-  </view>
-</template>
-
-<script setup lang="uts">
-import { ref } from 'vue';
-import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/utils/refresh.uts';
-
-// 1. 显式声明页面布局与导航栏配置
-definePage({
-  layout: 'navbar',
-  showBack: true,
-  hideNavbar: false,
-  enablePullDownRefresh: true, // 开启自定义下拉刷新
-  style: {
-    navigationBarTitleText: '页面标题',
-    navigationStyle: 'custom'
-  }
-});
-
-// 2. 状态变量显式类型声明（禁 undefined，数字/数组显式声明）
-const dataList = ref<Array<string>>(['数据项 1', '数据项 2', '数据项 3']);
-const scrollTop = ref<number>(0);
-
-// 3. 注册下拉刷新
-onNavbarPullDownRefresh(() => {
-  // 执行刷新请求
-  setTimeout(() => {
-    stopNavbarPullDownRefresh();
-  }, 1000);
-});
-
-// 4. 滚动事件监听
-function handleScroll(e: UniScrollEvent): void {
-  scrollTop.value = Math.ceil(e.detail.scrollTop);
-}
-
-function handleScrollToLower(): void {
-  console.log('触底加载更多');
-}
-</script>
-
-<style></style>
-```
-
-#### 模板 2：TabBar 主页面模板
-
-```uts
-<template>
-  <view class="flex flex-col flex-1 px-[16px] pt-[12px]">
-    <scroll-view direction="vertical" class="flex-1 flex flex-col">
-      <view class="flex flex-col">
-        <view class="bg-white rounded-[12px] p-[16px] mb-[12px]">
-          <text class="text-[16px] font-bold text-[#1e293b]">TabBar 模块标题</text>
-        </view>
-      </view>
-    </scroll-view>
-  </view>
-</template>
-
-<script setup lang="uts">
-import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/utils/refresh.uts';
-
-definePage({
-  layout: 'navbar',
-  showBack: false, // 👈 TabBar 页面无返回按钮
-  hideNavbar: false,
-  enablePullDownRefresh: true,
-  style: {
-    navigationBarTitleText: '首页模块',
-    navigationStyle: 'custom'
-  }
-});
-
-onNavbarPullDownRefresh(() => {
-  setTimeout(() => {
-    stopNavbarPullDownRefresh();
-  }, 1000);
-});
-</script>
-
-<style></style>
-```
-
----
-
-### 3.3 快速排查与对照表 (Quick Reference Matrix)
+## 3.3 快速排查与对照表 (Quick Reference Matrix)
 
 | 场景 / 报错现象 | 错误写法 | 正确规范写法 |
 | :--- | :--- | :--- |
-| **新增页面定义** | 缺少 `definePage` 或 `layout: false` | 顶部声明 `layout: 'navbar'`, `showBack`, `enablePullDownRefresh: true`, `navigationStyle: 'custom'` |
+| **新增页面定义** | 缺少 `definePage`；或把该用 navbar 的页面写成 `layout: false`（`false` 本身合法，但会连顶栏与滚动容器一起失去，见 5.4） | 顶部声明 `layout: 'navbar'` + `style.navigationStyle: 'custom'` —— **这两项硬性必需**（漏 `navigationStyle` 顶栏静默消失）；再按需补 `showBack`（默认 `true`，TabBar 页/首页写 `false`）、`enablePullDownRefresh: true`、`style.navigationBarTitleText` |
 | **页面根容器** | 根用 `<scroll-view>` 导致双重滚动冲突 | 根用 `<view class="flex flex-col flex-1">`，内部需要滚动自写 `<scroll-view>` |
 | **可用视口高度** | 手写 `100vh` 或手算状态栏/TabBar | 直接使用 `computedAvailableHeight`（基于 `availableHeight.value ?? 0`） |
 | **对象类型定义 (`UTS110111163`)** | `interface User { id: string }` | `type User = { id: string }` |
@@ -807,10 +77,45 @@ onNavbarPullDownRefresh(() => {
 | **组件库使用** | `import UniIcons from '...'` | 无需 import，模板直接使用 `<uni-icons>` |
 | **安全区底部适配** | 内联计算 paddingBottom | `class="pb-safe"` |
 | **对象字面量包含函数导出** | `export const env = { getApiBaseUrl }`（Kotlin 编译报 `Function invocation expected`） | 统一使用标准具名函数导出 `export function getApiBaseUrl()`，使用方 `import { getApiBaseUrl }` |
+| **文档预览参数 (openDocument)** | `uni.openDocument({ showMenu: true })`（Kotlin 报错 `No parameter with name 'showMenu' found`） | 移除 `showMenu`，仅传 `filePath` 与 `fileType` |
+| **键盘全局监听解绑** | `uni.offKeyboardHeightChange(callback)`（Kotlin 报错 `预期类型为 'Number?'`） | 保存 `listenerId = uni.onKeyboardHeightChange(...)`，通过 `uni.offKeyboardHeightChange(listenerId)` 解绑 |
+| **原生回调参数访问** | `(res as UTSJSONObject).tempFiles`（Kotlin 运行时崩溃 `ChooseFileSuccess cannot be cast to UTSJSONObject`） | 直接利用原生类型推断访问 `res.tempFiles` / `res.tempFilePaths`，严禁强转 `UTSJSONObject` |
+| **多层 `export *` 重导出（`error18 找不到名称"useXxxStore"` / 运行期 `NoSuchMethodError: getUseXxxStore()`）** | 子模块 `vdom/index.uts` 与门面 `store/index.uts` 对同一符号各 `export *` 转发一次（生成 `useXxxStore__1`） | 同一顶层符号只在一层门面中 `export *`；子模块 `index.uts` 只创建并默认导出实例，严禁再转发 |
+| **App 端「某个样式看不出效果」** | 直接断定是"写法不对"就去改写法 / 改成 class（本项目曾据此误判 `font-weight`，见 1.2.16） | 先用「静态 class + 动态 `:style` 并排渲染同一行」对照：两种都无效 ⇒ 样式没到元素，往渲染架构查（1.2.15 / 1.3.9 坑 4）；只有一种无效 ⇒ 才怀疑写法（1.2.13 / 1.2.14） |
+| **行内嵌套样式丢失（`***粗斜体***` 只剩斜体）** | `:style="inlineStyle(本节点)"` + `flatText(子树)`（内层标签连样式一起被摊平丢掉） | `:class="chainClass(n)"` 沿纯行内单链累加 class（见 1.2.15 / 1.3.9 改造 7） |
+| **给渲染器新增 HTML 标签后一片空白** | 只在模板里加 `n.name == 'video'` 分支，忘了改解析器（未知标签会被兜底分支**改名成 `div`**，分支永不命中） | 解析器里在 `br/hr/img` 那组**显式接住**新标签；且因 marked 把 `<video>` 当行内标签包进 `<p>`，**顶层与嵌套两条模板分支都要写**（见 1.3.9 坑 4） |
+| **流式渲染下媒体 `src` 半截** | `<video :src="src">` 直接用流式到达的半截 URL（渲染出报错黑框） | 取值函数加完成度守卫：含 `://` 且以已知扩展名结尾才返回，否则返回 `''`（模板 `src != ''` 才渲染，见 1.3.9 坑 4） |
+| **段落里的行内片段各占一行（段落被拆行）** | 用裸 `<view>` 承载行内混排内容（原生 `view` 默认 `flex-direction:column`，行内兄弟节点被当成列项） | 行内内容容器必须显式 `flex-direction:row;flex-wrap:wrap`，或按「行内连续段」分组 / 无混排时并成单个 `<text>`（见 1.2.17） |
+| **链式累加 class 却拿不到内层样式** | 解析阶段对行内标签 `stripAllTags(inner)` 摊平（内层标签在解析期就没了，`chainClass` 第一跳即 break） | 行内节点 children 用 `parseHtml(inner)` **保留树形**；`pre` / 行内 `code` 例外（见 1.2.15） |
+| **`error18 找不到名称"stop"` 的兄弟报错 `No value passed for parameter 'runner'`** | 页面里写 `function stop()`（与本页无关，但 `@vue/reactivity` 全局就有 `stop(runner: ReactiveEffectRunner)`，页面内 `stop()` 被解析成框架那个） | 局部方法**一律加业务前缀**（`stop` → `stopStream`）；未 import 就直接用的名字都要先假定会撞框架全局（见 1.3.14） |
+| **改名后反而报 `找不到名称"stopStream"`** | 以为是自己改坏了，把名字改回去 | **这是把被掩盖的顺序错误顶出来了**：`<script setup>` 局部声明不提升，定义必须在调用点之前。改名与调整顺序**必须一起做**（见 1.3.14） |
+| **回调引用承载它的那个变量（`error18 找不到名称"timerId"`）** | `const timerId = setInterval(() => { ... clearInterval(timerId) ... })` | `let timerId: number = 0;` 先声明，再 `timerId = setInterval(...)` 赋值（局部声明在自身初始化表达式内不可见，见 1.1.14） |
+| **宣称"编译成功"却漏掉 Kotlin 报错** | 用 `launch app-android --compile true`（或 `compile app-android --file`）当 UTS 编译验证 | 必须用**不带 `--compile`** 的真机 `launch app-android`，并先 `grep -c "编译为android class" <log>` ≥ 1；两条捷径对故意写坏的代码也报"编译成功"（见 1.3.15） |
+| **真机 `IndexOutOfBoundsException` 但 H5/单测一切正常** | `const next = arr[i + 1];` 写在循环外，边界判断 `i + 1 < arr.length` 写在下一行（JS 越界给 `undefined` 且被 `&&` 短路挡住，Kotlin 直接抛） | 把边界判断与读取写进**同一个** `&&`、判断在前：`while (i + 1 < arr.length && arr[i + 1].type == 'text')`（见 1.3.16） |
+| **原生端某条 CSS 只报警告、样式却没了（如 `vertical-align`）** | 看到 `is not a standard property name (may not be supported)` 就当噪音放过（`<sub>` / `<sup>` 实际只有字号生效、没有上下标偏移） | 这类警告一律回头确认该项样式是否真的生效 —— 原生端不认的属性全是「警告 + 静默失效」，同 1.2.13 / 1.2.14（见 1.2.18） |
+| **真机 `NullPointerException: null cannot be cast to non-null type kotlin.Boolean`** | 对可能缺失的字段做非空断言 `pre: token.pre as boolean`（行内 html token 根本没给 `pre`；JS 里 `null as boolean` 是空操作，所以 H5/小程序都好） | 判空后再断言：`token.pre == null ? null : (token.pre as boolean)`（见 1.3.17） |
+| **H5 / 微信小程序没走到预期的蒸汽（Vapor）分支** | 门面只用 `#ifdef VUE3-VAPOR` 分流（该宏**只在 App 蒸汽模式**成立；且框架对 web/小程序**强制删除** `UNI_APP_X_DOM2`，所以 `manifest.json` 里写 `vapor: true` 对它们**毫无作用**，二者双双落进 VDOM 分支） | 分流条件显式并列平台：`#ifdef VUE3-VAPOR \|\| H5 \|\| WEB \|\| MP`（`MP` 覆盖全部小程序；`H5` 已蕴含 `WEB`）；注意 `#ifndef A \|\| B` 语义是 `!(A \|\| B)`（见 1.3.18） |
+| **UTS 编译抛 `Error: Unbalanced right delimiter found in string at position N`** | 在 `/** */` 块注释里写了**带斜杠前缀**的条件编译标记名（形如 `// #ifdef` / `// #endif`）—— 普通斜杠散文不会触发，只有斜杠**紧跟**标记名时才炸，极难肉眼发现 | 注释里提到这些标记只写标记本身、不带前缀斜杠；定位用报错的字符偏移直接切片看上下文（见 1.3.12） |
+| **小程序报 `[plugin:uts] "ISingleTokenRes" is not exported by ".../store/index.uts"`** | 门面 `export * from './vapor/token'` 从 **`.ts`** 文件转发纯类型（补成 `./vapor/token.ts` 也**无效**，报错一字不变） | 跨分支共享类型抽到只含 `type` 的 **`.uts`** 叶子文件（如 `src/store/types.uts`），门面**无条件** `export * from './types.uts'`，两分支实现各自 `import type` 且不再 `export type` 同名类型（见 1.3.18） |
+| **CLI 编译 mp-weixin 报 `ENOENT ... .uts2js/cache/...` 且报错文件每次都不同** | 以为是代码缺陷，改源码 / 反复 `rm -rf unpackage/cache/.mp-weixin` | 这是**开着的 HBuilderX IDE 与 CLI 抢 `unpackage/cache` 的竞态**（判据：同一份代码换次运行报错文件就变）。**同一份代码直接重试即可通过**；注意 CLI **被打断时仍返回 exit 0**，必须 `test -d unpackage/dist/dev/mp-weixin/src/store` 看产物才算数（见 1.3.18） |
+| **IDE 报 `Cannot find module '../types.uts' or its corresponding type declarations`，但构建全绿** | 当成噪音忽略 / 手工补一个声明文件 | 凡被 `.ts` / `.uvue` 以 `xxx.uts` 导入的 `.uts` 都必须有**同目录同名** `<name>.d.uts.ts`（靠 `allowArbitraryExtensions`）。跑 `node scripts/gen-uts-dts.mjs`；不在 `src/utils/*/` 下的要登记进脚本的 `EXTRA_SOURCES`（见 1.3.19） |
+| **遍历值类型为 `any` 的 Map 报 `error17`**（`实际类型为 'Function2<Any, String, Unit>'，预期类型为 'Function1<Map.Entry<String, Any?>, Unit>'`） | `query.toMap().forEach((value: any, key: string): void => {})`（给值参数显式标注 `any`） | 去掉标注写 `query.toMap().forEach((value, key) => {})`，或改用 `UTSJSONObject.keys(query)` + `query.getAny(key)`（见 1.1.15） |
+| **Kotlin 报 `Expression 'keys' of type 'MutableSet<String>' cannot be invoked as a function`** | `map.keys()`（UTS 声明里是方法，Kotlin 侧是属性） | 改用 `UTSJSONObject.keys(obj)`；只取已知键时直接 `getString` / `getAny`，不要遍历 Map（见 1.1.15） |
+| **`error18 找不到名称"someLocalFn"`，但函数就在同一个文件里** | `setTimeout(someLocalFn, 1000)`；或在对象字面量的回调里引用外层局部函数 | 包一层 lambda：`setTimeout(() => { someLocalFn(); }, 1000)`（见 1.1.16） |
+| **真机运行日志里 `编译为android class` 恒为 0，却报「编译成功」** | 把这种「编译成功」当成 UTS 已过 Kotlin 编译 | 这是 `manifest.json` 的 `vapor-render-target: "bytecode"` 让整轮跳过 Kotlin 阶段；临时删掉 `vapor` 两个键改走 VDOM 模式再验（见 1.3.20） |
+| **Kotlin 报 `error: Function type parameters cannot have modifiers.`** | 把剩余参数写进对象类型的属性：`back: (...args: Array<number>) => void` | 抽成顶层别名 `export type BackFn = (...args: Array<number>) => void;` 再 `back: BackFn`（顶层别名里写 `...args` 合法，对象类型属性里不合法，见 1.1.17） |
+| **Kotlin 报 `error1 返回类型不匹配：预期类型为 'String'，实际类型为 'String?'`** | `return decodeURIComponent(value);`（包在 `try/catch` 里也不行） | 先判空再返回：`const decoded = decodeURIComponent(value); if (decoded == null) { return value; } return decoded;`（见 1.1.18） |
+| **Kotlin 先报 `expected 'UTSPromise<Any>?', actual 'UTSPromise<AsyncApiSuccessResult>?'`，按提示改成 `any` 后又报 `expected 'Any'`** | 给 uni 跳转 API 的返回值标 `Promise<any> | null`，或听提示只写 `any` | 声明与被调用方统一写 `any | null`（UTS 泛型不协变 + `any` 是非空 Kotlin `Any`，见 1.1.19） |
+| **`layout: 'navbar'` 页面顶栏整块消失，导航栏 / 返回箭头 / 状态栏占位全没了，且不报任何错** | 只写了 `layout: 'navbar'`（`navbar.uvue` 是 `<NavBar v-if="isCustomNav">`，`isCustomNav` 只认 `pageStyle.navigationStyle == 'custom'`） | `definePage` 的 `style` 里**必须同时写 `navigationStyle: 'custom'`**；漏写时页面看起来只剩一个滚动容器（见 5.4） |
+| **请求失败的 `catch` 里取不到 `err.message`（拿到 undefined / 空）** | `catch ((err: Error) => console.log(err.message))` —— lime-request 把拦截器里抛出的 `Error` 转成了 `LimeRequestFail` **普通对象**再 reject | 读 `err.errMsg`，或 `err.cause.message`，或照 `src/sub/httpDemo/httpDemo.uvue` 做 `instanceof Error` → `instanceof UTSJSONObject` 多级兜底；**注意 5.2 流式的 `error` 反而下沉真 `Error` 实例**（见 5.1 / 5.2） |
+| **调了 `setNavbarTitle` / `setHideNavbar` / `setStatusBarVisible` 毫无反应** | 在 `layout: 'default'` 或 `layout: false` 的页面上调用（前者只监听 `stopPagePullDownRefresh`，后者连布局都没有） | 这 9 个 `set*` / `reset*` 广播**只有 `layout: 'navbar'` 监听**；要运行时可改顶栏就必须选 navbar 布局（见 5.4 / 4.7） |
+| **`uni.addInterceptor` 加了拦截器却没拦住跳转** | `invoke` 里没写 `return false`（返回 `undefined` / 不写 `return` 一律视为放行） | 只有**显式返回 `false`** 才取消本次跳转；且 `uni.addInterceptor` 是**追加**语义，注册必须收敛到 `main.uts` 一处（见 5.3） |
+| **切了语言，原生 TabBar / 当前页导航栏标题还是旧语言** | 只调了 `appStore.setLocale(lang)` 就以为完事 | 切完还要调 4.4 的 `setTabbarItem()` 刷 TabBar 文案、4.7 的 `setNavigationBarTitle()` 刷标题（见 5.5） |
 
 ---
 
-### 3.4 代码生成红线清单 (Redlines Checklist)
+## 3.4 代码生成红线清单 (Redlines Checklist)
+
 
 在生成任何 `.uvue`、`.uts` 代码并宣告完成前，必须逐条自检：
 
@@ -831,17 +136,37 @@ onNavbarPullDownRefresh(() => {
 - [ ] **15. 模板作用域插槽调用点必须显式添加 `as` 类型断言**（避免触发 `error17`）
 - [ ] **16. 组件库组件严禁在 `<script>` 中手动 import**（统一使用 easycom 短横线标签自动导入）
 - [ ] **17. 严禁导出包裹了顶层函数的对象字面量**（如 `export const env = { fn }`，会触发 Android Kotlin 编译崩溃 `Function invocation expected`，统一使用标准具名函数导出）
-
----
-
-### 3.5 VDOM 与 Vapor 差异自动分类与 Skill 维护规范
-
-所有智能体（AI / Agent）在维护和使用本项目时，必须严格执行以下闭环同步机制：
-
-1. **自动归类与写入准则**：当发现某项 UTS 语法、Vue 响应式机制、组件属性、CSS 样式或 API 在 VDOM 模式与 Vapor 模式下表现不一致或报错时，**必须立即按照以下四维分类自动追加到本 Skill**：
-   - **语法与类型层不通用**（如特定响应式解构、类型推断、事件参数）：追加到 **第一部分 1.1 语法核心铁律**；
-   - **样式与渲染层不通用**（如阴影 Elevation、特定 CSS 属性继承、边框裁切）：追加到 **第一部分 1.2 样式与原生渲染铁律**；
-   - **运行时与编译引擎不通用**（如 TabBar 配置、反射获取未声明字段、生命周期差异）：追加到 **第一部分 1.3 跨端运行时约束**；
-   - **排查表与红线同步**：同步向 **3.3 快速排查表** 追加正反例，并将硬性致命错误追加至 **3.4 红线清单**。
-2. **标杆案例持续扩充**：若在业务开发中沉淀了更好的 VDOM/Vapor 双模式通用的骨架、组件组合或页面范式，同步收录至 **第二部分 项目正确案例**。
-3. **跨端环境同步保证**：修改 `.agents/skills/unibestX-skill/SKILL.md` 时，必须同步回写更新 `.claude/skills/unibestX-skill/SKILL.md`，保证全 agent 工具链标准统一。
+- [ ] **18. 严禁在 `uni.openDocument` 中传递 `showMenu` 参数**（uni-app X 原生 Kotlin 不支持该字段，会触发编译报错 `No parameter with name 'showMenu' found`）
+- [ ] **19. 全局键盘监听解绑必须使用 `listenerId: number`**（`uni.offKeyboardHeightChange` 入参为数字 ID 而非回调函数）
+- [ ] **20. 严禁将系统 API 回调原生结果对象强转为 `UTSJSONObject`**（如 `chooseFile` 的 `res as UTSJSONObject`，会触发 Android Kotlin 运行时 `ClassCastException` 崩溃，应直接访问对象属性）
+- [ ] **21. 严禁多层 / 重复 `export *` 转发同一顶层符号**（会导致 Kotlin 端符号被改名为 `useXxxStore__1`，`.uts` 编译报 `error18 找不到名称`、`.uvue` 运行期报 `NoSuchMethodError: getUseXxxStore()`；同一符号只允许在一层门面中转发，子模块 `index.uts` 不得再整包重导出）
+- [ ] **22. 遇到「样式看不出效果」严禁先猜写法**（必须先用「静态 class + 动态 `:style` 并排渲染同一行」对照，区分"样式没到元素"与"写法不对"；本项目曾据此误判动态 `:style` 的 `font-weight`，见 1.2.16）
+- [ ] **23. 行内嵌套样式必须沿单链累加，严禁「本节点样式 + 摊平子树」**（否则 `***粗斜体***`、`~~**粗删**~~` 这类内层效果被静默丢掉，见 1.2.15）
+- [ ] **24. 给 Markdown 渲染器新增 HTML 标签时，解析器与模板（顶层 + 嵌套）必须同时改**（未知标签会被兜底分支改名成 `div`；marked 把 `<video>` 等当行内标签包进 `<p>`，只写顶层分支会渲染成空，见 1.3.9 坑 4）
+- [ ] **25. 流式渲染下的媒体 `src` 必须加完成度守卫**（半截 URL 直接喂给 `<video>` / `<image>` 会闪出报错黑框；含 `://` 且以已知扩展名结尾才返回）
+- [ ] **26. 行内混排内容严禁用裸 `<view>` 承载**（原生 `view` 默认 `flex-direction:column`，段落里的行内兄弟节点会各占一行、把段落拆开；必须显式 `flex-direction:row;flex-wrap:wrap`，见 1.2.17）
+- [ ] **27. 行内节点的子节点严禁在解析阶段摊平**（`stripAllTags(inner)` 会让内层标签在解析期消失，链式累加 class 无从下探、内层样式静默丢失；必须 `parseHtml(inner)` 保留树形，见 1.2.15）
+- [ ] **28. 渲染链路的测试必须跑「真实解析器产出的树」，严禁手搭 fixture**（本项目曾用 20/20 全绿的手搭树测试掩盖了真机上的样式丢失 —— 解析器根本不产出那种树形；并且要验证"改回旧写法测试会红"，见 1.2.15）
+- [ ] **29. `<script setup>` 里的局部方法 / 变量严禁与框架全局同名**（未 import 就直接使用的名字一律先 grep 框架 d.ts；`stop` 撞 `@vue/reactivity` 的 `stop(runner)`，且**撞名会掩盖"先调用后定义"的顺序错误**，改名后才会暴露，见 1.3.14）
+- [ ] **30. `<script setup>` 里的局部函数必须定义在所有调用点之前**（Kotlin 局部声明不提升，先调用后定义直接 `error18 找不到名称`，见 1.3.14）
+- [ ] **31. 回调体内严禁引用承载它的那个局部变量**（`const timerId = setInterval(() => clearInterval(timerId))` 必炸 `error18`；必须 `let` 先声明后赋值，`const` 做不到，见 1.1.14）
+- [ ] **32. 严禁用 `launch app-android --compile true` 或 `compile app-android --file` 充当 UTS 编译验证**（两者都**不执行**「编译为android class」，对本项目故意写坏的代码同样报"编译成功"；必须用不带 `--compile` 的真机构建，并先确认日志里 `编译为android class` 出现 ≥ 1 次，见 1.3.15）
+- [ ] **33. 数组 / 列表下标读取，边界判断必须与读取写在同一个短路表达式内、且判断在前**（严禁"先在上方或循环外读可能越界的下标，再在下方判边界"：JS 只给 `undefined` 且常被 `&&` 挡住，Kotlin 直接抛 `IndexOutOfBoundsException` —— 真机必崩而 H5 与 node 单测全绿，见 1.3.16）
+- [ ] **34. 对可能缺失的字段做 `as` 非空断言前必须先判空**（Kotlin 的 `as T` 不允许 null、直接抛 NPE，JS 侧却是空操作 ⇒ 只在真机崩；尤其构造方与消费方分离的代码，如 `Tokenizer` → `Parser`，见 1.3.17）
+- [ ] **35. 多平台门面分流严禁只用 `VUE3-VAPOR`**（该宏只代表 **App 蒸汽模式**；且框架在 `hbx/alias.js` 里对 web/小程序**强制删除** `UNI_APP_X_DOM2`，**`manifest.json` 的 `vapor: true` 对它们完全无效** —— 只按它分流会把 Web 与全部小程序错误甩进 VDOM 分支；必须并列平台：`#ifdef VUE3-VAPOR || H5 || WEB || MP`，并牢记 `#ifndef A || B` 语义是 `!(A || B)`，见 1.3.18）
+- [ ] **36. 跨分支共享的纯类型严禁放在 `.ts` 实现文件里经 `export *` 转发**（微信小程序 uts2js 链路拿不到 `.ts` 经 `export *` 转发的类型，业务侧 `import type` 直接报 `"[X]" is not exported by ".../store/index.uts"`；补 `.ts` 扩展名无效。必须抽到只含 `type` 的 `.uts` 叶子文件，由门面**无条件**转发，见 1.3.18）
+- [ ] **37. `.uts` 里 `#ifdef` / `#ifndef` / `#endif` 三个词任何时候都不要带前缀斜杠书写**（行首会当真标记、块注释里带斜杠前缀则直接抛 `Unbalanced right delimiter` 中断 UTS 编译；注释里只写标记本身，见 1.3.12）
+- [ ] **38. 带条件编译（`#ifdef` 分段）的 `.uts` 文件严禁套用「导入/导出排序」类自动格式化**（排序会跨过 `#endif` 把语句挪出条件块，导致两个平台分支的 `export *` 在**所有平台同时生效** —— 命中 `useXxxStore__1` 红线并触发 1.1.12 的 `NoSuchMethodError`；发现语句顺序异常先 `git diff` 复原，见 1.3.18）
+- [ ] **39. 新增 / 移动任何被 `.ts`、`.uvue` 导入的 `.uts` 后，必须跑一次 `node scripts/gen-uts-dts.mjs`**（缺配套 `<name>.d.uts.ts` 就会在 IDE 里挂 `Cannot find module`；不在 `src/utils/*/` 下的还要先登记进 `EXTRA_SOURCES`。这条**不影响构建**、只在 IDE 面板出现，最容易被漏掉，见 1.3.19）
+- [ ] **40. 严禁手工编辑 `<name>.d.uts.ts`**（由脚本生成，会被下次运行覆盖；确需人工维护的模块登记进脚本的 `HANDWRITTEN`，见 1.3.19）
+- [ ] **41. 遇到 `ENOENT ... .uts2js/cache/...` 时严禁怀疑 / 修改业务代码**（那是 IDE 常驻 `uni.js -p mp-weixin` 与 CLI 抢 `unpackage/cache` 的竞态，**同一份代码重试即可通过**；且 CLI 被打断时仍返回 exit 0，判定必须落到产物目录是否存在，见 1.3.18）
+- [ ] **42. 遍历值类型为 `any` 的 `Map` 时，严禁给回调参数显式标注 `any`**（`query.toMap().forEach((value: any, key: string) => {})` 报 `error17` —— `Function2<Any, String, Unit>` 对不上 `Function1<Map.Entry<String, Any?>, Unit>`；去掉标注或改用 `UTSJSONObject.keys()` + `getAny()`，见 1.1.15）
+- [ ] **43. 严禁按方法调用 `map.keys()`**（UTS 声明是方法、Kotlin 侧是 `MutableSet` 属性，报 `cannot be invoked as a function`；改用 `UTSJSONObject.keys(obj)`，见 1.1.15）
+- [ ] **44. `<script setup>` 里的局部函数严禁当值传递、也严禁在对象字面量回调里引用**（`setTimeout(localFn, 1000)` 报 `error18 找不到名称`，必须包 `() => { localFn(); }`，见 1.1.16）
+- [ ] **45. 见到「编译成功」前必须先确认这轮真的进了 Kotlin 阶段**（`manifest.json` 的 `vapor-render-target: "bytecode"` 会让整轮走字节码 / `uts2js`，`grep -c "编译为android class"` 恒为 0；此时的「编译成功」不代表 UTS 过了 Kotlin，见 1.3.20）
+- [ ] **46. 对象类型的属性里严禁写剩余参数**（`back: (...args: Array<number>) => void` 报 `Function type parameters cannot have modifiers.`；抽成顶层 `type` 别名再引用即可，见 1.1.17）
+- [ ] **47. 自带可空返回的内置 API 严禁直接 `return` 给非空签名**（`return decodeURIComponent(value);` 在 `: string` 函数里报 `error1 返回类型不匹配`，`try/catch` 挡不住；先判空兜底再返回，见 1.1.18）
+- [ ] **48. uni 跳转 API 的返回值严禁标 `Promise<any> | null`、也不要只写 `any`**（前者报 `expected 'UTSPromise<Any>?'`，后者报 `expected 'Any'`；统一写 `any | null`，见 1.1.19）
+- [ ] **49. 任何 `layout: 'navbar'` 的页面，`definePage.style.navigationStyle` 必须显式写 `'custom'`**（漏写时 `<NavBar>` 整块不渲染、返回箭头与状态栏占位一并消失，**且完全静默不报错**；仓库 18 个 navbar 页面无一例外都写了，见 5.4）
+- [ ] **50. 接口请求的失败值严禁直接当 `Error` 实例用**（lime-request 会把拦截器抛出的 `Error` 转成 `LimeRequestFail` 普通对象，`err.message` 取不到；读 `errMsg` / `err.cause.message` 或做多级兜底。**5.2 流式请求的 `error` 才是真 `Error` 实例**，两套姿势不要混，见 5.1 / 5.2）
+- [ ] **51. 运行时改导航栏 / 状态栏严禁改 `definePage` 或 props**（`definePage` 是编译期数据、布局 props 只在渲染时读一次；必须走 4.7 的 `set*` 广播，且只有 `layout: 'navbar'` 会响应，见 5.4）

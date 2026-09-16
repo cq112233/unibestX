@@ -1,0 +1,53 @@
+<template>
+  <Card title="rxjs 流式演示">
+    <view class="flex-col mb-[14px]">
+      <text
+        class="text-[13px] leading-[18px]"
+        :style="{ color: 'var(--text-secondary, #64748b)' }"
+      >
+        uni-app X 的 App 端没有 JS 引擎，无法引入 npm 上的 rxjs。项目用 UTS 自研了 rxjs-lite，
+        API 语义对齐 rxjs，可全端一致运行。此页演示流式接收、防抖、节流与订阅生命周期管理。
+      </text>
+    </view>
+
+    <!-- 能力清单 -->
+    <view class="flex-row flex-wrap mb-[14px]">
+      <view class="rounded-[6px] px-[8px] py-[4px] bg-[#f5f3ff] mr-[8px] mb-[8px]">
+        <text class="text-[11px] text-[#6d28d9]">Observable / Subject</text>
+      </view>
+      <view class="rounded-[6px] px-[8px] py-[4px] bg-[#eff6ff] mr-[8px] mb-[8px]">
+        <text class="text-[11px] text-[#1d4ed8]">chunked 流式接收</text>
+      </view>
+      <view class="rounded-[6px] px-[8px] py-[4px] bg-[#ecfdf5] mr-[8px] mb-[8px]">
+        <text class="text-[11px] text-[#065f46]">防抖 / 节流 / scan</text>
+      </view>
+      <view class="rounded-[6px] px-[8px] py-[4px] bg-[#fff7ed] mr-[8px] mb-[8px]">
+        <text class="text-[11px] text-[#c2410c]">takeUntil / catchError</text>
+      </view>
+    </view>
+
+    <!-- 进入独立页面按钮 -->
+    <view
+      class="w-full h-[44px] rounded-[8px] flex flex-row items-center justify-center"
+      :style="{ backgroundColor: 'var(--theme-color, #7c3aed)' }"
+      @click="navigateToDemo"
+    >
+      <text class="text-[#ffffff] text-[14px] font-bold">进入 rxjs 流式演示页</text>
+    </view>
+  </Card>
+</template>
+
+<script setup lang="uts">
+import Card from './Card.uvue';
+
+function navigateToDemo() {
+  uni.navigateTo({
+    url: '/src/sub/rxjsDemo/rxjsDemo',
+    fail: (err) => {
+      console.error('navigateToDemo fail:', err);
+    }
+  });
+}
+</script>
+
+<style scoped></style>
