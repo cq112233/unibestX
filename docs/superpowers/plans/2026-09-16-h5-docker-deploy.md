@@ -289,6 +289,10 @@ git commit -m "chore(deploy): 新增 .dockerignore，隔离宿主机环境切换
 # 用法：
 #   生产：docker build --build-arg APP_ENV=prod -t unibestx-h5:prod .
 #   测试：docker build --build-arg APP_ENV=test -t unibestx-h5:test .
+#
+# ⚠️ 本文件中的系统库清单、就绪判据、offscreen 设置、apt 源、Node 获取方式
+#    均有实测依据，见 docs/superpowers/plans/docker-build-baseline.txt。
+#    修改前请先读那份基线，否则会重踩已解决的坑。
 # ==========================================
 
 # ==========================================
@@ -301,44 +305,81 @@ FROM --platform=linux/amd64 ubuntu:20.04 AS builder
 
 ARG APP_ENV=prod
 ARG HBX_VERSION=5.24.2026081301
-ARG NODE_MAJOR=20
+ARG NODE_VERSION=20.18.0
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV HBX_HOME=/opt/hbuilderx/HBuilderX
 # scripts/build-h5.mjs 的 findCli() 会优先读这个变量
 ENV HBUILDERX_CLI_PATH=/opt/hbuilderx/HBuilderX/cli
+# HBuilderX 是 Qt5 Widgets 程序；容器内无 X 显示，用 offscreen 平台插件无头运行。
+# ⚠️ 实测不需要 xvfb —— 装它反而会连带 mesa/llvm 约 477MB。
+ENV QT_QPA_PLATFORM=offscreen
 
-# ---------- ① 系统依赖 + Node + pnpm ----------
-RUN apt-get update && apt-get install -y --no-install-recommends \
-      ca-certificates curl tar xz-utils gnupg \
-    && curl -fsSL "https://deb.nodesource.com/setup_${NODE_MAJOR}.x" | bash - \
-    && apt-get install -y --no-install-recommends nodejs \
+# ---------- ① 系统依赖 ----------
+# 库清单由 ldd 实测得出（见基线文档），刻意不装 xvfb / libgtk-3-0。
+# 走 USTC 源：容器内直连 archive.ubuntu.com 经宿主代理频繁 Connection failed
+#（实测 apt 曾耗时 373s，另有一次 16 分钟超时失败），换 USTC 后降至约 136s。
+RUN sed -i 's|http://archive.ubuntu.com/ubuntu|http://mirrors.ustc.edu.cn/ubuntu|g; \
+            s|http://security.ubuntu.com/ubuntu|http://mirrors.ustc.edu.cn/ubuntu|g' \
+      /etc/apt/sources.list \
+    && ok=0; for i in 1 2 3 4 5; do \
+         if apt-get update -o Acquire::Retries=5 \
+            && apt-get install -y --no-install-recommends -o Acquire::Retries=5 --fix-missing \
+                 ca-certificates curl tar xz-utils \
+                 libglib2.0-0 libfontconfig1 libfreetype6 libpng16-16 libharfbuzz0b libgl1; \
+         then ok=1; break; fi; \
+         echo ">>> apt 第 $i 次失败，5s 后重试"; sleep 5; \
+       done; \
+    [ "$ok" = 1 ] || { echo ">>> apt 全部重试失败"; exit 1; }; \
+    rm -rf /var/lib/apt/lists/*
+
+# ---------- ② Node + pnpm ----------
+# 不走 deb.nodesource.com：它需要先配置 apt 源，而该链路的连通性已实测不稳。
+# 直接从 npmmirror 取官方预编译二进制（单一直接下载，已实测 HTTP 200）。
+RUN curl -fL -o /tmp/node.tar.xz \
+      "https://registry.npmmirror.com/-/binary/node/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.xz" \
+    && tar -xJf /tmp/node.tar.xz -C /usr/local --strip-components=1 \
+    && rm -f /tmp/node.tar.xz \
+    && node -v && npm -v \
     && npm i -g pnpm \
-    && node -v && pnpm -v \
-    && rm -rf /var/lib/apt/lists/*
+    && pnpm -v
 
-# ---------- ② 下载解压 HBuilderX ----------
-# 放在 COPY 源码之前：改业务代码时这一层走缓存，不重下 1.76GB
+# ---------- ③ 下载解压 HBuilderX ----------
+# 放在 COPY 源码之前：改业务代码时这一层走缓存，不重下 1.76GB。
+# ⚠️ URL 形如 /download/HBuilderX.<完整版本号>.linux_x64.full.tar.gz，
+#    版本号必须带日期后缀（如 5.24.2026081301）；短号「5.24」会 404。
 RUN curl -fL -o /tmp/hbx.tar.gz \
       "https://download1.dcloud.net.cn/download/HBuilderX.${HBX_VERSION}.linux_x64.full.tar.gz" \
     && mkdir -p /opt/hbuilderx \
     && tar -xzf /tmp/hbx.tar.gz -C /opt/hbuilderx \
     && rm -f /tmp/hbx.tar.gz \
-    && test -x "${HBX_HOME}/cli"
+    && test -x "${HBX_HOME}/cli" \
+    && { missing="$({ ldd "${HBX_HOME}/HBuilderX" 2>&1; ldd "${HBX_HOME}/cli" 2>&1; \
+                       ldd "${HBX_HOME}/platforms/libqoffscreen.so" 2>&1; } \
+                     | grep -a 'not found' | grep -av 'libQt5\|libicu\|libpcre2' || true)"; \
+         if [ -n "$missing" ]; then echo ">>> 系统库缺失："; echo "$missing"; exit 1; fi; } \
+    && echo ">>> HBuilderX 第三方系统库齐全"
 
-# ---------- ③ 源码与依赖 ----------
+# ---------- ④ 源码与依赖 ----------
 WORKDIR /app
 COPY . /app
 RUN pnpm install
 
-# ---------- ④ 构建 ----------
-# ⚠️ cli open / 构建 / cli quit 必须在同一条 RUN 内：
-#    Docker 每条 RUN 是独立临时容器，进程不跨层存活。
-RUN "${HBX_HOME}/cli" open \
+# ---------- ⑤ 构建 ----------
+# ⚠️ 以下必须在同一条 RUN 内：Docker 每条 RUN 是独立临时容器，进程不跨层存活。
+# ⚠️ `cli open` 必须重定向输出：它会派生出常驻的 HBuilderX 子进程并继承 stdout，
+#    不重定向会一直占住 buildkit 日志管道，导致构建在最后一步静默卡死（已实测踩到）。
+# ⚠️ 就绪判据必须判「输出内容」而非退出码：实测 `cli --help` 与 `cli ver` 的退出码
+#    恒为 0，未就绪时照样返回 0，用 `&&` 链式判断抓不住失败。
+RUN "${HBX_HOME}/cli" open > /tmp/cli-open.log 2>&1 \
+    && s0=$(date +%s) \
+    && ready=0 \
     && for i in $(seq 1 60); do \
-         if "${HBX_HOME}/cli" --help >/dev/null 2>&1; then break; fi; \
+         if "${HBX_HOME}/cli" ver 2>&1 | grep -qE '[0-9]+\.[0-9]+\.[0-9]+'; then ready=1; break; fi; \
          sleep 2; \
        done \
+    && { [ "$ready" = 1 ] || { echo ">>> HBuilderX 就绪超时，cli open 输出："; cat /tmp/cli-open.log; exit 1; }; } \
+    && echo ">>> HBuilderX 已就绪（$(( $(date +%s) - s0 ))s）" \
     && pnpm env:${APP_ENV} \
     && pnpm build:h5 \
     && "${HBX_HOME}/cli" app quit
@@ -348,10 +389,17 @@ RUN "${HBX_HOME}/cli" open \
 
 ```bash
 cd /Users/chenqi/Desktop/unibestX
-time docker build --target builder --build-arg APP_ENV=prod -t unibestx-h5:builder . 2>&1 | tail -30
+time docker build --target builder --build-arg APP_ENV=prod -t unibestx-h5:builder . 2>&1 | tail -40
 ```
 
-预期：构建成功，日志末尾出现 `✅ H5 打包成功，产物目录：unpackage/dist/build/web`（来自 `scripts/build-h5.mjs`）。
+> **⚠️ 这个构建会很久，必须用 `run_in_background: true` 发起再轮询。**
+> 参照物：探针（不含 Node/pnpm/真实编译）冷构建已是 **508s**。本步额外包含
+> `pnpm install` 与真实 H5 编译，**预计 15–30 分钟**。普通 Bash 调用有超时上限，
+> 直接跑会被杀掉。构建过程中请勿打断。
+
+预期：构建成功，日志中依次出现 `>>> HBuilderX 第三方系统库齐全`、`>>> HBuilderX 已就绪（Ns）`，末尾出现 `✅ H5 打包成功，产物目录：unpackage/dist/build/web`（来自 `scripts/build-h5.mjs`）。
+
+**这一行是整个计划最关键的判据**——它是「编译链路在容器内真正跑通」的唯一证据，比探针的「能启动」硬得多。若在此失败，请**完整保留失败日志**再汇报，不要只报一句「失败了」。
 
 - [ ] **步骤 3：验证产物确实存在**
 
