@@ -47,7 +47,7 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 | [references/2-examples.md](references/2-examples.md) | **二、项目正确案例**（5 个生产级标杆案例） | 新建页面、搭「上固定 + 下滚动」骨架、算可用高度、写 TabBar 页与下拉刷新、写二级 / 子包页、用 Easycom 引组件 —— **优先照抄，不要自创结构** |
 | [references/3-codegen.md](references/3-codegen.md) | **3.1 新增页面生成流程**、**3.2 页面代码标准模板**、**3.5 VDOM/Vapor 差异回写维护机制** | 生成新页面 / 组件前走流程、需要复制标准页面模板、需要按四维分类回写本 Skill |
 | [references/4-utils.md](references/4-utils.md) | **四、项目内置工具库**（`src/utils/` 10 个模块：route / theme / env / i18n / toast / backPress / refresh / upload / systemInfo / rxjs-lite） | **动手实现任何通用能力前先查这里**：取路由与路径、取主题色、读环境变量、多语言、提示弹窗、返回键接管、下拉刷新与导航栏控制、文件上传、系统与安全区尺寸、防抖节流与流式处理 |
-| [references/5-infra.md](references/5-infra.md) | **五、页面与应用基础设施**：5.1 请求（http/request）、5.2 流式请求（http/stream）、5.3 路由与拦截器（router）、5.4 页面布局（layouts）、5.5 国际化配置（i18n） | 发起接口请求 / 处理错误与 401、做 SSE 打字机输出、改登录拦截与登录策略、**选 `layout` 或配 `definePage` 导航栏字段**、增改多语言文案与语言包 |
+| [references/5-infra.md](references/5-infra.md) | **五、页面与应用基础设施**：5.1 请求（http/request）、5.2 流式请求（http/stream）、5.3 路由与拦截器（router）、5.4 页面布局（layouts）、5.5 国际化配置（i18n）、**5.6 业务 API 与 Mock 接口化（src/api/）** | 发起接口请求 / 处理错误与 401、做 SSE 打字机输出、改登录拦截与登录策略、**选 `layout` 或配 `definePage` 导航栏字段**、增改多语言文案、**抽离 Mock 模拟数据为后端接口函数** |
 
 > 📌 **3.3 快速排查对照表**与 **3.4 代码生成红线清单** 因使用频率最高，常驻在本文件下方，无需额外 Read。
 
@@ -113,6 +113,8 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 | **切了语言，原生 TabBar / 当前页导航栏标题还是旧语言** | 只调了 `appStore.setLocale(lang)` 就以为完事 | 切完还要调 4.4 的 `setTabbarItem()` 刷 TabBar 文案、4.7 的 `setNavigationBarTitle()` 刷标题（见 5.5） |
 | **H5 Docker 部署模式** | 在 Docker 容器内下载安装 3.7GB Linux 版 HBuilderX 桌面端做全流程构建（构建耗时 15~30 分钟、Mac M 芯片转译卡死、BuildKit 日志管道堵塞） | 宿主机/CI 执行 `pnpm build:test` / `pnpm build:prod`，Docker 仅基于 `nginx:alpine` 轻量镜像承载静态文件与 `${API_UPSTREAM}` 动态反代（镜像仅 ~25MB，打包 1~2 秒，详见 `docs/guide/docker-deploy.md`） |
 | **App 端动画卡顿 / 顿挫（Transition / Transform）** | 将 `transitionProperty` / `duration` 写在动态 `:style` 中；对带深阴影的元素做 `scale` 缩放；切换时改 `fontWeight` 触发文本 `requestLayout()`；用 `setTimeout` 延迟挂载来掩盖卡顿 | `transition` 规则写在静态 CSS class 中走原生 GPU 硬件加速；动态 `:style` 只传单一 `transform` 变化；避免带深阴影缩放与频繁改变 `fontWeight`；保持同步状态，严禁使用 `setTimeout` 掩盖动画性能缺陷（见 1.2.19） |
+| **模拟数据（Mock）直接在页面组件中硬编码** | 在 `.uvue` 页面组件的 `<script setup>` 里写死大段假数据数组/对象字面量（如 `const list = ref([...])`） | 抽离到 `src/api/xxx.uts`，先定义强类型 `type`，将 Mock 数据封装为返回 `Promise<T>` 的接口函数（如 `Promise.resolve(MOCK_LIST)`）；页面统一通过异步 API 函数拉取。后期对接真实后端仅需在 API 模块中改用 `http.get/post`，页面层 0 改动（见 5.6） |
+
 
 ---
 
@@ -171,8 +173,8 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 - [ ] **48. uni 跳转 API 的返回值严禁标 `Promise<any> | null`、也不要只写 `any`**（前者报 `expected 'UTSPromise<Any>?'`，后者报 `expected 'Any'`；统一写 `any | null`，见 1.1.19）
 - [ ] **49. 任何 `layout: 'navbar'` 的页面，`definePage.style.navigationStyle` 必须显式写 `'custom'`**（漏写时 `<NavBar>` 整块不渲染、返回箭头与状态栏占位一并消失，**且完全静默不报错**；仓库 18 个 navbar 页面无一例外都写了，见 5.4）
 - [ ] **50. 接口请求的失败值严禁直接当 `Error` 实例用**（lime-request 会把拦截器抛出的 `Error` 转成 `LimeRequestFail` 普通对象，`err.message` 取不到；读 `errMsg` / `err.cause.message` 或做多级兜底。**5.2 流式请求的 `error` 才是真 `Error` 实例**，两套姿势不要混，见 5.1 / 5.2）
-- [ ] **51. 运行时改导航栏 / 状态栏严禁改 `definePage` 或 props**（`definePage` 是编译期数据、布局 props 只在渲染时读一次；必须走 4.7 的 `set*` 广播，且只有 `layout: 'navbar'` 会响应，见 5.4）
+- [ ] **51. 运行时改导航栏 / 状态栏严禁改 `definePage` 或 props**（`definePage` 是编译期数据、布局 props只在渲染时读一次；必须走 4.7 的 `set*` 广播，且只有 `layout: 'navbar'` 会响应，见 5.4）
 - [ ] **52. H5 Docker 部署严禁在容器内安装 HBuilderX 桌面端做全流程构建**（必须使用宿主机/CI `pnpm build:h5` + `nginx:alpine` 轻量镜像交付，镜像仅 ~25MB，详见 `docs/guide/docker-deploy.md`）
 - [ ] **53. 需求功能与 `uni_modules` 匹配时严禁重复造轮子**（在编写 UI 界面或实现业务功能前，必须优先检索 `uni_modules/` 目录；若需求功能与 `uni_modules` 下已有成熟组件或插件匹配，如 `uni-icons`、`lime-icon`、`e-chart`、`z-paging-x`、`mp-html`、`sp-editor`、`lime-qrcode`、`lime-signature`、`uni-rate-x`、`uni-collapse-x`、`uni-badge-view`、`uni-number-box-x`、`uni-link-x`、`uni-fab-button`、`uni-time-format` 等，**必须优先使用现有组件/库**，严禁重复手写低效原生结构；且模板中直接使用标签，严禁在 `<script>` 中手动 import）
 - [ ] **54. App 端 `transition` 动画属性严禁写在动态 `:style` 中，严禁使用 `setTimeout` 错峰掩盖性能缺陷**（`transitionProperty` / `transitionDuration` / `transitionTimingFunction` 必须声明在静态 CSS 类中走硬件加速，动态 `:style` 只传单一 `transform` 变化；避免对带深阴影容器做缩放动画；严禁在外部容器使用 `setTimeout` 延迟挂载来掩盖组件自身的动画性能问题，见 1.2.19）
-
+- [ ] **55. 严禁在页面/组件内直接硬编码 Mock 模拟数据，必须抽离为 `src/api/` 标准后端接口函数**（模拟数据必须在 `src/api/` 下集中管理，定义强类型 `type` 并封装为返回 `Promise<T>` 的接口函数如 `Promise.resolve(MOCK_DATA)`，页面一律通过异步 API 函数拉取；对接真实接口时仅需在 API 模块内将 `Promise.resolve` 替换为 `http.get/post`，实现页面业务层零改动无缝切换，见 5.6）
