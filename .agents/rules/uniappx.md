@@ -75,6 +75,14 @@ description: uni-app X (UTS) 开发规范与踩坑避坑指南，适用于跨端
 *   **Display 属性与类名限制 (Display Property Restrictions)**：
     原生平台仅支持 `display: flex` 和 `display: none`。**禁止**使用 `display: grid` 或 `inline-block`。推荐全面使用 Tailwind 的 Flex 布局类名（`flex-row`、`flex-col`、`flex-1`）。
 
+*   **间距属性限制：禁止使用 `gap` 与 `space-*` (Gap & Space Restrictions)**：
+    *   **重要限制**：`uvue` 原生 App 端不支持 `gap`、`gap-x-*`、`gap-y-*`，因此 grid gap / flex gap 都不能作为可用能力来依赖；`space-x-*`、`space-y-*` 在 `uni-app x` 中也不支持（底层编译为原生不支持的兄弟选择器），不要作为布局方案使用。如果在原生端使用，子元素会**全部挤压在一起，间距完全丢失**。
+    *   *错误示例*：`class="flex flex-row gap-[12px]"`、`class="flex flex-col space-y-2"`
+    *   *正确做法*：更稳妥的替代方案是直接对子项写 `mt-*` / `mb-*` / `ml-*` / `mr-*`，或在业务层封装固定结构的占位间距组件。
+        - 水平排列：子项挂载 `mr-[10px]` 或 `ml-[10px]`；
+        - 双列网格/瀑布流：左列挂载 `mr-[6px]`，右列挂载 `ml-[6px]`，父级容器不写 `gap`；
+        - 垂直列表：卡片根节点挂载 `mb-[12px]` 或子项挂载 `mt-[12px]`。
+
 *   **Align-Items 属性与类名限制 (Align-Items Restrictions)**：
     原生平台对于 `align-items` 仅支持 `center`、`flex-start`、`flex-end`、`stretch`。**禁止使用 `items-baseline`（`align-items: baseline`）**，否则会触发原生 CSS 编译器报错：`property value baseline is not supported for align-items`。
     *   *错误示例*：`class="items-baseline"`
