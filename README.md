@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://github.com/cq112233/unibestX">
-    <img width="160" src="https://i.ibb.co/rhtd2V7/logo.png" style="border-radius: 20px;" alt="unibestX Logo">
+    <img width="160" src="static/logo-rounded.png" alt="unibestX Logo">
   </a>
 </p>
 
@@ -1085,5 +1085,5 @@ Copyright (c) 2026 HTwoO
 如果你觉得这个项目好用，可以请作者喝杯咖啡 ☕
 
 <p align="center">
-  <img alt="微信收款码" src="https://i.ibb.co/rKHkpcHP/wx.jpg" height="330" style="display:inline-block; height:330px;">
+  <img alt="微信收款码" src="https://i.ibb.co/rKHkpcHP/wx.jpg" height="330">
 </p>
