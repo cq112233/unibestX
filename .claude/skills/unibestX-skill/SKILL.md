@@ -111,6 +111,7 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 | **调了 `setNavbarTitle` / `setHideNavbar` / `setStatusBarVisible` 毫无反应** | 在 `layout: 'default'` 或 `layout: false` 的页面上调用（前者只监听 `stopPagePullDownRefresh`，后者连布局都没有） | 这 9 个 `set*` / `reset*` 广播**只有 `layout: 'navbar'` 监听**；要运行时可改顶栏就必须选 navbar 布局（见 5.4 / 4.7） |
 | **`uni.addInterceptor` 加了拦截器却没拦住跳转** | `invoke` 里没写 `return false`（返回 `undefined` / 不写 `return` 一律视为放行） | 只有**显式返回 `false`** 才取消本次跳转；且 `uni.addInterceptor` 是**追加**语义，注册必须收敛到 `main.uts` 一处（见 5.3） |
 | **切了语言，原生 TabBar / 当前页导航栏标题还是旧语言** | 只调了 `appStore.setLocale(lang)` 就以为完事 | 切完还要调 4.4 的 `setTabbarItem()` 刷 TabBar 文案、4.7 的 `setNavigationBarTitle()` 刷标题（见 5.5） |
+| **H5 Docker 部署模式** | 在 Docker 容器内下载安装 3.7GB Linux 版 HBuilderX 桌面端做全流程构建（构建耗时 15~30 分钟、Mac M 芯片转译卡死、BuildKit 日志管道堵塞） | 宿主机/CI 执行 `pnpm build:test` / `pnpm build:prod`，Docker 仅基于 `nginx:alpine` 轻量镜像承载静态文件与 `${API_UPSTREAM}` 动态反代（镜像仅 ~25MB，打包 1~2 秒，详见 `docs/guide/docker-deploy.md`） |
 
 ---
 
@@ -170,3 +171,4 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 - [ ] **49. 任何 `layout: 'navbar'` 的页面，`definePage.style.navigationStyle` 必须显式写 `'custom'`**（漏写时 `<NavBar>` 整块不渲染、返回箭头与状态栏占位一并消失，**且完全静默不报错**；仓库 18 个 navbar 页面无一例外都写了，见 5.4）
 - [ ] **50. 接口请求的失败值严禁直接当 `Error` 实例用**（lime-request 会把拦截器抛出的 `Error` 转成 `LimeRequestFail` 普通对象，`err.message` 取不到；读 `errMsg` / `err.cause.message` 或做多级兜底。**5.2 流式请求的 `error` 才是真 `Error` 实例**，两套姿势不要混，见 5.1 / 5.2）
 - [ ] **51. 运行时改导航栏 / 状态栏严禁改 `definePage` 或 props**（`definePage` 是编译期数据、布局 props 只在渲染时读一次；必须走 4.7 的 `set*` 广播，且只有 `layout: 'navbar'` 会响应，见 5.4）
+- [ ] **52. H5 Docker 部署严禁在容器内安装 HBuilderX 桌面端做全流程构建**（必须使用宿主机/CI `pnpm build:h5` + `nginx:alpine` 轻量镜像交付，镜像仅 ~25MB，详见 `docs/guide/docker-deploy.md`）

@@ -315,6 +315,26 @@ pnpm build:prod  # = env:prod + build:h5
 > [!WARNING]
 > **App 端（Android / iOS / 鸿蒙）与小程序发布仍需使用 HBuilderX**：原生 App 云打包 / 小程序上传依赖 HBuilderX 发行能力，命令行仅支持 H5。
 
+#### 🐳 H5：Docker 容器化部署（轻量交付，秒级打包）
+
+项目提供业界标准的 **「宿主机构建 + Nginx:alpine 极简容器」** 部署方案（镜像仅约 25MB，打包仅需 1~2 秒，原生支持 amd64 与 arm64）：
+
+```bash
+# 1. 测试环境：一键切换环境 -> H5 编译 -> 构建 Docker 镜像 -> 启动容器（访问 http://localhost:8080）
+pnpm docker:build:test
+pnpm docker:up:test
+
+# 2. 生产环境：一键切换环境 -> H5 编译 -> 构建 Docker 镜像 -> 启动容器（访问 http://localhost:8080）
+pnpm docker:build:prod
+pnpm docker:up:prod
+
+# 3. 停止容器
+pnpm docker:down
+```
+
+- **动态反代与环境变量**：在 `deploy/.env.test` 与 `deploy/.env.prod` 中可直接配置映射端口与 `API_UPSTREAM` 动态代理后端地址，修改后执行 `pnpm docker:up:*` 即刻生效，无需重新构建镜像。
+- **详尽操作手册**：详见 [docs/guide/docker-deploy.md](docs/guide/docker-deploy.md)。
+
 #### 🛠️ HBuilderX 发行打包
 
 | 平台 | 操作路径 |
@@ -364,7 +384,12 @@ unibestX/
 │   ├── gen-uts-dts.mjs           #   UTS 类型声明生成与校验
 │   ├── check-tabbar-surface.mjs  #   TabBar 接口面校验
 │   └── guard-test/ router-guard-test/  # 路由守卫相关测试
-├── deploy/nginx.conf             # 生产环境 Nginx 反向代理配置
+├── Dockerfile                    # H5 生产部署轻量容器（nginx:alpine）
+├── docker-compose.yml            # H5 容器编排服务（h5-test / h5-prod）
+├── deploy/                       # 生产与测试部署配置
+│   ├── nginx.conf                #   Nginx 动态反代与静态托管配置
+│   ├── .env.test                 #   测试环境 Docker 变量配置
+│   └── .env.prod                 #   生产环境 Docker 变量配置
 ├── docs/                         # VitePress 文档站源码（guide/ 下为各专题）
 ├── .claude/skills/               # AI 技能（Claude Code）：20 个 superpowers-zh + 3 个项目专属技能，共 23 个
 ├── .agents/                      # AI 技能与规约（其他 Agent）
