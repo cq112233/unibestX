@@ -94,6 +94,7 @@
   - [状态管理](#状态管理)
   - [i18n 多语言](#i18n-多语言)
   - [Layout 布局](#layout-布局)
+  - [H5 容器化部署 (Docker & Nginx)](#h5-容器化部署-docker--nginx)
 - [🗺️ 演进路线图](#️-演进路线图-roadmap)
 - [🔧 技术栈详情](#-技术栈详情)
 - [⚠️ UTS 开发注意事项](#️-uts-开发注意事项)
@@ -119,6 +120,7 @@
 - 📊 **ECharts** — 图表组件支持
 - 🔌 **请求封装** — 基于 `lime-request`，支持多域名、Token 自动续期、SSE 流式传输
 - 📤 **文件上传** — 基于原生 `uni.uploadFile` 统一封装，支持 OSS 上传与进度回调
+- 🐳 **H5 Docker 极速部署** — 宿主机构建 + Nginx:alpine 轻量容器运行（~25MB，秒级打包），内置动态环境变量反代与 Hash 路由兜底
 - 🤖 **AI 原生开发模板** — 内置 `unibestX-skill`（1 入口 + 7 分册）与 23 个技能，AI Agent 克隆即可按项目规范写代码；运行时自带 AI 对话页与 SSE 流式传输
 
 ## 📦 推荐的 UI 组件库
@@ -961,6 +963,28 @@ src/store/index.uts  (门面：唯一转发层)
 - 自动为页面包裹 Layout 组件
 - 内置 `default` / `empty` / `navbar` 三种布局，支持页面级别自定义布局
 - 可通过 `layout: false` 禁用布局
+
+### H5 容器化部署 (Docker & Nginx)
+
+针对传统前端容器化打包臃肿及 uni-app X 依赖 HBuilderX CLI 编译的特殊性，项目定制了业界标准的 **「宿主机构建 + Nginx:alpine 极简容器」** 部署方案：
+
+- ⚡️ **秒级打包与极致轻量**：镜像仅包含静态产物与 Nginx 运行时，体积仅约 **25MB**，打包过程 1~2 秒即可完成。
+- 🌍 **原生多架构支持**：基于 `nginx:alpine`，原生兼容 `linux/amd64` 与 Apple Silicon `linux/arm64`，开发机与云服务器均无转译损耗。
+- 🔄 **动态环境变量反代**：容器启动时，官方 entrypoint 自动利用 `envsubst` 读取 `deploy/.env.test` 或 `deploy/.env.prod` 中的 `API_UPSTREAM` 注入 Nginx，**修改后端地址无需重打镜像**。
+- 🛡️ **生产级 Web 保障**：内置 Gzip 压缩加速、SPA Hash 路由 `try_files` 兜底、静态资源 `/assets/` 30 天强缓存。
+
+```bash
+# 测试环境：一键切换环境 -> H5 编译 -> 构建 Docker 镜像 -> 启动容器（映射 8081）
+pnpm docker:build:test && pnpm docker:up:test
+
+# 生产环境：一键切换环境 -> H5 编译 -> 构建 Docker 镜像 -> 启动容器（映射 8080）
+pnpm docker:build:prod && pnpm docker:up:prod
+
+# 停止容器服务
+pnpm docker:down
+```
+
+> 📖 详尽部署指南与服务器上线步骤请参阅 [H5 端 Docker 部署手册](docs/guide/docker-deploy.md)。
 
 ---
 
