@@ -49,7 +49,7 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 | [references/3-codegen.md](references/3-codegen.md) | **3.1 新增页面生成流程**、**3.2 页面代码标准模板**、**3.5 VDOM/Vapor 差异回写维护机制** | 生成新页面 / 组件前走流程、需要复制标准页面模板、需要按四维分类回写本 Skill |
 | [references/4-utils.md](references/4-utils.md) | **四、项目内置工具库**（`src/utils/` 10 个模块：route / theme / env / i18n / toast / backPress / refresh / upload / systemInfo / rxjs-lite） | **动手实现任何通用能力前先查这里**：取路由与路径、取主题色、读环境变量、多语言、提示弹窗、返回键接管、下拉刷新与导航栏控制、文件上传、系统与安全区尺寸、防抖节流与流式处理 |
 | [references/5-infra.md](references/5-infra.md) | **五、页面与应用基础设施**：5.1 请求（http/request）、5.2 流式请求（http/stream）、5.3 路由与拦截器（router）、5.4 页面布局（layouts）、5.5 国际化配置（i18n）、**5.6 业务 API 与 Mock 接口化（src/api/）** | 发起接口请求 / 处理错误与 401、做 SSE 打字机输出、改登录拦截与登录策略、**选 `layout` 或配 `definePage` 导航栏字段**、增改多语言文案、**抽离 Mock 模拟数据为后端接口函数** |
-| [references/6-page-component-spec.md](references/6-page-component-spec.md) | **六、AI 页面层级与组件设计规范**（页面高内聚 · 三级防过度拆分 · 容器/视图分离 · Mock 接口契约化） | 规划新页面结构、拆分复杂页面组件、组织页面内 `components/common/` 与模块私有视图、放置与编写页面级 `mock.uts` 时必读 |
+| [references/6-page-component-spec.md](references/6-page-component-spec.md) | **六、AI 页面层级与组件设计规范**（页面高内聚 · 三级防过度拆分 · 容器/视图分离 · Mock 接口契约化 · 生产接口同名映射） | 规划新页面结构、拆分复杂页面组件、组织页面内 `components/common/` 与模块私有视图、从 mock.uts 对接 `src/api/<page>/<page>.uts` 时必读 |
 
 > 📌 **3.3 快速排查对照表**与 **3.4 代码生成红线清单** 因使用频率最高，常驻在本文件下方，无需额外 Read。
 
@@ -181,4 +181,7 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 - [ ] **54. App 端 `transition` 动画属性严禁写在动态 `:style` 中，严禁使用 `setTimeout` 错峰掩盖性能缺陷**（`transitionProperty` / `transitionDuration` / `transitionTimingFunction` 必须声明在静态 CSS 类中走硬件加速，动态 `:style` 只传单一 `transform` 变化；避免对带深阴影容器做缩放动画；严禁在外部容器使用 `setTimeout` 延迟挂载来掩盖组件自身的动画性能问题，见 1.2.19）
 - [ ] **55. 严禁在页面/组件内直接硬编码 Mock 模拟数据，必须抽离为 `src/api/` 标准后端接口函数**（模拟数据必须在 `src/api/` 下集中管理，定义强类型 `type` 并封装为返回 `Promise<T>` 的接口函数如 `Promise.resolve(MOCK_DATA)`，页面一律通过异步 API 函数拉取；对接真实接口时仅需在 API 模块内将 `Promise.resolve` 替换为 `http.get/post`，实现页面业务层零改动无缝切换，见 5.6）
 - [ ] **56. 页面内聚与组件拆分三级封顶，严禁在展示组件与 common 组件内调用接口**（页面尽量不要用外部公共组件，所有私有组件收归当前页面 `components/` 目录下；拆分严格限制为 Page ➔ Module A/B ➔ Leaf A-1/A-2 最多 3 级，严禁无限嵌套；`components/common/` 与私有叶子组件只负责纯视图排版，严禁编写业务逻辑与调用接口，业务逻辑与数据请求全部收敛在 L1 模块容器中，见分册 6）
+- [ ] **57. 生成的代码中业务逻辑必须全部附带清晰中文注释**（状态 ref/computed、业务函数、异步请求链路、事件处理以及 props/emits 必须有明确中文注释，严禁生成无注释逻辑代码，见分册 6）
+- [ ] **58. 功能实现绝对优先使用 `src/utils/` 与 `uni_modules` 现成方法**（路由、主题色、弹窗、国际化、安全区、刷新、上传、防抖等一律使用 utils 模块，图标、图表、分页、富文本等一律使用 uni_modules 组件，严禁手写重复轮子，见分册 4 与分册 6）
+- [ ] **59. 后端真实接口统一在 `src/api/<page>/<page>.uts` 按页面名称对齐收拢**（从 `mock.uts` 对接后端真实接口时，必须在 `src/api/` 下以页面同名目录及同名 `.uts` 文件存放，如 `src/api/index/index.uts`，以 `mock.uts` 为契约蓝本保持入参及出参 `Promise<T>` 签名 100% 一致，使得前端容器无感平滑切换，见分册 6）
 
