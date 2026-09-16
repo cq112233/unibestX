@@ -1,4 +1,5 @@
 import { isCompilerVersionGte } from '@/src/utils/systemInfo/index.uts';
+import { needHideNativeTabbar } from './strategy.uts';
 
 /**
  * 隐藏系统原生 TabBar 并根据编译器版本动态适配 H5 底部容器
@@ -23,14 +24,18 @@ export function safeHideNativeTabBar(): void {
   // #endif
 
   // #ifndef MP-WEIXIN
-  try {
-    uni.hideTabBar({
-      animation: false,
-      fail: (err: any) => {
-        console.log('hideTabBar fail: ', err);
-      }
-    });
+  // 仅在模式2（带原生底板的自定义模式）且系统存在原生 TabBar 时才需调用 hideTabBar
+  // 模式4（单页保活容器，当前默认）与模式3下 pages.json 无原生 tabBar 节点，避免调用触发 tabBar is not exist
+  if (needHideNativeTabbar) {
+    try {
+      uni.hideTabBar({
+        animation: false,
+        fail: (_err: any) => {
+          // 原生 tabBar 不存在时（如非 Tab 页面）属于预期内正常防御状态，静默捕获不输出报警日志
+        }
+      });
+    }
+    catch { }
   }
-  catch { }
   // #endif
 }
