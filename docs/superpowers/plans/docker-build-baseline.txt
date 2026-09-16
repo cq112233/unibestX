@@ -1,0 +1,66 @@
+HBuilderX 容器内可行性实测（第零步关卡）
+==========================================
+日期：2026-09-16
+宿主：Apple M5 / arm64 / macOS 25.4.0
+Docker：linux/amd64 容器（Rosetta 加速）
+HBuilderX 版本：5.24.2026081301
+
+- 下载+解压耗时：279.0s（冷构建 --no-cache 实测；另一轮独立实测 272.4s；包体 1762MB，解压后 /opt/hbuilderx = 3.7G）
+- cli open 就绪耗时：1s（轮询第 1 轮即就绪；多轮实测区间 1–2s）
+- 探针整体构建耗时：508s（8 分 28 秒，docker build --no-cache 冷构建，含导出解包）
+    分步：apt 装系统依赖 135.9s / 下载+解压 279.0s / 动态库齐备性检查 0.6s /
+          启动就绪验证 4.5s / 导出并解包镜像 84.2s
+- 最终镜像体积：1.94 GB（1,939,910,246 B；取自 docker image inspect .Size。
+    注意 docker images 的 Size 列在本机 Docker Desktop 上会显示成 5.93–6.14 GB，
+    与 inspect 数值不一致，以 inspect 为准）
+- 是否补装了系统库：是
+    libglib2.0-0 libfontconfig1 libfreetype6 libpng16-16 libharfbuzz0b libgl1
+    （6 个；由 ldd 实测得出，未装 xvfb / libgtk-3-0 —— 实测不需要）
+- 结论：通过
+
+──────────────────────────────────────────
+补充说明（重要，供后续任务使用）
+──────────────────────────────────────────
+1. Rosetta 已确证启用：容器内 /proc/cpuinfo 的 vendor_id = VirtualApple、
+   model name = "VirtualApple @ 2.50GHz"，即 Rosetta 2 对 x86 暴露的 CPU 标识
+   （若走 QEMU 全指令翻译，此处会显示 "QEMU Virtual CPU version ..."）。
+   性能特征吻合：整体仅约 1.3 倍损耗，HBuilderX 1–2s 即就绪。
+
+2. 无头启动不需要 xvfb。HBuilderX 是 Qt5 Widgets 程序，容器内无 X 显示。
+   显式设 QT_QPA_PLATFORM=offscreen 即可正常启动就绪。
+   实测即使完全不设 QT_QPA_PLATFORM 也能就绪，但显式指定 offscreen 更确定，
+   探针采用显式写法。装 xvfb 会连带引入 mesa/llvm（约 477MB），已避免。
+
+3. `cli --help` 不能当就绪判据。HBuilderX 未启动时它照样返回退出码 0，
+   只在 stdout 打印「未检测到已打开的HBuilderX，请先执行cli open启动HBuilderX后再重试」。
+   `cli ver` 的退出码同样恒为 0（未就绪时打印「与主程序的连接已中断…」）。
+   因此探针用「`cli ver` 输出中出现版本号」作为判据：
+     cli ver 2>&1 | grep -qE '[0-9]+\.[0-9]+\.[0-9]+'
+
+4. `cli open` 会派生常驻的 HBuilderX 子进程并继承 stdout。若在 RUN 里直接
+   `cli open`（不重定向），该子进程会一直占着 buildkit 的日志管道，
+   导致构建在最后一步卡死不返回。探针已把它的输出重定向到文件规避。
+
+5. apt 源走 USTC 镜像：容器内直连 archive.ubuntu.com 经宿主代理时频繁
+   「Ign / Connection failed [IP: 198.18.0.75]」重试，实测 apt 曾耗时 373s，
+   另有一次 16 分钟超时失败。换 http://mirrors.ustc.edu.cn/ubuntu 后降到 135.9s
+   （镜像连通性实测：ustc 0.58s / tuna 1.90s / archive 1.90s / aliyun 502）。
+
+6. 镜像体积构成：HBuilderX 解压后 3.7GB 是绝对大头（镜像内压缩后约 1.94GB）。
+   其中 libgl1 会连带 libgl1-mesa-dri(388MB) + libllvm12(89MB)，属可优化项：
+   主程序 HBuilderX 的 ELF NEEDED 里确实有 libGL.so.1，但在 offscreen 下
+   并不真正创建 GL 上下文，后续完整 Dockerfile 可尝试只装 libglvnd0/libglx0
+   验证是否还能启动，以省掉这 ~477MB。
+
+7. 本探针只验证「HBuilderX 能启动并就绪、CLI 通道可用」
+   （`cli ver` 返回版本号、`cli project list` 返回 `0:project list:OK`、
+   `cli app quit` 返回 `0:app quit:OK` 且进程退出）。
+   **尚未验证真正的 H5 编译链路**（把项目挂进容器跑 publish/build），
+   那属于后续任务；「启动可行」不等于「编译可行」。
+
+──────────────────────────────────────────
+复现命令
+──────────────────────────────────────────
+docker build -f deploy/probe/hbx-probe.Dockerfile -t hbx-probe .
+docker run --rm hbx-probe:latest bash -c \
+  '/opt/hbuilderx/HBuilderX/cli open >/tmp/o.log 2>&1; sleep 3; /opt/hbuilderx/HBuilderX/cli ver'
