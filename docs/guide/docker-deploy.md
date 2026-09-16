@@ -16,8 +16,7 @@ unibestX H5 采用业界标准的**「宿主机构建 + Nginx:alpine 轻量容�
 ├── .dockerignore                # 上下文白名单（过滤无关源码与依赖）
 ├── docker-compose.yml           # h5-test 与 h5-prod 服务编排
 └── deploy/
-    ├── nginx.conf               # 单机裸 Nginx 部署参考配置
-    ├── nginx.conf.template      # Docker 容器动态渲染配置模板
+    ├── nginx.conf               # Nginx 配置文件（同时支持 Docker 动态反代与裸机部署）
     ├── .env.test                # 测试服环境变量（端口、API 上游）
     └── .env.prod                # 生产服环境变量（端口、API 上游）
 ```
@@ -88,12 +87,15 @@ pnpm docker:down
 ### 方案 A：CI/CD 镜像推送（推荐）
 
 1. 在 CI 节点（具备 Node + HBuilderX 环境）执行：
+
    ```bash
    pnpm build:prod
    docker build -t your-registry.com/unibestx-h5:v1.0.0 .
    docker push your-registry.com/unibestx-h5:v1.0.0
    ```
+
 2. 目标服务器只需准备 `docker-compose.yml` 与 `deploy/.env.prod`，直接拉取镜像即可：
+
    ```bash
    docker compose pull
    docker compose up -d h5-prod
@@ -102,6 +104,7 @@ pnpm docker:down
 ### 方案 B：代码库直接上线
 
 若服务器已挂载或安装好环境：
+
 ```bash
 git pull
 pnpm docker:build:prod

@@ -10,8 +10,8 @@ FROM nginx:alpine
 LABEL maintainer="unibestX"
 LABEL description="unibestX H5 生产部署轻量容器"
 
-# 拷贝 Nginx 配置模板，容器启动时官方 entrypoint 自动由 envsubst 生成 /etc/nginx/conf.d/default.conf
-COPY deploy/nginx.conf.template /etc/nginx/templates/default.conf.template
+# 拷贝 Nginx 配置，容器启动时官方 entrypoint 自动由 envsubst 生成 /etc/nginx/conf.d/default.conf
+COPY deploy/nginx.conf /etc/nginx/templates/default.conf.template
 
 # 拷贝已在宿主机编译完成的静态资源
 COPY unpackage/dist/build/web /usr/share/nginx/html
