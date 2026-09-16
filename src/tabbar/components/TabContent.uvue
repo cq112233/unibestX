@@ -86,7 +86,11 @@ onMounted(() => {
 watch(isActive, (newVal: boolean) => {
   if (newVal) {
     if (!hasRendered.value) {
-      hasRendered.value = true;
+      setTimeout(() => {
+        if (isActive.value) {
+          hasRendered.value = true;
+        }
+      }, 30);
     }
     syncNavbarState();
   }
