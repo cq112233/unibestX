@@ -35,6 +35,7 @@
 </template>
 
 <script setup lang="uts">
+import { systemInfo } from '@/src/utils/systemInfo/index.uts';
 import HttpDemoCard from '../components/HttpDemoCard.uvue';
 import IconDemoCard from '../components/IconDemoCard.uvue';
 import LangSwitchCard from '../components/LangSwitchCard.uvue';
@@ -58,6 +59,7 @@ onTabPageShow(1, () => {
 }, true);
 
 onMounted(() => {
+  console.log(systemInfo.value?.availableHeight, 'systemInfo.value?.availableHeight');
   console.log('基础 Tab 挂载了');
 });
 
