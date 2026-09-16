@@ -21,7 +21,7 @@ graph TD
     D --> E[引入 refresh.uts 注册下拉刷新闭环]
     E --> F[搭建页面根容器: view + flex flex-col flex-1]
     F --> G[在内部自写 scroll-view 实现滚动]
-    G --> H[组件库优先: 引用 uni-icons 等成熟组件]
+    G --> H[组件库优先: 匹配并优先使用 uni_modules 成熟组件]
     H --> I[红线自检: 检查 interface/undefined/color on view/过度阴影]
 ```
 
@@ -32,7 +32,7 @@ graph TD
 3. **闭环刷新逻辑**：引入 `onNavbarPullDownRefresh` 与 `stopNavbarPullDownRefresh`，在数据拉取结束后必须调用 `stopNavbarPullDownRefresh()`；
 4. **根容器骨架铁律**：页面根节点一律为 `<view class="flex flex-col flex-1">`，严禁使用 `<scroll-view>` 作为页面根；
 5. **滚动区域实现**：需要滚动的区域在根内自写 `<scroll-view direction="vertical" class="flex-1 flex flex-col">`；
-6. **组件库优先**：界面图标使用 `<uni-icons>`，分页列表使用 `<z-paging-x>`，折叠面板使用 `<uni-collapse-x>`，严禁手动 import easycom 范围内的组件。
+6. **组件库优先**：若需求功能与 `uni_modules/` 下已有组件/库匹配（如图标使用 `<uni-icons>`/`<lime-icon>`，图表使用 `<e-chart>`，分页列表使用 `<z-paging-x>`，富文本使用 `<mp-html>`，富文本编辑器使用 `<sp-editor>`，二维码使用 `<lime-qrcode>`，签名使用 `<lime-signature>`，折叠面板使用 `<uni-collapse-x>`，评分使用 `<uni-rate-x>` 等），必须优先使用已有组件，严禁脱离生态手写重复且低效的原生结构；且模板中直接使用短横线标签调用，严禁手动 import easycom 范围内的组件。
 
 ---
 

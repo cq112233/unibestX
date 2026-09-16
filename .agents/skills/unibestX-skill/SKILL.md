@@ -16,7 +16,7 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 本文档按五大维度组织，采用 **「1 个入口 + 7 个分册」** 结构：
 
 1. **UTS 与原生规范**：语法与严格类型（分册 1.1）、CSS / Tailwind 样式引擎限制（分册 1.2）、跨端运行时铁律（分册 1.3）；
-2. **项目正确案例**：来自本项目的生产级标杆案例（分册 2）——页面骨架、TabBar、二级详情页、滚动与下拉刷新；
+2. **项目正确案例**：来自本项目的生产级标杆案例（分册 2）——页面骨架、TabBar、二级详情页、滚动与下拉刷新、组件与生态库优先范式；
 3. **项目代码生成规范**：生成流程与模板（分册 3）、本文件常驻的 3.3 对照表与 3.4 红线清单、回写维护机制（分册 3 的 3.5）；
 4. **项目内置工具库**：`src/utils/` 下 10 个现成模块的 API 与用法（分册 4）——**动手造轮子前先查这里**；
 5. **页面与应用基础设施**：`src/http/`（请求与流式）、`src/router/`（路由拦截）、`src/layouts/`（页面布局）、`src/i18n/`（语言装配）四套配置与装配层（分册 5）——**定策略 / 选骨架 / 改配置前先查这里**。
@@ -74,7 +74,7 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 | **Align-Items baseline** | `class="items-baseline"` | `class="items-end"` 或 `class="items-center"` |
 | **阴影使用限制** | 过度使用 `shadow-lg` / `box-shadow` | 严禁过度使用阴影，优先使用细腻浅色边框 `border-[1px] border-solid border-[#e2e8f0]` 与微反差背景区分层级（安卓端 VDOM 与 Vapor 阴影表现不一致） |
 | **键盘高度事件类型** | `(e: UniInputKeyboardHeightChangeEventDetail)` | `(e: UniInputKeyboardHeightChangeEvent)` |
-| **组件库使用** | `import UniIcons from '...'` | 无需 import，模板直接使用 `<uni-icons>` |
+| **组件库使用与生态优先原则** | 需求中涉及图标、图表、分页、富文本、二维码等功能时脱离生态重复造轮子手写低效原生结构；或在 `<script>` 中手动 `import` 组件 | 优先检索并使用 `uni_modules/` 下已内置的 38 个成熟组件/插件（如 `uni-icons`、`lime-icon`、`e-chart`、`z-paging-x`、`mp-html`、`sp-editor`、`lime-qrcode`、`lime-signature`、`uni-rate-x`、`uni-collapse-x`、`uni-badge-view` 等）；模板直接使用短横线标签（easycom 自动导入），严禁手动 `import` |
 | **安全区底部适配** | 内联计算 paddingBottom | `class="pb-safe"` |
 | **对象字面量包含函数导出** | `export const env = { getApiBaseUrl }`（Kotlin 编译报 `Function invocation expected`） | 统一使用标准具名函数导出 `export function getApiBaseUrl()`，使用方 `import { getApiBaseUrl }` |
 | **文档预览参数 (openDocument)** | `uni.openDocument({ showMenu: true })`（Kotlin 报错 `No parameter with name 'showMenu' found`） | 移除 `showMenu`，仅传 `filePath` 与 `fileType` |
@@ -172,3 +172,4 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 - [ ] **50. 接口请求的失败值严禁直接当 `Error` 实例用**（lime-request 会把拦截器抛出的 `Error` 转成 `LimeRequestFail` 普通对象，`err.message` 取不到；读 `errMsg` / `err.cause.message` 或做多级兜底。**5.2 流式请求的 `error` 才是真 `Error` 实例**，两套姿势不要混，见 5.1 / 5.2）
 - [ ] **51. 运行时改导航栏 / 状态栏严禁改 `definePage` 或 props**（`definePage` 是编译期数据、布局 props 只在渲染时读一次；必须走 4.7 的 `set*` 广播，且只有 `layout: 'navbar'` 会响应，见 5.4）
 - [ ] **52. H5 Docker 部署严禁在容器内安装 HBuilderX 桌面端做全流程构建**（必须使用宿主机/CI `pnpm build:h5` + `nginx:alpine` 轻量镜像交付，镜像仅 ~25MB，详见 `docs/guide/docker-deploy.md`）
+- [ ] **53. 需求功能与 `uni_modules` 匹配时严禁重复造轮子**（在编写 UI 界面或实现业务功能前，必须优先检索 `uni_modules/` 目录；若需求功能与 `uni_modules` 下已有成熟组件或插件匹配，如 `uni-icons`、`lime-icon`、`e-chart`、`z-paging-x`、`mp-html`、`sp-editor`、`lime-qrcode`、`lime-signature`、`uni-rate-x`、`uni-collapse-x`、`uni-badge-view`、`uni-number-box-x`、`uni-link-x`、`uni-fab-button`、`uni-time-format` 等，**必须优先使用现有组件/库**，严禁重复手写低效原生结构；且模板中直接使用标签，严禁在 `<script>` 中手动 import）
