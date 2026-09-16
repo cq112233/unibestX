@@ -320,7 +320,7 @@ pnpm build:prod  # = env:prod + build:h5
 项目提供业界标准的 **「宿主机构建 + Nginx:alpine 极简容器」** 部署方案（镜像仅约 25MB，打包仅需 1~2 秒，原生支持 amd64 与 arm64）：
 
 ```bash
-# 1. 测试环境：一键切换环境 -> H5 编译 -> 构建 Docker 镜像 -> 启动容器（访问 http://localhost:8080）
+# 1. 测试环境：一键切换环境 -> H5 编译 -> 构建 Docker 镜像 -> 启动容器（访问 http://localhost:8081）
 pnpm docker:build:test
 pnpm docker:up:test
 
