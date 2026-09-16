@@ -75,6 +75,14 @@ description: uni-app X (UTS) 开发规范与踩坑避坑指南，适用于跨端
 *   **Display 属性与类名限制 (Display Property Restrictions)**：
     原生平台仅支持 `display: flex` 和 `display: none`。**禁止**使用 `display: grid` 或 `inline-block`。推荐全面使用 Tailwind 的 Flex 布局类名（`flex-row`、`flex-col`、`flex-1`）。
 
+*   **间距属性限制：禁止使用 `gap` 与 `space-*` (Gap & Space Restrictions)**：
+    *   **重要限制**：`uvue` 原生 App 端不支持 `gap`、`gap-x-*`、`gap-y-*`，因此 grid gap / flex gap 都不能作为可用能力来依赖；`space-x-*`、`space-y-*` 在 `uni-app x` 中也不支持（底层编译为原生不支持的兄弟选择器），不要作为布局方案使用。如果在原生端使用，子元素会**全部挤压在一起，间距完全丢失**。
+    *   *错误示例*：`class="flex flex-row gap-[12px]"`、`class="flex flex-col space-y-2"`
+    *   *正确做法*：更稳妥的替代方案是直接对子项写 `mt-*` / `mb-*` / `ml-*` / `mr-*`，或在业务层封装固定结构的占位间距组件。
+        - 水平排列：子项挂载 `mr-[10px]` 或 `ml-[10px]`；
+        - 双列网格/瀑布流：左列挂载 `mr-[6px]`，右列挂载 `ml-[6px]`，父级容器不写 `gap`；
+        - 垂直列表：卡片根节点挂载 `mb-[12px]` 或子项挂载 `mt-[12px]`。
+
 *   **Align-Items 属性与类名限制 (Align-Items Restrictions)**：
     原生平台对于 `align-items` 仅支持 `center`、`flex-start`、`flex-end`、`stretch`。**禁止使用 `items-baseline`（`align-items: baseline`）**，否则会触发原生 CSS 编译器报错：`property value baseline is not supported for align-items`。
     *   *错误示例*：`class="items-baseline"`
@@ -128,6 +136,15 @@ description: uni-app X (UTS) 开发规范与踩坑避坑指南，适用于跨端
         ```
     *   **`VITE_TABBAR_MODE=1` 语义**：原生 TabBar 模式下 `availableHeight` 不含底部 tabbar 区域（底部非编辑区，无需计入）。
     *   *错误做法*：页面根使用 scroll-view（与布局冲突）；手写 `100vh`/`100%` 硬算高度。
+
+*   **长列表性能铁律：长列表用 `list-view` 不要用 `scroll-view` (Virtual List-View over Scroll-View)**：
+    *   **底层机制差异**：
+        - `<scroll-view>` 是普通无复用滚动容器，其所有子节点全量驻留内存并持续绘制。在长列表、分页追加、瀑布流、商品流等场景下，随着数据量增多，原生 Android / iOS 内存会呈线性急剧暴增，GC 频繁，甚至直接引发 OOM（内存溢出）闪退与严重滑动掉帧；
+        - `<list-view>` 是 uni-app X 专为长列表设计的原生高性能回收复用组件（底层映射为 Android `RecyclerView` / iOS `UITableView` / `UICollectionView`），支持视口外组件节点的原生回收与复用池（View Pool），无论数据有几千还是上万条，内存占用均恒定在几个可见项之内，滑动帧率稳定（60~120fps）。
+    *   **规范与红线**：
+        - **必须使用 `<list-view>` 的场景**：动态数据流、商品瀑布流、分页追加无限加载、超过 20+ 条的列表，一律强制使用 `<list-view>`（配合直接子项 `<list-item>`）或高级封装组件 `<z-paging-x>`（默认 `list-is="list-view"`）；
+        - **`<scroll-view>` 的允许场景**：仅允许用于固定短内容局部滚动（如配置面板、短表单）、顶部横向滑动的 Tab 分类条（`direction="horizontal"`）等不可无限增长的小体量滚动区域；
+        - **结构要求**：`<list-view>` 的直接子项**必须是 `<list-item>`**，具体业务卡片直接挂载在 `<list-item>` 内部，严禁在 `<list-view>` 下直接用一个大 `<view>` 包裹全部子元素，否则会破坏底层复用机制。
 
 ---
 

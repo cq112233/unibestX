@@ -456,4 +456,5 @@ export type { IModuleAItem, IModuleAQuery } from '@/src/api/index/index.uts';
 - [ ] **6. 严禁滥用 JS 动态计算高度（Flex-1 绝对优先）**：页面与模块滚动区域一律使用原生 Flex 弹性盒模型（`flex flex-col flex-1`）自适应撑满，严禁在页面与组件中滥用 `getScrollHeight()` 动态绑定 `:style="{ height: ... }"`；
 - [ ] **7. 逻辑代码必须附带完整中文注释**：所有状态定义（ref/computed）、业务函数、异步请求链路、事件回调与组件 Props/Emits 必须全部附带清晰中文注释，严禁生成无注释逻辑代码；
 - [ ] **8. 必须优先使用 utils 和 uni_modules 现成方法与组件**：凡是 `src/utils/`（路由/主题/弹窗/国际化/安全区/刷新）与 `uni_modules/`（图标/标签/图表/分页/富文本等）中已有能力的，严禁脱离现有体系手写重复轮子；
-- [ ] **9. 后端接口按页面同名收拢在 `src/api/<page>/<page>.uts`**：对接真实后端接口时，必须以 `mock.uts` 为契约蓝本，在 `src/api/` 下按页面名称创建同名目录与同名文件（如 `src/api/index/index.uts`、`src/api/mall/mall.uts`），严禁跨页面混写或在组件内直接写裸请求。
+- [ ] **9. 后端接口按页面同名收拢在 `src/api/<page>/<page>.uts`**：对接真实后端接口时，必须以 `mock.uts` 为契约蓝本，在 `src/api/` 下按页面名称创建同名目录与同名文件（如 `src/api/index/index.uts`、`src/api/mall/mall.uts`），严禁跨页面混写或在组件内直接写裸请求；
+- [ ] **10. 长列表/商品流必须使用 `<list-view>` 严禁使用 `<scroll-view>`**：任何动态追加、分页加载、商品瀑布流或长数据列表，一律强制使用具备原生节点回收复用池机制的 `<list-view>`（直接子项为 `<list-item>`）或高级组件 `<z-paging-x>`；`<scroll-view>` 仅限短内容或横向滑块，严禁在长列表场景中使用 `<scroll-view>` 导致原生内存暴增或 OOM 崩溃。

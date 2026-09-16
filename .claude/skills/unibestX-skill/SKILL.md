@@ -61,6 +61,7 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 | :--- | :--- | :--- |
 | **新增页面定义** | 缺少 `definePage`；或把该用 navbar 的页面写成 `layout: false`（`false` 本身合法，但会连顶栏与滚动容器一起失去，见 5.4） | 顶部声明标准完整 `definePage`（`customPageClass`, `customPageStyle`, `debug: false`, `debugHome: false`, `layout: 'navbar'`, `style.navigationStyle: 'custom'` 等）；按需配置 `showBack`（默认 `true`，TabBar 首页写 `false`）、`enablePullDownRefresh`（默认 `false`，按需设为 `true`）、`style.navigationBarTitleText` |
 | **页面根容器** | 根用 `<scroll-view>` 导致双重滚动冲突 | 根用 `<view class="flex flex-col flex-1">`，内部需要滚动自写 `<scroll-view>` |
+| **长列表 / 分页列表渲染** | 长列表、商品瀑布流、分页无限滚动使用 `<scroll-view>` 承载（无节点回收复用，内存暴增掉帧甚至 OOM 闪退） | 长列表必须使用 `<list-view>`（直接子节点为 `<list-item>`）或 `<z-paging-x>`；`<scroll-view>` 仅用于有限短内容或横向滑块（见 1.3.21） |
 | **可用视口高度** | 手写 `100vh` 或手算状态栏/TabBar | 直接使用 `computedAvailableHeight`（基于 `availableHeight.value ?? 0`） |
 | **对象类型定义 (`UTS110111163`)** | `interface User { id: string }` | `type User = { id: string }` |
 | **空值定义 (`UTS110111119`)** | `let name: string \| undefined` | `let name: string \| null = null` |
@@ -74,6 +75,7 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 | **原生 `<button>` 居中** | `<button class="items-center justify-center">` | 用 `<view class="flex flex-row items-center justify-center">` 包裹 |
 | **`<view>` 设置文字颜色** | `<view class="text-[#333]">` | `<text class="text-[#333]">` |
 | **Align-Items baseline** | `class="items-baseline"` | `class="items-end"` 或 `class="items-center"` |
+| **原生端间距（gap 与 space）支持限制** | 在原生 App 端依赖 `gap`、`gap-x-*`、`gap-y-*` 或 `space-x-*`、`space-y-*`（原生 Flexbox 引擎不支持 gap，也不支持 space 复杂选择器，导致间距完全丢失挤压变形） | 严禁使用 `gap` 与 `space-*`；水平排列改用 `mr-*` / `ml-*`（如双列左右分别 `mr-[6px]` 与 `ml-[6px]`），垂直列表在卡片根节点上挂载 `mb-*` 或子项 `mt-*`（见 1.2.20） |
 | **阴影使用限制** | 过度使用 `shadow-lg` / `box-shadow` | 严禁过度使用阴影，优先使用细腻浅色边框 `border-[1px] border-solid border-[#e2e8f0]` 与微反差背景区分层级（安卓端 VDOM 与 Vapor 阴影表现不一致） |
 | **键盘高度事件类型** | `(e: UniInputKeyboardHeightChangeEventDetail)` | `(e: UniInputKeyboardHeightChangeEvent)` |
 | **组件库使用与生态优先原则** | 需求中涉及图标、图表、分页、富文本、二维码等功能时脱离生态重复造轮子手写低效原生结构；或在 `<script>` 中手动 `import` 组件 | 优先检索并使用 `uni_modules/` 下已内置的 38 个成熟组件/插件（如 `uni-icons`、`lime-icon`、`e-chart`、`z-paging-x`、`mp-html`、`sp-editor`、`lime-qrcode`、`lime-signature`、`uni-rate-x`、`uni-collapse-x`、`uni-badge-view` 等）；模板直接使用短横线标签（easycom 自动导入），严禁手动 `import` |
@@ -184,4 +186,6 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 - [ ] **57. 生成的代码中业务逻辑必须全部附带清晰中文注释**（状态 ref/computed、业务函数、异步请求链路、事件处理以及 props/emits 必须有明确中文注释，严禁生成无注释逻辑代码，见分册 6）
 - [ ] **58. 功能实现绝对优先使用 `src/utils/` 与 `uni_modules` 现成方法**（路由、主题色、弹窗、国际化、安全区、刷新、上传、防抖等一律使用 utils 模块，图标、图表、分页、富文本等一律使用 uni_modules 组件，严禁手写重复轮子，见分册 4 与分册 6）
 - [ ] **59. 后端真实接口统一在 `src/api/<page>/<page>.uts` 按页面名称对齐收拢**（从 `mock.uts` 对接后端真实接口时，必须在 `src/api/` 下以页面同名目录及同名 `.uts` 文件存放，如 `src/api/index/index.uts`，以 `mock.uts` 为契约蓝本保持入参及出参 `Promise<T>` 签名 100% 一致，使得前端容器无感平滑切换，见分册 6）
+- [ ] **60. 原生平台严禁使用 `gap` 及其原子化类名与 `space-x-*` / `space-y-*`**（App 原生端 Flexbox 布局引擎不支持 `gap`、`row-gap`、`column-gap`，也不支持 space 复杂选择器，会导致子元素无间距挤压堆叠；水平间距改用 `mr-[...]` / `ml-[...]`，垂直间距改用 `mb-[...]` / `mt-[...]`，见 1.2.20）
+- [ ] **61. 长列表强制使用 `list-view` 严禁使用 `scroll-view`**（长列表、商品流、瀑布流、分页无限加载一律使用具有原生节点回收复用池机制的 `<list-view>` + `<list-item>` 或 `<z-paging-x>`；`<scroll-view>` 无复用机制，数据增多会导致原生端内存线性暴增甚至 OOM 闪退，仅允许用于短内容或横向滑块，见 1.3.21）
 
