@@ -59,9 +59,9 @@ const safeAreaBottom = computed<number>((): number => {
   return insets != null ? insets.bottom : 0;
 });
 
-/** 当前激活的主题色 */
+/** 当前激活的主题色（优先取 store 中持久化的 theme，保底取全局 themeColor） */
 const activeThemeColor = computed<string>((): string => {
-  return themeColor.value.length > 0 ? themeColor.value : appStore.state.theme;
+  return appStore.state.theme.length > 0 ? appStore.state.theme : themeColor.value;
 });
 
 /** 激活项的高亮胶囊底色（暗黑模式白色，浅色模式主题色，透明度由 pill 节点通过 opacity 控制，杜绝 8 位 hex 在 iOS 原生下变成实心红） */

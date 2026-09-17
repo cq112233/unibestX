@@ -138,6 +138,7 @@ export class AppStore extends PiniaStoreBase {
     themeColor.value = theme;
     syncUViewTheme(theme);
     applyThemeColor(theme);
+    this.$patch({ theme } as UTSJSONObject);
   }
 
   /**
@@ -212,6 +213,7 @@ export class AppStore extends PiniaStoreBase {
     // #endif
 
     this.refreshIsDark();
+    this.$patch({ themeMode: mode } as UTSJSONObject);
   }
 
   /**
@@ -240,7 +242,7 @@ export class AppStore extends PiniaStoreBase {
   setLocale(locale: string): void {
     this.state.locale = locale;
     i18n.global.locale.value = locale;
-    setUViewLocale(locale);
+    this.$patch({ locale } as UTSJSONObject);
   }
 }
 

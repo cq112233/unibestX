@@ -3,10 +3,18 @@ import { checkDirectEntry } from './src/router/interceptor';
 import { loadFont } from '@/uni_modules/uview-ultra/index.uts';
 import { useAppStore } from './src/store';
 import { initNativeMidButtonTap } from '@/src/tabbar';
+import { applyThemeColor, themeColor } from '@/src/utils/theme/index.uts';
 
 onLaunch(() => {
   // 提前实例化 App Store（含持久化还原），并初始化外观模式：跟随系统 / 浅色 / 深色
-  useAppStore().initThemeMode();
+  const appStore = useAppStore();
+  appStore.initThemeMode();
+
+  // 确保全局 themeColor 与运行环境同步为持久化恢复的主题色
+  if (appStore.state.theme.length > 0) {
+    themeColor.value = appStore.state.theme;
+    applyThemeColor(appStore.state.theme);
+  }
 
   // 加载 uview-ultra 图标字体
   loadFont();
