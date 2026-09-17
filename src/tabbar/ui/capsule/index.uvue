@@ -43,6 +43,16 @@ const themeTokens = computed((): ThemeTokens => {
   return getThemeTokens(appStore.state.isDark);
 });
 
+/** 胶囊底座背景色（显式解包 computed 避免 iOS VDOM 嵌套取值异常） */
+const tabBgColor = computed<string>((): string => {
+  return themeTokens.value.tabBg;
+});
+
+/** 胶囊底座边框色 */
+const tabBorderColor = computed<string>((): string => {
+  return themeTokens.value.tabBorder;
+});
+
 /** 安全区底部高度 */
 const safeAreaBottom = computed<number>((): number => {
   const insets = safeAreaInsets.value;
@@ -54,13 +64,17 @@ const activeThemeColor = computed<string>((): string => {
   return themeColor.value.length > 0 ? themeColor.value : appStore.state.theme;
 });
 
-/** 激活项的高亮胶囊底色（浅色时为主题色 10% 浅底，暗黑时为半透明白色） */
+/** 激活项的高亮胶囊底色（暗黑模式白色，浅色模式主题色，透明度由 pill 节点通过 opacity 控制，杜绝 8 位 hex 在 iOS 原生下变成实心红） */
 const activeItemBgColor = computed<string>((): string => {
   if (appStore.state.isDark) {
-    return 'rgba(255, 255, 255, 0.12)';
+    return '#ffffff';
   }
-  const color = activeThemeColor.value;
-  return `${color}18`;
+  return activeThemeColor.value;
+});
+
+/** 激活项高亮胶囊的不透明度 */
+const activeItemBgOpacity = computed<number>((): number => {
+  return appStore.state.isDark ? 0.15 : 0.12;
 });
 
 /** 滑块单项宽度占比（百分比） */
@@ -164,14 +178,14 @@ const bottom = computed(() => {
       :style="{
         bottom: `${bottom}px`,
         height: `${height}px`,
-        backgroundColor: themeTokens.tabBg,
-        borderColor: themeTokens.tabBorder
+        backgroundColor: tabBgColor,
+        borderColor: tabBorderColor
       }"
     >
       <!-- 动态滑动滑块：在各 Tab 底部平滑移动 (Animated Slider Pill) -->
       <view class="capsule-slider-track">
         <view class="capsule-slider" :style="sliderStyle">
-          <view class="capsule-slider-pill" :style="{ backgroundColor: activeItemBgColor }" />
+          <view class="capsule-slider-pill" :style="{ backgroundColor: activeItemBgColor, opacity: activeItemBgOpacity }" />
         </view>
       </view>
 
@@ -274,6 +288,7 @@ const bottom = computed(() => {
 
 /* 动态滑块单元（负责平移动画：在静态 CSS 中声明硬件加速过渡） */
 .capsule-slider {
+  width: 25%;
   height: 100%;
   align-items: center;
   justify-content: center;

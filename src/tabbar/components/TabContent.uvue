@@ -1,16 +1,31 @@
 <template>
   <view v-if="hasRendered" :style="rootStyle" class="tab-content-wrapper">
-    <scroll-view direction="vertical" class="flex-1 flex flex-col" style="flex: 1;">
+    <scroll-view
+      direction="vertical"
+      class="flex-1 flex flex-col"
+      style="flex: 1;"
+      :refresher-enabled="isRefresherEnabled"
+      :refresher-triggered="isTriggered"
+      :refresher-background="themeTokens.bgContent"
+      :lower-threshold="50"
+      @refresherrefresh="handleRefresherRefresh"
+      @refresherrestore="handleRefresherRestore"
+      @scroll="handleScroll"
+      @scrolltolower="handleScrollToLower"
+    >
       <slot />
     </scroll-view>
   </view>
 </template>
 
 <script setup lang="uts">
-import { computed, onMounted, provide, ref, watch } from 'vue';
+import { computed, onMounted, onUnmounted, provide, ref, watch } from 'vue';
 import { curIdx, tabbarList } from '@/src/tabbar/index.uts';
 import { $t } from '@/src/utils/i18n/index.uts';
-import { setHideNavbar, setHideStatusBar, setNavbarTitle } from '@/src/utils/refresh/index.uts';
+import { isPageRefresherDisabled, isPageScrollDisabled, setHideNavbar, setHideStatusBar, setNavbarTitle } from '@/src/utils/refresh/index.uts';
+import { useAppStore } from '@/src/store';
+import { getThemeTokens } from '@/src/utils/theme/index.uts';
+import type { ThemeTokens } from '@/src/utils/theme/index.uts';
 
 const props = defineProps({
   /** 对应的 TabBar 索引（0, 1, 2, 3 等） */
@@ -32,6 +47,11 @@ const props = defineProps({
   hideStatusBar: {
     type: Boolean,
     default: false
+  },
+  /** 当前 Tab 是否启用下拉刷新（默认 true） */
+  enablePullDownRefresh: {
+    type: Boolean,
+    default: true
   }
 });
 
@@ -116,6 +136,60 @@ watch(shouldHideStatusBar, (newVal: boolean) => {
   if (isActive.value) {
     setHideStatusBar(newVal);
   }
+});
+
+const appStore = useAppStore();
+const themeTokens = computed<ThemeTokens>((): ThemeTokens => {
+  return getThemeTokens(appStore.state.isDark);
+});
+
+/** 下拉刷新状态控制：true 表示刷新中，false 表示已复位收起 */
+const isTriggered = ref(false);
+
+/** 当前激活 Tab 是否允许下拉刷新 */
+const isRefresherEnabled = computed<boolean>((): boolean => {
+  return isActive.value && props.enablePullDownRefresh && !isPageScrollDisabled.value && !isPageRefresherDisabled.value;
+});
+
+/** 下拉刷新触发事件 */
+function handleRefresherRefresh(): void {
+  isTriggered.value = true;
+  uni.$emit('onPagePullDownRefresh');
+}
+
+/** 下拉刷新复位事件 */
+function handleRefresherRestore(): void {
+  isTriggered.value = false;
+}
+
+/** 监听外部发出的停止刷新通知（stopNavbarPullDownRefresh） */
+function onStopRefresh(): void {
+  isTriggered.value = false;
+}
+
+/** 滚动事件回调 */
+function handleScroll(e: UniScrollEvent): void {
+  if (!isActive.value) {
+    return;
+  }
+  const scrollTop = e.detail.scrollTop;
+  uni.$emit('onNavbarPageScroll', {
+    scrollTop: Math.ceil(scrollTop)
+  } as UTSJSONObject);
+}
+
+/** 触底事件回调 */
+function handleScrollToLower(): void {
+  if (!isActive.value) {
+    return;
+  }
+  uni.$emit('onNavbarReachBottom');
+}
+
+uni.$on('stopPagePullDownRefresh', onStopRefresh);
+
+onUnmounted(() => {
+  uni.$off('stopPagePullDownRefresh', onStopRefresh);
 });
 
 defineExpose({
