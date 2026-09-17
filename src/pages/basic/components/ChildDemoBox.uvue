@@ -87,9 +87,13 @@
           v-model="inputMsg"
           placeholder="输入要送回父组件的消息"
           class="text-[12px] flex-1 h-[30px] px-[8px] rounded-[4px] border-[1px] border-solid"
-          :style="{ backgroundColor: 'var(--card-bg, #ffffff)', color: 'var(--text-color, #334155)', borderColor: 'var(--border-color, #cbd5e1)' }"
+          :style="{ backgroundColor: 'var(--card-bg, #ffffff)', color: rootThemeColor, borderColor: rootThemeColor }"
         />
-        <view class="bg-[#059669] rounded-[6px] h-[30px] px-[10px] flex-row items-center justify-center ml-[8px]" @click="handleSendMsg">
+        <view
+          class="rounded-[6px] h-[30px] px-[10px] flex-row items-center justify-center ml-[8px]"
+          :style="{ backgroundColor: rootThemeColor }"
+          @click="handleSendMsg"
+        >
           <text class="text-[#ffffff] text-[12px]">发送给父组件</text>
         </view>
       </view>
@@ -106,9 +110,10 @@
 </template>
 
 <script setup lang="uts">
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import type { PropType } from 'vue';
 import { toast, toastSuccess } from '@/src/utils/toast/index.uts';
+import { themeColor } from '@/src/utils/theme/index.uts';
 
 defineProps({
   title: {
@@ -126,6 +131,16 @@ defineProps({
 });
 
 const emit = defineEmits(['add', 'reset', 'send-msg']);
+
+/**
+ * 当前根主题色（响应式）
+ * 取全局 themeColor，随 app store 换肤（setTheme）自动同步。
+ * 这里下发具体色值而非 var(--theme-color)：<input> 是原生控件，
+ * 在 iOS 端无法随 CSS 变量更新重绘（见 unibestX-skill 1.2.1）。
+ */
+const rootThemeColor = computed((): string => {
+  return themeColor.value as string;
+});
 
 const inputMsg = ref('Hello Parent from Child!');
 
