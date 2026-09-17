@@ -127,9 +127,9 @@ defineProps({
 
 const appStore = useAppStore();
 
-/** 当前激活的主题色（优先取响应式 themeColor，保底取 appStore.state.theme） */
+/** 当前激活的主题色（优先取 store 中持久化的 theme，保底取全局 themeColor） */
 const activeThemeColor = computed<string>((): string => {
-  return themeColor.value.length > 0 ? themeColor.value : appStore.state.theme;
+  return appStore.state.theme.length > 0 ? appStore.state.theme : themeColor.value;
 });
 
 // ==========================================
