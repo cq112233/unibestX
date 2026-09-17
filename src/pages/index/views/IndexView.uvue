@@ -1,5 +1,5 @@
 <template>
-  <view class="content-container flex flex-col">
+  <view class="content-container flex flex-col pb-[80px]">
     <image class="w-[90px] h-[90px] mx-auto mt-[16px] rounded-[18px]" src="/static/logo.png" />
     <text class="text-[24px] font-semibold mx-auto mt-[8px] text-[#d14328]">
       {{ systemInfo?.appTitle ?? '' }}
@@ -153,7 +153,7 @@
 
     <!-- 底部提示 -->
     <view
-      class="mx-[16px] mt-[4px] mb-[24px] px-[14px] py-[10px] rounded-[10px] border-[1px] border-solid flex flex-row items-center"
+      class="mx-[16px] mt-[14px] mb-[24px] px-[14px] py-[10px] rounded-[10px] border-[1px] border-solid flex flex-row items-center"
       :class="isDark ? 'bg-[#1e293b]/70 border-[#334155]' : 'bg-[#f8fafc] border-[#e2e8f0]'"
     >
       <text class="text-[14px] mr-[8px]">💡</text>

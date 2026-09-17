@@ -1,0 +1,55 @@
+<template>
+  <Card title="全屏遮罩弹窗（覆盖 TabBar）">
+    <view
+      class="rounded-[10px] p-[12px] border-[1px] border-solid"
+      :class="isDark ? 'bg-[#1e293b]/70 border-[#334155]' : 'bg-[#f8fafc] border-[#e2e8f0]'"
+    >
+      <view class="flex flex-row items-center justify-between mb-[6px]">
+        <text class="text-[13px] font-bold" :class="isDark ? 'text-[#f1f5f9]' : 'text-[#1e293b]'">🎭 TabBar 全局覆盖机制</text>
+        <text class="text-[10px] font-medium px-[6px] py-[2px] rounded-[4px] text-[#38bdf8] bg-[#0284c71f]">z-index: 9999</text>
+      </view>
+      <text
+        class="text-[12px] leading-[20px] mb-[10px]"
+        :class="isDark ? 'text-[#94a3b8]' : 'text-[#64748b]'"
+      >
+        测试在 Tab 页面内触发全屏遮罩弹窗。通过 position: fixed 与 z-index: 9999，即使 TabBar 悬浮胶囊处于最高视口层级，也能被遮罩完整覆盖，且切 Tab 时自动卸载。
+      </text>
+      <view
+        class="h-[36px] rounded-[8px] bg-[#4f46e5] flex flex-row items-center justify-center active:opacity-85"
+        @click="openModal"
+      >
+        <text class="text-[#ffffff] text-[13px] font-medium">打开遮罩弹窗（遮住 TabBar）</text>
+      </view>
+    </view>
+
+    <!-- 封装的弹窗遮罩组件 -->
+    <TabbarMaskModal
+      :visible="showModal"
+      :tab-index="1"
+      @close="closeModal"
+    />
+  </Card>
+</template>
+
+<script setup lang="uts">
+import { computed, ref } from 'vue';
+import { useAppStore } from '@/src/store';
+import Card from './Card.uvue';
+import TabbarMaskModal from './TabbarMaskModal.uvue';
+
+const appStore = useAppStore();
+const isDark = computed((): boolean => appStore.state.isDark);
+
+const showModal = ref(false);
+
+function openModal(): void {
+  showModal.value = true;
+}
+
+function closeModal(): void {
+  showModal.value = false;
+}
+</script>
+
+<style scoped>
+</style>

@@ -50,8 +50,7 @@ provide('isTabActive', isActive);
 const rootStyle = computed<UTSJSONObject>((): UTSJSONObject => {
   return {
     left: isActive.value ? '0px' : '-9999px',
-    visibility: isActive.value ? 'visible' : 'hidden',
-    display: isActive.value ? 'flex' : 'none'
+    visibility: isActive.value ? 'visible' : 'hidden'
   } as UTSJSONObject;
 });
 

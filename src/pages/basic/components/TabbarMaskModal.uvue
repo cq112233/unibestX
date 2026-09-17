@@ -1,0 +1,131 @@
+<template>
+  <!-- 全屏遮罩弹窗组件 (覆盖底部 TabBar 示例) -->
+  <view
+    v-if="visible && isCurrentTabActive"
+    class="modal-overlay"
+    :style="{ zIndex }"
+  >
+    <!-- 暗色遮罩背景（点击空白处关闭） -->
+    <view
+      class="modal-mask"
+      @click="handleClose"
+    />
+
+    <!-- 居中卡片本体 -->
+    <view
+      class="w-[310px] p-[20px] rounded-[16px] border-[1px] border-solid relative z-10 flex flex-col"
+      :class="isDark ? 'bg-[#1e293b] border-[#334155]' : 'bg-[#ffffff] border-[#e2e8f0]'"
+    >
+      <!-- 头部标题区 -->
+      <view class="flex flex-row items-center justify-between mb-[12px]">
+        <view class="flex flex-row items-center">
+          <text class="text-[18px] mr-[8px]">🛡️</text>
+          <text class="text-[16px] font-bold" :class="isDark ? 'text-[#f1f5f9]' : 'text-[#1e293b]'">
+            {{ title }}
+          </text>
+        </view>
+        <view class="p-[4px]" @click="handleClose">
+          <text class="text-[16px] text-[#94a3b8]">✕</text>
+        </view>
+      </view>
+
+      <!-- 详细说明区 -->
+      <slot>
+        <text class="text-[12px] leading-[20px] mb-[12px]" :class="isDark ? 'text-[#94a3b8]' : 'text-[#64748b]'">
+          你现在看到的暗色遮罩已经完全盖住了底部的 TabBar 悬浮胶囊/底座！
+        </text>
+
+        <!-- 关键原理解析卡片 -->
+        <view
+          class="p-[10px] rounded-[8px] mb-[16px] flex flex-col"
+          :class="isDark ? 'bg-[#0f172a]' : 'bg-[#f8fafc]'"
+        >
+          <text class="text-[11px] leading-[18px] text-[#059669]">
+            ✓ 层级机制：遮罩设置 z-index: {{ zIndex }} &gt; TabBar: 999
+          </text>
+          <text class="text-[11px] leading-[18px] text-[#4f46e5] mt-[4px]">
+            ✓ 定位机制：App 端 fixed 元素与根节点同级比较
+          </text>
+          <text class="text-[11px] leading-[18px] text-[#d97706] mt-[4px]">
+            ✓ iOS 防护：绑定 v-if="isCurrentTabActive" 切 Tab 自动销毁
+          </text>
+        </view>
+      </slot>
+
+      <!-- 底部操作按钮 -->
+      <slot name="footer">
+        <view
+          class="w-full h-[40px] rounded-[8px] bg-[#4f46e5] flex flex-row items-center justify-center active:opacity-85"
+          @click="handleClose"
+        >
+          <text class="text-[#ffffff] text-[14px] font-medium">关闭弹窗</text>
+        </view>
+      </slot>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed } from 'vue';
+import { useAppStore } from '@/src/store';
+import { curIdx } from '@/src/tabbar/index.uts';
+
+const props = defineProps({
+  /** 弹窗显隐控制 */
+  visible: {
+    type: Boolean,
+    default: false
+  },
+  /** 弹窗标题 */
+  title: {
+    type: String,
+    default: '已遮住底部 TabBar'
+  },
+  /** 弹窗层级（默认 9999，高于 TabBar 的 999） */
+  zIndex: {
+    type: Number,
+    default: 9999
+  },
+  /** 所属 TabBar 索引（默认 1 代表基础页，切走该 Tab 时自动销毁节点避免 iOS 残留） */
+  tabIndex: {
+    type: Number,
+    default: 1
+  }
+});
+
+const emit = defineEmits(['close', 'update:visible']);
+
+const appStore = useAppStore();
+const isDark = computed((): boolean => appStore.state.isDark);
+
+// 当前所属 Tab 是否处于激活状态
+const isCurrentTabActive = computed<boolean>((): boolean => {
+  return curIdx.value == props.tabIndex;
+});
+
+function handleClose(): void {
+  emit('close');
+  emit('update:visible', false);
+}
+</script>
+
+<style scoped>
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-mask {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: rgba(0, 0, 0, 0.65);
+}
+</style>
