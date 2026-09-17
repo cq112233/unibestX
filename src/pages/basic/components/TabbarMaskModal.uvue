@@ -1,5 +1,76 @@
 <template>
   <!-- 全屏遮罩弹窗组件 (覆盖底部 TabBar 示例) -->
+  <!-- 微信小程序端：需要 root-portal 提升至 page 根节点以穿透 TabBar -->
+  <!-- #ifdef MP-WEIXIN -->
+  <root-portal>
+    <view
+      v-if="visible && isCurrentTabActive"
+      class="modal-overlay"
+      :style="{ zIndex }"
+    >
+      <!-- 暗色遮罩背景（点击空白处关闭） -->
+      <view
+        class="modal-mask"
+        @click="handleClose"
+      />
+
+      <!-- 居中卡片本体 -->
+      <view
+        class="w-[310px] p-[20px] rounded-[16px] border-[1px] border-solid relative z-10 flex flex-col"
+        :class="isDark ? 'bg-[#1e293b] border-[#334155]' : 'bg-[#ffffff] border-[#e2e8f0]'"
+      >
+        <!-- 头部标题区 -->
+        <view class="flex flex-row items-center justify-between mb-[12px]">
+          <view class="flex flex-row items-center">
+            <text class="text-[18px] mr-[8px]">🛡️</text>
+            <text class="text-[16px] font-bold" :class="isDark ? 'text-[#f1f5f9]' : 'text-[#1e293b]'">
+              {{ title }}
+            </text>
+          </view>
+          <view class="p-[4px]" @click="handleClose">
+            <text class="text-[16px] text-[#94a3b8]">✕</text>
+          </view>
+        </view>
+
+        <!-- 详细说明区 -->
+        <slot>
+          <text class="text-[12px] leading-[20px] mb-[12px]" :class="isDark ? 'text-[#94a3b8]' : 'text-[#64748b]'">
+            你现在看到的暗色遮罩已经完全盖住了底部的 TabBar 悬浮胶囊/底座！
+          </text>
+
+          <!-- 关键原理解析卡片 -->
+          <view
+            class="p-[10px] rounded-[8px] mb-[16px] flex flex-col"
+            :class="isDark ? 'bg-[#0f172a]' : 'bg-[#f8fafc]'"
+          >
+            <text class="text-[11px] leading-[18px] text-[#059669]">
+              ✓ 层级机制：遮罩设置 z-index: {{ zIndex }} &gt; TabBar: 999
+            </text>
+            <text class="text-[11px] leading-[18px] text-[#4f46e5] mt-[4px]">
+              ✓ 定位机制：App 端 fixed 元素与根节点同级比较
+            </text>
+            <text class="text-[11px] leading-[18px] text-[#d97706] mt-[4px]">
+              ✓ iOS 防护：绑定 v-if="isCurrentTabActive" 切 Tab 自动销毁
+            </text>
+          </view>
+        </slot>
+
+        <!-- 底部操作按钮 -->
+        <slot name="footer">
+          <view
+            class="w-full h-[40px] rounded-[8px] bg-[#4f46e5] flex flex-row items-center justify-center active:opacity-85"
+            @click="handleClose"
+          >
+            <text class="text-[#ffffff] text-[14px] font-medium">关闭弹窗</text>
+          </view>
+        </slot>
+      </view>
+    </view>
+  </root-portal>
+  <!-- #endif -->
+
+  <!-- 非微信小程序端（App、H5 等）：无需 root-portal，直接由 position: fixed 覆盖 -->
+  <!-- #ifndef MP-WEIXIN -->
   <view
     v-if="visible && isCurrentTabActive"
     class="modal-overlay"
@@ -63,6 +134,7 @@
       </slot>
     </view>
   </view>
+  <!-- #endif -->
 </template>
 
 <script setup lang="uts">

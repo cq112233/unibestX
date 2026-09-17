@@ -1,6 +1,28 @@
+<!--
+  TabContent.uvue - 单页面 TabBar 容器子视图包裹组件
+
+  【核心职责】
+  1. 承载模式 4（单页面 TabBar 容器模式）下各 Tab 项（首页、基础、功能、我的等）的视图内容与插槽；
+  2. 独立管理各 Tab 专属的滚动容器（scroll-view）、局部下拉刷新状态机与触底事件；
+  3. 负责当前激活 Tab 的顶部导航栏标题（多语言 $t 同步）与状态栏显隐联动；
+  4. 实现全端保活机制（移出视口 + visibility），并解决微信小程序与原生端切 Tab 时下拉刷新卡死问题。
+-->
 <template>
+  <!-- 根视图容器：当该 Tab 首次被激活并完成初始渲染后常驻保活，非激活状态通过 rootStyle 移出视口 -->
   <view v-if="hasRendered" :style="rootStyle" class="tab-content-wrapper">
+    <!--
+      纵向滚动容器：各 Tab 独立拥有独立的滚动区域
+      :key="refresherKey" - 在刷新中途强行切走 Tab 时，通过改变 key 彻底重构组件，清除小程序/原生端卡死的转圈
+      :refresher-enabled - 是否开启自定义下拉刷新能力（保持稳定，严禁受 isActive 控制导致拔插头冻结）
+      :refresher-triggered - 下拉刷新动画状态（true 刷新中，false 已复位收起）
+      @refresherrefresh - 用户手势下拉达到阈值后触发的刷新事件
+      @refresherrestore - 下拉刷新控件动画彻底复位收起事件
+      @refresherabort - 手势异常中断或下拉未达阈值释放事件（鸿蒙/小程序兜底复位）
+      @scroll - 页面滚动监听，向上派发 onNavbarPageScroll 事件
+      @scrolltolower - 滚动触底监听，向上派发 onNavbarReachBottom 事件
+    -->
     <scroll-view
+      :key="refresherKey"
       direction="vertical"
       class="flex-1 flex flex-col"
       style="flex: 1;"
@@ -10,9 +32,11 @@
       :lower-threshold="50"
       @refresherrefresh="handleRefresherRefresh"
       @refresherrestore="handleRefresherRestore"
+      @refresherabort="handleRefresherRestore"
       @scroll="handleScroll"
       @scrolltolower="handleScrollToLower"
     >
+      <!-- 插槽：放置对应 Tab 的具体业务视图组件（如 IndexView、BasicView 等） -->
       <slot />
     </scroll-view>
   </view>
@@ -22,51 +46,85 @@
 import { computed, onMounted, onUnmounted, provide, ref, watch } from 'vue';
 import { curIdx, tabbarList } from '@/src/tabbar/index.uts';
 import { $t } from '@/src/utils/i18n/index.uts';
-import { isPageRefresherDisabled, isPageScrollDisabled, setHideNavbar, setHideStatusBar, setNavbarTitle } from '@/src/utils/refresh/index.uts';
+import {
+  isPageRefresherDisabled,
+  isPageScrollDisabled,
+  setHideNavbar,
+  setHideStatusBar,
+  setNavbarTitle,
+  stopNavbarPullDownRefresh
+} from '@/src/utils/refresh/index.uts';
 import { useAppStore } from '@/src/store';
 import { getThemeTokens } from '@/src/utils/theme/index.uts';
 import type { ThemeTokens } from '@/src/utils/theme/index.uts';
 
+// ==========================================
+// 1. 组件 Props 属性定义
+// ==========================================
 const props = defineProps({
-  /** 对应的 TabBar 索引（0, 1, 2, 3 等） */
+  /** 当前 Tab 对应的索引下标（0: 首页, 1: 基础, 2: 功能, 3: 我的 等） */
   contentIndex: {
     type: Number,
     required: true
   },
-  /** 可选的自定义导航栏标题（若未指定，默认读取当前 TabBar 对应项的多语言文本） */
+  /** 可选的自定义导航栏标题（若未指定，默认自动读取当前 Tab 项的多语言配置文案） */
   title: {
     type: String,
     default: ''
   },
-  /** 当前 Tab 是否隐藏顶部导航栏（各 Tab 独立控制显隐，true 隐藏，false 显示） */
+  /** 当前 Tab 是否隐藏顶部导航栏（各 Tab 独立控制显隐，true 隐藏，false 正常显示） */
   hideNavbar: {
     type: Boolean,
     default: false
   },
-  /** 当前 Tab 是否隐藏状态栏占位（默认 false，true 隐藏不占空间，完全沉浸式） */
+  /** 当前 Tab 是否隐藏状态栏占位（默认 false，true 为隐藏不占位，完全沉浸式体验） */
   hideStatusBar: {
     type: Boolean,
     default: false
   },
-  /** 当前 Tab 是否启用下拉刷新（默认 true） */
+  /** 当前 Tab 是否启用自定义下拉刷新（默认 true） */
   enablePullDownRefresh: {
     type: Boolean,
     default: true
   }
 });
 
+// ==========================================
+// 2. Tab 核心状态与激活控制
+// ==========================================
+/** 当前 Tab 是否已挂载渲染（按需懒渲染，首次点击激活后即常驻保活，避免重复销毁重挂载开销） */
 const hasRendered = ref(false);
+
+/** 计算当前 Tab 是否正处于激活显示状态 */
 const isActive = computed<boolean>((): boolean => curIdx.value == props.contentIndex);
+
+/** 标题与显隐相关的响应式计算属性（用于 watch 深度监听变更） */
 const contentTitle = computed((): string => props.title);
 const shouldHideNavbar = computed((): boolean => props.hideNavbar);
 const shouldHideStatusBar = computed((): boolean => props.hideStatusBar);
 
-// 向下跨层级注入当前 Tab 激活状态，供内部 fixed 元素通过 inject('isTabActive') 配合 v-if 兜底销毁
+/**
+ * 向下跨层级注入当前 Tab 激活状态：
+ * 供子组件内使用的 fixed 定位元素通过 inject('isTabActive') 配合 v-if 彻底在切走时销毁，
+ * 避免 iOS 原生引擎将 position: fixed 提升至 Page Root 无法被父级 CSS 隐藏的问题。
+ */
 provide('isTabActive', isActive);
 
-// 非激活 Tab 采用「移出视口 + visibility + display」三重隐藏，兼顾全端保活与渲染性能。
-// ⚠️ 注意：iOS 原生引擎会将 position: fixed 提升至 Page Root 视图，导致父级 CSS display:none 无法穿透；
-// 若 Tab 内部使用了 position: fixed，必须配合 v-if="isActive" 以在切走 Tab 时彻底卸载原生视图。
+// ==========================================
+// 3. 样式布局与主题令牌
+// ==========================================
+const appStore = useAppStore();
+
+/** 当前主题设计令牌（深浅色模式动态切换背景底色） */
+const themeTokens = computed<ThemeTokens>((): ThemeTokens => {
+  return getThemeTokens(appStore.state.isDark);
+});
+
+/**
+ * 根节点行内样式：
+ * 非激活 Tab 采用「left: -9999px + visibility: hidden」移出可视区域方案；
+ * 相比直接 v-if 销毁或 display: none，能完美保证 Tab 视图层 DOM 与滚动状态全端常驻保活，0ms 丝滑秒切。
+ */
 const rootStyle = computed<UTSJSONObject>((): UTSJSONObject => {
   return {
     left: isActive.value ? '0px' : '-9999px',
@@ -74,8 +132,78 @@ const rootStyle = computed<UTSJSONObject>((): UTSJSONObject => {
   } as UTSJSONObject;
 });
 
+// ==========================================
+// 4. 下拉刷新状态机与 Tab 切换容灾
+// ==========================================
+/** 下拉刷新状态控制：true 表示刷新中（展示 Loading 菊花），false 表示已复位收起 */
+const isTriggered = ref(false);
+
 /**
- * 设置/同步当前激活 Tab 的导航栏标题与显隐状态
+ * 刷新重置 key：
+ * 在刷新中途用户点击切换 Tab 时，通过递增该 key 强制重新构建 scroll-view，
+ * 彻底消除微信小程序及原生端因不可见或 enabled 冲突导致的原生转圈卡死死锁。
+ */
+const refresherKey = ref(0);
+
+/** 标记当前 Tab 是否在刷新中途被切换 Tab 强行中断 */
+let wasRefreshInterrupted: boolean = false;
+
+/** 记录最近一次 Tab 激活或切走的时间戳，用于防范视图重现时残余手势的误触发 */
+let lastTabSwitchTime: number = 0;
+
+/**
+ * 当前 Tab 是否允许下拉刷新：
+ * ⚠️ 极其关键设计：此处严禁绑定 isActive！
+ * 若切走 Tab 时将 enabled 动态变为 false，原生端与小程序会直接冻结正在运行的状态机，
+ * 导致切回时永久卡在转圈中；保持 enabled 稳定，依靠 left: -9999px 防误触即可。
+ */
+const isRefresherEnabled = computed<boolean>((): boolean => {
+  return props.enablePullDownRefresh && !isPageScrollDisabled.value && !isPageRefresherDisabled.value;
+});
+
+/**
+ * 下拉刷新触发事件回调（用户手势下拉超过阈值时触发）
+ */
+function handleRefresherRefresh(): void {
+  // 容灾拦截：若当前 Tab 未激活，或刚切 Tab 350ms 内触发（视图恢复时的残余 offset 误报），坚决丢弃并复位
+  if (!isActive.value || (Date.now() - lastTabSwitchTime < 350)) {
+    isTriggered.value = false;
+    return;
+  }
+  isTriggered.value = true;
+  // 向外全局派发页面下拉刷新通知，通知业务代码开始拉取最新数据
+  uni.$emit('onPagePullDownRefresh');
+}
+
+/**
+ * 下拉刷新复位完成 / 异常中断事件回调
+ */
+function handleRefresherRestore(): void {
+  isTriggered.value = false;
+}
+
+/**
+ * 监听外部业务代码发出的停止刷新通知（对应 stopNavbarPullDownRefresh()）
+ */
+function onStopRefresh(): void {
+  isTriggered.value = false;
+}
+
+/**
+ * 主动中断并彻底终止当前 Tab 的下拉刷新状态（切 Tab 或组件卸载时调用）
+ */
+function abortPullDownRefresh(): void {
+  wasRefreshInterrupted = true;
+  isTriggered.value = false;
+  refresherKey.value++;
+  stopNavbarPullDownRefresh();
+}
+
+// ==========================================
+// 5. 导航栏与状态栏同步
+// ==========================================
+/**
+ * 设置/同步当前激活 Tab 的导航栏标题（优先取 props.title，未传则读取 TabBar 配置的多语言文案）
  */
 function updateNavbarTitle(): void {
   let targetTitle = '';
@@ -88,86 +216,30 @@ function updateNavbarTitle(): void {
   }
 
   if (targetTitle.length > 0) {
+    // 同步给 NavBar 通用布局
     setNavbarTitle(targetTitle);
+    // 同步给系统原生导航栏底座
     uni.setNavigationBarTitle({
       title: targetTitle
     } as SetNavigationBarTitleOptions);
   }
 }
 
+/**
+ * 完整同步当前 Tab 的导航栏标题、状态栏与导航栏显隐配置
+ */
 function syncNavbarState(): void {
   updateNavbarTitle();
   setHideNavbar(props.hideNavbar);
   setHideStatusBar(props.hideStatusBar);
 }
 
-onMounted(() => {
-  if (curIdx.value == props.contentIndex) {
-    hasRendered.value = true;
-    syncNavbarState();
-  }
-});
-
-watch(isActive, (newVal: boolean) => {
-  if (newVal) {
-    if (!hasRendered.value) {
-      hasRendered.value = true;
-    }
-    syncNavbarState();
-  }
-});
-
-watch(contentTitle, (newTitle: string) => {
-  if (isActive.value && newTitle.length > 0) {
-    setNavbarTitle(newTitle);
-    uni.setNavigationBarTitle({
-      title: newTitle
-    } as SetNavigationBarTitleOptions);
-  }
-});
-
-watch(shouldHideNavbar, (newVal: boolean) => {
-  if (isActive.value) {
-    setHideNavbar(newVal);
-  }
-});
-
-watch(shouldHideStatusBar, (newVal: boolean) => {
-  if (isActive.value) {
-    setHideStatusBar(newVal);
-  }
-});
-
-const appStore = useAppStore();
-const themeTokens = computed<ThemeTokens>((): ThemeTokens => {
-  return getThemeTokens(appStore.state.isDark);
-});
-
-/** 下拉刷新状态控制：true 表示刷新中，false 表示已复位收起 */
-const isTriggered = ref(false);
-
-/** 当前激活 Tab 是否允许下拉刷新 */
-const isRefresherEnabled = computed<boolean>((): boolean => {
-  return isActive.value && props.enablePullDownRefresh && !isPageScrollDisabled.value && !isPageRefresherDisabled.value;
-});
-
-/** 下拉刷新触发事件 */
-function handleRefresherRefresh(): void {
-  isTriggered.value = true;
-  uni.$emit('onPagePullDownRefresh');
-}
-
-/** 下拉刷新复位事件 */
-function handleRefresherRestore(): void {
-  isTriggered.value = false;
-}
-
-/** 监听外部发出的停止刷新通知（stopNavbarPullDownRefresh） */
-function onStopRefresh(): void {
-  isTriggered.value = false;
-}
-
-/** 滚动事件回调 */
+// ==========================================
+// 6. 滚动与触底事件派发
+// ==========================================
+/**
+ * 滚动事件回调：统一向页面层派发 onNavbarPageScroll，保证 navbar 布局与页面监听正常工作
+ */
 function handleScroll(e: UniScrollEvent): void {
   if (!isActive.value) {
     return;
@@ -178,7 +250,9 @@ function handleScroll(e: UniScrollEvent): void {
   } as UTSJSONObject);
 }
 
-/** 触底事件回调 */
+/**
+ * 滚动触底事件回调：向页面层派发 onNavbarReachBottom 事件，驱动长列表触底分页加载
+ */
 function handleScrollToLower(): void {
   if (!isActive.value) {
     return;
@@ -186,12 +260,98 @@ function handleScrollToLower(): void {
   uni.$emit('onNavbarReachBottom');
 }
 
+// ==========================================
+// 7. 响应式监听与生命周期
+// ==========================================
+/**
+ * 组件初次挂载：若当前项正是默认激活项，立即标记已渲染并同步导航栏
+ */
+onMounted(() => {
+  if (curIdx.value == props.contentIndex) {
+    hasRendered.value = true;
+    syncNavbarState();
+  }
+});
+
+/**
+ * 监听当前 Tab 激活状态切换
+ */
+watch(isActive, (newVal: boolean) => {
+  // 记录切 Tab 时间戳，激活 350ms 内拦截任何偶发的残余刷新误触发
+  lastTabSwitchTime = Date.now();
+
+  if (newVal) {
+    // 首次激活时触发懒挂载
+    if (!hasRendered.value) {
+      hasRendered.value = true;
+    }
+    // 切换进入当前 Tab 时：若之前在刷新中被切走中断，强制递增 key 彻底重置底层状态机并确保收起
+    if (wasRefreshInterrupted) {
+      wasRefreshInterrupted = false;
+      refresherKey.value++;
+      isTriggered.value = false;
+      stopNavbarPullDownRefresh();
+    }
+    else {
+      isTriggered.value = false;
+    }
+    // 同步本 Tab 专属的导航栏配置
+    syncNavbarState();
+  }
+  else {
+    // 切换离开当前 Tab 时：若当前正处于下拉刷新中，立即强制终止并递增 key 重构
+    if (isTriggered.value) {
+      abortPullDownRefresh();
+    }
+  }
+});
+
+/**
+ * 监听自定义标题属性动态变化
+ */
+watch(contentTitle, (newTitle: string) => {
+  if (isActive.value && newTitle.length > 0) {
+    setNavbarTitle(newTitle);
+    uni.setNavigationBarTitle({
+      title: newTitle
+    } as SetNavigationBarTitleOptions);
+  }
+});
+
+/**
+ * 监听导航栏显隐动态变化
+ */
+watch(shouldHideNavbar, (newVal: boolean) => {
+  if (isActive.value) {
+    setHideNavbar(newVal);
+  }
+});
+
+/**
+ * 监听状态栏显隐动态变化
+ */
+watch(shouldHideStatusBar, (newVal: boolean) => {
+  if (isActive.value) {
+    setHideStatusBar(newVal);
+  }
+});
+
+// 全局监听停止刷新通知（如业务异步请求完成调用 stopNavbarPullDownRefresh()）
 uni.$on('stopPagePullDownRefresh', onStopRefresh);
 
+/**
+ * 组件销毁注销生命周期：停止可能存在的刷新，注销事件监听
+ */
 onUnmounted(() => {
+  if (isTriggered.value) {
+    abortPullDownRefresh();
+  }
   uni.$off('stopPagePullDownRefresh', onStopRefresh);
 });
 
+// ==========================================
+// 8. 对外暴露的方法接口
+// ==========================================
 defineExpose({
   updateNavbarTitle,
   syncNavbarState
@@ -199,6 +359,7 @@ defineExpose({
 </script>
 
 <style scoped>
+/* Tab 视图绝对定位铺满容器，配合 left: -9999px 实现无感后台保活 */
 .tab-content-wrapper {
   position: absolute;
   top: 0;

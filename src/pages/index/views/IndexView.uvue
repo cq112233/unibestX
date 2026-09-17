@@ -172,13 +172,35 @@ import { computed } from 'vue';
 import { useAppStore } from '@/src/store';
 import { systemInfo as systemInfoRef } from '@/src/utils/systemInfo/index.uts';
 import type { SystemInfoType } from '@/src/utils/systemInfo/index.uts';
-import { onTabPageShow, onTabShow } from '@/src/tabbar/index.uts';
+import { curIdx, onTabPageShow, onTabShow } from '@/src/tabbar/index.uts';
+import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/utils/refresh/index.uts';
 
 const appStore = useAppStore();
 const isDark = computed((): boolean => appStore.state.isDark);
 const systemInfo = computed<SystemInfoType | null>((): SystemInfoType | null => systemInfoRef.value);
 
-// 监听 Tab 切换到当前功能页（索引 0）时触发
+// 页面数据加载/刷新方法
+function refreshData(): void {
+  console.log('首页刷新中...');
+  setTimeout(() => {
+    // 门控检查：若刷新完成时用户已切到其他 Tab 则忽略
+    if (curIdx.value != 0) {
+      return;
+    }
+    console.log('首页刷新成功');
+    // 数据加载完毕后，手动停止下拉刷新动画状态
+    stopNavbarPullDownRefresh();
+  }, 1000);
+}
+
+// 监听 navbar 自定义下拉刷新事件（在 enablePullDownRefresh: true 且处于当前 Tab 时生效）
+onNavbarPullDownRefresh(() => {
+  if (curIdx.value == 0) {
+    refreshData();
+  }
+});
+
+// 监听 Tab 切换到当前首页（索引 0）时触发
 onTabShow(0, () => {
   console.log('onTabShow 首页 Tab 显示');
 }, true);

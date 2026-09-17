@@ -4,6 +4,7 @@
     <template v-if="isSinglePageTabbar">
       <!-- 自动挂载各 Tab 视图容器（由插件配合 config.uts 自动生成） -->
       <TabViews />
+
       <!-- 底部常驻 TabBar (同页渲染免路由跳转) -->
       <Tabbar />
     </template>
@@ -47,14 +48,16 @@ onHide(() => {
   notifyPageHide();
 });
 
-// 监听 navbar 自定义下拉刷新事件（在 enablePullDownRefresh: true 时生效）
+// 监听 navbar 自定义下拉刷新事件（独立页面模式下生效；单页 TabBar 模式由各子 View 自行监听）
 onNavbarPullDownRefresh(() => {
-  console.log('刷新中');
-  setTimeout(() => {
-    console.log('刷新成功');
-    // 数据加载完毕后，手动停止下拉刷新动画状态
-    stopNavbarPullDownRefresh();
-  }, 1000);
+  if (!isSinglePageTabbar) {
+    console.log('首页刷新中...');
+    setTimeout(() => {
+      console.log('首页刷新成功');
+      // 数据加载完毕后，手动停止下拉刷新动画状态
+      stopNavbarPullDownRefresh();
+    }, 1000);
+  }
 });
 
 onBackPress((options: OnBackPressOptions): boolean => {
