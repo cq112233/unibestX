@@ -219,7 +219,11 @@ const bottom = computed(() => {
 
 <style>
 .custom-capsule-wrapper {
+  /* 作为内部 absolute 胶囊的定位基准：本容器位于内容流末尾（flex 剩余空间之外），
+     其底边即页面可用区域底边，胶囊据此贴底悬浮 */
+  position: relative;
   width: 100%;
+  overflow: visible;
 }
 
 /* 占位容器 */
@@ -229,10 +233,11 @@ const bottom = computed(() => {
 
 /* 悬浮胶囊主底座 */
 .custom-capsule-container {
-  position: fixed;
+  /* 相对 .custom-capsule-wrapper 定位；垂直位置由模板绑定的 bottom（含安全区）决定，
+     此处不可再写 top，否则 top 胜出会把胶囊顶出可视区 */
+  position: absolute;
   left: 16px;
   right: 16px;
-  top: 30px;
   z-index: 999;
   flex-direction: row;
   align-items: center;
