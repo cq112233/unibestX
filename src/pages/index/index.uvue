@@ -20,7 +20,6 @@ import TabViews from '@/src/tabbar/components/TabViews.uvue';
 import Tabbar from '@/src/tabbar/tabbar.uvue';
 import { isSinglePageTabbar, notifyPageHide, notifyPageShow, setCurIdx } from '@/src/tabbar/index.uts';
 import { handleBackPressExit } from '@/src/utils/backPress/index.uts';
-import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/utils/refresh/index.uts';
 
 definePage({
   customPageClass: 'init-page', // 页面根容器自定义类名（配合 layout 布局使用，支持配置全局样式类）
@@ -50,18 +49,6 @@ onShow(() => {
 onHide(() => {
   notifyPageHide();
 });
-
-// 监听 navbar 自定义下拉刷新事件（独立页面模式下生效；单页 TabBar 模式由各子 View 自行监听）
-// onNavbarPullDownRefresh(() => {
-//   if (!isSinglePageTabbar) {
-//     console.log('首页刷新中...');
-//     setTimeout(() => {
-//       console.log('首页刷新成功');
-//       // 数据加载完毕后，手动停止下拉刷新动画状态
-//       stopNavbarPullDownRefresh();
-//     }, 1000);
-//   }
-// });
 
 onBackPress((options: OnBackPressOptions): boolean => {
   // #ifdef APP
