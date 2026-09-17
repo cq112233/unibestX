@@ -1,15 +1,15 @@
 <template>
   <view class="flex-1 relative" style="flex: 1; position: relative;">
-    <TabContent :content-index="0">
+    <TabContent :content-index="0" title="首页" :enable-pull-down-refresh="true" custom-page-class="init-page" custom-page-style="background-color: transparent;">
       <IndexView />
     </TabContent>
-    <TabContent :content-index="1">
+    <TabContent :content-index="1" title="基础" :enable-pull-down-refresh="true">
       <BasicView />
     </TabContent>
-    <TabContent :content-index="2">
+    <TabContent :content-index="2" title="功能" :enable-pull-down-refresh="true">
       <FunctionView />
     </TabContent>
-    <TabContent :content-index="3">
+    <TabContent :content-index="3" title="我的" :enable-pull-down-refresh="true">
       <MeView />
     </TabContent>
   </view>

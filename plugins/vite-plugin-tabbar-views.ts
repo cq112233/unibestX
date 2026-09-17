@@ -110,10 +110,35 @@ export function generateTabViews(projectRoot: string, options: TabbarViewsOption
 
   watchedTabPages.clear();
 
+  // 读取 pages.json 获取各页面完整配置
+  const pagesJsonMap = new Map<string, Record<string, any>>();
+  const pagesJsonPath = path.resolve(projectRoot, 'pages.json');
+  if (fs.existsSync(pagesJsonPath)) {
+    try {
+      const rawJson = fs.readFileSync(pagesJsonPath, 'utf-8');
+      const cleanJson = rawJson.replace(/\/\*[\s\S]*?\*\/|([^\\:]|^)\/\/.*$/gm, '$1');
+      const data = JSON.parse(cleanJson) as { pages?: any[]; subPackages?: any[] };
+      if (Array.isArray(data.pages)) {
+        data.pages.forEach((p: any) => {
+          if (p && typeof p.path === 'string') {
+            const normPath = p.path.replace(/\\/g, '/').replace(/^\//, '');
+            pagesJsonMap.set(normPath, p);
+          }
+        });
+      }
+    }
+    catch {}
+  }
+
   const viewsEntries: Array<{
     importName: string;
     importPath: string;
+    title: string;
     hideNavbar: boolean;
+    hideStatusBar: boolean;
+    enablePullDownRefresh: boolean;
+    customPageClass: string;
+    customPageStyle: string;
   }> = [];
   const usedNames = new Set<string>();
 
@@ -207,24 +232,63 @@ onNavbarPullDownRefresh(() => {
       }
     }
 
-    // 读取对应页面文件中的 definePage 配置（如 hideNavbar / hideStatusBar）
-    let hideNavbar = false;
-    let hideStatusBar = false;
+    // 优先从 pages.json 读取对应页面在 definePage 中的完整参数配置
+    const normTarget = rawPath.replace(/\\/g, '/').replace(/^\//, '').replace(/\.(uvue|vue)$/, '');
+    const pageConfig = pagesJsonMap.get(normTarget)
+      || pagesJsonMap.get(`src/${normTarget}`)
+      || pagesJsonMap.get(normTarget.replace(/^src\//, ''))
+      || null;
+
+    let hideNavbar = pageConfig?.hideNavbar === true;
+    let hideStatusBar = pageConfig?.hideStatusBar === true;
+    let enablePullDownRefresh = typeof pageConfig?.enablePullDownRefresh === 'boolean' ? pageConfig.enablePullDownRefresh : true;
+    let title = typeof pageConfig?.style?.navigationBarTitleText === 'string'
+      ? pageConfig.style.navigationBarTitleText
+      : (typeof pageConfig?.title === 'string' ? pageConfig.title : '');
+    let customPageClass = typeof pageConfig?.customPageClass === 'string'
+      ? pageConfig.customPageClass
+      : (typeof pageConfig?.class === 'string' ? pageConfig.class : '');
+    let customPageStyle = typeof pageConfig?.customPageStyle === 'string'
+      ? pageConfig.customPageStyle
+      : (typeof pageConfig?.customStyle === 'string' ? pageConfig.customStyle : '');
+
     const absPageFile = path.resolve(projectRoot, rawPath.endsWith('.uvue') ? rawPath : `${rawPath}.uvue`);
     watchedTabPages.add(absPageFile);
 
+    // 兜底直接解析对应主页面源码（针对开发过程中即时编辑 definePage 的场景）
     if (options.syncNavbarConfig !== false && fs.existsSync(absPageFile)) {
       try {
         const pageCode = fs.readFileSync(absPageFile, 'utf-8');
-        // 提取 hideNavbar: true / false
+        // 1. hideNavbar
         const mHide = pageCode.match(/hideNavbar\s*:\s*(true|false)/i);
         if (mHide) {
           hideNavbar = mHide[1].toLowerCase() === 'true';
         }
-        // 提取 hideStatusBar: true / false
+        // 2. hideStatusBar
         const mStatus = pageCode.match(/hideStatusBar\s*:\s*(true|false)/i);
         if (mStatus) {
           hideStatusBar = mStatus[1].toLowerCase() === 'true';
+        }
+        // 3. enablePullDownRefresh
+        const mRefresh = pageCode.match(/enablePullDownRefresh\s*:\s*(true|false)/i);
+        if (mRefresh) {
+          enablePullDownRefresh = mRefresh[1].toLowerCase() === 'true';
+        }
+        // 4. navigationBarTitleText / title
+        const mTitle = pageCode.match(/navigationBarTitleText\s*:\s*['"`](.*?)['"`]/i)
+          || pageCode.match(/\btitle\s*:\s*['"`](.*?)['"`]/i);
+        if (mTitle) {
+          title = mTitle[1].trim();
+        }
+        // 5. customPageClass
+        const mClass = pageCode.match(/customPageClass\s*:\s*['"`](.*?)['"`]/i);
+        if (mClass) {
+          customPageClass = mClass[1].trim();
+        }
+        // 6. customPageStyle
+        const mStyle = pageCode.match(/customPageStyle\s*:\s*['"`](.*?)['"`]/i);
+        if (mStyle) {
+          customPageStyle = mStyle[1].trim();
         }
       }
       catch {}
@@ -240,8 +304,12 @@ onNavbarPullDownRefresh(() => {
     viewsEntries.push({
       importName: finalCompName,
       importPath: `@/${actualRelPath.replace(/\\/g, '/')}`,
+      title,
       hideNavbar,
-      hideStatusBar
+      hideStatusBar,
+      enablePullDownRefresh,
+      customPageClass,
+      customPageStyle
     });
   }
 
@@ -257,9 +325,26 @@ onNavbarPullDownRefresh(() => {
 
   const contentBlocks = viewsEntries
     .map((item, index) => {
-      const hideNavAttr = item.hideNavbar ? ' :hide-navbar="true"' : '';
-      const hideStatusAttr = item.hideStatusBar ? ' :hide-status-bar="true"' : '';
-      return `    <TabContent :content-index="${index}"${hideNavAttr}${hideStatusAttr}>\n      <${item.importName} />\n    </TabContent>`;
+      let attrs = ` :content-index="${index}"`;
+      if (item.title) {
+        attrs += ` title="${item.title.replace(/"/g, '&quot;')}"`;
+      }
+      if (item.enablePullDownRefresh !== undefined) {
+        attrs += ` :enable-pull-down-refresh="${item.enablePullDownRefresh}"`;
+      }
+      if (item.hideNavbar) {
+        attrs += ` :hide-navbar="true"`;
+      }
+      if (item.hideStatusBar) {
+        attrs += ` :hide-status-bar="true"`;
+      }
+      if (item.customPageClass) {
+        attrs += ` custom-page-class="${item.customPageClass.replace(/"/g, '&quot;')}"`;
+      }
+      if (item.customPageStyle) {
+        attrs += ` custom-page-style="${item.customPageStyle.replace(/"/g, '&quot;')}"`;
+      }
+      return `    <TabContent${attrs}>\n      <${item.importName} />\n    </TabContent>`;
     })
     .join('\n');
 
@@ -351,6 +436,12 @@ export default function tabbarViewsPlugin(options: TabbarViewsOptions = {}): Plu
         }
         // 2. TabBar 对应的主页面文件（如 index.uvue, basic.uvue 等）改动触发
         if (watchedTabPages.has(norm)) {
+          debouncedGenerate();
+          return;
+        }
+        // 3. pages.json 改动触发
+        const pagesJsonPath = path.resolve(projectRoot, 'pages.json');
+        if (norm === pagesJsonPath) {
           debouncedGenerate();
         }
       });

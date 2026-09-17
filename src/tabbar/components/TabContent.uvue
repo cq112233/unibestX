@@ -9,7 +9,12 @@
 -->
 <template>
   <!-- 根视图容器：当该 Tab 首次被激活并完成初始渲染后常驻保活，非激活状态通过 rootStyle 移出视口 -->
-  <view v-if="hasRendered" :style="rootStyle" class="tab-content-wrapper">
+  <view
+    v-if="hasRendered"
+    :style="rootStyle"
+    class="tab-content-wrapper"
+    :class="customPageClass"
+  >
     <!--
       纵向滚动容器：各 Tab 独立拥有独立的滚动区域
       :key="refresherKey" - 在刷新中途强行切走 Tab 时，通过改变 key 彻底重构组件，清除小程序/原生端卡死的转圈
@@ -86,6 +91,16 @@ const props = defineProps({
   enablePullDownRefresh: {
     type: Boolean,
     default: true
+  },
+  /** 当前 Tab 页面根容器自定义类名（对应 definePage 的 customPageClass） */
+  customPageClass: {
+    type: String,
+    default: ''
+  },
+  /** 当前 Tab 页面根容器自定义行内样式（对应 definePage 的 customPageStyle） */
+  customPageStyle: {
+    type: String,
+    default: ''
   }
 });
 
@@ -123,13 +138,15 @@ const themeTokens = computed<ThemeTokens>((): ThemeTokens => {
 /**
  * 根节点行内样式：
  * 非激活 Tab 采用「left: -9999px + visibility: hidden」移出可视区域方案；
- * 相比直接 v-if 销毁或 display: none，能完美保证 Tab 视图层 DOM 与滚动状态全端常驻保活，0ms 丝滑秒切。
+ * 相比直接 v-if 销毁或 display: none，能完美保证 Tab 视图层 DOM 与滚动状态全端常驻保活，0ms 丝滑秒切；
+ * 并融合当前 Tab 页面自定义行内样式（customPageStyle）。
  */
-const rootStyle = computed<UTSJSONObject>((): UTSJSONObject => {
-  return {
-    left: isActive.value ? '0px' : '-9999px',
-    visibility: isActive.value ? 'visible' : 'hidden'
-  } as UTSJSONObject;
+const rootStyle = computed((): string => {
+  let s = isActive.value ? 'left: 0px; visibility: visible;' : 'left: -9999px; visibility: hidden;';
+  if (props.customPageStyle.length > 0) {
+    s += (s.endsWith(';') ? ' ' : '; ') + props.customPageStyle;
+  }
+  return s;
 });
 
 // ==========================================
@@ -208,7 +225,7 @@ function abortPullDownRefresh(): void {
 function updateNavbarTitle(): void {
   let targetTitle = '';
   if (props.title.length > 0) {
-    targetTitle = props.title;
+    targetTitle = $t(props.title);
   }
   else if (props.contentIndex >= 0 && props.contentIndex < tabbarList.length) {
     const item = tabbarList[props.contentIndex];
