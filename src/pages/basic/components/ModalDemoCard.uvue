@@ -1,32 +1,59 @@
 <template>
-  <Card title="全屏遮罩弹窗（覆盖 TabBar）">
+  <Card title="全屏遮罩弹窗（覆盖全屏）">
+    <!-- 说明与控制面板 -->
     <view
       class="rounded-[10px] p-[12px] border-[1px] border-solid"
-      :class="isDark ? 'bg-[#1e293b]/70 border-[#334155]' : 'bg-[#f8fafc] border-[#e2e8f0]'"
+      :class="isDark ? 'bg-[#1e293b] border-[#334155]' : 'bg-[#f8fafc] border-[#e2e8f0]'"
     >
       <view class="flex flex-row items-center justify-between mb-[6px]">
-        <text class="text-[13px] font-bold" :class="isDark ? 'text-[#f1f5f9]' : 'text-[#1e293b]'">🎭 TabBar 全局覆盖机制</text>
+        <text class="text-[13px] font-bold" :class="isDark ? 'text-[#f1f5f9]' : 'text-[#1e293b]'">🎭 全屏覆盖机制</text>
         <text class="text-[10px] font-medium px-[6px] py-[2px] rounded-[4px] text-[#38bdf8] bg-[#0284c71f]">z-index: 9999</text>
       </view>
       <text
         class="text-[12px] leading-[20px] mb-[10px]"
         :class="isDark ? 'text-[#94a3b8]' : 'text-[#64748b]'"
       >
-        演示全屏遮罩覆盖 TabBar 机制。在模式 0、2、3、4（推荐模式 4 单页保活）下，TabBar 为组件层渲染（z-index: 999），弹窗遮罩（z-index: 9999）可在全端 100% 完美覆盖；在模式 1 原生 TabBar 下，H5 端可遮挡，App/小程序原生底座层级高于页面需配合 hideTabBar API。
+        演示全屏遮罩覆盖机制。在模式 0、2、3、4（推荐模式 4 单页保活）下，TabBar 为组件层渲染（z-index: 999），弹窗遮罩（z-index: 9999）可在全端 100% 完美覆盖全屏（含底部 TabBar）；在模式 1 原生 TabBar 下，仅 H5 端可遮挡，App/小程序等原生底座无法直接遮挡。
       </text>
       <view
         class="h-[36px] rounded-[8px] bg-[#4f46e5] flex flex-row items-center justify-center active:opacity-85"
         @click="openModal"
       >
-        <text class="text-[#ffffff] text-[13px] font-medium">打开遮罩弹窗（遮住 TabBar）</text>
+        <text class="text-[#ffffff] text-[13px] font-medium">打开遮罩弹窗（覆盖全屏）</text>
       </view>
     </view>
 
-    <!-- 封装的弹窗遮罩组件 -->
+    <!-- 封装的弹窗遮罩组件（支持插槽自定义内容） -->
     <TabbarMaskModal
       :visible="showModal"
+      title="已覆盖全屏"
+      icon="🛡️"
+      confirm-text="关闭弹窗"
       @close="closeModal"
-    />
+    >
+      <text
+        class="text-[12px] leading-[20px] mb-[12px]"
+        :class="isDark ? 'text-[#94a3b8]' : 'text-[#64748b]'"
+      >
+        在模式 0、2、3、4（尤其默认推荐的模式 4）下，暗色遮罩已将全屏及底部 TabBar 完全覆盖！
+      </text>
+
+      <!-- 关键原理解析卡片 -->
+      <view
+        class="p-[10px] rounded-[8px] mb-[16px] flex flex-col"
+        :class="isDark ? 'bg-[#0f172a]' : 'bg-[#f8fafc]'"
+      >
+        <text class="text-[11px] leading-[18px] text-[#059669]">
+          ✓ 全屏覆盖：模式 0/2/3/4 全端完美覆盖全屏（z-index: 9999 &gt; 999）
+        </text>
+        <text class="text-[11px] leading-[18px] text-[#4f46e5] mt-[4px]">
+          ✓ 原生底座差异：模式 1 原生 TabBar 仅 H5 可遮挡，App/小程序为系统层级
+        </text>
+        <text class="text-[11px] leading-[18px] text-[#d97706] mt-[4px]">
+          ✓ 微信环境适配：小程序端使用 root-portal 提升至 Page 根节点
+        </text>
+      </view>
+    </TabbarMaskModal>
   </Card>
 </template>
 
@@ -34,7 +61,7 @@
 import { computed, ref } from 'vue';
 import { useAppStore } from '@/src/store';
 import Card from './Card.uvue';
-import TabbarMaskModal from './TabbarMaskModal.uvue';
+import TabbarMaskModal from '@/src/components/TabbarMaskModal/TabbarMaskModal.uvue';
 
 const appStore = useAppStore();
 const isDark = computed((): boolean => appStore.state.isDark);

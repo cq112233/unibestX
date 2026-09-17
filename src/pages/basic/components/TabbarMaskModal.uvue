@@ -1,144 +1,34 @@
 <template>
-  <!-- 全屏遮罩弹窗组件 (覆盖底部 TabBar 示例) -->
-  <!-- 微信小程序端：需要 root-portal 提升至 page 根节点以穿透 TabBar -->
-  <!-- #ifdef MP-WEIXIN -->
-  <root-portal v-if="visible">
-    <view
-      class="modal-overlay"
-      :style="{ zIndex }"
-    >
-      <!-- 暗色遮罩背景（点击空白处关闭） -->
-      <view
-        class="modal-mask"
-        @click="handleClose"
-      />
-
-      <!-- 居中卡片本体 -->
-      <view
-        class="w-[310px] p-[20px] rounded-[16px] border-[1px] border-solid relative z-10 flex flex-col"
-        :class="isDark ? 'bg-[#1e293b] border-[#334155]' : 'bg-[#ffffff] border-[#e2e8f0]'"
-      >
-        <!-- 头部标题区 -->
-        <view class="flex flex-row items-center justify-between mb-[12px]">
-          <view class="flex flex-row items-center">
-            <text class="text-[18px] mr-[8px]">🛡️</text>
-            <text class="text-[16px] font-bold" :class="isDark ? 'text-[#f1f5f9]' : 'text-[#1e293b]'">
-              {{ title }}
-            </text>
-          </view>
-          <view class="p-[4px]" @click="handleClose">
-            <text class="text-[16px] text-[#94a3b8]">✕</text>
-          </view>
-        </view>
-
-        <!-- 详细说明区 -->
-        <slot>
-          <text class="text-[12px] leading-[20px] mb-[12px]" :class="isDark ? 'text-[#94a3b8]' : 'text-[#64748b]'">
-            在模式 0、2、3、4（尤其默认推荐的模式 4）下，暗色遮罩已将底部 TabBar 悬浮胶囊/底座完全遮住！
-          </text>
-
-          <!-- 关键原理解析卡片 -->
-          <view
-            class="p-[10px] rounded-[8px] mb-[16px] flex flex-col"
-            :class="isDark ? 'bg-[#0f172a]' : 'bg-[#f8fafc]'"
-          >
-            <text class="text-[11px] leading-[18px] text-[#059669]">
-              ✓ 组件层遮挡：模式 0/2/3/4 全端完美遮盖（z-index: {{ zIndex }} &gt; 999）
-            </text>
-            <text class="text-[11px] leading-[18px] text-[#4f46e5] mt-[4px]">
-              ✓ 原生底座差异：模式 1 原生 TabBar 仅 H5 可遮挡，App/小程序为系统层级
-            </text>
-            <text class="text-[11px] leading-[18px] text-[#d97706] mt-[4px]">
-              ✓ 微信环境适配：小程序端使用 root-portal 提升至 Page 根节点
-            </text>
-          </view>
-        </slot>
-
-        <!-- 底部操作按钮 -->
-        <slot name="footer">
-          <view
-            class="w-full h-[40px] rounded-[8px] bg-[#4f46e5] flex flex-row items-center justify-center active:opacity-85"
-            @click="handleClose"
-          >
-            <text class="text-[#ffffff] text-[14px] font-medium">关闭弹窗</text>
-          </view>
-        </slot>
-      </view>
-    </view>
-  </root-portal>
-  <!-- #endif -->
-
-  <!-- 非微信小程序端（App、H5 等）：无需 root-portal，直接由 position: fixed 覆盖 -->
-  <!-- #ifndef MP-WEIXIN -->
-  <view
-    v-if="visible"
-    class="modal-overlay"
-    :style="{ zIndex }"
+  <TabbarMaskModal
+    :visible="visible"
+    :title="title"
+    :icon="icon"
+    :z-index="zIndex"
+    :width="width"
+    :show-close="showClose"
+    :mask-closable="maskClosable"
+    :confirm-text="confirmText"
+    @close="emit('close')"
+    @confirm="emit('confirm')"
+    @update:visible="(val: boolean) => emit('update:visible', val)"
   >
-    <!-- 暗色遮罩背景（点击空白处关闭） -->
-    <view
-      class="modal-mask"
-      @click="handleClose"
-    />
+    <!-- 默认内容插槽透传 -->
+    <slot />
 
-    <!-- 居中卡片本体 -->
-    <view
-      class="w-[310px] p-[20px] rounded-[16px] border-[1px] border-solid relative z-10 flex flex-col"
-      :class="isDark ? 'bg-[#1e293b] border-[#334155]' : 'bg-[#ffffff] border-[#e2e8f0]'"
-    >
-      <!-- 头部标题区 -->
-      <view class="flex flex-row items-center justify-between mb-[12px]">
-        <view class="flex flex-row items-center">
-          <text class="text-[18px] mr-[8px]">🛡️</text>
-          <text class="text-[16px] font-bold" :class="isDark ? 'text-[#f1f5f9]' : 'text-[#1e293b]'">
-            {{ title }}
-          </text>
-        </view>
-        <view class="p-[4px]" @click="handleClose">
-          <text class="text-[16px] text-[#94a3b8]">✕</text>
-        </view>
-      </view>
+    <!-- 头部插槽透传 -->
+    <template #header>
+      <slot name="header" />
+    </template>
 
-      <!-- 详细说明区 -->
-      <slot>
-        <text class="text-[12px] leading-[20px] mb-[12px]" :class="isDark ? 'text-[#94a3b8]' : 'text-[#64748b]'">
-          在模式 0、2、3、4（尤其默认推荐的模式 4）下，暗色遮罩已将底部 TabBar 悬浮胶囊/底座完全遮住！
-        </text>
-
-        <!-- 关键原理解析卡片 -->
-        <view
-          class="p-[10px] rounded-[8px] mb-[16px] flex flex-col"
-          :class="isDark ? 'bg-[#0f172a]' : 'bg-[#f8fafc]'"
-        >
-          <text class="text-[11px] leading-[18px] text-[#059669]">
-            ✓ 组件层遮挡：模式 0/2/3/4 全端完美遮盖（z-index: {{ zIndex }} &gt; 999）
-          </text>
-          <text class="text-[11px] leading-[18px] text-[#4f46e5] mt-[4px]">
-            ✓ 原生底座差异：模式 1 原生 TabBar 仅 H5 可遮挡，App/小程序为系统层级
-          </text>
-          <text class="text-[11px] leading-[18px] text-[#d97706] mt-[4px]">
-            ✓ 全端通用布局：position: fixed 覆盖当前页面顶层
-          </text>
-        </view>
-      </slot>
-
-      <!-- 底部操作按钮 -->
-      <slot name="footer">
-        <view
-          class="w-full h-[40px] rounded-[8px] bg-[#4f46e5] flex flex-row items-center justify-center active:opacity-85"
-          @click="handleClose"
-        >
-          <text class="text-[#ffffff] text-[14px] font-medium">关闭弹窗</text>
-        </view>
-      </slot>
-    </view>
-  </view>
-  <!-- #endif -->
+    <!-- 底部插槽透传 -->
+    <template #footer>
+      <slot name="footer" />
+    </template>
+  </TabbarMaskModal>
 </template>
 
 <script setup lang="uts">
-import { computed } from 'vue';
-import { useAppStore } from '@/src/store';
+import TabbarMaskModal from '@/src/components/TabbarMaskModal/TabbarMaskModal.uvue';
 
 defineProps({
   /** 弹窗显隐控制 */
@@ -149,43 +39,39 @@ defineProps({
   /** 弹窗标题 */
   title: {
     type: String,
-    default: '已遮住底部 TabBar'
+    default: '已覆盖全屏'
   },
-  /** 弹窗层级（默认 9999，高于 TabBar 的 999） */
+  /** 标题前置图标（如 emoji '🛡️'） */
+  icon: {
+    type: String,
+    default: '🛡️'
+  },
+  /** 弹窗层级（默认 9999，高于组件层 TabBar 的 999） */
   zIndex: {
     type: Number,
     default: 9999
+  },
+  /** 居中卡片宽度（默认 '310px'） */
+  width: {
+    type: String,
+    default: '310px'
+  },
+  /** 是否显示右上角关闭按钮 */
+  showClose: {
+    type: Boolean,
+    default: true
+  },
+  /** 点击暗色遮罩背景是否允许关闭 */
+  maskClosable: {
+    type: Boolean,
+    default: true
+  },
+  /** 默认底部确认按钮文本 */
+  confirmText: {
+    type: String,
+    default: '关闭弹窗'
   }
 });
 
-const emit = defineEmits(['close', 'update:visible']);
-
-const appStore = useAppStore();
-const isDark = computed((): boolean => appStore.state.isDark);
-
-function handleClose(): void {
-  emit('close');
-  emit('update:visible', false);
-}
+const emit = defineEmits(['close', 'update:visible', 'confirm']);
 </script>
-
-<style scoped>
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  align-items: center;
-  justify-content: center;
-}
-
-.modal-mask {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background-color: rgba(0, 0, 0, 0.65);
-}
-</style>
