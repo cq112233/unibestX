@@ -248,6 +248,7 @@ configs.push({
           'movable-view',
           'cover-view',
           'cover-image',
+          'root-portal',
 
           // uni-app X 原生高性能列表与流式组件
           'list-view',

@@ -15,9 +15,18 @@
       :border="border"
     />
 
+    <!-- 单页 TabBar 容器模式（模式 4 且为主页）：由内部 TabViews/TabContent 独立承载滚动与下拉刷新，避免外层嵌套 scroll-view 导致手势冲突、TabBar 跟随下移与双重下拉刷新 -->
+    <view
+      v-if="isSinglePageHome"
+      class="flex-1 flex flex-col overflow-hidden"
+      style="flex: 1; position: relative;"
+    >
+      <slot />
+    </view>
+
     <!-- 当开启自定义下拉刷新时（原生未开启且当前布局开启） -->
     <scroll-view
-      v-if="useCustomRefresher"
+      v-else-if="useCustomRefresher"
       :direction="pageScrollDirection"
       class="flex-1 flex flex-col"
       :refresher-enabled="isRefresherEnabled"
@@ -233,18 +242,29 @@ const isStatusBarVisible = computed((): boolean => {
   return true;
 });
 
+/**
+ * 响应全局 setStatusBarVisible 事件：设置状态栏是否可见
+ * @param visible 是否可见（true 为显示，false 为隐藏）
+ */
 function onSetStatusBarVisible(visible: any): void {
   if (typeof visible == 'boolean') {
     dynamicHideStatusBar.value = !(visible as boolean);
   }
 }
 
+/**
+ * 响应全局 setHideStatusBar 事件：设置是否隐藏状态栏
+ * @param hide 是否隐藏（true 为隐藏，false 为显示）
+ */
 function onSetHideStatusBar(hide: any): void {
   if (typeof hide == 'boolean') {
     dynamicHideStatusBar.value = hide as boolean;
   }
 }
 
+/**
+ * 响应全局 resetStatusBarVisible 事件：重置状态栏显隐为页面默认配置
+ */
 function onResetStatusBarVisible(): void {
   dynamicHideStatusBar.value = null;
 }
@@ -268,18 +288,29 @@ const isNavbarVisible = computed((): boolean => {
   return true;
 });
 
+/**
+ * 响应全局 setNavbarVisible 事件：设置导航栏是否可见
+ * @param visible 是否可见（true 为显示，false 为隐藏）
+ */
 function onSetNavbarVisible(visible: any): void {
   if (typeof visible == 'boolean') {
     dynamicHideNavbar.value = !(visible as boolean);
   }
 }
 
+/**
+ * 响应全局 setHideNavbar 事件：设置是否隐藏导航栏
+ * @param hide 是否隐藏（true 为隐藏，false 为显示）
+ */
 function onSetHideNavbar(hide: any): void {
   if (typeof hide == 'boolean') {
     dynamicHideNavbar.value = hide as boolean;
   }
 }
 
+/**
+ * 响应全局 resetNavbarVisible 事件：重置导航栏显隐为页面默认配置
+ */
 function onResetNavbarVisible(): void {
   dynamicHideNavbar.value = null;
 }
@@ -333,6 +364,11 @@ function resetNavbarTitle(): void {
   customTitle.value = null;
 }
 
+/**
+ * 响应全局 setNavbarTitle 事件：动态修改导航栏标题
+ * 支持传入 string 字符串，或形如 { title: string } 的 UTSJSONObject 对象
+ * @param title 新标题或包含 title 属性的配置对象
+ */
 function onSetNavbarTitle(title: any | null): void {
   if (title != null) {
     if (typeof title == 'string') {
@@ -349,6 +385,9 @@ function onSetNavbarTitle(title: any | null): void {
   }
 }
 
+/**
+ * 响应全局 resetNavbarTitle 事件：重置导航栏标题为初始配置标题
+ */
 function onResetNavbarTitle(): void {
   resetNavbarTitle();
 }
@@ -406,11 +445,37 @@ const isNativePullDown = computed((): boolean => {
 });
 
 /**
+ * 判断是否处于单页面 TabBar 的宿主首页容器
+ */
+const isSinglePageHome = computed((): boolean => {
+  if (!isSinglePageTabbar) {
+    return false;
+  }
+  if (props.type == 'home') {
+    return true;
+  }
+  try {
+    const pages = getCurrentPages();
+    if (pages.length > 0) {
+      const page = pages[pages.length - 1];
+      const r = (page.route ?? '').replace(/^\//, '');
+      if (r == 'pages/index/index' || r == 'src/pages/index/index' || r.endsWith('index/index') || r == '') {
+        return true;
+      }
+    }
+  }
+  catch {}
+  return false;
+});
+
+/**
  * 决定是否使用 NavBar 内部自定义下拉刷新：
- * 若原生已开启下拉（style.enablePullDownRefresh），原生优先并关闭内部下拉；仅在原生未开启时才使用自定义下拉
+ * 若原生已开启下拉（style.enablePullDownRefresh），原生优先并关闭内部下拉；
+ * 若处于单页 TabBar 首页模式（由内部 TabViews/TabContent 独立驱动下拉刷新），外层关闭下拉刷新，杜绝双重刷新圈与 TabBar 掉落；
+ * 仅在原生未开启时才使用自定义下拉
  */
 const useCustomRefresher = computed((): boolean => {
-  if (isNativePullDown.value) {
+  if (isNativePullDown.value || isSinglePageHome.value) {
     return false;
   }
   return props.enablePullDownRefresh;
@@ -423,7 +488,7 @@ const displayTitle = computed((): string => {
   if (customTitle.value != null) {
     return customTitle.value!;
   }
-  if (isSinglePageTabbar && props.type == 'home') {
+  if (isSinglePageHome.value) {
     if (curIdx.value >= 0 && curIdx.value < tabbarList.length) {
       return $t(tabbarList[curIdx.value].text);
     }
@@ -466,6 +531,9 @@ const navTitleColor = computed((): string => {
   return props.titleColor;
 });
 
+/**
+ * 判断当前页面是否启用了自定义导航栏（navigationStyle 为 'custom' 时渲染自定义 NavBar）
+ */
 const isCustomNav = computed((): boolean => {
   const textStyleFromStyle = (pageStyleObj.value.navigationStyle as string | null) ?? '';
   if (textStyleFromStyle.length > 0) {
@@ -481,6 +549,9 @@ const isCustomNav = computed((): boolean => {
   }
 });
 
+/**
+ * 获取当前主题的设计令牌（ThemeTokens，自适应明暗模式）
+ */
 const themeTokens = computed((): ThemeTokens => {
   return getThemeTokens(useAppStore().state.isDark);
 });

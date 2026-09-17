@@ -1,5 +1,5 @@
 <template>
-  <view>
+  <view class="pb-[80px]">
     <!-- 标题头 -->
     <view class="pt-[20px] px-[16px] pb-[10px]">
       <text class="text-[20px] font-bold text-[#1a202c]">功能组件库演示</text>
@@ -40,6 +40,10 @@ const isCanvasReady = ref(false);
 function refreshData(): void {
   console.log('功能页面刷新中...');
   setTimeout(() => {
+    // 门控检查：若刷新完成时用户已切到其他 Tab 则忽略
+    if (curIdx.value != 2) {
+      return;
+    }
     console.log('功能页面刷新成功');
     // 数据加载完毕后，手动停止下拉刷新动画状态
     stopNavbarPullDownRefresh();
@@ -48,7 +52,7 @@ function refreshData(): void {
 
 // 监听 Tab 切换到当前功能页（索引 2）时触发
 onTabShow(2, () => {
-  refreshData();
+  console.log('onTabShow 功能 Tab 显示');
   // 延迟 100ms 挂载：确保微信小程序与各端渲染线程（WebView/原生容器）已将视图移入可视区并完成物理像素排版
   if (!isCanvasReady.value) {
     setTimeout(() => {
@@ -75,11 +79,6 @@ onNavbarPullDownRefresh(() => {
     refreshData();
   }
 });
-
-// 监听 Tab 切换到当前功能页（索引 2）时触发
-onTabShow(2, () => {
-  console.log('onTabShow 功能 Tab 显示');
-}, true);
 
 // 监听功能 Tab 页面显示（切 Tab、从子页面返回、前台恢复都会触发）
 onTabPageShow(2, () => {

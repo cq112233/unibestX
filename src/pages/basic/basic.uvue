@@ -6,6 +6,7 @@
 import BasicView from './views/BasicView.uvue';
 import { handleBackPressExit } from '@/src/utils/backPress/index.uts';
 import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/utils/refresh/index.uts';
+import { notifyPageHide, notifyPageShow, setCurIdx } from '@/src/tabbar/index.uts';
 
 definePage({
   debug: false,
@@ -18,6 +19,16 @@ definePage({
     navigationBarTitleText: '基础',
     navigationStyle: 'custom'
   }
+});
+
+// 独立页面模式下，切到当前基础页时同步当前 Tab 激活索引并通知页面可见
+onShow(() => {
+  setCurIdx(1);
+  notifyPageShow();
+});
+
+onHide(() => {
+  notifyPageHide();
 });
 
 onNavbarPullDownRefresh(() => {

@@ -1,0 +1,77 @@
+<template>
+  <TabbarMaskModal
+    :visible="visible"
+    :title="title"
+    :icon="icon"
+    :z-index="zIndex"
+    :width="width"
+    :show-close="showClose"
+    :mask-closable="maskClosable"
+    :confirm-text="confirmText"
+    @close="emit('close')"
+    @confirm="emit('confirm')"
+    @update:visible="(val: boolean) => emit('update:visible', val)"
+  >
+    <!-- 默认内容插槽透传 -->
+    <slot />
+
+    <!-- 头部插槽透传 -->
+    <template #header>
+      <slot name="header" />
+    </template>
+
+    <!-- 底部插槽透传 -->
+    <template #footer>
+      <slot name="footer" />
+    </template>
+  </TabbarMaskModal>
+</template>
+
+<script setup lang="uts">
+import TabbarMaskModal from '@/src/components/TabbarMaskModal/TabbarMaskModal.uvue';
+
+defineProps({
+  /** 弹窗显隐控制 */
+  visible: {
+    type: Boolean,
+    default: false
+  },
+  /** 弹窗标题 */
+  title: {
+    type: String,
+    default: '已覆盖全屏'
+  },
+  /** 标题前置图标（如 emoji '🛡️'） */
+  icon: {
+    type: String,
+    default: '🛡️'
+  },
+  /** 弹窗层级（默认 9999，高于组件层 TabBar 的 999） */
+  zIndex: {
+    type: Number,
+    default: 9999
+  },
+  /** 居中卡片宽度（默认 '310px'） */
+  width: {
+    type: String,
+    default: '310px'
+  },
+  /** 是否显示右上角关闭按钮 */
+  showClose: {
+    type: Boolean,
+    default: true
+  },
+  /** 点击暗色遮罩背景是否允许关闭 */
+  maskClosable: {
+    type: Boolean,
+    default: true
+  },
+  /** 默认底部确认按钮文本 */
+  confirmText: {
+    type: String,
+    default: '关闭弹窗'
+  }
+});
+
+const emit = defineEmits(['close', 'update:visible', 'confirm']);
+</script>
