@@ -44,8 +44,7 @@ const shouldHideStatusBar = computed((): boolean => props.hideStatusBar);
 const rootStyle = computed<UTSJSONObject>((): UTSJSONObject => {
   return {
     left: isActive.value ? '0px' : '-9999px',
-    visibility: isActive.value ? 'visible' : 'hidden',
-    zIndex: isActive.value ? 1 : 0
+    visibility: isActive.value ? 'visible' : 'hidden'
   } as UTSJSONObject;
 });
 
