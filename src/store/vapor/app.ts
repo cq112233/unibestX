@@ -167,19 +167,5 @@ export const useAppStore = defineStore('app', () => {
     setLocale
   };
 }, {
-  persist: {
-    afterHydrate: (ctx) => {
-      const store = ctx.store;
-      if (store.state.theme != null && store.state.theme.length > 0) {
-        themeColor.value = store.state.theme;
-        applyThemeColor(store.state.theme);
-      }
-      if (store.state.locale != null && store.state.locale.length > 0 && i18n?.global?.locale != null) {
-        i18n.global.locale.value = store.state.locale;
-      }
-      if (store.state.themeMode != null) {
-        store.refreshIsDark();
-      }
-    }
-  }
+  persist: true
 });
