@@ -118,6 +118,7 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 | **H5 Docker 部署模式** | 在 Docker 容器内下载安装 3.7GB Linux 版 HBuilderX 桌面端做全流程构建（构建耗时 15~30 分钟、Mac M 芯片转译卡死、BuildKit 日志管道堵塞） | 宿主机/CI 执行 `pnpm build:test` / `pnpm build:prod`，Docker 仅基于 `nginx:alpine` 轻量镜像承载静态文件与 `${API_UPSTREAM}` 动态反代（镜像仅 ~25MB，打包 1~2 秒，详见 `docs/guide/docker-deploy.md`） |
 | **App 端动画卡顿 / 顿挫（Transition / Transform）** | 将 `transitionProperty` / `duration` 写在动态 `:style` 中；对带深阴影的元素做 `scale` 缩放；切换时改 `fontWeight` 触发文本 `requestLayout()`；用 `setTimeout` 延迟挂载来掩盖卡顿 | `transition` 规则写在静态 CSS class 中走原生 GPU 硬件加速；动态 `:style` 只传单一 `transform` 变化；避免带深阴影缩放与频繁改变 `fontWeight`；保持同步状态，严禁使用 `setTimeout` 掩盖动画性能缺陷（见 1.2.19） |
 | **模拟数据（Mock）直接在页面组件中硬编码** | 在 `.uvue` 页面组件的 `<script setup>` 里写死大段假数据数组/对象字面量（如 `const list = ref([...])`） | 抽离到 `src/api/xxx.uts`，先定义强类型 `type`，将 Mock 数据封装为返回 `Promise<T>` 的接口函数（如 `Promise.resolve(MOCK_LIST)`）；页面统一通过异步 API 函数拉取。后期对接真实后端仅需在 API 模块中改用 `http.get/post`，页面层 0 改动（见 5.6） |
+| **iOS 端单页 TabBar 内 `position: fixed` 脱壳残留** | 在单页 TabBar 视图内裸写 `position: fixed` 悬浮元素（iOS 会被提升至 Page Root ViewController 独立渲染，切 Tab 时父级 `display: none` 无法穿透隐藏） | 悬浮元素一律优先改用 `position: absolute` 配合当前 Tab 的满高相对定位容器；若必须使用 `fixed` 则必须在节点上挂载 `v-if="isTabActive"`（见 1.2.21） |
 
 
 ---
@@ -188,4 +189,4 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 - [ ] **59. 后端真实接口统一在 `src/api/<page>/<page>.uts` 按页面名称对齐收拢**（从 `mock.uts` 对接后端真实接口时，必须在 `src/api/` 下以页面同名目录及同名 `.uts` 文件存放，如 `src/api/index/index.uts`，以 `mock.uts` 为契约蓝本保持入参及出参 `Promise<T>` 签名 100% 一致，使得前端容器无感平滑切换，见分册 6）
 - [ ] **60. 原生平台严禁使用 `gap` 及其原子化类名与 `space-x-*` / `space-y-*`**（App 原生端 Flexbox 布局引擎不支持 `gap`、`row-gap`、`column-gap`，也不支持 space 复杂选择器，会导致子元素无间距挤压堆叠；水平间距改用 `mr-[...]` / `ml-[...]`，垂直间距改用 `mb-[...]` / `mt-[...]`，见 1.2.20）
 - [ ] **61. 长列表强制使用 `list-view` 严禁使用 `scroll-view`**（长列表、商品流、瀑布流、分页无限加载一律使用具有原生节点回收复用池机制的 `<list-view>` + `<list-item>` 或 `<z-paging-x>`；`<scroll-view>` 无复用机制，数据增多会导致原生端内存线性暴增甚至 OOM 闪退，仅允许用于短内容或横向滑块，见 1.3.21）
-
+- [ ] **62. 单页 TabBar 内部严禁裸写不带 `v-if` 控制的 `position: fixed`**（iOS 原生渲染引擎会将 fixed 元素提升至 Page Root ViewController 图层脱壳独立渲染，导致切 Tab 时父级 `display: none` 无法穿透隐藏；悬浮优先改用 `position: absolute` 配合 relative 容器，若用 fixed 必须绑定 `v-if="isTabActive"`，见 1.2.21）
