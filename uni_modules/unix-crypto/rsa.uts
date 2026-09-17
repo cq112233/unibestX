@@ -745,19 +745,9 @@ export function rsaVerifyUts(digestHex: string, hashType: string, publicKey: str
   return true
 }
 
-// ---- RSA 密钥对生成（纯大整数实现，支持微信小程序 / H5 / 鸿蒙 / 全端） ----
+// ---- RSA 密钥对生成（纯 JS / BigInt，支持微信小程序 / H5 / 全端） ----
 
-// 大整数的跨端类型差异：
-// 鸿蒙端编译为 ArkTS，原生支持 bigint，且严禁 any / unknown（arkts-no-any-unknown）；
-// 其余平台（iOS / H5 / 小程序）BigInt 可能缺失，沿用 any + 运行时兜底。
-// #ifdef APP-HARMONY
-type CipherBigInt = bigint
-// #endif
-// #ifndef APP-HARMONY
-type CipherBigInt = any
-// #endif
-
-function bigIntToDerInteger(n: CipherBigInt): Uint8Array {
+function bigIntToDerInteger(n: any): Uint8Array {
   let hex: string = n.toString(16)
   if (hex.length % 2 != 0) {
     hex = '0' + hex
@@ -830,25 +820,15 @@ function rsaGenerateKeyPairAndroid(bits: number): string {
 // #endif
 
 // #ifndef APP-ANDROID
-// BigInt 工厂：鸿蒙端 ArkTS 原生提供 BigInt，直接引用即可；
-// 其余平台做存在性探测，缺失时由调用方降级。
-// #ifdef APP-HARMONY
-const bigIntFunc = BigInt
-// #endif
-// #ifndef APP-HARMONY
-const bigIntFunc = (typeof BigInt !== 'undefined' ? BigInt : null) as any
-// #endif
-
-function getRandomBigInt(bits: number): CipherBigInt | null {
+function getRandomBigInt(bits: number): any {
   const bytes = Math.ceil(bits / 8)
   let hex = ''
   for (let i = 0; i < bytes; i++) {
     const b = Math.floor(Math.random() * 256)
     hex += (b < 16 ? '0' : '') + b.toString(16)
   }
-  // #ifndef APP-HARMONY
+  const bigIntFunc = (typeof BigInt !== 'undefined' ? BigInt : null) as any
   if (bigIntFunc == null) return null
-  // #endif
   let n = bigIntFunc('0x' + hex)
   const one = bigIntFunc(1)
   const shiftVal = bigIntFunc(bits - 1)
@@ -857,7 +837,8 @@ function getRandomBigInt(bits: number): CipherBigInt | null {
   return n
 }
 
-function bigIntModPow(base: CipherBigInt, exp: CipherBigInt, mod: CipherBigInt): CipherBigInt {
+function bigIntModPow(base: any, exp: any, mod: any): any {
+  const bigIntFunc = (typeof BigInt !== 'undefined' ? BigInt : null) as any
   const zero = bigIntFunc(0)
   const one = bigIntFunc(1)
   const two = bigIntFunc(2)
@@ -873,7 +854,8 @@ function bigIntModPow(base: CipherBigInt, exp: CipherBigInt, mod: CipherBigInt):
   return res
 }
 
-function isProbablePrime(n: CipherBigInt, k: number = 5): boolean {
+function isProbablePrime(n: any, k: number = 5): boolean {
+  const bigIntFunc = (typeof BigInt !== 'undefined' ? BigInt : null) as any
   const zero = bigIntFunc(0)
   const one = bigIntFunc(1)
   const two = bigIntFunc(2)
@@ -915,16 +897,15 @@ function isProbablePrime(n: CipherBigInt, k: number = 5): boolean {
   return true
 }
 
-function getPrime(bits: number): CipherBigInt {
+function getPrime(bits: number): any {
   while (true) {
     const p = getRandomBigInt(bits)
-    if (p != null && isProbablePrime(p)) {
-      return p
-    }
+    if (p != null && isProbablePrime(p)) return p
   }
 }
 
-function bigIntModInverse(a: CipherBigInt, m: CipherBigInt): CipherBigInt {
+function bigIntModInverse(a: any, m: any): any {
+  const bigIntFunc = (typeof BigInt !== 'undefined' ? BigInt : null) as any
   const zero = bigIntFunc(0)
   const one = bigIntFunc(1)
   let m0 = m
@@ -947,11 +928,10 @@ function bigIntModInverse(a: CipherBigInt, m: CipherBigInt): CipherBigInt {
 }
 
 function rsaGenerateKeyPairJs(bits: number): string {
-  // #ifndef APP-HARMONY
+  const bigIntFunc = (typeof BigInt !== 'undefined' ? BigInt : null) as any
   if (bigIntFunc == null) {
     return '{"publicKey":"","privateKey":""}'
   }
-  // #endif
   const primeBits = Math.floor(bits / 2)
   const p = getPrime(primeBits)
   const q = getPrime(primeBits)
