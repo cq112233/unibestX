@@ -12,7 +12,7 @@
         class="text-[12px] leading-[20px] mb-[10px]"
         :class="isDark ? 'text-[#94a3b8]' : 'text-[#64748b]'"
       >
-        测试在 Tab 页面内触发全屏遮罩弹窗。通过 position: fixed 与 z-index: 9999，即使 TabBar 悬浮胶囊处于最高视口层级，也能被遮罩完整覆盖，且切 Tab 时自动卸载。
+        演示全屏遮罩覆盖 TabBar 机制。在模式 0、2、3、4（推荐模式 4 单页保活）下，TabBar 为组件层渲染（z-index: 999），弹窗遮罩（z-index: 9999）可在全端 100% 完美覆盖；在模式 1 原生 TabBar 下，H5 端可遮挡，App/小程序原生底座层级高于页面需配合 hideTabBar API。
       </text>
       <view
         class="h-[36px] rounded-[8px] bg-[#4f46e5] flex flex-row items-center justify-center active:opacity-85"
@@ -25,7 +25,6 @@
     <!-- 封装的弹窗遮罩组件 -->
     <TabbarMaskModal
       :visible="showModal"
-      :tab-index="1"
       @close="closeModal"
     />
   </Card>

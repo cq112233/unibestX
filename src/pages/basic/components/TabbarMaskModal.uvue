@@ -2,9 +2,8 @@
   <!-- 全屏遮罩弹窗组件 (覆盖底部 TabBar 示例) -->
   <!-- 微信小程序端：需要 root-portal 提升至 page 根节点以穿透 TabBar -->
   <!-- #ifdef MP-WEIXIN -->
-  <root-portal>
+  <root-portal v-if="visible">
     <view
-      v-if="visible && isCurrentTabActive"
       class="modal-overlay"
       :style="{ zIndex }"
     >
@@ -35,7 +34,7 @@
         <!-- 详细说明区 -->
         <slot>
           <text class="text-[12px] leading-[20px] mb-[12px]" :class="isDark ? 'text-[#94a3b8]' : 'text-[#64748b]'">
-            你现在看到的暗色遮罩已经完全盖住了底部的 TabBar 悬浮胶囊/底座！
+            在模式 0、2、3、4（尤其默认推荐的模式 4）下，暗色遮罩已将底部 TabBar 悬浮胶囊/底座完全遮住！
           </text>
 
           <!-- 关键原理解析卡片 -->
@@ -44,13 +43,13 @@
             :class="isDark ? 'bg-[#0f172a]' : 'bg-[#f8fafc]'"
           >
             <text class="text-[11px] leading-[18px] text-[#059669]">
-              ✓ 层级机制：遮罩设置 z-index: {{ zIndex }} &gt; TabBar: 999
+              ✓ 组件层遮挡：模式 0/2/3/4 全端完美遮盖（z-index: {{ zIndex }} &gt; 999）
             </text>
             <text class="text-[11px] leading-[18px] text-[#4f46e5] mt-[4px]">
-              ✓ 定位机制：App 端 fixed 元素与根节点同级比较
+              ✓ 原生底座差异：模式 1 原生 TabBar 仅 H5 可遮挡，App/小程序为系统层级
             </text>
             <text class="text-[11px] leading-[18px] text-[#d97706] mt-[4px]">
-              ✓ iOS 防护：绑定 v-if="isCurrentTabActive" 切 Tab 自动销毁
+              ✓ 微信环境适配：小程序端使用 root-portal 提升至 Page 根节点
             </text>
           </view>
         </slot>
@@ -72,7 +71,7 @@
   <!-- 非微信小程序端（App、H5 等）：无需 root-portal，直接由 position: fixed 覆盖 -->
   <!-- #ifndef MP-WEIXIN -->
   <view
-    v-if="visible && isCurrentTabActive"
+    v-if="visible"
     class="modal-overlay"
     :style="{ zIndex }"
   >
@@ -103,7 +102,7 @@
       <!-- 详细说明区 -->
       <slot>
         <text class="text-[12px] leading-[20px] mb-[12px]" :class="isDark ? 'text-[#94a3b8]' : 'text-[#64748b]'">
-          你现在看到的暗色遮罩已经完全盖住了底部的 TabBar 悬浮胶囊/底座！
+          在模式 0、2、3、4（尤其默认推荐的模式 4）下，暗色遮罩已将底部 TabBar 悬浮胶囊/底座完全遮住！
         </text>
 
         <!-- 关键原理解析卡片 -->
@@ -112,13 +111,13 @@
           :class="isDark ? 'bg-[#0f172a]' : 'bg-[#f8fafc]'"
         >
           <text class="text-[11px] leading-[18px] text-[#059669]">
-            ✓ 层级机制：遮罩设置 z-index: {{ zIndex }} &gt; TabBar: 999
+            ✓ 组件层遮挡：模式 0/2/3/4 全端完美遮盖（z-index: {{ zIndex }} &gt; 999）
           </text>
           <text class="text-[11px] leading-[18px] text-[#4f46e5] mt-[4px]">
-            ✓ 定位机制：App 端 fixed 元素与根节点同级比较
+            ✓ 原生底座差异：模式 1 原生 TabBar 仅 H5 可遮挡，App/小程序为系统层级
           </text>
           <text class="text-[11px] leading-[18px] text-[#d97706] mt-[4px]">
-            ✓ iOS 防护：绑定 v-if="isCurrentTabActive" 切 Tab 自动销毁
+            ✓ 全端通用布局：position: fixed 覆盖当前页面顶层
           </text>
         </view>
       </slot>
@@ -140,9 +139,8 @@
 <script setup lang="uts">
 import { computed } from 'vue';
 import { useAppStore } from '@/src/store';
-import { curIdx } from '@/src/tabbar/index.uts';
 
-const props = defineProps({
+defineProps({
   /** 弹窗显隐控制 */
   visible: {
     type: Boolean,
@@ -157,11 +155,6 @@ const props = defineProps({
   zIndex: {
     type: Number,
     default: 9999
-  },
-  /** 所属 TabBar 索引（默认 1 代表基础页，切走该 Tab 时自动销毁节点避免 iOS 残留） */
-  tabIndex: {
-    type: Number,
-    default: 1
   }
 });
 
@@ -169,11 +162,6 @@ const emit = defineEmits(['close', 'update:visible']);
 
 const appStore = useAppStore();
 const isDark = computed((): boolean => appStore.state.isDark);
-
-// 当前所属 Tab 是否处于激活状态
-const isCurrentTabActive = computed<boolean>((): boolean => {
-  return curIdx.value == props.tabIndex;
-});
 
 function handleClose(): void {
   emit('close');
