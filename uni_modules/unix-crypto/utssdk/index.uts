@@ -775,7 +775,7 @@ export function base64Encode(text: string): Promise<string> {
     try {
       resolve(bytesToBase64(textToBytes(text)))
     }
-    catch (e: any) {
+    catch (e) {
       reject(e)
     }
   })
@@ -786,7 +786,7 @@ export function base64Decode(base64: string): Promise<string> {
     try {
       resolve(bytesToText(base64ToBytes(base64)))
     }
-    catch (e: any) {
+    catch (e) {
       reject(e)
     }
   })
@@ -797,7 +797,7 @@ export function md5(text: string): Promise<string> {
     try {
       resolve(md5Bytes(textToBytes(text)))
     }
-    catch (e: any) {
+    catch (e) {
       reject(e)
     }
   })
@@ -808,7 +808,7 @@ export function sha256(text: string): Promise<string> {
     try {
       resolve(sha256Bytes(textToBytes(text)))
     }
-    catch (e: any) {
+    catch (e) {
       reject(e)
     }
   })
@@ -819,7 +819,7 @@ export function hmacSha1(text: string, key: string): Promise<string> {
     try {
       resolve(hmacSha1Bytes(text, key))
     }
-    catch (e: any) {
+    catch (e) {
       reject(e)
     }
   })
@@ -830,7 +830,7 @@ export function aesEncrypt(text: string, key: string): Promise<string> {
     try {
       resolve(aesCipher(text, key, false))
     }
-    catch (e: any) {
+    catch (e) {
       reject(e)
     }
   })
@@ -841,7 +841,7 @@ export function aesDecrypt(hex: string, key: string): Promise<string> {
     try {
       resolve(aesCipher(hex, key, true))
     }
-    catch (e: any) {
+    catch (e) {
       reject(e)
     }
   })
@@ -852,7 +852,7 @@ export function desEncrypt(text: string, key: string): Promise<string> {
     try {
       resolve(desCipher(text, key, false))
     }
-    catch (e: any) {
+    catch (e) {
       reject(e)
     }
   })
@@ -863,7 +863,7 @@ export function desDecrypt(hex: string, key: string): Promise<string> {
     try {
       resolve(desCipher(hex, key, true))
     }
-    catch (e: any) {
+    catch (e) {
       reject(e)
     }
   })
@@ -874,7 +874,7 @@ export function rsaGenerateKeyPair(bits: number): Promise<string> {
     try {
       resolve(rsaGenerateKeyPairUts(bits))
     }
-    catch (e: any) {
+    catch (e) {
       reject(e)
     }
   })
@@ -885,7 +885,7 @@ export function rsaEncrypt(text: string, publicKey: string): Promise<string> {
     try {
       resolve(rsaEncryptUts(text, publicKey))
     }
-    catch (e: any) {
+    catch (e) {
       reject(e)
     }
   })
@@ -896,7 +896,7 @@ export function rsaDecrypt(hex: string, privateKey: string): Promise<string> {
     try {
       resolve(rsaDecryptUts(hex, privateKey))
     }
-    catch (e: any) {
+    catch (e) {
       reject(e)
     }
   })
@@ -917,7 +917,7 @@ export function rsaSign(text: string, privateKey: string, hashType: string): Pro
     try {
       resolve(rsaSignUts(hashHex(textToBytes(text), hashType), hashType, privateKey))
     }
-    catch (e: any) {
+    catch (e) {
       reject(e)
     }
   })
@@ -928,7 +928,7 @@ export function rsaVerify(text: string, publicKey: string, sigHex: string, hashT
     try {
       resolve(rsaVerifyUts(hashHex(textToBytes(text), hashType), hashType, publicKey, sigHex))
     }
-    catch (e: any) {
+    catch (e) {
       reject(e)
     }
   })
