@@ -7,7 +7,7 @@
 </template>
 
 <script setup lang="uts">
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, onMounted, provide, ref, watch } from 'vue';
 import { curIdx, tabbarList } from '@/src/tabbar/index.uts';
 import { $t } from '@/src/utils/i18n/index.uts';
 import { setHideNavbar, setHideStatusBar, setNavbarTitle } from '@/src/utils/refresh/index.uts';
@@ -41,10 +41,17 @@ const contentTitle = computed((): string => props.title);
 const shouldHideNavbar = computed((): boolean => props.hideNavbar);
 const shouldHideStatusBar = computed((): boolean => props.hideStatusBar);
 
+// 向下跨层级注入当前 Tab 激活状态，供内部 fixed 元素通过 inject('isTabActive') 配合 v-if 兜底销毁
+provide('isTabActive', isActive);
+
+// 非激活 Tab 采用「移出视口 + visibility + display」三重隐藏，兼顾全端保活与渲染性能。
+// ⚠️ 注意：iOS 原生引擎会将 position: fixed 提升至 Page Root 视图，导致父级 CSS display:none 无法穿透；
+// 若 Tab 内部使用了 position: fixed，必须配合 v-if="isActive" 以在切走 Tab 时彻底卸载原生视图。
 const rootStyle = computed<UTSJSONObject>((): UTSJSONObject => {
   return {
     left: isActive.value ? '0px' : '-9999px',
-    visibility: isActive.value ? 'visible' : 'hidden'
+    visibility: isActive.value ? 'visible' : 'hidden',
+    display: isActive.value ? 'flex' : 'none'
   } as UTSJSONObject;
 });
 
