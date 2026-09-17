@@ -1,20 +1,67 @@
 <template>
   <!-- 直接absolute，h5,微信小程序可以，安卓，ios, 鸿蒙不行 -->
-  <!-- <view class="common absolute z-1000 bottom-0 left-[var(--uni-safe-area-inset-left)] bg-[#ffff00]">
+  <!-- <view class="common absolute z-1000 top-0 left-[var(--uni-safe-area-inset-left)] bg-[#ffff00]">
     <text>absolute</text>
   </view> -->
 
   <!-- 直接reactive不行，h5,微信小程序可以，安卓，ios, 鸿蒙不行 -->
-  <view class="common reactive z-1000 bottom-0 left-[var(--uni-safe-area-inset-left)] bg-[#ffc0cb]">
-    <text>absolute</text>
-  </view>
+  <!-- <view class="common reactive z-1000 bottom-0 left-[var(--uni-safe-area-inset-left)] bg-[#ffc0cb]">
+    <text>reactive</text>
+  </view> -->
 
-  <!-- <view style="position:absolute;z-index:1000;">
-    <view class="common fixed bottom-0 left-[var(--uni-safe-area-inset-left)] z-1000 bg-[#ffff00]">
-      <text class="dark-block-text">position: fixed</text>
-      <text class="dark-block-text">z-index: 10</text>
+  <!-- 直接fix，h5,微信小程序，安卓，ios, 鸿蒙 可以 -->
+  <!-- <view class="common fixed z-1000 top-0 left-[var(--uni-safe-area-inset-left)] bg-[#ffc0cb]">
+    <text>fixed</text>
+  </view> -->
+
+  <!-- 直接relative下面fixed，父小于兄弟，子大于兄弟， h5,微信小程序不行，安卓，ios, 鸿蒙 可以 -->
+  <!-- 直接relative下面fixed，父大于兄弟，子大于兄弟， h5,微信小程序,安卓，ios, 鸿蒙 可以 -->
+  <!-- <view class="relative z-1000">
+    <view class="common fixed top-0 left-[var(--uni-safe-area-inset-left)] z-1000 bg-[#ffff00]">
+      <text class="dark-block-text">relative下面fixed</text>
     </view>
   </view> -->
+
+  <!-- 直接absolute下面fixed，父小于兄弟，子大于兄弟， h5,微信小程序不行，安卓，ios, 鸿蒙 可以 -->
+  <!-- 直接absolute下面fixed，父大于兄弟，子大于兄弟， h5,微信小程序,安卓，ios, 鸿蒙 可以 -->
+  <!-- <view class="absolute z-1000">
+    <view class="common fixed top-0 left-[var(--uni-safe-area-inset-left)] z-1000 bg-[#ffff00]">
+      <text class="dark-block-text">absolute下面fixed</text>
+    </view>
+  </view> -->
+
+  <!-- 直接fixed下面fixed，父小于兄弟，子大于兄弟， h5,微信小程序不行，安卓，ios, 鸿蒙 可以 -->
+  <!-- 直接fixed下面fixed，父大雨兄弟，子大于兄弟， h5,微信小程序,安卓，ios, 鸿蒙 可以 -->
+  <!-- <view class="fixed z-999">
+    <view class="common fixed top-0 left-[var(--uni-safe-area-inset-left)] z-1000 bg-[#ffff00]">
+      <text class="dark-block-text">fixed下面fixed</text>
+    </view>
+  </view> -->
+
+  <!-- 直接relative下面relative，父小于兄弟，子大于兄弟， h5,微信小程序可以，安卓，ios, 鸿蒙不行 -->
+  <!-- 直接relative下面relative，父大于兄弟，子大于兄弟， h5,微信小程序,安卓，ios, 鸿蒙 不可以 -->
+  <!-- <view class="relative z-999">
+    <view class="common relative top-0 left-[var(--uni-safe-area-inset-left)] z-1000 bg-[#ffff00]">
+      <text class="dark-block-text">relative下面relative</text>
+    </view>
+  </view> -->
+
+  <!-- 直接relative下面absolute，父小于兄弟，子大于兄弟， h5,微信小程序,安卓，ios, 鸿蒙不行 -->
+  <!-- 直接relative下面absolute，父大于兄弟，子大于兄弟， h5,微信小程序可以, 安卓，ios, 鸿蒙不可以 -->
+  <!-- <view class="relative z-1000 w-full h-full">
+    <view class="common absolute top-0 left-[var(--uni-safe-area-inset-left)] z-1000 bg-[#ffff00]">
+      <text class="dark-block-text">relative下面relative</text>
+    </view>
+  </view> -->
+
+  <!-- 直接relative下面absolute，父小于兄弟，子大于兄弟， h5,微信小程序,安卓，ios, 鸿蒙不行 -->
+  <!-- 直接relative下面absolute，父大于兄弟，子大于兄弟， h5,微信小程序可以, 安卓，ios, 鸿蒙不可以 -->
+  <view class="absolute z-999 w-full h-full">
+    <view class="common absolute top-0 left-[var(--uni-safe-area-inset-left)] z-1000 bg-[#ffff00]">
+      <text class="dark-block-text">relative下面relative</text>
+    </view>
+  </view>
+
   <!-- <view style="position:relative;z-index:1000;">
     <view class="common fixed bottom-0 right-0 z-1000 bg-[#ff0000]">
       <text class="dark-block-text">position: fixed</text>
