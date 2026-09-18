@@ -103,10 +103,27 @@
         </view>
       </list-item>
 
-      <!-- 自定义下拉刷新插槽：list-view 中需要使用 list-item slot="refresher" -->
-      <list-item v-if="hasRefresherSlot" slot="refresher">
+      <!-- 自定义下拉刷新插槽：list-view 中需要使用 list-item slot="refresher"，微信小程序需使用 view slot="refresher" 并保证全宽居中 -->
+      <!-- #ifdef MP-WEIXIN -->
+      <view
+        v-if="hasRefresherSlot"
+        slot="refresher"
+        class="nested-refresher-wrap w-full flex flex-row items-center justify-center"
+        :style="{ width: `${windowWidth}px` }"
+      >
+        <slot name="refresher" :refreshing="innerRefreshing" />
+      </view>
+      <!-- #endif -->
+      <!-- #ifndef MP-WEIXIN -->
+      <list-item
+        v-if="hasRefresherSlot"
+        slot="refresher"
+        class="nested-refresher-wrap w-full flex flex-row items-center justify-center"
+        :style="{ width: `${windowWidth}px` }"
+      >
         <slot name="refresher" :refreshing="innerRefreshing" />
       </list-item>
+      <!-- #endif -->
     </list-view>
 
     <!-- 一键返回顶部按钮 -->
@@ -312,7 +329,10 @@ const innerScrollWithAnimation = ref<boolean>(props.scrollWithAnimation);
 let refreshTimeoutId: number | null = null;
 let isMountedReady = false;
 
+const windowWidth = ref<number>(uni.getWindowInfo().windowWidth);
+
 onMounted(() => {
+  windowWidth.value = uni.getWindowInfo().windowWidth;
   // 挂载400ms后才允许手势下拉触发，杜绝鸿蒙等平台初次测绘时自动误发射refresherrefresh事件
   setTimeout(() => {
     isMountedReady = true;
@@ -436,4 +456,19 @@ defineExpose({
   position: absolute;
   z-index: 99;
 }
+.nested-refresher-wrap {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+/* #ifdef MP-WEIXIN */
+:deep(.wx-scroll-view-refresher) {
+  width: 100% !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+/* #endif */
 </style>

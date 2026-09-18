@@ -4,7 +4,7 @@
     <view class="flex-1 flex flex-col relative">
       <z-paging-x
         ref="pagingRef"
-        :list-is="'list-view'"
+        list-is="list-view"
         :custom-nested-scroll="false"
         :start-nested-scroll="false"
         :refresher-enabled="true"
@@ -239,9 +239,8 @@
 </template>
 
 <script setup lang="uts">
-import { computed, onMounted, onUnmounted, ref } from 'vue';
+import { computed, ref } from 'vue';
 import { useAppStore } from '@/src/store';
-import { setPageScrollEnabled } from '@/src/utils/refresh/index.uts';
 
 definePage({
   layout: 'navbar',
@@ -256,15 +255,6 @@ definePage({
 
 const appStore = useAppStore();
 const isDark = computed((): boolean => appStore.state.isDark);
-
-// 挂载时禁用外层通用滚动，交由 z-paging-x 独立接管
-onMounted(() => {
-  setPageScrollEnabled(false);
-});
-
-onUnmounted(() => {
-  setPageScrollEnabled(true);
-});
 
 // 数据模型定义（遵循规范：严格使用 type，禁止 interface）
 type ArticleItem = {
