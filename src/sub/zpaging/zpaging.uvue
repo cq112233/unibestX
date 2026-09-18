@@ -142,40 +142,38 @@
           </view>
         </template>
 
-        <!-- 列表内容：与 nested-scroll 一致的标准卡片列表（清空数据状态下强制不渲染） -->
-        <template v-if="!isSimEmpty">
-          <view v-for="item in articleList" :key="item.id" class="w-full">
-            <view
-              class="mx-[14px] my-[6px] p-[14px] rounded-[12px] border-[1px] border-solid flex flex-col"
-              :class="isDark ? 'bg-[#1e293b] border-[#334155]' : 'bg-white border-[#e2e8f0]'"
-            >
-              <view class="flex flex-row items-center justify-between mb-[6px]">
-                <view
-                  class="px-[8px] py-[2px] rounded-[4px]"
-                  :style="{ backgroundColor: item.categoryBg }"
-                >
-                  <text class="text-[10px] font-bold" :style="{ color: item.categoryColor }">
-                    {{ item.category }}
-                  </text>
-                </view>
-                <text class="text-[11px] text-[#94a3b8]">{{ item.time }}</text>
-              </view>
-              <text
-                class="text-[14px] font-bold mb-[4px] leading-[20px]"
-                :class="isDark ? 'text-[#f1f5f9]' : 'text-[#1e293b]'"
+        <!-- 列表内容：采用 list-item 匹配 list-view 原生回收复用机制 -->
+        <list-item v-for="item in articleList" :key="item.id" type="card" class="w-full">
+          <view
+            class="mx-[14px] my-[6px] p-[14px] rounded-[12px] border-[1px] border-solid flex flex-col"
+            :class="isDark ? 'bg-[#1e293b] border-[#334155]' : 'bg-white border-[#e2e8f0]'"
+          >
+            <view class="flex flex-row items-center justify-between mb-[6px]">
+              <view
+                class="px-[8px] py-[2px] rounded-[4px]"
+                :style="{ backgroundColor: item.categoryBg }"
               >
-                {{ item.title }}
-              </text>
-              <text class="text-[12px] leading-[18px] text-[#64748b] mb-[8px]">
-                {{ item.summary }}
-              </text>
-              <view class="flex flex-row items-center justify-between pt-[6px] border-t-[1px] border-solid border-[#f1f5f9]">
-                <text class="text-[11px] text-[#94a3b8]">z-paging-x 触底自动追加</text>
-                <text class="text-[11px] font-bold text-[#0957de]">序号 #{{ item.id }} ➜</text>
+                <text class="text-[10px] font-bold" :style="{ color: item.categoryColor }">
+                  {{ item.category }}
+                </text>
               </view>
+              <text class="text-[11px] text-[#94a3b8]">{{ item.time }}</text>
+            </view>
+            <text
+              class="text-[14px] font-bold mb-[4px] leading-[20px]"
+              :class="isDark ? 'text-[#f1f5f9]' : 'text-[#1e293b]'"
+            >
+              {{ item.title }}
+            </text>
+            <text class="text-[12px] leading-[18px] text-[#64748b] mb-[8px]">
+              {{ item.summary }}
+            </text>
+            <view class="flex flex-row items-center justify-between pt-[6px] border-t-[1px] border-solid border-[#f1f5f9]">
+              <text class="text-[11px] text-[#94a3b8]">z-paging-x 触底自动追加</text>
+              <text class="text-[11px] font-bold text-[#0957de]">序号 #{{ item.id }} ➜</text>
             </view>
           </view>
-        </template>
+        </list-item>
 
         <!-- 自定义底部加载状态：完全对齐 nested-scroll 演示逻辑与视觉 -->
         <template #loadMore>
