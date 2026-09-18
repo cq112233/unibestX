@@ -17,12 +17,13 @@
 
     <!-- 单页 TabBar 容器模式（模式 4 且为主页）：由内部 TabViews/TabContent 独立承载滚动与下拉刷新，避免外层嵌套 scroll-view 导致手势冲突、TabBar 跟随下移与双重下拉刷新 -->
     <view
-      v-if="isSinglePageHome"
+      v-if="isTabbarPage && isSinglePageHome"
       class="flex-1 flex flex-col overflow-hidden"
       style="flex: 1; position: relative;"
     >
       <slot />
     </view>
+
 
     <!-- 当开启自定义下拉刷新时（原生未开启且当前布局开启） -->
     <scroll-view
@@ -62,7 +63,7 @@ import { useAppStore } from '@/src/store';
 import { getThemeTokens } from '@/src/utils/theme/index.uts';
 import type { ThemeTokens } from '@/src/utils/theme/index.uts';
 import { isPageRefresherDisabled, isPageScrollDisabled } from '@/src/utils/refresh/index.uts';
-import { curIdx, isSinglePageTabbar, tabbarList } from '@/src/tabbar/index.uts';
+import { curIdx, isPageTabbar, isSinglePageTabbar, tabbarList } from '@/src/tabbar/index.uts';
 import { $t } from '@/src/utils/i18n/index.uts';
 
 /**
@@ -445,6 +446,27 @@ const isNativePullDown = computed((): boolean => {
 });
 
 /**
+ * 判断当前是否为 TabBar 页面
+ */
+const isTabbarPage = computed((): boolean => {
+  if (props.type == 'home') {
+    return true;
+  }
+  try {
+    const pages = getCurrentPages();
+    if (pages.length > 0) {
+      const page = pages[pages.length - 1];
+      const r = page.route ?? '';
+      if (r.length > 0) {
+        return isPageTabbar(r);
+      }
+    }
+  }
+  catch {}
+  return false;
+});
+
+/**
  * 判断是否处于单页面 TabBar 的宿主首页容器
  */
 const isSinglePageHome = computed((): boolean => {
@@ -459,7 +481,7 @@ const isSinglePageHome = computed((): boolean => {
     if (pages.length > 0) {
       const page = pages[pages.length - 1];
       const r = (page.route ?? '').replace(/^\//, '');
-      if (r == 'pages/index/index' || r == 'src/pages/index/index' || r.endsWith('index/index') || r == '') {
+      if (r == 'pages/index/index' || r == 'src/pages/index/index' || r.endsWith('index/index')) {
         return true;
       }
     }
@@ -475,7 +497,7 @@ const isSinglePageHome = computed((): boolean => {
  * 仅在原生未开启时才使用自定义下拉
  */
 const useCustomRefresher = computed((): boolean => {
-  if (isNativePullDown.value || isSinglePageHome.value) {
+  if (isNativePullDown.value || (isSinglePageHome.value && isTabbarPage.value)) {
     return false;
   }
   return props.enablePullDownRefresh;
@@ -488,7 +510,7 @@ const displayTitle = computed((): string => {
   if (customTitle.value != null) {
     return customTitle.value!;
   }
-  if (isSinglePageHome.value) {
+  if (isSinglePageHome.value && isTabbarPage.value) {
     if (curIdx.value >= 0 && curIdx.value < tabbarList.length) {
       return $t(tabbarList[curIdx.value].text);
     }

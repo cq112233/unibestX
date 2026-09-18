@@ -9,10 +9,9 @@
       <slot v-else name="header" />
     </view>
 
-    <!-- 核心滚动容器：全端全平台（Android / iOS / 鸿蒙 VDOM / Web / 小程序）统一采用标准高性能容器 -->
-    <scroll-view
+    <!-- 核心滚动容器：采用 list-view 原生高性能回收复用组件（Android RecyclerView / iOS UITableView），从根本上杜绝残影 -->
+    <list-view
       class="flex-1 flex flex-col w-full"
-      direction="vertical"
       :scroll-top="scrollTop"
       :scroll-with-animation="innerScrollWithAnimation"
       :show-scrollbar="showScrollbar"
@@ -28,15 +27,17 @@
       @scroll="handleScroll"
     >
       <!-- 普通滚动随动头部（非吸顶模式下随列表滚动） -->
-      <slot v-if="hasHeaderSlot && !affixHeader" name="header" />
+      <list-item v-if="hasHeaderSlot && !affixHeader" type="header">
+        <slot name="header" />
+      </list-item>
 
-      <!-- 列表数据默认插槽 -->
-      <slot />
+      <!-- 列表数据默认插槽：父级必须使用 list-item 包裹每一项（list-view 直接子项必须是 list-item） -->
+      <slot v-if="!empty" />
 
-      <!-- 空数据状态 -->
-      <view v-if="empty && !loading && !innerRefreshing" class="w-full">
+      <!-- 空数据状态：仅在 empty 为 true 且不在加载中/刷新中时展示 -->
+      <list-item v-if="empty && !loading && !innerRefreshing" type="empty">
         <slot v-if="hasEmptySlot" name="empty" />
-        <view v-else class="py-[48px] items-center justify-center">
+        <view v-else class="py-[48px] items-center justify-center flex flex-col">
           <text class="text-[36px] mb-[8px]">📭</text>
           <text
             class="text-[13px]"
@@ -45,64 +46,68 @@
             {{ emptyText }}
           </text>
         </view>
-      </view>
+      </list-item>
 
-      <!-- 底部加载更多状态条：仅在有对应状态或整体 footer 插槽时渲染，杜绝空白占位 -->
-      <template v-if="hasFooterSlot">
-        <slot
-          name="footer"
-          :loading="loading"
-          :finished="finished"
-          :error="error"
-        />
-      </template>
-      <view
-        v-else-if="!empty && enableLoadMore && (loading || error || finished)"
-        class="py-[16px] items-center justify-center flex flex-row"
+      <!-- 底部加载更多状态条：与 empty 互斥 -->
+      <list-item
+        v-if="!empty && enableLoadMore && (loading || error || finished)"
+        type="footer"
       >
-        <!-- 加载中 -->
-        <template v-if="loading">
-          <slot v-if="hasLoadingSlot" name="loading" />
-          <text
-            v-else
-            class="text-[12px] font-medium"
-            :class="isDark ? 'text-[#94a3b8]' : 'text-[#64748b]'"
-          >
-            {{ loadingText }}
-          </text>
-        </template>
+        <view class="py-[16px] items-center justify-center flex flex-row w-full">
+          <template v-if="hasFooterSlot">
+            <slot
+              name="footer"
+              :loading="loading"
+              :finished="finished"
+              :error="error"
+            />
+          </template>
+          <template v-else>
+            <!-- 加载中 -->
+            <template v-if="loading">
+              <slot v-if="hasLoadingSlot" name="loading" />
+              <text
+                v-else
+                class="text-[12px] font-medium"
+                :class="isDark ? 'text-[#94a3b8]' : 'text-[#64748b]'"
+              >
+                {{ loadingText }}
+              </text>
+            </template>
 
-        <!-- 加载失败重试 -->
-        <template v-else-if="error">
-          <slot v-if="hasErrorSlot" name="error" />
-          <view v-else class="flex flex-row items-center" @click="handleRetry">
-            <text class="text-[12px] text-[#ef4444] font-medium mr-[4px]">
-              {{ errorText }}
-            </text>
-            <text class="text-[12px] text-[#4f46e5] font-bold">
-              点击重试
-            </text>
-          </view>
-        </template>
+            <!-- 加载失败重试 -->
+            <template v-else-if="error">
+              <slot v-if="hasErrorSlot" name="error" />
+              <view v-else class="flex flex-row items-center" @click="handleRetry">
+                <text class="text-[12px] text-[#ef4444] font-medium mr-[4px]">
+                  {{ errorText }}
+                </text>
+                <text class="text-[12px] text-[#4f46e5] font-bold">
+                  点击重试
+                </text>
+              </view>
+            </template>
 
-        <!-- 没有更多数据了 -->
-        <template v-else-if="finished">
-          <slot v-if="hasFinishedSlot" name="finished" />
-          <text
-            v-else
-            class="text-[12px]"
-            :class="isDark ? 'text-[#475569]' : 'text-[#cbd5e1]'"
-          >
-            {{ finishedText }}
-          </text>
-        </template>
-      </view>
+            <!-- 没有更多数据了 -->
+            <template v-else-if="finished">
+              <slot v-if="hasFinishedSlot" name="finished" />
+              <text
+                v-else
+                class="text-[12px]"
+                :class="isDark ? 'text-[#475569]' : 'text-[#cbd5e1]'"
+              >
+                {{ finishedText }}
+              </text>
+            </template>
+          </template>
+        </view>
+      </list-item>
 
-      <!-- 自定义下拉刷新插槽：根据 uni-app x 官方规范，鸿蒙平台自定义下拉刷新元素必须放在最后一个子元素的位置，否则其后的元素上方会出现空白区域 -->
-      <view v-if="hasRefresherSlot" slot="refresher" class="w-full">
+      <!-- 自定义下拉刷新插槽：list-view 中需要使用 list-item slot="refresher" -->
+      <list-item v-if="hasRefresherSlot" slot="refresher">
         <slot name="refresher" :refreshing="innerRefreshing" />
-      </view>
-    </scroll-view>
+      </list-item>
+    </list-view>
 
     <!-- 一键返回顶部按钮 -->
     <view

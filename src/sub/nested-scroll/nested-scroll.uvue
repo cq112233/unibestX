@@ -9,7 +9,7 @@
         :affix-header="true"
         :finished="articleFinished"
         :error="articleError"
-        :empty="articleList.length === 0"
+        :empty="isEmptyState"
         :show-back-to-top="true"
         :back-to-top-threshold="200"
         :back-to-top-bottom="customBottom"
@@ -113,8 +113,8 @@
           </view>
         </template>
 
-        <!-- 列表内容：采用全端统一的标准弹性容器组件 -->
-        <view v-for="item in articleList" :key="item.id" class="w-full">
+        <!-- 列表内容：采用 list-item 匹配 list-view 原生回收复用机制 -->
+        <list-item v-for="item in articleList" :key="item.id" type="card" class="w-full">
           <view
             class="mx-[14px] my-[6px] p-[14px] rounded-[12px] border-[1px] border-solid flex flex-col"
             :class="isDark ? 'bg-[#1e293b] border-[#334155]' : 'bg-white border-[#e2e8f0]'"
@@ -143,7 +143,26 @@
               {{ item.summary }}
             </text>
           </view>
-        </view>
+        </list-item>
+
+        <!-- 空数据兜底插槽 -->
+        <template #empty>
+          <view class="py-[48px] items-center justify-center flex flex-col">
+            <text class="text-[40px] mb-[10px]">📭</text>
+            <text
+              class="text-[13px] font-bold mb-[14px]"
+              :class="isDark ? 'text-[#64748b]' : 'text-[#94a3b8]'"
+            >
+              暂无分页数据（空状态演示）
+            </text>
+            <view
+              class="px-[16px] py-[8px] rounded-[8px] bg-[#4f46e5] items-center justify-center active:opacity-75"
+              @click="triggerReset"
+            >
+              <text class="text-[12px] text-[#ffffff] font-bold" style="color: #ffffff;">重新加载数据</text>
+            </view>
+          </view>
+        </template>
 
         <!-- 2. 自定义正在加载中插槽演示 -->
         <template #loading>
@@ -253,6 +272,10 @@ const articleRefreshing = ref<boolean>(false);
 const articleLoading = ref<boolean>(false);
 const articleFinished = ref<boolean>(false);
 const articleError = ref<boolean>(false);
+const isSimEmpty = ref<boolean>(false);
+const isEmptyState = computed((): boolean => {
+  return isSimEmpty.value || articleList.value.length == 0;
+});
 
 // 状态机步骤控制：1=首批不足一屏, 2=自动调接口补齐中, 3=铺满待触底报错, 4=报错重试中, 5=全部加载完成
 const simStep = ref<number>(1);
@@ -282,11 +305,17 @@ function generateArticlesData(start: number, count: number, stageName: string): 
 
 // 第 2 步：自动掉接口补齐数据（超出底部一屏）
 function autoLoadFillScreen(): void {
+  if (isEmptyState.value) {
+    return;
+  }
   simStep.value = 2;
   articleLoading.value = true;
   simStatusText.value = '【第 2 步】检测到数据未超出底部，正在自动调用接口追加数据...';
 
   setTimeout(() => {
+    if (simStep.value != 2 || isEmptyState.value) {
+      return;
+    }
     // 追加 6 条数据，累计达到 8 条（总高度逾 1000px，页面已铺满并超出底部）
     const nextData = generateArticlesData(3, 6, '自动补齐数据');
     const combined: ArticleItem[] = [];
@@ -305,7 +334,7 @@ function autoLoadFillScreen(): void {
 
 // 上拉加载更多 / 错误重试处理函数
 function onArticleLoadMore(): void {
-  if (articleFinished.value) {
+  if (articleFinished.value || isEmptyState.value) {
     return;
   }
 
@@ -366,6 +395,7 @@ function onArticleLoadMore(): void {
 
 // 开始 / 重新启动完整模拟
 function startFullSimulation(): void {
+  isSimEmpty.value = false;
   articleError.value = false;
   articleFinished.value = false;
   articleRefreshing.value = false;
@@ -377,7 +407,7 @@ function startFullSimulation(): void {
 
   // 400ms 后自动触发第 2 步展示 loading UI 并掉接口补齐
   setTimeout(() => {
-    if (simStep.value == 1) {
+    if (simStep.value == 1 && !isEmptyState.value) {
       autoLoadFillScreen();
     }
   }, 400);
@@ -385,6 +415,7 @@ function startFullSimulation(): void {
 
 // 下拉刷新：重新再来一遍完整模拟
 function onArticleRefresh(): void {
+  isSimEmpty.value = false;
   articleRefreshing.value = true;
   articleError.value = false;
   articleFinished.value = false;
@@ -405,7 +436,7 @@ function onArticleRefresh(): void {
 
     // 3. 400ms 后自动触发第 2 步展示 loading UI 补齐超出底部
     setTimeout(() => {
-      if (simStep.value == 1) {
+      if (simStep.value == 1 && !isEmptyState.value) {
         autoLoadFillScreen();
       }
     }, 400);
@@ -413,15 +444,19 @@ function onArticleRefresh(): void {
 }
 
 function triggerEmpty(): void {
+  isSimEmpty.value = true;
   articleList.value = [];
   articleError.value = false;
   articleFinished.value = true;
+  articleLoading.value = false;
   simStep.value = 5;
-  simStatusText.value = '【已清空数据】触发空列表缺省兜底展示';
-  uni.showToast({ title: '已清空数据，触发空态兜底', icon: 'none' });
+  simStatusText.value = '【已清空数据】触发空列表缺省兜底展示（下拉可刷新恢复）';
+  articleScrollRef.value?.$callMethod('scrollToTop', false);
+  uni.showToast({ title: '已清空数据，下拉即可刷新恢复', icon: 'none' });
 }
 
 function triggerReset(): void {
+  isSimEmpty.value = false;
   startFullSimulation();
   uni.showToast({ title: '已重新开始完整流程模拟', icon: 'success' });
 }
