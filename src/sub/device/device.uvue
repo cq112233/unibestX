@@ -99,7 +99,98 @@
       </Card>
     </view>
 
-    <!-- 3. 键盘感知与高度避让卡片 -->
+    <!-- 3. 系统缓存管理 (getFileSystemManager) 卡片 -->
+    <view class="mb-[16px]">
+      <Card title="系统缓存管理 (FileSystemManager)">
+        <view class="rounded-[12px] p-[16px] border-[1px] border-solid border-[#e2e8f0] bg-[#ffffff]">
+          <!-- 头部总缓存大小徽标 -->
+          <view class="flex flex-row items-center justify-between mb-[10px]">
+            <view class="flex flex-col">
+              <text class="text-[14px] font-bold text-[#1e293b]">应用缓存与数据占用</text>
+              <text class="text-[11px] text-[#64748b] mt-[2px]">
+                文件 {{ fileCacheSizeText }} ＋ 存储 {{ storageSizeText }}
+              </text>
+            </view>
+            <view class="px-[8px] py-[4px] rounded-[6px] bg-[#ecfdf5] border-[1px] border-solid border-[#a7f3d0]">
+              <text class="text-[12px] font-bold text-[#059669]">
+                合计: {{ totalCacheSizeText }}
+              </text>
+            </view>
+          </view>
+
+          <text class="text-[12px] text-[#64748b] leading-[18px] mb-[12px]">
+            基于 uni.getFileSystemManager() 与 CACHE_PATH 读取、统计沙盒临时缓存并支持安全一键清理。
+          </text>
+
+          <!-- 缓存详情信息卡片 -->
+          <view class="rounded-[8px] p-[12px] bg-[#f8fafc] border-[1px] border-solid border-[#e2e8f0] mb-[12px]">
+            <view class="flex flex-row items-center justify-between mb-[6px]">
+              <view class="flex flex-row items-center">
+                <text class="text-[12px] text-[#64748b]">文件缓存大小：</text>
+                <text class="text-[10px] text-[#94a3b8]">(临时/下载文件)</text>
+              </view>
+              <text class="text-[12px] font-bold" :class="fileCacheBytes > 0 ? 'text-[#ef4444]' : 'text-[#10b981]'">{{ fileCacheSizeText }}</text>
+            </view>
+            <view class="flex flex-row items-center justify-between mb-[6px]">
+              <text class="text-[12px] text-[#64748b]">缓存文件数量：</text>
+              <text class="text-[12px] font-medium text-[#1e293b]">{{ cacheFileCount }} 个文件</text>
+            </view>
+            <view class="flex flex-row items-center justify-between mb-[6px]">
+              <view class="flex flex-row items-center">
+                <text class="text-[12px] text-[#64748b]">本地 Storage 占用：</text>
+                <text class="text-[10px] text-[#94a3b8]">(Token/Pinia/偏好)</text>
+              </view>
+              <text class="text-[12px] font-bold text-[#3b82f6]">{{ storageSizeText }}</text>
+            </view>
+            <view class="flex flex-col">
+              <text class="text-[12px] text-[#64748b] mb-[2px]">缓存路径 (CACHE_PATH)：</text>
+              <text class="text-[11px] text-[#94a3b8] leading-[16px]" style="font-family: monospace;">
+                {{ cacheDirPath }}
+              </text>
+            </view>
+          </view>
+          <!-- 操作按钮行：清晰区分文件缓存与 Storage 清理 -->
+          <view class="flex flex-row mb-[8px]">
+            <view
+              class="flex-1 h-[38px] rounded-[8px] bg-[#3b82f6] flex flex-row items-center justify-center mr-[6px]"
+              @click="calculateCacheSize(true)"
+            >
+              <text class="text-[#ffffff] text-[12px] font-bold">刷新统计</text>
+            </view>
+            <view
+              class="flex-1 h-[38px] rounded-[8px] bg-[#f97316] flex flex-row items-center justify-center mr-[6px]"
+              @click="handleClearFileCache"
+            >
+              <text class="text-[#ffffff] text-[12px] font-bold">清除文件缓存</text>
+            </view>
+            <view
+              class="flex-1 h-[38px] rounded-[8px] bg-[#8b5cf6] flex flex-row items-center justify-center"
+              @click="handleClearStorage"
+            >
+              <text class="text-[#ffffff] text-[12px] font-bold">清空 Storage</text>
+            </view>
+          </view>
+
+          <!-- 一键彻底清空全部 (文件 + Storage) -->
+          <view
+            class="w-full h-[38px] rounded-[8px] bg-[#ef4444] flex flex-row items-center justify-center mb-[8px]"
+            @click="handleClearAll"
+          >
+            <text class="text-[#ffffff] text-[13px] font-bold">一键清空全部缓存与数据 (彻底归零)</text>
+          </view>
+
+          <!-- 模拟写入测试缓存 -->
+          <view
+            class="w-full h-[36px] rounded-[8px] border-[1px] border-solid border-[#cbd5e1] bg-[#ffffff] flex flex-row items-center justify-center"
+            @click="handleGenerateTestCache"
+          >
+            <text class="text-[#475569] text-[12px] font-medium">+ 写入 500KB 测试缓存文件 (观察数据减少)</text>
+          </view>
+        </view>
+      </Card>
+    </view>
+
+    <!-- 4. 键盘感知与高度避让卡片 -->
     <view class="mb-[16px]">
       <Card title="键盘感知与避让">
         <view
@@ -356,7 +447,399 @@ function handleDownloadAndOpenSampleDoc(): void {
   });
 }
 
-// ==================== 3. 键盘感知与避让 ====================
+// ==================== 3. 系统缓存管理 (getFileSystemManager) ====================
+const fileCacheBytes = ref<number>(0);
+const storageCacheBytes = ref<number>(0);
+const cacheFileCount = ref<number>(0);
+const cacheDirPath = ref<string>('');
+
+const fileCacheSizeText = computed((): string => formatFileSize(fileCacheBytes.value));
+const storageSizeText = computed((): string => formatFileSize(storageCacheBytes.value));
+const totalCacheSizeText = computed((): string => formatFileSize(fileCacheBytes.value + storageCacheBytes.value));
+
+function getCachePath(): string {
+  try {
+    const p = uni.env.CACHE_PATH;
+    if (p != null && p.length > 0) {
+      return p;
+    }
+  }
+  catch (e) {
+    console.warn(e);
+  }
+  try {
+    const u = uni.env.USER_DATA_PATH;
+    if (u != null && u.length > 0) {
+      return u;
+    }
+  }
+  catch (e) {
+    console.warn(e);
+  }
+  return '';
+}
+
+function calculateCacheSize(showToast: boolean): void {
+  // 1. 读取 Storage 大小 (KB 转 Byte)
+  try {
+    uni.getStorageInfo({
+      success: (res) => {
+        storageCacheBytes.value = res.currentSize * 1024;
+      },
+      fail: () => {
+        storageCacheBytes.value = 0;
+      }
+    });
+  }
+  catch (e) {
+    console.warn(e);
+  }
+
+  // 2. 使用 FileSystemManager 统计 CACHE_PATH
+  let totalBytes = 0;
+  const path = getCachePath();
+  cacheDirPath.value = path.length > 0 ? path : '系统临时沙盒';
+
+  if (path.length == 0) {
+    fileCacheBytes.value = 0;
+    cacheFileCount.value = 0;
+    if (showToast) {
+      uni.showToast({ title: '已刷新缓存信息', icon: 'none' });
+    }
+    return;
+  }
+
+  try {
+    const fsm = uni.getFileSystemManager();
+    fsm.readdir({
+      dirPath: path,
+      success: (res) => {
+        const files = res.files;
+        cacheFileCount.value = files.length;
+
+        if (files.length == 0) {
+          fileCacheBytes.value = 0;
+          if (showToast) {
+            uni.showToast({ title: '当前文件缓存为 0 B', icon: 'none' });
+          }
+          return;
+        }
+
+        let pending = files.length;
+        for (let i = 0; i < files.length; i++) {
+          const fileName = files[i];
+          const fullPath = `${path}/${fileName}`;
+          fsm.getFileInfo({
+            filePath: fullPath,
+            success: (info) => {
+              totalBytes += info.size;
+              pending--;
+              if (pending <= 0) {
+                fileCacheBytes.value = totalBytes;
+                if (showToast) {
+                  uni.showToast({ title: `缓存统计完成: ${totalCacheSizeText.value}`, icon: 'none' });
+                }
+              }
+            },
+            fail: () => {
+              pending--;
+              if (pending <= 0) {
+                fileCacheBytes.value = totalBytes;
+                if (showToast) {
+                  uni.showToast({ title: `缓存统计完成: ${totalCacheSizeText.value}`, icon: 'none' });
+                }
+              }
+            }
+          });
+        }
+      },
+      fail: (err) => {
+        console.warn('readdir fail:', err);
+        fileCacheBytes.value = 0;
+        cacheFileCount.value = 0;
+        if (showToast) {
+          uni.showToast({ title: '已刷新缓存信息', icon: 'none' });
+        }
+      }
+    });
+  }
+  catch (e) {
+    console.error('getFileSystemManager error:', e);
+    fileCacheBytes.value = 0;
+    cacheFileCount.value = 0;
+  }
+}
+
+function handleClearFileCache(): void {
+  if (fileCacheBytes.value == 0) {
+    uni.showModal({
+      title: '文件缓存已为 0 B',
+      content: `当前文件缓存目录已无临时文件。\n\n上方显示的 ${storageSizeText.value} 是本地 Storage 存储数据（如登录Token、Pinia状态、主题与字体偏好）。若需彻底清空，请点击【清空 Storage】或【一键清空全部】。`,
+      showCancel: false,
+      confirmText: '我知道了'
+    });
+    return;
+  }
+
+  uni.showModal({
+    title: '清除文件缓存',
+    content: `确认清理 ${cacheFileCount.value} 个文件缓存 (${fileCacheSizeText.value}) 吗？此操作将清空临时与下载文件。`,
+    confirmText: '立即清理',
+    cancelText: '取消',
+    confirmColor: '#f97316',
+    success: (modalRes) => {
+      if (!modalRes.confirm) {
+        return;
+      }
+
+      uni.showLoading({ title: '正在清理文件缓存...' });
+
+      const path = getCachePath();
+      if (path.length == 0) {
+        uni.hideLoading();
+        fileCacheBytes.value = 0;
+        cacheFileCount.value = 0;
+        uni.showToast({ title: '文件缓存已清空', icon: 'success' });
+        return;
+      }
+
+      try {
+        const fsm = uni.getFileSystemManager();
+        fsm.readdir({
+          dirPath: path,
+          success: (res) => {
+            const files = res.files;
+            if (files.length == 0) {
+              uni.hideLoading();
+              fileCacheBytes.value = 0;
+              cacheFileCount.value = 0;
+              uni.showToast({ title: '文件缓存已清空', icon: 'success' });
+              return;
+            }
+
+            let remaining = files.length;
+            const onFileDone = () => {
+              remaining--;
+              if (remaining <= 0) {
+                uni.hideLoading();
+                fileCacheBytes.value = 0;
+                cacheFileCount.value = 0;
+                calculateCacheSize(false);
+                uni.showToast({ title: '文件缓存已彻底清空', icon: 'success' });
+              }
+            };
+
+            for (let i = 0; i < files.length; i++) {
+              const fileName = files[i];
+              if (fileName.startsWith('DCloud') || fileName.startsWith('uni')) {
+                onFileDone();
+                continue;
+              }
+
+              const fullPath = `${path}/${fileName}`;
+              fsm.unlink({
+                filePath: fullPath,
+                success: () => {
+                  onFileDone();
+                },
+                fail: () => {
+                  fsm.rmdir({
+                    dirPath: fullPath,
+                    recursive: true,
+                    complete: () => {
+                      onFileDone();
+                    }
+                  });
+                }
+              });
+            }
+          },
+          fail: () => {
+            uni.hideLoading();
+            fileCacheBytes.value = 0;
+            cacheFileCount.value = 0;
+            uni.showToast({ title: '文件缓存清理完成', icon: 'success' });
+          }
+        });
+      }
+      catch (e) {
+        uni.hideLoading();
+        console.error('clear file cache error:', e);
+        uni.showToast({ title: '清理完成', icon: 'none' });
+      }
+    }
+  });
+}
+
+function handleClearAll(): void {
+  uni.showModal({
+    title: '一键清空全部缓存与数据',
+    content: `将同时清理文件缓存 (${fileCacheSizeText.value}) 和本地 Storage 键值对 (${storageSizeText.value})。\n\n清空后应用状态将被重置为初始状态，确定执行吗？`,
+    confirmText: '彻底清空',
+    cancelText: '取消',
+    confirmColor: '#ef4444',
+    success: (modalRes) => {
+      if (!modalRes.confirm) {
+        return;
+      }
+
+      uni.showLoading({ title: '正在清理全部数据...' });
+      try {
+        uni.clearStorageSync();
+        storageCacheBytes.value = 0;
+      }
+      catch (e) {
+        console.warn(e);
+      }
+
+      const path = getCachePath();
+      if (path.length == 0) {
+        uni.hideLoading();
+        fileCacheBytes.value = 0;
+        cacheFileCount.value = 0;
+        calculateCacheSize(false);
+        uni.showToast({ title: '全部缓存与数据已清空', icon: 'success' });
+        return;
+      }
+
+      try {
+        const fsm = uni.getFileSystemManager();
+        fsm.readdir({
+          dirPath: path,
+          success: (res) => {
+            const files = res.files;
+            if (files.length == 0) {
+              uni.hideLoading();
+              fileCacheBytes.value = 0;
+              cacheFileCount.value = 0;
+              calculateCacheSize(false);
+              uni.showToast({ title: '全部缓存与数据已清空', icon: 'success' });
+              return;
+            }
+
+            let remaining = files.length;
+            const onAllDone = () => {
+              remaining--;
+              if (remaining <= 0) {
+                uni.hideLoading();
+                fileCacheBytes.value = 0;
+                cacheFileCount.value = 0;
+                calculateCacheSize(false);
+                uni.showToast({ title: '全部缓存与数据已清空', icon: 'success' });
+              }
+            };
+
+            for (let i = 0; i < files.length; i++) {
+              const fileName = files[i];
+              if (fileName.startsWith('DCloud') || fileName.startsWith('uni')) {
+                onAllDone();
+                continue;
+              }
+
+              const fullPath = `${path}/${fileName}`;
+              fsm.unlink({
+                filePath: fullPath,
+                success: () => {
+                  onAllDone();
+                },
+                fail: () => {
+                  fsm.rmdir({
+                    dirPath: fullPath,
+                    recursive: true,
+                    complete: () => {
+                      onAllDone();
+                    }
+                  });
+                }
+              });
+            }
+          },
+          fail: () => {
+            uni.hideLoading();
+            fileCacheBytes.value = 0;
+            cacheFileCount.value = 0;
+            calculateCacheSize(false);
+            uni.showToast({ title: '清理完成', icon: 'success' });
+          }
+        });
+      }
+      catch (e) {
+        uni.hideLoading();
+        console.warn(e);
+        calculateCacheSize(false);
+        uni.showToast({ title: '清理完成', icon: 'none' });
+      }
+    }
+  });
+}
+
+function handleClearStorage(): void {
+  uni.showModal({
+    title: '清空本地 Storage',
+    content: `当前 Storage 占用 ${storageSizeText.value}。清空将重置所有本地持久化键值（包括字体记忆与登录偏好），确定清空吗？`,
+    confirmText: '立即清空',
+    cancelText: '取消',
+    confirmColor: '#f97316',
+    success: (modalRes) => {
+      if (!modalRes.confirm) {
+        return;
+      }
+      try {
+        uni.clearStorageSync();
+        storageCacheBytes.value = 0;
+        calculateCacheSize(false);
+        uni.showToast({ title: 'Storage 缓存已全部清空', icon: 'success' });
+      }
+      catch (e) {
+        console.warn(e);
+        uni.showToast({ title: '清空失败', icon: 'none' });
+      }
+    }
+  });
+}
+
+function handleGenerateTestCache(): void {
+  const path = getCachePath();
+  if (path.length == 0) {
+    uni.showToast({ title: '当前环境无可用缓存路径', icon: 'none' });
+    return;
+  }
+
+  uni.showLoading({ title: '正在写入测试缓存...' });
+  try {
+    const fsm = uni.getFileSystemManager();
+    const testFileName = `test_cache_${Date.now()}.tmp`;
+    const targetFile = `${path}/${testFileName}`;
+
+    let dummy = 'unibestX_Cache_TestData_0123456789ABCDEF\n';
+    for (let i = 0; i < 10; i++) {
+      dummy = dummy + dummy;
+    }
+
+    fsm.writeFile({
+      filePath: targetFile,
+      data: dummy,
+      encoding: 'utf8',
+      success: () => {
+        uni.hideLoading();
+        uni.showToast({ title: '已成功生成测试缓存', icon: 'success' });
+        calculateCacheSize(false);
+      },
+      fail: (err) => {
+        uni.hideLoading();
+        console.warn('writeFile fail:', err);
+        uni.showToast({ title: '写入测试缓存失败', icon: 'none' });
+      }
+    });
+  }
+  catch (e) {
+    uni.hideLoading();
+    console.warn(e);
+    uni.showToast({ title: '写入异常', icon: 'none' });
+  }
+}
+
+// ==================== 4. 键盘感知与避让 ====================
 const keyboardInputText = ref<string>('');
 const keyboardHeight = ref<number>(0);
 let keyboardListenerId: number = -1;
@@ -375,6 +858,7 @@ onMounted(() => {
     keyboardHeight.value = Math.ceil(res.height);
   });
   // #endif
+  calculateCacheSize(false);
 });
 
 onUnmounted(() => {
