@@ -4,6 +4,11 @@
     <view class="flex-1 flex flex-col relative">
       <z-paging-x
         ref="pagingRef"
+        list-is="list-view"
+        :custom-nested-scroll="false"
+        :start-nested-scroll="false"
+        :refresher-enabled="true"
+        :use-custom-refresher="true"
         :model-value="articleList"
         :default-page-size="10"
         :show-back-to-top="true"
@@ -12,7 +17,7 @@
         :refresher-threshold="70"
         :refresher-complete-delay="300"
         :refresher-background="isDark ? '#0f172a' : '#f8fafc'"
-        :paging-style="{ flex: 1, position: 'relative', backgroundColor: isDark ? '#0f172a' : '#f8fafc' }"
+        :paging-style="{ flex: 1, position: 'relative', width: '100%', backgroundColor: isDark ? '#0f172a' : '#f8fafc' }"
         @update:model-value="onUpdateList"
         @refresher-status-change="onRefresherStatusChange"
         @query="onQuery"
@@ -54,31 +59,22 @@
             <!-- 控制操作按钮排 -->
             <view class="flex flex-row">
               <view
-                class="flex-1 py-[7px] mr-[4px] rounded-[6px] bg-[#fef3c7] items-center justify-center active:opacity-75"
+                class="flex-1 py-[7px] mr-[4px] rounded-[6px] bg-[#fef3c7] items-center justify-center"
                 @click="triggerEmpty"
               >
                 <text class="text-[10px] text-[#d97706] font-bold">清空数据</text>
               </view>
               <view
-                class="flex-1 py-[7px] mr-[4px] rounded-[6px] bg-[#dcfce7] items-center justify-center active:opacity-75"
+                class="flex-1 py-[7px] mr-[4px] rounded-[6px] bg-[#dcfce7] items-center justify-center"
                 @click="triggerReset"
               >
                 <text class="text-[10px] text-[#16a34a] font-bold">恢复重置</text>
               </view>
               <view
-                class="flex-1 py-[7px] mr-[4px] rounded-[6px] bg-[#e0e7ff] items-center justify-center active:opacity-75"
+                class="flex-1 py-[7px] rounded-[6px] bg-[#e0e7ff] items-center justify-center"
                 @click="triggerScrollToTop"
               >
                 <text class="text-[10px] text-[#4338ca] font-bold">一键回顶</text>
-              </view>
-              <view
-                class="flex-1 py-[7px] rounded-[6px] items-center justify-center active:opacity-75"
-                :class="isHideBottomState ? 'bg-[#f1f5f9]' : 'bg-[#fce7f3]'"
-                @click="toggleHideBottomState"
-              >
-                <text class="text-[10px] font-bold" :class="isHideBottomState ? 'text-[#64748b]' : 'text-[#db2777]'">
-                  {{ isHideBottomState ? '🙈 隐藏中(没了)' : '显示底部状态' }}
-                </text>
               </view>
             </view>
 
@@ -102,7 +98,10 @@
 
         <!-- 自定义下拉刷新插槽 -->
         <template #refresher>
-          <view class="w-full py-[16px] flex flex-row items-center justify-center">
+          <view
+            class="w-full py-[16px] flex flex-row items-center justify-center"
+            :style="{ width: `${windowWidth}px` }"
+          >
             <text class="text-[16px] mr-[8px]">{{ refresherIcon }}</text>
             <text
               class="text-[12px] font-bold"
@@ -143,98 +142,94 @@
           </view>
         </template>
 
-        <!-- 列表内容：与 nested-scroll 一致的标准卡片列表（清空数据状态下强制不渲染） -->
-        <template v-if="!isSimEmpty">
-          <view v-for="item in articleList" :key="item.id" class="w-full">
-            <view
-              class="mx-[14px] my-[6px] p-[14px] rounded-[12px] border-[1px] border-solid flex flex-col"
-              :class="isDark ? 'bg-[#1e293b] border-[#334155]' : 'bg-white border-[#e2e8f0]'"
-            >
-              <view class="flex flex-row items-center justify-between mb-[6px]">
-                <view
-                  class="px-[8px] py-[2px] rounded-[4px]"
-                  :style="{ backgroundColor: item.categoryBg }"
-                >
-                  <text class="text-[10px] font-bold" :style="{ color: item.categoryColor }">
-                    {{ item.category }}
-                  </text>
-                </view>
-                <text class="text-[11px] text-[#94a3b8]">{{ item.time }}</text>
-              </view>
-              <text
-                class="text-[14px] font-bold mb-[4px] leading-[20px]"
-                :class="isDark ? 'text-[#f1f5f9]' : 'text-[#1e293b]'"
+        <!-- 列表内容：采用 list-item 匹配 list-view 原生回收复用机制 -->
+        <list-item v-for="item in articleList" :key="item.id" type="card" class="w-full">
+          <view
+            class="mx-[14px] my-[6px] p-[14px] rounded-[12px] border-[1px] border-solid flex flex-col"
+            :class="isDark ? 'bg-[#1e293b] border-[#334155]' : 'bg-white border-[#e2e8f0]'"
+          >
+            <view class="flex flex-row items-center justify-between mb-[6px]">
+              <view
+                class="px-[8px] py-[2px] rounded-[4px]"
+                :style="{ backgroundColor: item.categoryBg }"
               >
-                {{ item.title }}
-              </text>
-              <text class="text-[12px] leading-[18px] text-[#64748b] mb-[8px]">
-                {{ item.summary }}
-              </text>
-              <view class="flex flex-row items-center justify-between pt-[6px] border-t-[1px] border-solid border-[#f1f5f9]">
-                <text class="text-[11px] text-[#94a3b8]">z-paging-x 触底自动追加</text>
-                <text class="text-[11px] font-bold text-[#0957de]">序号 #{{ item.id }} ➜</text>
+                <text class="text-[10px] font-bold" :style="{ color: item.categoryColor }">
+                  {{ item.category }}
+                </text>
               </view>
+              <text class="text-[11px] text-[#94a3b8]">{{ item.time }}</text>
+            </view>
+            <text
+              class="text-[14px] font-bold mb-[4px] leading-[20px]"
+              :class="isDark ? 'text-[#f1f5f9]' : 'text-[#1e293b]'"
+            >
+              {{ item.title }}
+            </text>
+            <text class="text-[12px] leading-[18px] text-[#64748b] mb-[8px]">
+              {{ item.summary }}
+            </text>
+            <view class="flex flex-row items-center justify-between pt-[6px] border-t-[1px] border-solid border-[#f1f5f9]">
+              <text class="text-[11px] text-[#94a3b8]">z-paging-x 触底自动追加</text>
+              <text class="text-[11px] font-bold text-[#0957de]">序号 #{{ item.id }} ➜</text>
             </view>
           </view>
-        </template>
+        </list-item>
 
         <!-- 自定义底部加载状态：完全对齐 nested-scroll 演示逻辑与视觉 -->
         <template #loadMore>
-          <template v-if="!isHideBottomState">
-            <!-- 1. 自定义正在加载中插槽演示 -->
-            <view
-              v-if="isLoadMoreLoading"
-              class="mx-[14px] my-[10px] p-[14px] rounded-[12px] border-[1px] border-dashed flex flex-row items-center justify-center shadow-xs"
-              :class="isDark ? 'bg-[#1e293b]/70 border-[#38bdf866]' : 'bg-[#eff6ff] border-[#93c5fd]'"
+          <!-- 1. 自定义正在加载中插槽演示 -->
+          <view
+            v-if="isLoadMoreLoading"
+            class="mx-[14px] my-[10px] p-[14px] rounded-[12px] border-[1px] border-dashed flex flex-row items-center justify-center shadow-xs"
+            :class="isDark ? 'bg-[#1e293b]/70 border-[#38bdf866]' : 'bg-[#eff6ff] border-[#93c5fd]'"
+          >
+            <text class="text-[14px] mr-[6px]">⚡</text>
+            <text
+              class="text-[12px] font-semibold"
+              :class="isDark ? 'text-[#38bdf8]' : 'text-[#0957de]'"
             >
-              <text class="text-[14px] mr-[6px]">⚡</text>
+              自定义加载中：z-paging-x 正在流式计算数据...
+            </text>
+          </view>
+
+          <!-- 2. 自定义加载报错与重试插槽演示 -->
+          <view
+            v-else-if="isLoadMoreError"
+            class="mx-[14px] my-[8px] p-[12px] rounded-[12px] border-[1px] border-solid flex flex-row items-center justify-between shadow-xs"
+            :class="isDark ? 'bg-[#450a0a]/50 border-[#7f1d1d]' : 'bg-[#fef2f2] border-[#fecaca]'"
+          >
+            <view class="flex flex-row items-center flex-1 mr-[10px]">
+              <text class="text-[18px] mr-[8px]">🚨</text>
+              <view class="flex flex-col">
+                <text class="text-[12px] font-bold text-[#dc2626]">自定义报错：服务连接暂时中断</text>
+                <text class="text-[10px] text-[#ef4444] mt-[2px]">请检查网络环境或轻触右侧按钮重新拉取</text>
+              </view>
+            </view>
+            <view
+              class="px-[12px] py-[6px] rounded-[6px] bg-[#dc2626] items-center justify-center"
+              @click="onRetryLoad"
+            >
+              <text class="text-[11px] font-bold text-[#ffffff]" style="color: #ffffff;">立即重试</text>
+            </view>
+          </view>
+
+          <!-- 3. 自定义没有更多数据插槽演示 -->
+          <view
+            v-else-if="isLoadMoreFinished"
+            class="w-full py-[18px] flex flex-row items-center justify-center"
+          >
+            <view class="w-[36px] h-[1px]" :class="isDark ? 'bg-[#334155]' : 'bg-[#cbd5e1]'" />
+            <view class="mx-[10px] flex flex-row items-center">
+              <text class="text-[12px] mr-[4px]">🎉</text>
               <text
-                class="text-[12px] font-semibold"
-                :class="isDark ? 'text-[#38bdf8]' : 'text-[#0957de]'"
+                class="text-[12px] font-medium"
+                :class="isDark ? 'text-[#64748b]' : 'text-[#94a3b8]'"
               >
-                自定义加载中：z-paging-x 正在流式计算数据...
+                已展示完全部数据内容
               </text>
             </view>
-
-            <!-- 2. 自定义加载报错与重试插槽演示 -->
-            <view
-              v-else-if="isLoadMoreError"
-              class="mx-[14px] my-[8px] p-[12px] rounded-[12px] border-[1px] border-solid flex flex-row items-center justify-between shadow-xs"
-              :class="isDark ? 'bg-[#450a0a]/50 border-[#7f1d1d]' : 'bg-[#fef2f2] border-[#fecaca]'"
-            >
-              <view class="flex flex-row items-center flex-1 mr-[10px]">
-                <text class="text-[18px] mr-[8px]">🚨</text>
-                <view class="flex flex-col">
-                  <text class="text-[12px] font-bold text-[#dc2626]">自定义报错：服务连接暂时中断</text>
-                  <text class="text-[10px] text-[#ef4444] mt-[2px]">请检查网络环境或轻触右侧按钮重新拉取</text>
-                </view>
-              </view>
-              <view
-                class="px-[12px] py-[6px] rounded-[6px] bg-[#dc2626] items-center justify-center active:opacity-75"
-                @click="onRetryLoad"
-              >
-                <text class="text-[11px] font-bold text-[#ffffff]" style="color: #ffffff;">立即重试</text>
-              </view>
-            </view>
-
-            <!-- 3. 自定义没有更多数据插槽演示 -->
-            <view
-              v-else-if="isLoadMoreFinished"
-              class="w-full py-[18px] flex flex-row items-center justify-center"
-            >
-              <view class="w-[36px] h-[1px]" :class="isDark ? 'bg-[#334155]' : 'bg-[#cbd5e1]'" />
-              <view class="mx-[10px] flex flex-row items-center">
-                <text class="text-[12px] mr-[4px]">🎉</text>
-                <text
-                  class="text-[12px] font-medium"
-                  :class="isDark ? 'text-[#64748b]' : 'text-[#94a3b8]'"
-                >
-                  已展示完全部数据内容
-                </text>
-              </view>
-              <view class="w-[36px] h-[1px]" :class="isDark ? 'bg-[#334155]' : 'bg-[#cbd5e1]'" />
-            </view>
-          </template>
+            <view class="w-[36px] h-[1px]" :class="isDark ? 'bg-[#334155]' : 'bg-[#cbd5e1]'" />
+          </view>
         </template>
       </z-paging-x>
     </view>
@@ -242,9 +237,8 @@
 </template>
 
 <script setup lang="uts">
-import { computed, onMounted, onUnmounted, ref } from 'vue';
+import { computed, ref } from 'vue';
 import { useAppStore } from '@/src/store';
-import { setPageScrollEnabled } from '@/src/utils/refresh/index.uts';
 
 definePage({
   layout: 'navbar',
@@ -259,15 +253,6 @@ definePage({
 
 const appStore = useAppStore();
 const isDark = computed((): boolean => appStore.state.isDark);
-
-// 挂载时禁用外层通用滚动，交由 z-paging-x 独立接管
-onMounted(() => {
-  setPageScrollEnabled(false);
-});
-
-onUnmounted(() => {
-  setPageScrollEnabled(true);
-});
 
 // 数据模型定义（遵循规范：严格使用 type，禁止 interface）
 type ArticleItem = {
@@ -284,6 +269,7 @@ const pagingRef = ref<ComponentPublicInstance | null>(null);
 const articleList = ref<ArticleItem[]>([]);
 const isSimEmpty = ref<boolean>(false);
 const customBottom = ref<number>(120);
+const windowWidth = ref<number>(uni.getWindowInfo().windowWidth);
 
 // 回顶样式：解除原生 76rpx (38px) 宽高的死限制，允许胶囊自然伸展并支持动态响应 bottom
 const backToTopStyle = computed((): UTSJSONObject => {
@@ -301,7 +287,6 @@ const simStatusText = ref<string>('【第 1 步】首次加载 2 条数据（未
 const isLoadMoreLoading = ref<boolean>(false);
 const isLoadMoreError = ref<boolean>(false);
 const isLoadMoreFinished = ref<boolean>(false);
-const isHideBottomState = ref<boolean>(false);
 
 // 下拉刷新状态跟踪
 const refresherStatus = ref<string>('default');
@@ -512,14 +497,6 @@ function toggleBottomPosition(): void {
   }
   uni.showToast({
     title: `回顶按钮底部边距设为 ${customBottom.value}px`,
-    icon: 'none'
-  });
-}
-
-function toggleHideBottomState(): void {
-  isHideBottomState.value = !isHideBottomState.value;
-  uni.showToast({
-    title: isHideBottomState.value ? '已开启「底态隐藏(没了)」模式' : '已恢复显示底部状态',
     icon: 'none'
   });
 }
