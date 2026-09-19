@@ -64,7 +64,31 @@
 		"distribute": {
 			"modules": {
 				"uni-oauth": {
-					"weixin": {}
+					"weixin": {
+						"appid": "wx6d379a8c0aff3ea3"
+					}
+				},
+				"uni-location": {
+					"system": {}
+				},
+				"uni-map": {
+					"tencent": {
+						"key": "EFTBZ-EZX6U-LJCVS-45MML-N6AN2-K7BNH"
+					}
+				},
+				"uni-payment": {
+					"alipay": {},
+					"wxpay": {}
+				},
+				"uni-share": {
+					"weixin": {
+						"appid": "wx6d379a8c0aff3ea3"
+					}
+				},
+				"uni-barcode-scanning": {},
+				"uni-network-cronet": {},
+				"uni-push": {
+					"hms": {}
 				}
 			},
 			"icons": {
@@ -74,8 +98,17 @@
 				"xxxhdpi": "package/logo/192x192.png"
 			},
 			"splashScreens": {
-				"default": {}
-			}
+				"default": {
+					"xhdpi": "package/splash/clean_white/xhdpi.png",
+					"xxhdpi": "package/splash/clean_white/xxhdpi.png",
+					"xxxhdpi": "package/splash/clean_white/xxxhdpi.png"
+				}
+			},
+			"abiFilters": [
+				"armeabi-v7a",
+				"arm64-v8a",
+				"x86_64"
+			]
 		}
 	},
 	"app-ios": {
@@ -107,6 +140,35 @@
 					"storeFile": "/Users/chenqi/Library/Application Support/HBuilder X/extensions/launcher/agc-certs/1785394649196.p12",
 					"storePassword": "0000001B93BBB9B62A487A04FD8306E077C8FE542BDFD995CE951E13BEF4E7ED88666ED9C3FFE6BA2C3ED6"
 				}
+			},
+			"deviceTypes": [
+				"phone"
+			],
+			"deviceArchs": [
+				"arm64-v8a"
+			],
+			"modules": {
+				"uni-location": {
+					"system": {}
+				},
+				"uni-map": {
+					"tencent": {}
+				},
+				"uni-oauth": {
+					"weixin": {
+						"appid": "wx6d379a8c0aff3ea3"
+					}
+				},
+				"uni-payment": {
+					"alipay": {},
+					"wxpay": {}
+				},
+				"uni-share": {
+					"weixin": {
+						"appid": "wx6d379a8c0aff3ea3"
+					}
+				},
+				"uni-requestMerchantTransfer": {}
 			}
 		}
 	}
