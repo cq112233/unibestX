@@ -1,0 +1,53 @@
+/**
+ * 支付宝登录成功回调数据
+ */
+export type AlipayLoginSuccess = {
+  /** 支付宝返回的结果状态码（'9000' 为成功） */
+  resultStatus: string
+  /** 支付宝授权原始返回串，包含 auth_code、user_id 等 */
+  result: string
+  /** 从原始结果中自动解析出的临时授权码 authCode（用于传给后端换取 UserID/AccessToken） */
+  authCode?: string
+  /** 从原始结果中解析出的支付宝用户 ID */
+  userId?: string
+  errMsg?: string
+}
+
+/**
+ * 支付宝登录失败回调数据
+ */
+export type AlipayLoginFail = {
+  errCode: number
+  errMsg: string
+  /** 支付宝原生状态码，如 '6001' 用户取消，'4000' 系统异常等 */
+  resultStatus?: string
+}
+
+/**
+ * 支付宝登录配置选项
+ */
+export type AlipayLoginOptions = {
+  /**
+   * 由业务后端调用支付宝开放平台接口（alipay.open.auth.sdk.code.get）生成的签约授权请求串
+   * 格式示例：apiname=com.alipay.account.auth&app_id=xxxx&auth_type=AUTHACCOUNT...
+   */
+  authInfo: string
+  /** 是否在拉起授权时展示 Loading，默认 true */
+  showLoading?: boolean
+  /** 成功回调 */
+  success?: (res: AlipayLoginSuccess) => void
+  /** 失败回调 */
+  fail?: (err: AlipayLoginFail) => void
+  /** 完成回调 */
+  complete?: (res: any | null) => void
+}
+
+/**
+ * 检查手机是否安装了支付宝客户端
+ */
+export type IsAlipayInstalled = () => boolean
+
+/**
+ * 发起支付宝授权登录
+ */
+export type AlipayLogin = (options: AlipayLoginOptions) => void

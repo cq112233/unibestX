@@ -1,0 +1,15 @@
+import { AlipayLoginOptions, IsAlipayInstalled, AlipayLogin } from './interface.uts'
+
+export const isAlipayInstalled: IsAlipayInstalled = function(): boolean {
+  console.warn('[uts-alipay-login] 当前平台未实现 isAlipayInstalled')
+  return false
+}
+
+export const alipayLogin: AlipayLogin = function(options: AlipayLoginOptions) {
+  console.warn('[uts-alipay-login] 当前平台未实现 alipayLogin')
+  options.fail?.({
+    errCode: -999,
+    errMsg: '当前平台暂不支持支付宝原生登录'
+  })
+  options.complete?.(null)
+}

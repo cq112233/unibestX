@@ -35,8 +35,35 @@
       <view v-if="tokenStore.hasValidLogin()" class="w-full h-[44px] rounded-[8px] bg-[#ef4444] flex flex-row items-center justify-center" @click="handleLogout">
         <text class="text-[#ffffff] text-[14px] font-bold">退出登录</text>
       </view>
-      <view v-else class="w-full h-[44px] rounded-[8px] bg-[#3b82f6] flex flex-row items-center justify-center" @click="handleLogin">
-        <text class="text-[#ffffff] text-[14px] font-bold">登录</text>
+      <view v-else class="w-full flex flex-col">
+        <!-- App 微信一键登录 -->
+        <view
+          class="w-full h-[44px] rounded-[8px] bg-[#07c160] flex flex-row items-center justify-center mb-[12px]"
+          @click="handleWechatLogin"
+        >
+          <text class="text-[#ffffff] text-[14px] font-bold">App 微信一键登录</text>
+        </view>
+        <!-- 钉钉一键登录 -->
+        <view
+          class="w-full h-[44px] rounded-[8px] bg-[#0089ff] flex flex-row items-center justify-center mb-[12px]"
+          @click="handleDingTalkLogin"
+        >
+          <text class="text-[#ffffff] text-[14px] font-bold">钉钉一键登录</text>
+        </view>
+        <!-- 支付宝一键登录 -->
+        <view
+          class="w-full h-[44px] rounded-[8px] bg-[#1677ff] flex flex-row items-center justify-center mb-[12px]"
+          @click="handleAlipayLogin"
+        >
+          <text class="text-[#ffffff] text-[14px] font-bold">支付宝一键登录</text>
+        </view>
+        <!-- 原有账号密码登录 -->
+        <view
+          class="w-full h-[44px] rounded-[8px] border-[1px] border-solid border-[#cbd5e1] bg-[#ffffff] flex flex-row items-center justify-center"
+          @click="handleLogin"
+        >
+          <text class="text-[#334155] text-[14px] font-bold">账号密码登录</text>
+        </view>
       </view>
     </view>
   </view>
@@ -44,10 +71,13 @@
 
 <script setup lang="uts">
 import { computed } from 'vue';
+import type { ISingleTokenRes, IUserInfo } from '@/src/store';
 import { useTokenStore, useUserStore } from '@/src/store';
 import { LOGIN_PAGE } from '@/src/router/config';
 import { curIdx, onTabPageShow, onTabShow, switchTabbar } from '@/src/tabbar/index.uts';
 import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/utils/refresh/index.uts';
+import { dingTalkLogin, isDingTalkInstalled } from '@/uni_modules/uts-dingtalk-login';
+import { alipayLogin, isAlipayInstalled } from '@/uni_modules/uts-alipay-login';
 
 // 页面数据加载/刷新方法
 function refreshData(): void {
@@ -91,6 +121,283 @@ const userInfoJson = computed((): string => {
   };
   return JSON.stringify(info, null, 2);
 });
+
+// App 微信登录
+function handleWechatLogin(): void {
+  // #ifdef APP
+  uni.showLoading({
+    title: '微信授权中...',
+    mask: true
+  });
+
+  // 1. 检查当前客户端运行环境是否支持微信登录服务
+  uni.getProvider({
+    service: 'oauth',
+    success: (providerRes) => {
+      const providers = providerRes.provider;
+      if (!providers.includes('weixin')) {
+        uni.hideLoading();
+        uni.showToast({
+          title: '当前环境未检测到微信登录模块',
+          icon: 'none'
+        });
+        return;
+      }
+
+      // 2. 调用 App 原生微信登录获取授权凭证
+      uni.login({
+        provider: 'weixin',
+        onlyAuthorize: true,
+        success: (loginRes) => {
+          uni.hideLoading();
+          const authCode = loginRes.code;
+          console.log('App 微信授权成功，code:', authCode);
+
+          // 3. 将微信凭证提交保存，更新业务 token 与用户信息
+          const tokenStr = `wx-token-${Date.now()}`;
+          tokenStore.setSingleToken({
+            token: tokenStr,
+            expiresIn: 7200
+          } as ISingleTokenRes);
+
+          userStore.setUserInfo({
+            userId: 6666,
+            username: 'WeChat_User',
+            nickname: '微信授权用户',
+            avatar: '/static/logo.png'
+          } as IUserInfo);
+
+          uni.showToast({
+            title: '微信登录成功',
+            icon: 'success'
+          });
+        },
+        fail: (err) => {
+          uni.hideLoading();
+          console.error('App 微信登录失败:', err);
+          uni.showModal({
+            title: '微信登录提示',
+            content: err.errMsg ?? '请检查是否已安装微信客户端，或微信开放平台 AppID 签名配置',
+            showCancel: false
+          });
+        }
+      });
+    },
+    fail: (err) => {
+      uni.hideLoading();
+      console.error('获取登录服务提供商失败:', err);
+      uni.showToast({
+        title: '获取登录服务提供商失败',
+        icon: 'none'
+      });
+    }
+  });
+  // #endif
+
+  // #ifndef APP
+  uni.showModal({
+    title: '平台提示',
+    content: 'App 微信原生登录需在手机端基座中运行。当前非 App 环境，是否执行微信模拟授权登录？',
+    success: (res) => {
+      if (res.confirm) {
+        tokenStore.setSingleToken({
+          token: `mock-wx-token-${Date.now()}`,
+          expiresIn: 7200
+        } as ISingleTokenRes);
+
+        userStore.setUserInfo({
+          userId: 6666,
+          username: 'WeChat_User',
+          nickname: '微信用户 (模拟)',
+          avatar: '/static/logo.png'
+        } as IUserInfo);
+
+        uni.showToast({
+          title: '微信登录成功',
+          icon: 'success'
+        });
+      }
+    }
+  });
+  // #endif
+}
+
+// 钉钉授权登录（基于 uts-dingtalk-login 原生插件）
+function handleDingTalkLogin(): void {
+  // #ifdef APP-ANDROID
+  // 1. 检查是否安装钉钉客户端
+  const installed = isDingTalkInstalled();
+  if (!installed) {
+    uni.showToast({
+      title: '未安装钉钉客户端',
+      icon: 'none'
+    });
+    return;
+  }
+
+  uni.showLoading({
+    title: '钉钉授权中...',
+    mask: true
+  });
+
+  // 2. 调用 uts-dingtalk-login 原生插件拉起钉钉授权
+  dingTalkLogin({
+    appId: 'dingoae0123456789', // 钉钉开放平台申请的 AppId
+    success: (res) => {
+      uni.hideLoading();
+      console.log('钉钉授权成功，authCode:', res.authCode);
+
+      // 将 authCode 提交给后端服务换取业务 token 与用户信息
+      const tokenStr = `dd-token-${Date.now()}`;
+      tokenStore.setSingleToken({
+        token: tokenStr,
+        expiresIn: 7200
+      } as ISingleTokenRes);
+
+      userStore.setUserInfo({
+        userId: 9999,
+        username: 'DingTalk_User',
+        nickname: '钉钉授权用户',
+        avatar: '/static/logo.png'
+      } as IUserInfo);
+
+      uni.showToast({
+        title: '钉钉登录成功',
+        icon: 'success'
+      });
+    },
+    fail: (err) => {
+      uni.hideLoading();
+      console.error('钉钉登录失败:', err.errCode, err.errMsg);
+      uni.showModal({
+        title: '钉钉登录提示',
+        content: `[${err.errCode}] ${err.errMsg}`,
+        showCancel: false
+      });
+    },
+    complete: () => {
+      uni.hideLoading();
+    }
+  });
+  // #endif
+
+  // #ifndef APP-ANDROID
+  uni.showModal({
+    title: '平台提示',
+    content: '钉钉原生插件需在 Android 自定义基座真机环境下运行。当前非 Android 原生环境，是否执行模拟授权登录？',
+    success: (res) => {
+      if (res.confirm) {
+        tokenStore.setSingleToken({
+          token: `mock-dd-token-${Date.now()}`,
+          expiresIn: 7200
+        } as ISingleTokenRes);
+
+        userStore.setUserInfo({
+          userId: 9999,
+          username: 'DingTalk_User',
+          nickname: '钉钉用户 (模拟)',
+          avatar: '/static/logo.png'
+        } as IUserInfo);
+
+        uni.showToast({
+          title: '钉钉登录成功',
+          icon: 'success'
+        });
+      }
+    }
+  });
+  // #endif
+}
+
+// 支付宝授权登录（基于 uts-alipay-login 原生插件）
+function handleAlipayLogin(): void {
+  // #ifdef APP-ANDROID
+  // 1. 检查是否安装支付宝客户端
+  const installed = isAlipayInstalled();
+  if (!installed) {
+    uni.showToast({
+      title: '未检测到支付宝客户端，将拉起网页授权',
+      icon: 'none'
+    });
+  }
+
+  uni.showLoading({
+    title: '支付宝授权中...',
+    mask: true
+  });
+
+  // 2. 调用 uts-alipay-login 原生插件发起授权
+  // 生产环境中 authInfo 由业务后端调用支付宝开放平台 alipay.open.auth.sdk.code.get 签名生成
+  const mockAuthInfo = 'apiname=com.alipay.account.auth&app_id=2021000000000000&auth_type=AUTHACCOUNT&biz_type=openservice&pid=2088000000000000&product_id=APP_FAST_LOGIN&scope=kuaijie&target_id=unibestX_user';
+
+  alipayLogin({
+    authInfo: mockAuthInfo,
+    showLoading: false,
+    success: (res) => {
+      uni.hideLoading();
+      console.log('支付宝授权成功，authCode:', res.authCode, 'userId:', res.userId);
+
+      // 将 authCode 提交给后端服务换取系统业务 Token 与用户信息
+      const tokenStr = `alipay-token-${Date.now()}`;
+      tokenStore.setSingleToken({
+        token: tokenStr,
+        expiresIn: 7200
+      } as ISingleTokenRes);
+
+      userStore.setUserInfo({
+        userId: 7777,
+        username: 'Alipay_User',
+        nickname: '支付宝授权用户',
+        avatar: '/static/logo.png'
+      } as IUserInfo);
+
+      uni.showToast({
+        title: '支付宝登录成功',
+        icon: 'success'
+      });
+    },
+    fail: (err) => {
+      uni.hideLoading();
+      console.error('支付宝登录失败:', err.errCode, err.errMsg);
+      uni.showModal({
+        title: '支付宝登录提示',
+        content: `[${err.errCode}] ${err.errMsg}`,
+        showCancel: false
+      });
+    },
+    complete: () => {
+      uni.hideLoading();
+    }
+  });
+  // #endif
+
+  // #ifndef APP-ANDROID
+  uni.showModal({
+    title: '平台提示',
+    content: '支付宝原生插件需在 Android 自定义基座真机环境下运行。当前非 Android 原生环境，是否执行模拟授权登录？',
+    success: (res) => {
+      if (res.confirm) {
+        tokenStore.setSingleToken({
+          token: `mock-alipay-token-${Date.now()}`,
+          expiresIn: 7200
+        } as ISingleTokenRes);
+
+        userStore.setUserInfo({
+          userId: 7777,
+          username: 'Alipay_User',
+          nickname: '支付宝用户 (模拟)',
+          avatar: '/static/logo.png'
+        } as IUserInfo);
+
+        uni.showToast({
+          title: '支付宝登录成功',
+          icon: 'success'
+        });
+      }
+    }
+  });
+  // #endif
+}
 
 // 登录
 function handleLogin() {

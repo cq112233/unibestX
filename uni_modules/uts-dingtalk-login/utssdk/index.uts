@@ -1,0 +1,15 @@
+import { DingTalkLoginOptions, IsDingTalkInstalled, DingTalkLogin } from './interface.uts'
+
+export const isDingTalkInstalled: IsDingTalkInstalled = function(appId?: string): boolean {
+  console.warn('[uts-dingtalk-login] 当前平台未实现 isDingTalkInstalled')
+  return false
+}
+
+export const dingTalkLogin: DingTalkLogin = function(options: DingTalkLoginOptions) {
+  console.warn('[uts-dingtalk-login] 当前平台未实现 dingTalkLogin')
+  options.fail?.({
+    errCode: -999,
+    errMsg: '当前平台暂不支持钉钉原生登录'
+  })
+  options.complete?.(null)
+}

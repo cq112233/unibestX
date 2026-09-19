@@ -1,0 +1,62 @@
+import {
+  DingTalkLoginOptions,
+  DingTalkLoginSuccess,
+  DingTalkLoginFail
+} from '../interface.uts'
+import DingTalkManager from 'uts.sdk.modules.utsDingtalkLogin.DingTalkManager'
+
+/**
+ * 检查手机是否安装了钉钉客户端
+ */
+export function isDingTalkInstalled(appId?: string): boolean {
+  const activity = UTSAndroid.getUniActivity()
+  if (activity == null) {
+    return false
+  }
+  return DingTalkManager.isInstalled(activity, appId ?? '')
+}
+
+/**
+ * 拉起钉钉授权登录
+ */
+export function dingTalkLogin(options: DingTalkLoginOptions) {
+  const activity = UTSAndroid.getUniActivity()
+  if (activity == null) {
+    options.fail?.({
+      errCode: -1,
+      errMsg: '获取应用上下文失败'
+    } as DingTalkLoginFail)
+    options.complete?.(null)
+    return
+  }
+
+  if (options.appId.length == 0) {
+    options.fail?.({
+      errCode: -101,
+      errMsg: '缺少必填参数 appId'
+    } as DingTalkLoginFail)
+    options.complete?.(null)
+    return
+  }
+
+  DingTalkManager.login(
+    activity,
+    options.appId,
+    options.state ?? '',
+    (authCode: string) => {
+      options.success?.({
+        authCode: authCode,
+        errMsg: 'dingtalk login:ok'
+      } as DingTalkLoginSuccess)
+    },
+    (errCode: number, errMsg: string) => {
+      options.fail?.({
+        errCode: errCode,
+        errMsg: errMsg
+      } as DingTalkLoginFail)
+    },
+    () => {
+      options.complete?.(null)
+    }
+  )
+}

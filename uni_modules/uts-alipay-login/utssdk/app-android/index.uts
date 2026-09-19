@@ -1,0 +1,68 @@
+import {
+  AlipayLoginOptions,
+  AlipayLoginSuccess,
+  AlipayLoginFail
+} from '../interface.uts'
+import AlipayLoginManager from 'uts.sdk.modules.utsAlipayLogin.AlipayLoginManager'
+
+/**
+ * 检查手机是否安装了支付宝客户端
+ */
+export function isAlipayInstalled(): boolean {
+  const activity = UTSAndroid.getUniActivity()
+  if (activity == null) {
+    return false
+  }
+  return AlipayLoginManager.isInstalled(activity)
+}
+
+/**
+ * 发起支付宝授权登录
+ */
+export function alipayLogin(options: AlipayLoginOptions) {
+  const activity = UTSAndroid.getUniActivity()
+  if (activity == null) {
+    options.fail?.({
+      errCode: -1,
+      errMsg: '获取应用上下文失败'
+    } as AlipayLoginFail)
+    options.complete?.(null)
+    return
+  }
+
+  if (options.authInfo.length == 0) {
+    options.fail?.({
+      errCode: -101,
+      errMsg: '缺少必填参数 authInfo (由后端接口生成的授权串)'
+    } as AlipayLoginFail)
+    options.complete?.(null)
+    return
+  }
+
+  const showLoading = options.showLoading ?? true
+
+  AlipayLoginManager.auth(
+    activity,
+    options.authInfo,
+    showLoading,
+    (resultStatus: string, rawResult: string, authCode: string, userId: string) => {
+      options.success?.({
+        resultStatus: resultStatus,
+        result: rawResult,
+        authCode: authCode,
+        userId: userId,
+        errMsg: 'alipay login:ok'
+      } as AlipayLoginSuccess)
+    },
+    (errCode: number, errMsg: string, resultStatus: string) => {
+      options.fail?.({
+        errCode: errCode,
+        errMsg: errMsg,
+        resultStatus: resultStatus
+      } as AlipayLoginFail)
+    },
+    () => {
+      options.complete?.(null)
+    }
+  )
+}

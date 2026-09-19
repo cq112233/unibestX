@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <queries>
+        <!-- 钉钉客户端应用可见性 (适配 Android 11+) -->
+        <package android:name="com.alibaba.android.rimet" />
+    </queries>
+
+    <application>
+        <!-- 钉钉回调实际处理 Activity -->
+        <activity
+            android:name="uts.sdk.modules.utsDingtalkLogin.DDShareActivity"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+
+        <!-- 钉钉 SDK 规范别名：${applicationId}.ddshare.DDShareActivity 映射到目标 Activity -->
+        <activity-alias
+            android:name="${applicationId}.ddshare.DDShareActivity"
+            android:exported="true"
+            android:targetActivity="uts.sdk.modules.utsDingtalkLogin.DDShareActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity-alias>
+    </application>
+</manifest>

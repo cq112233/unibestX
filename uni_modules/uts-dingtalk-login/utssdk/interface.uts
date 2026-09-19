@@ -1,0 +1,42 @@
+/**
+ * 钉钉登录成功回调数据
+ */
+export type DingTalkLoginSuccess = {
+  /** 钉钉临时授权码 authCode，用于传给后端换取用户身份信息 */
+  authCode: string
+  errMsg?: string
+}
+
+/**
+ * 钉钉登录失败回调数据
+ */
+export type DingTalkLoginFail = {
+  errCode: number
+  errMsg: string
+}
+
+/**
+ * 钉钉登录配置选项
+ */
+export type DingTalkLoginOptions = {
+  /** 钉钉开放平台申请的 AppId / ClientId */
+  appId: string
+  /** 自定义 state 标识，非必填 */
+  state?: string
+  /** 成功回调 */
+  success?: (res: DingTalkLoginSuccess) => void
+  /** 失败回调 */
+  fail?: (err: DingTalkLoginFail) => void
+  /** 完成回调（无论成功或失败均触发） */
+  complete?: (res: any | null) => void
+}
+
+/**
+ * 检查手机是否安装了钉钉客户端
+ */
+export type IsDingTalkInstalled = (appId?: string) => boolean
+
+/**
+ * 发起钉钉授权登录
+ */
+export type DingTalkLogin = (options: DingTalkLoginOptions) => void

@@ -69,7 +69,10 @@
 					}
 				},
 				"uni-location": {
-					"system": {}
+					"system": {},
+					"tencent": {
+						"key": "EFTBZ-EZX6U-LJCVS-45MML-N6AN2-K7BNH"
+					}
 				},
 				"uni-map": {
 					"tencent": {
@@ -86,10 +89,7 @@
 					}
 				},
 				"uni-barcode-scanning": {},
-				"uni-network-cronet": {},
-				"uni-push": {
-					"hms": {}
-				}
+				"uni-network-cronet": {}
 			},
 			"icons": {
 				"hdpi": "package/logo/72x72.png",
@@ -99,9 +99,9 @@
 			},
 			"splashScreens": {
 				"default": {
-					"xhdpi": "package/splash/clean_white/xhdpi.png",
-					"xxhdpi": "package/splash/clean_white/xxhdpi.png",
-					"xxxhdpi": "package/splash/clean_white/xxxhdpi.png"
+					"xhdpi": "package/splash/clean_white/xhdpi_720x1280.9.png",
+					"xxhdpi": "package/splash/clean_white/xxhdpi_1080x1920.9.png",
+					"xxxhdpi": "package/splash/clean_white/xxxhdpi_2160x3840.9.png"
 				}
 			},
 			"abiFilters": [
@@ -125,7 +125,12 @@
 			"mode": "hash",
 			"base": "./"
 		},
-		"darkmode": true
+		"darkmode": true,
+		"optimization": {
+			"treeShaking": {
+				"enable": true
+			}
+		}
 	},
 	"app-harmony": {
 		"distribute": {
