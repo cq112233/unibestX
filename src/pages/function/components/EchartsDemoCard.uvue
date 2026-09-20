@@ -1,5 +1,19 @@
 <template>
-  <Card :title="echartTitle">
+  <view
+    class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid"
+    :style="{
+      backgroundColor: 'var(--card-bg, #ffffff)',
+      borderColor: 'var(--border-color, #edf2f7)'
+    }"
+  >
+    <!-- 标题区域 -->
+    <view class="flex flex-row items-center mb-[16px]">
+      <view
+        class="w-[4px] h-[16px] rounded-[2px] mr-[8px]"
+        :style="{ backgroundColor: 'var(--theme-color, #3182ce)' }"
+      />
+      <text class="text-[16px] font-bold" :style="{ color: 'var(--text-color, #2d3748)' }">{{ echartTitle }}</text>
+    </view>
     <view class="w-full h-[280px] mt-[10px]">
       <e-chart ref="echartRef" height="280px" class="w-full h-full" @ready="initEchart" />
     </view>
@@ -47,11 +61,10 @@
         </view>
       </view>
     </view>
-  </Card>
+  </view>
 </template>
 
 <script setup lang="uts">
-import Card from '../../basic/components/Card.uvue';
 import { computed, ref, watch } from 'vue';
 import { systemInfo } from '@/src/utils/systemInfo/index.uts';
 import { $t } from '@/src/utils/i18n/index.uts';

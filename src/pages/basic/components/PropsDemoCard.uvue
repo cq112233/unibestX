@@ -1,5 +1,19 @@
 <template>
-  <Card title="父子组件传参 & 具名插槽演示">
+  <view
+    class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid"
+    :style="{
+      backgroundColor: 'var(--card-bg, #ffffff)',
+      borderColor: 'var(--border-color, #edf2f7)'
+    }"
+  >
+    <!-- 标题区域 -->
+    <view class="flex flex-row items-center mb-[16px]">
+      <view
+        class="w-[4px] h-[16px] rounded-[2px] mr-[8px]"
+        :style="{ backgroundColor: 'var(--theme-color, #3182ce)' }"
+      />
+      <text class="text-[16px] font-bold" :style="{ color: 'var(--text-color, #2d3748)' }">父子组件传参 & 具名插槽演示</text>
+    </view>
     <!-- 父组件状态展示面板 -->
     <view class="bg-[#eff6ff] rounded-[12px] p-[14px] mb-[14px] border-[1px] border-solid border-[#bfdbfe]">
       <text class="text-[14px] font-bold text-[#1e40af] mb-[6px]">👨‍👩‍👧 父组件状态管理面板</text>
@@ -69,12 +83,11 @@
         </view>
       </template>
     </ChildDemoBox>
-  </Card>
+  </view>
 </template>
 
 <script setup lang="uts">
 import { ref } from 'vue';
-import Card from './Card.uvue';
 import ChildDemoBox from './ChildDemoBox.uvue';
 
 const parentCount = ref<number>(10);

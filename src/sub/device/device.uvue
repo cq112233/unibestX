@@ -2,7 +2,21 @@
   <view class="flex flex-col p-[16px]" :class="isDark ? 'bg-[#0f172a]' : 'bg-[#f8fafc]'">
     <!-- 1. 通信与系统分享卡片 -->
     <view class="mb-[16px]">
-      <Card title="通信与系统分享">
+      <view
+        class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid"
+        :style="{
+          backgroundColor: 'var(--card-bg, #ffffff)',
+          borderColor: 'var(--border-color, #edf2f7)'
+        }"
+      >
+        <!-- 标题区域 -->
+        <view class="flex flex-row items-center mb-[16px]">
+          <view
+            class="w-[4px] h-[16px] rounded-[2px] mr-[8px]"
+            :style="{ backgroundColor: 'var(--theme-color, #3182ce)' }"
+          />
+          <text class="text-[16px] font-bold" :style="{ color: 'var(--text-color, #2d3748)' }">通信与系统分享</text>
+        </view>
         <!-- 拨号 -->
         <view class="rounded-[12px] p-[16px] mb-[16px] border-[1px] border-solid border-[#e2e8f0]">
           <view class="flex flex-row items-center mb-[8px]">
@@ -41,12 +55,26 @@
             <text class="text-[#ffffff] text-[14px] font-bold">调起系统分享面板</text>
           </view>
         </view>
-      </Card>
+      </view>
     </view>
 
     <!-- 2. 文件与文档预览卡片 -->
     <view class="mb-[16px]">
-      <Card title="文件与文档预览">
+      <view
+        class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid"
+        :style="{
+          backgroundColor: 'var(--card-bg, #ffffff)',
+          borderColor: 'var(--border-color, #edf2f7)'
+        }"
+      >
+        <!-- 标题区域 -->
+        <view class="flex flex-row items-center mb-[16px]">
+          <view
+            class="w-[4px] h-[16px] rounded-[2px] mr-[8px]"
+            :style="{ backgroundColor: 'var(--theme-color, #3182ce)' }"
+          />
+          <text class="text-[16px] font-bold" :style="{ color: 'var(--text-color, #2d3748)' }">文件与文档预览</text>
+        </view>
         <!-- 选文件 -->
         <view class="rounded-[12px] p-[16px] mb-[16px] border-[1px] border-solid border-[#e2e8f0]">
           <view class="flex flex-row items-center mb-[8px]">
@@ -96,12 +124,26 @@
             <text class="text-[#ffffff] text-[14px] font-bold">下载并打开在线示例 PDF 文档</text>
           </view>
         </view>
-      </Card>
+      </view>
     </view>
 
     <!-- 3. 系统缓存管理 (getFileSystemManager) 卡片 -->
     <view class="mb-[16px]">
-      <Card title="系统缓存管理 (FileSystemManager)">
+      <view
+        class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid"
+        :style="{
+          backgroundColor: 'var(--card-bg, #ffffff)',
+          borderColor: 'var(--border-color, #edf2f7)'
+        }"
+      >
+        <!-- 标题区域 -->
+        <view class="flex flex-row items-center mb-[16px]">
+          <view
+            class="w-[4px] h-[16px] rounded-[2px] mr-[8px]"
+            :style="{ backgroundColor: 'var(--theme-color, #3182ce)' }"
+          />
+          <text class="text-[16px] font-bold" :style="{ color: 'var(--text-color, #2d3748)' }">系统缓存管理 (FileSystemManager)</text>
+        </view>
         <view class="rounded-[12px] p-[16px] border-[1px] border-solid border-[#e2e8f0] bg-[#ffffff]">
           <!-- 头部总缓存大小徽标 -->
           <view class="flex flex-row items-center justify-between mb-[10px]">
@@ -187,12 +229,26 @@
             <text class="text-[#475569] text-[12px] font-medium">+ 写入 500KB 测试缓存文件 (观察数据减少)</text>
           </view>
         </view>
-      </Card>
+      </view>
     </view>
 
     <!-- 4. 键盘感知与高度避让卡片 -->
     <view class="mb-[16px]">
-      <Card title="键盘感知与避让">
+      <view
+        class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid"
+        :style="{
+          backgroundColor: 'var(--card-bg, #ffffff)',
+          borderColor: 'var(--border-color, #edf2f7)'
+        }"
+      >
+        <!-- 标题区域 -->
+        <view class="flex flex-row items-center mb-[16px]">
+          <view
+            class="w-[4px] h-[16px] rounded-[2px] mr-[8px]"
+            :style="{ backgroundColor: 'var(--theme-color, #3182ce)' }"
+          />
+          <text class="text-[16px] font-bold" :style="{ color: 'var(--text-color, #2d3748)' }">键盘感知与避让</text>
+        </view>
         <view
           class="rounded-[12px] p-[16px] border-[1px] border-solid border-[#e2e8f0]"
           :style="{ paddingBottom: `${keyboardHeight > 0 ? keyboardHeight + 8 : 16}px` }"
@@ -221,12 +277,26 @@
             <text class="text-[#ffffff] text-[14px] font-bold">收起软键盘 (hideKeyboard)</text>
           </view>
         </view>
-      </Card>
+      </view>
     </view>
 
     <!-- 4. 触感与震动工具卡片 -->
     <view class="mb-[16px]">
-      <Card title="触感与工具">
+      <view
+        class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid"
+        :style="{
+          backgroundColor: 'var(--card-bg, #ffffff)',
+          borderColor: 'var(--border-color, #edf2f7)'
+        }"
+      >
+        <!-- 标题区域 -->
+        <view class="flex flex-row items-center mb-[16px]">
+          <view
+            class="w-[4px] h-[16px] rounded-[2px] mr-[8px]"
+            :style="{ backgroundColor: 'var(--theme-color, #3182ce)' }"
+          />
+          <text class="text-[16px] font-bold" :style="{ color: 'var(--text-color, #2d3748)' }">触感与工具</text>
+        </view>
         <!-- 剪贴板 -->
         <view class="rounded-[12px] p-[16px] mb-[16px] border-[1px] border-solid border-[#e2e8f0]">
           <text class="text-[12px] text-[#94a3b8] mb-[8px]">剪贴板测试文本</text>
@@ -257,11 +327,25 @@
             </view>
           </view>
         </view>
-      </Card>
+      </view>
     </view>
 
     <!-- 5. 相机与多媒体卡片 -->
-    <Card title="相机与多媒体">
+    <view
+      class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid"
+      :style="{
+        backgroundColor: 'var(--card-bg, #ffffff)',
+        borderColor: 'var(--border-color, #edf2f7)'
+      }"
+    >
+      <!-- 标题区域 -->
+      <view class="flex flex-row items-center mb-[16px]">
+        <view
+          class="w-[4px] h-[16px] rounded-[2px] mr-[8px]"
+          :style="{ backgroundColor: 'var(--theme-color, #3182ce)' }"
+        />
+        <text class="text-[16px] font-bold" :style="{ color: 'var(--text-color, #2d3748)' }">相机与多媒体</text>
+      </view>
       <view class="rounded-[12px] p-[16px] mb-[16px] border-[1px] border-solid border-[#e2e8f0] items-center justify-center">
         <text v-if="photoUrl == ''" class="text-[14px] text-[#94a3b8]">未选择照片</text>
         <image v-else :src="photoUrl" class="w-[150px] h-[150px] rounded-[8px]" mode="aspectFill" />
@@ -278,13 +362,12 @@
       <view class="w-full h-[44px] rounded-[8px] bg-[#10b981] flex flex-row items-center justify-center" @click="scanCode">
         <text class="text-[#ffffff] text-[14px] font-bold">扫码测试</text>
       </view>
-    </Card>
+    </view>
   </view>
 </template>
 
 <script setup lang="uts">
 import { computed, onMounted, onUnmounted, ref } from 'vue';
-import Card from '@/src/pages/basic/components/Card.uvue';
 import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/utils/refresh/index.uts';
 import { useAppStore } from '@/src/store';
 

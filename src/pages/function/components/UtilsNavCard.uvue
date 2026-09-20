@@ -1,5 +1,19 @@
 <template>
-  <Card title="实用工具库与系统能力">
+  <view
+    class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid"
+    :style="{
+      backgroundColor: 'var(--card-bg, #ffffff)',
+      borderColor: 'var(--border-color, #edf2f7)'
+    }"
+  >
+    <!-- 标题区域 -->
+    <view class="flex flex-row items-center mb-[16px]">
+      <view
+        class="w-[4px] h-[16px] rounded-[2px] mr-[8px]"
+        :style="{ backgroundColor: 'var(--theme-color, #3182ce)' }"
+      />
+      <text class="text-[16px] font-bold" :style="{ color: 'var(--text-color, #2d3748)' }">实用工具库与系统能力</text>
+    </view>
     <view class="flex flex-col mb-[12px]">
       <text class="text-[13px] text-[#64748b] leading-[18px]">
         集成原生设备能力、Lodash 工具库、Crypto 密码学套件与 DayUTS 时间处理，独立分包页面高效呈现。
@@ -81,12 +95,10 @@
         <text class="text-[11px] text-white font-bold">查看 ➜</text>
       </view>
     </view>
-  </Card>
+  </view>
 </template>
 
 <script setup lang="uts">
-import Card from '../../basic/components/Card.uvue';
-
 function navigateToDevice() {
   uni.navigateTo({
     url: '/src/sub/device/device'

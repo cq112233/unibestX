@@ -1,5 +1,19 @@
 <template>
-  <Card title="页面布局与系统度量">
+  <view
+    class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid"
+    :style="{
+      backgroundColor: 'var(--card-bg, #ffffff)',
+      borderColor: 'var(--border-color, #edf2f7)'
+    }"
+  >
+    <!-- 标题区域 -->
+    <view class="flex flex-row items-center mb-[16px]">
+      <view
+        class="w-[4px] h-[16px] rounded-[2px] mr-[8px]"
+        :style="{ backgroundColor: 'var(--theme-color, #3182ce)' }"
+      />
+      <text class="text-[16px] font-bold" :style="{ color: 'var(--text-color, #2d3748)' }">页面布局与系统度量</text>
+    </view>
     <view class="flex-col mb-[14px]">
       <text
         class="text-[13px] leading-[18px]"
@@ -133,27 +147,6 @@
       </view>
     </view>
 
-    <!-- 可用高度与布局加回机制解析卡片 -->
-    <view class="rounded-[10px] p-[12px] mb-[14px] bg-[#eff6ff] border-[1px] border-solid border-[#bfdbfe] flex-col">
-      <view class="flex-row items-center mb-[6px]">
-        <text class="text-[13px] font-bold text-[#1e40af]">💡 可用高度推导机制（真正开发高度）</text>
-      </view>
-      <text class="text-[12px] text-[#334155] leading-[18px] mb-[6px]">
-        可用高度是开发页面真正能利用的可视高度。框架会根据当前页面声明的 layout 自动扣除或加回对应高度：
-      </text>
-      <view class="flex-col pl-[4px]">
-        <text class="text-[11px] text-[#475569] leading-[17px] mb-[3px]">
-          • 默认 navbar 布局：自动扣除 statusBar(状态栏) + 44px(NavBar) + 50px(TabBar)；
-        </text>
-        <text class="text-[11px] text-[#475569] leading-[17px] mb-[3px]">
-          • 声明 hideNavbar: true：导航栏隐藏，44px 空间会自动加回给页面作为可用高度；
-        </text>
-        <text class="text-[11px] text-[#1d4ed8] leading-[17px]">
-          • 开发者在任何页面只需根容器写 flex-1（或绑定 computedAvailableHeight），其余交给框架全自动处理。
-        </text>
-      </view>
-    </view>
-
     <!-- 进入示例页面按钮 -->
     <view
       class="w-full h-[44px] rounded-[8px] flex flex-row items-center justify-center"
@@ -162,12 +155,11 @@
     >
       <text class="text-[#ffffff] text-[14px] font-bold">进入布局页面骨架实测</text>
     </view>
-  </Card>
+  </view>
 </template>
 
 <script setup lang="uts">
 import { computed } from 'vue';
-import Card from './Card.uvue';
 import {
   availableHeight,
   menuRect,

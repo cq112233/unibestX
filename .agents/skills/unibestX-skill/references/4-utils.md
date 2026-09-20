@@ -1,8 +1,8 @@
 # 四、项目内置工具库（src/utils）
 
-> **本文件是 `unibestX-skill` 的参考分册**，由 [SKILL.md](../SKILL.md) 按需引用，收录 `src/utils/` 下 10 个内置工具模块的对外 API 与使用规范。
+> **本文件是 `unibestX-skill` 的参考分册**，由 [SKILL.md](../SKILL.md) 按需引用，收录 `src/utils/` 下 11 个内置工具模块的对外 API 与使用规范。
 >
-> **何时读本文件**：动手写「路由取路径、取主题色、读环境变量、多语言文案、提示弹窗、返回键接管、下拉刷新、文件上传、取系统/安全区尺寸、防抖节流/流式处理」之前 —— **先查本文件有没有现成工具，严禁重复造轮子**（例如自己写 `uni.getSystemInfoSync()`、裸写 `setInterval` 做防抖、手拼 `import.meta.env.VITE_XXX`）。
+> **何时读本文件**：动手写「路由取路径、取主题色、读环境变量、多语言文案、提示弹窗、返回键接管、下拉刷新、文件上传、取系统/安全区尺寸、防抖节流/流式处理、数学公式排版」之前 —— **先查本文件有没有现成工具，严禁重复造轮子**（例如自己写 `uni.getSystemInfoSync()`、裸写 `setInterval` 做防抖、手拼 `import.meta.env.VITE_XXX`、为渲染公式去引 KaTeX）。
 >
 > **回写规则**：`src/utils/` 新增模块、或既有模块新增导出 / 改变调用姿势时，同步追加到本文件，编号续接 `4.11`、`4.12`…，并更新 [SKILL.md](../SKILL.md) 的导航表。
 
@@ -590,3 +590,261 @@ onUnmounted(() => { unsubscribeAll(subs) })
 - ⚠️ `Subscriber` 刻意实现为 **class 而非对象字面量**（源码注释：UTS 在 Android 端会把对象字面量中的函数字段编译为 Kotlin `Map`，存在编译/运行风险）。业务侧自定义 `Observable` 时也应遵循这个姿势，不要用 `{ next: ..., complete: ... }` 字面量（同 **1.1.10**）。
 - **本模块没有 Vapor / VDOM 两条实现路径**：全文件无 `VUE3-VAPOR` 条件编译，纯 UTS 实现，源码注释明确「可在 Android / iOS / H5 / 小程序全端一致运行」。
 - 本模块**没有默认导出**（只有具名导出），使用方一律具名导入。
+
+## 4.11 LaTeX 公式排版（katex-lite）
+
+**一句话定位**：用纯 UTS 重写的极简 LaTeX 排版引擎（单文件、无第三方依赖），把公式源码排成一组**绝对定位图元**（文本盒 + 线段）；渲染由使用页面自理（几行模板，见下），项目里**没有**单独的公式组件。
+
+**为什么需要它**：App 端没有 JS 引擎，npm 上的 KaTeX 是纯 JS，**根本跑不起来**；mp-html 官方的 latex 插件同样走「H5 塞 KaTeX.js + App 走 WebView」的路线，与本项目的原生渲染链路不兼容。而项目内的 mp-html 只支持 text / image / table / pre 等有限标签，分式、根号、上下标这类二维排版用它的标签体系表达不出来（原生端 `<text>` 里也不能嵌 `<view>`）—— 所以公式只能自己排。
+
+**何时用**：需要展示数学公式（分式、根式、上下标、大运算符上下限、矩阵、分段函数）；AI 对话里「公式混在 Markdown 源文里、随分块到达、到一块重排一次」的场景。
+
+**导出面**
+
+| 导出 | 签名 | 说明 |
+| :--- | :--- | :--- |
+| `renderKatex` | `(latex: string, fontSize: number): KatexLayout` | 排版主入口；`fontSize` 是基准字号 px |
+| `KatexLayout` | `{ width; height; boxes; error }` | `width` / `height` 为公式尺寸 px；`error` 非空表示排版失败（已兜底，不抛异常） |
+| `KatexBox` | `{ kind; text; x; top; width; fontSize; lineHeight; italic }` | `kind` 为 `'text'`（文本盒）或 `'rule'`（分数线 / 根号横线 / 上划线）；坐标已换算成容器坐标系，直接 `position:absolute` 定位 |
+| `KATEX_BASELINE_RATIO` | `number = 0.84` | 文本盒「顶边 → 基线」的距离系数；换字体族时改这一个数 |
+
+**在页面里渲染（项目现状：不封组件）**
+
+引擎只管排版，渲染三步就能贴进页面，`rxjsDemo.uvue` 的流式公式段就是这么写的：
+
+```uts
+// 1) 引擎输出 → 模板能直接绑的样式串（文本框与线段盒分开收集）
+type KatexRenderBox = { text: string; style: string }
+
+function buildTextBoxes(latex: string, size: number): Array<KatexRenderBox> {
+  const layout: KatexLayout = renderKatex(latex, size)
+  const list: Array<KatexRenderBox> = []
+  const boxes: Array<KatexBox> = layout.boxes
+  for (let i: number = 0; i < boxes.length; i++) {
+    const box: KatexBox = boxes[i]
+    if (box.kind != 'text') {
+      continue
+    }
+    // line-height 必须等于 font-size，基线换算系数（KATEX_BASELINE_RATIO）才成立
+    let style: string = `position:absolute;top:${box.top}px;left:${box.x}px;`
+      + `font-size:${box.fontSize}px;line-height:${box.fontSize}px;color:#0f172a;`
+    if (box.italic) {
+      style = `${style}font-style:italic;`
+    }
+    list.push({ text: box.text, style: style } as KatexRenderBox)
+  }
+  return list
+}
+// 线段盒同理，只是样式换成 width / height / background-color
+```
+
+```html
+<!-- 2) 模板：容器用引擎算好的宽高，图元绝对定位贴进去 -->
+<view :style="rootStyle">
+  <text v-for="(box, i) in textBoxes" :key="`t${i}`" :style="box.style">{{ box.text }}</text>
+  <view v-for="(box, i) in ruleBoxes" :key="`r${i}`" :style="box.style" />
+</view>
+```
+
+- `rootStyle` 即 `position:relative;width:${layout.width}px;height:${layout.height}px`，由引擎算好，页面不要自己测量或判断居中。
+- **块级公式**：外面套一层 `flex flex-row items-center` 即可居中（容器自带宽高）。
+- **行内公式**：与 `<text>` 并排放在同一个 flex 行里 —— 把一句话拆成「文本片段 / 公式片段」交替的列表，模板按序平铺（`$$ … $$` 切片方案只覆盖独立成行的块级公式，行内公式要按这条自己拼）。
+- ⚠️ 一处页面有多个渲染点时图元模板会重复（uni-app X 不能在同一个 `.uvue` 内定义局部组件），**改动渲染方式务必同步每一处**。
+
+**流式公式：把公式写进 Markdown 源文，按 `$$` 切片**
+
+AI 对话场景下公式不该单独开一条流，而是**写进同一份 Markdown 源文**，按定界符把累积文本切成交替的「Markdown 片段 / 公式片段」，再分别交给 marked 与 katex-lite：
+
+```uts
+// 片段类型：kind 为 'md' 时用 html，为 'formula' 时用 render
+type StreamPart = { kind: string; html: string; render: FormulaRender }
+
+// 逐段扫描：碰到 $$ 就切一刀，中间那段交给 katex-lite
+let mdStart: number = 0
+let cursor: number = 0
+while (cursor < text.length) {
+  const open: number = text.indexOf('$$', cursor)
+  if (open < 0) { break }
+  if (!isLineStart(text, open)) {           // 行内的 $$ 不算（行内代码里写到的 $$ 要留给 Markdown）
+    cursor = open + 2
+    continue
+  }
+  const close: number = text.indexOf('$$', open + 2)
+  pushMarkdownPart(parts, text.substring(mdStart, open))
+  if (close < 0) {                          // $$ 还没闭合：尾部整段当公式，半截命令实时重排
+    pushFormulaPart(parts, text.substring(open + 2))
+    return parts
+  }
+  pushFormulaPart(parts, text.substring(open + 2, close))
+  cursor = close + 2
+  mdStart = cursor
+}
+```
+
+- 定界符只认 **独立成行** 的 `$$`（`isLineStart`：往前只有行首或空白），行内代码里的 `$$` 归 Markdown，免得把一段散文拖去当 LaTeX 排版。
+- 空白片段直接丢掉，避免产出空节点；公式源码 `trim()` 后再排版。
+- 模板按序平铺：`kind == 'md'` 走 `<MpHtml :content="part.html" />`，`kind == 'formula'` 走上面的图元模板（成行公式外面套 `items-center` 居中）。
+- ⚠️ 已知取舍：**围栏代码块**里独立成行的 `$$` 仍会被当成公式（切片器不做 Markdown 语法分析），演示源文里避开即可。
+
+**同一套切片：mermaid 围栏 → mermaid-lite 排成原生视图**
+
+`mermaid` 是纯 JS 库，App 端没有 JS 引擎跑不起来（见 1.3.9 所在分册的渲染链路说明）。
+**不要走「远端渲染成图片」那条路**（mermaid.ink / kroki）：要联网、放大就糊、字号也不跟页面走，本质还是一张网图。
+项目自研的 `mermaid-lite`（`src/utils/mermaid-lite/index.uts`）和 katex-lite 一样**自己排版**，
+输出的是「框 / 线 / 箭头 / 文字」四类图元，页面用普通 view 与 text 绝对定位贴上去 ——
+不联网、跟着页面字号走、点开放大到 3× 依然清晰。
+
+**接入三步**
+
+```uts
+import { renderMermaid } from '@/src/utils/mermaid-lite/index.uts'
+import type { MermaidLayout, MermaidShape } from '@/src/utils/mermaid-lite/index.uts'
+
+// 1) 引擎：源码 + 字号 → 图元（width / height 是整图尺寸，shapes 是图元表）
+const layout: MermaidLayout = renderMermaid('graph TD\n  A[开始] --> B{判断}\n  B --> C[左]\n', 12)
+
+// 2) 页面：图元 → 样式串（配色在页面侧定，引擎只管几何）
+//    'node'        → bgBoxes（底层，先画，否则实底会把文字与连线盖住）
+//    'text'        → textBoxes（line-height = font-size，与公式文本框同一规矩）
+//    'edge'/'arrow'→ ruleBoxes（连线与箭头切片，都是「带底色的 view」）
+const nodeStyle: string = `position:absolute;top:${shape.top}px;left:${shape.x}px;`
+  + `width:${shape.width}px;height:${shape.height}px;box-sizing:border-box;`
+  + `background-color:#ede9fe;border-width:1.5px;border-style:solid;`
+  + `border-color:#8b5cf6;border-radius:${shape.radius}px;`
+```
+
+```html
+<!-- 3) 模板：三组图元按「底 → 中 → 上」平铺，容器宽高直接用引擎算好的 rootStyle -->
+<view :style="part.render.rootStyle">
+  <view v-for="(box, bi) in part.render.bgBoxes" :key="`fb${bi}`" :style="box.style" />
+  <text v-for="(box, bi) in part.render.textBoxes" :key="`ft${bi}`" :style="box.style">{{ box.text }}</text>
+  <view v-for="(box, bi) in part.render.ruleBoxes" :key="`fr${bi}`" :style="box.style" />
+</view>
+```
+
+**支持范围**（子集，够画流程图）
+
+| 语法 | 说明 |
+| :--- | :--- |
+| `graph TD` / `flowchart LR` | `TD`/`TB`/`BT` 纵向、`LR`/`RL` 横向（不做反向）；缺省 TD |
+| `A[方框]` `B(圆角)` `C((圆))` `D([体育场])` `E{菱形}` `F` | 菱形按方框画；裸 id 直接显示 id |
+| `A --> B` / `A --- B` / `A --> B --> C` | 带箭头 / 不带箭头 / 链式，共用一条解析 |
+| `A -->|文字| B` | 标签跳过不渲染，只保证解析不串行 |
+| `;` 分隔多语句、`%%` 整行注释 | — |
+| 子图 `subgraph`、`classDef`/`style`/`click`、时序图与状态图、`-.->`/`==>` | **不支持**，按普通连线降级处理 |
+
+- **分层**：`layer(下游) = 1 + max(layer(上游))` 松弛到稳定，最多跑「节点数 + 1」遍 ⇒ **有环也不会死循环**，回边直接不画。
+- **节点尺寸**：文字宽度复用 katex-lite 导出的 `measureTextWidth`（原生端拿不到字体度量，字宽表全项目只维护一份）；节点高 = 字号 + 上下内边距。
+- **连线**：正交折线（纵向：下 → 横 → 下；横向：右 → 竖 → 右），中点是拐弯处。
+- **箭头**：`ARROW_SLICES` 片递减的矩形拼三角 —— **原生端画不了 path**，也**不要**用 `transform: rotate()` 去拼 V 形箭头（旋转原点与裁剪在两个平台不一致，切片法最稳）。
+- **容错**：任何输入都不抛异常。半截语句（流式常见）整句跳过，括号没配对就当普通 id，真解析不出内容就返回空图。
+- **只在围栏闭合后排版**：未闭合时留给 Markdown（marked 按代码块渲染）—— 半截图源码排出来只是一堆错位的框。
+- ⚠️ mp-html **本身不做 mermaid**：它拿不到「围栏是否闭合」这个信息；要全局支持，得在 mp-html 的 `pre` 分支里加同样判断（静态文档才安全）。
+
+**点图放大：不要用 `uni.previewImage`，页面内自绘缩放层**
+
+`uni.previewImage({ urls: [url] })` 看着最省事，但**H5 端它只是把图按屏幕铺满，没有任何缩放能力**：实测点开预览层后，层里的 `<image>` 宽高等于视口、`transform` 恒为 `none`，滚轮与 `dispatchTouchEvent` 的双指/滑动都不改尺寸（只有 App 端原生预览才带捏合）。所以统一的做法是自绘：
+
+```html
+<!-- 流里的 mermaid 图元外面套一层可点区域：点一下把源码交给查看器 -->
+<view class="w-full flex flex-col items-center my-[8px]" @click="onLayoutPartClick(part)">
+  <view class="flex flex-row items-center justify-center">
+    <view :style="part.render.rootStyle">
+      <!-- 三组图元，见上文 -->
+    </view>
+  </view>
+</view>
+
+<!-- 查看器：全屏遮罩 + 双向滚动 + 档位按钮 -->
+<view v-if="mermaidViewerSource != ''" class="fixed top-0 bottom-0 left-0 right-0 z-[1000] flex flex-col"
+      style="background-color: #020617" @click="closeMermaidViewer">
+  <view class="w-full flex flex-row items-center justify-between px-[16px] h-[48px]" @click.stop="stopBubble">
+    <text class="text-[12px] text-[#e2e8f0]">mermaid 图 · 可缩放 / 拖动</text>
+    <view class="px-[12px] h-[28px] flex flex-row items-center rounded-[14px]"
+          style="background-color: #1e293b" @click="closeMermaidViewer">
+      <text class="text-[12px] text-[#ffffff]">关闭</text>
+    </view>
+  </view>
+  <!-- 图元容器必须直挂 scroll-view：中间套一层 view 会被 H5 的 uni-view{overflow:hidden} 裁掉，横向拖不动（见 1.2.22） -->
+  <scroll-view direction="all" class="w-full flex-1" @click.stop="stopBubble">
+    <view :style="mermaidViewerRootStyle">
+      <view v-for="(box, bi) in mermaidViewerRender.bgBoxes" :key="`vb${bi}`" :style="box.style" />
+      <text v-for="(box, bi) in mermaidViewerRender.textBoxes" :key="`vt${bi}`" :style="box.style">{{ box.text }}</text>
+      <view v-for="(box, bi) in mermaidViewerRender.ruleBoxes" :key="`vr${bi}`" :style="box.style" />
+    </view>
+  </scroll-view>
+  <view class="w-full flex flex-row items-center justify-center h-[68px]" @click.stop="stopBubble">
+    <view class="w-[40px] h-[40px] rounded-[20px]" style="background-color: #1e293b" @click="zoomMermaidOut">
+      <text class="text-[20px] text-[#ffffff]">-</text>
+    </view>
+    <text class="text-[12px] text-[#e2e8f0] w-[80px]" style="text-align: center">{{ mermaidZoomText }}</text>
+    <view class="w-[40px] h-[40px] rounded-[20px]" style="background-color: #1e293b" @click="zoomMermaidIn">
+      <text class="text-[20px] text-[#ffffff]">+</text>
+    </view>
+  </view>
+</view>
+```
+
+```uts
+// 档位：相对「基准字号」的倍数。缩放 = 换更大字号重新排版一遍，图与文字都是原生视图，放到 3× 也不糊
+const MERMAID_ZOOM_STEPS: Array<number> = [1, 1.5, 2, 3]
+const MERMAID_ZOOM_DEFAULT_INDEX: number = 1        // 默认 1.5×：比页面里大一点，又不用横向拖
+
+const mermaidViewerSource = ref<string>('')
+const mermaidZoomIndex = ref<number>(0)
+
+/** 查看器里的图：按当前档位的字号重排一份（关闭时源码是空串，排出来就是空图） */
+const mermaidViewerRender = computed((): StreamRender => {
+  return buildMermaid(mermaidViewerSource.value, MERMAID_FONT_SIZE * MERMAID_ZOOM_STEPS[mermaidZoomIndex.value])
+})
+
+/** flex-shrink:0 与左右 margin 居中都是必须的，原因见 1.2.22 */
+const mermaidViewerRootStyle = computed((): string => {
+  const layout: StreamRender = mermaidViewerRender.value
+  const pad: number = Math.max(12, Math.round((WINDOW_WIDTH - layout.width) / 2))
+  return `${layout.rootStyle};flex-shrink:0;`
+    + `margin-top:12px;margin-bottom:12px;margin-left:${pad}px;margin-right:${pad}px;`
+})
+
+function openMermaidViewer(source: string): void {
+  if (source.length == 0) { return }
+  mermaidViewerSource.value = source
+  mermaidZoomIndex.value = MERMAID_ZOOM_DEFAULT_INDEX
+}
+function closeMermaidViewer(): void { mermaidViewerSource.value = '' }
+/** 到边界就停住，不循环（循环容易一下从最大跳回最小） */
+function zoomMermaidOut(): void { if (mermaidZoomIndex.value > 0) { mermaidZoomIndex.value -= 1 } }
+function zoomMermaidIn(): void {
+  if (mermaidZoomIndex.value < MERMAID_ZOOM_STEPS.length - 1) { mermaidZoomIndex.value += 1 }
+}
+/** `.stop` 必须挂在真函数上（空表达式不合法），用来吞掉冒泡、避免点图/点按钮时误关查看器 */
+function stopBubble(): void { /* 有意留空 */ }
+```
+
+- **流式片段的 kind 要留一份源码**：`StreamPart` 除了 `render`（小字号图元）再存一个 `source`（图源码），点图放大时才能按新字号重排；只存图元的话就放大不了了。
+- **`direction="all"`** 是双向滚动的正确写法（`scroll-x` / `scroll-y` 在 App 端已废弃且「不支持同时为 true」，见官方 `scroll-view` 文档）；它会被编译成 `scroll-x` + `scroll-y` 两个属性。
+- **遮罩必须不透明**（`#020617`，别用 `rgba(...,0.94)`）：半透明时后面的自定义导航栏标题会透上来，和查看器标题叠成两行字。
+
+**直接调引擎**
+
+```uts
+import { renderKatex } from '@/src/utils/katex-lite/index.uts'
+import type { KatexLayout, KatexBox } from '@/src/utils/katex-lite/index.uts'
+
+const layout: KatexLayout = renderKatex('x = \\frac{-b \\pm \\sqrt{b^{2}-4ac}}{2a}', 18)
+// layout.boxes 即最终图元；文本盒必须带 `line-height = font-size`，
+// 否则基线换算系数（KATEX_BASELINE_RATIO）失效，分子/分母/上下标会错位
+```
+
+**支持范围**：`^` `_`（含 `'` 撇号）、`\frac \dfrac \tfrac`、`\sqrt[n]{}`、`\sum \prod \int` 等大运算符（∑∏ 上下限堆叠、∫ 侧挂）、`\lim` 与 `\sin \cos \log` 等函数名、`\begin{pmatrix|bmatrix|Bmatrix|vmatrix|cases}…\end{…}`、希腊字母与常用关系/箭头/运算符号、`\text \mathrm \mathbf \mathbb`、`\hat \vec \bar \overline`、`\, \; \quad \qquad` 间距。
+
+**使用注意**
+
+- ⚠️ **只支持 LaTeX 子集**：`\left \right \big` 当作「不可见命令」跳过（定界符按原字号渲染，不拉伸），`\overset \color \boxed` 等样式类命令退化成「原样渲染组内容」，**未知命令不报错**、按正体显示命令名（流式下命令还没到齐时正是这个表现，下一块到达会自动重排）。
+- ⚠️ **绝不抛异常**：`\frac{1}{`（缺参数）、尾随 `\`、未闭合的 `\begin{pmatrix}` 都会「能排多少排多少」；真排不出来时返回 `error` 非空 + 空图元，页面不会白屏。
+- ⚠️ **宽高由引擎算好**：使用方不做任何测量与居中判断，`KatexLayout.width` / `height` 直接当容器宽高用。
+- ⚠️ **字号一律传 px**：`fontSize` 是基准字号（一般与所在正文一致），公式内上下标 / 分子分母按 0.72 / 0.95 倍率自动缩放，**不要传 em / rpx**。
+- ⚠️ **源码里的反斜杠要转义**：UTS 里写 `'\\frac{1}{2}'`；**不要用模板串**（模板串会把 `\f` `\s` 这类序列当转义字符吃掉）。
+- ⚠️ **本模块的 d.ts 曾因源码里的「增补平面字符」而丢失导出**：`scripts/gen-uts-dts.mjs` 的 `mask()` 原先用 `[...src]` 展开字符，遇到代理对（emoji、`𝔼` 这类数学字母）时下标映射整体错位、把后续代码当字符串抹掉，表现为「某些 export 凭空消失」。脚本已改为 `split('')`，但 `.uts` / `.uvue` 源码里仍不建议放这类字符（原生端字形多为豆腐块）。
+- 参考实现：演示页 `src/sub/rxjsDemo/rxjsDemo.uvue` —— `DEMO_TEXT` 里混着 `$$ … $$` 公式，页面切片后与 Markdown 同屏流式渲染（页面上只有这一处公式渲染，静态示例已按需求移除）。
+- 本模块**没有 Vapor / VDOM 两条实现路径**：纯 UTS 计算 + 绝对定位渲染，全端一致。

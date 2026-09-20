@@ -28,6 +28,32 @@
          详见 unibestX-skill 1.2.16。字重丢失的真因是嵌套行内样式被摊平，见上面第 7 条。
       9) 新增 <video> 分支（顶层 + 嵌套各一条）渲染成原生播放器。
          两条分支缺一不可，且 src 要等 URL 完整才渲染，原因见 videoSrc 与嵌套分支的注释。
+     10) 新增行内文字颜色：解析阶段把行内 style 里的 color 做白名单校验后存进 attrs._color，
+         渲染时由 chainColor() 沿行内元素链取值、贴到 <text> 的 :style 上（见 inlineStyle）。
+         上游把行内样式整体拼进动态 :style，本项目第 8 条已统一成静态 class；
+         颜色来自**内容**、没法预先写成 class，所以单独保留这一处动态样式，
+         取值格式在解析阶段收窄（#hex / rgb() / rgba() / 少量具名色），详见 unibestX-skill 1.3.9。
+     11) Mermaid 全屏查看器的 min-height/min-width/max-width:100% 改为 flex:1 / width:100% + box-sizing。
+         原生端 min-*/max-* 只认 number|px，百分比会被静默忽略（构建期 3 条 warn，运行期直接失效）：
+         画布比屏幕小时不再垂直居中、比屏幕宽时横向滚动区撑不出屏幕、不可滚。
+         详见 unibestX-skill 1.2.22。
+     12) Mermaid 全屏查看器由「两层 scroll-view 双向滚动」改为「手指拖动平移」（第 11 条的
+         两层 scroll-view 一并拆掉）：画布夹在中间层 view 里时，H5 的 uni-view 自带
+         overflow:hidden 会把溢出裁掉、滚动层量不到真实内容宽度；App 端嵌套 scroll-view 的
+         手势也常被外层吃掉。放大到 3× 后既滚不动也拖不动，等于看不了。现在直接用
+         touchstart/move/end 的位移量改画布的 left/top，全端行为一致，切档位自动回正。
+         画布渲染见 renderMermaidLayout / viewerLayout，平移见 onViewerTouchMove。
+     13) 公式 / 流程图的**图元层**全部加 flatten 拍平（正文里的 4 处渲染点，共 10 个 v-for）：
+        一个公式或流程图就是几十个绝对定位的小 box，一个个都创建独立原生 View 太浪费。
+        拍平后它们只作为绘制指令并进容器，不占原生节点（详见 unibestX-skill 1.3.24）。
+          - 只拍**叶子图元**，容器（rootStyle 那个 position:relative 的 view）**绝不能拍**：
+            它一被拍掉，子图元的 position:absolute 就没有了定位参照物。
+          - 前置条件逐条核对过：这些图元既没有挂事件，样式里也没有 z-index / visibility /
+            background-image / display:fixed（拍平会让这些**静默失效**）。
+          - **全屏查看器里的图元没拍**（`viewerLayout.ruleBoxes` / `bgBoxes` / `textBoxes` 那三行）：它的容器每次 touchmove 都在改
+            left/top，拍平与「移动中的相对定位容器」如何叠加尚未实测，先不动。
+          - ⚠️ 尚未真机验证：拍平对 position:absolute 图元的定位/绘制顺序有无影响，官方文档
+            没有正面说明。若真机上发现公式或流程图错位，**删掉这 10 个 flatten 即可回退**。
     -->
     <!-- 渲染节点树 -->
     <template v-for="(n, i) in localNodes" :key="i">
@@ -36,9 +62,25 @@
            flatText 里那条 br → '\n' 是真正的 JS 转义，所以块级分支里的换行本来是好的，
            只有「行内兄弟节点」这条路径需要修。 -->
       <text v-else-if="n.name == 'br'">{{ '\n' }}</text>
-      <image v-else-if="n.name == 'img'" :src="(n.attrs != null ? (n.attrs!['src'] as string) ?? '' : '')" style="width:110px;border-radius:8px" mode="widthFix" />
+      <image v-else-if="n.name == 'img' && imgSrc(n) != ''" :src="imgSrc(n)" style="max-width:240px;border-radius:8px" mode="widthFix" @tap="onImgTap(n)" />
       <text v-else-if="n.name == 'a'" class="mp-a" @tap="onLinkTap(n)">{{ flatText(n) }}</text>
-      <text v-else-if="isInline(n.name ?? '')" :class="chainClass(n)">{{ flatText(n) }}</text>
+      <text v-else-if="isInline(n.name ?? '')" :class="chainClass(n)" :style="inlineStyle(n)">{{ flatText(n) }}</text>
+      <!-- KaTeX 数学公式原生渲染 -->
+      <view v-else-if="n.name == 'katex'" style="display:flex;flex-direction:row;justify-content:center;margin:12px 0;width:100%">
+        <view :style="getOrComputeFormulaLayout(n).rootStyle">
+          <text v-for="(box, bi) in getOrComputeFormulaLayout(n).textBoxes" :key="`kt${bi}`" :style="box.style" flatten>{{ box.text }}</text>
+          <view v-for="(box, bi) in getOrComputeFormulaLayout(n).ruleBoxes" :key="`kr${bi}`" :style="box.style" flatten />
+        </view>
+      </view>
+      <!-- Mermaid 流程图原生渲染：先连线在底层、再节点框压住端点、最后文字在最顶层，支持点击放大 -->
+      <view v-else-if="n.name == 'mermaid'" style="display:flex;flex-direction:column;align-items:center;margin:12px 0;width:100%" @tap="openMermaidViewer(getMermaidCode(n))">
+        <view :style="getOrComputeMermaidLayout(n).rootStyle">
+          <view v-for="(box, bi) in getOrComputeMermaidLayout(n).ruleBoxes" :key="`mr${bi}`" :style="box.style" flatten />
+          <view v-for="(box, bi) in getOrComputeMermaidLayout(n).bgBoxes" :key="`mb${bi}`" :style="box.style" flatten />
+          <text v-for="(box, bi) in getOrComputeMermaidLayout(n).textBoxes" :key="`mt${bi}`" :style="box.style" flatten>{{ box.text }}</text>
+        </view>
+        <text style="font-size:10px;color:#94a3b8;margin-top:6px">Mermaid 原生排版 · 点击放大查看</text>
+      </view>
       <text v-else-if="n.name == 'h1' || n.name == 'h2' || n.name == 'h3' || n.name == 'h4' || n.name == 'h5' || n.name == 'h6'" class="mp-b" :style="headingStyle(n.name ?? '')">{{ flatText(n) }}</text>
       <!-- 代码块：语法高亮后逐行渲染。
            外层 view 承担底色/圆角/内边距（<text> 上不适合挂这些），
@@ -65,35 +107,132 @@
           </view>
         </view>
       </view>
-      <!-- 列表：项目符号并进同一个 text，避免 flex 行内的 text 按固有宽度排版而横向溢出 -->
-      <view v-else-if="n.name == 'ul' || n.name == 'ol'" style="padding-left:20px">
-        <text v-for="(li, lii) in (n.children ?? [])" :key="lii">{{ (n.name == 'ol' ? (lii + 1).toString() + '. ' : '• ') + flatText(li) }}</text>
+      <!-- 列表：支持列表项内的加粗、代码、斜体、删除线与行内文字颜色 -->
+      <view v-else-if="n.name == 'ul' || n.name == 'ol'" style="display:flex;flex-direction:column;padding-left:14px;margin:6px 0">
+        <view v-for="(li, lii) in (n.children ?? [])" :key="lii" style="display:flex;flex-direction:row;flex-wrap:wrap;align-items:flex-start;margin:2px 0">
+          <text style="color:#64748b;margin-right:6px">{{ n.name == 'ol' ? (lii + 1).toString() + '. ' : '• ' }}</text>
+          <template v-for="(lcn, lci) in (li.children ?? [])" :key="lci">
+            <text v-if="lcn.type == 'text'">{{ lcn.text }}</text>
+            <text v-else-if="lcn.name == 'br'">{{ '\n' }}</text>
+            <text v-else-if="lcn.name == 'a'" class="mp-a" @tap="onLinkTap(lcn)">{{ flatText(lcn) }}</text>
+            <text v-else-if="isInline(lcn.name ?? '')" :class="chainClass(lcn)" :style="inlineStyle(lcn)">{{ flatText(lcn) }}</text>
+            <template v-else-if="lcn.name == 'div' || lcn.name == 'p'">
+              <template v-for="(sub, subi) in (lcn.children ?? [])" :key="subi">
+                <text v-if="sub.type == 'text'">{{ sub.text }}</text>
+                <text v-else-if="sub.name == 'br'">{{ '\n' }}</text>
+                <text v-else-if="sub.name == 'a'" class="mp-a" @tap="onLinkTap(sub)">{{ flatText(sub) }}</text>
+                <text v-else-if="isInline(sub.name ?? '')" :class="chainClass(sub)" :style="inlineStyle(sub)">{{ flatText(sub) }}</text>
+                <text v-else>{{ flatText(sub) }}</text>
+              </template>
+            </template>
+            <text v-else>{{ flatText(lcn) }}</text>
+          </template>
+        </view>
       </view>
       <!-- 块级容器 -->
       <view v-else>
         <template v-for="(cn, ci) in (n.children ?? [])" :key="ci">
           <text v-if="cn.type == 'text'">{{ cn.text }}</text>
           <text v-else-if="cn.name == 'br'">{{ '\n' }}</text>
-          <image v-else-if="cn.name == 'img'" :src="(cn.attrs != null ? (cn.attrs!['src'] as string) ?? '' : '')" style="width:110px;border-radius:8px" mode="widthFix" />
+          <image v-else-if="cn.name == 'img' && imgSrc(cn) != ''" :src="imgSrc(cn)" style="max-width:240px;border-radius:8px" mode="widthFix" @tap="onImgTap(cn)" />
           <text v-else-if="cn.name == 'a'" class="mp-a" @tap="onLinkTap(cn)">{{ flatText(cn) }}</text>
+          <!-- 嵌套 KaTeX 公式与 Mermaid 流程图 -->
+          <view v-else-if="cn.name == 'katex'" style="display:flex;flex-direction:row;justify-content:center;margin:12px 0;width:100%">
+            <view :style="getOrComputeFormulaLayout(cn).rootStyle">
+              <text v-for="(box, bi) in getOrComputeFormulaLayout(cn).textBoxes" :key="`ckt${bi}`" :style="box.style" flatten>{{ box.text }}</text>
+              <view v-for="(box, bi) in getOrComputeFormulaLayout(cn).ruleBoxes" :key="`ckr${bi}`" :style="box.style" flatten />
+            </view>
+          </view>
+          <!-- Mermaid 流程图原生渲染：先连线在底层、再节点框压住端点、最后文字在最顶层，支持点击放大 -->
+          <view v-else-if="cn.name == 'mermaid'" style="display:flex;flex-direction:column;align-items:center;margin:12px 0;width:100%" @tap="openMermaidViewer(getMermaidCode(cn))">
+            <view :style="getOrComputeMermaidLayout(cn).rootStyle">
+              <view v-for="(box, bi) in getOrComputeMermaidLayout(cn).ruleBoxes" :key="`cmr${bi}`" :style="box.style" flatten />
+              <view v-for="(box, bi) in getOrComputeMermaidLayout(cn).bgBoxes" :key="`cmb${bi}`" :style="box.style" flatten />
+              <text v-for="(box, bi) in getOrComputeMermaidLayout(cn).textBoxes" :key="`cmt${bi}`" :style="box.style" flatten>{{ box.text }}</text>
+            </view>
+            <text style="font-size:10px;color:#94a3b8;margin-top:6px">Mermaid 原生排版 · 点击放大查看</text>
+          </view>
           <!-- video 这条必须在嵌套分支里也来一份：marked 把 video 归在**行内**标签表，
                单独的 `<video>` 行会被它包进段落（产物是 `<p><video …></video></p>`），
                于是视频节点是块级容器的子节点，只走顶层分支的话会渲染成空。 -->
           <view v-else-if="cn.name == 'video' && videoSrc(cn) != ''" style="display:flex;flex-direction:column;width:100%">
             <video :src="videoSrc(cn)" :controls="true" style="width:100%;height:180px;border-radius:8px" />
           </view>
-          <text v-else-if="isInline(cn.name ?? '')" :class="chainClass(cn)">{{ flatText(cn) }}</text>
+          <text v-else-if="isInline(cn.name ?? '')" :class="chainClass(cn)" :style="inlineStyle(cn)">{{ flatText(cn) }}</text>
           <text v-else>{{ flatText(cn) }}</text>
         </template>
       </view>
     </template>
+
+    <!-- Mermaid 全屏矢量缩放查看器 -->
+    <view
+      v-if="viewerMermaidSource != ''"
+      style="position:fixed;top:0;left:0;right:0;bottom:0;background-color:rgba(15,23,42,0.88);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center"
+      @click="closeMermaidViewer"
+    >
+      <!-- 画布承载区：手指拖动平移（点击空白深色区也可关闭）。
+           原来这里套了两层 scroll-view 想靠原生滚动「双向滚动查看」，实测滚不动：
+           溢出元素被夹在中间层 view 里，H5 的 uni-view 自带 overflow:hidden 会把溢出裁掉，
+           滚动层量不到真实内容宽度（详见 unibestX-skill 1.2.22）；App 端嵌套 scroll-view
+           的手势也常被外层吃掉。改成「手指位移 → 画布 left/top 偏移」，全端行为一致。
+           带 padding 的元素一律补 box-sizing:border-box，否则 width:100% + padding 会溢出（见 1.2.12）。 -->
+      <view
+        style="flex:1;width:100%;box-sizing:border-box;display:flex;flex-direction:row;justify-content:center;align-items:center;padding:72px 16px 84px 16px"
+        @click="closeMermaidViewer"
+      >
+        <view
+          :style="viewerCanvasStyle"
+          @touchstart="onViewerTouchStart"
+          @touchmove="onViewerTouchMove"
+          @touchend="onViewerTouchEnd"
+          @touchcancel="onViewerTouchEnd"
+          @click.stop=""
+        >
+          <view v-for="(box, bi) in viewerLayout.ruleBoxes" :key="`vmr${bi}`" :style="box.style" />
+          <view v-for="(box, bi) in viewerLayout.bgBoxes" :key="`vmb${bi}`" :style="box.style" />
+          <text v-for="(box, bi) in viewerLayout.textBoxes" :key="`vmt${bi}`" :style="box.style">{{ box.text }}</text>
+        </view>
+      </view>
+
+      <!-- 右上角关闭按钮（置于顶层，拥有最高 z-index 与 44px 舒适热区） -->
+      <view
+        style="position:absolute;top:36px;right:20px;width:44px;height:44px;border-radius:22px;background-color:rgba(255,255,255,0.22);display:flex;flex-direction:row;align-items:center;justify-content:center;z-index:10002"
+        @click.stop="closeMermaidViewer"
+      >
+        <text style="font-size:18px;color:#ffffff;line-height:18px">✕</text>
+      </view>
+
+      <!-- 底部档位缩放工具条 -->
+      <view
+        style="margin-bottom:36px;padding:8px 18px;border-radius:24px;background-color:rgba(15,23,42,0.92);border-width:1px;border-style:solid;border-color:rgba(255,255,255,0.18);display:flex;flex-direction:row;align-items:center;z-index:10001"
+        @click.stop=""
+      >
+        <view
+          style="width:36px;height:36px;border-radius:18px;background-color:rgba(255,255,255,0.16);display:flex;flex-direction:row;align-items:center;justify-content:center"
+          @click="zoomOut"
+        >
+          <text style="font-size:20px;color:#ffffff;line-height:20px">-</text>
+        </view>
+        <text style="font-size:13px;color:#e2e8f0;width:110px;text-align:center">{{ viewerZoomText }}</text>
+        <view
+          style="width:36px;height:36px;border-radius:18px;background-color:rgba(255,255,255,0.16);display:flex;flex-direction:row;align-items:center;justify-content:center"
+          @click="zoomIn"
+        >
+          <text style="font-size:20px;color:#ffffff;line-height:20px">+</text>
+        </view>
+      </view>
+    </view>
   </view>
 </template>
 
 <script setup lang="uts">
-import { ref, watch, onMounted } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { highlightCode } from './code-highlight.uts'
 import type { CodeSeg } from './code-highlight.uts'
+import { renderKatex, KATEX_LINE_HEIGHT_RATIO } from '../../common/katex-lite/index.uts'
+import type { KatexLayout, KatexBox } from '../../common/katex-lite/index.uts'
+import { renderMermaid } from '../../common/mermaid-lite/index.uts'
+import type { MermaidLayout, MermaidShape } from '../../common/mermaid-lite/index.uts'
 
 type HtmlNode = {
   name?: string
@@ -101,6 +240,139 @@ type HtmlNode = {
   children?: HtmlNode[]
   type?: string
   text?: string
+}
+
+type MpRenderBox = {
+  text: string
+  style: string
+}
+
+type MpElementLayout = {
+  width: number
+  height: number
+  rootStyle: string
+  bgBoxes: MpRenderBox[]
+  textBoxes: MpRenderBox[]
+  ruleBoxes: MpRenderBox[]
+}
+
+function renderFormulaLayout(latex: string): MpElementLayout {
+  const layout: KatexLayout = renderKatex(latex, 18)
+  const textBoxes: MpRenderBox[] = []
+  const ruleBoxes: MpRenderBox[] = []
+  const boxes: KatexBox[] = layout.boxes
+  for (let i = 0; i < boxes.length; i++) {
+    const box = boxes[i]
+    if (box.kind == 'text') {
+      // line-height 必须取 katex-lite 的 KATEX_LINE_HEIGHT_RATIO，且不要再四舍五入：
+      // 公式容器的 height 就是按这个倍数推「盒底」算出来的，两边取整不一致时
+      // 最深那行仍会探出容器（差 0.33px 就能把 `2a` 的下缘压掉）。
+      const lh = box.fontSize * KATEX_LINE_HEIGHT_RATIO
+      let style = `position:absolute;top:${box.top}px;left:${box.x}px;font-size:${box.fontSize}px;line-height:${lh}px;color:#0f172a;`
+      if (box.italic) style += 'font-style:italic;'
+      textBoxes.push({ text: box.text, style } as MpRenderBox)
+    } else {
+      const ruleStyle = `position:absolute;top:${box.top}px;left:${box.x}px;width:${box.width}px;height:${box.lineHeight}px;background-color:#0f172a;`
+      ruleBoxes.push({ text: '', style: ruleStyle } as MpRenderBox)
+    }
+  }
+  return {
+    width: layout.width,
+    height: layout.height,
+    rootStyle: `position:relative;width:${layout.width}px;height:${layout.height}px;`,
+    bgBoxes: [] as MpRenderBox[],
+    textBoxes,
+    ruleBoxes
+  } as MpElementLayout
+}
+
+function renderMermaidLayout(source: string): MpElementLayout {
+  const layout: MermaidLayout = renderMermaid(source, 12)
+  const bgBoxes: MpRenderBox[] = []
+  const textBoxes: MpRenderBox[] = []
+  const ruleBoxes: MpRenderBox[] = []
+  for (let i = 0; i < layout.shapes.length; i++) {
+    const shape = layout.shapes[i]
+    if (shape.kind == 'node') {
+      const nodeStyle = `position:absolute;top:${shape.top}px;left:${shape.x}px;width:${shape.width}px;height:${shape.height}px;box-sizing:border-box;background-color:#eff6ff;border-width:1px;border-style:solid;border-color:#6366f1;border-radius:${shape.radius}px;`
+      bgBoxes.push({ text: '', style: nodeStyle } as MpRenderBox)
+    } else if (shape.kind == 'text') {
+      const textStyle = `position:absolute;top:${shape.top}px;left:${shape.x}px;font-size:${shape.fontSize}px;line-height:${shape.fontSize}px;color:#1e293b;white-space:nowrap;`
+      textBoxes.push({ text: shape.text, style: textStyle } as MpRenderBox)
+    } else {
+      const lineStyle = `position:absolute;top:${shape.top}px;left:${shape.x}px;width:${shape.width}px;height:${shape.height}px;background-color:#94a3b8;`
+      ruleBoxes.push({ text: '', style: lineStyle } as MpRenderBox)
+    }
+  }
+  return {
+    width: layout.width,
+    height: layout.height,
+    rootStyle: `position:relative;width:${layout.width}px;height:${layout.height}px;`,
+    bgBoxes,
+    textBoxes,
+    ruleBoxes
+  } as MpElementLayout
+}
+
+/**
+ * 摊平子树取纯文本。
+ *
+ * 定义位置必须早于本文件里所有调用点：UTS 是「先定义后使用」，
+ * 写在后面会让 HBuilderX 报 error18「找不到名称 flatText」（kotlin 编译不过）。
+ */
+function flatText(n: HtmlNode): string {
+  if (n.type == 'text') return n.text ?? ''
+  if (n.children == null) return n.text ?? ''
+  let t = ''
+  for (let i = 0; i < n.children!.length; i++) {
+    const c = n.children![i]
+    if (c.type == 'text') t += c.text ?? ''
+    else if (c.name == 'br') t += '\n'
+    else t += flatText(c)
+  }
+  return t
+}
+
+function getFormulaCode(n: HtmlNode): string {
+  const attrs = n.attrs
+  if (attrs != null && attrs['_code'] != null) {
+    return attrs['_code'] as string
+  }
+  return flatText(n).trim()
+}
+
+function getMermaidCode(n: HtmlNode): string {
+  const attrs = n.attrs
+  if (attrs != null && attrs['_code'] != null) {
+    return attrs['_code'] as string
+  }
+  return flatText(n).trim()
+}
+
+function getOrComputeFormulaLayout(n: HtmlNode): MpElementLayout {
+  if (n.attrs != null && n.attrs!['_katexLayout'] != null) {
+    return n.attrs!['_katexLayout'] as MpElementLayout
+  }
+  const code = getFormulaCode(n)
+  const layout = renderFormulaLayout(code)
+  if (n.attrs == null) {
+    n.attrs = {} as UTSJSONObject
+  }
+  n.attrs!['_katexLayout'] = layout
+  return layout
+}
+
+function getOrComputeMermaidLayout(n: HtmlNode): MpElementLayout {
+  if (n.attrs != null && n.attrs!['_mermaidLayout'] != null) {
+    return n.attrs!['_mermaidLayout'] as MpElementLayout
+  }
+  const code = getMermaidCode(n)
+  const layout = renderMermaidLayout(code)
+  if (n.attrs == null) {
+    n.attrs = {} as UTSJSONObject
+  }
+  n.attrs!['_mermaidLayout'] = layout
+  return layout
 }
 
 defineOptions({
@@ -119,7 +391,7 @@ const props = defineProps({
   useAnchor: { type: [Boolean, Number] as any, default: false }
 })
 
-const emit = defineEmits(['load', 'ready', 'imgtap', 'linktap'])
+const emit = defineEmits(['load', 'ready', 'imgtap', 'linktap', 'mermaidtap'])
 
 const localNodes = ref<HtmlNode[]>([])
 
@@ -241,17 +513,15 @@ function stripAllTags(s: string): string {
   return cleanText(r)
 }
 
-function flatText(n: HtmlNode): string {
-  if (n.type == 'text') return n.text ?? ''
-  if (n.children == null) return n.text ?? ''
-  let t = ''
-  for (let i = 0; i < n.children!.length; i++) {
-    const c = n.children![i]
-    if (c.type == 'text') t += c.text ?? ''
-    else if (c.name == 'br') t += '\n'
-    else t += flatText(c)
+function extractCode(inner: string): string {
+  let s = inner.trim()
+  if (s.toLowerCase().startsWith('<code') && s.toLowerCase().endsWith('</code>')) {
+    const gt = s.indexOf('>')
+    if (gt != -1 && gt < s.length - 7) {
+      s = s.substring(gt + 1, s.length - 7).trim()
+    }
   }
-  return t
+  return decodeEntities(s).trim()
 }
 
 /**
@@ -308,6 +578,48 @@ function chainClass(n: HtmlNode): string {
   return cls
 }
 
+/** 本节点声明的文字颜色（解析阶段存下的 attrs._color，见 extractColor） */
+function nodeColor(n: HtmlNode): string {
+  const attrs = n.attrs
+  if (attrs == null) return ''
+  return attrs.getString('_color') ?? ''
+}
+
+/**
+ * 行内文字颜色：沿与 chainClass **完全相同的**「纯行内元素链」下探，取最内层声明的颜色。
+ *
+ * 为什么也要沿链取值：`<strong><span style="color:#e11d48">x</span></strong>` 这类写法里，
+ * 字重在外层、颜色在内层，但整个行内链最终只渲染成**一个** `<text>`，
+ * 所以样式与文字一样要沿链收集，否则内层颜色会静默丢失（与第 7 条同一个坑）。
+ */
+function chainColor(n: HtmlNode): string {
+  let color: string = nodeColor(n)
+  let cur: HtmlNode = n
+  while (true) {
+    const kids: HtmlNode[] | null = cur.children ?? null
+    if (kids == null || kids.length != 1) break
+    const only: HtmlNode = kids[0]
+    if (only.type == 'text') break
+    if (!isInline(only.name ?? '')) break
+    const c: string = nodeColor(only)
+    if (c != '') color = c
+    cur = only
+  }
+  return color
+}
+
+/**
+ * 行内节点的动态样式：目前只有文字颜色。
+ *
+ * 这是全组件**唯一**一处内容驱动的动态 `:style`（其余行内样式都是静态 class，原因见第 8 条）：
+ * 颜色来自 HTML 内容本身，没法预先写成 class。取值的格式在解析阶段已经收窄过，
+ * 不是什么串都能落到这里（见 sanitizeColor）。无色时返回空串，等于不写这条样式。
+ */
+function inlineStyle(n: HtmlNode): string {
+  const color: string = chainColor(n)
+  return color.length == 0 ? '' : 'color:' + color
+}
+
 /**
  * 取 `<video>` 的 src，且只在它「看起来完整」时才返回，否则返回空串。
  *
@@ -339,6 +651,30 @@ function videoSrc(n: HtmlNode): string {
 }
 
 /**
+ * 取 `<img>` 的 src，流式模式下仅在 URL 完整时才返回，
+ * 避免分块到达过程中的半截 URL 让 <image> 组件触发网络加载错误。
+ */
+function imgSrc(n: HtmlNode): string {
+  let raw: string = ''
+  const attrs = n.attrs
+  if (attrs != null) {
+    const v = attrs['src']
+    if (v != null) raw = v as string
+  }
+  if (raw.length == 0) return ''
+  if (raw.startsWith('data:image/') || raw.startsWith('/static/')) return raw
+  if (raw.indexOf('://') < 0) return raw
+  const exts: string[] = ['.png', '.jpg', '.jpeg', '.gif', '.webp', '.svg', '.bmp']
+  const lower = raw.toLowerCase()
+  for (let i = 0; i < exts.length; i++) {
+    const e: string = exts[i]
+    if (lower.length >= e.length && lower.substring(lower.length - e.length) == e) return raw
+    if (lower.indexOf(e + '?') >= 0 || lower.indexOf(e + '&') >= 0) return raw
+  }
+  return ''
+}
+
+/**
  * 标题字号（一律 px）。
  *
  * 为什么不用上游那套 `2em / 1.5em / 1.17em / 1em / 0.83em / 0.67em`：
@@ -353,7 +689,7 @@ function videoSrc(n: HtmlNode): string {
 function headingStyle(name: string): string {
   const sz: UTSJSONObject = { h1: '24px', h2: '20px', h3: '18px', h4: '16px', h5: '14px', h6: '13px' }
   // 只给字号：粗体交给模板上的静态 class="mp-b"（理由见 <style> 里的说明）
-  return 'font-size:' + ((sz[name] as string) ?? '16px')
+  return 'font-size:' + (sz.getString(name) ?? '16px')
 }
 
 /**
@@ -425,6 +761,91 @@ function parseAttrs(tag: string): UTSJSONObject {
   return attrs
 }
 
+/** 具名颜色表（CSS 标准值）：只收常用的十几个，够 `<span style="color:red">` 这类写法用 */
+function buildNamedColors(): Map<string, string> {
+  const m = new Map<string, string>()
+  m.set('black', '#000000')
+  m.set('blue', '#0000ff')
+  m.set('brown', '#a52a2a')
+  m.set('cyan', '#00ffff')
+  m.set('gray', '#808080')
+  m.set('grey', '#808080')
+  m.set('green', '#008000')
+  m.set('magenta', '#ff00ff')
+  m.set('orange', '#ffa500')
+  m.set('pink', '#ffc0cb')
+  m.set('purple', '#800080')
+  m.set('red', '#ff0000')
+  m.set('white', '#ffffff')
+  m.set('yellow', '#ffff00')
+  return m
+}
+const NAMED_COLORS: Map<string, string> = buildNamedColors()
+
+/**
+ * 颜色值白名单：`#rgb` / `#rrggbb` / `#rrggbbaa`、`rgb()` / `rgba()`，外加具名色。
+ *
+ * 为什么要卡格式：这条颜色最终会拼进动态 `:style`，是构建期看不见的值
+ * （同第 8 条的顾虑）。收窄成「只可能是颜色」的几种写法后，
+ * `var()` / `expression()` / 层叠注入这类取值进不来，App 端不会因为一条怪串整块样式失效。
+ * 不在白名单里的写法**静默丢弃**（当作没写颜色），不影响其余渲染。
+ */
+function sanitizeColor(raw: string): string {
+  const v: string = raw.trim().toLowerCase()
+  if (v.length == 0) return ''
+
+  if (v.charAt(0) == '#') {
+    const hex: string = v.substring(1)
+    if (hex.length != 3 && hex.length != 6 && hex.length != 8) return ''
+    for (let i = 0; i < hex.length; i++) {
+      const c: string = hex.charAt(i)
+      const isDigit: boolean = c >= '0' && c <= '9'
+      const isHexLetter: boolean = c >= 'a' && c <= 'f'
+      if (!isDigit && !isHexLetter) return ''
+    }
+    return v
+  }
+
+  const isRgb: boolean = v.indexOf('rgb(') == 0
+  const isRgba: boolean = v.indexOf('rgba(') == 0
+  if (isRgb || isRgba) {
+    if (v.charAt(v.length - 1) != ')') return ''
+    const body: string = v.substring(v.indexOf('(') + 1, v.length - 1)
+    if (body.length == 0) return ''
+    for (let i = 0; i < body.length; i++) {
+      const c: string = body.charAt(i)
+      const isDigit: boolean = c >= '0' && c <= '9'
+      const isAllowed: boolean = c == ',' || c == '.' || c == ' ' || c == '%'
+      if (!isDigit && !isAllowed) return ''
+    }
+    return v
+  }
+
+  return NAMED_COLORS.get(v) ?? ''
+}
+
+/**
+ * 从句内 `style` 里捞出文字颜色（只认 `color:`，**不认** `background-color:`），
+ * 白名单校验后存进 `attrs._color`，供模板上的 `inlineStyle()` 取用。
+ *
+ * 只处理行内节点：块级节点的颜色本项目暂不支持（块级分支渲染的是容器，颜色会落到子节点上，
+ * 语义与「给这一段上色」不一致，宁可不做）。
+ */
+function extractColor(attrs: UTSJSONObject): void {
+  const style = attrs['style']
+  if (style == null) return
+  const list: string[] = (style as string).split(';')
+  for (let i = 0; i < list.length; i++) {
+    const decl: string[] = list[i].split(':')
+    if (decl.length < 2) continue
+    if (decl[0].trim().toLowerCase() != 'color') continue
+    // 颜色值里不含 ':'（rgb() 也没有），取第二段即可
+    const safe: string = sanitizeColor(decl[1])
+    if (safe.length > 0) attrs['_color'] = safe
+    return
+  }
+}
+
 function findMatchingClose(html: string, start: number, tagName: string): number {
   let depth = 1
   let i = start
@@ -494,25 +915,6 @@ function parseTable(html: string): HtmlNode[] {
   return rows
 }
 
-function parseList(html: string): HtmlNode[] {
-  const items: HtmlNode[] = []
-  let i = 0
-  while (true) {
-    const liS = html.indexOf('<li', i)
-    if (liS == -1) break
-    const liGt = html.indexOf('>', liS)
-    if (liGt == -1) break
-    const liE = html.indexOf('</li>', liGt)
-    if (liE == -1) break
-    const text = stripAllTags(html.substring(liGt + 1, liE))
-    if (text.length > 0) {
-      items.push({ name: 'li', children: [{ type: 'text', text } as HtmlNode] } as HtmlNode)
-    }
-    i = liE + 5
-  }
-  return items
-}
-
 function parseHtml(html: string): HtmlNode[] {
   const result: HtmlNode[] = []
   let i = 0
@@ -556,6 +958,8 @@ function parseHtml(html: string): HtmlNode[] {
     if (name.length == 0) continue
 
     const attrs = parseAttrs(tag)
+    // 行内文字颜色的来源：style="color:…" 在这里被捞出来存进 attrs._color（见 extractColor）
+    extractColor(attrs)
 
     if (txt.length > 0) {
       const t = cleanText(txt)
@@ -580,15 +984,72 @@ function parseHtml(html: string): HtmlNode[] {
     const inner = html.substring(i, closePos)
     const node: HtmlNode = { name, attrs } as HtmlNode
 
+    if (name == 'katex' || name == 'formula' || name == 'latex') {
+      const formulaCode = extractCode(inner)
+      attrs['_code'] = formulaCode
+      result.push({ name: 'katex', attrs, children: [{ type: 'text', text: formulaCode } as HtmlNode] } as HtmlNode)
+      i = closePos + closeStr.length
+      continue
+    }
+    if (name == 'mermaid') {
+      const mermaidCode = extractCode(inner)
+      attrs['_code'] = mermaidCode
+      result.push({ name: 'mermaid', attrs, children: [{ type: 'text', text: mermaidCode } as HtmlNode] } as HtmlNode)
+      i = closePos + closeStr.length
+      continue
+    }
+
     if (name == 'table') {
       node.children = parseTable(inner)
     } else if (name == 'ul' || name == 'ol') {
-      node.children = parseList(inner)
+      // 原先抽了个 parseList()，但 UTS 是「先定义后使用」，而 parseList 与 parseHtml 互相递归：
+      // 无论谁写在前面，另一个都会报 error18「找不到名称」。只能在调用点内联展开。
+      const items: HtmlNode[] = []
+      let li = 0
+      while (true) {
+        const liS = inner.indexOf('<li', li)
+        if (liS == -1) break
+        const liGt = inner.indexOf('>', liS)
+        if (liGt == -1) break
+        const liE = inner.indexOf('</li>', liGt)
+        if (liE == -1) break
+        const liChildren = parseHtml(inner.substring(liGt + 1, liE))
+        if (liChildren.length > 0) {
+          items.push({ name: 'li', children: liChildren } as HtmlNode)
+        }
+        li = liE + 5
+      }
+      node.children = items
     } else if (name == 'pre' || name == 'code') {
-      // pre 与「行内 code」的内容必须是**纯文本**，不能有子节点：
-      // 前者交给 codeLines() 逐行着色，后者是等宽内联片段；
-      // 里面的 < > 是 marked 转义过的实体，不需要也不应该再被解析成标签。
-      node.children = [{ type: 'text', text: stripAllTags(inner) } as HtmlNode]
+      const codeText = extractCode(inner)
+      const className = attrs != null ? (attrs.getString('class') ?? '') : ''
+      const isMermaid = className.indexOf('language-mermaid') >= 0
+        || inner.indexOf('language-mermaid') >= 0
+        || codeText.indexOf('graph TD') == 0
+        || codeText.indexOf('graph LR') == 0
+        || codeText.indexOf('flowchart TD') == 0
+        || codeText.indexOf('flowchart LR') == 0
+
+      if (isMermaid) {
+        attrs['_code'] = codeText
+        result.push({ name: 'mermaid', attrs, children: [{ type: 'text', text: codeText } as HtmlNode] } as HtmlNode)
+        i = closePos + closeStr.length
+        continue
+      }
+
+      const isKatex = className.indexOf('language-latex') >= 0
+        || className.indexOf('language-katex') >= 0
+        || inner.indexOf('language-latex') >= 0
+        || inner.indexOf('language-katex') >= 0
+
+      if (isKatex) {
+        attrs['_code'] = codeText
+        result.push({ name: 'katex', attrs, children: [{ type: 'text', text: codeText } as HtmlNode] } as HtmlNode)
+        i = closePos + closeStr.length
+        continue
+      }
+
+      node.children = [{ type: 'text', text: codeText } as HtmlNode]
     } else if (name == 'a' || isInline(name) || isHeading(name)) {
       // 行内节点必须**保留子节点结构**，不能在这里 stripAllTags 摊平：
       // 否则 <em><strong>x</strong></em> 里的 <strong> 在解析阶段就消失了，
@@ -616,8 +1077,46 @@ function parseHtml(html: string): HtmlNode[] {
   return result
 }
 
+function preprocessHtml(raw: string): string {
+  if (raw.length == 0) return ''
+  let html = raw
+
+  // 将 $$...$$ 公式预处理为 <katex> 标签
+  if (html.indexOf('$$') >= 0) {
+    let cursor = 0
+    let out = ''
+    while (cursor < html.length) {
+      const start = html.indexOf('$$', cursor)
+      if (start < 0) {
+        out += html.substring(cursor)
+        break
+      }
+      out += html.substring(cursor, start)
+      const end = html.indexOf('$$', start + 2)
+      if (end < 0) {
+        const formula = html.substring(start + 2).trim()
+        if (formula.length > 0) {
+          out += '<katex>' + formula + '</katex>'
+        }
+        cursor = html.length
+        break
+      } else {
+        const formula = html.substring(start + 2, end).trim()
+        if (formula.length > 0) {
+          out += '<katex>' + formula + '</katex>'
+        }
+        cursor = end + 2
+      }
+    }
+    html = out
+  }
+
+  return html
+}
+
 function doParse(html: string): void {
-  const nodes = parseHtml(html)
+  const safeHtml = preprocessHtml(html)
+  const nodes = parseHtml(safeHtml)
   localNodes.value = nodes
   if (nodes.length > 0) {
     setTimeout(() => { emit('load') }, 50)
@@ -629,12 +1128,159 @@ function setContent(html: string): void { doParse(html) }
 function getText(): string { return flatText({ children: localNodes.value } as HtmlNode) }
 
 function onLinkTap(n: HtmlNode): void {
-  const href = n.attrs != null ? ((n.attrs!['href'] as string) ?? '') : ''
+  const href = n.attrs != null ? (n.attrs!.getString('href') ?? '') : ''
   emit('linktap', n.attrs ?? ({} as UTSJSONObject))
   if (href.length > 0 && href.includes('://')) {
     uni.setClipboardData({ data: href, success: () => { uni.showToast({ title: '链接已复制', icon: 'none' }) } })
   }
 }
+
+function onImgTap(n: HtmlNode): void {
+  const src = n.attrs != null ? (n.attrs!.getString('src') ?? '') : ''
+  emit('imgtap', n.attrs ?? ({} as UTSJSONObject))
+  if (src.length > 0) {
+    uni.previewImage({
+      current: src,
+      urls: [src]
+    })
+  }
+}
+
+const viewerMermaidSource = ref<string>('')
+const viewerZoomIndex = ref<number>(1)
+const ZOOM_STEPS: number[] = [1, 1.5, 2, 3]
+
+/** 查看器里画布的手指平移量（px，挂到画布的 left/top 上） */
+const viewerPanX = ref<number>(0)
+const viewerPanY = ref<number>(0)
+let panStartX: number = 0;
+let panStartY: number = 0;
+let panBaseX: number = 0;
+let panBaseY: number = 0;
+let panDragging: boolean = false;
+
+type MpTouchPoint = {
+  x: number
+  y: number
+}
+
+/** 切档位后把画布摆回居中，否则放大后还停在上一档的偏移上，容易「一放大就跑没了」 */
+function resetViewerPan(): void {
+  viewerPanX.value = 0
+  viewerPanY.value = 0
+  panDragging = false
+}
+
+function openMermaidViewer(source: string): void {
+  if (source.trim().length == 0) return
+  viewerMermaidSource.value = source
+  viewerZoomIndex.value = 1
+  resetViewerPan()
+  emit('mermaidtap', source)
+}
+
+function closeMermaidViewer(): void {
+  viewerMermaidSource.value = ''
+  panDragging = false
+}
+
+function zoomIn(): void {
+  if (viewerZoomIndex.value < ZOOM_STEPS.length - 1) {
+    viewerZoomIndex.value++
+    resetViewerPan()
+  }
+}
+
+function zoomOut(): void {
+  if (viewerZoomIndex.value > 0) {
+    viewerZoomIndex.value--
+    resetViewerPan()
+  }
+}
+
+const viewerZoomText = computed((): string => {
+  const step = ZOOM_STEPS[viewerZoomIndex.value]
+  return `${step}× (${Math.round(12 * step)}px)`
+})
+
+/** 取第一个触点的屏幕坐标（touches 为空时退回 changedTouches，与 lime-signature 同一套写法） */
+function viewerTouchPoint(e: UniTouchEvent): MpTouchPoint | null {
+  const touches = e.touches.length > 0 ? e.touches : e.changedTouches
+  if (touches.length == 0) return null
+  const touch = touches[0]
+  return { x: touch.clientX, y: touch.clientY } as MpTouchPoint
+}
+
+/** 限幅：最多让画布整体挪出一个自身尺寸，保证怎么拖都还能再拖回来 */
+function clampViewerPan(v: number, size: number): number {
+  const limit: number = size > 0 ? size : 0
+  if (v > limit) return limit
+  if (v < -limit) return -limit
+  return v
+}
+
+/** 查看器里的画布：按当前档位重新排版 mermaid（字号 = 12 × 档位） */
+const viewerLayout = computed((): MpElementLayout => {
+  if (viewerMermaidSource.value.length == 0) {
+    return { width: 0, height: 0, rootStyle: '', bgBoxes: [] as MpRenderBox[], textBoxes: [] as MpRenderBox[], ruleBoxes: [] as MpRenderBox[] } as MpElementLayout
+  }
+  const step = ZOOM_STEPS[viewerZoomIndex.value]
+  const size = 12 * step
+  const layout = renderMermaid(viewerMermaidSource.value, size)
+  const bgBoxes: MpRenderBox[] = []
+  const textBoxes: MpRenderBox[] = []
+  const ruleBoxes: MpRenderBox[] = []
+  for (let i = 0; i < layout.shapes.length; i++) {
+    const shape = layout.shapes[i]
+    if (shape.kind == 'node') {
+      const nodeStyle = `position:absolute;top:${shape.top}px;left:${shape.x}px;width:${shape.width}px;height:${shape.height}px;box-sizing:border-box;background-color:#eff6ff;border-width:1px;border-style:solid;border-color:#6366f1;border-radius:${shape.radius}px;`
+      bgBoxes.push({ text: '', style: nodeStyle } as MpRenderBox)
+    } else if (shape.kind == 'text') {
+      const textStyle = `position:absolute;top:${shape.top}px;left:${shape.x}px;font-size:${shape.fontSize}px;line-height:${shape.fontSize}px;color:#1e293b;white-space:nowrap;`
+      textBoxes.push({ text: shape.text, style: textStyle } as MpRenderBox)
+    } else {
+      const lineStyle = `position:absolute;top:${shape.top}px;left:${shape.x}px;width:${shape.width}px;height:${shape.height}px;background-color:#94a3b8;`
+      ruleBoxes.push({ text: '', style: lineStyle } as MpRenderBox)
+    }
+  }
+  return {
+    width: layout.width,
+    height: layout.height,
+    rootStyle: `position:relative;width:${layout.width}px;height:${layout.height}px;`,
+    bgBoxes,
+    textBoxes,
+    ruleBoxes
+  } as MpElementLayout
+})
+
+function onViewerTouchStart(e: UniTouchEvent): void {
+  const p: MpTouchPoint | null = viewerTouchPoint(e)
+  if (p == null) return
+  panDragging = true
+  panStartX = p.x
+  panStartY = p.y
+  panBaseX = viewerPanX.value
+  panBaseY = viewerPanY.value
+}
+
+function onViewerTouchMove(e: UniTouchEvent): void {
+  if (!panDragging) return
+  const p: MpTouchPoint | null = viewerTouchPoint(e)
+  if (p == null) return
+  const canvas: MpElementLayout = viewerLayout.value
+  viewerPanX.value = clampViewerPan(panBaseX + (p.x - panStartX), canvas.width)
+  viewerPanY.value = clampViewerPan(panBaseY + (p.y - panStartY), canvas.height)
+}
+
+function onViewerTouchEnd(_e: UniTouchEvent): void {
+  panDragging = false
+}
+
+/** 画布定位：mermaid-lite 给的 rootStyle（position:relative + 宽高）再叠上手指平移量 */
+const viewerCanvasStyle = computed((): string => {
+  const canvas: MpElementLayout = viewerLayout.value
+  return canvas.rootStyle + `left:${viewerPanX.value}px;top:${viewerPanY.value}px;`
+})
 
 watch((): string => props.content, (val: string) => {
   if (val.length > 0) doParse(val)

@@ -1,0 +1,112 @@
+/**
+ * 阿里 iconfont 字体图标库 —— 插件侧能力（不含任何宿主数据）
+ *
+ * 本模块只做三件事：
+ * 1. 持有字体家族名（ALI_ICON_FONT_FAMILY）—— 这是插件的身份标识，宿主不可改；
+ * 2. 把 common/icons.uts 里的图标表装进注册表，供 getAliIconCode 查；
+ * 3. 在小程序端把字体注册进全局（setupIconfont 内部），让自定义组件里也能用这个 family。
+ *
+ * 字体在各端的来源：
+ * - Web / H5：AliIconfontIcon 组件 style 块里的 @font-face，声明式、不依赖 JS 时序；
+ * - 小程序：本模块 setupIconfont() 里的 uni.loadFontFace，URL 取自 common/icons.uts；
+ * - App：不走这里 —— AliIconfontIcon 用 web-view 渲染，演示页里的字体是 base64 内联的
+ *   （系统 WebView 加载 file:// 页面时跨域拉 CDN 字体可能被拦，且断网必挂）。
+ *
+ * URL 与图标表为什么直接 import，而不是让宿主传参：
+ * 它们由 scripts/gen-icons.mjs 从阿里 CSS 生成在 common/icons.uts —— 和演示页里那份
+ * 字体二进制一样，属于「本插件已经绑定的那个阿里项目」，不是宿主调用方要操心的配置。
+ * 宿主只调一次 setupIconfont()；换图标 / 换库 = 改插件根目录的 iconfont.config.mjs、
+ * 跑一条 `pnpm icons`（同时更新图标表、@font-face 与演示页字体），宿主与插件源码都不用改。
+ *
+ * family 名（ALI_ICON_FONT_FAMILY）必须与 AliIconfontIcon 组件 style 块里 @font-face 的
+ * font-family 完全一致。那一段是生成区，由 gen-icons.mjs 依据本常量写出，
+ * 所以改名后跑 `pnpm icons` 即可同步，不用手抄。
+ *
+ * @example
+ * ```html
+ * <AliIconfontIcon name="gear" :size="24" />
+ * ```
+ */
+
+import { ALI_ICON_FONT_URL, ALI_ICONS } from './icons.uts';
+
+/**
+ * 字体家族名
+ *
+ * 刻意不叫 iconfont：那是阿里 CSS 里自带的通用名，项目里也存在同名的历史字体
+ * （static/iconfont.ttf）。同名家族的 @font-face 会互相顶掉，且顶掉是静默的。
+ */
+export const ALI_ICON_FONT_FAMILY = 'AlibabaIconfont';
+
+/**
+ * 图标名 → 码点（十六进制，不含 \u）注册表
+ *
+ * 由 setupIconfont 写入、getAliIconCode 读取。刻意不是 export：调用方不该直接碰它，
+ * 只能通过 setupIconfont 整体替换，避免出现「注册表被改了一半」的中间态。
+ */
+let aliIconRegistry: UTSJSONObject = {};
+
+/**
+ * 注册阿里 iconfont 字体与图标表
+ *
+ * ⚠️ 三端都必须调用一次（宿主 App.uvue 的 onLaunch 里）：
+ * - 小程序端靠它触发 uni.loadFontFace 把字体装进全局；
+ * - **另外两端也靠它灌入注册表** —— 没有注册表，getAliIconCode 查不到码点，
+ *   图标名会静默渲染成空白（不报错）。
+ * 时序是安全的：onLaunch 早于任何页面 / 组件渲染，注册表必然就绪。
+ *
+ * 没有参数：字体 URL 与图标表都来自本模块顶部 import 的 common/icons.uts（生成物）。
+ *
+ * ⚠️ 小程序真机需把字体域名（本项目是 at.alicdn.com）加进「downloadFile 合法域名」，
+ * 否则 loadFontFace 会 fail（微信开发者工具可勾选「不校验合法域名」绕过，但真机不生效）。
+ * 想彻底免掉这一步，把 ttf 放进 static/ 走本地路径即可。
+ *
+ * @example
+ * ```uts
+ * // App.uvue 的 onLaunch 里调用一次即可
+ * setupIconfont();
+ * ```
+ */
+export function setupIconfont(): void {
+  aliIconRegistry = ALI_ICONS;
+
+  // #ifdef MP
+  // URL 是生成物，理论上不会是空串；留这道判空是为了「宁可少注册一次，
+  // 也不拿一个空 url 去调 loadFontFace」—— 后者在小程序端只会 fail。
+  if (ALI_ICON_FONT_URL != '') {
+    // global: true 不能省 —— 不带时小程序端字体不会渗透进自定义组件，
+    // AliIconfontIcon 这类组件里会渲染成方块。
+    uni.loadFontFace({
+      global: true,
+      family: ALI_ICON_FONT_FAMILY,
+      source: `url("${ALI_ICON_FONT_URL}")`,
+      success() {
+        console.log('global loadFontFace AlibabaIconfont success');
+      },
+      fail(error) {
+        console.error('global loadFontFace AlibabaIconfont fail', error.errMsg);
+      }
+    });
+  }
+  // #endif
+}
+
+/**
+ * 取图标名对应的 Unicode 码点（十六进制字符串，不含 \u）
+ *
+ * 给「App 端 web-view 渲染」这类拿不到字体内部映射的场景用：
+ * 码点由注册表（setupIconfont 装入的 common/icons.uts 那张表）统一持有，
+ * 组件只需把图标名丢进来，不必再抄一份图标表。
+ *
+ * 图标名不存在时返回空串。注意：setupIconfont 未被调用时**所有**名字都会返回空串。
+ *
+ * @example
+ * ```uts
+ * getAliIconCode('gear') // 'E602'
+ * getAliIconCode('不存在的名字') // ''
+ * ```
+ */
+export function getAliIconCode(name: string): string {
+  const code = aliIconRegistry[name];
+  return code == null ? '' : (code as string);
+}

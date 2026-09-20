@@ -59,11 +59,29 @@ const HANDWRITTEN = new Set(['systemInfo']);
  * `collectParts` 里的 `export *` 分支负责 —— 它被 `src/tabbar/tabbar.uvue`、
  * `src/layouts/navbar.uvue`、`src/router/interceptor.uts` 等 13 处以
  * `@/src/tabbar/index.uts` 形式导入。
+ *
+ * `uni_modules/ali-iconfont/common/iconfont.uts` 被 `App.uvue` 以
+ * `@/uni_modules/ali-iconfont/common/iconfont.uts` 形式导入（取 `setupIconfont`）。
+ * 插件内部的导入（组件 import 同一文件）不需要声明文件 —— 组件自身在 tsconfig 的
+ * exclude 里，只有插件**外**的导入才会让 IDE 报 `Cannot find module`。
+ *
+ * 阿里 iconfont 的 URL 与图标表：`uni_modules/ali-iconfont/common/icons.uts` 由
+ * `uni_modules/ali-iconfont/scripts/gen-icons.mjs` **整个文件**生成，宿主 `App.uvue`
+ * 不碰它（只调插件导出的 `setupIconfont()`），消费者是插件自己的 `common/iconfont.uts`。
+ * 它依然要生成：没有声明文件时，任何解析这条 import 的地方（编辑器；宿主 `src/` 下的
+ * `.ts` 若哪天直接 import 这两个常量）都会报 `Cannot find module`。
+ * 只换图标 / 换图标库（值变、导出面不变）不需要重跑本脚本；增删或改名这两个常量
+ * （导出面变了）才要。
  */
 const EXTRA_SOURCES = [
   path.join(ROOT, 'src/store/types.uts'),
   path.join(ROOT, 'src/i18n/index.uts'),
-  path.join(ROOT, 'src/tabbar/index.uts')
+  path.join(ROOT, 'src/tabbar/index.uts'),
+  path.join(ROOT, 'uni_modules/ali-iconfont/common/iconfont.uts'),
+  path.join(ROOT, 'uni_modules/ali-iconfont/common/icons.uts'),
+  path.join(ROOT, 'uni_modules/mp-html/common/katex-lite/index.uts'),
+  path.join(ROOT, 'uni_modules/mp-html/common/mermaid-lite/index.uts'),
+  path.join(ROOT, 'uni_modules/mp-html/index.uts')
 ];
 
 const args = new Set(process.argv.slice(2));
@@ -78,7 +96,11 @@ const INCLUDE_ALL = args.has('--all');
  * 而切片仍然从原文取（保留 JSDoc）。
  */
 function mask(src) {
-  const out = [...src];
+  // 必须用 split('') 取「按 UTF-16 码元」的字符数组：`[...src]` 是按码点展开的，
+  // 一旦源码里出现 emoji / 数学字母这类增补平面字符（代理对），数组长度就会比
+  // src.length 短，后面 `out[i] = ' '` 的下标映射会整体错位，把代码当成字符串抹掉，
+  // 表现为「某些 export 在生成的 d.ts 里凭空消失」。
+  const out = src.split('');
   const n = src.length;
   let i = 0;
   while (i < n) {

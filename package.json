@@ -30,7 +30,9 @@
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs",
     "gen:uts-dts": "node scripts/gen-uts-dts.mjs",
-    "check:uts-dts": "node scripts/gen-uts-dts.mjs --check"
+    "check:uts-dts": "node scripts/gen-uts-dts.mjs --check",
+    "icons": "node uni_modules/ali-iconfont/scripts/gen-icons.mjs && node uni_modules/ali-iconfont/scripts/gen-demo.mjs --fetch-font",
+    "icons:check": "node uni_modules/ali-iconfont/scripts/gen-icons.mjs --check"
   },
   "dependencies": {
     "@dcloudio/uni-app": "3.0.0-5020420260813002",
