@@ -1,0 +1,155 @@
+<template>
+  <!-- App 端：系统 WebView 渲染插件自带的本地页。字体已 base64 内联在该页里，
+       不去 at.alicdn.com 拉，离线可用、也不吃 file:// 页面的跨域限制。 -->
+  <!-- #ifdef APP -->
+  <web-view
+    :src="webViewSrc"
+    :vertical-scroll-bar-access="false"
+    :horizontal-scroll-bar-access="false"
+    :style="webViewStyle"
+  />
+  <!-- #endif -->
+  <!-- 非 App 端：字体由 @font-face（Web / H5）或 uni.loadFontFace（小程序）注册好后，
+       用内联 font-family 的原生 text 直接渲染字形，不引第三方图标组件。 -->
+  <!-- #ifndef APP -->
+  <text :style="iconStyle">{{ iconChar }}</text>
+  <!-- #endif -->
+</template>
+
+<script setup lang="uts">
+import { computed } from 'vue';
+import { ALI_ICON_FONT_FAMILY, getAliIconCode } from '../../common/iconfont.uts';
+
+/**
+ * 阿里 iconfont 图标（项目与图标表见插件根目录的 iconfont.config.mjs）
+ *
+ * 为什么要分两条路渲染：
+ * - 字体本身是跨端的，非 App 端字体注册好之后，一个带 font-family 的 text 就能渲染；
+ * - App 端 web-view 加载的是本地页面，再用它去跨域拉 CDN 字体可能被系统 WebView 拦，
+ *   所以改用一个字体内联的本地页承载，本组件只需把码点、字号与主题传进去。
+ *
+ * 本组件刻意不依赖宿主项目的任何模块（不引 store、不引宿主工具库），
+ * 深浅色由 theme 属性显式传入 —— 一旦引了宿主 store，插件就没法整体拿出去复用了。
+ * 同理，本组件不直接 import「图标名 → 码点」那张表：它由脚本生成在插件侧的
+ * common/icons.uts、由 setupIconfont 装进注册表，本组件只通过 getAliIconCode 查表。
+ * 所以**宿主必须先调用 setupIconfont()**，否则所有图标名都会查不到码点、静默渲染成空白。
+ *
+ * @example
+ * ```html
+ * <AliIconfontIcon name="gear" :size="24" color="#f59e0b" />
+ * <AliIconfontIcon name="gear" :size="32" theme="dark" />
+ * ```
+ */
+const props = defineProps({
+  /** 图标名，取值见插件 `common/icons.uts` 里的 ALI_ICONS（如 gear / home / tune） */
+  name: {
+    type: String,
+    default: ''
+  },
+  /** 图标尺寸（px） */
+  size: {
+    type: Number,
+    default: 60
+  },
+  /**
+   * 图标颜色
+   *
+   * ⚠️ 目前只在非 App 端生效：App 端的演示页把色值写死在 CSS 里，
+   * 这个属性不会传过去（要支持需给演示页加一个 color 查询参数）。
+   */
+  color: {
+    type: String,
+    default: '#f59e0b'
+  },
+  /**
+   * 深浅色，只有 App 端有意义：'auto'（默认）/ 'light' / 'dark'
+   *
+   * 'auto' 时不给演示页传 dark 参数，页面自己按 prefers-color-scheme 跟随系统；
+   * 宿主手动切主题时，由调用方把当前主题传进来（见 IconDemoCard）。
+   */
+  theme: {
+    type: String,
+    default: 'auto'
+  }
+});
+
+// #ifndef APP
+/**
+ * 图标字形：把 iconfont 的码点转成字符，交给字体的 font-family 渲染。
+ * 图标名不存在时 getAliIconCode 返回空串，parseInt 得到 NaN，这里兜成空字符不显示。
+ */
+const iconChar = computed((): string => {
+  const code = parseInt(getAliIconCode(props.name), 16);
+  return isNaN(code) ? '' : String.fromCharCode(code);
+});
+
+/** 原生 text 上必须内联 font-family，字体族名与注册处（../../common/iconfont.uts）保持一致 */
+const iconStyle = computed((): string => {
+  return `font-family: ${ALI_ICON_FONT_FAMILY}; font-size: ${props.size}px; color: ${props.color};`;
+});
+// #endif
+
+// #ifdef APP
+/**
+ * 插件自带的本地演示页路径
+ *
+ * 放在插件自己的 static/app/ 下 —— 官方编译器文档明确「含 uni_modules 下的 static 目录」
+ * 会整体 copy 到编译产物，App 端 web-view 因此能按这个绝对路径加载它。
+ * 路径里的 app 是条件编译目录，H5 / 小程序包里不会带上这个页面。
+ * 路径大小写敏感，改名要两边同步。
+ */
+const DEMO_PAGE = '/uni_modules/ali-iconfont/static/app/ali-iconfont-demo.html';
+
+/**
+ * 演示页的 src：码点、字号、深浅色都得从查询串带进去。
+ * 页面里读不到宿主的 CSS 变量，web-view 的自绘背景也只能靠参数对齐卡片底色。
+ */
+const webViewSrc = computed((): string => {
+  const base = `${DEMO_PAGE}?code=${getAliIconCode(props.name)}&size=${props.size}`;
+  // 'auto' 时故意不传 dark，交给演示页里的 prefers-color-scheme 兜底
+  if (props.theme == 'dark') {
+    return `${base}&dark=1`;
+  }
+  if (props.theme == 'light') {
+    return `${base}&dark=0`;
+  }
+  return base;
+});
+
+/** 比图标本身大一圈，留出 4px 内边距，字形不会贴着边 */
+const webViewStyle = computed((): string => {
+  const side = props.size + 8;
+  return `width: ${side}px; height: ${side}px;`;
+});
+// #endif
+</script>
+
+<style>
+/* Web / H5 端的字体声明由组件自带：@font-face 是全局 at-rule、不受 scoped 影响，而组件的
+   <style> 会随组件进产物 —— 所以宿主不必在自己的全局样式里再写一遍。官方 uni-icons 同款做法
+   （它组件自己的 style 块里就写着 @font-face）。
+
+   ⚠️ 条件编译守卫（#ifdef / #endif）必须写在这个 style 块里，不能把 @font-face 挪进被
+   @import 的 .scss：预处理只解析顶层文件里的标记，被 @import 的文件里的标记会被 sass
+   连 CSS 注释一起剥掉 —— 于是 App / 小程序端也会被注入这条 CDN 字体规则，编译不报错，
+   现象只是 App 端白白多一次字体请求。
+
+   小程序端不走这里：由 setupIconfont 的 uni.loadFontFace 注册；
+   App 端也不走这里：web-view 渲染插件自带的本地页，字体内联在该页里。
+
+   ⚠️ 换图标 / 换库不要手改下面这段 @font-face：改插件根目录的 iconfont.config.mjs，
+   再在项目根目录跑 `pnpm icons`，由 gen-icons.mjs 重写（它同时也更新图标表与演示页字体）。 */
+/* #ifdef H5 || WEB */
+/* >>> gen-icons.mjs 生成区开始（改动会被脚本覆盖） */
+@font-face {
+  font-family: 'AlibabaIconfont';
+  src:
+    url('https://at.alicdn.com/t/c/font_5229558_ba6vyj2r9g5.woff2?t=1789888326012') format('woff2'),
+    url('https://at.alicdn.com/t/c/font_5229558_ba6vyj2r9g5.woff?t=1789888326012') format('woff'),
+    url('https://at.alicdn.com/t/c/font_5229558_ba6vyj2r9g5.ttf?t=1789888326012') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+/* <<< gen-icons.mjs 生成区结束 */
+/* #endif */
+</style>

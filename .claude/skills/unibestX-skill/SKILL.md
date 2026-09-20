@@ -18,7 +18,7 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 1. **UTS 与原生规范**：语法与严格类型（分册 1.1）、CSS / Tailwind 样式引擎限制（分册 1.2）、跨端运行时铁律（分册 1.3）；
 2. **项目正确案例**：来自本项目的生产级标杆案例（分册 2）——页面骨架、TabBar、二级详情页、滚动与下拉刷新、组件与生态库优先范式；
 3. **项目代码生成规范**：生成流程与模板（分册 3）、本文件常驻的 3.3 对照表与 3.4 红线清单、回写维护机制（分册 3 的 3.5）；
-4. **项目内置工具库**：`src/utils/` 下 11 个现成模块的 API 与用法（分册 4）——**动手造轮子前先查这里**；
+4. **项目内置工具库**：`src/utils/` 下 12 个现成模块的 API 与用法（分册 4）——**动手造轮子前先查这里**；
 5. **页面与应用基础设施**：`src/http/`（请求与流式）、`src/router/`（路由拦截）、`src/layouts/`（页面布局）、`src/i18n/`（语言装配）、`src/api/`（业务请求与 Mock）（分册 5）——**定策略 / 选骨架 / 改配置前先查这里**；
 6. **AI 页面层级与组件设计规范**：页面高内聚自包含、最多三级封顶、容器与纯展示解耦、Mock 接口契约化（分册 6）——**AI 生成复杂页面与拆分组件前必读**。
 
@@ -47,7 +47,7 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 | [references/1.3-runtime.md](references/1.3-runtime.md) | **1.3 跨端运行时与渲染模式约束**（20 条） | VDOM / Android VDOM / Vapor 差异、多平台门面分流与条件编译、UTS 插件与自定义基座、Markdown 渲染、真机与 Kotlin 报错、编译验证命令选择 |
 | [references/2-examples.md](references/2-examples.md) | **二、项目正确案例**（5 个生产级标杆案例） | 新建页面、搭「上固定 + 下滚动」骨架、算可用高度、写 TabBar 页与下拉刷新、写二级 / 子包页、用 Easycom 引组件 —— **优先照抄，不要自创结构** |
 | [references/3-codegen.md](references/3-codegen.md) | **3.1 新增页面生成流程**、**3.2 页面代码标准模板**、**3.5 VDOM/Vapor 差异回写维护机制** | 生成新页面 / 组件前走流程、需要复制标准页面模板、需要按四维分类回写本 Skill |
-| [references/4-utils.md](references/4-utils.md) | **四、项目内置工具库**（`src/utils/` 11 个模块：route / theme / env / i18n / toast / backPress / refresh / upload / systemInfo / rxjs-lite / katex-lite） | **动手实现任何通用能力前先查这里**：取路由与路径、取主题色、读环境变量、多语言、提示弹窗、返回键接管、下拉刷新与导航栏控制、文件上传、系统与安全区尺寸、防抖节流与流式处理、LaTeX 公式排版 |
+| [references/4-utils.md](references/4-utils.md) | **四、项目内置工具库**（`src/utils/` 12 个模块：route / theme / env / i18n / toast / backPress / refresh / upload / systemInfo / rxjs-lite / katex-lite / mermaid-lite） | **动手实现任何通用能力前先查这里**：取路由与路径、取主题色、读环境变量、多语言、提示弹窗、返回键接管、下拉刷新与导航栏控制、文件上传、系统与安全区尺寸、防抖节流与流式处理、LaTeX 公式排版、**mermaid 流程图原生排版（不联网、不用图片）** |
 | [references/5-infra.md](references/5-infra.md) | **五、页面与应用基础设施**：5.1 请求（http/request）、5.2 流式请求（http/stream）、5.3 路由与拦截器（router）、5.4 页面布局（layouts）、5.5 国际化配置（i18n）、**5.6 业务 API 与 Mock 接口化（src/api/）** | 发起接口请求 / 处理错误与 401、做 SSE 打字机输出、改登录拦截与登录策略、**选 `layout` 或配 `definePage` 导航栏字段**、增改多语言文案、**抽离 Mock 模拟数据为后端接口函数** |
 | [references/6-page-component-spec.md](references/6-page-component-spec.md) | **六、AI 页面层级与组件设计规范**（页面高内聚 · 三级防过度拆分 · 容器/视图分离 · Mock 接口契约化 · 生产接口同名映射） | 规划新页面结构、拆分复杂页面组件、组织页面内 `components/common/` 与模块私有视图、从 mock.uts 对接 `src/api/<page>/<page>.uts` 时必读 |
 
@@ -89,6 +89,12 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 | **对象类型属性里声明剩余参数** | `back: (...args: Array<number>) => void`（语法报错 `cannot have modifiers`） | 提取为独立顶层别名：`type BackFn = (...args: Array<number>) => void;` |
 | **自带可空返回的内置 API 直接返回** | `return decodeURIComponent(value);`（可空 `String?` 赋给非空 `String` 签名报错） | 先判空兜底再返回：`const d = decodeURIComponent(val); return d != null ? d : val;` |
 | **uni 跳转 API 返回值类型声明** | 标为 `Promise<any> | null` 或只写 `any`（泛型不协变导致类型不匹配） | 统一标为 `any | null` |
+| **H5 双向滚动拖不动 / 放大后被压回屏宽** | `<scroll-view direction="all"><view class="flex flex-row"><image style="width:812px" /></view></scroll-view>`（H5 的 `uni-view` 自带 `overflow:hidden`，溢出被中间层裁掉；且 H5 flex 项默认 `flex-shrink:1` 把图压回屏宽，App 端默认是 0 所以不复现） | 溢出元素**直挂** `scroll-view` 并显式 `flex-shrink:0`：`<scroll-view direction="all"><image :style="'width:812px;flex-shrink:0'" /></scroll-view>`；居中用左右 `margin`，别用 `justify-content:center`（详见 **1.2.22**） |
+| **一手排出来的「绝对定位图元画布」放大后拖不动** | 内容是一层 `<view>` 里的一堆 `position:absolute` 图元（mermaid / katex 视图、图元拼接画布），必须包一层载体 view ⇒ 又套回「中间层 `overflow:hidden` 裁掉溢出、滚动层量不到真实内容宽」，`scroll-view` 方案彻底不成立 | **不滚动，改手指平移**：承载区 flex 居中 + 画布自己吃 `touchstart/move/end`，`canvasStyle = rootStyle + 'left:${panX}px;top:${panY}px;'`（`position:relative` 的四向偏移官方全端支持），并做 `clamp(±画布尺寸)` 限幅与切档复位（详见 **1.2.22** 补充） |
+| **加了 `flatten` 后点击 / 触摸没反应、遮罩层压不住、阴影没了** | 在挂了 `@click` / `@touch*` 的元素，或依赖 `z-index` / `visibility` / `background-image` / `display:fixed` 的元素上拍平（拍平 = 不创建独立原生 View、作为绘制指令画到父上；**事件与这批 CSS 全部静默失效**，编译不报错运行不警告；`image` 还会只剩 gif 第一帧） | 只给**纯装饰、无事件、不依赖 z-index/visibility** 的元素拍平（katex / mermaid 图元层、静态图标分隔线）；交互元素与遮罩层一律不拍。仅蒸汽模式生效（本项目 `manifest.json` 已 `vapor:true`）；初始化属性不能动态绑定；**鸿蒙要至少两个相邻元素同时拍平才有收益，否则掉性能**（详见 **1.3.24**） |
+| **H5 报 `Cannot access 'x' before initialization`** | 同一函数里两个不同块各自 `const id = ...`（UTS 变量按**函数级**去重，把两者合成一个变量，声明点落在后面那个，前面那段就成了 TDZ） | 不同块的同名局部量按语义改名（`bare` / `sized` / `grouped`…）；顺序 `for` 里重名的 `i` 安全（详见 **1.1.20**） |
+| **App 端 `min-width` / `min-height` / `max-width:100%` 静默失效** | 写百分比 `min-height:100%` / `min-width:100%` / `max-width:100%`（原生端 `min-*` / `max-*` 只认 `number` 与 `px`，构建期只有一条 warn，运行期直接忽略；`width` / `height` 的百分比**是**支持的） | 「至少撑满」写 `flex:1`、「至多铺满」写 `width:100%`，带 padding / border 时补 `box-sizing:border-box`（详见 **1.2.23**） |
+| **流式渲染时 App 闪退 `UTS instance N is not registered`** | 计时器每来一个 chunk 就把整串内容喂给富文本渲染器（`streamText.value = full`）—— 末尾那个还没收完的块（`<video>` / mermaid / `$$…$$`）会先按**顶层节点**渲染，等闭合标签到齐又变成块的**子节点**，原生组件在两条分支间搬家、被销毁重建，新实例拿到已释放的原生实例 id | 接收与渲染分离：**只在块边界推进渲染快照**（`text.lastIndexOf('\n\n')` 取最后一个完整块的结尾），半截块永不进渲染；`complete` 回调里再补渲染一次尾巴（详见 **1.3.23**） |
 
 ---
 
@@ -123,3 +129,5 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 - [ ] **25. 对象类型的属性签名中严禁声明剩余参数**（`back: (...args: Array<number>) => void` 语法报错，必须抽成顶层独立 `type` 别名）
 - [ ] **26. 自带可空返回的内置 API 严禁直接 `return` 给非空签名**（必须先判空兜底再返回）
 - [ ] **27. uni 跳转 API 的返回值严禁标 `Promise<any> | null`、也不要只写 `any`**（统一写 `any | null`）
+- [ ] **28. 计时器高频驱动的流式渲染，严禁把「块结构未完成」的整串内容喂给富文本渲染器**（末尾半截块会让原生组件在渲染分支间搬家、被销毁重建，App 抛 `IllegalStateException: UTS instance N is not registered`；必须把接收与渲染分离，只按块边界推进渲染快照，见 1.3.23）
+- [ ] **29. 严禁给挂了事件或依赖 `z-index` / `visibility` / `display:fixed` / `background-image` 的元素加 `flatten`**（拍平后**事件与这批 CSS 全部静默失效** —— 编译不报错、运行不警告，只是点了没反应、遮罩压不住；`image` 拍平后 gif 只显第一帧。只给纯装饰图元加；仅蒸汽模式生效，是初始化属性不能动态绑定，鸿蒙需至少两个相邻元素同时拍平才有收益，见 1.3.24）

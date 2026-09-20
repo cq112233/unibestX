@@ -90,7 +90,11 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 | **自带可空返回的内置 API 直接返回** | `return decodeURIComponent(value);`（可空 `String?` 赋给非空 `String` 签名报错） | 先判空兜底再返回：`const d = decodeURIComponent(val); return d != null ? d : val;` |
 | **uni 跳转 API 返回值类型声明** | 标为 `Promise<any> | null` 或只写 `any`（泛型不协变导致类型不匹配） | 统一标为 `any | null` |
 | **H5 双向滚动拖不动 / 放大后被压回屏宽** | `<scroll-view direction="all"><view class="flex flex-row"><image style="width:812px" /></view></scroll-view>`（H5 的 `uni-view` 自带 `overflow:hidden`，溢出被中间层裁掉；且 H5 flex 项默认 `flex-shrink:1` 把图压回屏宽，App 端默认是 0 所以不复现） | 溢出元素**直挂** `scroll-view` 并显式 `flex-shrink:0`：`<scroll-view direction="all"><image :style="'width:812px;flex-shrink:0'" /></scroll-view>`；居中用左右 `margin`，别用 `justify-content:center`（详见 **1.2.22**） |
+| **一手排出来的「绝对定位图元画布」放大后拖不动** | 内容是一层 `<view>` 里的一堆 `position:absolute` 图元（mermaid / katex 视图、图元拼接画布），必须包一层载体 view ⇒ 又套回「中间层 `overflow:hidden` 裁掉溢出、滚动层量不到真实内容宽」，`scroll-view` 方案彻底不成立 | **不滚动，改手指平移**：承载区 flex 居中 + 画布自己吃 `touchstart/move/end`，`canvasStyle = rootStyle + 'left:${panX}px;top:${panY}px;'`（`position:relative` 的四向偏移官方全端支持），并做 `clamp(±画布尺寸)` 限幅与切档复位（详见 **1.2.22** 补充） |
+| **加了 `flatten` 后点击 / 触摸没反应、遮罩层压不住、阴影没了** | 在挂了 `@click` / `@touch*` 的元素，或依赖 `z-index` / `visibility` / `background-image` / `display:fixed` 的元素上拍平（拍平 = 不创建独立原生 View、作为绘制指令画到父上；**事件与这批 CSS 全部静默失效**，编译不报错运行不警告；`image` 还会只剩 gif 第一帧） | 只给**纯装饰、无事件、不依赖 z-index/visibility** 的元素拍平（katex / mermaid 图元层、静态图标分隔线）；交互元素与遮罩层一律不拍。仅蒸汽模式生效（本项目 `manifest.json` 已 `vapor:true`）；初始化属性不能动态绑定；**鸿蒙要至少两个相邻元素同时拍平才有收益，否则掉性能**（详见 **1.3.24**） |
 | **H5 报 `Cannot access 'x' before initialization`** | 同一函数里两个不同块各自 `const id = ...`（UTS 变量按**函数级**去重，把两者合成一个变量，声明点落在后面那个，前面那段就成了 TDZ） | 不同块的同名局部量按语义改名（`bare` / `sized` / `grouped`…）；顺序 `for` 里重名的 `i` 安全（详见 **1.1.20**） |
+| **App 端 `min-width` / `min-height` / `max-width:100%` 静默失效** | 写百分比 `min-height:100%` / `min-width:100%` / `max-width:100%`（原生端 `min-*` / `max-*` 只认 `number` 与 `px`，构建期只有一条 warn，运行期直接忽略；`width` / `height` 的百分比**是**支持的） | 「至少撑满」写 `flex:1`、「至多铺满」写 `width:100%`，带 padding / border 时补 `box-sizing:border-box`（详见 **1.2.23**） |
+| **流式渲染时 App 闪退 `UTS instance N is not registered`** | 计时器每来一个 chunk 就把整串内容喂给富文本渲染器（`streamText.value = full`）—— 末尾那个还没收完的块（`<video>` / mermaid / `$$…$$`）会先按**顶层节点**渲染，等闭合标签到齐又变成块的**子节点**，原生组件在两条分支间搬家、被销毁重建，新实例拿到已释放的原生实例 id | 接收与渲染分离：**只在块边界推进渲染快照**（`text.lastIndexOf('\n\n')` 取最后一个完整块的结尾），半截块永不进渲染；`complete` 回调里再补渲染一次尾巴（详见 **1.3.23**） |
 
 ---
 
@@ -125,3 +129,5 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 - [ ] **25. 对象类型的属性签名中严禁声明剩余参数**（`back: (...args: Array<number>) => void` 语法报错，必须抽成顶层独立 `type` 别名）
 - [ ] **26. 自带可空返回的内置 API 严禁直接 `return` 给非空签名**（必须先判空兜底再返回）
 - [ ] **27. uni 跳转 API 的返回值严禁标 `Promise<any> | null`、也不要只写 `any`**（统一写 `any | null`）
+- [ ] **28. 计时器高频驱动的流式渲染，严禁把「块结构未完成」的整串内容喂给富文本渲染器**（末尾半截块会让原生组件在渲染分支间搬家、被销毁重建，App 抛 `IllegalStateException: UTS instance N is not registered`；必须把接收与渲染分离，只按块边界推进渲染快照，见 1.3.23）
+- [ ] **29. 严禁给挂了事件或依赖 `z-index` / `visibility` / `display:fixed` / `background-image` 的元素加 `flatten`**（拍平后**事件与这批 CSS 全部静默失效** —— 编译不报错、运行不警告，只是点了没反应、遮罩压不住；`image` 拍平后 gif 只显第一帧。只给纯装饰图元加；仅蒸汽模式生效，是初始化属性不能动态绑定，鸿蒙需至少两个相邻元素同时拍平才有收益，见 1.3.24）

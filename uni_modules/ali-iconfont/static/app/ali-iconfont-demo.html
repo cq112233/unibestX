@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no"
+  />
+  <title>阿里 iconfont · web-view 渲染页</title>
+  <style>
+    /*
+     * 阿里 iconfont 在 App 端 web-view 里渲染单个图标的页面。
+     * 宿主：uni_modules/ali-iconfont/components/AliIconfontIcon/AliIconfontIcon.uvue
+     * 图标数据源（本页的字体与图标表、Web 端的 @font-face 同出这一份）：https://at.alicdn.com/t/c/font_5229558_ba6vyj2r9g5.css
+     *
+     * 字体为什么内联 base64 而不是写 at.alicdn.com 的链接：
+     * App 端 web-view 是系统 WebView，加载本地 file:// 页面时再去跨域拉 CDN 字体
+     * 会被跨域策略拦掉（且断网必挂）；ttf 只有 5KB，内联后离线也能渲染。
+     *
+     * 页面尺寸由宿主的 web-view style 决定（正方形，边长 = 图标尺寸 + 8），
+     * 所以这里不做响应式，只保证图标在方框里居中即可。
+     */
+    @font-face {
+      font-family: 'AlibabaIconfont';
+      src: url('data:font/truetype;charset=utf-8;base64,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') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+      font-display: block;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      /* 与宿主卡片的 --card-bg 一致：web-view 自身背景不透明，靠这一层融入卡片 */
+      background: #ffffff;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .ali-icon {
+      font-family: 'AlibabaIconfont';
+      /*
+       * font-style 必须显式 normal：图标是字形不是文字，一旦被斜体化，
+       * WebView 会给没有 italic 字面的字体合成倾斜（App 端实测字形是斜的）。
+       * 元素本身也刻意不用 <i> —— 那个标签浏览器默认就是 italic。
+       */
+      font-style: normal;
+      font-weight: normal;
+      /* 实际字号由脚本按 ?size= 覆盖，这里只给一个兜底值 */
+      font-size: 22px;
+      line-height: 1;
+      color: #f59e0b;
+    }
+
+    /* 深色主题：宿主把 theme 属性转成 ?dark=1/0 带过来，色值对齐宿主的 --card-bg
+       （宿主侧深色分支给出的就是 #1e293b，见其主题工具）。
+       不传该参数时（宿主 theme='auto'）由脚本按 prefers-color-scheme 跟随系统。 */
+    body.is-dark {
+      background: #1e293b;
+    }
+  </style>
+</head>
+<body>
+  <span class="ali-icon"></span>
+
+  <script>
+    /*
+     * 参数（都由宿主 AliIconfontIcon 拼在 src 上）：
+     *   code  图标 Unicode 码点（十六进制，如 E602），由宿主 AliIconfontIcon 从图标表查得
+     *         （插件 common/icons.uts 里的 ALI_ICONS，由 gen-icons.mjs 生成）
+     *   size  图标字号（px）
+     *   dark  1 = 深色主题，0 = 亮色；不传时下面按 prefers-color-scheme 跟随系统
+     */
+    (function () {
+      var params = null;
+      try {
+        params = new URLSearchParams(window.location.search);
+      } catch (e) {
+        params = null;
+      }
+      function param(key) {
+        return params ? params.get(key) : null;
+      }
+
+      var icon = document.querySelector('.ali-icon');
+
+      // 兜底码点：万一宿主查询串没传进来（老内核 / 路径处理差异、或图标名不在表里），
+      // 至少还能看见一个图标，不至于全空白。
+      // 码点由 gen-demo.mjs 从**图标表里真实存在的**图标（iconfont.config.mjs 的 fallbackIcon）
+      // 查出后写在这里，**不要手改成一个表外码点**：表外码点当前字体里也许有字形，
+      // 但换库重建字体后就没了，兜底会渲染成豆腐块，等于白兜。
+      var FALLBACK_CODE = 'E602';
+      var code = parseInt(param('code') || FALLBACK_CODE, 16);
+      if (isNaN(code) || code <= 0) {
+        code = parseInt(FALLBACK_CODE, 16);
+      }
+      // 图标码点都在 BMP 内（< 0x10000），老内核没有 fromCodePoint 时用 fromCharCode 等价
+      icon.textContent =
+        typeof String.fromCodePoint === 'function'
+          ? String.fromCodePoint(code)
+          : String.fromCharCode(code);
+
+      var size = parseFloat(param('size'));
+      if (!isNaN(size) && size > 0) {
+        icon.style.fontSize = size + 'px';
+      }
+
+      // 深色：宿主参数优先；取不到参数时跟随系统深浅色
+      var dark;
+      var q = param('dark');
+      if (q === '1') {
+        dark = true;
+      } else if (q === '0') {
+        dark = false;
+      } else {
+        try {
+          dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        } catch (e2) {
+          dark = false;
+        }
+      }
+      if (dark) {
+        document.body.className = 'is-dark';
+      }
+    })();
+  </script>
+</body>
+</html>

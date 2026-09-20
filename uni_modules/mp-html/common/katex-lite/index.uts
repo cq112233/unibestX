@@ -82,11 +82,20 @@ export type KatexLayout = {
 };
 
 /**
- * 文本盒「上边缘 → 基线」的距离系数：`基线偏移 = 0.84 × 字号`。
+ * 文本盒的 `line-height` 相对字号的倍数 —— **组件渲染文本盒时必须用同一个数**。
  *
- * 组件给文本盒写的是 `line-height = font-size`，此时文本盒内的基线位置是
- * 「半行距 + 字体升部」，只与字号成正比，所以可以用一个常数描述（Roboto 升部 0.927 /
- * 降部 0.244 → (1 + 0.927 - 0.244) / 2 ≈ 0.84）。换字体族时改这一个数即可。
+ * 取 1.15 而不是 1：盒高贴到字号上时，`(`、`∫` 这类降部比基线余量更深的字形会被原生
+ * 文本盒裁掉，上下各留 0.075em 余量更稳。`renderKatex` 算容器高度时也按这个倍数推盒底，
+ * 两边不同步就会出现「公式最后一行探出容器被裁掉」——二次方程求根公式的 `2a` 就是这么丢的。
+ */
+export const KATEX_LINE_HEIGHT_RATIO: number = 1.15;
+
+/**
+ * 文本盒「上边缘 → 基线」的距离系数：`基线偏移 = KATEX_BASELINE_RATIO × 字号`。
+ *
+ * 文本盒内的基线位置是「半行距 + 字体升部」，只与字号成正比，所以可以用一个常数描述。
+ * 0.84 是 Roboto 在实际行高下的实测值（升部 0.927 / 降部 0.244 的理论值是 0.92 上下），
+ * 换字体族、或改 KATEX_LINE_HEIGHT_RATIO，这个数都要重新标定。
  */
 export const KATEX_BASELINE_RATIO: number = 0.84;
 
@@ -1168,6 +1177,21 @@ function splitMatrix(body: string, isRow: boolean): Array<string> {
 /** 数学轴线高度（分式线、居中符号围绕它上下分布） */
 const AXIS: number = 0.25;
 
+/**
+ * 大运算符堆叠上下限时用的「墨迹盒」（em，相对算子自身字号）。
+ *
+ * `glyphMetrics` 给 ∑ 这类字符的是含留白的度量盒（高 0.85 / 降部 0.2em），
+ * 而字形真正画出来的墨迹只到 0.7em 高、底边坐在基线上（没有降部）。
+ * 照留白盒去贴上下限，上下各会被凭空推远 0.15em + 0.16em —— 实测
+ * `\sum_{n=1}^{\infty}` 的 ∞ 与 Σ 之间空了约 15px、n=1 空了约 17px，
+ * 明显比 KaTeX 松。堆叠定位改用墨迹盒。
+ */
+const BIGOP_INK_HEIGHT: number = 0.7;
+const BIGOP_INK_DEPTH: number = 0.04;
+
+/** 堆叠上下限与算子墨迹之间的净空（em，相对基准字号） */
+const BIGOP_LIMIT_GAP: number = 0.1;
+
 /** 算一个盒子的尺寸，并给它的子盒子定坐标（坐标相对本盒「左边缘 + 基线」） */
 function layoutNode(n: MNode, parentEm: number): void {
   if (n.kind == 'rule') {
@@ -1383,16 +1407,23 @@ function layoutScript(n: MNode, em: number): void {
 /** 大运算符：∑ 类上下限堆叠，∫ 类上下限侧挂 */
 function layoutBigop(n: MNode, em: number): void {
   const op: MNode = childAt(n, 0);
-  const opScale: number = n.scale > 0 ? n.scale : 1.35;
-  layoutNode(op, em * opScale);
+  // 字号口径必须与摊平（collectBoxes）完全一致，否则「算多大」和「画多大」会对不上：
+  // - 算子：layoutNode 已经把 n.scale（∑ 类算子的显示倍率 1.35）乘进 em 了，
+  //   这里直接用 em；再乘一次就是 1.35² —— 实测 Σ 按 32.8px 排版、却按 24.3px 绘制，
+  //   于是上下限被凭空推远、`n = 1` 的间距也被拉松。
+  // - 上下限：字号基准是「大运算符节点的父级字号」= em / n.scale（侧挂的 ∫ 同理），
+  //   与 collectBoxes 里传的 parentEm 对应。
+  const opScale: number = n.scale > 0 ? n.scale : 1;
+  layoutNode(op, em);
+  const limitEm: number = em / opScale;
 
   const sup: MNode | null = n.sup;
   const sub: MNode | null = n.sub;
   if (sup != null) {
-    layoutNode(sup, em);
+    layoutNode(sup, limitEm);
   }
   if (sub != null) {
-    layoutNode(sub, em);
+    layoutNode(sub, limitEm);
   }
 
   let width: number = op.width;
@@ -1400,6 +1431,12 @@ function layoutBigop(n: MNode, em: number): void {
   let depth: number = op.depth;
 
   if (n.mode == 'stack') {
+    // 上下限贴的是算子的「墨迹盒」而不是度量表给的「留白盒」（原因见 BIGOP_INK_HEIGHT）：
+    // 只有 ∑∏∐⋃⋂ 这类单字符大运算符有墨迹实测值，\lim 这种多字符算子仍按自己的度量盒走。
+    const isBigGlyph: boolean = op.kind == 'sym' && BIGOP_CHARS.includes(op.text);
+    const opH: number = isBigGlyph ? BIGOP_INK_HEIGHT * em : op.height;
+    const opD: number = isBigGlyph ? BIGOP_INK_DEPTH * em : op.depth;
+    const gap: number = BIGOP_LIMIT_GAP * limitEm;
     // 先把最终宽度定下来，再居中 —— 否则「子行比算子宽」时，先算的那个会被按旧宽度居中
     let stackW: number = op.width;
     if (sup != null && sup.width > stackW) {
@@ -1408,15 +1445,17 @@ function layoutBigop(n: MNode, em: number): void {
     if (sub != null && sub.width > stackW) {
       stackW = sub.width;
     }
+    height = opH;
+    depth = opD;
     if (sup != null) {
       sup.x = (stackW - sup.width) / 2;
-      sup.y = -(op.height + 0.18 * em) - sup.depth;
-      height = op.height + 0.18 * em + sup.height + sup.depth;
+      sup.y = -(opH + gap) - sup.depth;
+      height = opH + gap + sup.height + sup.depth;
     }
     if (sub != null) {
       sub.x = (stackW - sub.width) / 2;
-      sub.y = op.depth + 0.18 * em + sub.height;
-      depth = op.depth + 0.18 * em + sub.height + sub.depth;
+      sub.y = opD + gap + sub.height;
+      depth = opD + gap + sub.height + sub.depth;
     }
     op.x = (stackW - op.width) / 2;
     op.y = 0;
@@ -1725,7 +1764,20 @@ export function renderKatex(latex: string, fontSize: number): KatexLayout {
         boxes[i].top = round2(boxes[i].top - minTop);
       }
     }
-    result.height = round2(root.height + root.depth - minTop);
+    // 容器高度按「文本盒的盒底」收口，而不是盒子模型算出来的字形降部：
+    // 盒高是 KATEX_LINE_HEIGHT_RATIO 个字号，盒底比基线低 (比例 - 基线系数) em，
+    // 比字形降部（数字、字母只有 0.02~0.05em）更深。只按字形算，
+    // 最深那一行会整块探出容器被裁掉 —— 二次方程求根公式的 `2a` 就是这样被挡住的。
+    let bottom: number = root.height + root.depth;
+    for (let i: number = 0; i < boxes.length; i++) {
+      if (boxes[i].kind == 'text') {
+        const boxBottom: number = boxes[i].top + KATEX_LINE_HEIGHT_RATIO * boxes[i].fontSize;
+        if (boxBottom > bottom) {
+          bottom = boxBottom;
+        }
+      }
+    }
+    result.height = round2(bottom - minTop);
   }
   catch (e) {
     // 排版失败不该让页面白屏：兜底成「一行源码文本」，同时把错误信息交给调用方

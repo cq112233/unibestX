@@ -100,9 +100,46 @@ const DEMO_TEXT: string = '## 流式 Markdown 与全功能排版\n\n'
   + '$$\n\n'
   + '流式传输与自动排版完成。\n';
 
+/** 已接收到的完整内容（每个 chunk 都增长，不直接驱动渲染） */
+let receivedText = '';
+
+/**
+ * 已交给 mp-html 渲染的内容快照 —— **只在块边界推进**，不是每个 chunk 都推进。
+ *
+ * 为什么必须这样：Markdown 分块到达时，末尾那个块（`<video>`、```mermaid、`$$…$$`、表格）
+ * 常常只到了一半，此时块结构还没确定。若每个 chunk 都重渲染，同一个节点会在
+ * 渲染分支之间「搬家」——最典型的就是 `<video>`：`</p>` 还没到齐时 parseHtml 里
+ * `closePos == -1` 会把标签当顶层节点吐出（走顶层 video 分支），等 `</p>` 到齐它又变成
+ * `<p>` 的子节点（走嵌套 video 分支）。原生组件于是被**销毁 → 重建**，
+ * 在 Android Vapor 上重建时会拿到已释放的原生实例 id，直接抛
+ * `IllegalStateException: UTS instance N is not registered`
+ * （栈里 `codec` / `duration` 是 <video> 初始化时才会全量写一遍的私有 props，见 unibestX-skill 1.3.23）。
+ *
+ * 按空行（块边界）推进即回避整类问题：交给 mp-html 的每一份快照，块结构都是完整的。
+ * 附带收益：每秒重解析次数从 25 次降到几次。
+ */
 const streamText = ref<string>('');
 const streamPlaying = ref<boolean>(false);
+/** 是否已经收到过数据（比 streamText 更早翻转，用于第一块到齐前就切掉空状态文案） */
+const hasReceived = ref<boolean>(false);
 let streamSub: Subscription | null = null;
+
+/**
+ * 取「最后一个完整块」结尾的位置（末尾那次 `\n\n` 之后），没有则返回 -1。
+ *
+ * 用 lastIndexOf 而不是判断整串是否以 `\n\n` 结尾：分块是 8 个字符一块，
+ * 空行大多落在块中间，`endsWith` 会漏掉绝大多数块边界，流式会变成几次大跳。
+ */
+function lastBlockBoundary(text: string): number {
+  const cut = text.lastIndexOf('\n\n');
+  return cut < 0 ? -1 : cut + 2;
+}
+
+function resetStreamState(): void {
+  receivedText = '';
+  streamText.value = '';
+  hasReceived.value = false;
+}
 
 function stopStream(): void {
   if (streamSub != null) {
@@ -114,13 +151,24 @@ function stopStream(): void {
 
 function startStream(): void {
   stopStream();
-  streamText.value = '';
+  resetStreamState();
   streamPlaying.value = true;
-  streamSub = simulateStream(DEMO_TEXT, 8, 40)
+  // 吐字节奏：8 字/块 × 90ms ≈ 89 字/秒；原 40ms 一块约 200 字/秒，滚动太快跟不上阅读。
+  // 分块大小保持 8 —— lastBlockBoundary 的注释也是按 8 字一块写的。
+  streamSub = simulateStream(DEMO_TEXT, 8, 90)
     .pipe(scan((acc: string, chunk: StreamChunk): string => acc + chunk.text, ''))
     .subscribe((full: string): void => {
-      streamText.value = full;
+      receivedText = full;
+      hasReceived.value = true;
+      // 只把「最后一个完整块」为止的内容交给渲染器：半截块永不进渲染，
+      // 避免节点在渲染分支之间搬家、原生组件被销毁重建（详见 streamText 的说明）
+      const boundary = lastBlockBoundary(full);
+      if (boundary > streamText.value.length) {
+        streamText.value = full.substring(0, boundary);
+      }
     }, null, (): void => {
+      // 收尾：把最后不足一个块边界的尾巴也渲染出来
+      streamText.value = receivedText;
       streamPlaying.value = false;
     });
 }
@@ -136,11 +184,11 @@ function handleToggleStream(): void {
 
 function handleClear(): void {
   stopStream();
-  streamText.value = '';
+  resetStreamState();
 }
 
 const streamEmpty = computed((): boolean => {
-  return streamText.value.length == 0;
+  return !hasReceived.value;
 });
 
 const streamHtml = computed((): string => {

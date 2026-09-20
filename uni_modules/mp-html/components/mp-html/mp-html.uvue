@@ -33,6 +33,27 @@
          上游把行内样式整体拼进动态 :style，本项目第 8 条已统一成静态 class；
          颜色来自**内容**、没法预先写成 class，所以单独保留这一处动态样式，
          取值格式在解析阶段收窄（#hex / rgb() / rgba() / 少量具名色），详见 unibestX-skill 1.3.9。
+     11) Mermaid 全屏查看器的 min-height/min-width/max-width:100% 改为 flex:1 / width:100% + box-sizing。
+         原生端 min-*/max-* 只认 number|px，百分比会被静默忽略（构建期 3 条 warn，运行期直接失效）：
+         画布比屏幕小时不再垂直居中、比屏幕宽时横向滚动区撑不出屏幕、不可滚。
+         详见 unibestX-skill 1.2.22。
+     12) Mermaid 全屏查看器由「两层 scroll-view 双向滚动」改为「手指拖动平移」（第 11 条的
+         两层 scroll-view 一并拆掉）：画布夹在中间层 view 里时，H5 的 uni-view 自带
+         overflow:hidden 会把溢出裁掉、滚动层量不到真实内容宽度；App 端嵌套 scroll-view 的
+         手势也常被外层吃掉。放大到 3× 后既滚不动也拖不动，等于看不了。现在直接用
+         touchstart/move/end 的位移量改画布的 left/top，全端行为一致，切档位自动回正。
+         画布渲染见 renderMermaidLayout / viewerLayout，平移见 onViewerTouchMove。
+     13) 公式 / 流程图的**图元层**全部加 flatten 拍平（正文里的 4 处渲染点，共 10 个 v-for）：
+        一个公式或流程图就是几十个绝对定位的小 box，一个个都创建独立原生 View 太浪费。
+        拍平后它们只作为绘制指令并进容器，不占原生节点（详见 unibestX-skill 1.3.24）。
+          - 只拍**叶子图元**，容器（rootStyle 那个 position:relative 的 view）**绝不能拍**：
+            它一被拍掉，子图元的 position:absolute 就没有了定位参照物。
+          - 前置条件逐条核对过：这些图元既没有挂事件，样式里也没有 z-index / visibility /
+            background-image / display:fixed（拍平会让这些**静默失效**）。
+          - **全屏查看器里的图元没拍**（`viewerLayout.ruleBoxes` / `bgBoxes` / `textBoxes` 那三行）：它的容器每次 touchmove 都在改
+            left/top，拍平与「移动中的相对定位容器」如何叠加尚未实测，先不动。
+          - ⚠️ 尚未真机验证：拍平对 position:absolute 图元的定位/绘制顺序有无影响，官方文档
+            没有正面说明。若真机上发现公式或流程图错位，**删掉这 10 个 flatten 即可回退**。
     -->
     <!-- 渲染节点树 -->
     <template v-for="(n, i) in localNodes" :key="i">
@@ -47,16 +68,16 @@
       <!-- KaTeX 数学公式原生渲染 -->
       <view v-else-if="n.name == 'katex'" style="display:flex;flex-direction:row;justify-content:center;margin:12px 0;width:100%">
         <view :style="getOrComputeFormulaLayout(n).rootStyle">
-          <text v-for="(box, bi) in getOrComputeFormulaLayout(n).textBoxes" :key="`kt${bi}`" :style="box.style">{{ box.text }}</text>
-          <view v-for="(box, bi) in getOrComputeFormulaLayout(n).ruleBoxes" :key="`kr${bi}`" :style="box.style" />
+          <text v-for="(box, bi) in getOrComputeFormulaLayout(n).textBoxes" :key="`kt${bi}`" :style="box.style" flatten>{{ box.text }}</text>
+          <view v-for="(box, bi) in getOrComputeFormulaLayout(n).ruleBoxes" :key="`kr${bi}`" :style="box.style" flatten />
         </view>
       </view>
       <!-- Mermaid 流程图原生渲染：先连线在底层、再节点框压住端点、最后文字在最顶层，支持点击放大 -->
       <view v-else-if="n.name == 'mermaid'" style="display:flex;flex-direction:column;align-items:center;margin:12px 0;width:100%" @tap="openMermaidViewer(getMermaidCode(n))">
         <view :style="getOrComputeMermaidLayout(n).rootStyle">
-          <view v-for="(box, bi) in getOrComputeMermaidLayout(n).ruleBoxes" :key="`mr${bi}`" :style="box.style" />
-          <view v-for="(box, bi) in getOrComputeMermaidLayout(n).bgBoxes" :key="`mb${bi}`" :style="box.style" />
-          <text v-for="(box, bi) in getOrComputeMermaidLayout(n).textBoxes" :key="`mt${bi}`" :style="box.style">{{ box.text }}</text>
+          <view v-for="(box, bi) in getOrComputeMermaidLayout(n).ruleBoxes" :key="`mr${bi}`" :style="box.style" flatten />
+          <view v-for="(box, bi) in getOrComputeMermaidLayout(n).bgBoxes" :key="`mb${bi}`" :style="box.style" flatten />
+          <text v-for="(box, bi) in getOrComputeMermaidLayout(n).textBoxes" :key="`mt${bi}`" :style="box.style" flatten>{{ box.text }}</text>
         </view>
         <text style="font-size:10px;color:#94a3b8;margin-top:6px">Mermaid 原生排版 · 点击放大查看</text>
       </view>
@@ -118,16 +139,16 @@
           <!-- 嵌套 KaTeX 公式与 Mermaid 流程图 -->
           <view v-else-if="cn.name == 'katex'" style="display:flex;flex-direction:row;justify-content:center;margin:12px 0;width:100%">
             <view :style="getOrComputeFormulaLayout(cn).rootStyle">
-              <text v-for="(box, bi) in getOrComputeFormulaLayout(cn).textBoxes" :key="`ckt${bi}`" :style="box.style">{{ box.text }}</text>
-              <view v-for="(box, bi) in getOrComputeFormulaLayout(cn).ruleBoxes" :key="`ckr${bi}`" :style="box.style" />
+              <text v-for="(box, bi) in getOrComputeFormulaLayout(cn).textBoxes" :key="`ckt${bi}`" :style="box.style" flatten>{{ box.text }}</text>
+              <view v-for="(box, bi) in getOrComputeFormulaLayout(cn).ruleBoxes" :key="`ckr${bi}`" :style="box.style" flatten />
             </view>
           </view>
           <!-- Mermaid 流程图原生渲染：先连线在底层、再节点框压住端点、最后文字在最顶层，支持点击放大 -->
           <view v-else-if="cn.name == 'mermaid'" style="display:flex;flex-direction:column;align-items:center;margin:12px 0;width:100%" @tap="openMermaidViewer(getMermaidCode(cn))">
             <view :style="getOrComputeMermaidLayout(cn).rootStyle">
-              <view v-for="(box, bi) in getOrComputeMermaidLayout(cn).ruleBoxes" :key="`cmr${bi}`" :style="box.style" />
-              <view v-for="(box, bi) in getOrComputeMermaidLayout(cn).bgBoxes" :key="`cmb${bi}`" :style="box.style" />
-              <text v-for="(box, bi) in getOrComputeMermaidLayout(cn).textBoxes" :key="`cmt${bi}`" :style="box.style">{{ box.text }}</text>
+              <view v-for="(box, bi) in getOrComputeMermaidLayout(cn).ruleBoxes" :key="`cmr${bi}`" :style="box.style" flatten />
+              <view v-for="(box, bi) in getOrComputeMermaidLayout(cn).bgBoxes" :key="`cmb${bi}`" :style="box.style" flatten />
+              <text v-for="(box, bi) in getOrComputeMermaidLayout(cn).textBoxes" :key="`cmt${bi}`" :style="box.style" flatten>{{ box.text }}</text>
             </view>
             <text style="font-size:10px;color:#94a3b8;margin-top:6px">Mermaid 原生排版 · 点击放大查看</text>
           </view>
@@ -149,32 +170,29 @@
       style="position:fixed;top:0;left:0;right:0;bottom:0;background-color:rgba(15,23,42,0.88);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center"
       @click="closeMermaidViewer"
     >
-      <!-- 双向滚动承载区（水平+垂直居中展示，点击空白深色区也可关闭） -->
-      <scroll-view
-        direction="vertical"
-        style="width:100%;flex:1;display:flex;flex-direction:column"
+      <!-- 画布承载区：手指拖动平移（点击空白深色区也可关闭）。
+           原来这里套了两层 scroll-view 想靠原生滚动「双向滚动查看」，实测滚不动：
+           溢出元素被夹在中间层 view 里，H5 的 uni-view 自带 overflow:hidden 会把溢出裁掉，
+           滚动层量不到真实内容宽度（详见 unibestX-skill 1.2.22）；App 端嵌套 scroll-view
+           的手势也常被外层吃掉。改成「手指位移 → 画布 left/top 偏移」，全端行为一致。
+           带 padding 的元素一律补 box-sizing:border-box，否则 width:100% + padding 会溢出（见 1.2.12）。 -->
+      <view
+        style="flex:1;width:100%;box-sizing:border-box;display:flex;flex-direction:row;justify-content:center;align-items:center;padding:72px 16px 84px 16px"
+        @click="closeMermaidViewer"
       >
         <view
-          style="min-height:100%;width:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:72px 16px 84px 16px"
-          @click="closeMermaidViewer"
+          :style="viewerCanvasStyle"
+          @touchstart="onViewerTouchStart"
+          @touchmove="onViewerTouchMove"
+          @touchend="onViewerTouchEnd"
+          @touchcancel="onViewerTouchEnd"
+          @click.stop=""
         >
-          <scroll-view
-            direction="horizontal"
-            style="max-width:100%;display:flex;flex-direction:row"
-          >
-            <view
-              style="min-width:100%;display:flex;flex-direction:row;justify-content:center;align-items:center;padding:12px"
-              @click="closeMermaidViewer"
-            >
-              <view :style="viewerLayout.rootStyle" @click.stop="">
-                <view v-for="(box, bi) in viewerLayout.ruleBoxes" :key="`vmr${bi}`" :style="box.style" />
-                <view v-for="(box, bi) in viewerLayout.bgBoxes" :key="`vmb${bi}`" :style="box.style" />
-                <text v-for="(box, bi) in viewerLayout.textBoxes" :key="`vmt${bi}`" :style="box.style">{{ box.text }}</text>
-              </view>
-            </view>
-          </scroll-view>
+          <view v-for="(box, bi) in viewerLayout.ruleBoxes" :key="`vmr${bi}`" :style="box.style" />
+          <view v-for="(box, bi) in viewerLayout.bgBoxes" :key="`vmb${bi}`" :style="box.style" />
+          <text v-for="(box, bi) in viewerLayout.textBoxes" :key="`vmt${bi}`" :style="box.style">{{ box.text }}</text>
         </view>
-      </scroll-view>
+      </view>
 
       <!-- 右上角关闭按钮（置于顶层，拥有最高 z-index 与 44px 舒适热区） -->
       <view
@@ -211,7 +229,7 @@
 import { ref, computed, watch, onMounted } from 'vue'
 import { highlightCode } from './code-highlight.uts'
 import type { CodeSeg } from './code-highlight.uts'
-import { renderKatex } from '../../common/katex-lite/index.uts'
+import { renderKatex, KATEX_LINE_HEIGHT_RATIO } from '../../common/katex-lite/index.uts'
 import type { KatexLayout, KatexBox } from '../../common/katex-lite/index.uts'
 import { renderMermaid } from '../../common/mermaid-lite/index.uts'
 import type { MermaidLayout, MermaidShape } from '../../common/mermaid-lite/index.uts'
@@ -246,7 +264,10 @@ function renderFormulaLayout(latex: string): MpElementLayout {
   for (let i = 0; i < boxes.length; i++) {
     const box = boxes[i]
     if (box.kind == 'text') {
-      const lh = Math.round(box.fontSize * 1.15)
+      // line-height 必须取 katex-lite 的 KATEX_LINE_HEIGHT_RATIO，且不要再四舍五入：
+      // 公式容器的 height 就是按这个倍数推「盒底」算出来的，两边取整不一致时
+      // 最深那行仍会探出容器（差 0.33px 就能把 `2a` 的下缘压掉）。
+      const lh = box.fontSize * KATEX_LINE_HEIGHT_RATIO
       let style = `position:absolute;top:${box.top}px;left:${box.x}px;font-size:${box.fontSize}px;line-height:${lh}px;color:#0f172a;`
       if (box.italic) style += 'font-style:italic;'
       textBoxes.push({ text: box.text, style } as MpRenderBox)
@@ -1124,27 +1145,52 @@ const viewerMermaidSource = ref<string>('')
 const viewerZoomIndex = ref<number>(1)
 const ZOOM_STEPS: number[] = [1, 1.5, 2, 3]
 
+/** 查看器里画布的手指平移量（px，挂到画布的 left/top 上） */
+const viewerPanX = ref<number>(0)
+const viewerPanY = ref<number>(0)
+let panStartX: number = 0;
+let panStartY: number = 0;
+let panBaseX: number = 0;
+let panBaseY: number = 0;
+let panDragging: boolean = false;
+
+type MpTouchPoint = {
+  x: number
+  y: number
+}
+
 function openMermaidViewer(source: string): void {
   if (source.trim().length == 0) return
   viewerMermaidSource.value = source
   viewerZoomIndex.value = 1
+  resetViewerPan()
   emit('mermaidtap', source)
 }
 
 function closeMermaidViewer(): void {
   viewerMermaidSource.value = ''
+  panDragging = false
 }
 
 function zoomIn(): void {
   if (viewerZoomIndex.value < ZOOM_STEPS.length - 1) {
     viewerZoomIndex.value++
+    resetViewerPan()
   }
 }
 
 function zoomOut(): void {
   if (viewerZoomIndex.value > 0) {
     viewerZoomIndex.value--
+    resetViewerPan()
   }
+}
+
+/** 切档位后把画布摆回居中，否则放大后还停在上一档的偏移上，容易「一放大就跑没了」 */
+function resetViewerPan(): void {
+  viewerPanX.value = 0
+  viewerPanY.value = 0
+  panDragging = false
 }
 
 const viewerZoomText = computed((): string => {
@@ -1152,6 +1198,46 @@ const viewerZoomText = computed((): string => {
   return `${step}× (${Math.round(12 * step)}px)`
 })
 
+/** 取第一个触点的屏幕坐标（touches 为空时退回 changedTouches，与 lime-signature 同一套写法） */
+function viewerTouchPoint(e: UniTouchEvent): MpTouchPoint | null {
+  const touches = e.touches.length > 0 ? e.touches : e.changedTouches
+  if (touches.length == 0) return null
+  const touch = touches[0]
+  return { x: touch.clientX, y: touch.clientY } as MpTouchPoint
+}
+
+/** 限幅：最多让画布整体挪出一个自身尺寸，保证怎么拖都还能再拖回来 */
+function clampViewerPan(v: number, size: number): number {
+  const limit: number = size > 0 ? size : 0
+  if (v > limit) return limit
+  if (v < -limit) return -limit
+  return v
+}
+
+function onViewerTouchStart(e: UniTouchEvent): void {
+  const p: MpTouchPoint | null = viewerTouchPoint(e)
+  if (p == null) return
+  panDragging = true
+  panStartX = p.x
+  panStartY = p.y
+  panBaseX = viewerPanX.value
+  panBaseY = viewerPanY.value
+}
+
+function onViewerTouchMove(e: UniTouchEvent): void {
+  if (!panDragging) return
+  const p: MpTouchPoint | null = viewerTouchPoint(e)
+  if (p == null) return
+  const canvas: MpElementLayout = viewerLayout.value
+  viewerPanX.value = clampViewerPan(panBaseX + (p.x - panStartX), canvas.width)
+  viewerPanY.value = clampViewerPan(panBaseY + (p.y - panStartY), canvas.height)
+}
+
+function onViewerTouchEnd(_e: UniTouchEvent): void {
+  panDragging = false
+}
+
+/** 查看器里的画布：按当前档位重新排版 mermaid（字号 = 12 × 档位） */
 const viewerLayout = computed((): MpElementLayout => {
   if (viewerMermaidSource.value.length == 0) {
     return { width: 0, height: 0, rootStyle: '', bgBoxes: [] as MpRenderBox[], textBoxes: [] as MpRenderBox[], ruleBoxes: [] as MpRenderBox[] } as MpElementLayout
@@ -1183,6 +1269,12 @@ const viewerLayout = computed((): MpElementLayout => {
     textBoxes,
     ruleBoxes
   } as MpElementLayout
+})
+
+/** 画布定位：mermaid-lite 给的 rootStyle（position:relative + 宽高）再叠上手指平移量 */
+const viewerCanvasStyle = computed((): string => {
+  const canvas: MpElementLayout = viewerLayout.value
+  return canvas.rootStyle + `left:${viewerPanX.value}px;top:${viewerPanY.value}px;`
 })
 
 watch((): string => props.content, (val: string) => {
