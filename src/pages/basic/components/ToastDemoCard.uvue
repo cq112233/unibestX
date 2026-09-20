@@ -1,5 +1,20 @@
 <template>
-  <Card title="全局 Toast 轻提示">
+  <view
+    class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid"
+    :style="{
+      backgroundColor: 'var(--card-bg, #ffffff)',
+      borderColor: 'var(--border-color, #edf2f7)'
+    }"
+  >
+    <!-- 标题区域 -->
+    <view class="flex flex-row items-center mb-[16px]">
+      <view
+        class="w-[4px] h-[16px] rounded-[2px] mr-[8px]"
+        :style="{ backgroundColor: 'var(--theme-color, #3182ce)' }"
+      />
+      <text class="text-[16px] font-bold" :style="{ color: 'var(--text-color, #2d3748)' }">全局 Toast 轻提示</text>
+    </view>
+
     <!-- 说明区域 -->
     <view class="rounded-[12px] p-[16px] mb-[16px] border-[1px] border-solid border-[#e2e8f0]">
       <text class="text-[12px] text-[#64748b] leading-[20px]">
@@ -39,11 +54,10 @@
         </view>
       </view>
     </view>
-  </Card>
+  </view>
 </template>
 
 <script setup lang="uts">
-import Card from './Card.uvue';
 import { toast, toastError, toastSuccess, toastWarning } from '@/src/utils/toast';
 
 function handleDefaultToast() {

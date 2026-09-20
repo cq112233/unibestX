@@ -1,5 +1,20 @@
 <template>
-  <Card title="uview-ultra 组件库">
+  <view
+    class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid"
+    :style="{
+      backgroundColor: 'var(--card-bg, #ffffff)',
+      borderColor: 'var(--border-color, #edf2f7)'
+    }"
+  >
+    <!-- 标题区域 -->
+    <view class="flex flex-row items-center mb-[16px]">
+      <view
+        class="w-[4px] h-[16px] rounded-[2px] mr-[8px]"
+        :style="{ backgroundColor: 'var(--theme-color, #3182ce)' }"
+      />
+      <text class="text-[16px] font-bold" :style="{ color: 'var(--text-color, #2d3748)' }">uview-ultra 组件库</text>
+    </view>
+
     <view class="flex-col mb-[16px]">
       <text class="text-[13px] text-[#64748b] leading-[18px] mb-[12px]">
         uview-ultra 是一款专为 uni-app X 设计的高品质 UI 组件库，高度适配 UTS 强类型系统与原生跨端开发，包含按钮、表单、反馈等丰富且精美的组件集。
@@ -34,12 +49,10 @@
     >
       <text class="text-[#ffffff] text-[14px] font-bold">进入 uview-ultra 示例</text>
     </view>
-  </Card>
+  </view>
 </template>
 
 <script setup lang="uts">
-import Card from './Card.uvue';
-
 function copyWebsiteUrl() {
   uni.setClipboardData({
     data: 'https://uview-ultra.lingyun.net/',
