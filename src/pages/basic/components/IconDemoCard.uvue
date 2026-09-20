@@ -1,6 +1,19 @@
 <template>
-  <!-- 使用封装 of Card 组件 -->
-  <Card :title="iconDemoTitle">
+  <view
+    class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid"
+    :style="{
+      backgroundColor: 'var(--card-bg, #ffffff)',
+      borderColor: 'var(--border-color, #edf2f7)'
+    }"
+  >
+    <!-- 标题区域 -->
+    <view class="flex flex-row items-center mb-[16px]">
+      <view
+        class="w-[4px] h-[16px] rounded-[2px] mr-[8px]"
+        :style="{ backgroundColor: 'var(--theme-color, #3182ce)' }"
+      />
+      <text class="text-[16px] font-bold" :style="{ color: 'var(--text-color, #2d3748)' }">{{ iconDemoTitle }}</text>
+    </view>
     <!-- uni-icon 示例 -->
     <view class="flex-row items-center justify-between py-[12px]">
       <view class="flex-row items-center">
@@ -41,13 +54,10 @@
         <text class="text-[12px]" :style="{ color: 'var(--text-secondary, #94a3b8)' }">circle</text>
       </view>
     </view>
-
-    <view class="h-[1px]" :style="{ backgroundColor: 'var(--border-color, #f1f5f9)' }" />
-  </Card>
+  </view>
 </template>
 
 <script setup lang="uts">
-import Card from './Card.uvue';
 import { computed } from 'vue';
 import { $t } from '@/src/utils/i18n/index.uts';
 

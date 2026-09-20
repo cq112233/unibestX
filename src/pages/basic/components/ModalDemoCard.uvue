@@ -1,5 +1,19 @@
 <template>
-  <Card title="全屏遮罩弹窗（覆盖全屏）">
+  <view
+    class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid"
+    :style="{
+      backgroundColor: 'var(--card-bg, #ffffff)',
+      borderColor: 'var(--border-color, #edf2f7)'
+    }"
+  >
+    <!-- 标题区域 -->
+    <view class="flex flex-row items-center mb-[16px]">
+      <view
+        class="w-[4px] h-[16px] rounded-[2px] mr-[8px]"
+        :style="{ backgroundColor: 'var(--theme-color, #3182ce)' }"
+      />
+      <text class="text-[16px] font-bold" :style="{ color: 'var(--text-color, #2d3748)' }">全屏遮罩弹窗（覆盖全屏）</text>
+    </view>
     <!-- 说明与控制面板 -->
     <view
       class="rounded-[10px] p-[12px] border-[1px] border-solid"
@@ -54,13 +68,12 @@
         </text>
       </view>
     </TabbarMaskModal>
-  </Card>
+  </view>
 </template>
 
 <script setup lang="uts">
 import { computed, ref } from 'vue';
 import { useAppStore } from '@/src/store';
-import Card from './Card.uvue';
 import TabbarMaskModal from '@/src/components/TabbarMaskModal/TabbarMaskModal.uvue';
 
 const appStore = useAppStore();

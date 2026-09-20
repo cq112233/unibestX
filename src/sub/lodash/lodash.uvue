@@ -1,6 +1,20 @@
 <template>
   <view class="flex flex-col p-[16px]" :class="isDark ? 'bg-[#0f172a]' : 'bg-[#f8fafc]'">
-    <Card title="Lodash 工具库 (iRainna-lodash)">
+    <view
+      class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid"
+      :style="{
+        backgroundColor: 'var(--card-bg, #ffffff)',
+        borderColor: 'var(--border-color, #edf2f7)'
+      }"
+    >
+      <!-- 标题区域 -->
+      <view class="flex flex-row items-center mb-[16px]">
+        <view
+          class="w-[4px] h-[16px] rounded-[2px] mr-[8px]"
+          :style="{ backgroundColor: 'var(--theme-color, #3182ce)' }"
+        />
+        <text class="text-[16px] font-bold" :style="{ color: 'var(--text-color, #2d3748)' }">Lodash 工具库 (iRainna-lodash)</text>
+      </view>
       <!-- 1. 数组处理演示 (chunk, uniq, shuffle) -->
       <view class="rounded-[12px] p-[16px] mb-[16px] border-[1px] border-solid border-[#e2e8f0]">
         <text class="text-[13px] font-bold text-[#1e293b] mb-[8px]">1. 数组切片去重与随机打乱 (chunk, uniq, shuffle)</text>
@@ -119,13 +133,12 @@
           </view>
         </view>
       </view>
-    </Card>
+    </view>
   </view>
 </template>
 
 <script setup lang="uts">
 import { computed, ref } from 'vue';
-import Card from '@/src/pages/basic/components/Card.uvue';
 import { camelCase, capitalize, chunk, cloneDeep, debounce, get, kebabCase, random, shuffle, uniq } from '@/uni_modules/iRainna-lodash';
 import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/utils/refresh/index.uts';
 import { useAppStore } from '@/src/store';

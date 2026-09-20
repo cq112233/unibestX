@@ -1,0 +1,651 @@
+/**
+ * mermaid-lite：mermaid `graph` / `flowchart` 的纯 UTS 子集排版引擎。
+ *
+ * 为什么不直接用 mermaid：mermaid 是纯 JS 库，uni-app X 的 App 端没有 JS 引擎，跑不起来
+ * （和 marked / KaTeX 同一个问题）；而「远端渲染成图片」（mermaid.ink）那条路要联网、放大就糊、
+ * 字号也不跟页面走，本质还是一张网图。所以这里和 katex-lite 一样自己排版：
+ * 引擎只给图元（框 / 线 / 箭头 / 文字），页面用普通 view 与 text 绝对定位贴上去 ——
+ * 不联网、任意放大都清晰、全端表现一致。
+ *
+ * 支持范围（子集，够画流程图）：
+ * · 图头：graph TD|TB|LR|RL|BT / flowchart TD|LR（缺省 TD；RL/BT 按正向画，不做反向）
+ * · 节点：A[方框]、B(圆角)、C((圆))、D([体育场])、E{菱形}（按方框画）、裸 F（显示 id）
+ * · 连线：A --> B（带箭头）、A --- B（无箭头）、链式 A --> B --> C、边标签 A -->|文字| B（跳过标签）
+ * · 一行多条语句用 ; 分隔；整行 %% 注释
+ *
+ * 不支持（遇到降级，绝不抛异常）：子图 subgraph、classDef / style / click、时序图与状态图等其他图类型、
+ * -.-> / ==> 等特殊连线（按普通连线处理）。流式场景拿到的常是半截语句，解析不出来就整句跳过。
+ */
+
+import { measureTextWidth } from '../katex-lite/index.uts';
+
+// ==========================================
+// 排版常量（除注明 px 外都是 em，排版时乘字号）
+// ==========================================
+/** 节点文字左右内边距 */
+const NODE_PAD_X: number = 0.95;
+/** 节点文字上下内边距 */
+const NODE_PAD_Y: number = 0.5;
+/** 节点最小宽度：标签很短时，框也要有个像样的比例 */
+const NODE_MIN_W: number = 3.8;
+/** 同层节点间距 */
+const SIBLING_GAP: number = 1.1;
+/** 层间距：要给连线与箭头留地方 */
+const LAYER_GAP: number = 1.6;
+/** 箭头长度（沿流向） */
+const ARROW_LEN: number = 0.9;
+/** 箭头最大宽度（垂直流向） */
+const ARROW_W: number = 0.8;
+/** 箭头切几片：原生端没有 path，用递减的矩形拼三角，6 片肉眼看不出台阶 */
+const ARROW_SLICES: number = 6;
+/** 方框节点圆角（px） */
+const RECT_RADIUS: number = 6;
+/** 圆角 / 圆形节点圆角（px）：给一个大于半高的值即等效全圆角 */
+const ROUND_RADIUS: number = 999;
+/** 连线粗细（px） */
+const LINE_THICKNESS: number = 1.5;
+
+/**
+ * 一个排版图元。坐标原点在「图容器」左上角、y 向下为正，
+ * 使用方只需 position:absolute + top / left 贴上去，不用懂任何字体度量与图结构。
+ */
+export type MermaidShape = {
+  /** 'node' 节点框 / 'text' 节点文字 / 'edge' 连线 / 'arrow' 箭头切片 */
+  kind: string;
+  /** 文本内容（只有 kind == 'text' 非空） */
+  text: string;
+  /** 左边缘，px */
+  x: number;
+  /** 上边缘，px */
+  top: number;
+  /** 宽度，px */
+  width: number;
+  /** 高度，px（连线就是线粗，箭头切片是切片高） */
+  height: number;
+  /** 字号（只有 'text' 用，其余为 0） */
+  fontSize: number;
+  /** 圆角半径，px（只有 'node' 用：方框 6、圆角 999） */
+  radius: number;
+};
+
+/** 一张图的排版结果 */
+export type MermaidLayout = {
+  /** 图宽，px */
+  width: number;
+  /** 图高，px */
+  height: number;
+  /** 图元列表：连线在前、节点框在后（先画线再压框，端点才干净） */
+  shapes: Array<MermaidShape>;
+};
+
+// ==========================================
+// 解析用的内部结构
+// ==========================================
+/** 节点（带排版中间量） */
+type MNode = {
+  id: string;
+  text: string;
+  /** 圆角节点（(文本) / ((文本)) / ([文本])） */
+  round: boolean;
+  /** 层号，0 是最上游那层 */
+  layer: number;
+  /** 文字估算宽度，px（居中用） */
+  textWidth: number;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};
+
+/** 一条连线 */
+type MEdge = {
+  from: string;
+  to: string;
+  /** 是否画箭头（--> 画、--- 不画） */
+  arrow: boolean;
+};
+
+/** 解析结果 */
+type MGraph = {
+  nodes: Array<MNode>;
+  edges: Array<MEdge>;
+  /** 'TD' 纵向 / 'LR' 横向 */
+  direction: string;
+};
+
+/** 一个节点声明：A[文本] → id=A、text=文本、round=false、hasLabel=true */
+type MNodeSpec = {
+  id: string;
+  text: string;
+  round: boolean;
+  hasLabel: boolean;
+};
+
+// ==========================================
+// 解析
+// ==========================================
+/** 节点 id → 下标，找不到返回 -1（节点数量很少，线性查找足够） */
+function nodeIndex(nodes: Array<MNode>, id: string): number {
+  for (let i: number = 0; i < nodes.length; i++) {
+    if (nodes[i].id == id) {
+      return i;
+    }
+  }
+  return -1;
+}
+
+/**
+ * 标签原文 → 纯文本：去掉外层引号与 **加粗** / *斜体* / 反引号这类 Markdown 修饰，
+ * <br/> 一律换成空格。原生端一个 <text> 只吃纯文本，富文本标签留给后续版本。
+ */
+function cleanLabel(raw: string): string {
+  let body: string = raw.trim();
+  if (body.length >= 2) {
+    const head: string = body.charAt(0);
+    const tail: string = body.charAt(body.length - 1);
+    if ((head == '"' && tail == '"') || (head == '\'' && tail == '\'')) {
+      body = body.substring(1, body.length - 1);
+    }
+  }
+  let out: string = '';
+  let i: number = 0;
+  while (i < body.length) {
+    const ch: string = body.charAt(i);
+    if (ch == '*' || ch == '`') {
+      i = i + 1;
+      continue;
+    }
+    if (body.substring(i, i + 4) == '<br>') {
+      out += ' ';
+      i = i + 4;
+      continue;
+    }
+    if (body.substring(i, i + 5) == '<br/>') {
+      out += ' ';
+      i = i + 5;
+      continue;
+    }
+    out += ch;
+    i = i + 1;
+  }
+  return out.trim();
+}
+
+/** 标签左括号（[ ( {）的位置，没有则 -1 */
+function firstBracket(spec: string): number {
+  const square: number = spec.indexOf('[');
+  const round: number = spec.indexOf('(');
+  const curly: number = spec.indexOf('{');
+  let at: number = -1;
+  if (square >= 0) {
+    at = square;
+  }
+  if (round >= 0 && (at < 0 || round < at)) {
+    at = round;
+  }
+  if (curly >= 0 && (at < 0 || curly < at)) {
+    at = curly;
+  }
+  return at;
+}
+
+/** 取 [from, len - tail) 之间的内容并清洗 */
+function innerLabel(spec: string, from: number, tail: number): string {
+  const end: number = spec.length - tail;
+  if (end <= from) {
+    return '';
+  }
+  return cleanLabel(spec.substring(from, end));
+}
+
+/** A[文本] / B(圆角) / C((圆)) / D([体育场]) / 裸 E → 节点声明 */
+function parseNodeSpec(spec: string): MNodeSpec {
+  let body: string = spec.trim();
+  // 边标签 -->|文字| B：先把竖线包起来的标签跳掉（标签本身暂不渲染）
+  if (body.startsWith('|')) {
+    const end: number = body.indexOf('|', 1);
+    if (end > 0) {
+      body = body.substring(end + 1).trim();
+    }
+  }
+  const at: number = firstBracket(body);
+  if (at < 0) {
+    // 裸 id：没有标签，就显示 id 本身
+    // ⚠️ 局部量名字不能和下面的 `id` 重名：UTS 会把同一函数里不同块的同名 const 合成一个变量，
+    // 上面这段先执行、声明却在后面，H5 端直接报 `Cannot access 'id' before initialization`
+    const bare: string = body.trim();
+    return { id: bare, text: bare, round: false, hasLabel: false } as MNodeSpec;
+  }
+  const id: string = body.substring(0, at).trim();
+  const rest: string = body.substring(at).trim();
+  if (rest.startsWith('((') && rest.endsWith('))')) {
+    return { id, text: innerLabel(rest, 2, 2), round: true, hasLabel: true } as MNodeSpec;
+  }
+  if (rest.startsWith('([') && rest.endsWith('])')) {
+    return { id, text: innerLabel(rest, 2, 2), round: true, hasLabel: true } as MNodeSpec;
+  }
+  if (rest.startsWith('[') && rest.endsWith(']')) {
+    return { id, text: innerLabel(rest, 1, 1), round: false, hasLabel: true } as MNodeSpec;
+  }
+  if (rest.startsWith('(') && rest.endsWith(')')) {
+    return { id, text: innerLabel(rest, 1, 1), round: true, hasLabel: true } as MNodeSpec;
+  }
+  if (rest.startsWith('{') && rest.endsWith('}')) {
+    // 菱形节点：子集里按方框画，只有框形差别，不影响结构表达
+    return { id, text: innerLabel(rest, 1, 1), round: false, hasLabel: true } as MNodeSpec;
+  }
+  // 括号没配对（流式过程里的半截声明）：整段当 id，不猜
+  return { id: body, text: body, round: false, hasLabel: false } as MNodeSpec;
+}
+
+/** 登记节点：已存在时，只在「新声明带了标签、旧的还没标签」的情况下补上标签 */
+function upsertNode(nodes: Array<MNode>, spec: MNodeSpec): void {
+  if (spec.id.length == 0) {
+    return;
+  }
+  const at: number = nodeIndex(nodes, spec.id);
+  if (at < 0) {
+    nodes.push({
+      id: spec.id,
+      text: spec.hasLabel ? spec.text : spec.id,
+      round: spec.round,
+      layer: 0,
+      textWidth: 0,
+      x: 0,
+      y: 0,
+      width: 0,
+      height: 0
+    } as MNode);
+    return;
+  }
+  const node: MNode = nodes[at];
+  if (spec.hasLabel && node.text == node.id) {
+    node.text = spec.text;
+    node.round = spec.round;
+  }
+}
+
+/** 加边：同一对节点不重复加（链式写法容易重复声明） */
+function addEdge(edges: Array<MEdge>, from: string, to: string, arrow: boolean): void {
+  if (from == to) {
+    return;
+  }
+  for (let i: number = 0; i < edges.length; i++) {
+    if (edges[i].from == from && edges[i].to == to) {
+      return;
+    }
+  }
+  edges.push({ from, to, arrow } as MEdge);
+}
+
+/** 从 from 往后找下一个连线符（--> 或 ---）的下标，没有则 -1 */
+function nextEdgeIndex(text: string, from: number): number {
+  const withArrow: number = text.indexOf('-->', from);
+  const plain: number = text.indexOf('---', from);
+  if (withArrow < 0) {
+    return plain;
+  }
+  if (plain < 0) {
+    return withArrow;
+  }
+  return withArrow < plain ? withArrow : plain;
+}
+
+/** 命中位置的连线符是 -->（带箭头）还是 ---（无箭头） */
+function edgeHasArrow(text: string, at: number): boolean {
+  return text.substring(at, at + 3) == '-->';
+}
+
+/** 一条语句：A[文本] --> B(文本) --> C → 登记节点与边 */
+function parseStatement(statement: string, nodes: Array<MNode>, edges: Array<MEdge>): void {
+  const line: string = statement.trim();
+  if (line.length == 0 || line.startsWith('%%')) {
+    return;
+  }
+  const specs: Array<string> = [];
+  const arrows: Array<boolean> = [];
+  let cursor: number = 0;
+  while (cursor < line.length) {
+    const at: number = nextEdgeIndex(line, cursor);
+    if (at < 0) {
+      specs.push(line.substring(cursor));
+      break;
+    }
+    specs.push(line.substring(cursor, at));
+    arrows.push(edgeHasArrow(line, at));
+    cursor = at + 3;
+  }
+  const ids: Array<string> = [];
+  for (let i: number = 0; i < specs.length; i++) {
+    const spec: MNodeSpec = parseNodeSpec(specs[i]);
+    if (spec.id.length == 0) {
+      // 半截语句（流式过程中很常见）：整句丢掉，等下一块到达再解析
+      return;
+    }
+    ids.push(spec.id);
+    upsertNode(nodes, spec);
+  }
+  for (let i: number = 0; i + 1 < ids.length; i++) {
+    const arrow: boolean = i < arrows.length ? arrows[i] : true;
+    addEdge(edges, ids[i], ids[i + 1], arrow);
+  }
+}
+
+/** 图头行：graph TD / flowchart LR */
+function isGraphHeader(line: string): boolean {
+  const lower: string = line.toLowerCase();
+  return lower.startsWith('graph') || lower.startsWith('flowchart');
+}
+
+/** 图头里的方向：LR / RL 视作横向，其余（TD / TB / BT / 缺省）视作纵向 */
+function headerDirection(line: string): string {
+  const parts: Array<string> = line.split(' ');
+  for (let i: number = 0; i < parts.length; i++) {
+    const token: string = parts[i].trim().toUpperCase();
+    if (token == 'LR' || token == 'RL') {
+      return 'LR';
+    }
+  }
+  return 'TD';
+}
+
+/** mermaid 源码 → 节点 + 边 + 方向 */
+function parseGraph(source: string): MGraph {
+  const nodes: Array<MNode> = [];
+  const edges: Array<MEdge> = [];
+  let direction: string = 'TD';
+  const lines: Array<string> = source.split('\n');
+  for (let li: number = 0; li < lines.length; li++) {
+    const line: string = lines[li].trim();
+    if (line.length == 0 || line.startsWith('%%')) {
+      continue;
+    }
+    if (isGraphHeader(line)) {
+      direction = headerDirection(line);
+      continue;
+    }
+    const statements: Array<string> = line.split(';');
+    for (let si: number = 0; si < statements.length; si++) {
+      parseStatement(statements[si], nodes, edges);
+    }
+  }
+  return { nodes, edges, direction } as MGraph;
+}
+
+// ==========================================
+// 排版
+// ==========================================
+/**
+ * 分层：layer(下游) = 1 + max(layer(上游))，反复松弛到不再变化。
+ * 有环也不会死循环 —— 最多跑「节点数 + 1」遍，环上的节点被逐层往下推。
+ */
+function assignLayers(nodes: Array<MNode>, edges: Array<MEdge>): void {
+  for (let i: number = 0; i < nodes.length; i++) {
+    nodes[i].layer = 0;
+  }
+  const rounds: number = nodes.length + 1;
+  for (let r: number = 0; r < rounds; r++) {
+    let changed: boolean = false;
+    for (let i: number = 0; i < edges.length; i++) {
+      const from: number = nodeIndex(nodes, edges[i].from);
+      const to: number = nodeIndex(nodes, edges[i].to);
+      if (from < 0 || to < 0 || from == to) {
+        continue;
+      }
+      const want: number = nodes[from].layer + 1;
+      if (nodes[to].layer < want) {
+        nodes[to].layer = want;
+        changed = true;
+      }
+    }
+    if (!changed) {
+      break;
+    }
+  }
+}
+
+/** 线图元：竖线传 height 当长度，横线传 width 当长度 */
+function pushLine(shapes: Array<MermaidShape>, x: number, top: number, width: number, height: number): void {
+  if (width <= 0 || height <= 0) {
+    return;
+  }
+  shapes.push({ kind: 'edge', text: '', x, top, width, height, fontSize: 0, radius: 0 } as MermaidShape);
+}
+
+/**
+ * 箭头：原生端画不了 path，用 ARROW_SLICES 片递减的矩形拼一个三角。
+ * vertical 时朝下（tip 是箭尖），否则朝右。
+ */
+function pushArrow(shapes: Array<MermaidShape>, tipX: number, tipY: number, vertical: boolean, fontSize: number): void {
+  const len: number = ARROW_LEN * fontSize;
+  const fullW: number = ARROW_W * fontSize;
+  const slice: number = len / ARROW_SLICES;
+  for (let i: number = 0; i < ARROW_SLICES; i++) {
+    // i = 0 是最宽的一片（靠尾巴），最后一片最窄（贴箭尖）
+    const w: number = fullW * (ARROW_SLICES - i) / ARROW_SLICES;
+    if (vertical) {
+      shapes.push({
+        kind: 'arrow',
+        text: '',
+        x: tipX - w / 2,
+        top: tipY - len + i * slice,
+        width: w,
+        height: slice + 0.5,
+        fontSize: 0,
+        radius: 0
+      } as MermaidShape);
+    }
+    else {
+      shapes.push({
+        kind: 'arrow',
+        text: '',
+        x: tipX - len + i * slice,
+        top: tipY - w / 2,
+        width: slice + 0.5,
+        height: w,
+        fontSize: 0,
+        radius: 0
+      } as MermaidShape);
+    }
+  }
+}
+
+/**
+ * 纵向图的一条连线：下 → 横 → 下，最后在子节点顶边补箭头。
+ * 上下游反了的回边（子在上、父在下）直接不画，免得糊成一团。
+ */
+function pushVerticalEdge(shapes: Array<MermaidShape>, edge: MEdge, a: MNode, b: MNode, fontSize: number): void {
+  const startX: number = a.x + a.width / 2;
+  const startY: number = a.y + a.height;
+  const endX: number = b.x + b.width / 2;
+  const tipY: number = b.y;
+  const stopY: number = tipY - (edge.arrow ? ARROW_LEN * fontSize : 0);
+  if (stopY <= startY) {
+    return;
+  }
+  if (Math.abs(startX - endX) < 0.5) {
+    pushLine(shapes, startX - LINE_THICKNESS / 2, startY, LINE_THICKNESS, stopY - startY);
+  }
+  else {
+    const midY: number = (startY + stopY) / 2;
+    pushLine(shapes, startX - LINE_THICKNESS / 2, startY, LINE_THICKNESS, midY - startY);
+    pushLine(shapes, Math.min(startX, endX), midY - LINE_THICKNESS / 2, Math.abs(endX - startX), LINE_THICKNESS);
+    pushLine(shapes, endX - LINE_THICKNESS / 2, midY, LINE_THICKNESS, stopY - midY);
+  }
+  if (edge.arrow) {
+    pushArrow(shapes, endX, tipY, true, fontSize);
+  }
+}
+
+/** 横向图的一条连线：右 → 竖 → 右，最后在子节点左边补箭头 */
+function pushHorizontalEdge(shapes: Array<MermaidShape>, edge: MEdge, a: MNode, b: MNode, fontSize: number): void {
+  const startX: number = a.x + a.width;
+  const startY: number = a.y + a.height / 2;
+  const tipX: number = b.x;
+  const endY: number = b.y + b.height / 2;
+  const stopX: number = tipX - (edge.arrow ? ARROW_LEN * fontSize : 0);
+  if (stopX <= startX) {
+    return;
+  }
+  if (Math.abs(startY - endY) < 0.5) {
+    pushLine(shapes, startX, startY - LINE_THICKNESS / 2, stopX - startX, LINE_THICKNESS);
+  }
+  else {
+    const midX: number = (startX + stopX) / 2;
+    pushLine(shapes, startX, startY - LINE_THICKNESS / 2, midX - startX, LINE_THICKNESS);
+    pushLine(shapes, midX - LINE_THICKNESS / 2, Math.min(startY, endY), LINE_THICKNESS, Math.abs(endY - startY));
+    pushLine(shapes, midX, endY - LINE_THICKNESS / 2, stopX - midX, LINE_THICKNESS);
+  }
+  if (edge.arrow) {
+    pushArrow(shapes, tipX, endY, false, fontSize);
+  }
+}
+
+/** 一条连线：按方向选纵向还是横向的画法 */
+function pushEdge(shapes: Array<MermaidShape>, edge: MEdge, nodes: Array<MNode>, vertical: boolean, fontSize: number): void {
+  const fromIndex: number = nodeIndex(nodes, edge.from);
+  const toIndex: number = nodeIndex(nodes, edge.to);
+  if (fromIndex < 0 || toIndex < 0) {
+    return;
+  }
+  if (vertical) {
+    pushVerticalEdge(shapes, edge, nodes[fromIndex], nodes[toIndex], fontSize);
+    return;
+  }
+  pushHorizontalEdge(shapes, edge, nodes[fromIndex], nodes[toIndex], fontSize);
+}
+
+/** 节点框 + 居中标签 */
+function pushNodeShapes(shapes: Array<MermaidShape>, node: MNode, fontSize: number): void {
+  shapes.push({
+    kind: 'node',
+    text: '',
+    x: node.x,
+    top: node.y,
+    width: node.width,
+    height: node.height,
+    fontSize: 0,
+    radius: node.round ? ROUND_RADIUS : RECT_RADIUS
+  } as MermaidShape);
+  shapes.push({
+    kind: 'text',
+    text: node.text,
+    x: node.x + (node.width - node.textWidth) / 2,
+    top: node.y + (node.height - fontSize) / 2,
+    width: node.textWidth,
+    height: fontSize,
+    fontSize,
+    radius: 0
+  } as MermaidShape);
+}
+
+/**
+ * mermaid 源码 → 可直接贴进模板的图元。
+ *
+ * 三步：解析（节点 + 边）→ 分层 → 定位。同层节点在交叉轴上居中排开，
+ * 层与层之间留出连线与箭头的位置；孤立节点、回边、半截语句都不会让结果变成空图。
+ * 任何输入都不抛异常（与 katex-lite 同样的约定）。
+ */
+export function renderMermaid(source: string, fontSize: number): MermaidLayout {
+  const graph: MGraph = parseGraph(source);
+  const nodes: Array<MNode> = graph.nodes;
+  if (nodes.length == 0 || fontSize <= 0) {
+    return { width: 0, height: 0, shapes: [] } as MermaidLayout;
+  }
+  const vertical: boolean = graph.direction != 'LR';
+  assignLayers(nodes, graph.edges);
+
+  // 量节点：文字宽度复用 katex-lite 的字宽估算（原生端拿不到真实字体度量）
+  for (let i: number = 0; i < nodes.length; i++) {
+    // ⚠️ 同一个函数里别给不同循环复用同一个变量名：UTS 会把这些同名 const 合成一个，
+    // 后声明的那个会把前面的引用顶成 TDZ（见 parseNodeSpec 的注释）
+    const sized: MNode = nodes[i];
+    sized.textWidth = measureTextWidth(sized.text, fontSize);
+    sized.height = fontSize + 2 * NODE_PAD_Y * fontSize;
+    sized.width = Math.max(NODE_MIN_W * fontSize, sized.textWidth + 2 * NODE_PAD_X * fontSize);
+  }
+
+  // 按层归组
+  let lastLayer: number = 0;
+  for (let i: number = 0; i < nodes.length; i++) {
+    if (nodes[i].layer > lastLayer) {
+      lastLayer = nodes[i].layer;
+    }
+  }
+  const layers: Array<Array<number>> = [];
+  for (let l: number = 0; l <= lastLayer; l++) {
+    layers.push([] as Array<number>);
+  }
+  for (let i: number = 0; i < nodes.length; i++) {
+    layers[nodes[i].layer].push(i);
+  }
+
+  // 每层的两个尺寸：主轴尺寸（层占多深）与交叉轴尺寸（层里所有节点排开多宽 / 多高）
+  const layerMain: Array<number> = [];
+  const layerCross: Array<number> = [];
+  for (let l: number = 0; l <= lastLayer; l++) {
+    let main: number = 0;
+    let cross: number = 0;
+    for (let k: number = 0; k < layers[l].length; k++) {
+      const grouped: MNode = nodes[layers[l][k]];
+      if (k > 0) {
+        cross += SIBLING_GAP * fontSize;
+      }
+      cross += vertical ? grouped.width : grouped.height;
+      const depth: number = vertical ? grouped.height : grouped.width;
+      if (depth > main) {
+        main = depth;
+      }
+    }
+    layerMain.push(main);
+    layerCross.push(cross);
+  }
+
+  // 每层在主轴的起点 + 总尺寸
+  const layerStart: Array<number> = [];
+  let cursor: number = 0;
+  for (let l: number = 0; l <= lastLayer; l++) {
+    layerStart.push(cursor);
+    cursor += layerMain[l] + LAYER_GAP * fontSize;
+  }
+  const totalMain: number = cursor - LAYER_GAP * fontSize;
+  let totalCross: number = 0;
+  for (let l: number = 0; l <= lastLayer; l++) {
+    if (layerCross[l] > totalCross) {
+      totalCross = layerCross[l];
+    }
+  }
+
+  // 定位：同层节点沿主轴铺开，整层在交叉轴上居中
+  for (let l: number = 0; l <= lastLayer; l++) {
+    const indices: Array<number> = layers[l];
+    let offset: number = (totalCross - layerCross[l]) / 2;
+    for (let k: number = 0; k < indices.length; k++) {
+      const placed: MNode = nodes[indices[k]];
+      if (vertical) {
+        placed.x = offset;
+        placed.y = layerStart[l];
+        offset += placed.width + SIBLING_GAP * fontSize;
+      }
+      else {
+        placed.x = layerStart[l];
+        placed.y = offset;
+        offset += placed.height + SIBLING_GAP * fontSize;
+      }
+    }
+  }
+
+  // 先连线、后节点：线被节点框压住，端点才干净
+  const shapes: Array<MermaidShape> = [];
+  for (let i: number = 0; i < graph.edges.length; i++) {
+    pushEdge(shapes, graph.edges[i], nodes, vertical, fontSize);
+  }
+  for (let i: number = 0; i < nodes.length; i++) {
+    pushNodeShapes(shapes, nodes[i], fontSize);
+  }
+  return {
+    width: Math.round(vertical ? totalCross : totalMain),
+    height: Math.round(vertical ? totalMain : totalCross),
+    shapes
+  } as MermaidLayout;
+}

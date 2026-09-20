@@ -54,6 +54,16 @@ onShow((options?) => {
 @import './main.css';
 /* #endif */
 
+/* 阿里 iconfont（uni_modules/ali-iconfont）目前本项目没用到 —— 没有页面渲染 AliIconfontIcon。
+   以后要用，只做一件事：在 onLaunch 里 import 并调用一次 setupIconfont()（无参）：
+
+     import { setupIconfont } from '@/uni_modules/ali-iconfont/common/iconfont.uts';
+     setupIconfont();
+
+   漏掉这一步，组件查不到码点，图标会静默渲染成空白（不报错）。
+   字体声明不写在这里 —— 它跟着 AliIconfontIcon 组件走：组件的 style 块里，由插件脚本从阿里 CSS
+   生成（换图标 / 换库改插件的 iconfont.config.mjs 后跑 `pnpm icons`）。 */
+
 page {
   --test-color: #006241;
   --color-test: #006241;

@@ -1,5 +1,19 @@
 <template>
-  <Card title="字体与排版设置">
+  <view
+    class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid"
+    :style="{
+      backgroundColor: 'var(--card-bg, #ffffff)',
+      borderColor: 'var(--border-color, #edf2f7)'
+    }"
+  >
+    <!-- 标题区域 -->
+    <view class="flex flex-row items-center mb-[16px]">
+      <view
+        class="w-[4px] h-[16px] rounded-[2px] mr-[8px]"
+        :style="{ backgroundColor: 'var(--theme-color, #3182ce)' }"
+      />
+      <text class="text-[16px] font-bold" :style="{ color: 'var(--text-color, #2d3748)' }">字体与排版设置</text>
+    </view>
     <!-- 1. 实时排版渲染预览区 -->
     <view
       class="rounded-[12px] p-[16px] mb-[16px] border-[1px] border-solid bg-[#f8fafc]"
@@ -48,7 +62,7 @@
           fontSize: `${currentSize}px`
         }"
       >
-        基于 uni-app X 极速架构，深度融合强类型 UTS 系统与原子化跨端样式体系。
+        基于 uni-app X 极速架构与 UTS 强类型系统。
       </text>
 
       <!-- 英文短语与数字展示（英文字体与数字在此区域效果最明显） -->
@@ -322,12 +336,11 @@
     >
       <text class="text-[#475569] text-[13px] font-medium">恢复系统默认字体与字号</text>
     </view>
-  </Card>
+  </view>
 </template>
 
 <script setup lang="uts">
 import { computed, onMounted, ref } from 'vue';
-import Card from './Card.uvue';
 
 type LocalFontOption = {
   label: string;
@@ -376,23 +389,13 @@ const localFontOptions: LocalFontOption[] = [
     value: DEFAULT_FONT_FAMILY
   },
   {
-    label: '等宽代码体',
-    desc: 'Monospace 字符等宽（适合数据、代码排版）',
-    value: 'monospace'
-  },
-  {
     label: '经典衬线体',
     desc: 'Serif 衬线笔画（典雅庄重、阅读感强）',
     value: 'serif'
-  },
-  {
-    label: '生动手写体',
-    desc: 'Cursive 自由手写风格（个性化艺术感）',
-    value: 'cursive'
   }
 ];
 
-// 远程字体预设列表（首选 DCloud 官方高可用七牛国内极速 CDN，仅 14KB，秒级加载；其余提供国内镜像加速源）
+// 远程字体预设列表（DCloud 官方高可用七牛国内极速 CDN，仅 14KB，秒级加载）
 const remoteFonts = ref<RemoteFontItem[]>([
   {
     id: 'alimama',
@@ -400,22 +403,6 @@ const remoteFonts = ref<RemoteFontItem[]>([
     family: 'AlimamaDaoLiTiTTF',
     desc: 'DCloud 官方国内极速 CDN，仅 14KB，App 原生端秒级装载',
     url: 'https://qiniu-web-assets.dcloud.net.cn/uni-app-x/static/font/AlimamaDaoLiTi.ttf',
-    status: 'idle'
-  },
-  {
-    id: 'pacifico',
-    name: 'Pacifico 艺术手写体',
-    family: 'PacificoRemote',
-    desc: '流畅潇洒的连笔手写体，艺术感出众（国内加速镜像）',
-    url: 'https://testingcf.jsdelivr.net/gh/google/fonts@main/ofl/pacifico/Pacifico-Regular.ttf',
-    status: 'idle'
-  },
-  {
-    id: 'pressstart',
-    name: 'Press Start 2P 像素体',
-    family: 'PressStartRemote',
-    desc: '8-Bit 经典街机红白机像素风格（国内加速镜像）',
-    url: 'https://testingcf.jsdelivr.net/gh/google/fonts@main/ofl/pressstart2p/PressStart2P-Regular.ttf',
     status: 'idle'
   }
 ]);
