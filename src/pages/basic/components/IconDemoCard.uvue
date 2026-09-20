@@ -54,47 +54,13 @@
         <text class="text-[12px]" :style="{ color: 'var(--text-secondary, #94a3b8)' }">circle</text>
       </view>
     </view>
-
-    <view class="h-[1px]" :style="{ backgroundColor: 'var(--border-color, #f1f5f9)' }" />
-
-    <!-- 阿里 iconfont 示例（图标库/链接见插件根目录的 iconfont.config.mjs）
-         图标统一交给 AliIconfontIcon：Web / 小程序端走字体渲染，
-         App 端同一套图标改用 web-view 渲染本地演示页。 -->
-    <view class="flex-row items-center justify-between py-[12px]">
-      <view class="flex-row items-center">
-        <view class="w-[6px] h-[6px] rounded-[3px] bg-[#f59e0b] mr-[8px]" />
-        <text
-          class="text-[14px] font-medium"
-          :style="{ color: 'var(--text-color, #475569)' }"
-        >
-          {{ alibabaIconfontLabel }}
-        </text>
-      </view>
-      <view class="flex-row items-center">
-        <view class="mr-[8px]">
-          <AliIconfontIcon name="gear" :size="24" color="#f59e0b" :theme="iconTheme" />
-        </view>
-        <text class="text-[12px]" :style="{ color: 'var(--text-secondary, #94a3b8)' }">ali:gear</text>
-      </view>
-    </view>
   </view>
 </template>
 
 <script setup lang="uts">
 import { computed } from 'vue';
 import { $t } from '@/src/utils/i18n/index.uts';
-import { useAppStore } from '@/src/store';
-import AliIconfontIcon from '@/uni_modules/ali-iconfont/components/AliIconfontIcon/AliIconfontIcon.uvue';
 
 const iconDemoTitle = computed((): string => $t('basic.iconDemoTitle'));
 const svgAuthWarning = computed((): string => $t('basic.svgAuthWarning'));
-const alibabaIconfontLabel = computed((): string => $t('basic.alibabaIconfontLabel'));
-
-/**
- * 阿里图标在 App 端由 web-view 渲染，web-view 读不到宿主的 CSS 变量，
- * 深浅色只能显式传进去 —— 组件刻意不引 store（否则插件没法整体复用），
- * 所以由调用方（这里）自己读当前主题。
- */
-const appStore = useAppStore();
-const iconTheme = computed((): string => appStore.state.isDark ? 'dark' : 'light');
 </script>

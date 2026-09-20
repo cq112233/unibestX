@@ -227,3 +227,8 @@ ali-iconfont/
 └── App.uvue    script 块：import { setupIconfont }，onLaunch 里调一次（无参）
                 style  块：不用动 —— @font-face 跟着 AliIconfontIcon 组件走
 ```
+
+⚠️ 当前宿主（unibestX）**没有**这行调用，也没有页面渲染 `AliIconfontIcon` —— 这个插件处于
+「装着但没用」的状态。要用它，除了写组件标签，还要把上面那行 `setupIconfont()` 加回
+`App.uvue` 的 `onLaunch`：漏掉它组件查不到码点，图标会**静默渲染成空白**（不报错）。
+`App.uvue` 里那条注释也记着这件事。

@@ -2,7 +2,6 @@
 import { checkDirectEntry } from './src/router/interceptor';
 import { useAppStore } from './src/store';
 import { initNativeMidButtonTap } from '@/src/tabbar';
-import { setupIconfont } from '@/uni_modules/ali-iconfont/common/iconfont.uts';
 import { applyThemeColor, themeColor } from '@/src/utils/theme/index.uts';
 
 onLaunch(() => {
@@ -18,15 +17,6 @@ onLaunch(() => {
 
   // 注册原生 TabBar 中间按钮监听（仅在原生模式且配置了 midButton 时生效）
   initNativeMidButtonTap();
-
-  // 注册阿里 iconfont 字体图标库（见 uni_modules/ali-iconfont）。
-  // 无参：字体 URL 与图标表都由插件自持（common/icons.uts，由插件脚本从阿里 CSS 生成）。
-  // 换图标 / 换图标库 = 改插件根目录的 iconfont.config.mjs、再跑 `pnpm icons`，这里一个字都不用改。
-  // 字体加载：小程序端由 setupIconfont 内部统一 loadFontFace（带 global，覆盖全部小程序平台）；
-  // Web / H5 端靠 AliIconfontIcon 组件自带的 @font-face（同一份 CSS 生成，不手写）；
-  // App 端走 AliIconfontIcon 的 web-view，字体内联在本地页里，不在这里加载。
-  // 用法：<AliIconfontIcon name="gear" :size="24" />
-  setupIconfont();
 
   // #ifdef MP-WEIXIN
   // 微信小程序真机 @font-face 不生效，使用 uni.loadFontFace 加载 uni-icons 字体
@@ -63,10 +53,15 @@ onShow((options?) => {
 @import './main.css';
 /* #endif */
 
-/* 阿里 iconfont 的字体声明不在这里 —— 它跟着 AliIconfontIcon 组件走：
-   声明写在组件的 style 块里，由 uni_modules/ali-iconfont/scripts/gen-icons.mjs 从阿里 CSS 生成
-   （换库改 iconfont.config.mjs 后跑 `pnpm icons`）。
-   宿主只需在 onLaunch 调 setupIconfont()（见上），本文件一个字都不用改。 */
+/* 阿里 iconfont（uni_modules/ali-iconfont）目前本项目没用到 —— 没有页面渲染 AliIconfontIcon。
+   以后要用，只做一件事：在 onLaunch 里 import 并调用一次 setupIconfont()（无参）：
+
+     import { setupIconfont } from '@/uni_modules/ali-iconfont/common/iconfont.uts';
+     setupIconfont();
+
+   漏掉这一步，组件查不到码点，图标会静默渲染成空白（不报错）。
+   字体声明不写在这里 —— 它跟着 AliIconfontIcon 组件走：组件的 style 块里，由插件脚本从阿里 CSS
+   生成（换图标 / 换库改插件的 iconfont.config.mjs 后跑 `pnpm icons`）。 */
 
 page {
   --test-color: #006241;
