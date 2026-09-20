@@ -36,7 +36,21 @@
     >
       <view class="flex flex-col">
         <!-- ============ 1. uniCloud 云对象 ============ -->
-        <Card title="uniCloud 云对象">
+        <view
+          class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid"
+          :style="{
+            backgroundColor: 'var(--card-bg, #ffffff)',
+            borderColor: 'var(--border-color, #edf2f7)'
+          }"
+        >
+          <!-- 标题区域 -->
+          <view class="flex flex-row items-center mb-[16px]">
+            <view
+              class="w-[4px] h-[16px] rounded-[2px] mr-[8px]"
+              :style="{ backgroundColor: 'var(--theme-color, #3182ce)' }"
+            />
+            <text class="text-[16px] font-bold" :style="{ color: 'var(--text-color, #2d3748)' }">uniCloud 云对象</text>
+          </view>
           <view class="mb-[16px]">
             <view class="flex-row items-center justify-between mb-[10px]">
               <view class="flex-row items-center">
@@ -73,10 +87,24 @@
               </view>
             </view>
           </view>
-        </Card>
+        </view>
 
         <!-- ============ 2. Mock 数据列表 ============ -->
-        <Card title="Mock 数据列表（ID 为任意类型）">
+        <view
+          class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid"
+          :style="{
+            backgroundColor: 'var(--card-bg, #ffffff)',
+            borderColor: 'var(--border-color, #edf2f7)'
+          }"
+        >
+          <!-- 标题区域 -->
+          <view class="flex flex-row items-center mb-[16px]">
+            <view
+              class="w-[4px] h-[16px] rounded-[2px] mr-[8px]"
+              :style="{ backgroundColor: 'var(--theme-color, #3182ce)' }"
+            />
+            <text class="text-[16px] font-bold" :style="{ color: 'var(--text-color, #2d3748)' }">Mock 数据列表（ID 为任意类型）</text>
+          </view>
           <text class="text-[12px] text-[#64748b] leading-[19px] mb-[4px]">
             在 src/api/foo.uts 中定义，由 getFooList() 直接返回，无需网络即可演示列表渲染。
           </text>
@@ -86,10 +114,24 @@
             </view>
             <text class="text-[14px]" :style="{ color: 'var(--text-color, #334155)' }">{{ item.name }}</text>
           </view>
-        </Card>
+        </view>
 
         <!-- ============ 3. 真实接口请求状态 ============ -->
-        <Card title="真实 API 请求（拦截器 + 错误处理）">
+        <view
+          class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid"
+          :style="{
+            backgroundColor: 'var(--card-bg, #ffffff)',
+            borderColor: 'var(--border-color, #edf2f7)'
+          }"
+        >
+          <!-- 标题区域 -->
+          <view class="flex flex-row items-center mb-[16px]">
+            <view
+              class="w-[4px] h-[16px] rounded-[2px] mr-[8px]"
+              :style="{ backgroundColor: 'var(--theme-color, #3182ce)' }"
+            />
+            <text class="text-[16px] font-bold" :style="{ color: 'var(--text-color, #2d3748)' }">真实 API 请求（拦截器 + 错误处理）</text>
+          </view>
           <view class="rounded-[10px] p-[12px] mb-[16px] border-[1px] border-solid border-[#e2e8f0]">
             <view class="flex-row justify-between items-center mb-[6px]">
               <text class="text-[13px] text-[#64748b]">接口请求状态:</text>
@@ -128,10 +170,24 @@
               </view>
             </view>
           </view>
-        </Card>
+        </view>
 
         <!-- ============ 4. 文件上传 ============ -->
-        <Card title="文件上传（uploadFooFile → uni.uploadFile）">
+        <view
+          class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid"
+          :style="{
+            backgroundColor: 'var(--card-bg, #ffffff)',
+            borderColor: 'var(--border-color, #edf2f7)'
+          }"
+        >
+          <!-- 标题区域 -->
+          <view class="flex flex-row items-center mb-[16px]">
+            <view
+              class="w-[4px] h-[16px] rounded-[2px] mr-[8px]"
+              :style="{ backgroundColor: 'var(--theme-color, #3182ce)' }"
+            />
+            <text class="text-[16px] font-bold" :style="{ color: 'var(--text-color, #2d3748)' }">文件上传（uploadFooFile → uni.uploadFile）</text>
+          </view>
           <view class="mb-[16px]">
             <view class="flex-row items-center mb-[10px]">
               <view class="w-[32px] h-[32px] rounded-[8px] bg-[#fff7ed] border-[1px] border-solid border-[#fdba74] items-center justify-center mr-[10px]">
@@ -212,7 +268,7 @@
               </view>
             </view>
           </view>
-        </Card>
+        </view>
 
         <view class="flex-col items-center py-[16px]">
           <text class="text-[12px] text-[#94a3b8]">已触底 {{ reachBottomCount }} 次 · 内容结束</text>
@@ -224,7 +280,6 @@
 
 <script setup lang="uts">
 import { computed, ref } from 'vue';
-import Card from '@/src/pages/basic/components/Card.uvue';
 import { foo, FOO_UPLOAD_PATH, getFooList, uploadFooFile } from '@/src/api/foo';
 import type { IFoo } from '@/src/api/foo';
 import { DEFAULT_OSS_BASE_URL } from '@/src/utils/upload/index.uts';

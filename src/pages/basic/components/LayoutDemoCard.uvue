@@ -1,5 +1,19 @@
 <template>
-  <Card title="页面布局与系统度量">
+  <view
+    class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid"
+    :style="{
+      backgroundColor: 'var(--card-bg, #ffffff)',
+      borderColor: 'var(--border-color, #edf2f7)'
+    }"
+  >
+    <!-- 标题区域 -->
+    <view class="flex flex-row items-center mb-[16px]">
+      <view
+        class="w-[4px] h-[16px] rounded-[2px] mr-[8px]"
+        :style="{ backgroundColor: 'var(--theme-color, #3182ce)' }"
+      />
+      <text class="text-[16px] font-bold" :style="{ color: 'var(--text-color, #2d3748)' }">页面布局与系统度量</text>
+    </view>
     <view class="flex-col mb-[14px]">
       <text
         class="text-[13px] leading-[18px]"
@@ -162,12 +176,11 @@
     >
       <text class="text-[#ffffff] text-[14px] font-bold">进入布局页面骨架实测</text>
     </view>
-  </Card>
+  </view>
 </template>
 
 <script setup lang="uts">
 import { computed } from 'vue';
-import Card from './Card.uvue';
 import {
   availableHeight,
   menuRect,
