@@ -1,0 +1,1751 @@
+/**
+ * katex-lite —— 面向 uni-app X 的极简 LaTeX 公式排版引擎（纯 UTS 实现，全端通用）
+ *
+ * 为什么不用 npm 上的 KaTeX？
+ * uni-app X 的 App 端（Android 编译 Kotlin / iOS 编译 Swift）**没有 JS 引擎**，
+ * KaTeX 是纯 JS 库，在 App 端既无法引入也无法运行；mp-html 官方的 latex 插件同样是
+ * 「H5 塞 KaTeX.js + App 走 WebView」的路线，与本项目的原生渲染链路不兼容。
+ * 于是这里用 UTS 重写了一个「演示够用」的公式排版引擎。
+ *
+ * 三段式流水线：
+ * 1) 解析：LaTeX 子集 → 中间节点树（行 / 原子 / 分式 / 根式 / 上下标 / 大运算符 / 矩阵 / 重音）；
+ * 2) 排版：按 TeX 的盒子模型算尺寸 —— 每个盒子携带 width（宽）、height（基线以上）、
+ *    depth（基线以下），子盒子的坐标一律相对「本盒左边缘 + 本盒基线」；
+ * 3) 摊平：把盒子树展平成一组**绝对定位图元**（文本盒 + 线段），使用方按 style 串贴进容器即可
+ *    （参考 `src/sub/rxjsDemo/rxjsDemo.uvue` 的三处用法：流式公式 / 静态示例 / 行内公式）。
+ *
+ * 为什么输出「绝对定位图元」而不是 HTML？
+ * 本项目的 Markdown 走 mp-html，它只支持有限标签（text / image / table / pre …）：
+ * 分式、根号、上下标这类二维排版用它的标签体系表达不出来（原生端 <text> 里也不能嵌 view）。
+ * 原生端唯一能自由摆放二维结构的手段就是 position: absolute ——
+ * 公式的每一笔（分子、分母、分数线、根号横线、指数）各自是一个绝对定位的小盒子。
+ *
+ * 支持范围（够演示用，不追求 TeX 完备）：
+ * - 上下标 ^ _（含 `x'` 撇号）、\frac \dfrac \tfrac、\sqrt[n]{}
+ * - \sum \prod \int 等大运算符（∑∏ 上下限堆叠，∫ 侧挂）、\lim \sin \cos \log …
+ * - \begin{pmatrix|bmatrix|Bmatrix|vmatrix|cases} … \end{…} 矩阵与分段函数
+ * - 希腊字母、关系符、箭头、运算符号、\text \mathrm \mathbb、\hat \vec \bar \overline
+ * - 常用间距 \\, \; \quad \qquad；未知命令退化成「原样显示命令名」，不抛错
+ *
+ * 流式友好：LaTeX 分块到达时（`\frac{1}{`、尾随 `\`、未闭合 `\begin{pmatrix}`）不会抛异常，
+ * 半截公式按「能排多少排多少」渲染，下一块到达后整棵重排。
+ *
+ * @example
+ * ```uts
+ * import { renderKatex } from '@/uni_modules/mp-html/index.uts';
+ * import type { KatexLayout, KatexBox } from '@/uni_modules/mp-html/index.uts';
+ *
+ * const layout: KatexLayout = renderKatex('x = \\frac{-b \\pm \\sqrt{b^2-4ac}}{2a}', 18);
+ * // layout.boxes 是绝对定位图元，layout.height 是公式总高（px）
+ * ```
+ */
+
+// ==========================================
+// 一、对外类型（禁止 interface，统一用 type）
+// ==========================================
+
+/**
+ * 一个已排版好的图元。
+ *
+ * 坐标已经换算到「公式容器」坐标系（原点在容器左上角，y 向下为正）：
+ * 组件只需 `position:absolute; left:x; top:top` 贴上去即可，不需要再懂任何字体度量。
+ */
+export type KatexBox = {
+  /** 'text' 文本图元 / 'rule' 线段（分数线、根号横线、上划线） */
+  kind: string;
+  /** 文本内容（kind == 'rule' 时为空串） */
+  text: string;
+  /** 左边缘，px */
+  x: number;
+  /** 上边缘，px */
+  top: number;
+  /** 宽度，px（文本盒是估算宽度，线段盒是精确宽度） */
+  width: number;
+  /** 字号，px（kind == 'rule' 时为 0） */
+  fontSize: number;
+  /** 线段粗细，px（kind == 'text' 时为 0） */
+  lineHeight: number;
+  /** 是否斜体（数学变量斜体、数字与函数名正体） */
+  italic: boolean;
+};
+
+/** 排版结果 */
+export type KatexLayout = {
+  /** 公式宽度，px */
+  width: number;
+  /** 公式总高度（基线以上 + 以下），px */
+  height: number;
+  /** 图元列表，已按「先文本后线段」无关的顺序排列（渲染顺序不影响结果） */
+  boxes: Array<KatexBox>;
+  /** 出错信息，空串表示正常 */
+  error: string;
+};
+
+/**
+ * 文本盒「上边缘 → 基线」的距离系数：`基线偏移 = 0.84 × 字号`。
+ *
+ * 组件给文本盒写的是 `line-height = font-size`，此时文本盒内的基线位置是
+ * 「半行距 + 字体升部」，只与字号成正比，所以可以用一个常数描述（Roboto 升部 0.927 /
+ * 降部 0.244 → (1 + 0.927 - 0.244) / 2 ≈ 0.84）。换字体族时改这一个数即可。
+ */
+export const KATEX_BASELINE_RATIO: number = 0.84;
+
+/** 上下标相对基准字号的缩放 */
+const SCRIPT_SCALE: number = 0.72;
+/** 分式分子/分母相对基准字号的缩放（嵌套时自然逐层变小） */
+const FRAC_SCALE: number = 0.95;
+
+// ==========================================
+// 二、中间节点树
+// ==========================================
+
+/**
+ * 中间节点（内部类型，不导出）。
+ *
+ * 用「一个大 type + 全字段给默认值」而不是联合类型：UTS 里可选字段参与运算时
+ * 处处要判空，字段齐全反而更省心（这也是本项目禁止 interface 的同一套思路）。
+ */
+type MNode = {
+  /** row / sym / rule / space / frac / sqrt / script / bigop / matrix / accent / overline */
+  kind: string;
+  /** sym 的字符、accent 的重音符、bigop 的标记 */
+  text: string;
+  /** 原子类别：ord / bin / rel / open / close / punct / op / func，用于行内自动间距；matrix 借它存对齐方向 */
+  cls: string;
+  /** 字号倍率（相对父级字号）。注意：kind == 'rule' 时语义是「线段粗细（em）」 */
+  scale: number;
+  /** 数学变量斜体、数字与函数名正体 */
+  italic: boolean;
+  /** 子节点（row 的成员 / frac 的分子分母与分数线 / matrix 的单元格与定界符） */
+  children: Array<MNode>;
+  /** 上标；sqrt 借它存根指数 */
+  sup: MNode | null;
+  /** 下标 */
+  sub: MNode | null;
+  /** rule 的宽度（em）、space 的留白宽度（em） */
+  w: number;
+  /** frac: 'nobar' 表示不带分数线（预留）；bigop: 'stack' 上下限堆叠 / 'side' 侧挂 */
+  mode: string;
+  /** matrix 的行数、列数 */
+  rows: number;
+  cols: number;
+  /** matrix 的左右定界符（'{' 用于 cases，'' 表示不画） */
+  delimL: string;
+  delimR: string;
+
+  // ---- 以下为布局产物（px，相对本盒左边缘 / 本盒基线） ----
+  width: number;
+  height: number;
+  depth: number;
+  x: number;
+  y: number;
+};
+
+/** 盒子度量（em） */
+type Metrics = {
+  height: number;
+  depth: number;
+};
+
+function mnode(kind: string): MNode {
+  return {
+    kind,
+    text: '',
+    cls: 'ord',
+    scale: 1,
+    italic: false,
+    children: [] as Array<MNode>,
+    sup: null,
+    sub: null,
+    w: 0,
+    mode: '',
+    rows: 0,
+    cols: 0,
+    delimL: '',
+    delimR: '',
+    width: 0,
+    height: 0,
+    depth: 0,
+    x: 0,
+    y: 0
+  } as MNode;
+}
+
+/** 安全取子节点：下标越界时返回一个空行节点，避免原生端 IndexOutOfBoundsException */
+function childAt(n: MNode, i: number): MNode {
+  if (i >= 0 && i < n.children.length) {
+    return n.children[i];
+  }
+  return mnode('row');
+}
+
+/** 单字符原子 */
+function symbolNode(ch: string): MNode {
+  const n = mnode('sym');
+  n.text = ch;
+  n.cls = classOf(ch);
+  n.italic = isVariableChar(ch);
+  return n;
+}
+
+/** 多字符正体文本（\text{...}、函数名、未知命令名） */
+function textNode(s: string): MNode {
+  const n = mnode('sym');
+  n.text = s;
+  n.cls = 'ord';
+  n.italic = false;
+  return n;
+}
+
+/** 留白 */
+function spaceNode(wEm: number): MNode {
+  const n = mnode('space');
+  n.w = wEm;
+  return n;
+}
+
+/** 线段（分数线 / 根号横线 / 上划线）：w 为宽度（em），t 为粗细（em） */
+function ruleNode(wEm: number, tEm: number): MNode {
+  const n = mnode('rule');
+  n.w = wEm;
+  n.scale = tEm;
+  return n;
+}
+
+/** 大运算符（∑ ∏ ∫ 与 \lim 这类上下限可堆叠的算子） */
+function bigopNode(op: MNode, stacked: boolean): MNode {
+  const n = mnode('bigop');
+  n.children = [op];
+  n.mode = stacked ? 'stack' : 'side';
+  n.cls = 'op';
+  n.scale = op.kind == 'sym' && op.text.length == 1 ? 1.35 : 1;
+  return n;
+}
+
+// ==========================================
+// 三、字符分类与度量表
+// ==========================================
+
+const LETTERS: string = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+/** 二元运算：左右各留中等间距 */
+const BIN_CHARS: string = '+−±∓×÷∗⋅∘∙⊕⊗⊙∖∪∩∧∨';
+/** 关系符：左右各留关系间距 */
+const REL_CHARS: string = '=<>≤≥≠≈≡≃≅∼∝∈∉∋⊂⊃⊆⊇≪≫→←↔⇒⇐⇔↦∣∥⊥';
+/** 左/右定界符：内侧不留间距 */
+const OPEN_CHARS: string = '([{⟨⌈⌊';
+const CLOSE_CHARS: string = ')]}⟩⌉⌋';
+/** 标点：后面留一 ThinSpace */
+const PUNCT_CHARS: string = ',;';
+/** 堆叠上下限的大运算符 */
+const BIGOP_CHARS: string = '∑∏∐⋃⋂Σ';
+/** 侧挂上下限的大运算符 */
+const BIGINT_CHARS: string = '∫∬∮';
+/** 宽字形 */
+const WIDE_CHARS: string = '∑∏∐⋃⋂∫∬∮√Σ';
+/** 窄字形 */
+const NARROW_CHARS: string = 'ilj.,;:!\'`';
+/** 有降部（基线以下有笔画）的字符 */
+const DESCENDER_CHARS: string = 'gjpqyQ()[]{}|/';
+/** 只有 x 高的字符 */
+const XHEIGHT_CHARS: string = 'acemnorsuvwxz';
+/** 围绕数学轴线居中的字符（= + − × ≤ …），基线在它们的中部 */
+const CENTERED_CHARS: string = '=<>≤≥≈≡≠+−×÷±∓∼⋅≃≅∝∈∉⊂⊃⊆⊇';
+
+/** 希腊字母命令 → 字符（UTSJSONObject + getString：缺失键返回 null，不做下标强转） */
+const SYMBOLS: UTSJSONObject = {
+  alpha: 'α',
+  beta: 'β',
+  gamma: 'γ',
+  delta: 'δ',
+  varepsilon: 'ε',
+  epsilon: 'ε',
+  zeta: 'ζ',
+  eta: 'η',
+  theta: 'θ',
+  vartheta: 'ϑ',
+  iota: 'ι',
+  kappa: 'κ',
+  lambda: 'λ',
+  mu: 'μ',
+  nu: 'ν',
+  xi: 'ξ',
+  pi: 'π',
+  varpi: 'ϖ',
+  rho: 'ρ',
+  sigma: 'σ',
+  varsigma: 'ς',
+  tau: 'τ',
+  upsilon: 'υ',
+  varphi: 'φ',
+  phi: 'φ',
+  chi: 'χ',
+  psi: 'ψ',
+  omega: 'ω',
+  Gamma: 'Γ',
+  Delta: 'Δ',
+  Theta: 'Θ',
+  Lambda: 'Λ',
+  Xi: 'Ξ',
+  Pi: 'Π',
+  Sigma: 'Σ',
+  Upsilon: 'Υ',
+  Phi: 'Φ',
+  Psi: 'Ψ',
+  Omega: 'Ω',
+  times: '×',
+  div: '÷',
+  pm: '±',
+  mp: '∓',
+  cdot: '⋅',
+  ast: '∗',
+  star: '⋆',
+  circ: '∘',
+  bullet: '∙',
+  oplus: '⊕',
+  ominus: '⊖',
+  otimes: '⊗',
+  odot: '⊙',
+  cap: '∩',
+  cup: '∪',
+  setminus: '∖',
+  land: '∧',
+  lor: '∨',
+  wedge: '∧',
+  vee: '∨',
+  le: '≤',
+  leq: '≤',
+  ge: '≥',
+  geq: '≥',
+  ne: '≠',
+  neq: '≠',
+  approx: '≈',
+  sim: '∼',
+  simeq: '≃',
+  cong: '≅',
+  equiv: '≡',
+  propto: '∝',
+  ll: '≪',
+  gg: '≫',
+  in: '∈',
+  notin: '∉',
+  ni: '∋',
+  subset: '⊂',
+  supset: '⊃',
+  subseteq: '⊆',
+  supseteq: '⊇',
+  prec: '≺',
+  succ: '≻',
+  mid: '∣',
+  parallel: '∥',
+  perp: '⊥',
+  to: '→',
+  rightarrow: '→',
+  leftarrow: '←',
+  leftrightarrow: '↔',
+  Rightarrow: '⇒',
+  Leftarrow: '⇐',
+  Leftrightarrow: '⇔',
+  mapsto: '↦',
+  uparrow: '↑',
+  downarrow: '↓',
+  nearrow: '↗',
+  searrow: '↘',
+  infty: '∞',
+  partial: '∂',
+  nabla: '∇',
+  forall: '∀',
+  exists: '∃',
+  nexists: '∄',
+  emptyset: '∅',
+  varnothing: '∅',
+  angle: '∠',
+  triangle: '△',
+  neg: '¬',
+  lnot: '¬',
+  hbar: 'ℏ',
+  ell: 'ℓ',
+  Re: 'ℜ',
+  Im: 'ℑ',
+  aleph: 'ℵ',
+  ldots: '…',
+  cdots: '⋯',
+  vdots: '⋮',
+  ddots: '⋱',
+  dots: '…',
+  prime: '′',
+  langle: '⟨',
+  rangle: '⟩',
+  lfloor: '⌊',
+  rfloor: '⌋',
+  lceil: '⌈',
+  rceil: '⌉',
+  lbrace: '{',
+  rbrace: '}',
+  lbrack: '[',
+  rbrack: ']',
+  vert: '|',
+  lvert: '|',
+  rvert: '|',
+  Vert: '‖',
+  lVert: '‖',
+  rVert: '‖',
+  backslash: '\\',
+  sum: 'Σ',
+  prod: '∏',
+  coprod: '∐',
+  int: '∫',
+  iint: '∬',
+  oint: '∮',
+  bigcup: '⋃',
+  bigcap: '⋂',
+  therefore: '∴',
+  because: '∵',
+  dagger: '†',
+  degree: '°',
+  checkmark: '✓',
+  square: '□',
+  blacksquare: '■',
+  surd: '√'
+};
+
+/** 黑板体（\mathbb{R} → ℝ）：原生端换不了字体族，只能换字符 */
+const BLACKBOARD: UTSJSONObject = {
+  R: 'ℝ',
+  N: 'ℕ',
+  Z: 'ℤ',
+  Q: 'ℚ',
+  C: 'ℂ',
+  H: 'ℍ',
+  P: 'ℙ'
+};
+
+/** 正体函数名 → 是否把上下限堆到符号上下（\lim 是堆叠，\sin 不堆） */
+const FUNC_STACKED: string = 'lim max min sup inf det gcd';
+const FUNC_PLAIN: string = 'sin cos tan cot sec csc arcsin arccos arctan sinh cosh tanh log ln lg exp arg dim ker deg hom mod Pr';
+
+/** 数学变量（斜体）：拉丁字母与希腊小写 */
+function isVariableChar(ch: string): boolean {
+  const code: number = ch.charCodeAt(0) ?? 0;
+  if (code >= 0x41 && code <= 0x5A) {
+    return true;
+  } // 大写拉丁
+  if (code >= 0x61 && code <= 0x7A) {
+    return true;
+  } // 小写拉丁
+  if (code >= 0x3B1 && code <= 0x3C9) {
+    return true;
+  } // 小写希腊
+  return false;
+}
+
+/** 原子类别（决定行内自动间距） */
+function classOf(ch: string): string {
+  if (ch.length == 0) {
+    return 'ord';
+  }
+  if (BIN_CHARS.includes(ch)) {
+    return 'bin';
+  }
+  if (REL_CHARS.includes(ch)) {
+    return 'rel';
+  }
+  if (OPEN_CHARS.includes(ch)) {
+    return 'open';
+  }
+  if (CLOSE_CHARS.includes(ch)) {
+    return 'close';
+  }
+  if (PUNCT_CHARS.includes(ch)) {
+    return 'punct';
+  }
+  if (BIGOP_CHARS.includes(ch) || BIGINT_CHARS.includes(ch)) {
+    return 'op';
+  }
+  return 'ord';
+}
+
+/**
+ * 相邻原子的间距（em）。
+ * 取值对齐 TeX 的四个间距档：关系 5/18em、二元运算 4/18em、op 与函数 3/18em、标点后 3/18em。
+ */
+function atomSpace(prev: string, next: string): number {
+  if (prev == 'rel' || next == 'rel') {
+    return 0.28;
+  }
+  if (prev == 'bin' || next == 'bin') {
+    return 0.22;
+  }
+  if (prev == 'op' || next == 'op') {
+    return 0.17;
+  }
+  if (prev == 'func') {
+    return 0.17;
+  }
+  if (prev == 'punct') {
+    return 0.17;
+  }
+  return 0;
+}
+
+/** 单字符宽度（em）。原生端拿不到字体度量，这里按字符类别估一个够用的值 */
+function charWidth(ch: string): number {
+  const code: number = ch.charCodeAt(0) ?? 0;
+  if (code >= 0x2E80) {
+    return 1.0;
+  } // CJK 与全角符号
+  if (code >= 0x30 && code <= 0x39) {
+    return 0.5;
+  } // 数字
+  if (code >= 0x41 && code <= 0x5A) {
+    return 0.68;
+  } // 大写拉丁
+  if (code >= 0x61 && code <= 0x7A) {
+    return 0.5;
+  } // 小写拉丁
+  if (code >= 0x391 && code <= 0x3A9) {
+    return 0.7;
+  } // 大写希腊
+  if (code >= 0x3B1 && code <= 0x3C9) {
+    return 0.55;
+  } // 小写希腊
+  if (WIDE_CHARS.includes(ch)) {
+    return 0.95;
+  }
+  if (NARROW_CHARS.includes(ch)) {
+    return 0.3;
+  }
+  if (OPEN_CHARS.includes(ch) || CLOSE_CHARS.includes(ch)) {
+    return 0.36;
+  }
+  return 0.62;
+}
+
+/** 一串文本的宽度（em） */
+function textWidth(s: string, em: number): number {
+  let w: number = 0;
+  for (let i: number = 0; i < s.length; i++) {
+    w = w + charWidth(s.charAt(i));
+  }
+  return w * em;
+}
+
+function containsAny(s: string, set: string): boolean {
+  for (let i: number = 0; i < s.length; i++) {
+    if (set.includes(s.charAt(i))) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/** 全字符都在 x 高集合里（正文小写字母，字形矮） */
+function isAllXHeight(s: string): boolean {
+  if (s.length == 0) {
+    return false;
+  }
+  for (let i: number = 0; i < s.length; i++) {
+    if (!XHEIGHT_CHARS.includes(s.charAt(i))) {
+      return false;
+    }
+  }
+  return true;
+}
+
+/**
+ * 字形度量（em）：height 为基线以上高度、depth 为基线以下深度。
+ * 原生端没有字体度量 API，这里按「字符类别」给保守估计 —— 估大只会让分式/根号
+ * 的留白略宽，估小才会出现笔画重叠，所以宁可偏大。
+ */
+function glyphMetrics(s: string): Metrics {
+  if (containsAny(s, BIGOP_CHARS)) {
+    return { height: 0.85, depth: 0.2 } as Metrics;
+  }
+  if (containsAny(s, BIGINT_CHARS)) {
+    return { height: 0.95, depth: 0.3 } as Metrics;
+  }
+  if (containsAny(s, OPEN_CHARS) || containsAny(s, CLOSE_CHARS) || containsAny(s, '|‖')) {
+    return { height: 0.76, depth: 0.24 } as Metrics;
+  }
+  if (s == '√') {
+    return { height: 0.78, depth: 0.04 } as Metrics;
+  }
+  if (containsAny(s, CENTERED_CHARS)) {
+    return { height: 0.44, depth: 0.0 } as Metrics;
+  }
+  if (containsAny(s, DESCENDER_CHARS)) {
+    return { height: 0.7, depth: 0.22 } as Metrics;
+  }
+  if (isAllXHeight(s)) {
+    return { height: 0.48, depth: 0.02 } as Metrics;
+  }
+  return { height: 0.7, depth: 0.05 } as Metrics;
+}
+
+// ==========================================
+// 四、解析：LaTeX 子集 → 中间节点树
+// ==========================================
+
+function isSpaceChar(ch: string): boolean {
+  return ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r';
+}
+
+function isLetter(ch: string): boolean {
+  return LETTERS.includes(ch);
+}
+
+/** ASCII 连字符按数学减号渲染：字形更居中，且能命中二元运算符的间距规则 */
+function normalizeChar(ch: string): string {
+  return ch == '-' ? '−' : ch;
+}
+
+/** 一元正负号修正：紧跟二元运算符/关系符/左括号的 bin 按 ord 处理，否则 `-` 两边会空得过开 */
+function pushAtom(row: MNode, node: MNode): void {
+  if (node.cls == 'bin' && row.children.length > 0) {
+    const prev: MNode = row.children[row.children.length - 1];
+    if (prev.cls == 'bin' || prev.cls == 'rel' || prev.cls == 'open' || prev.cls == 'punct' || prev.cls == 'op') {
+      node.cls = 'ord';
+    }
+  }
+  row.children.push(node);
+}
+
+/**
+ * 递归下降解析器。
+ *
+ * 刻意做成 class 而不是一堆自由函数：解析状态（源码、游标）集中在实例字段里，
+ * 组参数、上下标参数、矩阵环境的递归都只动 `this._pos`，比来回传引用清晰得多
+ * （与本项目 Utf8StreamDecoder / rxjs-lite 的写法一致）。
+ */
+class LatexParser {
+  private _src: string = '';
+  private _len: number = 0;
+  private _pos: number = 0;
+
+  parse(src: string): MNode {
+    this._src = src;
+    this._len = src.length;
+    this._pos = 0;
+    const root = mnode('row');
+    this._fillRow(root, false);
+    return root;
+  }
+
+  // ---- 基础扫描 ----
+
+  private _skipChar(ch: string): void {
+    if (this._pos < this._len && this._src.charAt(this._pos) == ch) {
+      this._pos = this._pos + 1;
+    }
+  }
+
+  private _skipSpaces(): void {
+    while (this._pos < this._len && isSpaceChar(this._src.charAt(this._pos))) {
+      this._pos = this._pos + 1;
+    }
+  }
+
+  /** 解析一行；stopAtBrace 为真时遇到 '}' 停下（由调用方消费该 '}'） */
+  private _fillRow(row: MNode, stopAtBrace: boolean): void {
+    while (this._pos < this._len) {
+      const ch: string = this._src.charAt(this._pos);
+
+      if (ch == '}') {
+        if (stopAtBrace) {
+          return;
+        }
+        this._pos = this._pos + 1; // 多余的右括号：忽略（流式半截文本里很常见）
+        continue;
+      }
+      if (ch == '{') {
+        this._pos = this._pos + 1;
+        const group = mnode('row');
+        this._fillRow(group, true);
+        this._skipChar('}');
+        pushAtom(row, group);
+        continue;
+      }
+      if (ch == '\\') {
+        const node = this._parseCommand();
+        if (node != null) {
+          pushAtom(row, node);
+        }
+        continue;
+      }
+      if (ch == '^' || ch == '_') {
+        this._pos = this._pos + 1;
+        this._attachScript(row, ch, this._readScriptArg());
+        continue;
+      }
+      if (ch == '\'') {
+        this._pos = this._pos + 1;
+        this._applyPrime(row);
+        continue;
+      }
+      if (ch == '&' || ch == '$') {
+        this._pos = this._pos + 1; // 矩阵分隔符 / 调用方多传的定界符
+        continue;
+      }
+      if (isSpaceChar(ch)) {
+        this._pos = this._pos + 1;
+        continue;
+      }
+      this._pos = this._pos + 1;
+      pushAtom(row, symbolNode(normalizeChar(ch)));
+    }
+  }
+
+  /** 读一个「组」：{...} 或单个原子；到文件尾也要返回一个（可能是空的）行节点 */
+  private _readGroup(): MNode {
+    this._skipSpaces();
+    if (this._pos >= this._len) {
+      return mnode('row');
+    }
+    if (this._src.charAt(this._pos) == '{') {
+      this._pos = this._pos + 1;
+      const group = mnode('row');
+      this._fillRow(group, true);
+      this._skipChar('}');
+      return group;
+    }
+    return this._readSingleAtom();
+  }
+
+  /** 读一个原子（命令 / 单字符 / 组） */
+  private _readSingleAtom(): MNode {
+    if (this._pos >= this._len) {
+      return mnode('row');
+    }
+    const ch: string = this._src.charAt(this._pos);
+    if (ch == '\\') {
+      const node = this._parseCommand();
+      return node != null ? node : mnode('row');
+    }
+    if (ch == '{') {
+      this._pos = this._pos + 1;
+      const group = mnode('row');
+      this._fillRow(group, true);
+      this._skipChar('}');
+      return group;
+    }
+    this._pos = this._pos + 1;
+    return symbolNode(normalizeChar(ch));
+  }
+
+  /** 读上下标的参数：{...} / 单个原子 / 空（流式下 `^` 刚到手、参数还没到） */
+  private _readScriptArg(): MNode {
+    this._skipSpaces();
+    if (this._pos >= this._len) {
+      return mnode('row');
+    }
+    if (this._src.charAt(this._pos) == '{') {
+      this._pos = this._pos + 1;
+      const group = mnode('row');
+      this._fillRow(group, true);
+      this._skipChar('}');
+      return group;
+    }
+    return this._readSingleAtom();
+  }
+
+  /** 读花括号里的「原样文本」（不解析数学），返回内容字符串 */
+  private _readRawGroup(): string {
+    this._skipSpaces();
+    if (this._pos >= this._len) {
+      return '';
+    }
+    if (this._src.charAt(this._pos) != '{') {
+      const only: string = this._src.charAt(this._pos);
+      this._pos = this._pos + 1;
+      return only;
+    }
+    this._pos = this._pos + 1;
+    let raw: string = '';
+    let depth: number = 1;
+    while (this._pos < this._len) {
+      const ch: string = this._src.charAt(this._pos);
+      if (ch == '{') {
+        depth = depth + 1;
+      }
+      else if (ch == '}') {
+        depth = depth - 1;
+        if (depth == 0) {
+          this._pos = this._pos + 1;
+          break;
+        }
+      }
+      raw = raw + ch;
+      this._pos = this._pos + 1;
+    }
+    return raw;
+  }
+
+  // ---- 上下标 ----
+
+  /**
+   * 把上下标挂到「行尾最近的那个原子」上（它就变成基底）。
+   *
+   * 四种情形都要照顾到，缺一个就会丢内容：
+   * - 基底已经是 script / bigop：直接写它的 sup / sub 字段；
+   * - 基底是普通原子：把它包进新的 script 节点，**并把包好的节点放回行里**（pop 完必须 push 回去）；
+   * - 行首就是 ^ / _：补一个空基底，保证 script 节点永远有 children[0]（否则原生端取下标越界）；
+   * - 同类上下标已存在（x^a^b）：再套一层，外层只挂新的那个。
+   */
+  private _attachScript(row: MNode, marker: string, arg: MNode): void {
+    arg.scale = arg.scale * SCRIPT_SCALE;
+
+    const isSup: boolean = marker == '^';
+    let last: MNode | null = null;
+    if (row.children.length > 0) {
+      last = row.children[row.children.length - 1];
+    }
+    const reuse: boolean = last != null && (last.kind == 'script' || last.kind == 'bigop');
+
+    if (reuse && last != null) {
+      const occupied: boolean = isSup ? last.sup != null : last.sub != null;
+      if (!occupied) {
+        if (isSup) {
+          last.sup = arg;
+        }
+        else {
+          last.sub = arg;
+        }
+        return;
+      }
+      const outer = mnode('script');
+      outer.children = [last];
+      if (isSup) {
+        outer.sup = arg;
+      }
+      else {
+        outer.sub = arg;
+      }
+      row.children.pop();
+      row.children.push(outer);
+      return;
+    }
+
+    const base = mnode('script');
+    if (last != null && last.kind != 'space') {
+      base.children = [last];
+      row.children.pop();
+    }
+    else {
+      base.children = [mnode('row')];
+    }
+    if (isSup) {
+      base.sup = arg;
+    }
+    else {
+      base.sub = arg;
+    }
+    row.children.push(base);
+  }
+
+  /** `f'` → `f^{′}`；连续撇号并进同一个上标文本 */
+  private _applyPrime(row: MNode): void {
+    if (row.children.length > 0) {
+      const last: MNode = row.children[row.children.length - 1];
+      const sup: MNode | null = last.kind == 'script' ? last.sup : null;
+      if (sup != null && sup.kind == 'sym' && sup.text.includes('′')) {
+        sup.text = `${sup.text}′`;
+        return;
+      }
+    }
+    const prime = symbolNode('′');
+    this._attachScript(row, '^', prime);
+  }
+
+  // ---- 命令 ----
+
+  /** 解析一个反斜杠命令，返回节点；返回 null 表示「不产出任何图元」 */
+  private _parseCommand(): MNode | null {
+    this._pos = this._pos + 1; // 吃掉反斜杠
+    if (this._pos >= this._len) {
+      return null;
+    } // 流式：尾随反斜杠
+    const ch: string = this._src.charAt(this._pos);
+
+    if (ch == '\\') { // `\\` 换行
+      this._pos = this._pos + 1;
+      return null;
+    }
+    if (ch == ' ') { // `\ ` 一个空格宽度
+      this._pos = this._pos + 1;
+      return spaceNode(0.25);
+    }
+    if (ch == ',' || ch == ':' || ch == ';' || ch == '!') {
+      this._pos = this._pos + 1;
+      if (ch == ',') {
+        return spaceNode(0.17);
+      }
+      if (ch == ':') {
+        return spaceNode(0.22);
+      }
+      if (ch == ';') {
+        return spaceNode(0.28);
+      }
+      return spaceNode(-0.17); // \! 负间距：把后面的原子往左拉
+    }
+    if (ch == '{' || ch == '}' || ch == '%' || ch == '&' || ch == '#' || ch == '_' || ch == '$') {
+      this._pos = this._pos + 1; // 转义符号
+      return symbolNode(ch);
+    }
+    if (!isLetter(ch)) {
+      this._pos = this._pos + 1; // 兜底：`\|` `\/` 这类
+      return symbolNode(ch);
+    }
+
+    let name: string = '';
+    while (this._pos < this._len && isLetter(this._src.charAt(this._pos))) {
+      name = name + this._src.charAt(this._pos);
+      this._pos = this._pos + 1;
+    }
+    return this._commandToNode(name);
+  }
+
+  private _commandToNode(name: string): MNode | null {
+    // 1) 空白与样式开关（不产出图元）
+    if (name == 'quad') {
+      return spaceNode(1.0);
+    }
+    if (name == 'qquad') {
+      return spaceNode(2.0);
+    }
+    if (name == 'thinspace' || name == 'enspace') {
+      return spaceNode(0.3);
+    }
+    if (name == 'limits' || name == 'nolimits' || name == 'displaystyle' || name == 'textstyle') {
+      return null;
+    }
+
+    // 2) 结构类
+    if (name == 'frac' || name == 'dfrac' || name == 'tfrac' || name == 'cfrac') {
+      return this._readFrac();
+    }
+    if (name == 'sqrt') {
+      return this._readSqrt();
+    }
+    if (name == 'overline' || name == 'bar') {
+      return this._readOverline();
+    }
+    if (name == 'hat' || name == 'widehat') {
+      return this._readAccent('^', 0.5);
+    }
+    if (name == 'tilde' || name == 'widetilde') {
+      return this._readAccent('~', 0.5);
+    }
+    if (name == 'vec') {
+      return this._readAccent('→', 0.42);
+    }
+    if (name == 'dot') {
+      return this._readAccent('˙', 0.5);
+    }
+    if (name == 'ddot') {
+      return this._readAccent('¨', 0.5);
+    }
+    if (name == 'prime') {
+      return symbolNode('′');
+    }
+    if (name == 'begin') {
+      return this._readEnvironment();
+    }
+
+    // 3) 文本类：只换字符、不做数学解析
+    if (name == 'text' || name == 'textrm' || name == 'textbf' || name == 'textit'
+      || name == 'mathrm' || name == 'mathbf' || name == 'mathit' || name == 'mathsf'
+      || name == 'mathtt' || name == 'operatorname' || name == 'mbox' || name == 'textnormal') {
+      return textNode(this._readRawGroup());
+    }
+    if (name == 'mathbb' || name == 'mathcal' || name == 'mathscr') {
+      const raw: string = this._readRawGroup();
+      const mapped: string | null = BLACKBOARD.getString(raw);
+      return mapped != null ? symbolNode(mapped) : textNode(raw);
+    }
+    if (name == 'bm' || name == 'boldsymbol' || name == 'pmb' || name == 'underline'
+      || name == 'boxed' || name == 'color' || name == 'textcolor' || name == 'class'
+      || name == 'overset' || name == 'underset' || name == 'stackrel' || name == 'substack') {
+      // 样式/盒子类：拿不到对应能力，退化成「原样渲染组内容」，至少不影响公式成立
+      if (name == 'overset' || name == 'underset' || name == 'stackrel' || name == 'substack') {
+        this._readGroup();
+        return this._readGroup();
+      }
+      if (name == 'color' || name == 'textcolor' || name == 'class') {
+        this._readRawGroup();
+        return this._readGroup();
+      }
+      return this._readGroup();
+    }
+
+    // 4) 定界符缩放命令：后面的定界符由主循环当普通字符渲染
+    if (name == 'left' || name == 'right' || name == 'middle' || name == 'big' || name == 'Big'
+      || name == 'bigg' || name == 'Bigg' || name == 'bigl' || name == 'bigr' || name == 'Bigl'
+      || name == 'Bigr' || name == 'biggl' || name == 'biggr') {
+      this._skipSpaces();
+      this._skipChar('.'); // \left. \right. 是不可见定界符
+      return null;
+    }
+
+    // 5) 正体函数名
+    if (FUNC_PLAIN.includes(name) && this._isWordInList(name, FUNC_PLAIN)) {
+      const fn = textNode(name);
+      fn.cls = 'func';
+      return fn;
+    }
+    if (FUNC_STACKED.includes(name) && this._isWordInList(name, FUNC_STACKED)) {
+      const fn = textNode(name);
+      return bigopNode(fn, true);
+    }
+
+    // 6) 符号表
+    const sym: string | null = SYMBOLS.getString(name);
+    if (sym != null) {
+      const node = symbolNode(sym);
+      if (node.cls == 'op') {
+        return bigopNode(node, BIGOP_CHARS.includes(sym));
+      }
+      return node;
+    }
+
+    // 7) 未知命令：原样显示命令名（流式下命令可能还没到齐，下一块会重排）
+    return textNode(name);
+  }
+
+  /** 词表匹配必须整词，否则 `log` 会命中 `logarithm` 这类长命令的前缀 */
+  private _isWordInList(name: string, list: string): boolean {
+    const padded: string = ` ${list} `;
+    return padded.includes(` ${name} `);
+  }
+
+  private _readFrac(): MNode {
+    const num: MNode = this._readGroup();
+    const den: MNode = this._readGroup();
+    num.scale = num.scale * FRAC_SCALE;
+    den.scale = den.scale * FRAC_SCALE;
+    const n = mnode('frac');
+    n.children = [num, den];
+    return n;
+  }
+
+  private _readSqrt(): MNode {
+    this._skipSpaces();
+    let index: MNode | null = null;
+    if (this._pos < this._len && this._src.charAt(this._pos) == '[') {
+      this._pos = this._pos + 1;
+      let raw: string = '';
+      while (this._pos < this._len && this._src.charAt(this._pos) != ']') {
+        raw = raw + this._src.charAt(this._pos);
+        this._pos = this._pos + 1;
+      }
+      this._skipChar(']');
+      // 次数里可能还是公式（\sqrt[\frac{1}{2}]{}），交给一个新解析器递归处理
+      index = new LatexParser().parse(raw);
+      index.scale = 0.6;
+    }
+    const n = mnode('sqrt');
+    n.children = [this._readGroup()];
+    n.sup = index; // sqrt 借 sup 存根指数
+    return n;
+  }
+
+  private _readOverline(): MNode {
+    const n = mnode('overline');
+    n.children = [this._readGroup()];
+    return n;
+  }
+
+  private _readAccent(accent: string, accentScale: number): MNode {
+    const n = mnode('accent');
+    n.text = accent;
+    n.scale = accentScale; // 重音符自己的字号（相对基准）
+    n.children = [this._readGroup()];
+    return n;
+  }
+
+  /** \begin{env} … \end{env}：解析成矩阵节点 */
+  private _readEnvironment(): MNode | null {
+    const env: string = this._readRawGroup();
+    if (env.length == 0) {
+      return null;
+    }
+
+    const endTag: string = `\\end{${env}}`;
+    const endIdx: number = this._src.indexOf(endTag, this._pos);
+    let body: string = '';
+    if (endIdx >= 0) {
+      body = this._src.substring(this._pos, endIdx);
+      this._pos = endIdx + endTag.length;
+    }
+    else {
+      // 流式：\end{...} 还没到达 —— 先按普通内容渲染，下一块到齐后整体变回矩阵
+      body = this._src.substring(this._pos);
+      this._pos = this._len;
+    }
+
+    const n = mnode('matrix');
+    n.text = env;
+    n.cls = 'center';
+    if (env == 'pmatrix') {
+      n.delimL = '(';
+      n.delimR = ')';
+    }
+    else if (env == 'bmatrix') {
+      n.delimL = '[';
+      n.delimR = ']';
+    }
+    else if (env == 'Bmatrix') {
+      n.delimL = '{';
+      n.delimR = '}';
+    }
+    else if (env == 'vmatrix') {
+      n.delimL = '|';
+      n.delimR = '|';
+    }
+    else if (env == 'cases') {
+      n.delimL = '{';
+      n.delimR = '';
+      n.cls = 'left';
+    }
+
+    const rows: Array<string> = splitMatrix(body, true);
+    n.rows = rows.length;
+    n.cols = 0;
+    for (let r: number = 0; r < rows.length; r++) {
+      const cells: Array<string> = splitMatrix(rows[r], false);
+      if (cells.length > n.cols) {
+        n.cols = cells.length;
+      }
+      for (let c: number = 0; c < cells.length; c++) {
+        n.children.push(new LatexParser().parse(cells[c]));
+      }
+    }
+    return n;
+  }
+}
+
+/**
+ * 按 `\\`（isRow 为真）或 `&` 切分矩阵内容。
+ *
+ * 刻意不用 String.split()：UTS 编译到 Kotlin 后 split 的分隔符语义与 JS 不一致
+ * （Kotlin 的 split 收的是正则），本文件一律用字符扫描，跨端行为才可预期。
+ */
+function splitMatrix(body: string, isRow: boolean): Array<string> {
+  const parts: Array<string> = [];
+  let cur: string = '';
+  let depth: number = 0;
+  let i: number = 0;
+  while (i < body.length) {
+    const ch: string = body.charAt(i);
+    if (ch == '{') {
+      depth = depth + 1;
+    }
+    else if (ch == '}') {
+      depth = depth - 1;
+    }
+
+    if (depth == 0 && ch == '&' && !isRow) {
+      parts.push(cur);
+      cur = '';
+      i = i + 1;
+      continue;
+    }
+    if (depth == 0 && ch == '\\' && isRow && i + 1 < body.length && body.charAt(i + 1) == '\\') {
+      parts.push(cur);
+      cur = '';
+      i = i + 2;
+      continue;
+    }
+    cur = cur + ch;
+    i = i + 1;
+  }
+  parts.push(cur);
+  return parts;
+}
+
+// ==========================================
+// 五、排版：盒子模型
+// ==========================================
+
+/** 数学轴线高度（分式线、居中符号围绕它上下分布） */
+const AXIS: number = 0.25;
+
+/** 算一个盒子的尺寸，并给它的子盒子定坐标（坐标相对本盒「左边缘 + 基线」） */
+function layoutNode(n: MNode, parentEm: number): void {
+  if (n.kind == 'rule') {
+    // rule 的 scale 语义是「粗细（em）」，不参与字号换算，故在换算 em 之前处理
+    n.width = n.w * parentEm;
+    n.height = n.scale * parentEm;
+    n.depth = 0;
+    return;
+  }
+  if (n.kind == 'space') {
+    n.width = n.w * parentEm;
+    n.height = 0;
+    n.depth = 0;
+    return;
+  }
+
+  const em: number = parentEm * n.scale;
+  if (n.kind == 'sym') {
+    layoutSymbol(n, em);
+  }
+  else if (n.kind == 'row') {
+    layoutRow(n, em);
+  }
+  else if (n.kind == 'frac') {
+    layoutFrac(n, em);
+  }
+  else if (n.kind == 'sqrt') {
+    layoutSqrt(n, em);
+  }
+  else if (n.kind == 'script') {
+    layoutScript(n, em);
+  }
+  else if (n.kind == 'bigop') {
+    layoutBigop(n, em);
+  }
+  else if (n.kind == 'matrix') {
+    layoutMatrix(n, em);
+  }
+  else if (n.kind == 'accent') {
+    layoutAccent(n, em);
+  }
+  else if (n.kind == 'overline') {
+    layoutOverline(n, em);
+  }
+  else {
+    layoutRow(n, em);
+  }
+}
+
+function layoutSymbol(n: MNode, em: number): void {
+  n.width = textWidth(n.text, em);
+  const m: Metrics = glyphMetrics(n.text);
+  n.height = m.height * em;
+  n.depth = m.depth * em;
+}
+
+/** 一行：同类原子按类别自动留间距（TeX 的原子间距规则） */
+function layoutRow(n: MNode, em: number): void {
+  const kids: Array<MNode> = n.children;
+  let x: number = 0;
+  let h: number = 0;
+  let d: number = 0;
+  for (let i: number = 0; i < kids.length; i++) {
+    const kid: MNode = kids[i];
+    layoutNode(kid, em);
+    if (i > 0) {
+      x = x + atomSpace(kids[i - 1].cls, kid.cls) * em;
+    }
+    kid.x = x;
+    kid.y = 0;
+    x = x + kid.width;
+    const top: number = kid.height - kid.y;
+    if (top > h) {
+      h = top;
+    }
+    const bottom: number = kid.y + kid.depth;
+    if (bottom > d) {
+      d = bottom;
+    }
+  }
+  n.width = x;
+  n.height = h;
+  n.depth = d;
+}
+
+function layoutFrac(n: MNode, em: number): void {
+  const num: MNode = childAt(n, 0);
+  const den: MNode = childAt(n, 1);
+  layoutNode(num, em);
+  layoutNode(den, em);
+
+  const t: number = Math.max(1, 0.055 * em); // 分数线粗细
+  const gap: number = 0.14 * em; // 分数线与分子/分母的留白
+  const axis: number = AXIS * em;
+  const barW: number = Math.max(num.width, den.width) + 0.4 * em;
+
+  // 分子：底边落在线上方 gap + t/2 处；分母：顶边落在线下方同样的距离
+  const numY: number = -(axis + t / 2 + gap) - num.depth;
+  const denY: number = -(axis - t / 2 - gap) + den.height;
+  num.x = (barW - num.width) / 2;
+  num.y = numY;
+  den.x = (barW - den.width) / 2;
+  den.y = denY;
+
+  const bar = ruleNode(barW / em, t / em);
+  bar.x = 0;
+  bar.y = -axis + t / 2;
+  layoutNode(bar, em);
+
+  n.children = [num, den, bar];
+  n.width = barW;
+  n.height = -(numY - num.height);
+  n.depth = denY + den.depth;
+}
+
+function layoutSqrt(n: MNode, em: number): void {
+  const body: MNode = childAt(n, 0);
+  const index: MNode | null = n.sup;
+  layoutNode(body, em);
+  if (index != null) {
+    layoutNode(index, em);
+  }
+
+  const pad: number = 0.08 * em; // 横线在根号内的左右余量
+  const t: number = Math.max(1, 0.05 * em);
+  const innerH: number = body.height + body.depth + pad;
+
+  // 根号字形按「高度盖住被开方数」放大；字形高度约 0.76em
+  const surdFs: number = Math.max(em, innerH / 0.76);
+  const surdW: number = 0.5 * surdFs;
+  const surd = textNode('√');
+  surd.scale = surdFs / em;
+  layoutNode(surd, em);
+  surd.x = 0;
+  surd.y = body.depth; // 根号底端与被开方数底端对齐
+
+  const line = ruleNode((body.width + pad + surdW * 0.42) / em, t / em);
+  line.x = surdW * 0.58;
+  line.y = -(body.height + pad); // 横线底边贴住被开方数顶部
+  layoutNode(line, em);
+
+  body.x = surdW;
+  body.y = 0;
+
+  let width: number = surdW + body.width + pad;
+  let height: number = body.height + pad;
+  const depth: number = body.depth;
+
+  const kids: Array<MNode> = [surd, line, body];
+  if (index != null) {
+    // 根指数：排在根号左上角（近似 TeX 的位置）
+    index.x = 0;
+    index.y = -(height - 0.1 * em) + index.height;
+    const top: number = index.height - index.y;
+    if (top > height) {
+      height = top;
+    }
+    const shift: number = index.width + 0.04 * em;
+    surd.x = surd.x + shift;
+    line.x = line.x + shift;
+    body.x = body.x + shift;
+    width = width + shift;
+  }
+
+  n.children = kids;
+  n.width = width;
+  n.height = height;
+  n.depth = depth;
+}
+
+/** 上下标：上标抬到基底顶部附近，下标落到基底底部附近 */
+function layoutScript(n: MNode, em: number): void {
+  const base: MNode = childAt(n, 0);
+  layoutNode(base, em);
+
+  let width: number = base.width;
+  let height: number = base.height;
+  let depth: number = base.depth;
+  const scriptX: number = base.width + 0.03 * em;
+
+  const sup: MNode | null = n.sup;
+  if (sup != null) {
+    layoutNode(sup, em);
+    sup.x = scriptX;
+    sup.y = -Math.max(0.45 * em, base.height * 0.95);
+    const top: number = sup.height - sup.y;
+    if (top > height) {
+      height = top;
+    }
+    if (scriptX + sup.width > width) {
+      width = scriptX + sup.width;
+    }
+  }
+  const sub: MNode | null = n.sub;
+  if (sub != null) {
+    layoutNode(sub, em);
+    sub.x = scriptX;
+    sub.y = Math.max(0.2 * em, base.depth + 0.14 * em);
+    const bottom: number = sub.y + sub.depth;
+    if (bottom > depth) {
+      depth = bottom;
+    }
+    if (scriptX + sub.width > width) {
+      width = scriptX + sub.width;
+    }
+  }
+
+  n.width = width;
+  n.height = height;
+  n.depth = depth;
+}
+
+/** 大运算符：∑ 类上下限堆叠，∫ 类上下限侧挂 */
+function layoutBigop(n: MNode, em: number): void {
+  const op: MNode = childAt(n, 0);
+  const opScale: number = n.scale > 0 ? n.scale : 1.35;
+  layoutNode(op, em * opScale);
+
+  const sup: MNode | null = n.sup;
+  const sub: MNode | null = n.sub;
+  if (sup != null) {
+    layoutNode(sup, em);
+  }
+  if (sub != null) {
+    layoutNode(sub, em);
+  }
+
+  let width: number = op.width;
+  let height: number = op.height;
+  let depth: number = op.depth;
+
+  if (n.mode == 'stack') {
+    // 先把最终宽度定下来，再居中 —— 否则「子行比算子宽」时，先算的那个会被按旧宽度居中
+    let stackW: number = op.width;
+    if (sup != null && sup.width > stackW) {
+      stackW = sup.width;
+    }
+    if (sub != null && sub.width > stackW) {
+      stackW = sub.width;
+    }
+    if (sup != null) {
+      sup.x = (stackW - sup.width) / 2;
+      sup.y = -(op.height + 0.18 * em) - sup.depth;
+      height = op.height + 0.18 * em + sup.height + sup.depth;
+    }
+    if (sub != null) {
+      sub.x = (stackW - sub.width) / 2;
+      sub.y = op.depth + 0.18 * em + sub.height;
+      depth = op.depth + 0.18 * em + sub.height + sub.depth;
+    }
+    op.x = (stackW - op.width) / 2;
+    op.y = 0;
+    width = stackW;
+  }
+  else {
+    const sideX: number = op.width + 0.06 * em;
+    if (sup != null) {
+      sup.x = sideX;
+      sup.y = -Math.max(0.5 * em, op.height - 0.3 * em);
+      const top: number = sup.height - sup.y;
+      if (top > height) {
+        height = top;
+      }
+      if (sideX + sup.width > width) {
+        width = sideX + sup.width;
+      }
+    }
+    if (sub != null) {
+      sub.x = sideX;
+      sub.y = Math.max(0.28 * em, op.depth * 0.7);
+      const bottom: number = sub.y + sub.depth;
+      if (bottom > depth) {
+        depth = bottom;
+      }
+      if (sideX + sub.width > width) {
+        width = sideX + sub.width;
+      }
+    }
+  }
+
+  n.width = width;
+  n.height = height;
+  n.depth = depth;
+}
+
+/**
+ * 矩阵 / 分段函数：单元格网格 + 按内容高度放大的定界符。
+ * 整块内容在垂直方向以「数学轴线」居中（即矩阵基线在内容正中），定界符再按高度拉伸。
+ */
+function layoutMatrix(n: MNode, em: number): void {
+  const cells: Array<MNode> = n.children;
+  const rows: number = n.rows;
+  const cols: number = n.cols;
+  if (rows <= 0 || cols <= 0 || cells.length == 0) {
+    n.width = 0;
+    n.height = 0;
+    n.depth = 0;
+    return;
+  }
+
+  const colGap: number = 0.7 * em;
+  const rowGap: number = 0.42 * em;
+  const colW: Array<number> = [];
+  const rowH: Array<number> = [];
+  const rowD: Array<number> = [];
+  for (let c: number = 0; c < cols; c++) {
+    colW.push(0);
+  }
+  for (let r: number = 0; r < rows; r++) {
+    rowH.push(0);
+    rowD.push(0);
+  }
+
+  for (let i: number = 0; i < cells.length; i++) {
+    layoutNode(cells[i], em);
+    const r: number = Math.floor(i / cols);
+    const c: number = i % cols;
+    if (c >= cols || r >= rows) {
+      continue;
+    }
+    if (cells[i].width > colW[c]) {
+      colW[c] = cells[i].width;
+    }
+    if (cells[i].height > rowH[r]) {
+      rowH[r] = cells[i].height;
+    }
+    if (cells[i].depth > rowD[r]) {
+      rowD[r] = cells[i].depth;
+    }
+  }
+
+  let contentW: number = 0;
+  for (let c: number = 0; c < cols; c++) {
+    contentW = contentW + colW[c];
+  }
+  contentW = contentW + (cols - 1) * colGap;
+
+  let contentH: number = 0;
+  for (let r: number = 0; r < rows; r++) {
+    contentH = contentH + rowH[r] + rowD[r];
+  }
+  contentH = contentH + (rows - 1) * rowGap;
+  const centerY: number = contentH / 2;
+
+  const colX: Array<number> = [];
+  let accX: number = 0;
+  for (let c: number = 0; c < cols; c++) {
+    colX.push(accX);
+    accX = accX + colW[c] + colGap;
+  }
+
+  let accY: number = 0;
+  for (let r: number = 0; r < rows; r++) {
+    const baseY: number = accY + rowH[r] - centerY; // 相对矩阵基线
+    for (let c: number = 0; c < cols; c++) {
+      const idx: number = r * cols + c;
+      if (idx >= cells.length) {
+        continue;
+      }
+      const cell: MNode = cells[idx];
+      const left: boolean = n.cls == 'left';
+      cell.x = colX[c] + (left ? 0 : (colW[c] - cell.width) / 2);
+      cell.y = baseY;
+    }
+    accY = accY + rowH[r] + rowD[r] + rowGap;
+  }
+
+  // 定界符：字号按内容高度放大，字形中点在内容垂直中点上
+  let width: number = contentW;
+  const height: number = centerY;
+  const depth: number = centerY;
+  const delimFs: number = Math.max(em, (contentH + 0.3 * em) / 0.94);
+  const delimW: number = 0.36 * delimFs;
+  const delimKids: Array<MNode> = [];
+  let contentShift: number = 0;
+  if (n.delimL.length > 0) {
+    const left = textNode(n.delimL);
+    left.scale = delimFs / em;
+    layoutNode(left, em);
+    left.x = 0;
+    left.y = 0.25 * delimFs;
+    delimKids.push(left);
+    contentShift = delimW + 0.1 * em;
+    width = width + contentShift;
+  }
+  if (n.delimR.length > 0) {
+    const right = textNode(n.delimR);
+    right.scale = delimFs / em;
+    layoutNode(right, em);
+    right.x = contentShift + contentW + 0.1 * em;
+    right.y = 0.25 * delimFs;
+    delimKids.push(right);
+    width = width + delimW + 0.1 * em;
+  }
+
+  for (let i: number = 0; i < cells.length; i++) {
+    cells[i].x = cells[i].x + contentShift;
+  }
+  for (let i: number = 0; i < delimKids.length; i++) {
+    n.children.push(delimKids[i]);
+  }
+
+  const delimHalf: number = 0.5 * delimFs;
+  n.width = width;
+  n.height = Math.max(height, delimHalf);
+  n.depth = Math.max(depth, delimHalf);
+}
+
+/** 重音符（\hat \vec \dot …）：音符居中压在基底上方 */
+function layoutAccent(n: MNode, em: number): void {
+  const base: MNode = childAt(n, 0);
+  layoutNode(base, em);
+
+  const accent = textNode(n.text);
+  layoutNode(accent, em); // accent 的字号由 n.scale 决定（在 layoutNode 里已乘进 em）
+
+  const width: number = base.width;
+  accent.x = (width - accent.width) / 2 + (n.text == '→' ? 0.04 * em : 0);
+  accent.y = -(base.height + 0.06 * em) - accent.depth;
+
+  base.x = 0;
+  base.y = 0;
+
+  n.children = [base, accent];
+  n.width = width;
+  n.height = -(accent.y - accent.height);
+  n.depth = base.depth;
+}
+
+/** 上划线（\overline \bar）：基底上方一条贯穿的横线 */
+function layoutOverline(n: MNode, em: number): void {
+  const base: MNode = childAt(n, 0);
+  layoutNode(base, em);
+
+  const t: number = Math.max(1, 0.05 * em);
+  const pad: number = 0.06 * em;
+  const width: number = base.width + 2 * pad;
+  const line = ruleNode(width / em, t / em);
+  line.x = 0;
+  line.y = -(base.height + 0.12 * em);
+  layoutNode(line, em);
+
+  base.x = pad;
+  base.y = 0;
+
+  n.children = [base, line];
+  n.width = width;
+  n.height = base.height + 0.12 * em + t;
+  n.depth = base.depth;
+}
+
+// ==========================================
+// 六、摊平：盒子树 → 绝对定位图元
+// ==========================================
+
+/**
+ * 把盒子树展平成绝对定位图元。
+ *
+ * 文本盒的 `top` 由「根基线位置 + 盒子基线 + 基线系数 × 字号」反推出来：
+ * 组件给文本盒写死 `line-height = font-size`，此时盒内基线到盒顶的距离与字号成正比
+ * （见 KATEX_BASELINE_RATIO），所以只要按字号换算，分子/分母/上下标之间的基线关系
+ * 就是精确的 —— 这也是本项目用绝对定位而不是 flex 行来叠公式的原因。
+ */
+function collectBoxes(n: MNode, ox: number, oy: number, parentEm: number, rootBaseline: number, out: Array<KatexBox>): void {
+  const ax: number = ox + n.x;
+  const ay: number = oy + n.y;
+
+  if (n.kind == 'rule') {
+    out.push({
+      kind: 'rule',
+      text: '',
+      x: round2(ax),
+      top: round2(rootBaseline + ay - n.height),
+      width: round2(n.width),
+      fontSize: 0,
+      lineHeight: round2(n.height),
+      italic: false
+    } as KatexBox);
+    return;
+  }
+  if (n.kind == 'space') {
+    return;
+  }
+
+  const em: number = parentEm * n.scale;
+  if (n.kind == 'sym') {
+    if (n.text.length > 0) {
+      out.push({
+        kind: 'text',
+        text: n.text,
+        x: round2(ax),
+        top: round2(rootBaseline + ay - KATEX_BASELINE_RATIO * em),
+        width: round2(n.width),
+        fontSize: round2(em),
+        lineHeight: 0,
+        italic: n.italic
+      } as KatexBox);
+    }
+    return;
+  }
+
+  const kids: Array<MNode> = n.children;
+  for (let i: number = 0; i < kids.length; i++) {
+    collectBoxes(kids[i], ax, ay, em, rootBaseline, out);
+  }
+  // 上下标不在 children 里，而是挂在 sup / sub 字段上（分式、行、矩阵没有这两个字段）
+  if (n.sup != null) {
+    collectBoxes(n.sup, ax, ay, n.kind == 'bigop' ? parentEm : em, rootBaseline, out);
+  }
+  if (n.sub != null) {
+    collectBoxes(n.sub, ax, ay, n.kind == 'bigop' ? parentEm : em, rootBaseline, out);
+  }
+}
+
+function round2(v: number): number {
+  return Math.round(v * 100) / 100;
+}
+
+// ==========================================
+// 七、对外入口
+// ==========================================
+
+/**
+ * 把一段 LaTeX 排成绝对定位图元。
+ *
+ * @param latex LaTeX 源码（可带或不带 `$` / `$$` 定界符，会自动忽略）
+ * @param fontSize 基准字号 px（一般与被乘方公式所在正文的字号一致）
+ */
+export function renderKatex(latex: string, fontSize: number): KatexLayout {
+  const size: number = fontSize > 0 ? fontSize : 18;
+  const boxes: Array<KatexBox> = [];
+  const result: KatexLayout = {
+    width: 0,
+    height: 0,
+    boxes,
+    error: ''
+  } as KatexLayout;
+
+  try {
+    const root: MNode = new LatexParser().parse(latex);
+    layoutNode(root, size);
+    const rootBaseline: number = root.height;
+    collectBoxes(root, 0, 0, size, rootBaseline, boxes);
+    result.width = round2(root.width);
+    // 文本盒的「顶边」比字形顶边还高 0.84em（见 KATEX_BASELINE_RATIO），
+    // 所以按盒子模型算出来的基线还要往下压一点，否则首行盒子会落到容器外（top 为负）。
+    let minTop: number = 0;
+    for (let i: number = 0; i < boxes.length; i++) {
+      if (boxes[i].top < minTop) {
+        minTop = boxes[i].top;
+      }
+    }
+    if (minTop < 0) {
+      for (let i: number = 0; i < boxes.length; i++) {
+        boxes[i].top = round2(boxes[i].top - minTop);
+      }
+    }
+    result.height = round2(root.height + root.depth - minTop);
+  }
+  catch (e) {
+    // 排版失败不该让页面白屏：兜底成「一行源码文本」，同时把错误信息交给调用方
+    let msg: string = '公式排版失败';
+    if (e instanceof Error) {
+      msg = (e as Error).message;
+    }
+    result.error = msg;
+    result.boxes = [];
+    result.width = 0;
+    result.height = 0;
+  }
+  return result;
+}
+
+/**
+ * 文本宽度估算（px）：原生端拿不到字体度量，按字符类别估一个够用的值。
+ * 导出给别的自研排版引擎复用（mermaid-lite 量节点标签就靠它），
+ * 免得同一套字宽表在项目里出现两份、两处估算还不一致。
+ */
+export function measureTextWidth(text: string, fontSize: number): number {
+  return textWidth(text, fontSize);
+}

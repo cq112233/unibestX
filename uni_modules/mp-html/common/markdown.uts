@@ -1,0 +1,125 @@
+import { useMarked } from '@/uni_modules/kux-marked/common/marked.uts';
+import type { I_Marked, TokensList } from '@/uni_modules/kux-marked/utssdk/interface.uts';
+
+let markedInst: I_Marked | null = null;
+
+function getMarked(): I_Marked {
+  if (markedInst == null) {
+    markedInst = useMarked();
+  }
+  return markedInst!;
+}
+
+function renderPureMarkdown(md: string): string {
+  if (md.trim().length == 0) return '';
+  const m = getMarked();
+  const tokens: TokensList = m.lexer(md, null);
+  return m.parser(tokens.tokens, null);
+}
+
+function isLineStart(t: string, idx: number): boolean {
+  let i = idx - 1;
+  while (i >= 0) {
+    const c = t.charAt(i);
+    if (c == '\n') return true;
+    if (c != ' ' && c != '\t') return false;
+    i--;
+  }
+  return true;
+}
+
+/**
+ * 将包含 LaTeX 公式 ($$) 和 Mermaid 流程图的 Markdown 转换为原生 HTML
+ * 保护公式与图表免受 marked 解析器的意外转义
+ */
+export function markdownToHtml(raw: string): string {
+  if (raw.length == 0) return '';
+  const text = raw;
+  const MATH = '$$';
+  const FENCE = '```';
+  let cursor = 0;
+  let mdStart = 0;
+  let out = '';
+
+  while (cursor < text.length) {
+    const mathIdx = text.indexOf(MATH, cursor);
+    const fenceIdx = text.indexOf(FENCE, cursor);
+
+    let mermaidStart = -1;
+    let mermaidBody = -1;
+    if (fenceIdx >= 0 && isLineStart(text, fenceIdx)) {
+      let after = fenceIdx + 3;
+      while (after < text.length && (text.charAt(after) == ' ' || text.charAt(after) == '\t')) after++;
+      if (after + 7 <= text.length && text.substring(after, after + 7).toLowerCase() == 'mermaid') {
+        let body = after + 7;
+        while (body < text.length && text.charAt(body) != '\n') body++;
+        if (body < text.length && text.charAt(body) == '\n') body++;
+        mermaidStart = fenceIdx;
+        mermaidBody = body;
+      }
+    }
+
+    let mathStart = -1;
+    if (mathIdx >= 0 && isLineStart(text, mathIdx)) {
+      mathStart = mathIdx;
+    }
+
+    if (mermaidStart >= 0 && (mathStart < 0 || mermaidStart < mathStart)) {
+      let closeFence = -1;
+      let fi = mermaidBody;
+      while (fi < text.length) {
+        const nextF = text.indexOf(FENCE, fi);
+        if (nextF < 0) break;
+        if (isLineStart(text, nextF)) {
+          closeFence = nextF;
+          break;
+        }
+        fi = nextF + 3;
+      }
+
+      if (closeFence >= 0) {
+        if (mermaidStart > mdStart) {
+          out += renderPureMarkdown(text.substring(mdStart, mermaidStart));
+        }
+        const mermaidCode = text.substring(mermaidBody, closeFence).trim();
+        out += '<mermaid>' + mermaidCode + '</mermaid>';
+        cursor = closeFence + 3;
+        mdStart = cursor;
+        continue;
+      } else {
+        if (mermaidStart > mdStart) {
+          out += renderPureMarkdown(text.substring(mdStart, mermaidStart));
+        }
+        const mermaidCode = text.substring(mermaidBody).trim();
+        out += '<mermaid>' + mermaidCode + '</mermaid>';
+        return out;
+      }
+    }
+
+    if (mathStart >= 0) {
+      if (mathStart > mdStart) {
+        out += renderPureMarkdown(text.substring(mdStart, mathStart));
+      }
+      const closeMath = text.indexOf(MATH, mathStart + 2);
+      if (closeMath < 0) {
+        const formula = text.substring(mathStart + 2).trim();
+        out += '<katex>' + formula + '</katex>';
+        return out;
+      } else {
+        const formula = text.substring(mathStart + 2, closeMath).trim();
+        out += '<katex>' + formula + '</katex>';
+        cursor = closeMath + 2;
+        mdStart = cursor;
+        continue;
+      }
+    }
+
+    cursor++;
+  }
+
+  if (mdStart < text.length) {
+    out += renderPureMarkdown(text.substring(mdStart));
+  }
+
+  return out;
+}

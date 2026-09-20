@@ -63,7 +63,10 @@ const HANDWRITTEN = new Set(['systemInfo']);
 const EXTRA_SOURCES = [
   path.join(ROOT, 'src/store/types.uts'),
   path.join(ROOT, 'src/i18n/index.uts'),
-  path.join(ROOT, 'src/tabbar/index.uts')
+  path.join(ROOT, 'src/tabbar/index.uts'),
+  path.join(ROOT, 'uni_modules/mp-html/common/katex-lite/index.uts'),
+  path.join(ROOT, 'uni_modules/mp-html/common/mermaid-lite/index.uts'),
+  path.join(ROOT, 'uni_modules/mp-html/index.uts')
 ];
 
 const args = new Set(process.argv.slice(2));
@@ -78,7 +81,11 @@ const INCLUDE_ALL = args.has('--all');
  * 而切片仍然从原文取（保留 JSDoc）。
  */
 function mask(src) {
-  const out = [...src];
+  // 必须用 split('') 取「按 UTF-16 码元」的字符数组：`[...src]` 是按码点展开的，
+  // 一旦源码里出现 emoji / 数学字母这类增补平面字符（代理对），数组长度就会比
+  // src.length 短，后面 `out[i] = ' '` 的下标映射会整体错位，把代码当成字符串抹掉，
+  // 表现为「某些 export 在生成的 d.ts 里凭空消失」。
+  const out = src.split('');
   const n = src.length;
   let i = 0;
   while (i < n) {

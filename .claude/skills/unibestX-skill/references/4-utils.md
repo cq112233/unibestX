@@ -1,8 +1,8 @@
 # 四、项目内置工具库（src/utils）
 
-> **本文件是 `unibestX-skill` 的参考分册**，由 [SKILL.md](../SKILL.md) 按需引用，收录 `src/utils/` 下 10 个内置工具模块的对外 API 与使用规范。
+> **本文件是 `unibestX-skill` 的参考分册**，由 [SKILL.md](../SKILL.md) 按需引用，收录 `src/utils/` 下 11 个内置工具模块的对外 API 与使用规范。
 >
-> **何时读本文件**：动手写「路由取路径、取主题色、读环境变量、多语言文案、提示弹窗、返回键接管、下拉刷新、文件上传、取系统/安全区尺寸、防抖节流/流式处理」之前 —— **先查本文件有没有现成工具，严禁重复造轮子**（例如自己写 `uni.getSystemInfoSync()`、裸写 `setInterval` 做防抖、手拼 `import.meta.env.VITE_XXX`）。
+> **何时读本文件**：动手写「路由取路径、取主题色、读环境变量、多语言文案、提示弹窗、返回键接管、下拉刷新、文件上传、取系统/安全区尺寸、防抖节流/流式处理、数学公式排版」之前 —— **先查本文件有没有现成工具，严禁重复造轮子**（例如自己写 `uni.getSystemInfoSync()`、裸写 `setInterval` 做防抖、手拼 `import.meta.env.VITE_XXX`、为渲染公式去引 KaTeX）。
 >
 > **回写规则**：`src/utils/` 新增模块、或既有模块新增导出 / 改变调用姿势时，同步追加到本文件，编号续接 `4.11`、`4.12`…，并更新 [SKILL.md](../SKILL.md) 的导航表。
 
@@ -590,3 +590,122 @@ onUnmounted(() => { unsubscribeAll(subs) })
 - ⚠️ `Subscriber` 刻意实现为 **class 而非对象字面量**（源码注释：UTS 在 Android 端会把对象字面量中的函数字段编译为 Kotlin `Map`，存在编译/运行风险）。业务侧自定义 `Observable` 时也应遵循这个姿势，不要用 `{ next: ..., complete: ... }` 字面量（同 **1.1.10**）。
 - **本模块没有 Vapor / VDOM 两条实现路径**：全文件无 `VUE3-VAPOR` 条件编译，纯 UTS 实现，源码注释明确「可在 Android / iOS / H5 / 小程序全端一致运行」。
 - 本模块**没有默认导出**（只有具名导出），使用方一律具名导入。
+
+## 4.11 LaTeX 公式排版（katex-lite）
+
+**一句话定位**：用纯 UTS 重写的极简 LaTeX 排版引擎（单文件、无第三方依赖），把公式源码排成一组**绝对定位图元**（文本盒 + 线段）；渲染由使用页面自理（几行模板，见下），项目里**没有**单独的公式组件。
+
+**为什么需要它**：App 端没有 JS 引擎，npm 上的 KaTeX 是纯 JS，**根本跑不起来**；mp-html 官方的 latex 插件同样走「H5 塞 KaTeX.js + App 走 WebView」的路线，与本项目的原生渲染链路不兼容。而项目内的 mp-html 只支持 text / image / table / pre 等有限标签，分式、根号、上下标这类二维排版用它的标签体系表达不出来（原生端 `<text>` 里也不能嵌 `<view>`）—— 所以公式只能自己排。
+
+**何时用**：需要展示数学公式（分式、根式、上下标、大运算符上下限、矩阵、分段函数）；AI 对话里「公式混在 Markdown 源文里、随分块到达、到一块重排一次」的场景。
+
+**导出面**
+
+| 导出 | 签名 | 说明 |
+| :--- | :--- | :--- |
+| `renderKatex` | `(latex: string, fontSize: number): KatexLayout` | 排版主入口；`fontSize` 是基准字号 px |
+| `KatexLayout` | `{ width; height; boxes; error }` | `width` / `height` 为公式尺寸 px；`error` 非空表示排版失败（已兜底，不抛异常） |
+| `KatexBox` | `{ kind; text; x; top; width; fontSize; lineHeight; italic }` | `kind` 为 `'text'`（文本盒）或 `'rule'`（分数线 / 根号横线 / 上划线）；坐标已换算成容器坐标系，直接 `position:absolute` 定位 |
+| `KATEX_BASELINE_RATIO` | `number = 0.84` | 文本盒「顶边 → 基线」的距离系数；换字体族时改这一个数 |
+
+**在页面里渲染（项目现状：不封组件）**
+
+引擎只管排版，渲染三步就能贴进页面，`rxjsDemo.uvue` 就是这么写的（图元模板在 流式公式 / 静态示例 / 行内公式 三处保持一致）：
+
+```uts
+// 1) 引擎输出 → 模板能直接绑的样式串（文本框与线段盒分开收集）
+type KatexRenderBox = { text: string; style: string }
+
+function buildTextBoxes(latex: string, size: number): Array<KatexRenderBox> {
+  const layout: KatexLayout = renderKatex(latex, size)
+  const list: Array<KatexRenderBox> = []
+  const boxes: Array<KatexBox> = layout.boxes
+  for (let i: number = 0; i < boxes.length; i++) {
+    const box: KatexBox = boxes[i]
+    if (box.kind != 'text') {
+      continue
+    }
+    // line-height 必须等于 font-size，基线换算系数（KATEX_BASELINE_RATIO）才成立
+    let style: string = `position:absolute;top:${box.top}px;left:${box.x}px;`
+      + `font-size:${box.fontSize}px;line-height:${box.fontSize}px;color:#0f172a;`
+    if (box.italic) {
+      style = `${style}font-style:italic;`
+    }
+    list.push({ text: box.text, style: style } as KatexRenderBox)
+  }
+  return list
+}
+// 线段盒同理，只是样式换成 width / height / background-color
+```
+
+```html
+<!-- 2) 模板：容器用引擎算好的宽高，图元绝对定位贴进去 -->
+<view :style="rootStyle">
+  <text v-for="(box, i) in textBoxes" :key="`t${i}`" :style="box.style">{{ box.text }}</text>
+  <view v-for="(box, i) in ruleBoxes" :key="`r${i}`" :style="box.style" />
+</view>
+```
+
+- `rootStyle` 即 `position:relative;width:${layout.width}px;height:${layout.height}px`，由引擎算好，页面不要自己测量或判断居中。
+- **块级公式**：外面套一层 `flex flex-row items-center` 即可居中（容器自带宽高）。
+- **行内公式**：与 `<text>` 并排放在同一个 flex 行里 —— 把一句话拆成「文本片段 / 公式片段」交替的列表，模板按序平铺。
+- ⚠️ 一处页面有多个渲染点时图元模板会重复（uni-app X 不能在同一个 `.uvue` 内定义局部组件），**改动渲染方式务必同步每一处**。
+
+**流式公式：把公式写进 Markdown 源文，按 `$$` 切片**
+
+AI 对话场景下公式不该单独开一条流，而是**写进同一份 Markdown 源文**，按定界符把累积文本切成交替的「Markdown 片段 / 公式片段」，再分别交给 marked 与 katex-lite：
+
+```uts
+// 片段类型：kind 为 'md' 时用 html，为 'formula' 时用 render
+type StreamPart = { kind: string; html: string; render: FormulaRender }
+
+// 逐段扫描：碰到 $$ 就切一刀，中间那段交给 katex-lite
+let mdStart: number = 0
+let cursor: number = 0
+while (cursor < text.length) {
+  const open: number = text.indexOf('$$', cursor)
+  if (open < 0) { break }
+  if (!isLineStart(text, open)) {           // 行内的 $$ 不算（行内代码里写到的 $$ 要留给 Markdown）
+    cursor = open + 2
+    continue
+  }
+  const close: number = text.indexOf('$$', open + 2)
+  pushMarkdownPart(parts, text.substring(mdStart, open))
+  if (close < 0) {                          // $$ 还没闭合：尾部整段当公式，半截命令实时重排
+    pushFormulaPart(parts, text.substring(open + 2))
+    return parts
+  }
+  pushFormulaPart(parts, text.substring(open + 2, close))
+  cursor = close + 2
+  mdStart = cursor
+}
+```
+
+- 定界符只认 **独立成行** 的 `$$`（`isLineStart`：往前只有行首或空白），行内代码里的 `$$` 归 Markdown，免得把一段散文拖去当 LaTeX 排版。
+- 空白片段直接丢掉，避免产出空节点；公式源码 `trim()` 后再排版。
+- 模板按序平铺：`kind == 'md'` 走 `<MpHtml :content="part.html" />`，`kind == 'formula'` 走上面的图元模板（成行公式外面套 `items-center` 居中）。
+- ⚠️ 已知取舍：**围栏代码块**里独立成行的 `$$` 仍会被当成公式（切片器不做 Markdown 语法分析），演示源文里避开即可。
+
+**直接调引擎**
+
+```uts
+import { renderKatex } from '@/src/utils/katex-lite/index.uts'
+import type { KatexLayout, KatexBox } from '@/src/utils/katex-lite/index.uts'
+
+const layout: KatexLayout = renderKatex('x = \\frac{-b \\pm \\sqrt{b^{2}-4ac}}{2a}', 18)
+// layout.boxes 即最终图元；文本盒必须带 `line-height = font-size`，
+// 否则基线换算系数（KATEX_BASELINE_RATIO）失效，分子/分母/上下标会错位
+```
+
+**支持范围**：`^` `_`（含 `'` 撇号）、`\frac \dfrac \tfrac`、`\sqrt[n]{}`、`\sum \prod \int` 等大运算符（∑∏ 上下限堆叠、∫ 侧挂）、`\lim` 与 `\sin \cos \log` 等函数名、`\begin{pmatrix|bmatrix|Bmatrix|vmatrix|cases}…\end{…}`、希腊字母与常用关系/箭头/运算符号、`\text \mathrm \mathbf \mathbb`、`\hat \vec \bar \overline`、`\, \; \quad \qquad` 间距。
+
+**使用注意**
+
+- ⚠️ **只支持 LaTeX 子集**：`\left \right \big` 当作「不可见命令」跳过（定界符按原字号渲染，不拉伸），`\overset \color \boxed` 等样式类命令退化成「原样渲染组内容」，**未知命令不报错**、按正体显示命令名（流式下命令还没到齐时正是这个表现，下一块到达会自动重排）。
+- ⚠️ **绝不抛异常**：`\frac{1}{`（缺参数）、尾随 `\`、未闭合的 `\begin{pmatrix}` 都会「能排多少排多少」；真排不出来时返回 `error` 非空 + 空图元，页面不会白屏。
+- ⚠️ **宽高由引擎算好**：使用方不做任何测量与居中判断，`KatexLayout.width` / `height` 直接当容器宽高用。
+- ⚠️ **字号一律传 px**：`fontSize` 是基准字号（一般与所在正文一致），公式内上下标 / 分子分母按 0.72 / 0.95 倍率自动缩放，**不要传 em / rpx**。
+- ⚠️ **源码里的反斜杠要转义**：UTS 里写 `'\\frac{1}{2}'`；**不要用模板串**（模板串会把 `\f` `\s` 这类序列当转义字符吃掉）。
+- ⚠️ **本模块的 d.ts 曾因源码里的「增补平面字符」而丢失导出**：`scripts/gen-uts-dts.mjs` 的 `mask()` 原先用 `[...src]` 展开字符，遇到代理对（emoji、`𝔼` 这类数学字母）时下标映射整体错位、把后续代码当字符串抹掉，表现为「某些 export 凭空消失」。脚本已改为 `split('')`，但 `.uts` / `.uvue` 源码里仍不建议放这类字符（原生端字形多为豆腐块）。
+- 参考实现：演示页 `src/sub/rxjsDemo/rxjsDemo.uvue`（`DEMO_TEXT` 里混着 `$$ … $$` 公式，页面切片后与 Markdown 同屏流式渲染；另含静态示例与行内公式两处渲染）。
+- 本模块**没有 Vapor / VDOM 两条实现路径**：纯 UTS 计算 + 绝对定位渲染，全端一致。
