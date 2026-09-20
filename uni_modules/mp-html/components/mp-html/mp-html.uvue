@@ -314,6 +314,25 @@ function renderMermaidLayout(source: string): MpElementLayout {
   } as MpElementLayout
 }
 
+/**
+ * 摊平子树取纯文本。
+ *
+ * 定义位置必须早于本文件里所有调用点：UTS 是「先定义后使用」，
+ * 写在后面会让 HBuilderX 报 error18「找不到名称 flatText」（kotlin 编译不过）。
+ */
+function flatText(n: HtmlNode): string {
+  if (n.type == 'text') return n.text ?? ''
+  if (n.children == null) return n.text ?? ''
+  let t = ''
+  for (let i = 0; i < n.children!.length; i++) {
+    const c = n.children![i]
+    if (c.type == 'text') t += c.text ?? ''
+    else if (c.name == 'br') t += '\n'
+    else t += flatText(c)
+  }
+  return t
+}
+
 function getFormulaCode(n: HtmlNode): string {
   const attrs = n.attrs
   if (attrs != null && attrs['_code'] != null) {
@@ -505,19 +524,6 @@ function extractCode(inner: string): string {
   return decodeEntities(s).trim()
 }
 
-function flatText(n: HtmlNode): string {
-  if (n.type == 'text') return n.text ?? ''
-  if (n.children == null) return n.text ?? ''
-  let t = ''
-  for (let i = 0; i < n.children!.length; i++) {
-    const c = n.children![i]
-    if (c.type == 'text') t += c.text ?? ''
-    else if (c.name == 'br') t += '\n'
-    else t += flatText(c)
-  }
-  return t
-}
-
 /**
  * 行内节点映射到静态 class（见文件末尾 <style> 里的说明）。
  *
@@ -576,7 +582,7 @@ function chainClass(n: HtmlNode): string {
 function nodeColor(n: HtmlNode): string {
   const attrs = n.attrs
   if (attrs == null) return ''
-  return (attrs['_color'] as string) ?? ''
+  return attrs.getString('_color') ?? ''
 }
 
 /**
@@ -683,7 +689,7 @@ function imgSrc(n: HtmlNode): string {
 function headingStyle(name: string): string {
   const sz: UTSJSONObject = { h1: '24px', h2: '20px', h3: '18px', h4: '16px', h5: '14px', h6: '13px' }
   // 只给字号：粗体交给模板上的静态 class="mp-b"（理由见 <style> 里的说明）
-  return 'font-size:' + ((sz[name] as string) ?? '16px')
+  return 'font-size:' + (sz.getString(name) ?? '16px')
 }
 
 /**
@@ -909,26 +915,6 @@ function parseTable(html: string): HtmlNode[] {
   return rows
 }
 
-function parseList(html: string): HtmlNode[] {
-  const items: HtmlNode[] = []
-  let i = 0
-  while (true) {
-    const liS = html.indexOf('<li', i)
-    if (liS == -1) break
-    const liGt = html.indexOf('>', liS)
-    if (liGt == -1) break
-    const liE = html.indexOf('</li>', liGt)
-    if (liE == -1) break
-    const inner = html.substring(liGt + 1, liE)
-    const children = parseHtml(inner)
-    if (children.length > 0) {
-      items.push({ name: 'li', children } as HtmlNode)
-    }
-    i = liE + 5
-  }
-  return items
-}
-
 function parseHtml(html: string): HtmlNode[] {
   const result: HtmlNode[] = []
   let i = 0
@@ -1016,10 +1002,28 @@ function parseHtml(html: string): HtmlNode[] {
     if (name == 'table') {
       node.children = parseTable(inner)
     } else if (name == 'ul' || name == 'ol') {
-      node.children = parseList(inner)
+      // 原先抽了个 parseList()，但 UTS 是「先定义后使用」，而 parseList 与 parseHtml 互相递归：
+      // 无论谁写在前面，另一个都会报 error18「找不到名称」。只能在调用点内联展开。
+      const items: HtmlNode[] = []
+      let li = 0
+      while (true) {
+        const liS = inner.indexOf('<li', li)
+        if (liS == -1) break
+        const liGt = inner.indexOf('>', liS)
+        if (liGt == -1) break
+        const liE = inner.indexOf('</li>', liGt)
+        if (liE == -1) break
+        const liChildren = parseHtml(inner.substring(liGt + 1, liE))
+        if (liChildren.length > 0) {
+          items.push({ name: 'li', children: liChildren } as HtmlNode)
+        }
+        li = liE + 5
+      }
+      node.children = items
     } else if (name == 'pre' || name == 'code') {
       const codeText = extractCode(inner)
-      const isMermaid = (attrs != null && ((attrs['class'] as string ?? '').indexOf('language-mermaid') >= 0))
+      const className = attrs != null ? (attrs.getString('class') ?? '') : ''
+      const isMermaid = className.indexOf('language-mermaid') >= 0
         || inner.indexOf('language-mermaid') >= 0
         || codeText.indexOf('graph TD') == 0
         || codeText.indexOf('graph LR') == 0
@@ -1033,7 +1037,8 @@ function parseHtml(html: string): HtmlNode[] {
         continue
       }
 
-      const isKatex = (attrs != null && ((attrs['class'] as string ?? '').indexOf('language-latex') >= 0 || (attrs['class'] as string ?? '').indexOf('language-katex') >= 0))
+      const isKatex = className.indexOf('language-latex') >= 0
+        || className.indexOf('language-katex') >= 0
         || inner.indexOf('language-latex') >= 0
         || inner.indexOf('language-katex') >= 0
 
@@ -1123,7 +1128,7 @@ function setContent(html: string): void { doParse(html) }
 function getText(): string { return flatText({ children: localNodes.value } as HtmlNode) }
 
 function onLinkTap(n: HtmlNode): void {
-  const href = n.attrs != null ? ((n.attrs!['href'] as string) ?? '') : ''
+  const href = n.attrs != null ? (n.attrs!.getString('href') ?? '') : ''
   emit('linktap', n.attrs ?? ({} as UTSJSONObject))
   if (href.length > 0 && href.includes('://')) {
     uni.setClipboardData({ data: href, success: () => { uni.showToast({ title: '链接已复制', icon: 'none' }) } })
@@ -1131,7 +1136,7 @@ function onLinkTap(n: HtmlNode): void {
 }
 
 function onImgTap(n: HtmlNode): void {
-  const src = n.attrs != null ? ((n.attrs!['src'] as string) ?? '') : ''
+  const src = n.attrs != null ? (n.attrs!.getString('src') ?? '') : ''
   emit('imgtap', n.attrs ?? ({} as UTSJSONObject))
   if (src.length > 0) {
     uni.previewImage({
@@ -1157,6 +1162,13 @@ let panDragging: boolean = false;
 type MpTouchPoint = {
   x: number
   y: number
+}
+
+/** 切档位后把画布摆回居中，否则放大后还停在上一档的偏移上，容易「一放大就跑没了」 */
+function resetViewerPan(): void {
+  viewerPanX.value = 0
+  viewerPanY.value = 0
+  panDragging = false
 }
 
 function openMermaidViewer(source: string): void {
@@ -1186,13 +1198,6 @@ function zoomOut(): void {
   }
 }
 
-/** 切档位后把画布摆回居中，否则放大后还停在上一档的偏移上，容易「一放大就跑没了」 */
-function resetViewerPan(): void {
-  viewerPanX.value = 0
-  viewerPanY.value = 0
-  panDragging = false
-}
-
 const viewerZoomText = computed((): string => {
   const step = ZOOM_STEPS[viewerZoomIndex.value]
   return `${step}× (${Math.round(12 * step)}px)`
@@ -1212,29 +1217,6 @@ function clampViewerPan(v: number, size: number): number {
   if (v > limit) return limit
   if (v < -limit) return -limit
   return v
-}
-
-function onViewerTouchStart(e: UniTouchEvent): void {
-  const p: MpTouchPoint | null = viewerTouchPoint(e)
-  if (p == null) return
-  panDragging = true
-  panStartX = p.x
-  panStartY = p.y
-  panBaseX = viewerPanX.value
-  panBaseY = viewerPanY.value
-}
-
-function onViewerTouchMove(e: UniTouchEvent): void {
-  if (!panDragging) return
-  const p: MpTouchPoint | null = viewerTouchPoint(e)
-  if (p == null) return
-  const canvas: MpElementLayout = viewerLayout.value
-  viewerPanX.value = clampViewerPan(panBaseX + (p.x - panStartX), canvas.width)
-  viewerPanY.value = clampViewerPan(panBaseY + (p.y - panStartY), canvas.height)
-}
-
-function onViewerTouchEnd(_e: UniTouchEvent): void {
-  panDragging = false
 }
 
 /** 查看器里的画布：按当前档位重新排版 mermaid（字号 = 12 × 档位） */
@@ -1270,6 +1252,29 @@ const viewerLayout = computed((): MpElementLayout => {
     ruleBoxes
   } as MpElementLayout
 })
+
+function onViewerTouchStart(e: UniTouchEvent): void {
+  const p: MpTouchPoint | null = viewerTouchPoint(e)
+  if (p == null) return
+  panDragging = true
+  panStartX = p.x
+  panStartY = p.y
+  panBaseX = viewerPanX.value
+  panBaseY = viewerPanY.value
+}
+
+function onViewerTouchMove(e: UniTouchEvent): void {
+  if (!panDragging) return
+  const p: MpTouchPoint | null = viewerTouchPoint(e)
+  if (p == null) return
+  const canvas: MpElementLayout = viewerLayout.value
+  viewerPanX.value = clampViewerPan(panBaseX + (p.x - panStartX), canvas.width)
+  viewerPanY.value = clampViewerPan(panBaseY + (p.y - panStartY), canvas.height)
+}
+
+function onViewerTouchEnd(_e: UniTouchEvent): void {
+  panDragging = false
+}
 
 /** 画布定位：mermaid-lite 给的 rootStyle（position:relative + 宽高）再叠上手指平移量 */
 const viewerCanvasStyle = computed((): string => {
