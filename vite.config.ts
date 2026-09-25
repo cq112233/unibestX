@@ -30,11 +30,13 @@ catch {
   process.env.VITE_APP_VERSION = '1.0.0';
 }
 
+const isBuild = process.env.NODE_ENV === 'production' || process.argv.includes('build');
+
 const weappTailwindcssPlugins = WeappTailwindcss(
   uniAppX({
     base: projectRoot,
     cssEntries: [resolve(projectRoot, 'main.css')],
-    cssSourceTrace: true,
+    cssSourceTrace: !isBuild,
     rem2rpx: true,
     customAttributes: {
       '*': [/^t-class(?:-.+)?$/]
@@ -97,6 +99,9 @@ export default defineConfig({
       name: 'vite-plugin-strip-sticky',
       enforce: 'pre',
       transform(code: string, id: string) {
+        if (id.includes('node_modules')) {
+          return null;
+        }
         if ((id.endsWith('.uvue') || id.endsWith('.css') || id.endsWith('.scss') || id.includes('type=style')) && code.includes('sticky')) {
           return {
             code: code.replace(/position\s*:\s*sticky\s*;?/g, 'position: relative;')
@@ -133,7 +138,7 @@ export default defineConfig({
     // 单页 TabBar 基础脚手架与视图组件辅助生成插件（按需根据 src/tabbar/config.uts 辅助创建基础 TabViews）
     tabbarViewsPlugin({
       enabled: true,
-      autoCreateViews: true,
+      autoCreateViews: !isBuild,
       configFile: 'src/tabbar/config.uts'
     }),
     ...(!process.env.UNI_PLATFORM?.startsWith('mp-')
