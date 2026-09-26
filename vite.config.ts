@@ -128,7 +128,8 @@ export default defineConfig({
   },
   plugins: [
     ...cool(),
-    // 自动为自定义组件（components/、layouts/、views/）注入 main.scss，解决 uni-app X App 原生端组件样式隔离问题
+    // 自动为项目源码公共组件（src/components/、src/layouts/）注入 main.scss，解决 App 原生端组件样式隔离问题
+    // ⚠️ 极其关键防护：严禁对 uni_modules（180+第三方组件）和 views/ 注入，否则会因数百个组件重复编译全量 Tailwind 导致 5GB+ 内存溢出 (OOM)
     {
       name: 'vite-plugin-component-style-inject',
       enforce: 'pre',
@@ -136,24 +137,32 @@ export default defineConfig({
         if (process.env.UNI_PLATFORM === 'web' || process.env.UNI_PLATFORM === 'h5') {
           return null;
         }
-        if (id.endsWith('.uvue') && !id.endsWith('App.uvue') && /(?:components|layouts|views)[/\\].+\.uvue$/.test(id)) {
-          if (code.includes('@import "@/main.scss";') || code.includes('@import \'@/main.scss\';')) {
-            return null;
-          }
-          if (code.includes('<style')) {
-            return {
-              code: code.replace(/<style([^>]*)>/, '<style$1>\n@import "@/main.scss";\n'),
-              map: { mappings: '' }
-            };
-          }
-          else {
-            return {
-              code: `${code}\n<style lang="scss">\n@import "@/main.scss";\n</style>`,
-              map: { mappings: '' }
-            };
-          }
+        // 排除第三方依赖与全局入口
+        if (id.includes('node_modules') || id.includes('uni_modules') || id.endsWith('App.uvue') || !id.endsWith('.uvue')) {
+          return null;
         }
-        return null;
+        // 规范化路径，严格仅匹配项目源码 src/ 目录下的 components、layouts 与 views（杜绝扫描 uni_modules 防止 OOM）
+        const normalizedId = id.replace(/\\/g, '/');
+        const isTargetComponent = normalizedId.includes('/src/') && /(?:components|layouts|views)[/\\].+\.uvue$/.test(normalizedId);
+        if (!isTargetComponent) {
+          return null;
+        }
+        // 若已经手动引入，无需重复注入
+        if (code.includes('@import "@/main.scss";') || code.includes('@import \'@/main.scss\';')) {
+          return null;
+        }
+        if (code.includes('<style')) {
+          return {
+            code: code.replace(/<style([^>]*)>/, '<style$1>\n@import "@/main.scss";\n'),
+            map: { mappings: '' }
+          };
+        }
+        else {
+          return {
+            code: `${code}\n<style lang="scss">\n@import "@/main.scss";\n</style>`,
+            map: { mappings: '' }
+          };
+        }
       }
     },
     // 自动扫描与路由生成插件（基于 pages.config.json + 页面内 <route>/definePage 声明）
