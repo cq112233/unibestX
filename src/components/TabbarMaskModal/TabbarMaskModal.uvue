@@ -2,7 +2,7 @@
   <!-- 全屏遮罩弹窗组件 (具备穿透/覆盖底部 TabBar 能力的基础通用组件) -->
   <!-- 微信小程序端：使用 root-portal 提升至 page 根节点以穿透 TabBar -->
   <!-- #ifdef MP-WEIXIN -->
-  <root-portal v-if="visible">
+  <root-portal v-if="isShown">
     <view
       class="fixed top-0 bottom-0 left-0 right-0 flex flex-col items-center justify-center"
       :style="{ zIndex }"
@@ -31,7 +31,7 @@
                 class="text-[16px] font-bold"
                 :class="isDark ? 'text-[#f1f5f9]' : 'text-[#1e293b]'"
               >
-                {{ title }}
+                {{ displayTitle }}
               </text>
             </view>
             <view v-if="showClose" class="p-[4px]" @click="handleClose">
@@ -39,6 +39,14 @@
             </view>
           </view>
         </slot>
+
+        <!-- 命令式传入的数据回执（ref 桥「传数据」的落点）；未传时不渲染 -->
+        <view v-if="payloadMessage.length > 0" class="flex flex-col mb-[12px]">
+          <text class="text-[12px] leading-[20px]" :class="isDark ? 'text-[#94a3b8]' : 'text-[#64748b]'">
+            {{ payloadMessage }}
+          </text>
+          <text class="text-[11px] leading-[18px] mt-[4px] text-[#4f46e5]">来自：{{ payloadSource }}</text>
+        </view>
 
         <!-- 默认内容插槽（未传自定义 slot 时展示默认全屏覆盖解析卡片） -->
         <slot>
@@ -83,7 +91,7 @@
   <!-- 非微信小程序端（App、H5 等）：无需 root-portal，直接由 position: fixed 覆盖 -->
   <!-- #ifndef MP-WEIXIN -->
   <view
-    v-if="visible"
+    v-if="isShown"
     class="fixed top-0 bottom-0 left-0 right-0 flex flex-col items-center justify-center"
     :style="{ zIndex }"
   >
@@ -111,7 +119,7 @@
               class="text-[16px] font-bold"
               :class="isDark ? 'text-[#f1f5f9]' : 'text-[#1e293b]'"
             >
-              {{ title }}
+              {{ displayTitle }}
             </text>
           </view>
           <view v-if="showClose" class="p-[4px]" @click="handleClose">
@@ -119,6 +127,14 @@
           </view>
         </view>
       </slot>
+
+      <!-- 命令式传入的数据回执（ref 桥「传数据」的落点）；未传时不渲染 -->
+      <view v-if="payloadMessage.length > 0" class="flex flex-col mb-[12px]">
+        <text class="text-[12px] leading-[20px]" :class="isDark ? 'text-[#94a3b8]' : 'text-[#64748b]'">
+          {{ payloadMessage }}
+        </text>
+        <text class="text-[11px] leading-[18px] mt-[4px] text-[#4f46e5]">来自：{{ payloadSource }}</text>
+      </view>
 
       <!-- 默认内容插槽（未传自定义 slot 时展示默认全屏覆盖解析卡片） -->
       <slot>
@@ -161,8 +177,9 @@
 </template>
 
 <script setup lang="uts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { useAppStore } from '@/src/store';
+import type { IModalPayload } from '@/src/store';
 
 const props = defineProps({
   /** 弹窗显隐控制 */
@@ -209,10 +226,47 @@ const props = defineProps({
 
 const emit = defineEmits(['close', 'update:visible', 'confirm']);
 
+// ==========================================
+// 命令式开关（ref 桥）：与 visible prop 并存的第二条驱动路径
+// ==========================================
+// 本组件有两条驱动路径，任一为真即显示：
+//   1) prop 驱动：`:visible="xxx"`（页面级实例直接绑状态）；
+//   2) ref 命令式驱动：由 modal store 持有实例后 `$callMethod('openModal', payload)`。
+// 之所以要第二条：弹窗必须挂在页面级才能覆盖全屏，而触发它的按钮可能埋在很深的
+// 层级（例如 swiper-item 内的子组件）里，那种位置拿不到页面级的状态。
+//
+// ⚠️ 方法名刻意不叫 `open` / `close`：避免与运行环境（H5 的 window.open / close）
+// 同名，项目红线要求局部方法一律加业务前缀。
+
+/** 命令式打开态 */
+const innerVisible = ref(false);
+
+/** 最近一次关闭动作（confirm / close），供调用方「取数据」时经 ref 读回 */
+const lastAction = ref('');
+
+/** 通过 openModal(payload) 传进来的数据（「传数据」落到实例内的那一份） */
+const payloadTitle = ref('');
+const payloadMessage = ref('');
+const payloadSource = ref('');
+
+/** 最终显隐：prop 与命令式两条路取「或」 */
+const isShown = computed((): boolean => {
+  return props.visible || innerVisible.value;
+});
+
+/** 标题：命令式传入的优先，其次才是 title prop */
+const displayTitle = computed((): string => {
+  return payloadTitle.value.length > 0 ? payloadTitle.value : props.title;
+});
+
 const appStore = useAppStore();
 const isDark = computed((): boolean => appStore.state.isDark);
 
 function handleClose(): void {
+  // 命令式那条路径必须在这里收口：否则点遮罩 / ✕ / 底部按钮只会 emit 事件，
+  // innerVisible 仍为 true，弹窗根本关不掉（prop 驱动路径不受影响）
+  innerVisible.value = false;
+  lastAction.value = 'close';
   emit('close');
   emit('update:visible', false);
 }
@@ -222,4 +276,56 @@ function handleMaskClick(): void {
     handleClose();
   }
 }
+
+/**
+ * 命令式打开并把数据传进来（供 modal store 通过 `$callMethod('openModal', payload)` 调用）
+ *
+ * @param payload 传入的数据
+ */
+function openModal(payload: IModalPayload): void {
+  payloadTitle.value = payload.title;
+  payloadMessage.value = payload.message;
+  payloadSource.value = payload.source;
+  innerVisible.value = true;
+}
+
+/** 命令式关闭（调用方 `$callMethod('closeModal')`） */
+function closeModal(): void {
+  innerVisible.value = false;
+  // 与 handleClose 一样记录动作，否则经 ref 关闭后 getLastAction() 读回来是空的
+  lastAction.value = 'closeModal';
+  emit('close');
+}
+
+/** 当前是否处于显示态（含 prop 驱动），供 store 侧查询 */
+function isOpened(): boolean {
+  return isShown.value;
+}
+
+/**
+ * 取数据：把实例内部持有的 payload 吐给调用方
+ *
+ * ⚠️ 刻意返回 string 而不是对象：调用方走 `$callMethod`，其返回值类型是 `any | null`，
+ * 把 `any` 强转回对象类型在 Kotlin 端有抛 ClassCastException 的风险
+ * （与项目红线「严禁把回调结果强转 UTSJSONObject」同类问题）。
+ */
+/** 取数据：读回最近一次关闭动作（经 ref 读取，返回 string 同上为避险） */
+function getLastAction(): string {
+  return lastAction.value;
+}
+
+function readPayloadSummary(): string {
+  if (payloadTitle.value.length == 0) {
+    return '';
+  }
+  return `title=${payloadTitle.value}｜source=${payloadSource.value}`;
+}
+
+defineExpose({
+  openModal,
+  closeModal,
+  isOpened,
+  readPayloadSummary,
+  getLastAction
+});
 </script>

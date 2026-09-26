@@ -57,8 +57,9 @@
       <view class="flex-row flex-wrap justify-between">
         <!-- 窗口大小 -->
         <view
-          class="w-[48%] p-[10px] mb-[8px] rounded-[8px] border-[1px] border-solid flex-col"
+          class="p-[10px] mb-[8px] rounded-[8px] border-[1px] border-solid flex-col"
           :style="{
+            width: '48%',
             backgroundColor: 'var(--card-bg, #ffffff)',
             borderColor: 'var(--border-color, #e2e8f0)'
           }"
@@ -69,8 +70,9 @@
 
         <!-- 状态栏高度 -->
         <view
-          class="w-[48%] p-[10px] mb-[8px] rounded-[8px] border-[1px] border-solid flex-col"
+          class="p-[10px] mb-[8px] rounded-[8px] border-[1px] border-solid flex-col"
           :style="{
+            width: '48%',
             backgroundColor: 'var(--card-bg, #ffffff)',
             borderColor: 'var(--border-color, #e2e8f0)'
           }"
@@ -81,8 +83,9 @@
 
         <!-- 导航栏高度 -->
         <view
-          class="w-[48%] p-[10px] mb-[8px] rounded-[8px] border-[1px] border-solid flex-col"
+          class="p-[10px] mb-[8px] rounded-[8px] border-[1px] border-solid flex-col"
           :style="{
+            width: '48%',
             backgroundColor: 'var(--card-bg, #ffffff)',
             borderColor: 'var(--border-color, #e2e8f0)'
           }"
@@ -93,8 +96,9 @@
 
         <!-- 底部安全区 -->
         <view
-          class="w-[48%] p-[10px] mb-[8px] rounded-[8px] border-[1px] border-solid flex-col"
+          class="p-[10px] mb-[8px] rounded-[8px] border-[1px] border-solid flex-col"
           :style="{
+            width: '48%',
             backgroundColor: 'var(--card-bg, #ffffff)',
             borderColor: 'var(--border-color, #e2e8f0)'
           }"
@@ -129,11 +133,11 @@
 
         <!-- 有值：展示胶囊原始矩形；无值：说明 null 的成因。⚠️ v-if 与 v-else 必须紧邻，中间不能插入任何节点（注释或元素都不行），否则 eslint-plugin-vue 报 v-else has no adjacent v-if -->
         <view v-if="isCapsuleAvailable" class="flex-row flex-wrap justify-between">
-          <view class="w-[48%] p-[8px] rounded-[6px] bg-[#ffffff] border-[1px] border-solid border-[#ddd6fe] flex-col">
+          <view :style="{ width: '48%' }" class="p-[8px] rounded-[6px] bg-[#ffffff] border-[1px] border-solid border-[#ddd6fe] flex-col">
             <text class="text-[11px] text-[#7c3aed]">胶囊尺寸 (W×H)</text>
             <text class="text-[12px] font-bold text-[#5b21b6] mt-[3px]">{{ capsuleWidth }} × {{ capsuleHeight }} px</text>
           </view>
-          <view class="w-[48%] p-[8px] rounded-[6px] bg-[#ffffff] border-[1px] border-solid border-[#ddd6fe] flex-col">
+          <view :style="{ width: '48%' }" class="p-[8px] rounded-[6px] bg-[#ffffff] border-[1px] border-solid border-[#ddd6fe] flex-col">
             <text class="text-[11px] text-[#7c3aed]">纵向 (top，距屏幕顶边)</text>
             <text class="text-[12px] font-bold text-[#5b21b6] mt-[3px]">{{ capsuleTop }} px</text>
           </view>

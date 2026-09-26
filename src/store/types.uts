@@ -92,3 +92,23 @@ export type IUserInfo = {
 export type IUserState = {
   userInfo: IUserInfo;
 };
+
+// ==========================================
+// modal store（TabbarMaskModal 实例桥）
+// ==========================================
+
+/**
+ * 打开弹窗时传入的数据（由调用方直接透传给组件 `$callMethod`，store 不参与）
+ *
+ * ⚠️ 刻意用扁平的基础类型字段，而不是 `UTSJSONObject`：
+ * 该类型要同时喂给 Vapor 分支（官方 Pinia，`.ts`）与 VDOM 分支（x-pinia-s，`.uts`），
+ * 对象字面量字段类型越简单，两端行为越一致。
+ */
+export type IModalPayload = {
+  /** 弹窗标题 */
+  title: string;
+  /** 弹窗正文文案 */
+  message: string;
+  /** 数据来源标识（用来演示「同一实例被不同入口驱动」） */
+  source: string;
+};
