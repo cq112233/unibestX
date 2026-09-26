@@ -4,25 +4,40 @@ import uniLayoutsPlugin from './plugins/uni-layouts-plugin';
 import autoRootPlugin from './plugins/root-plugin';
 import uniPagesPlugin from './plugins/vite-plugin-uni-pages';
 import tabbarViewsPlugin from './plugins/vite-plugin-tabbar-views';
-import tailwindHmrPlugin from './plugins/vite-plugin-tailwind-hmr';
 
 // 修复 uni-app x web端/h5端 丢掉 easycom 导入的官方 bug
 import { uniEasycomPlugin } from '@dcloudio/uni-cli-shared/dist/vite/plugins/easycom.js';
 import { UNI_EASYCOM_EXCLUDE } from '@dcloudio/uni-cli-shared';
 
 import uniModule from '@dcloudio/vite-plugin-uni';
-import { uniAppX } from 'weapp-tailwindcss/presets';
-import { WeappTailwindcss } from 'weapp-tailwindcss/vite';
+import tailwindcss from 'tailwindcss';
+import tailwindConfigModule from './tailwind.config.js';
+import { cool as coolPlugin } from '@cool-vue/unix';
 import fs from 'node:fs';
-import { dirname, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { join } from 'node:path';
+
+// 确保 @cool-vue/unix 根目录环境变量存在
+process.env.UNI_INPUT_DIR = process.env.UNI_INPUT_DIR || process.cwd();
+
+// 直接使用 @cool-vue/unix 官方包提供的 uni-app X Tailwind 跨端支持插件套件
+// 过滤掉 COOL 框架专属的侵入式逻辑（.cool/bootstrap 客户端注入与 pages.json 覆写），保留其核心 Tailwind 编译套件
+function cool() {
+  return coolPlugin({
+    tailwind: {
+      enable: true
+    }
+  }).filter(p => p && p.name && p.name.includes('tailwind'));
+}
 
 const uni = (uniModule as typeof uniModule & { default?: typeof uniModule }).default ?? uniModule;
-const projectRoot = dirname(fileURLToPath(import.meta.url));
+const tailwindConfig = (tailwindConfigModule as any).default ?? tailwindConfigModule;
+function resolve(dir: string) {
+  return join(__dirname, dir);
+}
 
 // 读取 package.json，编译阶段注入应用版本号供 import.meta.env 全端安全访问
 try {
-  const pkgRaw = fs.readFileSync(resolve(projectRoot, 'package.json'), 'utf-8');
+  const pkgRaw = fs.readFileSync(resolve('package.json'), 'utf-8');
   const pkg = JSON.parse(pkgRaw);
   process.env.VITE_APP_VERSION = pkg.version ?? '1.0.0';
 }
@@ -31,24 +46,6 @@ catch {
 }
 
 const isBuild = process.env.NODE_ENV === 'production' || process.argv.includes('build');
-
-const weappTailwindcssPlugins = WeappTailwindcss(
-  uniAppX({
-    base: projectRoot,
-    cssEntries: [resolve(projectRoot, 'main.css')],
-    cssSourceTrace: !isBuild,
-    rem2rpx: true,
-    customAttributes: {
-      '*': [/^t-class(?:-.+)?$/]
-    },
-    componentLocalStyles: {
-      enabled: true,
-      onlyWhenStyleIsolationVersion2: true,
-      componentMatcher: id => /(?:^|[/\\])(?:components|layouts)(?:[/\\].+)?\.(?:uvue|nvue)$/.test(id)
-    },
-    uvueUnsupported: 'warn'
-  })
-) ?? [];
 
 export default defineConfig({
   base: './',
@@ -82,36 +79,72 @@ export default defineConfig({
   css: {
     postcss: {
       plugins: [
+        tailwindcss(tailwindConfig),
         {
-          postcssPlugin: 'strip-unsupported-sticky',
-          Declaration(decl: any) {
-            if (decl.prop === 'position' && decl.value === 'sticky') {
-              decl.value = 'relative';
-            }
+          postcssPlugin: 'clean-uniappx-unsupported-css',
+          prepare() {
+            return {
+              Rule(rule: any) {
+                const s = rule.selector || '';
+                // 剔除包含原生不支持选择符的规则（>、~、+、*、::before、::after、带空格的非法复杂选择器）
+                if (['>', '~', '+', '*', '::before', '::after'].some(char => s.includes(char)) || s.includes('%') || (s.startsWith('.') && s.includes(' '))) {
+                  rule.remove();
+                  return;
+                }
+              },
+              Declaration(decl: any) {
+                // 移除 position: static
+                if (decl.prop === 'position' && decl.value === 'static') {
+                  decl.remove();
+                  return;
+                }
+                // 移除 display: inline / list-item
+                if (decl.prop === 'display' && ['inline', 'list-item', 'contents', 'table'].includes(decl.value)) {
+                  decl.remove();
+                  return;
+                }
+                // 移除视口单位 100vh / 100vw
+                if (typeof decl.value === 'string' && (decl.value.includes('vh') || decl.value.includes('vw'))) {
+                  decl.remove();
+                  return;
+                }
+              }
+            };
           }
         }
       ]
     }
   },
   plugins: [
-    // 拦截并自动将原生 CSS 编译器不支持的 position: sticky 修正为 position: relative，杜绝 App 平台编译报错
+    ...cool(),
+    // 自动为自定义组件（components/、layouts/、views/）注入 main.scss，解决 uni-app X App 原生端组件样式隔离问题
     {
-      name: 'vite-plugin-strip-sticky',
+      name: 'vite-plugin-component-style-inject',
       enforce: 'pre',
       transform(code: string, id: string) {
-        if (id.includes('node_modules')) {
+        if (process.env.UNI_PLATFORM === 'web' || process.env.UNI_PLATFORM === 'h5') {
           return null;
         }
-        if ((id.endsWith('.uvue') || id.endsWith('.css') || id.endsWith('.scss') || id.includes('type=style')) && code.includes('sticky')) {
-          return {
-            code: code.replace(/position\s*:\s*sticky\s*;?/g, 'position: relative;')
-          };
+        if (id.endsWith('.uvue') && !id.endsWith('App.uvue') && /(?:components|layouts|views)[/\\].+\.uvue$/.test(id)) {
+          if (code.includes('@import "@/main.scss";') || code.includes('@import \'@/main.scss\';')) {
+            return null;
+          }
+          if (code.includes('<style')) {
+            return {
+              code: code.replace(/<style([^>]*)>/, '<style$1>\n@import "@/main.scss";\n'),
+              map: { mappings: '' }
+            };
+          }
+          else {
+            return {
+              code: `${code}\n<style lang="scss">\n@import "@/main.scss";\n</style>`,
+              map: { mappings: '' }
+            };
+          }
         }
         return null;
       }
     },
-    // 修复 H5 模式下外部或 AI 修改 .uvue/.uts 时 Tailwind CSS v4 样式热更新丢失的联动补丁插件
-    // tailwindHmrPlugin(),
     // 自动扫描与路由生成插件（基于 pages.config.json + 页面内 <route>/definePage 声明）
     uniPagesPlugin({
       // 【总控开关】：是否启用插件自动扫描与 pages.json 生成（设为 false 则完全失效，不扫描、不写入 pages.json、不监听文件变化）
@@ -144,13 +177,8 @@ export default defineConfig({
     ...(!process.env.UNI_PLATFORM?.startsWith('mp-')
       ? [uniEasycomPlugin({ exclude: UNI_EASYCOM_EXCLUDE })]
       : []),
-    // 手动补充 easycom 插件（限制非小程序端生效，含 App 与 Web）
-    // 该插件内部名为 uni:app-easycom，负责在 App 蒸汽模式与 Web 端把模板里的 easycom 标签转成静态 import；
-    // 小程序端（mp-*）由官方编译器基于 usingComponents 原生处理，挂载该插件会导致组件被转为未知动态组件并报错 resolveDynamicComponent。
-    // ...(process.env.UNI_PLATFORM?.startsWith('mp-') ? [] : [uniEasycomPlugin({ exclude: UNI_EASYCOM_EXCLUDE })]),
     uniLayoutsPlugin(), // 仿照 vite-plugin-uni-layouts 的跨端 Layout 布局插件
     autoRootPlugin(), // 自动给页面套上 App.ku.uvue 根包裹组件
-    uni(),
-    ...weappTailwindcssPlugins
+    uni()
   ]
 });

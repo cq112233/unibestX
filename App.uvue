@@ -49,8 +49,9 @@ onShow((options?) => {
 /* 微信小程序真机：在全局 app.wxss 中注册字体，确保组件内可用 */
 @import '@/uni_modules/uni-icons/components/uni-icons/uniicons_mp.css';
 /* #endif */
-/* #ifndef MP-WEIXIN */
-@import './main.css';
+
+/* #ifndef H5 || WEB */
+@import './main.scss';
 /* #endif */
 
 /* 阿里 iconfont（uni_modules/ali-iconfont）目前本项目没用到 —— 没有页面渲染 AliIconfontIcon。
