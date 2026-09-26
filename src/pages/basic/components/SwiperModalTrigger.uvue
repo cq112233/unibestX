@@ -1,0 +1,156 @@
+<!--
+  SwiperModalTrigger.uvue - 挂在 swiper-item 内部的触发器组件
+
+  【它解决的问题】
+  全屏遮罩弹窗必须挂在页面级（swiper 外面）才能覆盖全屏（swiper-item 带 transform 与
+  overflow: hidden，会把内部 fixed 元素的包含块换成自己并裁切掉溢出）。但触发按钮往往
+  埋在很深的层级里，拿不到页面级的状态。于是：
+    · 页面级组件挂 TabbarMaskModal 并把实例注册进 store（setInstance）；
+    · 本组件（swiper 内部）只做两件事：getInstance 取出实例 → `$callMethod` 调它。
+  swiper 内外就此解耦，触发器放哪儿都不影响遮罩覆盖全屏。
+
+  【数据流全在 ref 上，不经 store 中转】
+  store 只存实例，不存数据：传数据 = `$callMethod('openModal', payload)`，
+  取数据 = `$callMethod('readPayloadSummary')` / `$callMethod('getLastAction')`。
+  所以本组件自己拿局部 ref 存回执 —— 它不依赖任何全局响应式状态。
+-->
+<template>
+  <view class="absolute top-0 bottom-0 left-0 right-0 flex flex-col items-center justify-center px-[16px]">
+    <text class="text-[12px] mb-[6px]" :class="isDark ? 'text-[#cbd5e1]' : 'text-[#475569]'">
+      swiper-item 1 · 触发器组件挂在这里
+    </text>
+
+    <view
+      class="px-[14px] h-[32px] rounded-[8px] bg-[#dc2626] flex flex-row items-center justify-center active:opacity-85"
+      @click="handleOpen"
+    >
+      <text class="text-[#ffffff] text-[12px] font-medium">传数据并打开弹窗</text>
+    </view>
+
+    <view
+      class="px-[14px] h-[32px] rounded-[8px] bg-[#0ea5e9] flex flex-row items-center justify-center mt-[8px] active:opacity-85"
+      @click="handleReadFromInstance"
+    >
+      <text class="text-[#ffffff] text-[12px] font-medium">取数据（走实例 ref）</text>
+    </view>
+
+    <view
+      class="px-[14px] h-[32px] rounded-[8px] bg-[#64748b] flex flex-row items-center justify-center mt-[8px] active:opacity-85"
+      @click="handleCloseByRef"
+    >
+      <text class="text-[#ffffff] text-[12px] font-medium">通过 ref 关闭弹窗</text>
+    </view>
+
+    <!-- 本组件自己的回执（局部 ref，数据是从实例 ref 读回来的） -->
+    <view class="mt-[10px] flex flex-col items-center">
+      <text class="text-[11px] leading-[18px]" :class="isDark ? 'text-[#94a3b8]' : 'text-[#64748b]'">
+        实例是否注册：{{ registered }}
+      </text>
+      <text class="text-[11px] leading-[18px]" :class="isDark ? 'text-[#94a3b8]' : 'text-[#64748b]'">
+        本次传进去的标题：{{ sentTitle.length > 0 ? sentTitle : '—' }}
+      </text>
+      <text v-if="refSummary.length > 0" class="text-[11px] leading-[18px] text-[#0ea5e9]">
+        ref 直读实例：{{ refSummary }}
+      </text>
+      <text v-if="refAction.length > 0" class="text-[11px] leading-[18px] text-[#059669]">
+        ref 读回的关闭动作：{{ refAction }}
+      </text>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed, ref } from 'vue';
+import { useAppStore, useModalStore } from '@/src/store';
+import type { IModalPayload } from '@/src/store';
+
+defineOptions({
+  name: 'SwiperModalTrigger',
+  styleIsolation: 'isolated'
+});
+
+const appStore = useAppStore();
+const isDark = computed((): boolean => appStore.state.isDark);
+
+/** 实例注册表 store：页面级组件把弹窗实例注册进来，本组件取出来直接用 */
+const modalStore = useModalStore();
+
+/** 实例在注册表里的键，必须与页面级组件 setInstance 时用的键一致 */
+const MODAL_KEY: string = 'tabbarMaskModal';
+
+/** 本次传出去的数据（局部回执，仅用于展示） */
+const sentTitle = ref('');
+
+/** 经实例 ref 读回来的摘要 / 动作（非响应式数据，必须自己存进 ref 才能显示） */
+const refSummary = ref('');
+const refAction = ref('');
+
+/**
+ * 实例是否已注册：**故意不做成 computed**
+ *
+ * 注册表是模块级 Map（非响应式），computed 拿它当依赖会「首次求值后永不重算」——
+ * 而首屏渲染发生在父组件 onMounted 注册之前，那样会永久显示错误的值。
+ * 改成每次点击时探测一次，值总是当下的真实状态。
+ */
+const registered = ref('—（尚未探测）');
+
+/**
+ * 传数据：取出实例，直接调组件暴露的 openModal
+ *
+ * 弹窗挂在 swiper 外面，本组件不持有它 —— 只经由注册表拿到实例引用。
+ */
+function handleOpen(): void {
+  const inst = modalStore.getInstance(MODAL_KEY);
+  registered.value = inst == null ? 'false' : 'true';
+  if (inst == null) {
+    sentTitle.value = '（实例未注册）';
+    return;
+  }
+  const payload = {
+    title: '来自 swiper 内部的弹窗',
+    message: '这个弹窗挂在 swiper 外面，由 swiper-item 里的触发器组件经「实例注册表 + ref」打开。',
+    source: 'swiper-item-1'
+  } as IModalPayload;
+  sentTitle.value = payload.title;
+  refSummary.value = '';
+  refAction.value = '';
+  inst!.$callMethod('openModal', payload);
+}
+
+/**
+ * 取数据：绕过任何中间状态，直接从实例 ref 读
+ *
+ * 走的是 `$callMethod('readPayloadSummary')` / `$callMethod('getLastAction')`，
+ * 两者都返回 string —— 对象强转在 Kotlin 端有 ClassCastException 风险
+ * （项目红线「严禁把回调结果强转 UTSJSONObject」同类），故组件侧只暴露返回 string 的取值方法。
+ */
+function handleReadFromInstance(): void {
+  const inst = modalStore.getInstance(MODAL_KEY);
+  registered.value = inst == null ? 'false' : 'true';
+  if (inst == null) {
+    refSummary.value = '（实例未注册）';
+    refAction.value = '';
+    return;
+  }
+  const summary = inst!.$callMethod('readPayloadSummary');
+  const action = inst!.$callMethod('getLastAction');
+  refSummary.value = summary == null || `${summary}`.length == 0 ? '（实例里还没有数据）' : `${summary}`;
+  refAction.value = action == null || `${action}`.length == 0 ? '（还没有关闭过）' : `${action}`;
+}
+
+/**
+ * 通过 ref 关闭弹窗：演示「任何层级都能关它」—— 关闭由实例自己完成，本组件不碰它的显隐状态
+ */
+function handleCloseByRef(): void {
+  const inst = modalStore.getInstance(MODAL_KEY);
+  registered.value = inst == null ? 'false' : 'true';
+  if (inst == null) {
+    return;
+  }
+  inst!.$callMethod('closeModal');
+  refAction.value = 'closeModal（由 swiper 内部经 ref 调用）';
+}
+</script>
+
+<style scoped>
+</style>

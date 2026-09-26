@@ -68,18 +68,123 @@
         </text>
       </view>
     </TabbarMaskModal>
+
+    <!-- ================= 对照样例：在 swiper 内调用 TabbarMaskModal ================= -->
+    <!--
+      H5 实测：遮罩 rect = swiper 矩形（424×550），而视口是 500×813 —— 被 swiper-item 的
+      transform: matrix(...) + overflow: hidden 当成包含块并裁切，盖不住整页与底部 TabBar。
+      组件自身写法没错（fixed + z-index 9999），坏在挂载位置。
+      · App / 鸿蒙：未在真机验证（App 原生端 fixed 会脱壳提升，表现可能不同）；
+      · 微信小程序：组件内部走 root-portal，会把节点提到 Page 根节点，理论上不受 swiper 影响（未验证）。
+    -->
+    <view
+      class="mt-[16px] rounded-[10px] border-[1px] border-solid"
+      :class="isDark ? 'border-[#7f1d1d] bg-[#1e293b]' : 'border-[#fecaca] bg-[#fef2f2]'"
+    >
+      <view class="px-[12px] pt-[10px] pb-[8px]">
+        <text class="text-[13px] font-bold mb-[6px]" :class="isDark ? 'text-[#fca5a5]' : 'text-[#b91c1c]'">
+          ⚠️ 对照样例：在 swiper 内调用 TabbarMaskModal（H5 实测遮罩被裁）
+        </text>
+        <text class="text-[12px] leading-[20px]" :class="isDark ? 'text-[#cbd5e1]' : 'text-[#7f1d1d]'">
+          遮罩只会盖住这个 swiper 方块：swiper-item 自带 transform 与 overflow: hidden，会把组件根的 fixed 变成「相对 swiper 定位」并裁切。要覆盖全屏，本组件必须挂在 swiper 外面（见上方示例）。
+        </text>
+      </view>
+
+      <swiper
+        class="w-full"
+        style="height: 550px;"
+        :indicator-dots="true"
+        :circular="false"
+        :autoplay="false"
+      >
+        <!-- 第 1 屏：触发器组件 —— 它自己通过 modal store + 实例 ref 驱动 swiper 外面的弹窗 -->
+        <swiper-item>
+          <SwiperModalTrigger />
+        </swiper-item>
+
+        <!-- 第 2 屏：对照样例 —— 把弹窗直接挂在 swiper 内部（会被裁） -->
+        <swiper-item>
+          <view class="absolute top-0 bottom-0 left-0 right-0 flex flex-col items-center justify-center">
+            <text class="text-[12px] mb-[6px]" :class="isDark ? 'text-[#cbd5e1]' : 'text-[#475569]'">
+              swiper-item 2 · 弹窗组件挂在这里（对照）
+            </text>
+            <view
+              class="px-[14px] h-[32px] rounded-[8px] bg-[#dc2626] flex flex-row items-center justify-center active:opacity-85"
+              @click="openModalInSwiper"
+            >
+              <text class="text-[#ffffff] text-[12px] font-medium">在 swiper 内打开弹窗</text>
+            </view>
+          </view>
+
+          <!-- 挂错位置的弹窗：组件自己的写法完全正确，坏在外层被 swiper 套住 -->
+          <TabbarMaskModal
+            :visible="showModalInSwiper"
+            title="遮罩被 swiper 裁掉了"
+            icon="⚠️"
+            confirm-text="关闭弹窗"
+            @close="closeModalInSwiper"
+          >
+            <text
+              class="text-[12px] leading-[20px] mb-[12px]"
+              :class="isDark ? 'text-[#94a3b8]' : 'text-[#64748b]'"
+            >
+              H5 实测：此时暗色遮罩的矩形等于 swiper 的矩形（424×550），页面其余部分与底部 TabBar 都不会变暗。
+            </text>
+          </TabbarMaskModal>
+        </swiper-item>
+
+        <!-- 第 3 屏：空白对照，仅为让 swiper 可以真实滑动 -->
+        <swiper-item>
+          <view class="absolute top-0 bottom-0 left-0 right-0 flex flex-col items-center justify-center">
+            <text class="text-[12px]" :class="isDark ? 'text-[#cbd5e1]' : 'text-[#475569]'">
+              swiper-item 3 · 空白对照
+            </text>
+          </view>
+        </swiper-item>
+      </swiper>
+
+      <!-- ================= 新加：挂在 swiper 外面的实例，由 swiper 内部经 store + ref 驱动 ================= -->
+      <!-- 这个实例完全由 ref 命令式驱动（不绑 visible prop），实例在 onMounted 时注册进 modal store -->
+      <TabbarMaskModal
+        ref="storeModalRef"
+        icon="🔗"
+        title="由 swiper 内部驱动"
+        confirm-text="关闭弹窗"
+      >
+        <text
+          class="text-[12px] leading-[20px]"
+          :class="isDark ? 'text-[#94a3b8]' : 'text-[#64748b]'"
+        >
+          payload 里的正文会由组件自己渲染在上方；点「关闭弹窗」后动作会回写进 store，swiper 内的触发器组件能读到。
+        </text>
+      </TabbarMaskModal>
+    </view>
   </view>
 </template>
 
 <script setup lang="uts">
-import { computed, ref } from 'vue';
-import { useAppStore } from '@/src/store';
+import { computed, onMounted, onUnmounted, ref } from 'vue';
+import type { ComponentPublicInstance } from 'vue';
+import { useAppStore, useModalStore } from '@/src/store';
 import TabbarMaskModal from '@/src/components/TabbarMaskModal/TabbarMaskModal.uvue';
+import SwiperModalTrigger from './SwiperModalTrigger.uvue';
 
 const appStore = useAppStore();
 const isDark = computed((): boolean => appStore.state.isDark);
 
+/** 实例注册表：把挂在本卡片上（swiper 外面）的弹窗实例注册进去，供 swiper 内部的触发器取用 */
+const modalStore = useModalStore();
+
+/** 实例在注册表里的键，必须与 SwiperModalTrigger 里的 MODAL_KEY 一致 */
+const MODAL_KEY: string = 'tabbarMaskModal';
+
+/** swiper 外面那个实例的模板 ref（该实例不绑 visible，完全由 ref 命令式驱动） */
+const storeModalRef = ref<ComponentPublicInstance | null>(null);
+
 const showModal = ref(false);
+
+/** 对照样例里那个「挂在 swiper-item 内部」的弹窗显隐 */
+const showModalInSwiper = ref(false);
 
 function openModal(): void {
   showModal.value = true;
@@ -88,6 +193,30 @@ function openModal(): void {
 function closeModal(): void {
   showModal.value = false;
 }
+
+/** 在 swiper 内部打开对照样例的弹窗 */
+function openModalInSwiper(): void {
+  showModalInSwiper.value = true;
+}
+
+/** 关闭对照样例的弹窗 */
+function closeModalInSwiper(): void {
+  showModalInSwiper.value = false;
+}
+
+// ==========================================
+// 实例桥接线：注册 / 注销 / 结果回写
+// ==========================================
+
+/** 把 swiper 外面的弹窗实例注册进注册表，让任意层级的组件都能取出来驱动它 */
+onMounted((): void => {
+  modalStore.setInstance(MODAL_KEY, storeModalRef.value);
+});
+
+/** 卸载时删除，避免注册表里留着一个已销毁的实例 */
+onUnmounted((): void => {
+  modalStore.deleteInstance(MODAL_KEY);
+});
 </script>
 
 <style scoped>

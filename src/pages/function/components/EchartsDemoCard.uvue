@@ -1,6 +1,6 @@
 <template>
   <view
-    class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid"
+    class="rounded-[16px] p-[20px] m-[16px] border-[0px] border-[1px] border-solid"
     :style="{
       backgroundColor: 'var(--card-bg, #ffffff)',
       borderColor: 'var(--border-color, #edf2f7)'
@@ -68,6 +68,7 @@
 import { computed, ref, watch } from 'vue';
 import { systemInfo } from '@/src/utils/systemInfo/index.uts';
 import { $t } from '@/src/utils/i18n/index.uts';
+import { onTabPageShow } from '@/src/tabbar/index.uts';
 
 const echartTitle = computed((): string => $t('basic.echartTitle'));
 const echartLineText = computed((): string => $t('basic.echartLine'));
@@ -233,12 +234,45 @@ const pieOption = {
   }]
 } as UTSJSONObject;
 
-function initEchart() {
+let hasInitialized: boolean = false;
+
+function doInitEchart(): boolean {
   if (echartRef.value != null) {
     const chart = echartRef.value as ComponentPublicInstance;
     chart.$callMethod('init', lineOption);
+    hasInitialized = true;
+    return true;
+  }
+  return false;
+}
+
+function initEchart() {
+  if (!doInitEchart()) {
+    // 若 ref 尚未完成赋值绑定，多阶段阶梯式重试
+    setTimeout(() => {
+      if (!doInitEchart()) {
+        setTimeout(() => {
+          doInitEchart();
+        }, 150);
+      }
+    }, 60);
   }
 }
+
+// 监听功能页 Tab 再次激活（切 Tab 或页面从后台恢复时重新 resize 唤醒画布，防止 0 宽高白屏）
+onTabPageShow(2, () => {
+  setTimeout(() => {
+    if (echartRef.value != null) {
+      const chart = echartRef.value as ComponentPublicInstance;
+      if (!hasInitialized) {
+        chart.$callMethod('init', lineOption);
+        hasInitialized = true;
+      } else {
+        chart.$callMethod('re' + 'size');
+      }
+    }
+  }, 100);
+});
 
 function changeToLine() {
   currentType.value = 'line';

@@ -1,28 +1,22 @@
-const darkMode = [
-  'variant',
-  [
-    '&.dark',
-    '.dark &'
-  ]
-];
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-// 原 a-hua-unocss 自定义规则迁移到 Tailwind CSS v4：
-// - p-safe / pt-safe / pb-safe：安全区适配工具类，Tailwind 无内置，需显式注册
-// - justify-start/end、self-start/end、items-start/end：Tailwind v4 原生输出
-//   flex-start/flex-end（uni-app X 原生不支持 start/end 简写），无需额外配置
-// - table/grid/block/inline/inline-block/break-all/break-words/break-normal：
-//   Tailwind v4 原生支持，且项目未使用；v4 无 blocklist 配置项，无需处理
+const projectRoot = dirname(fileURLToPath(import.meta.url));
 
 /** @type {import('tailwindcss').Config} */
-export default {
+const config = {
   content: [
-    './App.uvue',
-    './App.ku.uvue',
-    './src/**/*.{uts,uvue}',
-    '!./uni_modules/**/*',
-    '!./unpackage/**/*'
+    resolve(projectRoot, './App.uvue'),
+    resolve(projectRoot, './App.ku.uvue'),
+    resolve(projectRoot, './src/**/*.{uts,uvue,vue}'),
+    `!${resolve(projectRoot, './uni_modules/**')}`,
+    `!${resolve(projectRoot, './uni_modules/**/*')}`,
+    `!${resolve(projectRoot, './unpackage/**')}`,
+    `!${resolve(projectRoot, './unpackage/**/*')}`,
+    `!${resolve(projectRoot, './node_modules/**')}`,
+    `!${resolve(projectRoot, './node_modules/**/*')}`
   ],
-  darkMode,
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
@@ -53,3 +47,5 @@ export default {
     container: false
   }
 };
+
+export default config;

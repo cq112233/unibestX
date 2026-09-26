@@ -76,11 +76,12 @@ export function applyPluginToStore(pinia : IPinia, store : any, plugin : PiniaPl
 	// store 是 PiniaStoreBase 子类实例（CounterStore extends PiniaStoreBase），
 	// 向上 cast 为 PiniaStoreBase 是类型安全的（继承关系），可以直接访问 $id / $state 属性
 	const storeBase : PiniaStoreBase = store as any as PiniaStoreBase
+	const currentState = storeBase.$state
 	const ctx : PiniaPluginContext = {
 		pinia: pinia,
 		storeId: storeBase.$id,
 		store: store,
-		state: storeBase.$state!
+		state: currentState != null ? currentState! : ({} as UTSJSONObject)
 	}
 	try {
 		plugin(ctx)

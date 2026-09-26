@@ -75,7 +75,10 @@
             </view>
 
             <!-- 回顶位置调节行 -->
-            <view class="flex flex-row items-center justify-between mt-[8px] pt-[6px] border-t-[1px] border-solid" :class="isDark ? 'border-[#334155]' : 'border-[#c7d2fe]'">
+            <view
+              class="flex flex-row items-center justify-between mt-[8px] pt-[6px] border-[0px] border-t-[1px] border-solid"
+              :class="isDark ? 'border-[#334155]' : 'border-[#c7d2fe]'"
+            >
               <text class="text-[11px]" :class="isDark ? 'text-[#94a3b8]' : 'text-[#475569]'">
                 回顶按钮底部边距: <text class="font-bold text-[#3b82f6]">{{ customBottom }}px</text>
               </text>
@@ -116,8 +119,8 @@
         <!-- 列表内容：采用 list-item 匹配 list-view 原生回收复用机制 -->
         <list-item v-for="item in articleList" :key="item.id" type="card" class="w-full">
           <view
-            class="mx-[14px] my-[6px] p-[14px] rounded-[12px] border-[1px] border-solid flex flex-col"
-            :class="isDark ? 'bg-[#1e293b] border-[#334155]' : 'bg-white border-[#e2e8f0]'"
+            class="mx-[14px] my-[6px] p-[14px] rounded-[12px] border-[0px] border-[1px] border-solid flex flex-col"
+            :class="isDark ? 'bg-[#1e293b] border-[#334155]' : 'bg-[#ffffff] border-[#e2e8f0]'"
           >
             <view class="flex flex-row items-center justify-between mb-[6px]">
               <view

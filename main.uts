@@ -1,3 +1,6 @@
+// #ifdef H5 || WEB
+import './main.scss';
+// #endif
 import App from './App.uvue'; // 导入应用根组件 App.uvue
 import { createSSRApp } from 'vue'; // 导入 Vue 的 SSR 应用创建方法
 import pinia from './src/store'; // 导入 Pinia 状态管理实例（在 App-Android 平台上强制进行顶层定义约束）

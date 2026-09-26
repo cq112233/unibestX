@@ -1,98 +1,7 @@
-@import 'tailwindcss' source(none);
-@config "./tailwind.config.js";
-@plugin "@iconify/tailwind4" {
-  prefix: 'i';
-}
-@source "./App.ku.uvue";
-@source "./App.uvue";
-@source "./src/**/*.{uts,uvue}";
-@source not "./uni_modules/**/*";
-@source not "./unpackage/**/*";
-@custom-variant system-dark {
-  @media (prefers-color-scheme: dark) {
-    @slot;
-  }
-}
-@custom-variant wx {
-  /*  #ifdef  MP-WEIXIN  */
-  @slot;
-  /*  #endif  */
-}
-@custom-variant not-wx {
-  /*  #ifndef  MP-WEIXIN  */
-  @slot;
-  /*  #endif  */
-}
-@custom-variant h5 {
-  /*  #ifdef  H5  */
-  @slot;
-  /*  #endif  */
-}
-@custom-variant not-h5 {
-  /*  #ifndef  H5  */
-  @slot;
-  /*  #endif  */
-}
-@custom-variant app {
-  /*  #ifdef  APP  */
-  @slot;
-  /*  #endif  */
-}
-@custom-variant not-app {
-  /*  #ifndef  APP  */
-  @slot;
-  /*  #endif  */
-}
-@custom-variant mp {
-  /*  #ifdef  MP  */
-  @slot;
-  /*  #endif  */
-}
-@custom-variant not-mp {
-  /*  #ifndef  MP  */
-  @slot;
-  /*  #endif  */
-}
-@custom-variant ali {
-  /*  #ifdef  MP-ALIPAY  */
-  @slot;
-  /*  #endif  */
-}
-@custom-variant tt {
-  /*  #ifdef  MP-TOUTIAO  */
-  @slot;
-  /*  #endif  */
-}
-@custom-variant android {
-  /*  #ifdef  APP-ANDROID  */
-  @slot;
-  /*  #endif  */
-}
-@custom-variant app-android {
-  /*  #ifdef  APP-ANDROID  */
-  @slot;
-  /*  #endif  */
-}
-@custom-variant ios {
-  /*  #ifdef  APP-IOS  */
-  @slot;
-  /*  #endif  */
-}
-@custom-variant app-ios {
-  /*  #ifdef  APP-IOS  */
-  @slot;
-  /*  #endif  */
-}
-@custom-variant harmony {
-  /*  #ifdef  APP-HARMONY  */
-  @slot;
-  /*  #endif  */
-}
-@custom-variant app-harmony {
-  /*  #ifdef  APP-HARMONY  */
-  @slot;
-  /*  #endif  */
-}
+/* @tailwind base; */
+@tailwind components;
+@tailwind utilities;
+
 @layer components {
   .template-corpus-apply {
     display: flex;
@@ -114,5 +23,3 @@ uni-tabbar,
   display: none !important;
 }
 /* #endif */
-
-@source inline("bg-[#102938] text-[#f7fbff] w-[173px] bg-[#3b0764] text-[#fef08a] h-[41px] mt-[19px] before:content-['现在，让我们开始神奇的_tailwindcss_开发之旅吧！'] before:content-['现在，让我们继续神奇的_tailwindcss_HMR_回归之旅吧！']");

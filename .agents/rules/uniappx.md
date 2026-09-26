@@ -53,10 +53,14 @@ description: uni-app X (UTS) 开发规范与踩坑避坑指南，适用于跨端
     *   **重要限制**：**严禁使用英文单词命名颜色**（如 `bg-[red]`、`text-[red]`、`border-[blue]` 等）。原生渲染层对 CSS 命名颜色（named colors）的支持与解析不一致，极易导致颜色失效或发生原生解析异常。
     *   **强制规范**：**颜色必须全部统一使用标准十六进制色值**（如 `text-[#ffffff]`、`bg-[#ffffff]`、`bg-[#ef4444]`、`border-[#e2e8f0]`）。
     *   **鸿蒙 VDOM 与原生插槽文本白色防护**：在作用域插槽（如 slot、z-paging 回顶、悬浮按钮等）中，避免单独使用 `text-white`（底层可能依赖 CSS 变量，在鸿蒙或部分原生组件中易丢失继承降级为黑色文本），推荐显式书写 `text-[#ffffff]`，必要时叠加行内样式 `:style="{ color: '#ffffff' }"` 确保 100% 稳定呈现白色。
-*   **Tailwind CSS 边框设置 (Border Utilities)**：
-    在 uni-app X 中使用 Tailwind CSS 设置边框时，推荐使用明确指定宽度、颜色与实线样式的类名组合：
+*   **Tailwind CSS 边框设置 (Border Utilities 与多端兼容)**：
+    在 uni-app X 中使用 Tailwind CSS 设置边框时，由于 H5 平台 uni-app 底层内置全局样式将组件的 `border-width` 默认设为 `medium`（约 3px），在缺少 Preflight 重置时，直接写边框类名（尤其是单边边框 `border-t-[1px]`）会与默认值叠加导致其他三边产生多余的 3px 粗边框。
+    *   **强制规范**：所有边框必须**在最前面显式前置 `border-[0px]` 进行全方向清空**，之后再指定宽度、实线样式与十六进制色值：
     ```html
-    <view class="border-[1px] border-solid border-[#e2e8f0] rounded-[12px] p-[16px]"></view>
+    <!-- 全边框 -->
+    <view class="border-[0px] border-[1px] border-solid border-[#e2e8f0] rounded-[12px] p-[16px]"></view>
+    <!-- 单边框（如顶边框） -->
+    <view class="border-[0px] border-t-[1px] border-solid border-[#e2e8f0]"></view>
     ```
 
 *   **阴影使用限制（严禁过度依赖阴影）**：

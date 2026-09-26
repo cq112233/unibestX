@@ -66,7 +66,7 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 | **插槽变量传参 (`error17`)** | `<text>{{ fn(item) }}</text>` | `<text>{{ fn(item as UTSJSONObject) }}</text>`（插槽参数为 `Any?`，需显式强转） |
 | **动态 `:style` 属性强转崩溃** | `:style="parent['style'] as UTSJSONObject"`（Kotlin 运行期抛 `Map cannot be cast to UTSJSONObject`） | `:style="(parent['style'] ?? {}) as any"`（使用双问号空兜底并转 `as any`） |
 | **`<text>` 混合文本嵌套** | `<text>a<text>b</text>c</text>` | 外层 `view` 内放多个兄弟 `<text>` 节点（原生 `<text>` 不支持内嵌多文本） |
-| **Tailwind 边框解析限制** | `class="border border-gray-200"` | `class="border-[1px] border-solid border-[#e2e8f0]"`（需明确指定宽度、线型与颜色） |
+| **Tailwind 边框书写规范与多端兼容** | `class="border border-gray-200"` 或单边漏前置重置 `class="border-t-[1px] border-solid"`（H5 漏写前置重置会导致其余边产生 3px 默认边框） | `class="border-[0px] border-[1px] border-solid border-[#e2e8f0]"` 或单边 `class="border-[0px] border-t-[1px] border-solid border-[#e2e8f0]"`（**一律显式前置 `border-[0px]` 清空默认值**，详见 **1.2.6**） |
 | **等宽字体显示 (`parse-css-font`)** | `class="font-mono"`（原生解析器缺 `font-size` 报错） | 内联 `style="font-family: monospace;"` |
 | **原生 `<button>` 布局限制** | `<button class="items-center justify-center">` | 用 `<view class="flex flex-row items-center justify-center">` 包裹 |
 | **`<view>` 设置文字颜色** | `<view class="text-[#333]">` | `<text class="text-[#333]">`（`color` 属性仅支持 `<text>`, `<button>`, `<input>`, `<textarea>`） |
