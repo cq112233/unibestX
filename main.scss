@@ -18,8 +18,58 @@
 }
 
 /* #ifdef H5 || WEB */
+
+/* ====================================================================
+   Tailwind Preflight border-width 补全重置
+   背景：@tailwind base（Preflight）被注释掉，而 uni-app 的内置 CSS 对
+   所有组件使用高优先级选择器 `uni-app uni-view` 设置了 border-width: medium。
+   普通 `*` 选择器优先级不够，无法覆盖。
+   因此需要用同等或更高优先级的选择器来重置 border-width: 0。
+   此重置仅在 H5/Web 生效，App 端 / 小程序端不受影响。
+   ==================================================================== */
+uni-app view,
+uni-app text,
+uni-app image,
+uni-app scroll-view,
+uni-app button,
+uni-app input,
+uni-app textarea,
+uni-app navigator,
+uni-app swiper,
+uni-app swiper-item,
+uni-app slider,
+uni-app switch,
+uni-app label,
+uni-app picker,
+uni-app rich-text,
+uni-app form,
+uni-app list-view,
+uni-app list-item {
+  border-width: 0;
+}
+
 uni-tabbar,
 .uni-tabbar {
   display: none !important;
+}
+
+
+/* 修复 H5/Web 端 <image> 自定义组件内部原生 <img> 未继承宽高导致图片按原始像素渲染被父容器裁切的问题 */
+image,
+uni-image {
+  display: inline-block;
+  overflow: hidden;
+  position: relative;
+}
+
+image > img,
+uni-image > img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: inherit;
+}
+img {
+  max-width: 100%;
 }
 /* #endif */

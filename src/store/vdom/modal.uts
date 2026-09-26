@@ -20,6 +20,10 @@ import { defineStore, PiniaStoreBase } from '@/uni_modules/x-pinia-s';
 const instanceMap: Map<string, ComponentPublicInstance> = new Map<string, ComponentPublicInstance>();
 
 export class ModalStore extends PiniaStoreBase {
+  constructor() {
+    super();
+  }
+
   /**
    * 注册（或覆盖）一个实例
    *

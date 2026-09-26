@@ -6,14 +6,14 @@
       <text class="text-[13px] text-[#718096] mt-[4px]">演示原生设备 API 调用、常用工具库与组件集成</text>
     </view>
 
+    <!-- ECharts 图表示例组件 -->
+    <EchartsDemoCard v-if="isCanvasReady" />
+
     <!-- 数据分页列表示例组件 (z-paging-x) -->
     <ZPagingDemoCard />
 
     <!-- 实用工具库与系统能力独立演示入口卡片 -->
     <UtilsNavCard />
-
-    <!-- ECharts 图表示例组件 -->
-    <EchartsDemoCard v-if="isCanvasReady" />
   </view>
 </template>
 
@@ -50,27 +50,26 @@ function refreshData(): void {
   }, 1000);
 }
 
-// 监听 Tab 切换到当前功能页（索引 2）时触发
-onTabShow(2, () => {
-  console.log('onTabShow 功能 Tab 显示');
-  // 延迟 100ms 挂载：确保微信小程序与各端渲染线程（WebView/原生容器）已将视图移入可视区并完成物理像素排版
+function activateCanvas(): void {
   if (!isCanvasReady.value) {
-    setTimeout(() => {
-      isCanvasReady.value = true;
-    }, 100);
+    isCanvasReady.value = true;
   }
+}
+
+// 监听功能 Tab 页面显示（切 Tab、从子页面返回、前台恢复都会触发）
+onTabPageShow(2, () => {
+  console.log('onTabPageShow 功能 Tab 显示');
+  setTimeout(() => {
+    activateCanvas();
+  }, 150);
 }, true);
 
 onMounted(() => {
-  // 挂载兜底兼容：
-  // 1. 独立页面访问模式（非 TabBar 容器场景，curIdx 为 -1）
-  // 2. 项目配置当前功能页为首屏默认激活 Tab（curIdx 为 2）
-  // 在视图节点初次渲染就绪后延迟激活 Canvas 组件
-  if (curIdx.value < 0 || curIdx.value == 2) {
-    setTimeout(() => {
-      isCanvasReady.value = true;
-    }, 200);
-  }
+  console.log('功能 Tab 挂载了');
+  // 挂载无条件延迟激活兜底（无论是 Tab 容器还是独立页面模式，确保 100% 激活）
+  setTimeout(() => {
+    activateCanvas();
+  }, 250);
 });
 
 // 监听 navbar 自定义下拉刷新事件（在 enablePullDownRefresh: true 且处于当前 Tab 时生效）
@@ -78,15 +77,6 @@ onNavbarPullDownRefresh(() => {
   if (curIdx.value == 2) {
     refreshData();
   }
-});
-
-// 监听功能 Tab 页面显示（切 Tab、从子页面返回、前台恢复都会触发）
-onTabPageShow(2, () => {
-  console.log('onTabPageShow 功能 Tab 显示');
-}, true);
-
-onMounted(() => {
-  console.log('功能 Tab 挂载了');
 });
 
 onUnmounted(() => {

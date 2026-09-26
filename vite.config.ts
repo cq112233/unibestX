@@ -85,6 +85,11 @@ export default defineConfig({
           prepare() {
             return {
               Rule(rule: any) {
+                // H5/Web 是标准浏览器环境，无需剔除任何 CSS 选择符，直接跳过
+                const platform = process.env.UNI_PLATFORM || '';
+                if (platform === 'h5' || platform === 'web') {
+                  return;
+                }
                 const s = rule.selector || '';
                 // 剔除包含原生不支持选择符的规则（>、~、+、*、::before、::after、带空格的非法复杂选择器）
                 if (['>', '~', '+', '*', '::before', '::after'].some(char => s.includes(char)) || s.includes('%') || (s.startsWith('.') && s.includes(' '))) {
@@ -93,6 +98,11 @@ export default defineConfig({
                 }
               },
               Declaration(decl: any) {
+                // H5/Web 跳过
+                const platform = process.env.UNI_PLATFORM || '';
+                if (platform === 'h5' || platform === 'web') {
+                  return;
+                }
                 // 移除 position: static
                 if (decl.prop === 'position' && decl.value === 'static') {
                   decl.remove();
@@ -112,6 +122,7 @@ export default defineConfig({
             };
           }
         }
+
       ]
     }
   },
