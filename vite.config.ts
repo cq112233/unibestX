@@ -29,7 +29,33 @@ function cool() {
   }).filter(p => p && p.name && p.name.includes('tailwind'));
 }
 
-const uni = (uniModule as typeof uniModule & { default?: typeof uniModule }).default ?? uniModule;
+const rawUni = (uniModule as typeof uniModule & { default?: typeof uniModule }).default ?? uniModule;
+
+// 消除 HBuilderX 启动时 CLI 入口与 uni() 插件重复输出的编译器版本与启动横幅（确保控制台仅保留一次输出）
+function uni(...args: any[]) {
+  const originalLog = console.log;
+  console.log = function (...logArgs: any[]) {
+    const text = logArgs.map(a => (typeof a === 'string' ? a : '')).join(' ').trim();
+    if (
+      text.includes('请注意运行模式下') ||
+      text.startsWith('编译器版本:') ||
+      text.includes('当前样式隔离策略') ||
+      text === '正在编译中...'
+    ) {
+      return; // 过滤 uni() 插件初始化阶段重复打印的横幅日志
+    }
+    return originalLog.apply(console, logArgs);
+  };
+  try {
+    return (rawUni as any)(...args);
+  }
+  finally {
+    // 异步恢复原始 console.log，确保后续正常的构建/运行日志完全不受影响
+    setTimeout(() => {
+      console.log = originalLog;
+    }, 1000);
+  }
+}
 const tailwindConfig = (tailwindConfigModule as any).default ?? tailwindConfigModule;
 function resolve(dir: string) {
   return join(__dirname, dir);
