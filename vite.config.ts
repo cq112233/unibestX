@@ -85,22 +85,33 @@ export default defineConfig({
           prepare() {
             return {
               Rule(rule: any) {
-                // H5/Web 是标准浏览器环境，无需剔除任何 CSS 选择符，直接跳过
+                // 1. 如果是 @keyframes 内的关键帧选择器（如 0%, 50%, 100%, from, to），绝不能误删
+                if (rule.parent && rule.parent.type === 'atrule' && rule.parent.name && rule.parent.name.includes('keyframes')) {
+                  return;
+                }
                 const platform = process.env.UNI_PLATFORM || '';
+                // 2. Web/H5 拥有完整浏览器能力，不作任何裁剪
                 if (platform === 'h5' || platform === 'web') {
                   return;
                 }
                 const s = rule.selector || '';
-                // 剔除包含原生不支持选择符的规则（>、~、+、*、::before、::after、带空格的非法复杂选择器）
+                // 3. 小程序端（mp-*）：WXSS 语法不支持兄弟选择器（~ 与 +），剔除带 ~ 和 + 的规则防止微信编译器报错 unexpected token
+                if (platform.startsWith('mp-')) {
+                  if (s.includes('~') || s.includes('+')) {
+                    rule.remove();
+                  }
+                  return;
+                }
+                // 4. App 原生渲染引擎：剔除原生不支持的选择器（>、~、+、*、::before、::after、带空格的非法复杂选择器）
                 if (['>', '~', '+', '*', '::before', '::after'].some(char => s.includes(char)) || s.includes('%') || (s.startsWith('.') && s.includes(' '))) {
                   rule.remove();
                   return;
                 }
               },
               Declaration(decl: any) {
-                // H5/Web 跳过
+                // 仅针对 App 原生平台裁剪
                 const platform = process.env.UNI_PLATFORM || '';
-                if (platform === 'h5' || platform === 'web') {
+                if (platform === 'h5' || platform === 'web' || platform.startsWith('mp-') || platform.startsWith('quickapp')) {
                   return;
                 }
                 // 移除 position: static
