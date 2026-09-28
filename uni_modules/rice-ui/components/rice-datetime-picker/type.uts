@@ -1,0 +1,50 @@
+import { PickerOption } from "../rice-picker"
+export type DateTimePickerUnit = 'year' | 'month' | 'day' | 'hour' | 'minute' | 'second'
+
+export type DateTimePickerFormatter = (type : DateTimePickerUnit, option : PickerOption) => PickerOption
+
+export type DateTimePickerFilter = (type : DateTimePickerUnit, options : PickerOption[]) => PickerOption[]
+
+export type DateTimePickerType = 'year' | 'month' | 'date' | 'minute' | 'time' | 'datehour' | 'dateminute' | 'datetime'
+
+export type DateTimePickerExtend = {
+	year : number,
+	month : number,
+	day : number,
+	hour : number,
+	minute : number,
+	second : number,
+	timeStamp : number,
+	value : string,
+}
+
+export type DateTimePickerEvent = {
+	value : string,
+	extend : DateTimePickerExtend
+}
+
+export type DateTimePickerProps = {
+	type ?: DateTimePickerType,
+	minDate ?: string,
+	maxDate ?: string,
+	valueFormat ?: string,
+	format ?: string,
+	toolbarPosition ?: 'top' | 'bottom' | 'none',
+	title ?: string | number,
+	confirmButtonText ?: string | number,
+	cancelButtonText ?: string | number,
+	closeOnClickOverlay ?: boolean,
+	closeOnClickConfirm ?: boolean,
+	closeOnClickCancel ?: boolean,
+	loading ?: boolean,
+	filter ?: DateTimePickerFilter,
+	formatter ?: DateTimePickerFormatter,
+	fontSize ?: string | number,
+	optionHeight ?: string | number,
+	visibleOptionNum ?: number,
+	zIndex ?: number,
+	usePopup ?: boolean,
+	emptyText ?: string,
+	safeAreaInsetBottom ?: boolean,
+	immediateChange ?: boolean,
+}

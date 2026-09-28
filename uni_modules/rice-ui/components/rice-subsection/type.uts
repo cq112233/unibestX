@@ -1,0 +1,18 @@
+
+export type SubsectionItemRect = {
+	height : number,
+	width : number,
+}
+
+export type SubsectionProps = {
+	list : string[],
+	shape ?: 'round' | 'square',
+	initAnimate ?: boolean,
+	duration ?: number,
+	beforeChange ?: (index : number) => Promise<boolean> | boolean,
+	barClass ?: string,
+	itemClass ?: string,
+	textClass ?: string,
+	activeTextClass ?: string,
+	inactiveTextClass ?: string,
+}

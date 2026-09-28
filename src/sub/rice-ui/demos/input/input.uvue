@@ -1,0 +1,64 @@
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
+    <view class="p-[16px]">
+      <!-- 基础用法 -->
+      <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
+        <view class="flex-row items-center mb-[12px]">
+          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px]" :style="{ backgroundColor: currentTheme }" />
+          <text class="text-[14px] font-bold text-[#334155]">基础输入框</text>
+        </view>
+        <view class="mb-[10px]">
+          <rice-input v-model="text1" placeholder="请输入文本" />
+        </view>
+        <view class="mb-[10px]">
+          <rice-input v-model="text2" placeholder="可一键清空" :clearable="true" />
+        </view>
+        <view class="mb-[10px]">
+          <rice-input v-model="text3" placeholder="密码输入框" :show-password="true" />
+        </view>
+        <view>
+          <rice-input :disabled="true" placeholder="禁用状态输入框" />
+        </view>
+      </view>
+
+      <!-- 前缀与后缀图标 -->
+      <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
+        <view class="flex-row items-center mb-[12px]">
+          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px]" :style="{ backgroundColor: currentTheme }" />
+          <text class="text-[14px] font-bold text-[#334155]">带图标输入框</text>
+        </view>
+        <view class="mb-[10px]">
+          <rice-input v-model="text4" placeholder="前缀搜索图标" prefix-icon="search" />
+        </view>
+        <view>
+          <rice-input v-model="text5" placeholder="后缀眼睛图标" suffix-icon="eyes" />
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { useAppStore } from '@/src/store';
+import { computed } from 'vue';
+
+definePage({
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
+  style: {
+    navigationBarTitleText: 'Input 输入框',
+    navigationStyle: 'custom'
+  }
+});
+
+const appStore = useAppStore();
+const currentTheme = computed((): string => appStore.state.theme);
+
+const text1 = ref('');
+const text2 = ref('Hello Rice UI');
+const text3 = ref('123456');
+const text4 = ref('');
+const text5 = ref('');
+</script>

@@ -1,0 +1,27 @@
+export type SignaturePoint = {
+	x : number,
+	y : number
+}
+
+export type SignatureCanvasSize = {
+	width : number,
+	height : number
+}
+
+export type SignatureProps = {
+	type ?: 'png' | 'jpeg',
+	width ?: number | string,
+	height ?: number | string,
+	disabled ?: boolean,
+	tips ?: string,
+	tipsSize ?: string | number,
+	tipsColor ?: string,
+	lineColor ?: string,
+	lineWidth ?: number,
+	bgColor ?: string,
+	contentBgColor ?: string,
+	clearButtonText ?: string,
+	confirmButtonText ?: string,
+	revokeButtonText ?: string,
+	customStyle ?: UTSJSONObject
+}

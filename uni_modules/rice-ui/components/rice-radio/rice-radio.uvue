@@ -1,0 +1,242 @@
+<template>
+	<view :class="radioClass" :style="customStyle" ref="checkboxRef" @click.stop="handleClick">
+		<view v-if="_iconPosition=='right'" :class="labelClass">
+			<slot :checked="isChecked" :disabled="isDisabled">
+				<text :class="textClass" :style="textStyle">{{label}}</text>
+			</slot>
+		</view>
+		<slot name="icon" :checked="isChecked" :disabled="isDisabled">
+			<view :class="iconClass" :style="iconBoxStyle" ref="iconBoxRef">
+				<rice-icon v-if="isChecked" name="checked" color="#fff" :size="_iconSize"
+					:custom-style="{transform: 'scale(0.6)'}" />
+			</view>
+		</slot>
+		<view v-if="_iconPosition=='left'" :class="labelClass">
+			<slot :checked="isChecked" :disabled="isDisabled">
+				<text :class="textClass" :style="textStyle">{{label}}</text>
+			</slot>
+		</view>
+	</view>
+</template>
+
+<script setup>
+	import { useNamespace } from '../../libs/use';
+	import { addUnit, hasStrValue, isSameValue, debugWarn } from '../../libs/utils';
+	import { isDark } from "../../libs/store";
+	import { formDisabledInjectKey, formReadonlyInjectKey } from "../rice-form"
+	import { RadioValueType, RadioGroupProvide, defDirection, defIconPosition, defShape, radioGroupInjectKey } from '../rice-radio-group';
+	import { RadioProps } from './type.uts';
+
+	defineOptions({
+		name: 'rice-radio',
+		styleIsolation: 'app-and-page'
+	})
+
+	const ns = useNamespace('radio')
+	const emit = defineEmits<{
+		change : [value: RadioValueType],
+	}>()
+
+	const slot = defineSlots<{
+		default(props : { checked : boolean, disabled : boolean }) : any,
+		icon(props : { checked : boolean, disabled : boolean }) : any,
+	}>()
+
+	const props = withDefaults(defineProps<RadioProps>(), {
+		disabled: false,
+		readonly: false,
+		spaceBetween: null,
+		customStyle: () : UTSJSONObject => ({}),
+	})
+
+
+	const radioGroup = inject<RadioGroupProvide | null>(radioGroupInjectKey, null)
+	const formDisabled = inject<Ref<boolean | null> | null>(formDisabledInjectKey, null)
+	const formReadonly = inject<Ref<boolean | null> | null>(formReadonlyInjectKey, null)
+
+	const isChecked = computed<boolean>(() => radioGroup != null ? isSameValue(props.value, radioGroup.modelValue.value) : false)
+	const isDisabled = computed<boolean>(() => (formDisabled?.value ?? false) || props.disabled || (radioGroup?.disabled.value ?? false))
+	const isReadonly = computed<boolean>(() => (formReadonly?.value ?? false) || props.readonly || (radioGroup?.readonly.value ?? false))
+	const _iconPosition = computed(() => props.iconPosition ?? radioGroup?.iconPosition.value ?? defIconPosition)
+	const _iconSize = computed(() => props.iconSize ?? radioGroup?.iconSize.value ?? '20px')
+
+	const handleClick = (e : UniPointerEvent) => {
+		e.stopPropagation()
+		const value = props.value
+		if (isReadonly.value || isDisabled.value || radioGroup == null || value == null) return
+		if (!isSameValue(value, radioGroup.modelValue.value)) {
+			radioGroup.updateValue!(value)
+		}
+	}
+
+	const checkboxRef = shallowRef<UniElement | null>(null)
+
+	const iconBoxStyle = computed(() => {
+		const css = new Map<string, string>()
+		const size = props.iconSize ?? radioGroup?.iconSize.value
+		if (size != null) {
+			const width = addUnit(size)
+			css.set('height', width)
+			css.set('width', width)
+		}
+
+		const checkedColor = props.checkedColor ?? radioGroup?.checkedColor.value
+
+		if (hasStrValue(checkedColor)) {
+			if (isChecked.value) {
+				css.set('background-color', checkedColor!)
+				css.set('border', `1px solid ${checkedColor!}`)
+			}
+			// #ifdef APP
+			else {
+				css.set('border', `1px solid ${isDisabled.value ? 'var(--rice-radio-disabled-border-color)' : 'var(--rice-radio-border-color)'}`)
+			}
+			// #endif
+
+		}
+
+		return css
+	})
+
+	const textStyle = computed(() => {
+		const css = new Map<string, string>()
+		const labelSize = props.labelSize ?? radioGroup?.labelSize.value
+		const labelColor = props.labelColor ?? radioGroup?.labelColor.value
+		if (hasStrValue(labelSize)) css.set('font-size', addUnit(labelSize!))
+		if (hasStrValue(labelColor) && !isDisabled.value) css.set('color', labelColor!)
+		return css
+	})
+
+	const radioClass = computed(() => {
+		const isSpace = props.spaceBetween ?? radioGroup?.spaceBetween.value
+		return [
+			ns.b(""),
+			ns.theme(),
+			ns.is('row', radioGroup?.direction.value == 'row'),
+			ns.is('space-between', isSpace == true),
+
+		]
+	})
+
+	const labelClass = computed(() => {
+		return [
+			ns.e('label'),
+			ns.e(`label--${_iconPosition.value}`)
+		]
+	})
+
+	const iconClass = computed(() => {
+		const shape = props.shape ?? radioGroup?.shape.value ?? 'round'
+		return [
+			ns.e('icon'),
+			ns.is('__icon--round', shape == 'round'),
+			ns.is('__icon--checked', isChecked.value),
+			ns.is('__icon--disabled', isDisabled.value && !isChecked.value),
+			ns.is('__icon--checked--disabled', isDisabled.value && isChecked.value),
+		]
+	})
+
+	const textClass = computed(() => {
+		return [
+			ns.e("label__text"),
+			ns.is("__label__text--disabled", isDisabled.value)
+		]
+	})
+
+	if (radioGroup == null) {
+		debugWarn('Radio', '<Radio> must be used with <RadioGroup>')
+	}
+</script>
+<style scoped lang="scss">
+	.rice-radio {
+		flex-direction: row;
+		align-items: center;
+
+
+		&__icon {
+			flex-direction: row;
+			align-items: center;
+			justify-content: center;
+			/* #ifndef APP */
+			transition: all 100ms ease-in-out;
+			/* #endif */
+			width: 20px;
+			height: 20px;
+			border: 1px solid var(--rice-radio-border-color);
+			border-radius: 4px;
+			background-color: transparent;
+
+
+			&--disabled {
+				background-color: var(--rice-radio-disabled-background);
+				border: 1px solid var(--rice-radio-disabled-border-color);
+				/* #ifdef WEB */
+				cursor: not-allowed;
+				/* #endif */
+			}
+
+			&--checked {
+				background-color: var(--rice-primary-color);
+				border: 1px solid var(--rice-primary-color);
+
+			}
+
+			&--checked--disabled {
+				background-color: var(--rice-primary-color);
+				border: 1px solid var(--rice-primary-color);
+				/* #ifndef APP-HARMONY */
+				opacity: 0.4;
+				/* #endif */
+				/* #ifdef APP-HARMONY */
+				opacity: 0.6;
+				/* #endif */
+			}
+
+
+			&--round {
+				border-radius: 999px;
+			}
+
+		}
+
+		&__label {
+
+			//#ifndef VUE3-VAPOR
+			flex: 0 1 auto;
+			//#endif
+
+			&--left {
+				padding-left: 8px;
+			}
+
+			&--right {
+				padding-right: 8px;
+			}
+
+			&__text {
+				font-size: 15px;
+				color: var(--rice-text-color);
+
+				&--disabled {
+					color: var(--rice-radio-label-disabled-color);
+					/* #ifdef WEB */
+					cursor: not-allowed;
+					/* #endif */
+				}
+			}
+		}
+
+		&--row {
+			margin-right: 12px;
+
+			//#ifndef VUE3-VAPOR
+			flex: 0 1 auto;
+			//#endif
+		}
+
+		&--space-between {
+			justify-content: space-between;
+		}
+
+	}
+</style>

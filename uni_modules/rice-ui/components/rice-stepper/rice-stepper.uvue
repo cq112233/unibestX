@@ -1,0 +1,469 @@
+<template>
+	<view :class="stepperClass" :style="customStyle">
+		<view v-if="showMinus" :class="minusClass" :style="[btnStyle,splitCssProperty(minusBtnStyle).rectCssProperty]"
+			@click.stop="decrease">
+			<rice-icon name="minus" :size="fontSize" :color="getIconColor('minus')" />
+		</view>
+		<input v-if="showInput" :type="inputType" :class="inputClass" :value="displayValue"
+			:style="[inputBoxStyle,inputStyle]" :disabled="_disabledInput" @input="onInput" @focus="onFocus" @blur="onBlur" />
+		<view v-if="showPlus" :class="plusClass" :style="[btnStyle,splitCssProperty(plusBtnStyle).rectCssProperty]"
+			@click.stop="increase">
+			<rice-icon name="plus" :size="fontSize" :color="getIconColor('plus')" />
+		</view>
+	</view>
+</template>
+
+<script setup>
+	import { isDark } from '../../libs/store';
+	import { addUnit, clamp, callInterceptor, debugWarn, hasStrValue, toNum, getPrecision, isSameValue, splitCssProperty } from "../../libs/utils"
+	import { useNamespace } from '../../libs/use';
+	import { formDisabledInjectKey, formReadonlyInjectKey } from "../rice-form"
+	import { BeforeChangeInterceptor } from "../../libs/types"
+	import { StepperProps, StepperCurrent } from './type.uts';
+
+	defineOptions({
+		name: 'rice-stepper',
+		styleIsolation: 'app-and-page'
+	})
+
+	const ns = useNamespace('stepper')
+	const emit = defineEmits<{
+		change : [newVal: number, oldVal?: number],
+		blur : [e: UniInputBlurEvent],
+		focus : [e: UniInputFocusEvent],
+		input : [newVal: string]
+	}>()
+	const props = withDefaults(defineProps<StepperProps>(), {
+		step: 1,
+		integer: false,
+		disabled: false,
+		readonly: false,
+		disableInput: false,
+		disableMinus: false,
+		disablePlus: false,
+		showMinus: true,
+		showPlus: true,
+		showInput: true,
+		autoFixed: true,
+		fontSize: '14px',
+		min: -Infinity,
+		max: Infinity,
+		decimalLength: 0,
+		mode: 'square',
+		plusBtnStyle: () : UTSJSONObject => ({}),
+		minusBtnStyle: () : UTSJSONObject => ({}),
+		inputStyle: () : UTSJSONObject => ({}),
+		customStyle: () : UTSJSONObject => ({}),
+	})
+	//@ts-ignore
+	const modelValue = defineModel({
+		type: Number as PropType<number | null>
+	})
+
+	const formDisabled = inject<Ref<boolean | null> | null>(formDisabledInjectKey, null)
+	const formReadonly = inject<Ref<boolean | null> | null>(formReadonlyInjectKey, null)
+	const _readonly = computed<boolean>(() => (formReadonly?.value ?? false) || props.readonly)
+
+	const overMax = computed(() => modelValue.value != null ? modelValue.value! >= props.max : false)
+	const overMin = computed(() => modelValue.value != null ? modelValue.value! <= props.min : false)
+	const _disabledInput = computed<boolean>(() => props.disableInput || _readonly.value || props.disabled || (formDisabled?.value ?? false))
+	const _disabledPlus = computed<boolean>(() => props.disablePlus || props.disabled || overMax.value || (formDisabled?.value ?? false))
+	const _disabledMinus = computed<boolean>(() => props.disableMinus || props.disabled || overMin.value || (formDisabled?.value ?? false))
+	const _beforeChange = computed(() => props.beforeChange != null && typeof props.beforeChange == 'function')
+
+	const inputType = computed(() => {
+		//鸿蒙number输入框输不了负数
+		// #ifdef APP-HARMONY || WEB
+		return 'text'
+		// #endif
+
+		// #ifndef APP-HARMONY || WEB
+		return props.integer ? 'number' : 'digit'
+		// #endif
+	})
+
+
+	const current = reactive<StepperCurrent>({
+		inputValue: null,
+		currentValue: modelValue.value
+	})
+
+	//显示在input框上的值
+	const displayValue = computed(() => {
+		if (current.inputValue != null) {
+			return current.inputValue!
+		}
+		let currentVal = current.currentValue
+		if (currentVal == null) return ""
+		if (typeof currentVal == 'number') {
+
+			if (isNaN(currentVal)) return ""
+			//保留小数点后几位
+			if (props.decimalLength > 0) {
+				currentVal = currentVal.toFixed(props.decimalLength)
+			} else {
+				currentVal = currentVal.toString()
+			}
+		}
+		return currentVal
+	})
+
+	const numPrecision = computed<number>(() => {
+		const stepDecimal = getPrecision(props.step)
+		if (props.decimalLength > 0) {
+			if (stepDecimal > props.decimalLength) {
+				debugWarn('Stepper', 'The decimalLength cannot be less than the number of decimal places of step!')
+			}
+			return props.decimalLength
+		}
+		return Math.max(getPrecision(modelValue.value), stepDecimal)
+	})
+
+	//将一个数字转换为指定精度的小数
+	function format(value : number, decimal ?: number) {
+		if (decimal == null) decimal = numPrecision.value
+		//将数字四舍五入为整数
+		if (decimal == 0) return Math.round(value)
+		let snum = value.toString()
+		const pointPos = snum.indexOf('.')
+		//没有小数
+		if (pointPos == -1) return value
+		const nums = snum.replace('.', '').split('')
+		const index = pointPos + decimal!
+		//索引超出数组范围,不需要进行精度处理
+		if (index >= nums.length) {
+			return value
+		}
+		const length = snum.length
+		//如果最后一位是5，将字符串的最后一个字符替换为 6，以减少四舍五入方法可能产生的误差。
+		if (snum.charAt(length - 1) == '5') {
+			snum = `${snum.slice(0, Math.max(0, length - 1))}6`
+		}
+		return parseFloat(parseFloat(snum).toFixed(decimal))
+	}
+
+	const updateModelValue = (newVal : number) => {
+		modelValue.value = newVal
+	}
+
+	const getMin = () => (props.min == -Infinity ? 0 : props.min) as number
+
+	function verifyValue(value ?: string | number, update = false) {
+		const { max, min, decimalLength, integer, autoFixed } = props
+
+		if (max < min) {
+			debugWarn('Steeper', 'min should not be greater than max.')
+		}
+
+		const val = hasStrValue(value) ? value : (autoFixed ? getMin() : null);
+		if (val == null || isNaN(toNum(val!))) return null
+		let newVal = toNum(val!)
+
+		if (decimalLength != 0) {
+			newVal = format(newVal, decimalLength)
+		}
+		if (integer) {
+			newVal = Math.round(newVal)
+		}
+		if (autoFixed) {
+			newVal = clamp(newVal, min, max)
+		}
+		if (!isSameValue(newVal, value) && update) {
+			updateModelValue(newVal)
+		}
+
+		return newVal
+	}
+
+	const handleChange = (newVal : number) => {
+		const oldVal = current.currentValue
+		updateModelValue(newVal)
+		if (!isSameValue(newVal, oldVal)) {
+			emit('change', newVal, oldVal == null ? oldVal : toNum(oldVal!))
+		}
+		current.currentValue = newVal
+	}
+
+	function setCurrentValue(value ?: string | number, source = 'btn') {
+		const oldVal = current.currentValue
+		const newVal = verifyValue(value)
+		if (newVal == null) return
+		//input 输入时，改变modelValue的值，但是不发射change事件，失去焦点时在发射事件
+		if (source == 'input') {
+			if (!_beforeChange.value) {
+				updateModelValue(newVal!)
+			}
+			return
+		}
+
+		if (isSameValue(newVal, oldVal)) return
+
+		if (!_beforeChange.value) {
+			current.inputValue = null
+			handleChange(newVal!)
+			return
+		}
+		//异步控制
+		callInterceptor(props.beforeChange as BeforeChangeInterceptor, {
+			done() {
+				handleChange(newVal!)
+			},
+			complete() {
+				current.inputValue = null
+			}
+		})
+
+	}
+
+	const setCurrentByModelValue = () => {
+		if (!isSameValue(modelValue.value, current.currentValue)) {
+			current.currentValue = modelValue.value
+		}
+	}
+
+	const increase = (e : UniPointerEvent) => {
+		e.stopPropagation()
+		if (_disabledPlus.value || _readonly.value) return
+		const n = parseFloat(displayValue.value)
+		const value = isNaN(n) ? getMin() : n
+		const newVal = format(value + props.step, null)
+		setCurrentValue(newVal)
+		setCurrentByModelValue()
+	}
+
+	const decrease = (e : UniPointerEvent) => {
+		e.stopPropagation()
+		if (_disabledMinus.value || _readonly.value) return
+		const n = parseFloat(displayValue.value)
+		const value = isNaN(n) ? getMin() : n
+		const newVal = format(value + props.step * -1, null)
+		setCurrentValue(newVal)
+		setCurrentByModelValue()
+	}
+
+	const onInput = (e : UniInputEvent) => {
+		const value = e.detail.value
+		current.inputValue = value
+		setCurrentValue(value, 'input')
+		emit('input', value)
+	}
+
+	const onFocus = (e : UniInputFocusEvent) => {
+		nextTick(() => emit('focus', e))
+	}
+
+	const isEmptyStr = (val : any) => {
+		// #ifndef APP-ANDROID
+		return val === ""
+		// #endif
+		// #ifdef APP-ANDROID
+		return val == ""
+		// #endif
+	}
+
+	const onBlur = (e : UniInputBlurEvent) => {
+		if (!_beforeChange.value) {
+			current.inputValue = null
+		}
+		const value = e.detail.value
+		const newVal = hasStrValue(value) ? parseFloat(value) : ""
+		if ((typeof newVal == 'number' && !isNaN(newVal)) || isEmptyStr(newVal)) {
+			setCurrentValue(newVal, 'blur')
+		}
+
+		setCurrentByModelValue()
+		nextTick(() => emit('blur', e))
+	}
+
+	watch(modelValue, (newVal ?: number, oldVal ?: number) => {
+		const value = verifyValue(newVal, true)
+		if (current.inputValue == null && !isSameValue(value, oldVal)) {
+			current.currentValue = value
+		}
+	}, {
+		immediate: true
+	})
+
+	watch([() : boolean => props.integer, () : number => props.decimalLength,
+	() : number => props.min, () : number => props.max], () => {
+		setCurrentValue(modelValue.value, 'watch')
+	})
+
+	const getIconColor = (type : string) => {
+		const textStyle = splitCssProperty(type == 'plus' ? props.plusBtnStyle : props.minusBtnStyle).textCssProperty
+		if (typeof textStyle['color'] == 'string') {
+			return textStyle['color'] as string
+		}
+
+		if (props.mode == 'round') {
+			return type == 'minus' ? 'var(--rice-primary-color)' : 'var(--rice-text-color-white)'
+		}
+		return 'var(--rice-text-color)'
+
+	}
+
+	const btnStyle = computed(() => {
+		const css = new Map<string, string>()
+		if (props.buttonSize != null) {
+			const size = addUnit(props.buttonSize!)
+			css.set('height', size)
+			css.set('width', size)
+		}
+		return css
+	})
+
+	const inputBoxStyle = computed(() => {
+		const css = new Map<string, string>()
+		if (props.buttonSize != null) {
+			css.set('height', addUnit(props.buttonSize!))
+		}
+		if (props.inputWidth != null) {
+			css.set('width', addUnit(props.inputWidth!))
+		}
+		css.set('font-size', addUnit(props.fontSize))
+		return css
+	})
+
+	const stepperClass = computed(() => {
+		return [
+			ns.b(""),
+			ns.theme(),
+			ns.is("disabled", props.disabled),
+			ns.m(props.mode),
+		]
+	})
+
+	const minusClass = computed(() => {
+		return [
+			ns.e("minus"),
+			ns.is("__minus--disabled", _disabledMinus.value && !props.disabled),
+			ns.e(`minus--${props.mode}`),
+		]
+	})
+
+	const plusClass = computed(() => {
+		return [
+			ns.e("plus"),
+			ns.is("__plus--disabled", _disabledPlus.value && !props.disabled),
+			ns.e(`plus--${props.mode}`),
+		]
+	})
+
+	const inputClass = computed<string[]>(() => {
+		const basic = [ns.e("input"), ns.e(`input--${props.mode}`)]
+		// #ifdef VUE3-VAPOR
+		//鸿蒙蒸汽模式的input不支持css变量
+		if (isDark.value) {
+			basic.push('rice-stepper__input--dark')
+		}
+		// #endif
+		return basic
+	})
+</script>
+
+<style scoped lang="scss">
+	$size: 30px;
+	$radius: 4px;
+
+	@mixin disabled() {
+		opacity: .6;
+		/* #ifdef WEB */
+		cursor: not-allowed;
+		/* #endif */
+	}
+
+	@mixin btnRound() {
+		border-radius: 999px;
+		border: 1px solid var(--rice-primary-color);
+	}
+
+	.rice-stepper {
+		flex-direction: row;
+
+		&__input {
+			box-sizing: border-box;
+			text-align: center;
+			margin: 0 2px;
+			height: $size;
+			width: 36px;
+			/* #ifdef VUE3-VAPOR */
+			color: #323233; //鸿蒙蒸汽模式input的color不支持css变量
+			/* #endif */
+			/* #ifndef VUE3-VAPOR */
+			color: var(--rice-text-color);
+			/* #endif */
+			background-color: var(--rice-stepper-background);
+
+			&--round {
+				background-color: transparent;
+			}
+
+			&--outline {
+				margin: 0px;
+				border-top: 1px solid var(--rice-stepper-background);
+				border-bottom: 1px solid var(--rice-stepper-background);
+				/* #ifdef APP-IOS */
+				border-left: 0px solid transparent;
+				border-right: 0px solid transparent;
+				/* #endif */
+				background-color: transparent;
+			}
+
+			/* #ifdef VUE3-VAPOR */
+			&--dark {
+				color: #f5f5f5;
+			}
+
+			/* #endif */
+		}
+
+		&__minus,
+		&__plus {
+			box-sizing: border-box;
+			align-items: center;
+			justify-content: center;
+			height: $size;
+			width: $size;
+			background-color: var(--rice-stepper-background);
+
+
+			&--disabled {
+				@include disabled;
+			}
+
+			&--outline {
+				border: 1px solid var(--rice-stepper-background);
+				background-color: transparent;
+			}
+		}
+
+		&__minus {
+			border-radius: $radius 0 0 $radius;
+
+			&--round {
+				@include btnRound;
+				background-color: transparent;
+
+			}
+		}
+
+		&__plus {
+			border-radius: 0 $radius $radius 0;
+
+			&--round {
+				@include btnRound;
+
+				background-color: var(--rice-primary-color);
+			}
+		}
+
+		&--outline {
+			border-radius: $radius;
+			// border: 1px solid var(--rice-stepper-background);
+		}
+
+		&--disabled {
+			@include disabled;
+		}
+	}
+</style>

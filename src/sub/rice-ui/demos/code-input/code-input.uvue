@@ -1,0 +1,67 @@
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
+    <view class="p-[16px]">
+      <!-- 基础框状 -->
+      <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
+        <view class="flex-row items-center mb-[12px]">
+          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px]" :style="{ backgroundColor: currentTheme }" />
+          <text class="text-[14px] font-bold text-[#334155]">基础框状验证码 (Box)</text>
+        </view>
+        <view class="py-[10px] flex-row justify-center">
+          <rice-code-input v-model="code1" :maxlength="4" :color="currentTheme" mode="box" />
+        </view>
+        <view class="mt-[8px] text-center">
+          <text class="text-[12px] text-[#64748b]">当前输入：{{ code1 }}</text>
+        </view>
+      </view>
+
+      <!-- 下划线状 -->
+      <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
+        <view class="flex-row items-center mb-[12px]">
+          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px]" :style="{ backgroundColor: currentTheme }" />
+          <text class="text-[14px] font-bold text-[#334155]">下划线模式 (Line)</text>
+        </view>
+        <view class="py-[10px] flex-row justify-center">
+          <rice-code-input v-model="code2" :maxlength="6" :color="currentTheme" mode="line" />
+        </view>
+        <view class="mt-[8px] text-center">
+          <text class="text-[12px] text-[#64748b]">当前输入：{{ code2 }}</text>
+        </view>
+      </view>
+
+      <!-- 密文模式 -->
+      <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
+        <view class="flex-row items-center mb-[12px]">
+          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px]" :style="{ backgroundColor: currentTheme }" />
+          <text class="text-[14px] font-bold text-[#334155]">密文掩码模式 (Dot)</text>
+        </view>
+        <view class="py-[10px] flex-row justify-center">
+          <rice-code-input v-model="code3" :maxlength="4" :color="currentTheme" :dot="true" />
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { useAppStore } from '@/src/store';
+import { computed } from 'vue';
+
+definePage({
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
+  style: {
+    navigationBarTitleText: 'CodeInput 验证码',
+    navigationStyle: 'custom'
+  }
+});
+
+const appStore = useAppStore();
+const currentTheme = computed((): string => appStore.state.theme);
+
+const code1 = ref('');
+const code2 = ref('123');
+const code3 = ref('8888');
+</script>

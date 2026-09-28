@@ -1,0 +1,31 @@
+import { BeforeChangeInterceptor } from "../../libs/types"
+
+
+export type PopupProps = {
+	duration ?: number,
+	position ?: 'top' | 'bottom' | 'left' | 'right' | 'center',
+	zIndex ?: number,
+	opacity ?: boolean,
+	zoom ?: boolean,
+	overlay ?: boolean,
+	overlayBgColor ?: string,
+	closeable ?: boolean,
+	closeIcon ?: string,
+	closeIconPosition ?: "top-left" | "top-right" | "bottom-left" | "bottom-right",
+	closeOnClickOverlay ?: boolean,
+	radius ?: number | string,
+	bgColor ?: string,
+	safeAreaInsetTop ?: boolean,
+	safeAreaInsetBottom ?: boolean,
+	closeOnSlideDown ?: boolean,
+	slideDownThreshold ?: number,
+	showDragBar ?: boolean,
+	dragWrapClass ?: string,
+	dragBarClass ?: string,
+	lockScroll ?: boolean,
+	scrollId ?: string,
+	beforeClose ?: BeforeChangeInterceptor,
+	marginTop ?: string | number,
+	popupClass ?: string,
+	customStyle ?: UTSJSONObject,
+}

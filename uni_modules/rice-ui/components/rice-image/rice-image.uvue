@@ -1,0 +1,170 @@
+<template>
+	<view :class="rootClass" :style="[rootStyle,customStyle]" @click="handleClick">
+		<view v-if="error" class="rice-image__error" :style="bgColorStyle">
+			<slot name="error">
+				<rice-icon v-if="showError" :name="errorIcon" :size="iconSize" :color="_iconColor" />
+			</slot>
+		</view>
+		<!-- #ifdef APP -->
+		<image v-else :class="imgClass" :src="src" :mode="mode" :style="imgStyle" @load="handleLoad" @error="handleError">
+		<!-- #endif -->
+			<!-- #ifndef APP -->
+			<image v-else :class="imgClass" :src="src" :mode="mode" :lazyLoad="lazyLoad" :fadeShow="fadeShow" :webp="webp"
+				:showMenuByLongpress="showMenuByLongpress" :draggable="draggable" :style="imgStyle" @load="handleLoad"
+				@error="handleError">
+			<!-- #endif -->
+			</image>
+			<view v-if="loading" class="rice-image__loading" :style="bgColorStyle">
+				<slot name="loading">
+					<rice-icon v-if="showLoading" :name="loadingIcon" :size="iconSize" :color="_iconColor" />
+				</slot>
+			</view>
+
+	</view>
+</template>
+
+<script setup>
+	import { addUnit, clamp } from "../../libs/utils"
+	import { useNamespace } from '../../libs/use';
+	import { isDark } from "../../libs/store";
+	import { ImageProps } from "./type.uts"
+
+	defineOptions({
+		name: 'rice-image',
+		styleIsolation: "app-and-page"
+	})
+
+	const ns = useNamespace('image')
+	const emit = defineEmits<{
+		click : [],
+		load : [event: UniImageLoadEvent],
+		error : [event: UniImageErrorEvent]
+	}>()
+
+	const props = withDefaults(defineProps<ImageProps>(), {
+		src: "",
+		mode: 'scaleToFill',
+		showError: true,
+		showLoading: true,
+		errorIcon: 'photo-fail',
+		loadingIcon: "photo",
+		iconSize: "30px",
+		preview: false,
+		lazyLoad: false,
+		fadeShow: false,
+		webp: true,
+		showMenuByLongpress: false,
+		draggable: false,
+		customStyle: () : UTSJSONObject => ({})
+	})
+
+	const _iconColor = computed<string>(() => props.iconColor ?? 'var(--rice-image-icon-color)')
+
+	const error = ref(false)
+	const loading = ref(true)
+
+
+	watch(() : string | null => props.src, () => {
+		error.value = false;
+		loading.value = true
+	})
+
+	const handleLoad = (event : UniImageLoadEvent) => {
+		error.value = false
+		if (loading.value) {
+			loading.value = false
+			emit('load', event)
+		}
+	}
+
+	const handleError = (event : UniImageErrorEvent) => {
+		error.value = true
+		loading.value = false
+		emit('error', event)
+	}
+
+	/**
+	 * 图片预览
+	 */
+	const handleClick = () => {
+		if (loading.value || error.value) return
+		const hasPreviewList = Array.isArray(props.previewSrcList) && props.previewSrcList.length > 0
+		if (props.preview || hasPreviewList) {
+			const urls = hasPreviewList ? props.previewSrcList! : [props.src]
+			let current = props.previewIndex ?? urls.findIndex(v => v == props.src)
+			current = clamp(current, 0, urls.length - 1)
+			uni.previewImage({
+				urls,
+				current
+			})
+			return
+		}
+		emit('click')
+	}
+
+
+	const rootStyle = computed(() => {
+		const css = new Map<string, string>()
+		if (props.height != null) css.set('height', addUnit(props.height!))
+		if (props.width != null) css.set('width', addUnit(props.width!))
+		if (props.radius != null) css.set('border-radius', addUnit(props.radius!))
+		if (props.bgColor != null) css.set('background-color', props.bgColor)
+
+		return css
+	})
+
+	const imgStyle = computed(() => {
+		const css = new Map<string, string>()
+		if (props.radius != null) css.set('border-radius', addUnit(props.radius!))
+		return css
+	})
+
+	const rootClass = computed(() => {
+		return [
+			ns.b(""),
+			ns.theme(),
+			ns.is("round", props.round == true),
+		]
+	})
+
+	const imgClass = computed(() => {
+		return [
+			ns.e("img"),
+			ns.is("round", props.round == true),
+		]
+	})
+
+	const bgColorStyle = computed(() => {
+		const css = new Map<string, string>()
+		if (props.bgColor != null) css.set('background-color', props.bgColor)
+		return css
+	})
+</script>
+
+<style scoped lang="scss">
+	.rice-image {
+		position: relative;
+
+		&__img {
+			height: 100%;
+			width: 100%
+		}
+
+		&--round {
+			border-radius: 999px;
+		}
+
+		&__loading,
+		&__error {
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			align-items: center;
+			justify-content: center;
+			background: var(--rice-image-placeholder-background);
+		}
+
+	}
+</style>

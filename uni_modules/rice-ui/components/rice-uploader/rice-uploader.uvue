@@ -1,0 +1,717 @@
+<template>
+	<view :class="uploaderClass" :style="customStyle">
+		<!-- 已上传文件的列表 -->
+		<view v-if="showFileList" class="rice-uploader__preview" v-for="(item,index) in fileList" :key="index"
+			:style="uploadItemStyle" @click="previewFile(item)">
+			<image v-if="(item.fileType=='image')||hasStrValue(item.poster)" :src="getImageUrl(item)" :mode="imageMode"
+				class="rice-uploader__preview__image" />
+			<video v-else-if="item.fileType=='video'" :src="item.url" :controls="false" :muted="true"
+				:show-fullscreen-btn="false" :show-play-btn="false" :show-center-play-btn="false"
+				:enable-progress-gesture="false" :object-fit="objectFit" class="rice-uploader__preview__image" />
+			<view v-else class="rice-uploader__preview__file">
+				<rice-icon name="file-success-fill" size="25px" />
+				<text class="rice-uploader__preview__text">{{getFileViewName(item)}}</text>
+			</view>
+			<!-- 播放icon -->
+			<view v-if="item.fileType=='video'" class="rice-uploader__preview__play">
+				<rice-icon name="play" size="35px" color="#fff"
+					:custom-style="{opacity:(item.status=='failed'||item.status=='uploading')?0.4:0.8}" />
+			</view>
+			<view v-if="item.status=='uploading'||item.status=='failed'" class="rice-uploader__status">
+				<rice-icon v-if="item.status=='failed'" name="clear" color="#fff" size="24px" />
+				<rice-loading v-else-if="item.status=='uploading'" color="#fff" size="22px" />
+				<text class="rice-uploader__status__text">{{getUploadingText(item)}}</text>
+			</view>
+			<view v-if="showDeletable(item)" class="rice-uploader__delete"
+				:style="splitCssProperty(deleteStyle).rectCssProperty" @click.stop="handleRemove(item,index)">
+				<slot name="delete">
+					<rice-icon :name="deleteIcon" color="#fff" size="12px"
+						:custom-style="splitCssProperty(deleteStyle).textCssProperty" />
+				</slot>
+			</view>
+			<view v-if="item.status=='success'&&showSuccess" class="rice-uploader__success">
+				<rice-icon name="checked" color="#fff" size="12px" />
+			</view>
+		</view>
+		<!-- 待选择区域 -->
+		<view v-if="!isOverLimit||!showFileList" @click="startChooseFiles">
+			<slot>
+				<view class="rice-uploader__item" :style="uploadItemStyle">
+					<rice-icon :name="uploadIcon" size="26px" :style="uploadIconStyle"></rice-icon>
+					<text class="rice-uploader__item__text" v-if="hasStrValue(uploadText)">{{uploadText}}</text>
+				</view>
+			</slot>
+		</view>
+	</view>
+</template>
+
+<script setup>
+	
+	import { useNamespace } from "../../libs/use"
+	import { addUnit, hasStrValue, isSameValue, splitCssProperty } from "../../libs/utils"
+	import { formDisabledInjectKey, formReadonlyInjectKey } from "../rice-form"
+	import { getFileType, getFileId } from "./utils"
+	// #ifdef WEB
+	import { getWebFileType } from "./utils"
+	// #endif
+	import { UploaderProps, UploaderFileItem, UploaderComplete, UploaderSuccess, UploaderFail } from "./type.uts"
+
+	defineOptions({
+		name: 'rice-uploader',
+		styleIsolation: 'app-and-page'
+	})
+	const ns = useNamespace("uploader")
+	const emit = defineEmits<{
+		add : [files: UploaderFileItem[]],
+		remove : [file: UploaderFileItem, index: number],
+		complete : [files: UploaderFileItem[], result: UploaderComplete],
+		clickPreview : [file: UploaderFileItem, files: UploaderFileItem[]],
+		error : [errMsg: string],
+	}>()
+
+	const props = withDefaults(defineProps<UploaderProps>(), {
+		showFileList: true,
+		uploadIcon: 'camera',
+		imageMode: 'scaleToFill',
+		objectFit: 'contain',
+		maxCount: 9,
+		maxDuration: 60,
+		showSuccess: true,
+		deletable: true,
+		deleteIcon: 'cross',
+		accept: 'image',
+		preview: true,
+		autoUpload: true,
+		showPercent: false,
+		loadingText: '上传中…',
+		uploadFailText: '上传失败',
+		camera: 'back',
+		pageOrientation: 'auto',
+		timeout: 120000,
+		sizeType: () => (['original', 'compressed']),
+		sourceType: () => (['album', 'camera']),
+		uploadIconStyle: () : UTSJSONObject => ({}),
+		deleteStyle: () : UTSJSONObject => ({}),
+		customStyle: () : UTSJSONObject => ({})
+	})
+
+
+	const modelValue = defineModel({
+		type: Array as PropType<UploaderFileItem[]>,
+		default: () => ([] as UploaderFileItem[])
+	})
+
+	const formDisabled = inject<Ref<boolean | null> | null>(formDisabledInjectKey, null)
+	const formReadonly = inject<Ref<boolean | null> | null>(formReadonlyInjectKey, null)
+	const isDisabled = computed<boolean>(() => (formDisabled?.value ?? false) || (props.disabled ?? false))
+	const isReadonly = computed<boolean>(() => (formReadonly?.value ?? false) || (props.readonly ?? false))
+
+	const formatFileList = () => {
+		// #ifndef APP-ANDROID
+		const files = modelValue.value ?? [] as UploaderFileItem[]
+		// #endif
+		// #ifdef APP-ANDROID
+		const files = modelValue.value as UploaderFileItem[]
+		// #endif
+		const list = files.map(file => {
+			return {
+				...file,
+				uid: file.uid ?? getFileId(),
+				fileType: file.fileType ?? getFileType(file),
+				deletable: file.deletable ?? props.deletable,
+			} as UploaderFileItem
+		})
+
+		return list
+	}
+
+
+	const fileList = ref<UploaderFileItem[]>(formatFileList())
+
+	//是否超出上传限制
+	const isOverLimit = computed(() => fileList.value.length >= props.maxCount)
+	//剩余可选文件的数量
+	const remainCount = computed(() => Math.max(props.maxCount - fileList.value.length, 0))
+
+	/**
+	 * 获取图片的url
+	 */
+	const getImageUrl = (file : UploaderFileItem) : string => {
+		if (file.poster != null && file.poster != '') return file.poster!
+		return file.url
+	}
+
+	/**
+	 * 获取上传中/上传视频的文字
+	 */
+
+	const getUploadingText = (file : UploaderFileItem) => {
+		//显示百分百
+		if (props.showPercent && file.status == 'uploading') {
+			return (file.percent ?? 0) + '%'
+		}
+		let message = file.message
+		//优先展示file里面的message
+		if (message != null) return message
+
+		if (file.status == 'failed') {
+			message = message ?? props.uploadFailText
+		}
+		return message ?? props.loadingText
+	}
+
+	/**
+	 * 是否显示删除按钮
+	 */
+
+	const showDeletable = (file : UploaderFileItem) => {
+		if (file.deletable == false || file.status == 'uploading') return false
+		return file.deletable ?? props.deletable
+	}
+
+	/**
+	 * 单个文件上传
+	 */
+	const uploadSingleFile = async (file : UploaderFileItem) : Promise<UploaderSuccess | null> => {
+		if (typeof props.beforeUpload == 'function') {
+			const response = await props.beforeUpload!(file)
+			//返回 false 即终止该文件上传
+			if (response == false) {
+				return Promise.resolve(null)
+			}
+		}
+		return new Promise<UploaderSuccess | null>((resolve, reject) => {
+			//上传失败
+			const uploadFail = (errCode : number, errMsg : string, data : string) => {
+				file.status = 'failed'
+				const failInfo = { errCode, statusCode: errCode, errMsg, data, file } as UploaderFail
+				if (typeof props.onFail == 'function') {
+					props.onFail!(failInfo, file)
+				}
+				// #ifndef APP
+				reject(failInfo)
+				// #endif
+				// #ifdef APP
+				reject(new Error(JSON.stringify(failInfo)))
+				// #endif
+			}
+			//上传成功
+			const uploadSuccess = (res : UploadFileSuccess) => {
+				const successInfo = { statusCode: res.statusCode, data: res.data, file } as UploaderSuccess
+				if (typeof props.onSuccess == 'function') {
+					//返回false表示上传失败
+					const flag = props.onSuccess!(successInfo, file)
+					if (flag == false) {
+						uploadFail(res.statusCode, '上传失败', res.data)
+						return
+					}
+				}
+				file.status = 'success'
+				resolve(successInfo)
+			}
+			//获取上传地址
+			const url = file.action ?? props.action ?? ''
+			if (url == '' || file.url == '') {
+				uploadFail(600009, `上传${url == '' ? 'URL' : '文件的url'}不能为空`, '')
+				return
+			}
+			file.status = 'uploading'
+			const formData = UTSJSONObject.assign<UTSJSONObject>(props.formData ?? {}, file.formData ?? {})
+			const header = UTSJSONObject.assign<UTSJSONObject>(props.header ?? {}, file.header ?? {})
+			//开始上传
+			const task = uni.uploadFile({
+				url,
+				filePath: file.url,
+				// #ifdef MP-WEIXIN
+				name: file.name ?? props.name ?? 'file',
+				// #endif
+
+				formData,
+				header,
+				timeout: props.timeout,
+				success: res => {
+					// 上传成功的条件为：无自定义状态码 或 状态码匹配
+					const isSuccess = props.successCode != null
+						? isSameValue(res.statusCode, props.successCode)
+						: true
+					isSuccess ? uploadSuccess(res) : uploadFail(res.statusCode, '上传失败', res.data)
+				},
+				fail: err => {
+					const errData = typeof err.data == 'string' ? err.data : '上传失败'
+					// #ifndef MP
+					const errCode = err.errCode
+					// #endif
+					// #ifdef MP
+					const errCode = err.errCode ?? err.errno ?? -1
+					// #endif
+					uploadFail(errCode, err.errMsg, errData)
+				},
+
+			})
+			//task
+			task.onProgressUpdate(res => {
+				file.percent = res.progress
+			})
+		})
+	}
+
+	/**
+	 * 执行文件上传
+	 */
+	const startUpload = async (files : UploaderFileItem[]) => {
+		if (files.length <= 0) {
+			return
+		}
+		const uploadFiles = files.map(file => uploadSingleFile(file))
+		const results = await Promise.allSettled(uploadFiles)
+		//上传成功合集
+		const successList = results.filter(v => v.status == 'fulfilled').map(v => {
+			//@ts-ignore
+			return (v as PromiseFulfilledResult).value as UploaderSuccess | null
+		}).filter(v => v != null) as UploaderSuccess[]
+		//上传失败合集
+		const failList = results.filter(v => v.status == 'rejected').map(v => {
+			//@ts-ignore
+			const rejected = v as PromiseRejectedResult
+			// #ifdef APP
+			//Android端不能直接as UploaderFail，要 as Error，不然会报错：error: java.lang.ClassCastException: HolderUTSError cannot be cast to UploaderFail‌
+			const err = rejected.reason as Error
+			return JSON.parse<UploaderFail>(err.message)
+			// #endif
+			// #ifndef APP
+			return rejected.reason as UploaderFail
+			// #endif
+		}).filter(v => v != null) as UploaderFail[]
+
+
+		emit('complete', fileList.value, {
+			successList,
+			failList,
+		} as UploaderComplete)
+	}
+
+	/**
+	 * 手动上传，只会上传状态为 ready 的文件
+	 */
+	const upload = () => {
+		const files = fileList.value.filter(v => v.status == 'ready')
+		startUpload(files)
+	}
+
+	/**
+	 * 文件读取完成后
+	 */
+
+	const onAfterRead = async (files : UploaderFileItem[]) => {
+		const lastIndex = fileList.value.length - 1
+		fileList.value = fileList.value.concat(files)
+		//从合并后的数组中，筛选出新增的元素,确保 _files 中的元素是合并后数组中的实际引用
+		const _files = fileList.value.filter((_, index) => index > lastIndex)
+		if (typeof props.afterRead == 'function') {
+			props.afterRead!(_files)
+		}
+		//自动上传
+		if (props.autoUpload == true) {
+			startUpload(_files)
+		}
+		emit('add', _files)
+	}
+
+	/**
+	 * 读取文件
+	 */
+	const readFiles = (files : UploaderFileItem[]) => {
+		//删除超出的文件
+		if (files.length > remainCount.value) {
+			files = files.slice(0, remainCount.value)
+		}
+		onAfterRead(files)
+	}
+
+	/**
+	 * 文件读取前
+	 */
+
+	const onBeforeRead = async (files : UploaderFileItem[]) => {
+		if (typeof props.beforeRead == 'function') {
+			const response = await props.beforeRead!(files)
+			//返回 false 即终止该文件读取
+			if (response == true) {
+				readFiles(files)
+			} else if (Array.isArray(response)) {
+				const list = response.filter((v : any) => v instanceof UploaderFileItem) as UploaderFileItem[]
+				readFiles(list)
+			}
+		} else {
+			readFiles(files)
+		}
+	}
+
+	/**
+	 * 选择图片
+	 */
+	const chooseImage = () => {
+		uni.chooseImage({
+			pageOrientation: props.pageOrientation,
+			count: remainCount.value,
+			sizeType: props.sizeType,
+			sourceType: props.sourceType,
+			// #ifdef WEB
+			extension: props.extension,
+			// #endif
+			success: res => {
+				const tempFiles = res.tempFiles
+				const files = tempFiles.map(file => {
+					return {
+						url: file.path,
+						status: 'ready',
+						percent: 0,
+						size: file.size,
+						duration: 0,
+						deletable: props.deletable,
+						uid: getFileId(),
+						// #ifndef WEB
+						fileType: 'image',
+						// #endif
+						// #ifdef WEB
+						fileType: getWebFileType(file.type),
+						fileName: file.name,
+						// #endif
+					} as UploaderFileItem
+				})
+
+				onBeforeRead(files)
+			},
+			fail: err => {
+				emit('error', err.errMsg)
+			}
+		})
+	}
+
+	/**
+	 * 获取视频缩略图
+	 */
+	const getVideoInfo = (path : string) => {
+		return new Promise<string>((resolve) => {
+			uni.getVideoInfo({
+				src: path,
+				success: res => {
+					resolve(res.thumbTempFilePath ?? '')
+				},
+				fail: () => {
+					resolve(path)
+				}
+			})
+		})
+	}
+
+	/**
+	 * 选择视频
+	 */
+	const chooseVideo = () => {
+		uni.chooseVideo({
+			pageOrientation: props.pageOrientation,
+			sourceType: props.sourceType,
+			maxDuration: props.maxDuration,
+			camera: props.camera,
+			// #ifdef WEB
+			extension: props.extension,
+			// #endif
+			success: file => {
+				//获取视频封面
+				getVideoInfo(file.tempFilePath).then((poster : string) => {
+					const files = [{
+						url: file.tempFilePath,
+						poster,
+						status: 'ready',
+						percent: 0,
+						size: file.size,
+						duration: file.duration,
+						deletable: props.deletable,
+						uid: getFileId(),
+						// #ifndef WEB
+						fileType: 'video',
+						// #endif
+						// #ifdef WEB
+						fileType: getWebFileType(file.tempFile.type),
+						// #endif
+					}] as UploaderFileItem[]
+					onBeforeRead(files)
+				})
+			},
+			fail: err => {
+				emit('error', err.errMsg)
+			}
+		})
+	}
+
+	/**
+	 * 选择media
+	 */
+	const chooseMedia = () => {
+		// #ifndef WEB
+		uni.chooseMedia({
+			pageOrientation: props.pageOrientation,
+			count: remainCount.value,
+			sourceType: props.sourceType,
+			maxDuration: props.maxDuration,
+			camera: props.camera,
+			success: res => {
+				const files = res.tempFiles.map(file => {
+					return {
+						url: file.tempFilePath,
+						poster: file.thumbTempFilePath,
+						status: 'ready',
+						percent: 0,
+						size: file.size,
+						duration: file.duration,
+						deletable: props.deletable,
+						uid: getFileId(),
+						fileType: file.fileType,
+					} as UploaderFileItem
+				})
+				onBeforeRead(files)
+			},
+			fail: err => {
+				emit('error', err.errMsg)
+			}
+		})
+		// #endif
+
+		// #ifdef WEB
+		uni.showActionSheet({
+			itemList: ['图片', '视频'],
+			success: res => {
+				if (res.tapIndex == 0) {
+					chooseImage()
+				} else {
+					chooseVideo()
+				}
+			}
+		})
+		// #endif
+	}
+
+	/**
+	 * 选择文件
+	 */
+
+	const startChooseFiles = async () => {
+		if (isDisabled.value || isReadonly.value || isOverLimit.value) return
+		if (props.accept == 'media') {
+			chooseMedia()
+		} else if (props.accept == 'video') {
+			chooseVideo()
+		} else {
+			chooseImage()
+		}
+	}
+
+	/**
+	 * 预览图片
+	 */
+	const previewFile = (file : UploaderFileItem) => {
+		if (file.fileType == 'image' && props.preview == true) {
+			const urls = fileList.value.filter(v => v.fileType == 'image').map(v => v.url!)
+			uni.previewImage({
+				current: urls.findIndex(v => v == file.url),
+				urls
+			})
+		}
+		emit('clickPreview', file, fileList.value)
+	}
+
+	/**
+	 * 删除
+	 */
+	const handleRemove = async (file : UploaderFileItem, index : number) => {
+		if (isDisabled.value || isReadonly.value) return;
+		//删除之前的回调函数
+		if (typeof props.beforeRemove == 'function') {
+			const response = await props.beforeRemove!(file, index)
+			// #ifdef APP-ANDROID
+			if (response == false) return
+			// #endif
+			// #ifndef APP-ANDROID
+			if (response === false) return
+			// #endif
+		}
+		fileList.value.splice(index, 1)
+		emit('remove', file, index)
+
+	}
+
+	/**
+	 * 获取非image/video 文件的显示名称
+	 */
+	const getFileViewName = (file : UploaderFileItem) => {
+		if (file.fileName != null) return file.fileName!
+		if (hasStrValue(file.fileType)) return file.fileType!
+		return file.url
+	}
+
+	// 防止watch导致无限循环
+	let isUpdating = false
+
+	watch(modelValue, () => {
+		const newFiles = formatFileList()
+		if (!isUpdating && !isSameValue(newFiles, fileList.value)) {
+			isUpdating = true
+			fileList.value = newFiles
+			nextTick(() => {
+				isUpdating = false
+			})
+		}
+	}, {
+		deep: true
+	})
+
+	watch(fileList, (newVal : UploaderFileItem[]) => {
+		if (!isUpdating && !isSameValue(newVal, modelValue.value)) {
+			modelValue.value = newVal
+		}
+	}, {
+		deep: true
+	})
+
+	/**
+	 * 样式
+	 */
+	const uploaderClass = computed(() => {
+		return [
+			ns.b(""),
+			ns.is('disabled', isDisabled.value),
+			ns.theme()
+		]
+	})
+
+	const uploadItemStyle = computed(() => {
+		const css = new Map<string, string>()
+		if (props.width != null) css.set('width', addUnit(props.width!))
+		if (props.height != null) css.set('height', addUnit(props.height!))
+		if (hasStrValue(props.bgColor)) css.set('background-color', props.bgColor!)
+		return css
+	})
+
+	defineExpose({
+		upload,
+	})
+</script>
+
+
+<style scoped lang="scss">
+	@mixin uploadPreview {
+		height: 80px;
+		width: 80px;
+		border-radius: 4px;
+		background-color: var(--rice-uploader-background);
+		margin: 0 8px 8px 0;
+	}
+
+	.rice-uploader {
+		position: relative;
+		flex-direction: row;
+		flex-wrap: wrap;
+
+		&__preview {
+			@include uploadPreview();
+			position: relative;
+
+			&__image {
+				width: 100%;
+				height: 100%;
+			}
+
+			&__file {
+				width: 100%;
+				height: 100%;
+				align-items: center;
+				justify-content: center;
+			}
+
+			&__play {
+				position: absolute;
+				z-index: 1;
+				left: 0;
+				top: 0;
+				width: 100%;
+				height: 100%;
+				align-items: center;
+				justify-content: center;
+			}
+
+			&__text {
+				width: 100%;
+				white-space: nowrap;
+				text-overflow: ellipsis;
+				color: var(--rice-text-color-2);
+				font-size: 12px;
+				text-align: center;
+			}
+		}
+
+		&__item {
+			@include uploadPreview();
+			align-items: center;
+			justify-content: center;
+
+			&__text {
+				color: var(--rice-text-color-2);
+				font-size: 12px;
+			}
+		}
+
+		&__status {
+			position: absolute;
+			z-index: 2;
+			align-items: center;
+			justify-content: center;
+			top: 0;
+			bottom: 0;
+			left: 0;
+			right: 0;
+			background-color: rgba(0, 0, 0, .4);
+			padding: 0 2px;
+
+			&__text {
+				color: #fff;
+				font-size: 12px;
+				margin-top: 4px;
+				text-align: center;
+				/* #ifndef APP */
+				word-break: break-all;
+				/* #endif */
+			}
+		}
+
+		&__success,
+		&__delete {
+			position: absolute;
+			z-index: 3;
+			right: 0;
+			align-items: center;
+			justify-content: center;
+			height: 18px;
+			width: 18px;
+		}
+
+		&__success {
+			bottom: 0;
+			background-color: var(--rice-success-color);
+			border-top-left-radius: 6px;
+		}
+
+		&__delete {
+			top: 0;
+			background-color: rgba(0, 0, 0, .4);
+			border-bottom-left-radius: 6px;
+		}
+
+
+		&--disabled {
+			opacity: .6;
+		}
+
+
+	}
+</style>

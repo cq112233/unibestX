@@ -1,0 +1,162 @@
+<template>
+	<view class="rice-progress" :class="ns.theme()" :style="customStyle">
+		<view class="rice-progress__wrapper" :class="{'rice-progress--inside':textPosition=='inside'}" :style="wrapperStyle"
+			ref="wrapperRef">
+			<view class="rice-progress__bar" :style="barStyle">
+				<slot v-if="textPosition=='inside'">
+					<text v-if="showText" class="rice-progress__text rice-progress__text--inside"
+						:style="textStyle">{{formatText}}</text>
+				</slot>
+			</view>
+		</view>
+		<slot v-if="textPosition=='right'">
+			<text v-if="showText" class="rice-progress__text" :style="textStyle">{{formatText}}</text>
+		</slot>
+	</view>
+</template>
+<script setup>
+	import { ProgressProps, ProgressColors } from './type.uts';
+	import { useNamespace } from '../../libs/use';
+	import { addUnit, clamp, toNum } from '../../libs/utils';
+
+	defineOptions({
+		name: 'rice-progress',
+		styleIsolation: 'app-and-page'
+	})
+
+	const ns = useNamespace('progress')
+	const slots = useSlots()
+
+	const props = withDefaults(defineProps<ProgressProps>(), {
+		percentage: 0,
+		showText: true,
+		textPosition: 'right',
+		customStyle: () => ({})
+	})
+
+	//百分比转换
+	const percent = computed<number>(() => toNum(props.percentage))
+
+	//显示的文字
+	const formatText = computed(() => {
+		if (typeof props.format == 'function') {
+			return props.format!(percent.value)
+		}
+		return `${percent.value}%`
+	})
+
+	const wrapperStyle = computed(() => {
+		const css = new Map<string, string>()
+		if (props.strokeWidth != null) css.set('height', addUnit(props.strokeWidth))
+		if (props.inactiveColor != null) css.set('background', props.inactiveColor)
+		css.set('border-radius', addUnit(props.radius ?? '100px'))
+		return css
+	})
+
+	// #ifdef APP
+	const wrapperWidth = ref(0)
+	// #endif
+
+	const barStyle = computed(() => {
+		const css = new Map<string, string>()
+
+		// #ifndef APP
+		css.set('width', `${percent.value}%`)
+		// #endif
+
+		// #ifdef APP
+		//App端 transition不支持结束属性值为百分比，需要转为px
+
+		const num = clamp(percent.value, 0, 100) / 100
+		css.set('width', `${wrapperWidth.value * num}px`)
+
+		// #endif
+
+		if (props.color != null) css.set('background', props.color)
+
+		css.set('border-radius', addUnit(props.radius ?? '100px'))
+		return css
+	})
+
+
+	const textStyle = computed(() => {
+		const css = new Map<string, string>()
+		if (props.textColor != null) css.set('color', props.textColor)
+		if (props.textSize != null) css.set('font-size', addUnit(props.textSize!))
+		return css
+	})
+
+
+	// #ifdef APP
+	const wrapperRef = shallowRef<UniElement | null>(null)
+	const obServer = ref<UniResizeObserver | null>(null)
+
+	//App端 transition不支持结束属性值为百分比，需要转为实际的宽度
+	const resizeObserver = async () => {
+		await nextTick()
+		if (wrapperRef.value == null) return
+		const rect = await wrapperRef.value!.getBoundingClientRectAsync()!
+		wrapperWidth.value = rect.width
+
+		obServer.value = new UniResizeObserver((entries : UniResizeObserverEntry[]) => {
+			const el = entries.find(v => v.target == wrapperRef.value)
+			if (el != null) {
+				wrapperWidth.value = Math.ceil(el.contentRect.width)
+			}
+		})
+
+		obServer.value!.observe(wrapperRef.value!)
+	}
+
+	onMounted(() => {
+		resizeObserver()
+	})
+
+	onUnmounted(() => {
+		if (wrapperRef.value != null) {
+			obServer.value?.unobserve(wrapperRef.value!)
+		}
+	})
+
+	// #endif
+</script>
+
+<style scoped lang="scss">
+	.rice-progress {
+		flex-direction: row;
+		align-items: center;
+
+		&__wrapper {
+			flex: 1;
+			height: 6px;
+			background-color: var(--rice-progress-background);
+		}
+
+		&__bar {
+			flex-direction: row;
+			justify-content: flex-end;
+			align-items: center;
+			height: 100%;
+			width: 0;
+			background-color: var(--rice-primary-color);
+			transition: all .2s ease;
+		}
+
+		&__text {
+			color: var(--rice-text-color-2);
+			font-size: 14px;
+			margin-left: 8px;
+			min-width: 40px;
+
+			&--inside {
+				margin-right: 8px;
+				color: #f5f5f5;
+				min-width: 0;
+			}
+		}
+
+		&--inside {
+			height: 20px;
+		}
+	}
+</style>

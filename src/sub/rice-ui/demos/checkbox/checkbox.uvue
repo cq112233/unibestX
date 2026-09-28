@@ -1,0 +1,71 @@
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
+    <view class="p-[16px]">
+      <!-- 单独使用 -->
+      <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
+        <view class="flex-row items-center mb-[12px]">
+          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px]" :style="{ backgroundColor: currentTheme }" />
+          <text class="text-[14px] font-bold text-[#334155]">基础复选框</text>
+        </view>
+        <view class="flex-col">
+          <view class="mb-[10px]">
+            <rice-checkbox v-model="checked1" :checked-color="currentTheme" label="基础复选框 1" />
+          </view>
+          <view class="mb-[10px]">
+            <rice-checkbox v-model="checked2" label="自定义颜色" checked-color="#ee0a24" />
+          </view>
+          <view class="mb-[10px]">
+            <rice-checkbox v-model="checked3" :checked-color="currentTheme" label="方形复选框" shape="square" />
+          </view>
+          <view>
+            <rice-checkbox :disabled="true" :value="true" :checked-color="currentTheme" label="禁用状态" />
+          </view>
+        </view>
+      </view>
+
+      <!-- 复选框组 -->
+      <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
+        <view class="flex-row items-center mb-[12px]">
+          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px]" :style="{ backgroundColor: currentTheme }" />
+          <text class="text-[14px] font-bold text-[#334155]">复选框组 (Group)</text>
+        </view>
+        <rice-checkbox-group v-model="groupValues" :checked-color="currentTheme">
+          <view class="mb-[10px]">
+            <rice-checkbox value="apple" label="苹果 🍎" :checked-color="currentTheme" />
+          </view>
+          <view class="mb-[10px]">
+            <rice-checkbox value="banana" label="香蕉 🍌" :checked-color="currentTheme" />
+          </view>
+          <view><rice-checkbox value="orange" label="橙子 🍊" :checked-color="currentTheme" /></view>
+        </rice-checkbox-group>
+        <view class="mt-[12px]">
+          <text class="text-[13px] text-[#64748b]">已选集合：{{ groupValues }}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { useAppStore } from '@/src/store';
+import { computed } from 'vue';
+
+definePage({
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
+  style: {
+    navigationBarTitleText: 'Checkbox 复选框',
+    navigationStyle: 'custom'
+  }
+});
+
+const appStore = useAppStore();
+const currentTheme = computed((): string => appStore.state.theme);
+
+const checked1 = ref(true);
+const checked2 = ref(false);
+const checked3 = ref(true);
+const groupValues = ref<string[]>(['apple']);
+</script>

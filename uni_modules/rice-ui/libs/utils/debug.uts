@@ -1,0 +1,6 @@
+export function debugWarn(scope : string, mess : string) {
+	if (process.env.NODE_ENV != 'production') {
+		const err = `[RiceUI] ${scope}` + ':' + mess
+		console.warn(err)
+	}
+}

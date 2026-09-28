@@ -1,0 +1,14 @@
+export type RadioProps = {
+	label ?: string,
+	value ?: string | number | boolean,
+	disabled ?: boolean,
+	readonly ?: boolean,
+	checkedColor ?: string,
+	iconSize ?: string | number,
+	labelSize ?: string | number,
+	labelColor ?: string,
+	shape ?: 'round' | 'square',
+	iconPosition ?: 'left' | 'right',
+	spaceBetween ?: boolean,
+	customStyle ?: UTSJSONObject,
+}

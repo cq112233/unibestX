@@ -1,0 +1,236 @@
+<template>
+	<view v-if="realShow" :class="tagClass" :style="[tagStyle,customStyle]" @click="handleClick"
+		@transitionend="onTransitionend">
+		<slot>
+			<rice-icon v-if="hasStrValue(icon)" :name="icon" :color="iconColor" :size="`${iconSize}px`"
+				:custom-style="{marginRight:'2px'}" />
+			<text :class="textClass" :style="textStyle">{{text}}</text>
+		</slot>
+
+		<view v-if="closeable" @click.stop="handleClose">
+			<rice-icon name="cross" :color="iconColor" :size="`${iconSize-2}px`" :custom-style="{marginLeft:'4px'}" />
+		</view>
+
+	</view>
+</template>
+
+<script setup>
+	import { useNamespace } from '../../libs/use';
+	import { isDark } from "../../libs/store";
+	import { Coloruts } from "../../libs/plugin";
+	import { addUnit, hasStrValue, isGradientColor, isThemeColor } from '../../libs/utils';
+	import { TagProps, TagType } from './type.uts';
+
+	defineOptions({
+		name: 'rice-tag',
+		styleIsolation: 'app-and-page'
+	})
+
+	const ns = useNamespace('tag')
+	const emit = defineEmits<{
+		click : [],
+		close : [],
+	}>()
+
+	const props = withDefaults(defineProps<TagProps>(), {
+		plainFill: false,
+		plain: false,
+		round: true,
+		mark: false,
+		closeable: false,
+		show: true,
+		customStyle: () : UTSJSONObject => ({})
+	})
+
+	const isPlain = computed(() => props.plain || props.plainFill)
+
+	const realShow = ref(props.show)
+
+
+	const handleClick = () => {
+		emit('click')
+	}
+
+	const handleClose = (e : UniPointerEvent) => {
+		e.stopPropagation();
+		emit('close')
+	}
+
+	const onTransitionend = () => {
+		realShow.value = props.show
+	}
+
+
+	watch(() : boolean => props.show, () => {
+		if (props.show) realShow.value = true
+	})
+
+	const getTextColor = () : string => {
+		if (props.textColor != null) return props.textColor!
+		if (props.color != null) {
+			return (isPlain.value && !isGradientColor(props.color!))
+				? props.color!
+				: '#f5f5f5'
+		}
+		return ""
+
+	}
+
+	const iconSize = computed(() => {
+		if (props.size == 'large') return 18;
+		if (props.size == 'small') return 14
+		return 16
+	})
+
+
+	const iconColor = computed<string>(() => {
+		const textColor = getTextColor()
+
+		if (textColor != "") return textColor
+		const baseColor = 'var(--rice-text-color)'
+		const themeColor = `var(--rice-${props.type}-color)`
+
+		if (isPlain.value) return isThemeColor(props.type) ? themeColor : baseColor
+
+		return isThemeColor(props.type) ? '#f5f5f5' : baseColor
+
+	})
+
+
+	function darken(color : Coloruts, amount = 20) {
+		return color.mix('#141414', amount).toHexString()
+	}
+
+	const tagStyle = computed(() => {
+		const css = new Map<string, any>()
+
+		if (props.color != null) {
+			const color = props.color!
+			if (isGradientColor(color)) {
+				css.set('background', color)
+				css.set('border-style', 'none')
+			} else {
+				const colorUts = new Coloruts(color)
+				css.set('border-color', color)
+				if (!isPlain.value) {
+					css.set('background', color)
+				} else if (props.plainFill) {
+					css.set('background', isDark.value ? darken(colorUts, 90) : colorUts.tint(90).toHexString())
+				}
+			}
+		}
+
+		css.set('opacity', props.show ? 1 : 0)
+
+		return css
+	})
+
+	const tagClass = computed<string[]>(() => {
+		const basic = [
+			ns.b(""),
+			ns.theme(),
+			ns.is('round', props.round),
+			ns.is('mark', props.mark),
+			ns.m(props.size),
+		]
+		if (isThemeColor(props.type)) {
+			const theme = ns.m(props.plainFill ? `${props.type}--plain-fill` : props.type!)
+			basic.push(theme)
+		}
+		basic.push(ns.is("plain", props.plain))
+		return basic
+	})
+
+
+	const textStyle = computed(() => {
+		const css = new Map<string, string>()
+		const textColor = getTextColor()
+		if (textColor != "") css.set('color', textColor)
+		if (props.textSize != null) css.set('font-size', addUnit(props.textSize!))
+		return css
+	})
+
+	const textClass = computed(() => {
+		const basic = [ns.e("text")]
+		if (isThemeColor(props.type)) {
+			const theme = ns.m(isPlain.value ? `${props.type}--plain__text` : `${props.type!}__text`)
+			basic.push(theme)
+		}
+		if (props.size != null) {
+			basic.push(ns.m(`${props.size}__text`))
+		}
+		return basic
+	})
+</script>
+
+<style scoped lang="scss">
+	@import "./style.scss";
+
+	.rice-tag {
+		flex-direction: row;
+		align-items: center;
+		justify-content: center;
+		padding: 0 10px;
+		height: 26px;
+		box-sizing: border-box;
+		transition-property: opacity;
+		transition-duration: .3s;
+		opacity: 1;
+		border: 1px solid var(--rice-tag-default-border);
+
+		/* #ifndef APP */
+		color: var(--rice-text-color);
+		width: fit-content;
+		/* #endif */
+
+		// #ifdef WEB
+		cursor: pointer;
+		//#endif
+
+		&__text {
+			/* #ifdef APP */
+			color: var(--rice-text-color);
+			/* #endif */
+			font-size: 14px;
+		}
+
+		&--round {
+			border-radius: 4px;
+		}
+
+		&--mark {
+			border-radius: 0 100px 100px 0;
+		}
+
+
+
+		@include tagTheme();
+		@include tagSize();
+
+		&--plain {
+			background: transparent;
+
+			/* #ifndef APP */
+			&.rice-tag--primary {
+				color: var(--rice-primary-color);
+			}
+
+			&.rice-tag--success {
+				color: var(--rice-success-color);
+			}
+
+			&.rice-tag--warning {
+				color: var(--rice-warning-color);
+			}
+
+			&.rice-tag--error {
+				color: var(--rice-error-color);
+			}
+
+
+
+			/* #endif */
+		}
+
+	}
+</style>

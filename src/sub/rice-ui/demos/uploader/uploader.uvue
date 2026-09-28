@@ -1,0 +1,48 @@
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
+    <view class="p-[16px]">
+      <!-- 基础图片上传 -->
+      <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
+        <view class="flex-row items-center mb-[12px]">
+          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px]" :style="{ backgroundColor: currentTheme }" />
+          <text class="text-[14px] font-bold text-[#334155]">图片上传与预览</text>
+        </view>
+        <rice-uploader
+          :model-value="fileList"
+          :max-count="3"
+          @update:model-value="onUpdateFileList"
+        />
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { useAppStore } from '@/src/store';
+import type { UploaderFileItem } from '@/uni_modules/rice-ui';
+import { computed, ref } from 'vue';
+
+definePage({
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
+  style: {
+    navigationBarTitleText: 'Uploader 上传',
+    navigationStyle: 'custom'
+  }
+});
+
+const appStore = useAppStore();
+const currentTheme = computed((): string => appStore.state.theme);
+
+const fileList = ref<UploaderFileItem[]>([
+  {
+    url: '/static/logo.png'
+  } as UploaderFileItem
+]);
+
+function onUpdateFileList(files: UploaderFileItem[]) {
+  fileList.value = files;
+}
+</script>

@@ -1,0 +1,72 @@
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
+    <view class="p-[16px]">
+      <!-- 基础用法 -->
+      <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
+        <view class="flex-row items-center mb-[12px]">
+          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px]" :style="{ backgroundColor: currentTheme }" />
+          <text class="text-[14px] font-bold text-[#334155]">基础开关</text>
+        </view>
+        <view class="flex-row items-center justify-between">
+          <text class="text-[14px] text-[#334155]">消息推送通知</text>
+          <rice-switch v-model="switchVal1" :active-color="currentTheme" />
+        </view>
+      </view>
+
+      <!-- 自定义颜色与大小 -->
+      <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
+        <view class="flex-row items-center mb-[12px]">
+          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px]" :style="{ backgroundColor: currentTheme }" />
+          <text class="text-[14px] font-bold text-[#334155]">自定义颜色与大小</text>
+        </view>
+        <view class="flex-row items-center justify-between mb-[12px]">
+          <text class="text-[14px] text-[#334155]">自定义颜色</text>
+          <rice-switch v-model="switchVal2" :active-color="currentTheme" />
+        </view>
+        <view class="flex-row items-center justify-between">
+          <text class="text-[14px] text-[#334155]">小尺寸</text>
+          <rice-switch v-model="switchVal3" size="20px" :active-color="currentTheme" />
+        </view>
+      </view>
+
+      <!-- 禁用与加载 -->
+      <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
+        <view class="flex-row items-center mb-[12px]">
+          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px]" :style="{ backgroundColor: currentTheme }" />
+          <text class="text-[14px] font-bold text-[#334155]">禁用与加载状态</text>
+        </view>
+        <view class="flex-row items-center justify-between mb-[12px]">
+          <text class="text-[14px] text-[#94a3b8]">禁用状态</text>
+          <rice-switch :model-value="true" :disabled="true" :active-color="currentTheme" />
+        </view>
+        <view class="flex-row items-center justify-between">
+          <text class="text-[14px] text-[#64748b]">加载中</text>
+          <rice-switch :model-value="true" :loading="true" :active-color="currentTheme" />
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { useAppStore } from '@/src/store';
+import { computed } from 'vue';
+
+definePage({
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
+  style: {
+    navigationBarTitleText: 'Switch 开关',
+    navigationStyle: 'custom'
+  }
+});
+
+const appStore = useAppStore();
+const currentTheme = computed((): string => appStore.state.theme);
+
+const switchVal1 = ref(true);
+const switchVal2 = ref(true);
+const switchVal3 = ref(false);
+</script>

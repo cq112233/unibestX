@@ -1,0 +1,37 @@
+import type { Ref } from "vue"
+
+export type RadioDirection = 'row' | 'col'
+export type RadioShape = 'round' | 'square'
+export type RadioIconPosition = 'left' | 'right'
+export type RadioValueType = string | number | boolean
+
+export type RadioGroupProps = {
+	disabled ?: boolean,
+	readonly ?: boolean,
+	direction ?: RadioDirection,
+	checkedColor ?: string,
+	iconSize ?: string | number,
+	labelSize ?: string | number,
+	labelColor ?: string,
+	shape ?: RadioShape,
+	iconPosition ?: RadioIconPosition,
+	spaceBetween ?: boolean,
+	customStyle ?: UTSJSONObject,
+	customClass ?: string,
+}
+
+export type RadioGroupProvide = {
+	modelValue : Ref<string | number | boolean>,
+	disabled : Ref<boolean>,
+	readonly : Ref<boolean>,
+	direction : Ref<RadioDirection>,
+	iconPosition : Ref<RadioIconPosition>,
+	spaceBetween : Ref<boolean>,
+	iconSize : Ref<string | number | null>,
+	labelSize : Ref<string | number | null>,
+	labelColor : Ref<string | null>,
+	checkedColor : Ref<string | null>,
+	shape : Ref<RadioShape>,
+	updateValue : (value : string | number | boolean) => void,
+
+}

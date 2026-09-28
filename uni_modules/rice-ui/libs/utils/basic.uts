@@ -1,0 +1,331 @@
+import { config } from "../store"
+import { BeforeChangeInterceptor } from "../types"
+/**
+ * 添加单位
+ */
+export const addUnit = (value : number | string) => {
+	const isNumeric = typeof value == 'number' || /^\d+(\.\d+)?$/.test(value)
+	return isNumeric ? `${value}${config.unit}` : value.toString()
+}
+
+/**
+ * 将一个数字限制在指定的最小值和最大值之间;
+ * 如果该数字小于最小值，则返回最小值；
+ * 如果该数字大于最大值，则返回最大值；
+ * 如果该数字在最小值和最大值之间，则返回该数字本身
+ */
+export const clamp = (num : number, min : number, max : number) : number => {
+	return Math.min(Math.max(num, min), max);
+}
+
+/**
+ * 比较差值，计算array数组里面离num最近的一个数值
+ */
+export const closeto = (array : number[], num : number) => {
+	return array.reduce((pre, next) => {
+		//两个数相减的差越小说明两个数字离得越近
+		return Math.abs(pre - num) < Math.abs(next - num) ? pre : next
+	})
+}
+
+/**
+ * 根据rpx/%的值获取px
+ */
+export function getPxNum(value : string | number, totalWidth = 0) : number {
+	if (typeof value == 'number') {
+		if (config.unit != 'rpx') return value
+		value = value + 'rpx'
+	}
+	//以rpx结尾
+	if (value.endsWith('rpx')) {
+		return uni.rpx2px(parseFloat(value))
+	}
+	//以%结尾
+	if (value.endsWith('%')) {
+		return parseFloat(value) * 0.01 * totalWidth
+	}
+	return parseFloat(value)
+}
+
+/**
+ * 获取随机字符串
+ */
+
+export function getRandomStr(length = 10) {
+	const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+	let result = '';
+	for (let i = 0; i < length; i++) {
+		const randomIndex = Math.floor(Math.random() * characters.length);
+		result += characters.charAt(randomIndex);
+	}
+
+	return result;
+}
+
+
+/**
+ * 获取当前节点的父节点
+ */
+//@ts-ignore
+export const getParentEl = (el ?: UniElement, targetEls : string[]) : UniElement | null => {
+	let currentEl = el
+	let els = targetEls.map(v => v.toUpperCase())
+	while (currentEl != null) {
+		const _el = currentEl.tagName.toUpperCase()
+		if (els.includes(_el)) {
+			return currentEl
+		}
+		currentEl = currentEl.parentElement
+	}
+	return null
+}
+
+/**
+ * 从当前节点内部查找第一个滚动元素
+ */
+export function getFirstScrollEl(el : UniElement | null) : UniElement | null {
+	if (el == null) return null
+	const scrollTags = ['SCROLL-VIEW', 'LIST-VIEW', 'WATERFLOW']
+	const tagName = el.tagName.toUpperCase()
+	if (scrollTags.includes(tagName)) {
+		return el
+	}
+	const children = el.children
+	for (let i = 0; i < children.length; i++) {
+		const child = children[i]
+		const target = getFirstScrollEl(child)
+		if (target != null) {
+			return target
+		}
+	}
+	return null
+}
+
+/**
+ * 判断字符串是否有值
+ */
+export const hasStrValue = (val ?: string | number | null) => {
+	if (val == null) return false
+	if (typeof val != 'string') {
+		val = val.toString()
+	}
+	return val.trim().length > 0
+}
+
+/**
+ * 字符串转数字类型
+ */
+export const toNum = (value : string | number) => {
+	if (typeof value == 'string') {
+		return parseFloat(value)
+	}
+	return value
+}
+
+/**
+ * 是否为渐变色
+ */
+export const isGradientColor = (color ?: string) => {
+	if (color == null || color == "") return false
+	const gradientRegex = /(linear-gradient|radial-gradient|conic-gradient)\(/i;
+	return gradientRegex.test(color!);
+}
+
+/**
+ * 是否为主题色
+ */
+export const isThemeColor = (type ?: string) => {
+	if (type == null || type == "") return false
+	return ['primary', 'success', 'warning', 'error'].includes(type)
+}
+
+
+/**
+ * 两个变量是否相等
+ */
+export const isSameValue = (value1 : any | null, value2 : any | null) => {
+	if (value1 == null || value2 == null) return false
+	if (typeof value1 == 'object' && typeof value2 == 'object') {
+		return JSON.stringify(value1) == JSON.stringify(value2)
+	}
+	// #ifdef APP-ANDROID
+	return value1 == value2
+	// #endif
+	// #ifndef APP-ANDROID
+	return value1 === value2
+	// #endif
+}
+
+/**
+ * 补零
+ */
+export function padZero(number : string | number, len : number = 2) {
+	const num = typeof number == 'number' ? number.toString() : number
+	return num.padStart(len, '0')
+}
+
+/**
+ * 分离文本的属性值和元素的属性值
+ * uniappx样式不继承且非text组件不支持color,font-size等文本特有的属性
+ */
+
+type SplitCssPropertyResult = {
+	textCssProperty : UTSJSONObject,
+	rectCssProperty : UTSJSONObject,
+}
+
+export const splitCssProperty = (css ?: UTSJSONObject) => {
+	const textCssProperty = {}
+	const rectCssProperty = {}
+	if (css != null) {
+		const textProperties = [
+			'color',
+			'font-family',
+			'fontFamily',
+			'font-size',
+			'fontSize',
+			'font-weight',
+			'fontWeight',
+			'font-style',
+			'fontStyle',
+			'text-align',
+			'textAlign',
+			'text-decoration',
+			'textDecoration',
+			'line-height',
+			'lineHeight',
+			'letter-spacing',
+			'letterSpacing',
+			'text-overflow',
+			'textOverflow',
+			'white-space',
+			'whiteSpace',
+			'lines',
+		];
+
+		for (let key in css) {
+			if (textProperties.includes(key)) {
+				textCssProperty[key] = css[key]
+			} else {
+				rectCssProperty[key] = css[key]
+			}
+		}
+
+	}
+
+	return {
+		textCssProperty,
+		rectCssProperty
+	} as SplitCssPropertyResult
+}
+
+
+/**
+ * 是否为 promise
+ */
+
+export const isPromise = (val : any) => {
+	// #ifdef APP-ANDROID
+	return typeof val == 'object' && val instanceof Promise<any>
+	// #endif
+
+	// #ifndef APP-ANDROID
+	return val && typeof val == 'object' && typeof val['then'] == 'function' && typeof val['catch'] == 'function'
+	// #endif
+
+
+}
+
+
+export type Interceptor = () => Promise<boolean> | boolean | null | void
+
+export type InterceptorOption = {
+	done : () => void, //拦截器通过时执行的回调
+	args ?: any[], //传递给拦截器的参数
+	canceled ?: () => void, //拦截器返回 false 时执行的回调
+	error ?: () => void, //拦截器抛出异常时执行的回调
+	undone ?: () => void, //拦截器返回 false 或抛出异常时执行的回调
+	complete ?: () => void,//调用结束的回调函数（调用成功、失败都会执行）
+}
+
+
+export function callInterceptor(interceptor : BeforeChangeInterceptor, interceptorOption : InterceptorOption) {
+
+	const { done, canceled, error, undone, complete } = interceptorOption
+	const returnVal = interceptor!()
+	//异步校验
+	if (isPromise(returnVal)) {
+		const promiseVal = returnVal as Promise<boolean>
+		promiseVal.then((result : boolean) => {
+			//promise 解析为 true，执行done
+			if (result == true) {
+				done()
+				if (complete != null) complete!()
+			} else {
+				//promise 解析为 !true，执行 canceled
+				if (canceled != null) canceled!()
+				if (undone != null) undone!()
+				if (complete != null) complete!()
+			}
+		}).catch(() => {
+			if (error != null) error!()
+			if (undone != null) undone!()
+			if (complete != null) complete!()
+		})
+	} else {
+		// 同步校验
+		if (returnVal == true) {
+			//不是promise 但是返回true了，执行done
+			done()
+		} else if (canceled != null) {
+			//不是promise 但没有返回true了，执行canceled
+			canceled()
+			if (undone != null) undone!()
+		}
+		if (complete != null) complete!()
+	}
+}
+
+/**
+ * 计算一个数字的小数位数（精度）
+ * @param value 
+ */
+
+export const getPrecision = (value ?: number | string) => {
+	if (value == null) return 0
+	if (typeof value == 'number') {
+		value = value.toString()
+	}
+	const dotIndex = value.indexOf('.')
+	let pre = 0
+	if (dotIndex != -1) {
+		pre = value.length - dotIndex - 1
+	}
+	return pre
+}
+
+/**
+ * 获取一个简易的UID
+ */
+export const getUID = () => {
+	return Date.now() + '' + Math.floor(Math.random() * 1e7)
+}
+
+
+/**
+ * 判断 URL 对应的文件是否为图片
+ */
+export const isImage = (url ?: string) => {
+	if (url == null) return false;
+	const imageExtensions = /\.(jpg|jpeg|png|gif|bmp|webp|svg|ico)$/i;
+	return imageExtensions.test(url);
+}
+
+/**
+ * 判断 URL 对应的文件是否为视频
+ */
+export const isVideo = (url ?: string) => {
+	if (url == null) return false;
+	const videoExtensions = /\.(mp4|webm|ogg|mov|avi|wmv|flv|mkv)$/i;
+	return videoExtensions.test(url);
+}

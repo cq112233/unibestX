@@ -1,0 +1,6 @@
+import { getRandomStr } from "../../libs/utils"
+export * from "./type.uts"
+export const radioGroupInjectKey = `RdioGroupKey-${getRandomStr()}`
+export const defDirection = 'col' 
+export const defShape = 'round'
+export const defIconPosition = 'left'

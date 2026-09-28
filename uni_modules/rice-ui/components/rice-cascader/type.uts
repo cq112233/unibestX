@@ -1,0 +1,42 @@
+export type CascaderOption = {
+	text : string,
+	value : string | number,
+	disabled ?: boolean,
+	children ?: CascaderOption[],
+	extend ?: any | null,
+}
+
+export type CascaderEvent = {
+	value : string | number,
+	selectedOptions : CascaderOption[],
+	tabIndex : number,
+}
+
+export type CascaderClickDisabledEvent = {
+	option : CascaderOption,
+	tabIndex : number,
+}
+
+export type GetSelectedOptionsByValue = ((options : CascaderOption[], value : string | number | null) => CascaderOption[]) | null
+
+export type CascaderTitleAlign = 'left' | 'center'
+
+export type CascaderProps = {
+	options ?: CascaderOption[],
+	title ?: string,
+	titleAlign ?: CascaderTitleAlign,
+	placeholder ?: string,
+	color ?: string,
+	activeColor ?: string,
+	fontSize ?: string | number,
+	closeable ?: boolean,
+	closeIcon ?: string,
+	border ?: boolean,
+	usePopup ?: boolean,
+	closeOnFinish ?: boolean,
+	closeOnClickClose ?: boolean,
+	closeOnClickOverlay ?: boolean,
+	safeAreaInsetBottom ?: boolean,
+	zIndex ?: number,
+	customStyle ?: UTSJSONObject
+}

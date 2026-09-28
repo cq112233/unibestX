@@ -1,0 +1,238 @@
+<template>
+	<view :class="rateClass" :style="customStyle" ref="rateRef" @touchmove="onTouchmove" @touchstart="onTouchstart">
+		<view v-for="(item,index) in rateList" :key="index" class="rice-rate__item" :style="getRateItemStyle(index)"
+			ref="rateItemRef" @click="handleClick($event as UniPointerEvent,index+1)">
+			<rice-icon :name="item.status=='full'?icon:voidIcon" :size="size" :color="getIconColor(item)"></rice-icon>
+			<rice-icon v-if="allowHalf&&item.value==0.5" :size="size" :name="icon" :custom-style="getHalfIconStyle(item)"
+				:color="iconFullColor"></rice-icon>
+		</view>
+	</view>
+</template>
+
+<script setup>
+
+	import { useCssVar, useNamespace, useTouch } from "../../libs/use"
+	import { addUnit, clamp, getPxNum, hasStrValue } from "../../libs/utils"
+	import { formDisabledInjectKey, formReadonlyInjectKey } from "../rice-form"
+	import { RateProps, RateStatus } from "./type.uts"
+
+	defineOptions({
+		name: 'rice-rate',
+		styleIsolation: 'app-and-page'
+	})
+	const ns = useNamespace('rate')
+	const emit = defineEmits<{
+		change : [value: number]
+	}>()
+	const touch = useTouch()
+	const props = withDefaults(defineProps<RateProps>(), {
+		count: 5,
+		icon: 'star-fill',
+		voidIcon: 'star',
+		size: '22px',
+		gutter: '4px',
+		allowHalf: false,
+		clearable: false,
+		readonly: false,
+		disabled: false,
+		touchable: true,
+		customStyle: () : UTSJSONObject => ({})
+	})
+
+	const modelValue = defineModel({
+		type: Number,
+		default: 0,
+	})
+
+	const formDisabled = inject<Ref<boolean | null> | null>(formDisabledInjectKey, null)
+	const formReadonly = inject<Ref<boolean | null> | null>(formReadonlyInjectKey, null)
+
+	const isDisabled = computed<boolean>(() => (formDisabled?.value ?? false) || props.disabled)
+	const isReadonly = computed<boolean>(() => (formReadonly?.value ?? false) || props.readonly)
+	const unable = computed<boolean>(() => isDisabled.value || isReadonly.value)
+
+	const rateRef = shallowRef<UniElement | null>(null)
+	const rateItemRef = shallowRef<UniElement[]>([])
+	const rateItemWidth = ref(0)
+	const rateLeft = ref(0)
+
+	const rateList = computed(() => {
+		const list = [] as RateStatus[]
+		// #ifdef APP-ANDROID
+		const value = modelValue.value!
+		// #endif
+		// #ifndef APP-ANDROID
+		const value = modelValue.value ?? 0
+		// #endif
+
+		for (let index = 1; index <= props.count; index++) {
+			if (value >= index) {
+				list.push({ status: 'full', value: 1 })
+			} else if (value + 0.5 >= index && props.allowHalf) {
+				list.push({ status: 'half', value: 0.5 })
+			} else {
+				list.push({ status: 'void', value: 0 })
+			}
+		}
+
+		return list
+	})
+
+	const getRateSize = () => {
+		rateRef.value?.getBoundingClientRectAsync()?.then((res : DOMRect) => {
+			rateLeft.value = res.left
+		})
+		if (rateItemRef.value.length > 0) {
+			rateItemRef.value[0]!.getBoundingClientRectAsync()!.then((res : DOMRect) => {
+				rateItemWidth.value = res.width
+			})
+		}
+	}
+
+	const updateModelValue = (value : number) => {
+		if (unable.value || value == modelValue.value) return
+		modelValue.value = value
+		emit('change', value)
+	}
+
+	const margin = computed(() => getPxNum(props.gutter))
+
+	const getRateIndex = (clientX : number) => {
+		const size = rateItemWidth.value
+		const moveRange = clientX - rateLeft.value
+		let index = Math.floor(moveRange / (size + margin.value))
+		index = index < 0 ? 0 : index;
+		const range = Math.floor(moveRange - (size + margin.value) * index)
+		let value : number;
+		if (props.allowHalf) {
+			if (range > (size / 2)) {
+				value = index + 1
+			} else {
+				value = index + 0.5
+			}
+		} else {
+			value = index + 1
+		}
+		value = clamp(value, 0.5, props.count)
+		if (touch.isTap.value && props.clearable && value == modelValue.value) {
+			value = 0
+		}
+		updateModelValue(value)
+	}
+
+
+
+	const handleClick = async (e : UniPointerEvent, value : number) => {
+		//鸿蒙平台点击事件的clientX是 NaN，原因未知，使用touchstart 事件代替
+		// #ifndef APP-HARMONY
+		if (props.allowHalf) {
+			getRateSize()
+			getRateIndex(e.clientX)
+			return
+		}
+		if (props.clearable && value == modelValue.value) {
+			value = 0
+		}
+
+		updateModelValue(value)
+		// #endif
+	}
+
+	const skipMove = ref(false)
+	const onTouchstart = (e : UniTouchEvent) => {
+		if (unable.value) return
+		getRateSize()
+		skipMove.value = false;
+		touch.start(e)
+		// #ifdef APP-HARMONY
+		getRateIndex(e.touches[0].clientX)
+		// #endif
+	}
+
+	const onTouchmove = async (e : UniTouchEvent) => {
+		if (unable.value || !props.touchable || skipMove.value) return
+		touch.move(e)
+		if (touch.direction.value == 'vertical') {
+			skipMove.value = true
+		}
+		if (touch.direction.value != 'horizontal') return
+		const clientX = e.touches[0].clientX
+		getRateIndex(clientX)
+		e.preventDefault()
+	}
+
+	//选中的颜色
+	const iconFullColor = computed<string>(() => props.color ?? 'var(--rice-rate-color)')
+
+	const getIconColor = (item : RateStatus) : string => {
+		return item.status == 'full'
+			? iconFullColor.value
+			: (props.voidColor ?? 'var(--rice-rate-void-color)')
+	}
+
+	const getRateItemStyle = (index : number) => {
+		const css = new Map<string, string>()
+		if (index < props.count - 1) {
+			css.set('margin-right', addUnit(props.gutter))
+		}
+		return css
+	}
+
+	const getHalfIconStyle = (item : RateStatus) => {
+		return {
+			position: 'absolute',
+			top: 0,
+			left: 0,
+			pointerEvents: 'none',
+			width: item.value * 100 + '%',
+		}
+	}
+
+
+	const rateClass = computed(() => {
+		return [
+			ns.b(''),
+			ns.theme(),
+			ns.is('disabled', isDisabled.value)
+		]
+	})
+
+
+
+	let timer : null | number = 0
+	onMounted(() => {
+		timer = setTimeout(() => {
+			getRateSize()
+		}, 100)
+	})
+
+	onUnmounted(() => {
+		if (timer != null) clearTimeout(timer!)
+	})
+</script>
+
+
+<style scoped lang="scss">
+	.rice-rate {
+		flex-direction: row;
+		flex-wrap: wrap;
+		/* #ifdef WEB */
+		cursor: pointer;
+		user-select: none;
+
+		/* #endif */
+		/* #ifndef APP */
+		width: fit-content;
+
+		/* #endif */
+		&__item {
+			position: relative;
+		}
+
+		&--disabled {
+			opacity: 0.5;
+		}
+
+
+	}
+</style>

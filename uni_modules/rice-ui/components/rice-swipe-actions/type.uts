@@ -1,0 +1,17 @@
+import type { Ref } from "vue"
+
+export type SwipeActionsProvide = {
+	accordion : Ref<boolean>,
+	disabled : Ref<boolean>,
+	autoClose : Ref<boolean>,
+	iosStyle : Ref<boolean>,
+	closeOtherSwipe : (instance ?: ComponentInternalInstance) => void,
+}
+
+export type SwipeActionsProps = {
+	disabled ?: boolean,
+	accordion ?: boolean,
+	autoClose ?: boolean,
+	iosStyle ?: boolean,
+	customStyle ?: UTSJSONObject
+}

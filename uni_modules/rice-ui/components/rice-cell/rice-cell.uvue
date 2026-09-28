@@ -1,0 +1,189 @@
+<template>
+	<view :class="cellClass" :style="customStyle" :hover-stay-time="100" :hover-class="hoverClass" @click="handleClick">
+		<slot name="leftIcon" v-if="hasLeftIcon">
+			<rice-icon :name="icon" :custom-style="{marginRight:'2px'}" :size="iconSize" />
+		</slot>
+		<view class="rice-cell__title" :style="titleStyle">
+			<slot name="title">
+				<text class="rice-cell__title__text" :style="titleTextStyle" :class="title">{{title}}</text>
+			</slot>
+			<slot name="label" v-if="hasLabel">
+				<text class="rice-cell__label" :style="labelStyle">{{label}}</text>
+			</slot>
+		</view>
+		<view v-if="hasValue" class="rice-cell__value" :style="valueStyle">
+			<slot name="value">
+				<text class="rice-cell__value__text" :style="valueTextStyle">{{value}}</text>
+			</slot>
+		</view>
+		<slot name="rightIcon" v-if="$slots['rightIcon']!=null||showArrow">
+			<rice-icon :name="`arrow-${arrowDirection}`" :size="iconSize" />
+		</slot>
+		<!-- #ifndef APP-ANDROID -->
+		<view v-if="border" class="rice-cell--border"></view>
+		<!-- #endif -->
+	</view>
+</template>
+
+<script setup>
+	import { useNamespace } from "../../libs/use"
+	import { hasStrValue, addUnit, debugWarn } from "../../libs/utils"
+	import { CellProps } from "./type.uts"
+
+	defineOptions({
+		name: 'rice-cell',
+		styleIsolation: 'app-and-page'
+	})
+
+	const ns = useNamespace('cell')
+	const slots = useSlots()
+	const emit = defineEmits<{
+		click : []
+	}>()
+
+	const props = withDefaults(defineProps<CellProps>(), {
+		arrowDirection: 'right',
+		border: true,
+		clickable: true,
+		arrow: null,
+		center: false,
+		titleStyle: () : UTSJSONObject => ({}),
+		titleTextStyle: () : UTSJSONObject => ({}),
+		valueStyle: () : UTSJSONObject => ({}),
+		valueTextStyle: () : UTSJSONObject => ({}),
+		labelStyle: () : UTSJSONObject => ({}),
+		customStyle: () : UTSJSONObject => ({}),
+	})
+
+	//传了 arrow就用arrow的值，没传arrow的情况下 url有值就显示右箭头
+	const showArrow = computed(() => props.arrow ?? hasStrValue(props.url))
+	const hasLeftIcon = computed(() => slots['leftIcon'] != null || hasStrValue(props.icon))
+	const hasValue = computed(() => slots['value'] != null || hasStrValue(props.value))
+	const hasLabel = computed(() => slots['label'] != null || hasStrValue(props.label))
+
+	const iconSize = computed(() => props.size == 'large' ? '17px' : '16px')
+
+	const handleClick = () => {
+		if (hasStrValue(props.url)) {
+			uni.navigateTo({
+				url: props.url!,
+				fail: err => {
+					debugWarn('Cell', err.errMsg)
+				}
+			})
+		}
+		emit('click')
+	}
+
+
+	const cellClass = computed(() => {
+		return [
+			ns.b(""),
+			ns.theme(),
+			ns.m(props.size),
+			ns.is('center', props.center),
+			// #ifdef APP-ANDROID
+			ns.is('border', props.border),
+			// #endif
+		]
+	})
+
+	const hoverClass = computed(() => props.clickable ? 'rice-cell--hover' : 'none')
+</script>
+
+<style scoped lang="scss">
+	@import "../../libs/style/mixins/hairline";
+
+	.rice-cell {
+		--rice-cell-title-size: 15px;
+		--rice-cell-value-size: 15px;
+		--rice-cell-label-size: 13px;
+		position: relative;
+		flex-direction: row;
+		padding: 14px 16px;
+		background-color: var(--rice-cell-background);
+		width: 100%;
+		/* #ifdef WEB */
+		cursor: pointer;
+
+		/* #endif */
+		&--medium {
+			--rice-cell-title-size: 16px;
+			--rice-cell-value-size: 16px;
+			--rice-cell-label-size: 14px;
+		}
+
+		&--large {
+			--rice-cell-title-size: 17px;
+			--rice-cell-value-size: 17px;
+			--rice-cell-label-size: 15px;
+			padding: 18px;
+		}
+
+		&__title {
+			flex: 1;
+			padding-right: 2px;
+
+			&__text {
+				color: var(--rice-text-color);
+				font-size: var(--rice-cell-title-size);
+				/* #ifndef APP */
+				word-wrap: break-word;
+				/* #endif */
+			}
+		}
+
+		&__value {
+			flex: 1;
+			padding-right: 2px;
+
+			/* #ifndef APP */
+			text-align: right;
+			word-break: break-all;
+
+			/* #endif */
+			&__text {
+				color: var(--rice-text-color-2);
+				font-size: var(--rice-cell-value-size);
+				text-align: right;
+				/* #ifndef APP */
+				word-wrap: break-word;
+
+				/* #endif */
+			}
+		}
+
+		&__label {
+			color: var(--rice-text-color-2);
+			font-size: var(--rice-cell-label-size);
+			margin-top: 5px;
+			/* #ifndef APP */
+			word-wrap: break-word;
+			/* #endif */
+		}
+
+		&--center {
+			align-items: center;
+		}
+
+		&--border {
+			/* #ifdef APP-ANDROID */
+			@include hairline-bottom;
+			/* #endif */
+			/* #ifndef APP-ANDROID */
+			position: absolute;
+			left: 0;
+			bottom: 0;
+			height: 1px;
+			width: 100%;
+			transform: scale(1, 0.5);
+			background-color: var(--rice-border-color);
+			/* #endif */
+		}
+
+		&--hover {
+
+			background-color: var(--rice-hover-color);
+		}
+	}
+</style>

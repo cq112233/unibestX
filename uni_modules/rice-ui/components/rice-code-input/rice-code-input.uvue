@@ -1,0 +1,314 @@
+<template>
+	<view class="rice-code-input" :class="ns.theme()" :style="[codeInputStyle,customStyle]">
+		<view v-for="(_,index) in maxlength" :key="index" :style="[boxStyle,getBoxStyle(index)]" :class="boxClass"
+			@click="boxClick">
+			<view v-if="dot&&displayValue.length>index" class="rice-code-input__box__dot"></view>
+			<text v-else class="rice-code-input__box__text" :style="textStyle">{{getCodeNum(index)}}</text>
+			<!-- #ifndef VUE3-VAPOR  && APP-HARMONY && uniVersion<5.12 -->
+			<view v-show="showCursor&&index==displayValue.length&&isFocus" class="rice-code-input__box__line" ref="boxLineRef"
+				:style="boxLineStyle"></view>
+			<!-- #endif -->
+		</view>
+		<input class="rice-code-input__input" type="number" :disabled="disabledKeyboard" :value="displayValue"
+			:style="inputStyle" :focus="isFocus" :maxlength="maxlength" :adjust-position="adjustPosition"
+			cursor-color="transparent" @input="onInput" @focus="onFocus" @blur="onBlur"></input>
+	</view>
+</template>
+
+<script setup>
+	import { addUnit, hasStrValue, getPxNum } from "../../libs/utils";
+	import { useNamespace } from "../../libs/use";
+	import { CodeInputProps } from "./type.uts"
+
+	defineOptions({
+		name: 'rice-code-input',
+		styleIsolation: 'app-and-page'
+	})
+
+	const ns = useNamespace('code-input')
+	const emit = defineEmits<{
+		finish : [value: string],
+		change : [value: string],
+		focus : [e: UniInputFocusEvent],
+		blur : [e: UniInputBlurEvent],
+	}>()
+	const props = withDefaults(defineProps<CodeInputProps>(), {
+		maxlength: 4,
+		dot: false,
+		mode: 'box',
+		showCursor: true,
+		space: '10px',
+		focus: false,
+		disabledKeyboard: false,
+		adjustPosition: true,
+		customStyle: () : UTSJSONObject => ({})
+	})
+
+	const modelValue = defineModel({
+		type: String,
+	})
+
+	const displayValue = ref("")
+	const isFocus = ref(props.focus)
+	
+	//@ts-ignore
+	const getCodeNum = (index : number) => displayValue.value.charAt(index)
+
+	watch(modelValue, (newVal : string | null) => {
+		if (newVal != null) {
+			if (newVal != displayValue.value) {
+				displayValue.value = newVal!.substring(0, props.maxlength)
+			}
+		} else {
+			displayValue.value = ""
+		}
+
+	}, {
+		immediate: true
+	})
+
+
+
+	// #ifdef APP
+
+	const boxLineRef = shallowRef<UniElement[]>([])
+
+	const startAmination = (value : string) => {
+
+		// #ifndef VUE3-VAPOR && APP-HARMONY && uniVersion<5.12
+		const len = value.length
+		if (len < boxLineRef.value.length) {
+			boxLineRef.value[len].animate([{
+				opacity: '0',
+			}, {
+				opacity: '1',
+			}, {
+				opacity: '0',
+			}], {
+				duration: 1000,
+				iterations: Infinity
+			})
+		}
+		// #endif
+
+	}
+
+
+	// #endif
+
+	const onInput = (e : UniInputEvent) => {
+		const value = e.detail.value
+		const newVal = value.substring(0, props.maxlength)
+		modelValue.value = newVal
+		displayValue.value = newVal
+		emit('change', newVal)
+		if (value.length >= props.maxlength) {
+			emit('finish', newVal)
+		}
+
+		// #ifdef APP
+		startAmination(newVal)
+		// #endif
+
+	}
+
+	const onFocus = (e : UniInputFocusEvent) => {
+		isFocus.value = true
+		// #ifdef APP
+		startAmination(displayValue.value)
+		// #endif
+		emit('focus', e)
+	}
+
+	const onBlur = (e : UniInputBlurEvent) => {
+		isFocus.value = false
+		emit('blur', e)
+	}
+
+	watch(() : boolean => props.focus, () => {
+		isFocus.value = props.focus
+	})
+
+	const boxClick = () => {
+		// #ifdef VUE3-VAPOR
+		isFocus.value = true
+		// #endif
+	}
+
+
+	const codeInputStyle = computed(() => {
+		const css = new Map<string, string>()
+		if (hasStrValue(props.justifyContent)) {
+			css.set('justify-content', props.justifyContent!)
+		}
+		return css
+	})
+
+	const boxStyle = computed(() => {
+		const css = new Map<string, string>()
+		if (hasStrValue(props.bgColor) && props.mode != 'line') {
+			css.set('background-color', props.bgColor!)
+		}
+		if (hasStrValue(props.borderColor)) {
+			css.set('border-color', props.borderColor!)
+		}
+		if (props.size != null) {
+			css.set('height', addUnit(props.size!))
+			css.set('width', addUnit(props.size!))
+		}
+		return css
+	})
+
+	//@ts-ignore
+	const getBoxStyle = (index : number) => {
+		const css = new Map<string, string>()
+		const space = getPxNum(props.space)
+		if (index == props.maxlength - 1) {
+			css.set('margin-right', '0px')
+		} else {
+			css.set('margin-right', addUnit(props.space)!)
+		}
+		//边距为0，设置第一个盒子和最后一个盒子的圆角就行
+		if (space == 0) {
+			if (index == 0 && props.mode != 'line') {
+				css.set('border-top-left-radius', '4px')
+				css.set('border-bottom-left-radius', '4px')
+			}
+			if (index == props.maxlength - 1 && props.mode != 'line') {
+				css.set('border-top-right-radius', '4px')
+				css.set('border-bottom-right-radius', '4px')
+			}
+			if (index != props.maxlength - 1) {
+				css.set('borderRight', 'none')
+			}
+		}
+
+		return css
+	}
+
+	const boxClass = computed(() => {
+		const basic = [ns.e('box')]
+		if (getPxNum(props.space) != 0) {
+			basic.push(ns.e('box--radius'))
+		}
+		if (props.mode == 'line') {
+			basic.push(ns.e('box--line'))
+		}
+		return basic
+	})
+
+	const inputStyle = computed(() => {
+		const css = new Map<string, string>()
+		if (props.size != null) css.set('height', addUnit(props.size!))
+		return css
+	})
+
+	const textStyle = computed(() => {
+		const css = new Map<string, string>()
+		if (props.bold == true) css.set('font-weight', 'bold')
+		if (hasStrValue(props.color)) css.set('color', props.color!)
+		if (props.fontSize != null) css.set('font-size', addUnit(props.fontSize!))
+		return css
+	})
+
+	const boxLineStyle = computed(() => {
+		const css = new Map<string, string>()
+		if (hasStrValue(props.cursorColor)) css.set('background-color', props.cursorColor!)
+		return css
+	})
+</script>
+
+<style scoped lang="scss">
+	.rice-code-input {
+		position: relative;
+		flex-direction: row;
+		align-items: center;
+		flex-wrap: wrap;
+
+		&__box {
+			position: relative;
+			flex-direction: row;
+			align-items: center;
+			justify-content: center;
+			background-color: var(--rice-code-input-background);
+			height: 42px;
+			width: 42px;
+			border: 1px solid var(--rice-code-input-background);
+
+			&__text {
+				font-size: 16px;
+				color: var(--rice-text-color);
+			}
+
+			&__dot {
+				height: 10px;
+				width: 10px;
+				border-radius: 100px;
+				background-color: var(--rice-text-color);
+			}
+
+			&__line {
+				position: absolute;
+				background-color: var(--rice-primary-color);
+				width: 1px;
+				height: 15px;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%, -50%);
+				/* #ifndef APP */
+				animation: 1s line-animation infinite;
+				/* #endif */
+			}
+
+			&--radius {
+				border-radius: 4px;
+			}
+
+			&--line {
+				background-color: transparent;
+				border-style: none;
+				border-bottom: 2px solid var(--rice-code-input-background);
+				border-radius: 0px;
+			}
+
+
+		}
+
+
+
+		&__input {
+			position: absolute;
+			z-index: 2;
+			//#ifndef VUE3-VAPOR
+			left: -750rpx;
+			//#endif
+			//#ifdef VUE3-VAPOR
+			left: -100px;
+			font-size: 0;
+			//#endif
+			right: 0;
+			top: 0;
+			bottom: 0;
+			background-color: transparent;
+			text-align: left;
+		}
+	}
+
+
+	/* #ifndef APP */
+	@keyframes line-animation {
+		0% {
+			opacity: 0;
+		}
+
+		50% {
+			opacity: 1;
+		}
+
+		100% {
+			opacity: 0;
+		}
+	}
+
+	/* #endif */
+</style>

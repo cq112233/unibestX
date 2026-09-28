@@ -1,0 +1,369 @@
+<template>
+	<view class="rice-collapse-item">
+		<view class="rice-collapse-item__header" :class="headerClass" :hover-stay-time="100" :hover-class="hoverClass"
+			:hover-stop-propagation="true" @click="handleHeaderClick">
+			<slot name="leftIcon" />
+			<view class="rice-collapse-item__title" :style="titleStyle">
+				<slot name="title">
+					<text class="rice-collapse-item__title--text" :class="{'rice-collapse-item__title--disabled':disabled}"
+						:style="titleTextStyle">{{title}}</text>
+				</slot>
+			</view>
+			<view v-if="$slots['value']!=null||hasStrValue(value)" class="rice-collapse-item__value" :style="valueStyle">
+				<slot name="value">
+					<text class="rice-collapse-item__value--text" :class="{'rice-collapse-item__value--disabled':disabled}"
+						:style="valueTextStyle">{{value}}</text>
+				</slot>
+			</view>
+			<slot name="rightIcon">
+				<rice-icon v-if="arrow" name="arrow-down" :color="rightIconColor" :custom-style="rightIconStyle" />
+			</slot>
+			<!-- #ifndef APP-ANDROID -->
+			<view v-if="border" class="rice-collapse-item__header--border"></view>
+			<!-- #endif -->
+		</view>
+		<view class="rice-collapse-item__wrapper" ref="wrapperRef" :style="wrapperStyle" @transitionend="onTransitionend">
+			<view class="rice-collapse-item__content" :id="contentId" :style="contentStyle" ref="contentRef">
+				<slot>
+					<text class="rice-collapse-item__content--text" :style="contentTextStyle">{{contentText}}</text>
+				</slot>
+			</view>
+			<view class="rice-collapse-item--border"
+				:class="{'rice-collapse-item--border--show':showContentBorder&&contentBorder}"></view>
+		</view>
+	</view>
+</template>
+
+<script setup>
+	import { getRandomStr, hasStrValue } from '../../libs/utils';
+	import { useNamespace } from '../../libs/use';
+	import { collapseInjectKey, CollapseInjectKey, CollapseActiveName } from '../rice-collapse';
+	import { CollapseItemProps } from './type.uts';
+	import { isDark } from '../../libs/store';
+
+	defineOptions({
+		name: 'rice-collapse-item',
+		styleIsolation: 'app-and-page'
+	})
+
+	const ns = useNamespace('collapse-item')
+	const collapse = inject<CollapseInjectKey>(collapseInjectKey)
+	const contentId = getRandomStr(10)
+
+	const props = withDefaults(defineProps<CollapseItemProps>(), {
+		arrow: true,
+		clickable: true,
+		border: true,
+		contentBorder: true,
+		disabled: false,
+		readonly: false,
+		titleStyle: () : UTSJSONObject => ({}),
+		titleTextStyle: () : UTSJSONObject => ({}),
+		valueStyle: () : UTSJSONObject => ({}),
+		valueTextStyle: () : UTSJSONObject => ({}),
+		contentStyle: () : UTSJSONObject => ({}),
+		contentTextStyle: () : UTSJSONObject => ({}),
+		customStyle: () : UTSJSONObject => ({}),
+	})
+
+	const showContentBorder = ref(false)
+	const wrapperRef = shallowRef<UniElement | null>(null)
+	const contentHeight = ref(0)
+	const itemName = computed(() => props.name ?? 'rice-' + getRandomStr())
+	const isActive = computed(() => collapse?.activeNames.value.includes(itemName.value) ?? false)
+	const activeNames = computed<CollapseActiveName[]>(() => collapse?.activeNames.value ?? [] as CollapseActiveName[])
+	const _duration = computed(() => props.duration ?? collapse?.duration.value ?? 250)
+
+	const handleHeaderClick = () => {
+		if (props.disabled || props.readonly) return
+		collapse?.handleItemClick!(itemName.value)
+	}
+
+	// #ifndef APP-ANDROID || APP-IOS
+	let timer : number | null = null
+	let endTimer : number | null = null
+
+	const clearTimer = () => {
+		if (timer != null) clearTimeout(timer!)
+		if (endTimer != null) clearTimeout(endTimer!)
+	}
+	// #endif
+
+	/**
+	 * 打开/关闭动画结束时执行
+	 */
+	const handleTransitionend = (flag : boolean) => {
+		if (flag) {
+			wrapperRef.value?.style.setProperty('height', 'auto')
+		}
+	}
+
+
+	const onTransitionend = () => {
+		// #ifdef WEB || MP || VUE3-VAPOR
+		handleTransitionend(isActive.value)
+		// #endif
+
+	}
+
+	/**
+	 * android 和 ios端有bug,使用 animate 实现
+	 * bug:https://issues.dcloud.net.cn/pages/issues/detail?id=19405
+	 */
+	const appAnimation = (newVal : boolean) => {
+		const newHeight = newVal ? `${contentHeight.value}px` : '0px'
+		const an = wrapperRef.value?.animate({
+			height: [newHeight]
+		}, {
+			duration: _duration.value,
+			easing: 'ease-in-out',
+		})
+		if (an != null) {
+			an.onfinish = () => {
+				handleTransitionend(newVal)
+			}
+		}
+	}
+
+	/**
+	 * 开始动画
+	 */
+	const startAnimation = async (newVal : boolean) => {
+		const height = `${contentHeight.value}px`
+		const properValue = wrapperRef.value?.style.getPropertyValue('height')
+
+		// 打开时要去掉下边框
+		showContentBorder.value = newVal
+
+		//关闭时先要把auto变成实际的高度才会有过渡动画
+		if (!newVal && properValue == 'auto') {
+			wrapperRef.value?.style.setProperty('height', height)
+		}
+
+		// #ifdef APP-ANDROID || APP-IOS
+		appAnimation(newVal)
+		// #endif
+
+		// #ifndef APP-ANDROID || APP-IOS
+
+		if (newVal) {
+			wrapperRef.value?.style.setProperty('height', height)
+
+			//鸿蒙不会触发 transitionend 事件，使用定时器处理高度为 auto 值
+			// #ifdef APP
+			// #ifndef VUE3-VAPOR
+			endTimer = setTimeout(async () => {
+				wrapperRef.value?.style.setProperty('height', 'auto')
+			}, _duration.value);
+			// #endif
+			// #endif
+
+		} else {
+			timer = setTimeout(() => {
+				wrapperRef.value?.style.setProperty('height', '0px')
+			}, 20)
+		}
+
+		// #endif
+	}
+
+	const instance = getCurrentInstance()
+	const contentRef = shallowRef<UniElement | null>(null)
+
+	watch(isActive, async (newVal : boolean) => {
+		await nextTick()
+		// #ifndef VUE3-VAPOR
+		uni.createSelectorQuery().in(instance).select(`#${contentId}`).boundingClientRect().exec(res => {
+
+			if (res.length == 0) return
+			const nodeInfo = res[0] as NodeInfo | null
+			contentHeight.value = nodeInfo?.height ?? 0
+			// #ifndef APP-ANDROID || APP-IOS
+			clearTimer()
+			// #endif
+			startAnimation(newVal)
+
+		})
+		// #endif
+
+		// #ifdef VUE3-VAPOR
+		const rect = await contentRef.value?.getBoundingClientRectAsync()
+		contentHeight.value = rect?.height ?? 0
+		startAnimation(newVal)
+		// #endif
+
+	}, {
+		immediate: true
+	})
+
+	const headerClass = computed(() => {
+		// #ifdef APP-ANDROID
+		return props.border ? 'rice-collapse-item__header--border' : ""
+		// #endif
+		// #ifndef APP-ANDROID
+		return ''
+		// #endif
+	})
+
+	const wrapperStyle = computed(() => {
+		const css = new Map<string, string>()
+		// #ifndef APP-ANDROID || APP-IOS
+		css.set('transition-duration', `${_duration.value}ms`)
+		// #endif
+
+		return css
+	})
+
+	//右侧箭头 的样式
+
+	const rightIconColor = computed(() => {
+		if (props.disabled) {
+			return isDark.value ? '#4d4d4d' : '#c8c9cc'
+		}
+		return null
+	})
+
+	const rightIconStyle = computed(() => {
+		return {
+			transform: isActive.value ? 'rotate(-180deg)' : 'rotate(0deg)',
+			transition: `transform ${_duration.value}ms`,
+		}
+	})
+
+	const hoverClass = computed(() => {
+		if (props.disabled || props.readonly || !props.clickable) return 'none'
+		return 'rice-collapse-item--hover'
+	})
+
+	// #ifndef APP-ANDROID || APP-IOS
+	onUnmounted(() => {
+		clearTimer()
+	})
+	// #endif
+</script>
+
+<style scoped lang="scss">
+	.rice-collapse-item {
+		background-color: var(--rice-collapse-background);
+		/* #ifdef WEB */
+		cursor: pointer;
+
+		/* #endif */
+		&__header {
+			position: relative;
+			justify-content: space-between;
+			align-items: center;
+			flex-direction: row;
+			padding: 14px 16px;
+
+			&--border {
+				/* #ifdef APP-ANDROID */
+				border-bottom: 0.5px solid var(--rice-border-color);
+				/* #endif */
+
+				/* #ifndef APP-ANDROID */
+				position: absolute;
+				left: 0;
+				bottom: 0;
+				height: 1px;
+				width: 100%;
+				transform: scale(1, 0.5);
+				background-color: var(--rice-border-color);
+				/* #endif */
+
+			}
+
+		}
+
+		&__title {
+			flex: 1;
+			padding-right: 2px;
+
+			&--text {
+				color: var(--rice-text-color);
+				font-size: 15px;
+				/* #ifndef APP */
+				word-wrap: break-word;
+				/* #endif */
+			}
+
+			&--disabled {
+				color: var(--rice-text-color-3);
+			}
+		}
+
+		&__value {
+			flex: 1;
+			padding-right: 2px;
+
+			/* #ifndef APP */
+			text-align: right;
+			word-break: break-all;
+
+			/* #endif */
+
+			&--text {
+				color: var(--rice-text-color-2);
+				font-size: 15px;
+				text-align: right;
+				/* #ifndef APP */
+				word-wrap: break-word;
+				/* #endif */
+			}
+
+			&--disabled {
+				color: var(--rice-text-color-3);
+			}
+		}
+
+		&__wrapper {
+			position: relative;
+			height: 0px;
+			// android 和 ios 使用animation实现，不需要transition
+			/* #ifndef APP-ANDROID || APP-IOS */
+			transition-property: height;
+			transition-timing-function: ease-in-out;
+			/* #endif */
+
+			/* #ifndef APP */
+			will-change: height;
+			/* #endif */
+		}
+
+
+		&__content {
+			position: relative;
+			padding: 12px 16px;
+
+			&--text {
+				color: var(--rice-text-color-2);
+				font-size: 14px;
+				/* #ifndef APP */
+				word-wrap: break-word;
+				word-break: break-all;
+				/* #endif */
+			}
+		}
+
+
+		&--border {
+			position: absolute;
+			bottom: 0;
+			left: 0;
+			height: 1px;
+			transform: scale(1, 0.5);
+			width: 100%;
+			background-color: var(--rice-border-color);
+			opacity: 0;
+			transition: opacity .3s;
+
+			&--show {
+				opacity: 1;
+			}
+		}
+
+		&--hover {
+			background-color: var(--rice-hover-color);
+		}
+	}
+</style>

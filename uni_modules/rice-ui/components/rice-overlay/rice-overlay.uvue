@@ -1,0 +1,168 @@
+<template>
+	<!-- #ifndef APP -->
+	<view v-if="realShow" :class="rootClass" :style="[overlayStyle,customStyle]" @click.stop="overlayClick"
+		@touchmove.stop.prevent="onTouchmove">
+		<slot />
+	</view>
+	<!-- #endif -->
+
+	<!-- #ifdef APP -->
+	<view v-if="realShow" :class="rootClass" :style="[overlayStyle,customStyle]" ref="overlayRef"
+		@touchstart="onTouchstart" @click="overlayClick" @touchmove="onTouchmove">
+		<slot />
+	</view>
+	<!-- #endif -->
+</template>
+
+<script setup>
+	import { useNamespace, useTouch } from "../../libs/use";
+	import { hasStrValue } from "../../libs/utils"
+	import { OverlayProps } from "./type.uts"
+
+	defineOptions({
+		name: 'rice-overlay',
+		styleIsolation: 'app-and-page'
+	})
+
+	const emit = defineEmits<{
+		click : [event: UniPointerEvent],
+		opened : [],
+		closed : [],
+	}>()
+
+	const ns = useNamespace('overlay')
+	const touch = useTouch()
+	const props = withDefaults(defineProps<OverlayProps>(), {
+		closeOnClickOverlay: true,
+		zIndex: 998,
+		duration: 300,
+		customStyle: () : UTSJSONObject => ({})
+	})
+
+
+	const show = defineModel('show', {
+		type: Boolean,
+		default: false,
+	})
+
+	const realShow = ref(false)
+	const transitionClass = ref("")
+
+
+	const overlayClick = (e : UniPointerEvent) => {
+		e.stopPropagation()
+		// #ifdef APP
+		//App端手指按下后在组件区域内移动不会取消tap/click事件的触发，移动到组件区域外才会取消tap/click事件的触发。
+		if (!touch.isTap.value) return
+		// #endif
+		if (props.closeOnClickOverlay) {
+			show.value = false
+		}
+		emit('click', e)
+	}
+
+	// #ifdef APP
+	const onTouchstart = (e : UniTouchEvent) => {
+		touch.start(e)
+	}
+	// #endif
+
+	const onTouchmove = (e : UniTouchEvent) => {
+
+		// #ifdef APP
+		touch.move(e)
+		// #endif
+	}
+
+	// #ifdef APP-HARMONY
+	const overlayRef = ref<UniElement | null>(null)
+	// #endif
+
+
+	/**
+	 * 打开
+	 */
+	let timer1 : number | null = null
+	let timer2 : number | null = null
+
+	const open = async () => {
+		realShow.value = true
+		await nextTick()
+		if (timer1 != null) clearTimeout(timer1!)
+
+		timer1 = setTimeout(() => {
+			// #ifdef APP-HARMONY
+			overlayRef.value?.style.setProperty('transition-duration', props.duration + 'ms')
+			// #endif
+			transitionClass.value = "rice-overlay--show"
+			emit('opened')
+		}, 30)
+	}
+
+	/**
+	 * 关闭
+	 */
+	const close = () => {
+		transitionClass.value = ""
+
+		if (timer2 != null) clearTimeout(timer2!)
+		timer2 = setTimeout(() => {
+			realShow.value = false
+			emit('closed')
+		}, props.duration)
+	}
+
+	watch(show, (newVal : boolean) => {
+		if (newVal && !realShow.value) {
+			open()
+		}
+		if (!newVal && realShow.value) {
+			close()
+		}
+	}, {
+		immediate: true
+	})
+
+	const rootClass = computed(() => {
+		return [
+			'rice-overlay',
+			ns.theme(),
+			transitionClass.value
+		] as string[]
+	})
+
+	const overlayStyle = computed(() => {
+		const css = new Map<string, string | number>()
+		css.set('z-index', props.zIndex)
+		// #ifndef APP-HARMONY
+		css.set('transition-duration', props.duration + 'ms')
+		//#endif
+		if (hasStrValue(props.bgColor)) {
+			css.set('background-color', props.bgColor!)
+		}
+		return css
+	})
+
+	onUnmounted(() => {
+		if (timer1 != null) clearTimeout(timer1!)
+		if (timer2 != null) clearTimeout(timer2!)
+	})
+</script>
+
+<style scoped lang="scss">
+	.rice-overlay {
+		position: fixed;
+		top: 0;
+		left: 0;
+		height: 100%;
+		width: 100%;
+		background-color: var(--rice-overlay-background);
+		transition-property: opacity;
+		opacity: 0;
+
+		&--show {
+			opacity: 1;
+
+		}
+	}
+</style>

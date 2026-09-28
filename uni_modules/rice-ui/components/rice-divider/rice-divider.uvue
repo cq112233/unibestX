@@ -1,0 +1,126 @@
+<template>
+	<view :class="dividerClass" :style="[dividerStyle,customStyle]">
+		<template v-if="hasText">
+			<view :class="getLineClass('left')" :style="dividerLineStyle"></view>
+			<slot>
+				<text class="rice-divider__text" :style="textStyle">{{text}}</text>
+			</slot>
+			<view :class="getLineClass('right')" :style="dividerLineStyle"></view>
+		</template>
+	</view>
+</template>
+
+<script setup>
+	import { addUnit, hasStrValue } from '../../libs/utils';
+	import { useNamespace } from '../../libs/use';
+	import { DividerProps } from './type.uts';
+
+	defineOptions({
+		name: 'rice-divider',
+		styleIsolation: 'app-and-page'
+	})
+
+	const ns = useNamespace('divider')
+	const slots = useSlots()
+
+	const props = withDefaults(defineProps<DividerProps>(), {
+		dashed: false,
+		hairline: true,
+		textPosition: 'center',
+		customStyle: () : UTSJSONObject => ({})
+	})
+
+	const hasText = computed(() => slots['default'] != null || hasStrValue(props.text))
+
+
+	const dividerStyle = computed(() => {
+		const css = new Map<string, string>()
+		if (props.lineColor != null && !hasText.value) css.set('border-color', props.lineColor!)
+		return css
+	})
+
+	const dividerLineStyle = computed(() => {
+		const css = new Map<string, string>()
+		if (props.lineColor != null) css.set('border-color', props.lineColor!)
+		return css
+	})
+
+
+	const dividerClass = computed(() => {
+		return [
+			ns.b(""),
+			ns.theme(),
+			ns.is("single", !hasText.value),
+			ns.is('hairline', props.hairline && !hasText.value),
+			ns.is('dashed', props.dashed && !hasText.value),
+		]
+	})
+
+
+	const getLineClass = (position : 'left' | 'right') => {
+		return [
+			ns.e(position),
+			ns.is('hairline', props.hairline),
+			ns.is('sides', props.textPosition == position),
+			ns.is('dashed', props.dashed),
+		]
+	}
+
+
+	const textStyle = computed(() => {
+		const css = new Map<string, string>()
+		if (props.textSize != null) css.set('font-size', addUnit(props.textSize!))
+		if (props.textColor != null) css.set('color', props.textColor!)
+		return css
+	})
+</script>
+
+<style scoped lang="scss">
+	.rice-divider {
+		flex-direction: row;
+		align-items: center;
+		margin: 16px auto;
+		width: 100%;
+
+		&--single {
+			border-top: 1px solid var(--rice-divider-line-color);
+			transform: scale(1, 1);
+		}
+
+
+		&__text {
+			font-size: 14px;
+			color: var(--rice-text-color-2);
+		}
+
+		&__left,
+		&__right {
+			flex: 1;
+			box-sizing: border-box;
+			border-top: 1px solid var(--rice-divider-line-color);
+		}
+
+		&__left {
+			margin-right: 12px;
+		}
+
+		&__right {
+			margin-left: 12px;
+		}
+
+		&--sides {
+			width: 30px;
+			flex: 0 1 auto;
+
+		}
+
+		&--dashed {
+			border-top-style: dashed;
+		}
+
+		&--hairline {
+			transform: scale(1, 0.5);
+		}
+
+	}
+</style>

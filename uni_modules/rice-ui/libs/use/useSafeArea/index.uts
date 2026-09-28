@@ -1,0 +1,45 @@
+
+
+export type SafeAreaInsets = {
+	top : number,
+	bottom : number,
+	statusBarHeight : number,
+}
+//全局存储
+
+export const safeAreaInsets = ref<SafeAreaInsets>({
+	top: 0,
+	bottom: 0,
+	// #ifndef WEB
+	statusBarHeight: 25,
+	// #endif
+	// #ifdef WEB
+	statusBarHeight: 0,
+	// #endif
+})
+
+export function useSafeArea() {
+
+	let timer : number | null = null
+
+	const getWindowInfo = () => {
+		// #ifndef WEB
+		const windowInfo = uni.getWindowInfo()
+		safeAreaInsets.value.bottom = windowInfo.safeAreaInsets.bottom
+		safeAreaInsets.value.top = windowInfo.safeAreaInsets.top
+		safeAreaInsets.value.statusBarHeight = windowInfo.statusBarHeight
+		// #endif
+	}
+
+	onMounted(() => {
+		if (timer != null) clearTimeout(timer!)
+		timer = setTimeout(() => {
+			getWindowInfo()
+		}, 200)
+	})
+
+	onUnmounted(() => {
+		if (timer != null) clearTimeout(timer!)
+	})
+
+}

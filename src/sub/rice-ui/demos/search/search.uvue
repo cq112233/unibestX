@@ -1,0 +1,61 @@
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
+    <view class="p-[16px]">
+      <!-- 基础搜索 -->
+      <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
+        <view class="flex-row items-center mb-[12px]">
+          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px]" :style="{ backgroundColor: currentTheme }" />
+          <text class="text-[14px] font-bold text-[#334155]">基础搜索框</text>
+        </view>
+        <rice-search v-model="searchValue1" placeholder="请输入搜索关键词" :action-style="{ color: currentTheme }" @search="onSearch" />
+      </view>
+
+      <!-- 圆角与背景 -->
+      <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
+        <view class="flex-row items-center mb-[12px]">
+          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px]" :style="{ backgroundColor: currentTheme }" />
+          <text class="text-[14px] font-bold text-[#334155]">圆角与操作按钮</text>
+        </view>
+        <rice-search
+          v-model="searchValue2"
+          placeholder="请输入搜索内容"
+          shape="round"
+          :show-action="true"
+          action-text="搜索"
+          :action-style="{ color: currentTheme }"
+          @search="onSearch"
+          @custom="onSearch"
+        />
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { useAppStore } from '@/src/store';
+import { computed } from 'vue';
+
+definePage({
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
+  style: {
+    navigationBarTitleText: 'Search 搜索框',
+    navigationStyle: 'custom'
+  }
+});
+
+const appStore = useAppStore();
+const currentTheme = computed((): string => appStore.state.theme);
+
+const searchValue1 = ref('');
+const searchValue2 = ref('');
+
+function onSearch(val: string) {
+  uni.showToast({
+    title: `搜索内容: ${val}`,
+    icon: 'none'
+  });
+}
+</script>

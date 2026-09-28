@@ -1,0 +1,372 @@
+export type FontData = {
+	name : string,
+	code : string
+}
+
+export const fontData : FontData[] = [{
+	name: 'arrow-up',
+	code: '\ueaa4'
+}, {
+	name: 'arrow-down',
+	code: '\ueaa1'
+}, {
+	name: 'arrow-left',
+	code: '\ueaa2'
+}, {
+	name: 'arrow-right',
+	code: '\ueaa3'
+}, {
+	name: 'up',
+	code: '\ueab1'
+}, {
+	name: 'down',
+	code: '\ueaa5'
+}, {
+	name: 'left',
+	code: '\ueaa9'
+}, {
+	name: 'right',
+	code: '\ueaab'
+}, {
+	name: 'back-top',
+	code: '\ueaae'
+}, {
+	name: 'back-bottom',
+	code: '\ueaad'
+}, {
+	name: 'double-right',
+	code: '\ueaa0'
+}, {
+	name: 'double-left',
+	code: '\ueaa7'
+}, {
+	name: 'minus',
+	code: '\uea7e',
+}, {
+	name: 'plus',
+	code: '\uea7d'
+}, {
+	name: 'search',
+	code: '\uea8c'
+}, {
+	name: 'search-fill',
+	code: '\uea89'
+}, {
+	name: 'scan',
+	code: '\uea67'
+}, {
+	name: 'qr',
+	code: '\ue6d8'
+}, {
+	name: 'sort',
+	code: '\ue6e2'
+},{
+	name:'sort-menu',
+	code:'\ueaac'
+}, {
+	name: 'bars',
+	code: '\ue69f'
+}, {
+	name: 'remind-disabled',
+	code: '\uea95'
+}, {
+	name: 'remind',
+	code: '\uea96'
+}, {
+	name: 'volume',
+	code: '\uea7c'
+}, {
+	name: 'volume-fill',
+	code: '\uea6f'
+}, {
+	name: 'volume-up',
+	code: '\uea78'
+}, {
+	name: 'volume-up-fill',
+	code: '\uea70'
+}, {
+	name: 'volume-down',
+	code: '\uea79'
+}, {
+	name: 'volume-down-fill',
+	code: '\uea73'
+}, {
+	name: 'volume-mute',
+	code: '\uea7a'
+}, {
+	name: 'volume-mute-fill',
+	code: '\uea72'
+}, {
+	name: 'voice',
+	code: '\uea77'
+}, {
+	name: 'voice-off',
+	code: '\uea7b'
+}, {
+	name: 'play',
+	code: '\uea76'
+}, {
+	name: 'play-fill',
+	code: '\uea71'
+}, {
+	name: 'pause',
+	code: '\uea75'
+}, {
+	name: 'pause-fill',
+	code: '\uea6e'
+}, {
+	name: 'headset',
+	code: '\uea74'
+}, {
+	name: 'headset-fill',
+	code: '\uea6d'
+}, {
+	name: 'user',
+	code: '\ueb30'
+}, {
+	name: 'peoples',
+	code: '\ueb2f'
+}, {
+	name: 'peoples-fill',
+	code: '\ueb2c'
+}, {
+	name: 'trophy',
+	code: '\ueb35'
+}, {
+	name: 'trophy-fill',
+	code: '\ueb33'
+}, {
+	name: 'add',
+	code: '\uea84'
+}, {
+	name: 'add-fill',
+	code: '\uea7f'
+}, {
+	name: 'reduce',
+	code: '\uea87'
+}, {
+	name: 'reduce-fill',
+	code: '\uea81'
+}, {
+	name: 'checked-circle',
+	code: '\uea86'
+}, {
+	name: 'checked-circle-fill',
+	code: '\uea80'
+}, {
+	name: 'help',
+	code: '\uea8a'
+}, {
+	name: 'help-fill',
+	code: '\uea82'
+}, {
+	name: 'info',
+	code: '\uea88'
+}, {
+	name: 'info-fill',
+	code: '\uea83'
+}, {
+	name: 'cross',
+	code: '\uea85'
+}, {
+	name: 'checked',
+	code: '\ue659'
+}, {
+	name: 'camera',
+	code: '\uea8f'
+}, {
+	name: 'camera-fill',
+	code: '\uea8b'
+}, {
+	name: 'app',
+	code: '\uea91'
+}, {
+	name: 'app-fill',
+	code: '\uea8d'
+}, {
+	name: 'like',
+	code: '\uea90'
+}, {
+	name: 'like-fill',
+	code: '\uea8e'
+}, {
+	name: 'eyes',
+	code: '\uea92'
+}, {
+	name: 'eyes-close',
+	code: '\uea94'
+}, {
+	name: 'sleep',
+	code: '\uea93'
+}, {
+	name: 'sun',
+	code: '\ueafe'
+}, {
+	name: 'menu-fold',
+	code: '\uea9e'
+}, {
+	name: 'menu-unfold',
+	code: '\uea9f'
+}, {
+	name: 'upload',
+	code: '\ueab2'
+}, {
+	name: 'download',
+	code: '\ueaa6'
+}, {
+	name: 'full-screen',
+	code: '\ueaa8'
+}, {
+	name: 'off-screen',
+	code: '\ueaaa'
+}, {
+	name: 'switch',
+	code: '\ueaaf'
+}, {
+	name: 'revoke',
+	code: '\ueab0'
+}, {
+	name: 'comments',
+	code: '\ueac3'
+}, {
+	name: 'comments-fill',
+	code: '\ueac2'
+}, {
+	name: 'phone-call',
+	code: '\ueaba'
+}, {
+	name: 'phone-call-fill',
+	code: '\ueab4'
+}, {
+	name: 'phone-in',
+	code: '\ueabc'
+}, {
+	name: 'phone-in-fill',
+	code: '\ueab5'
+}, {
+	name: 'phone-out',
+	code: '\ueabb'
+}, {
+	name: 'phone-out-fill',
+	code: '\ueab6'
+}, {
+	name: 'phone',
+	code: '\ueabd'
+}, {
+	name: 'phone-fill',
+	code: '\ueab7'
+}, {
+	name: 'phone-missed',
+	code: '\ueabe'
+}, {
+	name: 'phone-missed-fill',
+	code: '\ueab8'
+}, {
+	name: 'location',
+	code: '\ueac0'
+}, {
+	name: 'location-fill',
+	code: '\ueabf'
+}, {
+	name: 'bluetooth',
+	code: '\ueacb'
+}, {
+	name: 'calendar',
+	code: '\uead4'
+}, {
+	name: 'calendar-fill',
+	code: '\uead2'
+}, {
+	name: 'clear',
+	code: '\ueb34'
+}, {
+	name: 'clear-fill',
+	code: '\ueb32'
+}, {
+	name: 'share',
+	code: '\uea4e'
+}, {
+	name: 'share-fill',
+	code: '\uea3d'
+}, {
+	name: 'edit',
+	code: '\uea48'
+}, {
+	name: 'delete',
+	code: '\uea45'
+}, {
+	name: 'delete-fill',
+	code: '\uea37'
+}, {
+	name: 'shopping',
+	code: '\uea68'
+}, {
+	name: 'shopping-fill',
+	code: '\uea62'
+}, {
+	name: 'wallet',
+	code: '\uea69'
+}, {
+	name: 'bag',
+	code: '\uea6a'
+}, {
+	name: 'set',
+	code: '\ue6dc'
+}, {
+	name: 'set-fill',
+	code: '\ue6db'
+}, {
+	name: 'replay',
+	code: '\ue6dd'
+}, {
+	name: 'home',
+	code: '\ue6e9'
+}, {
+	name: 'home-fill',
+	code: '\ue6e8'
+}, {
+	name: 'chat',
+	code: '\ue6aa'
+}, {
+	name: 'chat-fill',
+	code: '\ue6a3'
+}, {
+	name: 'good',
+	code: '\ue6c3'
+}, {
+	name: 'good-fill',
+	code: '\ue6c2'
+}, {
+	name: 'gift',
+	code: '\ue6d4'
+}, {
+	name: 'gift-fill',
+	code: '\ue6d3'
+}, {
+	name: 'loading',
+	code: '\ue670'
+}, {
+	name: 'photo',
+	code: '\ue6cf'
+}, {
+	name: 'photo-fail',
+	code: '\ue6cd'
+}, {
+	name: 'star',
+	code: '\ue6ec'
+}, {
+	name: 'star-fill',
+	code: '\ue6ed'
+}, {
+	name: 'trend',
+	code: '\uea6b'
+}, {
+	name: 'trend-fill',
+	code: '\uea63'
+}, {
+	name: 'file-success-fill',
+	code: '\uea25'
+}, {
+	name: 'file-success',
+	code: '\uea2d'
+}]

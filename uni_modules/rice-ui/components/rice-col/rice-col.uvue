@@ -1,0 +1,79 @@
+<template>
+	<view class="rice-col" :class="colClass" :style="[colStyle,customStyle]">
+		<slot></slot>
+	</view>
+</template>
+
+<script setup>
+
+	import { addUnit } from '../../libs/utils';
+	import { RowProvide, rowInjectKey } from '../rice-row';
+	import { ColProps } from './type.uts';
+
+	defineOptions({
+		name: 'rice-col',
+		styleIsolation: 'app-and-page'
+	})
+
+	const props = withDefaults(defineProps<ColProps>(), {
+		span: 24,
+		offset: 0,
+		customStyle: () : UTSJSONObject => ({})
+	})
+
+	const row = inject<RowProvide | null>(rowInjectKey, null)
+	const gutter = computed(() => row?.gutter.value ?? 0)
+
+	const colStyle = computed(() => {
+		const css = new Map<string, string>()
+		if (gutter.value > 0) {
+			const gutterNum = addUnit(gutter.value / 2)
+			css.set('padding-left', `${gutterNum}`)
+			css.set('padding-right', `${gutterNum}`)
+		}
+		// #ifdef APP
+		if (props.span >= 0) {
+			const spanNum = 100 / 24 * props.span
+			css.set('flex', `0 0 ${spanNum}%`)
+		}
+		if (props.offset >= 0) {
+			const marginLeft = 100 / 24 * props.offset
+			css.set('margin-left', `${marginLeft}%`)
+		}
+		// #endif
+		return css
+	})
+
+	const colClass = computed(() => {
+		// #ifndef APP
+		const offset = props.offset > 0 ? `rice-col-offset-${props.offset}` : ''
+		return [`rice-col-${props.span}`, offset]
+		// #endif
+		// #ifdef APP
+		return [] as string[]
+		// #endif
+	})
+</script>
+
+<style scoped lang="scss">
+	.rice-col {
+		box-sizing: border-box;
+	}
+
+	// app 不支持这种写法
+	/* #ifndef APP */
+	@for $i from 0 through 24 {
+		.rice-col-#{$i} {
+			flex:0 0 calc(100% / 24 * #{$i});
+			max-width: calc(100% / 24 * #{$i});
+		}
+	}
+
+	@for $i from 1 through 24 {
+		.rice-col-offset-#{$i} {
+			margin-left:calc(100% / 24 * #{$i});
+		}
+	}
+
+	//#endif
+</style>

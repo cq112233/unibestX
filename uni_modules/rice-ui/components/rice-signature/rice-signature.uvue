@@ -1,0 +1,496 @@
+<template>
+	<view class="rice-signature" :class="ns.theme()" :style="[signatureStyle,customStyle]">
+		<view class="rice-signature__wrapper" :style="wrapperStyle" ref="wrapperRef">
+			<canvas class="rice-signature__canvas" :id="canvasId" type="2d" :disable-scroll="!disabled"
+				@touchstart="onTouchstart" @touchmove="onTouchmove" @touchend="onTouchend" @touchcancel="onTouchend"></canvas>
+			<view v-if="hasTips" class="rice-signature__tips">
+				<slot name="tips">
+					<text :style="tipsStyle" class="rice-signature__tips__text">{{tips}}</text>
+				</slot>
+			</view>
+		</view>
+		<view v-if="hasConfirm||hasClear||hasRevoke" class="rice-signature__footer">
+			<rice-button v-if="hasClear" :text="clearButtonText" size="small" class="rice-signature__footer__btn"
+				@click="clear" />
+			<rice-button v-if="hasRevoke" type="warning" :text="revokeButtonText" size="small"
+				class="rice-signature__footer__btn" @click="revoke" />
+			<rice-button v-if="hasConfirm" type="primary" :text="confirmButtonText" size="small"
+				class="rice-signature__footer__btn" @click="submit" />
+		</view>
+	</view>
+</template>
+
+<script setup>
+	import { useNamespace } from "../../libs/use"
+	import { addUnit, debugWarn, hasStrValue, getRandomStr } from "../../libs/utils"
+	import { SignatureProps, SignaturePoint, SignatureCanvasSize } from "./type.uts"
+
+	defineOptions({
+		name: 'rice-signature',
+		styleIsolation: "app-and-page"
+	})
+
+	const ns = useNamespace('signature')
+
+	const emit = defineEmits<{
+		start : [],
+		signing : [],
+		end : [],
+		submit : [image: string],
+	}>()
+
+	const slots = defineSlots()
+	const canvasId = 'rice-signature-' + getRandomStr()
+
+	const props = withDefaults(defineProps<SignatureProps>(), {
+		type: 'png',
+		disabled: false,
+		lineColor: '#000',
+		lineWidth: 3,
+		confirmButtonText: '确定',
+		clearButtonText: '清空',
+		revokeButtonText: '',
+		customStyle: () : UTSJSONObject => ({})
+	})
+
+	const hasTips = computed(() => slots['tips'] != null || hasStrValue(props.tips))
+	const hasConfirm = computed<boolean>(() => hasStrValue(props.confirmButtonText))
+	const hasClear = computed<boolean>(() => hasStrValue(props.clearButtonText))
+	const hasRevoke = computed<boolean>(() => hasStrValue(props.revokeButtonText))
+
+	// #ifdef APP-HARMONY
+	type SignatureStroke = {
+		lineColor : string,
+		lineWidth : number,
+		points : SignaturePoint[]
+	}
+	// #endif
+
+	// #ifndef APP-HARMONY
+
+	type SignatureSnapshot = {
+		imageData : ImageData,
+		width : number,
+		height : number,
+		hasDraw : boolean
+	}
+	// #endif
+
+	// #ifndef MP-WEIXIN
+	const offset = reactive<SignaturePoint>({
+		x: 0,
+		y: 0
+	})
+	// #endif
+
+	const lastPoint = reactive<SignaturePoint>({
+		x: 0,
+		y: 0
+	})
+
+	const renderingContext = ref<CanvasRenderingContext2D | null>(null)
+	const hasDraw = ref(false)
+	// #ifdef APP-HARMONY
+	const strokes = ref<SignatureStroke[]>([])
+	const currentStroke = ref<SignatureStroke | null>(null)
+	// #endif
+	// #ifndef APP-HARMONY
+	const history = ref<SignatureSnapshot[]>([])
+	// #endif
+
+	const getCanvasSize = () : SignatureCanvasSize => {
+		const width = renderingContext.value!.canvas.width
+		const height = renderingContext.value!.canvas.height
+		return {
+			width,
+			height
+		}
+	}
+
+	const setCanvasBgColor = () => {
+		if (renderingContext.value != null && hasStrValue(props.bgColor)) {
+			const ctx = renderingContext.value!
+			ctx.fillStyle = props.bgColor!
+			const size = getCanvasSize()
+			ctx.fillRect(0, 0, size.width, size.height)
+		}
+	}
+
+	const clearCanvas = () => {
+		const ctx = renderingContext.value
+		if (ctx == null) return
+		const size = getCanvasSize()
+		ctx.clearRect(0, 0, size.width, size.height)
+		setCanvasBgColor()
+	}
+
+	// #ifdef APP-HARMONY
+	const drawStroke = (stroke : SignatureStroke) => {
+		const ctx = renderingContext.value
+		if (ctx == null || stroke.points.length < 2) return
+		ctx.beginPath()
+		ctx.lineWidth = stroke.lineWidth
+		ctx.strokeStyle = stroke.lineColor
+		ctx.lineCap = "round"
+		ctx.lineJoin = "round"
+		const firstPoint = stroke.points[0]
+		ctx.moveTo(firstPoint.x, firstPoint.y)
+		for (let i = 1; i < stroke.points.length; i++) {
+			const point = stroke.points[i]
+			ctx.lineTo(point.x, point.y)
+		}
+		ctx.stroke()
+	}
+
+	const redrawStrokes = () => {
+		clearCanvas()
+		for (let i = 0; i < strokes.value.length; i++) {
+			drawStroke(strokes.value[i])
+		}
+	}
+	// #endif
+
+	// #ifndef APP-HARMONY
+	const saveSnapshot = () : boolean => {
+		const ctx = renderingContext.value
+		if (ctx == null) return false
+		const size = getCanvasSize()
+		if (size.width <= 0 || size.height <= 0) return false
+		const snapshot : SignatureSnapshot = {
+			imageData: ctx.getImageData(0, 0, size.width, size.height),
+			width: size.width,
+			height: size.height,
+			hasDraw: hasDraw.value
+		}
+		history.value.push(snapshot)
+		if (history.value.length > 50) {
+			history.value.shift()
+		}
+		return true
+	}
+	// #endif
+
+	const initSize = async () => {
+		const canvas = renderingContext.value!.canvas;
+		const dpr = uni.getWindowInfo().pixelRatio
+		canvas.width = canvas.offsetWidth * dpr
+		canvas.height = canvas.offsetHeight * dpr
+
+		renderingContext.value!.scale(dpr, dpr)
+		await nextTick()
+		setCanvasBgColor()
+	}
+	const createCanvasContext = () => {
+		// #ifndef APP-HARMONY
+		uni.createCanvasContextAsync({
+			id: canvasId,
+			component: getCurrentInstance()?.proxy,
+			success: (context : CanvasContext) => {
+				renderingContext.value = context.getContext('2d')!
+				initSize()
+			},
+			fail: err => {
+				debugWarn('Signature', err.errMsg)
+			}
+		})
+		// #endif
+
+		// #ifdef  APP-HARMONY
+		const context = uni.getElementById(canvasId) as UniCanvasElement
+		renderingContext.value = context.getContext('2d')!
+		initSize()
+		// #endif
+	}
+
+	const getPosition = (e : UniTouchEvent) : SignaturePoint => {
+
+		const touch = e.touches[0]
+		// #ifdef MP-WEIXIN
+		//https://developers.weixin.qq.com/miniprogram/dev/framework/view/wxml/event.html
+		//CanvasTouch 对象, 当前点击的区域距离 Canvas 左上角的距离，Canvas 的左上角为原点 ，横向为X轴，纵向为Y轴
+		return {
+			x: touch.x,
+			y: touch.y,
+		}
+		// #endif
+		// #ifndef MP-WEIXIN
+		return {
+			x: touch.clientX - offset.x,
+			y: touch.clientY - offset.y
+		}
+		// #endif
+
+	}
+
+	const onTouchstart = (e : UniTouchEvent) => {
+		if (renderingContext.value == null || props.disabled) return
+		const ctx = renderingContext.value!
+		const canvas = ctx.canvas;
+		// #ifndef MP-WEIXIN
+		const rect = canvas.getBoundingClientRect()
+		offset.x = rect.left
+		offset.y = rect.top
+		// #endif
+		const point = getPosition(e)
+		lastPoint.x = point.x
+		lastPoint.y = point.y
+		// #ifdef APP-HARMONY
+		currentStroke.value = {
+			lineColor: props.lineColor,
+			lineWidth: props.lineWidth,
+			points: [{
+				x: point.x,
+				y: point.y
+			}]
+		}
+		// #endif
+		// #ifndef APP-HARMONY
+		saveSnapshot()
+		// #endif
+		ctx.beginPath()
+		ctx.lineWidth = props.lineWidth
+		ctx.strokeStyle = props.lineColor
+		emit('start')
+
+	}
+
+	const onTouchmove = (e : UniTouchEvent) => {
+		if (props.disabled) return
+		// #ifndef MP-WEIXIN
+		e.preventDefault()
+		// #endif
+		if (renderingContext.value == null) return
+		hasDraw.value = true
+		const point = getPosition(e)
+		const x = point.x
+		const y = point.y
+		const ctx = renderingContext.value!
+		ctx.lineCap = "round"
+		ctx.lineJoin = "round"
+		ctx.moveTo(lastPoint.x, lastPoint.y)
+		ctx.lineTo(x, y)
+		ctx.stroke()
+		// #ifdef APP-HARMONY
+		currentStroke.value?.points.push({
+			x,
+			y
+		})
+		// #endif
+		lastPoint.x = x
+		lastPoint.y = y
+		emit('signing')
+	}
+
+	const onTouchend = () => {
+		if (props.disabled) return
+		// #ifdef APP-HARMONY
+		if (currentStroke.value != null && currentStroke.value.points.length > 1) {
+			strokes.value.push(currentStroke.value)
+			hasDraw.value = true
+		}
+		currentStroke.value = null
+		// #endif
+		emit('end')
+	}
+
+	const clear = () => {
+		if (renderingContext.value == null) return
+		// #ifdef APP-HARMONY
+		strokes.value = []
+		currentStroke.value = null
+		// #endif
+		// #ifndef APP-HARMONY
+		saveSnapshot()
+		// #endif
+		hasDraw.value = false
+		clearCanvas()
+	}
+
+	const revoke = () => {
+		// #ifdef APP-HARMONY
+		if (renderingContext.value == null || strokes.value.length == 0) return
+		strokes.value.pop()
+		currentStroke.value = null
+		hasDraw.value = strokes.value.length > 0
+		redrawStrokes()
+		// #endif
+		// #ifndef APP-HARMONY
+		const ctx = renderingContext.value
+		if (ctx == null || history.value.length == 0) return
+		const snapshot = history.value.pop()
+		if (snapshot == null) return
+		const size = getCanvasSize()
+		ctx.clearRect(0, 0, size.width, size.height)
+		if (snapshot.width == size.width && snapshot.height == size.height) {
+			ctx.putImageData(snapshot.imageData, 0, 0)
+		} else {
+			setCanvasBgColor()
+		}
+		const sameSize = snapshot.width == size.width && snapshot.height == size.height
+		hasDraw.value = snapshot.hasDraw && sameSize
+		// #endif
+	}
+
+	const done = () => {
+		if (!hasDraw.value) return ""
+		const ctx = renderingContext.value
+		if (ctx == null) return ""
+		const canvas = ctx!.canvas
+		//jpeg格式下生成的图片透明背景会变黑色请慎用或指定背景色
+		if (props.type == 'jpeg') {
+			return canvas.toDataURL(`image/jpeg`, 0.8)
+		}
+		return canvas.toDataURL(`image/png`)
+	}
+
+	const submit = () => {
+		const img = done()
+		emit('submit', img)
+	}
+
+	//组件显示状态变化或者绘制位置异常时，可以调用此方法来触发重绘
+	const resize = async () => {
+		const ctx = renderingContext.value
+		if (ctx == null) return
+		// #ifdef APP-HARMONY
+		await initSize()
+		if (strokes.value.length > 0) {
+			redrawStrokes()
+		}
+		// #endif
+		// #ifndef APP-HARMONY
+		if (!hasDraw.value) return
+		history.value = []
+		ctx.save()
+		const size = getCanvasSize()
+		// #ifdef WEB
+		const data = ctx.getImageData(0, 0, size.width, size.height)
+		// #endif
+		// #ifndef WEB
+		ctx.clearRect(0, 0, size.width, size.height)
+		// #endif
+		await initSize()
+		// #ifdef WEB
+		renderingContext.value?.putImageData(data, 0, 0)
+		// #endif
+		// #endif
+	}
+
+	const signatureStyle = computed(() => {
+		const css = new Map<string, string>()
+		if (props.width != null) css.set('width', addUnit(props.width!))
+		return css
+	})
+
+	const wrapperStyle = computed(() => {
+		const css = new Map<string, string>()
+		if (hasStrValue(props.contentBgColor) && !hasStrValue(props.bgColor)) css.set('background-color', props.contentBgColor!)
+		if (props.height != null) css.set('height', addUnit(props.height!))
+		return css
+	})
+
+	const tipsStyle = computed(() => {
+		const css = new Map<string, string>()
+		if (props.tipsSize != null) css.set('font-size', addUnit(props.tipsSize!))
+		if (hasStrValue(props.tipsColor)) css.set('color', props.tipsColor!)
+		return css
+	})
+
+	// #ifdef MP
+	watch([() => props.width, () => props.height], resize)
+	// #endif
+
+	// #ifndef MP
+
+	const wrapperRef = ref<UniElement | null>(null)
+	const resizeObserver = ref<UniResizeObserver | null>(null)
+
+	const initResizeObserver = async () => {
+		resizeObserver.value = new UniResizeObserver((entries : UniResizeObserverEntry[]) => {
+			if (entries.length > 0 && entries[0].target == wrapperRef.value) {
+				resize()
+			}
+		})
+		await nextTick()
+		if (wrapperRef.value != null) {
+			resizeObserver.value.observe(wrapperRef.value!)
+		}
+	}
+
+	onUnmounted(() => {
+		resizeObserver.value?.disconnect()
+	})
+
+	// #endif
+
+
+	onMounted(() => {
+		createCanvasContext()
+		// #ifndef MP
+		initResizeObserver()
+		// #endif
+	})
+
+
+	defineExpose({
+		revoke,
+		clear,
+		done,
+		resize,
+	})
+</script>
+
+<style scoped lang="scss">
+	.rice-signature {
+
+		&__wrapper {
+			position: relative;
+			width: 100%;
+			height: 200px;
+			background-color: var(--rice-signature-background);
+			border-radius: 8px;
+			border: 1px solid var(--rice-signature-border-color);
+		}
+
+		&__canvas {
+			position: relative;
+			z-index: 9;
+			width: 100%;
+			height: 100%;
+		}
+
+		&__tips {
+			position: absolute;
+			top: 50%;
+			left: 0;
+			right: 0;
+			width: 100%;
+			transform: translateY(-50%);
+			pointer-events: none;
+			z-index: 10;
+			/* #ifndef APP */
+			text-align: center;
+
+			/* #endif */
+			&__text {
+				font-weight: bold;
+				text-align: center;
+				letter-spacing: 3;
+				font-size: 28px;
+				color: rgba(204, 204, 204, 0.3);
+			}
+		}
+
+		&__footer {
+			width: 100%;
+			flex-direction: row;
+			justify-content: flex-end;
+			margin-top: 10px;
+
+			&__btn {
+				margin: 0 5px;
+				padding: 0 14px;
+			}
+		}
+	}
+</style>

@@ -1,0 +1,21 @@
+export type CodeInputMode = 'box' | 'line'
+
+export type CodeInputProps = {
+	maxlength ?: number,
+	dot ?: boolean,
+	mode ?: CodeInputMode,
+	bgColor ?: string,
+	borderColor ?: string,
+	showCursor ?: boolean,
+	cursorColor ?: string,
+	space ?: string | number,
+	justifyContent ?: string,
+	size ?: string | number,
+	fontSize ?: string | number,
+	color ?: string,
+	bold ?: boolean,
+	focus ?: boolean,
+	disabledKeyboard ?: boolean,
+	adjustPosition ?: boolean,
+	customStyle ?: UTSJSONObject,
+}

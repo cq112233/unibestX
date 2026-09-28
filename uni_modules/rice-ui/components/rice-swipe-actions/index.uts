@@ -1,0 +1,4 @@
+import { getRandomStr } from "../../libs/utils"
+export * from "./type.uts"
+export const swipeActionsName=`SwipeActions`
+export const swipeActionsInjectKey = `SwipeActionsKey-${getRandomStr()}`

@@ -1,0 +1,49 @@
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
+    <view class="p-[16px]">
+      <!-- 基础签名 -->
+      <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
+        <view class="flex-row items-center mb-[12px]">
+          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px]" :style="{ backgroundColor: currentTheme }" />
+          <text class="text-[14px] font-bold text-[#334155]">手写签名板</text>
+        </view>
+        <view class="rounded-[8px] overflow-hidden border border-solid border-[#e2e8f0]">
+          <rice-signature tips="请在上方空白区域书写您的签名" :pen-color="currentTheme" @submit="onSubmit" />
+        </view>
+        <view v-if="signatureImg != ''" class="mt-[12px]">
+          <text class="text-[13px] text-[#059669]">签名已生成！</text>
+          <image :src="signatureImg" style="width: 200px; height: 100px;" class="mt-[8px] bg-[#f1f5f9] rounded-[6px]" />
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { useAppStore } from '@/src/store';
+import { computed } from 'vue';
+
+definePage({
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
+  style: {
+    navigationBarTitleText: 'Signature 签名',
+    navigationStyle: 'custom'
+  }
+});
+
+const appStore = useAppStore();
+const currentTheme = computed((): string => appStore.state.theme);
+
+const signatureImg = ref('');
+
+function onSubmit(img: string) {
+  signatureImg.value = img;
+  uni.showToast({
+    title: '签名保存成功',
+    icon: 'success'
+  });
+}
+</script>

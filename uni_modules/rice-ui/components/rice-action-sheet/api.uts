@@ -1,0 +1,96 @@
+
+import { ActionSheetProps, ActionSheetAction } from "./type.uts"
+import { debugWarn, getUID } from "../../libs/utils"
+
+export type ActionSheetBusEvent = {
+	type : 'select' | 'cancel' | 'open' | 'close' | 'opened' | 'closed' | 'fail' | 'ready' | 'clickOverlay',
+	action ?: ActionSheetAction,
+	index ?: number,
+	errMsg ?: string,
+	pageIns ?: UniPage
+}
+
+const url = 'uni_modules/rice-ui/pages/action-sheet/action-sheet'
+
+export const showActionSheet = (options : ActionSheetProps) => {
+
+	// #ifndef MP
+	const uid = getUID()
+	const baseEventName = `rice_action_sheet_${uid}`
+	const readyEventName = baseEventName + '_ready'
+	const optionsEventName = baseEventName + '_options'
+	const busEventName = baseEventName + '_bus'
+
+	//传递option参数
+	uni.$on(readyEventName, () => {
+		uni.$emit(optionsEventName, options)
+	})
+
+	uni.$on(busEventName, (event : ActionSheetBusEvent) => {
+		const type = event.type
+		if (type == 'select') {
+			options.select?.(event.action!, event.index as number)
+		} else if (type == 'cancel') {
+			options.cancel?.()
+		} else if (type == 'open') {
+			options.open?.()
+		} else if (type == 'close') {
+			options.close?.()
+		} else if (type == 'opened') {
+			options.opened?.()
+		} else if (type == 'closed') {
+			options.closed?.()
+		} else if (type == 'ready') {
+			options.ready?.(event.pageIns!)
+		} else if (type == 'clickOverlay') {
+			options.clickOverlay?.()
+		} else if (type == 'fail') {
+			options.fail?.(event.errMsg ?? '')
+		}
+	})
+
+	uni.openDialogPage({
+		url: `/${url}?readyEventName=${readyEventName}&optionsEventName=${optionsEventName}&busEventName=${busEventName}`,
+		fail: err => {
+			options.fail?.(err.errMsg)
+			uni.$off(readyEventName)
+			uni.$off(busEventName)
+			debugWarn('action-sheet', `请在pages.json 中注册${url}页面！errMsg:${err.errMsg}`)
+		}
+	})
+
+	// #endif
+
+
+	// #ifdef MP
+	//小程序最多支持6项
+	const actions = options.actions?.slice(0, 6) ?? []
+	uni.showActionSheet({
+		itemList: actions.map(v => v.name),
+		success: res => {
+			options.select?.(actions[res.tapIndex], res.tapIndex)
+		},
+		fail: err => {
+			if (err.errMsg === 'showActionSheet:fail cancel') {
+				options.cancel?.()
+			} else {
+				options.fail?.({
+					errMsg: err.errMsg
+				})
+			}
+
+		}
+	})
+	// #endif
+
+}
+
+export const hideActionSheet = () => {
+	const pages = getCurrentPages()
+	const page = pages[pages.length - 1]
+	const dialogPages = page.getDialogPages().filter(v => v.route.startsWith(url))
+	if (dialogPages.length == 0) return
+	//要先关闭最后一个dialogpage
+	const lastPage = dialogPages[dialogPages.length - 1]
+	lastPage.vm?.$callMethod('close')
+}

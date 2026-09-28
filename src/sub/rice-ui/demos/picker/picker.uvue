@@ -1,0 +1,62 @@
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
+    <view class="p-[16px]">
+      <!-- 基础选择器 -->
+      <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
+        <view class="flex-row items-center mb-[12px]">
+          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px]" :style="{ backgroundColor: currentTheme }" />
+          <text class="text-[14px] font-bold text-[#334155]">单列选择器</text>
+        </view>
+        <view class="rounded-[8px] overflow-hidden border border-solid border-[#e2e8f0]">
+          <rice-picker
+            :columns="columns"
+            :use-popup="false"
+            title="选择城市"
+            @confirm="onConfirm"
+          />
+        </view>
+        <view class="mt-[10px]">
+          <text class="text-[13px] text-[#64748b]">已选城市：{{ selectedCity }}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { useAppStore } from '@/src/store';
+import type { PickerEvent, PickerOption } from '@/uni_modules/rice-ui';
+import { computed } from 'vue';
+
+definePage({
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
+  style: {
+    navigationBarTitleText: 'Picker 选择器',
+    navigationStyle: 'custom'
+  }
+});
+
+const appStore = useAppStore();
+const currentTheme = computed((): string => appStore.state.theme);
+
+const selectedCity = ref('杭州');
+
+const columns: PickerOption[][] = [
+  [
+    { text: '杭州', value: 'hangzhou' } as PickerOption,
+    { text: '宁波', value: 'ningbo' } as PickerOption,
+    { text: '温州', value: 'wenzhou' } as PickerOption,
+    { text: '嘉兴', value: 'jiaxing' } as PickerOption,
+    { text: '绍兴', value: 'shaoxing' } as PickerOption
+  ]
+];
+
+function onConfirm(e: PickerEvent) {
+  if (e.selectedOptions.length > 0) {
+    selectedCity.value = e.selectedOptions[0].text as string;
+  }
+}
+</script>

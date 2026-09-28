@@ -1,0 +1,20 @@
+import type { Ref } from 'vue'
+import { getRandomStr } from '../../libs/utils'
+
+export * from './type.uts'
+
+export type WaterflowItemLayout = {
+	x : number,
+	y : number,
+}
+
+export type WaterflowProvide = {
+	itemWidth : Ref<number>,
+	itemLayouts : Ref<WaterflowItemLayout[]>,
+	ready : Ref<boolean>,
+	requestLayout : () => void,
+	updateItemHeight : (index : number, height : number) => void,
+}
+
+export const waterflowInjectKey = `WaterflowKey-${getRandomStr()}`
+export const waterflowName = 'riceWaterflow'

@@ -1,0 +1,146 @@
+<template>
+	<view :class="rootClass" :style="[gridItemStyle,customStyle]" :hover-class="hoverClass" :hover-stay-time="100"
+		@click="handleClick">
+		<slot>
+			<rice-icon :font-family="iconFontFamily" :name="icon" :size="_iconSize" :color="_iconColor" />
+			<text class="rice-grid-item__text" :class="{'rice-grid-item--horizontal__text':isHorizontal}"
+				:style="textStyle">{{text}}</text>
+		</slot>
+	</view>
+</template>
+
+<script setup>
+
+	import { useNamespace, useParent } from "../../libs/use"
+	import { addUnit, debugWarn } from "../../libs/utils";
+	import { gridInjectKey, GridProvice, gridName } from "../rice-grid";
+	import { GridItemProps } from "./type.uts";
+
+	defineOptions({
+		name: 'rice-grid-item',
+		styleIsolation: "app-and-page"
+	})
+
+	const emit = defineEmits<{
+		click : []
+	}>()
+	const { childIndex } = useParent(gridName)
+	const ns = useNamespace('grid-item')
+	const props = withDefaults(defineProps<GridItemProps>(), {
+		customStyle: () : UTSJSONObject => ({})
+	})
+
+	const grid = inject<GridProvice | null>(gridInjectKey, null)
+	const isHorizontal = computed(() => grid?.vertical.value != true)
+	const _iconSize = computed(() => props.iconSize ?? grid?.iconSize.value ?? '32px')
+	const _iconColor = computed<string | null>(() => props.iconColor ?? grid?.iconColor.value)
+	const hoverClass = computed(() => grid?.clickable.value == true ? 'rice-grid-item--hover' : 'none')
+
+	const handleClick = () => {
+		if (props.to != null) {
+			uni.navigateTo({
+				url: props.to!,
+				fail: err => {
+					debugWarn('GridItem', err.errMsg)
+				}
+			})
+		}
+		emit('click')
+	}
+
+
+	const gridItemStyle = computed(() => {
+		const css = new Map<string, string>()
+		const columnNum = grid?.columnNum.value ?? 4
+		const percent = 100 / columnNum + '%'
+		css.set('flex-basis', percent)
+		return css
+	})
+
+	const textStyle = computed(() => {
+		const css = new Map<string, string>()
+		const textSize = props.textSize ?? grid?.textSize.value
+		const textColor = props.textColor ?? grid?.textColor.value
+		if (textSize != null) css.set('font-size', addUnit(textSize!))
+		if (textColor != null) css.set('color', textColor!)
+		return css
+	})
+
+	const instance = getCurrentInstance()
+
+	const rootClass = computed(() => {
+		const base = [
+			ns.b(""),
+			ns.is("horizontal", isHorizontal.value),
+		]
+
+		if (grid?.border.value == true) {
+			const children = grid!.childrenList.value
+			const index = children.findIndex(v => v.proxy == instance?.proxy)
+			if (index != -1) {
+				const columnNum = grid!.columnNum.value
+				//最右边一列不需要边框线
+				if ((index + 1) % columnNum != 0) {
+					base.push(ns.m('border--right'))
+				}
+			}
+			base.push(ns.m('border--bottom'))
+		}
+
+		return base
+	})
+
+
+	if (grid == null) {
+		debugWarn('GridItem', '<GridItem> must be used with <Grid>')
+	}
+</script>
+
+<style scoped lang="scss">
+	@import "../../libs/style/mixins/hairline";
+
+	.rice-grid-item {
+		padding: 12px 8px;
+		background-color: var(--rice-grid-background);
+		box-sizing: border-box;
+		align-items: center;
+		justify-content: center;
+		/* #ifdef WEB */
+		cursor: pointer;
+		/* #endif */
+
+		&__text {
+			font-size: 14px;
+			color: var(--rice-text-color);
+			margin-top: 6px;
+			text-align: center;
+			// #ifndef APP
+			word-break: break-all;
+			//#endif
+		}
+
+		&--horizontal {
+			flex-direction: row;
+			justify-content: center;
+
+			&__text {
+				margin-top: 0px;
+				margin-left: 6px;
+				text-align: left;
+				flex: 0 1 auto;
+			}
+		}
+
+		&--border--bottom {
+			@include hairline-bottom;
+		}
+
+		&--border--right {
+			@include hairline-right;
+		}
+
+		&--hover {
+			background-color: var(--rice-hover-color);
+		}
+	}
+</style>

@@ -1,0 +1,182 @@
+
+// #ifdef APP
+
+import { LoadingMode, LoadingTimingFunction } from "./type.uts"
+import { getPxNum } from "../../libs/utils"
+
+export type UseLoadingOptions = {
+	rotateRef : Ref<UniElement | null>,
+	circularRef : Ref<UniElement | null>,
+	timingFunction : LoadingTimingFunction,
+	mode : LoadingMode,
+	color : ComputedRef<string>,
+	size : string | number,
+	duration : number
+}
+
+export function useLoading(options : UseLoadingOptions) {
+
+	/**
+	 * snow、semicircle、circle 的旋转动画
+	 */
+
+	let aniIns : UniAnimation | null = null
+
+	const startAnimate = async () => {
+		const { rotateRef, timingFunction, duration } = options
+		await nextTick()
+		aniIns = rotateRef.value?.animate([{
+			transform: "rotate(0deg)"
+		}, {
+			transform: "rotate(360deg)"
+		}], {
+			duration,
+			easing: timingFunction,
+			iterations: Infinity,
+		})
+	}
+
+
+	// #ifndef VUE3-VAPOR
+
+	/**
+	 * circular 动画类型，使用 dom draw实现
+	 */
+
+	let timer : number | null = null
+	let drawContext : DrawableContext | null = null
+
+	const easeInOutCubic = (t : number) : number => {
+		return t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1;
+	}
+
+	const drawCircular = (ctx : DrawableContext) => {
+
+		let rotate = 0;
+		const size = getPxNum(options.size)
+		const ARC_LENGTH = 359;
+		const center = size / 2;
+		const lineWidth = size / 10;
+		const duration = options.duration;
+		const ARC_MAX = 352
+		let startTime = 0;
+		let foreward_end = 0
+		let reversal_end = ARC_MAX
+		function pogressTime() : number {
+			const currentTime = Date.now();
+			const elapsedTime = currentTime - startTime;
+			const progress = elapsedTime / duration;
+			const easedProgress = easeInOutCubic(progress);
+			return easedProgress
+		}
+		const draw = () => {
+			ctx.reset();
+			ctx.beginPath();
+			if (reversal_end == ARC_MAX) {
+				foreward_end = Math.min(pogressTime() * ARC_LENGTH, ARC_LENGTH);
+				if (foreward_end >= ARC_MAX) {
+					reversal_end = 0
+					foreward_end = ARC_MAX
+					startTime = Date.now();
+				}
+			}
+
+			if (foreward_end == ARC_MAX) {
+				reversal_end = Math.min(pogressTime() * ARC_LENGTH, ARC_LENGTH);
+				if (reversal_end >= ARC_MAX) {
+					reversal_end = ARC_MAX
+					foreward_end = 0
+					startTime = Date.now();
+				}
+			}
+
+			ctx.arc(
+				center,
+				center,
+				center - lineWidth,
+				rotate + (reversal_end * Math.PI / 180),
+				rotate + (foreward_end * Math.PI / 180)
+			);
+			ctx.lineWidth = lineWidth;
+
+			ctx.strokeStyle = options.color.value
+			ctx.stroke();
+			ctx.update();
+			rotate += 0.05;
+		}
+		timer = setInterval(() => draw(), 16);
+
+	}
+
+	const removeInterval = () => {
+		if (timer != null) {
+			clearInterval(timer!)
+			timer = null
+		}
+	}
+
+	const initCircular = () => {
+		const circularRef = options.circularRef
+		if (circularRef.value == null) return
+		removeInterval()
+		drawContext = circularRef.value!.getDrawableContext()!
+		drawContext!.reset()
+		drawCircular(drawContext!)
+	}
+
+	watch(() : string => options.color.value, () => {
+		initCircular()
+	})
+	// #endif
+
+
+	const init = async () => {
+		await nextTick()
+		// #ifndef VUE3-VAPOR
+		initCircular()
+		// #endif
+		startAnimate()
+	}
+
+	onMounted(() => {
+		init()
+	})
+
+	onUnmounted(() => {
+		// #ifndef VUE3-VAPOR
+		removeInterval()
+		// #endif
+	})
+
+	// #ifdef VUE3-VAPOR && APP-HARMONY
+	//鸿蒙蒸汽模式如果不写这里，返回页面时应用会闪退
+	onUnload(() => {
+		aniIns?.finish()
+	})
+	// #endif
+
+	let hasHide = false
+	onPageShow(() => {
+		// #ifndef VUE3-VAPOR
+		if (hasHide && drawContext != null) {
+			drawCircular(drawContext!)
+		}
+		// #endif
+		// if (aniIns?.playState == 'paused') {
+		// 	aniIns?.play()
+		// }
+
+	})
+
+	//优化组件性能，组件在页面不可见时取消动画
+	onPageHide(() => {
+		hasHide = true
+		// #ifndef VUE3-VAPOR
+		removeInterval()
+		// #endif
+		// aniIns?.pause()
+	})
+
+}
+
+// #endif

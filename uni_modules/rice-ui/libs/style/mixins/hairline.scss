@@ -1,0 +1,160 @@
+	/* #ifndef APP */
+//0.5px的边框线
+@mixin  hairline-commoon{
+	content:"";
+	position: absolute;
+	box-sizing: border-box;
+	pointer-events: none;
+}
+
+	/* #endif */
+
+// 全边框线-- 将伪元素扩大到2倍尺寸（200%）
+@mixin hairline($color: var(--van-border-color)) {
+  @include hairline-commoon;
+  top: -50%;
+	bottom: -50%;
+	left: -50%;
+  right: -50%;
+  border: 0 solid $color;
+  transform: scale(0.5); // 缩小回正常尺寸
+}
+
+//上边框线
+@mixin hairline-top($color:var(--rice-border-color),$left:0,$right:0){
+	/* #ifdef APP-ANDROID || APP-IOS */
+	border-top: 1rpx solid $color;
+	/* #endif */
+	
+	/* #ifdef APP-HARMONY */
+	border-top: 1px solid $color;
+	/* #endif */
+	
+	/* #ifndef APP */
+	position: relative;
+	&::after{
+		@include hairline-commoon;
+		top:0;
+		left:$left;
+		right:$right;
+		border-top: 1px solid $color;
+		transform: scaleY(0.5);
+	}
+	/* #endif */
+
+}
+
+//下边框线
+@mixin hairline-bottom($color:var(--rice-border-color),$left:0,$right:0) {
+
+	/* #ifdef APP-ANDROID */
+	border-bottom:0.5px solid $color;
+	/* #endif */
+	
+	/* #ifdef APP-IOS ||APP-HARMONY */
+	border-bottom:1px solid $color;
+	/* #endif */
+	
+		
+	/* #ifndef APP */
+	position: relative;
+	&::after{
+		@include hairline-commoon;
+		left:$left;
+		right:$right;
+		bottom:0;
+		border-bottom: 1px solid $color;
+		transform: scaleY(0.5);
+	}
+	/* #endif */
+	
+}
+
+//上下边框
+
+@mixin hairline-top-bottom($color:var(--rice-border-color),$left:0,$right:0)  {
+	/* #ifdef APP */
+	border-bottom: 0.5px solid $color;
+	border-top:0.5px solid $color;
+	/* #endif */
+	
+
+	
+	/* #ifndef APP */
+	position: relative;
+	&::after{
+		@include hairline-commoon;
+		top:0;
+		left:$left;
+		right:$right;
+		border-top: 1px solid $color;
+		transform: scaleY(0.5);
+		z-index:1;
+	}
+	&::before{
+		@include hairline-commoon;
+		left:$left;
+		right:$right;
+		bottom:0;
+		border-bottom: 1px solid $color;
+		transform: scaleY(0.5);
+		z-index:1;
+	}
+
+	/* #endif */
+	
+}
+
+
+// 左边框
+
+@mixin hairline-left($color:var(--rice-border-color),$top:0,$bottom:0) {
+	/* #ifdef APP-ANDROID || APP-IOS */
+	border-left: 1rpx solid $color;
+	/* #endif */
+	
+	/* #ifdef APP-HARMONY */
+	border-left: 1px solid $color;
+	/* #endif */
+	
+	/* #ifndef APP */
+	position: relative;
+	&::after{
+		@include hairline-commoon;
+		top:$top;
+		bottom:$bottom;
+		left: 0;
+		border-left:1px solid $color;
+		transform: scaleX(0.5);
+	}
+	/* #endif */
+	
+}
+
+
+// 右边框
+
+@mixin hairline-right($color:var(--rice-border-color),$top:0,$bottom:0) {
+	/* #ifdef APP-ANDROID || APP-IOS */
+	border-right: 1rpx solid $color;
+	/* #endif */
+	
+	/* #ifdef APP-HARMONY */
+	border-right: 1px solid $color;
+	/* #endif */
+	
+	/* #ifndef APP */
+	position: relative;
+	&::before{
+		@include hairline-commoon;
+		top:$top;
+		bottom:$bottom;
+		right: 0;
+		border-right:1px solid $color;
+		transform: scaleX(0.5);
+	}
+	/* #endif */
+	
+}
+
+

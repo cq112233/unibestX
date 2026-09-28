@@ -1,0 +1,368 @@
+<template>
+	<view :class="buttonClass" :style="[btnStyle,customStyle]" :hover-stay-time="100" :hover-class="hoverClass"
+		ref="buttonRef" @click.stop="emitClick">
+		<!-- :mode="loadingType" -->
+		<rice-loading v-if="loading" :color="_iconColor" :size="_loadingSize" :mode="loadingMode" />
+		<rice-icon v-if="icon" :name="icon" :color="_iconColor" :size="_iconSize" :font-family="iconFontFamily"/>
+		<slot>
+			<text v-if="hasStrValue(text)" :class="textClass" :style="textStyle">{{btnText}}</text>
+		</slot>
+		<!-- #ifdef MP-WEIXIN -->
+		<button type="default" :class="[ns.e('mp'),ns.e('reset')]" hover-class="none" :open-type="openType"
+			:form-type="formType" @click.stop="emitClick" @getphonenumber="getphonenumber"
+			@getrealtimephonenumber="getrealtimephonenumber" @getuserinfo="getuserinfo" @chooseavatar="chooseavatar"
+			@agreeprivacyauthorization="agreeprivacyauthorization" @launchapp="launchapp" @opensetting="opensetting"
+			@error="error" @contact="contact" />
+		<!-- #endif -->
+	</view>
+</template>
+
+<script setup>
+	import { addUnit, debugWarn, hasStrValue, isGradientColor, isThemeColor } from '../../libs/utils';
+	import { Coloruts } from "../../libs/plugin";
+	import { useNamespace } from '../../libs/use';
+	import { isDark } from "../../libs/store";
+	import { ButtonProps, ButtonType } from './type.uts';
+	import { iconSizeTypes, loadingSizeTypes } from "./utils"
+
+	defineOptions({
+		name: 'rice-button',
+		styleIsolation: 'app-and-page'
+	})
+
+	const ns = useNamespace('button')
+	const emit = defineEmits(['click', 'getphonenumber', 'getrealtimephonenumber', 'getuserinfo', 'chooseavatar', 'launchapp',
+		'agreeprivacyauthorization', 'opensetting', 'error', 'contact'])
+
+	const props = withDefaults(defineProps<ButtonProps>(), {
+		plain: false,
+		plainFill: false,
+		loading: false,
+		disabled: false,
+		customStyle: () : UTSJSONObject => ({})
+	})
+
+	const btnText = computed(() => props.loading && hasStrValue(props.loadingText) ? props.loadingText : props.text)
+	const isPlain = computed(() => props.plain || props.plainFill)
+	const buttonColor = computed<string | null>(() => isDark.value ? (props.darkColor ?? props.color) : props.color)
+
+	const emitClick = (e : UniPointerEvent) => {
+		e.stopPropagation()
+		if (props.disabled || props.loading) return
+		if (hasStrValue(props.to)) {
+			uni.navigateTo({
+				url: props.to!,
+				fail: err => {
+					debugWarn('Button', err.errMsg)
+				}
+			})
+		}
+		emit('click')
+	}
+
+	const _iconSize = computed<string | number>(() => {
+		if (hasStrValue(props.iconSize)) return props.iconSize!
+		return iconSizeTypes[props.size ?? 'default'] ?? '16px'
+	})
+
+
+	const _loadingSize = computed<string | number>(() => {
+		if (hasStrValue(props.loadingSize)) return props.loadingSize!
+		return loadingSizeTypes[props.size ?? 'default'] ?? '18px'
+	})
+
+	const buttonType = computed<string>(() => {
+		if (hasStrValue(buttonColor.value)) return ''
+		if (props.type == 'info') return 'info'
+		return isThemeColor(props.type) ? props.type! : 'default'
+	})
+
+	const getTextColor = () : string => {
+		if (hasStrValue(props.textColor)) return props.textColor!
+		//buttonColor 有值说明用户传了按钮的颜色
+		if (hasStrValue(buttonColor.value)) {
+			return (isPlain.value && !isGradientColor(buttonColor.value!))
+				? buttonColor.value!
+				: ""
+		}
+		return ""
+
+	}
+
+	//图标、loading的颜色
+	const themeColor = ref("")
+	const _iconColor = computed<string>(() => {
+		if (hasStrValue(props.iconColor)) {
+			return props.iconColor!
+		}
+		const textColor = getTextColor()
+		if (textColor != "") return textColor
+		// #ifdef APP
+		const baseColor = 'var(--rice-text-color)'
+		if (isPlain.value || buttonType.value == 'info' || buttonType.value == 'default') return themeColor.value == "" ? baseColor : themeColor.value
+		return '#f5f5f5'
+		// #endif
+
+		// #ifndef APP
+		return "inherit"
+		// #endif
+	})
+
+	function darken(color : Coloruts, amount = 20) {
+		return color.mix('#141414', amount).toHexString()
+	}
+
+	const btnStyle = computed(() => {
+		const css = new Map<string, any>()
+
+		//自定义颜色
+		if (hasStrValue(buttonColor.value)) {
+			const color = buttonColor.value!
+			if (isGradientColor(color)) {
+				css.set('background', color)
+				css.set('border-style', 'none')
+			} else {
+				const colorUts = new Coloruts(color)
+				css.set('border-color', color)
+
+				if (!isPlain.value) {
+					css.set('background', color)
+				} else if (props.plainFill) {
+					css.set('background', isDark.value ? darken(colorUts, 90) : colorUts.tint(90).toHexString())
+				}
+
+			}
+		}
+		// #ifndef APP
+		const textColor = getTextColor()
+		if (textColor != "") css.set('color', textColor)
+		// #endif
+		if (props.height != null) css.set('height', addUnit(props.height!))
+		if (props.width != null) css.set('width', addUnit(props.width!))
+		return css
+	})
+
+
+	const buttonClass = computed<string[]>(() => {
+
+		const basic = [
+			ns.b(''),
+			ns.theme(),
+			ns.m(props.size),
+			ns.m(props.shape),
+			ns.is('disabled', props.disabled),
+		]
+		if (buttonType.value != "") {
+			const theme = ns.m(props.plainFill ? `${buttonType.value}--plain-fill` : buttonType.value)
+			basic.push(theme)
+		}
+		basic.push(ns.is("plain", props.plain))
+		return basic
+	})
+
+
+	const textStyle = computed(() => {
+		const css = new Map<string, string>()
+		const textColor = getTextColor()
+		if (textColor != "") css.set('color', textColor)
+		if (props.textSize != null) css.set('font-size', addUnit(props.textSize!))
+		if (hasStrValue(props.icon) || props.loading) css.set('margin-left', '4px')
+		return css
+	})
+
+	const textClass = computed(() => {
+		const basic = [ns.e("text")]
+		if (buttonType.value != "") {
+			const theme = ns.m(isPlain.value ? `${buttonType.value}--plain__text` : `${buttonType.value}__text`)
+			basic.push(theme)
+		}
+		if (props.size != null) basic.push(ns.m(`${props.size}__text`))
+		return basic
+	})
+
+	const hoverClass = computed(() => {
+		if (props.disabled || props.loading) return 'none'
+		if (isPlain.value || buttonType.value == "") return 'rice-button--hover'
+		return `rice-button--${buttonType.value}--hover`
+
+	})
+
+	// #ifdef APP
+	const buttonRef = shallowRef<UniElement | null>(null)
+	const getCssVar = async () => {
+		await nextTick()
+		if (buttonType.value == 'default' || buttonType.value == 'info') {
+			themeColor.value = buttonRef.value?.style.getPropertyValue(`--rice-text-color`) ?? ""
+		} else if (isThemeColor(buttonType.value)) {
+			themeColor.value = buttonRef.value?.style.getPropertyValue(`--rice-${buttonType.value}-color`) ?? ""
+		} else {
+			themeColor.value = buttonRef.value?.style.getPropertyValue(`--rice-text-color-white`) ?? ""
+		}
+	}
+
+
+	watch([buttonType, () : boolean => isDark.value], () => {
+		getCssVar()
+	})
+
+	onMounted(() => {
+		getCssVar()
+	})
+	// #endif
+
+
+	// #ifdef MP-WEIXIN
+
+
+	const getphonenumber = (e) => {
+		emit('getphonenumber', e)
+	}
+
+	const getrealtimephonenumber = (e) => {
+		emit('getrealtimephonenumber', e)
+	}
+
+	const getuserinfo = (e) => {
+		emit('getuserinfo', e)
+	}
+
+	const chooseavatar = (e) => {
+		emit('chooseavatar', e)
+	}
+
+	const agreeprivacyauthorization = (e) => {
+		emit('agreeprivacyauthorization', e)
+	}
+
+	const launchapp = (e) => {
+		emit('launchapp')
+	}
+
+	const opensetting = (e) => {
+		emit('opensetting', e)
+	}
+
+	const error = (e) => {
+		emit('error', e)
+	}
+
+	const contact = (e) => {
+		contact('contact', e)
+	}
+	// #endif
+</script>
+
+<style scoped lang="scss">
+	@import "./style.scss";
+
+
+	.rice-button {
+		position: relative;
+		flex-direction: row;
+		align-items: center;
+		justify-content: center;
+		border-radius: 4px;
+		height: 42px;
+		padding: 0 15px;
+		box-sizing: border-box;
+		opacity: 1;
+		border: 1px solid var(--rice-button-default-border);
+		/* #ifndef APP */
+		color: var(--rice-text-color-white);
+
+		/* #endif */
+
+		/* #ifdef WEB */
+		cursor: pointer;
+		/* #endif */
+
+		&__text {
+			color: var(--rice-text-color-white);
+			font-size: 14px;
+		}
+
+		&--square {
+			border-radius: 0px;
+		}
+
+		&--round {
+			border-radius: 990px;
+		}
+
+		&--hover {
+			opacity: 0.6;
+		}
+
+		&--default-hover {
+			background-color: var(--rice-button-default-hover-background)
+		}
+
+
+		&--disabled {
+			opacity: 0.6;
+		}
+
+
+		@include buttonSize();
+
+		@each $theme,
+		$colors in $theme-colors {
+			@include button-variant($theme, $colors);
+		}
+
+		&--plain {
+			background: transparent;
+
+			/* #ifndef APP */
+			&.rice-button--primary {
+				color: var(--rice-primary-color);
+			}
+
+			&.rice-button--success {
+				color: var(--rice-success-color);
+			}
+
+			&.rice-button--warning {
+				color: var(--rice-warning-color);
+			}
+
+			&.rice-button--error {
+				color: var(--rice-error-color);
+			}
+
+			/* #endif */
+		}
+
+		/* #ifndef APP */
+		&--default,
+		&--info {
+			color: var(--rice-text-color);
+		}
+
+		/* #endif */
+
+
+		/* #ifdef MP-WEIXIN */
+		&__reset {
+			position: absolute;
+			z-index: 2;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			background-color: transparent;
+			border: none;
+
+			&:after {
+				border: none;
+			}
+		}
+
+		/* #endif */
+
+	}
+	
+	.rice-button--hover2{
+		background-color: red;
+	}
+</style>

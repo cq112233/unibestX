@@ -1,0 +1,157 @@
+// #ifdef MP-WEIXIN
+
+/**
+ * 此为wxs模块，支持微信小程序
+ * wxs内部不支持es6语法，变量只能使用var定义，无法使用解构，箭头函数等特性
+ */
+
+var touch = require('../../libs/use/useTouch/touch.wxs')
+
+
+function clamp(num, min, max) {
+	return Math.min(Math.max(num, min), max);
+}
+
+/**
+ * 比较差值，计算array数组里面离num最近的一个数值
+ */
+function closeto(array, num) {
+	return array.reduce(function(pre, next) {
+		//两个数相减的差越小说明两个数字离得越近
+		return Math.abs(pre - num) < Math.abs(next - num) ? pre : next
+	})
+}
+
+function setTransform(instance, ownerInstance, state, source) {
+	var duration = state.dragging ? '0ms' : (state.duration == undefined ? '300ms' : state.duration + 'ms')
+	instance.setStyle({
+		transform: 'translate(' + state.x + 'px,' + state.y + 'px)',
+		'transition-duration': duration,
+		opacity: 1,
+	})
+
+}
+
+function updateStateXY(instance, ownerInstance, state) {
+	var x = state.x
+	var y = state.y
+	var boundary = state.boundary || {}
+	if (state.adsorption == 'x') {
+		x = closeto([boundary.left, boundary.right], x)
+	} else if (state.adsorption == 'y') {
+		y = closeto([boundary.top, boundary.bottom], y)
+	}
+	x = clamp(x, boundary.left, boundary.right)
+	y = clamp(y, boundary.top, boundary.bottom)
+	state.x = x
+	state.y = y
+	setTransform(instance, ownerInstance, state)
+}
+
+function onTouchstart(event, ownerInstance) {
+	var instance = event.instance
+	var state = instance.getState()
+	if (state.disabled) return
+	touch.start(event, ownerInstance, state)
+	ownerInstance.callMethod('_wxsIsDragging', {
+		dragging: state.dragging
+	})
+	var dom = event.instance.getBoundingClientRect()
+	if (dom.width != undefined) {
+		state.width = dom.width
+	}
+	if (dom.height != undefined) {
+		state.height = dom.height
+	}
+	state.lastX = state.x || 0
+	state.lastY = state.y || 0
+}
+
+function onTouchmove(event, ownerInstance) {
+	var instance = event.instance
+	var state = instance.getState()
+	touch.move(event, ownerInstance, state)
+	if (state.disabled) return
+	var nextX = state.lastX + state.deltaX
+	var nextY = state.lastY + state.deltaY
+	var boundary = state.boundary || {}
+	var axis = state.axis || 'xy'
+	if (axis == 'x' || axis == 'xy') {
+		if (state.overGap) {
+			nextX = clamp(nextX, 0, boundary.right + state.gapRight)
+		} else {
+			nextX = clamp(nextX, boundary.left, boundary.right)
+		}
+		state.x = nextX
+	}
+	if (axis == 'y' || axis == 'xy') {
+		if (state.overGap) {
+			nextY = clamp(nextY, 0, boundary.bottom + state.gapBottom)
+		} else {
+			nextY = clamp(nextY, boundary.top, boundary.bottom)
+		}
+		state.y = nextY
+	}
+
+	ownerInstance.callMethod('_updateOffset', {
+		x: state.x,
+		y: state.y
+	})
+	setTransform(instance, ownerInstance, state)
+	return false
+}
+
+function onTouchend(event, ownerInstance) {
+	var instance = event.instance
+	var state = instance.getState()
+	touch.end(state)
+	ownerInstance.callMethod('_wxsIsDragging', {
+		dragging: state.dragging
+	})
+	if (state.disabled) return
+	updateStateXY(instance, ownerInstance, state)
+	var params = { x: state.x, y: state.y }
+	ownerInstance.callMethod('_updateOffset', params)
+	if (state.lastX != state.x || state.lastY != state.y) {
+		ownerInstance.callMethod('_emitOffsetChange', params)
+	}
+	setTransform(instance, ownerInstance, state)
+}
+
+function updateState(newVal, oldVal, ownerInstance, instance) {
+	if (newVal && typeof newVal == 'object') {
+		var state = instance.getState()
+		state.x = newVal.x
+		state.y = newVal.y
+	}
+}
+
+function updateBoundary(newVal, oldVal, ownerInstance, instance) {
+	var state = instance.getState()
+	state.boundary = newVal || {}
+}
+
+function updateMpProps(newVal, oldVal, ownerInstance, instance) {
+	if (newVal && typeof newVal == 'object') {
+		var state = instance.getState()
+		state.axis = newVal.axis
+		state.adsorption = newVal.adsorption
+		state.overGap = newVal.overGap
+		state.disabled = newVal.disabled
+		state.duration = newVal.duration
+		state.gapRight = newVal.gapRight
+		state.gapBottom = newVal.gapBottom
+	}
+}
+
+module.exports = {
+	onTouchstart: onTouchstart,
+	onTouchmove: onTouchmove,
+	onTouchend: onTouchend,
+	updateState: updateState,
+	updateBoundary: updateBoundary,
+	updateMpProps: updateMpProps,
+}
+
+
+// #endif

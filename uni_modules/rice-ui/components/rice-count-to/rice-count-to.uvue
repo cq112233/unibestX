@@ -1,0 +1,195 @@
+<template>
+	<text class="rice-count-to" :class="ns.theme()" :style="[countToStyle,customStyle]">{{displayValue}}</text>
+</template>
+
+<script setup>
+	import { useNamespace } from "../../libs/use"
+	import { addUnit, hasStrValue, toNum } from "../../libs/utils"
+	import { CountToProps, StartCountFn } from './type.uts';
+	defineOptions({
+		name: 'rice-count-to',
+		styleIsolation: "app-and-page"
+	})
+	const ns = useNamespace('count-to')
+
+	const emit = defineEmits<{
+		end : [],
+	}>()
+
+	const props = withDefaults(defineProps<CountToProps>(), {
+		startVal: 0,
+		endVal: 0,
+		duration: 1000,
+		autoplay: true,
+		restart: false,
+		customStyle: () : UTSJSONObject => ({}),
+	})
+
+
+	const formatNum = (value ?: string | number) => {
+		value = value == null ? 0 : toNum(value!)
+		const num = value.toFixed(props.decimals ?? 0)
+		const x = num.split('.')
+		let x1 = x[0]
+		let x2 = x.length > 1 ? `.${x[1]}` : ''
+		const reg = /(\d+)(\d{3})/;
+		if (hasStrValue(props.separator)) {
+			while (reg.test(x1)) {
+				x1 = x1.replace(reg, '$1' + props.separator + '$2')
+			}
+		}
+		return x1 + x2
+	}
+
+	const displayValue = ref(formatNum(props.startVal))
+	let paused = false
+	let startTime = 0
+	let localStartVal = 0
+	let lastTime = 0
+	let remainTime = 0
+	let currentVal = 0
+	let duration = props.duration
+	let timer : number | null = 0
+	let lastEndVal = toNum(props.endVal)
+
+	const startVal = computed(() => toNum(props.startVal))
+	const isCountDown = computed(() => {
+		return startVal.value > toNum(props.endVal)
+	})
+
+	const clearTimer = () => {
+		if (timer != null) clearTimeout(timer!)
+	}
+
+	const startAnimation = (callback : StartCountFn) => {
+		const currentTime = new Date().getTime()
+		const time = Math.max(0, 16 - (currentTime - lastTime));
+		clearTimer()
+		timer = setTimeout(() => {
+			callback(currentTime + time);
+		}, time);
+		lastTime = currentTime + time
+	}
+
+	let startCount : StartCountFn | null = null
+
+	startCount = (timestamp : number) => {
+
+		const endVal = toNum(props.endVal)
+		if (startTime == 0) startTime = timestamp
+		const progress = timestamp - startTime
+		remainTime = duration - progress
+
+		currentVal = localStartVal + (endVal - localStartVal) * (progress / duration)
+		currentVal = isCountDown.value
+			? localStartVal - (localStartVal - endVal) * (progress / duration)
+			: localStartVal + (endVal - localStartVal) * (progress / duration)
+
+		//递增
+		if (localStartVal < endVal) {
+			currentVal = Math.min(currentVal, endVal)
+		} else {
+			currentVal = Math.max(currentVal, endVal)
+		}
+
+		displayValue.value = formatNum(currentVal)
+		if (progress < duration) {
+			startAnimation(startCount!)
+		} else {
+			emit('end')
+			lastEndVal = endVal
+		}
+	}
+
+	function handleStart(value : number) {
+		localStartVal = value
+		duration = props.duration
+		startTime = 0
+		paused = false
+		startAnimation(startCount!)
+	}
+
+	//兼容 Android的写法
+	function start() {
+		handleStart(startVal.value)
+	}
+
+	function pause() {
+		clearTimer()
+		paused = true
+	}
+
+	function resume() {
+		if (!paused || remainTime == 0) return
+		startTime = 0
+		duration = remainTime
+		localStartVal = currentVal
+		startAnimation(startCount!)
+		paused = false
+	}
+
+	function reset() {
+		clearTimer()
+		startTime = 0
+		displayValue.value = formatNum(props.startVal)
+		lastEndVal = toNum(props.endVal)
+	}
+
+	function handleRestart() {
+		if (props.autoplay) {
+			start()
+		}
+	}
+
+	watch(() : string | number => props.startVal, () => {
+		handleRestart()
+	})
+
+	watch(() : string | number => props.endVal, (newVal : string | number) => {
+		if (props.restart) {
+			handleRestart()
+		} else {
+			const newNum = toNum(newVal)
+			if (newNum != lastEndVal) {
+				if (props.autoplay) {
+					handleStart(currentVal)
+				}
+				lastEndVal = newNum
+			}
+		}
+	})
+
+
+
+	const countToStyle = computed(() => {
+		const css = new Map<string, string>()
+		if (props.color != null) css.set('color', props.color!)
+		if (props.fontSize != null) css.set('font-size', addUnit(props.fontSize!))
+		if (props.bold == true) css.set('font-weight', 'bold')
+		return css
+	})
+
+	onMounted(() => {
+		if (props.autoplay) {
+			start()
+		}
+	})
+
+	onUnmounted(() => {
+		clearTimer()
+	})
+
+	defineExpose({
+		start,
+		pause,
+		resume,
+		reset,
+	})
+</script>
+
+<style scoped lang="scss">
+	.rice-count-to {
+		font-size: 16px;
+		color: var(--rice-text-color);
+	}
+</style>

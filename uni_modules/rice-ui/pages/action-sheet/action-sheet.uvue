@@ -1,0 +1,130 @@
+<template>
+	<rice-action-sheet v-model:show="show" :title="params.title" :actions="actionsList" :use-dialog-page="false"
+		:show-cancel="params.showCancel" :cancel-text="params.cancelText" :duration="params.duration"
+		:z-index="params.zIndex" :opacity="params.opacity" :overlay="params.overlay"
+		:overlay-bg-color="params.overlayBgColor" :close-on-click-action="params.closeOnClickAction"
+		:close-on-click-overlay="params.closeOnClickOverlay" :radius="params.radius"
+		:safe-area-inset-bottom="params.safeAreaInsetBottom" :custom-style="params.customStyle" @select="onSelect"
+		@cancel="onCancel" @open="onOpen" @close="onClose" @opened="onOpened" @closed="onClosed"
+		@clickOverlay="clickOverlay" />
+
+</template>
+
+<script setup>
+	import { ActionSheetProps, ActionSheetBusEvent, ActionSheetAction } from '../../components/rice-action-sheet/index';
+	defineOptions({
+		name: 'rice-action-sheet-page'
+	})
+
+	const show = ref(false)
+	const params = ref<ActionSheetProps>({})
+	let busEventName : string | null = null
+	let optionsEventName : string | null = null
+	let readyEventName : string | null = null
+	let closeTimer : number | null = null
+	const dialogPageIns = ref<UniPage | null>(null)
+
+	const actionsList = computed(() => params.value.actions ?? [] as ActionSheetAction[])
+
+	const handleBusEvent = (event : ActionSheetBusEvent) => {
+		if (busEventName != null) {
+			uni.$emit(busEventName!, event)
+		}
+	}
+
+	const onSelect = (action : ActionSheetAction, index : number) => {
+		handleBusEvent({
+			type: 'select',
+			action,
+			index
+		})
+	}
+	const onCancel = () => {
+		handleBusEvent({ type: 'cancel' })
+	}
+
+	const onOpen = () => {
+		handleBusEvent({ type: 'open' })
+	}
+
+	const onClose = () => {
+		show.value = false
+	}
+
+	const onOpened = () => {
+		handleBusEvent({ type: 'opened' })
+	}
+
+	const onClosed = () => {
+		handleBusEvent({ type: 'closed' })
+		uni.closeDialogPage({
+			dialogPage: dialogPageIns.value
+		})
+	}
+
+	const clickOverlay = () => {
+		handleBusEvent({ type: 'clickOverlay' })
+	}
+
+	const updateParams = (data : ActionSheetProps) => {
+		for (let key in data) {
+			if (data[key] != null) {
+				params.value[key] = data[key]
+			}
+		}
+	}
+
+	watch(show, (newVal : boolean) => {
+		if (!newVal) {
+			handleBusEvent({ type: 'close' })
+		}
+	})
+
+	const close = () => {
+		show.value = false
+	}
+
+	onLoad((options) => {
+		readyEventName = options['readyEventName']
+		optionsEventName = options['optionsEventName']
+		busEventName = options['busEventName']
+		if (readyEventName != null && optionsEventName != null) {
+			uni.$on(optionsEventName!, (data : ActionSheetProps) => {
+				params.value = data
+			})
+			uni.$emit(readyEventName!, {})
+		}
+
+	})
+
+	onReady(() => {
+		show.value = true
+		dialogPageIns.value = getCurrentInstance()?.proxy?.$page
+		handleBusEvent({
+			type: 'ready',
+			pageIns: dialogPageIns.value!
+		})
+	})
+
+	onBackPress(() => {
+		close()
+		return true
+	})
+
+	onUnload(() => {
+		if (busEventName != null) uni.$off(busEventName!, null)
+		if (optionsEventName != null) uni.$off(optionsEventName!, null)
+		if (readyEventName != null) uni.$off(readyEventName!, null)
+		if (closeTimer != null) clearTimeout(closeTimer!)
+	})
+
+
+
+	defineExpose({
+		updateParams,
+		close,
+	})
+</script>
+
+<style scoped lang="scss">
+</style>

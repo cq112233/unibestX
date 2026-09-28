@@ -1,0 +1,104 @@
+import { REGEX_PARSE, REGEX_ENDWIRHZ, M, INVALID_DATE_STRING } from "./constant.uts"
+import { Dateuts } from "./index.uts"
+import { DateParams } from "./type.uts";
+
+export const transform2Num = (val ?: string | null) => {
+	if (val == null || val == "") return 0
+	return parseInt(val)
+}
+
+
+export const parseDate = (params : DateParams | null) : Date => {
+	let date = params?.date
+
+	if (date == "" || date == null || date instanceof Dateuts) return new Date()
+
+	//如果Date构造函数传入不合法的字符串 web平台会抛出异常:Invalid Date APP平台不会抛出异常，会变成程序执行时日期
+
+	// #ifdef APP-ANDROID || APP-HARMONY
+	if (date instanceof Date) return new Date(date.toString())
+	// #endif
+
+	// #ifndef APP-ANDROID || APP-HARMONY
+	if (date instanceof Date) return new Date(date)
+	// #endif
+	if (typeof date == 'string' && !REGEX_ENDWIRHZ.test(date)) {
+		const d = date.match(REGEX_PARSE)
+		if (d != null) {
+			//毫秒
+			const year = transform2Num(d[1])
+			const month = Math.max(transform2Num(d[2]) - 1, 0)
+			const day = Math.max(transform2Num(d[3]), 1)
+			const hour = transform2Num(d[4])
+			const minutes = transform2Num(d[5])
+			const seconds = transform2Num(d[6])
+			const ms = parseInt(transform2Num(d[7]).toString().substring(0, 3))
+			return new Date(year, month, day, hour, minutes, seconds, ms)
+		}
+
+	}
+	//适配Andorra，此处不可省略
+	if (typeof date == 'number') {
+		return new Date(date)
+	}
+	if (Array.isArray(date)) {
+		const newd = date.slice() as number[]
+		while (newd.length < 7) {
+			newd.push(0)
+		}
+		return new Date(newd[0], newd[1], Math.max(newd[2], 1), newd[3], newd[4], newd[5], newd[6])
+	}
+	return new Date(date)
+}
+
+
+
+export const padStart = (str : number | string, len : number, pad : string) => {
+	let s : string | number
+	if (typeof str == 'number') {
+		s = str.toString()
+	} else {
+		s = str
+	}
+	if (s.length >= len) return s
+	return s.padStart(len, pad)
+}
+
+export const getShort = (arr : string[], index : number) => {
+	return arr[index]
+}
+
+export const getH = (hour : number, len : number) => {
+	let h = hour % 12
+	h = h == 0 ? 12 : h
+	return padStart(h, len, '0')
+}
+
+export const isNull = (val : any) => {
+	return val == null
+}
+
+export function monthDiff(a : Dateuts, b : Dateuts) : number {
+	if (a.date() < b.date()) return -monthDiff(b, a)
+	const ayear = a.year()
+	const amonth = a.month()
+	const byear = b.year()
+	const bmonth = b.month()
+	const wholeMonthDiff = ((byear - ayear) * 12) + (bmonth - amonth)
+	const anchor = a.clone().add(wholeMonthDiff, M).valueOf()
+	const bvalue = b.valueOf()
+	const c = bvalue - anchor < 0
+	const anchor2 = a.clone().add(wholeMonthDiff + (c ? -1 : 1), M).valueOf()
+	const diff = (bvalue - anchor) / (c ? (anchor - anchor2) : (anchor2 - anchor));
+	const result = wholeMonthDiff + diff
+	const result2 = -result
+	const absResult = +result2
+	const finalResult = !isNaN(absResult) ? absResult : 0
+	return finalResult
+
+}
+
+
+export const absFloor = (n : number) => {
+	return (n < 0 ? Math.ceil(n) : Math.floor(n))
+}

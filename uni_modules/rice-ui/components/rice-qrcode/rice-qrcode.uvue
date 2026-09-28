@@ -1,0 +1,470 @@
+<template>
+	<view class="rice-qrcode" :class="ns.theme()" :style="rootStyle" ref="wrapperRef">
+		<canvas class="rice-qrcode__canvas" :id="canvasId" :canvas-id="canvasId" :width="canvasPixelWidth"
+			:height="canvasPixelHeight" :style="contentStyle" type="2d" />
+		<view v-if="$slots['status']!=null&&showStatus" class="rice-qrcode__status" :class="statusClass">
+			<slot name="status"></slot>
+		</view>
+	</view>
+</template>
+
+<script setup>
+	import { getRandomStr, hasStrValue } from '../../libs/utils'
+	import { useNamespace } from '../../libs/use'
+	import { QRCodeCompletePayload, QRCodeProps, QRCodeError } from './type.uts'
+	import { createQRCodeModules, getQRCodeIconMetric } from './utils.uts'
+
+	defineOptions({
+		name: 'rice-qrcode',
+		styleIsolation: 'app-and-page',
+		externalClasses: ['status-class']
+	})
+
+	const emit = defineEmits<{
+		complete : [payload: QRCodeCompletePayload],
+		error : [payload: QRCodeError],
+	}>()
+
+	const ns = useNamespace('qrcode')
+	const canvasId = 'rice-qrcode-' + getRandomStr()
+	const instance = getCurrentInstance()?.proxy
+
+	const props = withDefaults(defineProps<QRCodeProps>(), {
+		value: '',
+		color: '#000',
+		bgColor: '#fff',
+		autoExport: false,
+		eyeShape: 'square',
+		dotShape: 'square',
+		size: 160,
+		statusClass: '',
+		showStatus: false,
+		iconOption: () : UTSJSONObject => ({
+			width: 30,
+			height: 30,
+		})
+	})
+
+	const canvasContextRef = ref<CanvasContext | null>(null)
+	const renderingContext = ref<CanvasRenderingContext2D | null>(null)
+	const wrapperRef = ref<UniElement | null>(null)
+	const canvasScaleApplied = ref(false)
+	const resolvedModuleCount = ref(21)
+	const quietZoneModules = 2//码边距，2个色块
+	const hasCenterIcon = computed<boolean>(() => hasStrValue(props.icon))
+	const getLevelWeight = (level : string) : number => {
+		if (level == 'L') {
+			return 0
+		}
+		if (level == 'M') {
+			return 1
+		}
+		if (level == 'Q') {
+			return 2
+		}
+		return 3
+	}
+	//带logo时，如果传的是 L 或 M，内部会自动抬到至少 Q，避免扫不出码的情况
+	const getSaferLogoLevel = (level : string) : string => {
+		return getLevelWeight(level) >= getLevelWeight('Q') ? level : 'Q'
+	}
+	const resolvedLevel = computed<string>(() => {
+		if (props.level != null) {
+			return hasCenterIcon.value ? getSaferLogoLevel(props.level) : props.level
+		}
+		return hasCenterIcon.value ? 'Q' : 'M'
+	})
+
+	const codeSize = computed<number>(() => props.size > 0 ? props.size : 160)
+
+	const getPixelRatio = () : number => {
+		const pixelRatio = uni.getWindowInfo().pixelRatio
+		return pixelRatio > 0 ? pixelRatio : 1
+	}
+
+	const canvasPixelWidth = computed<number>(() => {
+		const dpr = getPixelRatio()
+		return codeSize.value * dpr
+	})
+
+	const canvasPixelHeight = computed<number>(() => {
+		const dpr = getPixelRatio()
+		return codeSize.value * dpr
+	})
+
+	const resolvedPadding = computed<number>(() => {
+		const customPadding = props.padding
+		if (customPadding != null && customPadding >= 0) {
+			return customPadding
+		}
+		return codeSize.value * quietZoneModules / resolvedModuleCount.value
+	})
+
+	const wrapperSize = computed<number>(() => codeSize.value)
+
+	//图标宽高
+	const iconWidth = computed<number>(() => getQRCodeIconMetric(props.iconOption, 'width', 30))
+	const iconHeight = computed<number>(() => getQRCodeIconMetric(props.iconOption, 'height', 30))
+	const iconWrapPadding = computed<number>(() => Math.max(codeSize.value * 0.03, 4))
+
+	const isFinderPatternArea = (row : number, col : number, count : number) : boolean => {
+		const inTop = row >= 0 && row < 7
+		const inBottom = row >= count - 7 && row < count
+		const inLeft = col >= 0 && col < 7
+		const inRight = col >= count - 7 && col < count
+		return (inTop && inLeft) || (inTop && inRight) || (inBottom && inLeft)
+	}
+
+	const drawRoundedRect = (ctx : CanvasRenderingContext2D, x : number, y : number, width : number, height : number, radius : number, color : string) : void => {
+		const safeRadius = Math.min(radius, width / 2, height / 2)
+		ctx.beginPath()
+		ctx.moveTo(x + safeRadius, y)
+		ctx.lineTo(x + width - safeRadius, y)
+		ctx.arcTo(x + width, y, x + width, y + safeRadius, safeRadius)
+		ctx.lineTo(x + width, y + height - safeRadius)
+		ctx.arcTo(x + width, y + height, x + width - safeRadius, y + height, safeRadius)
+		ctx.lineTo(x + safeRadius, y + height)
+		ctx.arcTo(x, y + height, x, y + height - safeRadius, safeRadius)
+		ctx.lineTo(x, y + safeRadius)
+		ctx.arcTo(x, y, x + safeRadius, y, safeRadius)
+		ctx.closePath()
+		ctx.fillStyle = color
+		ctx.fill()
+	}
+
+	const drawCircle = (ctx : CanvasRenderingContext2D, centerX : number, centerY : number, radius : number, color : string) : void => {
+		ctx.beginPath()
+		ctx.arc(centerX, centerY, radius, 0, Math.PI * 2)
+		ctx.closePath()
+		ctx.fillStyle = color
+		ctx.fill()
+	}
+
+	const drawShapeBlock = (ctx : CanvasRenderingContext2D, x : number, y : number, width : number, height : number, color : string, shape : string) : void => {
+		if (shape == 'circle') {
+			drawCircle(ctx, x + (width / 2), y + (height / 2), Math.min(width, height) / 2, color)
+			return
+		}
+		if (shape == 'round') {
+			drawRoundedRect(ctx, x, y, width, height, Math.min(width, height) * 0.28, color)
+			return
+		}
+		ctx.fillStyle = color
+		ctx.fillRect(x, y, width, height)
+	}
+
+	const drawFinderPattern = (ctx : CanvasRenderingContext2D, left : number, top : number, tileSize : number) : void => {
+		const outerSize = tileSize * 7
+		const middleSize = tileSize * 5
+		const innerSize = tileSize * 3
+		const middleOffset = tileSize
+		const innerOffset = tileSize * 2
+		drawShapeBlock(ctx, left, top, outerSize, outerSize, props.color, props.eyeShape)
+		drawShapeBlock(ctx, left + middleOffset, top + middleOffset, middleSize, middleSize, props.bgColor, props.eyeShape)
+		drawShapeBlock(ctx, left + innerOffset, top + innerOffset, innerSize, innerSize, props.color, props.eyeShape)
+	}
+
+	const drawDataModule = (ctx : CanvasRenderingContext2D, x : number, y : number, tileSize : number) : void => {
+		if (props.dotShape == 'dot') {
+			drawCircle(ctx, x + (tileSize / 2), y + (tileSize / 2), tileSize * 0.28, props.color)
+			return
+		}
+		ctx.fillStyle = props.color
+		ctx.fillRect(x, y, tileSize, tileSize)
+	}
+
+	const syncModuleCount = () : void => {
+		if (!hasStrValue(props.value)) {
+			resolvedModuleCount.value = 21
+			return
+		}
+		try {
+			resolvedModuleCount.value = createQRCodeModules(props.value, resolvedLevel.value).length
+		} catch (error) {
+			resolvedModuleCount.value = 21
+		}
+	}
+
+	const syncCanvasSize = () : number[] => {
+		const ctx = renderingContext.value
+		if (ctx == null) {
+			return [codeSize.value, codeSize.value]
+		}
+		const canvas = ctx.canvas
+
+		const dpr = getPixelRatio()
+		const displayWidth = codeSize.value
+		const displayHeight = codeSize.value
+		const targetWidth = displayWidth * dpr
+		const targetHeight = displayHeight * dpr
+		if (canvas.width != targetWidth || canvas.height != targetHeight) {
+			canvas.width = targetWidth
+			canvas.height = targetHeight
+			canvasScaleApplied.value = false
+		}
+		if (!canvasScaleApplied.value) {
+			ctx.scale(dpr, dpr)
+			canvasScaleApplied.value = true
+		}
+		return [displayWidth, displayHeight]
+	}
+
+
+	const loadCanvasImage = (src : string) : Promise<Image | null> => {
+		return new Promise<Image | null>((resolve) => {
+			const canvasContext = canvasContextRef.value
+			if (canvasContext == null) {
+				resolve(null)
+				return
+			}
+			const image = canvasContext.createImage()
+			//必须先设置onload，再设置src
+			//因为src 可能会立即触发加载，先设 src 会有丢事件风险，导致 Promise 悬空，进而让二维码 icon 绘制链路卡住
+			image.onload = () => {
+				resolve(image)
+			}
+
+			image.src = src
+		})
+	}
+
+
+	/**
+	 * 绘制完成事件
+	 */
+	const emitComplete = (tempFilePath : string | null) : void => {
+		emit('complete', {
+			tempFilePath,
+			autoExport: props.autoExport,
+		} as QRCodeCompletePayload)
+	}
+
+	/**
+	 * 失败事件
+	 */
+	const emitError = (payload : QRCodeError) : void => {
+		emit('error', payload)
+	}
+
+	/**
+	 * 获取临时地址，web/小程序 返回base64，app返回图片的临时地址
+	 */
+	const getTempFilePath = () : Promise<string> => {
+		return new Promise<string>((resolve) => {
+			// #ifdef APP
+			const target = wrapperRef.value
+			if (target == null) {
+				resolve('')
+				return
+			}
+			target.takeSnapshot({
+				type: 'file',
+				format: 'png',
+				success: (res) => {
+					resolve(res.tempFilePath)
+				},
+				fail: () => {
+					resolve('')
+				}
+			})
+			return
+			// #endif
+
+			// #ifndef APP
+			const ctx = renderingContext.value
+			if (ctx == null) {
+				resolve('')
+				return
+			}
+			const dataUrl = ctx.canvas.toDataURL('image/png')
+			resolve(dataUrl)
+
+			// #endif
+
+		})
+	}
+
+	/**
+	 * 获取icon
+	 */
+	const drawCenterIcon = async (ctx : CanvasRenderingContext2D) : Promise<void> => {
+		if (!hasCenterIcon.value) {
+			return
+		}
+		const image = await loadCanvasImage(props.icon!)
+		if (image == null) {
+			return
+		}
+		const wrapWidth = iconWidth.value + (iconWrapPadding.value * 2)
+		const wrapHeight = iconHeight.value + (iconWrapPadding.value * 2)
+		const wrapLeft = (codeSize.value - wrapWidth) / 2
+		const wrapTop = (codeSize.value - wrapHeight) / 2
+		const iconLeft = (codeSize.value - iconWidth.value) / 2
+		const iconTop = (codeSize.value - iconHeight.value) / 2
+
+		ctx.fillStyle = props.bgColor
+		ctx.fillRect(wrapLeft, wrapTop, wrapWidth, wrapHeight)
+		ctx.drawImage(image, iconLeft, iconTop, iconWidth.value, iconHeight.value)
+	}
+
+
+	/**
+	 * 绘制二维码
+	 */
+	const drawQRCode = async () : Promise<void> => {
+		try {
+			await nextTick()
+			if (!hasStrValue(props.value)) {
+				const ctx = renderingContext.value
+				if (ctx != null) {
+					const sizeInfo = syncCanvasSize()
+					ctx.clearRect(0, 0, sizeInfo[0], sizeInfo[1])
+					ctx.fillStyle = props.bgColor
+					ctx.fillRect(0, 0, sizeInfo[0], sizeInfo[1])
+				}
+				emitError({
+					code: 1,
+					errMsg: 'qrcode value is required'
+				} as QRCodeError)
+				return
+			}
+			const modules = createQRCodeModules(props.value, resolvedLevel.value)
+			const ctx = renderingContext.value
+			if (ctx == null) {
+				emitError({
+					code: 2,
+					errMsg: 'draw qrcode failedd'
+				} as QRCodeError)
+				return
+			}
+			const sizeInfo = syncCanvasSize()
+			const drawWidth = sizeInfo[0]
+			const drawHeight = sizeInfo[1]
+			const count = modules.length
+			const quietZone = resolvedPadding.value
+			const availableWidth = Math.max(drawWidth - (quietZone * 2), 0)
+			const availableHeight = Math.max(drawHeight - (quietZone * 2), 0)
+			const tileSize = Math.min(availableWidth, availableHeight) / count
+			const offsetX = (drawWidth - (tileSize * count)) / 2
+			const offsetY = (drawHeight - (tileSize * count)) / 2
+			ctx.clearRect(0, 0, drawWidth, drawHeight)
+			ctx.fillStyle = props.bgColor
+			ctx.fillRect(0, 0, drawWidth, drawHeight)
+			ctx.fillStyle = props.color
+
+			for (let row = 0; row < count; row++) {
+				for (let col = 0; col < count; col++) {
+					if (!modules[row][col]) {
+						continue
+					}
+					if (isFinderPatternArea(row, col, count)) {
+						continue
+					}
+					const x = offsetX + (col * tileSize)
+					const y = offsetY + (row * tileSize)
+					drawDataModule(ctx, x, y, tileSize)
+				}
+			}
+			drawFinderPattern(ctx, offsetX, offsetY, tileSize)
+			drawFinderPattern(ctx, offsetX + ((count - 7) * tileSize), offsetY, tileSize)
+			drawFinderPattern(ctx, offsetX, offsetY + ((count - 7) * tileSize), tileSize)
+			await drawCenterIcon(ctx)
+			if (props.autoExport) {
+				await nextTick()
+				const tempFilePath = await getTempFilePath()
+				emitComplete(tempFilePath)
+			} else {
+				emitComplete(null)
+			}
+		} catch (error) {
+			emitError({
+				code: 2,
+				errMsg: 'draw qrcode failedd'
+			} as QRCodeError)
+		}
+	}
+
+	/**
+	 * 获取canvas实例
+	 */
+	const createCanvasContext = () => {
+		uni.createCanvasContextAsync({
+			id: canvasId,
+			component: getCurrentInstance()?.proxy,
+			success: (context : CanvasContext) => {
+				canvasContextRef.value = context
+				renderingContext.value = context.getContext('2d')!
+				drawQRCode()
+			},
+			fail: err => {
+				emitError({
+					code: 0,
+					errMsg: err.errMsg
+				} as QRCodeError)
+			}
+		})
+	}
+
+	const rootStyle = computed(() => {
+		const css = new Map<string, string>()
+		css.set('width', `${wrapperSize.value}px`)
+		css.set('height', `${wrapperSize.value}px`)
+		css.set('background-color', props.bgColor)
+
+		return css
+	})
+
+	const contentStyle = computed(() => {
+		const css = new Map<string, string>()
+		css.set('width', `${codeSize.value}px`)
+		css.set('height', `${codeSize.value}px`)
+		return css
+	})
+
+
+	watch([() : number => props.size > 0 ? props.size : 0, () : number => props.padding != null ? props.padding : -1], () => {
+		drawQRCode()
+	})
+
+	watch([() => props.value, () => props.color, () => props.bgColor, () : string | null => props.level, () => props.eyeShape, () => props.dotShape, () => props.autoExport, () : string | null => props.icon, () => iconWidth.value, () => iconHeight.value], () => {
+		syncModuleCount()
+		drawQRCode()
+	})
+
+	onMounted(() => {
+		syncModuleCount()
+		createCanvasContext()
+	})
+
+	defineExpose({
+		getTempFilePath,
+	})
+</script>
+
+<style scoped lang="scss">
+	.rice-qrcode {
+		position: relative;
+		align-items: center;
+		justify-content: center;
+		border: 1px solid var(--rice-border-color);
+		background-color: #fff;
+		border-radius: 4px;
+
+		&__canvas {
+			width: 160px;
+			height: 160px;
+		}
+
+		&__status {
+			position: absolute;
+			top: 0;
+			left: 0;
+			height: 100%;
+			width: 100%;
+			z-index: 99;
+			align-items: center;
+			justify-content: center;
+			background-color: var(--rice-qrcode-status-background);
+		}
+	}
+</style>

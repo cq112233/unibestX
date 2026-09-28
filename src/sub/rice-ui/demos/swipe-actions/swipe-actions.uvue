@@ -1,0 +1,108 @@
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
+    <view class="p-[16px]">
+      <!-- 基础左滑操作 -->
+      <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
+        <view class="flex-row items-center mb-[12px]">
+          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px]" :style="{ backgroundColor: currentTheme }" />
+          <text class="text-[14px] font-bold text-[#334155]">向左滑动（基础右侧菜单）</text>
+        </view>
+        <rice-swipe-actions>
+          <rice-swipe-actions-item :right-menu="rightOptions" @click="onClickAction">
+            <view class="p-[16px] bg-white border-b border-solid border-[#f1f5f9] flex-row items-center justify-between">
+              <view class="flex-col">
+                <text class="text-[14px] text-[#334155] font-medium">👈 向左滑动单元格 1</text>
+                <text class="text-[12px] text-[#94a3b8] mt-[4px]">支持收藏与删除操作</text>
+              </view>
+              <text class="text-[12px] text-[#94a3b8]">左滑试试</text>
+            </view>
+          </rice-swipe-actions-item>
+          <rice-swipe-actions-item :right-menu="rightOptions" @click="onClickAction">
+            <view class="p-[16px] bg-white flex-row items-center justify-between">
+              <view class="flex-col">
+                <text class="text-[14px] text-[#334155] font-medium">👈 向左滑动单元格 2</text>
+                <text class="text-[12px] text-[#94a3b8] mt-[4px]">点击操作按钮触发回调</text>
+              </view>
+              <text class="text-[12px] text-[#94a3b8]">左滑试试</text>
+            </view>
+          </rice-swipe-actions-item>
+        </rice-swipe-actions>
+      </view>
+
+      <!-- 双向滑动操作 -->
+      <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
+        <view class="flex-row items-center mb-[12px]">
+          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px]" :style="{ backgroundColor: currentTheme }" />
+          <text class="text-[14px] font-bold text-[#334155]">双向滑动（左右均有菜单）</text>
+        </view>
+        <rice-swipe-actions>
+          <rice-swipe-actions-item :left-menu="leftOptions" :right-menu="rightOptions" @click="onClickAction">
+            <view class="p-[16px] bg-white flex-row items-center justify-between">
+              <view class="flex-col">
+                <text class="text-[14px] text-[#334155] font-medium">👉 右滑已读 / 左滑删除 👈</text>
+                <text class="text-[12px] text-[#94a3b8] mt-[4px]">向左或向右滑动均可展开菜单</text>
+              </view>
+            </view>
+          </rice-swipe-actions-item>
+        </rice-swipe-actions>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { useAppStore } from '@/src/store';
+import type { SwipeActionsItemClick, SwipeActionsMenu } from '@/uni_modules/rice-ui';
+import { computed } from 'vue';
+
+definePage({
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
+  style: {
+    navigationBarTitleText: 'SwipeActions 滑动单元格',
+    navigationStyle: 'custom'
+  }
+});
+
+const appStore = useAppStore();
+const currentTheme = computed((): string => appStore.state.theme);
+
+const leftOptions = computed((): SwipeActionsMenu[] => [
+  {
+    text: '已读',
+    style: {
+      backgroundColor: '#10b981',
+      color: '#ffffff'
+    } as UTSJSONObject
+  } as SwipeActionsMenu
+]);
+
+const rightOptions = computed((): SwipeActionsMenu[] => [
+  {
+    text: '收藏',
+    style: {
+      backgroundColor: currentTheme.value,
+      color: '#ffffff'
+    } as UTSJSONObject
+  } as SwipeActionsMenu,
+  {
+    text: '删除',
+    style: {
+      backgroundColor: '#f56c6c',
+      color: '#ffffff'
+    } as UTSJSONObject
+  } as SwipeActionsMenu
+]);
+
+function onClickAction(e: SwipeActionsItemClick) {
+  if (e.position == 'cell') {
+    return;
+  }
+  uni.showToast({
+    title: `点击了${e.position == 'left' ? '左侧' : '右侧'}第 ${e.index + 1} 个操作`,
+    icon: 'none'
+  });
+}
+</script>

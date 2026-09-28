@@ -1,0 +1,21 @@
+
+export type WaterflowProps = {
+	crossAxisCount ?: number, //交叉轴元素数量，默认 2
+	mainAxisGap ?: number,//主轴方向间隔 默认 0
+	crossAxisGap ?: number,//交叉轴方向间隔 默认 0
+	associativeContainer ?: string, //关联的滚动容器 合法值：nested-scroll-view
+	bounces ?: boolean,//控制是否回弹效果 默认 true
+	upperThreshold ?: number, //距顶部/左边多远时（单位px），触发 scrolltoupper 事件 默认50
+	lowerThreshold ?: number,//距底部/右边多远时（单位px），触发 scrolltolower 事件 默认50
+	scrollTop ?: number,//设置竖向滚动条位置 默认 0
+	showScrollbar ?: boolean,//控制是否出现滚动条
+	scrollIntoView ?: string, //值应为某子元素id（id不能以数字开头）。设置哪个方向可滚动，则在哪个方向滚动到该元素起始位置
+	scrollWithAnimation ?: boolean,//是否在设置滚动条位置时使用滚动动画，设置false没有滚动动画，默认false
+	refresherEnabled ?: boolean, //是否开启下拉刷新，默认false
+	refresherThreshold ?: number, //设置下拉刷新阈值, 仅 refresher-default-style = 'none' 自定义样式下生效 默认45
+	refresherDefaultStyle ?: 'black' | 'white' | 'none',//设置下拉刷新默认样式，支持设置 black | white | none， none 表示不使用默认样式
+	refresherBackground ?: string,//设置下拉刷新区域背景颜色，默认透明
+	refresherTriggered ?: boolean,//设置当前下拉刷新状态，true 表示下拉刷新已经被触发，false 表示下拉刷新未被触发
+	enableBackToTop ?: boolean,//iOS点击顶部状态栏滚动条返回顶部，只支持竖向
+	customNestedScroll ?: boolean,//	子元素是否开启嵌套滚动 将滚动事件与父元素协商处理，默认false
+}

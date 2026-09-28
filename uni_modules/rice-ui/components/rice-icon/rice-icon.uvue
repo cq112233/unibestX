@@ -1,0 +1,91 @@
+<template>
+	<text v-if="!isImage" class="rice-icon" :class="iconClass" :style="[iconStyle,customStyle]" @click="iconClick">
+		<slot>{{iconCode}}</slot>
+	</text>
+	<image v-else :src="name" class="rice-icon__image" :style="[imageStyle,customStyle]" @click="iconClick"></image>
+</template>
+
+<script setup>
+	import { addUnit, hasStrValue } from '../../libs/utils';
+	import { useNamespace } from "../../libs/use";
+	import { IconProps } from './type.uts';
+	import { fontData } from './font';
+
+	defineOptions({
+		name: 'rice-icon',
+		styleIsolation: 'app-and-page'
+	})
+
+	const ns = useNamespace('icon')
+
+	const emit = defineEmits<{
+		click : []
+	}>()
+
+	const props = withDefaults(defineProps<IconProps>(), {
+		name: "",
+		size: '16px',
+		customStyle: () : UTSJSONObject => ({})
+	})
+
+	const isBase64 = () => {
+		return props.name.indexOf('data:') > -1 && props.name.indexOf('base64') > -1;
+	}
+
+	const isImage = computed<boolean>(() => props.name.includes('/') || isBase64())
+
+	const iconCode = computed(() => {
+		if (hasStrValue(props.fontFamily)) return String.fromCharCode(parseInt(props.name, 16))
+		return fontData.find(v => v.name == props.name)?.code ?? ""
+	})
+
+	const iconClick = () => {
+		emit('click')
+	}
+
+	const iconStyle = computed(() => {
+		const css = new Map<string, string>()
+		if (props.size != null) css.set('font-size', addUnit(props.size!))
+		if (hasStrValue(props.color)) css.set('color', props.color!)
+		if (hasStrValue(props.fontFamily)) css.set('font-family', props.fontFamily!)
+		return css
+	})
+
+	const imageStyle = computed(() => {
+		const css = new Map<string, string>()
+		if (props.size != null) {
+			const size = addUnit(props.size!)
+			css.set('height', addUnit(size))
+			css.set('width', addUnit(size))
+		}
+		return css
+	})
+
+	const iconClass = computed(() => {
+		return [
+			ns.theme(),
+			ns.is('bold', props.bold ?? false)
+		]
+	})
+</script>
+
+<style scoped lang="scss">
+	@font-face {
+		font-family: riceIcon;
+		src: url('../../static/font/riceIcon.ttf');
+	}
+
+	.rice-icon {
+		color: var(--rice-text-color-2);
+		font-family: riceIcon;
+
+		&--bold {
+			font-weight: bold;
+		}
+
+		&__image {
+			height: 16px;
+			width: 16px;
+		}
+	}
+</style>

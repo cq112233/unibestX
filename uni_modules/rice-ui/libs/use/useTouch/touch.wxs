@@ -1,0 +1,72 @@
+/**
+ * 此为wxs模块，支持微信小程序
+ * wxs内部不支持es6语法，变量只能使用var定义，无法使用解构，箭头函数等特性
+ */
+
+var MIN_DISTANCE = 10;
+var LOCK_DIRECTION_DISTANCE = 10;
+var TAP_OFFSET = 10;
+
+/**
+ * 获取滑动的方向
+ */
+var MIN_DISTANCE = 10;
+
+function getSlideDirection(x, y) {
+	if (x > y && x > MIN_DISTANCE) {
+		return 'horizontal'; //水平
+	}
+	if (y > x && y > MIN_DISTANCE) {
+		return 'vertical'; //垂直
+	}
+	return '';
+}
+
+
+function reset(state) {
+	state.x = state.x || 0
+	state.y = state.y || 0
+	state.deltaX = 0
+	state.deltaY = 0
+	state.offsetX = 0
+	state.offsetY = 0
+	state.direction = ''
+	state.isTap = true
+	state.dragging = true
+}
+
+function start(event, ownerInstance, state) {
+	reset(state)
+	var touches = event.touches[0]
+	state.startX = touches.clientX
+	state.startY = touches.clientY
+}
+
+function move(event, ownerInstance, state) {
+	var touches = event.touches[0]
+	state.deltaX = touches.clientX - state.startX
+	state.deltaY = touches.clientY - state.startY
+	state.offsetX = Math.abs(state.deltaX)
+	state.offsetY = Math.abs(state.deltaY)
+	if (state.direction == "" ||
+		(state.offsetX < LOCK_DIRECTION_DISTANCE &&
+			state.offsetY < LOCK_DIRECTION_DISTANCE)
+	) {
+		state.direction = getSlideDirection(state.offsetX, state.offsetY)
+	}
+
+	if (state.isTap && (state.offsetX > TAP_OFFSET || state.offsetY > TAP_OFFSET)) {
+		state.isTap = false
+	}
+}
+
+function end(state) {
+	state.dragging = false
+}
+
+module.exports = {
+	start: start,
+	move: move,
+	end: end,
+	getSlideDirection: getSlideDirection,
+}

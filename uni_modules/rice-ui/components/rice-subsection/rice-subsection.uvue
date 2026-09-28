@@ -1,0 +1,254 @@
+<template>
+	<view class="rice-subsection" :class="rootClass" ref="subsectionRef">
+		<view class="rice-subsection__bar" :class="barViewClass" ref="barRef"></view>
+		<view v-for="(item,index) in list" :key="index" class="rice-subsection__item" :class="itemClass" ref="itemRef"
+			@click="handleClick(index)">
+			<slot :index="index" :subname="item">
+				<text class="rice-subsection__item__text" :class="getTextClass(index)">{{item}}</text>
+			</slot>
+		</view>
+	</view>
+</template>
+
+<script setup>
+	import { useNamespace } from '../../libs/use';
+	import { SubsectionProps, SubsectionItemRect } from "./type.uts"
+
+	defineOptions({
+		name: 'rice-subsection',
+		styleIsolation: 'app-and-page'
+	})
+
+	defineSlots<{
+		default(props : { index : number, subname : string }) : any
+	}>()
+
+	const ns = useNamespace('subsection')
+
+	const emit = defineEmits<{
+		change : [index: number],
+		clickSub : [index: number]
+	}>()
+
+	const current = defineModel({
+		type: Number,
+		default: 0
+	})
+
+	const props = withDefaults(defineProps<SubsectionProps>(), {
+		list: () : string[] => ([]),
+		shape: "square",
+		duration: 300,
+		initAnimate: false,
+		itemClass: "",
+		barClass: "",
+		textClass: "",
+		activeTextClass: "",
+		inactiveTextClass: "",
+	})
+
+	const itemRef = shallowRef<UniElement[]>([])
+	const barRef = shallowRef<UniElement | null>(null)
+	const isFirstMove = ref(true)
+
+	const itemRect = ref<SubsectionItemRect>({
+		width: 0,
+		height: 0
+	})
+
+	/**
+	 * 设置bar的位置
+	 */
+
+	const setBarPosition = (index : number) => {
+		const x = index * itemRect.value.width
+		//首次是否需要动画效果
+		let duration = props.duration
+		if (!props.initAnimate && isFirstMove.value) {
+			duration = 0
+		}
+		barRef.value?.style.setProperty('transition-duration', `${duration}ms`)
+		barRef.value?.style.setProperty('transform', `translateX(${x}px)`)
+		isFirstMove.value = false
+	}
+
+	/**
+	 * 点击事件
+	 */
+	const handleClick = async (index : number) => {
+		if (current.value == index) return
+		if (typeof props.beforeChange == 'function') {
+			const flag = await props.beforeChange!(index)
+			if (flag == false) {
+				emit('clickSub', index)
+				return
+			}
+		}
+		current.value = index
+		setBarPosition(index)
+		emit('change', index)
+		emit('clickSub', index)
+	}
+
+
+	/**
+	 * 初始化
+	 */
+
+	const init = async () => {
+		await nextTick()
+		if (itemRef.value.length <= 0) return
+		const rect = await itemRef.value[0].getBoundingClientRectAsync()!
+		itemRect.value.width = rect.width
+		itemRect.value.height = rect.height
+		barRef.value?.style.setProperty('height', `${itemRect.value.height}px`)
+		barRef.value?.style.setProperty('width', `${itemRect.value.width}px`)
+		setBarPosition(current.value)
+	}
+
+	// #ifndef MP
+	/**
+	 * 监听元素尺寸变化
+	 */
+	const subsectionRef = shallowRef<UniElement | null>(null)
+	const resizeObserver = ref<UniResizeObserver | null>(null)
+	let isFirstObserver = true
+	const lastRect : SubsectionItemRect = {
+		height: 0,
+		width: 0,
+	}
+
+	const initObserver = async () => {
+		if (subsectionRef.value == null) return
+		//先获取subsection的尺寸
+		if (lastRect.height == 0) {
+			const rect = await subsectionRef.value!.getBoundingClientRectAsync()!
+			lastRect.height = rect.height
+			lastRect.width = rect.width
+		}
+		resizeObserver.value = new UniResizeObserver((entries : UniResizeObserverEntry[]) => {
+			const target = entries.find(item => item.target == subsectionRef.value)
+			if (target != null) {
+				const contentRect = target.contentRect
+				//Android不知道为什么会切换current的值时一直触发这个事件
+				//用lastRect和当前的宽度做个对比，任一尺寸不一致时才更新
+				if (lastRect.height != contentRect.height || lastRect.width != contentRect.width) {
+					if (!isFirstObserver) {
+						init()
+					}
+					lastRect.height = contentRect.height
+					lastRect.width = contentRect.width
+				}
+				isFirstObserver = false
+			}
+		})
+		resizeObserver.value!.observe(subsectionRef.value!)
+	}
+
+	// #endif
+
+	//根节点样式
+	const rootClass = computed(() => {
+		return [
+			ns.theme(),
+			ns.is('round', props.shape == 'round')
+		]
+	})
+
+	//bar 样式
+	const barViewClass = computed(() => {
+		const basic : string[] = []
+		if (props.shape == 'round') {
+			basic.push('rice-subsection__bar--round')
+		}
+		basic.push(props.barClass)
+		return basic
+	})
+
+	//文字样式
+	const getTextClass = (index : number) => {
+		const basic : string[] = [props.textClass]
+		if (index == current.value) {
+			basic.push('rice-subsection__item__text--active')
+			basic.push(props.activeTextClass)
+		} else {
+			basic.push(props.inactiveTextClass)
+		}
+
+		return basic
+	}
+
+	watch(current, (newVal : number) => {
+		setBarPosition(newVal)
+	})
+
+	watch(() : string[] => props.list, () => {
+		init()
+	}, {
+		deep: true
+	})
+
+	onMounted(() => {
+		init()
+		// #ifndef MP
+		nextTick(() => {
+			initObserver()
+		})
+		// #endif
+	})
+
+	// #ifndef MP
+	onUnmounted(() => {
+		if (subsectionRef.value != null) {
+			resizeObserver.value?.unobserve(subsectionRef.value!)
+		}
+	})
+	// #endif
+
+	defineExpose({
+		init
+	})
+</script>
+
+<style scoped lang="scss">
+	.rice-subsection {
+		position: relative;
+		flex-direction: row;
+		background-color: var(--rice-subsection-background);
+		height: 36px;
+		border-radius: 4px;
+		padding: 3px;
+
+		&--round {
+			border-radius: 999px;
+		}
+
+		&__bar {
+			position: absolute;
+			background-color: var(--rice-subsection-bar-background);
+			border-radius: 4px;
+			transition-property: transform;
+
+			&--round {
+				border-radius: 999px;
+			}
+		}
+
+		&__item {
+			align-items: center;
+			justify-content: center;
+			flex: 1;
+
+			&__text {
+				font-size: 15px;
+				color: var(--rice-text-color);
+				transition-property: transform, color;
+				transition-duration: 300ms;
+
+				&--active {
+					color: var(--rice-primary-color);
+				}
+			}
+		}
+	}
+</style>

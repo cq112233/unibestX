@@ -1,0 +1,1365 @@
+<template>
+	<rice-overlay v-if="usePopup" v-model:show="show" :z-index="zIndex-1" :close-on-click-overlay="closeOnClickOverlay"
+		:duration="300" />
+	<view v-if="isShow" class="rice-calendar" :class="rootClass" :style="[rootStyle,customStyle]" ref="calendarRef">
+		<view v-if="showTitle||closeable" class="rice-calendar__title">
+			<text v-if="showTitle" class="rice-calendar__title__text">{{title}}</text>
+			<rice-icon v-if="closeable" :name="closeIcon" :custom-style="closeStyle" size="20px" @click="clickClose" />
+		</view>
+		<slot name="header" :panelDate="getPanelYearMonth()" :currentWeek="currentWeekIndex+1">
+			<view v-if="switchMode!='none'||showSubtitle" class="rice-calendar__switch">
+				<view v-if="switchMode!='none'" class="rice-calendar__switch__action">
+					<rice-icon v-if="switchMode!='month'" name="double-left" :custom-style="switchArrowStyle"
+						@click="getLastYear" />
+					<rice-icon name="arrow-left" :custom-style="switchArrowStyle" @click="getLastMonth" />
+				</view>
+				<text v-if="showSubtitle" class="rice-calendar__switch__text">{{formatPanelDate}}</text>
+				<view v-if="switchMode!='none'" class="rice-calendar__switch__action">
+					<rice-icon name="arrow-right" :custom-style="switchArrowStyle" @click="getNextMonth" />
+					<rice-icon v-if="switchMode!='month'" name="double-right" :custom-style="switchArrowStyle"
+						@click="getNextYear" />
+				</view>
+			</view>
+		</slot>
+		<view class="rice-calendar__header">
+			<text flatten v-for="item in weekList" :key="item" class="rice-calendar__week">{{item}}</text>
+		</view>
+		<view class="rice-calendar__body" :class="{'rice-calendar__body--week':weeklyCalendar}" ref="bodyRef"
+			@click="onClick">
+			<!-- #ifdef VUE3-VAPOR || MP ||WEB -->
+			<text v-if="showMonthMark" class="rice-calendar__body__mark">{{currentMonth}}</text>
+			<!-- #endif -->
+			<!-- #ifdef VUE3-VAPOR || WEB || MP -->
+			<view class="rice-calendar__days" v-for="(item,index) in displayMonthDays" flatten
+				:key="getWeekRowKey(item, index)">
+				<view v-for="day in item" :key="day.fullDate" class="rice-calendar__day" :class="getDayClass(day,index)"
+					:style="getDayStyle(day,index)" flatten @click="handleClick(day)">
+					<text v-if="hasStrValue(day.topInfo)" flatten class="rice-calendar__day__top"
+						:class="getDayTextClass(day,index,'top')" :style="getTopTextStyle(day)">{{day.topInfo}}</text>
+					<text class="rice-calendar__day__text" :class="getDayTextClass(day,index,'inner')"
+						:style="getDayTextStyle(day,index)" flatten>{{hasStrValue(day.text) ? day.text : day.date}}</text>
+					<text v-if="lunar||getBottomInfo(day)!=null" flatten class="rice-calendar__day__bottom"
+						:class="getDayTextClass(day,index,'bottom')" :style="getBottomTextStyle(day)">{{getBottomInfo(day)}}</text>
+				</view>
+			</view>
+			<!-- #endif -->
+
+		</view>
+		<view v-if="showConfirmBtn" class="rice-calendar__footer">
+			<rice-button :color="color" type="primary" :disabled="confirmDisabled" :text="confirmText" shape="round"
+				@click="onConfirm" />
+		</view>
+	</view>
+</template>
+
+<script setup>
+	import { useNamespace, usePopup as usePopupBottom, useSafeArea, safeAreaInsets } from "../../libs/use"
+	import { isDark } from "../../libs/store"
+	import { dateuts, Coloruts } from "../../libs/plugin"
+	import { CalendarProps, CalendarData, CalendarSwitchPanelType, CalendarPanelChangeResult, GridItem } from "./type.uts"
+	import { addUnit, getPxNum, clamp, hasStrValue } from "../../libs/utils"
+	import { getMonthDays, getDateRange, getFirstWeekDays, getIsBetween, getIsSelected, formatDate } from "./utils"
+
+
+	defineOptions({
+		name: 'rice-calendar',
+		styleIsolation: 'app-and-page'
+	})
+	const ns = useNamespace('calendar')
+	useSafeArea()
+	const emit = defineEmits<{
+		select : [value: string | string[]],
+		confirm : [value: string | string[]],
+		unselect : [value: string],
+		panelChange : [value: CalendarPanelChangeResult],
+		clickDisabledDate : [value: string],
+		clickClose : [],
+		open : [],
+		close : [],
+		opened : [],
+		closed : [],
+		overRange : [],
+	}>()
+
+	defineSlots<{
+		header(props : { panelDate : string, currentWeek : number }) : any
+	}>()
+
+
+	const props = withDefaults(defineProps<CalendarProps>(), {
+		mode: "single",
+		switchMode: 'year-month',
+		lunar: false,
+		showTitle: true,
+		title: '请选择日期',
+		showSubtitle: true,
+		rowHeight: '60px',
+		firstDayOfWeek: 1,
+		showConfirmBtn: true,
+		confirmText: '确认',
+		showRangePrompt: true,
+		allowSameDay: false,
+		closeable: true,
+		closeIcon: 'cross',
+		usePopup: true,
+		closeOnClickClose: true,
+		closeOnClickOverlay: true,
+		safeAreaInsetBottom: null,
+		zIndex: 999,
+		weeklyCalendar: false,
+		showWeeklyText: true,
+		showFullDate: null, //补齐前后月日期，始终显示完整 7 列，周日历默认为true
+		showMonthMark: false,
+		customStyle: () : UTSJSONObject => ({})
+	})
+
+
+	const show = defineModel('show', {
+		type: Boolean,
+		default: false,
+	})
+
+	const calendarRef = shallowRef<UniElement | null>(null)
+	const { realShow } = usePopupBottom(calendarRef, {
+		show,
+		duration: 300,
+		position: 'bottom',
+		opacity: false,
+	})
+
+	const isShow = computed(() => props.usePopup ? realShow.value : true)
+	const _showFullDate = computed<boolean>(() => props.showFullDate ?? props.weeklyCalendar)
+
+	// #ifdef APP && !VUE3-VAPOR
+	let drawBody : (() => Promise<void>) | null = null
+	// #endif
+
+	//该日期是否禁用，主要作用于文字样式
+	const getDayIsDisabled = (day : CalendarData) => {
+		//非禁用的日期（一行中上一个月剩余的那几天，下个月开始的那几天）且当前选中了，返回 false
+		// if (isSelected && !day.disabled) return false
+		//周日历上一个月/下一个月多出的那几天文字不置灰
+		if (props.weeklyCalendar && day.disabled == false) return false
+		return day.disabled == true || day.isCurrentMonth == false
+	}
+
+
+	const getInitDate = () : string[] => {
+		const mode = props.mode
+		let defaultDate = props.date
+		if (defaultDate == "") {
+			return [] as string[]
+		}
+		const today = dateuts().format('YYYY-MM-DD')
+		let dates = [] as string[]
+		if (typeof defaultDate == 'string') {
+			dates = [(defaultDate as string)]
+		} else if (Array.isArray(defaultDate)) {
+			dates = (defaultDate as string[]).slice()
+		}
+		if (dates.length == 0) {
+			dates.push(today)
+		}
+
+		if (mode == 'range' && dates.length >= 2) {
+			const start = getDateRange(dates[0], props.minDate, props.maxDate)
+			const end = getDateRange(dates[1], props.minDate, props.maxDate)
+			if (dateuts(start).isAfter(end)) {
+				return [end, start] as string[]
+			}
+			return [start, end] as string[]
+		}
+		return dates.map(v => getDateRange(v, props.minDate, props.maxDate))
+	}
+
+
+	const currentDate = ref<string[]>(getInitDate())
+
+	const getInitPanelDate = () => {
+		const date = currentDate.value
+		if (date.length > 0) return date[0]
+		return getDateRange(dateuts().format('YYYY-MM-DD'), props.minDate, props.maxDate)
+	}
+
+	// #ifdef APP 
+	const primaryColor = ref('')
+
+	const activeColor = computed<string>(() => {
+		const color = props.color ?? primaryColor.value
+		return color == '' ? '#1989fa' : color
+	})
+
+	const getTintColor = (color : string) => {
+		const colorUts = new Coloruts(color)
+		return isDark.value
+			? colorUts.mix('#141414', 90).toHexString()
+			: colorUts.tint(90).toHexString()
+	}
+
+
+	// #endif
+
+	//起始周
+	const firstDayOfWeek = computed(() => clamp(props.firstDayOfWeek, 1, 7))
+
+	const currentPanelDate = ref(getInitPanelDate())
+	const monthDays = ref<Array<Array<CalendarData>>>([])
+	monthDays.value = getMonthDays([currentPanelDate.value], firstDayOfWeek.value, props.formatter, props.minDate, props.maxDate, _showFullDate.value)
+
+	const currentMonth = computed(() => dateuts(currentPanelDate.value).format('M'))
+
+	const currentWeekIndex = computed(() : number => {
+		if (props.weeklyCalendar == false) return 0
+		const panelDate = formatDate(currentPanelDate.value)
+		for (let week = 0; week < monthDays.value.length; week++) {
+			const weekItem = monthDays.value[week]
+			const dayIndex = weekItem.findIndex(day => day.fullDate == panelDate)
+			if (dayIndex != -1) {
+				return week
+			}
+		}
+		return 0
+	})
+
+	const displayMonthDays = computed(() : Array<Array<CalendarData>> => {
+		if (props.weeklyCalendar == false) {
+			return monthDays.value
+		}
+		if (monthDays.value.length == 0) {
+			return [] as Array<Array<CalendarData>>
+		}
+		return [monthDays.value[currentWeekIndex.value]] as Array<Array<CalendarData>>
+	})
+
+
+	/**
+	 * 必写，不然鸿蒙蒸汽模式日期可能不显示
+	 */
+	const displayMonthDaysRenderKey = computed(() : string => {
+		// #ifdef  APP-HARMONY
+		const list = displayMonthDays.value
+		const rowCount = list.length
+		const first = rowCount > 0 && list[0].length > 0 ? list[0][0].fullDate : 'empty'
+		const lastRow = rowCount > 0 ? list[rowCount - 1] : [] as CalendarData[]
+		const last = lastRow.length > 0 ? lastRow[lastRow.length - 1].fullDate : 'empty'
+		return `${currentPanelDate.value}-${rowCount}-${first}-${last}`
+		// #endif
+
+		// #ifndef APP-HARMONY
+		return '1'
+		// #endif
+	})
+
+	const getWeekRowKey = (weekItem : Array<CalendarData>, index : number) : string => {
+		// #ifndef APP-HARMONY
+		return `${index}`
+		// #endif
+		// #ifdef APP-HARMONY
+		const first = weekItem.length > 0 ? weekItem[0].fullDate : `empty-${index}`
+		const last = weekItem.length > 0 ? weekItem[weekItem.length - 1].fullDate : `empty-${index}`
+		return `${props.weeklyCalendar}-${displayMonthDaysRenderKey.value}-${first}-${last}-${index}`
+		// #endif
+	}
+
+	const getRealWeekIndex = (index : number) => {
+		if (props.weeklyCalendar == false) return index
+		return currentWeekIndex.value + index
+	}
+
+	const formatPanelDate = computed(() => {
+		if (props.weeklyCalendar && props.showWeeklyText) {
+			return `${dateuts(currentPanelDate.value).format('YYYY年M月')} 第${currentWeekIndex.value + 1}周`
+		}
+		return dateuts(currentPanelDate.value).format('YYYY年M月')
+	})
+
+	/**
+	 * 周期
+	 */
+
+	const weeks = ['一', '二', '三', '四', '五', '六', '日']
+	const weekList = computed(() => {
+		if (firstDayOfWeek.value == 1) return weeks
+		const firstDay = firstDayOfWeek.value
+		return [...weeks.slice(firstDay - 1, 7), ...weeks.slice(0, firstDay - 1)]
+	})
+
+	/**
+	 * 日期底部信息
+	 */
+	const getBottomInfo = (day : CalendarData) : string | null => {
+		if (hasStrValue(day.bottomInfo)) return day.bottomInfo!
+		if (props.mode == 'range') {
+			const dates = currentDate.value
+			if (props.allowSameDay == true
+				&& dates.length >= 2
+				&& getIsSelected(day, currentDate.value, props.mode)
+				&& dateuts(dates[0]).isSame(dates[1])) {
+				return '开始/结束'
+			}
+			if (dateuts(day.fullDate).isSame(dates[0])) return '开始'
+			if (dates.length >= 2 && dateuts(day.fullDate).isSame(dates[1])) return '结束'
+		}
+		return props.lunar ? day.lunarInfo?.IDayCn : null
+	}
+
+	/**
+	 * 获取当前日历对应的年月
+	 */
+
+	const getPanelYearMonth = () => {
+		return dateuts(currentPanelDate.value).format('YYYY-MM')
+	}
+
+	const getPanelYearMonthByDate = (panelDate : string) : string => {
+		return dateuts(panelDate).format('YYYY-MM')
+	}
+
+	const getPanelWeekByDate = (panelDate : string) : number => {
+		if (props.weeklyCalendar == false) {
+			return 1
+		}
+		const normalizedDate = formatDate(panelDate)
+		const panelMonthDays = getMonthDays([normalizedDate], firstDayOfWeek.value, props.formatter, props.minDate, props.maxDate, _showFullDate.value)
+		for (let week = 0; week < panelMonthDays.length; week++) {
+			const weekItem = panelMonthDays[week]
+			const dayIndex = weekItem.findIndex(day => day.fullDate == normalizedDate)
+			if (dayIndex != -1) {
+				return week + 1
+			}
+		}
+		return 1
+	}
+
+	const getPanelRowsByDate = (panelDate : string) : Array<Array<CalendarData>> => {
+		const normalizedDate = props.weeklyCalendar ? formatDate(panelDate) : panelDate
+		const panelMonthDays = getMonthDays([normalizedDate], firstDayOfWeek.value, props.formatter, props.minDate, props.maxDate, _showFullDate.value)
+		if (props.weeklyCalendar == false) {
+			return panelMonthDays
+		}
+		for (let week = 0; week < panelMonthDays.length; week++) {
+			const weekItem = panelMonthDays[week]
+			const dayIndex = weekItem.findIndex(day => day.fullDate == normalizedDate)
+			if (dayIndex != -1) {
+				return [weekItem] as Array<Array<CalendarData>>
+			}
+		}
+		return panelMonthDays.length > 0 ? [panelMonthDays[0]] as Array<Array<CalendarData>> : [] as Array<Array<CalendarData>>
+	}
+
+	const getPanelChangeResultByDate = (panelDate : string) : CalendarPanelChangeResult => {
+		const panelRows = getPanelRowsByDate(panelDate)
+		const panelYearMonth = getPanelYearMonthByDate(panelDate)
+		let firstDate = dateuts(panelDate).startOf('month').format('YYYY-MM-DD')
+		let lastDate = dateuts(panelDate).endOf('month').format('YYYY-MM-DD')
+		let prevMonthFirstDate = ''
+		let nextMonthLastDate = ''
+		if (props.weeklyCalendar && panelRows.length > 0) {
+			firstDate = ''
+			lastDate = ''
+		}
+		for (let rowIndex = 0; rowIndex < panelRows.length; rowIndex++) {
+			const row = panelRows[rowIndex]
+			for (let dayIndex = 0; dayIndex < row.length; dayIndex++) {
+				const day = row[dayIndex]
+				const dayYearMonth = dateuts(day.fullDate).format('YYYY-MM')
+				if (props.weeklyCalendar && dayYearMonth == panelYearMonth) {
+					if (firstDate == '') {
+						firstDate = day.fullDate
+					}
+					lastDate = day.fullDate
+				}
+				if (dayYearMonth < panelYearMonth && prevMonthFirstDate == '') {
+					prevMonthFirstDate = day.fullDate
+				}
+				if (dayYearMonth > panelYearMonth) {
+					nextMonthLastDate = day.fullDate
+				}
+			}
+		}
+		if (props.weeklyCalendar && firstDate == '') {
+			firstDate = dateuts(panelDate).format('YYYY-MM-DD')
+			lastDate = firstDate
+		}
+		return {
+			firstDate,
+			lastDate,
+			panelDate: panelYearMonth,
+			prevMonthFirstDate,
+			nextMonthLastDate,
+			week: getPanelWeekByDate(panelDate)
+		}
+	}
+
+	const emitPanelChangeByDate = (panelDate : string) => {
+		emit('panelChange', getPanelChangeResultByDate(panelDate))
+	}
+
+	const getPanelDate = () => {
+		return getPanelYearMonth()
+	}
+
+	const setPanelDate = (panelDate : string) => {
+		currentPanelDate.value = panelDate
+		emitPanelChangeByDate(panelDate)
+	}
+
+
+	const shiftPanelDate = (step : number, unit : string, format : string) => {
+		//@ts-ignore
+		const panelDate = dateuts(currentPanelDate.value).add(step, unit).format(format)
+		setPanelDate(panelDate)
+	}
+
+
+	const getLastMonth = () => {
+		if (props.weeklyCalendar) {
+			shiftPanelDate(-7, 'day', 'YYYY-MM-DD')
+		} else {
+			shiftPanelDate(-1, 'month', 'YYYY-MM')
+		}
+	}
+
+	const getNextMonth = () => {
+		if (props.weeklyCalendar) {
+			shiftPanelDate(7, 'day', 'YYYY-MM-DD')
+		} else {
+			shiftPanelDate(1, 'month', 'YYYY-MM')
+		}
+	}
+
+	const getLastYear = () => {
+		if (props.weeklyCalendar) {
+			shiftPanelDate(-1, 'month', 'YYYY-MM-DD')
+		} else {
+			shiftPanelDate(-1, 'year', 'YYYY-MM')
+		}
+	}
+
+	const getNextYear = () => {
+		if (props.weeklyCalendar) {
+			shiftPanelDate(1, 'month', 'YYYY-MM-DD')
+		} else {
+			shiftPanelDate(1, 'year', 'YYYY-MM')
+		}
+	}
+
+	const getLastWeek = () => {
+		if (props.weeklyCalendar == false) return
+		shiftPanelDate(-7, 'day', 'YYYY-MM-DD')
+	}
+
+	const getNextWeek = () => {
+		if (props.weeklyCalendar == false) return
+		shiftPanelDate(7, 'day', 'YYYY-MM-DD')
+	}
+
+	const switchPanelMonth = (step : number) => {
+		const format = props.weeklyCalendar ? 'YYYY-MM-DD' : 'YYYY-MM'
+		shiftPanelDate(step, 'month', format)
+	}
+
+	const switchPanelYear = (step : number) => {
+		const format = props.weeklyCalendar ? 'YYYY-MM-DD' : 'YYYY-MM'
+		shiftPanelDate(step, 'year', format)
+	}
+
+
+
+	//@ts-ignore
+	const switchPanel = (type : CalendarSwitchPanelType) => {
+		if (type == 'prev-week') {
+			getLastWeek()
+		} else if (type == 'next-week') {
+			getNextWeek()
+		} else if (type == 'prev-month') {
+			switchPanelMonth(-1)
+		} else if (type == 'next-month') {
+			switchPanelMonth(1)
+		} else if (type == 'next-year') {
+			switchPanelYear(1)
+		} else if (type == 'prev-year') {
+			switchPanelYear(-1)
+		}
+	}
+
+
+
+	/**
+	 * 选择超出最多可选天数
+	 */
+
+	const handleOverRange = () => {
+		emit('overRange')
+		if (props.showRangePrompt == false) return
+		const rangePrompt = props.rangePrompt ?? `最多选择${props.maxRange}天`
+		uni.showToast({
+			title: rangePrompt,
+			icon: 'none'
+		})
+	}
+
+	const confirmDisabled = computed(() => {
+		const len = currentDate.value.length;
+		return len <= 0 || (props.mode === 'range' && len < 2);
+	})
+
+	const confirmText = computed<string>(() => {
+		if (confirmDisabled.value && hasStrValue(props.confirmDisabledText)) {
+			return props.confirmDisabledText!
+		}
+		return props.confirmText
+	})
+
+	/**
+	 * 确认
+	 */
+	const onConfirm = () => {
+		if (confirmDisabled.value) {
+			return
+		}
+		emit('confirm', props.mode == 'single' ? currentDate.value[0] : currentDate.value.slice())
+		show.value = false
+	}
+
+	let drawTimer : number | null = null
+
+
+	const handleSelect = (date : string[]) => {
+		if (props.mode == 'range' && date.length >= 2 && props.maxRange != null) {
+			const diff = dateuts(date[1]).diff(date[0], 'day') + 1
+			if (diff > props.maxRange!) {
+				handleOverRange()
+				return
+			}
+		}
+		currentDate.value = date
+		emit('select', props.mode == 'single' ? date[0] : date.slice())
+		// #ifdef APP && !VUE3-VAPOR
+		drawBody?.()
+		// #endif
+		if (props.showConfirmBtn == false) {
+			onConfirm()
+		}
+	}
+
+
+	const handleClick = (day : CalendarData) => {
+		const fullDate = day.fullDate
+		if (props.readonly == true || (day.isCurrentMonth == false && !props.weeklyCalendar)) return
+		if (day.disabled == true) {
+			emit('clickDisabledDate', fullDate)
+			return
+		}
+		if (props.mode == 'range') {
+			if (currentDate.value.length == 0) {
+				handleSelect([fullDate])
+				return
+			}
+			const start = currentDate.value[0]
+			const end = currentDate.value.length >= 2
+				? currentDate.value[1]
+				: null
+			if (end == null) {
+				const isAfter = dateuts(fullDate).isAfter(start)
+				if (isAfter) {
+					handleSelect([start, fullDate])
+				} else if (dateuts(fullDate).isBefore(start)) {
+					handleSelect([fullDate])
+				} else if (props.allowSameDay) {
+					handleSelect([fullDate, fullDate])
+				}
+			} else {
+				handleSelect([fullDate])
+			}
+		} else if (props.mode == 'multiple') {
+			const selectedIndex = currentDate.value.findIndex(v => dateuts(v).isSame(fullDate))
+			if (selectedIndex != -1) {
+				let unselect = currentDate.value.splice(selectedIndex, 1)
+				// #ifdef APP && !VUE3-VAPOR
+				drawBody?.()
+				// #endif
+				emit('unselect', unselect[0])
+			} else if (props.maxRange != null && currentDate.value.length >= props.maxRange!) {
+				handleOverRange()
+			} else {
+				handleSelect([...currentDate.value, fullDate])
+			}
+		} else {
+			handleSelect([fullDate])
+		}
+
+	}
+	const bodyRef = shallowRef<UniElement | null>(null)
+
+	let cachedRowHeight = 0
+
+	// #ifdef APP && !VUE3-VAPOR
+	let gridItem = [] as Array<GridItem>
+	let gridCacheKey = ''
+	let cachedBodyWidth = 0
+	let cachedOneWidth = 0
+	let cachedTextColor = ''
+	let cachedInfoTextColor = ''
+	let cachedMarkColor = ''
+	let cachedDisabledColor = ''
+	let cachedPrimaryColor = ''
+	let cachedRangeTintColor = ''
+	// #endif
+
+	// #ifdef APP
+	const getCalendarGrid = (width : number) => {
+		const gridList = [] as GridItem[]
+		const oneWidth = width / weekList.value.length
+		const oneHeight = cachedRowHeight > 0 ? cachedRowHeight : getPxNum(addUnit(props.rowHeight))
+		for (let week = 0; week < displayMonthDays.value.length; week++) {
+			const weekItem = displayMonthDays.value[week]
+			const realWeekIndex = getRealWeekIndex(week)
+			for (let day = 0; day < weekItem.length; day++) {
+				const dayItem = weekItem[day]
+				let space = day
+				if (realWeekIndex == 0) {
+					space = 7 - weekItem.length + day
+				}
+				gridList.push({
+					x: space * oneWidth,
+					y: oneHeight * week + 4,
+					width: oneWidth,
+					height: oneHeight,
+					data: dayItem
+				} as GridItem)
+			}
+		}
+		return gridList
+	}
+	// #endif
+
+	// #ifdef APP && !VUE3-VAPOR
+
+	const bodyHeight = ref(300)
+
+	//缓存部分数据，避免每次重绘都重复取样式和重复算格子
+	const getDrawGridCacheKey = () : string => {
+		const weekCount = displayMonthDays.value.length
+		const firstWeek = weekCount > 0 ? displayMonthDays.value[0] : [] as CalendarData[]
+		const lastWeek = weekCount > 0 ? displayMonthDays.value[weekCount - 1] : [] as CalendarData[]
+		const firstDay = firstWeek.length > 0 ? firstWeek[0].fullDate : 'empty'
+		const lastDay = lastWeek.length > 0 ? lastWeek[lastWeek.length - 1].fullDate : 'empty'
+		return `${currentPanelDate.value}-${currentWeekIndex.value}-${weekCount}-${firstDay}-${lastDay}-${props.rowHeight}`
+	}
+
+	//缓存色彩数据
+	const syncDrawTheme = () => {
+		if (calendarRef.value == null) return
+		cachedTextColor = calendarRef.value.style.getPropertyValue('--rice-text-color')
+		cachedInfoTextColor = calendarRef.value.style.getPropertyValue('--rice-calendar-info-text')
+		cachedMarkColor = calendarRef.value.style.getPropertyValue('--rice-calendar-mark-color')
+		cachedDisabledColor = calendarRef.value.style.getPropertyValue('--rice-calendar-disabled-text')
+		primaryColor.value = calendarRef.value.style.getPropertyValue('--rice-primary-color')
+		cachedPrimaryColor = activeColor.value
+		cachedRangeTintColor = getTintColor(cachedPrimaryColor)
+	}
+
+	const syncGridCache = (width : number) => {
+		const nextKey = getDrawGridCacheKey()
+		if (nextKey == gridCacheKey && cachedBodyWidth == width && gridItem.length > 0) {
+			return
+		}
+		gridItem = getCalendarGrid(width)
+		gridCacheKey = nextKey
+		cachedBodyWidth = width
+		cachedOneWidth = width / weekList.value.length
+	}
+
+	function scheduleDrawBody(delay : number = 0) {
+		if (drawTimer != null) clearTimeout(drawTimer!)
+		drawTimer = setTimeout(() => {
+			drawBody?.()
+		}, delay)
+	}
+
+	const getNormalizedCurrentDates = () : string[] => {
+		if (currentDate.value.length == 0) {
+			return [] as string[]
+		}
+		return currentDate.value.map(item => formatDate(item))
+	}
+
+	const getDrawBottomInfo = (day : CalendarData, normalizedDates : string[]) : string | null => {
+		if (hasStrValue(day.bottomInfo)) return day.bottomInfo!
+		if (props.mode == 'range') {
+			if (props.allowSameDay == true
+				&& normalizedDates.length >= 2
+				&& normalizedDates[0] == normalizedDates[1]
+				&& day.fullDate == normalizedDates[0]) {
+				return '开始/结束'
+			}
+			if (normalizedDates.length >= 1 && day.fullDate == normalizedDates[0]) return '开始'
+			if (normalizedDates.length >= 2 && day.fullDate == normalizedDates[1]) return '结束'
+		}
+		return props.lunar ? day.lunarInfo?.IDayCn : null
+	}
+
+	const getDrawDayState = (day : CalendarData, normalizedDates : string[]) => {
+		const disabled = getDayIsDisabled(day)
+		const fullDate = day.fullDate
+		const start = normalizedDates.length >= 1 ? normalizedDates[0] : null
+		const end = normalizedDates.length >= 2 ? normalizedDates[1] : null
+		let isSelected = false
+		if (props.mode == 'range') {
+			isSelected = start == fullDate || end == fullDate
+		} else if (props.mode == 'multiple') {
+			isSelected = normalizedDates.includes(fullDate)
+		} else {
+			isSelected = start == fullDate
+		}
+		const isBetween = props.mode == 'range' && start != null && end != null && fullDate > start && fullDate < end
+		return {
+			disabled,
+			isSelected,
+			isBetween,
+		} as UTSJSONObject
+	}
+
+	drawBody = async () => {
+		if (bodyRef.value == null) return
+		const rect = await bodyRef.value!.getBoundingClientRectAsync()!
+
+		// #ifdef APP-HARMONY
+		//鸿蒙平台要加这段代码，不然切换月份的还是可能会导致最后一行显示不出来，原因未知
+		bodyRef.value?.style.setProperty('height', bodyHeight.value - 0.01 + 'px')
+		// #endif
+		const ctx = bodyRef.value!.getDrawableContext()!
+		syncGridCache(rect.width)
+		syncDrawTheme()
+		ctx.reset()
+		const oneWidth = cachedOneWidth
+		const oneHeight = cachedRowHeight
+		const textColor = cachedTextColor
+		const textColor2 = cachedInfoTextColor
+		const markColor = cachedMarkColor
+		const disabledColor = cachedDisabledColor
+		const primary = cachedPrimaryColor
+		const rangeTintColor = cachedRangeTintColor
+		const normalizedDates = getNormalizedCurrentDates()
+		ctx.fillStyle = textColor
+		ctx.textAlign = 'center'
+		if (props.showMonthMark) {
+			ctx.beginPath()
+			ctx.fillStyle = markColor
+			ctx.font = '160'
+			// #ifdef  APP-IOS
+			ctx.fillText(currentMonth.value, rect.width / 2, bodyHeight.value / 2 + 70)
+			// #endif
+			// #ifndef APP-IOS
+			ctx.fillText(currentMonth.value, rect.width / 2, bodyHeight.value / 2 + 50)
+			// #endif
+			ctx.fillStyle = textColor
+		}
+
+		let gridIndex = 0
+		for (let week = 0; week < displayMonthDays.value.length; week++) {
+			const weekItem = displayMonthDays.value[week]
+
+			for (let day = 0; day < weekItem.length; day++) {
+				const dayItem = weekItem[day]
+				const grid = gridItem[gridIndex]
+				gridIndex++
+				const dayState = getDrawDayState(dayItem, normalizedDates)
+				const isSelected = dayState['isSelected'] as boolean
+				const disabled = dayState['disabled'] as boolean
+				const isBetween = dayState['isBetween'] as boolean
+				const bottomInfo = getDrawBottomInfo(dayItem, normalizedDates)
+				const top = grid.y
+				const left = grid.x
+				if (isSelected) {
+					ctx.fillStyle = primary
+					ctx.fillRect(left, top, oneWidth, oneHeight)
+					ctx.fillStyle = '#f5f5f5'
+				} else {
+					ctx.fillStyle = textColor
+				}
+				if (isBetween && props.mode == 'range') {
+					ctx.fillStyle = rangeTintColor
+
+					ctx.fillRect(left, top, oneWidth, oneHeight)
+					ctx.fillStyle = primary
+				}
+				if (disabled) {
+					ctx.fillStyle = disabledColor
+				}
+				const text = dayItem.text ?? dayItem.date.toString()
+				const textTop = top + 35
+				const textLeft = left + oneWidth / 2
+				ctx.font = '16'
+				ctx.fillText(text, textLeft, textTop)
+				if (hasStrValue(dayItem.topInfo)) {
+					ctx.beginPath()
+					ctx.font = '11'
+					if (!disabled) {
+						ctx.fillStyle = dayItem.topInfoColor ?? (isSelected ? '#f5f5f5' : textColor2)
+					}
+					ctx.fillText(dayItem.topInfo!, textLeft, textTop - 20)
+				}
+				if (bottomInfo != null) {
+					ctx.beginPath()
+					ctx.font = '11'
+					if (!disabled) {
+						ctx.fillStyle = dayItem.bottomInfoColor ?? (isSelected ? '#f5f5f5' : textColor2)
+					}
+					ctx.fillText(bottomInfo, textLeft, textTop + 15)
+				}
+			}
+		}
+		ctx.update()
+	}
+
+	const clickGrid = (x : number, y : number) => {
+
+		for (let i = 0; i < gridItem.length; i++) {
+			const grid = gridItem[i]
+			const maxX = grid.x + grid.width
+			const maxY = grid.y + grid.height
+			const isXLimit = grid.x < x && x < maxX
+			const isYLimit = grid.y < y && y < maxY
+			const isSelect = isXLimit && isYLimit
+			if (isSelect) {
+				handleClick(grid.data)
+			}
+		}
+	}
+
+
+
+	const drawCalendar = async () => {
+		if (!isShow.value) return
+		await nextTick()
+		if (displayMonthDays.value.length > 0) {
+			const rowHeight = getPxNum(addUnit(props.rowHeight))
+			cachedRowHeight = rowHeight
+			const height = props.weeklyCalendar
+				? rowHeight
+				: displayMonthDays.value.length * rowHeight
+
+			// #ifdef APP-HARMONY
+			//鸿蒙平台要加这段代码，不然切换月份的还是可能会导致最后一行显示不出来，原因未知
+			bodyRef.value?.style.setProperty('height', height + 0.01 + 'px')
+			// #endif
+			// #ifndef APP-HARMONY
+			bodyRef.value?.style.setProperty('height', height + 'px')
+			// #endif
+			bodyHeight.value = height
+		}
+		scheduleDrawBody(50)
+	}
+
+	// #endif
+
+
+	const onClick = (e : UniPointerEvent) => {
+		// #ifdef APP
+		const target = e.currentTarget as UniElement
+		const rect = target!.getBoundingClientRect();
+		let bodyLeft = rect.left
+		let bodyTop = rect.top //在鸿蒙蒸汽模式下，页面滚动的时候，rect.top的值可能会变成负数，和其他平台不一致
+		let bodyWidth = rect.width
+		//点击命中的相对坐标按 popup 内部坐标系计算，不被页面滚动影响
+		if (props.usePopup && calendarRef.value != null) {
+			const calendarRect = calendarRef.value.getBoundingClientRect()
+			bodyLeft = calendarRect.left + target.offsetLeft
+			bodyTop = calendarRect.top + target.offsetTop
+			bodyWidth = target.offsetWidth > 0 ? target.offsetWidth : rect.width
+		}
+		const x = e.clientX - bodyLeft
+		const y = e.clientY - bodyTop
+
+		// #ifndef VUE3-VAPOR
+		clickGrid(x, y)
+		// #endif
+
+		// #ifdef VUE3-VAPOR
+		const currentGrid = getCalendarGrid(bodyWidth)
+		for (let i = 0; i < currentGrid.length; i++) {
+			const grid = currentGrid[i]
+			const maxX = grid.x + grid.width
+			const maxY = grid.y + grid.height
+			const isXLimit = grid.x < x && x < maxX
+			const isYLimit = grid.y < y && y < maxY
+			if (isXLimit && isYLimit) {
+				handleClick(grid.data)
+				break
+			}
+		}
+		// #endif
+
+		// #endif
+
+	}
+
+	/**
+	 * 关闭popup
+	 */
+	const clickClose = () => {
+		if (props.usePopup && props.closeOnClickClose) {
+			show.value = false
+		}
+		emit('clickClose')
+	}
+
+	/**
+	 * 获取day view class
+	 */
+
+	// #ifdef VUE3-VAPOR || MP ||WEB
+	const getDayClass = (day : CalendarData, index : number) => {
+		const css = [] as string[]
+		const pre = 'rice-calendar__day'
+		const isSelect = getIsSelected(day, currentDate.value, props.mode)
+		if (getDayIsDisabled(day)) {
+			css.push(`${pre}--disabled`)
+		}
+		if (isSelect) {
+			css.push(`${pre}--selected`)
+		}
+		if (getIsBetween(day, currentDate.value) && props.mode == 'range') {
+			css.push(`${pre}--middle`)
+		}
+		if (props.mode == 'range') {
+			if (currentDate.value[0] != null && formatDate(currentDate.value[0]) == day.fullDate) {
+				css.push(`${pre}--range--start`)
+			}
+			if (currentDate.value[1] != null && formatDate(currentDate.value[1]) == day.fullDate) {
+				css.push(`${pre}--range--end`)
+			}
+
+			if (getIsBetween(day, currentDate.value)) {
+				css.push(`${pre}--middle`)
+			}
+		}
+		return css
+	}
+
+	const getDayTextClass = (day : CalendarData, index : number, type : string) => {
+		const css = [] as string[]
+		const pre = 'rice-calendar__day'
+		const isSelect = getIsSelected(day, currentDate.value, props.mode)
+		if (getDayIsDisabled(day)) {
+			css.push(`${pre}--disabled__text`)
+		}
+		if (isSelect) {
+			css.push(`${pre}--selected__text`)
+		}
+		if (type == 'inner' && getIsBetween(day, currentDate.value) && props.mode == 'range') {
+			css.push(`${pre}--middle__text`)
+		}
+		return css
+	}
+
+	const getDayStyle = (day : CalendarData, index : number) => {
+		const css = new Map<string, string>()
+		if (getRealWeekIndex(index) == 0 && day.date == 1 && !_showFullDate.value) {
+			const realDay = (day.day + 7 - firstDayOfWeek.value) % 7
+			css.set('margin-left', `${(100 * realDay) / 7}%`)
+		}
+		if (hasStrValue(props.rowHeight)) {
+			css.set('height', addUnit(props.rowHeight!))
+		}
+
+		// #ifdef APP
+		const color = activeColor.value
+		// #endif
+		// #ifndef APP
+		const color = props.color
+		if (color != null) {
+			// #endif
+
+			const isSelect = getIsSelected(day, currentDate.value, props.mode)
+			if (isSelect) {
+				css.set('background-color', color)
+			}
+			if (getIsBetween(day, currentDate.value) && props.mode == 'range') {
+				// #ifdef APP
+				css.set('background-color', getTintColor(color))
+				// #endif
+				// #ifndef APP
+				css.set('color', props.color)
+				// #endif
+			}
+
+			// #ifndef APP
+		}
+		// #endif
+
+		return css
+	}
+
+	const getDayTextStyle = (day : CalendarData, index : number) => {
+		const css = new Map<string, string>()
+		if (props.color != null) {
+			// #ifdef VUE3-VAPOR
+			//鸿蒙蒸汽模式不写这个 颜色无法改变
+			const isSelect = getIsSelected(day, currentDate.value, props.mode)
+			if (isSelect) {
+				css.set('color', '#f5f5f5')
+			} else {
+				const disabled = getDayIsDisabled(day)
+				css.set('color', disabled ? 'var(--rice-calendar-disabled-text)' : 'var(--rice-text-color)')
+			}
+			// #endif
+			if (getIsBetween(day, currentDate.value) && props.mode == 'range') css.set('color', props.color!)
+		}
+		return css
+	}
+
+
+	// #endif
+
+
+	const rootClass = computed(() => {
+		return [
+			ns.theme(),
+			ns.is('popup', props.usePopup == true)
+		]
+	})
+
+	const rootStyle = computed(() => {
+		const css = new Map<string, string | number>()
+		if (props.usePopup) {
+			css.set('z-index', props.zIndex)
+		}
+		// #ifndef WEB
+		const isSafeAreaInsetBottom = props.safeAreaInsetBottom ?? props.usePopup
+		if (isSafeAreaInsetBottom) {
+			css.set('padding-bottom', safeAreaInsets.value.bottom + 'px')
+		}
+		// #endif
+		return css
+	})
+
+	const getBottomTextStyle = (day : CalendarData) => {
+		const css = {}
+		if (day.bottomInfoColor != null) css.color = day.bottomInfoColor
+		return css
+	}
+
+	const getTopTextStyle = (day : CalendarData) => {
+		const css = {}
+		if (day.topInfoColor != null) css.color = day.topInfoColor
+		return css
+	}
+
+	/**
+	 * 关闭按钮
+	 */
+	const closeStyle = ref({
+		position: 'absolute',
+		right: '16px',
+		top: '12px',
+		zIndex: 9
+	})
+
+	const switchArrowStyle = ref({
+		padding: "10px 4px"
+	})
+
+	watch(() : any | null => props.date, () => {
+		const previousPanelDate = currentPanelDate.value
+		currentDate.value = getInitDate()
+		let nextPanelDate = previousPanelDate
+		if (typeof props.date == 'string') {
+			nextPanelDate = props.date as string
+		} else if (Array.isArray(props.date)) {
+			const d = props.date as string[]
+			if (d.length > 0) {
+				nextPanelDate = d[0]
+			}
+		}
+		currentPanelDate.value = nextPanelDate
+		const previousYearMonth = getPanelYearMonthByDate(previousPanelDate)
+		const nextYearMonth = getPanelYearMonthByDate(nextPanelDate)
+		const previousWeek = getPanelWeekByDate(previousPanelDate)
+		const nextWeek = getPanelWeekByDate(nextPanelDate)
+		if (previousYearMonth != nextYearMonth || previousWeek != nextWeek) {
+			emit('panelChange', getPanelChangeResultByDate(nextPanelDate))
+		}
+	})
+
+	watch(
+		[
+			() : string | null => props.minDate,
+			() : string | null => props.maxDate,
+		],
+		() => {
+			currentDate.value = getInitDate()
+			monthDays.value = getMonthDays([currentPanelDate.value], firstDayOfWeek.value, props.formatter, props.minDate, props.maxDate, _showFullDate.value)
+		})
+
+
+
+	watch(() : boolean => props.weeklyCalendar, (newVal : boolean) => {
+		const normalizedDate = formatDate(currentPanelDate.value)
+		const nextPanelDate = newVal ? normalizedDate : dateuts(normalizedDate).format('YYYY-MM')
+		if (nextPanelDate != currentPanelDate.value) {
+			currentPanelDate.value = nextPanelDate
+			return
+		}
+		monthDays.value = getMonthDays([nextPanelDate], firstDayOfWeek.value, props.formatter, props.minDate, props.maxDate, _showFullDate.value)
+		// #ifdef APP && !VUE3-VAPOR
+		drawCalendar()
+		// #endif
+	})
+
+
+	watch([currentPanelDate, _showFullDate], () => {
+		monthDays.value = getMonthDays([currentPanelDate.value], firstDayOfWeek.value, props.formatter, props.minDate, props.maxDate, _showFullDate.value)
+		// #ifdef APP && !VUE3-VAPOR
+		drawCalendar()
+		// #endif
+	})
+
+
+
+	// #ifdef APP && !VUE3-VAPOR
+
+	watch([isDark, () : boolean => props.weeklyCalendar, () : boolean => props.showMonthMark], async () => {
+		await nextTick()
+		drawCalendar()
+	})
+
+	watch(isShow, async (newVal : boolean) => {
+		if (newVal) {
+			await nextTick()
+			drawCalendar()
+		}
+	})
+
+
+	onUnmounted(() => {
+		if (drawTimer != null) clearTimeout(drawTimer)
+	})
+
+	// #endif
+
+	onMounted(() => {
+		// #ifdef APP
+		primaryColor.value = calendarRef.value?.style.getPropertyValue('--rice-primary-color') ?? ''
+		// #endif
+
+		// #ifdef APP && !VUE3-VAPOR
+		drawCalendar()
+		// #endif
+	})
+
+	defineExpose({
+		switchPanel,
+		getPanelDate,
+	})
+</script>
+
+<style scoped lang="scss">
+	.rice-calendar {
+		background-color: var(--rice-calendar-background);
+
+		&--popup {
+			position: fixed;
+			bottom: 0;
+			left: 0;
+			right: 0;
+			border-radius: 12px 12px 0 0;
+			transition-property: transform;
+			transform: translateY(100%);
+		}
+
+
+
+		&__title {
+			position: relative;
+			height: 48px;
+			align-items: center;
+			justify-content: center;
+			padding: 0 16px;
+
+			&__text {
+				padding: 8px 16px;
+				font-size: 16px;
+				font-weight: bold;
+				color: var(--rice-text-color);
+				text-align: center;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+				width: 100%;
+			}
+		}
+
+
+		&__switch {
+			flex-direction: row;
+			align-items: center;
+			justify-content: space-between;
+			padding: 12px;
+
+			&__action {
+				flex-direction: row;
+			}
+
+			&__text {
+				color: var(--rice-text-color);
+				font-size: 14px;
+				font-weight: bold;
+				flex: 1;
+				text-align: center;
+			}
+		}
+
+
+		&__header {
+			flex-direction: row;
+			align-items: center;
+			justify-content: space-between;
+			height: 46px;
+			border-bottom: 1px solid var(--rice-border-color);
+			border-top: 1px solid var(--rice-border-color);
+		}
+
+		&__week {
+			font-size: 14px;
+			color: var(--rice-calendar-info-text);
+			flex: 1;
+			text-align: center;
+		}
+
+
+
+		&__body {
+			position: relative;
+			/* #ifdef APP && !VUE3-VAPOR */
+			height: 300px;
+			/* #endif */
+			margin: 0 2px 4px;
+
+			&--week {
+				/* #ifdef APP && !VUE3-VAPOR */
+				height: 60px;
+				/* #endif */
+			}
+
+
+			&__mark {
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%, -50%);
+				/* #ifdef APP */
+				z-index: -1;
+				/* #endif */
+				/* #ifndef APP */
+				z-index: 0;
+				/* #endif */
+				color: var(--rice-calendar-mark-color);
+				font-size: 160px;
+				pointer-events: none;
+
+			}
+		}
+
+		&__footer {
+			padding: 12px 16px 16px;
+		}
+
+		/* #ifdef VUE3-VAPOR || WEB || MP */
+		&__days {
+			z-index: 2;
+			flex-direction: row;
+			margin-top: 4px;
+		}
+
+		&__day {
+			position: relative;
+			align-items: center;
+			justify-content: center;
+			width: 14.285%;
+			height: 60px;
+
+			&__text {
+				color: var(--rice-text-color);
+				font-size: 16px;
+			}
+
+
+			&__top,
+			&__bottom {
+				position: absolute;
+				color: var(--rice-calendar-info-text);
+				font-size: 11px;
+				left: 0;
+				width: 100%;
+				text-align: center;
+
+			}
+
+			&__top {
+				top: 6px;
+			}
+
+			&__bottom {
+				bottom: 6px;
+			}
+
+			&--selected {
+				border-radius: 4px;
+				background-color: var(--rice-primary-color);
+
+				&__text {
+					color: #f5f5f5;
+				}
+			}
+
+
+			&--range--end {
+				border-top-left-radius: 0px;
+				border-bottom-left-radius: 0px;
+			}
+
+			&--range--start {
+				border-top-right-radius: 0px;
+				border-bottom-right-radius: 0px;
+			}
+
+
+			&--middle {
+				/* #ifndef APP */
+				color: var(--rice-primary-color);
+				/* #endif */
+
+				&__text {
+					color: var(--rice-primary-color);
+				}
+
+				/* #ifdef WEB || MP */
+				&::after {
+					content: '';
+					position: absolute;
+					top: 0;
+					left: 0;
+					right: 0;
+					bottom: 0;
+					opacity: .1;
+					background-color: currentColor;
+				}
+
+				/* #endif */
+			}
+
+
+			&--disabled {
+				&__text {
+					color: var(--rice-calendar-disabled-text);
+				}
+			}
+		}
+
+		/* #endif */
+
+
+	}
+</style>

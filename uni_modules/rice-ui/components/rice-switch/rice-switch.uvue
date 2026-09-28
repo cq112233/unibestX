@@ -1,0 +1,291 @@
+<template>
+	<view :class="switchClass" :style="[switchStyle,customStyle]" ref="switchRef" @click.stop="changeValue">
+		<view v-if="showOutBall" :class="innerClass">
+			<rice-icon v-if="hasIcon" :name="isChecked?activeIcon:inactiveIcon" color="rgba(255,255,255,.9)"
+				:size="iconSize" />
+			<text v-else-if="hasText" :style="innerTextStyle"
+				class="rice-switch__inner__text">{{isChecked?activeText:inactiveText}}</text>
+		</view>
+		<view :class="nodeClass" :style="nodeStyle">
+			<rice-loading v-if="loading" size="17" :color="iconColor" />
+			<template v-else-if="showInsidePrompt">
+				<rice-icon v-if="hasIcon" :name="isChecked?activeIcon:inactiveIcon" :color="iconColor" :size="iconSize" />
+				<text v-else-if="hasText" class="rice-switch__node__text"
+					:style="nodeTextStyle">{{isChecked?activeText:inactiveText}}</text>
+			</template>
+		</view>
+	</view>
+</template>
+
+<script setup>
+	import { useCssVar, useNamespace } from "../../libs/use"
+	import { BeforeChangeInterceptor } from "../../libs/types"
+	import { addUnit, callInterceptor, isSameValue, hasStrValue, getPxNum } from "../../libs/utils"
+	import { formDisabledInjectKey, formReadonlyInjectKey } from "../rice-form"
+	import { SwitchProps, SwitchValueType } from "./type.uts"
+
+	defineOptions({
+		name: 'rice-switch',
+		styleIsolation: 'app-and-page'
+	})
+
+	const ns = useNamespace('switch')
+	const emit = defineEmits<{
+		change : [value: SwitchValueType]
+	}>()
+
+	const props = withDefaults(defineProps<SwitchProps>(), {
+		activeValue: true,
+		inactiveValue: false,
+		iconSize: '12px',
+		loading: false,
+		disabled: false,
+		readonly: false,
+		vibrate: true,
+		promptPosition: 'outball',
+		customStyle: () : UTSJSONObject => ({})
+	})
+
+	const modelValue = defineModel({
+		type: [String, Number, Boolean] as PropType<SwitchValueType>,
+		default: false
+	})
+
+	const formDisabled = inject<Ref<boolean | null> | null>(formDisabledInjectKey, null)
+	const formReadonly = inject<Ref<boolean | null> | null>(formReadonlyInjectKey, null)
+
+	const isDisabled = computed<boolean>(() => (formDisabled?.value ?? false) || props.disabled)
+	const isReadonly = computed<boolean>(() => (formReadonly?.value ?? false) || props.readonly)
+
+	const isChecked = computed(() => isSameValue(modelValue.value, props.activeValue))
+	const hasText = computed(() => hasStrValue(props.activeText) || hasStrValue(props.inactiveText))
+	const hasIcon = computed(() => hasStrValue(props.activeIcon) || hasStrValue(props.inactiveIcon))
+	const showOutBall = computed(() => props.promptPosition == 'outball' && (hasText.value || hasIcon.value))
+	const showInsidePrompt = computed(() => props.promptPosition == 'inball' && (hasText.value || hasIcon.value))
+
+	const handleChange = () => {
+		const value = isChecked.value ? props.inactiveValue : props.activeValue
+		modelValue.value = value
+		// #ifdef MP-WEIXIN
+		if (props.vibrate) {
+			uni.vibrateShort({
+				type: 'medium'
+			})
+		}
+		// #endif
+
+		emit('change', value)
+	}
+
+	//异步控制
+	const changeValue = (e : UniPointerEvent) => {
+		e.stopPropagation()
+		if (isDisabled.value || isReadonly.value || props.loading) return
+		if (typeof props.beforeChange != 'function') {
+			handleChange()
+			return
+		}
+		//异步控制
+		callInterceptor(props.beforeChange as BeforeChangeInterceptor, {
+			done() {
+				handleChange()
+			}
+		})
+	}
+
+
+	// #ifdef APP
+	const switchRef = shallowRef<UniElement | null>(null)
+	//App端 transtion不支持使用var
+	const primaryColor = useCssVar('--rice-primary-color', switchRef)
+	const switchBgColor = useCssVar('--rice-switch-background', switchRef)
+	// #endif
+
+	const switchColor = computed<string>(() => {
+
+		// #ifdef APP
+		//app 端 transtion不支持使用var css变量.
+		if (isChecked.value) {
+			return props.activeColor ?? primaryColor.value
+		}
+		return props.inactiveColor ?? switchBgColor.value
+
+		// #endif
+
+		// #ifndef APP
+
+		if (isChecked.value) return props.activeColor ?? ""
+		return props.inactiveColor ?? ""
+		// #endif
+
+	})
+
+	const iconColor = computed(() => {
+		// #ifndef APP
+		return switchColor.value != "" ? switchColor.value : 'inherit'
+		// #endif
+		// #ifdef APP
+		return switchColor.value
+		// #endif
+	})
+
+	const switchStyle = computed(() => {
+		const css = new Map<string, string>()
+		if (switchColor.value != "") {
+			css.set('background-color', switchColor.value)
+			// #ifndef APP
+			css.set('color', switchColor.value)
+			// #endif
+		}
+		if (props.width != null) {
+			css.set('width', addUnit(props.width!))
+		}
+		return css
+	})
+
+	const innerTextStyle = computed(() => {
+		const css = new Map<string, string>()
+		if (props.textSize != null) {
+			css.set('font-size', addUnit(props.textSize!))
+		}
+		return css
+	})
+
+	const nodeTextStyle = computed(() => {
+		const css = new Map<string, string>()
+		if (props.textSize != null) {
+			css.set('font-size', addUnit(props.textSize!))
+		}
+		// #ifdef APP
+		if (switchColor.value != "") {
+			css.set('color', switchColor.value)
+		}
+		// #endif
+		return css
+	})
+
+	const nodeStyle = computed(() => {
+		const css = new Map<string, string>()
+		const switchWidth = props.width != null ? getPxNum(props.width!) : 50
+		const nodeWidth = 22
+		const translateX = isChecked.value ? `${switchWidth - nodeWidth - 4}px` : '4px'
+		css.set('transform', `translateX(${translateX})`)
+		return css
+	})
+
+	const switchClass = computed(() => {
+		return [
+			ns.b(""),
+			ns.theme(),
+			ns.is('disabled', isDisabled.value),
+			ns.is('active', isChecked.value),
+		]
+	})
+
+	const innerClass = computed(() => {
+		return [
+			ns.e('inner'),
+			ns.is('__inner--active', isChecked.value),
+		]
+	})
+
+	const nodeClass = computed(() => {
+		return [
+			ns.e('node'),
+		]
+	})
+	// #ifdef APP-IOS
+	onMounted(() => {
+		nextTick(() => {
+			switchRef.value?.style.setProperty('transition-duration', '300ms')
+		})
+	})
+	// #endif
+</script>
+
+<style scoped lang="scss">
+	$duration: 300ms;
+
+	.rice-switch {
+		position: relative;
+		flex-direction: row;
+		align-items: center;
+		border-radius: 200px;
+		height: 28px;
+		width: 50px;
+		box-sizing: border-box;
+		transition-property: color, background-color;
+		/* #ifndef APP-IOS */
+		transition-duration: $duration;
+		/* #endif */
+		/* #ifdef WEB */
+		cursor: pointer;
+
+		/* #endif */
+		/* #ifndef APP */
+		background-color: var(--rice-switch-background);
+		color: var(--rice-switch-background);
+
+		/* #endif */
+		&__inner {
+			width: 100%;
+			transition: padding $duration;
+			padding: 0 6px 0 28px;
+			box-sizing: border-box;
+
+			&__text {
+				font-size: 12px;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+				color: rgba(255, 255, 255, .9);
+				text-align: center;
+			}
+
+			&--active {
+				padding: 0 28px 0 6px;
+			}
+
+		}
+
+		&__node {
+			position: absolute;
+			flex-direction: row;
+			align-items: center;
+			justify-content: center;
+			background-color: #fff;
+			height: 22px;
+			width: 22px;
+			border-radius: 200px;
+			transition: transform $duration;
+			/* #ifndef APP-HARMONY || APP-IOS */
+			box-shadow: 0 2px 3px rgba(0, 0, 0, 0.2);
+
+			/* #endif */
+
+
+			&__text {
+				font-size: 12px;
+				transition: color $duration;
+				white-space: nowrap;
+				text-align: center;
+				width: 100%;
+			}
+		}
+
+		&--active {
+			/* #ifndef APP */
+			background-color: var(--rice-primary-color);
+			color: var(--rice-primary-color);
+
+			/* #endif */
+		}
+
+		&--disabled {
+			opacity: 0.6;
+			/* #ifdef WEB */
+			cursor: not-allowed;
+
+			/* #endif */
+		}
+	}
+</style>

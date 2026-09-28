@@ -1,0 +1,510 @@
+<template>
+	<rice-overlay v-if="overlay" :show="show" :z-index="zIndex-1" :close-on-click-overlay="false"
+		:bg-color="overlayBgColor" @click="overlayClick" />
+
+	<view v-if="realShow" class="rice-popup" :class="[popupClass,rootClass]" :style="[popupStyle,customStyle]"
+		ref="popupRef" @touchstart="onContentstart" @touchmove.stop="onContentmove" @touchend="onContentend"
+		@touchcancel="onContentend">
+		<view v-if="closeable" class="rice-popup__close" :class="`rice-popup__close--${closeIconPosition}`"
+			:style="closeStyle" @click.stop="handleClose">
+			<rice-icon :name="closeIcon" size="20px" />
+		</view>
+		<view v-if="showDragBar==true&&position=='bottom'" class="rice-popup__drag" :class="dragWrapClass"
+			@touchstart="onDragstart" @touchmove.stop="onDragmove" @touchend.stop="onDragend" @touchcancel.stop="onDragend">
+			<slot name="drag">
+				<view class="rice-popup__drag__bar" :class="dragBarClass"></view>
+			</slot>
+		</view>
+		<slot />
+	</view>
+
+</template>
+
+<script setup>
+	import { addUnit } from "../../libs/utils"
+	import { BeforeChangeInterceptor } from "../../libs/types"
+	import { useNamespace, usePopup, UsePopupOptions, useSafeArea, safeAreaInsets } from "../../libs/use"
+	import { PopupProps } from "./type.uts"
+
+
+	defineOptions({
+		name: 'rice-popup',
+		styleIsolation: 'app-and-page',
+		externalClasses: ['popup-class', 'drag-bar-class', 'drag-wrap-class']
+	})
+
+	useSafeArea()
+	const ns = useNamespace('popup')
+
+	const emit = defineEmits<{
+		open : [],
+		close : [],
+		opened : [],
+		closed : [],
+		clickOverlay : [],
+	}>()
+
+
+	const props = withDefaults(defineProps<PopupProps>(), {
+		duration: 300,
+		position: 'bottom',
+		zIndex: 999,
+		zoom: true,
+		overlay: true,
+		closeable: true,
+		closeIcon: 'cross',
+		closeIconPosition: 'top-right',
+		closeOnClickOverlay: true,
+		safeAreaInsetTop: false,
+		safeAreaInsetBottom: true,
+		popupClass: '',
+		dragBarClass: '',
+		dragWrapClass: '',
+		slideDownThreshold: 40,
+		closeOnSlideDown: false,
+		lockScroll: true,
+		opacity: null,
+		customStyle: () : UTSJSONObject => ({})
+	})
+
+	const show = defineModel('show', {
+		type: Boolean,
+		default: false,
+	})
+
+	const popupRef = shallowRef<UniElement | null>(null)
+
+	//center默认为true，其他为false
+	const _opacity = computed<boolean>(() => {
+		if (props.opacity != null) return props.opacity!
+		return props.position == 'center'
+	})
+
+	const { realShow, doClose } = usePopup(popupRef, {
+		show,
+		position: toRef(() : string => props.position),
+		duration: toRef(() : number => props.duration),
+		opacity: toRef(() : boolean => _opacity.value),
+		zoom: toRef(() : boolean => props.zoom),
+		beforeClose: toRef(() => props.beforeClose as BeforeChangeInterceptor | null),
+	} as UsePopupOptions)
+
+	/**
+	 * 关闭按钮
+	 */
+	const handleClose = (e : UniPointerEvent) => {
+		e.stopPropagation()
+		doClose()
+	}
+
+	/**
+	 * 点击遮罩层
+	 */
+	const overlayClick = () => {
+		emit('clickOverlay')
+		if (!props.closeOnClickOverlay) {
+			return
+		}
+		doClose()
+	}
+
+	/**
+	 * 拖拽关闭
+	 */
+	let isAnimation = false
+	let halfScreenY = 0
+	let currentY = 0 //最新一次拖动的 Y 值
+	let previousY = 0 //上一次拖动的 Y 值
+	let lastDragDirection = 0 // 1: 下拉, -1: 上拉, 0: 未识别
+	let halfOffset = 0
+	let scrollEl : UniElement | null = null //popup内部有滚动容器时的id，
+	let contentTouchStartY = 0
+	let isContentDragging = false
+	const canDrag = computed(() => props.position == 'bottom')
+
+
+	const lockScrollAtTop = () => {
+		if (scrollEl == null) return
+		if (scrollEl!.scrollTop > 0) {
+			scrollEl!.scrollTop = 0
+		}
+	}
+
+	const resetDragState = (startY : number) => {
+		halfScreenY = startY
+		currentY = startY
+		previousY = startY
+		lastDragDirection = 0
+		halfOffset = 0
+		popupRef.value?.style.setProperty('transition-duration', '0ms')
+	}
+
+	const onDragstart = (e : UniTouchEvent) => {
+		const startY = e.touches[0].screenY
+		resetDragState(startY)
+		isContentDragging = false
+	}
+
+	const onDragmove = (e : UniTouchEvent) => {
+		if (isAnimation || !canDrag.value) return
+		let p = e.touches[0];
+		previousY = currentY
+		currentY = p.screenY
+		const moveDelta = currentY - previousY
+		if (Math.abs(moveDelta) >= 2) {
+			lastDragDirection = moveDelta > 0 ? 1 : -1
+		}
+
+		if (halfScreenY == 0) {
+			halfScreenY = p.screenY
+		}
+		let offset = p.screenY - halfScreenY
+		//向下拖动
+		if (offset > 0) {
+			lockScrollAtTop()
+			popupRef.value?.style.setProperty('transform', `translateY(${offset}px)`)
+			halfOffset = offset
+		}
+
+		// #ifdef WEB
+		e.preventDefault();
+		// #endif
+
+	}
+
+	const resumedPopup = () => {
+		popupRef.value?.style.setProperty('transform', 'translateY(0px)')
+		halfScreenY = 0
+		halfOffset = 0
+		lastDragDirection = 0
+		isContentDragging = false
+		isAnimation = false
+	}
+
+	const onDragend = () => {
+		popupRef.value?.style.setProperty('transition-duration', `${props.duration}ms`)
+		if (!canDrag.value) return
+		halfScreenY = 0
+		if (isAnimation) return
+		const threshold = Math.max(0, props.slideDownThreshold)
+		//最后一次的手势是否上拉，上拉的时候不要关闭popup
+		const isLastSwipeUp = lastDragDirection < 0
+		let shouldClose = halfOffset >= threshold && !isLastSwipeUp
+
+		if (shouldClose) {
+			isContentDragging = false
+			doClose()
+		} else {
+			resumedPopup()
+		}
+
+	}
+
+	const onContentstart = (e : UniTouchEvent) => {
+		if (!props.closeOnSlideDown) return
+		if (props.scrollId != null && props.scrollId != '') {
+			scrollEl = uni.getElementById(props.scrollId!)
+		} else {
+			scrollEl = null
+		}
+		contentTouchStartY = e.touches[0].screenY
+		isContentDragging = false
+		resetDragState(contentTouchStartY)
+	}
+
+	const onContentmove = (e : UniTouchEvent) => {
+		if (!props.closeOnSlideDown) return
+		if (!canDrag.value || isAnimation) return
+		const currentTouchY = e.touches[0].screenY
+		const gestureOffset = currentTouchY - contentTouchStartY
+		const isMovingDown = gestureOffset > 0
+
+		if (isContentDragging) {
+			lockScrollAtTop()
+			onDragmove(e)
+			return
+		}
+
+		if (!isMovingDown) {
+			return
+		}
+
+		const top = scrollEl?.scrollTop ?? 0
+
+		if (top >= 0.01) {
+			return
+		}
+
+		isContentDragging = true
+		resetDragState(contentTouchStartY)
+		lockScrollAtTop()
+		onDragmove(e)
+	}
+
+	const onContentend = () => {
+		popupRef.value?.style.setProperty('transition-duration', `${props.duration}ms`)
+		if (!props.closeOnSlideDown) return
+		if (!isContentDragging) {
+			resumedPopup()
+			return
+		}
+		onDragend()
+	}
+
+
+
+	/**
+	 * popup class
+	 */
+	const rootClass = computed(() => {
+		const isZoom = props.zoom && props.position == 'center'
+		const basic = [
+			ns.theme(),
+			ns.is('opacity', _opacity.value),
+			ns.m(props.position),
+			ns.is('zoom', isZoom)
+		] as string[]
+
+		//鸿蒙端在rice-popup--centen 里面设置 transform 会导致打开popup的时候动画异常
+		// #ifdef APP-HARMONY
+		if (props.position == 'center' && !props.zoom) {
+			basic.push('rice-popup--notzoom')
+		}
+		// #endif
+
+		return basic
+	})
+
+	/**
+	 * popup style
+	 */
+
+	const popupStyle = computed(() => {
+		const css = new Map<string, string | number>()
+		const position = props.position
+		css.set('z-index', props.zIndex)
+		if (props.bgColor != null) {
+			css.set('background-color', props.bgColor!)
+		}
+		if (props.position == 'center' && props.marginTop != null) {
+			css.set('margin-top', addUnit(props.marginTop!))
+		}
+
+		//底部安全区域
+		// #ifndef WEB
+		if (props.position != 'center' && props.safeAreaInsetBottom) {
+			css.set('padding-bottom', safeAreaInsets.value.bottom + 'px')
+		}
+		if (props.position != 'center' && props.safeAreaInsetTop) {
+			css.set('padding-top', safeAreaInsets.value.top + 'px')
+		}
+		// #endif
+
+		//圆角值
+
+		if (props.radius != null) {
+
+			const radius = addUnit(props.radius!)
+			if (position == 'top') {
+				css.set('border-bottom-left-radius', radius)
+				css.set('border-bottom-right-radius', radius)
+			} else if (position == 'bottom') {
+				css.set('border-top-left-radius', radius)
+				css.set('border-top-right-radius', radius)
+			} else if (position == 'left') {
+				css.set('border-top-right-radius', radius)
+				css.set('border-bottom-right-radius', radius)
+			} else if (position == 'right') {
+				css.set('border-top-left-radius', radius)
+				css.set('border-bottom-left-radius', radius)
+			} else {
+				css.set('border-radius', radius)
+			}
+		}
+
+		return css
+	})
+
+
+	const closeStyle = computed(() => {
+		const css = new Map<string, string>()
+		//底部安全区域
+		// #ifndef WEB
+		if (props.position != 'center' && props.safeAreaInsetBottom) {
+			css.set('bottom', safeAreaInsets.value.bottom + 'px')
+		}
+		if (props.position != 'center' && props.safeAreaInsetTop) {
+			css.set('top', safeAreaInsets.value.top + 'px')
+		}
+		// #endif
+		return css
+	})
+
+	// #ifdef WEB
+
+	//web端阻止页面滚动
+	let webScrollLocked = false
+	const webLockCountKey = 'data-rice-popup-lock-count'
+	const webScrollTopKey = 'data-rice-popup-scroll-top'
+	const webBodyStyleKey = 'data-rice-popup-body-style'
+
+	const lockWebScroll = () => {
+		if (!props.lockScroll) return
+		if (webScrollLocked || !props.overlay) return
+		const body = document.body
+		const lockCount = parseInt(body.getAttribute(webLockCountKey) ?? '0')
+
+		if (lockCount <= 0) {
+			const scrollTop = window.scrollY || document.documentElement.scrollTop || body.scrollTop || 0
+			body.setAttribute(webScrollTopKey, `${scrollTop}`)
+			body.setAttribute(webBodyStyleKey, body.getAttribute('style') ?? '')
+			body.style.setProperty('position', 'fixed')
+			body.style.setProperty('top', `-${scrollTop}px`)
+			body.style.setProperty('left', '0')
+			body.style.setProperty('right', '0')
+			body.style.setProperty('width', '100%')
+			body.style.setProperty('overflow', 'hidden')
+		}
+
+		body.setAttribute(webLockCountKey, `${lockCount + 1}`)
+		webScrollLocked = true
+	}
+
+	const unlockWebScroll = () => {
+		if (!props.lockScroll) return
+		if (!webScrollLocked || !props.overlay) return
+		const body = document.body
+		const lockCount = parseInt(body.getAttribute(webLockCountKey) ?? '0')
+		const nextCount = Math.max(0, lockCount - 1)
+
+		if (nextCount == 0) {
+			const scrollTop = parseInt(body.getAttribute(webScrollTopKey) ?? '0')
+			const inlineStyle = body.getAttribute(webBodyStyleKey) ?? ''
+			if (inlineStyle.length > 0) {
+				body.setAttribute('style', inlineStyle)
+			} else {
+				body.removeAttribute('style')
+			}
+			body.removeAttribute(webLockCountKey)
+			body.removeAttribute(webScrollTopKey)
+			body.removeAttribute(webBodyStyleKey)
+			window.scrollTo(0, scrollTop)
+		} else {
+			body.setAttribute(webLockCountKey, `${nextCount}`)
+		}
+
+		webScrollLocked = false
+	}
+
+	watch(() => realShow.value, (newVal : boolean) => {
+		if (newVal) {
+			lockWebScroll()
+		} else {
+			unlockWebScroll()
+		}
+	}, {
+		immediate: true
+	})
+
+	onUnmounted(() => {
+		unlockWebScroll()
+	})
+	// #endif
+</script>
+
+<style scoped lang="scss">
+	.rice-popup {
+		position: fixed;
+		background-color: var(--rice-background-2);
+		transform: translate(0, 0) scale(1);
+		transition-property: transform, opacity;
+		/* #ifndef APP */
+		max-height: 100%;
+		overflow-y: auto;
+
+		/* #endif */
+
+		&__drag {
+			justify-content: center;
+			align-items: center;
+			min-height: 32px;
+
+			&__bar {
+				height: 3px;
+				border-radius: 6px;
+				width: 20px;
+				background-color: #c8c9cc;
+			}
+		}
+
+		&--opacity {
+			opacity: 0;
+		}
+
+		&--center {
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+		}
+
+		&--zoom {
+			transform: translate(-50%, -50%) scale(0.6);
+		}
+
+		&--top {
+			top: 0;
+			left: 0;
+			width: 100%;
+			transform: translate(0, -100%);
+		}
+
+		&--bottom {
+			bottom: 0;
+			left: 0;
+			width: 100%;
+			transform: translate(0px, 100%);
+		}
+
+		&--left {
+			top: 0;
+			bottom: 0;
+			left: 0;
+			transform: translate(-100%, 0);
+		}
+
+		&--right {
+			top: 0;
+			bottom: 0;
+			right: 0;
+			transform: translate(100%, 0);
+		}
+
+
+		&__close {
+			position: absolute;
+			z-index: 9;
+			padding: 16px 16px 0 0;
+
+			&--top-left {
+				top: 0;
+				left: 0;
+			}
+
+			&--top-right {
+				top: 0;
+				right: 0;
+			}
+
+			&--bottom-left {
+				bottom: 0;
+				left: 0;
+			}
+
+			&--bottom-right {
+				bottom: 0;
+				right: 0;
+			}
+		}
+
+	}
+</style>

@@ -1,0 +1,7 @@
+import { getRandomStr } from "../../libs/utils"
+export * from "./type"
+export const checkboxGroupInjectKey = `CheckboxGroupKey-${getRandomStr()}`
+export const defCheckboxDirection = 'col' 
+export const defCheckboxShape = 'square'
+export const defCheckboxIconPosition = 'left'
+export const defCheckboxIconSize = '20px'

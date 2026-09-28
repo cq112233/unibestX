@@ -1,0 +1,63 @@
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
+    <view class="p-[16px]">
+      <!-- 基础用法 -->
+      <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
+        <view class="flex-row items-center mb-[12px]">
+          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px]" :style="{ backgroundColor: currentTheme }" />
+          <text class="text-[14px] font-bold text-[#334155]">基础步进器</text>
+        </view>
+        <view class="flex-row items-center justify-between">
+          <text class="text-[14px] text-[#334155]">购买数量</text>
+          <rice-stepper v-model="stepVal1" :button-style="{ color: currentTheme }" />
+        </view>
+      </view>
+
+      <!-- 步长与限制 -->
+      <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
+        <view class="flex-row items-center mb-[12px]">
+          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px]" :style="{ backgroundColor: currentTheme }" />
+          <text class="text-[14px] font-bold text-[#334155]">限制范围 (Min: 1, Max: 10, Step: 2)</text>
+        </view>
+        <view class="flex-row items-center justify-between">
+          <text class="text-[14px] text-[#334155]">批量调整</text>
+          <rice-stepper v-model="stepVal2" :min="1" :max="10" :step="2" :button-style="{ color: currentTheme }" />
+        </view>
+      </view>
+
+      <!-- 禁用状态 -->
+      <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
+        <view class="flex-row items-center mb-[12px]">
+          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px]" :style="{ backgroundColor: currentTheme }" />
+          <text class="text-[14px] font-bold text-[#334155]">禁用状态</text>
+        </view>
+        <view class="flex-row items-center justify-between">
+          <text class="text-[14px] text-[#94a3b8]">不可调节</text>
+          <rice-stepper :model-value="5" :disabled="true" />
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { useAppStore } from '@/src/store';
+import { computed } from 'vue';
+
+definePage({
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
+  style: {
+    navigationBarTitleText: 'Stepper 步进器',
+    navigationStyle: 'custom'
+  }
+});
+
+const appStore = useAppStore();
+const currentTheme = computed((): string => appStore.state.theme);
+
+const stepVal1 = ref(1);
+const stepVal2 = ref(2);
+</script>

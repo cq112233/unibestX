@@ -1,0 +1,55 @@
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
+    <view class="p-[16px]">
+      <!-- 基础滑块 -->
+      <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
+        <view class="flex-row items-center mb-[12px]">
+          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px]" :style="{ backgroundColor: currentTheme }" />
+          <text class="text-[14px] font-bold text-[#334155]">基础用法</text>
+        </view>
+        <view class="py-[12px] px-[8px]">
+          <rice-slider v-model="val1" :active-color="currentTheme" />
+        </view>
+        <view class="mt-[8px]">
+          <text class="text-[13px] text-[#64748b]">当前数值：{{ val1 }}</text>
+        </view>
+      </view>
+
+      <!-- 自定义区间与步长 -->
+      <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
+        <view class="flex-row items-center mb-[12px]">
+          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px]" :style="{ backgroundColor: currentTheme }" />
+          <text class="text-[14px] font-bold text-[#334155]">自定义步长 (Step: 10)</text>
+        </view>
+        <view class="py-[12px] px-[8px]">
+          <rice-slider v-model="val2" :step="10" :active-color="currentTheme" />
+        </view>
+        <view class="mt-[8px]">
+          <text class="text-[13px] text-[#64748b]">当前数值：{{ val2 }}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { useAppStore } from '@/src/store';
+import { computed } from 'vue';
+
+definePage({
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
+  style: {
+    navigationBarTitleText: 'Slider 滑块',
+    navigationStyle: 'custom'
+  }
+});
+
+const appStore = useAppStore();
+const currentTheme = computed((): string => appStore.state.theme);
+
+const val1 = ref(50);
+const val2 = ref(20);
+</script>

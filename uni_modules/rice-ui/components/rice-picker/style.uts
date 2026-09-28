@@ -1,0 +1,37 @@
+import { isDark } from "../../libs/store"
+import type { ComputedRef } from "vue"
+
+type UsePickerStyle = {
+	maskBottomStyle : ComputedRef<string>,
+	maskStyle : ComputedRef<string>,
+	maskTopStyle : ComputedRef<string>,
+
+}
+
+export function usePickerStyle() {
+
+	const maskTopStyle = computed<string>(() => {
+		return !isDark.value
+			? 'background-image:linear-gradient(to bottom,rgba(255, 255, 255, 0.9),rgba(255, 255, 255, 0.5))'
+			: 'background-image:linear-gradient(to bottom,rgba(24, 24, 24, 0.8),rgba(24, 24, 24, 0.5))'
+	})
+
+	const maskBottomStyle = computed<string>(() => {
+		return !isDark.value
+			? 'background-image:linear-gradient(to top,rgba(255, 255, 255, 0.9),rgba(255, 255, 255, 0.5))'
+			: 'background-image:linear-gradient(to top,rgba(24, 24, 24, 0.8),rgba(24, 24, 24, 0.5))'
+	})
+
+	const maskStyle = computed<string>(() => {
+
+		return isDark.value
+			? 'background-image:linear-gradient(180deg,rgba(25,25,25,.9),rgba(25,25,25,.5)),linear-gradient(0deg,rgba(25,25,25,.9),rgba(25,25,25,.5))'
+			: 'background-image:linear-gradient(180deg,hsla(0,0%,100%,.9),hsla(0,0%,100%,.5)),linear-gradient(0deg,hsla(0,0%,100%,.9),hsla(0,0%,100%,.5))'
+	})
+
+	return {
+		maskTopStyle,
+		maskBottomStyle,
+		maskStyle,
+	} as UsePickerStyle
+}

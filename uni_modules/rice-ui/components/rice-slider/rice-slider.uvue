@@ -1,0 +1,650 @@
+<template>
+	<view class="rice-slider" :class="rootClass" :style="customStyle">
+		<view class="rice-slider__top" v-if="_valuePosition=='top'">
+			<text class="rice-slider__value rice-slider__value__top" :style="[getTopValueStyle('first'),textStyle]">
+				{{formatDisplayValue(current.firstValue)}}</text>
+			<text class="rice-slider__value rice-slider__value__top" v-if="isRange"
+				:style="[getTopValueStyle('second'),textStyle]">
+				{{formatDisplayValue(current.secondValue)}}</text>
+		</view>
+		<text v-if="_valuePosition=='right'&&isRange" class="rice-slider__value rice-slider__value__left"
+			:style="textStyle">{{formatDisplayValue(current.firstValue)}}</text>
+
+		<view class="rice-slider__content" :class="contentClass" :style="contentStyle" @click="contentClick">
+			<view class="rice-slider__track" :class="trackClass" :style="trackStyle" ref="trackRef"></view>
+			<view class="rice-slider__active" :class="activeClass" :style="activeStyle"></view>
+			<view class="rice-slider__button rice-slider__button--first" :class="buttonClass"
+				:style="getButtonWrapStyle('first')" @click.stop="buttonClick"
+				@touchstart.stop="onButtonTouchstart($event as UniTouchEvent,'first')" @touchmove.stop="onTrackTouchmove"
+				@touchend.stop="onTrackTouchend" @touchcancel.stop="onTrackTouchend"></view>
+			<view v-if="isRange" class="rice-slider__button rice-slider__button--second" :class="buttonClass"
+				:style="getButtonWrapStyle('second')" @click.stop="buttonClick"
+				@touchstart.stop="onButtonTouchstart($event as UniTouchEvent,'second')" @touchmove.stop="onTrackTouchmove"
+				@touchend.stop="onTrackTouchend" @touchcancel.stop="onTrackTouchend"></view>
+		</view>
+
+		<text v-if="_valuePosition=='right'" class="rice-slider__value rice-slider__value__right"
+			:style="textStyle">{{formatDisplayValue(current.secondValue)}}</text>
+	</view>
+</template>
+
+<script setup>
+	import { addUnit, clamp, getPrecision, getPxNum, isSameValue } from '../../libs/utils';
+	import { useNamespace, useTouch } from '../../libs/use';
+	import { formDisabledInjectKey, formReadonlyInjectKey } from "../rice-form"
+	import { SliderProps, SliderInitData, SliderValue } from './type.uts';
+
+
+	defineOptions({
+		name: 'rice-slider',
+		styleIsolation: 'app-and-page',
+		externalClasses: ['button-class']
+	})
+
+	const props = withDefaults(defineProps<SliderProps>(), {
+		min: 0,
+		max: 100,
+		step: 1,
+		range: false,
+		showValue: false,
+		mode: 'default',
+		valuePosition: 'top',
+		buttonSize: 25,
+		buttonClass: "",
+		clickChange: true,
+		customStyle: () : UTSJSONObject => ({})
+	})
+
+	const ns = useNamespace('slider')
+	const touch = useTouch()
+
+	const emit = defineEmits<{
+		change : [value: SliderValue],
+		changing : [value: SliderValue]
+	}>()
+
+	//@ts-ignore
+	const modelValue = defineModel({
+		type: [Array, Number] as PropType<number[] | number>,
+		default: 0
+	})
+
+	//form 表单联动
+	const formDisabled = inject<Ref<boolean | null> | null>(formDisabledInjectKey, null)
+	const formReadonly = inject<Ref<boolean | null> | null>(formReadonlyInjectKey, null)
+
+	const _disabled = computed<boolean>(() => (formDisabled?.value ?? false) || props.disabled == true)
+	const _readonly = computed<boolean>(() => (formReadonly?.value ?? false) || props.readonly == true)
+
+	//双滑块  绑定值需要是一个数组
+	const isRange = computed<boolean>(() => props.range && Array.isArray(modelValue.value))
+
+	// value值显示的位置
+	const _valuePosition = computed(() => props.showValue ? props.valuePosition : 'none')
+
+	const minValue = computed<number>(() => Math.min(props.min, props.max))
+	const maxValue = computed<number>(() => Math.max(props.min, props.max))
+	const stepValue = computed<number>(() => props.step > 0 ? props.step : 1)
+	const precision = computed<number>(() => getPrecision(stepValue.value))
+	const capsuleMainInset = computed(() => props.mode == 'capsule' ? 2 : 0)
+
+	const trackRef = shallowRef<UniElement | null>(null)
+	const resizeObserver = ref<UniResizeObserver | null>(null)
+	const allowTrackTapUpdate = ref(false)
+
+	const current = reactive<SliderInitData>({
+		dragging: 'none',
+		moveReady: false,
+		firstValue: 0,
+		secondValue: 0,
+		startValue: 0,
+		sliderWidth: 0,
+		sliderHeight: 0,
+		trackLeft: 0,
+		trackTop: 0,
+		trackWidth: 0,
+		trackHeight: 0,
+	})
+
+	const formatDisplayValue = (value : number) : string | number => {
+		if (typeof props.formatValuetip == 'function') {
+			return props.formatValuetip!(value)
+		}
+		return value
+	}
+
+	//进度条轨道的高度
+	const trackHeightPx = computed<number>(() => {
+		if (props.trackHeight != null) {
+			return getPxNum(props.trackHeight!)
+		}
+		return props.mode == 'capsule' ? 18 : 4
+	})
+
+
+	//按钮的宽高
+	const buttonSizePx = computed<number>(() => {
+		if (props.mode == 'capsule') {
+			return trackHeightPx.value
+		}
+		return getPxNum(props.buttonSize)
+	})
+
+	const getPercentByValue = (value : number) => {
+		const distance = maxValue.value - minValue.value
+		if (distance <= 0) return 0
+		return (value - minValue.value) / distance
+	}
+
+	const getAxisLength = () => {
+		const base = current.trackWidth
+		return Math.max(base - capsuleMainInset.value * 2 - buttonSizePx.value, 0)
+	}
+
+	const getOffsetByValue = (value : number) => {
+		const axisLength = getAxisLength()
+		if (axisLength <= 0) return 0
+		return capsuleMainInset.value + axisLength * getPercentByValue(value)
+	}
+
+
+	const getButtonCenterOffset = (value : number) => {
+		return getOffsetByValue(value) + buttonSizePx.value / 2
+	}
+
+	const updateTrackRect = async () => {
+		await nextTick()
+		if (trackRef.value == null) return
+		const rect = await trackRef.value!.getBoundingClientRectAsync()!
+		current.trackLeft = rect.left
+		current.trackTop = rect.top
+		current.trackWidth = rect.width
+		current.trackHeight = rect.height
+		current.sliderWidth = rect.width
+		current.sliderHeight = rect.height
+	}
+
+	const initTrackObserver = async () => {
+		if (trackRef.value == null) return
+		await updateTrackRect()
+		// #ifndef MP
+		resizeObserver.value = new UniResizeObserver((entries : UniResizeObserverEntry[]) => {
+			const target = entries.find(item => item.target == trackRef.value)
+			if (target != null) {
+				current.trackWidth = Math.ceil(target.contentRect.width)
+				current.trackHeight = Math.ceil(target.contentRect.height)
+			}
+		})
+		resizeObserver.value!.observe(trackRef.value!)
+		// #endif
+	}
+
+
+	const trackStyle = computed(() => {
+		const css = new Map<string, string>()
+		if (props.mode == 'capsule') {
+			css.set('height', `${trackHeightPx.value + 6}px`)
+		} else {
+			css.set('height', `${trackHeightPx.value}px`)
+		}
+		if (props.inactiveColor != null) {
+			css.set('background', props.inactiveColor!)
+		}
+		return css
+	})
+
+	const contentStyle = computed(() => {
+		const css = new Map<string, string>()
+		if (props.mode == 'capsule') {
+			css.set('height', `${trackHeightPx.value + 6}px`)
+		} else {
+			css.set('height', `${buttonSizePx.value}px`)
+		}
+		return css
+	})
+
+	const getTopValueStyle = (type : string) => {
+		const css = new Map<string, string>()
+		const value = type == 'first' ? current.firstValue : current.secondValue
+		css.set('left', `${getButtonCenterOffset(value)}px`)
+		return css
+	}
+
+	const getStartOffset = () => {
+		if (isRange.value) {
+			return getButtonCenterOffset(current.firstValue)
+		}
+		return capsuleMainInset.value
+	}
+
+
+	const getEndOffset = () => {
+		const target = props.range ? current.secondValue : current.firstValue
+		return getButtonCenterOffset(target)
+	}
+
+	const activeStyle = computed(() => {
+		const css = new Map<string, string>()
+		const start = getStartOffset()
+		const end = getEndOffset()
+		let width = end - start
+		if (!isRange.value && current.firstValue == props.min) {
+			width = 0
+		}
+		css.set('left', `${start}px`)
+		css.set('width', `${Math.max(width, 0)}px`)
+		css.set('height', `${trackHeightPx.value}px`)
+		if (props.activeColor != null) {
+			css.set('background', props.activeColor!)
+		}
+		if (props.mode == 'capsule') {
+			if (isRange.value) {
+				css.set('border-radius', '0px')
+			} else {
+				css.set('border-top-right-radius', '0px')
+				css.set('border-bottom-right-radius', '0px')
+				// #ifdef APP-ANDROID
+				css.set('border-top-left-radius', '99px')
+				css.set('border-bottom-left-radius', '99px')
+				// #endif
+			}
+		} else {
+			css.set('border-radius', '99px')
+		}
+
+		return css
+	})
+
+	const textStyle = computed(() => {
+		const css = new Map<string, string>()
+		if (props.valueColor != null) {
+			css.set('color', props.valueColor!)
+		}
+		return css
+	})
+
+
+	const clampValue = (value : number) => {
+		return clamp(value, minValue.value, maxValue.value)
+	}
+
+	const formatByPrecision = (value : number) => {
+		const fixed = precision.value
+		if (fixed <= 0) return Math.round(value)
+		return parseFloat(value.toFixed(fixed))
+	}
+
+	const alignToStep = (value : number) => {
+		const safeValue = clampValue(value)
+		const step = stepValue.value
+		const distance = safeValue - minValue.value
+		const stepCount = Math.round(distance / step)
+		const nextValue = minValue.value + stepCount * step
+		return clampValue(formatByPrecision(nextValue))
+	}
+
+	const getValueByClientX = (clientX : number) => {
+		const width = getAxisLength()
+		const offset = clamp(clientX - current.trackLeft - capsuleMainInset.value - buttonSizePx.value / 2, 0, width)
+		const percent = width <= 0 ? 0 : offset / width
+		const rawValue = minValue.value + (maxValue.value - minValue.value) * percent
+		return alignToStep(rawValue)
+	}
+
+	const createValueByCurrent = () : SliderValue => {
+		if (props.range) {
+			return [current.firstValue, current.secondValue]
+		}
+		return current.firstValue
+	}
+
+	function syncModelValue(force = false) {
+		const nextValue = createValueByCurrent()
+		if (force || !isSameValue(modelValue.value, nextValue)) {
+			modelValue.value = nextValue
+		}
+	}
+
+	function updateValueByAxis(clientPoint : number, emitChanging = true) {
+		const nextValue = getValueByClientX(clientPoint)
+		if (props.range) {
+			if (current.dragging == 'second') {
+				if (nextValue < current.firstValue) {
+					const swapValue = current.firstValue
+					current.firstValue = nextValue
+					current.secondValue = swapValue
+					current.dragging = 'first'
+				} else {
+					current.secondValue = nextValue
+				}
+			} else {
+				if (nextValue > current.secondValue) {
+					const swapValue = current.secondValue
+					current.secondValue = nextValue
+					current.firstValue = swapValue
+					current.dragging = 'second'
+				} else {
+					current.firstValue = nextValue
+				}
+			}
+		} else {
+			current.firstValue = nextValue
+			current.secondValue = nextValue
+		}
+		syncModelValue()
+		if (emitChanging) {
+			emit('changing', createValueByCurrent())
+		}
+	}
+
+
+	const startDragging = async (e : UniTouchEvent, type : string, updateOnStart : boolean, enableTapUpdate : boolean) => {
+		if (_disabled.value || _readonly.value) return
+		touch.start(e)
+		//@ts-ignore
+		current.dragging = type
+		current.moveReady = updateOnStart
+		allowTrackTapUpdate.value = enableTapUpdate
+		current.startValue = createValueByCurrent()
+		await updateTrackRect()
+		if (updateOnStart) {
+			updateValueByAxis(e.touches[0].clientX)
+		}
+	}
+
+	const pickDraggingThumb = (value : number) => {
+		if (!isRange.value) return 'first'
+		const firstDistance = Math.abs(value - current.firstValue)
+		const secondDistance = Math.abs(value - current.secondValue)
+		if (firstDistance <= secondDistance) {
+			return 'first'
+		}
+		return 'second'
+	}
+	//阻止点击按钮的时候冒泡
+	const buttonClick = () => { }
+
+	const contentClick = async (e : UniPointerEvent) => {
+		if (!props.clickChange || _disabled.value || _readonly.value) return
+		const startValue = createValueByCurrent()
+		await updateTrackRect()
+		const nextValue = getValueByClientX(e.clientX)
+		current.dragging = pickDraggingThumb(nextValue)
+		updateValueByAxis(e.clientX, false)
+		const changed = !isSameValue(startValue, createValueByCurrent())
+		current.dragging = 'none'
+		current.moveReady = false
+		allowTrackTapUpdate.value = false
+		if (changed) {
+			emit('change', createValueByCurrent())
+		}
+	}
+
+	const onButtonTouchstart = (e : UniTouchEvent, type : string) => {
+		startDragging(e, type, false, false)
+	}
+
+
+	const onTrackTouchmove = (e : UniTouchEvent) => {
+		if (_disabled.value || _readonly.value || current.dragging == 'none') return
+		touch.move(e)
+		if (touch.skipMove.value) return
+		if (!current.moveReady) {
+			const axisOffset = touch.offsetX.value
+			if (touch.direction.value != 'horizontal') {
+				return
+			}
+			current.moveReady = true
+		}
+		updateValueByAxis(e.touches[0].clientX, true)
+		e.preventDefault()
+	}
+
+	const onTrackTouchend = () => {
+		if (current.dragging == 'none') return
+		if (allowTrackTapUpdate.value && !current.moveReady && touch.isTap.value) {
+			updateValueByAxis(touch.startX.value, false)
+		}
+		const nextValue = createValueByCurrent()
+		const changed = !isSameValue(current.startValue, nextValue)
+		current.dragging = 'none'
+		current.moveReady = false
+		allowTrackTapUpdate.value = false
+		touch.end()
+		if (changed) {
+			emit('change', nextValue)
+		}
+	}
+
+	const getButtonWrapStyle = (type : string) => {
+		const css = new Map<string, string>()
+		const value = type == 'first' ? current.firstValue : current.secondValue
+		css.set('width', `${buttonSizePx.value}px`)
+		css.set('height', `${buttonSizePx.value}px`)
+		css.set('left', `${getOffsetByValue(value)}px`)
+		if (props.buttonBorderColor != null) {
+			css.set('border-color', props.buttonBorderColor!)
+		}
+		if (props.buttonColor != null) {
+			css.set('background', props.buttonColor!)
+		}
+		return css
+	}
+
+
+	const normalizeModelValue = (value : SliderValue) : SliderValue => {
+		if (props.range) {
+			let start = minValue.value
+			let end = minValue.value
+			if (Array.isArray(value)) {
+				if (value.length > 0) {
+					start = alignToStep(value[0]!)
+				}
+				if (value.length > 1) {
+					end = alignToStep(value[1]!)
+				} else {
+					end = start
+				}
+			} else if (typeof value == 'number') {
+				start = alignToStep(value)
+				end = start
+			}
+			if (start > end) {
+				const temp = start
+				start = end
+				end = temp
+			}
+			return [start, end]
+		}
+
+		if (typeof value == 'number') {
+			return alignToStep(value)
+		}
+		if (Array.isArray(value) && value.length > 0) {
+			return alignToStep(value[0]!)
+		}
+		return alignToStep(minValue.value)
+	}
+
+	const syncCurrentValue = (value : SliderValue) => {
+		const normalizedValue = normalizeModelValue(value)
+		if (Array.isArray(normalizedValue)) {
+			current.firstValue = normalizedValue[0]!
+			current.secondValue = normalizedValue[1]!
+		} else {
+			current.firstValue = normalizedValue
+			current.secondValue = normalizedValue
+		}
+	}
+
+	//跟节点class
+	const rootClass = computed(() => {
+		return [
+			ns.theme(),
+			ns.is('capsule', props.mode == 'capsule'),
+			ns.is('aside', _valuePosition.value == 'right'),
+			ns.is('disabled', _disabled.value),
+		]
+	})
+
+	const contentClass = computed(() => {
+		return [
+			ns.is('__content--aside--value', _valuePosition.value == 'right'),
+			ns.is('__content--capsule', props.mode == 'capsule'),
+		]
+	})
+
+	const trackClass = computed(() => {
+		return [
+			ns.is('__track--capsule', props.mode == 'capsule'),
+		]
+	})
+
+	const activeClass = computed(() => {
+		return [
+			ns.is('__active--capsule', props.mode == 'capsule'),
+		]
+	})
+
+	watch(modelValue, (newVal : SliderValue) => {
+		if (current.dragging != 'none') return
+		const normalizedValue = normalizeModelValue(newVal)
+		if (!isSameValue(newVal, normalizedValue)) {
+			modelValue.value = normalizedValue
+			return
+		}
+		syncCurrentValue(normalizedValue)
+	}, {
+		immediate: true,
+		deep: true,
+	})
+
+	watch(() : (number | boolean)[] => [props.min, props.max, props.step, props.range], () => {
+		const normalizedValue = normalizeModelValue(modelValue.value)
+		if (!isSameValue(modelValue.value, normalizedValue)) {
+			modelValue.value = normalizedValue
+		}
+		syncCurrentValue(normalizedValue)
+	})
+
+	onMounted(() => {
+		initTrackObserver()
+	})
+
+	onUnmounted(() => {
+		if (trackRef.value != null) {
+			resizeObserver.value?.unobserve(trackRef.value!)
+		}
+	})
+</script>
+
+
+<style scoped lang="scss">
+	@mixin textStyle {
+		color: var(--rice-text-color);
+		font-size: 14px;
+		width: 40px;
+		white-space: nowrap;
+		/* #ifndef APP */
+		word-break: keep-all;
+		/* #endif */
+	}
+
+	.rice-slider {
+		padding: 4px 0;
+		flex-direction: column;
+
+		&__content {
+			position: relative;
+			justify-content: center;
+
+			&--aside--value {
+				flex: 1;
+			}
+
+		}
+
+		&__track {
+			width: 100%;
+			height: 4px;
+			border-radius: 99px;
+			background-color: var(--rice-slider-inactive-background);
+
+			&--capsule {
+				height: 18px;
+			}
+
+		}
+
+		&__active {
+			position: absolute;
+			background-color: var(--rice-primary-color);
+			/* #ifndef APP-ANDROID */
+			border-radius: 99px;
+			/* #endif */
+
+		}
+
+		&__top {
+			position: relative;
+			height: 25px;
+			padding: 0 2px;
+		}
+
+		&__value {
+			color: var(--rice-text-color);
+			font-size: 14px;
+			white-space: nowrap;
+			/* #ifndef APP */
+			word-break: keep-all;
+
+			/* #endif */
+			&__top {
+				position: absolute;
+				top: 0;
+				z-index: 2;
+				transform: translateX(-50%);
+			}
+
+			&__left {
+				padding-right: 4px;
+				width: 45px;
+				text-align: right;
+			}
+
+			&__right {
+				padding-left: 4px;
+				width: 45px;
+				text-align: left;
+			}
+		}
+
+		&__button {
+			position: absolute;
+			width: 25px;
+			height: 25px;
+			border-radius: 999px;
+			background-color: #fff;
+			/* #ifndef APP*/
+			border: 1px solid var(--rice-border-color);
+			/* #endif */
+			/* #ifdef APP */
+			border: 1px solid var(--rice-border-color);
+			/* #endif */
+			/* #ifdef WEB */
+			cursor: grab;
+			user-select: none;
+			/* #endif */
+		}
+
+		&--disabled {
+			opacity: .6;
+		}
+
+		&--aside {
+			flex-direction: row;
+			align-items: center;
+		}
+
+	}
+</style>

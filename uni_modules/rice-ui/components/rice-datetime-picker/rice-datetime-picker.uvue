@@ -1,0 +1,331 @@
+<template>
+	<rice-picker v-model="currentValues" v-model:show="(show as boolean)" :columns="currentColumns" :use-popup="usePopup"
+		:loading="loading" :toolbar-position="toolbarPosition" :immediate-change="immediateChange"
+		:close-on-click-confirm="closeOnClickConfirm" :close-on-click-cancel="closeOnClickCancel"
+		:close-on-click-overlay="closeOnClickOverlay" :title="title" :confirm-button-text="confirmButtonText"
+		:cancel-button-text="cancelButtonText" :font-size="fontSize" :visible-option-num="visibleOptionNum"
+		:option-height="optionHeight" :empty-text="emptyText" :z-index="zIndex"
+		:safe-area-inset-bottom="safeAreaInsetBottom" @confirm="onConfirm" @cancel="onCancel" @change="onChange"
+		@open="onOpen" @close="onClose" @opened="onOpened" @closed="onClosed">
+	</rice-picker>
+</template>
+
+<script setup>
+	import { clamp, isSameValue, hasStrValue } from '../../libs/utils';
+	import { dateuts, Dateuts } from "../../libs/plugin";
+	import { PickerOption, PickerEvent } from '../rice-picker';
+	import { getOptions, getMode, isTime, startOfMaps, FULL_MODES, isRightDate } from "./utils.uts"
+	import { DateTimePickerProps, DateTimePickerUnit, DateTimePickerExtend, DateTimePickerFormatter } from './type.uts';
+
+	defineOptions({
+		name: 'rice-datetime-picker',
+		styleIsolation: 'app-and-page'
+	})
+
+	const emit = defineEmits<{
+		confirm : [value: string, extend: DateTimePickerExtend],
+		change : [value: string, extend: DateTimePickerExtend],
+		cancel : [value: string, extend: DateTimePickerExtend],
+		open : [],
+		close : [],
+		opened : [],
+		closed : [],
+	}>()
+
+	const props = withDefaults(defineProps<DateTimePickerProps>(), {
+		type: 'date',
+		minDate: dateuts().subtract(10, 'year').startOf('day').format('YYYY-MM-DD HH:mm:ss'),
+		maxDate: dateuts().add(10, 'year').endOf('day').format('YYYY-MM-DD HH:mm:ss'),
+		usePopup: true,
+		closeOnClickOverlay: true,
+		closeOnClickConfirm: true,
+		closeOnClickCancel: true,
+		safeAreaInsetBottom: true,
+		immediateChange: true,
+	})
+
+	const modelValue = defineModel({
+		type: String,
+		default: ''
+	})
+
+	const show = defineModel('show', {
+		type: Boolean,
+		default: false
+	})
+
+	//defineProps 的 default 是一个静态值（仅在组件首次创建时赋值），它不会在每次组件重新挂载时重新计算。
+	if (!hasStrValue(modelValue.value)) {
+		modelValue.value = dateuts().format('YYYY-MM-DD HH:mm:ss')
+	}
+
+	const mode = computed(() => getMode(props.type))
+	const isVisible = computed(() => show.value || props.usePopup == false)
+
+	const getMinOrMaxDate = (minOrMax : string) => {
+
+		const isTimeMode = props.type == 'minute' || props.type == 'time'
+		const isMin = minOrMax == 'min'
+		let boundary = isMin ? props.minDate : props.maxDate
+		const isDate = isRightDate(boundary)
+
+		// 类型为时间选择器是，年月日应该设置为一致进行比较
+		if (isTimeMode) {
+			const now = isRightDate(modelValue.value)
+				? dateuts(modelValue.value).format('YYYY-MM-DD')
+				: dateuts().format('YYYY-MM-DD')
+			const range = isMin ? '00:00:00' : '23:59:59'
+			//格式化成 HH:mm:ss
+			const second = isDate
+				? dateuts(boundary).format('HH:mm:ss')
+				: isTime(boundary) ? boundary : range
+			return dateuts(`${now} ${second}`)
+
+		}
+		//非时间选择器
+
+		if (!isDate) {
+			return isMin ? dateuts().subtract(10, 'year').startOf('day')
+				: dateuts().add(10, 'year').endOf('day')
+		}
+		return dateuts(boundary)
+	}
+
+	const minDate = computed(() => getMinOrMaxDate('min'))
+	const maxDate = computed(() => getMinOrMaxDate('max'))
+
+
+	const getParseDate = () : Dateuts => {
+		let newVal = modelValue.value
+		const isTimeMode = props.type == 'minute' || props.type == 'time'
+		//eg 15:00 16:00:00
+		if (isTimeMode && isTime(newVal)) {
+			newVal = dateuts().format(`YYYY-MM-DD ${newVal}`)
+		}
+		const isDate = isRightDate(newVal)
+		if (!isDate) {
+			return minDate.value
+		}
+		let date = dateuts(newVal)
+
+		//将时间值限定在最小值和最大值区间内，若小于最小值，则使用最小值；若大于最大值，则使用最大值。
+		const compare = clamp(date.valueOf(), minDate.value.valueOf(), maxDate.value.valueOf())
+		const startValue = (startOfMaps[props.type] as string | null) ?? 'date'
+		//@ts-ignore
+		const d = dateuts(compare).startOf(startValue)
+		return d.isValid() ? d : minDate.value
+	}
+	const currentDate = ref<Dateuts>(getParseDate())
+
+	const initCurrentValues = () : number[] => {
+		const date = currentDate.value.toObject()
+		const values = mode.value.map((type) : number => {
+			switch (type) {
+				case 'year':
+					return date.year;
+				case 'month':
+					return date.month + 1;
+				case 'day':
+					return date.date;
+				case 'hour':
+					return date.hours;
+				case 'minute':
+					return date.minutes;
+				case 'second':
+					return date.seconds;
+				default:
+					return 0
+			}
+		})
+		return values
+	}
+	const currentValues = ref<number[]>(isVisible.value ? initCurrentValues() : [])
+
+
+	function getDateArr(type = 'default') {
+		let date = minDate.value
+		if (type == 'max') {
+			date = maxDate.value
+		} else if (type == 'default') {
+			const compare = clamp(currentDate.value.valueOf(), minDate.value.valueOf(), maxDate.value.valueOf())
+			const d = dateuts(compare)
+			date = d.isValid() ? d : minDate.value
+		}
+		return date.toArray()
+	}
+
+	const getOptionBoundary = (minOrMax : string, type : DateTimePickerUnit) : number => {
+		const isMin = minOrMax == 'min'
+		const boundary = {
+			year: [2000, 2099],
+			month: [0, 11],
+			day: [1, currentDate.value.daysInMonth()],
+			hour: [0, 23],
+			minute: [0, 59],
+			second: [0, 59]
+		}
+		const curDate = getDateArr()
+		const compareDate = getDateArr(minOrMax)
+		const boundaryInfo = (boundary.getArray(type)!) as number[]
+		for (let i = 0; i < curDate.length; i++) {
+			if (type == FULL_MODES[i]) {
+				return compareDate[i]
+			}
+			//当前选择的时间和最大/最小可选时间不同
+			if (curDate[i] != compareDate[i]) {
+				return isMin ? boundaryInfo[0] : boundaryInfo[1]
+			}
+		}
+		return isMin ? boundaryInfo[0] : boundaryInfo[1]
+	}
+
+	const createOptionsGenera = (type : DateTimePickerUnit) => {
+		let min = getOptionBoundary('min', type)
+		let max = getOptionBoundary('max', type)
+		if (type == 'month') {
+			min += 1
+			max += 1
+		}
+		return getOptions(min, max, type, props.formatter, props.filter)
+	}
+	const currentColumns = ref<PickerOption[][]>([])
+
+	const updateColumns = () => {
+		if (!isVisible.value) return
+		let options = mode.value.map((type) : PickerOption[] => {
+			switch (type) {
+				case 'year':
+					return createOptionsGenera('year')
+				case 'month':
+					return createOptionsGenera('month')
+				case 'day':
+					return createOptionsGenera('day')
+				case 'hour':
+					return createOptionsGenera('hour')
+				case 'minute':
+					return createOptionsGenera('minute')
+				case 'second':
+					return createOptionsGenera('second')
+				default:
+					return ([] as PickerOption[])
+			}
+		})
+		currentColumns.value = options
+	}
+	updateColumns()
+
+	const format = computed<string>(() => {
+		if (props.format != null) return props.format!
+		const type = props.type
+		if (type == 'year') return 'YYYY'
+		if (type == 'month') return 'YYYY-MM'
+		if (type == 'date') return 'YYYY-MM-DD'
+		if (type == 'minute') return 'HH:mm'
+		if (type == 'time') return 'HH:mm:ss'
+		if (type == 'datehour') return 'YYYY-MM-DD HH'
+		if (type == 'dateminute') return 'YYYY-MM-DD HH:mm'
+		return 'YYYY-MM-DD HH:mm:ss'
+	})
+
+	const normalizePickerExtend = (value : DateTimePickerExtend) : DateTimePickerExtend => {
+		const normalized = {
+			...value
+		} as DateTimePickerExtend
+
+		const hasYear = mode.value.includes('year')
+		const hasMonth = mode.value.includes('month')
+		const hasDay = mode.value.includes('day')
+
+		if (hasYear && hasMonth && hasDay) {
+			const safeMonth = clamp(normalized.month, 1, 12)
+			const monthStart = dateuts(`${normalized.year}-${safeMonth}-01 00:00:00`)
+			const maxDay = monthStart.daysInMonth()
+			normalized.month = safeMonth
+			normalized.day = clamp(normalized.day, 1, maxDay)
+		}
+
+		return normalized
+	}
+
+	const getAllValue = () => {
+		const date = currentDate.value.toObject()
+		const result = {
+			year: date.year,
+			month: date.month + 1,
+			day: date.date,
+			hour: date.hours,
+			minute: date.minutes,
+			second: date.seconds,
+			timeStamp: 0,
+			value: ''
+		} as DateTimePickerExtend
+
+		mode.value.forEach((m, i) => {
+			if (result[m] != null && currentValues.value.length > 0) result[m] = currentValues.value[i]
+		})
+		const normalized = normalizePickerExtend(result)
+		const newVal = `${normalized.year}-${normalized.month}-${normalized.day} ${normalized.hour}:${normalized.minute}:${normalized.second}`
+		const d = dateuts(newVal)
+		normalized.timeStamp = d.valueOf()
+		normalized.value = d.format(format.value)
+		return normalized
+	}
+
+	const onConfirm = () => {
+		const values = getAllValue()
+		emit('confirm', values.value, values)
+	}
+
+	const onCancel = () => {
+		const values = getAllValue()
+		emit('cancel', values.value, values)
+	}
+
+	const onChange = async () => {
+		await nextTick()
+		const values = getAllValue()
+		emit('change', values.value, values)
+	}
+
+	const updateModelValue = (newVal : string) => {
+		if (!isVisible.value || modelValue.value == newVal) return
+		modelValue.value = newVal
+	}
+
+	watch(currentValues, () => {
+		const result = getAllValue()
+		updateModelValue(result.value)
+	}, {
+		deep: true,
+		immediate: true,
+	})
+	watch([modelValue, mode, isVisible, () : string => props.minDate, () : string => props.maxDate], async () => {
+		if (!isVisible.value) return
+		currentDate.value = getParseDate()
+		currentValues.value = initCurrentValues()
+		updateColumns()
+	}, {
+		deep: true,
+	})
+
+
+	const onOpen = () => {
+		emit('open')
+	}
+
+	const onClose = () => {
+		emit('close')
+	}
+
+	const onOpened = () => {
+		emit('opened')
+	}
+
+	const onClosed = () => {
+		emit('closed')
+	}
+</script>
+
+<style scoped lang="scss">
+
+</style>

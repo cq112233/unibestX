@@ -1,0 +1,33 @@
+import { BeforeChangeInterceptor } from "../../libs/types"
+
+export type StepperCurrent = {
+	inputValue ?: string,
+	currentValue ?: number | string
+}
+
+export type StepperProps = {
+	mode ?: 'square' | 'round' | 'outline',
+	step ?: number,
+	stepStrictly ?: boolean,
+	min ?: number,
+	max ?: number,
+	autoFixed ?: boolean,
+	integer ?: boolean,
+	decimalLength ?: number,
+	inputWidth ?: number | string,
+	buttonSize ?: number | string,
+	fontSize ?: number | string,
+	disabled ?: boolean,
+	readonly ?: boolean,
+	disablePlus ?: boolean,
+	disableMinus ?: boolean,
+	disableInput ?: boolean,
+	showPlus ?: boolean,
+	showMinus ?: boolean,
+	showInput ?: boolean,
+	beforeChange ?: BeforeChangeInterceptor,
+	plusBtnStyle ?: UTSJSONObject,
+	minusBtnStyle ?: UTSJSONObject,
+	inputStyle ?: UTSJSONObject,
+	customStyle ?: UTSJSONObject,
+}

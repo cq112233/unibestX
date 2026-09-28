@@ -1,0 +1,63 @@
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
+    <view class="p-[16px]">
+      <!-- 基础徽标 -->
+      <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
+        <view class="flex-row items-center mb-[12px]">
+          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px]" :style="{ backgroundColor: currentTheme }" />
+          <text class="text-[14px] font-bold text-[#334155]">基础数字徽标</text>
+        </view>
+        <view class="flex-row items-center justify-around py-[10px]">
+          <rice-badge :value="5">
+            <view class="w-[48px] h-[48px] bg-[#e2e8f0] rounded-[8px] flex items-center justify-center">
+              <rice-icon name="chat" size="24px" color="#475569" />
+            </view>
+          </rice-badge>
+          <rice-badge :value="99" max="99">
+            <view class="w-[48px] h-[48px] bg-[#e2e8f0] rounded-[8px] flex items-center justify-center">
+              <rice-icon name="volume" size="24px" color="#475569" />
+            </view>
+          </rice-badge>
+          <rice-badge :is-dot="true">
+            <view class="w-[48px] h-[48px] bg-[#e2e8f0] rounded-[8px] flex items-center justify-center">
+              <rice-icon name="user" size="24px" color="#475569" />
+            </view>
+          </rice-badge>
+        </view>
+      </view>
+
+      <!-- 自定义类型与独立徽标 -->
+      <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
+        <view class="flex-row items-center mb-[12px]">
+          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px]" :style="{ backgroundColor: currentTheme }" />
+          <text class="text-[14px] font-bold text-[#334155]">类型与独立徽标</text>
+        </view>
+        <view class="flex-row items-center justify-around py-[10px]">
+          <rice-badge value="HOT" type="error" :single="true" />
+          <rice-badge value="NEW" type="success" :single="true" />
+          <rice-badge value="VIP" type="warning" :single="true" />
+          <rice-badge :value="12" :color="currentTheme" :single="true" />
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { useAppStore } from '@/src/store';
+import { computed } from 'vue';
+
+definePage({
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
+  style: {
+    navigationBarTitleText: 'Badge 徽标',
+    navigationStyle: 'custom'
+  }
+});
+
+const appStore = useAppStore();
+const currentTheme = computed((): string => appStore.state.theme);
+</script>

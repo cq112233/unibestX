@@ -1,0 +1,30 @@
+
+export type Config = {
+	theme : 'dark' | 'light',
+	unit : 'px' | 'rpx'
+}
+
+export const config = reactive<Config>({
+	theme: "light",
+	unit: 'px'
+})
+
+export const isDark = computed(() => config.theme == 'dark')
+
+export const setTheme = (theme : 'dark' | 'light') => {
+	config.theme = theme
+}
+
+// #ifdef WEB
+watch(() => isDark.value, (newVal : boolean) => {
+	if (newVal) {
+		document.documentElement.classList.remove('rice-theme-light')
+		document.documentElement.classList.add('rice-theme-dark')
+	} else {
+		document.documentElement.classList.remove('rice-theme-dark')
+		document.documentElement.classList.add('rice-theme-light')
+	}
+}, {
+	immediate: true
+})
+// #endif

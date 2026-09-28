@@ -1,0 +1,108 @@
+import { hueStep, saturationStep, brightnessStep1, brightnessStep2, saturationStep2, lightColorCount, darkColorCount } from './constant';
+import { ParseNumber } from "./type.uts"
+
+export function getGenHue(hsv : UTSJSONObject, i : number, light = false) : number {
+	let hue : number;
+	const h = hsv['h'] as number
+
+	// 根据色相不同，色相转向不同
+	if (Math.round(h) >= 60 && Math.round(h) <= 240) {
+		hue = light == true ? Math.round(h) - hueStep * i : Math.round(h) + hueStep * i;
+	} else {
+		hue = light == true ? Math.round(h) + hueStep * i : Math.round(h) - hueStep * i;
+	}
+	if (hue < 0) {
+		hue += 360;
+	} else if (hue >= 360) {
+		hue -= 360;
+	}
+	return hue;
+}
+
+export function getGenSaturation(hsv : UTSJSONObject, i : number, light = false) : number {
+	const h = hsv['h'] as number
+	const s = hsv['s'] as number
+	if (h == 0 && s == 0) {
+		return s;
+	}
+	let saturation = s + saturationStep2 * i
+	if (light) {
+		saturation = s - saturationStep * i;
+	} else if (i == darkColorCount) {
+		saturation = s + saturationStep;
+	}
+	if (saturation > 1) {
+		saturation = 1;
+	}
+	if (light && i == lightColorCount && saturation > 0.1) {
+		saturation = 0.1;
+	}
+	if (saturation < 0.06) {
+		saturation = 0.06;
+	}
+	return Math.round(saturation * 100) / 100;
+}
+
+export function getGenValue(hsv : UTSJSONObject, i : number, light = false) {
+	const v = hsv['v'] as number
+	let value = v + brightnessStep1 * i;
+	if (!light) {
+		value = v - brightnessStep2 * i;
+	}
+	value = Math.max(0, Math.min(1, value));
+	return Math.round(value * 100) / 100;
+}
+
+function fillArr(arr : string[]) {
+	while (arr.length < 4) {
+		arr.push("")
+	}
+	return arr;
+}
+
+
+//从字符串 str 中提取所有符合特定格式的数字或百分比值
+export function splitColorStr(str : string, parseNum : ParseNumber) : number[] {
+	const match =
+		str.replace(/^[^(]*\((.*)/, '$1')
+			.replace(/\).*/, '')
+			.match(/\d*\.?\d+%?/g) ?? [] as string[];
+	const m = fillArr(match as string[]) as string[]
+	let numList = m.map((item : string) => parseFloat(item as string));
+	for (let i = 0; i < 3; i += 1) {
+		numList[i] = parseNum(numList[i], m[i], i)
+	}
+	if (m[3] != "") {
+		numList[3] = m[3].includes('%') ? numList[3] / 100 : numList[3]
+	} else {
+		numList[3] = 1
+	}
+	return numList
+}
+
+export function limitRange(value : number, max = 255) {
+	// #ifndef APP
+	const mergedMax = max || 255;
+	// #endif
+
+	// #ifdef APP
+	const mergedMax = max == 0 ? 255 : max;
+	// #endif
+
+	if (value > mergedMax) {
+		return mergedMax;
+	}
+	if (value < 0) {
+		return 0;
+	}
+	return value;
+}
+
+export const parseHSVorHSL : ParseNumber = (num : number, _ : string, index : number) => {
+	// #ifdef APP
+	return index == 0 ? num : num / 100;
+	// #endif
+	// #ifndef APP
+	return index === 0 ? num : num / 100;
+	// #endif
+}

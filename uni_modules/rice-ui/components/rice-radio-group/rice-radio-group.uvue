@@ -1,0 +1,79 @@
+<template>
+	<view :class="rootClass" :style="customStyle">
+		<slot></slot>
+	</view>
+</template>
+
+<script setup>
+
+	import { useNamespace } from "../../libs/use";
+	import { radioGroupInjectKey, defDirection, defShape, defIconPosition } from "./index.uts"
+	import { RadioGroupProps, RadioValueType, RadioGroupProvide, RadioIconPosition, RadioShape, RadioDirection } from "./type.uts"
+
+	defineOptions({
+		name: 'rice-radio-group',
+		styleIsolation: 'app-and-page'
+	})
+
+	const ns = useNamespace('radio-group')
+	const emit = defineEmits<{
+		change : [value: RadioValueType],
+	}>()
+
+	const props = withDefaults(defineProps<RadioGroupProps>(), {
+		disabled: false,
+		readonly: false,
+		direction: defDirection,
+		spaceBetween: false,
+		shape: defShape,
+		iconPosition: defIconPosition,
+		customStyle: () : UTSJSONObject => ({})
+	})
+
+	//@ts-ignore
+	const modelValue = defineModel({
+		type: [String, Number, Boolean] as PropType<RadioValueType>,
+		default: false
+	})
+
+	const updateValue = (value : RadioValueType) => {
+		modelValue.value = value
+		emit('change', value)
+	}
+
+	// 不支持 ...toRefs()
+	provide(radioGroupInjectKey, {
+		modelValue,
+		disabled: toRef<boolean>(() => props.disabled),
+		readonly: toRef<boolean>(() => props.readonly),
+		direction: toRef<RadioDirection>(() => props.direction),
+		iconPosition: toRef<RadioIconPosition>(() => props.iconPosition),
+		spaceBetween: toRef<boolean>(() => props.spaceBetween),
+		iconSize: toRef<string | number | null>(() => props.iconSize),
+		labelSize: toRef<string | number | null>(() => props.labelSize),
+		labelColor: toRef<string | null>(() => props.labelColor),
+		checkedColor: toRef<string | null>(() => props.checkedColor),
+		shape: toRef<RadioShape>(() => props.shape),
+		updateValue,
+	} as RadioGroupProvide)
+
+
+	const rootClass = computed(() => {
+		return [
+			ns.b(""),
+			ns.m(props.direction),
+			ns.theme(),
+		]
+	})
+</script>
+
+<style scoped lang="scss">
+	.rice-radio-group {
+		flex-direction: column;
+
+		&--row {
+			flex-direction: row;
+			flex-wrap: wrap;
+		}
+	}
+</style>

@@ -1,0 +1,145 @@
+<template>
+	<view class="rice-scroll-x" :class="ns.theme()" :style="customStyle" ref="scrollXRef">
+		<scroll-view direction="horizontal" :bounces="bounces" :show-scrollbar="false" :upper-threshold="0"
+			:lower-threshold="0" class="rice-scroll-x__scroll-view" @scroll="onScroll" @scrolltoupper="onScrolltoupper"
+			@scrolltolower="onScrolltolower">
+			<slot />
+		</scroll-view>
+		<view v-if="showIndicator" class="rice-scroll-x__indicator" :style="indicatorStyles">
+			<view class="rice-scroll-x__indicator__line" :class="indicatorClass" :style="[lineStyle,indicatorStyle]">
+				<view class="rice-scroll-x__indicator__bar" :class="indicatorActiveClass" :style="barStyle" ref="barRef"></view>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script setup>
+	import { useNamespace } from "../../libs/use"
+	import { addUnit, getPxNum } from "../../libs/utils"
+	import { ScrollXProps } from "./type.uts"
+	defineOptions({
+		name: 'rice-scroll-x',
+		styleIsolation: "app-and-page",
+		externalClasses: ['indicator-class', 'indicator-active-class']
+	})
+	const ns = useNamespace('scroll-x')
+	const emit = defineEmits<{
+		scrollToLeft : [],
+		scrollToRight : [],
+	}>()
+	const props = withDefaults(defineProps<ScrollXProps>(), {
+		showIndicator: true,
+		indicatorWidth: '50px',
+		indicatorBarWidth: '20px',
+		indicatorActiveClass: "",
+		indicatorClass: "",
+		indicatorStyle: () : UTSJSONObject => ({}),
+		customStyle: () : UTSJSONObject => ({}),
+	})
+	// #ifdef APP-HARMONY
+	const bounces = ref(false)
+	// #endif
+	// #ifndef APP-HARMONY
+	const bounces = ref(true)
+	// #endif
+	const scrollXRef = shallowRef<UniElement | null>(null)
+	const barRef = shallowRef<UniElement | null>(null)
+
+	const _indicatorWidth = computed(() => getPxNum(addUnit(props.indicatorWidth)))
+	const _indicatorBarWidth = computed(() => getPxNum(addUnit(props.indicatorBarWidth)))
+
+	const scrollXWidth = ref(0)
+	const getScrollRect = async () => {
+		await nextTick()
+		if (scrollXRef.value != null) {
+			const rect = await scrollXRef.value!.getBoundingClientRectAsync()!
+			scrollXWidth.value = rect.width
+		}
+	}
+
+	const onScrolltoupper = () => {
+		emit('scrollToLeft')
+	}
+
+	const onScrolltolower = () => {
+		emit('scrollToRight')
+	}
+
+	const onScroll = async (e : UniScrollEvent) => {
+		const scrollLeft = e.detail.scrollLeft
+		const scrollWidth = e.detail.scrollWidth
+		if (scrollXWidth.value == 0) {
+			await getScrollRect()
+		}
+		const x = scrollLeft / (scrollWidth - scrollXWidth.value) * (_indicatorWidth.value - _indicatorBarWidth.value)
+		barRef.value?.style.setProperty('transform', `translateX(${x}px)`)
+	}
+
+
+
+	const indicatorStyles = computed(() => {
+		const css = new Map<string, string>()
+		if (props.indicatorHeight != null) {
+			css.set('height', addUnit(props.indicatorHeight!))
+		}
+		return css
+	})
+
+	const lineStyle = computed(() => {
+		const css = new Map<string, string>()
+		css.set('width', addUnit(props.indicatorWidth!))
+		if (props.indicatorColor != null) {
+			css.set('background-color', props.indicatorColor!)
+		}
+		return css
+	})
+
+	const barStyle = computed(() => {
+		const css = new Map<string, string>()
+		css.set('width', addUnit(props.indicatorBarWidth!))
+		if (props.indicatorActiveColor != null) {
+			css.set('background-color', props.indicatorActiveColor!)
+		}
+		return css
+	})
+
+	let timer : number | null = null
+	onMounted(() => {
+		timer = setTimeout(() => {
+			getScrollRect()
+		}, 50)
+	})
+
+	onUnmounted(() => {
+		if (timer != null) clearTimeout(timer!)
+	})
+</script>
+
+<style scoped lang="scss">
+	.rice-scroll-x {
+
+		&__scroll-view {
+			flex-direction: row;
+		}
+
+		&__indicator {
+			position: relative;
+			flex-direction: row;
+			justify-content: center;
+			margin-top: var(--rice-padding-md);
+			height: 4px;
+
+			&__line {
+				height: 100%;
+				border-radius: 100px;
+				background-color: var(--rice-scroll-x-indicator-background);
+			}
+
+			&__bar {
+				height: 100%;
+				border-radius: 100px;
+				background-color: var(--rice-primary-color);
+			}
+		}
+	}
+</style>

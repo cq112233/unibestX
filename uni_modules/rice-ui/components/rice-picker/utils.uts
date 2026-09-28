@@ -1,0 +1,62 @@
+import { PickerOption, PickerColumnType, PickerModelValue } from "./type.uts"
+import { isSameValue } from "../../libs/utils"
+
+/**
+ * 判断数组的每一项是否相同
+ */
+
+// 为什么不把isSameValueArr 和 isSameIndexArray 合成一个函数
+// 因为 android 平台 的uts类型校验很………烦恼
+export const isSameValueArr = (left : PickerModelValue[], right : PickerModelValue[]) => {
+	if (left.length != right.length) {
+		return false
+	}
+	for (let i = 0; i < left.length; i++) {
+		if (!isSameValue(left[i], right[i])) {
+			return false
+		}
+	}
+	return true
+}
+
+
+export const isSameIndexArray = (left : number[], right : number[]) : boolean => {
+	if (left.length != right.length) {
+		return false
+	}
+	for (let i = 0; i < left.length; i++) {
+		if (left[i] != right[i]) {
+			return false
+		}
+	}
+	return true
+}
+
+/**
+ * 获取第一个可选中的元素
+ */
+export const getFirstEnabledIndex = (options : PickerOption[]) : number => {
+	if (options.length == 0) {
+		return 0
+	}
+	const enabledIndex = options.findIndex(option => option.disabled != true)
+	return enabledIndex > -1 ? enabledIndex : 0
+}
+
+
+
+/**
+ * 获取当前columns的类型
+ * multiple示例 : [ []  , [] ] 
+ * cascade示例 : [ [{children:[]}]] 
+ * default示例 : [ [{}] ]   
+ */
+
+export const getColumnsType = (columns : PickerOption[][]) : PickerColumnType => {
+	if (columns.length > 1) return 'multiple'
+	const firstColumn = columns.length > 0 ? columns[0] : null
+	if (firstColumn != null) {
+		if (Array.isArray(firstColumn![0].children)) return 'cascade'
+	}
+	return 'default'
+}
