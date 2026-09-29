@@ -1,7 +1,7 @@
 <template>
   <view class="_mp_root">
     <!--
-      本项目对上游 mp-html 的改动（详情见 unibestX-skill 1.3.9）：
+      本项目对上游 mp-html 的改动（详情见 unibestX-skill 3.9）：
       1) <image> 由 max-width:750px 改为固定 width:110px + border-radius:8px。
          上游只写 max-width 而没给 width，导致图片按自然宽度渲染、宽图会溢出卡片；
          固定 110px 缩略图尺寸后，任何素材都不会撑破容器。
@@ -12,31 +12,31 @@
       4) <pre> 由「等宽 + 底色」升级为「底色卡片 + 逐行语法高亮」（code-highlight.uts）。
          官方 mp-html 在 App 端给不了高亮 —— 它的 highlight 插件依赖 prismjs（纯 Web）。
       5) 标题与小字号的单位由 em/smaller 改为 px：原生端不支持相对字号，
-         字号会塌成 0、整行标题看不见（H5 却正常）。详见 unibestX-skill 1.2.13。
+         字号会塌成 0、整行标题看不见（H5 却正常）。详见 unibestX-skill 2.13。
       6) 行内样式里的 text-decoration 简写改为 text-decoration-line 长属性：
          App 端不支持该简写，写了等于没写 —— 删除线/下划线在 H5 有、原生端整条消失。
-         详见 unibestX-skill 1.2.14。
+         详见 unibestX-skill 2.14。
       7) 行内节点改为 chainClass(node) 沿「纯行内元素链」累加 class：
          原先「本节点样式 + flatText 摊平」会把内层标签的样式一并丢掉，
-         于是 ***粗斜体***（<em><strong>）只剩斜体。详见 unibestX-skill 1.2.15。
+         于是 ***粗斜体***（<em><strong>）只剩斜体。详见 unibestX-skill 2.15。
          ⚠️ 有个前提：parseHtml 的行内分支**不能**再 stripAllTags 摊平子节点，
          否则 <strong> 在解析阶段就没了、chainClass 第一跳即 break，等于白改。
          这条一开始漏了，真机上粗斜体依旧不加粗 —— 见该分支处的注释。
       8) 行内样式由动态 :style 改为静态 class（.mp-* 一组规则）：
          属于风格统一，**不是**修复 —— 曾以为"动态 :style 里的 font-weight 在 App 端不生效"，
          但真机四种写法并排对照后已证伪（静态 class 与动态 :style 的 700/bold 都同样生效），
-         详见 unibestX-skill 1.2.16。字重丢失的真因是嵌套行内样式被摊平，见上面第 7 条。
+         详见 unibestX-skill 2.16。字重丢失的真因是嵌套行内样式被摊平，见上面第 7 条。
       9) 新增 <video> 分支（顶层 + 嵌套各一条）渲染成原生播放器。
          两条分支缺一不可，且 src 要等 URL 完整才渲染，原因见 videoSrc 与嵌套分支的注释。
      10) 新增行内文字颜色：解析阶段把行内 style 里的 color 做白名单校验后存进 attrs._color，
          渲染时由 chainColor() 沿行内元素链取值、贴到 <text> 的 :style 上（见 inlineStyle）。
          上游把行内样式整体拼进动态 :style，本项目第 8 条已统一成静态 class；
          颜色来自**内容**、没法预先写成 class，所以单独保留这一处动态样式，
-         取值格式在解析阶段收窄（#hex / rgb() / rgba() / 少量具名色），详见 unibestX-skill 1.3.9。
+         取值格式在解析阶段收窄（#hex / rgb() / rgba() / 少量具名色），详见 unibestX-skill 3.9。
      11) Mermaid 全屏查看器的 min-height/min-width/max-width:100% 改为 flex:1 / width:100% + box-sizing。
          原生端 min-*/max-* 只认 number|px，百分比会被静默忽略（构建期 3 条 warn，运行期直接失效）：
          画布比屏幕小时不再垂直居中、比屏幕宽时横向滚动区撑不出屏幕、不可滚。
-         详见 unibestX-skill 1.2.22。
+         详见 unibestX-skill 2.22。
      12) Mermaid 全屏查看器由「两层 scroll-view 双向滚动」改为「手指拖动平移」（第 11 条的
          两层 scroll-view 一并拆掉）：画布夹在中间层 view 里时，H5 的 uni-view 自带
          overflow:hidden 会把溢出裁掉、滚动层量不到真实内容宽度；App 端嵌套 scroll-view 的
@@ -45,7 +45,7 @@
          画布渲染见 renderMermaidLayout / viewerLayout，平移见 onViewerTouchMove。
      13) 公式 / 流程图的**图元层**全部加 flatten 拍平（正文里的 4 处渲染点，共 10 个 v-for）：
         一个公式或流程图就是几十个绝对定位的小 box，一个个都创建独立原生 View 太浪费。
-        拍平后它们只作为绘制指令并进容器，不占原生节点（详见 unibestX-skill 1.3.24）。
+        拍平后它们只作为绘制指令并进容器，不占原生节点（详见 unibestX-skill 3.24）。
           - 只拍**叶子图元**，容器（rootStyle 那个 position:relative 的 view）**绝不能拍**：
             它一被拍掉，子图元的 position:absolute 就没有了定位参照物。
           - 前置条件逐条核对过：这些图元既没有挂事件，样式里也没有 z-index / visibility /
@@ -85,7 +85,7 @@
       <!-- 代码块：语法高亮后逐行渲染。
            外层 view 承担底色/圆角/内边距（<text> 上不适合挂这些），
            一行代码 = 一个 flex 行，行内各着色片段是「同级兄弟 <text>」——
-           不能写成嵌套 <text>，原生端一个 text 只能有一个文本节点（见 unibestX-skill 1.2.4）。
+           不能写成嵌套 <text>，原生端一个 text 只能有一个文本节点（见 unibestX-skill 2.4）。
            行内 code 走 isInline 分支，不在这里。 -->
       <view v-else-if="n.name == 'pre'" style="display:flex;flex-direction:column;background-color:#f8fafc;border-radius:6px;padding:8px 10px;border-width:1px;border-color:#e2e8f0;border-style:solid">
         <view v-for="(line, li) in codeLines(n)" :key="li" style="display:flex;flex-direction:row;flex-wrap:wrap">
@@ -173,7 +173,7 @@
       <!-- 画布承载区：手指拖动平移（点击空白深色区也可关闭）。
            原来这里套了两层 scroll-view 想靠原生滚动「双向滚动查看」，实测滚不动：
            溢出元素被夹在中间层 view 里，H5 的 uni-view 自带 overflow:hidden 会把溢出裁掉，
-           滚动层量不到真实内容宽度（详见 unibestX-skill 1.2.22）；App 端嵌套 scroll-view
+           滚动层量不到真实内容宽度（详见 unibestX-skill 2.22）；App 端嵌套 scroll-view
            的手势也常被外层吃掉。改成「手指位移 → 画布 left/top 偏移」，全端行为一致。
            带 padding 的元素一律补 box-sizing:border-box，否则 width:100% + padding 会溢出（见 1.2.12）。 -->
       <view
@@ -410,7 +410,7 @@ function isHeading(name: string): boolean {
  *
  * 取值刻意用 `UTSJSONObject.getString()` 而不是下标 + 强转：
  * `map['amp'] as string` 得到的是 `Any?`，键不存在时强转到非空 string 在原生端有崩的风险
- * （同类坑见 unibestX-skill 1.3.1 / 1.3.5）；getString 直接返回 `string | null`，天然处理缺失。
+ * （同类坑见 unibestX-skill 3.1 / 1.3.5）；getString 直接返回 `string | null`，天然处理缺失。
  */
 const ENTITIES: UTSJSONObject = {
   amp: '&', lt: '<', gt: '>', quot: '"', apos: "'",
@@ -560,7 +560,7 @@ function inlineClass(name: string): string {
  * 只在「单链」时继续下探：一旦某层子节点不止一个（如 `<em>前<strong>后</strong></em>`），
  * 就不再往下钻 —— 那种情形本来也无法用一个 text 表达，剩下的交给 flatText 摊平即可。
  * 这里始终只产出「一个 <text> 包一个文本节点」，不触碰原生端「一个 text 只能有一个文本节点」
- * 的限制（见 unibestX-skill 1.2.4）。
+ * 的限制（见 unibestX-skill 2.4）。
  */
 function chainClass(n: HtmlNode): string {
   let cls = inlineClass(n.name ?? '')
@@ -684,7 +684,7 @@ function imgSrc(n: HtmlNode): string {
  * 于是 em 在原生端没有可依父级字号，字号会塌成 0，**整行标题直接不可见**
  * （实测：H5 正常，安卓上 h2/h3 那两行消失，而正文/列表/引用/表格/代码块都在 ——
  * 因为 demo 文本里只有标题用了 em）。改成 px 后两端一致。
- * 详见 unibestX-skill 1.2.13。
+ * 详见 unibestX-skill 2.13。
  */
 function headingStyle(name: string): string {
   const sz: UTSJSONObject = { h1: '24px', h2: '20px', h3: '18px', h4: '16px', h5: '14px', h6: '13px' }
@@ -1303,7 +1303,7 @@ defineExpose({
   后用真机对照证伪：静态 class、动态 `:style` 的 `700`、动态 `:style` 的 `bold`，
   **四种写法都同样能显示为粗体**。`***粗斜体***` 看不出加粗的真因是嵌套行内样式被摊平
   （见上面第 7 条的 chainClass），与 `font-weight` 的写法无关。
-  详见 unibestX-skill 1.2.16（已记为一则反面教材）。
+  详见 unibestX-skill 2.16（已记为一则反面教材）。
 
   之所以仍然全部走 class：与 1.2.13（动态 `:style` 里的 `em` 字号塌成 0）、
   1.2.14（`text-decoration` 简写被整个忽略）保持同一种防御姿态 ——
@@ -1317,7 +1317,7 @@ defineExpose({
 .mp-mark { background-color: #ffff00; }
 /* 字号一律 px，不用 em/smaller 这类相对单位，见 1.2.13 */
 /* 上下标：vertical-align 原生端不支持（编译期只吐 [plugin:uni:app-uvue-css] 警告、
-   样式静默失效，见 skill 1.2.18），故只在 Web 保留；原生端仅剩 font-size 的小号效果。 */
+   样式静默失效，见 skill 2.18），故只在 Web 保留；原生端仅剩 font-size 的小号效果。 */
 .mp-sub {
   font-size: 12px;
   /* #ifdef WEB */

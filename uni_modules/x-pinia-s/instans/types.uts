@@ -70,7 +70,7 @@ export type PiniaPluginContext = {
 	storeId : string,
 	/** 当前 store 实例（实际类型为 PiniaStoreBase 子类，按 any 暴露） */
 	store : any,
-	/** 当前 store 的 state 引用（用户 reactive 对象，按 any 暴露） */
+	/** 当前 store 的 state 引用（用户 reactive 对象，按 any 暴露）；无状态 store 为空对象 */
 	state : any
 }
 

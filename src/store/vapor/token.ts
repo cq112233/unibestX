@@ -1,7 +1,7 @@
 import { reactive } from 'vue';
 import { defineStore } from 'pinia';
 // 类型统一来自 src/store/types.uts（唯一真源），本文件严禁再 export type 同名类型
-import type { ILoginForm, ISingleTokenRes, IDoubleTokenRes, ITokenState } from '../types.uts';
+import type { IDoubleTokenRes, ISingleTokenRes, ITokenState } from '../types.d.uts';
 
 export const useTokenStore = defineStore('token', () => {
   // 1. 响应式状态

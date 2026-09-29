@@ -1,5 +1,6 @@
 import { reactive, watch } from 'vue';
 import { defineStore } from 'pinia';
+// @ts-expect-error allowArbitraryExtensions
 import i18n from '@/src/i18n/index.uts';
 import {
   applyThemeColor,
@@ -8,10 +9,12 @@ import {
   getSystemTheme,
   isDarkMode,
   themeColor
+// @ts-expect-error allowArbitraryExtensions
 } from '@/src/utils/theme/index.uts';
+// @ts-expect-error allowArbitraryExtensions
 import { getDefaultLocale } from '@/src/utils/env/index.uts';
 // 类型统一来自 src/store/types.uts（唯一真源），本文件严禁再 export type 同名类型
-import type { IAppState } from '../types.uts';
+import type { IAppState } from '../types.d.uts';
 
 /**
  * 启动时同步预读一次本地持久化数据，使初始状态直接命中用户配置，彻底消除启动闪烁与默认值覆盖
