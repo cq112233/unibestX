@@ -28,6 +28,7 @@
 
 ## 项目规则与专属 Skills
 
-- **AI / Agent 必读铁律**：所有参与本项目开发的 AI、Agent 在进行任何编码、重构、修 bug 或新增页面任务前，**必须首先完整阅读并严格遵循 `unibestX-skill`**（`.claude/skills/unibestX-skill/SKILL.md`）。该 Skill 为**「1 个入口 + 6 个分册」**结构：入口 `SKILL.md` 只常驻「概述 + 分册导航 + 3.3 对照表 + 3.4 红线清单」，正文细节在 `references/` 下的 6 个分册（`1-uts-syntax` / `2-styling` / `3-runtime` / `4-examples` / `5-codegen` / `6-page-component-spec`）；命中导航或速查表条目时，**必须继续 Read 对应分册**核对完整正反例，不得只看入口结论就改代码。
+- **AI / Agent 必读铁律**：所有参与本项目开发的 AI、Agent 在进行任何编码、重构、修 bug 或新增页面任务前，**必须首先完整阅读并严格遵循 `unibestX-skill`**（`.claude/skills/unibestX-skill/SKILL.md`）。该 Skill 为**「1 个入口 + 7 个分册」**结构：入口 `SKILL.md` 只常驻「概述 + 分册导航 + 3.3 对照表 + 3.4 红线清单」，正文细节在 `references/` 下的 7 个分册（`1-uts-syntax` / `2-styling` / `3-runtime` / `4-examples` / `5-codegen` / `6-page-component-spec` / `7-api-spec`）；命中导航或速查表条目时，**必须继续 Read 对应分册**核对完整正反例，不得只看入口结论就改代码。
+- **新增页面必须同步建接口层**：每新增一个页面（`src/pages/<page>/`、`src/sub/<page>/`），必须在**同一次改动**里建出 `src/api/<page>/<page>.uts`（接口函数，按模块分段）；接口文件预计 ≥ 400 行时再拆 `src/api/<page>/types.uts`（只含 `type` 的契约类型）与 `src/api/<page>/mock/<模块>.uts`（模拟数据集）。**页面目录下严禁出现 `mock.uts`，页面与组件里严禁 `ref([...])` 硬编码假数据**；后端就绪时只换函数体、签名冻结。完整规范见 `unibestX-skill` 分册 7（`references/7-api-spec.md`），对照结构见分册 6 铁律 5。
 - **必须遵守** `.agents/rules/uniappx.md` 中的 uni-app X 开发规范。每次会话开始时先 Read 该文件，并在编写 `.uvue`、`.uts`、`.ts`、`.scss` 文件时严格遵循其中的规则。
 - **一律禁止使用 `interface`**：在本项目中定义任何对象结构、状态、参数或返回值类型时，**一律禁止使用 `interface`**，**必须全部统一使用 `type`（类型别名）**，避免触发 UTS 底层对对象字面量赋值的 `UTS110111163` 编译错误。

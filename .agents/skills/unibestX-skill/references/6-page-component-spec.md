@@ -6,7 +6,9 @@
 >
 > **核心定位**：针对 AI 容易陷入的“万行单文件”或“过度碎裂拆分”两大极端，制定**「高内聚自包含、最多三级封顶、数据所有权下沉（根视图不存模块数据）、容器与展示视图严格解耦、模块数据互不共享、Mock 数据集与接口函数同层收拢在 `src/api/<page>/<page>.uts`、后端就绪只换函数体」**的标准架构范式。
 >
-> ⚠️ **Mock 的落位**：页面目录下**不再有 `mock.uts`**，模拟数据与接口函数同层收拢在 `src/api/<page>/<page>.uts`（**铁律 5** 是完整说明，**6.4** 是对接与迁移细则）。
+> ⚠️ **Mock 的落位**：页面目录下**不再有 `mock.uts`**，模拟数据与接口函数同层收拢在页面同名的 `src/api/<page>/` 目录里 —— `<page>.uts`（接口函数）+ `types.uts`（契约类型）+ `mock/<模块>.uts`（模拟数据集）三件套（**铁律 5** 是完整说明，**6.4** 是对接与迁移细则）。
+>
+> 🚨 **新增页面必产接口层**：**每新增一个页面，必须在同一次改动里建出 `src/api/<page>/`，没有配套接口层的新页面视为未交付**（判据与目录形态见铁律 5 开头，**接口层自己怎么写 —— 命名 / 类型 / mock / 请求实现 —— 一律以分册 [7-api-spec.md](7-api-spec.md) 为准**）。
 
 ---
 
@@ -41,7 +43,7 @@ graph TD
 | **L-Common** | `components/common/*.uvue` | 页面内复用的纯展示外壳（卡片 / 标题栏 / 空状态） | ❌ | ❌ | 只吃 Props |
 | **L1 模块容器** | `components/<模块>/<模块>.uvue` | 模块唯一决策中心：取数 / loading / 分页 / 筛选 | ✅ **唯一允许** | ✅ 只持本模块的 | `@/src/api/<page>/<page>.uts` 里自己那一段 |
 | **L2 模块私有视图** | `components/<模块>/components/*.uvue` | 纯展示 | ❌ | ❌ | 只吃 Props、只抛 Emits |
-| **Data 层** | `src/api/<page>/<page>.uts` | 类型契约 + mock 数据集 + 接口函数 | —— 它本身就是接口 | ✅ 只持本模块的 mock 数据 | 开发期 `Promise.resolve(MOCK_X)`，后端就绪换 `http.get` |
+| **Data 层** | `src/api/<page>/`（`<page>.uts` 接口函数 + `types.uts` 契约类型 + `mock/<模块>.uts` 数据集） | 类型契约 + mock 数据集 + 接口函数 | —— 它本身就是接口 | ✅ 只持本模块的 mock 数据 | 开发期 `Promise.resolve(MOCK_X)`，后端就绪换 `http.get` |
 | **页面常量** | `src/pages/<page>/constants.uts` | 页面结构级只读常量（分区定义 / 排序枚举） | ❌ | 不算业务数据 | 同步导出，本页可共用（唯一例外，见铁律 4） |
 
 ### 铁律 1：页面高内聚、自包含（Zero External Component Leaks）
@@ -153,25 +155,45 @@ graph TD
   - 参考实现：`src/tabbar/ui/default/TabbarItem.uvue`、`src/sub/creator/components/CreatorHeaderCard.uvue`。
   - **历史包袱提醒**：`src/utils/theme/index.uts` 的 `activeThemeColor` 是 store 派生出来的响应式副本，早期组件大量在用它。**新代码与改到的代码一律改为上面 store 直读口径**；`activeThemeColor` 只保留给 store 自身与 tabbar 兜底使用，不要再新增引用。
 
-### 铁律 5：模拟数据（Mock）必须收拢进页面接口文件，且按模块独立造数
+### 铁律 5：模拟数据（Mock）必须收拢进页面接口层，且按模块独立造数
 
-> **先记住落位**：Mock **不再放页面**。页面目录（`src/pages/<page>/`、`src/sub/<page>/`）下**严禁出现 `mock.uts`**；模拟数据集与它对应的接口函数**同层收拢**在页面同名的 `src/api/<page>/<page>.uts` 里。
+> **先记住落位**：Mock **不再放页面**。页面目录（`src/pages/<page>/`、`src/sub/<page>/`）下**严禁出现 `mock.uts`**；模拟数据集与它对应的接口函数**同层收拢**在页面同名的 `src/api/<page>/` 目录里。
 
-- **严禁**在 `.uvue` 组件或页面内部通过 `ref([...])` 硬编码写死模拟数据；每个页面在 `src/api/` 下**按页面同名**建目录与同名文件：`src/pages/mall/` ⇒ `src/api/mall/mall.uts`（映射规则见 6.2 / 6.4）。
+- 🚨 **新建页面 = 同一次改动里建出接口层（硬门槛，不因「先搭 UI」「后端还没来」而豁免）**：
+  - 每新增一个页面（`src/pages/<page>/` 或 `src/sub/<page>/`），**必须同步创建 `src/api/<page>/`，至少建出 `<page>.uts` 并导出该页用到的接口函数**；页面与组件里**不许出现任何 `ref([...])` 硬编码假数据**，也不许留「等后端接好了再抽接口」的尾巴；
+  - **判定标准（交付前自查）**：这个新页面里每一块会由后端下发的数据，都能顺着「页面组件 → `@/src/api/<page>/<page>.uts` 里的某个 `fetchXxx()`」找到出处。找不到 ⇒ 接口层没建完，**视为未交付**。
+  - **接口层内部怎么写**（落位命名 / 契约类型 / 按模块造数 / `http` 请求与后端对接）**一律以分册 [7-api-spec.md](7-api-spec.md) 为准** —— 本铁律只规定「数据落在哪、归谁用」，同属铁律体系，不重复也不冲突。
+  - 接口层是**全局层**，永远走别名引用：组件里写 `import { fetchXxx } from '@/src/api/<page>/<page>.uts'`，禁用 `'../../api/<page>/<page>.uts'` 这类相对穿透（铁律 1）。
+- **严禁**在 `.uvue` 组件或页面内部通过 `ref([...])` 硬编码写死模拟数据；每个页面在 `src/api/` 下**按页面同名**建目录与同名接口文件：`src/pages/mall/` ⇒ `src/api/mall/mall.uts`（映射规则见 6.2 / 6.4）。
+- **标准目录形态（三件套，标杆：`src/api/index/`）**：
+
+  ```text
+  src/api/<page>/
+  ├── <page>.uts          # ★ 必须：页面同名接口文件 —— 只放接口函数（按模块用注释分段）+ 各段的 type
+  ├── types.uts           #   契约类型叶子文件：只放后端 DTO 类型与分页结果容器，一律 type（严禁 interface），不写函数、不写数据
+  └── mock/               #   模拟数据集目录：一个模块一份文件，各自 export MOCK_*，只服务本模块
+      ├── <模块 A>.uts
+      └── <模块 B>.uts
+  ```
+
+  - `types.uts` 存在时，`<page>.uts` 与 `mock/*.uts` **都从它 `import type`**（写 `'./types.uts'` / `'../types.uts'`），保证契约类型只有一份真源；
+  - `mock/*.uts` 里的 `MOCK_*` 常量**必须 `export`**（数据集拆了文件，就是给同目录的 `<page>.uts` 取数用的），但**仍严禁被另一个模块的数据文件或接口函数引用**（见下方「按模块独立造数」）。
 - 该文件内固定三块内容，**按模块分段**摆放：
   1. **接口类型契约**：一律 `type` 定义（**严禁 `interface`**，规避 `UTS110111163`）；
-  2. **mock 数据集**：私有常量（`const MOCK_A_LIST: Array<IModuleAItem> = [...]`），只在文件内部使用、不导出；
+  2. **mock 数据集**：**形态一**下是写在文件内的私有常量（`const MOCK_A_LIST: Array<IModuleAItem> = [...]`，不导出、只在文件内部使用）；**形态二**下则落进 `mock/<模块>.uts` 并 `export`（供同目录 `<page>.uts` 取数）；
   3. **返回 `Promise<T>` 的接口函数**：开发期函数体就是 `return Promise.resolve(MOCK_A_LIST);`，写法和真实接口 100% 一致。
 - **后端就绪时只换函数体**：把 `Promise.resolve(MOCK_X)` 换成 `http.get(...)`（并补上 `UTSJSONObject` 的安全取值转换），**函数名 / 入参签名 / 返回类型一个字都不改**，页面侧零改动 —— 这就是「无缝切换」的全部含义，不需要任何中间转发层；
-- **类型跟着接口走**：后端 DTO 类型收拢在 `src/api/<page>/`（同文件内分段，超长拆到 `src/api/<page>/types.uts`）；页面目录的 `types.uts` 只留**页面 UI 层自用**的类型（分区项、下灌给子视图的展示模型、props 结构）。
+- **类型跟着接口走**：后端 DTO 类型收拢在 `src/api/<page>/` —— 默认写在 `<page>.uts` 对应段内；**类型较多、或要被多段共用时（如分页容器 `PageResult<T>`）收进 `src/api/<page>/types.uts`**，这是一个**只含 `type` 的叶子文件**（不写函数、不写数据集），供 `<page>.uts` 与 `mock/*.uts` 各自 `import type`；页面目录的 `types.uts` 只留**页面 UI 层自用**的类型（分区项、下灌给子视图的展示模型、props 结构），**严禁**在页面 `types.uts` 里写后端 DTO。
 - **按模块独立造数（与铁律 4 配套，严禁一份数据喂两个模块）**：
   - **各自的 mock 数据集独立造**：`MOCK_A_*` 与 `MOCK_B_*` 各自编写，**严禁 A 的数组被 B 直接复用**（哪怕结构看着一样，也必须各造一份）；
   - **各自的接口函数独立命名、独立收口**：`fetchModuleAList()` 与 `fetchModuleBList()` 是两个函数，严禁抽一个「通用 `fetchList(type)`」让两个模块共用 —— 一旦合并，某天 A 要加分页、B 要加筛选，函数立刻长出 `if (type == 'a')` 分支，模块独立性当场死亡；
   - **各自的类型归属清晰**：模块私有数据结构写在同文件**该模块那一段**，严禁把 A 的类型给 B 当返回值用；
-  - **文件可以同一个，数据与函数名绝不能共享**：A、B 两段都写在 `src/api/<page>/<page>.uts` 里**合法且推荐**；被禁止的是 A 段的数据集或函数被 B 段引用。
-- **文件组织两种形态均合法，按页面体量选择**：
-  - **单文件分区（默认，推荐中小页面）**：`src/api/<page>/<page>.uts` 一个文件，**按模块用注释分段**，各段只放本模块的类型、数据集与接口函数，模块只 `import` 自己那段的符号；
-  - **数据集下沉（该文件超 400 行时）**：把 mock 数据集单独挪到**同目录**的 `src/api/<page>/mock.uts`，`<page>.uts` 只留类型与接口函数，函数体从 `./mock.uts` 取数 —— ⚠️ 这是**唯一**允许出现 `mock.uts` 的位置（在 `src/api/` 目录内，不在页面目录里）；
+  - **文件可以同一个，数据与函数名绝不能共享**：小页面（形态一）里 A、B 两段都写在 `src/api/<page>/<page>.uts` 里**合法，且是默认推荐**；被禁止的始终是「A 段的数据集或函数被 B 段引用」，而不是「两段同处一个文件」。
+- **文件组织三种形态，按页面体量递进选择**（目录名与文件名**不随形态变化**，永远是 `src/api/<page>/` + `<page>.uts`，变的只是「类型与数据集放哪」）：
+  - **形态一：单文件内联（默认，预计 < 400 行的小页面）**：只建 `src/api/<page>/<page>.uts` 一个文件，类型、数据集、接口函数三块**按模块用注释分段**全写在里面，模块只 `import` 自己那段的符号；此时不建 `types.uts` 与 `mock/`；
+  - **形态二：数据集与类型下沉（该文件预计 ≥ 400 行，或类型被多段共用）**：数据集按模块拆进 `src/api/<page>/mock/<模块>.uts`、契约类型收进 `src/api/<page>/types.uts`，`<page>.uts` 只留接口函数与分段注释，函数体从 `./mock/xxx.uts` 取数、类型从 `./types.uts` `import type`；
+  - **形态三：按接口域拆兄弟文件（同页有多个互不相干的接口域，且主文件已贴 500 行硬上限）**：在 `src/api/<page>/` 下再开 `src/api/<page>/<模块>.uts`，**每个文件自带「类型 + 数据集 + 函数」三块**（标杆：登录页式的写回复弹层独立成 `src/api/qa-detail/reply-friends.uts`）；⚠️ 拆的**理由只能是行数**（铁律 2 的 500 行上限），不是为了「看起来更整齐」把三个函数拆成三个文件；
+  - ❌ **已废弃的旧形态**：`src/api/<page>/mock.uts` 这种「所有模块的数据集堆一个文件」的写法不再使用 —— 数据集一律按模块落进 `mock/` 目录，一模块一文件（这也是迁移表 6.4 里 `mock/*.uts` 的由来）；
   - 无论哪种形态，**铁律不倒**：各模块的 mock 数据集与接口函数独立命名、独立造数、互不引用。
 
 ### 铁律 6：注释加在「组件」「模板里的组件与功能块」「脚本功能块与方法」上 —— 严禁中文注释刷屏
@@ -286,11 +308,14 @@ graph TD
 
 ```text
 src/
-├── api/                            # 【全局业务接口目录 · 页面接口文件的家】
-│   └── index/                      # 对应 src/pages/index 页面
-│       ├── index.uts               # ★ 页面同名接口文件：类型契约 + mock 数据集 + 接口函数，内部按模块分段
+├── api/                            # 【全局业务接口目录 · 页面接口文件的家】一页一目录，目录名 = 页面目录名
+│   └── index/                      # 对应 src/pages/index 页面（src/sub/xxx/ ⇒ src/api/xxx/）
+│       ├── index.uts               # ★ 必须：页面同名接口文件 —— 只放接口函数，内部按模块用注释分段
 │       │                           #   开发期函数体 Promise.resolve(MOCK_X) → 后端就绪换成 http.get，签名不变
-│       └── mock.uts                #   （可选）该文件超 400 行时，把 mock 数据集下沉到这里，只放 const 数据集
+│       ├── types.uts               #   后端契约类型（只含 type 的叶子文件，供同目录各文件 import type）
+│       └── mock/                   #   模拟数据集：一模块一文件，各自 export MOCK_*，只服务本模块
+│           ├── follow.uts          #     例：关注段数据集（对应 index.uts 的「关注段」那一节）
+│           └── wallpaper.uts       #     例：壁纸段数据集
 │
 └── pages/
     └── index/
@@ -501,10 +526,12 @@ function handleItemClick(item: IModuleAItem): void {
 </script>
 ```
 
-### 5. 【Data 层】`src/api/index/index.uts`（页面接口文件：类型 + mock 数据集 + 接口函数）
+### 5. 【Data 层】`src/api/<page>/`（页面接口层：接口函数 + 契约类型 + 模拟数据集）
 
-> **一页一文件**：页面 `src/pages/index/` ⇒ 接口文件 `src/api/index/index.uts`（`src/sub/ball/` ⇒ `src/api/ball/ball.uts`，以此类推）。
-> 文件内**必须按模块分段**，各段只放本模块的类型、数据集与接口函数。
+> **一页一目录**：页面 `src/pages/index/` ⇒ 接口目录 `src/api/index/`（`src/sub/ball/` ⇒ `src/api/ball/`，以此类推）。
+> **接口文件必须存在**：`src/api/index/index.uts` 是**新增页面时的必产文件**，不允许出现「这个页面暂时没接口，就先不建」——页面里每一块将来由后端下发的数据，都必须在这里有对应的 `fetchXxx()`。
+
+#### 形态一（默认，小页面）：类型 / 数据集 / 函数三块内联在一个文件里，按模块分段
 
 ```uts
 // ==========================================
@@ -547,24 +574,76 @@ export function fetchModuleAList(_query: IModuleAQuery | null = null): Promise<I
 // ------------------------------------------
 ```
 
+#### 形态二（该文件预计 ≥ 400 行）：数据集拆进 `mock/`、契约类型收进 `types.uts`，`<page>.uts` 只留函数
+
+```uts
+// 文件位置：src/api/index/types.uts —— 只含 type 的叶子文件，不写函数、不写数据集
+// 通用分页容器放这里，各段共用同一份真源
+export type IndexPageResult<T> = {
+  list: Array<T>;
+  hasMore: boolean;
+  total: number;
+};
+
+export type WallpaperItem = {
+  id: number;
+  title: string;
+  url: string;
+  category: string;
+};
+```
+
+```uts
+// 文件位置：src/api/index/mock/wallpaper.uts —— 只服务「壁纸段」，禁止被其它模块引用
+import type { WallpaperItem } from '../types.uts';
+
+export const MOCK_WALLPAPERS: Array<WallpaperItem> = [
+  { id: 601, title: '球房晨光', url: 'https://img.example.com/601.jpg', category: 'star' }
+];
+```
+
+```uts
+// 文件位置：src/api/index/index.uts —— 只剩接口函数，仍按模块用注释分段
+import { MOCK_WALLPAPERS } from './mock/wallpaper.uts';
+import type { IndexPageResult, WallpaperItem } from './types.uts';
+
+// ------------------------------------------
+// 【壁纸段接口】（模块：壁纸）
+// ------------------------------------------
+
+/** 分页获取壁纸列表 */
+export function fetchWallpaperList(category: string = 'all', pageNo: number = 1): Promise<IndexPageResult<WallpaperItem>> {
+  return Promise.resolve({
+    list: MOCK_WALLPAPERS,
+    hasMore: false,
+    total: MOCK_WALLPAPERS.length
+  } as IndexPageResult<WallpaperItem>);
+}
+```
+
+- ⚠️ **拆了文件，调用点一个字都不变**：无论形态一还是形态二，页面侧始终只写 `import { fetchWallpaperList } from '@/src/api/index/index.uts';` —— 内部搬家属于实现细节，**严禁**因此把 import 路径改成 `.../mock/wallpaper.uts` 或 `.../types.uts` 去取业务函数；
+- ⚠️ **`mock/*.uts` 必须 `export` 常量**（拆出去就是为了给同目录的 `<page>.uts` 取数），但**仍不得被另一个模块的数据文件或接口函数引用**（铁律 5「按模块独立造数」）；
+- ⚠️ **`types.uts` 只放类型**：写进任何 `const` / `function` 都会让它从「纯类型叶子文件」变成实现文件，跨分支转发时容易踩 `.ts` / `export *` 那条红线（见 `SKILL.md` A.2 第 20 条）。
+
 ---
 
-## 6.4 后端对接与现网迁移（`src/api/<page>/<page>.uts`）
+## 6.4 后端对接与现网迁移（`src/api/<page>/`）
 
-> **规则本身见铁律 5**，本节只讲对接与迁移的落地细则。对接后端**不搬迁文件、不改 import 路径**，只把**函数体**从 mock 换成 http。
+> **规则本身见铁律 5**，本节只讲对接与迁移的落地细则（**接口层的写法细则 —— 命名 / 契约类型 / 按模块造数 / `http` 调用与类型转换 —— 见分册 [7-api-spec.md](7-api-spec.md)**）。对接后端**不搬迁文件、不改 import 路径**，只把**函数体**从 mock 换成 http。
 
-### 1. 目录与文件名严格对齐（一页一文件）
+### 1. 目录与文件名严格对齐（一页一目录）
 
 - **路径映射**：页面目录与接口目录**同名一一对应**，普通页（`src/sub/`）以页面目录名为准，不因挂在 `pages/` 还是 `sub/` 而改变：
 
-  $$\text{页面目录: } \texttt{src/pages/<page_name>/} \quad \Longrightarrow \quad \text{接口文件: } \texttt{src/api/<page_name>/<page_name>.uts}$$
+  $$\text{页面目录: } \texttt{src/pages/<page_name>/} \quad \Longrightarrow \quad \text{接口目录: } \texttt{src/api/<page_name>/（含 <page_name>.uts + types.uts + mock/）}$$
 
-  | 页面 | 接口文件 | 页面 | 接口文件 |
+  | 页面 | 接口目录 | 页面 | 接口目录 |
   | :--- | :--- | :--- | :--- |
   | `src/pages/index/` | `src/api/index/index.uts` | `src/pages/ball/` | `src/api/ball/ball.uts` |
   | `src/pages/mall/` | `src/api/mall/mall.uts` | `src/sub/cart/` | `src/api/cart/cart.uts` |
   | `src/pages/forum/` | `src/api/forum/forum.uts` | `src/sub/product/` | `src/api/product/product.uts` |
 
+- 上表列的是**必产的那个接口文件**；该页是否另有 `types.uts` 与 `mock/`，按铁律 5 的三种形态判定。
 - 只有对应模块 import 它自己那段：严禁 B 模块调用为 A 写的接口函数，哪怕后端返回结构一样。
 
 ### 2. 后端就绪时：只换函数体，签名一个字都不改
@@ -615,7 +694,7 @@ import type { IModuleAItem } from '@/src/api/index/index.uts';
 
 | 页面 | 现网旧位置 | 行数 | 目标位置 |
 | :--- | :--- | ---: | :--- |
-| 商城 | `src/pages/mall/mock.uts` | 650 | `src/api/mall/mall.uts`（数据集下沉 `src/api/mall/mock.uts`） |
+| 商城 | `src/pages/mall/mock.uts` | 650 | `src/api/mall/mall.uts` + `src/api/mall/mock/*.uts` |
 | 选球 | `src/pages/ball/mock/*.uts`（7 个） | 972 | `src/api/ball/ball.uts` + `src/api/ball/mock/*.uts` |
 | 首页 | `src/pages/index/mock/*.uts`（6 个） | 707 | `src/api/index/index.uts` + `src/api/index/mock/*.uts` |
 | 论坛 | `src/pages/forum/mock.uts` | 353 | `src/api/forum/forum.uts` |
@@ -639,12 +718,12 @@ import type { IModuleAItem } from '@/src/api/index/index.uts';
 - [ ] **1. 严禁跨页面引用业务组件**（铁律 1）
 - [ ] **2. 组件拆分严禁超过 3 层** —— 层级止于 `模块/components/Leaf.uvue`，叶子内不得再开 `components/`（铁律 2）
 - [ ] **3. 纯展示组件严禁调接口** —— `components/common/` 与各模块 `components/` 内不得出现 `http` 调用、`fetch*` 函数或异步定时器（铁律 3）
-- [ ] **4. 严禁组件内硬编码假数据；页面目录下严禁出现 `mock.uts`** —— 数据收拢进 `src/api/<page>/<page>.uts`，且按模块独立造数（铁律 5）
+- [ ] **4. 严禁组件内硬编码假数据；页面目录下严禁出现 `mock.uts`** —— 数据收拢进 `src/api/<page>/`（接口函数 + 契约类型 + `mock/<模块>.uts` 数据集），且按模块独立造数；**新增页面必须同一次改动里建出接口层**（铁律 5 / 分册 7）
 - [ ] **5. 单向数据流** —— 容器经 Props 下灌、叶子经 Emits 上抛，子组件严禁直接改 Props（铁律 3）
 - [ ] **6. 严禁用 JS 动态算高度** —— 滚动区域一律 `flex flex-col flex-1`，不得用 `getScrollHeight()` 绑 `:style="{ height }"`
 - [ ] **7. 注释只落三处**：组件顶部一句用途、模板里每个组件与功能块上方一句、脚本里每组状态与方法上方一句；变量一律不写（铁律 6）
 - [ ] **8. 必须优先用 `src/utils/` 与 `uni_modules/` 的现成能力**，严禁手写重复实现（铁律 7）
-- [ ] **9. 接口按页面同名收拢在 `src/api/<page>/<page>.uts`（一页一文件）** —— mock 与真实接口同文件，对接只换函数体、签名冻结（铁律 5 / 6.4）
+- [ ] **9. 接口按页面同名收拢在 `src/api/<page>/`（一页一目录，`<page>.uts` 必产）** —— mock 与真实接口同文件，对接只换函数体、签名冻结（铁律 5 / 6.4 / 分册 7）
 - [ ] **10. 长列表严禁用 `<scroll-view>`** —— 一律 `<list-view>` + `<list-item>` 或 `<z-paging-x>`；`<scroll-view>` 只用于短内容或横向滑块
 - [ ] **11. 根视图严禁持有模块业务数据** —— 只持结构级状态（分区下标 / swiper 锁 / 主题色 / 下拉信号）（铁律 4）
 - [ ] **12. 模块之间的数据、状态、mock 与接口严禁共享** —— 跨模块只传「切分区 / 跳转」这类结构级意图，且不携带业务数据（铁律 4 / 铁律 5）

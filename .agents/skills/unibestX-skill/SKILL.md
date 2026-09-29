@@ -12,12 +12,13 @@ description: Use when developing, compiling, refactoring, or troubleshooting uni
 uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直接编译为原生代码（Android 编译为 Kotlin，iOS 插件编译为 Swift，鸿蒙插件编译为 ArkTS，Web/小程序编译为 JS）。  
 与宽容的 TypeScript/JavaScript 不同，UTS 采用**名义强类型系统（Nominal Strong Typing）**与**原生渲染规范**。
 
-本文档按四大维度组织，采用 **「1 个入口 + 6 个分册」** 结构：
+本文档按五大维度组织，采用 **「1 个入口 + 7 个分册」** 结构：
 
 1. **UTS 与原生规范**：语法与严格类型（分册 1）、CSS / Tailwind 样式引擎限制（分册 2）、跨端运行时铁律（分册 3）；
 2. **项目正确案例**：来自本项目的生产级标杆案例（分册 4）——页面骨架、TabBar、二级详情页、滚动与下拉刷新、组件与生态库优先范式；
 3. **项目代码生成规范**：生成流程与模板（分册 5）、本文件常驻的 A.1 对照表与 A.2 红线清单；
-4. **AI 页面层级与组件设计规范**：页面高内聚自包含、最多三级封顶、容器与纯展示解耦、Mock 接口契约化（分册 6）——**AI 生成复杂页面与拆分组件前必读**。
+4. **AI 页面层级与组件设计规范**：页面高内聚自包含、最多三级封顶、容器与纯展示解耦、Mock 接口契约化（分册 6）——**AI 生成复杂页面与拆分组件前必读**；
+5. **API 接口层规范**：一页一目录落位、契约类型（`type`）与 Mock 数据集同层、后端就绪只换函数体（分册 7）——**新增页面与对接后端前必读**。
 
 ---
 
@@ -25,6 +26,8 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 
 - 编写、重构或新增 `.uvue`、`.uts`、`.ts`、`.scss` 文件时
 - 规划或生成新页面结构、骨架布局与视口高度（`computedAvailableHeight`）时
+- **新增页面并同步建 `src/api/<page>/` 接口层（接口函数 + `types.uts` + `mock/`）时**、把页面里的假数据抽成接口函数时
+- 对接后端真实接口、写 `http` 请求 / 文件上传 / SSE 流式接口时
 - 使用 Tailwind CSS 编写跨端 UI、按钮排版、文本颜色与安全区适配时
 - 遇到 UTS 强类型编译错误（`UTS110111163`、`UTS110111119`、`UTS110111120`、`UTS100006`、`error17`）
 - 遇到 Android/iOS 原生运行时报错（`ClassCastException: Map cannot be cast to UTSJSONObject`）
@@ -43,8 +46,9 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 | [references/2-styling.md](references/2-styling.md) | **2 样式 (CSS & Tailwind) 与原生渲染铁律**（23 条） | 写 `.scss` / Tailwind 工具类；处理按钮与文本排版、安全区、高度单位、阴影边框、字号字重、行内嵌套样式、样式不生效或表现不一致 |
 | [references/3-runtime.md](references/3-runtime.md) | **3 跨端运行时与渲染模式约束**（25 条） | VDOM / Android VDOM / Vapor 差异、多平台门面分流与条件编译、UTS 插件与自定义基座、**第三方组件（选项式 `.vue`）是否可用**、Markdown 渲染、真机与 Kotlin 报错、编译验证命令选择 |
 | [references/4-examples.md](references/4-examples.md) | **4 项目正确案例**（5 个生产级标杆案例） | 新建页面、搭「上固定 + 下滚动」骨架、算可用高度、写 TabBar 页与下拉刷新、写二级 / 子包页、用 Easycom 引组件 —— **优先照抄，不要自创结构** |
-| [references/5-codegen.md](references/5-codegen.md) | **5.1 新增页面生成流程**、**5.2 页面代码标准模板** | 生成新页面 / 组件前走流程、需要复制标准页面模板 |
-| [references/6-page-component-spec.md](references/6-page-component-spec.md) | **6 AI 页面层级与组件设计规范**（页面高内聚 · 数据所有权下沉 · 容器/视图分离 · Mock 收拢进页面接口文件 · 后端就绪只换函数体，附八大铁律与 19 条自检红线） | 规划新页面结构、拆分复杂页面组件、组织页面内 `components/common/` 与模块私有视图、把 mock 收拢进 `src/api/<page>/<page>.uts`、对接后端真实接口时必读 |
+| [references/5-codegen.md](references/5-codegen.md) | **5.1 新增页面生成流程**、**5.2 页面代码标准模板** | 生成新页面 / 组件前走流程、需要复制标准页面模板；**新增页面时必产接口层**（接口文件模板见分册 7） |
+| [references/6-page-component-spec.md](references/6-page-component-spec.md) | **6 AI 页面层级与组件设计规范**（页面高内聚 · 数据所有权下沉 · 容器/视图分离 · Mock 收拢进页面接口目录 · 后端就绪只换函数体，附八大铁律与 19 条自检红线） | 规划新页面结构、拆分复杂页面组件、组织页面内 `components/common/` 与模块私有视图、把 mock 收拢进 `src/api/<page>/`、对接后端真实接口时必读 |
+| [references/7-api-spec.md](references/7-api-spec.md) | **7 API 接口层规范**（一页一目录落位 · 命名约定 · 契约类型铁律 · 按模块独立造数 · `http` 单例 / 上传 / SSE 用法 · 后端就绪只换函数体，附 12 条接口层自检红线） | **新增页面同步建 `src/api/<page>/` 时**、抽接口函数时、写 mock 数据集与契约类型时、对接后端真实接口时必读 |
 
 > 📌 **A.1 快速排查对照表**与 **A.2 代码生成红线清单** 因使用频率最高，常驻在本文件下方，无需额外 Read。
 
