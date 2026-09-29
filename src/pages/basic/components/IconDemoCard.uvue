@@ -12,7 +12,7 @@
         class="w-[4px] h-[16px] rounded-[2px] mr-[8px]"
         :style="{ backgroundColor: 'var(--theme-color, #3182ce)' }"
       />
-      <text class="text-[16px] font-bold" :style="{ color: 'var(--text-color, #2d3748)' }">{{ iconDemoTitle }}</text>
+      <text class="text-[16px] font-bold" :style="{ color: 'var(--text-color, #2d3748)' }">字体图标示例</text>
     </view>
     <!-- uni-icon 示例 -->
     <view class="flex-row items-center justify-between py-[12px]">
@@ -45,7 +45,7 @@
             lime-icon
           </text>
           <view class="bg-[#fff1f2] rounded-[4px] py-[2px] px-[6px] mt-[4px] self-start border-[1px] border-solid border-[#ffe4e6]">
-            <text class="text-[10px] text-[#f43f5e]">{{ svgAuthWarning }}</text>
+            <text class="text-[10px] text-[#f43f5e]">SVG模式需授权收费</text>
           </view>
         </view>
       </view>
@@ -73,9 +73,5 @@
 </template>
 
 <script setup lang="uts">
-import { computed } from 'vue';
-import { $t } from '@/src/utils/i18n/index.uts';
-
-const iconDemoTitle = computed((): string => $t('basic.iconDemoTitle'));
-const svgAuthWarning = computed((): string => $t('basic.svgAuthWarning'));
+// 图标组件示例
 </script>
