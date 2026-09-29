@@ -1,10 +1,10 @@
-# 1.3 跨端运行时与渲染模式约束
+# 3 跨端运行时与渲染模式约束
 
 > **本文件是 `unibestX-skill` 的参考分册**，由 [SKILL.md](../SKILL.md) 按需引用，收录本部分全部铁律的完整正反例与实测结论。
 >
 > **何时读本文件**：处理 VDOM / Android VDOM / Vapor（蒸汽模式）渲染差异、多平台门面分流与条件编译、UTS 插件与自定义基座、引入第三方组件前确认其写法是否可用（选项式 `.vue` 在蒸汽模式下不可编译）、Markdown 渲染、真机与 Kotlin 运行时报错、编译验证命令选择、`manifest.json` 渲染目标配置时。
 
-## 1.3.1 `Map` / 原生 SDK 对象转 `UTSJSONObject` 的 ClassCastException 与 `:style` 类型安全
+## 3.1 `Map` / 原生 SDK 对象转 `UTSJSONObject` 的 ClassCastException 与 `:style` 类型安全
 
 - **ClassCastException 陷阱**：
   1. 在 Android (Kotlin) 端，从 Vue props 或动态对象传递过来的样式/属性在底层是 Kotlin `LinkedHashMap`，而不是 `UTSJSONObject`。如果直接执行 `as UTSJSONObject` 会触发运行时崩溃：`java.lang.ClassCastException: LinkedHashMap cannot be cast to UTSJSONObject`；
@@ -17,12 +17,12 @@
   <view :style="(parentData['labelStyle'] ?? {}) as any"></view>
   ```
 
-## 1.3.2 Options API 组件方法名与自定义事件同名冲突
+## 3.2 Options API 组件方法名与自定义事件同名冲突
 
 - **陷阱**：在 Options API 组件中，若局部方法与声明的 `emits` 事件同名（如模板中 `@change="change"` 且在 `methods` 中声明 `change(e)`），Android 编译器会将方法解析为事件回调属性而非实例方法，导致事件处理函数无法被触发。
 - **解决规范**：重命名局部方法加前缀区分，如 `keyboardChange`、`onSelectorChange`。
 
-## 1.3.3 键盘高度变化事件类型声明与全局监听解绑规范
+## 3.3 键盘高度变化事件类型声明与全局监听解绑规范
 
 - **模板事件入参类型**：监听 `@keyboardheightchange` 事件时，事件回调的入参类型必须声明为 `UniInputKeyboardHeightChangeEvent`，严禁声明为 `UniInputKeyboardHeightChangeEventDetail`（否则 Android 端会发生 ClassCastException 崩溃）。
 
@@ -36,12 +36,12 @@
   - 调用 `uni.onKeyboardHeightChange` 注册全局监听时，回调函数入参类型必须声明为 `(res: OnKeyboardHeightChangeCallbackResult) => void`，其返回值为一个 `number` 类型的监听器 ID（如 `keyboardListenerId`）；
   - **重要限制**：解绑全局监听时，**必须调用 `uni.offKeyboardHeightChange(keyboardListenerId)` 并传入监听器 ID（`number`）**，严禁传入回调函数自身（否则 Kotlin 编译报错：`参数类型不匹配：实际类型为 'KFunction1<...>'，预期类型为 'Number?'`）。
 
-## 1.3.4 原生文档预览 API (openDocument) 参数限制
+## 3.4 原生文档预览 API (openDocument) 参数限制
 
 - **限制**：在 uni-app X 原生平台（Android / iOS）中，`uni.openDocument` 的选项类型定义中**不支持 `showMenu` 参数**（仅支持 `filePath`, `fileType`, `success`, `fail`, `complete`）。若传入 `showMenu: true`，Kotlin 编译器会直接报错：`error: No parameter with name 'showMenu' found`。
 - **正确做法**：调用 `uni.openDocument` 时仅传递 `filePath`、`fileType` 及回调函数。
 
-## 1.3.5 VDOM / Android VDOM / Vapor 渲染模式与编译兼容避坑
+## 3.5 VDOM / Android VDOM / Vapor 渲染模式与编译兼容避坑
 
 - **渲染模式判断**：使用条件编译 `#ifdef VUE3-VAPOR` / `#ifndef VUE3-VAPOR`，禁止依赖运行时环境变量或读取 manifest：
 
@@ -71,7 +71,7 @@
   const total: number = ah > 0 ? ah + TABBAR_BASE_HEIGHT : 0;
   ```
 
-## 1.3.6 依赖原生 jar 的 UTS 插件（如 kux-marked）必须打包「自定义基座」，否则整个 App 编译中断
+## 3.6 依赖原生 jar 的 UTS 插件（如 kux-marked）必须打包「自定义基座」，否则整个 App 编译中断
 
 - **报错现象**：只要某个页面 import 了这类插件，**全工程 App 编译失败**（不只是该页面）：
 
@@ -88,13 +88,13 @@
   2. 在自定义基座就绪前，用 `#ifndef APP-ANDROID` 把该插件的 **import + 实例化 + 调用**整段隔离掉，并在同文件写清「做好基座后如何打开」的注释，避免后人误以为是死代码；
   3. 选择第三方能力时优先挑**纯 UTS 实现**（无原生 jar）的插件，可保持标准基座调试流程不被打断。
 
-## 1.3.7 UTS 内置 `TextDecoder.decode()` 只有单参数签名（没有 Web 端的 `{ stream: true }`）
+## 3.7 UTS 内置 `TextDecoder.decode()` 只有单参数签名（没有 Web 端的 `{ stream: true }`）
 
 - **陷阱**：分块接收（`uni.request` 的 `enableChunked` + `onChunkReceived`）时，若对每个 chunk 直接调用 `TextDecoder.decode(chunk)`，被 chunk 边界切断的多字节字符（中文、emoji）会被解成 U+FFFD「�」。
 - **根因**：Web 端靠 `decode(buf, { stream: true })` 保留跨块残字节，而 UTS 的 `TextDecoder` **只支持 `decode(input)` 单参数**，没有 stream 语义。
 - **正确做法**：自持一个尾部字节缓冲，手动判断尾部是否为不完整的 UTF-8 序列（最多向前回溯 4 字节，跳过 `0b10xxxxxx` 续接字节），只解码完整字符，残缺尾部留给下一块拼接。本项目实现见 `src/http/stream.uts` 的 `Utf8StreamDecoder`。
 
-## 1.3.8 判断「某平台能不能用某个 UTS 插件」，必须看**实际解析到哪个入口**，不能只看 `utssdk/app-<平台>/index.uts` 是否存在/是否为空
+## 3.8 判断「某平台能不能用某个 UTS 插件」，必须看**实际解析到哪个入口**，不能只看 `utssdk/app-<平台>/index.uts` 是否存在/是否为空
 
 - **陷阱**：`uni_modules/kux-marked/utssdk/app-ios/index.uts` 是 HBuilderX 新建插件时的**模板残留**（只有示例的 `myApi` / `myApiSync`，没有 `export * from '../../common/marked'`），`package.json` 里却写着 `uni-app-x.app.ios: "√"`。据此容易误判「iOS 上的 `import { useMarked } from '@/uni_modules/kux-marked'` 必然解析失败，需要把降级条件从 `#ifndef APP-ANDROID` 扩到 iOS」。
 - **真相**：**`app-ios/index.uts` 根本不会被解析到**。构建时页面里的 `'@/uni_modules/kux-marked'` 被解析到 **`utssdk/app-js/index.uts`**（其内容为 `export * from '../../common/marked'` + `export * from '../interface'`），即平台无关的公共 UTS 实现，所以 iOS 上 `useMarked` 能正常解析，**不需要为 iOS 加降级**。
@@ -106,7 +106,7 @@
   | `utssdk/web/index.uts` | 同上 | ✅ |
   | `utssdk/mp-weixin/index.uts` | 同上 | ✅ |
   | `utssdk/app-harmony/index.uts` | 同上 | ✅ |
-  | `utssdk/app-android/index.uts` | `export * from '../../common/marked'` + `callJSReg` + **顶层 `import JSReg from 'io.dcloud.uts.jsreg.JSReg'`** | ✅ 但**强制依赖原生 jar**（见 1.3.6） |
+  | `utssdk/app-android/index.uts` | `export * from '../../common/marked'` + `callJSReg` + **顶层 `import JSReg from 'io.dcloud.uts.jsreg.JSReg'`** | ✅ 但**强制依赖原生 jar**（见 3.6） |
   | `utssdk/app-ios/index.uts` | 模板 stub（仅 `myApi` / `myApiSync`） | ❌ 但**不参与解析** |
 
 - **验证方法（负向对照法，强烈推荐）**：想确认某平台的模块解析目标，就往 import 里**故意加一个不存在的符号**，跑一次真机编译，构建日志会点名解析到的文件：
@@ -130,33 +130,33 @@
   这行同时给出了**解析到的入口文件**（`app-js`）与**调用方文件**。再用只存在于目标 stub 的符号（如 `myApi`）复验一次，同样被报「不存在于 `app-js/index.uts`」，即可确认该 stub 从未参与解析。
 - **红线**：**不要**因为某个 `utssdk/app-<平台>/index.uts` 长得像 stub 就贸然加平台降级 —— 会平白废掉该平台上本可正常工作的能力。先用上面的负向对照法确认解析目标，再决定是否降级。
 
-## 1.3.9 用 Markdown 渲染时，mp-html.uvue 相对上游的 11 处改造 + 表格 / 图片 / 代码块 / 视频 / 文字颜色的坑
+## 3.9 用 Markdown 渲染时，mp-html.uvue 相对上游的 11 处改造 + 表格 / 图片 / 代码块 / 视频 / 文字颜色的坑
 
 渲染链路是 `kux-marked`（UTS 版 marked）把 markdown 解析成 HTML，再交给项目内已适配 uni-app X 的 `mp-html.uvue` 原生渲染。**本项目保留的是轻量版 `mp-html.uvue`（未接线同目录那份闲置的 `parser.uts` / `node.uvue`）**，并就地做了 11 处改造（文件头有同样的清单）：
 
 1. **表格**：单元格改「按列数等分的百分比宽度 + `box-sizing:border-box`」（上游是 `flex:1`）；
 2. **列表**：列表项并进单个块级 `<text>`（上游是 `<text>• </text>` + `<text>内容</text>` 的 flex 行）；
 3. **HTML 实体解码**：上游把 `<text>` 的内容直接输出，`&nbsp;` `&amp;` `&#39;` `&#x27;` 之类会**原样显示成字符**。本项目的 `decodeEntities()` 支持命名实体表 + `&#dec;` + `&#xhex;`（用 `parseInt` + `String.fromCharCode`，`code > 0` 守卫），只解一层；`&nbsp;` → U+00A0 这类**非折叠空白**在后续的 `cleanText()` 里被刻意保留（先解码再折空白）。
-4. **代码块**：`<pre>` 渲染为「浅底卡片 + 逐行着色」，着色由本项目手写的 `code-highlight.uts` 提供（关键字/字符串/数字/注释四类，纯字符扫描、零正则）。**不要试图接入官方 `highlight` 插件**：它依赖 prismjs（纯 JS），App 原生端跑不了；官方 `node.uvue` 的 `pre`/`code` 分支也只给了等宽字体 + 底色，没有 token 级着色。渲染结构遵循 1.2.4：一行代码 = 一个 `flex flex-row flex-wrap` 行容器，行内各着色片段是**同级兄弟 `<text>`**。
-5. **字号**：标题与小字号由 `em` / `smaller` 改为**具体 px**（`24/20/18/16/14/13px`）。原因见 1.2.13。
-6. **文本修饰线**：行内样式表里的 `text-decoration:underline|line-through` 改为**长属性 `text-decoration-line:`**。原因见 1.2.14（App 端不支持简写，写了等于没写）。
-7. **行内嵌套样式**：行内节点由「本节点样式 + `flatText` 摊平」改为 **`chainClass(node)` 沿纯行内元素链累加 class**，使 `***粗斜体***`（`<em><strong>`）等嵌套写法不再丢内层效果。原因与实现见 1.2.15。`chainClass` 求值顺序与 `flatText` 保持一致（同为深搜摊平），只是多带了样式。
-8. **行内样式全部改为静态 class**：上游把行内标签的样式拼成字符串塞进 `:style="inlineStyle(name)"`（`<b>` → `font-weight:bold` 等）。本项目改为 **`inlineClass(name)` 返回静态 class 名**（`b/strong`→`mp-b`、`i/em`→`mp-i`、`u/ins`→`mp-u`、`del/s/strike`→`mp-del`、`code`→`mp-code`、`sub`→`mp-sub`、`sup`→`mp-sup`、`small`→`mp-small`、`big`→`mp-big`、`mark`→`mp-mark`），样式统一写在组件 `<style>` 里的 `.mp-*` 规则中，模板上只留 `:class="chainClass(n)"`。**动态 `:style` 只保留字号**（`headingStyle()` 现在只返回 `font-size:…`，粗体交给模板上的 `class="mp-b"`）。**这是风格统一而非 bug 修复** —— 理由与一则被证伪的推断见 1.2.16。
+4. **代码块**：`<pre>` 渲染为「浅底卡片 + 逐行着色」，着色由本项目手写的 `code-highlight.uts` 提供（关键字/字符串/数字/注释四类，纯字符扫描、零正则）。**不要试图接入官方 `highlight` 插件**：它依赖 prismjs（纯 JS），App 原生端跑不了；官方 `node.uvue` 的 `pre`/`code` 分支也只给了等宽字体 + 底色，没有 token 级着色。渲染结构遵循 2.4：一行代码 = 一个 `flex flex-row flex-wrap` 行容器，行内各着色片段是**同级兄弟 `<text>`**。
+5. **字号**：标题与小字号由 `em` / `smaller` 改为**具体 px**（`24/20/18/16/14/13px`）。原因见 2.13。
+6. **文本修饰线**：行内样式表里的 `text-decoration:underline|line-through` 改为**长属性 `text-decoration-line:`**。原因见 2.14（App 端不支持简写，写了等于没写）。
+7. **行内嵌套样式**：行内节点由「本节点样式 + `flatText` 摊平」改为 **`chainClass(node)` 沿纯行内元素链累加 class**，使 `***粗斜体***`（`<em><strong>`）等嵌套写法不再丢内层效果。原因与实现见 2.15。`chainClass` 求值顺序与 `flatText` 保持一致（同为深搜摊平），只是多带了样式。
+8. **行内样式全部改为静态 class**：上游把行内标签的样式拼成字符串塞进 `:style="inlineStyle(name)"`（`<b>` → `font-weight:bold` 等）。本项目改为 **`inlineClass(name)` 返回静态 class 名**（`b/strong`→`mp-b`、`i/em`→`mp-i`、`u/ins`→`mp-u`、`del/s/strike`→`mp-del`、`code`→`mp-code`、`sub`→`mp-sub`、`sup`→`mp-sup`、`small`→`mp-small`、`big`→`mp-big`、`mark`→`mp-mark`），样式统一写在组件 `<style>` 里的 `.mp-*` 规则中，模板上只留 `:class="chainClass(n)"`。**动态 `:style` 只保留字号**（`headingStyle()` 现在只返回 `font-size:…`，粗体交给模板上的 `class="mp-b"`）。**这是风格统一而非 bug 修复** —— 理由与一则被证伪的推断见 2.16。
 9. **`<video>` 分支**：新增原生 `<video>` 渲染（顶层 + 嵌套各一条分支），源由 `videoSrc(n)` 提供。**两条分支缺一不可**，原因见下方坑 4；`videoSrc()` 在流式场景下会等到 URL 完整（含 `://` 与已知扩展名）才返回，避免半截 URL 先渲染出一个报错黑框。
 10. **行内文字颜色**：上游把行内样式整体拼进动态 `:style`，本项目第 8 条已统一成静态 class，但**颜色来自内容**、没法预先写成 class —— 于是新增 `extractColor()`（解析阶段从句内 `style` 里捞 `color:`，只认 `color`、不认 `background-color`）+ `sanitizeColor()`（白名单：`#rgb` / `#rrggbb` / `#rrggbbaa`、`rgb()` / `rgba()`、十几个具名色，其余**静默丢弃**）+ `chainColor()` / `inlineStyle()`（沿与 `chainClass` **相同的行内元素链**取最内层颜色，贴到 `<text>` 的 `:style` 上）。写法：`<span style="color:#e11d48">红</span>`；嵌套在加粗里同样生效（`**<span style="color:#7c3aed">紫色粗体</span>**`）。**局限**：只支持行内节点（块级节点的颜色不生效）；颜色值不在白名单里时降级为默认色；`<font color="red">` 这类旧写法不支持，请用 `style="color:…"`。演示见 `rxjsDemo.uvue` 的 `DEMO_TEXT`「文字颜色：」一行。
-11. **Mermaid 全屏查看器的 `min-height` / `min-width` / `max-width:100%` 改为 `flex:1` / `width:100%` + `box-sizing:border-box`**：上游那三处百分比在原生端被静默忽略（构建期 3 条 warn），导致画布比屏幕小时不垂直居中、比屏幕宽时横向滚动区撑不出屏幕、拖不动。替代写法的选择依据与红线见 1.2.23。
+11. **Mermaid 全屏查看器的 `min-height` / `min-width` / `max-width:100%` 改为 `flex:1` / `width:100%` + `box-sizing:border-box`**：上游那三处百分比在原生端被静默忽略（构建期 3 条 warn），导致画布比屏幕小时不垂直居中、比屏幕宽时横向滚动区撑不出屏幕、拖不动。替代写法的选择依据与红线见 2.23。
 
 - **支持的标签（已确认）**：`mp-html.uvue` 的节点分支里已包含 `table` / `tr` / `th` / `td`（渲染为 flex 行列，单元格宽度按列数等分百分比计算）与 `img`（渲染为 uni `<image>`）；kux-marked 侧 `Renderer.table()` 输出 `<table><thead><tr><th|td>…`，`Renderer` 中图片输出 `<img src alt>`，且 `defaults.uts` 里 `gfm: true` 为默认值，GFM 表格能正常分词与渲染。
 - **坑 1：表格单元格内的行内格式会被抹平**。`parseTable()` 对每个单元格执行 `stripAllTags(...)`，只保留纯文本再塞进单个 `<text>`。所以单元格里写 `**加粗**` 或 `` `代码` `` 只会显示为普通文字（文字内容不丢，样式丢失）。确实需要在单元格里保留样式时，只能自行扩展 `parseTable`。
 - **坑 2：图片必须给固定宽度，只写 `max-width` 会溢出**。上游 mp-html 渲染 `<image>` 时写死 `style="max-width:750px"` + `mode="widthFix"` 却**不给 `width`**：图片于是按自身自然宽度渲染，只被 750px 上限兜住，一旦超过容器宽度就横向溢出。**本项目已就地改成 `style="width:110px;border-radius:8px"`**（缩略图尺寸，任何素材都不会撑破容器）——若你把它改回只写 `max-width`，或换成别的 `max-width` 方案，这个坑立刻复现。写 markdown 插图时仍建议挑小素材：`static/logo.png` 是 200×200，而 `logo-text-colorful.png`(1329×458)、`qq_uniBestX.jpg`(1284×2289) 这类大图在旧写法下会溢出。
-- **坑 3：表格与列表在 App 原生端会横向溢出、最右一列/整行被裁切**。上游把单元格写成 `flex:1`、把列表项写成「`<text>• </text>` + `<text>内容</text>` 的 flex 行」，两者在原生端的宽度下限都是内容的 min-content，于是被长内容顶宽、把整行撑出父容器。**本项目已就地改成：单元格按列数算等分百分比宽度 + `box-sizing:border-box`，列表项并进单个块级 `<text>`**。另外 **Markdown 表格的单元格里不要放长英文 token**（如 `simulateStream`）：原生端没有 `word-break` 兜底，一个不可断行的长词就能把整列顶宽。根因与通用解法见 1.2.12。
+- **坑 3：表格与列表在 App 原生端会横向溢出、最右一列/整行被裁切**。上游把单元格写成 `flex:1`、把列表项写成「`<text>• </text>` + `<text>内容</text>` 的 flex 行」，两者在原生端的宽度下限都是内容的 min-content，于是被长内容顶宽、把整行撑出父容器。**本项目已就地改成：单元格按列数算等分百分比宽度 + `box-sizing:border-box`，列表项并进单个块级 `<text>`**。另外 **Markdown 表格的单元格里不要放长英文 token**（如 `simulateStream`）：原生端没有 `word-break` 兜底，一个不可断行的长词就能把整列顶宽。根因与通用解法见 2.12。
 - **坑 4：新增一个 HTML 标签要在「解析器 + 模板」两处同时接住，且模板里要接两次**。这是**给渲染器加新标签时最容易踩的连环坑**，本项目加 `<video>` 时连踩三下：
   1. **解析器会把不认识的标签改名成 `div`**：`parseHtml()` 的兜底分支对未在白名单里的标签执行「当普通容器处理」，`video` 就落在这里被改名 —— 于是模板里那条 `n.name == 'video'` 的分支**永远命中不了**，页面一片空白，而代码看着毫无问题。**解法**：在 `br/hr/img` 那一组（只带 `attrs`、不解析子节点的 self-closing 类）里**显式接住**新标签：`if (name == 'video') { result.push({ name: 'video', attrs } as HtmlNode); continue }`；
   2. **marked 把 `<video>` 归在「行内标签表」里** → 源码里单独一行的 `<video …></video>` 会被包进段落，输出成 `<p><video …></video></p>`。也就是说这个节点**是块级容器的子节点，不是顶层节点** —— 只在顶层写分支的话它会落进嵌套分支被渲染成空。**解法**：顶层与嵌套**两条模板分支都要写**（本项目确实两处都写了，嵌套那处带注释说明为什么重复）；
   3. **流式下 URL 是半截到达的**：`mp-html` 每收到一块 chunk 就整体重渲染，`src` 会先出现 `https://qiniu-web-assets.dcloud.n` 这种半截值，`<video>` 拿它去加载就是一个报错黑框。**解法**：取值函数加完成度守卫 —— 必须含 `://` **且**以已知扩展名（`.mp4/.m4v/.mov/.3gp/.webm/.m3u8/.avi`）结尾才返回，否则返回 `''`（模板上是 `videoSrc(n) != ''` 才渲染）。
 - **视频相关补充**：`<video>` 组件的属性直接写成 `:controls="true"` + `style="width:100%;height:180px;border-radius:8px"` 即可（本项目实测能在蒸汽模式下编译进包，产物里是 `createSharedDataComponentWithFallback(_component_video, …, {src, controls:true, style:…})`）；**不要写 `autoplay`**，安卓不允许无用户手势的自动播放。写 markdown 时用**远程 URL**（`static/` 里没有视频素材），本项目用的是 DCloud 文档示例 `https://qiniu-web-assets.dcloud.net.cn/unidoc/zh/2minute-demo.mp4`（实测 `200 video/mp4`）。
 
-## 1.3.10 kux-marked 的安卓 jar 依赖对 uni-app X 4.72+ 是**遗留**，绕开它就能在标准基座用 Markdown
+## 3.10 kux-marked 的安卓 jar 依赖对 uni-app X 4.72+ 是**遗留**，绕开它就能在标准基座用 Markdown
 
 - **症状**：安卓端只要 `import { useMarked } from '@/uni_modules/kux-marked'`，整个项目编译中断：
   `[plugin:uts] Could not resolve "io.dcloud.uts.jsreg.JSReg"`。表现为「安卓上 Markdown 完全渲染不出来」。注意这是**打包器解析模块**失败，不是 Kotlin 编译失败（蒸汽模式下 App 逻辑层打成 JS：`unpackage/dist/dev/app-android/app-service.js`）。
@@ -175,7 +175,7 @@
   3. 已确认 `#ifndef APP-ANDROID` 那套「安卓降级为纯文本」的做法**可以整体删掉**了，不要留着当兜底。
 - **校验表格语法的陷阱**：表格能被识别的前提是「表头行 + 分隔行」同时匹配 `rules.uts` 中 `gfmTable` 的 Header/Align 子模式，且各行列数一致，否则会整体退化成普通段落。注意 Align 子模式里的 `-+` **只要求至少一个短横**，所以无序列表项的那个 `-` 号也能匹配；用多行正则在整个文档里取「第一处匹配」会误命中列表而给出假阳性。务必把正则**锚定到表格块开头**再判断。
 
-## 1.3.11 `\p{...}` Unicode 属性转义在 App 逻辑层非法 —— 模块初始化即死，整个页面的逻辑一起陪葬
+## 3.11 `\p{...}` Unicode 属性转义在 App 逻辑层非法 —— 模块初始化即死，整个页面的逻辑一起陪葬
 
 - **症状**：安卓端启动即报，紧跟 `应用【unibestX】已启动`：
   `SyntaxError: Invalid regular expression: /[\p{L}\p{N}]/u: Invalid property name in character class`。**H5 却完全正常**。
@@ -185,7 +185,7 @@
 - **验证方法（可复用）**：拿 `\p` 逐码位扫全 BMP，与自建区间做差集。本项目实测残留（已写在 `rules.uts` 注释里）：ALNUM 多判 245 / 漏判 9441，PUNCT 多判 78 / 漏判 2729，全部落在生僻文字（希腊/西里尔/希伯来/阿拉伯/天城文/假名/谚文/中日韩）、未分配码位与星光平面；本项目实际内容（中英 + 拉丁）零影响。
 - **红线**：给 App 端写正则，**一律不用 `\p{...}` / `\P{...}`**；同代的**后顾 `(?<=` 、命名组 `(?<name>`、`s`/`d` 标记也一律先假定不可用**（本项目已静态扫过，为 0）。
 
-## 1.3.12 蒸汽模式下「`#ifdef APP-ANDROID`」≠「编译成 Kotlin」——给 Kotlin 写的那一支同样会进 JS 逻辑层
+## 3.12 蒸汽模式下「`#ifdef APP-ANDROID`」≠「编译成 Kotlin」——给 Kotlin 写的那一支同样会进 JS 逻辑层
 
 - **症状（本项目实测两条）**：
   1. `ReferenceError: Suppress is not defined`；
@@ -231,12 +231,12 @@
   - **必炸**：Kotlin/UTS 独有的 stdlib 扩展（`getOrNull`、`firstOrNull`、`toIntOrNull`、`isNullOrEmpty`）、Kotlin 注解（`@Suppress`、`@JvmStatic`）；
   - **部分可用、必须逐项验证**：`UTSAndroid.*`。它在 JS 层**存在**（产物里框架自己就在用 `UTSAndroid.getUniActivity()`），但只覆盖部分成员 —— `parse()` 里的 `UTSAndroid.getDispatcher('io').async(...)` 属于**未经本项目验证**的路径，所以 `rxjsDemo` 特意走 `lexer` + `parser`（同步、且绕开 dispatcher，顺带避免打字机效果的 Promise 竞态）。
 
-## 1.3.13 不用真机、不用反复重启：把 App 逻辑层那条 JS 路径搬到 node 里跑，提前引爆运行时雷
+## 3.13 不用真机、不用反复重启：把 App 逻辑层那条 JS 路径搬到 node 里跑，提前引爆运行时雷
 
-真机一轮「改代码 → 重新编译 → 重启 App → 贴报错」要几分钟，而 1.3.11 / 1.3.12 这三颗雷是**串联**的：每次只炸一颗，下一颗要等下一次部署。把 `kux-marked` 整条解析链搬到 node 里跑，可以一次性把「JS 运行时缺东西」这类雷全引爆。
+真机一轮「改代码 → 重新编译 → 重启 App → 贴报错」要几分钟，而 3.11 / 3.12 这三颗雷是**串联**的：每次只炸一颗，下一颗要等下一次部署。把 `kux-marked` 整条解析链搬到 node 里跑，可以一次性把「JS 运行时缺东西」这类雷全引爆。
 
 - **能抓**：JS 运行时缺少的全局/方法（`getOrNull`、`UTSJSONObject` 之类）—— node 同样没有，所以与真机**同构**，误报为零；纯逻辑错误；以及流式渲染的每个前缀（半个 `**`、没闭合的代码围栏）。
-- **抓不到**：**引擎版本差异**（node 的 V8 支持 `\p{...}`，App 的引擎不支持）—— 这类只能靠 1.3.11 那样的 grep + 静态排查 + 真机确认。两者互补，缺一不可。
+- **抓不到**：**引擎版本差异**（node 的 V8 支持 `\p{...}`，App 的引擎不支持）—— 这类只能靠 3.11 那样的 grep + 静态排查 + 真机确认。两者互补，缺一不可。
 - **步骤**：
   1. 把 `uni_modules/kux-marked/common/*.uts` 复制成 `.ts`，做 4 处纯文本转换：删掉纯类型 barrel（`../utssdk/interface`）的 import、相对导入补 `.ts` 后缀（node ESM 不猜扩展名）、UTS 的 `a ?: A` 形式可选参数 → TS 的 `a?: A`、按 App 的取值跑一遍条件编译（`APP-ANDROID` = 真、`APP-HARMONY` = 假、`uniVersion >= 4.72` = 真）；同级放一个 `{"type":"module"}` 的 `package.json`。
   2. **坑：`ifndef` 必须取反**。我第一版 `evaluate()` 漏了这一步，把 `#ifndef APP-HARMONY` 和 `#ifdef APP-HARMONY` **两支一起删掉**，凭空造出一个源码里根本不存在的 `ReferenceError: cap is not defined`，白白追了一轮。转换完先自检：`grep -c "const cap = " Tokenizer.ts`，数量要与源码一致。
@@ -244,7 +244,7 @@
   4. 跑真实 demo 文本的**每一个流式前缀**（`simulateStream` 是 6 字符一块，90 个用例），每块都 `lexer` + `parser` 一遍；命令：`node --experimental-strip-types run.ts`。
 - **价值实证**：修复前 `成功 8 / 失败 82`，首个失败点在前缀 **54 字符**处，报 `TypeError: match.getOrNull is not a function` —— 与真机上用户看到的一字不差，并直接把触发点定位到 `**强调**`；修复后 **90/90 通过**，且完整 HTML 的标题/段落/加粗/列表/引用/表格/围栏代码块/图片/分割线全部正确。
 
-## 1.3.14 `<script setup>` 局部名撞框架全局名 —— 会把「先调用后定义」的错误**掩盖**成编译通过
+## 3.14 `<script setup>` 局部名撞框架全局名 —— 会把「先调用后定义」的错误**掩盖**成编译通过
 
 - **报错现象（两个坑连环，本项目实测 `src/sub/rxjsDemo/rxjsDemo.uvue`）**：
 
@@ -281,7 +281,7 @@
   1. `<script setup>` 里的局部方法 **一律加业务前缀**（`stop` → `stopStream`、`start` → `startStream`、`read` → `readToken`），尤其**未 import 就直接使用的名字**，一律先假定它会撞框架全局（`stop`、`effect`、`nextTick`、`reactive`、`toRefs`、`trigger`、`pause`、`resume` 等）；
   2. **定义必须写在所有调用点之前**（同一文件内），不要依赖任何"提升"。
 
-## 1.3.15 验证 UTS→Kotlin 编译，必须用会真正进入「编译为android class」的命令 —— 另两条都是**假绿**
+## 3.15 验证 UTS→Kotlin 编译，必须用会真正进入「编译为android class」的命令 —— 另两条都是**假绿**
 
 > 这一条是**验证方法论**，杀伤力最大：它决定了「编译成功」这四个字能不能信。
 
@@ -294,7 +294,7 @@
   | ✅ `cli launch app-android --project unibestX --deviceId <序列号>`（**不带** `--compile`） | ✅ 是 | 真机运行流程会进 Kotlin 阶段 |
 
 - **关键澄清**：`--compile true` 的语义是"仅编译代码"（不装机），**恰恰少了 Kotlin 那一段**；`--compile` 不是"更彻底的编译"，而是"不装机的编译"。
-- **⚠️ 补充：还有第三个假绿来源，而且在「配置」侧（2026-09-15 实测）** —— 即使命令选对了（不带 `--compile` 的真机 `launch app-android`），只要 `manifest.json` 的 `uni-app-x.vapor-render-target` 仍是 `"bytecode"`，整轮就走蒸汽 / 字节码、**一条 Kotlin 报错都拿不到**（实测 `编译为android class` = 0、`[plugin:uni:app-uts]` 整段不出现，而同一份代码切到 VDOM 立刻报出 3 条 error）。判定前务必先 `grep -c "编译为android class" <log>` ≥ 1，为 0 就先按 **1.3.20** 临时删掉 `vapor` 两个键。
+- **⚠️ 补充：还有第三个假绿来源，而且在「配置」侧（2026-09-15 实测）** —— 即使命令选对了（不带 `--compile` 的真机 `launch app-android`），只要 `manifest.json` 的 `uni-app-x.vapor-render-target` 仍是 `"bytecode"`，整轮就走蒸汽 / 字节码、**一条 Kotlin 报错都拿不到**（实测 `编译为android class` = 0、`[plugin:uni:app-uts]` 整段不出现，而同一份代码切到 VDOM 立刻报出 3 条 error）。判定前务必先 `grep -c "编译为android class" <log>` ≥ 1，为 0 就先按 **3.20** 临时删掉 `vapor` 两个键。
 - **判定方法（唯一可信）**：每轮构建后先数这一行，**`< 1` 就直接作废，不许宣称通过**：
 
   ```bash
@@ -306,9 +306,9 @@
   - 失败 ⇒ `[plugin:uni:app-uts] kotlin编译失败` + `error: ...`（这两行**只**在真机构建里出现）
 - **设备准备**：`cli devices list`（本项目实测可用设备 `Huawei TAS-AL00`）。真机构建会**安装到手机**，跑一轮约 1～2 分钟。
 - **⚠️ CLI 构建会被 IDE 里正在进行的运行抢占**：若 HBuilderX 界面里同时在跑真机/预览，CLI 这轮会在编译中途被中断 —— 表现是日志**只跑十几秒就 `已停止运行`，既没有 `编译成功` 也没有 `编译为android class`**。这不是代码问题，重跑即可（或先停掉界面里的运行）。
-- **顺手可捡的东西**：真机构建的 Kotlin 阶段还会吐 `warning:`（如 `Identity equality ...`），这些是单文件编译与 `--compile true` 都拿不到的，见 1.1.4。
+- **顺手可捡的东西**：真机构建的 Kotlin 阶段还会吐 `warning:`（如 `Identity equality ...`），这些是单文件编译与 `--compile true` 都拿不到的，见 1.4。
 
-## 1.3.16 Kotlin 下标越界会**抛异常**，JS 只返回 `undefined` —— 边界判断排在读取之后的写法**只在真机炸**
+## 3.16 Kotlin 下标越界会**抛异常**，JS 只返回 `undefined` —— 边界判断排在读取之后的写法**只在真机炸**
 
 - **报错现象**（本项目实测，`uni_modules/kux-marked/common/Parser.uts`）：
 
@@ -337,7 +337,7 @@
   ```
 
 - **顺带修掉的第二个缺陷（JS 与 Kotlin 同构，容易被一起漏掉）**：原写法把读取提到循环外，`nextToken` 成了**快照** —— 循环体里 `++i` 之后，后续几轮仍拿**旧** token 判断，会把非 text token（strong / html 等）也当 text 合并掉。修法同上（每轮条件里重新读）。
-- **验证分工（重要）**：node harness（1.3.13）**抓不到本例的崩溃**（JS 侧根本不抛），抓的是上面那个**语义**缺陷 —— `/tmp/km/_oob.ts`：修复前 `htmlCalls = 0`（html token 被吞），修复后 `1`。所以这类问题必须「真机复现 + 类型级推理 + 全项目同族扫描」三件一起做。
+- **验证分工（重要）**：node harness（3.13）**抓不到本例的崩溃**（JS 侧根本不抛），抓的是上面那个**语义**缺陷 —— `/tmp/km/_oob.ts`：修复前 `htmlCalls = 0`（html token 被吞），修复后 `1`。所以这类问题必须「真机复现 + 类型级推理 + 全项目同族扫描」三件一起做。
 - **同族扫描（一条 grep 扫完）**：
 
   ```bash
@@ -347,7 +347,7 @@
   本项目实测结论：`Lexer.uts` 的 `_getLastToken` 有显式 `length == 0` 守卫（**安全**）；`Tokenizer.uts` 三处 `tokens[tokens.length - 1]` 后面紧跟 `.type` 解引用 ⇒ 空数组时 JS 同样 `TypeError`，而 H5 一直正常 ⇒ **实际不可达，未改**。
 - **红线**：任何下标读取，**边界判断必须与读取写在同一个短路表达式内并排在前**；严禁"先在上方/循环外读一个可能越界的下标，再在下方判边界"。
 
-## 1.3.17 `x as boolean` / `as number` 是**非空**转换 —— 字段缺失（null）直接 NPE，而 JS 侧是空操作
+## 3.17 `x as boolean` / `as number` 是**非空**转换 —— 字段缺失（null）直接 NPE，而 JS 侧是空操作
 
 - **报错现象**（本项目实测，`uni_modules/kux-marked/common/Parser.uts`）：
 
@@ -380,14 +380,14 @@
 
 - **⚠️ 排查判据（最有用的一条）**：**「只有 App 崩、H5 与小程序都好」⇒ 优先怀疑"UTS 类型系统在 Kotlin 侧更严格"这一族**，而不是业务逻辑。这一族目前已知四类，全部只在真机炸：
   1. **非空断言** `x as T` 遇到 null（本条）；
-  2. **下标越界**（1.3.16，抛 `IndexOutOfBoundsException`）；
-  3. **名称解析**（1.1.13 / 1.3.14，error18 编译期）；
-  4. **原生对象强转**（1.3.1，`ClassCastException`）。
+  2. **下标越界**（3.16，抛 `IndexOutOfBoundsException`）；
+  3. **名称解析**（1.13 / 3.14，error18 编译期）；
+  4. **原生对象强转**（3.1，`ClassCastException`）。
 - **一次性把这一族扫完（本项目已落地，`/tmp/km/_tok.ts`）**：拿**真实词法器输出**逐 token 对账「Parser 做了非空断言的字段，词法器是否真的给了」，把缺失字段与已知清单比对 —— 多出一项就是新的未判空断言。本项目实测结论：`html.token` 两个，**只有行内那个缺 `pre`**，全项目这一族仅此一处；`heading.depth`、`list.ordered` / `list.loose` 在 Tokenizer 里都是无条件赋值，安全。
 - **红线**：对**可能缺失的字段**做 `as` 非空断言前必须先判空；尤其 `Tokenizer` / `Parser` 这种"构造方与消费方分离"的代码 —— 消费方不能假定构造方永远给全字段。
 - **类型层面的证据（说明这个判空是类型正确的，不是打补丁）**：`utssdk/Tokens.interface.uts` 里 `NodesToken` 把 `pre` / `block` 声明为 **`boolean | null`**（Parser 里 `as NodesToken` 的目标类型就是它），所以赋 `null` 合法；而同一文件的 `HTML` 类型把它们声明成**非空** `boolean`。也就是说**行内分支造出来的 token 根本不满足 `HTML` 类型的契约** —— 消费方按 `HTML` 的严格语义去断言，就崩在这里。
 
-## 1.3.18 多平台门面分流：`VUE3-VAPOR` 只代表「App 蒸汽模式」，**不覆盖 H5 / 小程序**；且小程序（uts2js）**不能从 `.ts` 文件经 `export *` 转发纯类型**
+## 3.18 多平台门面分流：`VUE3-VAPOR` 只代表「App 蒸汽模式」，**不覆盖 H5 / 小程序**；且小程序（uts2js）**不能从 `.ts` 文件经 `export *` 转发纯类型**
 
 本项目的 `src/store/index.uts` 是「Vapor（官方 Pinia） / VDOM（x-pinia-s）」双实现的**唯一编译期门面**。它同时踩到两颗雷，都会以「明明代码没问题却编译失败 / 平台走错分支」的形式出现。
 
@@ -475,8 +475,8 @@
 
 - **为什么必须无条件转发**：类型与平台无关，两个分支共用同一套。放进 `#ifdef` 必然漏掉另一端；而 `.ts` / `.uts` 两种后缀的实现文件都要能拿到它。
 - **为什么不能让实现文件继续 `export type`**：门面会同时从 `./types.uts` 与 `./vapor/token` 收到同名类型，形成重复导出。
-- **本雷与 1.1.12 的关系**：**类型转发也是转发**。抽出的 `types.uts` 是叶子（不再往下星号导出），门面是唯一转发层 —— 依然满足「同一顶层符号只允许在一层门面 `export *`」的红线，不会产生 `useXxxStore__1`。
-- **本雷的连带修正**：`src/store/vapor/index.ts` 原本还写了 `export * from './app' | './token' | './user'`，与门面构成**两层转发**（正是 1.1.12 判定的 `__1` 改名场景）。该文件只应 `createPinia()` + 注册插件 + `export default pinia`，转发一律交给门面。
+- **本雷与 1.12 的关系**：**类型转发也是转发**。抽出的 `types.uts` 是叶子（不再往下星号导出），门面是唯一转发层 —— 依然满足「同一顶层符号只允许在一层门面 `export *`」的红线，不会产生 `useXxxStore__1`。
+- **本雷的连带修正**：`src/store/vapor/index.ts` 原本还写了 `export * from './app' | './token' | './user'`，与门面构成**两层转发**（正是 1.12 判定的 `__1` 改名场景）。该文件只应 `createPinia()` + 注册插件 + `export default pinia`，转发一律交给门面。
 
 **验证 mp-weixin 到底走了哪一支（看产物，不要看源码）**
 
@@ -517,7 +517,7 @@ test -d unpackage/dist/dev/mp-weixin/src/store && echo 产物在，才算真的�
 
 ---
 
-## 1.3.19 被 `.ts` / `.uvue` 导入的 `.uts` **必须**有同目录同名的 `<name>.d.uts.ts`，否则 IDE 一直报 `Cannot find module`
+## 3.19 被 `.ts` / `.uvue` 导入的 `.uts` **必须**有同目录同名的 `<name>.d.uts.ts`，否则 IDE 一直报 `Cannot find module`
 
 **报错现象**（HBuilderX / VSCode 的 tsserver 面板，本项目实测）：
 
@@ -576,14 +576,14 @@ cat unpackage/dist/dev/mp-weixin/src/i18n/index.d.uts.js   # → "use strict";
 
 ---
 
-## 1.3.20 `manifest.json` 的 `vapor-render-target: "bytecode"` 会让真机运行**跳过 Kotlin 阶段** —— 1.3.15 之外的**第三个假绿来源**（更隐蔽：它是项目自身配置，不是命令选择）
+## 3.20 `manifest.json` 的 `vapor-render-target: "bytecode"` 会让真机运行**跳过 Kotlin 阶段** —— 3.15 之外的**第三个假绿来源**（更隐蔽：它是项目自身配置，不是命令选择）
 
 - **实测证据（本项目，2026-09-15，同一份代码只改 `manifest.json` 一处）**：
 
   | `uni-app-x` 配置 | 日志特征 | `grep -c "编译为android class"` | Kotlin 报错 | 结论 |
   | :--- | :--- | :--- | :--- | :--- |
   | `{ "styleIsolationVersion": "2", "vapor": true, "vapor-render-target": "bytecode" }`（**HEAD 默认**） | `编译器版本：5.24（uni-app x）蒸汽模式` + `当前视图层编译目标：字节码` | **0** | 一条都没有（`[plugin:uni:app-uts]` 整段不出现） | 假绿：含 Kotlin 必炸代码也报「编译成功」，真机照跑 |
-  | `{ "styleIsolationVersion": "2" }`（临时删掉 `vapor`） | `编译器版本：5.24（uni-app x）VDOM模式` | **89** | 3 条真实 error（见 1.1.14 / 1.1.15） | ✅ 唯一可信的 Kotlin 通道 |
+  | `{ "styleIsolationVersion": "2" }`（临时删掉 `vapor`） | `编译器版本：5.24（uni-app x）VDOM模式` | **89** | 3 条真实 error（见 1.14 / 1.15） | ✅ 唯一可信的 Kotlin 通道 |
 
 - **机理**：`vapor + bytecode` 下**整个应用走蒸汽模式**，视图层编译成字节码、UTS 逻辑层走 `uts2js`（产物在 `unpackage/cache/vapor/.app-android/.uts2js/`），**完全不进 Kotlin 编译阶段**。此时「编译成功」只代表字节码/JS 链路没报错。
 - **判定方法**：真机构建后先数那行，**`< 1` 就说明这轮没进 Kotlin，任何「编译成功」都不作数**：
@@ -601,11 +601,11 @@ cat unpackage/dist/dev/mp-weixin/src/i18n/index.d.uts.js   # → "use strict";
   }
   ```
 - **两种模式都要跑**：蒸汽/字节码是**项目默认运行方式**（改回去才是真实开发体验），VDOM/Kotlin 是**唯一能暴露 Kotlin 禁令**的通道。只跑一种都会漏。
-- **与 1.3.15 的关系**：1.3.15 讲的是「**命令选错**」（`--compile true` / `compile --file`）导致假绿；本条讲的是「**配置导致**」—— 即使命令选对了（不带 `--compile` 的真机 `launch app-android`），只要 `vapor-render-target` 还是 `bytecode`，照样一条 Kotlin 报错都拿不到。
+- **与 3.15 的关系**：3.15 讲的是「**命令选错**」（`--compile true` / `compile --file`）导致假绿；本条讲的是「**配置导致**」—— 即使命令选对了（不带 `--compile` 的真机 `launch app-android`），只要 `vapor-render-target` 还是 `bytecode`，照样一条 Kotlin 报错都拿不到。
 
 ---
 
-## 1.3.21 长列表性能铁律：长列表必须使用 `list-view`，严禁使用 `scroll-view`（虚拟节点复用 vs 全量渲染崩溃）
+## 3.21 长列表性能铁律：长列表必须使用 `list-view`，严禁使用 `scroll-view`（虚拟节点复用 vs 全量渲染崩溃）
 
 - **症状与危害**：
   - 在列表数据量较小（如 5~10 条）时，使用 `<scroll-view>` 和 `<list-view>` 视觉上看不出太大差异；
@@ -634,7 +634,7 @@ cat unpackage/dist/dev/mp-weixin/src/i18n/index.d.uts.js   # → "use strict";
 
 ---
 
-## 1.3.22 `scroll-view` 下拉刷新在 TabBar 切换 / 隐藏时的状态机死锁与强制复位治理
+## 3.22 `scroll-view` 下拉刷新在 TabBar 切换 / 隐藏时的状态机死锁与强制复位治理
 
 - **症状与现象（本项目微信小程序 & 原生 App 实测）**：
   - 在单页面 TabBar 容器模式（如宿主首页 Tab 0）中进行下拉刷新（转圈中）；
@@ -661,7 +661,7 @@ cat unpackage/dist/dev/mp-weixin/src/i18n/index.d.uts.js   # → "use strict";
 
 ---
 
-## 1.3.23 流式渲染：高频重渲染「块结构未完成」的富文本快照，会让原生组件在渲染分支间**搬家** → 销毁重建 → App 抛 `UTS instance N is not registered`
+## 3.23 流式渲染：高频重渲染「块结构未完成」的富文本快照，会让原生组件在渲染分支间**搬家** → 销毁重建 → App 抛 `UTS instance N is not registered`
 
 - **症状（本项目 Android 真机实测，RxJS 流式 Markdown 演示页）**：
 
@@ -736,7 +736,7 @@ cat unpackage/dist/dev/mp-weixin/src/i18n/index.d.uts.js   # → "use strict";
   - **界面细节**：用 `hasReceived`（收到第一个 chunk 即置真）而不是 `text.length == 0`
     控制空状态文案，否则第一块到齐前界面会一直停在「点击按钮开始接收数据流」。
 
-## 1.3.24 蒸汽模式 `flatten` 拍平：省的是原生 View 数量，代价是**静默吃掉事件**与一批 CSS —— 交互元素与遮罩层一概不能加
+## 3.24 蒸汽模式 `flatten` 拍平：省的是原生 View 数量，代价是**静默吃掉事件**与一批 CSS —— 交互元素与遮罩层一概不能加
 
 - **是什么**：`flatten` 是 `view` / `text` / `image` 三个基础组件的属性，**蒸汽模式（Vapor）专属**。加了它的元素**不再创建独立原生 View 实例**，而是作为绘制指令直接「拍平」合并到父容器的渲染管线里（审查元素边界时看不到独立红框）。官方定位见[性能优化「控制好 dom 的数量和嵌套层数」](https://doc.dcloud.net.cn/uni-app-x/performance.html)：vdom 时代要达到同等性能只能上 Draw API，而「Draw API 使用复杂，且无法跨端到 web 和小程序」，拍平就是来解这个的。
 
@@ -745,7 +745,7 @@ cat unpackage/dist/dev/mp-weixin/src/i18n/index.d.uts.js   # → "use strict";
   <text flatten>{{ title }}</text>
   ```
 
-- **前提：只有蒸汽模式认这个属性**，VDOM 模式不支持（写了不生效）。本项目 `manifest.json` 是 `"vapor": true` + `"vapor-render-target": "bytecode"`（HEAD 默认，见 1.3.20），编译器 5.24，版本门槛已满足：
+- **前提：只有蒸汽模式认这个属性**，VDOM 模式不支持（写了不生效）。本项目 `manifest.json` 是 `"vapor": true` + `"vapor-render-target": "bytecode"`（HEAD 默认，见 3.20），编译器 5.24，版本门槛已满足：
 
   | | Android(Vapor) | iOS(Vapor) | HarmonyOS(Vapor) |
   | --- | --- | --- | --- |
@@ -769,15 +769,15 @@ cat unpackage/dist/dev/mp-weixin/src/i18n/index.d.uts.js   # → "use strict";
 
 - **本项目取舍**（据当前代码）：
   - ❌ **mp-html 的 mermaid 全屏查看器**：`position:fixed` + `z-index:9999` + 满屏 `@click`，红线一二三**一次性全踩**，绝对不要加。底部档位工具条、右上角关闭按钮同理。
-  - ❌ **画布手指平移容器**（`@touchstart` / `@touchmove` / `@touchend` 全靠事件驱动，见 1.2.22 补充）同理不能加 —— 加了平移会直接失灵。
+  - ❌ **画布手指平移容器**（`@touchstart` / `@touchmove` / `@touchend` 全靠事件驱动，见 2.22 补充）同理不能加 —— 加了平移会直接失灵。
   - ✅ **纯装饰、无事件、不依赖 `z-index` / `visibility` 的图元层**才是候选：katex / mermaid 画布里那些只有 `position:absolute` + 宽高 + `background-color` 的 `ruleBoxes` / `bgBoxes` / `textBoxes`（一个公式就是几十个 box），以及静态图标、分隔线一类的 view / text。
   - ⚠️ **第三方组件已有先例**：`uni_modules/uni-nav-bar-x` 的 mid/right 容器与标题 `text`、`uni_modules/uni-fab-button` 的 `.plus` 条都已在用 `flatten`（后者还叠了 `transform: rotate(90deg)`，它**没有子元素**所以不踩上面那条 transform 缺陷 —— 一旦给它加子元素，旋转就会失效）。
-  - **验证通道**：拍平只在蒸汽模式生效，想看到差异只能走真机 / 模拟器（`launch app-android` 等）；走 VDOM 通道（1.3.20）**看不到任何区别**。
+  - **验证通道**：拍平只在蒸汽模式生效，想看到差异只能走真机 / 模拟器（`launch app-android` 等）；走 VDOM 通道（3.20）**看不到任何区别**。
   - **未实测、别写进结论**：拍平对 `position:absolute` 图元的定位是否有影响，官方文档没有正面说明，本项目**尚未实测**；要用先拿一屏公式做 A/B 对比再铺开。
 
 ---
 
-## 1.3.25 蒸汽模式（Vapor）不支持选项式 `<script>`，第三方 Options API 组件一律不可用
+## 3.25 蒸汽模式（Vapor）不支持选项式 `<script>`，第三方 Options API 组件一律不可用
 
 - **错误码**：引用第三方 `uni_modules` 组件后，App 编译直接中断：
 

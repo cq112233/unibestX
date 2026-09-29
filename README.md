@@ -23,7 +23,7 @@
 
 内置 `自定义 TabBar`、`Layout 布局`、`请求封装`、`登录拦截`、`路由守卫`、`Tailwind CSS`、`i18n 多语言`、`主题切换`、`沙盒极速调试` 等基础能力，并提供 `代码提示`、`自动格式化`、`统一配置` 等辅助功能，让你编写 `uni-app X` 拥有 `best` 体验。
 
-🤖 **同时它也是一套「AI 原生」开发模板**：项目自带 **`unibestX-skill`**（「1 个入口 + 8 个分册」的 uni-app X / UTS 规范知识库），Claude Code、Codex 等 AI Agent 克隆即可直接按项目规范写代码、生成页面骨架、自动排查跨端编译报错；运行时亦内置 **AI 对话页**与 **SSE / Chunk 跨端流式传输**能力。详见 [🤖 AI 与 Skill 体系](#-ai-与-skill-体系)。
+🤖 **同时它也是一套「AI 原生」开发模板**：项目自带 **`unibestX-skill`**（「1 个入口 + 6 个分册」的 uni-app X / UTS 规范知识库），Claude Code、Codex 等 AI Agent 克隆即可直接按项目规范写代码、生成页面骨架、自动排查跨端编译报错；运行时亦内置 **AI 对话页**与 **SSE / Chunk 跨端流式传输**能力。详见 [🤖 AI 与 Skill 体系](#-ai-与-skill-体系)。
 
 | 👉 在线 H5 演示 | 📖 官方文档 | 🐙 GitHub | 🍊 Gitee 镜像 |
 | :---: | :---: | :---: | :---: |
@@ -142,18 +142,16 @@
 
 ### 1. `unibestX-skill` — 项目专属 uni-app X / UTS 规范库
 
-这是与项目强绑定的核心技能，也是仓库中**唯一保留的技能**，采用 **「1 个入口 + 8 个分册」** 结构，把 UTS 强类型约束、跨端样式限制与本项目的生产级写法沉淀成可被 AI 直接检索的知识库。
+这是与项目强绑定的核心技能，也是仓库中**唯一保留的技能**，采用 **「1 个入口 + 6 个分册」** 结构，把 UTS 强类型约束、跨端样式限制与本项目的生产级写法沉淀成可被 AI 直接检索的知识库。
 
 | 分册 | 内容 |
 | :--- | :--- |
-| `SKILL.md`（入口，常驻） | 概述 + 分册导航 + 3.3 快速对照表 + 3.4 红线清单 |
-| `1.1-uts-syntax.md` | UTS 强类型系统与语法核心铁律（`UTS110111163` 等报错成因） |
-| `1.2-styling.md` | CSS & Tailwind 样式引擎与原生渲染限制 |
-| `1.3-runtime.md` | 跨端运行时与 VDOM / Vapor 渲染模式约束 |
-| `2-examples.md` | 5 个项目内生产级标杆案例（页面骨架、TabBar、二级详情页、滚动与下拉刷新） |
-| `3-codegen.md` | 代码生成流程与标准页面模板 |
-| `4-utils.md` | `src/utils/` 下 10 个内置工具的 API 与用法 —— **动手造轮子前先查这里** |
-| `5-infra.md` | `src/http/` `src/router/` `src/layouts/` `src/i18n/` 四套基础设施装配规范 |
+| `SKILL.md`（入口，常驻） | 概述 + 分册导航 + A.1 快速对照表 + A.2 红线清单 |
+| `1-uts-syntax.md` | UTS 强类型系统与语法核心铁律（`UTS110111163` 等报错成因） |
+| `2-styling.md` | CSS & Tailwind 样式引擎与原生渲染限制 |
+| `3-runtime.md` | 跨端运行时与 VDOM / Vapor 渲染模式约束 |
+| `4-examples.md` | 5 个项目内生产级标杆案例（页面骨架、TabBar、二级详情页、滚动与下拉刷新） |
+| `5-codegen.md` | 代码生成流程与标准页面模板 |
 | `6-page-component-spec.md` | AI 页面层级与组件设计规范（页面高内聚、三级防过度拆分、容器与纯展示解耦、Mock 接口契约化） |
 
 **工作机制**：入口文件只常驻导航与红线清单，AI 命中条目后**必须继续读取对应分册**核对完整正反例才允许改代码。
@@ -545,7 +543,6 @@ import { sys } from '@/src/utils/systemInfo/index.uts';
 
 > 💡 每个模块同时提供**扁平函数导出**与**类实例导出**（如 `toast()` 与 `toastUtils.toast()`），按项目风格任选其一即可。
 > 每个模块都配有 `index.d.uts.ts` 类型声明文件，供编辑器补全；修改模块后可用 `pnpm gen:uts-dts` 重新生成、`pnpm check:uts-dts` 校验。
-> 完整的 API 签名与用法示例见 `unibestX-skill/references/4-utils.md`。
 
 ### 环境变量配置（`.env`）
 

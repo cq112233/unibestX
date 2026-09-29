@@ -1,4 +1,4 @@
-# 二、项目正确案例（5 个生产级标杆案例）
+# 4 项目正确案例（5 个生产级标杆案例）
 
 > **本文件是 `unibestX-skill` 的参考分册**，由 [SKILL.md](../SKILL.md) 按需引用。
 >
@@ -6,7 +6,7 @@
 
 以下案例均源自 unibestX 本地工程中已验证、可直接编译运行的真实生产级代码。
 
-## 2.1 标杆案例 1：标准“上固定 + 下滚动”骨架与可用高度
+## 4.1 标杆案例 1：标准“上固定 + 下滚动”骨架与可用高度
 
 > 真实参考源：[src/sub/layoutDemo/layoutDemo.uvue](file:///Users/chenqi/Desktop/unibestX/src/sub/layoutDemo/layoutDemo.uvue)
 
@@ -111,7 +111,7 @@ function handleScrollToLower(): void {
 
 ---
 
-## 2.2 标杆案例 2：主包 TabBar 页面与自定义平滑下拉刷新
+## 4.2 标杆案例 2：主包 TabBar 页面与自定义平滑下拉刷新
 
 > 真实参考源：[src/pages/basic/basic.uvue](file:///Users/chenqi/Desktop/unibestX/src/pages/basic/basic.uvue) / [src/pages/index/index.uvue](file:///Users/chenqi/Desktop/unibestX/src/pages/index/index.uvue)
 
@@ -151,7 +151,7 @@ onNavbarPullDownRefresh(() => {
 
 ---
 
-## 2.3 标杆案例 3：二级页面 / 子包分包页面标准实现
+## 4.3 标杆案例 3：二级页面 / 子包分包页面标准实现
 
 > 真实参考源：[src/sub/time/time.uvue](file:///Users/chenqi/Desktop/unibestX/src/sub/time/time.uvue) / [src/sub/device/device.uvue](file:///Users/chenqi/Desktop/unibestX/src/sub/device/device.uvue)
 
@@ -199,7 +199,7 @@ onNavbarPullDownRefresh(() => {
 
 ---
 
-## 2.4 标杆案例 4：整页按内容高度自然滚动
+## 4.4 标杆案例 4：整页按内容高度自然滚动
 
 > 真实参考源：[src/utils/refresh/index.uts](file:///Users/chenqi/Desktop/unibestX/src/utils/refresh/index.uts)
 
@@ -236,7 +236,7 @@ onNavbarReachBottom(() => {
 
 ---
 
-## 2.5 标杆案例 5：组件与生态库优先原则（Component Library First）
+## 4.5 标杆案例 5：组件与生态库优先原则（Component Library First）
 
 > 真实参考源：[src/pages/function/views/FunctionView.uvue](file:///Users/chenqi/Desktop/unibestX/src/pages/function/views/FunctionView.uvue)
 

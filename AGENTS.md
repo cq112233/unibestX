@@ -29,6 +29,6 @@ Skills 位于 `.agents/skills/` 目录，目前**只保留 `unibestX-skill` 一�
 
 ## 项目规则与专属 Skills
 
-- **AI / Agent 必读铁律**：所有参与本项目开发的 AI、Agent 在进行任何编码、重构、修 bug 或新增页面任务前，**必须首先完整阅读并严格遵循 `unibestX-skill`**（`.agents/skills/unibestX-skill/SKILL.md`）。该 Skill 为**「1 个入口 + 8 个分册」**结构，命中入口导航或速查表条目时**必须继续 Read 对应分册**核对完整正反例。
+- **AI / Agent 必读铁律**：所有参与本项目开发的 AI、Agent 在进行任何编码、重构、修 bug 或新增页面任务前，**必须首先完整阅读并严格遵循 `unibestX-skill`**（`.agents/skills/unibestX-skill/SKILL.md`）。该 Skill 为**「1 个入口 + 6 个分册」**结构，命中入口导航或速查表条目时**必须继续 Read 对应分册**核对完整正反例。
 - **必须遵守** `.agents/rules/uniappx.md` 中的 uni-app X 开发规范。每次会话开始时先 Read 该文件，并在编写 `.uvue`、`.uts`、`.ts`、`.scss` 文件时严格遵循其中的规则。
 - **一律禁止使用 `interface`**：在本项目中定义任何对象结构、状态、参数或返回值类型时，**一律禁止使用 `interface`**，**必须全部统一使用 `type`（类型别名）**，避免触发 UTS 底层对对象字面量赋值的 `UTS110111163` 编译错误。

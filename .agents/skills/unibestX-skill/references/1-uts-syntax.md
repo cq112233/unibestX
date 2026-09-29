@@ -1,10 +1,10 @@
-# 1.1 UTS 强类型系统与语法核心铁律
+# 1 UTS 强类型系统与语法核心铁律
 
 > **本文件是 `unibestX-skill` 的参考分册**，由 [SKILL.md](../SKILL.md) 按需引用，收录本部分全部铁律的完整正反例与实测结论。
 >
 > **何时读本文件**：定义对象结构与类型标注、写 `export` / `class` / 闭包 / 定时器回调 / 集合遍历，或遇到 `UTS110111163`、`UTS110111119`、`UTS110111120`、`error1`、`error17`、`error18`、`NoSuchMethodError`、`ClassCastException` 等编译与运行时报错时。
 
-## 1.1.1 一律禁止使用 `interface`，全面统一使用 `type`
+## 1.1 一律禁止使用 `interface`，全面统一使用 `type`
 
 - **错误码**：`UTS110111163: Object literals only support object types defined by construction type, and do not support interfaces`
 - **底层原理**：UTS 将 `interface` 严格映射为底层面向对象纯接口，禁止将对象字面量（如 `{ name: 'foo' }`）、Mock 数据或 API 返回值赋值给 `interface`。
@@ -26,7 +26,7 @@ type UserInfo = {
 const user: UserInfo = { name: "Tom", age: 18 }
 ```
 
-## 1.1.2 不支持 `undefined`，必须初始化为 `null`
+## 1.2 不支持 `undefined`，必须初始化为 `null`
 
 - **错误码**：`UTS110111119`
 - **底层原理**：UTS 编译到 Kotlin / Swift / ArkTS 这类原生强类型语言，而原生类型系统里根本没有 `undefined` 这个概念，UTS 因此在语言层面把它整个移除了。
@@ -42,7 +42,7 @@ let value: string | null = null
 function test(param: string | null): void {}
 ```
 
-## 1.1.3 条件语句必须为显式布尔表达式
+## 1.3 条件语句必须为显式布尔表达式
 
 - **错误码**：`UTS110111120`
 - **底层原理**：UTS 取消了 JS 的 truthy / falsy 隐式转换 —— 原生强类型语言里「一个值算不算真」没有统一定义（Kotlin 里 `String` 甚至不能直接放在条件位置），所以条件处只接受真正的 `boolean`。
@@ -60,7 +60,7 @@ if (str != null && str != "") {}
 const list = arr != null ? arr : []
 ```
 
-## 1.1.4 等值比较使用 `==` / `!=`，禁止对基础类型使用 `===` / `!==`
+## 1.4 等值比较使用 `==` / `!=`，禁止对基础类型使用 `===` / `!==`
 
 - **错误码**：没有编译错误，但 Kotlin 阶段会产 `warning: Identity equality for arguments of types 'Number' and 'Int' can be unstable because of implicit boxing.` —— **要当作缺陷看，不要当噪音**。
 - **底层原理**：在 Kotlin (Android) 原生端，`===` 会编译为引用/身份比较（Identity Equality）。对于字符串，比较的是内存地址而非文本内容；对于数值/布尔值，隐式装箱（Implicit Boxing）会导致不同包装对象的引用比较返回 `false`。
@@ -85,7 +85,7 @@ if (statusCode == 200) {}
 if (routePath == '/home') {}
 ```
 
-## 1.1.5 数字与数组必须显式声明类型
+## 1.5 数字与数组必须显式声明类型
 
 - **错误码**：无独立报错码，属**类型推导歧义** —— 推导结果随目标平台漂移（Kotlin 端 `Int` 与 `Double` 是两种类型），往往要到后续赋值或比较时才以类型不匹配的形式炸出来，排查成本更高。
 - **底层原理**：UTS 把 `number` 编译为各平台的原生数值类型，字面量 `0` 在 Kotlin 端推成 `Int`、换个上下文可能推成 `Double`；裸写 `[]` 更是推不出元素类型。`string` 与 `boolean` 没有这种平台分叉，才允许依赖字面量推导。
@@ -103,7 +103,7 @@ let list: Array<string> = []
 let list: string[] = []
 ```
 
-## 1.1.6 函数参数、返回值类型与安全调用运算符 `?.`
+## 1.6 函数参数、返回值类型与安全调用运算符 `?.`
 
 - **错误码**：无独立报错码，缺标注时按「推导出的类型与调用方不符」报类型不匹配；可空类型漏写 `?.` 则在 Kotlin 端以空指针形式炸出来。
 - **底层原理**：函数签名要随代码一起编译进原生产物，参数与返回值类型不能靠运行时推断；对可空类型直接取属性，在 Kotlin 里等价于对 `null` 取值，必然崩。
@@ -124,7 +124,7 @@ function getLength(str: string | null): number {
 }
 ```
 
-## 1.1.7 类型定义必须在文件顶层作用域
+## 1.7 类型定义必须在文件顶层作用域
 
 - **错误码**：`UTS100006`（type）、`UTS110111166`（interface）
 - **底层原理**：`type` 要编译成目标语言的原生类型声明，而 Kotlin / Swift / ArkTS 都**不允许在函数体内声明类型**，所以类型只能落在文件顶层作用域。
@@ -144,7 +144,7 @@ function buildUser(): void {
 }
 ```
 
-## 1.1.8 作用域插槽解构变量推断为 `Any?`
+## 1.8 作用域插槽解构变量推断为 `Any?`
 
 - **错误码**：`error17: 参数类型不匹配：实际类型为 'Any?'，预期类型为 'UTSJSONObject'`
 - **底层原理**：作用域插槽的数据在原生端是运行期才知道形状的 `Any?`，编译器无法从模板上下文推出具体类型，传给强类型函数时自然对不上签名。
@@ -160,7 +160,7 @@ function buildUser(): void {
 <text>{{ (index as number) + 1 }}</text>
 ```
 
-## 1.1.9 Class 语法使用约束
+## 1.9 Class 语法使用约束
 
 - **错误码**：`UTS110111128`（`#prop`）、`UTS110111129`（下标访问）、`UTS110111130`（`static {}`）、`UTS110111131`（继承）、`UTS110111151`（传递 Class）
 - **底层原理**：UTS 的 `class` 直接编译为 Kotlin / Swift / ArkTS 的原生类，必须服从这些原生语言共同的面向对象规则 —— 只有原生可见性修饰符、没有 JS 的 `#` 私有字段、没有「把实例当字典存取」的下标语义、静态初始化必须走方法。
@@ -206,7 +206,7 @@ function createUser(): UserInfo {
 
 - **`super(...)` 构造实参中不能引用 `this`**：Kotlin 端父类构造先于子类字段初始化执行，`super(...)` 的实参里引用 `this` 会编译失败。需要把「子类自己的状态」交给父类构造时（典型如 `class Subject extends Observable`），**改用组合而非继承**：让 `Subject` 持有一个私有 `_observers` 数组，并额外提供 `asObservable(): Observable<T>` 返回一个由 `this` 闭包驱动的 `Observable` 供下游 `.pipe()` 使用。本项目实现见 `src/utils/rxjs-lite/index.uts` 的 `Subject`。
 
-## 1.1.10 严禁在对象字面量（UTSJSONObject）中放入顶层函数作为聚合对象导出
+## 1.10 严禁在对象字面量（UTSJSONObject）中放入顶层函数作为聚合对象导出
 
 - **错误码**：无 UTS 错误码，Android (Kotlin) 编译失败：`error: Function invocation 'xxx()' expected. at src/utils/xxx.uts`
 - **底层原理**：UTS 在 Android 端将对象字面量 `{ getApiBaseUrl }` 编译为 Kotlin 的 `_uO("getApiBaseUrl" to getApiBaseUrl)`。在 Kotlin 语法中，顶层函数名 `getApiBaseUrl` 不能作为裸值赋值给键值对，编译器会强行要求函数调用 `getApiBaseUrl()`；且 `UTSJSONObject` 在强类型原生端无法动态调用方法。
@@ -225,7 +225,7 @@ export function getApiBaseUrl(): string { return "https://api.example.com"; }
 // 业务方：import { getApiBaseUrl } from '@/src/utils/env/index.uts';
 ```
 
-## 1.1.11 严禁顶层函数与同名属性采用 Getter 命名冲突（Kotlin 平台声明冲突导致 NoSuchMethodError）
+## 1.11 严禁顶层函数与同名属性采用 Getter 命名冲突（Kotlin 平台声明冲突导致 NoSuchMethodError）
 
 - **错误码**：Android 运行时崩溃：`error: java.lang.NoSuchMethodError: No static method getWindowHeight()Lio/dcloud/uniapp/vue/ComputedRef; in class Luni/.../IndexKt;`
 - **底层原理**：在 Kotlin 原生编译中，包顶层属性 `val windowHeight = computed(...)` 会被 Kotlin 编译器自动生成静态 getter：`public static final ComputedRef getWindowHeight()`。若同文件在顶层还显式导出了同名顶层函数 `export function getWindowHeight(): number`，在 JVM 字节码层面上会产生方法签名冲突（Platform Declaration Clash），函数的返回类型覆盖挤占了响应式属性的 getter。当 Vue 模板在执行 `{{ windowHeight }}` 时，因找不到匹配的 getter 而在运行时直接崩溃。
@@ -261,7 +261,7 @@ class SystemUtils {
   grep -nE "^export function get[A-Z]" src/utils/xxx/index.uts
   ```
 
-## 1.1.12 严禁多层 / 重复 `export *` 星号重导出同一顶层符号（Kotlin 端符号被改名 `xxx__1`）
+## 1.12 严禁多层 / 重复 `export *` 星号重导出同一顶层符号（Kotlin 端符号被改名 `xxx__1`）
 
 - **错误码**（一错两态，同一根因）：
   1. **编译期**：`.uts` 文件引用处报 `error18 找不到名称"useTokenStore"`（`参考: compiler-known-issues.html#error18`）；
@@ -313,7 +313,7 @@ export * from './vdom/user.uts';
 // #endif
 ```
 
-## 1.1.13 局部声明在**其自身的初始化表达式内不可见** —— `const timerId = setInterval(() => clearInterval(timerId))` 必炸
+## 1.13 局部声明在**其自身的初始化表达式内不可见** —— `const timerId = setInterval(() => clearInterval(timerId))` 必炸
 
 - **错误码**（本项目实测，`src/http/stream.uts`）：
 
@@ -342,12 +342,12 @@ export * from './vdom/user.uts';
   ```
 
 - **同族情形（一律按此处理）**：任何「回调体引用承载它的那个变量」都命中此坑 —— 定时器句柄、事件监听句柄、递归闭包、`subscribe` 里回读自己的 `subscription`。
-- **为什么容易被当成误报**：这类代码在 **H5 上完全正常**（浏览器 JS 引擎延迟执行 + 变量提升），只有走到 Kotlin 阶段才炸；而 `launch app-android --compile true` 根本不到 Kotlin 阶段（见 1.3.15），于是"本地一直是好的"。
+- **为什么容易被当成误报**：这类代码在 **H5 上完全正常**（浏览器 JS 引擎延迟执行 + 变量提升），只有走到 Kotlin 阶段才炸；而 `launch app-android --compile true` 根本不到 Kotlin 阶段（见 3.15），于是"本地一直是好的"。
 
 ---
 
 
-## 1.1.14 遍历「值类型为 `any` 的 Map」时，**给回调参数显式标注 `any`** 会炸 —— 去掉标注或改用 `UTSJSONObject.keys()`；且 `map.keys()` 在 Kotlin 里是属性不是函数
+## 1.14 遍历「值类型为 `any` 的 Map」时，**给回调参数显式标注 `any`** 会炸 —— 去掉标注或改用 `UTSJSONObject.keys()`；且 `map.keys()` 在 Kotlin 里是属性不是函数
 
 - **错误码**（本项目实测，unix-router-guard 任务 0 探针，真机 VDOM/Kotlin 通道）：
 
@@ -390,12 +390,12 @@ export * from './vdom/user.uts';
   });
   ```
 
-- **对照（重要）**：本条**只在 Kotlin 阶段暴露**。同一份代码在**蒸汽 / 字节码模式**（本项目 `manifest.json` 默认配置，见 1.3.20）下完全正常。本项目 `uni_modules/lime-i18n/common/composer.uts` 就写着双参 `toMap().forEach((value, key) => ...)` —— 它能跑正是因为**没写类型标注**；一旦「好心」补上 `: any` 就会在 Kotlin 端炸。
+- **对照（重要）**：本条**只在 Kotlin 阶段暴露**。同一份代码在**蒸汽 / 字节码模式**（本项目 `manifest.json` 默认配置，见 3.20）下完全正常。本项目 `uni_modules/lime-i18n/common/composer.uts` 就写着双参 `toMap().forEach((value, key) => ...)` —— 它能跑正是因为**没写类型标注**；一旦「好心」补上 `: any` 就会在 Kotlin 端炸。
 - **范围界定**：`Array.forEach` 带标注没问题（`keys.forEach((key: string): void => {})` 实测可用）；`Map<string, string>.forEach((value: string, key: string) => {})` 也实测可用。**只有「值类型为 `any` 的 Map」**命中此坑。
 
 ---
 
-## 1.1.15 Kotlin 下**局部函数不能当值传递** —— `setTimeout(localFn, 100)` 报 `error18`，必须包一层 lambda
+## 1.15 Kotlin 下**局部函数不能当值传递** —— `setTimeout(localFn, 100)` 报 `error18`，必须包一层 lambda
 
 - **错误码**（本项目实测，`App.uvue` 真机 VDOM/Kotlin 通道）：
 
@@ -422,12 +422,12 @@ export * from './vdom/user.uts';
   }, 1200);
   ```
 
-- **与 1.1.13 的关系**：同属「Kotlin 里局部声明的可见域比 JS 窄」这一族 —— 1.1.13 是「在其自身初始化表达式内不可见」，本条是「不能当值传递 / 嵌套作用域内可能不可见」。1.3.14 与 3.4 第 16 条的「局部函数必须定义在调用点之前」是同一族的第三种表现。
+- **与 1.13 的关系**：同属「Kotlin 里局部声明的可见域比 JS 窄」这一族 —— 1.13 是「在其自身初始化表达式内不可见」，本条是「不能当值传递 / 嵌套作用域内可能不可见」。3.14 与 A.2 第 16 条的「局部函数必须定义在调用点之前」是同一族的第三种表现。
 - **只在 Kotlin 阶段暴露**：字节码 / 蒸汽模式与 H5 都正常。
 
 ---
 
-## 1.1.16 Kotlin 下**剩余参数不能写在对象类型的属性上** —— `back: (...args: Array<number>) => void` 报 `Function type parameters cannot have modifiers.`
+## 1.16 Kotlin 下**剩余参数不能写在对象类型的属性上** —— `back: (...args: Array<number>) => void` 报 `Function type parameters cannot have modifiers.`
 
 - **错误码**（本项目实测，unix-router-guard 任务 9，真机 VDOM/Kotlin 通道）：
 
@@ -461,7 +461,7 @@ export * from './vdom/user.uts';
 
 ---
 
-## 1.1.17 内置 `decodeURIComponent` 在 UTS 里返回 `string?` —— 直接 `return` 给 `: string` 报 `error1 返回类型不匹配`
+## 1.17 内置 `decodeURIComponent` 在 UTS 里返回 `string?` —— 直接 `return` 给 `: string` 报 `error1 返回类型不匹配`
 
 - **错误码**（本项目实测，unix-router-guard 任务 9，真机 VDOM/Kotlin 通道）：
 
@@ -499,7 +499,7 @@ export * from './vdom/user.uts';
 
 ---
 
-## 1.1.18 uni 跳转 API 的 Promise **收不进 `Promise<any> | null`** —— UTS 泛型不协变且 `any` 等价非空 Kotlin `Any`，只能写 `any | null`
+## 1.18 uni 跳转 API 的 Promise **收不进 `Promise<any> | null`** —— UTS 泛型不协变且 `any` 等价非空 Kotlin `Any`，只能写 `any | null`
 
 - **错误码**（本项目实测，unix-router-guard 任务 9，真机 VDOM/Kotlin 通道；同一处代码按提示改一轮换一种错）：
 
@@ -540,9 +540,9 @@ export * from './vdom/user.uts';
   ```
 
 - **代价**：调用方拿到的是 `any`，链式 `await` 的类型提示会丢失；「返回的是该 uni API 的 Promise」只能靠 JSDoc 说明。
-- **只在 Kotlin 阶段暴露**：蒸汽 / 字节码模式与 H5 都放行（这也正是「必须先用 `grep -c "编译为android class"` 确认进了 Kotlin 阶段」的原因，见 1.3.20）。
+- **只在 Kotlin 阶段暴露**：蒸汽 / 字节码模式与 H5 都放行（这也正是「必须先用 `grep -c "编译为android class"` 确认进了 Kotlin 阶段」的原因，见 3.20）。
 
-## 1.1.19 同一函数里**不同块内重名的 `const` 会被 UTS 合并成一个变量** —— H5 报 `Cannot access 'x' before initialization`
+## 1.19 同一函数里**不同块内重名的 `const` 会被 UTS 合并成一个变量** —— H5 报 `Cannot access 'x' before initialization`
 
 - **错误码**：H5 端运行时报 `ReferenceError: Cannot access 'l' before initialization`（`l` 是压缩后的变量名）—— 代码看着毫无问题，App 端不复现。
 - **底层原理**：UTS 收集变量时按**函数级去重**，同一函数里不同块的同名局部量会被合并成一个变量，声明点落在最后一次声明处；JS 本该有的块级作用域在合并后失效，于是先执行的那个分支引用了还没声明的变量，落进 TDZ。

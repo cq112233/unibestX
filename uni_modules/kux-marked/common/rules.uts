@@ -4,7 +4,7 @@ import { Other, EditObject, NoopTest, BlockNormal, BlockGfm, BlockPedantic, Inli
 // 于是会牵扯到 utssdk/app-android/index.uts 顶层那句 `import JSReg from 'io.dcloud.uts.jsreg.JSReg'`，
 // 而标准基座不带 JSReg3.jar，导致「Could not resolve "io.dcloud.uts.jsreg.JSReg"」整个项目编译中断。
 // uni-app X 4.72+ 安卓端已原生支持正则字面量（见下方 `#ifdef uniVersion >= 4.72` 分支），jar 属老版本遗留。
-// 详见 unibestX-skill 1.3.10。
+// 详见 unibestX-skill 3.10。
 // #ifdef uniVersion < 4.72
 // #ifdef APP-ANDROID
 import { callJSReg } from '../utssdk/app-android';
@@ -21,7 +21,7 @@ const noopTest = {
 //   SyntaxError: Invalid regular expression: /[\p{L}\p{N}]/u: Invalid property name in character class
 // 出错点是「模块级对象的字面量」（下面 other 里的 unicodeAlphaNumeric，以及文件后段的 _punctuation 系列），
 // 于是 app-service.js 求值到这一行就整体中断，App 端页面逻辑全部失效；H5 端的引擎支持该语法，
-// 所以这问题只在 App 复现。详见 unibestX-skill 1.3.11。
+// 所以这问题只在 App 复现。详见 unibestX-skill 3.11。
 //
 // 下面两个字符类是等价替代（不含 `\p`、不依赖 `u` 标记，任何 JS 引擎都能跑）：
 // - RE_ALNUM_CLASS ≈ `\p{L}\p{N}`：ASCII + 拉丁扩展/IPA + 希腊/西里尔/希伯来/阿拉伯/天城文
@@ -30,7 +30,7 @@ const noopTest = {
 //                   + 货币/字母式/箭头/数学/几何/装饰 + CJK 标点 + 全角标点。
 // 两者都**不含空白**（` `、` `、`　` 均不在区间内），
 // 所以「标点或空白」的组合仍由 `\s` 承担，语义与原来一致。
-// 区间取值是拿 `\p` 逐码位扫全 BMP 比对后定的（验证方法见 unibestX-skill 1.3.11）：
+// 区间取值是拿 `\p` 逐码位扫全 BMP 比对后定的（验证方法见 unibestX-skill 3.11）：
 // 常用区（ASCII / Latin-1 / 拉丁扩展 / 通用标点 / CJK 标点 / 全角）精确等同于 `\p`；
 // 冷僻符号块（货币、几何、装饰等）按整块覆盖，块内个别未分配码位会被多判，不影响实际排版。
 // 两点已知近似：① 不在上列脚本内的文字（亚美尼亚文、泰文、埃塞俄比亚文等）会被当成非字母数字；

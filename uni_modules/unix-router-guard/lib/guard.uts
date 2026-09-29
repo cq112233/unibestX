@@ -68,7 +68,7 @@ export function registerAfterHook(hook: AfterNavigationHook): () => void {
 export function runBeforeGuards(to: RouteTarget, from: RouteTarget): GuardOutcome {
   const total = beforeGuards.length;
   for (let i = 0; i < total; i++) {
-    // 守卫在链上可能把自己或别人注销掉，数组会变短；边界判断必须紧贴读取（红线 1.3.16）
+    // 守卫在链上可能把自己或别人注销掉，数组会变短；边界判断必须紧贴读取（红线 3.16）
     if (i >= beforeGuards.length) {
       break;
     }
