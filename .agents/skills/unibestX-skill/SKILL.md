@@ -8,7 +8,6 @@ description: Use when developing, compiling, refactoring, or troubleshooting uni
 ## 概述
 
 > 🚨 **AI / Agent 必读铁律**：所有参与本项目开发的 AI、Agent 在进行任何编码、重构、修 bug 或新增页面任务前，**必须首先完整阅读本文件，并按其命中的分册继续 Read 对应参考文件**。只看本文件（入口）而不读分册就动手，视为未遵守本 Skill。
-> 🔄 **VDOM 与 Vapor 差异自动回写机制**：若在开发或排错过程中，遇到任何 UTS 语法、组件属性、生命周期、CSS 样式在 **VDOM 模式与 Vapor 模式不通用 / 存在渲染差异** 的问题，AI / Agent **必须主动按四维分类追加到对应分册**（见 3.5），严禁遗漏！
 
 uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直接编译为原生代码（Android 编译为 Kotlin，iOS 插件编译为 Swift，鸿蒙插件编译为 ArkTS，Web/小程序编译为 JS）。  
 与宽容的 TypeScript/JavaScript 不同，UTS 采用**名义强类型系统（Nominal Strong Typing）**与**原生渲染规范**。
@@ -17,7 +16,7 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 
 1. **UTS 与原生规范**：语法与严格类型（分册 1.1）、CSS / Tailwind 样式引擎限制（分册 1.2）、跨端运行时铁律（分册 1.3）；
 2. **项目正确案例**：来自本项目的生产级标杆案例（分册 2）——页面骨架、TabBar、二级详情页、滚动与下拉刷新、组件与生态库优先范式；
-3. **项目代码生成规范**：生成流程与模板（分册 3）、本文件常驻的 3.3 对照表与 3.4 红线清单、回写维护机制（分册 3 的 3.5）；
+3. **项目代码生成规范**：生成流程与模板（分册 3）、本文件常驻的 3.3 对照表与 3.4 红线清单；
 4. **项目内置工具库**：`src/utils/` 下 12 个现成模块的 API 与用法（分册 4）——**动手造轮子前先查这里**；
 5. **页面与应用基础设施**：`src/http/`（请求与流式）、`src/router/`（路由拦截）、`src/layouts/`（页面布局）、`src/i18n/`（语言装配）、`src/api/`（业务请求与 Mock）（分册 5）——**定策略 / 选骨架 / 改配置前先查这里**；
 6. **AI 页面层级与组件设计规范**：页面高内聚自包含、最多三级封顶、容器与纯展示解耦、Mock 接口契约化（分册 6）——**AI 生成复杂页面与拆分组件前必读**。
@@ -46,7 +45,7 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 | [references/1.2-styling.md](references/1.2-styling.md) | **1.2 样式 (CSS & Tailwind) 与原生渲染铁律**（19 条） | 写 `.scss` / Tailwind 工具类；处理按钮与文本排版、安全区、高度单位、阴影边框、字号字重、行内嵌套样式、样式不生效或表现不一致 |
 | [references/1.3-runtime.md](references/1.3-runtime.md) | **1.3 跨端运行时与渲染模式约束**（20 条） | VDOM / Android VDOM / Vapor 差异、多平台门面分流与条件编译、UTS 插件与自定义基座、Markdown 渲染、真机与 Kotlin 报错、编译验证命令选择 |
 | [references/2-examples.md](references/2-examples.md) | **二、项目正确案例**（5 个生产级标杆案例） | 新建页面、搭「上固定 + 下滚动」骨架、算可用高度、写 TabBar 页与下拉刷新、写二级 / 子包页、用 Easycom 引组件 —— **优先照抄，不要自创结构** |
-| [references/3-codegen.md](references/3-codegen.md) | **3.1 新增页面生成流程**、**3.2 页面代码标准模板**、**3.5 VDOM/Vapor 差异回写维护机制** | 生成新页面 / 组件前走流程、需要复制标准页面模板、需要按四维分类回写本 Skill |
+| [references/3-codegen.md](references/3-codegen.md) | **3.1 新增页面生成流程**、**3.2 页面代码标准模板** | 生成新页面 / 组件前走流程、需要复制标准页面模板 |
 | [references/4-utils.md](references/4-utils.md) | **四、项目内置工具库**（`src/utils/` 12 个模块：route / theme / env / i18n / toast / backPress / refresh / upload / systemInfo / rxjs-lite / katex-lite / mermaid-lite） | **动手实现任何通用能力前先查这里**：取路由与路径、取主题色、读环境变量、多语言、提示弹窗、返回键接管、下拉刷新与导航栏控制、文件上传、系统与安全区尺寸、防抖节流与流式处理、LaTeX 公式排版、**mermaid 流程图原生排版（不联网、不用图片）** |
 | [references/5-infra.md](references/5-infra.md) | **五、页面与应用基础设施**：5.1 请求（http/request）、5.2 流式请求（http/stream）、5.3 路由与拦截器（router）、5.4 页面布局（layouts）、5.5 国际化配置（i18n）、**5.6 业务 API 与 Mock 接口化（src/api/）** | 发起接口请求 / 处理错误与 401、做 SSE 打字机输出、改登录拦截与登录策略、**选 `layout` 或配 `definePage` 导航栏字段**、增改多语言文案、**抽离 Mock 模拟数据为后端接口函数** |
 | [references/6-page-component-spec.md](references/6-page-component-spec.md) | **六、AI 页面层级与组件设计规范**（页面高内聚 · 三级防过度拆分 · 容器/视图分离 · Mock 接口契约化 · 生产接口同名映射） | 规划新页面结构、拆分复杂页面组件、组织页面内 `components/common/` 与模块私有视图、从 mock.uts 对接 `src/api/<page>/<page>.uts` 时必读 |

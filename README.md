@@ -23,7 +23,7 @@
 
 内置 `自定义 TabBar`、`Layout 布局`、`请求封装`、`登录拦截`、`路由守卫`、`Tailwind CSS`、`i18n 多语言`、`主题切换`、`沙盒极速调试` 等基础能力，并提供 `代码提示`、`自动格式化`、`统一配置` 等辅助功能，让你编写 `uni-app X` 拥有 `best` 体验。
 
-🤖 **同时它也是一套「AI 原生」开发模板**：项目自带 **`unibestX-skill`**（「1 个入口 + 7 个分册」的 uni-app X / UTS 规范知识库）与整套 **superpowers-zh 技能框架**，Claude Code、Codex 等 AI Agent 克隆即可直接按项目规范写代码、生成页面骨架、自动排查跨端编译报错；运行时亦内置 **AI 对话页**与 **SSE / Chunk 跨端流式传输**能力。详见 [🤖 AI 与 Skill 体系](#-ai-与-skill-体系)。
+🤖 **同时它也是一套「AI 原生」开发模板**：项目自带 **`unibestX-skill`**（「1 个入口 + 8 个分册」的 uni-app X / UTS 规范知识库），Claude Code、Codex 等 AI Agent 克隆即可直接按项目规范写代码、生成页面骨架、自动排查跨端编译报错；运行时亦内置 **AI 对话页**与 **SSE / Chunk 跨端流式传输**能力。详见 [🤖 AI 与 Skill 体系](#-ai-与-skill-体系)。
 
 | 👉 在线 H5 演示 | 📖 官方文档 | 🐙 GitHub | 🍊 Gitee 镜像 |
 | :---: | :---: | :---: | :---: |
@@ -121,7 +121,7 @@
 - 🔌 **请求封装** — 基于 `lime-request`，支持多域名、Token 自动续期、SSE 流式传输
 - 📤 **文件上传** — 基于原生 `uni.uploadFile` 统一封装，支持 OSS 上传与进度回调
 - 🐳 **H5 Docker 极速部署** — 宿主机构建 + Nginx:alpine 轻量容器运行（~25MB，秒级打包），内置动态环境变量反代与 Hash 路由兜底
-- 🤖 **AI 原生开发模板** — 内置 `unibestX-skill`（1 入口 + 7 分册）与 23 个技能，AI Agent 克隆即可按项目规范写代码；运行时自带 AI 对话页与 SSE 流式传输
+- 🤖 **AI 原生开发模板** — 内置 `unibestX-skill`（1 入口 + 8 分册），AI Agent 克隆即可按项目规范写代码；运行时自带 AI 对话页与 SSE 流式传输
 
 ## 📦 推荐的 UI 组件库
 
@@ -138,11 +138,11 @@
 
 ## 🤖 AI 与 Skill 体系
 
-`unibestX` 不只是一个运行时的跨端模板，也是一套**为 AI Agent 准备充分**的开发模板：项目内直接内置了 uni-app X 领域知识库与工程化技能框架，让 Claude Code、Codex 等 AI 工具**克隆后无需额外提示词，即可按项目既定规范产出代码**。
+`unibestX` 不只是一个运行时的跨端模板，也是一套**为 AI Agent 准备充分**的开发模板：项目内直接内置了 uni-app X 领域知识库（`unibestX-skill`）与会话级开发规约，让 Claude Code、Codex 等 AI 工具**克隆后无需额外提示词，即可按项目既定规范产出代码**。
 
 ### 1. `unibestX-skill` — 项目专属 uni-app X / UTS 规范库
 
-这是与项目强绑定的核心技能，采用 **「1 个入口 + 7 个分册」** 结构，把 UTS 强类型约束、跨端样式限制与本项目的生产级写法沉淀成可被 AI 直接检索的知识库。
+这是与项目强绑定的核心技能，也是仓库中**唯一保留的技能**，采用 **「1 个入口 + 8 个分册」** 结构，把 UTS 强类型约束、跨端样式限制与本项目的生产级写法沉淀成可被 AI 直接检索的知识库。
 
 | 分册 | 内容 |
 | :--- | :--- |
@@ -151,21 +151,26 @@
 | `1.2-styling.md` | CSS & Tailwind 样式引擎与原生渲染限制 |
 | `1.3-runtime.md` | 跨端运行时与 VDOM / Vapor 渲染模式约束 |
 | `2-examples.md` | 5 个项目内生产级标杆案例（页面骨架、TabBar、二级详情页、滚动与下拉刷新） |
-| `3-codegen.md` | 代码生成流程、标准模板与维护机制 |
+| `3-codegen.md` | 代码生成流程与标准页面模板 |
 | `4-utils.md` | `src/utils/` 下 10 个内置工具的 API 与用法 —— **动手造轮子前先查这里** |
 | `5-infra.md` | `src/http/` `src/router/` `src/layouts/` `src/i18n/` 四套基础设施装配规范 |
+| `6-page-component-spec.md` | AI 页面层级与组件设计规范（页面高内聚、三级防过度拆分、容器与纯展示解耦、Mock 接口契约化） |
 
-**工作机制**：入口文件只常驻导航与红线清单，AI 命中条目后**必须继续读取对应分册**核对完整正反例才允许改代码。若在开发中遇到 **VDOM 与 Vapor 模式表现不一致**的语法、组件属性、生命周期或样式问题，规范要求 AI **主动按四维分类回写到对应分册**，规则随项目使用不断增厚。
+**工作机制**：入口文件只常驻导航与红线清单，AI 命中条目后**必须继续读取对应分册**核对完整正反例才允许改代码。
 
-### 2. superpowers-zh 技能框架（20 个 skills）
+### 2. 任务分级门槛（原 superpowers-zh 框架已移除）
 
-项目内置中文增强版技能框架，覆盖从需求分析到交付收尾的完整闭环，例如 `brainstorming`（需求分析）、`writing-plans` / `executing-plans`（计划与执行）、`test-driven-development`、`systematic-debugging`（先定位再改）、`verification-before-completion`（用证据支撑「已完成」）、`requesting-code-review` / `receiving-code-review`，以及四份中文工程规约（commit 规范、代码 review 话术、文档排版、国内 Git 平台接入）。
+本项目**不再内置 superpowers-zh 技能框架**——原先 20 个通用技能（`brainstorming`、`writing-plans`、`executing-plans`、`test-driven-development`、`systematic-debugging`、`verification-before-completion`、`requesting-code-review` 等）连同四份中文工程规约，已从 `.claude/skills/` 与 `.agents/skills/` 中**全部删除**，`unibestX-skill` 是仓库中唯一保留的技能。
 
-叠加 3 个项目专属技能后，技能总数共 **23 个**：
+原先由框架承担的「需求澄清 → 计划 → 执行 → 验证」流程，改由 [CLAUDE.md](CLAUDE.md) / [AGENTS.md](AGENTS.md) 里的**任务复杂度分级门槛**替代，核心是「别为小改动跑重流程」：
 
-- **`unibestX-skill`** —— 上文介绍的 uni-app X / UTS 规范知识库（1 入口 + 7 分册）
-- **`uniappx-page-skeleton`** —— 页面骨架约定（根容器用 `view`、`flex-1` 撑满、可用高度走 `computedAvailableHeight`、滚动区在内部自写 `scroll-view`）
-- **`uts-any-slot-prop`** —— UTS 作用域插槽 `Any?` 类型报错（`error17`）的成因与修法，VDOM / Vapor 双模式适配时高频命中
+| 复杂度 | 典型场景 | 做法 |
+| :--- | :--- | :--- |
+| 第 1 级 | 单行修改、CSS 样式、文案、简单配置 | 主代理直接改 + 轻量验证，不派生代理、不建 worktree、不写单测 |
+| 第 2 级 | 单文件开发、独立 UI 页面、常规 Bug 修复 | 主代理直做；Bug 成因不明时先定位根因再改 |
+| 第 3 级 | 跨多文件重构、核心业务系统升级 | 先澄清需求 / 写计划文档，再分步实现 |
+
+**不因任务大小豁免的底线**：声称完成 / 已修复 / 测试通过之前，必须实际运行验证命令并确认输出。
 
 ### 3. AI 开发规约文件
 
@@ -393,9 +398,9 @@ unibestX/
 │   ├── .env.test                 #   测试环境 Docker 变量配置
 │   └── .env.prod                 #   生产环境 Docker 变量配置
 ├── docs/                         # VitePress 文档站源码（guide/ 下为各专题）
-├── .claude/skills/               # AI 技能（Claude Code）：20 个 superpowers-zh + 3 个项目专属技能，共 23 个
+├── .claude/skills/               # AI 技能（Claude Code）：仅 unibestX-skill（1 入口 + 8 分册）
 ├── .agents/                      # AI 技能与规约（其他 Agent）
-│   ├── skills/                   #   与 .claude/skills 一一对应的技能副本（共 23 个），需保持同步
+│   ├── skills/                   #   与 .claude/skills 一一对应的技能副本（仅 unibestX-skill），需保持同步
 │   └── rules/uniappx.md          #   uni-app X 开发规范（编写 .uvue/.uts 前必读）
 ├── CLAUDE.md / AGENTS.md         # AI Agent 会话级规约（技能路由、内置工具优先复用等）
 ├── src/
