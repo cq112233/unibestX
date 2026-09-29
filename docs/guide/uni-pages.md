@@ -42,7 +42,7 @@ definePage({
     navigationBarTextStyle: 'black',          // 导航栏文字颜色 ('black' | 'white')
     backgroundColor: '#F8F8F8',               // 页面下拉露出背景色
     backgroundColorContent: '#F8F8F8',        // 页面内容区域背景色
-    disableScroll: false,                     // 是否禁用整屏滚动（如使用 z-paging 时设为 true）
+    disableScroll: false,                     // 是否禁用整屏滚动（如页面使用 list-view 自管滚动时设为 true）
     enablePullDownRefresh: false,             // 是否开启原生下拉刷新
     onReachBottomDistance: 50,                // 触底事件触发距离 (px)
   },
@@ -87,8 +87,6 @@ definePage({
     "backgroundColor": "#F8F8F8",
     "list": [
       { "pagePath": "src/pages/index/index", "text": "首页" },
-      { "pagePath": "src/pages/basic/basic", "text": "基础" },
-      { "pagePath": "src/pages/function/function", "text": "功能" },
       { "pagePath": "src/pages/me/me", "text": "我的" }
     ]
   }

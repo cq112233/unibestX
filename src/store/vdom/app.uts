@@ -1,5 +1,4 @@
 import { defineStore, PiniaStoreBase } from '@/uni_modules/x-pinia-s';
-import i18n from '@/src/i18n/index.uts';
 import {
   applyThemeColor,
   applyThemeMode,
@@ -8,13 +7,11 @@ import {
   isDarkMode,
   themeColor
 } from '@/src/utils/theme/index.uts';
-import { getDefaultLocale } from '@/src/utils/env/index.uts';
 // 类型统一来自 src/store/types.uts（唯一真源），本文件严禁再 export type 同名类型
 import type { IAppState } from '../types.uts';
 
 const defaultAppState: IAppState = {
   theme: getDefaultTheme(),
-  locale: getDefaultLocale(),
   themeMode: 'auto',
   isDark: isDarkMode('auto'),
   mode: 'vdom'
@@ -28,7 +25,6 @@ export class AppStore extends PiniaStoreBase {
   // 1. 响应式状态
   state: IAppState = reactive<IAppState>({
     theme: getDefaultTheme(),
-    locale: getDefaultLocale(),
     themeMode: 'auto',
     isDark: isDarkMode('auto'),
     mode: 'vdom'
@@ -47,9 +43,6 @@ export class AppStore extends PiniaStoreBase {
     // 应用主题主色调与外观模式
     applyThemeColor(this.state.theme);
     applyThemeMode(this.state.themeMode, this.state.isDark);
-
-    // 同步语言到 i18n
-    i18n.global.locale.value = this.state.locale;
   }
 
   // ==========================================
@@ -58,14 +51,12 @@ export class AppStore extends PiniaStoreBase {
 
   override _doReset(): void {
     this.state.theme = defaultAppState.theme;
-    this.state.locale = defaultAppState.locale;
     this.state.themeMode = defaultAppState.themeMode;
     this.state.isDark = defaultAppState.isDark;
     this.state.mode = defaultAppState.mode;
 
     themeColor.value = defaultAppState.theme;
     applyThemeColor(defaultAppState.theme);
-    i18n.global.locale.value = defaultAppState.locale;
 
     // 重新应用外观模式（App 端同步 setAppTheme）
     this.initThemeMode();
@@ -77,11 +68,6 @@ export class AppStore extends PiniaStoreBase {
       this.state.theme = colorVal;
       themeColor.value = colorVal;
       applyThemeColor(colorVal);
-    }
-    if (_data.locale != null) {
-      const localeVal = _data.locale as string;
-      this.state.locale = localeVal;
-      i18n.global.locale.value = localeVal;
     }
     if (_data.themeMode != null) {
       const modeVal = _data.themeMode as string;
@@ -102,7 +88,6 @@ export class AppStore extends PiniaStoreBase {
   override _serialize(): UTSJSONObject {
     return {
       theme: this.state.theme,
-      locale: this.state.locale,
       themeMode: this.state.themeMode
     } as UTSJSONObject;
   }
@@ -214,15 +199,6 @@ export class AppStore extends PiniaStoreBase {
     }
 
     applyThemeMode(mode, this.state.isDark);
-  }
-
-  /**
-   * 设置语言
-   */
-  setLocale(locale: string): void {
-    this.state.locale = locale;
-    i18n.global.locale.value = locale;
-    this.$patch({ locale } as UTSJSONObject);
   }
 }
 

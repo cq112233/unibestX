@@ -50,7 +50,6 @@
 <script setup lang="uts">
 import { computed, onMounted, onUnmounted, provide, ref, watch } from 'vue';
 import { curIdx, tabbarList } from '@/src/tabbar/index.uts';
-import { $t } from '@/src/utils/i18n/index.uts';
 import {
   isPageRefresherDisabled,
   isPageScrollDisabled,
@@ -67,7 +66,7 @@ import type { ThemeTokens } from '@/src/utils/theme/index.uts';
 // 1. 组件 Props 属性定义
 // ==========================================
 const props = defineProps({
-  /** 当前 Tab 对应的索引下标（0: 首页, 1: 基础, 2: 功能, 3: 我的 等） */
+  /** 当前 Tab 对应的索引下标（0: 首页, 1: 我的 等） */
   contentIndex: {
     type: Number,
     required: true
@@ -220,16 +219,16 @@ function abortPullDownRefresh(): void {
 // 5. 导航栏与状态栏同步
 // ==========================================
 /**
- * 设置/同步当前激活 Tab 的导航栏标题（优先取 props.title，未传则读取 TabBar 配置的多语言文案）
+ * 设置/同步当前激活 Tab 的导航栏标题（优先取 props.title，未传则读取 TabBar 配置文案）
  */
 function updateNavbarTitle(): void {
   let targetTitle = '';
   if (props.title.length > 0) {
-    targetTitle = $t(props.title);
+    targetTitle = props.title;
   }
   else if (props.contentIndex >= 0 && props.contentIndex < tabbarList.length) {
     const item = tabbarList[props.contentIndex];
-    targetTitle = $t(item.text);
+    targetTitle = item.text;
   }
 
   if (targetTitle.length > 0) {

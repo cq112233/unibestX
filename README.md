@@ -19,9 +19,9 @@
 
 </div>
 
-`unibestX` 由 **`uni-app X` + `Vue3` + `UTS` + `Vite5` + `Tailwind CSS` + `uview-ultra` + `z-paging-x`** 构成，采用下一代 uni-app 原生开发技术栈，通过 `HBuilderX` 一键运行到 **Android / iOS / 鸿蒙 / H5 / 微信小程序** 五大平台。
+`unibestX` 由 **`uni-app X` + `Vue3` + `UTS` + `Vite5` + `Tailwind CSS`** 构成，采用下一代 uni-app 原生开发技术栈，通过 `HBuilderX` 一键运行到 **Android / iOS / 鸿蒙 / H5 / 微信小程序** 五大平台。
 
-内置 `自定义 TabBar`、`Layout 布局`、`请求封装`、`登录拦截`、`路由守卫`、`Tailwind CSS`、`i18n 多语言`、`主题切换`、`沙盒极速调试` 等基础能力，并提供 `代码提示`、`自动格式化`、`统一配置` 等辅助功能，让你编写 `uni-app X` 拥有 `best` 体验。
+内置 `自定义 TabBar`、`Layout 布局`、`请求封装`、`登录拦截`、`路由守卫`、`Tailwind CSS`、`主题切换`、`沙盒极速调试` 等基础能力，并提供 `代码提示`、`自动格式化`、`统一配置` 等辅助功能，让你编写 `uni-app X` 拥有 `best` 体验。
 
 🤖 **同时它也是一套「AI 原生」开发模板**：项目自带 **`unibestX-skill`**（「1 个入口 + 6 个分册」的 uni-app X / UTS 规范知识库），Claude Code、Codex 等 AI Agent 克隆即可直接按项目规范写代码、生成页面骨架、自动排查跨端编译报错；运行时亦内置 **AI 对话页**与 **SSE / Chunk 跨端流式传输**能力。详见 [🤖 AI 与 Skill 体系](#-ai-与-skill-体系)。
 
@@ -53,7 +53,7 @@
 
 > **2. 关于 UI 组件库与分支选择**
 >
-> - **`main` 分支（默认）**：全面兼容 **VDOM** 与 **Vapor** 两种模式（**默认 Vapor 蒸汽模式**），内置作者深度修复版的 `uview-ultra`。受限于个人精力，作者后续**不再对其维护与定制更新**。
+> - **`main` 分支（默认）**：全面兼容 **VDOM** 与 **Vapor** 两种模式（**默认 Vapor 蒸汽模式**）。受限于个人精力，作者后续**不再对其维护与定制更新**。
 > - **`uniX-rice-ui` 分支（强烈推荐）**：集成 **Rice UI 官方组件库**，由官方团队持续维护迭代，同样完美支持 VDOM 与 Vapor 模式。新项目或需长期维护支持，建议优先选用。
 >
 > ```bash
@@ -63,10 +63,10 @@
 >
 > 四种组件库的完整对比见下方 [📦 推荐的 UI 组件库](#-推荐的-ui-组件库)。
 
-> **3. 请勿覆盖内置的 `z-paging-x` 与 `uview-ultra`**
+> **3. 当前分支是「基础模板」**
 >
-> 本项目内置的 [z-paging-x.uvue](uni_modules/z-paging-x/components/z-paging-x/z-paging-x.uvue) 等组件已由作者做了**深度定制修改与修复**（针对 Android 原生嵌套手势协商、`type="nested"` 架构支持、Flex 布局及各端 CSS 解析限制等）。
-> **请勿直接从官方插件市场重新下载覆盖**，否则多端兼容性与手势机制可能失效。
+> 本分支已移除**全部第三方 UI 组件库**与 **i18n 多语言**能力，`uni_modules` 仅保留 `lime-request`（请求底座）、`lime-dayuts`、`x-pinia-s` 与 `uni-icons`（TabBar 图标），适合作为新项目的干净起点。
+> 需要开箱即用的 UI 组件库时，请切换到 `uniX-rice-ui` 或 `uniX-uview-ultra` 分支。
 
 ---
 
@@ -92,7 +92,6 @@
   - [请求封装](#请求封装)
   - [文件上传](#文件上传)
   - [状态管理](#状态管理)
-  - [i18n 多语言](#i18n-多语言)
   - [Layout 布局](#layout-布局)
   - [H5 容器化部署 (Docker & Nginx)](#h5-容器化部署-docker--nginx)
 - [🗺️ 演进路线图](#️-演进路线图-roadmap)
@@ -109,15 +108,11 @@
 - 🚀 **uni-app X（Vapor 默认 + VDOM 兼容）** — 默认启用 **Vapor 蒸汽模式**（无虚拟 DOM 高性能原生渲染），同时全面兼容传统 VDOM 模式，可在 `manifest.json` 自由切换
 - 💪 **Vue3 + Vite5** — 最新前端技术栈，极速开发体验
 - 🎨 **Tailwind CSS** — 原子化 CSS 引擎（v4 + weapp-tailwindcss），全端通用，方括号任意值语法
-- 📦 **uview-ultra** — uni-app X 专用 UI 组件库（内置深度修复版，兼容 VDOM 与 Vapor，基础功能完备）
-- 📜 **z-paging-x** — 强大的分页列表组件（已针对 Android 嵌套手势协商、Flex 布局与 `type="nested"` 深度适配）
 - 🏝️ **多策略 TabBar 体系** — 5 种运行策略 + 2 种视觉形态，支持角标徽标与全端主题联动
 - ⚡ **沙盒独立调试模式** — 大型项目本地开发只编译当前页面，秒级热更新，启动直达目标页
 - 🔧 **Pinia 持久化** — Vapor 走官方 Pinia，VDOM 走 `x-pinia-s`，按平台自动路由，开箱即用
-- 🌐 **i18n 多语言** — 内置中英文切换，支持自动检测系统语言
 - 🛡️ **路由守卫** — 黑名单／白名单策略，灵活的登录拦截与登录后回跳
 - 🌈 **动态主题** — `theme.json` 单源色板，CSS 变量驱动的明暗主题切换
-- 📊 **ECharts** — 图表组件支持
 - 🔌 **请求封装** — 基于 `lime-request`，支持多域名、Token 自动续期、SSE 流式传输
 - 📤 **文件上传** — 基于原生 `uni.uploadFile` 统一封装，支持 OSS 上传与进度回调
 - 🐳 **H5 Docker 极速部署** — 宿主机构建 + Nginx:alpine 轻量容器运行（~25MB，秒级打包），内置动态环境变量反代与 Hash 路由兜底
@@ -130,11 +125,11 @@
 | 组件库 | 简介 | 推荐分支 / 官网 | 维护状态 |
 | :--- | :--- | :--- | :--- |
 | **Rice UI**（强烈推荐） | 专为 uni-app X 打造的现代 UI 组件库，**完美支持 Vapor 与 VDOM 模式无缝切换**，由 Rice UI 官方团队持续维护与技术支持。 | **`uniX-rice-ui` 分支** / [riceui.cn](https://riceui.cn/) | 团队持续维护与迭代 |
-| **uview-ultra** | 专为 uni-app X 打造的 UI 库，`main` 分支内置深度修复版，已兼容 Vapor/VDOM，基础功能基本够用。 | **`main` 分支** / [uview-ultra.lingyun.net](https://uview-ultra.lingyun.net/) | 已停止后续维护与定制 |
+| **uview-ultra** | 专为 uni-app X 打造的 UI 库，`uniX-uview-ultra` 分支内置作者深度修复版，已兼容 Vapor/VDOM。 | **`uniX-uview-ultra` 分支** / [uview-ultra.lingyun.net](https://uview-ultra.lingyun.net/) | 已停止后续维护与定制 |
 | **TMUI** | 功能丰富、高度可定制的企业级组件库，提供完善的业务组件和主题系统。 | [tmui.design](https://tmui.design/) | 社区维护 |
 | **Lime UI** | 社区活跃的 uni-app X 组件库，组件风格清新，覆盖常用移动端场景。 | [limex.qcoon.cn](https://limex.qcoon.cn/) | 社区维护 |
 
-> 💡 **选型建议**：新项目或需要长期维护支持，优先选 **`uniX-rice-ui`** 分支；若只需基础组件且想沿用 `main` 分支的既有实现，内置的 `uview-ultra` 已基本够用。
+> 💡 **选型建议**：需要开箱即用的 UI 组件库时，优先选 **`uniX-rice-ui`** 分支（官方团队持续维护）或 `uniX-uview-ultra` 分支；只想要干净骨架、自己搭 UI 时，直接用本 `base` 分支。
 
 ## 🤖 AI 与 Skill 体系
 
@@ -184,10 +179,10 @@
 
 模板同时预置了 AI 应用所需的运行时能力，可直接作为 AI 类 App 的起点：
 
-- **AI 对话页** — `src/pages/ai/`（含 TabBar 中间鼓包按钮入口 `AiView`）
-- **跨端流式传输** — [src/http/stream.uts](src/http/stream.uts) 提供 SSE / Chunk 流式请求；[src/utils/rxjs-lite/](src/utils/rxjs-lite/) 提供轻量流式算子，配套 `src/sub/rxjsDemo` 流式演示页
-- **Markdown 渲染** — 内置 `mp-html` 与 `kux-marked`，支持 Markdown 排版与代码块展示
-- **流式接口配置** — 通过 `.env` 的 `VITE_STREAM_URL` 指定（留空时演示页自动使用本地模拟流）
+- **跨端流式传输** — [src/http/stream.uts](src/http/stream.uts) 提供 SSE / Chunk 流式请求；[src/utils/rxjs-lite/](src/utils/rxjs-lite/) 提供轻量流式算子
+- **流式接口配置** — 通过 `.env` 的 `VITE_STREAM_URL` 指定
+
+> 📌 本分支已移除 AI 对话演示页与 Markdown 渲染组件（`mp-html` / `kux-marked`），流式底座完整保留，可直接用于自建 AI 应用。
 
 ## 📱 各端首页截图
 
@@ -388,7 +383,6 @@ unibestX/
 │   ├── switch-env.mjs            #   env:test / env:prod 环境切换
 │   ├── gen-uts-dts.mjs           #   UTS 类型声明生成与校验
 │   ├── check-tabbar-surface.mjs  #   TabBar 接口面校验
-│   └── guard-test/ router-guard-test/  # 路由守卫相关测试
 ├── Dockerfile                    # H5 生产部署轻量容器（nginx:alpine）
 ├── docker-compose.yml            # H5 容器编排服务（h5-test / h5-prod）
 ├── deploy/                       # 生产与测试部署配置
@@ -405,26 +399,19 @@ unibestX/
 │   ├── api/                      # API 请求模块（foo.uts / user.uts / auth.uts 等）
 │   ├── assets/                   # 静态资源（图标、图片等）
 │   ├── components/               # 公共业务组件
-│   │   ├── NavBar/               #   自定义通用导航栏组件
-│   │   └── NestedScroll/         #   自研嵌套滚动组件
+│   │   └── NavBar/               #   自定义通用导航栏组件
 │   ├── http/                     # HTTP 客户端封装（基于 lime-request）
 │   │   ├── request.uts           #   HttpClient 核心类与拦截器
 │   │   ├── stream.uts            #   SSE / Chunk 流式请求封装
 │   │   ├── types.uts             #   HTTP 响应与请求类型定义
 │   │   └── tools/enum.uts        #   HTTP 状态码与业务枚举
-│   ├── i18n/                     # 国际化多语言
-│   │   ├── index.uts             #   i18n 实例与响应式切换
-│   │   └── locales/              #   中英文语言包（zh-Hans / en）
 │   ├── layouts/                  # 页面布局模板
 │   │   ├── default.uvue          #   默认页面布局
 │   │   ├── empty.uvue            #   空白全屏布局
 │   │   └── navbar.uvue           #   自定义导航栏布局（需配 navigationStyle: 'custom'）
 │   ├── pages/                    # 主包页面（TabBar 页面）
-│   │   ├── index/                #   首页（概览、常用入口）
-│   │   ├── basic/                #   基础组件与工具演示
-│   │   ├── function/             #   原生能力展示（设备、系统信息、扫码等）
-│   │   ├── ai/                   #   AI 助手对话演示
-│   │   └── me/                   #   个人中心与系统设置
+│   │   ├── index/                #   首页
+│   │   └── me/                   #   个人中心
 │   ├── router/                   # 路由守卫与导航控制
 │   │   ├── index.uts             #   路由模块统一出口
 │   │   ├── config.uts            #   页面登录白名单 / 黑名单策略
@@ -436,27 +423,15 @@ unibestX/
 │   │   ├── types.d.uts.ts        #   类型声明
 │   │   ├── vapor/                #   官方 Pinia 实现（App Vapor / H5 / Web / 小程序）
 │   │   │   ├── index.ts          #     Pinia 实例 + pinia-plugin-persistedstate
-│   │   │   ├── app.ts            #     应用全局状态（主题、语言等）
+│   │   │   ├── app.ts            #     应用全局状态（主题、外观模式等）
 │   │   │   ├── token.ts          #     Token 鉴权状态（单 / 双 Token 自动续期）
 │   │   │   └── user.ts           #     当前登录用户信息
 │   │   └── vdom/                 #   x-pinia-s 实现（App VDOM 原生端）
 │   │       ├── index.uts         #     Pinia 实例（UTS 强类型版）
 │   │       ├── app.uts / token.uts / user.uts
 │   ├── style/                    # 全局样式（Tailwind、变量等）
-│   ├── sub/                      # 应用分包页面（按需加载，13 个演示模块）
-│   │   ├── auth/                 #   登录、注册、找回密码
-│   │   ├── crypto/               #   加密解密演示
-│   │   ├── device/               #   原生设备能力
-│   │   ├── httpDemo/             #   HTTP 请求演示
-│   │   ├── layoutDemo/           #   Layout 布局示例
-│   │   ├── lodash/               #   UTS 版 Lodash
-│   │   ├── nested-scroll/        #   自研嵌套滚动
-│   │   ├── rxjsDemo/             #   rxjs 流式演示
-│   │   ├── tailwindcss/          #   weapp-tailwindcss 示例
-│   │   ├── test/                 #   页面间 URL 参数传递测试
-│   │   ├── time/                 #   时间日期操作
-│   │   ├── uiTest/               #   UI 测试与排版
-│   │   └── zpaging/              #   z-paging-x 分页列表各种场景
+│   ├── sub/                      # 应用分包页面（按需加载）
+│   │   └── auth/                 #   登录、注册
 │   ├── tabbar/                   # 底部 TabBar 体系
 │   │   ├── internal/             #   模块内部实现（不对消费者暴露，请走 index.uts 门面）
 │   │   │   ├── strategy.uts      #     策略枚举与模式判定
@@ -475,28 +450,21 @@ unibestX/
 │   │   └── types.uts             #   TabBar 强类型定义
 │   ├── types/                    # 全局 TypeScript / UTS 类型定义
 │   │   └── uni.d.ts              #   definePage 宏、Vue 宏与全局 API 类型补全
-│   └── utils/                    # 全局工具函数（10 个模块，统一走 index.uts 导出的对象）
+│   └── utils/                    # 全局工具函数（9 个模块，统一走 index.uts 导出的对象）
 │       ├── env/                  #   环境变量读取（getApiBaseUrl / getTabBarMode 等）
 │       ├── route/                #   取路由与路径工具
 │       ├── theme/                #   主题色与明暗模式工具
-│       ├── i18n/                 #   多语言辅助工具（t / $t）
 │       ├── toast/                #   全局 Toast 轻提示
 │       ├── systemInfo/           #   屏幕、安全区与系统信息
 │       ├── upload/               #   文件上传封装（OSS 上传、进度回调）
 │       ├── backPress/            #   Android 物理返回键双击退出
 │       ├── refresh/              #   下拉刷新与滚动事件联动
 │       └── rxjs-lite/            #   轻量流式处理工具
-├── uni_modules/                  # uni-app 扩展插件模块（38 个）
-│   ├── uview-ultra/              #   深度优化适配的 UI 组件库
-│   ├── z-paging-x/               #   深度优化适配的分页组件
-│   ├── unix-crypto/              #   跨端加密解密库（AES/DES/RSA/MD5/SHA/HMAC/Base64/UUID）
+├── uni_modules/                  # uni-app 扩展插件模块（4 个）
+│   ├── lime-request/             #   HTTP 请求核心库（src/http 依赖）
+│   ├── lime-dayuts/              #   时间日期处理（dayjs 封装）
 │   ├── x-pinia-s/                #   UTS 版 Pinia（VDOM 模式使用）
-│   ├── iRainna-lodash/           #   UTS 版 Lodash 工具库
-│   ├── lime-request/             #   HTTP 请求核心库
-│   ├── lime-i18n/                #   国际化核心库
-│   ├── lime-signature/           #   手写签名板组件
-│   ├── e-chart/                  #   ECharts 图表适配组件
-│   └── ...                       #   其他官方 / 三方 uni_modules
+│   └── uni-icons/                #   uni-app 官方字体图标组件（TabBar 图标）
 ├── js_sdk/                       # JS / UTS SDK 资源
 ├── App.ku.uvue                   # 全局根包裹组件（动态主题注入、全局 Toast 容器）
 ├── main.uts                      # 应用主入口文件
@@ -535,7 +503,6 @@ import { sys } from '@/src/utils/systemInfo/index.uts';
 | `systemInfo/` | 屏幕尺寸、安全区、导航栏 / TabBar 高度（响应式 `computed`） | `windowWidth` `windowHeight` `screenWidth` `screenHeight` `statusBarHeight` `navBarHeight` `tabBarHeight` `safeAreaBottom` `availableHeight` `menuRect` `updateSystemInfo()` `getScrollHeight()`；实例 `sys` |
 | `theme/` | 主题色与明暗模式：读取、应用、监听 | `themeColor` `isDarkMode(mode)` `getThemeTokens(isDark)` `getRootThemeStyle()` `applyThemeColor(color)` `applyThemeMode(mode, isDark)` `applyNavbarTheme(isDark)` `watchThemeChange(cb)`；实例 `theme` |
 | `toast/` | 全局轻提示（统一风格，替代裸 `uni.showToast`） | `toast(msg)` `toastSuccess(msg)` `toastError(msg)` `toastWarning(msg)` `toastPrimary(msg)` `showToast(options)`；实例 `toastUtils` |
-| `i18n/` | 非 Vue 环境下的多语言文案与导航栏 / TabBar 文案设置 | `t(key, named)` `$t(key, named)` `getI18nText(key)` `setTabbarItem()` `setNavigationBarTitle(key)`；实例 `i18nUtils` |
 | `refresh/` | 下拉刷新、滚动到底、导航栏标题与可见性、状态栏可见性的跨端联动 | `onNavbarPageScroll(cb)` `onNavbarReachBottom(cb)` `onNavbarPullDownRefresh(cb)` `stopNavbarPullDownRefresh()` `setNavbarTitle(t)` `setNavbarVisible(v)` `setHideNavbar(h)` `setHideStatusBar(h)` `isPageScrollDisabled` `isPageRefresherDisabled`；实例 `refresh` |
 | `backPress/` | Android 物理返回键双击退出 | `handleBackPressExit(): boolean` |
 | `upload/` | 文件上传（OSS 上传、进度回调、多后端返回格式兼容） | `uploadFile(options)` `uploadOssFile(filePath)` 类型 `UploadFileOptions`；实例 `upload` |
@@ -614,9 +581,9 @@ pnpm env:prod    # 删除 .env.production.local → 恢复生产环境
 
    ```json
    {
-     "path": "uview-ultra/demos/circle-progress/circle-progress",
+     "path": "src/sub/demo/demo",
      "style": {
-       "navigationBarTitleText": "CircleProgress 圆形进度条",
+       "navigationBarTitleText": "示例页面",
        "navigationStyle": "custom"
      }
    }
@@ -833,7 +800,7 @@ src/tabbar/config.uts (唯一样本源)
 
 ### 主题切换（暗黑模式）
 
-内置三种外观模式：`auto`（跟随系统）/ `light`（浅色）/ `dark`（深色）。入口位于「基础」页的主题切换卡片（`src/pages/basic/components/ThemeSwitchCard.uvue`），状态管理在 `src/store/`。
+内置三种外观模式：`auto`（跟随系统）/ `light`（浅色）/ `dark`（深色）。状态由 `src/store/` 的 `appStore.state.themeMode` 承载，可通过 `appStore.setThemeMode('auto' | 'light' | 'dark')` 切换。
 
 **各端跟随机制：**
 
@@ -949,15 +916,6 @@ src/store/index.uts  (门面：唯一转发层)
 >
 > ⚠️ **重导出红线**：同一顶层符号（`useAppStore` / `useTokenStore` / `useUserStore`）只允许在 `src/store/index.uts` 这一层门面 `export *` 转发，层层转发会让 UTS 在 Android 端生成 `useXxxStore__1` 重名符号并导致运行期 `NoSuchMethodError`。详见该文件头部注释。
 
-### i18n 多语言
-
-基于 `lime-i18n` 的国际化方案：
-
-- 内置中文（zh-CN）和英文（en-US）
-- 自动检测系统语言，也可通过 `.env` 的 `VITE_DEFAULT_LOCALE` 指定默认语言
-- 支持 VSCode i18n-ally 插件
-- 非 Vue 文件中也可通过 `src/utils/i18n/index.uts` 的 `t()` / `$t()` 使用翻译函数
-
 ### Layout 布局
 
 通过 `plugins/uni-layouts-plugin.ts` 实现：
@@ -999,7 +957,7 @@ pnpm docker:down
 | **M1** | **🔐 登录适配器体系** | 微信登录（小程序一键手机号/授权、App 原生 OpenSDK 授权、H5 网页授权/扫码）、钉钉免登、统一 Auth 策略抽象与自动路由拦截 | 全端通用 | **P0** | 🚧 架构就绪，落地推进中 |
 | **M2** | **💳 跨端统一支付中心** | 微信支付（小程序/App/JSAPI/H5）、支付宝支付（App/H5/网页收银台）、统一收银台 UI、订单真实状态轮询服务 | 全端通用 | **P1** | 📝 规划完成 |
 | **M3** | **🤖 AI-Agent 智能体套件** | SSE / Chunk 跨端流式传输、打字机平滑缓冲、Markdown 富文本解析与代码高亮、多轮对话容器与上下文管理 | 全端通用 | **P1** | 📝 规划完成 |
-| **M4** | **💬 WebSocket 实时通信与 IM** | 企业级 SocketClient（心跳保活/退避重连/离线消息队列/Ack）、z-paging 聊天交互、多媒体消息收发 | 全端通用 | **P2** | 📝 规划完成 |
+| **M4** | **💬 WebSocket 实时通信与 IM** | 企业级 SocketClient（心跳保活/退避重连/离线消息队列/Ack）、聊天记录分页加载、多媒体消息收发 | 全端通用 | **P2** | 📝 规划完成 |
 | **M5** | **📹 实时音视频通话 (RTC)** | 双向呼叫信令系统、通话状态机、全屏视频通话 UI（大小画中画自由切换、前后置摄像头切换、静音控制） | App / 小程序 / H5 | **P2** | 📝 规划完成 |
 
 <details>
@@ -1040,7 +998,7 @@ pnpm docker:down
   - **平滑打字机缓冲区 (Typewriter Buffer)**：动态计算输出速率，消除大段成块刷新的生硬感；
   - 支持随时中止生成（Abort / 停止回答）。
 - **高性能 Markdown 渲染与代码高亮**
-  - 依托定制适配好的 `mp-html` 解析核心，完美支持 Markdown 标题、列表、表格、引用等排版；
+  - 自研 Markdown 解析核心，支持标题、列表、表格、引用等排版；
   - 代码块卡片化展示：语言识别、暗色背景、一键快速复制代码；
   - 深度适配系统深色模式（Dark Mode）。
 - **智能体对话容器**
@@ -1056,7 +1014,7 @@ pnpm docker:down
   - **离线消息缓冲队列**：连接未建立时的发送请求自动入队，连接建立后有序自动出队补发；
   - **可靠消息机制**：内置消息唯一 ID 与 Ack 回执确认。
 - **完整 IM 聊天页面演示**
-  - 集成 `z-paging-x` 实现聊天记录向上平滑加载历史消息（位置不跳动）；
+  - 聊天记录向上平滑加载历史消息（位置不跳动）；
   - 丰富消息类型：文本、图片（全屏预览大图）、语音条、系统提示条；
   - 多功能扩展盘（拍照、相册选图并联动统一上传模块发送）。
 
@@ -1088,13 +1046,9 @@ pnpm docker:down
 | 前端框架 | Vue 3 | ^3.5.13 | Composition API |
 | 构建工具 | Vite | 5.2.8 | 极速开发体验 |
 | CSS 引擎 | Tailwind CSS | ^4.3.3 | v4 + weapp-tailwindcss 5.5.2，方括号任意值语法 |
-| UI 组件库 | uview-ultra | 内置定制版 | uni-app X 专用 UI 库（深度修复版，兼容 VDOM/Vapor） |
-| 分页组件 | z-paging-x | 内置定制版 | 强大的下拉刷新 + 分页加载 |
 | 状态管理 | Pinia / x-pinia-s | ^3.0.4 / — | Vapor・Web・小程序走官方 Pinia；App VDOM 走 x-pinia-s |
 | HTTP 请求 | lime-request | — | uni-app X 兼容请求库 |
-| 国际化 | lime-i18n | — | vue-i18n 兼容方案 |
-| 图表 | e-chart | — | ECharts for uni-app X |
-| 图标 | uni-icons + lime-icon | — | 双图标方案 |
+| 图标 | uni-icons | — | uni-app 官方字体图标组件（TabBar 图标） |
 | 文档站 | VitePress | ^1.6.4 | `docs/` 目录 |
 
 ## ⚠️ UTS 开发注意事项

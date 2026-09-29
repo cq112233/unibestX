@@ -176,7 +176,7 @@ export type CustomTabBarItemBadge = number | 'dot';
 
 /** 自定义 tabbar 单项配置 */
 export type CustomTabBarItem = {
-  /** 显示文本（支持 i18n key，如 tabbar.home） */
+  /** 显示文本 */
   text: string;
   /** 页面路径（不带前导 /） */
   pagePath: string;

@@ -1,7 +1,6 @@
 <script setup lang="uts">
 import type { CustomTabBarItem } from '../../types';
 import { curIdx } from '@/src/tabbar/index.uts';
-import { $t } from '@/src/utils/i18n/index.uts';
 import { useAppStore } from '@/src/store';
 import { getThemeTokens, themeColor } from '@/src/utils/theme/index.uts';
 import type { ThemeTokens } from '@/src/utils/theme/index.uts';
@@ -82,11 +81,6 @@ const isDotBadge = computed((): boolean => {
 const isNumberBadge = computed((): boolean => {
   return typeof tabbarItem.value.badge == 'number';
 });
-
-/** 统一获取多语言文本 */
-function getText(text: string): string {
-  return $t(text);
-}
 </script>
 
 <template>
@@ -108,7 +102,7 @@ function getText(text: string): string {
       />
     </view>
     <text v-if="tabbarItem.text.length > 0" class="bulge-text" :style="{ color: textColor }">
-      {{ getText(tabbarItem.text) }}
+      {{ tabbarItem.text }}
     </text>
   </view>
 
@@ -138,12 +132,12 @@ function getText(text: string): string {
       <view v-else-if="isDotBadge" class="tabbar-badge-dot" />
     </view>
 
-    <!-- 标签文字（支持 i18n 多语言） -->
+    <!-- 标签文字 -->
     <text
       class="tabbar-item-text"
       :style="{ color: textColor, fontWeight: curIdx == index ? '600' : 'normal' }"
     >
-      {{ getText(tabbarItem.text) }}
+      {{ tabbarItem.text }}
     </text>
   </view>
 </template>

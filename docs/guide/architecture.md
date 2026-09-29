@@ -11,12 +11,9 @@
 | **前端框架** | Vue 3 | 采用 Composition API 编写 UI 逻辑 |
 | **构建工具** | Vite 5 | 提供极速的本地开发启动与热更新体验 |
 | **CSS 引擎** | Tailwind CSS | v4 + weapp-tailwindcss 原子化 CSS，轻量且高效 |
-| **UI 组件库** | 多分支方案 | main 分支无内置 UI 库（纯净底座）；开箱即用可选 `uniX-rice-ui`（Rice UI 40+）/ `uniX-uview-ultra`（uview-ultra 80+） |
-| **分页组件** | z-paging-x | 提供强大的下拉刷新与分页列表加载体验 |
+| **UI 组件库** | 多分支方案 | `base` 分支无内置 UI 库（纯净底座）；开箱即用可选 `uniX-rice-ui`（Rice UI）/ `uniX-uview-ultra`（uview-ultra） |
 | **状态管理** | x-pinia-s | 兼容 uni-app X 的 Pinia 方案 |
 | **HTTP 请求** | lime-request | uni-app X 兼容的现代化请求库 |
-| **国际化** | lime-i18n | 兼容 vue-i18n 生态的多语言方案 |
-| **图表库** | e-chart | ECharts 在 uni-app X 中的适配实现 |
 
 ## 📁 项目目录结构
 
@@ -32,23 +29,20 @@ unibestX/
 │   ├── assets/               # 静态资源（图标、图片）
 │   ├── components/           # 公共业务组件（NavBar 自定义通用导航栏）
 │   ├── http/                 # HTTP 客户端封装（基于 lime-request，拦截器与错误处理）
-│   ├── i18n/                 # 国际化多语言配置（zh-Hans / en 语言包）
 │   ├── layouts/              # 页面布局模板（如 default.uvue / empty.uvue）
-│   ├── pages/                # 主应用页面（首页、基础组件展示、原生能力展示、AI助手、个人中心）
+│   ├── pages/                # 主应用页面（首页、个人中心）
 │   ├── router/               # 全局路由拦截器与登录白名单策略
 │   ├── store/                # Pinia 状态管理与持久化（app, token, user）
 │   ├── style/                # 全局样式（Tailwind CSS / SCSS）
-│   ├── sub/                  # 应用分包页面（auth, paging, tailwindcss, test, uiTest 等）
+│   ├── sub/                  # 应用分包页面（auth 登录 / 注册）
 │   ├── tabbar/               # 自定义 TabBar 组件与状态配置
 │   ├── types/                # 全局类型定义（uni.d.ts 等）
 │   └── utils/                # 全局工具函数（toast, systemInfo, env, backPress 等）
 ├── uni_modules/              # uni-app 扩展插件模块
-│   ├── unix-crypto/          #   全端跨平台加密解密与安全工具库
-│   ├── z-paging-x/           #   uni-app X 深度定制分页列表组件
-│   ├── iRainna-lodash/       #   UTS 版 Lodash 工具库
-│   ├── lime-request/         #   HTTP 请求库
-│   ├── lime-signature/       #   手写签名板组件
-│   └── e-chart/              #   ECharts 图表适配组件
+│   ├── lime-request/         #   HTTP 请求核心库（src/http 依赖）
+│   ├── lime-dayuts/          #   时间日期处理（dayjs 封装）
+│   ├── x-pinia-s/            #   UTS 版 Pinia（VDOM 模式）
+│   └── uni-icons/            #   uni-app 官方字体图标组件
 ├── js_sdk/                   # JS / UTS SDK 资源
 ├── docs/                     # VitePress 文档源码
 ├── App.ku.uvue               # 全局根包裹组件（动态主题注入、自定义 Tabbar）

@@ -3,21 +3,13 @@
     <TabContent :content-index="0" title="首页" :enable-pull-down-refresh="true" custom-page-class="init-page" custom-page-style="background-color: transparent;">
       <IndexView />
     </TabContent>
-    <TabContent :content-index="1" title="基础" :enable-pull-down-refresh="true">
-      <BasicView />
-    </TabContent>
-    <TabContent :content-index="2" title="功能" :enable-pull-down-refresh="true">
-      <FunctionView />
-    </TabContent>
-    <TabContent :content-index="3" title="我的" :enable-pull-down-refresh="true">
+    <TabContent :content-index="1" title="我的" :enable-pull-down-refresh="true">
       <MeView />
     </TabContent>
   </view>
 </template>
 
 <script setup lang="uts">
-import BasicView from '@/src/pages/basic/views/BasicView.uvue';
-import FunctionView from '@/src/pages/function/views/FunctionView.uvue';
 import IndexView from '@/src/pages/index/views/IndexView.uvue';
 import MeView from '@/src/pages/me/views/MeView.uvue';
 import TabContent from './TabContent.uvue';

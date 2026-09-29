@@ -12,7 +12,6 @@ import {
   syncCurIdxByCurrentPage,
   tabbarList
 } from '@/src/tabbar/index.uts';
-import { $t } from '@/src/utils/i18n/index.uts';
 import { useAppStore } from '@/src/store';
 import { getThemeTokens, themeColor } from '@/src/utils/theme/index.uts';
 import type { ThemeTokens } from '@/src/utils/theme/index.uts';
@@ -104,11 +103,6 @@ onMounted(() => {
 /** 处理 Tab 点击 */
 function onTabClick(index: number) {
   handleTabbarClick(index);
-}
-
-/** 获取多语言翻译文本 */
-function getText(text: string): string {
-  return $t(text);
 }
 
 /** 获取图标字体名称 */
@@ -216,14 +210,14 @@ const bottom = computed(() => {
             </view>
           </view>
 
-          <!-- 标签文字（支持 i18n 翻译） -->
+          <!-- 标签文字 -->
           <text
             class="capsule-item-text" :style="{
               color: getItemTextColor(index),
               fontWeight: getItemFontWeight(index)
             }"
           >
-            {{ getText(item.text) }}
+            {{ item.text }}
           </text>
         </view>
       </view>

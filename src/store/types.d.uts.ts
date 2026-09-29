@@ -10,7 +10,6 @@
  */
 export type IAppState = {
   theme: string;
-  locale: string;
   themeMode: string; // 'auto'（跟随系统）| 'light' | 'dark'
   isDark: boolean; // 实际生效的亮/暗（auto 模式下跟随系统/宿主主题）
   mode: string; // 当前 Store 实现模式：'vapor'（官方 Pinia）| 'vdom'（x-pinia-s）

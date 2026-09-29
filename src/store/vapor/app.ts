@@ -1,7 +1,5 @@
 import { reactive, watch } from 'vue';
 import { defineStore } from 'pinia';
-// @ts-expect-error allowArbitraryExtensions
-import i18n from '@/src/i18n/index.uts';
 import {
   applyThemeColor,
   applyThemeMode,
@@ -11,8 +9,6 @@ import {
   themeColor
 // @ts-expect-error allowArbitraryExtensions
 } from '@/src/utils/theme/index.uts';
-// @ts-expect-error allowArbitraryExtensions
-import { getDefaultLocale } from '@/src/utils/env/index.uts';
 // 类型统一来自 src/store/types.uts（唯一真源），本文件严禁再 export type 同名类型
 import type { IAppState } from '../types.d.uts';
 
@@ -39,7 +35,6 @@ export const useAppStore = defineStore('app', () => {
   // 1. 响应式状态（优先使用本地已持久化的状态，未配置时使用环境默认值）
   const state = reactive<IAppState>({
     theme: stored?.theme ?? getDefaultTheme(),
-    locale: stored?.locale ?? getDefaultLocale(),
     themeMode: stored?.themeMode ?? 'auto',
     isDark: stored?.isDark ?? isDarkMode(stored?.themeMode ?? 'auto'),
     mode: 'vapor'
@@ -51,9 +46,6 @@ export const useAppStore = defineStore('app', () => {
   themeColor.value = state.theme;
   applyThemeColor(state.theme);
   applyThemeMode(state.themeMode, state.isDark);
-  if (i18n?.global?.locale != null) {
-    i18n.global.locale.value = state.locale;
-  }
 
   // 监听 state.theme 变化，自动同步全局 themeColor 与运行环境 CSS 变量（涵盖持久化还原与动态切换）
   watch(
@@ -62,16 +54,6 @@ export const useAppStore = defineStore('app', () => {
       if (newTheme.length > 0) {
         themeColor.value = newTheme;
         applyThemeColor(newTheme);
-      }
-    }
-  );
-
-  // 监听 state.locale 变化，自动同步 i18n
-  watch(
-    () => state.locale,
-    (newLocale: string) => {
-      if (newLocale.length > 0 && i18n?.global?.locale != null) {
-        i18n.global.locale.value = newLocale;
       }
     }
   );
@@ -154,20 +136,12 @@ export const useAppStore = defineStore('app', () => {
     refreshIsDark();
   }
 
-  function setLocale(locale: string): void {
-    state.locale = locale;
-    if (i18n?.global?.locale != null) {
-      i18n.global.locale.value = locale;
-    }
-  }
-
   return {
     state,
     setTheme,
     initThemeMode,
     setThemeMode,
-    refreshIsDark,
-    setLocale
+    refreshIsDark
   };
 }, {
   persist: true

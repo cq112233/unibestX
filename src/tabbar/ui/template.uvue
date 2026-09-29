@@ -68,7 +68,7 @@
             </view>
           </view>
 
-          <!-- Tab 文本标签（内置 $t 国际化翻译转换，根据选中态自适应粗细与高亮颜色） -->
+          <!-- Tab 文本标签（根据选中态自适应粗细与高亮颜色） -->
           <text
             class="item-text"
             :style="{
@@ -76,7 +76,7 @@
               fontWeight: curIdx == index ? '600' : 'normal'
             }"
           >
-            {{ $t(item.text) }}
+            {{ item.text }}
           </text>
         </view>
       </view>
@@ -103,7 +103,6 @@ import {
 import type { CustomTabBarItem } from '@/src/tabbar/index.uts';
 import { themeColor } from '@/src/utils/theme/index.uts';
 import { useAppStore } from '@/src/store';
-import { $t } from '@/src/utils/i18n/index.uts';
 
 // ==========================================
 // Props 组件属性定义

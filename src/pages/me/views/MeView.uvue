@@ -54,7 +54,7 @@ function refreshData(): void {
   console.log('我的页面刷新中...');
   setTimeout(() => {
     // 门控检查：若刷新完成时用户已切到其他 Tab 则忽略
-    if (curIdx.value != 3) {
+    if (curIdx.value != 1) {
       return;
     }
     console.log('我的页面刷新成功');
@@ -65,7 +65,7 @@ function refreshData(): void {
 
 // 监听 navbar 自定义下拉刷新事件（在 enablePullDownRefresh: true 且处于当前 Tab 时生效）
 onNavbarPullDownRefresh(() => {
-  if (curIdx.value == 3) {
+  if (curIdx.value == 1) {
     refreshData();
   }
 });
@@ -121,7 +121,7 @@ function handleLogout() {
   });
 }
 
-// 监听 Tab 切换到当前功能页（索引 3）时触发
+// 监听 Tab 切换到当前「我的」页（索引 1）时触发
 onTabShow(3, () => {
   console.log('onTabShow 我 Tab 显示');
 }, true);

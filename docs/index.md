@@ -4,7 +4,7 @@ layout: home
 hero:
   name: "unibestX"
   text: "最好的 uni-app X 开发框架"
-  tagline: uni-app X + Vue3 + UTS + Vite5 + Tailwind CSS + z-paging-x
+  tagline: uni-app X + Vue3 + UTS + Vite5 + Tailwind CSS
   image:
     src: https://uniappx.oss-cn-beijing.aliyuncs.com/logo.png
     alt: unibestX Logo
@@ -24,10 +24,10 @@ features:
     details: 基于 UTS 语言开发，编译为原生 Kotlin (Android) 和 Swift (iOS)，性能远超传统的 WebView 混合方案，体验媲美原生 App。
   - title: 极致的开发体验
     details: 采用 Vue 3 组合式 API、Vite 5 极速构建以及 Tailwind CSS 原子化引擎，为您带来现代化的前端开发工作流。
-  - title: 深度定制的 z-paging-x
-    details: 针对 uni-app X 深度适配定制的分页组件，支持嵌套手势、下拉刷新与触底加载等复杂交互。
+  - title: 多策略 TabBar 体系
+    details: 5 种运行策略 + 2 种视觉形态，支持单页保活零闪烁切换、角标徽标与全端主题联动。
   - title: 丰富的内置功能
-    details: 开箱即用的状态管理 (Pinia 持久化)、i18n 多语言、路由拦截守卫、请求封装以及灵活的动态主题切换功能。
+    details: 开箱即用的状态管理 (Pinia 持久化)、路由拦截守卫、请求封装、文件上传以及灵活的动态主题切换功能。
 ---
 
 <div align="center" style="margin-top: 40px; margin-bottom: 20px;">

@@ -63,30 +63,6 @@ export function getDefaultTheme(): string {
 }
 
 /**
- * 获取默认国际化语言（全端从 import.meta.env 读取，未配置时自动识别系统语言，最后兜底 zh-CN）
- */
-export function getDefaultLocale(): string {
-  const envLocale = `${import.meta.env.VITE_DEFAULT_LOCALE ?? ''}`.trim();
-  if (envLocale.length > 0) {
-    return envLocale;
-  }
-  try {
-    const sysInfo = uni.getSystemInfoSync();
-    const appLang = sysInfo.appLanguage;
-    if (appLang != null && appLang.toLowerCase().includes('zh')) {
-      return 'zh-CN';
-    }
-    if (appLang != null && appLang.toLowerCase().includes('en')) {
-      return 'en-US';
-    }
-  }
-  catch {
-    // ignore
-  }
-  return 'zh-CN';
-}
-
-/**
  * 获取流式演示接口地址（VITE_STREAM_URL）
  *
  * 支持两种写法：
@@ -321,11 +297,6 @@ export class EnvUtils {
   /** 获取默认主题主色调（全端从 import.meta.env 读取） */
   getDefaultTheme(): string {
     return getDefaultTheme();
-  }
-
-  /** 获取默认国际化语言（全端从 import.meta.env 读取，未配置时自动识别系统语言，最后兜底 zh-CN） */
-  getDefaultLocale(): string {
-    return getDefaultLocale();
   }
 
   /** 获取流式演示接口地址（VITE_STREAM_URL，相对路径会自动拼接 baseURL） */

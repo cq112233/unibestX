@@ -740,16 +740,6 @@ function generatePagesJson(
       .replace(/\/\*[\s\S]*?\*\//g, '')
       .replace(/\/\/.*$/gm, '');
 
-    // 读取中文翻译字典
-    let zhDict: Record<string, any> = {};
-    const zhPath = path.resolve(projectRoot, 'src/i18n/locales/zh-CN.json');
-    if (fs.existsSync(zhPath)) {
-      try {
-        zhDict = JSON.parse(fs.readFileSync(zhPath, 'utf-8'));
-      }
-      catch {}
-    }
-
     const colorMatch = content.match(/color\s*:\s*['"`](.*?)['"`]/);
     const selectedColorMatch = content.match(/selectedColor\s*:\s*['"`](.*?)['"`]/);
     const backgroundColorMatch = content.match(/backgroundColor\s*:\s*['"`](.*?)['"`]/);
@@ -776,13 +766,7 @@ function generatePagesJson(
       if (height && height[1].trim())
         mb.height = height[1].trim();
       if (text && text[1].trim()) {
-        const textKey = text[1].trim();
-        let translatedText = textKey;
-        if (textKey.startsWith('tabbar.')) {
-          const subKey = textKey.replace('tabbar.', '');
-          translatedText = zhDict.tabbar?.[subKey] ?? textKey;
-        }
-        mb.text = translatedText;
+        mb.text = text[1].trim();
       }
       if (iconPath && iconPath[1].trim())
         mb.iconPath = iconPath[1].trim();
@@ -828,16 +812,9 @@ function generatePagesJson(
         const iconPath = itemBlock.match(/iconPath\s*:\s*['"`](.*?)['"`]/);
         const selectedIconPath = itemBlock.match(/selectedIconPath\s*:\s*['"`](.*?)['"`]/);
         if (pagePath && text) {
-          const textKey = text[1].trim();
-          let translatedText = textKey;
-          if (textKey.startsWith('tabbar.')) {
-            const subKey = textKey.replace('tabbar.', '');
-            translatedText = zhDict.tabbar?.[subKey] ?? textKey;
-          }
-
           const itemObj: Record<string, any> = {
             pagePath: pagePath[1].trim().replace(/^\//, ''),
-            text: translatedText,
+            text: text[1].trim(),
             iconPath: iconPath ? iconPath[1].trim() : '',
             selectedIconPath: selectedIconPath ? selectedIconPath[1].trim() : ''
           };

@@ -1,7 +1,6 @@
 import App from './App.uvue'; // 导入应用根组件 App.uvue
 import { createSSRApp } from 'vue'; // 导入 Vue 的 SSR 应用创建方法
 import pinia from './src/store'; // 导入 Pinia 状态管理实例（在 App-Android 平台上强制进行顶层定义约束）
-import i18n from './src/i18n'; // 导入 i18n 国际化配置实例
 import { installRouteInterceptor } from './src/router/interceptor'; // 导入全局路由拦截器安装函数
 
 /**
@@ -19,9 +18,6 @@ export function createApp() {
 
   // 可选配置：将 pinia 实例挂载到 Vue 全局属性中，以便于在 Options API 模板中使用 this.$pinia 访问
   app.config.globalProperties.$pinia = pinia;
-
-  // 注册 i18n 国际化插件
-  app.use(i18n);
 
   // 返回创建好的应用实例对象，供系统挂载运行
   return {

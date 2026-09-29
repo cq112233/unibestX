@@ -3,7 +3,7 @@ import { isNativeTabbar, isSinglePageTabbar, selectedTabbarStrategy, TABBAR_STRA
 import { customTabbarConfig } from '../config.uts';
 
 /** 中间鼓包 tabbarItem 点击事件 */
-function handleClickBulge(url: string = '/src/pages/ai/ai'): void {
+function handleClickBulge(url: string = '/src/pages/index/index'): void {
   uni.navigateTo({
     url
   });
@@ -90,7 +90,7 @@ export function handleTabbarClick(index: number): void {
     return;
   }
   if (list[index].isBulge) {
-    handleClickBulge(list[index].pagePath.length > 0 ? list[index].pagePath : '/src/pages/ai/ai');
+    handleClickBulge(list[index].pagePath.length > 0 ? list[index].pagePath : '/src/pages/index/index');
     return;
   }
   isSwitchingTab = true;
@@ -115,7 +115,7 @@ export function initNativeMidButtonTap(): void {
     const mid = customTabbarConfig.midButton;
     const targetUrl = (mid != null && mid.pagePath != null && mid.pagePath!.length > 0)
       ? mid.pagePath!
-      : '/src/pages/ai/ai';
+      : '/src/pages/index/index';
     uni.onTabBarMidButtonTap(() => {
       handleClickBulge(targetUrl);
     });

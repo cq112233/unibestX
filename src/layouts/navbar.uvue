@@ -24,7 +24,6 @@
       <slot />
     </view>
 
-
     <!-- 当开启自定义下拉刷新时（原生未开启且当前布局开启） -->
     <scroll-view
       v-else-if="useCustomRefresher"
@@ -64,7 +63,6 @@ import { getThemeTokens } from '@/src/utils/theme/index.uts';
 import type { ThemeTokens } from '@/src/utils/theme/index.uts';
 import { isPageRefresherDisabled, isPageScrollDisabled } from '@/src/utils/refresh/index.uts';
 import { curIdx, isPageTabbar, isSinglePageTabbar, tabbarList } from '@/src/tabbar/index.uts';
-import { $t } from '@/src/utils/i18n/index.uts';
 
 /**
  * 布局属性定义（由 uni-layouts-plugin 编译时自动从页面 definePage 或 pages.json 提取传入）
@@ -512,7 +510,7 @@ const displayTitle = computed((): string => {
   }
   if (isSinglePageHome.value && isTabbarPage.value) {
     if (curIdx.value >= 0 && curIdx.value < tabbarList.length) {
-      return $t(tabbarList[curIdx.value].text);
+      return tabbarList[curIdx.value].text;
     }
   }
   const titleFromStyle = (pageStyleObj.value.navigationBarTitleText as string | null) ?? '';

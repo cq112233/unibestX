@@ -26,7 +26,7 @@ export declare const THEME_COLOR_PRESETS: string[];
 /**
  * 自定义 NavBar / TabBar 等组件使用的主题色板
  *
- * 说明：uts 支持直接 import JSON（HBuilderX 4.25+，项目内 i18n 已有先例），
+ * 说明：uts 支持直接 import JSON（HBuilderX 4.25+），
  * 因此这里以根目录 theme.json 为单源，与 pages.json 的亮 / 暗配置保持一致。
  * navigationBarTextStyle / tabBarBorderStyle 为 black / white 枚举：
  * - navigationBarTextStyle：black / white 直接映射为 #000000 / #ffffff
