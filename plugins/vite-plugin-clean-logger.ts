@@ -72,6 +72,13 @@ export default function cleanLoggerPlugin(options: CleanLoggerOptions = {}): Plu
     console.log = (...args: any[]) => {
       const str = args.map(a => (typeof a === 'string' ? a : (a?.message ?? a?.toString?.() ?? ''))).join(' ');
 
+      // 绝对不拦截错误信息（\u2060 为 DCloud ERROR_BLOCK）
+      if (str.includes('\u2060') || str.includes('error:') || str.includes('Error:') || str.includes('failed') || str.includes('失败')) {
+        lastWasSuppressedWarn = false;
+        originalConsoleLog.apply(console, args);
+        return;
+      }
+
       // 1. DCloud 编译告警标识符 (\uFEFF 为 SPECIAL_CHARS.WARN_BLOCK)
       if (str.includes('\uFEFF')) {
         lastWasSuppressedWarn = true;
@@ -83,9 +90,9 @@ export default function cleanLoggerPlugin(options: CleanLoggerOptions = {}): Plu
         return;
       }
 
-      // 3. 代码片段 Code Frame 格式（例如 "  2 | ..." 或 "> 4 | ..."）
-      if (/(?:^|\n)\s*(?:>\s*)?\d+\s*\|/.test(str) && shouldIgnore(str)) {
-        lastWasSuppressedWarn = true;
+      // 3. 紧跟在被拦截告警后的代码片段 Code Frame 格式（例如 "  2 | ..." 或 "> 4 | ..."）
+      if (lastWasSuppressedWarn && /(?:^|\n)\s*(?:>\s*)?\d+\s*\|/.test(str)) {
+        lastWasSuppressedWarn = false;
         return;
       }
 
