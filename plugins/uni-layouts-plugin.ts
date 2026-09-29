@@ -86,12 +86,25 @@ function parseDefinePage(content: string): Record<string, any> | null {
   return null;
 }
 
-export interface UniLayoutsOptions {
+export type UniLayoutsOptions = {
+  /**
+   * 布局目录路径（相对项目根目录）
+   * @default 'src/layouts'
+   */
   layoutDir?: string;
+  /**
+   * 默认使用的全局布局名称
+   * @default 'default'
+   */
   layout?: string;
-}
+  /**
+   * 工作目录
+   * @default process.cwd()
+   */
+  cwd?: string;
+};
 
-interface PageConfig {
+type PageConfig = {
   path: string;
   layout?: string | boolean;
   style?: {
@@ -99,23 +112,23 @@ interface PageConfig {
     [key: string]: any;
   };
   [key: string]: any;
-}
+};
 
-interface SubPackageConfig {
+type SubPackageConfig = {
   root: string;
   pages: PageConfig[];
-}
+};
 
-interface PagesJson {
+type PagesJson = {
   pages: PageConfig[];
   subPackages?: SubPackageConfig[];
-}
+};
 
 /**
  * 仿照 vite-plugin-uni-layouts 的跨端 Layout 布局包装插件，适配 uni-app X + UTS
  */
-export default function uniLayoutsPlugin(options: UniLayoutsOptions = {}) {
-  let projectRoot = process.cwd();
+export function uniLayoutsPlugin(options: UniLayoutsOptions = {}) {
+  let projectRoot = options.cwd || process.cwd();
   const layoutDirName = options.layoutDir || 'src/layouts';
   const defaultLayoutName = options.layout || 'default';
 
@@ -273,6 +286,7 @@ export default function uniLayoutsPlugin(options: UniLayoutsOptions = {}) {
         || normalizedId.includes('/src/components/_layouts/')
         || normalizedId.includes('App.uvue')
         || normalizedId.includes('App.ku.uvue')
+        || normalizedId.includes('AppRoot.uvue')
         || normalizedId.includes('/components/')
         || normalizedId.includes('/views/')
       ) {
@@ -493,3 +507,6 @@ export default function uniLayoutsPlugin(options: UniLayoutsOptions = {}) {
     }
   };
 }
+
+export { uniLayoutsPlugin as uniLayoutsX };
+export default uniLayoutsPlugin;

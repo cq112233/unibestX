@@ -2,78 +2,17 @@ import fs from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
-import { createLogger, defineConfig } from 'vite';
+import { defineConfig } from 'vite';
 import { uniEasycomPlugin } from '@dcloudio/uni-cli-shared/dist/vite/plugins/easycom.js';
 import { UNI_EASYCOM_EXCLUDE } from '@dcloudio/uni-cli-shared';
 import uniModule from '@dcloudio/vite-plugin-uni';
 import { uniAppX } from 'weapp-tailwindcss/presets';
 import { WeappTailwindcss } from 'weapp-tailwindcss/vite';
-import autoRootPlugin from './plugins/root-plugin';
+import uniRootX from './plugins/root-plugin';
+import cleanLoggerPlugin from './plugins/vite-plugin-clean-logger';
 import uniLayoutsPlugin from './plugins/uni-layouts-plugin';
 import tabbarViewsPlugin from './plugins/vite-plugin-tabbar-views';
 import uniPagesPlugin from './plugins/vite-plugin-uni-pages';
-
-// 控制台警告过滤配置：彻底净化控制台，拦截过滤无害编译警告（如 UTS/TS 声明文件扩展名提示、第三方库类型推断等）
-const SILENCE_ALL_WARNINGS = true; // 设为 true 则完全不在控制台打印 warning，只保留 error 和 info
-
-const IGNORED_WARNINGS = [
-  '--allowArbitraryExtensions',
-  'allowArbitraryExtensions',
-  'rice-ui',
-  'useChildren.uts',
-  'No overload matches this call',
-  'neither type sufficiently overlaps',
-  'Conversion of type',
-  'utf8'
-];
-
-const customLogger = createLogger();
-const originalWarn = customLogger.warn;
-const originalWarnOnce = customLogger.warnOnce;
-
-customLogger.warn = (msg, options) => {
-  if (SILENCE_ALL_WARNINGS || IGNORED_WARNINGS.some(k => msg.includes(k))) {
-    return;
-  }
-  originalWarn(msg, options);
-};
-
-customLogger.warnOnce = (msg, options) => {
-  if (SILENCE_ALL_WARNINGS || IGNORED_WARNINGS.some(k => msg.includes(k))) {
-    return;
-  }
-  originalWarnOnce(msg, options);
-};
-
-// 拦截直接通过 console.warn 打印的第三方库或插件警告
-const originalConsoleWarn = console.warn;
-console.warn = (...args: any[]) => {
-  const str = args.map(a => (typeof a === 'string' ? a : (a?.message ?? a?.toString?.() ?? ''))).join(' ');
-  if (SILENCE_ALL_WARNINGS || IGNORED_WARNINGS.some(k => str.includes(k))) {
-    return;
-  }
-  originalConsoleWarn.apply(console, args);
-};
-
-// 拦截直接通过 console.log 打印的 DCloud 编译告警代码片段 (Code Frame)
-const originalConsoleLog = console.log;
-let lastWasSuppressedWarn = false;
-console.log = (...args: any[]) => {
-  const str = args.map(a => (typeof a === 'string' ? a : (a?.message ?? a?.toString?.() ?? ''))).join(' ');
-  if (str.includes('\uFEFF')) {
-    lastWasSuppressedWarn = true;
-    return;
-  }
-  if (lastWasSuppressedWarn && (str.startsWith('at ') || str.includes(' at '))) {
-    return;
-  }
-  if (/(?:^|\n)\s*(?:>\s*)?\d+\s*\|/.test(str) && (SILENCE_ALL_WARNINGS || IGNORED_WARNINGS.some(k => str.includes(k)))) {
-    lastWasSuppressedWarn = true;
-    return;
-  }
-  lastWasSuppressedWarn = false;
-  originalConsoleLog.apply(console, args);
-};
 
 const uni = (uniModule as typeof uniModule & { default?: typeof uniModule }).default ?? uniModule;
 const projectRoot = dirname(fileURLToPath(import.meta.url));
@@ -109,7 +48,6 @@ const weappTailwindcssPlugins = WeappTailwindcss(
 ) ?? [];
 
 export default defineConfig({
-  customLogger,
   base: './',
   resolve: {
     alias: (process.env.UNI_PLATFORM === 'web' || process.env.UNI_PLATFORM === 'h5')
@@ -136,49 +74,11 @@ export default defineConfig({
     }
   },
   build: {
-    sourcemap: false, // 关闭 sourcemap，警告直接消失
-    rollupOptions: {
-      onwarn(warning, defaultHandler) {
-        if (SILENCE_ALL_WARNINGS)
-          return;
-        const msg = warning.message || '';
-        if (IGNORED_WARNINGS.some(k => msg.includes(k)))
-          return;
-        defaultHandler(warning);
-      }
-    }
-  },
-  css: {
-    postcss: {
-      plugins: [
-        {
-          postcssPlugin: 'strip-unsupported-sticky',
-          Declaration(decl: any) {
-            if (decl.prop === 'position' && decl.value === 'sticky') {
-              decl.value = 'relative';
-            }
-          }
-        }
-      ]
-    }
+    sourcemap: false // 关闭 sourcemap，警告直接消失
   },
   plugins: [
-    // 拦截并自动将原生 CSS 编译器不支持的 position: sticky 修正为 position: relative，杜绝 App 平台编译报错
-    {
-      name: 'vite-plugin-strip-sticky',
-      enforce: 'pre',
-      transform(code: string, id: string) {
-        if (id.includes('node_modules')) {
-          return null;
-        }
-        if ((id.endsWith('.uvue') || id.endsWith('.css') || id.endsWith('.scss') || id.includes('type=style')) && code.includes('sticky')) {
-          return {
-            code: code.replace(/position\s*:\s*sticky\s*;?/g, 'position: relative;')
-          };
-        }
-        return null;
-      }
-    },
+    // 控制台警告与代码片段净化插件：拦截 Vite/Rollup/DCloud 编译告警输出
+    cleanLoggerPlugin({ silenceAll: true }),
     // 修复 H5 模式下外部或 AI 修改 .uvue/.uts 时 Tailwind CSS v4 样式热更新丢失的联动补丁插件
     // tailwindHmrPlugin(),
     // 自动扫描与路由生成插件（基于 pages.config.json + 页面内 <route>/definePage 声明）
@@ -210,15 +110,20 @@ export default defineConfig({
       autoCreateViews: !isBuild,
       configFile: 'src/tabbar/config.uts'
     }),
-    ...(!process.env.UNI_PLATFORM?.startsWith('mp-')
-      ? [uniEasycomPlugin({ exclude: UNI_EASYCOM_EXCLUDE })]
-      : []),
     // 手动补充 easycom 插件（限制非小程序端生效，含 App 与 Web）
     // 该插件内部名为 uni:app-easycom，负责在 App 蒸汽模式与 Web 端把模板里的 easycom 标签转成静态 import；
     // 小程序端（mp-*）由官方编译器基于 usingComponents 原生处理，挂载该插件会导致组件被转为未知动态组件并报错 resolveDynamicComponent。
-    // ...(process.env.UNI_PLATFORM?.startsWith('mp-') ? [] : [uniEasycomPlugin({ exclude: UNI_EASYCOM_EXCLUDE })]),
-    uniLayoutsPlugin(), // 仿照 vite-plugin-uni-layouts 的跨端 Layout 布局插件
-    autoRootPlugin(), // 自动给页面套上 App.ku.uvue 根包裹组件
+    ...(!process.env.UNI_PLATFORM?.startsWith('mp-')
+      ? [uniEasycomPlugin({ exclude: UNI_EASYCOM_EXCLUDE })]
+      : []),
+    uniLayoutsPlugin({
+      layoutDir: 'src/layouts',
+      layout: 'default'
+    }),
+    uniRootX({
+      enabledGlobalRef: false,
+      rootFileName: 'App.ku'
+    }),
     uni(),
     ...weappTailwindcssPlugins
   ]
