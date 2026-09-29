@@ -1,11 +1,11 @@
 # superpowers 文档约定
 
-本目录是 **brainstorming / writing-plans 工作流**的产出落地处，由 AI Agent 与维护者共同写入：
+本目录是 **「先设计、再计划、后实现」工作流**的产出落地处，由 AI Agent 与维护者共同写入：
 
 | 子目录 | 内容 | 命名 |
 | --- | --- | --- |
-| `specs/` | 设计规格（brainstorming 产出） | `YYYY-MM-DD-<topic>-design.md` |
-| `plans/` | 实现计划（writing-plans 产出） | `YYYY-MM-DD-<feature-name>.md` |
+| `specs/` | 设计规格（动手前澄清需求与方案的产出） | `YYYY-MM-DD-<topic>-design.md` |
+| `plans/` | 实现计划（跨多文件重构等复杂任务的分步拆解） | `YYYY-MM-DD-<feature-name>.md` |
 
 这些文档**会被 VitePress 编译进官网**（`docs/` 是 `srcDir`），因此正文必须满足 VitePress 的链接规则。下面这条是所有踩坑里唯一会导致**整站部署失败**的。
 

@@ -902,7 +902,7 @@ function handleGenerateTestCache(): void {
     fsm.writeFile({
       filePath: targetFile,
       data: dummy,
-      encoding: 'utf8',
+      encoding: 'utf-8',
       success: () => {
         uni.hideLoading();
         uni.showToast({ title: '已成功生成测试缓存', icon: 'success' });

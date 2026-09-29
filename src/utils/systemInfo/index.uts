@@ -378,7 +378,7 @@ export function isCompilerVersionGte(targetVersion: string): boolean {
  *
  * ⚠️ 刻意不叫 getTabBarHeight：顶层 computed `tabBarHeight` 会被 Kotlin 编译器
  * 生成同名静态 getter `getTabBarHeight()`，两者并存会触发平台声明冲突，导致
- * Android 运行时 NoSuchMethodError（见 SKILL 1.1.11）。
+ * Android 运行时 NoSuchMethodError（见 SKILL 1.11）。
  * 需要对外调用请用类方法 `systemUtils.getTabBarHeight()`。
  *
  * @param includeSafeArea 是否包含底部安全区高度（默认 false）

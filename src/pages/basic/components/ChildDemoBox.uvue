@@ -136,7 +136,7 @@ const emit = defineEmits(['add', 'reset', 'send-msg']);
  * 当前根主题色（响应式）
  * 取全局 themeColor，随 app store 换肤（setTheme）自动同步。
  * 这里下发具体色值而非 var(--theme-color)：<input> 是原生控件，
- * 在 iOS 端无法随 CSS 变量更新重绘（见 unibestX-skill 1.2.1）。
+ * 在 iOS 端无法随 CSS 变量更新重绘（见 unibestX-skill 2.1）。
  */
 const rootThemeColor = computed((): string => {
   return themeColor.value as string;

@@ -10,7 +10,7 @@ import { Rules, I_Lexer, Links, Tokens, Token, MarkedOptions, InlineLink, I_Toke
 
 // ↓↓↓【本项目的改动】同上：这个 JSReg import 在本文件里根本没有被使用，却会在安卓端
 // 无条件把原生 jar 依赖拉进来。收窄到 uniVersion < 4.72 后，5.24 项目上等于不存在。
-// 详见 unibestX-skill 1.3.10。
+// 详见 unibestX-skill 3.10。
 // #ifdef uniVersion < 4.72
 // #ifdef APP-ANDROID
 import JSReg from 'io.dcloud.uts.jsreg.JSReg';
@@ -259,7 +259,7 @@ export class Tokenizer implements I_Tokenizer {
 	// 安卓的**逻辑层是 JS**，转译器会把这个注解当成 JS 装饰器，产出：
 	//   _blockquote_decorators = [Suppress("RedundantFieldInitialization")]
 	// 类定义求值时即抛 `ReferenceError: Suppress is not defined`。
-	// 它本来只是消一条「字段初始化冗余」的 Kotlin 警告，去掉不影响任何行为。详见 unibestX-skill 1.3.12。
+	// 它本来只是消一条「字段初始化冗余」的 Kotlin 警告，去掉不影响任何行为。详见 unibestX-skill 3.12。
 	blockquote(src : string) : NodesToken | null {
 		const cap = this.rules!.block.blockquote.exec(src);
 		if (cap != null && cap[0] != null) {
@@ -955,7 +955,7 @@ export class Tokenizer implements I_Tokenizer {
 				// 现在两边统一用「先判长度、再取下标」：Kotlin 侧不会越界访问，
 				// JS 侧未参与匹配的捕获组取到 undefined，而 undefined != null 恰好也是 false，
 				// 语义与 Kotlin 侧的 null 判断一致。写法与上方 for 循环里的 match[idx] 判断保持统一。
-				// 详见 unibestX-skill 1.3.12。
+				// 详见 unibestX-skill 3.12。
 				const isMatch5Or6 = (match.length > 5 && match[5] != null) || (match.length > 6 && match[6] != null);
 
 				if ((match[3] != null && `${match[3]}`.length > 0) || (match[4] != null && `${match[4]}`.length > 0)) {

@@ -71,16 +71,22 @@ class Pinia implements IPinia {
  *
  * store 参数为 any（实际为 PiniaStoreBase 子类实例），
  * 内部 cast 为 PiniaStoreBase 后访问 $id / $state（继承关系，类型安全）。
+ * 无状态 store（不声明 state、不调 bindState，如 modal 实例容器）的 $state 为 null，
+ * 这里兜底成空对象后再交给插件。
  */
 export function applyPluginToStore(pinia : IPinia, store : any, plugin : PiniaPlugin) : void {
 	// store 是 PiniaStoreBase 子类实例（CounterStore extends PiniaStoreBase），
 	// 向上 cast 为 PiniaStoreBase 是类型安全的（继承关系），可以直接访问 $id / $state 属性
 	const storeBase : PiniaStoreBase = store as any as PiniaStoreBase
+	// ctx.state 是非空 any，而 $state 对无状态 store（不声明 state、不调 bindState）返回 null：
+	// 直接写 $state! 会被编成 Kotlin 的 !!，遇 null 抛 java.lang.NullPointerException（真机崩溃点），
+	// 所以用 ?? 兜底成空对象（与官方 Pinia 无状态 store 的 $state 表现为 {} 一致）
+	const storeState : any = storeBase.$state ?? ({} as UTSJSONObject)
 	const ctx : PiniaPluginContext = {
 		pinia: pinia,
 		storeId: storeBase.$id,
 		store: store,
-		state: storeBase.$state!
+		state: storeState
 	}
 	try {
 		plugin(ctx)
