@@ -12,7 +12,7 @@
         class="w-[4px] h-[16px] rounded-[2px] mr-[8px]"
         :style="{ backgroundColor: 'var(--theme-color, #3182ce)' }"
       />
-      <text class="text-[16px] font-bold" :style="{ color: 'var(--text-color, #2d3748)' }">{{ echartTitle }}</text>
+      <text class="text-[16px] font-bold" :style="{ color: 'var(--text-color, #2d3748)' }">ECharts 图表示例</text>
     </view>
     <view class="w-full h-[280px] mt-[10px]">
       <e-chart ref="echartRef" height="280px" class="w-full h-full" @ready="initEchart" />
@@ -28,7 +28,7 @@
             class="text-[12px] font-bold"
             :class="currentType !== 'line' ? 'text-[#3b82f6]' : 'text-[#ffffff]'"
           >
-            {{ echartLineText }}
+            折线图
           </text>
         </view>
       </view>
@@ -42,7 +42,7 @@
             class="text-[12px] font-bold"
             :class="currentType !== 'bar' ? 'text-[#10b981]' : 'text-[#ffffff]'"
           >
-            {{ echartBarText }}
+            柱状图
           </text>
         </view>
       </view>
@@ -56,7 +56,7 @@
             class="text-[12px] font-bold"
             :class="currentType !== 'pie' ? 'text-[#f59e0b]' : 'text-[#ffffff]'"
           >
-            {{ echartPieText }}
+            饼图
           </text>
         </view>
       </view>
@@ -67,12 +67,6 @@
 <script setup lang="uts">
 import { computed, ref, watch } from 'vue';
 import { systemInfo } from '@/src/utils/systemInfo/index.uts';
-import { $t } from '@/src/utils/i18n/index.uts';
-
-const echartTitle = computed((): string => $t('basic.echartTitle'));
-const echartLineText = computed((): string => $t('basic.echartLine'));
-const echartBarText = computed((): string => $t('basic.echartBar'));
-const echartPieText = computed((): string => $t('basic.echartPie'));
 
 const echartRef = ref<ComponentPublicInstance | null>(null);
 const currentType = ref('line');
