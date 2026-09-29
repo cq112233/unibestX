@@ -4,7 +4,7 @@
     <!-- 箭头旋转通过内联style设置transform触发transition(蒸汽模式下通过切换class触发transition不可靠) -->
     <z-paging-loading v-if="isLoading" :color="indicatorColor" :src="refreshingImg" :animated="refreshingAnimated" :img-style="imgStyle" />
     <image v-else class="zpx-r-image" :style="[{ transform: getLeftImageTransform }, imgStyle]" :src="getLeftImageSrc" />
-    <view class="zpx-r-text-container" :style="{marginLeft: showRefresherTimeText ? '25rpx' : '10rpx'}">
+    <view class="zpx-r-text-container" :style="{marginLeft: showRefresherTimeText ? '12px' : '5px'}">
       <text class="zpx-r-text" :style="[{ color: titleColor }, titleStyle]">{{statusText}}</text>
       <text v-if="showRefresherTimeText" class="zpx-r-text zpx-r-time-text" :style="[{ color: titleColor }, updateTimeStyle]">
         {{refresherTimeText}}
@@ -204,6 +204,7 @@
 <style scoped>
   .zpx-r-container {
     /* 这里下拉刷新view高度需要用px，否则在iOS中下拉刷新view会被展示在最底部 */
+    /* 图标尺寸与字号一律用px：rpx 按屏宽折算，折叠屏展开后会被整体放大，与项目px体系也不一致 */
     height: 40px;
     flex-direction: row;
     align-items: center;
@@ -211,8 +212,8 @@
   }
 
   .zpx-r-image {
-    width: 34rpx;
-    height: 34rpx;
+    width: 17px;
+    height: 17px;
     /* transform由模板内联style设置，初始值需写在transition-property之前，避免初始渲染触发过渡 */
     transform: rotate(0deg);
     transition-property: transform;
@@ -225,11 +226,11 @@
   }
 
   .zpx-r-text {
-    font-size: 28rpx;
+    font-size: 14px;
   }
 
   .zpx-r-time-text {
-    font-size: 26rpx;
-    margin-top: 10rpx;
+    font-size: 13px;
+    margin-top: 5px;
   }
 </style>

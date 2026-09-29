@@ -801,6 +801,9 @@ by ZXLee
   // 列表(list-view/scroll-view)可视高度，蒸汽模式及web端用于撑满空数据图容器，由UniResizeObserver监听列表尺寸变化自动更新
   const listHeight = ref(0)
   let listResizeObserver: UniResizeObserver | null = null
+  // 内容宽度(contentWidth)的尺寸监听：折叠屏折叠/展开、分屏、旋屏后窗口宽度会变，
+  // 只靠onMounted量一次会让下拉刷新的图标与状态文字停在旧宽度里错位，因此同样跟随根节点宽度
+  let contentResizeObserver: UniResizeObserver | null = null
   // #endif
 
   // 是否是加载中状态
@@ -1471,6 +1474,15 @@ by ZXLee
         zPagingXEle.getBoundingClientRectAsync()!.then((rect : DOMRect) => {
           contentWidth.value = rect.width;
         })
+        // #ifdef VUE3-VAPOR || WEB
+        // 监听根节点尺寸变化，窗口宽度变化(折叠屏折叠/展开等)后下拉刷新区宽度需重新跟随
+        contentResizeObserver = new UniResizeObserver((entries : Array<UniResizeObserverEntry>) => {
+          entries.forEach((entry : UniResizeObserverEntry) => {
+            contentWidth.value = entry.contentRect.width;
+          })
+        })
+        contentResizeObserver!.observe(zPagingXEle);
+        // #endif
       }
 
       // #ifdef VUE3-VAPOR || WEB
@@ -1497,6 +1509,10 @@ by ZXLee
     if (listResizeObserver !== null) {
       listResizeObserver!.disconnect();
       listResizeObserver = null;
+    }
+    if (contentResizeObserver !== null) {
+      contentResizeObserver!.disconnect();
+      contentResizeObserver = null;
     }
     // #endif
     // #ifdef APP
