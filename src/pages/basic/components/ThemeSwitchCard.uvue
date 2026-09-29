@@ -12,7 +12,7 @@
         class="w-[4px] h-[16px] rounded-[2px] mr-[8px]"
         :style="{ backgroundColor: 'var(--theme-color, #3182ce)' }"
       />
-      <text class="text-[16px] font-bold" :style="{ color: 'var(--text-color, #2d3748)' }">{{ themeTitle }}</text>
+      <text class="text-[16px] font-bold" :style="{ color: 'var(--text-color, #2d3748)' }">主题设置</text>
     </view>
     <!-- 预览区域 -->
     <view
@@ -23,14 +23,14 @@
         class="text-[12px] mb-[8px]"
         :style="{ color: 'var(--text-secondary, #94a3b8)' }"
       >
-        {{ themePreview }}
+        主题色效果预览
       </text>
 
       <view
         class="mt-[10px] mx-auto w-[200px] h-[44px] rounded-[8px] flex flex-row items-center justify-center"
         :style="{ backgroundColor: currentTheme }"
       >
-        <text class="text-[#ffffff] text-[14px] font-medium">{{ themeButton }}</text>
+        <text class="text-[#ffffff] text-[14px] font-medium">主题按钮</text>
       </view>
     </view>
 
@@ -63,7 +63,7 @@
         class="text-[14px]"
         :style="{ color: 'var(--text-color, #2d3748)' }"
       >
-        {{ themeModeLabel }}
+        外观模式
       </text>
       <view
         class="flex flex-row rounded-[8px] overflow-hidden"
@@ -99,7 +99,6 @@
 <script setup lang="uts">
 import { computed } from 'vue';
 import { useAppStore } from '@/src/store';
-import { $t } from '@/src/utils/i18n/index.uts';
 import { THEME_COLOR_PRESETS } from '@/src/utils/theme/index.uts';
 import { toast } from '@/src/utils/toast/index.uts';
 
@@ -111,29 +110,22 @@ type ThemeModeOption = {
 
 const appStore = useAppStore();
 
-const themeTitle = computed((): string => $t('basic.themeTitle'));
-const themePreview = computed((): string => $t('basic.themePreview'));
-const themeButton = computed((): string => $t('basic.themeButton'));
-const themeModeLabel = computed((): string => $t('basic.themeModeTitle'));
-
 const currentTheme = computed((): string => appStore.state.theme);
 const currentMode = computed((): string => appStore.state.themeMode);
 
-const themeModeOptions = computed((): ThemeModeOption[] => {
-  return [
-    { label: $t('basic.themeModeAuto'), value: 'auto' },
-    { label: $t('basic.themeModeLight'), value: 'light' },
-    { label: $t('basic.themeModeDark'), value: 'dark' }
-  ];
-});
+const themeModeOptions: ThemeModeOption[] = [
+  { label: '跟随系统', value: 'auto' },
+  { label: '浅色', value: 'light' },
+  { label: '深色', value: 'dark' }
+];
 
 function changeTheme(color: string) {
   appStore.setTheme(color);
-  toast($t('basic.themeSuccess'));
+  toast('主题色切换成功');
 }
 
 function changeThemeMode(value: string) {
   appStore.setThemeMode(value);
-  toast($t('basic.themeModeSuccess'));
+  toast('外观模式切换成功');
 }
 </script>
