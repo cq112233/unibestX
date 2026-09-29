@@ -1,21 +1,79 @@
+import fs from 'node:fs';
+import { dirname, resolve } from 'node:path';
 import process from 'node:process';
-import { defineConfig } from 'vite';
-import uniLayoutsPlugin from './plugins/uni-layouts-plugin';
-import autoRootPlugin from './plugins/root-plugin';
-import uniPagesPlugin from './plugins/vite-plugin-uni-pages';
-import tabbarViewsPlugin from './plugins/vite-plugin-tabbar-views';
-import tailwindHmrPlugin from './plugins/vite-plugin-tailwind-hmr';
-
-// 修复 uni-app x web端/h5端 丢掉 easycom 导入的官方 bug
+import { fileURLToPath } from 'node:url';
+import { createLogger, defineConfig } from 'vite';
 import { uniEasycomPlugin } from '@dcloudio/uni-cli-shared/dist/vite/plugins/easycom.js';
 import { UNI_EASYCOM_EXCLUDE } from '@dcloudio/uni-cli-shared';
-
 import uniModule from '@dcloudio/vite-plugin-uni';
 import { uniAppX } from 'weapp-tailwindcss/presets';
 import { WeappTailwindcss } from 'weapp-tailwindcss/vite';
-import fs from 'node:fs';
-import { dirname, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import autoRootPlugin from './plugins/root-plugin';
+import uniLayoutsPlugin from './plugins/uni-layouts-plugin';
+import tabbarViewsPlugin from './plugins/vite-plugin-tabbar-views';
+import uniPagesPlugin from './plugins/vite-plugin-uni-pages';
+
+// 控制台警告过滤配置：彻底净化控制台，拦截过滤无害编译警告（如 UTS/TS 声明文件扩展名提示、第三方库类型推断等）
+const SILENCE_ALL_WARNINGS = true; // 设为 true 则完全不在控制台打印 warning，只保留 error 和 info
+
+const IGNORED_WARNINGS = [
+  '--allowArbitraryExtensions',
+  'allowArbitraryExtensions',
+  'rice-ui',
+  'useChildren.uts',
+  'No overload matches this call',
+  'neither type sufficiently overlaps',
+  'Conversion of type',
+  'utf8'
+];
+
+const customLogger = createLogger();
+const originalWarn = customLogger.warn;
+const originalWarnOnce = customLogger.warnOnce;
+
+customLogger.warn = (msg, options) => {
+  if (SILENCE_ALL_WARNINGS || IGNORED_WARNINGS.some(k => msg.includes(k))) {
+    return;
+  }
+  originalWarn(msg, options);
+};
+
+customLogger.warnOnce = (msg, options) => {
+  if (SILENCE_ALL_WARNINGS || IGNORED_WARNINGS.some(k => msg.includes(k))) {
+    return;
+  }
+  originalWarnOnce(msg, options);
+};
+
+// 拦截直接通过 console.warn 打印的第三方库或插件警告
+const originalConsoleWarn = console.warn;
+console.warn = (...args: any[]) => {
+  const str = args.map(a => (typeof a === 'string' ? a : (a?.message ?? a?.toString?.() ?? ''))).join(' ');
+  if (SILENCE_ALL_WARNINGS || IGNORED_WARNINGS.some(k => str.includes(k))) {
+    return;
+  }
+  originalConsoleWarn.apply(console, args);
+};
+
+// 拦截直接通过 console.log 打印的 DCloud 编译告警代码片段 (Code Frame)
+const originalConsoleLog = console.log;
+let lastWasSuppressedWarn = false;
+console.log = (...args: any[]) => {
+  const str = args.map(a => (typeof a === 'string' ? a : (a?.message ?? a?.toString?.() ?? ''))).join(' ');
+  if (str.includes('\uFEFF')) {
+    lastWasSuppressedWarn = true;
+    return;
+  }
+  if (lastWasSuppressedWarn && (str.startsWith('at ') || str.includes(' at '))) {
+    return;
+  }
+  if (/(?:^|\n)\s*(?:>\s*)?\d+\s*\|/.test(str) && (SILENCE_ALL_WARNINGS || IGNORED_WARNINGS.some(k => str.includes(k)))) {
+    lastWasSuppressedWarn = true;
+    return;
+  }
+  lastWasSuppressedWarn = false;
+  originalConsoleLog.apply(console, args);
+};
 
 const uni = (uniModule as typeof uniModule & { default?: typeof uniModule }).default ?? uniModule;
 const projectRoot = dirname(fileURLToPath(import.meta.url));
@@ -51,6 +109,7 @@ const weappTailwindcssPlugins = WeappTailwindcss(
 ) ?? [];
 
 export default defineConfig({
+  customLogger,
   base: './',
   resolve: {
     alias: (process.env.UNI_PLATFORM === 'web' || process.env.UNI_PLATFORM === 'h5')
@@ -77,7 +136,17 @@ export default defineConfig({
     }
   },
   build: {
-    sourcemap: false // 关闭 sourcemap，警告直接消失
+    sourcemap: false, // 关闭 sourcemap，警告直接消失
+    rollupOptions: {
+      onwarn(warning, defaultHandler) {
+        if (SILENCE_ALL_WARNINGS)
+          return;
+        const msg = warning.message || '';
+        if (IGNORED_WARNINGS.some(k => msg.includes(k)))
+          return;
+        defaultHandler(warning);
+      }
+    }
   },
   css: {
     postcss: {
