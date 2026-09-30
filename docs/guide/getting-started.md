@@ -8,9 +8,9 @@
 
 * **Node.js**: `>= 22`
 * **包管理器**: `pnpm >= 7.30`
-* **IDE**: `HBuilderX >= 5.21`
+* **IDE**: `HBuilderX >= 5.24`
   > [!TIP] 建议
-  > 推荐使用 **HBuilderX 5.21 及以上版本**，全面支持 Android / iOS / 鸿蒙三端蒸汽（Vapor）模式；最好升级至最新 **HBuilderX 5.24** 版本。
+  > 请使用 **HBuilderX 5.24 及以上版本**，全面支持 Android / iOS / 鸿蒙三端蒸汽（Vapor）模式。
   > 旧版本可切换 VDOM 模式（`manifest.json` 中 `"vapor": false`）稳定运行。
 * **Vue Official**: `>= 2.1.10`
 * **TypeScript**: `>= 5.0`
@@ -23,7 +23,41 @@
 
 ### 1. 创建 / 克隆项目
 
-* **方式一：通过 `degit` 快速创建（推荐，无历史提交记录）**：
+* **方式一：使用官方脚手架 `create-unibestx`（推荐）**：
+
+  脚手架基于本仓库的分支生成项目，交互式引导选择 UI 库、功能特性与演示分包：
+
+  ```bash
+  # 交互式创建（推荐）
+  pnpm create unibestx my-app
+
+  # 免安装直接运行
+  npx create-unibestx my-app
+
+  # 全局安装（提供 bestx / unibestx / create-unibestx 三个等价命令）
+  npm i -g create-unibestx
+  bestx my-app
+  ```
+
+  相比手动克隆，脚手架会额外完成：**UI 库三选一**（Rice UI / uview-ultra / 无 UI 库）、**按需裁剪功能与 12 个演示分包**、**重写 `package.json` 与 `.env` 并执行 `git init`**，最后跑一遍四查自检（悬空 import、悬空组件标签、路由一致性、依赖一致性），出现 error 直接回滚生成物。
+
+  ```bash
+  # 一键指定配置：Rice UI + 多语言 + ECharts + 全部演示分包
+  pnpm create unibestx my-app -u rice-ui --features i18n,echarts --subs all
+
+  # 跳过提问，使用默认推荐配置
+  pnpm create unibestx my-app --yes
+
+  # 使用本地模板仓库（内网 / 离线）
+  pnpm create unibestx my-app --template /path/to/unibestX
+
+  # 对任意已有项目跑健康自检
+  pnpm create unibestx doctor ./my-app
+  ```
+
+  > 完整参数见 [create-unibestx 文档](https://www.npmjs.com/package/create-unibestx)。
+
+* **方式二：通过 `degit` 快速创建（无历史提交记录）**：
 
   ```bash
   # 主分支（main，默认 VDOM 模式，全面兼通 VDOM & Vapor）
@@ -33,7 +67,7 @@
   npx degit cq112233/unibestX#uniX-rice-ui my-project
   ```
 
-* **方式二：通过 `git clone` 克隆**：
+* **方式三：通过 `git clone` 克隆**：
 
   ```bash
   # GitHub
