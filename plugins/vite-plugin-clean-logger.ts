@@ -57,18 +57,29 @@ export default function cleanLoggerPlugin(options: CleanLoggerOptions = {}): Plu
   if (!isConsolePatched) {
     isConsolePatched = true;
 
+    // 告警正文与 `at 文件:行:列` 定位行走 console.warn，紧随其后的代码片段却走 console.log 且不带任何标记字符，
+    // 用该状态把两者串起来，否则告警正文被吞后只剩孤立的代码片段
+    let lastWasSuppressedWarn = false;
+
     const originalConsoleWarn = console.warn;
     console.warn = (...args: any[]) => {
       const str = args.map(a => (typeof a === 'string' ? a : (a?.message ?? a?.toString?.() ?? ''))).join(' ');
       if (shouldIgnore(str)) {
+        lastWasSuppressedWarn = true;
         return;
       }
+      lastWasSuppressedWarn = false;
       originalConsoleWarn.apply(console, args);
     };
 
-    const originalConsoleLog = console.log;
-    let lastWasSuppressedWarn = false;
+    const originalConsoleError = console.error;
+    console.error = (...args: any[]) => {
+      // 错误块必须原样放行，同时结束抑制状态：H5/Web 端错误块不带标记字符，残留状态会吞掉真错误的代码片段
+      lastWasSuppressedWarn = false;
+      originalConsoleError.apply(console, args);
+    };
 
+    const originalConsoleLog = console.log;
     console.log = (...args: any[]) => {
       const str = args.map(a => (typeof a === 'string' ? a : (a?.message ?? a?.toString?.() ?? ''))).join(' ');
 
@@ -91,8 +102,8 @@ export default function cleanLoggerPlugin(options: CleanLoggerOptions = {}): Plu
       }
 
       // 3. 紧跟在被拦截告警后的代码片段 Code Frame 格式（例如 "  2 | ..." 或 "> 4 | ..."）
+      // 不复位状态：同一帧的多行可能分多次打印，需整帧吞完，遇到非片段行再复位
       if (lastWasSuppressedWarn && /(?:^|\n)\s*(?:>\s*)?\d+\s*\|/.test(str)) {
-        lastWasSuppressedWarn = false;
         return;
       }
 
