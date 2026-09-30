@@ -122,12 +122,12 @@ function handleLogout() {
 }
 
 // 监听 Tab 切换到当前「我的」页（索引 1）时触发
-onTabShow(3, () => {
+onTabShow(1, () => {
   console.log('onTabShow 我 Tab 显示');
 }, true);
 
 // 监听我 Tab 页面显示（切 Tab、从子页面返回、前台恢复都会触发）
-onTabPageShow(3, () => {
+onTabPageShow(1, () => {
   console.log('onTabPageShow 我 Tab 显示');
 }, true);
 
