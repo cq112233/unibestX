@@ -14,16 +14,17 @@
 [![GitHub forks](https://img.shields.io/github/forks/cq112233/unibestX?style=flat&logo=github)](https://github.com/cq112233/unibestX)
 ![node version](https://img.shields.io/badge/node-%3E%3D22-green)
 ![pnpm version](https://img.shields.io/badge/pnpm-%3E%3D7.30-green)
+![HBuilderX version](https://img.shields.io/badge/HBuilderX-%3E%3D5.24-blue)
 ![GitHub package.json version](https://img.shields.io/github/package-json/v/cq112233/unibestX)
 ![unibest License](https://img.shields.io/github/license/cq112233/unibestX)
 
 </div>
 
-`unibestX` 由 **`uni-app X` + `Vue3` + `UTS` + `Vite5` + `Tailwind CSS`** 构成，采用下一代 uni-app 原生开发技术栈，通过 `HBuilderX` 一键运行到 **Android / iOS / 鸿蒙 / H5 / 微信小程序** 五大平台。
+`unibestX` 由 **`uni-app X` + `Vue3` + `UTS` + `Vite5` + `Tailwind CSS` + `z-paging-x`** 构成，采用下一代 uni-app 原生开发技术栈，通过 `HBuilderX` 一键运行到 **Android / iOS / 鸿蒙 / H5 / 微信小程序** 五大平台。
 
-内置 `自定义 TabBar`、`Layout 布局`、`请求封装`、`登录拦截`、`路由守卫`、`Tailwind CSS`、`主题切换`、`沙盒极速调试` 等基础能力，并提供 `代码提示`、`自动格式化`、`统一配置` 等辅助功能，让你编写 `uni-app X` 拥有 `best` 体验。
+内置 `自定义 TabBar`、`Layout 布局`、`请求封装`、`登录拦截`、`路由守卫`、`Tailwind CSS`、`i18n 多语言`、`主题切换`、`沙盒极速调试` 等基础能力，并提供 `代码提示`、`自动格式化`、`统一配置` 等辅助功能，让你编写 `uni-app X` 拥有 `best` 体验。
 
-🤖 **同时它也是一套「AI 原生」开发模板**：项目自带 **`unibestX-skill`**（「1 个入口 + 6 个分册」的 uni-app X / UTS 规范知识库），Claude Code、Codex 等 AI Agent 克隆即可直接按项目规范写代码、生成页面骨架、自动排查跨端编译报错；运行时亦内置 **AI 对话页**与 **SSE / Chunk 跨端流式传输**能力。详见 [🤖 AI 与 Skill 体系](#-ai-与-skill-体系)。
+🤖 **同时它也是一套「AI 原生」开发模板**：项目自带 **`unibestX-skill`**（「1 个入口 + 7 个分册」的 uni-app X / UTS 规范知识库），Claude Code、Codex 等 AI Agent 克隆即可直接按项目规范写代码、生成页面骨架、自动排查跨端编译报错；运行时亦内置 **AI 对话页**与 **SSE / Chunk 跨端流式传输**能力。详见 [🤖 AI 与 Skill 体系](#-ai-与-skill-体系)。
 
 | 👉 在线 H5 演示 | 📖 官方文档 | 🐙 GitHub | 🍊 Gitee 镜像 |
 | :---: | :---: | :---: | :---: |
@@ -42,43 +43,15 @@
 
 ---
 
-## ⚠️ 开始之前：三条必读提示
-
-> **1. HBuilderX 版本要求**
->
-> - 推荐 **HBuilderX 5.21 及以上**（全面支持三端 Vapor 蒸汽模式）；
-> - 最好升级至最新 **HBuilderX 5.24**，完整体验无虚拟 DOM 高性能原生渲染；
-> - 旧版本可切换 **VDOM 模式**（`manifest.json` 中 `"vapor": false`）稳定运行。
-> - 使用 CLI 命令（`pnpm dev:*`）前**必须先启动 HBuilderX**，CLI 本质是驱动正在运行的 HBuilderX 完成编译。
-
-> **2. 关于 UI 组件库与分支选择**
->
-> - **`main` 分支（默认）**：全面兼容 **VDOM** 与 **Vapor** 两种模式（**默认 Vapor 蒸汽模式**）。受限于个人精力，作者后续**不再对其维护与定制更新**。
-> - **`uniX-rice-ui` 分支（强烈推荐）**：集成 **Rice UI 官方组件库**，由官方团队持续维护迭代，同样完美支持 VDOM 与 Vapor 模式。新项目或需长期维护支持，建议优先选用。
->
-> ```bash
-> # 切换至 uniX-rice-ui 分支
-> git checkout uniX-rice-ui
-> ```
->
-> 四种组件库的完整对比见下方 [📦 推荐的 UI 组件库](#-推荐的-ui-组件库)。
-
-> **3. 当前分支是「基础模板」**
->
-> 本分支已移除**全部第三方 UI 组件库**与 **i18n 多语言**能力，`uni_modules` 仅保留 `lime-request`（请求底座）、`lime-dayuts`、`x-pinia-s` 与 `uni-icons`（TabBar 图标），适合作为新项目的干净起点。
-> 需要开箱即用的 UI 组件库时，请切换到 `uniX-rice-ui` 或 `uniX-uview-ultra` 分支。
-
----
-
 ## 📖 目录
 
+- [🚀 快速开始](#-快速开始)
+- [⚙️ 环境要求](#️-环境要求)
 - [✨ 特性](#-特性)
 - [📦 推荐的 UI 组件库](#-推荐的-ui-组件库)
 - [🤖 AI 与 Skill 体系](#-ai-与-skill-体系)
 - [📱 各端首页截图](#-各端首页截图)
 - [平台兼容性](#平台兼容性)
-- [🚀 快速开始](#-快速开始)
-- [⚙️ 环境要求](#️-环境要求)
 - [📁 项目结构](#-项目结构)
 - [🧩 核心功能说明](#-核心功能说明)
   - [内置工具库（src/utils）](#内置工具库srcutils)
@@ -92,6 +65,7 @@
   - [请求封装](#请求封装)
   - [文件上传](#文件上传)
   - [状态管理](#状态管理)
+  - [i18n 多语言](#i18n-多语言)
   - [Layout 布局](#layout-布局)
   - [H5 容器化部署 (Docker & Nginx)](#h5-容器化部署-docker--nginx)
 - [🗺️ 演进路线图](#️-演进路线图-roadmap)
@@ -101,116 +75,52 @@
 - [📄 License](#-license)
 - [💬 联系 & 交流](#-联系--交流)
 
----
-
-## ✨ 特性
-
-- 🚀 **uni-app X（Vapor 默认 + VDOM 兼容）** — 默认启用 **Vapor 蒸汽模式**（无虚拟 DOM 高性能原生渲染），同时全面兼容传统 VDOM 模式，可在 `manifest.json` 自由切换
-- 💪 **Vue3 + Vite5** — 最新前端技术栈，极速开发体验
-- 🎨 **Tailwind CSS** — 原子化 CSS 引擎（v4 + weapp-tailwindcss），全端通用，方括号任意值语法
-- 🏝️ **多策略 TabBar 体系** — 5 种运行策略 + 2 种视觉形态，支持角标徽标与全端主题联动
-- ⚡ **沙盒独立调试模式** — 大型项目本地开发只编译当前页面，秒级热更新，启动直达目标页
-- 🔧 **Pinia 持久化** — Vapor 走官方 Pinia，VDOM 走 `x-pinia-s`，按平台自动路由，开箱即用
-- 🛡️ **路由守卫** — 黑名单／白名单策略，灵活的登录拦截与登录后回跳
-- 🌈 **动态主题** — `theme.json` 单源色板，CSS 变量驱动的明暗主题切换
-- 🔌 **请求封装** — 基于 `lime-request`，支持多域名、Token 自动续期、SSE 流式传输
-- 📤 **文件上传** — 基于原生 `uni.uploadFile` 统一封装，支持 OSS 上传与进度回调
-- 🐳 **H5 Docker 极速部署** — 宿主机构建 + Nginx:alpine 轻量容器运行（~25MB，秒级打包），内置动态环境变量反代与 Hash 路由兜底
-- 🤖 **AI 原生开发模板** — 内置 `unibestX-skill`（1 入口 + 8 分册），AI Agent 克隆即可按项目规范写代码；运行时自带 AI 对话页与 SSE 流式传输
-
-## 📦 推荐的 UI 组件库
-
-`unibestX` 提供多分支与多种 UI 组件库选择，可根据项目架构与需求灵活选用：
-
-| 组件库 | 简介 | 推荐分支 / 官网 | 维护状态 |
-| :--- | :--- | :--- | :--- |
-| **Rice UI**（强烈推荐） | 专为 uni-app X 打造的现代 UI 组件库，**完美支持 Vapor 与 VDOM 模式无缝切换**，由 Rice UI 官方团队持续维护与技术支持。 | **`uniX-rice-ui` 分支** / [riceui.cn](https://riceui.cn/) | 团队持续维护与迭代 |
-| **uview-ultra** | 专为 uni-app X 打造的 UI 库，`uniX-uview-ultra` 分支内置作者深度修复版，已兼容 Vapor/VDOM。 | **`uniX-uview-ultra` 分支** / [uview-ultra.lingyun.net](https://uview-ultra.lingyun.net/) | 已停止后续维护与定制 |
-| **TMUI** | 功能丰富、高度可定制的企业级组件库，提供完善的业务组件和主题系统。 | [tmui.design](https://tmui.design/) | 社区维护 |
-| **Lime UI** | 社区活跃的 uni-app X 组件库，组件风格清新，覆盖常用移动端场景。 | [limex.qcoon.cn](https://limex.qcoon.cn/) | 社区维护 |
-
-> 💡 **选型建议**：需要开箱即用的 UI 组件库时，优先选 **`uniX-rice-ui`** 分支（官方团队持续维护）或 `uniX-uview-ultra` 分支；只想要干净骨架、自己搭 UI 时，直接用本 `base` 分支。
-
-## 🤖 AI 与 Skill 体系
-
-`unibestX` 不只是一个运行时的跨端模板，也是一套**为 AI Agent 准备充分**的开发模板：项目内直接内置了 uni-app X 领域知识库（`unibestX-skill`）与会话级开发规约，让 Claude Code、Codex 等 AI 工具**克隆后无需额外提示词，即可按项目既定规范产出代码**。
-
-### 1. `unibestX-skill` — 项目专属 uni-app X / UTS 规范库
-
-这是与项目强绑定的核心技能，也是仓库中**唯一保留的技能**，采用 **「1 个入口 + 6 个分册」** 结构，把 UTS 强类型约束、跨端样式限制与本项目的生产级写法沉淀成可被 AI 直接检索的知识库。
-
-| 分册 | 内容 |
-| :--- | :--- |
-| `SKILL.md`（入口，常驻） | 概述 + 分册导航 + A.1 快速对照表 + A.2 红线清单 |
-| `1-uts-syntax.md` | UTS 强类型系统与语法核心铁律（`UTS110111163` 等报错成因） |
-| `2-styling.md` | CSS & Tailwind 样式引擎与原生渲染限制 |
-| `3-runtime.md` | 跨端运行时与 VDOM / Vapor 渲染模式约束 |
-| `4-examples.md` | 5 个项目内生产级标杆案例（页面骨架、TabBar、二级详情页、滚动与下拉刷新） |
-| `5-codegen.md` | 代码生成流程与标准页面模板 |
-| `6-page-component-spec.md` | AI 页面层级与组件设计规范（页面高内聚、三级防过度拆分、容器与纯展示解耦、Mock 接口契约化） |
-
-**工作机制**：入口文件只常驻导航与红线清单，AI 命中条目后**必须继续读取对应分册**核对完整正反例才允许改代码。
-
-### 2. 任务分级门槛（原 superpowers-zh 框架已移除）
-
-本项目**不再内置 superpowers-zh 技能框架**——原先 20 个通用技能（`brainstorming`、`writing-plans`、`executing-plans`、`test-driven-development`、`systematic-debugging`、`verification-before-completion`、`requesting-code-review` 等）连同四份中文工程规约，已从 `.claude/skills/` 与 `.agents/skills/` 中**全部删除**，`unibestX-skill` 是仓库中唯一保留的技能。
-
-原先由框架承担的「需求澄清 → 计划 → 执行 → 验证」流程，改由 [CLAUDE.md](CLAUDE.md) / [AGENTS.md](AGENTS.md) 里的**任务复杂度分级门槛**替代，核心是「别为小改动跑重流程」：
-
-| 复杂度 | 典型场景 | 做法 |
-| :--- | :--- | :--- |
-| 第 1 级 | 单行修改、CSS 样式、文案、简单配置 | 主代理直接改 + 轻量验证，不派生代理、不建 worktree、不写单测 |
-| 第 2 级 | 单文件开发、独立 UI 页面、常规 Bug 修复 | 主代理直做；Bug 成因不明时先定位根因再改 |
-| 第 3 级 | 跨多文件重构、核心业务系统升级 | 先澄清需求 / 写计划文档，再分步实现 |
-
-**不因任务大小豁免的底线**：声称完成 / 已修复 / 测试通过之前，必须实际运行验证命令并确认输出。
-
-### 3. AI 开发规约文件
-
-| 文件 | 作用 |
-| :--- | :--- |
-| [CLAUDE.md](CLAUDE.md) | Claude Code 会话级规约（技能路由、内置工具优先复用、基础设施按既有配置走） |
-| [AGENTS.md](AGENTS.md) | 通用 AI Agent 规约（Codex 等） |
-| [.agents/rules/uniappx.md](.agents/rules/uniappx.md) | uni-app X 开发规范，编写 `.uvue` / `.uts` / `.ts` / `.scss` 前必读 |
-
-> 📌 技能目录有两份副本：`.claude/skills/`（Claude Code）与 `.agents/skills/`（其他 Agent），修改技能时需同步一致。
-
-### 4. 运行时的 AI 能力
-
-模板同时预置了 AI 应用所需的运行时能力，可直接作为 AI 类 App 的起点：
-
-- **跨端流式传输** — [src/http/stream.uts](src/http/stream.uts) 提供 SSE / Chunk 流式请求；[src/utils/rxjs-lite/](src/utils/rxjs-lite/) 提供轻量流式算子
-- **流式接口配置** — 通过 `.env` 的 `VITE_STREAM_URL` 指定
-
-> 📌 本分支已移除 AI 对话演示页与 Markdown 渲染组件（`mp-html` / `kux-marked`），流式底座完整保留，可直接用于自建 AI 应用。
-
-## 📱 各端首页截图
-
-<p align="center">
-  <img src="https://i.ibb.co/xS0ssKm9/wxxcx.png" width="19%" alt="微信小程序" />
-  <img src="https://i.ibb.co/cSJ8wPbn/android.png" width="19%" alt="Android" />
-  <img src="https://i.ibb.co/Fbzwbzsx/h5.png" width="19%" alt="H5" />
-  <img src="https://i.ibb.co/7dpytqFJ/ios.png" width="19%" alt="iOS" />
-  <img src="https://i.ibb.co/MxXrjGq9/hm.png" width="19%" alt="鸿蒙" />
-</p>
-
-<p align="center">
-  微信小程序 &nbsp;&nbsp;|&nbsp;&nbsp; Android &nbsp;&nbsp;|&nbsp;&nbsp; H5 &nbsp;&nbsp;|&nbsp;&nbsp; iOS &nbsp;&nbsp;|&nbsp;&nbsp; 鸿蒙
-</p>
-
-## 平台兼容性
-
-| Android | iOS | 鸿蒙 | H5 | 微信小程序 |
-| ------- | --- | --- | -- | ---------- |
-| √ | √ | √ | √ | √ |
-
-> 注意：uni-app X 目前兼容以上 5 个端平台，其他小程序平台暂不支持。
-
 ## 🚀 快速开始
 
 ### 1. 创建 / 克隆项目
 
-- **方式一：通过 `degit` 快速创建（推荐，不含历史提交记录）**：
+- **方式一：使用官方脚手架 `create-unibestx`（推荐）**：
+
+  脚手架基于本仓库的分支生成项目，可**交互式引导**或**一行命令**完成创建：
+
+  ```bash
+  # 交互式创建（推荐），逐步选择 UI 库、功能特性与演示分包
+  pnpm create unibestx my-app
+
+  # 免安装直接运行
+  npx create-unibestx my-app
+
+  # 全局安装（提供 bestx / unibestx / create-unibestx 三个等价命令）
+  npm i -g create-unibestx
+  bestx my-app
+  ```
+
+  相比手动克隆，脚手架额外完成这些事：
+
+  - **UI 组件库三选一**：Rice UI（官方持续维护）/ uview-ultra（内置修复版）/ 无 UI 库（原生组件 + Tailwind 纯净基线），也支持 `base` 极简模板；
+  - **功能按需裁剪**：多语言 i18n、ECharts 图表可勾选，登录鉴权与明暗主题为永久内置底座；
+  - **12 个演示分包按需保留**：默认全部裁掉，需要时用 `--subs` 逐个勾选或 `all` 全量保留；
+  - **收尾自动化**：重写 `package.json` 与 `.env`、执行 `git init`，并跑一遍四查自检（悬空 import、悬空组件标签、路由一致性、依赖一致性），出现 error 直接回滚生成物。
+
+  常用命令速查：
+
+  ```bash
+  # 一键指定配置：Rice UI + 多语言 + ECharts + 全部演示分包
+  pnpm create unibestx my-app -u rice-ui --features i18n,echarts --subs all
+
+  # 跳过提问，使用默认推荐配置
+  pnpm create unibestx my-app --yes
+
+  # 使用本地模板仓库（内网 / 离线，或在改动本仓库后立即验证生成结果）
+  pnpm create unibestx my-app --template /path/to/unibestX
+
+  # 对任意已有项目跑健康自检
+  pnpm create unibestx doctor ./my-app
+  ```
+
+  > 完整参数（`--ui` / `--features` / `--subs` / `--package-manager` / `--keep-unused-modules` 等）见 [create-unibestx 文档](https://www.npmjs.com/package/create-unibestx)。
+
+- **方式二：通过 `degit` 快速创建（不含历史提交记录）**：
 
   ```bash
   # 主分支（main，默认 Vapor 蒸汽模式，全面兼通 VDOM & Vapor）
@@ -220,7 +130,7 @@
   npx degit cq112233/unibestX#uniX-rice-ui my-project
   ```
 
-- **方式二：通过 `git clone` 克隆**：
+- **方式三：通过 `git clone` 克隆**：
 
   ```bash
   # GitHub
@@ -241,12 +151,14 @@
 pnpm install
 ```
 
+> 方式一的脚手架在生成时会询问「是否立即安装依赖」，已选择安装的项目可跳过本步。
+
 ### 3. 运行项目（支持热更新）
 
 支持 **命令行 CLI** 与 **HBuilderX 图形界面** 两种开发方式。
 
 > [!WARNING]
-> **使用 CLI 命令前，必须先启动 HBuilderX**（推荐 5.24+）。CLI 命令本质是通过正在运行的 HBuilderX 来编译运行项目，未打开时会报「未找到 HBuilderX」。App 端（Android / iOS / 鸿蒙）编译只能由 HBuilderX 完成。
+> **使用 CLI 命令前，必须先启动 HBuilderX**（需 **5.24 及以上**）。CLI 命令本质是通过正在运行的 HBuilderX 来编译运行项目，未打开时会报「未找到 HBuilderX」。App 端（Android / iOS / 鸿蒙）编译只能由 HBuilderX 完成。
 
 #### 🖥️ 方式一：命令行 CLI
 
@@ -361,13 +273,124 @@ pnpm check:uts-dts # 校验 UTS 类型声明是否为最新（CI 用）
 | :--- | :--- |
 | Node | >= 22 |
 | pnpm | >= 7.30 |
-| HBuilderX | >= 5.21（建议最新 **5.24**；旧版本可切 VDOM 模式运行） |
+| HBuilderX | **5.24 及以上**（App 端蒸汽模式必需；旧版本可切 VDOM 模式运行） |
 | Vue Official | >= 2.1.10 |
 | TypeScript | >= 5.0 |
 | JDK | >= 17（Android 平台） |
 | Android SDK | Android 平台 |
 | Xcode | iOS 平台，仅 macOS |
 | DevEco Studio | 鸿蒙平台 |
+
+---
+
+## ✨ 特性
+
+- 🚀 **uni-app X（Vapor 默认 + VDOM 兼容）** — 默认启用 **Vapor 蒸汽模式**（无虚拟 DOM 高性能原生渲染），同时全面兼容传统 VDOM 模式，可在 `manifest.json` 自由切换
+- 💪 **Vue3 + Vite5** — 最新前端技术栈，极速开发体验
+- 🎨 **Tailwind CSS** — 原子化 CSS 引擎（v4 + weapp-tailwindcss），全端通用，方括号任意值语法
+- 📦 **多分支 UI 选型** — `main` 分支为**无 UI 库纯净基线**（原生组件 + Tailwind CSS）；另有 `uniX-rice-ui`（Rice UI，官方团队持续维护）与 `uniX-uview-ultra`（内置深度修复版）两个开箱即用分支
+- 📜 **z-paging-x** — 强大的分页列表组件（已针对 Android 嵌套手势协商、Flex 布局与 `type="nested"` 深度适配）
+- 🏝️ **多策略 TabBar 体系** — 5 种运行策略 + 2 种视觉形态，支持角标徽标与全端主题联动
+- ⚡ **沙盒独立调试模式** — 大型项目本地开发只编译当前页面，秒级热更新，启动直达目标页
+- 🔧 **Pinia 持久化** — Vapor 走官方 Pinia，VDOM 走 `x-pinia-s`，按平台自动路由，开箱即用
+- 🌐 **i18n 多语言** — 内置中英文切换，支持自动检测系统语言
+- 🛡️ **路由守卫** — 黑名单／白名单策略，灵活的登录拦截与登录后回跳
+- 🌈 **动态主题** — `theme.json` 单源色板，CSS 变量驱动的明暗主题切换
+- 📊 **ECharts** — 图表组件支持
+- 🔌 **请求封装** — 基于 `lime-request`，支持多域名、Token 自动续期、SSE 流式传输
+- 📤 **文件上传** — 基于原生 `uni.uploadFile` 统一封装，支持 OSS 上传与进度回调
+- 🐳 **H5 Docker 极速部署** — 宿主机构建 + Nginx:alpine 轻量容器运行（~25MB，秒级打包），内置动态环境变量反代与 Hash 路由兜底
+- 🤖 **AI 原生开发模板** — 内置 `unibestX-skill`（1 入口 + 7 分册），AI Agent 克隆即可按项目规范写代码；运行时自带 AI 对话页与 SSE 流式传输
+- 🧰 **官方脚手架** — `pnpm create unibestx` 一键创建项目：UI 库三选一、功能与 12 个演示分包按需裁剪，生成后自动跑四查自检
+
+## 📦 推荐的 UI 组件库
+
+`unibestX` 提供多分支与多种 UI 组件库选择，可根据项目架构与需求灵活选用：
+
+| 组件库 | 简介 | 推荐分支 / 官网 | 维护状态 |
+| :--- | :--- | :--- | :--- |
+| **Rice UI**（强烈推荐） | 专为 uni-app X 打造的现代 UI 组件库，**完美支持 Vapor 与 VDOM 模式无缝切换**，由 Rice UI 官方团队持续维护与技术支持。 | **`uniX-rice-ui` 分支** / [riceui.cn](https://riceui.cn/) | 团队持续维护与迭代 |
+| **uview-ultra** | 专为 uni-app X 打造的 UI 库，`uniX-uview-ultra` 分支内置作者深度修复版，已兼容 Vapor/VDOM，基础功能基本够用。 | **`uniX-uview-ultra` 分支** / [uview-ultra.lingyun.net](https://uview-ultra.lingyun.net/) | 已停止后续维护与定制 |
+| **TMUI** | 功能丰富、高度可定制的企业级组件库，提供完善的业务组件和主题系统。 | [tmui.design](https://tmui.design/) | 社区维护 |
+| **Lime UI** | 社区活跃的 uni-app X 组件库，组件风格清新，覆盖常用移动端场景。 | [limex.qcoon.cn](https://limex.qcoon.cn/) | 社区维护 |
+
+> 💡 **选型建议**：新项目或需要长期维护支持，优先选 **`uniX-rice-ui`** 分支；只需基础组件可切 **`uniX-uview-ultra`** 分支（内置作者深度修复版）；**不想引入任何第三方 UI 组件库**就直接用 **`main`（默认分支）** —— 它是无 UI 库的纯净基线，原生组件 + Tailwind CSS 起步。
+
+## 🤖 AI 与 Skill 体系
+
+`unibestX` 不只是一个运行时的跨端模板，也是一套**为 AI Agent 准备充分**的开发模板：项目内直接内置了 uni-app X 领域知识库（`unibestX-skill`）与会话级开发规约，让 Claude Code、Codex 等 AI 工具**克隆后无需额外提示词，即可按项目既定规范产出代码**。
+
+### 1. `unibestX-skill` — 项目专属 uni-app X / UTS 规范库
+
+这是与项目强绑定的核心技能，也是仓库中**唯一保留的技能**，采用 **「1 个入口 + 7 个分册」** 结构，把 UTS 强类型约束、跨端样式限制与本项目的生产级写法沉淀成可被 AI 直接检索的知识库。
+
+| 分册 | 内容 |
+| :--- | :--- |
+| `SKILL.md`（入口，常驻） | 概述 + 分册导航 + A.1 快速对照表 + A.2 红线清单 |
+| `1-uts-syntax.md` | UTS 强类型系统与语法核心铁律（`UTS110111163` 等报错成因） |
+| `2-styling.md` | CSS & Tailwind 样式引擎与原生渲染限制 |
+| `3-runtime.md` | 跨端运行时与 VDOM / Vapor 渲染模式约束 |
+| `4-examples.md` | 5 个项目内生产级标杆案例（页面骨架、TabBar、二级详情页、滚动与下拉刷新） |
+| `5-codegen.md` | 代码生成流程与标准页面模板 |
+| `6-page-component-spec.md` | AI 页面层级与组件设计规范（页面高内聚、三级防过度拆分、容器与纯展示解耦、Mock 接口契约化） |
+| `7-api-spec.md` | API 接口层规范（一页一目录、契约类型用 `type`、Mock 数据集与接口函数同层、后端就绪只换函数体） |
+
+**工作机制**：入口文件只常驻导航与红线清单，AI 命中条目后**必须继续读取对应分册**核对完整正反例才允许改代码。
+
+### 2. 任务分级门槛（原 superpowers-zh 框架已移除）
+
+本项目**不再内置 superpowers-zh 技能框架**——原先 20 个通用技能（`brainstorming`、`writing-plans`、`executing-plans`、`test-driven-development`、`systematic-debugging`、`verification-before-completion`、`requesting-code-review` 等）连同四份中文工程规约，已从 `.claude/skills/` 与 `.agents/skills/` 中**全部删除**，`unibestX-skill` 是仓库中唯一保留的技能。
+
+原先由框架承担的「需求澄清 → 计划 → 执行 → 验证」流程，改由 [CLAUDE.md](CLAUDE.md) / [AGENTS.md](AGENTS.md) 里的**任务复杂度分级门槛**替代，核心是「别为小改动跑重流程」：
+
+| 复杂度 | 典型场景 | 做法 |
+| :--- | :--- | :--- |
+| 第 1 级 | 单行修改、CSS 样式、文案、简单配置 | 主代理直接改 + 轻量验证，不派生代理、不建 worktree、不写单测 |
+| 第 2 级 | 单文件开发、独立 UI 页面、常规 Bug 修复 | 主代理直做；Bug 成因不明时先定位根因再改 |
+| 第 3 级 | 跨多文件重构、核心业务系统升级 | 先澄清需求 / 写计划文档，再分步实现 |
+
+**不因任务大小豁免的底线**：声称完成 / 已修复 / 测试通过之前，必须实际运行验证命令并确认输出。
+
+### 3. AI 开发规约文件
+
+| 文件 | 作用 |
+| :--- | :--- |
+| [CLAUDE.md](CLAUDE.md) | Claude Code 会话级规约（技能路由、内置工具优先复用、基础设施按既有配置走） |
+| [AGENTS.md](AGENTS.md) | 通用 AI Agent 规约（Codex 等） |
+| [.agents/rules/uniappx.md](.agents/rules/uniappx.md) | uni-app X 开发规范，编写 `.uvue` / `.uts` / `.ts` / `.scss` 前必读 |
+
+> 📌 技能目录有两份副本：`.claude/skills/`（Claude Code）与 `.agents/skills/`（其他 Agent），修改技能时需同步一致。
+
+### 4. 运行时的 AI 能力
+
+模板同时预置了 AI 应用所需的运行时能力，可直接作为 AI 类 App 的起点：
+
+- **AI 对话页** — `src/pages/ai/`（含 TabBar 中间鼓包按钮入口 `AiView`）
+- **跨端流式传输** — [src/http/stream.uts](src/http/stream.uts) 提供 SSE / Chunk 流式请求；[src/utils/rxjs-lite/](src/utils/rxjs-lite/) 提供轻量流式算子，配套 `src/sub/rxjsDemo` 流式演示页
+- **Markdown 渲染** — 内置 `mp-html` 与 `kux-marked`，支持 Markdown 排版与代码块展示
+- **流式接口配置** — 通过 `.env` 的 `VITE_STREAM_URL` 指定（留空时演示页自动使用本地模拟流）
+
+## 📱 各端首页截图
+
+<p align="center">
+  <img src="https://i.ibb.co/xS0ssKm9/wxxcx.png" width="19%" alt="微信小程序" />
+  <img src="https://i.ibb.co/cSJ8wPbn/android.png" width="19%" alt="Android" />
+  <img src="https://i.ibb.co/Fbzwbzsx/h5.png" width="19%" alt="H5" />
+  <img src="https://i.ibb.co/7dpytqFJ/ios.png" width="19%" alt="iOS" />
+  <img src="https://i.ibb.co/MxXrjGq9/hm.png" width="19%" alt="鸿蒙" />
+</p>
+
+<p align="center">
+  微信小程序 &nbsp;&nbsp;|&nbsp;&nbsp; Android &nbsp;&nbsp;|&nbsp;&nbsp; H5 &nbsp;&nbsp;|&nbsp;&nbsp; iOS &nbsp;&nbsp;|&nbsp;&nbsp; 鸿蒙
+</p>
+
+## 平台兼容性
+
+| Android | iOS | 鸿蒙 | H5 | 微信小程序 |
+| ------- | --- | --- | -- | ---------- |
+| √ | √ | √ | √ | √ |
+
+> 注意：uni-app X 目前兼容以上 5 个端平台，其他小程序平台暂不支持。
 
 ## 📁 项目结构
 
@@ -377,12 +400,15 @@ unibestX/
 │   ├── vite-plugin-uni-pages.ts  #   自动文件路由插件（生成 pages.json / definePage 支持）
 │   ├── uni-layouts-plugin.ts     #   跨端 Layout 布局插件（default / empty / navbar）
 │   ├── vite-plugin-tabbar-views.ts # 单页 TabBar 脚手架与视图自动生成插件
+│   ├── vite-plugin-clean-logger.ts # 过滤编译期控制台噪音日志
+│   ├── vite-plugin-tailwind-hmr.ts # Tailwind 入口 CSS 变更的热更新加速
 │   └── root-plugin.ts            #   自动包裹 App.ku.uvue 全局根骨架组件
 ├── scripts/                      # 构建与环境切换脚本
 │   ├── build-h5.mjs              #   H5 打包（调用 HBuilderX cli publish）
 │   ├── switch-env.mjs            #   env:test / env:prod 环境切换
 │   ├── gen-uts-dts.mjs           #   UTS 类型声明生成与校验
 │   ├── check-tabbar-surface.mjs  #   TabBar 接口面校验
+│   └── router-guard-test/        #   路由守卫决策矩阵测试（node 直跑，无需测试框架）
 ├── Dockerfile                    # H5 生产部署轻量容器（nginx:alpine）
 ├── docker-compose.yml            # H5 容器编排服务（h5-test / h5-prod）
 ├── deploy/                       # 生产与测试部署配置
@@ -390,7 +416,7 @@ unibestX/
 │   ├── .env.test                 #   测试环境 Docker 变量配置
 │   └── .env.prod                 #   生产环境 Docker 变量配置
 ├── docs/                         # VitePress 文档站源码（guide/ 下为各专题）
-├── .claude/skills/               # AI 技能（Claude Code）：仅 unibestX-skill（1 入口 + 8 分册）
+├── .claude/skills/               # AI 技能（Claude Code）：仅 unibestX-skill（1 入口 + 7 分册）
 ├── .agents/                      # AI 技能与规约（其他 Agent）
 │   ├── skills/                   #   与 .claude/skills 一一对应的技能副本（仅 unibestX-skill），需保持同步
 │   └── rules/uniappx.md          #   uni-app X 开发规范（编写 .uvue/.uts 前必读）
@@ -399,19 +425,27 @@ unibestX/
 │   ├── api/                      # API 请求模块（foo.uts / user.uts / auth.uts 等）
 │   ├── assets/                   # 静态资源（图标、图片等）
 │   ├── components/               # 公共业务组件
-│   │   └── NavBar/               #   自定义通用导航栏组件
+│   │   ├── NavBar/               #   自定义通用导航栏组件
+│   │   ├── NestedScroll/         #   自研嵌套滚动组件
+│   │   └── TabbarMaskModal/      #   TabBar 遮罩弹层
 │   ├── http/                     # HTTP 客户端封装（基于 lime-request）
 │   │   ├── request.uts           #   HttpClient 核心类与拦截器
 │   │   ├── stream.uts            #   SSE / Chunk 流式请求封装
 │   │   ├── types.uts             #   HTTP 响应与请求类型定义
 │   │   └── tools/enum.uts        #   HTTP 状态码与业务枚举
+│   ├── i18n/                     # 国际化多语言
+│   │   ├── index.uts             #   i18n 实例与响应式切换
+│   │   └── locales/              #   中英文语言包（zh-Hans / en）
 │   ├── layouts/                  # 页面布局模板
 │   │   ├── default.uvue          #   默认页面布局
 │   │   ├── empty.uvue            #   空白全屏布局
 │   │   └── navbar.uvue           #   自定义导航栏布局（需配 navigationStyle: 'custom'）
 │   ├── pages/                    # 主包页面（TabBar 页面）
-│   │   ├── index/                #   首页
-│   │   └── me/                   #   个人中心
+│   │   ├── index/                #   首页（概览、常用入口）
+│   │   ├── basic/                #   基础组件与工具演示
+│   │   ├── function/             #   原生能力展示（设备、系统信息、扫码等）
+│   │   ├── ai/                   #   AI 助手对话演示
+│   │   └── me/                   #   个人中心与系统设置
 │   ├── router/                   # 路由守卫与导航控制
 │   │   ├── index.uts             #   路由模块统一出口
 │   │   ├── config.uts            #   页面登录白名单 / 黑名单策略
@@ -423,15 +457,27 @@ unibestX/
 │   │   ├── types.d.uts.ts        #   类型声明
 │   │   ├── vapor/                #   官方 Pinia 实现（App Vapor / H5 / Web / 小程序）
 │   │   │   ├── index.ts          #     Pinia 实例 + pinia-plugin-persistedstate
-│   │   │   ├── app.ts            #     应用全局状态（主题、外观模式等）
+│   │   │   ├── app.ts            #     应用全局状态（主题、语言等）
 │   │   │   ├── token.ts          #     Token 鉴权状态（单 / 双 Token 自动续期）
 │   │   │   └── user.ts           #     当前登录用户信息
 │   │   └── vdom/                 #   x-pinia-s 实现（App VDOM 原生端）
 │   │       ├── index.uts         #     Pinia 实例（UTS 强类型版）
 │   │       ├── app.uts / token.uts / user.uts
 │   ├── style/                    # 全局样式（Tailwind、变量等）
-│   ├── sub/                      # 应用分包页面（按需加载）
-│   │   └── auth/                 #   登录、注册
+│   ├── sub/                      # 应用分包页面（按需加载，13 个演示模块）
+│   │   ├── auth/                 #   登录、注册、找回密码
+│   │   ├── crypto/               #   加密解密演示
+│   │   ├── device/               #   原生设备能力
+│   │   ├── httpDemo/             #   HTTP 请求演示
+│   │   ├── layoutDemo/           #   Layout 布局示例
+│   │   ├── lodash/               #   UTS 版 Lodash
+│   │   ├── nested-scroll/        #   自研嵌套滚动
+│   │   ├── rxjsDemo/             #   rxjs 流式演示
+│   │   ├── tailwindcss/          #   weapp-tailwindcss 示例
+│   │   ├── test/                 #   页面间 URL 参数传递测试
+│   │   ├── time/                 #   时间日期操作
+│   │   ├── uiTest/               #   UI 测试与排版
+│   │   └── zpaging/              #   z-paging-x 分页列表各种场景
 │   ├── tabbar/                   # 底部 TabBar 体系
 │   │   ├── internal/             #   模块内部实现（不对消费者暴露，请走 index.uts 门面）
 │   │   │   ├── strategy.uts      #     策略枚举与模式判定
@@ -450,21 +496,28 @@ unibestX/
 │   │   └── types.uts             #   TabBar 强类型定义
 │   ├── types/                    # 全局 TypeScript / UTS 类型定义
 │   │   └── uni.d.ts              #   definePage 宏、Vue 宏与全局 API 类型补全
-│   └── utils/                    # 全局工具函数（9 个模块，统一走 index.uts 导出的对象）
+│   └── utils/                    # 全局工具函数（10 个模块，统一走 index.uts 导出的对象）
 │       ├── env/                  #   环境变量读取（getApiBaseUrl / getTabBarMode 等）
 │       ├── route/                #   取路由与路径工具
 │       ├── theme/                #   主题色与明暗模式工具
+│       ├── i18n/                 #   多语言辅助工具（t / $t）
 │       ├── toast/                #   全局 Toast 轻提示
 │       ├── systemInfo/           #   屏幕、安全区与系统信息
 │       ├── upload/               #   文件上传封装（OSS 上传、进度回调）
 │       ├── backPress/            #   Android 物理返回键双击退出
 │       ├── refresh/              #   下拉刷新与滚动事件联动
 │       └── rxjs-lite/            #   轻量流式处理工具
-├── uni_modules/                  # uni-app 扩展插件模块（4 个）
-│   ├── lime-request/             #   HTTP 请求核心库（src/http 依赖）
-│   ├── lime-dayuts/              #   时间日期处理（dayjs 封装）
+├── uni_modules/                  # uni-app 扩展插件模块（39 个）
+│   ├── z-paging-x/               #   深度优化适配的分页组件
+│   ├── unix-crypto/              #   跨端加密解密库（AES/DES/RSA/MD5/SHA/HMAC/Base64/UUID）
+│   ├── unix-router-guard/        #   路由守卫底层插件
 │   ├── x-pinia-s/                #   UTS 版 Pinia（VDOM 模式使用）
-│   └── uni-icons/                #   uni-app 官方字体图标组件（TabBar 图标）
+│   ├── iRainna-lodash/           #   UTS 版 Lodash 工具库
+│   ├── lime-request/             #   HTTP 请求核心库
+│   ├── lime-i18n/                #   国际化核心库
+│   ├── lime-signature/           #   手写签名板组件
+│   ├── e-chart/                  #   ECharts 图表适配组件
+│   └── ...                       #   其他官方 / 三方 uni_modules（UI 组件库请按分支选型：Rice UI / uview-ultra）
 ├── js_sdk/                       # JS / UTS SDK 资源
 ├── App.ku.uvue                   # 全局根包裹组件（动态主题注入、全局 Toast 容器）
 ├── main.uts                      # 应用主入口文件
@@ -473,10 +526,13 @@ unibestX/
 ├── pages.config.json             # ⭐ 页面路由与全局配置（路由与页面配置请改这里）
 ├── pages.json                    # ⚠️ 自动生成的页面路由表（编译产物，请勿手动编辑）
 ├── manifest.json                 # 应用配置清单（多端 AppID、权限、vapor 开关等）
-├── vite.config.ts                # Vite 构建配置（Tailwind 与 4 个自定义插件）
+├── vite.config.ts                # Vite 构建配置（Tailwind 与 5 个自定义插件）
 ├── uni.scss                      # 全局 SCSS 变量与主题注入
 └── tsconfig.json                 # TypeScript / UTS 编译配置
 ```
+
+> [!WARNING]
+> **请勿覆盖内置的定制组件**。`uni_modules/` 下的 [z-paging-x.uvue](uni_modules/z-paging-x/components/z-paging-x/z-paging-x.uvue) 等组件都已由作者做了**深度定制修改与修复**（针对 Android 原生嵌套手势协商、`type="nested"` 架构支持、Flex 布局及各端 CSS 解析限制等）。**请勿直接从官方插件市场重新下载覆盖**，否则多端兼容性与手势机制可能失效。
 
 ---
 
@@ -503,6 +559,7 @@ import { sys } from '@/src/utils/systemInfo/index.uts';
 | `systemInfo/` | 屏幕尺寸、安全区、导航栏 / TabBar 高度（响应式 `computed`） | `windowWidth` `windowHeight` `screenWidth` `screenHeight` `statusBarHeight` `navBarHeight` `tabBarHeight` `safeAreaBottom` `availableHeight` `menuRect` `updateSystemInfo()` `getScrollHeight()`；实例 `sys` |
 | `theme/` | 主题色与明暗模式：读取、应用、监听 | `themeColor` `isDarkMode(mode)` `getThemeTokens(isDark)` `getRootThemeStyle()` `applyThemeColor(color)` `applyThemeMode(mode, isDark)` `applyNavbarTheme(isDark)` `watchThemeChange(cb)`；实例 `theme` |
 | `toast/` | 全局轻提示（统一风格，替代裸 `uni.showToast`） | `toast(msg)` `toastSuccess(msg)` `toastError(msg)` `toastWarning(msg)` `toastPrimary(msg)` `showToast(options)`；实例 `toastUtils` |
+| `i18n/` | 非 Vue 环境下的多语言文案与导航栏 / TabBar 文案设置 | `t(key, named)` `$t(key, named)` `getI18nText(key)` `setTabbarItem()` `setNavigationBarTitle(key)`；实例 `i18nUtils` |
 | `refresh/` | 下拉刷新、滚动到底、导航栏标题与可见性、状态栏可见性的跨端联动 | `onNavbarPageScroll(cb)` `onNavbarReachBottom(cb)` `onNavbarPullDownRefresh(cb)` `stopNavbarPullDownRefresh()` `setNavbarTitle(t)` `setNavbarVisible(v)` `setHideNavbar(h)` `setHideStatusBar(h)` `isPageScrollDisabled` `isPageRefresherDisabled`；实例 `refresh` |
 | `backPress/` | Android 物理返回键双击退出 | `handleBackPressExit(): boolean` |
 | `upload/` | 文件上传（OSS 上传、进度回调、多后端返回格式兼容） | `uploadFile(options)` `uploadOssFile(filePath)` 类型 `UploadFileOptions`；实例 `upload` |
@@ -568,8 +625,9 @@ pnpm env:prod    # 删除 .env.production.local → 恢复生产环境
    ```html
    <script setup lang="uts">
    definePage({
+     layout: 'navbar',
      style: {
-       navigationBarTitleText: 'CircleProgress 圆形进度条',
+       navigationBarTitleText: '基础',
        navigationStyle: 'custom'
      }
    })
@@ -581,9 +639,10 @@ pnpm env:prod    # 删除 .env.production.local → 恢复生产环境
 
    ```json
    {
-     "path": "src/sub/demo/demo",
+     "path": "src/pages/basic/basic",
+     "layout": "navbar",
      "style": {
-       "navigationBarTitleText": "示例页面",
+       "navigationBarTitleText": "基础",
        "navigationStyle": "custom"
      }
    }
@@ -800,7 +859,7 @@ src/tabbar/config.uts (唯一样本源)
 
 ### 主题切换（暗黑模式）
 
-内置三种外观模式：`auto`（跟随系统）/ `light`（浅色）/ `dark`（深色）。状态由 `src/store/` 的 `appStore.state.themeMode` 承载，可通过 `appStore.setThemeMode('auto' | 'light' | 'dark')` 切换。
+内置三种外观模式：`auto`（跟随系统）/ `light`（浅色）/ `dark`（深色）。入口位于「基础」页的主题切换卡片（`src/pages/basic/components/ThemeSwitchCard.uvue`），状态管理在 `src/store/`。
 
 **各端跟随机制：**
 
@@ -916,6 +975,15 @@ src/store/index.uts  (门面：唯一转发层)
 >
 > ⚠️ **重导出红线**：同一顶层符号（`useAppStore` / `useTokenStore` / `useUserStore`）只允许在 `src/store/index.uts` 这一层门面 `export *` 转发，层层转发会让 UTS 在 Android 端生成 `useXxxStore__1` 重名符号并导致运行期 `NoSuchMethodError`。详见该文件头部注释。
 
+### i18n 多语言
+
+基于 `lime-i18n` 的国际化方案：
+
+- 内置中文（zh-CN）和英文（en-US）
+- 自动检测系统语言，也可通过 `.env` 的 `VITE_DEFAULT_LOCALE` 指定默认语言
+- 支持 VSCode i18n-ally 插件
+- 非 Vue 文件中也可通过 `src/utils/i18n/index.uts` 的 `t()` / `$t()` 使用翻译函数
+
 ### Layout 布局
 
 通过 `plugins/uni-layouts-plugin.ts` 实现：
@@ -957,7 +1025,7 @@ pnpm docker:down
 | **M1** | **🔐 登录适配器体系** | 微信登录（小程序一键手机号/授权、App 原生 OpenSDK 授权、H5 网页授权/扫码）、钉钉免登、统一 Auth 策略抽象与自动路由拦截 | 全端通用 | **P0** | 🚧 架构就绪，落地推进中 |
 | **M2** | **💳 跨端统一支付中心** | 微信支付（小程序/App/JSAPI/H5）、支付宝支付（App/H5/网页收银台）、统一收银台 UI、订单真实状态轮询服务 | 全端通用 | **P1** | 📝 规划完成 |
 | **M3** | **🤖 AI-Agent 智能体套件** | SSE / Chunk 跨端流式传输、打字机平滑缓冲、Markdown 富文本解析与代码高亮、多轮对话容器与上下文管理 | 全端通用 | **P1** | 📝 规划完成 |
-| **M4** | **💬 WebSocket 实时通信与 IM** | 企业级 SocketClient（心跳保活/退避重连/离线消息队列/Ack）、聊天记录分页加载、多媒体消息收发 | 全端通用 | **P2** | 📝 规划完成 |
+| **M4** | **💬 WebSocket 实时通信与 IM** | 企业级 SocketClient（心跳保活/退避重连/离线消息队列/Ack）、z-paging 聊天交互、多媒体消息收发 | 全端通用 | **P2** | 📝 规划完成 |
 | **M5** | **📹 实时音视频通话 (RTC)** | 双向呼叫信令系统、通话状态机、全屏视频通话 UI（大小画中画自由切换、前后置摄像头切换、静音控制） | App / 小程序 / H5 | **P2** | 📝 规划完成 |
 
 <details>
@@ -998,7 +1066,7 @@ pnpm docker:down
   - **平滑打字机缓冲区 (Typewriter Buffer)**：动态计算输出速率，消除大段成块刷新的生硬感；
   - 支持随时中止生成（Abort / 停止回答）。
 - **高性能 Markdown 渲染与代码高亮**
-  - 自研 Markdown 解析核心，支持标题、列表、表格、引用等排版；
+  - 依托定制适配好的 `mp-html` 解析核心，完美支持 Markdown 标题、列表、表格、引用等排版；
   - 代码块卡片化展示：语言识别、暗色背景、一键快速复制代码；
   - 深度适配系统深色模式（Dark Mode）。
 - **智能体对话容器**
@@ -1014,7 +1082,7 @@ pnpm docker:down
   - **离线消息缓冲队列**：连接未建立时的发送请求自动入队，连接建立后有序自动出队补发；
   - **可靠消息机制**：内置消息唯一 ID 与 Ack 回执确认。
 - **完整 IM 聊天页面演示**
-  - 聊天记录向上平滑加载历史消息（位置不跳动）；
+  - 集成 `z-paging-x` 实现聊天记录向上平滑加载历史消息（位置不跳动）；
   - 丰富消息类型：文本、图片（全屏预览大图）、语音条、系统提示条；
   - 多功能扩展盘（拍照、相册选图并联动统一上传模块发送）。
 
@@ -1046,9 +1114,13 @@ pnpm docker:down
 | 前端框架 | Vue 3 | ^3.5.13 | Composition API |
 | 构建工具 | Vite | 5.2.8 | 极速开发体验 |
 | CSS 引擎 | Tailwind CSS | ^4.3.3 | v4 + weapp-tailwindcss 5.5.2，方括号任意值语法 |
+| UI 组件库 | 多分支选型 | — | `main` 分支无内置 UI 库（原生组件 + Tailwind）；`uniX-rice-ui` 集成 Rice UI（官方维护）、`uniX-uview-ultra` 内置深度修复版 uview-ultra |
+| 分页组件 | z-paging-x | 内置定制版 | 强大的下拉刷新 + 分页加载 |
 | 状态管理 | Pinia / x-pinia-s | ^3.0.4 / — | Vapor・Web・小程序走官方 Pinia；App VDOM 走 x-pinia-s |
 | HTTP 请求 | lime-request | — | uni-app X 兼容请求库 |
-| 图标 | uni-icons | — | uni-app 官方字体图标组件（TabBar 图标） |
+| 国际化 | lime-i18n | — | vue-i18n 兼容方案 |
+| 图表 | e-chart | — | ECharts for uni-app X |
+| 图标 | uni-icons + lime-icon | — | 双图标方案 |
 | 文档站 | VitePress | ^1.6.4 | `docs/` 目录 |
 
 ## ⚠️ UTS 开发注意事项
