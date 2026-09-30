@@ -54,7 +54,7 @@ function refreshData(): void {
   console.log('我的页面刷新中...');
   setTimeout(() => {
     // 门控检查：若刷新完成时用户已切到其他 Tab 则忽略
-    if (curIdx.value != 1) {
+    if (curIdx.value != 3) {
       return;
     }
     console.log('我的页面刷新成功');
@@ -65,13 +65,16 @@ function refreshData(): void {
 
 // 监听 navbar 自定义下拉刷新事件（在 enablePullDownRefresh: true 且处于当前 Tab 时生效）
 onNavbarPullDownRefresh(() => {
-  if (curIdx.value == 1) {
+  if (curIdx.value == 3) {
     refreshData();
   }
 });
 
 const userStore = useUserStore();
 const tokenStore = useTokenStore();
+
+/** 本视图所属的「我的」页面路由：退出登录后固定回到此页（该页无需登录，未登录态自身渲染） */
+const ME_PAGE_PATH: string = '/src/pages/me/me';
 
 // 计算头像
 const avatarUrl = computed((): string => {
@@ -112,16 +115,17 @@ function handleLogout() {
           title: '退出登录成功',
           icon: 'success'
         });
-        // 退出后跳回首页（me 页需要登录，不能停留）
+        // 退出后留在「我的」页面（me 页无需登录，未登录态自身渲染）
+        // 统一走 switchTabbar 回到本页：mode 4 只切激活索引不跳路由，mode 0-3 按各自策略 switchTab / redirectTo
         setTimeout(() => {
-          switchTabbar('/src/pages/index/index');
+          switchTabbar(ME_PAGE_PATH);
         }, 0);
       }
     }
   });
 }
 
-// 监听 Tab 切换到当前「我的」页（索引 1）时触发
+// 监听 Tab 切换到当前功能页（索引 3）时触发
 onTabShow(1, () => {
   console.log('onTabShow 我 Tab 显示');
 }, true);
