@@ -73,6 +73,9 @@ onNavbarPullDownRefresh(() => {
 const userStore = useUserStore();
 const tokenStore = useTokenStore();
 
+/** 本视图所属的「我的」页面路由：退出登录后固定回到此页（该页无需登录，未登录态自身渲染） */
+const ME_PAGE_PATH: string = '/src/pages/me/me';
+
 // 计算头像
 const avatarUrl = computed((): string => {
   if (userStore.state.userInfo.avatar.length > 0) {
@@ -112,9 +115,10 @@ function handleLogout() {
           title: '退出登录成功',
           icon: 'success'
         });
-        // 退出后跳回首页（me 页需要登录，不能停留）
+        // 退出后留在「我的」页面（me 页无需登录，未登录态自身渲染）
+        // 统一走 switchTabbar 回到本页：mode 4 只切激活索引不跳路由，mode 0-3 按各自策略 switchTab / redirectTo
         setTimeout(() => {
-          switchTabbar('/src/pages/index/index');
+          switchTabbar(ME_PAGE_PATH);
         }, 0);
       }
     }

@@ -85,7 +85,7 @@ const sliderWidthPercent = computed<number>((): number => {
   return 100 / tabbarList.length;
 });
 
-/** 动态滑块平移动画样式 */
+/** 动态滑块平移动画样式（transition 声明在静态类里，此处只下发 transform） */
 const sliderStyle = computed<UTSJSONObject>((): UTSJSONObject => {
   const widthPct = sliderWidthPercent.value;
   const offsetPct = curIdx.value * 100;
@@ -169,12 +169,9 @@ const bottom = computed(() => {
       :style="{ height: `${height + bottomOffset * 2 + safeAreaBottom}px` }"
     />
 
-    <!-- 悬浮胶囊底座主容器（按下整体微弹变大，松开弹性缩回） -->
+    <!-- 悬浮胶囊底座主容器 -->
     <view
       class="custom-capsule-container"
-      hover-class="capsule-container-active"
-      :hover-start-time="0"
-      :hover-stay-time="120"
       :style="{
         bottom: `${bottom}px`,
         height: `${height}px`,
@@ -182,7 +179,7 @@ const bottom = computed(() => {
         borderColor: tabBorderColor
       }"
     >
-      <!-- 动态滑动滑块：在各 Tab 底部平滑移动 (Animated Slider Pill) -->
+      <!-- 滑动滑块：在各 Tab 底部平滑移动 (Animated Slider Pill) -->
       <view class="capsule-slider-track">
         <view class="capsule-slider" :style="sliderStyle">
           <view class="capsule-slider-pill" :style="{ backgroundColor: activeItemBgColor, opacity: activeItemBgOpacity }" />
@@ -262,16 +259,6 @@ const bottom = computed(() => {
   border-radius: 34px;
   /* 轻量弱阴影，避免在原生 Android 端阴影重绘掉帧 */
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-  /* 按下微弹变大，松开弹性缩回（类 iOS 灵动触感） */
-  transform: scale(1);
-  transition-property: transform;
-  transition-duration: 200ms;
-  transition-timing-function: cubic-bezier(0.25, 1, 0.5, 1);
-}
-
-/* 按下时整体胶囊底座微弹放大 */
-.capsule-container-active {
-  transform: scale(1.03);
 }
 
 /* 动态滑块滑动轨道（与外层 4px 6px padding 区域对齐） */
@@ -286,7 +273,7 @@ const bottom = computed(() => {
   flex-direction: row;
 }
 
-/* 动态滑块单元（负责平移动画：在静态 CSS 中声明硬件加速过渡） */
+/* 滑块单元（负责平移动画：在静态 CSS 中声明硬件加速过渡，禁止挪进动态 :style） */
 .capsule-slider {
   width: 25%;
   height: 100%;
