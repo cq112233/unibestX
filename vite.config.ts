@@ -41,7 +41,7 @@ const weappTailwindcssPlugins = WeappTailwindcss(
     componentLocalStyles: {
       enabled: true,
       onlyWhenStyleIsolationVersion2: true,
-      componentMatcher: id => /(?:^|[/\\])src[/\\](?:pages|sub)[/\\].*?components(?:[/\\].+)?\.(?:uvue|nvue)$/.test(id)
+      componentMatcher: id => /(?:^|[/\\])src[/\\](?:pages|sub|components)[/\\].*?\.(?:uvue|nvue)$/.test(id)
     },
     uvueUnsupported: 'warn'
   })
