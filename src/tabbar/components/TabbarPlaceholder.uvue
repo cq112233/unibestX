@@ -1,0 +1,28 @@
+<template>
+  <!-- 底部 TabBar 统一自适应垫高占位组件：根据 VITE_TABBAR_MODE、TabBar 风格形态及机型屏幕安全区动态垫高 -->
+  <view
+    v-if="shouldRender"
+    class="w-full"
+    :style="{ height: `${tabbarBottomPaddingHeight}px` }"
+  />
+</template>
+
+<script setup lang="uts">
+import { computed } from 'vue';
+import { needTabbarBottomPadding, tabbarBottomPaddingHeight } from '@/src/tabbar/index.uts';
+
+const props = defineProps({
+  /** 当前宿主页面是否属于 TabBar 页面（默认 true；在通用布局 navbar.uvue 中可动态传入 :is-tabbar-page="isTabbarPage"） */
+  isTabbarPage: {
+    type: Boolean,
+    default: true
+  }
+});
+
+/** 是否满足渲染垫高占位块的条件 */
+const shouldRender = computed((): boolean => {
+  return props.isTabbarPage && needTabbarBottomPadding && tabbarBottomPaddingHeight.value > 0;
+});
+</script>
+
+<style scoped></style>
