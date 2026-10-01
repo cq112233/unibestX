@@ -26,9 +26,13 @@
     "docker:down": "docker compose down",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
+    "lint:style": "stylelint \"src/**/*.{css,scss,vue,uvue}\" \"*.{css,scss,vue,uvue}\" --cache",
+    "lint:style:fix": "stylelint \"src/**/*.{css,scss,vue,uvue}\" \"*.{css,scss,vue,uvue}\" --fix --cache",
+    "lint:all": "pnpm lint && pnpm lint:style",
     "gen:uts-dts": "node scripts/gen-uts-dts.mjs",
     "check:uts-dts": "node scripts/gen-uts-dts.mjs --check",
-    "sandbox:reset": "node scripts/reset-sandbox.mjs"
+    "sandbox:reset": "node scripts/reset-sandbox.mjs",
+    "prepare": "husky"
   },
   "dependencies": {
     "@dcloudio/uni-app": "3.0.0-5020420260813002",
@@ -44,6 +48,8 @@
     "vue": "^3.5.13"
   },
   "devDependencies": {
+    "@commitlint/cli": "^19.8.1",
+    "@commitlint/config-conventional": "^19.8.1",
     "@dcloudio/hbuilderx-cli": "^1.2.0",
     "@dcloudio/types": "^3.4.31",
     "@tailwindcss/postcss": "^4.3.3",
@@ -52,9 +58,18 @@
     "@uni-helper/uni-app-types": "^1.0.1",
     "eslint": "^9.39.4",
     "eslint-plugin-format": "^1.5.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.5.2",
+    "postcss-html": "^2.0.0",
     "sass": "^1.63.2",
     "sass-loader": "10.4.1",
+    "stylelint": "^17.15.0",
+    "stylelint-config-standard-scss": "^17.0.0",
+    "stylelint-config-standard-vue": "^2.0.0",
+    "stylelint-order": "^8.1.1",
     "tailwindcss": "^4.3.3",
+    "typescript": "~5.8.3",
+    "vue-tsc": "^3.3.11",
     "weapp-tailwindcss": "5.5.11"
   },
   "pnpm": {
@@ -69,5 +84,13 @@
       "@vue/shared": "^3.5.13",
       "vue": "^3.5.13"
     }
+  },
+  "lint-staged": {
+    "**/*.{js,jsx,ts,tsx,uts,vue,uvue,mjs,cjs,json,md}": [
+      "eslint --fix"
+    ],
+    "**/*.{css,scss,vue,uvue}": [
+      "stylelint --fix"
+    ]
   }
 }

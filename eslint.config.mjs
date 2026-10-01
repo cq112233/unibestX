@@ -1,4 +1,5 @@
 import uniHelper from '@uni-helper/eslint-config';
+import { pluginUts } from './plugins/eslint-plugin-uts.mjs';
 
 const composer = uniHelper({
   stylistic: {
@@ -220,8 +221,32 @@ for (const config of configs) {
 }
 
 configs.push({
+  files: ['**/*.uts', '**/*.uvue'],
+  plugins: {
+    uts: pluginUts
+  },
+  rules: {
+    // UTS 强类型系统与原生规范（仅作用于 .uts 与 .uvue）
+    'uts/no-interface': 'error',
+    'uts/no-undefined': 'error',
+    'uts/no-map-keys-call': 'error',
+    'uts/no-exported-object-functions': 'error',
+    'uts/prefer-double-equals': 'off',
+
+    // UVUE 模板平台规范校验（Vapor 模式优先，提示 VDOM 兼容性差异）
+    'uts/uvue-no-view-text-color': 'warn',
+    'uts/uvue-no-button-flex': 'warn',
+    'uts/uvue-no-gap-and-space': 'warn',
+    'uts/uvue-no-font-mono': 'warn',
+    'uts/uvue-no-items-baseline': 'warn',
+    'uts/uvue-prefer-hex-color': 'warn'
+  }
+});
+
+configs.push({
   files: ['**/*.vue', '**/*.uvue', '**/*.uts', '**/*.ts', '**/*.js'],
   rules: {
+
     'eqeqeq': 'off',
     'vue/eqeqeq': 'off',
     'ts/consistent-type-definitions': 'off',
