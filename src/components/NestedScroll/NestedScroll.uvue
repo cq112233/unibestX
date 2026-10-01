@@ -1,9 +1,9 @@
 <template>
-  <view class="nested-scroll-container flex-1 flex flex-col w-full relative">
+  <view class="nested-scroll-container">
     <!-- 粘性吸顶头部区域：当启用 affix-header 或使用 #affix 插槽时在顶部吸附展示 -->
     <view
       v-if="hasAffixSlot || (affixHeader && hasHeaderSlot)"
-      class="nested-affix-bar w-full z-10 shrink-0"
+      class="nested-affix-bar"
     >
       <slot v-if="hasAffixSlot" name="affix" />
       <slot v-else name="header" />
@@ -11,7 +11,7 @@
 
     <!-- 核心滚动容器：采用 list-view 原生高性能回收复用组件（Android RecyclerView / iOS UITableView），从根本上杜绝残影 -->
     <list-view
-      class="flex-1 flex flex-col w-full"
+      class="nested-list-view"
       :scroll-top="scrollTop"
       :scroll-with-animation="innerScrollWithAnimation"
       :show-scrollbar="showScrollbar"
@@ -37,11 +37,11 @@
       <!-- 空数据状态：仅在 empty 为 true 且不在加载中/刷新中时展示 -->
       <list-item v-if="empty && !loading && !innerRefreshing" type="empty">
         <slot v-if="hasEmptySlot" name="empty" />
-        <view v-else class="py-[48px] items-center justify-center flex flex-col">
-          <text class="text-[36px] mb-[8px]">📭</text>
+        <view v-else class="nested-empty-wrap">
+          <text class="nested-empty-icon">📭</text>
           <text
-            class="text-[13px]"
-            :class="isDark ? 'text-[#64748b]' : 'text-[#94a3b8]'"
+            class="nested-empty-text"
+            :class="{ 'nested-empty-text--dark': isDark }"
           >
             {{ emptyText }}
           </text>
@@ -53,7 +53,7 @@
         v-if="!empty && enableLoadMore && (loading || error || finished)"
         type="footer"
       >
-        <view class="py-[16px] items-center justify-center flex flex-row w-full">
+        <view class="nested-footer-wrap">
           <template v-if="hasFooterSlot">
             <slot
               name="footer"
@@ -68,8 +68,8 @@
               <slot v-if="hasLoadingSlot" name="loading" />
               <text
                 v-else
-                class="text-[12px] font-medium"
-                :class="isDark ? 'text-[#94a3b8]' : 'text-[#64748b]'"
+                class="nested-footer-loading-text"
+                :class="{ 'nested-footer-loading-text--dark': isDark }"
               >
                 {{ loadingText }}
               </text>
@@ -78,11 +78,11 @@
             <!-- 加载失败重试 -->
             <template v-else-if="error">
               <slot v-if="hasErrorSlot" name="error" />
-              <view v-else class="flex flex-row items-center" @click="handleRetry">
-                <text class="text-[12px] text-[#ef4444] font-medium mr-[4px]">
+              <view v-else class="nested-retry-wrap" @click="handleRetry">
+                <text class="nested-retry-error-text">
                   {{ errorText }}
                 </text>
-                <text class="text-[12px] text-[#4f46e5] font-bold">
+                <text class="nested-retry-action-text">
                   点击重试
                 </text>
               </view>
@@ -93,8 +93,8 @@
               <slot v-if="hasFinishedSlot" name="finished" />
               <text
                 v-else
-                class="text-[12px]"
-                :class="isDark ? 'text-[#475569]' : 'text-[#cbd5e1]'"
+                class="nested-finished-text"
+                :class="{ 'nested-finished-text--dark': isDark }"
               >
                 {{ finishedText }}
               </text>
@@ -108,7 +108,7 @@
       <view
         v-if="hasRefresherSlot"
         slot="refresher"
-        class="nested-refresher-wrap w-full flex flex-row items-center justify-center"
+        class="nested-refresher-wrap"
         :style="{ width: `${windowWidth}px` }"
       >
         <slot name="refresher" :refreshing="innerRefreshing" />
@@ -118,7 +118,7 @@
       <list-item
         v-if="hasRefresherSlot"
         slot="refresher"
-        class="nested-refresher-wrap w-full flex flex-row items-center justify-center"
+        class="nested-refresher-wrap"
         :style="{ width: `${windowWidth}px` }"
       >
         <slot name="refresher" :refreshing="innerRefreshing" />
@@ -136,8 +136,8 @@
       <slot v-if="hasBackToTopSlot" name="backToTop" />
       <view
         v-else
-        class="w-[42px] h-[42px] rounded-full items-center justify-center flex flex-row border-[1px] border-solid"
-        :class="isDark ? 'bg-[#1e293b] border-[#334155]' : 'bg-white border-[#e2e8f0]'"
+        class="nested-back-to-top-btn"
+        :class="{ 'nested-back-to-top-btn--dark': isDark }"
       >
         <uni-icons type="top" size="20" :color="isDark ? '#cbd5e1' : '#475569'" />
       </view>
@@ -440,22 +440,128 @@ defineExpose({
 });
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .nested-scroll-container {
   width: 100%;
   height: 100%;
   position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
+
 .nested-header-wrap {
   width: 100%;
 }
+
 .nested-affix-bar {
   width: 100%;
+  z-index: 10;
+  flex-shrink: 0;
 }
+
+.nested-list-view {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.nested-empty-wrap {
+  padding-top: 48px;
+  padding-bottom: 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.nested-empty-icon {
+  font-size: 36px;
+  margin-bottom: 8px;
+}
+
+.nested-empty-text {
+  font-size: 13px;
+  color: #94a3b8;
+
+  &--dark {
+    color: #64748b;
+  }
+}
+
+.nested-footer-wrap {
+  width: 100%;
+  padding-top: 16px;
+  padding-bottom: 16px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.nested-footer-loading-text {
+  font-size: 12px;
+  font-weight: 500;
+  color: #64748b;
+
+  &--dark {
+    color: #94a3b8;
+  }
+}
+
+.nested-retry-wrap {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.nested-retry-error-text {
+  font-size: 12px;
+  font-weight: 500;
+  color: #ef4444;
+  margin-right: 4px;
+}
+
+.nested-retry-action-text {
+  font-size: 12px;
+  font-weight: bold;
+  color: #4f46e5;
+}
+
+.nested-finished-text {
+  font-size: 12px;
+  color: #cbd5e1;
+
+  &--dark {
+    color: #475569;
+  }
+}
+
 .nested-back-to-top {
   position: absolute;
   z-index: 99;
 }
+
+.nested-back-to-top-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 9999px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  border-width: 1px;
+  border-style: solid;
+  border-color: #e2e8f0;
+  background-color: #ffffff;
+
+  &--dark {
+    background-color: #1e293b;
+    border-color: #334155;
+  }
+}
+
 .nested-refresher-wrap {
   width: 100%;
   display: flex;
@@ -463,6 +569,7 @@ defineExpose({
   align-items: center;
   justify-content: center;
 }
+
 /* #ifdef MP-WEIXIN */
 :deep(.wx-scroll-view-refresher) {
   width: 100% !important;

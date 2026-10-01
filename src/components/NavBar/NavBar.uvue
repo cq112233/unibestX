@@ -1,8 +1,9 @@
 <template>
-  <view v-if="isNavbarVisible" class="w-full">
+  <view v-if="isNavbarVisible" class="navbar-wrapper">
     <!-- 导航栏外层容器 -->
     <view
-      :class="fixed ? 'w-full flex flex-col fixed top-0 left-0 right-0 z-[999]' : 'w-full flex flex-col'"
+      class="navbar-bar"
+      :class="{ 'navbar-bar--fixed': fixed }"
       :style="{
         backgroundColor: effectiveBgColor,
         borderBottomWidth: (border && isNavbarVisible) ? '1px' : '0px',
@@ -11,41 +12,48 @@
       }"
     >
       <!-- 安全区域：状态栏占位高度 -->
-      <view v-if="!hideStatusBar" class="status-bar" :style="{ height: `${statusBarHeight}px` }">
+      <view v-if="!hideStatusBar" class="navbar-status-bar" :style="{ height: `${statusBarHeight}px` }">
         <slot name="statusBar"></slot>
       </view>
 
       <!-- 导航栏内容区 -->
-      <view class="relative w-full flex flex-row items-center justify-center" :style="{ height: `${NAVBAR_CONTENT_HEIGHT}px` }">
+      <view class="navbar-content" :style="{ height: `${NAVBAR_CONTENT_HEIGHT}px` }">
         <!-- 左侧返回按钮区域 -->
-        <view class="absolute top-0 bottom-0 left-0 z-10 w-[60px] flex flex-row items-center justify-start">
+        <view class="navbar-left">
           <slot name="left">
-            <view v-if="showBack" class="flex flex-row items-center justify-center py-[10px] px-[15px]" @click="handleBack">
-              <view class="h-[10px] w-[10px] border-t-0 border-r-0 border-b-[2px] border-l-[2px] border-solid" :style="{ borderLeftColor: effectiveTitleColor, borderBottomColor: effectiveTitleColor, transform: 'rotate(45deg)' }"></view>
+            <view v-if="showBack" class="navbar-back-btn" @click="handleBack">
+              <view
+                class="navbar-back-icon"
+                :style="{
+                  borderLeftColor: effectiveTitleColor,
+                  borderBottomColor: effectiveTitleColor,
+                  transform: 'rotate(45deg)'
+                }"
+              ></view>
             </view>
           </slot>
         </view>
 
         <!-- 中间标题区域 -->
-        <view class="flex h-full flex-1 flex-row items-center justify-center pl-[60px] pr-[60px]">
+        <view class="navbar-mid">
           <slot name="mid">
             <slot>
-              <text v-if="title.length > 0" class="text-[17px] font-semibold text-ellipsis" :style="{ color: effectiveTitleColor }">{{ title }}</text>
+              <text v-if="title.length > 0" class="navbar-title" :style="{ color: effectiveTitleColor }">{{ title }}</text>
             </slot>
           </slot>
         </view>
 
         <!-- 右侧操作栏区域 -->
-        <view class="absolute top-0 bottom-0 right-0 z-10 w-[60px] flex flex-row items-center justify-end pr-[15px]">
+        <view class="navbar-right">
           <slot name="right"></slot>
         </view>
       </view>
     </view>
 
     <!-- 占位垫高块：当固定在顶部时防内容遮挡 -->
-    <view v-if="fixed && placeholder" :style="{ height: `${(hideStatusBar ? 0 : statusBarHeight) + (isNavbarVisible ? NAVBAR_CONTENT_HEIGHT : 0)}px` }"></view>
+    <view v-if="fixed && placeholder" class="navbar-placeholder" :style="{ height: `${(hideStatusBar ? 0 : statusBarHeight) + (isNavbarVisible ? NAVBAR_CONTENT_HEIGHT : 0)}px` }"></view>
   </view>
-  <view v-else-if="!hideStatusBar" class="status-bar" :style="{ height: `${statusBarHeight}px` }"></view>
+  <view v-else-if="!hideStatusBar" class="navbar-status-bar" :style="{ height: `${statusBarHeight}px` }"></view>
 </template>
 
 <script setup lang="uts">
@@ -143,4 +151,104 @@ function handleBack() {
 }
 </script>
 
-<style></style>
+<style lang="scss" scoped>
+.navbar-wrapper {
+  width: 100%;
+}
+
+.navbar-bar {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+
+  &--fixed {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 999;
+  }
+}
+
+.navbar-status-bar {
+  width: 100%;
+}
+
+.navbar-content {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.navbar-left {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 10;
+  width: 60px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.navbar-back-btn {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 15px;
+}
+
+.navbar-back-icon {
+  width: 10px;
+  height: 10px;
+  border-top-width: 0px;
+  border-right-width: 0px;
+  border-bottom-width: 2px;
+  border-left-width: 2px;
+  border-style: solid;
+}
+
+.navbar-mid {
+  display: flex;
+  height: 100%;
+  flex: 1;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  padding-left: 60px;
+  padding-right: 60px;
+}
+
+.navbar-title {
+  font-size: 17px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  /* #ifndef APP */
+  white-space: nowrap;
+  /* #endif */
+}
+
+.navbar-right {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  z-index: 10;
+  width: 60px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 15px;
+}
+
+.navbar-placeholder {
+  width: 100%;
+}
+</style>

@@ -1,13 +1,13 @@
 <template>
   <!-- 应用全局骨架与皮肤容器，通过 CSS 变量绑定响应式主题色 / 暗黑模式 -->
   <view
-    class="root-container flex flex-col flex-1"
+    class="root-container"
     style="flex: 1; display: flex; flex-direction: column;"
     :class="{ dark: appStore.state.isDark }"
     :style="themeStyle"
   >
     <!-- 页面内容滚动容器 -->
-    <scroll-view direction="vertical" class="flex-1" style="flex: 1;">
+    <scroll-view direction="vertical" class="root-scroll-view" style="flex: 1;">
       <slot></slot>
     </scroll-view>
     <!-- 自定义 TabBar：根据 config.uts 中的 type 配置切换形态（胶囊或标准底座） -->
@@ -212,6 +212,13 @@ uni.$on('setHideNavbar', (hide: any) => {
 
 <style lang="scss" scoped>
 .root-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
   background-color: var(--bg-color, #f5f6fa);
+}
+
+.root-scroll-view {
+  flex: 1;
 }
 </style>

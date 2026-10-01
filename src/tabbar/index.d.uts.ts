@@ -51,7 +51,7 @@ export declare function notifyPageHide(): void;
  * 1. 切换 Tab 到该页（curIdx 变化）——与 onTabShow 相同；
  * 2. 页面重新显示（原生 onShow：从子页面返回、App 回前台）——onTabShow 覆盖不到。
  *
- * @param index 对应 Tab 索引（0: 首页, 1: 基础, 2: 功能, 3: 我的）
+ * @param index 对应 Tab 索引（0: 首页, 1: 我的）
  * @param callback 页面显示时的回调函数
  * @param immediate 若注册时页面已经显示过且当前 Tab 正好激活，是否立即补发一次
  *                  （首次进入页面时不会再重复触发：那一次由紧随其后的 onShow 通知负责）
@@ -75,6 +75,14 @@ export declare const isVersionGte525: ComputedRef<boolean>;
 
 /** 占位块高度：统一为 50 + 底部安全区，占据正常文档流防止遮挡滚动内容 */
 export declare const tabbarPlaceholderHeight: ComputedRef<number>;
+
+/**
+ * 动态计算底部自定义/单页 TabBar 实际占用的真实垫高（px，响应式自适应 TabBar 风格、鼓包及机型安全区）
+ * - 若无需垫高（模式 0 无TabBar 或模式 1 原生TabBar）：返回 0
+ * - 胶囊形态 (capsule)：胶囊高度 64 + 底部偏移 12 + 底部安全区 safeAreaBottom（+ 4px 微小缓冲间距）
+ * - 标准底座形态 (default)：若有鼓包/midButton 为 80 + safeAreaBottom，普通为 50 + safeAreaBottom
+ */
+export declare const tabbarBottomPaddingHeight: ComputedRef<number>;
 
 /**
  * 隐藏系统原生 TabBar 并根据编译器版本动态适配 H5 底部容器
@@ -122,7 +130,7 @@ export declare function isPageTabbar(path: string): boolean;
 
 /**
  * 监听指定 Tab 激活显示（当单页面模式切换到该 Tab 时触发，可用于刷新数据或重新请求接口）
- * @param index 对应 Tab 索引（0: 首页, 1: 基础, 2: 功能, 3: 我的）
+ * @param index 对应 Tab 索引（0: 首页, 1: 我的）
  * @param callback 激活显示时的回调函数
  * @param immediate 若首次加载时当前 Tab 正好处于激活状态，是否立即执行一次（默认 false）
  */
@@ -170,6 +178,12 @@ export declare const tabbarType: string;
 
 /** 是否启用了自定义 TabBar（模式 2 或 3 为 true）——根组件 App.ku.uvue 用它决定是否渲染 <Tabbar> */
 export declare const customTabbarEnable: boolean;
+
+/** 是否需要为底部自定义/单页 TabBar 预留底部内边距（模式 2、3、4 底部有浮动 TabBar 需预留 80px，模式 0 和 1 不需要） */
+export declare const needTabbarBottomPadding: boolean;
+
+/** 底部 TabBar 统一预留内边距类名：自定义/单页 TabBar 时返回 'pb-[80px]'，无 TabBar 或原生 TabBar 时返回 '' */
+export declare const tabbarBottomPaddingClass: string;
 
 /** badge 类型：数字或小红点 */
 export type CustomTabBarItemBadge = number | 'dot';
