@@ -240,7 +240,9 @@ configs.push({
     'uts/uvue-no-font-mono': 'warn',
     'uts/uvue-no-items-baseline': 'warn',
     'uts/uvue-prefer-hex-color': 'warn',
-    'uts/uvue-no-important-modifier': 'error'
+    'uts/uvue-no-important-modifier': 'error',
+    // 启用 UVUE/Vue 模板未导入组件检测与一键快速修复导入（Code Action 自动导入）
+    'uts/auto-import-component': 'warn'
   }
 });
 
@@ -254,102 +256,8 @@ configs.push({
     '@typescript-eslint/consistent-type-definitions': 'off',
     'style/comma-dangle': ['error', 'never'],
     'vue/comma-dangle': ['error', 'never'],
-    'vue/no-undef-components': [
-      'warn',
-      {
-        ignorePatterns: [
-          // 基础内容
-          'text',
-          'rich-text',
-          'progress',
-          'icon',
-
-          // 视图容器
-          'view',
-          'scroll-view',
-          'swiper',
-          'swiper-item',
-          'match-media',
-          'movable-area',
-          'movable-view',
-          'cover-view',
-          'cover-image',
-          'root-portal',
-
-          // uni-app X 原生高性能列表与流式组件
-          'list-view',
-          'list-item',
-          'sticky-header',
-          'sticky-section',
-          'waterflow',
-          'flow-item',
-          'nested-scroll-header',
-          'nested-scroll-body',
-          'refresh-box',
-          'refresh-header',
-          'custom-refresher-box',
-
-          // 表单组件
-          'button',
-          'checkbox',
-          'checkbox-group',
-          'editor',
-          'form',
-          'input',
-          'label',
-          'picker',
-          'picker-view',
-          'picker-view-column',
-          'radio',
-          'radio-group',
-          'slider',
-          'switch',
-          'textarea',
-
-          // 导航与页面元信息
-          'navigator',
-          'page-meta',
-          'navigation-bar',
-
-          // 媒体组件
-          'audio',
-          'camera',
-          'image',
-          'video',
-          'live-player',
-          'live-pusher',
-
-          // 地图、画布与网页
-          'map',
-          'canvas',
-          'web-view',
-
-          // 广告与开放能力
-          'ad',
-          'ad-custom',
-          'open-data',
-
-          // Vue 内置虚拟与容器组件
-          'slot',
-          'template',
-          'component',
-          'transition',
-          'transition-group',
-          'keep-alive',
-          'teleport',
-
-          // easycom UI 库与通用组件通配符
-          'up-*',
-          'u-*',
-          'z-paging-x',
-          'z-paging',
-          'lime-*',
-          'iRainna-*',
-          'NavBar',
-          'nav-bar'
-        ]
-      }
-    ]
+    // 替换为支持快速修复导入的 uts/auto-import-component 规则
+    'vue/no-undef-components': 'off'
   },
   languageOptions: {
     globals: {

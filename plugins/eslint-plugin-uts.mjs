@@ -5,6 +5,8 @@
  * 1. 满足 Vue 3 Vapor 蒸汽模式与 Kotlin/Swift 原生强类型规范（报错拦截）
  * 2. 对 VDOM 模式特有的渲染差异提供友好兼容性提示（警告提示）
  */
+import fs from 'node:fs';
+import path from 'node:path';
 
 /** 辅助函数：从 VElement 或 AST 节点中获取 class 属性字符串 */
 function getClassValues(node) {
@@ -496,6 +498,293 @@ export const pluginUts = {
                 });
                 match = importantPattern.exec(text);
               }
+            }
+          }
+        });
+      }
+    },
+
+    /** 8. UVUE/Vue 模板中未导入组件自动检测与一键快速修复导入 (Code Action 自动导入) */
+    'auto-import-component': {
+      meta: {
+        type: 'suggestion',
+        docs: {
+          description: '检测 UVUE/Vue 模板中未导入的自定义组件，并在 VS Code 快速修复（小灯泡）中提供点击一键自动导入选项'
+        },
+        hasSuggestions: true,
+        messages: {
+          undefComponent: '组件 \'<{{name}}>\' 尚未导入',
+          undefNoCandidate: '组件 \'<{{name}}>\' 尚未定义或导入'
+        }
+      },
+      create(context) {
+        if (!context.sourceCode.parserServices?.defineTemplateBodyVisitor) {
+          return {};
+        }
+
+        const filename = context.filename || context.getFilename?.() || '';
+        if (!filename.endsWith('.vue') && !filename.endsWith('.uvue')) {
+          return {};
+        }
+
+        // 收集 script 中已定义的标识符与导入
+        const definedNames = new Set();
+
+        // 收集自身组件名（避免递归引用自身报错）
+        const basename = path.basename(filename, path.extname(filename));
+        definedNames.add(basename);
+
+        const ast = context.sourceCode.ast;
+        let lastImportNode = null;
+
+        if (ast && ast.body) {
+          for (const stmt of ast.body) {
+            if (stmt.type === 'ImportDeclaration') {
+              lastImportNode = stmt;
+              for (const spec of stmt.specifiers || []) {
+                if (spec.local && spec.local.name) {
+                  definedNames.add(spec.local.name);
+                }
+              }
+            }
+            else if (stmt.type === 'VariableDeclaration') {
+              for (const decl of stmt.declarations || []) {
+                if (decl.id && decl.id.name) {
+                  definedNames.add(decl.id.name);
+                }
+              }
+            }
+            else if (stmt.type === 'FunctionDeclaration' && stmt.id?.name) {
+              definedNames.add(stmt.id.name);
+            }
+            else if (stmt.type === 'ClassDeclaration' && stmt.id?.name) {
+              definedNames.add(stmt.id.name);
+            }
+          }
+        }
+
+        // 查找 <script setup> 标签位置
+        const rawSource = context.sourceCode.text;
+        const scriptSetupMatch = /<script(?:\s[^>]*)?\ssetup(?:\s[^>]*)?>/i.exec(rawSource);
+
+        // 忽略的内置/基础/uni-app/Vue 原生标签
+        const defaultIgnore = new Set([
+          'view',
+          'scroll-view',
+          'swiper',
+          'swiper-item',
+          'match-media',
+          'movable-area',
+          'movable-view',
+          'cover-view',
+          'cover-image',
+          'root-portal',
+          'list-view',
+          'list-item',
+          'sticky-header',
+          'sticky-section',
+          'waterflow',
+          'flow-item',
+          'nested-scroll-header',
+          'nested-scroll-body',
+          'refresh-box',
+          'refresh-header',
+          'custom-refresher-box',
+          'text',
+          'rich-text',
+          'progress',
+          'icon',
+          'button',
+          'checkbox',
+          'checkbox-group',
+          'editor',
+          'form',
+          'input',
+          'label',
+          'picker',
+          'picker-view',
+          'picker-view-column',
+          'radio',
+          'radio-group',
+          'slider',
+          'switch',
+          'textarea',
+          'navigator',
+          'page-meta',
+          'navigation-bar',
+          'audio',
+          'camera',
+          'image',
+          'video',
+          'live-player',
+          'live-pusher',
+          'map',
+          'canvas',
+          'web-view',
+          'ad',
+          'ad-custom',
+          'open-data',
+          'slot',
+          'template',
+          'component',
+          'transition',
+          'transition-group',
+          'keep-alive',
+          'teleport'
+        ]);
+
+        const projectRoot = process.cwd();
+
+        function toPascalCase(str) {
+          return str.replace(/(?:^|[-_])(\w)/g, (_, c) => c.toUpperCase());
+        }
+
+        // 查找候选组件文件（全工程 src 目录递归检索）
+        function findCandidates(rawName) {
+          const candidates = [];
+          const seen = new Set();
+
+          function addCandidate(filePath) {
+            if (fs.existsSync(filePath) && !seen.has(filePath)) {
+              seen.add(filePath);
+              const rel = `@/${path.relative(projectRoot, filePath).replace(/\\/g, '/')}`;
+              candidates.push({ filePath, importPath: rel });
+            }
+          }
+
+          const pascalName = toPascalCase(rawName);
+
+          // 1. 优先检查当前文件同目录或其 components 子目录（就近原则）
+          const currentDir = path.dirname(filename);
+          addCandidate(path.join(currentDir, 'components', `${rawName}.uvue`));
+          addCandidate(path.join(currentDir, 'components', `${rawName}.vue`));
+          addCandidate(path.join(currentDir, 'components', `${pascalName}.uvue`));
+          addCandidate(path.join(currentDir, 'components', `${pascalName}.vue`));
+          addCandidate(path.join(currentDir, 'components', rawName, `${rawName}.uvue`));
+          addCandidate(path.join(currentDir, 'components', pascalName, `${pascalName}.uvue`));
+          addCandidate(path.join(currentDir, `${rawName}.uvue`));
+          addCandidate(path.join(currentDir, `${pascalName}.uvue`));
+
+          // 2. 检查 src/components/
+          addCandidate(path.join(projectRoot, 'src/components', rawName, `${rawName}.uvue`));
+          addCandidate(path.join(projectRoot, 'src/components', pascalName, `${pascalName}.uvue`));
+          addCandidate(path.join(projectRoot, 'src/components', rawName, `${rawName}.vue`));
+          addCandidate(path.join(projectRoot, 'src/components', pascalName, `${pascalName}.vue`));
+          addCandidate(path.join(projectRoot, 'src/components', `${rawName}.uvue`));
+          addCandidate(path.join(projectRoot, 'src/components', `${pascalName}.uvue`));
+          addCandidate(path.join(projectRoot, 'src/components', `${rawName}.vue`));
+          addCandidate(path.join(projectRoot, 'src/components', `${pascalName}.vue`));
+
+          // 3. 全局扫描 src 目录下的所有 .uvue 与 .vue 文件（支持全项目任意子目录组件，如 src/tabbar/ui/...）
+          const srcDir = path.join(projectRoot, 'src');
+          if (fs.existsSync(srcDir)) {
+            const allFiles = [];
+            function walk(dir) {
+              try {
+                const entries = fs.readdirSync(dir, { withFileTypes: true });
+                for (const entry of entries) {
+                  if (entry.isDirectory()) {
+                    if (!['node_modules', 'unpackage', 'dist', '.git'].includes(entry.name)) {
+                      walk(path.join(dir, entry.name));
+                    }
+                  }
+                  else if (entry.name.endsWith('.uvue') || entry.name.endsWith('.vue')) {
+                    allFiles.push(path.join(dir, entry.name));
+                  }
+                }
+              }
+              catch {}
+            }
+            walk(srcDir);
+
+            for (const filePath of allFiles) {
+              if (seen.has(filePath))
+                continue;
+              const ext = path.extname(filePath);
+              const base = path.basename(filePath, ext);
+              const parentDir = path.basename(path.dirname(filePath));
+
+              // 文件名精确或 PascalCase 匹配
+              if (base === rawName || base === pascalName || base.toLowerCase() === rawName.toLowerCase() || base.toLowerCase() === pascalName.toLowerCase()) {
+                addCandidate(filePath);
+                continue;
+              }
+
+              // 目录名匹配（如 TabbarItem/index.uvue）
+              if (parentDir === rawName || parentDir === pascalName || parentDir.toLowerCase() === rawName.toLowerCase() || parentDir.toLowerCase() === pascalName.toLowerCase()) {
+                if (base === 'index' || base === rawName || base === pascalName) {
+                  addCandidate(filePath);
+                  continue;
+                }
+              }
+
+              // 组件内容定义匹配 name: 'rawName'
+              try {
+                const content = fs.readFileSync(filePath, 'utf-8');
+                if (new RegExp(`name\\s*:\\s*['"]${rawName}['"]`, 'i').test(content)) {
+                  addCandidate(filePath);
+                }
+              }
+              catch {}
+            }
+          }
+
+          return candidates;
+        }
+
+        return context.sourceCode.parserServices.defineTemplateBodyVisitor({
+          VElement(node) {
+            const rawName = node.rawName;
+            if (!rawName)
+              return;
+
+            // 基础标签与已知标签跳过
+            if (defaultIgnore.has(rawName))
+              return;
+
+            // 纯小写 HTML 标签跳过（非自定义组件）
+            if (/^[a-z]+$/.test(rawName))
+              return;
+
+            // easycom 库前缀组件跳过
+            if (/^(?:uni|up|u|lime|iRainna|z-paging)-/i.test(rawName))
+              return;
+
+            // 已定义/已导入组件跳过
+            if (definedNames.has(rawName))
+              return;
+
+            // 查找候选组件
+            const candidates = findCandidates(rawName);
+
+            if (candidates.length > 0) {
+              const suggestions = candidates.map(c => ({
+                desc: `导入组件: import ${rawName} from '${c.importPath}'`,
+                fix(fixer) {
+                  if (lastImportNode) {
+                    return fixer.insertTextAfter(lastImportNode, `\nimport ${rawName} from '${c.importPath}';`);
+                  }
+                  if (scriptSetupMatch) {
+                    const insertPos = scriptSetupMatch.index + scriptSetupMatch[0].length;
+                    return fixer.insertTextAfterRange([insertPos, insertPos], `\nimport ${rawName} from '${c.importPath}';\n`);
+                  }
+                  return null;
+                }
+              }));
+
+              context.report({
+                node: node.startTag,
+                messageId: 'undefComponent',
+                data: { name: rawName },
+                suggest: suggestions
+              });
+            }
+            else {
+              context.report({
+                node: node.startTag,
+                messageId: 'undefNoCandidate',
+                data: { name: rawName }
+              });
             }
           }
         });

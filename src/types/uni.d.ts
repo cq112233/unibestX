@@ -259,6 +259,17 @@ declare global {
 }
 
 declare module '*.uts';
-declare module '*.uvue';
+declare module '*.uvue' {
+  const component: import('vue').DefineComponent<{}, {}, any>;
+  export default component;
+}
+
+declare module '@vue/runtime-core' {
+  export interface GlobalComponents {
+    A1: typeof import('../components/A1/A1.uvue')['default'];
+    NavBar: typeof import('../components/NavBar/NavBar.uvue')['default'];
+    TabbarMaskModal: typeof import('../components/TabbarMaskModal/TabbarMaskModal.uvue')['default'];
+  }
+}
 
 export {};
