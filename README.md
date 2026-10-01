@@ -266,9 +266,9 @@ pnpm lint:fix       # ESLint 自动修复
 pnpm lint:style     # Stylelint 样式检查（支持 SCSS / CSS / UVUE <style>）
 pnpm lint:style:fix # Stylelint 样式自动修复
 pnpm lint:all       # 全量代码与样式校验（ESLint + Stylelint）
+pnpm docs:dev       # 本地启动 VitePress 文档站
 pnpm gen:uts-dts    # 生成 UTS 类型声明（.d.uts.ts）
 pnpm check:uts-dts  # 校验 UTS 类型声明是否为最新（CI 用）
-pnpm sandbox:reset  # 一键还原所有页面的沙盒独立调试标记（debug/debugHome 还原为 false）
 ```
 
 ## ⚙️ 环境要求
