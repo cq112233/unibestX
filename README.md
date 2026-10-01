@@ -24,7 +24,7 @@
 
 内置 `自定义 TabBar`、`Layout 布局`、`请求封装`、`登录拦截`、`路由守卫`、`Tailwind CSS`、`i18n 多语言`、`主题切换`、`沙盒极速调试` 等基础能力，并提供 `代码提示`、`自动格式化`、`统一配置` 等辅助功能，让你编写 `uni-app X` 拥有 `best` 体验。
 
-🤖 **同时它也是一套「AI 原生」开发模板**：项目自带 **`unibestX-skill`**（「1 个入口 + 7 个分册」的 uni-app X / UTS 规范知识库），Claude Code、Codex 等 AI Agent 克隆即可直接按项目规范写代码、生成页面骨架、自动排查跨端编译报错；运行时亦内置 **AI 对话页**与 **SSE / Chunk 跨端流式传输**能力。详见 [🤖 AI 与 Skill 体系](#-ai-与-skill-体系)。
+🤖 **同时它也是一套「AI 原生」开发模板**：项目自带 **`unibestX-skill`**（「1 个入口 + 8 个分册」的 uni-app X / UTS 规范知识库），Claude Code、Codex 等 AI Agent 克隆即可直接按项目规范写代码、生成页面骨架、自动排查跨端编译报错；运行时亦内置 **AI 对话页**与 **SSE / Chunk 跨端流式传输**能力。详见 [🤖 AI 与 Skill 体系](#-ai-与-skill-体系)。
 
 | 👉 在线 H5 演示 | 📖 官方文档 | 🐙 GitHub | 🍊 Gitee 镜像 |
 | :---: | :---: | :---: | :---: |
@@ -68,6 +68,7 @@
   - [i18n 多语言](#i18n-多语言)
   - [Layout 布局](#layout-布局)
   - [H5 容器化部署 (Docker & Nginx)](#h5-容器化部署-docker--nginx)
+  - [代码规范与 Git 提交拦截 (Husky · Stylelint · Commitlint)](#代码规范与-git-提交拦截-husky--stylelint--commitlint)
 - [🗺️ 演进路线图](#️-演进路线图-roadmap)
 - [🔧 技术栈详情](#-技术栈详情)
 - [⚠️ UTS 开发注意事项](#️-uts-开发注意事项)
@@ -250,11 +251,14 @@ pnpm docker:down
 #### 其他常用脚本
 
 ```bash
-pnpm lint          # ESLint 检查
-pnpm lint:fix      # ESLint 自动修复
-pnpm docs:dev      # 本地启动 VitePress 文档站
-pnpm gen:uts-dts   # 生成 UTS 类型声明（.d.uts.ts）
-pnpm check:uts-dts # 校验 UTS 类型声明是否为最新（CI 用）
+pnpm lint           # ESLint 检查（含 UTS 强类型与 UVUE 模板规则）
+pnpm lint:fix       # ESLint 自动修复
+pnpm lint:style     # Stylelint 样式检查（支持 SCSS / CSS / UVUE <style>）
+pnpm lint:style:fix # Stylelint 样式自动修复
+pnpm lint:all       # 全量代码与样式校验（ESLint + Stylelint）
+pnpm docs:dev       # 本地启动 VitePress 文档站
+pnpm gen:uts-dts    # 生成 UTS 类型声明（.d.uts.ts）
+pnpm check:uts-dts  # 校验 UTS 类型声明是否为最新（CI 用）
 ```
 
 ## ⚙️ 环境要求
@@ -290,7 +294,8 @@ pnpm check:uts-dts # 校验 UTS 类型声明是否为最新（CI 用）
 - 🔌 **请求封装** — 基于 `lime-request`，支持多域名、Token 自动续期、SSE 流式传输
 - 📤 **文件上传** — 基于原生 `uni.uploadFile` 统一封装，支持 OSS 上传与进度回调
 - 🐳 **H5 Docker 极速部署** — 宿主机构建 + Nginx:alpine 轻量容器运行（~25MB，秒级打包），内置动态环境变量反代与 Hash 路由兜底
-- 🤖 **AI 原生开发模板** — 内置 `unibestX-skill`（1 入口 + 7 分册），AI Agent 克隆即可按项目规范写代码；运行时自带 AI 对话页与 SSE 流式传输
+- 🤖 **AI 原生开发模板** — 内置 `unibestX-skill`（1 入口 + 8 分册），AI Agent 克隆即可按项目规范写代码；运行时自带 AI 对话页与 SSE 流式传输
+- 🔍 **工程化代码规范与 Git 提交拦截** — 深度整合 **ESLint**（内置针对 UTS 强类型与 UVUE 模板的自定义规则）、**Stylelint**（针对 SCSS、uni-app 特有单位与标签适配）、**Husky**、**lint-staged** 以及 **Commitlint**，提交时自动运行增量校验与友好中文规范提示，把跨端隐患拦截在提交前
 - 🧰 **官方脚手架** — `pnpm create unibestx` 一键创建项目：UI 库三选一、功能与 12 个演示分包按需裁剪，生成后自动跑四查自检
 
 ## 📦 推荐的 UI 组件库
@@ -312,7 +317,7 @@ pnpm check:uts-dts # 校验 UTS 类型声明是否为最新（CI 用）
 
 ### 1. `unibestX-skill` — 项目专属 uni-app X / UTS 规范库
 
-这是与项目强绑定的核心技能，也是仓库中**唯一保留的技能**，采用 **「1 个入口 + 7 个分册」** 结构，把 UTS 强类型约束、跨端样式限制与本项目的生产级写法沉淀成可被 AI 直接检索的知识库。
+这是与项目强绑定的核心技能，也是仓库中**唯一保留的技能**，采用 **「1 个入口 + 8 个分册」** 结构，把 UTS 强类型约束、跨端样式限制与本项目的生产级写法沉淀成可被 AI 直接检索的知识库。
 
 | 分册 | 内容 |
 | :--- | :--- |
@@ -324,14 +329,13 @@ pnpm check:uts-dts # 校验 UTS 类型声明是否为最新（CI 用）
 | `5-codegen.md` | 代码生成流程与标准页面模板 |
 | `6-page-component-spec.md` | AI 页面层级与组件设计规范（页面高内聚、三级防过度拆分、容器与纯展示解耦、Mock 接口契约化） |
 | `7-api-spec.md` | API 接口层规范（一页一目录、契约类型用 `type`、Mock 数据集与接口函数同层、后端就绪只换函数体） |
+| `8-utils-spec.md` | 项目核心工具库使用规范（系统信息 `src/utils/systemInfo`、环境变量 `src/utils/env`、通用工具优先原则） |
 
 **工作机制**：入口文件只常驻导航与红线清单，AI 命中条目后**必须继续读取对应分册**核对完整正反例才允许改代码。
 
-### 2. 任务分级门槛（原 superpowers-zh 框架已移除）
+### 2. 任务复杂度分级与门槛控制
 
-本项目**不再内置 superpowers-zh 技能框架**——原先 20 个通用技能（`brainstorming`、`writing-plans`、`executing-plans`、`test-driven-development`、`systematic-debugging`、`verification-before-completion`、`requesting-code-review` 等）连同四份中文工程规约，已从 `.claude/skills/` 与 `.agents/skills/` 中**全部删除**，`unibestX-skill` 是仓库中唯一保留的技能。
-
-原先由框架承担的「需求澄清 → 计划 → 执行 → 验证」流程，改由 [CLAUDE.md](CLAUDE.md) / [AGENTS.md](AGENTS.md) 里的**任务复杂度分级门槛**替代，核心是「别为小改动跑重流程」：
+在开发过程中，根据 [CLAUDE.md](CLAUDE.md) 与 [AGENTS.md](AGENTS.md) 严格匹配任务复杂度，避免过度设计与流程冗长，按层级匹配执行方案：
 
 | 复杂度 | 典型场景 | 做法 |
 | :--- | :--- | :--- |
@@ -399,6 +403,10 @@ unibestX/
 │   ├── gen-uts-dts.mjs           #   UTS 类型声明生成与校验
 │   ├── check-tabbar-surface.mjs  #   TabBar 接口面校验
 │   └── router-guard-test/        #   路由守卫决策矩阵测试（node 直跑，无需测试框架）
+├── .husky/                       # Git 提交钩子（pre-commit / commit-msg）
+├── .commitlintrc.cjs             # Commitlint 提交信息规范配置
+├── stylelint.config.mjs          # Stylelint 样式规范配置（支持 SCSS / UVUE）
+├── eslint.config.mjs             # ESLint 扁平化配置（含 UTS 专属规则插件）
 ├── Dockerfile                    # H5 生产部署轻量容器（nginx:alpine）
 ├── docker-compose.yml            # H5 容器编排服务（h5-test / h5-prod）
 ├── deploy/                       # 生产与测试部署配置
@@ -406,7 +414,7 @@ unibestX/
 │   ├── .env.test                 #   测试环境 Docker 变量配置
 │   └── .env.prod                 #   生产环境 Docker 变量配置
 ├── docs/                         # VitePress 文档站源码（guide/ 下为各专题）
-├── .claude/skills/               # AI 技能（Claude Code）：仅 unibestX-skill（1 入口 + 7 分册）
+├── .claude/skills/               # AI 技能（Claude Code）：仅 unibestX-skill（1 入口 + 8 分册）
 ├── .agents/                      # AI 技能与规约（其他 Agent）
 │   ├── skills/                   #   与 .claude/skills 一一对应的技能副本（仅 unibestX-skill），需保持同步
 │   └── rules/uniappx.md          #   uni-app X 开发规范（编写 .uvue/.uts 前必读）
@@ -1003,6 +1011,74 @@ pnpm docker:down
 ```
 
 > 📖 详尽部署指南与服务器上线步骤请参阅 [H5 端 Docker 部署手册](docs/guide/docker-deploy.md)。
+
+### 代码规范与 Git 提交拦截 (Husky · Stylelint · Commitlint)
+
+`unibestX` 引入了覆盖 **JavaScript / UTS 强类型代码、SCSS / UVUE 样式以及 Git 提交日志** 的完整工程化质检链路，把跨端平台崩溃隐患拦截在 Git 提交之前：
+
+```mermaid
+graph LR
+    A[git commit 触发] --> B[Husky pre-commit 钩子]
+    B --> C[lint-staged 暂存区增量扫描]
+    C --> D[ESLint + UTS 规则自动修复]
+    C --> E[Stylelint 样式规范校验]
+    D & E -->|校验通过| F[Husky commit-msg 钩子]
+    F --> G[verify-commit-msg 中文规范校验]
+    G -->|符合规范| H[提交成功]
+    G -->|不符合规范| I[终止提交并输出中文指引与示例]
+```
+
+#### 1. ESLint & UTS 平台专属规则插件 (`plugins/eslint-plugin-uts.mjs`)
+
+针对 uni-app X 跨端原生编译对 UTS 类型与模板语法的严苛要求，内置 12 条专项规则：
+
+- **强类型红线**：强制使用 `type` 禁止 `interface`（`uts/no-interface` 支持自动 `--fix`）、禁止 `undefined`、禁止 `map.keys()` 函数式调用；
+- **原生平台编译防护**：严禁在模板 class 中使用 `!` 修饰符（`uts/uvue-no-important-modifier`），防止 `weapp-tailwindcss` 生成包含 `__weapp_tw_important__` 类名引发鸿蒙 ArkTS 编译器未知类报错；
+- **VDOM 兼容性提示（`warn`）**：提示 `<view>` 误挂 `color` 文本颜色、原生不支持的 `gap` 与 `space-*`、`font-mono` 等差异。
+
+#### 2. Stylelint 样式规范 (`stylelint.config.mjs`)
+
+- 基于 `stylelint-config-standard-scss` 与 `stylelint-config-standard-vue/scss`（通过 `postcss-html` 解析 `.uvue` 中的 `<style>` 标签）；
+- 原生放行 uni-app 特有尺寸单位（`rpx`、`upx`）及原生组件标签（`page`、`view`、`scroll-view`、`list-view`、`uni-tabbar` 等）；
+- 完美兼容 Tailwind CSS v4 指令（`@theme`、`@utility`、`@source`、`@apply` 等）；
+- 针对 App 原生渲染引擎关闭 `inset` 等简写强转，保证 `top`/`bottom`/`left`/`right` 显式声明不被破坏。
+
+#### 3. Husky + lint-staged 增量校验
+
+- 提交时触发 `pre-commit` 钩子，**仅对暂存区变动文件执行校验与修复**，秒级完成，免去全量扫描耗时；
+- 串行执行并抑制底噪，遇到错误时输出清晰中文横幅与精准行号定位。
+
+#### 4. Commitlint 提交信息中文校验
+
+提交日志遵循 [Conventional Commits](https://www.conventionalchangelog.org/) 规范，格式为 `<type>(<scope>): <subject>`。未按规范书写时，提交会被拦截并输出友好中文说明：
+
+| 类型 | 说明 | 示例 |
+| :--- | :--- | :--- |
+| `feat` | 新增功能与特性 | `git commit -m "feat(auth): 新增微信小程序一键授权登录"` |
+| `fix` | 修复缺陷或问题 | `git commit -m "fix(popup): 修复鸿蒙端手势滑动关闭失效"` |
+| `docs` | 文档与注释变更 | `git commit -m "docs: 更新 Docker 容器化部署指南"` |
+| `style` | 样式、代码格式调整（不影响功能） | `git commit -m "style: 调整个人中心卡片内边距"` |
+| `refactor` | 代码重构（非新增功能、非修 bug） | `git commit -m "refactor(http): 重构网络请求拦截器"` |
+| `perf` | 性能优化 | `git commit -m "perf(list): 将长列表优化为 list-view 虚拟复用"` |
+| `test` | 增加或修改测试用例 | `git commit -m "test(router): 补充登录拦截守卫测试用例"` |
+| `build` / `ci` | 构建系统、外部依赖或 CI 流水线调整 | `git commit -m "build: 升级 Tailwind CSS 与 Vite 插件"` |
+| `chore` | 其他杂务、琐事配置变更 | `git commit -m "chore: 更新 .gitignore 过滤规则"` |
+
+#### 5. 常用命令与跳过机制
+
+- **手动触发全量检查**：
+
+  ```bash
+  pnpm lint:all        # 全量运行 ESLint + Stylelint 检查
+  pnpm lint:fix        # 自动修复 ESLint 问题
+  pnpm lint:style:fix  # 自动修复 Stylelint 问题
+  ```
+
+- **临时跳过提交钩子（紧急情况）**：
+
+  ```bash
+  git commit -m "fix: 紧急修复线上问题" --no-verify
+  ```
 
 ---
 
