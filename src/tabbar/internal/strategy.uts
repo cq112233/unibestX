@@ -64,3 +64,11 @@ export const tabbarType: string = customTabbarConfig.type ?? 'default';
 
 /** 是否启用了自定义 TabBar（模式 2 或 3 为 true）——根组件 App.ku.uvue 用它决定是否渲染 <Tabbar> */
 export const customTabbarEnable: boolean = selectedTabbarStrategy == TABBAR_STRATEGY_MAP.CUSTOM_TABBAR_WITH_NATIVE || selectedTabbarStrategy == TABBAR_STRATEGY_MAP.CUSTOM_TABBAR_WITHOUT_NATIVE;
+
+/** 是否需要为底部自定义/单页 TabBar 预留底部内边距（模式 2、3、4 底部有浮动 TabBar 需预留 80px，模式 0 和 1 不需要） */
+export const needTabbarBottomPadding: boolean = selectedTabbarStrategy == TABBAR_STRATEGY_MAP.CUSTOM_TABBAR_WITH_NATIVE
+  || selectedTabbarStrategy == TABBAR_STRATEGY_MAP.CUSTOM_TABBAR_WITHOUT_NATIVE
+  || selectedTabbarStrategy == TABBAR_STRATEGY_MAP.SINGLE_PAGE_TABBAR;
+
+/** 底部 TabBar 统一预留内边距类名：自定义/单页 TabBar 时返回 'pb-[80px]'，无 TabBar 或原生 TabBar 时返回 '' */
+export const tabbarBottomPaddingClass: string = needTabbarBottomPadding ? 'pb-[80px]' : '';
