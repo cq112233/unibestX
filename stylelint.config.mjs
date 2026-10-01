@@ -125,6 +125,10 @@ export default {
     ],
     // SCSS 命名约定与类名放宽
     'scss/dollar-variable-pattern': null,
-    'selector-class-pattern': null
+    'selector-class-pattern': null,
+    // 允许规则块之间紧凑排列，不强制空行
+    'rule-empty-line-before': null,
+    // 允许显式书写4值简写（例如 0 16px 8px 16px），避免误触
+    'shorthand-property-no-redundant-values': null
   }
 };

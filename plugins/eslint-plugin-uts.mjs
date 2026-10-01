@@ -461,6 +461,45 @@ export const pluginUts = {
           }
         });
       }
+    },
+
+    /** 12. UVUE 模板中严禁使用 ! 提高优先级修饰符（鸿蒙端编译报错） */
+    'uvue-no-important-modifier': {
+      meta: {
+        type: 'problem',
+        docs: {
+          description: '严禁在模板 class 中使用 ! 提高优先级修饰符，鸿蒙 app-harmony 会报错 Cannot apply unknown utility class'
+        },
+        messages: {
+          noImportant: '[鸿蒙编译铁律] 严禁在模板 class 中使用 "!{{cls}}"，编译为 HarmonyOS 原生代码时会报 Cannot apply unknown utility class，请使用内联 style 或局部样式类替代'
+        }
+      },
+      create(context) {
+        const importantPattern = /(?:^|\s)!([\w[\]#-]+)(?:\s|$)/g;
+
+        if (!context.sourceCode.parserServices?.defineTemplateBodyVisitor) {
+          return {};
+        }
+
+        return context.sourceCode.parserServices.defineTemplateBodyVisitor({
+          VElement(node) {
+            const classList = getClassValues(node);
+            for (const { text, loc } of classList) {
+              importantPattern.lastIndex = 0;
+              let match = importantPattern.exec(text);
+              while (match !== null) {
+                context.report({
+                  node,
+                  loc,
+                  messageId: 'noImportant',
+                  data: { cls: match[1] }
+                });
+                match = importantPattern.exec(text);
+              }
+            }
+          }
+        });
+      }
     }
   }
 };

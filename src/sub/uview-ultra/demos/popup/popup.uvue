@@ -20,7 +20,7 @@
       <!-- 2. 各方向手势滑动关闭演示 (居中无手势) -->
       <view class="demo-block mt-[12px]">
         <view class="flex-row items-center justify-between mb-[8px]">
-          <text class="demo-label !mb-0">各方向手势滑动关闭</text>
+          <text class="demo-label mb-0">各方向手势滑动关闭</text>
           <text class="text-[11px] bg-[#eff6ff] text-[#2563eb] px-[6px] py-[1px] rounded-full font-medium">方向自适应</text>
         </view>
         <text class="text-[12px] text-[#64748b] leading-[18px] mb-[12px]">
@@ -40,7 +40,7 @@
       <!-- 3. 自定义滑动阈值演示 -->
       <view class="demo-block mt-[12px]">
         <view class="flex-row items-center justify-between mb-[8px]">
-          <text class="demo-label !mb-0">自定义阈值 (Threshold)</text>
+          <text class="demo-label mb-0">自定义阈值 (Threshold)</text>
           <text class="text-[11px] bg-[#fef3c7] text-[#d97706] px-[6px] py-[1px] rounded-full font-medium">灵敏度控制</text>
         </view>
         <text class="text-[12px] text-[#64748b] leading-[18px] mb-[10px]">
@@ -55,7 +55,7 @@
       <!-- 4. 嵌套长列表防冲突 (z-paging-x 协同) -->
       <view class="demo-block mt-[12px]">
         <view class="flex-row items-center justify-between mb-[8px]">
-          <text class="demo-label !mb-0">嵌套分页列表 (z-paging-x 协同)</text>
+          <text class="demo-label mb-0">嵌套分页列表 (z-paging-x 协同)</text>
           <text class="text-[11px] bg-[#f3e8ff] text-[#7e22ce] px-[6px] py-[1px] rounded-full font-medium">防冲突 + 分页</text>
         </view>
         <text class="text-[12px] text-[#64748b] leading-[18px] mb-[10px]">
@@ -376,24 +376,42 @@ definePage({
 });
 // ---------------- 基础方向弹窗（每个方向独立状态） ----------------
 const basicTopShow = ref(false);
-function openTopBasic() { basicTopShow.value = true; }
+function openTopBasic() {
+  basicTopShow.value = true;
+}
 const basicBottomShow = ref(false);
-function openBottomBasic() { basicBottomShow.value = true; }
+function openBottomBasic() {
+  basicBottomShow.value = true;
+}
 const basicCenterShow = ref(false);
-function openCenterBasic() { basicCenterShow.value = true; }
+function openCenterBasic() {
+  basicCenterShow.value = true;
+}
 const basicLeftShow = ref(false);
-function openLeftBasic() { basicLeftShow.value = true; }
+function openLeftBasic() {
+  basicLeftShow.value = true;
+}
 const basicRightShow = ref(false);
-function openRightBasic() { basicRightShow.value = true; }
+function openRightBasic() {
+  basicRightShow.value = true;
+}
 // ---------------- 手势弹窗（每个方向独立状态） ----------------
 const gestureTopShow = ref(false);
-function openTopGesture() { gestureTopShow.value = true; }
+function openTopGesture() {
+  gestureTopShow.value = true;
+}
 const gestureBottomShow = ref(false);
-function openBottomGesture() { gestureBottomShow.value = true; }
+function openBottomGesture() {
+  gestureBottomShow.value = true;
+}
 const gestureLeftShow = ref(false);
-function openLeftGesture() { gestureLeftShow.value = true; }
+function openLeftGesture() {
+  gestureLeftShow.value = true;
+}
 const gestureRightShow = ref(false);
-function openRightGesture() { gestureRightShow.value = true; }
+function openRightGesture() {
+  gestureRightShow.value = true;
+}
 // ---------------- 阈值、列表弹窗 ----------------
 const showBasicPopup = ref<boolean>(false);
 const showHighThresholdPopup = ref<boolean>(false);
