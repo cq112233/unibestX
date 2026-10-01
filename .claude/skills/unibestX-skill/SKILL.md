@@ -12,22 +12,24 @@ description: Use when developing, compiling, refactoring, or troubleshooting uni
 uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直接编译为原生代码（Android 编译为 Kotlin，iOS 插件编译为 Swift，鸿蒙插件编译为 ArkTS，Web/小程序编译为 JS）。  
 与宽容的 TypeScript/JavaScript 不同，UTS 采用**名义强类型系统（Nominal Strong Typing）**与**原生渲染规范**。
 
-本文档按五大维度组织，采用 **「1 个入口 + 7 个分册」** 结构：
+本文档按六大维度组织，采用 **「1 个入口 + 8 个分册」** 结构：
 
 1. **UTS 与原生规范**：语法与严格类型（分册 1）、CSS / Tailwind 样式引擎限制（分册 2）、跨端运行时铁律（分册 3）；
 2. **项目正确案例**：来自本项目的生产级标杆案例（分册 4）——页面骨架、TabBar、二级详情页、滚动与下拉刷新、组件与生态库优先范式；
 3. **项目代码生成规范**：生成流程与模板（分册 5）、本文件常驻的 A.1 对照表与 A.2 红线清单；
 4. **AI 页面层级与组件设计规范**：页面高内聚自包含、最多三级封顶、容器与纯展示解耦、Mock 接口契约化（分册 6）——**AI 生成复杂页面与拆分组件前必读**；
-5. **API 接口层规范**：一页一目录落位、契约类型（`type`）与 Mock 数据集同层、后端就绪只换函数体（分册 7）——**新增页面与对接后端前必读**。
+5. **API 接口层规范**：一页一目录落位、契约类型（`type`）与 Mock 数据集同层、后端就绪只换函数体（分册 7）——**新增页面与对接后端前必读**；
+6. **项目核心工具库规范**：系统信息（`src/utils/systemInfo`）、环境变量（`src/utils/env`）与基础通用工具（分册 8）——**页面开发与调用通用能力前必读**。
 
 ---
 
 ## 何时使用
 
 - 编写、重构或新增 `.uvue`、`.uts`、`.ts`、`.scss` 文件时
-- 规划或生成新页面结构、骨架布局与视口高度（`computedAvailableHeight`）时
+- 规划或生成新页面结构、骨架布局与视口高度（`availableHeight`）时
 - **新增页面并同步建 `src/api/<page>/` 接口层（接口函数 + `types.uts` + `mock/`）时**、把页面里的假数据抽成接口函数时
 - 对接后端真实接口、写 `http` 请求 / 文件上传 / SSE 流式接口时
+- **获取系统信息、视口高度、状态栏/导航栏高度，或读取环境变量、API 域名、调用 Toast / Router 时**
 - 使用 Tailwind CSS 编写跨端 UI、按钮排版、文本颜色与安全区适配时
 - 遇到 UTS 强类型编译错误（`UTS110111163`、`UTS110111119`、`UTS110111120`、`UTS100006`、`error17`）
 - 遇到 Android/iOS 原生运行时报错（`ClassCastException: Map cannot be cast to UTSJSONObject`）
@@ -37,7 +39,7 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 
 ## 文档结构（分册导航 —— 命中即必须 Read）
 
-> ⚠️ **本 Skill 为分册式组织：下表的 6 个分册文件不会自动加载**，需要时用 Read 工具打开。
+> ⚠️ **本 Skill 为分册式组织：下表的分册文件不会自动加载**，需要时用 Read 工具打开。
 > **硬性要求**：对照表（A.1）或红线清单（A.2）命中某条时，**必须打开其标注的分册核对完整正反例与实测结论**，不得只凭本文件的一行结论就改代码 —— 每条铁律的「为什么会炸」「反例长什么样」都在分册里。
 
 | 分册文件 | 收录内容 | 何时 Read |
@@ -49,6 +51,7 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 | [references/5-codegen.md](references/5-codegen.md) | **5.1 新增页面生成流程**、**5.2 页面代码标准模板** | 生成新页面 / 组件前走流程、需要复制标准页面模板；**新增页面时必产接口层**（接口文件模板见分册 7） |
 | [references/6-page-component-spec.md](references/6-page-component-spec.md) | **6 AI 页面层级与组件设计规范**（页面高内聚 · 数据所有权下沉 · 容器/视图分离 · Mock 收拢进页面接口目录 · 后端就绪只换函数体，附八大铁律与 19 条自检红线） | 规划新页面结构、拆分复杂页面组件、组织页面内 `components/common/` 与模块私有视图、把 mock 收拢进 `src/api/<page>/`、对接后端真实接口时必读 |
 | [references/7-api-spec.md](references/7-api-spec.md) | **7 API 接口层规范**（一页一目录落位 · 命名约定 · 契约类型铁律 · 按模块独立造数 · `http` 单例 / 上传 / SSE 用法 · 后端就绪只换函数体，附 12 条接口层自检红线） | **新增页面同步建 `src/api/<page>/` 时**、抽接口函数时、写 mock 数据集与契约类型时、对接后端真实接口时必读 |
+| [references/8-utils-spec.md](references/8-utils-spec.md) | **8 项目核心工具库规范**（系统信息 `src/utils/systemInfo` · 环境变量 `src/utils/env` · 基础通用工具优先原则，附完整 API 矩阵与 10 条红线） | 获取屏幕/窗口尺寸、状态栏/导航栏/TabBar高度、计算内容可用高度（`availableHeight`）；判断开发/生产环境、获取接口基础地址；使用 Toast、Loading、路由跳转、主题与返回键时必读 |
 
 > 📌 **A.1 快速排查对照表**与 **A.2 代码生成红线清单** 因使用频率最高，常驻在本文件下方，无需额外 Read。
 
@@ -94,6 +97,10 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 | **H5 报 `Cannot access 'x' before initialization`** | 同一函数里两个不同块各自 `const id = ...`（UTS 变量按**函数级**去重，把两者合成一个变量，声明点落在后面那个，前面那段就成了 TDZ） | 不同块的同名局部量按语义改名（`bare` / `sized` / `grouped`…）；顺序 `for` 里重名的 `i` 安全（详见 **1.19**） |
 | **App 端 `min-width` / `min-height` / `max-width:100%` 静默失效** | 写百分比 `min-height:100%` / `min-width:100%` / `max-width:100%`（原生端 `min-*` / `max-*` 只认 `number` 与 `px`，构建期只有一条 warn，运行期直接忽略；`width` / `height` 的百分比**是**支持的） | 「至少撑满」写 `flex:1`、「至多铺满」写 `width:100%`，带 padding / border 时补 `box-sizing:border-box`（详见 **2.23**） |
 | **流式渲染时 App 闪退 `UTS instance N is not registered`** | 计时器每来一个 chunk 就把整串内容喂给富文本渲染器（`streamText.value = full`）—— 末尾那个还没收完的块（`<video>` / mermaid / `$$…$$`）会先按**顶层节点**渲染，等闭合标签到齐又变成块的**子节点**，原生组件在两条分支间搬家、被销毁重建，新实例拿到已释放的原生实例 id | 接收与渲染分离：**只在块边界推进渲染快照**（`text.lastIndexOf('\n\n')` 取最后一个完整块的结尾），半截块永不进渲染；`complete` 回调里再补渲染一次尾巴（详见 **3.23**） |
+| **系统尺寸与高度获取** | 散落调用 `uni.getSystemInfoSync()` 或样式手写 `100vh`（损耗性能、非响应式、原生端不支持 vh 且易被 TabBar/导航栏遮挡） | 优先引入 `@/src/utils/systemInfo/index.uts` 中的响应式变量（`availableHeight`、`statusBarHeight`、`navBarHeight`、`safeAreaBottom`）或使用 `sys` 单例（详见 **分册 8**） |
+| **环境变量与服务地址读取** | 手写 `process.env` / `import.meta.env` 或在代码里硬编码域名 IP（原生平台无法识别且切换环境易出错） | 统一从 `@/src/utils/env/index.uts` 引入具名方法（`getApiBaseUrl()`、`getOssBaseUrl()`、`isDev()`、`isProd()`、`isVaporMode()`）（详见 **分册 8**） |
+| **轻提示与加载动画 (Toast / Loading)** | 散落手写 `uni.showToast({ title: '...', icon: 'none' })` | 统一引入 `@/src/utils/toast/index.uts` 中的 `toast(msg)`、`showToast(...)`、`showLoading()`、`hideLoading()`（详见 **分册 8**） |
+| **页面跳转与路由控制** | 直接调用原生 `uni.navigateTo` 等且未做参数编码与越界防护 | 优先引入 `@/src/utils/route/index.uts` 的 `router.push()` / `router.replace()` / `router.back()` 或模块封装函数（详见 **分册 8**） |
 
 ---
 
@@ -130,3 +137,7 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 - [ ] **27. uni 跳转 API 的返回值严禁标 `Promise<any> | null`、也不要只写 `any`**（统一写 `any | null`）
 - [ ] **28. 计时器高频驱动的流式渲染，严禁把「块结构未完成」的整串内容喂给富文本渲染器**（末尾半截块会让原生组件在渲染分支间搬家、被销毁重建，App 抛 `IllegalStateException: UTS instance N is not registered`；必须把接收与渲染分离，只按块边界推进渲染快照，见 3.23）
 - [ ] **29. 严禁给挂了事件或依赖 `z-index` / `visibility` / `display:fixed` / `background-image` 的元素加 `flatten`**（拍平后**事件与这批 CSS 全部静默失效** —— 编译不报错、运行不警告，只是点了没反应、遮罩压不住；`image` 拍平后 gif 只显第一帧。只给纯装饰图元加；仅蒸汽模式生效，是初始化属性不能动态绑定，鸿蒙需至少两个相邻元素同时拍平才有收益，见 3.24）
+- [ ] **30. 严禁在页面各处直接调用 `uni.getSystemInfoSync()` 与使用 CSS `100vh`**（系统信息与视口高度必须优先从 `@/src/utils/systemInfo/index.uts` 引入 `statusBarHeight`、`availableHeight` 等响应式变量，见分册 8）
+- [ ] **31. 严禁手写 `process.env` / `import.meta.env` 或硬编码请求域名**（必须统一从 `@/src/utils/env/index.uts` 引入 `getApiBaseUrl()`、`isDev()` 等方法，见分册 8）
+- [ ] **32. 严禁在业务页面中散落调用原生 `uni.showToast({ title, icon: 'none' })`**（必须统一使用 `@/src/utils/toast/index.uts` 导出的 `toast(msg)` 或 `showToast(...)`，见分册 8）
+- [ ] **33. 业务功能开发前优先复用 `@/src/utils/` 下既有封装**（严禁在局部重新手写已有的通用方法，引用路径一律使用 `@/src/utils/<module>/index.uts` 绝对路径，见分册 8）
