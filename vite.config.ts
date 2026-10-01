@@ -63,6 +63,19 @@ export default defineConfig({
   server: {
     host: '0.0.0.0',
     port: 8080,
+    // 启用快速文件系统状态缓存，减少启动与热重载时重复 stat 系统调用
+    fs: {
+      cachedChecks: true
+    },
+    // Vite 5+ 服务端预热核心入口与首页模块，避免首屏访问时串行等待 Transform
+    warmup: {
+      clientFiles: [
+        './main.uts',
+        './App.uvue',
+        './src/pages/index/index.uvue',
+        './src/pages/index/views/IndexView.uvue'
+      ]
+    },
     // H5 走代理模式时生效（.env 里 VITE_H5_USE_PROXY=true）；直连模式（false）请求不经过此代理
     proxy: {
       '/api': {
