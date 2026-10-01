@@ -95,29 +95,6 @@
   bestx my-app
   ```
 
-  相比手动克隆，脚手架额外完成这些事：
-
-  - **UI 组件库三选一**：Rice UI（官方持续维护）/ uview-ultra（内置修复版）/ 无 UI 库（原生组件 + Tailwind 纯净基线），也支持 `base` 极简模板；
-  - **功能按需裁剪**：多语言 i18n、ECharts 图表可勾选，登录鉴权与明暗主题为永久内置底座；
-  - **12 个演示分包按需保留**：默认全部裁掉，需要时用 `--subs` 逐个勾选或 `all` 全量保留；
-  - **收尾自动化**：重写 `package.json` 与 `.env`、执行 `git init`，并跑一遍四查自检（悬空 import、悬空组件标签、路由一致性、依赖一致性），出现 error 直接回滚生成物。
-
-  常用命令速查：
-
-  ```bash
-  # 一键指定配置：Rice UI + 多语言 + ECharts + 全部演示分包
-  pnpm create unibestx my-app -u rice-ui --features i18n,echarts --subs all
-
-  # 跳过提问，使用默认推荐配置
-  pnpm create unibestx my-app --yes
-
-  # 使用本地模板仓库（内网 / 离线，或在改动本仓库后立即验证生成结果）
-  pnpm create unibestx my-app --template /path/to/unibestX
-
-  # 对任意已有项目跑健康自检
-  pnpm create unibestx doctor ./my-app
-  ```
-
   > 完整参数（`--ui` / `--features` / `--subs` / `--package-manager` / `--keep-unused-modules` 等）见 [create-unibestx 文档](https://www.npmjs.com/package/create-unibestx)。
 
 - **方式二：通过 `degit` 快速创建（不含历史提交记录）**：
@@ -145,7 +122,20 @@
   git clone -b uniX-rice-ui https://github.com/cq112233/unibestX.git
   ```
 
-### 2. 安装依赖
+### 2. 填写 AppID（请自行申请）
+
+> [!IMPORTANT]
+> 项目内自带的 AppID 仅用于演示，**请自行申请并替换为你自己的**，否则无法真机运行、云打包与上传小程序。
+
+| 平台 | 申请入口 | 填写位置 |
+| :--- | :--- | :--- |
+| App（Android / iOS / 鸿蒙） | [DCloud 开发者中心](https://dev.dcloud.net.cn/) → 创建应用，获取 `__UNI__` 开头的 AppID | [manifest.json](manifest.json) 的顶层 `appid` |
+| 微信小程序 | [微信公众平台](https://mp.weixin.qq.com/) → 注册小程序，获取 `wx` 开头的 AppID | [manifest.json](manifest.json) 的 `mp-weixin.appid` |
+
+- 用 HBuilderX 打开项目后，双击 `manifest.json` 可视化界面也可直接填写，App 端点击「重新获取」可自动申请一个新的 DCloud AppID。
+- 微信小程序还需在微信公众平台后台配置 **request 合法域名**（对应 `.env` 的 `VITE_SERVER_BASEURL`）后才能正常请求接口。
+
+### 3. 安装依赖
 
 ```bash
 pnpm install
@@ -153,7 +143,7 @@ pnpm install
 
 > 方式一的脚手架在生成时会询问「是否立即安装依赖」，已选择安装的项目可跳过本步。
 
-### 3. 运行项目（支持热更新）
+### 4. 运行项目（支持热更新）
 
 支持 **命令行 CLI** 与 **HBuilderX 图形界面** 两种开发方式。
 
@@ -181,7 +171,7 @@ pnpm dev:mp-weixin      # 运行到微信小程序
 | H5 | `运行 → 运行到浏览器` |
 | 微信小程序 | `运行 → 运行到小程序模拟器 → 微信开发者工具` |
 
-### 4. 打包与发布
+### 5. 打包与发布
 
 #### 🖥️ H5：在自己服务器 / CI 上打包（推荐）
 
