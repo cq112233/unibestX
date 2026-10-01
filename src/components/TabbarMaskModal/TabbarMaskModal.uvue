@@ -3,72 +3,69 @@
   <!-- 微信小程序端：使用 root-portal 提升至 page 根节点以穿透 TabBar -->
   <!-- #ifdef MP-WEIXIN -->
   <root-portal v-if="isShown">
-    <view
-      class="fixed top-0 bottom-0 left-0 right-0 flex flex-col items-center justify-center"
-      :style="{ zIndex }"
-    >
+    <view class="tabbar-modal-mask-root" :style="{ zIndex }">
       <!-- 暗色遮罩背景（点击空白处触发关闭） -->
-      <view
-        class="absolute top-0 bottom-0 left-0 right-0 bg-[#000000a6]"
-        @click="handleMaskClick"
-      />
+      <view class="tabbar-modal-backdrop" @click="handleMaskClick" />
 
       <!-- 居中卡片本体 -->
       <view
-        class="p-[20px] rounded-[16px] border-[1px] border-solid relative z-10 flex flex-col"
-        :class="isDark ? 'bg-[#1e293b] border-[#334155]' : 'bg-[#ffffff] border-[#e2e8f0]'"
+        class="tabbar-modal-card"
+        :class="{ 'tabbar-modal-card--dark': isDark }"
         :style="{ width }"
       >
         <!-- 头部插槽 / 默认标题栏 -->
         <slot name="header">
           <view
             v-if="title.length > 0 || showClose"
-            class="flex flex-row items-center justify-between mb-[12px]"
+            class="tabbar-modal-header"
           >
-            <view class="flex flex-row items-center flex-1 mr-[8px]">
-              <text v-if="icon.length > 0" class="text-[18px] mr-[8px]">{{ icon }}</text>
+            <view class="tabbar-modal-title-wrap">
+              <text v-if="icon.length > 0" class="tabbar-modal-icon">{{ icon }}</text>
               <text
-                class="text-[16px] font-bold"
-                :class="isDark ? 'text-[#f1f5f9]' : 'text-[#1e293b]'"
+                class="tabbar-modal-title-text"
+                :class="{ 'tabbar-modal-title-text--dark': isDark }"
               >
                 {{ displayTitle }}
               </text>
             </view>
-            <view v-if="showClose" class="p-[4px]" @click="handleClose">
-              <text class="text-[16px] text-[#94a3b8]">✕</text>
+            <view v-if="showClose" class="tabbar-modal-close-btn" @click="handleClose">
+              <text class="tabbar-modal-close-text">✕</text>
             </view>
           </view>
         </slot>
 
         <!-- 命令式传入的数据回执（ref 桥「传数据」的落点）；未传时不渲染 -->
-        <view v-if="payloadMessage.length > 0" class="flex flex-col mb-[12px]">
-          <text class="text-[12px] leading-[20px]" :class="isDark ? 'text-[#94a3b8]' : 'text-[#64748b]'">
+        <view v-if="payloadMessage.length > 0" class="tabbar-modal-payload-wrap">
+          <text
+            class="tabbar-modal-payload-msg"
+            :class="{ 'tabbar-modal-payload-msg--dark': isDark }"
+          >
             {{ payloadMessage }}
           </text>
-          <text class="text-[11px] leading-[18px] mt-[4px] text-[#4f46e5]">来自：{{ payloadSource }}</text>
+          <text class="tabbar-modal-payload-source">来自：{{ payloadSource }}</text>
         </view>
 
         <!-- 默认内容插槽（未传自定义 slot 时展示默认全屏覆盖解析卡片） -->
         <slot>
           <text
-            class="text-[12px] leading-[20px] mb-[12px]"
-            :class="isDark ? 'text-[#94a3b8]' : 'text-[#64748b]'"
+            class="tabbar-modal-desc-text"
+            :class="{ 'tabbar-modal-desc-text--dark': isDark }"
           >
             在模式 0、2、3、4（尤其默认推荐的模式 4）下，暗色遮罩已将全屏及底部 TabBar 完全覆盖！
           </text>
 
           <!-- 关键原理解析卡片 -->
           <view
-            class="p-[10px] rounded-[8px] mb-[16px] flex flex-col"
-            :class="isDark ? 'bg-[#0f172a]' : 'bg-[#f8fafc]'"
+            class="tabbar-modal-tip-card"
+            :class="{ 'tabbar-modal-tip-card--dark': isDark }"
           >
-            <text class="text-[11px] leading-[18px] text-[#059669]">
+            <text class="tabbar-modal-tip-text-green">
               ✓ 全屏覆盖：模式 0/2/3/4 全端完美覆盖全屏（z-index: {{ zIndex }} &gt; 999）
             </text>
-            <text class="text-[11px] leading-[18px] text-[#4f46e5] mt-[4px]">
+            <text class="tabbar-modal-tip-text-indigo">
               ✓ 原生底座差异：模式 1 原生 TabBar 仅 H5 可遮挡，App/小程序为系统层级
             </text>
-            <text class="text-[11px] leading-[18px] text-[#d97706] mt-[4px]">
+            <text class="tabbar-modal-tip-text-amber">
               ✓ 微信环境适配：小程序端使用 root-portal 提升至 Page 根节点
             </text>
           </view>
@@ -76,11 +73,8 @@
 
         <!-- 底部插槽 / 默认操作按钮 -->
         <slot name="footer">
-          <view
-            class="w-full h-[40px] rounded-[8px] bg-[#4f46e5] flex flex-row items-center justify-center active:opacity-85"
-            @click="handleClose"
-          >
-            <text class="text-[#ffffff] text-[14px] font-medium">{{ confirmText }}</text>
+          <view class="tabbar-modal-confirm-btn" @click="handleClose">
+            <text class="tabbar-modal-confirm-text">{{ confirmText }}</text>
           </view>
         </slot>
       </view>
@@ -92,71 +86,71 @@
   <!-- #ifndef MP-WEIXIN -->
   <view
     v-if="isShown"
-    class="fixed top-0 bottom-0 left-0 right-0 flex flex-col items-center justify-center"
+    class="tabbar-modal-mask-root"
     :style="{ zIndex }"
   >
     <!-- 暗色遮罩背景（点击空白处触发关闭） -->
-    <view
-      class="absolute top-0 bottom-0 left-0 right-0 bg-[#000000a6]"
-      @click="handleMaskClick"
-    />
+    <view class="tabbar-modal-backdrop" @click="handleMaskClick" />
 
     <!-- 居中卡片本体 -->
     <view
-      class="p-[20px] rounded-[16px] border-[1px] border-solid relative z-10 flex flex-col"
-      :class="isDark ? 'bg-[#1e293b] border-[#334155]' : 'bg-[#ffffff] border-[#e2e8f0]'"
+      class="tabbar-modal-card"
+      :class="{ 'tabbar-modal-card--dark': isDark }"
       :style="{ width }"
     >
       <!-- 头部插槽 / 默认标题栏 -->
       <slot name="header">
         <view
           v-if="title.length > 0 || showClose"
-          class="flex flex-row items-center justify-between mb-[12px]"
+          class="tabbar-modal-header"
         >
-          <view class="flex flex-row items-center flex-1 mr-[8px]">
-            <text v-if="icon.length > 0" class="text-[18px] mr-[8px]">{{ icon }}</text>
+          <view class="tabbar-modal-title-wrap">
+            <text v-if="icon.length > 0" class="tabbar-modal-icon">{{ icon }}</text>
             <text
-              class="text-[16px] font-bold"
-              :class="isDark ? 'text-[#f1f5f9]' : 'text-[#1e293b]'"
+              class="tabbar-modal-title-text"
+              :class="{ 'tabbar-modal-title-text--dark': isDark }"
             >
               {{ displayTitle }}
             </text>
           </view>
-          <view v-if="showClose" class="p-[4px]" @click="handleClose">
-            <text class="text-[16px] text-[#94a3b8]">✕</text>
+          <view v-if="showClose" class="tabbar-modal-close-btn" @click="handleClose">
+            <text class="tabbar-modal-close-text">✕</text>
           </view>
         </view>
       </slot>
 
       <!-- 命令式传入的数据回执（ref 桥「传数据」的落点）；未传时不渲染 -->
-      <view v-if="payloadMessage.length > 0" class="flex flex-col mb-[12px]">
-        <text class="text-[12px] leading-[20px]" :class="isDark ? 'text-[#94a3b8]' : 'text-[#64748b]'">
+      <view v-if="payloadMessage.length > 0" class="tabbar-modal-payload-wrap">
+        <text
+          class="tabbar-modal-payload-msg"
+          :class="{ 'tabbar-modal-payload-msg--dark': isDark }"
+        >
           {{ payloadMessage }}
         </text>
-        <text class="text-[11px] leading-[18px] mt-[4px] text-[#4f46e5]">来自：{{ payloadSource }}</text>
+        <text class="tabbar-modal-payload-source">来自：{{ payloadSource }}</text>
       </view>
 
       <!-- 默认内容插槽（未传自定义 slot 时展示默认全屏覆盖解析卡片） -->
       <slot>
         <text
-          class="text-[12px] leading-[20px] mb-[12px]"
-          :class="isDark ? 'text-[#94a3b8]' : 'text-[#64748b]'"
+          class="tabbar-modal-desc-text"
+          :class="{ 'tabbar-modal-desc-text--dark': isDark }"
         >
           在模式 0、2、3、4（尤其默认推荐的模式 4）下，暗色遮罩已将全屏及底部 TabBar 完全覆盖！
         </text>
 
         <!-- 关键原理解析卡片 -->
         <view
-          class="p-[10px] rounded-[8px] mb-[16px] flex flex-col"
-          :class="isDark ? 'bg-[#0f172a]' : 'bg-[#f8fafc]'"
+          class="tabbar-modal-tip-card"
+          :class="{ 'tabbar-modal-tip-card--dark': isDark }"
         >
-          <text class="text-[11px] leading-[18px] text-[#059669]">
+          <text class="tabbar-modal-tip-text-green">
             ✓ 全屏覆盖：模式 0/2/3/4 全端完美覆盖全屏（z-index: {{ zIndex }} &gt; 999）
           </text>
-          <text class="text-[11px] leading-[18px] text-[#4f46e5] mt-[4px]">
+          <text class="tabbar-modal-tip-text-indigo">
             ✓ 原生底座差异：模式 1 原生 TabBar 仅 H5 可遮挡，App/小程序为系统层级
           </text>
-          <text class="text-[11px] leading-[18px] text-[#d97706] mt-[4px]">
+          <text class="tabbar-modal-tip-text-amber">
             ✓ 微信环境适配：小程序端使用 root-portal 提升至 Page 根节点
           </text>
         </view>
@@ -164,11 +158,8 @@
 
       <!-- 底部插槽 / 默认操作按钮 -->
       <slot name="footer">
-        <view
-          class="w-full h-[40px] rounded-[8px] bg-[#4f46e5] flex flex-row items-center justify-center active:opacity-85"
-          @click="handleClose"
-        >
-          <text class="text-[#ffffff] text-[14px] font-medium">{{ confirmText }}</text>
+        <view class="tabbar-modal-confirm-btn" @click="handleClose">
+          <text class="tabbar-modal-confirm-text">{{ confirmText }}</text>
         </view>
       </slot>
     </view>
@@ -329,3 +320,172 @@ defineExpose({
   getLastAction
 });
 </script>
+
+<style lang="scss" scoped>
+.tabbar-modal-mask-root {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.tabbar-modal-backdrop {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: rgba(0, 0, 0, 0.65);
+}
+
+.tabbar-modal-card {
+  padding: 20px;
+  border-radius: 16px;
+  border-width: 1px;
+  border-style: solid;
+  border-color: #e2e8f0;
+  background-color: #ffffff;
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+
+  &--dark {
+    background-color: #1e293b;
+    border-color: #334155;
+  }
+}
+
+.tabbar-modal-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.tabbar-modal-title-wrap {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex: 1;
+  margin-right: 8px;
+}
+
+.tabbar-modal-icon {
+  font-size: 18px;
+  margin-right: 8px;
+}
+
+.tabbar-modal-title-text {
+  font-size: 16px;
+  font-weight: bold;
+  color: #1e293b;
+
+  &--dark {
+    color: #f1f5f9;
+  }
+}
+
+.tabbar-modal-close-btn {
+  padding: 4px;
+}
+
+.tabbar-modal-close-text {
+  font-size: 16px;
+  color: #94a3b8;
+}
+
+.tabbar-modal-payload-wrap {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 12px;
+}
+
+.tabbar-modal-payload-msg {
+  font-size: 12px;
+  line-height: 20px;
+  color: #64748b;
+
+  &--dark {
+    color: #94a3b8;
+  }
+}
+
+.tabbar-modal-payload-source {
+  font-size: 11px;
+  line-height: 18px;
+  margin-top: 4px;
+  color: #4f46e5;
+}
+
+.tabbar-modal-desc-text {
+  font-size: 12px;
+  line-height: 20px;
+  margin-bottom: 12px;
+  color: #64748b;
+
+  &--dark {
+    color: #94a3b8;
+  }
+}
+
+.tabbar-modal-tip-card {
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  background-color: #f8fafc;
+
+  &--dark {
+    background-color: #0f172a;
+  }
+}
+
+.tabbar-modal-tip-text-green {
+  font-size: 11px;
+  line-height: 18px;
+  color: #059669;
+}
+
+.tabbar-modal-tip-text-indigo {
+  font-size: 11px;
+  line-height: 18px;
+  color: #4f46e5;
+  margin-top: 4px;
+}
+
+.tabbar-modal-tip-text-amber {
+  font-size: 11px;
+  line-height: 18px;
+  color: #d97706;
+  margin-top: 4px;
+}
+
+.tabbar-modal-confirm-btn {
+  width: 100%;
+  height: 40px;
+  border-radius: 8px;
+  background-color: #4f46e5;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+
+  &:active {
+    opacity: 0.85;
+  }
+}
+
+.tabbar-modal-confirm-text {
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 500;
+}
+</style>

@@ -64,7 +64,7 @@ const props = defineProps({
 });
 
 const rootClass = computed((): string => {
-  let cls = 'empty-layout flex flex-col';
+  let cls = 'empty-layout';
   if (props.customPageClass.length > 0) {
     cls += ` ${props.customPageClass}`;
   }
@@ -96,5 +96,7 @@ console.log(props, 'empty layout props');
 
 <style lang="scss" scoped>
 .empty-layout {
+  display: flex;
+  flex-direction: column;
 }
 </style>

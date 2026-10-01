@@ -349,7 +349,7 @@ onNavbarPullDownRefresh(() => {
     .join('\n');
 
   const tabViewsContent = `<template>
-  <view class="flex-1 relative" style="flex: 1; position: relative;">
+  <view class="tab-views-container" style="flex: 1; position: relative;">
 ${contentBlocks}
   </view>
 </template>
@@ -358,6 +358,13 @@ ${contentBlocks}
 ${importLines}
 import TabContent from './TabContent.uvue';
 </script>
+
+<style lang="scss" scoped>
+.tab-views-container {
+  flex: 1;
+  position: relative;
+}
+</style>
 `;
 
   let existingContent = '';
