@@ -24,7 +24,6 @@
       <slot />
     </view>
 
-
     <!-- 当开启自定义下拉刷新时（原生未开启且当前布局开启） -->
     <scroll-view
       v-else-if="useCustomRefresher"
@@ -40,6 +39,7 @@
       @scrolltolower="handleScrollToLower"
     >
       <slot />
+      <TabbarPlaceholder :is-tabbar-page="isTabbarPage" />
     </scroll-view>
 
     <!-- 未开启自定义下拉刷新时（包含开启原生下拉刷新时）：渲染普通滚动容器 -->
@@ -52,6 +52,7 @@
       @scrolltolower="handleScrollToLower"
     >
       <slot />
+      <TabbarPlaceholder :is-tabbar-page="isTabbarPage" />
     </scroll-view>
   </view>
 </template>
@@ -59,6 +60,7 @@
 <script setup lang="uts">
 import { computed, onUnmounted, ref } from 'vue';
 import NavBar from '@/src/components/NavBar/NavBar.uvue';
+import TabbarPlaceholder from '@/src/tabbar/components/TabbarPlaceholder.uvue';
 import { useAppStore } from '@/src/store';
 import { getThemeTokens } from '@/src/utils/theme/index.uts';
 import type { ThemeTokens } from '@/src/utils/theme/index.uts';
