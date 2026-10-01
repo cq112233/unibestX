@@ -239,7 +239,8 @@ configs.push({
     'uts/uvue-no-gap-and-space': 'warn',
     'uts/uvue-no-font-mono': 'warn',
     'uts/uvue-no-items-baseline': 'warn',
-    'uts/uvue-prefer-hex-color': 'warn'
+    'uts/uvue-prefer-hex-color': 'warn',
+    'uts/uvue-no-important-modifier': 'error'
   }
 });
 
