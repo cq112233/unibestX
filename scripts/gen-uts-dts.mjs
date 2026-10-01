@@ -75,13 +75,10 @@ const HANDWRITTEN = new Set(['systemInfo']);
  */
 const EXTRA_SOURCES = [
   path.join(ROOT, 'src/store/types.uts'),
-  path.join(ROOT, 'src/i18n/index.uts'),
   path.join(ROOT, 'src/tabbar/index.uts'),
-  path.join(ROOT, 'uni_modules/ali-iconfont/common/iconfont.uts'),
-  path.join(ROOT, 'uni_modules/ali-iconfont/common/icons.uts'),
-  path.join(ROOT, 'uni_modules/mp-html/common/katex-lite/index.uts'),
-  path.join(ROOT, 'uni_modules/mp-html/common/mermaid-lite/index.uts'),
-  path.join(ROOT, 'uni_modules/mp-html/index.uts')
+  path.join(ROOT, 'src/tabbar/types.uts'),
+  path.join(ROOT, 'src/router/config.uts'),
+  path.join(ROOT, 'src/router/index.uts')
 ];
 
 const args = new Set(process.argv.slice(2));
