@@ -242,12 +242,15 @@ configs.push({
     'uts/uvue-prefer-hex-color': 'warn',
     'uts/uvue-no-important-modifier': 'error',
     // 启用 UVUE/Vue 模板未导入组件检测与一键快速修复导入（Code Action 自动导入）
-    'uts/auto-import-component': 'warn'
+    'uts/auto-import-component': 'warn',
+    // 启用未定义符号/函数检测与一键快速修复导入（Code Action 自动导入函数与变量，未导入立即爆红报错）
+    'uts/auto-import-symbol': 'error'
   }
 });
 
 configs.push({
   files: ['**/*.vue', '**/*.uvue', '**/*.uts', '**/*.ts', '**/*.js'],
+  ignores: ['**/*.d.ts', '**/*.d.uts.ts'],
   rules: {
 
     'eqeqeq': 'off',
@@ -257,7 +260,9 @@ configs.push({
     'style/comma-dangle': ['error', 'never'],
     'vue/comma-dangle': ['error', 'never'],
     // 替换为支持快速修复导入的 uts/auto-import-component 规则
-    'vue/no-undef-components': 'off'
+    'vue/no-undef-components': 'off',
+    // 替换为支持一键快速修复导入的 uts/auto-import-symbol 规则
+    'no-undef': 'off'
   },
   languageOptions: {
     globals: {
@@ -273,6 +278,10 @@ configs.push({
       defineSlots: 'readonly',
       defineModel: 'readonly',
       withDefaults: 'readonly',
+
+      // 应用生命周期与 Node 全局对象
+      onLaunch: 'readonly',
+      NodeJS: 'readonly',
 
       // uni-app 页面生命周期（原生支持全局调用）
       onInit: 'readonly',
@@ -296,7 +305,20 @@ configs.push({
       onShareTimeline: 'readonly',
       onAddToFavorites: 'readonly',
       getCurrentPages: 'readonly',
-      getApp: 'readonly'
+      getApp: 'readonly',
+
+      // uni-app X 原生全局事件与路由类型
+      UniScrollEvent: 'readonly',
+      SetNavigationBarTitleOptions: 'readonly',
+      NavigateToOptions: 'readonly',
+      RedirectToOptions: 'readonly',
+      ReLaunchOptions: 'readonly',
+      SwitchTabOptions: 'readonly',
+      AppThemeChangeResult: 'readonly',
+      OsThemeChangeResult: 'readonly',
+      OnHostThemeChangeCallbackResult: 'readonly',
+      UTSAndroid: 'readonly',
+      java: 'readonly'
     }
   }
 });

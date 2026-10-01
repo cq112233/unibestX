@@ -216,6 +216,77 @@ declare global {
    */
   function defineModel<T = any>(name?: string, options?: Record<string, any>): import('vue').Ref<T>;
 
+  // ==========================================
+  // Vue 核心响应式与生命周期 API 全局声明（全工程免 import 自动推导）
+  // ==========================================
+  const ref: typeof import('vue')['ref'];
+  const reactive: typeof import('vue')['reactive'];
+  const computed: typeof import('vue')['computed'];
+  const watch: typeof import('vue')['watch'];
+  const watchEffect: typeof import('vue')['watchEffect'];
+  const shallowRef: typeof import('vue')['shallowRef'];
+  const shallowReactive: typeof import('vue')['shallowReactive'];
+  const toRef: typeof import('vue')['toRef'];
+  const toRefs: typeof import('vue')['toRefs'];
+  const toValue: typeof import('vue')['toValue'];
+  const unref: typeof import('vue')['unref'];
+  const nextTick: typeof import('vue')['nextTick'];
+  const onMounted: typeof import('vue')['onMounted'];
+  const onUpdated: typeof import('vue')['onUpdated'];
+  const onUnmounted: typeof import('vue')['onUnmounted'];
+  const provide: typeof import('vue')['provide'];
+  const inject: typeof import('vue')['inject'];
+
+  // ==========================================
+  // uni-app X / UTS 核心对象与生命周期全局声明
+  // ==========================================
+  type UTSJSONObject = Record<string, any> & {
+    getString?: (key: string) => string | null;
+    getNumber?: (key: string) => number | null;
+    getBoolean?: (key: string) => boolean | null;
+    getJSON?: (key: string) => UTSJSONObject | null;
+    getArray?: (key: string) => any[] | null;
+    get?: (key: string) => any;
+    set?: (key: string, value: any) => void;
+  };
+  const UTSJSONObject: {
+    new (obj?: any): UTSJSONObject;
+    (obj?: any): UTSJSONObject;
+    keys: (obj: any) => string[];
+    values: (obj: any) => any[];
+    assign: (target: any, ...sources: any[]) => any;
+  };
+
+  type OnBackPressOptions = {
+    from: 'backbutton' | 'navigateBack';
+  };
+
+  type UniScrollEvent = {
+    detail: {
+      scrollLeft: number;
+      scrollTop: number;
+      scrollHeight: number;
+      scrollWidth: number;
+      deltaX: number;
+      deltaY: number;
+    };
+  };
+
+  function onLaunch(callback: (options?: any) => void): void;
+  function onShow(callback: (options?: any) => void): void;
+  function onHide(callback: () => void): void;
+  function onLoad(callback: (options?: any) => void): void;
+  function onReady(callback: () => void): void;
+  function onUnload(callback: () => void): void;
+  function onBackPress(callback: (options: OnBackPressOptions) => boolean | Promise<boolean> | void): void;
+  function onPullDownRefresh(callback: () => void): void;
+  function onReachBottom(callback: () => void): void;
+  function onPageScroll(callback: (options: { scrollTop: number }) => void): void;
+  function onResize(callback: (options: { size: { windowWidth: number; windowHeight: number } }) => void): void;
+  function onTabItemTap(callback: (options: { index: number; pagePath: string; text: string }) => void): void;
+  function getCurrentPages(): any[];
+  function getApp(): any;
+
   interface Uni {
     /**
      * 使手机发生较短时间的振动（15ms）
@@ -258,10 +329,25 @@ declare global {
   }
 }
 
-declare module '*.uts';
 declare module '*.uvue' {
   const component: import('vue').DefineComponent<{}, {}, any>;
   export default component;
+}
+
+declare module '@/src/router/interceptor' {
+  export * from '@/src/router/interceptor.uts';
+}
+
+declare module './src/router/interceptor' {
+  export * from '@/src/router/interceptor.uts';
+}
+
+declare module '@/src/tabbar' {
+  export * from '@/src/tabbar/index.uts';
+}
+
+declare module './src/tabbar' {
+  export * from '@/src/tabbar/index.uts';
 }
 
 declare module '@vue/runtime-core' {

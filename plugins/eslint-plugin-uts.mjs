@@ -789,6 +789,263 @@ export const pluginUts = {
           }
         });
       }
+    },
+
+    /** 9. 未定义符号/函数自动检测并提供一键快速修复导入 (Quick Fix 导入函数与变量) */
+    'auto-import-symbol': {
+      meta: {
+        type: 'problem',
+        docs: {
+          description: '检测未导入的全局函数与变量（如 switchTabbar、useAppStore 等），标红报错并在快速修复（小灯泡）中提供一键自动导入'
+        },
+        hasSuggestions: true,
+        messages: {
+          undefWithImport: '\'{{name}}\' 未定义。可一键导入: {{importPath}}',
+          undef: '\'{{name}}\' is not defined.'
+        }
+      },
+      create(context) {
+        const filename = context.filename || context.getFilename?.() || '';
+        if (filename.endsWith('.d.ts') || filename.endsWith('.d.uts.ts')) {
+          return {};
+        }
+
+        const projectRoot = process.cwd();
+
+        // 收集全项目公开导出的符号索引
+        function collectProjectExports() {
+          const exportMap = new Map();
+
+          function addSymbol(name, importPath) {
+            if (!name || name === 'default' || name.length <= 1)
+              return;
+            if (!exportMap.has(name))
+              exportMap.set(name, new Set());
+            exportMap.get(name).add(importPath);
+          }
+
+          function parseExports(relPath, facadeImportPath) {
+            const fullPath = path.join(projectRoot, relPath);
+            if (!fs.existsSync(fullPath))
+              return;
+            const content = fs.readFileSync(fullPath, 'utf-8');
+            const importPath = facadeImportPath || (`@/${relPath.replace(/\\/g, '/')}`);
+
+            const declRegex = /export\s+(?:declare\s+)?(?:function|const|let|var|type|class|enum)\s+([\w$]+)/g;
+            let m = declRegex.exec(content);
+            while (m !== null) {
+              addSymbol(m[1], importPath);
+              m = declRegex.exec(content);
+            }
+
+            const namedExportRegex = /export\s*\{([^}]+)\}/g;
+            let nm = namedExportRegex.exec(content);
+            while (nm !== null) {
+              const parts = nm[1].split(',');
+              for (const p of parts) {
+                const trimmed = p.trim();
+                if (!trimmed)
+                  continue;
+                const aliasMatch = trimmed.match(/\bas\s+([\w$]+)$/);
+                if (aliasMatch) {
+                  addSymbol(aliasMatch[1], importPath);
+                }
+                else {
+                  const directMatch = trimmed.match(/^[\w$]+/);
+                  if (directMatch)
+                    addSymbol(directMatch[0], importPath);
+                }
+              }
+              nm = namedExportRegex.exec(content);
+            }
+
+            const exportStarRegex = /export\s*\*\s*from\s*['"]([^'"]+)['"]/g;
+            let sm = exportStarRegex.exec(content);
+            while (sm !== null) {
+              const targetRel = path.normalize(path.join(path.dirname(relPath), sm[1]));
+              for (const ext of ['', '.uts', '.ts', '/index.uts', '/index.ts']) {
+                const cand = targetRel + ext;
+                const candFull = path.join(projectRoot, cand);
+                if (fs.existsSync(candFull) && !fs.statSync(candFull).isDirectory()) {
+                  parseExports(cand, importPath);
+                  break;
+                }
+              }
+              sm = exportStarRegex.exec(content);
+            }
+          }
+
+          // 核心公共门面
+          parseExports('src/tabbar/index.uts');
+          parseExports('src/store/index.uts');
+          parseExports('src/router/index.uts');
+          parseExports('src/http/request.uts');
+
+          // src/utils 各模块
+          const utilsDir = path.join(projectRoot, 'src/utils');
+          if (fs.existsSync(utilsDir)) {
+            try {
+              for (const sub of fs.readdirSync(utilsDir)) {
+                const idxFile = path.join(utilsDir, sub, 'index.uts');
+                if (fs.existsSync(idxFile)) {
+                  parseExports(path.relative(projectRoot, idxFile));
+                }
+              }
+            }
+            catch {}
+          }
+
+          return exportMap;
+        }
+
+        const exportMap = collectProjectExports();
+
+        return {
+          'Program:exit': function () {
+            const scopeManager = context.sourceCode.scopeManager;
+            if (!scopeManager || !scopeManager.globalScope)
+              return;
+
+            const globalVars = new Set(
+              scopeManager.globalScope.variables.map(v => v.name)
+            );
+
+            // 基础内置全局变量与常见类型
+            const builtins = new Set([
+              'String',
+              'Number',
+              'Boolean',
+              'Array',
+              'Object',
+              'Function',
+              'Promise',
+              'Map',
+              'Set',
+              'Date',
+              'Math',
+              'JSON',
+              'RegExp',
+              'Error',
+              'Record',
+              'any',
+              'void',
+              'null',
+              'undefined',
+              'never',
+              'unknown',
+              'UTSJSONObject',
+              'Uni',
+              'console',
+              'setTimeout',
+              'clearTimeout',
+              'setInterval',
+              'clearInterval',
+              'ref',
+              'computed',
+              'reactive',
+              'watch',
+              'watchEffect',
+              'shallowRef',
+              'shallowReactive',
+              'toRef',
+              'toRefs',
+              'toValue',
+              'unref',
+              'nextTick',
+              'onMounted',
+              'onUpdated',
+              'onUnmounted',
+              'provide',
+              'inject',
+              'defineOptions',
+              'defineProps',
+              'defineEmits',
+              'defineExpose',
+              'defineSlots',
+              'defineModel',
+              'definePage',
+              'withDefaults',
+              'uni',
+              'plus'
+            ]);
+
+            // 收集当前文件中所有已存在的 ImportDeclaration
+            const ast = context.sourceCode.ast;
+            let lastImportNode = null;
+            const existingImports = new Map(); // importPath -> ImportDeclaration node
+
+            if (ast && ast.body) {
+              for (const stmt of ast.body) {
+                if (stmt.type === 'ImportDeclaration' && stmt.source?.value) {
+                  lastImportNode = stmt;
+                  existingImports.set(stmt.source.value, stmt);
+                }
+              }
+            }
+
+            // 查找 <script setup> 标签位置
+            const rawSource = context.sourceCode.text;
+            const scriptSetupMatch = /<script\s[^>]*setup[^>]*>/i.exec(rawSource);
+
+            const reported = new Set();
+
+            for (const ref of scopeManager.globalScope.through) {
+              const idNode = ref.identifier;
+              const name = idNode.name;
+
+              if (reported.has(name))
+                continue;
+              if (globalVars.has(name) || builtins.has(name))
+                continue;
+
+              reported.add(name);
+
+              const candidateImports = exportMap.get(name);
+
+              if (candidateImports && candidateImports.size > 0) {
+                const suggestions = [];
+                for (const importPath of candidateImports) {
+                  suggestions.push({
+                    desc: `导入 ${name}: import { ${name} } from '${importPath}'`,
+                    fix(fixer) {
+                      const existing = existingImports.get(importPath);
+                      if (existing && existing.specifiers && existing.specifiers.length > 0) {
+                        const lastSpec = existing.specifiers[existing.specifiers.length - 1];
+                        return fixer.insertTextAfter(lastSpec, `, ${name}`);
+                      }
+                      if (lastImportNode) {
+                        return fixer.insertTextAfter(lastImportNode, `\nimport { ${name} } from '${importPath}';`);
+                      }
+                      if (scriptSetupMatch) {
+                        const insertPos = scriptSetupMatch.index + scriptSetupMatch[0].length;
+                        return fixer.insertTextAfterRange([insertPos, insertPos], `\nimport { ${name} } from '${importPath}';\n`);
+                      }
+                      return null;
+                    }
+                  });
+                }
+
+                context.report({
+                  node: idNode,
+                  messageId: 'undefWithImport',
+                  data: {
+                    name,
+                    importPath: Array.from(candidateImports)[0]
+                  },
+                  suggest: suggestions
+                });
+              }
+              else {
+                context.report({
+                  node: idNode,
+                  messageId: 'undef',
+                  data: { name }
+                });
+              }
+            }
+          }
+        };
+      }
     }
   }
 };

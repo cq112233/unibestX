@@ -136,7 +136,7 @@ module.exports = ({ modules }) => {
     order: -1,
 
     getLanguageId(fileName) {
-      if (fileName.endsWith('.uvue')) {
+      if (fileName.endsWith('.uvue') || fileName.endsWith('.uts')) {
         return 'vue';
       }
     },
@@ -148,6 +148,35 @@ module.exports = ({ modules }) => {
     parseSFC2(_fileName, languageId, content) {
       if (languageId !== 'vue') {
         return;
+      }
+      if (_fileName.endsWith('.uts')) {
+        const lines = content.split('\n');
+        return {
+          descriptor: {
+            filename: _fileName,
+            source: content,
+            comments: [],
+            template: null,
+            script: {
+              type: 'script',
+              content,
+              loc: {
+                start: { line: 1, column: 1, offset: 0 },
+                end: { line: lines.length, column: (lines[lines.length - 1] || '').length + 1, offset: content.length },
+                source: content
+              },
+              attrs: { lang: 'ts' },
+              lang: 'ts'
+            },
+            scriptSetup: null,
+            styles: [],
+            customBlocks: [],
+            cssVars: [],
+            slotted: false,
+            shouldForceReload: () => false
+          },
+          errors: []
+        };
       }
       const CompilerDOM = modules['@vue/compiler-dom'];
       const parse = createSfcParser(CompilerDOM);
