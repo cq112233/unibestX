@@ -18,7 +18,7 @@
     <!-- 单页 TabBar 容器模式（模式 4 且为主页）：由内部 TabViews/TabContent 独立承载滚动与下拉刷新，避免外层嵌套 scroll-view 导致手势冲突、TabBar 跟随下移与双重下拉刷新 -->
     <view
       v-if="isTabbarPage && isSinglePageHome"
-      class="flex-1 flex flex-col overflow-hidden"
+      class="navbar-tab-container"
       style="flex: 1; position: relative;"
     >
       <slot />
@@ -28,7 +28,7 @@
     <scroll-view
       v-else-if="useCustomRefresher"
       :direction="pageScrollDirection"
-      class="flex-1 flex flex-col"
+      class="navbar-scroll-view"
       :refresher-enabled="isRefresherEnabled"
       :refresher-triggered="isTriggered"
       :refresher-background="themeTokens.bgContent"
@@ -45,7 +45,7 @@
     <!-- 未开启自定义下拉刷新时（包含开启原生下拉刷新时）：渲染普通滚动容器 -->
     <scroll-view
       v-else
-      class="flex-1 flex flex-col"
+      class="navbar-scroll-view"
       :direction="pageScrollDirection"
       :lower-threshold="50"
       @scroll="handleScroll"
@@ -199,7 +199,7 @@ const isRefresherEnabled = computed((): boolean => {
  * 根容器样式类名：合并默认基础类名与自定义页面类名（customPageClass）
  */
 const rootClass = computed((): string => {
-  let cls = 'navbar-layout flex-1 flex flex-col';
+  let cls = 'navbar-layout';
   if (props.customPageClass.length > 0) {
     cls += ` ${props.customPageClass}`;
   }
@@ -589,5 +589,22 @@ defineExpose({
 
 <style lang="scss" scoped>
 .navbar-layout {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.navbar-tab-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+
+.navbar-scroll-view {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 </style>

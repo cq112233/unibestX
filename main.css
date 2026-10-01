@@ -1,10 +1,8 @@
 @import 'tailwindcss' source(none);
 @config "./tailwind.config.js";
-@source "./App.ku.uvue";
-@source "./App.uvue";
-@source "./src/**/*.{uts,uvue}";
-@source not "./uni_modules/**/*";
-@source not "./unpackage/**/*";
+@source "./src/pages/**/*.{uts,uvue}";
+@source "./src/sub/**/*.{uts,uvue}";
+@source "./src/components/**/*.{uts,uvue}";
 @custom-variant system-dark {
   @media (prefers-color-scheme: dark) {
     @slot;

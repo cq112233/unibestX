@@ -2,7 +2,7 @@
   <!-- 底部 TabBar 统一自适应垫高占位组件：根据 VITE_TABBAR_MODE、TabBar 风格形态及机型屏幕安全区动态垫高 -->
   <view
     v-if="shouldRender"
-    class="w-full"
+    class="tabbar-placeholder-box"
     :style="{ height: `${tabbarBottomPaddingHeight}px` }"
   />
 </template>
@@ -25,4 +25,8 @@ const shouldRender = computed((): boolean => {
 });
 </script>
 
-<style scoped></style>
+<style lang="scss" scoped>
+.tabbar-placeholder-box {
+  width: 100%;
+}
+</style>
