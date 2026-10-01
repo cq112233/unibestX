@@ -17,7 +17,8 @@ const darkMode = [
 export default {
   content: [
     './src/pages/**/*.{uts,uvue}',
-    './src/sub/**/*.{uts,uvue}'
+    './src/sub/**/*.{uts,uvue}',
+    './src/components/**/*.{uts,uvue}'
   ],
   darkMode,
   theme: {
