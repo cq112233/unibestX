@@ -230,7 +230,7 @@ export function uniRootX(options: UniRootXOptions = {}) {
           }
         }
         else {
-          const defaultContent = `<template>\n\t<view class="flex-1">\n\t\t<slot></slot>\n\t</view>\n</template>\n\n<script setup lang="uts">\nconst props = defineProps({\n\tlayout: { type: String, default: '' },\n\tshowBack: { type: Boolean, default: true },\n\thideNavbar: { type: Boolean, default: false },\n\thideStatusBar: { type: Boolean, default: false },\n\tenablePullDownRefresh: { type: Boolean, default: false },\n\tcustomPageClass: { type: String, default: '' },\n\tcustomPageStyle: { type: String, default: '' },\n\tpageStyle: { type: Object, default: () => ({}) }\n});\n</script>\n\n<style>\n</style>\n`;
+          const defaultContent = `<template>\n\t<view class="root-container" style="flex: 1;">\n\t\t<slot></slot>\n\t</view>\n</template>\n\n<script setup lang="uts">\nconst props = defineProps({\n\tlayout: { type: String, default: '' },\n\tshowBack: { type: Boolean, default: true },\n\thideNavbar: { type: Boolean, default: false },\n\thideStatusBar: { type: Boolean, default: false },\n\tenablePullDownRefresh: { type: Boolean, default: false },\n\tcustomPageClass: { type: String, default: '' },\n\tcustomPageStyle: { type: String, default: '' },\n\tpageStyle: { type: Object, default: () => ({}) }\n});\n</script>\n\n<style lang="scss" scoped>\n.root-container {\n\tflex: 1;\n}\n</style>\n`;
           try {
             fs.writeFileSync(targetFilePath, defaultContent, 'utf-8');
             console.log(`[uniRootX] 自动生成了缺少的 ${rawRootFileName}${targetFileExt} 文件`);

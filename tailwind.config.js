@@ -16,11 +16,8 @@ const darkMode = [
 /** @type {import('tailwindcss').Config} */
 export default {
   content: [
-    './App.uvue',
-    './App.ku.uvue',
-    './src/**/*.{uts,uvue}',
-    '!./uni_modules/**/*',
-    '!./unpackage/**/*'
+    './src/pages/**/*.{uts,uvue}',
+    './src/sub/**/*.{uts,uvue}'
   ],
   darkMode,
   theme: {

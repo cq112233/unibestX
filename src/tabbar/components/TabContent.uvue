@@ -29,7 +29,7 @@
     <scroll-view
       :key="refresherKey"
       direction="vertical"
-      class="flex-1 flex flex-col"
+      class="tab-content-scroll"
       style="flex: 1;"
       :refresher-enabled="isRefresherEnabled"
       :refresher-triggered="isTriggered"
@@ -378,13 +378,19 @@ defineExpose({
 });
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 /* Tab 视图绝对定位铺满容器，配合 left: -9999px 实现无感后台保活 */
 .tab-content-wrapper {
   position: absolute;
   top: 0;
   width: 100%;
   height: 100%;
+  flex-direction: column;
+}
+
+.tab-content-scroll {
+  flex: 1;
+  display: flex;
   flex-direction: column;
 }
 </style>
