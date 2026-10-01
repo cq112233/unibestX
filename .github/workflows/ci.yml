@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - base
+  pull_request:
+    branches:
+      - main
+      - base
+
+jobs:
+  lint:
+    name: Lint & Quality Checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
+
+      - name: UTS & UVUE ESLint
+        run: pnpm lint
+
+      - name: Stylelint (CSS / SCSS / UVUE)
+        run: pnpm lint:style
+
+      - name: Check UTS DTS Sync
+        run: pnpm check:uts-dts
