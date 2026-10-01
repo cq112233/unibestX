@@ -1,7 +1,10 @@
+import { computed } from 'vue';
 import { useAppStore } from '@/src/store';
 import { getThemeTokens } from '@/src/utils/theme/index.uts';
 import type { ThemeTokens } from '@/src/utils/theme/index.uts';
 import { isCompilerVersionGte, safeAreaInsets, TABBAR_BASE_HEIGHT } from '@/src/utils/systemInfo/index.uts';
+import { customTabbarConfig } from '../config.uts';
+import { needTabbarBottomPadding, tabbarType } from './strategy.uts';
 
 /** tabbar 白色底板高度（px），基准值统一引用 systemInfo 中的 TABBAR_BASE_HEIGHT */
 export const TABBAR_HEIGHT: number = TABBAR_BASE_HEIGHT;
@@ -36,4 +39,48 @@ export const isVersionGte525 = computed<boolean>((): boolean => {
 /** 占位块高度：统一为 50 + 底部安全区，占据正常文档流防止遮挡滚动内容 */
 export const tabbarPlaceholderHeight = computed<number>((): number => {
   return TABBAR_HEIGHT + safeAreaBottom.value;
+});
+
+/**
+ * 动态计算底部自定义/单页 TabBar 实际占用的真实垫高（px，响应式自适应 TabBar 风格、鼓包及机型安全区）
+ * - 若无需垫高（模式 0 无TabBar 或模式 1 原生TabBar）：返回 0
+ * - 胶囊形态 (capsule)：胶囊高度 64 + 底部偏移 12 + 底部安全区 safeAreaBottom（+ 4px 微小缓冲间距）
+ * - 标准底座形态 (default)：若有鼓包/midButton 为 80 + safeAreaBottom，普通为 50 + safeAreaBottom
+ */
+export const tabbarBottomPaddingHeight = computed<number>((): number => {
+  if (!needTabbarBottomPadding) {
+    return 0;
+  }
+  const safeBottom = safeAreaBottom.value;
+  // 胶囊悬浮岛样式 (默认高度 64 + 底部偏移 12 + 安全区 + 4px 缓冲间距)
+  if (tabbarType == 'capsule') {
+    return 64 + 12 + safeBottom + 4;
+  }
+  // #ifndef H5
+  // 在 App 端与小程序端：标准贴底底座 (default) 自身已作为普通文档流元素（tabbar-placeholder）占据高度，
+  // 滚动容器天然位于 TabBar 上方，内部无需重复垫高，返回 0 避免底部空白
+  return 0;
+  // #endif
+
+  // #ifdef H5
+  // 在 H5 端：若编译器 >= 5.25，DefaultTabbar 启用了 position: absolute 脱离文档流，需在滚动容器内部垫高
+  if (isVersionGte525.value) {
+    let hasBulge = false;
+    if (customTabbarConfig.midButton != null) {
+      hasBulge = true;
+    }
+    else {
+      const list = customTabbarConfig.list;
+      for (let i = 0; i < list.length; i++) {
+        if (list[i].isBulge == true) {
+          hasBulge = true;
+          break;
+        }
+      }
+    }
+    const baseH = hasBulge ? TABBAR_CONTAINER_HEIGHT : TABBAR_HEIGHT;
+    return baseH + safeBottom;
+  }
+  return 0;
+  // #endif
 });

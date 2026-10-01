@@ -43,6 +43,9 @@
     >
       <!-- 插槽：放置对应 Tab 的具体业务视图组件（如 IndexView、BasicView 等） -->
       <slot />
+
+      <!-- 底部 TabBar 统一占位垫高组件：根据 VITE_TABBAR_MODE、风格形态及安全区动态计算高度 -->
+      <TabbarPlaceholder />
     </scroll-view>
   </view>
 </template>
@@ -50,6 +53,7 @@
 <script setup lang="uts">
 import { computed, onMounted, onUnmounted, provide, ref, watch } from 'vue';
 import { curIdx, tabbarList } from '@/src/tabbar/index.uts';
+import TabbarPlaceholder from './TabbarPlaceholder.uvue';
 import { $t } from '@/src/utils/i18n/index.uts';
 import {
   isPageRefresherDisabled,
