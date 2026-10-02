@@ -287,7 +287,61 @@ declare global {
   function getCurrentPages(): any[];
   function getApp(): any;
 
+  type AppThemeChangeResult = {
+    appTheme: 'light' | 'dark' | string;
+  };
+
+  type OsThemeChangeResult = {
+    osTheme: 'light' | 'dark' | string;
+  };
+
+  type OnHostThemeChangeCallbackResult = {
+    hostTheme: 'light' | 'dark' | string;
+  };
+
+  type SetAppThemeOptions = {
+    theme: 'light' | 'dark' | 'auto' | string;
+    success?: (res: any) => void;
+    fail?: (err: any) => void;
+    complete?: (res: any) => void;
+  };
+
   interface Uni {
+    /**
+     * 设置应用深浅色主题模式（仅 App 端）
+     */
+    setAppTheme: (options: SetAppThemeOptions) => void;
+
+    /**
+     * 监听应用主题改变事件（仅 App 端）
+     */
+    onAppThemeChange: (callback: (result: AppThemeChangeResult) => void) => void;
+
+    /**
+     * 取消监听应用主题改变事件
+     */
+    offAppThemeChange?: (callback?: (result: AppThemeChangeResult) => void) => void;
+
+    /**
+     * 监听系统操作系统深浅色改变事件（仅 App 端跟随系统 auto 模式使用）
+     */
+    onOsThemeChange: (callback: (result: OsThemeChangeResult) => void) => void;
+
+    /**
+     * 取消监听系统操作系统深浅色改变事件
+     */
+    offOsThemeChange?: (callback?: (result: OsThemeChangeResult) => void) => void;
+
+    /**
+     * 监听小程序宿主主题改变事件
+     */
+    onHostThemeChange: (callback: (result: OnHostThemeChangeCallbackResult) => void) => void;
+
+    /**
+     * 取消监听小程序宿主主题改变事件
+     */
+    offHostThemeChange?: (callback?: (result: OnHostThemeChangeCallbackResult) => void) => void;
+
     /**
      * 使手机发生较短时间的振动（15ms）
      *
@@ -325,7 +379,6 @@ declare global {
       fail?: (result: any) => void;
       complete?: (result: any) => void;
     }) => void;
-
   }
 }
 
