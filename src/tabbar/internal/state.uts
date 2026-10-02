@@ -8,7 +8,6 @@ function buildFullTabbarList(config: TabBarConfig): CustomTabBarItem[] {
   const result: CustomTabBarItem[] = [];
   const list = config.list;
   const mid = config.midButton;
-
   if (mid != null) {
     const midItem: CustomTabBarItem = {
       text: mid.text ?? 'AI',

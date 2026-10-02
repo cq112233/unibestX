@@ -200,14 +200,12 @@ export class Observable<T> {
         subscription.unsubscribe();
       }
     );
-
     try {
       subscription.add(this._subscribeFn(subscriber));
     }
     catch (err) {
       subscriber.error(err);
     }
-
     return subscription;
   }
 
@@ -617,7 +615,6 @@ export function takeUntil<T>(notifier: Observable<any>): Operator<T, T> {
     return new Observable<T>((subscriber: Subscriber<T>): TeardownFn | null => {
       const state = new Subscription();
       let stopped: boolean = false;
-
       const notifierSub = notifier.subscribe(
         (_value: any): void => {
           stopped = true;
@@ -625,7 +622,6 @@ export function takeUntil<T>(notifier: Observable<any>): Operator<T, T> {
           state.unsubscribe();
         }
       );
-
       const sourceSub = source.subscribe(
         (value: T): void => {
           if (!stopped) {
@@ -643,14 +639,12 @@ export function takeUntil<T>(notifier: Observable<any>): Operator<T, T> {
           }
         }
       );
-
       state.add((): void => {
         notifierSub.unsubscribe();
       });
       state.add((): void => {
         sourceSub.unsubscribe();
       });
-
       return (): void => {
         stopped = true;
         state.unsubscribe();
@@ -717,7 +711,6 @@ export function catchError<T>(handler: (error: any) => Observable<T>): Operator<
   return (source: Observable<T>): Observable<T> => {
     return new Observable<T>((subscriber: Subscriber<T>): TeardownFn | null => {
       let fallbackSub: Subscription | null = null;
-
       const sub = source.subscribe(
         (value: T): void => {
           subscriber.next(value);
@@ -740,7 +733,6 @@ export function catchError<T>(handler: (error: any) => Observable<T>): Operator<
           subscriber.complete();
         }
       );
-
       return (): void => {
         sub.unsubscribe();
         const fs = fallbackSub;

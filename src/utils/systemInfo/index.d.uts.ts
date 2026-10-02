@@ -215,7 +215,10 @@ export declare function getScrollHeight(
 
 /** 更新页面可用高度 */
 export declare function updateAvailableHeight(
-  kuProps: AppKuHeightProps,
+  hideNavbar: boolean,
+  hideStatusBar: boolean,
+  pageStyle: Record<string, any> | null,
+  layout: string,
   selectedTabbarStrategy: number
 ): void;
 
@@ -311,7 +314,13 @@ export declare class SystemUtils {
   ): number;
 
   /** 更新页面可用高度 */
-  updateAvailableHeight(kuProps: AppKuHeightProps, selectedTabbarStrategy: number): void;
+  updateAvailableHeight(
+    hideNavbar: boolean,
+    hideStatusBar: boolean,
+    pageStyle: Record<string, any> | null,
+    layout: string,
+    selectedTabbarStrategy: number
+  ): void;
 }
 
 /** 系统与屏幕信息工具全局单例 */

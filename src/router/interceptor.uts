@@ -29,7 +29,6 @@ export function parseUrlToObj(url: string): UrlObj {
   const parts = url.split('?');
   const path = parts[0];
   const query = new Map<string, string>();
-
   if (parts.length > 1) {
     const queryStr = parts[1];
     const pairs = queryStr.split('&');
@@ -71,16 +70,13 @@ function doIntercept(url: string): boolean {
   if (url == null || url == '') {
     return true;
   }
-
   const urlObj = parseUrlToObj(url);
   let path = urlObj.path;
   const query = urlObj.query;
-
   // 1. 规范化路径：如果以 'src/' 开头，补充前导 '/' 使其变为 '/src/'
   if (path.startsWith('src/')) {
     path = `/${path}`;
   }
-
   // 相对路径解析：将 "subpage" 转换为基于当前页面所在目录的绝对路径 "/src/pages/.../subpage"
   if (!path.startsWith('/') && !path.startsWith('plugin://') && !path.startsWith('http://') && !path.startsWith('https://')) {
     const pages = getCurrentPages();
@@ -102,19 +98,15 @@ function doIntercept(url: string): boolean {
     }
     path = `${baseDir}/${path}`;
   }
-
   // 确保最终 path 也是以 '/' 开头的绝对路径形式，便于后面和 LOGIN_PAGE 及排除列表匹配
   if (path.startsWith('src/')) {
     path = `/${path}`;
   }
-
   console.log('doIntercept normalized path:', path);
-
   // 检查 Token 登录有效性
   const tokenStore = useTokenStore();
   const hasLogin = tokenStore.hasValidLogin();
   console.log('doIntercept login status - hasLogin:', hasLogin);
-
   if (hasLogin) {
     // 已经登录的情况下，如果目标不是登录页直接放行
     if (path !== LOGIN_PAGE) {
@@ -133,7 +125,6 @@ function doIntercept(url: string): boolean {
       return false;
     }
   }
-
   // 未登录情况下，记录想要跳转的完整 fullPath 并在登录成功后跳转回去
   let fullPath = path;
   if (query.size > 0) {
@@ -144,7 +135,6 @@ function doIntercept(url: string): boolean {
     fullPath += `?${paramsList.join('&')}`;
   }
   const redirectUrl = `${LOGIN_PAGE}?redirect=${encodeURIComponent(fullPath)}`;
-
   // 1. 默认需要登录模式（白名单策略）：EXCLUDE_LOGIN_PATH_LIST 中存放免登录页面
   if (isNeedLoginMode) {
     if (judgeIsExcludePath(path)) {
@@ -271,7 +261,6 @@ export function checkDirectEntry(options: UTSJSONObject | null) {
     const pathVal = options.path as string | null;
     if (pathVal != null && pathVal != '') {
       let url = `/${pathVal}`;
-
       // #ifdef H5
       let h5Url = '';
       const hash = window.location.hash;
@@ -285,7 +274,6 @@ export function checkDirectEntry(options: UTSJSONObject | null) {
         url = h5Url;
       }
       // #endif
-
       navigateToInterceptor.invoke({ url } as any);
     }
   }

@@ -17,7 +17,7 @@
 
 <script setup lang="uts">
 import Tabbar from '@/src/tabbar/tabbar.uvue';
-import { customTabbarEnable, isPageTabbar, selectedTabbarStrategy, syncCurIdxByCurrentPage } from '@/src/tabbar';
+import { customTabbarEnable, isPageTabbar, selectedTabbarStrategy, syncCurIdxByCurrentPage } from '@/src/tabbar/index.uts';
 import { useAppStore } from '@/src/store';
 import { applyNavbarTheme, getRootThemeStyle } from '@/src/utils/theme/index.uts';
 import { computed, onMounted, ref, watch } from 'vue';
@@ -170,12 +170,13 @@ function doUpdateHeight(overrideHideNavbar: boolean | null = null, overrideHideS
   if (overrideHideStatusBar != null) {
     activeHideStatusBar = overrideHideStatusBar as boolean;
   }
-  updateAvailableHeight({
-    hideNavbar: activeHideNavbar,
-    hideStatusBar: activeHideStatusBar,
-    pageStyle: (props.pageStyle ?? {}) as UTSJSONObject,
-    layout: props.layout
-  }, selectedTabbarStrategy);
+  updateAvailableHeight(
+    activeHideNavbar,
+    activeHideStatusBar,
+    (props.pageStyle ?? {}) as UTSJSONObject,
+    props.layout,
+    selectedTabbarStrategy
+  );
 }
 
 // 挂载时立即执行一次可用高度计算
