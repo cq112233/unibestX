@@ -7,7 +7,6 @@ import {
   getSystemTheme,
   isDarkMode,
   themeColor
-// @ts-expect-error allowArbitraryExtensions
 } from '@/src/utils/theme/index.uts';
 // 类型统一来自 src/store/types.uts（唯一真源），本文件严禁再 export type 同名类型
 import type { IAppState } from '../types.d.uts';
