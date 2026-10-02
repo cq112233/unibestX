@@ -374,14 +374,13 @@ function handleRefresherRefresh() {
   innerRefreshing.value = true;
   emit('update:refreshing', true);
   emit('refresh');
-
   if (refreshTimeoutId != null) {
     clearTimeout(refreshTimeoutId!);
   }
   // 6秒防卡死保底复位，避免外部异常导致无限转圈
-  refreshTimeoutId = setTimeout(() => {
+  refreshTimeoutId = (setTimeout(() => {
     endRefresh();
-  }, 6000);
+  }, 6000) as any) as number;
 }
 
 // 下拉刷新恢复
@@ -399,7 +398,6 @@ function handleScroll(e: UniScrollEvent) {
   const currentY = e.detail.scrollTop;
   oldScrollTop.value = currentY;
   emit('scroll', e);
-
   if (props.showBackToTop) {
     showBackToTopBtn.value = currentY > props.backToTopThreshold;
   }

@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import process from 'node:process';
+import type { Plugin } from 'vite';
 
 /**
  * 驼峰转连字符 helper（与 uni-layouts-plugin 中保持一致）
@@ -91,7 +92,7 @@ export type UniRootXOptions = {
 };
 
 // 自动给所有页面套上根包裹组件（如 AppRoot.uvue / App.ku.uvue），并把当前页面的参数通过 props 注入
-export function uniRootX(options: UniRootXOptions = {}) {
+export function uniRootX(options: UniRootXOptions = {}): Plugin {
   const {
     enabledGlobalRef = false,
     rootFileName = 'App.ku',
@@ -147,7 +148,7 @@ export function uniRootX(options: UniRootXOptions = {}) {
           if (subPkg == null || typeof subPkg.root !== 'string' || !Array.isArray(subPkg.pages)) {
             return;
           }
-          subPkg.pages.forEach((page) => {
+          subPkg.pages.forEach((page: any) => {
             if (page == null || typeof page.path !== 'string') {
               return;
             }
@@ -272,8 +273,8 @@ export function uniRootX(options: UniRootXOptions = {}) {
         });
       }
       const rootAttrs = buildPageAttrs(filteredParams);
-      if (typeof this.addWatchFile === 'function') {
-        this.addWatchFile(pagesJsonPath);
+      if (typeof (this as any).addWatchFile === 'function') {
+        (this as any).addWatchFile(pagesJsonPath);
       }
 
       let newCode = code;
@@ -326,6 +327,45 @@ export function uniRootX(options: UniRootXOptions = {}) {
         code: newCode,
         map: { mappings: '' }
       };
+    },
+    generateBundle(this: any, _: any, bundle: any) {
+      // 兼容 uni-app 小程序端对根目录含点文件名组件（如 App.ku.uvue）模板编译时将前缀截断为 App.wxml 的缺陷
+      if (rawRootFileName.includes('.')) {
+        const miniProgramExts = ['.wxml', '.axml', '.ttml', '.swan', '.qml'];
+        for (const ext of miniProgramExts) {
+          const srcFile = `App${ext}`;
+          const destFile = `${rawRootFileName}${ext}`;
+          if (bundle[srcFile] && !bundle[destFile]) {
+            this.emitFile({
+              type: 'asset',
+              fileName: destFile,
+              source: (bundle[srcFile] as any).source
+            });
+          }
+        }
+      }
+    },
+    writeBundle(options: any) {
+      // 产物落盘后的双重兜底，确保磁盘目录中同步存在完整的组件模板文件
+      if (rawRootFileName.includes('.')) {
+        const outDir = options.dir;
+        if (!outDir) {
+          return;
+        }
+        const miniProgramExts = ['.wxml', '.axml', '.ttml', '.swan', '.qml'];
+        for (const ext of miniProgramExts) {
+          const srcFile = path.join(outDir, `App${ext}`);
+          const destFile = path.join(outDir, `${rawRootFileName}${ext}`);
+          if (fs.existsSync(srcFile)) {
+            try {
+              fs.copyFileSync(srcFile, destFile);
+            }
+            catch {
+              // ignore
+            }
+          }
+        }
+      }
     }
   };
 }

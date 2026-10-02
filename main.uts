@@ -14,19 +14,14 @@ import '@/uni_modules/rice-ui/libs/style/index.css';
 export function createApp() {
   // 安装全局路由拦截器
   installRouteInterceptor();
-
   // 创建 Vue 应用程序实例，传入根组件 App
   const app = createSSRApp(App);
-
   // 注册 Pinia 状态管理
   app.use(pinia);
-
   // 可选配置：将 pinia 实例挂载到 Vue 全局属性中，以便于在 Options API 模板中使用 this.$pinia 访问
   app.config.globalProperties.$pinia = pinia;
-
   // 注册 i18n 国际化插件
   app.use(i18n);
-
   // 返回创建好的应用实例对象，供系统挂载运行
   return {
     app

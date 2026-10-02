@@ -53,7 +53,6 @@ export class UserStore extends PiniaStoreBase {
       this.state.userInfo.nickname = _data.nickname as string;
     if (_data.avatar != null)
       this.state.userInfo.avatar = _data.avatar as string;
-
     // 新版本嵌套结构
     if (_data.userInfo != null) {
       const infoObj = _data.userInfo as UTSJSONObject;
@@ -75,7 +74,6 @@ export class UserStore extends PiniaStoreBase {
       nickname: this.state.userInfo.nickname,
       avatar: this.state.userInfo.avatar
     } as UTSJSONObject;
-
     return {
       userInfo: infoObj
     } as UTSJSONObject;

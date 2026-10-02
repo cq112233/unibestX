@@ -135,11 +135,13 @@ export const useAppStore = defineStore('app', () => {
 
       // #ifndef APP
       // #ifndef H5
-      uni.onHostThemeChange((_res: OnHostThemeChangeCallbackResult) => {
-        if (state.themeMode == 'auto') {
-          refreshIsDark();
-        }
-      });
+      if (typeof (uni as any).onHostThemeChange === 'function') {
+        (uni as any).onHostThemeChange((_res: any) => {
+          if (state.themeMode == 'auto') {
+            refreshIsDark();
+          }
+        });
+      }
       // #endif
       // #endif
     }

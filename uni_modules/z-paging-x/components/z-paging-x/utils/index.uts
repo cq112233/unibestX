@@ -67,7 +67,7 @@ function _timeFormat(time: number): string {
   } else if (disTime == -86400000) {
     dayStr = refresherTimeTextMap.yesterday;
   } else {
-    dayStr = _dateDayFormat(date, date.getFullYear() !== currentDate.getFullYear());
+    dayStr = _dateDayFormat(date, date.getFullYear() != currentDate.getFullYear());
   }
   return `${dayStr} ${timeStr}`;
 }

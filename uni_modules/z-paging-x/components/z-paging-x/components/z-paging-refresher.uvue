@@ -27,7 +27,7 @@
     // 下拉刷新状态
     status: {
       type: String,
-      default: Enum.Refresher.Default,
+      default: Enum.Refresher.Default
     },
     // 自定义下拉刷新默认状态下的文字，默认：继续下拉刷新
     defaultText: {
@@ -113,7 +113,7 @@
     updateTimeStyle: {
       type: Object,
       default: (): UTSJSONObject => ({})
-    },
+    }
   })
 
   // 与z-paging的zTheme保持一致
@@ -141,16 +141,16 @@
   })
 
   const isDefault = computed((): boolean => {
-    return props.status === Enum.Refresher.Default;
+    return props.status == Enum.Refresher.Default;
   })
   const isReleaseToRefresh = computed((): boolean => {
-    return props.status === Enum.Refresher.ReleaseToRefresh;
+    return props.status == Enum.Refresher.ReleaseToRefresh;
   })
   const isLoading = computed((): boolean => {
-    return props.status === Enum.Refresher.Loading;
+    return props.status == Enum.Refresher.Loading;
   })
   const isComplete = computed((): boolean => {
-    return props.status === Enum.Refresher.Complete;
+    return props.status == Enum.Refresher.Complete;
   })
   const isGoF2 = computed((): boolean => {
     return props.status === Enum.Refresher.GoF2;

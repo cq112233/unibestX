@@ -1046,6 +1046,209 @@ export const pluginUts = {
           }
         };
       }
+    },
+
+    /** 13. UVUE 模板中标签与属性格式自动化清理（消除属性内换行、标签与属性间多余空行） */
+    'uvue-clean-template-whitespace': {
+      meta: {
+        type: 'layout',
+        docs: {
+          description: '自动格式化清理模板中标签内部空行、标签与属性间多余空行、class 属性内的换行与异常空格'
+        },
+        fixable: 'code',
+        messages: {
+          noBlankInTag: '标签内部（标签名与属性、属性与属性之间）禁止多余空行',
+          noBlankAfterComment: 'HTML 注释与紧随其后的标签之间不应有多余空行',
+          cleanAttr: '{{attrName}} 属性值应保持单行整洁，禁止在引号内部包含多余换行、连续空行或首尾空格'
+        }
+      },
+      create(context) {
+        if (!context.sourceCode.parserServices?.defineTemplateBodyVisitor) {
+          return {};
+        }
+
+        return context.sourceCode.parserServices.defineTemplateBodyVisitor({
+          // 1. 检查并清理标签内所有静态属性（class, style, src 等）内部的换行与连续空白
+          VAttribute(node) {
+            // 排除指令（如 :style、v-bind 等，只针对静态字符串属性）
+            if (node.directive || !node.key || !node.value) {
+              return;
+            }
+
+            const attrName = typeof node.key.name === 'string' ? node.key.name : 'attribute';
+            const rawText = context.sourceCode.getText(node.value);
+            const match = rawText.match(/^(['"])([\s\S]*)\1$/);
+            if (!match) {
+              return;
+            }
+
+            const quote = match[1];
+            const content = match[2];
+
+            const hasNewline = /[\r\n]/.test(content);
+            const hasExcessiveSpaces = /^\s+|\s+$|\s{2,}/.test(content);
+
+            if (hasNewline || hasExcessiveSpaces) {
+              const cleanedContent = content.replace(/\s+/g, ' ').trim();
+              const fixedText = `${quote}${cleanedContent}${quote}`;
+
+              context.report({
+                node: node.value,
+                messageId: 'cleanAttr',
+                data: { attrName },
+                fix(fixer) {
+                  return fixer.replaceText(node.value, fixedText);
+                }
+              });
+            }
+          },
+
+          // 2. 检查并清理开始标签内部（标签名与首属性、属性之间、尾属性与 > 之间）的多余空行
+          VStartTag(node) {
+            const attributes = node.attributes || [];
+            if (attributes.length === 0) {
+              return;
+            }
+
+            // 2.1 检查标签名到第一个属性之间的空行
+            const firstAttr = attributes[0];
+            const tagName = node.parent?.rawName || '';
+            const tagIdentifierEnd = node.range[0] + tagName.length + 1; // <tagName 的结束位置
+            const textBeforeFirstAttr = context.sourceCode.text.slice(tagIdentifierEnd, firstAttr.range[0]);
+
+            if (/(?:[\r\n]\s*){2,}/.test(textBeforeFirstAttr)) {
+              const indentMatch = textBeforeFirstAttr.match(/\r?\n([ \t]*)$/);
+              const indent = indentMatch ? indentMatch[1] : '      ';
+              context.report({
+                node: firstAttr,
+                messageId: 'noBlankInTag',
+                fix(fixer) {
+                  return fixer.replaceTextRange([tagIdentifierEnd, firstAttr.range[0]], `\n${indent}`);
+                }
+              });
+            }
+
+            // 2.2 检查属性与属性之间的空行
+            for (let i = 0; i < attributes.length - 1; i++) {
+              const currentAttr = attributes[i];
+              const nextAttr = attributes[i + 1];
+              const textBetween = context.sourceCode.text.slice(currentAttr.range[1], nextAttr.range[0]);
+              if (/(?:[\r\n]\s*){2,}/.test(textBetween)) {
+                const indentMatch = textBetween.match(/\r?\n([ \t]*)$/);
+                const indent = indentMatch ? indentMatch[1] : '      ';
+                context.report({
+                  node: nextAttr,
+                  messageId: 'noBlankInTag',
+                  fix(fixer) {
+                    return fixer.replaceTextRange([currentAttr.range[1], nextAttr.range[0]], `\n${indent}`);
+                  }
+                });
+              }
+            }
+
+            // 2.3 检查最后一个属性到 > 之间的空行
+            const lastAttr = attributes[attributes.length - 1];
+            const closeBracketStart = node.selfClosing ? node.range[1] - 2 : node.range[1] - 1;
+            const textAfterLastAttr = context.sourceCode.text.slice(lastAttr.range[1], closeBracketStart);
+            if (/(?:[\r\n]\s*){2,}/.test(textAfterLastAttr)) {
+              const indentMatch = textAfterLastAttr.match(/\r?\n([ \t]*)$/);
+              const indent = indentMatch ? indentMatch[1] : '    ';
+              context.report({
+                node: lastAttr,
+                messageId: 'noBlankInTag',
+                fix(fixer) {
+                  return fixer.replaceTextRange([lastAttr.range[1], closeBracketStart], `\n${indent}`);
+                }
+              });
+            }
+          }
+        }, {
+          // 3. 检查并清理 HTML 注释与紧随其后的标签之间的空行
+          'Program:exit': function () {
+            const comments = context.sourceCode.ast?.templateBody?.comments || [];
+            for (const comment of comments) {
+              const textAfter = context.sourceCode.text.slice(comment.range[1]);
+              const match = textAfter.match(/^((?:[ \t]*\r?\n){2,})([ \t]*)(<[a-z])/i);
+              if (match) {
+                const replaceStart = comment.range[1];
+                const replaceEnd = comment.range[1] + match[1].length + match[2].length;
+                const indent = match[2];
+                context.report({
+                  loc: comment.loc,
+                  messageId: 'noBlankAfterComment',
+                  fix(fixer) {
+                    return fixer.replaceTextRange([replaceStart, replaceEnd], `\n${indent}`);
+                  }
+                });
+              }
+            }
+          }
+        });
+      }
+    },
+
+    /** 14. 禁止函数体内部包含空行（格式化与保存时自动清除函数体内多余空行，保持函数紧凑） */
+    'no-empty-lines-in-function': {
+      meta: {
+        type: 'layout',
+        docs: {
+          description: '禁止函数体内部包含多余空行，保存或格式化时自动收拢消除'
+        },
+        fixable: 'code',
+        messages: {
+          noEmptyLine: '函数体内部禁止空行，请保持代码紧凑'
+        }
+      },
+      create(context) {
+        const sourceCode = context.sourceCode;
+        const reported = new Set();
+
+        function checkBlock(node) {
+          if (!node.parent)
+            return;
+          const parentType = node.parent.type;
+          const isFunction = (
+            (parentType === 'FunctionDeclaration' && node.parent.body === node)
+            || (parentType === 'FunctionExpression' && node.parent.body === node)
+            || (parentType === 'ArrowFunctionExpression' && node.parent.body === node)
+            || (parentType === 'MethodDefinition' && node.parent.value?.body === node)
+          );
+          if (!isFunction)
+            return;
+
+          const tokens = sourceCode.getTokens(node, { includeComments: true });
+          for (let i = 0; i < tokens.length - 1; i++) {
+            const tokenA = tokens[i];
+            const tokenB = tokens[i + 1];
+            if (tokenB.loc.start.line - tokenA.loc.end.line > 1) {
+              const key = `${tokenA.range[1]}-${tokenB.range[0]}`;
+              if (reported.has(key))
+                continue;
+              reported.add(key);
+
+              const textBetween = sourceCode.text.slice(tokenA.range[1], tokenB.range[0]);
+              const indentMatch = textBetween.match(/\r?\n([ \t]*)$/);
+              const indent = indentMatch ? indentMatch[1] : '';
+              const newline = textBetween.includes('\r\n') ? '\r\n' : '\n';
+
+              context.report({
+                loc: {
+                  start: { line: tokenA.loc.end.line + 1, column: 0 },
+                  end: { line: tokenB.loc.start.line - 1, column: 0 }
+                },
+                messageId: 'noEmptyLine',
+                fix(fixer) {
+                  return fixer.replaceTextRange([tokenA.range[1], tokenB.range[0]], `${newline}${indent}`);
+                }
+              });
+            }
+          }
+        }
+
+        return {
+          BlockStatement: checkBlock
+        };
+      }
     }
   }
 };

@@ -17,19 +17,15 @@ export function toLoginPage(options: UTSJSONObject | null = null) {
     return;
   }
   lastRedirectTime = now;
-
   const opts = options ?? ({} as UTSJSONObject);
   const mode = (opts.getString('mode') ?? 'navigateTo') as string;
   const queryString = (opts.getString('queryString') ?? '') as string;
-
   const url = `${LOGIN_PAGE}${queryString}`;
-
   // 判断当前页面是否已是登录页，避免重复跳转
   const currentPath = getCurrentPath();
   if (currentPath == LOGIN_PAGE || currentPath.endsWith(LOGIN_PAGE)) {
     return;
   }
-
   if (mode == 'navigateTo') {
     uni.navigateTo({ url });
   }

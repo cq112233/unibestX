@@ -244,7 +244,11 @@ configs.push({
     // 启用 UVUE/Vue 模板未导入组件检测与一键快速修复导入（Code Action 自动导入）
     'uts/auto-import-component': 'warn',
     // 启用未定义符号/函数检测与一键快速修复导入（Code Action 自动导入函数与变量，未导入立即爆红报错）
-    'uts/auto-import-symbol': 'error'
+    'uts/auto-import-symbol': 'error',
+    // 启用 UVUE/Vue 模板静态 class 属性与标签内部多余换行、连续空行与首尾空格自动收敛清理
+    'uts/uvue-clean-template-whitespace': 'error',
+    // 启用函数体内部禁止空行规范，保存与格式化时自动收拢消除函数内部空行
+    'uts/no-empty-lines-in-function': 'error'
   }
 });
 
