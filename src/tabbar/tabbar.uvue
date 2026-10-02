@@ -1,6 +1,6 @@
 <template>
   <!-- 悬浮胶囊风格 (type: 'capsule') -->
-  <CapsuleTabbar v-if="activeType == 'capsule'" />
+  <CapsuleTabbar v-if="activeType == 'capsule'" :glass-effect="glassEffect" />
   <!-- 标准底座风格 (type: 'default') -->
   <DefaultTabbar v-else-if="activeType == 'default'" />
   <!-- 兜底使用标准底座风格（若扩展了其他自定义风格，可在此继续添加分支） -->
@@ -18,6 +18,11 @@ const props = defineProps({
   type: {
     type: String,
     default: ''
+  },
+  /** 是否开启毛玻璃效果（默认 false，胶囊形态下生效） */
+  glassEffect: {
+    type: Boolean,
+    default: false
   }
 });
 
