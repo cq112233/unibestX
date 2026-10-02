@@ -18,21 +18,25 @@
 
       <!-- 导航栏内容区 -->
       <view class="navbar-content" :style="{ height: `${NAVBAR_CONTENT_HEIGHT}px` }">
-        <!-- 左侧返回按钮区域 -->
+        <!-- 左侧返回按钮区域（支付宝小程序不渲染，使用原生返回栏） -->
+        <!-- #ifndef MP-ALIPAY -->
         <view class="navbar-left">
           <slot name="left">
             <view v-if="showBack" class="navbar-back-btn" @click="handleBack">
-              <view
-                class="navbar-back-icon"
-                :style="{
-                  borderLeftColor: effectiveTitleColor,
-                  borderBottomColor: effectiveTitleColor,
-                  transform: 'rotate(45deg)'
-                }"
-              ></view>
+              <view class="navbar-back-icon">
+                <view
+                  class="navbar-back-line navbar-back-line--top"
+                  :style="{ backgroundColor: effectiveTitleColor }"
+                ></view>
+                <view
+                  class="navbar-back-line navbar-back-line--bottom"
+                  :style="{ backgroundColor: effectiveTitleColor }"
+                ></view>
+              </view>
             </view>
           </slot>
         </view>
+        <!-- #endif -->
 
         <!-- 中间标题区域 -->
         <view class="navbar-mid">
@@ -189,7 +193,7 @@ function handleBack() {
   bottom: 0;
   left: 0;
   z-index: 10;
-  width: 60px;
+  height: 100%;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -197,21 +201,38 @@ function handleBack() {
 }
 
 .navbar-back-btn {
+  height: 100%;
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  padding: 10px 15px;
+  padding-left: 16px;
+  padding-right: 16px;
 }
 
 .navbar-back-icon {
-  width: 10px;
-  height: 10px;
-  border-top-width: 0px;
-  border-right-width: 0px;
-  border-bottom-width: 2px;
-  border-left-width: 2px;
-  border-style: solid;
+  position: relative;
+  width: 12px;
+  height: 18px;
+}
+
+.navbar-back-line {
+  position: absolute;
+  width: 13.5px;
+  height: 2px;
+  border-radius: 1px;
+}
+
+.navbar-back-line--top {
+  left: 0px;
+  top: 4.5px;
+  transform: rotate(-35deg);
+}
+
+.navbar-back-line--bottom {
+  left: 0px;
+  top: 12.5px;
+  transform: rotate(35deg);
 }
 
 .navbar-mid {

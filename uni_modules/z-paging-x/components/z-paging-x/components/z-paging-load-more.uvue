@@ -20,7 +20,7 @@
     // 下拉刷新状态
     status: {
       type: String,
-      default: Enum.More.Default,
+      default: Enum.More.Default
     },
     // 滑动到底部"默认"文字，默认：点击加载更多
     defaultText: {
@@ -51,7 +51,7 @@
     isChat: {
       type: Boolean,
       default: false
-    },
+    }
   })
 
   const emit = defineEmits<{
@@ -73,16 +73,16 @@
   })
 
   const isDefault = computed((): boolean => {
-    return props.status === Enum.More.Default;
+    return props.status == Enum.More.Default;
   })
   const isLoading = computed((): boolean => {
-    return props.status === Enum.More.Loading;
+    return props.status == Enum.More.Loading;
   })
   const isNoMore = computed((): boolean => {
-    return props.status === Enum.More.NoMore;
+    return props.status == Enum.More.NoMore;
   })
   const isFail = computed((): boolean => {
-    return props.status === Enum.More.Fail;
+    return props.status == Enum.More.Fail;
   })
   const statusText = computed((): string => {
     // 底部加载更多状态 default:默认状态 loading:加载中 no-more:没有更多数据 fail:加载失败

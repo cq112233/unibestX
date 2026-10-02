@@ -72,7 +72,6 @@ export const themeColor = ref(getDefaultTheme());
  */
 export function getSystemTheme(): string {
   let theme: string = 'light';
-
   // #ifdef APP
   try {
     theme = uni.getDeviceInfo().osTheme ?? 'light';
@@ -81,7 +80,6 @@ export function getSystemTheme(): string {
     // ignore
   }
   // #endif
-
   // #ifdef H5
   // H5：系统深浅色跟随浏览器 prefers-color-scheme
   try {
@@ -91,7 +89,6 @@ export function getSystemTheme(): string {
     // ignore
   }
   // #endif
-
   // #ifndef APP
   // #ifndef H5
   // 微信小程序：读取宿主主题
@@ -103,7 +100,6 @@ export function getSystemTheme(): string {
   }
   // #endif
   // #endif
-
   return theme;
 }
 
@@ -211,7 +207,6 @@ export function applyThemeMode(mode: string, isDark: boolean): void {
     // ignore
   }
   // #endif
-
   // #ifdef H5
   try {
     const docEl = document.documentElement;
@@ -245,7 +240,6 @@ export function applyThemeMode(mode: string, isDark: boolean): void {
  */
 export function applyNavbarTheme(isDark: boolean): void {
   const tokens = getThemeTokens(isDark);
-
   // #ifdef H5
   // H5：直接修改 uni-page-head 的 DOM 样式（背景色 + 文字色 + 按钮色）
   try {
@@ -273,7 +267,6 @@ export function applyNavbarTheme(isDark: boolean): void {
     // 页面未就绪时忽略
   }
   // #endif
-
   // #ifndef H5
   // #ifndef APP
   // 微信小程序：调用官方 API（frontColor 仅支持 #ffffff / #000000，theme.json 已映射）
@@ -309,7 +302,6 @@ export function watchThemeChange(callback: () => void): void {
     // ignore
   }
   // #endif
-
   // #ifdef H5
   try {
     const darkMql = window.matchMedia('(prefers-color-scheme: dark)');
@@ -321,7 +313,6 @@ export function watchThemeChange(callback: () => void): void {
     // ignore
   }
   // #endif
-
   // #ifndef APP
   // #ifndef H5
   try {

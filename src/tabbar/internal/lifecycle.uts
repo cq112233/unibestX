@@ -89,7 +89,6 @@ export function onTabPageShow(index: number, callback: () => void, immediate: bo
     callback
   };
   subscribers.push(subscriber);
-
   onUnmounted(() => {
     for (let i = 0; i < subscribers.length; i++) {
       if (subscribers[i].id == id) {
@@ -98,7 +97,6 @@ export function onTabPageShow(index: number, callback: () => void, immediate: bo
       }
     }
   });
-
   watch(curIdx, (newVal: number, oldVal: number) => {
     if (newVal != index || oldVal == index) {
       return;
@@ -109,7 +107,6 @@ export function onTabPageShow(index: number, callback: () => void, immediate: bo
     }
     callback();
   });
-
   if (immediate && pageShowTimes.value > 0 && isPageVisible.value && curIdx.value == index) {
     callback();
   }

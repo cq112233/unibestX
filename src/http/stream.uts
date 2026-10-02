@@ -61,29 +61,24 @@ export class Utf8StreamDecoder {
     for (let i: number = 0; i < incomingLen; i++) {
       merged.push(incoming[i]);
     }
-
     const total = merged.length;
     const safeEnd = this._findSafeEnd(merged, total);
-
     if (safeEnd <= 0) {
       // 整段都还不完整，继续等下一块
       this._pending = merged;
       return '';
     }
-
     // 可安全解码的部分
     const safe = new Uint8Array(safeEnd);
     for (let i: number = 0; i < safeEnd; i++) {
       safe[i] = merged[i];
     }
-
     // 残缺尾部留待下一块
     const rest: Array<number> = [];
     for (let i: number = safeEnd; i < total; i++) {
       rest.push(merged[i]);
     }
     this._pending = rest;
-
     return this._decoder.decode(safe);
   }
 
@@ -100,7 +95,6 @@ export class Utf8StreamDecoder {
     if (total <= 0) {
       return 0;
     }
-
     // 最多向前回溯 4 字节（UTF-8 单字符最长 4 字节），跳过续接字节 0b10xxxxxx
     let contCount: number = 0;
     let idx: number = total - 1;
@@ -115,12 +109,10 @@ export class Utf8StreamDecoder {
       }
       break;
     }
-
     if (idx < 0) {
       // 整段都是续接字节（异常数据），全部留待下一块
       return 0;
     }
-
     const lead: number = bytes[idx];
     let expected: number = 1;
     if ((lead & 0x80) == 0x00) {
@@ -139,7 +131,6 @@ export class Utf8StreamDecoder {
       // 非法起始字节，按单字节放行，交给 TextDecoder 输出 U+FFFD
       expected = 1;
     }
-
     if (contCount + 1 >= expected) {
       // 该字符已完整到达
       return total;
@@ -175,7 +166,6 @@ export function requestStream(
     const decoder = new Utf8StreamDecoder();
     let receivedText: string = '';
     let settled: boolean = false;
-
     // 错误统一以 Error 实例下沉，页面侧用 `err instanceof Error` 即可安全取文案，
     // 规避 UTS 中对象字面量 / UTSJSONObject 类型断言的运行时不确定性
     const settle = (errMsg: string | null): void => {
@@ -190,14 +180,12 @@ export function requestStream(
         subscriber.error(new Error(errMsg));
       }
     };
-
     const requestHeader: UTSJSONObject = header != null
       ? header
       : {
           'Content-Type': 'application/json',
           'Accept': 'text/event-stream, application/x-ndjson, application/json'
         } as UTSJSONObject;
-
     const task = uni.request({
       url,
       method: 'POST',
@@ -218,7 +206,6 @@ export function requestStream(
         settle(msg);
       }
     });
-
     // 逐块接收：解码 → 累积 → 推送
     task.onChunkReceived((result) => {
       if (settled) {
@@ -235,7 +222,6 @@ export function requestStream(
         elapsedMs: Date.now() - startTime
       } as StreamChunk);
     });
-
     // 取消订阅时中断底层请求
     return (): void => {
       settled = true;
@@ -266,15 +252,12 @@ export function simulateStream(
   return new Observable<StreamChunk>((subscriber: Subscriber<StreamChunk>): TeardownFn | null => {
     const startTime: number = Date.now();
     const totalLen = text.length;
-
     if (totalLen <= 0) {
       subscriber.complete();
       return null;
     }
-
     let cursor: number = 0;
     let receivedLength: number = 0;
-
     // 必须先声明再赋值，不能写成 `const timerId = setInterval(() => { ... clearInterval(timerId) ... })`：
     // 回调体里引用了 timerId 自己，Kotlin 端会报「找不到名称 timerId」
     // （变量在自身初始化表达式中不可见；JS 因为回调延后执行才侥幸能跑）。
@@ -285,19 +268,16 @@ export function simulateStream(
       const piece = text.substring(cursor, cursor + size);
       cursor = cursor + size;
       receivedLength = receivedLength + piece.length;
-
       subscriber.next({
         text: piece,
         receivedLength,
         elapsedMs: Date.now() - startTime
       } as StreamChunk);
-
       if (cursor >= totalLen) {
         clearInterval(timerId);
         subscriber.complete();
       }
     }, intervalMs);
-
     return (): void => {
       clearInterval(timerId);
     };

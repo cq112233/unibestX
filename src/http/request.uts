@@ -67,7 +67,6 @@ requestInstance.interceptors.request.use(
     if (header.Accept == null) {
       header.Accept = 'application/json, text/plain, */*';
     }
-
     const extra = config.extra;
     let ignoreAuth = false;
     if (extra !== null) {
@@ -76,7 +75,6 @@ requestInstance.interceptors.request.use(
         ignoreAuth = true;
       }
     }
-
     if (!ignoreAuth) {
       const tokenStore = useTokenStore();
       const token = tokenStore.getToken();
@@ -85,14 +83,12 @@ requestInstance.interceptors.request.use(
       }
       header.token = token;
     }
-
     if (extra !== null) {
       const domain = (extra as UTSJSONObject).domain as string | null;
       if (domain != null) {
         config.baseURL = domain;
       }
     }
-
     return config;
   },
   (error: LimeRequestFail): Promise<LimeRequestFail> => {
@@ -108,11 +104,9 @@ requestInstance.interceptors.response.use(
     const config = response.config;
     const extra = config.extra;
     const method = config.method;
-
     if (method === 'UPLOAD' || method === 'DOWNLOAD') {
       return response;
     }
-
     const statusCode = response.statusCode;
     if (statusCode != 200) {
       const errorMessage = ShowMessage(statusCode);
@@ -125,19 +119,16 @@ requestInstance.interceptors.response.use(
       }
       throw new Error(`${errorMessage}：${response.errMsg}`);
     }
-
     const rawData = response.data;
     if (rawData === null) {
       throw new Error('返回的响应数据为空');
     }
-
     const resultObj = JSON.parseObject(JSON.stringify(rawData));
     if (resultObj !== null) {
       const code = resultObj.getNumber('code');
       const msgByKey = resultObj.message as string | null;
       const msgByMsg = resultObj.msg as string | null;
       const message: string = msgByKey != null ? msgByKey : (msgByMsg != null ? msgByMsg : '未知错误');
-
       if (code !== null) {
         const codeVal = code as number;
         if (codeVal !== ResultEnum.Success0 && codeVal !== ResultEnum.Success200) {
@@ -160,7 +151,6 @@ requestInstance.interceptors.response.use(
         }
       }
     }
-
     return response;
   },
   (error: LimeRequestFail): Promise<LimeRequestFail> => {
@@ -192,7 +182,6 @@ export class HttpClient {
           throw new Error('响应结构包含 code，但 data 字段为空');
         }
       }
-
       return rawData as T;
     });
   }

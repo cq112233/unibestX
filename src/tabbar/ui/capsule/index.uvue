@@ -7,6 +7,7 @@
 <script setup lang="uts">
 import {
   curIdx,
+  customTabbarConfig,
   handleTabbarClick,
   safeHideNativeTabBar,
   syncCurIdxByCurrentPage,
@@ -33,23 +34,42 @@ const props = defineProps({
   showPlaceholder: {
     type: Boolean,
     default: false
+  },
+  /** 是否开启毛玻璃效果（默认 false） */
+  glassEffect: {
+    type: Boolean,
+    default: false
   }
 });
 
 const appStore = useAppStore();
+
+/** 是否开启毛玻璃效果（优先取 prop，未传或为 false 时降级读取 config.uts 中的 glassEffect 配置） */
+const isGlass = computed<boolean>((): boolean => {
+  if (props.glassEffect) {
+    return true;
+  }
+  return customTabbarConfig.glassEffect == true;
+});
 
 // 亮 / 暗主题 token（与 theme.json tabBar 配置同步）
 const themeTokens = computed((): ThemeTokens => {
   return getThemeTokens(appStore.state.isDark);
 });
 
-/** 胶囊底座背景色（显式解包 computed 避免 iOS VDOM 嵌套取值异常） */
+/** 胶囊底座背景色（开启毛玻璃时使用半透明色值，未开启使用实色） */
 const tabBgColor = computed<string>((): string => {
+  if (isGlass.value) {
+    return appStore.state.isDark ? 'rgba(30, 41, 59, 0.8)' : 'rgba(255, 255, 255, 0.82)';
+  }
   return themeTokens.value.tabBg;
 });
 
-/** 胶囊底座边框色 */
+/** 胶囊底座边框色（开启毛玻璃时使用半透明通透边框） */
 const tabBorderColor = computed<string>((): string => {
+  if (isGlass.value) {
+    return appStore.state.isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(255, 255, 255, 0.6)';
+  }
   return themeTokens.value.tabBorder;
 });
 
@@ -172,6 +192,7 @@ const bottom = computed(() => {
     <!-- 悬浮胶囊底座主容器 -->
     <view
       class="custom-capsule-container"
+      :class="{ 'capsule-glass': isGlass }"
       :style="{
         bottom: `${bottom}px`,
         height: `${height}px`,
@@ -259,6 +280,13 @@ const bottom = computed(() => {
   border-radius: 34px;
   /* 轻量弱阴影，避免在原生 Android 端阴影重绘掉帧 */
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+/* 毛玻璃磨砂滤镜效果（Web / 小程序） */
+.capsule-glass {
+  /* #ifdef WEB || MP-WEIXIN */
+  backdrop-filter: blur(20px);
+  /* #endif */
 }
 
 /* 动态滑块滑动轨道（与外层 4px 6px padding 区域对齐） */
