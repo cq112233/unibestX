@@ -20,7 +20,7 @@
 
 </div>
 
-`unibestX` 由 **`uni-app X` + `Vue3` + `UTS` + `Vite5` + `Tailwind CSS` + `z-paging-x`** 构成，采用下一代 uni-app 原生开发技术栈，通过 `HBuilderX` 一键运行到 **Android / iOS / 鸿蒙 / H5 / 微信小程序** 五大平台。
+`unibestX` 由 **`uni-app X` + `Vue3` + `UTS` + `Vite5` + `Tailwind CSS` + `z-paging-x`** 构成，采用下一代 uni-app 原生开发技术栈，通过 `HBuilderX` 一键运行到 **Android / iOS / 鸿蒙 / H5 / 微信小程序 / 支付宝小程序** 六大平台。
 
 内置 `自定义 TabBar`、`Layout 布局`、`请求封装`、`登录拦截`、`路由守卫`、`Tailwind CSS`、`i18n 多语言`、`主题切换`、`沙盒极速调试` 等基础能力，并提供 `代码提示`、`自动格式化`、`统一配置` 等辅助功能，让你编写 `uni-app X` 拥有 `best` 体验。
 
@@ -170,6 +170,7 @@ pnpm dev:app-ios        # 运行到 iOS 模拟器（需 macOS + Xcode）
 pnpm dev:app-ios:device # 运行到 iOS 真机（需连接 iPhone 并信任此电脑）
 pnpm dev:app-harmony    # 运行到鸿蒙原生端（需 DevEco Studio）
 pnpm dev:mp-weixin      # 运行到微信小程序
+pnpm dev:mp-alipay      # 运行到支付宝小程序
 ```
 
 #### 🛠️ 方式二：HBuilderX 图形化
@@ -181,6 +182,7 @@ pnpm dev:mp-weixin      # 运行到微信小程序
 | Android / iOS / 鸿蒙 | `运行 → 运行到手机或模拟器`，选择已连接的设备 |
 | H5 | `运行 → 运行到浏览器` |
 | 微信小程序 | `运行 → 运行到小程序模拟器 → 微信开发者工具` |
+| 支付宝小程序 | `运行 → 运行到小程序模拟器 → 支付宝小程序开发者工具` |
 
 ### 4. 打包与发布
 
@@ -257,6 +259,7 @@ pnpm docker:down
 | 鸿蒙 | `发行 → 原生App-鸿蒙` |
 | H5 | `发行 → 网站-H5手机版`，产物在 `unpackage/dist/build/web` |
 | 微信小程序 | `发行 → 小程序-微信`，再通过微信开发者工具上传 |
+| 支付宝小程序 | `发行 → 小程序-支付宝`，再通过支付宝小程序开发者工具上传 |
 
 #### 其他常用脚本
 
@@ -277,13 +280,13 @@ pnpm check:uts-dts  # 校验 UTS 类型声明是否为最新（CI 用）
 | :--- | :--- |
 | Node | >= 22 |
 | pnpm | >= 7.30 |
-| HBuilderX | **5.24 及以上**（App 端蒸汽模式必需；旧版本可切 VDOM 模式运行） |
+| HBuilderX | **5.24 及以上**（Android 蒸汽模式需 >= 5.21，iOS 需 >= 5.11；支付宝小程序需 >= 5.31） |
 | Vue Official | >= 2.1.10 |
 | TypeScript | >= 5.0 |
 | JDK | >= 17（Android 平台） |
-| Android SDK | Android 平台 |
-| Xcode | iOS 平台，仅 macOS |
-| DevEco Studio | 鸿蒙平台 |
+| Android SDK | 最低 Android 6.0+ |
+| Xcode | 最低 iOS 15+（仅 macOS） |
+| DevEco Studio | 鸿蒙平台（最低 API 20+，即鸿蒙 6.0+） |
 
 ---
 
@@ -377,24 +380,32 @@ pnpm check:uts-dts  # 校验 UTS 类型声明是否为最新（CI 用）
 ## 📱 各端首页截图
 
 <p align="center">
-  <img src="https://i.ibb.co/xS0ssKm9/wxxcx.png" width="19%" alt="微信小程序" />
-  <img src="https://i.ibb.co/cSJ8wPbn/android.png" width="19%" alt="Android" />
-  <img src="https://i.ibb.co/Fbzwbzsx/h5.png" width="19%" alt="H5" />
-  <img src="https://i.ibb.co/7dpytqFJ/ios.png" width="19%" alt="iOS" />
-  <img src="https://i.ibb.co/MxXrjGq9/hm.png" width="19%" alt="鸿蒙" />
+  <img src="https://i.ibb.co/xS0ssKm9/wxxcx.png" width="16%" alt="微信小程序" />
+  <img src="https://i.ibb.co/8LFWxXLj/Screen-Shot-2026-10-02-204808-629.png" width="16%" alt="支付宝小程序" />
+  <img src="https://i.ibb.co/cSJ8wPbn/android.png" width="16%" alt="Android" />
+  <img src="https://i.ibb.co/Fbzwbzsx/h5.png" width="16%" alt="H5" />
+  <img src="https://i.ibb.co/7dpytqFJ/ios.png" width="16%" alt="iOS" />
+  <img src="https://i.ibb.co/MxXrjGq9/hm.png" width="16%" alt="鸿蒙" />
 </p>
 
 <p align="center">
-  微信小程序 &nbsp;&nbsp;|&nbsp;&nbsp; Android &nbsp;&nbsp;|&nbsp;&nbsp; H5 &nbsp;&nbsp;|&nbsp;&nbsp; iOS &nbsp;&nbsp;|&nbsp;&nbsp; 鸿蒙
+  微信小程序 &nbsp;&nbsp;|&nbsp;&nbsp; 支付宝小程序 &nbsp;&nbsp;|&nbsp;&nbsp; Android &nbsp;&nbsp;|&nbsp;&nbsp; H5 &nbsp;&nbsp;|&nbsp;&nbsp; iOS &nbsp;&nbsp;|&nbsp;&nbsp; 鸿蒙
 </p>
 
 ## 平台兼容性
 
-| Android | iOS | 鸿蒙 | H5 | 微信小程序 |
-| ------- | --- | --- | -- | ---------- |
-| √ | √ | √ | √ | √ |
+| Android | iOS | 鸿蒙 (HarmonyOS) | H5 | 微信小程序 | 支付宝小程序 |
+| :---: | :---: | :---: | :---: | :---: | :---: |
+| √ | √ | √ | √ | √ | √ |
+| **>= 5.21**<br>(蒸汽模式起) | **>= 5.11**<br>(蒸汽模式起) | **>= 5.0** | **>= 4.0** | **>= 4.0** | **>= 5.31** |
 
-> 注意：uni-app X 目前兼容以上 5 个端平台，其他小程序平台暂不支持。
+> 💡 **支持的 HBuilderX 版本与系统最低要求说明**：
+>
+> - **Android 端**：**HBuilderX 5.21+** 支持（蒸汽模式起），最低系统要求为 **Android 6.0+**；
+> - **iOS 端**：**HBuilderX 5.11+** 支持（蒸汽模式起），最低系统要求为 **iOS 15+**；
+> - **鸿蒙 (HarmonyOS)**：**HBuilderX 5.0+** 支持，最低 API 要求为 **20+（即鸿蒙 6.0+）**；
+> - **支付宝小程序**：需 **HBuilderX 5.31 及以上**；
+> - **H5 / 微信小程序**：从 **HBuilderX 4.0 起** 全面支持。
 
 ## 📁 项目结构
 
