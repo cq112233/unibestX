@@ -14,22 +14,6 @@ export function getAppTitle(): string {
  * 获取当前应用版本号（优先从系统运行时获取，若为空从 VITE_APP_VERSION 或兜底 1.0.0）
  */
 export function getAppVersion(): string {
-  try {
-    const sys = uni.getSystemInfoSync();
-    if ((sys.appVersion ?? '') != '') {
-      return `${sys.appVersion}`;
-    }
-  }
-  catch { }
-  // #ifdef MP-WEIXIN
-  try {
-    const appBaseInfo = uni.getAppBaseInfo() as any;
-    if ((appBaseInfo.appVersion ?? '') != '') {
-      return `${appBaseInfo.appVersion}`;
-    }
-  }
-  catch { }
-  // #endif
   return `${import.meta.env.VITE_APP_VERSION ?? '1.0.0'}`;
 }
 

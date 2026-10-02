@@ -20,7 +20,6 @@ export function handleBackPressExit(): boolean {
     }, 2000);
     return true;
   }
-
   // 2秒内再次触发，退出应用
   // #ifdef APP-ANDROID
   try {
@@ -40,10 +39,8 @@ export function handleBackPressExit(): boolean {
     uni.exit();
   }
   // #endif
-
   // #ifndef APP-ANDROID
   uni.exit();
   // #endif
-
   return false;
 }

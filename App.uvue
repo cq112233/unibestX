@@ -1,23 +1,20 @@
 <script setup lang="uts">
-import { checkDirectEntry } from './src/router/interceptor';
+import { checkDirectEntry } from './src/router/interceptor.uts';
 import { useAppStore } from './src/store';
-import { initNativeMidButtonTap } from '@/src/tabbar';
+import { initNativeMidButtonTap } from '@/src/tabbar/index.uts';
 import { applyThemeColor, themeColor } from '@/src/utils/theme/index.uts';
 
 onLaunch(() => {
   // 提前实例化 App Store（含持久化还原），并初始化外观模式：跟随系统 / 浅色 / 深色
   const appStore = useAppStore();
   appStore.initThemeMode();
-
   // 确保全局 themeColor 与运行环境同步为持久化恢复的主题色
   if (appStore.state.theme.length > 0) {
     themeColor.value = appStore.state.theme;
     applyThemeColor(appStore.state.theme);
   }
-
   // 注册原生 TabBar 中间按钮监听（仅在原生模式且配置了 midButton 时生效）
   initNativeMidButtonTap();
-
   // #ifdef MP-WEIXIN
   // 微信小程序真机 @font-face 不生效，使用 uni.loadFontFace 加载 uni-icons 字体
   uni.loadFontFace({
@@ -31,7 +28,6 @@ onLaunch(() => {
       console.warn('global loadFontFace uniicons.ttf fail', error.errMsg);
     }
   });
-
   // #endif
 });
 

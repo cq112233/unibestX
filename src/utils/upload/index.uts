@@ -51,7 +51,6 @@ export function uploadFile(options: UploadFileOptions): Promise<string> {
       finalUrl = `${DEFAULT_OSS_BASE_URL}${finalUrl}`;
     }
     const header = options.header ?? ({} as UTSJSONObject);
-
     // 自动携带 Token
     if (options.ignoreAuth != true) {
       const tokenStore = useTokenStore();
@@ -60,7 +59,6 @@ export function uploadFile(options: UploadFileOptions): Promise<string> {
         header.token = token;
       }
     }
-
     const uploadTask = uni.uploadFile({
       url: finalUrl,
       filePath: options.filePath,
@@ -86,7 +84,6 @@ export function uploadFile(options: UploadFileOptions): Promise<string> {
         reject(new Error(err.errMsg ?? '文件上传失败'));
       }
     });
-
     // 上传进度监听
     if (options.onProgress != null) {
       uploadTask.onProgressUpdate((res) => {
@@ -120,12 +117,10 @@ function parseUploadResult(raw: string): string {
   if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
     return trimmed;
   }
-
   const obj = JSON.parseObject(trimmed);
   if (obj == null) {
     return trimmed;
   }
-
   // 1. 优先检查显式的 success 布尔值
   const successVal = obj.getBoolean('success');
   if (successVal == false) {
@@ -133,14 +128,12 @@ function parseUploadResult(raw: string): string {
     const code = obj.getString('code') ?? (obj.getNumber('code') != null ? `${obj.getNumber('code')}` : '');
     throw new Error(`上传失败${code != '' ? `[${code}]` : ''}：${msg}`);
   }
-
   // 2. 检查 code 状态码（若 success 显式为 true 则视为成功；未提供 success 时按 code 白名单校验）
   if (successVal != true) {
     const numCode = obj.getNumber('code');
     const strCode = obj.getString('code');
     let isFailed = false;
     let codeStr = '';
-
     if (numCode != null) {
       codeStr = `${numCode}`;
       // 常见成功码：200, 0, 10000
@@ -155,19 +148,16 @@ function parseUploadResult(raw: string): string {
         isFailed = true;
       }
     }
-
     if (isFailed) {
       const msg = obj.getString('msg') ?? obj.getString('message') ?? '上传失败';
       throw new Error(`上传失败[${codeStr}]：${msg}`);
     }
   }
-
   // 3. 提取 url（顶级 url 或嵌套 data.url / data.fileUrl 等）
   const topUrl = obj.getString('url');
   if (topUrl != null && topUrl != '') {
     return topUrl;
   }
-
   const data = obj.get('data');
   if (data != null) {
     if (typeof data == 'string') {
@@ -182,12 +172,10 @@ function parseUploadResult(raw: string): string {
       return dataUrl;
     }
   }
-
   // 4. 若没有找到明确的 URL，且原内容不是 URL，抛出解析异常，避免将未知 JSON 当成 URL
   if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
     throw new Error('上传成功但未能从响应中解析出文件 URL 地址');
   }
-
   return trimmed;
 }
 

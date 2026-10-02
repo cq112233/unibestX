@@ -1,0 +1,18 @@
+export type QueryResult = {
+  pageNo: number;
+  pageSize: number;
+}
+
+export type ZPagingXInstance = {
+  reload: () => void;
+  refresh: () => void;
+  complete: (data: any[] | null) => void;
+  completeByTotal: (data: any[] | null, total: number) => void;
+  completeByNoMore: (data: any[] | null, nomore: boolean) => void;
+  completeByError: () => void;
+  endRefresh: () => void;
+  clear: () => void;
+  scrollToTop: (animate: boolean) => void;
+  scrollToBottom: (animate: boolean) => void;
+  scrollToY: (y: number, animate: boolean) => void;
+}

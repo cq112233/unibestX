@@ -61,7 +61,6 @@ export const tabbarBottomPaddingHeight = computed<number>((): number => {
   // 滚动容器天然位于 TabBar 上方，内部无需重复垫高，返回 0 避免底部空白
   return 0;
   // #endif
-
   // #ifdef H5
   // 在 H5 端：若编译器 >= 5.25，DefaultTabbar 启用了 position: absolute 脱离文档流，需在滚动容器内部垫高
   if (isVersionGte525.value) {
