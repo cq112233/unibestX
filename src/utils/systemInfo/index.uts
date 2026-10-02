@@ -181,47 +181,36 @@ export const availableHeight = computed<number>((): number => {
 /** 便捷响应式：底部安全区高度（px），未初始化时为 0 */
 export const safeAreaBottom = computed<number>((): number => systemInfo.value?.safeAreaInsets?.bottom ?? 0);
 
-export function updateSystemInfo() {
-  // 窗口信息：所有平台统一从 uni.getWindowInfo() 读取
-  const windowInfo = uni.getWindowInfo();
-  // ---- 编译器版本：各平台来源不同，互相兜底 ----
-  let compileVer = '';
+/**
+ * 解析并规范化当前环境的编译器 / 基础库版本号
+ */
+function resolveCompilerVersion(): string {
   // #ifdef H5
   try {
     const conf = (globalThis as any).__uniConfig as any;
     if (conf != null && conf.compilerVersion != null) {
-      compileVer = `${conf.compilerVersion}`;
+      return `${conf.compilerVersion}`;
     }
   }
   catch { }
   // #endif
-  // 非 H5：优先 uni.getSystemInfoSync().uniCompileVersion（全端通用 uni 编译版本，已验证 App 可取）
-  if (compileVer == '') {
-    try {
-      const sysInfo = uni.getSystemInfoSync();
-      const uniCompileVersion = `${sysInfo.uniCompileVersion ?? ''}`;
-      compileVer = uniCompileVersion;
-    }
-    catch {
+  try {
+    const base = uni.getAppBaseInfo() as any;
+    const ver = `${base.uniCompilerVersion ?? base.appCompilerVersion ?? base.SDKVersion ?? ''}`;
+    if (ver != '') {
+      return ver.replace(/\.0{3}.*$/, '');
     }
   }
-  // 兜底：getAppBaseInfo 版本字段（微信小程序用 appCompilerVersion/SDKVersion，其余用 version 引擎号）
-  if (compileVer == '') {
-    try {
-      const appBaseInfo = uni.getAppBaseInfo();
-      // #ifdef MP-WEIXIN
-      compileVer = `${(appBaseInfo as any).appCompilerVersion ?? (appBaseInfo as any).SDKVersion ?? ''}`;
-      // #endif
-      // #ifndef MP-WEIXIN
-      compileVer = `${appBaseInfo.version ?? ''}`;
-      // #endif
-    }
-    catch { }
-  }
-  if (compileVer == '') {
-    compileVer = '1.0.0';
-  }
-  // ---- 品牌 / 型号 / 系统信息：getDeviceInfo 优先，缺失时回退 getSystemInfoSync ----
+  catch { }
+  return '1.0.0';
+}
+
+export function updateSystemInfo() {
+  // 窗口信息：所有平台统一从 uni.getWindowInfo() 读取
+  const windowInfo = uni.getWindowInfo();
+  // 编译器 / 引擎版本解析
+  const compileVer = resolveCompilerVersion();
+  // 品牌 / 型号 / 系统信息：getDeviceInfo 优先，缺失时回退 getSystemInfoSync
   let brand = '';
   let model = '';
   let system = '';
@@ -242,7 +231,7 @@ export function updateSystemInfo() {
     }
   }
   catch { }
-  // ---- 写入公共系统信息 ----
+  // 写入公共系统信息
   systemInfo.value = {
     screenWidth: windowInfo.screenWidth, // 屏幕宽度（px）
     screenHeight: windowInfo.screenHeight, // 屏幕高度（px）
@@ -270,34 +259,7 @@ export function updateSystemInfo() {
     safeArea: null,
     menuRect: null // 小程序胶囊按钮布局信息（仅微信小程序，稍后单独赋值）
   } as SystemInfoType;
-  // ---- 安全区：微信 safeArea 为绝对坐标矩形，其余平台为相对边界距离 ----
-  // #ifdef MP-WEIXIN
-  const safeAreaInset = windowInfo.safeAreaInsets;
-  console.log('wx windowInfo.safeArea:', safeAreaInset);
-  console.log('wx windowInfo.safeAreaInsets:', windowInfo.safeAreaInsets);
-  if (safeAreaInset != null) {
-    const insets = {
-      top: safeAreaInset.top,
-      right: safeAreaInset.right,
-      bottom: safeAreaInset.bottom,
-      left: safeAreaInset.left
-    } as SystemSafeAreaInsets;
-    safeAreaInsets.value = insets;
-    systemInfo.value.safeAreaInsets = insets;
-  }
-  const safeArea = windowInfo.safeArea;
-  if (safeArea != null) {
-    systemInfo.value.safeArea = {
-      top: safeArea.top,
-      right: safeArea.right,
-      bottom: safeArea.bottom,
-      left: safeArea.left,
-      width: safeArea.width,
-      height: safeArea.height
-    } as SystemSafeArea;
-  }
-  // #endif
-  // #ifndef MP-WEIXIN
+  // 安全区信息提取（全端通用）
   const safeAreaInset = windowInfo.safeAreaInsets;
   if (safeAreaInset != null) {
     const insets = {
@@ -320,9 +282,8 @@ export function updateSystemInfo() {
       height: safeArea.height
     } as SystemSafeArea;
   }
-  // #endif
-  // ---- 小程序胶囊按钮位置：仅微信小程序提供，其余平台保持 null ----
-  // 用于自定义导航栏时让标题区与右上角胶囊垂直居中对齐。
+  // 小程序胶囊按钮位置：仅微信小程序提供，其余平台保持 null
+  // 用于自定义导航栏时让标题区与右上角胶囊垂直居中对齐
   // #ifdef MP-WEIXIN
   try {
     const menu = uni.getMenuButtonBoundingClientRect();
@@ -336,7 +297,6 @@ export function updateSystemInfo() {
     } as SystemMenuRect;
     menuRectRef.value = rect;
     systemInfo.value.menuRect = rect;
-    console.log('胶囊位置信息:', rect);
   }
   catch {
     // 胶囊信息取不到时不阻断 systemInfo 整体初始化（页面未就绪时调用可能抛错）
