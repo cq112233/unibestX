@@ -9,14 +9,24 @@
  * 校验是否已同步：node scripts/gen-uts-dts.mjs --check
  */
 /**
- * 调用全局 Toast 提示
+ * 注册当前页面的 toast 实例到全局栈中
+ */
+export declare function registerToast(toastInstance: ComponentPublicInstance): void;
+
+/**
+ * 从全局栈中移除当前页面的 toast 实例
+ */
+export declare function unregisterToast(toastInstance: ComponentPublicInstance): void;
+
+/**
+ * 调用当前最上层活跃页面的 toast 提示
  */
 export declare function showToast(options: UTSJSONObject): void;
 
 /**
  * 快捷调用 toast
  */
-export declare function toast(message: string, _type: string = 'default'): void;
+export declare function toast(message: string, type: string = 'default'): void;
 
 export declare function toastSuccess(message: string): void;
 

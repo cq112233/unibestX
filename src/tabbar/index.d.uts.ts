@@ -51,7 +51,7 @@ export declare function notifyPageHide(): void;
  * 1. 切换 Tab 到该页（curIdx 变化）——与 onTabShow 相同；
  * 2. 页面重新显示（原生 onShow：从子页面返回、App 回前台）——onTabShow 覆盖不到。
  *
- * @param index 对应 Tab 索引（0: 首页, 1: 我的）
+ * @param index 对应 Tab 索引（0: 首页, 1: 基础, 2: 功能, 3: 我的）
  * @param callback 页面显示时的回调函数
  * @param immediate 若注册时页面已经显示过且当前 Tab 正好激活，是否立即补发一次
  *                  （首次进入页面时不会再重复触发：那一次由紧随其后的 onShow 通知负责）
@@ -130,7 +130,7 @@ export declare function isPageTabbar(path: string): boolean;
 
 /**
  * 监听指定 Tab 激活显示（当单页面模式切换到该 Tab 时触发，可用于刷新数据或重新请求接口）
- * @param index 对应 Tab 索引（0: 首页, 1: 我的）
+ * @param index 对应 Tab 索引（0: 首页, 1: 基础, 2: 功能, 3: 我的）
  * @param callback 激活显示时的回调函数
  * @param immediate 若首次加载时当前 Tab 正好处于激活状态，是否立即执行一次（默认 false）
  */
