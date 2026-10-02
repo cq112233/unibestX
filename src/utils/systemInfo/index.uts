@@ -194,7 +194,6 @@ export function updateSystemInfo() {
     }
   }
   catch { }
-
   // #endif
   // 非 H5：优先 uni.getSystemInfoSync().uniCompileVersion（全端通用 uni 编译版本，已验证 App 可取）
   if (compileVer == '') {
@@ -222,7 +221,6 @@ export function updateSystemInfo() {
   if (compileVer == '') {
     compileVer = '1.0.0';
   }
-
   // ---- 品牌 / 型号 / 系统信息：getDeviceInfo 优先，缺失时回退 getSystemInfoSync ----
   let brand = '';
   let model = '';
@@ -244,7 +242,6 @@ export function updateSystemInfo() {
     }
   }
   catch { }
-
   // ---- 写入公共系统信息 ----
   systemInfo.value = {
     screenWidth: windowInfo.screenWidth, // 屏幕宽度（px）
@@ -273,7 +270,6 @@ export function updateSystemInfo() {
     safeArea: null,
     menuRect: null // 小程序胶囊按钮布局信息（仅微信小程序，稍后单独赋值）
   } as SystemInfoType;
-
   // ---- 安全区：微信 safeArea 为绝对坐标矩形，其余平台为相对边界距离 ----
   // #ifdef MP-WEIXIN
   const safeAreaInset = windowInfo.safeAreaInsets;
@@ -325,7 +321,6 @@ export function updateSystemInfo() {
     } as SystemSafeArea;
   }
   // #endif
-
   // ---- 小程序胶囊按钮位置：仅微信小程序提供，其余平台保持 null ----
   // 用于自定义导航栏时让标题区与右上角胶囊垂直居中对齐。
   // #ifdef MP-WEIXIN
@@ -430,7 +425,13 @@ export type AppKuHeightProps = {
 };
 
 // 参考这个计算得出 https://doc.dcloud.net.cn/uni-app-x/api/get-window-info.html#%E8%BF%94%E5%9B%9E%E5%80%BC
-export function updateAvailableHeight(kuProps: AppKuHeightProps, selectedTabbarStrategy: number): void {
+export function updateAvailableHeight(
+  hideNavbar: boolean,
+  hideStatusBar: boolean,
+  pageStyle: UTSJSONObject | null,
+  layout: string,
+  selectedTabbarStrategy: number
+): void {
   updateSystemInfo();
   // 非空收窄：局部 sys 固定为 SystemInfoType，避免对可空的 systemInfo.value 逐个 ?. / !! 处理（?. 得到 Number? 不能直接参与运算）
   const sys = systemInfo.value;
@@ -440,25 +441,22 @@ export function updateAvailableHeight(kuProps: AppKuHeightProps, selectedTabbarS
   const safeBottom: number = sys.safeAreaInsets?.bottom ?? 0;
   const safeTop: number = sys.safeAreaInsets?.top ?? 0;
   const safeAreaBottom: number = sys.safeArea?.bottom ?? 0;
-
   // 是否自定义导航栏（navigationStyle == 'custom'）：由注入的 pageStyle 推导，与 App.ku.uvue 内 isCustomNav 判定同源
-  const kuPageStyle: UTSJSONObject | null = kuProps.pageStyle ?? null;
+  const kuPageStyle: UTSJSONObject | null = pageStyle ?? null;
   // eslint-disable-next-line dot-notation
   const navStyleText: string = (kuPageStyle != null && kuPageStyle['navigationStyle'] != null) ? `${kuPageStyle['navigationStyle']}` : '';
   const isCustomNav: boolean = navStyleText == 'custom';
   // 布局不是 'navbar'（default 等无自定义导航布局）时，窗口内没有导航栏占位，状态栏与导航栏高度都不扣除
-  const isNoNavbarLayout: boolean = kuProps.layout != 'navbar';
+  const isNoNavbarLayout: boolean = layout != 'navbar';
   // hideNavbar 为 true（页面隐藏导航栏）或非 navbar 布局时，可用高度不扣除导航栏高度
-
   // 自定义状态栏高度
   let statusBarOffset: number = 0;
   if (isNoNavbarLayout) {
-    statusBarOffset = isCustomNav ? 0 : (kuProps.hideStatusBar ? 0 : safeTop);
+    statusBarOffset = isCustomNav ? 0 : (hideStatusBar ? 0 : safeTop);
   }
   else {
-    statusBarOffset = kuProps.hideStatusBar ? 0 : safeTop;
+    statusBarOffset = hideStatusBar ? 0 : safeTop;
   }
-
   // 自定义导航栏高度
   let navBarOffset: number = 0;
   if (isNoNavbarLayout) {
@@ -466,15 +464,12 @@ export function updateAvailableHeight(kuProps: AppKuHeightProps, selectedTabbarS
   }
   else {
     if (isCustomNav) {
-      navBarOffset = kuProps.hideNavbar ? 0 : sys.navBarHeight;
+      navBarOffset = hideNavbar ? 0 : sys.navBarHeight;
     }
     else {
       navBarOffset = sys.navBarHeight;
     }
   }
-
-  // console.log(`[updateAvailableHeight] hideStatusBar:${kuProps.hideStatusBar}, hideNavbar:${kuProps.hideNavbar}, statusBarOffset:${statusBarOffset}, navBarOffset:${navBarOffset}`);
-
   // 根据当前选中的 TabBar 策略计算可用高度：
   // 1 / 2 / 3（标准内嵌/固定/原生 TabBar）：从安全区底部扣除导航栏、状态栏及 TabBar 高度
   // 0 / 4（全屏模式 / 悬浮 TabBar）：不扣除 TabBar 高度，并补偿 safeBottom
@@ -484,9 +479,7 @@ export function updateAvailableHeight(kuProps: AppKuHeightProps, selectedTabbarS
   else {
     sys.availableHeight = safeAreaBottom - navBarOffset - statusBarOffset - sys.tabBarHeight;
   }
-
   systemId++;
-  // console.log('AppKu:', sys.availableHeight, selectedTabbarStrategy, isCustomNav, 'selectedTabbarStrategy');
 }
 
 // 初始化获取一次
@@ -627,8 +620,14 @@ export class SystemUtils {
   }
 
   /** 更新页面可用高度 */
-  updateAvailableHeight(kuProps: AppKuHeightProps, selectedTabbarStrategy: number): void {
-    updateAvailableHeight(kuProps, selectedTabbarStrategy);
+  updateAvailableHeight(
+    hideNavbar: boolean,
+    hideStatusBar: boolean,
+    pageStyle: UTSJSONObject | null,
+    layout: string,
+    selectedTabbarStrategy: number
+  ): void {
+    updateAvailableHeight(hideNavbar, hideStatusBar, pageStyle, layout, selectedTabbarStrategy);
   }
 }
 

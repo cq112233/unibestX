@@ -65,7 +65,7 @@ import { useAppStore } from '@/src/store';
 import { getThemeTokens } from '@/src/utils/theme/index.uts';
 import type { ThemeTokens } from '@/src/utils/theme/index.uts';
 import { isPageRefresherDisabled, isPageScrollDisabled } from '@/src/utils/refresh/index.uts';
-import { curIdx, isPageTabbar, isSinglePageTabbar, tabbarList } from '@/src/tabbar/index.uts';
+import { isPageTabbar, isSinglePageTabbar } from '@/src/tabbar/index.uts';
 
 /**
  * 布局属性定义（由 uni-layouts-plugin 编译时自动从页面 definePage 或 pages.json 提取传入）
@@ -511,19 +511,19 @@ const displayTitle = computed((): string => {
   if (customTitle.value != null) {
     return customTitle.value!;
   }
-  if (isSinglePageHome.value && isTabbarPage.value) {
-    if (curIdx.value >= 0 && curIdx.value < tabbarList.length) {
-      return tabbarList[curIdx.value].text;
-    }
+  // 1. 优先读取当前页面 definePage.style.navigationBarTitleText（用户显式配置了空字符串 '' 也必须尊重）
+  const rawStyleTitle = pageStyleObj.value.navigationBarTitleText;
+  if (rawStyleTitle != null) {
+    return `${rawStyleTitle}`;
   }
-  const titleFromStyle = (pageStyleObj.value.navigationBarTitleText as string | null) ?? '';
-  if (titleFromStyle.length > 0) {
-    return titleFromStyle;
-  }
+  // 2. 页面 props 显式传入标题
   if (props.navigationBarTitleText.length > 0) {
     return props.navigationBarTitleText;
   }
-  return props.title;
+  if (props.title.length > 0) {
+    return props.title;
+  }
+  return '';
 });
 
 /**

@@ -560,6 +560,35 @@ function generatePagesJson(
     }
   }
 
+  // 自动为支付宝小程序适配自定义导航栏（transparentTitle + titlePenetrate + defaultTitle）
+  const normalizeCustomNavForAlipay = (p: PageConfig) => {
+    const topMpAlipay = (p as any)['mp-alipay'];
+    if (topMpAlipay != null) {
+      p.style = p.style ?? {};
+      p.style['mp-alipay'] = { ...(p.style['mp-alipay'] ?? {}), ...topMpAlipay };
+      delete (p as any)['mp-alipay'];
+    }
+    if (p.style?.navigationStyle === 'custom') {
+      p.style['mp-alipay'] = {
+        transparentTitle: 'always',
+        titlePenetrate: 'YES',
+        defaultTitle: '',
+        ...(p.style['mp-alipay'] ?? {})
+      };
+    }
+  };
+  finalPages.forEach(normalizeCustomNavForAlipay);
+  scannedSubPkgs.forEach((pkg) => {
+    pkg.pages.forEach(normalizeCustomNavForAlipay);
+  });
+  if (baseConfig.globalStyle?.navigationStyle === 'custom') {
+    baseConfig.globalStyle['mp-alipay'] = {
+      transparentTitle: 'always',
+      titlePenetrate: 'YES',
+      ...(baseConfig.globalStyle['mp-alipay'] ?? {})
+    };
+  }
+
   // 清理临时标记属性
   finalPages.forEach((p) => {
     delete (p as any)._hasMeta;
@@ -728,6 +757,7 @@ function generatePagesJson(
     iconWidth?: string;
     spacing?: string;
     height?: string;
+    midButton?: any;
     list: Array<{ pagePath: string; text: string; iconPath: string; selectedIconPath: string }>;
   } {
     const configPath = path.resolve(projectRoot, 'src/tabbar/config.uts');

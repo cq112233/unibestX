@@ -52,7 +52,7 @@
 
 <script setup lang="uts">
 import { computed, onMounted, onUnmounted, provide, ref, watch } from 'vue';
-import { curIdx, tabbarList } from '@/src/tabbar/index.uts';
+import { curIdx } from '@/src/tabbar/index.uts';
 import TabbarPlaceholder from './TabbarPlaceholder.uvue';
 import {
   isPageRefresherDisabled,
@@ -226,21 +226,11 @@ function abortPullDownRefresh(): void {
  * 设置/同步当前激活 Tab 的导航栏标题（优先取 props.title，未传则读取 TabBar 配置文案）
  */
 function updateNavbarTitle(): void {
-  let targetTitle = '';
   if (props.title.length > 0) {
-    targetTitle = props.title;
-  }
-  else if (props.contentIndex >= 0 && props.contentIndex < tabbarList.length) {
-    const item = tabbarList[props.contentIndex];
-    targetTitle = item.text;
-  }
-
-  if (targetTitle.length > 0) {
-    // 同步给 NavBar 通用布局
-    setNavbarTitle(targetTitle);
-    // 同步给系统原生导航栏底座
+    // 仅在显式传入 props.title 时同步标题
+    setNavbarTitle(props.title);
     uni.setNavigationBarTitle({
-      title: targetTitle
+      title: props.title
     } as SetNavigationBarTitleOptions);
   }
 }
@@ -299,7 +289,6 @@ onMounted(() => {
 watch(isActive, (newVal: boolean) => {
   // 记录切 Tab 时间戳，激活 350ms 内拦截任何偶发的残余刷新误触发
   lastTabSwitchTime = Date.now();
-
   if (newVal) {
     // 首次激活时触发懒挂载
     if (!hasRendered.value) {
