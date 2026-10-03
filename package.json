@@ -43,6 +43,8 @@
     "gen:uts-dts": "node scripts/gen-uts-dts.mjs",
     "check:uts-dts": "node scripts/gen-uts-dts.mjs --check",
     "sandbox:reset": "node scripts/reset-sandbox.mjs",
+    "doctor": "node scripts/doctor.mjs",
+    "doctor:quick": "node scripts/doctor.mjs --quick",
     "prepare": "husky"
   },
   "dependencies": {
@@ -70,6 +72,7 @@
     "@uni-helper/uni-app-types": "^1.0.1",
     "@vue/test-utils": "^2.5.1",
     "@vue/typescript-plugin": "3.3.11",
+    "depcheck": "^1.4.7",
     "eslint": "^9.39.4",
     "eslint-plugin-format": "^1.5.0",
     "happy-dom": "^20.14.5",
