@@ -39,5 +39,8 @@ jobs:
       - name: Check UTS DTS Sync
         run: pnpm check:uts-dts
 
+      - name: Type Check
+        run: pnpm typecheck
+
       - name: Unit Tests (Vitest)
         run: pnpm test

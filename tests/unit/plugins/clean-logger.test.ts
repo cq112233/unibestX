@@ -42,4 +42,28 @@ describe('cleanLoggerPlugin Unit Tests', () => {
     );
     expect(defaultHandler).toHaveBeenCalledTimes(1);
   });
+
+  it('should maintain onwarn and customLogger in configResolved hook', () => {
+    const plugin = cleanLoggerPlugin({ silenceAll: true });
+    expect(plugin.configResolved).toBeDefined();
+
+    const mockConfig: any = {
+      customLogger: {
+        warn: vi.fn(),
+        warnOnce: vi.fn()
+      },
+      build: {
+        rollupOptions: {
+          onwarn: vi.fn()
+        }
+      }
+    };
+
+    (plugin.configResolved as any)(mockConfig);
+
+    // Call onwarn on resolved config, should be intercepted
+    const defaultHandler = vi.fn();
+    mockConfig.build.rollupOptions.onwarn({ message: 'any warning' }, defaultHandler);
+    expect(defaultHandler).not.toHaveBeenCalled();
+  });
 });

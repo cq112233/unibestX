@@ -1256,7 +1256,7 @@ export default function uniPagesPlugin(options: UniPagesOptions = {}) {
       }
 
       const newCode = code.slice(0, start) + code.slice(endIdx);
-      return { code: newCode, map: { mappings: '' } };
+      return { code: newCode, map: null };
     },
 
     configureServer(s: any) {

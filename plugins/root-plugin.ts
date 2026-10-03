@@ -325,7 +325,7 @@ export function uniRootX(options: UniRootXOptions = {}): Plugin {
 
       return {
         code: newCode,
-        map: { mappings: '' }
+        map: null
       };
     },
     generateBundle(this: any, _: any, bundle: any) {

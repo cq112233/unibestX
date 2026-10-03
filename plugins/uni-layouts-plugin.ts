@@ -271,7 +271,7 @@ export function uniLayoutsPlugin(options: UniLayoutsOptions = {}) {
     },
     buildStart() {
     },
-    transform(code: string, id: string) {
+    transform(this: any, code: string, id: string) {
       const normalizedId = id.replace(/\\/g, '/');
       if (normalizedId.includes('?')) {
         return null;
@@ -373,7 +373,7 @@ export function uniLayoutsPlugin(options: UniLayoutsOptions = {}) {
       if (layoutName === false || layoutName === 'false') {
         return {
           code: cleanCode,
-          map: { mappings: '' }
+          map: null
         };
       }
 
@@ -391,7 +391,7 @@ export function uniLayoutsPlugin(options: UniLayoutsOptions = {}) {
         }
         return {
           code: cleanCode,
-          map: { mappings: '' }
+          map: null
         };
       }
 
@@ -439,7 +439,7 @@ export function uniLayoutsPlugin(options: UniLayoutsOptions = {}) {
       if (!hasTemplate) {
         return {
           code: cleanCode,
-          map: { mappings: '' }
+          map: null
         };
       }
 
@@ -456,7 +456,7 @@ export function uniLayoutsPlugin(options: UniLayoutsOptions = {}) {
 
       return {
         code: cleanCode,
-        map: { mappings: '' }
+        map: null
       };
     },
 

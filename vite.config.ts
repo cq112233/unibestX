@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
+import type { PluginOption } from 'vite';
 import { defineConfig } from 'vite';
 import { uniEasycomPlugin } from '@dcloudio/uni-cli-shared/dist/vite/plugins/easycom.js';
 import { UNI_EASYCOM_EXCLUDE } from '@dcloudio/uni-cli-shared';
@@ -29,11 +30,10 @@ catch {
 
 const isBuild = process.env.NODE_ENV === 'production' || process.argv.includes('build');
 
-const weappTailwindcssPlugins = WeappTailwindcss(
+const weappTailwindcssPlugins: PluginOption[] = (WeappTailwindcss(
   uniAppX({
     base: projectRoot,
     cssEntries: [resolve(projectRoot, 'main.css')],
-    cssSourceTrace: !isBuild,
     rem2rpx: true,
     customAttributes: {
       '*': [/^t-class(?:-.+)?$/]
@@ -41,11 +41,12 @@ const weappTailwindcssPlugins = WeappTailwindcss(
     componentLocalStyles: {
       enabled: true,
       onlyWhenStyleIsolationVersion2: true,
-      componentMatcher: id => /(?:^|[/\\])src[/\\](?:pages|sub|components)[/\\].*?\.(?:uvue|nvue)$/.test(id)
+      componentMatcher: (id: string) => /(?:^|[/\\])src[/\\](?:pages|sub|components)[/\\].*?\.(?:uvue|nvue)$/.test(id)
     },
-    uvueUnsupported: 'warn'
-  })
-) ?? [];
+    uvueUnsupported: 'warn',
+    cssSourceTrace: !isBuild
+  } as any)
+) ?? []) as PluginOption[];
 
 export default defineConfig({
   base: './',
