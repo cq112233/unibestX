@@ -1099,6 +1099,7 @@ graph LR
 #### 2. 测试覆盖与最佳实践
 
 测试用例位于 `tests/unit/` 目录，涵盖关键业务与工程环节：
+
 - **组件挂载测试 (`tests/unit/components/`)**：验证 [NavBar.uvue](src/components/NavBar/NavBar.uvue) 等组件的标题渲染、返回按钮展示、自定义插槽与事件响应；
 - **核心工具库测试 (`tests/unit/utils/`)**：验证 [route](src/utils/route/index.uts) 路由提取、[rxjs-lite](src/utils/rxjs-lite/index.uts) 响应式流处理与算子管道；
 - **工程构建插件测试 (`tests/unit/plugins/`)**：验证 `clean-logger` 告警净化插件以及 ESLint UTS 专属规则（十六进制颜色校验、接口规范、未定义检查）。
@@ -1182,6 +1183,7 @@ pnpm typecheck       # 运行严格类型检查（tsc --noEmit，0 报错门禁�
 #### 6. GitHub Actions CI 持续集成流水线 (`.github/workflows/ci.yml`)
 
 项目已预置生产级 CI 自动化工作流，在开发者向 `main` / `base` 分支发起 Push 或 Pull Request 时自动并行执行五大质量门禁：
+
 1. **ESLint 检查**（`pnpm lint`）
 2. **Stylelint 检查**（`pnpm lint:style`）
 3. **UTS 声明同步校验**（`pnpm check:uts-dts`）
@@ -1313,6 +1315,11 @@ pnpm typecheck       # 运行严格类型检查（tsc --noEmit，0 报错门禁�
 | 国际化 | lime-i18n | — | vue-i18n 兼容方案 |
 | 图表 | e-chart | — | ECharts for uni-app X |
 | 图标 | uni-icons + lime-icon | — | 双图标方案 |
+| 单元测试 | Vitest | ^2.1.9 | 极速现代单元测试框架，支持 watch 模式 |
+| 组件测试 | @vue/test-utils | ^2.5.1 | 官方 Vue / UVue 组件挂载与交互断言 |
+| 测试环境 | happy-dom | ^20.14.5 | 毫秒级轻量 DOM 仿真运行时环境 |
+| 产物分析 | rollup-plugin-visualizer | ^5.14.0 | 交互式 Treemap 产物体积分析报告（含 Gzip / Brotli） |
+| 代码规范 | ESLint + Stylelint | ^9.39 / ^17.15 | 深度定制 UTS 专属规则与 CSS 属性排序 |
 | 文档站 | VitePress | ^1.6.4 | `docs/` 目录 |
 
 ## ⚠️ UTS 开发注意事项
