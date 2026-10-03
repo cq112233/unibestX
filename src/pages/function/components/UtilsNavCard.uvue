@@ -79,7 +79,7 @@
 
     <!-- Time 时间日期操作入口 -->
     <view
-      class="rounded-[12px] p-[14px] border-[1px] border-solid border-[#e2e8f0] bg-white flex flex-row items-center justify-between shadow-xs"
+      class="rounded-[12px] p-[14px] mb-[10px] border-[1px] border-solid border-[#e2e8f0] bg-white flex flex-row items-center justify-between shadow-xs"
       @click="navigateToTime"
     >
       <view class="flex flex-row items-center flex-1 mr-[10px]">
@@ -92,6 +92,25 @@
         </view>
       </view>
       <view class="px-[10px] py-[5px] rounded-[6px] bg-[#0284c7] flex flex-row items-center">
+        <text class="text-[11px] text-white font-bold">查看 ➜</text>
+      </view>
+    </view>
+
+    <!-- WebView 双向通讯入口 -->
+    <view
+      class="rounded-[12px] p-[14px] border-[1px] border-solid border-[#e2e8f0] bg-white flex flex-row items-center justify-between shadow-xs"
+      @click="navigateToWebView"
+    >
+      <view class="flex flex-row items-center flex-1 mr-[10px]">
+        <view class="w-[40px] h-[40px] rounded-[10px] bg-[#f59e0b14] flex flex-row items-center justify-center mr-[12px]">
+          <text class="text-[20px]">🌐</text>
+        </view>
+        <view class="flex flex-col flex-1">
+          <text class="text-[14px] font-bold text-[#1e293b] mb-[2px]">WebView 双向通讯演示</text>
+          <text class="text-[11px] text-[#64748b]">内嵌网页、postMessage 消息收发、evalJS 动态指令交互</text>
+        </view>
+      </view>
+      <view class="px-[10px] py-[5px] rounded-[6px] bg-[#f59e0b] flex flex-row items-center">
         <text class="text-[11px] text-white font-bold">查看 ➜</text>
       </view>
     </view>
@@ -120,6 +139,12 @@ function navigateToCrypto() {
 function navigateToTime() {
   uni.navigateTo({
     url: '/src/sub/time/time'
+  });
+}
+
+function navigateToWebView() {
+  uni.navigateTo({
+    url: '/src/sub/webview/webview'
   });
 }
 </script>

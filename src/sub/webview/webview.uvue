@@ -1,0 +1,356 @@
+<template>
+  <view class="flex flex-col flex-1 bg-[#f8fafc]">
+    <!-- 1. 顶部控制面板（宿主 App -> WebView 通讯控制） -->
+    <view class="p-[14px] bg-[#ffffff] border-b-[1px] border-solid border-[#e2e8f0]">
+      <view class="flex flex-row items-center justify-between mb-[10px]">
+        <view class="flex flex-row items-center">
+          <view class="w-[4px] h-[16px] rounded-[2px] bg-[#2563eb] mr-[8px]" />
+          <text class="text-[15px] font-bold text-[#1e293b]">宿主 App ➔ WebView 通讯控制台</text>
+        </view>
+        <view class="px-[8px] py-[2px] rounded-[10px] bg-[#dbeafe]">
+          <text class="text-[11px] text-[#1e40af] font-bold">双向通讯</text>
+        </view>
+      </view>
+
+      <view class="flex flex-col mb-[12px]">
+        <text class="text-[12px] text-[#64748b] leading-[18px]">
+          点击下方按钮，宿主 App 会通过 evalJS 向内嵌网页下发指令与数据载荷：
+        </text>
+      </view>
+
+      <!-- 控制操作按钮网格（使用 flex 布局，不用 gap） -->
+      <view class="flex flex-col">
+        <!-- 第一行按钮 -->
+        <view class="flex flex-row mb-[8px]">
+          <view
+            class="flex-1 h-[38px] rounded-[8px] bg-[#2563eb] flex flex-row items-center justify-center mr-[8px] active:opacity-90"
+            @click="sendGreetingToWeb"
+          >
+            <text class="text-[12px] text-[#ffffff] font-bold">📢 发送问候</text>
+          </view>
+          <view
+            class="flex-1 h-[38px] rounded-[8px] bg-[#059669] flex flex-row items-center justify-center mr-[8px] active:opacity-90"
+            @click="sendDataPayloadToWeb"
+          >
+            <text class="text-[12px] text-[#ffffff] font-bold">📊 下发配置</text>
+          </view>
+          <view
+            class="flex-1 h-[38px] rounded-[8px] bg-[#7c3aed] flex flex-row items-center justify-center active:opacity-90"
+            @click="incrementWebCounter"
+          >
+            <text class="text-[12px] text-[#ffffff] font-bold">➕ 计数+1</text>
+          </view>
+        </view>
+
+        <!-- 第二行按钮 -->
+        <view class="flex flex-row">
+          <view
+            class="flex-1 h-[38px] rounded-[8px] bg-[#d97706] flex flex-row items-center justify-center mr-[8px] active:opacity-90"
+            @click="switchWebTheme"
+          >
+            <text class="text-[12px] text-[#ffffff] font-bold">🎨 切换网页主题</text>
+          </view>
+          <view
+            class="w-[100px] h-[38px] rounded-[8px] border-[1px] border-solid border-[#cbd5e1] bg-[#ffffff] flex flex-row items-center justify-center active:opacity-80"
+            @click="reloadWebView"
+          >
+            <text class="text-[12px] text-[#475569] font-medium">🔄 刷新网页</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 2. 接收消息看板（WebView -> 宿主 App） -->
+    <view class="px-[14px] py-[10px] bg-[#ffffff] border-b-[1px] border-solid border-[#e2e8f0]">
+      <view class="flex flex-row items-center justify-between mb-[6px]">
+        <view class="flex flex-row items-center">
+          <text class="text-[13px] font-bold text-[#1e293b]">📥 已接收 WebView 消息</text>
+          <view class="ml-[6px] px-[6px] py-[1px] rounded-[8px] bg-[#f1f5f9]">
+            <text class="text-[11px] text-[#64748b] font-bold">{{ messageList.length }} 条</text>
+          </view>
+        </view>
+        <view
+          v-if="messageList.length > 0"
+          class="px-[8px] py-[3px] rounded-[4px] bg-[#fee2e2]"
+          @click="clearMessages"
+        >
+          <text class="text-[11px] text-[#ef4444] font-medium">清空记录</text>
+        </view>
+      </view>
+
+      <!-- 消息列表 -->
+      <view v-if="messageList.length == 0" class="py-[12px] flex flex-row items-center justify-center">
+        <text class="text-[12px] text-[#94a3b8]">暂未收到消息，请在下方网页中点击发送按钮</text>
+      </view>
+      <view v-else class="max-h-[140px] overflow-y-auto">
+        <view
+          v-for="msg in messageList"
+          :key="msg.id"
+          class="p-[8px] mb-[6px] rounded-[6px] bg-[#f8fafc] border-[1px] border-solid border-[#e2e8f0] flex flex-col"
+        >
+          <view class="flex flex-row items-center justify-between mb-[2px]">
+            <view class="flex flex-row items-center">
+              <view class="px-[5px] py-[1px] rounded-[4px] bg-[#e0e7ff] mr-[6px]">
+                <text class="text-[10px] text-[#4338ca] font-bold">{{ msg.type }}</text>
+              </view>
+              <text class="text-[11px] font-bold text-[#334155]">{{ msg.title }}</text>
+            </view>
+            <text class="text-[10px] text-[#94a3b8]">{{ msg.time }}</text>
+          </view>
+          <text class="text-[11px] text-[#64748b] leading-[16px]">{{ msg.content }}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 3. WebView 网页视图容器 -->
+    <view class="flex-1 flex flex-col relative w-full overflow-hidden">
+      <!-- 网页加载状态提示条 -->
+      <view
+        v-if="isLoading"
+        class="h-[28px] bg-[#eff6ff] px-[12px] flex flex-row items-center justify-between border-b-[1px] border-solid border-[#bfdbfe]"
+      >
+        <text class="text-[11px] text-[#2563eb]">网页加载中，请稍候...</text>
+      </view>
+
+      <!-- 核心 web-view 节点 -->
+      <web-view
+        id="web-view"
+        class="flex-1 w-full h-full"
+        :src="currentWebUrl"
+        @message="onWebMessage"
+        @load="onWebLoad"
+        @error="onWebError"
+      />
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { getCurrentInstance, onMounted, ref } from 'vue';
+
+type WebMessageItem = {
+  id: number;
+  time: string;
+  type: string;
+  title: string;
+  content: string;
+};
+
+definePage({
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
+  style: {
+    navigationBarTitleText: 'WebView 双向通讯',
+    navigationStyle: 'custom'
+  }
+});
+
+const instance = getCurrentInstance();
+
+// 根据运行平台确定本地 HTML 路径（支持 App 与 H5 两种加载模式）
+let defaultUrl = '/static/webview/index.html';
+// #ifdef APP
+defaultUrl = '/hybrid/html/index.html';
+// #endif
+const currentWebUrl = ref<string>(defaultUrl);
+
+const isLoading = ref<boolean>(true);
+const messageList = ref<Array<WebMessageItem>>([]);
+let nextMsgId = 1;
+
+// 主题状态：'default' | 'blue' | 'dark'
+let currentThemeIndex = 0;
+const themeList = ['default', 'blue', 'dark'];
+
+function formatNowTime(): string {
+  const d = new Date();
+  const h = d.getHours() < 10 ? `0${d.getHours()}` : `${d.getHours()}`;
+  const m = d.getMinutes() < 10 ? `0${d.getMinutes()}` : `${d.getMinutes()}`;
+  const s = d.getSeconds() < 10 ? `0${d.getSeconds()}` : `${d.getSeconds()}`;
+  return `${h}:${m}:${s}`;
+}
+
+// ==========================================
+// 宿主 App 向 WebView 发送消息 (evalJS / postMessage)
+// ==========================================
+function sendPayloadToWeb(action: string, data: UTSJSONObject): void {
+  const payload = {
+    action,
+    timestamp: Date.now(),
+    ...data
+  } as UTSJSONObject;
+  const payloadStr = JSON.stringify(payload);
+  // #ifdef APP
+  try {
+    // @ts-expect-error Native UniWebViewElement
+    const webviewEl = uni.getElementById('web-view') as any | null;
+    if (webviewEl != null) {
+      webviewEl.evalJS(`window.receiveFromApp && window.receiveFromApp(${payloadStr})`);
+    }
+    else {
+      // @ts-expect-error Native createWebviewContext
+      const ctx = uni.createWebviewContext('web-view', instance?.proxy) as any | null;
+      if (ctx != null) {
+        ctx.evalJS(`window.receiveFromApp && window.receiveFromApp(${payloadStr})`);
+      }
+    }
+  }
+  catch (err) {
+    console.error('App evalJS error:', err);
+  }
+  // #endif
+  // #ifdef WEB || H5
+  try {
+    const iframe = document.querySelector('iframe') as HTMLIFrameElement | null;
+    if (iframe != null && iframe.contentWindow != null) {
+      iframe.contentWindow.postMessage(payload, '*');
+    }
+  }
+  catch (err) {
+    console.error('Web postMessage error:', err);
+  }
+  // #endif
+  uni.showToast({
+    title: `已发送指令: ${action}`,
+    icon: 'none',
+    duration: 1500
+  });
+}
+
+// 1. 发送问候消息
+function sendGreetingToWeb(): void {
+  sendPayloadToWeb('MESSAGE', {
+    text: `你好，WebView！当前宿主时间: ${formatNowTime()}`,
+    source: 'uni-app X Host App'
+  } as UTSJSONObject);
+}
+
+// 2. 下发业务配置数据
+function sendDataPayloadToWeb(): void {
+  sendPayloadToWeb('CONFIG_UPDATE', {
+    appName: 'unibestX',
+    platform: uni.getSystemInfoSync().platform,
+    version: '1.0.0',
+    userInfo: {
+      userId: 8888,
+      nickName: '极速工程师',
+      token: 'TOKEN_EXP_2026_ABCD'
+    }
+  } as UTSJSONObject);
+}
+
+// 3. 递增网页计数器
+function incrementWebCounter(): void {
+  sendPayloadToWeb('INCREMENT_COUNTER', {
+    step: 1
+  } as UTSJSONObject);
+}
+
+// 4. 切换网页主题
+function switchWebTheme(): void {
+  currentThemeIndex = (currentThemeIndex + 1) % themeList.length;
+  const targetTheme = themeList[currentThemeIndex];
+  sendPayloadToWeb('SET_THEME', {
+    theme: targetTheme
+  } as UTSJSONObject);
+}
+
+// 5. 重新加载 WebView
+function reloadWebView(): void {
+  isLoading.value = true;
+  // #ifdef APP
+  try {
+    // @ts-expect-error Native createWebviewContext
+    const ctx = uni.createWebviewContext('web-view', instance?.proxy) as any | null;
+    if (ctx != null) {
+      ctx.reload();
+    }
+  }
+  catch {}
+  // #endif
+  // #ifndef APP
+  const originalUrl = currentWebUrl.value.split('?')[0];
+  currentWebUrl.value = `${originalUrl}?t=${Date.now()}`;
+  // #endif
+  uni.showToast({
+    title: '正在重新加载',
+    icon: 'none'
+  });
+}
+
+// ==========================================
+// 接收来自 WebView 的消息 (@message 回调)
+// ==========================================
+function onWebMessage(event: any): void {
+  console.log('接收到来自 web-view 的 message 事件:', JSON.stringify(event.detail));
+  const detail = event.detail as UTSJSONObject;
+  let receivedData: any = detail.data;
+  // 微信小程序与 App-iOS/Android 传过来的 data 可能是数组形式 [{ ... }]
+  if (Array.isArray(receivedData)) {
+    const arr = receivedData as Array<any>;
+    if (arr.length > 0) {
+      receivedData = arr[arr.length - 1];
+    }
+  }
+  const rawJson = typeof receivedData == 'object' ? JSON.stringify(receivedData) : `${receivedData}`;
+  let parsedType = 'POST_MESSAGE';
+  let parsedTitle = '网页消息';
+  if (receivedData != null && typeof receivedData == 'object') {
+    const obj = receivedData as UTSJSONObject;
+    if (obj.type != null) {
+      parsedType = obj.type!.toString();
+    }
+    if (obj.title != null) {
+      parsedTitle = obj.title!.toString();
+    }
+    // 监听网页请求返回
+    if (parsedType == 'NAVIGATE_BACK') {
+      uni.navigateBack();
+      return;
+    }
+  }
+  const newMsg = {
+    id: nextMsgId++,
+    time: formatNowTime(),
+    type: parsedType,
+    title: parsedTitle,
+    content: rawJson
+  } as WebMessageItem;
+  messageList.value.unshift(newMsg);
+  uni.showToast({
+    title: `收到来自网页的 ${parsedType} 消息`,
+    icon: 'none'
+  });
+}
+
+function onWebLoad(_event: any): void {
+  isLoading.value = false;
+  console.log('WebView 页面加载成功');
+}
+
+function onWebError(event: any): void {
+  isLoading.value = false;
+  console.error('WebView 加载错误:', JSON.stringify(event.detail));
+  uni.showToast({
+    title: 'WebView 加载失败',
+    icon: 'none'
+  });
+}
+
+function clearMessages(): void {
+  messageList.value = [] as Array<WebMessageItem>;
+}
+
+onMounted(() => {
+  console.log('WebView 演示页已挂载，当前 URL:', currentWebUrl.value);
+});
+</script>
+
+<style scoped>
+/* 滚动容器自适应 */
+.max-h-\[140px\] {
+  max-height: 140px;
+}
+</style>
