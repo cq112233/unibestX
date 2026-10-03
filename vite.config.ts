@@ -16,6 +16,7 @@ import uniLayoutsPlugin from './plugins/uni-layouts-plugin';
 import tabbarViewsPlugin from './plugins/vite-plugin-tabbar-views';
 import uniPagesPlugin from './plugins/vite-plugin-uni-pages';
 import { viteMockServe } from 'vite-plugin-mock';
+import { viteVConsole } from 'vite-plugin-vconsole';
 
 const uni = (uniModule as typeof uniModule & { default?: typeof uniModule }).default ?? uniModule;
 const projectRoot = dirname(fileURLToPath(import.meta.url));
@@ -47,6 +48,23 @@ const isMock = process.env.VITE_USE_MOCK === 'true'
   || process.env.MOCK === 'true'
   || env.MOCK === 'true'
   || process.argv.includes('--mock');
+
+const isWeb = process.env.UNI_PLATFORM === 'web'
+  || process.env.UNI_PLATFORM === 'h5'
+  || !process.env.UNI_PLATFORM;
+
+// 生产环境绝对严禁包含 vConsole（即使显式配置了开关或参数也强制屏蔽，防止线上泄漏）
+const isProduction = env.VITE_ENV_TYPE === 'production'
+  || process.env.VITE_ENV_TYPE === 'production'
+  || (isBuild && env.VITE_ENV_TYPE !== 'test');
+
+const isVConsole = !isProduction && isWeb && (
+  process.env.VITE_SHOW_VCONSOLE === 'true'
+  || env.VITE_SHOW_VCONSOLE === 'true'
+  || process.env.VCONSOLE === 'true'
+  || env.VCONSOLE === 'true'
+  || process.argv.includes('--vconsole')
+);
 
 const weappTailwindcssPlugins: PluginOption[] = (WeappTailwindcss(
   uniAppX({
@@ -177,6 +195,23 @@ export default defineConfig({
             enable: true,
             watchFiles: true,
             logger: true
+          }) as PluginOption
+        ]
+      : []),
+    // 移动端真机调试工具 vConsole（仅在 Web/H5 且开启时注入，如 pnpm dev:vconsole）
+    ...(isVConsole
+      ? [
+          viteVConsole({
+            entry: [
+              resolve(projectRoot, 'main.uts'),
+              resolve(projectRoot, 'main')
+            ],
+            enabled: isVConsole,
+            config: {
+              maxLogNumber: 1000,
+              theme: 'dark'
+            },
+            customHide: 'location.href.includes("vconsole=false")'
           }) as PluginOption
         ]
       : [])
