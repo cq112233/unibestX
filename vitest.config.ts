@@ -27,7 +27,11 @@ export default defineConfig({
       enforce: 'pre',
       async transform(code, id) {
         if (id.endsWith('.uts') || id.includes('.uts?')) {
-          return transformWithEsbuild(code, id, { loader: 'ts' });
+          const res = await transformWithEsbuild(code, id, { loader: 'ts' });
+          return {
+            code: res.code,
+            map: res.map as any
+          };
         }
       }
     },

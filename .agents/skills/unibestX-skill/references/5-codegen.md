@@ -64,7 +64,7 @@ graph TD
   <view class="flex flex-col flex-1 px-[16px] pt-[12px]">
 
     <!-- 顶部固定区域（可选） -->
-    <view class="w-full mb-[12px] bg-white rounded-[12px] p-[16px]">
+    <view class="w-full mb-[12px] bg-[#ffffff] rounded-[12px] p-[16px]">
       <text class="text-[15px] font-semibold text-[#1e293b]">顶部标题区</text>
       <text class="text-[12px] text-[#64748b] mt-[2px]">说明文本</text>
     </view>
@@ -82,7 +82,7 @@ graph TD
         <view
           v-for="(item, index) in dataList"
           :key="index"
-          class="w-full bg-white rounded-[8px] p-[12px] mb-[8px] flex flex-col"
+          class="w-full bg-[#ffffff] rounded-[8px] p-[12px] mb-[8px] flex flex-col"
         >
           <text class="text-[14px] text-[#334155]">{{ item }}</text>
         </view>
@@ -136,7 +136,7 @@ function handleScrollToLower(): void {
   <view class="flex flex-col flex-1 px-[16px] pt-[12px]">
     <scroll-view direction="vertical" class="flex-1 flex flex-col">
       <view class="flex flex-col">
-        <view class="bg-white rounded-[12px] p-[16px] mb-[12px]">
+        <view class="bg-[#ffffff] rounded-[12px] p-[16px] mb-[12px]">
           <text class="text-[16px] font-bold text-[#1e293b]">TabBar 模块标题</text>
         </view>
       </view>
@@ -211,3 +211,33 @@ export function fetchGoodsList(pageNo: number = 1, pageSize: number = 10, keywor
 import { fetchGoodsList } from '@/src/api/mall/mall.uts';
 import type { MallGoodsItem } from '@/src/api/mall/mall.uts';
 ```
+
+---
+
+## 5.3 ESLint 与 Stylelint 强制代码规范自检清单
+
+在代码生成、重构交付前，必须核对以下项目工程代码检查红线：
+
+1. **分号与引号规范**：
+   - 语句结尾必须以分号 `;` 结尾（`semi: true`）；
+   - JS/TS/UTS 字符串必须统一使用单引号 `'`（除非嵌套双引号或模板字符串）。
+2. **尾随逗号禁止（Comma Dangle Never）**：
+   - 对象字面量、数组字面量、函数参数列表中**最后一个元素后面严禁添加逗号**（`style/comma-dangle: never`）。
+3. **未使用的变量与导入**：
+   - 严禁留存未使用的局部变量或 import（`unused-imports/no-unused-imports`）；
+   - 未使用的函数入参必须显式以下划线 `_` 开头（如 `_event`、`_index`）。
+4. **Vue SFC 顶级块布局**：
+   - `<template>` / `<script>` 必须位于上方，`<style>` 必须位于文件末尾（`vue/block-order`）。
+5. **十六进制颜色与 Stylelint 规范**：
+   - 样式表 `<style>` 与 Tailwind 工具类中严禁使用任何英文命名颜色（如 `color: red;` 或 `text-[white]`），必须统一使用标准十六进制色值（如 `color: #ff0000;` 或 `text-[#ffffff]`）；
+   - `<style>` 中的 CSS 属性必须严格按照 8 阶排序（定位 → 布局/Flex → 尺寸 → 边距 → 边框 → 背景 → 文字 → 动效，详见分册 2.24）。
+6. **空行与格式净化**：
+   - 文件末尾禁止多余空行（保留 0 空行）；禁止连续多行空白。
+7. **交付前自动化验证**：
+   - 每次代码生成或修改完毕，在宣称完成前必须在终端实际运行：
+
+     ```bash
+     pnpm check:uts-dts && pnpm lint && pnpm lint:style && pnpm test
+     ```
+
+   - 确保全套检查 100% 绿灯退出码为 0，严禁携带 Lint 报错交付。
