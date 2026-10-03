@@ -27,6 +27,8 @@ const composer = uniHelper({
     'src/manifest.json',
     // 忽略外部/文档/工具目录
     '**/js_sdk/**',
+    'hybrid/**',
+    'static/**',
     'docs/**',
     'unpackage/**',
     '.claude/**',

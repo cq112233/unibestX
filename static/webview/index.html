@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>WebView 双向通讯演示</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background-color: #f8fafc;
+      color: #1e293b;
+      padding: 16px;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    body.theme-dark {
+      background-color: #0f172a;
+      color: #f1f5f9;
+    }
+    body.theme-blue {
+      background-color: #eff6ff;
+      color: #1e3a8a;
+    }
+    .card {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 14px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      transition: background-color 0.3s, border-color 0.3s;
+    }
+    body.theme-dark .card {
+      background: #1e293b;
+      border-color: #334155;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    }
+    body.theme-blue .card {
+      background: #ffffff;
+      border-color: #bfdbfe;
+    }
+    .card-title {
+      font-size: 15px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 9999px;
+      background-color: #e0e7ff;
+      color: #4338ca;
+      margin-left: 8px;
+    }
+    body.theme-dark .badge {
+      background-color: #312e81;
+      color: #c7d2fe;
+    }
+    .desc {
+      font-size: 12px;
+      color: #64748b;
+      line-height: 1.5;
+      margin-bottom: 12px;
+    }
+    body.theme-dark .desc {
+      color: #94a3b8;
+    }
+    .btn-group {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+    .btn {
+      appearance: none;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+      transition: transform 0.1s, opacity 0.2s;
+      background-color: #2563eb;
+      color: #ffffff;
+    }
+    .btn:active {
+      transform: scale(0.97);
+      opacity: 0.9;
+    }
+    .btn-emerald {
+      background-color: #059669;
+    }
+    .btn-indigo {
+      background-color: #4f46e5;
+    }
+    .btn-amber {
+      background-color: #d97706;
+    }
+    .btn-outline {
+      background-color: transparent;
+      border: 1px solid #cbd5e1;
+      color: #475569;
+    }
+    body.theme-dark .btn-outline {
+      border-color: #475569;
+      color: #cbd5e1;
+    }
+    .counter-box {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #f1f5f9;
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin-top: 10px;
+    }
+    body.theme-dark .counter-box {
+      background: #0f172a;
+    }
+    .counter-value {
+      font-size: 18px;
+      font-weight: bold;
+      color: #2563eb;
+    }
+    body.theme-dark .counter-value {
+      color: #60a5fa;
+    }
+    .log-list {
+      max-height: 180px;
+      overflow-y: auto;
+      background: #f8fafc;
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+      padding: 8px;
+      font-family: monospace;
+      font-size: 11px;
+    }
+    body.theme-dark .log-list {
+      background: #0f172a;
+      border-color: #334155;
+    }
+    .log-item {
+      padding: 6px 8px;
+      border-radius: 4px;
+      background: #ffffff;
+      margin-bottom: 6px;
+      border-left: 3px solid #3b82f6;
+      word-break: break-all;
+    }
+    body.theme-dark .log-item {
+      background: #1e293b;
+      border-left-color: #60a5fa;
+    }
+    .log-time {
+      color: #94a3b8;
+      margin-right: 6px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 卡片 1: 网页状态与介绍 -->
+  <div class="card">
+    <div class="card-title">
+      <span>🌐 Web-View 网页容器</span>
+      <span class="badge" id="envBadge">HTML5</span>
+    </div>
+    <p class="desc">
+      当前页面运行在嵌入式 Web-View 中。点击下方操作按钮可向宿主 App 发送不同类型的消息，同时网页提供监听函数接收 App 的实时推送。
+    </p>
+    <div class="counter-box">
+      <span style="font-size: 13px;">宿主控制的计数器：</span>
+      <span class="counter-value" id="counterNum">0</span>
+    </div>
+  </div>
+
+  <!-- 卡片 2: 网页向宿主发送消息 -->
+  <div class="card">
+    <div class="card-title">
+      <span>📤 网页 ➔ 宿主 App 通讯</span>
+    </div>
+    <p class="desc">调用 uni.webView.postMessage 发送结构化数据到应用层：</p>
+    <div class="btn-group">
+      <button class="btn" type="button" onclick="sendSimpleGreeting()">打个招呼 👋</button>
+      <button class="btn btn-emerald" type="button" onclick="sendUserData()">提交业务数据 📋</button>
+      <button class="btn btn-indigo" type="button" onclick="sendTimestamp()">发送时间戳 ⏱️</button>
+      <button class="btn btn-amber" type="button" onclick="navigateBackToApp()">调用原生返回 ⬅️</button>
+    </div>
+  </div>
+
+  <!-- 卡片 3: 接收宿主消息日志 -->
+  <div class="card">
+    <div class="card-title">
+      <span>📥 宿主 App ➔ 网页 接收日志</span>
+      <span class="badge" id="msgCountBadge">0 条</span>
+    </div>
+    <p class="desc">通过 window.receiveFromApp 全局函数接收宿主消息：</p>
+    <div class="log-list" id="logList">
+      <div style="color: #94a3b8; text-align: center; padding: 12px 0;">等待宿主发送指令...</div>
+    </div>
+  </div>
+
+  <!-- uni 的 SDK -->
+  <script type="text/javascript" src="uni.webview.1.5.5.js"></script>
+  <script type="text/javascript">
+    var messageCount = 0;
+    var hostCounter = 0;
+
+    // 格式化时间
+    function formatTime() {
+      var d = new Date();
+      var pad = function(n) { return n < 10 ? '0' + n : n; };
+      return pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds());
+    }
+
+    // 在页面中记录日志
+    function appendLog(from, text) {
+      messageCount++;
+      document.getElementById('msgCountBadge').innerText = messageCount + ' 条';
+      var logList = document.getElementById('logList');
+      if (messageCount === 1) {
+        logList.innerHTML = '';
+      }
+      var item = document.createElement('div');
+      item.className = 'log-item';
+      item.innerHTML = '<span class="log-time">[' + formatTime() + ']</span><strong>' + from + ':</strong> ' + text;
+      logList.insertBefore(item, logList.firstChild);
+    }
+
+    // 核心发送方法：统一封装 postMessage（多端自适应）
+    function postToApp(data) {
+      try {
+        if (window.uni && window.uni.webView && typeof window.uni.webView.postMessage === 'function') {
+          window.uni.webView.postMessage({ data: data });
+        } else if (window.parent && window.parent !== window) {
+          window.parent.postMessage(data, '*');
+        }
+      } catch (err) {
+        console.error('postMessage error:', err);
+      }
+      appendLog('Web已发出', JSON.stringify(data));
+    }
+
+    // 1. 发送普通问候
+    function sendSimpleGreeting() {
+      postToApp({
+        type: 'GREETING',
+        title: '问候消息',
+        content: '你好，来自 WebView 网页的问候！',
+        timestamp: Date.now()
+      });
+    }
+
+    // 2. 发送业务数据
+    function sendUserData() {
+      postToApp({
+        type: 'USER_DATA',
+        title: '用户信息上报',
+        user: {
+          id: 'U9527',
+          name: '前端工程师',
+          role: 'Admin',
+          score: 98.5
+        },
+        timestamp: Date.now()
+      });
+    }
+
+    // 3. 发送时间戳
+    function sendTimestamp() {
+      postToApp({
+        type: 'PING',
+        title: '心跳 Ping',
+        currentTime: new Date().toISOString(),
+        timestamp: Date.now()
+      });
+    }
+
+    // 4. 调用原生返回
+    function navigateBackToApp() {
+      appendLog('Web操作', '触发 navigateBack');
+      if (window.uni && window.uni.webView && typeof window.uni.webView.navigateBack === 'function') {
+        window.uni.webView.navigateBack({ delta: 1 });
+      } else {
+        postToApp({ type: 'NAVIGATE_BACK' });
+      }
+    }
+
+    // ==========================================
+    // 宿主 -> 网页 通讯接口：暴露全局函数供 evalJS 调用
+    // ==========================================
+    window.receiveFromApp = function(payload) {
+      console.log('WebView 收到来自宿主的消息:', payload);
+      var data = payload;
+      if (typeof payload === 'string') {
+        try {
+          data = JSON.parse(payload);
+        } catch (e) {
+          data = { message: payload };
+        }
+      }
+
+      var action = data.action || data.type || 'MESSAGE';
+
+      if (action === 'SET_THEME') {
+        document.body.className = '';
+        if (data.theme && data.theme !== 'default') {
+          document.body.classList.add('theme-' + data.theme);
+        }
+        appendLog('宿主切换主题', data.theme || 'default');
+      } else if (action === 'INCREMENT_COUNTER') {
+        hostCounter += (data.step || 1);
+        document.getElementById('counterNum').innerText = hostCounter;
+        appendLog('宿主累加计数', '当前值为 ' + hostCounter);
+      } else if (action === 'RESET_COUNTER') {
+        hostCounter = 0;
+        document.getElementById('counterNum').innerText = '0';
+        appendLog('宿主重置计数', '计数器归零');
+      } else {
+        appendLog('宿主消息', JSON.stringify(data));
+      }
+
+      return {
+        success: true,
+        receivedAction: action,
+        currentTime: Date.now()
+      };
+    };
+
+    // 监听 Web/iframe 模式下的 postMessage
+    window.addEventListener('message', function(event) {
+      if (event.data && typeof event.data === 'object' && event.data.action) {
+        window.receiveFromApp(event.data);
+      }
+    });
+
+    // 页面就绪后自检环境
+    document.addEventListener('DOMContentLoaded', function() {
+      if (window.uni && window.uni.webView) {
+        window.uni.webView.getEnv(function(res) {
+          var envName = 'H5';
+          if (res.plus) envName = 'App-Plus';
+          else if (res.miniprogram) envName = '小程序';
+          document.getElementById('envBadge').innerText = envName;
+        });
+      }
+    });
+  </script>
+</body>
+</html>
