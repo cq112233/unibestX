@@ -55,11 +55,11 @@ jobs:
           fi
 
           echo "📥 拉取源分支 ${SOURCE} 与目标分支 ${TARGET} 状态..."
-          git fetch origin "${SOURCE}:${SOURCE}"
-          git fetch origin "${TARGET}:${TARGET}"
+          git fetch origin "${SOURCE}"
+          git fetch origin "${TARGET}"
 
           # 统计源分支超前目标分支的提交数量
-          COMMITS_AHEAD=$(git rev-list --count "${TARGET}..origin/${SOURCE}" || echo "0")
+          COMMITS_AHEAD=$(git rev-list --count "origin/${TARGET}..origin/${SOURCE}" || echo "0")
           echo "📊 ${SOURCE} 分支超前 ${TARGET} 分支 ${COMMITS_AHEAD} 个提交"
 
           if [ "$COMMITS_AHEAD" -eq 0 ]; then
@@ -82,7 +82,7 @@ jobs:
           fi
 
           # 获取超前的提交摘要（最多展示最近 10 条）
-          COMMIT_LOG=$(git log "${TARGET}..origin/${SOURCE}" --oneline -n 10)
+          COMMIT_LOG=$(git log "origin/${TARGET}..origin/${SOURCE}" --oneline -n 10)
           PR_TITLE="chore(sync): 自动同步 ${SOURCE} 分支更新到 ${TARGET}"
 
           # 导出环境变量并通过 node 生成 PR Markdown 正文，避免 Shell 字符转义及 YAML 缩进解析问题
