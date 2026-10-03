@@ -3,12 +3,13 @@ import { dirname, resolve } from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 import type { PluginOption } from 'vite';
-import { defineConfig } from 'vite';
+import { defineConfig, loadEnv } from 'vite';
 import { uniEasycomPlugin } from '@dcloudio/uni-cli-shared/dist/vite/plugins/easycom.js';
 import { UNI_EASYCOM_EXCLUDE } from '@dcloudio/uni-cli-shared';
 import uniModule from '@dcloudio/vite-plugin-uni';
 import { uniAppX } from 'weapp-tailwindcss/presets';
 import { WeappTailwindcss } from 'weapp-tailwindcss/vite';
+import { visualizer } from 'rollup-plugin-visualizer';
 import uniRootX from './plugins/root-plugin';
 import cleanLoggerPlugin from './plugins/vite-plugin-clean-logger';
 import uniLayoutsPlugin from './plugins/uni-layouts-plugin';
@@ -29,6 +30,16 @@ catch {
 }
 
 const isBuild = process.env.NODE_ENV === 'production' || process.argv.includes('build');
+const env = loadEnv(process.env.NODE_ENV || 'production', projectRoot, '');
+const isVisualizer = process.env.VISUALIZER === 'true'
+  || env.VISUALIZER === 'true'
+  || env.VITE_VISUALIZER === 'true'
+  || process.env.ANALYZE === 'true'
+  || env.ANALYZE === 'true'
+  || process.env.VITE_BUNDLE_ANALYZE === 'true'
+  || env.VITE_BUNDLE_ANALYZE === 'true'
+  || process.argv.includes('--visualizer')
+  || process.argv.includes('--analyze');
 
 const weappTailwindcssPlugins: PluginOption[] = (WeappTailwindcss(
   uniAppX({
@@ -139,6 +150,17 @@ export default defineConfig({
       rootFileName: 'App.ku'
     }),
     uni(),
-    ...weappTailwindcssPlugins
+    ...weappTailwindcssPlugins,
+    ...(isVisualizer
+      ? [
+          visualizer({
+            filename: resolve(projectRoot, 'stats.html'),
+            title: 'unibestX 产物体积分析报告',
+            open: process.env.VISUALIZER_OPEN ? process.env.VISUALIZER_OPEN === 'true' : true,
+            gzipSize: true,
+            brotliSize: true
+          }) as PluginOption
+        ]
+      : [])
   ]
 });

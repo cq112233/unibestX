@@ -15,6 +15,8 @@
 ![node version](https://img.shields.io/badge/node-%3E%3D22-green)
 ![pnpm version](https://img.shields.io/badge/pnpm-%3E%3D7.30-green)
 ![HBuilderX version](https://img.shields.io/badge/HBuilderX-%3E%3D5.24-blue)
+[![Vitest](https://img.shields.io/badge/tested_with-vitest-yellow?logo=vitest)](https://vitest.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.8-blue?logo=typescript)](https://www.typescriptlang.org/)
 ![GitHub package.json version](https://img.shields.io/github/package-json/v/cq112233/unibestX)
 ![unibest License](https://img.shields.io/github/license/cq112233/unibestX)
 
@@ -68,7 +70,9 @@
   - [i18n 多语言](#i18n-多语言)
   - [Layout 布局](#layout-布局)
   - [H5 容器化部署 (Docker & Nginx)](#h5-容器化部署-docker--nginx)
-  - [代码规范与 Git 提交拦截 (Husky · Stylelint · Commitlint)](#代码规范与-git-提交拦截-husky--stylelint--commitlint)
+  - [产物体积可视化分析 (Rollup Visualizer)](#产物体积可视化分析-rollup-visualizer)
+  - [自动化单元测试体系 (Vitest · 组件与工具单测)](#自动化单元测试体系-vitest--组件与工具单测)
+  - [代码规范、类型检查与 CI 流水线 (Husky · Stylelint · Commitlint · TypeCheck · Actions)](#代码规范类型检查与-ci-流水线-husky--stylelint--commitlint--typecheck--actions)
 - [🗺️ 演进路线图](#️-演进路线图-roadmap)
 - [🔧 技术栈详情](#-技术栈详情)
 - [⚠️ UTS 开发注意事项](#️-uts-开发注意事项)
@@ -264,6 +268,10 @@ pnpm docker:down
 #### 其他常用脚本
 
 ```bash
+pnpm test           # Vitest 自动化单元测试（含 UVUE / Vue 组件与核心工具库）
+pnpm test:watch     # Vitest 交互式监听测试模式
+pnpm typecheck      # TypeScript 严格类型检查（tsc --noEmit，0 报错门禁）
+pnpm analyze        # 构建产物体积分析报告并自动在浏览器打开（stats.html）
 pnpm lint           # ESLint 检查（含 UTS 强类型与 UVUE 模板规则）
 pnpm lint:fix       # ESLint 自动修复
 pnpm lint:style     # Stylelint 样式检查（支持 SCSS / CSS / UVUE <style>）
@@ -307,8 +315,11 @@ pnpm check:uts-dts  # 校验 UTS 类型声明是否为最新（CI 用）
 - 🔌 **请求封装** — 基于 `lime-request`，支持多域名、Token 自动续期、SSE 流式传输
 - 📤 **文件上传** — 基于原生 `uni.uploadFile` 统一封装，支持 OSS 上传与进度回调
 - 🐳 **H5 Docker 极速部署** — 宿主机构建 + Nginx:alpine 轻量容器运行（~25MB，秒级打包），内置动态环境变量反代与 Hash 路由兜底
+- 🧪 **完整单元测试体系** — 内置 **Vitest + @vue/test-utils + happy-dom**，原生支持 UTS 核心工具类、自定义构建插件与 `.uvue` 页面组件挂载测试，单测 100% 覆盖核心逻辑
+- 📊 **产物体积可视化分析** — 整合 **rollup-plugin-visualizer**，`pnpm analyze` 一键生成交互式 Treemap 产物分析报告，支持 Gzip / Brotli 压缩体积真实对比
+- 🛡️ **严格类型检查 (TypeCheck)** — `pnpm typecheck` 一键运行 `tsc --noEmit`，0 报错门禁，杜绝类型隐式推导退化与插件配置类型漂移
 - 🤖 **AI 原生开发模板** — 内置 `unibestX-skill`（1 入口 + 8 分册），AI Agent 克隆即可按项目规范写代码；运行时自带 AI 对话页与 SSE 流式传输
-- 🔍 **工程化代码规范与 Git 提交拦截** — 深度整合 **ESLint**（内置针对 UTS 强类型与 UVUE 模板的自定义规则）、**Stylelint**（针对 SCSS、uni-app 特有单位与标签适配）、**Husky**、**lint-staged** 以及 **Commitlint**，提交时自动运行增量校验与友好中文规范提示，把跨端隐患拦截在提交前
+- 🔍 **工程化代码规范、Git 拦截与 CI 流水线** — 深度整合 **ESLint**（内置针对 UTS 强类型与 UVUE 模板的自定义规则）、**Stylelint**（针对 SCSS、uni-app 特有单位与标签适配）、**Husky**、**lint-staged**、**Commitlint** 以及 **GitHub Actions CI**，把跨端隐患拦截在本地提交与代码合并前
 - 🧰 **官方脚手架** — `pnpm create unibestx` 一键创建项目：UI 库三选一、功能与 12 个演示分包按需裁剪，生成后自动跑四查自检
 
 ## 📦 推荐的 UI 组件库
@@ -424,10 +435,19 @@ unibestX/
 │   ├── gen-uts-dts.mjs           #   UTS 类型声明生成与校验
 │   ├── check-tabbar-surface.mjs  #   TabBar 接口面校验
 │   └── router-guard-test/        #   路由守卫决策矩阵测试（node 直跑，无需测试框架）
+├── tests/                        # 自动化测试目录（Vitest）
+│   ├── setup.ts                  #   测试全局初始化（uni 跨端 API 桩与 Vue 运行时注入）
+│   └── unit/                     #   单元测试套件
+│       ├── components/           #     NavBar 等 UVue 组件挂载与交互断言
+│       ├── utils/                #     route、rxjs-lite 等核心工具库单测
+│       └── plugins/              #     ESLint 专属规则与 clean-logger 插件单测
+├── .github/                      # GitHub 自动化工作流
+│   └── workflows/ci.yml          #   CI 流水线（Lint / Style / DTS / TypeCheck / Test）
 ├── .husky/                       # Git 提交钩子（pre-commit / commit-msg）
 ├── .commitlintrc.cjs             # Commitlint 提交信息规范配置
 ├── stylelint.config.mjs          # Stylelint 样式规范配置（支持 SCSS / UVUE）
 ├── eslint.config.mjs             # ESLint 扁平化配置（含 UTS 专属规则插件）
+├── vitest.config.ts              # Vitest 配置文件（UVue 预转译与组件测试支持）
 ├── Dockerfile                    # H5 生产部署轻量容器（nginx:alpine）
 ├── docker-compose.yml            # H5 容器编排服务（h5-test / h5-prod）
 ├── deploy/                       # 生产与测试部署配置
@@ -1033,9 +1053,69 @@ pnpm docker:down
 
 > 📖 详尽部署指南与服务器上线步骤请参阅 [H5 端 Docker 部署手册](docs/guide/docker-deploy.md)。
 
-### 代码规范与 Git 提交拦截 (Husky · Stylelint · Commitlint)
+### 产物体积可视化分析 (Rollup Visualizer)
 
-`unibestX` 引入了覆盖 **JavaScript / UTS 强类型代码、SCSS / UVUE 样式以及 Git 提交日志** 的完整工程化质检链路，把跨端平台崩溃隐患拦截在 Git 提交之前：
+为协助开发者直观分析打包产物构成、排查大包依赖与冗余引入，项目深度集成了 `rollup-plugin-visualizer`，并针对 HBuilderX CLI 守护进程打包机制完成了零污染环境变量透传与双格式兼容支持：
+
+- 📊 **交互式 Treemap 报告**：生成清晰的可视化层级矩形树图（Treemap），直观展现各包真实体积、Gzip 压缩体积与 Brotli 压缩体积。
+- 🔄 **自动环境透传与零污染还原**：通过 `pnpm analyze` 执行构建时，底层自动将 `VISUALIZER=true` 临时注入 `.env.production.local` 穿透至 HBuilderX 编译进程；打包完成后立即自动清理临时文件，绝不污染 Git 工作区。
+- ⚡ **开箱即用命令**：
+
+```bash
+# 1. 运行体积分析构建，并在浏览器中自动打开交互式可视化报告（根目录 stats.html）
+pnpm analyze
+# 或等价命令
+pnpm build:analyze
+
+# 2. 静默生成报告（不自动弹窗打开浏览器，适用于 CI / 无头服务器环境）
+VISUALIZER_OPEN=false pnpm analyze
+```
+
+- 🛡️ **Git 忽略保护**：生成的 `stats.html` 报告已在 `.gitignore` 中默认排除，避免误提至代码仓库。
+
+### 自动化单元测试体系 (Vitest · 组件与工具单测)
+
+`unibestX` 率先在 uni-app X 跨端工程中落地了现代化的自动化测试底座，依托 **Vitest + @vue/test-utils + happy-dom**，不仅能极速测试纯 TS / UTS 工具函数，更**原生兼通 `.uvue` 页面组件的挂载、渲染与交互断言**：
+
+```mermaid
+graph LR
+    A[Vitest 调度器] --> B[happy-dom 轻量 DOM 环境]
+    B --> C[tests/setup.ts 全局运行时桩]
+    C --> D[uni 跨端原生 API 模拟]
+    C --> E[Vue 响应式全局对象注入]
+    A --> F[@vitejs/plugin-vue + UVue 预转译器]
+    F --> G[@vue/test-utils 挂载 .uvue 组件]
+```
+
+#### 1. 核心技术架构亮点
+
+- **Happy-DOM 高性能仿真环境**：提供比 jsdom 更轻量、启动毫秒级的 DOM 仿真运行时，完美满足组件挂载需求。
+- **全局跨端 API 仿真注入 (`tests/setup.ts`)**：提供 `uni.getSystemInfoSync`、`uni.navigateTo`、`uni.showToast` 等原生全局 API 桩函数与 `getCurrentPages()` 页面栈模拟，免去业务层重复 mock 的繁琐样板代码。
+- **UVue 视图组件预转译流水线 (`vitest.config.ts`)**：
+  - 自动将 `.uvue` 的 `<script setup lang="uts">` 转译为标准 TypeScript 脚本；
+  - 识别并处理 `view`、`text`、`scroll-view`、`list-view` 等 uni-app X 原生标签，防止组件挂载解析失败；
+  - 将 `.uts` 强类型模块与 `@dcloudio/types` 统一映射，实现逻辑与视图的双重测试验证。
+
+#### 2. 测试覆盖与最佳实践
+
+测试用例位于 `tests/unit/` 目录，涵盖关键业务与工程环节：
+- **组件挂载测试 (`tests/unit/components/`)**：验证 [NavBar.uvue](src/components/NavBar/NavBar.uvue) 等组件的标题渲染、返回按钮展示、自定义插槽与事件响应；
+- **核心工具库测试 (`tests/unit/utils/`)**：验证 [route](src/utils/route/index.uts) 路由提取、[rxjs-lite](src/utils/rxjs-lite/index.uts) 响应式流处理与算子管道；
+- **工程构建插件测试 (`tests/unit/plugins/`)**：验证 `clean-logger` 告警净化插件以及 ESLint UTS 专属规则（十六进制颜色校验、接口规范、未定义检查）。
+
+#### 3. 常用测试命令
+
+```bash
+# 运行全量单元测试（单次执行模式，CI 默认执行）
+pnpm test
+
+# 进入交互式监听测试模式（代码变更时自动重跑对应测试，TDD 推荐）
+pnpm test:watch
+```
+
+### 代码规范、类型检查与 CI 流水线 (Husky · Stylelint · Commitlint · TypeCheck · Actions)
+
+`unibestX` 引入了覆盖 **JavaScript / UTS 强类型代码、SCSS / UVUE 样式、TypeScript 静态类型检查、Git 提交日志与 CI 自动化** 的完整工程化质量护航体系：
 
 ```mermaid
 graph LR
@@ -1046,7 +1126,11 @@ graph LR
     D & E -->|校验通过| F[Husky commit-msg 钩子]
     F --> G[verify-commit-msg 中文规范校验]
     G -->|符合规范| H[提交成功]
-    G -->|不符合规范| I[终止提交并输出中文指引与示例]
+    H --> I[GitHub Actions CI 流水线]
+    I --> J[UTS DTS 同步检查]
+    I --> K[全量 ESLint & Stylelint]
+    I --> L[TypeScript 0 报错类型检查]
+    I --> M[Vitest 全量单元测试]
 ```
 
 #### 1. ESLint & UTS 平台专属规则插件 (`plugins/eslint-plugin-uts.mjs`)
@@ -1054,6 +1138,7 @@ graph LR
 针对 uni-app X 跨端原生编译对 UTS 类型与模板语法的严苛要求，内置 12 条专项规则：
 
 - **强类型红线**：强制使用 `type` 禁止 `interface`（`uts/no-interface` 支持自动 `--fix`）、禁止 `undefined`、禁止 `map.keys()` 函数式调用；
+- **颜色十六进制规范**：要求颜色统一使用标准十六进制色值（`uts/uvue-prefer-hex-color` 支持自动 `--fix`），防止鸿蒙与原生端英文颜色解析异常；
 - **原生平台编译防护**：严禁在模板 class 中使用 `!` 修饰符（`uts/uvue-no-important-modifier`），防止 `weapp-tailwindcss` 生成包含 `__weapp_tw_important__` 类名引发鸿蒙 ArkTS 编译器未知类报错；
 - **VDOM 兼容性提示（`warn`）**：提示 `<view>` 误挂 `color` 文本颜色、原生不支持的 `gap` 与 `space-*`、`font-mono` 等差异。
 
@@ -1061,15 +1146,24 @@ graph LR
 
 - 基于 `stylelint-config-standard-scss` 与 `stylelint-config-standard-vue/scss`（通过 `postcss-html` 解析 `.uvue` 中的 `<style>` 标签）；
 - 原生放行 uni-app 特有尺寸单位（`rpx`、`upx`）及原生组件标签（`page`、`view`、`scroll-view`、`list-view`、`uni-tabbar` 等）；
+- 严格遵循现代前端 8 阶段 CSS 属性排列顺序（定位 ➡️ 盒模型 ➡️ 尺寸 ➡️ 布局 ➡️ 排版 ➡️ 视觉 ➡️ 动画 ➡️ 其他）；
 - 完美兼容 Tailwind CSS v4 指令（`@theme`、`@utility`、`@source`、`@apply` 等）；
 - 针对 App 原生渲染引擎关闭 `inset` 等简写强转，保证 `top`/`bottom`/`left`/`right` 显式声明不被破坏。
 
-#### 3. Husky + lint-staged 增量校验
+#### 3. TypeScript 严格类型检查 (TypeCheck)
+
+针对全工程 TypeScript、构建插件与配置运行 `tsc --noEmit`，杜绝类型隐式推导退化：
+
+```bash
+pnpm typecheck       # 运行严格类型检查（tsc --noEmit，0 报错门禁）
+```
+
+#### 4. Husky + lint-staged 增量校验
 
 - 提交时触发 `pre-commit` 钩子，**仅对暂存区变动文件执行校验与修复**，秒级完成，免去全量扫描耗时；
 - 串行执行并抑制底噪，遇到错误时输出清晰中文横幅与精准行号定位。
 
-#### 4. Commitlint 提交信息中文校验
+#### 5. Commitlint 提交信息中文校验
 
 提交日志遵循 [Conventional Commits](https://www.conventionalchangelog.org/) 规范，格式为 `<type>(<scope>): <subject>`。未按规范书写时，提交会被拦截并输出友好中文说明：
 
@@ -1085,7 +1179,16 @@ graph LR
 | `build` / `ci` | 构建系统、外部依赖或 CI 流水线调整 | `git commit -m "build: 升级 Tailwind CSS 与 Vite 插件"` |
 | `chore` | 其他杂务、琐事配置变更 | `git commit -m "chore: 更新 .gitignore 过滤规则"` |
 
-#### 5. 常用命令与跳过机制
+#### 6. GitHub Actions CI 持续集成流水线 (`.github/workflows/ci.yml`)
+
+项目已预置生产级 CI 自动化工作流，在开发者向 `main` / `base` 分支发起 Push 或 Pull Request 时自动并行执行五大质量门禁：
+1. **ESLint 检查**（`pnpm lint`）
+2. **Stylelint 检查**（`pnpm lint:style`）
+3. **UTS 声明同步校验**（`pnpm check:uts-dts`）
+4. **TypeScript 严格类型检查**（`pnpm typecheck`）
+5. **Vitest 自动化单元测试**（`pnpm test`）
+
+#### 7. 常用命令与跳过机制
 
 - **手动触发全量检查**：
 
@@ -1093,6 +1196,8 @@ graph LR
   pnpm lint:all        # 全量运行 ESLint + Stylelint 检查
   pnpm lint:fix        # 自动修复 ESLint 问题
   pnpm lint:style:fix  # 自动修复 Stylelint 问题
+  pnpm typecheck       # 严格类型检查
+  pnpm test            # 单元测试
   ```
 
 - **临时跳过提交钩子（紧急情况）**：
