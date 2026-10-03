@@ -53,7 +53,7 @@ const composer = uniHelper({
     'ts/no-redeclare': 'off',
     'style/no-tabs': 'off',
     'unused-imports/no-unused-vars': [
-      'warn',
+      'error',
       {
         vars: 'all',
         varsIgnorePattern: '^_',

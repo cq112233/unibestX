@@ -129,6 +129,89 @@ export default {
     // 允许规则块之间紧凑排列，不强制空行
     'rule-empty-line-before': null,
     // 允许显式书写4值简写（例如 0 16px 8px 16px），避免误触
-    'shorthand-property-no-redundant-values': null
+    'shorthand-property-no-redundant-values': null,
+    // CSS 属性排序规则（基于 stylelint-order，设置为 warning 黄色警告）
+    'order/properties-order': [
+      [
+        // 1. 定位属性
+        'position',
+        'top',
+        'right',
+        'bottom',
+        'left',
+        'z-index',
+        // 2. 布局模型 (Flexbox / Display)
+        'display',
+        'flex-direction',
+        'flex-wrap',
+        'justify-content',
+        'align-items',
+        'align-content',
+        'flex',
+        'flex-grow',
+        'flex-shrink',
+        'flex-basis',
+        'order',
+        // 3. 盒模型尺寸
+        'box-sizing',
+        'width',
+        'min-width',
+        'max-width',
+        'height',
+        'min-height',
+        'max-height',
+        // 4. 外边距 & 内边距
+        'margin',
+        'margin-top',
+        'margin-right',
+        'margin-bottom',
+        'margin-left',
+        'padding',
+        'padding-top',
+        'padding-right',
+        'padding-bottom',
+        'padding-left',
+        // 5. 边框 & 圆角
+        'border',
+        'border-width',
+        'border-style',
+        'border-color',
+        'border-top',
+        'border-right',
+        'border-bottom',
+        'border-left',
+        'border-radius',
+        // 6. 背景
+        'background',
+        'background-color',
+        'background-image',
+        'background-repeat',
+        'background-position',
+        'background-size',
+        // 7. 文本与字体
+        'color',
+        'font',
+        'font-family',
+        'font-size',
+        'font-weight',
+        'line-height',
+        'text-align',
+        'text-decoration',
+        'text-overflow',
+        'white-space',
+        'word-break',
+        // 8. 其他视觉 & 变换 & 过渡
+        'opacity',
+        'overflow',
+        'overflow-x',
+        'overflow-y',
+        'transform',
+        'transition',
+        'animation'
+      ],
+      {
+        severity: 'warning'
+      }
+    ]
   }
 };
