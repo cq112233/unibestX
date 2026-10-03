@@ -35,10 +35,23 @@ for (let i = 0; i < args.length; i++) {
   }
 }
 
+const isAnalyze = process.env.VISUALIZER === 'true'
+  || process.env.ANALYZE === 'true'
+  || args.includes('--analyze')
+  || args.includes('--visualizer');
+
 let createdTempEnv = false;
 const readIfExists = file => (fs.existsSync(file) ? fs.readFileSync(file, 'utf8') : '');
 
 function setupEnv() {
+  const extraEnvLines = [];
+  if (isAnalyze) {
+    extraEnvLines.push('VISUALIZER=true');
+    if (process.env.VISUALIZER_OPEN !== undefined) {
+      extraEnvLines.push(`VISUALIZER_OPEN=${process.env.VISUALIZER_OPEN}`);
+    }
+  }
+
   if (targetEnv === 'test') {
     if (!fs.existsSync(testEnvFile)) {
       console.error(`❌ 未找到测试配置文件: ${testEnvFile}`);
@@ -47,7 +60,8 @@ function setupEnv() {
     const content = `${[
       '# ===== 由 scripts/build-h5.mjs 打包临时生成，打包结束后自动清理，勿手改 =====',
       readIfExists(commonEnvFile).trim(),
-      readIfExists(testEnvFile).trim()
+      readIfExists(testEnvFile).trim(),
+      ...extraEnvLines
     ]
       .filter(Boolean)
       .join('\n\n')}\n`;
@@ -60,7 +74,22 @@ function setupEnv() {
       fs.rmSync(prodLocalFile, { force: true });
       console.log('🧹 检测到残留的 .env.production.local，已自动清理以确保纯正生产构建');
     }
+    if (isAnalyze) {
+      const content = `${[
+        '# ===== 由 scripts/build-h5.mjs 打包临时生成（体积分析），打包结束后自动清理，勿手改 =====',
+        readIfExists(commonEnvFile).trim(),
+        ...extraEnvLines
+      ]
+        .filter(Boolean)
+        .join('\n\n')}\n`;
+      fs.writeFileSync(prodLocalFile, content);
+      createdTempEnv = true;
+    }
     console.log('🚀 正在以【生产环境】打包 H5');
+  }
+
+  if (isAnalyze) {
+    console.log('📊 已开启构建产物体积分析（rollup-plugin-visualizer）');
   }
 }
 
@@ -194,6 +223,10 @@ try {
   }
 
   console.log('✅ H5 全新打包成功，产物目录：unpackage/dist/build/web');
+  const statsFile = path.join(root, 'stats.html');
+  if (fs.existsSync(statsFile)) {
+    console.log(`📈 体积分析报告已生成：${statsFile}`);
+  }
 }
 finally {
   cleanup();

@@ -101,6 +101,13 @@ export default {
     ],
     // 保持十六进制颜色标准（uni-app X 推荐 6 位十六进制，不强制缩写）
     'color-hex-length': null,
+    // 严禁使用英文单词命名颜色，统一使用标准十六进制色值
+    'color-named': [
+      'never',
+      {
+        severity: 'warning'
+      }
+    ],
     // 允许传统 rgba 声明（uni-app 原生渲染兼容更好）
     'color-function-notation': null,
     'color-function-alias-notation': null,
