@@ -25,7 +25,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: pnpm
 
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
@@ -38,3 +37,9 @@ jobs:
 
       - name: Check UTS DTS Sync
         run: pnpm check:uts-dts
+
+      - name: Type Check
+        run: pnpm typecheck
+
+      - name: Unit Tests (Vitest)
+        run: pnpm test

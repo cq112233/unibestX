@@ -16,16 +16,16 @@ const DEFAULT_API_URL: string = 'https://ukw0y1.laf.run';
 const directBaseUrl: string = getApiBaseUrl();
 const directSecondaryUrl: string = getApiSecondaryUrl();
 
+let defaultUrl: string = directBaseUrl.startsWith('/') ? DEFAULT_API_URL : directBaseUrl;
+let secondaryUrl: string = directSecondaryUrl.startsWith('/') ? DEFAULT_API_URL : directSecondaryUrl;
+
 // #ifdef H5
 // H5：VITE_H5_USE_PROXY=true 时走 /api 反向代理
 const useH5Proxy: boolean = getH5UseProxy();
-const defaultUrl: string = useH5Proxy ? '/api' : directBaseUrl;
-const secondaryUrl: string = useH5Proxy ? '/api' : directSecondaryUrl;
-// #endif
-// #ifndef H5
-// 小程序 / App：固定直连，误配 /api 时回退默认完整域名
-const defaultUrl: string = directBaseUrl.startsWith('/') ? DEFAULT_API_URL : directBaseUrl;
-const secondaryUrl: string = directSecondaryUrl.startsWith('/') ? DEFAULT_API_URL : directSecondaryUrl;
+if (useH5Proxy) {
+  defaultUrl = '/api';
+  secondaryUrl = '/api';
+}
 // #endif
 
 type ApiDomainConfig = {
@@ -69,8 +69,11 @@ requestInstance.interceptors.request.use(
     }
     const extra = config.extra;
     let ignoreAuth = false;
-    if (extra !== null) {
-      const authVal = (extra as UTSJSONObject).getBoolean('ignoreAuth');
+    if (extra != null) {
+      const extraObj = extra as UTSJSONObject;
+      const authVal = typeof extraObj.getBoolean === 'function'
+        ? extraObj.getBoolean('ignoreAuth')
+        : (extraObj.ignoreAuth as boolean | null);
       if (authVal == true) {
         ignoreAuth = true;
       }
@@ -78,13 +81,14 @@ requestInstance.interceptors.request.use(
     if (!ignoreAuth) {
       const tokenStore = useTokenStore();
       const token = tokenStore.getToken();
-      if (token === '') {
+      if (token == '') {
         throw new Error('[请求错误]：未登录');
       }
       header.token = token;
     }
-    if (extra !== null) {
-      const domain = (extra as UTSJSONObject).domain as string | null;
+    if (extra != null) {
+      const extraObj = extra as UTSJSONObject;
+      const domain = extraObj.domain as string | null;
       if (domain != null) {
         config.baseURL = domain;
       }

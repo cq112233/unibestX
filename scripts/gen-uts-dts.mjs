@@ -78,7 +78,9 @@ const EXTRA_SOURCES = [
   path.join(ROOT, 'src/tabbar/index.uts'),
   path.join(ROOT, 'src/tabbar/types.uts'),
   path.join(ROOT, 'src/router/config.uts'),
-  path.join(ROOT, 'src/router/index.uts')
+  path.join(ROOT, 'src/router/index.uts'),
+  path.join(ROOT, 'src/api/foo.uts'),
+  path.join(ROOT, 'src/api/auth.uts')
 ];
 
 const args = new Set(process.argv.slice(2));
