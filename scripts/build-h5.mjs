@@ -13,6 +13,7 @@ import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { runOptimizer } from './optimize-images.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const pagesFile = path.join(root, 'pages.json');
@@ -124,6 +125,9 @@ console.log(`📌 HBuilderX CLI: ${cli}`);
 
 // ---------- 备份 pages.json 与环境设置 ----------
 setupEnv();
+
+// ---------- 静态图片自动化压缩优化（带智能缓存，0毫秒无感跳过） ----------
+await runOptimizer();
 
 const hadPages = fs.existsSync(pagesFile);
 if (hadPages) {

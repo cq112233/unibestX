@@ -18,6 +18,27 @@ export function getAppVersion(): string {
 }
 
 /**
+ * 获取打包构建时间（全端从 import.meta.env 读取）
+ */
+export function getBuildTime(): string {
+  return `${import.meta.env.VITE_BUILD_TIME ?? ''}`;
+}
+
+/**
+ * 获取 Git Commit 简写哈希（全端从 import.meta.env 读取）
+ */
+export function getGitCommitHash(): string {
+  return `${import.meta.env.VITE_GIT_COMMIT_HASH ?? ''}`;
+}
+
+/**
+ * 获取 Git 当前打包分支名称（全端从 import.meta.env 读取）
+ */
+export function getGitBranch(): string {
+  return `${import.meta.env.VITE_GIT_BRANCH ?? ''}`;
+}
+
+/**
  * 获取接口 BaseURL 地址（全端从 import.meta.env 读取）
  */
 export function getApiBaseUrl(): string {
@@ -356,6 +377,21 @@ export class EnvUtils {
   /** 获取当前编译运行模式（如 "Vapor 模式 (开发)" / "VDOM 模式 (生产)"） */
   getCompileMode(): string {
     return getCompileMode();
+  }
+
+  /** 获取打包构建时间 */
+  getBuildTime(): string {
+    return getBuildTime();
+  }
+
+  /** 获取 Git Commit 简写哈希 */
+  getGitCommitHash(): string {
+    return getGitCommitHash();
+  }
+
+  /** 获取 Git 当前打包分支名称 */
+  getGitBranch(): string {
+    return getGitBranch();
   }
 }
 
