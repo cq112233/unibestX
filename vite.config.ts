@@ -15,11 +15,16 @@ import cleanLoggerPlugin from './plugins/vite-plugin-clean-logger';
 import uniLayoutsPlugin from './plugins/uni-layouts-plugin';
 import tabbarViewsPlugin from './plugins/vite-plugin-tabbar-views';
 import uniPagesPlugin from './plugins/vite-plugin-uni-pages';
+import { execSync } from 'node:child_process';
+import { viteMockServe } from 'vite-plugin-mock';
+import { viteVConsole } from 'vite-plugin-vconsole';
+import vitePluginAppinfo from 'vite-plugin-build-info';
+import { ViteImageOptimizer } from 'vite-plugin-image-optimizer';
 
 const uni = (uniModule as typeof uniModule & { default?: typeof uniModule }).default ?? uniModule;
 const projectRoot = dirname(fileURLToPath(import.meta.url));
 
-// 读取 package.json，编译阶段注入应用版本号供 import.meta.env 全端安全访问
+// 读取 package.json 与 Git 元信息，编译阶段注入环境变量供 import.meta.env 全端安全访问
 try {
   const pkgRaw = fs.readFileSync(resolve(projectRoot, 'package.json'), 'utf-8');
   const pkg = JSON.parse(pkgRaw);
@@ -28,6 +33,16 @@ try {
 catch {
   process.env.VITE_APP_VERSION = '1.0.0';
 }
+
+try {
+  process.env.VITE_GIT_COMMIT_HASH = execSync('git rev-parse --short HEAD', { stdio: ['pipe', 'pipe', 'ignore'] }).toString().trim();
+  process.env.VITE_GIT_BRANCH = execSync('git rev-parse --abbrev-ref HEAD', { stdio: ['pipe', 'pipe', 'ignore'] }).toString().trim();
+}
+catch {
+  process.env.VITE_GIT_COMMIT_HASH = 'unknown';
+  process.env.VITE_GIT_BRANCH = 'unknown';
+}
+process.env.VITE_BUILD_TIME = new Date().toISOString();
 
 const isBuild = process.env.NODE_ENV === 'production' || process.argv.includes('build');
 const env = loadEnv(process.env.NODE_ENV || 'production', projectRoot, '');
@@ -40,6 +55,29 @@ const isVisualizer = process.env.VISUALIZER === 'true'
   || env.VITE_BUNDLE_ANALYZE === 'true'
   || process.argv.includes('--visualizer')
   || process.argv.includes('--analyze');
+
+const isMock = process.env.VITE_USE_MOCK === 'true'
+  || env.VITE_USE_MOCK === 'true'
+  || process.env.MOCK === 'true'
+  || env.MOCK === 'true'
+  || process.argv.includes('--mock');
+
+const isWeb = process.env.UNI_PLATFORM === 'web'
+  || process.env.UNI_PLATFORM === 'h5'
+  || !process.env.UNI_PLATFORM;
+
+// 生产环境绝对严禁包含 vConsole（即使显式配置了开关或参数也强制屏蔽，防止线上泄漏）
+const isProduction = env.VITE_ENV_TYPE === 'production'
+  || process.env.VITE_ENV_TYPE === 'production'
+  || (isBuild && env.VITE_ENV_TYPE !== 'test');
+
+const isVConsole = !isProduction && isWeb && (
+  process.env.VITE_SHOW_VCONSOLE === 'true'
+  || env.VITE_SHOW_VCONSOLE === 'true'
+  || process.env.VCONSOLE === 'true'
+  || env.VCONSOLE === 'true'
+  || process.argv.includes('--vconsole')
+);
 
 const weappTailwindcssPlugins: PluginOption[] = (WeappTailwindcss(
   uniAppX({
@@ -159,6 +197,52 @@ export default defineConfig({
             open: process.env.VISUALIZER_OPEN ? process.env.VISUALIZER_OPEN === 'true' : true,
             gzipSize: true,
             brotliSize: true
+          }) as PluginOption
+        ]
+      : []),
+    // 构建元信息自动注入插件：向 HTML 注入 meta[name="app-info"]、全局变量 __APP_INFO__ 与控制台徽标
+    vitePluginAppinfo({
+      enableLog: true,
+      enableMeta: true,
+      enableGlobal: true
+    }),
+    // 静态资源自动化压缩插件：在构建阶段压缩打包图片资源
+    ...(isBuild
+      ? [
+          ViteImageOptimizer({
+            png: { quality: 80, compressionLevel: 9 },
+            jpeg: { quality: 80 },
+            jpg: { quality: 80 },
+            webp: { quality: 80 },
+            logStats: true
+          }) as PluginOption
+        ]
+      : []),
+    // 本地 Mock 中间件插件：支持纯前端离线联调（VITE_USE_MOCK=true / pnpm dev:mock）
+    ...(isMock
+      ? [
+          viteMockServe({
+            mockPath: 'mock',
+            enable: true,
+            watchFiles: true,
+            logger: true
+          }) as PluginOption
+        ]
+      : []),
+    // 移动端真机调试工具 vConsole（仅在 Web/H5 且开启时注入，如 pnpm dev:vconsole）
+    ...(isVConsole
+      ? [
+          viteVConsole({
+            entry: [
+              resolve(projectRoot, 'main.uts'),
+              resolve(projectRoot, 'main')
+            ],
+            enabled: isVConsole,
+            config: {
+              maxLogNumber: 1000,
+              theme: 'dark'
+            },
+            customHide: 'location.href.includes("vconsole=false")'
           }) as PluginOption
         ]
       : [])

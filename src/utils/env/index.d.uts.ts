@@ -19,6 +19,21 @@ export declare function getAppTitle(): string;
 export declare function getAppVersion(): string;
 
 /**
+ * 获取打包构建时间（全端从 import.meta.env 读取）
+ */
+export declare function getBuildTime(): string;
+
+/**
+ * 获取 Git Commit 简写哈希（全端从 import.meta.env 读取）
+ */
+export declare function getGitCommitHash(): string;
+
+/**
+ * 获取 Git 当前打包分支名称（全端从 import.meta.env 读取）
+ */
+export declare function getGitBranch(): string;
+
+/**
  * 获取接口 BaseURL 地址（全端从 import.meta.env 读取）
  */
 export declare function getApiBaseUrl(): string;
@@ -176,6 +191,12 @@ export declare class EnvUtils {
   getCompilePlatform(): string;
 
   getCompileMode(): string;
+
+  getBuildTime(): string;
+
+  getGitCommitHash(): string;
+
+  getGitBranch(): string;
 }
 
 /** 环境变量与运行环境工具全局单例 */

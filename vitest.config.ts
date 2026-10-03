@@ -27,11 +27,9 @@ export default defineConfig({
       enforce: 'pre',
       async transform(code, id) {
         if (id.endsWith('.uts') || id.includes('.uts?')) {
-          // 预处理条件编译：Vitest 运行于模拟浏览器 (happy-dom) 环境，移除针对原生 App 的条件编译块
-          const cleaned = code
-            .replace(/\/\/\s*#ifdef\s+APP[^\n]*\n[\s\S]*?\/\/\s*#endif/g, '')
-            .replace(/\/\/\s*#(?:ifdef|ifndef|endif)[^\n]*/g, '');
-          const res = await transformWithEsbuild(cleaned, id, { loader: 'ts' });
+          // 在单测环境模拟 UNI-APP-X 预编译：移除 #ifndef UNI-APP-X 代码块，规避第三方库内变量重复定义
+          const cleanedCode = code.replace(/\/\/\s*#ifndef\s+UNI-APP-X[\s\S]*?\/\/\s*#endif/g, '');
+          const res = await transformWithEsbuild(cleanedCode, id, { loader: 'ts' });
           return {
             code: res.code,
             map: res.map as any
