@@ -18,8 +18,8 @@ import { ref } from 'vue';
 import type { ISingleTokenRes, IUserInfo } from '../../store';
 import { useTokenStore, useUserStore } from '../../store';
 import { isPageTabbar, switchTabbar } from '@/src/tabbar/index.uts';
-import { login } from '@/src/api/auth/auth.uts';
-import type { LoginParams, LoginResult } from '@/src/api/auth/types.uts';
+import { login } from '@/src/api/auth.uts';
+import type { LoginParams, LoginResult } from '@/src/api/auth.uts';
 
 const tokenStore = useTokenStore();
 const userStore = useUserStore();

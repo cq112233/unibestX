@@ -8,18 +8,32 @@
  * 修改 `auth.uts` 的导出后，重新执行：node scripts/gen-uts-dts.mjs
  * 校验是否已同步：node scripts/gen-uts-dts.mjs --check
  */
-export type { AuthUserInfo, LoginParams, LoginResult } from './types.uts';
+export type LoginParams = {
+  username: string;
+  password: string;
+};
+
+export type AuthUserInfo = {
+  userId: number;
+  username: string;
+  nickname: string;
+  avatar: string;
+  roles: Array<string>;
+  permissions?: Array<string> | null;
+};
+
+export type LoginResult = {
+  token: string;
+  expiresIn: number;
+  userInfo: AuthUserInfo;
+};
 
 /**
  * 用户登录接口
- * @param params 账号与密码
+ * 运行 pnpm dev:mock 时发起网络请求并由根目录 mock/auth.ts 拦截响应
+ * 离线无服务时平滑降级回退到本地 UTS Mock 数据
  */
 export declare function login(params: LoginParams): Promise<LoginResult>;
-
-/**
- * 远程真实登录示范（后端联调时启用）
- */
-export declare function loginRemote(params: LoginParams): Promise<LoginResult>;
 
 /**
  * 获取当前登录用户信息

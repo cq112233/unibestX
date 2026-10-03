@@ -1,20 +1,57 @@
 import { http } from '@/src/http/request.uts';
 import type { LimeRequestConfig } from '@/uni_modules/lime-request';
-import { MOCK_LOGIN_RESULT, MOCK_USER_INFO } from './mock/auth.uts';
-import type { AuthUserInfo, LoginParams, LoginResult } from './types.uts';
-
-export type { AuthUserInfo, LoginParams, LoginResult } from './types.uts';
 
 // ==========================================
-// 鉴权 API 接口（对应 src/sub/auth/）
-// 遵循规范：通过 http 单例发起请求，本地开发由根目录 mock/ 拦截响应
-// 离线无服务时平滑降级到 UTS 内存 Mock 数据集
+// 1. 类型定义（遵循规范：一律使用 type，严禁 interface）
+// ==========================================
+
+export type LoginParams = {
+  username: string;
+  password: string;
+};
+
+export type AuthUserInfo = {
+  userId: number;
+  username: string;
+  nickname: string;
+  avatar: string;
+  roles: Array<string>;
+  permissions?: Array<string> | null;
+};
+
+export type LoginResult = {
+  token: string;
+  expiresIn: number;
+  userInfo: AuthUserInfo;
+};
+
+// ==========================================
+// 2. 本地模拟数据集
+// ==========================================
+
+const MOCK_USER_INFO: AuthUserInfo = {
+  userId: 1001,
+  username: 'UNIX',
+  nickname: 'UNIX 开发者',
+  avatar: '/static/logo.png',
+  roles: ['admin', 'developer'],
+  permissions: ['*']
+};
+
+const MOCK_LOGIN_RESULT: LoginResult = {
+  token: 'mock-token-UNIX-123456',
+  expiresIn: 7200,
+  userInfo: MOCK_USER_INFO
+};
+
+// ==========================================
+// 3. API 接口函数
 // ==========================================
 
 /**
  * 用户登录接口
- * 运行 pnpm dev:mock 时，本请求会被根目录 mock/auth.ts 自动拦截并响应
- * @param params 账号与密码
+ * 运行 pnpm dev:mock 时发起网络请求并由根目录 mock/auth.ts 拦截响应
+ * 离线无服务时平滑降级回退到本地 UTS Mock 数据
  */
 export function login(params: LoginParams): Promise<LoginResult> {
   return http.post<UTSJSONObject>('/auth/login', params, {
@@ -37,7 +74,6 @@ export function login(params: LoginParams): Promise<LoginResult> {
       } as AuthUserInfo
     } as LoginResult;
   }).catch((_err: any): Promise<LoginResult> => {
-    // 离线无服务或单测网络未连通时，自动回退到本地 UTS Mock 数据集
     const fallback: LoginResult = {
       token: MOCK_LOGIN_RESULT.token,
       expiresIn: MOCK_LOGIN_RESULT.expiresIn,
@@ -55,7 +91,6 @@ export function login(params: LoginParams): Promise<LoginResult> {
 
 /**
  * 获取当前登录用户信息
- * 运行 pnpm dev:mock 时被根目录 mock/auth.ts 中的 /api/user/info 拦截
  */
 export function fetchUserInfo(): Promise<AuthUserInfo> {
   return http.get<UTSJSONObject>('/user/info').then((data: UTSJSONObject): AuthUserInfo => {
@@ -74,7 +109,6 @@ export function fetchUserInfo(): Promise<AuthUserInfo> {
 
 /**
  * 退出登录接口
- * 运行 pnpm dev:mock 时被根目录 mock/auth.ts 中的 /api/auth/logout 拦截
  */
 export function logout(): Promise<boolean> {
   return http.post<any>('/auth/logout').then((_data: any): boolean => {

@@ -1,19 +1,174 @@
-/**
- * Foo 接口入口（遵循 unibestX-skill 规范）
- * 推荐引用规范路径：@/src/api/foo/foo.uts
- */
+import { API_DOMAINS, http } from '@/src/http/request.uts';
+import type { LimeRequestConfig } from '@/uni_modules/lime-request';
+import { DEFAULT_OSS_UPLOAD_PATH, uploadFile } from '@/src/utils/upload/index.uts';
+import type { UploadFileOptions } from '@/src/utils/upload/index.uts';
 
-export {
-  createFoo,
-  deleteFoo,
-  fetchFooById,
-  fetchFooList,
-  fetchFooRemote,
-  foo,
-  FOO_UPLOAD_PATH,
-  getFooById,
-  getFooList,
-  updateFoo,
-  uploadFooFile
-} from './foo/foo.uts';
-export type { FooItem, FooPageResult, FooQuery, IFoo, IFooList } from './foo/types.uts';
+export const FOO_UPLOAD_PATH: string = DEFAULT_OSS_UPLOAD_PATH;
+
+// ==========================================
+// 1. 类型定义（遵循规范：一律使用 type，严禁 interface）
+// ==========================================
+
+export type FooItem = {
+  id: number;
+  name: string;
+  desc: string;
+};
+
+export type PageResult<T> = {
+  list: Array<T>;
+  hasMore: boolean;
+  total: number;
+};
+
+export type FooPageResult = PageResult<FooItem>;
+
+// 兼容历史类型别名
+export type IFoo = FooItem;
+export type IFooList = FooPageResult;
+
+// ==========================================
+// 2. 本地模拟数据集（模块内私有闭环）
+// ==========================================
+
+const MOCK_FOO_LIST: Array<FooItem> = [
+  { id: 1, name: 'unix', desc: 'uni-app X 核心架构' },
+  { id: 2, name: 'UnibestX', desc: '最好用的 uni-app X 跨端开发模板' },
+  { id: 3, name: 'lime-request', desc: '高性能轻量级网络请求库' },
+  { id: 4, name: 'weapp-tailwindcss', desc: '全平台原子化样式解决方案' },
+  { id: 5, name: 'vitest', desc: '极速轻量单元测试框架' }
+];
+
+// ==========================================
+// 3. API 接口函数
+// 遵循规范：开发期返回本地 Mock，后端就绪只换函数体，签名冻结
+// ==========================================
+
+/**
+ * 分页查询 Foo 列表（支持关键字筛选与分页）
+ * @param keyword 搜索关键字（默认空字符串）
+ * @param pageNo 当前页码（默认 1）
+ * @param pageSize 分页大小（默认 10）
+ */
+export function fetchFooList(keyword: string = '', pageNo: number = 1, pageSize: number = 10): Promise<FooPageResult> {
+  let filtered = MOCK_FOO_LIST;
+  if (keyword.length > 0) {
+    filtered = MOCK_FOO_LIST.filter((item: FooItem): boolean => {
+      return item.name.toLowerCase().includes(keyword.toLowerCase());
+    });
+  }
+
+  const offset = (pageNo - 1) * pageSize;
+  const list = offset < filtered.length
+    ? filtered.slice(offset, offset + pageSize)
+    : [] as Array<FooItem>;
+
+  return Promise.resolve({
+    list,
+    hasMore: offset + pageSize < filtered.length,
+    total: filtered.length
+  } as FooPageResult);
+}
+
+/**
+ * 根据 ID 查询单条 Foo 详情
+ */
+export function fetchFooById(id: number): Promise<FooItem | null> {
+  const found = MOCK_FOO_LIST.find((item: FooItem): boolean => item.id == id);
+  return Promise.resolve(found != null ? found : null);
+}
+
+/**
+ * 新增 Foo
+ */
+export function createFoo(data: FooItem): Promise<FooItem> {
+  const newItem: FooItem = {
+    id: data.id > 0 ? data.id : Date.now(),
+    name: data.name,
+    desc: data.desc
+  };
+  MOCK_FOO_LIST.unshift(newItem);
+  return Promise.resolve(newItem);
+}
+
+/**
+ * 更新 Foo
+ */
+export function updateFoo(id: number, data: FooItem): Promise<FooItem> {
+  const index = MOCK_FOO_LIST.findIndex((item: FooItem): boolean => item.id == id);
+  if (index >= 0) {
+    MOCK_FOO_LIST[index] = { id, name: data.name, desc: data.desc } as FooItem;
+    return Promise.resolve(MOCK_FOO_LIST[index]);
+  }
+  return Promise.resolve(data);
+}
+
+/**
+ * 删除 Foo
+ */
+export function deleteFoo(id: number): Promise<boolean> {
+  const index = MOCK_FOO_LIST.findIndex((item: FooItem): boolean => item.id == id);
+  if (index >= 0) {
+    MOCK_FOO_LIST.splice(index, 1);
+  }
+  return Promise.resolve(true);
+}
+
+/**
+ * 真实远程接口调用示范（http.get）
+ */
+export function fetchFooRemote(): Promise<FooItem> {
+  return http.get<UTSJSONObject>('/foo', {
+    params: {
+      name: 'unix',
+      page: 1,
+      pageSize: 10
+    } as UTSJSONObject,
+    baseURL: API_DOMAINS.SECONDARY,
+    extra: {
+      ignoreAuth: true
+    } as UTSJSONObject
+  } as LimeRequestConfig).then((data: UTSJSONObject): FooItem => {
+    return {
+      id: data.getNumber('id') ?? 1,
+      name: data.getString('name') ?? '',
+      desc: data.getString('desc') ?? ''
+    } as FooItem;
+  });
+}
+
+/**
+ * 上传文件示例
+ * @param filePath 本地文件路径
+ * @param ignoreAuth 是否跳过鉴权
+ * @param uploadPathOrUrl 上传目标路径
+ */
+export function uploadFooFile(
+  filePath: string,
+  ignoreAuth: boolean = false,
+  uploadPathOrUrl: string = FOO_UPLOAD_PATH
+): Promise<string> {
+  return uploadFile({
+    url: uploadPathOrUrl,
+    filePath,
+    formData: null,
+    ignoreAuth
+  } as UploadFileOptions);
+}
+
+// ==========================================
+// 历史兼容调用别名
+// ==========================================
+
+export function getFooList(params: UTSJSONObject | null = null): Promise<Array<FooItem>> {
+  const keyword = params?.getString('name') ?? '';
+  return fetchFooList(keyword, 1, 100).then((res: FooPageResult): Array<FooItem> => res.list);
+}
+
+export function getFooById(id: number): Promise<FooItem | null> {
+  return fetchFooById(id);
+}
+
+export function foo(): Promise<FooItem> {
+  return fetchFooRemote();
+}
