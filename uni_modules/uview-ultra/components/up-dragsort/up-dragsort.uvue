@@ -1,99 +1,103 @@
 <template>
-    <view
-        class="up-dragsort"
-        :class="[
-            direction == 'horizontal' ? 'up-dragsort--horizontal' : '',
-            direction == 'vertical' ? 'up-dragsort--vertical' : '',
-            direction == 'all' ? 'up-dragsort--all' : ''
-        ]"
-        :style="movableAreaStyle"
-    >
-        <!-- #ifdef APP -->
-        <view class="up-dragsort-area">
+    <view class="up-dragsort-host">
+        <view
+            class="up-dragsort"
+            :class="[
+                direction == 'horizontal' ? 'up-dragsort--horizontal' : '',
+                direction == 'vertical' ? 'up-dragsort--vertical' : '',
+                direction == 'all' ? 'up-dragsort--all' : ''
+            ]"
+            :style="containerStyle"
+        >
             <view
-                v-for="(item, index) in typedList"
-                :key="getItemKey(item, index)"
-                :id="`up-dragsort-item-${index}`"
+                v-for="(item, index) in innerList"
+                :key="itemIds.length > index ? itemIds[index] : index"
                 class="up-dragsort-item"
                 :class="{
-                    dragging: dragIndex == index,
-                    disabled: !draggable || isItemDisabled(item),
-                    'up-dragsort-item--vertical': direction == 'vertical',
-                    'up-dragsort-item--horizontal': direction == 'horizontal',
-                    'up-dragsort-item--all': direction == 'all'
+                    'up-dragsort-item--active': activeIndex == index,
+                    'up-dragsort-item--disabled': isItemDisabled(item)
                 }"
-                :style="getItemStyle(item, index)"
-                @touchstart="onItemTouchStart(index, $event as UniTouchEvent)"
-                @touchmove="onTouchMove($event as UniTouchEvent)"
-                @touchend="onTouchEnd($event as UniTouchEvent)"
-                @touchcancel="onTouchEnd($event as UniTouchEvent)"
+                :style="getItemStyle(index)"
+                @touchstart.stop="onItemTouchStart($event, index)"
+                @touchmove="onItemTouchMove($event, index)"
+                @touchend="onItemTouchEnd($event, index)"
+                @touchcancel="onItemTouchEnd($event, index)"
             >
-                <view class="up-dragsort-item-content">
-                    <view
-                        class="ui-dragSort-item-handler"
-                        :class="[(handleDrag || hasHandlerSlot) ? 'ui-dragSort-item-handler--enabled' : '', handlerPosition == 'left' ? 'ui-dragSort-item-handler--left' : '']"
-                        data-action="handler"
-                        @touchstart.stop="onHandlerTouchStart(index, $event as UniTouchEvent)"
-                    >
-                        <slot name="handler" :item="item" :index="index"></slot>
+                <view class="up-dragsort-item-inner">
+                    <view class="up-dragsort-item-content">
+                        <!-- #ifndef MP -->
+                        <view
+                            v-if="handleDrag || hasHandlerSlot"
+                            class="ui-dragSort-item-handler"
+                            :class="[
+                                handlerPosition == 'left' ? 'ui-dragSort-item-handler--left' : '',
+                                direction == 'horizontal' ? 'ui-dragSort-item-handler--h' : '',
+                                direction == 'all' ? 'ui-dragSort-item-handler--grid' : '',
+                                isItemDisabled(item) ? 'ui-dragSort-item-handler--disabled' : ''
+                            ]"
+                            data-action="handler"
+                            @touchstart.stop="onHandleTouchStart($event, index)"
+                            @touchend.stop="onHandleTouchEnd($event, index)"
+                            @touchcancel.stop="onHandleTouchEnd($event, index)"
+                        >
+                            <slot name="handler" :item="item" :index="index">
+                                <up-icon
+                                    name="list"
+                                    :color="getHandlerIconColor(item)"
+                                    :size="getHandlerIconSize()"
+                                />
+                            </slot>
+                        </view>
+                        <!-- #endif -->
+                        <!-- #ifdef MP -->
+                        <view
+                            v-if="handleDrag || hasHandlerSlot"
+                            class="ui-dragSort-item-handler"
+                            :class="[
+                                handlerPosition == 'left' ? 'ui-dragSort-item-handler--left' : '',
+                                direction == 'horizontal' ? 'ui-dragSort-item-handler--h' : '',
+                                direction == 'all' ? 'ui-dragSort-item-handler--grid' : '',
+                                isItemDisabled(item) ? 'ui-dragSort-item-handler--disabled' : ''
+                            ]"
+                            data-action="handler"
+                            @touchstart.stop="onHandleTouchStart($event, index)"
+                            @touchend.stop="onHandleTouchEnd($event, index)"
+                            @touchcancel.stop="onHandleTouchEnd($event, index)"
+                        >
+                            <up-icon
+                                name="list"
+                                :color="getHandlerIconColor(item)"
+                                :size="getHandlerIconSize()"
+                            />
+                        </view>
+                        <!-- #endif -->
+                        <slot :item="item" :index="index">
+                            {{ getItemLabel(item) }}
+                        </slot>
                     </view>
-                    <slot :item="item" :index="index">
-                        {{ getItemLabel(item) }}
-                    </slot>
                 </view>
             </view>
         </view>
-        <!-- #endif -->
-        <!-- #ifndef APP -->
-        <movable-area class="up-dragsort-area">
-            <movable-view
-                v-for="(item, index) in typedList"
-                :key="getItemKey(item, index)"
-                :id="`up-dragsort-item-${index}`"
-                class="up-dragsort-item"
-                :class="{
-                    dragging: dragIndex == index,
-                    disabled: !draggable || isItemDisabled(item),
-                    'up-dragsort-item--vertical': direction == 'vertical',
-                    'up-dragsort-item--horizontal': direction == 'horizontal',
-                    'up-dragsort-item--all': direction == 'all'
-                }"
-                :direction="direction === 'all' ? 'all' : direction"
-                :x="getItemX(item)"
-                :y="getItemY(item)"
-                :inertia="false"
-                :disabled="!draggable || dragIndex != index || isItemDisabled(item)"
-                @change="onChange(index, $event)"
-                @touchstart="onTouchStart(index, $event)"
-                @touchend="onTouchEnd"
-                @touchcancel="onTouchEnd"
-                @touchmove="onTouchMove"
-            >
-                <view class="up-dragsort-item-content">
-                    <view
-                        class="ui-dragSort-item-handler"
-                        :class="[(handleDrag || hasHandlerSlot) ? 'ui-dragSort-item-handler--enabled' : '', handlerPosition == 'left' ? 'ui-dragSort-item-handler--left' : '']"
-                        data-action="handler"
-                        @touchstart="onHandlerTouchStart(index, $event)"
-                    >
-                        <slot name="handler" :item="item" :index="index"></slot>
-                    </view>
-                    <slot :item="item" :index="index">
-                        {{ getItemLabel(item) }}
-                    </slot>
-                </view>
-            </movable-view>
-        </movable-area>
-        <!-- #endif -->
     </view>
 </template>
 
 <script setup lang="uts">
 import { ref, computed, watch, onMounted, nextTick, getCurrentInstance, useSlots } from 'vue'
-import { sleep } from '../../libs/function/index.uts'
 
-function createDragList(): Array<UTSJSONObject> {
-    return [] as Array<UTSJSONObject>
+type ItemLayout = {
+    left: number,
+    pageTop: number,
+    width: number,
+    height: number,
+    centerX: number,
+    centerY: number
+}
+
+type ContainerLayout = {
+    left: number,
+    pageTop: number,
+    width: number,
+    height: number
 }
 
 function copyObject(item: UTSJSONObject): UTSJSONObject {
@@ -113,24 +117,16 @@ function copyList(list: Array<UTSJSONObject>): Array<UTSJSONObject> {
     return copied
 }
 
-function normalizeNumber(value: any | null, defaultValue: number = 0): number {
-    if (typeof value == 'number') {
-        return value as number
-    }
-    if (value == null) {
-        return defaultValue
-    }
-    const parsed = parseFloat(value.toString())
-    return isNaN(parsed) ? defaultValue : parsed
-}
-
 function stringValue(value: any | null): string {
     return value == null ? '' : value.toString()
 }
 
 defineOptions({
     name: 'up-dragsort',
-    styleIsolation: 'app-and-page'
+    styleIsolation: 'app-and-page',
+    options: {
+        styleIsolation: 'apply-shared'
+    }
 })
 
 const props = defineProps({
@@ -167,24 +163,35 @@ const props = defineProps({
 
 const emit = defineEmits(['drag-end'])
 const instance = getCurrentInstance()
+const slots = useSlots()
 
-function getItemKey(item: UTSJSONObject, index: number): string | number {
-    if (item['id'] != null) {
-        return item['id'] as string | number
-    }
-    return index
-}
+const hasHandlerSlot = computed<boolean>(() => {
+    return slots['handler'] != null
+})
+
+const innerList = ref<Array<UTSJSONObject>>(copyList(props.initialList))
+const itemIds = ref<number[]>([])
+const layouts = ref<ItemLayout[]>([])
+const gridColumnCenters = ref<number[]>([])
+const gridRowCenters = ref<number[]>([])
+const previewItemIds = ref<number[]>([])
+const settling = ref<boolean>(false)
+const dragging = ref<boolean>(false)
+const activeIndex = ref<number>(-1)
+const hoverIndex = ref<number>(-1)
+const dragOffsetX = ref<number>(0)
+const dragOffsetY = ref<number>(0)
+const startTouchX = ref<number>(0)
+const startTouchY = ref<number>(0)
+const containerLayout = ref<ContainerLayout | null>(null)
+const activeViewLeft = ref<number>(0)
+const activeViewTop = ref<number>(0)
+const dragCoordOffsetX = ref<number>(0)
+const dragCoordOffsetY = ref<number>(0)
+const nextItemId = ref<number>(0)
 
 function getItemLabel(item: UTSJSONObject): string {
     return stringValue(item['label'])
-}
-
-function getItemX(item: UTSJSONObject): number {
-    return normalizeNumber(item['x'], 0)
-}
-
-function getItemY(item: UTSJSONObject): number {
-    return normalizeNumber(item['y'], 0)
 }
 
 function isItemDisabled(item: UTSJSONObject): boolean {
@@ -192,277 +199,290 @@ function isItemDisabled(item: UTSJSONObject): boolean {
     return draggableValue != null && draggableValue.toString() == 'false'
 }
 
-// #ifdef APP
-// ===================== App（Android/iOS/鸿蒙）：原生 touch 手势实现 =====================
-const slots = useSlots()
-const hasHandlerSlot = computed<boolean>(() => {
-    return slots['handler'] != null
-})
-
-const list = ref<Array<UTSJSONObject>>(createDragList())
-const dragIndex = ref<number>(-1)
-const sortChanged = ref<boolean>(false)
-const itemHeight = ref<number>(0)
-const itemWidth = ref<number>(0)
-const areaWidth = ref<number>(0)
-const areaHeight = ref<number>(0)
-const dragStartX = ref<number>(0)
-const dragStartY = ref<number>(0)
-const dragOffsetX = ref<number>(0)
-const dragOffsetY = ref<number>(0)
-let timer: number = 0
-let dragTouchId: number = -1
-
-const typedList = computed<Array<UTSJSONObject>>(() => {
-    return list.value
-})
-
-const movableAreaStyle = computed<UTSJSONObject>(() => {
-    const style = {} as UTSJSONObject
-    const l = typedList.value
-    if (props.direction == 'vertical') {
-        style['height'] = itemHeight.value > 0 ? `${l.length * itemHeight.value}px` : 'auto'
-        style['width'] = '100%'
-        return style
+function getHandlerIconColor(item: UTSJSONObject): string {
+    if (isItemDisabled(item)) {
+        return '#94a3b8'
     }
     if (props.direction == 'horizontal') {
-        style['height'] = itemHeight.value > 0 ? `${itemHeight.value}px` : 'auto'
-        style['width'] = itemWidth.value > 0 ? `${l.length * itemWidth.value}px` : 'auto'
-        return style
+        return '#2563eb'
     }
-    const rows = Math.ceil(l.length / props.columns)
-    style['height'] = itemHeight.value > 0 ? `${rows * itemHeight.value}px` : 'auto'
-    style['width'] = '100%'
-    return style
+    if (props.direction == 'all') {
+        return '#475569'
+    }
+    return '#64748b'
+}
+
+function getHandlerIconSize(): number {
+    if (props.direction == 'all') {
+        return 14
+    }
+    return 20
+}
+
+const containerStyle = computed<string>(() => {
+    const currentContainerLayout = containerLayout.value
+    if (dragging.value && currentContainerLayout != null) {
+        return `height: ${currentContainerLayout.height}px;`
+    }
+    return ''
 })
 
-function buildItemPosition(item: UTSJSONObject, index: number): UTSJSONObject {
-    const nextItem = copyObject(item)
-    let x = 0
-    let y = 0
-    if (props.direction == 'horizontal' && itemWidth.value > 0) {
-        x = index * itemWidth.value
-    } else if (props.direction == 'vertical' && itemHeight.value > 0) {
-        y = index * itemHeight.value
-    } else if (itemWidth.value > 0 && itemHeight.value > 0) {
-        const col = index % props.columns
-        const row = Math.floor(index / props.columns)
-        x = col * itemWidth.value
-        y = row * itemHeight.value
+function buildIdList(length: number): number[] {
+    const ids: number[] = []
+    for (let i = 0; i < length; i++) {
+        ids.push(nextItemId.value)
+        nextItemId.value = nextItemId.value + 1
     }
-    nextItem['x'] = x
-    nextItem['y'] = y
-    return nextItem
+    return ids
 }
 
-function updatePositions(isDragging: boolean = false): void {
-    const nextList = [] as Array<UTSJSONObject>
-    const l = typedList.value
-    for (let i = 0; i < l.length; i++) {
-        const currentItem = l[i]
-        if (isDragging && dragIndex.value == i) {
-            nextList.push(copyObject(currentItem))
-        } else {
-            nextList.push(buildItemPosition(currentItem, i))
+function createIdentityOrder(length: number): number[] {
+    const order: number[] = []
+    for (let i = 0; i < length; i++) {
+        order.push(i)
+    }
+    return order
+}
+
+function buildPreviewOrder(length: number, from: number, to: number): number[] {
+    const order = createIdentityOrder(length)
+    if (from == to) {
+        return order
+    }
+    order.splice(from, 1)
+    order.splice(to, 0, from)
+    return order
+}
+
+function applyPreviewOrder(order: number[]): void {
+    const nextPreviewItemIds: number[] = []
+    for (let i = 0; i < order.length; i++) {
+        const sourceIndex = order[i]
+        if (sourceIndex >= 0 && sourceIndex < itemIds.value.length) {
+            nextPreviewItemIds.push(itemIds.value[sourceIndex])
         }
     }
-    list.value = nextList
+    previewItemIds.value = nextPreviewItemIds
 }
 
-function initList(): void {
-    const nextList = [] as Array<UTSJSONObject>
-    const source = props.initialList
-    for (let i = 0; i < source.length; i++) {
-        nextList.push(buildItemPosition(source[i], i))
-    }
-    list.value = nextList
-}
-
-async function calculateItemSize(): Promise<NodeInfo | null> {
-    await sleep(30)
-    return new Promise((resolve) => {
-        uni.createSelectorQuery()
-            .in(instance?.proxy)
-            .select('.up-dragsort-item-content')
-            .boundingClientRect((res: any) => {
-                const rect = res as NodeInfo | null
-                if (rect != null) {
-                    itemHeight.value = rect.height != null ? rect.height! : 40
-                    itemWidth.value = rect.width != null ? rect.width! : 80
-                    updatePositions()
-                }
-                resolve(rect)
-            })
-            .exec()
-    })
-}
-
-async function calculateAreaSize(): Promise<NodeInfo | null> {
-    await sleep(30)
-    return new Promise((resolve) => {
-        uni.createSelectorQuery()
-            .in(instance?.proxy)
-            .select('.up-dragsort-area')
-            .boundingClientRect((res: any) => {
-                const rect = res as NodeInfo | null
-                if (rect != null) {
-                    areaWidth.value = rect.width != null ? rect.width! : 300
-                    areaHeight.value = rect.height != null ? rect.height! : 300
-                }
-                resolve(rect)
-            })
-            .exec()
-    })
-}
-
-function getItemStyle(item: UTSJSONObject, index: number): UTSJSONObject {
-    const style = {} as UTSJSONObject
-    let x = getItemX(item)
-    let y = getItemY(item)
-    if (dragIndex.value == index) {
-        x = x + dragOffsetX.value
-        y = y + dragOffsetY.value
-    }
-    style['left'] = `${x}px`
-    style['top'] = `${y}px`
-    return style
-}
-
-function findTouchByIdentifier(touches: UniTouch[], identifier: number): UniTouch | null {
-    for (let i = 0; i < touches.length; i++) {
-        const touch = touches[i]
-        if (touch.identifier == identifier) {
-            return touch
+function findPreviewPosition(itemId: number): number {
+    for (let i = 0; i < previewItemIds.value.length; i++) {
+        if (previewItemIds.value[i] == itemId) {
+            return i
         }
     }
-    return null
+    return -1
 }
 
-function beginDrag(index: number, e: UniTouchEvent): void {
-    const l = typedList.value
-    if (!props.draggable || index < 0 || index >= l.length || isItemDisabled(l[index])) {
-        return
-    }
-    if (dragTouchId != -1) {
-        return
-    }
-    if (timer > 0) {
-        clearTimeout(timer)
-        timer = 0
-    }
-    let startTouch: UniTouch | null = null
-    if (e.changedTouches.length > 0) {
-        startTouch = e.changedTouches[0]
-    } else if (e.touches.length > 0) {
-        startTouch = e.touches[0]
-    }
-    if (startTouch == null) {
-        return
-    }
-    sortChanged.value = false
-    dragIndex.value = index
-    dragTouchId = startTouch.identifier
-    dragStartX.value = startTouch.pageX
-    dragStartY.value = startTouch.pageY
+function resetDragState(): void {
+    dragging.value = false
+    activeIndex.value = -1
+    hoverIndex.value = -1
+    activeViewLeft.value = 0
+    activeViewTop.value = 0
+    dragCoordOffsetX.value = 0
+    dragCoordOffsetY.value = 0
     dragOffsetX.value = 0
     dragOffsetY.value = 0
+    applyPreviewOrder(createIdentityOrder(innerList.value.length))
 }
 
-function onItemTouchStart(index: number, e: UniTouchEvent): void {
-    if (props.handleDrag || hasHandlerSlot.value) {
-        return
-    }
-    beginDrag(index, e)
+function resetItemIdsByListOrder(): void {
+    itemIds.value = buildIdList(innerList.value.length)
+    applyPreviewOrder(createIdentityOrder(innerList.value.length))
 }
 
-function onHandlerTouchStart(index: number, e: UniTouchEvent): void {
-    beginDrag(index, e)
-}
-
-function reorderItems(fromIndex: number, toIndex: number): void {
-    const l = typedList.value
-    if (fromIndex < 0 || toIndex < 0 || fromIndex >= l.length || toIndex >= l.length) {
-        return
-    }
-    const movedItems = l.splice(fromIndex, 1) as Array<UTSJSONObject>
-    if (movedItems.length == 0) {
-        return
-    }
-    l.splice(toIndex, 0, movedItems[0])
-    list.value = l
-    dragIndex.value = toIndex
-    sortChanged.value = true
-    updatePositions(true)
-    // #ifndef H5
-    // vibrateShort: Android/iOS/HarmonyOS/小程序支持，H5 不支持
-    if (props.vibrate) {
-        uni.vibrateShort({ type: 'light' })
-    }
-    // #endif
-}
-
-function updateDragTarget(index: number): void {
-    const l = typedList.value
-    if (l.length <= 1) {
-        return
-    }
-    const currentX = getItemX(l[index]) + dragOffsetX.value
-    const currentY = getItemY(l[index]) + dragOffsetY.value
-    let targetIndex = index
-    if (props.direction == 'vertical') {
-        if (itemHeight.value > 0) {
-            targetIndex = Math.max(0, Math.min(Math.round(currentY / itemHeight.value), l.length - 1))
+function rebuildGridAxisCache(nextLayouts: ItemLayout[]): void {
+    const nextColumnCenters: number[] = []
+    const nextRowCenters: number[] = []
+    const length = nextLayouts.length
+    const columns = props.columns
+    if (columns > 0 && length > 0) {
+        const actualCols = Math.min(columns, length)
+        for (let i = 0; i < actualCols; i++) {
+            nextColumnCenters.push(nextLayouts[i].centerX)
         }
-    } else if (props.direction == 'horizontal') {
-        if (itemWidth.value > 0) {
-            targetIndex = Math.max(0, Math.min(Math.round(currentX / itemWidth.value), l.length - 1))
-        }
-    } else {
-        if (itemWidth.value > 0 && itemHeight.value > 0) {
-            const col = Math.max(0, Math.min(Math.round(currentX / itemWidth.value), props.columns - 1))
-            const row = Math.max(0, Math.round(currentY / itemHeight.value))
-            targetIndex = row * props.columns + col
-            targetIndex = Math.max(0, Math.min(targetIndex, l.length - 1))
+        for (let i = 0; i < length; i += actualCols) {
+            nextRowCenters.push(nextLayouts[i].centerY)
         }
     }
-    if (targetIndex != index) {
-        reorderItems(index, targetIndex)
+    gridColumnCenters.value = nextColumnCenters
+    gridRowCenters.value = nextRowCenters
+}
+
+function measureLayouts(): Promise<void> {
+    if (instance == null || instance.proxy == null) {
+        return Promise.resolve()
+    }
+    const query = uni.createSelectorQuery().in(instance.proxy)
+    query.select('.up-dragsort').boundingClientRect((rect) => {
+        if (rect != null) {
+            const containerRect = rect as NodeInfo
+            let top = containerRect.top != null ? containerRect.top! : 0
+            const height = containerRect.height != null ? containerRect.height! : 0
+            if (top == 0 && containerRect.bottom != null) {
+                top = containerRect.bottom! - height
+            }
+            containerLayout.value = {
+                left: containerRect.left != null ? containerRect.left! : 0,
+                pageTop: top,
+                width: containerRect.width != null ? containerRect.width! : 0,
+                height: height
+            }
+        }
+    })
+    query.selectAll('.up-dragsort-item').boundingClientRect((rects) => {
+        const nextLayouts: ItemLayout[] = []
+        if (rects != null) {
+            const rectList = rects as NodeInfo[]
+            for (let i = 0; i < rectList.length; i++) {
+                const rect = rectList[i]
+                const left = rect.left != null ? rect.left! : 0
+                let top = rect.top != null ? rect.top! : 0
+                const width = rect.width != null ? rect.width! : 0
+                const height = rect.height != null ? rect.height! : 0
+                if (top == 0 && rect.bottom != null) {
+                    top = rect.bottom! - height
+                }
+                nextLayouts.push({
+                    left: left,
+                    pageTop: top,
+                    width: width,
+                    height: height,
+                    centerX: left + width / 2,
+                    centerY: top + height / 2
+                })
+            }
+        }
+        layouts.value = nextLayouts
+        rebuildGridAxisCache(nextLayouts)
+    })
+    return new Promise((resolve) => {
+        query.exec(() => {
+            resolve()
+        })
+    })
+}
+
+function syncFromModel(): void {
+    if (dragging.value) {
+        return
+    }
+    innerList.value = copyList(props.initialList)
+    itemIds.value = buildIdList(innerList.value.length)
+    resetDragState()
+}
+
+function findNearestAxisIndex(centers: number[], value: number): number {
+    let nearestIndex = 0
+    let nearestDistance = -1.0
+    for (let i = 0; i < centers.length; i++) {
+        const distance = Math.abs(centers[i] - value)
+        if (nearestDistance < 0 || distance < nearestDistance) {
+            nearestDistance = distance
+            nearestIndex = i
+        }
+    }
+    return nearestIndex
+}
+
+function getGridHoverIndex(centerX: number, centerY: number): number {
+    const length = layouts.value.length
+    const columns = props.columns
+    if (columns <= 0 || length == 0) {
+        return activeIndex.value
+    }
+    const actualCols = Math.min(columns, length)
+    const columnIndex = findNearestAxisIndex(gridColumnCenters.value, centerX)
+    const rowIndex = findNearestAxisIndex(gridRowCenters.value, centerY)
+    const rowStart = rowIndex * actualCols
+    const rowEnd = Math.min(rowStart + actualCols, length)
+    let targetIndex = rowStart + columnIndex
+    if (targetIndex >= rowEnd) {
+        targetIndex = rowEnd - 1
+    }
+    return targetIndex
+}
+
+function updateHoverIndex(): void {
+    const currentActiveIndex = activeIndex.value
+    if (currentActiveIndex < 0 || currentActiveIndex >= layouts.value.length) {
+        return
+    }
+    const sourceLayout = layouts.value[currentActiveIndex]
+    const centerX = sourceLayout.left + sourceLayout.width / 2 + dragOffsetX.value
+    const centerY = sourceLayout.pageTop + sourceLayout.height / 2 + dragOffsetY.value
+
+    if (props.direction == 'all' && props.columns > 0) {
+        const touchX = startTouchX.value + dragOffsetX.value + dragCoordOffsetX.value
+        const touchY = startTouchY.value + dragOffsetY.value + dragCoordOffsetY.value
+        const targetIndex = getGridHoverIndex(touchX, touchY)
+        if (targetIndex != hoverIndex.value) {
+            hoverIndex.value = targetIndex
+            applyPreviewOrder(buildPreviewOrder(innerList.value.length, currentActiveIndex, targetIndex))
+            if (props.vibrate) {
+                // #ifndef H5
+                uni.vibrateShort({ type: 'light' })
+                // #endif
+            }
+        }
+        return
+    }
+
+    let nearestIndex = currentActiveIndex
+    let nearestDistance = -1.0
+    for (let i = 0; i < layouts.value.length; i++) {
+        const layout = layouts.value[i]
+        const deltaX = layout.centerX - centerX
+        const deltaY = layout.centerY - centerY
+        const distance = deltaX * deltaX + deltaY * deltaY
+        if (nearestDistance < 0 || distance < nearestDistance) {
+            nearestDistance = distance
+            nearestIndex = i
+        }
+    }
+    if (nearestIndex != hoverIndex.value) {
+        hoverIndex.value = nearestIndex
+        applyPreviewOrder(buildPreviewOrder(innerList.value.length, currentActiveIndex, nearestIndex))
+        if (props.vibrate) {
+            // #ifndef H5
+            uni.vibrateShort({ type: 'light' })
+            // #endif
+        }
     }
 }
 
-function onTouchMove(e: UniTouchEvent): void {
-    if (dragIndex.value == -1) {
-        return
+function setDragContext(index: number, clientX: number, clientY: number): void {
+    startTouchX.value = clientX
+    startTouchY.value = clientY
+    if (index >= 0 && index < layouts.value.length) {
+        const layout = layouts.value[index]
+        activeViewLeft.value = layout.left
+        activeViewTop.value = layout.pageTop
     }
-    let touch = findTouchByIdentifier(e.changedTouches, dragTouchId)
-    if (touch == null) {
-        touch = findTouchByIdentifier(e.touches, dragTouchId)
-    }
-    if (touch == null) {
-        return
-    }
-    e.stopPropagation()
-    e.preventDefault()
-    let offsetX = touch.pageX - dragStartX.value
-    let offsetY = touch.pageY - dragStartY.value
-    if (props.direction == 'vertical') {
-        offsetX = 0
-    } else if (props.direction == 'horizontal') {
-        offsetY = 0
-    }
-    dragOffsetX.value = offsetX
-    dragOffsetY.value = offsetY
-    updateDragTarget(dragIndex.value)
 }
 
-function onTouchEnd(e: UniTouchEvent): void {
-    if (dragIndex.value == -1) {
+function beginDrag(index: number, clientX: number, clientY: number): void {
+    if (layouts.value.length != innerList.value.length || index >= layouts.value.length) {
         return
     }
-    const endTouch = findTouchByIdentifier(e.changedTouches, dragTouchId)
-    if (endTouch != null) {
-        let offsetX = endTouch.pageX - dragStartX.value
-        let offsetY = endTouch.pageY - dragStartY.value
+    startTouchX.value = clientX
+    startTouchY.value = clientY
+    dragOffsetX.value = 0
+    dragOffsetY.value = 0
+    dragCoordOffsetX.value = layouts.value[index].left - activeViewLeft.value
+    dragCoordOffsetY.value = layouts.value[index].pageTop - activeViewTop.value
+    settling.value = false
+    dragging.value = true
+    activeIndex.value = index
+    hoverIndex.value = index
+    applyPreviewOrder(createIdentityOrder(innerList.value.length))
+}
+
+function moveDrag(clientX: number, clientY: number): void {
+    if (dragging.value == true && activeIndex.value >= 0) {
+        let offsetX = clientX - startTouchX.value
+        let offsetY = clientY - startTouchY.value
         if (props.direction == 'vertical') {
             offsetX = 0
         } else if (props.direction == 'horizontal') {
@@ -470,400 +490,286 @@ function onTouchEnd(e: UniTouchEvent): void {
         }
         dragOffsetX.value = offsetX
         dragOffsetY.value = offsetY
-        updateDragTarget(dragIndex.value)
+        updateHoverIndex()
     }
-    dragTouchId = -1
-    updatePositions()
-    dragOffsetX.value = 0
-    dragOffsetY.value = 0
-    if (sortChanged.value) {
-        emit('drag-end', copyList(typedList.value))
-        sortChanged.value = false
+}
+
+function finishDrag(): void {
+    if (dragging.value != true || activeIndex.value < 0) {
+        resetDragState()
+        return
     }
-    timer = setTimeout(() => {
-        dragIndex.value = -1
-        timer = 0
-    }, 600)
+    const currentActiveIndex = activeIndex.value
+    const targetIndex = hoverIndex.value
+    if (targetIndex < 0 || targetIndex == currentActiveIndex) {
+        resetDragState()
+        return
+    }
+
+    const nextList = innerList.value.slice()
+    const movedItem = nextList.splice(currentActiveIndex, 1)[0]
+    nextList.splice(targetIndex, 0, movedItem)
+
+    settling.value = true
+    resetDragState()
+    innerList.value = nextList
+    resetItemIdsByListOrder()
+    emit('drag-end', copyList(innerList.value))
+    nextTick(() => {
+        settling.value = false
+    })
+}
+
+function onItemTouchStart(event: any, index: number): void {
+    if (props.handleDrag || hasHandlerSlot.value) {
+        return
+    }
+    if (!props.draggable || isItemDisabled(innerList.value[index])) {
+        return
+    }
+    if (dragging.value) {
+        return
+    }
+    const touchEvent = event as UniTouchEvent
+    if (touchEvent.touches.length == 0) {
+        return
+    }
+    const touch = touchEvent.touches[0]
+    measureLayouts().then(() => {
+        setDragContext(index, touch.clientX, touch.clientY)
+        beginDrag(index, touch.clientX, touch.clientY)
+    })
+}
+
+function onHandleTouchStart(event: any, index: number): void {
+    if (!props.draggable || isItemDisabled(innerList.value[index])) {
+        return
+    }
+    if (dragging.value) {
+        return
+    }
+    const touchEvent = event as UniTouchEvent
+    if (touchEvent.touches.length == 0) {
+        return
+    }
+    const touch = touchEvent.touches[0]
+    measureLayouts().then(() => {
+        setDragContext(index, touch.clientX, touch.clientY)
+        beginDrag(index, touch.clientX, touch.clientY)
+    })
+}
+
+function onItemTouchMove(event: any, index: number): void {
+    const touchEvent = event as UniTouchEvent
+    if (touchEvent.touches.length == 0) {
+        return
+    }
+    const touch = touchEvent.touches[0]
+    if (dragging.value) {
+        try {
+            touchEvent.preventDefault()
+        } catch (_e) {}
+        if (index != activeIndex.value) {
+            return
+        }
+        moveDrag(touch.clientX, touch.clientY)
+    }
+}
+
+function onItemTouchEnd(_event: any, index: number): void {
+    if (index != activeIndex.value) {
+        return
+    }
+    if (dragging.value) {
+        finishDrag()
+    }
+}
+
+function onHandleTouchEnd(_event: any, index: number): void {
+    if (index != activeIndex.value) {
+        return
+    }
+    if (dragging.value) {
+        finishDrag()
+    }
+}
+
+function getItemStyle(index: number): string {
+    let widthStyle = 'width: 100%;'
+    let positionStyle = ''
+    if (props.direction == 'all' && props.columns > 0) {
+        widthStyle = `width: ${100 / props.columns}%;`
+    } else if (props.direction == 'horizontal') {
+        widthStyle = 'width: auto;'
+    } else {
+        widthStyle = 'width: 100%;'
+    }
+
+    let zIndexStyle = 'z-index: 1;'
+    let transitionStyle = 'transition-duration: 200ms;'
+    let transformStyle = 'translateX(0px) translateY(0px)'
+
+    // #ifdef APP-ANDROID && !VUE3-VAPOR
+    transitionStyle = 'transition-duration: 0ms;'
+    // #endif
+
+    if (settling.value) {
+        transitionStyle = 'transition-duration: 0ms;'
+    }
+
+    const currentContainerLayout = containerLayout.value
+    if (dragging.value && index < layouts.value.length && currentContainerLayout != null) {
+        const sourceLayout = layouts.value[index]
+        const baseLeft = sourceLayout.left - currentContainerLayout.left
+        const baseTop = sourceLayout.pageTop - currentContainerLayout.pageTop
+        widthStyle = ''
+        if (activeIndex.value == index) {
+            positionStyle = `position: absolute; left: ${baseLeft}px; top: ${baseTop}px; width: ${sourceLayout.width}px; height: ${sourceLayout.height}px;`
+            transitionStyle = 'transition-duration: 0ms;'
+            zIndexStyle = 'z-index: 30;'
+            transformStyle = `translateX(${dragOffsetX.value}px) translateY(${dragOffsetY.value}px)`
+        } else {
+            positionStyle = `position: absolute; left: ${baseLeft}px; top: ${baseTop}px; width: ${sourceLayout.width}px; height: ${sourceLayout.height}px;`
+            if (index < itemIds.value.length) {
+                const currentItemId = itemIds.value[index]
+                const targetPosition = findPreviewPosition(currentItemId)
+                if (targetPosition >= 0 && targetPosition < layouts.value.length) {
+                    const targetLayout = layouts.value[targetPosition]
+                    const deltaX = targetLayout.left - sourceLayout.left
+                    const deltaY = targetLayout.pageTop - sourceLayout.pageTop
+                    transformStyle = `translateX(${deltaX}px) translateY(${deltaY}px)`
+                }
+            }
+        }
+    } else if (index != activeIndex.value) {
+        transitionStyle = 'transition-duration: 0ms;'
+    }
+
+    return `${widthStyle}${positionStyle}${zIndexStyle}${transitionStyle}transform: ${transformStyle};`
 }
 
 watch((): Array<UTSJSONObject> => props.initialList, () => {
     nextTick(() => {
-        initList()
+        syncFromModel()
     })
 }, { deep: true })
 
-watch((): string => props.direction, () => {
-    nextTick(() => {
-        initList()
-        calculateItemSize()
-        calculateAreaSize()
-    })
-})
-
-watch((): number => props.columns, () => {
-    if (props.direction == 'all') {
-        nextTick(() => {
-            initList()
-            updatePositions()
-        })
-    }
-})
-
 onMounted(() => {
-    nextTick(() => {
-        initList()
-        calculateItemSize()
-        calculateAreaSize()
-    })
+    itemIds.value = buildIdList(innerList.value.length)
+    applyPreviewOrder(createIdentityOrder(innerList.value.length))
 })
-// #endif
-
-// #ifndef APP
-// ===================== H5 / 小程序：movable-view 原实现 =====================
-const slots = useSlots()
-const hasHandlerSlot = computed<boolean>(() => {
-    return slots['handler'] != null
-})
-
-const list = ref<Array<UTSJSONObject>>(createDragList())
-const dragIndex = ref<number>(-1)
-const sortChanged = ref<boolean>(false)
-const itemHeight = ref<number>(0)
-const itemWidth = ref<number>(0)
-const areaWidth = ref<number>(0)
-const areaHeight = ref<number>(0)
-const currentX = ref<number>(0)
-const currentY = ref<number>(0)
-let timer = 0
-let handlerTouchIndex = -1
-
-const typedList = computed<Array<UTSJSONObject>>(() => {
-    return list.value
-})
-
-const movableAreaStyle = computed<UTSJSONObject>(() => {
-    const style = {} as UTSJSONObject
-    const l = typedList.value
-    if (props.direction === 'vertical') {
-        style['height'] = itemHeight.value > 0 ? `${l.length * itemHeight.value}px` : 'auto'
-        style['width'] = '100%'
-        return style
-    }
-    if (props.direction === 'horizontal') {
-        style['height'] = itemHeight.value > 0 ? `${itemHeight.value}px` : 'auto'
-        style['width'] = itemWidth.value > 0 ? `${l.length * itemWidth.value}px` : 'auto'
-        return style
-    }
-    const rows = Math.ceil(l.length / props.columns)
-    style['height'] = itemHeight.value > 0 ? `${rows * itemHeight.value}px` : 'auto'
-    style['width'] = '100%'
-    return style
-})
-
-function getDetailNumber(detail: UTSJSONObject, key: string): number {
-    return normalizeNumber(detail[key], 0)
-}
-
-function buildItemPosition(item: UTSJSONObject, index: number): UTSJSONObject {
-    const nextItem = copyObject(item)
-    let x = 0
-    let y = 0
-    if (props.direction === 'horizontal' && itemWidth.value > 0) {
-        x = index * itemWidth.value
-    } else if (props.direction === 'vertical' && itemHeight.value > 0) {
-        y = index * itemHeight.value
-    } else if (itemWidth.value > 0 && itemHeight.value > 0) {
-        const col = index % props.columns
-        const row = Math.floor(index / props.columns)
-        x = col * itemWidth.value
-        y = row * itemHeight.value
-    }
-    nextItem['x'] = x
-    nextItem['y'] = y
-    return nextItem
-}
-
-function updatePositions(isDragging: boolean = false): void {
-    const nextList = [] as Array<UTSJSONObject>
-    const l = typedList.value
-    for (let i = 0; i < l.length; i++) {
-        const currentItem = l[i]
-        if (isDragging && dragIndex.value === i) {
-            nextList.push(copyObject(currentItem))
-        } else {
-            nextList.push(buildItemPosition(currentItem, i))
-        }
-    }
-    list.value = nextList
-}
-
-function initList(): void {
-    const nextList = [] as Array<UTSJSONObject>
-    const source = props.initialList
-    for (let i = 0; i < source.length; i++) {
-        nextList.push(buildItemPosition(source[i], i))
-    }
-    list.value = nextList
-}
-
-async function calculateItemSize(): Promise<NodeInfo | null> {
-    await sleep(30)
-    return new Promise((resolve) => {
-        uni.createSelectorQuery()
-            .in(instance?.proxy)
-            .select('.up-dragsort-item-content')
-            .boundingClientRect((res: any) => {
-                const rect = res as NodeInfo | null
-                if (rect != null) {
-                    itemHeight.value = rect.height != null ? rect.height! : 40
-                    itemWidth.value = rect.width != null ? rect.width! : 80
-                    updatePositions()
-                }
-                resolve(rect)
-            })
-            .exec()
-    })
-}
-
-async function calculateAreaSize(): Promise<NodeInfo | null> {
-    await sleep(30)
-    return new Promise((resolve) => {
-        uni.createSelectorQuery()
-            .in(instance?.proxy)
-            .select('.up-dragsort-area')
-            .boundingClientRect((res: any) => {
-                const rect = res as NodeInfo | null
-                if (rect != null) {
-                    areaWidth.value = rect.width != null ? rect.width! : 300
-                    areaHeight.value = rect.height != null ? rect.height! : 300
-                }
-                resolve(rect)
-            })
-            .exec()
-    })
-}
-
-function onHandlerTouchStart(index: number, e: any): void {
-    handlerTouchIndex = index
-    onTouchStart(index, e)
-}
-
-function onTouchStart(index: number, e: any): void {
-    if ((props.handleDrag || hasHandlerSlot.value) && handlerTouchIndex != index) {
-        return
-    }
-    handlerTouchIndex = -1
-    const l = typedList.value
-    if (index >= 0 && index < l.length && isItemDisabled(l[index])) {
-        return
-    }
-    if (timer > 0) {
-        clearTimeout(timer)
-        timer = 0
-    }
-    sortChanged.value = false
-    dragIndex.value = index
-}
-
-function onTouchMove(e: any): void {
-    if (dragIndex.value != -1) {
-        const event = e as UniTouchEvent
-        event.stopPropagation()
-        event.preventDefault()
-    }
-}
-
-function reorderItems(fromIndex: number, toIndex: number): void {
-    const l = typedList.value
-    if (fromIndex < 0 || toIndex < 0 || fromIndex >= l.length || toIndex >= l.length) {
-        return
-    }
-    const movedItems = l.splice(fromIndex, 1) as Array<UTSJSONObject>
-    if (movedItems.length == 0) {
-        return
-    }
-    l.splice(toIndex, 0, movedItems[0])
-    list.value = l
-    dragIndex.value = toIndex
-    sortChanged.value = true
-    updatePositions(true)
-}
-
-function handleAllModeChange(index: number): void {
-    if (itemWidth.value <= 0 || itemHeight.value <= 0) {
-        return
-    }
-    const col = Math.max(0, Math.min(Math.round(currentX.value / itemWidth.value), props.columns - 1))
-    const row = Math.max(0, Math.round(currentY.value / itemHeight.value))
-    let targetIndex = row * props.columns + col
-    const l = typedList.value
-    targetIndex = Math.max(0, Math.min(targetIndex, l.length - 1))
-    if (targetIndex !== index) {
-        reorderItems(index, targetIndex)
-    }
-}
-
-function onChange(index: number, event: any): void {
-    const customEvent = event as UniCustomEvent<UTSJSONObject>
-    if (customEvent.detail == null || stringValue(customEvent.detail['source']) != 'touch') {
-        return
-    }
-    const l = typedList.value
-    currentX.value = getDetailNumber(customEvent.detail, 'x')
-    currentY.value = getDetailNumber(customEvent.detail, 'y')
-    if (props.direction === 'all') {
-        handleAllModeChange(index)
-        return
-    }
-
-    let itemSize = 0
-    let targetIndex = index
-    if (props.direction === 'vertical') {
-        itemSize = itemHeight.value
-        if (itemSize > 0) {
-            targetIndex = Math.max(0, Math.min(Math.round(currentY.value / itemSize), l.length - 1))
-        }
-    } else if (props.direction === 'horizontal') {
-        itemSize = itemWidth.value
-        if (itemSize > 0) {
-            targetIndex = Math.max(0, Math.min(Math.round(currentX.value / itemSize), l.length - 1))
-        }
-    }
-
-    if (targetIndex !== index) {
-        reorderItems(index, targetIndex)
-    }
-}
-
-function onTouchEnd(): void {
-    handlerTouchIndex = -1
-    if (dragIndex.value == -1) {
-        return
-    }
-    const l = typedList.value
-    const dragItem = l[dragIndex.value]
-    if (props.direction === 'horizontal') {
-        dragItem['x'] = currentX.value + 0.001
-    } else {
-        dragItem['x'] = currentX.value + 0.001
-        dragItem['y'] = currentY.value + 0.001
-    }
-    list.value = l
-    sleep(50).then(() => {
-        updatePositions()
-        if (sortChanged.value) {
-            emit('drag-end', copyList(typedList.value))
-            sortChanged.value = false
-        }
-        timer = setTimeout(() => {
-            dragIndex.value = -1
-            timer = 0
-        }, 600)
-    })
-}
-
-watch(() => props.initialList, () => {
-    nextTick(() => {
-        initList()
-    })
-}, { deep: true })
-
-watch(() => props.direction, () => {
-    nextTick(() => {
-        initList()
-        calculateItemSize()
-        calculateAreaSize()
-    })
-})
-
-watch(() => props.columns, () => {
-    if (props.direction === 'all') {
-        nextTick(() => {
-            initList()
-            updatePositions()
-        })
-    }
-})
-
-onMounted(() => {
-    nextTick(() => {
-        initList()
-        calculateItemSize()
-        calculateAreaSize()
-    })
-})
-// #endif
 </script>
 
 <style scoped lang="scss">
-.up-dragsort {
+.up-dragsort-host {
+    position: relative;
     width: 100%;
-    height: auto;
+    overflow: visible;
 }
 
-.up-dragsort-area {
-    width: 100%;
-    height: 100%;
+.up-dragsort {
     position: relative;
+    width: 100%;
+    display: flex;
+    overflow: visible;
+}
+
+.up-dragsort--vertical {
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.up-dragsort--horizontal {
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    overflow-x: auto;
+}
+
+.up-dragsort--all {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-start;
 }
 
 .up-dragsort-item {
-    position: absolute;
-    width: 100%;
-
-    /* #ifndef APP */
-    /* 仅在 Web/小程序端保留过渡动画；App 端（尤其 iOS）transition 不支持 box-shadow，
-       原生过渡会卡在起始帧导致拖拽结束后阴影残留 */
-    transition: box-shadow 0.45s ease-out;
-    /* #endif */
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    transition-property: transform;
+    transition-timing-function: ease;
+    transform-origin: center center;
+    box-sizing: border-box;
+    overflow: visible;
 }
 
-.dragging {
-    z-index: 1000;
+.up-dragsort-item--active {
+    z-index: 30 !important;
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.up-dragsort-item-inner {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
 }
 
 .up-dragsort-item-content {
     position: relative;
-    padding: 0;
+    width: 100%;
+    height: 100%;
     box-sizing: border-box;
 }
 
-.ui-dragSort-item-handler--enabled {
+.ui-dragSort-item-handler {
     position: absolute;
     top: 0;
     right: 0;
-    bottom: 0;
     width: 44px;
+    height: 100%;
     display: flex;
+    flex-direction: row;
     align-items: center;
     justify-content: center;
-    z-index: 1;
+    background-color: #eef2f7;
+    border-left-width: 1px;
+    border-left-style: solid;
+    border-left-color: #e2e8f0;
+    box-sizing: border-box;
+    z-index: 2;
+    touch-action: none;
 }
 
 .ui-dragSort-item-handler--left {
-    right: auto;
     left: 0;
+    right: auto;
+    border-left-width: 0px;
+    border-right-width: 1px;
+    border-right-style: solid;
+    border-right-color: #e2e8f0;
 }
 
-.up-dragsort-item--vertical {
-    height: auto;
+.ui-dragSort-item-handler--h {
+    width: 40px;
+    height: 100%;
+    background-color: #dbeafe;
+    border-left-width: 1px;
+    border-left-style: solid;
+    border-left-color: #bfdbfe;
+    border-radius: 0 8px 8px 0;
 }
 
-/* #ifndef APP */
-.up-dragsort--horizontal .up-dragsort-area {
-    display: flex;
-    white-space: nowrap;
-}
-/* #endif */
-
-.up-dragsort-item--horizontal {
-    width: auto;
-    height: auto;
+.ui-dragSort-item-handler--grid {
+    width: 28px;
+    height: 28px;
+    background-color: #e2e8f0;
+    border-left-width: 0px;
+    border-radius: 0 8px 0 8px;
 }
 
-.up-dragsort-item--all {
-    width: auto;
-    height: auto;
+.ui-dragSort-item-handler--disabled {
+    background-color: #e2e8f0;
 }
 </style>
