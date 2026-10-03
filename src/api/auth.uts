@@ -1,0 +1,119 @@
+import { http } from '@/src/http/request.uts';
+import type { LimeRequestConfig } from '@/uni_modules/lime-request';
+
+// ==========================================
+// 1. 类型定义（遵循规范：一律使用 type，严禁 interface）
+// ==========================================
+
+export type LoginParams = {
+  username: string;
+  password: string;
+};
+
+export type AuthUserInfo = {
+  userId: number;
+  username: string;
+  nickname: string;
+  avatar: string;
+  roles: Array<string>;
+  permissions?: Array<string> | null;
+};
+
+export type LoginResult = {
+  token: string;
+  expiresIn: number;
+  userInfo: AuthUserInfo;
+};
+
+// ==========================================
+// 2. 本地模拟数据集
+// ==========================================
+
+const MOCK_USER_INFO: AuthUserInfo = {
+  userId: 1001,
+  username: 'UNIX',
+  nickname: 'UNIX 开发者',
+  avatar: '/static/logo.png',
+  roles: ['admin', 'developer'],
+  permissions: ['*']
+};
+
+const MOCK_LOGIN_RESULT: LoginResult = {
+  token: 'mock-token-UNIX-123456',
+  expiresIn: 7200,
+  userInfo: MOCK_USER_INFO
+};
+
+// ==========================================
+// 3. API 接口函数
+// ==========================================
+
+/**
+ * 用户登录接口
+ * 运行 pnpm dev:mock 时发起网络请求并由根目录 mock/auth.ts 拦截响应
+ * 离线无服务时平滑降级回退到本地 UTS Mock 数据
+ */
+export function login(params: LoginParams): Promise<LoginResult> {
+  return http.post<UTSJSONObject>('/auth/login', params, {
+    extra: {
+      ignoreAuth: true
+    } as UTSJSONObject
+  } as LimeRequestConfig).then((data: UTSJSONObject): LoginResult => {
+    const rawUser = data.get('userInfo') as UTSJSONObject | null;
+    const rawRoles = rawUser?.getArray<string>('roles', [] as Array<string>) ?? ([] as Array<string>);
+
+    return {
+      token: data.getString('token') ?? `mock-token-${Date.now()}`,
+      expiresIn: data.getNumber('expiresIn') ?? 7200,
+      userInfo: {
+        userId: rawUser?.getNumber('userId') ?? 1001,
+        username: rawUser?.getString('username') ?? params.username,
+        nickname: rawUser?.getString('nickname') ?? (params.username == 'admin' ? '超级管理员' : 'UNIX 开发者'),
+        avatar: rawUser?.getString('avatar') ?? '/static/logo.png',
+        roles: rawRoles.length > 0 ? rawRoles : ['admin']
+      } as AuthUserInfo
+    } as LoginResult;
+  }).catch((_err: any): Promise<LoginResult> => {
+    const fallback: LoginResult = {
+      token: MOCK_LOGIN_RESULT.token,
+      expiresIn: MOCK_LOGIN_RESULT.expiresIn,
+      userInfo: {
+        userId: MOCK_USER_INFO.userId,
+        username: params.username.length > 0 ? params.username : MOCK_USER_INFO.username,
+        nickname: params.username == 'admin' ? '超级管理员' : MOCK_USER_INFO.nickname,
+        avatar: MOCK_USER_INFO.avatar,
+        roles: MOCK_USER_INFO.roles
+      } as AuthUserInfo
+    };
+    return Promise.resolve(fallback);
+  });
+}
+
+/**
+ * 获取当前登录用户信息
+ */
+export function fetchUserInfo(): Promise<AuthUserInfo> {
+  return http.get<UTSJSONObject>('/user/info').then((data: UTSJSONObject): AuthUserInfo => {
+    const rawRoles = data.getArray<string>('roles', [] as Array<string>) ?? ([] as Array<string>);
+    return {
+      userId: data.getNumber('userId') ?? 1001,
+      username: data.getString('username') ?? 'admin',
+      nickname: data.getString('nickname') ?? 'UNIX 极客开发者',
+      avatar: data.getString('avatar') ?? '/static/logo.png',
+      roles: rawRoles.length > 0 ? rawRoles : ['admin', 'developer']
+    } as AuthUserInfo;
+  }).catch((_err: any): Promise<AuthUserInfo> => {
+    return Promise.resolve(MOCK_USER_INFO);
+  });
+}
+
+/**
+ * 退出登录接口
+ */
+export function logout(): Promise<boolean> {
+  return http.post<any>('/auth/logout').then((_data: any): boolean => {
+    return true;
+  }).catch((_err: any): Promise<boolean> => {
+    return Promise.resolve(true);
+  });
+}

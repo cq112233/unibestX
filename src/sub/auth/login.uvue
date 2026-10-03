@@ -18,6 +18,8 @@ import { ref } from 'vue';
 import type { ISingleTokenRes, IUserInfo } from '../../store';
 import { useTokenStore, useUserStore } from '../../store';
 import { isPageTabbar, switchTabbar } from '@/src/tabbar/index.uts';
+import { login } from '@/src/api/auth.uts';
+import type { LoginParams, LoginResult } from '@/src/api/auth.uts';
 
 const tokenStore = useTokenStore();
 const userStore = useUserStore();
@@ -60,34 +62,38 @@ function doLogin() {
     }
     return;
   }
-  // 模拟登录：设置 token 与用户信息
-  tokenStore.setSingleToken({
-    token: 'mock-token-UNIX-123456',
-    expiresIn: 7200
-  } as ISingleTokenRes);
-  userStore.setUserInfo({
-    userId: 1001,
+  login({
     username: 'UNIX',
-    nickname: 'UNIX 开发者',
-    avatar: '/static/logo.png'
-  } as IUserInfo);
-  uni.showToast({
-    title: '登录成功',
-    icon: 'success'
-  });
-  setTimeout(() => {
-    if (redirectUrl.value !== '') {
-      const targetUrl = decodeURIComponent(redirectUrl.value) ?? '';
-      if (isPageTabbar(targetUrl)) {
-        switchTabbar(targetUrl);
+    password: 'admin'
+  } as LoginParams).then((res: LoginResult) => {
+    tokenStore.setSingleToken({
+      token: res.token,
+      expiresIn: res.expiresIn
+    } as ISingleTokenRes);
+    userStore.setUserInfo({
+      userId: res.userInfo.userId,
+      username: res.userInfo.username,
+      nickname: res.userInfo.nickname,
+      avatar: res.userInfo.avatar
+    } as IUserInfo);
+    uni.showToast({
+      title: '登录成功',
+      icon: 'success'
+    });
+    setTimeout(() => {
+      if (redirectUrl.value != '') {
+        const targetUrl = decodeURIComponent(redirectUrl.value) ?? '';
+        if (isPageTabbar(targetUrl)) {
+          switchTabbar(targetUrl);
+        }
+        else {
+          uni.redirectTo({ url: targetUrl });
+        }
       }
       else {
-        uni.redirectTo({ url: targetUrl });
+        uni.navigateBack();
       }
-    }
-    else {
-      uni.navigateBack();
-    }
-  }, 1000);
+    }, 1000);
+  });
 }
 </script>

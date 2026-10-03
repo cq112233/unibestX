@@ -101,12 +101,19 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 | **环境变量与服务地址读取** | 手写 `process.env` / `import.meta.env` 或在代码里硬编码域名 IP（原生平台无法识别且切换环境易出错） | 统一从 `@/src/utils/env/index.uts` 引入具名方法（`getApiBaseUrl()`、`getOssBaseUrl()`、`isDev()`、`isProd()`、`isVaporMode()`）（详见 **分册 8**） |
 | **轻提示与加载动画 (Toast / Loading)** | 散落手写 `uni.showToast({ title: '...', icon: 'none' })` | 统一引入 `@/src/utils/toast/index.uts` 中的 `toast(msg)`、`showToast(...)`、`showLoading()`、`hideLoading()`（详见 **分册 8**） |
 | **页面跳转与路由控制** | 直接调用原生 `uni.navigateTo` 等且未做参数编码与越界防护 | 优先引入 `@/src/utils/route/index.uts` 的 `router.push()` / `router.replace()` / `router.back()` 或模块封装函数（详见 **分册 8**） |
+| **尾随逗号格式限制 (`comma-dangle`)** | `const list = [1, 2, 3,];` / `{ a: 1, };` | `const list = [1, 2, 3];` / `{ a: 1 };`（末尾元素严禁尾随逗号，遵照 ESLint `style/comma-dangle: never`） |
+| **引号与分号规范 (`quotes` & `semi`)** | `let name = "unibest"` / `return 1` | `let name = 'unibest';` / `return 1;`（统一单引号 `'`，语句末尾必须带分号 `;`，遵照 ESLint 规范） |
+| **未使用的变量与参数 (`unused-vars`)** | `const unused = 1;` / `function cb(data, index) { use(data); }` | 移除未使用的变量；未使用的入参必须以下划线开头：`function cb(data, _index) { use(data); }` |
+| **Vue SFC 顶级块顺序 (`vue/block-order`)** | `<style>` 放在最上方或脚本与模板之间 | 遵循 `<template>` / `<script>` 在上、`<style>` 在最下方的结构（遵照 ESLint `vue/block-order`） |
+| **`<style>` 英文命名颜色 (`color-named`)** | `<style>` 中写 `color: red;` / `background: blue;` | 统一写为十六进制：`color: #ff0000;` / `background: #2563eb;`（遵照 Stylelint `color-named: never`） |
+| **CSS 属性声明顺序 (`properties-order`)** | 样式属性无序散落（如 `color` 写在 `display` 之前） | 必须严格按 8 阶排序：1.定位 → 2.布局/Flex → 3.盒模型尺寸 → 4.内外边距 → 5.边框圆角 → 6.背景 → 7.文本字体 → 8.动效过渡（遵照 Stylelint `order/properties-order`） |
+| **单元测试与 CI 门禁验证** | 声称代码完成却未实际运行验证命令 | 必须在 `tests/unit/` 下为新功能/工具/组件配单测，并在终端实跑 `pnpm check:uts-dts && pnpm lint && pnpm lint:style && pnpm test` 全绿 |
 
 ---
 
 ## A.2 代码生成红线清单 (Redlines Checklist)
 
-在生成任何 `.uvue`、`.uts` 代码并宣告完成前，必须逐条自检纯 UTS 语法与跨端编译器规范：
+在生成任何 `.uvue`、`.uts` 代码并宣告完成前，必须逐条自检纯 UTS 语法、跨端编译器及工程代码规范：
 
 - [ ] **1. 严禁使用 `interface`**（所有对象数据模型统一使用 `type`，规避 `UTS110111163`）
 - [ ] **2. 严禁使用 `undefined`**（所有变量显式赋予初始值，空值统一用 `null`，联合类型仅限 `Type | null`，规避 `UTS110111119`）
@@ -141,3 +148,11 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 - [ ] **31. 严禁手写 `process.env` / `import.meta.env` 或硬编码请求域名**（必须统一从 `@/src/utils/env/index.uts` 引入 `getApiBaseUrl()`、`isDev()` 等方法，见分册 8）
 - [ ] **32. 严禁在业务页面中散落调用原生 `uni.showToast({ title, icon: 'none' })`**（必须统一使用 `@/src/utils/toast/index.uts` 导出的 `toast(msg)` 或 `showToast(...)`，见分册 8）
 - [ ] **33. 业务功能开发前优先复用 `@/src/utils/` 下既有封装**（严禁在局部重新手写已有的通用方法，引用路径一律使用 `@/src/utils/<module>/index.uts` 绝对路径，见分册 8）
+- [ ] **34. 严禁在对象或数组字面量末尾添加尾随逗号**（必须遵照 ESLint `'style/comma-dangle': 'never'` 与 `'vue/comma-dangle': 'never'` 规范）
+- [ ] **35. JS/TS/UTS 代码一律统一使用单引号 `'` 且每条语句末尾必须带分号 `;`**（遵照 ESLint `quotes: single` 与 `semi: true`）
+- [ ] **36. 严禁留存未使用的局部变量或参数**（未使用的入参必须以 `_` 前缀命名，如 `_event`，其余未引用的变量一律删除，遵照 ESLint `unused-imports`）
+- [ ] **37. 文件末尾严禁多余空行，代码块间禁止连续空白**（遵照 ESLint `style/no-multiple-empty-lines`，文件末尾保留 0 额外空行）
+- [ ] **38. `<style>` 中严禁使用英文命名颜色，一律使用标准十六进制色值**（遵照 Stylelint `'color-named': 'never'`，如 `color: #ff0000;` 严禁 `color: red;`）
+- [ ] **39. `<style>` 中的 CSS 属性必须严格按照规范 8 阶顺序排列**（定位 → 布局/Flex → 尺寸 → 边距 → 边框 → 背景 → 文字 → 动效，遵照 Stylelint `order/properties-order`）
+- [ ] **40. 任何代码生成或修改完成后，必须实际运行 `pnpm check:uts-dts && pnpm lint && pnpm lint:style && pnpm test` 验证 100% 绿灯无报错**
+

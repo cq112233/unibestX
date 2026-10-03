@@ -1,0 +1,143 @@
+name: Sync Branches (Base/Main to UI Extensions)
+
+on:
+  push:
+    branches:
+      - base
+      - main
+  workflow_dispatch:
+    inputs:
+      source_branch:
+        description: 指定源分支（base 或 main）
+        required: false
+        default: base
+        type: choice
+        options:
+          - base
+          - main
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync-branches:
+    name: Sync ${{ github.event.inputs.source_branch || github.ref_name }} -> ${{ matrix.target }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        target:
+          - main
+          - uniX-rice-ui
+          - uniX-uview-ultra
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check Diff and Create Sync PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TARGET: ${{ matrix.target }}
+          SOURCE: ${{ github.event.inputs.source_branch || github.ref_name }}
+        run: |
+          if [ "${SOURCE}" = "${TARGET}" ]; then
+            echo "⏩ 源分支与目标分支均为 ${SOURCE}，跳过同步"
+            exit 0
+          fi
+
+          echo "🔍 检查远程目标分支 ${TARGET} 是否存在..."
+          if ! git ls-remote --exit-code --heads origin "${TARGET}" > /dev/null 2>&1; then
+            echo "⚠️ 远程仓库未检测到分支 ${TARGET}，跳过同步"
+            exit 0
+          fi
+
+          echo "📥 拉取源分支 ${SOURCE} 与目标分支 ${TARGET} 状态..."
+          git fetch origin "${SOURCE}"
+          git fetch origin "${TARGET}"
+
+          # 统计源分支超前目标分支的提交数量
+          COMMITS_AHEAD=$(git rev-list --count "origin/${TARGET}..origin/${SOURCE}" || echo "0")
+          echo "📊 ${SOURCE} 分支超前 ${TARGET} 分支 ${COMMITS_AHEAD} 个提交"
+
+          if [ "$COMMITS_AHEAD" -eq 0 ]; then
+            echo "✅ 分支 ${TARGET} 已经包含 ${SOURCE} 的全部最新提交，无需发起同步 PR"
+            exit 0
+          fi
+
+          # 检查是否已存在同名且处于 open 状态的同步 PR
+          EXISTING_PR_URL=$(gh pr list \
+            --base "${TARGET}" \
+            --head "${SOURCE}" \
+            --state open \
+            --json url \
+            --jq '.[0].url // empty')
+
+          if [ -n "$EXISTING_PR_URL" ]; then
+            echo "ℹ️ 目标分支 ${TARGET} 已存在来自 ${SOURCE} 的 open 状态同步 PR，GitHub 会自动更新包含最新提交："
+            echo "👉 ${EXISTING_PR_URL}"
+            exit 0
+          fi
+
+          # 获取超前的提交摘要（最多展示最近 10 条）
+          COMMIT_LOG=$(git log "origin/${TARGET}..origin/${SOURCE}" --oneline -n 10)
+          PR_TITLE="chore(sync): 自动同步 ${SOURCE} 分支更新到 ${TARGET}"
+
+          # 导出环境变量并通过 node 生成 PR Markdown 正文，避免 Shell 字符转义及 YAML 缩进解析问题
+          export COMMITS_AHEAD
+          export COMMIT_LOG
+          export TARGET
+          export SOURCE
+
+          node -e '
+            const fs = require("fs");
+            const source = process.env.SOURCE;
+            const target = process.env.TARGET;
+            const commitsAhead = process.env.COMMITS_AHEAD;
+            const commitLog = process.env.COMMIT_LOG;
+            const body = [
+              `### 🤖 自动同步 PR：\`${source}\` ➡️ \`${target}\``,
+              "",
+              `检测到上游分支 \`${source}\` 有新提交合入，由 **Sync Branches** 工作流自动发起此 PR。`,
+              "",
+              "---",
+              "",
+              "#### 📌 同步信息",
+              `- **源分支 (Source)**：\`${source}\``,
+              `- **目标分支 (Target)**：\`${target}\``,
+              `- **新增提交数**：共 ${commitsAhead} 个提交`,
+              "",
+              "#### 📝 最近提交摘要",
+              "```text",
+              commitLog,
+              "```",
+              "",
+              "---",
+              "",
+              "#### ⚠️ 人工复核与合并建议",
+              "1. UI 扩展分支包含各自专属的组件库依赖与特定样式适配，请**人工检查文件改动及冲突标记**；",
+              "2. 建议使用 **「Create a merge commit」** 方式合并，完整保留分支演化拓扑图；",
+              "3. 如遇到冲突，请拉取本地分支解决后提交推送：",
+              "   ```bash",
+              `   git checkout ${target}`,
+              `   git pull origin ${target}`,
+              `   git merge origin/${source}`,
+              "   # 解决冲突并通过 pnpm check:uts-dts && pnpm lint && pnpm test 后推送",
+              `   git push origin ${target}`,
+              "   ```",
+              "",
+            ].join("\n");
+            fs.writeFileSync("pr_body.md", body);
+          '
+
+          echo "🚀 正在为 ${TARGET} 分支创建同步 Pull Request..."
+          NEW_PR_URL=$(gh pr create \
+            --base "${TARGET}" \
+            --head "${SOURCE}" \
+            --title "${PR_TITLE}" \
+            --body-file pr_body.md)
+
+          echo "🎉 同步 PR 创建成功："
+          echo "👉 ${NEW_PR_URL}"

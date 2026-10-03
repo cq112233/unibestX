@@ -24,13 +24,27 @@ const DEFAULT_IGNORED_PATTERNS: (string | RegExp)[] = [
 ];
 
 let isConsolePatched = false;
+let globalSilenceAll = true;
+let globalIgnoredPatterns: (string | RegExp)[] = DEFAULT_IGNORED_PATTERNS;
+
+function checkShouldIgnore(text: string): boolean {
+  if (globalSilenceAll) {
+    return true;
+  }
+  return globalIgnoredPatterns.some((pattern) => {
+    if (typeof pattern === 'string') {
+      return text.includes(pattern);
+    }
+    return pattern.test(text);
+  });
+}
 
 /**
  * 控制台警告与代码片段净化 Vite 插件
  *
  * 功能：
  * 1. 过滤 Vite 开发服务器及构建阶段的 warning 日志输出（保留 error 与 info）
- * 2. 拦截第三方库及插件直接调用的 console.warn
+ * 2. 拦截第三方库及插件直接调用的 console.warn 以及紧随其后的定位行与代码片段
  * 3. 拦截 DCloud 编译期通过 console.log 打印的 WARN_BLOCK（\uFEFF）与代码片段（Code Frame）
  */
 export default function cleanLoggerPlugin(options: CleanLoggerOptions = {}): Plugin {
@@ -39,75 +53,74 @@ export default function cleanLoggerPlugin(options: CleanLoggerOptions = {}): Plu
     ignoredPatterns = []
   } = options;
 
-  const allPatterns = [...DEFAULT_IGNORED_PATTERNS, ...ignoredPatterns];
+  globalSilenceAll = silenceAll;
+  globalIgnoredPatterns = [...DEFAULT_IGNORED_PATTERNS, ...ignoredPatterns];
 
   function shouldIgnore(text: string): boolean {
-    if (silenceAll) {
-      return true;
-    }
-    return allPatterns.some((pattern) => {
-      if (typeof pattern === 'string') {
-        return text.includes(pattern);
-      }
-      return pattern.test(text);
-    });
+    return checkShouldIgnore(text);
   }
 
-  // 补丁拦截全局 console.warn 与 console.log（防止 DCloud onCompileLog 打印告警代码片段）
+  // 补丁拦截全局 console.warn 与 console.log（防止 DCloud / uni-uts-v1 打印告警代码片段）
   if (!isConsolePatched) {
     isConsolePatched = true;
 
-    // 告警正文与 `at 文件:行:列` 定位行走 console.warn，紧随其后的代码片段却走 console.log 且不带任何标记字符，
-    // 用该状态把两者串起来，否则告警正文被吞后只剩孤立的代码片段
-    let lastWasSuppressedWarn = false;
+    let suppressCodeFrameCount = 0;
 
     const originalConsoleWarn = console.warn;
     console.warn = (...args: any[]) => {
       const str = args.map(a => (typeof a === 'string' ? a : (a?.message ?? a?.toString?.() ?? ''))).join(' ');
+
+      // 如果需要忽略此 warning
       if (shouldIgnore(str)) {
-        lastWasSuppressedWarn = true;
+        suppressCodeFrameCount = 3;
         return;
       }
-      lastWasSuppressedWarn = false;
+
+      // 如果当前正处于被忽略告警的后续定位行（如 "at src/store/vapor/app.ts:10:7"）
+      if (suppressCodeFrameCount > 0 && (str.startsWith('at ') || str.includes(' at '))) {
+        return;
+      }
+
+      suppressCodeFrameCount = 0;
       originalConsoleWarn.apply(console, args);
     };
 
-    const originalConsoleError = console.error;
-    console.error = (...args: any[]) => {
-      // 错误块必须原样放行，同时结束抑制状态：H5/Web 端错误块不带标记字符，残留状态会吞掉真错误的代码片段
-      lastWasSuppressedWarn = false;
-      originalConsoleError.apply(console, args);
-    };
-
     const originalConsoleLog = console.log;
+
     console.log = (...args: any[]) => {
       const str = args.map(a => (typeof a === 'string' ? a : (a?.message ?? a?.toString?.() ?? ''))).join(' ');
 
       // 绝对不拦截错误信息（\u2060 为 DCloud ERROR_BLOCK）
       if (str.includes('\u2060') || str.includes('error:') || str.includes('Error:') || str.includes('failed') || str.includes('失败')) {
-        lastWasSuppressedWarn = false;
+        suppressCodeFrameCount = 0;
         originalConsoleLog.apply(console, args);
         return;
       }
 
       // 1. DCloud 编译告警标识符 (\uFEFF 为 SPECIAL_CHARS.WARN_BLOCK)
       if (str.includes('\uFEFF')) {
-        lastWasSuppressedWarn = true;
+        suppressCodeFrameCount = 3;
         return;
       }
 
       // 2. 紧跟在告警后面的定位行 (at relativeFileName:line:column)
-      if (lastWasSuppressedWarn && (str.startsWith('at ') || str.includes(' at '))) {
+      if (suppressCodeFrameCount > 0 && (str.startsWith('at ') || str.includes(' at '))) {
         return;
       }
 
-      // 3. 紧跟在被拦截告警后的代码片段 Code Frame 格式（例如 "  2 | ..." 或 "> 4 | ..."）
-      // 不复位状态：同一帧的多行可能分多次打印，需整帧吞完，遇到非片段行再复位
-      if (lastWasSuppressedWarn && /(?:^|\n)\s*(?:>\s*)?\d+\s*\|/.test(str)) {
+      // 3. 代码片段 Code Frame 格式（例如 "  8 | ..."、"> 10 | ..." 或 "     |   ^^^^"）
+      const isCodeFrame = /(?:^|\n)\s*(?:>\s*)?\d+\s*\|/.test(str) || /(?:^|\n)\s*\|\s*\^+/.test(str);
+      if (isCodeFrame && (suppressCodeFrameCount > 0 || globalSilenceAll)) {
+        suppressCodeFrameCount = Math.max(0, suppressCodeFrameCount - 1);
         return;
       }
 
-      lastWasSuppressedWarn = false;
+      // 4. 空行跟随在代码片段后时，如果刚才抑制了告警，也吃掉避免多余空行
+      if (suppressCodeFrameCount > 0 && str.trim() === '') {
+        return;
+      }
+
+      suppressCodeFrameCount = 0;
       originalConsoleLog.apply(console, args);
     };
   }
@@ -160,6 +173,42 @@ export default function cleanLoggerPlugin(options: CleanLoggerOptions = {}): Plu
           defaultHandler(warning);
         }
       };
+    },
+
+    configResolved(config) {
+      // 确保在其他插件（如 @dcloudio/vite-plugin-uni）合并后，仍然保持拦截生效
+      if (config.customLogger) {
+        const originalWarn = config.customLogger.warn;
+        config.customLogger.warn = (msg, opts) => {
+          if (shouldIgnore(msg)) {
+            return;
+          }
+          originalWarn(msg, opts);
+        };
+        const originalWarnOnce = config.customLogger.warnOnce;
+        config.customLogger.warnOnce = (msg, opts) => {
+          if (shouldIgnore(msg)) {
+            return;
+          }
+          originalWarnOnce(msg, opts);
+        };
+      }
+
+      if (config.build?.rollupOptions) {
+        const prevOnwarn = config.build.rollupOptions.onwarn;
+        config.build.rollupOptions.onwarn = (warning, defaultHandler) => {
+          const msg = warning.message || '';
+          if (shouldIgnore(msg)) {
+            return;
+          }
+          if (prevOnwarn) {
+            prevOnwarn(warning, defaultHandler);
+          }
+          else {
+            defaultHandler(warning);
+          }
+        };
+      }
     }
   };
 }

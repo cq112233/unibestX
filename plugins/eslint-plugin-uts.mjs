@@ -7,6 +7,8 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
+import colorNames from 'color-name';
+import postcss from 'postcss';
 
 /** 辅助函数：从 VElement 或 AST 节点中获取 class 属性字符串 */
 function getClassValues(node) {
@@ -18,17 +20,212 @@ function getClassValues(node) {
   for (const attr of node.startTag.attributes) {
     if (!attr.directive && attr.key && attr.key.name === 'class') {
       if (attr.value && typeof attr.value.value === 'string') {
-        values.push({ text: attr.value.value, loc: attr.loc });
+        values.push({ text: attr.value.value, loc: attr.loc, attrNode: attr });
       }
     }
     // 处理 :class="'...'" 静态字符串形式
     if (attr.directive && attr.key && (attr.key.name?.name === 'class' || attr.key.argument?.name === 'class')) {
       if (attr.value && attr.value.expression && attr.value.expression.type === 'Literal' && typeof attr.value.expression.value === 'string') {
-        values.push({ text: attr.value.expression.value, loc: attr.loc });
+        values.push({ text: attr.value.expression.value, loc: attr.loc, attrNode: attr.value.expression });
       }
     }
   }
   return values;
+}
+
+/** 标准 CSS 英文单词命名颜色集合（uni-app X 原生端与 VDOM 平台建议统一替换为十六进制色值） */
+const CSS_NAMED_COLORS = new Set(Object.keys(colorNames));
+
+/** 将 CSS 英文单词命名颜色转换为标准十六进制色值（如 red -> #ff0000） */
+function getHexFromNamedColor(name) {
+  if (!name) {
+    return null;
+  }
+  const rgb = colorNames[name.toLowerCase()];
+  if (!rgb) {
+    return null;
+  }
+  return `#${rgb.map(x => x.toString(16).padStart(2, '0')).join('')}`;
+}
+
+/** 判断 CSS 属性名是否为颜色或可携带颜色的复合属性 */
+function isColorProperty(prop) {
+  if (!prop)
+    return false;
+  const p = prop.toLowerCase().trim();
+  if (p === 'color')
+    return true;
+  if (p.endsWith('-color'))
+    return true;
+  if (p === 'background' || p === 'border' || p.startsWith('border-'))
+    return true;
+  if (p === 'outline' || p === 'text-decoration' || p === 'box-shadow' || p === 'text-shadow')
+    return true;
+  if (p === 'fill' || p === 'stroke' || p === 'caret-color')
+    return true;
+  if (p.startsWith('--') && (p.includes('color') || p.includes('theme') || p.includes('bg') || p.includes('border')))
+    return true;
+  return false;
+}
+
+/** 从 CSS 声明的 value 中查找所有英文单词命名颜色，并返回其在 value 内的偏移位置 */
+function findNamedColorsInCssValue(value) {
+  if (!value || typeof value !== 'string')
+    return [];
+  // 屏蔽注释、引号字符串、十六进制色值、url(...)、var(...)，保持字符索引长度一致
+  const masked = value
+    .replace(/\/\*[\s\S]*?\*\//g, m => ' '.repeat(m.length))
+    .replace(/"(?:\\.|[^"\\])*"/g, m => ' '.repeat(m.length))
+    .replace(/'(?:\\.|[^'\\])*'/g, m => ' '.repeat(m.length))
+    .replace(/#[0-9a-f]+/gi, m => ' '.repeat(m.length))
+    .replace(/\burl\([^()]*\)/gi, m => ' '.repeat(m.length))
+    .replace(/\bvar\([^()]*\)/gi, m => ' '.repeat(m.length));
+
+  const regex = /\b([a-z]+)\b/gi;
+  const matches = [];
+  let m = regex.exec(masked);
+  while (m !== null) {
+    const word = m[1].toLowerCase();
+    if (CSS_NAMED_COLORS.has(word)) {
+      matches.push({ color: m[1], index: m.index });
+    }
+    m = regex.exec(masked);
+  }
+  return matches;
+}
+
+/** 降级正则扫描 CSS 字符串中的颜色声明 */
+function scanCssFallback(text, baseOffset, context) {
+  const declPattern = /(?:^|[;{\n])\s*([a-z_-]+)\s*:\s*([^;}\n]+)/gi;
+  let match = declPattern.exec(text);
+  while (match !== null) {
+    const prop = match[1];
+    const val = match[2];
+    if (isColorProperty(prop)) {
+      const matches = findNamedColorsInCssValue(val);
+      const colonIndex = match[0].indexOf(':');
+      const valOffsetInMatch = colonIndex + 1 + match[0].slice(colonIndex + 1).indexOf(val);
+      const valStart = match.index + valOffsetInMatch;
+
+      for (const m of matches) {
+        const start = baseOffset + valStart + m.index;
+        const end = start + m.color.length;
+        const hexColor = getHexFromNamedColor(m.color);
+        context.report({
+          loc: {
+            start: context.sourceCode.getLocFromIndex(start),
+            end: context.sourceCode.getLocFromIndex(end)
+          },
+          messageId: 'preferHexStyle',
+          data: { color: m.color },
+          fix(fixer) {
+            if (!hexColor) {
+              return null;
+            }
+            return fixer.replaceTextRange([start, end], hexColor);
+          }
+        });
+      }
+    }
+    match = declPattern.exec(text);
+  }
+}
+
+/** 检查单个 <style> 元素中的 CSS 声明 */
+function checkStyleElement(styleNode, context) {
+  for (const child of (styleNode.children || [])) {
+    if (child.type === 'VText' && typeof child.value === 'string' && child.range) {
+      const text = child.value;
+      const baseOffset = child.range[0];
+
+      try {
+        const root = postcss.parse(text);
+        root.walkDecls((decl) => {
+          if (isColorProperty(decl.prop)) {
+            const matches = findNamedColorsInCssValue(decl.value);
+            if (matches.length > 0) {
+              const declSlice = text.slice(decl.source.start.offset, decl.source.end.offset + 1);
+              const colonIndex = declSlice.indexOf(':');
+              const valueSubIndex = colonIndex !== -1 ? colonIndex + 1 + declSlice.slice(colonIndex + 1).indexOf(decl.value) : declSlice.indexOf(decl.value);
+              const valueOffset = decl.source.start.offset + Math.max(0, valueSubIndex);
+
+              for (const m of matches) {
+                const start = baseOffset + valueOffset + m.index;
+                const end = start + m.color.length;
+                const hexColor = getHexFromNamedColor(m.color);
+                context.report({
+                  loc: {
+                    start: context.sourceCode.getLocFromIndex(start),
+                    end: context.sourceCode.getLocFromIndex(end)
+                  },
+                  messageId: 'preferHexStyle',
+                  data: { color: m.color },
+                  fix(fixer) {
+                    if (!hexColor) {
+                      return null;
+                    }
+                    return fixer.replaceTextRange([start, end], hexColor);
+                  }
+                });
+              }
+            }
+          }
+        });
+      }
+      catch {
+        scanCssFallback(text, baseOffset, context);
+      }
+    }
+  }
+}
+
+/** 检查内联静态 style 字符串 */
+function checkInlineStyleString(styleStr, range, context) {
+  if (!range || !styleStr) {
+    return;
+  }
+  const quoteOffset = 1;
+  const baseOffset = range[0] + quoteOffset;
+  scanCssFallback(styleStr, baseOffset, context);
+}
+
+/** 检查动态 :style 表达式 */
+function checkDynamicStyleExpression(expr, context) {
+  if (!expr) {
+    return;
+  }
+  if (expr.type === 'Literal' && typeof expr.value === 'string' && expr.range) {
+    checkInlineStyleString(expr.value, expr.range, context);
+  }
+  else if (expr.type === 'ObjectExpression' && Array.isArray(expr.properties)) {
+    for (const prop of expr.properties) {
+      if (prop.type === 'Property') {
+        const keyName = prop.key?.name || prop.key?.value;
+        if (typeof keyName === 'string' && isColorProperty(keyName)) {
+          if (prop.value && prop.value.type === 'Literal' && typeof prop.value.value === 'string') {
+            const matches = findNamedColorsInCssValue(prop.value.value);
+            for (const m of matches) {
+              const hexColor = getHexFromNamedColor(m.color);
+              context.report({
+                node: prop.value,
+                loc: prop.value.loc,
+                messageId: 'preferHexStyle',
+                data: { color: m.color },
+                fix(fixer) {
+                  if (!hexColor) {
+                    return null;
+                  }
+                  const raw = context.sourceCode.getText(prop.value);
+                  const quote = raw[0] === '"' ? '"' : '\'';
+                  return fixer.replaceText(prop.value, `${quote}${hexColor}${quote}`);
+                }
+              });
+            }
+          }
+        }
+      }
+    }
+  }
 }
 
 export const pluginUts = {
@@ -426,19 +623,21 @@ export const pluginUts = {
       }
     },
 
-    /** 11. UVUE 模板中使用英文单词命名颜色提示 */
+    /** 11. UVUE 模板与样式中使用英文单词命名颜色提示与自动修复 */
     'uvue-prefer-hex-color': {
       meta: {
         type: 'suggestion',
+        fixable: 'code',
         docs: {
-          description: '原生平台部分渲染层不支持英文单词命名颜色（如 bg-[red]），建议统一使用标准十六进制色值'
+          description: '原生平台部分渲染层不支持英文单词命名颜色（如 bg-[red]、color: red），建议统一使用标准十六进制色值'
         },
         messages: {
-          preferHex: '[VDOM不兼容提示] 原生端部分平台不支持英文单词命名颜色 "{{cls}}"，建议统一使用标准十六进制色值（如 text-[#ffffff]、bg-[#ef4444]）'
+          preferHex: '[VDOM不兼容提示] 原生端部分平台不支持英文单词命名颜色 "{{cls}}"，建议统一使用标准十六进制色值（如 text-[#ffffff]、bg-[#ef4444]）',
+          preferHexStyle: '[VDOM不兼容提示] 原生端部分平台不支持英文单词命名颜色 "{{color}}"，建议统一使用标准十六进制色值（如 #ffffff、#ef4444）'
         }
       },
       create(context) {
-        const namedColorPattern = /(?:^|\s)((?:bg|text|border)-\[(?:red|blue|green|yellow|black|white|purple|orange|pink|gray)\])(?:\s|$)/gi;
+        const namedColorPattern = /(?:^|\s)((?:bg|text|border(?:-[trblxy])?)-\[([a-z]+)\])(?:\s|$)/gi;
 
         if (!context.sourceCode.parserServices?.defineTemplateBodyVisitor) {
           return {};
@@ -446,19 +645,67 @@ export const pluginUts = {
 
         return context.sourceCode.parserServices.defineTemplateBodyVisitor({
           VElement(node) {
+            // 1. 检查模板 class 中的 Tailwind 英文单词颜色（如 bg-[red]、text-[white]、border-t-[blue] 等）
             const classList = getClassValues(node);
-            for (const { text, loc } of classList) {
+            for (const { text, loc, attrNode } of classList) {
               namedColorPattern.lastIndex = 0;
               let match = namedColorPattern.exec(text);
               while (match !== null) {
-                context.report({
-                  node,
-                  loc,
-                  messageId: 'preferHex',
-                  data: { cls: match[1] }
-                });
+                const colorName = match[2]?.toLowerCase();
+                if (colorName && CSS_NAMED_COLORS.has(colorName)) {
+                  const hexColor = getHexFromNamedColor(colorName);
+                  const matchedCls = match[1];
+                  context.report({
+                    node,
+                    loc,
+                    messageId: 'preferHex',
+                    data: { cls: matchedCls },
+                    fix(fixer) {
+                      if (!hexColor || !attrNode) {
+                        return null;
+                      }
+                      const rawAttr = context.sourceCode.getText(attrNode);
+                      const prefix = matchedCls.slice(0, matchedCls.indexOf('[') + 1);
+                      const replacement = `${prefix}${hexColor}]`;
+                      const newAttr = rawAttr.replace(matchedCls, replacement);
+                      if (newAttr !== rawAttr) {
+                        return fixer.replaceText(attrNode, newAttr);
+                      }
+                      return null;
+                    }
+                  });
+                }
                 match = namedColorPattern.exec(text);
               }
+            }
+
+            // 2. 检查模板内联 style 与 :style 属性
+            if (node.startTag && node.startTag.attributes) {
+              for (const attr of node.startTag.attributes) {
+                // 静态 style="color: red; ..."
+                if (!attr.directive && attr.key && attr.key.name === 'style') {
+                  if (attr.value && typeof attr.value.value === 'string' && attr.value.range) {
+                    checkInlineStyleString(attr.value.value, attr.value.range, context);
+                  }
+                }
+                // 动态 :style="{ color: 'red' }" 或 :style="'color: red;'"
+                if (attr.directive && attr.key && (attr.key.name?.name === 'style' || attr.key.argument?.name === 'style')) {
+                  if (attr.value && attr.value.expression) {
+                    checkDynamicStyleExpression(attr.value.expression, context);
+                  }
+                }
+              }
+            }
+          }
+        }, {
+          // 3. 检查 <style> / <style scoped> / <style lang="..."> 块中的 CSS 样式声明
+          'Program:exit': function () {
+            const df = context.sourceCode.parserServices?.getDocumentFragment?.();
+            if (!df || !Array.isArray(df.children))
+              return;
+            const styleNodes = df.children.filter(c => c.type === 'VElement' && c.name === 'style');
+            for (const styleNode of styleNodes) {
+              checkStyleElement(styleNode, context);
             }
           }
         });
