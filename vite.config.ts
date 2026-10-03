@@ -15,6 +15,7 @@ import cleanLoggerPlugin from './plugins/vite-plugin-clean-logger';
 import uniLayoutsPlugin from './plugins/uni-layouts-plugin';
 import tabbarViewsPlugin from './plugins/vite-plugin-tabbar-views';
 import uniPagesPlugin from './plugins/vite-plugin-uni-pages';
+import { viteMockServe } from 'vite-plugin-mock';
 
 const uni = (uniModule as typeof uniModule & { default?: typeof uniModule }).default ?? uniModule;
 const projectRoot = dirname(fileURLToPath(import.meta.url));
@@ -40,6 +41,12 @@ const isVisualizer = process.env.VISUALIZER === 'true'
   || env.VITE_BUNDLE_ANALYZE === 'true'
   || process.argv.includes('--visualizer')
   || process.argv.includes('--analyze');
+
+const isMock = process.env.VITE_USE_MOCK === 'true'
+  || env.VITE_USE_MOCK === 'true'
+  || process.env.MOCK === 'true'
+  || env.MOCK === 'true'
+  || process.argv.includes('--mock');
 
 const weappTailwindcssPlugins: PluginOption[] = (WeappTailwindcss(
   uniAppX({
@@ -159,6 +166,17 @@ export default defineConfig({
             open: process.env.VISUALIZER_OPEN ? process.env.VISUALIZER_OPEN === 'true' : true,
             gzipSize: true,
             brotliSize: true
+          }) as PluginOption
+        ]
+      : []),
+    // 本地 Mock 中间件插件：支持纯前端离线联调（VITE_USE_MOCK=true / pnpm dev:mock）
+    ...(isMock
+      ? [
+          viteMockServe({
+            mockPath: 'mock',
+            enable: true,
+            watchFiles: true,
+            logger: true
           }) as PluginOption
         ]
       : [])

@@ -1,0 +1,33 @@
+/**
+ * 鉴权接口契约类型
+ * 遵循 unibestX-skill 规范：一律使用 type，严禁 interface，空值一律 null
+ */
+
+/**
+ * 登录入参
+ */
+export type LoginParams = {
+  username: string;
+  password: string;
+};
+
+/**
+ * 用户信息
+ */
+export type AuthUserInfo = {
+  userId: number;
+  username: string;
+  nickname: string;
+  avatar: string;
+  roles: Array<string>;
+  permissions?: Array<string> | null;
+};
+
+/**
+ * 登录成功返回凭据
+ */
+export type LoginResult = {
+  token: string;
+  expiresIn: number;
+  userInfo: AuthUserInfo;
+};

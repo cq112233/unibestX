@@ -1,0 +1,30 @@
+import type { PageResult } from '@/src/api/types.uts';
+
+/**
+ * Foo 实体数据结构
+ */
+export type FooItem = {
+  id: number;
+  name: string;
+  desc: string;
+};
+
+/**
+ * Foo 列表查询参数
+ */
+export type FooQuery = {
+  name?: string | null;
+  pageNo?: number;
+  pageSize?: number;
+};
+
+/**
+ * Foo 分页容器
+ */
+export type FooPageResult = PageResult<FooItem>;
+
+/**
+ * 历史类型别名兼容
+ */
+export type IFoo = FooItem;
+export type IFooList = FooPageResult;

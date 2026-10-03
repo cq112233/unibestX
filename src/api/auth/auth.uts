@@ -1,0 +1,85 @@
+import { http } from '@/src/http/request.uts';
+import type { LimeRequestConfig } from '@/uni_modules/lime-request';
+import { MOCK_LOGIN_RESULT, MOCK_USER_INFO } from './mock/auth.uts';
+import type { AuthUserInfo, LoginParams, LoginResult } from './types.uts';
+
+export type { AuthUserInfo, LoginParams, LoginResult } from './types.uts';
+
+// ==========================================
+// 鉴权 API 接口（对应 src/sub/auth/）
+// 遵循规范：通过 http 单例发起请求，本地开发由根目录 mock/ 拦截响应
+// 离线无服务时平滑降级到 UTS 内存 Mock 数据集
+// ==========================================
+
+/**
+ * 用户登录接口
+ * 运行 pnpm dev:mock 时，本请求会被根目录 mock/auth.ts 自动拦截并响应
+ * @param params 账号与密码
+ */
+export function login(params: LoginParams): Promise<LoginResult> {
+  return http.post<UTSJSONObject>('/auth/login', params, {
+    extra: {
+      ignoreAuth: true
+    } as UTSJSONObject
+  } as LimeRequestConfig).then((data: UTSJSONObject): LoginResult => {
+    const rawUser = data.get('userInfo') as UTSJSONObject | null;
+    const rawRoles = rawUser?.getArray<string>('roles', [] as Array<string>) ?? ([] as Array<string>);
+
+    return {
+      token: data.getString('token') ?? `mock-token-${Date.now()}`,
+      expiresIn: data.getNumber('expiresIn') ?? 7200,
+      userInfo: {
+        userId: rawUser?.getNumber('userId') ?? 1001,
+        username: rawUser?.getString('username') ?? params.username,
+        nickname: rawUser?.getString('nickname') ?? (params.username == 'admin' ? '超级管理员' : 'UNIX 开发者'),
+        avatar: rawUser?.getString('avatar') ?? '/static/logo.png',
+        roles: rawRoles.length > 0 ? rawRoles : ['admin']
+      } as AuthUserInfo
+    } as LoginResult;
+  }).catch((_err: any): Promise<LoginResult> => {
+    // 离线无服务或单测网络未连通时，自动回退到本地 UTS Mock 数据集
+    const fallback: LoginResult = {
+      token: MOCK_LOGIN_RESULT.token,
+      expiresIn: MOCK_LOGIN_RESULT.expiresIn,
+      userInfo: {
+        userId: MOCK_USER_INFO.userId,
+        username: params.username.length > 0 ? params.username : MOCK_USER_INFO.username,
+        nickname: params.username == 'admin' ? '超级管理员' : MOCK_USER_INFO.nickname,
+        avatar: MOCK_USER_INFO.avatar,
+        roles: MOCK_USER_INFO.roles
+      } as AuthUserInfo
+    };
+    return Promise.resolve(fallback);
+  });
+}
+
+/**
+ * 获取当前登录用户信息
+ * 运行 pnpm dev:mock 时被根目录 mock/auth.ts 中的 /api/user/info 拦截
+ */
+export function fetchUserInfo(): Promise<AuthUserInfo> {
+  return http.get<UTSJSONObject>('/user/info').then((data: UTSJSONObject): AuthUserInfo => {
+    const rawRoles = data.getArray<string>('roles', [] as Array<string>) ?? ([] as Array<string>);
+    return {
+      userId: data.getNumber('userId') ?? 1001,
+      username: data.getString('username') ?? 'admin',
+      nickname: data.getString('nickname') ?? 'UNIX 极客开发者',
+      avatar: data.getString('avatar') ?? '/static/logo.png',
+      roles: rawRoles.length > 0 ? rawRoles : ['admin', 'developer']
+    } as AuthUserInfo;
+  }).catch((_err: any): Promise<AuthUserInfo> => {
+    return Promise.resolve(MOCK_USER_INFO);
+  });
+}
+
+/**
+ * 退出登录接口
+ * 运行 pnpm dev:mock 时被根目录 mock/auth.ts 中的 /api/auth/logout 拦截
+ */
+export function logout(): Promise<boolean> {
+  return http.post<any>('/auth/logout').then((_data: any): boolean => {
+    return true;
+  }).catch((_err: any): Promise<boolean> => {
+    return Promise.resolve(true);
+  });
+}

@@ -1,0 +1,22 @@
+import type { AuthUserInfo, LoginResult } from '../types.uts';
+
+/**
+ * 模拟登录用户信息
+ */
+export const MOCK_USER_INFO: AuthUserInfo = {
+  userId: 1001,
+  username: 'UNIX',
+  nickname: 'UNIX 开发者',
+  avatar: '/static/logo.png',
+  roles: ['admin', 'developer'],
+  permissions: ['*']
+};
+
+/**
+ * 模拟登录凭据
+ */
+export const MOCK_LOGIN_RESULT: LoginResult = {
+  token: 'mock-token-UNIX-123456',
+  expiresIn: 7200,
+  userInfo: MOCK_USER_INFO
+};

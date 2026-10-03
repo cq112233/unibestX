@@ -1,0 +1,22 @@
+/**
+ * 全局 API 契约通用类型
+ * 遵循 unibestX-skill 规范：一律使用 type，严禁 interface，空值一律 null
+ */
+
+/**
+ * 通用分页返回容器
+ */
+export type PageResult<T> = {
+  list: Array<T>;
+  hasMore: boolean;
+  total: number;
+};
+
+/**
+ * 通用分页查询参数
+ */
+export type PageQuery = {
+  pageNo?: number;
+  pageSize?: number;
+  keyword?: string | null;
+};

@@ -27,7 +27,9 @@ export default defineConfig({
       enforce: 'pre',
       async transform(code, id) {
         if (id.endsWith('.uts') || id.includes('.uts?')) {
-          const res = await transformWithEsbuild(code, id, { loader: 'ts' });
+          // 在单测环境模拟 UNI-APP-X 预编译：移除 #ifndef UNI-APP-X 代码块，规避第三方库内变量重复定义
+          const cleanedCode = code.replace(/\/\/\s*#ifndef\s+UNI-APP-X[\s\S]*?\/\/\s*#endif/g, '');
+          const res = await transformWithEsbuild(cleanedCode, id, { loader: 'ts' });
           return {
             code: res.code,
             map: res.map as any

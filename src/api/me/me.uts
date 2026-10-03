@@ -1,0 +1,23 @@
+import { MOCK_USER_MENUS, MOCK_USER_PROFILE } from './mock/profile.uts';
+import type { UserMenuItem, UserProfile } from './types.uts';
+
+export type { UserMenuItem, UserProfile } from './types.uts';
+
+// ==========================================
+// 个人中心 API 接口（对应 src/pages/me/）
+// 遵循规范：一页一目录、模块独立造数、契约强类型
+// ==========================================
+
+/**
+ * 获取用户个人资料档案
+ */
+export function fetchUserProfile(): Promise<UserProfile> {
+  return Promise.resolve(MOCK_USER_PROFILE);
+}
+
+/**
+ * 获取个人中心菜单列表
+ */
+export function fetchUserMenuList(): Promise<Array<UserMenuItem>> {
+  return Promise.resolve(MOCK_USER_MENUS);
+}

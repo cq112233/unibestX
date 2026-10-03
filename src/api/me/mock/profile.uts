@@ -1,0 +1,21 @@
+import type { UserMenuItem, UserProfile } from '../types.uts';
+
+/**
+ * 个人中心模拟档案数据
+ */
+export const MOCK_USER_PROFILE: UserProfile = {
+  userId: 1001,
+  username: 'UNIX',
+  nickname: 'UNIX 开发者',
+  avatar: '/static/logo.png',
+  isLogin: true
+};
+
+/**
+ * 个人中心常用菜单
+ */
+export const MOCK_USER_MENUS: Array<UserMenuItem> = [
+  { id: 'theme', title: '主题外观', icon: 'color-palette', badge: null, route: '/src/sub/setting/theme' },
+  { id: 'settings', title: '系统设置', icon: 'settings', badge: null, route: '/src/sub/setting/index' },
+  { id: 'docs', title: '开发文档', icon: 'document-text', badge: 'v1.0', route: null }
+];
