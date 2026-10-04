@@ -259,7 +259,7 @@ export default defineConfig({
     // 修复 weapp-tailwindcss 在 H5 构建中把 uni-app x 边框中和规则排到框架样式之前的顺序缺陷：
     // 该缺陷使所有内置组件（uni-view / uni-text / uni-button 等）被框架的 border-width:medium
     // 覆盖而凭空获得 3px 实线边框。详见 plugins/vite-plugin-uni-app-x-border-fix.ts。
-    uniAppXBorderFixPlugin({ debug: false }),
+    ...(isBuild ? [uniAppXBorderFixPlugin({ debug: false })] : []),
     ...(isVisualizer
       ? [
           visualizer({
