@@ -18,7 +18,7 @@
 import HomeView from './views/IndexView.uvue';
 import TabViews from '@/src/tabbar/components/TabViews.uvue';
 import Tabbar from '@/src/tabbar/tabbar.uvue';
-import { isSinglePageTabbar, notifyPageHide, notifyPageShow, setCurIdx } from '@/src/tabbar/index.uts';
+import { isSinglePageTabbar, notifyPageHide, notifyPageShow, setCurIdxByKey } from '@/src/tabbar/index.uts';
 import { handleBackPressExit } from '@/src/utils/backPress/index.uts';
 
 definePage({
@@ -49,7 +49,7 @@ onShow(() => {
   }
   // #endif
   if (!isSinglePageTabbar) {
-    setCurIdx(0);
+    setCurIdxByKey('index');
   }
   notifyPageShow();
 });

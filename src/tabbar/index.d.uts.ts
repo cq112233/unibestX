@@ -119,6 +119,16 @@ export declare const curIdx: Ref<number>;
 /** 设置当前索引并持久化 */
 export declare function setCurIdx(idx: number): void;
 
+/**
+ * 按 Tab 标识（config.uts 中该项的 `tabType`，如 'index' / 'me'）设置当前索引并持久化
+ *
+ * 相比写死的数字下标，它不随 list 顺序调整（增删 Tab、加 midButton 插位）而失效。
+ * 标识无法解析时不做任何改动，仅输出告警。
+ *
+ * @param key Tab 业务标识（也兼容数字下标的字符串形式与 pagePath）
+ */
+export declare function setCurIdxByKey(key: string): void;
+
 /** 设置某项的 badge */
 export declare function setTabbarItemBadge(idx: number, badge: CustomTabBarItemBadge): void;
 
