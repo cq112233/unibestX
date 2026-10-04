@@ -43,3 +43,6 @@ jobs:
 
       - name: Unit Tests (Vitest)
         run: pnpm test
+
+      - name: Project Health Check (depcheck / UTS DTS / images / config)
+        run: pnpm health:quick
