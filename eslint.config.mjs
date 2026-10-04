@@ -309,6 +309,8 @@ configs.push({
       onPageScroll: 'readonly',
       onResize: 'readonly',
       onTabItemTap: 'readonly',
+      onError: 'readonly',
+      onUnhandledRejection: 'readonly',
       onNavigationBarButtonTap: 'readonly',
       onNavigationBarSearchInputChanged: 'readonly',
       onNavigationBarSearchInputConfirmed: 'readonly',

@@ -272,6 +272,84 @@ declare global {
     };
   };
 
+  /** 触摸事件（touchstart / touchmove / touchend 等） */
+  type UniTouchEvent = {
+    detail: {
+      x: number;
+      y: number;
+      clientX: number;
+      clientY: number;
+      pageX: number;
+      pageY: number;
+      screenX: number;
+      screenY: number;
+    };
+    touches: Array<UniTouchEventTouch>;
+    changedTouches: Array<UniTouchEventTouch>;
+  };
+
+  type UniTouchEventTouch = {
+    identifier: number;
+    clientX: number;
+    clientY: number;
+    pageX: number;
+    pageY: number;
+    screenX: number;
+    screenY: number;
+    force: number;
+  };
+
+  /** 输入框键盘高度变化事件（组件 @keyboardheightchange 回调参数） */
+  type UniInputKeyboardHeightChangeEvent = {
+    detail: {
+      height: number;
+      duration: number;
+    };
+  };
+
+  /** uni.onKeyboardHeightChange 的回调参数 */
+  type OnKeyboardHeightChangeCallbackResult = {
+    height: number;
+    duration: number;
+  };
+
+  /** uni.setTabBarItem 的参数 */
+  type SetTabBarItemOptions = {
+    index: number;
+    text?: string;
+    iconPath?: string;
+    selectedIconPath?: string;
+    visible?: boolean;
+    badge?: string;
+    success?: (result: any) => void;
+    fail?: (error: any) => void;
+    complete?: (result: any) => void;
+  };
+
+  /** uni.setNavigationBarTitle 的参数 */
+  type SetNavigationBarTitleOptions = {
+    title: string;
+    success?: (result: any) => void;
+    fail?: (error: any) => void;
+    complete?: (result: any) => void;
+  };
+
+  /** uni.showModal 的参数 */
+  type ShowModalOptions = {
+    title?: string;
+    content?: string;
+    showCancel?: boolean;
+    cancelText?: string;
+    cancelColor?: string;
+    confirmText?: string;
+    confirmColor?: string;
+    editable?: boolean;
+    placeholderText?: string;
+    success?: (result: any) => void;
+    fail?: (error: any) => void;
+    complete?: (result: any) => void;
+  };
+
   function onLaunch(callback: (options?: any) => void): void;
   function onShow(callback: (options?: any) => void): void;
   function onHide(callback: () => void): void;
@@ -284,6 +362,10 @@ declare global {
   function onPageScroll(callback: (options: { scrollTop: number }) => void): void;
   function onResize(callback: (options: { size: { windowWidth: number; windowHeight: number } }) => void): void;
   function onTabItemTap(callback: (options: { index: number; pagePath: string; text: string }) => void): void;
+  /** 全局错误监听（App.uvue 专用）：全平台支持，参数为错误信息（含堆栈） */
+  function onError(callback: (error: any) => void): void;
+  /** 未处理 Promise 拒绝监听（App.uvue 专用）：仅 Web 与小程序支持，App 原生端不支持须 #ifdef WEB || MP 隔离 */
+  function onUnhandledRejection(callback: (result: { promise: Promise<any>; reason: any }) => void): void;
   function getCurrentPages(): any[];
   function getApp(): any;
 

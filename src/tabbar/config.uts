@@ -43,8 +43,16 @@ export const customTabbarConfig: TabBarConfig = {
   //   badge: null,
   //   isBulge: true
   // },
+  /**
+   * ⚠️ type（业务标识）
+   * 每项的 `type` 是该 Tab 的业务唯一标识，供 onTabShow / onTabPageShow 订阅：
+   *   onTabShow('index', () => { ... })
+   * 相比写数字下标，它不随 list 顺序调整（增删 Tab、加 midButton 插位）而失效。
+   * 建议保持全小写、全列表唯一；未配置时回退为 `tab-${下标}`。
+   */
   list: [
     {
+      tabType: 'index',
       text: 'tabbar.home',
       pagePath: 'src/pages/index/index',
       iconType: 'icon',
@@ -56,6 +64,7 @@ export const customTabbarConfig: TabBarConfig = {
       isBulge: false
     },
     {
+      tabType: 'basic',
       text: 'tabbar.basic',
       pagePath: 'src/pages/basic/basic',
       iconType: 'icon',
@@ -67,6 +76,7 @@ export const customTabbarConfig: TabBarConfig = {
       isBulge: false
     },
     {
+      tabType: 'function',
       text: 'tabbar.function',
       pagePath: 'src/pages/function/function',
       iconType: 'icon',
@@ -78,6 +88,7 @@ export const customTabbarConfig: TabBarConfig = {
       isBulge: false
     },
     {
+      tabType: 'me',
       text: 'tabbar.me',
       pagePath: 'src/pages/me/me',
       iconType: 'icon',
