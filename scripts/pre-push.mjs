@@ -2,11 +2,14 @@
 import { spawn } from 'node:child_process';
 import process from 'node:process';
 
-// push 前门禁：跑 health:quick + 单元测试，避免把问题留到 CI 才发现
-// health:quick 已覆盖依赖/UTS 声明/图片/配置完整性，且跳过 typecheck/lint/test（避免与 test step 重复）
+// push 前门禁：仅跑 health:quick，避免把配置/依赖类问题留到 CI 才发现
+// health:quick 已覆盖依赖/图片/配置完整性，且跳过 typecheck/lint/test
+//
+// 说明：全量单元测试（pnpm test，vitest run）耗时较长，已从 push 前门禁移除，
+// 请由 CI 或本地按需执行；如需恢复，把下面被注释掉的 test step 放开即可。
 const steps = [
-  { name: '项目健康自检 (health:quick)', cmd: 'pnpm', args: ['health:quick'] },
-  { name: '单元测试 (vitest)', cmd: 'pnpm', args: ['test'] }
+  { name: '项目健康自检 (health:quick)', cmd: 'pnpm', args: ['health:quick'] }
+  // { name: '单元测试 (vitest)', cmd: 'pnpm', args: ['test'] }
 ];
 
 function runStep(step) {
