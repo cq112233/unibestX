@@ -21,8 +21,10 @@ export type CustomTabBarItem = {
    * 仅用于生成 pages.json 原生 tabBar 配置（模式 1 需要页面级唯一键）；
    * 自定义模式下由 `src/tabbar/internal/tab-key.uts` 按 list 下标读取。
    * 未配置时回退为 `tab-${下标}`。
+   *
+   * 命名刻意避开 `type`，以免与 TabBarConfig.type（胶囊/贴底形态）混淆。
    */
-  type?: string;
+  tabType?: string;
   /** 显示文本 */
   text: string;
   /** 页面路径（不带前导 /） */

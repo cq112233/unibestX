@@ -52,7 +52,7 @@ export declare function notifyPageHide(): void;
  * 2. 页面重新显示（原生 onShow：从子页面返回、App 回前台）——onTabShow 覆盖不到。
  *
  * @param target Tab 标识，支持三种写法：
- *               - 业务标识字符串（推荐）：`'index'` —— 对应 config.uts 中该项的 `type` 字段；
+ *               - 业务标识字符串（推荐）：`'index'` —— 对应 config.uts 中该项的 `tabType` 字段；
  *               - 数字下标：`0` —— 传统写法，等价于完整列表（含 midButton）中的位置；
  *               - 下标字符串 / pagePath：`'0'`、`'src/pages/index/index'`（兼容写法）
  * @param callback 页面显示时的回调函数
@@ -134,7 +134,7 @@ export declare function isPageTabbar(path: string): boolean;
 /**
  * 监听指定 Tab 激活显示（当单页面模式切换到该 Tab 时触发，可用于刷新数据或重新请求接口）
  * @param target Tab 标识，支持三种写法：
- *               - 业务标识字符串（推荐）：`'index'` —— 对应 config.uts 中该项的 `type` 字段；
+ *               - 业务标识字符串（推荐）：`'index'` —— 对应 config.uts 中该项的 `tabType` 字段；
  *               - 数字下标：`0` —— 传统写法，等价于完整列表（含 midButton）中的位置；
  *               - 下标字符串 / pagePath：`'0'`、`'src/pages/index/index'`（兼容写法）
  * @param callback 激活显示时的回调函数
@@ -213,8 +213,10 @@ export type CustomTabBarItem = {
    * 仅用于生成 pages.json 原生 tabBar 配置（模式 1 需要页面级唯一键）；
    * 自定义模式下由 `src/tabbar/internal/tab-key.uts` 按 list 下标读取。
    * 未配置时回退为 `tab-${下标}`。
+   *
+   * 命名刻意避开 `type`，以免与 TabBarConfig.type（胶囊/贴底形态）混淆。
    */
-  type?: string;
+  tabType?: string;
   /** 显示文本 */
   text: string;
   /** 页面路径（不带前导 /） */
