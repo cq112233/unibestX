@@ -120,7 +120,7 @@ export function isPageTabbar(path: string): boolean {
 /**
  * 监听指定 Tab 激活显示（当单页面模式切换到该 Tab 时触发，可用于刷新数据或重新请求接口）
  * @param target Tab 标识，支持三种写法：
- *               - 业务标识字符串（推荐）：`'index'` —— 对应 config.uts 中该项的 `type` 字段；
+ *               - 业务标识字符串（推荐）：`'index'` —— 对应 config.uts 中该项的 `tabType` 字段；
  *               - 数字下标：`0` —— 传统写法，等价于完整列表（含 midButton）中的位置；
  *               - 下标字符串 / pagePath：`'0'`、`'src/pages/index/index'`（兼容写法）
  * @param callback 激活显示时的回调函数

@@ -2,17 +2,17 @@ import { customTabbarConfig } from '../config.uts';
 import type { CustomTabBarItem } from '../types.uts';
 
 /**
- * Tab 标识（`CustomTabBarItem.type`）解析：
+ * Tab 标识（`CustomTabBarItem.tabType`）解析：
  * 订阅 API（onTabShow / onTabPageShow 等）允许直接传 `'index'` / `'me'` 这类业务标识，
  * 也保留原有的数字下标写法，两者在此统一归一为数字下标。
  */
 
-/** 未配置 `type` 时的兜底标识前缀，完整形式为 `tab-${下标}` */
+/** 未配置 `tabType` 时的兜底标识前缀，完整形式为 `tab-${下标}` */
 const TAB_KEY_FALLBACK_PREFIX: string = 'tab-';
 
-/** 取单项的 Tab 标识：未配置 type 时回退为 `tab-${下标}` */
+/** 取单项的 Tab 标识：未配置 tabType 时回退为 `tab-${下标}` */
 function resolveItemTabKey(item: CustomTabBarItem, idx: number): string {
-  const key: string = item.type ?? '';
+  const key: string = item.tabType ?? '';
   return key.length > 0 ? key : `${TAB_KEY_FALLBACK_PREFIX}${idx}`;
 }
 
@@ -78,9 +78,9 @@ export function resolveTabIndexByKey(key: string): number {
  * 将订阅 API 的入参统一解析为「curIdx 数字下标」
  *
  * - number：直接返回（负数视为非法，返回 -1）
- * - string：按业务标识（type）→ 下标字符串 → pagePath 依次尝试
+ * - string：按业务标识（tabType）→ 下标字符串 → pagePath 依次尝试
  *
- * 解析失败（返回 -1）时订阅不会生效，会在控制台给出告警，便于定位写错的 type。
+ * 解析失败（返回 -1）时订阅不会生效，会在控制台给出告警，便于定位写错的 tabType。
  *
  * @param target Tab 标识（业务标识字符串 / 数字 / 下标字符串）
  * @param apiName 订阅 API 名称，仅用于告警文案
@@ -91,7 +91,7 @@ export function resolveTabIndex(target: number | string, apiName: string = 'onTa
   }
   const idx: number = resolveTabIndexByKey(target);
   if (idx < 0) {
-    console.warn(`[tabbar] ${apiName} 无法解析 Tab 标识「${target}」，请检查 config.uts 中该项的 type 字段`);
+    console.warn(`[tabbar] ${apiName} 无法解析 Tab 标识「${target}」，请检查 config.uts 中该项的 tabType 字段`);
   }
   return idx;
 }

@@ -63,7 +63,7 @@ export function generateTabViews(projectRoot: string, options: TabbarViewsOption
   const itemRegex = /\{([\s\S]*?)\}/g;
   let m = itemRegex.exec(listBlock);
   const tabPages: string[] = [];
-  /** pagePath → 业务标识（CustomTabBarItem.type），用于生成视图组件时按标识订阅 */
+  /** pagePath → 业务标识（CustomTabBarItem.tabType），用于生成视图组件时按标识订阅 */
   const tabPageKeys = new Map<string, string>();
 
   while (m !== null) {
@@ -72,7 +72,7 @@ export function generateTabViews(projectRoot: string, options: TabbarViewsOption
     if (pagePathMatch) {
       const pagePath = pagePathMatch[1].trim().replace(/^\//, '');
       tabPages.push(pagePath);
-      const typeMatch = itemBlock.match(/type\s*:\s*['"`](.*?)['"`]/);
+      const typeMatch = itemBlock.match(/tabType\s*:\s*['"`](.*?)['"`]/);
       if (typeMatch && typeMatch[1].trim())
         tabPageKeys.set(pagePath, typeMatch[1].trim());
     }
@@ -213,7 +213,7 @@ function refreshData(): void {
   }, 1000);
 }
 
-// 监听 Tab 切换（${tabKey ? `type: '${tabKey}'` : `索引 ${idx}`}）时触发刷新
+// 监听 Tab 切换（${tabKey ? `tabType: '${tabKey}'` : `索引 ${idx}`}）时触发刷新
 onTabShow(${tabKey ? `'${tabKey}'` : idx}, () => {
   console.log('切换到了 ${expectedCompName} Tab');
   refreshData();

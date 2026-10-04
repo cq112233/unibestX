@@ -758,7 +758,7 @@ function generatePagesJson(
     spacing?: string;
     height?: string;
     midButton?: any;
-    list: Array<{ type?: string; pagePath: string; text: string; iconPath: string; selectedIconPath: string }>;
+    list: Array<{ tabType?: string; pagePath: string; text: string; iconPath: string; selectedIconPath: string }>;
   } {
     const configPath = path.resolve(projectRoot, 'src/tabbar/config.uts');
     if (!fs.existsSync(configPath)) {
@@ -830,14 +830,14 @@ function generatePagesJson(
     }
 
     const listMatch = content.match(/list\s*:\s*\[([\s\S]*?)\]/);
-    const listResult: Array<{ type?: string; pagePath: string; text: string; iconPath: string; selectedIconPath: string }> = [];
+    const listResult: Array<{ tabType?: string; pagePath: string; text: string; iconPath: string; selectedIconPath: string }> = [];
     if (listMatch) {
       const listBlock = listMatch[1];
       const itemRegex = /\{([\s\S]*?)\}/g;
       let m = itemRegex.exec(listBlock);
       while (m !== null) {
         const itemBlock = m[1];
-        const itemType = itemBlock.match(/type\s*:\s*['"`](.*?)['"`]/);
+        const itemType = itemBlock.match(/tabType\s*:\s*['"`](.*?)['"`]/);
         const pagePath = itemBlock.match(/pagePath\s*:\s*['"`](.*?)['"`]/);
         const text = itemBlock.match(/text\s*:\s*['"`](.*?)['"`]/);
         const iconPath = itemBlock.match(/iconPath\s*:\s*['"`](.*?)['"`]/);
@@ -852,7 +852,7 @@ function generatePagesJson(
 
           // 业务标识（type）：仅回写为页面级唯一键，供原生 tabBar 页面互跳去重
           if (itemType && itemType[1].trim())
-            itemObj.type = itemType[1].trim();
+            itemObj.tabType = itemType[1].trim();
 
           const iconfontMatch = itemBlock.match(/iconfont\s*:\s*\{([\s\S]*?)\}/);
           if (iconfontMatch) {
