@@ -272,6 +272,84 @@ declare global {
     };
   };
 
+  /** 触摸事件（touchstart / touchmove / touchend 等） */
+  type UniTouchEvent = {
+    detail: {
+      x: number;
+      y: number;
+      clientX: number;
+      clientY: number;
+      pageX: number;
+      pageY: number;
+      screenX: number;
+      screenY: number;
+    };
+    touches: Array<UniTouchEventTouch>;
+    changedTouches: Array<UniTouchEventTouch>;
+  };
+
+  type UniTouchEventTouch = {
+    identifier: number;
+    clientX: number;
+    clientY: number;
+    pageX: number;
+    pageY: number;
+    screenX: number;
+    screenY: number;
+    force: number;
+  };
+
+  /** 输入框键盘高度变化事件（组件 @keyboardheightchange 回调参数） */
+  type UniInputKeyboardHeightChangeEvent = {
+    detail: {
+      height: number;
+      duration: number;
+    };
+  };
+
+  /** uni.onKeyboardHeightChange 的回调参数 */
+  type OnKeyboardHeightChangeCallbackResult = {
+    height: number;
+    duration: number;
+  };
+
+  /** uni.setTabBarItem 的参数 */
+  type SetTabBarItemOptions = {
+    index: number;
+    text?: string;
+    iconPath?: string;
+    selectedIconPath?: string;
+    visible?: boolean;
+    badge?: string;
+    success?: (result: any) => void;
+    fail?: (error: any) => void;
+    complete?: (result: any) => void;
+  };
+
+  /** uni.setNavigationBarTitle 的参数 */
+  type SetNavigationBarTitleOptions = {
+    title: string;
+    success?: (result: any) => void;
+    fail?: (error: any) => void;
+    complete?: (result: any) => void;
+  };
+
+  /** uni.showModal 的参数 */
+  type ShowModalOptions = {
+    title?: string;
+    content?: string;
+    showCancel?: boolean;
+    cancelText?: string;
+    cancelColor?: string;
+    confirmText?: string;
+    confirmColor?: string;
+    editable?: boolean;
+    placeholderText?: string;
+    success?: (result: any) => void;
+    fail?: (error: any) => void;
+    complete?: (result: any) => void;
+  };
+
   function onLaunch(callback: (options?: any) => void): void;
   function onShow(callback: (options?: any) => void): void;
   function onHide(callback: () => void): void;
