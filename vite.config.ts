@@ -62,7 +62,7 @@ function resolveUniRuntimePath(subPath: string): string | null {
 
 // H5 运行时体积巨大（uni-h5.es.js 约 1MB 源码 / 转换后 3.3MB），且被 DCloud 强制排除在
 // esbuild 预打包之外，冷启动必须逐个模块转换。这里解析一次供 warmup 使用。
-const uniRuntimeFiles = [
+const _uniRuntimeFiles = [
   resolveUniRuntimePath('uni-h5/dist-x/uni-h5.es.js'),
   resolveUniRuntimePath('uni-h5-vue/dist-x/vue.runtime.esm.js')
 ].filter((p): p is string => !!p);
@@ -161,15 +161,20 @@ export default defineConfig({
       cachedChecks: true
     },
     // Vite 5+ 服务端预热核心入口与首页模块，避免首屏访问时串行等待 Transform
-    // 额外的 uniRuntimeFiles 是 H5 运行时（约 1MB 源码），它是首屏加载的大头；
-    // Vite 的 warmup 支持 root 之外的绝对路径，会自动转成浏览器实际请求的 /@fs/ URL。
+    // ⚠️ 不要把 uniRuntimeFiles 加入 warmup：
+    // uni-h5.es.js 静态 import 了 @dcloudio/uni-shared / vue-router / @dcloudio/uni-i18n / vue(→uni-h5-vue)，
+    // 这些全在 DCloud 的 optimizeDeps.exclude 列表里、scanner 没预构建。
+    // warmup 一请求 uni-h5.es.js，crawler 就沿 import 链发现这些 missing dep → 调度 rerun，
+    // rerun 窗口期间浏览器的旧 browserHash 请求会命中 504 (Outdated Optimize Dep)。
+    // 业务页面 warmup 保留：main.uts → App.uvue → IndexView 不直接依赖被 exclude 的运行时，
+    // 不会主动激活 crawler，rerun 由首屏自然请求按需触发，窗口与用户访问不重叠。
     warmup: {
       clientFiles: [
         './main.uts',
         './App.uvue',
         './src/pages/index/index.uvue',
-        './src/pages/index/views/IndexView.uvue',
-        ...uniRuntimeFiles
+        './src/pages/index/views/IndexView.uvue'
+        // ...uniRuntimeFiles  // 不要加：会触发 crawler → rerun → 504
       ]
     },
     // H5 走代理模式时生效（.env 里 VITE_H5_USE_PROXY=true）；直连模式（false）请求不经过此代理
@@ -189,7 +194,9 @@ export default defineConfig({
     // 控制台警告与代码片段净化插件：拦截 Vite/Rollup/DCloud 编译告警输出
     cleanLoggerPlugin({ silenceAll: true }),
     // H5 冷启动性能优化：覆盖 DCloud 对依赖预构建的禁用，将核心大体积依赖纳入 esbuild 预构建
-    h5OptimizeDepsPlugin({ debug: false }),
+    // extraIncludes 透传 isVConsole 时的 vconsole：vite-plugin-vconsole 在 transform 钩子里动态注入
+    // `import VConsole from 'vconsole'` 到 main.uts，scanner 看不到，需显式 include 让 scanner 预构建。
+    h5OptimizeDepsPlugin({ debug: false, extraIncludes: isVConsole ? ['vconsole'] : [] }),
     // 修复 H5 模式下外部或 AI 修改 .uvue/.uts 时 Tailwind CSS v4 样式热更新丢失的联动补丁插件
     // tailwindHmrPlugin(),
     // 自动扫描与路由生成插件（基于 pages.config.json + 页面内 <route>/definePage 声明）
