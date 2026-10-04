@@ -46,7 +46,7 @@
 import { computed } from 'vue';
 import { useTokenStore, useUserStore } from '@/src/store';
 import { LOGIN_PAGE } from '@/src/router/config.uts';
-import { curIdx, onTabPageShow, onTabShow, switchTabbar } from '@/src/tabbar/index.uts';
+import { curIdx, onTabPageShow, onTabShow, resolveTabIndexByKey, switchTabbar } from '@/src/tabbar/index.uts';
 import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/utils/refresh/index.uts';
 
 // 页面数据加载/刷新方法
@@ -54,7 +54,7 @@ function refreshData(): void {
   console.log('我的页面刷新中...');
   setTimeout(() => {
     // 门控检查：若刷新完成时用户已切到其他 Tab 则忽略
-    if (curIdx.value != 1) {
+    if (curIdx.value != resolveTabIndexByKey('me')) {
       return;
     }
     console.log('我的页面刷新成功');
@@ -65,7 +65,7 @@ function refreshData(): void {
 
 // 监听 navbar 自定义下拉刷新事件（在 enablePullDownRefresh: true 且处于当前 Tab 时生效）
 onNavbarPullDownRefresh(() => {
-  if (curIdx.value == 1) {
+  if (curIdx.value == resolveTabIndexByKey('me')) {
     refreshData();
   }
 });
