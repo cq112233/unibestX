@@ -5,8 +5,6 @@ import i18n from './src/i18n'; // 导入 i18n 国际化配置实例
 import ultraUI from '@/uni_modules/uview-ultra/index.uts'; // 导入 uview-ultra 跨端 UI 组件库
 import { installRouteInterceptor } from './src/router/interceptor'; // 导入全局路由拦截器安装函数
 
-import { setupH5Components } from './src/utils/h5-components.uts';
-
 /**
  * 创建应用实例的入口函数
  */
@@ -32,8 +30,6 @@ export function createApp() {
       }
     };
   });
-  // 临时修复 H5 生产环境 easycom 失效导致内置组件不渲染的问题
-  setupH5Components(app);
   // 返回创建好的应用实例对象，供系统挂载运行
   return {
     app
