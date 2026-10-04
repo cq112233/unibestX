@@ -63,12 +63,18 @@ export function generateTabViews(projectRoot: string, options: TabbarViewsOption
   const itemRegex = /\{([\s\S]*?)\}/g;
   let m = itemRegex.exec(listBlock);
   const tabPages: string[] = [];
+  /** pagePath → 业务标识（CustomTabBarItem.tabType），用于生成视图组件时按标识订阅 */
+  const tabPageKeys = new Map<string, string>();
 
   while (m !== null) {
     const itemBlock = m[1];
     const pagePathMatch = itemBlock.match(/pagePath\s*:\s*['"`](.*?)['"`]/);
     if (pagePathMatch) {
-      tabPages.push(pagePathMatch[1].trim().replace(/^\//, ''));
+      const pagePath = pagePathMatch[1].trim().replace(/^\//, '');
+      tabPages.push(pagePath);
+      const typeMatch = itemBlock.match(/tabType\s*:\s*['"`](.*?)['"`]/);
+      if (typeMatch && typeMatch[1].trim())
+        tabPageKeys.set(pagePath, typeMatch[1].trim());
     }
     m = itemRegex.exec(listBlock);
   }
@@ -145,6 +151,9 @@ export function generateTabViews(projectRoot: string, options: TabbarViewsOption
   for (let idx = 0; idx < fullTabPages.length; idx++) {
     const rawPath = fullTabPages[idx];
     const cleanPath = rawPath.replace(/^src\//, '');
+    // 业务标识按「带前导 src/ 的原始 pagePath」查表（cleanPath 已剥掉 src/，不能直接当 key）
+    const pagePathKey = rawPath.replace(/^\//, '');
+    const tabKey = tabPageKeys.get(pagePathKey);
     const pageDirRel = path.dirname(cleanPath);
     const absPageDir = path.resolve(projectRoot, 'src', pageDirRel);
     const dirName = path.basename(absPageDir);
@@ -204,8 +213,8 @@ function refreshData(): void {
   }, 1000);
 }
 
-// 监听 Tab 切换到当前功能页（索引 ${idx}）时触发刷新
-onTabShow(${idx}, () => {
+// 监听 Tab 切换（${tabKey ? `tabType: '${tabKey}'` : `索引 ${idx}`}）时触发刷新
+onTabShow(${tabKey ? `'${tabKey}'` : idx}, () => {
   console.log('切换到了 ${expectedCompName} Tab');
   refreshData();
 });
@@ -349,7 +358,7 @@ onNavbarPullDownRefresh(() => {
     .join('\n');
 
   const tabViewsContent = `<template>
-  <view class="tab-views-container" style="flex: 1; position: relative;">
+  <view class="tab-views-container" style="position: relative;flex: 1;">
 ${contentBlocks}
   </view>
 </template>
@@ -361,8 +370,8 @@ import TabContent from './TabContent.uvue';
 
 <style lang="scss" scoped>
 .tab-views-container {
-  flex: 1;
   position: relative;
+  flex: 1;
 }
 </style>
 `;

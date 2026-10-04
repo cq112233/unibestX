@@ -54,6 +54,11 @@ export declare function getH5UseProxy(): boolean;
 export declare function getDefaultTheme(): string;
 
 /**
+ * 获取默认国际化语言（全端从 import.meta.env 读取，未配置时自动识别系统语言，最后兜底 zh-CN）
+ */
+export declare function getDefaultLocale(): string;
+
+/**
  * 获取流式演示接口地址（VITE_STREAM_URL）
  *
  * 支持两种写法：
@@ -161,6 +166,8 @@ export declare class EnvUtils {
   getH5UseProxy(): boolean;
 
   getDefaultTheme(): string;
+
+  getDefaultLocale(): string;
 
   getStreamUrl(): string;
 

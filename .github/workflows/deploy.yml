@@ -21,9 +21,7 @@ jobs:
           fetch-depth: 0
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v3
-        with:
-          version: 9
+        uses: pnpm/action-setup@v4 # 不指定 version，自动读取 package.json 的 packageManager 字段（pnpm@10.6.1）
 
       - name: Setup Node
         uses: actions/setup-node@v4

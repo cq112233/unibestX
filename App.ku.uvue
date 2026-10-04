@@ -2,7 +2,7 @@
   <!-- 应用全局骨架与皮肤容器，通过 CSS 变量绑定响应式主题色 / 暗黑模式 -->
   <view
     class="root-container"
-    style="flex: 1; display: flex; flex-direction: column;"
+    style="display: flex; flex-direction: column;flex: 1;"
     :class="{ dark: appStore.state.isDark }"
     :style="themeStyle"
   >
@@ -170,9 +170,9 @@ uni.$on('setHideNavbar', (hide: any) => {
 
 <style lang="scss" scoped>
 .root-container {
-  flex: 1;
   display: flex;
   flex-direction: column;
+  flex: 1;
   background-color: var(--bg-color, #f5f6fa);
 }
 

@@ -2,6 +2,7 @@ import { watch } from 'vue';
 import type { CustomTabBarItem, CustomTabBarItemBadge, TabBarConfig } from '../types.uts';
 import { customTabbarConfig } from '../config.uts';
 import { cleanPath, getCurrentPath, isSamePath } from '@/src/utils/route/index.uts';
+import { registerFullTabbarListGetter, resolveTabIndex, resolveTabIndexByKey } from './tab-key.uts';
 
 /** 组合 list 与 midButton 供自定义 TabBar 渲染（自动将 midButton 插入居中位置） */
 function buildFullTabbarList(config: TabBarConfig): CustomTabBarItem[] {
@@ -42,6 +43,9 @@ function buildFullTabbarList(config: TabBarConfig): CustomTabBarItem[] {
 /** 完整 TabBar 列表（含中间鼓包项），仅本文件内部使用 */
 const customTabbarList: CustomTabBarItem[] = buildFullTabbarList(customTabbarConfig);
 
+// 把完整列表暴露给 tab-key.uts，用于把业务标识（type）解析为 curIdx 下标
+registerFullTabbarListGetter((): CustomTabBarItem[] | null => customTabbarList);
+
 /**
  * tabbar 响应式列表（统一加前导 /）
  */
@@ -73,6 +77,23 @@ export const curIdx = ref(0);
 export function setCurIdx(idx: number): void {
   curIdx.value = idx;
   uni.setStorageSync('app-tabbar-index', idx);
+}
+
+/**
+ * 按 Tab 标识（config.uts 中该项的 `tabType`，如 'index' / 'me'）设置当前索引并持久化
+ *
+ * 相比写死的数字下标，它不随 list 顺序调整（增删 Tab、加 midButton 插位）而失效。
+ * 标识无法解析时不做任何改动，仅输出告警。
+ *
+ * @param key Tab 业务标识（也兼容数字下标的字符串形式与 pagePath）
+ */
+export function setCurIdxByKey(key: string): void {
+  const index: number = resolveTabIndexByKey(key);
+  if (index < 0) {
+    console.warn(`[tabbar] setCurIdxByKey 无法解析 Tab 标识「${key}」，请检查 config.uts 中该项的 tabType 字段`);
+    return;
+  }
+  setCurIdx(index);
 }
 
 /** 设置某项的 badge */
@@ -115,11 +136,18 @@ export function isPageTabbar(path: string): boolean {
 
 /**
  * 监听指定 Tab 激活显示（当单页面模式切换到该 Tab 时触发，可用于刷新数据或重新请求接口）
- * @param index 对应 Tab 索引（0: 首页, 1: 基础, 2: 功能, 3: 我的）
+ * @param target Tab 标识，支持三种写法：
+ *               - 业务标识字符串（推荐）：`'index'` —— 对应 config.uts 中该项的 `tabType` 字段；
+ *               - 数字下标：`0` —— 传统写法，等价于完整列表（含 midButton）中的位置；
+ *               - 下标字符串 / pagePath：`'0'`、`'src/pages/index/index'`（兼容写法）
  * @param callback 激活显示时的回调函数
  * @param immediate 若首次加载时当前 Tab 正好处于激活状态，是否立即执行一次（默认 false）
  */
-export function onTabShow(index: number, callback: () => void, immediate: boolean = false): void {
+export function onTabShow(target: number | string, callback: () => void, immediate: boolean = false): void {
+  const index: number = resolveTabIndex(target);
+  if (index < 0) {
+    return;
+  }
   if (immediate && curIdx.value == index) {
     callback();
   }

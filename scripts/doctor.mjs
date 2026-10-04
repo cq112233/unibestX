@@ -12,8 +12,8 @@
  * 7. 关键配置文件完整性校验
  *
  * 用法：
- *   pnpm doctor          # 执行全量自检
- *   pnpm doctor:quick    # 仅执行轻量快速检查（跳过 lint/typecheck/test）
+ *   pnpm health          # 执行全量自检
+ *   pnpm health:quick    # 仅执行轻量快速检查（跳过 lint/typecheck/test）
  */
 
 import { execSync } from 'node:child_process';
@@ -305,11 +305,11 @@ function checkConfigIntegrity() {
   // 检查 Node.js 版本
   const nodeVersion = process.version;
   const major = Number.parseInt(nodeVersion.slice(1));
-  if (major >= 18) {
-    pass(`Node.js 版本 ${nodeVersion} 满足要求 (>=18)`);
+  if (major >= 22) {
+    pass(`Node.js 版本 ${nodeVersion} 满足要求 (>=22)`);
   }
   else {
-    fail(`Node.js 版本 ${nodeVersion} 过低`, '要求 >=18，请升级 Node.js');
+    fail(`Node.js 版本 ${nodeVersion} 过低`, '要求 >=22，请升级 Node.js');
   }
 
   // 检查 pnpm 版本
