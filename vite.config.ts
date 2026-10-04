@@ -12,6 +12,7 @@ import { WeappTailwindcss } from 'weapp-tailwindcss/vite';
 import { visualizer } from 'rollup-plugin-visualizer';
 import uniRootX from './plugins/root-plugin';
 import cleanLoggerPlugin from './plugins/vite-plugin-clean-logger';
+import h5OptimizeDepsPlugin from './plugins/vite-plugin-h5-optimize-deps';
 import uniLayoutsPlugin from './plugins/uni-layouts-plugin';
 import tabbarViewsPlugin from './plugins/vite-plugin-tabbar-views';
 import uniPagesPlugin from './plugins/vite-plugin-uni-pages';
@@ -23,6 +24,48 @@ import { ViteImageOptimizer } from 'vite-plugin-image-optimizer';
 
 const uni = (uniModule as typeof uniModule & { default?: typeof uniModule }).default ?? uniModule;
 const projectRoot = dirname(fileURLToPath(import.meta.url));
+
+/**
+ * 解析 H5 运行时（uni-h5 / uni-h5-vue）的真实磁盘路径。
+ *
+ * 为什么不能直接用项目 node_modules 里的副本：
+ * `pnpm dev` 走的是 `uni-launch` → HBuilderX CLI，编译器与运行时始终由 HBuilderX 安装目录提供，
+ * 项目 node_modules 下的 @dcloudio/* 并不参与 dev 编译（两边版本可能不一致，实测也不同）。
+ * 浏览器真正请求的是 /@fs/<HBuilderX 路径>/...，因此预热必须指向 HBuilderX 内的文件；
+ * 若误指向项目 node_modules 里的副本，实际预热的是永远不会被请求的另一个版本，等于无效。
+ *
+ * @param subPath dist-x 目录下的相对入口文件
+ * @returns 绝对路径；未找到 HBuilderX 时返回 null（调用方需自行跳过）
+ */
+function resolveUniRuntimePath(subPath: string): string | null {
+  const candidates = [
+    process.env.HBUILDERX_PLUGINS_PATH,
+    // macOS
+    '/Applications/HBuilderX.app/Contents/HBuilderX/plugins',
+    // Linux
+    '/opt/hbuilderx/HBuilderX/plugins',
+    '/opt/HBuilderX/plugins',
+    '/usr/local/hbuilderx/HBuilderX/plugins',
+    // Windows
+    'C:\\Program Files\\HBuilderX\\plugins',
+    'C:\\HBuilderX\\plugins'
+  ].filter((p): p is string => !!p);
+
+  for (const base of candidates) {
+    const full = resolve(base, 'uniapp-cli-vite/node_modules/@dcloudio', subPath);
+    if (fs.existsSync(full)) {
+      return full;
+    }
+  }
+  return null;
+}
+
+// H5 运行时体积巨大（uni-h5.es.js 约 1MB 源码 / 转换后 3.3MB），且被 DCloud 强制排除在
+// esbuild 预打包之外，冷启动必须逐个模块转换。这里解析一次供 warmup 使用。
+const uniRuntimeFiles = [
+  resolveUniRuntimePath('uni-h5/dist-x/uni-h5.es.js'),
+  resolveUniRuntimePath('uni-h5-vue/dist-x/vue.runtime.esm.js')
+].filter((p): p is string => !!p);
 
 // 读取 package.json 与 Git 元信息，编译阶段注入环境变量供 import.meta.env 全端安全访问
 try {
@@ -118,12 +161,15 @@ export default defineConfig({
       cachedChecks: true
     },
     // Vite 5+ 服务端预热核心入口与首页模块，避免首屏访问时串行等待 Transform
+    // 额外的 uniRuntimeFiles 是 H5 运行时（约 1MB 源码），它是首屏加载的大头；
+    // Vite 的 warmup 支持 root 之外的绝对路径，会自动转成浏览器实际请求的 /@fs/ URL。
     warmup: {
       clientFiles: [
         './main.uts',
         './App.uvue',
         './src/pages/index/index.uvue',
-        './src/pages/index/views/IndexView.uvue'
+        './src/pages/index/views/IndexView.uvue',
+        ...uniRuntimeFiles
       ]
     },
     // H5 走代理模式时生效（.env 里 VITE_H5_USE_PROXY=true）；直连模式（false）请求不经过此代理
@@ -142,6 +188,8 @@ export default defineConfig({
   plugins: [
     // 控制台警告与代码片段净化插件：拦截 Vite/Rollup/DCloud 编译告警输出
     cleanLoggerPlugin({ silenceAll: true }),
+    // H5 冷启动性能优化：覆盖 DCloud 对依赖预构建的禁用，将核心大体积依赖纳入 esbuild 预构建
+    h5OptimizeDepsPlugin({ debug: false }),
     // 修复 H5 模式下外部或 AI 修改 .uvue/.uts 时 Tailwind CSS v4 样式热更新丢失的联动补丁插件
     // tailwindHmrPlugin(),
     // 自动扫描与路由生成插件（基于 pages.config.json + 页面内 <route>/definePage 声明）
