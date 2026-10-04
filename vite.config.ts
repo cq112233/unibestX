@@ -174,7 +174,7 @@ export default defineConfig({
         './main.uts',
         './App.uvue',
         './src/pages/index/index.uvue',
-        './src/pages/index/views/IndexView.uvue',
+        './src/pages/index/views/IndexView.uvue'
         // 预热首屏会拉到的业务模块，命中裸路径即触发整页编译，
         // 浏览器后续的 ?import / ?vue&type=script / ?vue&type=style 变体直接命中 moduleGraph 缓存
         // （实测单模块 623ms → 30ms）。
@@ -182,11 +182,11 @@ export default defineConfig({
         // 注意：加 './index.html' 无效——warmup 对 html 走 transformIndexHtml('/index.html')，
         // 与浏览器请求的 '/' 不是同一路径，且 '/' 每次重新生成（含可变 buildTime）。
         // 这些都是业务模块，不激活被 exclude 的运行时 + crawler rerun 的 504 窗口。
-        './src/pages/**/*.uvue',
-        './src/sub/**/*.uvue',
-        './src/http/**/*.uts',
-        './src/router/**/*.uts',
-        './src/api/**/*.uts'
+        // './src/pages/**/*.uvue',
+        // './src/sub/**/*.uvue',
+        // './src/http/**/*.uts',
+        // './src/router/**/*.uts',
+        // './src/api/**/*.uts'
       ]
     },
     // H5 走代理模式时生效（.env 里 VITE_H5_USE_PROXY=true）；直连模式（false）请求不经过此代理
@@ -259,7 +259,7 @@ export default defineConfig({
     // 修复 weapp-tailwindcss 在 H5 构建中把 uni-app x 边框中和规则排到框架样式之前的顺序缺陷：
     // 该缺陷使所有内置组件（uni-view / uni-text / uni-button 等）被框架的 border-width:medium
     // 覆盖而凭空获得 3px 实线边框。详见 plugins/vite-plugin-uni-app-x-border-fix.ts。
-    uniAppXBorderFixPlugin({ debug: false }),
+    ...(isBuild ? [uniAppXBorderFixPlugin({ debug: false })] : []),
     ...(isVisualizer
       ? [
           visualizer({
