@@ -284,6 +284,10 @@ declare global {
   function onPageScroll(callback: (options: { scrollTop: number }) => void): void;
   function onResize(callback: (options: { size: { windowWidth: number; windowHeight: number } }) => void): void;
   function onTabItemTap(callback: (options: { index: number; pagePath: string; text: string }) => void): void;
+  /** 全局错误监听（App.uvue 专用）：全平台支持，参数为错误信息（含堆栈） */
+  function onError(callback: (error: any) => void): void;
+  /** 未处理 Promise 拒绝监听（App.uvue 专用）：仅 Web 与小程序支持，App 原生端不支持须 #ifdef WEB || MP 隔离 */
+  function onUnhandledRejection(callback: (result: { promise: Promise<any>; reason: any }) => void): void;
   function getCurrentPages(): any[];
   function getApp(): any;
 
