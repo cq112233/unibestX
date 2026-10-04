@@ -125,13 +125,13 @@ function handleLogout() {
   });
 }
 
-// 监听 Tab 切换到当前功能页（索引 3）时触发
-onTabShow(1, () => {
+// 监听 Tab 切换到当前功能页（config.uts 中 type: 'me'）时触发
+onTabShow('me', () => {
   console.log('onTabShow 我 Tab 显示');
 }, true);
 
 // 监听我 Tab 页面显示（切 Tab、从子页面返回、前台恢复都会触发）
-onTabPageShow(1, () => {
+onTabPageShow('me', () => {
   console.log('onTabPageShow 我 Tab 显示');
 }, true);
 

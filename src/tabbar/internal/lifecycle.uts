@@ -1,5 +1,6 @@
 import { onUnmounted, ref, watch } from 'vue';
 import { curIdx } from './state.uts';
+import { resolveTabIndex } from './tab-key.uts';
 
 /** 页面显示事件订阅项 */
 type PageShowSubscriber = {
@@ -75,12 +76,19 @@ export function notifyPageHide(): void {
  * 1. 切换 Tab 到该页（curIdx 变化）——与 onTabShow 相同；
  * 2. 页面重新显示（原生 onShow：从子页面返回、App 回前台）——onTabShow 覆盖不到。
  *
- * @param index 对应 Tab 索引（0: 首页, 1: 我的）
+ * @param target Tab 标识，支持三种写法：
+ *               - 业务标识字符串（推荐）：`'index'` —— 对应 config.uts 中该项的 `type` 字段；
+ *               - 数字下标：`0` —— 传统写法，等价于完整列表（含 midButton）中的位置；
+ *               - 下标字符串 / pagePath：`'0'`、`'src/pages/index/index'`（兼容写法）
  * @param callback 页面显示时的回调函数
  * @param immediate 若注册时页面已经显示过且当前 Tab 正好激活，是否立即补发一次
  *                  （首次进入页面时不会再重复触发：那一次由紧随其后的 onShow 通知负责）
  */
-export function onTabPageShow(index: number, callback: () => void, immediate: boolean = false): void {
+export function onTabPageShow(target: number | string, callback: () => void, immediate: boolean = false): void {
+  const index: number = resolveTabIndex(target, 'onTabPageShow');
+  if (index < 0) {
+    return;
+  }
   const id = subscriberSeq;
   subscriberSeq++;
   const subscriber: PageShowSubscriber = {

@@ -1,0 +1,97 @@
+import { customTabbarConfig } from '../config.uts';
+import type { CustomTabBarItem } from '../types.uts';
+
+/**
+ * Tab 标识（`CustomTabBarItem.type`）解析：
+ * 订阅 API（onTabShow / onTabPageShow 等）允许直接传 `'index'` / `'me'` 这类业务标识，
+ * 也保留原有的数字下标写法，两者在此统一归一为数字下标。
+ */
+
+/** 未配置 `type` 时的兜底标识前缀，完整形式为 `tab-${下标}` */
+const TAB_KEY_FALLBACK_PREFIX: string = 'tab-';
+
+/** 取单项的 Tab 标识：未配置 type 时回退为 `tab-${下标}` */
+function resolveItemTabKey(item: CustomTabBarItem, idx: number): string {
+  const key: string = item.type ?? '';
+  return key.length > 0 ? key : `${TAB_KEY_FALLBACK_PREFIX}${idx}`;
+}
+
+/**
+ * 数据源优先级：完整 tabbar 列表（含 midButton，与 curIdx 的取值空间对齐）→ config.list
+ *
+ * 用 getter 惰性读取，避免与 state.uts 产生模块循环依赖（state.uts 反过来依赖本文件）。
+ */
+function getSourceList(): CustomTabBarItem[] {
+  const fullList: CustomTabBarItem[] | null = getFullTabbarList();
+  if (fullList != null && fullList.length > 0) {
+    return fullList;
+  }
+  return customTabbarConfig.list;
+}
+
+/** 由 state.uts 注入的「完整列表」getter（含 midButton 插入项） */
+let fullTabbarListGetter: (() => CustomTabBarItem[] | null) | null = null;
+
+/** 由 state.uts 注册完整列表 getter，供本模块解析 index 时取用（仅内部使用） */
+export function registerFullTabbarListGetter(getter: () => CustomTabBarItem[] | null): void {
+  fullTabbarListGetter = getter;
+}
+
+/** 读取完整列表，未注册或尚未就绪时返回 null */
+function getFullTabbarList(): CustomTabBarItem[] | null {
+  const getter = fullTabbarListGetter;
+  if (getter == null) {
+    return null;
+  }
+  return getter();
+}
+
+/**
+ * 将「Tab 标识」解析为「curIdx 数字下标」
+ * @param key 业务标识字符串（如 'index' / 'me'），或数字下标的字符串形式（如 '0'）
+ */
+export function resolveTabIndexByKey(key: string): number {
+  const list = getSourceList();
+  const target: string = key.trim();
+  // 1. 优先按业务标识匹配
+  for (let i = 0; i < list.length; i++) {
+    if (resolveItemTabKey(list[i], i) == target) {
+      return i;
+    }
+  }
+  // 2. 兼容直接传下标字符串（'0' / '1'）
+  const numeric: number = parseInt(target);
+  if (!isNaN(numeric) && numeric >= 0 && numeric < list.length) {
+    return numeric;
+  }
+  // 3. 兼容直接传 pagePath（'src/pages/index/index' / '/src/pages/index/index'）
+  const targetPath: string = target.replace(/^\//, '');
+  for (let i = 0; i < list.length; i++) {
+    if (list[i].pagePath.replace(/^\//, '') == targetPath) {
+      return i;
+    }
+  }
+  return -1;
+}
+
+/**
+ * 将订阅 API 的入参统一解析为「curIdx 数字下标」
+ *
+ * - number：直接返回（负数视为非法，返回 -1）
+ * - string：按业务标识（type）→ 下标字符串 → pagePath 依次尝试
+ *
+ * 解析失败（返回 -1）时订阅不会生效，会在控制台给出告警，便于定位写错的 type。
+ *
+ * @param target Tab 标识（业务标识字符串 / 数字 / 下标字符串）
+ * @param apiName 订阅 API 名称，仅用于告警文案
+ */
+export function resolveTabIndex(target: number | string, apiName: string = 'onTabShow'): number {
+  if (typeof target == 'number') {
+    return target >= 0 ? target : -1;
+  }
+  const idx: number = resolveTabIndexByKey(target);
+  if (idx < 0) {
+    console.warn(`[tabbar] ${apiName} 无法解析 Tab 标识「${target}」，请检查 config.uts 中该项的 type 字段`);
+  }
+  return idx;
+}

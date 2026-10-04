@@ -3,6 +3,16 @@ export type CustomTabBarItemBadge = number | 'dot';
 
 /** 自定义 tabbar 单项配置 */
 export type CustomTabBarItem = {
+  /**
+   * 该项的业务标识（如 'index' / 'me'），供 onTabShow / onTabPageShow 按标识订阅
+   *
+   * ⚠️ 这是业务自定义字段，不是 uni-app 原生 tabBar 规范字段：
+   * 不参与「自定义 TabBar 模式」（模式 2 / 3 / 4）的 UI 渲染，
+   * 仅用于生成 pages.json 原生 tabBar 配置（模式 1 需要页面级唯一键）；
+   * 自定义模式下由 `src/tabbar/internal/tab-key.uts` 按 list 下标读取。
+   * 未配置时回退为 `tab-${下标}`。
+   */
+  type?: string;
   /** 显示文本 */
   text: string;
   /** 页面路径（不带前导 /） */
