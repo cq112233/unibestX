@@ -245,6 +245,22 @@ function getDrawElement(): UniElement | null {
 }
 
 function updateRect(): void {
+	// #ifdef MP
+	// 小程序端无 DOM，getBoundingClientRect 不可用，改用 selectorQuery 查询画布位置
+	uni.createSelectorQuery()
+		.in(instance)
+		.select('#' + canvasId.value)
+		.boundingClientRect((res: any | null) => {
+			if (res != null) {
+				const rect = res as NodeInfo
+				cachedRectLeft = rect.left
+				cachedRectTop = rect.top
+			}
+		})
+		.exec()
+	return
+	// #endif
+
 	const el = getDrawElement()
 	if (el != null) {
 		const rect = el.getBoundingClientRect()
@@ -456,6 +472,23 @@ function touchStart(e: UniTouchEvent): void {
 	e.stopPropagation()
 	e.preventDefault()
 	uni.$emit('setPageScrollEnabled', false)
+	// #ifdef MP
+	// 小程序端 rect 查询是异步的，先查完再落笔，避免用未初始化的坐标画到左上角
+	uni.createSelectorQuery()
+		.in(instance)
+		.select('#' + canvasId.value)
+		.boundingClientRect((res: any | null) => {
+			if (res != null) {
+				const rect = res as NodeInfo
+				cachedRectLeft = rect.left
+				cachedRectTop = rect.top
+			}
+			const point = getTouchPoint(e)
+			startDraw(point.x, point.y)
+		})
+		.exec()
+	return
+	// #endif
 	updateRect()
 	const point = getTouchPoint(e)
 	startDraw(point.x, point.y)
@@ -682,11 +715,11 @@ defineExpose({
 		}
 
 		&__toolbar-icon {
-			flex: 1;
 			display: flex;
 			flex-direction: row;
 			justify-content: center;
 			align-items: center;
+			flex: 1;
 			padding: 5px 0;
 		}
 
@@ -701,8 +734,8 @@ defineExpose({
 		&__color-label {
 			display: flex;
 			margin-bottom: 10px;
-			font-size: 14px;
 			color: #999999;
+			font-size: 14px;
 		}
 
 		&__colors {
@@ -714,12 +747,12 @@ defineExpose({
 		&__color-item {
 			width: 30px;
 			height: 30px;
-			border-radius: 50%;
 			margin-right: 10px;
 			margin-bottom: 10px;
 			border-width: 2px;
 			border-style: solid;
 			border-color: transparent;
+			border-radius: 50%;
 
 			&--active {
 				border-color: #2979ff;
