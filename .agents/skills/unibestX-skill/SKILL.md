@@ -9,6 +9,8 @@ description: Use when developing, compiling, refactoring, or troubleshooting uni
 
 > 🚨 **AI / Agent 必读铁律**：所有参与本项目开发的 AI、Agent 在进行任何编码、重构、修 bug 或新增页面任务前，**必须首先完整阅读本文件，并按其命中的分册继续 Read 对应参考文件**。只看本文件（入口）而不读分册就动手，视为未遵守本 Skill。
 
+> 🚫 **AI / Agent 严禁擅自修改本 Skill**：本 Skill 是项目规范知识库，AI / Agent **严禁在本 Skill 内新增、删除、改写字数、调整结构或「顺手优化」**。仅当**开发者显式、明确地要求修改本 Skill** 时，才可动本 Skill 下的任何一个文件（含 `SKILL.md` 与 `references/` 全部分册）。发现本 Skill 与实际代码不符、或觉得某条规则「应该改一改」时，**只能在回复里提出建议并等待开发者裁决，不得先改再说**。
+
 uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直接编译为原生代码（Android 编译为 Kotlin，iOS 插件编译为 Swift，鸿蒙插件编译为 ArkTS，Web/小程序编译为 JS）。  
 与宽容的 TypeScript/JavaScript 不同，UTS 采用**名义强类型系统（Nominal Strong Typing）**与**原生渲染规范**。
 

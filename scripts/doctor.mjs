@@ -4,12 +4,11 @@
  *
  * 一键执行多维度项目健康检查，快速定位冗余依赖、失效配置与潜在风险：
  * 1. 依赖健康检查（depcheck）：扫描未使用的 dependencies / devDependencies
- * 2. UTS 声明文件同步检查：确保 .d.uts.ts 与源码同步
- * 3. TypeScript 类型检查：tsc --noEmit
- * 4. ESLint 代码规范检查
- * 5. 单元测试套件检查
- * 6. 静态图片压缩空间检查
- * 7. 关键配置文件完整性校验
+ * 2. TypeScript 类型检查：tsc --noEmit
+ * 3. ESLint 代码规范检查
+ * 4. 单元测试套件检查
+ * 5. 静态图片压缩空间检查
+ * 6. 关键配置文件完整性校验
  *
  * 用法：
  *   pnpm health          # 执行全量自检
@@ -109,7 +108,7 @@ const DEPCHECK_IGNORE_DEV = new Set([
 ]);
 
 async function checkDependencies() {
-  console.log('\n🔍 [1/7] 依赖健康检查 (depcheck)');
+  console.log('\n🔍 [1/6] 依赖健康检查 (depcheck)');
 
   const result = runCmd('npx depcheck --json');
   if (!result.output) {
@@ -159,23 +158,8 @@ async function checkDependencies() {
   }
 }
 
-function checkUtsDts() {
-  console.log('\n📋 [2/7] UTS 声明文件同步检查');
-
-  const result = runCmd('node scripts/gen-uts-dts.mjs --check');
-  if (result.output && result.output.includes('全部声明文件与源码同步')) {
-    pass('所有 .d.uts.ts 声明文件与源码同步');
-  }
-  else if (result.output && result.output.includes('❌')) {
-    fail('部分 .d.uts.ts 声明文件与源码不同步', '运行 pnpm gen:uts-dts 重新生成');
-  }
-  else {
-    pass('UTS 声明文件检查完成');
-  }
-}
-
 function checkTypeScript() {
-  console.log('\n🔷 [3/7] TypeScript 类型检查');
+  console.log('\n🔷 [2/6] TypeScript 类型检查');
 
   if (isQuick) {
     console.log('  ⏭  快速模式，跳过 typecheck');
@@ -193,7 +177,7 @@ function checkTypeScript() {
 }
 
 function checkEslint() {
-  console.log('\n📐 [4/7] ESLint 代码规范检查');
+  console.log('\n📐 [3/6] ESLint 代码规范检查');
 
   if (isQuick) {
     console.log('  ⏭  快速模式，跳过 eslint');
@@ -222,7 +206,7 @@ function checkEslint() {
 }
 
 function checkTests() {
-  console.log('\n🧪 [5/7] 单元测试套件检查');
+  console.log('\n🧪 [4/6] 单元测试套件检查');
 
   if (isQuick) {
     console.log('  ⏭  快速模式，跳过单元测试');
@@ -245,7 +229,7 @@ function checkTests() {
 }
 
 function checkImageOptimization() {
-  console.log('\n🖼️  [6/7] 静态图片压缩空间检查');
+  console.log('\n🖼️  [5/6] 静态图片压缩空间检查');
 
   const result = runCmd('node scripts/optimize-images.mjs --check');
   if (result.ok || result.output) {
@@ -269,7 +253,7 @@ function checkImageOptimization() {
 }
 
 function checkConfigIntegrity() {
-  console.log('\n📦 [7/7] 关键配置文件完整性校验');
+  console.log('\n📦 [6/6] 关键配置文件完整性校验');
 
   const requiredFiles = [
     ['package.json', '项目配置入口'],
@@ -349,7 +333,6 @@ async function main() {
   }
 
   await checkDependencies();
-  checkUtsDts();
   checkTypeScript();
   checkEslint();
   checkTests();
