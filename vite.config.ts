@@ -173,8 +173,18 @@ export default defineConfig({
         './main.uts',
         './App.uvue',
         './src/pages/index/index.uvue',
-        './src/pages/index/views/IndexView.uvue'
-        // ...uniRuntimeFiles  // 不要加：会触发 crawler → rerun → 504
+        './src/pages/index/views/IndexView.uvue',
+        // 首屏实测慢模块：首页虽不直接用 login/请求库，但 uni 的页面注册会把它们拉进首屏闭包。
+        // 预热这些「裸路径」会触发整页编译，浏览器后续请求的 ?import / ?vue&type=script /
+        // ?vue&type=style 变体直接命中 moduleGraph 缓存（实测单模块 623ms → 30ms）。
+        // 注意：加 './index.html' 无效——warmup 对 html 走 transformIndexHtml('/index.html')，
+        // 与浏览器请求的 '/' 不是同一路径，且 '/' 每次重新生成（含可变 buildTime）。
+        // 这些是业务模块，不激活被 exclude 的运行时 + crawler rerun 的 504 窗口。
+        './src/pages/me/me.uvue',
+        './src/sub/auth/login.uvue',
+        './src/http/request.uts',
+        './src/router/toLoginPage.uts',
+        './src/api/auth.uts'
       ]
     },
     // H5 走代理模式时生效（.env 里 VITE_H5_USE_PROXY=true）；直连模式（false）请求不经过此代理

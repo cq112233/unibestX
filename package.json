@@ -8,12 +8,12 @@
     "pnpm": ">=10.0.0"
   },
   "scripts": {
-    "dev": "uni-launch web",
+    "dev": "node scripts/dev-warmup.mjs web",
     "dev:mp-weixin": "uni-launch mp-weixin",
     "dev:mp-alipay": "uni-launch mp-alipay",
-    "dev:web": "uni-launch web",
-    "dev:mock": "VITE_USE_MOCK=true VITE_H5_USE_PROXY=true uni-launch web",
-    "dev:vconsole": "VITE_SHOW_VCONSOLE=true uni-launch web",
+    "dev:web": "node scripts/dev-warmup.mjs web",
+    "dev:mock": "VITE_USE_MOCK=true VITE_H5_USE_PROXY=true node scripts/dev-warmup.mjs web",
+    "dev:vconsole": "VITE_SHOW_VCONSOLE=true node scripts/dev-warmup.mjs web",
     "dev:app-android": "uni-launch app-android",
     "dev:app-ios": "uni-launch app-ios --iosTarget simulator",
     "dev:app-ios:device": "uni-launch app-ios --iosTarget device",
