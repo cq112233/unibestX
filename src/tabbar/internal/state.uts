@@ -2,7 +2,7 @@ import { watch } from 'vue';
 import type { CustomTabBarItem, CustomTabBarItemBadge, TabBarConfig } from '../types.uts';
 import { customTabbarConfig } from '../config.uts';
 import { cleanPath, getCurrentPath, isSamePath } from '@/src/utils/route/index.uts';
-import { registerFullTabbarListGetter, resolveTabIndex } from './tab-key.uts';
+import { registerFullTabbarListGetter, resolveTabIndex, resolveTabIndexByKey } from './tab-key.uts';
 
 /** 组合 list 与 midButton 供自定义 TabBar 渲染（自动将 midButton 插入居中位置） */
 function buildFullTabbarList(config: TabBarConfig): CustomTabBarItem[] {
@@ -77,6 +77,23 @@ export const curIdx = ref(0);
 export function setCurIdx(idx: number): void {
   curIdx.value = idx;
   uni.setStorageSync('app-tabbar-index', idx);
+}
+
+/**
+ * 按 Tab 标识（config.uts 中该项的 `tabType`，如 'index' / 'me'）设置当前索引并持久化
+ *
+ * 相比写死的数字下标，它不随 list 顺序调整（增删 Tab、加 midButton 插位）而失效。
+ * 标识无法解析时不做任何改动，仅输出告警。
+ *
+ * @param key Tab 业务标识（也兼容数字下标的字符串形式与 pagePath）
+ */
+export function setCurIdxByKey(key: string): void {
+  const index: number = resolveTabIndexByKey(key);
+  if (index < 0) {
+    console.warn(`[tabbar] setCurIdxByKey 无法解析 Tab 标识「${key}」，请检查 config.uts 中该项的 tabType 字段`);
+    return;
+  }
+  setCurIdx(index);
 }
 
 /** 设置某项的 badge */
