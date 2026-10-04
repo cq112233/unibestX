@@ -118,7 +118,7 @@ export function runGuardCases(): void {
     next(123);
   }).pass, false);
 
-  const forgot = outcomeOf((to: RouteTarget, from: RouteTarget, next: Next): void => {
+  const forgot = outcomeOf((_to: RouteTarget, _from: RouteTarget, _next: Next): void => {
     // 故意不调用 next
   });
   check('未调用 next 时中止', forgot.pass, false);
@@ -174,10 +174,10 @@ export function runGuardCases(): void {
   console.log('\n[guard] 后置钩子');
   const afterOrder: Array<string> = [];
   resetGuards();
-  registerAfterHook((to: RouteTarget, from: RouteTarget): void => {
+  registerAfterHook((_to: RouteTarget, _from: RouteTarget): void => {
     afterOrder.push('h1');
   });
-  const unregisterAfter = registerAfterHook((to: RouteTarget, from: RouteTarget): void => {
+  const unregisterAfter = registerAfterHook((_to: RouteTarget, _from: RouteTarget): void => {
     afterOrder.push('h2');
   });
   runAfterHooks(parseUrl('/a/b', '', 'navigateTo') as RouteTarget, parseUrl('/c/d', '', 'navigateTo') as RouteTarget);
