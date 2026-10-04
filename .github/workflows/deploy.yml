@@ -1,0 +1,68 @@
+name: Deploy site to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main # 只有在 push 到 main 分支时才触发部署
+
+# 设置 GITHUB_TOKEN 的权限，允许写入仓库内容（用于发布到 gh-pages 分支）
+permissions:
+  contents: write
+
+jobs:
+  build-and-deploy:
+    concurrency: ci-${{ github.ref }} # 防止并发部署冲突
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4 # 不指定 version，自动读取 package.json 的 packageManager 字段（pnpm@10.6.1）
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Build VitePress site (官网)
+        run: pnpm run docs:build
+
+      - name: Assemble publish directory
+        run: |
+          rm -rf publish
+          mkdir -p publish
+
+          # 1. 尝试从 gh-pages 分支提取上一次已发布的静态资源，保留上一次的 H5 演示站
+          if git fetch origin gh-pages:gh-pages 2>/dev/null; then
+            echo "Found remote gh-pages branch, extracting previous H5 build..."
+            git archive gh-pages | tar -x -C publish/ 2>/dev/null || true
+            # 清理旧的 docs 目录，由本次全新构建的 docs 替换
+            rm -rf publish/docs
+          fi
+
+          # 2. 如果本次工作区有最新的 unpackage/dist/build/web，覆盖更新根目录
+          if [ -d unpackage/dist/build/web ]; then
+            echo "Found new unpackage/dist/build/web, updating root demo..."
+            cp -r unpackage/dist/build/web/. publish/
+          fi
+
+          # 3. 将本次最新构建的 VitePress 官网放到 publish/docs/
+          mkdir -p publish/docs
+          cp -r docs/.vitepress/dist/. publish/docs/
+
+          # 4. 创建 .nojekyll，防止 GitHub Pages 过滤带下划线的前端静态资源与 JSON
+          touch publish/.nojekyll
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./publish
+          force_orphan: true # 一次性发布官网 + H5 演示站，避免两个 workflow 互相覆盖
