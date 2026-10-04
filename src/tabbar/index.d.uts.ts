@@ -51,12 +51,15 @@ export declare function notifyPageHide(): void;
  * 1. 切换 Tab 到该页（curIdx 变化）——与 onTabShow 相同；
  * 2. 页面重新显示（原生 onShow：从子页面返回、App 回前台）——onTabShow 覆盖不到。
  *
- * @param index 对应 Tab 索引（0: 首页, 1: 我的）
+ * @param target Tab 标识，支持三种写法：
+ *               - 业务标识字符串（推荐）：`'index'` —— 对应 config.uts 中该项的 `tabType` 字段；
+ *               - 数字下标：`0` —— 传统写法，等价于完整列表（含 midButton）中的位置；
+ *               - 下标字符串 / pagePath：`'0'`、`'src/pages/index/index'`（兼容写法）
  * @param callback 页面显示时的回调函数
  * @param immediate 若注册时页面已经显示过且当前 Tab 正好激活，是否立即补发一次
  *                  （首次进入页面时不会再重复触发：那一次由紧随其后的 onShow 通知负责）
  */
-export declare function onTabPageShow(index: number, callback: () => void, immediate: boolean = false): void;
+export declare function onTabPageShow(target: number | string, callback: () => void, immediate: boolean = false): void;
 
 /** tabbar 白色底板高度（px），基准值统一引用 systemInfo 中的 TABBAR_BASE_HEIGHT */
 export declare const TABBAR_HEIGHT: number;
@@ -130,11 +133,14 @@ export declare function isPageTabbar(path: string): boolean;
 
 /**
  * 监听指定 Tab 激活显示（当单页面模式切换到该 Tab 时触发，可用于刷新数据或重新请求接口）
- * @param index 对应 Tab 索引（0: 首页, 1: 我的）
+ * @param target Tab 标识，支持三种写法：
+ *               - 业务标识字符串（推荐）：`'index'` —— 对应 config.uts 中该项的 `tabType` 字段；
+ *               - 数字下标：`0` —— 传统写法，等价于完整列表（含 midButton）中的位置；
+ *               - 下标字符串 / pagePath：`'0'`、`'src/pages/index/index'`（兼容写法）
  * @param callback 激活显示时的回调函数
  * @param immediate 若首次加载时当前 Tab 正好处于激活状态，是否立即执行一次（默认 false）
  */
-export declare function onTabShow(index: number, callback: () => void, immediate: boolean = false): void;
+export declare function onTabShow(target: number | string, callback: () => void, immediate: boolean = false): void;
 
 /**
  * Tabbar 策略映射结构类型
@@ -185,12 +191,33 @@ export declare const needTabbarBottomPadding: boolean;
 /** 底部 TabBar 统一预留内边距类名：自定义/单页 TabBar 时返回 'pb-[80px]'，无 TabBar 或原生 TabBar 时返回 '' */
 export declare const tabbarBottomPaddingClass: string;
 
+/** 由 state.uts 注册完整列表 getter，供本模块解析 index 时取用（仅内部使用） */
+export declare function registerFullTabbarListGetter(getter: () => CustomTabBarItem[] | null): void;
+
+/**
+ * 将「Tab 标识」解析为「curIdx 数字下标」
+ * @param key 业务标识字符串（如 'index' / 'me'），或数字下标的字符串形式（如 '0'）
+ */
+export declare function resolveTabIndexByKey(key: string): number;
+
 /** badge 类型：数字或小红点 */
 export type CustomTabBarItemBadge = number | 'dot';
 
 /** 自定义 tabbar 单项配置 */
 export type CustomTabBarItem = {
-  /** 显示文本（支持 i18n key，如 tabbar.home） */
+  /**
+   * 该项的业务标识（如 'index' / 'me'），供 onTabShow / onTabPageShow 按标识订阅
+   *
+   * ⚠️ 这是业务自定义字段，不是 uni-app 原生 tabBar 规范字段：
+   * 不参与「自定义 TabBar 模式」（模式 2 / 3 / 4）的 UI 渲染，
+   * 仅用于生成 pages.json 原生 tabBar 配置（模式 1 需要页面级唯一键）；
+   * 自定义模式下由 `src/tabbar/internal/tab-key.uts` 按 list 下标读取。
+   * 未配置时回退为 `tab-${下标}`。
+   *
+   * 命名刻意避开 `type`，以免与 TabBarConfig.type（胶囊/贴底形态）混淆。
+   */
+  tabType?: string;
+  /** 显示文本 */
   text: string;
   /** 页面路径（不带前导 /） */
   pagePath: string;

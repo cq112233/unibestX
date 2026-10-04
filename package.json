@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "packageManager": "pnpm@10.6.1",
   "description": "unibestX - 最好的 uni-app X 开发框架",
+  "engines": {
+    "node": ">=22.0.0",
+    "pnpm": ">=10.0.0"
+  },
   "scripts": {
     "dev": "uni-launch web",
     "dev:mp-weixin": "uni-launch mp-weixin",
@@ -46,8 +50,8 @@
     "gen:uts-dts": "node scripts/gen-uts-dts.mjs",
     "check:uts-dts": "node scripts/gen-uts-dts.mjs --check",
     "sandbox:reset": "node scripts/reset-sandbox.mjs",
-    "doctor": "node scripts/doctor.mjs",
-    "doctor:quick": "node scripts/doctor.mjs --quick",
+    "health": "node scripts/doctor.mjs",
+    "health:quick": "node scripts/doctor.mjs --quick",
     "prepare": "husky"
   },
   "dependencies": {

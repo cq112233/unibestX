@@ -200,13 +200,13 @@ onNavbarPullDownRefresh(() => {
   }
 });
 
-// 监听 Tab 切换到当前首页（索引 0）时触发
-onTabShow(0, () => {
+// 监听 Tab 切换到当前首页（config.uts 中 type: 'index'）时触发
+onTabShow('index', () => {
   console.log('onTabShow 首页 Tab 显示');
 }, true);
 
 // 监听首页 Tab 页面显示（切 Tab、从子页面返回、前台恢复都会触发）
-onTabPageShow(0, () => {
+onTabPageShow('index', () => {
   console.log('onTabPageShow 首页 Tab 显示');
 }, true);
 
