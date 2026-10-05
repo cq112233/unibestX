@@ -330,6 +330,10 @@ configs.push({
       RequestTask: 'readonly',
       UploadTask: 'readonly',
       DownloadTask: 'readonly',
+      // uni-app X 原生路由事件类型（onBeforeAppRoute / onAppRoute 回调参数，5.25+）
+      BeforeAppRouteEvent: 'readonly',
+      AppRouteEvent: 'readonly',
+      AppRouteOpenType: 'readonly',
       AppThemeChangeResult: 'readonly',
       OsThemeChangeResult: 'readonly',
       OnHostThemeChangeCallbackResult: 'readonly',
