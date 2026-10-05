@@ -8,6 +8,12 @@
  * 修改 `index.uts` 的导出后，重新执行：node scripts/gen-uts-dts.mjs
  * 校验是否已同步：node scripts/gen-uts-dts.mjs --check
  */
+/** 隐私页路径（首启闸门与再确认共用，用 mode 区分场景） */
+export declare const PRIVACY_PAGE: string;
+
+/** 再确认场景的 query 标记，对应隐私页 onLoad 里读的 mode 参数 */
+export declare const MODE_RECONFIRM: string;
+
 /** 是否已同意隐私政策（不校验版本） */
 export declare function hasPrivacyAgreed(): boolean;
 
@@ -28,3 +34,14 @@ export declare function clearPrivacyAgreed(): void;
  * - 已同意且版本落后：返回 true
  */
 export declare function needsPrivacyReconfirm(): boolean;
+
+/**
+ * 冷启动隐私闸门：在 App.onLaunch 中调用，负责跳转与拦截。
+ *
+ * @returns true 表示已放行（可继续执行后续启动逻辑）；false 表示已跳转隐私页，
+ *          调用方应立即 return，终止本次启动流程。
+ *
+ * 注意：本函数只做「判定 + 跳转」，不负责主题 / TabBar 初始化 ——
+ * 调用方需保证这些初始化已完成，隐私页才能拿到主题与布局。
+ */
+export declare function runPrivacyGate(): boolean;

@@ -1,48 +1,39 @@
 // ==========================================
 // 文件位置：src/api/privacy/privacy.uts（对应页面 src/sub/privacy/）
-// 隐私页内容契约：协议文案与链接。
-// 开发期：函数体返回本地配置；后端/配置中心就绪时只换函数体，签名一字不改。
+//
+// 隐私页内容契约：标题 / 摘要 / 按钮文案。协议链接不在此下发 ——
+// 它是前端可配置项（src/utils/privacy/config.uts），上架前必须填真实地址。
+//
+// 开发期：函数体返回本地数据集；后端 / 配置中心就绪时只换函数体，签名一字不改。
 // ==========================================
-
-/** 协议条目：可点击打开的协议文档 */
-export type PrivacyAgreementItem = {
-  /** 唯一标识：user / policy */
-  key: string;
-  /** 展示名，如「用户协议」 */
-  label: string;
-  /** 文档链接；空串表示未配置，点击时应提示而不是静默失败 */
-  url: string;
-};
 
 /** 隐私页展示内容 */
 export type PrivacyContent = {
+  /** 页面标题 */
   title: string;
-  /** 首启场景摘要 */
+  /** 首启场景摘要文案 */
   summary: string;
-  /** 协议版本变更后再确认场景的摘要 */
+  /** 协议版本变更后再确认场景的摘要文案 */
   reconfirmSummary: string;
-  /** 协议列表 */
-  agreements: Array<PrivacyAgreementItem>;
   /** 首启场景主按钮文案 */
   agreeText: string;
   /** 再确认场景主按钮文案 */
   reconfirmAgreeText: string;
-  /** 拒绝按钮文案 */
+  /** 拒绝按钮文案（仅首启场景展示） */
   rejectText: string;
 };
 
-// 页面结构与文案固化在前端，不随环境变化；协议链接由隐私配置在页面侧注入
+// 合规声明属前端固化文案，不随环境变化，也不由后端下发
 const MOCK_PRIVACY_CONTENT: PrivacyContent = {
   title: '用户协议与隐私政策',
   summary: '在使用本应用前，请阅读并同意《用户协议》与《隐私政策》。我们会在你使用服务时收集必要的设备与应用信息，用于保障服务正常运行与改进体验。',
   reconfirmSummary: '我们更新了《用户协议》与《隐私政策》。请阅读并确认后继续使用本应用。',
-  agreements: [],
   agreeText: '同意并进入应用',
   reconfirmAgreeText: '同意并继续',
   rejectText: '不同意并退出'
 };
 
-/** 获取隐私页展示内容（协议链接由配置注入，未配置时 url 为空串） */
+/** 获取隐私页展示内容 */
 export function fetchPrivacyContent(): Promise<PrivacyContent> {
   return Promise.resolve(MOCK_PRIVACY_CONTENT);
 }
