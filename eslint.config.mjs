@@ -326,6 +326,10 @@ configs.push({
       RedirectToOptions: 'readonly',
       ReLaunchOptions: 'readonly',
       SwitchTabOptions: 'readonly',
+      // uni-app X 原生异步任务类型（request/upload/download 返回，均带 abort()）
+      RequestTask: 'readonly',
+      UploadTask: 'readonly',
+      DownloadTask: 'readonly',
       AppThemeChangeResult: 'readonly',
       OsThemeChangeResult: 'readonly',
       OnHostThemeChangeCallbackResult: 'readonly',

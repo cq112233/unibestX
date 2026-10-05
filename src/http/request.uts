@@ -1,11 +1,29 @@
 import { Request } from '@/uni_modules/lime-request';
-import type { LimeRequestConfig, LimeRequestFail, LimeRequestResponse } from '@/uni_modules/lime-request';
+import type { LimeRequestConfig, LimeRequestFail, LimeRequestResponse, LimeRequestTask } from '@/uni_modules/lime-request';
 import { useTokenStore } from '@/src/store';
 import { toLoginPage } from '../router/toLoginPage';
 import { ContentTypeEnum, ResultEnum, ShowMessage } from './tools/enum';
 import { claimRefreshFailure, tryRefreshToken } from './refresh.uts';
+import {
+  buildRequestKey,
+  clearCache,
+  clearTask,
+  consumeAborted,
+  getCache,
+  getInflight,
+  isAborted,
+  readExtraBoolean,
+  readExtraNumber,
+  readExtraString,
+  registerTask,
+  setCache,
+  setInflight
+} from './lifecycle.uts';
 
 import { getApiBaseUrl, getApiSecondaryUrl, getH5UseProxy } from '../utils/env/index.uts';
+
+export { abortAllHttp, abortHttp } from './lifecycle.uts';
+export { clearCache } from './lifecycle.uts';
 
 /**
  * 401 哨兵：拦截器抛出它表示「应尝试刷新并重放」，由 HttpClient.request 捕获。
@@ -100,6 +118,14 @@ requestInstance.interceptors.request.use(
         config.baseURL = domain;
       }
     }
+    // 登记 RequestTask，使 abortHttp(requestKey) 能取消这次请求。
+    // 注意必须在 config 上原地挂 getTask，不能包一层覆盖掉调用方已有的 getTask。
+    const requestKey = readExtraString(config, 'requestKey');
+    if (requestKey != '') {
+      config.getTask = (task: LimeRequestTask) => {
+        registerTask(requestKey, task);
+      };
+    }
     return config;
   },
   (error: LimeRequestFail): Promise<LimeRequestFail> => {
@@ -119,11 +145,11 @@ requestInstance.interceptors.response.use(
       return response;
     }
     const statusCode = response.statusCode;
-    if (statusCode != 200) {
+    if (statusCode != ResultEnum.Success200) {
       const errorMessage = ShowMessage(statusCode);
       console.error('errorMessage===>', errorMessage);
       uni.showToast({ title: errorMessage, icon: 'error' });
-      if (statusCode == 401) {
+      if (statusCode == ResultEnum.Unauthorized) {
         // 是否跳过自动刷新（刷新接口自身 / 明确声明不需要刷新的请求）
         let skipRefresh = false;
         if (extra != null) {
@@ -134,7 +160,7 @@ requestInstance.interceptors.response.use(
         }
         if (skipRefresh) {
           // 抛错即可，交由调用方处理；绝不在此清 token，避免刷新失败连锁登出
-          throw new Error(`未授权[401]：${response.errMsg}`);
+          throw new Error(`未授权[${ResultEnum.Unauthorized}]：${response.errMsg}`);
         }
         // 标记为可刷新错误，由 HttpClient.request 捕获后刷新并重放一次
         throw new Error(REFRESHABLE_401);
@@ -261,7 +287,62 @@ function toError(err: any): Error {
 
 export class HttpClient {
   request<T>(config: LimeRequestConfig): Promise<T> {
-    return this.send<T>(config).catch((err: any): Promise<T> => {
+    const fingerprint = buildRequestKey(config);
+    const isGet = config.method == null || config.method == 'GET';
+
+    // 已被取消：直接失败，不发请求
+    if (isAborted(fingerprint)) {
+      consumeAborted(fingerprint);
+      return Promise.reject(new Error('请求已取消')) as Promise<T>;
+    }
+
+    // GET 默认并发去重：同指纹已在飞则复用同一份 Promise
+    const useDedupe = isGet && readExtraBoolean(config, 'dedupe') != false;
+    if (useDedupe) {
+      const pending = getInflight<T>(fingerprint);
+      if (pending != null) {
+        return pending;
+      }
+    }
+
+    // GET TTL 缓存：显式传 cacheTtl > 0 才启用
+    const cacheTtl = isGet ? readExtraNumber(config, 'cacheTtl') : 0;
+    if (cacheTtl > 0) {
+      const cached = getCache(fingerprint);
+      if (cached != null) {
+        try {
+          return Promise.resolve(JSON.parse(cached) as T);
+        }
+        catch (_) {
+          // 缓存脏数据：清掉后走真实请求
+          clearCache(fingerprint);
+        }
+      }
+    }
+
+    const task = this.execute<T>(config, fingerprint, cacheTtl);
+    if (useDedupe) {
+      setInflight<T>(fingerprint, task);
+    }
+    return task;
+  }
+
+  /** 真实请求流程：send → 401 刷新重放，并在收尾时清理任务登记 */
+  private execute<T>(config: LimeRequestConfig, fingerprint: string, cacheTtl: number): Promise<T> {
+    const requestKey = readExtraString(config, 'requestKey');
+    const done = (data: T): T => {
+      clearTask(requestKey);
+      this.cacheIfNeeded(fingerprint, cacheTtl, data);
+      return data;
+    };
+    return this.send<T>(config).then(done).catch((err: any): Promise<T> => {
+      clearTask(requestKey);
+      // 主动取消：静默失败，不弹 toast、不触发登录收尾
+      if (isAborted(requestKey) || isAborted(fingerprint)) {
+        consumeAborted(requestKey);
+        consumeAborted(fingerprint);
+        return Promise.reject(new Error('请求已取消')) as Promise<T>;
+      }
       // 非 401 哨兵错误：原样抛出
       if (!isRefreshable401(err)) {
         throw toError(err);
@@ -274,7 +355,8 @@ export class HttpClient {
         }
         // 刷新成功：用同一份 config 重放一次（不递归，避免无限刷新）
         const replayConfig = cloneConfig(config);
-        return this.send<T>(replayConfig).catch((replayErr: any): Promise<T> => {
+        return this.send<T>(replayConfig).then(done).catch((replayErr: any): Promise<T> => {
+          clearTask(requestKey);
           // 重放仍 401：刷新出来的 token 依然无效，只收尾一次
           if (isRefreshable401(replayErr)) {
             this.handleUnauthorizedOnce();
@@ -299,6 +381,17 @@ export class HttpClient {
     const tokenStore = useTokenStore();
     tokenStore.clearToken();
     toLoginPage({ mode: 'reLaunch' } as UTSJSONObject);
+  }
+
+  /** 成功结果按需写入 TTL 缓存；序列化失败则跳过，不影响本次返回 */
+  private cacheIfNeeded<T>(fingerprint: string, cacheTtl: number, data: T): void {
+    if (cacheTtl <= 0) {
+      return;
+    }
+    try {
+      setCache(fingerprint, JSON.stringify(data), cacheTtl);
+    }
+    catch (_) {}
   }
 
   /** 实际发出请求并解包业务数据 */

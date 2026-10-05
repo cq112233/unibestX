@@ -25,7 +25,21 @@ export type AuthUserInfo = {
 export type LoginResult = {
   token: string;
   expiresIn: number;
+  /** 双 token 模式：用于 401 时静默换取新 accessToken */
+  refreshToken: string;
+  refreshExpiresIn: number;
   userInfo: AuthUserInfo;
+};
+
+export type RefreshTokenParams = {
+  refreshToken: string;
+};
+
+export type RefreshTokenResult = {
+  accessToken: string;
+  accessExpiresIn: number;
+  refreshToken: string;
+  refreshExpiresIn: number;
 };
 
 /**
@@ -39,6 +53,14 @@ export declare function login(params: LoginParams): Promise<LoginResult>;
  * 获取当前登录用户信息
  */
 export declare function fetchUserInfo(): Promise<AuthUserInfo>;
+
+/**
+ * 刷新 accessToken
+ *
+ * ⚠️ extra.skipRefresh 必须保留：该标记让 request.uts 的拦截器在本次请求 401 时
+ * 直接失败、不再触发刷新，否则刷新接口自身 401 会形成无限递归。
+ */
+export declare function refreshAccessToken(params: RefreshTokenParams): Promise<RefreshTokenResult>;
 
 /**
  * 退出登录接口
