@@ -22,7 +22,21 @@ export type AuthUserInfo = {
 export type LoginResult = {
   token: string;
   expiresIn: number;
+  /** 双 token 模式：用于 401 时静默换取新 accessToken */
+  refreshToken: string;
+  refreshExpiresIn: number;
   userInfo: AuthUserInfo;
+};
+
+export type RefreshTokenParams = {
+  refreshToken: string;
+};
+
+export type RefreshTokenResult = {
+  accessToken: string;
+  accessExpiresIn: number;
+  refreshToken: string;
+  refreshExpiresIn: number;
 };
 
 // ==========================================
@@ -41,6 +55,8 @@ const MOCK_USER_INFO: AuthUserInfo = {
 const MOCK_LOGIN_RESULT: LoginResult = {
   token: 'mock-token-UNIX-123456',
   expiresIn: 7200,
+  refreshToken: 'mock-refresh-UNIX-654321',
+  refreshExpiresIn: 604800,
   userInfo: MOCK_USER_INFO
 };
 
@@ -65,6 +81,8 @@ export function login(params: LoginParams): Promise<LoginResult> {
     return {
       token: data.getString('token') ?? `mock-token-${Date.now()}`,
       expiresIn: data.getNumber('expiresIn') ?? 7200,
+      refreshToken: data.getString('refreshToken') ?? `mock-refresh-${Date.now()}`,
+      refreshExpiresIn: data.getNumber('refreshExpiresIn') ?? 604800,
       userInfo: {
         userId: rawUser?.getNumber('userId') ?? 1001,
         username: rawUser?.getString('username') ?? params.username,
@@ -77,6 +95,8 @@ export function login(params: LoginParams): Promise<LoginResult> {
     const fallback: LoginResult = {
       token: MOCK_LOGIN_RESULT.token,
       expiresIn: MOCK_LOGIN_RESULT.expiresIn,
+      refreshToken: MOCK_LOGIN_RESULT.refreshToken,
+      refreshExpiresIn: MOCK_LOGIN_RESULT.refreshExpiresIn,
       userInfo: {
         userId: MOCK_USER_INFO.userId,
         username: params.username.length > 0 ? params.username : MOCK_USER_INFO.username,
@@ -104,6 +124,37 @@ export function fetchUserInfo(): Promise<AuthUserInfo> {
     } as AuthUserInfo;
   }).catch((_err: any): Promise<AuthUserInfo> => {
     return Promise.resolve(MOCK_USER_INFO);
+  });
+}
+
+/**
+ * 刷新 accessToken
+ *
+ * ⚠️ extra.skipRefresh 必须保留：该标记让 request.uts 的拦截器在本次请求 401 时
+ * 直接失败、不再触发刷新，否则刷新接口自身 401 会形成无限递归。
+ */
+export function refreshAccessToken(params: RefreshTokenParams): Promise<RefreshTokenResult> {
+  return http.post<UTSJSONObject>('/auth/refresh', params, {
+    extra: {
+      skipRefresh: true,
+      ignoreAuth: true,
+      toast: false
+    } as UTSJSONObject
+  } as LimeRequestConfig).then((data: UTSJSONObject): RefreshTokenResult => {
+    return {
+      accessToken: data.getString('accessToken') ?? data.getString('token') ?? '',
+      accessExpiresIn: data.getNumber('accessExpiresIn') ?? 7200,
+      refreshToken: data.getString('refreshToken') ?? params.refreshToken,
+      refreshExpiresIn: data.getNumber('refreshExpiresIn') ?? 604800
+    } as RefreshTokenResult;
+  }).catch((_err: any): Promise<RefreshTokenResult> => {
+    const fallback: RefreshTokenResult = {
+      accessToken: `mock-token-refreshed-${Date.now()}`,
+      accessExpiresIn: 7200,
+      refreshToken: params.refreshToken,
+      refreshExpiresIn: 604800
+    };
+    return Promise.resolve(fallback);
   });
 }
 
