@@ -3,6 +3,7 @@ import type { LimeRequestConfig, LimeRequestFail, LimeRequestResponse, LimeReque
 import { useTokenStore } from '@/src/store';
 import { toLoginPage } from '../router/toLoginPage';
 import { ContentTypeEnum, ResultEnum, ShowMessage } from './tools/enum';
+import { resolveErrorMessage } from '@/src/http/error/index.uts';
 import { claimRefreshFailure, tryRefreshToken } from './refresh.uts';
 import {
   buildRequestKey,
@@ -148,7 +149,8 @@ requestInstance.interceptors.response.use(
     if (statusCode != ResultEnum.Success200) {
       const errorMessage = ShowMessage(statusCode);
       console.error('errorMessage===>', errorMessage);
-      uni.showToast({ title: errorMessage, icon: 'error' });
+      // 面向用户统一走归一文案（离线 / 超时 / HTTP 分类），技术文案只留在日志与抛错里
+      uni.showToast({ title: resolveErrorMessage(errorMessage, statusCode).message, icon: 'error' });
       if (statusCode == ResultEnum.Unauthorized) {
         // 是否跳过自动刷新（刷新接口自身 / 明确声明不需要刷新的请求）
         let skipRefresh = false;
@@ -211,7 +213,13 @@ requestInstance.interceptors.response.use(
   },
   (error: LimeRequestFail): Promise<LimeRequestFail> => {
     console.error('request error ===>', error);
-    uni.showToast({ title: '网络错误，请稍后再试', icon: 'none' });
+    // 站在网络失败分支，直接把原始 errMsg 交给归一器，可区分超时 / 离线 / 其它网络错误
+    const rawMsg = error.errMsg != null ? `${error.errMsg}` : '';
+    // 主动取消（abortHttp）不是错误，静默失败，不弹 toast 打扰用户
+    if (rawMsg.toLowerCase().includes('abort')) {
+      return Promise.reject(error) as Promise<LimeRequestFail>;
+    }
+    uni.showToast({ title: resolveErrorMessage(rawMsg, -1).message, icon: 'none' });
     return Promise.reject(error) as Promise<LimeRequestFail>;
   }
 );
