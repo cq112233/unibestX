@@ -1,0 +1,61 @@
+/**
+ * 隐私合规闸门
+ *
+ * 两级判定：
+ * 1. hasPrivacyAgreed()       —— 是否已同意过（首启闸门）
+ * 2. needsPrivacyReconfirm()  —— 已同意但本地记录的政策版本落后于配置版本
+ *
+ * 冷启动用法见 App.uvue：未首启同意 → 隐私页；已同意但需再确认 → 隐私页（reconfirm 模式）。
+ */
+
+// 配置文件同层，沿用项目 tabbar/config.uts 的「配置与模块同目录」约定
+import { privacyConfig } from './config.uts';
+
+const KEY_AGREED = 'privacy_agreed';
+const KEY_VERSION = 'privacy_agreed_version';
+const AGREED_VALUE = '1';
+
+/** 是否已同意隐私政策（不校验版本） */
+export function hasPrivacyAgreed(): boolean {
+  const v = uni.getStorageSync(KEY_AGREED);
+  return v != null && v === AGREED_VALUE;
+}
+
+/** 本地记录的用户已同意的协议版本；无记录返回空串 */
+export function getAgreedPrivacyVersion(): string {
+  const v = uni.getStorageSync(KEY_VERSION);
+  if (v == null || v == '') {
+    return '';
+  }
+  return `${v}`;
+}
+
+/** 写入同意状态，并记录当前政策版本 */
+export function setPrivacyAgreed(): void {
+  uni.setStorageSync(KEY_AGREED, AGREED_VALUE);
+  uni.setStorageSync(KEY_VERSION, privacyConfig.policyVersion);
+}
+
+/** 清除同意状态（仅调试用，正式包不要暴露入口） */
+export function clearPrivacyAgreed(): void {
+  uni.removeStorageSync(KEY_AGREED);
+  uni.removeStorageSync(KEY_VERSION);
+}
+
+/**
+ * 是否需要因协议版本变更而重新确认。
+ *
+ * - 未首启同意：返回 false（走首启闸门，不走再确认）
+ * - 已同意但无版本记录（老数据）：返回 true，补一次确认
+ * - 已同意且版本落后：返回 true
+ */
+export function needsPrivacyReconfirm(): boolean {
+  if (!hasPrivacyAgreed()) {
+    return false;
+  }
+  const local = getAgreedPrivacyVersion();
+  if (local == '') {
+    return true;
+  }
+  return local != privacyConfig.policyVersion;
+}

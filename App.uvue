@@ -3,6 +3,7 @@ import { checkDirectEntry } from './src/router/interceptor.uts';
 import { useAppStore } from './src/store';
 import { initNativeMidButtonTap } from '@/src/tabbar/index.uts';
 import { applyThemeColor, themeColor } from '@/src/utils/theme/index.uts';
+import { hasPrivacyAgreed, needsPrivacyReconfirm } from '@/src/utils/privacy/index.uts';
 
 onLaunch(() => {
   // 提前实例化 App Store（含持久化还原），并初始化外观模式：跟随系统 / 浅色 / 深色
@@ -15,6 +16,18 @@ onLaunch(() => {
   }
   // 注册原生 TabBar 中间按钮监听（仅在原生模式且配置了 midButton 时生效）
   initNativeMidButtonTap();
+
+  // 隐私合规闸门：未同意走首启页；已同意但协议版本落后走再确认
+  // 放在 TabBar / 主题初始化之后，保证隐私页本身也能拿到主题与布局
+  if (!hasPrivacyAgreed()) {
+    uni.reLaunch({ url: '/src/sub/privacy/privacy' });
+    return;
+  }
+  if (needsPrivacyReconfirm()) {
+    uni.reLaunch({ url: '/src/sub/privacy/privacy?mode=reconfirm' });
+    return;
+  }
+
   // #ifdef MP-WEIXIN
   // 微信小程序真机 @font-face 不生效，使用 uni.loadFontFace 加载 uni-icons 字体
   uni.loadFontFace({

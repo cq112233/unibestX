@@ -47,7 +47,6 @@ export const useUserStore = defineStore('user', () => {
       nickname: defaultUserInfo.nickname,
       avatar: defaultUserInfo.avatar
     };
-    uni.removeStorageSync('user');
   }
 
   return {

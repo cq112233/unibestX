@@ -5,7 +5,7 @@ import type { LimeRequestConfig } from '@/uni_modules/lime-request';
 // 1. 类型定义（遵循规范：一律使用 type，严禁 interface）
 // ==========================================
 
-export type LoginParams = {
+export type LoginQuery = {
   username: string;
   password: string;
 };
@@ -28,7 +28,7 @@ export type LoginResult = {
   userInfo: AuthUserInfo;
 };
 
-export type RefreshTokenParams = {
+export type RefreshTokenQuery = {
   refreshToken: string;
 };
 
@@ -69,7 +69,7 @@ const MOCK_LOGIN_RESULT: LoginResult = {
  * 运行 pnpm dev:mock 时发起网络请求并由根目录 mock/auth.ts 拦截响应
  * 离线无服务时平滑降级回退到本地 UTS Mock 数据
  */
-export function login(params: LoginParams): Promise<LoginResult> {
+export function login(params: LoginQuery): Promise<LoginResult> {
   return http.post<UTSJSONObject>('/auth/login', params, {
     extra: {
       ignoreAuth: true
@@ -133,7 +133,7 @@ export function fetchUserInfo(): Promise<AuthUserInfo> {
  * ⚠️ extra.skipRefresh 必须保留：该标记让 request.uts 的拦截器在本次请求 401 时
  * 直接失败、不再触发刷新，否则刷新接口自身 401 会形成无限递归。
  */
-export function refreshAccessToken(params: RefreshTokenParams): Promise<RefreshTokenResult> {
+export function refreshAccessToken(params: RefreshTokenQuery): Promise<RefreshTokenResult> {
   return http.post<UTSJSONObject>('/auth/refresh', params, {
     extra: {
       skipRefresh: true,

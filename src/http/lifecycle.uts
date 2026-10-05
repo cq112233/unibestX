@@ -43,33 +43,48 @@ const cacheMap = new Map<string, CacheEntry>();
 // 1. requestKey 读写
 // ==========================================
 
-/** 从 config.extra 读取字符串字段，缺失返回空串 */
+/**
+ * 从 config.extra 读取字符串字段，缺失返回空串。
+ *
+ * extra 在真机上是 UTSJSONObject（走 getString），但在 H5/测试等 JS 运行时
+ * 可能是普通对象字面量（没有 getString 方法），故必须先探方法是否存在，
+ * 回退到下标取值 —— 与 request.uts 读取 ignoreAuth 的写法保持一致。
+ */
 export function readExtraString(config: LimeRequestConfig, key: string): string {
   const extra = config.extra;
   if (extra == null) {
     return '';
   }
-  const v = (extra as UTSJSONObject).getString(key);
+  const extraObj = extra as UTSJSONObject;
+  const v = typeof extraObj.getString == 'function'
+    ? extraObj.getString(key)
+    : (extraObj[key] as string | null);
   return v != null ? v : '';
 }
 
-/** 从 config.extra 读取数字字段，缺失返回 0 */
+/** 从 config.extra 读取数字字段，缺失返回 0（取值方式说明见 readExtraString） */
 export function readExtraNumber(config: LimeRequestConfig, key: string): number {
   const extra = config.extra;
   if (extra == null) {
     return 0;
   }
-  const v = (extra as UTSJSONObject).getNumber(key);
+  const extraObj = extra as UTSJSONObject;
+  const v = typeof extraObj.getNumber == 'function'
+    ? extraObj.getNumber(key)
+    : (extraObj[key] as number | null);
   return v != null ? v : 0;
 }
 
-/** 从 config.extra 读取布尔字段，缺失返回 false */
+/** 从 config.extra 读取布尔字段，缺失返回 false（取值方式说明见 readExtraString） */
 export function readExtraBoolean(config: LimeRequestConfig, key: string): boolean {
   const extra = config.extra;
   if (extra == null) {
     return false;
   }
-  const v = (extra as UTSJSONObject).getBoolean(key);
+  const extraObj = extra as UTSJSONObject;
+  const v = typeof extraObj.getBoolean == 'function'
+    ? extraObj.getBoolean(key)
+    : (extraObj[key] as boolean | null);
   return v != null && v == true;
 }
 

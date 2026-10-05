@@ -8,7 +8,7 @@
  * 修改 `auth.uts` 的导出后，重新执行：node scripts/gen-uts-dts.mjs
  * 校验是否已同步：node scripts/gen-uts-dts.mjs --check
  */
-export type LoginParams = {
+export type LoginQuery = {
   username: string;
   password: string;
 };
@@ -31,7 +31,7 @@ export type LoginResult = {
   userInfo: AuthUserInfo;
 };
 
-export type RefreshTokenParams = {
+export type RefreshTokenQuery = {
   refreshToken: string;
 };
 
@@ -47,7 +47,7 @@ export type RefreshTokenResult = {
  * 运行 pnpm dev:mock 时发起网络请求并由根目录 mock/auth.ts 拦截响应
  * 离线无服务时平滑降级回退到本地 UTS Mock 数据
  */
-export declare function login(params: LoginParams): Promise<LoginResult>;
+export declare function login(params: LoginQuery): Promise<LoginResult>;
 
 /**
  * 获取当前登录用户信息
@@ -60,7 +60,7 @@ export declare function fetchUserInfo(): Promise<AuthUserInfo>;
  * ⚠️ extra.skipRefresh 必须保留：该标记让 request.uts 的拦截器在本次请求 401 时
  * 直接失败、不再触发刷新，否则刷新接口自身 401 会形成无限递归。
  */
-export declare function refreshAccessToken(params: RefreshTokenParams): Promise<RefreshTokenResult>;
+export declare function refreshAccessToken(params: RefreshTokenQuery): Promise<RefreshTokenResult>;
 
 /**
  * 退出登录接口

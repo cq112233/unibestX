@@ -15,7 +15,8 @@ export class TokenStore extends PiniaStoreBase {
     accessExpiresIn: 0,
     refreshToken: '',
     refreshExpiresIn: 0,
-    tokenExpireTime: 0
+    tokenExpireTime: 0,
+    refreshTokenExpireTime: 0
   });
 
   // 2. constructor
@@ -37,6 +38,7 @@ export class TokenStore extends PiniaStoreBase {
     this.state.refreshToken = '';
     this.state.refreshExpiresIn = 0;
     this.state.tokenExpireTime = 0;
+    this.state.refreshTokenExpireTime = 0;
   }
 
   override _hydrate(_data: UTSJSONObject): void {
@@ -54,6 +56,8 @@ export class TokenStore extends PiniaStoreBase {
       this.state.refreshExpiresIn = _data.refreshExpiresIn as number;
     if (_data.tokenExpireTime != null)
       this.state.tokenExpireTime = _data.tokenExpireTime as number;
+    if (_data.refreshTokenExpireTime != null)
+      this.state.refreshTokenExpireTime = _data.refreshTokenExpireTime as number;
   }
 
   override _serialize(): UTSJSONObject {
@@ -64,7 +68,8 @@ export class TokenStore extends PiniaStoreBase {
       accessExpiresIn: this.state.accessExpiresIn,
       refreshToken: this.state.refreshToken,
       refreshExpiresIn: this.state.refreshExpiresIn,
-      tokenExpireTime: this.state.tokenExpireTime
+      tokenExpireTime: this.state.tokenExpireTime,
+      refreshTokenExpireTime: this.state.refreshTokenExpireTime
     } as UTSJSONObject;
   }
 
@@ -78,9 +83,7 @@ export class TokenStore extends PiniaStoreBase {
   setSingleToken(res: ISingleTokenRes): void {
     this.state.token = res.token;
     this.state.expiresIn = res.expiresIn;
-    const expireTime = Date.now() + res.expiresIn * 1000;
-    this.state.tokenExpireTime = expireTime;
-    uni.setStorageSync('accessTokenExpireTime', expireTime);
+    this.state.tokenExpireTime = Date.now() + res.expiresIn * 1000;
   }
 
   /**
@@ -92,10 +95,8 @@ export class TokenStore extends PiniaStoreBase {
     this.state.refreshToken = res.refreshToken;
     this.state.refreshExpiresIn = res.refreshExpiresIn;
     const now = Date.now();
-    const expireTime = now + res.accessExpiresIn * 1000;
-    this.state.tokenExpireTime = expireTime;
-    uni.setStorageSync('accessTokenExpireTime', expireTime);
-    uni.setStorageSync('refreshTokenExpireTime', now + res.refreshExpiresIn * 1000);
+    this.state.tokenExpireTime = now + res.accessExpiresIn * 1000;
+    this.state.refreshTokenExpireTime = now + res.refreshExpiresIn * 1000;
   }
 
   /**
@@ -103,8 +104,6 @@ export class TokenStore extends PiniaStoreBase {
    */
   clearToken(): void {
     this._doReset();
-    uni.removeStorageSync('accessTokenExpireTime');
-    uni.removeStorageSync('refreshTokenExpireTime');
   }
 
   /**
@@ -122,15 +121,6 @@ export class TokenStore extends PiniaStoreBase {
    * 检查 accessToken 是否有效（未过期）
    */
   isTokenValid(): boolean {
-    if (this.state.tokenExpireTime <= 0) {
-      const val = uni.getStorageSync('accessTokenExpireTime');
-      if (val != null && val != '') {
-        const num = Number.parseFloat(val.toString());
-        if (!isNaN(num)) {
-          this.state.tokenExpireTime = num;
-        }
-      }
-    }
     return this.state.tokenExpireTime > 0 && Date.now() < this.state.tokenExpireTime;
   }
 
@@ -138,13 +128,7 @@ export class TokenStore extends PiniaStoreBase {
    * 检查 refreshToken 是否有效（未过期）
    */
   isRefreshTokenValid(): boolean {
-    const val = uni.getStorageSync('refreshTokenExpireTime');
-    if (val == null || val == '')
-      return false;
-    const num = Number.parseFloat(val.toString());
-    if (isNaN(num))
-      return false;
-    return Date.now() < num;
+    return this.state.refreshTokenExpireTime > 0 && Date.now() < this.state.refreshTokenExpireTime;
   }
 
   /**

@@ -53,8 +53,10 @@ export type ITokenState = {
   accessExpiresIn: number;
   refreshToken: string;
   refreshExpiresIn: number;
-  /** Token 过期时间戳 (ms) */
+  /** AccessToken 过期时间戳 (ms) */
   tokenExpireTime: number;
+  /** RefreshToken 过期时间戳 (ms)；0 表示无 */
+  refreshTokenExpireTime: number;
 };
 
 export type IUserInfo = {
