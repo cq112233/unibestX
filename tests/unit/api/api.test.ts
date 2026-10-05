@@ -1,19 +1,19 @@
 import { describe, expect, it } from 'vitest';
-import { createFoo, deleteFoo, fetchFooById, fetchFooList, updateFoo } from '@/src/api/foo.uts';
-import type { FooItem } from '@/src/api/foo.uts';
-import { fetchUserInfo, login, logout } from '@/src/api/auth.uts';
+import { createFoo, deleteFoo, fetchFooById, fetchFooList, updateFoo } from '@/src/api/example.uts';
+import type { FooItem } from '@/src/api/example.uts';
+import { fetchUserInfo, login, logout } from '@/src/api/auth/auth.uts';
 
 describe('src/api spec compliant tests', () => {
   describe('foo api module', () => {
     it('fetchFooList should return paginated data with correct total', async () => {
-      const res = await fetchFooList('', 1, 2);
+      const res = await fetchFooList(1, 2, '');
       expect(res.list.length).toBe(2);
       expect(res.total).toBeGreaterThanOrEqual(5);
       expect(res.hasMore).toBe(true);
     });
 
     it('fetchFooList should filter by keyword', async () => {
-      const res = await fetchFooList('vitest', 1, 10);
+      const res = await fetchFooList(1, 10, 'vitest');
       expect(res.list.some((item: FooItem) => item.name === 'vitest')).toBe(true);
     });
 

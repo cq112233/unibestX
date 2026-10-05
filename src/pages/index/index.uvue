@@ -43,7 +43,7 @@ onShow(() => {
   // #ifdef MP-ALIPAY
   // 隐藏支付宝小程序左侧原生的“返回首页”按钮
   // @ts-expect-error 支付宝全局对象类型兼容
-  if (typeof my !== 'undefined' && typeof my.hideBackHome === 'function') {
+  if (typeof my != 'undefined' && typeof my.hideBackHome == 'function') {
     // @ts-expect-error 支付宝全局对象类型兼容
     my.hideBackHome();
   }

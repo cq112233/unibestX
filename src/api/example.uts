@@ -1,3 +1,13 @@
+// ==========================================
+// 接口层写法参照（非页面接口层，不对应任何页面）
+//
+// 本文件不对应具体页面，因此不受分册 7 的「一页一目录」落位约束；
+// 它的用途是演示 api 层的标准写法：契约类型 / mock 数据集 / 接口函数三块，
+// 以及 http.get / uploadFile 的正确调用方式，供新增页面时照抄。
+//
+// 新增真实页面请一律建 src/api/<页面目录名>/<页面目录名>.uts，不要改本文件。
+// ==========================================
+
 import { API_DOMAINS, http } from '@/src/http/request.uts';
 import type { LimeRequestConfig } from '@/uni_modules/lime-request';
 import { DEFAULT_OSS_UPLOAD_PATH, uploadFile } from '@/src/utils/upload/index.uts';
@@ -46,11 +56,12 @@ const MOCK_FOO_LIST: Array<FooItem> = [
 
 /**
  * 分页查询 Foo 列表（支持关键字筛选与分页）
- * @param keyword 搜索关键字（默认空字符串）
+ * 分页三件套按规范顺序 (pageNo, pageSize, keyword)，默认值齐全、后端就绪不改签名
  * @param pageNo 当前页码（默认 1）
  * @param pageSize 分页大小（默认 10）
+ * @param keyword 搜索关键字（默认空字符串）
  */
-export function fetchFooList(keyword: string = '', pageNo: number = 1, pageSize: number = 10): Promise<FooPageResult> {
+export function fetchFooList(pageNo: number = 1, pageSize: number = 10, keyword: string = ''): Promise<FooPageResult> {
   let filtered = MOCK_FOO_LIST;
   if (keyword.length > 0) {
     filtered = MOCK_FOO_LIST.filter((item: FooItem): boolean => {
@@ -162,7 +173,7 @@ export function uploadFooFile(
 
 export function getFooList(params: UTSJSONObject | null = null): Promise<Array<FooItem>> {
   const keyword = params?.getString('name') ?? '';
-  return fetchFooList(keyword, 1, 100).then((res: FooPageResult): Array<FooItem> => res.list);
+  return fetchFooList(1, 100, keyword).then((res: FooPageResult): Array<FooItem> => res.list);
 }
 
 export function getFooById(id: number): Promise<FooItem | null> {

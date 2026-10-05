@@ -1,0 +1,102 @@
+/**
+ * 埋点钩子
+ *
+ * 设计要点：只留钩子不给实现 —— 不绑任何厂商 SDK、不注册回调函数引用
+ * （UTS 禁传函数引用）。接入时直接改 onTrackStub 的函数体，或先
+ * setTrackEndpoint() 再在 stub 内发请求。
+ *
+ * 上报地址默认为空：为空时 onTrackStub 直接返回，不会把数据误发到未知域名。
+ */
+
+import { isProd } from '@/src/utils/env/index.uts';
+
+export type TrackPayload = {
+  event: string;
+  propsJson: string;
+  page: string;
+  time: number;
+};
+
+/** 上报地址；为空表示未配置，stub 不发任何请求 */
+let trackEndpoint: string = '';
+
+/** 配置埋点上报地址（空则 stub 不真正发送） */
+export function setTrackEndpoint(url: string): void {
+  trackEndpoint = url;
+}
+
+/** 当前埋点上报地址 */
+export function getTrackEndpoint(): string {
+  return trackEndpoint;
+}
+
+/** 取当前页面路径，失败返回空串 */
+function currentPagePath(): string {
+  try {
+    const pages = getCurrentPages();
+    if (pages.length == 0) {
+      return '';
+    }
+    const cur = pages[pages.length - 1];
+    const route = cur.route;
+    if (route == null) {
+      return '';
+    }
+    const r = `${route}`;
+    return r.indexOf('/') == 0 ? r : `/${r}`;
+  }
+  catch (_) {
+    return '';
+  }
+}
+
+/**
+ * 业务覆盖此 stub 实现真实上报。
+ *
+ * 默认实现只在本项目已配置上报地址、且处于生产环境时才提示，
+ * 避免开发期误发数据。接入真实 SDK 时替换本函数体即可，签名保持不变。
+ */
+export function onTrackStub(payload: TrackPayload): void {
+  if (trackEndpoint.length == 0) {
+    return;
+  }
+  if (!isProd()) {
+    return;
+  }
+  // 占位：对接时在此发起上报请求（如 http.post(trackEndpoint, payload)）
+  console.log('[track] stub →', trackEndpoint, payload.event, payload.page);
+}
+
+/**
+ * 上报一个埋点事件
+ * @param event 事件名
+ * @param propsJson 属性 JSON 字符串（UTS 友好，避免传对象）
+ */
+export function track(event: string, propsJson: string = ''): void {
+  if (event.length == 0) {
+    return;
+  }
+  const payload: TrackPayload = {
+    event,
+    propsJson,
+    page: currentPagePath(),
+    time: Date.now()
+  } as TrackPayload;
+  try {
+    onTrackStub(payload);
+  }
+  catch (e) {
+    console.error('[track] stub threw', e);
+  }
+}
+
+/** 页面曝光：page 为空则取当前路由 */
+export function trackPageView(page: string = ''): void {
+  const p = page.length > 0 ? page : currentPagePath();
+  track('page_view', `{"page":"${p}"}`);
+}
+
+/** 点击埋点 */
+export function trackClick(name: string): void {
+  track('click', `{"name":"${name}"}`);
+}
