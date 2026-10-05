@@ -80,7 +80,7 @@ const requestInstance = new Request({
 // ==========================================
 requestInstance.interceptors.request.use(
   (config: LimeRequestConfig): LimeRequestConfig => {
-    if (config.header === null) {
+    if (config.header == null) {
       config.header = {} as UTSJSONObject;
     }
     const header = config.header as UTSJSONObject;
@@ -96,7 +96,7 @@ requestInstance.interceptors.request.use(
     let ignoreAuth = false;
     if (extra != null) {
       const extraObj = extra as UTSJSONObject;
-      const authVal = typeof extraObj.getBoolean === 'function'
+      const authVal = typeof extraObj.getBoolean == 'function'
         ? extraObj.getBoolean('ignoreAuth')
         : (extraObj.ignoreAuth as boolean | null);
       if (authVal == true) {
@@ -141,7 +141,7 @@ requestInstance.interceptors.response.use(
     const config = response.config;
     const extra = config.extra;
     const method = config.method;
-    if (method === 'UPLOAD' || method === 'DOWNLOAD') {
+    if (method == 'UPLOAD' || method == 'DOWNLOAD') {
       return response;
     }
     const statusCode = response.statusCode;
@@ -168,20 +168,20 @@ requestInstance.interceptors.response.use(
       throw new Error(`${errorMessage}：${response.errMsg}`);
     }
     const rawData = response.data;
-    if (rawData === null) {
+    if (rawData == null) {
       throw new Error('返回的响应数据为空');
     }
     const resultObj = JSON.parseObject(JSON.stringify(rawData));
-    if (resultObj !== null) {
+    if (resultObj != null) {
       const code = resultObj.getNumber('code');
       const msgByKey = resultObj.message as string | null;
       const msgByMsg = resultObj.msg as string | null;
       const message: string = msgByKey != null ? msgByKey : (msgByMsg != null ? msgByMsg : '未知错误');
-      if (code !== null) {
+      if (code != null) {
         const codeVal = code as number;
-        if (codeVal !== ResultEnum.Success0 && codeVal !== ResultEnum.Success200) {
+        if (codeVal != ResultEnum.Success0 && codeVal != ResultEnum.Success200) {
           let toastEnabled = true;
-          if (extra !== null) {
+          if (extra != null) {
             const toastVal = (extra as UTSJSONObject).getBoolean('toast');
             if (toastVal == false) {
               toastEnabled = false;
@@ -190,7 +190,7 @@ requestInstance.interceptors.response.use(
           if (toastEnabled) {
             uni.showToast({ title: message, icon: 'none' });
           }
-          if (codeVal === ResultEnum.Unauthorized) {
+          if (codeVal == ResultEnum.Unauthorized) {
             let skipRefresh = false;
             if (extra != null) {
               const skipVal = (extra as UTSJSONObject).getBoolean('skipRefresh');
@@ -398,15 +398,15 @@ export class HttpClient {
   private send<T>(config: LimeRequestConfig): Promise<T> {
     return requestInstance.request<any>(config).then((res: LimeRequestResponse<any>): T => {
       const rawData = res.data;
-      if (rawData === null) {
+      if (rawData == null) {
         throw new Error('响应数据为空');
       }
       const obj = JSON.parseObject(JSON.stringify(rawData));
-      if (obj !== null) {
+      if (obj != null) {
         const code = obj.getNumber('code');
-        if (code !== null) {
+        if (code != null) {
           const innerData = obj.get('data');
-          if (innerData !== null) {
+          if (innerData != null) {
             return innerData as T;
           }
           throw new Error('响应结构包含 code，但 data 字段为空');
@@ -453,7 +453,7 @@ export class HttpClient {
   upload<T>(url: string, config: LimeRequestConfig | null = null): Promise<T> {
     return requestInstance.upload(url, config).then((res: LimeRequestResponse<any>): T => {
       const rawData = res.data;
-      if (rawData === null) {
+      if (rawData == null) {
         throw new Error('上传响应为空');
       }
       return rawData as T;

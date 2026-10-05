@@ -124,7 +124,7 @@ export class TokenStore extends PiniaStoreBase {
   isTokenValid(): boolean {
     if (this.state.tokenExpireTime <= 0) {
       const val = uni.getStorageSync('accessTokenExpireTime');
-      if (val != null && val !== '') {
+      if (val != null && val != '') {
         const num = Number.parseFloat(val.toString());
         if (!isNaN(num)) {
           this.state.tokenExpireTime = num;
@@ -139,7 +139,7 @@ export class TokenStore extends PiniaStoreBase {
    */
   isRefreshTokenValid(): boolean {
     const val = uni.getStorageSync('refreshTokenExpireTime');
-    if (val == null || val === '')
+    if (val == null || val == '')
       return false;
     const num = Number.parseFloat(val.toString());
     if (isNaN(num))

@@ -48,7 +48,7 @@ onLoad((options: UTSJSONObject | null) => {
 
 function doLogin() {
   if (tokenStore.hasValidLogin()) {
-    if (redirectUrl.value !== '') {
+    if (redirectUrl.value != '') {
       const targetUrl = decodeURIComponent(redirectUrl.value) ?? '';
       if (isPageTabbar(targetUrl)) {
         switchTabbar(targetUrl);

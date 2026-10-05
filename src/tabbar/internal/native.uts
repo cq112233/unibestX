@@ -7,7 +7,7 @@ import { needHideNativeTabbar } from './strategy.uts';
 export function safeHideNativeTabBar(): void {
   // #ifdef H5
   try {
-    if (typeof document !== 'undefined' && document.getElementById('hide-native-tabbar-style') == null) {
+    if (typeof document != 'undefined' && document.getElementById('hide-native-tabbar-style') == null) {
       const style = document.createElement('style');
       style.id = 'hide-native-tabbar-style';
       if (isCompilerVersionGte('5.25')) {
