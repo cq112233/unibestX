@@ -1,0 +1,89 @@
+/**
+ * 统一错误文案归一
+ *
+ * 把请求层 / 列表页的各种失败归一成带分类的 AppErrorInfo，
+ * 调用方按 kind 决定行为（提示文案 / 是否重试 / 是否引导设置），
+ * 避免各页面硬编码错误文案。
+ */
+
+/** 错误分类：离线 / 超时 / HTTP / 业务 / 未知 */
+export type AppErrorKind = 'offline' | 'timeout' | 'http' | 'business' | 'unknown';
+
+/** 归一化后的错误信息 */
+export type AppErrorInfo = {
+  kind: AppErrorKind;
+  message: string;
+  code: number;
+};
+
+// 文案集中在此，便于统一调整或后续接入 i18n
+const MSG_OFFLINE = '网络不可用，请检查网络连接';
+const MSG_TIMEOUT = '请求超时，请稍后重试';
+const MSG_NETWORK = '网络错误，请稍后重试';
+
+/**
+ * 当前是否离线。
+ *
+ * 用 uni.getNetworkType 的结果同步返回 —— 该 API 是异步的，这里通过
+ * 模块级缓存 + 首次调用时触发刷新来兼顾「同步可判」与「结果准确」。
+ * 首次调用返回上一次刷新的结果（初始视为在线），并异步更新缓存供后续调用。
+ */
+let cachedNetworkConnected: boolean = true;
+let refreshingNetwork: boolean = false;
+
+function refreshNetworkCache(): void {
+  if (refreshingNetwork) {
+    return;
+  }
+  // 测试环境（vitest）与部分平台可能没有该 API，缺失时保持「在线」判定，
+  // 避免因为查不到网络状态就把所有请求都归为离线
+  if (typeof uni.getNetworkType != 'function') {
+    return;
+  }
+  refreshingNetwork = true;
+  uni.getNetworkType({
+    success: (res) => {
+      cachedNetworkConnected = res.networkType != 'none';
+      refreshingNetwork = false;
+    },
+    fail: (_) => {
+      // 取不到网络类型时不武断判为离线，避免误报
+      cachedNetworkConnected = true;
+      refreshingNetwork = false;
+    }
+  });
+}
+
+/** 当前是否判定为离线（基于最近一次网络状态查询的缓存） */
+export function isOffline(): boolean {
+  refreshNetworkCache();
+  return !cachedNetworkConnected;
+}
+
+/**
+ * 将任意失败信息归一成可读文案
+ * @param rawMessage uni.request fail / 业务 message
+ * @param code 业务码；网络失败常用 -1
+ */
+export function resolveErrorMessage(rawMessage: string, code: number = -1): AppErrorInfo {
+  if (isOffline()) {
+    return { kind: 'offline', message: MSG_OFFLINE, code } as AppErrorInfo;
+  }
+  const msg = rawMessage.length > 0 ? rawMessage : '';
+  const lower = msg.toLowerCase();
+  if (lower.includes('timeout') || msg.includes('超时')) {
+    return { kind: 'timeout', message: MSG_TIMEOUT, code } as AppErrorInfo;
+  }
+  if (code == -1 || lower.includes('fail') || msg.includes('网络')) {
+    return { kind: 'http', message: msg.length > 0 ? msg : MSG_NETWORK, code } as AppErrorInfo;
+  }
+  if (code != 0 && msg.length > 0) {
+    return { kind: 'business', message: msg, code } as AppErrorInfo;
+  }
+  return { kind: 'unknown', message: msg.length > 0 ? msg : MSG_NETWORK, code } as AppErrorInfo;
+}
+
+/** 列表 / 页面失败时的默认提示 */
+export function defaultFailMessage(rawMessage: string = ''): string {
+  return resolveErrorMessage(rawMessage, -1).message;
+}

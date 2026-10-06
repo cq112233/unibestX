@@ -15,11 +15,11 @@
 <script setup lang="uts">
 /* eslint-disable dot-notation */
 import { ref } from 'vue';
-import type { ISingleTokenRes, IUserInfo } from '../../store';
+import type { IDoubleTokenRes, IUserInfo } from '../../store';
 import { useTokenStore, useUserStore } from '../../store';
 import { isPageTabbar, switchTabbar } from '@/src/tabbar/index.uts';
-import { login } from '@/src/api/auth.uts';
-import type { LoginParams, LoginResult } from '@/src/api/auth.uts';
+import { login } from '@/src/api/auth/auth.uts';
+import type { LoginQuery, LoginResult } from '@/src/api/auth/auth.uts';
 
 const tokenStore = useTokenStore();
 const userStore = useUserStore();
@@ -48,7 +48,7 @@ onLoad((options: UTSJSONObject | null) => {
 
 function doLogin() {
   if (tokenStore.hasValidLogin()) {
-    if (redirectUrl.value !== '') {
+    if (redirectUrl.value != '') {
       const targetUrl = decodeURIComponent(redirectUrl.value) ?? '';
       if (isPageTabbar(targetUrl)) {
         switchTabbar(targetUrl);
@@ -65,11 +65,13 @@ function doLogin() {
   login({
     username: 'UNIX',
     password: 'admin'
-  } as LoginParams).then((res: LoginResult) => {
-    tokenStore.setSingleToken({
-      token: res.token,
-      expiresIn: res.expiresIn
-    } as ISingleTokenRes);
+  } as LoginQuery).then((res: LoginResult) => {
+    tokenStore.setDoubleToken({
+      accessToken: res.token,
+      accessExpiresIn: res.expiresIn,
+      refreshToken: res.refreshToken,
+      refreshExpiresIn: res.refreshExpiresIn
+    } as IDoubleTokenRes);
     userStore.setUserInfo({
       userId: res.userInfo.userId,
       username: res.userInfo.username,

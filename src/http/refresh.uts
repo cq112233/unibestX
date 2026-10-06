@@ -1,0 +1,85 @@
+/**
+ * AccessToken 静默刷新（单飞）
+ *
+ * - 并发多个 401 只触发一次刷新请求，其余复用同一个 inflight Promise
+ * - 刷新失败时，由「首个」调用方执行一次收尾（清登录 + 跳登录页），
+ *   并发请求拿到的是同一个 false，不会再各自收尾
+ * - 刷新接口自身通过 extra.skipRefresh 旁路拦截器，杜绝无限递归
+ */
+
+import { refreshAccessToken } from '@/src/api/auth/auth.uts';
+import type { RefreshTokenQuery } from '@/src/api/auth/auth.uts';
+import { useTokenStore } from '@/src/store';
+import type { IDoubleTokenRes } from '@/src/store';
+
+/** 进行中的刷新；非空表示已有刷新在飞，后来者直接复用 */
+let inflight: Promise<boolean> | null = null;
+
+/**
+ * 本轮刷新失败是否已被收尾。
+ * inflight 释放后置位，保证同一波并发 401 只有第一个调用方触发登出，
+ * 不会 N 个请求各清一次 token、各跳一次登录页。
+ */
+let failureHandled: boolean = false;
+
+/**
+ * 尝试用 refreshToken 换取新的 accessToken。
+ *
+ * @returns true 表示刷新成功且已写回 store；false 表示无 refreshToken 或刷新失败
+ */
+export function tryRefreshToken(): Promise<boolean> {
+  if (inflight != null) {
+    return inflight;
+  }
+
+  const task = doRefresh();
+  inflight = task;
+  // 无论成功失败都要释放单飞锁，否则后续 401 会永远拿到已结束的 Promise
+  task.then((ok: boolean) => {
+    inflight = null;
+    failureHandled = !ok;
+  }, (_err: any) => {
+    inflight = null;
+    failureHandled = true;
+  });
+  return task;
+}
+
+/**
+ * 判定「本次刷新失败」是否需要由调用方执行收尾。
+ *
+ * 并发场景下 N 个请求都会拿到 false，但只有第一个返回 true —— 调用方据此
+ * 决定要不要清登录跳登录页，避免重复收尾。
+ */
+export function claimRefreshFailure(): boolean {
+  if (!failureHandled) {
+    return false;
+  }
+  failureHandled = false;
+  return true;
+}
+
+function doRefresh(): Promise<boolean> {
+  const tokenStore = useTokenStore();
+  const refreshToken = tokenStore.state.refreshToken;
+  if (refreshToken == '') {
+    return Promise.resolve(false);
+  }
+
+  return refreshAccessToken({ refreshToken } as RefreshTokenQuery)
+    .then((res): boolean => {
+      if (res.accessToken == '') {
+        return false;
+      }
+      tokenStore.setDoubleToken({
+        accessToken: res.accessToken,
+        accessExpiresIn: res.accessExpiresIn,
+        refreshToken: res.refreshToken,
+        refreshExpiresIn: res.refreshExpiresIn
+      } as IDoubleTokenRes);
+      return true;
+    })
+    .catch((_err: any): boolean => {
+      return false;
+    });
+}
