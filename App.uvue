@@ -4,6 +4,11 @@ import { loadFont } from '@/uni_modules/uview-ultra/index.uts';
 import { useAppStore } from './src/store';
 import { initNativeMidButtonTap } from '@/src/tabbar/index.uts';
 import { applyThemeColor, themeColor } from '@/src/utils/theme/index.uts';
+import { reportError } from '@/src/utils/error-report/index.uts';
+// 隐私闸门仅 App 端启用，导入同步条件编译，避免其它端留下未使用导入
+// #ifdef APP
+import { runPrivacyGate } from '@/src/utils/privacy/index.uts';
+// #endif
 
 onLaunch(() => {
   // 提前实例化 App Store（含持久化还原），并初始化外观模式：跟随系统 / 浅色 / 深色
@@ -18,6 +23,17 @@ onLaunch(() => {
   loadFont();
   // 注册原生 TabBar 中间按钮监听（仅在原生模式且配置了 midButton 时生效）
   initNativeMidButtonTap();
+
+  // 隐私合规闸门：未同意走首启页；已同意但协议版本落后走再确认
+  // 放在 TabBar / 主题初始化之后，保证隐私页本身也能拿到主题与布局
+  // 仅 App 端启用：H5 / 小程序在 onLaunch 期间调 reLaunch 会被启动护栏入队（页面栈尚未建立），
+  // 跳转时机不可控，故这两端不在此处拦截
+  // #ifdef APP
+  if (!runPrivacyGate()) {
+    return;
+  }
+  // #endif
+
   // #ifdef MP-WEIXIN
   // 微信小程序真机 @font-face 不生效，使用 uni.loadFontFace 加载 uni-icons 字体
   uni.loadFontFace({
@@ -43,13 +59,13 @@ onShow((options?) => {
 // 全局错误监听：仅可在 App.uvue 中生效
 // onError 覆盖 Web / 小程序 / Android / iOS / 鸿蒙全平台（App 端 4.33+ 亦覆盖异步逻辑错误）
 onError((error) => {
-  console.error('[GlobalError]', error);
+  reportError(error, 'App.onError');
 });
 
 // onUnhandledRejection 仅 Web 与小程序支持，App 原生端（Android / iOS / 鸿蒙）不支持，须条件编译隔离
 // #ifdef WEB || MP
 onUnhandledRejection((res) => {
-  console.error('[UnhandledRejection]', res.reason);
+  reportError(res.reason, 'App.onUnhandledRejection');
 });
 // #endif
 </script>

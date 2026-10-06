@@ -1,0 +1,202 @@
+<template>
+  <!-- 页面根容器：view + flex-1 弹性撑满，滚动交给内部 scroll-view；背景与文字色跟随主题 -->
+  <view class="flex flex-col flex-1 px-[24px] pt-[24px]" :style="{ backgroundColor: themeTokens.bgContent }">
+    <!-- 协议正文区（可滚动）：标题 / 摘要 / 协议入口 / 底部说明 -->
+    <scroll-view direction="vertical" class="flex-1 flex flex-col" :show-scrollbar="false">
+      <!-- 标题 -->
+      <view class="w-full">
+        <text class="text-[18px] font-bold" :style="{ color: themeTokens.navText }">{{ title }}</text>
+      </view>
+
+      <!-- 摘要：按首启 / 再确认两种语境切换措辞 -->
+      <view class="w-full pt-[16px]">
+        <text class="text-[14px] leading-[22px]" :style="{ color: themeTokens.navText }">{{ summaryText }}</text>
+      </view>
+
+      <!-- 协议入口列表（L2 纯展示块，点击抛 openAgreement）；文字用主题色 -->
+      <view class="w-full pt-[20px]">
+        <view
+          v-for="item in agreements"
+          :key="item.key"
+          class="flex flex-row items-center py-[10px]"
+          @click="openAgreement(item)"
+        >
+          <text class="text-[14px]" :style="{ color: activeThemeColor }">{{ `《${item.label}》` }}</text>
+        </view>
+      </view>
+
+      <!-- 底部说明 -->
+      <view class="w-full pt-[16px]">
+        <text class="text-[13px] leading-[20px]" :style="{ color: themeTokens.tabColor }">{{ footerTip }}</text>
+      </view>
+    </scroll-view>
+
+    <!-- 底部操作区：主按钮常显；拒绝按钮仅在首启场景展示，避免把老用户挡死 -->
+    <view class="w-full pt-[16px] pb-[24px]">
+      <view
+        class="w-full h-[46px] rounded-[8px] flex flex-row items-center justify-center"
+        :style="{ backgroundColor: activeThemeColor }"
+        @click="onAgree"
+      >
+        <text class="text-[#ffffff] text-[15px] font-bold">{{ agreeText }}</text>
+      </view>
+      <view
+        v-if="!isReconfirm"
+        class="w-full h-[46px] mt-[12px] rounded-[8px] border-[1px] border-solid flex flex-row items-center justify-center"
+        :style="{ borderColor: themeTokens.tabBorder }"
+        @click="onReject"
+      >
+        <text class="text-[15px]" :style="{ color: themeTokens.tabColor }">{{ rejectText }}</text>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+/* eslint-disable dot-notation */
+/**
+ * 隐私合规页（src/sub/privacy/privacy.uvue）
+ *
+ * 两种打开方式：
+ * 1. 首启闸门：未同意过时由 App.onLaunch 跳入，按钮为「同意并进入应用」，提供「不同意并退出」
+ * 2. 版本再确认：已同意但 policyVersion 变更时跳入（?mode=reconfirm），
+ *    按钮为「同意并继续」，且不展示拒绝按钮，避免把老用户挡在门外
+ */
+import { computed, ref } from 'vue';
+import { fetchPrivacyContent } from '@/src/api/privacy/privacy.uts';
+import type { PrivacyContent } from '@/src/api/privacy/privacy.uts';
+import { privacyConfig } from '@/src/utils/privacy/config.uts';
+import { getAppTitle } from '@/src/utils/env/index.uts';
+import { MODE_RECONFIRM, setPrivacyAgreed } from '@/src/utils/privacy/index.uts';
+import { toast } from '@/src/utils/toast/index.uts';
+import { useAppStore } from '@/src/store';
+import { getThemeTokens, themeColor } from '@/src/utils/theme/index.uts';
+import type { ThemeTokens } from '@/src/utils/theme/index.uts';
+
+// 协议条目：key 用于 v-for 的 :key，url 由隐私配置注入（空串表示未配置）
+type AgreementItem = {
+  key: string;
+  label: string;
+  url: string;
+};
+
+// 兜底文案：接口返回前首帧即有内容，避免标题 / 按钮闪空
+const FALLBACK_CONTENT: PrivacyContent = {
+  title: '用户协议与隐私政策',
+  summary: '',
+  reconfirmSummary: '',
+  agreeText: '同意',
+  reconfirmAgreeText: '同意并继续',
+  rejectText: '不同意并退出'
+};
+
+definePage({
+  customPageClass: 'page-container',
+  customPageStyle: 'background-color: transparent;',
+  debug: false,
+  debugHome: false,
+  layout: 'navbar',
+  showBack: false,
+  hideStatusBar: false,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
+  style: {
+    navigationBarTitleText: '隐私政策',
+    navigationStyle: 'custom'
+  }
+});
+
+/** 是否处于「协议版本变更后再确认」场景 */
+const isReconfirm = ref<boolean>(false);
+
+// —— 页面文案：走页面接口层（@/src/api/privacy/privacy.uts），开发期返回本地数据
+const content = ref<PrivacyContent>(FALLBACK_CONTENT);
+
+function loadContent(): void {
+  fetchPrivacyContent()
+    .then((data: PrivacyContent): void => {
+      content.value = data;
+    })
+    .catch((err: any): void => {
+      console.error('隐私页文案加载失败:', err);
+    });
+}
+
+// —— 主题：主题色与明暗 token 均直读 app store（铁律 4），不自行 ref 一份
+const appStore = useAppStore();
+
+const themeTokens = computed((): ThemeTokens => {
+  return getThemeTokens(appStore.state.isDark);
+});
+
+/** 当前主题色（优先取 store 持久化的 theme，保底取全局 themeColor） */
+const activeThemeColor = computed<string>((): string => {
+  return appStore.state.theme.length > 0 ? appStore.state.theme : themeColor.value;
+});
+
+// —— 以下文案均由接口数据派生，页面不再硬编码任何合规话术
+const title = computed((): string => content.value.title);
+
+const summaryText = computed((): string => {
+  return isReconfirm.value ? content.value.reconfirmSummary : content.value.summary;
+});
+
+const agreeText = computed((): string => {
+  return isReconfirm.value ? content.value.reconfirmAgreeText : content.value.agreeText;
+});
+
+const rejectText = computed((): string => content.value.rejectText);
+
+// —— 协议列表：链接来自隐私配置，未配置时为空串，点击时提示
+const agreements = computed((): Array<AgreementItem> => {
+  return [
+    { key: 'user', label: '用户协议', url: privacyConfig.userAgreementUrl } as AgreementItem,
+    { key: 'policy', label: '隐私政策', url: privacyConfig.privacyPolicyUrl } as AgreementItem
+  ];
+});
+
+const footerTip = computed((): string => {
+  const company = privacyConfig.companyName != '' ? privacyConfig.companyName : getAppTitle();
+  return `点击「同意」即表示你已阅读并同意上述协议，${company}将依法保护你的个人信息。`;
+});
+
+// —— 交互：打开协议文档
+/** 未配置链接时明确提示，避免开发期漏配却无感 */
+function openAgreement(item: AgreementItem): void {
+  if (item.url == '') {
+    toast(`请在 src/utils/privacy/config.uts 配置《${item.label}》地址`);
+    return;
+  }
+  uni.navigateTo({
+    url: `/src/sub/webview/webview?url=${encodeURIComponent(item.url)}`
+  });
+}
+
+// —— 交互：同意 / 拒绝
+function onAgree(): void {
+  setPrivacyAgreed();
+  uni.reLaunch({ url: '/src/pages/index/index' });
+}
+
+/** App 端直接退出；其它端无法退出应用，提示后停留 */
+function onReject(): void {
+  // #ifdef APP
+  // @ts-expect-error uni.exit 为 UTS 原生 API，TS 类型桩未覆盖（项目内 backPress 亦如此调用）
+  uni.exit();
+  // #endif
+  // #ifndef APP
+  toast('需同意协议后才能使用本应用');
+  // #endif
+}
+
+onLoad((options: UTSJSONObject | null) => {
+  loadContent();
+  if (options == null) {
+    return;
+  }
+  const mode = options['mode'] as string | null;
+  if (mode != null && mode == MODE_RECONFIRM) {
+    isReconfirm.value = true;
+  }
+});
+</script>

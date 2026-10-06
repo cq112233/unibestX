@@ -1,0 +1,94 @@
+/**
+ * 隐私合规闸门
+ *
+ * 两级判定：
+ * 1. hasPrivacyAgreed()       —— 是否已同意过（首启闸门）
+ * 2. needsPrivacyReconfirm()  —— 已同意但本地记录的政策版本落后于配置版本
+ *
+ * 唯一入口是 runPrivacyGate()，见 App.uvue。
+ */
+
+import { getCurrentPath } from '@/src/utils/route/index.uts';
+
+// 配置文件同层，沿用项目 tabbar/config.uts 的「配置与模块同目录」约定
+import { privacyConfig } from './config.uts';
+
+const KEY_AGREED = 'privacy_agreed';
+const KEY_VERSION = 'privacy_agreed_version';
+const AGREED_VALUE = '1';
+
+/** 隐私页路径（首启闸门与再确认共用，用 mode 区分场景） */
+export const PRIVACY_PAGE = '/src/sub/privacy/privacy';
+/** 再确认场景的 query 标记，对应隐私页 onLoad 里读的 mode 参数 */
+export const MODE_RECONFIRM = 'reconfirm';
+
+/** 是否已同意隐私政策（不校验版本） */
+export function hasPrivacyAgreed(): boolean {
+  const v = uni.getStorageSync(KEY_AGREED);
+  return v != null && v == AGREED_VALUE;
+}
+
+/** 本地记录的用户已同意的协议版本；无记录返回空串 */
+export function getAgreedPrivacyVersion(): string {
+  const v = uni.getStorageSync(KEY_VERSION);
+  if (v == null || v == '') {
+    return '';
+  }
+  return `${v}`;
+}
+
+/** 写入同意状态，并记录当前政策版本 */
+export function setPrivacyAgreed(): void {
+  uni.setStorageSync(KEY_AGREED, AGREED_VALUE);
+  uni.setStorageSync(KEY_VERSION, privacyConfig.policyVersion);
+}
+
+/** 清除同意状态（仅调试用，正式包不要暴露入口） */
+export function clearPrivacyAgreed(): void {
+  uni.removeStorageSync(KEY_AGREED);
+  uni.removeStorageSync(KEY_VERSION);
+}
+
+/**
+ * 是否需要因协议版本变更而重新确认。
+ *
+ * - 未首启同意：返回 false（走首启闸门，不走再确认）
+ * - 已同意但无版本记录（老数据）：返回 true，补一次确认
+ * - 已同意且版本落后：返回 true
+ */
+export function needsPrivacyReconfirm(): boolean {
+  if (!hasPrivacyAgreed()) {
+    return false;
+  }
+  const local = getAgreedPrivacyVersion();
+  if (local == '') {
+    return true;
+  }
+  return local != privacyConfig.policyVersion;
+}
+
+/**
+ * 冷启动隐私闸门：在 App.onLaunch 中调用，负责跳转与拦截。
+ *
+ * @returns true 表示已放行（可继续执行后续启动逻辑）；false 表示已跳转隐私页，
+ *          调用方应立即 return，终止本次启动流程。
+ *
+ * 注意：本函数只做「判定 + 跳转」，不负责主题 / TabBar 初始化 ——
+ * 调用方需保证这些初始化已完成，隐私页才能拿到主题与布局。
+ */
+export function runPrivacyGate(): boolean {
+  // 已经在隐私页上（如热重载、从隐私页再次触发启动）时不再重复跳转，避免死循环
+  if (getCurrentPath() == PRIVACY_PAGE) {
+    return false;
+  }
+  // 隐私页走 reLaunch：不保留启动栈，用户同意后由隐私页自行进入首页
+  if (!hasPrivacyAgreed()) {
+    uni.reLaunch({ url: PRIVACY_PAGE });
+    return false;
+  }
+  if (needsPrivacyReconfirm()) {
+    uni.reLaunch({ url: `${PRIVACY_PAGE}?mode=${MODE_RECONFIRM}` });
+    return false;
+  }
+  return true;
+}

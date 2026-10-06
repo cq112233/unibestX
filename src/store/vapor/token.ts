@@ -12,7 +12,8 @@ export const useTokenStore = defineStore('token', () => {
     accessExpiresIn: 0,
     refreshToken: '',
     refreshExpiresIn: 0,
-    tokenExpireTime: 0
+    tokenExpireTime: 0,
+    refreshTokenExpireTime: 0
   });
 
   // ==========================================
@@ -22,9 +23,7 @@ export const useTokenStore = defineStore('token', () => {
   function setSingleToken(res: ISingleTokenRes): void {
     state.token = res.token;
     state.expiresIn = res.expiresIn;
-    const expireTime = Date.now() + res.expiresIn * 1000;
-    state.tokenExpireTime = expireTime;
-    uni.setStorageSync('accessTokenExpireTime', expireTime);
+    state.tokenExpireTime = Date.now() + res.expiresIn * 1000;
   }
 
   function setDoubleToken(res: IDoubleTokenRes): void {
@@ -33,10 +32,8 @@ export const useTokenStore = defineStore('token', () => {
     state.refreshToken = res.refreshToken;
     state.refreshExpiresIn = res.refreshExpiresIn;
     const now = Date.now();
-    const expireTime = now + res.accessExpiresIn * 1000;
-    state.tokenExpireTime = expireTime;
-    uni.setStorageSync('accessTokenExpireTime', expireTime);
-    uni.setStorageSync('refreshTokenExpireTime', now + res.refreshExpiresIn * 1000);
+    state.tokenExpireTime = now + res.accessExpiresIn * 1000;
+    state.refreshTokenExpireTime = now + res.refreshExpiresIn * 1000;
   }
 
   function clearToken(): void {
@@ -47,8 +44,7 @@ export const useTokenStore = defineStore('token', () => {
     state.refreshToken = '';
     state.refreshExpiresIn = 0;
     state.tokenExpireTime = 0;
-    uni.removeStorageSync('accessTokenExpireTime');
-    uni.removeStorageSync('refreshTokenExpireTime');
+    state.refreshTokenExpireTime = 0;
   }
 
   function getToken(): string {
@@ -59,28 +55,11 @@ export const useTokenStore = defineStore('token', () => {
   }
 
   function isTokenValid(): boolean {
-    if (state.tokenExpireTime <= 0) {
-      const val = uni.getStorageSync('accessTokenExpireTime');
-      if (val != null && val !== '') {
-        const num = Number.parseFloat(val.toString());
-        if (!isNaN(num)) {
-          state.tokenExpireTime = num;
-        }
-      }
-    }
     return state.tokenExpireTime > 0 && Date.now() < state.tokenExpireTime;
   }
 
   function isRefreshTokenValid(): boolean {
-    const val = uni.getStorageSync('refreshTokenExpireTime');
-    if (val == null || val === '') {
-      return false;
-    }
-    const num = Number.parseFloat(val.toString());
-    if (isNaN(num)) {
-      return false;
-    }
-    return Date.now() < num;
+    return state.refreshTokenExpireTime > 0 && Date.now() < state.refreshTokenExpireTime;
   }
 
   function hasLoginInfo(): boolean {

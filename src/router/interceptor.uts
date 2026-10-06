@@ -109,7 +109,7 @@ function doIntercept(url: string): boolean {
   console.log('doIntercept login status - hasLogin:', hasLogin);
   if (hasLogin) {
     // 已经登录的情况下，如果目标不是登录页直接放行
-    if (path !== LOGIN_PAGE) {
+    if (path != LOGIN_PAGE) {
       return true;
     }
     else {
@@ -142,7 +142,7 @@ function doIntercept(url: string): boolean {
     }
     else {
       // 目标是登录页本身，放行以防无限重定向
-      if (path === LOGIN_PAGE) {
+      if (path == LOGIN_PAGE) {
         return true;
       }
       console.log('doIntercept: redirecting to login page', redirectUrl);
@@ -270,7 +270,7 @@ export function checkDirectEntry(options: UTSJSONObject | null) {
       else {
         h5Url = window.location.pathname + window.location.search;
       }
-      if (h5Url !== '' && h5Url !== '/') {
+      if (h5Url != '' && h5Url != '/') {
         url = h5Url;
       }
       // #endif
