@@ -197,6 +197,15 @@ export default defineConfig({
         // 如果后端接口路径本身不带 /api 前缀，放开下面这行去掉前缀
         // rewrite: (p) => p.replace(/^\/api/, ''),
       }
+    },
+    hmr: true,
+    watch: {
+      ignored: [
+        '**/node_modules/**',
+        '**/.git/**',
+        '**/dist/**',
+        '**/unpackage/**'
+      ]
     }
   },
   build: {

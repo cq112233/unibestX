@@ -279,6 +279,7 @@
 </template>
 
 <script setup lang="uts">
+/* eslint-disable dot-notation */
 import { computed, ref } from 'vue';
 import { foo, FOO_UPLOAD_PATH, getFooList, uploadFooFile } from '@/src/api/example.uts';
 import type { IFoo } from '@/src/api/example.uts';
@@ -449,7 +450,10 @@ async function fetchRealApi() {
       msg = (err as Error).message;
     }
     else if (err instanceof UTSJSONObject) {
-      const errMsg = (err as UTSJSONObject).getString('message') ?? (err as UTSJSONObject).getString('msg') ?? (err as UTSJSONObject).getString('errMsg');
+      // 用下标取值而非 getString：getString 在 TS 类型桩里被标为可能 undefined，
+      // 与本项目其它位置（如 login.uvue 读 options）保持同一种写法
+      const errObj = err as UTSJSONObject;
+      const errMsg = (errObj['message'] as string | null) ?? (errObj['msg'] as string | null) ?? (errObj['errMsg'] as string | null);
       if (errMsg != null) {
         msg = errMsg;
       }
@@ -472,7 +476,6 @@ async function getUserInfo() {
 
   try {
     const res = await uniCloud.importObject('user').getUserInfo();
-    // eslint-disable-next-line dot-notation
     userInfo.value = JSON.stringify((res as UTSJSONObject)['data'] ?? res);
     console.log('res', res);
   }
