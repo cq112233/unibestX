@@ -106,7 +106,7 @@
             <text class="text-[16px] font-bold" :style="{ color: 'var(--text-color, #2d3748)' }">Mock 数据列表（ID 为任意类型）</text>
           </view>
           <text class="text-[12px] text-[#64748b] leading-[19px] mb-[4px]">
-            在 src/api/foo.uts 中定义，由 getFooList() 直接返回，无需网络即可演示列表渲染。
+            在 src/api/example.uts 中定义，由 getFooList() 直接返回，无需网络即可演示列表渲染。
           </text>
           <view v-for="(item, index) in mockList" :key="index" class="flex-row items-center py-[10px] px-[12px] bg-[#f1f5f9] rounded-[8px] mt-[8px]">
             <view class="w-[28px] h-[28px] rounded-[14px] bg-[#3182ce] justify-center items-center mr-[10px]">
@@ -280,8 +280,8 @@
 
 <script setup lang="uts">
 import { computed, ref } from 'vue';
-import { foo, FOO_UPLOAD_PATH, getFooList, uploadFooFile } from '@/src/api/foo';
-import type { IFoo } from '@/src/api/foo';
+import { foo, FOO_UPLOAD_PATH, getFooList, uploadFooFile } from '@/src/api/example.uts';
+import type { IFoo } from '@/src/api/example.uts';
 import { DEFAULT_OSS_BASE_URL } from '@/src/utils/upload/index.uts';
 import { toast, toastSuccess } from '@/src/utils/toast/index.uts';
 import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/utils/refresh/index.uts';
