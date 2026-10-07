@@ -29,7 +29,7 @@ const taskMap = new Map<string, AbortableTask>();
 const abortedMap = new Map<string, boolean>();
 
 /** 请求指纹 → 进行中的 Promise（GET 去重） */
-const inflightMap = new Map<string, Promise<any>>();
+const inflightMap = new Map<string, any>();
 
 /** 内存 TTL 缓存：指纹 → { expireAt, value } */
 type CacheEntry = {
@@ -199,6 +199,8 @@ export function getInflight<T>(fingerprint: string): Promise<T> | null {
 
 /** 登记进行中的请求，结束后自动摘除（成功失败都要摘） */
 export function setInflight<T>(fingerprint: string, task: Promise<T>): void {
+  // UTS 泛型不协变：Promise<T> 收不进 Map<string, Promise<any>>（报 error17）。
+  // 故 inflightMap 的值类型取 any 作为收口，本表只做同指纹去重，泛型恢复由 getInflight 负责断言。
   inflightMap.set(fingerprint, task);
   task.then((_r: T) => {
     if (inflightMap.get(fingerprint) == task) {

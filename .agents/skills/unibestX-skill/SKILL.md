@@ -46,7 +46,7 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 
 | 分册文件 | 收录内容 | 何时 Read |
 | :--- | :--- | :--- |
-| [references/1-uts-syntax.md](references/1-uts-syntax.md) | **1 UTS 强类型系统与语法核心铁律**（19 条） | 定义对象结构与类型标注、写 `export` / `class` / 闭包 / 定时器回调 / 集合遍历；遇 `UTS110111163`、`UTS110111119`、`UTS110111120`、`error1`、`error17`、`error18`、`NoSuchMethodError` |
+| [references/1-uts-syntax.md](references/1-uts-syntax.md) | **1 UTS 强类型系统与语法核心铁律**（21 条） | 定义对象结构与类型标注、写 `export` / `class` / 闭包 / 定时器回调 / 集合遍历 / 联合类型上的三元表达式 / Promise 的 `.then` 与 `.catch`；遇 `UTS110111163`、`UTS110111119`、`UTS110111120`、`error1`、`error17`、`error18`、`error25`、`NoSuchMethodError`、`Expression expected` |
 | [references/2-styling.md](references/2-styling.md) | **2 样式 (CSS & Tailwind) 与原生渲染铁律**（23 条） | 写 `.scss` / Tailwind 工具类；处理按钮与文本排版、安全区、高度单位、阴影边框、字号字重、行内嵌套样式、样式不生效或表现不一致 |
 | [references/3-runtime.md](references/3-runtime.md) | **3 跨端运行时与渲染模式约束**（25 条） | VDOM / Android VDOM / Vapor 差异、多平台门面分流与条件编译、UTS 插件与自定义基座、**第三方组件（选项式 `.vue`）是否可用**、Markdown 渲染、真机与 Kotlin 报错、编译验证命令选择 |
 | [references/4-examples.md](references/4-examples.md) | **4 项目正确案例**（5 个生产级标杆案例） | 新建页面、搭「上固定 + 下滚动」骨架、算可用高度、写 TabBar 页与下拉刷新、写二级 / 子包页、用 Easycom 引组件 —— **优先照抄，不要自创结构** |
@@ -99,23 +99,18 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 | **H5 报 `Cannot access 'x' before initialization`** | 同一函数里两个不同块各自 `const id = ...`（UTS 变量按**函数级**去重，把两者合成一个变量，声明点落在后面那个，前面那段就成了 TDZ） | 不同块的同名局部量按语义改名（`bare` / `sized` / `grouped`…）；顺序 `for` 里重名的 `i` 安全（详见 **1.19**） |
 | **App 端 `min-width` / `min-height` / `max-width:100%` 静默失效** | 写百分比 `min-height:100%` / `min-width:100%` / `max-width:100%`（原生端 `min-*` / `max-*` 只认 `number` 与 `px`，构建期只有一条 warn，运行期直接忽略；`width` / `height` 的百分比**是**支持的） | 「至少撑满」写 `flex:1`、「至多铺满」写 `width:100%`，带 padding / border 时补 `box-sizing:border-box`（详见 **2.23**） |
 | **流式渲染时 App 闪退 `UTS instance N is not registered`** | 计时器每来一个 chunk 就把整串内容喂给富文本渲染器（`streamText.value = full`）—— 末尾那个还没收完的块（`<video>` / mermaid / `$$…$$`）会先按**顶层节点**渲染，等闭合标签到齐又变成块的**子节点**，原生组件在两条分支间搬家、被销毁重建，新实例拿到已释放的原生实例 id | 接收与渲染分离：**只在块边界推进渲染快照**（`text.lastIndexOf('\n\n')` 取最后一个完整块的结尾），半截块永不进渲染；`complete` 回调里再补渲染一次尾巴（详见 **3.23**） |
+| **联合类型上的三元表达式（`Expression expected`）** | `return target >= 0 ? target : -1;`（`target: number \| string`，UTS 在 `typeof` 窄化前先解析三元，判据对另一分支非法即报错，错误箭头指向 `>=`） | 拆成 `if` 语句提前 `return`：`if (target >= 0) { return target; } return -1;`（仅在**联合类型**上必需，单类型变量上的三元合法，切勿全仓机械替换，详见 **1.20**） |
+| **链式 `.catch()`（`error25 None of the following candidates is applicable`）** | `.then(done).catch((err: any) => {...})`（UTSPromise 的三个 `.catch` 重载在 Kotlin 端均无法收敛；**与回调返回类型、是否 `throw` 无关**，单一返回类型的回调照样报错） | 改为双参 `.then(onFulfilled, onRejected)`，拒绝回调并进第二参；要表达「抛出」时用 `Promise.reject(toError(err)) as Promise<T>` 而非 `throw`（`Promise.resolve(...)` 包裹也一并去掉，详见 **1.21**） |
 | **系统尺寸与高度获取** | 散落调用 `uni.getSystemInfoSync()` 或样式手写 `100vh`（损耗性能、非响应式、原生端不支持 vh 且易被 TabBar/导航栏遮挡） | 优先引入 `@/src/utils/systemInfo/index.uts` 中的响应式变量（`availableHeight`、`statusBarHeight`、`navBarHeight`、`safeAreaBottom`）或使用 `sys` 单例（详见 **分册 8**） |
 | **环境变量与服务地址读取** | 手写 `process.env` / `import.meta.env` 或在代码里硬编码域名 IP（原生平台无法识别且切换环境易出错） | 统一从 `@/src/utils/env/index.uts` 引入具名方法（`getApiBaseUrl()`、`getOssBaseUrl()`、`isDev()`、`isProd()`、`isVaporMode()`）（详见 **分册 8**） |
 | **轻提示与加载动画 (Toast / Loading)** | 散落手写 `uni.showToast({ title: '...', icon: 'none' })` | 统一引入 `@/src/utils/toast/index.uts` 中的 `toast(msg)`、`showToast(...)`、`showLoading()`、`hideLoading()`（详见 **分册 8**） |
 | **页面跳转与路由控制** | 直接调用原生 `uni.navigateTo` 等且未做参数编码与越界防护 | 优先引入 `@/src/utils/route/index.uts` 的 `router.push()` / `router.replace()` / `router.back()` 或模块封装函数（详见 **分册 8**） |
-| **尾随逗号格式限制 (`comma-dangle`)** | `const list = [1, 2, 3,];` / `{ a: 1, };` | `const list = [1, 2, 3];` / `{ a: 1 };`（末尾元素严禁尾随逗号，遵照 ESLint `style/comma-dangle: never`） |
-| **引号与分号规范 (`quotes` & `semi`)** | `let name = "unibest"` / `return 1` | `let name = 'unibest';` / `return 1;`（统一单引号 `'`，语句末尾必须带分号 `;`，遵照 ESLint 规范） |
-| **未使用的变量与参数 (`unused-vars`)** | `const unused = 1;` / `function cb(data, index) { use(data); }` | 移除未使用的变量；未使用的入参必须以下划线开头：`function cb(data, _index) { use(data); }` |
-| **Vue SFC 顶级块顺序 (`vue/block-order`)** | `<style>` 放在最上方或脚本与模板之间 | 遵循 `<template>` / `<script>` 在上、`<style>` 在最下方的结构（遵照 ESLint `vue/block-order`） |
-| **`<style>` 英文命名颜色 (`color-named`)** | `<style>` 中写 `color: red;` / `background: blue;` | 统一写为十六进制：`color: #ff0000;` / `background: #2563eb;`（遵照 Stylelint `color-named: never`） |
-| **CSS 属性声明顺序 (`properties-order`)** | 样式属性无序散落（如 `color` 写在 `display` 之前） | 必须严格按 8 阶排序：1.定位 → 2.布局/Flex → 3.盒模型尺寸 → 4.内外边距 → 5.边框圆角 → 6.背景 → 7.文本字体 → 8.动效过渡（遵照 Stylelint `order/properties-order`） |
-| **单元测试与 CI 门禁验证** | 声称代码完成却未实际运行验证命令 | 必须在 `tests/unit/` 下为新功能/工具/组件配单测，并在终端实跑 `pnpm check:uts-dts && pnpm lint && pnpm lint:style && pnpm test` 全绿 |
 
 ---
 
 ## A.2 代码生成红线清单 (Redlines Checklist)
 
-在生成任何 `.uvue`、`.uts` 代码并宣告完成前，必须逐条自检纯 UTS 语法、跨端编译器及工程代码规范：
+在生成任何 `.uvue`、`.uts` 代码并宣告完成前，必须逐条自检纯 UTS 语法与跨端编译器规范：
 
 - [ ] **1. 严禁使用 `interface`**（所有对象数据模型统一使用 `type`，规避 `UTS110111163`）
 - [ ] **2. 严禁使用 `undefined`**（所有变量显式赋予初始值，空值统一用 `null`，联合类型仅限 `Type | null`，规避 `UTS110111119`）
@@ -150,11 +145,5 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 - [ ] **31. 严禁手写 `process.env` / `import.meta.env` 或硬编码请求域名**（必须统一从 `@/src/utils/env/index.uts` 引入 `getApiBaseUrl()`、`isDev()` 等方法，见分册 8）
 - [ ] **32. 严禁在业务页面中散落调用原生 `uni.showToast({ title, icon: 'none' })`**（必须统一使用 `@/src/utils/toast/index.uts` 导出的 `toast(msg)` 或 `showToast(...)`，见分册 8）
 - [ ] **33. 业务功能开发前优先复用 `@/src/utils/` 下既有封装**（严禁在局部重新手写已有的通用方法，引用路径一律使用 `@/src/utils/<module>/index.uts` 绝对路径，见分册 8）
-- [ ] **34. 严禁在对象或数组字面量末尾添加尾随逗号**（必须遵照 ESLint `'style/comma-dangle': 'never'` 与 `'vue/comma-dangle': 'never'` 规范）
-- [ ] **35. JS/TS/UTS 代码一律统一使用单引号 `'` 且每条语句末尾必须带分号 `;`**（遵照 ESLint `quotes: single` 与 `semi: true`）
-- [ ] **36. 严禁留存未使用的局部变量或参数**（未使用的入参必须以 `_` 前缀命名，如 `_event`，其余未引用的变量一律删除，遵照 ESLint `unused-imports`）
-- [ ] **37. 文件末尾严禁多余空行，代码块间禁止连续空白**（遵照 ESLint `style/no-multiple-empty-lines`，文件末尾保留 0 额外空行）
-- [ ] **38. `<style>` 中严禁使用英文命名颜色，一律使用标准十六进制色值**（遵照 Stylelint `'color-named': 'never'`，如 `color: #ff0000;` 严禁 `color: red;`）
-- [ ] **39. `<style>` 中的 CSS 属性必须严格按照规范 8 阶顺序排列**（定位 → 布局/Flex → 尺寸 → 边距 → 边框 → 背景 → 文字 → 动效，遵照 Stylelint `order/properties-order`）
-- [ ] **40. 任何代码生成或修改完成后，必须实际运行 `pnpm check:uts-dts && pnpm lint && pnpm lint:style && pnpm test` 验证 100% 绿灯无报错**
-
+- [ ] **34. 联合类型变量（`number | string`、`T | null` 等）上严禁直接写三元表达式**（UTS 在 `typeof` 窄化前先解析三元，判据对另一分支类型非法即报 `Expression expected` 且箭头指向判据操作数；必须拆成 `if` 语句提前 `return`。**只针对联合类型，单类型变量上的三元合法，严禁全仓机械替换**，见 1.20）
+- [ ] **35. 严禁写链式 `.catch()`**（UTSPromise 的三个 `.catch` 重载在 Kotlin 端均无法收敛，报 `error25 None of the following candidates is applicable`，**与回调返回类型 / 是否 `throw` 无关**；一律改为双参 `.then(onFulfilled, onRejected)`，拒绝回调并进第二参，并且该回调内要用 `Promise.reject(err) as Promise<T>` 而非 `throw` 来表达失败，见 1.21）

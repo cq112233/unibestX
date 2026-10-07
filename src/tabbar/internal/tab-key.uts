@@ -87,7 +87,11 @@ export function resolveTabIndexByKey(key: string): number {
  */
 export function resolveTabIndex(target: number | string, apiName: string = 'onTabShow'): number {
   if (typeof target == 'number') {
-    return target >= 0 ? target : -1;
+    const n: number = target;
+    if (n >= 0) {
+      return n;
+    }
+    return -1;
   }
   const idx: number = resolveTabIndexByKey(target);
   if (idx < 0) {
