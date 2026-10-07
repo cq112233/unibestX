@@ -107,6 +107,8 @@ function handleLogout() {
   uni.showModal({
     title: '提示',
     content: '确定要退出登录吗？',
+    cancelText: '取消',
+    confirmText: '确定',
     success: (res) => {
       if (res.confirm) {
         tokenStore.clearToken();

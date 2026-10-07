@@ -581,3 +581,148 @@ export * from './vdom/user.uts';
 - **自查脚本**（本项目实测有效）：把每个 `function` 的函数体按大括号配平切出来，正则收集 `(const|let)\s+(\w+)\s*[:=]`，同名即告警。
   ⚠️ 配平前**必须先把字符串字面量里的 `{` `}` 抠掉** —— `spec.indexOf('{')` 这种写法会把配平带偏，得出满屏假阳性。
 - **为什么 App 端不复现**：Kotlin 允许内层作用域遮蔽（shadowing），编译出来本来就是两个变量 —— 这个坑**只在 H5 / 小程序这类 JS 产物上炸**，真机跑一遍反而看不见。
+
+---
+
+## 1.20 联合类型上的三元表达式必炸 —— **UTS 在 `typeof` 窄化之前先解析三元**，判据对另一分支非法即 `Expression expected`
+
+- **错误码**（本项目实测，2026-10-07，`src/tabbar/internal/tab-key.uts:90`，真机 VDOM/Kotlin 通道）：
+
+  ```text
+  [plugin:uni:app-uts] Expression expected
+  at src/tabbar/internal/tab-key.uts:90:17
+    88 |  export function resolveTabIndex(target: number | string, apiName: string = 'onTabShow'): number {
+    89 |    if (typeof target == 'number') {
+    90 |      return target >= 0 ? target : -1;
+       |                   ^
+    91 |    }
+  ```
+
+  报错点看着毫无道理：外层 `if (typeof target == 'number')` 明明已经把 `target` 收窄成 `number` 了，`target >= 0` 怎么看都合法。
+
+- **底层原理**：UTS 编译器在 **`return` 语句位置先解析三元表达式**，**早于** `typeof` 的窄化生效。此时 `target` 的静态类型仍是 `number | string`，三元表达式要求两个候选分支必须是**同一类型**，而 `target >= 0` 这个判据落在 `string` 分支上非法 —— 于是三元整体无法定型，报 `Expression expected` 并把箭头指向第一个类型不合法的操作数。
+
+  **关键点**：窄化（narrowing）在这条语句里不生效，**拆成语句后立即生效**。所以这不是「三元不能用」，而是「三元 + 联合类型」这个组合不能用。
+
+- **强制规范**：**联合类型变量上的三元表达式，一律拆成 `if` 语句提前 `return`**：
+
+  ```uts
+  // ❌ 错误：target 是 number | string，三元在窄化前解析，string 分支上 `>= 0` 非法
+  //    编译报 Expression expected
+  export function resolveTabIndex(target: number | string, apiName: string = 'onTabShow'): number {
+    if (typeof target == 'number') {
+      return target >= 0 ? target : -1;
+    }
+    const idx: number = resolveTabIndexByKey(target);
+    return idx;
+  }
+
+  // ✅ 正确：拆成 if 语句，窄化在语句位置生效
+  export function resolveTabIndex(target: number | string, apiName: string = 'onTabShow'): number {
+    if (typeof target == 'number') {
+      if (target >= 0) {
+        return target;
+      }
+      return -1;
+    }
+    const idx: number = resolveTabIndexByKey(target);
+    return idx;
+  }
+  ```
+
+- **⚠️ 不要顺手把所有三元都改成 `if`**：本条只针对**联合类型**（`number | string`、`T | null` 等）。单类型变量上的三元是完全合法的 —— 本项目 `src/utils/theme/index.uts`、`src/utils/error-report/index.uts`、`src/tabbar/internal/strategy.uts` 等几十处三元一直正常编译。**改法要精准命中联合类型，不要全仓机械替换**。
+- **⚠️ 为什么 H5 / `lint` / 真机跑一遍都发现不了**：这是**编译期**错误，H5 编译目标是 JS 走的是另一套宽松语法；而 `launch app-android --compile true` 不到 Kotlin 阶段（见 3.15 / 3.20），本地很容易全绿。**只有真正走到 Kotlin 编译阶段才暴露**。
+
+---
+
+## 1.21 链式 `.catch()` 在 Kotlin 端**重载不可解析** —— 一律改用双参 `.then(onFulfilled, onRejected)`
+
+- **错误码**（本项目实测，2026-10-07，HBuilderX 5.26，真机 VDOM/Kotlin 通道）：
+
+  ```text
+  [plugin:uni:app-uts] kotlin编译失败
+  error: None of the following candidates is applicable
+    错误详情链接: https://doc.dcloud.net.cn/uni-app-x/uts/compiler-known-issues.html#error25
+  fun <R> catch(onRejected: () -> UTSPromise<R>): UTSPromise<R>
+  fun <R> catch(onRejected: (@ParameterName(...) Any?) -> R): UTSPromise<R>
+  fun <R> catch(onRejected: (@ParameterName(...) Any?) -> UTSPromise<R>): UTSPromise<R>
+  at src/http/request.uts:346:43
+    346 |      return this.send<T>(config).then(done).catch((err: any) => {
+        |                                             ^
+  ```
+
+  三个重载都列出来了，但**一个都匹配不上**。
+
+- **⚠️ 最容易踩的误判**：会以为是「回调里混用了 `throw` 与 `return Promise<T>`，推断出联合返回类型」，于是去拆回调、把 `throw` 改写成 `Promise.reject(...)`。**改完错误会在其它同样写了 `.catch()` 的文件里原样复现** —— 因为根因不在回调，而在 `.catch` 这个方法本身。
+
+  **决定性反例**：`.catch((_err: any): boolean => { return false; })` 返回类型完全单一、无任何 `throw`，**照样报同一个错**。
+
+- **底层原理**：该版本 HBuilderX 的 `UTSPromise` 上，三个 `.catch` 重载在 Kotlin 端的类型推导均无法收敛（官方编译器已知问题 error25：重载匹配失败）。**与回调签名、返回类型、是否 `throw` 都无关**。
+
+- **强制规范**：**`.uts` / `.uvue` 里一律不写链式 `.catch()`，把拒绝回调并进 `.then` 的第二个参数**：
+
+  ```uts
+  // ❌ 错误：链式 .catch 在 Kotlin 阶段报 error25
+  return doX<T>(config)
+    .then((data: T): T => {
+      return data;
+    })
+    .catch((err: any) => {
+      return fallback;          // 或 throw toError(err)
+    });
+
+  // ✅ 正确：双参 .then(onFulfilled, onRejected)，两个回调各自独立标注签名
+  return doX<T>(config).then(
+    (data: T): T => {
+      return data;
+    },
+    (err: any): T => {
+      return fallback;
+    }
+  );
+  ```
+
+  两个收益叠加：① 绕开不可解析的 `.catch` 重载；② 两个回调签名各自独立，**不再需要 `Promise.resolve` 包裹**，直接 `return` 值即可。
+
+- **失败分支要「抛出」时用 `Promise.reject`，不要 `throw`**：
+
+  ```uts
+  // ❌ 错误：throw 让该回调推断出的返回类型与 Promise<T> 不一致，
+  //    在 .then 第二参上同样报 Return type mismatch: expected 'Function'
+  const onRejected = (err: any): Promise<T> => {
+    if (!isRetryable(err)) {
+      throw toError(err);
+    }
+    return Promise.reject(new Error('已过期')) as Promise<T>;
+  };
+
+  // ✅ 正确：所有失败都通过 Promise.reject 表达，返回类型恒为 Promise<T>
+  const onRejected = (err: any): Promise<T> => {
+    if (!isRetryable(err)) {
+      return Promise.reject(toError(err)) as Promise<T>;
+    }
+    return Promise.reject(new Error('已过期')) as Promise<T>;
+  };
+  ```
+
+  同一 `.catch` 报错常伴随 `error: Return type mismatch: expected 'Function', actual 'UTSPromise<T>'` —— 那是**同一个根因的下游症状**，把 `.catch` 改成双参 `.then` 后一并消失，不要单独去修。
+
+- **`throw` 也严禁出现在 `.then` 的 onFulfilled 里吗？** 不 —— **单参 `.then(onFulfilled)` 里 `throw` 是合法的**（本项目拦住器大量使用）。本条的约束是：**当这个回调的返回值要参与 `Promise<R>` 的泛型推导时**（即作为 `.then` 的**第二个参数**、或链式 `.catch` 的参数），才必须用 `Promise.reject` 而非 `throw` 来保持返回类型单一。
+
+- **自查命令**（一条命中全仓）：
+
+  ```bash
+  grep -rn "\.catch(" src App.uvue | grep -v "^\S*: *[*#]"    # 排除注释里的示例
+  ```
+
+  注释 / JSDoc 里的 `.catch(` 示例不受影响，无需改；但**注释里给出的示例代码本身也应改成双参 `.then`**，避免后来者照抄。
+
+- **只在 Kotlin 阶段暴露**：H5 / 小程序（UTS2JS）与字节码模式全部放行。所以 **`pnpm build:h5` 全绿、`eslint` 干净、单测全过，都不代表没这个问题** —— 必须跑一次真机编译才算验证：
+
+  ```bash
+  npx uni-launch app-android --compile true --vaporRenderTarget nativecode
+  ```
+
+  验证产物看 `unpackage/cache/.app-android/src/index.kt`（**注意不带 `vapornativecode` 段**，那个目录里是恒为空的 `UniAppConfig`），编译成功时该文件有数千行，可用字符串常量（如 `__REFRESHABLE_401__`）grep 确认应用级 UTS 确实编进去了。
+
+---

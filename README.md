@@ -805,6 +805,19 @@ uni-app X 推出了新一代的 **蒸汽模式（Vapor）**。新版渲染引擎
 | **`1`** | **`NATIVE_TABBAR`**<br>纯原生 TabBar | 支持缓存 | `uni.switchTab` | 纯原生 `pages.json` TabBar 渲染（⚠️ 原生 `midButton` 在微信小程序 / 鸿蒙 / iOS(Vapor) 端官方不支持）。 |
 | **`0`** | **`NO_TABBAR`**<br>无 TabBar | 无 | 无 | 纯单页、登录页或不需要 TabBar 的应用场景。 |
 
+> [!IMPORTANT]
+> **模式 `4`（单页面容器保活）的取舍：保活是拿渲染节点换来的，Tab 数量请克制。**
+>
+> 各 Tab 视图在首次激活后**常驻不卸载** —— [TabContent.uvue](src/tabbar/components/TabContent.uvue) 用 `hasRendered` 闩住渲染，非激活时仅靠 `rootStyle`（移出视口）与 `visibility` 隐藏，**并未销毁节点**。因此：
+>
+> - 每个访问过的 Tab 都会**永久留在渲染树里**，其子组件、长列表、定时器、监听器全部持续存活；
+> - 单页面内的节点总量 ≈ **所有已访问 Tab 之和**，而非当前可见的那一个；
+> - Tab 越多、每个 Tab 内列表越长，切换时的合成与内存压力就越接近「把所有页面同时打开」。
+>
+> **实践建议：Tab 项控制在 3～5 个以内，且不要把节点量大的页面（超长列表、复杂图表、富文本）直接堆成一个 Tab。** 这类页面更适合放进**二级页面**（`router.push` 打开，用完即销毁），Tab 内只保留入口。
+>
+> 若业务确实需要大量 Tab 页，或某个 Tab 页面节点极重，改用模式 `2`（`CUSTOM_TABBAR_WITH_NATIVE`）—— 它以**原生 `switchTab` + 页面级缓存**承载，同样零白屏，但没有「所有 Tab 同时挂在树上」的问题。
+
 #### 2. 视觉呈现形态（`src/tabbar/config.uts`）
 
 在自定义模式（模式 2 / 3 / 4）下，可通过 `src/tabbar/config.uts` 的 `type` 字段一键切换 UI 风格：
