@@ -196,7 +196,15 @@ function resolveCompilerVersion(): string {
   // #endif
   try {
     const base = uni.getAppBaseInfo() as any;
-    const ver = `${base.uniCompilerVersion ?? base.appCompilerVersion ?? base.SDKVersion ?? ''}`;
+    // UTS 会把 `base.uniCompilerVersion` 这类 any 属性访问直接编译成 Kotlin 标识符
+    // （不走动态查找），而该字段仅部分平台存在 → 报 error18 找不到名称。
+    // 必须先用 UTSJSONObject 包一层，再经 getAny() 动态取值。
+    const baseObj = base as UTSJSONObject;
+    const rawVer = baseObj.getAny('uniCompilerVersion')
+      ?? baseObj.getAny('appCompilerVersion')
+      ?? baseObj.getAny('SDKVersion')
+      ?? '';
+    const ver = `${rawVer}`;
     if (ver != '') {
       return ver.replace(/\.0{3}.*$/, '');
     }

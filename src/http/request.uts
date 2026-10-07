@@ -335,7 +335,15 @@ export class HttpClient {
     return task;
   }
 
-  /** 真实请求流程：send → 401 刷新重放，并在收尾时清理任务登记 */
+  /**
+   * 真实请求流程：send → 401 刷新重放，并在收尾时清理任务登记。
+   *
+   * 全程使用「双参 .then(onFulfilled, onRejected)」而非链式 .catch()：
+   * UTSPromise 的 .catch 重载在 Kotlin 端要求回调返回单一确定类型，
+   * 而这里的失败分支既可能 `throw`（返回 never）又可能返回 Promise<T>，
+   * 联合返回值会让重载匹配失败，报 error25 与 `Return type mismatch: expected 'Function'`。
+   * 双参形式每个回调签名独立且已显式标注，可规避该重载歧义。
+   */
   private execute<T>(config: LimeRequestConfig, fingerprint: string, cacheTtl: number): Promise<T> {
     const requestKey = readExtraString(config, 'requestKey');
     const done = (data: T): T => {
@@ -343,37 +351,55 @@ export class HttpClient {
       this.cacheIfNeeded(fingerprint, cacheTtl, data);
       return data;
     };
-    return this.send<T>(config).then(done).catch((err: any): Promise<T> => {
-      clearTask(requestKey);
-      // 主动取消：静默失败，不弹 toast、不触发登录收尾
-      if (isAborted(requestKey) || isAborted(fingerprint)) {
-        consumeAborted(requestKey);
-        consumeAborted(fingerprint);
-        return Promise.reject(new Error('请求已取消')) as Promise<T>;
+    // 失败分支统一收口：清理任务登记 → 主动取消静默失败 → 非 401 原样抛出 → 否则交给刷新重放
+    const onRejected = (err: any): Promise<T> => {
+      return this.handleFailure<T>(err, config, requestKey, fingerprint);
+    };
+    return this.send<T>(config).then(done, onRejected);
+  }
+
+  /**
+   * 失败分支处理：返回一个「最终结果」Promise，调用方无需再挂 .catch。
+   *
+   * 所有失败都通过 `Promise.reject(...)` 表达，绝不 `throw` ——
+   * 抛出会让回调推断出 never/Promise<T> 的联合返回类型，触发 error25。
+   */
+  private handleFailure<T>(err: any, config: LimeRequestConfig, requestKey: string, fingerprint: string): Promise<T> {
+    clearTask(requestKey);
+    // 主动取消：静默失败，不弹 toast、不触发登录收尾
+    if (isAborted(requestKey) || isAborted(fingerprint)) {
+      consumeAborted(requestKey);
+      consumeAborted(fingerprint);
+      return Promise.reject(new Error('请求已取消')) as Promise<T>;
+    }
+    // 非 401 哨兵错误：原样抛出（以 reject 表达，避免与 Promise<T> 形成联合返回）
+    if (!isRefreshable401(err)) {
+      return Promise.reject(toError(err)) as Promise<T>;
+    }
+    // 刷新接口自身的 401 已在拦截器抛普通错误，不会走到这里
+    const onRefreshed = (ok: boolean): Promise<T> => {
+      if (!ok) {
+        this.handleUnauthorizedOnce();
+        return Promise.reject(new Error('登录已过期，请重新登录')) as Promise<T>;
       }
-      // 非 401 哨兵错误：原样抛出
-      if (!isRefreshable401(err)) {
-        throw toError(err);
-      }
-      // 刷新接口自身的 401 已在拦截器抛普通错误，不会走到这里
-      return tryRefreshToken().then((ok: boolean): Promise<T> => {
-        if (!ok) {
+      // 刷新成功：用同一份 config 重放一次（不递归，避免无限刷新）
+      const replayConfig = cloneConfig(config);
+      const doneReplay = (data: T): T => {
+        clearTask(requestKey);
+        return data;
+      };
+      const onReplayFailed = (replayErr: any): Promise<T> => {
+        clearTask(requestKey);
+        // 重放仍 401：刷新出来的 token 依然无效，只收尾一次
+        if (isRefreshable401(replayErr)) {
           this.handleUnauthorizedOnce();
           return Promise.reject(new Error('登录已过期，请重新登录')) as Promise<T>;
         }
-        // 刷新成功：用同一份 config 重放一次（不递归，避免无限刷新）
-        const replayConfig = cloneConfig(config);
-        return this.send<T>(replayConfig).then(done).catch((replayErr: any): Promise<T> => {
-          clearTask(requestKey);
-          // 重放仍 401：刷新出来的 token 依然无效，只收尾一次
-          if (isRefreshable401(replayErr)) {
-            this.handleUnauthorizedOnce();
-            return Promise.reject(new Error('登录已过期，请重新登录')) as Promise<T>;
-          }
-          throw toError(replayErr);
-        });
-      });
-    });
+        return Promise.reject(toError(replayErr)) as Promise<T>;
+      };
+      return this.send<T>(replayConfig).then(doneReplay, onReplayFailed);
+    };
+    return tryRefreshToken().then(onRefreshed);
   }
 
   /**

@@ -141,7 +141,7 @@ export const MOCK_WALLPAPERS: Array<WallpaperItem> = [
 - 业务码 `code != 0 && code != 200`：toast 后端返回的 `message` / `msg`（`extra.toast: false` 可关）；**业务码 `401` 同样清 token 并跳登录页**；
 - 网络失败：toast「网络错误，请稍后再试」并 `reject`。
 
-⇒ 因此 api 层函数里**不要再写** `uni.showToast` / 跳登录 / 判 401；**页面侧只需要 `.catch()` 收尾自己的 loading 状态**（`finally` 里关 `loading`）。
+⇒ 因此 api 层函数里**不要再写** `uni.showToast` / 跳登录 / 判 401；**页面侧只需要用 `.then` 的第二参（拒绝回调）收尾自己的 loading 状态**（`finally` 里关 `loading`）。**注意写双参 `.then(onFulfilled, onRejected)`，不要写链式 `.catch()`** —— 后者在 Kotlin 端报 `error25` 重载不可解析（见分册 1 的 1.21）。
 
 ### 3. 文件上传与流式接口也走既有封装
 

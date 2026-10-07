@@ -28,8 +28,12 @@ let failureHandled: boolean = false;
  * @returns true 表示刷新成功且已写回 store；false 表示无 refreshToken 或刷新失败
  */
 export function tryRefreshToken(): Promise<boolean> {
-  if (inflight != null) {
-    return inflight;
+  // 不能用 `if (inflight != null) return inflight;`
+  // inflight 是模块级可变属性，Kotlin 拒绝为它做 smart cast
+  // （Smart cast to 'UTSPromise<Boolean>' is impossible...），必须取局部量再判空
+  const current = inflight;
+  if (current != null) {
+    return current;
   }
 
   const task = doRefresh();
@@ -78,8 +82,7 @@ function doRefresh(): Promise<boolean> {
         refreshExpiresIn: res.refreshExpiresIn
       } as IDoubleTokenRes);
       return true;
-    })
-    .catch((_err: any): boolean => {
+    }, (_err: any): boolean => {
       return false;
     });
 }

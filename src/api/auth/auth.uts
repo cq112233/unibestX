@@ -91,7 +91,7 @@ export function login(params: LoginQuery): Promise<LoginResult> {
         roles: rawRoles.length > 0 ? rawRoles : ['admin']
       } as AuthUserInfo
     } as LoginResult;
-  }).catch((_err: any): Promise<LoginResult> => {
+  }, (_err: any): LoginResult => {
     const fallback: LoginResult = {
       token: MOCK_LOGIN_RESULT.token,
       expiresIn: MOCK_LOGIN_RESULT.expiresIn,
@@ -105,7 +105,7 @@ export function login(params: LoginQuery): Promise<LoginResult> {
         roles: MOCK_USER_INFO.roles
       } as AuthUserInfo
     };
-    return Promise.resolve(fallback);
+    return fallback;
   });
 }
 
@@ -122,8 +122,8 @@ export function fetchUserInfo(): Promise<AuthUserInfo> {
       avatar: data.getString('avatar') ?? '/static/logo.png',
       roles: rawRoles.length > 0 ? rawRoles : ['admin', 'developer']
     } as AuthUserInfo;
-  }).catch((_err: any): Promise<AuthUserInfo> => {
-    return Promise.resolve(MOCK_USER_INFO);
+  }, (_err: any): AuthUserInfo => {
+    return MOCK_USER_INFO;
   });
 }
 
@@ -147,14 +147,14 @@ export function refreshAccessToken(params: RefreshTokenQuery): Promise<RefreshTo
       refreshToken: data.getString('refreshToken') ?? params.refreshToken,
       refreshExpiresIn: data.getNumber('refreshExpiresIn') ?? 604800
     } as RefreshTokenResult;
-  }).catch((_err: any): Promise<RefreshTokenResult> => {
+  }, (_err: any): RefreshTokenResult => {
     const fallback: RefreshTokenResult = {
       accessToken: `mock-token-refreshed-${Date.now()}`,
       accessExpiresIn: 7200,
       refreshToken: params.refreshToken,
       refreshExpiresIn: 604800
     };
-    return Promise.resolve(fallback);
+    return fallback;
   });
 }
 
@@ -164,7 +164,7 @@ export function refreshAccessToken(params: RefreshTokenQuery): Promise<RefreshTo
 export function logout(): Promise<boolean> {
   return http.post<any>('/auth/logout').then((_data: any): boolean => {
     return true;
-  }).catch((_err: any): Promise<boolean> => {
-    return Promise.resolve(true);
+  }, (_err: any): boolean => {
+    return true;
   });
 }
