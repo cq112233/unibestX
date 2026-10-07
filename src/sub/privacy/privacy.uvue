@@ -116,8 +116,7 @@ function loadContent(): void {
   fetchPrivacyContent()
     .then((data: PrivacyContent): void => {
       content.value = data;
-    })
-    .catch((err: any): void => {
+    }, (err: any): void => {
       console.error('隐私页文案加载失败:', err);
     });
 }

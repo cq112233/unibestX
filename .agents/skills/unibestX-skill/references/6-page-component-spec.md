@@ -469,8 +469,7 @@ function loadData(): void {
   fetchModuleAList()
     .then((data: Array<IModuleAItem>): void => {
       listData.value = data;
-    })
-    .catch((err: any): void => {
+    }, (err: any): void => {
       console.error('模块 A 数据加载失败:', err);
     })
     .finally((): void => {
