@@ -467,7 +467,9 @@ function detectIde() {
       }
     }
     // HBuilderV：VSCode 系布局，没有 plugins/ 也没有 HBuilderX 的 cli
-    if (fs.existsSync(install.productJson)) {
+    // productJson 只有 installFromExecutable 会给，兜底路径的入参没有这个键，
+    // 直接 existsSync(undefined) 会触发 DEP0187，所以先判空
+    if (install.productJson && fs.existsSync(install.productJson)) {
       const parsed = readProductJsonVersion(install.productJson);
       if (parsed) {
         return { ...parsed, ...install, cliPath: cli, via, versionSource: 'product.json' };
