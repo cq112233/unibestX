@@ -50,6 +50,14 @@
  *   pnpm sync:hbuilderx --alpha      # 允许并优先选择 alpha 通道的最新构建
  *   pnpm sync:hbuilderx --no-install # 只改 package.json，不跑 pnpm install
  *   pnpm sync:hbuilderx --plugins-path /path/to/HBuilderX/plugins
+ *   pnpm sync:hbuilderx --ensure     # 对齐就静默过，不对齐才自动同步（挂在 dev / build 脚本前）
+ *   pnpm sync:hbuilderx --preflight  # 只做本地比对，不联网；不对齐时提示并退出码 3（供 vite 插件调用）
+ *
+ * 为什么要 --ensure / --preflight：手动跑的脚本等于没有。--ensure 挂在所有 dev / build 脚本前面，
+ * 开发者升级编辑器后下一次跑命令就自动对齐；--preflight 由 plugins/vite-plugin-editor-version.ts
+ * 调用，覆盖从编辑器「运行」「发行」按钮启动的那条路（那条路不经过 npm 脚本，修不了）。
+ * --preflight **只提示不阻断** —— 版本不一致未必立刻报错，但一旦报错往往是 API 行为差异、
+ * 类型不匹配这类看不出根因的问题，所以每次都提醒，由开发者自己决定要不要先同步。
  */
 
 import { execFileSync, execSync } from 'node:child_process';
@@ -72,6 +80,11 @@ const isCheck = hasFlag('--check');
 const isDryRun = hasFlag('--dry-run');
 const skipInstall = hasFlag('--no-install');
 const preferAlpha = hasFlag('--alpha');
+const isPreflight = hasFlag('--preflight');
+const isEnsure = hasFlag('--ensure');
+
+/** --preflight 判定「不一致」的退出码。与「脚本自身崩了」的 1 区分开，避免误拦 */
+const EXIT_DRIFT = 3;
 
 /** 需要与编辑器编译器保持同版本号的包（顺序即 package.json 中的出现顺序） */
 const UNI_PACKAGES = [
@@ -579,7 +592,7 @@ function patchPackageJson(source, updates) {
   let next = source;
   const applied = [];
   for (const [name, version] of updates) {
-    const lineRe = new RegExp(`^(\\s*"${name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}":\\s*")([^"]+)(",\\s*)$`, 'm');
+    const lineRe = new RegExp(`^(\\s*"${escapeRe(name)}":\\s*")([^"]+)(",\\s*)$`, 'm');
     const m = lineRe.exec(next);
     if (!m) {
       applied.push({ name, from: null, to: version });
@@ -593,9 +606,112 @@ function patchPackageJson(source, updates) {
   return { next, applied };
 }
 
+/** 转义正则里的字面量 */
+function escapeRe(text) {
+  return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+/** 从 package.json 现有内容里取出这 4 个依赖当前的 npm 版本前缀（`3.0.0-` / `3.0.0-alpha-` 之后那 5 位） */
+function currentPinnedPrefix(source) {
+  for (const pkg of UNI_PACKAGES) {
+    const m = new RegExp(`^\\s*"${escapeRe(pkg)}":\\s*"3\\.0\\.0-(?:alpha-)?(\\d{5})`, 'm').exec(source);
+    if (m) {
+      return m[1];
+    }
+  }
+  return null;
+}
+
+/**
+ * 本地快速比对：编辑器版本推出的候选前缀，是否与 package.json 当前 pin 的前缀一致。
+ *
+ * 刻意**不查 registry** —— 这一步会被挂到每次 dev / build 前面，不能有网络开销。
+ * 它只回答「是不是同一个编译器世代」；「这个版本还在不在 registry 上」由完整同步负责。
+ *
+ * @returns {{ status: 'aligned'|'drift'|'no-editor'|'no-pin'|'no-prefix', hx?: object, prefixes?: string[], pinned?: string }}
+ */
+function fastCheck() {
+  const { hx } = detectIde();
+  if (!hx) {
+    return { status: 'no-editor' };
+  }
+
+  const prefixes = prefixCandidates(hx.versionParts);
+  if (prefixes.length === 0) {
+    return { status: 'no-prefix', hx };
+  }
+
+  const pinned = currentPinnedPrefix(fs.readFileSync(pkgFile, 'utf-8'));
+  if (!pinned) {
+    return { status: 'no-pin', hx };
+  }
+
+  return {
+    status: prefixes.includes(pinned) ? 'aligned' : 'drift',
+    hx,
+    prefixes,
+    pinned
+  };
+}
+
+/**
+ * --preflight：只回答「对齐了没」，供 vite 插件在每次 dev / build 前调用。
+ *
+ * **只警告、不阻断**：检出不一致时把提示写到 stderr 并以 3 退出，由调用方决定要不要拦。
+ * 之所以只警告，是因为版本不一致未必立刻出错 —— 但一旦出错，症状通常是 API 行为差异或
+ * 类型不匹配这种看不出根因的问题，所以值得每次都提醒一次。
+ *
+ * 退出码：0 = 对齐（含「本机没有编辑器」这类不该打扰人的情况）；3 = 不一致；1 = 脚本自身出错。
+ */
+function runPreflight() {
+  const result = fastCheck();
+
+  // 「本机没装编辑器」必须静默放行 —— CI、以及不用编辑器的同事都不该被打扰
+  if (result.status !== 'drift') {
+    return;
+  }
+
+  const { hx, prefixes, pinned } = result;
+  console.error('');
+  console.error('╔══════════════════════════════════════════════════════════════╗');
+  console.error('║  ⚠️   编辑器与 package.json pin 的编译器版本不一致           ║');
+  console.error('╚══════════════════════════════════════════════════════════════╝');
+  console.error('');
+  console.error(`    本机编辑器      ${hx.versionParts.join('.')}  (${hx.rawVersion})`);
+  console.error(`    期望版本前缀    ${prefixes.join(' / ')}`);
+  console.error(`    package.json    ${pinned}   ← 对不上`);
+  console.error('');
+  console.error('    编译器和项目依赖不同版本时，API 可能出现行为差异或类型不匹配。');
+  console.error('    这类问题的报错位置通常看不出根因，排查成本很高。');
+  console.error('');
+  console.error('    修好它： pnpm sync:hbuilderx');
+  console.error('');
+  console.error('    跑 pnpm dev / pnpm build:* 会自动修，不必手动执行；');
+  console.error('    这里提示的是从编辑器「运行」「发行」按钮启动的那条路。');
+  console.error('');
+
+  process.exit(EXIT_DRIFT);
+}
+
+/**
+ * --ensure：给 dev / build 脚本用的「自动修」入口，挂在命令前面即可。
+ * 对齐就一声不吭直接过（只花一次版本探测的功夫），不对齐才走完整的联网同步 + 装依赖。
+ * 探测不到编辑器时同样静默放行，绝不因为 CI 或同事机器上没装编辑器就把命令卡住。
+ */
+function runEnsure() {
+  const result = fastCheck();
+
+  if (result.status !== 'drift') {
+    return;
+  }
+
+  console.log(`\n📦 编辑器已升级到 ${result.hx.versionParts.join('.')}，package.json 还停在 ${result.pinned}，自动同步中...`);
+  runSync();
+}
+
 // ==================== 主流程 ====================
 
-function main() {
+function runSync() {
   console.log('');
   console.log('╔══════════════════════════════════════════════════╗');
   console.log('║   📦 HBuilderX / HBuilderV 编译器版本同步 (X)    ║');
@@ -701,6 +817,18 @@ function main() {
 
   console.log('\n🎉 同步完成。建议重启编辑器后再编译，避免旧进程仍持有旧版本编译器。');
   console.log('');
+}
+
+function main() {
+  if (isPreflight) {
+    runPreflight();
+    return;
+  }
+  if (isEnsure) {
+    runEnsure();
+    return;
+  }
+  runSync();
 }
 
 try {
