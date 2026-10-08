@@ -13,7 +13,6 @@ import { visualizer } from 'rollup-plugin-visualizer';
 import uniRootX from './plugins/root-plugin';
 import cleanLoggerPlugin from './plugins/vite-plugin-clean-logger';
 import h5OptimizeDepsPlugin from './plugins/vite-plugin-h5-optimize-deps';
-import uniAppXBorderFixPlugin from './plugins/vite-plugin-uni-app-x-border-fix';
 import uniLayoutsPlugin from './plugins/uni-layouts-plugin';
 import tabbarViewsPlugin from './plugins/vite-plugin-tabbar-views';
 import uniPagesPlugin from './plugins/vite-plugin-uni-pages';
@@ -265,10 +264,6 @@ export default defineConfig({
     }),
     uni(),
     ...weappTailwindcssPlugins,
-    // 修复 weapp-tailwindcss 在 H5 构建中把 uni-app x 边框中和规则排到框架样式之前的顺序缺陷：
-    // 该缺陷使所有内置组件（uni-view / uni-text / uni-button 等）被框架的 border-width:medium
-    // 覆盖而凭空获得 3px 实线边框。详见 plugins/vite-plugin-uni-app-x-border-fix.ts。
-    ...(isBuild ? [uniAppXBorderFixPlugin({ debug: false })] : []),
     ...(isVisualizer
       ? [
           visualizer({
