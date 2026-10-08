@@ -11,8 +11,11 @@
  *
  * 为什么不直接把预热塞进 vite.config：warmupFiles 是异步不 await，与首个浏览器请求抢 CPU，
  * 反而让第二次请求更慢（实测 1.98s）。必须先让 server 完全就绪、串行地打几发请求才有效。
+ *
+ * 除了预热，本文件还是 dev 的「HBuilderX 状态守门人」：编辑器没开时直接报错退出，
+ * 而不是让 uni-launch 去自动启动它（那条路会让终端无限卡住）。原因见 ensureHbuilderxRunning。
  */
-import { execSync, spawn } from 'node:child_process';
+import { execFileSync, execSync, spawn } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -39,45 +42,99 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const CLI_CACHE_FILE = path.join(ROOT, 'node_modules', '.hbuilderx-cli-path');
 
 /**
- * 把 HBuilderX 的 cli.exe 交给 uni-launch。
+ * 确认 HBuilderX 在运行，并把它的 cli.exe 交给 uni-launch；没在运行就直接拦下。
  *
- * uni-launch 自己找编辑器用的是 `wmic process where "name='HBuilderX.exe'"`，而 wmic 从
- * Windows 11 24H2 起已被系统移除，进程探测必然失败、只能退回 HBUILDERX_CLI_PATH，最后
- * 报「未检测到正在运行的 HBuilderX 进程」并 exit 1 —— 哪怕 HBuilderX 明明开着。
+ * 为什么要自己拦这一步：uni-launch 拿到 cli 路径后，只要它认为「HBuilderX 没在运行」
+ * （Windows 上它用 `wmic process where "name='HBuilderX.exe'"` 查进程，而 wmic 从 Win11
+ * 24H2 起已被系统移除，这个判断在 Windows 上**永远**是「没在运行」），就会先跑 `cli open`
+ * 把编辑器拉起来，紧接着对**还没就绪**的编辑器发 `project open` / `launch`。后两条命令等不到
+ * 响应就永远等下去 —— 表现出来就是编辑器被拉起来了、终端却卡死，180s 后只等到 dev-warmup
+ * 那句「未在超时内检测到 ready in」。所以「编辑器没开」这个前置条件必须由我们自己判断掉，
+ * 根本不进那条自动启动路径。
  *
- * 取路径的顺序：环境变量 → 上次探测的缓存 → 运行中的进程（PowerShell CIM，同
- * scripts/sync-hbuilderx.mjs 的做法）。拿到后注入 HBUILDERX_CLI_PATH，子进程默认继承
- * process.env，spawn 时无需再传。
+ * 判断方式用 `cli --version`：编辑器在跑时它打印版本号（实测 `5.26.2026091802`，耗时约 90ms），
+ * 没在跑时打印的是「未检测到已打开的HBuilderX」这类提示。两条线索都认，互为兜底：
+ *   - 输出里出现那句提示 → 没在跑（最直接的证据，优先）
+ *   - 输出里有版本号     → 在跑
+ * 不把提示语当唯一依据，是因为文案会随版本改；也不把版本号当唯一依据，是因为提示语里一旦
+ * 带上安装路径（本项目实测就装在 `HBuilderX.5.26.2026091802` 这种带版本号的目录下），
+ * 路径本身就能骗过「有没有版本号」的判断。两条一起看，任一信号失效还有另一条兜住。
  *
- * 为什么要缓存：HBuilderX 没开着时进程探测必然为空，可 uni-launch 一旦拿到路径就会自己
- * 先跑 `cli open` 把编辑器拉起来。不缓存的话「关掉编辑器再 dev」就直接失败；缓存路径失效
- * （编辑器被移动/升级）时也会自动重新探测，不用手工维护。
- * 一路都取不到就什么都不做，让 uni-launch 照常给出它自己的报错。
- * macOS / Linux 上 uni-launch 走 `ps` 能自己找到，不碰这段。
+ * 路径来源的优先级：环境变量 → 上次探测的缓存 → 现场查进程表（PowerShell CIM）。
+ * 有缓存时只付一次 cli 调用的代价，不用起 PowerShell 查系统进程表。
+ * 一路都取不到 cli 路径就什么都不做：uni-launch 会自己报「未找到 HBuilderX」并以 1 退出，
+ * 既快又明确，不必我们再复述一遍。
+ * macOS / Linux 上 uni-launch 走 `ps` 能正确判断编辑器在不在，不需要这段。
  */
-function injectHbuilderxCliPath() {
-  const preset = process.env.HBUILDERX_CLI_PATH;
-  if ((preset && fs.existsSync(preset)) || process.platform !== 'win32') {
+function ensureHbuilderxRunning() {
+  if (process.platform !== 'win32') {
     return;
   }
 
-  let found = readCliCache();
+  const preset = process.env.HBUILDERX_CLI_PATH;
+  const known = preset && fs.existsSync(preset) ? preset : readCliCache();
+  let notRunning = null;
 
-  if (!found) {
-    found = detectRunningCli();
-    if (found) {
-      try {
-        fs.writeFileSync(CLI_CACHE_FILE, found, 'utf-8');
-      }
-      catch {
-        // 写不进去不影响本次启动
-      }
+  if (known) {
+    const output = cliVersionOutput(known);
+    if (isIdeRunning(output)) {
+      process.env.HBUILDERX_CLI_PATH = known;
+      return;
     }
+    notRunning = { cli: known, output };
   }
 
-  if (found) {
-    process.env.HBUILDERX_CLI_PATH = found;
+  // 缓存/环境变量里的这个 cli 说编辑器没在跑：可能是真没开，也可能是编辑器被移动或升级、
+  // 路径指向了旧安装。查一次系统进程表把两者分开，别把「换了新版本」误判成「没开」。
+  const located = detectRunningCli();
+  if (located) {
+    writeCliCache(located);
+    process.env.HBUILDERX_CLI_PATH = located;
+    return;
   }
+
+  // 进程表里也确实没有。此时若本来就有一个 cli 路径（说明这台机器装过编辑器，只是没开），
+  // 就明确报错退出；一路都没找到 cli 则交给 uni-launch 报它自己的「未找到 HBuilderX」。
+  if (notRunning) {
+    failWithoutHbuilderx(notRunning);
+  }
+}
+
+/** cli 在「编辑器没打开」时给出的提示语 —— 不是唯一判据，见 ensureHbuilderxRunning */
+const IDE_NOT_RUNNING_HINT = '未检测到已打开的HBuilderX';
+
+/**
+ * 问一次 cli 本体：编辑器是不是已经能接命令了。
+ *
+ * 返回原始输出；一旦 cli 自身起不来（超时、非 0 退出）也把 error 上挂着的输出拼回来 ——
+ * 判定只看输出内容，不关心退出码。
+ */
+function cliVersionOutput(cli) {
+  const options = { stdio: ['ignore', 'pipe', 'pipe'], encoding: 'utf-8', timeout: 15_000 };
+  try {
+    return `${execFileSync(cli, ['--version'], options)}`.trim();
+  }
+  catch (err) {
+    return `${err?.stdout ?? ''}${err?.stderr ?? ''}`.trim();
+  }
+}
+
+/** 输出带版本号、且没有「没打开」的提示 = 编辑器在跑（两个信号的含义见 ensureHbuilderxRunning） */
+function isIdeRunning(output) {
+  return !output.includes(IDE_NOT_RUNNING_HINT) && /\d+\.\d+/.test(output);
+}
+
+/** 编辑器没开：明确报错退出，绝不把 cli 路径交给 uni-launch 去自动启动（那会卡死） */
+function failWithoutHbuilderx({ cli, output }) {
+  console.error('');
+  console.error('❌ HBuilderX 没有在运行，dev 无法开始编译。');
+  console.error('');
+  console.error(`   cli 路径：${cli}`);
+  console.error(`   cli --version：${output || '(无输出)'}`);
+  console.error('');
+  console.error('   请先打开 HBuilderX，再重新执行 pnpm dev。');
+  console.error('');
+  process.exit(1);
 }
 
 /** 读上次探测到的 cli.exe；编辑器被移动或升级后路径失效，就当作没有 */
@@ -88,6 +145,16 @@ function readCliCache() {
   }
   catch {
     return null;
+  }
+}
+
+/** 记下探测到的 cli.exe，下次启动省掉一次系统进程表查询；写不进去不影响本次启动 */
+function writeCliCache(cli) {
+  try {
+    fs.writeFileSync(CLI_CACHE_FILE, cli, 'utf-8');
+  }
+  catch {
+    // 忽略
   }
 }
 
@@ -111,7 +178,7 @@ function detectRunningCli() {
   return null;
 }
 
-injectHbuilderxCliPath();
+ensureHbuilderxRunning();
 
 // Windows 下 node_modules/.bin 里只有 uni-launch.cmd，而 child_process 不能直接执行 .cmd
 // （spawn 会 ENOENT / EINVAL，.cmd 必须经 cmd.exe 解析 PATHEXT），所以显式套一层 cmd /c；
