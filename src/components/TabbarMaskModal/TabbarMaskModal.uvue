@@ -1,7 +1,7 @@
 <template>
   <!-- 全屏遮罩弹窗组件 (具备穿透/覆盖底部 TabBar 能力的基础通用组件) -->
   <!-- 微信小程序端：使用 root-portal 提升至 page 根节点以穿透 TabBar -->
-  <!-- #ifdef MP-WEIXIN -->
+  <!-- #ifdef MP -->
   <root-portal v-if="isShown">
     <view class="tabbar-modal-mask-root" :style="{ zIndex }">
       <!-- 暗色遮罩背景（点击空白处触发关闭） -->
@@ -83,7 +83,7 @@
   <!-- #endif -->
 
   <!-- 非微信小程序端（App、H5 等）：无需 root-portal，直接由 position: fixed 覆盖 -->
-  <!-- #ifndef MP-WEIXIN -->
+  <!-- #ifndef MP -->
   <view
     v-if="isShown"
     class="tabbar-modal-mask-root"
@@ -325,47 +325,47 @@ defineExpose({
 .tabbar-modal-mask-root {
   position: fixed;
   top: 0;
+  right: 0;
   bottom: 0;
   left: 0;
-  right: 0;
   display: flex;
   flex-direction: column;
-  align-items: center;
   justify-content: center;
+  align-items: center;
 }
 
 .tabbar-modal-backdrop {
   position: absolute;
   top: 0;
+  right: 0;
   bottom: 0;
   left: 0;
-  right: 0;
   background-color: rgba(0, 0, 0, 0.65);
 }
 
 .tabbar-modal-card {
-  padding: 20px;
-  border-radius: 16px;
-  border-width: 1px;
-  border-style: solid;
-  border-color: #e2e8f0;
-  background-color: #ffffff;
   position: relative;
   z-index: 10;
   display: flex;
   flex-direction: column;
+  padding: 20px;
+  border-width: 1px;
+  border-style: solid;
+  border-color: #e2e8f0;
+  border-radius: 16px;
+  background-color: #ffffff;
 
   &--dark {
-    background-color: #1e293b;
     border-color: #334155;
+    background-color: #1e293b;
   }
 }
 
 .tabbar-modal-header {
   display: flex;
   flex-direction: row;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
   margin-bottom: 12px;
 }
 
@@ -378,14 +378,14 @@ defineExpose({
 }
 
 .tabbar-modal-icon {
-  font-size: 18px;
   margin-right: 8px;
+  font-size: 18px;
 }
 
 .tabbar-modal-title-text {
+  color: #1e293b;
   font-size: 16px;
   font-weight: bold;
-  color: #1e293b;
 
   &--dark {
     color: #f1f5f9;
@@ -397,8 +397,8 @@ defineExpose({
 }
 
 .tabbar-modal-close-text {
-  font-size: 16px;
   color: #94a3b8;
+  font-size: 16px;
 }
 
 .tabbar-modal-payload-wrap {
@@ -408,9 +408,9 @@ defineExpose({
 }
 
 .tabbar-modal-payload-msg {
+  color: #64748b;
   font-size: 12px;
   line-height: 20px;
-  color: #64748b;
 
   &--dark {
     color: #94a3b8;
@@ -418,17 +418,17 @@ defineExpose({
 }
 
 .tabbar-modal-payload-source {
-  font-size: 11px;
-  line-height: 18px;
   margin-top: 4px;
   color: #4f46e5;
+  font-size: 11px;
+  line-height: 18px;
 }
 
 .tabbar-modal-desc-text {
-  font-size: 12px;
-  line-height: 20px;
   margin-bottom: 12px;
   color: #64748b;
+  font-size: 12px;
+  line-height: 20px;
 
   &--dark {
     color: #94a3b8;
@@ -436,11 +436,11 @@ defineExpose({
 }
 
 .tabbar-modal-tip-card {
-  padding: 10px;
-  border-radius: 8px;
-  margin-bottom: 16px;
   display: flex;
   flex-direction: column;
+  margin-bottom: 16px;
+  padding: 10px;
+  border-radius: 8px;
   background-color: #f8fafc;
 
   &--dark {
@@ -449,34 +449,34 @@ defineExpose({
 }
 
 .tabbar-modal-tip-text-green {
+  color: #059669;
   font-size: 11px;
   line-height: 18px;
-  color: #059669;
 }
 
 .tabbar-modal-tip-text-indigo {
+  margin-top: 4px;
+  color: #4f46e5;
   font-size: 11px;
   line-height: 18px;
-  color: #4f46e5;
-  margin-top: 4px;
 }
 
 .tabbar-modal-tip-text-amber {
+  margin-top: 4px;
+  color: #d97706;
   font-size: 11px;
   line-height: 18px;
-  color: #d97706;
-  margin-top: 4px;
 }
 
 .tabbar-modal-confirm-btn {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
   width: 100%;
   height: 40px;
   border-radius: 8px;
   background-color: #4f46e5;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
 
   &:active {
     opacity: 0.85;
