@@ -2,6 +2,12 @@ import uniHelper from '@uni-helper/eslint-config';
 import { pluginUts } from './plugins/eslint-plugin-uts.mjs';
 
 const composer = uniHelper({
+  // 关闭「编辑器模式」：@antfu/eslint-config 检测到 VSCODE_PID/VSCODE_CWD 时，
+  // 会用 composer.disableRulesFix() 摘掉 prefer-const / unused-imports/no-unused-imports
+  // / test/no-only-tests 三条规则的 autofix（report 里的 fix 被删掉），
+  // 导致 VSCode 快速修复里只剩「Disable xxx for this line」，没有「let → const」。
+  // 置 false 后编辑器行为与 CLI/CI 完全一致，上述快速修复恢复可用。
+  isInEditor: false,
   stylistic: {
     semi: true // 启用自动分号
   },
@@ -55,7 +61,7 @@ const composer = uniHelper({
     'ts/no-redeclare': 'off',
     'style/no-tabs': 'off',
     'unused-imports/no-unused-vars': [
-      'error',
+      'warn',
       {
         vars: 'all',
         varsIgnorePattern: '^_',
