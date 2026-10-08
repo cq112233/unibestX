@@ -116,6 +116,8 @@ export default {
     'declaration-block-no-redundant-longhand-properties': null,
     // 空样式块不报错（很多组件预留空 style 标签）
     'no-empty-source': null,
+    // 允许行内 style 与嵌套声明（防止 uvue 模板行内 style 误报）
+    'no-invalid-position-declaration': null,
     // 注释规则放宽
     'comment-empty-line-before': null,
     'scss/double-slash-comment-whitespace-inside': null,

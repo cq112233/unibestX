@@ -7,12 +7,13 @@ import {
   getSystemTheme,
   isDarkMode,
   themeColor
-} from '@/src/utils/theme/index.uts';
+} from '@/src/theme/index.uts';
 import { getDefaultLocale } from '@/src/utils/env/index.uts';
 import { setLocale as setUViewLocale } from '@/uni_modules/uview-ultra/libs/i18n/index.uts';
 import uViewConfig from '@/uni_modules/uview-ultra/libs/config/config.uts';
 // 类型统一来自 src/store/types.uts（唯一真源），本文件严禁再 export type 同名类型
 import type { IAppState } from '../types.uts';
+
 // ==========================================
 // 业务与组件库主题同步辅助方法
 // ==========================================
@@ -215,7 +216,7 @@ export class AppStore extends PiniaStoreBase {
       this.state.isDark = true;
     }
     else {
-      // auto：跟随系统 / 宿主主题（App 读 osTheme，H5 用 matchMedia，小程序读 hostTheme，见 src/utils/theme/index.uts）
+      // auto：跟随系统 / 宿主主题（App 读 osTheme，H5 用 matchMedia，小程序读 hostTheme，见 src/theme/index.uts）
       this.state.isDark = getSystemTheme() == 'dark';
     }
     applyThemeMode(mode, this.state.isDark);
