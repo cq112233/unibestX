@@ -686,9 +686,6 @@ function runPreflight() {
   console.error('');
   console.error('    修好它： pnpm sync:hbuilderx');
   console.error('');
-  console.error('    跑 pnpm dev / pnpm build:* 会自动修，不必手动执行；');
-  console.error('    这里提示的是从编辑器「运行」「发行」按钮启动的那条路。');
-  console.error('');
 
   process.exit(EXIT_DRIFT);
 }
