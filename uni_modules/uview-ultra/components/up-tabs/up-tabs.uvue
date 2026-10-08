@@ -1,508 +1,498 @@
+<!--
+  up-tabs 标签页（本仓库重写版）
+
+  重写原因：uview-ultra 原版嵌在「组件内部」用时（如首页 IndexView 挂在 TabContent 里），
+  整条标签栏会静默变成 44px 空白，根因在原版实现的三个取向：① 靠内嵌 scroll-view 做横向
+  滚动，嵌在外层滚动容器里时量不到尺寸、__nav 被排成 0 宽而整条被裁没；② 下划线靠
+  createSelectorQuery 逐项量宽再累加算偏移，渲染正确性绑死在测量上；③ 布局吃 <view> 的
+  默认显示类型（App 端是 flex column，小程序端组件里是 block）。本版对应改为：①「普通
+  view + overflow: hidden + 手指平移」，② 下划线画在选中项内部靠 flex 居中、不量宽度，
+  ③ 所有布局属性显式写进样式表。
+
+  对外 API（props / slots / events / expose）与原版完全一致，调用方无需改动。
+-->
 <template>
-	<view class="up-tabs">
-		<view class="up-tabs__wrapper" :style="tabsWrapperStyle">
-			<slot name="left" />
-			<view class="up-tabs__wrapper__scroll-view-wrapper">
-				<scroll-view
-					:direction="scrollable ? 'horizontal' : 'none'"
-					:scroll-left="scrollLeft"
-					scroll-with-animation
-					class="up-tabs__wrapper__scroll-view"
-					:show-scrollbar="false"
-					ref="up-tabs__wrapper__scroll-view"
-					:style="tabsWrapperStyle"
-				>
-					<view
-						class="up-tabs__wrapper__nav"
-						ref="up-tabs__wrapper__nav"
-						:style="tabsWrapperStyle"
-					>
-						<view
-							class="up-tabs__wrapper__nav__item"
-							v-for="(item, index) in list"
-							:key="index"
-							@tap="clickHandler(item, index)"
-							@longpress="longPressHandler(item, index)"
-							:ref="`up-tabs__wrapper__nav__item-${index}`"
-							:style="getItemStyle()"
-							:class="[`up-tabs__wrapper__nav__item-${index}`,
-								(item['disabled'] != null && (item['disabled'] as boolean)) ? 'up-tabs__wrapper__nav__item--disabled' : '',
-								innerCurrent == index ? 'up-tabs__wrapper__nav__item-active' : '']"
-						>
-							<slot v-if="$slots['icon']" name="icon" :item="item"
-								:keyName="keyName" :index="index"></slot>
-							<template v-else>
-								<view class="up-tabs__wrapper__nav__item__prefix-icon" v-if="item['icon'] != null">
-									<up-icon
-										:name="item['icon']"
-										:customStyle="iconCustomStyle"
-									></up-icon>
-								</view>
-							</template>
-							<slot name="content" v-if="$slots['content'] != null"
-								:item="item" :keyName="keyName" :index="index"></slot>
-							<slot name="default" v-else-if="$slots['content'] == null && ($slots['default'] != null || $slots['$default'] != null)"
-								:item="item" :keyName="keyName" :index="index"></slot>
-							<text v-else
-								:class="[(item['disabled'] != null && (item['disabled'] as boolean)) ? 'up-tabs__wrapper__nav__item__text--disabled' : '']"
-								class="up-tabs__wrapper__nav__item__text"
-								:style="textStyle(index)"
-							>{{ item[keyName] }}</text>
-							<up-badge
-								:show="getShowValue(item)"
-								:isDot="getBadgePropValue(item, 'isDot')"
-								:value="getBadgePropValue(item, 'value')"
-								:max="getBadgePropValue(item, 'max')"
-								:type="getBadgePropValue(item, 'type')"
-								:showZero="getBadgePropValue(item, 'showZero')"
-								:bgColor="getBadgePropValue(item, 'bgColor')"
-								:color="getBadgePropValue(item, 'color')"
-								:shape="getBadgePropValue(item, 'shape')"
-								:numberType="getBadgePropValue(item, 'numberType')"
-								:inverted="getBadgePropValue(item, 'inverted')"
-								customStyle="margin-left: 4px;"
-							></up-badge>
-						</view>
-						<view
-							class="up-tabs__wrapper__nav__line"
-							ref="up-tabs__wrapper__nav__line"
-							:style="lineStyle"
-						>
-						</view>
-					</view>
-				</scroll-view>
-			</view>
-			<slot name="right" />
-		</view>
-	</view>
+  <view class="up-tabs">
+    <view class="up-tabs__wrapper" :style="wrapperStyle">
+      <slot name="left" />
+
+      <!-- 视口：横向内容超出时由手指拖动平移，禁用原生滚动容器 -->
+      <view
+        class="up-tabs__viewport"
+        @touchstart="onTouchStart"
+        @touchmove="onTouchMove"
+        @touchend="onTouchEnd"
+        @touchcancel="onTouchEnd"
+      >
+        <!-- 标签行：宽度由内容撑开（flex-shrink 0），靠 left 偏移做平移 -->
+        <view class="up-tabs__nav" :style="navStyle">
+          <view
+            v-for="(item, index) in list"
+            :key="index"
+            class="up-tabs__item"
+            :class="[isDisabled(item) ? 'up-tabs__item--disabled' : '', innerCurrent == index ? 'up-tabs__item--active' : '']"
+            :style="itemRowStyle"
+            @tap="onItemTap(item, index)"
+            @longpress="onItemLongPress(item, index)"
+          >
+            <!-- 图标：优先走 icon 具名插槽，其次读项自带的 icon 字段 -->
+            <slot v-if="$slots['icon'] != null" name="icon" :item="item" :keyName="keyName" :index="index" />
+            <view v-else-if="item['icon'] != null" class="up-tabs__item__icon">
+              <up-icon :name="item['icon']" :customStyle="iconCustomStyle" />
+            </view>
+            <!-- 内容：优先走 content 作用域插槽，其次 default 插槽，最后按 keyName 取文案 -->
+            <slot name="content" v-if="$slots['content'] != null" :item="item" :keyName="keyName" :index="index" />
+            <slot name="default" v-else-if="$slots['default'] != null" :item="item" :keyName="keyName" :index="index" />
+            <text
+              v-else
+              class="up-tabs__item__text"
+              :class="isDisabled(item) ? 'up-tabs__item__text--disabled' : ''"
+              :style="textStyle(index)"
+            >{{ itemText(item) }}</text>
+            <!-- 角标 -->
+            <up-badge
+              :show="getShowValue(item)"
+              :isDot="getBadgePropValue(item, 'isDot')"
+              :value="getBadgePropValue(item, 'value')"
+              :max="getBadgePropValue(item, 'max')"
+              :type="getBadgePropValue(item, 'type')"
+              :showZero="getBadgePropValue(item, 'showZero')"
+              :bgColor="getBadgePropValue(item, 'bgColor')"
+              :color="getBadgePropValue(item, 'color')"
+              :shape="getBadgePropValue(item, 'shape')"
+              :numberType="getBadgePropValue(item, 'numberType')"
+              :inverted="getBadgePropValue(item, 'inverted')"
+              customStyle="margin-left: 4px;"
+            />
+            <!-- 下划线：只画在选中项上并居中，不依赖测量；它铺满选中项，故也是居中时量取选中项位置的目标 -->
+            <view v-if="innerCurrent == index" class="up-tabs__item__linewrap">
+              <view class="up-tabs__item__line" :style="lineStyle" />
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <slot name="right" />
+    </view>
+  </view>
 </template>
 
 <script setup lang="uts">
-import { ref, computed, watch, onMounted, getCurrentInstance, nextTick } from 'vue'
-import badgeProps from '../../components/up-badge/badge'
-import { addUnit, addStyle, deepMerge, getPx, sleep, getWindowInfo, upGetRect } from '../../libs/function/index.uts'
+import { computed, getCurrentInstance, nextTick, onMounted, ref, watch } from 'vue';
+import type { PropType } from 'vue';
+import badgeProps from '../../components/up-badge/badge';
+import { addStyle, addUnit, deepMerge, upGetRect } from '../../libs/function/index.uts';
 
 defineOptions({
-	name: 'up-tabs'
-})
+  name: 'up-tabs'
+});
 
 const props = defineProps({
-	duration: {
-		type: Number,
-		default: 200
-	},
-	list: {
-		type: Array as PropType<Array<UTSJSONObject>>,
-		default: () => [] as Array<UTSJSONObject>
-	},
-	lineColor: {
-		type: String,
-		default: '#3c9cff'
-	},
-	activeStyle: {
-		type: [String, Object],
-		default: () => ({
-			color: '#303133'
-		})
-	},
-	inactiveStyle: {
-		type: [String, Object],
-		default: () => ({
-			color: '#606266'
-		})
-	},
-	lineWidth: {
-		type: [String, Number],
-		default: '20px'
-	},
-	lineHeight: {
-		type: [String, Number],
-		default: '3px'
-	},
-	lineBgSize: {
-		type: String,
-		default: 'cover'
-	},
-	itemStyle: {
-		type: [String, Object],
-		default: () => ({
-			height: '44px'
-		})
-	},
-	scrollable: {
-		type: Boolean,
-		default: true
-	},
-	current: {
-		type: [Number, String],
-		default: 0
-	},
-	keyName: {
-		type: String,
-		default: 'name'
-	},
-	iconStyle: {
-		type: [String, Object],
-		default: () => ({})
-	},
-	height: {
-		type: [String, Number],
-		default: '44px'
-	}
-})
+  duration: {
+    type: Number,
+    default: 200
+  },
+  list: {
+    type: Array as PropType<Array<UTSJSONObject>>,
+    default: () => [] as Array<UTSJSONObject>
+  },
+  lineColor: {
+    type: String,
+    default: '#3c9cff'
+  },
+  activeStyle: {
+    type: [String, Object],
+    default: () => ({ color: '#303133' } as UTSJSONObject)
+  },
+  inactiveStyle: {
+    type: [String, Object],
+    default: () => ({ color: '#606266' } as UTSJSONObject)
+  },
+  lineWidth: {
+    type: [String, Number],
+    default: '20px'
+  },
+  lineHeight: {
+    type: [String, Number],
+    default: '3px'
+  },
+  lineBgSize: {
+    type: String,
+    default: 'cover'
+  },
+  itemStyle: {
+    type: [String, Object],
+    default: () => ({ height: '44px' } as UTSJSONObject)
+  },
+  scrollable: {
+    type: Boolean,
+    default: true
+  },
+  current: {
+    type: [Number, String],
+    default: 0
+  },
+  keyName: {
+    type: String,
+    default: 'name'
+  },
+  iconStyle: {
+    type: [String, Object],
+    default: () => ({} as UTSJSONObject)
+  },
+  height: {
+    type: [String, Number],
+    default: '44px'
+  }
+});
 
-const emit = defineEmits(['click', 'longPress', 'change', 'update:current'])
-const instance = getCurrentInstance()
+const emit = defineEmits(['click', 'longPress', 'change', 'update:current']);
+const instance = getCurrentInstance();
 
-const firstTime = ref<boolean>(true)
-const scrollLeft = ref<number>(0)
-const scrollViewWidth = ref<number>(0)
-const lineOffsetLeft = ref<number>(0)
-const tabsRect = ref<NodeInfo>({
-	left: 0,
-	right: 0,
-} as NodeInfo)
-const innerCurrent = ref<number>(0)
-const retryCount = ref<number>(0)
-const itemRects = ref<Array<NodeInfo>>([])
+// 1. 选中态与横向平移状态
+/** 内部选中下标：由 props.current 同步，点击时先行更新以获得即时反馈 */
+const innerCurrent = ref<number>(0);
+/** 横向平移量（px）：拖动时实时更新，内容不溢出时恒为 0 */
+const panOffset = ref<number>(0);
+/** 可平移上限 = 标签行宽度 - 视口宽度，0 表示无需平移 */
+const maxPan = ref<number>(0);
+/** 视口宽度（px）：算居中偏移要用，与平移上限同一帧量得 */
+let viewportWidth: number = 0;
+/** 拖动起点：按下时的触点横坐标与当时的平移量 */
+let touchStartX: number = 0;
+let touchStartOffset: number = 0;
+/** 测量重试计数：首帧布局未稳时量到的是 0 宽，重试几次再定论 */
+let measureRetry: number = 0;
 
-const tabsWrapperStyle = computed((): UTSJSONObject => {
-	return {
-		height: addUnit(props.height)
-	} as UTSJSONObject
-})
+// 2. 尺寸与样式（全部显式给值，不吃 <view> 的默认显示类型）
+/** 整条标签栏高度：小程序端与 App 端都用同一个显式高度撑开 */
+const wrapperStyle = computed((): UTSJSONObject => {
+  return {
+    height: addUnit(props.height)
+  } as UTSJSONObject;
+});
 
+/** 标签行样式：靠 left 偏移做平移，宽度由内容撑开 */
+const navStyle = computed((): UTSJSONObject => {
+  return {
+    left: `${-panOffset.value}px`,
+    transitionDuration: `${props.duration}ms`
+  } as UTSJSONObject;
+});
+
+/** 单项样式：默认不收缩（横向可溢出），scrollable 关闭时等分撑满 */
+const itemRowStyle = computed((): UTSJSONObject => {
+  const custom = addStyle(props.itemStyle) as UTSJSONObject;
+  const base = {
+    flex: props.scrollable ? 'none' : '1'
+  } as UTSJSONObject;
+  return deepMerge(base, custom) as UTSJSONObject;
+});
+
+/** 下划线样式：只给宽高与颜色，水平位置由外层 flex 居中决定 */
+const lineStyle = computed((): UTSJSONObject => {
+  return {
+    width: addUnit(props.lineWidth),
+    height: addUnit(props.lineHeight),
+    backgroundColor: props.lineColor,
+    backgroundSize: props.lineBgSize
+  } as UTSJSONObject;
+});
+
+/** 项内图标样式 */
 const iconCustomStyle = computed((): UTSJSONObject => {
-	return addStyle(props.iconStyle) as UTSJSONObject
-})
+  return addStyle(props.iconStyle) as UTSJSONObject;
+});
 
-const propsBadge = computed<UTSJSONObject>(() => {
-	return badgeProps['badge'] as UTSJSONObject
-})
+/** 未传 icon prop 时的角标默认值来源 */
+const propsBadge = computed((): UTSJSONObject => {
+  return badgeProps['badge'] as UTSJSONObject;
+});
 
-const lineStyle = computed<UTSJSONObject>(() => {
-	const style = {} as UTSJSONObject
-	style['width'] = addUnit(props.lineWidth)
-	style['transform'] = 'translateX(' + (lineOffsetLeft.value) + 'px)'
-	style['transitionDuration'] = `${firstTime.value ? 0 : props.duration}ms`
-	style['height'] = addUnit(props.lineHeight)
-	style['backgroundSize'] = props.lineBgSize
-	if (props.lineColor != '#3c9cff') {
-		style['backgroundColor'] = props.lineColor
-	}
-	return style
-})
-
-function getShowValue(itemObj: UTSJSONObject): boolean {
-	if (itemObj['badge'] != null) {
-		let itemObjBadge = itemObj['badge'] as UTSJSONObject
-		if (itemObjBadge['show'] != null && (itemObjBadge['show'] as boolean)
-			|| (itemObjBadge['isDot'] != null && (itemObjBadge['isDot'] as boolean))
-			|| itemObjBadge['value'] != null) {
-			return true
-		}
-	}
-	return false
-}
-
-function getBadgePropValue(itemObj: UTSJSONObject, name: string): any {
-	if (itemObj != null && itemObj['badge'] != null) {
-		let itemObjBadge = itemObj['badge'] as UTSJSONObject
-		if (itemObjBadge != null && itemObjBadge[name] != null) {
-			return (itemObjBadge[name] != null ? itemObjBadge[name] : '') as any
-		} else {
-			return (propsBadge.value != null && propsBadge.value[name] != null ? propsBadge.value[name] : '') as any
-		}
-	}
-	return ''
-}
-
+/** 文字样式：选中项取 activeStyle，其余取 inactiveStyle */
 function textStyle(index: number): any {
-	const style = {}
-	const customeStyle = (index == innerCurrent.value)
-		? addStyle(props.activeStyle)
-		: addStyle(props.inactiveStyle)
-	if (props.list[index]['disabled'] != null && (props.list[index]['disabled'] as boolean)) {
-		style['color'] = '#c8c9cc'
-	}
-	return deepMerge(customeStyle, style)
+  const custom = index == innerCurrent.value
+    ? addStyle(props.activeStyle)
+    : addStyle(props.inactiveStyle);
+  return deepMerge(custom, {} as UTSJSONObject);
 }
 
-function getItemStyle(): UTSJSONObject {
-	const custom = addStyle(props.itemStyle) as UTSJSONObject
-	const base = {
-		flex: props.scrollable ? 'none' : '1'
-	} as UTSJSONObject
-	return deepMerge(base, custom) as UTSJSONObject
+// 3. 数据取值（list 项一律按 UTSJSONObject 取值，兼容原生端）
+/** 项是否被禁用 */
+function isDisabled(item: UTSJSONObject): boolean {
+  const value = item['disabled'];
+  return value != null && (value as boolean);
+}
+/** 项文案：按 keyName 取，取不到给空串，避免渲染出 "null" */
+function itemText(item: UTSJSONObject): string {
+  const raw = item[props.keyName];
+  return raw == null ? '' : `${raw}`;
+}
+/** 项是否要显示角标：show / isDot / value 任一存在即显示 */
+function getShowValue(item: UTSJSONObject): boolean {
+  const badge = item['badge'];
+  if (badge == null) {
+    return false;
+  }
+  const target = badge as UTSJSONObject;
+  if (target['show'] != null && (target['show'] as boolean)) {
+    return true;
+  }
+  if (target['isDot'] != null && (target['isDot'] as boolean)) {
+    return true;
+  }
+  return target['value'] != null;
+}
+/** 取角标某个字段：项自带优先，否则回落到 up-badge 的默认值 */
+function getBadgePropValue(item: UTSJSONObject, name: string): any {
+  const badge = item['badge'];
+  if (badge != null) {
+    const target = badge as UTSJSONObject;
+    if (target[name] != null) {
+      return target[name] as any;
+    }
+  }
+  const fallback = propsBadge.value;
+  if (fallback != null && fallback[name] != null) {
+    return fallback[name] as any;
+  }
+  return '';
 }
 
-function isListEqual(list1: Array<UTSJSONObject>, list2: Array<UTSJSONObject>): boolean {
-	if (list1.length != list2.length) {
-		return false
-	}
-	for (let i = 0; i < list1.length; i++) {
-		const item1 = list1[i]
-		const item2 = list2[i]
-		if (item1[props.keyName] != item2[props.keyName]) {
-			return false
-		}
-	}
-	return true
+// 4. 横向平移（拖动视口内的标签行，边界由测量结果夹住，量不到也不影响渲染）
+/** 把平移量夹到 [0, maxPan] */
+function clampPan(value: number): number {
+  if (value < 0) {
+    return 0;
+  }
+  if (value > maxPan.value) {
+    return maxPan.value;
+  }
+  return value;
 }
 
-function getTabsRect(): Promise<NodeInfo> {
-	return upGetRect('.up-tabs__wrapper__scroll-view', false, instance?.proxy)
+/** 把选中项滚到视口中间：下划线容器铺满选中项，量它就等于量选中项 */
+function centerCurrent(): void {
+  if (maxPan.value <= 0 || viewportWidth <= 0) {
+    return;
+  }
+  upGetRect('.up-tabs__nav', false, instance?.proxy).then((navRect: NodeInfo) => {
+    upGetRect('.up-tabs__item__linewrap', false, instance?.proxy).then((activeRect: NodeInfo) => {
+      const activeWidth = activeRect.width ?? 0;
+      if (activeWidth <= 0) {
+        return;
+      }
+      // 选中项中心相对标签行左边缘的横坐标：两个矩形同帧量得，不受当前平移量影响
+      const activeCenter = (activeRect.left ?? 0) - (navRect.left ?? 0) + activeWidth / 2;
+      panOffset.value = clampPan(activeCenter - viewportWidth / 2);
+    });
+  });
 }
 
-function getAllItemRect(): Promise<Array<NodeInfo>> {
-	return new Promise((resolve: (res: Array<NodeInfo>) => void) => {
-		const total = props.list.length
-		if (total == 0) {
-			resolve([] as Array<NodeInfo>)
-			return
-		}
-		let results: Array<NodeInfo> = []
-		let count = 0
-		for (let i = 0; i < total; i++) {
-			const idx = i
-			upGetRect(`.up-tabs__wrapper__nav__item-${idx}`, false, instance?.proxy).then((size: NodeInfo) => {
-				results.push(size)
-				count++
-				if (count == total) {
-					resolve(results)
-				}
-			})
-		}
-	})
+/** 重新计算可平移上限并把选中项滚到中间（首帧常常量不到，重试几次等布局稳定） */
+function refreshPanLimit(): void {
+  if (!props.scrollable) {
+    maxPan.value = 0;
+    panOffset.value = 0;
+    return;
+  }
+  if (props.list.length == 0) {
+    return;
+  }
+  upGetRect('.up-tabs__viewport', false, instance?.proxy).then((viewRect: NodeInfo) => {
+    upGetRect('.up-tabs__nav', false, instance?.proxy).then((navRect: NodeInfo) => {
+      const navWidth = navRect.width ?? 0;
+      const viewWidth = viewRect.width ?? 0;
+      if (navWidth <= 0 && measureRetry < 5) {
+        measureRetry++;
+        setTimeout(() => {
+          refreshPanLimit();
+        }, 50);
+        return;
+      }
+      measureRetry = 0;
+      const overflow = navWidth - viewWidth;
+      maxPan.value = overflow > 0 ? overflow : 0;
+      viewportWidth = viewWidth;
+      panOffset.value = clampPan(panOffset.value);
+      centerCurrent();
+    });
+  });
 }
 
-function setLineLeft() {
-	if (itemRects.value.length <= innerCurrent.value) {
-		return
-	}
-	const tabItem = itemRects.value[innerCurrent.value]
-	if (tabItem == null) {
-		return
-	}
-	let totalOffset = itemRects.value
-		.slice(0, innerCurrent.value)
-		.reduce((total: number, curr: NodeInfo) => {
-			return total + (curr.width ?? 0)
-		}, 0)
-	const lineWidthVal = parseFloat(getPx(props.lineWidth))
-	const tabWidth = tabItem.width ?? 0
-	const offset = tabWidth > 0 ? (tabWidth - lineWidthVal) / 2 : 0
-	lineOffsetLeft.value = totalOffset + offset
-
-	if (firstTime.value) {
-		setTimeout(() => {
-			firstTime.value = false
-		}, 30)
-	}
+/** 等本次渲染落地后再量：选中项宽度会随 activeStyle 变，量早了取到的是旧尺寸 */
+function refreshAfterLayout(): void {
+  nextTick(() => {
+    refreshPanLimit();
+  });
 }
 
-function setScrollLeft() {
-	if (innerCurrent.value < 0) {
-		innerCurrent.value = 0
-	}
-	if (itemRects.value.length <= innerCurrent.value) {
-		return
-	}
-	const tabRect = itemRects.value[innerCurrent.value]
-	if (tabRect == null) {
-		return
-	}
-	const offsetLeft = itemRects.value
-		.slice(0, innerCurrent.value)
-		.reduce((total: number, curr: NodeInfo) => {
-			return total + (curr.width ?? 0)
-		}, 0)
-	const windowWidth = getWindowInfo().windowWidth
-	let nextScrollLeft = offsetLeft - ((tabsRect.value.width ?? 0) - (tabRect.width ?? 0)) / 2 - (windowWidth - (tabsRect.value.right ?? 0)) / 2 + (tabsRect.value.left ?? 0) / 2
-	nextScrollLeft = Math.min(nextScrollLeft, scrollViewWidth.value - (tabsRect.value.width ?? 0))
-	scrollLeft.value = Math.max(0, nextScrollLeft)
+/** 按下：记住起点，本次拖动以当前平移量为基准 */
+function onTouchStart(e: UniTouchEvent): void {
+  if (!props.scrollable || maxPan.value <= 0 || e.touches.length == 0) {
+    return;
+  }
+  touchStartX = e.touches[0].clientX;
+  touchStartOffset = panOffset.value;
 }
 
-function resize() {
-	if (props.list.length == 0) {
-		return
-	}
-	getTabsRect().then((tRect: NodeInfo) => {
-		getAllItemRect().then((iRect: Array<NodeInfo>) => {
-			const firstWidth = (iRect.length > 0 && iRect[0] != null) ? (iRect[0].width ?? 0) : 0
-			let minWidthExpected = 30
-			if (props.list.length > 0) {
-				const firstItemName = props.list[0][props.keyName]
-				if (firstItemName != null) {
-					const nameStr = firstItemName.toString()
-					minWidthExpected = nameStr.length * 12 + 20
-				}
-			}
-			if ((firstWidth < minWidthExpected) && retryCount.value < 5) {
-				retryCount.value++
-				setTimeout(() => {
-					resize()
-				}, 50)
-				return
-			}
-			if ((tRect.left ?? 0) > (tRect.width ?? 0)) {
-				tRect.right = (tRect.right ?? 0) - Math.floor((tRect.left ?? 0) / (tRect.width ?? 0)) * (tRect.width ?? 0)
-				tRect.left = (tRect.left ?? 0) % (tRect.width ?? 1)
-			}
-			tabsRect.value = tRect
-			itemRects.value = iRect
-			scrollViewWidth.value = 0
-			for (let i = 0; i < iRect.length; i++) {
-				const item = iRect[i]
-				if (item != null) {
-					scrollViewWidth.value = scrollViewWidth.value + (item.width ?? 0)
-				}
-			}
-			setLineLeft()
-			setScrollLeft()
-		})
-	})
+/** 拖动：手指左移内容左移，实时夹住边界 */
+function onTouchMove(e: UniTouchEvent): void {
+  if (!props.scrollable || maxPan.value <= 0 || e.touches.length == 0) {
+    return;
+  }
+  const delta = e.touches[0].clientX - touchStartX;
+  panOffset.value = clampPan(touchStartOffset - delta);
 }
 
-function clickHandler(item: any, index: number) {
-	emit('click', {
-		...item as UTSJSONObject,
-		index
-	}, index)
-	if (item['disabled'] != null && (item['disabled'] as boolean)) return
-	if (innerCurrent.value == index) return
-	innerCurrent.value = index
-	nextTick(() => {
-		const hasRect = itemRects.value.length > 0 && itemRects.value.length == props.list.length && (itemRects.value[0].width ?? 0) > 0
-		if (hasRect) {
-			setLineLeft()
-			setScrollLeft()
-		} else {
-			resize()
-		}
-	})
-	emit('update:current', index)
-	emit('change', {
-		...item as UTSJSONObject,
-		index
-	}, index)
+/** 抬起：把当前平移量固化为下次拖动的新基准 */
+function onTouchEnd(): void {
+  touchStartOffset = panOffset.value;
 }
 
-function longPressHandler(item: UTSJSONObject, index: number) {
-	emit('longPress', {
-		...item,
-		index
-	})
+// 5. 交互
+/** 把项数据复制一份并塞入 index：点击 / 切换事件统一回传这个载荷 */
+function withIndex(item: UTSJSONObject, index: number): UTSJSONObject {
+  const payload = new UTSJSONObject({});
+  const keys = UTSJSONObject.keys(item);
+  for (let i = 0; i < keys.length; i++) {
+    payload[keys[i]] = item[keys[i]];
+  }
+  payload['index'] = index;
+  return payload;
 }
 
-function init() {
-	retryCount.value = 0
-	sleep(30).then(() => {
-		resize()
-	})
+/** 点击某项：先上抛 click，再切选中态并上抛 change / update:current，最后把新选中项滚到中间 */
+function onItemTap(item: UTSJSONObject, index: number): void {
+  emit('click', withIndex(item, index), index);
+  if (isDisabled(item)) {
+    return;
+  }
+  if (innerCurrent.value == index) {
+    return;
+  }
+  innerCurrent.value = index;
+  emit('update:current', index);
+  emit('change', withIndex(item, index), index);
+  refreshAfterLayout();
 }
 
+/** 长按某项 */
+function onItemLongPress(item: UTSJSONObject, index: number): void {
+  emit('longPress', withIndex(item, index), index);
+}
+
+// 6. 生命周期与外部同步
+/** 挂载后算一次可平移上限（首次布局完成后） */
+function resize(): void {
+  refreshPanLimit();
+}
+
+/** 供外部（如切分区后）触发的重算入口，与原版同名 */
+function init(): void {
+  refreshPanLimit();
+}
+
+/** current 变化 → 同步内部选中下标并居中（swiper 横滑过来的下标也要居中） */
 watch((): any => props.current, (newValue: any) => {
-	let num = typeof newValue == 'string' ? parseInt(newValue.toString()) : (newValue as number)
-	if (num != innerCurrent.value) {
-		innerCurrent.value = num
-		nextTick(() => {
-			const hasRect = itemRects.value.length > 0 && itemRects.value.length == props.list.length && (itemRects.value[0].width ?? 0) > 0
-			if (hasRect) {
-				setLineLeft()
-				setScrollLeft()
-			} else {
-				resize()
-			}
-		})
-	}
-}, { immediate: true })
+  const num = typeof newValue == 'string' ? parseInt(newValue.toString()) : (newValue as number);
+  if (num != innerCurrent.value) {
+    innerCurrent.value = num;
+    refreshAfterLayout();
+  }
+}, { immediate: true });
 
-watch((): Array<UTSJSONObject> => props.list, (newValue: Array<UTSJSONObject>, oldValue: Array<UTSJSONObject> | null) => {
-	if (oldValue != null && isListEqual(newValue, oldValue)) {
-		return
-	}
-	nextTick(() => {
-		resize()
-	})
-})
+/** list 变化 → 选中下标越界兜底 + 重算可平移上限 */
+watch((): Array<UTSJSONObject> => props.list, (newValue: Array<UTSJSONObject>) => {
+  if (innerCurrent.value >= newValue.length) {
+    innerCurrent.value = 0;
+  }
+  measureRetry = 0;
+  refreshAfterLayout();
+});
 
 onMounted(() => {
-	init()
-})
+  refreshAfterLayout();
+});
 
 defineExpose({
-	init,
-	resize
-})
+  init,
+  resize
+});
 </script>
 
 <style lang="scss" scoped>
-	.up-tabs {
-		&__wrapper {
-			display: flex;
-			flex-direction: row;
-			align-items: center;
-			width: 100%;
+.up-tabs {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
 
-			&__scroll-view-wrapper {
-				flex: 1;
-			}
+  &__wrapper {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+  }
 
-			&__scroll-view {
-				display: flex;
-				flex-direction: row;
-				flex: 1;
-			}
+  /* 视口：横向裁掉溢出的标签行，由手指拖动平移（不用原生 scroll-view） */
+  &__viewport {
+    display: flex;
+    flex-direction: row;
+    flex: 1;
+    overflow: hidden;
+  }
 
-			&__nav {
-				display: flex;
-				flex-direction: row;
-				position: relative;
-				height: 100%;
+  /* 标签行：宽度由内容撑开（flex-shrink 0），靠 left 偏移平移 */
+  &__nav {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    flex-shrink: 0;
+    height: 100%;
+    transition-property: left;
+    transition-timing-function: ease-out;
+  }
 
-				&__item {
-					padding: 0 11px;
-					display: flex;
-					flex-direction: row;
-					align-items: center;
-					justify-content: center;
-					flex-shrink: 0;
-					height: 100%;
-					/* #ifdef H5 */
-					cursor: pointer;
-					/* #endif */
+  &__item {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+    height: 100%;
+    padding: 0 11px;
 
-					&--disabled {
-						/* #ifdef H5 */
-						cursor: not-allowed;
-						/* #endif */
-					}
-
-					&__text {
-						font-size: 15px;
-						color: $up-content-color;
-						/* #ifndef APP-NVUE */
-						white-space: nowrap !important;
-						/* #endif */
-
-						&--disabled {
-							color: $up-disabled-color !important;
-						}
-					}
-				}
-
-				&__line {
-					height: 3px;
-					background-color: $up-primary;
-					width: 30px;
-					position: absolute;
-					bottom: 2px;
-					border-radius: 100px;
-					transition-property: transform;
-					transition-duration: 300ms;
-				}
-			}
-		}
-	}
+    &--disabled {
+      opacity: 0.6;
+    }
+    &__icon {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+    }
+    &__text {
+      color: $up-content-color;
+      font-size: 15px;
+      white-space: nowrap;
+    }
+    &__text--disabled {
+      color: $up-disabled-color;
+    }
+    /* 下划线容器：铺满单项宽度，靠 flex 把下划线居中 */
+    &__linewrap {
+      position: absolute;
+      right: 0;
+      bottom: 2px;
+      left: 0;
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+    }
+    &__line {
+      border-radius: 100px;
+    }
+  }
+}
 </style>
