@@ -12,6 +12,7 @@ import { WeappTailwindcss } from 'weapp-tailwindcss/vite';
 import { visualizer } from 'rollup-plugin-visualizer';
 import uniRootX from './plugins/root-plugin';
 import cleanLoggerPlugin from './plugins/vite-plugin-clean-logger';
+import editorVersionPlugin from './plugins/vite-plugin-editor-version';
 import h5OptimizeDepsPlugin from './plugins/vite-plugin-h5-optimize-deps';
 import uniAppXBorderFixPlugin from './plugins/vite-plugin-uni-app-x-border-fix';
 import uniLayoutsPlugin from './plugins/uni-layouts-plugin';
@@ -212,6 +213,12 @@ export default defineConfig({
     sourcemap: false // 关闭 sourcemap，警告直接消失
   },
   plugins: [
+    // 编辑器版本对齐提示：HBuilderX / HBuilderV 升级后，package.json pin 的 @dcloudio/*
+    // 可能还是旧版。只提示不阻断 —— 版本不一致未必立刻报错，但报错时往往是 API 行为差异、
+    // 类型不匹配这类看不出根因的问题，所以每次都提醒一下。
+    // 没装编辑器、或 package.json 没有这几个 pin 的环境会静默跳过。
+    // 自动同步在 npm 脚本层（pnpm dev / build:* 前面挂了 --ensure）。
+    editorVersionPlugin(),
     // 控制台警告与代码片段净化插件：拦截 Vite/Rollup/DCloud 编译告警输出
     cleanLoggerPlugin({ silenceAll: true }),
     // H5 冷启动性能优化：覆盖 DCloud 对依赖预构建的禁用，将核心大体积依赖纳入 esbuild 预构建
