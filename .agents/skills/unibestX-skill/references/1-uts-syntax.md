@@ -346,7 +346,6 @@ export * from './vdom/user.uts';
 
 ---
 
-
 ## 1.14 遍历「值类型为 `any` 的 Map」时，**给回调参数显式标注 `any`** 会炸 —— 去掉标注或改用 `UTSJSONObject.keys()`；且 `map.keys()` 在 Kotlin 里是属性不是函数
 
 - **错误码**（本项目实测，unix-router-guard 任务 0 探针，真机 VDOM/Kotlin 通道）：
@@ -630,7 +629,7 @@ export * from './vdom/user.uts';
   }
   ```
 
-- **⚠️ 不要顺手把所有三元都改成 `if`**：本条只针对**联合类型**（`number | string`、`T | null` 等）。单类型变量上的三元是完全合法的 —— 本项目 `src/utils/theme/index.uts`、`src/utils/error-report/index.uts`、`src/tabbar/internal/strategy.uts` 等几十处三元一直正常编译。**改法要精准命中联合类型，不要全仓机械替换**。
+- **⚠️ 不要顺手把所有三元都改成 `if`**：本条只针对**联合类型**（`number | string`、`T | null` 等）。单类型变量上的三元是完全合法的 —— 本项目 `src/theme/index.uts`、`src/utils/error-report/index.uts`、`src/tabbar/internal/strategy.uts` 等几十处三元一直正常编译。**改法要精准命中联合类型，不要全仓机械替换**。
 - **⚠️ 为什么 H5 / `lint` / 真机跑一遍都发现不了**：这是**编译期**错误，H5 编译目标是 JS 走的是另一套宽松语法；而 `launch app-android --compile true` 不到 Kotlin 阶段（见 3.15 / 3.20），本地很容易全绿。**只有真正走到 Kotlin 编译阶段才暴露**。
 
 ---

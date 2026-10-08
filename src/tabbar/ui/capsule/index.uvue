@@ -14,8 +14,8 @@ import {
   tabbarList
 } from '@/src/tabbar/index.uts';
 import { useAppStore } from '@/src/store';
-import { getThemeTokens, themeColor } from '@/src/utils/theme/index.uts';
-import type { ThemeTokens } from '@/src/utils/theme/index.uts';
+import { getThemeTokens, themeColor } from '@/src/theme/index.uts';
+import type { ThemeTokens } from '@/src/theme/index.uts';
 import { safeAreaInsets } from '@/src/utils/systemInfo/index.uts';
 
 const props = defineProps({
@@ -262,12 +262,12 @@ const bottom = computed(() => {
   /* 相对 .custom-capsule-wrapper 定位；垂直位置由模板绑定的 bottom（含安全区）决定，
      此处不可再写 top，否则 top 胜出会把胶囊顶出可视区 */
   position: absolute;
-  left: 16px;
   right: 16px;
+  left: 16px;
   z-index: 999;
   flex-direction: row;
-  align-items: center;
   justify-content: space-around;
+  align-items: center;
   padding: 4px 6px;
   border-width: 1px;
   border-style: solid;
@@ -287,20 +287,20 @@ const bottom = computed(() => {
 .capsule-slider-track {
   position: absolute;
   top: 4px;
+  right: 6px;
   bottom: 4px;
   left: 6px;
-  right: 6px;
   z-index: 1;
-  pointer-events: none;
   flex-direction: row;
+  pointer-events: none;
 }
 
 /* 动态滑块单元（负责平移动画：在静态 CSS 中声明硬件加速过渡） */
 .capsule-slider {
+  justify-content: center;
+  align-items: center;
   width: 25%;
   height: 100%;
-  align-items: center;
-  justify-content: center;
   transition-property: transform;
   transition-duration: 220ms;
   transition-timing-function: cubic-bezier(0.25, 1, 0.5, 1);
@@ -317,9 +317,9 @@ const bottom = computed(() => {
 .capsule-item-slot {
   position: relative;
   z-index: 2;
-  flex: 1;
-  align-items: center;
   justify-content: center;
+  align-items: center;
+  flex: 1;
   height: 100%;
   background-color: transparent;
 }
@@ -332,19 +332,19 @@ const bottom = computed(() => {
 /* 胶囊内容项 */
 .capsule-item-inner {
   flex-direction: column;
-  align-items: center;
   justify-content: center;
+  align-items: center;
   width: 90%;
   height: 84%;
-  border-radius: 20px;
   padding: 2px 0;
+  border-radius: 20px;
 }
 
 /* 图标包裹器（含绝对定位徽标） */
 .capsule-icon-wrap {
   position: relative;
-  align-items: center;
   justify-content: center;
+  align-items: center;
   height: 22px;
 }
 
@@ -355,9 +355,9 @@ const bottom = computed(() => {
 
 /* 标签文本 */
 .capsule-item-text {
+  margin-top: 2px;
   font-size: 11px;
   line-height: 14px;
-  margin-top: 2px;
 }
 
 /* 徽标小红点 */
@@ -376,12 +376,12 @@ const bottom = computed(() => {
   position: absolute;
   top: -4px;
   right: -12px;
-  padding: 0 4px;
+  justify-content: center;
+  align-items: center;
   height: 14px;
+  padding: 0 4px;
   border-radius: 999px;
   background-color: #ef4444;
-  align-items: center;
-  justify-content: center;
 }
 
 .capsule-badge-label {

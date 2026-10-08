@@ -923,7 +923,7 @@ src/tabbar/config.uts (唯一样本源)
 
 - 根目录 [theme.json](theme.json) 定义 `light` / `dark` 两套色板（导航栏、TabBar、页面背景等）；
 - `pages.json` 通过 `@` 变量引用（如 `"navigationBarBackgroundColor": "@navigationBarBackgroundColor"`），驱动原生导航栏 / TabBar / 页面背景；
-- 自定义组件（NavBar、TabBar、全局容器）通过 `src/utils/theme/index.uts` 的 `getThemeTokens()` 读取同一份色板，保证与原生配置一致。
+- 自定义组件（NavBar、TabBar、全局容器）通过 `src/theme/index.uts` 的 `getThemeTokens()` 读取同一份色板，保证与原生配置一致。
 
 > 💡 **修改 `light` / `dark` 主题配色，请统一在根目录 [theme.json](theme.json) 中配置**（单源维护，`pages.json` 与自定义组件自动同步生效，勿在页面或组件中写死颜色）。
 
