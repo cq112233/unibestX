@@ -77,38 +77,38 @@ function onTabClick(index: number) {
 /* 固定在底部的容器，内部级联展示三个层 */
 .tabbar-container {
   position: fixed;
+  right: 0;
   bottom: 0;
   left: 0;
-  right: 0;
   z-index: 1;
-  background-color: transparent;
   flex-direction: column;
+  background-color: transparent;
 }
 
 /* 【底板层】覆盖「固定高度 + 安全区」的底板，绑定高度动态设定 */
 .tabbar-bg {
   position: absolute;
+  right: 0;
   bottom: 0;
   left: 0;
-  right: 0;
+  z-index: 1;
   border-top-width: 1rpx;
   border-top-style: solid;
-  z-index: 1;
 }
 
 /* 【固定高度层】tab 图标按钮区，与底板同高；鼓包由 TabbarItem 内绝对定位向上突出 */
 .tabbar-inner {
-  flex-direction: row;
-  height: 80px;
-  align-items: flex-end;
   z-index: 2;
+  flex-direction: row;
+  align-items: flex-end;
+  height: 80px;
 }
 
 /* 单个 tab 项：flex 平分宽度；高度通过 :style 动态绑定（普通项 TABBAR_HEIGHT / 鼓包项 TABBAR_CONTAINER_HEIGHT） */
 .tabbar-item {
-  flex: 1;
-  align-items: center;
   justify-content: center;
+  align-items: center;
+  flex: 1;
 }
 
 /* 【安全区层】底部安全区填充，高度动态设定 */

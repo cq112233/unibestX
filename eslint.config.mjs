@@ -16,10 +16,13 @@ const composer = uniHelper({
   markdown: false,
   ignores: [
     // 忽略uni_modules目录
-    '**/uni_modules/',
+    'uni_modules/**',
+    '**/uni_modules/**',
     // 忽略原生插件目录
-    '**/nativeplugins/',
-    'dist',
+    'nativeplugins/**',
+    '**/nativeplugins/**',
+    'dist/**',
+    '**/dist/**',
     // auto-import 生成的类型文件
     'auto-import.d.ts',
     // uni-pages 生成的类型文件
@@ -37,6 +40,7 @@ const composer = uniHelper({
     'static/**',
     'docs/**',
     'unpackage/**',
+    '**/unpackage/**',
     '.claude/**',
     '.agents/**',
     // 忽略自动生成文件
@@ -121,6 +125,24 @@ const composer = uniHelper({
 
 // Resolve the flat config array and map custom extensions
 const configs = await composer;
+
+// 确保 Flat Config 具备最顶级的全局忽略规则（无 files 字段即为全局忽略）
+configs.unshift({
+  ignores: [
+    'uni_modules/**',
+    '**/uni_modules/**',
+    'nativeplugins/**',
+    '**/nativeplugins/**',
+    'dist/**',
+    '**/dist/**',
+    'unpackage/**',
+    '**/unpackage/**',
+    'docs/**',
+    '.claude/**',
+    '.agents/**',
+    'src/service/**'
+  ]
+});
 
 for (const config of configs) {
   if (config.files) {
@@ -238,6 +260,12 @@ for (const config of configs) {
 
 configs.push({
   files: ['**/*.uts', '**/*.uvue'],
+  ignores: [
+    'uni_modules/**',
+    '**/uni_modules/**',
+    'unpackage/**',
+    '**/unpackage/**'
+  ],
   plugins: {
     uts: pluginUts
   },
