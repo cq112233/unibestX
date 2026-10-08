@@ -1267,6 +1267,10 @@ export const pluginUts = {
                 continue;
               if (globalVars.has(name) || builtins.has(name))
                 continue;
+              // uni-app X 会为 uvue 组件生成 <组件名>ComponentPublicInstance 实例类型（HBuilderX 侧可见），
+              // 项目里由 src/types/uni.d.ts 补了等价声明，无需导入，直接放行
+              if (name.endsWith('ComponentPublicInstance'))
+                continue;
 
               reported.add(name);
 

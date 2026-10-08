@@ -462,6 +462,28 @@ declare global {
       complete?: (result: any) => void;
     }) => void;
   }
+
+  /**
+   * z-paging-x 组件实例类型（`<z-paging-x ref="pagingX">` 中 ref 的类型）。
+   *
+   * uni-app X 在 HBuilderX 侧会为 uvue 组件生成 `<组件名>ComponentPublicInstance` 实例类型
+   * （插件市场里组件的「插件类型」就是这个命名），VSCode / tsconfig 拿不到这份编译产物，
+   * 直接写会报 TS2304「找不到名称」。这里补一份等价声明，让编辑器能识别。
+   * 方法签名真源：uni_modules/z-paging-x/components/z-paging-x/types/index.uts 的 ZPagingXInstance。
+   */
+  type ZPagingXComponentPublicInstance = import('vue').ComponentPublicInstance & {
+    reload: () => void;
+    refresh: () => void;
+    complete: (data: any[] | null) => void;
+    completeByTotal: (data: any[] | null, total: number) => void;
+    completeByNoMore: (data: any[] | null, nomore: boolean) => void;
+    completeByError: () => void;
+    endRefresh: () => void;
+    clear: () => void;
+    scrollToTop: (animate: boolean) => void;
+    scrollToBottom: (animate: boolean) => void;
+    scrollToY: (y: number, animate: boolean) => void;
+  };
 }
 
 declare module '*.uvue' {
