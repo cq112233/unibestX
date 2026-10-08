@@ -138,10 +138,10 @@ export declare function watchThemeChange(callback: () => void): void;
  * @example
  * ```uts
  * // 方式 1：标准具名导入
- * import { isDarkMode, getThemeTokens } from '@/src/utils/theme/index.uts';
+ * import { isDarkMode, getThemeTokens } from '@/src/theme/index.uts';
  *
  * // 方式 2：对象单例导入（一目了然）
- * import { theme } from '@/src/utils/theme/index.uts';
+ * import { theme } from '@/src/theme/index.uts';
  * console.log(theme.isDarkMode('auto'));
  * ```
  */
