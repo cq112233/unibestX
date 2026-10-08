@@ -19,7 +19,7 @@
     <view
       v-if="isTabbarPage && isSinglePageHome"
       class="navbar-tab-container"
-      style="flex: 1; position: relative;"
+      style="position: relative;flex: 1;"
     >
       <slot />
     </view>
@@ -82,8 +82,8 @@ import { computed, onUnmounted, ref } from 'vue';
 import NavBar from '@/src/components/NavBar/NavBar.uvue';
 import TabbarPlaceholder from '@/src/tabbar/components/TabbarPlaceholder.uvue';
 import { useAppStore } from '@/src/store';
-import { getThemeTokens } from '@/src/utils/theme/index.uts';
-import type { ThemeTokens } from '@/src/utils/theme/index.uts';
+import { getThemeTokens } from '@/src/theme/index.uts';
+import type { ThemeTokens } from '@/src/theme/index.uts';
 import { isPageRefresherDisabled, isPageScrollDisabled } from '@/src/utils/refresh/index.uts';
 import { isPageTabbar, isSinglePageTabbar } from '@/src/tabbar/index.uts';
 
@@ -671,49 +671,49 @@ defineExpose({
 
 <style lang="scss" scoped>
 .navbar-layout {
-  flex: 1;
   display: flex;
   flex-direction: column;
+  flex: 1;
 }
 
 .navbar-tab-container {
-  flex: 1;
+  position: relative;
   display: flex;
   flex-direction: column;
+  flex: 1;
   overflow: hidden;
-  position: relative;
 }
 
 .navbar-scroll-view {
-  flex: 1;
   display: flex;
   flex-direction: column;
+  flex: 1;
 }
 
 /* #ifdef MP-ALIPAY */
 .alipay-pull-header {
-  width: 100%;
-  overflow: hidden;
   display: flex;
   flex-direction: row;
-  align-items: center;
   justify-content: center;
+  align-items: center;
+  width: 100%;
+  overflow: hidden;
 }
 
 .wechat-pull-dots {
   display: flex;
   flex-direction: row;
-  align-items: center;
   justify-content: center;
+  align-items: center;
   padding: 10px 0;
 }
 
 .wechat-pull-dot {
   width: 7px;
   height: 7px;
+  margin: 0 4px;
   border-radius: 4px;
   background-color: #94a3b8;
-  margin: 0 4px;
 }
 
 .wechat-pull-dots--active .wechat-pull-dot--1 {
@@ -735,12 +735,12 @@ defineExpose({
   0%,
   80%,
   100% {
-    transform: scale(0.6);
     opacity: 0.35;
+    transform: scale(0.6);
   }
   40% {
-    transform: scale(1.15);
     opacity: 1;
+    transform: scale(1.15);
   }
 }
 /* #endif */

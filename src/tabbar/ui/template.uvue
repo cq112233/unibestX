@@ -101,7 +101,7 @@ import {
   themeTokens
 } from '@/src/tabbar/index.uts';
 import type { CustomTabBarItem } from '@/src/tabbar/index.uts';
-import { themeColor } from '@/src/utils/theme/index.uts';
+import { themeColor } from '@/src/theme/index.uts';
 import { useAppStore } from '@/src/store';
 import { $t } from '@/src/utils/i18n/index.uts';
 
@@ -206,38 +206,38 @@ function getItemIconPath(item: CustomTabBarItem, index: number): string {
 /* 底部固定定位容器：悬浮于屏幕最底端，拥有极高的层级保证可见性 */
 .template-tabbar-fixed {
   position: fixed;
+  right: 0;
   bottom: 0;
   left: 0;
-  right: 0;
   z-index: 999;
+  flex-direction: column;
   border-top-width: 1px;
   border-top-style: solid;
-  flex-direction: column;
 }
 
 /* 主交互区域排版：横向均匀分布 */
 .template-tabbar-content {
   flex-direction: row;
-  align-items: center;
   justify-content: space-around;
+  align-items: center;
   width: 100%;
 }
 
 /* 单个 Tab 格位：等宽均分剩余横向空间，居中对齐图标与文字 */
 .template-tabbar-item {
-  flex: 1;
-  align-items: center;
   justify-content: center;
+  align-items: center;
+  flex: 1;
   height: 100%;
 }
 
 /* 图标包裹盒：固定基准尺寸，为右上方徽标（Badge）提供定位参照点 */
 .item-icon-box {
   position: relative;
+  justify-content: center;
+  align-items: center;
   width: 28px;
   height: 28px;
-  align-items: center;
-  justify-content: center;
 }
 
 /* 本地图片图标统一大小 */
@@ -248,8 +248,8 @@ function getItemIconPath(item: CustomTabBarItem, index: number): string {
 
 /* 底部描述文本样式：小巧精炼，具备清晰的行高 */
 .item-text {
-  font-size: 10px;
   margin-top: 2px;
+  font-size: 10px;
   line-height: 12px;
 }
 
@@ -269,17 +269,17 @@ function getItemIconPath(item: CustomTabBarItem, index: number): string {
   position: absolute;
   top: -2px;
   right: -6px;
-  background-color: #ef4444;
-  border-radius: 9px;
+  justify-content: center;
+  align-items: center;
   min-width: 16px;
   height: 16px;
-  padding-left: 4px;
   padding-right: 4px;
-  align-items: center;
-  justify-content: center;
+  padding-left: 4px;
   border-width: 1px;
   border-style: solid;
   border-color: #ffffff;
+  border-radius: 9px;
+  background-color: #ef4444;
 }
 
 /* 数字角标内部文本样式 */
