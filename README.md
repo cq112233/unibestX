@@ -12,7 +12,7 @@
 
 [![GitHub Repo stars](https://img.shields.io/github/stars/cq112233/unibestX?style=flat&logo=github)](https://github.com/cq112233/unibestX)
 [![GitHub forks](https://img.shields.io/github/forks/cq112233/unibestX?style=flat&logo=github)](https://github.com/cq112233/unibestX)
-![node version](https://img.shields.io/badge/node-%3E%3D22-green)
+![node version](https://img.shields.io/badge/node-%3E%3D22.22.2-green)
 ![pnpm version](https://img.shields.io/badge/pnpm-%3E%3D7.30-green)
 ![HBuilderX version](https://img.shields.io/badge/HBuilderX-%3E%3D5.24-blue)
 [![Vitest](https://img.shields.io/badge/tested_with-vitest-yellow?logo=vitest)](https://vitest.dev/)
@@ -276,7 +276,7 @@ pnpm check:uts-dts  # 校验 UTS 类型声明是否为最新（CI 用）
 
 | 依赖 | 版本要求 |
 | :--- | :--- |
-| Node | >= 22 |
+| Node | `^22.22.2`（或 `^24.15.0`、`>=26.0.0`） |
 | pnpm | >= 7.30 |
 | HBuilderX | **5.24 及以上**（Android 蒸汽模式需 >= 5.21，iOS 需 >= 5.11；支付宝小程序需 >= 5.31） |
 | Vue Official | >= 2.1.10 |

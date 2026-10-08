@@ -1,5 +1,8 @@
-name: Sync Branches (Base/Main to UI Extensions)
+name: Sync Branches
 
+# 触发方式：
+#   1. push 到 base / main 时自动同步到其余目标分支（GitHub 与 Gitee 同时同步）
+#   2. 手动 workflow_dispatch，可指定源分支
 on:
   push:
     branches:
@@ -16,128 +19,301 @@ on:
           - base
           - main
 
+# contents: write      → git fetch / 读取分支状态
+# pull-requests: write → gh pr create / gh pr merge
+# 注意：Gitee 侧使用 GITEE_TOKEN（Gitee 私人令牌，需勾选 projects 权限）
 permissions:
   contents: write
   pull-requests: write
 
+# 串行执行：base 触发的同步合并完成后再跑 main 触发的同步，避免同一目标分支被并发合并
+concurrency:
+  group: sync-branches
+  cancel-in-progress: false
+
 jobs:
   sync-branches:
-    name: Sync ${{ github.event.inputs.source_branch || github.ref_name }} -> ${{ matrix.target }}
+    name: ${{ github.event.inputs.source_branch || github.ref_name }} → ${{ matrix.target }} @ ${{ matrix.remote }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
+        # 两个远端各自独立成 job：某一格失败不会连累其他格
+        remote:
+          - github
+          - gitee
         target:
           - main
           - uniX-rice-ui
           - uniX-uview-ultra
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GITEE_TOKEN: ${{ secrets.GITEE_TOKEN }}
+      SOURCE: ${{ github.event.inputs.source_branch || github.ref_name }}
+      TARGET: ${{ matrix.target }}
+      REMOTE: ${{ matrix.remote }}
+      GITEE_OWNER: htwoO-cq
+      GITEE_REPO: uni-best-x
+      GITEE_URL: https://gitee.com/htwoO-cq/uni-best-x.git
+      GITEE_API: https://gitee.com/api/v5/repos/htwoO-cq/uni-best-x
+      GITEE_HTML: https://gitee.com/htwoO-cq/uni-best-x
+      # 目标分支带有各自专属的组件库依赖，用 merge commit 保留分支演化拓扑
+      SYNC_MERGE_METHOD: merge
+
     steps:
-      - name: Checkout Code
+      - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Check Diff and Create Sync PR
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TARGET: ${{ matrix.target }}
-          SOURCE: ${{ github.event.inputs.source_branch || github.ref_name }}
+      - name: Create or update sync PR
         run: |
+          set -euo pipefail
+
+          # ---------- 0. 远端准备 ----------
+          if [ "${REMOTE}" = "gitee" ]; then
+            if [ -z "${GITEE_TOKEN}" ]; then
+              echo "::notice::未配置 secrets.GITEE_TOKEN，跳过 Gitee 同步。"
+              exit 0
+            fi
+            echo "::add-mask::${GITEE_TOKEN}"
+            REMOTE_REF="${GITEE_URL}"
+            REF_NS="refs/remotes/gitee"
+            # 公开仓库匿名 HTTPS 即可。若仓库转为私有，把 GITEE_URL 换成带令牌的形式：
+            # https://oauth2:${GITEE_TOKEN}@gitee.com/${GITEE_OWNER}/${GITEE_REPO}.git
+          else
+            REMOTE_REF="origin"
+            REF_NS="refs/remotes/origin"
+          fi
+
+          SRC_REF="${REF_NS}/${SOURCE}"
+          TGT_REF="${REF_NS}/${TARGET}"
+          BASE_REF="${REF_NS}/base"
+          REPO_HTML="$([ "${REMOTE}" = "gitee" ] && echo "${GITEE_HTML}" || echo "https://github.com/${GITHUB_REPOSITORY}")"
+
+          echo "📥 拉取 ${REMOTE} 全部分支..."
+          git fetch --quiet "${REMOTE_REF}" '+refs/heads/*:'"${REF_NS}"'/*'
+
+          # ---------- 1. 前置跳过 ----------
           if [ "${SOURCE}" = "${TARGET}" ]; then
-            echo "⏩ 源分支与目标分支均为 ${SOURCE}，跳过同步"
+            echo "⏩ 源分支与目标分支同为 ${SOURCE}，跳过"
             exit 0
           fi
 
-          echo "🔍 检查远程目标分支 ${TARGET} 是否存在..."
-          if ! git ls-remote --exit-code --heads origin "${TARGET}" > /dev/null 2>&1; then
-            echo "⚠️ 远程仓库未检测到分支 ${TARGET}，跳过同步"
+          if ! git rev-parse --verify --quiet "${TGT_REF}" >/dev/null; then
+            echo "⚠️ ${REMOTE} 不存在分支 ${TARGET}，跳过"
             exit 0
           fi
 
-          echo "📥 拉取源分支 ${SOURCE} 与目标分支 ${TARGET} 状态..."
-          git fetch origin "${SOURCE}"
-          git fetch origin "${TARGET}"
+          # ---------- 2. 去重：main → UI 分支只在 base 这条路覆盖不到时才执行 ----------
+          # push base 会同时产生 base→T 与（base→main 合并后）main→T 两个内容重复的同步。
+          # 若 main 相对 T 的额外提交全部来自 base，说明 main 自身没有独立内容，
+          # base→T 那条链路已覆盖，main→T 纯属重复。
+          # 判据只看 ref 历史（base / main / T 均为本次 fetch 后的最新状态），不受并发合并时序影响。
+          if [ "${SOURCE}" = "main" ] && [ "${TARGET}" != "main" ]; then
+            MAIN_ONLY=$(git rev-list --count --no-merges "${TGT_REF}..${SRC_REF}" --not "${BASE_REF}" || echo 0)
+            if [ "${MAIN_ONLY}" -eq 0 ]; then
+              echo "ℹ️ main 相对 ${TARGET} 的改动全部来自 base，与 base → ${TARGET} 重复，跳过"
+              exit 0
+            fi
+          fi
 
-          # 统计源分支超前目标分支的提交数量
-          COMMITS_AHEAD=$(git rev-list --count "origin/${TARGET}..origin/${SOURCE}" || echo "0")
-          echo "📊 ${SOURCE} 分支超前 ${TARGET} 分支 ${COMMITS_AHEAD} 个提交"
-
-          if [ "$COMMITS_AHEAD" -eq 0 ]; then
-            echo "✅ 分支 ${TARGET} 已经包含 ${SOURCE} 的全部最新提交，无需发起同步 PR"
+          AHEAD=$(git rev-list --count "${TGT_REF}..${SRC_REF}")
+          echo "📊 ${REMOTE}：${SOURCE} 领先 ${TARGET} ${AHEAD} 个提交"
+          if [ "${AHEAD}" -eq 0 ]; then
+            echo "✅ ${REMOTE} 的 ${TARGET} 已包含 ${SOURCE} 的全部提交，无需同步"
             exit 0
           fi
 
-          # 检查是否已存在同名且处于 open 状态的同步 PR
-          EXISTING_PR_URL=$(gh pr list \
-            --base "${TARGET}" \
-            --head "${SOURCE}" \
-            --state open \
-            --json url \
-            --jq '.[0].url // empty')
+          # ---------- 3. PR 正文 ----------
+          COMMIT_LOG=$(git log "${TGT_REF}..${SRC_REF}" --oneline -n 10)
+          # 提交信息里的反引号会破坏 Markdown 代码块，统一替换掉
+          SAFE_LOG=$(printf '%s' "${COMMIT_LOG}" | tr '`' "'")
 
-          if [ -n "$EXISTING_PR_URL" ]; then
-            echo "ℹ️ 目标分支 ${TARGET} 已存在来自 ${SOURCE} 的 open 状态同步 PR，GitHub 会自动更新包含最新提交："
-            echo "👉 ${EXISTING_PR_URL}"
+          {
+            printf '%s\n' "### 🤖 自动同步 PR：\`${SOURCE}\` ➡️ \`${TARGET}\`"
+            printf '%s\n' ""
+            printf '%s\n' "由 **Sync Branches** 工作流自动发起（远端：\`${REMOTE}\`）。检测到 \`${SOURCE}\` 有 ${AHEAD} 个新提交尚未进入 \`${TARGET}\`。"
+            printf '%s\n' ""
+            printf '%s\n' "#### 📝 最近提交（最多 10 条）"
+            printf '%s\n' '```text'
+            printf '%s\n' "${SAFE_LOG}"
+            printf '%s\n' '```'
+            printf '%s\n' ""
+            printf '%s\n' "#### ⚙️ 合并方式"
+            printf '%s\n' "本 PR 创建后已自动以 **${SYNC_MERGE_METHOD}** 方式合入 \`${TARGET}\`，无冲突时无需人工干预。"
+            printf '%s\n' ""
+            printf '%s\n' "若存在冲突，会自动降级为人工处理，工作流会在本 PR 下留言说明解决步骤。"
+          } > pr_body.md
+
+          # ---------- 4. API 适配层 ----------
+          # 查找已存在的 open 同步 PR，返回 PR 编号（无则返回空）
+          find_pr() {
+            if [ "${REMOTE}" = "gitee" ]; then
+              curl -sS --max-time 30 \
+                "${GITEE_API}/pulls?access_token=${GITEE_TOKEN}&state=open&head=${SOURCE}&base=${TARGET}&per_page=100" \
+                | jq -r '.[0].number // empty'
+            else
+              gh pr list --base "${TARGET}" --head "${SOURCE}" --state open --json number --jq '.[0].number // empty'
+            fi
+          }
+
+          # 创建 PR，返回 PR 编号（失败时可能为空）
+          create_pr() {
+            local title="$1" body_file="$2"
+            if [ "${REMOTE}" = "gitee" ]; then
+              curl -sS --max-time 30 -X POST "${GITEE_API}/pulls" \
+                --data-urlencode "access_token=${GITEE_TOKEN}" \
+                --data-urlencode "title=${title}" \
+                --data-urlencode "head=${SOURCE}" \
+                --data-urlencode "base=${TARGET}" \
+                --data-urlencode "body@${body_file}" \
+                | jq -r '.number // empty'
+            else
+              # 仓库里没有 auto-pr 标签时传 --label 会让 gh pr create 直接报错，先探测再决定
+              local label_args=()
+              if gh label list --search "auto-pr" --json name --jq '.[].name' | grep -qx "auto-pr"; then
+                label_args=(--label "auto-pr")
+              fi
+              gh pr create \
+                --base "${TARGET}" \
+                --head "${SOURCE}" \
+                --title "${title}" \
+                --body-file "${body_file}" \
+                ${label_args[@]+"${label_args[@]}"} \
+                | tail -n 1 | sed 's|.*/||'
+            fi
+          }
+
+          # 在 PR 下留言（用于人工介入提示）
+          comment_pr() {
+            local number="$1" body_file="$2"
+            if [ "${REMOTE}" = "gitee" ]; then
+              curl -sS --max-time 30 -o /dev/null -X POST "${GITEE_API}/pulls/${number}/comments" \
+                --data-urlencode "access_token=${GITEE_TOKEN}" \
+                --data-urlencode "body@${body_file}"
+            else
+              gh pr comment "${number}" --body-file "${body_file}"
+            fi
+          }
+
+          # 输出当前 PR 是否可合并：true / false / unknown
+          pr_mergeable() {
+            local number="$1"
+            if [ "${REMOTE}" = "gitee" ]; then
+              curl -sS --max-time 30 "${GITEE_API}/pulls/${number}?access_token=${GITEE_TOKEN}" \
+                | jq -r 'if .mergeable == true then "true" elif .mergeable == false then "false" else "unknown" end' 2>/dev/null || echo "unknown"
+            else
+              local m
+              m=$(gh pr view "${number}" --json mergeable --jq '.mergeable' 2>/dev/null || echo "UNKNOWN")
+              case "${m}" in
+                MERGEABLE)   echo "true" ;;
+                CONFLICTING) echo "false" ;;
+                *)           echo "unknown" ;;
+              esac
+            fi
+          }
+
+          # 冲突时的降级处理：留言 + 告警，不阻断其他格
+          handle_conflict() {
+            local number="$1"
+            {
+              printf '%s\n' "### ⚠️ 自动同步受阻：存在合并冲突"
+              printf '%s\n' ""
+              printf '%s\n' "\`${SOURCE}\` ➡️ \`${TARGET}\` 无法自动合并，需要人工处理。"
+              printf '%s\n' ""
+              printf '%s\n' '```bash'
+              printf '%s\n' "git checkout ${TARGET}"
+              printf '%s\n' "git pull origin ${TARGET}"
+              printf '%s\n' "git merge origin/${SOURCE}"
+              printf '%s\n' "# 解决冲突后提交并推送"
+              printf '%s\n' "git push origin ${TARGET}"
+              printf '%s\n' '```'
+              printf '%s\n' ""
+              printf '%s\n' "推送完成后本 PR 会自动变为可合并状态。"
+            } > conflict_body.md
+
+            comment_pr "${number}" conflict_body.md
+            echo "::warning::${REMOTE} 上 ${SOURCE} → ${TARGET} 存在冲突，请人工解决 PR #${number}：${REPO_HTML}/pulls/${number}"
+          }
+
+          # ---------- 5. 复用或创建 PR ----------
+          PR_NUMBER=$(find_pr)
+
+          if [ -n "${PR_NUMBER}" ]; then
+            echo "ℹ️ 复用已存在的同步 PR #${PR_NUMBER}（新提交已自动包含在该 PR 中）"
+          else
+            echo "🚀 正在 ${REMOTE} 创建 ${SOURCE} → ${TARGET} 的同步 PR..."
+            PR_NUMBER=$(create_pr "chore(sync): ${SOURCE} → ${TARGET} 自动同步" pr_body.md)
+            # 创建接口的返回体结构若不符预期，回查一次兜底
+            if [ -z "${PR_NUMBER}" ] || [ "${PR_NUMBER}" = "null" ]; then
+              PR_NUMBER=$(find_pr)
+            fi
+          fi
+
+          case "${PR_NUMBER}" in
+            '' | *[!0-9]*)
+              echo "::error::${REMOTE}：无法获得 ${SOURCE} → ${TARGET} 的 PR 编号（得到 '${PR_NUMBER}'）"
+              exit 1
+              ;;
+          esac
+          echo "🔗 PR #${PR_NUMBER}：${REPO_HTML}/pulls/${PR_NUMBER}"
+
+          # ---------- 6. 合并 ----------
+          if [ "${REMOTE}" = "gitee" ]; then
+            # Gitee 无 auto-merge 参数，只能显式调用合并接口；
+            # 刚建的 PR 服务端可能尚未算完可合并性，故做几次重试。
+            MERGED=0
+            for attempt in 1 2 3 4; do
+              CODE=$(curl -sS --max-time 30 -o /tmp/merge_resp.json -w '%{http_code}' \
+                -X PUT "${GITEE_API}/pulls/${PR_NUMBER}/merge?access_token=${GITEE_TOKEN}" \
+                --data-urlencode "merge_method=${SYNC_MERGE_METHOD}")
+              if [ "${CODE}" = "200" ] || [ "${CODE}" = "201" ]; then
+                MERGED=1
+                break
+              fi
+              echo "⏳ 第 ${attempt} 次合并未成功（HTTP ${CODE}），5 秒后重试..."
+              sleep 5
+            done
+
+            if [ "${MERGED}" -eq 1 ]; then
+              echo "🎉 ${REMOTE} 上 PR #${PR_NUMBER} 已合并（${SYNC_MERGE_METHOD}）"
+              exit 0
+            fi
+
+            # 合并失败：区分「真冲突」与「其他错误」
+            MERGEABLE=$(pr_mergeable "${PR_NUMBER}")
+            if [ "${MERGEABLE}" = "false" ]; then
+              handle_conflict "${PR_NUMBER}"
+              exit 0
+            fi
+
+            echo "::error::${REMOTE} 上 PR #${PR_NUMBER} 合并失败，接口返回：$(head -c 400 /tmp/merge_resp.json)"
+            exit 1
+          fi
+
+          # GitHub：先确认可合并状态，再开启自动合并
+          MERGEABLE="unknown"
+          for _ in 1 2 3 4 5 6; do
+            # 查询失败不应中断流程：拿不到状态就按 unknown 处理，交给下面的合并兜底逻辑
+            MERGEABLE=$(pr_mergeable "${PR_NUMBER}" || echo "unknown")
+            [ "${MERGEABLE}" != "unknown" ] && break
+            sleep 5
+          done
+          echo "🔎 PR #${PR_NUMBER} mergeable=${MERGEABLE}"
+
+          if [ "${MERGEABLE}" = "false" ]; then
+            handle_conflict "${PR_NUMBER}"
             exit 0
           fi
 
-          # 获取超前的提交摘要（最多展示最近 10 条）
-          COMMIT_LOG=$(git log "origin/${TARGET}..origin/${SOURCE}" --oneline -n 10)
-          PR_TITLE="chore(sync): 自动同步 ${SOURCE} 分支更新到 ${TARGET}"
-
-          # 导出环境变量并通过 node 生成 PR Markdown 正文，避免 Shell 字符转义及 YAML 缩进解析问题
-          export COMMITS_AHEAD
-          export COMMIT_LOG
-          export TARGET
-          export SOURCE
-
-          node -e '
-            const fs = require("fs");
-            const source = process.env.SOURCE;
-            const target = process.env.TARGET;
-            const commitsAhead = process.env.COMMITS_AHEAD;
-            const commitLog = process.env.COMMIT_LOG;
-            const body = [
-              `### 🤖 自动同步 PR：\`${source}\` ➡️ \`${target}\``,
-              "",
-              `检测到上游分支 \`${source}\` 有新提交合入，由 **Sync Branches** 工作流自动发起此 PR。`,
-              "",
-              "---",
-              "",
-              "#### 📌 同步信息",
-              `- **源分支 (Source)**：\`${source}\``,
-              `- **目标分支 (Target)**：\`${target}\``,
-              `- **新增提交数**：共 ${commitsAhead} 个提交`,
-              "",
-              "#### 📝 最近提交摘要",
-              "```text",
-              commitLog,
-              "```",
-              "",
-              "---",
-              "",
-              "#### ⚠️ 人工复核与合并建议",
-              "1. UI 扩展分支包含各自专属的组件库依赖与特定样式适配，请**人工检查文件改动及冲突标记**；",
-              "2. 建议使用 **「Create a merge commit」** 方式合并，完整保留分支演化拓扑图；",
-              "3. 如遇到冲突，请拉取本地分支解决后提交推送：",
-              "   ```bash",
-              `   git checkout ${target}`,
-              `   git pull origin ${target}`,
-              `   git merge origin/${source}`,
-              "   # 解决冲突并通过 pnpm check:uts-dts && pnpm lint && pnpm test 后推送",
-              `   git push origin ${target}`,
-              "   ```",
-              "",
-            ].join("\n");
-            fs.writeFileSync("pr_body.md", body);
-          '
-
-          echo "🚀 正在为 ${TARGET} 分支创建同步 Pull Request..."
-          NEW_PR_URL=$(gh pr create \
-            --base "${TARGET}" \
-            --head "${SOURCE}" \
-            --title "${PR_TITLE}" \
-            --body-file pr_body.md)
-
-          echo "🎉 同步 PR 创建成功："
-          echo "👉 ${NEW_PR_URL}"
+          # --auto 在仓库配置了必需状态检查时排队等待；无检查保护时 GitHub 会立即合入。
+          # 若仓库未开启 auto-merge 能力，则直接立即合并兜底。
+          if gh pr merge "${PR_NUMBER}" --auto --"${SYNC_MERGE_METHOD}" 2>/dev/null; then
+            echo "🎉 已为 PR #${PR_NUMBER} 开启自动合并（${SYNC_MERGE_METHOD}）"
+          elif gh pr merge "${PR_NUMBER}" --"${SYNC_MERGE_METHOD}"; then
+            echo "🎉 PR #${PR_NUMBER} 已直接合并（${SYNC_MERGE_METHOD}）"
+          else
+            echo "::error::${REMOTE} 上 PR #${PR_NUMBER} 合并失败"
+            exit 1
+          fi
