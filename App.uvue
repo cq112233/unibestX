@@ -4,10 +4,6 @@ import { useAppStore } from './src/store';
 import { initNativeMidButtonTap } from '@/src/tabbar/index.uts';
 import { applyThemeColor, themeColor } from '@/src/utils/theme/index.uts';
 import { reportError } from '@/src/utils/error-report/index.uts';
-// 隐私闸门仅 App 端启用，导入同步条件编译，避免其它端留下未使用导入
-// #ifdef APP
-import { runPrivacyGate } from '@/src/utils/privacy/index.uts';
-// #endif
 
 onLaunch(() => {
   // 提前实例化 App Store（含持久化还原），并初始化外观模式：跟随系统 / 浅色 / 深色
@@ -20,16 +16,6 @@ onLaunch(() => {
   }
   // 注册原生 TabBar 中间按钮监听（仅在原生模式且配置了 midButton 时生效）
   initNativeMidButtonTap();
-
-  // 隐私合规闸门：未同意走首启页；已同意但协议版本落后走再确认
-  // 放在 TabBar / 主题初始化之后，保证隐私页本身也能拿到主题与布局
-  // 仅 App 端启用：H5 / 小程序在 onLaunch 期间调 reLaunch 会被启动护栏入队（页面栈尚未建立），
-  // 跳转时机不可控，故这两端不在此处拦截
-  // #ifdef APP
-  if (!runPrivacyGate()) {
-    return;
-  }
-  // #endif
 
   // #ifdef MP-WEIXIN
   // 微信小程序真机 @font-face 不生效，使用 uni.loadFontFace 加载 uni-icons 字体
