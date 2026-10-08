@@ -525,6 +525,15 @@ by ZXLee
       default: gc<boolean>('cleanListWhenReload', true)
     },
     /**
+     * @description 首页(下拉刷新或reload)请求失败时是否清空原list以展示失败页面。
+     * 为true时会丢弃现有数据并展示失败页面；为false时保持原list不动(失败信号无UI可展示，页面需自行提示)
+     * @default true
+     */
+    cleanListWhenError: {
+      type: Boolean,
+      default: gc<boolean>('cleanListWhenError', true)
+    },
+    /**
      * @description 空数据描述文字
      * @default 没有数据哦~
      */
@@ -785,6 +794,8 @@ by ZXLee
   const refresherCompleteDelayTimer = ref<number | null>(null)
   // 下拉刷新回弹动画的定时器
   const refresherEndAnimateTimer = ref<number | null>(null)
+  // 本次下拉刷新是否已在query回调中被同步结束(用于补一次refresherTriggered跳变，见_handleRefresh)
+  let refresherEndedSync: boolean = false
   // 底部加载更多状态
   const loadMoreStatus = ref(Enum.More.Default)
   // 触发query来源
@@ -1091,6 +1102,8 @@ by ZXLee
     refresherTriggered.value = false;
     refresherStatus.value = Enum.Refresher.Default;
     isLoading.value = false;
+    // 标记本次刷新已被结束，用于识别query被同步完成的情况(见_handleRefresh)
+    refresherEndedSync = true;
   }
 
   // 聊天记录模式：首屏数据渲染后滚动到底部，多次触发以避免list-item尚未渲染完毕导致位置不正确
@@ -1253,7 +1266,13 @@ by ZXLee
   // 请求结束(失败)调用此方法，将自动展示失败页面或底部加载失败状态
   const completeByError = () => {
     isLoadFailed.value = true;
-    if (!isFirstPage.value) {
+    if (isFirstPage.value) {
+      // 首页失败：失败信号(isLoadFailed)只被空数据视图消费，而空数据视图要求totalData为空，
+      // 列表非空时showEmpty为false会让失败信号被整个吞掉，故按需清空原list以展示失败页面
+      if (props.cleanListWhenError) {
+        totalData.value = [];
+      }
+    } else {
       loadMoreStatus.value = Enum.More.Fail;
     }
     forceHideLoadMore.value = false;
@@ -1354,7 +1373,17 @@ by ZXLee
     pageNo.value = props.defaultPageNo;
     queryFrom.value = Enum.QueryFrom.UserPullDown;
     customNoMore.value = -1;
+    refresherEndedSync = false;
     _emitQuery(pageNo.value, props.defaultPageSize);
+    // 若query被同步完成(如completeByError或延迟为0的complete)，refresherTriggered已在上面的emit中
+    // 被endRefresh置回false，原生refresher观察不到true→false的跳变就不会收回，此处补一次显式跳变
+    // (与下方松手进入二楼分支的处理同理)
+    if (refresherEndedSync) {
+      refresherTriggered.value = true;
+      nextTick(() => {
+        endRefresh();
+      })
+    }
   }
   // 下拉刷新被触发事件
   const _onRefresherrefresh = (e: RefresherEvent) => {
