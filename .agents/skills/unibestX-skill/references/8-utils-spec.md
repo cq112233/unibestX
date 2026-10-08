@@ -29,7 +29,7 @@ graph LR
     A -->|轻提示/Loading| D[src/utils/toast]
     A -->|路由导航/参数安全| E[src/utils/route]
     A -->|滚动与触底监听| F[src/utils/refresh]
-    A -->|主题配置/暗黑模式| G[src/utils/theme]
+    A -->|主题配置/暗黑模式| G[src/theme]
 ```
 
 ---
@@ -192,7 +192,7 @@ if (isDev()) {
   - `onNavbarReachBottom(callback: () => void)`
 - **规则**：在采用了 `layout="navbar"` 或 `layout="default"` 的页面中，由于根容器已被布局自带的 `scroll-view` 接管，原生 `onPageScroll` / `onReachBottom` 不会被触发，**必须使用 `onNavbarPageScroll` 与 `onNavbarReachBottom`**。
 
-### 8.4.4 主题与样式辅助：`@/src/utils/theme/index.uts`
+### 8.4.4 主题与样式系统：`@/src/theme/index.uts`
 
 - **导出方法**：
   - `getThemeTokens(isDark: boolean): ThemeTokens`：获取当前明暗模式下的颜色代币集合。

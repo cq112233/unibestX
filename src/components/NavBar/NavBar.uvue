@@ -64,8 +64,8 @@
 import { computed } from 'vue';
 import { NAVBAR_CONTENT_HEIGHT, safeAreaInsets, systemInfo } from '@/src/utils/systemInfo/index.uts';
 import { useAppStore } from '@/src/store';
-import { getThemeTokens } from '@/src/utils/theme/index.uts';
-import type { ThemeTokens } from '@/src/utils/theme/index.uts';
+import { getThemeTokens } from '@/src/theme/index.uts';
+import type { ThemeTokens } from '@/src/theme/index.uts';
 
 // 定义组件参数类型
 const props = defineProps({
@@ -161,15 +161,15 @@ function handleBack() {
 }
 
 .navbar-bar {
-  width: 100%;
   display: flex;
   flex-direction: column;
+  width: 100%;
 
   &--fixed {
     position: fixed;
     top: 0;
-    left: 0;
     right: 0;
+    left: 0;
     z-index: 999;
   }
 }
@@ -180,11 +180,11 @@ function handleBack() {
 
 .navbar-content {
   position: relative;
-  width: 100%;
   display: flex;
   flex-direction: row;
-  align-items: center;
   justify-content: center;
+  align-items: center;
+  width: 100%;
 }
 
 .navbar-left {
@@ -193,21 +193,21 @@ function handleBack() {
   bottom: 0;
   left: 0;
   z-index: 10;
-  height: 100%;
   display: flex;
   flex-direction: row;
-  align-items: center;
   justify-content: flex-start;
+  align-items: center;
+  height: 100%;
 }
 
 .navbar-back-btn {
-  height: 100%;
   display: flex;
   flex-direction: row;
-  align-items: center;
   justify-content: center;
-  padding-left: 16px;
+  align-items: center;
+  height: 100%;
   padding-right: 16px;
+  padding-left: 16px;
 }
 
 .navbar-back-icon {
@@ -224,26 +224,26 @@ function handleBack() {
 }
 
 .navbar-back-line--top {
-  left: 0px;
   top: 4.5px;
+  left: 0px;
   transform: rotate(-35deg);
 }
 
 .navbar-back-line--bottom {
-  left: 0px;
   top: 12.5px;
+  left: 0px;
   transform: rotate(35deg);
 }
 
 .navbar-mid {
   display: flex;
-  height: 100%;
-  flex: 1;
   flex-direction: row;
-  align-items: center;
   justify-content: center;
-  padding-left: 60px;
+  align-items: center;
+  flex: 1;
+  height: 100%;
   padding-right: 60px;
+  padding-left: 60px;
 }
 
 .navbar-title {
@@ -258,14 +258,14 @@ function handleBack() {
 .navbar-right {
   position: absolute;
   top: 0;
-  bottom: 0;
   right: 0;
+  bottom: 0;
   z-index: 10;
-  width: 60px;
   display: flex;
   flex-direction: row;
-  align-items: center;
   justify-content: flex-end;
+  align-items: center;
+  width: 60px;
   padding-right: 15px;
 }
 

@@ -35,8 +35,8 @@
 <script setup lang="uts">
 import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { useAppStore } from '@/src/store';
-import { getThemeTokens } from '@/src/utils/theme/index.uts';
-import type { ThemeTokens } from '@/src/utils/theme/index.uts';
+import { getThemeTokens } from '@/src/theme/index.uts';
+import type { ThemeTokens } from '@/src/theme/index.uts';
 import { isPageRefresherDisabled, isPageScrollDisabled } from '@/src/utils/refresh/index.uts';
 import { updateSystemInfo } from '@/src/utils/systemInfo/index.uts';
 
@@ -219,14 +219,14 @@ const themeTokens = computed((): ThemeTokens => {
 
 <style lang="scss" scoped>
 .default-layout {
-  flex: 1;
   display: flex;
   flex-direction: column;
+  flex: 1;
 }
 
 .default-scroll-view {
-  flex: 1;
   display: flex;
   flex-direction: column;
+  flex: 1;
 }
 </style>
