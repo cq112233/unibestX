@@ -3,7 +3,7 @@
   <view
     class="root-container"
     style="display: flex; flex-direction: column;flex: 1;"
-    :class="{ dark: appStore.state.isDark }"
+    :class="themeStore.state.isDark ? 'dark' : ''"
     :style="themeStyle"
   >
     <!-- 页面内容滚动容器 -->
@@ -18,7 +18,7 @@
 <script setup lang="uts">
 import Tabbar from '@/src/tabbar/tabbar.uvue';
 import { customTabbarEnable, isPageTabbar, selectedTabbarStrategy, syncCurIdxByCurrentPage } from '@/src/tabbar/index.uts';
-import { useAppStore } from '@/src/store';
+import { useThemeStore } from '@/src/store';
 import { applyNavbarTheme, getRootThemeStyle } from '@/src/theme/index.uts';
 import { computed, onMounted, ref, watch } from 'vue';
 import { updateAvailableHeight } from '@/src/utils/systemInfo/index.uts';
@@ -71,8 +71,8 @@ const props = defineProps({
   }
 });
 
-// 激活应用状态管理 Store
-const appStore = useAppStore();
+// 激活主题状态管理 Store
+const themeStore = useThemeStore();
 
 /**
  * 获取 pageStyle 对象
@@ -81,9 +81,9 @@ const _pageStyleObj = computed((): UTSJSONObject => {
   return (props.pageStyle ?? {}) as UTSJSONObject;
 });
 
-// 主题样式变量：亮 / 暗两套，跟随 appStore.state.isDark 响应式切换
+// 主题样式变量：亮 / 暗两套，跟随 themeStore.state.isDark 响应式切换
 const themeStyle = computed((): UTSJSONObject => {
-  return getRootThemeStyle(appStore.state.theme, appStore.state.isDark);
+  return getRootThemeStyle(themeStore.state.theme, themeStore.state.isDark);
 });
 
 // 控制当前页面是否需要显示底部导航栏
@@ -91,7 +91,7 @@ const isCurrentPageTabbar = ref(false);
 
 // 组件挂载时：同步 H5 / 小程序原生导航栏主题与路由状态
 onMounted(() => {
-  applyNavbarTheme(appStore.state.isDark);
+  applyNavbarTheme(themeStore.state.isDark);
   try {
     const pages = getCurrentPages();
     if (pages.length > 0) {
@@ -110,7 +110,7 @@ onMounted(() => {
 });
 
 // 主题模式 / 系统深浅色变化时，当前页面不切换也实时同步导航栏
-watch((): boolean => appStore.state.isDark, (newVal: boolean) => {
+watch((): boolean => themeStore.state.isDark, (newVal: boolean) => {
   applyNavbarTheme(newVal);
 });
 

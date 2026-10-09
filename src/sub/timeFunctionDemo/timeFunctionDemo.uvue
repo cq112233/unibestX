@@ -1,24 +1,19 @@
 <template>
-  <view class="flex flex-col p-[16px]" :class="isDark ? 'bg-[#0f172a]' : 'bg-[#f8fafc]'">
+  <view class="flex flex-col p-[16px] bg-[#f8fafc]">
     <view
-      class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid"
-      :style="{
-        backgroundColor: 'var(--card-bg, #ffffff)',
-        borderColor: 'var(--border-color, #edf2f7)'
-      }"
+      class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid border-[#edf2f7] bg-[#ffffff]"
     >
       <!-- 标题区域 -->
       <view class="flex flex-row items-center mb-[16px]">
         <view
-          class="w-[4px] h-[16px] rounded-[2px] mr-[8px]"
-          :style="{ backgroundColor: 'var(--theme-color, #3182ce)' }"
+          class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#3182ce]"
         />
-        <text class="text-[16px] font-bold" :style="{ color: 'var(--text-color, #2d3748)' }">时间日期操作 (lime-dayuts)</text>
+        <text class="text-[16px] font-bold text-[#2d3748]">时间日期操作 (lime-dayuts)</text>
       </view>
       <!-- 实时时间与自定义格式化展示 -->
       <view class="rounded-[12px] p-[16px] mb-[16px] border-[1px] border-solid border-[#e2e8f0]">
         <text class="text-[13px] font-bold text-[#1e293b] mb-[8px]">实时高精度时钟 (更新于每一百毫秒)</text>
-        <text class="text-[24px] font-bold text-[var(--theme-color,#37c2bc)] mb-[6px]" style="font-family: monospace;">
+        <text class="text-[24px] font-bold text-[#37c2bc] mb-[6px]" style="font-family: monospace;">
           {{ currentFullTime }}
         </text>
         <text class="text-[12px] text-[#94a3b8]">
@@ -94,7 +89,6 @@
 import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { dayuts } from '@/uni_modules/lime-dayuts';
 import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/layouts/navbar/utils/index.uts';
-import { useAppStore } from '@/src/store';
 
 definePage({
   debug: false,
@@ -108,12 +102,9 @@ definePage({
   }
 });
 
-const appStore = useAppStore();
-const isDark = computed((): boolean => appStore.state.isDark);
-
 // 实时时间状态
 const currentFullTime = ref('');
-let timerId = 0;
+let timerId: number = 0;
 
 // 偏移时间计算
 const offsetDays = ref(0);
@@ -157,9 +148,9 @@ const daysToYearEnd = computed((): number => {
 
 onMounted(() => {
   updateClock();
-  timerId = setInterval(() => {
+  timerId = (setInterval((): void => {
     updateClock();
-  }, 100);
+  }, 100) as any) as number;
 });
 
 onUnmounted(() => {

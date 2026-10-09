@@ -16,7 +16,7 @@
 -->
 <template>
   <view class="absolute top-0 bottom-0 left-0 right-0 flex flex-col items-center justify-center px-[16px]">
-    <text class="text-[12px] mb-[6px]" :class="isDark ? 'text-[#cbd5e1]' : 'text-[#475569]'">
+    <text class="text-[12px] mb-[6px] text-[#475569]">
       swiper-item 1 · 触发器组件挂在这里
     </text>
 
@@ -43,10 +43,10 @@
 
     <!-- 本组件自己的回执（局部 ref，数据是从实例 ref 读回来的） -->
     <view class="mt-[10px] flex flex-col items-center">
-      <text class="text-[11px] leading-[18px]" :class="isDark ? 'text-[#94a3b8]' : 'text-[#64748b]'">
+      <text class="text-[11px] leading-[18px] text-[#64748b]">
         实例是否注册：{{ registered }}
       </text>
-      <text class="text-[11px] leading-[18px]" :class="isDark ? 'text-[#94a3b8]' : 'text-[#64748b]'">
+      <text class="text-[11px] leading-[18px] text-[#64748b]">
         本次传进去的标题：{{ sentTitle.length > 0 ? sentTitle : '—' }}
       </text>
       <text v-if="refSummary.length > 0" class="text-[11px] leading-[18px] text-[#0ea5e9]">
@@ -60,17 +60,14 @@
 </template>
 
 <script setup lang="uts">
-import { computed, ref } from 'vue';
-import { useAppStore, useModalStore } from '@/src/store';
+import { ref } from 'vue';
+import { useModalStore } from '@/src/store';
 import type { IModalPayload } from '@/src/store';
 
 defineOptions({
   name: 'SwiperModalTrigger',
   styleIsolation: 'isolated'
 });
-
-const appStore = useAppStore();
-const isDark = computed((): boolean => appStore.state.isDark);
 
 /** 实例注册表 store：页面级组件把弹窗实例注册进来，本组件取出来直接用 */
 const modalStore = useModalStore();

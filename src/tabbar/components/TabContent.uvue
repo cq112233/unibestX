@@ -99,7 +99,7 @@ import {
   setNavbarTitle,
   stopNavbarPullDownRefresh
 } from '@/src/layouts/navbar/utils/index.uts';
-import { useAppStore } from '@/src/store';
+import { useThemeStore } from '@/src/store';
 import { getThemeTokens } from '@/src/theme/index.uts';
 import type { ThemeTokens } from '@/src/theme/index.uts';
 
@@ -168,11 +168,11 @@ provide('isTabActive', isActive);
 // ==========================================
 // 3. 样式布局与主题令牌
 // ==========================================
-const appStore = useAppStore();
+const themeStore = useThemeStore();
 
 /** 当前主题设计令牌（深浅色模式动态切换背景底色） */
 const themeTokens = computed<ThemeTokens>((): ThemeTokens => {
-  return getThemeTokens(appStore.state.isDark);
+  return getThemeTokens(themeStore.state.isDark);
 });
 
 /**

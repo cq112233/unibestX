@@ -91,7 +91,7 @@
 import { computed, onUnmounted, ref } from 'vue';
 import NavBar from '@/src/components/NavBar/NavBar.uvue';
 import TabbarPlaceholder from '@/src/tabbar/components/TabbarPlaceholder.uvue';
-import { useAppStore } from '@/src/store';
+import { useThemeStore } from '@/src/store';
 import { getThemeTokens } from '@/src/theme/index.uts';
 import type { ThemeTokens } from '@/src/theme/index.uts';
 import { isPageRefresherDisabled, isPageScrollDisabled } from './utils/index.uts';
@@ -675,7 +675,7 @@ const isCustomNav = computed((): boolean => {
  * 获取当前主题的设计令牌（ThemeTokens，自适应明暗模式）
  */
 const themeTokens = computed((): ThemeTokens => {
-  return getThemeTokens(useAppStore().state.isDark);
+  return getThemeTokens(useThemeStore().state.isDark);
 });
 
 defineExpose({

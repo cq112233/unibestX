@@ -102,7 +102,7 @@ import {
 } from '@/src/tabbar/index.uts';
 import type { CustomTabBarItem } from '@/src/tabbar/index.uts';
 import { themeColor } from '@/src/theme/index.uts';
-import { useAppStore } from '@/src/store';
+import { useThemeStore } from '@/src/store';
 import { $t } from '@/src/i18n/utils/index.uts';
 
 // ==========================================
@@ -125,11 +125,11 @@ defineProps({
   }
 });
 
-const appStore = useAppStore();
+const themeStore = useThemeStore();
 
 /** 当前激活的主题色（优先取 store 中持久化的 theme，保底取全局 themeColor） */
 const activeThemeColor = computed<string>((): string => {
-  return appStore.state.theme.length > 0 ? appStore.state.theme : themeColor.value;
+  return themeStore.state.theme.length > 0 ? themeStore.state.theme : themeColor.value;
 });
 
 // ==========================================

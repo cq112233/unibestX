@@ -1,30 +1,33 @@
 <template>
-  <view class="flex flex-col flex-1 bg-[#f8fafc]">
+  <view class="flex flex-col flex-1" :style="{ backgroundColor: isDark ? '#0f172a' : '#f8fafc' }">
     <scroll-view direction="vertical" class="flex-1 flex flex-col p-[16px]">
       <view
         class="rounded-[16px] p-[20px] mb-[16px] border-[1px] border-solid"
         :style="{
-          backgroundColor: 'var(--card-bg, #ffffff)',
-          borderColor: 'var(--border-color, #edf2f7)'
+          backgroundColor: isDark ? '#1e293b' : '#ffffff',
+          borderColor: isDark ? '#334155' : '#edf2f7'
         }"
       >
         <!-- 标题区域 -->
         <view class="flex flex-row items-center mb-[16px]">
           <view
             class="w-[4px] h-[16px] rounded-[2px] mr-[8px]"
-            :style="{ backgroundColor: 'var(--theme-color, #3182ce)' }"
+            :style="{ backgroundColor: currentTheme }"
           />
-          <text class="text-[16px] font-bold" :style="{ color: 'var(--text-color, #2d3748)' }">主题设置</text>
+          <text class="text-[16px] font-bold" :style="{ color: isDark ? '#ffffff' : '#2d3748' }">主题设置</text>
         </view>
 
         <!-- 预览区域 -->
         <view
           class="rounded-[12px] p-[16px] mb-[16px] border-[1px] border-solid items-center"
-          :style="{ borderColor: 'var(--border-color, #e2e8f0)' }"
+          :style="{
+            backgroundColor: isDark ? '#0f172a' : '#f8fafc',
+            borderColor: isDark ? '#334155' : '#e2e8f0'
+          }"
         >
           <text
             class="text-[12px] mb-[8px]"
-            :style="{ color: 'var(--text-secondary, #94a3b8)' }"
+            :style="{ color: isDark ? '#94a3b8' : '#64748b' }"
           >
             主题色效果预览
           </text>
@@ -47,7 +50,7 @@
               backgroundColor: item,
               borderWidth: currentTheme == item ? '3px' : '0px',
               borderStyle: 'solid',
-              borderColor: appStore.state.isDark ? '#ffffff' : '#1e293b'
+              borderColor: isDark ? '#ffffff' : '#1e293b'
             }"
             @click="changeTheme(item)"
           >
@@ -64,7 +67,7 @@
         <view class="flex flex-row justify-between items-center mt-[10px] pt-[10px]">
           <text
             class="text-[14px]"
-            :style="{ color: 'var(--text-color, #2d3748)' }"
+            :style="{ color: isDark ? '#ffffff' : '#2d3748' }"
           >
             外观模式
           </text>
@@ -73,7 +76,7 @@
             :style="{
               borderWidth: '1px',
               borderStyle: 'solid',
-              borderColor: 'var(--border-color, #e2e8f0)'
+              borderColor: isDark ? '#334155' : '#e2e8f0'
             }"
           >
             <view
@@ -81,14 +84,14 @@
               :key="index"
               class="px-[14px] py-[8px]"
               :style="{
-                backgroundColor: currentMode == item.value ? currentTheme : 'transparent'
+                backgroundColor: currentMode == item.value ? currentTheme : (isDark ? '#0f172a' : 'transparent')
               }"
               @click="changeThemeMode(item.value)"
             >
               <text
                 class="text-[12px]"
                 :style="{
-                  color: currentMode == item.value ? '#ffffff' : 'var(--text-secondary, #64748b)'
+                  color: currentMode == item.value ? '#ffffff' : (isDark ? '#94a3b8' : '#64748b')
                 }"
               >
                 {{ item.label }}
@@ -103,7 +106,7 @@
 
 <script setup lang="uts">
 import { computed } from 'vue';
-import { useAppStore } from '@/src/store';
+import { useThemeStore } from '@/src/store';
 import { THEME_COLOR_PRESETS } from '@/src/theme/index.uts';
 import { toast } from '@/src/utils/toast/index.uts';
 
@@ -124,10 +127,11 @@ type ThemeModeOption = {
   value: string;
 };
 
-const appStore = useAppStore();
+const themeStore = useThemeStore();
 
-const currentTheme = computed((): string => appStore.state.theme);
-const currentMode = computed((): string => appStore.state.themeMode);
+const currentTheme = computed((): string => themeStore.state.theme);
+const currentMode = computed((): string => themeStore.state.themeMode);
+const isDark = computed((): boolean => themeStore.state.isDark);
 
 const themeModeOptions: ThemeModeOption[] = [
   { label: '跟随系统', value: 'auto' },
@@ -136,14 +140,18 @@ const themeModeOptions: ThemeModeOption[] = [
 ];
 
 function changeTheme(color: string) {
-  appStore.setTheme(color);
+  themeStore.setTheme(color);
   toast('主题色切换成功');
 }
 
 function changeThemeMode(value: string) {
-  appStore.setThemeMode(value);
+  themeStore.setThemeMode(value);
   toast('外观模式切换成功');
 }
+
+onMounted(() => {
+  themeStore.initThemeMode();
+});
 </script>
 
 <style scoped>

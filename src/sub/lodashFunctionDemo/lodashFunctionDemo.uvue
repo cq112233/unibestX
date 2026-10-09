@@ -1,19 +1,14 @@
 <template>
-  <view class="flex flex-col p-[16px]" :class="isDark ? 'bg-[#0f172a]' : 'bg-[#f8fafc]'">
+  <view class="flex flex-col p-[16px] bg-[#f8fafc]">
     <view
-      class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid"
-      :style="{
-        backgroundColor: 'var(--card-bg, #ffffff)',
-        borderColor: 'var(--border-color, #edf2f7)'
-      }"
+      class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid border-[#edf2f7] bg-[#ffffff]"
     >
       <!-- 标题区域 -->
       <view class="flex flex-row items-center mb-[16px]">
         <view
-          class="w-[4px] h-[16px] rounded-[2px] mr-[8px]"
-          :style="{ backgroundColor: 'var(--theme-color, #3182ce)' }"
+          class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#3182ce]"
         />
-        <text class="text-[16px] font-bold" :style="{ color: 'var(--text-color, #2d3748)' }">Lodash 工具库 (iRainna-lodash)</text>
+        <text class="text-[16px] font-bold text-[#2d3748]">Lodash 工具库 (iRainna-lodash)</text>
       </view>
       <!-- 1. 数组处理演示 (chunk, uniq, shuffle) -->
       <view class="rounded-[12px] p-[16px] mb-[16px] border-[1px] border-solid border-[#e2e8f0]">
@@ -141,7 +136,6 @@
 import { computed, ref } from 'vue';
 import { camelCase, capitalize, chunk, cloneDeep, debounce, get, kebabCase, random, shuffle, uniq } from '@/uni_modules/iRainna-lodash';
 import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/layouts/navbar/utils/index.uts';
-import { useAppStore } from '@/src/store';
 
 definePage({
   debug: false,
@@ -154,9 +148,6 @@ definePage({
     navigationStyle: 'custom'
   }
 });
-
-const appStore = useAppStore();
-const isDark = computed((): boolean => appStore.state.isDark);
 
 // 1. 数组处理状态
 const rawArray = ref<number[]>([1, 2, 2, 3, 4, 4, 5, 6, 7, 8]);

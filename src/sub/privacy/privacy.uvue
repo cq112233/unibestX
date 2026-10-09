@@ -1,16 +1,16 @@
 <template>
-  <!-- 页面根容器：view + flex-1 弹性撑满，滚动交给内部 scroll-view；背景与文字色跟随主题 -->
-  <view class="flex flex-col flex-1 px-[24px] pt-[24px]" :style="{ backgroundColor: themeTokens.bgContent }">
+  <!-- 页面根容器：view + flex-1 弹性撑满，滚动交给内部 scroll-view；白底简约风格 -->
+  <view class="flex flex-col flex-1 px-[24px] pt-[24px] bg-[#ffffff]">
     <!-- 协议正文区（可滚动）：标题 / 摘要 / 协议入口 / 底部说明 -->
     <scroll-view direction="vertical" class="flex-1 flex flex-col" :show-scrollbar="false">
       <!-- 标题 -->
       <view class="w-full">
-        <text class="text-[18px] font-bold" :style="{ color: themeTokens.navText }">{{ title }}</text>
+        <text class="text-[18px] font-bold text-[#1e293b]">{{ title }}</text>
       </view>
 
       <!-- 摘要：按首启 / 再确认两种语境切换措辞 -->
       <view class="w-full pt-[16px]">
-        <text class="text-[14px] leading-[22px]" :style="{ color: themeTokens.navText }">{{ summaryText }}</text>
+        <text class="text-[14px] leading-[22px] text-[#334155]">{{ summaryText }}</text>
       </view>
 
       <!-- 协议入口列表（L2 纯展示块，点击抛 openAgreement）；文字用主题色 -->
@@ -21,32 +21,30 @@
           class="flex flex-row items-center py-[10px]"
           @click="openAgreement(item)"
         >
-          <text class="text-[14px]" :style="{ color: activeThemeColor }">{{ `《${item.label}》` }}</text>
+          <text class="text-[14px] text-[#0957de]">{{ `《${item.label}》` }}</text>
         </view>
       </view>
 
       <!-- 底部说明 -->
       <view class="w-full pt-[16px]">
-        <text class="text-[13px] leading-[20px]" :style="{ color: themeTokens.tabColor }">{{ footerTip }}</text>
+        <text class="text-[13px] leading-[20px] text-[#64748b]">{{ footerTip }}</text>
       </view>
     </scroll-view>
 
     <!-- 底部操作区：主按钮常显；拒绝按钮仅在首启场景展示，避免把老用户挡死 -->
     <view class="w-full pt-[16px] pb-[24px]">
       <view
-        class="w-full h-[46px] rounded-[8px] flex flex-row items-center justify-center"
-        :style="{ backgroundColor: activeThemeColor }"
+        class="w-full h-[46px] rounded-[8px] flex flex-row items-center justify-center bg-[#0957de]"
         @click="onAgree"
       >
         <text class="text-[#ffffff] text-[15px] font-bold">{{ agreeText }}</text>
       </view>
       <view
         v-if="!isReconfirm"
-        class="w-full h-[46px] mt-[12px] rounded-[8px] border-[1px] border-solid flex flex-row items-center justify-center"
-        :style="{ borderColor: themeTokens.tabBorder }"
+        class="w-full h-[46px] mt-[12px] rounded-[8px] border-[1px] border-solid border-[#e2e8f0] flex flex-row items-center justify-center"
         @click="onReject"
       >
-        <text class="text-[15px]" :style="{ color: themeTokens.tabColor }">{{ rejectText }}</text>
+        <text class="text-[15px] text-[#64748b]">{{ rejectText }}</text>
       </view>
     </view>
   </view>
@@ -67,9 +65,6 @@ import { fetchPrivacyContent } from '@/src/api/privacy/privacy.uts';
 import type { PrivacyContent } from '@/src/api/privacy/privacy.uts';
 import { getAppTitle, MODE_RECONFIRM, privacyConfig, setPrivacyAgreed } from '@/src/config/index.uts';
 import { toast } from '@/src/utils/toast/index.uts';
-import { useAppStore } from '@/src/store';
-import { getThemeTokens, themeColor } from '@/src/theme/index.uts';
-import type { ThemeTokens } from '@/src/theme/index.uts';
 
 // 协议条目：key 用于 v-for 的 :key，url 由隐私配置注入（空串表示未配置）
 type AgreementItem = {
@@ -118,18 +113,6 @@ function loadContent(): void {
       console.error('隐私页文案加载失败:', err);
     });
 }
-
-// —— 主题：主题色与明暗 token 均直读 app store（铁律 4），不自行 ref 一份
-const appStore = useAppStore();
-
-const themeTokens = computed((): ThemeTokens => {
-  return getThemeTokens(appStore.state.isDark);
-});
-
-/** 当前主题色（优先取 store 持久化的 theme，保底取全局 themeColor） */
-const activeThemeColor = computed<string>((): string => {
-  return appStore.state.theme.length > 0 ? appStore.state.theme : themeColor.value;
-});
 
 // —— 以下文案均由接口数据派生，页面不再硬编码任何合规话术
 const title = computed((): string => content.value.title);

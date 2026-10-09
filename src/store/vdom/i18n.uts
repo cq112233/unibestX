@@ -1,0 +1,64 @@
+import { defineStore, PiniaStoreBase } from '@/uni_modules/x-pinia-s';
+import i18n from '@/src/i18n/index.uts';
+import { getDefaultLocale } from '@/src/config/env/env.uts';
+import type { II18nState } from '../types.uts';
+
+const defaultI18nState: II18nState = {
+  locale: getDefaultLocale()
+};
+
+/**
+ * 国际化多语言 Store（可独立裁撤的扩展功能模块）
+ */
+export class I18nStore extends PiniaStoreBase {
+  state: II18nState = reactive<II18nState>({
+    locale: getDefaultLocale()
+  });
+
+  constructor() {
+    super();
+    this.bindState(this.state);
+    i18n.global.locale.value = this.state.locale;
+  }
+
+  /**
+   * 重置语言状态为系统默认语言
+   */
+  override _doReset(): void {
+    this.state.locale = defaultI18nState.locale;
+    i18n.global.locale.value = defaultI18nState.locale;
+  }
+
+  /**
+   * 从本地缓存数据中反序列化还原语言配置
+   */
+  override _hydrate(data: UTSJSONObject): void {
+    const _data = (data.state != null ? data.state : data) as UTSJSONObject;
+    if (_data.locale != null) {
+      const localeVal = _data.locale as string;
+      this.state.locale = localeVal;
+      i18n.global.locale.value = localeVal;
+    }
+  }
+
+  /**
+   * 序列化语言状态用于持久化存储
+   */
+  override _serialize(): UTSJSONObject {
+    return {
+      locale: this.state.locale
+    } as UTSJSONObject;
+  }
+
+  /**
+   * 切换当前应用语言，同步更新 vue-i18n 全局响应式语言及持久化缓存
+   * @param locale 目标语言标识（如 'zh-Hans', 'en'）
+   */
+  setLocale(locale: string): void {
+    this.state.locale = locale;
+    i18n.global.locale.value = locale;
+    this.$patch({ locale } as UTSJSONObject);
+  }
+}
+
+export const useI18nStore = defineStore<I18nStore>('i18n', (): I18nStore => new I18nStore());

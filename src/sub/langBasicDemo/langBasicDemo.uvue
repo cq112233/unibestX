@@ -2,43 +2,34 @@
   <view class="flex flex-col flex-1 bg-[#f8fafc]">
     <scroll-view direction="vertical" class="flex-1 flex flex-col p-[16px]">
       <view
-        class="rounded-[16px] p-[20px] mb-[16px] border-[1px] border-solid"
-        :style="{
-          backgroundColor: 'var(--card-bg, #ffffff)',
-          borderColor: 'var(--border-color, #edf2f7)'
-        }"
+        class="rounded-[16px] p-[20px] mb-[16px] border-[1px] border-solid border-[#edf2f7] bg-[#ffffff]"
       >
         <!-- 标题区域 -->
         <view class="flex flex-row items-center mb-[16px]">
           <view
-            class="w-[4px] h-[16px] rounded-[2px] mr-[8px]"
-            :style="{ backgroundColor: 'var(--theme-color, #3182ce)' }"
+            class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#3182ce]"
           />
-          <text class="text-[16px] font-bold" :style="{ color: 'var(--text-color, #2d3748)' }">{{ langTitle }}</text>
+          <text class="text-[16px] font-bold text-[#2d3748]">{{ langTitle }}</text>
         </view>
 
         <!-- 当前语言预览 -->
         <view
-          class="rounded-[12px] p-[16px] mb-[16px] border-[1px] border-solid"
-          :style="{ borderColor: 'var(--border-color, #e2e8f0)' }"
+          class="rounded-[12px] p-[16px] mb-[16px] border-[1px] border-solid border-[#e2e8f0] bg-[#f8fafc]"
         >
           <text
-            class="text-[12px] mb-[6px]"
-            :style="{ color: 'var(--text-secondary, #94a3b8)' }"
+            class="text-[12px] mb-[6px] text-[#94a3b8]"
           >
             {{ langPreview }}
           </text>
 
           <text
-            class="text-[16px] font-bold"
-            :style="{ color: 'var(--text-color, #1e293b)' }"
+            class="text-[16px] font-bold text-[#1e293b]"
           >
             {{ welcomeText }}
           </text>
 
           <text
-            class="text-[14px] mt-[8px]"
-            :style="{ color: 'var(--text-secondary, #475569)' }"
+            class="text-[14px] mt-[8px] text-[#475569]"
           >
             {{ helloText }}
           </text>
@@ -56,7 +47,7 @@
             <view class="flex-row items-center">
               <text
                 class="text-[15px] font-medium"
-                :style="{ color: currentLocale == item.value ? 'var(--theme-color, #3b82f6)' : 'var(--text-color, #334155)' }"
+                :class="currentLocale == item.value ? 'text-[#3b82f6]' : 'text-[#334155]'"
               >
                 {{ item.label }}
               </text>
@@ -66,14 +57,13 @@
                 v-if="currentLocale == item.value"
                 type="checkmarkempty"
                 size="20"
-                :color="appStore.state.theme"
+                color="#0957de"
               />
             </view>
           </view>
           <view
             v-if="index < languageOptions.length - 1"
-            class="h-[1px]"
-            :style="{ backgroundColor: 'var(--border-color, #f1f5f9)' }"
+            class="h-[1px] bg-[#f1f5f9]"
           />
         </view>
       </view>
@@ -84,7 +74,7 @@
 <script setup lang="uts">
 import { computed } from 'vue';
 import { $t } from '@/src/i18n/utils/index.uts';
-import { useAppStore } from '@/src/store';
+import { useI18nStore } from '@/src/store/index.uts';
 import { setTabbarItem } from '@/src/tabbar/index.uts';
 import { toast } from '@/src/utils/toast/index.uts';
 
@@ -105,14 +95,14 @@ type LanguageOption = {
   value: string;
 };
 
-const appStore = useAppStore();
+const i18nStore = useI18nStore();
 
 const langTitle = computed((): string => $t('basic.langTitle'));
 const langPreview = computed((): string => $t('basic.langPreview'));
 const welcomeText = computed((): string => $t('message.welcome'));
 const helloText = computed((): string => $t('message.hello', { msg: 'hi' }));
 
-const currentLocale = computed((): string => appStore.state.locale);
+const currentLocale = computed((): string => i18nStore.state.locale);
 
 const languageOptions: LanguageOption[] = [
   { label: '简体中文', value: 'zh-CN' },
@@ -120,7 +110,7 @@ const languageOptions: LanguageOption[] = [
 ];
 
 function switchLanguage(lang: string) {
-  appStore.setLocale(lang);
+  i18nStore.setLocale(lang);
   setTabbarItem();
   toast($t('message.switch_success'));
 }
