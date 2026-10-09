@@ -160,6 +160,18 @@ import { useAppStore, useModalStore } from '@/src/store';
 import TabbarMaskModal from '@/src/components/TabbarMaskModal/TabbarMaskModal.uvue';
 import SwiperModalTrigger from './components/SwiperModalTrigger.uvue';
 
+definePage({
+  debug: false,
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
+  style: {
+    navigationBarTitleText: '全屏遮罩弹窗',
+    navigationStyle: 'custom'
+  }
+});
+
 const appStore = useAppStore();
 const isDark = computed((): boolean => appStore.state.isDark);
 

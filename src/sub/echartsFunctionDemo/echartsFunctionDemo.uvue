@@ -84,6 +84,18 @@ import { computed, ref, watch } from 'vue';
 import type { ComponentPublicInstance } from 'vue';
 import { systemInfo } from '@/src/utils/systemInfo/index.uts';
 
+definePage({
+  debug: false,
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
+  style: {
+    navigationBarTitleText: 'ECharts 跨端图表',
+    navigationStyle: 'custom'
+  }
+});
+
 const echartRef = ref<ComponentPublicInstance | null>(null);
 const currentType = ref('line');
 const gridKey = 'gr' + 'id';

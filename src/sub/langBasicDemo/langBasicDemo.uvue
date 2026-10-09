@@ -87,6 +87,18 @@ import { useAppStore } from '@/src/store';
 import { $t, setTabbarItem } from '@/src/utils/i18n/index.uts';
 import { toast } from '@/src/utils/toast/index.uts';
 
+definePage({
+  debug: false,
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
+  style: {
+    navigationBarTitleText: '国际化多语言',
+    navigationStyle: 'custom'
+  }
+});
+
 type LanguageOption = {
   label: string;
   value: string;

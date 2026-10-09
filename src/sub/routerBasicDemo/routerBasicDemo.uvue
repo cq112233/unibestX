@@ -29,7 +29,7 @@
             </text>
           </view>
           <text class="text-[12px] leading-normal" :style="{ color: 'var(--text-secondary, #94a3b8)' }">
-            测试场景说明：Test 页面属于需登录拦截页面。未登录时点击跳转将拦截并重定向到登录页，登录成功后会自动跳回 Test 页并解析 query 传参。
+            测试场景说明：参数接收页属于需登录拦截页面。未登录时点击跳转将拦截并重定向到登录页，登录成功后会自动跳回目标页并解析 query 传参。
           </text>
         </view>
 
@@ -41,7 +41,7 @@
               :style="{ backgroundColor: 'var(--theme-color, #3182ce)', lineHeight: '42px' }"
               @click="jumpToTest"
             >
-              跳转 Test 页 (传参)
+              跳转参数接收页 (传参)
             </button>
           </view>
           <view class="flex-1 ml-[6px]">
@@ -64,6 +64,18 @@ import { computed } from 'vue';
 import { useTokenStore, useUserStore } from '@/src/store';
 import { toastSuccess } from '@/src/utils/toast/index.uts';
 
+definePage({
+  debug: false,
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
+  style: {
+    navigationBarTitleText: '路由拦截与传参',
+    navigationStyle: 'custom'
+  }
+});
+
 const tokenStore = useTokenStore();
 const userStore = useUserStore();
 
@@ -71,9 +83,9 @@ const hasLogin = computed((): boolean => {
   return tokenStore.hasValidLogin();
 });
 
-function jumpToTest() {
+function jumpToTest(): void {
   uni.navigateTo({
-    url: '/src/sub/test/test?id=999&name=UNIX'
+    url: '/src/sub/routerParamsBasicDemo/routerParamsBasicDemo?id=999&name=UNIX'
   });
 }
 

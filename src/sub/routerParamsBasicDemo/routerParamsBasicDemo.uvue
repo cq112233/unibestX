@@ -22,7 +22,7 @@
           </view>
           <view class="flex-row items-center">
             <view class="bg-[#3182ce] rounded-[20px] px-[14px] py-[6px]">
-              <text class="text-[13px] font-medium text-white">{{ countLabel }}</text>
+              <text class="text-[13px] font-medium text-[#ffffff]">{{ countLabel }}</text>
             </view>
           </view>
         </view>
@@ -71,6 +71,7 @@ import { computed, ref } from 'vue';
 import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/utils/refresh/index.uts';
 
 definePage({
+  debug: false,
   layout: 'navbar',
   showBack: true,
   hideNavbar: false,
@@ -89,7 +90,7 @@ const countLabel = computed((): string => {
 });
 
 onLoad((options: UTSJSONObject | null) => {
-  console.log('test page onLoad options:', options);
+  console.log('routerParamsBasicDemo page onLoad options:', options);
   if (options != null) {
     queryOptions.value = options;
     optionKeys.value = UTSJSONObject.keys(options);

@@ -107,6 +107,18 @@ import { useAppStore } from '@/src/store';
 import { THEME_COLOR_PRESETS } from '@/src/theme/index.uts';
 import { toast } from '@/src/utils/toast/index.uts';
 
+definePage({
+  debug: false,
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
+  style: {
+    navigationBarTitleText: '主题设置',
+    navigationStyle: 'custom'
+  }
+});
+
 type ThemeModeOption = {
   label: string;
   value: string;

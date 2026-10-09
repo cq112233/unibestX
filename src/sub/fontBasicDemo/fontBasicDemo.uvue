@@ -346,6 +346,18 @@
 <script setup lang="uts">
 import { computed, onMounted, ref } from 'vue';
 
+definePage({
+  debug: false,
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
+  style: {
+    navigationBarTitleText: '字体与排版设置',
+    navigationStyle: 'custom'
+  }
+});
+
 type LocalFontOption = {
   label: string;
   desc: string;

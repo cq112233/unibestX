@@ -31,14 +31,16 @@
         </text>
       </view>
 
-      <!-- 原生跳转按钮 -->
-      <button
-        class="w-full h-[42px] text-center text-[#ffffff] text-[14px] font-bold rounded-[8px]"
-        :style="{ backgroundColor: 'var(--theme-color, #0957de)', lineHeight: '42px' }"
+      <!-- 跳转按钮 -->
+      <view
+        class="w-full h-[42px] flex flex-row items-center justify-center rounded-[8px] active:opacity-90"
+        :style="{ backgroundColor: 'var(--theme-color, #0957de)' }"
         @click="navigateToDemo(item.path)"
       >
-        {{ item.btnText }}
-      </button>
+        <text class="text-[#ffffff] text-[14px] font-bold">
+          {{ item.btnText }}
+        </text>
+      </view>
     </view>
   </view>
 </template>

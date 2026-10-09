@@ -31,14 +31,16 @@
         </text>
       </view>
 
-      <!-- 原生跳转按钮 -->
-      <button
-        class="w-full h-[42px] text-center text-[#ffffff] text-[14px] font-bold rounded-[8px]"
-        :style="{ backgroundColor: 'var(--theme-color, #0957de)', lineHeight: '42px' }"
+      <!-- 跳转按钮 -->
+      <view
+        class="w-full h-[42px] flex flex-row items-center justify-center rounded-[8px] active:opacity-90"
+        :style="{ backgroundColor: 'var(--theme-color, #0957de)' }"
         @click="navigateToDemo(item.path)"
       >
-        {{ item.btnText }}
-      </button>
+        <text class="text-[#ffffff] text-[14px] font-bold">
+          {{ item.btnText }}
+        </text>
+      </view>
     </view>
   </view>
 </template>
@@ -62,14 +64,14 @@ const demoList: Array<FunctionDemoItem> = [
     title: 'z-paging-x 原生分页 Demo',
     desc: '演示 120Hz 极速列表、原生阻尼下拉刷新与高性能复用加载。',
     btnText: '进入 z-paging-x 原生分页功能',
-    path: '/src/sub/zpaging/zpaging'
+    path: '/src/sub/zpagingFunctionDemo/zpagingFunctionDemo'
   },
   {
     id: 'nestedScroll',
     title: 'NestedScroll 嵌套滚动 Demo',
     desc: '自研原生手势联通与平滑衔接，彻底消除双重滚动冲突。',
     btnText: '进入 NestedScroll 嵌套滚动功能',
-    path: '/src/sub/nested-scroll/nested-scroll'
+    path: '/src/sub/nestedScrollFunctionDemo/nestedScrollFunctionDemo'
   },
   {
     id: 'echarts',
@@ -97,35 +99,35 @@ const demoList: Array<FunctionDemoItem> = [
     title: '原生设备与系统能力 Demo',
     desc: '演示拨号分享、文件文档预览、触感震动、键盘避让与相机扫码。',
     btnText: '进入原生设备与系统能力功能',
-    path: '/src/sub/device/device'
+    path: '/src/sub/deviceFunctionDemo/deviceFunctionDemo'
   },
   {
     id: 'lodash',
     title: 'Lodash 工具库 Demo',
     desc: '演示数组切片去重、对象深拷贝、驼峰转换与函数防抖节流。',
     btnText: '进入 Lodash 工具库功能',
-    path: '/src/sub/lodash/lodash'
+    path: '/src/sub/lodashFunctionDemo/lodashFunctionDemo'
   },
   {
     id: 'crypto',
     title: 'Crypto 加密解密 Demo',
     desc: '演示 Base64、MD5、SHA-256、HMAC、AES 与 DES 常用加解密套件。',
     btnText: '进入 Crypto 加密解密功能',
-    path: '/src/sub/crypto/crypto'
+    path: '/src/sub/cryptoFunctionDemo/cryptoFunctionDemo'
   },
   {
     id: 'time',
     title: 'Time 时间日期操作 Demo',
     desc: '基于 lime-dayuts，演示时间格式化、增减计算、相对时间与时间戳转换。',
     btnText: '进入 Time 时间日期操作功能',
-    path: '/src/sub/time/time'
+    path: '/src/sub/timeFunctionDemo/timeFunctionDemo'
   },
   {
     id: 'webview',
     title: 'WebView 双向通讯 Demo',
     desc: '演示网页容器内嵌、postMessage 跨端消息收发与 evalJS 动态交互。',
     btnText: '进入 WebView 双向通讯功能',
-    path: '/src/sub/webview/webview'
+    path: '/src/sub/webviewFunctionDemo/webviewFunctionDemo'
   }
 ];
 

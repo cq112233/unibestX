@@ -149,6 +149,18 @@ import type { ComponentPublicInstance } from 'vue';
 import type { LimeSignatureToFileSuccess, LimeSignatureToTempFilePathOptions } from '@/uni_modules/lime-signature/index.uts';
 import { setPageScrollEnabled } from '@/src/utils/refresh/index.uts';
 
+definePage({
+  debug: false,
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
+  style: {
+    navigationBarTitleText: 'lime-signature 签名板',
+    navigationStyle: 'custom'
+  }
+});
+
 const sigRef = ref<ComponentPublicInstance | null>(null);
 
 const penColor = ref('#ef4444');
