@@ -18,6 +18,22 @@ const defaultThemeState: IThemeState = {
   isDark: isDarkMode(defaultMode)
 };
 
+function getStoredThemeState(): UTSJSONObject | null {
+  try {
+    const raw = uni.getStorageSync('pinia:theme');
+    if (raw != null && typeof raw == 'string' && (raw as string) != '') {
+      const parsed = JSON.parseObject(raw as string);
+      if (parsed != null) {
+        return (parsed.state != null ? parsed.state : parsed) as UTSJSONObject;
+      }
+    }
+  }
+  catch {
+    // ignore
+  }
+  return null;
+}
+
 /**
  * 主题与外观管理 Store（支持主题色换肤、浅色/暗黑模式及跟随系统）
  */
@@ -33,6 +49,30 @@ export class ThemeStore extends PiniaStoreBase {
   constructor() {
     super();
     this.bindState(this.state);
+    const stored = getStoredThemeState();
+    if (stored != null) {
+      if (stored.theme != null) {
+        const themeVal = stored.theme as string;
+        if (themeVal.length > 0) {
+          this.state.theme = themeVal;
+        }
+      }
+      if (stored.themeMode != null) {
+        const modeVal = stored.themeMode as string;
+        if (modeVal == 'auto' || modeVal == 'light' || modeVal == 'dark') {
+          this.state.themeMode = modeVal;
+        }
+      }
+      else if (stored.isDark != null) {
+        this.state.themeMode = (stored.isDark as boolean) ? 'dark' : 'light';
+      }
+      if (stored.isDark != null) {
+        this.state.isDark = stored.isDark as boolean;
+      }
+      else {
+        this.refreshIsDark();
+      }
+    }
     themeColor.value = this.state.theme;
     applyThemeColor(this.state.theme);
     applyThemeMode(this.state.themeMode, this.state.isDark);
@@ -96,6 +136,12 @@ export class ThemeStore extends PiniaStoreBase {
     themeColor.value = theme;
     applyThemeColor(theme);
     this.$patch({ theme } as UTSJSONObject);
+    try {
+      uni.setStorageSync('pinia:theme', JSON.stringify(this._serialize()));
+    }
+    catch {
+      // ignore
+    }
   }
 
   /**
@@ -149,6 +195,12 @@ export class ThemeStore extends PiniaStoreBase {
     // #endif
     this.refreshIsDark();
     this.$patch({ themeMode: mode, isDark: this.state.isDark } as UTSJSONObject);
+    try {
+      uni.setStorageSync('pinia:theme', JSON.stringify(this._serialize()));
+    }
+    catch {
+      // ignore
+    }
   }
 
   /**

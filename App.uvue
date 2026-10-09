@@ -1,7 +1,7 @@
 <script setup lang="uts">
 import { checkDirectEntry } from '@/src/router/index.uts';
-import { useThemeStore } from './src/store';
-import { initNativeMidButtonTap } from '@/src/tabbar/index.uts';
+import { useI18nStore, useThemeStore } from './src/store';
+import { initNativeMidButtonTap, setTabbarItem } from '@/src/tabbar/index.uts';
 import { applyThemeColor, themeColor } from '@/src/theme/index.uts';
 import { reportError } from '@/src/utils/report/index.uts';
 // 隐私闸门仅 App 端启用，导入同步条件编译，避免其它端留下未使用导入
@@ -18,6 +18,12 @@ onLaunch(() => {
     themeColor.value = themeStore.state.theme;
     applyThemeColor(themeStore.state.theme);
   }
+
+  // 提前实例化 i18n Store（含持久化还原），同步当前应用语言与原生 TabBar 文本
+  const i18nStore = useI18nStore();
+  i18nStore.initLocale();
+  setTabbarItem();
+
   // 注册原生 TabBar 中间按钮监听（仅在原生模式且配置了 midButton 时生效）
   initNativeMidButtonTap();
 

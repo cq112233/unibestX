@@ -153,8 +153,13 @@ const hasRendered = ref(false);
 /** 计算当前 Tab 是否正处于激活显示状态 */
 const isActive = computed<boolean>((): boolean => curIdx.value == props.contentIndex);
 
-/** 标题与显隐相关的响应式计算属性（用于 watch 深度监听变更） */
-const contentTitle = computed((): string => props.title);
+/** 标题与显隐相关的响应式计算属性（用于 watch 深度监听变更，支持多语言 $t 响应式联动） */
+const contentTitle = computed((): string => {
+  if (props.title.length > 0) {
+    return $t(props.title);
+  }
+  return '';
+});
 const shouldHideNavbar = computed((): boolean => props.hideNavbar);
 const shouldHideStatusBar = computed((): boolean => props.hideStatusBar);
 
@@ -327,8 +332,8 @@ function handleAlipayTouchEnd() {
  * 设置/同步当前激活 Tab 的导航栏标题（优先取 props.title，未传则读取 TabBar 配置的多语言文案）
  */
 function updateNavbarTitle(): void {
-  if (props.title.length > 0) {
-    const targetTitle = $t(props.title);
+  const targetTitle = contentTitle.value;
+  if (targetTitle.length > 0) {
     setNavbarTitle(targetTitle);
     uni.setNavigationBarTitle({
       title: targetTitle

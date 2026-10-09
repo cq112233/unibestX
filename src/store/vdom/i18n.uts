@@ -7,6 +7,38 @@ const defaultI18nState: II18nState = {
   locale: getDefaultLocale()
 };
 
+function getStoredI18nState(): UTSJSONObject | null {
+  try {
+    const raw = uni.getStorageSync('pinia:i18n');
+    if (raw != null) {
+      const rawStr = `${raw}`;
+      if (rawStr.length > 0 && rawStr != 'null' && rawStr != 'undefined') {
+        const parsed = JSON.parseObject(rawStr);
+        if (parsed != null) {
+          const res = (parsed.state != null ? parsed.state : parsed) as UTSJSONObject;
+          if (res.locale != null) {
+            const locStr = `${res.locale}`;
+            if (locStr.length > 0 && locStr != 'null' && locStr != 'undefined') {
+              return res;
+            }
+          }
+        }
+      }
+    }
+    const limeRaw = uni.getStorageSync('uVueI18nLocale');
+    if (limeRaw != null) {
+      const limeStr = `${limeRaw}`;
+      if (limeStr.length > 0 && limeStr != 'null' && limeStr != 'undefined') {
+        return { locale: limeStr } as UTSJSONObject;
+      }
+    }
+  }
+  catch {
+    // ignore
+  }
+  return null;
+}
+
 /**
  * 国际化多语言 Store（可独立裁撤的扩展功能模块）
  */
@@ -18,6 +50,20 @@ export class I18nStore extends PiniaStoreBase {
   constructor() {
     super();
     this.bindState(this.state);
+    this.initLocale();
+  }
+
+  /**
+   * 初始化应用多语言配置（从持久化存储恢复并同步设置 全局 i18n 语言）
+   */
+  initLocale(): void {
+    const stored = getStoredI18nState();
+    if (stored != null && stored.locale != null) {
+      const localeVal = `${stored.locale}`;
+      if (localeVal.length > 0 && localeVal != 'null' && localeVal != 'undefined') {
+        this.state.locale = localeVal;
+      }
+    }
     i18n.global.locale.value = this.state.locale;
   }
 
@@ -35,9 +81,11 @@ export class I18nStore extends PiniaStoreBase {
   override _hydrate(data: UTSJSONObject): void {
     const _data = (data.state != null ? data.state : data) as UTSJSONObject;
     if (_data.locale != null) {
-      const localeVal = _data.locale as string;
-      this.state.locale = localeVal;
-      i18n.global.locale.value = localeVal;
+      const localeVal = `${_data.locale}`;
+      if (localeVal.length > 0 && localeVal != 'null' && localeVal != 'undefined') {
+        this.state.locale = localeVal;
+        i18n.global.locale.value = localeVal;
+      }
     }
   }
 
@@ -58,6 +106,13 @@ export class I18nStore extends PiniaStoreBase {
     this.state.locale = locale;
     i18n.global.locale.value = locale;
     this.$patch({ locale } as UTSJSONObject);
+    try {
+      uni.setStorageSync('pinia:i18n', JSON.stringify(this._serialize()));
+      uni.setStorageSync('uVueI18nLocale', locale);
+    }
+    catch {
+      // ignore
+    }
   }
 }
 

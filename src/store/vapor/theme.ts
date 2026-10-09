@@ -88,6 +88,12 @@ export const useThemeStore = defineStore('theme', () => {
     state.theme = theme;
     themeColor.value = theme;
     applyThemeColor(theme);
+    try {
+      uni.setStorageSync('pinia:theme', JSON.stringify({ state }));
+    }
+    catch {
+      // ignore
+    }
   }
 
   /**
@@ -100,6 +106,12 @@ export const useThemeStore = defineStore('theme', () => {
     uni.setAppTheme({ theme: mode as 'light' | 'dark' | 'auto' });
     // #endif
     refreshIsDark();
+    try {
+      uni.setStorageSync('pinia:theme', JSON.stringify({ state }));
+    }
+    catch {
+      // ignore
+    }
   }
 
   /**
