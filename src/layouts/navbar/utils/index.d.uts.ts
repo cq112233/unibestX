@@ -47,6 +47,10 @@ export declare function onNavbarPageScroll(callback: (e: PageScrollDetail) => vo
  */
 export declare function onNavbarReachBottom(callback: () => void): void;
 
+export declare const EVENT_PULL_DOWN_REFRESH: string;
+
+export declare const EVENT_STOP_PULL_DOWN_REFRESH: string;
+
 /**
  * 监听 NavBar 布局下拉刷新事件
  */
@@ -117,54 +121,3 @@ export declare function setStatusBarVisible(visible: boolean): void;
  * 重置状态栏显隐为页面初始配置
  */
 export declare function resetStatusBarVisible(): void;
-
-/**
- * 页面滚动、下拉刷新与导航栏事件控制聚合类
- *
- * 集中呈现页面与导航栏控制方法，一目了然；同时支持面向对象式 `refresh.xxx()` 调用。
- *
- * @example
- * ```uts
- * // 方式 1：标准具名导入
- * import { stopNavbarPullDownRefresh, setNavbarTitle } from '@/src/utils/refresh/index.uts';
- *
- * // 方式 2：对象单例导入（一目了然）
- * import { refresh } from '@/src/utils/refresh/index.uts';
- * refresh.stopNavbarPullDownRefresh();
- * ```
- */
-export declare class RefreshUtils {
-  setPageScrollEnabled(enabled: boolean): void;
-
-  setPageRefresherEnabled(enabled: boolean): void;
-
-  onNavbarPageScroll(callback: (e: PageScrollDetail) => void): void;
-
-  onNavbarReachBottom(callback: () => void): void;
-
-  onNavbarPullDownRefresh(callback: () => void): void;
-
-  stopNavbarPullDownRefresh(): void;
-
-  setNavbarTitle(title: string): void;
-
-  resetNavbarTitle(): void;
-
-  setNavbarVisible(visible: boolean): void;
-
-  setHideNavbar(hide: boolean): void;
-
-  resetNavbarVisible(): void;
-
-  setStatusBarVisible(visible: boolean): void;
-
-  resetStatusBarVisible(): void;
-}
-
-/** 页面与导航栏控制工具全局单例 */
-export declare const refresh: RefreshUtils;
-
-/** 别名导出 */
-export declare const refreshUtils: RefreshUtils;
-
-export default refresh;

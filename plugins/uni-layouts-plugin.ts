@@ -250,6 +250,23 @@ export function uniLayoutsPlugin(options: UniLayoutsOptions = {}) {
 
     for (const name of candidates) {
       for (const ext of extensions) {
+        // 1. 优先探测子目录同名文件（如 src/layouts/default/default.uvue）
+        const subDirPath = path.join(layoutDir, name, `${name}${ext}`);
+        if (fs.existsSync(subDirPath)) {
+          return {
+            fileName: `${name}/${name}${ext}`,
+            importPath: `@/src/layouts/${name}/${name}${ext}`
+          };
+        }
+        // 2. 探测子目录 index 文件（如 src/layouts/default/index.uvue）
+        const subDirIndexPath = path.join(layoutDir, name, `index${ext}`);
+        if (fs.existsSync(subDirIndexPath)) {
+          return {
+            fileName: `${name}/index${ext}`,
+            importPath: `@/src/layouts/${name}/index${ext}`
+          };
+        }
+        // 3. 兼容一级目录平铺文件（如 src/layouts/default.uvue）
         const filePath = path.join(layoutDir, `${name}${ext}`);
         if (fs.existsSync(filePath)) {
           return {

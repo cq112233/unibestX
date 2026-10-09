@@ -77,7 +77,10 @@ const EXTRA_SOURCES = [
   path.join(ROOT, 'src/store/types.uts'),
   path.join(ROOT, 'src/tabbar/index.uts'),
   path.join(ROOT, 'src/tabbar/types.uts'),
-  path.join(ROOT, 'src/router/config.uts'),
+  path.join(ROOT, 'src/router/config/config.uts'),
+  path.join(ROOT, 'src/router/interceptor/interceptor.uts'),
+  path.join(ROOT, 'src/router/toLoginPage/toLoginPage.uts'),
+  path.join(ROOT, 'src/router/utils/utils.uts'),
   path.join(ROOT, 'src/router/index.uts'),
   path.join(ROOT, 'src/api/example.uts'),
   path.join(ROOT, 'src/api/auth/auth.uts'),
@@ -87,7 +90,8 @@ const EXTRA_SOURCES = [
   path.join(ROOT, 'src/http/stream/stream.uts'),
   path.join(ROOT, 'src/http/error/error.uts'),
   path.join(ROOT, 'src/utils/report/track.uts'),
-  path.join(ROOT, 'src/utils/report/error.uts')
+  path.join(ROOT, 'src/utils/report/error.uts'),
+  path.join(ROOT, 'src/layouts/navbar/utils/index.uts')
 ];
 
 const args = new Set(process.argv.slice(2));

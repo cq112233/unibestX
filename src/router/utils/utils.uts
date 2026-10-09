@@ -1,7 +1,50 @@
 /**
  * 路由与页面路径工具库
- * 统一收敛页面路径规范化、清洗、当前页面路径获取与路径比对方法
+ * 统一收敛页面路径规范化、清洗、当前页面路径获取与比对、以及 URL 解析方法
  */
+
+/**
+ * URL 解析结构体
+ */
+export type UrlObj = {
+  /** 页面路由路径（不含参数） */
+  path: string;
+  /** 路由参数键值对 Map */
+  query: Map<string, string>;
+};
+
+/**
+ * 解析 URL 字符串为路径与参数键值对
+ * 例如: "/src/pages/login?redirect=index" -> { path: "/src/pages/login", query: { redirect: "index" } }
+ *
+ * @param url 待解析的 URL 字符串
+ * @returns 包含 path 和 query Map 的 UrlObj
+ */
+export function parseUrlToObj(url: string): UrlObj {
+  const parts = url.split('?');
+  const path = parts[0];
+  const query = new Map<string, string>();
+  if (parts.length > 1) {
+    const queryStr = parts[1];
+    const pairs = queryStr.split('&');
+    for (let i = 0; i < pairs.length; i++) {
+      const pair = pairs[i].split('=');
+      if (pair.length > 1) {
+        const key = pair[0];
+        let value = pair[1];
+        // 解码包含百分号转义的参数值
+        if (value.includes('%')) {
+          value = decodeURIComponent(value) ?? '';
+        }
+        query.set(key, value);
+      }
+      else if (pair.length > 0) {
+        query.set(pair[0], '');
+      }
+    }
+  }
+  return { path, query } as UrlObj;
+}
 
 /**
  * 保证路径以前导斜杠 "/" 开头
@@ -152,14 +195,19 @@ export function getPageStackLength(): number {
  * @example
  * ```uts
  * // 方式 1：标准具名导入
- * import { cleanPath, getCurrentPath } from '@/src/router/index.uts';
+ * import { cleanPath, getCurrentPath, parseUrlToObj } from '@/src/router';
  *
  * // 方式 2：对象单例导入（一目了然）
- * import { route } from '@/src/router/index.uts';
+ * import { route } from '@/src/router';
  * console.log(route.getCurrentPath());
  * ```
  */
 export class RouteUtils {
+  /** 解析 URL 为路径与参数 Map */
+  parseUrlToObj(url: string): UrlObj {
+    return parseUrlToObj(url);
+  }
+
   /** 清洗并规范化页面路径（去除 ? 参数，统一补全前导 /） */
   cleanPath(path: string): string {
     return cleanPath(path);
@@ -205,6 +253,7 @@ export class RouteUtils {
 export const route = new RouteUtils();
 
 /** 别名导出 */
+export const routerUtils = route;
 export const routeUtils = route;
 
 export default route;

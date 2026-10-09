@@ -248,7 +248,7 @@ graph TD
 ### 铁律 7：生态工具与模块方法优先（Utils & uni_modules First）
 
 - **凡是 `src/utils/` 和 `uni_modules/` 中已有现成方法或能力的，必须绝对优先使用，严禁自行重复造轮子**：
-  - **`src/utils/` 基础与业务工具**：路由跳转与传参 → `route/index.uts`（`router.push` / `replace` / `back`）；主题色读取与切换 → **`useAppStore()` 直读 `appStore.state.theme`，切换走 `appStore.setTheme(theme)`**（`src/theme` 只留给 store 自身与 tabbar 兜底，新代码禁止引用，理由见铁律 4）；弹窗与交互反馈 → `toast/index.uts`（`showSuccess` / `showError` / `showLoading`）；文案读取 → `i18n/index.uts`（`$t` / `t`）；视口与安全区 → `systemInfo/index.uts`（`availableHeight` / `systemInfo`）；下拉刷新与触底 → `refresh/index.uts`（`onNavbarPullDownRefresh` / `stopNavbarPullDownRefresh`）；物理返回键 → `backPress/index.uts`（`handleBackPressExit`）；文件上传 → `upload/index.uts`（`uploadFile`）；防抖 / 节流与响应式流 → `rxjs-lite/index.uts`。
+  - **`src/utils/` 基础与业务工具**：路由跳转与传参 → `src/router/`（`router.push` / `replace` / `back`）；主题色读取与切换 → **`useAppStore()` 直读 `appStore.state.theme`，切换走 `appStore.setTheme(theme)`**；弹窗与交互反馈 → `src/utils/toast/index.uts`（`toast` / `toastSuccess` / `toastError` / `showLoading`）；数据上报与监控 → `src/utils/report/index.uts`（`track` / `reportError`）；视口与安全区 → `src/utils/systemInfo/index.uts`（`availableHeight` / `systemInfo`）；下拉刷新与触底 → `@/src/layouts/navbar/utils/index.uts`（`onNavbarPullDownRefresh` / `stopNavbarPullDownRefresh`）；防抖 / 节流与响应式流 → `src/utils/rxjs-lite/index.uts`。
   - **`uni_modules/` 组件生态**：图标 → `<uni-icons>` / `<lime-icon>`；标签与滑动列表 → `<up-tabs>` / `<up-scroll-list>`；复杂图表 → `<e-chart>`；分页下拉 / 触底 → `<z-paging-x>`；富文本渲染与编辑 → `<mp-html>` / `<sp-editor>`；二维码与手写签名 → `<lime-qrcode>` / `<lime-signature>`；折叠面板与评分 → `<uni-collapse-x>` / `<uni-rate-x>`。
 - 严禁脱离项目现成成熟资产去手写原生重复实现，或引入未经兼容性验证的外部库。
 

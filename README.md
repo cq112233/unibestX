@@ -507,6 +507,17 @@ unibestX/
 │   │   ├── time/                 #   时间日期操作
 │   │   ├── uiTest/               #   UI 测试与排版
 │   │   └── zpaging/              #   z-paging-x 分页列表各种场景
+│   ├── layouts/                  # 全局页面布局容器
+│   │   ├── default/              #   默认通用布局 (default.uvue)
+│   │   ├── navbar/               #   自定义导航栏布局 (navbar.uvue)
+│   │   │   └── utils/            #     下拉刷新与滚动联动控制器 (index.uts)
+│   │   └── empty/                #   空白纯净布局 (empty.uvue)
+│   ├── router/                   # 路由与全局拦截体系（模块化架构）
+│   │   ├── config/               #   登录白/黑名单策略配置
+│   │   ├── interceptor/          #   全局路由跳转拦截守卫
+│   │   ├── toLoginPage/          #   登录页重定向防抖控制
+│   │   ├── utils/                #   路径规范化与 URL 解析工具
+│   │   └── index.uts             #   统一门面入口
 │   ├── tabbar/                   # 底部 TabBar 体系
 │   │   ├── internal/             #   模块内部实现（不对消费者暴露，请走 index.uts 门面）
 │   │   │   ├── strategy.uts      #     策略枚举与模式判定
@@ -525,16 +536,14 @@ unibestX/
 │   │   └── types.uts             #   TabBar 强类型定义
 │   ├── types/                    # 全局 TypeScript / UTS 类型定义
 │   │   └── uni.d.ts              #   definePage 宏、Vue 宏与全局 API 类型补全
-│   └── utils/                    # 全局工具函数（10 个模块，统一走 index.uts 导出的对象）
+│   └── utils/                    # 全局工具函数（统一走 index.uts 导出的对象或纯函数）
 │       ├── env/                  #   环境变量读取（getApiBaseUrl / getTabBarMode 等）
-│       ├── route/                #   取路由与路径工具
-│       ├── theme/                #   主题色与明暗模式工具
-│       ├── i18n/                 #   多语言辅助工具（t / $t）
-│       ├── toast/                #   全局 Toast 轻提示
 │       ├── systemInfo/           #   屏幕、安全区与系统信息
-│       ├── upload/               #   文件上传封装（OSS 上传、进度回调）
+│       ├── theme/                #   主题色与明暗模式工具
+│       ├── toast/                #   全局 Toast 轻提示（5 个轻量纯函数）
+│       ├── report/               #   数据埋点与异常监控上报（track / error）
+│       ├── i18n/                 #   多语言辅助工具（t / $t）
 │       ├── backPress/            #   Android 物理返回键双击退出
-│       ├── refresh/              #   下拉刷新与滚动事件联动
 │       └── rxjs-lite/            #   轻量流式处理工具
 ├── uni_modules/                  # uni-app 扩展插件模块（39 个）
 │   ├── z-paging-x/               #   深度优化适配的分页组件
@@ -567,10 +576,10 @@ unibestX/
 
 ## 🧩 核心功能说明
 
-### 内置工具库（`src/utils`）
+### 内置工具库（`src/utils` 与核心模块）
 
 > [!IMPORTANT]
-> **动手实现任何通用能力之前，先查这里。** `src/utils/` 下已有 **10 个开箱即用的模块**，覆盖取路由与路径、取主题色、读环境变量、多语言文案、提示弹窗、返回键接管、下拉刷新与导航栏控制、文件上传、系统与安全区尺寸、流式处理。
+> **动手实现任何通用能力之前，先查这里。** 系统内已有开箱即用的工具模块，覆盖取路由与路径、取主题色、读环境变量、多语言文案、提示弹窗、返回键接管、下拉刷新与导航栏控制、系统与安全区尺寸、流式处理。
 > **严禁重复造轮子** —— 例如自己写 `uni.getSystemInfoSync()`、裸写 `setInterval` 做防抖、直接读 `import.meta.env.VITE_XXX`。
 
 **导入约定**（`@` 指向项目根，且 `.uts` 后缀**必须保留**，否则会丢类型补全并报 `TS2307`）：
@@ -581,20 +590,20 @@ import { getApiBaseUrl, isVaporMode } from '@/src/utils/env/index.uts';
 import { sys } from '@/src/utils/systemInfo/index.uts';
 ```
 
-| 模块 | 用途 | 主要 API |
+| 模块 | 用途 | 主要 API / 纯函数 |
 | :--- | :--- | :--- |
 | `env/` | 环境变量统一读取（禁止裸读 `import.meta.env`） | `getApiBaseUrl()` `getApiSecondaryUrl()` `getAppTitle()` `getAppVersion()` `getTabBarMode()` `getCurrentEnv()` `getCurrentEnvName()` `isDev()` `isTest()` `isProd()` `isVaporMode()` `getStreamUrl()` `getOssUploadUrl()`；实例 `env` |
-| `route/` | 取当前路由 / 路径 / 参数、页面栈深度、路径规范化 | `getCurrentPath()` `getCurrentRoute()` `getQueryString(url)` `getPageStackLength()` `cleanPath(path)` `isSamePath(a, b)` `ensureLeadingSlash()` `removeLeadingSlash()`；实例 `route` |
 | `systemInfo/` | 屏幕尺寸、安全区、导航栏 / TabBar 高度（响应式 `computed`） | `windowWidth` `windowHeight` `screenWidth` `screenHeight` `statusBarHeight` `navBarHeight` `tabBarHeight` `safeAreaBottom` `availableHeight` `menuRect` `updateSystemInfo()` `getScrollHeight()`；实例 `sys` |
 | `theme/` | 主题色与明暗模式：读取、应用、监听 | `themeColor` `isDarkMode(mode)` `getThemeTokens(isDark)` `getRootThemeStyle()` `applyThemeColor(color)` `applyThemeMode(mode, isDark)` `applyNavbarTheme(isDark)` `watchThemeChange(cb)`；实例 `theme` |
-| `toast/` | 全局轻提示与 Loading（统一风格，替代裸 `uni.showToast`） | `toast(msg)` `toastSuccess(msg)` `toastError(msg)` `showLoading(title?, mask?)` `hideLoading()` |
+| `toast/` | 全局轻提示与 Loading（极简去油 5 个纯函数） | `toast(title)` `toastSuccess(title)` `toastError(title)` `showLoading(title?, mask?)` `hideLoading()` |
+| `report/` | 数据埋点上报与全局异常监控（合并整合） | `track(event, params?)` `reportError(error, context?)` `createBreadcrumb(category, message)`；实例 `tracker` `errorReporter` |
 | `i18n/` | 非 Vue 环境下的多语言文案与导航栏 / TabBar 文案设置 | `t(key, named)` `$t(key, named)` `getI18nText(key)` `setTabbarItem()` `setNavigationBarTitle(key)`；实例 `i18nUtils` |
-| `refresh/` | 下拉刷新、滚动到底、导航栏标题与可见性、状态栏可见性的跨端联动 | `onNavbarPageScroll(cb)` `onNavbarReachBottom(cb)` `onNavbarPullDownRefresh(cb)` `stopNavbarPullDownRefresh()` `setNavbarTitle(t)` `setNavbarVisible(v)` `setHideNavbar(h)` `setHideStatusBar(h)` `isPageScrollDisabled` `isPageRefresherDisabled`；实例 `refresh` |
 | `backPress/` | Android 物理返回键双击退出 | `handleBackPressExit(): boolean` |
 | `rxjs-lite/` | 轻量流式处理（不依赖 RxJS 全量包） | `Observable` `Subject` `Subscription`；创建 `fromArray` `interval` `timer` `throwError`；算子 `map` `scan` `filter` `toArray` `distinctUntilChanged` `debounceTime` `throttleTime` `take` `takeUntil` `tap` `startWith` `catchError` `finalize` `unsubscribeAll` |
+| `layouts/navbar/utils/` | 下拉刷新、滚动到底与导航栏联动的跨端控制器 | `onNavbarPageScroll(cb)` `onNavbarReachBottom(cb)` `onNavbarPullDownRefresh(cb)` `stopNavbarPullDownRefresh()` `setNavbarTitle(t)` `setNavbarVisible(v)` `setHideNavbar(h)` `setHideStatusBar(h)` |
+| `router/` | 路由守卫、URL 参数解析、路径规范化与登录拦截 | `cleanPath(path)` `getCurrentPath()` `getCurrentRoute()` `isSamePath(a, b)` `parseUrlToObj(url)` `toLoginPage()` `LOGIN_PAGE`；实例 `route` |
 
-> 💡 每个模块同时提供**扁平函数导出**与**类实例导出**（如 `toast()` 与 `toastUtils.toast()`），按项目风格任选其一即可。
-> 每个模块都配有 `index.d.uts.ts` 类型声明文件，供编辑器补全；修改模块后可用 `pnpm gen:uts-dts` 重新生成、`pnpm check:uts-dts` 校验。
+> 💡 每个工具模块都配有 `index.d.uts.ts` 类型声明文件，供编辑器补全；修改模块后可用 `pnpm gen:uts-dts` 重新生成、`pnpm check:uts-dts` 校验。
 
 ### 环境变量配置（`.env`）
 
@@ -932,7 +941,7 @@ src/tabbar/config.uts (唯一样本源)
 - **白名单模式**：除指定页面外，全部需要登录
 - 支持登录后自动跳回原页面
 
-相关文件：`src/router/config.uts`（策略配置）、`src/router/interceptor.uts`（跳转拦截）、`src/router/toLoginPage.uts`（登录页跳转）。
+相关文件：`src/router/`（统一从 `@/src/router/index.uts` 导出，子模块化拆分为 `config/`、`interceptor/`、`toLoginPage/`、`utils/`）。
 
 ### 请求封装
 

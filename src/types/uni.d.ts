@@ -3,6 +3,16 @@
 // ==========================================
 
 declare global {
+  type UniEnv = {
+    USER_DATA_PATH?: string;
+    CACHE_PATH?: string;
+    [key: string]: any;
+  };
+
+  export interface Uni {
+    env?: UniEnv;
+  }
+
   export interface PageStyle {
     /** 导航栏标题文字内容 */
     'navigationBarTitleText'?: string;
@@ -310,7 +320,7 @@ declare global {
   /** uni.onKeyboardHeightChange 的回调参数 */
   type OnKeyboardHeightChangeCallbackResult = {
     height: number;
-    duration: number;
+    duration?: number;
   };
 
   /** uni.setTabBarItem 的参数 */
@@ -491,12 +501,20 @@ declare module '*.uvue' {
   export default component;
 }
 
+declare module '@/src/router' {
+  export * from '@/src/router/index.uts';
+}
+
+declare module './src/router' {
+  export * from '@/src/router/index.uts';
+}
+
 declare module '@/src/router/interceptor' {
-  export * from '@/src/router/interceptor.uts';
+  export * from '@/src/router/interceptor/interceptor.uts';
 }
 
 declare module './src/router/interceptor' {
-  export * from '@/src/router/interceptor.uts';
+  export * from '@/src/router/interceptor/interceptor.uts';
 }
 
 declare module '@/src/tabbar' {

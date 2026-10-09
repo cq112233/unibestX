@@ -3,6 +3,7 @@ import {
   cleanPath,
   ensureLeadingSlash,
   isSamePath,
+  parseUrlToObj,
   removeLeadingSlash
 } from '@/src/router/index.uts';
 
@@ -53,6 +54,27 @@ describe('route utils Unit Tests', () => {
       expect(isSamePath('pages/index/index', '/pages/index/index')).toBe(true);
       expect(isSamePath('/src/pages/index/index', 'pages/index/index')).toBe(true);
       expect(isSamePath('/pages/me/index', '/pages/index/index')).toBe(false);
+    });
+  });
+
+  describe('parseUrlToObj', () => {
+    it('should parse url without query', () => {
+      const res = parseUrlToObj('/pages/index');
+      expect(res.path).toBe('/pages/index');
+      expect(res.query.size).toBe(0);
+    });
+
+    it('should parse url with single and multiple query parameters', () => {
+      const res = parseUrlToObj('/src/pages/login?redirect=index&tab=2');
+      expect(res.path).toBe('/src/pages/login');
+      expect(res.query.get('redirect')).toBe('index');
+      expect(res.query.get('tab')).toBe('2');
+    });
+
+    it('should decode url encoded parameters', () => {
+      const res = parseUrlToObj('/login?name=%E6%B5%8B%E8%AF%95');
+      expect(res.path).toBe('/login');
+      expect(res.query.get('name')).toBe('测试');
     });
   });
 });

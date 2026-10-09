@@ -177,20 +177,25 @@ if (isDev()) {
 
 ### 8.4.2 路由与页面跳转：`@/src/router/index.uts`
 
+- **架构定位**：采用与 `@/src/http` 镜像对称的子模块化架构（`config/`、`interceptor/`、`toLoginPage/`、`utils/`），统一从 `@/src/router/index.uts` 导出。
 - **导出方法 / 单例**：
-  - `router.push(url: string)`：普通页面跳转（自带安全校验与参数编码）。
-  - `router.replace(url: string)`：页面重定向（关闭当前页）。
-  - `router.reLaunch(url: string)`：重启到某页面（清空页面栈）。
-  - `router.switchTab(url: string)`：切换 TabBar 页面。
-  - `router.back(delta?: number)`：返回上一页或指定层级。
-  - `navigateTo` / `redirectTo` / `switchTab` / `navigateBack` 独立函数导出。
-- **规则**：优先使用 `router` 单例或模块函数进行页面跳转，统一享受拦截与页面栈保护。
+  - `cleanPath(path: string)`：清洗并规范化页面路径（去除 `?` 参数，补全前导 `/`）。
+  - `getCurrentPath(): string`：获取当前栈顶页面的规范化路径。
+  - `getCurrentRoute(): string`：获取当前栈顶页面的原生 route 字符串。
+  - `isSamePath(path1: string, path2: string): boolean`：判断两路径是否指向同一页面。
+  - `parseUrlToObj(url: string): UrlObj`：解析 URL 为路径和参数 Map。
+  - `toLoginPage(options?: UTSJSONObject)`：带防抖节流的登录重定向（自动防重复跳转自身）。
+  - `LOGIN_PAGE`：登录页路由常量。
+  - `route` / `routeUtils`：路由工具全局单例。
+- **规则**：优先使用 `@/src/router/index.uts` 导出的路由工具方法，统一享受拦截与页面栈保护。
 
-### 8.4.3 Navbar 布局页面滚动监听：`@/src/utils/refresh/index.uts`
+### 8.4.3 Navbar 布局页面滚动监听：`@/src/layouts/navbar/utils/index.uts`
 
 - **导出方法**：
   - `onNavbarPageScroll(callback: (scrollTop: number) => void)`
   - `onNavbarReachBottom(callback: () => void)`
+  - `onNavbarPullDownRefresh(callback: () => void)`
+  - `stopNavbarPullDownRefresh()`
 - **规则**：在采用了 `layout="navbar"` 或 `layout="default"` 的页面中，由于根容器已被布局自带的 `scroll-view` 接管，原生 `onPageScroll` / `onReachBottom` 不会被触发，**必须使用 `onNavbarPageScroll` 与 `onNavbarReachBottom`**。
 
 ### 8.4.4 主题与样式系统：`@/src/theme/index.uts`
@@ -212,6 +217,13 @@ if (isDev()) {
   - `uploadFile(options: UploadFileOptions): Promise<string>`：全平台原生文件上传。
   - `uploadOssFile(filePath: string, formData?, ignoreAuth?): Promise<string>`：快捷上传图片到 OSS。
   - `upload` / `uploadUtils`：上传工具全局单例。
+
+### 8.4.7 数据埋点与监控上报：`@/src/utils/report/index.uts`
+
+- **导出方法**：
+  - `track(event: string, params?: UTSJSONObject)`：业务数据埋点上报。
+  - `reportError(error: any, context?: UTSJSONObject)`：全局错误捕获与日志监控上报。
+  - `createBreadcrumb(category: string, message: string)`：记录用户行为面包屑日志。
 
 ---
 
@@ -256,6 +268,6 @@ if (isDev()) {
 - [ ] **红线 5**：严禁在业务页面中散落调用原生 `uni.showToast({ title, icon: 'none' })`，必须统一使用 `toast(msg)` 或 `showToast(...)`。
 - [ ] **红线 6**：有自定义导航栏需要避让状态栏时，必须绑定 `:style="{ height: statusBarHeight + 'px' }"`，严禁硬编码 `20px` / `44px`。
 - [ ] **红线 7**：在 `navbar` 布局下监听整页滚动，必须使用 `onNavbarPageScroll` / `onNavbarReachBottom`，不可使用原生 `onPageScroll`。
-- [ ] **红线 8**：页面跳转必须使用 `@/src/utils/route/index.uts` 提供的 `router` 或封装函数，确保参数安全与平台守卫生效。
+- [ ] **红线 8**：页面跳转与路径处理必须使用 `@/src/router/index.uts` 提供的路由方法（`toLoginPage`、`cleanPath`、`getCurrentPath` 等）或 `route` 单例，确保参数安全与平台守卫生效。
 - [ ] **红线 9**：引用工具库必须采用 `@/src/utils/<module>/index.uts` 形式，严禁跨层深层相对路径穿透。
 - [ ] **红线 10**：实现新功能前，必须首先在 `@/src/utils/` 中查验已有工具，严禁在局部重新手写已有的通用方法（如防抖、格式化、URL解析等）。

@@ -119,12 +119,12 @@ function handleScrollToLower(): void {
 
 - `definePage` 中 `showBack: false`（主 TabBar 页面无需返回箭头）；
 - 顶层配置 `enablePullDownRefresh: true` 开启自定义平滑下拉刷新；
-- 统一从 `@/src/utils/refresh/index.uts` 引入 `onNavbarPullDownRefresh` 与 `stopNavbarPullDownRefresh`；
+- 统一从 `@/src/layouts/navbar/utils/index.uts` 引入 `onNavbarPullDownRefresh` 与 `stopNavbarPullDownRefresh`；
 - （仅限首页配置 `type: 'home'`，其余 TabBar 页面不填）。
 
 ```uts
 <script setup lang="uts">
-import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/utils/refresh/index.uts';
+import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/layouts/navbar/utils/index.uts';
 
 definePage({
   layout: 'navbar',
@@ -176,7 +176,7 @@ onNavbarPullDownRefresh(() => {
 </template>
 
 <script setup lang="uts">
-import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/utils/refresh/index.uts';
+import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/layouts/navbar/utils/index.uts';
 
 definePage({
   layout: 'navbar',
@@ -201,7 +201,7 @@ onNavbarPullDownRefresh(() => {
 
 ## 4.4 标杆案例 4：整页按内容高度自然滚动
 
-> 真实参考源：[src/utils/refresh/index.uts](file:///Users/chenqi/Desktop/unibestX/src/utils/refresh/index.uts)
+> 真实参考源：[src/layouts/navbar/utils/index.uts](file:///Users/chenqi/Desktop/unibestX/src/layouts/navbar/utils/index.uts)
 
 **设计要点**：
 
@@ -211,7 +211,7 @@ onNavbarPullDownRefresh(() => {
 
 ```uts
 <script setup lang="uts">
-import { onNavbarPageScroll, onNavbarReachBottom, PageScrollDetail } from '@/src/utils/refresh/index.uts';
+import { onNavbarPageScroll, onNavbarReachBottom, PageScrollDetail } from '@/src/layouts/navbar/utils/index.uts';
 
 definePage({
   layout: 'navbar',

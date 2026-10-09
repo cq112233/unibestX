@@ -368,7 +368,7 @@
 
 <script setup lang="uts">
 import { computed, onMounted, onUnmounted, ref } from 'vue';
-import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/utils/refresh/index.uts';
+import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/layouts/navbar/utils/index.uts';
 import { useAppStore } from '@/src/store';
 
 definePage({
@@ -453,6 +453,12 @@ function formatFileSize(bytes: number): string {
   return `${mb} MB`;
 }
 
+type LocalChosenFile = {
+  name?: string;
+  size?: number;
+  path?: string;
+};
+
 function handleChooseFile(): void {
   // #ifdef H5 || MP-WEIXIN || APP
   try {
@@ -460,18 +466,24 @@ function handleChooseFile(): void {
       count: 1,
       type: 'all',
       success: (res) => {
-        const tempFiles = res.tempFiles;
-        if (tempFiles.length > 0) {
-          const fileObj = tempFiles[0];
-          selectedFileName.value = fileObj.name;
-          selectedFileSizeText.value = formatFileSize(fileObj.size);
-          selectedFilePath.value = fileObj.path;
+        const rawFiles = res.tempFiles as any;
+        const fileList = (Array.isArray(rawFiles) ? rawFiles : [rawFiles]) as Array<LocalChosenFile>;
+        if (fileList.length > 0 && fileList[0] != null) {
+          const fileObj = fileList[0];
+          const fileName = `${fileObj.name ?? ''}`;
+          selectedFileName.value = fileName.length > 0 ? fileName : '已选文件';
+          selectedFileSizeText.value = formatFileSize((fileObj.size ?? 0) as number);
+          selectedFilePath.value = `${fileObj.path ?? ''}`;
           uni.showToast({ title: '文件选择成功', icon: 'success' });
         }
-        else if (res.tempFilePaths.length > 0) {
-          selectedFilePath.value = res.tempFilePaths[0];
-          selectedFileName.value = '已选文件';
-          uni.showToast({ title: '文件选择成功', icon: 'success' });
+        else {
+          const rawPaths = res.tempFilePaths as any;
+          const pathList = (Array.isArray(rawPaths) ? rawPaths : [rawPaths]) as Array<string>;
+          if (pathList.length > 0 && pathList[0] != null && pathList[0].length > 0) {
+            selectedFilePath.value = pathList[0];
+            selectedFileName.value = '已选文件';
+            uni.showToast({ title: '文件选择成功', icon: 'success' });
+          }
         }
       },
       fail: () => {
@@ -543,18 +555,24 @@ const totalCacheSizeText = computed((): string => formatFileSize(fileCacheBytes.
 
 function getCachePath(): string {
   try {
-    const p = uni.env.CACHE_PATH;
-    if (p != null && p.length > 0) {
-      return p;
+    const uniEnv = uni.env;
+    if (uniEnv != null) {
+      const p = `${uniEnv.CACHE_PATH ?? ''}`;
+      if (p.length > 0) {
+        return p;
+      }
     }
   }
   catch (e) {
     console.warn(e);
   }
   try {
-    const u = uni.env.USER_DATA_PATH;
-    if (u != null && u.length > 0) {
-      return u;
+    const uniEnv = uni.env;
+    if (uniEnv != null) {
+      const u = `${uniEnv.USER_DATA_PATH ?? ''}`;
+      if (u.length > 0) {
+        return u;
+      }
     }
   }
   catch (e) {
@@ -926,6 +944,7 @@ function handleGenerateTestCache(): void {
 // ==================== 4. 键盘感知与避让 ====================
 const keyboardInputText = ref<string>('');
 const keyboardHeight = ref<number>(0);
+let keyboardChangeCallback: ((res: OnKeyboardHeightChangeCallbackResult) => void) | null = null;
 let keyboardListenerId: number = -1;
 
 function handleKeyboardHeightChange(event: UniInputKeyboardHeightChangeEvent): void {
@@ -938,9 +957,13 @@ function handleHideKeyboard(): void {
 
 onMounted(() => {
   // #ifdef APP || MP-WEIXIN
-  keyboardListenerId = uni.onKeyboardHeightChange((res: OnKeyboardHeightChangeCallbackResult) => {
+  keyboardChangeCallback = (res: OnKeyboardHeightChangeCallbackResult): void => {
     keyboardHeight.value = Math.ceil(res.height);
-  });
+  };
+  const retId = (uni.onKeyboardHeightChange as any)(keyboardChangeCallback);
+  if (typeof retId === 'number') {
+    keyboardListenerId = retId as number;
+  }
   // #endif
   calculateCacheSize(false);
 });
@@ -948,8 +971,12 @@ onMounted(() => {
 onUnmounted(() => {
   // #ifdef APP || MP-WEIXIN
   if (keyboardListenerId != -1) {
-    uni.offKeyboardHeightChange(keyboardListenerId);
+    (uni.offKeyboardHeightChange as any)(keyboardListenerId);
     keyboardListenerId = -1;
+  }
+  else if (keyboardChangeCallback != null) {
+    (uni.offKeyboardHeightChange as any)(keyboardChangeCallback);
+    keyboardChangeCallback = null;
   }
   // #endif
 });

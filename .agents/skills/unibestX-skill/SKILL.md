@@ -103,8 +103,8 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 | **链式 `.catch()`（`error25 None of the following candidates is applicable`）** | `.then(done).catch((err: any) => {...})`（UTSPromise 的三个 `.catch` 重载在 Kotlin 端均无法收敛；**与回调返回类型、是否 `throw` 无关**，单一返回类型的回调照样报错） | 改为双参 `.then(onFulfilled, onRejected)`，拒绝回调并进第二参；要表达「抛出」时用 `Promise.reject(toError(err)) as Promise<T>` 而非 `throw`（`Promise.resolve(...)` 包裹也一并去掉，详见 **1.21**） |
 | **系统尺寸与高度获取** | 散落调用 `uni.getSystemInfoSync()` 或样式手写 `100vh`（损耗性能、非响应式、原生端不支持 vh 且易被 TabBar/导航栏遮挡） | 优先引入 `@/src/utils/systemInfo/index.uts` 中的响应式变量（`availableHeight`、`statusBarHeight`、`navBarHeight`、`safeAreaBottom`）或使用 `sys` 单例（详见 **分册 8**） |
 | **环境变量与服务地址读取** | 手写 `process.env` / `import.meta.env` 或在代码里硬编码域名 IP（原生平台无法识别且切换环境易出错） | 统一从 `@/src/utils/env/index.uts` 引入具名方法（`getApiBaseUrl()`、`getOssBaseUrl()`、`isDev()`、`isProd()`、`isVaporMode()`）（详见 **分册 8**） |
-| **轻提示与加载动画 (Toast / Loading)** | 散落手写 `uni.showToast({ title: '...', icon: 'none' })` | 统一引入 `@/src/utils/toast/index.uts` 中的 `toast(msg)`、`showToast(...)`、`showLoading()`、`hideLoading()`（详见 **分册 8**） |
-| **页面跳转与路由控制** | 直接调用原生 `uni.navigateTo` 等且未做参数编码与越界防护 | 优先引入 `@/src/utils/route/index.uts` 的 `router.push()` / `router.replace()` / `router.back()` 或模块封装函数（详见 **分册 8**） |
+| **轻提示与加载动画 (Toast / Loading)** | 散落手写 `uni.showToast({ title: '...', icon: 'none' })` | 统一引入 `@/src/utils/toast/index.uts` 中的 5 个轻量纯函数：`toast(msg)`、`toastSuccess(msg)`、`toastError(msg)`、`showLoading()`、`hideLoading()`（详见 **分册 8**） |
+| **页面跳转与路由控制** | 直接调用原生 `uni.navigateTo` 等且未做参数编码与越界防护 | 优先引入 `@/src/router/index.uts` 的路由封装方法（如 `toLoginPage()`、`cleanPath()`、`getCurrentPath()`、`parseUrlToObj()` 或 `route` 单例，详见 **分册 8**） |
 
 ---
 

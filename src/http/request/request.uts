@@ -1,7 +1,7 @@
 import { Request } from '@/uni_modules/lime-request';
 import type { LimeRequestConfig, LimeRequestFail, LimeRequestResponse, LimeRequestTask } from '@/uni_modules/lime-request';
 import { useTokenStore } from '@/src/store';
-import { toLoginPage } from '@/src/router/toLoginPage';
+import { toLoginPage } from '@/src/router/index.uts';
 import { ContentTypeEnum, ResultEnum, ShowMessage } from './internal/enum.uts';
 import { resolveErrorMessage } from '../error/error.uts';
 import { claimRefreshFailure, tryRefreshToken } from './internal/refresh.uts';
