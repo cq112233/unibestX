@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { maskSensitive } from '@/src/utils/error-report/index.uts';
-import { resolveErrorMessage } from '@/src/http/error/index.uts';
+import { maskSensitive } from '@/src/utils/report/index.uts';
+import { resolveErrorMessage } from '@/src/http/index.uts';
 
 describe('error-report masking', () => {
   it('should mask mobile numbers', () => {

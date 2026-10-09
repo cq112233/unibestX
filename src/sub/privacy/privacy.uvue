@@ -65,9 +65,7 @@
 import { computed, ref } from 'vue';
 import { fetchPrivacyContent } from '@/src/api/privacy/privacy.uts';
 import type { PrivacyContent } from '@/src/api/privacy/privacy.uts';
-import { privacyConfig } from '@/src/utils/privacy/config.uts';
-import { getAppTitle } from '@/src/utils/env/index.uts';
-import { MODE_RECONFIRM, setPrivacyAgreed } from '@/src/utils/privacy/index.uts';
+import { getAppTitle, MODE_RECONFIRM, privacyConfig, setPrivacyAgreed } from '@/src/config/index.uts';
 import { toast } from '@/src/utils/toast/index.uts';
 import { useAppStore } from '@/src/store';
 import { getThemeTokens, themeColor } from '@/src/theme/index.uts';
@@ -163,11 +161,11 @@ const footerTip = computed((): string => {
 /** 未配置链接时明确提示，避免开发期漏配却无感 */
 function openAgreement(item: AgreementItem): void {
   if (item.url == '') {
-    toast(`请在 src/utils/privacy/config.uts 配置《${item.label}》地址`);
+    toast(`请在 src/config/privacy/privacy.uts 配置《${item.label}》地址`);
     return;
   }
   uni.navigateTo({
-    url: `/src/sub/webview/webview?url=${encodeURIComponent(item.url)}`
+    url: `/src/sub/webviewFunctionDemo/webviewFunctionDemo?url=${encodeURIComponent(item.url)}`
   });
 }
 

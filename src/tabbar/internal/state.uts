@@ -1,7 +1,7 @@
 import { watch } from 'vue';
 import type { CustomTabBarItem, CustomTabBarItemBadge, TabBarConfig } from '../types.uts';
 import { customTabbarConfig } from '../config.uts';
-import { cleanPath, getCurrentPath, isSamePath } from '@/src/utils/route/index.uts';
+import { cleanPath, getCurrentPath, isSamePath } from '@/src/router/index.uts';
 import { registerFullTabbarListGetter, resolveTabIndex, resolveTabIndexByKey } from './tab-key.uts';
 
 /** 组合 list 与 midButton 供自定义 TabBar 渲染（自动将 midButton 插入居中位置） */

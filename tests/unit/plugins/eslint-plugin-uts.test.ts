@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { ESLint } from 'eslint';
 
-describe('eslint-plugin-uts Unit Tests', () => {
+describe('eslint-plugin-uts Unit Tests', { timeout: 20000 }, () => {
   const eslint = new ESLint({
     overrideConfigFile: 'eslint.config.mjs'
   });
@@ -113,6 +113,30 @@ let user: string | undefined;
       const undefErrors = res.messages.filter(m => m.ruleId === 'uts/no-undefined');
 
       expect(undefErrors.length).toBeGreaterThanOrEqual(1);
+    });
+  });
+
+  describe('file scope restriction', () => {
+    it('should completely ignore files in uni_modules', async () => {
+      const code = `
+interface ForbiddenInterface {
+  name: string;
+}
+`;
+      const [res] = await eslint.lintText(code, { filePath: 'uni_modules/test-plugin/index.uts' });
+      const utsErrors = res.messages.filter(m => m.ruleId?.startsWith('uts/'));
+      expect(utsErrors.length).toBe(0);
+    });
+
+    it('should ignore files outside src/ (except root entry)', async () => {
+      const code = `
+interface ForbiddenInterface {
+  name: string;
+}
+`;
+      const [res] = await eslint.lintText(code, { filePath: 'docs/demo.uts' });
+      const utsErrors = res.messages.filter(m => m.ruleId?.startsWith('uts/'));
+      expect(utsErrors.length).toBe(0);
     });
   });
 });

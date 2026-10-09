@@ -1,0 +1,1077 @@
+<template>
+  <view class="flex flex-col p-[16px]" :class="isDark ? 'bg-[#0f172a]' : 'bg-[#f8fafc]'">
+    <!-- 1. 通信与系统分享卡片 -->
+    <view class="mb-[16px]">
+      <view
+        class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid"
+        :style="{
+          backgroundColor: 'var(--card-bg, #ffffff)',
+          borderColor: 'var(--border-color, #edf2f7)'
+        }"
+      >
+        <!-- 标题区域 -->
+        <view class="flex flex-row items-center mb-[16px]">
+          <view
+            class="w-[4px] h-[16px] rounded-[2px] mr-[8px]"
+            :style="{ backgroundColor: 'var(--theme-color, #3182ce)' }"
+          />
+          <text class="text-[16px] font-bold" :style="{ color: 'var(--text-color, #2d3748)' }">通信与系统分享</text>
+        </view>
+        <!-- 拨号 -->
+        <view class="rounded-[12px] p-[16px] mb-[16px] border-[1px] border-solid border-[#e2e8f0]">
+          <view class="flex flex-row items-center mb-[8px]">
+            <text class="text-[14px] font-bold text-[#1e293b]">拨打电话 (makePhoneCall)</text>
+          </view>
+          <text class="text-[12px] text-[#94a3b8] mb-[8px]">输入要拨打的电话号码</text>
+          <input
+            v-model="phoneNumber"
+            type="number"
+            placeholder="请输入电话号码"
+            class="h-[38px] bg-white rounded-[6px] px-[12px] border-[1px] border-solid border-[#cbd5e1] text-[14px] text-[#334155] mb-[12px]"
+          />
+          <view class="w-full h-[38px] rounded-[8px] bg-[#3b82f6] flex flex-row items-center justify-center" @click="handleMakePhoneCall">
+            <text class="text-[#ffffff] text-[14px] font-bold">一键拨打电话</text>
+          </view>
+        </view>
+
+        <!-- 系统分享 -->
+        <view class="rounded-[12px] p-[16px] border-[1px] border-solid border-[#e2e8f0]">
+          <view class="flex flex-row items-center mb-[8px]">
+            <text class="text-[14px] font-bold text-[#1e293b]">系统分享 (shareWithSystem)</text>
+          </view>
+          <text class="text-[12px] text-[#94a3b8] mb-[6px]">分享摘要内容</text>
+          <input
+            v-model="shareSummary"
+            placeholder="请输入分享摘要"
+            class="h-[38px] bg-white rounded-[6px] px-[12px] border-[1px] border-solid border-[#cbd5e1] text-[14px] text-[#334155] mb-[10px]"
+          />
+          <text class="text-[12px] text-[#94a3b8] mb-[6px]">分享链接 (URL)</text>
+          <input
+            v-model="shareHref"
+            placeholder="请输入分享网址"
+            class="h-[38px] bg-white rounded-[6px] px-[12px] border-[1px] border-solid border-[#cbd5e1] text-[14px] text-[#334155] mb-[12px]"
+          />
+          <view class="w-full h-[38px] rounded-[8px] bg-[#8b5cf6] flex flex-row items-center justify-center" @click="handleShareWithSystem">
+            <text class="text-[#ffffff] text-[14px] font-bold">调起系统分享面板</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 2. 文件与文档预览卡片 -->
+    <view class="mb-[16px]">
+      <view
+        class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid"
+        :style="{
+          backgroundColor: 'var(--card-bg, #ffffff)',
+          borderColor: 'var(--border-color, #edf2f7)'
+        }"
+      >
+        <!-- 标题区域 -->
+        <view class="flex flex-row items-center mb-[16px]">
+          <view
+            class="w-[4px] h-[16px] rounded-[2px] mr-[8px]"
+            :style="{ backgroundColor: 'var(--theme-color, #3182ce)' }"
+          />
+          <text class="text-[16px] font-bold" :style="{ color: 'var(--text-color, #2d3748)' }">文件与文档预览</text>
+        </view>
+        <!-- 选文件 -->
+        <view class="rounded-[12px] p-[16px] mb-[16px] border-[1px] border-solid border-[#e2e8f0]">
+          <view class="flex flex-row items-center mb-[8px]">
+            <text class="text-[14px] font-bold text-[#1e293b]">本地选文件 (chooseFile)</text>
+          </view>
+          <text class="text-[12px] text-[#94a3b8] mb-[12px]">选择设备中的文档、压缩包或其他文件</text>
+
+          <view class="w-full h-[38px] rounded-[8px] bg-[#0ea5e9] flex flex-row items-center justify-center mb-[12px]" @click="handleChooseFile">
+            <text class="text-[#ffffff] text-[14px] font-bold">从手机/本地选择文件</text>
+          </view>
+
+          <!-- 选中文件详情展示 -->
+          <view class="rounded-[8px] p-[12px] bg-[#f8fafc] border-[1px] border-solid border-[#e2e8f0]">
+            <view class="flex flex-row items-center justify-between mb-[6px]">
+              <text class="text-[12px] text-[#64748b]">文件名：</text>
+              <text class="text-[12px] font-medium text-[#1e293b]">{{ selectedFileName != '' ? selectedFileName : '未选择' }}</text>
+            </view>
+            <view class="flex flex-row items-center justify-between mb-[6px]">
+              <text class="text-[12px] text-[#64748b]">大小：</text>
+              <text class="text-[12px] font-medium text-[#1e293b]">{{ selectedFileSizeText != '' ? selectedFileSizeText : '-' }}</text>
+            </view>
+            <view class="flex flex-col">
+              <text class="text-[12px] text-[#64748b] mb-[2px]">临时路径：</text>
+              <text class="text-[11px] text-[#94a3b8] leading-[16px]" style="font-family: monospace;">{{ selectedFilePath != '' ? selectedFilePath : '-' }}</text>
+            </view>
+          </view>
+        </view>
+
+        <!-- 打开文档 -->
+        <view class="rounded-[12px] p-[16px] border-[1px] border-solid border-[#e2e8f0]">
+          <view class="flex flex-row items-center mb-[8px]">
+            <text class="text-[14px] font-bold text-[#1e293b]">文档原生预览 (openDocument)</text>
+          </view>
+          <text class="text-[12px] text-[#94a3b8] mb-[12px]">使用系统内置阅读器打开 PDF、Word、Excel 等文档</text>
+
+          <!-- 打开已选文档按钮 -->
+          <view
+            class="w-full h-[38px] rounded-[8px] flex flex-row items-center justify-center mb-[10px]"
+            :class="selectedFilePath != '' ? 'bg-[#10b981]' : 'bg-[#cbd5e1]'"
+            @click="handleOpenSelectedDoc"
+          >
+            <text class="text-[#ffffff] text-[14px] font-bold">打开已选择的文件</text>
+          </view>
+
+          <!-- 下载并打开在线示例文档 -->
+          <view class="w-full h-[38px] rounded-[8px] bg-[#6366f1] flex flex-row items-center justify-center" @click="handleDownloadAndOpenSampleDoc">
+            <text class="text-[#ffffff] text-[14px] font-bold">下载并打开在线示例 PDF 文档</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 3. 系统缓存管理 (getFileSystemManager) 卡片 -->
+    <view class="mb-[16px]">
+      <view
+        class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid"
+        :style="{
+          backgroundColor: 'var(--card-bg, #ffffff)',
+          borderColor: 'var(--border-color, #edf2f7)'
+        }"
+      >
+        <!-- 标题区域 -->
+        <view class="flex flex-row items-center mb-[16px]">
+          <view
+            class="w-[4px] h-[16px] rounded-[2px] mr-[8px]"
+            :style="{ backgroundColor: 'var(--theme-color, #3182ce)' }"
+          />
+          <text class="text-[16px] font-bold" :style="{ color: 'var(--text-color, #2d3748)' }">系统缓存管理 (FileSystemManager)</text>
+        </view>
+        <view class="rounded-[12px] p-[16px] border-[1px] border-solid border-[#e2e8f0] bg-[#ffffff]">
+          <!-- 头部总缓存大小徽标 -->
+          <view class="flex flex-row items-center justify-between mb-[10px]">
+            <view class="flex flex-col">
+              <text class="text-[14px] font-bold text-[#1e293b]">应用缓存与数据占用</text>
+              <text class="text-[11px] text-[#64748b] mt-[2px]">
+                文件 {{ fileCacheSizeText }} ＋ 存储 {{ storageSizeText }}
+              </text>
+            </view>
+            <view class="px-[8px] py-[4px] rounded-[6px] bg-[#ecfdf5] border-[1px] border-solid border-[#a7f3d0]">
+              <text class="text-[12px] font-bold text-[#059669]">
+                合计: {{ totalCacheSizeText }}
+              </text>
+            </view>
+          </view>
+
+          <text class="text-[12px] text-[#64748b] leading-[18px] mb-[12px]">
+            基于 uni.getFileSystemManager() 与 CACHE_PATH 读取、统计沙盒临时缓存并支持安全一键清理。
+          </text>
+
+          <!-- 缓存详情信息卡片 -->
+          <view class="rounded-[8px] p-[12px] bg-[#f8fafc] border-[1px] border-solid border-[#e2e8f0] mb-[12px]">
+            <view class="flex flex-row items-center justify-between mb-[6px]">
+              <view class="flex flex-row items-center">
+                <text class="text-[12px] text-[#64748b]">文件缓存大小：</text>
+                <text class="text-[10px] text-[#94a3b8]">(临时/下载文件)</text>
+              </view>
+              <text class="text-[12px] font-bold" :class="fileCacheBytes > 0 ? 'text-[#ef4444]' : 'text-[#10b981]'">{{ fileCacheSizeText }}</text>
+            </view>
+            <view class="flex flex-row items-center justify-between mb-[6px]">
+              <text class="text-[12px] text-[#64748b]">缓存文件数量：</text>
+              <text class="text-[12px] font-medium text-[#1e293b]">{{ cacheFileCount }} 个文件</text>
+            </view>
+            <view class="flex flex-row items-center justify-between mb-[6px]">
+              <view class="flex flex-row items-center">
+                <text class="text-[12px] text-[#64748b]">本地 Storage 占用：</text>
+                <text class="text-[10px] text-[#94a3b8]">(Token/Pinia/偏好)</text>
+              </view>
+              <text class="text-[12px] font-bold text-[#3b82f6]">{{ storageSizeText }}</text>
+            </view>
+            <view class="flex flex-col">
+              <text class="text-[12px] text-[#64748b] mb-[2px]">缓存路径 (CACHE_PATH)：</text>
+              <text class="text-[11px] text-[#94a3b8] leading-[16px]" style="font-family: monospace;">
+                {{ cacheDirPath }}
+              </text>
+            </view>
+          </view>
+          <!-- 操作按钮行：清晰区分文件缓存与 Storage 清理 -->
+          <view class="flex flex-row mb-[8px]">
+            <view
+              class="flex-1 h-[38px] rounded-[8px] bg-[#3b82f6] flex flex-row items-center justify-center mr-[6px]"
+              @click="calculateCacheSize(true)"
+            >
+              <text class="text-[#ffffff] text-[12px] font-bold">刷新统计</text>
+            </view>
+            <view
+              class="flex-1 h-[38px] rounded-[8px] bg-[#f97316] flex flex-row items-center justify-center mr-[6px]"
+              @click="handleClearFileCache"
+            >
+              <text class="text-[#ffffff] text-[12px] font-bold">清除文件缓存</text>
+            </view>
+            <view
+              class="flex-1 h-[38px] rounded-[8px] bg-[#8b5cf6] flex flex-row items-center justify-center"
+              @click="handleClearStorage"
+            >
+              <text class="text-[#ffffff] text-[12px] font-bold">清空 Storage</text>
+            </view>
+          </view>
+
+          <!-- 一键彻底清空全部 (文件 + Storage) -->
+          <view
+            class="w-full h-[38px] rounded-[8px] bg-[#ef4444] flex flex-row items-center justify-center mb-[8px]"
+            @click="handleClearAll"
+          >
+            <text class="text-[#ffffff] text-[13px] font-bold">一键清空全部缓存与数据 (彻底归零)</text>
+          </view>
+
+          <!-- 模拟写入测试缓存 -->
+          <view
+            class="w-full h-[36px] rounded-[8px] border-[1px] border-solid border-[#cbd5e1] bg-[#ffffff] flex flex-row items-center justify-center"
+            @click="handleGenerateTestCache"
+          >
+            <text class="text-[#475569] text-[12px] font-medium">+ 写入 500KB 测试缓存文件 (观察数据减少)</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 4. 键盘感知与高度避让卡片 -->
+    <view class="mb-[16px]">
+      <view
+        class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid"
+        :style="{
+          backgroundColor: 'var(--card-bg, #ffffff)',
+          borderColor: 'var(--border-color, #edf2f7)'
+        }"
+      >
+        <!-- 标题区域 -->
+        <view class="flex flex-row items-center mb-[16px]">
+          <view
+            class="w-[4px] h-[16px] rounded-[2px] mr-[8px]"
+            :style="{ backgroundColor: 'var(--theme-color, #3182ce)' }"
+          />
+          <text class="text-[16px] font-bold" :style="{ color: 'var(--text-color, #2d3748)' }">键盘感知与避让</text>
+        </view>
+        <view
+          class="rounded-[12px] p-[16px] border-[1px] border-solid border-[#e2e8f0]"
+          :style="{ paddingBottom: `${keyboardHeight > 0 ? keyboardHeight + 8 : 16}px` }"
+        >
+          <view class="flex flex-row items-center justify-between mb-[8px]">
+            <text class="text-[14px] font-bold text-[#1e293b]">键盘高度动态避让</text>
+            <view class="px-[8px] py-[3px] rounded-[6px] bg-[#e0f2fe] flex flex-row items-center">
+              <text class="text-[12px] font-bold text-[#0284c7]">
+                高度: {{ keyboardHeight }} px
+              </text>
+            </view>
+          </view>
+          <text class="text-[12px] text-[#64748b] leading-[18px] mb-[12px]">
+            监听软键盘弹起高度变化，演练容器根据高度动态增加内边距防止遮挡内容。
+          </text>
+
+          <input
+            v-model="keyboardInputText"
+            placeholder="点击此输入框触发键盘弹起与避让"
+            :adjust-position="false"
+            class="h-[40px] bg-white rounded-[6px] px-[12px] border-[1px] border-solid border-[#cbd5e1] text-[14px] text-[#334155] mb-[12px]"
+            @keyboardheightchange="handleKeyboardHeightChange"
+          />
+
+          <view class="w-full h-[38px] rounded-[8px] bg-[#64748b] flex flex-row items-center justify-center" @click="handleHideKeyboard">
+            <text class="text-[#ffffff] text-[14px] font-bold">收起软键盘 (hideKeyboard)</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 4. 触感与震动工具卡片 -->
+    <view class="mb-[16px]">
+      <view
+        class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid"
+        :style="{
+          backgroundColor: 'var(--card-bg, #ffffff)',
+          borderColor: 'var(--border-color, #edf2f7)'
+        }"
+      >
+        <!-- 标题区域 -->
+        <view class="flex flex-row items-center mb-[16px]">
+          <view
+            class="w-[4px] h-[16px] rounded-[2px] mr-[8px]"
+            :style="{ backgroundColor: 'var(--theme-color, #3182ce)' }"
+          />
+          <text class="text-[16px] font-bold" :style="{ color: 'var(--text-color, #2d3748)' }">触感与工具</text>
+        </view>
+        <!-- 剪贴板 -->
+        <view class="rounded-[12px] p-[16px] mb-[16px] border-[1px] border-solid border-[#e2e8f0]">
+          <text class="text-[12px] text-[#94a3b8] mb-[8px]">剪贴板测试文本</text>
+          <input
+            v-model="copyText"
+            placeholder="请输入要复制的文本"
+            class="h-[38px] bg-white rounded-[6px] px-[12px] border-[1px] border-solid border-[#cbd5e1] text-[14px] text-[#334155] mb-[12px]"
+          />
+          <view class="w-full h-[38px] rounded-[8px] bg-[#10b981] flex flex-row items-center justify-center" @click="handleCopy">
+            <text class="text-[#ffffff] text-[14px] font-bold">复制测试文本到剪贴板</text>
+          </view>
+        </view>
+
+        <!-- 震动反馈（短震 / 长震） -->
+        <view class="rounded-[12px] p-[16px] border-[1px] border-solid border-[#e2e8f0]">
+          <text class="text-[14px] font-bold text-[#1e293b] mb-[8px]">硬件震动反馈</text>
+          <text class="text-[12px] text-[#94a3b8] mb-[12px]">提供短震动与长震动两种物理触感梯度</text>
+          <view class="flex flex-row">
+            <view class="flex-1 mr-[8px]">
+              <view class="w-full h-[40px] rounded-[8px] bg-[#f59e0b] flex flex-row items-center justify-center" @click="triggerShortVibration">
+                <text class="text-[#ffffff] text-[13px] font-bold">短震动反馈</text>
+              </view>
+            </view>
+            <view class="flex-1">
+              <view class="w-full h-[40px] rounded-[8px] bg-[#ea580c] flex flex-row items-center justify-center" @click="triggerLongVibration">
+                <text class="text-[#ffffff] text-[13px] font-bold">长震动反馈</text>
+              </view>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 5. 相机与多媒体卡片 -->
+    <view
+      class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid"
+      :style="{
+        backgroundColor: 'var(--card-bg, #ffffff)',
+        borderColor: 'var(--border-color, #edf2f7)'
+      }"
+    >
+      <!-- 标题区域 -->
+      <view class="flex flex-row items-center mb-[16px]">
+        <view
+          class="w-[4px] h-[16px] rounded-[2px] mr-[8px]"
+          :style="{ backgroundColor: 'var(--theme-color, #3182ce)' }"
+        />
+        <text class="text-[16px] font-bold" :style="{ color: 'var(--text-color, #2d3748)' }">相机与多媒体</text>
+      </view>
+      <view class="rounded-[12px] p-[16px] mb-[16px] border-[1px] border-solid border-[#e2e8f0] items-center justify-center">
+        <text v-if="photoUrl == ''" class="text-[14px] text-[#94a3b8]">未选择照片</text>
+        <image v-else :src="photoUrl" class="w-[150px] h-[150px] rounded-[8px]" mode="aspectFill" />
+      </view>
+      <view class="w-full h-[44px] rounded-[8px] bg-[#3b82f6] mb-[12px] flex flex-row items-center justify-center" @click="chooseImage">
+        <text class="text-[#ffffff] text-[14px] font-bold">拍摄/选择照片</text>
+      </view>
+
+      <!-- 扫码测试 -->
+      <view class="rounded-[12px] p-[16px] mb-[16px] border-[1px] border-solid border-[#e2e8f0]">
+        <text class="text-[12px] text-[#94a3b8] mb-[8px]">扫码结果</text>
+        <text class="text-[14px] font-bold text-[#334155]">{{ scanResult != '' ? scanResult : '暂无数据' }}</text>
+      </view>
+      <view class="w-full h-[44px] rounded-[8px] bg-[#10b981] flex flex-row items-center justify-center" @click="scanCode">
+        <text class="text-[#ffffff] text-[14px] font-bold">扫码测试</text>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed, onMounted, onUnmounted, ref } from 'vue';
+import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/layouts/navbar/utils/index.uts';
+import { useAppStore } from '@/src/store';
+
+definePage({
+  debug: false,
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: true,
+  style: {
+    navigationBarTitleText: '原生设备能力',
+    navigationStyle: 'custom'
+  }
+});
+
+const appStore = useAppStore();
+const isDark = computed((): boolean => appStore.state.isDark);
+
+// ==================== 1. 通信与分享 ====================
+const phoneNumber = ref<string>('10086');
+const shareSummary = ref<string>('unibestX - 高性能跨端原生开发框架');
+const shareHref = ref<string>('https://github.com/cq112233/unibestX');
+
+function handleMakePhoneCall(): void {
+  if (phoneNumber.value == '') {
+    uni.showToast({ title: '请输入电话号码', icon: 'none' });
+    return;
+  }
+  uni.makePhoneCall({
+    phoneNumber: phoneNumber.value,
+    success: () => {
+      console.log('拨号成功');
+    },
+    fail: () => {
+      uni.showToast({ title: '已取消或拨号失败', icon: 'none' });
+    }
+  });
+}
+
+function handleShareWithSystem(): void {
+  // shareWithSystem 是 App 专有 API，小程序端为 x（且小程序不允许 API 调起分享，
+  // 只能由用户点 <button open-type="share"> 触发）—— 这里不能带上 MP-WEIXIN，
+  // 否则小程序产物会编译进一个不存在的 API 并在点击时报 TypeError。
+  // #ifdef APP
+  uni.shareWithSystem({
+    summary: shareSummary.value,
+    href: shareHref.value,
+    success: () => {
+      uni.showToast({ title: '分享调用成功', icon: 'success' });
+    },
+    fail: () => {
+      uni.showToast({ title: '已取消或分享失败', icon: 'none' });
+    }
+  });
+  // #endif
+  // #ifndef APP
+  uni.setClipboardData({
+    data: `${shareSummary.value} ${shareHref.value}`,
+    success: () => {
+      uni.showToast({ title: '链接已复制到剪贴板', icon: 'none' });
+    }
+  });
+  // #endif
+}
+
+// ==================== 2. 文件与文档 ====================
+const selectedFileName = ref<string>('');
+const selectedFileSizeText = ref<string>('');
+const selectedFilePath = ref<string>('');
+
+function formatFileSize(bytes: number): string {
+  if (bytes <= 0) {
+    return '0 B';
+  }
+  if (bytes < 1024) {
+    return `${bytes} B`;
+  }
+  if (bytes < 1024 * 1024) {
+    const kb = (bytes / 1024.0).toFixed(1);
+    return `${kb} KB`;
+  }
+  const mb = (bytes / (1024.0 * 1024.0)).toFixed(1);
+  return `${mb} MB`;
+}
+
+type LocalChosenFile = {
+  name?: string;
+  size?: number;
+  path?: string;
+};
+
+function handleChooseFile(): void {
+  // #ifdef H5 || MP-WEIXIN || APP
+  try {
+    uni.chooseFile({
+      count: 1,
+      type: 'all',
+      success: (res) => {
+        const rawFiles = res.tempFiles as any;
+        const fileList = (Array.isArray(rawFiles) ? rawFiles : [rawFiles]) as Array<LocalChosenFile>;
+        if (fileList.length > 0 && fileList[0] != null) {
+          const fileObj = fileList[0];
+          const fileName = `${fileObj.name ?? ''}`;
+          selectedFileName.value = fileName.length > 0 ? fileName : '已选文件';
+          selectedFileSizeText.value = formatFileSize((fileObj.size ?? 0) as number);
+          selectedFilePath.value = `${fileObj.path ?? ''}`;
+          uni.showToast({ title: '文件选择成功', icon: 'success' });
+        }
+        else {
+          const rawPaths = res.tempFilePaths as any;
+          const pathList = (Array.isArray(rawPaths) ? rawPaths : [rawPaths]) as Array<string>;
+          if (pathList.length > 0 && pathList[0] != null && pathList[0].length > 0) {
+            selectedFilePath.value = pathList[0];
+            selectedFileName.value = '已选文件';
+            uni.showToast({ title: '文件选择成功', icon: 'success' });
+          }
+        }
+      },
+      fail: () => {
+        uni.showToast({ title: '已取消选择文件', icon: 'none' });
+      }
+    });
+  }
+  catch (_e: any) {
+    console.error(_e);
+    uni.showToast({ title: '当前环境不支持选文件', icon: 'none' });
+  }
+  // #endif
+}
+
+function handleOpenSelectedDoc(): void {
+  if (selectedFilePath.value == '') {
+    uni.showToast({ title: '请先选择文档文件', icon: 'none' });
+    return;
+  }
+  uni.openDocument({
+    filePath: selectedFilePath.value,
+    success: () => {
+      console.log('文档打开成功');
+    },
+    fail: () => {
+      uni.showToast({ title: '文档预览失败，请检查文件格式', icon: 'none' });
+    }
+  });
+}
+
+function handleDownloadAndOpenSampleDoc(): void {
+  uni.showLoading({ title: '下载示例文档中...' });
+  uni.downloadFile({
+    url: 'https://raw.githubusercontent.com/mozilla/pdf.js/master/examples/learning/helloworld.pdf',
+    success: (res) => {
+      uni.hideLoading();
+      if (res.statusCode == 200 && res.tempFilePath != '') {
+        uni.openDocument({
+          filePath: res.tempFilePath,
+          fileType: 'pdf',
+          success: () => {
+            uni.showToast({ title: '文档已打开', icon: 'success' });
+          },
+          fail: () => {
+            uni.showToast({ title: '系统暂无法打开该格式文档', icon: 'none' });
+          }
+        });
+      }
+      else {
+        uni.showToast({ title: '文档下载失败', icon: 'none' });
+      }
+    },
+    fail: () => {
+      uni.hideLoading();
+      uni.showToast({ title: '下载示例文档超时或失败', icon: 'none' });
+    }
+  });
+}
+
+// ==================== 3. 系统缓存管理 (getFileSystemManager) ====================
+const fileCacheBytes = ref<number>(0);
+const storageCacheBytes = ref<number>(0);
+const cacheFileCount = ref<number>(0);
+const cacheDirPath = ref<string>('');
+
+const fileCacheSizeText = computed((): string => formatFileSize(fileCacheBytes.value));
+const storageSizeText = computed((): string => formatFileSize(storageCacheBytes.value));
+const totalCacheSizeText = computed((): string => formatFileSize(fileCacheBytes.value + storageCacheBytes.value));
+
+function getCachePath(): string {
+  try {
+    const uniEnv = uni.env;
+    if (uniEnv != null) {
+      const p = `${uniEnv.CACHE_PATH ?? ''}`;
+      if (p.length > 0) {
+        return p;
+      }
+    }
+  }
+  catch (e) {
+    console.warn(e);
+  }
+  try {
+    const uniEnv = uni.env;
+    if (uniEnv != null) {
+      const u = `${uniEnv.USER_DATA_PATH ?? ''}`;
+      if (u.length > 0) {
+        return u;
+      }
+    }
+  }
+  catch (e) {
+    console.warn(e);
+  }
+  return '';
+}
+
+function calculateCacheSize(showToast: boolean): void {
+  // 1. 读取 Storage 大小 (KB 转 Byte)
+  try {
+    uni.getStorageInfo({
+      success: (res) => {
+        storageCacheBytes.value = res.currentSize * 1024;
+      },
+      fail: () => {
+        storageCacheBytes.value = 0;
+      }
+    });
+  }
+  catch (e) {
+    console.warn(e);
+  }
+
+  // 2. 使用 FileSystemManager 统计 CACHE_PATH
+  let totalBytes = 0;
+  const path = getCachePath();
+  cacheDirPath.value = path.length > 0 ? path : '系统临时沙盒';
+
+  if (path.length == 0) {
+    fileCacheBytes.value = 0;
+    cacheFileCount.value = 0;
+    if (showToast) {
+      uni.showToast({ title: '已刷新缓存信息', icon: 'none' });
+    }
+    return;
+  }
+
+  try {
+    const fsm = uni.getFileSystemManager();
+    fsm.readdir({
+      dirPath: path,
+      success: (res) => {
+        const files = res.files;
+        cacheFileCount.value = files.length;
+
+        if (files.length == 0) {
+          fileCacheBytes.value = 0;
+          if (showToast) {
+            uni.showToast({ title: '当前文件缓存为 0 B', icon: 'none' });
+          }
+          return;
+        }
+
+        let pending = files.length;
+        for (let i = 0; i < files.length; i++) {
+          const fileName = files[i];
+          const fullPath = `${path}/${fileName}`;
+          fsm.getFileInfo({
+            filePath: fullPath,
+            success: (info) => {
+              totalBytes += info.size;
+              pending--;
+              if (pending <= 0) {
+                fileCacheBytes.value = totalBytes;
+                if (showToast) {
+                  uni.showToast({ title: `缓存统计完成: ${totalCacheSizeText.value}`, icon: 'none' });
+                }
+              }
+            },
+            fail: () => {
+              pending--;
+              if (pending <= 0) {
+                fileCacheBytes.value = totalBytes;
+                if (showToast) {
+                  uni.showToast({ title: `缓存统计完成: ${totalCacheSizeText.value}`, icon: 'none' });
+                }
+              }
+            }
+          });
+        }
+      },
+      fail: (err) => {
+        console.warn('readdir fail:', err);
+        fileCacheBytes.value = 0;
+        cacheFileCount.value = 0;
+        if (showToast) {
+          uni.showToast({ title: '已刷新缓存信息', icon: 'none' });
+        }
+      }
+    });
+  }
+  catch (e) {
+    console.error('getFileSystemManager error:', e);
+    fileCacheBytes.value = 0;
+    cacheFileCount.value = 0;
+  }
+}
+
+function handleClearFileCache(): void {
+  if (fileCacheBytes.value == 0) {
+    uni.showModal({
+      title: '文件缓存已为 0 B',
+      content: `当前文件缓存目录已无临时文件。\n\n上方显示的 ${storageSizeText.value} 是本地 Storage 存储数据（如登录Token、Pinia状态、主题与字体偏好）。若需彻底清空，请点击【清空 Storage】或【一键清空全部】。`,
+      showCancel: false,
+      confirmText: '我知道了'
+    });
+    return;
+  }
+
+  uni.showModal({
+    title: '清除文件缓存',
+    content: `确认清理 ${cacheFileCount.value} 个文件缓存 (${fileCacheSizeText.value}) 吗？此操作将清空临时与下载文件。`,
+    confirmText: '立即清理',
+    cancelText: '取消',
+    confirmColor: '#f97316',
+    success: (modalRes) => {
+      if (!modalRes.confirm) {
+        return;
+      }
+
+      uni.showLoading({ title: '正在清理文件缓存...' });
+
+      const path = getCachePath();
+      if (path.length == 0) {
+        uni.hideLoading();
+        fileCacheBytes.value = 0;
+        cacheFileCount.value = 0;
+        uni.showToast({ title: '文件缓存已清空', icon: 'success' });
+        return;
+      }
+
+      try {
+        const fsm = uni.getFileSystemManager();
+        fsm.readdir({
+          dirPath: path,
+          success: (res) => {
+            const files = res.files;
+            if (files.length == 0) {
+              uni.hideLoading();
+              fileCacheBytes.value = 0;
+              cacheFileCount.value = 0;
+              uni.showToast({ title: '文件缓存已清空', icon: 'success' });
+              return;
+            }
+
+            let remaining = files.length;
+            const onFileDone = () => {
+              remaining--;
+              if (remaining <= 0) {
+                uni.hideLoading();
+                fileCacheBytes.value = 0;
+                cacheFileCount.value = 0;
+                calculateCacheSize(false);
+                uni.showToast({ title: '文件缓存已彻底清空', icon: 'success' });
+              }
+            };
+
+            for (let i = 0; i < files.length; i++) {
+              const fileName = files[i];
+              if (fileName.startsWith('DCloud') || fileName.startsWith('uni')) {
+                onFileDone();
+                continue;
+              }
+
+              const fullPath = `${path}/${fileName}`;
+              fsm.unlink({
+                filePath: fullPath,
+                success: () => {
+                  onFileDone();
+                },
+                fail: () => {
+                  fsm.rmdir({
+                    dirPath: fullPath,
+                    recursive: true,
+                    complete: () => {
+                      onFileDone();
+                    }
+                  });
+                }
+              });
+            }
+          },
+          fail: () => {
+            uni.hideLoading();
+            fileCacheBytes.value = 0;
+            cacheFileCount.value = 0;
+            uni.showToast({ title: '文件缓存清理完成', icon: 'success' });
+          }
+        });
+      }
+      catch (e) {
+        uni.hideLoading();
+        console.error('clear file cache error:', e);
+        uni.showToast({ title: '清理完成', icon: 'none' });
+      }
+    }
+  });
+}
+
+function handleClearAll(): void {
+  uni.showModal({
+    title: '一键清空全部缓存与数据',
+    content: `将同时清理文件缓存 (${fileCacheSizeText.value}) 和本地 Storage 键值对 (${storageSizeText.value})。\n\n清空后应用状态将被重置为初始状态，确定执行吗？`,
+    confirmText: '彻底清空',
+    cancelText: '取消',
+    confirmColor: '#ef4444',
+    success: (modalRes) => {
+      if (!modalRes.confirm) {
+        return;
+      }
+
+      uni.showLoading({ title: '正在清理全部数据...' });
+      try {
+        uni.clearStorageSync();
+        storageCacheBytes.value = 0;
+      }
+      catch (e) {
+        console.warn(e);
+      }
+
+      const path = getCachePath();
+      if (path.length == 0) {
+        uni.hideLoading();
+        fileCacheBytes.value = 0;
+        cacheFileCount.value = 0;
+        calculateCacheSize(false);
+        uni.showToast({ title: '全部缓存与数据已清空', icon: 'success' });
+        return;
+      }
+
+      try {
+        const fsm = uni.getFileSystemManager();
+        fsm.readdir({
+          dirPath: path,
+          success: (res) => {
+            const files = res.files;
+            if (files.length == 0) {
+              uni.hideLoading();
+              fileCacheBytes.value = 0;
+              cacheFileCount.value = 0;
+              calculateCacheSize(false);
+              uni.showToast({ title: '全部缓存与数据已清空', icon: 'success' });
+              return;
+            }
+
+            let remaining = files.length;
+            const onAllDone = () => {
+              remaining--;
+              if (remaining <= 0) {
+                uni.hideLoading();
+                fileCacheBytes.value = 0;
+                cacheFileCount.value = 0;
+                calculateCacheSize(false);
+                uni.showToast({ title: '全部缓存与数据已清空', icon: 'success' });
+              }
+            };
+
+            for (let i = 0; i < files.length; i++) {
+              const fileName = files[i];
+              if (fileName.startsWith('DCloud') || fileName.startsWith('uni')) {
+                onAllDone();
+                continue;
+              }
+
+              const fullPath = `${path}/${fileName}`;
+              fsm.unlink({
+                filePath: fullPath,
+                success: () => {
+                  onAllDone();
+                },
+                fail: () => {
+                  fsm.rmdir({
+                    dirPath: fullPath,
+                    recursive: true,
+                    complete: () => {
+                      onAllDone();
+                    }
+                  });
+                }
+              });
+            }
+          },
+          fail: () => {
+            uni.hideLoading();
+            fileCacheBytes.value = 0;
+            cacheFileCount.value = 0;
+            calculateCacheSize(false);
+            uni.showToast({ title: '清理完成', icon: 'success' });
+          }
+        });
+      }
+      catch (e) {
+        uni.hideLoading();
+        console.warn(e);
+        calculateCacheSize(false);
+        uni.showToast({ title: '清理完成', icon: 'none' });
+      }
+    }
+  });
+}
+
+function handleClearStorage(): void {
+  uni.showModal({
+    title: '清空本地 Storage',
+    content: `当前 Storage 占用 ${storageSizeText.value}。清空将重置所有本地持久化键值（包括字体记忆与登录偏好），确定清空吗？`,
+    confirmText: '立即清空',
+    cancelText: '取消',
+    confirmColor: '#f97316',
+    success: (modalRes) => {
+      if (!modalRes.confirm) {
+        return;
+      }
+      try {
+        uni.clearStorageSync();
+        storageCacheBytes.value = 0;
+        calculateCacheSize(false);
+        uni.showToast({ title: 'Storage 缓存已全部清空', icon: 'success' });
+      }
+      catch (e) {
+        console.warn(e);
+        uni.showToast({ title: '清空失败', icon: 'none' });
+      }
+    }
+  });
+}
+
+function handleGenerateTestCache(): void {
+  const path = getCachePath();
+  if (path.length == 0) {
+    uni.showToast({ title: '当前环境无可用缓存路径', icon: 'none' });
+    return;
+  }
+
+  uni.showLoading({ title: '正在写入测试缓存...' });
+  try {
+    const fsm = uni.getFileSystemManager();
+    const testFileName = `test_cache_${Date.now()}.tmp`;
+    const targetFile = `${path}/${testFileName}`;
+
+    let dummy = 'unibestX_Cache_TestData_0123456789ABCDEF\n';
+    for (let i = 0; i < 10; i++) {
+      dummy = dummy + dummy;
+    }
+
+    fsm.writeFile({
+      filePath: targetFile,
+      data: dummy,
+      encoding: 'utf-8',
+      success: () => {
+        uni.hideLoading();
+        uni.showToast({ title: '已成功生成测试缓存', icon: 'success' });
+        calculateCacheSize(false);
+      },
+      fail: (err) => {
+        uni.hideLoading();
+        console.warn('writeFile fail:', err);
+        uni.showToast({ title: '写入测试缓存失败', icon: 'none' });
+      }
+    });
+  }
+  catch (e) {
+    uni.hideLoading();
+    console.warn(e);
+    uni.showToast({ title: '写入异常', icon: 'none' });
+  }
+}
+
+// ==================== 4. 键盘感知与避让 ====================
+const keyboardInputText = ref<string>('');
+const keyboardHeight = ref<number>(0);
+let keyboardChangeCallback: ((res: OnKeyboardHeightChangeCallbackResult) => void) | null = null;
+let keyboardListenerId: number = -1;
+
+function handleKeyboardHeightChange(event: UniInputKeyboardHeightChangeEvent): void {
+  keyboardHeight.value = Math.ceil(event.detail.height);
+}
+
+function handleHideKeyboard(): void {
+  uni.hideKeyboard();
+}
+
+onMounted(() => {
+  // #ifdef MP-WEIXIN
+  keyboardChangeCallback = (res: OnKeyboardHeightChangeCallbackResult): void => {
+    keyboardHeight.value = Math.ceil(res.height);
+  };
+  const retId = (uni.onKeyboardHeightChange as any)(keyboardChangeCallback);
+  if (typeof retId === 'number') {
+    keyboardListenerId = retId as number;
+  }
+  // #endif
+  calculateCacheSize(false);
+});
+
+onUnmounted(() => {
+  // #ifdef MP-WEIXIN
+  if (keyboardListenerId != -1) {
+    (uni.offKeyboardHeightChange as any)(keyboardListenerId);
+    keyboardListenerId = -1;
+  }
+  else if (keyboardChangeCallback != null) {
+    (uni.offKeyboardHeightChange as any)(keyboardChangeCallback);
+    keyboardChangeCallback = null;
+  }
+  // #endif
+});
+
+// ==================== 4. 触感与震动 ====================
+const copyText = ref<string>('Hello unibestX!');
+
+function triggerShortVibration(): void {
+  // #ifdef APP || MP-WEIXIN
+  uni.vibrateShort({
+    type: 'light',
+    success: () => {
+      uni.showToast({ title: '已触发短震动反馈', icon: 'none' });
+    },
+    fail: () => {
+      uni.showToast({ title: '短震动触发失败', icon: 'none' });
+    }
+  });
+  // #endif
+  // #ifndef APP || MP-WEIXIN
+  uni.showToast({
+    title: '当前环境不支持震动',
+    icon: 'none'
+  });
+  // #endif
+}
+
+function triggerLongVibration(): void {
+  // #ifdef APP || MP-WEIXIN
+  uni.vibrateLong({
+    success: () => {
+      uni.showToast({ title: '已触发长震动反馈', icon: 'none' });
+    },
+    fail: () => {
+      uni.showToast({ title: '长震动触发失败', icon: 'none' });
+    }
+  });
+  // #endif
+  // #ifndef APP || MP-WEIXIN
+  uni.showToast({
+    title: '当前环境不支持长震动',
+    icon: 'none'
+  });
+  // #endif
+}
+
+function handleCopy(): void {
+  if (copyText.value == '')
+    return;
+  uni.setClipboardData({
+    data: copyText.value,
+    success: () => {
+      uni.showToast({
+        title: '复制成功',
+        icon: 'success'
+      });
+    }
+  });
+}
+
+// ==================== 5. 相机与多媒体 ====================
+const photoUrl = ref<string>('');
+const scanResult = ref<string>('');
+
+function chooseImage(): void {
+  uni.chooseImage({
+    count: 1,
+    success: (res) => {
+      const paths = res.tempFilePaths;
+      if (paths.length > 0) {
+        photoUrl.value = paths[0];
+      }
+    },
+    fail: (err) => {
+      console.error(err);
+    }
+  });
+}
+
+function scanCode(): void {
+  uni.scanCode({
+    success: (res) => {
+      scanResult.value = res.result;
+    },
+    fail: (err) => {
+      console.error(err);
+    }
+  });
+}
+
+onNavbarPullDownRefresh(() => {
+  setTimeout(() => {
+    stopNavbarPullDownRefresh();
+  }, 800);
+});
+</script>
+
+<style scoped></style>

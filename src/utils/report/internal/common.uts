@@ -1,0 +1,23 @@
+/**
+ * 上报模块内部共享工具
+ */
+
+/** 取当前页面路径，失败返回空串 */
+export function currentPagePath(): string {
+  try {
+    const pages = getCurrentPages();
+    if (pages.length == 0) {
+      return '';
+    }
+    const cur = pages[pages.length - 1];
+    const route = cur.route;
+    if (route == null) {
+      return '';
+    }
+    const r = `${route}`;
+    return r.indexOf('/') == 0 ? r : `/${r}`;
+  }
+  catch (_) {
+    return '';
+  }
+}

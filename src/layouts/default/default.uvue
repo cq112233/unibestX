@@ -1,0 +1,232 @@
+<template>
+  <!-- Default 页面通用布局根容器（无自定义导航栏，由页面或原生系统导航接管，内嵌滚动与下拉刷新容器） -->
+  <view :class="rootClass" :style="rootStyle">
+    <!-- 当开启自定义下拉刷新时（原生未开启且当前布局开启） -->
+    <scroll-view
+      v-if="useCustomRefresher"
+      :direction="pageScrollDirection"
+      class="default-scroll-view"
+      :refresher-enabled="isRefresherEnabled"
+      :refresher-triggered="isTriggered"
+      :refresher-background="themeTokens.bgContent"
+      :lower-threshold="50"
+      @refresherrefresh="handleRefresherRefresh"
+      @refresherrestore="handleRefresherRestore"
+      @scroll="handleScroll"
+      @scrolltolower="handleScrollToLower"
+    >
+      <slot />
+    </scroll-view>
+
+    <!-- 未开启自定义下拉刷新时（包含开启原生下拉刷新时）：渲染普通滚动容器 -->
+    <scroll-view
+      v-else
+      class="default-scroll-view"
+      :direction="pageScrollDirection"
+      :lower-threshold="50"
+      @scroll="handleScroll"
+      @scrolltolower="handleScrollToLower"
+    >
+      <slot />
+    </scroll-view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed, onMounted, onUnmounted, ref } from 'vue';
+import { useAppStore } from '@/src/store';
+import { getThemeTokens } from '@/src/theme/index.uts';
+import type { ThemeTokens } from '@/src/theme/index.uts';
+import { isPageRefresherDisabled, isPageScrollDisabled } from '@/src/layouts/navbar/utils/index.uts';
+import { updateSystemInfo } from '@/src/utils/systemInfo/index.uts';
+
+/**
+ * 布局属性定义（由 uni-layouts-plugin 编译时自动从页面 definePage 或 pages.json 提取传入）
+ */
+const props = defineProps({
+  /** 是否启用内容区域的自定义下拉刷新 */
+  enablePullDownRefresh: {
+    type: Boolean,
+    default: false
+  },
+  /** 页面 style 完整配置对象（未拍平，包含 enablePullDownRefresh 等） */
+  pageStyle: {
+    type: Object,
+    default: () => ({})
+  },
+  /** 页面根容器自定义类名（通过 definePage 或 pages.config.json 中的 customPageClass 传入） */
+  customPageClass: {
+    type: String,
+    default: ''
+  },
+  /** 兼容别名：自定义类名 */
+  customClass: {
+    type: String,
+    default: ''
+  },
+  layoutClass: {
+    type: String,
+    default: ''
+  },
+  /** 页面根容器自定义行内样式（通过 definePage 或 pages.config.json 中的 customPageStyle 传入） */
+  customPageStyle: {
+    type: String,
+    default: ''
+  },
+  /** 兼容别名：自定义行内样式 */
+  customStyle: {
+    type: String,
+    default: ''
+  },
+  layoutStyle: {
+    type: String,
+    default: ''
+  }
+});
+
+onMounted(() => {
+  updateSystemInfo();
+});
+
+/**
+ * 获取 pageStyle 对象
+ */
+const pageStyleObj = computed((): UTSJSONObject => {
+  return (props.pageStyle ?? {}) as UTSJSONObject;
+});
+
+const pageScrollDirection = computed((): string => {
+  return isPageScrollDisabled.value ? 'none' : 'vertical';
+});
+
+const isRefresherEnabled = computed((): boolean => {
+  return !isPageScrollDisabled.value && !isPageRefresherDisabled.value;
+});
+
+/**
+ * 根容器样式类名：合并默认基础类名与自定义页面类名（customPageClass）
+ */
+const rootClass = computed((): string => {
+  let cls = 'default-layout';
+  if (props.customPageClass.length > 0) {
+    cls += ` ${props.customPageClass}`;
+  }
+  if (props.customClass.length > 0) {
+    cls += ` ${props.customClass}`;
+  }
+  if (props.layoutClass.length > 0) {
+    cls += ` ${props.layoutClass}`;
+  }
+  return cls;
+});
+
+/**
+ * 根容器行内样式：合并自定义页面行内样式（customPageStyle）
+ */
+const rootStyle = computed((): string => {
+  let s = '';
+  if (props.customPageStyle.length > 0) {
+    s += props.customPageStyle;
+  }
+  if (props.customStyle.length > 0) {
+    s += (s.length > 0 ? ';' : '') + props.customStyle;
+  }
+  if (props.layoutStyle.length > 0) {
+    s += (s.length > 0 ? ';' : '') + props.layoutStyle;
+  }
+  return s;
+});
+
+/** 下拉刷新状态控制：true 表示刷新中（展示 Loading），false 表示已复位收起 */
+const isTriggered = ref(false);
+
+/**
+ * 用户下拉触发刷新回调
+ */
+function handleRefresherRefresh() {
+  isTriggered.value = true;
+  // 向页面派发下拉刷新通知事件
+  uni.$emit('onPagePullDownRefresh');
+}
+
+/**
+ * 下拉刷新复位完成事件
+ */
+function handleRefresherRestore() {
+  isTriggered.value = false;
+}
+
+/**
+ * 接收页面业务层发出的停止刷新通知（stopNavbarPullDownRefresh）
+ */
+function onStopRefresh() {
+  isTriggered.value = false;
+}
+
+// 挂载时注册全局停止刷新事件监听
+onMounted(() => {
+  uni.$on('stopPagePullDownRefresh', onStopRefresh);
+});
+
+// 卸载时移除全局事件监听，避免内存泄漏
+onUnmounted(() => {
+  uni.$off('stopPagePullDownRefresh', onStopRefresh);
+});
+
+/**
+ * 布局滚动容器滚动事件回调：统一向页面层派发 onNavbarPageScroll 事件
+ */
+function handleScroll(e: UniScrollEvent): void {
+  const scrollTop = e.detail.scrollTop;
+  uni.$emit('onNavbarPageScroll', {
+    scrollTop: Math.ceil(scrollTop)
+  } as UTSJSONObject);
+}
+
+/**
+ * 布局滚动容器触底事件回调：统一向页面层派发 onNavbarReachBottom 事件
+ */
+function handleScrollToLower(): void {
+  uni.$emit('onNavbarReachBottom');
+}
+
+/**
+ * 判断当前页面是否开启了原生系统下拉刷新（读取 definePage.style.enablePullDownRefresh）
+ */
+const isNativePullDown = computed((): boolean => {
+  const psVal = pageStyleObj.value.enablePullDownRefresh;
+  if (psVal == true || psVal == 'true') {
+    return true;
+  }
+  return false;
+});
+
+/**
+ * 决定是否使用内部自定义下拉刷新：
+ * 若原生已开启下拉（style.enablePullDownRefresh），原生优先并关闭内部下拉；仅在原生未开启时才使用自定义下拉
+ */
+const useCustomRefresher = computed((): boolean => {
+  if (isNativePullDown.value) {
+    return false;
+  }
+  return props.enablePullDownRefresh;
+});
+
+const themeTokens = computed((): ThemeTokens => {
+  return getThemeTokens(useAppStore().state.isDark);
+});
+</script>
+
+<style lang="scss" scoped>
+.default-layout {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.default-scroll-view {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+</style>

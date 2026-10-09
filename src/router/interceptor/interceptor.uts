@@ -1,0 +1,235 @@
+import { useTokenStore } from '@/src/store';
+import { isPageTabbar, switchTabbar } from '@/src/tabbar/index.uts';
+import { EXCLUDE_LOGIN_PATH_LIST, isNeedLoginMode, LOGIN_PAGE } from '../config/config.uts';
+import { parseUrlToObj } from '../utils/utils.uts';
+
+// #ifndef APP
+export type Interceptor = {
+  invoke: (options: any) => boolean;
+  success?: (res: any) => void;
+  fail?: (err: any) => void;
+  complete?: (res: any) => void;
+};
+// #endif
+
+/**
+ * 判断路径是否符合排除登录校验名单 (EXCLUDE_LOGIN_PATH_LIST)
+ */
+export function judgeIsExcludePath(path: string): boolean {
+  let normalizedPath = path;
+  if (normalizedPath.startsWith('src/')) {
+    normalizedPath = `/${normalizedPath}`;
+  }
+  return EXCLUDE_LOGIN_PATH_LIST.includes(normalizedPath);
+}
+
+/**
+ * 核心拦截业务逻辑函数
+ */
+function doIntercept(url: string): boolean {
+  if (url == null || url == '') {
+    return true;
+  }
+  const urlObj = parseUrlToObj(url);
+  let path = urlObj.path;
+  const query = urlObj.query;
+
+  // 1. 规范化路径：如果以 'src/' 开头，补充前导 '/' 使其变为 '/src/'
+  if (path.startsWith('src/')) {
+    path = `/${path}`;
+  }
+
+  // 2. 相对路径解析：将 "subpage" 转换为基于当前页面所在目录的绝对路径
+  if (!path.startsWith('/') && !path.startsWith('plugin://') && !path.startsWith('http://') && !path.startsWith('https://')) {
+    const pages = getCurrentPages();
+    let currentPath = '';
+    if (pages.length > 0) {
+      currentPath = pages[pages.length - 1].route;
+    }
+    let normalizedCurrentPath = currentPath;
+    if (normalizedCurrentPath.startsWith('src/')) {
+      normalizedCurrentPath = `/${normalizedCurrentPath}`;
+    }
+    if (!normalizedCurrentPath.startsWith('/')) {
+      normalizedCurrentPath = `/${normalizedCurrentPath}`;
+    }
+    const lastSlashIdx = normalizedCurrentPath.lastIndexOf('/');
+    let baseDir = '';
+    if (lastSlashIdx >= 0) {
+      baseDir = normalizedCurrentPath.substring(0, lastSlashIdx);
+    }
+    path = `${baseDir}/${path}`;
+  }
+
+  // 确保最终 path 也是以 '/' 开头的绝对路径形式
+  if (path.startsWith('src/')) {
+    path = `/${path}`;
+  }
+
+  // 3. 检查 Token 登录有效性
+  const tokenStore = useTokenStore();
+  const hasLogin = tokenStore.hasValidLogin();
+  if (hasLogin) {
+    // 已经登录：若目标不是登录页直接放行
+    if (path != LOGIN_PAGE) {
+      return true;
+    }
+    // 已登录但再次访问登录页，重定向至来源页面或首页
+    const redirect = query.get('redirect');
+    const redirectUrl = (redirect != null && redirect != '') ? redirect : '/src/pages/index/index';
+    if (isPageTabbar(redirectUrl)) {
+      switchTabbar(redirectUrl);
+    }
+    else {
+      uni.navigateTo({ url: redirectUrl });
+    }
+    return false;
+  }
+
+  // 4. 未登录情况下拼装重定向参数
+  let fullPath = path;
+  if (query.size > 0) {
+    const paramsList: string[] = [];
+    query.forEach((val, key) => {
+      paramsList.push(`${key}=${val}`);
+    });
+    fullPath += `?${paramsList.join('&')}`;
+  }
+  const redirectUrl = `${LOGIN_PAGE}?redirect=${encodeURIComponent(fullPath)}`;
+
+  // 白名单策略模式：仅 EXCLUDE_LOGIN_PATH_LIST 中页面免登录
+  if (isNeedLoginMode) {
+    if (judgeIsExcludePath(path)) {
+      return true;
+    }
+    if (path == LOGIN_PAGE) {
+      return true;
+    }
+    uni.navigateTo({ url: redirectUrl });
+    return false;
+  }
+
+  // 黑名单策略模式（默认）：EXCLUDE_LOGIN_PATH_LIST 中页面必须登录
+  if (judgeIsExcludePath(path)) {
+    uni.navigateTo({ url: redirectUrl });
+    return false;
+  }
+  return true;
+}
+
+/**
+ * 路由 API 独立拦截器
+ */
+export const navigateToInterceptor: Interceptor = {
+  invoke(options: any): boolean {
+    let url = '';
+    if (options != null) {
+      // #ifdef APP
+      const opt = options as NavigateToOptions;
+      url = opt.url;
+      // #endif
+      // #ifndef APP
+      const urlObj = options as UTSJSONObject;
+      url = (urlObj.url != null) ? (urlObj.url as string) : '';
+      // #endif
+    }
+    return doIntercept(url);
+  }
+};
+
+export const redirectToInterceptor: Interceptor = {
+  invoke(options: any): boolean {
+    let url = '';
+    if (options != null) {
+      // #ifdef APP
+      const opt = options as RedirectToOptions;
+      url = opt.url;
+      // #endif
+      // #ifndef APP
+      const urlObj = options as UTSJSONObject;
+      url = (urlObj.url != null) ? (urlObj.url as string) : '';
+      // #endif
+    }
+    return doIntercept(url);
+  }
+};
+
+export const reLaunchInterceptor: Interceptor = {
+  invoke(options: any): boolean {
+    let url = '';
+    if (options != null) {
+      // #ifdef APP
+      const opt = options as ReLaunchOptions;
+      url = opt.url;
+      // #endif
+      // #ifndef APP
+      const urlObj = options as UTSJSONObject;
+      url = (urlObj.url != null) ? (urlObj.url as string) : '';
+      // #endif
+    }
+    return doIntercept(url);
+  }
+};
+
+export const switchTabInterceptor: Interceptor = {
+  invoke(options: any): boolean {
+    let url = '';
+    if (options != null) {
+      // #ifdef APP
+      const opt = options as SwitchTabOptions;
+      url = opt.url;
+      // #endif
+      // #ifndef APP
+      const urlObj = options as UTSJSONObject;
+      url = (urlObj.url != null) ? (urlObj.url as string) : '';
+      // #endif
+    }
+    return doIntercept(url);
+  }
+};
+
+/**
+ * 地图选点调用拦截器（默认直接放行）
+ */
+export const chooseLocationInterceptor: Interceptor = {
+  invoke(_options: any): boolean {
+    return true;
+  }
+};
+
+/**
+ * 全局路由拦截安装器
+ */
+export function installRouteInterceptor() {
+  uni.addInterceptor('navigateTo', navigateToInterceptor);
+  uni.addInterceptor('reLaunch', reLaunchInterceptor);
+  uni.addInterceptor('redirectTo', redirectToInterceptor);
+  uni.addInterceptor('switchTab', switchTabInterceptor);
+  uni.addInterceptor('chooseLocation', chooseLocationInterceptor);
+}
+
+/**
+ * 校验并处理直接进入（如 H5 直链、小程序分享链接等）的路由场景，补充权限校验
+ */
+export function checkDirectEntry(options: UTSJSONObject | null) {
+  if (options != null) {
+    const pathVal = options.path as string | null;
+    if (pathVal != null && pathVal != '') {
+      let url = `/${pathVal}`;
+      // #ifdef H5
+      let h5Url = '';
+      const hash = window.location.hash;
+      if (hash.startsWith('#/')) {
+        h5Url = hash.substring(1);
+      }
+      else {
+        h5Url = window.location.pathname + window.location.search;
+      }
+      if (h5Url != '' && h5Url != '/') {
+        url = h5Url;
+      }
+      // #endif
+      navigateToInterceptor.invoke({ url } as any);
+    }
+  }
+}

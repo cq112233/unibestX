@@ -10,7 +10,7 @@ export const customTabbarConfig: TabBarConfig = {
    * - 'capsule': 悬浮胶囊岛屿样式
    * - 'default': 标准贴底样式（支持中间凸起鼓包 midButton）
    */
-  type: 'capsule',
+  type: 'default',
   color: '@tabBarColor',
   selectedColor: '@tabBarSelectedColor',
   backgroundColor: '@tabBarBackgroundColor',
@@ -29,20 +29,20 @@ export const customTabbarConfig: TabBarConfig = {
    * 请在 .env 中配置 VITE_TABBAR_MODE=2（自定义 TabBar 模式），组件层支持 100% 全端一致渲染。
    * 💡 提示：若不需要 midButton，直接用行注释（//）或块注释把该属性包起来即可，插件已自动过滤注释，不会同步到 pages.json
    */
-  // midButton: {
-  //   width: '50px',
-  //   height: '50px',
-  //   text: 'tabbar.ai',
-  //   pagePath: 'src/pages/ai/ai',
-  //   iconType: 'icon',
-  //   icon: 'chatboxes',
-  //   iconActive: 'chatboxes-filled',
-  //   iconPath: 'static/tabbar/AI.png',
-  //   selectedIconPath: 'static/tabbar/AI_fill.png',
-  //   iconWidth: '24px',
-  //   badge: null,
-  //   isBulge: true
-  // },
+  midButton: {
+    width: '50px',
+    height: '50px',
+    text: 'tabbar.ai',
+    pagePath: 'src/pages/ai/ai',
+    iconType: 'icon',
+    icon: 'chatboxes',
+    iconActive: 'chatboxes-filled',
+    iconPath: 'static/tabbar/AI.png',
+    selectedIconPath: 'static/tabbar/AI_fill.png',
+    iconWidth: '24px',
+    badge: null,
+    isBulge: true
+  },
   /**
    * ⚠️ type（业务标识）
    * 每项的 `type` 是该 Tab 的业务唯一标识，供 onTabShow / onTabPageShow 订阅：

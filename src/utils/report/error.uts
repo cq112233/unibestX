@@ -1,0 +1,212 @@
+/**
+ * 全局错误上报钩子
+ *
+ * 与 track 同思路：只留钩子不给实现，不绑厂商 SDK、不注册回调函数引用。
+ * 接入方式二选一：
+ * 1. setErrorReportUrl('https://api.xxx/client-error')，再在 onErrorReportStub 内发请求
+ * 2. 直接改 onErrorReportStub，发到自有日志服务
+ *
+ * 上报前会用 maskSensitive 抹掉 token / 手机号等，避免敏感信息外泄。
+ */
+
+import { isProd } from '@/src/config/index.uts';
+import { currentPagePath } from './internal/common.uts';
+
+export type ErrorReportPayload = {
+  message: string;
+  stack: string;
+  page: string;
+  time: number;
+};
+
+/** 上报地址；为空表示未配置，只打本地日志 */
+let reportUrl: string = '';
+
+/** 配置上报地址（空则只打本地日志） */
+export function setErrorReportUrl(url: string): void {
+  reportUrl = url;
+}
+
+/** 当前错误上报地址 */
+export function getErrorReportUrl(): string {
+  return reportUrl;
+}
+
+// ==========================================
+// 脱敏
+// ==========================================
+
+/** 手机号脱敏：13800138000 → 138****8000 */
+function maskMobile(text: string): string {
+  let out = text;
+  let i = 0;
+  while (i + 11 <= out.length) {
+    if (out.charAt(i) == '1') {
+      let allDigit = true;
+      for (let j = 1; j < 11; j++) {
+        const c = out.charAt(i + j);
+        if (c < '0' || c > '9') {
+          allDigit = false;
+          break;
+        }
+      }
+      if (allDigit) {
+        const full = out.substring(i, i + 11);
+        out = `${out.substring(0, i) + full.substring(0, 3)}****${full.substring(7)}${out.substring(i + 11)}`;
+        i = i + 11;
+        continue;
+      }
+    }
+    i = i + 1;
+  }
+  return out;
+}
+
+/** 密钥 / token 脱敏：保留首尾各 4 位 */
+function maskSecret(text: string): string {
+  if (text.length <= 8) {
+    return '****';
+  }
+  return `${text.substring(0, 4)}****${text.substring(text.length - 4)}`;
+}
+
+/** 需要脱敏的字段名（含 Authorization 等常见写法） */
+const SENSITIVE_KEYS: Array<string> = ['token', 'accessToken', 'refreshToken', 'password', 'authorization'];
+
+/**
+ * 抹掉文本中的敏感信息。
+ *
+ * 覆盖两种常见形态：JSON 里的 "key":"value"，以及 key=value 形式的串。
+ */
+export function maskSensitive(text: string): string {
+  let out = maskMobile(text);
+  for (let k = 0; k < SENSITIVE_KEYS.length; k++) {
+    const key = SENSITIVE_KEYS[k];
+    const patterns: Array<string> = [`"${key}":"`, `"${key}": "`, `${key}=`];
+    for (let p = 0; p < patterns.length; p++) {
+      const needle = patterns[p];
+      const isQuoted = needle.includes('"');
+      let from = 0;
+      while (true) {
+        const idx = out.indexOf(needle, from);
+        if (idx < 0) {
+          break;
+        }
+        const start = idx + needle.length;
+        let end = start;
+        if (isQuoted) {
+          end = out.indexOf('"', start);
+          if (end < 0) {
+            end = out.length;
+          }
+        }
+        else {
+          while (end < out.length) {
+            const c = out.charAt(end);
+            if (c == '&' || c == ' ' || c == ',' || c == '}') {
+              break;
+            }
+            end = end + 1;
+          }
+        }
+        const masked = maskSecret(out.substring(start, end));
+        out = out.substring(0, start) + masked + out.substring(end);
+        from = start + masked.length;
+      }
+    }
+  }
+  return out;
+}
+
+// ==========================================
+// 上报
+// ==========================================
+
+/**
+ * 业务覆盖此 stub 实现真实上报（保持签名，勿改为传函数引用注册）。
+ * 默认只在已配置 reportUrl 且生产环境时提示，不会误打到未知域名。
+ */
+export function onErrorReportStub(payload: ErrorReportPayload): void {
+  if (reportUrl.length == 0) {
+    return;
+  }
+  if (!isProd()) {
+    return;
+  }
+  // 占位：对接时在此 httpPost(reportUrl, payload)
+  console.log('[error-report] stub →', reportUrl, payload.message, payload.page);
+}
+
+/** 从任意错误对象提取可读 message，附加上调用方传入的说明 */
+function buildMessage(err: any | null, extraMessage: string): string {
+  const prefix = extraMessage;
+  if (err == null) {
+    return prefix.length > 0 ? prefix : 'unknown';
+  }
+  if (typeof err == 'string') {
+    const s = err as string;
+    return prefix.length == 0 ? s : `${prefix} | ${s}`;
+  }
+  try {
+    const obj = err as UTSJSONObject;
+    const msg = obj.message;
+    if (msg != null) {
+      const m = `${msg}`;
+      return prefix.length == 0 ? m : `${prefix} | ${m}`;
+    }
+  }
+  catch (_) {}
+  try {
+    return prefix.length > 0 ? prefix : JSON.stringify(err);
+  }
+  catch (_) {
+    return prefix.length > 0 ? prefix : '[unknown error]';
+  }
+}
+
+function buildStack(err: any | null): string {
+  if (err == null || typeof err == 'string') {
+    return '';
+  }
+  try {
+    const obj = err as UTSJSONObject;
+    const stk = obj.stack;
+    if (stk != null) {
+      return `${stk}`;
+    }
+  }
+  catch (_) {}
+  return '';
+}
+
+/**
+ * 记录并尝试上报一个错误。
+ * @param err 错误对象；可为 Error / 字符串 / 任意对象
+ * @param extraMessage 附加说明（如「自动检查更新失败」）
+ */
+export function reportError(err: any | null, extraMessage: string = ''): void {
+  const message = maskSensitive(buildMessage(err, extraMessage));
+  const rawStack = buildStack(err);
+  // 堆栈里也可能带敏感信息（如请求 URL 上的 token）
+  const stack = rawStack.length > 0 ? maskSensitive(rawStack) : '';
+
+  console.error('[error-report]', message, stack.length > 0 ? stack : '');
+
+  const payload: ErrorReportPayload = {
+    message,
+    stack,
+    page: currentPagePath(),
+    time: Date.now()
+  } as ErrorReportPayload;
+  try {
+    onErrorReportStub(payload);
+  }
+  catch (e) {
+    console.error('[error-report] stub threw', e);
+  }
+}
+
+/** 仅上报文案（无 Error 对象） */
+export function reportErrorMessage(message: string): void {
+  reportError(null, message);
+}

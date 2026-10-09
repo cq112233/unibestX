@@ -32,9 +32,11 @@
   }
   ```
 
-- **全局监听与解绑规范**：
-  - 调用 `uni.onKeyboardHeightChange` 注册全局监听时，回调函数入参类型必须声明为 `(res: OnKeyboardHeightChangeCallbackResult) => void`，其返回值为一个 `number` 类型的监听器 ID（如 `keyboardListenerId`）；
-  - **重要限制**：解绑全局监听时，**必须调用 `uni.offKeyboardHeightChange(keyboardListenerId)` 并传入监听器 ID（`number`）**，严禁传入回调函数自身（否则 Kotlin 编译报错：`参数类型不匹配：实际类型为 'KFunction1<...>'，预期类型为 'Number?'`）。
+- **全局监听与解绑规范（仅限微信小程序等特定平台）**：
+  - **平台限制铁律**：全局 API `uni.onKeyboardHeightChange` 与 `uni.offKeyboardHeightChange` **在 App 原生端（Android / iOS）不被支持**！直接调用会导致 Kotlin 编译失败：`error: 请检查 uni.onKeyboardHeightChange 的拼写是否正确，或确认当前 HBuilderX 版本在当前平台是否支持此 API`；
+  - **正确用法**：全局键盘监听一律必须用条件编译包裹 `// #ifdef MP-WEIXIN`；在 App 原生端如果需要响应键盘高度，必须通过 `<input>` 或 `<textarea>` 组件级的 `@keyboardheightchange` 事件进行响应；
+  - 在支持的平台（如微信小程序）注册全局监听时，回调函数入参类型必须声明为 `(res: OnKeyboardHeightChangeCallbackResult) => void`，其返回值为一个 `number` 类型的监听器 ID（如 `keyboardListenerId`）；
+  - 解绑全局监听时，**必须调用 `uni.offKeyboardHeightChange(keyboardListenerId)` 并传入监听器 ID（`number`）**，严禁传入回调函数自身（否则 Kotlin 编译报错：`参数类型不匹配：实际类型为 'KFunction1<...>'，预期类型为 'Number?'`）。
 
 ## 3.4 原生文档预览 API (openDocument) 参数限制
 

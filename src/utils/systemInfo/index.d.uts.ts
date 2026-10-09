@@ -25,6 +25,37 @@ export declare const NAVBAR_CONTENT_HEIGHT: number;
 /** TabBar 默认基准高度（单位 px，标准 50px） */
 export declare const TABBAR_BASE_HEIGHT: number;
 
+/** 是否为 Android App 原生平台 */
+export declare const isAppAndroid: boolean;
+
+/** 是否为 iOS App 原生平台 */
+export declare const isAppIos: boolean;
+
+/** 是否为 HarmonyOS (鸿蒙) App 原生平台 */
+export declare const isAppHarmony: boolean;
+
+/** 是否为 Web / H5 平台 */
+export declare const isWeb: boolean;
+
+/** 是否为 微信小程序平台 */
+export declare const isWeixinMp: boolean;
+
+/** 是否为 支付宝小程序平台 */
+export declare const isAlipayMp: boolean;
+
+/** 是否为 App 原生平台（Android / iOS / HarmonyOS） */
+export declare const isApp: boolean;
+
+/** 是否为 小程序平台（微信 / 支付宝） */
+export declare const isMp: boolean;
+
+/** 别名兼容导出 */
+export declare const isAndroid: boolean;
+export declare const isIos: boolean;
+export declare const isHarmony: boolean;
+export declare const isH5: boolean;
+export declare const isWechatMp: boolean;
+
 /** 系统信息变更计数器（每次 updateAvailableHeight 自增） */
 // eslint-disable-next-line import/no-mutable-exports
 export declare let systemId: number;
@@ -233,6 +264,37 @@ export declare class SystemUtils {
 
   /** TabBar 默认基准高度（50px） */
   readonly TABBAR_BASE_HEIGHT: number;
+
+  /** 是否为 Android App 原生平台 */
+  readonly isAppAndroid: boolean;
+
+  /** 是否为 iOS App 原生平台 */
+  readonly isAppIos: boolean;
+
+  /** 是否为 HarmonyOS (鸿蒙) App 原生平台 */
+  readonly isAppHarmony: boolean;
+
+  /** 是否为 Web / H5 平台 */
+  readonly isWeb: boolean;
+
+  /** 是否为 微信小程序平台 */
+  readonly isWeixinMp: boolean;
+
+  /** 是否为 支付宝小程序平台 */
+  readonly isAlipayMp: boolean;
+
+  /** 是否为 App 原生平台（Android / iOS / HarmonyOS） */
+  readonly isApp: boolean;
+
+  /** 是否为 小程序平台（微信 / 支付宝） */
+  readonly isMp: boolean;
+
+  /** 别名兼容 */
+  readonly isAndroid: boolean;
+  readonly isIos: boolean;
+  readonly isHarmony: boolean;
+  readonly isH5: boolean;
+  readonly isWechatMp: boolean;
 
   /** 系统信息全局响应式 ref（与顶层具名导出的 systemInfo 是同一个 ref 实例） */
   readonly systemInfo: Ref<SystemInfoType | null>;
