@@ -53,7 +53,6 @@
 
 <script setup lang="uts">
 import { ref } from 'vue';
-import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/utils/refresh';
 
 definePage({
   layout: 'navbar',
@@ -64,15 +63,6 @@ definePage({
     navigationBarTitleText: 'up-list 双列表嵌套',
     navigationStyle: 'custom'
   }
-});
-
-// 监听 navbar 自定义下拉刷新事件（在 enablePullDownRefresh: true 时生效）
-onNavbarPullDownRefresh(() => {
-  // 执行下拉刷新业务逻辑（如重新请求接口获取最新数据）
-  setTimeout(() => {
-    // 数据加载完毕后，手动停止下拉刷新动画状态
-    stopNavbarPullDownRefresh();
-  }, 1000);
 });
 
 const listItems = ref([
@@ -149,18 +139,18 @@ function onListRefresh(): void {
   flex-direction: row;
   align-items: center;
   padding: 16px;
-  background-color: #ffffff;
   border-bottom: 1px solid #f5f5f5;
+  background-color: #ffffff;
 }
 .demo-list-cell-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 4px;
-  margin-right: 12px;
-  background-color: #2979ff;
   display: flex;
   justify-content: center;
   align-items: center;
+  width: 40px;
+  height: 40px;
+  margin-right: 12px;
+  border-radius: 4px;
+  background-color: #2979ff;
 }
 .demo-list-cell-content {
   flex: 1;
