@@ -58,6 +58,20 @@ export function getDefaultTheme(): string {
 }
 
 /**
+ * 获取默认外观模式（全端从 import.meta.env.VITE_DEFAULT_THEME_MODE 读取，合法值：auto | light | dark，未配置或非法值时兜底 auto）
+ */
+export function getDefaultThemeMode(): ThemeMode {
+  const envMode = `${import.meta.env.VITE_DEFAULT_THEME_MODE ?? ''}`.trim().toLowerCase();
+  if (envMode == 'light') {
+    return 'light';
+  }
+  if (envMode == 'dark') {
+    return 'dark';
+  }
+  return 'auto';
+}
+
+/**
  * 全局主题色（响应式）：由 app store 在主题变更时写入，TabBar 各 UI 组件读取。
  * 迁入主题域后 store 不再反向依赖 tabbar。
  */
@@ -350,6 +364,11 @@ export class ThemeUtils {
   /** 获取默认主题主色调 */
   getDefaultTheme(): string {
     return getDefaultTheme();
+  }
+
+  /** 获取默认外观模式（'auto' | 'light' | 'dark'） */
+  getDefaultThemeMode(): ThemeMode {
+    return getDefaultThemeMode();
   }
 
   /** 获取当前系统 / 宿主主题（'dark' | 'light'） */

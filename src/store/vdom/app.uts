@@ -4,6 +4,7 @@ import {
   applyThemeColor,
   applyThemeMode,
   getDefaultTheme,
+  getDefaultThemeMode,
   getSystemTheme,
   isDarkMode,
   themeColor
@@ -27,11 +28,13 @@ function syncUViewTheme(color: string): void {
   }
 }
 
+const defaultMode = getDefaultThemeMode();
+
 const defaultAppState: IAppState = {
   theme: getDefaultTheme(),
   locale: getDefaultLocale(),
-  themeMode: 'auto',
-  isDark: isDarkMode('auto'),
+  themeMode: defaultMode,
+  isDark: isDarkMode(defaultMode),
   mode: 'vdom'
 };
 
@@ -44,8 +47,8 @@ export class AppStore extends PiniaStoreBase {
   state: IAppState = reactive<IAppState>({
     theme: getDefaultTheme(),
     locale: getDefaultLocale(),
-    themeMode: 'auto',
-    isDark: isDarkMode('auto'),
+    themeMode: defaultMode,
+    isDark: isDarkMode(defaultMode),
     mode: 'vdom'
   });
 
@@ -107,7 +110,7 @@ export class AppStore extends PiniaStoreBase {
         this.state.themeMode = modeVal;
       }
       else {
-        this.state.themeMode = 'auto';
+        this.state.themeMode = defaultMode;
       }
     }
     else if (_data.isDark != null) {
