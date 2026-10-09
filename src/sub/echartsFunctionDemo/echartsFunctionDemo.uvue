@@ -257,7 +257,7 @@ const pieOption = {
 
 function initEchart(): void {
   if (echartRef.value != null) {
-    const chart = echartRef.value as any;
+    const chart = echartRef.value as ComponentPublicInstance;
     chart.$callMethod('init', lineOption);
   }
 }
@@ -265,7 +265,7 @@ function initEchart(): void {
 function changeToLine(): void {
   currentType.value = 'line';
   if (echartRef.value != null) {
-    const chart = echartRef.value as any;
+    const chart = echartRef.value as ComponentPublicInstance;
     chart.$callMethod('setOption', lineOption);
   }
 }
@@ -273,7 +273,7 @@ function changeToLine(): void {
 function changeToBar(): void {
   currentType.value = 'bar';
   if (echartRef.value != null) {
-    const chart = echartRef.value as any;
+    const chart = echartRef.value as ComponentPublicInstance;
     chart.$callMethod('setOption', barOption);
   }
 }
@@ -281,7 +281,7 @@ function changeToBar(): void {
 function changeToPie(): void {
   currentType.value = 'pie';
   if (echartRef.value != null) {
-    const chart = echartRef.value as any;
+    const chart = echartRef.value as ComponentPublicInstance;
     chart.$callMethod('setOption', pieOption);
   }
 }
@@ -293,7 +293,7 @@ const windowWidth = computed((): number => {
 watch(windowWidth, () => {
   setTimeout(() => {
     if (echartRef.value != null) {
-      const chart = echartRef.value as any;
+      const chart = echartRef.value as ComponentPublicInstance;
       chart.$callMethod('re' + 'size');
     }
   }, 100);

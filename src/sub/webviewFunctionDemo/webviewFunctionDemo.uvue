@@ -43,9 +43,9 @@ onLoad((options: UTSJSONObject | null) => {
   targetUrl.value = defaultDemoUrl;
 });
 
-function onWebviewMessage(event: any): void {
-  const detail = event?.detail as UTSJSONObject | null;
-  const data = detail != null ? (detail['data'] as Array<any> | null) : null;
+function onWebviewMessage(event: UniWebViewMessageEvent): void {
+  const detail = event.detail;
+  const data = detail.data;
   if (data != null && data.length > 0) {
     const lastItem = data[data.length - 1] as UTSJSONObject;
     const msgType = lastItem['type'] as string | null;

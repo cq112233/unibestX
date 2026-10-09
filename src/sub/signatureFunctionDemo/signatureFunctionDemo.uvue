@@ -188,7 +188,7 @@ onUnmounted(() => {
 });
 
 function onAction(type: string): void {
-  const el = sigRef.value as any;
+  const el = sigRef.value;
   if (el == null) {
     uni.showToast({ title: '签名组件未就绪', icon: 'none' });
     return;

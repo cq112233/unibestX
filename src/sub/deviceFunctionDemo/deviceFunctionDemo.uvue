@@ -956,7 +956,7 @@ function handleHideKeyboard(): void {
 }
 
 onMounted(() => {
-  // #ifdef APP || MP-WEIXIN
+  // #ifdef MP-WEIXIN
   keyboardChangeCallback = (res: OnKeyboardHeightChangeCallbackResult): void => {
     keyboardHeight.value = Math.ceil(res.height);
   };
@@ -969,7 +969,7 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-  // #ifdef APP || MP-WEIXIN
+  // #ifdef MP-WEIXIN
   if (keyboardListenerId != -1) {
     (uni.offKeyboardHeightChange as any)(keyboardListenerId);
     keyboardListenerId = -1;

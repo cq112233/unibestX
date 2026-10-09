@@ -317,6 +317,13 @@ declare global {
     };
   };
 
+  /** web-view 组件 @message 回调参数类型 */
+  type UniWebViewMessageEvent = {
+    detail: {
+      data: Array<UTSJSONObject>;
+    };
+  };
+
   /** uni.onKeyboardHeightChange 的回调参数 */
   type OnKeyboardHeightChangeCallbackResult = {
     height: number;
@@ -525,7 +532,16 @@ declare module './src/tabbar' {
   export * from '@/src/tabbar/index.uts';
 }
 
+declare module 'vue' {
+  export interface ComponentCustomProperties {
+    $callMethod: (name: string, ...args: any[]) => any;
+  }
+}
+
 declare module '@vue/runtime-core' {
+  export interface ComponentCustomProperties {
+    $callMethod: (name: string, ...args: any[]) => any;
+  }
   export interface GlobalComponents {
     A1: typeof import('../components/A1/A1.uvue')['default'];
     NavBar: typeof import('../components/NavBar/NavBar.uvue')['default'];
