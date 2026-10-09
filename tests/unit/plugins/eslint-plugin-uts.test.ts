@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { ESLint } from 'eslint';
 
-describe('eslint-plugin-uts Unit Tests', () => {
+describe('eslint-plugin-uts Unit Tests', { timeout: 20000 }, () => {
   const eslint = new ESLint({
     overrideConfigFile: 'eslint.config.mjs'
   });

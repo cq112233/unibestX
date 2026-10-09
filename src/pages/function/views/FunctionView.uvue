@@ -46,7 +46,7 @@
 </template>
 
 <script setup lang="uts">
-import { curIdx, onTabPageShow, onTabShow } from '@/src/tabbar/index.uts';
+import { curIdx, onTabPageShow, onTabShow, resolveTabIndexByKey } from '@/src/tabbar/index.uts';
 import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/layouts/navbar/utils/index.uts';
 import { systemInfo } from '@/src/utils/systemInfo/index.uts';
 
@@ -144,7 +144,7 @@ function navigateToDemo(url: string): void {
 function refreshData(): void {
   console.log('功能页面刷新中...');
   setTimeout(() => {
-    if (curIdx.value != 2) {
+    if (curIdx.value != resolveTabIndexByKey('function')) {
       return;
     }
     console.log('功能页面刷新成功');
@@ -154,18 +154,18 @@ function refreshData(): void {
 
 // 监听 navbar 自定义下拉刷新事件
 onNavbarPullDownRefresh(() => {
-  if (curIdx.value == 2) {
+  if (curIdx.value == resolveTabIndexByKey('function')) {
     refreshData();
   }
 });
 
-// 监听 Tab 切换到当前功能页（索引 2）
-onTabShow(2, () => {
+// 监听 Tab 切换到当前功能页（config.uts 中 type: 'function'）
+onTabShow('function', () => {
   console.log('onTabShow 功能 Tab 显示');
 }, true);
 
 // 监听功能 Tab 页面显示
-onTabPageShow(2, () => {
+onTabPageShow('function', () => {
   console.log('onTabPageShow 功能 Tab 显示');
 }, true);
 

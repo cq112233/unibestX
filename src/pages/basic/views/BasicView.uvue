@@ -46,7 +46,7 @@
 </template>
 
 <script setup lang="uts">
-import { curIdx, onTabPageShow, onTabShow } from '@/src/tabbar/index.uts';
+import { curIdx, onTabPageShow, onTabShow, resolveTabIndexByKey } from '@/src/tabbar/index.uts';
 import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/layouts/navbar/utils/index.uts';
 import { systemInfo } from '@/src/utils/systemInfo/index.uts';
 
@@ -137,7 +137,7 @@ function navigateToDemo(url: string): void {
 function refreshData(): void {
   console.log('基础页面刷新中...');
   setTimeout(() => {
-    if (curIdx.value != 1) {
+    if (curIdx.value != resolveTabIndexByKey('basic')) {
       return;
     }
     console.log('基础页面刷新成功');
@@ -147,18 +147,18 @@ function refreshData(): void {
 
 // 监听 navbar 自定义下拉刷新事件
 onNavbarPullDownRefresh(() => {
-  if (curIdx.value == 1) {
+  if (curIdx.value == resolveTabIndexByKey('basic')) {
     refreshData();
   }
 });
 
-// 监听 Tab 切换到当前基础页（索引 1）
-onTabShow(1, () => {
+// 监听 Tab 切换到当前基础页（config.uts 中 type: 'basic'）
+onTabShow('basic', () => {
   console.log('onTabShow 基础 Tab 显示');
 }, true);
 
 // 监听基础 Tab 页面显示
-onTabPageShow(1, () => {
+onTabPageShow('basic', () => {
   console.log('onTabPageShow 基础 Tab 显示');
 }, true);
 
