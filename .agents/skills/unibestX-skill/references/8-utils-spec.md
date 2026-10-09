@@ -174,7 +174,7 @@ if (isDev()) {
   - `hideLoading()`：安全关闭加载遮罩（防未开启时报错）。
 - **规则**：严禁散落手写 `uni.showToast({ title: '...', icon: 'none' })`。
 
-### 8.4.2 路由与页面跳转：`@/src/utils/route/index.uts`
+### 8.4.2 路由与页面跳转：`@/src/router/index.uts`
 
 - **导出方法 / 单例**：
   - `router.push(url: string)`：普通页面跳转（自带安全校验与参数编码）。
@@ -204,6 +204,14 @@ if (isDev()) {
 - **导出方法**：
   - `useBackPress(callback: () => boolean)`：安全监听 Android 原生物理返回键，返回 `true` 表示拦截默认返回行为。
 
+### 8.4.6 文件上传与 OSS：`@/src/http/upload.uts`
+
+- **架构定位**：文件上传属于网络传输范畴，收敛在 `@/src/http/upload.uts`（与 `request.uts`、`stream.uts` 并列）。
+- **导出方法 / 单例**：
+  - `uploadFile(options: UploadFileOptions): Promise<string>`：全平台原生文件上传。
+  - `uploadOssFile(filePath: string, formData?, ignoreAuth?): Promise<string>`：快捷上传图片到 OSS。
+  - `upload` / `uploadUtils`：上传工具全局单例。
+
 ---
 
 ## 8.5 模块引用与路径铁律
@@ -214,7 +222,7 @@ if (isDev()) {
    ```ts
    // ✅ 正确规范写法
    import { availableHeight, statusBarHeight } from '@/src/utils/systemInfo/index.uts';
-   import { getApiBaseUrl, isDev } from '@/src/utils/env/index.uts';
+   import { getApiBaseUrl, isDev } from '@/src/config/index.uts';
    import { toast, showLoading, hideLoading } from '@/src/utils/toast/index.uts';
 
    // ❌ 错误穿透写法
@@ -228,11 +236,11 @@ if (isDev()) {
 
    ```ts
    // ✅ 优先引入具名函数
-   import { isDev, getApiBaseUrl } from '@/src/utils/env/index.uts';
+   import { isDev, getApiBaseUrl } from '@/src/config/index.uts';
    if (isDev()) { ... }
 
    // ❌ 避免在原生端解构纯对象中的函数导出（Kotlin 端可能报 Function invocation expected）
-   // import { env } from '@/src/utils/env/index.uts';
+   // import { env } from '@/src/config/index.uts';
    // const { isDev } = env; // ❌ 容易出问题
    ```
 

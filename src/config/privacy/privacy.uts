@@ -1,0 +1,108 @@
+/**
+ * 隐私合规配置与授权闸门
+ *
+ * 1. 静态配置：上架前填写 userAgreementUrl / privacyPolicyUrl / companyName。
+ * 2. 运行时授权：hasPrivacyAgreed / setPrivacyAgreed / needsPrivacyReconfirm / runPrivacyGate。
+ */
+
+import { getCurrentPath } from '@/src/router/index.uts';
+
+export type PrivacyConfig = {
+  /** 《用户协议》链接 */
+  userAgreementUrl: string;
+  /** 《隐私政策》链接 */
+  privacyPolicyUrl: string;
+  /** 协议版本号：内容更新时递增，老用户会被要求重新确认 */
+  policyVersion: string;
+  /**
+   * 公司 / 开发者名称，留空则回退用 getAppTitle()（取自 VITE_APP_TITLE）。
+   * 应用名不做独立配置项，避免与项目已有的 env 配置重复。
+   */
+  companyName: string;
+};
+
+export const privacyConfig: PrivacyConfig = {
+  // TODO: 换成真实地址，留空时点击会 toast 提示
+  userAgreementUrl: '',
+  privacyPolicyUrl: '',
+  // 协议内容有实质变更时递增（如 '1.0.0' -> '1.0.1'），触发老用户再确认
+  policyVersion: '1.0.0',
+  companyName: ''
+};
+
+const KEY_AGREED = 'privacy_agreed';
+const KEY_VERSION = 'privacy_agreed_version';
+const AGREED_VALUE = '1';
+
+/** 隐私页路径（首启闸门与再确认共用，用 mode 区分场景） */
+export const PRIVACY_PAGE = '/src/sub/privacy/privacy';
+/** 再确认场景的 query 标记，对应隐私页 onLoad 里读的 mode 参数 */
+export const MODE_RECONFIRM = 'reconfirm';
+
+/** 是否已同意隐私政策（不校验版本） */
+export function hasPrivacyAgreed(): boolean {
+  const v = uni.getStorageSync(KEY_AGREED);
+  return v != null && v == AGREED_VALUE;
+}
+
+/** 本地记录的用户已同意的协议版本；无记录返回空串 */
+export function getAgreedPrivacyVersion(): string {
+  const v = uni.getStorageSync(KEY_VERSION);
+  if (v == null || v == '') {
+    return '';
+  }
+  return `${v}`;
+}
+
+/** 写入同意状态，并记录当前政策版本 */
+export function setPrivacyAgreed(): void {
+  uni.setStorageSync(KEY_AGREED, AGREED_VALUE);
+  uni.setStorageSync(KEY_VERSION, privacyConfig.policyVersion);
+}
+
+/** 清除同意状态（仅调试用，正式包不要暴露入口） */
+export function clearPrivacyAgreed(): void {
+  uni.removeStorageSync(KEY_AGREED);
+  uni.removeStorageSync(KEY_VERSION);
+}
+
+/**
+ * 是否需要因协议版本变更而重新确认。
+ *
+ * - 未首启同意：返回 false（走首启闸门，不走再确认）
+ * - 已同意但无版本记录（老数据）：返回 true，补一次确认
+ * - 已同意且版本落后：返回 true
+ */
+export function needsPrivacyReconfirm(): boolean {
+  if (!hasPrivacyAgreed()) {
+    return false;
+  }
+  const local = getAgreedPrivacyVersion();
+  if (local == '') {
+    return true;
+  }
+  return local != privacyConfig.policyVersion;
+}
+
+/**
+ * 冷启动隐私闸门：在 App.onLaunch 中调用，负责跳转与拦截。
+ *
+ * @returns true 表示已放行（可继续执行后续启动逻辑）；false 表示已跳转隐私页，
+ *          调用方应立即 return，终止本次启动流程。
+ */
+export function runPrivacyGate(): boolean {
+  // 已经在隐私页上（如热重载、从隐私页再次触发启动）时不再重复跳转，避免死循环
+  if (getCurrentPath() == PRIVACY_PAGE) {
+    return false;
+  }
+  // 隐私页走 reLaunch：不保留启动栈，用户同意后由隐私页自行进入首页
+  if (!hasPrivacyAgreed()) {
+    uni.reLaunch({ url: PRIVACY_PAGE });
+    return false;
+  }
+  if (needsPrivacyReconfirm()) {
+    uni.reLaunch({ url: `${PRIVACY_PAGE}?mode=${MODE_RECONFIRM}` });
+    return false;
+  }
+  return true;
+}

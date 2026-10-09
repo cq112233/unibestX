@@ -59,7 +59,9 @@ graph TD
   - ⚠️ **接口一律走 `@/src/api/<page>/<page>.uts`，哪怕它就在本页面对应的目录里**：`src/api/` 属于页面目录**之外**的全局层，禁用 `'../../api/mall/mall.uts'` 这类相对穿透；同页的 `types.uts` / `constants.uts` 才用相对路径。
   - **反例（本项目真实存在过）**：组件里写 `import { getScrollHeight } from '../../../../utils/systemInfo.uts'` —— 既穿透四层目录，路径本身还是错的（真实文件是 `utils/systemInfo/index.uts`）；正确写法是 `@/src/utils/systemInfo/index.uts`。
   - **为什么必须用 `@/`**：① 相对路径的层数会随组件挪位而失效；② **路径写错的后果是静默的** —— UTS / Vite 解析不到时未必报错，可能直到运行期才暴露；③ `@/` 是编译期固定映射（`@` = 项目根），文件怎么挪都不会断。
-  - **同一条规则同样适用于 `src/` 下的全局模块之间**：`src/utils/systemInfo/index.uts` 引用 `src/tabbar/config.uts`、`src/http/request.uts` 引用 `src/utils/env/index.uts` 这类**跨模块**引用，也一律写 `@/src/...`；只有**同一模块目录内部**（如 `src/tabbar/ui/default/` 引用 `src/tabbar/types`）才用相对路径。
+  - **同一条规则同样适用于 `src/` 下的全局模块之间**：
+    - **跨模块引用**一律写 `@/src/...` 绝对路径（如外部文件调用 `src/config` 必须写 `@/src/config/index.uts`；外部文件调用 `src/http` 必须写 `@/src/http/index.uts`；`src/utils/systemInfo/index.uts` 调用 `@/src/tabbar/config.uts`）；
+    - **同一模块内部**一律写相对路径 `./` 或 `../`（如 `src/config/` 里面的文件相互调用使用相对路径：`src/config/index.uts` 导出写 `./env/env.uts`，`src/config/privacy/privacy.uts` 若调用 env 写 `../env/env.uts`；`src/http/request/request.uts` 引用同模块错误处理写 `../error/error.uts`、引用内部生命周期写 `./internal/lifecycle.uts`；`src/tabbar/internal/navigate.uts` 引用 `../config.uts`；`src/i18n/utils/index.uts` 引用 `../index.uts`）。
 
 ### 铁律 2：严禁过度拆分组件（三级封顶，防套娃碎裂）
 

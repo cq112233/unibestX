@@ -591,7 +591,6 @@ import { sys } from '@/src/utils/systemInfo/index.uts';
 | `i18n/` | 非 Vue 环境下的多语言文案与导航栏 / TabBar 文案设置 | `t(key, named)` `$t(key, named)` `getI18nText(key)` `setTabbarItem()` `setNavigationBarTitle(key)`；实例 `i18nUtils` |
 | `refresh/` | 下拉刷新、滚动到底、导航栏标题与可见性、状态栏可见性的跨端联动 | `onNavbarPageScroll(cb)` `onNavbarReachBottom(cb)` `onNavbarPullDownRefresh(cb)` `stopNavbarPullDownRefresh()` `setNavbarTitle(t)` `setNavbarVisible(v)` `setHideNavbar(h)` `setHideStatusBar(h)` `isPageScrollDisabled` `isPageRefresherDisabled`；实例 `refresh` |
 | `backPress/` | Android 物理返回键双击退出 | `handleBackPressExit(): boolean` |
-| `upload/` | 文件上传（OSS 上传、进度回调、多后端返回格式兼容） | `uploadFile(options)` `uploadOssFile(filePath)` 类型 `UploadFileOptions`；实例 `upload` |
 | `rxjs-lite/` | 轻量流式处理（不依赖 RxJS 全量包） | `Observable` `Subject` `Subscription`；创建 `fromArray` `interval` `timer` `throwError`；算子 `map` `scan` `filter` `toArray` `distinctUntilChanged` `debounceTime` `throttleTime` `take` `takeUntil` `tap` `startWith` `catchError` `finalize` `unsubscribeAll` |
 
 > 💡 每个模块同时提供**扁平函数导出**与**类实例导出**（如 `toast()` 与 `toastUtils.toast()`），按项目风格任选其一即可。
@@ -950,7 +949,7 @@ src/tabbar/config.uts (唯一样本源)
 
 ### 文件上传
 
-基于原生 `uni.uploadFile` 统一封装的高性能跨端文件上传模块（[src/utils/upload/index.uts](src/utils/upload/index.uts)）：
+基于原生 `uni.uploadFile` 统一封装的高性能跨端文件上传模块（[src/http/upload.uts](src/http/upload.uts)）：
 
 - **跨端原生适配**：全端通用（App Android / iOS / HarmonyOS、微信小程序、H5）
 - **统一鉴权**：自动从 `TokenStore` 注入 `header.token`（支持 `ignoreAuth: true` 跳过鉴权）
@@ -972,7 +971,7 @@ VITE_UPLOAD_PATH=/gateway/user/sys/oss/upload/xxx  # 上传接口路由
 **调用示例**：
 
 ```uts
-import { uploadOssFile, uploadFile } from '@/src/utils/upload/index.uts';
+import { uploadOssFile, uploadFile } from '@/src/http/upload.uts';
 
 // 1. 快捷上传图片到 OSS
 uploadOssFile(filePath)

@@ -283,7 +283,7 @@
 import { computed, ref } from 'vue';
 import { foo, FOO_UPLOAD_PATH, getFooList, uploadFooFile } from '@/src/api/example.uts';
 import type { IFoo } from '@/src/api/example.uts';
-import { DEFAULT_OSS_BASE_URL } from '@/src/utils/upload/index.uts';
+import { DEFAULT_OSS_BASE_URL } from '@/src/http/index.uts';
 import { toast, toastSuccess } from '@/src/utils/toast/index.uts';
 import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/utils/refresh/index.uts';
 
@@ -520,7 +520,7 @@ async function uploadFileByPath(filePath: string) {
 }
 
 /**
- * 选择图片并上传（uploadFooFile → utils/upload/index.uts → uni.uploadFile）
+ * 选择图片并上传（uploadFooFile → http/upload.uts → uni.uploadFile）
  */
 function chooseAndUpload() {
   if (uploadLoading.value) {

@@ -4,7 +4,7 @@ import {
   ensureLeadingSlash,
   isSamePath,
   removeLeadingSlash
-} from '@/src/utils/route/index.uts';
+} from '@/src/router/index.uts';
 
 describe('route utils Unit Tests', () => {
   describe('ensureLeadingSlash', () => {

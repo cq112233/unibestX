@@ -1,0 +1,45 @@
+/**
+ * 本文件由 `scripts/gen-uts-dts.mjs` 自动生成，请勿手工编辑。
+ *
+ * 它声明 `./error.uts` 的导出面，供 TS / IDE 解析类型与补全。
+ * tsconfig 的 `allowArbitraryExtensions` 把 `./error.uts` 解析到同目录的
+ * `error.d.uts.ts`，因此本文件必须与 `error.uts` **同目录同名**，不能挪走。
+ *
+ * 修改 `error.uts` 的导出后，重新执行：node scripts/gen-uts-dts.mjs
+ * 校验是否已同步：node scripts/gen-uts-dts.mjs --check
+ */
+export type ErrorReportPayload = {
+  message: string;
+  stack: string;
+  page: string;
+  time: number;
+};
+
+/** 配置上报地址（空则只打本地日志） */
+export declare function setErrorReportUrl(url: string): void;
+
+/** 当前错误上报地址 */
+export declare function getErrorReportUrl(): string;
+
+/**
+ * 抹掉文本中的敏感信息。
+ *
+ * 覆盖两种常见形态：JSON 里的 "key":"value"，以及 key=value 形式的串。
+ */
+export declare function maskSensitive(text: string): string;
+
+/**
+ * 业务覆盖此 stub 实现真实上报（保持签名，勿改为传函数引用注册）。
+ * 默认只在已配置 reportUrl 且生产环境时提示，不会误打到未知域名。
+ */
+export declare function onErrorReportStub(payload: ErrorReportPayload): void;
+
+/**
+ * 记录并尝试上报一个错误。
+ * @param err 错误对象；可为 Error / 字符串 / 任意对象
+ * @param extraMessage 附加说明（如「自动检查更新失败」）
+ */
+export declare function reportError(err: any | null, extraMessage: string = ''): void;
+
+/** 仅上报文案（无 Error 对象） */
+export declare function reportErrorMessage(message: string): void;

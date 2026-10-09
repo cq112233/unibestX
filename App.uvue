@@ -3,10 +3,10 @@ import { checkDirectEntry } from './src/router/interceptor.uts';
 import { useAppStore } from './src/store';
 import { initNativeMidButtonTap } from '@/src/tabbar/index.uts';
 import { applyThemeColor, themeColor } from '@/src/theme/index.uts';
-import { reportError } from '@/src/utils/error-report/index.uts';
+import { reportError } from '@/src/utils/report/index.uts';
 // 隐私闸门仅 App 端启用，导入同步条件编译，避免其它端留下未使用导入
 // #ifdef APP
-import { runPrivacyGate } from '@/src/utils/privacy/index.uts';
+import { runPrivacyGate } from '@/src/config/index.uts';
 // #endif
 
 onLaunch(() => {
