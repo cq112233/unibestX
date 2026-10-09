@@ -1,0 +1,100 @@
+<template>
+  <view class="flex flex-col flex-1 bg-[#f8fafc]">
+    <scroll-view direction="vertical" class="flex-1 flex flex-col p-[16px]">
+      <view
+        class="rounded-[16px] p-[20px] mb-[16px] border-[1px] border-solid"
+        :style="{
+          backgroundColor: 'var(--card-bg, #ffffff)',
+          borderColor: 'var(--border-color, #edf2f7)'
+        }"
+      >
+        <!-- 标题区域 -->
+        <view class="flex flex-row items-center mb-[16px]">
+          <view
+            class="w-[4px] h-[16px] rounded-[2px] mr-[8px]"
+            :style="{ backgroundColor: 'var(--theme-color, #3182ce)' }"
+          />
+          <text class="text-[16px] font-bold" :style="{ color: 'var(--text-color, #2d3748)' }">路由拦截与传参测试</text>
+        </view>
+
+        <!-- 状态展示 -->
+        <view
+          class="rounded-[12px] p-[16px] mb-[16px] border-[1px] border-solid"
+          :style="{ borderColor: 'var(--border-color, #e2e8f0)' }"
+        >
+          <view class="flex-row justify-between items-center mb-[8px]">
+            <text class="text-[14px]" :style="{ color: 'var(--text-secondary, #64748b)' }">当前登录状态:</text>
+            <text :style="{ fontSize: '14px', fontWeight: 'bold', color: hasLogin ? '#10b981' : '#f43f5e' }">
+              {{ hasLogin ? '已登录' : '未登录' }}
+            </text>
+          </view>
+          <text class="text-[12px] leading-normal" :style="{ color: 'var(--text-secondary, #94a3b8)' }">
+            测试场景说明：参数接收页属于需登录拦截页面。未登录时点击跳转将拦截并重定向到登录页，登录成功后会自动跳回目标页并解析 query 传参。
+          </text>
+        </view>
+
+        <!-- 操作按钮区 -->
+        <view class="flex-row justify-between">
+          <view class="flex-1 mr-[6px]">
+            <button
+              class="w-full rounded-[8px] h-[42px] text-center text-[#ffffff] text-[14px] font-bold"
+              :style="{ backgroundColor: 'var(--theme-color, #3182ce)', lineHeight: '42px' }"
+              @click="jumpToTest"
+            >
+              跳转参数接收页 (传参)
+            </button>
+          </view>
+          <view class="flex-1 ml-[6px]">
+            <button
+              class="w-full bg-[#ef4444] rounded-[8px] h-[42px] text-center text-[#ffffff] text-[14px] font-bold"
+              :style="{ lineHeight: '42px' }"
+              @click="handleLogout"
+            >
+              清除登录状态
+            </button>
+          </view>
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed } from 'vue';
+import { useTokenStore, useUserStore } from '@/src/store';
+import { toastSuccess } from '@/src/utils/toast/index.uts';
+
+definePage({
+  debug: false,
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
+  style: {
+    navigationBarTitleText: '路由拦截与传参',
+    navigationStyle: 'custom'
+  }
+});
+
+const tokenStore = useTokenStore();
+const userStore = useUserStore();
+
+const hasLogin = computed((): boolean => {
+  return tokenStore.hasValidLogin();
+});
+
+function jumpToTest(): void {
+  uni.navigateTo({
+    url: '/src/sub/routerParamsBasicDemo/routerParamsBasicDemo?id=999&name=UNIX'
+  });
+}
+
+function handleLogout() {
+  tokenStore.clearToken();
+  userStore.clearUserInfo();
+  toastSuccess('已清除登录状态');
+}
+</script>
+
+<style scoped>
+</style>

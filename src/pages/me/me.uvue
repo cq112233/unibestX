@@ -5,7 +5,6 @@
 <script setup lang="uts">
 import MeView from './views/MeView.uvue';
 import { handleBackPressExit } from '@/src/utils/backPress/index.uts';
-import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/utils/refresh/index.uts';
 import { notifyPageHide, notifyPageShow, setCurIdxByKey } from '@/src/tabbar/index.uts';
 
 definePage({
@@ -29,13 +28,6 @@ onShow(() => {
 
 onHide(() => {
   notifyPageHide();
-});
-
-onNavbarPullDownRefresh(() => {
-  // 执行下拉刷新业务逻辑（例如重新获取数据）
-  setTimeout(() => {
-    stopNavbarPullDownRefresh();
-  }, 1000);
 });
 
 onBackPress((options: OnBackPressOptions): boolean => {

@@ -59,7 +59,9 @@ graph TD
   - ⚠️ **接口一律走 `@/src/api/<page>/<page>.uts`，哪怕它就在本页面对应的目录里**：`src/api/` 属于页面目录**之外**的全局层，禁用 `'../../api/mall/mall.uts'` 这类相对穿透；同页的 `types.uts` / `constants.uts` 才用相对路径。
   - **反例（本项目真实存在过）**：组件里写 `import { getScrollHeight } from '../../../../utils/systemInfo.uts'` —— 既穿透四层目录，路径本身还是错的（真实文件是 `utils/systemInfo/index.uts`）；正确写法是 `@/src/utils/systemInfo/index.uts`。
   - **为什么必须用 `@/`**：① 相对路径的层数会随组件挪位而失效；② **路径写错的后果是静默的** —— UTS / Vite 解析不到时未必报错，可能直到运行期才暴露；③ `@/` 是编译期固定映射（`@` = 项目根），文件怎么挪都不会断。
-  - **同一条规则同样适用于 `src/` 下的全局模块之间**：`src/utils/systemInfo/index.uts` 引用 `src/tabbar/config.uts`、`src/http/request.uts` 引用 `src/utils/env/index.uts` 这类**跨模块**引用，也一律写 `@/src/...`；只有**同一模块目录内部**（如 `src/tabbar/ui/default/` 引用 `src/tabbar/types`）才用相对路径。
+  - **同一条规则同样适用于 `src/` 下的全局模块之间**：
+    - **跨模块引用**一律写 `@/src/...` 绝对路径（如外部文件调用 `src/config` 必须写 `@/src/config/index.uts`；外部文件调用 `src/http` 必须写 `@/src/http/index.uts`；`src/utils/systemInfo/index.uts` 调用 `@/src/tabbar/config.uts`）；
+    - **同一模块内部**一律写相对路径 `./` 或 `../`（如 `src/config/` 里面的文件相互调用使用相对路径：`src/config/index.uts` 导出写 `./env/env.uts`，`src/config/privacy/privacy.uts` 若调用 env 写 `../env/env.uts`；`src/http/request/request.uts` 引用同模块错误处理写 `../error/error.uts`、引用内部生命周期写 `./internal/lifecycle.uts`；`src/tabbar/internal/navigate.uts` 引用 `../config.uts`；`src/i18n/utils/index.uts` 引用 `../index.uts`）。
 
 ### 铁律 2：严禁过度拆分组件（三级封顶，防套娃碎裂）
 
@@ -246,7 +248,7 @@ graph TD
 ### 铁律 7：生态工具与模块方法优先（Utils & uni_modules First）
 
 - **凡是 `src/utils/` 和 `uni_modules/` 中已有现成方法或能力的，必须绝对优先使用，严禁自行重复造轮子**：
-  - **`src/utils/` 基础与业务工具**：路由跳转与传参 → `route/index.uts`（`router.push` / `replace` / `back`）；主题色读取与切换 → **`useAppStore()` 直读 `appStore.state.theme`，切换走 `appStore.setTheme(theme)`**（`src/theme` 只留给 store 自身与 tabbar 兜底，新代码禁止引用，理由见铁律 4）；弹窗与交互反馈 → `toast/index.uts`（`showSuccess` / `showError` / `showLoading`）；文案读取 → `i18n/index.uts`（`$t` / `t`）；视口与安全区 → `systemInfo/index.uts`（`availableHeight` / `systemInfo`）；下拉刷新与触底 → `refresh/index.uts`（`onNavbarPullDownRefresh` / `stopNavbarPullDownRefresh`）；物理返回键 → `backPress/index.uts`（`handleBackPressExit`）；文件上传 → `upload/index.uts`（`uploadFile`）；防抖 / 节流与响应式流 → `rxjs-lite/index.uts`。
+  - **`src/utils/` 基础与业务工具**：路由跳转与传参 → `src/router/`（`router.push` / `replace` / `back`）；主题色读取与切换 → **`useAppStore()` 直读 `appStore.state.theme`，切换走 `appStore.setTheme(theme)`**；弹窗与交互反馈 → `src/utils/toast/index.uts`（`toast` / `toastSuccess` / `toastError` / `showLoading`）；数据上报与监控 → `src/utils/report/index.uts`（`track` / `reportError`）；视口与安全区 → `src/utils/systemInfo/index.uts`（`availableHeight` / `systemInfo`）；下拉刷新与触底 → `@/src/layouts/navbar/utils/index.uts`（`onNavbarPullDownRefresh` / `stopNavbarPullDownRefresh`）；防抖 / 节流与响应式流 → `src/utils/rxjs-lite/index.uts`。
   - **`uni_modules/` 组件生态**：图标 → `<uni-icons>` / `<lime-icon>`；标签与滑动列表 → `<up-tabs>` / `<up-scroll-list>`；复杂图表 → `<e-chart>`；分页下拉 / 触底 → `<z-paging-x>`；富文本渲染与编辑 → `<mp-html>` / `<sp-editor>`；二维码与手写签名 → `<lime-qrcode>` / `<lime-signature>`；折叠面板与评分 → `<uni-collapse-x>` / `<uni-rate-x>`。
 - 严禁脱离项目现成成熟资产去手写原生重复实现，或引入未经兼容性验证的外部库。
 

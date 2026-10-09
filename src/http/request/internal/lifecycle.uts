@@ -1,0 +1,252 @@
+/**
+ * 请求生命周期管理：主动取消 / 并发去重 / TTL 缓存
+ *
+ * 三个 Map 各司其职：
+ * - taskMap      requestKey → RequestTask，供 abortHttp(key) 取消在飞请求
+ * - abortedMap   requestKey → true，标记已取消，防止竞态回调把结果继续往下喂
+ * - inflightMap  请求指纹 → Promise，GET 并发去重时后来者复用同一份结果
+ *
+ * 用法（调用方在 extra 里传 requestKey / dedupe / cacheTtl）：
+ *   http.get('/list', { extra: { requestKey: 'index-list' } as UTSJSONObject } as LimeRequestConfig)
+ *   abortHttp('index-list')   // 切页时取消该组请求
+ *   abortAllHttp()            // 退出登录等场景取消全部
+ */
+
+import type { LimeRequestConfig, LimeRequestTask } from '@/uni_modules/lime-request';
+
+/**
+ * 在飞请求任务。
+ * 存为 RequestTask 而非 LimeRequestTask 联合类型：abort() 在联合类型上
+ * 不便直接调用，而登记进来的都来自 request（UPLOAD/DOWNLOAD 走 upload 分支）。
+ * 与 lime-request 自身 `(task as RequestTask).abort()` 的写法保持一致。
+ */
+type AbortableTask = RequestTask;
+
+/** requestKey → 在飞请求任务 */
+const taskMap = new Map<string, AbortableTask>();
+
+/** requestKey → 是否已被标记取消 */
+const abortedMap = new Map<string, boolean>();
+
+/** 请求指纹 → 进行中的 Promise（GET 去重） */
+const inflightMap = new Map<string, any>();
+
+/** 内存 TTL 缓存：指纹 → { expireAt, value } */
+type CacheEntry = {
+  expireAt: number;
+  value: string;
+};
+
+const cacheMap = new Map<string, CacheEntry>();
+
+// ==========================================
+// 1. requestKey 读写
+// ==========================================
+
+/**
+ * 从 config.extra 读取字符串字段，缺失返回空串。
+ *
+ * extra 在真机上是 UTSJSONObject（走 getString），但在 H5/测试等 JS 运行时
+ * 可能是普通对象字面量（没有 getString 方法），故必须先探方法是否存在，
+ * 回退到下标取值 —— 与 request.uts 读取 ignoreAuth 的写法保持一致。
+ */
+export function readExtraString(config: LimeRequestConfig, key: string): string {
+  const extra = config.extra;
+  if (extra == null) {
+    return '';
+  }
+  const extraObj = extra as UTSJSONObject;
+  const v = typeof extraObj.getString == 'function'
+    ? extraObj.getString(key)
+    : (extraObj[key] as string | null);
+  return v != null ? v : '';
+}
+
+/** 从 config.extra 读取数字字段，缺失返回 0（取值方式说明见 readExtraString） */
+export function readExtraNumber(config: LimeRequestConfig, key: string): number {
+  const extra = config.extra;
+  if (extra == null) {
+    return 0;
+  }
+  const extraObj = extra as UTSJSONObject;
+  const v = typeof extraObj.getNumber == 'function'
+    ? extraObj.getNumber(key)
+    : (extraObj[key] as number | null);
+  return v != null ? v : 0;
+}
+
+/** 从 config.extra 读取布尔字段，缺失返回 false（取值方式说明见 readExtraString） */
+export function readExtraBoolean(config: LimeRequestConfig, key: string): boolean {
+  const extra = config.extra;
+  if (extra == null) {
+    return false;
+  }
+  const extraObj = extra as UTSJSONObject;
+  const v = typeof extraObj.getBoolean == 'function'
+    ? extraObj.getBoolean(key)
+    : (extraObj[key] as boolean | null);
+  return v != null && v == true;
+}
+
+// ==========================================
+// 2. 取消：登记 / 中止 / 判定
+// ==========================================
+
+/**
+ * 登记在飞请求，供后续 abort。
+ * 入参是 getTask 回调给的联合类型，此处统一收敛为可 abort 的 RequestTask。
+ */
+export function registerTask(requestKey: string, task: LimeRequestTask): void {
+  if (requestKey == '') {
+    return;
+  }
+  taskMap.set(requestKey, task as AbortableTask);
+}
+
+/** 请求结束后摘除登记（成功或失败都要调，避免 Map 泄漏） */
+export function clearTask(requestKey: string): void {
+  if (requestKey == '') {
+    return;
+  }
+  taskMap.delete(requestKey);
+}
+
+/** 该 requestKey 是否已被标记取消 */
+export function isAborted(requestKey: string): boolean {
+  if (requestKey == '') {
+    return false;
+  }
+  const v = abortedMap.get(requestKey);
+  return v != null && v == true;
+}
+
+/** 消费取消标记：读取并清除，避免污染同 key 的下一次请求 */
+export function consumeAborted(requestKey: string): boolean {
+  if (requestKey == '') {
+    return false;
+  }
+  if (abortedMap.get(requestKey) != true) {
+    return false;
+  }
+  abortedMap.delete(requestKey);
+  return true;
+}
+
+/**
+ * 取消指定 requestKey 的在飞请求。
+ *
+ * 先打标记再 abort：abort 触发的 fail 回调是异步的，标记能让回调认出
+ * 「这是主动取消」而不是真失败，从而不弹错误 toast。
+ */
+export function abortHttp(requestKey: string): void {
+  if (requestKey == '') {
+    return;
+  }
+  abortedMap.set(requestKey, true);
+  const task = taskMap.get(requestKey);
+  if (task != null) {
+    try {
+      task.abort();
+    }
+    catch (e) {
+      console.warn('[request] abort fail', requestKey, e);
+    }
+  }
+  taskMap.delete(requestKey);
+  inflightMap.delete(requestKey);
+  console.log('[request] abort', requestKey);
+}
+
+/** 取消全部在飞请求 */
+export function abortAllHttp(): void {
+  const keys: Array<string> = [];
+  taskMap.forEach((_task: AbortableTask, key: string) => {
+    keys.push(key);
+  });
+  for (let i = 0; i < keys.length; i++) {
+    abortHttp(keys[i]);
+  }
+}
+
+// ==========================================
+// 3. 并发去重（GET）
+// ==========================================
+
+/** 生成请求指纹：method + url + 序列化后的 data */
+export function buildRequestKey(config: LimeRequestConfig): string {
+  const method = config.method != null ? config.method : 'GET';
+  const url = config.url != null ? config.url : '';
+  let dataPart = '';
+  if (config.data != null) {
+    try {
+      dataPart = JSON.stringify(config.data);
+    }
+    catch (_) {
+      dataPart = '';
+    }
+  }
+  return `${method}|${url}|${dataPart}`;
+}
+
+/** 取进行中的同指纹请求（没有则返回 null） */
+export function getInflight<T>(fingerprint: string): Promise<T> | null {
+  const p = inflightMap.get(fingerprint);
+  if (p == null) {
+    return null;
+  }
+  return p as Promise<T>;
+}
+
+/** 登记进行中的请求，结束后自动摘除（成功失败都要摘） */
+export function setInflight<T>(fingerprint: string, task: Promise<T>): void {
+  inflightMap.set(fingerprint, task);
+  task.then((_r: T) => {
+    if (inflightMap.get(fingerprint) == task) {
+      inflightMap.delete(fingerprint);
+    }
+  }, (_e: any) => {
+    if (inflightMap.get(fingerprint) == task) {
+      inflightMap.delete(fingerprint);
+    }
+  });
+}
+
+// ==========================================
+// 4. 内存 TTL 缓存
+// ==========================================
+
+/** 写入缓存；ttlMs <= 0 不写 */
+export function setCache(fingerprint: string, value: string, ttlMs: number): void {
+  if (fingerprint == '' || ttlMs <= 0) {
+    return;
+  }
+  cacheMap.set(fingerprint, {
+    expireAt: Date.now() + ttlMs,
+    value
+  } as CacheEntry);
+}
+
+/** 读取缓存；过期则删除并返回 null */
+export function getCache(fingerprint: string): string | null {
+  if (fingerprint == '') {
+    return null;
+  }
+  const entry = cacheMap.get(fingerprint);
+  if (entry == null) {
+    return null;
+  }
+  if (Date.now() >= entry.expireAt) {
+    cacheMap.delete(fingerprint);
+    return null;
+  }
+  return entry.value;
+}
+
+/** 手动清缓存：不传 key 清全部，传 key 清单条 */
+export function clearCache(fingerprint: string = ''): void {
+  if (fingerprint == '') {
+    cacheMap.clear();
+    return;
+  }
+  cacheMap.delete(fingerprint);
+}

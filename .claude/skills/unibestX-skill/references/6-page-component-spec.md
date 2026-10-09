@@ -59,7 +59,9 @@ graph TD
   - ⚠️ **接口一律走 `@/src/api/<page>/<page>.uts`，哪怕它就在本页面对应的目录里**：`src/api/` 属于页面目录**之外**的全局层，禁用 `'../../api/mall/mall.uts'` 这类相对穿透；同页的 `types.uts` / `constants.uts` 才用相对路径。
   - **反例（本项目真实存在过）**：组件里写 `import { getScrollHeight } from '../../../../utils/systemInfo.uts'` —— 既穿透四层目录，路径本身还是错的（真实文件是 `utils/systemInfo/index.uts`）；正确写法是 `@/src/utils/systemInfo/index.uts`。
   - **为什么必须用 `@/`**：① 相对路径的层数会随组件挪位而失效；② **路径写错的后果是静默的** —— UTS / Vite 解析不到时未必报错，可能直到运行期才暴露；③ `@/` 是编译期固定映射（`@` = 项目根），文件怎么挪都不会断。
-  - **同一条规则同样适用于 `src/` 下的全局模块之间**：`src/utils/systemInfo/index.uts` 引用 `src/tabbar/config.uts`、`src/http/request.uts` 引用 `src/utils/env/index.uts` 这类**跨模块**引用，也一律写 `@/src/...`；只有**同一模块目录内部**（如 `src/tabbar/ui/default/` 引用 `src/tabbar/types`）才用相对路径。
+  - **同一条规则同样适用于 `src/` 下的全局模块之间**：
+    - **跨模块引用**一律写 `@/src/...` 绝对路径（如外部文件调用 `src/config` 必须写 `@/src/config/index.uts`；外部文件调用 `src/http` 必须写 `@/src/http/index.uts`；`src/utils/systemInfo/index.uts` 调用 `@/src/tabbar/config.uts`）；
+    - **同一模块内部**一律写相对路径 `./` 或 `../`（如 `src/config/` 里面的文件相互调用使用相对路径：`src/config/index.uts` 导出写 `./env/env.uts`，`src/config/privacy/privacy.uts` 若调用 env 写 `../env/env.uts`；`src/http/request/request.uts` 引用同模块错误处理写 `../error/error.uts`、引用内部生命周期写 `./internal/lifecycle.uts`；`src/tabbar/internal/navigate.uts` 引用 `../config.uts`；`src/i18n/utils/index.uts` 引用 `../index.uts`）。
 
 ### 铁律 2：严禁过度拆分组件（三级封顶，防套娃碎裂）
 
@@ -127,13 +129,13 @@ graph TD
   - 反之，任何「某个模块用、且将来可能换成后端接口」的数据，一律不得做成页面级共享常量，必须回到 `src/api/<page>/<page>.uts` 中该模块自己那段接口函数里。
 - **全局 UI 态（主题色 / 亮暗 / 语言…）一律从 store 取，且同样严禁逐层透传 Props**（与模块数据一样，是另一种 Props 钻孔）：
 
-  > **唯一真源是 `src/store`（app store）**：主题色、亮暗 `isDark`、语言 `locale` 都持久化在 app store 里（`persist: true`）。组件**一律 `const appStore = useAppStore()` 后直读 `appStore.state.xxx`**，不要再从 `src/utils/theme` 拿裸 ref、更不要自己 `ref` 一份或用 `import.meta.env` 另起炉灶 —— 那样会绕过持久化，出现「设置页改了主题、别的页面不跟随」。
+  > **唯一真源是 `src/store`（app store）**：主题色、亮暗 `isDark`、语言 `locale` 都持久化在 app store 里（`persist: true`）。组件**一律 `const appStore = useAppStore()` 后直读 `appStore.state.xxx`**，不要再从 `src/theme` 拿裸 ref、更不要自己 `ref` 一份或用 `import.meta.env` 另起炉灶 —— 那样会绕过持久化，出现「设置页改了主题、别的页面不跟随」。
   >
   > 🚨 **严禁对 store 读取的值做多余判断与拦截**：从 `appStore.state` 读取状态时，**严禁添加任何硬编码条件判断、黑名单拦截或私加假兜底**（例如写 `if (storeTheme.length > 0 && storeTheme != '#37c2bc') return '#a87c55'` 导致 store 里的真实主题色被静默篡改覆盖）。一律直接使用 `appStore.state.xxx`。
 
   | 全局态 | 正确的取法（各组件 `useAppStore()` 直读） | 错误写法 |
   | :--- | :--- | :--- |
-  | 主题色 | `appStore.state.theme`（常用就派生 `computed((): string => appStore.state.theme)`，**直读直用，严禁加 `if` 判断拦截**） | 页面 `computed` 出 `themeColor` 再 `:theme-color` 逐层传；或写 `if (theme != '...')` 私加判断覆盖真实主题色；或从 `@/src/utils/theme` 取裸 ref 绕过 store |
+  | 主题色 | `appStore.state.theme`（常用就派生 `computed((): string => appStore.state.theme)`，**直读直用，严禁加 `if` 判断拦截**） | 页面 `computed` 出 `themeColor` 再 `:theme-color` 逐层传；或写 `if (theme != '...')` 私加判断覆盖真实主题色；或从 `@/src/theme` 取裸 ref 绕过 store |
   | 亮 / 暗模式 | `appStore.state.isDark`（`themeMode` 为三态 `auto` / `light` / `dark`） | 页面自己 `getSystemTheme()` 判断后再层层下传 |
   | 语言 | 读文案走 `@/src/utils/i18n/index.uts`（`$t`），**切换**语言走 `appStore.setLocale(lang)` | 页面 `t()` 后把文案当 props 传 |
   | 安全区 / 屏幕尺寸 | `@/src/utils/systemInfo/index.uts`（`safeAreaBottom`、`safeAreaInsets`） | 页面量好再层层下传 |
@@ -153,7 +155,7 @@ graph TD
 
     模板里写 `:style="{ color: themeColor }"`（`<script setup>` 的绑定模板自动解包，不用 `.value`），脚本里比较 / 计算时才写 `themeColor.value`。
   - 参考实现：`src/tabbar/ui/default/TabbarItem.uvue`、`src/sub/creator/components/CreatorHeaderCard.uvue`。
-  - **历史包袱提醒**：`src/utils/theme/index.uts` 的 `activeThemeColor` 是 store 派生出来的响应式副本，早期组件大量在用它。**新代码与改到的代码一律改为上面 store 直读口径**；`activeThemeColor` 只保留给 store 自身与 tabbar 兜底使用，不要再新增引用。
+  - **历史包袱提醒**：`src/theme/index.uts` 的 `activeThemeColor` 是 store 派生出来的响应式副本，早期组件大量在用它。**新代码与改到的代码一律改为上面 store 直读口径**；`activeThemeColor` 只保留给 store 自身与 tabbar 兜底使用，不要再新增引用。
 
 ### 铁律 5：模拟数据（Mock）必须收拢进页面接口层，且按模块独立造数
 
@@ -246,7 +248,7 @@ graph TD
 ### 铁律 7：生态工具与模块方法优先（Utils & uni_modules First）
 
 - **凡是 `src/utils/` 和 `uni_modules/` 中已有现成方法或能力的，必须绝对优先使用，严禁自行重复造轮子**：
-  - **`src/utils/` 基础与业务工具**：路由跳转与传参 → `route/index.uts`（`router.push` / `replace` / `back`）；主题色读取与切换 → **`useAppStore()` 直读 `appStore.state.theme`，切换走 `appStore.setTheme(theme)`**（`src/utils/theme` 只留给 store 自身与 tabbar 兜底，新代码禁止引用，理由见铁律 4）；弹窗与交互反馈 → `toast/index.uts`（`showSuccess` / `showError` / `showLoading`）；文案读取 → `i18n/index.uts`（`$t` / `t`）；视口与安全区 → `systemInfo/index.uts`（`availableHeight` / `systemInfo`）；下拉刷新与触底 → `refresh/index.uts`（`onNavbarPullDownRefresh` / `stopNavbarPullDownRefresh`）；物理返回键 → `backPress/index.uts`（`handleBackPressExit`）；文件上传 → `upload/index.uts`（`uploadFile`）；防抖 / 节流与响应式流 → `rxjs-lite/index.uts`。
+  - **`src/utils/` 基础与业务工具**：路由跳转与传参 → `src/router/`（`router.push` / `replace` / `back`）；主题色读取与切换 → **`useAppStore()` 直读 `appStore.state.theme`，切换走 `appStore.setTheme(theme)`**；弹窗与交互反馈 → `src/utils/toast/index.uts`（`toast` / `toastSuccess` / `toastError` / `showLoading`）；数据上报与监控 → `src/utils/report/index.uts`（`track` / `reportError`）；视口与安全区 → `src/utils/systemInfo/index.uts`（`availableHeight` / `systemInfo`）；下拉刷新与触底 → `@/src/layouts/navbar/utils/index.uts`（`onNavbarPullDownRefresh` / `stopNavbarPullDownRefresh`）；防抖 / 节流与响应式流 → `src/utils/rxjs-lite/index.uts`。
   - **`uni_modules/` 组件生态**：图标 → `<uni-icons>` / `<lime-icon>`；标签与滑动列表 → `<up-tabs>` / `<up-scroll-list>`；复杂图表 → `<e-chart>`；分页下拉 / 触底 → `<z-paging-x>`；富文本渲染与编辑 → `<mp-html>` / `<sp-editor>`；二维码与手写签名 → `<lime-qrcode>` / `<lime-signature>`；折叠面板与评分 → `<uni-collapse-x>` / `<uni-rate-x>`。
 - 严禁脱离项目现成成熟资产去手写原生重复实现，或引入未经兼容性验证的外部库。
 
@@ -726,7 +728,7 @@ import type { IModuleAItem } from '@/src/api/index/index.uts';
 - [ ] **10. 长列表严禁用 `<scroll-view>`** —— 一律 `<list-view>` + `<list-item>` 或 `<z-paging-x>`；`<scroll-view>` 只用于短内容或横向滑块
 - [ ] **11. 根视图严禁持有模块业务数据** —— 只持结构级状态（分区下标 / swiper 锁 / 主题色 / 下拉信号）（铁律 4）
 - [ ] **12. 模块之间的数据、状态、mock 与接口严禁共享** —— 跨模块只传「切分区 / 跳转」这类结构级意图，且不携带业务数据（铁律 4 / 铁律 5）
-- [ ] **13. 全局 UI 态一律从 store 直读，严禁声明同名 prop 逐层透传** —— 主题色 / `isDark` 走 `appStore.state.*`，严禁从 `@/src/utils/theme` 取裸 ref 或自己 `ref` 一份（铁律 4）
+- [ ] **13. 全局 UI 态一律从 store 直读，严禁声明同名 prop 逐层透传** —— 主题色 / `isDark` 走 `appStore.state.*`，严禁从 `@/src/theme` 取裸 ref 或自己 `ref` 一份（铁律 4）
 - [ ] **14. 无人写入的状态与事件线一律不留** —— 如 `props.refreshTick` 若全页找不到写入点，连同 `watch` 与 props 声明一起删（见 3.22）
 - [ ] **15. 单个 `.uvue` / `.uts` 文件严禁超过 500 行** —— 交付前 `wc -l` 自查，只允许向下拆（铁律 2）
 - [ ] **16. 可读性优先** —— 循环与 `if` 嵌套各不超两层、单处分支不超 3 个、相似逻辑出现两遍立刻抽函数（抽函数与分组同时受 `SKILL.md` A.2 第 16 / 18 条约束）（铁律 8）

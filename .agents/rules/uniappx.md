@@ -212,6 +212,18 @@ description: uni-app X (UTS) 开发规范与踩坑避坑指南，适用于跨端
             emit("keyboardheightchange", event);
         }
         ```
+*   **键盘高度全局监听与解绑平台限制 (Global Keyboard Height Listener Restrictions)**:
+    *   **重要限制**：全局 API `uni.onKeyboardHeightChange` 与 `uni.offKeyboardHeightChange` **在 App 原生端（Android / iOS）不被支持**！直接调用会导致 Kotlin 编译报错：`error: 请检查 uni.onKeyboardHeightChange 的拼写是否正确，或确认当前 HBuilderX 版本在当前平台是否支持此 API`。
+    *   *正确做法*：全局键盘监听一律必须用条件编译包裹 `// #ifdef MP-WEIXIN`；在 App 原生端若需响应键盘高度，必须通过 `<input>` 或 `<textarea>` 组件级的 `@keyboardheightchange` 事件；解绑时向 `uni.offKeyboardHeightChange` 传入注册返回的监听器 ID（`number`），严禁传入回调函数自身。
+*   **组件实例方法动态调用必须使用 ComponentPublicInstance ($callMethod Restrictions)**:
+    *   **重要限制**：通过 `ref` 获取的组件实例，**严禁使用 `as any` 强转后调用 `$callMethod`**（如 `(el as any).$callMethod('clear')`），否则在 Kotlin 原生编译时会触发 `error: 找不到名称“$callMethod”`（error18）。UTS 对 `any` 类型不支持动态反射方法调用。
+    *   *正确做法*：声明 `ref<ComponentPublicInstance | null>(null)` 保持强类型，直接调用 `el.value?.$callMethod('clear')`。
+*   **`<web-view>` 组件 `@message` 事件入参必须显式声明类型 (UniWebViewMessageEvent)**:
+    *   **重要限制**：`<web-view>` 的 `@message` 事件回调函数入参**禁止声明为 `any` 或省略类型**。若声明为 `(e: any)`，在读取 `e.detail` 时 UTS 强类型检查会抛出 `error: 找不到名称“detail”`（error18）。
+    *   *正确做法*：显式将入参声明为官方强类型 `(e: UniWebViewMessageEvent)`。
+*   **全局开发坚持精准导入（Deep / Precise Import）原则，杜绝 Barrel 循环依赖死锁**:
+    *   **重要限制**：当某个模块使用 `index.uts` 作为聚合门面（Barrel File）并包含多个 `export *` 时，一旦被底层模块交叉引用，Java/Kotlin 类加载器在静态初始化（`<clinit>`）阶段会瞬间形成**循环引用死锁**，导致底层单例为 `null` 抛出 `NullPointerException` 与 `ExceptionInInitializerError`。
+    *   *正确做法*：所有工具函数、状态与配置导入，一律精准引入具体实现文件（如 `@/src/config/env/env.uts`、`@/src/router/utils/utils.uts`、`@/src/i18n/utils/index.uts`）；基础设施层（`config`、`utils`、`router`、`store`、`i18n`）严禁互相引用 `index.uts` 总入口；聚合入口严禁反向 `export *` 形成自环。
 
 ---
 

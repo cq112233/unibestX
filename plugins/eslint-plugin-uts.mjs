@@ -994,7 +994,7 @@ export const pluginUts = {
               return;
 
             // easycom 库前缀组件跳过
-            if (/^(?:uni|up|u|lime|iRainna|z-paging)-/i.test(rawName))
+            if (/^(?:uni|up|u|lime|[le]|iRainna|z-paging)-/i.test(rawName))
               return;
 
             // 已定义/已导入组件跳过
@@ -1190,6 +1190,7 @@ export const pluginUts = {
               'UniInputEvent',
               'UniMouseEvent',
               'UniWebViewElement',
+              'UniWebViewMessageEvent',
               'UniElement',
               'OnKeyboardHeightChangeCallbackResult',
               'OnHostThemeChangeCallbackResult',
@@ -1462,5 +1463,47 @@ export const pluginUts = {
     }
   }
 };
+
+/**
+ * 校验目标文件判定：
+ * 1. 严格排除 uni_modules 目录（第三方插件不进行任何 uts 规范约束）
+ * 2. 仅检测 src/ 目录下的源码（以及项目根入口 App.uvue / App.ku.uvue / main.uts）
+ */
+function shouldLintFile(context) {
+  const filename = context.filename || context.getFilename?.() || '';
+  if (!filename) {
+    return false;
+  }
+  const normalized = filename.replace(/\\/g, '/');
+
+  // 1. 严格排除 uni_modules 目录
+  if (/(?:^|\/)uni_modules\//.test(normalized)) {
+    return false;
+  }
+
+  // 2. 严格排除 node_modules、dist、unpackage 等构建与依赖目录
+  if (/(?:^|\/)(?:node_modules|unpackage|dist)\//.test(normalized)) {
+    return false;
+  }
+
+  // 3. 仅检测 src 目录下文件或项目根入口文件
+  const isSrc = /(?:^|\/)src\//.test(normalized);
+  const isRootEntry = /(?:^|\/)(?:App|App\.ku)\.uvue$/.test(normalized) || /(?:^|\/)main\.uts$/.test(normalized);
+
+  return isSrc || isRootEntry;
+}
+
+// 为所有 uts 插件规则统一注入文件范围过滤：严格排除 uni_modules，仅检测 src/ 与根入口
+for (const ruleObj of Object.values(pluginUts.rules)) {
+  if (ruleObj && typeof ruleObj.create === 'function') {
+    const originalCreate = ruleObj.create;
+    ruleObj.create = function (context) {
+      if (!shouldLintFile(context)) {
+        return {};
+      }
+      return originalCreate.call(this, context);
+    };
+  }
+}
 
 export default pluginUts;

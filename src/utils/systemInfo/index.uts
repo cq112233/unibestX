@@ -1,5 +1,5 @@
 import { computed, ref } from 'vue';
-import { customTabbarConfig } from '../../tabbar/config.uts';
+import { customTabbarConfig } from '@/src/tabbar/config.uts';
 import {
   getApiBaseUrl,
   getAppTitle,
@@ -11,7 +11,7 @@ import {
   getTabbarStrategyNum,
   isNativeTabBar,
   isVaporMode
-} from '../env/index.uts';
+} from '@/src/config/index.uts';
 
 /**
  * NavBar 内容区默认基准高度（不含状态栏，单位 px，标准 44px）
@@ -22,6 +22,39 @@ export const NAVBAR_CONTENT_HEIGHT: number = 44;
  * TabBar 默认基准高度（单位 px，标准 50px）
  */
 export const TABBAR_BASE_HEIGHT: number = 50;
+
+const currentPlatform: string = uni.getSystemInfoSync().uniPlatform;
+
+/** 是否为 Android App 原生平台 */
+export const isAppAndroid: boolean = currentPlatform == 'app-android';
+
+/** 是否为 iOS App 原生平台 */
+export const isAppIos: boolean = currentPlatform == 'app-ios';
+
+/** 是否为 HarmonyOS (鸿蒙) App 原生平台 */
+export const isAppHarmony: boolean = currentPlatform == 'app-harmony';
+
+/** 是否为 Web / H5 平台 */
+export const isWeb: boolean = currentPlatform == 'web';
+
+/** 是否为 微信小程序平台 */
+export const isWeixinMp: boolean = currentPlatform == 'mp-weixin';
+
+/** 是否为 支付宝小程序平台 */
+export const isAlipayMp: boolean = currentPlatform == 'mp-alipay';
+
+/** 是否为 App 原生平台（Android / iOS / HarmonyOS） */
+export const isApp: boolean = isAppAndroid || isAppIos || isAppHarmony;
+
+/** 是否为 小程序平台（微信 / 支付宝） */
+export const isMp: boolean = isWeixinMp || isAlipayMp;
+
+/** 别名兼容导出 */
+export const isAndroid: boolean = isAppAndroid;
+export const isIos: boolean = isAppIos;
+export const isHarmony: boolean = isAppHarmony;
+export const isH5: boolean = isWeb;
+export const isWechatMp: boolean = isWeixinMp;
 
 // eslint-disable-next-line import/no-mutable-exports
 export let systemId: number = 0;
@@ -183,6 +216,15 @@ export const safeAreaBottom = computed<number>((): number => systemInfo.value?.s
 
 /**
  * 解析并规范化当前环境的编译器 / 基础库版本号
+ *
+ * ⚠️ 取这类「原生 API 返回对象」的字段，只能按编译期类型推断直接点属性。
+ * 两种看起来更「通用」的写法都是坑：
+ *   1. `(base as any).uniCompilerVersion` —— UTS 把 any 上的属性访问直译成 Kotlin 标识符
+ *      （不走动态查找），VDOM 模式（本项目唯一走 Kotlin 的通道）报 error18 找不到名称，编译不过；
+ *   2. `base as UTSJSONObject` + getAny/getString —— 原生端 getAppBaseInfo 返回的是 SDK 强类型类
+ *      （uts.sdk.modules.DCloudUniGetAppBaseInfo.GetAppBaseInfoResult），Kotlin 运行时抛
+ *      ClassCastException: ... cannot be cast to UTSJSONObject，被 catch 吞掉后静默退化成 '1.0.0'
+ *      （实测：真机日志里 catch 分支每次必打，取版本那句永远不执行）。
  */
 function resolveCompilerVersion(): string {
   // #ifdef H5
@@ -195,16 +237,11 @@ function resolveCompilerVersion(): string {
   catch { }
   // #endif
   try {
-    const base = uni.getAppBaseInfo() as any;
-    // UTS 会把 `base.uniCompilerVersion` 这类 any 属性访问直接编译成 Kotlin 标识符
-    // （不走动态查找），而该字段仅部分平台存在 → 报 error18 找不到名称。
-    // 必须先用 UTSJSONObject 包一层，再经 getAny() 动态取值。
-    const baseObj = base as UTSJSONObject;
-    const rawVer = baseObj.getAny('uniCompilerVersion')
-      ?? baseObj.getAny('appCompilerVersion')
-      ?? baseObj.getAny('SDKVersion')
-      ?? '';
-    const ver = `${rawVer}`;
+    // 字段按平台能力依次兜底（均在类型声明内，故不会踩 error18）：
+    // uniCompilerVersion（Android 4.0+ / iOS 4.11+ / 鸿蒙 4.61+ / 微信小程序 4.41+ / Web 4.18+）
+    // → uniCompileVersion → version（支付宝等未实现前两者的端，取引擎号）
+    const base = uni.getAppBaseInfo();
+    const ver = base.uniCompilerVersion ?? base.uniCompileVersion ?? base.version ?? '';
     if (ver != '') {
       return ver.replace(/\.0{3}.*$/, '');
     }
@@ -514,6 +551,37 @@ export class SystemUtils {
 
   /** 底部安全区高度响应式 computed（px），未初始化时为 0 */
   readonly safeAreaBottom = safeAreaBottom;
+
+  /** 是否为 Android App 原生平台 */
+  readonly isAppAndroid = isAppAndroid;
+
+  /** 是否为 iOS App 原生平台 */
+  readonly isAppIos = isAppIos;
+
+  /** 是否为 HarmonyOS (鸿蒙) App 原生平台 */
+  readonly isAppHarmony = isAppHarmony;
+
+  /** 是否为 Web / H5 平台 */
+  readonly isWeb = isWeb;
+
+  /** 是否为 微信小程序平台 */
+  readonly isWeixinMp = isWeixinMp;
+
+  /** 是否为 支付宝小程序平台 */
+  readonly isAlipayMp = isAlipayMp;
+
+  /** 是否为 App 原生平台（Android / iOS / HarmonyOS） */
+  readonly isApp = isApp;
+
+  /** 是否为 小程序平台（微信 / 支付宝） */
+  readonly isMp = isMp;
+
+  /** 别名兼容 */
+  readonly isAndroid = isAppAndroid;
+  readonly isIos = isAppIos;
+  readonly isHarmony = isAppHarmony;
+  readonly isH5 = isWeb;
+  readonly isWechatMp = isWeixinMp;
 
   /** 刷新并更新系统全局信息响应式状态 */
   updateSystemInfo(): void {

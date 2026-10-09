@@ -1,0 +1,761 @@
+<template>
+  <!-- NavBar 页面通用布局根容器 -->
+  <view :class="rootClass" :style="rootStyle">
+    <!-- 顶部固定自定义导航栏：位于页面内容上方，不随下拉刷新位移 -->
+    <NavBar
+      v-if="isCustomNav"
+      :is-navbar-visible="isNavbarVisible"
+      :hide-status-bar="!isStatusBarVisible"
+      :title="displayTitle"
+      :show-back="showBack"
+      :title-color="navTitleColor"
+      :bg-color="navBgColor"
+      :fixed="false"
+      :placeholder="false"
+      :border="border"
+    />
+
+    <!-- 单页 TabBar 容器模式（模式 4 且为主页）：由内部 TabViews/TabContent 独立承载滚动与下拉刷新，避免外层嵌套 scroll-view 导致手势冲突、TabBar 跟随下移与双重下拉刷新 -->
+    <view
+      v-if="isTabbarPage && isSinglePageHome"
+      class="navbar-tab-container"
+      style="position: relative;flex: 1;"
+    >
+      <slot />
+    </view>
+
+    <!-- 当开启自定义下拉刷新时（原生未开启且当前布局开启） -->
+    <!-- 1. 支付宝小程序专享：手势下拉刷新（解决支付宝小程序无原生 refresher 问题） -->
+    <scroll-view
+      v-else-if="useCustomRefresher && isAlipayMp"
+      :direction="pageScrollDirection"
+      class="navbar-scroll-view"
+      :lower-threshold="50"
+      @scroll="handleScroll"
+      @scrolltolower="handleScrollToLower"
+      @touchstart="handleAlipayTouchStart"
+      @touchmove="handleAlipayTouchMove"
+      @touchend="handleAlipayTouchEnd"
+      @touchcancel="handleAlipayTouchEnd"
+    >
+      <!-- 微信小程序同款：三个小圆点手势下拉刷新 Header -->
+      <view
+        class="alipay-pull-header"
+        :style="alipayHeaderStyle"
+      >
+        <view class="wechat-pull-dots" :class="{ 'wechat-pull-dots--active': isTriggered }">
+          <view class="wechat-pull-dot wechat-pull-dot--1"></view>
+          <view class="wechat-pull-dot wechat-pull-dot--2"></view>
+          <view class="wechat-pull-dot wechat-pull-dot--3"></view>
+        </view>
+      </view>
+      <slot />
+      <TabbarPlaceholder :is-tabbar-page="isTabbarPage" />
+    </scroll-view>
+
+    <!-- 2. 原生全端（Android VDOM / iOS / Web / 微信小程序）：原生极速流畅滚动，彻底剥离 touch 事件 -->
+    <scroll-view
+      v-else-if="useCustomRefresher"
+      :direction="pageScrollDirection"
+      class="navbar-scroll-view"
+      :refresher-enabled="isRefresherEnabled"
+      :refresher-triggered="isTriggered"
+      :refresher-background="themeTokens.bgContent"
+      :lower-threshold="50"
+      @refresherrefresh="handleRefresherRefresh"
+      @refresherrestore="handleRefresherRestore"
+      @refresherabort="handleRefresherRestore"
+      @scroll="handleScroll"
+      @scrolltolower="handleScrollToLower"
+    >
+      <slot />
+      <TabbarPlaceholder :is-tabbar-page="isTabbarPage" />
+    </scroll-view>
+
+    <!-- 未开启自定义下拉刷新时（包含开启原生下拉刷新时）：渲染普通滚动容器 -->
+    <scroll-view
+      v-else
+      class="navbar-scroll-view"
+      :direction="pageScrollDirection"
+      :lower-threshold="50"
+      @scroll="handleScroll"
+      @scrolltolower="handleScrollToLower"
+    >
+      <slot />
+      <TabbarPlaceholder :is-tabbar-page="isTabbarPage" />
+    </scroll-view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed, onUnmounted, ref } from 'vue';
+import NavBar from '@/src/components/NavBar/NavBar.uvue';
+import TabbarPlaceholder from '@/src/tabbar/components/TabbarPlaceholder.uvue';
+import { useAppStore } from '@/src/store';
+import { getThemeTokens } from '@/src/theme/index.uts';
+import type { ThemeTokens } from '@/src/theme/index.uts';
+import { isPageRefresherDisabled, isPageScrollDisabled } from './utils/index.uts';
+import { isPageTabbar, isSinglePageTabbar } from '@/src/tabbar/index.uts';
+import { isAlipayMp } from '@/src/utils/systemInfo/index.uts';
+
+/**
+ * 布局属性定义（由 uni-layouts-plugin 编译时自动从页面 definePage 或 pages.json 提取传入）
+ */
+const props = defineProps({
+  /** 页面顶层类型标识，如 'home' */
+  type: {
+    type: String,
+    default: ''
+  },
+  /** 导航栏标题（读取自 page.title） */
+  title: {
+    type: String,
+    default: ''
+  },
+  /** 是否显示左侧返回按钮（默认 true） */
+  showBack: {
+    type: Boolean,
+    default: true
+  },
+  /** 是否启用内容区域的自定义下拉刷新 */
+  enablePullDownRefresh: {
+    type: Boolean,
+    default: false
+  },
+  /** 导航栏备用背景色（读取自 page.bgColor） */
+  bgColor: {
+    type: String,
+    default: ''
+  },
+  /** 导航栏备用文字颜色（读取自 page.titleColor） */
+  titleColor: {
+    type: String,
+    default: ''
+  },
+  /** 导航栏底部是否显示 1px 细分割线 */
+  border: {
+    type: Boolean,
+    default: false
+  },
+  /** 页面 style 完整配置对象（未拍平，包含 navigationBarTitleText, enablePullDownRefresh, navigationBarBackgroundColor 等） */
+  pageStyle: {
+    type: Object,
+    default: () => ({})
+  },
+  /** 是否隐藏状态栏占位高度（默认 false，为 true 时不占用状态栏空间） */
+  hideStatusBar: {
+    type: Boolean,
+    default: false
+  },
+  /** 是否隐藏导航栏（默认 false） */
+  hideNavbar: {
+    type: Boolean,
+    default: false
+  },
+  hideNavBar: {
+    type: Boolean,
+    default: false
+  },
+  /** 是否显示导航栏（默认 true） */
+  showNavbar: {
+    type: Boolean,
+    default: true
+  },
+  showNavBar: {
+    type: Boolean,
+    default: true
+  },
+  /** 扁平兼容字段：导航栏标题 */
+  navigationBarTitleText: {
+    type: String,
+    default: ''
+  },
+  /** 扁平兼容字段：导航栏背景色 */
+  navigationBarBackgroundColor: {
+    type: String,
+    default: ''
+  },
+  /** 扁平兼容字段：导航栏文字颜色 */
+  navigationBarTextStyle: {
+    type: String,
+    default: ''
+  },
+  /** 页面根容器自定义类名（通过 definePage 或 pages.config.json 中的 customPageClass 传入） */
+  customPageClass: {
+    type: String,
+    default: ''
+  },
+  /** 兼容别名：自定义类名 */
+  customClass: {
+    type: String,
+    default: ''
+  },
+  layoutClass: {
+    type: String,
+    default: ''
+  },
+  /** 页面根容器自定义行内样式（通过 definePage 或 pages.config.json 中的 customPageStyle 传入） */
+  customPageStyle: {
+    type: String,
+    default: ''
+  },
+  /** 兼容别名：自定义行内样式 */
+  customStyle: {
+    type: String,
+    default: ''
+  },
+  layoutStyle: {
+    type: String,
+    default: ''
+  }
+});
+
+/**
+ * 获取 pageStyle 对象
+ */
+const pageStyleObj = computed((): UTSJSONObject => {
+  return (props.pageStyle ?? {}) as UTSJSONObject;
+});
+
+const pageScrollDirection = computed((): string => {
+  return isPageScrollDisabled.value ? 'none' : 'vertical';
+});
+
+const isRefresherEnabled = computed((): boolean => {
+  return !isPageScrollDisabled.value && !isPageRefresherDisabled.value;
+});
+
+/**
+ * 根容器样式类名：合并默认基础类名与自定义页面类名（customPageClass）
+ */
+const rootClass = computed((): string => {
+  let cls = 'navbar-layout';
+  if (props.customPageClass.length > 0) {
+    cls += ` ${props.customPageClass}`;
+  }
+  if (props.customClass.length > 0) {
+    cls += ` ${props.customClass}`;
+  }
+  if (props.layoutClass.length > 0) {
+    cls += ` ${props.layoutClass}`;
+  }
+  return cls;
+});
+
+/**
+ * 根容器行内样式：合并自定义页面行内样式（customPageStyle）
+ */
+const rootStyle = computed((): string => {
+  let s = '';
+  if (props.customPageStyle.length > 0) {
+    s += props.customPageStyle;
+  }
+  if (props.customStyle.length > 0) {
+    s += (s.length > 0 ? ';' : '') + props.customStyle;
+  }
+  if (props.layoutStyle.length > 0) {
+    s += (s.length > 0 ? ';' : '') + props.layoutStyle;
+  }
+  return s;
+});
+
+/** 动态控制状态栏显隐（优先级高于配置项，null 表示采取默认配置） */
+const dynamicHideStatusBar = ref<boolean | null>(null);
+
+/**
+ * 计算状态栏是否可见
+ */
+const isStatusBarVisible = computed((): boolean => {
+  if (dynamicHideStatusBar.value != null) {
+    return dynamicHideStatusBar.value == false;
+  }
+  if (props.hideStatusBar) {
+    return false;
+  }
+  return true;
+});
+
+/**
+ * 响应全局 setStatusBarVisible 事件：设置状态栏是否可见
+ * @param visible 是否可见（true 为显示，false 为隐藏）
+ */
+function onSetStatusBarVisible(visible: any): void {
+  if (typeof visible == 'boolean') {
+    dynamicHideStatusBar.value = !(visible as boolean);
+  }
+}
+
+/**
+ * 响应全局 setHideStatusBar 事件：设置是否隐藏状态栏
+ * @param hide 是否隐藏（true 为隐藏，false 为显示）
+ */
+function onSetHideStatusBar(hide: any): void {
+  if (typeof hide == 'boolean') {
+    dynamicHideStatusBar.value = hide as boolean;
+  }
+}
+
+/**
+ * 响应全局 resetStatusBarVisible 事件：重置状态栏显隐为页面默认配置
+ */
+function onResetStatusBarVisible(): void {
+  dynamicHideStatusBar.value = null;
+}
+
+/** 动态控制导航栏显隐（优先级高于配置项，null 表示采取默认配置） */
+const dynamicHideNavbar = ref<boolean | null>(null);
+
+/**
+ * 计算导航栏是否可见
+ * 1. 优先读取动态设置 dynamicHideNavbar
+ * 2. 其次读取 props.hideNavbar / props.hideNavBar / props.showNavbar / props.showNavBar
+ * 3. 兜底读取 pageStyle 中的 hideNavbar / showNavbar
+ */
+const isNavbarVisible = computed((): boolean => {
+  if (dynamicHideNavbar.value != null) {
+    return dynamicHideNavbar.value == false;
+  }
+  if (props.hideNavbar || props.hideNavBar || !props.showNavbar || !props.showNavBar) {
+    return false;
+  }
+  return true;
+});
+
+/**
+ * 响应全局 setNavbarVisible 事件：设置导航栏是否可见
+ * @param visible 是否可见（true 为显示，false 为隐藏）
+ */
+function onSetNavbarVisible(visible: any): void {
+  if (typeof visible == 'boolean') {
+    dynamicHideNavbar.value = !(visible as boolean);
+  }
+}
+
+/**
+ * 响应全局 setHideNavbar 事件：设置是否隐藏导航栏
+ * @param hide 是否隐藏（true 为隐藏，false 为显示）
+ */
+function onSetHideNavbar(hide: any): void {
+  if (typeof hide == 'boolean') {
+    dynamicHideNavbar.value = hide as boolean;
+  }
+}
+
+/**
+ * 响应全局 resetNavbarVisible 事件：重置导航栏显隐为页面默认配置
+ */
+function onResetNavbarVisible(): void {
+  dynamicHideNavbar.value = null;
+}
+
+/** 下拉刷新状态控制：true 表示刷新中（展示 Loading），false 表示已复位收起 */
+const isTriggered = ref(false);
+
+/**
+ * 用户下拉触发刷新回调
+ */
+function handleRefresherRefresh() {
+  isTriggered.value = true;
+  // 向页面派发下拉刷新通知事件
+  uni.$emit('onPagePullDownRefresh');
+}
+
+/**
+ * 下拉刷新复位完成事件
+ */
+function handleRefresherRestore() {
+  isTriggered.value = false;
+}
+
+const alipayPullHeight = ref(0);
+
+/**
+ * 接收页面业务层发出的停止刷新通知（stopNavbarPullDownRefresh）
+ */
+function onStopRefresh() {
+  isTriggered.value = false;
+  if (isAlipayMp) {
+    alipayPullHeight.value = 0;
+  }
+}
+
+let alipayTouchStartY: number = 0;
+const isAlipayTouching = ref(false);
+let currentScrollTop: number = 0;
+
+/**
+ * 支付宝手势下拉刷新 Header 动态样式
+ */
+const alipayHeaderStyle = computed((): string => {
+  if (!isAlipayMp) {
+    return 'height: 0px;';
+  }
+  const trans = isAlipayTouching.value ? 'none' : 'height 0.25s ease';
+  return `height: ${alipayPullHeight.value}px; transition: ${trans};`;
+});
+
+function handleAlipayTouchStart(e: UniTouchEvent) {
+  if (!isAlipayMp) {
+    return;
+  }
+  if (currentScrollTop <= 2 && !isTriggered.value) {
+    const touches = e.touches;
+    if (touches.length > 0) {
+      const t = touches[0];
+      alipayTouchStartY = t.clientY;
+      isAlipayTouching.value = true;
+    }
+  }
+}
+
+function handleAlipayTouchMove(e: UniTouchEvent) {
+  if (!isAlipayMp || !isAlipayTouching.value || isTriggered.value || currentScrollTop > 2) {
+    return;
+  }
+  const touches = e.touches;
+  if (touches.length > 0) {
+    const t = touches[0];
+    const deltaY = t.clientY - alipayTouchStartY;
+    if (deltaY > 0) {
+      alipayPullHeight.value = Math.min(Math.floor(deltaY * 0.45), 75);
+    }
+    else {
+      alipayPullHeight.value = 0;
+    }
+  }
+}
+
+function handleAlipayTouchEnd() {
+  if (!isAlipayMp || !isAlipayTouching.value) {
+    return;
+  }
+  isAlipayTouching.value = false;
+  if (alipayPullHeight.value >= 45) {
+    alipayPullHeight.value = 45;
+    handleRefresherRefresh();
+  }
+  else {
+    alipayPullHeight.value = 0;
+  }
+}
+
+/**
+ * 动态自定义标题（优先级高于配置项）
+ * 注意：UTS 会把 <script setup> 里的 function 降级为「声明点之后才可见」的局部量，
+ * 因此必须声明在 onSetNavbarTitle / onResetNavbarTitle 之前；否则调用会落空，
+ * 同名时还会被 utils 里的包级函数悄悄接管（导致事件自触发死循环）。
+ */
+const customTitle = ref<string | null>(null);
+
+/**
+ * 动态修改/设置当前导航栏标题
+ * @param title 新的导航栏标题
+ */
+function setNavbarTitle(title: string): void {
+  customTitle.value = title;
+}
+
+/**
+ * 重置导航栏标题为初始配置标题
+ */
+function resetNavbarTitle(): void {
+  customTitle.value = null;
+}
+
+/**
+ * 响应全局 setNavbarTitle 事件：动态修改导航栏标题
+ * 支持传入 string 字符串，或形如 { title: string } 的 UTSJSONObject 对象
+ * @param title 新标题或包含 title 属性的配置对象
+ */
+function onSetNavbarTitle(title: any | null): void {
+  if (title != null) {
+    if (typeof title == 'string') {
+      setNavbarTitle(title as string);
+    }
+    else {
+      const obj = title as UTSJSONObject;
+      // eslint-disable-next-line dot-notation
+      const t = obj['title'] != null ? `${obj['title']}` : null;
+      if (t != null && t.length > 0) {
+        setNavbarTitle(t);
+      }
+    }
+  }
+}
+
+/**
+ * 响应全局 resetNavbarTitle 事件：重置导航栏标题为初始配置标题
+ */
+function onResetNavbarTitle(): void {
+  resetNavbarTitle();
+}
+
+// 在 setup 执行期立即注册全局事件监听，确保子组件 onMounted 触发事件能够被可靠接收
+uni.$on('stopPagePullDownRefresh', onStopRefresh);
+uni.$on('setNavbarTitle', onSetNavbarTitle);
+uni.$on('resetNavbarTitle', onResetNavbarTitle);
+uni.$on('setNavbarVisible', onSetNavbarVisible);
+uni.$on('setHideNavbar', onSetHideNavbar);
+uni.$on('resetNavbarVisible', onResetNavbarVisible);
+uni.$on('setStatusBarVisible', onSetStatusBarVisible);
+uni.$on('setHideStatusBar', onSetHideStatusBar);
+uni.$on('resetStatusBarVisible', onResetStatusBarVisible);
+
+// 卸载时移除全局事件监听，避免内存泄漏
+onUnmounted(() => {
+  uni.$off('stopPagePullDownRefresh', onStopRefresh);
+  uni.$off('setNavbarTitle', onSetNavbarTitle);
+  uni.$off('resetNavbarTitle', onResetNavbarTitle);
+  uni.$off('setNavbarVisible', onSetNavbarVisible);
+  uni.$off('setHideNavbar', onSetHideNavbar);
+  uni.$off('resetNavbarVisible', onResetNavbarVisible);
+  uni.$off('setStatusBarVisible', onSetStatusBarVisible);
+  uni.$off('setHideStatusBar', onSetHideStatusBar);
+  uni.$off('resetStatusBarVisible', onResetStatusBarVisible);
+});
+
+/**
+ * 布局滚动容器滚动事件回调：统一向页面层派发 onNavbarPageScroll 事件
+ */
+function handleScroll(e: UniScrollEvent): void {
+  const scrollTop = e.detail.scrollTop;
+  if (isAlipayMp) {
+    currentScrollTop = Math.ceil(scrollTop);
+  }
+  uni.$emit('onNavbarPageScroll', {
+    scrollTop: Math.ceil(scrollTop)
+  } as UTSJSONObject);
+}
+
+/**
+ * 布局滚动容器触底事件回调：统一向页面层派发 onNavbarReachBottom 事件
+ */
+function handleScrollToLower(): void {
+  uni.$emit('onNavbarReachBottom');
+}
+
+/**
+ * 判断当前页面是否开启了原生系统下拉刷新（读取 definePage.style.enablePullDownRefresh）
+ */
+const isNativePullDown = computed((): boolean => {
+  const psVal = pageStyleObj.value.enablePullDownRefresh;
+  if (psVal == true || psVal == 'true') {
+    return true;
+  }
+  return false;
+});
+
+/**
+ * 判断当前是否为 TabBar 页面
+ */
+const isTabbarPage = computed((): boolean => {
+  if (props.type == 'home') {
+    return true;
+  }
+  try {
+    const pages = getCurrentPages();
+    if (pages.length > 0) {
+      const page = pages[pages.length - 1];
+      const r = page.route ?? '';
+      if (r.length > 0) {
+        return isPageTabbar(r);
+      }
+    }
+  }
+  catch {}
+  return false;
+});
+
+/**
+ * 判断是否处于单页面 TabBar 的宿主首页容器
+ */
+const isSinglePageHome = computed((): boolean => {
+  if (!isSinglePageTabbar) {
+    return false;
+  }
+  if (props.type == 'home') {
+    return true;
+  }
+  try {
+    const pages = getCurrentPages();
+    if (pages.length > 0) {
+      const page = pages[pages.length - 1];
+      const r = (page.route ?? '').replace(/^\//, '');
+      if (r == 'pages/index/index' || r == 'src/pages/index/index' || r.endsWith('index/index')) {
+        return true;
+      }
+    }
+  }
+  catch {}
+  return false;
+});
+
+/**
+ * 决定是否使用 NavBar 内部自定义下拉刷新：
+ * 若原生已开启下拉（style.enablePullDownRefresh），原生优先并关闭内部下拉；
+ * 若处于单页 TabBar 首页模式（由内部 TabViews/TabContent 独立驱动下拉刷新），外层关闭下拉刷新，杜绝双重刷新圈与 TabBar 掉落；
+ * 仅在原生未开启时才使用自定义下拉
+ */
+const useCustomRefresher = computed((): boolean => {
+  if (isNativePullDown.value || (isSinglePageHome.value && isTabbarPage.value)) {
+    return false;
+  }
+  return props.enablePullDownRefresh;
+});
+
+/**
+ * 计算最终生效的导航栏标题
+ */
+const displayTitle = computed((): string => {
+  if (customTitle.value != null) {
+    return customTitle.value!;
+  }
+  // 1. 优先读取当前页面 definePage.style.navigationBarTitleText（用户显式配置了空字符串 '' 也必须尊重）
+  const rawStyleTitle = pageStyleObj.value.navigationBarTitleText;
+  if (rawStyleTitle != null) {
+    return `${rawStyleTitle}`;
+  }
+  // 2. 页面 props 显式传入标题
+  if (props.navigationBarTitleText.length > 0) {
+    return props.navigationBarTitleText;
+  }
+  if (props.title.length > 0) {
+    return props.title;
+  }
+  return '';
+});
+
+/**
+ * 计算最终生效的导航栏背景色
+ */
+const navBgColor = computed((): string => {
+  const bgFromStyle = (pageStyleObj.value.navigationBarBackgroundColor as string | null) ?? '';
+  if (bgFromStyle.length > 0) {
+    return bgFromStyle;
+  }
+  if (props.navigationBarBackgroundColor.length > 0) {
+    return props.navigationBarBackgroundColor;
+  }
+  return props.bgColor;
+});
+
+/**
+ * 计算最终生效的导航栏文字/图标颜色
+ */
+const navTitleColor = computed((): string => {
+  const textStyleFromStyle = (pageStyleObj.value.navigationBarTextStyle as string | null) ?? '';
+  if (textStyleFromStyle.length > 0) {
+    return textStyleFromStyle;
+  }
+  if (props.navigationBarTextStyle.length > 0) {
+    return props.navigationBarTextStyle;
+  }
+  return props.titleColor;
+});
+
+/**
+ * 判断当前页面是否启用了自定义导航栏（navigationStyle 为 'custom' 时渲染自定义 NavBar）
+ */
+const isCustomNav = computed((): boolean => {
+  const textStyleFromStyle = (pageStyleObj.value.navigationStyle as string | null) ?? '';
+  if (textStyleFromStyle.length > 0) {
+    if (textStyleFromStyle == 'custom') {
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
+  else {
+    return false;
+  }
+});
+
+/**
+ * 获取当前主题的设计令牌（ThemeTokens，自适应明暗模式）
+ */
+const themeTokens = computed((): ThemeTokens => {
+  return getThemeTokens(useAppStore().state.isDark);
+});
+
+defineExpose({
+  resetNavbarTitle,
+  setNavbarTitle,
+  setTitle: setNavbarTitle
+});
+</script>
+
+<style lang="scss" scoped>
+.navbar-layout {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.navbar-tab-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+}
+
+.navbar-scroll-view {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.alipay-pull-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  overflow: hidden;
+}
+
+.wechat-pull-dots {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 0;
+}
+
+.wechat-pull-dot {
+  width: 7px;
+  height: 7px;
+  margin: 0 4px;
+  border-radius: 4px;
+  background-color: #94a3b8;
+}
+
+.wechat-pull-dots--active .wechat-pull-dot--1 {
+  animation: wechat-dot-bounce 1.1s infinite ease-in-out;
+  animation-delay: 0s;
+}
+
+.wechat-pull-dots--active .wechat-pull-dot--2 {
+  animation: wechat-dot-bounce 1.1s infinite ease-in-out;
+  animation-delay: 0.18s;
+}
+
+.wechat-pull-dots--active .wechat-pull-dot--3 {
+  animation: wechat-dot-bounce 1.1s infinite ease-in-out;
+  animation-delay: 0.36s;
+}
+
+@keyframes wechat-dot-bounce {
+  0%,
+  80%,
+  100% {
+    opacity: 0.35;
+    transform: scale(0.6);
+  }
+  40% {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+}
+</style>

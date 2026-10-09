@@ -1,92 +1,164 @@
 <template>
-  <view class="flex-col">
-    <!-- 全屏弹窗遮罩（覆盖 TabBar）演示组件 -->
-    <ModalDemoCard />
+  <view class="flex-col p-[16px]">
+    <!-- 基础能力演示列表（Card + 一行描述 + 原生按钮跳转） -->
+    <view
+      v-for="item in demoList"
+      :key="item.id"
+      class="rounded-[16px] p-[20px] mb-[16px] border-[1px] border-solid"
+      :style="{
+        backgroundColor: 'var(--card-bg, #ffffff)',
+        borderColor: 'var(--border-color, #edf2f7)'
+      }"
+    >
+      <!-- 标题区域 -->
+      <view class="flex flex-row items-center mb-[12px]">
+        <view
+          class="w-[4px] h-[16px] rounded-[2px] mr-[8px]"
+          :style="{ backgroundColor: 'var(--theme-color, #3182ce)' }"
+        />
+        <text class="text-[16px] font-bold" :style="{ color: 'var(--text-color, #2d3748)' }">
+          {{ item.title }}
+        </text>
+      </view>
 
-    <!-- 布局页面示例组件 -->
-    <LayoutDemoCard />
+      <!-- 一行功能描述 -->
+      <view class="flex-col mb-[16px]">
+        <text
+          class="text-[13px] leading-[18px]"
+          :style="{ color: 'var(--text-secondary, #64748b)' }"
+        >
+          {{ item.desc }}
+        </text>
+      </view>
 
-    <!-- weapp-tailwindcss 样式引擎示例 -->
-    <TailwindcssDemoCard />
-
-    <!-- 使用 uview-ultra 组件库 -->
-    <UViewUltraDemoCard />
-
-    <!-- 使用封装的主题切换组件 -->
-    <ThemeSwitchCard />
-
-    <!-- 使用路由拦截与传参演示组件 -->
-    <RouterDemoCard />
-
-    <!-- 使用 src/store 双模式门面的状态管理演示组件 -->
-    <StoreDemoCard />
-
-    <!-- 使用封装的多语言切换组件 -->
-    <LangSwitchCard />
-
-    <!-- 字体族与字号调节演示组件 -->
-    <FontDemoCard />
-
-    <!-- 使用封装的图标示例组件 -->
-    <IconDemoCard />
-
-    <!-- HTTP 请求 Demo（独立页面入口） -->
-    <HttpDemoCard />
-
-    <!-- rxjs 流式演示（独立页面入口） -->
-    <RxjsDemoCard />
-
-    <!-- 父子组件传参 & 具名插槽演示组件 -->
-    <PropsDemoCard />
+      <!-- 跳转按钮 -->
+      <view
+        class="w-full h-[42px] flex flex-row items-center justify-center rounded-[8px] active:opacity-90"
+        :style="{ backgroundColor: 'var(--theme-color, #0957de)' }"
+        @click="navigateToDemo(item.path)"
+      >
+        <text class="text-[#ffffff] text-[14px] font-bold">
+          {{ item.btnText }}
+        </text>
+      </view>
+    </view>
   </view>
 </template>
 
 <script setup lang="uts">
+import { curIdx, onTabPageShow, onTabShow, resolveTabIndexByKey } from '@/src/tabbar/index.uts';
+import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/layouts/navbar/utils/index.uts';
 import { systemInfo } from '@/src/utils/systemInfo/index.uts';
-import FontDemoCard from '../components/FontDemoCard.uvue';
-import HttpDemoCard from '../components/HttpDemoCard.uvue';
-import IconDemoCard from '../components/IconDemoCard.uvue';
-import LangSwitchCard from '../components/LangSwitchCard.uvue';
-import LayoutDemoCard from '../components/LayoutDemoCard.uvue';
-import ModalDemoCard from '../components/ModalDemoCard.uvue';
-import PropsDemoCard from '../components/PropsDemoCard.uvue';
-import RouterDemoCard from '../components/RouterDemoCard.uvue';
-import RxjsDemoCard from '../components/RxjsDemoCard.uvue';
-import StoreDemoCard from '../components/StoreDemoCard.uvue';
-import TailwindcssDemoCard from '../components/TailwindcssDemoCard.uvue';
-import ThemeSwitchCard from '../components/ThemeSwitchCard.uvue';
-import UViewUltraDemoCard from '../components/UViewUltraDemoCard.uvue';
-import { curIdx, onTabPageShow, onTabShow } from '@/src/tabbar/index.uts';
-import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/utils/refresh/index.uts';
+
+type BasicDemoItem = {
+  id: string;
+  title: string;
+  desc: string;
+  btnText: string;
+  path: string;
+};
+
+const demoList: Array<BasicDemoItem> = [
+  {
+    id: 'modal',
+    title: '全屏弹窗与遮罩 Demo',
+    desc: '演示全屏遮罩弹窗、覆盖原生 TabBar 穿透及层级管理。',
+    btnText: '进入全屏弹窗与遮罩功能',
+    path: '/src/sub/modalBasicDemo/modalBasicDemo'
+  },
+  {
+    id: 'layout',
+    title: '页面布局骨架 Demo',
+    desc: '演示 navbar 与 default 布局下滚动容器与可用高度规范。',
+    btnText: '进入页面布局骨架功能',
+    path: '/src/sub/layoutBasicDemo/layoutBasicDemo'
+  },
+  {
+    id: 'tailwindcss',
+    title: 'Tailwind CSS 样式 Demo',
+    desc: '演示 weapp-tailwindcss v4 原子化类名、动态主题与样式规范。',
+    btnText: '进入 Tailwind CSS 样式功能',
+    path: '/src/sub/tailwindcssBasicDemo/tailwindcssBasicDemo'
+  },
+  {
+    id: 'theme',
+    title: '主题换肤与暗黑模式 Demo',
+    desc: '演示主题主色调切换、跟随系统外观及暗黑模式实时响应。',
+    btnText: '进入主题换肤与暗黑模式功能',
+    path: '/src/sub/themeBasicDemo/themeBasicDemo'
+  },
+  {
+    id: 'router',
+    title: '路由跳转与路由拦截 Demo',
+    desc: '演示自定义路由拦截器、黑白名单鉴权守卫与跨页传参。',
+    btnText: '进入路由跳转与路由拦截功能',
+    path: '/src/sub/routerBasicDemo/routerBasicDemo'
+  },
+  {
+    id: 'lang',
+    title: 'i18n 多语言国际化 Demo',
+    desc: '演示基于 vue-i18n 的中英文多语言即时动态切换。',
+    btnText: '进入 i18n 多语言国际化功能',
+    path: '/src/sub/langBasicDemo/langBasicDemo'
+  },
+  {
+    id: 'font',
+    title: '字体族与字号调节 Demo',
+    desc: '演示跨端字体族规约与多级动态字号调节渲染。',
+    btnText: '进入字体族与字号调节功能',
+    path: '/src/sub/fontBasicDemo/fontBasicDemo'
+  },
+  {
+    id: 'icon',
+    title: '通用图标库集成 Demo',
+    desc: '演示 easycom 图标库自动化导入、彩色图标与状态绑定。',
+    btnText: '进入通用图标库集成功能',
+    path: '/src/sub/iconBasicDemo/iconBasicDemo'
+  },
+  {
+    id: 'http',
+    title: 'HTTP 网络请求 Demo',
+    desc: '基于 lime-request 封装，包含 Mock、真实接口与文件上传。',
+    btnText: '进入 HTTP 网络请求功能',
+    path: '/src/sub/httpBasicDemo/httpBasicDemo'
+  }
+];
+
+function navigateToDemo(url: string): void {
+  uni.navigateTo({
+    url,
+    fail: (err) => {
+      console.error('navigateToDemo fail:', err);
+    }
+  });
+}
 
 // 页面数据加载/刷新方法
 function refreshData(): void {
   console.log('基础页面刷新中...');
   setTimeout(() => {
-    // 门控检查：若刷新完成时用户已切到其他 Tab 则忽略
-    if (curIdx.value != 1) {
+    if (curIdx.value != resolveTabIndexByKey('basic')) {
       return;
     }
     console.log('基础页面刷新成功');
-    // 数据加载完毕后，手动停止下拉刷新动画状态
     stopNavbarPullDownRefresh();
   }, 1000);
 }
 
-// 监听 navbar 自定义下拉刷新事件（在 enablePullDownRefresh: true 且处于当前 Tab 时生效）
+// 监听 navbar 自定义下拉刷新事件
 onNavbarPullDownRefresh(() => {
-  if (curIdx.value == 1) {
+  if (curIdx.value == resolveTabIndexByKey('basic')) {
     refreshData();
   }
 });
 
-// 监听 Tab 切换到当前基础页（索引 1）时触发
-onTabShow(1, () => {
+// 监听 Tab 切换到当前基础页（config.uts 中 type: 'basic'）
+onTabShow('basic', () => {
   console.log('onTabShow 基础 Tab 显示');
 }, true);
 
-// 监听基础 Tab 页面显示（切 Tab、从子页面返回、前台恢复都会触发）
-onTabPageShow(1, () => {
+// 监听基础 Tab 页面显示
+onTabPageShow('basic', () => {
   console.log('onTabPageShow 基础 Tab 显示');
 }, true);
 

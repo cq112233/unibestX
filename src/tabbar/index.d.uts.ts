@@ -88,6 +88,11 @@ export declare const tabbarPlaceholderHeight: ComputedRef<number>;
 export declare const tabbarBottomPaddingHeight: ComputedRef<number>;
 
 /**
+ * 设置原生 TabBar 各项的多语言文本 (设置 uni.setTabBarItem)
+ */
+export declare function setTabbarItem(): void;
+
+/**
  * 隐藏系统原生 TabBar 并根据编译器版本动态适配 H5 底部容器
  */
 export declare function safeHideNativeTabBar(): void;

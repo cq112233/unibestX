@@ -1,91 +1,176 @@
 <template>
-  <view class="flex-col">
-    <!-- 标题头 -->
-    <view class="pt-[20px] px-[16px] pb-[10px]">
-      <text class="text-[20px] font-bold text-[#1a202c]">功能组件库演示</text>
-      <text class="text-[13px] text-[#718096] mt-[4px]">演示原生设备 API 调用、常用工具库与组件集成</text>
+  <view class="flex-col p-[16px]">
+    <!-- 功能能力演示列表（Card + 一行描述 + 原生按钮跳转） -->
+    <view
+      v-for="item in demoList"
+      :key="item.id"
+      class="rounded-[16px] p-[20px] mb-[16px] border-[1px] border-solid"
+      :style="{
+        backgroundColor: 'var(--card-bg, #ffffff)',
+        borderColor: 'var(--border-color, #edf2f7)'
+      }"
+    >
+      <!-- 标题区域 -->
+      <view class="flex flex-row items-center mb-[12px]">
+        <view
+          class="w-[4px] h-[16px] rounded-[2px] mr-[8px]"
+          :style="{ backgroundColor: 'var(--theme-color, #3182ce)' }"
+        />
+        <text class="text-[16px] font-bold" :style="{ color: 'var(--text-color, #2d3748)' }">
+          {{ item.title }}
+        </text>
+      </view>
+
+      <!-- 一行功能描述 -->
+      <view class="flex-col mb-[16px]">
+        <text
+          class="text-[13px] leading-[18px]"
+          :style="{ color: 'var(--text-secondary, #64748b)' }"
+        >
+          {{ item.desc }}
+        </text>
+      </view>
+
+      <!-- 跳转按钮 -->
+      <view
+        class="w-full h-[42px] flex flex-row items-center justify-center rounded-[8px] active:opacity-90"
+        :style="{ backgroundColor: 'var(--theme-color, #0957de)' }"
+        @click="navigateToDemo(item.path)"
+      >
+        <text class="text-[#ffffff] text-[14px] font-bold">
+          {{ item.btnText }}
+        </text>
+      </view>
     </view>
-
-    <!-- 数据分页列表示例组件 (z-paging-x) -->
-    <ZPagingDemoCard />
-
-    <!-- 实用工具库与系统能力独立演示入口卡片 -->
-    <UtilsNavCard />
-
-    <!-- ECharts 图表示例组件 -->
-    <EchartsDemoCard v-if="isCanvasReady" />
   </view>
 </template>
 
 <script setup lang="uts">
-import { onMounted, ref } from 'vue';
-import EchartsDemoCard from '../components/EchartsDemoCard.uvue';
-import UtilsNavCard from '../components/UtilsNavCard.uvue';
-import ZPagingDemoCard from '../components/ZPagingDemoCard.uvue';
-import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/utils/refresh/index.uts';
-import { curIdx, onTabPageShow, onTabShow } from '@/src/tabbar/index.uts';
+import { curIdx, onTabPageShow, onTabShow, resolveTabIndexByKey } from '@/src/tabbar/index.uts';
+import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/layouts/navbar/utils/index.uts';
+import { systemInfo } from '@/src/utils/systemInfo/index.uts';
 
-/**
- * Canvas 画布组件（签名板、ECharts）按需加载标记：
- * 【原因说明】：
- * 1. 在单页面 TabBar 容器（模式 4）下，非首屏 Tab 初始处于非激活隐藏态（如 left: -9999px 或排版未完成）。
- * 2. 微信小程序与跨端底层在节点隐藏或尺寸未稳定时初始化 Canvas，createSelectorQuery() 获取到的物理宽高可能为 0px，
- *    从而导致图表渲染不全、变形、白屏，或签名板初始化报尺寸计算错误。
- * 3. 故默认设为 false，仅在用户首次切换进入当前 Tab 且容器物理布局就绪后挂载 Canvas 节点；
- * 4. 挂载后状态保持为 true（组件保活），后续切 Tab 不会重复销毁/重建，既保留画板笔迹，又避免重复创建的性能开销。
- */
-const isCanvasReady = ref(false);
+type FunctionDemoItem = {
+  id: string;
+  title: string;
+  desc: string;
+  btnText: string;
+  path: string;
+};
+
+const demoList: Array<FunctionDemoItem> = [
+  {
+    id: 'zpaging',
+    title: 'z-paging-x 原生分页 Demo',
+    desc: '演示 120Hz 极速列表、原生阻尼下拉刷新与高性能复用加载。',
+    btnText: '进入 z-paging-x 原生分页功能',
+    path: '/src/sub/zpagingFunctionDemo/zpagingFunctionDemo'
+  },
+  {
+    id: 'nestedScroll',
+    title: 'NestedScroll 嵌套滚动 Demo',
+    desc: '自研原生手势联通与平滑衔接，彻底消除双重滚动冲突。',
+    btnText: '进入 NestedScroll 嵌套滚动功能',
+    path: '/src/sub/nestedScrollFunctionDemo/nestedScrollFunctionDemo'
+  },
+  {
+    id: 'echarts',
+    title: 'ECharts 跨端图表 Demo',
+    desc: '基于 e-chart 组件，演示折线图、柱状图、饼图动态切换与交互。',
+    btnText: '进入 ECharts 跨端图表功能',
+    path: '/src/sub/echartsFunctionDemo/echartsFunctionDemo'
+  },
+  {
+    id: 'signature',
+    title: 'lime-signature 签名板 Demo',
+    desc: '演示平滑笔迹书写、画笔粗细与颜色调节、撤销重做与图片保存。',
+    btnText: '进入 lime-signature 签名板功能',
+    path: '/src/sub/signatureFunctionDemo/signatureFunctionDemo'
+  },
+  {
+    id: 'rxjs',
+    title: 'RxJS 响应式流 Demo',
+    desc: 'UTS 自研 rxjs-lite，演示防抖节流、流式接收与订阅管理。',
+    btnText: '进入 RxJS 响应式流功能',
+    path: '/src/sub/rxjsFunctionDemo/rxjsFunctionDemo'
+  },
+  {
+    id: 'device',
+    title: '原生设备与系统能力 Demo',
+    desc: '演示拨号分享、文件文档预览、触感震动、键盘避让与相机扫码。',
+    btnText: '进入原生设备与系统能力功能',
+    path: '/src/sub/deviceFunctionDemo/deviceFunctionDemo'
+  },
+  {
+    id: 'lodash',
+    title: 'Lodash 工具库 Demo',
+    desc: '演示数组切片去重、对象深拷贝、驼峰转换与函数防抖节流。',
+    btnText: '进入 Lodash 工具库功能',
+    path: '/src/sub/lodashFunctionDemo/lodashFunctionDemo'
+  },
+  {
+    id: 'crypto',
+    title: 'Crypto 加密解密 Demo',
+    desc: '演示 Base64、MD5、SHA-256、HMAC、AES 与 DES 常用加解密套件。',
+    btnText: '进入 Crypto 加密解密功能',
+    path: '/src/sub/cryptoFunctionDemo/cryptoFunctionDemo'
+  },
+  {
+    id: 'time',
+    title: 'Time 时间日期操作 Demo',
+    desc: '基于 lime-dayuts，演示时间格式化、增减计算、相对时间与时间戳转换。',
+    btnText: '进入 Time 时间日期操作功能',
+    path: '/src/sub/timeFunctionDemo/timeFunctionDemo'
+  },
+  {
+    id: 'webview',
+    title: 'WebView 双向通讯 Demo',
+    desc: '演示网页容器内嵌、postMessage 跨端消息收发与 evalJS 动态交互。',
+    btnText: '进入 WebView 双向通讯功能',
+    path: '/src/sub/webviewFunctionDemo/webviewFunctionDemo'
+  }
+];
+
+function navigateToDemo(url: string): void {
+  uni.navigateTo({
+    url,
+    fail: (err) => {
+      console.error('navigateToDemo fail:', err);
+    }
+  });
+}
 
 // 页面数据加载/刷新方法
 function refreshData(): void {
   console.log('功能页面刷新中...');
   setTimeout(() => {
-    // 门控检查：若刷新完成时用户已切到其他 Tab 则忽略
-    if (curIdx.value != 2) {
+    if (curIdx.value != resolveTabIndexByKey('function')) {
       return;
     }
     console.log('功能页面刷新成功');
-    // 数据加载完毕后，手动停止下拉刷新动画状态
     stopNavbarPullDownRefresh();
   }, 1000);
 }
 
-// 监听 Tab 切换到当前功能页（索引 2）时触发
-onTabShow(2, () => {
-  console.log('onTabShow 功能 Tab 显示');
-  // 延迟 100ms 挂载：确保微信小程序与各端渲染线程（WebView/原生容器）已将视图移入可视区并完成物理像素排版
-  if (!isCanvasReady.value) {
-    setTimeout(() => {
-      isCanvasReady.value = true;
-    }, 100);
-  }
-}, true);
-
-onMounted(() => {
-  // 挂载兜底兼容：
-  // 1. 独立页面访问模式（非 TabBar 容器场景，curIdx 为 -1）
-  // 2. 项目配置当前功能页为首屏默认激活 Tab（curIdx 为 2）
-  // 在视图节点初次渲染就绪后延迟激活 Canvas 组件
-  if (curIdx.value < 0 || curIdx.value == 2) {
-    setTimeout(() => {
-      isCanvasReady.value = true;
-    }, 200);
-  }
-});
-
-// 监听 navbar 自定义下拉刷新事件（在 enablePullDownRefresh: true 且处于当前 Tab 时生效）
+// 监听 navbar 自定义下拉刷新事件
 onNavbarPullDownRefresh(() => {
-  if (curIdx.value == 2) {
+  if (curIdx.value == resolveTabIndexByKey('function')) {
     refreshData();
   }
 });
 
-// 监听功能 Tab 页面显示（切 Tab、从子页面返回、前台恢复都会触发）
-onTabPageShow(2, () => {
+// 监听 Tab 切换到当前功能页（config.uts 中 type: 'function'）
+onTabShow('function', () => {
+  console.log('onTabShow 功能 Tab 显示');
+}, true);
+
+// 监听功能 Tab 页面显示
+onTabPageShow('function', () => {
   console.log('onTabPageShow 功能 Tab 显示');
 }, true);
 
 onMounted(() => {
+  console.log(systemInfo.value?.availableHeight, 'systemInfo.value?.availableHeight');
   console.log('功能 Tab 挂载了');
 });
 

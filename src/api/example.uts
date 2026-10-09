@@ -8,10 +8,9 @@
 // 新增真实页面请一律建 src/api/<页面目录名>/<页面目录名>.uts，不要改本文件。
 // ==========================================
 
-import { API_DOMAINS, http } from '@/src/http/request.uts';
+import { API_DOMAINS, DEFAULT_OSS_UPLOAD_PATH, http, uploadFile } from '@/src/http/index.uts';
+import type { UploadFileOptions } from '@/src/http/index.uts';
 import type { LimeRequestConfig } from '@/uni_modules/lime-request';
-import { DEFAULT_OSS_UPLOAD_PATH, uploadFile } from '@/src/utils/upload/index.uts';
-import type { UploadFileOptions } from '@/src/utils/upload/index.uts';
 
 export const FOO_UPLOAD_PATH: string = DEFAULT_OSS_UPLOAD_PATH;
 

@@ -9,65 +9,31 @@
  * 校验是否已同步：node scripts/gen-uts-dts.mjs --check
  */
 /**
- * 注册当前页面的 toast 实例到全局栈中
+ * 普通文本轻提示（无图标，时长 1500ms）
+ * @param message 提示文本
  */
-export declare function registerToast(toastInstance: ComponentPublicInstance): void;
+export declare function toast(message: string): void;
 
 /**
- * 从全局栈中移除当前页面的 toast 实例
+ * 成功轻提示（带成功对勾图标，时长 1500ms）
+ * @param message 成功提示文本
  */
-export declare function unregisterToast(toastInstance: ComponentPublicInstance): void;
-
-/**
- * 调用当前最上层活跃页面的 toast 提示
- */
-export declare function showToast(options: UTSJSONObject): void;
-
-/**
- * 快捷调用 toast
- */
-export declare function toast(message: string, type: string = 'default'): void;
-
 export declare function toastSuccess(message: string): void;
 
+/**
+ * 失败错误轻提示（带错误图标，时长 1500ms）
+ * @param message 错误提示文本
+ */
 export declare function toastError(message: string): void;
 
-export declare function toastWarning(message: string): void;
-
-export declare function toastPrimary(message: string): void;
+/**
+ * 显示全局加载中提示框（默认带透明蒙层防重复操作）
+ * @param title 加载中文案，默认为 '加载中...'
+ * @param mask 是否显示透明蒙层，默认为 true
+ */
+export declare function showLoading(title: string = '加载中...', mask: boolean = true): void;
 
 /**
- * 消息提示工具聚合类
- *
- * 集中呈现各类 Toast 提示方法，一目了然；同时支持面向对象式 `toastUtils.xxx()` 调用。
- *
- * @example
- * ```uts
- * // 方式 1：标准具名导入
- * import { toast, toastSuccess, toastError } from '@/src/utils/toast/index.uts';
- *
- * // 方式 2：对象单例导入（一目了然）
- * import { toastUtils } from '@/src/utils/toast/index.uts';
- * toastUtils.success('操作成功');
- * ```
+ * 关闭全局加载中提示框
  */
-export declare class ToastUtils {
-  showToast(options: UTSJSONObject): void;
-
-  toast(message: string, type: string = 'default'): void;
-
-  info(message: string): void;
-
-  success(message: string): void;
-
-  error(message: string): void;
-
-  warning(message: string): void;
-
-  primary(message: string): void;
-}
-
-/** 消息提示工具全局单例 */
-export declare const toastUtils: ToastUtils;
-
-export default toastUtils;
+export declare function hideLoading(): void;

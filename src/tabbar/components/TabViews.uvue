@@ -6,16 +6,20 @@
     <TabContent :content-index="1" title="基础" :enable-pull-down-refresh="true">
       <BasicView />
     </TabContent>
-    <TabContent :content-index="2" title="功能" :enable-pull-down-refresh="true">
+    <TabContent :content-index="2" title="AI 智能助手" :enable-pull-down-refresh="false">
+      <AiView />
+    </TabContent>
+    <TabContent :content-index="3" title="功能" :enable-pull-down-refresh="true">
       <FunctionView />
     </TabContent>
-    <TabContent :content-index="3" title="我的" :enable-pull-down-refresh="true">
+    <TabContent :content-index="4" title="我的" :enable-pull-down-refresh="true">
       <MeView />
     </TabContent>
   </view>
 </template>
 
 <script setup lang="uts">
+import AiView from '@/src/pages/ai/views/AiView.uvue';
 import BasicView from '@/src/pages/basic/views/BasicView.uvue';
 import FunctionView from '@/src/pages/function/views/FunctionView.uvue';
 import IndexView from '@/src/pages/index/views/IndexView.uvue';

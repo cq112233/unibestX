@@ -200,7 +200,7 @@ defineOptions({
   styleIsolation: 'isolated'
 });
 
-import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/utils/refresh/index.uts';
+import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/layouts/navbar/utils/index.uts';
 import { curIdx, onTabShow } from '@/src/tabbar';
 
 // 页面数据加载/刷新方法

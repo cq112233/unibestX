@@ -45,9 +45,9 @@
 <script setup lang="uts">
 import { computed } from 'vue';
 import { useTokenStore, useUserStore } from '@/src/store';
-import { LOGIN_PAGE } from '@/src/router/config.uts';
+import { LOGIN_PAGE } from '@/src/router/index.uts';
 import { curIdx, onTabPageShow, onTabShow, resolveTabIndexByKey, switchTabbar } from '@/src/tabbar/index.uts';
-import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/utils/refresh/index.uts';
+import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/layouts/navbar/utils/index.uts';
 
 // 页面数据加载/刷新方法
 function refreshData(): void {
