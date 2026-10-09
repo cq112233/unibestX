@@ -10,6 +10,4 @@
  */
 declare const i18n: any;
 
-export * from './utils/index.d.uts';
-
 export default i18n;

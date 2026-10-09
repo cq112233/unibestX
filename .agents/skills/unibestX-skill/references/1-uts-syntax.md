@@ -725,3 +725,113 @@ export * from './vdom/user.uts';
   验证产物看 `unpackage/cache/.app-android/src/index.kt`（**注意不带 `vapornativecode` 段**，那个目录里是恒为空的 `UniAppConfig`），编译成功时该文件有数千行，可用字符串常量（如 `__REFRESHABLE_401__`）grep 确认应用级 UTS 确实编进去了。
 
 ---
+
+## 1.22 全局开发统一遵循「精准导入（Deep / Precise Import）」铁律，杜绝原生类静态初始化死锁与 NPE
+
+- **错误现象**（本项目实测，真机 Android VDOM 模式与原生 Class 加载阶段）：
+
+  ```text
+  error: java.lang.NullPointerException: Parameter specified as non-null is null: method ComposerClass.setAvailabilities, parameter <set-?>
+  Possible Unhandled Promise Rejection: [java.lang.NoClassDefFoundError] {"message": "uni.UNIB120614.IndexKt", "cause": [java.lang.ExceptionInInitializerError] {"cause": [java.lang.NullPointerException] ...
+  ```
+
+- **底层原理**：
+  在 UTS 编译为 Android 原生 Kotlin 时，每个 `.uts` 都会映射生成一个 Kotlin Class 文件。
+  当某个模块使用 `index.uts` 作为聚合门面（Barrel File）并包含多个 `export *` 时，一旦被任意模块 `import`，Java/Kotlin 类加载器就会强行触发其转发的**所有子模块**的静态初始化代码（`<clinit>`）。
+  如果底层模块之间（如 `config`、`utils`、`router`、`store`、`i18n`）互相从 `index.uts` 导入，或者总入口 `index.uts` 反向 `export *` 子目录工具文件，就会瞬间形成**循环引用死锁（Circular Dependency Ring）**。
+  JVM 虚拟机为防止无限递归，会强行返回未完成初始化的类，导致类顶层的常量与实例为 `null`，传入 Kotlin 生成的 `@NotNull` 属性 setter 时直接抛出 `NullPointerException`，进而触发 `ExceptionInInitializerError` 导致整个应用崩溃。
+
+- **强制规范**：
+  1. **全局开发坚持精准导入（Deep Import）**：所有工具函数、状态与配置导入，一律精准引入具体的实现文件（如 `@/src/config/env/env.uts`、`@/src/router/utils/utils.uts`、`@/src/i18n/utils/index.uts`），严禁跨底层模块引入 `index.uts` 聚合门面。
+  2. **总入口严禁反向导出形成自环**：主入口（如 `src/i18n/index.uts`）严禁再写 `export * from './utils/index.uts'`，彻底保持单向有向无环图（DAG）。
+  3. **分层原则**：
+     - **业务页面/组件**（`src/pages/`、`src/sub/`）：优先使用业务封装好的对外接口；
+     - **基础设施层核心库之间**（`config/`、`utils/`、`router/`、`store/`、`i18n/`）：**铁律**：严禁互相引用任何 `index.uts` 总入口，必须精准引入叶子文件。
+
+- **正反例**：
+
+  ```uts
+  // ❌ 错误：从路由聚合门面引入，连带拉起 interceptor、store，形成 config ➜ router ➜ store ➜ config 循环死锁
+  import { getCurrentPath } from '@/src/router/index.uts';
+
+  // ✅ 正确：精准导入纯净的具体实现文件，0 额外依赖，杜绝循环引用
+  import { getCurrentPath } from '@/src/router/utils/utils.uts';
+  ```
+
+  ```uts
+  // ❌ 错误：在主入口中反向导出子工具，导致 index.uts 还没初始化完就加载子工具，形成自引用死锁
+  export * from './utils/index.uts';
+
+  // ✅ 正确：主入口只专注于自身实例创建与导出，工具方法在具体工具文件中独立导出
+  export default i18n;
+  ```
+
+---
+
+## 1.23 组件实例方法调用必须使用 `ComponentPublicInstance`，严禁强转 `as any` 后调用 `$callMethod`
+
+- **错误码与现象**（Kotlin 原生编译）：
+
+  ```text
+  error: 找不到名称“$callMethod”。参考: https://doc.dcloud.net.cn/uni-app-x/uts/compiler-known-issues.html#error18
+  at src/sub/signatureFunctionDemo/signatureFunctionDemo.uvue:201:7
+  200|    if (type === 'clear') {
+  201|      (el as any).$callMethod('clear');
+  ```
+
+- **底层原理**：
+  在 UTS 原生编译为 Kotlin 时，`any` 类型**不支持动态方法反射调用**。当把组件引用 `(el as any)` 强转为 `any` 时，UTS 编译器认为 `any` 上没有任何属性与方法，直接抛出 `error18 找不到名称“$callMethod”`。
+  `$callMethod` 是 uni-app X 官方专门挂载在 `ComponentPublicInstance` 上的跨端方法分发接口。
+- **强制规范**：
+  1. 通过 `ref` 承载的组件实例一律声明为 `ref<ComponentPublicInstance | null>(null)`；
+  2. 调用时保持 `ComponentPublicInstance` 强类型：`el.$callMethod('methodName', args)`，**严禁使用 `as any`**；
+  3. 如在 TS 检查下提示属性不存在，应在全局 `src/types/uni.d.ts` 为 `ComponentCustomProperties` 扩充 `$callMethod` 声明。
+
+- **正反例**：
+
+  ```uts
+  // ❌ 错误：强转 as any 导致 Kotlin 编译器丢失类型推断，报 error18 找不到名称 $callMethod
+  const el = sigRef.value;
+  (el as any).$callMethod('clear');
+
+  // ✅ 正确：声明为 ComponentPublicInstance 强类型，直接调用 $callMethod
+  const sigRef = ref<ComponentPublicInstance | null>(null);
+  const el = sigRef.value;
+  if (el != null) {
+    el.$callMethod('clear');
+  }
+  ```
+
+---
+
+## 1.24 `<web-view>` 组件 `@message` 事件入参必须显式声明为 `UniWebViewMessageEvent`
+
+- **错误码与现象**（Kotlin 原生编译）：
+
+  ```text
+  error: 找不到名称“detail”。参考: https://doc.dcloud.net.cn/uni-app-x/uts/compiler-known-issues.html#error18
+  at src/sub/webviewFunctionDemo/webviewFunctionDemo.uvue:47:20
+  46|  function onWebviewMessage(event: any): void {
+  47|    const data = event.detail.data;
+  ```
+
+- **底层原理**：
+  在 `<web-view>` 组件的 `@message` 回调中，如果参数写成 `(event: any)`，在 Web 动态环境可以读取 `event.detail`，但在 Android Kotlin 编译时，UTS 对 `any` 不支持隐式属性访问，会直接抛出 `error18 找不到名称“detail”`。
+- **强制规范**：
+  必须将回调参数显式声明为 uni-app X 官方事件强类型 `event: UniWebViewMessageEvent`。
+
+- **正反例**：
+
+  ```uts
+  // ❌ 错误：声明为 any，Kotlin 编译期报 error18 找不到名称 detail
+  function onWebviewMessage(event: any): void {
+    const list = event.detail.data;
+  }
+
+  // ✅ 正确：显式声明为官方强类型 UniWebViewMessageEvent
+  function onWebviewMessage(event: UniWebViewMessageEvent): void {
+    const list = event.detail.data;
+  }
+  ```
+
+---

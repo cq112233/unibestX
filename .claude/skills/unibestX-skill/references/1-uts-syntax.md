@@ -346,7 +346,6 @@ export * from './vdom/user.uts';
 
 ---
 
-
 ## 1.14 遍历「值类型为 `any` 的 Map」时，**给回调参数显式标注 `any`** 会炸 —— 去掉标注或改用 `UTSJSONObject.keys()`；且 `map.keys()` 在 Kotlin 里是属性不是函数
 
 - **错误码**（本项目实测，unix-router-guard 任务 0 探针，真机 VDOM/Kotlin 通道）：
@@ -630,7 +629,7 @@ export * from './vdom/user.uts';
   }
   ```
 
-- **⚠️ 不要顺手把所有三元都改成 `if`**：本条只针对**联合类型**（`number | string`、`T | null` 等）。单类型变量上的三元是完全合法的 —— 本项目 `src/utils/theme/index.uts`、`src/utils/error-report/index.uts`、`src/tabbar/internal/strategy.uts` 等几十处三元一直正常编译。**改法要精准命中联合类型，不要全仓机械替换**。
+- **⚠️ 不要顺手把所有三元都改成 `if`**：本条只针对**联合类型**（`number | string`、`T | null` 等）。单类型变量上的三元是完全合法的 —— 本项目 `src/theme/index.uts`、`src/utils/error-report/index.uts`、`src/tabbar/internal/strategy.uts` 等几十处三元一直正常编译。**改法要精准命中联合类型，不要全仓机械替换**。
 - **⚠️ 为什么 H5 / `lint` / 真机跑一遍都发现不了**：这是**编译期**错误，H5 编译目标是 JS 走的是另一套宽松语法；而 `launch app-android --compile true` 不到 Kotlin 阶段（见 3.15 / 3.20），本地很容易全绿。**只有真正走到 Kotlin 编译阶段才暴露**。
 
 ---
@@ -724,5 +723,47 @@ export * from './vdom/user.uts';
   ```
 
   验证产物看 `unpackage/cache/.app-android/src/index.kt`（**注意不带 `vapornativecode` 段**，那个目录里是恒为空的 `UniAppConfig`），编译成功时该文件有数千行，可用字符串常量（如 `__REFRESHABLE_401__`）grep 确认应用级 UTS 确实编进去了。
+
+---
+
+## 1.22 全局开发统一遵循「精准导入（Deep / Precise Import）」铁律，杜绝原生类静态初始化死锁与 NPE
+
+- **错误现象**（本项目实测，真机 Android VDOM 模式与原生 Class 加载阶段）：
+
+  ```text
+  error: java.lang.NullPointerException: Parameter specified as non-null is null: method ComposerClass.setAvailabilities, parameter <set-?>
+  Possible Unhandled Promise Rejection: [java.lang.NoClassDefFoundError] {"message": "uni.UNIB120614.IndexKt", "cause": [java.lang.ExceptionInInitializerError] {"cause": [java.lang.NullPointerException] ...
+  ```
+
+- **底层原理**：
+  在 UTS 编译为 Android 原生 Kotlin 时，每个 `.uts` 都会映射生成一个 Kotlin Class 文件。
+  当某个模块使用 `index.uts` 作为聚合门面（Barrel File）并包含多个 `export *` 时，一旦被任意模块 `import`，Java/Kotlin 类加载器就会强行触发其转发的**所有子模块**的静态初始化代码（`<clinit>`）。
+  如果底层模块之间（如 `config`、`utils`、`router`、`store`、`i18n`）互相从 `index.uts` 导入，或者总入口 `index.uts` 反向 `export *` 子目录工具文件，就会瞬间形成**循环引用死锁（Circular Dependency Ring）**。
+  JVM 虚拟机为防止无限递归，会强行返回未完成初始化的类，导致类顶层的常量与实例为 `null`，传入 Kotlin 生成的 `@NotNull` 属性 setter 时直接抛出 `NullPointerException`，进而触发 `ExceptionInInitializerError` 导致整个应用崩溃。
+
+- **强制规范**：
+  1. **全局开发坚持精准导入（Deep Import）**：所有工具函数、状态与配置导入，一律精准引入具体的实现文件（如 `@/src/config/env/env.uts`、`@/src/router/utils/utils.uts`、`@/src/i18n/utils/index.uts`），严禁跨底层模块引入 `index.uts` 聚合门面。
+  2. **总入口严禁反向导出形成自环**：主入口（如 `src/i18n/index.uts`）严禁再写 `export * from './utils/index.uts'`，彻底保持单向有向无环图（DAG）。
+  3. **分层原则**：
+     - **业务页面/组件**（`src/pages/`、`src/sub/`）：优先使用业务封装好的对外接口；
+     - **基础设施层核心库之间**（`config/`、`utils/`、`router/`、`store/`、`i18n/`）：**铁律**：严禁互相引用任何 `index.uts` 总入口，必须精准引入叶子文件。
+
+- **正反例**：
+
+  ```uts
+  // ❌ 错误：从路由聚合门面引入，连带拉起 interceptor、store，形成 config ➜ router ➜ store ➜ config 循环死锁
+  import { getCurrentPath } from '@/src/router/index.uts';
+
+  // ✅ 正确：精准导入纯净的具体实现文件，0 额外依赖，杜绝循环引用
+  import { getCurrentPath } from '@/src/router/utils/utils.uts';
+  ```
+
+  ```uts
+  // ❌ 错误：在主入口中反向导出子工具，导致 index.uts 还没初始化完就加载子工具，形成自引用死锁
+  export * from './utils/index.uts';
+
+  // ✅ 正确：主入口只专注于自身实例创建与导出，工具方法在具体工具文件中独立导出
+  export default i18n;
+  ```
 
 ---

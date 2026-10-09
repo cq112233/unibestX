@@ -80,6 +80,7 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 | **对象字面量包含函数导出** | `export const env = { getApiBaseUrl }`（Kotlin 编译报 `Function invocation expected`） | 统一使用标准具名函数导出 `export function getApiBaseUrl()` |
 | **原生回调参数访问** | `(res as UTSJSONObject).tempFiles`（Kotlin 运行时崩溃 `ClassCastException`） | 直接利用原生类型推断访问 `res.tempFiles`，严禁将回调结果强转 `UTSJSONObject` |
 | **多层 `export *` 重导出（`error18 找不到名称` / 运行期 `NoSuchMethodError`）** | 子模块与门面对同一符号多次 `export *` 转发（Kotlin 端符号被改名为 `useXxxStore__1`） | 同一顶层符号只在一层门面中 `export *`；子模块严禁再整包重导出 |
+| **模块导入与循环引用（Kotlin 类加载死锁 / NPE）** | 底层模块互相引用 `index.uts` 聚合门面，或总入口反向 `export *` 导致循环引用闭环（运行期报 `Parameter specified as non-null is null` / `ExceptionInInitializerError` / `NoClassDefFoundError`） | 全局开发统一坚持**精准导入（Deep / Precise Import）**，直接引入具体实现文件（如 `@/src/config/env/env.uts`、`@/src/router/utils/utils.uts`），严禁底层互相穿透引用 `index.uts` 总入口，总入口严禁反向 `export *` 自环（详见 **1.22**） |
 | **局部函数/变量与框架全局同名（撞车导致找不到或参数不匹配）** | 页面里写 `function stop()`（撞 `@vue/reactivity` 全局 `stop(runner)`） | 局部方法一律加业务前缀（如 `stopStream`）；且局部函数必须定义在调用点之前（Kotlin 声明不提升） |
 | **回调引用承载自身的变量（`error18 找不到名称`）** | `const timerId = setInterval(() => { clearInterval(timerId) })` | `let timerId: number = 0;` 先声明，再 `timerId = setInterval(...)` 赋值 |
 | **真机 `IndexOutOfBoundsException`** | 数组下标越界检查未前置（JS 返回 `undefined`，Kotlin 直接抛异常） | 边界判断必须与下标读取写进**同一个**短路表达式且判断在前：`i < arr.length && arr[i]` |
@@ -103,8 +104,8 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 | **链式 `.catch()`（`error25 None of the following candidates is applicable`）** | `.then(done).catch((err: any) => {...})`（UTSPromise 的三个 `.catch` 重载在 Kotlin 端均无法收敛；**与回调返回类型、是否 `throw` 无关**，单一返回类型的回调照样报错） | 改为双参 `.then(onFulfilled, onRejected)`，拒绝回调并进第二参；要表达「抛出」时用 `Promise.reject(toError(err)) as Promise<T>` 而非 `throw`（`Promise.resolve(...)` 包裹也一并去掉，详见 **1.21**） |
 | **系统尺寸与高度获取** | 散落调用 `uni.getSystemInfoSync()` 或样式手写 `100vh`（损耗性能、非响应式、原生端不支持 vh 且易被 TabBar/导航栏遮挡） | 优先引入 `@/src/utils/systemInfo/index.uts` 中的响应式变量（`availableHeight`、`statusBarHeight`、`navBarHeight`、`safeAreaBottom`）或使用 `sys` 单例（详见 **分册 8**） |
 | **环境变量与服务地址读取** | 手写 `process.env` / `import.meta.env` 或在代码里硬编码域名 IP（原生平台无法识别且切换环境易出错） | 统一从 `@/src/utils/env/index.uts` 引入具名方法（`getApiBaseUrl()`、`getOssBaseUrl()`、`isDev()`、`isProd()`、`isVaporMode()`）（详见 **分册 8**） |
-| **轻提示与加载动画 (Toast / Loading)** | 散落手写 `uni.showToast({ title: '...', icon: 'none' })` | 统一引入 `@/src/utils/toast/index.uts` 中的 `toast(msg)`、`showToast(...)`、`showLoading()`、`hideLoading()`（详见 **分册 8**） |
-| **页面跳转与路由控制** | 直接调用原生 `uni.navigateTo` 等且未做参数编码与越界防护 | 优先引入 `@/src/utils/route/index.uts` 的 `router.push()` / `router.replace()` / `router.back()` 或模块封装函数（详见 **分册 8**） |
+| **轻提示与加载动画 (Toast / Loading)** | 散落手写 `uni.showToast({ title: '...', icon: 'none' })` | 统一引入 `@/src/utils/toast/index.uts` 中的 5 个轻量纯函数：`toast(msg)`、`toastSuccess(msg)`、`toastError(msg)`、`showLoading()`、`hideLoading()`（详见 **分册 8**） |
+| **页面跳转与路由控制** | 直接调用原生 `uni.navigateTo` 等且未做参数编码与越界防护 | 优先引入 `@/src/router/index.uts` 的路由封装方法（如 `toLoginPage()`、`cleanPath()`、`getCurrentPath()`、`parseUrlToObj()` 或 `route` 单例，详见 **分册 8**） |
 
 ---
 
@@ -147,3 +148,4 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 - [ ] **33. 业务功能开发前优先复用 `@/src/utils/` 下既有封装**（严禁在局部重新手写已有的通用方法，引用路径一律使用 `@/src/utils/<module>/index.uts` 绝对路径，见分册 8）
 - [ ] **34. 联合类型变量（`number | string`、`T | null` 等）上严禁直接写三元表达式**（UTS 在 `typeof` 窄化前先解析三元，判据对另一分支类型非法即报 `Expression expected` 且箭头指向判据操作数；必须拆成 `if` 语句提前 `return`。**只针对联合类型，单类型变量上的三元合法，严禁全仓机械替换**，见 1.20）
 - [ ] **35. 严禁写链式 `.catch()`**（UTSPromise 的三个 `.catch` 重载在 Kotlin 端均无法收敛，报 `error25 None of the following candidates is applicable`，**与回调返回类型 / 是否 `throw` 无关**；一律改为双参 `.then(onFulfilled, onRejected)`，拒绝回调并进第二参，并且该回调内要用 `Promise.reject(err) as Promise<T>` 而非 `throw` 来表达失败，见 1.21）
+- [ ] **36. 全局开发统一坚持「精准导入（Deep / Precise Import）」原则**（严禁底层模块从聚合门面 `index.uts` 互相穿透引用，所有模块导入一律精准指向具体的实现文件如 `@/src/config/env/env.uts`、`@/src/router/utils/utils.uts`、`@/src/i18n/utils/index.uts`；总入口严禁反向 `export *` 形成自环；彻底根绝 Android 原生端类静态初始化 `<clinit>` 循环死锁与 `NullPointerException`，见 1.22）
