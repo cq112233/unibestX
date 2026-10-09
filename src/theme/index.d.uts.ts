@@ -56,6 +56,11 @@ export type ThemeTokens = {
 export declare function getDefaultTheme(): string;
 
 /**
+ * 获取默认外观模式（全端从 import.meta.env.VITE_DEFAULT_THEME_MODE 读取，合法值：auto | light | dark，未配置或非法值时兜底 auto）
+ */
+export declare function getDefaultThemeMode(): ThemeMode;
+
+/**
  * 全局主题色（响应式）：由 app store 在主题变更时写入，TabBar 各 UI 组件读取。
  * 迁入主题域后 store 不再反向依赖 tabbar。
  */
@@ -147,6 +152,8 @@ export declare function watchThemeChange(callback: () => void): void;
  */
 export declare class ThemeUtils {
   getDefaultTheme(): string;
+
+  getDefaultThemeMode(): ThemeMode;
 
   getSystemTheme(): string;
 

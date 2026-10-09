@@ -5,6 +5,7 @@ import {
   applyThemeColor,
   applyThemeMode,
   getDefaultTheme,
+  getDefaultThemeMode,
   getSystemTheme,
   isDarkMode,
   themeColor
@@ -32,13 +33,14 @@ function getStoredAppState(): Partial<IAppState> | null {
 
 export const useAppStore = defineStore('app', () => {
   const stored = getStoredAppState();
+  const defaultMode = getDefaultThemeMode();
 
   // 1. 响应式状态（优先使用本地已持久化的状态，未配置时使用环境默认值）
   const state = reactive<IAppState>({
     theme: stored?.theme ?? getDefaultTheme(),
     locale: stored?.locale ?? getDefaultLocale(),
-    themeMode: stored?.themeMode ?? 'auto',
-    isDark: stored?.isDark ?? isDarkMode(stored?.themeMode ?? 'auto'),
+    themeMode: stored?.themeMode ?? defaultMode,
+    isDark: stored?.isDark ?? isDarkMode(stored?.themeMode ?? defaultMode),
     mode: 'vapor'
   });
 

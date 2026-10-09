@@ -54,6 +54,11 @@ export declare function getH5UseProxy(): boolean;
 export declare function getDefaultTheme(): string;
 
 /**
+ * 获取默认外观模式（全端从 import.meta.env 读取，合法值：auto | light | dark，兜底 auto）
+ */
+export declare function getDefaultThemeMode(): string;
+
+/**
  * 获取默认国际化语言（全端从 import.meta.env 读取，未配置时自动识别系统语言，最后兜底 zh-CN）
  */
 export declare function getDefaultLocale(): string;
@@ -166,6 +171,8 @@ export declare class EnvUtils {
   getH5UseProxy(): boolean;
 
   getDefaultTheme(): string;
+
+  getDefaultThemeMode(): string;
 
   getDefaultLocale(): string;
 
