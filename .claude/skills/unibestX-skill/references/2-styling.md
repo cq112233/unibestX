@@ -88,19 +88,39 @@
 ## 2.5 颜色值一律强制十六进制，严禁使用英文命名颜色
 
 - **铁律**：**颜色必须全部统一使用标准十六进制色值（如 `#ffffff`、`#ef4444`、`#1e293b`），严禁使用英文单词命名颜色（如 `bg-[red]`、`text-[red]`、`border-[blue]`）**。
-- **原因**：原生平台对 CSS 命名颜色的解析不一致，极易失效；且预设类名（如 `text-white`）在鸿蒙 VDOM 或作用域插槽中可能丢失 CSS 变量继承退化为黑色。
+- **生效范围**：
+  1. **Tailwind 类名**：严禁 `bg-[red]`、`text-[red]`、`border-[blue]`，推荐 `text-[#ffffff]`、`bg-[#ffffff]`、`border-[#e2e8f0]`；避免使用直接依赖 CSS 变量的英文类（如 `text-white`、`bg-white` 推荐显式写为 `text-[#ffffff]`、`bg-[#ffffff]`）。
+  2. **`<style>` 样式表**：根据项目 Stylelint 规则 `'color-named': ['never', { severity: 'warning' }]`，样式表中严禁书写 `color: red;`、`background-color: white;`，必须全部转为标准十六进制 `color: #ff0000;`、`background-color: #ffffff;`。
+  3. **行内样式与动态 `:style`**：统一书写十六进制或通过主题 Token 注入十六进制。
+- **原因**：原生平台对 CSS 命名颜色的解析不一致，极易失效；且预设类名在鸿蒙 VDOM 或作用域插槽中可能丢失 CSS 变量继承退化为黑色。
 - **鸿蒙 VDOM 白色双重防护**：在插槽（slot）、下拉刷新、悬浮按钮等容器内的白色文字，强烈建议使用 `class="text-[#ffffff]"` 并叠加内联样式 `:style="{ color: '#ffffff' }"` 确保 100% 稳定呈现白色。
 
 ```html
-<!-- ❌ 错误：使用英文命名颜色 -->
-<view class="bg-[red] p-[10px]">
-  <text class="text-[white]">提示</text>
-</view>
+<!-- ❌ 错误：使用英文命名颜色（Tailwind 与 <style> 均会触发 ESLint / Stylelint 警告与原生解析失效） -->
+<template>
+  <view class="bg-[red] p-[10px]">
+    <text class="text-[white]">提示</text>
+  </view>
+</template>
+
+<style lang="scss">
+.title {
+  color: red; /* ❌ 触发 Stylelint color-named 警告 */
+}
+</style>
 
 <!-- ✅ 正确：全部标准十六进制 + 关键白色双重防护 -->
-<view class="bg-[#ef4444] p-[10px]">
-  <text class="text-[#ffffff] text-[14px]" style="color: #ffffff;">提示</text>
-</view>
+<template>
+  <view class="bg-[#ef4444] p-[10px]">
+    <text class="text-[#ffffff] text-[14px]" style="color: #ffffff;">提示</text>
+  </view>
+</template>
+
+<style lang="scss">
+.title {
+  color: #ef4444; /* ✅ 十六进制色值 */
+}
+</style>
 ```
 
 ## 2.6 Tailwind CSS 边框书写规范
@@ -617,4 +637,47 @@ warn: property value `100%` is not supported for `min-height` (supported values 
 <view class="flex-1 w-full" style="box-sizing:border-box;">
   <text>画布</text>
 </view>
+```
+
+## 2.24 Stylelint 规范与 CSS 属性声明严格 8 阶排序 (`order/properties-order`)
+
+为了保证项目样式代码结构清晰、统一可维护，并通过 CI 的 Stylelint 检查，在 `.vue` / `.uvue` 中的 `<style>` 块及 `.scss` 文件内书写 CSS 时，必须严格遵循以下 **8 阶属性声明排序规则**：
+
+| 顺序阶梯 | 属性分类 | 核心属性清单（按先后顺序书写） |
+| :--- | :--- | :--- |
+| **1. 定位** | Positioning | `position` → `top` → `right` → `bottom` → `left` → `z-index` |
+| **2. 布局模型** | Display & Flexbox | `display` → `flex-direction` → `flex-wrap` → `justify-content` → `align-items` → `align-content` → `flex` → `flex-grow` → `flex-shrink` → `flex-basis` → `order` |
+| **3. 盒模型尺寸** | Box Model | `box-sizing` → `width` → `min-width` → `max-width` → `height` → `min-height` → `max-height` |
+| **4. 边距系统** | Margin & Padding | `margin` (`margin-top` → `margin-right` → `margin-bottom` → `margin-left`) → `padding` (`padding-top` → `padding-right` → `padding-bottom` → `padding-left`) |
+| **5. 边框与圆角** | Border & Radius | `border` → `border-width` → `border-style` → `border-color` → `border-top` → `border-right` → `border-bottom` → `border-left` → `border-radius` |
+| **6. 背景** | Background | `background` → `background-color` → `background-image` → `background-repeat` → `background-position` → `background-size` |
+| **7. 文本与排版** | Typography | `color` → `font` → `font-family` → `font-size` → `font-weight` → `line-height` → `text-align` → `text-decoration` → `text-overflow` → `white-space` → `word-break` |
+| **8. 其他视觉** | Visual & Animation | `opacity` → `overflow` (`overflow-x`, `overflow-y`) → `transform` → `transition` → `animation` |
+
+```scss
+/* ❌ 错误：乱序书写（触发 Stylelint order/properties-order 警告） */
+.card {
+  color: #1e293b;
+  width: 100%;
+  display: flex;
+  margin-top: 12px;
+  position: relative;
+  background-color: #ffffff;
+}
+
+/* ✅ 正确：严格按照「定位 -> 布局 -> 尺寸 -> 边距 -> 边框 -> 背景 -> 文本 -> 其他」8阶排序 */
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  margin-top: 12px;
+  padding: 16px;
+  border-radius: 8px;
+  background-color: #ffffff;
+  color: #1e293b;
+  font-size: 14px;
+  line-height: 20px;
+}
 ```

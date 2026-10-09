@@ -23,6 +23,39 @@ export const NAVBAR_CONTENT_HEIGHT: number = 44;
  */
 export const TABBAR_BASE_HEIGHT: number = 50;
 
+const currentPlatform: string = uni.getSystemInfoSync().uniPlatform;
+
+/** 是否为 Android App 原生平台 */
+export const isAppAndroid: boolean = currentPlatform == 'app-android';
+
+/** 是否为 iOS App 原生平台 */
+export const isAppIos: boolean = currentPlatform == 'app-ios';
+
+/** 是否为 HarmonyOS (鸿蒙) App 原生平台 */
+export const isAppHarmony: boolean = currentPlatform == 'app-harmony';
+
+/** 是否为 Web / H5 平台 */
+export const isWeb: boolean = currentPlatform == 'web';
+
+/** 是否为 微信小程序平台 */
+export const isWeixinMp: boolean = currentPlatform == 'mp-weixin';
+
+/** 是否为 支付宝小程序平台 */
+export const isAlipayMp: boolean = currentPlatform == 'mp-alipay';
+
+/** 是否为 App 原生平台（Android / iOS / HarmonyOS） */
+export const isApp: boolean = isAppAndroid || isAppIos || isAppHarmony;
+
+/** 是否为 小程序平台（微信 / 支付宝） */
+export const isMp: boolean = isWeixinMp || isAlipayMp;
+
+/** 别名兼容导出 */
+export const isAndroid: boolean = isAppAndroid;
+export const isIos: boolean = isAppIos;
+export const isHarmony: boolean = isAppHarmony;
+export const isH5: boolean = isWeb;
+export const isWechatMp: boolean = isWeixinMp;
+
 // eslint-disable-next-line import/no-mutable-exports
 export let systemId: number = 0;
 
@@ -518,6 +551,37 @@ export class SystemUtils {
 
   /** 底部安全区高度响应式 computed（px），未初始化时为 0 */
   readonly safeAreaBottom = safeAreaBottom;
+
+  /** 是否为 Android App 原生平台 */
+  readonly isAppAndroid = isAppAndroid;
+
+  /** 是否为 iOS App 原生平台 */
+  readonly isAppIos = isAppIos;
+
+  /** 是否为 HarmonyOS (鸿蒙) App 原生平台 */
+  readonly isAppHarmony = isAppHarmony;
+
+  /** 是否为 Web / H5 平台 */
+  readonly isWeb = isWeb;
+
+  /** 是否为 微信小程序平台 */
+  readonly isWeixinMp = isWeixinMp;
+
+  /** 是否为 支付宝小程序平台 */
+  readonly isAlipayMp = isAlipayMp;
+
+  /** 是否为 App 原生平台（Android / iOS / HarmonyOS） */
+  readonly isApp = isApp;
+
+  /** 是否为 小程序平台（微信 / 支付宝） */
+  readonly isMp = isMp;
+
+  /** 别名兼容 */
+  readonly isAndroid = isAppAndroid;
+  readonly isIos = isAppIos;
+  readonly isHarmony = isAppHarmony;
+  readonly isH5 = isWeb;
+  readonly isWechatMp = isWeixinMp;
 
   /** 刷新并更新系统全局信息响应式状态 */
   updateSystemInfo(): void {

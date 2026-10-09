@@ -767,3 +767,71 @@ export * from './vdom/user.uts';
   ```
 
 ---
+
+## 1.23 组件实例方法调用必须使用 `ComponentPublicInstance`，严禁强转 `as any` 后调用 `$callMethod`
+
+- **错误码与现象**（Kotlin 原生编译）：
+
+  ```text
+  error: 找不到名称“$callMethod”。参考: https://doc.dcloud.net.cn/uni-app-x/uts/compiler-known-issues.html#error18
+  at src/sub/signatureFunctionDemo/signatureFunctionDemo.uvue:201:7
+  200|    if (type === 'clear') {
+  201|      (el as any).$callMethod('clear');
+  ```
+
+- **底层原理**：
+  在 UTS 原生编译为 Kotlin 时，`any` 类型**不支持动态方法反射调用**。当把组件引用 `(el as any)` 强转为 `any` 时，UTS 编译器认为 `any` 上没有任何属性与方法，直接抛出 `error18 找不到名称“$callMethod”`。
+  `$callMethod` 是 uni-app X 官方专门挂载在 `ComponentPublicInstance` 上的跨端方法分发接口。
+- **强制规范**：
+  1. 通过 `ref` 承载的组件实例一律声明为 `ref<ComponentPublicInstance | null>(null)`；
+  2. 调用时保持 `ComponentPublicInstance` 强类型：`el.$callMethod('methodName', args)`，**严禁使用 `as any`**；
+  3. 如在 TS 检查下提示属性不存在，应在全局 `src/types/uni.d.ts` 为 `ComponentCustomProperties` 扩充 `$callMethod` 声明。
+
+- **正反例**：
+
+  ```uts
+  // ❌ 错误：强转 as any 导致 Kotlin 编译器丢失类型推断，报 error18 找不到名称 $callMethod
+  const el = sigRef.value;
+  (el as any).$callMethod('clear');
+
+  // ✅ 正确：声明为 ComponentPublicInstance 强类型，直接调用 $callMethod
+  const sigRef = ref<ComponentPublicInstance | null>(null);
+  const el = sigRef.value;
+  if (el != null) {
+    el.$callMethod('clear');
+  }
+  ```
+
+---
+
+## 1.24 `<web-view>` 组件 `@message` 事件入参必须显式声明为 `UniWebViewMessageEvent`
+
+- **错误码与现象**（Kotlin 原生编译）：
+
+  ```text
+  error: 找不到名称“detail”。参考: https://doc.dcloud.net.cn/uni-app-x/uts/compiler-known-issues.html#error18
+  at src/sub/webviewFunctionDemo/webviewFunctionDemo.uvue:47:20
+  46|  function onWebviewMessage(event: any): void {
+  47|    const data = event.detail.data;
+  ```
+
+- **底层原理**：
+  在 `<web-view>` 组件的 `@message` 回调中，如果参数写成 `(event: any)`，在 Web 动态环境可以读取 `event.detail`，但在 Android Kotlin 编译时，UTS 对 `any` 不支持隐式属性访问，会直接抛出 `error18 找不到名称“detail”`。
+- **强制规范**：
+  必须将回调参数显式声明为 uni-app X 官方事件强类型 `event: UniWebViewMessageEvent`。
+
+- **正反例**：
+
+  ```uts
+  // ❌ 错误：声明为 any，Kotlin 编译期报 error18 找不到名称 detail
+  function onWebviewMessage(event: any): void {
+    const list = event.detail.data;
+  }
+
+  // ✅ 正确：显式声明为官方强类型 UniWebViewMessageEvent
+  function onWebviewMessage(event: UniWebViewMessageEvent): void {
+    const list = event.detail.data;
+  }
+  ```
+
+---

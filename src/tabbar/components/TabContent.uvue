@@ -26,8 +26,43 @@
       @scroll - 页面滚动监听，向上派发 onNavbarPageScroll 事件
       @scrolltolower - 滚动触底监听，向上派发 onNavbarReachBottom 事件
     -->
+    <!-- 1. 支付宝小程序专享：手势模拟下拉刷新（解决支付宝小程序无原生 refresher 问题） -->
     <scroll-view
-      :key="refresherKey"
+      v-if="isAlipayMp"
+      :key="`alipay-${refresherKey}`"
+      direction="vertical"
+      class="tab-content-scroll"
+      style="flex: 1;"
+      :lower-threshold="50"
+      @scroll="handleScroll"
+      @scrolltolower="handleScrollToLower"
+      @touchstart="handleAlipayTouchStart"
+      @touchmove="handleAlipayTouchMove"
+      @touchend="handleAlipayTouchEnd"
+      @touchcancel="handleAlipayTouchEnd"
+    >
+      <!-- 微信小程序同款：三个小圆点手势下拉刷新 Header -->
+      <view
+        class="alipay-pull-header"
+        :style="alipayHeaderStyle"
+      >
+        <view class="wechat-pull-dots" :class="{ 'wechat-pull-dots--active': isTriggered }">
+          <view class="wechat-pull-dot wechat-pull-dot--1"></view>
+          <view class="wechat-pull-dot wechat-pull-dot--2"></view>
+          <view class="wechat-pull-dot wechat-pull-dot--3"></view>
+        </view>
+      </view>
+      <!-- 插槽：放置对应 Tab 的具体业务视图组件（如 IndexView、BasicView 等） -->
+      <slot />
+
+      <!-- 底部 TabBar 统一占位垫高组件：根据 VITE_TABBAR_MODE、风格形态及安全区动态计算高度 -->
+      <TabbarPlaceholder />
+    </scroll-view>
+
+    <!-- 2. 原生全端（Android VDOM / iOS / Web / 微信小程序）：原生高性能极速滚动，无任何 touch 事件干扰 -->
+    <scroll-view
+      v-else
+      :key="`native-${refresherKey}`"
       direction="vertical"
       class="tab-content-scroll"
       style="flex: 1;"
@@ -40,27 +75,7 @@
       @refresherabort="handleRefresherRestore"
       @scroll="handleScroll"
       @scrolltolower="handleScrollToLower"
-      @touchstart="handleAlipayTouchStart"
-      @touchmove="handleAlipayTouchMove"
-      @touchend="handleAlipayTouchEnd"
-      @touchcancel="handleAlipayTouchEnd"
     >
-      <!-- #ifdef MP-ALIPAY -->
-      <!-- 微信小程序同款：三个小圆点手势下拉刷新 Header -->
-      <view
-        class="alipay-pull-header"
-        :style="{
-          height: `${alipayPullHeight}px`,
-          transition: isAlipayTouching ? 'none' : 'height 0.25s ease'
-        }"
-      >
-        <view class="wechat-pull-dots" :class="{ 'wechat-pull-dots--active': isTriggered }">
-          <view class="wechat-pull-dot wechat-pull-dot--1"></view>
-          <view class="wechat-pull-dot wechat-pull-dot--2"></view>
-          <view class="wechat-pull-dot wechat-pull-dot--3"></view>
-        </view>
-      </view>
-      <!-- #endif -->
       <!-- 插槽：放置对应 Tab 的具体业务视图组件（如 IndexView、BasicView 等） -->
       <slot />
 
@@ -75,6 +90,7 @@ import { computed, onMounted, onUnmounted, provide, ref, watch } from 'vue';
 import { curIdx } from '@/src/tabbar/index.uts';
 import TabbarPlaceholder from './TabbarPlaceholder.uvue';
 import { $t } from '@/src/i18n/utils/index.uts';
+import { isAlipayMp } from '@/src/utils/systemInfo/index.uts';
 import {
   isPageRefresherDisabled,
   isPageScrollDisabled,
@@ -230,9 +246,7 @@ const alipayPullHeight = ref(0);
  */
 function onStopRefresh(): void {
   isTriggered.value = false;
-  // #ifdef MP-ALIPAY
   alipayPullHeight.value = 0;
-  // #endif
 }
 
 /**
@@ -241,45 +255,48 @@ function onStopRefresh(): void {
 function abortPullDownRefresh(): void {
   wasRefreshInterrupted = true;
   isTriggered.value = false;
-  // #ifdef MP-ALIPAY
   alipayPullHeight.value = 0;
-  // #endif
   refresherKey.value++;
   stopNavbarPullDownRefresh();
 }
 
-// #ifdef MP-ALIPAY
 let alipayTouchStartY: number = 0;
 const isAlipayTouching = ref(false);
 let currentScrollTop: number = 0;
-// #endif
 
-function handleAlipayTouchStart(e: any) {
-  // #ifdef MP-ALIPAY
-  if (!isActive.value || !props.enablePullDownRefresh) {
+/**
+ * 支付宝手势下拉刷新 Header 动态样式
+ */
+const alipayHeaderStyle = computed((): string => {
+  if (!isAlipayMp) {
+    return 'height: 0px;';
+  }
+  const trans = isAlipayTouching.value ? 'none' : 'height 0.25s ease';
+  return `height: ${alipayPullHeight.value}px; transition: ${trans};`;
+});
+
+function handleAlipayTouchStart(e: UniTouchEvent) {
+  if (!isAlipayMp || !isActive.value || !props.enablePullDownRefresh) {
     return;
   }
   if (currentScrollTop <= 2 && !isTriggered.value) {
-    const touches = e.touches as Array<any>;
-    if (touches != null && touches.length > 0) {
-      const t = touches[0] as UTSJSONObject;
-      alipayTouchStartY = (t.clientY ?? t.pageY ?? 0) as number;
+    const touches = e.touches;
+    if (touches.length > 0) {
+      const t = touches[0];
+      alipayTouchStartY = t.clientY;
       isAlipayTouching.value = true;
     }
   }
-  // #endif
 }
 
-function handleAlipayTouchMove(e: any) {
-  // #ifdef MP-ALIPAY
-  if (!isAlipayTouching.value || isTriggered.value || currentScrollTop > 2) {
+function handleAlipayTouchMove(e: UniTouchEvent) {
+  if (!isAlipayMp || !isAlipayTouching.value || isTriggered.value || currentScrollTop > 2) {
     return;
   }
-  const touches = e.touches as Array<any>;
-  if (touches != null && touches.length > 0) {
-    const t = touches[0] as UTSJSONObject;
-    const curY = (t.clientY ?? t.pageY ?? 0) as number;
-    const deltaY = curY - alipayTouchStartY;
+  const touches = e.touches;
+  if (touches.length > 0) {
+    const t = touches[0];
+    const deltaY = t.clientY - alipayTouchStartY;
     if (deltaY > 0) {
       alipayPullHeight.value = Math.min(Math.floor(deltaY * 0.45), 75);
     }
@@ -287,12 +304,10 @@ function handleAlipayTouchMove(e: any) {
       alipayPullHeight.value = 0;
     }
   }
-  // #endif
 }
 
 function handleAlipayTouchEnd() {
-  // #ifdef MP-ALIPAY
-  if (!isAlipayTouching.value) {
+  if (!isAlipayMp || !isAlipayTouching.value) {
     return;
   }
   isAlipayTouching.value = false;
@@ -303,7 +318,6 @@ function handleAlipayTouchEnd() {
   else {
     alipayPullHeight.value = 0;
   }
-  // #endif
 }
 
 // ==========================================
@@ -342,9 +356,9 @@ function handleScroll(e: UniScrollEvent): void {
     return;
   }
   const scrollTop = e.detail.scrollTop;
-  // #ifdef MP-ALIPAY
-  currentScrollTop = Math.ceil(scrollTop);
-  // #endif
+  if (isAlipayMp) {
+    currentScrollTop = Math.ceil(scrollTop);
+  }
   uni.$emit('onNavbarPageScroll', {
     scrollTop: Math.ceil(scrollTop)
   } as UTSJSONObject);
@@ -473,7 +487,6 @@ defineExpose({
   flex: 1;
 }
 
-/* #ifdef MP-ALIPAY */
 .alipay-pull-header {
   display: flex;
   flex-direction: row;
@@ -526,5 +539,4 @@ defineExpose({
     transform: scale(1.15);
   }
 }
-/* #endif */
 </style>
