@@ -1,49 +1,64 @@
 <template>
-  <!-- 通用 webview 容器：整页交给原生 <web-view>，无需自建根容器与滚动区 -->
-  <web-view :src="targetUrl"></web-view>
+  <view class="flex flex-col flex-1" :style="{ height: `${availableHeight}px` }">
+    <web-view
+      class="flex-1 w-full h-full"
+      style="flex: 1;"
+      :src="targetUrl"
+      @message="onWebviewMessage"
+    />
+  </view>
 </template>
 
 <script setup lang="uts">
 /* eslint-disable dot-notation */
-/**
- * 通用 webview 容器（src/sub/webview/webview.uvue）
- *
- * 用法：/src/sub/webview/webview?url=<encodeURIComponent(链接)>
- * 供隐私页打开《用户协议》《隐私政策》等外链使用。
- *
- * 说明：整页由原生 <web-view> 承载，因此不使用 navbar 布局、不建 flex 根容器
- * 与 scroll-view（滚动由 web-view 自身接管）。
- */
 import { ref } from 'vue';
+import { availableHeight } from '@/src/utils/systemInfo/index.uts';
 
 definePage({
-  customPageClass: 'page-container',
-  customPageStyle: 'background-color: transparent;',
-  debug: false,
-  debugHome: false,
-  showBack: false,
-  hideStatusBar: false,
+  layout: 'navbar',
+  showBack: true,
   hideNavbar: false,
   enablePullDownRefresh: false,
   style: {
-    navigationBarTitleText: '详情',
+    navigationBarTitleText: 'WebView 双向通讯',
     navigationStyle: 'custom'
   }
 });
 
-// —— 页面状态：待打开的链接
-const targetUrl = ref<string>('');
+// 默认加载项目内置的双向通讯演示网页
+const defaultDemoUrl = '/static/webview/index.html';
+const targetUrl = ref<string>(defaultDemoUrl);
 
-// —— 参数解析：url 由调用方 encodeURIComponent 编码后传入
+// 参数解析：优先使用传入的 url（供隐私协议等外链使用），未传时回退到默认演示页面
 onLoad((options: UTSJSONObject | null) => {
-  if (options == null) {
-    return;
+  if (options != null) {
+    const raw = options['url'] as string | null;
+    if (raw != null && raw != '') {
+      const decoded = decodeURIComponent(raw);
+      targetUrl.value = decoded != null ? decoded : raw;
+      return;
+    }
   }
-  const raw = options['url'] as string | null;
-  if (raw == null || raw == '') {
-    return;
-  }
-  const decoded = decodeURIComponent(raw);
-  targetUrl.value = decoded != null ? decoded : raw;
+  targetUrl.value = defaultDemoUrl;
 });
+
+function onWebviewMessage(event: any): void {
+  const detail = event?.detail as UTSJSONObject | null;
+  const data = detail != null ? (detail['data'] as Array<any> | null) : null;
+  if (data != null && data.length > 0) {
+    const lastItem = data[data.length - 1] as UTSJSONObject;
+    const msgType = lastItem['type'] as string | null;
+    if (msgType === 'NAVIGATE_BACK') {
+      uni.navigateBack();
+      return;
+    }
+    const title = (lastItem['title'] as string | null) ?? (lastItem['content'] as string | null) ?? '收到网页消息';
+    uni.showToast({
+      title,
+      icon: 'none'
+    });
+  }
+}
 </script>
+
+<style scoped></style>
