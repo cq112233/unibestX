@@ -168,11 +168,12 @@ if (isDev()) {
 ### 8.4.1 轻提示与 Loading：`@/src/utils/toast/index.uts`
 
 - **导出方法**：
-  - `toast(title: string)`：简易黑色背景无图标轻提示，自动截断防原生崩溃，时长 1500ms。
-  - `showToast(title: string, options?: ToastOptions)`：完整参数轻提示。
-  - `showLoading(title?: string)`：全局加载中菊花遮罩，默认「加载中...」。
-  - `hideLoading()`：安全关闭加载遮罩（防未开启时报错）。
-- **规则**：严禁散落手写 `uni.showToast({ title: '...', icon: 'none' })`。
+  - `toast(message: string)`：简易黑色背景无图标轻提示，防御原生大对勾乌龙，时长 1500ms。
+  - `toastSuccess(message: string)`：成功轻提示（带成功对勾图标），时长 1500ms。
+  - `toastError(message: string)`：失败错误轻提示（带错误图标），时长 1500ms。
+  - `showLoading(title?: string, mask?: boolean)`：全局加载中菊花遮罩，默认「加载中...」，默认带透明蒙层防重复操作。
+  - `hideLoading()`：关闭加载遮罩。
+- **规则**：严禁散落手写 `uni.showToast({ title: '...', icon: 'none' })`，统一使用 `toast(msg)` 或 `toastSuccess(msg)`。
 
 ### 8.4.2 路由与页面跳转：`@/src/router/index.uts`
 

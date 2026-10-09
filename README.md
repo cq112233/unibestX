@@ -587,7 +587,7 @@ import { sys } from '@/src/utils/systemInfo/index.uts';
 | `route/` | 取当前路由 / 路径 / 参数、页面栈深度、路径规范化 | `getCurrentPath()` `getCurrentRoute()` `getQueryString(url)` `getPageStackLength()` `cleanPath(path)` `isSamePath(a, b)` `ensureLeadingSlash()` `removeLeadingSlash()`；实例 `route` |
 | `systemInfo/` | 屏幕尺寸、安全区、导航栏 / TabBar 高度（响应式 `computed`） | `windowWidth` `windowHeight` `screenWidth` `screenHeight` `statusBarHeight` `navBarHeight` `tabBarHeight` `safeAreaBottom` `availableHeight` `menuRect` `updateSystemInfo()` `getScrollHeight()`；实例 `sys` |
 | `theme/` | 主题色与明暗模式：读取、应用、监听 | `themeColor` `isDarkMode(mode)` `getThemeTokens(isDark)` `getRootThemeStyle()` `applyThemeColor(color)` `applyThemeMode(mode, isDark)` `applyNavbarTheme(isDark)` `watchThemeChange(cb)`；实例 `theme` |
-| `toast/` | 全局轻提示（统一风格，替代裸 `uni.showToast`） | `toast(msg)` `toastSuccess(msg)` `toastError(msg)` `toastWarning(msg)` `toastPrimary(msg)` `showToast(options)`；实例 `toastUtils` |
+| `toast/` | 全局轻提示与 Loading（统一风格，替代裸 `uni.showToast`） | `toast(msg)` `toastSuccess(msg)` `toastError(msg)` `showLoading(title?, mask?)` `hideLoading()` |
 | `i18n/` | 非 Vue 环境下的多语言文案与导航栏 / TabBar 文案设置 | `t(key, named)` `$t(key, named)` `getI18nText(key)` `setTabbarItem()` `setNavigationBarTitle(key)`；实例 `i18nUtils` |
 | `refresh/` | 下拉刷新、滚动到底、导航栏标题与可见性、状态栏可见性的跨端联动 | `onNavbarPageScroll(cb)` `onNavbarReachBottom(cb)` `onNavbarPullDownRefresh(cb)` `stopNavbarPullDownRefresh()` `setNavbarTitle(t)` `setNavbarVisible(v)` `setHideNavbar(h)` `setHideStatusBar(h)` `isPageScrollDisabled` `isPageRefresherDisabled`；实例 `refresh` |
 | `backPress/` | Android 物理返回键双击退出 | `handleBackPressExit(): boolean` |
