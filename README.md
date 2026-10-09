@@ -545,17 +545,16 @@ unibestX/
 │       ├── i18n/                 #   多语言辅助工具（t / $t）
 │       ├── backPress/            #   Android 物理返回键双击退出
 │       └── rxjs-lite/            #   轻量流式处理工具
-├── uni_modules/                  # uni-app 扩展插件模块（39 个）
+├── uni_modules/                  # uni-app 扩展插件模块（精简收敛为 16 个核心插件）
 │   ├── z-paging-x/               #   深度优化适配的分页组件
 │   ├── unix-crypto/              #   跨端加密解密库（AES/DES/RSA/MD5/SHA/HMAC/Base64/UUID）
-│   ├── unix-router-guard/        #   路由守卫底层插件
 │   ├── x-pinia-s/                #   UTS 版 Pinia（VDOM 模式使用）
 │   ├── iRainna-lodash/           #   UTS 版 Lodash 工具库
 │   ├── lime-request/             #   HTTP 请求核心库
 │   ├── lime-i18n/                #   国际化核心库
 │   ├── lime-signature/           #   手写签名板组件
 │   ├── e-chart/                  #   ECharts 图表适配组件
-│   └── ...                       #   其他官方 / 三方 uni_modules（UI 组件库请按分支选型：Rice UI / uview-ultra）
+│   └── ...                       #   其他核心支持库（lime-icon、mp-html、kux-marked、uni-icons 等）
 ├── js_sdk/                       # JS / UTS SDK 资源
 ├── App.ku.uvue                   # 全局根包裹组件（动态主题注入、全局 Toast 容器）
 ├── main.uts                      # 应用主入口文件
