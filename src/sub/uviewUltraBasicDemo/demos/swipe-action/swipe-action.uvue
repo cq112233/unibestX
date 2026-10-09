@@ -1,0 +1,84 @@
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
+    <view class="p-[16px]">
+      <view class="demo-block">
+        <text class="demo-label">基础用法</text>
+        <up-swipe-action>
+          <up-swipe-action-item :options="options1">
+            <view class="p-[15px] bg-[#fff] rounded-[5px]">
+              <text>操作选项</text>
+            </view>
+          </up-swipe-action-item>
+        </up-swipe-action>
+      </view>
+      <view class="demo-block mt-[12px]">
+        <text class="demo-label">多按钮</text>
+        <up-swipe-action>
+          <up-swipe-action-item :options="options2">
+            <view class="p-[15px] bg-[#fff] rounded-[5px]">
+              <text>多按钮操作</text>
+            </view>
+          </up-swipe-action-item>
+        </up-swipe-action>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { ref } from 'vue';
+
+definePage({
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
+  style: {
+    navigationBarTitleText: 'SwipeAction 滑动操作',
+    navigationStyle: 'custom'
+  }
+});
+
+const options1 = ref<UTSJSONObject[]>([
+  {
+    text: '删除',
+    style: {
+      backgroundColor: '#f56c6c'
+    } as UTSJSONObject
+  } as UTSJSONObject
+]);
+
+const options2 = ref<UTSJSONObject[]>([
+  {
+    text: '置顶',
+    style: {
+      backgroundColor: '#2979ff'
+    } as UTSJSONObject
+  } as UTSJSONObject,
+  {
+    text: '删除',
+    style: {
+      backgroundColor: '#f56c6c'
+    } as UTSJSONObject
+  } as UTSJSONObject
+]);
+</script>
+
+<style lang="scss" scoped>
+.demo-block {
+  margin-bottom: 12px;
+  padding: 12px;
+  border-radius: 8px;
+  background-color: #ffffff;
+}
+.demo-label {
+  margin-bottom: 10px;
+  padding-left: 4px;
+  color: #606266;
+  font-size: 14px;
+  font-weight: bold;
+  border-left-width: 3px;
+  border-left-style: solid;
+  border-left-color: $up-primary;
+}
+</style>
