@@ -452,10 +452,11 @@ unibestX/
 │   ├── .env.test                 #   测试环境 Docker 变量配置
 │   └── .env.prod                 #   生产环境 Docker 变量配置
 ├── docs/                         # VitePress 文档站源码（guide/ 下为各专题）
-├── .claude/skills/               # AI 技能（Claude Code）：仅 unibestX-skill（1 入口 + 8 分册）
-├── .agents/                      # AI 技能与规约（其他 Agent）
-│   ├── skills/                   #   与 .claude/skills 一一对应的技能副本（仅 unibestX-skill），需保持同步
+├── .agents/                      # AI 规范与技能中心（唯一物理源）
+│   ├── skills/unibestX-skill/    #   核心知识库（1 入口 + 8 分册）
 │   └── rules/uniappx.md          #   uni-app X 开发规范（编写 .uvue/.uts 前必读）
+├── .claude/                      # Claude Code 目录（符号链接自动同步自 .agents）
+├── .trae/                        # Trae IDE 目录（符号链接自动同步自 .agents）
 ├── CLAUDE.md / AGENTS.md         # AI Agent 会话级规约（技能路由、内置工具优先复用等）
 ├── src/
 │   ├── api/                      # API 请求模块（foo.uts / user.uts / auth.uts 等）
@@ -472,7 +473,7 @@ unibestX/
 │   ├── i18n/                     # 国际化多语言
 │   │   ├── index.uts             #   i18n 实例与响应式切换
 │   │   └── locales/              #   中英文语言包（zh-Hans / en）
-│   ├── layouts/                  # 页面布局模板
+│   ├── layouts/                  # 页面布局模板与控制器
 │   │   ├── default.uvue          #   默认页面布局
 │   │   ├── empty.uvue            #   空白全屏布局
 │   │   └── navbar.uvue           #   自定义导航栏布局（需配 navigationStyle: 'custom'）
@@ -482,11 +483,12 @@ unibestX/
 │   │   ├── function/             #   原生能力展示（设备、系统信息、扫码等）
 │   │   ├── ai/                   #   AI 助手对话演示
 │   │   └── me/                   #   个人中心与系统设置
-│   ├── router/                   # 路由守卫与导航控制
-│   │   ├── index.uts             #   路由模块统一出口
-│   │   ├── config.uts            #   页面登录白名单 / 黑名单策略
-│   │   ├── interceptor.uts       #   全局路由跳转拦截器
-│   │   └── toLoginPage.uts       #   跳转登录页逻辑封装
+│   ├── router/                   # 路由守卫与导航控制（模块化架构）
+│   │   ├── config/               #   页面登录白名单 / 黑名单策略
+│   │   ├── interceptor/          #   全局路由跳转拦截守卫
+│   │   ├── toLoginPage/          #   登录页重定向防抖控制
+│   │   ├── utils/                #   路径规范化与 URL 解析工具
+│   │   └── index.uts             #   统一门面入口
 │   ├── store/                    # 状态管理（双模式自适应）
 │   │   ├── index.uts             #   门面：按平台条件编译路由到 vapor / vdom
 │   │   ├── types.uts             #   共享类型（与平台无关，恒定向外转发）
@@ -499,32 +501,14 @@ unibestX/
 │   │   └── vdom/                 #   x-pinia-s 实现（App VDOM 原生端）
 │   │       ├── index.uts         #     Pinia 实例（UTS 强类型版）
 │   │       ├── app.uts / token.uts / user.uts
+│   │       └── ...
 │   ├── style/                    # 全局样式（Tailwind、变量等）
-│   ├── sub/                      # 应用分包页面（按需加载，13 个演示模块）
-│   │   ├── auth/                 #   登录、注册、找回密码
-│   │   ├── crypto/               #   加密解密演示
-│   │   ├── device/               #   原生设备能力
-│   │   ├── httpDemo/             #   HTTP 请求演示
-│   │   ├── layoutDemo/           #   Layout 布局示例
-│   │   ├── lodash/               #   UTS 版 Lodash
-│   │   ├── nested-scroll/        #   自研嵌套滚动
-│   │   ├── rxjsDemo/             #   rxjs 流式演示
-│   │   ├── tailwindcss/          #   weapp-tailwindcss 示例
-│   │   ├── test/                 #   页面间 URL 参数传递测试
-│   │   ├── time/                 #   时间日期操作
-│   │   ├── uiTest/               #   UI 测试与排版
-│   │   └── zpaging/              #   z-paging-x 分页列表各种场景
-│   ├── layouts/                  # 全局页面布局容器
-│   │   ├── default/              #   默认通用布局 (default.uvue)
-│   │   ├── navbar/               #   自定义导航栏布局 (navbar.uvue)
-│   │   │   └── utils/            #     下拉刷新与滚动联动控制器 (index.uts)
-│   │   └── empty/                #   空白纯净布局 (empty.uvue)
-│   ├── router/                   # 路由与全局拦截体系（模块化架构）
-│   │   ├── config/               #   登录白/黑名单策略配置
-│   │   ├── interceptor/          #   全局路由跳转拦截守卫
-│   │   ├── toLoginPage/          #   登录页重定向防抖控制
-│   │   ├── utils/                #   路径规范化与 URL 解析工具
-│   │   └── index.uts             #   统一门面入口
+│   ├── sub/                      # 应用分包页面（按需加载）
+│   │   ├── auth/                 #   ⭐【基础常驻】登录、注册、找回密码
+│   │   ├── privacy/              #   ⭐【基础常驻】服务条款与隐私政策详情
+│   │   ├── webview/              #   ⭐【基础常驻】通用内置 Webview 网页容器
+│   │   ├── *BasicDemo/           #   💡【演示 Demo】基础能力演练分包（如 httpBasicDemo 等）
+│   │   └── *FunctionDemo/        #   💡【演示 Demo】原生与功能演练分包（如 zpagingFunctionDemo 等）
 │   ├── tabbar/                   # 底部 TabBar 体系
 │   │   ├── internal/             #   模块内部实现（不对消费者暴露，请走 index.uts 门面）
 │   │   │   ├── strategy.uts      #     策略枚举与模式判定
