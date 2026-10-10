@@ -1,15 +1,15 @@
 <template>
   <view class="tab-views-container" style="position: relative;flex: 1;">
-    <TabContent :content-index="0" title="首页" :enable-pull-down-refresh="true" custom-page-class="init-page" custom-page-style="background-color: transparent;">
+    <TabContent :content-index="0" title="tabbar.home" :enable-pull-down-refresh="true" custom-page-class="init-page" custom-page-style="background-color: transparent;">
       <IndexView />
     </TabContent>
-    <TabContent :content-index="1" title="基础" :enable-pull-down-refresh="true">
+    <TabContent :content-index="1" title="tabbar.basic" :enable-pull-down-refresh="true">
       <BasicView />
     </TabContent>
-    <TabContent :content-index="2" title="功能" :enable-pull-down-refresh="true">
+    <TabContent :content-index="2" title="tabbar.function" :enable-pull-down-refresh="true">
       <FunctionView />
     </TabContent>
-    <TabContent :content-index="3" title="我的" :enable-pull-down-refresh="true">
+    <TabContent :content-index="3" title="tabbar.me" :enable-pull-down-refresh="true">
       <MeView />
     </TabContent>
   </view>

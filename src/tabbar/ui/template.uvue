@@ -76,7 +76,7 @@
               fontWeight: curIdx == index ? '600' : 'normal'
             }"
           >
-            {{ $t(item.text) }}
+            {{ formatTabbarText(item.text) }}
           </text>
         </view>
       </view>
@@ -90,7 +90,9 @@
 <script setup lang="uts">
 import { onMounted } from 'vue';
 import {
+  activeThemeColor,
   curIdx,
+  formatTabbarText,
   handleTabbarClick,
   safeAreaBottom,
   safeHideNativeTabBar,
@@ -101,9 +103,6 @@ import {
   themeTokens
 } from '@/src/tabbar/index.uts';
 import type { CustomTabBarItem } from '@/src/tabbar/index.uts';
-import { themeColor } from '@/src/theme/index.uts';
-import { useThemeStore } from '@/src/store';
-import { $t } from '@/src/i18n/utils/index.uts';
 
 // ==========================================
 // Props 组件属性定义
@@ -123,13 +122,6 @@ defineProps({
     type: Boolean,
     default: true
   }
-});
-
-const themeStore = useThemeStore();
-
-/** 当前激活的主题色（优先取 store 中持久化的 theme，保底取全局 themeColor） */
-const activeThemeColor = computed<string>((): string => {
-  return themeStore.state.theme.length > 0 ? themeStore.state.theme : themeColor.value;
 });
 
 // ==========================================

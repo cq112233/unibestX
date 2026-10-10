@@ -341,3 +341,18 @@ export type TabBarConfig = {
   /** tab 列表配置（最少2个、最多5个） */
   list: CustomTabBarItem[];
 };
+
+/**
+ * TabBar 文本国际化桥接函数
+ */
+export declare function formatTabbarText(text: string): string;
+
+/**
+ * 当前是否为深色模式（响应式）
+ */
+export declare const isDark: import('vue').ComputedRef<boolean>;
+
+/**
+ * TabBar 当前激活的高亮主题色（响应式）
+ */
+export declare const activeThemeColor: import('vue').ComputedRef<string>;
