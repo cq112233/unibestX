@@ -1,19 +1,28 @@
 import { getI18nText } from '@/src/i18n/utils/index.uts';
 import { isCompilerVersionGte } from '@/src/utils/systemInfo/index.uts';
 import { tabbarList } from './state.uts';
-import { needHideNativeTabbar } from './strategy.uts';
+import { isNativeTabbar, needHideNativeTabbar } from './strategy.uts';
 
 /**
  * 设置原生 TabBar 各项的多语言文本 (设置 uni.setTabBarItem)
  */
 export function setTabbarItem(): void {
+  // 仅在原生 TabBar 模式或带原生缓存的自定义模式（pages.json 中存在 tabBar 节点）下执行
+  if (!isNativeTabbar && !needHideNativeTabbar) {
+    return;
+  }
   for (let i = 0; i < tabbarList.length; i++) {
     const item = tabbarList[i];
     const text = getI18nText(item.text);
-    uni.setTabBarItem({
-      index: i,
-      text
-    } as SetTabBarItemOptions);
+    try {
+      uni.setTabBarItem({
+        index: i,
+        text
+      } as SetTabBarItemOptions);
+    }
+    catch {
+      // 捕获无原生 tabBar 节点时的异常，保证全平台平稳运行
+    }
   }
 }
 

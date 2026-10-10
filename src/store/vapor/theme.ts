@@ -11,32 +11,14 @@ import {
 } from '@/src/theme/index.uts';
 import type { IThemeState } from '../types.d.uts';
 
-/**
- * 启动时同步预读一次本地持久化数据，使初始状态直接命中用户配置，彻底消除启动闪烁与默认值覆盖
- */
-function getStoredThemeState(): Partial<IThemeState> | null {
-  try {
-    const raw = uni.getStorageSync('pinia:theme');
-    if (raw != null && typeof raw === 'string' && raw !== '') {
-      const parsed = JSON.parse(raw);
-      return (parsed?.state ?? parsed) as Partial<IThemeState>;
-    }
-  }
-  catch {
-    // ignore
-  }
-  return null;
-}
-
 export const useThemeStore = defineStore('theme', () => {
-  const stored = getStoredThemeState();
   const defaultMode = getDefaultThemeMode();
 
-  // 1. 响应式状态（优先使用本地已持久化的状态，未配置时使用环境默认值）
+  // 1. 响应式状态（由 pinia-plugin-persistedstate 自动从 Storage 恢复与持久化）
   const state = reactive<IThemeState>({
-    theme: stored?.theme ?? getDefaultTheme(),
-    themeMode: stored?.themeMode ?? defaultMode,
-    isDark: stored?.isDark ?? isDarkMode(stored?.themeMode ?? defaultMode)
+    theme: getDefaultTheme(),
+    themeMode: defaultMode,
+    isDark: isDarkMode(defaultMode)
   });
 
   let _themeModeInited = false;
@@ -88,12 +70,6 @@ export const useThemeStore = defineStore('theme', () => {
     state.theme = theme;
     themeColor.value = theme;
     applyThemeColor(theme);
-    try {
-      uni.setStorageSync('pinia:theme', JSON.stringify({ state }));
-    }
-    catch {
-      // ignore
-    }
   }
 
   /**
@@ -106,12 +82,6 @@ export const useThemeStore = defineStore('theme', () => {
     uni.setAppTheme({ theme: mode as 'light' | 'dark' | 'auto' });
     // #endif
     refreshIsDark();
-    try {
-      uni.setStorageSync('pinia:theme', JSON.stringify({ state }));
-    }
-    catch {
-      // ignore
-    }
   }
 
   /**
