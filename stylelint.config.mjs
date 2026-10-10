@@ -1,5 +1,12 @@
 /** @type {import('stylelint').Config} */
 export default {
+  ignoreFiles: [
+    'uni_modules/**',
+    '**/uni_modules/**',
+    'unpackage/**',
+    'dist/**',
+    'node_modules/**'
+  ],
   extends: [
     'stylelint-config-standard-scss',
     'stylelint-config-standard-vue/scss'
