@@ -1,0 +1,134 @@
+<template>
+  <view class="rice-text" :class="ns.theme()" @click="handleClick">
+    <rice-icon v-if="hasStrValue(prefixIcon)" :name="prefixIcon" :color="iconColor" style="margin-right: 4px;"
+      :custom-style="prefixIconStyle" />
+    <text class="rice-text__text" :class="[valueClass,textClass]" :style="valueStyle" :max-lines="lines">{{text}}</text>
+    <rice-icon v-if="hasStrValue(suffixIcon)" :name="suffixIcon" :color="iconColor" style="margin-left: 4px;"
+      :custom-style="suffixIconStyle" />
+  </view>
+</template>
+
+<script setup>
+  import { TextProps } from './type.uts';
+  import { useNamespace } from '../../libs/use';
+  import { hasStrValue, debugWarn } from '../../libs/utils';
+
+  defineOptions({
+    name: 'rice-text',
+    styleIsolation: 'app-and-page',
+    externalClasses: ['text-class']
+  })
+
+  const ns = useNamespace('text')
+
+  const emit = defineEmits<{
+    click : []
+  }>()
+
+  const props = withDefaults(defineProps<TextProps>(), {
+    text: '',
+    type: 'default',
+    decoration: 'none',
+    textClass: '',
+    lines: -1,
+  })
+
+  const handleClick = () => {
+    if (hasStrValue(props.url)) {
+      uni.navigateTo({
+        url: props.url!,
+        fail: err => {
+          debugWarn('Text', err.errMsg)
+        }
+      })
+    }
+    emit('click')
+  }
+
+  const iconColor = computed<string>(() => {
+    if (props.type == 'primary') return 'var(--rice-primary-color)'
+    if (props.type == 'success') return 'var(--rice-success-color)'
+    if (props.type == 'warning') return 'var(--rice-warning-color)'
+    if (props.type == 'error') return 'var(--rice-error-color)'
+    if (props.type == 'info') return 'var(--rice-text-color-2)'
+    return ''
+  })
+
+  const valueClass = computed(() => {
+    return [
+      `rice-text__text--${props.type}`,
+      // #ifndef APP
+      { 'rice-text__text--lines': props.lines != null && props.lines > 0 }
+      // #endif
+    ]
+  })
+
+  const valueStyle = computed(() => {
+    const css = new Map<string, string | number>()
+    // #ifndef VUE3-VAPOR && APP
+    if (props.lines != null && props.lines > 0) {
+      css.set('lines', props.lines!)
+    }
+    // #endif
+
+    // #ifndef APP
+    if (props.lines != null && props.lines > 0) {
+      css.set('-webkit-line-clamp', props.lines)
+    }
+    // #endif
+    css.set('text-decoration-line', props.decoration)
+
+    return css
+  })
+</script>
+
+<style scoped lang="scss">
+  .rice-text {
+    flex-direction: row;
+    align-items: center;
+
+
+    &__text {
+      flex-shrink: 1;
+      font-size: 16px;
+      color: var(--rice-text-color);
+      text-overflow: ellipsis;
+      /* #ifndef APP */
+      max-width: 100%;
+      word-break: break-all;
+      /* #endif */
+
+      /* #ifndef APP */
+      &--lines {
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        white-space: normal;
+      }
+
+      /* #endif */
+
+      &--primary {
+        color: var(--rice-primary-color);
+      }
+
+      &--success {
+        color: var(--rice-success-color);
+      }
+
+      &--warning {
+        color: var(--rice-warning-color);
+      }
+
+      &--error {
+        color: var(--rice-error-color);
+      }
+
+      &--info {
+        color: var(--rice-text-color-2);
+      }
+
+    }
+
+  }
+</style>

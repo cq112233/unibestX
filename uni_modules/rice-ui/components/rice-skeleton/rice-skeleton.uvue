@@ -1,0 +1,71 @@
+<template>
+    <!-- #ifdef MP -->
+    <view v-if="loading" v-bind="$attrs" class="rice-skeleton" :class="ns.theme()">
+    <!-- #endif -->
+    <!-- #ifndef MP -->
+    <view v-if="loading"  class="rice-skeleton" :class="ns.theme()">
+    <!-- #endif -->
+    <slot name="skeleton">
+      <rice-skeleton-item v-if="showTitle" class="rice-skeleton__title" />
+      <rice-skeleton-item v-for="(row,rowIndex) in rows" :key="row" type="p"
+        :class="{'rice-skeleton__gap':rowIndex!=0||showTitle}" />
+    </slot>
+  </view>
+  <!-- https://issues.dcloud.net.cn/pages/issues/detail?id=32352 -->
+  <!-- #ifdef VUE3-VAPOR && APP-IOS -->
+  <view v-else>
+    <slot />
+  </view>
+  <!-- #endif -->
+
+  <!-- #ifndef VUE3-VAPOR && APP-IOS-->
+  <template v-else>
+    <slot />
+  </template>
+  <!-- #endif -->
+
+</template>
+
+<script setup>
+  import { useNamespace } from "../../libs/use"
+  import { SkeletionProps, SkeletionAnimate } from "./type.uts"
+  import { skeletonAnimateInjectKey } from "./index.uts"
+
+  defineOptions({
+    name: 'rice-skeleton',
+    styleIsolation: "app-and-page"
+  })
+
+  const props = withDefaults(defineProps<SkeletionProps>(), {
+    loading: true,
+    animate: 'flashed',
+    showTitle: false,
+    rows: 3,
+  })
+
+  const ns = useNamespace('skeleton')
+
+  provide(skeletonAnimateInjectKey, toRef<SkeletionAnimate>(() => props.animate))
+</script>
+
+<style scoped lang="scss">
+  .rice-skeleton {
+    --rice-skeleton-circle-size: 45px;
+    --rice-skeleton-rect-size: 70px;
+    --rice-skeleton-image-size: 70px;
+    --rice-skeleton-image-icon-size: 26px;
+    --rice-skeleton-item-height: 16px;
+    --rice-skeleton-item-gap: 16px;
+    --rice-skeleton-title-width: 33%;
+
+    &__gap {
+      margin-top: var(--rice-skeleton-item-gap);
+    }
+
+    &__title {
+      width: var(--rice-skeleton-title-width);
+    }
+
+
+  }
+</style>

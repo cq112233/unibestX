@@ -1,0 +1,190 @@
+<template>
+  <view class="rice-skeleton-item" :class="rootClass" ref="skeletonItemRef">
+    <!-- #ifdef VUE3-VAPOR || WEB || MP || APP-HARMONY -->
+    <view v-if="animate=='gradient'" ref="skeletonGradientRef" class="rice-skeleton-item--gradient"></view>
+    <!-- #endif -->
+    <rice-icon v-if="type=='image'" name="photo" :size="imageIconSize??'var(--rice-skeleton-image-icon-size)'" />
+  </view>
+</template>
+
+<script setup>
+  import { SkeletionAnimate } from "../rice-skeleton/type.uts"
+  import { SkeletonItemProps } from "./type.uts"
+  import { useNamespace } from "../../libs/use"
+  import { skeletonAnimateInjectKey } from "../rice-skeleton/index.uts"
+
+  defineOptions({
+    name: 'rice-skeleton-item',
+    styleIsolation: "app-and-page"
+  })
+
+  const ns = useNamespace('skeleton-item')
+
+  const props = withDefaults(defineProps<SkeletonItemProps>(), {
+    type: "p",
+  })
+
+  const animate = inject<Ref<SkeletionAnimate>>(skeletonAnimateInjectKey, ref('flashed'))
+
+  const rootClass = computed(() => {
+    return [
+      ns.m(props.type),
+      { 'rice-skeleton-item--flashed': animate.value == 'flashed' }
+    ]
+  })
+
+
+  // #ifdef APP
+  const skeletonItemRef = ref<UniElement | null>(null)
+  const skeletonGradientRef = ref<UniElement | null>(null)
+  let animateIns : UniAnimation | null = null
+
+  const stopAnimate = () => {
+    animateIns?.cancel()
+    animateIns = null
+  }
+
+  const initAnimate = async () => {
+    stopAnimate()
+    await nextTick()
+
+    if (animate.value == 'none') {
+      return
+    }
+    if (animate.value == 'flashed') {
+      animateIns = skeletonItemRef.value?.animate([{
+        opacity: 1,
+      }, {
+        opacity: 0.4,
+      }, {
+        opacity: 1,
+      }], {
+        duration: 1600,
+        iterations: Infinity,
+        easing: 'linear'
+      })
+    } else {
+      // #ifdef VUE3-VAPOR || APP-HARMONY
+      animateIns = skeletonGradientRef.value?.animate([{
+        transform: `translateX(-100%)`
+      }, {
+        transform: `translateX(100%)`
+      }], {
+        duration: 1300,
+        iterations: Infinity,
+        easing: 'linear'
+      })
+      // #endif
+    }
+  }
+
+  watch(animate, () => {
+    initAnimate()
+  })
+
+  // #ifndef VUE3-VAPOR
+  let timer : number | null = null
+  // #endif
+
+  onMounted(() => {
+    // #ifndef VUE3-VAPOR
+    timer = setTimeout(() => {
+      initAnimate()
+    }, 100)
+    // #endif
+
+    // #ifdef VUE3-VAPOR
+    initAnimate()
+    // #endif
+
+  })
+
+
+  onUnmounted(() => {
+    // #ifndef VUE3-VAPOR
+    if (timer != null) clearTimeout(timer!)
+    // #endif
+    stopAnimate()
+  })
+
+  // #endif
+</script>
+
+<style scoped lang="scss">
+  .rice-skeleton-item {
+    position: relative;
+    align-items: center;
+    justify-content: center;
+    height: var(--rice-skeleton-item-height);
+    background-color: var(--rice-skeleton-background);
+    border-radius: 4px;
+
+    &--circle {
+      width: var(--rice-skeleton-circle-size);
+      height: var(--rice-skeleton-circle-size);
+      border-radius: 999px;
+    }
+
+    &--rect {
+      height: var(--rice-skeleton-rect-size);
+      width: var(--rice-skeleton-rect-size);
+      border-radius: 6px;
+    }
+
+    &--image {
+      height: var(--rice-skeleton-rect-size);
+      width: var(--rice-skeleton-rect-size);
+      border-radius: 6px;
+    }
+
+    &--gradient {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      top: 0;
+      background: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(0, 0, 0, 0.05), rgba(255, 255, 255, 0));
+      /* #ifndef APP */
+      animation: skeletonGradient 1.3s linear 0s infinite;
+      /* #endif */
+
+    }
+
+    /* #ifndef APP */
+
+    &--flashed {
+      animation: skeletonFlashed 1.6s linear 0s infinite;
+    }
+
+    /* #endif */
+  }
+
+  /* #ifndef APP */
+
+  @keyframes skeletonGradient {
+    0% {
+      transform: translateX(-100%) skewX(-15deg);
+    }
+
+    100% {
+      transform: translateX(100%) skewX(-15deg);
+    }
+  }
+
+
+  @keyframes skeletonFlashed {
+    0% {
+      opacity: 1;
+    }
+
+    50% {
+      opacity: .4
+    }
+
+    100% {
+      opacity: 1;
+    }
+  }
+
+  /* #endif */
+</style>

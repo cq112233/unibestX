@@ -1,3 +1,10 @@
+## 1.2.1（2026-08-30）
+- [修复] 修复1.2.0版本引起 Icon 在APP端无法显示图片的问题
+## 1.2.0（2026-08-23）
+- [新增] Skeleton 骨架屏组件 [文档](https://riceui.cn/components/skeleton.html)
+- [新增] Text 文本组件 [文档](https://riceui.cn/components/text.html)
+- [提示] RiceUI组件库在 **蒸汽模式下** HBuilderx 推荐在5.21以上的版本中使用，非蒸汽模式推荐在5.0以上的版本中使用
+- [体验] 蒸汽模式APP体验： [鸿蒙](https://appgallery.huawei.com/app/detail?id=com.rice.xui)、[iOS](https://apps.apple.com/cn/app/riceui/id6742657989)、[Android 1.2版本](https://gitee.com/riceui/riceui-demo/releases/download/1.2/RiceUI1.2.apk)
 ## 1.1.9（2026-07-20）
 - 蒸汽模式APP体验： [鸿蒙](https://appgallery.huawei.com/app/detail?id=com.rice.xui)、[iOS](https://apps.apple.com/cn/app/riceui/id6742657989)
 - [新增] 支持Android蒸汽模式，HBuilder X 需要 5.21 以上的版本
