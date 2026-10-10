@@ -87,7 +87,7 @@
 
 <script setup lang="uts">
 import { computed, onMounted, onUnmounted, provide, ref, watch } from 'vue';
-import { curIdx, formatTabbarText, themeTokens } from '@/src/tabbar/index.uts';
+import { activeTabTitle, curIdx, formatTabbarText, themeTokens } from '@/src/tabbar/index.uts';
 import TabbarPlaceholder from './TabbarPlaceholder.uvue';
 import { isAlipayMp } from '@/src/utils/systemInfo/index.uts';
 import {
@@ -95,7 +95,6 @@ import {
   isPageScrollDisabled,
   setHideNavbar,
   setHideStatusBar,
-  setNavbarTitle,
   stopNavbarPullDownRefresh
 } from '@/src/layouts/navbar/utils/index.uts';
 
@@ -319,15 +318,12 @@ function handleAlipayTouchEnd() {
 // 5. 导航栏与状态栏同步
 // ==========================================
 /**
- * 设置/同步当前激活 Tab 的导航栏标题（优先取 props.title，未传则读取 TabBar 配置的多语言文案）
+ * 设置/同步当前激活 Tab 的导航栏标题
+ * 直接响应式更新 activeTabTitle，不发全局事件广播，彻底杜绝跨页面事件污染与返回时序闪变
  */
 function updateNavbarTitle(): void {
-  const targetTitle = contentTitle.value;
-  if (targetTitle.length > 0) {
-    setNavbarTitle(targetTitle);
-    uni.setNavigationBarTitle({
-      title: targetTitle
-    });
+  if (isActive.value) {
+    activeTabTitle.value = props.title.length > 0 ? props.title : contentTitle.value;
   }
 }
 
@@ -415,14 +411,11 @@ watch(isActive, (newVal: boolean) => {
 });
 
 /**
- * 监听自定义标题属性动态变化
+ * 监听自定义标题属性动态变化（仅更新内部响应式 activeTabTitle，不发全局事件）
  */
-watch(contentTitle, (newTitle: string) => {
-  if (isActive.value && newTitle.length > 0) {
-    setNavbarTitle(newTitle);
-    uni.setNavigationBarTitle({
-      title: newTitle
-    });
+watch(contentTitle, (_newTitle: string) => {
+  if (isActive.value) {
+    updateNavbarTitle();
   }
 });
 

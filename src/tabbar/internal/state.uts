@@ -73,6 +73,11 @@ export const tabbarList: CustomTabBarItem[] = reactive(normalizeList());
  */
 export const curIdx = ref(0);
 
+/**
+ * 当前激活 Tab 的自定义标题（单页 TabBar 模式下由激活的 TabContent 响应式更新，供宿主 Navbar 联动）
+ */
+export const activeTabTitle = ref('');
+
 /** 设置当前索引并持久化 */
 export function setCurIdx(idx: number): void {
   curIdx.value = idx;
