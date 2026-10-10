@@ -60,17 +60,48 @@
             作者: cq112233
           </text>
         </view>
-        <text
-          class="text-[10px] font-medium px-[6px] py-[2px] rounded-[4px] text-[#059669] bg-[#10b98114]"
+        <view
+          class="flex flex-row items-center px-[8px] py-[2px] rounded-[4px] bg-[#10b98114] active:opacity-80"
+          @click="openGithub"
         >
-          官方开箱即用
-        </text>
+          <text class="text-[10px] font-medium text-[#059669] mr-[2px]">
+            官方开源
+          </text>
+          <text class="text-[10px] font-bold text-[#059669]">
+            ↗
+          </text>
+        </view>
       </view>
       <text
         class="text-[12px] leading-[22px] text-[#475569]"
       >
         unibestX 是一个集成了多种工具与技术的 uni-appX 开发模板，由 cq112233 开发，基于 uni-appX + Vue3 + UTS + weapp-tailwindcss + VSCode 构建，完美兼容 vapor / vdom 双模式，模板具有代码提示、自动格式化、统一配置、代码片段等功能，并内置了 ECharts 图表、主题配置、暗黑模式、加密方式配置等常用功能与基本组件，让你开发 uni-appX 拥有极致的体验。
       </text>
+
+      <!-- 官方 CLI 脚手架快捷创建 -->
+      <view class="mt-[12px] p-[10px] rounded-[8px] bg-[#ffffff] border-[1px] border-solid border-[#e2e8f0]">
+        <view class="flex flex-row items-center justify-between mb-[6px]">
+          <view class="flex flex-row items-center">
+            <text class="text-[12px] font-bold text-[#1e293b] mr-[6px]">🚀 create-unibestx</text>
+            <text class="text-[10px] font-medium text-[#4f46e5] bg-[#6366f114] px-[5px] py-[1px] rounded-[4px]">CLI 脚手架</text>
+          </view>
+          <text class="text-[10px] text-[#64748b]">交互式一键创建</text>
+        </view>
+        <text class="text-[11px] text-[#64748b] leading-[18px] mb-[8px]">
+          支持交互式选择 Rice UI、uview-ultra、按需功能裁剪与完整性自检：
+        </text>
+        <view
+          class="px-[10px] py-[8px] rounded-[6px] bg-[#0f172a] flex flex-row items-center justify-between active:opacity-90"
+          @click="copyCliCommand"
+        >
+          <text class="text-[11px] text-[#38bdf8] flex-1" style="font-family: monospace;">
+            pnpm create unibestx my-app
+          </text>
+          <text class="text-[10px] text-[#94a3b8] ml-[8px]">
+            点击复制
+          </text>
+        </view>
+      </view>
     </view>
 
     <!-- 核心特性（2列紧凑卡片网格） -->
@@ -81,52 +112,26 @@
       </view>
 
       <view class="flex flex-row flex-wrap justify-between">
-        <!-- 单页 TabBar -->
         <view
-          class="w-[48.5%] p-[12px] mb-[10px] rounded-[10px] border-[1px] border-solid bg-[#10b9810f] border-[#10b98126]"
+          v-for="item in featureList"
+          :key="item.id"
+          class="w-[48.5%] p-[12px] mb-[10px] rounded-[10px] border-[1px] border-solid flex flex-col justify-between"
+          :style="{ backgroundColor: item.bgColor, borderColor: item.borderColor }"
         >
-          <text class="text-[13px] font-bold text-[#059669]">🚀 单页 TabBar</text>
-          <text class="text-[11px] mt-[4px] leading-[16px] text-[#64748b]">0ms 秒切保活・零白屏</text>
-        </view>
-
-        <!-- 沙盒调试 -->
-        <view
-          class="w-[48.5%] p-[12px] mb-[10px] rounded-[10px] border-[1px] border-solid bg-[#8b5cf60f] border-[#8b5cf626]"
-        >
-          <text class="text-[13px] font-bold text-[#7c3aed]">🧪 沙盒独立调试</text>
-          <text class="text-[11px] mt-[4px] leading-[16px] text-[#64748b]">单页秒级编译・极速开发</text>
-        </view>
-
-        <!-- Vapor 渲染 -->
-        <view
-          class="w-[48.5%] p-[12px] mb-[10px] rounded-[10px] border-[1px] border-solid bg-[#0284c70f] border-[#0284c726]"
-        >
-          <text class="text-[13px] font-bold text-[#0284c7]">⚡ Vapor 蒸汽渲染</text>
-          <text class="text-[11px] mt-[4px] leading-[16px] text-[#64748b]">无虚拟 DOM 原生高性能</text>
-        </view>
-
-        <!-- Tailwind CSS -->
-        <view
-          class="w-[48.5%] p-[12px] mb-[10px] rounded-[10px] border-[1px] border-solid bg-[#0d94880f] border-[#0d948826]"
-        >
-          <text class="text-[13px] font-bold text-[#0d9488]">🎨 Tailwind CSS</text>
-          <text class="text-[11px] mt-[4px] leading-[16px] text-[#64748b]">原子化样式・全端自适应</text>
-        </view>
-
-        <!-- 自动文件路由 -->
-        <view
-          class="w-[48.5%] p-[12px] mb-[10px] rounded-[10px] border-[1px] border-solid bg-[#f59e0b0f] border-[#f59e0b26]"
-        >
-          <text class="text-[13px] font-bold text-[#d97706]">📄 自动文件路由</text>
-          <text class="text-[11px] mt-[4px] leading-[16px] text-[#64748b]">自动扫描与配置同步</text>
-        </view>
-
-        <!-- 丰富生态 -->
-        <view
-          class="w-[48.5%] p-[12px] mb-[10px] rounded-[10px] border-[1px] border-solid bg-[#6366f10f] border-[#6366f126]"
-        >
-          <text class="text-[13px] font-bold text-[#4f46e5]">🛠️ 完善配套能力</text>
-          <text class="text-[11px] mt-[4px] leading-[16px] text-[#64748b]">图表/分页/加密/i18n</text>
+          <view class="flex flex-col">
+            <text class="text-[13px] font-bold" :style="{ color: item.textColor }">
+              {{ item.title }}
+            </text>
+            <text class="text-[11px] mt-[4px] leading-[16px] text-[#64748b]">
+              {{ item.desc }}
+            </text>
+          </view>
+          <text
+            class="text-[10px] mt-[6px]"
+            :style="{ color: item.textColor, fontFamily: 'monospace' }"
+          >
+            {{ item.configPath }}
+          </text>
         </view>
       </view>
     </view>
@@ -152,7 +157,165 @@ import type { SystemInfoType } from '@/src/utils/systemInfo/index.uts';
 import { curIdx, onTabPageShow, onTabShow, resolveTabIndexByKey } from '@/src/tabbar/index.uts';
 import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/layouts/navbar/utils/index.uts';
 
+type FeatureItem = {
+  id: string;
+  title: string;
+  desc: string;
+  configPath: string;
+  bgColor: string;
+  borderColor: string;
+  textColor: string;
+};
+
+const featureList: Array<FeatureItem> = [
+  {
+    id: 'tabbar',
+    title: '🚀 单页 TabBar',
+    desc: '0ms 秒切保活・零白屏',
+    configPath: 'src/tabbar/config.uts',
+    bgColor: '#10b9810f',
+    borderColor: '#10b98126',
+    textColor: '#059669'
+  },
+  {
+    id: 'router',
+    title: '📄 路由与拦截守卫',
+    desc: '黑白名单免登・全局鉴权',
+    configPath: 'src/router/config/config.uts',
+    bgColor: '#f59e0b0f',
+    borderColor: '#f59e0b26',
+    textColor: '#d97706'
+  },
+  {
+    id: 'env',
+    title: '🌐 多环境变量体系',
+    desc: '多端跨平台接口与环境',
+    configPath: '.env',
+    bgColor: '#0284c70f',
+    borderColor: '#0284c726',
+    textColor: '#0284c7'
+  },
+  {
+    id: 'http',
+    title: '📡 网络请求与拦截',
+    desc: '统一拦截・Token・401处理',
+    configPath: 'src/http/index.uts',
+    bgColor: '#06b6d40f',
+    borderColor: '#06b6d426',
+    textColor: '#0891b2'
+  },
+  {
+    id: 'store',
+    title: '📦 全局状态管理',
+    desc: 'Pinia・Vapor/VDOM双模式',
+    configPath: 'src/store/index.uts',
+    bgColor: '#8b5cf60f',
+    borderColor: '#8b5cf626',
+    textColor: '#7c3aed'
+  },
+  {
+    id: 'pages',
+    title: '📑 页面与分包路由',
+    desc: '页面注册・SubPackages 分包',
+    configPath: 'pages.json',
+    bgColor: '#f973160f',
+    borderColor: '#f9731626',
+    textColor: '#ea580c'
+  },
+  {
+    id: 'theme',
+    title: '🎨 主题与暗黑模式',
+    desc: '主色调换肤・跟随系统外观',
+    configPath: 'src/theme/index.uts',
+    bgColor: '#a855f70f',
+    borderColor: '#a855f726',
+    textColor: '#9333ea'
+  },
+  {
+    id: 'i18n',
+    title: '🌍 i18n 国际化',
+    desc: '中英多语言・即时动态切换',
+    configPath: 'src/i18n/index.uts',
+    bgColor: '#e11d480f',
+    borderColor: '#e11d4826',
+    textColor: '#e11d48'
+  },
+  {
+    id: 'tailwind',
+    title: '🖌️ Tailwind CSS',
+    desc: '原子化样式・全端自适应',
+    configPath: 'tailwind.config.ts',
+    bgColor: '#0d94880f',
+    borderColor: '#0d948826',
+    textColor: '#0d9488'
+  },
+  {
+    id: 'vapor',
+    title: '⚡ Vapor 蒸汽渲染',
+    desc: '无虚拟 DOM 原生高性能',
+    configPath: 'vite.config.ts / 双模式',
+    bgColor: '#3b82f60f',
+    borderColor: '#3b82f626',
+    textColor: '#2563eb'
+  },
+  {
+    id: 'sandbox',
+    title: '🧪 沙盒独立调试',
+    desc: '单页秒级编译・极速开发',
+    configPath: 'pages.json 首项沙盒',
+    bgColor: '#6366f10f',
+    borderColor: '#6366f126',
+    textColor: '#4f46e5'
+  },
+  {
+    id: 'ecosystem',
+    title: '🛠️ 完善配套能力',
+    desc: '图表/分页/加密/UI组件',
+    configPath: 'uni_modules 开箱即用',
+    bgColor: '#14b8a60f',
+    borderColor: '#14b8a626',
+    textColor: '#0f766e'
+  }
+];
+
 const systemInfo = computed<SystemInfoType | null>((): SystemInfoType | null => systemInfoRef.value);
+
+// 复制 create-unibestx 脚手架命令
+function copyCliCommand(): void {
+  uni.setClipboardData({
+    data: 'pnpm create unibestx my-app',
+    success: () => {
+      uni.showToast({
+        title: '已复制 CLI 命令',
+        icon: 'success'
+      });
+    }
+  });
+}
+
+// 打开 GitHub 官方仓库地址
+function openGithub(): void {
+  const url = 'https://github.com/cq112233/unibestX';
+  // #ifdef WEB
+  window.open(url, '_blank');
+  // #endif
+  // #ifndef WEB
+  uni.navigateTo({
+    url: `/src/sub/webview/webview?url=${encodeURIComponent(url)}&title=unibestX`,
+    fail: () => {
+      uni.setClipboardData({
+        data: url,
+        success: () => {
+          uni.showToast({
+            title: '已复制 GitHub 链接',
+            icon: 'none'
+          });
+        }
+      });
+    }
+  });
+  // #endif
+}
 
 // 页面数据加载/刷新方法
 function refreshData(): void {
