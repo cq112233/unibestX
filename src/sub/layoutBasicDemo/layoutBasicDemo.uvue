@@ -153,6 +153,50 @@
           </view>
         </view>
 
+        <!-- 动态修改导航栏标题示例 -->
+        <view class="w-full bg-[#ffffff] rounded-[12px] p-[16px] mb-[16px] flex flex-col border-[1px] border-solid border-[#edf2f7]">
+          <view class="flex-row items-center justify-between pb-[8px]">
+            <view class="flex-row items-center">
+              <view class="w-[4px] h-[14px] rounded-[2px] bg-[#3b82f6] mr-[8px]" />
+              <text class="text-[14px] font-semibold text-[#334155]">动态修改导航栏标题</text>
+            </view>
+            <view class="bg-[#f8fafc] px-[8px] py-[2px] rounded-[4px] border-[1px] border-solid border-[#e2e8f0]">
+              <text class="text-[11px] text-[#64748b]">生效中: {{ currentTitleState }}</text>
+            </view>
+          </view>
+          <view class="h-[1px] bg-[#f1f5f9] mb-[12px]" />
+          <text class="text-[12px] text-[#64748b] leading-[18px] mb-[12px]">
+            通过 setNavbarTitle() 可在运行时随业务（如订单号、详情标题）动态变更顶部标题；调用 resetNavbarTitle() 一键恢复初始标题。
+          </text>
+
+          <view class="flex-row flex-wrap">
+            <view
+              class="h-[36px] px-[12px] rounded-[8px] bg-[#3b82f6] active:opacity-90 flex flex-row items-center justify-center mr-[8px] mb-[8px]"
+              @click="handleSetCustomTitle('订单详情 #9527')"
+            >
+              <text class="text-[12px] font-medium text-[#ffffff]">改为：订单详情</text>
+            </view>
+            <view
+              class="h-[36px] px-[12px] rounded-[8px] bg-[#10b981] active:opacity-90 flex flex-row items-center justify-center mr-[8px] mb-[8px]"
+              @click="handleSetCustomTitle('用户信息 (已认证)')"
+            >
+              <text class="text-[12px] font-medium text-[#ffffff]">改为：用户信息</text>
+            </view>
+            <view
+              class="h-[36px] px-[12px] rounded-[8px] bg-[#8b5cf6] active:opacity-90 flex flex-row items-center justify-center mr-[8px] mb-[8px]"
+              @click="handleIncrementTitle"
+            >
+              <text class="text-[12px] font-medium text-[#ffffff]">计数变更 ({{ titleChangeCount }})</text>
+            </view>
+            <view
+              class="h-[36px] px-[12px] rounded-[8px] bg-[#f1f5f9] border-[1px] border-solid border-[#e2e8f0] active:opacity-80 flex flex-row items-center justify-center mr-[8px] mb-[8px]"
+              @click="handleResetTitle"
+            >
+              <text class="text-[12px] font-medium text-[#475569]">重置为初始标题</text>
+            </view>
+          </view>
+        </view>
+
         <!-- 滚动演示列表 -->
         <view
           v-for="(item, index) in demoItems" :key="index"
@@ -187,6 +231,7 @@
 <script setup lang="uts">
 import { computed, ref } from 'vue';
 import { availableHeight } from '@/src/utils/systemInfo/index.uts';
+import { resetNavbarTitle, setNavbarTitle } from '@/src/layouts/navbar/utils/index.uts';
 
 definePage({
   debug: false,
@@ -246,6 +291,28 @@ function handleScroll(e: UniScrollEvent): void {
 }
 function handleScrollToLower(): void {
   reachBottomCount.value++;
+}
+
+/** 动态修改导航栏标题演示 */
+const currentTitleState = ref('布局页面示例');
+const titleChangeCount = ref(0);
+
+function handleSetCustomTitle(title: string): void {
+  currentTitleState.value = title;
+  setNavbarTitle(title);
+}
+
+function handleIncrementTitle(): void {
+  titleChangeCount.value++;
+  const title = `动态标题 (${titleChangeCount.value})`;
+  currentTitleState.value = title;
+  setNavbarTitle(title);
+}
+
+function handleResetTitle(): void {
+  currentTitleState.value = '布局页面示例';
+  titleChangeCount.value = 0;
+  resetNavbarTitle();
 }
 </script>
 

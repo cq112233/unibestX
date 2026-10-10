@@ -92,7 +92,7 @@ import { computed, onUnmounted, ref } from 'vue';
 import NavBar from '@/src/components/NavBar/NavBar.uvue';
 import TabbarPlaceholder from '@/src/tabbar/components/TabbarPlaceholder.uvue';
 import { formatNavbarTitle, isPageRefresherDisabled, isPageScrollDisabled, refresherBackground } from './utils/index.uts';
-import { isPageTabbar, isSinglePageTabbar } from '@/src/tabbar/index.uts';
+import { activeTabTitle, curIdx, isPageTabbar, isSinglePageTabbar, tabbarList } from '@/src/tabbar/index.uts';
 import { isAlipayMp } from '@/src/utils/systemInfo/index.uts';
 
 /**
@@ -604,15 +604,25 @@ const useCustomRefresher = computed((): boolean => {
  * 计算最终生效的导航栏标题（内置 formatNavbarTitle 自动多语言翻译）
  */
 const displayTitle = computed((): string => {
+  // 1. 若处于单页面 TabBar 宿主首页容器模式：直接响应式读取当前激活 Tab 的标题，彻底杜绝跨页面事件污染与返回时序闪变
+  if (isSinglePageHome.value && isTabbarPage.value) {
+    if (activeTabTitle.value.length > 0) {
+      return formatNavbarTitle(activeTabTitle.value);
+    }
+    if (curIdx.value >= 0 && curIdx.value < tabbarList.length) {
+      return formatNavbarTitle(tabbarList[curIdx.value].text);
+    }
+  }
+  // 2. 动态自定义标题（由页面内部主动 setNavbarTitle 设置）
   if (customTitle.value != null) {
     return formatNavbarTitle(customTitle.value!);
   }
-  // 1. 优先读取当前页面 definePage.style.navigationBarTitleText（用户显式配置了空字符串 '' 也必须尊重）
+  // 3. 优先读取当前页面 definePage.style.navigationBarTitleText（用户显式配置了空字符串 '' 也必须尊重）
   const rawStyleTitle = pageStyleObj.value.navigationBarTitleText;
   if (rawStyleTitle != null) {
     return formatNavbarTitle(`${rawStyleTitle}`);
   }
-  // 2. 页面 props 显式传入标题
+  // 4. 页面 props 显式传入标题
   if (props.navigationBarTitleText.length > 0) {
     return formatNavbarTitle(props.navigationBarTitleText);
   }
