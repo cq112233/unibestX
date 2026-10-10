@@ -1,0 +1,27 @@
+import { computed } from 'vue';
+import { useThemeStore } from '@/src/store';
+import { getThemeTokens, themeColor } from '@/src/theme/index.uts';
+import type { ThemeTokens } from '@/src/theme/index.uts';
+
+/**
+ * 当前是否为深色模式（响应式）
+ */
+export const isDark = computed<boolean>((): boolean => {
+  return useThemeStore().state.isDark;
+});
+
+/**
+ * TabBar 主题样式令牌（响应式自适应深浅色模式）
+ * （当 CLI 裁剪掉 theme 模块时，只需替换本文件为静态固定颜色，TabBar 内部 UI 无需做任何修改）
+ */
+export const themeTokens = computed((): ThemeTokens => {
+  return getThemeTokens(isDark.value);
+});
+
+/**
+ * TabBar 当前激活的高亮主题色（优先取 store 中的持久化主题色，保底取全局 themeColor）
+ */
+export const activeThemeColor = computed<string>((): string => {
+  const storeTheme = useThemeStore().state.theme;
+  return storeTheme.length > 0 ? storeTheme : themeColor.value;
+});

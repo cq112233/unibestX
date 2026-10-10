@@ -4,7 +4,9 @@
  */
 export * from './types.uts';
 export * from './vapor/app';
+export * from './vapor/i18n';
 export * from './vapor/modal';
+export * from './vapor/theme';
 export * from './vapor/token';
 export * from './vapor/user';
 

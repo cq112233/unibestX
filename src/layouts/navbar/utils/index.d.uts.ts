@@ -121,3 +121,18 @@ export declare function setStatusBarVisible(visible: boolean): void;
  * 重置状态栏显隐为页面初始配置
  */
 export declare function resetStatusBarVisible(): void;
+
+/**
+ * 布局主题设计令牌
+ */
+export declare const navbarThemeTokens: import('vue').ComputedRef<import('@/src/theme/index.uts').ThemeTokens>;
+
+/**
+ * 下拉刷新背景底色
+ */
+export declare const refresherBackground: import('vue').ComputedRef<string>;
+
+/**
+ * 将导航栏标题进行国际化多语言转换
+ */
+export declare function formatNavbarTitle(title: string): string;

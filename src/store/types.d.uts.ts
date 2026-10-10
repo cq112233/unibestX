@@ -8,11 +8,17 @@
  * 修改 `types.uts` 的导出后，重新执行：node scripts/gen-uts-dts.mjs
  * 校验是否已同步：node scripts/gen-uts-dts.mjs --check
  */
-export type IAppState = {
+export type IThemeState = {
   theme: string;
-  locale: string;
   themeMode: string; // 'auto'（跟随系统）| 'light' | 'dark'
   isDark: boolean; // 实际生效的亮/暗（auto 模式下跟随系统/宿主主题）
+};
+
+export type II18nState = {
+  locale: string;
+};
+
+export type IAppState = {
   mode: string; // 当前 Store 实现模式：'vapor'（官方 Pinia）| 'vdom'（x-pinia-s）
 };
 

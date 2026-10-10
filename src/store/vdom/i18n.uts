@@ -1,0 +1,119 @@
+import { defineStore, PiniaStoreBase } from '@/uni_modules/x-pinia-s';
+import i18n from '@/src/i18n/index.uts';
+import { getDefaultLocale } from '@/src/config/env/env.uts';
+import type { II18nState } from '../types.uts';
+
+const defaultI18nState: II18nState = {
+  locale: getDefaultLocale()
+};
+
+function getStoredI18nState(): UTSJSONObject | null {
+  try {
+    const raw = uni.getStorageSync('pinia:i18n');
+    if (raw != null) {
+      const rawStr = `${raw}`;
+      if (rawStr.length > 0 && rawStr != 'null' && rawStr != 'undefined') {
+        const parsed = JSON.parseObject(rawStr);
+        if (parsed != null) {
+          const res = (parsed.state != null ? parsed.state : parsed) as UTSJSONObject;
+          if (res.locale != null) {
+            const locStr = `${res.locale}`;
+            if (locStr.length > 0 && locStr != 'null' && locStr != 'undefined') {
+              return res;
+            }
+          }
+        }
+      }
+    }
+    const limeRaw = uni.getStorageSync('uVueI18nLocale');
+    if (limeRaw != null) {
+      const limeStr = `${limeRaw}`;
+      if (limeStr.length > 0 && limeStr != 'null' && limeStr != 'undefined') {
+        return { locale: limeStr } as UTSJSONObject;
+      }
+    }
+  }
+  catch {
+    // ignore
+  }
+  return null;
+}
+
+/**
+ * 国际化多语言 Store（可独立裁撤的扩展功能模块）
+ */
+export class I18nStore extends PiniaStoreBase {
+  state: II18nState = reactive<II18nState>({
+    locale: getDefaultLocale()
+  });
+
+  constructor() {
+    super();
+    this.bindState(this.state);
+    this.initLocale();
+  }
+
+  /**
+   * 初始化应用多语言配置（从持久化存储恢复并同步设置 全局 i18n 语言）
+   */
+  initLocale(): void {
+    const stored = getStoredI18nState();
+    if (stored != null && stored.locale != null) {
+      const localeVal = `${stored.locale}`;
+      if (localeVal.length > 0 && localeVal != 'null' && localeVal != 'undefined') {
+        this.state.locale = localeVal;
+      }
+    }
+    i18n.global.locale.value = this.state.locale;
+  }
+
+  /**
+   * 重置语言状态为系统默认语言
+   */
+  override _doReset(): void {
+    this.state.locale = defaultI18nState.locale;
+    i18n.global.locale.value = defaultI18nState.locale;
+  }
+
+  /**
+   * 从本地缓存数据中反序列化还原语言配置
+   */
+  override _hydrate(data: UTSJSONObject): void {
+    const _data = (data.state != null ? data.state : data) as UTSJSONObject;
+    if (_data.locale != null) {
+      const localeVal = `${_data.locale}`;
+      if (localeVal.length > 0 && localeVal != 'null' && localeVal != 'undefined') {
+        this.state.locale = localeVal;
+        i18n.global.locale.value = localeVal;
+      }
+    }
+  }
+
+  /**
+   * 序列化语言状态用于持久化存储
+   */
+  override _serialize(): UTSJSONObject {
+    return {
+      locale: this.state.locale
+    } as UTSJSONObject;
+  }
+
+  /**
+   * 切换当前应用语言，同步更新 vue-i18n 全局响应式语言及持久化缓存
+   * @param locale 目标语言标识（如 'zh-Hans', 'en'）
+   */
+  setLocale(locale: string): void {
+    this.state.locale = locale;
+    i18n.global.locale.value = locale;
+    this.$patch({ locale } as UTSJSONObject);
+    try {
+      uni.setStorageSync('pinia:i18n', JSON.stringify(this._serialize()));
+      uni.setStorageSync('uVueI18nLocale', locale);
+    }
+    catch {
+      // ignore
+    }
+  }
+}
+
+export const useI18nStore = defineStore<I18nStore>('i18n', (): I18nStore => new I18nStore());

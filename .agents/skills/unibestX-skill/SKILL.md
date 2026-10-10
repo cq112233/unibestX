@@ -106,8 +106,8 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 | **链式 `.catch()`（`error25 None of the following candidates is applicable`）** | `.then(done).catch((err: any) => {...})`（UTSPromise 的三个 `.catch` 重载在 Kotlin 端均无法收敛；**与回调返回类型、是否 `throw` 无关**，单一返回类型的回调照样报错） | 改为双参 `.then(onFulfilled, onRejected)`，拒绝回调并进第二参；要表达「抛出」时用 `Promise.reject(toError(err)) as Promise<T>` 而非 `throw`（`Promise.resolve(...)` 包裹也一并去掉，详见 **1.21**） |
 | **系统尺寸与高度获取** | 散落调用 `uni.getSystemInfoSync()` 或样式手写 `100vh`（损耗性能、非响应式、原生端不支持 vh 且易被 TabBar/导航栏遮挡） | 优先引入 `@/src/utils/systemInfo/index.uts` 中的响应式变量（`availableHeight`、`statusBarHeight`、`navBarHeight`、`safeAreaBottom`）或使用 `sys` 单例（详见 **分册 8**） |
 | **环境变量与服务地址读取** | 手写 `process.env` / `import.meta.env` 或在代码里硬编码域名 IP（原生平台无法识别且切换环境易出错） | 统一从 `@/src/utils/env/index.uts` 引入具名方法（`getApiBaseUrl()`、`getOssBaseUrl()`、`isDev()`、`isProd()`、`isVaporMode()`）（详见 **分册 8**） |
-| **轻提示与加载动画 (Toast / Loading)** | 散落手写 `uni.showToast({ title: '...', icon: 'none' })` | 统一引入 `@/src/utils/toast/index.uts` 中的 5 个轻量纯函数：`toast(msg)`、`toastSuccess(msg)`、`toastError(msg)`、`showLoading()`、`hideLoading()`（详见 **分册 8**） |
 | **页面跳转与路由控制** | 直接调用原生 `uni.navigateTo` 等且未做参数编码与越界防护 | 优先引入 `@/src/router/index.uts` 的路由封装方法（如 `toLoginPage()`、`cleanPath()`、`getCurrentPath()`、`parseUrlToObj()` 或 `route` 单例，详见 **分册 8**） |
+| **LeakCanary 报 Activity 内存泄漏（`mDestroyed = true`）** | 页面或根容器组件（如 `App.ku.uvue`）通过 `uni.$on` 注册全局监听但**未在 `onUnmounted` 中通过 `uni.$off` 注销**（或直接传入匿名函数无法解绑）；全局单例 `IndexKt.emitter` 永久持有页面回调，导致退出页面后原生 Activity 无法被 GC 回收 | 回调函数必须抽离为**具名函数**，`onMounted` 注册，`onUnmounted` 必须严格调用 `uni.$off(eventName, handler)` 注销（详见 **3.26**） |
 
 ---
 
@@ -154,3 +154,4 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 - [ ] **37. 严禁在 App 原生端直接调用全局 `uni.onKeyboardHeightChange`**（全局键盘监听在 App-Android/iOS 原生环境未实现，调用报未定义/拼写错误；App 端必须使用 `<input>` / `<textarea>` 的 `@keyboardheightchange` 组件事件，且其入参类型必须严格声明为 `UniInputKeyboardHeightChangeEvent`，严禁写成 `...Detail` 导致 Android 运行时抛 `ClassCastException`，见 3.3）
 - [ ] **38. 组件实例方法动态调用严禁强转 `as any` 后调用 `$callMethod`**（UTS 强类型系统对 `any` 不支持动态方法反射，写 `(el as any).$callMethod(...)` 会报 `error18 找不到名称“$callMethod”`；必须保持 `ref<ComponentPublicInstance | null>(null)` 强类型并调用 `el.value?.$callMethod(...)`，见 1.23）
 - [ ] **39. `<web-view>` 组件的 `@message` 事件入参必须显式声明为 `UniWebViewMessageEvent`**（严禁将入参声明为 `(e: any)` 或省略类型后直接访问 `e.detail`，UTS 强类型检查会报 `找不到名称“detail”`；必须显式声明为官方事件强类型 `(e: UniWebViewMessageEvent)`，见 1.24）
+- [ ] **40. 严禁在页面或组件中使用 `uni.$on` 注册全局事件后不执行 `uni.$off` 注销**（全局单例 `IndexKt.emitter` 生命周期贯穿整个应用进程，未注销的回调闭包会死死抓取组件实例、DOM 树及 `UniPortraitPageActivity`，导致每次进出页面都泄露一个完整的原生 Activity，被 LeakCanary 报内存泄漏；监听回调必须抽为具名函数，在 `onMounted` 注册，并在 `onUnmounted` 中调用 `uni.$off` 严格注销，见 3.26）

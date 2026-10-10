@@ -8,7 +8,7 @@
         backgroundColor: effectiveBgColor,
         borderBottomWidth: (border && isNavbarVisible) ? '1px' : '0px',
         borderBottomStyle: (border && isNavbarVisible) ? 'solid' : 'none',
-        borderBottomColor: (border && isNavbarVisible) ? '#e2e8f0' : 'transparent'
+        borderBottomColor: (border && isNavbarVisible) ? effectiveBorderColor : 'transparent'
       }"
     >
       <!-- 安全区域：状态栏占位高度 -->
@@ -66,7 +66,7 @@
 <script setup lang="uts">
 import { computed } from 'vue';
 import { NAVBAR_CONTENT_HEIGHT, safeAreaInsets, systemInfo } from '@/src/utils/systemInfo/index.uts';
-import { useAppStore } from '@/src/store';
+import { useThemeStore } from '@/src/store';
 import { getThemeTokens } from '@/src/theme/index.uts';
 import type { ThemeTokens } from '@/src/theme/index.uts';
 
@@ -113,7 +113,7 @@ const props = defineProps({
 
 // 亮 / 暗主题 token（与 theme.json 同步）：未显式传色时跟随当前外观模式
 const themeTokens = computed((): ThemeTokens => {
-  return getThemeTokens(useAppStore().state.isDark);
+  return getThemeTokens(useThemeStore().state.isDark);
 });
 
 // 实际生效的导航栏背景色：显式传 bgColor 时优先，否则跟随主题
@@ -124,6 +124,11 @@ const effectiveBgColor = computed((): string => {
 // 实际生效的标题 / 返回箭头颜色：显式传 titleColor 时优先，否则跟随主题
 const effectiveTitleColor = computed((): string => {
   return props.titleColor != '' ? props.titleColor : themeTokens.value.navText;
+});
+
+// 实际生效的底边框颜色：跟随暗黑模式自适应
+const effectiveBorderColor = computed((): string => {
+  return useThemeStore().state.isDark ? '#334155' : '#e2e8f0';
 });
 
 // 计算状态栏高度

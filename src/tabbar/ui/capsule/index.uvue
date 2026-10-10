@@ -6,17 +6,17 @@
 -->
 <script setup lang="uts">
 import {
+  activeThemeColor,
   curIdx,
   customTabbarConfig,
+  formatTabbarText,
   handleTabbarClick,
+  isDark,
   safeHideNativeTabBar,
   syncCurIdxByCurrentPage,
-  tabbarList
+  tabbarList,
+  themeTokens
 } from '@/src/tabbar/index.uts';
-import { $t } from '@/src/i18n/utils/index.uts';
-import { useAppStore } from '@/src/store';
-import { getThemeTokens, themeColor } from '@/src/theme/index.uts';
-import type { ThemeTokens } from '@/src/theme/index.uts';
 import { safeAreaInsets } from '@/src/utils/systemInfo/index.uts';
 
 const props = defineProps({
@@ -42,8 +42,6 @@ const props = defineProps({
   }
 });
 
-const appStore = useAppStore();
-
 /** 是否开启毛玻璃效果（优先取 prop，未传或为 false 时降级读取 config.uts 中的 glassEffect 配置） */
 const isGlass = computed<boolean>((): boolean => {
   if (props.glassEffect) {
@@ -52,15 +50,10 @@ const isGlass = computed<boolean>((): boolean => {
   return customTabbarConfig.glassEffect == true;
 });
 
-// 亮 / 暗主题 token（与 theme.json tabBar 配置同步）
-const themeTokens = computed((): ThemeTokens => {
-  return getThemeTokens(appStore.state.isDark);
-});
-
 /** 胶囊底座背景色（开启毛玻璃时使用半透明色值，未开启使用实色） */
 const tabBgColor = computed<string>((): string => {
   if (isGlass.value) {
-    return appStore.state.isDark ? 'rgba(30, 41, 59, 0.8)' : 'rgba(255, 255, 255, 0.82)';
+    return isDark.value ? 'rgba(30, 41, 59, 0.8)' : 'rgba(255, 255, 255, 0.82)';
   }
   return themeTokens.value.tabBg;
 });
@@ -68,7 +61,7 @@ const tabBgColor = computed<string>((): string => {
 /** 胶囊底座边框色（开启毛玻璃时使用半透明通透边框） */
 const tabBorderColor = computed<string>((): string => {
   if (isGlass.value) {
-    return appStore.state.isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(255, 255, 255, 0.6)';
+    return isDark.value ? 'rgba(255, 255, 255, 0.12)' : 'rgba(255, 255, 255, 0.6)';
   }
   return themeTokens.value.tabBorder;
 });
@@ -79,14 +72,9 @@ const safeAreaBottom = computed<number>((): number => {
   return insets != null ? insets.bottom : 0;
 });
 
-/** 当前激活的主题色（优先取 store 中持久化的 theme，保底取全局 themeColor） */
-const activeThemeColor = computed<string>((): string => {
-  return appStore.state.theme.length > 0 ? appStore.state.theme : themeColor.value;
-});
-
 /** 激活项的高亮胶囊底色（暗黑模式白色，浅色模式主题色，透明度由 pill 节点通过 opacity 控制，杜绝 8 位 hex 在 iOS 原生下变成实心红） */
 const activeItemBgColor = computed<string>((): string => {
-  if (appStore.state.isDark) {
+  if (isDark.value) {
     return '#ffffff';
   }
   return activeThemeColor.value;
@@ -94,7 +82,7 @@ const activeItemBgColor = computed<string>((): string => {
 
 /** 激活项高亮胶囊的不透明度 */
 const activeItemBgOpacity = computed<number>((): number => {
-  return appStore.state.isDark ? 0.15 : 0.12;
+  return isDark.value ? 0.15 : 0.12;
 });
 
 /** 滑块单项宽度占比（百分比） */
@@ -128,7 +116,7 @@ function onTabClick(index: number) {
 
 /** 获取多语言翻译文本 */
 function getText(text: string): string {
-  return $t(text);
+  return formatTabbarText(text);
 }
 
 /** 获取图标字体名称 */

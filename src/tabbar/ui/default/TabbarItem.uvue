@@ -1,10 +1,6 @@
 <script setup lang="uts">
 import type { CustomTabBarItem } from '@/src/tabbar/index.uts';
-import { curIdx } from '@/src/tabbar/index.uts';
-import { $t } from '@/src/i18n/utils/index.uts';
-import { useAppStore } from '@/src/store';
-import { getThemeTokens, themeColor } from '@/src/theme/index.uts';
-import type { ThemeTokens } from '@/src/theme/index.uts';
+import { activeThemeColor, curIdx, formatTabbarText, themeTokens } from '@/src/tabbar/index.uts';
 
 const props = defineProps({
   item: {
@@ -24,18 +20,6 @@ const props = defineProps({
 // 将 props.item 转换为强类型的 CustomTabBarItem
 const tabbarItem = computed((): CustomTabBarItem => {
   return props.item as CustomTabBarItem;
-});
-
-const appStore = useAppStore();
-
-// 亮 / 暗主题 token（与 theme.json tabBar 配置同步）
-const themeTokens = computed((): ThemeTokens => {
-  return getThemeTokens(appStore.state.isDark);
-});
-
-/** 当前激活的主题色（优先取 store 中持久化的 theme，保底取全局 themeColor） */
-const activeThemeColor = computed<string>((): string => {
-  return appStore.state.theme.length > 0 ? appStore.state.theme : themeColor.value;
 });
 
 /** 根据选中状态返回对应图标 */
@@ -85,7 +69,7 @@ const isNumberBadge = computed((): boolean => {
 
 /** 统一获取多语言文本 */
 function getText(text: string): string {
-  return $t(text);
+  return formatTabbarText(text);
 }
 </script>
 

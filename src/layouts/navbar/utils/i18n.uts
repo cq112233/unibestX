@@ -1,0 +1,18 @@
+import { useI18nStore } from '@/src/store/index.uts';
+import { getI18nText } from '@/src/i18n/utils/index.uts';
+
+/**
+ * 将导航栏标题进行国际化多语言转换（响应式跟随语言切换）
+ * （若 CLI 裁剪掉 i18n 模块，只需替换本文件为直接返回原字符串即可，Navbar 布局组件 0 侵入）
+ *
+ * @param title 标题原文或多语言 key（如 'tabbar.home' 或 '%tabbar.home%'）
+ * @returns 翻译后的展示标题
+ */
+export function formatNavbarTitle(title: string): string {
+  if (title.length == 0) {
+    return '';
+  }
+  // 建立与 i18nStore.state.locale 的响应式依赖，语言变更时自动触发 computed 重新计算
+  const _locale = useI18nStore().state.locale;
+  return getI18nText(title);
+}

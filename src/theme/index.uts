@@ -226,6 +226,17 @@ export function applyThemeMode(mode: string, isDark: boolean): void {
     const docEl = document.documentElement;
     if (docEl != null) {
       docEl.setAttribute('data-theme', isDark ? 'dark' : 'light');
+      if (isDark) {
+        docEl.classList.add('dark');
+      }
+      else {
+        docEl.classList.remove('dark');
+      }
+      docEl.style.setProperty('--bg-color', isDark ? '#0f172a' : '#f8fafc');
+      docEl.style.setProperty('--border-color', isDark ? '#334155' : '#e2e8f0');
+      docEl.style.setProperty('--card-bg', isDark ? '#1e293b' : '#ffffff');
+      docEl.style.setProperty('--text-color', isDark ? '#e2e8f0' : '#1e293b');
+      docEl.style.setProperty('--text-secondary', isDark ? '#94a3b8' : '#64748b');
     }
   }
   catch {
