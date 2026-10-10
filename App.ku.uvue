@@ -20,7 +20,7 @@ import Tabbar from '@/src/tabbar/tabbar.uvue';
 import { customTabbarEnable, isPageTabbar, selectedTabbarStrategy, syncCurIdxByCurrentPage } from '@/src/tabbar/index.uts';
 import { useThemeStore } from '@/src/store';
 import { applyNavbarTheme, getRootThemeStyle } from '@/src/theme/index.uts';
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { updateAvailableHeight } from '@/src/utils/systemInfo/index.uts';
 
 /**
@@ -153,18 +153,28 @@ watch((): boolean => props.hideNavbar, (newVal: boolean) => {
   doUpdateHeight(newVal, null);
 });
 
-// 监听单页 TabBar 切换或全局发出的 setHideStatusBar 事件
-uni.$on('setHideStatusBar', (hide: any) => {
+function onSetHideStatusBar(hide: any) {
   if (typeof hide == 'boolean') {
     doUpdateHeight(null, hide as boolean);
   }
-});
+}
 
-// 监听单页 TabBar 切换或全局发出的 setHideNavbar 事件
-uni.$on('setHideNavbar', (hide: any) => {
+function onSetHideNavbar(hide: any) {
   if (typeof hide == 'boolean') {
     doUpdateHeight(hide as boolean, null);
   }
+}
+
+// 挂载时监听单页 TabBar 切换或全局发出的显隐变更事件
+onMounted(() => {
+  uni.$on('setHideStatusBar', onSetHideStatusBar);
+  uni.$on('setHideNavbar', onSetHideNavbar);
+});
+
+// 卸载时严格移除全局事件监听，彻底消除 IndexKt.emitter 持有页面导致的 Activity 内存泄漏
+onUnmounted(() => {
+  uni.$off('setHideStatusBar', onSetHideStatusBar);
+  uni.$off('setHideNavbar', onSetHideNavbar);
 });
 </script>
 
