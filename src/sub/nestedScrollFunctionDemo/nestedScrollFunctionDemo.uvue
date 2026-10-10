@@ -1,5 +1,5 @@
 <template>
-  <view class="flex flex-col flex-1" :class="isDark ? 'bg-[#0f172a]' : 'bg-[#f8fafc]'">
+  <view class="flex flex-col flex-1 bg-[#f8fafc]">
     <!-- 核心嵌套滚动场景（基于验证无误的标准容器结构） -->
     <view class="flex-1 flex flex-col relative">
       <NestedScroll
@@ -21,13 +21,11 @@
         <!-- 粘性吸顶头部插槽：全生命周期模拟演练卡片与操作面板（向上滑动时吸附在顶部不滚出） -->
         <template #affix>
           <view
-            class="m-[14px] p-[16px] rounded-[14px] border-[1px] border-solid shadow-xs"
-            :class="isDark ? 'bg-[#1e293b] border-[#334155]' : 'bg-[#e0e7ff] border-[#c7d2fe]'"
+            class="m-[14px] p-[16px] rounded-[14px] border-[1px] border-solid shadow-xs bg-[#e0e7ff] border-[#c7d2fe]"
           >
             <view class="flex flex-row items-center justify-between mb-[6px]">
               <text
-                class="text-[15px] font-bold"
-                :class="isDark ? 'text-[#f1f5f9]' : 'text-[#1e293b]'"
+                class="text-[15px] font-bold text-[#1e293b]"
               >
                 🎨 全生命周期模拟演练
               </text>
@@ -38,33 +36,44 @@
 
             <!-- 实时步骤状态条 -->
             <view
-              class="p-[8px] rounded-[8px] my-[8px] flex flex-row items-center border-[1px] border-solid"
-              :class="isDark ? 'bg-[#0f172a]/60 border-[#334155]' : 'bg-white/80 border-[#c7d2fe]'"
+              class="p-[8px] rounded-[8px] my-[8px] flex flex-row items-center border-[1px] border-solid bg-white/80 border-[#c7d2fe]"
             >
               <text class="text-[14px] mr-[6px]">
                 {{ simStep == 1 || simStep == 2 ? '⏳' : (simStep == 3 ? (articleError ? '🚨' : '⚡') : (simStep >= 4 ? '🎉' : '💡')) }}
               </text>
               <text
                 class="text-[11px] font-medium leading-[16px] flex-1"
-                :class="articleError ? 'text-[#dc2626]' : (simStep >= 4 ? 'text-[#16a34a]' : (isDark ? 'text-[#38bdf8]' : 'text-[#4338ca]'))"
+                :class="articleError ? 'text-[#dc2626]' : (simStep >= 4 ? 'text-[#16a34a]' : 'text-[#4338ca]')"
               >
                 {{ simStatusText }}
               </text>
             </view>
 
             <!-- 控制操作按钮排 -->
-            <view class="flex flex-row">
+            <view class="flex flex-row items-center justify-between mt-[4px]">
               <view
-                class="flex-1 py-[7px] mr-[4px] rounded-[6px] bg-[#fef3c7] items-center justify-center"
-                @click="triggerEmpty"
+                class="flex-1 py-[7px] mr-[6px] rounded-[6px] bg-[#4f46e5] items-center justify-center active:opacity-75"
+                @click="onArticleRefresh"
               >
-                <text class="text-[10px] text-[#d97706] font-bold">清空数据</text>
+                <text class="text-[10px] text-[#ffffff] font-bold">手动刷新</text>
               </view>
               <view
-                class="flex-1 py-[7px] mr-[4px] rounded-[6px] bg-[#dcfce7] items-center justify-center"
-                @click="triggerReset"
+                class="flex-1 py-[7px] mr-[6px] rounded-[6px] bg-[#2563eb] items-center justify-center active:opacity-75"
+                @click="onArticleLoadMore"
               >
-                <text class="text-[10px] text-[#16a34a] font-bold">恢复重置</text>
+                <text class="text-[10px] text-[#ffffff] font-bold">追加数据</text>
+              </view>
+              <view
+                class="flex-1 py-[7px] mr-[6px] rounded-[6px] bg-[#dc2626] items-center justify-center active:opacity-75"
+                @click="articleError = true"
+              >
+                <text class="text-[10px] text-[#ffffff] font-bold">模拟异常</text>
+              </view>
+              <view
+                class="flex-1 py-[7px] mr-[6px] rounded-[6px] bg-[#64748b] items-center justify-center active:opacity-75"
+                @click="triggerEmpty"
+              >
+                <text class="text-[10px] text-[#ffffff] font-bold">置空页面</text>
               </view>
               <view
                 class="flex-1 py-[7px] rounded-[6px] bg-[#e0e7ff] items-center justify-center"
@@ -75,8 +84,8 @@
             </view>
 
             <!-- 回顶位置调节行 -->
-            <view class="flex flex-row items-center justify-between mt-[8px] pt-[6px] border-t-[1px] border-solid" :class="isDark ? 'border-[#334155]' : 'border-[#c7d2fe]'">
-              <text class="text-[11px]" :class="isDark ? 'text-[#94a3b8]' : 'text-[#475569]'">
+            <view class="flex flex-row items-center justify-between mt-[8px] pt-[6px] border-t-[1px] border-solid border-[#c7d2fe]">
+              <text class="text-[11px] text-[#475569]">
                 回顶按钮底部边距: <text class="font-bold text-[#3b82f6]">{{ customBottom }}px</text>
               </text>
               <view
@@ -94,8 +103,7 @@
           <view class="w-full py-[16px] flex flex-row items-center justify-center">
             <text class="text-[16px] mr-[8px]">{{ articleRefreshing ? '🚀' : '⚓' }}</text>
             <text
-              class="text-[12px] font-bold"
-              :class="isDark ? 'text-[#38bdf8]' : 'text-[#0957de]'"
+              class="text-[12px] font-bold text-[#0957de]"
             >
               {{ articleRefreshing ? '自定义下拉中：数据正在极速吞吐...' : '松开手指立即触发自定义刷新' }}
             </text>
@@ -105,8 +113,7 @@
         <!-- 2. 自定义一键返回顶部插槽演示 -->
         <template #backToTop>
           <view
-            class="px-[12px] py-[8px] rounded-full flex flex-row items-center border-[1px] border-solid shadow-md active:opacity-75"
-            :class="isDark ? 'bg-[#0284c7] border-[#38bdf8]' : 'bg-[#0957de] border-[#1d4ed8]'"
+            class="px-[12px] py-[8px] rounded-full flex flex-row items-center border-[1px] border-solid shadow-md active:opacity-75 bg-[#0957de] border-[#1d4ed8]"
           >
             <uni-icons type="top" size="14" color="#ffffff" />
             <text class="text-[12px] text-[#ffffff] font-bold ml-[4px]">回顶</text>
@@ -116,8 +123,7 @@
         <!-- 列表内容：采用 list-item 匹配 list-view 原生回收复用机制 -->
         <list-item v-for="item in articleList" :key="item.id" type="card" class="w-full">
           <view
-            class="mx-[14px] my-[6px] p-[14px] rounded-[12px] border-[1px] border-solid flex flex-col"
-            :class="isDark ? 'bg-[#1e293b] border-[#334155]' : 'bg-white border-[#e2e8f0]'"
+            class="mx-[14px] my-[6px] p-[14px] rounded-[12px] border-[1px] border-solid flex flex-col bg-white border-[#e2e8f0]"
           >
             <view class="flex flex-row items-center justify-between mb-[6px]">
               <view
@@ -131,14 +137,12 @@
               <text class="text-[11px] text-[#94a3b8]">{{ item.time }}</text>
             </view>
             <text
-              class="text-[14px] font-bold mb-[4px]"
-              :class="isDark ? 'text-[#f1f5f9]' : 'text-[#1e293b]'"
+              class="text-[14px] font-bold mb-[4px] text-[#1e293b]"
             >
               {{ item.title }}
             </text>
             <text
-              class="text-[12px] leading-[17px]"
-              :class="isDark ? 'text-[#94a3b8]' : 'text-[#64748b]'"
+              class="text-[12px] leading-[17px] text-[#64748b]"
             >
               {{ item.summary }}
             </text>
@@ -150,8 +154,7 @@
           <view class="py-[48px] items-center justify-center flex flex-col">
             <text class="text-[40px] mb-[10px]">📭</text>
             <text
-              class="text-[13px] font-bold mb-[14px]"
-              :class="isDark ? 'text-[#64748b]' : 'text-[#94a3b8]'"
+              class="text-[13px] font-bold mb-[14px] text-[#94a3b8]"
             >
               暂无分页数据（空状态演示）
             </text>
@@ -167,13 +170,11 @@
         <!-- 2. 自定义正在加载中插槽演示 -->
         <template #loading>
           <view
-            class="mx-[14px] my-[10px] p-[14px] rounded-[12px] border-[1px] border-dashed flex flex-row items-center justify-center shadow-xs"
-            :class="isDark ? 'bg-[#1e293b]/70 border-[#38bdf866]' : 'bg-[#eff6ff] border-[#93c5fd]'"
+            class="mx-[14px] my-[10px] p-[14px] rounded-[12px] border-[1px] border-dashed flex flex-row items-center justify-center shadow-xs bg-[#eff6ff] border-[#93c5fd]"
           >
             <text class="text-[14px] mr-[6px]">⚡</text>
             <text
-              class="text-[12px] font-semibold"
-              :class="isDark ? 'text-[#38bdf8]' : 'text-[#0957de]'"
+              class="text-[12px] font-semibold text-[#0957de]"
             >
               自定义加载中：自研引擎正在流式计算数据...
             </text>
@@ -183,8 +184,7 @@
         <!-- 3. 自定义加载报错与重试插槽演示 -->
         <template #error>
           <view
-            class="mx-[14px] my-[8px] p-[12px] rounded-[12px] border-[1px] border-solid flex flex-row items-center justify-between shadow-xs"
-            :class="isDark ? 'bg-[#450a0a]/50 border-[#7f1d1d]' : 'bg-[#fef2f2] border-[#fecaca]'"
+            class="mx-[14px] my-[8px] p-[12px] rounded-[12px] border-[1px] border-solid flex flex-row items-center justify-between shadow-xs bg-[#fef2f2] border-[#fecaca]"
           >
             <view class="flex flex-row items-center flex-1 mr-[10px]">
               <text class="text-[18px] mr-[8px]">🚨</text>
@@ -205,17 +205,16 @@
         <!-- 4. 自定义没有更多数据插槽演示 -->
         <template #finished>
           <view class="w-full py-[18px] flex flex-row items-center justify-center">
-            <view class="w-[36px] h-[1px]" :class="isDark ? 'bg-[#334155]' : 'bg-[#cbd5e1]'" />
+            <view class="w-[36px] h-[1px] bg-[#cbd5e1]" />
             <view class="mx-[10px] flex flex-row items-center">
               <text class="text-[12px] mr-[4px]">🎉</text>
               <text
-                class="text-[12px] font-medium"
-                :class="isDark ? 'text-[#64748b]' : 'text-[#94a3b8]'"
+                class="text-[12px] font-medium text-[#94a3b8]"
               >
                 已展示完全部数据内容
               </text>
             </view>
-            <view class="w-[36px] h-[1px]" :class="isDark ? 'bg-[#334155]' : 'bg-[#cbd5e1]'" />
+            <view class="w-[36px] h-[1px] bg-[#cbd5e1]" />
           </view>
         </template>
       </NestedScroll>
@@ -227,7 +226,6 @@
 import { computed, ref } from 'vue';
 import type { ComponentPublicInstance } from 'vue';
 import NestedScroll from '@/src/components/NestedScroll/NestedScroll.uvue';
-import { useAppStore } from '@/src/store';
 
 definePage({
   debug: false,
@@ -240,9 +238,6 @@ definePage({
     navigationStyle: 'custom'
   }
 });
-
-const appStore = useAppStore();
-const isDark = computed((): boolean => appStore.state.isDark);
 
 // -------------------------------------------------------------
 // 数据模型定义（遵守规范，严禁使用 interface，全部使用 type）

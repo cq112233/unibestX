@@ -10,7 +10,7 @@ const pinia = createPinia();
 // 持久化插件配置
 pinia.use(createPersistPlugin({
   keyPrefix: 'pinia:',
-  includeStores: ['token', 'user', 'app'],
+  includeStores: ['token', 'user', 'app', 'theme', 'i18n'],
   excludeStores: [] as string[],
   serializer: null
 } as PersistOptions));

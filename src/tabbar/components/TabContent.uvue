@@ -87,21 +87,16 @@
 
 <script setup lang="uts">
 import { computed, onMounted, onUnmounted, provide, ref, watch } from 'vue';
-import { curIdx } from '@/src/tabbar/index.uts';
+import { activeTabTitle, curIdx, formatTabbarText, themeTokens } from '@/src/tabbar/index.uts';
 import TabbarPlaceholder from './TabbarPlaceholder.uvue';
-import { $t } from '@/src/i18n/utils/index.uts';
 import { isAlipayMp } from '@/src/utils/systemInfo/index.uts';
 import {
   isPageRefresherDisabled,
   isPageScrollDisabled,
   setHideNavbar,
   setHideStatusBar,
-  setNavbarTitle,
   stopNavbarPullDownRefresh
 } from '@/src/layouts/navbar/utils/index.uts';
-import { useAppStore } from '@/src/store';
-import { getThemeTokens } from '@/src/theme/index.uts';
-import type { ThemeTokens } from '@/src/theme/index.uts';
 
 // ==========================================
 // 1. 组件 Props 属性定义
@@ -153,8 +148,13 @@ const hasRendered = ref(false);
 /** 计算当前 Tab 是否正处于激活显示状态 */
 const isActive = computed<boolean>((): boolean => curIdx.value == props.contentIndex);
 
-/** 标题与显隐相关的响应式计算属性（用于 watch 深度监听变更） */
-const contentTitle = computed((): string => props.title);
+/** 标题与显隐相关的响应式计算属性（用于 watch 深度监听变更，支持多语言响应式联动） */
+const contentTitle = computed((): string => {
+  if (props.title.length > 0) {
+    return formatTabbarText(props.title);
+  }
+  return '';
+});
 const shouldHideNavbar = computed((): boolean => props.hideNavbar);
 const shouldHideStatusBar = computed((): boolean => props.hideStatusBar);
 
@@ -166,14 +166,8 @@ const shouldHideStatusBar = computed((): boolean => props.hideStatusBar);
 provide('isTabActive', isActive);
 
 // ==========================================
-// 3. 样式布局与主题令牌
+// 3. 样式布局
 // ==========================================
-const appStore = useAppStore();
-
-/** 当前主题设计令牌（深浅色模式动态切换背景底色） */
-const themeTokens = computed<ThemeTokens>((): ThemeTokens => {
-  return getThemeTokens(appStore.state.isDark);
-});
 
 /**
  * 根节点行内样式：
@@ -324,15 +318,12 @@ function handleAlipayTouchEnd() {
 // 5. 导航栏与状态栏同步
 // ==========================================
 /**
- * 设置/同步当前激活 Tab 的导航栏标题（优先取 props.title，未传则读取 TabBar 配置的多语言文案）
+ * 设置/同步当前激活 Tab 的导航栏标题
+ * 直接响应式更新 activeTabTitle，不发全局事件广播，彻底杜绝跨页面事件污染与返回时序闪变
  */
 function updateNavbarTitle(): void {
-  if (props.title.length > 0) {
-    const targetTitle = $t(props.title);
-    setNavbarTitle(targetTitle);
-    uni.setNavigationBarTitle({
-      title: targetTitle
-    });
+  if (isActive.value) {
+    activeTabTitle.value = props.title.length > 0 ? props.title : contentTitle.value;
   }
 }
 
@@ -420,14 +411,11 @@ watch(isActive, (newVal: boolean) => {
 });
 
 /**
- * 监听自定义标题属性动态变化
+ * 监听自定义标题属性动态变化（仅更新内部响应式 activeTabTitle，不发全局事件）
  */
-watch(contentTitle, (newTitle: string) => {
-  if (isActive.value && newTitle.length > 0) {
-    setNavbarTitle(newTitle);
-    uni.setNavigationBarTitle({
-      title: newTitle
-    });
+watch(contentTitle, (_newTitle: string) => {
+  if (isActive.value) {
+    updateNavbarTitle();
   }
 });
 

@@ -8,7 +8,7 @@
       class="default-scroll-view"
       :refresher-enabled="isRefresherEnabled"
       :refresher-triggered="isTriggered"
-      :refresher-background="themeTokens.bgContent"
+      :refresher-background="refresherBackground"
       :lower-threshold="50"
       @refresherrefresh="handleRefresherRefresh"
       @refresherrestore="handleRefresherRestore"
@@ -34,10 +34,7 @@
 
 <script setup lang="uts">
 import { computed, onMounted, onUnmounted, ref } from 'vue';
-import { useAppStore } from '@/src/store';
-import { getThemeTokens } from '@/src/theme/index.uts';
-import type { ThemeTokens } from '@/src/theme/index.uts';
-import { isPageRefresherDisabled, isPageScrollDisabled } from '@/src/layouts/navbar/utils/index.uts';
+import { isPageRefresherDisabled, isPageScrollDisabled, refresherBackground } from '@/src/layouts/navbar/utils/index.uts';
 import { updateSystemInfo } from '@/src/utils/systemInfo/index.uts';
 
 /**
@@ -210,10 +207,6 @@ const useCustomRefresher = computed((): boolean => {
     return false;
   }
   return props.enablePullDownRefresh;
-});
-
-const themeTokens = computed((): ThemeTokens => {
-  return getThemeTokens(useAppStore().state.isDark);
 });
 </script>
 

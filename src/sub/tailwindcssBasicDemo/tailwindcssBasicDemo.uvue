@@ -2,16 +2,6 @@
 import WeappTailwindcss from './components/WeappTailwindcss.uvue';
 import BindClass from './components/BindClass.uvue';
 import TButton from './components/t-button.uvue';
-import { useAppStore } from '@/src/store/index.uts';
-
-const appStore = useAppStore();
-
-const isDark = computed((): boolean => appStore.state.isDark);
-
-function toggleDark(): void {
-  const nextMode = appStore.state.isDark ? 'light' : 'dark';
-  appStore.setThemeMode(nextMode);
-}
 
 const buttonColors: Array<string> = [
   'bg-[#000]',
@@ -66,13 +56,10 @@ onLoad((): void => {
 
 <template>
   <view>
-    <view class="content" :class="{ dark: isDark }">
+    <view class="content">
       <WeappTailwindcss />
       <BindClass />
-      <button class="mt-4 w-64 rounded-full px-4 py-2 text-white" :style="{ backgroundColor: isDark ? '#3498db' : '#eccc68' }" @click="toggleDark">
-        {{ isDark ? '切换到亮色模式' : '切换到暗色模式' }}
-      </button>
-      <view class="w-full bg-[#164e63] p-[12px] issue-1002-probe">
+      <view class="w-full bg-[#164e63] p-[12px] issue-1002-probe mt-4">
         <text class="text-xs text-white">issue-1002 text-xs</text>
         <text class="text-sm text-white">issue-1002 text-sm</text>
         <text class="text-base text-white">issue-1002 text-base</text>
@@ -117,11 +104,8 @@ onLoad((): void => {
             @apply 多端写法示例
           </text>
         </view>
-        <view class="theme-mode-demo mt-4 rounded px-4 py-3" :class="isDark ? 'bg-zinc-900 text-zinc-50' : 'bg-white text-slate-900'">
-          <text>uni-app x Tailwind CSS v4 system dark</text>
-          <view class="theme-dark mt-2 rounded px-3 py-2" :class="isDark ? 'bg-zinc-950 text-zinc-50' : 'bg-white text-slate-900'">
-            <text>uni-app x Tailwind CSS v4 manual dark</text>
-          </view>
+        <view class="theme-mode-demo mt-4 rounded px-4 py-3 bg-white text-slate-900 border border-slate-200">
+          <text>uni-app x Tailwind CSS 样式演示</text>
         </view>
         <t-button t-class="bg-[#0977ee] text-[31rpx]" t-class-content="px-[29rpx]">
           <text>issue 977 t-class</text>

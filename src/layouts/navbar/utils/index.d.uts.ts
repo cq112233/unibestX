@@ -8,7 +8,7 @@
  * 修改 `index.uts` 的导出后，重新执行：node scripts/gen-uts-dts.mjs
  * 校验是否已同步：node scripts/gen-uts-dts.mjs --check
  */
-import type { Ref } from 'vue';
+import type { ComputedRef, Ref } from 'vue';
 
 /** 页面滚动禁用响应式开关 */
 export declare const isPageScrollDisabled: Ref<boolean>;
@@ -121,3 +121,23 @@ export declare function setStatusBarVisible(visible: boolean): void;
  * 重置状态栏显隐为页面初始配置
  */
 export declare function resetStatusBarVisible(): void;
+
+/**
+ * 将导航栏标题进行国际化多语言转换（响应式跟随语言切换）
+ * （若 CLI 裁剪掉 i18n 模块，只需替换本文件为直接返回原字符串即可，Navbar 布局组件 0 侵入）
+ *
+ * @param title 标题原文或多语言 key（如 'tabbar.home' 或 '%tabbar.home%'）
+ * @returns 翻译后的展示标题
+ */
+export declare function formatNavbarTitle(title: string): string;
+
+/**
+ * 布局主题设计令牌（自适应深浅色模式）
+ * （当 CLI 裁剪掉 theme 模块时，只需将本文件替换为静态默认颜色，布局内部 UI 无需做任何修改）
+ */
+export declare const navbarThemeTokens: any;
+
+/**
+ * 下拉刷新背景底色（自适应深浅色）
+ */
+export declare const refresherBackground: ComputedRef<string>;

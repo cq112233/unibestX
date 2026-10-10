@@ -1,21 +1,16 @@
 <template>
-  <view class="flex flex-col p-[16px]" :class="isDark ? 'bg-[#0f172a]' : 'bg-[#f8fafc]'">
+  <view class="flex flex-col p-[16px] bg-[#f8fafc]">
     <!-- 1. 通信与系统分享卡片 -->
     <view class="mb-[16px]">
       <view
-        class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid"
-        :style="{
-          backgroundColor: 'var(--card-bg, #ffffff)',
-          borderColor: 'var(--border-color, #edf2f7)'
-        }"
+        class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid border-[#edf2f7] bg-[#ffffff]"
       >
         <!-- 标题区域 -->
         <view class="flex flex-row items-center mb-[16px]">
           <view
-            class="w-[4px] h-[16px] rounded-[2px] mr-[8px]"
-            :style="{ backgroundColor: 'var(--theme-color, #3182ce)' }"
+            class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#3182ce]"
           />
-          <text class="text-[16px] font-bold" :style="{ color: 'var(--text-color, #2d3748)' }">通信与系统分享</text>
+          <text class="text-[16px] font-bold text-[#2d3748]">通信与系统分享</text>
         </view>
         <!-- 拨号 -->
         <view class="rounded-[12px] p-[16px] mb-[16px] border-[1px] border-solid border-[#e2e8f0]">
@@ -61,19 +56,14 @@
     <!-- 2. 文件与文档预览卡片 -->
     <view class="mb-[16px]">
       <view
-        class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid"
-        :style="{
-          backgroundColor: 'var(--card-bg, #ffffff)',
-          borderColor: 'var(--border-color, #edf2f7)'
-        }"
+        class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid border-[#edf2f7] bg-[#ffffff]"
       >
         <!-- 标题区域 -->
         <view class="flex flex-row items-center mb-[16px]">
           <view
-            class="w-[4px] h-[16px] rounded-[2px] mr-[8px]"
-            :style="{ backgroundColor: 'var(--theme-color, #3182ce)' }"
+            class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#3182ce]"
           />
-          <text class="text-[16px] font-bold" :style="{ color: 'var(--text-color, #2d3748)' }">文件与文档预览</text>
+          <text class="text-[16px] font-bold text-[#2d3748]">文件与文档预览</text>
         </view>
         <!-- 选文件 -->
         <view class="rounded-[12px] p-[16px] mb-[16px] border-[1px] border-solid border-[#e2e8f0]">
@@ -130,19 +120,14 @@
     <!-- 3. 系统缓存管理 (getFileSystemManager) 卡片 -->
     <view class="mb-[16px]">
       <view
-        class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid"
-        :style="{
-          backgroundColor: 'var(--card-bg, #ffffff)',
-          borderColor: 'var(--border-color, #edf2f7)'
-        }"
+        class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid border-[#edf2f7] bg-[#ffffff]"
       >
         <!-- 标题区域 -->
         <view class="flex flex-row items-center mb-[16px]">
           <view
-            class="w-[4px] h-[16px] rounded-[2px] mr-[8px]"
-            :style="{ backgroundColor: 'var(--theme-color, #3182ce)' }"
+            class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#3182ce]"
           />
-          <text class="text-[16px] font-bold" :style="{ color: 'var(--text-color, #2d3748)' }">系统缓存管理 (FileSystemManager)</text>
+          <text class="text-[16px] font-bold text-[#2d3748]">系统缓存管理 (FileSystemManager)</text>
         </view>
         <view class="rounded-[12px] p-[16px] border-[1px] border-solid border-[#e2e8f0] bg-[#ffffff]">
           <!-- 头部总缓存大小徽标 -->
@@ -235,19 +220,14 @@
     <!-- 4. 键盘感知与高度避让卡片 -->
     <view class="mb-[16px]">
       <view
-        class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid"
-        :style="{
-          backgroundColor: 'var(--card-bg, #ffffff)',
-          borderColor: 'var(--border-color, #edf2f7)'
-        }"
+        class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid border-[#edf2f7] bg-[#ffffff]"
       >
         <!-- 标题区域 -->
         <view class="flex flex-row items-center mb-[16px]">
           <view
-            class="w-[4px] h-[16px] rounded-[2px] mr-[8px]"
-            :style="{ backgroundColor: 'var(--theme-color, #3182ce)' }"
+            class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#3182ce]"
           />
-          <text class="text-[16px] font-bold" :style="{ color: 'var(--text-color, #2d3748)' }">键盘感知与避让</text>
+          <text class="text-[16px] font-bold text-[#2d3748]">键盘感知与避让</text>
         </view>
         <view
           class="rounded-[12px] p-[16px] border-[1px] border-solid border-[#e2e8f0]"
@@ -283,19 +263,14 @@
     <!-- 4. 触感与震动工具卡片 -->
     <view class="mb-[16px]">
       <view
-        class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid"
-        :style="{
-          backgroundColor: 'var(--card-bg, #ffffff)',
-          borderColor: 'var(--border-color, #edf2f7)'
-        }"
+        class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid border-[#edf2f7] bg-[#ffffff]"
       >
         <!-- 标题区域 -->
         <view class="flex flex-row items-center mb-[16px]">
           <view
-            class="w-[4px] h-[16px] rounded-[2px] mr-[8px]"
-            :style="{ backgroundColor: 'var(--theme-color, #3182ce)' }"
+            class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#3182ce]"
           />
-          <text class="text-[16px] font-bold" :style="{ color: 'var(--text-color, #2d3748)' }">触感与工具</text>
+          <text class="text-[16px] font-bold text-[#2d3748]">触感与工具</text>
         </view>
         <!-- 剪贴板 -->
         <view class="rounded-[12px] p-[16px] mb-[16px] border-[1px] border-solid border-[#e2e8f0]">
@@ -332,19 +307,14 @@
 
     <!-- 5. 相机与多媒体卡片 -->
     <view
-      class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid"
-      :style="{
-        backgroundColor: 'var(--card-bg, #ffffff)',
-        borderColor: 'var(--border-color, #edf2f7)'
-      }"
+      class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid border-[#edf2f7] bg-[#ffffff]"
     >
       <!-- 标题区域 -->
       <view class="flex flex-row items-center mb-[16px]">
         <view
-          class="w-[4px] h-[16px] rounded-[2px] mr-[8px]"
-          :style="{ backgroundColor: 'var(--theme-color, #3182ce)' }"
+          class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#3182ce]"
         />
-        <text class="text-[16px] font-bold" :style="{ color: 'var(--text-color, #2d3748)' }">相机与多媒体</text>
+        <text class="text-[16px] font-bold text-[#2d3748]">相机与多媒体</text>
       </view>
       <view class="rounded-[12px] p-[16px] mb-[16px] border-[1px] border-solid border-[#e2e8f0] items-center justify-center">
         <text v-if="photoUrl == ''" class="text-[14px] text-[#94a3b8]">未选择照片</text>
@@ -367,9 +337,8 @@
 </template>
 
 <script setup lang="uts">
-import { computed, onMounted, onUnmounted, ref } from 'vue';
+import { onMounted, onUnmounted, ref } from 'vue';
 import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/layouts/navbar/utils/index.uts';
-import { useAppStore } from '@/src/store';
 
 definePage({
   debug: false,
@@ -382,9 +351,6 @@ definePage({
     navigationStyle: 'custom'
   }
 });
-
-const appStore = useAppStore();
-const isDark = computed((): boolean => appStore.state.isDark);
 
 // ==================== 1. 通信与分享 ====================
 const phoneNumber = ref<string>('10086');

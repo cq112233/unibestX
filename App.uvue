@@ -1,7 +1,7 @@
 <script setup lang="uts">
 import { checkDirectEntry } from '@/src/router/index.uts';
-import { useAppStore } from './src/store';
-import { initNativeMidButtonTap } from '@/src/tabbar/index.uts';
+import { useI18nStore, useThemeStore } from './src/store';
+import { initNativeMidButtonTap, setTabbarItem } from '@/src/tabbar/index.uts';
 import { applyThemeColor, themeColor } from '@/src/theme/index.uts';
 import { reportError } from '@/src/utils/report/index.uts';
 // 隐私闸门仅 App 端启用，导入同步条件编译，避免其它端留下未使用导入
@@ -10,14 +10,20 @@ import { runPrivacyGate } from '@/src/config/index.uts';
 // #endif
 
 onLaunch(() => {
-  // 提前实例化 App Store（含持久化还原），并初始化外观模式：跟随系统 / 浅色 / 深色
-  const appStore = useAppStore();
-  appStore.initThemeMode();
+  // 提前实例化 Theme Store（含持久化还原），并初始化外观模式：跟随系统 / 浅色 / 深色
+  const themeStore = useThemeStore();
+  themeStore.initThemeMode();
   // 确保全局 themeColor 与运行环境同步为持久化恢复的主题色
-  if (appStore.state.theme.length > 0) {
-    themeColor.value = appStore.state.theme;
-    applyThemeColor(appStore.state.theme);
+  if (themeStore.state.theme.length > 0) {
+    themeColor.value = themeStore.state.theme;
+    applyThemeColor(themeStore.state.theme);
   }
+
+  // 提前实例化 i18n Store（含持久化还原），同步当前应用语言与原生 TabBar 文本
+  const i18nStore = useI18nStore();
+  i18nStore.initLocale();
+  setTabbarItem();
+
   // 注册原生 TabBar 中间按钮监听（仅在原生模式且配置了 midButton 时生效）
   initNativeMidButtonTap();
 

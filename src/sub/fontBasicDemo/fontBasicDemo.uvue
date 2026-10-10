@@ -2,24 +2,18 @@
   <view class="flex flex-col flex-1 bg-[#f8fafc]">
     <scroll-view direction="vertical" class="flex-1 flex flex-col p-[16px]">
       <view
-        class="rounded-[16px] p-[20px] mb-[16px] border-[1px] border-solid"
-        :style="{
-          backgroundColor: 'var(--card-bg, #ffffff)',
-          borderColor: 'var(--border-color, #edf2f7)'
-        }"
+        class="rounded-[16px] p-[20px] mb-[16px] border-[1px] border-solid border-[#edf2f7] bg-[#ffffff]"
       >
         <!-- 标题区域 -->
         <view class="flex flex-row items-center mb-[16px]">
           <view
-            class="w-[4px] h-[16px] rounded-[2px] mr-[8px]"
-            :style="{ backgroundColor: 'var(--theme-color, #3182ce)' }"
+            class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#3182ce]"
           />
-          <text class="text-[16px] font-bold" :style="{ color: 'var(--text-color, #2d3748)' }">字体与排版设置</text>
+          <text class="text-[16px] font-bold text-[#2d3748]">字体与排版设置</text>
         </view>
         <!-- 1. 实时排版渲染预览区 -->
         <view
-          class="rounded-[12px] p-[16px] mb-[16px] border-[1px] border-solid bg-[#f8fafc]"
-          :style="{ borderColor: 'var(--border-color, #e2e8f0)' }"
+          class="rounded-[12px] p-[16px] mb-[16px] border-[1px] border-solid bg-[#f8fafc] border-[#e2e8f0]"
         >
           <!-- 预览区状态提示标签 -->
           <view class="flex-row items-center mb-[12px] flex-wrap">
@@ -47,7 +41,7 @@
           <text
             class="font-bold mb-[8px]"
             :style="{
-              color: 'var(--text-color, #0f172a)',
+              color: '#0f172a',
               fontFamily: currentFontFamily,
               fontSize: `${currentSize + 5}px`
             }"
@@ -59,7 +53,7 @@
           <text
             class="leading-[24px] mb-[10px]"
             :style="{
-              color: 'var(--text-secondary, #334155)',
+              color: '#334155',
               fontFamily: currentFontFamily,
               fontSize: `${currentSize}px`
             }"
@@ -72,7 +66,7 @@
             <text
               class="mb-[6px] leading-[22px]"
               :style="{
-                color: 'var(--text-secondary, #475569)',
+                color: '#475569',
                 fontFamily: currentFontFamily,
                 fontSize: `${currentSize}px`
               }"
@@ -82,7 +76,7 @@
             <text
               class="font-medium"
               :style="{
-                color: 'var(--theme-color, #37c2bc)',
+                color: '#37c2bc',
                 fontFamily: currentFontFamily,
                 fontSize: `${currentSize + 2}px`
               }"
@@ -104,13 +98,13 @@
             >
               <text
                 class="text-[11px] font-medium mr-[4px]"
-                :style="{ color: isGlobalFont ? 'var(--theme-color, #0f766e)' : '#64748b' }"
+                :style="{ color: isGlobalFont ? '#0f766e' : '#64748b' }"
               >
                 全局持久生效
               </text>
               <text
                 class="text-[11px] font-bold"
-                :style="{ color: isGlobalFont ? 'var(--theme-color, #37c2bc)' : '#94a3b8' }"
+                :style="{ color: isGlobalFont ? '#37c2bc' : '#94a3b8' }"
               >
                 {{ isGlobalFont ? '✓' : '○' }}
               </text>
@@ -127,7 +121,7 @@
             class="p-[12px] mb-[10px] rounded-[10px] border-[1px] border-solid bg-[#ffffff]"
             :class="currentFontFamily == item.family ? 'border-[#37c2bc] bg-[#f0fdfa]' : 'border-[#e2e8f0]'"
             :style="{
-              borderColor: currentFontFamily == item.family ? 'var(--theme-color, #37c2bc)' : '#e2e8f0'
+              borderColor: currentFontFamily == item.family ? '#37c2bc' : '#e2e8f0'
             }"
           >
             <view class="flex-row items-center justify-between mb-[4px]">
@@ -135,7 +129,7 @@
                 <text
                   class="text-[13px] font-bold"
                   :style="{
-                    color: currentFontFamily == item.family ? 'var(--theme-color, #0f766e)' : '#1e293b'
+                    color: currentFontFamily == item.family ? '#0f766e' : '#1e293b'
                   }"
                 >
                   {{ item.name }}
@@ -167,10 +161,9 @@
             <!-- 字体效果样例 -->
             <view class="p-[8px] mb-[10px] rounded-[6px] bg-[#f8fafc] border-[1px] border-solid border-[#f1f5f9]">
               <text
-                class="text-[13px]"
+                class="text-[13px] text-[#334155]"
                 :style="{
-                  fontFamily: item.status == 'loaded' ? item.family : 'inherit',
-                  color: 'var(--text-color, #334155)'
+                  fontFamily: item.status == 'loaded' ? item.family : 'inherit'
                 }"
               >
                 样例 Sample: unibestX 极速架构 123
@@ -183,7 +176,7 @@
                 <text
                   v-if="currentFontFamily == item.family"
                   class="text-[11px] font-bold"
-                  :style="{ color: 'var(--theme-color, #0f766e)' }"
+                  :style="{ color: '#0f766e' }"
                 >
                   ● 当前正在使用此字体
                 </text>
@@ -211,7 +204,7 @@
               <view
                 class="px-[12px] py-[6px] rounded-[6px] flex-row items-center justify-center"
                 :class="currentFontFamily == item.family ? 'bg-[#e2e8f0]' : ''"
-                :style="currentFontFamily == item.family ? {} : { backgroundColor: 'var(--theme-color, #37c2bc)' }"
+                :style="currentFontFamily == item.family ? {} : { backgroundColor: '#37c2bc' }"
                 @click="downloadAndApplyRemoteFont(item)"
               >
                 <text
@@ -230,8 +223,7 @@
               <text class="text-[12px] font-bold text-[#1e293b]">自定义远程字体 URL</text>
               <view @click="fillCustomExample">
                 <text
-                  class="text-[11px] font-medium"
-                  :style="{ color: 'var(--theme-color, #37c2bc)' }"
+                  class="text-[11px] font-medium text-[#37c2bc]"
                 >
                   填入官方高速示例
                 </text>
@@ -244,8 +236,7 @@
                 placeholder="输入 https://... .ttf 链接"
               />
               <view
-                class="h-[36px] px-[14px] rounded-[6px] flex-row items-center justify-center"
-                :style="{ backgroundColor: 'var(--theme-color, #37c2bc)' }"
+                class="h-[36px] px-[14px] rounded-[6px] flex-row items-center justify-center bg-[#37c2bc]"
                 @click="downloadCustomFont"
               >
                 <text class="text-[12px] text-[#ffffff] font-medium">下载替换</text>
@@ -266,7 +257,7 @@
             class="flex-row items-center justify-between p-[12px] mb-[8px] rounded-[10px] border-[1px] border-solid"
             :class="currentFontFamily == item.value ? 'bg-[#f0fdfa]' : 'bg-[#ffffff]'"
             :style="{
-              borderColor: currentFontFamily == item.value ? 'var(--theme-color, #37c2bc)' : '#e2e8f0'
+              borderColor: currentFontFamily == item.value ? '#37c2bc' : '#e2e8f0'
             }"
             @click="selectLocalFont(item.value)"
           >
@@ -274,7 +265,7 @@
               <text
                 class="text-[14px] font-bold"
                 :style="{
-                  color: currentFontFamily == item.value ? 'var(--theme-color, #0f766e)' : '#1e293b',
+                  color: currentFontFamily == item.value ? '#0f766e' : '#1e293b',
                   fontFamily: item.value
                 }"
               >
@@ -285,8 +276,8 @@
             <view
               class="w-[20px] h-[20px] rounded-[10px] border-[1px] border-solid flex flex-row items-center justify-center"
               :style="{
-                borderColor: currentFontFamily == item.value ? 'var(--theme-color, #37c2bc)' : '#cbd5e1',
-                backgroundColor: currentFontFamily == item.value ? 'var(--theme-color, #37c2bc)' : '#ffffff'
+                borderColor: currentFontFamily == item.value ? '#37c2bc' : '#cbd5e1',
+                backgroundColor: currentFontFamily == item.value ? '#37c2bc' : '#ffffff'
               }"
             >
               <text
@@ -313,7 +304,7 @@
               <text
                 class="text-[13px] font-medium"
                 :style="{
-                  color: currentSize == item.size ? 'var(--theme-color, #0f766e)' : '#64748b',
+                  color: currentSize == item.size ? '#0f766e' : '#64748b',
                   fontWeight: currentSize == item.size ? 'bold' : 'normal'
                 }"
               >
@@ -322,7 +313,7 @@
               <text
                 class="text-[10px] mt-[1px]"
                 :style="{
-                  color: currentSize == item.size ? 'var(--theme-color, #0f766e)' : '#94a3b8'
+                  color: currentSize == item.size ? '#0f766e' : '#94a3b8'
                 }"
               >
                 {{ item.size }}px

@@ -811,3 +811,82 @@ const props = defineProps<{ content: string }>()
 ```
 
 - **真实案例（本项目已踩）**：`uni_modules/zero-markdown-view` 是 `dcloudext.type: component-vue` 的选项式组件（内部还依赖自带的 `mp-html.vue` + `marked.min.js` + `prism.min.js` 纯 JS 链路），在蒸汽模式下**完全无法编译**；同时它的 `components/mp-html/` 与项目已适配的 `uni_modules/mp-html/components/mp-html/mp-html.uvue` 同名，会额外触发 `easycom组件冲突` 警告。
+
+---
+
+## 3.26 `uni.$on` 全局事件总线未解绑导致的 Activity / Page 内存泄漏（LeakCanary 实测案例）
+
+- **LeakCanary 告警与引用链实证（本项目真机实测捕获）**：
+
+  ```text
+  ┬───
+  │ GC Root: Thread object
+  │
+  ├─ io.dcloud.uniapp.framework.extapi.IndexKt class
+  │    Leaking: NO (a class is never leaking)
+  │    ↓ static IndexKt.emitter                    <-- 全局静态事件中心单例（贯穿 App 整个生命周期）
+  │                     ~~~~~~~
+  ├─ io.dcloud.uniapp.framework.runtime.Emitter instance
+  │    Leaking: UNKNOWN
+  │    Retaining 2.8 MB in 70917 objects
+  │    ↓ Emitter.map
+  ├─ io.dcloud.uts.Map instance
+  │    ↓ LinkedHashMap.head
+  ├─ io.dcloud.uts.UTSArray instance
+  ├─ io.dcloud.uniapp.framework.runtime.EmitterCallBackImpl instance
+  │    ↓ EmitterCallBackImpl.fn                    <-- 注册的回调函数对象
+  ├─ uni.UNIB120614.GenAppku$$ExternalSyntheticLambda5 instance
+  │    ↓ GenAppku$$ExternalSyntheticLambda5.f$2
+  ├─ uni.UNIB120614.GenAppku instance              <-- App.ku 页面根容器组件实例
+  │    ↓ VueComponent.$_
+  ├─ io.dcloud.uniapp.vue.ComponentInternalInstance instance
+  │    ↓ ComponentInternalInstance.document
+  ├─ io.dcloud.uniapp.dom.UniNativeDocumentImpl instance
+  │    ↓ UniNativeDocumentImpl.page
+  ├─ io.dcloud.uniapp.appframe.a instance
+  ├─ io.dcloud.uniapp.appframe.ui.PageFrameView instance
+  │    Leaking: YES (View.mContext references a destroyed activity)
+  │    mContext instance of io.dcloud.uniapp.appframe.activity.UniPortraitPageActivity with mDestroyed = true
+  │    ↓ View.mContext
+  ╰→ io.dcloud.uniapp.appframe.activity.UniPortraitPageActivity instance
+       Leaking: YES (Activity#onDestroy() 已被调用且 mDestroyed = true)
+       [Page: @@@/src/sub/zpagingFunctionDemo/zpagingFunctionDemo@@@]
+       Retaining 51.3 kB in 994 objects
+  ```
+
+- **底层原理**：
+  1. `uni.$on` 注册的监听器保存在底层全局静态单例 `IndexKt.emitter`（生命周期与整个 Application 进程同生共死）；
+  2. 当页面、全局 Layout 或自动包裹页面的根容器（如本项目的 `App.ku.uvue`）在 setup 或 `onMounted` 中通过 `uni.$on` 注册事件时，回调闭包会捕获该组件的实例上下文；
+  3. 组件实例反向持有了 Vue 内部实例（`ComponentInternalInstance`）、页面虚拟文档（`UniNativeDocumentImpl`）、原生页面框架视图（`PageFrameView`），最终持有 Android 原生承载 Activity（`UniPortraitPageActivity`）；
+  4. **如果在页面销毁（`onUnmounted`）时没有显式调用 `uni.$off` 精准注销**，即使用户已经按下返回键退出了页面（系统回调了 `Activity#onDestroy()`），`IndexKt.emitter` 依然强引用着该回调。**Activity 及其整棵 DOM/View 树将永远无法被 GC 回收**，造成严重的 Activity 级内存泄漏。用户每进出一个页面，内存就永久堆积一份，最终导致内存膨胀与 OOM 崩溃。
+
+- **强制规范**：
+  1. **严禁直接传入匿名箭头函数**：凡使用 `uni.$on` 注册的事件，回调必须抽为独立的具名函数（具名函数引用才能在 `$off` 时准确命中并注销）；
+  2. **严格成对注册与注销**：在 `onMounted`（或 setup 阶段）调用 `uni.$on` 注册的监听，**必须在 `onUnmounted` 中调用 `uni.$off` 逐一注销解绑**；
+  3. **高发区域严防**：
+     - 自动包裹所有页面的根骨架组件（如 `App.ku.uvue`）；
+     - 页面外层全局 Layout 模板（如 `src/layouts/navbar/navbar.uvue`、`src/layouts/default/default.uvue`）；
+     - 单页面 TabBar 容器（如 `src/tabbar/components/TabContent.uvue`）。
+
+```uts
+// ❌ 错误：直接传入匿名函数且无 onUnmounted 解绑，页面销毁后 Activity 永久泄漏
+uni.$on('setHideStatusBar', (hide: any) => {
+  doUpdateHeight(null, hide as boolean);
+});
+
+// ✅ 正确：抽取具名回调，挂载时注册，卸载时严格注销解绑
+function onSetHideStatusBar(hide: any) {
+  if (typeof hide == 'boolean') {
+    doUpdateHeight(null, hide as boolean);
+  }
+}
+
+onMounted(() => {
+  uni.$on('setHideStatusBar', onSetHideStatusBar);
+});
+
+onUnmounted(() => {
+  uni.$off('setHideStatusBar', onSetHideStatusBar);
+});
+```
+

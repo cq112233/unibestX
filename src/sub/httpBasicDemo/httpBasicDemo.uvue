@@ -37,19 +37,14 @@
       <view class="flex flex-col">
         <!-- ============ 1. uniCloud 云对象 ============ -->
         <view
-          class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid"
-          :style="{
-            backgroundColor: 'var(--card-bg, #ffffff)',
-            borderColor: 'var(--border-color, #edf2f7)'
-          }"
+          class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid border-[#edf2f7] bg-[#ffffff]"
         >
           <!-- 标题区域 -->
           <view class="flex flex-row items-center mb-[16px]">
             <view
-              class="w-[4px] h-[16px] rounded-[2px] mr-[8px]"
-              :style="{ backgroundColor: 'var(--theme-color, #3182ce)' }"
+              class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#3182ce]"
             />
-            <text class="text-[16px] font-bold" :style="{ color: 'var(--text-color, #2d3748)' }">uniCloud 云对象</text>
+            <text class="text-[16px] font-bold text-[#2d3748]">uniCloud 云对象</text>
           </view>
           <view class="mb-[16px]">
             <view class="flex-row items-center justify-between mb-[10px]">
@@ -58,7 +53,7 @@
                   <text class="text-[12px] font-bold text-[#0f766e]">UC</text>
                 </view>
                 <view>
-                  <text class="text-[14px] font-bold" :style="{ color: 'var(--text-color, #1e293b)' }">uniCloud 云对象</text>
+                  <text class="text-[14px] font-bold text-[#1e293b]">uniCloud 云对象</text>
                   <text class="text-[11px] text-[#64748b] mt-[2px]">user.getUserInfo</text>
                 </view>
               </view>
@@ -91,19 +86,14 @@
 
         <!-- ============ 2. Mock 数据列表 ============ -->
         <view
-          class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid"
-          :style="{
-            backgroundColor: 'var(--card-bg, #ffffff)',
-            borderColor: 'var(--border-color, #edf2f7)'
-          }"
+          class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid border-[#edf2f7] bg-[#ffffff]"
         >
           <!-- 标题区域 -->
           <view class="flex flex-row items-center mb-[16px]">
             <view
-              class="w-[4px] h-[16px] rounded-[2px] mr-[8px]"
-              :style="{ backgroundColor: 'var(--theme-color, #3182ce)' }"
+              class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#3182ce]"
             />
-            <text class="text-[16px] font-bold" :style="{ color: 'var(--text-color, #2d3748)' }">Mock 数据列表（ID 为任意类型）</text>
+            <text class="text-[16px] font-bold text-[#2d3748]">Mock 数据列表（ID 为任意类型）</text>
           </view>
           <text class="text-[12px] text-[#64748b] leading-[19px] mb-[4px]">
             在 src/api/example.uts 中定义，由 getFooList() 直接返回，无需网络即可演示列表渲染。
@@ -112,25 +102,20 @@
             <view class="w-[28px] h-[28px] rounded-[14px] bg-[#3182ce] justify-center items-center mr-[10px]">
               <text class="text-[12px] text-[#ffffff] font-bold">{{ item.id }}</text>
             </view>
-            <text class="text-[14px]" :style="{ color: 'var(--text-color, #334155)' }">{{ item.name }}</text>
+            <text class="text-[14px] text-[#334155]">{{ item.name }}</text>
           </view>
         </view>
 
         <!-- ============ 3. 真实接口请求状态 ============ -->
         <view
-          class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid"
-          :style="{
-            backgroundColor: 'var(--card-bg, #ffffff)',
-            borderColor: 'var(--border-color, #edf2f7)'
-          }"
+          class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid border-[#edf2f7] bg-[#ffffff]"
         >
           <!-- 标题区域 -->
           <view class="flex flex-row items-center mb-[16px]">
             <view
-              class="w-[4px] h-[16px] rounded-[2px] mr-[8px]"
-              :style="{ backgroundColor: 'var(--theme-color, #3182ce)' }"
+              class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#3182ce]"
             />
-            <text class="text-[16px] font-bold" :style="{ color: 'var(--text-color, #2d3748)' }">真实 API 请求（拦截器 + 错误处理）</text>
+            <text class="text-[16px] font-bold text-[#2d3748]">真实 API 请求（拦截器 + 错误处理）</text>
           </view>
           <view class="rounded-[10px] p-[12px] mb-[16px] border-[1px] border-solid border-[#e2e8f0]">
             <view class="flex-row justify-between items-center mb-[6px]">
@@ -141,10 +126,9 @@
             </view>
             <view
               v-if="hasResponseData"
-              class="rounded-[8px] p-[10px] border-[1px] border-solid"
-              :style="{ backgroundColor: 'var(--card-bg, #ffffff)', borderColor: 'var(--border-color, #e2e8f0)' }"
+              class="rounded-[8px] p-[10px] border-[1px] border-solid bg-[#ffffff] border-[#e2e8f0]"
             >
-              <text class="text-[12px]" :style="{ color: 'var(--text-secondary, #475569)' }">{{ responseText }}</text>
+              <text class="text-[12px] text-[#475569]">{{ responseText }}</text>
             </view>
             <view v-if="hasErrorMsg" class="bg-[#fff5f5] rounded-[8px] p-[10px] border-[1px] border-solid border-[#fecaca] mt-[6px]">
               <text class="text-[12px] text-[#ef4444]">错误：{{ errorMsg }}</text>
@@ -174,19 +158,14 @@
 
         <!-- ============ 4. 文件上传 ============ -->
         <view
-          class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid"
-          :style="{
-            backgroundColor: 'var(--card-bg, #ffffff)',
-            borderColor: 'var(--border-color, #edf2f7)'
-          }"
+          class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid border-[#edf2f7] bg-[#ffffff]"
         >
           <!-- 标题区域 -->
           <view class="flex flex-row items-center mb-[16px]">
             <view
-              class="w-[4px] h-[16px] rounded-[2px] mr-[8px]"
-              :style="{ backgroundColor: 'var(--theme-color, #3182ce)' }"
+              class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#3182ce]"
             />
-            <text class="text-[16px] font-bold" :style="{ color: 'var(--text-color, #2d3748)' }">文件上传（uploadFooFile → uni.uploadFile）</text>
+            <text class="text-[16px] font-bold text-[#2d3748]">文件上传（uploadFooFile → uni.uploadFile）</text>
           </view>
           <view class="mb-[16px]">
             <view class="flex-row items-center mb-[10px]">
@@ -217,8 +196,7 @@
                 <view v-else-if="hasUploadResult">
                   <!-- 上：图片居中预览（支持点击放大） -->
                   <view
-                    class="items-center justify-center py-[10px] rounded-[8px] border-[1px] border-solid"
-                    :style="{ backgroundColor: 'var(--card-bg, #ffffff)', borderColor: 'var(--border-color, #e2e8f0)' }"
+                    class="items-center justify-center py-[10px] rounded-[8px] border-[1px] border-solid bg-[#ffffff] border-[#e2e8f0]"
                   >
                     <image
                       :src="uploadResultText"
@@ -231,13 +209,12 @@
 
                   <!-- 下：OSS 链接美化展示卡片（支持一键复制） -->
                   <view
-                    class="mt-[10px] p-[10px] rounded-[8px] border-[1px] border-solid"
-                    :style="{ backgroundColor: 'var(--bg-color, #f8fafc)', borderColor: 'var(--border-color, #e2e8f0)' }"
+                    class="mt-[10px] p-[10px] rounded-[8px] border-[1px] border-solid bg-[#f8fafc] border-[#e2e8f0]"
                   >
                     <view class="flex-row items-center justify-between mb-[6px]">
                       <view class="flex-row items-center">
                         <view class="w-[3px] h-[12px] bg-[#f97316] rounded-[2px] mr-[6px]" />
-                        <text class="text-[11px] font-bold" :style="{ color: 'var(--text-color, #475569)' }">OSS 链接地址</text>
+                        <text class="text-[11px] font-bold text-[#475569]">OSS 链接地址</text>
                       </view>
                       <view
                         class="px-[8px] py-[3px] rounded-[4px] bg-[#ea580c] flex-row items-center"
@@ -247,8 +224,7 @@
                       </view>
                     </view>
                     <text
-                      class="oss-url-text text-[11px] leading-[18px]"
-                      :style="{ color: 'var(--text-color, #334155)' }"
+                      class="oss-url-text text-[11px] leading-[18px] text-[#334155]"
                       :selectable="true"
                     >
                       {{ uploadResultText }}

@@ -1,0 +1,37 @@
+import { $t, getI18nText } from '@/src/i18n/utils/index.uts';
+import { tabbarList } from './state.uts';
+import { isNativeTabbar, needHideNativeTabbar } from './strategy.uts';
+
+/**
+ * TabBar 文本国际化桥接函数
+ * （当 CLI 裁剪掉 i18n 时，只需替换本文件为直接返回原文本，TabBar 内部 UI 无需做任何修改）
+ *
+ * @param text 待翻译文本或多语言 key
+ * @returns 翻译后的展示文本
+ */
+export function formatTabbarText(text: string): string {
+  return $t(text);
+}
+
+/**
+ * 设置原生 TabBar 各项的多语言文本 (设置 uni.setTabBarItem)
+ */
+export function setTabbarItem(): void {
+  // 仅在原生 TabBar 模式或带原生缓存的自定义模式（pages.json 中存在 tabBar 节点）下执行
+  if (!isNativeTabbar && !needHideNativeTabbar) {
+    return;
+  }
+  for (let i = 0; i < tabbarList.length; i++) {
+    const item = tabbarList[i];
+    const text = getI18nText(item.text);
+    try {
+      uni.setTabBarItem({
+        index: i,
+        text
+      } as SetTabBarItemOptions);
+    }
+    catch {
+      // 捕获无原生 tabBar 节点时的异常，保证全平台平稳运行
+    }
+  }
+}

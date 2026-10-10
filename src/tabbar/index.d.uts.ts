@@ -17,6 +17,20 @@ import type { ComputedRef, Ref } from 'vue';
 export declare const customTabbarConfig: TabBarConfig;
 
 /**
+ * TabBar 文本国际化桥接函数
+ * （当 CLI 裁剪掉 i18n 时，只需替换本文件为直接返回原文本，TabBar 内部 UI 无需做任何修改）
+ *
+ * @param text 待翻译文本或多语言 key
+ * @returns 翻译后的展示文本
+ */
+export declare function formatTabbarText(text: string): string;
+
+/**
+ * 设置原生 TabBar 各项的多语言文本 (设置 uni.setTabBarItem)
+ */
+export declare function setTabbarItem(): void;
+
+/**
  * 当前页面是否处于显示状态
  *
  * 由页面的 onShow / onHide 经 notifyPageShow() / notifyPageHide() 维护。
@@ -67,9 +81,6 @@ export declare const TABBAR_HEIGHT: number;
 /** tabbar 容器总高度（包含鼓包突出的部分，px） */
 export declare const TABBAR_CONTAINER_HEIGHT: number;
 
-/** 亮 / 暗主题 token（与 theme.json tabBar 配置同步） */
-export declare const themeTokens: any;
-
 /** 安全区底部高度，从全局 systemInfo 工具中响应式读取 */
 export declare const safeAreaBottom: ComputedRef<number>;
 
@@ -86,11 +97,6 @@ export declare const tabbarPlaceholderHeight: ComputedRef<number>;
  * - 标准底座形态 (default)：若有鼓包/midButton 为 80 + safeAreaBottom，普通为 50 + safeAreaBottom
  */
 export declare const tabbarBottomPaddingHeight: ComputedRef<number>;
-
-/**
- * 设置原生 TabBar 各项的多语言文本 (设置 uni.setTabBarItem)
- */
-export declare function setTabbarItem(): void;
 
 /**
  * 隐藏系统原生 TabBar 并根据编译器版本动态适配 H5 底部容器
@@ -120,6 +126,11 @@ export declare const tabbarList: CustomTabBarItem[];
  * 当前选中的 tab 索引（持久化到 storage）
  */
 export declare const curIdx: Ref<number>;
+
+/**
+ * 当前激活 Tab 的自定义标题（单页 TabBar 模式下由激活的 TabContent 响应式更新，供宿主 Navbar 联动）
+ */
+export declare const activeTabTitle: Ref<string>;
 
 /** 设置当前索引并持久化 */
 export declare function setCurIdx(idx: number): void;
@@ -214,6 +225,22 @@ export declare function registerFullTabbarListGetter(getter: () => CustomTabBarI
  * @param key 业务标识字符串（如 'index' / 'me'），或数字下标的字符串形式（如 '0'）
  */
 export declare function resolveTabIndexByKey(key: string): number;
+
+/**
+ * 当前是否为深色模式（响应式）
+ */
+export declare const isDark: ComputedRef<boolean>;
+
+/**
+ * TabBar 主题样式令牌（响应式自适应深浅色模式）
+ * （当 CLI 裁剪掉 theme 模块时，只需替换本文件为静态固定颜色，TabBar 内部 UI 无需做任何修改）
+ */
+export declare const themeTokens: any;
+
+/**
+ * TabBar 当前激活的高亮主题色（优先取 store 中的持久化主题色，保底取全局 themeColor）
+ */
+export declare const activeThemeColor: ComputedRef<string>;
 
 /** badge 类型：数字或小红点 */
 export type CustomTabBarItemBadge = number | 'dot';
