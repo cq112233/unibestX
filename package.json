@@ -134,11 +134,17 @@
     }
   },
   "lint-staged": {
-    "**/*.{js,jsx,ts,tsx,uts,vue,uvue,mjs,cjs,json,md}": [
+    "src/**/*.{js,jsx,ts,tsx,uts,vue,uvue,mjs,cjs,json}": [
       "eslint --fix"
     ],
-    "**/*.{css,scss,vue,uvue}": [
-      "stylelint --fix"
+    "{App.uvue,App.ku.uvue,main.uts}": [
+      "eslint --fix"
+    ],
+    "src/**/*.{css,scss,vue,uvue}": [
+      "stylelint --fix --allow-empty-input"
+    ],
+    "{App.uvue,App.ku.uvue}": [
+      "stylelint --fix --allow-empty-input"
     ]
   }
 }
