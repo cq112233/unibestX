@@ -240,22 +240,59 @@ requestInstance.interceptors.response.use(
 //    Android 端泛型方法需要 inline + reified 注解
 // ==========================================
 
+/**
+ * 从未知错误对象中安全提取错误文案。
+ * 兼容 Error 实例、LimeRequestFail、UTSJSONObject、普通 JS 对象与字符串。
+ */
+function extractErrorMessage(err: any): string {
+  if (err == null) {
+    return '';
+  }
+  if (typeof err == 'string') {
+    return err as string;
+  }
+  if (err instanceof Error) {
+    return (err as Error).message;
+  }
+  try {
+    const obj = err as UTSJSONObject;
+    // 优先读取 LimeRequestFail 的 errMsg 字段，次选 message、msg
+    let msg: string | null = null;
+    if (typeof obj.getString == 'function') {
+      msg = obj.getString('errMsg') ?? obj.getString('message') ?? obj.getString('msg');
+    }
+    else {
+      // eslint-disable-next-line dot-notation
+      msg = (obj['errMsg'] as string | null) ?? (obj['message'] as string | null) ?? (obj['msg'] as string | null);
+    }
+    if (msg != null && msg != '') {
+      return msg;
+    }
+    // 兼容 LimeRequestFail 的 cause 嵌套属性
+    // eslint-disable-next-line dot-notation
+    const cause = obj['cause'];
+    if (cause != null) {
+      if (cause instanceof Error) {
+        return (cause as Error).message;
+      }
+      if (typeof cause == 'string') {
+        return cause as string;
+      }
+    }
+  }
+  catch (_) {
+    // 忽略异常，由下方兜底返回
+  }
+  return '';
+}
+
 /** 判断错误是否为拦截器抛出的「可刷新 401」哨兵 */
 function isRefreshable401(err: any): boolean {
   if (err == null) {
     return false;
   }
-  if (typeof err == 'string') {
-    return err == REFRESHABLE_401;
-  }
-  try {
-    const obj = err as UTSJSONObject;
-    const msg = obj.getString('message');
-    return msg != null && msg == REFRESHABLE_401;
-  }
-  catch (_) {
-    return false;
-  }
+  const msg = extractErrorMessage(err);
+  return msg == REFRESHABLE_401;
 }
 
 /** 浅拷贝请求配置：重放时不能复用已被拦截器改写的对象，同时保留 getTask 等回调字段 */
@@ -285,7 +322,7 @@ function cloneConfig(config: LimeRequestConfig): LimeRequestConfig {
 }
 
 /**
- * 把任意错误安全地转成 Error，供抛出使用。
+ * 把任意错误（包括 LimeRequestFail）安全地转成 Error，供抛出使用。
  *
  * 严禁直接 `err as Error`：拦截器与 lime-request 失败回调抛出的是对象类型，
  * 强转在 Kotlin 端会抛 ClassCastException（skill 红线 19）。
@@ -297,9 +334,12 @@ function toError(err: any): Error {
   if (typeof err == 'string') {
     return new Error(err as string);
   }
-  const e = err as Error;
-  if (e.message != null && e.message != '') {
-    return e;
+  if (err instanceof Error) {
+    return err as Error;
+  }
+  const msg = extractErrorMessage(err);
+  if (msg != '') {
+    return new Error(msg);
   }
   return new Error('请求失败');
 }
