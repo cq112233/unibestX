@@ -4,7 +4,7 @@
       <!-- 基础左滑操作 -->
       <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
         <view class="flex-row items-center mb-[12px]">
-          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px]" :style="{ backgroundColor: currentTheme }" />
+          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px] bg-[#3b82f6]" />
           <text class="text-[14px] font-bold text-[#334155]">向左滑动（基础右侧菜单）</text>
         </view>
         <rice-swipe-actions>
@@ -32,7 +32,7 @@
       <!-- 双向滑动操作 -->
       <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
         <view class="flex-row items-center mb-[12px]">
-          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px]" :style="{ backgroundColor: currentTheme }" />
+          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px] bg-[#3b82f6]" />
           <text class="text-[14px] font-bold text-[#334155]">双向滑动（左右均有菜单）</text>
         </view>
         <rice-swipe-actions>
@@ -51,7 +51,6 @@
 </template>
 
 <script setup lang="uts">
-import { useAppStore } from '@/src/store';
 import type { SwipeActionsItemClick, SwipeActionsMenu } from '@/uni_modules/rice-ui';
 import { computed } from 'vue';
 
@@ -65,9 +64,6 @@ definePage({
     navigationStyle: 'custom'
   }
 });
-
-const appStore = useAppStore();
-const currentTheme = computed((): string => appStore.state.theme);
 
 const leftOptions = computed((): SwipeActionsMenu[] => [
   {
@@ -83,7 +79,7 @@ const rightOptions = computed((): SwipeActionsMenu[] => [
   {
     text: '收藏',
     style: {
-      backgroundColor: currentTheme.value,
+      backgroundColor: '#3b82f6',
       color: '#ffffff'
     } as UTSJSONObject
   } as SwipeActionsMenu,

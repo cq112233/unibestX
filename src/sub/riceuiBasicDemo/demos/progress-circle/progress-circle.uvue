@@ -4,12 +4,12 @@
       <!-- 基础圆环进度条 -->
       <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
         <view class="flex-row items-center mb-[12px]">
-          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px]" :style="{ backgroundColor: currentTheme }" />
+          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px] bg-[#3b82f6]" />
           <text class="text-[14px] font-bold text-[#334155]">圆环进度条</text>
         </view>
         <view class="flex-row items-center justify-around py-[10px]">
           <view class="flex-col items-center">
-            <rice-progress-circle :percentage="65" :color="currentTheme" />
+            <rice-progress-circle :percentage="65" />
             <text class="text-[12px] text-[#64748b] mt-[6px]">65%</text>
           </view>
           <view class="flex-col items-center">
@@ -27,9 +27,6 @@
 </template>
 
 <script setup lang="uts">
-import { useAppStore } from '@/src/store';
-import { computed } from 'vue';
-
 definePage({
   layout: 'navbar',
   showBack: true,
@@ -40,7 +37,4 @@ definePage({
     navigationStyle: 'custom'
   }
 });
-
-const appStore = useAppStore();
-const currentTheme = computed((): string => appStore.state.theme);
 </script>

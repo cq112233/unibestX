@@ -4,13 +4,12 @@
       <!-- 基础滚动公告 -->
       <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
         <view class="flex-row items-center mb-[12px]">
-          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px]" :style="{ backgroundColor: currentTheme }" />
+          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px] bg-[#3b82f6]" />
           <text class="text-[14px] font-bold text-[#334155]">基础滚动公告</text>
         </view>
         <rice-notice-bar
           message="🎉 欢迎体验 unibestX 集成的 Rice UI 组件库，全端原生渲染，轻盈灵动！"
           :scrollable="true"
-          :color="currentTheme"
           left-icon="volume"
         />
       </view>
@@ -18,11 +17,11 @@
       <!-- 样式类型 -->
       <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
         <view class="flex-row items-center mb-[12px]">
-          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px]" :style="{ backgroundColor: currentTheme }" />
+          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px] bg-[#3b82f6]" />
           <text class="text-[14px] font-bold text-[#334155]">类型与通知</text>
         </view>
         <view class="mb-[10px]">
-          <rice-notice-bar type="primary" :color="currentTheme" message="系统已升级至最新版本，体验更佳。" />
+          <rice-notice-bar type="primary" message="系统已升级至最新版本，体验更佳。" />
         </view>
         <view class="mb-[10px]">
           <rice-notice-bar type="success" message="您提交的申请已审批通过。" />
@@ -36,9 +35,6 @@
 </template>
 
 <script setup lang="uts">
-import { useAppStore } from '@/src/store';
-import { computed } from 'vue';
-
 definePage({
   layout: 'navbar',
   showBack: true,
@@ -49,7 +45,4 @@ definePage({
     navigationStyle: 'custom'
   }
 });
-
-const appStore = useAppStore();
-const currentTheme = computed((): string => appStore.state.theme);
 </script>

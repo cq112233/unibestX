@@ -4,7 +4,7 @@
       <!-- 功能说明与控制面板 -->
       <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
         <view class="flex-row items-center mb-[12px]">
-          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px]" :style="{ backgroundColor: currentTheme }" />
+          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px] bg-[#3b82f6]" />
           <text class="text-[14px] font-bold text-[#334155]">返回顶部控制与说明</text>
         </view>
         <text class="text-[13px] text-[#64748b] leading-[20px] mb-[8px]">
@@ -14,7 +14,7 @@
         <!-- 实时滚动距离监控 -->
         <view class="p-[10px] rounded-[6px] bg-[#f1f5f9] mb-[12px] flex-row items-center justify-between">
           <text class="text-[12px] text-[#475569]">当前列表滚动 (scrollTop):</text>
-          <text class="text-[13px] font-bold" :style="{ color: currentTheme }">{{ Math.round(scrollTop) }} px</text>
+          <text class="text-[13px] font-bold text-[#3b82f6]">{{ Math.round(scrollTop) }} px</text>
         </view>
 
         <!-- 模式切换 -->
@@ -41,8 +41,7 @@
         <!-- 一键测试滚动按钮 -->
         <view class="flex-row items-center justify-between mt-[10px]">
           <view
-            class="flex-1 py-[8px] rounded-[6px] items-center justify-center mr-[6px]"
-            :style="{ backgroundColor: currentTheme }"
+            class="flex-1 py-[8px] rounded-[6px] items-center justify-center mr-[6px] bg-[#3b82f6]"
             @click="scrollToDistance(600)"
           >
             <text class="text-[12px] text-white font-medium">滚动到 600px</text>
@@ -59,7 +58,7 @@
       <!-- 模拟长列表内容 (独立滚动区域) -->
       <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
         <view class="flex-row items-center mb-[12px]">
-          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px]" :style="{ backgroundColor: currentTheme }" />
+          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px] bg-[#3b82f6]" />
           <text class="text-[14px] font-bold text-[#334155]">模拟长列表内容（在框内向下滚动）</text>
         </view>
         <scroll-view
@@ -86,7 +85,6 @@
       :scroll-top="scrollTop"
       :offset="100"
       :mode="currentMode"
-      :bg-color="currentTheme"
       text-color="#ffffff"
       text="顶部"
       @click="onBackTopClick"
@@ -95,8 +93,7 @@
 </template>
 
 <script setup lang="uts">
-import { useAppStore } from '@/src/store';
-import { computed, ref } from 'vue';
+import { ref } from 'vue';
 
 definePage({
   layout: 'navbar',
@@ -108,9 +105,6 @@ definePage({
     navigationStyle: 'custom'
   }
 });
-
-const appStore = useAppStore();
-const currentTheme = computed((): string => appStore.state.theme);
 
 const currentMode = ref<'round' | 'half-round'>('round');
 const scrollTop = ref<number>(0);

@@ -4,10 +4,10 @@
       <!-- 基础分段器 -->
       <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
         <view class="flex-row items-center mb-[12px]">
-          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px]" :style="{ backgroundColor: currentTheme }" />
+          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px] bg-[#3b82f6]" />
           <text class="text-[14px] font-bold text-[#334155]">基础分段器 (圆角)</text>
         </view>
-        <rice-subsection v-model="currentIndex1" :list="list1" :active-color="currentTheme" shape="round" />
+        <rice-subsection v-model="currentIndex1" :list="list1" shape="round" />
         <view class="mt-[12px]">
           <text class="text-[13px] text-[#64748b]">当前选中：{{ list1[currentIndex1] }}</text>
         </view>
@@ -16,10 +16,10 @@
       <!-- 方形分段器 -->
       <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
         <view class="flex-row items-center mb-[12px]">
-          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px]" :style="{ backgroundColor: currentTheme }" />
+          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px] bg-[#3b82f6]" />
           <text class="text-[14px] font-bold text-[#334155]">方形分段器 (Square)</text>
         </view>
-        <rice-subsection v-model="currentIndex2" :list="list2" :active-color="currentTheme" shape="square" />
+        <rice-subsection v-model="currentIndex2" :list="list2" shape="square" />
         <view class="mt-[12px]">
           <text class="text-[13px] text-[#64748b]">当前选中：{{ list2[currentIndex2] }}</text>
         </view>
@@ -29,9 +29,6 @@
 </template>
 
 <script setup lang="uts">
-import { useAppStore } from '@/src/store';
-import { computed } from 'vue';
-
 definePage({
   layout: 'navbar',
   showBack: true,
@@ -42,9 +39,6 @@ definePage({
     navigationStyle: 'custom'
   }
 });
-
-const appStore = useAppStore();
-const currentTheme = computed((): string => appStore.state.theme);
 
 const currentIndex1 = ref(0);
 const currentIndex2 = ref(1);

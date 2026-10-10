@@ -4,27 +4,27 @@
       <!-- 基础 4 宫格 -->
       <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
         <view class="flex-row items-center mb-[12px]">
-          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px]" :style="{ backgroundColor: currentTheme }" />
+          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px] bg-[#3b82f6]" />
           <text class="text-[14px] font-bold text-[#334155]">基础 4 宫格</text>
         </view>
         <rice-grid :column-num="4">
-          <rice-grid-item icon="photo" :icon-color="currentTheme" text="相册" />
-          <rice-grid-item icon="search" :icon-color="currentTheme" text="发现" />
-          <rice-grid-item icon="star-fill" :icon-color="currentTheme" text="收藏" />
-          <rice-grid-item icon="set" :icon-color="currentTheme" text="设置" />
+          <rice-grid-item icon="photo" text="相册" />
+          <rice-grid-item icon="search" text="发现" />
+          <rice-grid-item icon="star-fill" text="收藏" />
+          <rice-grid-item icon="set" text="设置" />
         </rice-grid>
       </view>
 
       <!-- 3 宫格与点击事件 -->
       <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
         <view class="flex-row items-center mb-[12px]">
-          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px]" :style="{ backgroundColor: currentTheme }" />
+          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px] bg-[#3b82f6]" />
           <text class="text-[14px] font-bold text-[#334155]">3 宫格带角标</text>
         </view>
         <rice-grid :column-num="3">
-          <rice-grid-item icon="volume" :icon-color="currentTheme" text="消息" badge="9+" />
-          <rice-grid-item icon="user" :icon-color="currentTheme" text="个人中心" />
-          <rice-grid-item icon="qr" :icon-color="currentTheme" text="扫一扫" />
+          <rice-grid-item icon="volume" text="消息" badge="9+" />
+          <rice-grid-item icon="user" text="个人中心" />
+          <rice-grid-item icon="qr" text="扫一扫" />
         </rice-grid>
       </view>
     </view>
@@ -32,9 +32,6 @@
 </template>
 
 <script setup lang="uts">
-import { useAppStore } from '@/src/store';
-import { computed } from 'vue';
-
 definePage({
   layout: 'navbar',
   showBack: true,
@@ -45,7 +42,4 @@ definePage({
     navigationStyle: 'custom'
   }
 });
-
-const appStore = useAppStore();
-const currentTheme = computed((): string => appStore.state.theme);
 </script>

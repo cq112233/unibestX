@@ -4,12 +4,12 @@
       <!-- 基础用法 -->
       <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
         <view class="flex-row items-center mb-[12px]">
-          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px]" :style="{ backgroundColor: currentTheme }" />
+          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px] bg-[#3b82f6]" />
           <text class="text-[14px] font-bold text-[#334155]">按钮类型</text>
         </view>
         <view class="flex-col">
           <view class="mb-[10px]">
-            <rice-button type="primary" :color="currentTheme" text="主要按钮" />
+            <rice-button type="primary" text="主要按钮" />
           </view>
           <view class="mb-[10px]">
             <rice-button type="success" text="成功按钮" />
@@ -32,12 +32,12 @@
       <!-- 朴素按钮 -->
       <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
         <view class="flex-row items-center mb-[12px]">
-          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px]" :style="{ backgroundColor: currentTheme }" />
+          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px] bg-[#3b82f6]" />
           <text class="text-[14px] font-bold text-[#334155]">朴素按钮 (Plain)</text>
         </view>
         <view class="flex-row items-center flex-wrap">
           <view class="mr-[10px] mb-[10px]">
-            <rice-button type="primary" :color="currentTheme" text="朴素主要" :plain="true" />
+            <rice-button type="primary" text="朴素主要" :plain="true" />
           </view>
           <view class="mr-[10px] mb-[10px]">
             <rice-button type="success" text="朴素成功" :plain="true" />
@@ -54,21 +54,21 @@
       <!-- 按钮尺寸 -->
       <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
         <view class="flex-row items-center mb-[12px]">
-          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px]" :style="{ backgroundColor: currentTheme }" />
+          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px] bg-[#3b82f6]" />
           <text class="text-[14px] font-bold text-[#334155]">按钮尺寸 (Size)</text>
         </view>
         <view class="flex-col">
           <view class="mb-[10px]">
-            <rice-button type="primary" :color="currentTheme" text="大号按钮 (large)" size="large" />
+            <rice-button type="primary" text="大号按钮 (large)" size="large" />
           </view>
           <view class="mb-[10px]">
-            <rice-button type="primary" :color="currentTheme" text="普通按钮 (normal)" size="normal" />
+            <rice-button type="primary" text="普通按钮 (normal)" size="normal" />
           </view>
           <view class="flex-row items-center">
             <view class="mr-[10px]">
-              <rice-button type="primary" :color="currentTheme" text="小型按钮 (small)" size="small" />
+              <rice-button type="primary" text="小型按钮 (small)" size="small" />
             </view>
-            <view><rice-button type="primary" :color="currentTheme" text="迷你 (mini)" size="mini" /></view>
+            <view><rice-button type="primary" text="迷你 (mini)" size="mini" /></view>
           </view>
         </view>
       </view>
@@ -76,21 +76,21 @@
       <!-- 图标与加载 -->
       <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
         <view class="flex-row items-center mb-[12px]">
-          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px]" :style="{ backgroundColor: currentTheme }" />
+          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px] bg-[#3b82f6]" />
           <text class="text-[14px] font-bold text-[#334155]">图标与加载状态</text>
         </view>
         <view class="flex-row items-center flex-wrap">
           <view class="mr-[10px] mb-[10px]">
-            <rice-button type="primary" :color="currentTheme" icon="search" text="搜索" />
+            <rice-button type="primary" icon="search" text="搜索" />
           </view>
           <view class="mr-[10px] mb-[10px]">
             <rice-button type="success" icon="plus" text="添加" />
           </view>
           <view class="mr-[10px] mb-[10px]">
-            <rice-button type="primary" :color="currentTheme" :loading="true" loading-text="加载中..." />
+            <rice-button type="primary" :loading="true" loading-text="加载中..." />
           </view>
           <view class="mb-[10px]">
-            <rice-button type="primary" :color="currentTheme" :disabled="true" text="禁用状态" />
+            <rice-button type="primary" :disabled="true" text="禁用状态" />
           </view>
         </view>
       </view>
@@ -98,12 +98,12 @@
       <!-- 形状与自定义颜色 -->
       <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
         <view class="flex-row items-center mb-[12px]">
-          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px]" :style="{ backgroundColor: currentTheme }" />
+          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px] bg-[#3b82f6]" />
           <text class="text-[14px] font-bold text-[#334155]">形状与自定义颜色</text>
         </view>
         <view class="flex-row items-center flex-wrap">
           <view class="mr-[10px] mb-[10px]">
-            <rice-button type="primary" :color="currentTheme" shape="round" text="圆形按钮" />
+            <rice-button type="primary" shape="round" text="圆形按钮" />
           </view>
           <view class="mr-[10px] mb-[10px]">
             <rice-button color="#7232dd" text="单色按钮" />
@@ -118,9 +118,6 @@
 </template>
 
 <script setup lang="uts">
-import { useAppStore } from '@/src/store';
-import { computed } from 'vue';
-
 definePage({
   layout: 'navbar',
   showBack: true,
@@ -131,7 +128,4 @@ definePage({
     navigationStyle: 'custom'
   }
 });
-
-const appStore = useAppStore();
-const currentTheme = computed((): string => appStore.state.theme);
 </script>

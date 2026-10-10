@@ -4,12 +4,12 @@
       <!-- 基础加载图标 -->
       <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
         <view class="flex-row items-center mb-[12px]">
-          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px]" :style="{ backgroundColor: currentTheme }" />
+          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px] bg-[#3b82f6]" />
           <text class="text-[14px] font-bold text-[#334155]">加载类型与模式</text>
         </view>
         <view class="flex-row items-center justify-around py-[10px]">
           <view class="flex-col items-center">
-            <rice-loading mode="circular" size="28px" :color="currentTheme" />
+            <rice-loading mode="circular" size="28px" />
             <text class="text-[12px] text-[#64748b] mt-[6px]">circular</text>
           </view>
           <view class="flex-col items-center">
@@ -22,7 +22,7 @@
       <!-- 尺寸与文字 -->
       <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
         <view class="flex-row items-center mb-[12px]">
-          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px]" :style="{ backgroundColor: currentTheme }" />
+          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px] bg-[#3b82f6]" />
           <text class="text-[14px] font-bold text-[#334155]">自定义尺寸与文字</text>
         </view>
         <view class="flex-row items-center justify-around py-[10px]">
@@ -31,7 +31,7 @@
             <text class="text-[12px] text-[#64748b] mt-[6px]">36px</text>
           </view>
           <view class="flex-col items-center">
-            <rice-loading size="24px" text="加载中..." :color="currentTheme" />
+            <rice-loading size="24px" text="加载中..." />
           </view>
         </view>
       </view>
@@ -40,9 +40,6 @@
 </template>
 
 <script setup lang="uts">
-import { useAppStore } from '@/src/store';
-import { computed } from 'vue';
-
 definePage({
   layout: 'navbar',
   showBack: true,
@@ -53,7 +50,4 @@ definePage({
     navigationStyle: 'custom'
   }
 });
-
-const appStore = useAppStore();
-const currentTheme = computed((): string => appStore.state.theme);
 </script>

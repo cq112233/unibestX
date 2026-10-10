@@ -4,7 +4,7 @@
       <!-- 基础导航栏 -->
       <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
         <view class="flex-row items-center mb-[12px]">
-          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px]" :style="{ backgroundColor: currentTheme }" />
+          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px] bg-[#3b82f6]" />
           <text class="text-[14px] font-bold text-[#334155]">基础导航栏</text>
         </view>
         <view class="rounded-[8px] overflow-hidden border border-solid border-[#e2e8f0]">
@@ -15,7 +15,7 @@
       <!-- 带右侧按钮导航栏 -->
       <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
         <view class="flex-row items-center mb-[12px]">
-          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px]" :style="{ backgroundColor: currentTheme }" />
+          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px] bg-[#3b82f6]" />
           <text class="text-[14px] font-bold text-[#334155]">带右侧操作</text>
         </view>
         <view class="rounded-[8px] overflow-hidden border border-solid border-[#e2e8f0]">
@@ -32,7 +32,7 @@
       <!-- 自定义背景导航栏 -->
       <view class="mb-[12px] p-[14px] bg-white rounded-[10px]">
         <view class="flex-row items-center mb-[12px]">
-          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px]" :style="{ backgroundColor: currentTheme }" />
+          <view class="w-[3px] h-[14px] rounded-[1px] mr-[6px] bg-[#3b82f6]" />
           <text class="text-[14px] font-bold text-[#334155]">自定义背景与颜色</text>
         </view>
         <view class="rounded-[8px] overflow-hidden border border-solid border-[#e2e8f0]">
@@ -40,7 +40,7 @@
             title="品牌主页"
             :left-arrow="true"
             arrow-color="#ffffff"
-            :bg-color="currentTheme"
+            bg-color="#3b82f6"
             :fixed="false"
           >
             <template #title>
@@ -54,9 +54,6 @@
 </template>
 
 <script setup lang="uts">
-import { useAppStore } from '@/src/store';
-import { computed } from 'vue';
-
 definePage({
   layout: 'navbar',
   showBack: true,
@@ -67,9 +64,6 @@ definePage({
     navigationStyle: 'custom'
   }
 });
-
-const appStore = useAppStore();
-const currentTheme = computed((): string => appStore.state.theme);
 
 function onClickRight() {
   uni.showToast({
