@@ -1,27 +1,61 @@
 <template>
   <view class="flex-col p-[16px]">
-    <!-- 基础能力演示列表（Card + 一行描述 + 原生按钮跳转） -->
+    <!-- 顶部开发指引提示（正式业务可直接移除） -->
+    <view class="rounded-[12px] p-[12px] mb-[16px] bg-[#eff6ff] border-[1px] border-solid border-[#bfdbfe] flex flex-row items-start">
+      <text class="text-[14px] mr-[6px]">💡</text>
+      <view class="flex-1 flex flex-col">
+        <text class="text-[13px] font-bold text-[#1d4ed8] mb-[2px]">开发指引（可删除）：</text>
+        <text class="text-[12px] leading-[18px] text-[#2563eb]">
+          本页面所有卡片均为 unibestX 基础能力演示 Demo。开发正式业务时，可直接删除本列表与对应的 /src/sub/*BasicDemo 分包目录。
+        </text>
+      </view>
+    </view>
+
+    <!-- 基础能力演示列表（Card + 一行描述 + sub路径展示 + 原生按钮跳转） -->
     <view
       v-for="item in demoList"
       :key="item.id"
       class="rounded-[16px] p-[20px] mb-[16px] border-[1px] border-solid border-[#edf2f7] bg-[#ffffff]"
     >
       <!-- 标题区域 -->
-      <view class="flex flex-row items-center mb-[12px]">
-        <view
-          class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#3b82f6]"
-        />
-        <text class="text-[16px] font-bold text-[#2d3748]">
-          {{ item.title }}
-        </text>
+      <view class="flex flex-row items-center justify-between mb-[12px]">
+        <view class="flex flex-row items-center flex-1">
+          <view
+            class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#3b82f6]"
+          />
+          <text class="text-[16px] font-bold text-[#2d3748]">
+            {{ item.title }}
+          </text>
+        </view>
+        <!-- 可删除标识 -->
+        <view class="px-[6px] py-[2px] rounded-[4px] bg-[#fef2f2] border-[1px] border-solid border-[#fee2e2]">
+          <text class="text-[11px] font-medium text-[#ef4444]">
+            可删除 Demo
+          </text>
+        </view>
       </view>
 
       <!-- 一行功能描述 -->
-      <view class="flex-col mb-[16px]">
+      <view class="flex-col mb-[12px]">
         <text
           class="text-[13px] leading-[18px] text-[#64748b]"
         >
           {{ item.desc }}
+        </text>
+      </view>
+
+      <!-- 对应 sub 路径及删除指引 -->
+      <view class="p-[10px] rounded-[8px] bg-[#f8fafc] border-[1px] border-solid border-[#e2e8f0] mb-[16px]">
+        <view class="flex flex-row items-center mb-[4px]">
+          <text class="text-[11px] font-bold text-[#475569] mr-[6px]">
+            对应 sub 路径:
+          </text>
+          <text class="text-[11px] text-[#2563eb]" style="font-family: monospace;">
+            {{ item.path }}
+          </text>
+        </view>
+        <text class="text-[11px] leading-[16px] text-[#94a3b8]">
+          提示：正式业务开发时，可删除此卡片及对应的 sub 演示目录与 pages.json 路由。
         </text>
       </view>
 
@@ -43,6 +77,19 @@ import { curIdx, onTabPageShow, onTabShow, resolveTabIndexByKey } from '@/src/ta
 import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/layouts/navbar/utils/index.uts';
 import { systemInfo } from '@/src/utils/systemInfo/index.uts';
 
+// =========================================================================
+// 【可选删除】以下数据与方法仅供脚手架基础功能演示使用。
+// 接入真实业务时可整段删除，并同步清理对应 sub 分包与 pages.json 路由：
+// - modal:       /src/sub/modalBasicDemo/
+// - layout:      /src/sub/layoutBasicDemo/
+// - tailwindcss: /src/sub/tailwindcssBasicDemo/
+// - theme:       /src/sub/themeBasicDemo/
+// - router:      /src/sub/routerBasicDemo/
+// - lang:        /src/sub/langBasicDemo/
+// - font:        /src/sub/fontBasicDemo/
+// - icon:        /src/sub/iconBasicDemo/
+// - http:        /src/sub/httpBasicDemo/
+// =========================================================================
 type BasicDemoItem = {
   id: string;
   title: string;
@@ -132,6 +179,7 @@ function navigateToDemo(url: string): void {
     }
   });
 }
+// =================== 【可选删除】基础演示 Demo 数据与跳转方法 结束 ===================
 
 // 页面数据加载/刷新方法
 function refreshData(): void {
