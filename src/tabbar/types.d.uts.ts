@@ -61,6 +61,8 @@ export type TabBarMidButtonIconfont = {
 
 /** midButton 中间鼓包按钮配置（完全对齐 uni-app 原生 midButton 规范） */
 export type TabBarMidButton = {
+  /** 业务标识（如 'index' / 'me'），供 onTabShow / onTabPageShow 按标识订阅 */
+  tabType?: string;
   /** 中间按钮的宽度，默认与其它项平分宽度（默认 "80px"） */
   width?: string;
   /** 中间按钮的高度，可以大于 tabBar 高度，达到中间凸起的效果（默认 "80px"） */
