@@ -68,11 +68,38 @@ class MockUTSJSONObject extends Object {
     return (this as any)[key];
   }
 
+  getNumber(key: string) {
+    const val = (this as any)[key];
+    return typeof val === 'number' ? val : null;
+  }
+
+  getString(key: string) {
+    const val = (this as any)[key];
+    return typeof val === 'string' ? val : null;
+  }
+
+  getBoolean(key: string) {
+    const val = (this as any)[key];
+    return typeof val === 'boolean' ? val : null;
+  }
+
   toMap() {
     return new Map(Object.entries(this));
   }
 }
 (globalThis as any).UTSJSONObject = MockUTSJSONObject;
+
+if (typeof (JSON as any).parseObject !== 'function') {
+  (JSON as any).parseObject = (str: string) => {
+    try {
+      const obj = JSON.parse(str);
+      return Object.assign(new MockUTSJSONObject(), obj);
+    }
+    catch {
+      return null;
+    }
+  };
+}
 
 // Mock i18n 避免 lime-i18n 原生 UTS 宏在 Vitest 纯 JS 模拟环境中执行报错
 const mockI18n = {

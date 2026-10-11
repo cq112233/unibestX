@@ -1,0 +1,761 @@
+/**
+ * HttpClient 核心请求调度引擎
+ *
+ * 职责：
+ * 1. 负责请求前置拦截钩子、响应后置成功/失败/完成钩子的注册与异步链式调度；
+ * 2. 负责主动取消、并发去重、TTL 缓存与底层 RequestTask 生命周期协作；
+ * 3. 负责 401 自动刷新令牌与单次静默重放逻辑；
+ * 4. 彻底解耦底层驱动与具体业务逻辑（驱动由 requestAdapter 或 client 外部注入）。
+ */
+
+import { Request } from '@/uni_modules/lime-request';
+import type { LimeRequestConfig, LimeRequestFail, LimeRequestResponse, LimeRequestTask } from '@/uni_modules/lime-request';
+import { ContentTypeEnum, ResultEnum, ShowMessage } from './enum.uts';
+import { claimRefreshFailure } from './refresh.uts';
+import { RequestLifecycle } from './lifecycle.uts';
+
+/**
+ * 请求前置钩子函数类型（支持同步函数或返回 Promise 的 async 异步函数）
+ */
+export type BeforeRequestHook = (config: LimeRequestConfig) => any;
+
+/**
+ * 响应成功后置钩子函数类型（支持转换/解包数据，支持 async 异步函数）
+ */
+export type AfterResponseSuccessHook = (data: any, config: LimeRequestConfig) => any;
+
+/**
+ * 响应失败后置钩子函数类型（可执行统一错误提示等副作用，支持 async 异步函数）
+ */
+export type AfterResponseErrorHook = (err: any, config: LimeRequestConfig) => any;
+
+/**
+ * 请求完成拦截钩子函数类型（对齐 Alova onComplete，无论成功、失败或命中缓存均触发）
+ */
+export type AfterResponseCompleteHook = (config: LimeRequestConfig) => any;
+
+/**
+ * 复合响应拦截器配置对象（完全对齐 Alova responded: { onSuccess, onError, onComplete }）
+ */
+export type RespondedOptions = {
+  onSuccess?: AfterResponseSuccessHook;
+  onError?: AfterResponseErrorHook;
+  onComplete?: AfterResponseCompleteHook;
+};
+
+/**
+ * 兼容别名
+ */
+export type AfterResponseOptions = RespondedOptions;
+
+/**
+ * 令牌刷新函数类型
+ */
+export type RefreshTokenFn = () => Promise<boolean>;
+
+/**
+ * 未授权/登录过期处理器类型
+ */
+export type UnauthorizedFn = () => void;
+
+/**
+ * 请求适配器函数类型（接收基础配置，返回底层 Request 实例，对齐 Alova requestAdapter 规范）
+ */
+export type HttpRequestAdapter = (config: LimeRequestConfig) => Request;
+
+/**
+ * HttpClient 实例化配置选项
+ */
+export type HttpClientOptions = {
+  baseURL: string;
+  timeout?: number;
+  header?: UTSJSONObject;
+  dataType?: string;
+  responseType?: string;
+  sslVerify?: boolean;
+  withCredentials?: boolean;
+  /**
+   * 请求适配器（对齐 Alova requestAdapter 规范，解耦底层网络驱动）
+   */
+  requestAdapter?: HttpRequestAdapter;
+  /**
+   * 底层 Request 实例（可选，支持外部直接传入已初始化的 client）
+   */
+  client?: Request;
+  /**
+   * 请求生命周期管理器（可选，支持自定义或共享生命周期）
+   */
+  lifecycle?: RequestLifecycle;
+  beforeRequest?: BeforeRequestHook;
+  afterResponse?: any;
+  responded?: any;
+  respondedOptions?: RespondedOptions;
+  refreshToken?: RefreshTokenFn;
+  onUnauthorized?: UnauthorizedFn;
+};
+
+/**
+ * 401 哨兵：拦截器抛出它表示「应尝试刷新并重放」，由 HttpClient.request 捕获。
+ */
+export const REFRESHABLE_401: string = '__REFRESHABLE_401__';
+
+/**
+ * 从未知错误对象中安全提取错误文案。
+ * 兼容 Error 实例、LimeRequestFail、UTSJSONObject、普通 JS 对象与字符串。
+ */
+export function extractErrorMessage(err: any): string {
+  if (err == null) {
+    return '';
+  }
+  if (typeof err == 'string') {
+    return err as string;
+  }
+  if (err instanceof Error) {
+    return (err as Error).message;
+  }
+  try {
+    const obj = err as UTSJSONObject;
+    let msg: string | null = null;
+    if (typeof obj.getString == 'function') {
+      msg = obj.getString('errMsg') ?? obj.getString('message') ?? obj.getString('msg');
+    }
+    else {
+      // eslint-disable-next-line dot-notation
+      msg = (obj['errMsg'] as string | null) ?? (obj['message'] as string | null) ?? (obj['msg'] as string | null);
+    }
+    if (msg != null && msg != '') {
+      return msg;
+    }
+    // eslint-disable-next-line dot-notation
+    const cause = obj['cause'];
+    if (cause != null) {
+      if (cause instanceof Error) {
+        return (cause as Error).message;
+      }
+      if (typeof cause == 'string') {
+        return cause as string;
+      }
+    }
+  }
+  catch (_) {}
+  return '';
+}
+
+/** 判断错误是否为拦截器抛出的「可刷新 401」哨兵 */
+export function isRefreshable401(err: any): boolean {
+  if (err == null) {
+    return false;
+  }
+  const msg = extractErrorMessage(err);
+  return msg == REFRESHABLE_401;
+}
+
+/** 浅拷贝请求配置：重放时不能复用已被拦截器改写的对象，同时保留 getTask 等回调字段 */
+export function cloneConfig(config: LimeRequestConfig): LimeRequestConfig {
+  return {
+    url: config.url,
+    method: config.method,
+    data: config.data,
+    params: config.params,
+    header: config.header,
+    timeout: config.timeout,
+    baseURL: config.baseURL,
+    dataType: config.dataType,
+    responseType: config.responseType,
+    sslVerify: config.sslVerify,
+    withCredentials: config.withCredentials,
+    enableCache: config.enableCache,
+    enableQuic: config.enableQuic,
+    enableChunked: config.enableChunked,
+    forceCellularNetwork: config.forceCellularNetwork,
+    enableCookie: config.enableCookie,
+    defer: config.defer,
+    files: config.files,
+    getTask: config.getTask,
+    extra: config.extra
+  } as LimeRequestConfig;
+}
+
+/**
+ * 把任意错误（包括 LimeRequestFail）安全地转成 Error，供抛出使用。
+ */
+export function toError(err: any): Error {
+  if (err == null) {
+    return new Error('请求失败');
+  }
+  if (typeof err == 'string') {
+    return new Error(err as string);
+  }
+  if (err instanceof Error) {
+    return err as Error;
+  }
+  const msg = extractErrorMessage(err);
+  if (msg != '') {
+    return new Error(msg);
+  }
+  return new Error('请求失败');
+}
+
+/**
+ * 通用 HTTP 客户端控制器
+ */
+export class HttpClient {
+  private client: Request;
+  private lifecycle: RequestLifecycle;
+  private beforeRequestHooks: Array<BeforeRequestHook> = [];
+  private afterSuccessHooks: Array<AfterResponseSuccessHook> = [];
+  private afterErrorHooks: Array<AfterResponseErrorHook> = [];
+  private afterCompleteHooks: Array<AfterResponseCompleteHook> = [];
+  private refreshTokenHandler: RefreshTokenFn | null = null;
+  private unauthorizedHandler: UnauthorizedFn | null = null;
+
+  constructor(options: HttpClientOptions | null = null) {
+    this.lifecycle = options != null && options.lifecycle != null
+      ? (options.lifecycle as RequestLifecycle)
+      : new RequestLifecycle();
+
+    const defaultHeader = {
+      'Content-Type': ContentTypeEnum.AppJson,
+      'Accept': 'application/json, text/plain, */*'
+    } as UTSJSONObject;
+
+    if (options != null && options.header != null) {
+      const customHeader = options.header as UTSJSONObject;
+      const keys = UTSJSONObject.keys(customHeader);
+      for (let i = 0; i < keys.length; i = i + 1) {
+        const k = keys[i];
+        defaultHeader[k] = customHeader[k];
+      }
+    }
+
+    const baseConfig = {
+      baseURL: options != null && options.baseURL != null ? (options.baseURL as string) : '',
+      timeout: options != null && options.timeout != null ? (options.timeout as number) : 5000,
+      header: defaultHeader,
+      dataType: options != null && options.dataType != null ? (options.dataType as string) : 'json',
+      responseType: options != null && options.responseType != null ? (options.responseType as string) : 'text',
+      sslVerify: options != null && options.sslVerify != null ? (options.sslVerify as boolean) : true,
+      withCredentials: options != null && options.withCredentials != null ? (options.withCredentials as boolean) : false
+    } as LimeRequestConfig;
+
+    if (options != null && options.client != null) {
+      this.client = options.client as Request;
+    }
+    else if (options != null && options.requestAdapter != null) {
+      const adapterFn = options.requestAdapter as HttpRequestAdapter;
+      this.client = adapterFn(baseConfig);
+    }
+    else {
+      this.client = new Request(baseConfig);
+    }
+    this.setupInterceptors();
+
+    if (options != null) {
+      if (options.refreshToken != null) {
+        this.refreshTokenHandler = options.refreshToken ?? null;
+      }
+      if (options.onUnauthorized != null) {
+        this.unauthorizedHandler = options.onUnauthorized ?? null;
+      }
+      const beforeHook = options.beforeRequest;
+      if (beforeHook != null) {
+        this.beforeRequest(beforeHook as BeforeRequestHook);
+      }
+      const resp = options.responded ?? options.afterResponse ?? options.respondedOptions;
+      if (resp != null) {
+        this.afterResponse(resp);
+      }
+    }
+  }
+
+  /**
+   * 为当前实例专属的底层 lime-request 绑定通用网络生命周期与取消拦截器
+   */
+  private setupInterceptors(): void {
+    // 1. 底层请求拦截器（仅负责基础请求头兜底与 RequestTask 登记）
+    this.client.interceptors.request.use(
+      (config: LimeRequestConfig): LimeRequestConfig => {
+        if (config.header == null) {
+          config.header = {} as UTSJSONObject;
+        }
+        const header = config.header as UTSJSONObject;
+        if (config.method != 'UPLOAD' && header['Content-Type'] == null) {
+          header['Content-Type'] = ContentTypeEnum.AppJson;
+        }
+        if (header.Accept == null) {
+          header.Accept = 'application/json, text/plain, */*';
+        }
+        const extra = config.extra;
+        if (extra != null) {
+          const extraObj = extra as UTSJSONObject;
+          const domain = extraObj.domain as string | null;
+          if (domain != null) {
+            config.baseURL = domain;
+          }
+        }
+        const requestKey = this.lifecycle.readExtraString(config, 'requestKey');
+        if (requestKey != '') {
+          config.getTask = (task: LimeRequestTask) => {
+            this.lifecycle.registerTask(requestKey, task);
+          };
+        }
+        return config;
+      },
+      (error: LimeRequestFail): Promise<LimeRequestFail> => {
+        return Promise.reject(error) as Promise<LimeRequestFail>;
+      }
+    );
+
+    // 2. 底层响应拦截器（仅负责基础 HTTP 状态码校验与取消静默）
+    this.client.interceptors.response.use(
+      (response: LimeRequestResponse<any>): LimeRequestResponse<any> => {
+        const config = response.config;
+        const extra = config.extra;
+        const method = config.method;
+        if (method == 'UPLOAD' || method == 'DOWNLOAD') {
+          return response;
+        }
+        const statusCode = response.statusCode;
+        if (statusCode != ResultEnum.Success200) {
+          if (statusCode == ResultEnum.Unauthorized) {
+            let skipRefresh = false;
+            if (extra != null) {
+              const skipVal = (extra as UTSJSONObject).getBoolean('skipRefresh');
+              if (skipVal == true) {
+                skipRefresh = true;
+              }
+            }
+            if (skipRefresh) {
+              throw new Error(`未授权[${ResultEnum.Unauthorized}]：${response.errMsg}`);
+            }
+            throw new Error(REFRESHABLE_401);
+          }
+          const errorMessage = ShowMessage(statusCode);
+          throw new Error(`${errorMessage}：${response.errMsg}`);
+        }
+        return response;
+      },
+      (error: LimeRequestFail): Promise<LimeRequestFail> => {
+        const rawMsg = error.errMsg != null ? `${error.errMsg}` : '';
+        if (rawMsg.toLowerCase().includes('abort')) {
+          return Promise.reject(error) as Promise<LimeRequestFail>;
+        }
+        return Promise.reject(error) as Promise<LimeRequestFail>;
+      }
+    );
+  }
+
+  /**
+   * 注册请求前置拦截钩子（类似 Alova 的 beforeRequest，支持 async 异步函数）
+   */
+  beforeRequest(hook: BeforeRequestHook): HttpClient {
+    this.beforeRequestHooks.push(hook);
+    return this;
+  }
+
+  /**
+   * 移除已注册的前置拦截钩子
+   */
+  removeBeforeRequest(hook: BeforeRequestHook): void {
+    const nextList: Array<BeforeRequestHook> = [];
+    for (let i = 0; i < this.beforeRequestHooks.length; i = i + 1) {
+      if (this.beforeRequestHooks[i] != hook) {
+        nextList.push(this.beforeRequestHooks[i]);
+      }
+    }
+    this.beforeRequestHooks = nextList;
+  }
+
+  /**
+   * 清空所有已注册的前置拦截钩子
+   */
+  clearBeforeRequest(): void {
+    this.beforeRequestHooks = [];
+  }
+
+  /**
+   * 注册响应后置拦截钩子（完全对齐 Alova 的 responded 规范）
+   */
+  afterResponse(
+    onSuccessOrOptions: any | null = null,
+    onError: AfterResponseErrorHook | null = null,
+    onComplete: AfterResponseCompleteHook | null = null
+  ): HttpClient {
+    if (onSuccessOrOptions == null) {
+      return this;
+    }
+    if (typeof onSuccessOrOptions == 'object') {
+      const opts = onSuccessOrOptions as RespondedOptions;
+      const succ = opts.onSuccess ?? null;
+      const err = opts.onError ?? null;
+      const comp = opts.onComplete ?? null;
+      if (succ != null) {
+        this.afterSuccessHooks.push(succ as AfterResponseSuccessHook);
+      }
+      if (err != null) {
+        this.afterErrorHooks.push(err as AfterResponseErrorHook);
+      }
+      if (comp != null) {
+        this.afterCompleteHooks.push(comp as AfterResponseCompleteHook);
+      }
+      return this;
+    }
+    if (typeof onSuccessOrOptions == 'function') {
+      this.afterSuccessHooks.push(onSuccessOrOptions as AfterResponseSuccessHook);
+    }
+    if (onError != null) {
+      this.afterErrorHooks.push(onError as AfterResponseErrorHook);
+    }
+    if (onComplete != null) {
+      this.afterCompleteHooks.push(onComplete as AfterResponseCompleteHook);
+    }
+    return this;
+  }
+
+  /**
+   * 注册响应后置拦截钩子（Alova 别名，等同于 afterResponse）
+   */
+  responded(
+    onSuccessOrOptions: any | null = null,
+    onError: AfterResponseErrorHook | null = null,
+    onComplete: AfterResponseCompleteHook | null = null
+  ): HttpClient {
+    return this.afterResponse(onSuccessOrOptions, onError, onComplete);
+  }
+
+  /**
+   * 移除已注册的响应后置拦截钩子
+   */
+  removeAfterResponse(
+    onSuccess: AfterResponseSuccessHook | null = null,
+    onError: AfterResponseErrorHook | null = null,
+    onComplete: AfterResponseCompleteHook | null = null
+  ): void {
+    if (onSuccess != null) {
+      const nextSuccess: Array<AfterResponseSuccessHook> = [];
+      for (let i = 0; i < this.afterSuccessHooks.length; i = i + 1) {
+        if (this.afterSuccessHooks[i] != onSuccess) {
+          nextSuccess.push(this.afterSuccessHooks[i]);
+        }
+      }
+      this.afterSuccessHooks = nextSuccess;
+    }
+    if (onError != null) {
+      const nextError: Array<AfterResponseErrorHook> = [];
+      for (let i = 0; i < this.afterErrorHooks.length; i = i + 1) {
+        if (this.afterErrorHooks[i] != onError) {
+          nextError.push(this.afterErrorHooks[i]);
+        }
+      }
+      this.afterErrorHooks = nextError;
+    }
+    if (onComplete != null) {
+      const nextComplete: Array<AfterResponseCompleteHook> = [];
+      for (let i = 0; i < this.afterCompleteHooks.length; i = i + 1) {
+        if (this.afterCompleteHooks[i] != onComplete) {
+          nextComplete.push(this.afterCompleteHooks[i]);
+        }
+      }
+      this.afterCompleteHooks = nextComplete;
+    }
+  }
+
+  /**
+   * 清空所有响应后置拦截钩子
+   */
+  clearAfterResponse(): void {
+    this.afterSuccessHooks = [];
+    this.afterErrorHooks = [];
+    this.afterCompleteHooks = [];
+  }
+
+  /**
+   * 执行所有前置钩子
+   */
+  private async applyBeforeRequest(config: LimeRequestConfig): Promise<LimeRequestConfig> {
+    if (config.header == null) {
+      config.header = {} as UTSJSONObject;
+    }
+    for (let i = 0; i < this.beforeRequestHooks.length; i = i + 1) {
+      const hook = this.beforeRequestHooks[i];
+      await hook(config);
+    }
+    return config;
+  }
+
+  /**
+   * 执行所有成功后置钩子
+   */
+  private async applyAfterSuccess<T>(data: T, config: LimeRequestConfig): Promise<T> {
+    // UTS 的 any 编译为 Kotlin 非空 Any，泛型 T 无上界（T : Any?），直接赋值报 Initializer type mismatch；
+    // 必须显式 as any 收口（与 uni_modules/x-pinia-s/instans/defineStore.uts 的 `cached as any as T` 同源写法）
+    let currentData: any = data as any;
+    for (let i = 0; i < this.afterSuccessHooks.length; i = i + 1) {
+      const hook = this.afterSuccessHooks[i];
+      const result = await hook(currentData, config);
+      if (typeof result != 'undefined' && result != null) {
+        currentData = result;
+      }
+    }
+    return currentData as T;
+  }
+
+  /**
+   * 执行所有失败后置钩子
+   */
+  private async applyAfterError<T>(err: any, config: LimeRequestConfig): Promise<T> {
+    for (let i = 0; i < this.afterErrorHooks.length; i = i + 1) {
+      const hook = this.afterErrorHooks[i];
+      await hook(err, config);
+    }
+    return Promise.reject(toError(err)) as Promise<T>;
+  }
+
+  /**
+   * 执行所有完成拦截钩子（对齐 Alova onComplete，无论成功、失败或命中缓存均触发）
+   */
+  private async applyAfterComplete(config: LimeRequestConfig): Promise<void> {
+    for (let i = 0; i < this.afterCompleteHooks.length; i = i + 1) {
+      const hook = this.afterCompleteHooks[i];
+      await hook(config);
+    }
+  }
+
+  /**
+   * 取消指定 requestKey 的在飞请求
+   */
+  abort(requestKey: string): void {
+    this.lifecycle.abort(requestKey);
+  }
+
+  /**
+   * 取消当前客户端实例的全部在飞请求
+   */
+  abortAll(): void {
+    this.lifecycle.abortAll();
+  }
+
+  /**
+   * 清除当前客户端实例的 TTL 缓存（不传 key 清全部，传 key 清指定项）
+   */
+  clearCache(fingerprint: string = ''): void {
+    this.lifecycle.clearCache(fingerprint);
+  }
+
+  /**
+   * 获取当前客户端绑定的生命周期管理器
+   */
+  getLifecycle(): RequestLifecycle {
+    return this.lifecycle;
+  }
+
+  request<T>(config: LimeRequestConfig): Promise<T> {
+    const finalConfig = (config ?? {}) as LimeRequestConfig;
+    return this.applyBeforeRequest(finalConfig).then(
+      (validConfig: LimeRequestConfig): Promise<T> => {
+        const fingerprint = this.lifecycle.buildRequestKey(validConfig);
+        const isGet = validConfig.method == null || validConfig.method == 'GET';
+
+        // 已被取消：直接失败，不发请求
+        if (this.lifecycle.isAborted(fingerprint)) {
+          this.lifecycle.consumeAborted(fingerprint);
+          return Promise.reject(new Error('请求已取消')) as Promise<T>;
+        }
+
+        // GET 默认并发去重：同指纹已在飞则复用同一份 Promise
+        const useDedupe = isGet && this.lifecycle.readExtraBoolean(validConfig, 'dedupe') != false;
+        if (useDedupe) {
+          const pending = this.lifecycle.getInflight<T>(fingerprint);
+          if (pending != null) {
+            return pending;
+          }
+        }
+
+        // GET TTL 缓存：显式传 cacheTtl > 0 才启用（命中时同样触发 onComplete 钩子）
+        const cacheTtl = isGet ? this.lifecycle.readExtraNumber(validConfig, 'cacheTtl') : 0;
+        if (cacheTtl > 0) {
+          const cached = this.lifecycle.getCache(fingerprint);
+          if (cached != null) {
+            try {
+              const parsed = JSON.parse(cached) as T;
+              return this.applyAfterComplete(validConfig).then((): T => parsed);
+            }
+            catch (_) {
+              this.lifecycle.clearCache(fingerprint);
+            }
+          }
+        }
+
+        const task = this.execute<T>(validConfig, fingerprint, cacheTtl).then(
+          (data: T): Promise<T> => {
+            return this.applyAfterComplete(validConfig).then((): T => data);
+          },
+          (err: any): Promise<T> => {
+            return this.applyAfterComplete(validConfig).then((): Promise<T> => {
+              return Promise.reject(toError(err)) as Promise<T>;
+            });
+          }
+        );
+        if (useDedupe) {
+          this.lifecycle.setInflight<T>(fingerprint, task);
+        }
+        return task;
+      },
+      (err: any): Promise<T> => {
+        return Promise.reject(toError(err)) as Promise<T>;
+      }
+    );
+  }
+
+  /**
+   * 真实请求流程：send → 401 刷新重放，并在收尾时清理任务登记。
+   */
+  private execute<T>(config: LimeRequestConfig, fingerprint: string, cacheTtl: number): Promise<T> {
+    const requestKey = this.lifecycle.readExtraString(config, 'requestKey');
+    const done = (data: T): T => {
+      this.lifecycle.clearTask(requestKey);
+      this.cacheIfNeeded(fingerprint, cacheTtl, data);
+      return data;
+    };
+    const onRejected = (err: any): Promise<T> => {
+      return this.handleFailure<T>(err, config, requestKey, fingerprint);
+    };
+    return this.send<T>(config).then(done, onRejected);
+  }
+
+  /**
+   * 失败分支处理
+   */
+  private handleFailure<T>(err: any, config: LimeRequestConfig, requestKey: string, fingerprint: string): Promise<T> {
+    this.lifecycle.clearTask(requestKey);
+    if (this.lifecycle.isAborted(requestKey) || this.lifecycle.isAborted(fingerprint)) {
+      this.lifecycle.consumeAborted(requestKey);
+      this.lifecycle.consumeAborted(fingerprint);
+      return Promise.reject(new Error('请求已取消')) as Promise<T>;
+    }
+    if (!isRefreshable401(err) || this.refreshTokenHandler == null) {
+      return this.applyAfterError<T>(err, config);
+    }
+    const onRefreshed = (ok: boolean): Promise<T> => {
+      if (!ok) {
+        this.handleUnauthorizedOnce();
+        const expireErr = new Error('登录已过期，请重新登录');
+        return this.applyAfterError<T>(expireErr, config);
+      }
+      const replayConfig = cloneConfig(config);
+      const doneReplay = (data: T): T => {
+        this.lifecycle.clearTask(requestKey);
+        return data;
+      };
+      const onReplayFailed = (replayErr: any): Promise<T> => {
+        this.lifecycle.clearTask(requestKey);
+        if (isRefreshable401(replayErr)) {
+          this.handleUnauthorizedOnce();
+          const expireErr = new Error('登录已过期，请重新登录');
+          return this.applyAfterError<T>(expireErr, config);
+        }
+        return this.applyAfterError<T>(replayErr, config);
+      };
+      return this.send<T>(replayConfig).then(doneReplay, onReplayFailed);
+    };
+    return this.refreshTokenHandler!().then(onRefreshed);
+  }
+
+  private handleUnauthorizedOnce(): void {
+    if (!claimRefreshFailure()) {
+      return;
+    }
+    if (this.unauthorizedHandler != null) {
+      this.unauthorizedHandler!();
+    }
+  }
+
+  private cacheIfNeeded<T>(fingerprint: string, cacheTtl: number, data: T): void {
+    if (cacheTtl <= 0) {
+      return;
+    }
+    try {
+      this.lifecycle.setCache(fingerprint, JSON.stringify(data), cacheTtl);
+    }
+    catch (_) {}
+  }
+
+  private send<T>(config: LimeRequestConfig): Promise<T> {
+    return this.client.request<any>(config).then((res: LimeRequestResponse<any>): Promise<T> => {
+      const rawData = res.data;
+      if (rawData == null) {
+        return Promise.reject(new Error('响应数据为空')) as Promise<T>;
+      }
+      return this.applyAfterSuccess<T>(rawData as T, config);
+    });
+  }
+
+  get<T>(url: string, config: LimeRequestConfig | null = null): Promise<T> {
+    const _config = (config ?? {}) as LimeRequestConfig;
+    _config.url = url;
+    _config.method = 'GET';
+    return this.request<T>(_config);
+  }
+
+  post<T>(url: string, data: any | null = null, config: LimeRequestConfig | null = null): Promise<T> {
+    const _config = (config ?? {}) as LimeRequestConfig;
+    _config.url = url;
+    _config.data = data;
+    _config.method = 'POST';
+    return this.request<T>(_config);
+  }
+
+  put<T>(url: string, data: any | null = null, config: LimeRequestConfig | null = null): Promise<T> {
+    const _config = (config ?? {}) as LimeRequestConfig;
+    _config.url = url;
+    _config.data = data;
+    _config.method = 'PUT';
+    return this.request<T>(_config);
+  }
+
+  delete<T>(url: string, data: any | null = null, config: LimeRequestConfig | null = null): Promise<T> {
+    const _config = (config ?? {}) as LimeRequestConfig;
+    _config.url = url;
+    _config.data = data;
+    _config.method = 'DELETE';
+    return this.request<T>(_config);
+  }
+
+  /**
+   * 上传文件
+   */
+  upload<T>(url: string, config: LimeRequestConfig | null = null): Promise<T> {
+    const _config = (config ?? {}) as LimeRequestConfig;
+    _config.url = url;
+    _config.method = 'UPLOAD';
+    return this.applyBeforeRequest(_config).then(
+      (validConfig: LimeRequestConfig): Promise<T> => {
+        return this.client.upload(url, validConfig).then(
+          (res: LimeRequestResponse<any>): Promise<T> => {
+            const rawData = res.data;
+            if (rawData == null) {
+              const emptyErr = new Error('上传响应为空');
+              return this.applyAfterComplete(validConfig).then((): Promise<T> => {
+                return Promise.reject(emptyErr) as Promise<T>;
+              });
+            }
+            return this.applyAfterSuccess<T>(rawData as T, validConfig).then(
+              (data: T): Promise<T> => this.applyAfterComplete(validConfig).then((): T => data)
+            );
+          },
+          (err: any): Promise<T> => {
+            return this.applyAfterError<T>(err, validConfig).then(
+              (data: T): Promise<T> => this.applyAfterComplete(validConfig).then((): T => data),
+              (finalErr: any): Promise<T> => this.applyAfterComplete(validConfig).then((): Promise<T> => {
+                return Promise.reject(toError(finalErr)) as Promise<T>;
+              })
+            );
+          }
+        );
+      },
+      (err: any): Promise<T> => {
+        return Promise.reject(toError(err)) as Promise<T>;
+      }
+    );
+  }
+}
