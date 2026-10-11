@@ -653,6 +653,23 @@ export class HttpClient {
         return this.applyAfterError<T>(expireErr, config);
       }
       const replayConfig = cloneConfig(config);
+      // 重建请求头并摘掉上一轮注入的旧鉴权字段：
+      // defaultBusinessBeforeRequest 见到 header 里已有 token 会跳过注入（它刻意不覆盖调用方自定义 token），
+      // 不摘掉的话，刷新后的新 token 永远写不进去，重放仍带着那份已过期的旧 token。
+      const originHeader = config.header;
+      const replayHeader = {} as UTSJSONObject;
+      if (originHeader != null) {
+        const originObj = originHeader as UTSJSONObject;
+        const originKeys = UTSJSONObject.keys(originObj);
+        for (let i = 0; i < originKeys.length; i = i + 1) {
+          const headerKey = originKeys[i];
+          const isAuthKey = headerKey == 'token' || headerKey == 'Authorization' || headerKey == 'authorization';
+          if (!isAuthKey) {
+            replayHeader[headerKey] = originObj[headerKey];
+          }
+        }
+      }
+      replayConfig.header = replayHeader;
       const doneReplay = (data: T): T => {
         this.lifecycle.clearTask(requestKey);
         return data;
@@ -666,7 +683,17 @@ export class HttpClient {
         }
         return this.applyAfterError<T>(replayErr, config);
       };
-      return this.send<T>(replayConfig).then(doneReplay, onReplayFailed);
+      // 关键修复：重放前重新执行一遍前置钩子链，否则刷新后的新 token 注入不进来。
+      // 钩子自身抛错（如 token 已被清空）时按普通请求失败收口。
+      return this.applyBeforeRequest(replayConfig).then(
+        (readyConfig: LimeRequestConfig): Promise<T> => {
+          return this.send<T>(readyConfig).then(doneReplay, onReplayFailed);
+        },
+        (hookErr: any): Promise<T> => {
+          this.lifecycle.clearTask(requestKey);
+          return this.applyAfterError<T>(hookErr, config);
+        }
+      );
     };
     return this.refreshTokenHandler!().then(onRefreshed);
   }

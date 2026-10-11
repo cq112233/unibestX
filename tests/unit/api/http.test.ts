@@ -510,3 +510,116 @@ describe('httpClient downloadFile', () => {
     spy.mockRestore();
   });
 });
+
+describe('httpClient 401 refresh replay', () => {
+  /**
+   * 造一个底层 request 被 mock 掉的客户端，保留真实的前置钩子链与 401 重放逻辑。
+   * 首次调用抛 REFRESHABLE_401 哨兵，后续调用成功。
+   */
+  function createReplayClient(options: {
+    onRequest: (config: any, callIndex: number) => void;
+    beforeRequest?: (config: any) => void;
+    refreshToken?: () => Promise<boolean>;
+    header?: any;
+  }): HttpClient {
+    const rawClient = defaultRequestAdapter({ baseURL: 'https://replay.example.com' } as any);
+    let callCount = 0;
+    (rawClient as any).request = (config: any) => {
+      callCount += 1;
+      options.onRequest(config, callCount);
+      if (callCount === 1) {
+        return Promise.reject(new Error('__REFRESHABLE_401__'));
+      }
+      return Promise.resolve({
+        statusCode: 200,
+        data: { code: 0, data: 'ok' },
+        config
+      });
+    };
+
+    const clientOptions: any = {
+      baseURL: 'https://replay.example.com',
+      client: rawClient
+    };
+    if (options.header != null) {
+      clientOptions.header = options.header;
+    }
+    if (options.beforeRequest != null) {
+      clientOptions.beforeRequest = options.beforeRequest;
+    }
+    if (options.refreshToken != null) {
+      clientOptions.refreshToken = options.refreshToken;
+    }
+    return createHttpClient(clientOptions);
+  }
+
+  it('should re-run beforeRequest hooks on replay so the refreshed token is injected', async () => {
+    let currentToken = 'old-token';
+    const sentTokens: Array<string> = [];
+    let hookCallCount = 0;
+
+    const client = createReplayClient({
+      onRequest: (config) => {
+        const header: any = config.header ?? {};
+        sentTokens.push(header.token ?? '');
+      },
+      beforeRequest: (config: any) => {
+        hookCallCount += 1;
+        if (config.header == null) {
+          config.header = {};
+        }
+        const header = config.header;
+        // 对齐 defaultBusinessBeforeRequest：仅当未显式携带 token 时才注入
+        if (header.token == null || header.token === '') {
+          header.token = currentToken;
+        }
+      },
+      refreshToken: () => {
+        currentToken = 'new-token';
+        return Promise.resolve(true);
+      }
+    });
+
+    await client.get<any>('/protected');
+
+    // 首轮带旧 token，重放必须带刷新后的新 token
+    expect(sentTokens).toEqual(['old-token', 'new-token']);
+    // 前置钩子在重放时被重新执行
+    expect(hookCallCount).toBe(2);
+  });
+
+  it('should strip the stale auth header before replay', async () => {
+    let injectToken = true;
+    let replayHeader: any = null;
+
+    const client = createReplayClient({
+      onRequest: (config, callIndex) => {
+        if (callIndex === 2) {
+          replayHeader = config.header;
+        }
+      },
+      beforeRequest: (config: any) => {
+        if (!injectToken) {
+          return;
+        }
+        if (config.header == null) {
+          config.header = {};
+        }
+        config.header.token = 'stale-token';
+      },
+      refreshToken: () => {
+        // 模拟刷新后钩子不再注入（如 token 已被清空）
+        injectToken = false;
+        return Promise.resolve(true);
+      }
+    });
+
+    // 显式携带非鉴权业务头，随重放保留
+    await client.get<any>('/protected', { header: { 'X-Tenant': 'tenant-1' } } as any);
+
+    // 非鉴权字段保留
+    expect(replayHeader['X-Tenant']).toBe('tenant-1');
+    // 上一轮注入的旧 token 已被摘掉，不会污染重放
+    expect(replayHeader.token).toBeUndefined();
+  });
+});
