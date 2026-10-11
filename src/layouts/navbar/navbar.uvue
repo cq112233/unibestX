@@ -4,6 +4,7 @@
     <!-- 顶部固定自定义导航栏：位于页面内容上方，不随下拉刷新位移 -->
     <NavBar
       v-if="isCustomNav"
+      :page-style-obj="pageStyleObj"
       :is-navbar-visible="isNavbarVisible"
       :hide-status-bar="!isStatusBarVisible"
       :title="displayTitle"
@@ -94,6 +95,7 @@ import TabbarPlaceholder from '@/src/tabbar/components/TabbarPlaceholder.uvue';
 import { formatNavbarTitle, isPageRefresherDisabled, isPageScrollDisabled, refresherBackground } from './utils/index.uts';
 import { activeTabTitle, curIdx, isPageTabbar, isSinglePageTabbar, tabbarList } from '@/src/tabbar/index.uts';
 import { isAlipayMp } from '@/src/utils/systemInfo/index.uts';
+import { onPageHide, onPageShow } from '@dcloudio/uni-app';
 
 /**
  * 布局属性定义（由 uni-layouts-plugin 编译时自动从页面 definePage 或 pages.json 提取传入）
@@ -206,6 +208,8 @@ const props = defineProps({
     default: ''
   }
 });
+
+console.log(props, 'props');
 
 /**
  * 获取 pageStyle 对象
@@ -633,11 +637,9 @@ const displayTitle = computed((): string => {
 });
 
 /**
- * H5 页面活跃状态标记：
- * 当页面被导航覆盖（如 navigateTo 子页面）时 onDeactivated 置为 false，
- * 子页面返回后 onActivated 恢复为 true。
- * syncPageTitle 仅在 pageActive 为 true 时才写入 document.title，
- * 防止背景页的标题覆盖前台页。
+ * 页面活跃状态标记：
+ * 当页面被导航覆盖（如 navigateTo 子页面）时置为 false，子页面返回后恢复为 true。
+ * syncPageTitle 仅在 pageActive 为 true 时才写入标题，防止背景页的标题覆盖前台页。
  */
 const pageActive = ref(true);
 
@@ -645,13 +647,14 @@ function syncPageTitle(title: string): void {
   if (title.length == 0) {
     return;
   }
-  // H5 下所有页面栈中的 navbar 实例都会因语言切换重新计算 displayTitle，
-  // 但只有栈顶（当前可见）页面才应写入 document.title，否则背景页会覆盖前台页标题
-  // #ifdef H5
+  // ⚠️ 该门控必须全端生效，不能只在 H5 生效：
+  // 页面栈中所有 navbar 实例都会因语言切换而重新计算 displayTitle 并调用 setNavigationBarTitle，
+  // 而小程序端（如支付宝）该 API 作用于「当前栈顶页面」，于是背景页会把前台页标题覆盖掉
+  // （典型现象：在子页面切换语言后，标题被单页 TabBar 宿主首页写成当前 Tab 的「基础」）。
   if (!pageActive.value) {
     return;
   }
-  // #endif
+
   try {
     uni.setNavigationBarTitle({
       title
@@ -661,6 +664,17 @@ function syncPageTitle(title: string): void {
     // 忽略个别平台未实现该 API 的异常，不影响页面渲染
   }
 }
+
+// 全端：组件内监听所在页面的显示 / 隐藏（组合式 API 中对应页面的 onShow / onHide）
+onPageShow((): void => {
+  pageActive.value = true;
+  // 页面重新显示（从子页面返回 / 前台恢复）时补同步一次，确保标题为当前页标题
+  syncPageTitle(displayTitle.value);
+});
+
+onPageHide((): void => {
+  pageActive.value = false;
+});
 
 // #ifdef H5
 onActivated((): void => {

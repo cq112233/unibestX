@@ -1226,6 +1226,9 @@ export const pluginUts = {
               'onMounted',
               'onUpdated',
               'onUnmounted',
+              // 组合式 API 中「组件内」监听所在页面显示/隐藏的钩子（对应页面 onShow / onHide）
+              'onPageShow',
+              'onPageHide',
               'provide',
               'inject',
               'defineOptions',
