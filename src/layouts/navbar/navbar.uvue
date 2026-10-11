@@ -88,7 +88,7 @@
 </template>
 
 <script setup lang="uts">
-import { computed, onUnmounted, ref } from 'vue';
+import { computed, onActivated, onDeactivated, onMounted, watch } from 'vue';
 import NavBar from '@/src/components/NavBar/NavBar.uvue';
 import TabbarPlaceholder from '@/src/tabbar/components/TabbarPlaceholder.uvue';
 import { formatNavbarTitle, isPageRefresherDisabled, isPageScrollDisabled, refresherBackground } from './utils/index.uts';
@@ -630,6 +630,58 @@ const displayTitle = computed((): string => {
     return formatNavbarTitle(props.title);
   }
   return '';
+});
+
+/**
+ * H5 页面活跃状态标记：
+ * 当页面被导航覆盖（如 navigateTo 子页面）时 onDeactivated 置为 false，
+ * 子页面返回后 onActivated 恢复为 true。
+ * syncPageTitle 仅在 pageActive 为 true 时才写入 document.title，
+ * 防止背景页的标题覆盖前台页。
+ */
+const pageActive = ref(true);
+
+function syncPageTitle(title: string): void {
+  if (title.length == 0) {
+    return;
+  }
+  // H5 下所有页面栈中的 navbar 实例都会因语言切换重新计算 displayTitle，
+  // 但只有栈顶（当前可见）页面才应写入 document.title，否则背景页会覆盖前台页标题
+  // #ifdef H5
+  if (!pageActive.value) {
+    return;
+  }
+  // #endif
+  try {
+    uni.setNavigationBarTitle({
+      title
+    } as SetNavigationBarTitleOptions);
+  }
+  catch {
+    // 忽略个别平台未实现该 API 的异常，不影响页面渲染
+  }
+}
+
+// #ifdef H5
+onActivated((): void => {
+  pageActive.value = true;
+  // 页面重新激活时同步一次标题，确保返回时 document.title 正确
+  syncPageTitle(displayTitle.value);
+});
+
+onDeactivated((): void => {
+  pageActive.value = false;
+});
+// #endif
+
+// 标题变化（含语言切换、单页 TabBar 切换、动态 setNavbarTitle）时同步页面标题
+watch(displayTitle, (newTitle: string): void => {
+  syncPageTitle(newTitle);
+});
+
+// 首次挂载时立即同步一次，覆盖运行时写入的原始多语言 key
+onMounted((): void => {
+  syncPageTitle(displayTitle.value);
 });
 
 /**

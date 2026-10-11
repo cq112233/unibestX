@@ -23,7 +23,37 @@ export const NAVBAR_CONTENT_HEIGHT: number = 44;
  */
 export const TABBAR_BASE_HEIGHT: number = 50;
 
-const currentPlatform: string = uni.getSystemInfoSync().uniPlatform;
+/**
+ * 解析当前运行平台标识（对齐 uni-app 的 uniPlatform 取值：app-android / app-ios / app-harmony / web / mp-xxx）
+ *
+ * ⚠️ 不再调用 `uni.getSystemInfoSync()` —— 微信小程序基础库已将其标记废弃，调用会在控制台打印
+ *    「wx.getSystemInfoSync is deprecated. Please use wx.getSystemSetting / wx.getDeviceInfo /
+ *    wx.getWindowInfo / wx.getAppBaseInfo instead」告警。这里改为编译期条件编译注入常量：
+ *    零运行时桥接开销，且与 `getCompilePlatform()` 的平台分流口径保持一致。
+ */
+function resolveCurrentPlatform(): string {
+  // #ifdef APP-ANDROID
+  return 'app-android';
+  // #endif
+  // #ifdef APP-IOS
+  return 'app-ios';
+  // #endif
+  // #ifdef APP-HARMONY
+  return 'app-harmony';
+  // #endif
+  // #ifdef H5
+  return 'web';
+  // #endif
+  // #ifdef MP-WEIXIN
+  return 'mp-weixin';
+  // #endif
+  // #ifdef MP-ALIPAY
+  return 'mp-alipay';
+  // #endif
+  return '';
+}
+
+const currentPlatform: string = resolveCurrentPlatform();
 
 /** 是否为 Android App 原生平台 */
 export const isAppAndroid: boolean = currentPlatform == 'app-android';
@@ -122,12 +152,12 @@ export type SystemInfoType = {
   tabBarHeight: number;
   /** 设备像素比（dpr） */
   pixelRatio: number;
-  // ---- 设备信息（getDeviceInfo 优先，缺失字段回退 getSystemInfoSync，都取不到则为 ''）----
+  // ---- 设备信息（全部来自 getDeviceInfo，取不到则为 ''）----
   /** 设备品牌（如 'Apple'） */
   brand: string;
   /** 设备型号（如 'iPhone 15 Pro'） */
   model: string;
-  /** 操作系统及版本（如 'iOS 17.4'），⚠️ 只来自 getSystemInfoSync */
+  /** 操作系统及版本（如 'iOS 17.4'） */
   system: string;
   // ---- 编译引擎与平台信息 ----
   /** 编译器 / SDK 版本（各平台来源不同互相兜底，最终兜底 '1.0.0'） */
@@ -255,7 +285,7 @@ export function updateSystemInfo() {
   const windowInfo = uni.getWindowInfo();
   // 编译器 / 引擎版本解析
   const compileVer = resolveCompilerVersion();
-  // 品牌 / 型号 / 系统信息：getDeviceInfo 优先，缺失时回退 getSystemInfoSync
+  // 品牌 / 型号 / 系统信息：统一从 uni.getDeviceInfo() 读取（不再调用已废弃的 getSystemInfoSync）
   let brand = '';
   let model = '';
   let system = '';
@@ -263,17 +293,7 @@ export function updateSystemInfo() {
     const dev = uni.getDeviceInfo();
     brand = `${dev.brand ?? ''}`;
     model = `${dev.model ?? ''}`;
-  }
-  catch { }
-  try {
-    const sys = uni.getSystemInfoSync();
-    system = `${sys.system ?? ''}`;
-    if (brand == '') {
-      brand = `${sys.brand ?? ''}`;
-    }
-    if (model == '') {
-      model = `${sys.model ?? ''}`;
-    }
+    system = `${dev.system ?? ''}`;
   }
   catch { }
   // 写入公共系统信息
