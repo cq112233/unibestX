@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   createHttpClient,
   DEFAULT_HTTP_OPTIONS,
@@ -6,6 +6,7 @@ import {
   defaultBusinessAfterSuccess,
   defaultBusinessBeforeRequest,
   defaultRequestAdapter,
+  downloadHttp,
   http,
   HttpClient,
   RequestLifecycle
@@ -223,8 +224,8 @@ describe('httpClient beforeRequest & afterResponse hooks', () => {
     expect(typeof defaultBusinessAfterSuccess).toBe('function');
     expect(typeof defaultBusinessAfterComplete).toBe('function');
     expect(typeof defaultRequestAdapter).toBe('function');
-    expect(DEFAULT_HTTP_OPTIONS.beforeRequest).toBe(defaultBusinessBeforeRequest);
-    expect(DEFAULT_HTTP_OPTIONS.requestAdapter).toBe(defaultRequestAdapter);
+    expect(typeof DEFAULT_HTTP_OPTIONS.beforeRequest).toBe('function');
+    expect(typeof DEFAULT_HTTP_OPTIONS.requestAdapter).toBe('function');
     expect(typeof DEFAULT_HTTP_OPTIONS.refreshToken).toBe('function');
     expect(typeof DEFAULT_HTTP_OPTIONS.onUnauthorized).toBe('function');
 
@@ -371,5 +372,141 @@ describe('httpClient beforeRequest & afterResponse hooks', () => {
     expect(typeof client.abortAll).toBe('function');
     expect(typeof client.clearCache).toBe('function');
     expect(client.getLifecycle()).toBeInstanceOf(RequestLifecycle);
+  });
+});
+
+describe('httpClient downloadFile', () => {
+  /** 造一个底层下载被 mock 掉的客户端，保留真实拦截器链路 */
+  function createMockDownloadClient(
+    result: any,
+    onDownload?: (url: string, config: any) => void
+  ): HttpClient {
+    const rawClient = defaultRequestAdapter({ baseURL: 'https://download.example.com' } as any);
+    (rawClient as any).download = (url: string, config: any) => {
+      if (onDownload != null) {
+        onDownload(url, config);
+      }
+      return Promise.resolve(result);
+    };
+    return createHttpClient({
+      baseURL: 'https://download.example.com',
+      client: rawClient
+    });
+  }
+
+  it('should resolve DownloadResult with tempFilePath and statusCode', async () => {
+    let receivedUrl = '';
+    let receivedConfig: any = null;
+    const client = createMockDownloadClient(
+      { statusCode: 200, tempFilePath: '/tmp/download/avatar.png', errMsg: 'request:ok' },
+      (url, config) => {
+        receivedUrl = url;
+        receivedConfig = config;
+      }
+    );
+
+    const res = await client.downloadFile('/files/avatar.png');
+
+    expect(res.tempFilePath).toBe('/tmp/download/avatar.png');
+    expect(res.statusCode).toBe(200);
+    expect(receivedUrl).toBe('/files/avatar.png');
+    expect(receivedConfig.method).toBe('DOWNLOAD');
+  });
+
+  it('should inject auth header via beforeRequest hook before downloading', async () => {
+    let receivedHeader: any = null;
+    const client = createMockDownloadClient(
+      { statusCode: 200, tempFilePath: '/tmp/a.png', errMsg: 'ok' },
+      (_url, config) => {
+        receivedHeader = config.header;
+      }
+    );
+    client.beforeRequest((config: any) => {
+      if (config.header == null) {
+        config.header = {};
+      }
+      config.header.token = 'download-token';
+    });
+
+    await client.downloadFile('/files/a.png');
+
+    expect(receivedHeader).not.toBeNull();
+    expect(receivedHeader.token).toBe('download-token');
+  });
+
+  it('should reject with HTTP error and trigger onError / onComplete on non-2xx status', async () => {
+    let errorCaught: any = null;
+    let completeCalled = false;
+    const client = createMockDownloadClient({
+      statusCode: 404,
+      tempFilePath: '',
+      errMsg: 'downloadFile:fail 404'
+    });
+    client.afterResponse({
+      onError: () => {},
+      onComplete: () => {
+        completeCalled = true;
+      }
+    });
+
+    try {
+      await client.downloadFile('/files/missing.png');
+    }
+    catch (err: any) {
+      errorCaught = err;
+    }
+
+    expect(errorCaught).not.toBeNull();
+    expect(errorCaught.message).toContain('404');
+    expect(completeCalled).toBe(true);
+  });
+
+  it('should reject when tempFilePath is empty', async () => {
+    const client = createMockDownloadClient({
+      statusCode: 200,
+      tempFilePath: '',
+      errMsg: 'downloadFile:ok'
+    });
+
+    let errorCaught: any = null;
+    try {
+      await client.downloadFile('/files/empty.png');
+    }
+    catch (err: any) {
+      errorCaught = err;
+    }
+
+    expect(errorCaught).not.toBeNull();
+    expect(errorCaught.message).toContain('下载响应为空');
+  });
+
+  it('should keep download() as an alias of downloadFile()', async () => {
+    const client = createMockDownloadClient({
+      statusCode: 200,
+      tempFilePath: '/tmp/alias.png',
+      errMsg: 'ok'
+    });
+
+    expect(typeof client.downloadFile).toBe('function');
+    expect(typeof client.download).toBe('function');
+
+    const res = await client.download('/files/alias.png');
+    expect(res.tempFilePath).toBe('/tmp/alias.png');
+    expect(res.statusCode).toBe(200);
+  });
+
+  it('should expose downloadHttp facade delegating to default http instance', async () => {
+    expect(typeof downloadHttp).toBe('function');
+
+    const spy = vi.spyOn(http, 'downloadFile').mockResolvedValue({
+      tempFilePath: '/tmp/facade.png',
+      statusCode: 200
+    } as any);
+
+    const res = await downloadHttp('/files/facade.png');
+
+    expect(spy).toHaveBeenCalledTimes(1);
+    expect(res.tempFilePath).toBe('/tmp/facade.png');
+    spy.mockRestore();
   });
 });

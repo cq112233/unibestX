@@ -53,6 +53,16 @@ export type RefreshTokenFn = () => Promise<boolean>;
 export type UnauthorizedFn = () => void;
 
 /**
+ * 下载结果类型
+ */
+export type DownloadResult = {
+  /** 临时文件路径（下载后的文件会存储到一个临时文件） */
+  tempFilePath: string;
+  /** HTTP 状态码 */
+  statusCode: number;
+};
+
+/**
  * 请求适配器函数类型（接收基础配置，返回底层 Request 实例，对齐 Alova requestAdapter 规范）
  */
 export type HttpRequestAdapter = (config: LimeRequestConfig) => Request;
@@ -197,6 +207,12 @@ export declare class HttpClient {
   delete<T>(url: string, data: any | null = null, config: LimeRequestConfig | null = null): Promise<T>;
 
   upload<T>(url: string, config: LimeRequestConfig | null = null): Promise<T>;
+
+  downloadFile(url: string, config: LimeRequestConfig | null = null): Promise<DownloadResult>;
+
+  private rejectDownload(err: Error, config: LimeRequestConfig): Promise<DownloadResult>;
+
+  download(url: string, config: LimeRequestConfig | null = null): Promise<DownloadResult>;
 }
 
 export { ContentTypeEnum, ResultEnum, ShowMessage } from './internal/enum.uts';
@@ -279,5 +295,12 @@ export declare function clearCache(fingerprint: string = ''): void;
  * 便捷函数：文件上传（委托给默认 http 实例）
  */
 export declare function uploadHttp(url: string, config: LimeRequestConfig | null = null): Promise<T>;
+
+/**
+ * 便捷函数：文件下载（委托给默认 http 实例）
+ *
+ * 自动携带 Token，返回临时文件路径与 HTTP 状态码。
+ */
+export declare function downloadHttp(url: string, config: LimeRequestConfig | null = null): Promise<DownloadResult>;
 
 export default http;

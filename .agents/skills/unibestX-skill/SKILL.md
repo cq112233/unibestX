@@ -46,7 +46,7 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 
 | 分册文件 | 收录内容 | 何时 Read |
 | :--- | :--- | :--- |
-| [references/1-uts-syntax.md](references/1-uts-syntax.md) | **1 UTS 强类型系统与语法核心铁律**（21 条） | 定义对象结构与类型标注、写 `export` / `class` / 闭包 / 定时器回调 / 集合遍历 / 联合类型上的三元表达式 / Promise 的 `.then` 与 `.catch`；遇 `UTS110111163`、`UTS110111119`、`UTS110111120`、`error1`、`error17`、`error18`、`error25`、`NoSuchMethodError`、`Expression expected` |
+| [references/1-uts-syntax.md](references/1-uts-syntax.md) | **1 UTS 强类型系统与语法核心铁律**（25 条） | 定义对象结构与类型标注、写 `export` / `class` / 闭包 / 定时器回调 / 集合遍历 / 联合类型上的三元表达式 / Promise 的 `.then` 与 `.catch`；遇 `UTS110111163`、`UTS110111119`、`UTS110111120`、`error1`、`error17`、`error18`、`error25`、`NoSuchMethodError`、`Expression expected`、运行期 `ReferenceError: XxxPageResult is not defined` |
 | [references/2-styling.md](references/2-styling.md) | **2 样式 (CSS & Tailwind) 与原生渲染铁律**（23 条） | 写 `.scss` / Tailwind 工具类；处理按钮与文本排版、安全区、高度单位、阴影边框、字号字重、行内嵌套样式、样式不生效或表现不一致 |
 | [references/3-runtime.md](references/3-runtime.md) | **3 跨端运行时与渲染模式约束**（25 条） | VDOM / Android VDOM / Vapor 差异、多平台门面分流与条件编译、UTS 插件与自定义基座、**第三方组件（选项式 `.vue`）是否可用**、Markdown 渲染、真机与 Kotlin 报错、编译验证命令选择 |
 | [references/4-examples.md](references/4-examples.md) | **4 项目正确案例**（5 个生产级标杆案例） | 新建页面、搭「上固定 + 下滚动」骨架、算可用高度、写 TabBar 页与下拉刷新、写二级 / 子包页、用 Easycom 引组件 —— **优先照抄，不要自创结构** |
@@ -108,6 +108,7 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 | **环境变量与服务地址读取** | 手写 `process.env` / `import.meta.env` 或在代码里硬编码域名 IP（原生平台无法识别且切换环境易出错） | 统一从 `@/src/utils/env/index.uts` 引入具名方法（`getApiBaseUrl()`、`getOssBaseUrl()`、`isDev()`、`isProd()`、`isVaporMode()`）（详见 **分册 8**） |
 | **页面跳转与路由控制** | 直接调用原生 `uni.navigateTo` 等且未做参数编码与越界防护 | 优先引入 `@/src/router/index.uts` 的路由封装方法（如 `toLoginPage()`、`cleanPath()`、`getCurrentPath()`、`parseUrlToObj()` 或 `route` 单例，详见 **分册 8**） |
 | **LeakCanary 报 Activity 内存泄漏（`mDestroyed = true`）** | 页面或根容器组件（如 `App.ku.uvue`）通过 `uni.$on` 注册全局监听但**未在 `onUnmounted` 中通过 `uni.$off` 注销**（或直接传入匿名函数无法解绑）；全局单例 `IndexKt.emitter` 永久持有页面回调，导致退出页面后原生 Activity 无法被 GC 回收 | 回调函数必须抽离为**具名函数**，`onMounted` 注册，`onUnmounted` 必须严格调用 `uni.$off(eventName, handler)` 注销（详见 **3.26**） |
+| **`ReferenceError: XxxPageResult is not defined`**（**编译期零报错，运行期才炸**，且常被页面的 `try/catch` 吞成「列表渲染不出来 + 一条 `console.error`」） | 在 `as` 断言位置写「**泛型实例化别名**」：`} as FooPageResult);`（而 `type FooPageResult = PageResult<FooItem>`）—— UTS 把 `as` 断言**编译成构造调用** `new FooPageResult({...})`，但别名只是编译期 `type`、**没有任何运行期绑定**（编译器只为泛型本体生成 `class PageResult`）⇒ 产物里留下一个指向不存在标识符的 `new` | 断言**直写泛型本体、实参写全**：`} as PageResult<FooItem>);`；别名只允许出现在**类型位置**（返回值标注 / 回调参数标注）。口诀：**`as` / `new` 后面不许出现泛型实例化别名，`:` 后面可以**。判据必须落到产物上：`grep -rn "new [A-Za-z_]*PageResult(" unpackage/dist/dev/mp-weixin/src/api/*.js`（单测走 esbuild 转译、**不复现**这一层，全绿也照样有坑；详见 **1.25**） |
 
 ---
 
@@ -155,3 +156,4 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 - [ ] **38. 组件实例方法动态调用严禁强转 `as any` 后调用 `$callMethod`**（UTS 强类型系统对 `any` 不支持动态方法反射，写 `(el as any).$callMethod(...)` 会报 `error18 找不到名称“$callMethod”`；必须保持 `ref<ComponentPublicInstance | null>(null)` 强类型并调用 `el.value?.$callMethod(...)`，见 1.23）
 - [ ] **39. `<web-view>` 组件的 `@message` 事件入参必须显式声明为 `UniWebViewMessageEvent`**（严禁将入参声明为 `(e: any)` 或省略类型后直接访问 `e.detail`，UTS 强类型检查会报 `找不到名称“detail”`；必须显式声明为官方事件强类型 `(e: UniWebViewMessageEvent)`，见 1.24）
 - [ ] **40. 严禁在页面或组件中使用 `uni.$on` 注册全局事件后不执行 `uni.$off` 注销**（全局单例 `IndexKt.emitter` 生命周期贯穿整个应用进程，未注销的回调闭包会死死抓取组件实例、DOM 树及 `UniPortraitPageActivity`，导致每次进出页面都泄露一个完整的原生 Activity，被 LeakCanary 报内存泄漏；监听回调必须抽为具名函数，在 `onMounted` 注册，并在 `onUnmounted` 中调用 `uni.$off` 严格注销，见 3.26）
+- [ ] **41. 「泛型实例化别名」（如 `type FooPageResult = PageResult<FooItem>`）严禁出现在 `as` 断言位置**（UTS 把 `as` 断言编译成**构造调用**，写 `} as FooPageResult);` 会生成 `new FooPageResult({...})`，而别名只是编译期 `type`、**没有任何运行期绑定**（编译器只为泛型本体生成 `class PageResult`）⇒ 产物里留下指向不存在标识符的 `new`，**编译期零报错零警告**、运行期抛 `ReferenceError: FooPageResult is not defined`，且常被页面 `try/catch` 吞成「列表渲染不出来 + 一条 `console.error`」而被误判为网络问题；断言必须**直写泛型本体、实参写全** `} as PageResult<FooItem>);`，别名只允许出现在类型位置（返回值标注 / 回调参数标注）；口诀「`as` / `new` 后面不许出现泛型实例化别名，`:` 后面可以」。**判据必须落到产物上**：`grep -rn "new [A-Za-z_]*PageResult(" unpackage/dist/dev/mp-weixin/src/api/*.js` —— 单测走 esbuild 转译、**不复现**这一层，全绿也照样有坑，见 1.25）

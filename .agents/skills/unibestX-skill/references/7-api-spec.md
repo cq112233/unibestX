@@ -85,6 +85,7 @@ src/api/<page>/
   ```
 
 - **弱类型必须在 api 层就地转强类型，严禁 `UTSJSONObject` 出 api 层**：后端返回的对象要在 api 层用 `getString` / `getNumber` / `getBoolean` + `??` 兜底映射成强类型 DTO 再 `return`；**严禁把 `UTSJSONObject` 直接抛给页面**，否则页面模板里必然踩 `UTS110111163` / `error17` / 运行期 `ClassCastException`；
+- **`PageResult<T>` 严禁用「泛型实例化别名」做 `as` 断言**：`} as PageResult<WallpaperItem>);` ✅，`type WallpaperPageResult = PageResult<WallpaperItem>` 后写 `} as WallpaperPageResult);` ❌ —— UTS 把 `as` 断言编译成构造调用 `new WallpaperPageResult({...})`，而别名只是编译期 `type`、**没有运行期绑定**，产物里留下指向不存在标识符的 `new`，**编译期零报错**、运行期抛 `ReferenceError`（详见 `SKILL.md` A.2 第 41 条与 1.25）。**别名只允许出现在类型位置**（返回值标注 / 回调参数标注）；
 - **api 层内部也要守住原生安全取值**：数组下标读取先做边界检查（`i < arr.length && arr[i]`）、可能为 null 的字段做 `as` 断言前先判空（`SKILL.md` A.2 第 18 / 19 条）。
 
 ---
