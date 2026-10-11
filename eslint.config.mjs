@@ -287,8 +287,11 @@ configs.push({
     'uts/uvue-no-important-modifier': 'error',
     // 启用 UVUE/Vue 模板未导入组件检测与一键快速修复导入（Code Action 自动导入）
     'uts/auto-import-component': 'warn',
-    // 启用未定义符号/函数检测与一键快速修复导入（Code Action 自动导入函数与变量，未导入立即爆红报错）
-    'uts/auto-import-symbol': 'error',
+    // 启用未定义符号/函数/类型检测与一键快速修复导入（Code Action 自动导入函数与变量）。
+    // 等级定为 warn：框架原生类型（如文件系统 RmDirOptions / WriteFileOptions 等）只存在于
+    // HBuilderX 内置 dts，ESLint 作用域解析不到，属「类型没有 / 类型不对」的正常提示，
+    // 只需黄色警告，不应中断 CI（warn 仍会产出报告，快速修复 Code Action 不受等级影响）。
+    'uts/auto-import-symbol': 'warn',
     // 启用 UVUE/Vue 模板静态 class 属性与标签内部多余换行、连续空行与首尾空格自动收敛清理
     'uts/uvue-clean-template-whitespace': 'error'
   }
@@ -336,6 +339,9 @@ configs.push({
       onReady: 'readonly',
       onHide: 'readonly',
       onUnload: 'readonly',
+      // 组合式 API 中「组件内」监听所在页面显示/隐藏的钩子（对应页面 onShow / onHide）
+      onPageShow: 'readonly',
+      onPageHide: 'readonly',
       onPullDownRefresh: 'readonly',
       onReachBottom: 'readonly',
       onBackPress: 'readonly',
@@ -366,6 +372,8 @@ configs.push({
       RequestTask: 'readonly',
       UploadTask: 'readonly',
       DownloadTask: 'readonly',
+      // 原生下载进度回调入参类型（DownloadTask.onProgressUpdate 的参数）
+      OnProgressDownloadResult: 'readonly',
       // uni-app X 原生路由事件类型（onBeforeAppRoute / onAppRoute 回调参数，5.25+）
       BeforeAppRouteEvent: 'readonly',
       AppRouteEvent: 'readonly',

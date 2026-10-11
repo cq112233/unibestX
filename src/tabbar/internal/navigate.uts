@@ -110,15 +110,17 @@ export function initNativeMidButtonTap(): void {
   if (!isNativeTabbar || customTabbarConfig.midButton == null) {
     return;
   }
-  // #ifndef MP-WEIXIN
+  // #ifndef MP
   try {
     const mid = customTabbarConfig.midButton;
     const targetUrl = (mid != null && mid.pagePath != null && mid.pagePath!.length > 0)
       ? mid.pagePath!
       : '/src/pages/ai/ai';
-    uni.onTabBarMidButtonTap(() => {
+    // 显式标注回调类型，规避 UTS 无法推断匿名函数参数类型（error23）
+    const onMidButtonTap: () => void = (): void => {
       handleClickBulge(targetUrl);
-    });
+    };
+    uni.onTabBarMidButtonTap(onMidButtonTap);
   }
   catch (e) {
     console.warn('onTabBarMidButtonTap registration error', e);

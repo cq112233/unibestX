@@ -581,7 +581,7 @@ function calculateCacheSize(showToast: boolean): void {
     const fsm = uni.getFileSystemManager();
     fsm.readdir({
       dirPath: path,
-      success: (res) => {
+      success: (res: ReadDirSuccessResult) => {
         const files = res.files;
         cacheFileCount.value = files.length;
 
@@ -599,7 +599,7 @@ function calculateCacheSize(showToast: boolean): void {
           const fullPath = `${path}/${fileName}`;
           fsm.getFileInfo({
             filePath: fullPath,
-            success: (info) => {
+            success: (info: GetFileInfoSuccessResult) => {
               totalBytes += info.size;
               pending--;
               if (pending <= 0) {
@@ -618,7 +618,7 @@ function calculateCacheSize(showToast: boolean): void {
                 }
               }
             }
-          });
+          } as GetFileInfoOptions);
         }
       },
       fail: (err) => {
@@ -629,7 +629,7 @@ function calculateCacheSize(showToast: boolean): void {
           uni.showToast({ title: '已刷新缓存信息', icon: 'none' });
         }
       }
-    });
+    } as ReadDirOptions);
   }
   catch (e) {
     console.error('getFileSystemManager error:', e);
@@ -675,7 +675,7 @@ function handleClearFileCache(): void {
         const fsm = uni.getFileSystemManager();
         fsm.readdir({
           dirPath: path,
-          success: (res) => {
+          success: (res: ReadDirSuccessResult) => {
             const files = res.files;
             if (files.length == 0) {
               uni.hideLoading();
@@ -717,9 +717,9 @@ function handleClearFileCache(): void {
                     complete: () => {
                       onFileDone();
                     }
-                  });
+                  } as RmDirOptions);
                 }
-              });
+              } as UnLinkOptions);
             }
           },
           fail: () => {
@@ -728,7 +728,7 @@ function handleClearFileCache(): void {
             cacheFileCount.value = 0;
             uni.showToast({ title: '文件缓存清理完成', icon: 'success' });
           }
-        });
+        } as ReadDirOptions);
       }
       catch (e) {
         uni.hideLoading();
@@ -774,7 +774,7 @@ function handleClearAll(): void {
         const fsm = uni.getFileSystemManager();
         fsm.readdir({
           dirPath: path,
-          success: (res) => {
+          success: (res: ReadDirSuccessResult) => {
             const files = res.files;
             if (files.length == 0) {
               uni.hideLoading();
@@ -817,9 +817,9 @@ function handleClearAll(): void {
                     complete: () => {
                       onAllDone();
                     }
-                  });
+                  } as RmDirOptions);
                 }
-              });
+              } as UnLinkOptions);
             }
           },
           fail: () => {
@@ -829,7 +829,7 @@ function handleClearAll(): void {
             calculateCacheSize(false);
             uni.showToast({ title: '清理完成', icon: 'success' });
           }
-        });
+        } as ReadDirOptions);
       }
       catch (e) {
         uni.hideLoading();
@@ -898,7 +898,7 @@ function handleGenerateTestCache(): void {
         console.warn('writeFile fail:', err);
         uni.showToast({ title: '写入测试缓存失败', icon: 'none' });
       }
-    });
+    } as WriteFileOptions);
   }
   catch (e) {
     uni.hideLoading();
