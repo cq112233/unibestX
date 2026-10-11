@@ -336,6 +336,9 @@ configs.push({
       onReady: 'readonly',
       onHide: 'readonly',
       onUnload: 'readonly',
+      // 组合式 API 中「组件内」监听所在页面显示/隐藏的钩子（对应页面 onShow / onHide）
+      onPageShow: 'readonly',
+      onPageHide: 'readonly',
       onPullDownRefresh: 'readonly',
       onReachBottom: 'readonly',
       onBackPress: 'readonly',
@@ -366,6 +369,8 @@ configs.push({
       RequestTask: 'readonly',
       UploadTask: 'readonly',
       DownloadTask: 'readonly',
+      // 原生下载进度回调入参类型（DownloadTask.onProgressUpdate 的参数）
+      OnProgressDownloadResult: 'readonly',
       // uni-app X 原生路由事件类型（onBeforeAppRoute / onAppRoute 回调参数，5.25+）
       BeforeAppRouteEvent: 'readonly',
       AppRouteEvent: 'readonly',

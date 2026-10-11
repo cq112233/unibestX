@@ -19,8 +19,7 @@
       <!-- 导航栏内容区 -->
       <view class="navbar-content" :style="{ height: `${NAVBAR_CONTENT_HEIGHT}px` }">
         <!-- 左侧返回按钮区域（支付宝小程序不渲染，使用原生返回栏） -->
-        <!-- #ifndef MP-ALIPAY -->
-        <view class="navbar-left">
+        <view v-if="!isAlipayMp" class="navbar-left">
           <slot name="left">
             <view v-if="showBack" class="navbar-back-btn" @click="handleBack">
               <view class="navbar-back-icon">
@@ -39,13 +38,13 @@
             </view>
           </slot>
         </view>
-        <!-- #endif -->
 
         <!-- 中间标题区域 -->
         <view class="navbar-mid">
           <slot name="mid">
             <slot>
-              <text v-if="title.length > 0" class="navbar-title" :style="{ color: effectiveTitleColor }">{{ title }}</text>
+              <!-- 支付宝小程序不显示标题，使用原生返回栏 -->
+              <text v-if="title.length > 0 && !isAlipayMp " class="navbar-title" :style="{ color: effectiveTitleColor }">{{ title }}</text>
             </slot>
           </slot>
         </view>
@@ -65,7 +64,7 @@
 
 <script setup lang="uts">
 import { computed } from 'vue';
-import { NAVBAR_CONTENT_HEIGHT, safeAreaInsets, systemInfo } from '@/src/utils/systemInfo/index.uts';
+import { isAlipayMp, NAVBAR_CONTENT_HEIGHT, safeAreaInsets, systemInfo } from '@/src/utils/systemInfo/index.uts';
 import { useThemeStore } from '@/src/store';
 import { getThemeTokens } from '@/src/theme/index.uts';
 import type { ThemeTokens } from '@/src/theme/index.uts';
@@ -108,6 +107,11 @@ const props = defineProps({
   hideStatusBar: {
     type: Boolean,
     default: false
+  },
+  /** 页面 style 完整配置对象（未拍平，包含 navigationBarTitleText, enablePullDownRefresh 等） */
+  pageStyleObj: {
+    type: Object,
+    default: () => ({})
   }
 });
 
