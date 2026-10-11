@@ -367,6 +367,81 @@ declare global {
     complete?: (result: any) => void;
   };
 
+  // ==========================================
+  // 文件系统管理 (uni.getFileSystemManager)
+  // 框架类型仅存在于 HBuilderX 内置 dts，项目 types 未引入，
+  // 故在此按官方签名补齐，供 IDE (Volar) 解析，避免 "Xxx is not defined"。
+  // ==========================================
+
+  /** fsm.readdir 成功回调参数 */
+  type ReadDirSuccessResult = {
+    /** 目录下的文件名列表 */
+    files: string[];
+    errMsg?: string;
+  };
+
+  /** fsm.readdir 的参数 */
+  type ReadDirOptions = {
+    /** 要读取的目录路径 (本地路径) */
+    dirPath: string;
+    success?: ((res: ReadDirSuccessResult) => void) | null;
+    fail?: ((err: any) => void) | null;
+    complete?: ((res: any) => void) | null;
+  };
+
+  /** fsm.getFileInfo 成功回调参数 */
+  type GetFileInfoSuccessResult = {
+    /** 按照传入的 digestAlgorithm 计算得出的文件摘要 */
+    digest: string;
+    /** 文件大小，以字节为单位 */
+    size: number;
+    errMsg?: string;
+  };
+
+  /** fsm.getFileInfo 的参数 */
+  type GetFileInfoOptions = {
+    /** 要读取的文件路径 (本地路径) */
+    filePath: string;
+    /** 计算文件摘要的算法 */
+    digestAlgorithm?: 'md5' | 'sha1' | null;
+    success?: ((res: GetFileInfoSuccessResult) => void) | null;
+    fail?: ((err: any) => void) | null;
+    complete?: ((res: any) => void) | null;
+  };
+
+  /** fsm.rmdir 的参数 */
+  type RmDirOptions = {
+    /** 要删除的目录路径 (本地路径) */
+    dirPath: string;
+    /** 是否递归删除目录 */
+    recursive: boolean;
+    success?: ((res: any) => void) | null;
+    fail?: ((err: any) => void) | null;
+    complete?: ((res: any) => void) | null;
+  };
+
+  /** fsm.unlink 的参数 */
+  type UnLinkOptions = {
+    /** 文件路径，只支持绝对地址 */
+    filePath: string;
+    success?: ((res: any) => void) | null;
+    fail?: ((err: any) => void) | null;
+    complete?: ((res: any) => void) | null;
+  };
+
+  /** fsm.writeFile 的参数 */
+  type WriteFileOptions = {
+    /** 文件路径，只支持绝对地址 */
+    filePath: string;
+    /** 字符编码 */
+    encoding?: 'ascii' | 'base64' | 'utf-8';
+    /** 写入的内容 */
+    data: string | ArrayBuffer;
+    success?: ((res: any) => void) | null;
+    fail?: ((err: any) => void) | null;
+    complete?: ((res: any) => void) | null;
+  };
+
   function onLaunch(callback: (options?: any) => void): void;
   function onShow(callback: (options?: any) => void): void;
   function onHide(callback: () => void): void;

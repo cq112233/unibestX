@@ -690,7 +690,6 @@ onDeactivated((): void => {
 
 // 标题变化（含语言切换、单页 TabBar 切换、动态 setNavbarTitle）时同步页面标题
 watch(displayTitle, (newTitle: string): void => {
-  console.log(newTitle, 'newTitle');
   syncPageTitle(newTitle);
 });
 
