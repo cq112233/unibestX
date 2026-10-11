@@ -835,3 +835,94 @@ export * from './vdom/user.uts';
   ```
 
 ---
+
+## 1.25 「泛型实例化别名」严禁出现在 `as` 断言位置 —— 会被编译成 `new 别名(...)`，别名无运行期绑定，抛 `ReferenceError`
+
+- **报错现象**（本项目实测，mp-weixin 真机 / 开发者工具运行期）：
+
+  ```text
+  httpBasicDemo.js:123 loadMockData error: <ReferenceError: FooPageResult is not defined>
+  ReferenceError: FooPageResult is not defined
+      at fetchFooList (.../getmainpackagebundle.js:1136:32)
+      at Object.getFooList (.../getmainpackagebundle.js:1231:12)
+      at .../getsubpackagebundle_src%2Fsub%2F.js:1529:49
+  ```
+
+  注意**编译期一声不吭**：没有 error、没有 warn，构建日志照样 `编译成功`，只在运行期炸。而 `getFooList()` 又恰好被页面的 `try/catch` 包着，最终只表现为「列表渲染不出来 + 一条 `console.error`」，极易被误判成网络问题。
+
+- **错误写法**：
+
+  ```uts
+  export type PageResult<T> = {
+    list: Array<T>;
+    hasMore: boolean;
+    total: number;
+  };
+
+  // ⚠️ 泛型实例化别名：别名 = 泛型本体 + 实参
+  export type FooPageResult = PageResult<FooItem>;
+
+  export function fetchFooList(): Promise<FooPageResult> {
+    return Promise.resolve({
+      list,
+      hasMore: false,
+      total: 0
+    } as FooPageResult);          // ❌ 断言位置写了别名
+  }
+  ```
+
+- **底层原理（关键）**：
+  UTS 编译器把 `as <类型>` 断言**编译成构造调用**（`new <类型>({...})`），而不是纯类型标注 —— 这是 UTS 为「对象字面量 → 强类型实例」做的转换。此时它会直接取断言里写的那个**名字**去构造：
+
+  | 源码 | 编译产物（JS 层） |
+  | :--- | :--- |
+  | `} as PageResult<FooItem>);` | `return Promise.resolve(new PageResult({ ... }));` ✅ |
+  | `} as FooPageResult);` | `return Promise.resolve(new FooPageResult({ ... }));` ❌ |
+
+  而 `FooPageResult` 只是**编译期的 `type` 别名**，编译器为泛型本体生成了 `class PageResult`，**不会**为「别名」再生成任何运行期绑定 ⇒ 产物里出现了一个指向不存在标识符的 `new` ⇒ 运行期 `ReferenceError`。
+
+- **跨端一致性**：本项目实测该缺陷**同时存在于四端产物**（`grep -rl "new FooPageResult" unpackage/` 命中 mp-weixin、app-ios、app-harmony、app-android 的 dist 与 cache），不是某个平台的孤例 —— 只要断言里写了泛型实例化别名，各端都会带上这个坏引用。
+
+- **强制规范**：
+  1. **断言必须直写泛型本体**（`as PageResult<FooItem>`），把实参写全，严禁图省事写别名；
+  2. 别名**只能出现在类型位置** —— 返回值标注（`Promise<FooPageResult>`）、回调参数标注（`(res: FooPageResult)`）、变量标注（`const r: FooPageResult = ...`）都合法，因为这些位置**不产生运行期代码**（本项目同一文件里这两处写法实测编译通过）；
+  3. 判断口诀：**「`as` 后面 / `new` 后面」不许出现泛型实例化别名；「`:` 后面」可以。**
+
+- **正反例**：
+
+  ```uts
+  // ❌ 错误：断言里写泛型实例化别名 ⇒ 产物 new FooPageResult(...) ⇒ 运行期 ReferenceError
+  return Promise.resolve({
+    list,
+    hasMore: false,
+    total: 0
+  } as FooPageResult);
+
+  // ✅ 正确：断言直写泛型本体，实参写全
+  return Promise.resolve({
+    list,
+    hasMore: false,
+    total: 0
+  } as PageResult<FooItem>);
+
+  // ✅ 正确：别名用在类型位置（返回值标注 / 回调参数标注）是安全的
+  export function fetchFooList(): Promise<FooPageResult> {
+    return fetchFooListRaw().then((res: FooPageResult): Array<FooItem> => res.list);
+  }
+  ```
+
+- **同类排查手法**（一条命令扫全仓，防复发）：
+
+  ```bash
+  # 1) 先列出所有「泛型实例化别名」定义
+  grep -rn "^export type [A-Za-z_]* = [A-Za-z_]*<" --include="*.uts" src
+  # 2) 再查这些别名是否被写进了 as 断言位置
+  grep -rn "as [A-Za-z_]*PageResult\b\|as [A-Za-z_]*Result\b" --include="*.uts" --include="*.uvue" src | grep -v "as PageResult<"
+  # 3) 最终判据落到产物上（编译成功不等于没坏引用）
+  grep -rn "new [A-Za-z_]*PageResult(" unpackage/dist/dev/mp-weixin/src/api/*.js
+  ```
+
+- **验证方式（本项目实测有效）**：
+  单测走的是 esbuild 转译，**不会**复现 UTS 这一层编译行为，因此这类问题单测全绿也照样存在。必须落到产物上：重新编译目标平台后 `grep` 产物，确认「坏引用」已消失、只剩 `new PageResult({...})`（判定方法见 3.15）。
+
+---
