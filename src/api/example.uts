@@ -3,16 +3,16 @@
 //
 // 本文件不对应具体页面，因此不受分册 7 的「一页一目录」落位约束；
 // 它的用途是演示 api 层的标准写法：契约类型 / mock 数据集 / 接口函数三块，
-// 以及 http.get / uploadFile 的正确调用方式，供新增页面时照抄。
+// 以及 http.get / http.upload 的正确调用方式，供新增页面时照抄。
 //
 // 新增真实页面请一律建 src/api/<页面目录名>/<页面目录名>.uts，不要改本文件。
 // ==========================================
 
-import { API_DOMAINS, DEFAULT_OSS_UPLOAD_PATH, http, uploadFile } from '@/src/http/index.uts';
-import type { UploadFileOptions } from '@/src/http/index.uts';
+import { getOssUploadPath } from '@/src/config/index.uts';
+import { API_DOMAINS, http } from '@/src/http/index.uts';
 import type { LimeRequestConfig } from '@/uni_modules/lime-request';
 
-export const FOO_UPLOAD_PATH: string = DEFAULT_OSS_UPLOAD_PATH;
+export const FOO_UPLOAD_PATH: string = getOssUploadPath();
 
 // ==========================================
 // 1. 类型定义（遵循规范：一律使用 type，严禁 interface）
@@ -158,12 +158,16 @@ export function uploadFooFile(
   ignoreAuth: boolean = false,
   uploadPathOrUrl: string = FOO_UPLOAD_PATH
 ): Promise<string> {
-  return uploadFile({
-    url: uploadPathOrUrl,
+  const extra = {} as UTSJSONObject;
+  if (ignoreAuth) {
+    extra.set('ignoreAuth', true);
+  }
+  const config = {
     filePath,
-    formData: null,
-    ignoreAuth
-  } as UploadFileOptions);
+    name: 'file',
+    extra
+  } as LimeRequestConfig;
+  return http.upload<string>(uploadPathOrUrl, config);
 }
 
 // ==========================================

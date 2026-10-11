@@ -86,7 +86,6 @@ const EXTRA_SOURCES = [
   path.join(ROOT, 'src/api/auth/auth.uts'),
   path.join(ROOT, 'src/http/index.uts'),
   path.join(ROOT, 'src/http/request/request.uts'),
-  path.join(ROOT, 'src/http/upload/upload.uts'),
   path.join(ROOT, 'src/http/stream/stream.uts'),
   path.join(ROOT, 'src/http/error/error.uts'),
   path.join(ROOT, 'src/utils/report/track.uts'),

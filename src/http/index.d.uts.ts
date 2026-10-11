@@ -31,30 +31,174 @@ export declare function resolveErrorMessage(rawMessage: string, code: number = -
 /** 列表 / 页面失败时的默认提示 */
 export declare function defaultFailMessage(rawMessage: string = ''): string;
 
-export { ContentTypeEnum, ResultEnum, ShowMessage } from './internal/enum.uts';
-
-export { abortAllHttp, abortHttp } from './internal/lifecycle.uts';
-
-export { clearCache } from './internal/lifecycle.uts';
+/**
+ * 请求前置钩子函数类型（支持同步函数或返回 Promise 的 async 异步函数）
+ */
+export type BeforeRequestHook = (config: LimeRequestConfig) => any;
 
 /**
- * 通用响应格式（兼容 message 与 msg 字段）
+ * 响应成功后置钩子函数类型（支持转换/解包数据，支持 async 异步函数）
  */
-export type IResponse<T> = {
-  code: number;
-  data: T;
-  message: string;
-  msg?: string;
+export type AfterResponseSuccessHook = (data: any, config: LimeRequestConfig) => any;
+
+/**
+ * 响应失败后置钩子函数类型（可执行统一错误提示等副作用，支持 async 异步函数）
+ */
+export type AfterResponseErrorHook = (err: any, config: LimeRequestConfig) => any;
+
+/**
+ * 请求完成拦截钩子函数类型（对齐 Alova onComplete，无论成功、失败或命中缓存均触发）
+ */
+export type AfterResponseCompleteHook = (config: LimeRequestConfig) => any;
+
+/**
+ * 复合响应拦截器配置对象（完全对齐 Alova responded: { onSuccess, onError, onComplete }）
+ */
+export type RespondedOptions = {
+  onSuccess?: AfterResponseSuccessHook;
+  onError?: AfterResponseErrorHook;
+  onComplete?: AfterResponseCompleteHook;
 };
 
-export type ApiDomainConfig = {
-  DEFAULT: string;
-  SECONDARY: string;
+/**
+ * 兼容别名
+ */
+export type AfterResponseOptions = RespondedOptions;
+
+/**
+ * 令牌刷新函数类型
+ */
+export type RefreshTokenFn = () => Promise<boolean>;
+
+/**
+ * 未授权/登录过期处理器类型
+ */
+export type UnauthorizedFn = () => void;
+
+/**
+ * 请求适配器函数类型（接收基础配置，返回底层 Request 实例，对齐 Alova requestAdapter 规范）
+ */
+export type HttpRequestAdapter = (config: LimeRequestConfig) => Request;
+
+/**
+ * HttpClient 实例化配置选项
+ */
+export type HttpClientOptions = {
+  baseURL: string;
+  timeout?: number;
+  header?: UTSJSONObject;
+  dataType?: string;
+  responseType?: string;
+  sslVerify?: boolean;
+  withCredentials?: boolean;
+  /**
+   * 请求适配器（对齐 Alova requestAdapter 规范，解耦底层网络驱动）
+   */
+  requestAdapter?: HttpRequestAdapter;
+  /**
+   * 底层 Request 实例（可选，支持外部直接传入已初始化的 client）
+   */
+  client?: Request;
+  /**
+   * 请求生命周期管理器（可选，支持自定义或共享生命周期）
+   */
+  lifecycle?: RequestLifecycle;
+  beforeRequest?: BeforeRequestHook;
+  afterResponse?: any;
+  responded?: any;
+  respondedOptions?: RespondedOptions;
+  refreshToken?: RefreshTokenFn;
+  onUnauthorized?: UnauthorizedFn;
 };
 
-export declare const API_DOMAINS: ApiDomainConfig;
+/**
+ * 401 哨兵：拦截器抛出它表示「应尝试刷新并重放」，由 HttpClient.request 捕获。
+ */
+export declare const REFRESHABLE_401: string;
 
+/**
+ * 从未知错误对象中安全提取错误文案。
+ * 兼容 Error 实例、LimeRequestFail、UTSJSONObject、普通 JS 对象与字符串。
+ */
+export declare function extractErrorMessage(err: any): string;
+
+/** 判断错误是否为拦截器抛出的「可刷新 401」哨兵 */
+export declare function isRefreshable401(err: any): boolean;
+
+/** 浅拷贝请求配置：重放时不能复用已被拦截器改写的对象，同时保留 getTask 等回调字段 */
+export declare function cloneConfig(config: LimeRequestConfig): LimeRequestConfig;
+
+/**
+ * 把任意错误（包括 LimeRequestFail）安全地转成 Error，供抛出使用。
+ */
+export declare function toError(err: any): Error;
+
+/**
+ * 通用 HTTP 客户端控制器
+ */
 export declare class HttpClient {
+  private client: Request;
+
+  private lifecycle: RequestLifecycle;
+
+  private beforeRequestHooks: Array<BeforeRequestHook>;
+
+  private afterSuccessHooks: Array<AfterResponseSuccessHook>;
+
+  private afterErrorHooks: Array<AfterResponseErrorHook>;
+
+  private afterCompleteHooks: Array<AfterResponseCompleteHook>;
+
+  private refreshTokenHandler: RefreshTokenFn | null;
+
+  private unauthorizedHandler: UnauthorizedFn | null;
+
+  constructor(options: HttpClientOptions | null = null);
+
+  private setupInterceptors(): void;
+
+  beforeRequest(hook: BeforeRequestHook): HttpClient;
+
+  removeBeforeRequest(hook: BeforeRequestHook): void;
+
+  clearBeforeRequest(): void;
+
+  afterResponse(
+    onSuccessOrOptions: any | null = null,
+    onError: AfterResponseErrorHook | null = null,
+    onComplete: AfterResponseCompleteHook | null = null
+  ): HttpClient;
+
+  responded(
+    onSuccessOrOptions: any | null = null,
+    onError: AfterResponseErrorHook | null = null,
+    onComplete: AfterResponseCompleteHook | null = null
+  ): HttpClient;
+
+  removeAfterResponse(
+    onSuccess: AfterResponseSuccessHook | null = null,
+    onError: AfterResponseErrorHook | null = null,
+    onComplete: AfterResponseCompleteHook | null = null
+  ): void;
+
+  clearAfterResponse(): void;
+
+  private async applyBeforeRequest(config: LimeRequestConfig): Promise<LimeRequestConfig>;
+
+  private async applyAfterSuccess<T>(data: T, config: LimeRequestConfig): Promise<T>;
+
+  private async applyAfterError<T>(err: any, config: LimeRequestConfig): Promise<T>;
+
+  private async applyAfterComplete(config: LimeRequestConfig): Promise<void>;
+
+  abort(requestKey: string): void;
+
+  abortAll(): void;
+
+  clearCache(fingerprint: string = ''): void;
+
+  getLifecycle(): RequestLifecycle;
+
   request<T>(config: LimeRequestConfig): Promise<T>;
 
   private execute<T>(config: LimeRequestConfig, fingerprint: string, cacheTtl: number): Promise<T>;
@@ -78,7 +222,86 @@ export declare class HttpClient {
   upload<T>(url: string, config: LimeRequestConfig | null = null): Promise<T>;
 }
 
+export { ContentTypeEnum, ResultEnum, ShowMessage } from './internal/enum.uts';
+
+export { defaultLifecycle, HttpLifecycle, RequestLifecycle } from './internal/lifecycle.uts';
+
+/**
+ * 通用响应格式（兼容 message 与 msg 字段）
+ */
+export type IResponse<T> = {
+  code: number;
+  data: T;
+  message: string;
+  msg?: string;
+};
+
+export type ApiDomainConfig = {
+  DEFAULT: string;
+  SECONDARY: string;
+};
+
+export declare const API_DOMAINS: ApiDomainConfig;
+
+/**
+ * 默认请求适配器：基于 lime-request 实例化底层网络驱动客户端
+ */
+export declare function defaultRequestAdapter(config: LimeRequestConfig): Request;
+
+/**
+ * 业务默认请求前置拦截钩子：处理业务 Token 鉴权与注入
+ */
+export declare function defaultBusinessBeforeRequest(config: LimeRequestConfig): void;
+
+/**
+ * 业务默认响应成功钩子：状态码判定、业务 code 校验、Toast 提示、业务 401 标记与数据解包
+ */
+export declare function defaultBusinessAfterSuccess(data: any, config: LimeRequestConfig): any;
+
+/**
+ * 业务默认响应失败钩子：统一网络错误提示
+ */
+export declare function defaultBusinessAfterError(err: any, _config: LimeRequestConfig): void;
+
+/**
+ * 业务默认响应完成钩子：请求收尾处理（无论成功、失败或命中缓存均会执行）
+ */
+export declare function defaultBusinessAfterComplete(_config: LimeRequestConfig): void;
+
+/**
+ * 默认基础 HTTP 配置选项（集成业务 Token 注入、统一错误提示与无感刷新）
+ */
+export declare const DEFAULT_HTTP_OPTIONS: HttpClientOptions;
+
+/**
+ * 工厂函数：统一创建并生成 HttpClient 实例
+ */
+export declare function createHttpClient(options: HttpClientOptions | null = null): HttpClient;
+
+/**
+ * 全局默认 HTTP 客户端单例（使用 createHttpClient 工厂模式创建生成）
+ */
 export declare const http: HttpClient;
+
+/**
+ * 便捷函数：取消指定 requestKey 的在飞请求（委托给默认 http 实例）
+ */
+export declare function abortHttp(requestKey: string): void;
+
+/**
+ * 便捷函数：取消全部在飞请求（委托给默认 http 实例）
+ */
+export declare function abortAllHttp(): void;
+
+/**
+ * 便捷函数：清除缓存（委托给默认 http 实例）
+ */
+export declare function clearCache(fingerprint: string = ''): void;
+
+/**
+ * 便捷函数：文件上传（委托给默认 http 实例）
+ */
+export declare function uploadHttp(url: string, config: LimeRequestConfig | null = null): Promise<T>;
 
 export default http;
 
@@ -144,89 +367,3 @@ export declare function simulateStream(
   chunkSize: number = 6,
   intervalMs: number = 90
 ): Observable<StreamChunk>;
-
-export type UploadFileOptions = {
-  url?: string;
-  filePath: string;
-  name?: string;
-  header?: UTSJSONObject;
-  formData?: UTSJSONObject;
-  ignoreAuth?: boolean;
-  onProgress?: (progress: number) => void;
-};
-
-/**
- * 默认 OSS 上传基础域名与接口路径（支持直接在 .env 中配置 VITE_UPLOAD_BASEURL 与 VITE_UPLOAD_PATH）
- */
-export declare const DEFAULT_OSS_BASE_URL: string;
-
-export declare const DEFAULT_OSS_UPLOAD_PATH: string;
-
-export declare const DEFAULT_OSS_UPLOAD_URL: string;
-
-/**
- * 使用 uni.uploadFile 统一封装的文件上传函数（App / 小程序 / H5 全端通用）
- * - 统一原生 uni.uploadFile 底层调用
- * - 支持传入完整 URL 或仅传入相对路径（如 /gateway/... 自动拼接 base URL）
- * - 自动携带 Token（可传 ignoreAuth: true 跳过）
- * - 支持 onProgress 上传进度回调
- * - 严格解析并校验返回值（兼容 code: 200 / "200" / success: true / 各种 url 结构）
- *
- * 使用示例：
- * uni.chooseImage({
- *   count: 1,
- *   success: (res) => {
- *     const filePath = res.tempFilePaths[0] as string;
- *     uploadOssFile(filePath)
- *       .then((url: string) => {
- *         console.log('上传成功 OSS 地址:', url);
- *       })
- *       .catch((err: Error | null) => {
- *         uni.showToast({ title: err?.message ?? '上传失败', icon: 'none' });
- *       });
- *   }
- * });
- */
-export declare function uploadFile(options: UploadFileOptions): Promise<string>;
-
-/**
- * 上传 OSS 文件快捷函数
- */
-export declare function uploadOssFile(
-  filePath: string,
-  formData: UTSJSONObject | null = null,
-  ignoreAuth: boolean = false
-): Promise<string>;
-
-/**
- * 文件上传工具聚合类
- *
- * 集中呈现文件上传相关方法，一目了然；同时支持面向对象式 `upload.xxx()` 调用。
- *
- * @example
- * ```uts
- * // 方式 1：标准具名导入
- * import { uploadFile, uploadOssFile } from '@/src/http/upload/upload.uts';
- *
- * // 方式 2：对象单例导入（一目了然）
- * import { upload } from '@/src/http/upload/upload.uts';
- * upload.uploadOssFile(filePath);
- * ```
- */
-export declare class UploadUtils {
-  uploadFile(options: UploadFileOptions): Promise<string>;
-
-  uploadOssFile(
-    filePath: string,
-    formData: UTSJSONObject | null = null,
-    ignoreAuth: boolean = false
-  ): Promise<string>;
-}
-
-/** 上传工具全局单例 */
-export declare const upload: UploadUtils;
-
-/** 别名导出 */
-export declare const uploadUtils: UploadUtils;
-
-export default upload;
