@@ -73,11 +73,15 @@ export function fetchFooList(pageNo: number = 1, pageSize: number = 10, keyword:
     ? filtered.slice(offset, offset + pageSize)
     : [] as Array<FooItem>;
 
+  // ⚠️ 断言必须直接写泛型本体 `PageResult<FooItem>`，严禁写别名 `as FooPageResult`：
+  // UTS 会把「泛型实例化别名」的断言编译成 `new FooPageResult({...})`，而产物里只生成了
+  // `class PageResult`，别名在运行时不存在 ⇒ 小程序/App 端抛 `ReferenceError: FooPageResult is not defined`。
+  // 别名 `FooPageResult` 只能出现在类型位置（返回值标注 / 回调参数标注），不得出现在断言或构造位置。
   return Promise.resolve({
     list,
     hasMore: offset + pageSize < filtered.length,
     total: filtered.length
-  } as FooPageResult);
+  } as PageResult<FooItem>);
 }
 
 /**

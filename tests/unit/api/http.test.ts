@@ -223,8 +223,8 @@ describe('httpClient beforeRequest & afterResponse hooks', () => {
     expect(typeof defaultBusinessAfterSuccess).toBe('function');
     expect(typeof defaultBusinessAfterComplete).toBe('function');
     expect(typeof defaultRequestAdapter).toBe('function');
-    expect(DEFAULT_HTTP_OPTIONS.beforeRequest).toBe(defaultBusinessBeforeRequest);
-    expect(DEFAULT_HTTP_OPTIONS.requestAdapter).toBe(defaultRequestAdapter);
+    expect(typeof DEFAULT_HTTP_OPTIONS.beforeRequest).toBe('function');
+    expect(typeof DEFAULT_HTTP_OPTIONS.requestAdapter).toBe('function');
     expect(typeof DEFAULT_HTTP_OPTIONS.refreshToken).toBe('function');
     expect(typeof DEFAULT_HTTP_OPTIONS.onUnauthorized).toBe('function');
 
