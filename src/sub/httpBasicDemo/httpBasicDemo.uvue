@@ -165,7 +165,7 @@
             <view
               class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#3182ce]"
             />
-            <text class="text-[16px] font-bold text-[#2d3748]">文件上传（uploadFooFile → uni.uploadFile）</text>
+            <text class="text-[16px] font-bold text-[#2d3748]">文件上传（uploadFooFile → http.upload）</text>
           </view>
           <view class="mb-[16px]">
             <view class="flex-row items-center mb-[10px]">
@@ -259,7 +259,7 @@
 import { computed, ref } from 'vue';
 import { foo, FOO_UPLOAD_PATH, getFooList, uploadFooFile } from '@/src/api/example.uts';
 import type { IFoo } from '@/src/api/example.uts';
-import { DEFAULT_OSS_BASE_URL } from '@/src/http/index.uts';
+import { getOssBaseUrl } from '@/src/config/index.uts';
 import { toast, toastSuccess } from '@/src/utils/toast/index.uts';
 import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/layouts/navbar/utils/index.uts';
 
@@ -468,7 +468,8 @@ async function getUserInfo() {
  * 执行上传并展示结果
  */
 async function uploadFileByPath(filePath: string) {
-  if (DEFAULT_OSS_BASE_URL == '' || DEFAULT_OSS_BASE_URL.includes('xxx') || uploadPath.value == '' || uploadPath.value.includes('xxx')) {
+  const ossBaseUrl = getOssBaseUrl();
+  if (ossBaseUrl == '' || ossBaseUrl.includes('xxx') || uploadPath.value == '' || uploadPath.value.includes('xxx')) {
     uploadError.value = '请在对应环境的 .env 文件中配置真实的 VITE_UPLOAD_BASEURL 与 VITE_UPLOAD_PATH';
     toast('请先在 .env 中配置真实上传地址');
     return;
@@ -496,7 +497,7 @@ async function uploadFileByPath(filePath: string) {
 }
 
 /**
- * 选择图片并上传（uploadFooFile → http/upload.uts → uni.uploadFile）
+ * 选择图片并上传（uploadFooFile → http.upload）
  */
 function chooseAndUpload() {
   if (uploadLoading.value) {
