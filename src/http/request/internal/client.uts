@@ -59,6 +59,16 @@ export type RefreshTokenFn = () => Promise<boolean>;
 export type UnauthorizedFn = () => void;
 
 /**
+ * 下载结果类型
+ */
+export type DownloadResult = {
+  /** 临时文件路径（下载后的文件会存储到一个临时文件） */
+  tempFilePath: string;
+  /** HTTP 状态码 */
+  statusCode: number;
+};
+
+/**
  * 请求适配器函数类型（接收基础配置，返回底层 Request 实例，对齐 Alova requestAdapter 规范）
  */
 export type HttpRequestAdapter = (config: LimeRequestConfig) => Request;
@@ -757,5 +767,74 @@ export class HttpClient {
         return Promise.reject(toError(err)) as Promise<T>;
       }
     );
+  }
+
+  /**
+   * 下载文件
+   *
+   * 委托给底层 lime-request 的 download 方法（内部走 uni.downloadFile），
+   * 复用统一的鉴权头注入、前置钩子与完成钩子，成功后返回 DownloadResult
+   * （临时文件路径 + HTTP 状态码）。
+   *
+   * @param url 下载地址（相对路径会与 baseURL 拼接，也可传完整 http(s) 地址）
+   * @param config 可选配置；传 filePath 指定落盘路径，传 extra.ignoreAuth 跳过鉴权，
+   *               传 extra.requestKey 可配合 abort() 取消下载
+   */
+  downloadFile(url: string, config: LimeRequestConfig | null = null): Promise<DownloadResult> {
+    const _config = (config ?? {}) as LimeRequestConfig;
+    _config.url = url;
+    _config.method = 'DOWNLOAD';
+    return this.applyBeforeRequest(_config).then(
+      (validConfig: LimeRequestConfig): Promise<DownloadResult> => {
+        return this.client.download(url, validConfig).then(
+          (res: LimeRequestResponse<any>): Promise<DownloadResult> => {
+            const statusCode = res.statusCode;
+            // DOWNLOAD 在底层响应拦截器中被放行，HTTP 状态码需在此处自行校验
+            if (statusCode < 200 || statusCode >= 300) {
+              const httpErr = new Error(`${ShowMessage(statusCode)}：${res.errMsg}`);
+              return this.rejectDownload(httpErr, validConfig);
+            }
+            const tempFilePath: string = res.tempFilePath;
+            if (tempFilePath == '') {
+              return this.rejectDownload(new Error('下载响应为空'), validConfig);
+            }
+            const result: DownloadResult = {
+              tempFilePath,
+              statusCode
+            };
+            return this.applyAfterComplete(validConfig).then((): DownloadResult => result);
+          },
+          (err: any): Promise<DownloadResult> => {
+            return this.rejectDownload(toError(err), validConfig);
+          }
+        );
+      },
+      (err: any): Promise<DownloadResult> => {
+        return Promise.reject(toError(err)) as Promise<DownloadResult>;
+      }
+    );
+  }
+
+  /**
+   * 下载失败统一收口：先触发业务失败钩子（统一错误提示），再触发完成钩子
+   */
+  private rejectDownload(err: Error, config: LimeRequestConfig): Promise<DownloadResult> {
+    return this.applyAfterError<DownloadResult>(err, config).then(
+      (data: DownloadResult): Promise<DownloadResult> => {
+        return this.applyAfterComplete(config).then((): DownloadResult => data);
+      },
+      (finalErr: any): Promise<DownloadResult> => {
+        return this.applyAfterComplete(config).then((): Promise<DownloadResult> => {
+          return Promise.reject(toError(finalErr)) as Promise<DownloadResult>;
+        });
+      }
+    );
+  }
+
+  /**
+   * 下载文件（downloadFile 的兼容别名，行为完全一致）
+   */
+  download(url: string, config: LimeRequestConfig | null = null): Promise<DownloadResult> {
+    return this.downloadFile(url, config);
   }
 }

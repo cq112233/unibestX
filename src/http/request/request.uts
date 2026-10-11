@@ -18,6 +18,7 @@ import {
   HttpClient
 } from './internal/client.uts';
 import type {
+  DownloadResult,
   HttpClientOptions,
   RespondedOptions
 } from './internal/client.uts';
@@ -273,6 +274,15 @@ export function clearCache(fingerprint: string = ''): void {
  */
 export function uploadHttp<T>(url: string, config: LimeRequestConfig | null = null): Promise<T> {
   return http.upload<T>(url, config);
+}
+
+/**
+ * 便捷函数：文件下载（委托给默认 http 实例）
+ *
+ * 自动携带 Token，返回临时文件路径与 HTTP 状态码。
+ */
+export function downloadHttp(url: string, config: LimeRequestConfig | null = null): Promise<DownloadResult> {
+  return http.downloadFile(url, config);
 }
 
 export default http;
