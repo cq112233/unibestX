@@ -6,7 +6,7 @@ import { getI18nText } from '@/src/i18n/utils/index.uts';
  * （若 CLI 裁剪掉 i18n 模块，只需替换本文件为直接返回原字符串即可，Navbar 布局组件 0 侵入）
  *
  * @param title 标题原文或多语言 key（如 'tabbar.home' 或 '%tabbar.home%'）
- * @returns 翻译后的展示标题
+ * @returns 翻译后的展示标题；**中文等展示原文原样返回**（不进入 i18n 查询，避免缺 key 告警）
  */
 export function formatNavbarTitle(title: string): string {
   if (title.length == 0) {
