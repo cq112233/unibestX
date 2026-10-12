@@ -1,0 +1,33 @@
+# 说明：本文件已迁入 docker/ 目录，以下相对路径均以本文件所在目录为基准
+# - context: ..            -> 构建上下文 = 仓库根目录（Dockerfile 里的 COPY 路径也相对根目录）
+# - dockerfile: docker/Dockerfile -> 相对构建上下文
+# - env_file: ../deploy/*  -> 相对本文件所在目录
+# name 显式固定，避免因编排文件搬家导致 compose 项目名从 unibestx 变成 docker
+name: unibestx
+
+services:
+  # 测试环境服务
+  h5-test:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    image: unibestx-h5:test
+    container_name: unibestx-h5-test
+    restart: always
+    env_file:
+      - ../deploy/.env.test
+    ports:
+      - '${H5_TEST_PORT:-8081}:80'
+
+  # 生产环境服务
+  h5-prod:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    image: unibestx-h5:prod
+    container_name: unibestx-h5-prod
+    restart: always
+    env_file:
+      - ../deploy/.env.prod
+    ports:
+      - '${H5_PROD_PORT:-8080}:80'
