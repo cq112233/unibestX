@@ -21,6 +21,7 @@ import type { LimeRequestConfig, LimeRequestFail, LimeRequestResponse, LimeReque
 import { ContentTypeEnum, ResultEnum, ShowMessage } from './enum.uts';
 import { claimRefreshFailure } from './refresh.uts';
 import { RequestLifecycle } from './lifecycle.uts';
+import { HttpError } from '../../error/error.uts';
 
 /**
  * 请求前置钩子函数类型（支持同步函数或返回 Promise 的 async 异步函数）
@@ -165,6 +166,31 @@ export function extractErrorMessage(err: any): string {
   }
   catch (_) {}
   return '';
+}
+
+/**
+ * 从未知错误对象中安全提取 HTTP 状态码。
+ * 兼容 `HttpError` 实例、以及被 lime-request 包成 LimeRequestFail（我方抛出的错误挂在 `cause` 上）两种形态。
+ * @param err 任意形态的错误值；取不到状态码时返回 0 —— 调用方据此走文案兜底，
+ *            **不要把 0 当成一个真实状态码**
+ */
+export function extractStatusCode(err: any): number {
+  if (err == null) {
+    return 0;
+  }
+  if (err instanceof HttpError) {
+    return (err as HttpError).statusCode;
+  }
+  try {
+    const obj = err as UTSJSONObject;
+    // eslint-disable-next-line dot-notation
+    const cause = obj['cause'];
+    if (cause != null && cause instanceof HttpError) {
+      return (cause as HttpError).statusCode;
+    }
+  }
+  catch (_) {}
+  return 0;
 }
 
 /**
@@ -369,12 +395,14 @@ export class HttpClient {
               }
             }
             if (skipRefresh) {
-              throw new Error(`未授权[${ResultEnum.Unauthorized}]：${response.errMsg}`);
+              throw new HttpError(`未授权[${ResultEnum.Unauthorized}]：${response.errMsg}`, ResultEnum.Unauthorized);
             }
             throw new Error(REFRESHABLE_401);
           }
           const errorMessage = ShowMessage(statusCode);
-          throw new Error(`${errorMessage}：${response.errMsg}`);
+          // 用 HttpError 而不是裸 Error 上抛：状态码是归一函数区分「HTTP 失败」与「业务失败」
+          // 的唯一硬证据，拍进文案里下游就只剩字符串、没法再分类
+          throw new HttpError(`${errorMessage}：${response.errMsg}`, statusCode);
         }
         return response;
       },

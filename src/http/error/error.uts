@@ -12,19 +12,90 @@ export type AppErrorKind = 'offline' | 'timeout' | 'http' | 'business' | 'unknow
 /** 归一化后的错误信息 */
 export type AppErrorInfo = {
   kind: AppErrorKind;
+  /** 给用户看的一句话；离线 / 超时用固定文案，其余透传原始文案 */
   message: string;
+  /** 后端业务码；-1 表示「网络层就失败了、根本没拿到业务码」 */
   code: number;
+  /** HTTP 状态码（传输层，**不是**响应体里的业务码）；0 表示拿不到 */
+  statusCode: number;
 };
+
+/**
+ * 业务失败错误：让业务码跟着错误对象一起上抛
+ *
+ * 抛错方（响应成功钩子）在抛出前就知道业务码，而归一函数要分类也必须要它。
+ * 若把业务码只拼进文案（如 `[业务错误 5001]：余额不足`），下游拿到的就只是个字符串，
+ * 既无法参与分类、又会把内部标记原样弹给用户。
+ */
+export class BusinessError extends Error {
+  /** 后端业务码（响应体里的 code，非 HTTP 状态码） */
+  code: number = 0;
+
+  constructor(message: string, code: number) {
+    super(message);
+    this.code = code;
+  }
+}
+
+/**
+ * HTTP 层失败错误：让真实状态码跟着错误对象一起上抛
+ *
+ * 客户端响应拦截器在非 200 时抛出，归一函数据此走「状态码优先」判定，
+ * 不必再去嗅探「请求超时(408)」这类文案。
+ */
+export class HttpError extends Error {
+  /** HTTP 状态码（传输层，非业务码） */
+  statusCode: number = 0;
+
+  constructor(message: string, statusCode: number) {
+    super(message);
+    this.statusCode = statusCode;
+  }
+}
 
 // 文案集中在此，便于统一调整或后续接入 i18n
 const MSG_OFFLINE = '网络不可用，请检查网络连接';
 const MSG_TIMEOUT = '请求超时，请稍后重试';
 const MSG_NETWORK = '网络错误，请稍后重试';
+const MSG_BUSINESS = '操作失败，请稍后重试';
+
+/** HTTP 408：传输层已明确给出超时，不必再看文案 */
+const HTTP_STATUS_TIMEOUT = 408;
 
 // —— 网络状态缓存：uni.getNetworkType 只给异步回调，而调用方要的是「同步可判」，
-// 所以缓存上一次查询结果（初始视为在线），首次调用时才触发一次异步刷新供后续调用使用
+// 所以缓存最近一次查询结果，并绑定网络变化监听让缓存持续保鲜
 let cachedNetworkConnected: boolean = true;
+// 初始「未知」而不是「在线」：还没问到网络状态时既不能谎称在线、也不能武断判离线
+let networkStateKnown: boolean = false;
 let refreshingNetwork: boolean = false;
+let networkListenerBound: boolean = false;
+
+/** 回写一次网络状态查询结果 */
+function applyNetworkType(networkType: string): void {
+  cachedNetworkConnected = networkType != 'none';
+  networkStateKnown = true;
+  refreshingNetwork = false;
+}
+
+/**
+ * 绑定一次系统网络变化监听（哨兵标志保证全局只绑一次）
+ *
+ * 只靠 `uni.getNetworkType` 的话，缓存只在 `isOffline()` 被调到时刷新，
+ * 网络中途断开会一直沿用旧结论。
+ */
+function bindNetworkListener(): void {
+  if (networkListenerBound) {
+    return;
+  }
+  if (typeof uni.onNetworkStatusChange != 'function') {
+    return;
+  }
+  networkListenerBound = true;
+  uni.onNetworkStatusChange((res) => {
+    cachedNetworkConnected = res.isConnected;
+    networkStateKnown = true;
+  });
+}
 
 /**
  * 触发一次网络类型查询并回写缓存
@@ -35,7 +106,7 @@ function refreshNetworkCache(): void {
   if (refreshingNetwork) {
     return;
   }
-  // 测试环境（vitest）与部分平台可能没有该 API，缺失时保持「在线」判定，
+  // 测试环境（vitest）与部分平台可能没有该 API，缺失时保持「未知」判定，
   // 避免因为查不到网络状态就把所有请求都归为离线
   if (typeof uni.getNetworkType != 'function') {
     return;
@@ -43,46 +114,53 @@ function refreshNetworkCache(): void {
   refreshingNetwork = true;
   uni.getNetworkType({
     success: (res) => {
-      cachedNetworkConnected = res.networkType != 'none';
-      refreshingNetwork = false;
+      applyNetworkType(res.networkType);
     },
     fail: (_) => {
-      // 取不到网络类型时不武断判为离线，避免误报
-      cachedNetworkConnected = true;
+      // 取不到网络类型时不武断判为离线，保持上一次结论（首次即保持「未知」）
       refreshingNetwork = false;
     }
   });
 }
 
-/** 当前是否判定为离线（基于最近一次网络状态查询的缓存） */
+/**
+ * 当前是否判定为离线（基于最近一次网络状态查询 / 网络变化监听的缓存）
+ *
+ * 状态未知时返回 false —— 宁可交给后续分支分类，也不误报离线把错误吞成「网络不可用」。
+ */
 export function isOffline(): boolean {
+  bindNetworkListener();
   refreshNetworkCache();
-  return !cachedNetworkConnected;
+  return networkStateKnown && !cachedNetworkConnected;
 }
 
 /**
  * 将任意失败信息归一成可读文案
- * @param rawMessage 底层回调或后端返回的**原始**文案（未加工）；传空串时按 code 的判定兜底
+ * @param rawMessage 底层回调或后端返回的**原始**文案（未加工）；传空串时按 code / statusCode 的判定兜底
  * @param code 后端业务码；默认 -1 表示「网络层就失败了、根本没拿到业务码」
- * @returns kind 按「离线 → 超时 → 网络/HTTP → 业务 → 未知」顺序**首个命中即返回**，
- *          所以设备离线时即使后端文案更像业务错误也会被判成 offline；调用方按 kind 决定是否重试 / 引导设置
+ * @param statusCode HTTP 状态码；默认 0 表示拿不到（如 `uni.request` 直接 fail，压根没有响应）
+ * @returns kind 按「离线 → 业务 → 超时 → 网络/HTTP → 未知」顺序**首个命中即返回**。
+ *          **业务码优先于文案嗅探**：拿到真实业务码就以它为准，业务文案里出现「网络」「fail」
+ *          不该把来源改判成 http；状态码与关键词嗅探只作为没有业务码时的兜底判据。
+ *          设备离线时即使后端文案更像业务错误也会被判成 offline；调用方按 kind 决定是否重试 / 引导设置
  */
-export function resolveErrorMessage(rawMessage: string, code: number = -1): AppErrorInfo {
+export function resolveErrorMessage(rawMessage: string, code: number = -1, statusCode: number = 0): AppErrorInfo {
   if (isOffline()) {
-    return { kind: 'offline', message: MSG_OFFLINE, code } as AppErrorInfo;
+    return { kind: 'offline', message: MSG_OFFLINE, code, statusCode } as AppErrorInfo;
   }
-  const msg = rawMessage.length > 0 ? rawMessage : '';
+  const msg = rawMessage;
   const lower = msg.toLowerCase();
-  if (lower.includes('timeout') || msg.includes('超时')) {
-    return { kind: 'timeout', message: MSG_TIMEOUT, code } as AppErrorInfo;
+  if (code > 0) {
+    return { kind: 'business', message: msg.length > 0 ? msg : MSG_BUSINESS, code, statusCode } as AppErrorInfo;
   }
-  if (code == -1 || lower.includes('fail') || msg.includes('网络')) {
-    return { kind: 'http', message: msg.length > 0 ? msg : MSG_NETWORK, code } as AppErrorInfo;
+  if (statusCode == HTTP_STATUS_TIMEOUT || lower.includes('timeout') || msg.includes('超时')) {
+    return { kind: 'timeout', message: MSG_TIMEOUT, code, statusCode } as AppErrorInfo;
   }
-  if (code != 0 && msg.length > 0) {
-    return { kind: 'business', message: msg, code } as AppErrorInfo;
+  // code < 0 即「没拿到业务码」，说明失败在传输层，归到 http
+  if (statusCode > 0 || code < 0 || lower.includes('fail') || msg.includes('网络')) {
+    return { kind: 'http', message: msg.length > 0 ? msg : MSG_NETWORK, code, statusCode } as AppErrorInfo;
   }
-  return { kind: 'unknown', message: msg.length > 0 ? msg : MSG_NETWORK, code } as AppErrorInfo;
+  return { kind: 'unknown', message: msg.length > 0 ? msg : MSG_NETWORK, code, statusCode } as AppErrorInfo;
 }
 
 /**
