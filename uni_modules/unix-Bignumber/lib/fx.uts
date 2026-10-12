@@ -1,0 +1,381 @@
+/**
+ * fx.uts —— 带符号「定点数」运算与初等函数（ln / exp / sqrt）实现（unix-Bignumber 内部依赖）
+ *
+ * 表示约定：一个定点数用**带可选负号的十进制整数字符串**表示，统一放大 10^p 倍。
+ * 例如 p=4 时，字符串 `'15000'` 表示 1.5，`'-2345'` 表示 -0.2345。
+ *
+ * 作用：为非整数次幂 `exponentiatedBy(0.5)` 这类场景提供 `x^n = exp(n * ln x)` 的计算能力。
+ * 与 zint.uts 一样，全程只用字符串整数运算，**不依赖原生 Math.log / Math.exp / 浮点**，
+ * 保证 Android / iOS / 鸿蒙 / H5 / 小程序 五端结果字节级一致。
+ *
+ * 精度说明：定点中间精度 p 由调用方（BigNumber）按 `DECIMAL_PLACES + 保护位` 给出，
+ * 最终结果再按用户配置的舍入模式收敛到目标小数位，因此内部误差（约 10^-p）不会外溢。
+ */
+import { ziAdd, ziCmp, ziDivMod, ziDivModSmall, ziIsZero, ziMul, ziMulSmall, ziPow10, ziShiftRoundHalfUp, ziSqrt, ziSub, ziTrim, ziTrimEnd, ziZeros } from './zint.uts'
+
+/** 符号常量：零的符号用 0 表示 */
+const SIGN_ZERO: number = 0
+
+/**
+ * 取符号
+ * @param s 定点数字符串
+ * @returns 正数 1 / 负数 -1 / 零 0
+ */
+export function fxSign(s: string): number {
+  if (fxIsZero(s)) {
+    return SIGN_ZERO
+  }
+  return (s.charCodeAt(0) ?? 0) == 45 ? -1 : 1
+}
+
+/**
+ * 是否为零
+ * @param s 定点数字符串
+ * @returns 是否为零
+ */
+export function fxIsZero(s: string): boolean {
+  if (s.length == 0) {
+    return true
+  }
+  if (s == '0' || s == '-0') {
+    return true
+  }
+  const digits: string = fxAbs(s)
+  return ziIsZero(digits)
+}
+
+/**
+ * 取绝对值
+ * @param s 定点数字符串
+ * @returns 绝对值串（无符号）
+ */
+export function fxAbs(s: string): string {
+  if (s.length > 0 && (s.charCodeAt(0) ?? 0) == 45) {
+    return s.substring(1)
+  }
+  return s
+}
+
+/**
+ * 取相反数
+ * @param s 定点数字符串
+ * @returns 取反后的定点数
+ */
+export function fxNeg(s: string): string {
+  if (fxIsZero(s)) {
+    return '0'
+  }
+  return fxSign(s) > 0 ? '-' + fxAbs(s) : fxAbs(s)
+}
+
+/**
+ * 按符号把绝对值还原为带符号串
+ * @param digits 绝对值数字串
+ * @param sign 符号（1 / -1）
+ * @returns 带符号串
+ */
+function fxPack(digits: string, sign: number): string {
+  const v: string = ziTrim(digits)
+  if (ziIsZero(v)) {
+    return '0'
+  }
+  return sign < 0 ? '-' + v : v
+}
+
+/**
+ * 定点数比较
+ * @param a 定点数字符串
+ * @param b 定点数字符串
+ * @returns a>b 返回 1，a<b 返回 -1，相等返回 0
+ */
+export function fxCmp(a: string, b: string): number {
+  const sa: number = fxSign(a)
+  const sb: number = fxSign(b)
+  if (sa != sb) {
+    return sa > sb ? 1 : -1
+  }
+  if (sa == SIGN_ZERO) {
+    return 0
+  }
+  const c: number = ziCmp(fxAbs(a), fxAbs(b))
+  return sa < 0 ? -c : c
+}
+
+/**
+ * 定点数加法
+ * @param a 定点数字符串
+ * @param b 定点数字符串
+ * @returns a+b
+ */
+export function fxAdd(a: string, b: string): string {
+  const sa: number = fxSign(a)
+  const sb: number = fxSign(b)
+  if (sa == SIGN_ZERO) {
+    return b
+  }
+  if (sb == SIGN_ZERO) {
+    return a
+  }
+  const ua: string = fxAbs(a)
+  const ub: string = fxAbs(b)
+  if (sa == sb) {
+    return fxPack(ziAdd(ua, ub), sa)
+  }
+  const c: number = ziCmp(ua, ub)
+  if (c == 0) {
+    return '0'
+  }
+  if (c > 0) {
+    return fxPack(ziSub(ua, ub), sa)
+  }
+  return fxPack(ziSub(ub, ua), sb)
+}
+
+/**
+ * 定点数减法
+ * @param a 定点数字符串
+ * @param b 定点数字符串
+ * @returns a-b
+ */
+export function fxSub(a: string, b: string): string {
+  return fxAdd(a, fxNeg(b))
+}
+
+/**
+ * 定点数乘法：(a * b) / 10^p，末位四舍五入
+ * @param a 定点数字符串
+ * @param b 定点数字符串
+ * @param p 定点精度
+ * @returns a*b 的定点表示
+ */
+export function fxMul(a: string, b: string, p: number): string {
+  const sign: number = fxSign(a) * fxSign(b)
+  if (sign == SIGN_ZERO) {
+    return '0'
+  }
+  const prod: string = ziMul(fxAbs(a), fxAbs(b))
+  return fxPack(ziShiftRoundHalfUp(prod, p), sign)
+}
+
+/**
+ * 定点数除法：(a * 10^p) / b，末位四舍五入
+ * @param a 定点数字符串
+ * @param b 定点数字符串（不可为零，调用方保证）
+ * @param p 定点精度
+ * @returns a/b 的定点表示
+ */
+export function fxDiv(a: string, b: string, p: number): string {
+  const sign: number = fxSign(a) * fxSign(b)
+  if (sign == SIGN_ZERO) {
+    return '0'
+  }
+  const ua: string = fxAbs(a)
+  const ub: string = fxAbs(b)
+  const num: string = ua + ziZeros(p)
+  const dm = ziDivMod(num, ub)
+  const rounded: string = ziCmp(ziMulSmall(dm.r, 2), ub) >= 0 ? ziAdd(dm.q, '1') : dm.q
+  return fxPack(rounded, sign)
+}
+
+/**
+ * 定点数乘小整数
+ * @param a 定点数字符串
+ * @param n 整数乘数（可为负，绝对值需小于 1e9）
+ * @returns a*n
+ */
+export function fxMulInt(a: string, n: number): string {
+  if (n == 0 || fxIsZero(a)) {
+    return '0'
+  }
+  const sign: number = fxSign(a) * (n > 0 ? 1 : -1)
+  return fxPack(ziMulSmall(fxAbs(a), Math.abs(n)), sign)
+}
+
+/**
+ * 定点数除以小整数，末位四舍五入
+ * @param a 定点数字符串
+ * @param d 整数除数（不可为零，绝对值需小于 1e9）
+ * @returns a/d
+ */
+export function fxDivInt(a: string, d: number): string {
+  if (fxIsZero(a)) {
+    return '0'
+  }
+  const sign: number = fxSign(a) * (d > 0 ? 1 : -1)
+  const ud: number = Math.abs(d)
+  const dm = ziDivModSmall(fxAbs(a), ud)
+  const rounded: string = ziCmp(ziMulSmall(dm.r, 2), ud.toString()) >= 0 ? ziAdd(dm.q, '1') : dm.q
+  return fxPack(rounded, sign)
+}
+
+/**
+ * 定点数开平方（向下取整）
+ * @param a 非负定点数字符串
+ * @param p 定点精度
+ * @returns floor(sqrt(a/10^p) * 10^p)
+ */
+export function fxSqrt(a: string, p: number): string {
+  if (fxIsZero(a)) {
+    return '0'
+  }
+  // sqrt(a/10^p) * 10^p = sqrt(a * 10^p)
+  return ziSqrt(ziMul(fxAbs(a), ziPow10(p)))
+}
+
+/**
+ * 定点数向下取整为整数串
+ * @param a 定点数字符串
+ * @param p 定点精度
+ * @returns floor(a/10^p) 的整数串
+ */
+export function fxFloorInt(a: string, p: number): string {
+  const sign: number = fxSign(a)
+  if (sign == SIGN_ZERO) {
+    return '0'
+  }
+  const digits: string = fxAbs(a)
+  let q: string = '0'
+  if (digits.length > p) {
+    q = digits.substring(0, digits.length - p)
+  }
+  const truncated: boolean = !ziIsZero(digits.length > p ? digits.substring(digits.length - p) : digits)
+  if (sign < 0 && truncated) {
+    return '-' + ziAdd(q, '1')
+  }
+  return sign < 0 ? '-' + q : q
+}
+
+/**
+ * 自然对数的级数展开部分：计算 ln(M / 10^p) * 10^p（M 为 < 10^p 数量级的正定点数，内部自动做平方根降幅）
+ * @param m 正定点数字符串
+ * @param p 定点精度
+ * @returns ln(m/10^p) 的定点表示
+ */
+function fxLnSeries(m: string, p: number): string {
+  const unit: string = ziPow10(p)
+  // 反复开平方把 m 压到 (1, 1.5]，让 atanh 级数收敛更快
+  let red: number = 0
+  let x: string = m
+  const upper: string = ziAdd(unit, ziDivModSmall(unit, 2).q) // 1.5 * 10^p
+  while (fxCmp(x, upper) > 0 && red < 12) {
+    x = fxSqrt(x, p)
+    red++
+  }
+  // z = (x - 1) / (x + 1) ∈ [0, 0.2]，ln(x) = 2 * atanh(z)
+  const z: string = fxDiv(fxSub(x, unit), fxAdd(x, unit), p)
+  let total: string = '0'
+  if (!fxIsZero(z)) {
+    const z2: string = fxMul(z, z, p)
+    let term: string = z
+    total = z
+    const maxIter: number = 4 * p + 64
+    for (let i: number = 1; i <= maxIter; i++) {
+      term = fxMul(term, z2, p)
+      const add: string = fxDivInt(term, 2 * i + 1)
+      if (fxIsZero(add)) {
+        break
+      }
+      total = fxAdd(total, add)
+    }
+  }
+  // ln(m) = 2^red * ln(sqrt... ) ，再乘回 2 的 red 次方
+  let result: string = fxMulInt(total, 2)
+  for (let i: number = 0; i < red; i++) {
+    result = fxMulInt(result, 2)
+  }
+  return result
+}
+
+/** ln(10) 的定点缓存：按精度 p 缓存一次，避免每次都重算级数 */
+let LN10_CACHE: string = ''
+let LN10_CACHE_P: number = -1
+
+/**
+ * 计算 ln(10) 的定点表示
+ * @param p 定点精度
+ * @returns ln(10) * 10^p
+ */
+export function fxLn10(p: number): string {
+  if (LN10_CACHE_P == p && LN10_CACHE.length > 0) {
+    return LN10_CACHE
+  }
+  const tenScaled: string = ziMulSmall(ziPow10(p), 10)
+  LN10_CACHE = fxLnSeries(tenScaled, p)
+  LN10_CACHE_P = p
+  return LN10_CACHE
+}
+
+/**
+ * 计算自然对数 ln(x)
+ * @param c 输入值的系数数字串（无前导零、无尾随零，非零）
+ * @param e 输入值的指数（value = c * 10^e）
+ * @param p 定点精度
+ * @returns ln(value) 的定点表示
+ */
+export function fxLn(c: string, e: number, p: number): string {
+  // 去尾随零，把有效数字与十进指数分离
+  const trimmed = ziTrimEnd(c)
+  const digits: string = trimmed.value
+  const exp10: number = e + trimmed.removed
+  // 最高位十进制指数 dex，使 m = value / 10^dex ∈ [1, 10)
+  const dex: number = exp10 + digits.length - 1
+  // 把 m 表示成精度 p 的定点数
+  const shift: number = p - digits.length + 1
+  let m: string = '0'
+  if (shift >= 0) {
+    m = digits + ziZeros(shift)
+  }
+  else {
+    m = ziShiftRoundHalfUp(digits, -shift)
+  }
+  const series: string = fxLnSeries(m, p)
+  const scale: string = fxMulInt(fxLn10(p), dex)
+  return fxAdd(series, scale)
+}
+
+/** `fxExp` 的返回值：value = digits * 10^exp */
+export type FxExpResult = {
+  /** 有效数字串 */
+  digits: string
+  /** 十进制指数 */
+  exp: number
+}
+
+/**
+ * 计算自然指数 e^y
+ * @param y 指数 y 的定点表示
+ * @param p 定点精度
+ * @returns e^y 的「数字串 + 指数」表示，避免结果过大时整数位溢出
+ */
+export function fxExp(y: string, p: number): FxExpResult {
+  const unit: string = ziPow10(p)
+  if (fxIsZero(y)) {
+    return { digits: '1', exp: 0 } as FxExpResult
+  }
+  const ln10: string = fxLn10(p)
+  // k = floor(y / ln10)，使 r = y - k*ln10 ∈ [0, ln10)
+  let k: number = 0
+  const dm = ziDivMod(fxAbs(y), ln10)
+  const quotient: number = Number.parseInt(dm.q)
+  const hasRemainder: boolean = !ziIsZero(dm.r)
+  if (fxSign(y) > 0) {
+    k = quotient
+  }
+  else {
+    k = hasRemainder ? -(quotient + 1) : -quotient
+  }
+  const r: string = fxSub(y, fxMulInt(ln10, k))
+  // Taylor 级数 e^r = Σ r^n / n!
+  let sum: string = unit
+  let term: string = unit
+  const maxIter: number = 4 * p + 64
+  for (let n: number = 1; n <= maxIter; n++) {
+    term = fxDivInt(fxMul(term, r, p), n)
+    if (fxIsZero(term)) {
+      break
+    }
+    sum = fxAdd(sum, term)
+  }
+  // e^y = sum * 10^(k - p)
+  return { digits: sum, exp: k - p } as FxExpResult
+}
