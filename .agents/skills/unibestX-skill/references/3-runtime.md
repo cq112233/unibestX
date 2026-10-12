@@ -94,7 +94,7 @@
 
 - **陷阱**：分块接收（`uni.request` 的 `enableChunked` + `onChunkReceived`）时，若对每个 chunk 直接调用 `TextDecoder.decode(chunk)`，被 chunk 边界切断的多字节字符（中文、emoji）会被解成 U+FFFD「�」。
 - **根因**：Web 端靠 `decode(buf, { stream: true })` 保留跨块残字节，而 UTS 的 `TextDecoder` **只支持 `decode(input)` 单参数**，没有 stream 语义。
-- **正确做法**：自持一个尾部字节缓冲，手动判断尾部是否为不完整的 UTF-8 序列（最多向前回溯 4 字节，跳过 `0b10xxxxxx` 续接字节），只解码完整字符，残缺尾部留给下一块拼接。本项目实现见 `src/http/stream.uts` 的 `Utf8StreamDecoder`。
+- **正确做法**：自持一个尾部字节缓冲，手动判断尾部是否为不完整的 UTF-8 序列（最多向前回溯 4 字节，跳过 `0b10xxxxxx` 续接字节），只解码完整字符，残缺尾部留给下一块拼接。本项目实现见 `src/http/stream/stream.uts` 的 `Utf8StreamDecoder`。
 
 ## 3.8 判断「某平台能不能用某个 UTS 插件」，必须看**实际解析到哪个入口**，不能只看 `utssdk/app-<平台>/index.uts` 是否存在/是否为空
 
@@ -126,7 +126,7 @@
   ```text
   "…__definitelyNotExported__" is not exported by
     "…/uni_modules/kux-marked/utssdk/app-js/index.uts",
-    imported by "…/src/sub/rxjsDemo/rxjsDemo.uvue?vue&type=script&setup=true&vapor=true&lang.uts"
+    imported by "…/src/sub/rxjsFunctionDemo/rxjsFunctionDemo.uvue?vue&type=script&setup=true&vapor=true&lang.uts"
   ```
 
   这行同时给出了**解析到的入口文件**（`app-js`）与**调用方文件**。再用只存在于目标 stub 的符号（如 `myApi`）复验一次，同样被报「不存在于 `app-js/index.uts`」，即可确认该 stub 从未参与解析。
@@ -145,7 +145,7 @@
 7. **行内嵌套样式**：行内节点由「本节点样式 + `flatText` 摊平」改为 **`chainClass(node)` 沿纯行内元素链累加 class**，使 `***粗斜体***`（`<em><strong>`）等嵌套写法不再丢内层效果。原因与实现见 2.15。`chainClass` 求值顺序与 `flatText` 保持一致（同为深搜摊平），只是多带了样式。
 8. **行内样式全部改为静态 class**：上游把行内标签的样式拼成字符串塞进 `:style="inlineStyle(name)"`（`<b>` → `font-weight:bold` 等）。本项目改为 **`inlineClass(name)` 返回静态 class 名**（`b/strong`→`mp-b`、`i/em`→`mp-i`、`u/ins`→`mp-u`、`del/s/strike`→`mp-del`、`code`→`mp-code`、`sub`→`mp-sub`、`sup`→`mp-sup`、`small`→`mp-small`、`big`→`mp-big`、`mark`→`mp-mark`），样式统一写在组件 `<style>` 里的 `.mp-*` 规则中，模板上只留 `:class="chainClass(n)"`。**动态 `:style` 只保留字号**（`headingStyle()` 现在只返回 `font-size:…`，粗体交给模板上的 `class="mp-b"`）。**这是风格统一而非 bug 修复** —— 理由与一则被证伪的推断见 2.16。
 9. **`<video>` 分支**：新增原生 `<video>` 渲染（顶层 + 嵌套各一条分支），源由 `videoSrc(n)` 提供。**两条分支缺一不可**，原因见下方坑 4；`videoSrc()` 在流式场景下会等到 URL 完整（含 `://` 与已知扩展名）才返回，避免半截 URL 先渲染出一个报错黑框。
-10. **行内文字颜色**：上游把行内样式整体拼进动态 `:style`，本项目第 8 条已统一成静态 class，但**颜色来自内容**、没法预先写成 class —— 于是新增 `extractColor()`（解析阶段从句内 `style` 里捞 `color:`，只认 `color`、不认 `background-color`）+ `sanitizeColor()`（白名单：`#rgb` / `#rrggbb` / `#rrggbbaa`、`rgb()` / `rgba()`、十几个具名色，其余**静默丢弃**）+ `chainColor()` / `inlineStyle()`（沿与 `chainClass` **相同的行内元素链**取最内层颜色，贴到 `<text>` 的 `:style` 上）。写法：`<span style="color:#e11d48">红</span>`；嵌套在加粗里同样生效（`**<span style="color:#7c3aed">紫色粗体</span>**`）。**局限**：只支持行内节点（块级节点的颜色不生效）；颜色值不在白名单里时降级为默认色；`<font color="red">` 这类旧写法不支持，请用 `style="color:…"`。演示见 `rxjsDemo.uvue` 的 `DEMO_TEXT`「文字颜色：」一行。
+10. **行内文字颜色**：上游把行内样式整体拼进动态 `:style`，本项目第 8 条已统一成静态 class，但**颜色来自内容**、没法预先写成 class —— 于是新增 `extractColor()`（解析阶段从句内 `style` 里捞 `color:`，只认 `color`、不认 `background-color`）+ `sanitizeColor()`（白名单：`#rgb` / `#rrggbb` / `#rrggbbaa`、`rgb()` / `rgba()`、十几个具名色，其余**静默丢弃**）+ `chainColor()` / `inlineStyle()`（沿与 `chainClass` **相同的行内元素链**取最内层颜色，贴到 `<text>` 的 `:style` 上）。写法：`<span style="color:#e11d48">红</span>`；嵌套在加粗里同样生效（`**<span style="color:#7c3aed">紫色粗体</span>**`）。**局限**：只支持行内节点（块级节点的颜色不生效）；颜色值不在白名单里时降级为默认色；`<font color="red">` 这类旧写法不支持，请用 `style="color:…"`。演示见 `rxjsFunctionDemo.uvue` 的 `DEMO_TEXT`「文字颜色：」一行。
 11. **Mermaid 全屏查看器的 `min-height` / `min-width` / `max-width:100%` 改为 `flex:1` / `width:100%` + `box-sizing:border-box`**：上游那三处百分比在原生端被静默忽略（构建期 3 条 warn），导致画布比屏幕小时不垂直居中、比屏幕宽时横向滚动区撑不出屏幕、拖不动。替代写法的选择依据与红线见 2.23。
 
 - **支持的标签（已确认）**：`mp-html.uvue` 的节点分支里已包含 `table` / `tr` / `th` / `td`（渲染为 flex 行列，单元格宽度按列数等分百分比计算）与 `img`（渲染为 uni `<image>`）；kux-marked 侧 `Renderer.table()` 输出 `<table><thead><tr><th|td>…`，`Renderer` 中图片输出 `<img src alt>`，且 `defaults.uts` 里 `gfm: true` 为默认值，GFM 表格能正常分词与渲染。
@@ -231,7 +231,7 @@
 
 - **红线**：在 `#ifdef APP-ANDROID` 里下笔前先自问「这段是给 Kotlin 还是给 JS？」，判据是**这个 API 在纯 JS 引擎里存不存在**：
   - **必炸**：Kotlin/UTS 独有的 stdlib 扩展（`getOrNull`、`firstOrNull`、`toIntOrNull`、`isNullOrEmpty`）、Kotlin 注解（`@Suppress`、`@JvmStatic`）；
-  - **部分可用、必须逐项验证**：`UTSAndroid.*`。它在 JS 层**存在**（产物里框架自己就在用 `UTSAndroid.getUniActivity()`），但只覆盖部分成员 —— `parse()` 里的 `UTSAndroid.getDispatcher('io').async(...)` 属于**未经本项目验证**的路径，所以 `rxjsDemo` 特意走 `lexer` + `parser`（同步、且绕开 dispatcher，顺带避免打字机效果的 Promise 竞态）。
+  - **部分可用、必须逐项验证**：`UTSAndroid.*`。它在 JS 层**存在**（产物里框架自己就在用 `UTSAndroid.getUniActivity()`），但只覆盖部分成员 —— `parse()` 里的 `UTSAndroid.getDispatcher('io').async(...)` 属于**未经本项目验证**的路径，所以 `rxjsFunctionDemo` 特意走 `lexer` + `parser`（同步、且绕开 dispatcher，顺带避免打字机效果的 Promise 竞态）。
 
 ## 3.13 不用真机、不用反复重启：把 App 逻辑层那条 JS 路径搬到 node 里跑，提前引爆运行时雷
 
@@ -248,14 +248,14 @@
 
 ## 3.14 `<script setup>` 局部名撞框架全局名 —— 会把「先调用后定义」的错误**掩盖**成编译通过
 
-- **报错现象（两个坑连环，本项目实测 `src/sub/rxjsDemo/rxjsDemo.uvue`）**：
+- **报错现象（两个坑连环，本项目实测 `src/sub/rxjsFunctionDemo/rxjsFunctionDemo.uvue`）**：
 
   ```text
   # 第一版：页面里有个局部 function stop()
   error: Cannot infer type for this parameter. Specify it explicitly.
-  at src/sub/rxjsDemo/rxjsDemo.uvue:170:2
+  at src/sub/rxjsFunctionDemo/rxjsFunctionDemo.uvue:170:2
   error: No value passed for parameter 'runner'.
-  at src/sub/rxjsDemo/rxjsDemo.uvue:170:2
+  at src/sub/rxjsFunctionDemo/rxjsFunctionDemo.uvue:170:2
   170|    stop();
   ```
 
@@ -263,7 +263,7 @@
 
   ```text
   error: 找不到名称"stopStream"。参考: ...#error18
-  at src/sub/rxjsDemo/rxjsDemo.uvue:170:2
+  at src/sub/rxjsFunctionDemo/rxjsFunctionDemo.uvue:170:2
   ```
 
 - **根因（两个独立规则，缺一个都解释不通）**：
@@ -292,7 +292,7 @@
   | 命令 | 是否执行「编译为android class」 | 结论 |
   | :--- | :--- | :--- |
   | `cli launch app-android --project unibestX --compile true` | ❌ **否**（三轮日志 `grep -c` 均为 0） | 只走完 JS/字节码层。**据此宣称"编译成功"是假绿** —— 真实存在的两条 Kotlin 报错被完全掩盖 |
-  | `cli compile app-android --project unibestX --file src/http/stream.uts` | ❌ 否 | 反证实测：对**故意写坏的**自引用 `const timerId` 也报 `编译成功`；产物 `unpackage/cache/uts_standard_android/.../index.kt` 里连 `simulateStream` 都没有（只打进了 import 图上的 `rxjs-lite`）。**它不校验文件本体** |
+  | `cli compile app-android --project unibestX --file src/http/stream/stream.uts` | ❌ 否 | 反证实测：对**故意写坏的**自引用 `const timerId` 也报 `编译成功`；产物 `unpackage/cache/uts_standard_android/.../index.kt` 里连 `simulateStream` 都没有（只打进了 import 图上的 `rxjs-lite`）。**它不校验文件本体** |
   | ✅ `cli launch app-android --project unibestX --deviceId <序列号>`（**不带** `--compile`） | ✅ 是 | 真机运行流程会进 Kotlin 阶段 |
 
 - **关键澄清**：`--compile true` 的语义是"仅编译代码"（不装机），**恰恰少了 Kotlin 那一段**；`--compile` 不是"更彻底的编译"，而是"不装机的编译"。
@@ -471,14 +471,14 @@
   两个分支的实现文件：
 
   ```uts
-  // src/store/vapor/token.ts 与 src/store/vdom/token.uts 都这样写
+  // src/store/vapor/token.uts 与 src/store/vdom/token.uts 都这样写
   import type { ILoginForm, ISingleTokenRes, IDoubleTokenRes, ITokenState } from '../types.uts';
   ```
 
 - **为什么必须无条件转发**：类型与平台无关，两个分支共用同一套。放进 `#ifdef` 必然漏掉另一端；而 `.ts` / `.uts` 两种后缀的实现文件都要能拿到它。
 - **为什么不能让实现文件继续 `export type`**：门面会同时从 `./types.uts` 与 `./vapor/token` 收到同名类型，形成重复导出。
 - **本雷与 1.12 的关系**：**类型转发也是转发**。抽出的 `types.uts` 是叶子（不再往下星号导出），门面是唯一转发层 —— 依然满足「同一顶层符号只允许在一层门面 `export *`」的红线，不会产生 `useXxxStore__1`。
-- **本雷的连带修正**：`src/store/vapor/index.ts` 原本还写了 `export * from './app' | './token' | './user'`，与门面构成**两层转发**（正是 1.12 判定的 `__1` 改名场景）。该文件只应 `createPinia()` + 注册插件 + `export default pinia`，转发一律交给门面。
+- **本雷的连带修正**：`src/store/vapor/index.uts` 原本还写了 `export * from './app' | './token' | './user'`，与门面构成**两层转发**（正是 1.12 判定的 `__1` 改名场景）。该文件只应 `createPinia()` + 注册插件 + `export default pinia`，转发一律交给门面。
 
 **验证 mp-weixin 到底走了哪一支（看产物，不要看源码）**
 
@@ -525,9 +525,9 @@ test -d unpackage/dist/dev/mp-weixin/src/store && echo 产物在，才算真的�
 
 ```text
 warning: Cannot find module '../types.uts' or its corresponding type declarations.
-  at src/store/vapor/app.ts:14:31
+  at src/store/vapor/app.uts:14:31
 warning: Cannot find module '@/src/i18n/index.uts' or its corresponding type declarations.
-  at src/store/vapor/app.ts:4:17
+  at src/store/vapor/app.uts:4:17
 ```
 
 **机制**：`tsconfig.json` 里的 `allowArbitraryExtensions: true` 是 TS 能把 `./index.uts` 解析到同目录 `index.d.uts.ts` 的**前提**（**同名同目录，不能改名、不能挪走**）。没有这个文件就只剩 `Cannot find module`，该 `.uts` 的导出在 IDE 里全变 `any`、补全全丢。
@@ -538,8 +538,8 @@ warning: Cannot find module '@/src/i18n/index.uts' or its corresponding type dec
 
   | 文件 | 谁导入它 |
   | --- | --- |
-  | `src/store/types.uts` | `src/store/vapor/*.ts` |
-  | `src/i18n/index.uts` | `src/store/vapor/app.ts`、`src/store/vdom/app.uts` |
+  | `src/store/types.uts` | `src/store/vapor/*.uts` |
+  | `src/i18n/index.uts` | `src/store/vapor/app.uts`、`src/store/vdom/app.uts` |
 
   **漏登记的后果就是上面那条 `Cannot find module` 一直挂着** —— 而且它只出现在 IDE 面板里，**不影响任何构建**（H5 / mp-weixin 都照样编译成功），所以极易被当噪音忽略。
 - 需要人工维护类型的模块登记在 `HANDWRITTEN`（脚本跳过，`--all` 可强制重生成）；本项目当前只有 `systemInfo`（含 `computed()`，无法静态推断）。
@@ -561,7 +561,7 @@ const ts = require('typescript');
 const raw = ts.readConfigFile('tsconfig.json', ts.sys.readFile);
 const parsed = ts.parseJsonConfigFileContent(raw.config, ts.sys, process.cwd());
 const host = ts.createCompilerHost(parsed.options);
-console.log(ts.resolveModuleName('../types.uts', 'src/store/vapor/app.ts', parsed.options, host).resolvedModule);
+console.log(ts.resolveModuleName('../types.uts', 'src/store/vapor/app.uts', parsed.options, host).resolvedModule);
 // → { resolvedFileName: '<项目>/src/store/types.d.uts.ts', extension: '.d.uts.ts' }
 //   undefined ⇒ 仍缺声明
 ```
@@ -773,7 +773,6 @@ cat unpackage/dist/dev/mp-weixin/src/i18n/index.d.uts.js   # → "use strict";
   - ❌ **mp-html 的 mermaid 全屏查看器**：`position:fixed` + `z-index:9999` + 满屏 `@click`，红线一二三**一次性全踩**，绝对不要加。底部档位工具条、右上角关闭按钮同理。
   - ❌ **画布手指平移容器**（`@touchstart` / `@touchmove` / `@touchend` 全靠事件驱动，见 2.22 补充）同理不能加 —— 加了平移会直接失灵。
   - ✅ **纯装饰、无事件、不依赖 `z-index` / `visibility` 的图元层**才是候选：katex / mermaid 画布里那些只有 `position:absolute` + 宽高 + `background-color` 的 `ruleBoxes` / `bgBoxes` / `textBoxes`（一个公式就是几十个 box），以及静态图标、分隔线一类的 view / text。
-  - ⚠️ **第三方组件已有先例**：`uni_modules/uni-nav-bar-x` 的 mid/right 容器与标题 `text`、`uni_modules/uni-fab-button` 的 `.plus` 条都已在用 `flatten`（后者还叠了 `transform: rotate(90deg)`，它**没有子元素**所以不踩上面那条 transform 缺陷 —— 一旦给它加子元素，旋转就会失效）。
   - **验证通道**：拍平只在蒸汽模式生效，想看到差异只能走真机 / 模拟器（`launch app-android` 等）；走 VDOM 通道（3.20）**看不到任何区别**。
   - **未实测、别写进结论**：拍平对 `position:absolute` 图元的定位是否有影响，官方文档没有正面说明，本项目**尚未实测**；要用先拿一屏公式做 A/B 对比再铺开。
 
@@ -809,8 +808,6 @@ export default {
 const props = defineProps<{ content: string }>()
 </script>
 ```
-
-- **真实案例（本项目已踩）**：`uni_modules/zero-markdown-view` 是 `dcloudext.type: component-vue` 的选项式组件（内部还依赖自带的 `mp-html.vue` + `marked.min.js` + `prism.min.js` 纯 JS 链路），在蒸汽模式下**完全无法编译**；同时它的 `components/mp-html/` 与项目已适配的 `uni_modules/mp-html/components/mp-html/mp-html.uvue` 同名，会额外触发 `easycom组件冲突` 警告。
 
 ---
 

@@ -212,7 +212,7 @@ function createUser(): UserInfo {
 - **底层原理**：UTS 在 Android 端将对象字面量 `{ getApiBaseUrl }` 编译为 Kotlin 的 `_uO("getApiBaseUrl" to getApiBaseUrl)`。在 Kotlin 语法中，顶层函数名 `getApiBaseUrl` 不能作为裸值赋值给键值对，编译器会强行要求函数调用 `getApiBaseUrl()`；且 `UTSJSONObject` 在强类型原生端无法动态调用方法。
 - **强制规范**：
   1. 所有工具库必须使用标准 ES 模块具名函数导出：`export function getApiBaseUrl(): string { ... }`；
-  2. 业务方统一按需具名解构导入：`import { getApiBaseUrl } from '@/src/utils/env/index.uts'`；
+  2. 业务方统一按需具名解构导入：`import { getApiBaseUrl } from '@/src/config/env/env.uts'`；
   3. **一律严禁**写出如 `export const env = { getApiBaseUrl, ... }` 或 `export default { ... }` 这种包裹函数的对象字面量导出。
 
 ```uts
@@ -222,7 +222,7 @@ export const env = { getApiBaseUrl };
 
 // ✅ 正确：只用具名函数导出，业务方按需解构导入
 export function getApiBaseUrl(): string { return "https://api.example.com"; }
-// 业务方：import { getApiBaseUrl } from '@/src/utils/env/index.uts';
+// 业务方：import { getApiBaseUrl } from '@/src/config/env/env.uts';
 ```
 
 ## 1.11 严禁顶层函数与同名属性采用 Getter 命名冲突（Kotlin 平台声明冲突导致 NoSuchMethodError）
@@ -271,7 +271,7 @@ class SystemUtils {
   - `.uvue` 页面编译为**独立的 Kotlin 文件**（如 `App.ku.kt`），其调用点不会同步改写，仍写 `useAppStore()` → Kotlin 按顶层属性生成 getter 访问 `IndexKt.getUseAppStore()` → 该静态方法不存在 → 编译期 or 运行期崩溃。
 - **强制规范**：
   1. 一个顶层符号**只允许在一层门面中 `export *` 转发**；门面链严禁套娃（`index.uts` 再 `export *` 一个同样做 `export *` 的 `index.uts`）；
-  2. 本项目 `src/store/index.uts` 是**唯一**门面，`src/store/vdom/index.uts`、`src/store/vapor/index.ts` 只负责创建并默认导出 pinia 实例，**严禁再 `export *` 转发 stores**；
+  2. 本项目 `src/store/index.uts` 是**唯一**门面，`src/store/vdom/index.uts`、`src/store/vapor/index.uts` 只负责创建并默认导出 pinia 实例，**严禁再 `export *` 转发 stores**；
   3. 同理，新增聚合门面（如 `src/tabbar/index.uts`、`src/router/index.uts`）时，被聚合的子模块自身不得再对外做整包重导出，避免形成两层转发。
 - **排查方法（人工定位）**：直接检查生成的 Kotlin 产物，若出现 `useXxx__1`、`val useAppStore__1 =` 字样即命中：
 
@@ -315,11 +315,11 @@ export * from './vdom/user.uts';
 
 ## 1.13 局部声明在**其自身的初始化表达式内不可见** —— `const timerId = setInterval(() => clearInterval(timerId))` 必炸
 
-- **错误码**（本项目实测，`src/http/stream.uts`）：
+- **错误码**（本项目实测，`src/http/stream/stream.uts`）：
 
   ```text
   error: 找不到名称"timerId"。参考: https://doc.dcloud.net.cn/uni-app-x/uts/compiler-known-issues.html#error18
-  at src/http/stream.uts:292:22
+  at src/http/stream/stream.uts:292:22
   292|        clearInterval(timerId);
   ```
 
@@ -629,7 +629,7 @@ export * from './vdom/user.uts';
   }
   ```
 
-- **⚠️ 不要顺手把所有三元都改成 `if`**：本条只针对**联合类型**（`number | string`、`T | null` 等）。单类型变量上的三元是完全合法的 —— 本项目 `src/theme/index.uts`、`src/utils/error-report/index.uts`、`src/tabbar/internal/strategy.uts` 等几十处三元一直正常编译。**改法要精准命中联合类型，不要全仓机械替换**。
+- **⚠️ 不要顺手把所有三元都改成 `if`**：本条只针对**联合类型**（`number | string`、`T | null` 等）。单类型变量上的三元是完全合法的 —— 本项目 `src/theme/index.uts`、`src/utils/report/index.uts`、`src/tabbar/internal/strategy.uts` 等几十处三元一直正常编译。**改法要精准命中联合类型，不要全仓机械替换**。
 - **⚠️ 为什么 H5 / `lint` / 真机跑一遍都发现不了**：这是**编译期**错误，H5 编译目标是 JS 走的是另一套宽松语法；而 `launch app-android --compile true` 不到 Kotlin 阶段（见 3.15 / 3.20），本地很容易全绿。**只有真正走到 Kotlin 编译阶段才暴露**。
 
 ---
@@ -645,7 +645,7 @@ export * from './vdom/user.uts';
   fun <R> catch(onRejected: () -> UTSPromise<R>): UTSPromise<R>
   fun <R> catch(onRejected: (@ParameterName(...) Any?) -> R): UTSPromise<R>
   fun <R> catch(onRejected: (@ParameterName(...) Any?) -> UTSPromise<R>): UTSPromise<R>
-  at src/http/request.uts:346:43
+  at src/http/request/request.uts:346:43
     346 |      return this.send<T>(config).then(done).catch((err: any) => {
         |                                             ^
   ```

@@ -1,3 +1,14 @@
+/**
+ * 官方 Pinia 实例（vapor 分支）
+ *
+ * 与 `../vdom/index.uts`（x-pinia-s / UTS 原生实现）二选一，由 `../index.uts` 门面按平台路由。
+ *
+ * ⚠️ 本目录虽已统一为 `.uts`（项目内脚本一律 UTS），但依赖的是 node_modules 里的**官方 JS 包**
+ *    （pinia / pinia-plugin-persistedstate），因此只在「逻辑层由 uts2js 转译」的平台上生效：
+ *    App 蒸汽模式、H5、全部小程序。**未开蒸汽模式的 App 原生端走 `../vdom`** ——
+ *    本目录的改动不会传导到 VDOM 端，两端需同步修改（对照见 `../vdom/modal.uts` 的说明）。
+ *    不要把这里当作「vapor 已能原生化」的依据。
+ */
 import { createPinia, setActivePinia } from 'pinia';
 import { createPersistedState } from 'pinia-plugin-persistedstate';
 

@@ -45,7 +45,7 @@ graph TD
 3. **闭环刷新逻辑**：当开启 `enablePullDownRefresh: true` 时，必须引入 `onNavbarPullDownRefresh` 与 `stopNavbarPullDownRefresh`，在数据拉取结束后必须调用 `stopNavbarPullDownRefresh()`；
 4. **根容器骨架铁律**：页面根节点一律为 `<view class="flex flex-col flex-1">`，严禁使用 `<scroll-view>` 作为页面根；
 5. **滚动区域实现**：需要滚动的区域在根内自写 `<scroll-view direction="vertical" class="flex-1 flex flex-col">`；
-6. **组件库优先**：若需求功能与 `uni_modules/` 下已有组件/库匹配（如图标使用 `<uni-icons>`/`<lime-icon>`，图表使用 `<e-chart>`，分页列表使用 `<z-paging-x>`，富文本使用 `<mp-html>`，富文本编辑器使用 `<sp-editor>`，二维码使用 `<lime-qrcode>`，签名使用 `<lime-signature>`，折叠面板使用 `<uni-collapse-x>`，评分使用 `<uni-rate-x>` 等），必须优先使用已有组件，严禁脱离生态手写重复且低效的原生结构；且模板中直接使用短横线标签调用，严禁手动 import easycom 范围内的组件；
+6. **组件库优先**：若需求功能与 `uni_modules/` 下已有组件/库匹配（如图标使用 `<uni-icons>`/`<lime-icon>`，图表使用 `<e-chart>`，分页列表使用 `<z-paging-x>`，富文本使用 `<mp-html>`，签名使用 `<lime-signature>` 等），必须优先使用已有组件，严禁脱离生态手写重复且低效的原生结构；且模板中直接使用短横线标签调用，严禁手动 import easycom 范围内的组件；
 7. **同步建出页面接口层（必产步骤，铁律级）**：页面与组件内部严禁直接硬编码大段模拟数据或假数据对象（如在 `<script setup>` 中写死数据数组）；新增页面时**必须在同一次改动里建出「页面同名目录 + 页面同名接口文件」** `src/pages/mall/` ⇒ `src/api/mall/mall.uts`（`src/sub/ball/` ⇒ `src/api/ball/ball.uts`），用 `type` 定义数据模型（**严禁 `interface`**），把数据封装为返回 `Promise<T>` 的标准接口函数（开发期 `return Promise.resolve(MOCK_X)`）。页面端一律通过异步接口函数拉取数据，后期对接真实后端时页面业务层零修改：
    - **目录形态（三选一）**：① **默认** —— 类型 / 数据集 / 函数三块内联在 `<page>.uts` 里按模块分段，此时不建 `types.uts` 与 `mock/`；② **类型被多段共用** ⇒ 契约类型收进 `src/api/<page>/types.uts`；**数据集过大** ⇒ 拆进 `src/api/<page>/mock/<模块>.uts`，`<page>.uts` 只留接口函数；③ 某个接口域已贴 500 行上限 ⇒ 在 `src/api/<page>/` 下另开兄弟文件，每个文件自带「类型 + 数据集 + 函数」三块；⚠️ 抽 `types.uts` 的依据是「共用」而非「行数」—— 类型通常只占 0~13%，抽了并不减行；
    - **命名与写法**：`fetchXxxList` / `fetchXxxDetail` / `createXxx`、`MOCK_<模块>_<用途>`、分页容器 `PageResult<T>`、分页入参统一 `(pageNo, pageSize, keyword)` 并给默认值；
