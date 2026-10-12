@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import i18n from '@/src/i18n';
+import i18n from '@/src/i18n/index.uts';
 import { getI18nText, isI18nKeyLike } from '@/src/i18n/utils/index.uts';
 
 describe('i18n text Unit Tests', () => {

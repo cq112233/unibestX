@@ -945,7 +945,7 @@ export function rsaVerify(text: string, publicKey: string, sigHex: string, hashT
  * @returns 36 位 UUID 字符串
  */
 export function generateUUID(): string {
-  // #ifdef APP-ANDROID
+  // #ifdef APP-ANDROID && !VUE3-VAPOR
   try {
     return java.util.UUID.randomUUID().toString()
   }
