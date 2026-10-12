@@ -41,7 +41,7 @@
  *    持久化插件（pinia-plugin-persistedstate）全端复用。
  *
  * ⚠️【重导出红线】：同一个顶层符号（useAppStore / useTokenStore / useUserStore）
- * 只允许在本文件这一层门面中 `export *` 转发。`./vdom/index.uts`、`./vapor/index.ts`
+ * 只允许在本文件这一层门面中 `export *` 转发。`./vdom/index.uts`、`./vapor/index.uts`
  * 只创建并默认导出 pinia 实例，**严禁再对外 `export *` 转发 stores**。
  * 否则 UTS 在 Android 端合并生成 Kotlin 时会把重名符号改名为 `useXxxStore__1`，
  * 表现为 `.uts` 编译报 `error18 找不到名称"useXxxStore"`、`.uvue` 运行期报
@@ -75,7 +75,7 @@
 // ==========================================
 
 // #ifdef VUE3-VAPOR || H5 || WEB || MP
-import pinia from './vapor/index.ts';
+import pinia from './vapor/index.uts';
 // #endif
 
 // #ifndef VUE3-VAPOR || H5 || WEB || MP
@@ -91,12 +91,12 @@ export default pinia;
 // ==========================================
 
 // #ifdef VUE3-VAPOR || H5 || WEB || MP
-export * from './vapor/app.ts';
-export * from './vapor/i18n.ts';
-export * from './vapor/modal.ts';
-export * from './vapor/theme.ts';
-export * from './vapor/token.ts';
-export * from './vapor/user.ts';
+export * from './vapor/app.uts';
+export * from './vapor/i18n.uts';
+export * from './vapor/modal.uts';
+export * from './vapor/theme.uts';
+export * from './vapor/token.uts';
+export * from './vapor/user.uts';
 // #endif
 
 // #ifndef VUE3-VAPOR || H5 || WEB || MP

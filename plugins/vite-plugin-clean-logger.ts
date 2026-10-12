@@ -76,7 +76,7 @@ export default function cleanLoggerPlugin(options: CleanLoggerOptions = {}): Plu
         return;
       }
 
-      // 如果当前正处于被忽略告警的后续定位行（如 "at src/store/vapor/app.ts:10:7"）
+      // 如果当前正处于被忽略告警的后续定位行（如 "at src/store/vapor/app.uts:10:7"）
       if (suppressCodeFrameCount > 0 && (str.startsWith('at ') || str.includes(' at '))) {
         return;
       }

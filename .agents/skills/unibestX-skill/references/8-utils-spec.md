@@ -1,4 +1,4 @@
-# 8 项目核心工具库使用规范（系统信息 · 环境变量 · 通用工具优先原则）
+# 8 项目核心工具库使用规范（系统信息 · 环境变量 · 生态工具库优先 · 通用工具优先原则）
 
 > **本文件是 `unibestX-skill` 的参考分册**，由 [SKILL.md](../SKILL.md) 按需引用。
 >
@@ -7,9 +7,10 @@
 > - 获取屏幕尺寸、视口高度、状态栏高度、安全区、导航栏高度、TabBar 高度时；
 > - 判断当前运行环境（开发/生产/测试）、获取 API 基础请求地址、OSS 配置、当前编译平台或 Vapor 模式时；
 > - 使用轻提示（Toast）、加载动画（Loading）、路由跳转与参数传递、滚动监听、主题切换等通用能力时；
+> - **需要数学运算（大数 / 精度）、加解密与哈希、日期时间处理、颜色转换、数组与对象工具函数、组合式 hooks（倒计时 / 验证码 / 定时器 / 层级管理）时** —— 先查 `uni_modules/` 生态库（见 8.5）；
 > - 编写任何页面、组件或业务模块，准备手写底层原生 API 前 —— **必须首先阅读并优先使用 `src/utils/` 中的封装工具**。
 >
-> **核心铁律**：**严禁重复造轮子，严禁在业务层散落原生硬编码**。系统信息优先使用 `@/src/utils/systemInfo`，环境变量优先使用 `@/src/utils/env`，开发中所需的基础通用能力优先检索并使用 `@/src/utils/...`。
+> **核心铁律**：**严禁重复造轮子，严禁在业务层散落原生硬编码**。系统信息优先使用 `@/src/utils/systemInfo`，环境变量优先使用 `@/src/config/env`，通用算法能力优先复用 `uni_modules/` 下的生态库（见 8.5），开发中所需的基础通用能力优先检索并使用 `@/src/utils/...`。
 
 ---
 
@@ -25,11 +26,12 @@
 ```mermaid
 graph LR
     A[页面 / 组件 / API 层] -->|系统尺寸/视口高度| B[src/utils/systemInfo]
-    A -->|环境判断/域名地址| C[src/utils/env]
+    A -->|环境判断/域名地址| C[src/config/env]
     A -->|轻提示/Loading| D[src/utils/toast]
-    A -->|路由导航/参数安全| E[src/utils/route]
-    A -->|滚动与触底监听| F[src/utils/refresh]
+    A -->|路由导航/参数安全| E[src/router]
+    A -->|滚动与触底监听| F[src/layouts/navbar/utils]
     A -->|主题配置/暗黑模式| G[src/theme]
+    A -->|通用算法：大数/加解密/日期/颜色/纯函数/hooks| H[uni_modules 生态库]
 ```
 
 ---
@@ -98,7 +100,7 @@ const contentHeight = computed((): number => availableHeight.value);
 
 ---
 
-## 8.3 环境变量模块：`src/utils/env`
+## 8.3 环境变量模块：`src/config/env`
 
 ### 8.3.1 核心导出与推荐用法
 
@@ -135,14 +137,14 @@ const res = await uni.request({ url: 'http://192.168.1.100:8080/api/user/info' }
 if (location.hostname !== 'localhost') { ... } // ❌ 跨端无效
 // #endif
 
-// ✅ 正确做法：统一从 @/src/utils/env/index.uts 引入
+// ✅ 正确做法：统一从 @/src/config/env/env.uts 引入
 import {
   getApiBaseUrl,
   getOssBaseUrl,
   isDev,
   isProd,
   getCompilePlatform
-} from '@/src/utils/env/index.uts';
+} from '@/src/config/env/env.uts';
 
 // 获取全路径接口地址
 const requestUrl = `${getApiBaseUrl()}/api/v1/goods/detail`;
@@ -192,7 +194,7 @@ if (isDev()) {
 ### 8.4.3 Navbar 布局页面滚动监听：`@/src/layouts/navbar/utils/index.uts`
 
 - **导出方法**：
-  - `onNavbarPageScroll(callback: (scrollTop: number) => void)`
+  - `onNavbarPageScroll(callback: (e: PageScrollDetail) => void)`
   - `onNavbarReachBottom(callback: () => void)`
   - `onNavbarPullDownRefresh(callback: () => void)`
   - `stopNavbarPullDownRefresh()`
@@ -205,29 +207,84 @@ if (isDev()) {
   - `getRootThemeStyle(themeColor: string, isDark: boolean): UTSJSONObject`：生成绑定在根容器 `:style` 上的 CSS 变量集合。
   - `applyThemeColor(color: string)`：动态注入全局主题色。
 
-### 8.4.5 跨端物理返回键拦截：`@/src/utils/backPress/index.uts`
+### 8.4.5 跨端「再按一次退出应用」：`@/src/utils/backPress/index.uts`
 
 - **导出方法**：
-  - `useBackPress(callback: () => boolean)`：安全监听 Android 原生物理返回键，返回 `true` 表示拦截默认返回行为。
+  - `handleBackPressExit(): boolean`：双击返回退出应用的辅助函数。首次触发弹「再按一次退出应用」toast 并返回 `true`（拦截本次返回），2 秒内再次触发则退出应用并返回 `false`。Android 端先 `finishAffinity()` 播退出动画、延迟后 `System.exit(0)` 彻底杀进程，确保下次是干净冷启动。
 
-### 8.4.6 文件上传与 OSS：`@/src/http/upload.uts`
+### 8.4.6 文件上传：走 `http.upload<T>`（`@/src/http/request/request.uts`）
 
-- **架构定位**：文件上传属于网络传输范畴，收敛在 `@/src/http/upload.uts`（与 `request.uts`、`stream.uts` 并列）。
-- **导出方法 / 单例**：
-  - `uploadFile(options: UploadFileOptions): Promise<string>`：全平台原生文件上传。
-  - `uploadOssFile(filePath: string, formData?, ignoreAuth?): Promise<string>`：快捷上传图片到 OSS。
-  - `upload` / `uploadUtils`：上传工具全局单例。
+- **架构定位**：文件上传属于网络传输范畴，收敛在 `src/http/request/request.uts`（与 `src/http/stream/stream.uts` 的 `requestStream` 并列），全部由 `@/src/http/index.uts` 门面导出。
+- **导出方法**：
+  - `http.upload<T>(url: string, config: LimeRequestConfig | null): Promise<T>`：`http` 单例上的上传方法，底层走 lime-request 的 UPLOAD，自动带 token；`T` 无法从入参推断，**必须显式标注**（如 `http.upload<string>(...)`）。
+  - `uploadHttp<T>(url: string, config: LimeRequestConfig | null): Promise<T>`：`http.upload<T>` 的具名函数包装，由 `@/src/http/request/request.uts` 直接导出。
+  - OSS 直传地址读 `getOssUploadUrl()` / `getOssUploadPath()`（`@/src/config/env/env.uts`），**严禁硬编码**。
 
 ### 8.4.7 数据埋点与监控上报：`@/src/utils/report/index.uts`
 
-- **导出方法**：
-  - `track(event: string, params?: UTSJSONObject)`：业务数据埋点上报。
-  - `reportError(error: any, context?: UTSJSONObject)`：全局错误捕获与日志监控上报。
-  - `createBreadcrumb(category: string, message: string)`：记录用户行为面包屑日志。
+- **导出方法**（该门面 `export *` 自 `./track.uts` 与 `./error.uts`）：
+  - `track(event: string, propsJson: string = '')`：业务数据埋点上报，附加属性以 **JSON 字符串**传入（不是 `UTSJSONObject`）。
+  - `reportError(err: any | null, extraMessage: string = '')`：全局错误捕获与日志监控上报。
+  - `reportErrorMessage(message: string)`：按纯文本消息上报一条错误。
+  - `trackPageView(page: string = '')` / `trackClick(name: string)`：页面浏览 / 点击埋点。
 
 ---
 
-## 8.5 模块引用与路径铁律
+## 8.5 生态工具库优先：`uni_modules/` 下的通用能力库
+
+### 8.5.1 三段式检索顺序（写通用能力前必走）
+
+`src/utils/` 覆盖的是**项目专属能力**（系统信息、环境变量、Toast、路由、主题），`uni_modules/` 下的生态库覆盖的是**通用算法能力**（大数运算、加解密、日期时间、颜色处理、纯函数、组合式 hooks）。两者**互补、不重叠**，因此不是「二选一」，而是**两边都要查**：
+
+1. **先查 `uni_modules/` 生态库**（下表 6 个）—— 生态库实现成熟、已适配全端、自带 `readme.md` 与项目内演示页；
+2. **再查 `@/src/utils/` 项目封装**（见 8.2 / 8.3 / 8.4）；
+3. **两处都没有，才允许自己实现**；实现后应沉淀回 `@/src/utils/` 供后续复用（见红线 10）。
+
+> 🚫 **严禁「先把算法写出来，事后才发现生态库里本来就有」**。判断依据是**先读下表、再读该库的 `readme.md`**，不是凭印象或凭「以前没这么用过」。
+
+### 8.5.2 六个生态工具库速查表
+
+| 库 | 定位 | 导入入口 | 典型导出 | 项目内演示页 |
+| :--- | :--- | :--- | :--- | :--- |
+| `lime-shared` | 通用纯函数集合，90+ 个「一函数一文件」模块 | **必须深引入到具体函数文件**（见下方 ⚠️） | `addUnit`、`debounce`、`throttle`、`floatAdd`、`fillZero`、`raf`、`uniqid`、`isEmail` | `src/sub/limeSharedFunctionDemo/limeSharedFunctionDemo.uvue` |
+| `lime-use` | Vue3 组合式函数（hooks）库 | `@/uni_modules/lime-use` | `useCountDown`、`useCodeTimer`、`useTimeout`、`useZIndex`、`useTransition`、`usePopupStack` | `src/sub/limeUseFunctionDemo/limeUseFunctionDemo.uvue` |
+| `lime-color` | 颜色处理（tinycolor 的 UTS 版） | `@/uni_modules/lime-color` | `tinyColor`、`generate`、类型 `TinyColor` / `LGenerateOptions` | `src/sub/limeColorFunctionDemo/limeColorFunctionDemo.uvue` |
+| `lime-dayuts` | 日期时间库（dayjs 的 UTS 移植版） | `@/uni_modules/lime-dayuts` | `dayuts`（链式 API 与 dayjs 基本一致） | `src/sub/timeFunctionDemo/timeFunctionDemo.uvue` |
+| `unix-Bignumber` | 任意精度十进制运算（bignumber.js 风格） | `@/uni_modules/unix-Bignumber` | `BigNumber`、`config`、`ROUND_UP` / `ROUND_HALF_UP` 等 9 种舍入常量 | `src/sub/bignumberFunctionDemo/bignumberFunctionDemo.uvue` |
+| `unix-crypto` | 加解密与安全工具（Promise 风格） | `@/uni_modules/unix-crypto` | `base64Encode` / `base64Decode`、`md5`、`sha256`、`hmacSha1`、`aesEncrypt` / `aesDecrypt`、`desEncrypt` / `desDecrypt`、`rsaEncrypt` / `rsaDecrypt` / `rsaSign` / `rsaVerify`、`generateUUID` | `src/sub/cryptoFunctionDemo/cryptoFunctionDemo.uvue` |
+
+**选型指引**：
+
+- **单次 / 少量浮点运算**（如 `0.1 + 0.2`）→ `lime-shared` 的 `floatAdd` / `floatSub` / `floatMul` / `floatDiv` 即可，**不必上 `unix-Bignumber`**；
+- **连续多步运算、需要指定精度或舍入模式、2~36 进制、千分位格式化** → `unix-Bignumber`；
+- **格式化与取值用 `lime-dayuts`，不要手写日期拼接**；涉及时区与 locale 时以该库的 `locale` 支持为准。
+
+### 8.5.3 导入写法（对齐项目既有先例）
+
+```ts
+// ✅ 桶导入：以下 5 个库的入口文件有真实有效导出，一个库一行
+import { dayuts } from '@/uni_modules/lime-dayuts';
+import { BigNumber, ROUND_HALF_UP } from '@/uni_modules/unix-Bignumber';
+import { md5, sha256, aesEncrypt, rsaVerify } from '@/uni_modules/unix-crypto';
+import { generate, tinyColor } from '@/uni_modules/lime-color';
+import { useCountDown, useCodeTimer, useZIndex } from '@/uni_modules/lime-use';
+
+// ✅ lime-shared 必须深引入：其入口 index.ts 的导出全体被注释掉，桶入口实际不导出任何符号
+import { addUnit } from '@/uni_modules/lime-shared/addUnit';
+import { debounce } from '@/uni_modules/lime-shared/debounce';
+import { floatAdd } from '@/uni_modules/lime-shared/floatAdd';
+
+// ❌ 相对路径穿透（与 8.6 节路径铁律冲突）
+import { addUnit } from '../../uni_modules/lime-shared/addUnit';
+```
+
+> ⚠️ **`lime-shared` 的深引入不是风格偏好，是硬约束**：`uni_modules/lime-shared/index.ts` 全文 43 行里 26 条 `export *` **全部被注释掉**（文件开头还带 `// @ts-nocheck`），桶入口实际不导出任何符号。写 `import { addUnit } from '@/uni_modules/lime-shared'` 会直接取不到值。
+>
+> ⚠️ **升级陷阱（`lime-shared`）**：`uniq`、`chunk`、`get`、`capitalize`、`isEqual` 五个函数是**项目在模块内自行补充实现**的（该模块原生未提供，项目演示页内已就此标注）。从插件市场**升级或覆盖 `lime-shared` 会丢掉这五个函数**，升级后必须回来核对这五项是否还在，不要在业务代码里把它们当作「模块自带能力」依赖。
+
+---
+
+## 8.6 模块引用与路径铁律
 
 1. **绝对路径导入**：
    一律使用 `@/src/utils/<module>/index.uts`（或 `@/src/utils/<module>`），严禁使用相对路径 `../../utils/...`。
@@ -235,7 +292,7 @@ if (isDev()) {
    ```ts
    // ✅ 正确规范写法
    import { availableHeight, statusBarHeight } from '@/src/utils/systemInfo/index.uts';
-   import { getApiBaseUrl, isDev } from '@/src/config/index.uts';
+   import { getApiBaseUrl, isDev } from '@/src/config/env/env.uts';
    import { toast, showLoading, hideLoading } from '@/src/utils/toast/index.uts';
 
    // ❌ 错误穿透写法
@@ -249,17 +306,17 @@ if (isDev()) {
 
    ```ts
    // ✅ 优先引入具名函数
-   import { isDev, getApiBaseUrl } from '@/src/config/index.uts';
+   import { isDev, getApiBaseUrl } from '@/src/config/env/env.uts';
    if (isDev()) { ... }
 
    // ❌ 避免在原生端解构纯对象中的函数导出（Kotlin 端可能报 Function invocation expected）
-   // import { env } from '@/src/config/index.uts';
+   // import { env } from '@/src/config/env/env.uts';
    // const { isDev } = env; // ❌ 容易出问题
    ```
 
 ---
 
-## 8.6 工具库使用自检清单与 10 条红线
+## 8.7 工具库使用自检清单与 11 条红线
 
 - [ ] **红线 1**：严禁在页面各处直接调用 `uni.getSystemInfoSync()`，一律优先从 `@/src/utils/systemInfo/index.uts` 引入响应式变量或使用 `sys` 单例。
 - [ ] **红线 2**：严禁在 `<style>` 或行内样式中写 `height: 100vh` 或 `width: 100vw`，高度撑满一律使用 `flex-1` 或绑定 `:style="{ height: availableHeight + 'px' }"`。
@@ -271,3 +328,4 @@ if (isDev()) {
 - [ ] **红线 8**：页面跳转与路径处理必须使用 `@/src/router/index.uts` 提供的路由方法（`toLoginPage`、`cleanPath`、`getCurrentPath` 等）或 `route` 单例，确保参数安全与平台守卫生效。
 - [ ] **红线 9**：引用工具库必须采用 `@/src/utils/<module>/index.uts` 形式，严禁跨层深层相对路径穿透。
 - [ ] **红线 10**：实现新功能前，必须首先在 `@/src/utils/` 中查验已有工具，严禁在局部重新手写已有的通用方法（如防抖、格式化、URL解析等）。
+- [ ] **红线 11**：通用算法能力（大数 / 精度运算、加解密与哈希、日期时间、颜色处理、数组与对象工具函数、组合式 hooks）必须先查 `uni_modules/` 下的 6 个生态库并优先复用，严禁直接手写（如自己实现 `md5`、手拼日期格式化、用 `+` 直接做大数运算）；且 `lime-shared` 必须**深引入到具体函数文件**（其桶入口 `index.ts` 的导出全体被注释，`import { addUnit } from '@/uni_modules/lime-shared'` 取不到值），见 8.5。

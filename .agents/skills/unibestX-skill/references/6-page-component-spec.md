@@ -129,32 +129,32 @@ graph TD
   - 反之，任何「某个模块用、且将来可能换成后端接口」的数据，一律不得做成页面级共享常量，必须回到 `src/api/<page>/<page>.uts` 中该模块自己那段接口函数里。
 - **全局 UI 态（主题色 / 亮暗 / 语言…）一律从 store 取，且同样严禁逐层透传 Props**（与模块数据一样，是另一种 Props 钻孔）：
 
-  > **唯一真源是 `src/store`（app store）**：主题色、亮暗 `isDark`、语言 `locale` 都持久化在 app store 里（`persist: true`）。组件**一律 `const appStore = useAppStore()` 后直读 `appStore.state.xxx`**，不要再从 `src/theme` 拿裸 ref、更不要自己 `ref` 一份或用 `import.meta.env` 另起炉灶 —— 那样会绕过持久化，出现「设置页改了主题、别的页面不跟随」。
+  > **唯一真源是 `src/store`**：主题色 / 亮暗 `isDark` 持久化在 **`useThemeStore()`** 里、语言 `locale` 持久化在 **`useI18nStore()`** 里（均 `persist: true`）。**`useAppStore()` 只是应用底座**（`state.mode`），**没有** `theme` / `isDark` / `setTheme` / `setLocale` —— 别拿它直读主题。组件一律按需 `const themeStore = useThemeStore()` 后直读 `themeStore.state.xxx`，不要再从 `src/theme` 拿裸 ref、更不要自己 `ref` 一份或用 `import.meta.env` 另起炉灶 —— 那样会绕过持久化，出现「设置页改了主题、别的页面不跟随」。
   >
-  > 🚨 **严禁对 store 读取的值做多余判断与拦截**：从 `appStore.state` 读取状态时，**严禁添加任何硬编码条件判断、黑名单拦截或私加假兜底**（例如写 `if (storeTheme.length > 0 && storeTheme != '#37c2bc') return '#a87c55'` 导致 store 里的真实主题色被静默篡改覆盖）。一律直接使用 `appStore.state.xxx`。
+  > 🚨 **严禁对 store 读取的值做多余判断与拦截**：从 store 读取状态时，**严禁添加任何硬编码条件判断、黑名单拦截或私加假兜底**（例如写 `if (storeTheme.length > 0 && storeTheme != '#37c2bc') return '#a87c55'` 导致 store 里的真实主题色被静默篡改覆盖）。一律直接使用 `store.state.xxx`。
 
-  | 全局态 | 正确的取法（各组件 `useAppStore()` 直读） | 错误写法 |
+  | 全局态 | 正确的取法（各组件按需取对应 store 直读） | 错误写法 |
   | :--- | :--- | :--- |
-  | 主题色 | `appStore.state.theme`（常用就派生 `computed((): string => appStore.state.theme)`，**直读直用，严禁加 `if` 判断拦截**） | 页面 `computed` 出 `themeColor` 再 `:theme-color` 逐层传；或写 `if (theme != '...')` 私加判断覆盖真实主题色；或从 `@/src/theme` 取裸 ref 绕过 store |
-  | 亮 / 暗模式 | `appStore.state.isDark`（`themeMode` 为三态 `auto` / `light` / `dark`） | 页面自己 `getSystemTheme()` 判断后再层层下传 |
-  | 语言 | 读文案走 `@/src/utils/i18n/index.uts`（`$t`），**切换**语言走 `appStore.setLocale(lang)` | 页面 `t()` 后把文案当 props 传 |
+  | 主题色 | `useThemeStore().state.theme`（常用就派生 `computed((): string => themeStore.state.theme)`，**直读直用，严禁加 `if` 判断拦截**） | 页面 `computed` 出 `themeColor` 再 `:theme-color` 逐层传；或写 `if (theme != '...')` 私加判断覆盖真实主题色；或从 `@/src/theme` 取裸 ref 绕过 store |
+  | 亮 / 暗模式 | `useThemeStore().state.isDark`（`state.themeMode` 为三态 `auto` / `light` / `dark`） | 页面自己 `getSystemTheme()` 判断后再层层下传 |
+  | 语言 | 读文案走 `@/src/i18n/utils/index.uts`（`$t`），**切换**语言走 `useI18nStore().setLocale(locale)` | 页面 `t()` 后把文案当 props 传 |
   | 安全区 / 屏幕尺寸 | `@/src/utils/systemInfo/index.uts`（`safeAreaBottom`、`safeAreaInsets`） | 页面量好再层层下传 |
 
   - **判定标准**：**值的来源是全局单例 / store（不由父组件决定），且任何一层拿到的都是同一个值** —— 那就是全局态，任何组件都可以直接读，一个 prop 都不要声明；反之，**由父组件决定、或各实例取值可能不同** 的值（如「当前选中项」「本模块的列表」）必须走 Props。
-  - **模板里用局部 `computed` 承载**（`appStore.state.theme` 模板里直接写也可以，但派生一个具名 `computed` 更好读、也便于脚本里复用）：
+  - **模板里用局部 `computed` 承载**（`themeStore.state.theme` 模板里直接写也可以，但派生一个具名 `computed` 更好读、也便于脚本里复用）：
 
     ```uts
     import { computed } from 'vue';
-    import { useAppStore } from '@/src/store';
+    import { useThemeStore } from '@/src/store';
 
-    const appStore = useAppStore();
+    const themeStore = useThemeStore();
 
-    /** 当前主题色（app store 持久化，跟随设置页实时变化） */
-    const themeColor = computed<string>((): string => appStore.state.theme);
+    /** 当前主题色（theme store 持久化，跟随设置页实时变化） */
+    const themeColor = computed<string>((): string => themeStore.state.theme);
     ```
 
     模板里写 `:style="{ color: themeColor }"`（`<script setup>` 的绑定模板自动解包，不用 `.value`），脚本里比较 / 计算时才写 `themeColor.value`。
-  - 参考实现：`src/tabbar/ui/default/TabbarItem.uvue`、`src/sub/creator/components/CreatorHeaderCard.uvue`。
+  - 参考实现：`src/tabbar/ui/default/TabbarItem.uvue`。
   - **历史包袱提醒**：`src/theme/index.uts` 的 `activeThemeColor` 是 store 派生出来的响应式副本，早期组件大量在用它。**新代码与改到的代码一律改为上面 store 直读口径**；`activeThemeColor` 只保留给 store 自身与 tabbar 兜底使用，不要再新增引用。
 
 ### 铁律 5：模拟数据（Mock）必须收拢进页面接口层，且按模块独立造数
@@ -167,7 +167,7 @@ graph TD
   - **接口层内部怎么写**（落位命名 / 契约类型 / 按模块造数 / `http` 请求与后端对接）**一律以分册 [7-api-spec.md](7-api-spec.md) 为准** —— 本铁律只规定「数据落在哪、归谁用」，同属铁律体系，不重复也不冲突。
   - 接口层是**全局层**，永远走别名引用：组件里写 `import { fetchXxx } from '@/src/api/<page>/<page>.uts'`，禁用 `'../../api/<page>/<page>.uts'` 这类相对穿透（铁律 1）。
 - **严禁**在 `.uvue` 组件或页面内部通过 `ref([...])` 硬编码写死模拟数据；每个页面在 `src/api/` 下**按页面同名**建目录与同名接口文件：`src/pages/mall/` ⇒ `src/api/mall/mall.uts`（映射规则见 6.2 / 6.4）。
-- **标准目录形态（三件套，标杆：`src/api/index/`）**：
+- **标准目录形态（三件套）**：
 
   ```text
   src/api/<page>/
@@ -195,8 +195,8 @@ graph TD
   - **形态一：单文件内联（默认）**：只建 `src/api/<page>/<page>.uts` 一个文件，类型、数据集、接口函数三块**按模块用注释分段**全写在里面，模块只 `import` 自己那段的符号；此时不建 `types.uts` 与 `mock/`；
   - **形态二：类型与数据集下沉（两个触发条件彼此独立）**：**类型被多段共用** ⇒ 契约类型收进 `src/api/<page>/types.uts`；**数据集本身过大** ⇒ 按模块拆进 `src/api/<page>/mock/<模块>.uts`。`<page>.uts` 只留接口函数与分段注释，函数体从 `./mock/xxx.uts` 取数、类型从 `./types.uts` `import type`；
     - ⚠️ **`types.uts` 的触发条件是「共用」，不是「行数」**：类型通常只占文件 0~13%，按总行数抽 `types.uts` 抽了也不减行；真要减行请看形态三；
-  - **形态三：按接口域拆兄弟文件（同页有多个互不相干的接口域，且主文件已贴 500 行硬上限）**：在 `src/api/<page>/` 下再开 `src/api/<page>/<模块>.uts`，**每个文件自带「类型 + 数据集 + 函数」三块**（标杆：登录页式的写回复弹层独立成 `src/api/qa-detail/reply-friends.uts`）；⚠️ 拆的**理由只能是行数**（铁律 2 的 500 行上限），不是为了「看起来更整齐」把三个函数拆成三个文件；
-  - ❌ **已废弃的旧形态**：`src/api/<page>/mock.uts` 这种「所有模块的数据集堆一个文件」的写法不再使用 —— 数据集一律按模块落进 `mock/` 目录，一模块一文件（这也是迁移表 6.4 里 `mock/*.uts` 的由来）；
+  - **形态三：按接口域拆兄弟文件（同页有多个互不相干的接口域，且主文件已贴 500 行硬上限）**：在 `src/api/<page>/` 下再开 `src/api/<page>/<模块>.uts`，**每个文件自带「类型 + 数据集 + 函数」三块**（如写回复弹层这类与主列表互不相干的接口域单独成文件）；⚠️ 拆的**理由只能是行数**（铁律 2 的 500 行上限），不是为了「看起来更整齐」把三个函数拆成三个文件；
+  - ❌ **已废弃的旧形态**：`src/api/<page>/mock.uts` 这种「所有模块的数据集堆一个文件」的写法不再使用 —— 数据集一律按模块落进 `mock/` 目录，一模块一文件；
   - 无论哪种形态，**铁律不倒**：各模块的 mock 数据集与接口函数独立命名、独立造数、互不引用。
 
 ### 铁律 6：注释加在「组件」「模板里的组件与功能块」「脚本功能块与方法」上 —— 严禁中文注释刷屏
@@ -214,7 +214,7 @@ graph TD
   <!-- 1. 顶部轮播（L2 纯视图，数据来自本模块 banners，点击抛 openProduct） -->
   <HomeBanner :banners="banners" @click="onBannerClick" />
 
-  <!-- 2. 热销推荐榜单（up-scroll-list 横向滑动） -->
+  <!-- 2. 热销推荐榜单（横向滑动区块） -->
   <HotSaleSection :hot-sales="hotSales" @click="onHotSaleClick" />
   ```
 
@@ -252,8 +252,8 @@ graph TD
 ### 铁律 7：生态工具与模块方法优先（Utils & uni_modules First）
 
 - **凡是 `src/utils/` 和 `uni_modules/` 中已有现成方法或能力的，必须绝对优先使用，严禁自行重复造轮子**：
-  - **`src/utils/` 基础与业务工具**：路由跳转与传参 → `src/router/`（`router.push` / `replace` / `back`）；主题色读取与切换 → **`useAppStore()` 直读 `appStore.state.theme`，切换走 `appStore.setTheme(theme)`**；弹窗与交互反馈 → `src/utils/toast/index.uts`（`toast` / `toastSuccess` / `toastError` / `showLoading`）；数据上报与监控 → `src/utils/report/index.uts`（`track` / `reportError`）；视口与安全区 → `src/utils/systemInfo/index.uts`（`availableHeight` / `systemInfo`）；下拉刷新与触底 → `@/src/layouts/navbar/utils/index.uts`（`onNavbarPullDownRefresh` / `stopNavbarPullDownRefresh`）；防抖 / 节流与响应式流 → `src/utils/rxjs-lite/index.uts`。
-  - **`uni_modules/` 组件生态**：图标 → `<uni-icons>` / `<lime-icon>`；标签与滑动列表 → `<up-tabs>` / `<up-scroll-list>`；复杂图表 → `<e-chart>`；分页下拉 / 触底 → `<z-paging-x>`；富文本渲染与编辑 → `<mp-html>` / `<sp-editor>`；二维码与手写签名 → `<lime-qrcode>` / `<lime-signature>`；折叠面板与评分 → `<uni-collapse-x>` / `<uni-rate-x>`。
+  - **`src/utils/` 基础与业务工具**：路由与路径 → `src/router/`（登录重定向 `toLoginPage()`、路径清洗 `cleanPath()` / 取当前路径 `getCurrentPath()`、参数解析 `parseUrlToObj()`、`route` 单例；**注意本项目 `src/router` 未封装 `push` / `replace` / `back`，页面跳转仍用 `uni.navigateTo` / `redirectTo` / `navigateBack`**）；主题色读取与切换 → `useThemeStore()` 直读 `themeStore.state.theme`，切换走 `themeStore.setTheme(theme)`（亮暗走 `setThemeMode()`）；语言切换 → `useI18nStore().setLocale(locale)`；弹窗与交互反馈 → `src/utils/toast/index.uts`（`toast` / `toastSuccess` / `toastError` / `showLoading`）；数据上报与监控 → `src/utils/report/index.uts`（`track` / `reportError`）；视口与安全区 → `src/utils/systemInfo/index.uts`（`availableHeight` / `systemInfo`）；下拉刷新与触底 → `@/src/layouts/navbar/utils/index.uts`（`onNavbarPullDownRefresh` / `stopNavbarPullDownRefresh`）；防抖 / 节流与响应式流 → `src/utils/rxjs-lite/index.uts`。
+  - **`uni_modules/` 组件生态**：图标 → `<uni-icons>` / `<lime-icon>`；复杂图表 → `<e-chart>`；分页下拉 / 触底 → `<z-paging-x>`；富文本渲染 → `<mp-html>`；手写签名 → `<lime-signature>`。
 - 严禁脱离项目现成成熟资产去手写原生重复实现，或引入未经兼容性验证的外部库。
 
 ### 铁律 8：可读性优先 —— 少嵌套、少多条件判断、相似逻辑立刻抽函数
@@ -639,9 +639,9 @@ export function fetchWallpaperList(category: string = 'all', pageNo: number = 1)
 
 ---
 
-## 6.4 后端对接与现网迁移（`src/api/<page>/`）
+## 6.4 后端对接细则（`src/api/<page>/`）
 
-> **规则本身见铁律 5**，本节只讲对接与迁移的落地细则（**接口层的写法细则 —— 命名 / 契约类型 / 按模块造数 / `http` 调用与类型转换 —— 见分册 [7-api-spec.md](7-api-spec.md)**）。对接后端**不搬迁文件、不改 import 路径**，只把**函数体**从 mock 换成 http。
+> **规则本身见铁律 5**，本节只讲对接的落地细则（**接口层的写法细则 —— 命名 / 契约类型 / 按模块造数 / `http` 调用与类型转换 —— 见分册 [7-api-spec.md](7-api-spec.md)**）。对接后端**不搬迁文件、不改 import 路径**，只把**函数体**从 mock 换成 http。
 
 ### 1. 目录与文件名严格对齐（一页一目录）
 
@@ -708,26 +708,9 @@ import type { IModuleAItem } from '@/src/api/index/index.uts';
 2. **弱类型就地转换**：后端的 `UTSJSONObject` 必须在 api 层就转成强类型 DTO 再返回（`getString` / `getNumber` + `??` 兜底），**严禁把 `UTSJSONObject` 直接抛给页面**，否则页面模板里必然踩 `UTS110111163` / `error17` / `ClassCastException`；
 3. **mock 数据集先留着**：接口刚联调通、后端还在动的时候，`MOCK_*` 常量与 mock 分支不要删（后端挂了可以一行切回来）；等接口验收稳定后再连同常量一起清掉。
 
-### 3. 现网迁移状态（诚实清单）
+### 3. 本项目 `src/api/` 现状
 
-> ⚠️ **本节描述的是目标形态，现网尚未全部迁移。** 下列 12 个页面的模拟数据目前仍在页面目录下，属**旧形态**；迁移时按上面的映射表逐页搬进 `src/api/<page>/<page>.uts` 并删除页面侧 `mock.uts`（页面侧组件只需把 import 换成 `@/src/api/...`，其余逻辑不动）：
-
-| 页面 | 现网旧位置 | 行数 | 目标位置 |
-| :--- | :--- | ---: | :--- |
-| 商城 | `src/pages/mall/mock.uts` | 650 | `src/api/mall/mall.uts` + `src/api/mall/mock/*.uts` |
-| 选球 | `src/pages/ball/mock/*.uts`（7 个） | 972 | `src/api/ball/ball.uts` + `src/api/ball/mock/*.uts` |
-| 首页 | `src/pages/index/mock/*.uts`（6 个） | 707 | `src/api/index/index.uts` + `src/api/index/mock/*.uts` |
-| 论坛 | `src/pages/forum/mock.uts` | 353 | `src/api/forum/forum.uts` |
-| 服务 | `src/sub/service/mock.uts` | 391 | `src/api/service/service.uts` |
-| 订单列表 | `src/sub/order-list/mock.uts` | 377 | `src/api/order-list/order-list.uts` |
-| 商品详情 | `src/sub/product/mock.uts` | 280 | `src/api/product/product.uts` |
-| 待付款 | `src/sub/order-pending-pay/mock.uts` | 128 | `src/api/order-pending-pay/order-pending-pay.uts` |
-| 确认订单 | `src/sub/order-confirm/mock.uts` | 96 | `src/api/order-confirm/order-confirm.uts` |
-| 支付结果 | `src/sub/order-pay-result/mock.uts` | 116 | `src/api/order-pay-result/order-pay-result.uts` |
-| 购物车 | `src/sub/cart/mock.uts` | 126 | `src/api/cart/cart.uts` |
-| 登录 | `src/sub/auth/mock.uts` | 127 | `src/api/auth/auth.uts` |
-
-- 迁移时**顺带处理两处旧约定**：① 页面 `mock.uts` 里同步导出的**页面结构级只读常量**（如选球页 `STORE_TABS`，现在 `src/pages/ball/mock/catalog.uts`）要移到页面自己的 `constants.uts`，**不进 `src/api/`**；② 现网 `src/api/index/index.uts` 仍在从 `@/src/pages/index/types.uts` 反向导入后端 DTO 类型，按铁律 5「类型跟着接口走」应把 DTO 下沉进 api 层，页面 `types.uts` 只留 UI 层类型。
+> **本仓库没有「页面侧 `mock.uts` 待迁」的历史包袱**：`src/api/` 下现有 `example.uts`（`FooItem` + 分页容器 `PageResult<T>`，含 `http.get` / `http.upload` / `http.downloadFile` 写法参照）、`auth/auth.uts`、`privacy/privacy.uts`。页面级 `src/api/<page>/` 目录**从新建页面起按上述规则直接落位**，不存在需要逐页搬迁的旧 `mock.uts`，**页面目录下也不会再出现 `mock.uts`**。
 
 ---
 
@@ -747,7 +730,7 @@ import type { IModuleAItem } from '@/src/api/index/index.uts';
 - [ ] **10. 长列表严禁用 `<scroll-view>`** —— 一律 `<list-view>` + `<list-item>` 或 `<z-paging-x>`；`<scroll-view>` 只用于短内容或横向滑块
 - [ ] **11. 根视图严禁持有模块业务数据** —— 只持结构级状态（分区下标 / swiper 锁 / 主题色 / 下拉信号）（铁律 4）
 - [ ] **12. 模块之间的数据、状态、mock 与接口严禁共享** —— 跨模块只传「切分区 / 跳转」这类结构级意图，且不携带业务数据（铁律 4 / 铁律 5）
-- [ ] **13. 全局 UI 态一律从 store 直读，严禁声明同名 prop 逐层透传** —— 主题色 / `isDark` 走 `appStore.state.*`，严禁从 `@/src/theme` 取裸 ref 或自己 `ref` 一份（铁律 4）
+- [ ] **13. 全局 UI 态一律从 store 直读，严禁声明同名 prop 逐层透传** —— 主题色 / `isDark` 走 `useThemeStore().state.*`、语言走 `useI18nStore()`（**不是 `useAppStore()`**，它只有 `state.mode`），严禁从 `@/src/theme` 取裸 ref 或自己 `ref` 一份（铁律 4）
 - [ ] **14. 无人写入的状态与事件线一律不留** —— 如 `props.refreshTick` 若全页找不到写入点，连同 `watch` 与 props 声明一起删（见 3.22）
 - [ ] **15. 单个 `.uvue` / `.uts` 文件严禁超过 500 行** —— 交付前 `wc -l` 自查，只允许向下拆：`.uvue` 拆组件、`.uts` 拆兄弟文件；⚠️ 抽 `types.uts` **不是**减行手段（类型只占 0~13%，且抽不抽只看共用，见分册 7）（铁律 2）
 - [ ] **16. 可读性优先** —— 循环与 `if` 嵌套各不超两层、单处分支不超 3 个、相似逻辑出现两遍立刻抽函数（抽函数与分组同时受 `SKILL.md` A.2 第 16 / 18 条约束）（铁律 8）

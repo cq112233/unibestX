@@ -21,7 +21,7 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 3. **项目代码生成规范**：生成流程与模板（分册 5）、本文件常驻的 A.1 对照表与 A.2 红线清单；
 4. **AI 页面层级与组件设计规范**：页面高内聚自包含、最多三级封顶、容器与纯展示解耦、Mock 接口契约化（分册 6）——**AI 生成复杂页面与拆分组件前必读**；
 5. **API 接口层规范**：一页一目录落位、契约类型（`type`）与 Mock 数据集同层、后端就绪只换函数体（分册 7）——**新增页面与对接后端前必读**；
-6. **项目核心工具库规范**：系统信息（`src/utils/systemInfo`）、环境变量（`src/utils/env`）与基础通用工具（分册 8）——**页面开发与调用通用能力前必读**。
+6. **项目核心工具库规范**：系统信息（`src/utils/systemInfo`）、环境变量（`src/config/env`）与基础通用工具（分册 8）——**页面开发与调用通用能力前必读**。
 
 ---
 
@@ -53,7 +53,7 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 | [references/5-codegen.md](references/5-codegen.md) | **5.1 新增页面生成流程**、**5.2 页面代码标准模板** | 生成新页面 / 组件前走流程、需要复制标准页面模板；**新增页面时必产接口层**（接口文件模板见分册 7） |
 | [references/6-page-component-spec.md](references/6-page-component-spec.md) | **6 AI 页面层级与组件设计规范**（页面高内聚 · 数据所有权下沉 · 容器/视图分离 · Mock 收拢进页面接口目录 · 后端就绪只换函数体，附八大铁律与 19 条自检红线） | 规划新页面结构、拆分复杂页面组件、组织页面内 `components/common/` 与模块私有视图、把 mock 收拢进 `src/api/<page>/`、对接后端真实接口时必读 |
 | [references/7-api-spec.md](references/7-api-spec.md) | **7 API 接口层规范**（一页一目录落位 · 命名约定 · 契约类型铁律 · 按模块独立造数 · `http` 单例 / 上传 / SSE 用法 · 后端就绪只换函数体，附 12 条接口层自检红线） | **新增页面同步建 `src/api/<page>/` 时**、抽接口函数时、写 mock 数据集与契约类型时、对接后端真实接口时必读 |
-| [references/8-utils-spec.md](references/8-utils-spec.md) | **8 项目核心工具库规范**（系统信息 `src/utils/systemInfo` · 环境变量 `src/utils/env` · 基础通用工具优先原则，附完整 API 矩阵与 10 条红线） | 获取屏幕/窗口尺寸、状态栏/导航栏/TabBar高度、计算内容可用高度（`availableHeight`）；判断开发/生产环境、获取接口基础地址；使用 Toast、Loading、路由跳转、主题与返回键时必读 |
+| [references/8-utils-spec.md](references/8-utils-spec.md) | **8 项目核心工具库规范**（系统信息 `src/utils/systemInfo` · 环境变量 `src/config/env` · `uni_modules/` 生态工具库优先原则 · 基础通用工具优先原则，附完整 API 矩阵与 11 条红线） | 获取屏幕/窗口尺寸、状态栏/导航栏/TabBar高度、计算内容可用高度（`availableHeight`）；判断开发/生产环境、获取接口基础地址；使用 Toast、Loading、路由跳转、主题与返回键时必读；**要写大数运算 / 加解密与哈希 / 日期时间 / 颜色处理 / 数组对象工具 / 组合式 hooks 前必读（先查 `uni_modules/` 生态库，不要手写）** |
 
 > 📌 **A.1 快速排查对照表**与 **A.2 代码生成红线清单** 因使用频率最高，常驻在本文件下方，无需额外 Read。
 
@@ -105,7 +105,7 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 | **联合类型上的三元表达式（`Expression expected`）** | `return target >= 0 ? target : -1;`（`target: number \| string`，UTS 在 `typeof` 窄化前先解析三元，判据对另一分支非法即报错，错误箭头指向 `>=`） | 拆成 `if` 语句提前 `return`：`if (target >= 0) { return target; } return -1;`（仅在**联合类型**上必需，单类型变量上的三元合法，切勿全仓机械替换，详见 **1.20**） |
 | **链式 `.catch()`（`error25 None of the following candidates is applicable`）** | `.then(done).catch((err: any) => {...})`（UTSPromise 的三个 `.catch` 重载在 Kotlin 端均无法收敛；**与回调返回类型、是否 `throw` 无关**，单一返回类型的回调照样报错） | 改为双参 `.then(onFulfilled, onRejected)`，拒绝回调并进第二参；要表达「抛出」时用 `Promise.reject(toError(err)) as Promise<T>` 而非 `throw`（`Promise.resolve(...)` 包裹也一并去掉，详见 **1.21**） |
 | **系统尺寸与高度获取** | 散落调用 `uni.getSystemInfoSync()` 或样式手写 `100vh`（损耗性能、非响应式、原生端不支持 vh 且易被 TabBar/导航栏遮挡） | 优先引入 `@/src/utils/systemInfo/index.uts` 中的响应式变量（`availableHeight`、`statusBarHeight`、`navBarHeight`、`safeAreaBottom`）或使用 `sys` 单例（详见 **分册 8**） |
-| **环境变量与服务地址读取** | 手写 `process.env` / `import.meta.env` 或在代码里硬编码域名 IP（原生平台无法识别且切换环境易出错） | 统一从 `@/src/utils/env/index.uts` 引入具名方法（`getApiBaseUrl()`、`getOssBaseUrl()`、`isDev()`、`isProd()`、`isVaporMode()`）（详见 **分册 8**） |
+| **环境变量与服务地址读取** | 手写 `process.env` / `import.meta.env` 或在代码里硬编码域名 IP（原生平台无法识别且切换环境易出错） | 统一从 `@/src/config/env/env.uts` 引入具名方法（`getApiBaseUrl()`、`getOssBaseUrl()`、`isDev()`、`isProd()`、`isVaporMode()`）（详见 **分册 8**） |
 | **页面跳转与路由控制** | 直接调用原生 `uni.navigateTo` 等且未做参数编码与越界防护 | 优先引入 `@/src/router/index.uts` 的路由封装方法（如 `toLoginPage()`、`cleanPath()`、`getCurrentPath()`、`parseUrlToObj()` 或 `route` 单例，详见 **分册 8**） |
 | **LeakCanary 报 Activity 内存泄漏（`mDestroyed = true`）** | 页面或根容器组件（如 `App.ku.uvue`）通过 `uni.$on` 注册全局监听但**未在 `onUnmounted` 中通过 `uni.$off` 注销**（或直接传入匿名函数无法解绑）；全局单例 `IndexKt.emitter` 永久持有页面回调，导致退出页面后原生 Activity 无法被 GC 回收 | 回调函数必须抽离为**具名函数**，`onMounted` 注册，`onUnmounted` 必须严格调用 `uni.$off(eventName, handler)` 注销（详见 **3.26**） |
 | **`ReferenceError: XxxPageResult is not defined`**（**编译期零报错，运行期才炸**，且常被页面的 `try/catch` 吞成「列表渲染不出来 + 一条 `console.error`」） | 在 `as` 断言位置写「**泛型实例化别名**」：`} as FooPageResult);`（而 `type FooPageResult = PageResult<FooItem>`）—— UTS 把 `as` 断言**编译成构造调用** `new FooPageResult({...})`，但别名只是编译期 `type`、**没有任何运行期绑定**（编译器只为泛型本体生成 `class PageResult`）⇒ 产物里留下一个指向不存在标识符的 `new` | 断言**直写泛型本体、实参写全**：`} as PageResult<FooItem>);`；别名只允许出现在**类型位置**（返回值标注 / 回调参数标注）。口诀：**`as` / `new` 后面不许出现泛型实例化别名，`:` 后面可以**。判据必须落到产物上：`grep -rn "new [A-Za-z_]*PageResult(" unpackage/dist/dev/mp-weixin/src/api/*.js`（单测走 esbuild 转译、**不复现**这一层，全绿也照样有坑；详见 **1.25**） |
@@ -146,7 +146,7 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 - [ ] **28. 计时器高频驱动的流式渲染，严禁把「块结构未完成」的整串内容喂给富文本渲染器**（末尾半截块会让原生组件在渲染分支间搬家、被销毁重建，App 抛 `IllegalStateException: UTS instance N is not registered`；必须把接收与渲染分离，只按块边界推进渲染快照，见 3.23）
 - [ ] **29. 严禁给挂了事件或依赖 `z-index` / `visibility` / `display:fixed` / `background-image` 的元素加 `flatten`**（拍平后**事件与这批 CSS 全部静默失效** —— 编译不报错、运行不警告，只是点了没反应、遮罩压不住；`image` 拍平后 gif 只显第一帧。只给纯装饰图元加；仅蒸汽模式生效，是初始化属性不能动态绑定，鸿蒙需至少两个相邻元素同时拍平才有收益，见 3.24）
 - [ ] **30. 严禁在页面各处直接调用 `uni.getSystemInfoSync()` 与使用 CSS `100vh`**（系统信息与视口高度必须优先从 `@/src/utils/systemInfo/index.uts` 引入 `statusBarHeight`、`availableHeight` 等响应式变量，见分册 8）
-- [ ] **31. 严禁手写 `process.env` / `import.meta.env` 或硬编码请求域名**（必须统一从 `@/src/utils/env/index.uts` 引入 `getApiBaseUrl()`、`isDev()` 等方法，见分册 8）
+- [ ] **31. 严禁手写 `process.env` / `import.meta.env` 或硬编码请求域名**（必须统一从 `@/src/config/env/env.uts` 引入 `getApiBaseUrl()`、`isDev()` 等方法，见分册 8）
 - [ ] **32. 严禁在业务页面中散落调用原生 `uni.showToast({ title, icon: 'none' })`**（必须统一使用 `@/src/utils/toast/index.uts` 导出的 `toast(msg)` 或 `showToast(...)`，见分册 8）
 - [ ] **33. 业务功能开发前优先复用 `@/src/utils/` 下既有封装**（严禁在局部重新手写已有的通用方法，引用路径一律使用 `@/src/utils/<module>/index.uts` 绝对路径，见分册 8）
 - [ ] **34. 联合类型变量（`number | string`、`T | null` 等）上严禁直接写三元表达式**（UTS 在 `typeof` 窄化前先解析三元，判据对另一分支类型非法即报 `Expression expected` 且箭头指向判据操作数；必须拆成 `if` 语句提前 `return`。**只针对联合类型，单类型变量上的三元合法，严禁全仓机械替换**，见 1.20）
@@ -157,3 +157,4 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 - [ ] **39. `<web-view>` 组件的 `@message` 事件入参必须显式声明为 `UniWebViewMessageEvent`**（严禁将入参声明为 `(e: any)` 或省略类型后直接访问 `e.detail`，UTS 强类型检查会报 `找不到名称“detail”`；必须显式声明为官方事件强类型 `(e: UniWebViewMessageEvent)`，见 1.24）
 - [ ] **40. 严禁在页面或组件中使用 `uni.$on` 注册全局事件后不执行 `uni.$off` 注销**（全局单例 `IndexKt.emitter` 生命周期贯穿整个应用进程，未注销的回调闭包会死死抓取组件实例、DOM 树及 `UniPortraitPageActivity`，导致每次进出页面都泄露一个完整的原生 Activity，被 LeakCanary 报内存泄漏；监听回调必须抽为具名函数，在 `onMounted` 注册，并在 `onUnmounted` 中调用 `uni.$off` 严格注销，见 3.26）
 - [ ] **41. 「泛型实例化别名」（如 `type FooPageResult = PageResult<FooItem>`）严禁出现在 `as` 断言位置**（UTS 把 `as` 断言编译成**构造调用**，写 `} as FooPageResult);` 会生成 `new FooPageResult({...})`，而别名只是编译期 `type`、**没有任何运行期绑定**（编译器只为泛型本体生成 `class PageResult`）⇒ 产物里留下指向不存在标识符的 `new`，**编译期零报错零警告**、运行期抛 `ReferenceError: FooPageResult is not defined`，且常被页面 `try/catch` 吞成「列表渲染不出来 + 一条 `console.error`」而被误判为网络问题；断言必须**直写泛型本体、实参写全** `} as PageResult<FooItem>);`，别名只允许出现在类型位置（返回值标注 / 回调参数标注）；口诀「`as` / `new` 后面不许出现泛型实例化别名，`:` 后面可以」。**判据必须落到产物上**：`grep -rn "new [A-Za-z_]*PageResult(" unpackage/dist/dev/mp-weixin/src/api/*.js` —— 单测走 esbuild 转译、**不复现**这一层，全绿也照样有坑，见 1.25）
+- [ ] **42. 通用算法能力严禁直接手写**（如自己实现 `md5` / SHA-256、手拼日期格式化、用 `+` 或 `*` 直接做大数运算、手写颜色空间转换）：必须先查 `uni_modules/` 下 6 个生态库并优先复用 —— `lime-shared`（91 个纯函数模块）、`lime-use`（组合式 hooks）、`lime-color`（颜色）、`lime-dayuts`（日期）、`unix-Bignumber`（任意精度）、`unix-crypto`（加解密 / 哈希 / UUID），每库自带 `readme.md` 与项目内演示页（`src/sub/*FunctionDemo/`）。**注意两点**：① `lime-shared` 必须**深引入到具体函数文件**（其桶入口 `index.ts` 的 26 条导出**全被注释**，`import { addUnit } from '@/uni_modules/lime-shared'` 取不到值）；② 该模块的 `uniq` / `chunk` / `get` / `capitalize` / `isEqual` 是**项目本地补进去的**，升级 `lime-shared` 会被覆盖，升级后必须回来核对（见分册 8.5）

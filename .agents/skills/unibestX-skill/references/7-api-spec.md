@@ -113,9 +113,9 @@ export const MOCK_WALLPAPERS: Array<WallpaperItem> = [
 
 ## 7.4 请求实现：一律走 `src/http` 的 `http` 单例
 
-> 🚨 **严禁自己写 `uni.request`**：鉴权头、业务码判定、401 清 token 并跳登录、错误 toast 全部已经收在 `src/http/request.uts` 的拦截器里，绕过去就等于把这些能力全部重写一遍，且必然漏掉其中一项。
+> 🚨 **严禁自己写 `uni.request`**：鉴权头、业务码判定、401 清 token 并跳登录、错误 toast 全部已经收在 `src/http/request/request.uts` 的拦截器里，绕过去就等于把这些能力全部重写一遍，且必然漏掉其中一项。
 
-### 1. 单例 API（`import { http } from '@/src/http/request'`）
+### 1. 单例 API（`import { http } from '@/src/http/request/request.uts'`）
 
 | 方法 | 签名 | 说明 |
 | :--- | :--- | :--- |
@@ -147,8 +147,8 @@ export const MOCK_WALLPAPERS: Array<WallpaperItem> = [
 
 ### 3. 文件上传与流式接口也走既有封装
 
-- **上传**：用 `uploadFile`（`@/src/utils/upload/index.uts`，底层 `uni.uploadFile`，自动带 token、支持 `onProgress`），返回值是 OSS 地址字符串 —— 需要时在 api 层包一个语义化函数（如 `uploadAvatar(filePath): Promise<string>`）再暴露给页面，**严禁**页面里直接调 `uni.chooseImage` + `uni.uploadFile` 拼流程；
-- **SSE / 流式**：用 `requestStream`（`@/src/http/stream.uts`，返回 `Observable<StreamChunk>`）或 `simulateStream`。**流式接口同样收在 api 层**：在 `<page>.uts` 里包一个 `fetchXxxStream(params, onChunk)` 形态的函数，页面只负责把 chunk 往渲染层喂；**半截块不进渲染器**（分册 3 的 3.23 有完整事故与结论）。
+- **上传**：用 `http.upload<T>(url, config)` 或具名函数 `uploadHttp<T>(url, config)`（`@/src/http/request/request.uts`，底层走 lime-request 的 UPLOAD，自动带 token），`T` 无法从入参推断、**必须显式标注**（如 `http.upload<string>(...)`）；返回值是 OSS 地址字符串 —— 需要时在 api 层包一个语义化函数（如 `uploadAvatar(filePath): Promise<string>`）再暴露给页面，**严禁**页面里直接调 `uni.chooseImage` + `uni.uploadFile` 拼流程。OSS 直传地址读 `getOssUploadUrl()` / `getOssUploadPath()`（`@/src/config/env/env.uts`），严禁硬编码；
+- **SSE / 流式**：用 `requestStream`（`@/src/http/stream/stream.uts`，返回 `Observable<StreamChunk>`）或 `simulateStream`。**流式接口同样收在 api 层**：在 `<page>.uts` 里包一个 `fetchXxxStream(params, onChunk)` 形态的函数，页面只负责把 chunk 往渲染层喂；**半截块不进渲染器**（分册 3 的 3.23 有完整事故与结论）。
 
 ---
 
@@ -239,7 +239,7 @@ import type { WallpaperItem } from '@/src/api/index/index.uts';
 - [ ] **5. 后端 DTO 只放 api 层** —— 页面 `types.uts` 只留 UI 层类型，严禁页面侧反向给 api 层提供类型（7.2）
 - [ ] **6. Mock 按模块独立造数** —— 数据集与函数名一一对应、互不引用，严禁「通用 `fetchList(type)`」共用函数（7.3 / 分册 6 铁律 5）
 - [ ] **7. mock 函数体要像真接口** —— 分页 / 筛选 / 排序逻辑照写，别无视入参返回整个数组（7.3）
-- [ ] **8. 严禁自己写 `uni.request`** —— 一律走 `http` 单例 / `uploadFile` / `requestStream`（7.4）
+- [ ] **8. 严禁自己写 `uni.request`** —— 一律走 `http` 单例 / `http.upload` / `requestStream`（7.4）
 - [ ] **9. 拦截器已处理的错误不要重复处理** —— api 层不写 `uni.showToast`、不判 401、不跳登录页（7.4）
 - [ ] **10. 对接后端只换函数体** —— 函数名 / 入参（含默认值）/ 返回类型一个字不改，mock 常量先留着（7.5）
 - [ ] **11. 接口引用一律 `@/src/api/<page>/<page>.uts`** —— 严禁相对路径穿透（7.1 / 分册 6 铁律 1）
@@ -264,4 +264,4 @@ Chaser/src/api/
 └── address/ auth/ ball/ cart/ mall/ order-*/ product/ search/ service/ zone/ ...
 ```
 
-**本项目 unibestX 现状**：`src/api/` 下目前只有 `foo.uts`（含 `http.get` / `post` / `put` / `delete` / `upload` 的完整调用示例，可作为**写法参照**），页面级接口目录尚未建立 —— 各页面的模拟数据仍在页面目录下，迁移清单与逐页目标位置见**分册 6 的 6.4**。**从今往后新建的页面一律按本分册直接落位，不再产生新的页面侧 `mock.uts`。**
+**本项目 unibestX 现状**：`src/api/` 下现有 `src/api/example.uts`（216 行，`FooItem` + 分页容器 `PageResult<T>`，含 `http.get` / `http.upload` / `http.downloadFile` 的完整调用示例，可作为**写法参照**）、`src/api/auth/auth.uts`、`src/api/privacy/privacy.uts`；页面级 `src/api/<page>/` 接口目录尚未逐页建立。**从今往后新建的页面一律按本分册直接落位，不再产生页面侧的 `mock.uts`。**

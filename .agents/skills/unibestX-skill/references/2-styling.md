@@ -9,7 +9,7 @@
 - **根节点绑定**：为了保证 App 原生平台下 CSS 变量跟随 JS 变量动态更新，**必须在根元素（如 layout 根 `view`）上内联绑定该变量**：
 
   ```html
-  <view :style="{ '--theme-color': appStore.state.theme }">
+  <view :style="{ '--theme-color': themeStore.state.theme }">
     <slot></slot>
   </view>
   ```
@@ -18,7 +18,7 @@
   - **正确做法**：在 `<button>` 等原生控件上，通过 Vue 响应式行内样式直接绑定具体变量值：
 
     ```html
-    <button :style="{ backgroundColor: appStore.state.theme }">按钮</button>
+    <button :style="{ backgroundColor: themeStore.state.theme }">按钮</button>
     ```
 
 ```html
@@ -28,9 +28,9 @@
 </view>
 
 <!-- ✅ 正确：layout 根节点内联绑定变量；原生控件另用行内样式直接给具体值 -->
-<view :style="{ '--theme-color': appStore.state.theme }">
+<view :style="{ '--theme-color': themeStore.state.theme }">
   <text :style="{ color: 'var(--theme-color)' }">当前主题</text>
-  <button :style="{ backgroundColor: appStore.state.theme }">按钮</button>
+  <button :style="{ backgroundColor: themeStore.state.theme }">按钮</button>
 </view>
 ```
 
@@ -517,7 +517,7 @@ const text2: string = flatText(n);               // 文本仍由摊平取得，�
 
 ## 2.22 H5 里 `uni-view` 默认 `overflow: hidden` —— 滚动容器中间套一层 view 会把溢出裁掉；`flex-shrink` 默认值 App=0 / H5=1
 
-**现象**：`<scroll-view direction="all">` 里放一张比屏幕宽的图（`:style="width:812px"`），**H5 横向拖不动**（`scrollLeft` 恒为 0），竖向却完全正常；同一份代码在 App 端没事。本文来自 rxjsDemo 的 mermaid 图片查看器实测。
+**现象**：`<scroll-view direction="all">` 里放一张比屏幕宽的图（`:style="width:812px"`），**H5 横向拖不动**（`scrollLeft` 恒为 0），竖向却完全正常；同一份代码在 App 端没事。本文来自 rxjsFunctionDemo 的 mermaid 图片查看器实测。
 
 **根因一：H5 运行时的 `uni-view` 自带 `overflow: hidden`**
 
