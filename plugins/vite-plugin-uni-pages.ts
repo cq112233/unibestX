@@ -1117,9 +1117,7 @@ function generatePagesJson(
     }
 
     // 2) 同步分包（新增、修改、剔除已删除）
-    if (currentConfig.subPackages == null) {
-      currentConfig.subPackages = [];
-    }
+    currentConfig.subPackages ??= [];
     for (let s = 0; s < scannedSubPkgs.length; s++) {
       const spkg = scannedSubPkgs[s];
       const targetSub = currentConfig.subPackages.find(cp => cp.root === spkg.root);

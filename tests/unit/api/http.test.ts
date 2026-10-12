@@ -45,9 +45,7 @@ describe('httpClient beforeRequest & afterResponse hooks', () => {
     let capturedHeader: any = null;
 
     const hook = (config: any) => {
-      if (config.header == null) {
-        config.header = {};
-      }
+      config.header ??= {};
       const header = config.header;
       header.token = 'custom-test-token';
       header['X-Custom-Header'] = 'custom-value';
@@ -78,9 +76,7 @@ describe('httpClient beforeRequest & afterResponse hooks', () => {
     http.beforeRequest(async (config: any) => {
       executionOrder.push('start-async');
       await new Promise(resolve => setTimeout(resolve, 10));
-      if (config.header == null) {
-        config.header = {};
-      }
+      config.header ??= {};
       config.header['X-Async-Id'] = 'async-123';
       executionOrder.push('end-async');
     });
@@ -432,9 +428,7 @@ describe('httpClient downloadFile', () => {
       }
     );
     client.beforeRequest((config: any) => {
-      if (config.header == null) {
-        config.header = {};
-      }
+      config.header ??= {};
       config.header.token = 'download-token';
     });
 
@@ -575,9 +569,7 @@ describe('httpClient 401 refresh replay', () => {
       },
       beforeRequest: (config: any) => {
         hookCallCount += 1;
-        if (config.header == null) {
-          config.header = {};
-        }
+        config.header ??= {};
         const header = config.header;
         // 对齐 defaultBusinessBeforeRequest：仅当未显式携带 token 时才注入
         if (header.token == null || header.token === '') {
@@ -614,9 +606,7 @@ describe('httpClient 401 refresh replay', () => {
         if (!injectToken) {
           return;
         }
-        if (config.header == null) {
-          config.header = {};
-        }
+        config.header ??= {};
         config.header.token = 'stale-token';
       },
       refreshToken: () => {

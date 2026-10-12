@@ -30,7 +30,7 @@ jobs:
           node-version-file: .nvmrc
 
       - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: Build VitePress site (官网)
         run: pnpm run docs:build
