@@ -12,10 +12,10 @@ export function range(start : number, end : number, step : number = 1, fromRight
 	// 计算范围的长度
 	let length = Math.max(Math.ceil((end - start) / step), 0);
 	// 创建一个长度为 length 的数组
-	// #ifdef APP-ANDROID
+	// #ifdef APP-ANDROID && !VUE3-VAPOR
 	const result = Array.fromNative(new IntArray(length.toInt()));
 	// #endif
-	// #ifndef APP-ANDROID
+	// #ifndef APP-ANDROID && !VUE3-VAPOR
 	const result = new Array(length);
 	// #endif
 

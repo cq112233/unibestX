@@ -684,8 +684,17 @@ function checkSignatureEm(em: Uint8Array, k: number, digestHex: string, hashType
 // 而同一份代码在 H5 上只要 100 多毫秒（JS 的 number 是原生类型，不存在装箱）。
 // 因此 Android 侧一律改用 java.security / javax.crypto 原生实现（密钥生成本来就已是原生），
 // H5 / 小程序 / iOS / 鸿蒙 仍走上面的纯 UTS 实现。
+//
+// ⚠️ 但「Android」不等于「编译成 Kotlin」：蒸汽模式（VUE3-VAPOR）下 App 逻辑层整体打成 JS
+// （`unpackage/dist/dev/app-android/app-service.js`），而 `APP-ANDROID` 在这一层**同样成立**，
+// 于是 `import Cipher from 'javax.crypto.Cipher'` 会原样落进 JS 包，
+// 被打包器当成外部依赖写成 IIFE 形参 —— 运行时求值实参直接 `ReferenceError: Cipher is not defined`，
+// **整个逻辑层在加载期就挂掉**（不是只有 crypto 页面不可用）。
+// `javax.crypto` / `java.security` / `android.util` 都是 JVM 类，纯 JS 引擎里根本不存在，
+// 所以这一整块必须同时排除蒸汽模式，让安卓蒸汽模式退回上面的纯 UTS 实现（JS 的 number 不装箱，无性能问题）。
+// 下列每一处 `#ifdef` / `#ifndef` 都按此成对收窄，改动时务必保持两支互补。
 
-// #ifdef APP-ANDROID
+// #ifdef APP-ANDROID && !VUE3-VAPOR
 import Cipher from 'javax.crypto.Cipher'
 import KeyFactory from 'java.security.KeyFactory'
 import X509EncodedKeySpec from 'java.security.spec.X509EncodedKeySpec'
@@ -897,11 +906,11 @@ function rsaVerifyAndroid(digestHex: string, hashType: string, publicKey: string
  * @returns 密文十六进制字符串
  */
 export function rsaEncryptUts(text: string, publicKey: string): string {
-  // #ifdef APP-ANDROID
+  // #ifdef APP-ANDROID && !VUE3-VAPOR
   return rsaEncryptAndroid(text, publicKey)
   // #endif
 
-  // #ifndef APP-ANDROID
+  // #ifndef APP-ANDROID && !VUE3-VAPOR
   const key = parsePublicKey(publicKey)
   const k = key.modulus.length
   const m = textToBytes(text)
@@ -932,11 +941,11 @@ export function rsaEncryptUts(text: string, publicKey: string): string {
  * @returns 明文（UTF-8）
  */
 export function rsaDecryptUts(hex: string, privateKey: string): string {
-  // #ifdef APP-ANDROID
+  // #ifdef APP-ANDROID && !VUE3-VAPOR
   return rsaDecryptAndroid(hex, privateKey)
   // #endif
 
-  // #ifndef APP-ANDROID
+  // #ifndef APP-ANDROID && !VUE3-VAPOR
   const key = parsePrivateKey(privateKey)
   const k = key.modulus.length
   const c = hexToBytes(hex)
@@ -970,11 +979,11 @@ export function rsaDecryptUts(hex: string, privateKey: string): string {
  * @returns 签名十六进制字符串
  */
 export function rsaSignUts(digestHex: string, hashType: string, privateKey: string): string {
-  // #ifdef APP-ANDROID
+  // #ifdef APP-ANDROID && !VUE3-VAPOR
   return rsaSignAndroid(digestHex, hashType, privateKey)
   // #endif
 
-  // #ifndef APP-ANDROID
+  // #ifndef APP-ANDROID && !VUE3-VAPOR
   const key = parsePrivateKey(privateKey)
   const k = key.modulus.length
   const em = buildSignatureEm(digestHex, hashType, k)
@@ -992,11 +1001,11 @@ export function rsaSignUts(digestHex: string, hashType: string, privateKey: stri
  * @returns 验签是否通过
  */
 export function rsaVerifyUts(digestHex: string, hashType: string, publicKey: string, sigHex: string): boolean {
-  // #ifdef APP-ANDROID
+  // #ifdef APP-ANDROID && !VUE3-VAPOR
   return rsaVerifyAndroid(digestHex, hashType, publicKey, sigHex)
   // #endif
 
-  // #ifndef APP-ANDROID
+  // #ifndef APP-ANDROID && !VUE3-VAPOR
   const key = parsePublicKey(publicKey)
   const k = key.modulus.length
   const s = hexToBytes(sigHex)
@@ -1069,7 +1078,7 @@ function derSequence(items: Uint8Array[]): Uint8Array {
   return out
 }
 
-// #ifdef APP-ANDROID
+// #ifdef APP-ANDROID && !VUE3-VAPOR
 function rsaGenerateKeyPairAndroid(bits: number): string {
   try {
     const kpg = java.security.KeyPairGenerator.getInstance('RSA')
@@ -1087,7 +1096,7 @@ function rsaGenerateKeyPairAndroid(bits: number): string {
 }
 // #endif
 
-// #ifndef APP-ANDROID
+// #ifndef APP-ANDROID && !VUE3-VAPOR
 function getRandomBigInt(bits: number): any {
   const bytes = Math.ceil(bits / 8)
   let hex = ''
@@ -1269,11 +1278,11 @@ function rsaGenerateKeyPairJs(bits: number): string {
  * @returns JSON：{"publicKey":"SPKI-Base64","privateKey":"PKCS8-Base64"}
  */
 export function rsaGenerateKeyPairUts(bits: number): string {
-  // #ifdef APP-ANDROID
+  // #ifdef APP-ANDROID && !VUE3-VAPOR
   return rsaGenerateKeyPairAndroid(bits)
   // #endif
 
-  // #ifndef APP-ANDROID
+  // #ifndef APP-ANDROID && !VUE3-VAPOR
   return rsaGenerateKeyPairJs(bits)
   // #endif
 }

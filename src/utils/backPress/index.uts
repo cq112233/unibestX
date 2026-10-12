@@ -21,7 +21,7 @@ export function handleBackPressExit(): boolean {
     return true;
   }
   // 2秒内再次触发，退出应用
-  // #ifdef APP-ANDROID
+  // #ifdef APP-ANDROID && !VUE3-VAPOR
   try {
     const activity = UTSAndroid.getUniActivity();
     if (activity != null) {
@@ -30,7 +30,7 @@ export function handleBackPressExit(): boolean {
     }
     // 等退出动画播放完毕后，强制杀进程确保彻底退出
     setTimeout(() => {
-      // #ifdef APP-ANDROID
+      // #ifdef APP-ANDROID && !VUE3-VAPOR
       java.lang.System.exit(0);
       // #endif
     }, 500);
@@ -39,7 +39,7 @@ export function handleBackPressExit(): boolean {
     uni.exit();
   }
   // #endif
-  // #ifndef APP-ANDROID
+  // #ifndef APP-ANDROID && !VUE3-VAPOR
   uni.exit();
   // #endif
   return false;

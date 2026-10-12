@@ -395,7 +395,7 @@ export class HttpClient {
               }
             }
             if (skipRefresh) {
-              throw new HttpError(`未授权[${ResultEnum.Unauthorized}]：${response.errMsg}`, ResultEnum.Unauthorized);
+              throw new Error(`未授权[${ResultEnum.Unauthorized}]：${response.errMsg}`);
             }
             throw new Error(REFRESHABLE_401);
           }
