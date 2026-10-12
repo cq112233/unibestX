@@ -12,7 +12,7 @@ g.isArray = Array.isArray;
 // 才不会污染 JSON.stringify / for-in，用例里手写的对象字面量照旧是普通对象。
 // 只实现插件真正用到的那几个（getString / getJSON / getAny / toMap + 静态 keys）。
 if (g.UTSJSONObject == null) {
-  const hasOwn = (target: any, key: string): boolean => Object.prototype.hasOwnProperty.call(target, key);
+  const hasOwn = (target: any, key: string): boolean => Object.hasOwn(target, key);
   const read = (target: any, key: string): any => (hasOwn(target, key) ? target[key] : null);
 
   Object.defineProperties(Object.prototype, {
