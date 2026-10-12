@@ -21,16 +21,16 @@ const MSG_OFFLINE = '网络不可用，请检查网络连接';
 const MSG_TIMEOUT = '请求超时，请稍后重试';
 const MSG_NETWORK = '网络错误，请稍后重试';
 
-/**
- * 当前是否离线。
- *
- * 用 uni.getNetworkType 的结果同步返回 —— 该 API 是异步的，这里通过
- * 模块级缓存 + 首次调用时触发刷新来兼顾「同步可判」与「结果准确」。
- * 首次调用返回上一次刷新的结果（初始视为在线），并异步更新缓存供后续调用。
- */
+// —— 网络状态缓存：uni.getNetworkType 只给异步回调，而调用方要的是「同步可判」，
+// 所以缓存上一次查询结果（初始视为在线），首次调用时才触发一次异步刷新供后续调用使用
 let cachedNetworkConnected: boolean = true;
 let refreshingNetwork: boolean = false;
 
+/**
+ * 触发一次网络类型查询并回写缓存
+ *
+ * 同一时刻只放一次查询在飞 —— 查询期间后来的调用直接复用上次结果，避免每次判离线都打一次 API。
+ */
 function refreshNetworkCache(): void {
   if (refreshingNetwork) {
     return;
@@ -62,8 +62,10 @@ export function isOffline(): boolean {
 
 /**
  * 将任意失败信息归一成可读文案
- * @param rawMessage uni.request fail / 业务 message
- * @param code 业务码；网络失败常用 -1
+ * @param rawMessage 底层回调或后端返回的**原始**文案（未加工）；传空串时按 code 的判定兜底
+ * @param code 后端业务码；默认 -1 表示「网络层就失败了、根本没拿到业务码」
+ * @returns kind 按「离线 → 超时 → 网络/HTTP → 业务 → 未知」顺序**首个命中即返回**，
+ *          所以设备离线时即使后端文案更像业务错误也会被判成 offline；调用方按 kind 决定是否重试 / 引导设置
  */
 export function resolveErrorMessage(rawMessage: string, code: number = -1): AppErrorInfo {
   if (isOffline()) {
@@ -86,6 +88,7 @@ export function resolveErrorMessage(rawMessage: string, code: number = -1): AppE
 /**
  * 列表 / 页面失败时的默认提示
  * @param rawMessage 后端或原生回调给的原始文案；传空字符串时按网络异常兜底
+ * @returns 一句话提示文案，可直接丢给 toast
  */
 export function defaultFailMessage(rawMessage: string = ''): string {
   return resolveErrorMessage(rawMessage, -1).message;

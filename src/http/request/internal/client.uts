@@ -6,6 +6,14 @@
  * 2. 负责主动取消、并发去重、TTL 缓存与底层 RequestTask 生命周期协作；
  * 3. 负责 401 自动刷新令牌与单次静默重放逻辑；
  * 4. 彻底解耦底层驱动与具体业务逻辑（驱动由 requestAdapter 或 client 外部注入）。
+ *
+ * 本模块识别的 `config.extra` 开关（都由 api 层传，不传即不启用）：
+ * - `requestKey`  登记 RequestTask 的键，只有传了才能被 abort() 取消；
+ * - `dedupe`      仅 GET 生效，**显式传 false** 才关掉「同指纹复用同一个 Promise」；
+ * - `cacheTtl`    仅 GET 生效，毫秒数，> 0 才启用内存 TTL 缓存；
+ * - `skipRefresh` 401 不再抛可刷新哨兵（刷新接口自身必须开，否则无限递归）；
+ * - `domain`      临时覆盖 baseURL（少用，优先在 options.baseURL 上切域名）。
+ * 另有 `ignoreAuth` / `toast` 由 request.uts 的默认业务钩子消费，不在本文件。
  */
 
 import { Request } from '@/uni_modules/lime-request';
@@ -97,8 +105,14 @@ export type HttpClientOptions = {
    */
   lifecycle?: RequestLifecycle;
   beforeRequest?: BeforeRequestHook;
+  /**
+   * 响应后置钩子，三种写法等价、按 `responded > afterResponse > respondedOptions` 取第一个非空（只为兼容历史叫法）；
+   * 推荐统一写成 `{ onSuccess, onError, onComplete }` 三件套
+   */
   afterResponse?: any;
+  /** 响应拦截器三件套（对齐 Alova responded 规范） */
   responded?: any;
+  /** responded 的兼容别名，二选一即可；同时传时以 responded 为准，本字段被忽略 */
   respondedOptions?: RespondedOptions;
   refreshToken?: RefreshTokenFn;
   onUnauthorized?: UnauthorizedFn;
@@ -168,8 +182,9 @@ export function isRefreshable401(err: any): boolean {
 
 /**
  * 浅拷贝请求配置：重放时不能复用已被拦截器改写的对象，同时保留 getTask 等回调字段
- * @param config 原始请求配置；**只拷贝白名单内的字段**，未在函数体里列出的字段不会进入副本，
+ * @param config 待重放的请求配置；**只拷贝白名单内的字段** —— 未在函数体里列出的字段不会进入副本，
  *               新增配置项时必须同步补进拷贝列表，否则重放会丢配置
+ * @returns 字段级副本；`data` / `header` 是浅拷贝，重放时若钩子原地改它们，原配置也会跟着变
  */
 export function cloneConfig(config: LimeRequestConfig): LimeRequestConfig {
   return {
@@ -230,6 +245,13 @@ export class HttpClient {
   private refreshTokenHandler: RefreshTokenFn | null = null;
   private unauthorizedHandler: UnauthorizedFn | null = null;
 
+  /**
+   * @param options 客户端配置；不传或传 null = 全默认（baseURL 空串、timeout 5000、dataType json、
+   *                responseType text、sslVerify true、withCredentials false）。
+   *                传入的 header 会并到默认的 Content-Type / Accept 之上（同键以传入值为准）；
+   *                底层驱动按 `client > requestAdapter > 自建 Request` 取其一 —— client 用于复用外部已建好的实例，
+   *                requestAdapter 用于换一个底层驱动实现
+   */
   constructor(options: HttpClientOptions | null = null) {
     this.lifecycle = options != null && options.lifecycle != null
       ? (options.lifecycle as RequestLifecycle)
@@ -368,6 +390,9 @@ export class HttpClient {
 
   /**
    * 注册请求前置拦截钩子（类似 Alova 的 beforeRequest，支持 async 异步函数）
+   * @param hook 拿到的 config **必须原地改写** —— 返回值会被丢弃，返回一个新对象等于什么都没改；
+   *             多个钩子按注册顺序逐个 await，任一钩子 reject 则本次请求直接失败，不再发往底层
+   * @returns 当前实例，支持链式注册
    */
   beforeRequest(hook: BeforeRequestHook): HttpClient {
     this.beforeRequestHooks.push(hook);
@@ -376,6 +401,7 @@ export class HttpClient {
 
   /**
    * 移除已注册的前置拦截钩子
+   * @param hook 按引用相等匹配；同一个函数注册过多次会被一次性全部移除
    */
   removeBeforeRequest(hook: BeforeRequestHook): void {
     const nextList: Array<BeforeRequestHook> = [];
@@ -396,6 +422,11 @@ export class HttpClient {
 
   /**
    * 注册响应后置拦截钩子（完全对齐 Alova 的 responded 规范）
+   * @param onSuccessOrOptions 传对象按 `{ onSuccess, onError, onComplete }` 三件套注册；
+   *                           传函数则当作 onSuccess；传 null 直接返回，什么都不注册
+   * @param onError 仅第一个参数传函数时生效；传 null 表示这次不注册失败钩子
+   * @param onComplete 同上；无论成功、失败还是命中缓存都会执行
+   * @returns 当前实例，支持链式注册
    */
   afterResponse(
     onSuccessOrOptions: any | null = null,
@@ -434,7 +465,11 @@ export class HttpClient {
   }
 
   /**
-   * 注册响应后置拦截钩子（Alova 别名，等同于 afterResponse）
+   * 注册响应后置拦截钩子（Alova 别名，行为与 afterResponse 完全一致）
+   * @param onSuccessOrOptions 同 afterResponse：对象走三件套、函数当 onSuccess、null 直接返回
+   * @param onError 同 afterResponse，仅第一个参数是函数时生效
+   * @param onComplete 同 afterResponse
+   * @returns 当前实例，支持链式注册
    */
   responded(
     onSuccessOrOptions: any | null = null,
@@ -446,6 +481,9 @@ export class HttpClient {
 
   /**
    * 移除已注册的响应后置拦截钩子
+   * @param onSuccess 传 null 表示这一类不动；三类各自独立移除，均按引用相等匹配
+   * @param onError 同上
+   * @param onComplete 同上
    */
   removeAfterResponse(
     onSuccess: AfterResponseSuccessHook | null = null,
@@ -492,6 +530,7 @@ export class HttpClient {
 
   /**
    * 执行所有前置钩子
+   * @param config 本次请求配置；进钩子链前先把 header 兜底成空对象，钩子内部不必再判空
    */
   private async applyBeforeRequest(config: LimeRequestConfig): Promise<LimeRequestConfig> {
     if (config.header == null) {
@@ -505,7 +544,10 @@ export class HttpClient {
   }
 
   /**
-   * 执行所有成功后置钩子
+   * 执行所有成功后置钩子，数据沿钩子链逐级传递（前一个的返回值成为后一个的入参）
+   * @param data 底层返回、且已由业务成功钩子拆包后的数据
+   * @param config 本次请求配置，只读
+   * @returns 链上最后一份数据；钩子不返回值或返回 null 视为「不改写」，沿用上一份
    */
   private async applyAfterSuccess<T>(data: T, config: LimeRequestConfig): Promise<T> {
     // UTS 的 any 编译为 Kotlin 非空 Any，泛型 T 无上界（T : Any?），直接赋值报 Initializer type mismatch；
@@ -522,7 +564,10 @@ export class HttpClient {
   }
 
   /**
-   * 执行所有失败后置钩子
+   * 执行所有失败后置钩子 —— 钩子的返回值被丢弃，这里**必定 reject**
+   * @param err 任意形态的原始错误
+   * @param config 本次请求配置，只读
+   * @returns 不会 resolve；统一以 `toError(err)` 的文案 reject（标成 Promise<T> 只是为了接进请求链）
    */
   private async applyAfterError<T>(err: any, config: LimeRequestConfig): Promise<T> {
     for (let i = 0; i < this.afterErrorHooks.length; i = i + 1) {
@@ -534,6 +579,7 @@ export class HttpClient {
 
   /**
    * 执行所有完成拦截钩子（对齐 Alova onComplete，无论成功、失败或命中缓存均触发）
+   * @param config 本次请求配置；钩子里抛错会顺着调用方的 Promise 链继续往外冒
    */
   private async applyAfterComplete(config: LimeRequestConfig): Promise<void> {
     for (let i = 0; i < this.afterCompleteHooks.length; i = i + 1) {
@@ -544,6 +590,7 @@ export class HttpClient {
 
   /**
    * 取消指定 requestKey 的在飞请求
+   * @param requestKey 发请求时登记在 `extra.requestKey` 的键；没登记过的键只留取消标记，不报错
    */
   abort(requestKey: string): void {
     this.lifecycle.abort(requestKey);
@@ -557,7 +604,8 @@ export class HttpClient {
   }
 
   /**
-   * 清除当前客户端实例的 TTL 缓存（不传 key 清全部，传 key 清指定项）
+   * 清除当前客户端实例的 TTL 缓存
+   * @param fingerprint 缓存指纹；默认空串 = 清空全部
    */
   clearCache(fingerprint: string = ''): void {
     this.lifecycle.clearCache(fingerprint);
@@ -570,6 +618,12 @@ export class HttpClient {
     return this.lifecycle;
   }
 
+  /**
+   * 发起一次请求，完整链路：前置钩子 → 取消判定 → GET 并发去重 → GET TTL 缓存 → 发送 → 失败时按需刷新令牌并重放。
+   * 各环节的开关都在 `extra` 上，见文件头。
+   * @param config 完整请求配置（url / method / data / extra…）；传空对象也能跑，只是没有 url 必然失败
+   * @returns 已由业务成功钩子拆包的业务数据 —— 拿到的是 `{ code, data }` 里的 data 本身，所以 T 只标业务数据
+   */
   request<T>(config: LimeRequestConfig): Promise<T> {
     const finalConfig = (config ?? {}) as LimeRequestConfig;
     return this.applyBeforeRequest(finalConfig).then(
@@ -630,6 +684,9 @@ export class HttpClient {
 
   /**
    * 真实请求流程：send → 401 刷新重放，并在收尾时清理任务登记。
+   * @param config 已跑完前置钩子的配置
+   * @param fingerprint 请求指纹，仅用于回写 TTL 缓存
+   * @param cacheTtl 缓存毫秒数；<= 0 表示本次不写缓存
    */
   private execute<T>(config: LimeRequestConfig, fingerprint: string, cacheTtl: number): Promise<T> {
     const requestKey = this.lifecycle.readExtraString(config, 'requestKey');
@@ -645,7 +702,11 @@ export class HttpClient {
   }
 
   /**
-   * 失败分支处理
+   * 失败分支收口，按「取消 → 可刷新 401 → 业务失败钩子」的顺序判定
+   * @param err 底层或拦截器抛出的错误
+   * @param config 本次请求配置；401 重放时会基于它克隆一份
+   * @param requestKey 本次请求登记的键，用于摘除 RequestTask
+   * @param fingerprint 请求指纹 —— 取消标记也可能打在指纹上（abort 用的键未必就是 requestKey）
    */
   private handleFailure<T>(err: any, config: LimeRequestConfig, requestKey: string, fingerprint: string): Promise<T> {
     this.lifecycle.clearTask(requestKey);
@@ -709,6 +770,12 @@ export class HttpClient {
     return this.refreshTokenHandler!().then(onRefreshed);
   }
 
+  /**
+   * 刷新彻底失败后的登出：清 token + 跳登录页只执行一次。
+   *
+   * 靠 claimRefreshFailure 抢名额 —— 同一波并发 401 里只有第一个走到这里的实例真正跳转，
+   * 否则 N 个请求会各跳一次登录页。
+   */
   private handleUnauthorizedOnce(): void {
     if (!claimRefreshFailure()) {
       return;
@@ -718,6 +785,12 @@ export class HttpClient {
     }
   }
 
+  /**
+   * 按需把成功数据写进 TTL 缓存
+   * @param fingerprint buildRequestKey 算出的指纹
+   * @param cacheTtl 毫秒数；<= 0 直接返回，不写
+   * @param data 成功数据；序列化失败（循环引用等）静默跳过 —— 缓存写不进去不该把已经成功的请求变成失败
+   */
   private cacheIfNeeded<T>(fingerprint: string, cacheTtl: number, data: T): void {
     if (cacheTtl <= 0) {
       return;
@@ -728,6 +801,11 @@ export class HttpClient {
     catch (_) {}
   }
 
+  /**
+   * 单次发射：调底层驱动，再把响应交给成功钩子链
+   * @param config 已就绪的配置
+   * @returns 拆包后的业务数据；响应体为空按异常 reject（上传 / 下载走各自的分支，不经过这里）
+   */
   private send<T>(config: LimeRequestConfig): Promise<T> {
     return this.client.request<any>(config).then((res: LimeRequestResponse<any>): Promise<T> => {
       const rawData = res.data;
@@ -738,6 +816,12 @@ export class HttpClient {
     });
   }
 
+  /**
+   * GET 请求
+   * @param url 相对路径会与客户端 baseURL 拼接；查询参数放 `config.params`
+   * @param config 本次请求配置；传 null 走客户端默认（**会被就地改写** —— 本方法会把 url 与 method 写进去）
+   * @returns 拆包后的业务数据
+   */
   get<T>(url: string, config: LimeRequestConfig | null = null): Promise<T> {
     const _config = (config ?? {}) as LimeRequestConfig;
     _config.url = url;
@@ -745,6 +829,13 @@ export class HttpClient {
     return this.request<T>(_config);
   }
 
+  /**
+   * POST 请求
+   * @param url 相对路径会与客户端 baseURL 拼接
+   * @param data 请求体；传 null 表示不带 body
+   * @param config 本次请求配置；传 null 走客户端默认（**会被就地改写** —— 本方法会把 url / data / method 写进去）
+   * @returns 拆包后的业务数据
+   */
   post<T>(url: string, data: any | null = null, config: LimeRequestConfig | null = null): Promise<T> {
     const _config = (config ?? {}) as LimeRequestConfig;
     _config.url = url;
@@ -753,6 +844,13 @@ export class HttpClient {
     return this.request<T>(_config);
   }
 
+  /**
+   * PUT 请求
+   * @param url 相对路径会与客户端 baseURL 拼接
+   * @param data 请求体；传 null 表示不带 body
+   * @param config 与 post 完全相同（含就地写入 url / data / method 的行为）
+   * @returns 拆包后的业务数据
+   */
   put<T>(url: string, data: any | null = null, config: LimeRequestConfig | null = null): Promise<T> {
     const _config = (config ?? {}) as LimeRequestConfig;
     _config.url = url;
@@ -761,6 +859,13 @@ export class HttpClient {
     return this.request<T>(_config);
   }
 
+  /**
+   * DELETE 请求
+   * @param url 相对路径会与客户端 baseURL 拼接
+   * @param data 请求体；传 null 表示不带 body（要按查询串传参请改用 `config.params`）
+   * @param config 与 post 完全相同（含就地写入 url / data / method 的行为）
+   * @returns 拆包后的业务数据
+   */
   delete<T>(url: string, data: any | null = null, config: LimeRequestConfig | null = null): Promise<T> {
     const _config = (config ?? {}) as LimeRequestConfig;
     _config.url = url;
@@ -770,7 +875,11 @@ export class HttpClient {
   }
 
   /**
-   * 上传文件
+   * 上传文件（走底层驱动的 UPLOAD 分支，自动带鉴权头）
+   * @param url 上传地址；相对路径会与 baseURL 拼接
+   * @param config 必须带 `filePath` 与 `name`，否则底层直接报参数缺失；可选 `extra.requestKey`（配合 abort 取消）、
+   *               `getTask`（拿上传进度）；传 null 走客户端默认
+   * @returns 拆包后的业务数据；响应体为空按「上传响应为空」失败
    */
   upload<T>(url: string, config: LimeRequestConfig | null = null): Promise<T> {
     const _config = (config ?? {}) as LimeRequestConfig;
@@ -855,6 +964,9 @@ export class HttpClient {
 
   /**
    * 下载失败统一收口：先触发业务失败钩子（统一错误提示），再触发完成钩子
+   * @param err 已归一化成 Error 的失败
+   * @param config 本次下载配置
+   * @returns 必定 reject，不会 resolve
    */
   private rejectDownload(err: Error, config: LimeRequestConfig): Promise<DownloadResult> {
     return this.applyAfterError<DownloadResult>(err, config).then(

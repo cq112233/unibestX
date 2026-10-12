@@ -48,12 +48,16 @@ export type StreamChunk = {
  * U+FFFD「」。本类自持一个尾部字节缓冲，只解码完整的 UTF-8 字符序列，残缺尾部留给下一块拼接。
  */
 export class Utf8StreamDecoder {
-  /** 上一块遗留的不完整多字节序列 */
+  /** 上一块遗留的不完整多字节序列；不能直接丢弃，丢了那个字符就会解码成 U+FFFD */
   private _pending: Array<number> = [];
-  /** 底层解码器 */
   private _decoder: TextDecoder = new TextDecoder('utf-8');
 
-  /** 解码一个 chunk，返回本次可安全输出的文本（可能为空字符串） */
+  /**
+   * 解码一个 chunk
+   * @param buffer 本次到达的原始字节；平台给的是 ArrayBuffer，内部才转成 Uint8Array
+   * @returns 本次可安全输出的文本；返回空串表示这一块全是被截断的多字节字符 ——
+   *          那些字节已留在 _pending 里等下一块拼，调用方按「本次没有新文本」处理即可
+   */
   decodeChunk(buffer: ArrayBuffer): string {
     const incoming = new Uint8Array(buffer);
     const merged: Array<number> = this._pending;
@@ -68,12 +72,10 @@ export class Utf8StreamDecoder {
       this._pending = merged;
       return '';
     }
-    // 可安全解码的部分
     const safe = new Uint8Array(safeEnd);
     for (let i: number = 0; i < safeEnd; i++) {
       safe[i] = merged[i];
     }
-    // 残缺尾部留待下一块
     const rest: Array<number> = [];
     for (let i: number = safeEnd; i < total; i++) {
       rest.push(merged[i]);
@@ -90,6 +92,8 @@ export class Utf8StreamDecoder {
   /**
    * 从尾部向前寻找可安全解码的结束位置。
    * 末尾若存在被截断的多字节序列，则把该序列整体留给下一块。
+   * @param bytes 待扫描的字节缓冲（已含上一块遗留的残缺序列）
+   * @param total 缓冲总长度，取值与 bytes.length 相同
    */
   private _findSafeEnd(bytes: Array<number>, total: number): number {
     if (total <= 0) {

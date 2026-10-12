@@ -47,6 +47,8 @@ const DEFAULT_API_URL: string = 'https://ukw0y1.laf.run';
 const directBaseUrl: string = getApiBaseUrl();
 const directSecondaryUrl: string = getApiSecondaryUrl();
 
+// 环境变量给的是以 / 开头的相对路径时，说明语义本来就不是「直连」（H5 走同源代理、或开发态 mock），
+// 此时直连域名回退到云端默认地址；只有配了完整域名才采用环境变量里的值
 let defaultUrl: string = directBaseUrl.startsWith('/') ? DEFAULT_API_URL : directBaseUrl;
 let secondaryUrl: string = directSecondaryUrl.startsWith('/') ? DEFAULT_API_URL : directSecondaryUrl;
 
@@ -59,11 +61,13 @@ if (useH5Proxy) {
 }
 // #endif
 
+/** 域名表契约：主域名与备用域名 */
 export type ApiDomainConfig = {
   DEFAULT: string;
   SECONDARY: string;
 };
 
+/** 对外暴露的域名表；临时切域名时用 `config.baseURL = API_DOMAINS.SECONDARY` 覆盖单次请求 */
 export const API_DOMAINS: ApiDomainConfig = {
   DEFAULT: defaultUrl,
   SECONDARY: secondaryUrl
@@ -265,8 +269,8 @@ export const http: HttpClient = createHttpClient(DEFAULT_HTTP_OPTIONS);
 
 /**
  * 便捷函数：取消指定 requestKey 的在飞请求（委托给默认 http 实例）
- * @param requestKey 发请求时登记的键（取自配置 `extra.requestKey`）；
- *                   同键的多个在飞请求会被一并取消，键不存在时静默无操作
+ * @param requestKey 发请求时登记在 `extra.requestKey` 的键；同一个键被复用时生命周期里只留最后登记的
+ *                   那个 RequestTask（后登记覆盖先登记），键从没登记过也不报错，只是白留一个取消标记
  */
 export function abortHttp(requestKey: string): void {
   http.abort(requestKey);
@@ -281,7 +285,7 @@ export function abortAllHttp(): void {
 
 /**
  * 便捷函数：清除缓存（委托给默认 http 实例）
- * @param fingerprint 缓存指纹（由请求参数算出，获取方式见 `http.getCacheKey`）；
+ * @param fingerprint 缓存指纹，由 `http.getLifecycle().buildRequestKey(config)` 算出；
  *                    传空字符串表示**清空全部缓存**
  */
 export function clearCache(fingerprint: string = ''): void {

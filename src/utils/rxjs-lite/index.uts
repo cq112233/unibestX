@@ -555,10 +555,18 @@ export function debounceTime<T>(due: number): Operator<T, T> {
             clearTimeout(timerId);
           }
           hasTimer = true;
-          timerId = setTimeout((): void => {
+          // ⚠️ 两端 `setTimeout` 的返回类型不一致，赋值前必须收敛一次：
+          //   · UTS 真源（HBuilderX uts-types/common/timers.d.ts:65）返回 `number`
+          //   · VSCode 侧程序里混进了 @types/node 的全局声明，判成 `Timeout`（对象），
+          //     直接赋给 `number` 报 TS2322「不能将类型"Timeout"分配给类型"number"」
+          // 用 `as any as number` 做**纯编译期**收敛（项目既有写法：NestedScroll.uvue:381），
+          // Kotlin / JS 产物不受影响。
+          // 注：在 src/types 里补一份 `function setTimeout(): number` 是**无效**的 ——
+          // 全局重载合并后 TS 取「先声明」的那支，@types/node 那支始终排在项目声明之前（已实测）。
+          timerId = (setTimeout((): void => {
             hasTimer = false;
             subscriber.next(value);
-          }, due);
+          }, due) as any) as number;
         },
         (err: any): void => {
           subscriber.error(err);

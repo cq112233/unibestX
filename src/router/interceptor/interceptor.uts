@@ -46,7 +46,9 @@ function doIntercept(url: string): boolean {
     const pages = getCurrentPages();
     let currentPath = '';
     if (pages.length > 0) {
-      currentPath = pages[pages.length - 1].route;
+      // route 在 npm @dcloudio/types 侧被标为可选（不兜底会报 TS2322），
+      // 真源（HBuilderX dts）里是非空 string，故沿用 router/utils、layouts/navbar 的 `?? ''` 写法兼顾两侧
+      currentPath = pages[pages.length - 1].route ?? '';
     }
     let normalizedCurrentPath = currentPath;
     if (normalizedCurrentPath.startsWith('src/')) {
