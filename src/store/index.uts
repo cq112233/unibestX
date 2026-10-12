@@ -1,3 +1,11 @@
+// eslint-disable-next-line ts/ban-ts-comment -- 条件编译二选一带来的 TS 固有假报，只能整文件关闭，详见下方说明
+// @ts-nocheck
+//   ⬆ 本文件必须整文件关掉 TS 报错，原因：条件编译标记在 TS 眼里只是普通注释，
+//   下面两个平台分支会被 TS 同时看到，必然报 TS2300「pinia 重复」与 TS2308「已导出同名成员」，
+//   这两类是该写法的固有假报，无法通过改写代码消除（TS 无法表达「二选一」）。
+//   本文件是纯门面（全篇只有 import / export，没有可检查的逻辑），关掉无副作用：
+//   业务侧仍能拿到先出现的 vapor 分支的强类型（已实测：业务侧 Store 用法写错照样报 TS2322/TS2339）。
+//   UTS 真实编译走条件编译预处理器，与本行无关，产物零影响。
 /**
  * Pinia 状态管理统一入口
  *
@@ -59,7 +67,7 @@
 // ==========================================
 // ⚠️ 必须是 `.uts` 且必须放在 `#ifdef` 之外：
 //    a) 小程序（uts2js）链路无法从 `.ts` 文件经 `export *` 转发纯类型，
-//       否则业务侧 `import type { ISingleTokenRes } from '@/src/store'` 会报
+//       否则业务侧 `import type { ISingleTokenRes } from '@/src/store/index.uts'` 会报
 //       `"ISingleTokenRes" is not exported by ".../src/store/index.uts"`；
 //    b) 两个分支（vapor / vdom）共用同一套类型，放条件编译里必然漏掉一端。
 // ==========================================

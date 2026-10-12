@@ -9,8 +9,8 @@
 
 import { refreshAccessToken } from '@/src/api/auth/auth.uts';
 import type { RefreshTokenQuery } from '@/src/api/auth/auth.uts';
-import { useTokenStore } from '@/src/store';
-import type { IDoubleTokenRes } from '@/src/store';
+import { useTokenStore } from '@/src/store/index.uts';
+import type { IDoubleTokenRes } from '@/src/store/index.uts';
 
 // —— 单飞 + 失败收尾：
 // inflight 非空 = 已有刷新在飞，后来者直接复用同一个 Promise；

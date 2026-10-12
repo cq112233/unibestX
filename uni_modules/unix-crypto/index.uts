@@ -12,9 +12,15 @@
  * 7. RSA 密钥对生成、公钥加密、私钥解密、SHA-256 签名与验签
  */
 
-import { rsaEncryptUts, rsaDecryptUts, rsaSignUts, rsaVerifyUts, rsaGenerateKeyPairUts } from './rsa'
+import { rsaEncryptUts, rsaDecryptUts, rsaSignUts, rsaVerifyUts, rsaGenerateKeyPairUts } from './rsa.uts'
+import { utf8Encode, utf8Decode, b64Encode, b64Decode } from './codec.uts'
 
 // ---- 通用工具：字节、文本、Base64 与十六进制互转 ----
+//
+// ⚠️ 下面四个编解码函数一律走 codec.uts 的纯 UTS 实现，
+// **严禁改回 `new TextEncoder()` / `uni.arrayBufferToBase64()`**：
+// TextEncoder / TextDecoder 在小程序运行时不是全局（开发者工具会假装支持、真机才炸），
+// 一旦改回去，本库在小程序端会只剩 uuid 可用。详见 codec.uts 顶部说明。
 
 /**
  * 字符串转 UTF-8 字节数组
@@ -22,7 +28,7 @@ import { rsaEncryptUts, rsaDecryptUts, rsaSignUts, rsaVerifyUts, rsaGenerateKeyP
  * @returns UTF-8 编码的字节数组
  */
 function textToBytes(text: string): Uint8Array {
-  return new TextEncoder().encode(text)
+  return utf8Encode(text)
 }
 
 /**
@@ -31,7 +37,7 @@ function textToBytes(text: string): Uint8Array {
  * @returns 解码后的字符串
  */
 function bytesToText(bytes: Uint8Array): string {
-  return new TextDecoder().decode(bytes)
+  return utf8Decode(bytes)
 }
 
 /**
@@ -40,7 +46,7 @@ function bytesToText(bytes: Uint8Array): string {
  * @returns Base64 字符串
  */
 function bytesToBase64(bytes: Uint8Array): string {
-  return uni.arrayBufferToBase64(bytes.buffer as ArrayBuffer)
+  return b64Encode(bytes)
 }
 
 /**
@@ -49,7 +55,7 @@ function bytesToBase64(bytes: Uint8Array): string {
  * @returns 字节数组
  */
 function base64ToBytes(b64: string): Uint8Array {
-  return new Uint8Array(uni.base64ToArrayBuffer(b64))
+  return b64Decode(b64)
 }
 
 /**

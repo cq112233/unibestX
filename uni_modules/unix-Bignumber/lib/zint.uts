@@ -1,0 +1,364 @@
+/**
+ * zint.uts —— 任意精度「十进制数字串」整数运算内核（unix-Bignumber 内部依赖）
+ *
+ * 设计要点：
+ * 1. 全部基于「十进制数字字符串」做逐位运算，**不依赖 BigInt / BigInteger / Float64**，
+ *    因此在 App-Android / App-iOS / 鸿蒙 / H5 / 小程序 上行为完全一致，真正做到全端可编译、结果一致；
+ * 2. 所有入参约定为**已去前导零的非负整数串**（`'0'` 表示零），内部函数不再重复校验；
+ * 3. 除法用「逐位试商」实现（每位最多比较 9 次），乘法用教科书竖式（O(n*m)），
+ *    对高精度小数场景（几十到几百位）性能完全够用。
+ *
+ * ⚠️ 关于 `charCodeAt` 的 `?? 0`：UTS 里 `String.charCodeAt()` 的返回类型是 `number | null`
+ * （不是 JS 的 `number`），不兜底就直接参与算术，Kotlin 侧会报
+ * `Operator call is prohibited on a nullable receiver of type 'Number?'`，
+ * 而 H5 / 小程序端因为原始类型不报错 —— 属于「只有原生端才炸」的坑。
+ * 本模块内**所有** `charCodeAt` 取值一律写成 `(s.charCodeAt(i) ?? 0)`，
+ * 越界得到 0（与 JS 的 `NaN` 一样不等于任何数字编码，判定结果不变）。
+ */
+
+/** 字符 '0' 的编码，避免魔法数字散落各处 */
+const C_ZERO: number = 48
+
+/**
+ * 把数字串结果拼成字符串（内部工具）
+ * @param digits 低位在前、高位在后的数字数组（每项 0-9）
+ * @returns 正常顺序的数字串
+ */
+function joinReversed(digits: Array<string>): string {
+  digits.reverse()
+  return digits.join('')
+}
+
+/**
+ * 去掉前导零（`'000'` → `'0'`）
+ * @param s 任意数字串；空串按零处理
+ * @returns 规范化后的非负整数串
+ */
+export function ziTrim(s: string): string {
+  if (s.length == 0) {
+    return '0'
+  }
+  let i: number = 0
+  const n: number = s.length
+  while (i < n - 1 && (s.charCodeAt(i) ?? 0) == C_ZERO) {
+    i++
+  }
+  return s.substring(i)
+}
+
+/**
+ * 去掉尾随零（`'1200'` → `'12'`），配套返回被去掉的个数
+ * @param s 已去前导零的数字串
+ * @returns 去尾随零后的串与去掉的位数
+ */
+export function ziTrimEnd(s: string): ZiTrimEndResult {
+  let end: number = s.length
+  while (end > 1 && (s.charCodeAt(end - 1) ?? 0) == C_ZERO) {
+    end--
+  }
+  return { value: s.substring(0, end), removed: s.length - end } as ZiTrimEndResult
+}
+
+/** `ziTrimEnd` 的返回值 */
+export type ZiTrimEndResult = {
+  /** 去尾随零后的数字串 */
+  value: string
+  /** 被去掉的尾随零个数 */
+  removed: number
+}
+
+/**
+ * 判断是否为零
+ * @param s 已规范化的数字串
+ * @returns 是否为零
+ */
+export function ziIsZero(s: string): boolean {
+  return s.length == 0 || s == '0'
+}
+
+/**
+ * 生成 n 个零的串（等价于 `'0'.repeat(n)`，但 repeat 在部分原生端缺失，故手写）
+ * @param n 个数；小于等于 0 时返回空串
+ * @returns 零串
+ */
+export function ziZeros(n: number): string {
+  if (n <= 0) {
+    return ''
+  }
+  const buf: Array<string> = []
+  for (let i: number = 0; i < n; i++) {
+    buf.push('0')
+  }
+  return buf.join('')
+}
+
+/**
+ * 生成 `10^n` 的数字串（等价于 `'1'` 后接 n 个零）
+ * @param n 指数；小于 0 时返回 `'1'`
+ * @returns 10 的 n 次幂
+ */
+export function ziPow10(n: number): string {
+  if (n <= 0) {
+    return '1'
+  }
+  return '1' + ziZeros(n)
+}
+
+/**
+ * 比较两个非负整数串的大小
+ * @param a 数字串（已去前导零）
+ * @param b 数字串（已去前导零）
+ * @returns a>b 返回 1，a<b 返回 -1，相等返回 0
+ */
+export function ziCmp(a: string, b: string): number {
+  if (a.length > b.length) {
+    return 1
+  }
+  if (a.length < b.length) {
+    return -1
+  }
+  if (a == b) {
+    return 0
+  }
+  return a > b ? 1 : -1
+}
+
+/**
+ * 非负整数加法
+ * @param a 数字串
+ * @param b 数字串
+ * @returns a+b
+ */
+export function ziAdd(a: string, b: string): string {
+  const out: Array<string> = []
+  let i: number = a.length - 1
+  let j: number = b.length - 1
+  let carry: number = 0
+  while (i >= 0 || j >= 0 || carry > 0) {
+    let sum: number = carry
+    if (i >= 0) {
+      sum += (a.charCodeAt(i) ?? 0) - C_ZERO
+      i--
+    }
+    if (j >= 0) {
+      sum += (b.charCodeAt(j) ?? 0) - C_ZERO
+      j--
+    }
+    out.push(String.fromCharCode(C_ZERO + (sum % 10)))
+    carry = Math.floor(sum / 10)
+  }
+  return joinReversed(out)
+}
+
+/**
+ * 非负整数减法（要求 a >= b，调用方负责保证）
+ * @param a 数字串
+ * @param b 数字串
+ * @returns a-b
+ */
+export function ziSub(a: string, b: string): string {
+  const out: Array<string> = []
+  let i: number = a.length - 1
+  let j: number = b.length - 1
+  let borrow: number = 0
+  while (i >= 0) {
+    let d: number = (a.charCodeAt(i) ?? 0) - C_ZERO - borrow
+    if (j >= 0) {
+      d -= (b.charCodeAt(j) ?? 0) - C_ZERO
+      j--
+    }
+    if (d < 0) {
+      d += 10
+      borrow = 1
+    }
+    else {
+      borrow = 0
+    }
+    out.push(String.fromCharCode(C_ZERO + d))
+    i--
+  }
+  return ziTrim(joinReversed(out))
+}
+
+/**
+ * 非负整数乘小整数
+ * @param a 数字串
+ * @param m 乘数，需满足 0 <= m < 1e9
+ * @returns a*m
+ */
+export function ziMulSmall(a: string, m: number): string {
+  if (m == 0 || ziIsZero(a)) {
+    return '0'
+  }
+  if (m == 1) {
+    return ziTrim(a)
+  }
+  const out: Array<string> = []
+  let carry: number = 0
+  for (let i: number = a.length - 1; i >= 0; i--) {
+    const p: number = ((a.charCodeAt(i) ?? 0) - C_ZERO) * m + carry
+    out.push(String.fromCharCode(C_ZERO + (p % 10)))
+    carry = Math.floor(p / 10)
+  }
+  while (carry > 0) {
+    out.push(String.fromCharCode(C_ZERO + (carry % 10)))
+    carry = Math.floor(carry / 10)
+  }
+  return joinReversed(out)
+}
+
+/**
+ * 非负整数除法（小整数除数）
+ * @param a 数字串
+ * @param d 除数，需满足 0 < d < 1e9
+ * @returns 商与余数的结构体
+ */
+export function ziDivModSmall(a: string, d: number): ZiDivModResult {
+  if (d == 1) {
+    return { q: ziTrim(a), r: '0' } as ZiDivModResult
+  }
+  const out: Array<string> = []
+  let rem: number = 0
+  for (let i: number = 0; i < a.length; i++) {
+    const cur: number = rem * 10 + ((a.charCodeAt(i) ?? 0) - C_ZERO)
+    out.push(String.fromCharCode(C_ZERO + Math.floor(cur / d)))
+    rem = cur % d
+  }
+  return { q: ziTrim(out.join('')), r: rem.toString() } as ZiDivModResult
+}
+
+/** `ziDivMod*` 的返回值：商与余数 */
+export type ZiDivModResult = {
+  /** 商 */
+  q: string
+  /** 余数 */
+  r: string
+}
+
+/**
+ * 非负整数乘法（教科书竖式）
+ * @param a 数字串
+ * @param b 数字串
+ * @returns a*b
+ */
+export function ziMul(a: string, b: string): string {
+  if (ziIsZero(a) || ziIsZero(b)) {
+    return '0'
+  }
+  const n: number = a.length
+  const m: number = b.length
+  const res: Array<number> = []
+  for (let i: number = 0; i < n + m; i++) {
+    res.push(0)
+  }
+  for (let i: number = n - 1; i >= 0; i--) {
+    const da: number = (a.charCodeAt(i) ?? 0) - C_ZERO
+    let carry: number = 0
+    for (let j: number = m - 1; j >= 0; j--) {
+      const idx: number = i + j + 1
+      const cur: number = res[idx] + da * ((b.charCodeAt(j) ?? 0) - C_ZERO) + carry
+      res[idx] = cur % 10
+      carry = Math.floor(cur / 10)
+    }
+    let k: number = i
+    while (carry > 0 && k >= 0) {
+      const cur2: number = res[k] + carry
+      res[k] = cur2 % 10
+      carry = Math.floor(cur2 / 10)
+      k--
+    }
+  }
+  const out: Array<string> = []
+  for (let i: number = 0; i < res.length; i++) {
+    out.push(String.fromCharCode(C_ZERO + res[i]))
+  }
+  return ziTrim(out.join(''))
+}
+
+/**
+ * 非负整数除法（大整数除数，逐位试商）
+ * @param a 被除数数字串
+ * @param b 除数数字串（不可为零，调用方保证）
+ * @returns 商与余数
+ */
+export function ziDivMod(a: string, b: string): ZiDivModResult {
+  const na: string = ziTrim(a)
+  const nb: string = ziTrim(b)
+  if (nb == '1') {
+    return { q: na, r: '0' } as ZiDivModResult
+  }
+  if (ziCmp(na, nb) < 0) {
+    return { q: '0', r: na } as ZiDivModResult
+  }
+  // 预计算 nb 的 1..9 倍，避免每位除法里重复做乘法
+  const multiples: Array<string> = []
+  for (let k: number = 1; k <= 9; k++) {
+    multiples.push(ziMulSmall(nb, k))
+  }
+  const quotient: Array<string> = []
+  let rem: string = '0'
+  for (let i: number = 0; i < na.length; i++) {
+    const grown: string = ziTrim(rem + na.substring(i, i + 1))
+    let digit: number = 0
+    for (let k: number = 0; k < 9; k++) {
+      if (ziCmp(grown, multiples[k]) >= 0) {
+        digit = k + 1
+      }
+    }
+    if (digit > 0) {
+      rem = ziSub(grown, multiples[digit - 1])
+    }
+    else {
+      rem = grown
+    }
+    quotient.push(String.fromCharCode(C_ZERO + digit))
+  }
+  return { q: ziTrim(quotient.join('')), r: ziTrim(rem) } as ZiDivModResult
+}
+
+/**
+ * 非负整数开平方（向下取整，牛顿迭代）
+ * @param a 数字串
+ * @returns floor(sqrt(a))
+ */
+export function ziSqrt(a: string): string {
+  const na: string = ziTrim(a)
+  if (ziIsZero(na)) {
+    return '0'
+  }
+  if (na == '1') {
+    return '1'
+  }
+  // 初值取 10^ceil(len/2)，保证 >= sqrt(na)
+  const guessDigits: number = Math.floor((na.length + 1) / 2)
+  let x: string = ziPow10(guessDigits)
+  while (true) {
+    const q: string = ziDivMod(na, x).q
+    const y: string = ziDivModSmall(ziAdd(x, q), 2).q
+    if (ziCmp(y, x) >= 0) {
+      break
+    }
+    x = y
+  }
+  return x
+}
+
+/**
+ * 对数字串做四舍五入到「保留 keep 位整数位」（即整体除以 10^drop 后按四舍五入取整）
+ * @param s 数字串（已去前导零）
+ * @param drop 需要丢弃的低位位数，需 >= 0
+ * @returns 四舍五入后的整数串
+ */
+export function ziShiftRoundHalfUp(s: string, drop: number): string {
+  if (drop <= 0) {
+    return s
+  }
+  if (s.length <= drop) {
+    // 全部被丢弃：仅看最高丢弃位是否 >= 5
+    const first: number = (s.charCodeAt(0) ?? 0) - C_ZERO
+    return first >= 5 ? '1' : '0'
+  }
+  const kept: string = s.substring(0, s.length - drop)
+  const next: number = (s.charCodeAt(s.length - drop) ?? 0) - C_ZERO
+  return next >= 5 ? ziAdd(kept, '1') : kept
+}

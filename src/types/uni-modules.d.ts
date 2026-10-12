@@ -72,6 +72,84 @@ declare module '@/uni_modules/lime-dayuts' {
   export function dayuts(...args: any[]): any;
 }
 
+// ---------- unix-Bignumber ----------
+// 真源：uni_modules/unix-Bignumber/index.uts
+// 说明：入参与返回值类型在真源里多为 `any`（对应 bignumber.js 的宽松签名），
+// 这里如实照抄，避免 TS 侧宣称比真源更严格的类型。
+declare module '@/uni_modules/unix-Bignumber' {
+  export const ROUND_UP: number;
+  export const ROUND_DOWN: number;
+  export const ROUND_CEIL: number;
+  export const ROUND_FLOOR: number;
+  export const ROUND_HALF_UP: number;
+  export const ROUND_HALF_DOWN: number;
+  export const ROUND_HALF_EVEN: number;
+  export const ROUND_HALF_CEIL: number;
+  export const ROUND_HALF_FLOOR: number;
+  export const MODULO_MODE_DOWN: number;
+  export const MODULO_MODE_EUCLID: number;
+
+  export type BigNumberFormat = any;
+  export type BigNumberFormatInput = any;
+  export type BigNumberConfigInput = any;
+  export type BigNumberConfigOutput = any;
+
+  export function config(cfg: any): any;
+  export function getConfig(): any;
+
+  export class BigNumber {
+    constructor(value: any, base?: number);
+    plus(value: any): BigNumber;
+    minus(value: any): BigNumber;
+    multipliedBy(value: any): BigNumber;
+    dividedBy(value: any): BigNumber;
+    dividedToIntegerBy(value: any): BigNumber;
+    modulo(value: any): BigNumber;
+    exponentiatedBy(value: any, modulus?: any): BigNumber;
+    sqrt(): BigNumber;
+    comparedTo(value: any): any;
+    isEqualTo(value: any): boolean;
+    isGreaterThan(value: any): boolean;
+    isGreaterThanOrEqualTo(value: any): boolean;
+    isLessThan(value: any): boolean;
+    isLessThanOrEqualTo(value: any): boolean;
+    isFinite(): boolean;
+    isInteger(): boolean;
+    isNaN(): boolean;
+    isNegative(): boolean;
+    isPositive(): boolean;
+    isZero(): boolean;
+    absoluteValue(): BigNumber;
+    negated(): BigNumber;
+    integerValue(rm?: number): BigNumber;
+    decimalPlaces(dp?: number, rm?: number): any;
+    sd(significantDigits?: any, rm?: any): any;
+    precision(significantDigits?: any, rm?: any): any;
+    shiftedBy(places: number): BigNumber;
+    toString(base?: number): string;
+    toFixed(dp?: number, rm?: number): string;
+    toFormat(dp?: number, rm?: number, format?: any): string;
+    toNumber(): number;
+    toJSON(): string;
+    valueOf(): string;
+    times(value: any): BigNumber;
+    div(value: any): BigNumber;
+    idiv(value: any): BigNumber;
+    mod(value: any): BigNumber;
+    pow(value: any, modulus?: any): BigNumber;
+    eq(value: any): boolean;
+    gt(value: any): boolean;
+    gte(value: any): boolean;
+    lt(value: any): boolean;
+    lte(value: any): boolean;
+    abs(): BigNumber;
+    static isBigNumber(value: any): boolean;
+    static config(cfg: any): any;
+    static getConfig(): any;
+    static of(value: any, base?: number): BigNumber;
+  }
+}
+
 // ---------- unix-crypto ----------
 // 真源：uni_modules/unix-crypto/index.uts
 declare module '@/uni_modules/unix-crypto' {

@@ -19,10 +19,15 @@ type RsaPrivateKey = { modulus: Uint8Array; privateExponent: Uint8Array }
 /** DER 元素信息 */
 type DerElement = { tag: number; contentStart: number; contentLen: number; nextStart: number }
 
+import { utf8Encode, utf8Decode, b64Encode, b64Decode } from './codec.uts'
+
 /** Base64 字符表 */
 const B64_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
 
 // ---- 通用工具：文本 / 字节 / 十六进制 ----
+//
+// ⚠️ UTF-8 与 Base64 一律走 codec.uts 的纯 UTS 实现，
+// **严禁改回 `new TextEncoder()` / `uni.base64ToArrayBuffer()`**：详见 codec.uts 顶部说明。
 
 /**
  * 字节数组转十六进制字符串（小写）
@@ -58,7 +63,7 @@ function hexToBytes(hex: string): Uint8Array {
  * @returns UTF-8 编码的字节数组
  */
 function textToBytes(text: string): Uint8Array {
-  return new TextEncoder().encode(text)
+  return utf8Encode(text)
 }
 
 /**
@@ -67,7 +72,7 @@ function textToBytes(text: string): Uint8Array {
  * @returns 解码后的字符串
  */
 function bytesToText(bytes: Uint8Array): string {
-  return new TextDecoder().decode(bytes)
+  return utf8Decode(bytes)
 }
 
 /**
@@ -112,17 +117,13 @@ function stripPem(pem: string): string {
 }
 
 /**
- * Base64 解码为字节数组（使用 uni-app X 自带 API）
+ * Base64 解码为字节数组（纯 UTS，兼容带 PEM 头尾 / 无填充 / 带换行的写法）
  * @param b64 Base64 字符串（可带 PEM 头尾）
  * @returns 解码后的字节数组
  */
 function base64DecodeToBytes(b64: string): Uint8Array {
-  // 先剔除 PEM 头尾，再补齐 = 填充到 4 的倍数（兼容无填充的裸 Base64）
-  let clean = stripPem(b64)
-  while (clean.length % 4 != 0) {
-    clean = clean + '='
-  }
-  return new Uint8Array(uni.base64ToArrayBuffer(clean))
+  // b64Decode 自身会忽略 `=` 与换行等非表内字符，无需再补齐填充
+  return b64Decode(stripPem(b64))
 }
 
 // ---- DER 解析：密钥导入 ----
@@ -962,7 +963,7 @@ function rsaGenerateKeyPairJs(bits: number): string {
   for (let i = 0; i < bitStringContent.length; i++) bitString[bitHeader.length + i] = bitStringContent[i]
 
   const spkiDer = derSequence([algo, bitString])
-  const pubB64 = uni.arrayBufferToBase64(spkiDer.buffer as ArrayBuffer)
+  const pubB64 = b64Encode(spkiDer)
 
   // 构造 PKCS#8 私钥
   const version0 = hexToBytes('020100')
@@ -989,7 +990,7 @@ function rsaGenerateKeyPairJs(bits: number): string {
   for (let i = 0; i < pkcs1Pri.length; i++) octString[octHeader.length + i] = pkcs1Pri[i]
 
   const pkcs8Der = derSequence([version0, algo, octString])
-  const priB64 = uni.arrayBufferToBase64(pkcs8Der.buffer as ArrayBuffer)
+  const priB64 = b64Encode(pkcs8Der)
 
   return '{"publicKey":"' + pubB64 + '","privateKey":"' + priB64 + '"}'
 }
