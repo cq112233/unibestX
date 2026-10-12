@@ -1,0 +1,37 @@
+/*
+ * @Author       : jry
+ * @Description  :
+ * @version      : 4.0
+ * @Date         : 2025-11-06 12:20:08
+ * @LastAuthor   : jry
+ * @lastTime     : 2025-11-06 12:20:08
+ * @FilePath     : /uview-ultra/libs/config/props/countDown
+ */
+import { defineMixin } from '../../libs/vue'
+import defProps from './countDown.uts'
+let crtProp = defProps['countDown'] as UTSJSONObject
+
+export const propsCountDown = defineMixin({
+    props: {
+        // 倒计时时长，单位ms
+        time: {
+            type: [String, Number],
+            default: crtProp['time']
+        },
+        // 时间格式，DD-日，HH-时，mm-分，ss-秒，SSS-毫秒
+        format: {
+            type: String,
+            default: crtProp['format']
+        },
+        // 是否自动开始倒计时
+        autoStart: {
+            type: Boolean,
+            default: crtProp['autoStart']
+        },
+        // 是否展示毫秒倒计时
+        millisecond: {
+            type: Boolean,
+            default: crtProp['millisecond']
+        }
+    }
+})

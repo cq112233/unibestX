@@ -1,0 +1,16 @@
+/*
+ * @Author       : jry
+ * @Description  :
+ * @version      : 4.0
+ * @Date         : 2024-04-22 16:44:21
+ * @LastAuthor   : jry
+ * @lastTime     : 2024-08-28 16:54:16
+ * @FilePath     : /uview-ultra/libs/config/props/cellGroup.js
+ */
+export default {
+    // cell-group组件的props
+    cellGroup: {
+        title: '',
+        border: true
+    }
+} as UTSJSONObject

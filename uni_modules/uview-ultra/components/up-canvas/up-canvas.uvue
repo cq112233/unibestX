@@ -1,0 +1,298 @@
+<template>
+    <view
+        class="up-canvas"
+        :id="rootId"
+        :style="rootStyle"
+    >
+        <canvas
+            class="up-canvas__canvas"
+            :id="canvasId"
+            :canvas-id="canvasId"
+            :style="canvasStyle"
+            @touchstart="onTouchStart"
+            @touchmove="onTouchMove"
+            @touchend="onTouchEnd"
+            @touchcancel="onTouchEnd"
+        ></canvas>
+    </view>
+</template>
+
+<script setup lang="uts">
+import { ref, computed, onMounted, getCurrentInstance } from 'vue'
+
+let canvasCompCount = 0
+
+function normalizeSize(value: any | null, fallback: number): number {
+    if (typeof value === 'number') {
+        return value as number
+    }
+    if (value == null) {
+        return fallback
+    }
+    const parsed = parseFloat(value.toString())
+    return isNaN(parsed) ? fallback : parsed
+}
+
+function makeId(prefix: string): string {
+    return prefix + Date.now().toString() + '_' + (++canvasCompCount).toString()
+}
+
+defineOptions({
+    name: 'up-canvas'
+})
+
+const props = defineProps({
+    canvasId: {
+        type: String,
+        default: ''
+    },
+    width: {
+        type: [String, Number],
+        default: 300
+    },
+    height: {
+        type: [String, Number],
+        default: 300
+    },
+    unit: {
+        type: String,
+        default: 'px'
+    },
+    useRootHeightAndWidth: {
+        type: Boolean,
+        default: false
+    },
+    bgColor: {
+        type: String,
+        default: '#ffffff'
+    }
+})
+
+const emit = defineEmits(['touchstart', 'touchmove', 'touchend'])
+const instance = getCurrentInstance()
+
+const rootId = ref<string>(makeId('rootId-'))
+const canvasId = ref<string>(props.canvasId != '' ? props.canvasId : makeId('up-canvas-'))
+const widthLocal = ref<number>(normalizeSize(props.width, 300))
+const heightLocal = ref<number>(normalizeSize(props.height, 300))
+let canvasContext: CanvasContext | null = null
+let ctx: CanvasRenderingContext2D | null = null
+const isReady = ref<boolean>(false)
+
+const actualWidth = computed<number>(() => {
+    return props.useRootHeightAndWidth ? normalizeSize(widthLocal.value, 300) : normalizeSize(props.width, 300)
+})
+
+const actualHeight = computed<number>(() => {
+    return props.useRootHeightAndWidth ? normalizeSize(heightLocal.value, 300) : normalizeSize(props.height, 300)
+})
+
+const rootStyle = computed<UTSJSONObject>(() => {
+    const style = {} as UTSJSONObject
+    style['width'] = props.useRootHeightAndWidth ? '100%' : actualWidth.value.toString() + props.unit
+    style['height'] = props.useRootHeightAndWidth ? '100%' : actualHeight.value.toString() + props.unit
+    return style
+})
+
+const canvasStyle = computed<UTSJSONObject>(() => {
+    const style = {} as UTSJSONObject
+    style['width'] = actualWidth.value.toString() + props.unit
+    style['height'] = actualHeight.value.toString() + props.unit
+    return style
+})
+
+function onTouchStart(e: UniTouchEvent): void {
+    emit('touchstart', e)
+}
+
+function onTouchMove(e: UniTouchEvent): void {
+    emit('touchmove', e)
+}
+
+function onTouchEnd(e: UniTouchEvent): void {
+    emit('touchend', e)
+}
+
+function getCanvasContext(): CanvasRenderingContext2D | null {
+    return ctx
+}
+
+function clearRect(x: number, y: number, w: number, h: number): void {
+    if (ctx != null) {
+        ctx!.clearRect(x, y, w, h)
+    }
+}
+
+function setFillStyle(color: string): void {
+    if (ctx != null) {
+        ctx!.fillStyle = color
+    }
+}
+
+function clearCanvas(): void {
+    if (!ensureContext()) return
+    clearRect(0, 0, actualWidth.value, actualHeight.value)
+    setFillStyle(props.bgColor)
+    if (ctx != null) {
+        ctx!.fillRect(0, 0, actualWidth.value, actualHeight.value)
+    }
+}
+
+function initCanvas(): void {
+    uni.createCanvasContextAsync({
+        id: canvasId.value as string.IDString,
+        component: instance?.proxy,
+        success: (context: CanvasContext) => {
+            canvasContext = context
+            ctx = context.getContext('2d')
+            isReady.value = ctx != null
+            clearCanvas()
+        },
+        fail: (err: UniError) => {
+            isReady.value = false
+            console.error('初始化Canvas失败:', err)
+        }
+    })
+}
+
+function ensureContext(): boolean {
+    if (ctx != null) return true
+    if (!isReady.value) {
+        initCanvas()
+    }
+    return ctx != null
+}
+
+function rect(x: number, y: number, w: number, h: number): void {
+    if (ctx != null) {
+        ctx!.rect(x, y, w, h)
+    }
+}
+
+function fill(): void {
+    if (ctx != null) {
+        ctx!.fill('nonzero')
+    }
+}
+
+function setLineCap(lineCap: string = 'round'): void {
+    if (ctx != null) {
+        ctx!.lineCap = lineCap
+    }
+}
+
+function setLineJoin(lineJoin: string = 'round'): void {
+    if (ctx != null) {
+        ctx!.lineJoin = lineJoin
+    }
+}
+
+function setStrokeStyle(color: string): void {
+    if (ctx != null) {
+        ctx!.strokeStyle = color
+    }
+}
+
+function setLineWidth(w: number): void {
+    if (ctx != null) {
+        ctx!.lineWidth = w
+    }
+}
+
+function setLineStyle(lineColor: string, lineWidth: number): void {
+    setLineCap('round')
+    setLineJoin('round')
+    setStrokeStyle(lineColor)
+    setLineWidth(lineWidth)
+}
+
+function beginPath(): void {
+    if (ctx != null) {
+        ctx!.beginPath()
+    }
+}
+
+function moveTo(x: number, y: number): void {
+    if (ctx != null) {
+        ctx!.moveTo(x, y)
+    }
+}
+
+function lineTo(x: number, y: number): void {
+    if (ctx != null) {
+        ctx!.lineTo(x, y)
+    }
+}
+
+function stroke(): void {
+    if (ctx != null) {
+        ctx!.stroke()
+    }
+}
+
+function closePath(): void {
+    if (ctx != null) {
+        ctx!.closePath()
+    }
+}
+
+function draw(_isLastDraw: boolean = false): void {
+}
+
+function exportImage(fileType: string = 'png', quality: number = 1): Promise<string> {
+    return new Promise((resolve, reject) => {
+        if (canvasContext == null) {
+            reject(new Error('Canvas is not ready'))
+            return
+        }
+        const mime = fileType == 'jpg' || fileType == 'jpeg' ? 'image/jpeg' : 'image/png'
+        resolve(canvasContext!.toDataURL(mime, quality))
+    })
+}
+
+function setNewSize(): void {
+    widthLocal.value = normalizeSize(props.width, 300)
+    heightLocal.value = normalizeSize(props.height, 300)
+}
+
+onMounted(() => {
+    if (props.useRootHeightAndWidth) {
+        setNewSize()
+    }
+    initCanvas()
+})
+
+defineExpose({
+    getCanvasContext,
+    initCanvas,
+    clearCanvas,
+    rect,
+    clearRect,
+    fill,
+    setFillStyle,
+    setLineStyle,
+    setLineCap,
+    setLineJoin,
+    setStrokeStyle,
+    setLineWidth,
+    beginPath,
+    moveTo,
+    lineTo,
+    stroke,
+    closePath,
+    draw,
+    exportImage,
+    setNewSize
+})
+</script>
+
+<style lang="scss" scoped>
+    .up-canvas {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .up-canvas__canvas {
+        display: flex;
+    }
+</style>

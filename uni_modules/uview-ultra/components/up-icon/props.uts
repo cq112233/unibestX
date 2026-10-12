@@ -1,0 +1,101 @@
+/*
+ * @Author       : jry
+ * @Description  : uview-plus component's props mixin file
+ * @version      : 4.0
+ * @Date         : 2024-04-22 16:44:21
+ * @LastAuthor   : jry
+ * @lastTime     : 2024-08-28 12:27:20
+ */
+import { defineMixin } from '../../libs/vue'
+import defProps from './icon'
+let crtProp = defProps['icon'] as UTSJSONObject
+
+export const propsIcon = defineMixin({
+    props: {
+        // 图标类名
+        name: {
+            type: String,
+            default: crtProp['name']
+        },
+        // 图标颜色，可接受主题色
+        color: {
+            type: String,
+            default: crtProp['color']
+        },
+        // 字体大小，单位px
+        size: {
+            type: [String, Number],
+            default: crtProp['size']
+        },
+        // 是否显示粗体
+        bold: {
+            type: Boolean,
+            default: crtProp['bold']
+        },
+        // 点击图标的时候传递事件出去的index（用于区分点击了哪一个）
+        index: {
+            type: [String],
+            default: crtProp['index']
+        },
+        // 触摸图标时的类名
+        hoverClass: {
+            type: String,
+            default: crtProp['hoverClass']
+        },
+        // 自定义扩展前缀，方便用户扩展自己的图标库
+        customPrefix: {
+            type: String,
+            default: crtProp['customPrefix']
+        },
+        // 图标右边或者下面的文字
+        label: {
+            type: [String],
+            default: crtProp['label']
+        },
+        // label的位置，只能右边或者下边
+        labelPos: {
+            type: String,
+            default: crtProp['labelPos']
+        },
+        // label的大小
+        labelSize: {
+            type: [String],
+            default: crtProp['labelSize']
+        },
+        // label的颜色
+        labelColor: {
+            type: String,
+            default: crtProp['labelColor']
+        },
+        // label与图标的距离
+        space: {
+            type: [String],
+            default: crtProp['space']
+        },
+        // 图片的mode
+        imgMode: {
+            type: String,
+            default: crtProp['imgMode']
+        },
+        // 用于显示图片小图标时，图片的宽度
+        width: {
+            type: [String],
+            default: crtProp['width']
+        },
+        // 用于显示图片小图标时，图片的高度
+        height: {
+            type: [String],
+            default: crtProp['height']
+        },
+        // 用于解决某些情况下，让图标垂直居中的用途
+        top: {
+            type: [String],
+            default: crtProp['top']
+        },
+        // 是否阻止事件传播
+        stop: {
+            type: Boolean,
+            default: crtProp['stop']
+        }
+    }
+})

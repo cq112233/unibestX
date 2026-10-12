@@ -1,0 +1,302 @@
+<template>
+  <view
+    class="up-pull-refresh"
+    @touchstart="onTouchStart"
+    @touchmove="onTouchMove"
+    @touchend="onTouchEnd"
+    @touchcancel="onTouchEnd"
+  >
+    <view
+      class="refresh-area"
+      :style="{ height: refreshDistance + 'px' }"
+      :class="{ refreshing: isRefreshing }"
+    >
+      <slot
+        v-if="refreshStatus === 'pull'"
+        name="pull"
+        :distance="refreshDistance"
+        :threshold="threshold"
+      >
+        <view class="refresh-content">
+          <view class="refresh-indicator">
+            <up-icon name="arrow-downward" size="26px"></up-icon>
+          </view>
+          <text class="refresh-text">下拉刷新</text>
+        </view>
+      </slot>
+
+      <slot
+        v-else-if="refreshStatus === 'release'"
+        name="release"
+        :distance="refreshDistance"
+        :threshold="threshold"
+      >
+        <view class="refresh-content">
+          <view class="refresh-indicator">
+            <up-icon name="arrow-upward" size="26px"></up-icon>
+          </view>
+          <text class="refresh-text">释放刷新</text>
+        </view>
+      </slot>
+
+      <slot
+        v-else-if="refreshStatus === 'refreshing'"
+        name="refreshing"
+      >
+        <view class="refresh-content">
+          <view class="refresh-indicator">
+            <view class="spinner"></view>
+          </view>
+          <text class="refresh-text">刷新中...</text>
+        </view>
+      </slot>
+    </view>
+
+    <view
+      class="refresh-content-wrapper"
+      :style="{ transform: `translateY(${contentTranslateY}px)` }"
+    >
+      <scroll-view
+        v-if="useScrollView"
+        class="scroll-wrapper"
+        direction="vertical"
+        :enable-back-to-top="enableBackToTop"
+        :scroll-top="parseFloat(scrollTop.toString())"
+        :lower-threshold="parseFloat(lowerThreshold.toString())"
+        @scroll="handleScroll"
+        @scrolltolower="handleScrollToLower"
+      >
+        <slot></slot>
+
+        <up-loadmore
+          v-if="showLoadmore"
+          v-bind="loadmoreProps"
+        />
+      </scroll-view>
+
+      <view v-else>
+        <slot></slot>
+
+        <up-loadmore
+          v-if="showLoadmore"
+          v-bind="loadmoreProps"
+        />
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { ref, watch } from 'vue'
+
+defineOptions({
+  name: 'up-pull-refresh'
+})
+
+const props = defineProps({
+  refreshing: {
+    type: Boolean,
+    default: false
+  },
+  threshold: {
+    type: Number,
+    default: 80
+  },
+  damping: {
+    type: Number,
+    default: 0.4
+  },
+  maxDistance: {
+    type: Number,
+    default: 120
+  },
+  showLoadmore: {
+    type: Boolean,
+    default: false
+  },
+  loadmoreProps: {
+    type: Object,
+    default: () => ({ status: 'loadmore' })
+  },
+  useScrollView: {
+    type: Boolean,
+    default: true
+  },
+  enableBackToTop: {
+    type: Boolean,
+    default: false
+  },
+  lowerThreshold: {
+    type: [Number, String],
+    default: 50
+  },
+  scrollTop: {
+    type: [Number, String],
+    default: 0
+  }
+})
+
+const emit = defineEmits(['refresh', 'loadmore', 'scroll'])
+
+const isRefreshing = ref<boolean>(false)
+const refreshStatus = ref<string>('pull')
+const refreshDistance = ref<number>(0)
+const startY = ref<number>(0)
+const currentY = ref<number>(0)
+const currentScrollTop = ref<number>(0)
+const touching = ref<boolean>(false)
+const contentTranslateY = ref<number>(0)
+
+function getTouchPageY(e: UniTouchEvent): number {
+  if (e.touches.length > 0) {
+    return e.touches[0].pageX
+  }
+  if (e.changedTouches.length > 0) {
+    return e.changedTouches[0].pageY
+  }
+  return 0
+}
+
+function stringValue(value: any | null): string {
+  return value == null ? '' : value.toString()
+}
+
+function getLoadmoreStatus(): string {
+  return stringValue((props.loadmoreProps as UTSJSONObject)['status'])
+}
+
+function isScrollViewAtTop(): boolean {
+  return currentScrollTop.value <= 0
+}
+
+function resetRefresh(): void {
+  refreshDistance.value = 0
+  contentTranslateY.value = 0
+}
+
+function startRefresh(): void {
+  isRefreshing.value = true
+  refreshStatus.value = 'refreshing'
+  refreshDistance.value = props.threshold
+  contentTranslateY.value = props.threshold
+}
+
+function finishRefresh(): void {
+  isRefreshing.value = false
+  refreshStatus.value = 'pull'
+  resetRefresh()
+}
+
+function onTouchStart(e: UniTouchEvent): void {
+  if (isRefreshing.value) return
+  touching.value = true
+  startY.value = getTouchPageY(e)
+  currentY.value = startY.value
+  refreshStatus.value = 'pull'
+}
+
+function onTouchMove(e: UniTouchEvent): void {
+  if (!touching.value || isRefreshing.value) return
+  currentY.value = getTouchPageY(e)
+  const diff = currentY.value - startY.value
+  if (diff > 0 && isScrollViewAtTop()) {
+    refreshDistance.value = Math.min(diff * props.damping, props.maxDistance)
+    contentTranslateY.value = refreshDistance.value
+    if (refreshDistance.value >= props.threshold) {
+      refreshStatus.value = 'release'
+    } else {
+      refreshStatus.value = 'pull'
+    }
+    e.preventDefault()
+    e.stopPropagation()
+  }
+}
+
+function onTouchEnd(): void {
+  if (!touching.value) return
+  touching.value = false
+  if (refreshDistance.value >= props.threshold && !isRefreshing.value) {
+    startRefresh()
+    emit('refresh')
+  } else {
+    resetRefresh()
+  }
+}
+
+function handleScroll(e: UniScrollEvent): void {
+  currentScrollTop.value = e.detail.scrollTop
+  emit('scroll', e)
+}
+
+function handleScrollToLower(_e: UniScrollToLowerEvent): void {
+  if (props.showLoadmore && getLoadmoreStatus() == 'loadmore') {
+    emit('loadmore')
+  }
+}
+
+watch(() => props.refreshing, (newVal: boolean) => {
+  if (newVal) {
+    startRefresh()
+  } else {
+    finishRefresh()
+  }
+})
+
+defineExpose({
+  startRefresh,
+  finishRefresh
+})
+</script>
+
+<style scoped lang="scss">
+.up-pull-refresh {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+}
+
+.refresh-area {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  overflow: hidden;
+  transition: height 0.2s ease-out;
+}
+
+.refresh-content-wrapper {
+  height: 100%;
+  transition: transform 0.2s ease-out;
+}
+
+.scroll-wrapper {
+  height: 100%;
+}
+
+.refresh-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding-bottom: 10px;
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border-width: 2px;
+  border-style: solid;
+  border-color: #f3f3f3;
+  border-top-color: #666;
+  border-radius: 50%;
+}
+
+.refresh-text {
+  font-size: 14px;
+  color: #666;
+}
+</style>

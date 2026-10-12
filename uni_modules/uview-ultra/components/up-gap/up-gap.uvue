@@ -1,0 +1,54 @@
+<template>
+	<view class="up-gap" :style="[gapStyle]"></view>
+</template>
+
+<script setup lang="uts">
+import { computed } from 'vue'
+import { mpSharedMpOptions } from '../../libs/composable/useMp'
+import defProps from './gap.uts'
+import { addUnit } from '../../libs/function/index'
+
+// options
+defineOptions({
+  // ...mpSharedMpOptions,
+  name: 'up-gap'
+})
+
+// props
+const props = defineProps({
+	// 背景颜色（默认 'transparent' ）
+	bgColor: {
+	    type: String,
+	    default: defProps.getString('gap.bgColor')
+	},
+	// 分割槽高度，单位px（默认 20 ）
+	height: {
+	    type: [String, Number],
+	    default: defProps.getNumber('gap.height')
+	},
+	// 与前一个组件的距离，单位px（ 默认 0 ）
+	marginTop: {
+	    type: [String, Number],
+	    default: defProps.getNumber('gap.marginTop')
+	},
+	// 与后一个组件的距离，单位px （默认 0 ）
+	marginBottom: {
+	    type: [String, Number],
+	    default: defProps.getNumber('gap.marginBottom')
+	}
+})
+
+// computed
+const gapStyle = computed(() => {
+	return {
+		backgroundColor: props.bgColor,
+		height: addUnit(props.height),
+		marginTop: addUnit(props.marginTop),
+		marginBottom: addUnit(props.marginBottom)
+	} as UTSJSONObject
+})
+</script>
+
+<style lang="scss" scoped>
+	@import "../../libs/css/components.scss";
+</style>

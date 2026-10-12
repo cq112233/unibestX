@@ -1,0 +1,175 @@
+<template>
+	<view class="up-tabbar">
+		<view
+		    class="up-tabbar__content"
+		    @touchmove.stop.prevent="noop"
+		    :class="[border ? 'up-border-top' : '', fixed ? 'up-tabbar--fixed' : '']"
+		    :style="tabbarStyle"
+		>
+			<view class="up-tabbar__content__item-wrapper">
+				<slot />
+			</view>
+			<up-safe-bottom v-if="safeAreaInsetBottom"></up-safe-bottom>
+		</view>
+		<view
+		    class="up-tabbar__placeholder"
+			v-if="placeholder && fixed"
+		    :style="{
+				height: placeholderHeight + 'px',
+			}"
+		></view>
+	</view>
+</template>
+
+<script setup lang="uts">
+import { computed, ref, watch, provide, onMounted, getCurrentInstance } from 'vue'
+import { addStyle, deepMerge, sleep, upGetRect } from '../../libs/function/index.uts'
+
+defineOptions({
+  name: 'up-tabbar'
+})
+
+const props = defineProps({
+  value: {
+    type: [String, Number],
+    default: null
+  },
+  safeAreaInsetBottom: {
+    type: Boolean,
+    default: true
+  },
+  border: {
+    type: Boolean,
+    default: true
+  },
+  borderColor: {
+    type: String,
+    default: ''
+  },
+  zIndex: {
+    type: [String, Number],
+    default: 1
+  },
+  activeColor: {
+    type: String,
+    default: '#1989fa'
+  },
+  inactiveColor: {
+    type: String,
+    default: '#7d7e80'
+  },
+  fixed: {
+    type: Boolean,
+    default: true
+  },
+  placeholder: {
+    type: Boolean,
+    default: true
+  },
+  backgroundColor: {
+    type: String,
+    default: '#ffffff'
+  },
+  customStyle: {
+    type: Object,
+    default: () => ({})
+  }
+})
+
+const emit = defineEmits(['change', 'update:value'])
+const instance = getCurrentInstance()
+const placeholderHeight = ref<number>(0)
+
+const tabbarStyle = computed<UTSJSONObject>(() => {
+  const style = {
+    zIndex: props.zIndex
+  } as UTSJSONObject
+  if (props.borderColor != '') {
+    style['borderColor'] = props.borderColor + ' !important'
+  }
+  if (props.backgroundColor != '') {
+    style['backgroundColor'] = props.backgroundColor
+  }
+  return deepMerge(style, addStyle(props.customStyle)) as UTSJSONObject
+})
+
+const parentState = computed((): UTSJSONObject => {
+  return {
+    value: props.value,
+    activeColor: props.activeColor,
+    inactiveColor: props.inactiveColor,
+    safeAreaInsetBottom: props.safeAreaInsetBottom,
+    border: props.border,
+    borderColor: props.borderColor,
+    zIndex: props.zIndex,
+    fixed: props.fixed,
+    placeholder: props.placeholder,
+    backgroundColor: props.backgroundColor,
+  } as UTSJSONObject
+})
+
+const itemCount = ref<number>(0)
+const registerTabbarItem = (): number => {
+  const currentIndex = itemCount.value
+  itemCount.value = itemCount.value + 1
+  return currentIndex
+}
+
+provide('upTabbarProps', parentState)
+provide('upTabbarRegister', registerTabbarItem)
+provide('upTabbarChange', (name: any) => {
+  emit('update:value', name)
+  emit('change', name)
+})
+
+async function setPlaceholderHeight() {
+  if (!props.fixed || !props.placeholder) return
+  await sleep(20)
+  upGetRect('.up-tabbar__content', false, instance?.proxy).then((size: NodeInfo) => {
+    placeholderHeight.value = size.height ?? 50
+  })
+}
+
+function noop() {}
+
+watch((): Array<any | null> => [props.fixed, props.placeholder] as Array<any | null>, () => {
+  setPlaceholderHeight()
+})
+
+onMounted(() => {
+  setPlaceholderHeight()
+})
+</script>
+
+<style lang="scss" scoped>
+	@import '../../libs/css/components.scss';
+
+	.up-tabbar {
+		display: flex;
+		flex-direction: column;
+		width: 100%;
+
+		&__content {
+			display: flex;
+			flex-direction: column;
+			background-color: #fff;
+			width: 100%;
+
+			&__item-wrapper {
+				height: 50px;
+				display: flex;
+				flex-direction: row;
+				justify-content: space-around;
+				align-items: stretch;
+				width: 100%;
+			}
+		}
+
+		&--fixed {
+			position: fixed;
+			bottom: 0;
+			left: 0;
+			right: 0;
+		}
+	}
+</style>

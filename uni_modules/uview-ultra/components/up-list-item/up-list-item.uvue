@@ -1,0 +1,34 @@
+<template>
+	<view
+		class="up-list-item"
+		:ref="refstr"
+		:class="[`up-list-item-${refstr}`]"
+	>
+		<slot />
+	</view>
+</template>
+
+<script setup lang="uts">
+import { ref } from 'vue'
+import { guid } from '../../libs/function/index.uts'
+
+defineOptions({
+	name: 'up-list-item'
+})
+
+const props = defineProps({
+	anchor: {
+		type: [String, Number],
+		default: ''
+	},
+	customStyle: {
+		type: Object,
+		default: () => ({})
+	}
+})
+
+const refstr = ref<string>(guid())
+</script>
+
+<style lang="scss" scoped>
+</style>

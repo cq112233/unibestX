@@ -1,0 +1,98 @@
+<template>
+    <view class="up-agreement">
+        <up-modal v-model:show="show" showCancelButton @confirm="confirm" @cancel="close" confirmText="阅读并同意">
+            <view class="agreement-content">
+                <slot>
+                    <text class="agreement-text">
+                        我们非常重视您的个人信息和隐私保护。为了更好地保障您的个人权益，在您使用我们的产品前，请务必审慎阅读《
+                    </text>
+                    <text class="agreement-url" @click="urlClick('urlProtocol')">用户协议</text>
+                    <text class="agreement-text">》和《</text>
+                    <text class="agreement-url" @click="urlClick('urlPrivacy')">隐私政策</text>
+                    <text class="agreement-text">
+                        》内的所有条款，尤其是: 1.我们对您的个人信息的收集/保存/使用/对外提供/保护等规则条款，以及您的用户权利等条款; 2.约定我们的限制责任、免责条款; 3.其他以颜色或加粗进行标识的重要条款。如您对以上协议有任何疑问，请先不要同意，您点击“同意并继续”的行为即表示您已阅读完毕并同意以上协议的全部内容。
+                    </text>
+                </slot>
+            </view>
+        </up-modal>
+    </view>
+</template>
+
+<script setup lang="uts">
+import { ref } from 'vue'
+
+defineOptions({
+    name: 'up-agreement'
+})
+
+const props = defineProps({
+    urlProtocol: {
+        type: String,
+        default: '/pages/user_agreement/agreement/info?title=用户协议'
+    },
+    urlPrivacy: {
+        type: String,
+        default: '/pages/user_agreement/agreement/info?title=隐私政策'
+    }
+})
+
+const emit = defineEmits(['confirm'])
+
+const show = ref<boolean>(false)
+
+function close() {
+    // #ifdef H5
+    try {
+        window.opener = null
+        window.close()
+    } catch (_e) {}
+    // #endif
+    // #ifdef APP-PLUS
+    try {
+        plus.runtime.quit()
+    } catch (_e) {}
+    // #endif
+}
+
+function confirm() {
+    show.value = false
+    emit('confirm', 1)
+}
+
+function showModal() {
+    show.value = true
+}
+
+function urlClick(type: string) {
+    const targetUrl = type == 'urlPrivacy' ? props.urlPrivacy : props.urlProtocol
+    uni.navigateTo({
+        url: targetUrl
+    })
+}
+
+defineExpose({
+    showModal,
+    close,
+    confirm
+})
+</script>
+
+<style scoped lang="scss">
+    .agreement-content {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+    .agreement-text {
+        font-size: 14px;
+        color: #606266;
+        line-height: 22px;
+    }
+    .agreement-url {
+        display: flex;
+        color: $up-primary;
+        /* #ifdef H5 */
+        cursor: pointer;
+        /* #endif */
+    }
+</style>

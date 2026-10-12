@@ -1,0 +1,18 @@
+import type { Ref } from 'vue'
+
+// up-collapse 与 up-collapse-item 之间的约定：父组件 provide，子组件 inject。
+// 键名集中在这里，省得两边各写一份字符串字面量而对不上。
+export const UP_COLLAPSE_PROPS = 'upCollapseProps'
+export const UP_COLLAPSE_REGISTER = 'upCollapseRegister'
+export const UP_COLLAPSE_UNREGISTER = 'upCollapseUnregister'
+export const UP_COLLAPSE_TOGGLE = 'upCollapseToggle'
+
+// 子项注册时提交给父组件的内部状态。
+// 父组件既要读 isOpen（手风琴模式下判断该收起谁、拼接 change 载荷），
+// 也要能写 setOpen（点击切换、以及 value / accordion 变化后重新同步）
+export type CollapseItemChild = {
+	elId: string,
+	name: string,
+	isOpen: Ref<boolean>,
+	setOpen: (open: boolean) => void
+}

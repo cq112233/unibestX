@@ -156,14 +156,17 @@ description: uni-app X (UTS) 开发规范与踩坑避坑指南，适用于跨端
     `uni_modules/*/components/` 与 `src/components/` 下的组件，模板里直接写 `<uni-icons type="..." />`、`<e-chart />`、`<z-paging-x />` 即可，**无需 `import`**。
     *   *正确做法*：`<uni-icons type="info" size="28" color="#cbd5e1" />`
     *   *错误做法*：`import UniIcons from '@/uni_modules/uni-icons/components/uni-icons/uni-icons.uvue'` 再用 `<UniIcons />` —— 多余的样板代码，标签还被迫改成 PascalCase。
-*   **⚠️ 前提：`vite.config.ts` 里的 easycom 插件必须全平台生效**：
+*   **⚠️ 前提：`vite.config.ts` 里的 easycom 插件必须对 App 端与 Web/H5 端生效（排除小程序端）**：
 
     ```ts
-    // 必须无条件加入，不能只限 web/h5 —— App 端也要靠它把 _resolveComponent 转成静态 import
-    uniEasycomPlugin({ exclude: UNI_EASYCOM_EXCLUDE }),
+    // 服务于 App 端与 Web/H5 端（不能只限 web/h5 —— App 端也要靠它把 _resolveComponent 转成静态 import）；
+    // 小程序端（mp-*）由官方 mp-compiler 原生 usingComponents 处理，必须排除，否则会向 uni-mp-vue 注入缺失的 resolveDynamicComponent 导致编译报错
+    ...(!process.env.UNI_PLATFORM?.startsWith('mp-')
+      ? [uniEasycomPlugin({ exclude: UNI_EASYCOM_EXCLUDE })]
+      : []),
     ```
 
-    该插件内部名为 `uni:app-easycom`。蒸汽模式 + `vapor-render-target: "bytecode"` 下，只有进入模块 import 图的 `.uvue` 才会生成 `bytes/*.bytes` 视图层字节码；插件若在 App 端被 `UNI_PLATFORM` 条件排除，easycom 组件就不生成 bytecode，**云打包安装后组件不渲染**。历史上正是这个条件被误设，才误导出「必须手动 import」的错误结论。
+    该插件内部名为 `uni:app-easycom`。蒸汽模式 + `vapor-render-target: "bytecode"` 下，只有进入模块 import 图的 `.uvue` 才会生成 `bytes/*.bytes` 视图层字节码；插件若在 App 端被条件排除，easycom 组件就不生成 bytecode，**云打包安装后组件不渲染**。但该插件内嵌的转换代码依赖 `vue` 的 `resolveDynamicComponent`，小程序端 `@dcloudio/uni-mp-vue` 未导出该 API，因此必须仅在非小程序端加载。
 *   **例外：不在 easycom 扫描范围内的组件仍需手动 import**：
     easycom 只自动扫描项目根的 `components/组件名/组件名.uvue` 与 `uni_modules/*/components/`。放在页面目录下的私有组件（如 `src/pages/*/components/ToastDemoCard.uvue`）不会被扫描，**必须手动 import**。
 *   **保留 pages.json 的 easycom 配置，不要删**：`autoscan: true` 是 uni_modules 内部互相引用（如 `z-paging-x` → `z-paging-x-empty`）所必需的；自定义规则（如 `^NavBar$`、`^e-chart$`）也保留。
@@ -279,6 +282,15 @@ description: uni-app X (UTS) 开发规范与踩坑避坑指南，适用于跨端
   * 在同一个 `.uts` 文件顶层，若导出了属性（如 `export const windowHeight = computed(...)`），**严禁在顶层额外导出一个同名的 Getter 函数（如 `export function getWindowHeight(): number`）**。
   * **原因**：在 Kotlin 原生编译中，属性 `val windowHeight` 会由 Kotlin 编译器自动生成静态 getter：`public static final ComputedRef getWindowHeight()`。若同文件还显式导出了同名顶层函数 `fun getWindowHeight(): Number`，两者在 JVM 字节码签名上发生声明冲突（Platform Declaration Clash），函数的返回类型会挤占破坏属性原本的 getter。当 Vue 模板在执行 `{{ windowHeight }}` 时，因找不到匹配的 getter 而在运行时直接崩溃报：`java.lang.NoSuchMethodError: No static method getWindowHeight()Lio/dcloud/uniapp/vue/ComputedRef; in class ...`。
   * *正确做法*：顶层仅保留属性本身（`export const windowHeight = computed(...)`），不要在顶层额外导出一个同名 getter。若需面向对象式调用，将其封装在 class 实例方法中（如 `systemUtils.getWindowHeight()`），避免污染包顶层静态命名空间。
+* **`computed` 只允许单参 getter 形式 (Computed: Getter-Only)**：
+  * 禁止在 `<script setup>` 顶层写带显式泛型的可写 computed：`computed<T>({ get() {...}, set() {...} })`。它**能通过编译**——`cli publish` 与 IDE 编译均无任何告警——但运行期必抛 `java.lang.ClassCastException: UTSJSONObject cannot be cast to WritableComputedOptions`（UTS 把该对象字面量落实为 `UTSJSONObject`，而非运行时期望的 `WritableComputedOptions`）。实测于 2026-09-11 `up-radio-group` / `up-checkbox-group`。
+  * *正确做法*：只读用途写 `const modelValue = computed<RadioValue>((): RadioValue => props.modelValue)`；需要回写的场景（v-model 等）在业务函数里直接 `emit('update:modelValue', v)`，不要绕经 setter。
+  * *错误示例*：`const modelValue = computed<RadioValue>({ get(): RadioValue { return props.modelValue }, set(v : RadioValue) { emit('update:modelValue', v) } })`
+  * **注意适用范围**：同样的对象字面量形式出现在 `uni_modules/lime-i18n/common/composer.uts`（赋值给已声明类型的类字段）时**并未崩溃**——类型上下文能纠正字面量。所以本条的实测结论限定于「`<script setup>` 顶层 + 显式泛型」这一形态，不要据此去改 lime-i18n。
+* **`<script setup>` 顶层 `const` 必须先声明后使用 (No Forward References)**：
+  * UTS 编译到 Kotlin 后，局部 `val` 不允许前向引用——**即使引用发生在箭头函数体内**（`computed` / `watch` 的回调正是这种情况），编译期也会报 `找不到名称 xxx`。
+  * *正确做法*：凡被 `computed` / `watch` 回调引用的 `const`，其声明必须写在引用它的那条语句之前；类名、样式等派生 computed 尤其容易踩到。
+  * *错误示例*：`const style = computed(() => placementClass.value)` 写在 `const placementClass = computed(() => ...)` 之前。
 
 ---
 

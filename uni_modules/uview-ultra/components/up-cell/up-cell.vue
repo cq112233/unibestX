@@ -1,0 +1,268 @@
+<template>
+	<view class="up-cell" :class="[customClass]" :style="[addStyle(customStyle)]"
+		:hover-class="(!disabled && (clickable || isLink)) ? 'up-cell--clickable' : ''" :hover-stay-time="250"
+		@tap="clickHandler">
+		<view class="up-cell__body" :class="[ center && 'up-cell--center', size === 'large' && 'up-cell__body--large']">
+			<view class="up-cell__body__content">
+				<view class="up-cell__left-icon-wrap" v-if="$slots.icon || icon">
+					<slot name="icon" v-if="$slots.icon">
+					</slot>
+					<up-icon v-else :name="icon"
+						:custom-style="iconStyle"
+						:size="size === 'large' ? 22 : 18"></up-icon>
+				</view>
+				<view class="up-cell__title">
+                    <!-- 将slot与默认内容用if/else分开主要是因为微信小程序不支持slot嵌套传递，这样才能解决collapse组件的slot不失效问题，label暂时未用到。 -->
+					<slot name="title" v-if="$slots.title || !title">
+					</slot>
+                    <text v-else class="up-cell__title-text" :style="[titleTextStyle]"
+                        :class="[required && 'up-cell--required', disabled && 'up-cell--disabled', size === 'large' && 'up-cell__title-text--large']">{{ title }}</text>
+					<slot name="label">
+						<text class="up-cell__label" v-if="label"
+							:class="[disabled && 'up-cell--disabled', size === 'large' && 'up-cell__label--large']">{{ label }}</text>
+					</slot>
+				</view>
+			</view>
+			<slot name="value">
+				<text class="up-cell__value"
+					:class="[disabled && 'up-cell--disabled', size === 'large' && 'up-cell__value--large']"
+					v-if="!testEmpty(value)">{{ value }}</text>
+			</slot>
+			<view class="up-cell__right-icon-wrap" v-if="$slots['right-icon'] || isLink"
+				:class="[`up-cell__right-icon-wrap--${arrowDirection}`]">
+				<up-icon v-if="rightIcon && !$slots['right-icon']" :name="rightIcon"
+					:custom-style="rightIconStyle" :color="disabled ? '#c8c9cc' : 'info'"
+					:size="size === 'large' ? 18 : 16"></up-icon>
+				<slot v-else name="right-icon">
+				</slot>
+			</view>
+			<view class="up-cell__right-icon-wrap" v-if="$slots['righticon']"
+				:class="[`up-cell__right-icon-wrap--${arrowDirection}`]">
+				<slot name="righticon">
+				</slot>
+			</view>
+		</view>
+		<up-line v-if="border"></up-line>
+	</view>
+</template>
+
+<script>
+	import { propsCell } from './props.js';
+	import { mpMixin } from '../../libs/mixin/mpMixin.js';
+	import { mixin } from '../../libs/mixin/mixin.js';
+	import { addStyle } from '../../libs/function/index.js';
+	import test from '../../libs/function/test.js';
+	/**
+	 * cell  单元格
+	 * @description cell单元格一般用于一组列表的情况，比如个人中心页，设置页等。
+	 * @tutorial https://uview-plus.jiangruyi.com/components/cell.html
+	 * @property {String | Number}	title			标题
+	 * @property {String | Number}	label			标题下方的描述信息
+	 * @property {String | Number}	value			右侧的内容
+	 * @property {String}			icon			左侧图标名称，或者图片链接(本地文件建议使用绝对地址)
+	 * @property {Boolean}			disabled		是否禁用cell	
+	 * @property {Boolean}			border			是否显示下边框 (默认 true )
+	 * @property {Boolean}			center			内容是否垂直居中(主要是针对右侧的value部分) (默认 false )
+	 * @property {String}			url				点击后跳转的URL地址
+	 * @property {String}			linkType		链接跳转的方式，内部使用的是uView封装的route方法，可能会进行拦截操作 (默认 'navigateTo' )
+	 * @property {Boolean}			clickable		是否开启点击反馈(表现为点击时加上灰色背景) （默认 false ） 
+	 * @property {Boolean}			isLink			是否展示右侧箭头并开启点击反馈 （默认 false ）
+	 * @property {Boolean}			required		是否显示表单状态下的必填星号(此组件可能会内嵌入input组件) （默认 false ）
+	 * @property {String}			rightIcon		右侧的图标箭头 （默认 'arrow-right'）
+	 * @property {String}			arrowDirection	右侧箭头的方向，可选值为：left，up，down
+	 * @property {Object | String}			rightIconStyle	右侧箭头图标的样式
+	 * @property {Object | String}			titleStyle		标题的样式
+	 * @property {Object | String}			iconStyle		左侧图标样式
+	 * @property {String}			size			单位元的大小，可选值为 large，normal，mini 
+	 * @property {Boolean}			stop			点击cell是否阻止事件传播 (默认 true )
+	 * @property {Object}			customStyle		定义需要用到的外部样式
+	 * 
+	 * @event {Function}			click			点击cell列表时触发
+	 * @example 该组件需要搭配cell-group组件使用，见官方文档示例
+	 */
+	export default {
+		name: 'up-cell',
+		data() {
+			return {
+
+			}
+		},
+		mixins: [mpMixin, mixin, propsCell],
+		computed: {
+			titleTextStyle() {
+				return addStyle(this.titleStyle)
+			}
+		},
+		emits: ['click'],
+		methods: {
+			addStyle,
+			testEmpty: test.empty,
+			// 点击cell
+			clickHandler(e) {
+				if (this.disabled) return
+				this.$emit('click', {
+					name: this.name
+				})
+				// 如果配置了url(此props参数通过mixin引入)参数，跳转页面
+				this.openPage()
+				// 是否阻止事件传播
+				this.stop && this.preventEvent(e)
+			},
+		}
+	}
+</script>
+
+<style lang="scss" scoped>
+	@import "../../libs/css/components.scss";
+
+	$up-cell-padding: 13px 15px !default;
+	$up-cell-font-size: 15px !default;
+	$up-cell-line-height: 24px !default;
+	$up-cell-color: $up-main-color !default;
+	$up-cell-icon-size: 16px !default;
+	$up-cell-title-font-size: 15px !default;
+	$up-cell-title-line-height: 22px !default;
+	$up-cell-title-color: $up-main-color !default;
+	$up-cell-label-font-size: 12px !default;
+	$up-cell-label-color: $up-tips-color !default;
+	$up-cell-label-line-height: 18px !default;
+	$up-cell-value-font-size: 14px !default;
+	$up-cell-value-color: $up-content-color !default;
+	$up-cell-clickable-color: $up-bg-color !default;
+	$up-cell-disabled-color: #c8c9cc !default;
+	$up-cell-padding-top-large: 13px !default;
+	$up-cell-padding-bottom-large: 13px !default;
+	$up-cell-value-font-size-large: 15px !default;
+	$up-cell-label-font-size-large: 14px !default;
+	$up-cell-title-font-size-large: 16px !default;
+	$up-cell-left-icon-wrap-margin-right: 4px !default;
+	$up-cell-right-icon-wrap-margin-left: 4px !default;
+	$up-cell-title-flex:1 !default;
+	$up-cell-label-margin-top:5px !default;
+
+
+	.up-cell {
+		&__body {
+			@include flex();
+			/* #ifndef APP-NVUE */
+			box-sizing: border-box;
+			/* #endif */
+			padding: $up-cell-padding;
+			font-size: $up-cell-font-size;
+			color: $up-cell-color;
+			// line-height: $up-cell-line-height;
+			align-items: center;
+
+			&__content {
+				@include flex(row);
+				align-items: center;
+				flex: 1;
+			}
+
+			&--large {
+				padding-top: $up-cell-padding-top-large;
+				padding-bottom: $up-cell-padding-bottom-large;
+			}
+		}
+
+		&__left-icon-wrap,
+		&__right-icon-wrap {
+			@include flex();
+			align-items: center;
+			// height: $up-cell-line-height;
+			font-size: $up-cell-icon-size;
+		}
+
+		&__left-icon-wrap {
+			margin-right: $up-cell-left-icon-wrap-margin-right;
+		}
+
+		&__right-icon-wrap {
+			margin-left: $up-cell-right-icon-wrap-margin-left;
+			transition: transform 0.3s;
+
+			&--up {
+				transform: rotate(-90deg);
+			}
+
+			&--down {
+				transform: rotate(90deg);
+			}
+		}
+
+		&__title {
+			flex: $up-cell-title-flex;
+			display: flex;
+			flex-direction: column;
+
+			&-text {
+				font-size: $up-cell-title-font-size;
+				line-height: $up-cell-title-line-height;
+				color: $up-cell-title-color;
+
+				&--large {
+					font-size: $up-cell-title-font-size-large;
+				}
+			}
+
+		}
+
+		&__label {
+			margin-top: $up-cell-label-margin-top;
+			font-size: $up-cell-label-font-size;
+			color: $up-cell-label-color;
+			line-height: $up-cell-label-line-height;
+
+			&--large {
+				font-size: $up-cell-label-font-size-large;
+			}
+		}
+
+		&__value {	
+			text-align: right;
+			/* #ifndef APP-NVUE */
+			margin-left: auto;
+			/* #endif */	
+			font-size: $up-cell-value-font-size;
+			line-height: $up-cell-line-height;
+			color: $up-cell-value-color;
+			&--large {
+				font-size: $up-cell-value-font-size-large;
+			}
+		}
+
+		&--required {
+			/* #ifndef APP-NVUE */
+			overflow: visible;
+			/* #endif */
+			@include flex;
+			align-items: center;
+		}
+
+		&--required:before {
+			position: absolute;
+			/* #ifndef APP-NVUE */
+			content: '*';
+			/* #endif */
+			left: -8px;
+			margin-top: 4rpx;
+			font-size: 14px;
+			color: $up-error;
+		}
+
+		&--clickable {
+			background-color: $up-cell-clickable-color;
+		}
+
+		&--disabled {
+			color: $up-cell-disabled-color;
+			/* #ifndef APP-NVUE */
+			cursor: not-allowed;
+			/* #endif */
+		}
+
+		&--center {
+			align-items: center;
+		}
+	}
+</style>

@@ -1,0 +1,18 @@
+export type UPFormRuleItem = {
+	trigger?: string | string[],
+	key?: any,
+	required?: boolean,
+	min?: number,
+	max?: number,
+	message?: string,
+	type?: string,
+	len?: number,
+	pattern?: any,
+	enum?: string[],
+	whitespace?: boolean,
+	validator?: any,
+	asyncValidator?: any,
+	field?: string,
+	fullField?: string,
+	transform?: any,
+}

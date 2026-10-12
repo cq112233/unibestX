@@ -1,0 +1,198 @@
+<template>
+	<up-popup
+		:overlay="overlay"
+		:closeOnClickOverlay="closeOnClickOverlay"
+		mode="bottom"
+		:popup="false"
+		:show="show"
+		:safeAreaInsetBottom="safeAreaInsetBottom"
+		@close="popupClose"
+		:zIndex="zIndex"
+		:customStyle="{
+			backgroundColor: 'rgb(214, 218, 220)'
+		}"
+	>
+		<view class="up-keyboard">
+			<slot />
+			<view
+				class="up-keyboard__tooltip"
+				v-if="tooltip"
+			>
+				<view
+					hover-class="up-hover-class"
+					:hover-stay-time="100"
+				>
+					<text
+						class="up-keyboard__tooltip__item up-keyboard__tooltip__cancel"
+						v-if="showCancel"
+						@tap="onCancel"
+					>{{cancelText}}</text>
+				</view>
+				<view>
+					<text
+						v-if="showTips"
+						class="up-keyboard__tooltip__item up-keyboard__tooltip__tips"
+					>{{tips != '' ? tips : mode == 'number' ? '数字键盘' : mode == 'card' ? '身份证键盘' : '车牌号键盘'}}</text>
+				</view>
+				<view
+					hover-class="up-hover-class"
+					:hover-stay-time="100"
+				>
+					<text
+						v-if="showConfirm"
+						@tap="onConfirm"
+						class="up-keyboard__tooltip__item up-keyboard__tooltip__submit"
+						hover-class="up-hover-class"
+					>{{showConfirm ? confirmText : ''}}</text>
+				</view>
+			</view>
+			<template v-if="mode == 'number' || mode == 'card'">
+				<up-number-keyboard
+					:random="random"
+					@backspace="keyboardBackspace"
+					@change="keyboardChange"
+					:mode="mode"
+					:dotDisabled="dotDisabled"
+				></up-number-keyboard>
+			</template>
+			<template v-else>
+				<up-car-keyboard
+					:random="random"
+					:autoChange="autoChange"
+					@backspace="keyboardBackspace"
+					@change="keyboardChange"
+				></up-car-keyboard>
+			</template>
+		</view>
+	</up-popup>
+</template>
+
+<script setup lang="uts">
+defineOptions({
+	name: "up-keyboard"
+})
+
+const props = defineProps({
+	mode: {
+		type: String,
+		default: 'number'
+	},
+	dotDisabled: {
+		type: Boolean,
+		default: false
+	},
+	tooltip: {
+		type: Boolean,
+		default: true
+	},
+	showTips: {
+		type: Boolean,
+		default: true
+	},
+	tips: {
+		type: String,
+		default: ''
+	},
+	showCancel: {
+		type: Boolean,
+		default: true
+	},
+	showConfirm: {
+		type: Boolean,
+		default: true
+	},
+	random: {
+		type: Boolean,
+		default: false
+	},
+	safeAreaInsetBottom: {
+		type: Boolean,
+		default: true
+	},
+	closeOnClickOverlay: {
+		type: Boolean,
+		default: true
+	},
+	show: {
+		type: Boolean,
+		default: false
+	},
+	overlay: {
+		type: Boolean,
+		default: true
+	},
+	zIndex: {
+		type: [String, Number],
+		default: 1075
+	},
+	cancelText: {
+		type: String,
+		default: '取消'
+	},
+	confirmText: {
+		type: String,
+		default: '确认'
+	},
+	autoChange: {
+		type: Boolean,
+		default: false
+	}
+})
+
+const emit = defineEmits(["change", "close", "confirm", "cancel", "backspace"])
+
+function keyboardChange(e: any) {
+	emit('change', e.toString())
+}
+
+function popupClose() {
+	emit('close')
+}
+
+function onConfirm() {
+	emit('confirm')
+}
+
+function onCancel() {
+	emit('cancel')
+}
+
+function keyboardBackspace() {
+	emit('backspace')
+}
+</script>
+
+<style lang="scss" scoped>
+	@import "../../libs/css/components.scss";
+
+	.up-keyboard {
+
+		&__tooltip {
+			@include flex;
+			justify-content: space-between;
+			background-color: #FFFFFF;
+			padding: 14px 12px;
+
+			&__item {
+				color: #333333;
+				flex: 1;
+				text-align: center;
+				font-size: 15px;
+			}
+
+			&__submit {
+				text-align: right;
+				color: $up-primary;
+			}
+
+			&__cancel {
+				text-align: left;
+				color: #888888;
+			}
+
+			&__tips {
+				color: $up-tips-color;
+			}
+		}
+	}
+</style>

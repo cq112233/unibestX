@@ -1,0 +1,775 @@
+<template>
+    <view class="up-dragsort-host">
+        <view
+            class="up-dragsort"
+            :class="[
+                direction == 'horizontal' ? 'up-dragsort--horizontal' : '',
+                direction == 'vertical' ? 'up-dragsort--vertical' : '',
+                direction == 'all' ? 'up-dragsort--all' : ''
+            ]"
+            :style="containerStyle"
+        >
+            <view
+                v-for="(item, index) in innerList"
+                :key="itemIds.length > index ? itemIds[index] : index"
+                class="up-dragsort-item"
+                :class="{
+                    'up-dragsort-item--active': activeIndex == index,
+                    'up-dragsort-item--disabled': isItemDisabled(item)
+                }"
+                :style="getItemStyle(index)"
+                @touchstart.stop="onItemTouchStart($event, index)"
+                @touchmove="onItemTouchMove($event, index)"
+                @touchend="onItemTouchEnd($event, index)"
+                @touchcancel="onItemTouchEnd($event, index)"
+            >
+                <view class="up-dragsort-item-inner">
+                    <view class="up-dragsort-item-content">
+                        <!-- #ifndef MP -->
+                        <view
+                            v-if="handleDrag || hasHandlerSlot"
+                            class="ui-dragSort-item-handler"
+                            :class="[
+                                handlerPosition == 'left' ? 'ui-dragSort-item-handler--left' : '',
+                                direction == 'horizontal' ? 'ui-dragSort-item-handler--h' : '',
+                                direction == 'all' ? 'ui-dragSort-item-handler--grid' : '',
+                                isItemDisabled(item) ? 'ui-dragSort-item-handler--disabled' : ''
+                            ]"
+                            data-action="handler"
+                            @touchstart.stop="onHandleTouchStart($event, index)"
+                            @touchend.stop="onHandleTouchEnd($event, index)"
+                            @touchcancel.stop="onHandleTouchEnd($event, index)"
+                        >
+                            <slot name="handler" :item="item" :index="index">
+                                <up-icon
+                                    name="list"
+                                    :color="getHandlerIconColor(item)"
+                                    :size="getHandlerIconSize()"
+                                />
+                            </slot>
+                        </view>
+                        <!-- #endif -->
+                        <!-- #ifdef MP -->
+                        <view
+                            v-if="handleDrag || hasHandlerSlot"
+                            class="ui-dragSort-item-handler"
+                            :class="[
+                                handlerPosition == 'left' ? 'ui-dragSort-item-handler--left' : '',
+                                direction == 'horizontal' ? 'ui-dragSort-item-handler--h' : '',
+                                direction == 'all' ? 'ui-dragSort-item-handler--grid' : '',
+                                isItemDisabled(item) ? 'ui-dragSort-item-handler--disabled' : ''
+                            ]"
+                            data-action="handler"
+                            @touchstart.stop="onHandleTouchStart($event, index)"
+                            @touchend.stop="onHandleTouchEnd($event, index)"
+                            @touchcancel.stop="onHandleTouchEnd($event, index)"
+                        >
+                            <up-icon
+                                name="list"
+                                :color="getHandlerIconColor(item)"
+                                :size="getHandlerIconSize()"
+                            />
+                        </view>
+                        <!-- #endif -->
+                        <slot :item="item" :index="index">
+                            {{ getItemLabel(item) }}
+                        </slot>
+                    </view>
+                </view>
+            </view>
+        </view>
+    </view>
+</template>
+
+<script setup lang="uts">
+import { ref, computed, watch, onMounted, nextTick, getCurrentInstance, useSlots } from 'vue'
+
+type ItemLayout = {
+    left: number,
+    pageTop: number,
+    width: number,
+    height: number,
+    centerX: number,
+    centerY: number
+}
+
+type ContainerLayout = {
+    left: number,
+    pageTop: number,
+    width: number,
+    height: number
+}
+
+function copyObject(item: UTSJSONObject): UTSJSONObject {
+    const copied = {} as UTSJSONObject
+    const keys = UTSJSONObject.keys(item)
+    for (let i = 0; i < keys.length; i++) {
+        copied[keys[i]] = item[keys[i]]
+    }
+    return copied
+}
+
+function copyList(list: Array<UTSJSONObject>): Array<UTSJSONObject> {
+    const copied = [] as Array<UTSJSONObject>
+    for (let i = 0; i < list.length; i++) {
+        copied.push(copyObject(list[i]))
+    }
+    return copied
+}
+
+function stringValue(value: any | null): string {
+    return value == null ? '' : value.toString()
+}
+
+defineOptions({
+    name: 'up-dragsort',
+    styleIsolation: 'app-and-page',
+    options: {
+        styleIsolation: 'apply-shared'
+    }
+})
+
+const props = defineProps({
+    initialList: {
+        type: Array as PropType<Array<UTSJSONObject>>,
+        required: true,
+        default: () => [] as Array<UTSJSONObject>
+    },
+    draggable: {
+        type: Boolean,
+        default: true
+    },
+    vibrate: {
+        type: Boolean,
+        default: true
+    },
+    direction: {
+        type: String,
+        default: 'vertical'
+    },
+    columns: {
+        type: Number,
+        default: 3
+    },
+    handleDrag: {
+        type: Boolean,
+        default: false
+    },
+    handlerPosition: {
+        type: String,
+        default: 'right'
+    }
+})
+
+const emit = defineEmits(['drag-end'])
+const instance = getCurrentInstance()
+const slots = useSlots()
+
+const hasHandlerSlot = computed<boolean>(() => {
+    return slots['handler'] != null
+})
+
+const innerList = ref<Array<UTSJSONObject>>(copyList(props.initialList))
+const itemIds = ref<number[]>([])
+const layouts = ref<ItemLayout[]>([])
+const gridColumnCenters = ref<number[]>([])
+const gridRowCenters = ref<number[]>([])
+const previewItemIds = ref<number[]>([])
+const settling = ref<boolean>(false)
+const dragging = ref<boolean>(false)
+const activeIndex = ref<number>(-1)
+const hoverIndex = ref<number>(-1)
+const dragOffsetX = ref<number>(0)
+const dragOffsetY = ref<number>(0)
+const startTouchX = ref<number>(0)
+const startTouchY = ref<number>(0)
+const containerLayout = ref<ContainerLayout | null>(null)
+const activeViewLeft = ref<number>(0)
+const activeViewTop = ref<number>(0)
+const dragCoordOffsetX = ref<number>(0)
+const dragCoordOffsetY = ref<number>(0)
+const nextItemId = ref<number>(0)
+
+function getItemLabel(item: UTSJSONObject): string {
+    return stringValue(item['label'])
+}
+
+function isItemDisabled(item: UTSJSONObject): boolean {
+    const draggableValue = item['draggable']
+    return draggableValue != null && draggableValue.toString() == 'false'
+}
+
+function getHandlerIconColor(item: UTSJSONObject): string {
+    if (isItemDisabled(item)) {
+        return '#94a3b8'
+    }
+    if (props.direction == 'horizontal') {
+        return '#2563eb'
+    }
+    if (props.direction == 'all') {
+        return '#475569'
+    }
+    return '#64748b'
+}
+
+function getHandlerIconSize(): number {
+    if (props.direction == 'all') {
+        return 14
+    }
+    return 20
+}
+
+const containerStyle = computed<string>(() => {
+    const currentContainerLayout = containerLayout.value
+    if (dragging.value && currentContainerLayout != null) {
+        return `height: ${currentContainerLayout.height}px;`
+    }
+    return ''
+})
+
+function buildIdList(length: number): number[] {
+    const ids: number[] = []
+    for (let i = 0; i < length; i++) {
+        ids.push(nextItemId.value)
+        nextItemId.value = nextItemId.value + 1
+    }
+    return ids
+}
+
+function createIdentityOrder(length: number): number[] {
+    const order: number[] = []
+    for (let i = 0; i < length; i++) {
+        order.push(i)
+    }
+    return order
+}
+
+function buildPreviewOrder(length: number, from: number, to: number): number[] {
+    const order = createIdentityOrder(length)
+    if (from == to) {
+        return order
+    }
+    order.splice(from, 1)
+    order.splice(to, 0, from)
+    return order
+}
+
+function applyPreviewOrder(order: number[]): void {
+    const nextPreviewItemIds: number[] = []
+    for (let i = 0; i < order.length; i++) {
+        const sourceIndex = order[i]
+        if (sourceIndex >= 0 && sourceIndex < itemIds.value.length) {
+            nextPreviewItemIds.push(itemIds.value[sourceIndex])
+        }
+    }
+    previewItemIds.value = nextPreviewItemIds
+}
+
+function findPreviewPosition(itemId: number): number {
+    for (let i = 0; i < previewItemIds.value.length; i++) {
+        if (previewItemIds.value[i] == itemId) {
+            return i
+        }
+    }
+    return -1
+}
+
+function resetDragState(): void {
+    dragging.value = false
+    activeIndex.value = -1
+    hoverIndex.value = -1
+    activeViewLeft.value = 0
+    activeViewTop.value = 0
+    dragCoordOffsetX.value = 0
+    dragCoordOffsetY.value = 0
+    dragOffsetX.value = 0
+    dragOffsetY.value = 0
+    applyPreviewOrder(createIdentityOrder(innerList.value.length))
+}
+
+function resetItemIdsByListOrder(): void {
+    itemIds.value = buildIdList(innerList.value.length)
+    applyPreviewOrder(createIdentityOrder(innerList.value.length))
+}
+
+function rebuildGridAxisCache(nextLayouts: ItemLayout[]): void {
+    const nextColumnCenters: number[] = []
+    const nextRowCenters: number[] = []
+    const length = nextLayouts.length
+    const columns = props.columns
+    if (columns > 0 && length > 0) {
+        const actualCols = Math.min(columns, length)
+        for (let i = 0; i < actualCols; i++) {
+            nextColumnCenters.push(nextLayouts[i].centerX)
+        }
+        for (let i = 0; i < length; i += actualCols) {
+            nextRowCenters.push(nextLayouts[i].centerY)
+        }
+    }
+    gridColumnCenters.value = nextColumnCenters
+    gridRowCenters.value = nextRowCenters
+}
+
+function measureLayouts(): Promise<void> {
+    if (instance == null || instance.proxy == null) {
+        return Promise.resolve()
+    }
+    const query = uni.createSelectorQuery().in(instance.proxy)
+    query.select('.up-dragsort').boundingClientRect((rect) => {
+        if (rect != null) {
+            const containerRect = rect as NodeInfo
+            let top = containerRect.top != null ? containerRect.top! : 0
+            const height = containerRect.height != null ? containerRect.height! : 0
+            if (top == 0 && containerRect.bottom != null) {
+                top = containerRect.bottom! - height
+            }
+            containerLayout.value = {
+                left: containerRect.left != null ? containerRect.left! : 0,
+                pageTop: top,
+                width: containerRect.width != null ? containerRect.width! : 0,
+                height: height
+            }
+        }
+    })
+    query.selectAll('.up-dragsort-item').boundingClientRect((rects) => {
+        const nextLayouts: ItemLayout[] = []
+        if (rects != null) {
+            const rectList = rects as NodeInfo[]
+            for (let i = 0; i < rectList.length; i++) {
+                const rect = rectList[i]
+                const left = rect.left != null ? rect.left! : 0
+                let top = rect.top != null ? rect.top! : 0
+                const width = rect.width != null ? rect.width! : 0
+                const height = rect.height != null ? rect.height! : 0
+                if (top == 0 && rect.bottom != null) {
+                    top = rect.bottom! - height
+                }
+                nextLayouts.push({
+                    left: left,
+                    pageTop: top,
+                    width: width,
+                    height: height,
+                    centerX: left + width / 2,
+                    centerY: top + height / 2
+                })
+            }
+        }
+        layouts.value = nextLayouts
+        rebuildGridAxisCache(nextLayouts)
+    })
+    return new Promise((resolve) => {
+        query.exec(() => {
+            resolve()
+        })
+    })
+}
+
+function syncFromModel(): void {
+    if (dragging.value) {
+        return
+    }
+    innerList.value = copyList(props.initialList)
+    itemIds.value = buildIdList(innerList.value.length)
+    resetDragState()
+}
+
+function findNearestAxisIndex(centers: number[], value: number): number {
+    let nearestIndex = 0
+    let nearestDistance = -1.0
+    for (let i = 0; i < centers.length; i++) {
+        const distance = Math.abs(centers[i] - value)
+        if (nearestDistance < 0 || distance < nearestDistance) {
+            nearestDistance = distance
+            nearestIndex = i
+        }
+    }
+    return nearestIndex
+}
+
+function getGridHoverIndex(centerX: number, centerY: number): number {
+    const length = layouts.value.length
+    const columns = props.columns
+    if (columns <= 0 || length == 0) {
+        return activeIndex.value
+    }
+    const actualCols = Math.min(columns, length)
+    const columnIndex = findNearestAxisIndex(gridColumnCenters.value, centerX)
+    const rowIndex = findNearestAxisIndex(gridRowCenters.value, centerY)
+    const rowStart = rowIndex * actualCols
+    const rowEnd = Math.min(rowStart + actualCols, length)
+    let targetIndex = rowStart + columnIndex
+    if (targetIndex >= rowEnd) {
+        targetIndex = rowEnd - 1
+    }
+    return targetIndex
+}
+
+function updateHoverIndex(): void {
+    const currentActiveIndex = activeIndex.value
+    if (currentActiveIndex < 0 || currentActiveIndex >= layouts.value.length) {
+        return
+    }
+    const sourceLayout = layouts.value[currentActiveIndex]
+    const centerX = sourceLayout.left + sourceLayout.width / 2 + dragOffsetX.value
+    const centerY = sourceLayout.pageTop + sourceLayout.height / 2 + dragOffsetY.value
+
+    if (props.direction == 'all' && props.columns > 0) {
+        const touchX = startTouchX.value + dragOffsetX.value + dragCoordOffsetX.value
+        const touchY = startTouchY.value + dragOffsetY.value + dragCoordOffsetY.value
+        const targetIndex = getGridHoverIndex(touchX, touchY)
+        if (targetIndex != hoverIndex.value) {
+            hoverIndex.value = targetIndex
+            applyPreviewOrder(buildPreviewOrder(innerList.value.length, currentActiveIndex, targetIndex))
+            if (props.vibrate) {
+                // #ifndef H5
+                uni.vibrateShort({ type: 'light' })
+                // #endif
+            }
+        }
+        return
+    }
+
+    let nearestIndex = currentActiveIndex
+    let nearestDistance = -1.0
+    for (let i = 0; i < layouts.value.length; i++) {
+        const layout = layouts.value[i]
+        const deltaX = layout.centerX - centerX
+        const deltaY = layout.centerY - centerY
+        const distance = deltaX * deltaX + deltaY * deltaY
+        if (nearestDistance < 0 || distance < nearestDistance) {
+            nearestDistance = distance
+            nearestIndex = i
+        }
+    }
+    if (nearestIndex != hoverIndex.value) {
+        hoverIndex.value = nearestIndex
+        applyPreviewOrder(buildPreviewOrder(innerList.value.length, currentActiveIndex, nearestIndex))
+        if (props.vibrate) {
+            // #ifndef H5
+            uni.vibrateShort({ type: 'light' })
+            // #endif
+        }
+    }
+}
+
+function setDragContext(index: number, clientX: number, clientY: number): void {
+    startTouchX.value = clientX
+    startTouchY.value = clientY
+    if (index >= 0 && index < layouts.value.length) {
+        const layout = layouts.value[index]
+        activeViewLeft.value = layout.left
+        activeViewTop.value = layout.pageTop
+    }
+}
+
+function beginDrag(index: number, clientX: number, clientY: number): void {
+    if (layouts.value.length != innerList.value.length || index >= layouts.value.length) {
+        return
+    }
+    startTouchX.value = clientX
+    startTouchY.value = clientY
+    dragOffsetX.value = 0
+    dragOffsetY.value = 0
+    dragCoordOffsetX.value = layouts.value[index].left - activeViewLeft.value
+    dragCoordOffsetY.value = layouts.value[index].pageTop - activeViewTop.value
+    settling.value = false
+    dragging.value = true
+    activeIndex.value = index
+    hoverIndex.value = index
+    applyPreviewOrder(createIdentityOrder(innerList.value.length))
+}
+
+function moveDrag(clientX: number, clientY: number): void {
+    if (dragging.value == true && activeIndex.value >= 0) {
+        let offsetX = clientX - startTouchX.value
+        let offsetY = clientY - startTouchY.value
+        if (props.direction == 'vertical') {
+            offsetX = 0
+        } else if (props.direction == 'horizontal') {
+            offsetY = 0
+        }
+        dragOffsetX.value = offsetX
+        dragOffsetY.value = offsetY
+        updateHoverIndex()
+    }
+}
+
+function finishDrag(): void {
+    if (dragging.value != true || activeIndex.value < 0) {
+        resetDragState()
+        return
+    }
+    const currentActiveIndex = activeIndex.value
+    const targetIndex = hoverIndex.value
+    if (targetIndex < 0 || targetIndex == currentActiveIndex) {
+        resetDragState()
+        return
+    }
+
+    const nextList = innerList.value.slice()
+    const movedItem = nextList.splice(currentActiveIndex, 1)[0]
+    nextList.splice(targetIndex, 0, movedItem)
+
+    settling.value = true
+    resetDragState()
+    innerList.value = nextList
+    resetItemIdsByListOrder()
+    emit('drag-end', copyList(innerList.value))
+    nextTick(() => {
+        settling.value = false
+    })
+}
+
+function onItemTouchStart(event: any, index: number): void {
+    if (props.handleDrag || hasHandlerSlot.value) {
+        return
+    }
+    if (!props.draggable || isItemDisabled(innerList.value[index])) {
+        return
+    }
+    if (dragging.value) {
+        return
+    }
+    const touchEvent = event as UniTouchEvent
+    if (touchEvent.touches.length == 0) {
+        return
+    }
+    const touch = touchEvent.touches[0]
+    measureLayouts().then(() => {
+        setDragContext(index, touch.clientX, touch.clientY)
+        beginDrag(index, touch.clientX, touch.clientY)
+    })
+}
+
+function onHandleTouchStart(event: any, index: number): void {
+    if (!props.draggable || isItemDisabled(innerList.value[index])) {
+        return
+    }
+    if (dragging.value) {
+        return
+    }
+    const touchEvent = event as UniTouchEvent
+    if (touchEvent.touches.length == 0) {
+        return
+    }
+    const touch = touchEvent.touches[0]
+    measureLayouts().then(() => {
+        setDragContext(index, touch.clientX, touch.clientY)
+        beginDrag(index, touch.clientX, touch.clientY)
+    })
+}
+
+function onItemTouchMove(event: any, index: number): void {
+    const touchEvent = event as UniTouchEvent
+    if (touchEvent.touches.length == 0) {
+        return
+    }
+    const touch = touchEvent.touches[0]
+    if (dragging.value) {
+        try {
+            touchEvent.preventDefault()
+        } catch (_e) {}
+        if (index != activeIndex.value) {
+            return
+        }
+        moveDrag(touch.clientX, touch.clientY)
+    }
+}
+
+function onItemTouchEnd(_event: any, index: number): void {
+    if (index != activeIndex.value) {
+        return
+    }
+    if (dragging.value) {
+        finishDrag()
+    }
+}
+
+function onHandleTouchEnd(_event: any, index: number): void {
+    if (index != activeIndex.value) {
+        return
+    }
+    if (dragging.value) {
+        finishDrag()
+    }
+}
+
+function getItemStyle(index: number): string {
+    let widthStyle = 'width: 100%;'
+    let positionStyle = ''
+    if (props.direction == 'all' && props.columns > 0) {
+        widthStyle = `width: ${100 / props.columns}%;`
+    } else if (props.direction == 'horizontal') {
+        widthStyle = 'width: auto;'
+    } else {
+        widthStyle = 'width: 100%;'
+    }
+
+    let zIndexStyle = 'z-index: 1;'
+    let transitionStyle = 'transition-duration: 200ms;'
+    let transformStyle = 'translateX(0px) translateY(0px)'
+
+    // #ifdef APP-ANDROID && !VUE3-VAPOR
+    transitionStyle = 'transition-duration: 0ms;'
+    // #endif
+
+    if (settling.value) {
+        transitionStyle = 'transition-duration: 0ms;'
+    }
+
+    const currentContainerLayout = containerLayout.value
+    if (dragging.value && index < layouts.value.length && currentContainerLayout != null) {
+        const sourceLayout = layouts.value[index]
+        const baseLeft = sourceLayout.left - currentContainerLayout.left
+        const baseTop = sourceLayout.pageTop - currentContainerLayout.pageTop
+        widthStyle = ''
+        if (activeIndex.value == index) {
+            positionStyle = `position: absolute; left: ${baseLeft}px; top: ${baseTop}px; width: ${sourceLayout.width}px; height: ${sourceLayout.height}px;`
+            transitionStyle = 'transition-duration: 0ms;'
+            zIndexStyle = 'z-index: 30;'
+            transformStyle = `translateX(${dragOffsetX.value}px) translateY(${dragOffsetY.value}px)`
+        } else {
+            positionStyle = `position: absolute; left: ${baseLeft}px; top: ${baseTop}px; width: ${sourceLayout.width}px; height: ${sourceLayout.height}px;`
+            if (index < itemIds.value.length) {
+                const currentItemId = itemIds.value[index]
+                const targetPosition = findPreviewPosition(currentItemId)
+                if (targetPosition >= 0 && targetPosition < layouts.value.length) {
+                    const targetLayout = layouts.value[targetPosition]
+                    const deltaX = targetLayout.left - sourceLayout.left
+                    const deltaY = targetLayout.pageTop - sourceLayout.pageTop
+                    transformStyle = `translateX(${deltaX}px) translateY(${deltaY}px)`
+                }
+            }
+        }
+    } else if (index != activeIndex.value) {
+        transitionStyle = 'transition-duration: 0ms;'
+    }
+
+    return `${widthStyle}${positionStyle}${zIndexStyle}${transitionStyle}transform: ${transformStyle};`
+}
+
+watch((): Array<UTSJSONObject> => props.initialList, () => {
+    nextTick(() => {
+        syncFromModel()
+    })
+}, { deep: true })
+
+onMounted(() => {
+    itemIds.value = buildIdList(innerList.value.length)
+    applyPreviewOrder(createIdentityOrder(innerList.value.length))
+})
+</script>
+
+<style scoped lang="scss">
+.up-dragsort-host {
+    position: relative;
+    width: 100%;
+    overflow: visible;
+}
+
+.up-dragsort {
+    position: relative;
+    width: 100%;
+    display: flex;
+    overflow: visible;
+}
+
+.up-dragsort--vertical {
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.up-dragsort--horizontal {
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    overflow-x: auto;
+}
+
+.up-dragsort--all {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-start;
+}
+
+.up-dragsort-item {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    transition-property: transform;
+    transition-timing-function: ease;
+    transform-origin: center center;
+    box-sizing: border-box;
+    overflow: visible;
+}
+
+.up-dragsort-item--active {
+    z-index: 30 !important;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.up-dragsort-item-inner {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+}
+
+.up-dragsort-item-content {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+}
+
+.ui-dragSort-item-handler {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 44px;
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    background-color: #eef2f7;
+    border-left-width: 1px;
+    border-left-style: solid;
+    border-left-color: #e2e8f0;
+    box-sizing: border-box;
+    z-index: 2;
+    touch-action: none;
+}
+
+.ui-dragSort-item-handler--left {
+    left: 0;
+    right: auto;
+    border-left-width: 0px;
+    border-right-width: 1px;
+    border-right-style: solid;
+    border-right-color: #e2e8f0;
+}
+
+.ui-dragSort-item-handler--h {
+    width: 40px;
+    height: 100%;
+    background-color: #dbeafe;
+    border-left-width: 1px;
+    border-left-style: solid;
+    border-left-color: #bfdbfe;
+    border-radius: 0 8px 8px 0;
+}
+
+.ui-dragSort-item-handler--grid {
+    width: 28px;
+    height: 28px;
+    background-color: #e2e8f0;
+    border-left-width: 0px;
+    border-radius: 0 8px 0 8px;
+}
+
+.ui-dragSort-item-handler--disabled {
+    background-color: #e2e8f0;
+}
+</style>

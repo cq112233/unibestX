@@ -1,0 +1,123 @@
+<template>
+	<view class="up-td" :class="[customClass]" :style="mergedTdStyle">
+		<slot>
+			<text class="up-td__text" :style="tdTextStyle">{{ (text != null && text != '' ? text : label).toString() }}</text>
+		</slot>
+		<slot name="content"></slot>
+	</view>
+</template>
+
+<script setup lang="uts">
+	import { ref, computed, onMounted, getCurrentInstance } from 'vue'
+	import { addUnit, addStyle, deepMerge } from '../../libs/function/index'
+	import { useUltraUI } from '../../libs/composable/useUltraUI'
+	const { parent, getParent } = useUltraUI({
+		padding: 0,
+		align: '',
+		borderColor: '',
+		thStyle:{}
+	})
+	const instance = getCurrentInstance()!.proxy!
+
+	defineOptions({
+	  name: 'up-td'
+	})
+
+	const props = defineProps({
+		customStyle: {
+			type: [Object, String],
+			default: () => ({})
+		},
+		customClass: {
+			type: String,
+			default: ''
+		},
+		text: {
+			type: [String, Number],
+			default: ''
+		},
+		label: {
+			type: [String, Number],
+			default: ''
+		},
+		width: {
+			type: [String],
+			default: 'auto'
+		},
+		textAlign: {
+			type: String,
+			default: ''
+		},
+		fontSize: {
+			type: String,
+			default: ''
+		},
+		borderColor: {
+			type: String,
+			default: ''
+		},
+		color: {
+			type: String,
+			default: ''
+		}
+	})
+
+	const tdStyle = ref<UTSJSONObject>({})
+	const tdTextStyle = ref<UTSJSONObject>({})
+
+	const mergedTdStyle = computed((): UTSJSONObject => {
+		const custom = addStyle(props.customStyle) as UTSJSONObject
+		const td = tdStyle.value
+		return deepMerge(td, custom) as UTSJSONObject
+	})
+
+	onMounted(() => {
+		getParent('up-table', instance)
+		if (parent.value != null) {
+			let style: UTSJSONObject = {}
+			let styleText: UTSJSONObject = {}
+			let parentProps = parent.value.$callMethod('getProps') as UTSJSONObject
+			if (props.width != "auto") style['flex'] = `0 0 ${props.width}`
+			styleText['textAlign'] = parentProps.getString('align')
+			styleText['fontSize'] = addUnit(parentProps.getString('fontSize'))
+			style['padding'] = parentProps.getString('padding')
+			const isBorder = parentProps.getBoolean('border') ?? true
+			if (isBorder) {
+				style['borderBottom'] = `solid 1px `+ parentProps.getString('borderColor')
+				style['borderRight'] = `solid 1px `+ parentProps.getString('borderColor')
+			}
+			styleText['color'] = parentProps.getString('color')
+			if (props.textAlign != '') {
+				styleText['textAlign'] = props.textAlign
+			}
+			if (props.fontSize != '') {
+				styleText['fontSize'] = props.fontSize
+			}
+			if (props.borderColor != '') {
+				style['borderColor'] = props.borderColor
+			}
+			if (props.color != '') {
+				styleText['color'] = props.color
+			}
+			tdStyle.value = style
+			tdTextStyle.value = styleText
+		}
+	})
+</script>
+
+<style lang="scss" scoped>
+	.up-td {
+		@include flex;
+		flex-direction: column;
+		flex: 1;
+		justify-content: center;
+		align-self: stretch;
+		box-sizing: border-box;
+		height: 100%;
+
+		&__text {
+			font-size: 14px;
+			color: $up-content-color;
+		}
+	}
+</style>

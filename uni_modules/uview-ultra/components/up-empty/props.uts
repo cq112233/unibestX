@@ -1,0 +1,71 @@
+/*
+ * @Author       : jry
+ * @Description  : uview-plus component's props mixin file
+ * @version      : 4.0
+ * @Date         : 2024-04-22 16:44:21
+ * @LastAuthor   : jry
+ * @lastTime     : 2024-08-28 12:27:20
+ */
+import { defineMixin } from '../../libs/vue.uts'
+import defProps from './empty.uts'
+let emptyProp = defProps['empty'] as UTSJSONObject
+
+export const propsEmpty = defineMixin({
+    props: {
+        // 内置图标名称，或图片路径，建议绝对路径
+        icon: {
+            type: String,
+            default: emptyProp['icon']
+        },
+        // 提示文字
+        text: {
+            type: String,
+            default: emptyProp['text']
+        },
+        // 文字颜色
+        textColor: {
+            type: String,
+            default: emptyProp['textColor']
+        },
+        // 文字大小
+        textSize: {
+            type: [String, Number],
+            default: emptyProp['textSize']
+        },
+        // 图标的颜色
+        iconColor: {
+            type: String,
+            default: emptyProp['iconColor']
+        },
+        // 图标的大小
+        iconSize: {
+            type: [String, Number],
+            default: emptyProp['iconSize']
+        },
+        // 选择预置的图标类型
+        mode: {
+            type: String,
+            default: emptyProp['mode']
+        },
+        //  图标宽度，单位px
+        width: {
+            type: [String, Number],
+            default: emptyProp['width']
+        },
+        // 图标高度，单位px
+        height: {
+            type: [String, Number],
+            default: emptyProp['height']
+        },
+        // 是否显示组件
+        show: {
+            type: Boolean,
+            default: emptyProp['show']
+        },
+        // 组件距离上一个元素之间的距离，默认px单位
+        marginTop: {
+            type: [String, Number],
+            default: emptyProp['marginTop']
+        }
+    }
+})

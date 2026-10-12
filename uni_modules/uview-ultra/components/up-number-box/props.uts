@@ -1,0 +1,148 @@
+/*
+ * @Author       : jry
+ * @Description  : uview-plus component's props mixin file
+ * @version      : 4.0
+ * @Date         : 2024-04-22 16:44:21
+ * @LastAuthor   : jry
+ * @lastTime     : 2024-08-28 12:27:20
+ */
+import { defineMixin } from '../../libs/vue.uts'
+import defProps from './numberBox.uts'
+let numberBoxProp = defProps['numberBox'] as UTSJSONObject
+
+export const propsNumberBox = defineMixin({
+    props: {
+        // 步进器标识符，在change回调返回
+        name: {
+            type: [String, Number],
+            default: numberBoxProp['name']
+        },
+        // #ifdef VUE3
+        // 用于双向绑定的值，初始化时设置设为默认min值(最小值)
+        modelValue: {
+            type: [String, Number],
+            default: numberBoxProp['value']
+        },
+        // #endif
+        // 最小值
+        min: {
+            type: [String, Number],
+            default: numberBoxProp['min']
+        },
+        // 最大值
+        max: {
+            type: [String, Number],
+            default: numberBoxProp['max']
+        },
+        // 加减的步长，可为小数
+        step: {
+            type: [String, Number],
+            default: numberBoxProp['step']
+        },
+        // 是否只允许输入整数
+        integer: {
+            type: Boolean,
+            default: numberBoxProp['integer']
+        },
+        // 是否禁用，包括输入框，加减按钮
+        disabled: {
+            type: Boolean,
+            default: numberBoxProp['disabled']
+        },
+        // 是否禁用输入框
+        disabledInput: {
+            type: Boolean,
+            default: numberBoxProp['disabledInput']
+        },
+        // 是否开启异步变更，开启后需要手动控制输入值
+        asyncChange: {
+            type: Boolean,
+            default: numberBoxProp['asyncChange']
+        },
+        // 输入框宽度，单位为px
+        inputWidth: {
+            type: [String, Number],
+            default: numberBoxProp['inputWidth']
+        },
+        // 是否显示减少按钮
+        showMinus: {
+            type: Boolean,
+            default: numberBoxProp['showMinus']
+        },
+        // 是否显示增加按钮
+        showPlus: {
+            type: Boolean,
+            default: numberBoxProp['showPlus']
+        },
+        // 显示的小数位数
+        decimalLength: {
+            type: [String, Number],
+            default: numberBoxProp['decimalLength']
+        },
+        // 是否开启长按加减手势
+        longPress: {
+            type: Boolean,
+            default: numberBoxProp['longPress']
+        },
+        // 输入框文字和加减按钮图标的颜色
+        color: {
+            type: String,
+            default: numberBoxProp['color']
+        },
+        // 按钮宽度
+        buttonWidth: {
+            type: [String, Number],
+            default: numberBoxProp['buttonWidth']
+        },
+        // 按钮大小，宽高等于此值，单位px，输入框高度和此值保持一致
+        buttonSize: {
+            type: [String, Number],
+            default: numberBoxProp['buttonSize']
+        },
+        // 按钮圆角
+        buttonRadius: {
+            type: [String],
+            default: numberBoxProp['buttonRadius']
+        },
+        // 输入框和按钮的背景颜色
+        bgColor: {
+            type: String,
+            default: numberBoxProp['bgColor']
+        },
+        // 按钮禁用背景色
+        disabledBgColor: {
+            type: String,
+            default: numberBoxProp['disabledBgColor']
+        },
+        // 输入框背景颜色
+        inputBgColor: {
+            type: String,
+            default: numberBoxProp['inputBgColor']
+        },
+        // 指定光标于键盘的距离，避免键盘遮挡输入框，单位px
+        cursorSpacing: {
+            type: [String, Number],
+            default: numberBoxProp['cursorSpacing']
+        },
+        // 是否禁用增加按钮
+        disablePlus: {
+            type: Boolean,
+            default: numberBoxProp['disablePlus']
+        },
+        // 是否禁用减少按钮
+        disableMinus: {
+            type: Boolean,
+            default: numberBoxProp['disableMinus']
+        },
+        // 加减按钮图标的样式
+        iconStyle: {
+            type: [UTSJSONObject, String],
+            default: numberBoxProp['iconStyle']
+        },
+        // 迷你模式
+        miniMode: {
+            type: Boolean,
+            default: numberBoxProp['miniMode']
+        },
+    }
+})

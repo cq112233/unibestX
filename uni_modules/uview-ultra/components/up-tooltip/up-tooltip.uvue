@@ -1,0 +1,593 @@
+<template>
+	<view
+		class="up-tooltip"
+		:style="[rootStyle]"
+	>
+		<up-overlay
+			:show="overlayShow"
+			:opacity="0"
+			@click="overlayClickHandler"
+		></up-overlay>
+		<view class="up-tooltip__wrapper">
+			<text
+				v-if="hasText"
+				class="up-tooltip__wrapper__text"
+				:id="textId"
+				:ref="textId"
+				:selectable="false"
+				@longpress.stop="longpressHandler"
+				@click.stop="clickHandler"
+				:style="[textStyle]"
+			>{{ displayText }}</text>
+			<view
+				v-else
+				class="up-tooltip__wrapper__trigger"
+				:id="textId"
+				:ref="textId"
+				@longpress.stop="longpressHandler"
+				@click.stop="clickHandler"
+			>
+				<slot name="trigger">
+					<slot></slot>
+				</slot>
+			</view>
+			<up-transition
+				mode="fade"
+				:show="displayShow"
+				duration="300"
+				:customStyle="transitionStyle"
+			>
+				<view
+					class="up-tooltip__wrapper__popup"
+					:id="tooltipId"
+					:ref="tooltipId"
+				>
+					<view
+						class="up-tooltip__wrapper__popup__indicator"
+						hover-class="up-tooltip__wrapper__popup__indicator--hover"
+						v-if="showIndicator"
+						:style="[indicatorMergedStyle]"
+					>
+					</view>
+					<slot name="content">
+						<view class="up-tooltip__wrapper__popup__list" :style="[popupListStyle]">
+							<view
+								v-if="showCopyButton"
+								class="up-tooltip__wrapper__popup__list__btn"
+								hover-class="up-tooltip__wrapper__popup__list__btn--hover"
+								@click="setClipboardData"
+							>
+								<text
+									class="up-tooltip__wrapper__popup__list__btn__text"
+								>复制</text>
+							</view>
+							<up-line
+								direction="column"
+								color="#8d8e90"
+								v-if="showCopyLine"
+								length="18"
+							></up-line>
+							<template v-for="(item, index) in buttonItems" :key="index">
+								<view
+									class="up-tooltip__wrapper__popup__list__btn"
+									hover-class="up-tooltip__wrapper__popup__list__btn--hover"
+									@click="btnClickHandler(index)"
+								>
+									<text
+										class="up-tooltip__wrapper__popup__list__btn__text"
+									>{{ item }}</text>
+								</view>
+								<up-line
+									direction="column"
+									color="#8d8e90"
+									v-if="index < buttonCount - 1"
+									length="18"
+								></up-line>
+							</template>
+						</view>
+					</slot>
+				</view>
+			</up-transition>
+		</view>
+	</view>
+</template>
+
+<script setup lang="uts">
+import { ref, computed, watch, onMounted, getCurrentInstance, nextTick } from 'vue'
+import { addStyle, addUnit, guid, toast, sleep, sys, upGetRect } from '../../libs/function/index.uts'
+
+defineOptions({
+	name: 'up-tooltip'
+})
+
+const props = defineProps({
+	text: {
+		type: [String, Number],
+		default: ''
+	},
+	copyText: {
+		type: [String, Number],
+		default: ''
+	},
+	size: {
+		type: [String, Number],
+		default: 14
+	},
+	color: {
+		type: String,
+		default: '#606266'
+	},
+	bgColor: {
+		type: String,
+		default: 'transparent'
+	},
+	popupBgColor: {
+		type: String,
+		default: '#060607'
+	},
+	direction: {
+		type: String,
+		default: 'top'
+	},
+	placement: {
+		type: String,
+		default: ''
+	},
+	zIndex: {
+		type: [String, Number],
+		default: 10071
+	},
+	showCopy: {
+		type: Boolean,
+		default: true
+	},
+	buttons: {
+		type: Array as PropType<Array<string>>,
+		default: () => [] as Array<string>
+	},
+	overlay: {
+		type: Boolean,
+		default: true
+	},
+	showToast: {
+		type: Boolean,
+		default: true
+	},
+	show: {
+		type: Boolean,
+		default: false
+	},
+	triggerMode: {
+		type: String,
+		default: 'click'
+	},
+	forcePosition: {
+		type: Object,
+		default: () => ({})
+	},
+	customStyle: {
+		type: Object,
+		default: () => ({})
+	}
+})
+
+const emit = defineEmits(["click", "open", "close"])
+const instance = getCurrentInstance()
+
+function createRectInfo(): UTSJSONObject {
+	const info = {} as UTSJSONObject
+	info['width'] = 0
+	info['left'] = 0
+	info['right'] = 0
+	return info
+}
+
+function normalizeBool(value: any | null): boolean {
+	return value == true
+}
+
+function normalizeNumber(value: any | null, fallback: number = 0): number {
+	if (typeof value === 'number') {
+		return value as number
+	}
+	if (value == null) {
+		return fallback
+	}
+	const parsed = parseFloat(value.toString())
+	return isNaN(parsed) ? fallback : parsed
+}
+
+function getObjNumber(obj: any | null, key: string, fallback: number = 0): number {
+	if (obj == null) {
+		return fallback
+	}
+	return normalizeNumber((obj as UTSJSONObject)[key], fallback)
+}
+
+const innerShow = ref<boolean>(false)
+const lastLongpressTime = ref<number>(0)
+const lastClickTime = ref<number>(0)
+const openTime = ref<number>(0)
+const textId = ref<string>(guid())
+const tooltipId = ref<string>(guid())
+const tooltipInfo = ref<UTSJSONObject>(createRectInfo())
+const textInfo = ref<UTSJSONObject>(createRectInfo())
+const screenGap = 12
+const indicatorWidth = 14
+
+const displayText = computed<string>(() => {
+	return props.text == null ? '' : props.text.toString()
+})
+
+const hasText = computed<boolean>(() => {
+	return displayText.value != ''
+})
+
+const currentDirection = computed<string>(() => {
+	if (props.placement != '') {
+		if (props.placement.indexOf('bottom') != -1) {
+			return 'bottom'
+		}
+		if (props.placement.indexOf('top') != -1) {
+			return 'top'
+		}
+	}
+	return props.direction == 'bottom' ? 'bottom' : 'top'
+})
+
+const displayShow = computed<boolean>(() => {
+	return props.show || innerShow.value
+})
+
+const rootStyle = computed<UTSJSONObject>(() => {
+	return addStyle(props.customStyle) as UTSJSONObject
+})
+
+const buttonItems = computed<Array<string>>(() => {
+	return props.buttons
+})
+
+const buttonCount = computed<number>(() => {
+	return buttonItems.value.length
+})
+
+const overlayShow = computed<boolean>(() => {
+	return displayShow.value == true && normalizeBool(props.overlay)
+})
+
+const showIndicator = computed<boolean>(() => {
+	return normalizeBool(props.showCopy) || buttonCount.value > 0
+})
+
+const showCopyLine = computed<boolean>(() => {
+	return normalizeBool(props.showCopy) && buttonCount.value > 0
+})
+
+const showCopyButton = computed<boolean>(() => {
+	return normalizeBool(props.showCopy)
+})
+
+const textStyle = computed<UTSJSONObject>(() => {
+	const style = {} as UTSJSONObject
+	style['fontSize'] = addUnit(props.size)
+	style['color'] = props.color
+	style['borderRadius'] = '4px'
+	style['padding'] = '2px 4px'
+	style['backgroundColor'] = props.bgColor != '' && props.bgColor != 'transparent' && displayShow.value == true ? props.bgColor : 'transparent'
+	return style
+})
+
+const popupListStyle = computed<UTSJSONObject>(() => {
+	const style = {} as UTSJSONObject
+	if (props.popupBgColor != '' && props.popupBgColor != 'transparent') {
+		style['backgroundColor'] = props.popupBgColor
+	}
+	return style
+})
+
+const indicatorStyle = computed<UTSJSONObject>(() => {
+	const style = {} as UTSJSONObject
+	const sysInfo = sys()
+	const tInfo = tooltipInfo.value
+	const txInfo = textInfo.value
+	const tooltipWidth = getObjNumber(tInfo, 'width')
+	const textWidth = getObjNumber(txInfo, 'width')
+	const textLeft = getObjNumber(txInfo, 'left')
+	const windowWidth = normalizeNumber(sysInfo.windowWidth, 0)
+
+	if (props.popupBgColor != '' && props.popupBgColor != 'transparent') {
+		style['backgroundColor'] = props.popupBgColor
+	}
+
+	if (tooltipWidth > 0 && textWidth > 0 && textLeft >= 0 && windowWidth > 0) {
+		const textCenter = textLeft + textWidth / 2
+		const idealPopupLeftScreen = textCenter - tooltipWidth / 2
+		let actualPopupLeftScreen = idealPopupLeftScreen
+
+		if (idealPopupLeftScreen < screenGap) {
+			actualPopupLeftScreen = screenGap
+		} else if (idealPopupLeftScreen + tooltipWidth > windowWidth - screenGap) {
+			actualPopupLeftScreen = windowWidth - screenGap - tooltipWidth
+		}
+
+		const textCenterInPopup = textCenter - actualPopupLeftScreen
+		let indicatorLeftRelative = textCenterInPopup - indicatorWidth / 2
+
+		const minLeft = 8
+		const maxLeft = tooltipWidth - indicatorWidth - 8
+		if (indicatorLeftRelative < minLeft) {
+			indicatorLeftRelative = minLeft
+		} else if (indicatorLeftRelative > maxLeft) {
+			indicatorLeftRelative = maxLeft
+		}
+
+		style['left'] = addUnit(indicatorLeftRelative)
+	} else {
+		style['left'] = '50%'
+		style['marginLeft'] = '-' + addUnit(indicatorWidth / 2)
+	}
+
+	if (currentDirection.value === 'top') {
+		style['bottom'] = '-4px'
+	} else {
+		style['top'] = '-4px'
+	}
+	return style
+})
+
+const tooltipStyle = computed<UTSJSONObject>(() => {
+	const style = {} as UTSJSONObject
+	const sysInfo = sys()
+	const tInfo = tooltipInfo.value
+	const txInfo = textInfo.value
+	const tooltipWidth = getObjNumber(tInfo, 'width')
+	const textWidth = getObjNumber(txInfo, 'width')
+	const textLeft = getObjNumber(txInfo, 'left')
+	const windowWidth = normalizeNumber(sysInfo.windowWidth, 0)
+
+	let isCentered = false
+
+	if (tooltipWidth > 0 && textWidth > 0 && textLeft >= 0 && windowWidth > 0) {
+		const textCenter = textLeft + textWidth / 2
+		const idealPopupLeftScreen = textCenter - tooltipWidth / 2
+		let actualPopupLeftScreen = idealPopupLeftScreen
+
+		if (idealPopupLeftScreen < screenGap) {
+			actualPopupLeftScreen = screenGap
+		} else if (idealPopupLeftScreen + tooltipWidth > windowWidth - screenGap) {
+			actualPopupLeftScreen = windowWidth - screenGap - tooltipWidth
+		}
+
+		const popupLeftRelative = actualPopupLeftScreen - textLeft
+		style['left'] = addUnit(popupLeftRelative)
+	} else {
+		style['left'] = '50%'
+		isCentered = true
+	}
+
+	if (currentDirection.value === 'top') {
+		style['top'] = '0px'
+		style['transform'] = isCentered ? 'translate(-50%, -100%)' : 'translateY(-100%)'
+		style['marginTop'] = '-10px'
+	} else {
+		style['top'] = '100%'
+		style['transform'] = isCentered ? 'translate(-50%, 0%)' : 'translateY(0%)'
+		style['marginTop'] = '10px'
+	}
+	return style
+})
+
+const transitionStyle = computed<UTSJSONObject>(() => {
+	const style = {} as UTSJSONObject
+	style['position'] = 'absolute'
+	style['zIndex'] = props.zIndex
+	const ts = tooltipStyle.value
+	UTSJSONObject.keys(ts).forEach((key: string) => {
+		style[key] = ts[key]
+	})
+	return style
+})
+
+const indicatorMergedStyle = computed<UTSJSONObject>(() => {
+	const style = {} as UTSJSONObject
+	const isStyle = indicatorStyle.value
+	UTSJSONObject.keys(isStyle).forEach((key: string) => {
+		style[key] = isStyle[key]
+	})
+	style['width'] = addUnit(indicatorWidth)
+	style['height'] = addUnit(indicatorWidth)
+	return style
+})
+
+function queryRect(refName: string): Promise<NodeInfo> {
+	return upGetRect(`#${refName}`, false, instance?.proxy)
+}
+
+function getElRect() {
+	queryRect(tooltipId.value).then((size: NodeInfo) => {
+		tooltipInfo.value = size as any as UTSJSONObject
+	})
+	queryRect(textId.value).then((size: NodeInfo) => {
+		textInfo.value = size as any as UTSJSONObject
+	})
+}
+
+function triggerPopup() {
+	innerShow.value = !innerShow.value
+	if (innerShow.value) {
+		openTime.value = Date.now()
+		emit('open')
+		sleep(30).then(() => {
+			getElRect()
+		})
+	} else {
+		emit('close')
+	}
+}
+
+function longpressHandler() {
+	lastLongpressTime.value = Date.now()
+	triggerPopup()
+}
+
+function clickHandler() {
+	if (Date.now() - lastLongpressTime.value < 500) return
+	if (Date.now() - lastClickTime.value < 300) return
+	lastClickTime.value = Date.now()
+	if (props.triggerMode == 'click' || props.triggerMode == 'hover') {
+		triggerPopup()
+	}
+}
+
+function overlayClickHandler() {
+	if (Date.now() - openTime.value < 200) return
+	innerShow.value = false
+	emit('close')
+}
+
+function btnClickHandler(index: number): void {
+	innerShow.value = false
+	emit('close')
+	emit('click', props.showCopy ? index + 1 : index)
+}
+
+function getCopyData(): string {
+	const copyText = props.copyText
+	if (copyText != null && copyText.toString() != '') {
+		return copyText.toString()
+	}
+	return displayText.value
+}
+
+function setClipboardData() {
+	innerShow.value = false
+	emit('close')
+	emit('click', 0)
+	uni.setClipboardData({
+		data: getCopyData(),
+		success: () => {
+			if (props.showToast == true) {
+				toast('复制成功')
+			}
+		},
+		fail: () => {
+			if (props.showToast == true) {
+				toast('复制失败')
+			}
+		}
+	})
+}
+
+watch((): boolean => props.show, (newVal: boolean) => {
+	innerShow.value = newVal
+	if (newVal) {
+		getElRect()
+	}
+})
+
+watch(displayShow, (newVal: boolean) => {
+	if (newVal) {
+		nextTick(() => {
+			getElRect()
+			sleep(50).then(() => {
+				getElRect()
+			})
+			sleep(150).then(() => {
+				getElRect()
+			})
+		})
+	}
+})
+
+onMounted(() => {
+	if (props.show) {
+		innerShow.value = true
+	}
+	getElRect()
+})
+
+defineExpose({
+	open: () => {
+		innerShow.value = true
+		openTime.value = Date.now()
+		emit('open')
+		sleep(30).then(() => {
+			getElRect()
+		})
+	},
+	close: () => {
+		innerShow.value = false
+		emit('close')
+	}
+})
+</script>
+
+<style lang="scss" scoped>
+	@import "../../libs/css/components.scss";
+
+	.up-tooltip {
+		position: relative;
+		@include flex;
+
+		&__wrapper {
+			@include flex;
+			justify-content: center;
+			/* #ifndef APP-NVUE */
+			white-space: nowrap;
+			/* #endif */
+
+			&__text {
+				font-size: 14px;
+			}
+
+			&__trigger {
+				@include flex;
+			}
+
+			&__popup {
+				@include flex;
+				justify-content: center;
+
+				&__list {
+					background-color: #060607;
+					position: relative;
+					flex: 1;
+					border-radius: 5px;
+					padding: 0px 0;
+					@include flex(row);
+					align-items: center;
+					overflow: hidden;
+
+					&__btn {
+						padding: 11px 13px;
+
+						&--hover {
+							background-color: #58595B;
+						}
+
+						&__text {
+							line-height: 12px;
+							font-size: 13px;
+							color: #FFFFFF;
+						}
+					}
+				}
+
+				&__indicator {
+					position: absolute;
+					background-color: #060607;
+					width: 14px;
+					height: 14px;
+					bottom: -4px;
+					transform: rotate(45deg);
+					border-radius: 2px;
+					z-index: -1;
+
+					&--hover {
+						background-color: #58595B;
+					}
+				}
+			}
+		}
+	}
+</style>

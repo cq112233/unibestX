@@ -1,0 +1,17 @@
+/*
+ * @Author       : jry,jry
+ * @Description  :
+ * @version      : 3.0
+ * @Date         : 2024-04-22 16:44:21
+ * @LastAuthor   : jry
+ * @lastTime     : 2024-08-20 14:20:58
+ * @FilePath     : /uview-ultra/libs/config/props/row.js
+ */
+export default {
+    // row
+    row: {
+        gutter: 0,
+        justify: 'start',
+        align: 'center'
+    }
+} as UTSJSONObject

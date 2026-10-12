@@ -1,0 +1,480 @@
+const DEFAULT_QUIET_ZONE = 0
+const PAD0 = 0xec
+const PAD1 = 0x11
+const MAX_VERSION = 40
+
+const PATTERN_POSITION_TABLE = [
+    [] as Array<number>, [6, 18], [6, 22], [6, 26], [6, 30], [6, 34],
+    [6, 22, 38], [6, 24, 42], [6, 26, 46], [6, 28, 50], [6, 30, 54],
+    [6, 32, 58], [6, 34, 62], [6, 26, 46, 66], [6, 26, 48, 70],
+    [6, 26, 50, 74], [6, 30, 54, 78], [6, 30, 56, 82],
+    [6, 30, 58, 86], [6, 34, 62, 90], [6, 28, 50, 72, 94],
+    [6, 26, 50, 74, 98], [6, 30, 54, 78, 102], [6, 28, 54, 80, 106],
+    [6, 32, 58, 84, 110], [6, 30, 58, 86, 114], [6, 34, 62, 90, 118],
+    [6, 26, 50, 74, 98, 122], [6, 30, 54, 78, 102, 126],
+    [6, 26, 52, 78, 104, 130], [6, 30, 56, 82, 108, 134],
+    [6, 34, 60, 86, 112, 138], [6, 30, 58, 86, 114, 142],
+    [6, 34, 62, 90, 118, 146], [6, 30, 54, 78, 102, 126, 150],
+    [6, 24, 50, 76, 102, 128, 154], [6, 28, 54, 80, 106, 132, 158],
+    [6, 32, 58, 84, 110, 136, 162], [6, 26, 54, 82, 110, 138, 166],
+    [6, 30, 58, 86, 114, 142, 170]
+] as Array<Array<number>>
+
+const RS_BLOCK_TABLE = [
+    [1,26,19],[1,26,16],[1,26,13],[1,26,9],
+    [1,44,34],[1,44,28],[1,44,22],[1,44,16],
+    [1,70,55],[1,70,44],[2,35,17],[2,35,13],
+    [1,100,80],[2,50,32],[2,50,24],[4,25,9],
+    [1,134,108],[2,67,43],[2,33,15,2,34,16],[2,33,11,2,34,12],
+    [2,86,68],[4,43,27],[4,43,19],[4,43,15],
+    [2,98,78],[4,49,31],[2,32,14,4,33,15],[4,39,13,1,40,14],
+    [2,121,97],[2,60,38,2,61,39],[4,40,18,2,41,19],[4,40,14,2,41,15],
+    [2,146,116],[3,58,36,2,59,37],[4,36,16,4,37,17],[4,36,12,4,37,13],
+    [2,86,68,2,87,69],[4,69,43,1,70,44],[6,43,19,2,44,20],[6,43,15,2,44,16],
+    [4,101,81],[1,80,50,4,81,51],[4,50,22,4,51,23],[3,36,12,8,37,13],
+    [2,116,92,2,117,93],[6,58,36,2,59,37],[4,46,20,6,47,21],[7,42,14,4,43,15],
+    [4,133,107],[8,59,37,1,60,38],[8,44,20,4,45,21],[12,33,11,4,34,12],
+    [3,145,115,1,146,116],[4,64,40,5,65,41],[11,36,16,5,37,17],[11,36,12,5,37,13],
+    [5,109,87,1,110,88],[5,65,41,5,66,42],[5,54,24,7,55,25],[11,36,12],
+    [5,122,98,1,123,99],[7,73,45,3,74,46],[15,43,19,2,44,20],[3,45,15,13,46,16],
+    [1,135,107,5,136,108],[10,74,46,1,75,47],[1,50,22,15,51,23],[2,42,14,17,43,15],
+    [5,150,120,1,151,121],[9,69,43,4,70,44],[17,50,22,1,51,23],[2,42,14,19,43,15],
+    [3,141,113,4,142,114],[3,70,44,11,71,45],[17,47,21,4,48,22],[9,39,13,16,40,14],
+    [3,135,107,5,136,108],[3,67,41,13,68,42],[15,54,24,5,55,25],[15,43,15,10,44,16],
+    [4,144,116,4,145,117],[17,68,42],[17,50,22,6,51,23],[19,46,16,6,47,17],
+    [2,139,111,7,140,112],[17,74,46],[7,54,24,16,55,25],[34,37,13],
+    [4,151,121,5,152,122],[4,75,47,14,76,48],[11,54,24,14,55,25],[16,45,15,14,46,16],
+    [6,147,117,4,148,118],[6,73,45,14,74,46],[11,54,24,16,55,25],[30,46,16,2,47,17],
+    [8,132,106,4,133,107],[8,75,47,13,76,48],[7,54,24,22,55,25],[22,45,15,13,46,16],
+    [10,142,114,2,143,115],[19,74,46,4,75,47],[28,50,22,6,51,23],[33,46,16,4,47,17],
+    [8,152,122,4,153,123],[22,73,45,3,74,46],[8,53,23,26,54,24],[12,45,15,28,46,16],
+    [3,147,117,10,148,118],[3,73,45,23,74,46],[4,54,24,31,55,25],[11,45,15,31,46,16],
+    [7,146,116,7,147,117],[21,73,45,7,74,46],[1,53,23,37,54,24],[19,45,15,26,46,16],
+    [5,145,115,10,146,116],[19,75,47,10,76,48],[15,54,24,25,55,25],[23,45,15,25,46,16],
+    [13,145,115,3,146,116],[2,74,46,29,75,47],[42,54,24,1,55,25],[23,45,15,28,46,16],
+    [17,145,115],[10,74,46,23,75,47],[10,54,24,35,55,25],[19,45,15,35,46,16],
+    [17,145,115,1,146,116],[14,74,46,21,75,47],[29,54,24,19,55,25],[11,45,15,46,46,16],
+    [13,145,115,6,146,116],[14,74,46,23,75,47],[44,54,24,7,55,25],[59,46,16,1,47,17],
+    [12,151,121,7,152,122],[12,75,47,26,76,48],[39,54,24,14,55,25],[22,45,15,41,46,16],
+    [6,151,121,14,152,122],[6,75,47,34,76,48],[46,54,24,10,55,25],[2,45,15,64,46,16],
+    [17,152,122,4,153,123],[29,74,46,14,75,47],[49,54,24,10,55,25],[24,45,15,46,46,16],
+    [4,152,122,18,153,123],[13,74,46,32,75,47],[48,54,24,14,55,25],[42,45,15,32,46,16],
+    [20,147,117,4,148,118],[40,75,47,7,76,48],[43,54,24,22,55,25],[10,45,15,67,46,16],
+    [19,148,118,6,149,119],[18,75,47,31,76,48],[34,54,24,34,55,25],[20,45,15,61,46,16]
+] as Array<Array<number>>
+
+function normalizeLevel(level: number): number {
+    if (level < 0) return 0
+    if (level > 3) return 3
+    return level
+}
+
+function normalizeQuietZone(quietZone: number): number {
+    if (quietZone < 0) {
+        return 0
+    }
+    return Math.floor(quietZone)
+}
+
+function moduleCount(version: number): number {
+    return version * 4 + 17
+}
+
+function utf8Bytes(value: string): Array<number> {
+    const bytes = [] as Array<number>
+    for (let i = 0; i < value.length; i++) {
+        const rawCode = value.charCodeAt(i)
+        const code = rawCode == null ? 0 : rawCode
+        if (code < 0x80) {
+            bytes.push(code)
+        } else if (code < 0x800) {
+            bytes.push(0xc0 | (code >> 6))
+            bytes.push(0x80 | (code & 0x3f))
+        } else {
+            bytes.push(0xe0 | (code >> 12))
+            bytes.push(0x80 | ((code >> 6) & 0x3f))
+            bytes.push(0x80 | (code & 0x3f))
+        }
+    }
+    return bytes
+}
+
+function putBits(bits: Array<number>, value: number, length: number): void {
+    for (let i = length - 1; i >= 0; i--) {
+        bits.push((value >>> i) & 1)
+    }
+}
+
+function getRsBlock(version: number, level: number): Array<number> {
+    return RS_BLOCK_TABLE[(version - 1) * 4 + normalizeLevel(level)]
+}
+
+function getTotalDataCount(rsBlock: Array<number>): number {
+    let total = 0
+    for (let i = 0; i < rsBlock.length; i += 3) {
+        total += rsBlock[i] * rsBlock[i + 2]
+    }
+    return total
+}
+
+function chooseVersion(bytes: Array<number>, level: number): number {
+    for (let version = 1; version <= MAX_VERSION; version++) {
+        const lengthBits = version > 9 ? 16 : 8
+        const requiredBits = 4 + lengthBits + bytes.length * 8
+        const capacityBits = getTotalDataCount(getRsBlock(version, level)) * 8
+        if (requiredBits <= capacityBits) {
+            return version
+        }
+    }
+    throw new Error('二维码内容超过最大容量')
+}
+
+function createDataCodewords(bytes: Array<number>, version: number, totalDataCount: number): Array<number> {
+    const bits = [] as Array<number>
+    putBits(bits, 4, 4)
+    putBits(bits, bytes.length, version > 9 ? 16 : 8)
+    for (let i = 0; i < bytes.length; i++) {
+        putBits(bits, bytes[i], 8)
+    }
+    const maxBits = totalDataCount * 8
+    if (bits.length > maxBits) {
+        throw new Error('二维码内容超过当前版本容量')
+    }
+    putBits(bits, 0, Math.min(4, maxBits - bits.length))
+    while (bits.length % 8 != 0) {
+        bits.push(0)
+    }
+    const result = [] as Array<number>
+    for (let i = 0; i < bits.length; i += 8) {
+        let codeword = 0
+        for (let j = 0; j < 8; j++) {
+            codeword = (codeword << 1) | bits[i + j]
+        }
+        result.push(codeword)
+    }
+    let pad = true
+    while (result.length < totalDataCount) {
+        result.push(pad ? PAD0 : PAD1)
+        pad = !pad
+    }
+    return result
+}
+
+function gfMultiply(left: number, right: number): number {
+    let x = left
+    let y = right
+    let result = 0
+    while (y > 0) {
+        if ((y & 1) != 0) result ^= x
+        x <<= 1
+        if ((x & 0x100) != 0) x ^= 0x11d
+        y >>>= 1
+    }
+    return result & 0xff
+}
+
+function gfPow(base: number, exponent: number): number {
+    let result = 1
+    for (let i = 0; i < exponent; i++) {
+        result = gfMultiply(result, base)
+    }
+    return result
+}
+
+function polyMultiply(left: Array<number>, right: Array<number>): Array<number> {
+    const result = [] as Array<number>
+    for (let i = 0; i < left.length + right.length - 1; i++) result.push(0)
+    for (let i = 0; i < left.length; i++) {
+        for (let j = 0; j < right.length; j++) {
+            result[i + j] = result[i + j] ^ gfMultiply(left[i], right[j])
+        }
+    }
+    return result
+}
+
+function rsGenerator(degree: number): Array<number> {
+    let result = [1] as Array<number>
+    for (let i = 0; i < degree; i++) {
+        result = polyMultiply(result, [1, gfPow(2, i)] as Array<number>)
+    }
+    return result
+}
+
+function rsRemainder(data: Array<number>, degree: number): Array<number> {
+    const generator = rsGenerator(degree)
+    const result = [] as Array<number>
+    for (let i = 0; i < degree; i++) result.push(0)
+    for (let i = 0; i < data.length; i++) {
+        const factor = data[i] ^ result[0]
+        for (let j = 0; j < degree - 1; j++) result[j] = result[j + 1]
+        result[degree - 1] = 0
+        for (let j = 0; j < degree; j++) {
+            result[j] = result[j] ^ gfMultiply(generator[j + 1], factor)
+        }
+    }
+    return result
+}
+
+function createBytes(data: Array<number>, rsBlock: Array<number>): Array<number> {
+    const dcdata = [] as Array<Array<number>>
+    const ecdata = [] as Array<Array<number>>
+    let maxDcCount = 0
+    let maxEcCount = 0
+    let offset = 0
+    for (let i = 0; i < rsBlock.length; i += 3) {
+        const count = rsBlock[i]
+        const totalCount = rsBlock[i + 1]
+        const dataCount = rsBlock[i + 2]
+        for (let r = 0; r < count; r++) {
+            const dc = [] as Array<number>
+            for (let j = 0; j < dataCount; j++) dc.push(data[offset + j])
+            offset += dataCount
+            const ecCount = totalCount - dataCount
+            const ec = rsRemainder(dc, ecCount)
+            dcdata.push(dc)
+            ecdata.push(ec)
+            maxDcCount = Math.max(maxDcCount, dataCount)
+            maxEcCount = Math.max(maxEcCount, ecCount)
+        }
+    }
+    const result = [] as Array<number>
+    for (let i = 0; i < maxDcCount; i++) {
+        for (let r = 0; r < dcdata.length; r++) {
+            if (i < dcdata[r].length) result.push(dcdata[r][i])
+        }
+    }
+    for (let i = 0; i < maxEcCount; i++) {
+        for (let r = 0; r < ecdata.length; r++) {
+            if (i < ecdata[r].length) result.push(ecdata[r][i])
+        }
+    }
+    return result
+}
+
+function createMatrix(size: number, fillValue: number): Array<Array<number>> {
+    const matrix = [] as Array<Array<number>>
+    for (let row = 0; row < size; row++) {
+        const line = [] as Array<number>
+        for (let col = 0; col < size; col++) line.push(fillValue)
+        matrix.push(line)
+    }
+    return matrix
+}
+
+function setModule(matrix: Array<Array<number>>, reserved: Array<Array<number>>, row: number, col: number, dark: boolean): void {
+    const size = matrix.length
+    if (row < 0 || col < 0 || row >= size || col >= size) return
+    matrix[row][col] = dark ? 1 : 0
+    reserved[row][col] = 1
+}
+
+function setupFinder(matrix: Array<Array<number>>, reserved: Array<Array<number>>, row: number, col: number): void {
+    const size = matrix.length
+    for (let r = -1; r <= 7; r++) {
+        for (let c = -1; c <= 7; c++) {
+            const y = row + r
+            const x = col + c
+            if (y < 0 || x < 0 || y >= size || x >= size) continue
+            const dark = (r >= 0 && r <= 6 && (c == 0 || c == 6))
+                || (c >= 0 && c <= 6 && (r == 0 || r == 6))
+                || (r >= 2 && r <= 4 && c >= 2 && c <= 4)
+            setModule(matrix, reserved, y, x, dark)
+        }
+    }
+}
+
+function setupAlignment(matrix: Array<Array<number>>, reserved: Array<Array<number>>, version: number): void {
+    const pos = PATTERN_POSITION_TABLE[version - 1]
+    for (let i = 0; i < pos.length; i++) {
+        for (let j = 0; j < pos.length; j++) {
+            const row = pos[i]
+            const col = pos[j]
+            if (reserved[row][col] != 0) continue
+            for (let r = -2; r <= 2; r++) {
+                for (let c = -2; c <= 2; c++) {
+                    const dark = r == -2 || r == 2 || c == -2 || c == 2 || (r == 0 && c == 0)
+                    setModule(matrix, reserved, row + r, col + c, dark)
+                }
+            }
+        }
+    }
+}
+
+function setupTiming(matrix: Array<Array<number>>, reserved: Array<Array<number>>): void {
+    const size = matrix.length
+    for (let i = 8; i < size - 8; i++) {
+        setModule(matrix, reserved, 6, i, i % 2 == 0)
+        setModule(matrix, reserved, i, 6, i % 2 == 0)
+    }
+}
+
+function bchDigit(value: number): number {
+    let digit = 0
+    let data = value
+    while (data != 0) {
+        digit++
+        data >>>= 1
+    }
+    return digit
+}
+
+function bchTypeInfo(data: number): number {
+    const g15 = (1 << 10) | (1 << 8) | (1 << 5) | (1 << 4) | (1 << 2) | (1 << 1) | 1
+    const g15Mask = (1 << 14) | (1 << 12) | (1 << 10) | (1 << 4) | (1 << 1)
+    let d = data << 10
+    while (bchDigit(d) - bchDigit(g15) >= 0) {
+        d = d ^ (g15 << (bchDigit(d) - bchDigit(g15)))
+    }
+    return ((data << 10) | d) ^ g15Mask
+}
+
+function bchTypeNumber(data: number): number {
+    const g18 = (1 << 12) | (1 << 11) | (1 << 10) | (1 << 9) | (1 << 8) | (1 << 5) | (1 << 2) | 1
+    let d = data << 12
+    while (bchDigit(d) - bchDigit(g18) >= 0) {
+        d = d ^ (g18 << (bchDigit(d) - bchDigit(g18)))
+    }
+    return (data << 12) | d
+}
+
+function setupTypeNumber(matrix: Array<Array<number>>, reserved: Array<Array<number>>, version: number): void {
+    const size = matrix.length
+    const bits = bchTypeNumber(version)
+    for (let i = 0; i < 18; i++) {
+        const dark = ((bits >> i) & 1) == 1
+        setModule(matrix, reserved, Math.floor(i / 3), i % 3 + size - 11, dark)
+        setModule(matrix, reserved, i % 3 + size - 11, Math.floor(i / 3), dark)
+    }
+}
+
+function setupFormat(matrix: Array<Array<number>>, reserved: Array<Array<number>>, level: number, maskPattern: number): void {
+    const size = matrix.length
+    const levelBits = ([1, 0, 3, 2] as Array<number>)[normalizeLevel(level)]
+    const bits = bchTypeInfo((levelBits << 3) | maskPattern)
+    for (let i = 0; i < 15; i++) {
+        const dark = ((bits >> i) & 1) == 1
+        if (i < 6) setModule(matrix, reserved, i, 8, dark)
+        else if (i < 8) setModule(matrix, reserved, i + 1, 8, dark)
+        else setModule(matrix, reserved, size - 15 + i, 8, dark)
+        if (i < 8) setModule(matrix, reserved, 8, size - i - 1, dark)
+        else if (i < 9) setModule(matrix, reserved, 8, 15 - i, dark)
+        else setModule(matrix, reserved, 8, 15 - i - 1, dark)
+    }
+    setModule(matrix, reserved, size - 8, 8, true)
+}
+
+function getMask(maskPattern: number, row: number, col: number): boolean {
+    switch (maskPattern) {
+        case 0: return (row + col) % 2 == 0
+        case 1: return row % 2 == 0
+        case 2: return col % 3 == 0
+        case 3: return (row + col) % 3 == 0
+        case 4: return (Math.floor(row / 2) + Math.floor(col / 3)) % 2 == 0
+        case 5: return (row * col) % 2 + (row * col) % 3 == 0
+        case 6: return ((row * col) % 2 + (row * col) % 3) % 2 == 0
+        case 7: return ((row * col) % 3 + (row + col) % 2) % 2 == 0
+        default: return false
+    }
+}
+
+function mapData(matrix: Array<Array<number>>, reserved: Array<Array<number>>, codewords: Array<number>, maskPattern: number): void {
+    const size = matrix.length
+    let bitIndex = 0
+    let row = size - 1
+    let direction = -1
+    for (let col = size - 1; col > 0; col -= 2) {
+        if (col == 6) col--
+        while (true) {
+            for (let c = 0; c < 2; c++) {
+                const x = col - c
+                if (reserved[row][x] == 0) {
+                    let dark = false
+                    if (bitIndex < codewords.length * 8) {
+                        const codeword = codewords[Math.floor(bitIndex / 8)]
+                        dark = (((codeword >>> (7 - (bitIndex % 8))) & 1) == 1)
+                    }
+                    if (getMask(maskPattern, row, x)) dark = !dark
+                    matrix[row][x] = dark ? 1 : 0
+                    bitIndex++
+                }
+            }
+            row += direction
+            if (row < 0 || row >= size) {
+                row -= direction
+                direction = -direction
+                break
+            }
+        }
+    }
+}
+
+function isFinderColor(row: number, col: number, size: number): boolean {
+    const inTopLeft = row > 1 && row < 5 && col > 1 && col < 5
+    const inBottomLeft = row > size - 6 && row < size - 2 && col > 1 && col < 5
+    const inTopRight = row > 1 && row < 5 && col > size - 6 && col < size - 2
+    return inTopLeft || inBottomLeft || inTopRight
+}
+
+function buildMatrix(value: string, level: number): Array<Array<number>> {
+    const bytes = utf8Bytes(value)
+    const version = chooseVersion(bytes, level)
+    const size = moduleCount(version)
+    const matrix = createMatrix(size, 0)
+    const reserved = createMatrix(size, 0)
+    setupFinder(matrix, reserved, 0, 0)
+    setupFinder(matrix, reserved, size - 7, 0)
+    setupFinder(matrix, reserved, 0, size - 7)
+    setupAlignment(matrix, reserved, version)
+    setupTiming(matrix, reserved)
+    if (version >= 7) setupTypeNumber(matrix, reserved, version)
+    const maskPattern = 0
+    setupFormat(matrix, reserved, level, maskPattern)
+    const rsBlock = getRsBlock(version, level)
+    const data = createDataCodewords(bytes, version, getTotalDataCount(rsBlock))
+    mapData(matrix, reserved, createBytes(data, rsBlock), maskPattern)
+    return matrix
+}
+
+export function createQrCells(value: string, foreground: string, background: string, pdground: string, level: number = 3, quietZone: number = DEFAULT_QUIET_ZONE): Array<UTSJSONObject> {
+    const matrix = buildMatrix(value, level)
+    const cells = [] as Array<UTSJSONObject>
+    const size = matrix.length
+    const zone = normalizeQuietZone(quietZone)
+    const total = size + zone * 2
+    for (let row = 0; row < total; row++) {
+        for (let col = 0; col < total; col++) {
+            const qrRow = row - zone
+            const qrCol = col - zone
+            let dark = false
+            let color = background
+            if (qrRow >= 0 && qrCol >= 0 && qrRow < size && qrCol < size) {
+                dark = matrix[qrRow][qrCol] == 1
+                if (dark) {
+                    color = isFinderColor(qrRow, qrCol, size) ? pdground : foreground
+                }
+            }
+            cells.push({
+                key: row.toString() + '-' + col.toString(),
+                dark: dark,
+                color: color
+            } as UTSJSONObject)
+        }
+    }
+    return cells
+}
+
+export function getQrRenderCount(value: string = '', level: number = 3): number {
+    return getQrRenderCountWithQuietZone(value, level, DEFAULT_QUIET_ZONE)
+}
+
+export function getQrRenderCountWithQuietZone(value: string = '', level: number = 3, quietZone: number = DEFAULT_QUIET_ZONE): number {
+    const zone = normalizeQuietZone(quietZone)
+    if (value.length == 0) {
+        return moduleCount(1) + zone * 2
+    }
+    try {
+        return moduleCount(chooseVersion(utf8Bytes(value), level)) + zone * 2
+    } catch (_: any) {
+        return moduleCount(MAX_VERSION) + zone * 2
+    }
+}

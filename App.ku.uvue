@@ -106,7 +106,14 @@ onMounted(() => {
       }
     }
   }
-  catch { }
+  catch (_e) {
+    // 捕获异常
+  }
+});
+
+// 每个页面切换都会触发：同步 H5 / 小程序原生导航栏主题
+onShow(() => {
+  applyNavbarTheme(themeStore.state.isDark);
 });
 
 // 主题模式 / 系统深浅色变化时，当前页面不切换也实时同步导航栏
