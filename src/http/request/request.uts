@@ -10,11 +10,12 @@ import type { LimeRequestConfig } from '@/uni_modules/lime-request';
 import { useTokenStore } from '@/src/store/index.uts';
 import { toLoginPage } from '@/src/router/index.uts';
 import { ContentTypeEnum, ResultEnum } from './internal/enum.uts';
-import { resolveErrorMessage } from '../error/error.uts';
+import { BusinessError, resolveErrorMessage } from '../error/error.uts';
 import { tryRefreshToken } from './internal/refresh.uts';
 import { defaultLifecycle } from './internal/lifecycle.uts';
 import {
   extractErrorMessage,
+  extractStatusCode,
   HttpClient
 } from './internal/client.uts';
 import type {
@@ -163,11 +164,12 @@ export function defaultBusinessAfterSuccess(data: any, config: LimeRequestConfig
             }
           }
           if (skipRefresh) {
-            throw new Error(`[业务未授权]：${message}`);
+            throw new BusinessError(message, codeVal);
           }
           throw new Error('__REFRESHABLE_401__');
         }
-        throw new Error(`[业务错误 ${codeVal}]：${message}`);
+        // 用 BusinessError 而不是把业务码拍进文案：调用方与错误归一都还需要这个码
+        throw new BusinessError(message, codeVal);
       }
     }
     const innerData = resultObj.get('data');
@@ -190,7 +192,14 @@ export function defaultBusinessAfterError(err: any, _config: LimeRequestConfig):
   if (rawMsg.toLowerCase().includes('abort')) {
     return;
   }
-  uni.showToast({ title: resolveErrorMessage(rawMsg, -1).message, icon: 'none' });
+  // 业务错误的文案已在 defaultBusinessAfterSuccess 里按后端原文提示过，
+  // 这里再弹一次只会把用户看不懂的内部标记透出去；业务码随 BusinessError 继续交给调用方
+  // （toError 对 Error 实例原样透传，调用方拿到的仍是这个带 code 的实例）
+  if (err instanceof BusinessError) {
+    return;
+  }
+  // HTTP 层失败带着真实状态码，作为首选判据；取不到再交给文案兜底
+  uni.showToast({ title: resolveErrorMessage(rawMsg, -1, extractStatusCode(err)).message, icon: 'none' });
 }
 
 /**
