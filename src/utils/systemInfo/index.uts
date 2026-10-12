@@ -30,27 +30,47 @@ export const TABBAR_BASE_HEIGHT: number = 50;
  *    「wx.getSystemInfoSync is deprecated. Please use wx.getSystemSetting / wx.getDeviceInfo /
  *    wx.getWindowInfo / wx.getAppBaseInfo instead」告警。这里改为编译期条件编译注入常量：
  *    零运行时桥接开销，且与 `getCompilePlatform()` 的平台分流口径保持一致。
+ *
+ * ⚠️ 条件编译段内只赋值、最后统一 return：写成「每个 `#ifdef` 里各自 return」会被 TS 判成
+ *    「不可达代码」（TS7027），编辑器整片变灰（理由见 `src/config/env/env.uts` 的 isVaporMode()）。
+ *
+ * ⚠️ 赋值必须带「空值哨兵」判断：真编译会按平台剔除分支，只剩一支生效；但单测（vitest）环境
+ *    不做条件编译剔除，`#ifdef` 只是普通注释，所有分支都会执行 —— 那时必须是**第一个命中的分支生效**，
+ *    才与原来的 `#ifdef ... return` 语义一致（否则最后一个分支会覆盖前面的，测试里平台判断全错）。
  */
 function resolveCurrentPlatform(): string {
+  let platform = '';
   // #ifdef APP-ANDROID
-  return 'app-android';
+  if (platform == '') {
+    platform = 'app-android';
+  }
   // #endif
   // #ifdef APP-IOS
-  return 'app-ios';
+  if (platform == '') {
+    platform = 'app-ios';
+  }
   // #endif
   // #ifdef APP-HARMONY
-  return 'app-harmony';
+  if (platform == '') {
+    platform = 'app-harmony';
+  }
   // #endif
   // #ifdef H5
-  return 'web';
+  if (platform == '') {
+    platform = 'web';
+  }
   // #endif
   // #ifdef MP-WEIXIN
-  return 'mp-weixin';
+  if (platform == '') {
+    platform = 'mp-weixin';
+  }
   // #endif
   // #ifdef MP-ALIPAY
-  return 'mp-alipay';
+  if (platform == '') {
+    platform = 'mp-alipay';
+  }
   // #endif
-  return '';
+  return platform;
 }
 
 const currentPlatform: string = resolveCurrentPlatform();

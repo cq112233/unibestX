@@ -11,6 +11,37 @@ declare global {
 
   export interface Uni {
     env?: UniEnv;
+
+    // ==========================================
+    // 补齐 uni-app X 专有的 uni.exit()
+    //
+    // ⚠️ 位置有讲究：必须加在**这里**（`declare global` 顶层的 `interface Uni`），
+    //    写进下方 `namespace UniNamespace { interface Uni {} }` 对全局 `uni` 是**无效**的。
+    //    原因在 @dcloudio/types 的 uni-app/uni/legacy/uni.d.ts：
+    //      · 1~9652 行是 `declare namespace UniNamespace {}`，里面**根本没有** `Uni`；
+    //      · 9659 行 `declare const uni: UniNamespace.Uni;` 引用的 `UniNamespace.Uni` 并不存在
+    //        （skipLibCheck 把它压住了）；
+    //      · 9661~11915 行的**顶层全局 `interface Uni`** 才是真正的 API 面（getAppBaseInfo
+    //        等都在其中，文件末尾还有 `type UniInterface = Uni;` 佐证）。
+    //    实测对比（探针）：`uni.__probeGlobal` 通过、`uni.__probeInNs` 报 TS2339。
+    //    口诀：补 `uni.xxx` → 全局 `interface Uni`；补 `UniNamespace.Xxx` 类型 → namespace 块。
+    //
+    // 真源：HBuilderX @dcloudio/uni-app-x/types/uni/uts-plugin-api/lib/uni-exit/utssdk/interface.d.ts
+    //       exit(options?: ExitOptions | null): void
+    //       平台矩阵（真源 @uniPlatform）：Android 3.8.15+ / iOS uniX 4.33+；鸿蒙与 Web 未标注。
+    //
+    // ⚠️ 选项类型**就地内联**，不新增全局类型名：ExitOptions / ExitSuccess 等在 HBuilderX 侧
+    //    已是全局类型，另起同名声明会在 HBuilderX 的 TS 检查里撞名。
+    // ==========================================
+    /** 退出当前应用（App 端专有，平台矩阵见上方真源说明） */
+    exit: (options?: {
+      /** 退出成功回调，只带统一 errMsg */
+      success?: ((res: { errMsg: string }) => void) | null;
+      /** 退出失败回调；errCode 取值为 12001 / 12002 / 12003 */
+      fail?: ((res: { errCode: number; errMsg?: string }) => void) | null;
+      /** 完成回调，成功与失败都会走 */
+      complete?: ((res: any) => void) | null;
+    } | null) => void;
   }
 
   export interface PageStyle {
@@ -683,6 +714,49 @@ declare global {
       onChunkReceived: (listener: (result: { data: ArrayBuffer }) => void) => number;
       /** 移除分块数据监听（不传参则移除全部） */
       offChunkReceived: (listener?: number | ((result: { data: ArrayBuffer }) => void) | null) => void;
+    }
+
+    // ==========================================
+    // 给 @dcloudio/types 的 UniNamespace.GetAppBaseInfoResult 补齐 uni-app X 专有字段
+    //
+    // @dcloudio/types 是 uni-app **经典版**（Vue2 时代）的类型，其 GetAppBaseInfoResult
+    // 只有 appId / appName / appVersion / language / version / hostName ... 这一批，
+    // **整份没有** uni-app X 才返回的 uniPlatform / uniCompilerVersion / uniCompileVersion 等，
+    // 于是 `uni.getAppBaseInfo().uniPlatform` 在 VSCode 里报 TS2339。
+    //
+    // 真源：HBuilderX uni-app x dts
+    //   @dcloudio/uni-app-x/types/uni/uts-plugin-api/lib/uni-getAppBaseInfo/utssdk/interface.d.ts
+    // 该处 GetAppBaseInfoResult 是 `type`（不可合并），故这里对 @dcloudio/types 的同名
+    // `interface` 做声明合并来补齐；字段连同可选性、字面量联合取值一并与真源保持一致。
+    // ==========================================
+    interface GetAppBaseInfoResult {
+      /**
+       * 当前运行平台标识（uni-app X 专有）。
+       * 真源为字面量联合，这里同样精确到取值，便于 isWebOrMpPlatform 一类的判断收敛。
+       */
+      uniPlatform?:
+        | 'app'
+        | 'web'
+        | 'mp-weixin'
+        | 'mp-alipay'
+        | 'mp-baidu'
+        | 'mp-toutiao'
+        | 'mp-lark'
+        | 'mp-qq'
+        | 'mp-kuaishou'
+        | 'mp-jd'
+        | 'mp-360'
+        | 'quickapp-webview'
+        | 'quickapp-webview-union'
+        | 'quickapp-webview-huawei';
+      /** uni 编译器版本号（Android 4.0+ / iOS 4.11+ / 鸿蒙 4.61+ / 微信小程序 4.41+ / Web 4.18+） */
+      uniCompilerVersion?: string;
+      /** uni 编译版本号（支付宝等未实现 uniCompilerVersion 的端由它兜底） */
+      uniCompileVersion?: string;
+      /** uni 运行时版本号 */
+      uniRuntimeVersion?: string;
+      /** 当前是否运行在 uni-app X 环境 */
+      isUniAppX?: boolean;
     }
   }
 
