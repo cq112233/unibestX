@@ -59,7 +59,7 @@
 // ==========================================
 // ⚠️ 必须是 `.uts` 且必须放在 `#ifdef` 之外：
 //    a) 小程序（uts2js）链路无法从 `.ts` 文件经 `export *` 转发纯类型，
-//       否则业务侧 `import type { ISingleTokenRes } from '@/src/store'` 会报
+//       否则业务侧 `import type { ISingleTokenRes } from '@/src/store/index.uts'` 会报
 //       `"ISingleTokenRes" is not exported by ".../src/store/index.uts"`；
 //    b) 两个分支（vapor / vdom）共用同一套类型，放条件编译里必然漏掉一端。
 // ==========================================

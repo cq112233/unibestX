@@ -8,7 +8,7 @@
  *
  * 1. **小程序端类型丢失**：`src/store/index.uts` 门面通过 `export * from './vapor/token'`
  *    转发 `.ts` 文件中的 `export type` 时，微信小程序（uts2js）链路拿不到这些纯类型导出，
- *    业务侧 `import type { ISingleTokenRes } from '@/src/store'` 会直接编译失败：
+ *    业务侧 `import type { ISingleTokenRes } from '@/src/store/index.uts'` 会直接编译失败：
  *    `[plugin:uts] "ISingleTokenRes" is not exported by ".../src/store/index.uts"`；
  *    `.uts` → `.uts` 的类型转发则稳定可用。
  * 2. **双份定义漂移**：两个分支各写一遍同名类型，改一处漏一处。

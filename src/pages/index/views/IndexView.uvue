@@ -136,7 +136,7 @@
       </view>
     </view>
 
-    <!-- 内置工具库（lime-shared / lime-use / lime-color / unix-crypto） -->
+    <!-- 内置工具库（lime-shared / lime-use / lime-color / lime-dayuts / unix-crypto） -->
     <view class="mt-[16px] mx-[16px]">
       <view class="flex flex-row items-center justify-between mb-[10px]">
         <text class="text-[14px] font-bold text-[#1e293b]">🧰 内置工具库</text>
@@ -369,6 +369,17 @@ const toolLibList: Array<ToolLibItem> = [
     bgColor: '#db27770f',
     borderColor: '#db277726',
     textColor: '#db2777'
+  },
+  {
+    id: 'lime-dayuts',
+    title: '📅 lime-dayuts',
+    tag: '日期时间库',
+    desc: 'dayjs 的 UTS 移植版，几乎保持一致的调用风格，覆盖日期解析、格式化与取值赋值、加减与起止（startOf / endOf）、时间差计算与比较查询，并内置中英双语 locale。',
+    chips: ['解析/格式化', '加减与起止', 'diff 时间差', '比较查询', '中英 locale'],
+    configPath: 'uni_modules/lime-dayuts',
+    bgColor: '#4338ca0f',
+    borderColor: '#4338ca26',
+    textColor: '#4338ca'
   },
   {
     id: 'unix-Bignumber',
