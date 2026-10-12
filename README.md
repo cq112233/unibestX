@@ -442,8 +442,10 @@ unibestX/
 ├── stylelint.config.mjs          # Stylelint 样式规范配置（支持 SCSS / UVUE）
 ├── eslint.config.mjs             # ESLint 扁平化配置（含 UTS 专属规则插件）
 ├── vitest.config.ts              # Vitest 配置文件（UVue 预转译与组件测试支持）
-├── Dockerfile                    # H5 生产部署轻量容器（nginx:alpine）
-├── docker-compose.yml            # H5 容器编排服务（h5-test / h5-prod）
+├── docker/                       # H5 容器化部署配置（构建上下文仍为仓库根目录）
+│   ├── Dockerfile                #   nginx:alpine 生产部署轻量容器
+│   ├── Dockerfile.dockerignore   #   构建上下文白名单（须与 Dockerfile 同目录同名前缀）
+│   └── docker-compose.yml        #   H5 容器编排服务（h5-test / h5-prod）
 ├── deploy/                       # 生产与测试部署配置
 │   ├── nginx.conf                #   Nginx 动态反代与静态托管配置
 │   ├── .env.test                 #   测试环境 Docker 变量配置
