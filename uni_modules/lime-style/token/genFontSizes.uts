@@ -8,10 +8,10 @@ export function getLineHeight(fontSize : number) : number {
 export function getFontSizes(base : number) : FontSize[] {
 	const length = 11 // 10
 	const offset = 2 // 1
-	// #ifdef APP-ANDROID
+	// #ifdef APP-ANDROID && !VUE3-VAPOR
 	const arr = Array.fromNative(new IntArray(length.toInt()));
 	// #endif
-	// #ifndef APP-ANDROID
+	// #ifndef APP-ANDROID && !VUE3-VAPOR
 	 const arr = Array.from({ length });
 	// #endif
 	const fontSizes = arr.map((_, index) : number => {

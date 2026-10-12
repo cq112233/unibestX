@@ -11,7 +11,7 @@ import {
 // #endif
 
 // #ifdef UNI-APP-X
-// #ifndef APP-ANDROID
+// #ifndef APP-ANDROID && !VUE3-VAPOR
 import type { ComputedRef } from 'vue'
 // #endif
 // #endif
@@ -85,11 +85,11 @@ function isSameSecond(time1 : number, time2 : number) : boolean {
 	const diff = Math.abs(time1 - time2);
 	return diff < 1000 || Math.floor(time1 / 1000) == Math.floor(time2 / 1000);
 }
-// #ifndef APP-ANDROID
+// #ifndef APP-ANDROID && !VUE3-VAPOR
 const now = () : number => (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
 // #endif
 
-// #ifdef APP-ANDROID
+// #ifdef APP-ANDROID && !VUE3-VAPOR
 const now = () : number => System.nanoTime() / 1_000_000.0  // Date.now();
 // #endif
 
