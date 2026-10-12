@@ -21,7 +21,11 @@ export type TrackPayload = {
 /** 上报地址；为空表示未配置，stub 不发任何请求 */
 let trackEndpoint: string = '';
 
-/** 配置埋点上报地址（空则 stub 不真正发送） */
+/**
+ * 配置埋点上报地址（空则 stub 不真正发送）
+ * @param url 埋点上报接口的完整地址；传空字符串等于**关闭上报**（stub 直接 return），
+ *            另外 stub 还要求处于生产环境才会真正发送
+ */
 export function setTrackEndpoint(url: string): void {
   trackEndpoint = url;
 }
@@ -36,6 +40,8 @@ export function getTrackEndpoint(): string {
  *
  * 默认实现只在本项目已配置上报地址、且处于生产环境时才提示，
  * 避免开发期误发数据。接入真实 SDK 时替换本函数体即可，签名保持不变。
+ * @param payload 已组装好的埋点载荷（event / propsJson / page / time）；
+ *                默认实现只打一条 console.log，且仅在「已配置 endpoint + 生产环境」时命中
  */
 export function onTrackStub(payload: TrackPayload): void {
   if (trackEndpoint.length == 0) {
@@ -71,13 +77,21 @@ export function track(event: string, propsJson: string = ''): void {
   }
 }
 
-/** 页面曝光：page 为空则取当前路由 */
+/**
+ * 页面曝光：page 为空则取当前路由
+ * @param page 页面路径；传空字符串即自动取 `currentPagePath()`（页面栈顶路由），
+ *             显式传入的场景一般是「上报的是上一个页面」
+ */
 export function trackPageView(page: string = ''): void {
   const p = page.length > 0 ? page : currentPagePath();
   track('page_view', `{"page":"${p}"}`);
 }
 
-/** 点击埋点 */
+/**
+ * 点击埋点
+ * @param name 点击事件名（建议形如 `btn_login`）；会被直接拼进 `propsJson` 的 `{"name":"..."}`，
+ *             **含双引号会破坏 JSON 结构**，命名请只用字母 / 数字 / 下划线
+ */
 export function trackClick(name: string): void {
   track('click', `{"name":"${name}"}`);
 }

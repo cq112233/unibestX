@@ -11,6 +11,37 @@ declare global {
 
   export interface Uni {
     env?: UniEnv;
+
+    // ==========================================
+    // 补齐 uni-app X 专有的 uni.exit()
+    //
+    // ⚠️ 位置有讲究：必须加在**这里**（`declare global` 顶层的 `interface Uni`），
+    //    写进下方 `namespace UniNamespace { interface Uni {} }` 对全局 `uni` 是**无效**的。
+    //    原因在 @dcloudio/types 的 uni-app/uni/legacy/uni.d.ts：
+    //      · 1~9652 行是 `declare namespace UniNamespace {}`，里面**根本没有** `Uni`；
+    //      · 9659 行 `declare const uni: UniNamespace.Uni;` 引用的 `UniNamespace.Uni` 并不存在
+    //        （skipLibCheck 把它压住了）；
+    //      · 9661~11915 行的**顶层全局 `interface Uni`** 才是真正的 API 面（getAppBaseInfo
+    //        等都在其中，文件末尾还有 `type UniInterface = Uni;` 佐证）。
+    //    实测对比（探针）：`uni.__probeGlobal` 通过、`uni.__probeInNs` 报 TS2339。
+    //    口诀：补 `uni.xxx` → 全局 `interface Uni`；补 `UniNamespace.Xxx` 类型 → namespace 块。
+    //
+    // 真源：HBuilderX @dcloudio/uni-app-x/types/uni/uts-plugin-api/lib/uni-exit/utssdk/interface.d.ts
+    //       exit(options?: ExitOptions | null): void
+    //       平台矩阵（真源 @uniPlatform）：Android 3.8.15+ / iOS uniX 4.33+；鸿蒙与 Web 未标注。
+    //
+    // ⚠️ 选项类型**就地内联**，不新增全局类型名：ExitOptions / ExitSuccess 等在 HBuilderX 侧
+    //    已是全局类型，另起同名声明会在 HBuilderX 的 TS 检查里撞名。
+    // ==========================================
+    /** 退出当前应用（App 端专有，平台矩阵见上方真源说明） */
+    exit: (options?: {
+      /** 退出成功回调，只带统一 errMsg */
+      success?: ((res: { errMsg: string }) => void) | null;
+      /** 退出失败回调；errCode 取值为 12001 / 12002 / 12003 */
+      fail?: ((res: { errCode: number; errMsg?: string }) => void) | null;
+      /** 完成回调，成功与失败都会走 */
+      complete?: ((res: any) => void) | null;
+    } | null) => void;
   }
 
   export interface PageStyle {
@@ -250,15 +281,28 @@ declare global {
   // ==========================================
   // uni-app X / UTS 核心对象与生命周期全局声明
   // ==========================================
-  type UTSJSONObject = Record<string, any> & {
-    getString?: (key: string) => string | null;
-    getNumber?: (key: string) => number | null;
-    getBoolean?: (key: string) => boolean | null;
-    getJSON?: (key: string) => UTSJSONObject | null;
-    getArray?: (key: string) => any[] | null;
-    get?: (key: string) => any;
-    set?: (key: string, value: any) => void;
-  };
+  // UTSJSONObject：UTS 内置的 JSON 对象类型（uni.request 返回体、_serialize/_hydrate 等）。
+  //
+  // ⚠️ 只能声明为纯索引签名（等价 Record<string, any>），不得附加具名方法，否则必踩以下坑：
+  //   - 交叉 + 方法可选（`Record<string, any> & { getString?: ... }`）：
+  //     `obj['k']` / `obj.k` 可用，但 `data.getNumber('id')` 报 TS2722
+  //     「不能调用可能是未定义的对象」（src/api/example.uts 曾如此）。
+  //   - 交叉 + 方法必选（`Record<string, any> & { getString: ... }`）：
+  //     调用可用，但 `{ ... } as UTSJSONObject` 报 TS2352、赋值报 TS2739 / TS2322
+  //     （字面量缺 getString 等必选成员）—— 项目内此类断言逾百处。
+  //     （已实测：TS 的索引签名无法满足具名必选属性，故「必选方法 + 索引签名」也不可行。）
+  //   - 方法集 | Record<string, any>（联合）：调用与断言可用，但 `obj['k']` / `obj.k`
+  //     报 TS7053 / TS2339（联合的每个成员都须具备该索引签名 / 属性）。
+  // 故取纯索引签名：`obj['k']`、`obj.k`、`data.getNumber('id')`、`as UTSJSONObject`、
+  // `= {}` 五种写法全部通过。代价是具名方法调用结果为 any（项目已接受该取舍）。
+  //
+  // ⚠️ 附带代价：**不能给这些方法传泛型实参**。`obj.getArray` 经索引签名解析为 any，
+  //    写 `data.getArray<string>('roles', [])` 会报 TS2347「非类型化函数调用不能接受类型参数」。
+  //    需要元素类型时，改用带类型标注的默认值反推，例如：
+  //      const defaultRoles: Array<string> = [];
+  //      const roles = data.getArray('roles', defaultRoles) ?? defaultRoles;
+  //    （UTS 真源侧 `getArray<T>(key, defaultValue)` 本身支持泛型，仅 TS 侧声明受限。）
+  type UTSJSONObject = Record<string, any>;
   const UTSJSONObject: {
     new (obj?: any): UTSJSONObject;
     (obj?: any): UTSJSONObject;
@@ -266,6 +310,68 @@ declare global {
     values: (obj: any) => any[];
     assign: (target: any, ...sources: any[]) => any;
   };
+
+  // ==========================================
+  // UTS 原生平台全局：UTSAndroid / java（仅 App-Android 的条件编译段内可用）
+  //
+  // 为什么需要补：
+  //   `#ifdef APP-ANDROID` 段里写的不是 `uni.*`，而是 UTS 直通原生的全局
+  //   （src/utils/backPress/index.uts:26、:34）。它们的声明由 HBuilderX 自带的 uts-types
+  //   提供，**不挂在** npm 包 @dcloudio/types 里：
+  //     · UTSAndroid —— HBuilderX plugins/uniapp-uts-v1/uts-types/app-android/UTSAndroid.d.ts
+  //                     文件末尾 `declare global { var UTSAndroid : UTSAndroid; }`；
+  //                     getUniActivity() 真源返回 `Activity | null`（Activity 来自
+  //                     `import Activity from 'android.app.Activity'`）
+  //     · java       —— 同目录 android.d.ts:94141 `declare module java { export module lang {
+  //                     export class System … } }`，其中 `public static exit(param0: number): void`（94173 行）
+  //   项目 tsconfig 的 types 白名单只有 "@dcloudio/types"（uni-app 经典版），故 VSCode / Volar 里
+  //   报 TS2304「找不到名称 "UTSAndroid" / "java"」。ESLint 侧早已豁免（eslint.config.mjs:384-385）。
+  //
+  // 为什么只补这么点：
+  //   HBuilderX 的 android.d.ts 有 13 万行（整棵 Android SDK 类树），UTSAndroid 自己也有 30+ 成员；
+  //   全量搬进来既没必要、又会与上方 UTSJSONObject 这类兜底声明互相打架。此处只补**项目实际用到**的成员，
+  //   将来要用别的（如 UTSAndroid.getTopPageActivity()）再照真源签名逐个加。
+  //
+  // ⚠️ 三条红线（下笔前先看）：
+  //   1) 这两个全局只在 App-Android 存在，调用点必须待在 `#ifdef APP-ANDROID` 内，
+  //      否则 Web / 小程序端直接 ReferenceError；
+  //   2) 类型补好 ≠ 运行时可用：App 的 vapor / uts2js(JS) 层未必实现同名成员
+  //      （UTSAndroid 在 JS 层只覆盖部分成员，见 skill 分册 3 的「3.12」）；
+  //   3) 类型名刻意不叫 `UTSAndroid`（真源里那是 HBuilderX 模块内的 interface），
+  //      避免与真源同名声明在 HBuilderX 侧产生歧义。
+  // ==========================================
+
+  /**
+   * `UTSAndroid.getUniActivity()` 的返回值：`android.app.Activity` 的**最小结构子集**
+   * 真源：android.d.ts:4369 `public finishAffinity(): void`
+   */
+  type UTSAndroidActivity = {
+    /** 关闭当前应用的全部 Activity（带退出动画） */
+    finishAffinity: () => void;
+  };
+
+  /** `UTSAndroid` 全局对象的 TS 侧子集（真源：UTSAndroid.d.ts 的 `interface UTSAndroid`） */
+  type UTSAndroidApi = {
+    /** 获取当前应用栈顶的 Activity 实例（页面未与 Activity 建立绑定等场景可能为 null） */
+    getUniActivity: () => UTSAndroidActivity | null;
+  };
+
+  /**
+   * uni-app X App-Android 原生能力入口（仅 `#ifdef APP-ANDROID` 内可用）。
+   * ⚠️ 真源写的是 `var`，这里用 `const`：一是 ESLint `vars-on-top` 不接受全局 `var`
+   *    （本文件既有的 `const UTSJSONObject` / `const ref` 同理），二是项目内只读不写。
+   */
+  const UTSAndroid: UTSAndroidApi;
+
+  /** Java 互操作命名空间（仅 `#ifdef APP-ANDROID` 内可用）；此处只补退出应用用到的 `System.exit(0)` */
+  namespace java {
+    namespace lang {
+      class System {
+        /** 终止当前 JVM，0 表示正常退出（真源 android.d.ts:94173 `public static exit(param0: number): void`） */
+        static exit(code: number): void;
+      }
+    }
+  }
 
   type OnBackPressOptions = {
     from: 'backbutton' | 'navigateBack';
@@ -576,6 +682,346 @@ declare global {
     scrollToBottom: (animate: boolean) => void;
     scrollToY: (y: number, animate: boolean) => void;
   };
+
+  // ==========================================
+  // uni-app X 原生异步任务类型（uni.request / uploadFile / downloadFile 的返回值）
+  //
+  // 为什么需要补这份声明：
+  //   1) HBuilderX 编辑器与真机编译用的是它自带的 uni-app x dts，其中这三个类型
+  //      已通过 `declare global` 暴露为全局（HBuilderX 内置
+  //      @dcloudio/uni-app-x/types/uni/uts-plugin-api/lib/uni-network/utssdk/global.d.ts:56,70），
+  //      所以 HBuilderX 里裸写 `RequestTask` 不报错。
+  //   2) VSCode / tsconfig 侧挂的是 npm 包 `@dcloudio/types`，它把三者关在
+  //      `declare namespace UniNamespace` 内（base/request.d.ts:1,113），**未提升到全局**，
+  //      于是 .uts 里裸写 `RequestTask` 会报 TS2304「找不到名称」。
+  //   3) 不能改用 `UniNamespace.RequestTask` 绕开：`declare namespace` 只是 TS 的 d.ts 语法，
+  //      并非 UTS 运行时语法，写进 .uts 源码会被 HBuilderX 编译报错。
+  //
+  // 故按 HBuilderX 真源签名补齐全局声明（真源：utssdk/interface.d.ts:1760 起）。
+  // ⚠️ 必须用 `type` 而非 `interface`：scripts/gen-uts-dts.mjs 注明「项目禁用 interface」。
+  // ==========================================
+
+  /** uni.request 的返回值，可用于中断请求、监听响应头 / 分块数据 */
+  type RequestTask = {
+    /** 中断请求任务 */
+    abort: () => void;
+    /** 监听 Transfer-Encoding Chunk Received 事件，返回监听器 id */
+    onChunkReceived: (listener: (result: { data: ArrayBuffer }) => void) => number;
+    /** 移除分块数据监听（不传参则移除全部） */
+    offChunkReceived: (listener?: number | ((result: { data: ArrayBuffer }) => void) | null) => void;
+    /** 监听 HTTP Response Header 事件，返回监听器 id */
+    onHeadersReceived: (listener: (result: { header: any; cookies: string[]; statusCode: number }) => void) => number;
+    /** 移除响应头监听（不传参则移除全部） */
+    offHeadersReceived: (listener?: number | ((result: { header: any; cookies: string[]; statusCode: number }) => void) | null) => void;
+  };
+
+  /** uni.uploadFile 的返回值，可用于中断上传、监听上传进度 */
+  type UploadTask = {
+    /** 中断上传任务 */
+    abort: () => void;
+    /** 监听上传进度变化 */
+    onProgressUpdate: (callback: (result: {
+      progress: number;
+      totalBytesSent: number;
+      totalBytesExpectedToSend: number;
+    }) => void) => void;
+  };
+
+  /** uni.downloadFile 的返回值，可用于中断下载、监听下载进度 */
+  type DownloadTask = {
+    /** 中断下载任务 */
+    abort: () => void;
+    /** 监听下载进度变化 */
+    onProgressUpdate: (callback: (result: {
+      progress: number;
+      totalBytesWritten: number;
+      totalBytesExpectedToWrite: number;
+    }) => void) => void;
+  };
+
+  /** uni.uploadFile 的 onProgressUpdate 回调入参 */
+  type OnProgressUpdateResult = {
+    /** 上传进度百分比 */
+    progress: number;
+    /** 已上传的数据长度，单位 Bytes */
+    totalBytesSent: number;
+    /** 预期需要上传的数据总长度，单位 Bytes */
+    totalBytesExpectedToSend: number;
+  };
+
+  /** uni.downloadFile 的 onProgressUpdate 回调入参 */
+  type OnProgressDownloadResult = {
+    /** 下载进度百分比 */
+    progress: number;
+    /** 已下载的数据长度，单位 Bytes */
+    totalBytesWritten: number;
+    /** 预期需要下载的数据总长度，单位 Bytes */
+    totalBytesExpectedToWrite: number;
+  };
+
+  // ==========================================
+  // uni-app X 路由 API 的 Options 类型（navigateTo / redirectTo / reLaunch / switchTab）
+  //
+  // 为什么要补（与上方 RequestTask 完全同一成因，只是换了个 API 分组）：
+  //   1) HBuilderX 自带 uni-app x dts 已把四者提升为全局
+  //      （HBuilderX 内置 @dcloudio/uni-app-x/types/uni/uts-plugin-api/lib/uni-route/
+  //       utssdk/global.d.ts:65,69,73,80），故 HBuilderX 里写 `options as NavigateToOptions` 不报错；
+  //   2) VSCode / tsconfig 侧挂的 npm 包 `@dcloudio/types` 把四者关在
+  //      `declare namespace UniNamespace` 内（uni/legacy/uni.d.ts:5276 起），**未提升到全局**，
+  //      于是 .uts 里裸写名字报 TS2304「找不到名称」；
+  //   3) 同样不能改用 `UniNamespace.NavigateToOptions` 绕开（`declare namespace` 非 UTS 语法，
+  //      写进 .uts 源码会被 HBuilderX 编译报错）。
+  //
+  // 真源：uni-route/utssdk/interface.d.ts 的 NavigateToOptions:842 / RedirectToOptions:1637 /
+  //       ReLaunchOptions:1919 / SwitchTabOptions:2203；三个回调入参在真源里统一取自
+  //       AsyncApiResult（native/AsyncApiResult.d.ts:5，即 `{ errMsg: string }`），失败回参另带 errCode。
+  // ⚠️ 必须用 `type` 而非 `interface`：scripts/gen-uts-dts.mjs 注明「项目禁用 interface」。
+  // ⚠️ 这里的 `url` 只留 `string`：真源标注是 `string | string.PageURIString`（品牌化字符串），
+  //    UTS 侧可直接赋给 string；VSCode 侧若照抄该联合类型，`url = opt.url` 会反过来报 TS2322。
+  // ==========================================
+
+  /** 路由 API 成功 / 完成回调的入参 */
+  type UniRouteApiResult = {
+    errMsg: string;
+  };
+
+  /** 路由 API 失败回调的入参（真源 errCode 为字面量 `4`，这里放宽为 number） */
+  type UniRouteApiFailResult = {
+    errMsg: string;
+    errCode: number;
+  };
+
+  type NavigateToOptions = {
+    url: string;
+    animationType?:
+      | 'auto'
+      | 'none'
+      | 'slide-in-right'
+      | 'slide-in-left'
+      | 'slide-in-top'
+      | 'slide-in-bottom'
+      | 'fade-in'
+      | 'zoom-out'
+      | 'zoom-fade-out'
+      | 'pop-in'
+      | null;
+    animationDuration?: number | null;
+    events?: any | null;
+    success?: ((result: UniRouteApiResult) => void) | null;
+    fail?: ((result: UniRouteApiFailResult) => void) | null;
+    complete?: ((result: UniRouteApiResult) => void) | null;
+    routeConfig?: any | null;
+    routeOptions?: any | null;
+    routeType?: string | null;
+    withOpenContainer?: any | null;
+  };
+
+  type RedirectToOptions = {
+    url: string;
+    success?: ((result: UniRouteApiResult) => void) | null;
+    fail?: ((result: UniRouteApiFailResult) => void) | null;
+    complete?: ((result: UniRouteApiResult) => void) | null;
+  };
+
+  type ReLaunchOptions = {
+    url: string;
+    success?: ((result: UniRouteApiResult) => void) | null;
+    fail?: ((result: UniRouteApiFailResult) => void) | null;
+    complete?: ((result: UniRouteApiResult) => void) | null;
+  };
+
+  type SwitchTabOptions = {
+    url: string;
+    success?: ((result: UniRouteApiResult) => void) | null;
+    fail?: ((result: UniRouteApiFailResult) => void) | null;
+    complete?: ((result: UniRouteApiResult) => void) | null;
+  };
+
+  // ==========================================
+  // 给 @dcloudio/types 的 UniNamespace.RequestTask 补齐分块接收 API
+  //
+  // `uni.request(...)` 的返回类型是 `UniNamespace.RequestTask`（来自 @dcloudio/types，
+  // 即 Vue2 时代 uni-app 的类型），它只有 abort / onHeadersReceived / offHeadersReceived，
+  // **没有** uni-app X 才有的 `onChunkReceived` —— 于是 stream.uts 里
+  // `task.onChunkReceived(...)` 报 TS2339「RequestTask 上不存在属性 onChunkReceived」。
+  //
+  // 用声明合并（interface 可合并）就地补齐，无需改动 @dcloudio/types。
+  // 真源签名同上方全局 `RequestTask`（HBuilderX 内置 uni-app x dts）。
+  // ==========================================
+  namespace UniNamespace {
+    interface RequestTask {
+      /** 监听 Transfer-Encoding Chunk Received 事件，返回监听器 id */
+      onChunkReceived: (listener: (result: { data: ArrayBuffer }) => void) => number;
+      /** 移除分块数据监听（不传参则移除全部） */
+      offChunkReceived: (listener?: number | ((result: { data: ArrayBuffer }) => void) | null) => void;
+    }
+
+    // ==========================================
+    // 给 @dcloudio/types 的 UniNamespace.GetAppBaseInfoResult 补齐 uni-app X 专有字段
+    //
+    // @dcloudio/types 是 uni-app **经典版**（Vue2 时代）的类型，其 GetAppBaseInfoResult
+    // 只有 appId / appName / appVersion / language / version / hostName ... 这一批，
+    // **整份没有** uni-app X 才返回的 uniPlatform / uniCompilerVersion / uniCompileVersion 等，
+    // 于是 `uni.getAppBaseInfo().uniPlatform` 在 VSCode 里报 TS2339。
+    //
+    // 真源：HBuilderX uni-app x dts
+    //   @dcloudio/uni-app-x/types/uni/uts-plugin-api/lib/uni-getAppBaseInfo/utssdk/interface.d.ts
+    // 该处 GetAppBaseInfoResult 是 `type`（不可合并），故这里对 @dcloudio/types 的同名
+    // `interface` 做声明合并来补齐；字段连同可选性、字面量联合取值一并与真源保持一致。
+    // ==========================================
+    interface GetAppBaseInfoResult {
+      /**
+       * 当前运行平台标识（uni-app X 专有）。
+       * 真源为字面量联合，这里同样精确到取值，便于 isWebOrMpPlatform 一类的判断收敛。
+       */
+      uniPlatform?:
+        | 'app'
+        | 'web'
+        | 'mp-weixin'
+        | 'mp-alipay'
+        | 'mp-baidu'
+        | 'mp-toutiao'
+        | 'mp-lark'
+        | 'mp-qq'
+        | 'mp-kuaishou'
+        | 'mp-jd'
+        | 'mp-360'
+        | 'quickapp-webview'
+        | 'quickapp-webview-union'
+        | 'quickapp-webview-huawei';
+      /** uni 编译器版本号（Android 4.0+ / iOS 4.11+ / 鸿蒙 4.61+ / 微信小程序 4.41+ / Web 4.18+） */
+      uniCompilerVersion?: string;
+      /** uni 编译版本号（支付宝等未实现 uniCompilerVersion 的端由它兜底） */
+      uniCompileVersion?: string;
+      /** uni 运行时版本号 */
+      uniRuntimeVersion?: string;
+      /** 当前是否运行在 uni-app X 环境 */
+      isUniAppX?: boolean;
+    }
+
+    // ==========================================
+    // 给 @dcloudio/types 的 UniNamespace.GetDeviceInfoResult 补齐 uni-app X 专有字段
+    //
+    // 与上方 GetAppBaseInfoResult 同一成因：@dcloudio/types 是 uni-app **经典版**类型，
+    // 其 GetDeviceInfoResult（uni/legacy/uni.d.ts:3213）只有 deviceBrand / deviceModel /
+    // deviceId / deviceType / devicePixelRatio / deviceOrientation / brand / model /
+    // system / platform 这批经典字段，**整份没有** osTheme / osName / osVersion 等
+    // uni-app X 才返回的字段，于是 `uni.getDeviceInfo().osTheme`（src/theme/index.uts:91）
+    // 在 VSCode 里报 TS2339「类型"GetDeviceInfoResult"上不存在属性"osTheme"」。
+    //
+    // 真源：HBuilderX uni-app x dts
+    //   @dcloudio/uni-app-x/types/uni/uts-plugin-api/lib/uni-getDeviceInfo/utssdk/interface.d.ts:21
+    // 该处 GetDeviceInfoResult 是 `type`（不可合并），故这里对 @dcloudio/types 的同名
+    // `interface` 做声明合并来补齐；取值联合、可选性一并与真源保持一致。
+    //
+    // ⚠️ 只列真源**独有**的字段：deviceModel / deviceType / platform 等在经典版已存在，
+    //    重复声明会因两侧类型不同（真源是字面量联合、经典版是 string）触发 TS2717。
+    //    平台矩阵（真源 @uniPlatform）：osTheme —— Android / iOS unixVer 4.18+、
+    //    鸿蒙 4.23+；Web 未实现，故取值需 `?? 'light'` 兜底。
+    // ==========================================
+    interface GetDeviceInfoResult {
+      /** 设备是否为 root（App-Android 4.18+） */
+      isRoot?: boolean;
+      /** 设备是否为模拟器（App 4.18+） */
+      isSimulator?: boolean;
+      /** 设备是否开启 USB 调试（App-Android 4.18+） */
+      isUSBDebugging?: boolean;
+      /** 操作系统名称（App / Web 4.18+，鸿蒙 4.61+；Web 端为浏览器所在系统） */
+      osName?: 'ios' | 'android' | 'harmonyos' | 'macos' | 'windows' | 'linux' | null;
+      /** 操作系统版本号（App / Web 4.18+，鸿蒙 4.61+） */
+      osVersion?: string | null;
+      /** 操作系统语言（App / Web 4.18+，鸿蒙 4.61+） */
+      osLanguage?: string | null;
+      /** 操作系统主题（App-Android / iOS 4.18+、鸿蒙 4.23+；Web 未实现） */
+      osTheme?: 'light' | 'dark' | null;
+      /** Android 系统 API 等级（App-Android 4.18+） */
+      osAndroidAPILevel?: number | null;
+      /** 鸿蒙系统 SDK API 版本（App-鸿蒙 4.23+） */
+      osHarmonySDKAPIVersion?: number | null;
+      /** 鸿蒙系统发行版本（App-鸿蒙 4.23+） */
+      osHarmonyDisplayVersion?: string | null;
+      /** 设备 ROM 名称（App 4.18+） */
+      romName?: string | null;
+      /** 设备 ROM 版本（App 4.18+） */
+      romVersion?: string | null;
+      /** 应用二进制接口类型（App-Android 4.18+） */
+      abi?: string | null;
+      /** 设备 CPU 类型（App-Android / iOS 4.18+） */
+      cpuType?: string | null;
+      /** 设备 ABI（App-Android 4.18+） */
+      deviceAbi?: string | null;
+      /** 设备性能等级（App-Android 4.18+） */
+      benchmarkLevel?: number | null;
+      /** 设备内存大小，单位 MB（App-Android 4.18+） */
+      memorySize?: string | null;
+    }
+  }
+
+  // ==========================================
+  // Vite 环境变量：import.meta.env.*
+  //
+  // 项目 tsconfig 的 `types` 白名单仅含 "@dcloudio/types"（未引入 "vite/client"），
+  // 故 VSCode / tsc 下 `import.meta.env.VITE_*` 报 TS2339「ImportMeta 上不存在 env」。
+  // 此处按 vite/client 的声明形式补齐。
+  //
+  // ⚠️ 必须用 interface 以与 lib.es5 的全局 `interface ImportMeta` 做声明合并，
+  //    改成 type 会因重名报错（interface 可合并，type 不可）。
+  // ==========================================
+  interface ImportMetaEnv {
+    readonly [key: string]: any;
+    readonly BASE_URL: string;
+    readonly MODE: string;
+    readonly DEV: boolean;
+    readonly PROD: boolean;
+    readonly SSR: boolean;
+
+    // —— 以下为项目自定义变量（真源：仓库根 .env / .env.development / .env.production / .env.test）
+    // ⚠️ 一律声明为可选：同一变量并非每个模式文件都有（如 VITE_ENV_NAME 只在 .development/.test/.production 中），
+    //    且 .env 中被注释掉的项在运行时确实不存在。声明为必选会让 `${x ?? 'default'}` 的兜底写法失去意义，
+    //    并可能触发 no-unnecessary-condition 类告警。
+
+    // 取自 .env
+    readonly VITE_APP_TITLE?: string;
+    readonly VITE_APP_VERSION?: string;
+    readonly VITE_DEFAULT_LOCALE?: string;
+    readonly VITE_DEFAULT_THEME?: string;
+    readonly VITE_DEFAULT_THEME_MODE?: string;
+    readonly VITE_DEV_SANDBOX?: string;
+    readonly VITE_DEV_SANDBOX_PAGES?: string;
+    readonly VITE_H5_USE_PROXY?: string;
+    readonly VITE_SHOW_VCONSOLE?: string;
+    readonly VITE_STREAM_URL?: string;
+    readonly VITE_TABBAR_MODE?: string;
+    readonly VITE_USE_MOCK?: string;
+
+    // 取自 .env.development / .env.production / .env.test
+    readonly VITE_ENV_NAME?: string;
+    readonly VITE_ENV_TYPE?: string;
+    readonly VITE_SERVER_BASEURL?: string;
+    readonly VITE_SERVER_BASEURL_SECONDARY?: string;
+    readonly VITE_UPLOAD_BASEURL?: string;
+    readonly VITE_UPLOAD_PATH?: string;
+
+    // 非 .env 声明，由 vite 构建期插件注入
+    readonly VITE_BUILD_TIME?: string;
+    readonly VITE_GIT_BRANCH?: string;
+    readonly VITE_GIT_COMMIT_HASH?: string;
+  }
+
+  interface ImportMeta {
+    readonly env: ImportMetaEnv;
+  }
+
+  // ==========================================
+  // UTS 扩展的 JSON 静态方法
+  //
+  // HBuilderX 内置 UTS 运行时提供 `JSON.parseObject`（把字符串解析为 UTSJSONObject，
+  // 解析失败返回 null），但 @dcloudio/types 未覆盖。此处合并进全局 JSON 接口。
+  // 真源用法：src/store/vdom/i18n.uts:16、src/http/request/request.uts:124 等。
+  // ==========================================
+  interface JSON {
+    parseObject: (text: string) => any;
+  }
 }
 
 declare module '*.uvue' {

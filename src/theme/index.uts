@@ -157,6 +157,8 @@ function mapTabBorderStyle(value: string, isDark: boolean): string {
 
 /**
  * 获取亮 / 暗模式对应的主题色板（直接读取 theme.json，单源）
+ * @param isDark true 取 theme.json 的 `dark` 段、false 取 `light` 段；
+ *               纯读取、**不会切换主题**，切换请用 `useThemeStore().setThemeMode()`
  */
 export function getThemeTokens(isDark: boolean): ThemeTokens {
   const themeData = themeJson as UTSJSONObject;
@@ -262,6 +264,8 @@ export function applyThemeMode(mode: string, isDark: boolean): void {
  *
  * 注意：navigationStyle: custom 的页面没有 uni-page-head（或为空），H5 端自动跳过，
  * 小程序端 setNavigationBarColor 仅 frontColor（状态栏文字）会生效，符合预期。
+ * @param isDark 当前**实际生效**的亮暗标识（应传运行时状态，而非用户偏好设置）；
+ *               App 端（Android / iOS / 鸿蒙）本函数不处理 —— 主题由 `uni.setAppTheme` 系统级切换，原生导航栏自动跟随
  */
 export function applyNavbarTheme(isDark: boolean): void {
   const tokens = getThemeTokens(isDark);

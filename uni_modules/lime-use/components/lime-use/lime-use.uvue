@@ -1,0 +1,28 @@
+<!-- lime-use 组件示例容器 -->
+<!-- 这是一个容器组件，用于展示 lime-use 模块中的各种组合式函数示例 -->
+<template>
+	<view class="p-4">
+		<text class="text-2xl font-bold mb-2">lime-use</text>
+		<text class="text-sm text-gray-5 mb-4">组合式函数集合，提供常用的 Vue 组合式 API 工具。</text>
+		<view>
+			<!-- 导入 useCodeTimer 示例 -->
+			<!-- <use-code-timer-example /> -->
+			
+			<!-- 导入 useTransition 示例 -->
+			<use-transition-example />
+		</view>
+	</view>
+</template>
+
+<script setup>
+	defineOptions({
+		styleIsolation: 'app-and-page'
+	})
+	// 导入示例组件
+	// import UseCodeTimerExample from './use-code-timer-example.uvue'
+	// import UseTransitionExample from './use-transition-example.uvue'
+</script>
+
+<style lang="scss">
+	@import '@/uni_modules/lime-style/atomic.scss';
+</style>

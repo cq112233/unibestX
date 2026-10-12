@@ -30,27 +30,47 @@ export const TABBAR_BASE_HEIGHT: number = 50;
  *    「wx.getSystemInfoSync is deprecated. Please use wx.getSystemSetting / wx.getDeviceInfo /
  *    wx.getWindowInfo / wx.getAppBaseInfo instead」告警。这里改为编译期条件编译注入常量：
  *    零运行时桥接开销，且与 `getCompilePlatform()` 的平台分流口径保持一致。
+ *
+ * ⚠️ 条件编译段内只赋值、最后统一 return：写成「每个 `#ifdef` 里各自 return」会被 TS 判成
+ *    「不可达代码」（TS7027），编辑器整片变灰（理由见 `src/config/env/env.uts` 的 isVaporMode()）。
+ *
+ * ⚠️ 赋值必须带「空值哨兵」判断：真编译会按平台剔除分支，只剩一支生效；但单测（vitest）环境
+ *    不做条件编译剔除，`#ifdef` 只是普通注释，所有分支都会执行 —— 那时必须是**第一个命中的分支生效**，
+ *    才与原来的 `#ifdef ... return` 语义一致（否则最后一个分支会覆盖前面的，测试里平台判断全错）。
  */
 function resolveCurrentPlatform(): string {
+  let platform = '';
   // #ifdef APP-ANDROID
-  return 'app-android';
+  if (platform == '') {
+    platform = 'app-android';
+  }
   // #endif
   // #ifdef APP-IOS
-  return 'app-ios';
+  if (platform == '') {
+    platform = 'app-ios';
+  }
   // #endif
   // #ifdef APP-HARMONY
-  return 'app-harmony';
+  if (platform == '') {
+    platform = 'app-harmony';
+  }
   // #endif
   // #ifdef H5
-  return 'web';
+  if (platform == '') {
+    platform = 'web';
+  }
   // #endif
   // #ifdef MP-WEIXIN
-  return 'mp-weixin';
+  if (platform == '') {
+    platform = 'mp-weixin';
+  }
   // #endif
   // #ifdef MP-ALIPAY
-  return 'mp-alipay';
+  if (platform == '') {
+    platform = 'mp-alipay';
+  }
   // #endif
-  return '';
+  return platform;
 }
 
 const currentPlatform: string = resolveCurrentPlatform();
@@ -280,6 +300,13 @@ function resolveCompilerVersion(): string {
   return '1.0.0';
 }
 
+/**
+ * 拉取并刷新全局系统信息（屏幕尺寸 / 设备品牌型号 / 编译器版本 / 安全区 / 胶囊位置等），
+ * 重新计算后写入 `systemInfo` ref，并递增导出的 `systemId`（供需要感知重算的调用方比对）
+ *
+ * 无入参。App.ku.uvue 启动时、以及每次 `updateAvailableHeight` 前都会调用，业务侧一般无需直接调；
+ * 设备信息取不到时不抛错，降级为空字符串继续
+ */
 export function updateSystemInfo() {
   // 窗口信息：所有平台统一从 uni.getWindowInfo() 读取
   const windowInfo = uni.getWindowInfo();
@@ -371,6 +398,9 @@ export function updateSystemInfo() {
 
 /**
  * 判断当前 HBuilderX / uni-app 编译器版本是否大于等于指定版本（如 '5.25' 或 '4.25'）
+ * @param targetVersion 目标版本号，**点分数字**形式（如 `'5.25'` / `'4.25'`）；
+ *                      与当前编译器版本按段逐位比大小，缺位按 0 补齐，故 `'5.2'` 与 `'5.20'` 等价。
+ *                      取不到当前版本（空串）时**直接返回 false**
  */
 export function isCompilerVersionGte(targetVersion: string): boolean {
   const current = systemInfo.value?.compilerVersion ?? '';
@@ -449,7 +479,20 @@ export type AppKuHeightProps = {
   layout: string;
 };
 
-// 参考这个计算得出 https://doc.dcloud.net.cn/uni-app-x/api/get-window-info.html#%E8%BF%94%E5%9B%9E%E5%80%BC
+/**
+ * 重算并写回可用高度 `systemInfo.value.availableHeight`
+ *
+ * 入参语义与 `AppKuHeightProps` 各字段一一对应，由 App.ku.uvue 编译期注入后调用；
+ * 业务页面**不要自己调**，读高度用 `systemInfo.value.availableHeight` 即可。
+ * 参考：https://doc.dcloud.net.cn/uni-app-x/api/get-window-info.html#返回值
+ *
+ * @param hideNavbar true = 页面隐藏了导航栏，可用高度不扣 `navBarHeight`
+ * @param hideStatusBar true = 不扣状态栏高度 `safeTop`
+ * @param pageStyle 页面 style 配置对象，取其中的 `navigationStyle`；为 `'custom'` 时按自定义导航栏处理
+ * @param layout 页面布局模板标识；**不是 `'navbar'`**（default 等无导航布局）时状态栏与导航栏都不扣除
+ * @param selectedTabbarStrategy TabBar 策略值（取值见 `TABBAR_STRATEGY_MAP`）：0(NO_TABBAR) 与
+ *                               4(SINGLE_PAGE_TABBAR) 不扣 TabBar 高度并补偿底部安全区，其余值按 `tabBarHeight` 扣除
+ */
 export function updateAvailableHeight(
   hideNavbar: boolean,
   hideStatusBar: boolean,

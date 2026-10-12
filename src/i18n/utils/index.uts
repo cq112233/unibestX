@@ -16,6 +16,12 @@ export function t(key: string, named: UTSJSONObject | null = null): string {
   return (res != null && res.length > 0) ? res : key;
 }
 
+/**
+ * 模板内可直接调用的翻译别名（`t` 的同义封装，行为完全一致；脚本里请直接用 `t`）
+ * @param key 翻译 key，**未命中翻译时原样返回 key 本身**（不抛错也不返回空串，方便肉眼发现漏配）
+ * @param named 命名插值参数（对应文案里 `{name}` 形式的占位符），传 null 表示该文案无插值
+ * @returns 翻译文案；key 不存在时返回 key 原文
+ */
 export function $t(key: string, named: UTSJSONObject | null = null): string {
   return t(key, named);
 }

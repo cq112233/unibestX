@@ -14,6 +14,9 @@ function handleClickBulge(url: string = '/src/pages/ai/ai'): void {
  * - 模式 1 / 模式 2 (具备原生底座配置)：调用 uni.switchTab，保留页面缓存
  * - 模式 0 / 模式 3 (无原生配置)：调用 uni.redirectTo
  * 内部自动同步激活索引
+ * @param url 目标 tabbar 页面地址，**必须带前导斜杠**且已在 pages.json 的 tabBar 中声明；
+ *            单一 tabbar（单页仿真）模式下该参数被忽略——固定回首页而不跳转；
+ *            沙盒调试时目标页未编译，会退化为 toast 提示而非崩溃
  */
 export function switchTabbar(url: string): void {
   setCurIdxByPath(url);
@@ -21,7 +24,7 @@ export function switchTabbar(url: string): void {
     try {
       const pages = getCurrentPages();
       if (pages.length > 0) {
-        const currentRoute = pages[pages.length - 1].route;
+        const currentRoute = pages[pages.length - 1].route as string;
         const normalizedRoute = currentRoute.startsWith('/') ? currentRoute : `/${currentRoute}`;
         if (normalizedRoute == '/pages/index/index' || normalizedRoute == '/src/pages/index/index') {
           return;
@@ -76,7 +79,11 @@ export function switchTabbar(url: string): void {
 /** 路由切换节流锁，防止快速连击导致原生视图切换重叠错乱 */
 let isSwitchingTab = false;
 
-/** 点击 tab 切换路由跳转逻辑 */
+/**
+ * 点击 tab 切换路由跳转逻辑
+ * @param index 被点击的 tab 下标，**从 0 开始、对应 tabbarList 的顺序**（不是页面栈下标）；
+ *              以下情况会被静默忽略：与当前激活项相同、下标越界、或落在 250ms 防连击锁内
+ */
 export function handleTabbarClick(index: number): void {
   if (index == curIdx.value || isSwitchingTab) {
     return;

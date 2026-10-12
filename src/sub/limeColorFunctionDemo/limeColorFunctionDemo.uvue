@@ -1,0 +1,321 @@
+<template>
+  <view class="flex flex-col items-center flex-1 px-[16px] pt-[12px] pb-[24px]">
+    <scroll-view direction="vertical" class="w-full flex flex-col flex-1" :style="{ maxWidth: '560px' }">
+      <!-- 模块说明：来源与演示范围 -->
+      <view class="w-full rounded-[16px] bg-[#ffffff] border-[1px] border-solid border-[#e2e8f0] p-[16px] mb-[12px]">
+        <text class="text-[15px] font-bold text-[#1e293b]">lime-color 颜色工具</text>
+        <text class="text-[12px] leading-[18px] text-[#64748b] mt-[6px]">uni_modules/lime-color 是 tinycolor 的 UTS 版：多格式解析、颜色空间互转、亮度饱和度调整、配色方案生成与 Ant Design 主题色阶，原生端可直接调用。</text>
+      </view>
+
+      <!-- 1. 颜色解析与格式转换 -->
+      <view class="w-full rounded-[16px] bg-[#ffffff] border-[1px] border-solid border-[#e2e8f0] p-[16px] mb-[12px]">
+        <view class="flex flex-row items-center mb-[10px]">
+          <view class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#2563eb]" />
+          <text class="text-[14px] font-bold text-[#1e293b]">1. 颜色解析与格式转换</text>
+        </view>
+
+        <!-- 基色选择：同一个实例换基色，下面所有结果实时跟着变 -->
+        <view class="flex flex-row items-center mb-[12px]">
+          <text class="text-[12px] text-[#64748b] mr-[8px]">基色</text>
+          <view
+            v-for="(item, idx) in baseColors"
+            :key="idx"
+            class="w-[26px] h-[26px] rounded-[8px] border-[1px] border-solid border-[#e2e8f0] mr-[8px]"
+            :style="{ backgroundColor: item }"
+            @click="onSelectBaseColor(item)"
+          />
+          <text class="text-[12px] font-bold text-[#1e293b]" style="font-family: monospace;">{{ baseColor }}</text>
+        </view>
+
+        <view class="flex flex-row items-center justify-between mb-[6px]">
+          <text class="text-[12px] text-[#64748b]">toHexString()</text>
+          <text class="text-[12px] font-bold text-[#2563eb]" style="font-family: monospace;">{{ baseHexString }}</text>
+        </view>
+        <view class="flex flex-row items-center justify-between mb-[6px]">
+          <text class="text-[12px] text-[#64748b]">toHex8String()（带透明度）</text>
+          <text class="text-[12px] font-bold text-[#2563eb]" style="font-family: monospace;">{{ baseHex8String }}</text>
+        </view>
+        <view class="flex flex-row items-center justify-between mb-[6px]">
+          <text class="text-[12px] text-[#64748b]">toRgbString()</text>
+          <text class="text-[12px] font-bold text-[#2563eb]" style="font-family: monospace;">{{ baseRgbString }}</text>
+        </view>
+        <view class="flex flex-row items-center justify-between mb-[6px]">
+          <text class="text-[12px] text-[#64748b]">toPercentageRgbString()</text>
+          <text class="text-[12px] font-bold text-[#2563eb]" style="font-family: monospace;">{{ basePercentageRgbString }}</text>
+        </view>
+        <view class="flex flex-row items-center justify-between mb-[6px]">
+          <text class="text-[12px] text-[#64748b]">toHslString()</text>
+          <text class="text-[12px] font-bold text-[#2563eb]" style="font-family: monospace;">{{ baseHslString }}</text>
+        </view>
+        <view class="flex flex-row items-center justify-between mb-[6px]">
+          <text class="text-[12px] text-[#64748b]">toHsvString()</text>
+          <text class="text-[12px] font-bold text-[#2563eb]" style="font-family: monospace;">{{ baseHsvString }}</text>
+        </view>
+        <view class="flex flex-row items-center justify-between mb-[6px]">
+          <text class="text-[12px] text-[#64748b]">toHsbString()</text>
+          <text class="text-[12px] font-bold text-[#2563eb]" style="font-family: monospace;">{{ baseHsbString }}</text>
+        </view>
+        <view class="flex flex-row items-center justify-between">
+          <text class="text-[12px] text-[#64748b]">toName()</text>
+          <text class="text-[12px] font-bold text-[#2563eb]" style="font-family: monospace;">{{ baseNameText }}</text>
+        </view>
+      </view>
+
+      <!-- 2. 颜色修改：调亮调暗、饱和度、色相旋转与混色 -->
+      <view class="w-full rounded-[16px] bg-[#ffffff] border-[1px] border-solid border-[#e2e8f0] p-[16px] mb-[12px]">
+        <view class="flex flex-row items-center mb-[10px]">
+          <view class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#7c3aed]" />
+          <text class="text-[14px] font-bold text-[#1e293b]">2. 颜色修改</text>
+        </view>
+
+        <view class="flex flex-row items-center mb-[8px]">
+          <text class="text-[12px] text-[#64748b] w-[132px]">lighten(20) 调亮</text>
+          <view class="w-[22px] h-[22px] rounded-[6px] border-[1px] border-solid border-[#e2e8f0] mr-[8px]" :style="{ backgroundColor: lightenHex }" />
+          <text class="text-[12px] text-[#1e293b]" style="font-family: monospace;">{{ lightenHex }}</text>
+        </view>
+        <view class="flex flex-row items-center mb-[8px]">
+          <text class="text-[12px] text-[#64748b] w-[132px]">darken(20) 调暗</text>
+          <view class="w-[22px] h-[22px] rounded-[6px] border-[1px] border-solid border-[#e2e8f0] mr-[8px]" :style="{ backgroundColor: darkenHex }" />
+          <text class="text-[12px] text-[#1e293b]" style="font-family: monospace;">{{ darkenHex }}</text>
+        </view>
+        <view class="flex flex-row items-center mb-[8px]">
+          <text class="text-[12px] text-[#64748b] w-[132px]">brighten(20) 提亮</text>
+          <view class="w-[22px] h-[22px] rounded-[6px] border-[1px] border-solid border-[#e2e8f0] mr-[8px]" :style="{ backgroundColor: brightenHex }" />
+          <text class="text-[12px] text-[#1e293b]" style="font-family: monospace;">{{ brightenHex }}</text>
+        </view>
+        <view class="flex flex-row items-center mb-[8px]">
+          <text class="text-[12px] text-[#64748b] w-[132px]">saturate(20) 加饱和</text>
+          <view class="w-[22px] h-[22px] rounded-[6px] border-[1px] border-solid border-[#e2e8f0] mr-[8px]" :style="{ backgroundColor: saturateHex }" />
+          <text class="text-[12px] text-[#1e293b]" style="font-family: monospace;">{{ saturateHex }}</text>
+        </view>
+        <view class="flex flex-row items-center mb-[8px]">
+          <text class="text-[12px] text-[#64748b] w-[132px]">desaturate(20) 降饱和</text>
+          <view class="w-[22px] h-[22px] rounded-[6px] border-[1px] border-solid border-[#e2e8f0] mr-[8px]" :style="{ backgroundColor: desaturateHex }" />
+          <text class="text-[12px] text-[#1e293b]" style="font-family: monospace;">{{ desaturateHex }}</text>
+        </view>
+        <view class="flex flex-row items-center mb-[8px]">
+          <text class="text-[12px] text-[#64748b] w-[132px]">spin(180) 转色相</text>
+          <view class="w-[22px] h-[22px] rounded-[6px] border-[1px] border-solid border-[#e2e8f0] mr-[8px]" :style="{ backgroundColor: spinHex }" />
+          <text class="text-[12px] text-[#1e293b]" style="font-family: monospace;">{{ spinHex }}</text>
+        </view>
+        <view class="flex flex-row items-center mb-[8px]">
+          <text class="text-[12px] text-[#64748b] w-[132px]">greyscale() 灰度</text>
+          <view class="w-[22px] h-[22px] rounded-[6px] border-[1px] border-solid border-[#e2e8f0] mr-[8px]" :style="{ backgroundColor: greyscaleHex }" />
+          <text class="text-[12px] text-[#1e293b]" style="font-family: monospace;">{{ greyscaleHex }}</text>
+        </view>
+        <view class="flex flex-row items-center">
+          <text class="text-[12px] text-[#64748b] w-[132px]">mix('#ffffff', 50)</text>
+          <view class="w-[22px] h-[22px] rounded-[6px] border-[1px] border-solid border-[#e2e8f0] mr-[8px]" :style="{ backgroundColor: mixWhiteHex }" />
+          <text class="text-[12px] text-[#1e293b]" style="font-family: monospace;">{{ mixWhiteHex }}</text>
+        </view>
+      </view>
+
+      <!-- 3. 亮度判断与半透明叠加 -->
+      <view class="w-full rounded-[16px] bg-[#ffffff] border-[1px] border-solid border-[#e2e8f0] p-[16px] mb-[12px]">
+        <view class="flex flex-row items-center mb-[10px]">
+          <view class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#0d9488]" />
+          <text class="text-[14px] font-bold text-[#1e293b]">3. 亮度判断与半透明叠加</text>
+        </view>
+
+        <view class="flex flex-row items-center justify-between mb-[6px]">
+          <text class="text-[12px] text-[#64748b]">getBrightness() 0-255</text>
+          <text class="text-[12px] font-bold text-[#0f766e]" style="font-family: monospace;">{{ brightnessText }}</text>
+        </view>
+        <view class="flex flex-row items-center justify-between mb-[6px]">
+          <text class="text-[12px] text-[#64748b]">getLuminance() 0-1</text>
+          <text class="text-[12px] font-bold text-[#0f766e]" style="font-family: monospace;">{{ luminanceText }}</text>
+        </view>
+        <view class="flex flex-row items-center justify-between mb-[6px]">
+          <text class="text-[12px] text-[#64748b]">isDark() / isLight()</text>
+          <text class="text-[12px] font-bold text-[#0f766e]" style="font-family: monospace;">{{ darkLightText }}</text>
+        </view>
+        <view class="flex flex-row items-center justify-between mb-[6px]">
+          <text class="text-[12px] text-[#64748b]">isMonochrome()</text>
+          <text class="text-[12px] font-bold text-[#0f766e]" style="font-family: monospace;">{{ monochromeText }}</text>
+        </view>
+        <view class="flex flex-row items-center justify-between mb-[12px]">
+          <text class="text-[12px] text-[#64748b]">getAlpha()</text>
+          <text class="text-[12px] font-bold text-[#0f766e]" style="font-family: monospace;">{{ alphaText }}</text>
+        </view>
+
+        <text class="text-[12px] text-[#64748b]">setAlpha(0.4) 后的颜色贴在浅色 / 深色背景上的实际观感：</text>
+        <view class="flex flex-row items-center mt-[8px]">
+          <view class="w-[56px] h-[36px] rounded-[8px] mr-[10px] flex flex-row items-center justify-center bg-[#ffffff] border-[1px] border-solid border-[#e2e8f0]">
+            <view class="w-[40px] h-[24px] rounded-[6px]" :style="{ backgroundColor: halfAlphaRgb }" />
+          </view>
+          <text class="text-[12px] text-[#64748b]">{{ halfAlphaRgb }}</text>
+        </view>
+        <view class="flex flex-row items-center mt-[8px]">
+          <view class="w-[56px] h-[36px] rounded-[8px] mr-[10px] flex flex-row items-center justify-center bg-[#f8fafc] border-[1px] border-solid border-[#e2e8f0]">
+            <view class="w-[40px] h-[24px] rounded-[6px]" :style="{ backgroundColor: onLightBackgroundHex }" />
+          </view>
+          <text class="text-[12px] text-[#64748b]">onBackground('#ffffff')：{{ onLightBackgroundHex }}</text>
+        </view>
+        <view class="flex flex-row items-center mt-[8px]">
+          <view class="w-[56px] h-[36px] rounded-[8px] mr-[10px] flex flex-row items-center justify-center bg-[#0f172a] border-[1px] border-solid border-[#334155]">
+            <view class="w-[40px] h-[24px] rounded-[6px]" :style="{ backgroundColor: onDarkBackgroundHex }" />
+          </view>
+          <text class="text-[12px] text-[#64748b]">onBackground('#0f172a')：{{ onDarkBackgroundHex }}</text>
+        </view>
+      </view>
+
+      <!-- 4. 配色方案：补色、三角、四角、相似色与单色系列 -->
+      <view class="w-full rounded-[16px] bg-[#ffffff] border-[1px] border-solid border-[#e2e8f0] p-[16px] mb-[12px]">
+        <view class="flex flex-row items-center mb-[10px]">
+          <view class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#d97706]" />
+          <text class="text-[14px] font-bold text-[#1e293b]">4. 配色方案</text>
+        </view>
+
+        <text class="text-[12px] text-[#64748b]">complement() 补色</text>
+        <view class="flex flex-row items-center mt-[6px] mb-[6px]">
+          <view v-for="(item, idx) in complementColors" :key="idx" class="flex-1 h-[28px] rounded-[6px] mr-[4px]" :style="{ backgroundColor: item }" />
+        </view>
+        <text class="text-[11px] text-[#94a3b8] leading-[16px] mb-[10px]" style="font-family: monospace;">{{ complementText }}</text>
+
+        <text class="text-[12px] text-[#64748b]">triad() 三角配色</text>
+        <view class="flex flex-row items-center mt-[6px] mb-[6px]">
+          <view v-for="(item, idx) in triadColors" :key="idx" class="flex-1 h-[28px] rounded-[6px] mr-[4px]" :style="{ backgroundColor: item }" />
+        </view>
+        <text class="text-[11px] text-[#94a3b8] leading-[16px] mb-[10px]" style="font-family: monospace;">{{ triadText }}</text>
+
+        <text class="text-[12px] text-[#64748b]">tetrad() 四角配色</text>
+        <view class="flex flex-row items-center mt-[6px] mb-[6px]">
+          <view v-for="(item, idx) in tetradColors" :key="idx" class="flex-1 h-[28px] rounded-[6px] mr-[4px]" :style="{ backgroundColor: item }" />
+        </view>
+        <text class="text-[11px] text-[#94a3b8] leading-[16px] mb-[10px]" style="font-family: monospace;">{{ tetradText }}</text>
+
+        <text class="text-[12px] text-[#64748b]">analogous(6) 相似色</text>
+        <view class="flex flex-row items-center mt-[6px] mb-[6px]">
+          <view v-for="(item, idx) in analogousColors" :key="idx" class="flex-1 h-[28px] rounded-[6px] mr-[4px]" :style="{ backgroundColor: item }" />
+        </view>
+        <text class="text-[11px] text-[#94a3b8] leading-[16px] mb-[10px]" style="font-family: monospace;">{{ analogousText }}</text>
+
+        <text class="text-[12px] text-[#64748b]">monochromatic(6) 单色系列</text>
+        <view class="flex flex-row items-center mt-[6px] mb-[6px]">
+          <view v-for="(item, idx) in monochromaticColors" :key="idx" class="flex-1 h-[28px] rounded-[6px] mr-[4px]" :style="{ backgroundColor: item }" />
+        </view>
+        <text class="text-[11px] text-[#94a3b8] leading-[16px]" style="font-family: monospace;">{{ monochromaticText }}</text>
+      </view>
+
+      <!-- 5. 主题色阶生成：Ant Design 颜色等级算法 -->
+      <view class="w-full rounded-[16px] bg-[#ffffff] border-[1px] border-solid border-[#e2e8f0] p-[16px] mb-[12px]">
+        <view class="flex flex-row items-center mb-[10px]">
+          <view class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#059669]" />
+          <text class="text-[14px] font-bold text-[#1e293b]">5. 主题色阶生成</text>
+        </view>
+        <text class="text-[12px] leading-[18px] text-[#64748b]">generate(color) 按 Ant Design 算法产出 10 档色阶（5 档浅色 + 主色 + 4 档深色），常用于生成设计系统的主题色板。</text>
+
+        <text class="text-[12px] text-[#64748b] mt-[10px]">generate(baseColor) 默认主题</text>
+        <view class="flex flex-row items-center mt-[6px]">
+          <view v-for="(item, idx) in defaultThemeColors" :key="idx" class="flex-1 h-[32px] mr-[3px]" :style="{ backgroundColor: item }" />
+        </view>
+
+        <text class="text-[12px] text-[#64748b] mt-[12px]">generate(baseColor, { theme: 'dark' }) 深色主题</text>
+        <view class="flex flex-row items-center mt-[6px]">
+          <view v-for="(item, idx) in darkThemeColors" :key="idx" class="flex-1 h-[32px] mr-[3px]" :style="{ backgroundColor: item }" />
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed, ref } from 'vue';
+import { generate, tinyColor } from '@/uni_modules/lime-color';
+import type { TinyColor } from '@/uni_modules/lime-color';
+
+definePage({
+  debug: false,
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
+  style: {
+    navigationBarTitleText: 'lime-color 颜色工具',
+    navigationStyle: 'custom'
+  }
+});
+
+// =========================================================================
+// 【可选删除】以下内容仅供 lime-color 演示使用，接入真实业务时可整段删除。
+// 演示参数属于「页面结构级只读常量」（随页面固化、不由后端下发），故内联在本文件。
+// =========================================================================
+/** 可切换的基色，用于观察各方法随基色变化的效果 */
+const BASE_COLORS: Array<string> = ['#3b82f6', '#ef4444', '#10b981', '#a855f7'];
+/** 混色演示的另一个颜色（与白色对半混） */
+const MIX_TARGET: string = '#ffffff';
+/** 半透明叠加演示的两个背景色 */
+const LIGHT_BACKGROUND: string = '#ffffff';
+const DARK_BACKGROUND: string = '#0f172a';
+
+const baseColors: Array<string> = BASE_COLORS;
+const baseColor = ref<string>('#3b82f6');
+
+// —— 基色实例：换一次基色，下面所有转换与操作结果都重新计算
+const baseColorInstance = computed((): TinyColor => tinyColor(baseColor.value));
+const halfAlphaColor = computed((): TinyColor => tinyColor(baseColor.value).setAlpha(0.4));
+
+/** 把颜色数组拼成一行便于读的 hex 文本 */
+function toHexLine(colors: Array<string>): string {
+  return colors.join(' ');
+}
+
+/** TinyColor 数组统一转成 hex 字符串数组，模板只渲染字符串 */
+function toHexList(list: Array<TinyColor>): Array<string> {
+  return list.map((item: TinyColor): string => item.toHexString());
+}
+
+// —— 第 1 张卡：格式转换
+const baseHexString = computed((): string => baseColorInstance.value.toHexString());
+const baseHex8String = computed((): string => baseColorInstance.value.toHex8String());
+const baseRgbString = computed((): string => baseColorInstance.value.toRgbString());
+const basePercentageRgbString = computed((): string => baseColorInstance.value.toPercentageRgbString());
+const baseHslString = computed((): string => baseColorInstance.value.toHslString());
+const baseHsvString = computed((): string => baseColorInstance.value.toHsvString());
+const baseHsbString = computed((): string => baseColorInstance.value.toHsbString());
+const baseNameText = computed((): string => baseColorInstance.value.toName() ?? '（无对应颜色名）');
+
+// —— 第 2 张卡：颜色修改
+const lightenHex = computed((): string => baseColorInstance.value.lighten(20).toHexString());
+const darkenHex = computed((): string => baseColorInstance.value.darken(20).toHexString());
+const brightenHex = computed((): string => baseColorInstance.value.brighten(20).toHexString());
+const saturateHex = computed((): string => baseColorInstance.value.saturate(20).toHexString());
+const desaturateHex = computed((): string => baseColorInstance.value.desaturate(20).toHexString());
+const spinHex = computed((): string => baseColorInstance.value.spin(180).toHexString());
+const greyscaleHex = computed((): string => baseColorInstance.value.greyscale().toHexString());
+const mixWhiteHex = computed((): string => baseColorInstance.value.mix(MIX_TARGET, 50).toHexString());
+
+// —— 第 3 张卡：亮度判断与半透明叠加
+const brightnessText = computed((): string => Math.round(baseColorInstance.value.getBrightness()).toString());
+const luminanceText = computed((): string => (Math.round(baseColorInstance.value.getLuminance() * 1000) / 1000).toString());
+const darkLightText = computed((): string => baseColorInstance.value.isDark() ? '深色' : '浅色');
+const monochromeText = computed((): string => baseColorInstance.value.isMonochrome() ? '是' : '否');
+const alphaText = computed((): string => halfAlphaColor.value.getAlpha().toString());
+const halfAlphaRgb = computed((): string => halfAlphaColor.value.toRgbString());
+const onLightBackgroundHex = computed((): string => halfAlphaColor.value.onBackground(LIGHT_BACKGROUND).toHexString());
+const onDarkBackgroundHex = computed((): string => halfAlphaColor.value.onBackground(DARK_BACKGROUND).toHexString());
+
+// —— 第 4 张卡：配色方案
+const complementColors = computed((): Array<string> => [baseColorInstance.value.complement().toHexString()]);
+const complementText = computed((): string => toHexLine(complementColors.value));
+const triadColors = computed((): Array<string> => toHexList(baseColorInstance.value.triad()));
+const triadText = computed((): string => toHexLine(triadColors.value));
+const tetradColors = computed((): Array<string> => toHexList(baseColorInstance.value.tetrad()));
+const tetradText = computed((): string => toHexLine(tetradColors.value));
+const analogousColors = computed((): Array<string> => toHexList(baseColorInstance.value.analogous(6)));
+const analogousText = computed((): string => toHexLine(analogousColors.value));
+const monochromaticColors = computed((): Array<string> => toHexList(baseColorInstance.value.monochromatic(6)));
+const monochromaticText = computed((): string => toHexLine(monochromaticColors.value));
+
+// —— 第 5 张卡：主题色阶
+const defaultThemeColors = computed((): Array<string> => generate(baseColor.value));
+const darkThemeColors = computed((): Array<string> => generate(baseColor.value, { theme: 'dark' }));
+
+/** 切换基色：只改这一个 ref，全部结果随之刷新 */
+function onSelectBaseColor(color: string): void {
+  baseColor.value = color;
+}
+// =================== 【可选删除】lime-color 颜色工具演示 结束 ===================
+</script>
+
+<style scoped></style>

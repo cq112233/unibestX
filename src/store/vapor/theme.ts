@@ -9,7 +9,17 @@ import {
   isDarkMode,
   themeColor
 } from '@/src/theme/index.uts';
-import type { IThemeState } from '../types.d.uts';
+
+/**
+ * 主题状态（类型镜像自唯一真源 `../types.uts`）
+ *
+ * ⚠️ 为什么不 `import type` 那个 `.uts`：见 `src/types/uts-shim.d.ts` 说明（会报 TS2709）。
+ */
+type IThemeState = {
+  theme: string;
+  themeMode: string; // 'auto'（跟随系统）| 'light' | 'dark'
+  isDark: boolean;
+};
 
 export const useThemeStore = defineStore('theme', () => {
   const defaultMode = getDefaultThemeMode();

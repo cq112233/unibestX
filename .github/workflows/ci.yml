@@ -36,14 +36,11 @@ jobs:
       - name: Stylelint (CSS / SCSS / UVUE)
         run: pnpm lint:style
 
-      - name: Check UTS DTS Sync
-        run: pnpm check:uts-dts
-
       - name: Type Check
         run: pnpm typecheck
 
       - name: Unit Tests (Vitest)
         run: pnpm test
 
-      - name: Project Health Check (depcheck / UTS DTS / images / config)
+      - name: Project Health Check (depcheck / images / config)
         run: pnpm health:quick

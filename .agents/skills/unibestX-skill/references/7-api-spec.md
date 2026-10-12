@@ -44,11 +44,12 @@ src/api/<page>/
 
 | 形态 | 触发条件 | 目录长什么样 |
 | :--- | :--- | :--- |
-| **形态一：单文件内联**（默认） | 接口文件预计 < 400 行的小页面 | 只有 `src/api/<page>/<page>.uts`，类型 / 数据集 / 函数三块按模块分段全在里面，**不建** `types.uts` 与 `mock/` |
-| **形态二：数据集与类型下沉** | 该文件预计 ≥ 400 行，或类型要被多段共用 | `mock/<模块>.uts` 放数据集、`types.uts` 放契约类型，`<page>.uts` 只留接口函数与分段注释 |
+| **形态一：单文件内联**（默认） | 类型只被本模块单一处消费 | 只有 `src/api/<page>/<page>.uts`，类型 / 数据集 / 函数三块按模块分段全在里面，**不建** `types.uts` 与 `mock/` |
+| **形态二：类型与数据集下沉** | **类型要被多段共用** ⇒ 拆 `types.uts`；**数据集本身过大** ⇒ 拆 `mock/<模块>.uts`（两个触发条件彼此独立，按需分别触发） | `mock/<模块>.uts` 放数据集、`types.uts` 放契约类型，`<page>.uts` 只留接口函数与分段注释 |
 | **形态三：按接口域拆兄弟文件** | 同页有多个互不相干的接口域，且主文件已贴 500 行硬上限 | 在 `src/api/<page>/` 下再开 `src/api/<page>/<模块>.uts`，**每个文件自带「类型 + 数据集 + 函数」三块** |
 
-- ⚠️ **拆文件只允许因为行数**（分册 6 铁律 2 的 500 行硬上限），不是为了「看起来更整齐」把三个函数拆成三个文件 —— 过度碎裂会让后端契约散落在多个文件里，联调时找不全；
+- 🚨 **「类型抽不抽」看共用，不看行数**：类型通常只占文件 **0~13%** 行数，把它抽成 `types.uts` **并不减行**（实测 868 行的 `client.uts` 里类型只占 46 行，抽完还剩 822 行，照样超 500）。`types.uts` 的**唯一**触发条件是「类型被多处共用」（含跨 `.ts` / `.uts` 分支共用，见 `SKILL.md` A.2 第 20 条）；文件真的大到读不动时，正确做法是**按接口域拆兄弟文件（形态三）**，不是抽类型；
+- ⚠️ **拆 mock 数据集可以因为行数**（数据集往往是文件里最占行的部分，拆出去能实际减行），但**严禁**为了「看起来更整齐」把三个函数拆成三个文件 —— 过度碎裂会让后端契约散落在多个文件里，联调时找不全；
 - ❌ **旧形态已废弃**：`src/api/<page>/mock.uts`（所有模块的数据集堆进一个文件）不再使用，数据集一律按模块落进 `mock/` 目录，一模块一文件。
 
 ### 4. 命名约定（照抄，别自创）
@@ -157,6 +158,12 @@ export const MOCK_WALLPAPERS: Array<WallpaperItem> = [
 
 ```uts
 // 【对接前】mock 实现
+/**
+ * 分页获取壁纸列表
+ * @param category 分类标识，传 'all' 表示全部分类
+ * @param pageNo 页码，从 1 开始计数
+ * @param pageSize 单页条数，默认 9（首页九宫格一屏）
+ */
 export function fetchWallpaperList(category: string = 'all', pageNo: number = 1, pageSize: number = 9): Promise<PageResult<WallpaperItem>> {
   return Promise.resolve({
     list: MOCK_WALLPAPERS,
@@ -166,6 +173,13 @@ export function fetchWallpaperList(category: string = 'all', pageNo: number = 1,
 }
 
 // 【对接后】http 实现：函数名 / 入参（含默认值）/ 返回类型与上面逐字一致，页面侧零改动
+//（JSDoc 同样原样保留——注释也是契约的一部分，页面侧悬停提示不该因换实现而消失或改口）
+/**
+ * 分页获取壁纸列表
+ * @param category 分类标识，传 'all' 表示全部分类
+ * @param pageNo 页码，从 1 开始计数
+ * @param pageSize 单页条数，默认 9（首页九宫格一屏）
+ */
 export function fetchWallpaperList(category: string = 'all', pageNo: number = 1, pageSize: number = 9): Promise<PageResult<WallpaperItem>> {
   return http.get<UTSJSONObject>('/api/v1/index/wallpaper/list', {
     params: { category, pageNo, pageSize } as UTSJSONObject
@@ -209,10 +223,10 @@ import type { WallpaperItem } from '@/src/api/index/index.uts';
 1. 定页面目录名 → 建 `src/api/<page>/` 目录；
 2. 逐个数清这个页面的**业务模块**，每个模块想好「要哪几个接口」；
 3. 建 `src/api/<page>/<page>.uts`（**必产**），按模块用注释分段，每段写：类型 → 数据集 → 接口函数；
-4. 判断形态：预计 ≥ 400 行 ⇒ 拆 `mock/<模块>.uts` + `types.uts`（形态二）；某接口域已经独立到贴 500 行上限 ⇒ 拆兄弟文件（形态三）；
+4. 判断形态：**类型被多段共用** ⇒ 拆 `types.uts`；**数据集过大** ⇒ 拆 `mock/<模块>.uts`（形态二）；某接口域已经独立到贴 500 行上限 ⇒ 拆兄弟文件（形态三）。⚠️ **别按「文件总行数」决定是否抽 `types.uts`** —— 类型通常只占 0~13%，抽了并不减行；
 5. 每个接口函数**现在就用 `Promise<T>` 签名**、入参写全（分页三件套给默认值），保证将来只换函数体；
 6. 页面 / 组件里**只**通过 `@/src/api/<page>/<page>.uts` 取数，删掉任何 `ref([...])` 假数据；
-7. 交付前 `wc -l` 自查：任何 `.uts` 不得超过 **500 行**（分册 6 铁律 2）。
+7. 交付前 `wc -l` 自查：任何 `.uts` 不得超过 **500 行**（分册 6 铁律 2）；超了**按接口域拆兄弟文件**（形态三），而不是抽 `types.uts`。
 
 ---
 
@@ -229,7 +243,7 @@ import type { WallpaperItem } from '@/src/api/index/index.uts';
 - [ ] **9. 拦截器已处理的错误不要重复处理** —— api 层不写 `uni.showToast`、不判 401、不跳登录页（7.4）
 - [ ] **10. 对接后端只换函数体** —— 函数名 / 入参（含默认值）/ 返回类型一个字不改，mock 常量先留着（7.5）
 - [ ] **11. 接口引用一律 `@/src/api/<page>/<page>.uts`** —— 严禁相对路径穿透（7.1 / 分册 6 铁律 1）
-- [ ] **12. 单个接口文件严禁超 500 行** —— 只允许按接口域向下拆兄弟文件，不允许为整齐而碎裂（7.1 / 分册 6 铁律 2）
+- [ ] **12. 单个接口文件严禁超 500 行** —— 只允许按接口域向下拆兄弟文件（拆兄弟文件才能真正减行），不允许为整齐而碎裂；⚠️ `types.uts` 的拆分依据是「类型被多处共用」，**不是**行数（7.1 / 分册 6 铁律 2）
 
 ---
 

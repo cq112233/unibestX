@@ -2,7 +2,15 @@ import { reactive, watch } from 'vue';
 import { defineStore } from 'pinia';
 import i18n from '@/src/i18n/index.uts';
 import { getDefaultLocale } from '@/src/config/env/env.uts';
-import type { II18nState } from '../types.d.uts';
+
+/**
+ * 多语言状态（类型镜像自唯一真源 `../types.uts`）
+ *
+ * ⚠️ 为什么不 `import type` 那个 `.uts`：见 `src/types/uts-shim.d.ts` 说明（会报 TS2709）。
+ */
+type II18nState = {
+  locale: string;
+};
 
 export const useI18nStore = defineStore('i18n', () => {
   const state = reactive<II18nState>({

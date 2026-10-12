@@ -14,6 +14,8 @@ export type Interceptor = {
 
 /**
  * 判断路径是否符合排除登录校验名单 (EXCLUDE_LOGIN_PATH_LIST)
+ * @param path 页面路径，可省略前导斜杠（`src/xxx` 会补成 `/src/xxx` 后再比）；
+ *             与名单做**全等匹配**，不支持前缀 / 通配 —— 加白名单必须写完整路径
  */
 export function judgeIsExcludePath(path: string): boolean {
   let normalizedPath = path;
@@ -44,7 +46,9 @@ function doIntercept(url: string): boolean {
     const pages = getCurrentPages();
     let currentPath = '';
     if (pages.length > 0) {
-      currentPath = pages[pages.length - 1].route;
+      // route 在 npm @dcloudio/types 侧被标为可选（不兜底会报 TS2322），
+      // 真源（HBuilderX dts）里是非空 string，故沿用 router/utils、layouts/navbar 的 `?? ''` 写法兼顾两侧
+      currentPath = pages[pages.length - 1].route ?? '';
     }
     let normalizedCurrentPath = currentPath;
     if (normalizedCurrentPath.startsWith('src/')) {
@@ -210,6 +214,9 @@ export function installRouteInterceptor() {
 
 /**
  * 校验并处理直接进入（如 H5 直链、小程序分享链接等）的路由场景，补充权限校验
+ * @param options 直链参数对象，取 `options.path` 作为目标路径（不带前导 `/` 时会补上）；
+ *                H5 端随后会用 `location.hash` / `pathname` 覆盖它，直链地址优先以免丢查询串；
+ *                传 null 或 path 为空时**直接返回**，不触发任何拦截校验
  */
 export function checkDirectEntry(options: UTSJSONObject | null) {
   if (options != null) {

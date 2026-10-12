@@ -73,7 +73,7 @@ graph TD
   - **> 500 行必须拆组件**，没什么可商量的：按「区块 / 状态 / 子视图」拆成 `components/` 下的私有叶子视图，或把纯逻辑（数据变换、格式化、校验、分页计算）抽到同目录的 `.uts` 模块里；
   - **400 ~ 500 行是预警区**：功能继续叠加前先拆，别等到 800 行再回头返工；
   - 拆分方向**只能向下**（拆成 L2 私有叶子视图），**严禁**为了压行数把内容挪去新的页面或跨页面公共组件（那会踩铁律 1、铁律 4）；
-  - 单个 `.uts` / `.ts` 逻辑文件同样适用 500 行上限，超了按功能域拆文件。
+  - 单个 `.uts` / `.ts` 逻辑文件同样适用 500 行上限，超了**按功能域拆兄弟文件**（拆出的是新的功能文件）。⚠️ **别把「抽 `types.uts`」当减行手段** —— 类型通常只占文件 0~13%，抽出来并不减行；类型抽不抽只看它被几处共用（见分册 7 的形态二）。
 
 ### 铁律 3：容器与展示视图严格分离（Smart Container vs Dumb View）
 
@@ -191,9 +191,10 @@ graph TD
   - **各自的接口函数独立命名、独立收口**：`fetchModuleAList()` 与 `fetchModuleBList()` 是两个函数，严禁抽一个「通用 `fetchList(type)`」让两个模块共用 —— 一旦合并，某天 A 要加分页、B 要加筛选，函数立刻长出 `if (type == 'a')` 分支，模块独立性当场死亡；
   - **各自的类型归属清晰**：模块私有数据结构写在同文件**该模块那一段**，严禁把 A 的类型给 B 当返回值用；
   - **文件可以同一个，数据与函数名绝不能共享**：小页面（形态一）里 A、B 两段都写在 `src/api/<page>/<page>.uts` 里**合法，且是默认推荐**；被禁止的始终是「A 段的数据集或函数被 B 段引用」，而不是「两段同处一个文件」。
-- **文件组织三种形态，按页面体量递进选择**（目录名与文件名**不随形态变化**，永远是 `src/api/<page>/` + `<page>.uts`，变的只是「类型与数据集放哪」）：
-  - **形态一：单文件内联（默认，预计 < 400 行的小页面）**：只建 `src/api/<page>/<page>.uts` 一个文件，类型、数据集、接口函数三块**按模块用注释分段**全写在里面，模块只 `import` 自己那段的符号；此时不建 `types.uts` 与 `mock/`；
-  - **形态二：数据集与类型下沉（该文件预计 ≥ 400 行，或类型被多段共用）**：数据集按模块拆进 `src/api/<page>/mock/<模块>.uts`、契约类型收进 `src/api/<page>/types.uts`，`<page>.uts` 只留接口函数与分段注释，函数体从 `./mock/xxx.uts` 取数、类型从 `./types.uts` `import type`；
+- **文件组织三种形态，按「类型是否共用 / 数据集与主文件体量」递进选择**（目录名与文件名**不随形态变化**，永远是 `src/api/<page>/` + `<page>.uts`，变的只是「类型与数据集放哪」）：
+  - **形态一：单文件内联（默认）**：只建 `src/api/<page>/<page>.uts` 一个文件，类型、数据集、接口函数三块**按模块用注释分段**全写在里面，模块只 `import` 自己那段的符号；此时不建 `types.uts` 与 `mock/`；
+  - **形态二：类型与数据集下沉（两个触发条件彼此独立）**：**类型被多段共用** ⇒ 契约类型收进 `src/api/<page>/types.uts`；**数据集本身过大** ⇒ 按模块拆进 `src/api/<page>/mock/<模块>.uts`。`<page>.uts` 只留接口函数与分段注释，函数体从 `./mock/xxx.uts` 取数、类型从 `./types.uts` `import type`；
+    - ⚠️ **`types.uts` 的触发条件是「共用」，不是「行数」**：类型通常只占文件 0~13%，按总行数抽 `types.uts` 抽了也不减行；真要减行请看形态三；
   - **形态三：按接口域拆兄弟文件（同页有多个互不相干的接口域，且主文件已贴 500 行硬上限）**：在 `src/api/<page>/` 下再开 `src/api/<page>/<模块>.uts`，**每个文件自带「类型 + 数据集 + 函数」三块**（标杆：登录页式的写回复弹层独立成 `src/api/qa-detail/reply-friends.uts`）；⚠️ 拆的**理由只能是行数**（铁律 2 的 500 行上限），不是为了「看起来更整齐」把三个函数拆成三个文件；
   - ❌ **已废弃的旧形态**：`src/api/<page>/mock.uts` 这种「所有模块的数据集堆一个文件」的写法不再使用 —— 数据集一律按模块落进 `mock/` 目录，一模块一文件（这也是迁移表 6.4 里 `mock/*.uts` 的由来）；
   - 无论哪种形态，**铁律不倒**：各模块的 mock 数据集与接口函数独立命名、独立造数、互不引用。
@@ -203,7 +204,10 @@ graph TD
 - **必须写注释的三个位置**：
   1. **组件文件顶部的用途说明**：每个 `.uvue` 顶部写一句用途说明（这是什么、归谁用、在哪被引）；涉及踩坑写法的组件，再补一段「为什么必须这么写」的约束说明；
   2. **`<template>` 里的每个组件与功能块**：每个自定义组件（`<HomeBanner>`、`<ProductCard>` …）以及每个独立功能区块（`<view>` 包起来的轮播区 / 双列瀑布流 / 悬浮按钮插槽等）**上方必须有一句中文注释**，说清「这是什么、数据从哪来、交互抛给谁」；注释**按功能块加**，同一功能块内部的元素不重复注释；
-  3. **`<script setup>` 里的功能块与其方法**：响应式变量与操作它们的 `function` **按功能成组、相邻摆放**（一组状态 + 操作它的方法紧挨着），**每组上方一句中文注释**说明这组负责什么功能；每个 `function` 再用单行注释或 JSDoc 说明职责，**仅当有入参 / 返回值 / 特殊调用时序时**才补 `@param` 与时机说明。
+  3. **`<script setup>` 里的功能块与其方法**：响应式变量与操作它们的 `function` **按功能成组、相邻摆放**（一组状态 + 操作它的方法紧挨着），**每组上方一句中文注释**说明这组负责什么功能；**每个 `function` 一律用 JSDoc（`/** ... */`）** 说明职责，不再用单行注释：
+     - **有入参的方法 ⇒ `@param` 必须逐参写全**（含 `.uts` 里对外导出的接口函数）；参数含义无法靠名字自明的 —— 布尔开关、`mode` / `strategy` / `type` 一类枚举、带默认值的参数 —— 必须写清**取值范围、默认值、不传时的行为**；返回值语义不显然时补 `@returns`；
+     - **无入参的方法** ⇒ 一行 JSDoc 职责说明即可，**不硬凑** `@param` / `@returns`；
+     - 🚫 **红线：严禁复述参数名**。`@param filePath 文件路径` 属于注释刷屏（违反本铁律开头的「严禁中文注释刷屏」）—— 必须写**名字之外的信息**，例如「本地文件路径（App 端为 `file://` 绝对路径，H5 为相对路径）」。
 
   ```html
   <!-- ✅ 每个组件 / 功能块上方一句，块内不再重复 -->
@@ -532,7 +536,7 @@ function handleItemClick(item: IModuleAItem): void {
 > **一页一目录**：页面 `src/pages/index/` ⇒ 接口目录 `src/api/index/`（`src/sub/ball/` ⇒ `src/api/ball/`，以此类推）。
 > **接口文件必须存在**：`src/api/index/index.uts` 是**新增页面时的必产文件**，不允许出现「这个页面暂时没接口，就先不建」——页面里每一块将来由后端下发的数据，都必须在这里有对应的 `fetchXxx()`。
 
-#### 形态一（默认，小页面）：类型 / 数据集 / 函数三块内联在一个文件里，按模块分段
+#### 形态一（默认）：类型 / 数据集 / 函数三块内联在一个文件里，按模块分段
 
 ```uts
 // ==========================================
@@ -564,7 +568,10 @@ const MOCK_A_LIST: IModuleAItem[] = [
 ];
 
 // 3. 接口函数（统一返回 Promise<T>，与真实 API 签名 100% 对齐）
-/** 获取模块 A 列表数据 */
+/**
+ * 获取模块 A 列表数据
+ * @param _query 筛选条件，传 null 表示取全部（形参带下划线前缀 = 当前实现不消费，仅为对齐真实接口签名而保留）
+ */
 export function fetchModuleAList(_query: IModuleAQuery | null = null): Promise<IModuleAItem[]> {
   // 与真实接口同形：返回 Promise，页面侧感知不到这里是本地数据
   return Promise.resolve(MOCK_A_LIST);
@@ -575,7 +582,7 @@ export function fetchModuleAList(_query: IModuleAQuery | null = null): Promise<I
 // ------------------------------------------
 ```
 
-#### 形态二（该文件预计 ≥ 400 行）：数据集拆进 `mock/`、契约类型收进 `types.uts`，`<page>.uts` 只留函数
+#### 形态二（类型被多段共用 ⇒ 拆 `types.uts`；数据集过大 ⇒ 拆 `mock/`）：`<page>.uts` 只留函数
 
 ```uts
 // 文件位置：src/api/index/types.uts —— 只含 type 的叶子文件，不写函数、不写数据集
@@ -612,7 +619,11 @@ import type { IndexPageResult, WallpaperItem } from './types.uts';
 // 【壁纸段接口】（模块：壁纸）
 // ------------------------------------------
 
-/** 分页获取壁纸列表 */
+/**
+ * 分页获取壁纸列表
+ * @param category 壁纸分类标识，传 'all' 表示不按分类过滤
+ * @param pageNo 目标页码，从 1 开始计数
+ */
 export function fetchWallpaperList(category: string = 'all', pageNo: number = 1): Promise<IndexPageResult<WallpaperItem>> {
   return Promise.resolve({
     list: MOCK_WALLPAPERS,
@@ -653,11 +664,19 @@ export function fetchWallpaperList(category: string = 'all', pageNo: number = 1)
 
 ```uts
 // 【对接前】mock 实现：函数体返回本地数据集
+/**
+ * 获取模块 A 列表数据
+ * @param query 筛选条件，传 null 表示取全部
+ */
 export function fetchModuleAList(query: IModuleAQuery | null = null): Promise<IModuleAItem[]> {
   return Promise.resolve(MOCK_A_LIST);
 }
 
 // 【对接后】http 实现：函数名 / 入参 / 返回类型与上面完全一致，页面侧零改动
+/**
+ * 获取模块 A 列表数据
+ * @param query 筛选条件，传 null 表示取全部
+ */
 export function fetchModuleAList(query: IModuleAQuery | null = null): Promise<IModuleAItem[]> {
   // 调用全局封装的 http 单例发起 GET 请求（严禁自己写 uni.request）
   return http.get<UTSJSONObject[]>('/api/v1/index/module-a/list', {
@@ -730,7 +749,7 @@ import type { IModuleAItem } from '@/src/api/index/index.uts';
 - [ ] **12. 模块之间的数据、状态、mock 与接口严禁共享** —— 跨模块只传「切分区 / 跳转」这类结构级意图，且不携带业务数据（铁律 4 / 铁律 5）
 - [ ] **13. 全局 UI 态一律从 store 直读，严禁声明同名 prop 逐层透传** —— 主题色 / `isDark` 走 `appStore.state.*`，严禁从 `@/src/theme` 取裸 ref 或自己 `ref` 一份（铁律 4）
 - [ ] **14. 无人写入的状态与事件线一律不留** —— 如 `props.refreshTick` 若全页找不到写入点，连同 `watch` 与 props 声明一起删（见 3.22）
-- [ ] **15. 单个 `.uvue` / `.uts` 文件严禁超过 500 行** —— 交付前 `wc -l` 自查，只允许向下拆（铁律 2）
+- [ ] **15. 单个 `.uvue` / `.uts` 文件严禁超过 500 行** —— 交付前 `wc -l` 自查，只允许向下拆：`.uvue` 拆组件、`.uts` 拆兄弟文件；⚠️ 抽 `types.uts` **不是**减行手段（类型只占 0~13%，且抽不抽只看共用，见分册 7）（铁律 2）
 - [ ] **16. 可读性优先** —— 循环与 `if` 嵌套各不超两层、单处分支不超 3 个、相似逻辑出现两遍立刻抽函数（抽函数与分组同时受 `SKILL.md` A.2 第 16 / 18 条约束）（铁律 8）
 - [ ] **17. `<style>` 能不用就不用** —— 只写原子化表达不了的（伪类、`@keyframes`、必须固化的静态 `transition`、原生控件必需样式），且 `scoped` 最小化；空 `<style>` 一律删掉
 - [ ] **18. Props 必须收敛** —— 子视图优先只吃一个数据对象，严禁把同一业务对象的字段摊成一串同名 prop（铁律 3）

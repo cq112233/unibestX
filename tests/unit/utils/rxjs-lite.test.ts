@@ -25,7 +25,9 @@ describe('rxjs-lite Unit Tests', () => {
   });
 
   it('should support Subject multicast and unsubscription', () => {
-    const subject$ = new Subject<string>();
+    // ⚠️ 不能写 `new Subject<string>()`：TS 侧 `.uts` 只有通配 any 声明
+    // （见 src/types/uts-shim.d.ts），未类型化的调用不接受类型实参（TS2347）。
+    const subject$ = new Subject();
     const received: string[] = [];
 
     const sub = subject$.asObservable().subscribe((msg: string) => {
