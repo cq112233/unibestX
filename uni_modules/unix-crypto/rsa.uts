@@ -19,10 +19,15 @@ type RsaPrivateKey = { modulus: Uint8Array; privateExponent: Uint8Array }
 /** DER 元素信息 */
 type DerElement = { tag: number; contentStart: number; contentLen: number; nextStart: number }
 
+import { utf8Encode, utf8Decode, b64Encode, b64Decode } from './codec.uts'
+
 /** Base64 字符表 */
 const B64_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
 
 // ---- 通用工具：文本 / 字节 / 十六进制 ----
+//
+// ⚠️ UTF-8 与 Base64 一律走 codec.uts 的纯 UTS 实现，
+// **严禁改回 `new TextEncoder()` / `uni.base64ToArrayBuffer()`**：详见 codec.uts 顶部说明。
 
 /**
  * 字节数组转十六进制字符串（小写）
@@ -58,7 +63,7 @@ function hexToBytes(hex: string): Uint8Array {
  * @returns UTF-8 编码的字节数组
  */
 function textToBytes(text: string): Uint8Array {
-  return new TextEncoder().encode(text)
+  return utf8Encode(text)
 }
 
 /**
@@ -67,7 +72,7 @@ function textToBytes(text: string): Uint8Array {
  * @returns 解码后的字符串
  */
 function bytesToText(bytes: Uint8Array): string {
-  return new TextDecoder().decode(bytes)
+  return utf8Decode(bytes)
 }
 
 /**
@@ -112,17 +117,13 @@ function stripPem(pem: string): string {
 }
 
 /**
- * Base64 解码为字节数组（使用 uni-app X 自带 API）
+ * Base64 解码为字节数组（纯 UTS，兼容带 PEM 头尾 / 无填充 / 带换行的写法）
  * @param b64 Base64 字符串（可带 PEM 头尾）
  * @returns 解码后的字节数组
  */
 function base64DecodeToBytes(b64: string): Uint8Array {
-  // 先剔除 PEM 头尾，再补齐 = 填充到 4 的倍数（兼容无填充的裸 Base64）
-  let clean = stripPem(b64)
-  while (clean.length % 4 != 0) {
-    clean = clean + '='
-  }
-  return new Uint8Array(uni.base64ToArrayBuffer(clean))
+  // b64Decode 自身会忽略 `=` 与换行等非表内字符，无需再补齐填充
+  return b64Decode(stripPem(b64))
 }
 
 // ---- DER 解析：密钥导入 ----
@@ -608,78 +609,14 @@ function buildDigestInfo(digestHex: string, hashType: string): Uint8Array {
   return out
 }
 
-// ---- 对外导出 ----
-
 /**
- * RSA 公钥加密（EME-PKCS1-v1_5）
- * @param text 明文（UTF-8）
- * @param publicKey 公钥（PEM 或 Base64，PKCS#1 / SPKI）
- * @returns 密文十六进制字符串
- */
-export function rsaEncryptUts(text: string, publicKey: string): string {
-  const key = parsePublicKey(publicKey)
-  const k = key.modulus.length
-  const m = textToBytes(text)
-  const mLen = m.length
-  if (mLen > k - 11) {
-    throw new Error('RSA 明文过长：最长 ' + (k - 11) + ' 字节，当前 ' + mLen + ' 字节')
-  }
-  const em = new Uint8Array(k)
-  em[0] = 0
-  em[1] = 2
-  const psLen = k - mLen - 3
-  for (let i = 0; i < psLen; i++) {
-    em[2 + i] = Math.floor(Math.random() * 255) + 1
-  }
-  em[k - mLen - 1] = 0
-  for (let i = 0; i < mLen; i++) {
-    em[k - mLen + i] = m[i]
-  }
-  const c = bigModPow(em, key.exponent, key.modulus)
-  return bytesToHex(i2osp(c, k))
-}
-
-/**
- * RSA 私钥解密（EME-PKCS1-v1_5）
- * @param hex 密文十六进制字符串
- * @param privateKey 私钥（PEM 或 Base64，PKCS#1 / PKCS#8）
- * @returns 明文（UTF-8）
- */
-export function rsaDecryptUts(hex: string, privateKey: string): string {
-  const key = parsePrivateKey(privateKey)
-  const k = key.modulus.length
-  const c = hexToBytes(hex)
-  if (c.length != k) {
-    throw new Error('RSA 密文长度不正确：应为 ' + k + ' 字节，实际 ' + c.length + ' 字节')
-  }
-  const m = bigModPow(c, key.privateExponent, key.modulus)
-  const em = i2osp(m, k)
-  if (em[0] != 0 || em[1] != 2) {
-    throw new Error('RSA 解密失败：填充头无效')
-  }
-  let sep = -1
-  for (let i = 2; i < k; i++) {
-    if (em[i] == 0) {
-      sep = i
-      break
-    }
-  }
-  if (sep < 10) {
-    throw new Error('RSA 解密失败：填充无效')
-  }
-  return bytesToText(subBytes(em, sep + 1, k))
-}
-
-/**
- * RSA 私钥签名（EMSA-PKCS1-v1_5）
+ * 构造 EMSA-PKCS1-v1_5 的编码消息 EM（`00 01 FF..FF 00 || DigestInfo`，长度恰好 k 字节）
  * @param digestHex 摘要十六进制字符串
  * @param hashType 摘要算法名（MD5 / SHA-1 / SHA-256）
- * @param privateKey 私钥（PEM 或 Base64，PKCS#1 / PKCS#8）
- * @returns 签名十六进制字符串
+ * @param k 模数字节数
+ * @returns 长度恰好为 k 的 EM
  */
-export function rsaSignUts(digestHex: string, hashType: string, privateKey: string): string {
-  const key = parsePrivateKey(privateKey)
-  const k = key.modulus.length
+function buildSignatureEm(digestHex: string, hashType: string, k: number): Uint8Array {
   const t = buildDigestInfo(digestHex, hashType)
   const tLen = t.length
   if (tLen > k - 11) {
@@ -696,27 +633,18 @@ export function rsaSignUts(digestHex: string, hashType: string, privateKey: stri
   for (let i = 0; i < tLen; i++) {
     em[k - tLen + i] = t[i]
   }
-  const s = bigModPow(em, key.privateExponent, key.modulus)
-  return bytesToHex(i2osp(s, k))
+  return em
 }
 
 /**
- * RSA 公钥验签（EMSA-PKCS1-v1_5）
+ * 校验验签后的 EM 是否为期望的 EMSA-PKCS1-v1_5 结构
+ * @param em 裸公钥运算还原出的 EM（长度应为 k 字节）
+ * @param k 模数字节数
  * @param digestHex 摘要十六进制字符串
  * @param hashType 摘要算法名（MD5 / SHA-1 / SHA-256）
- * @param publicKey 公钥（PEM 或 Base64，PKCS#1 / SPKI）
- * @param sigHex 签名十六进制字符串
  * @returns 验签是否通过
  */
-export function rsaVerifyUts(digestHex: string, hashType: string, publicKey: string, sigHex: string): boolean {
-  const key = parsePublicKey(publicKey)
-  const k = key.modulus.length
-  const s = hexToBytes(sigHex)
-  if (s.length != k) {
-    return false
-  }
-  const m = bigModPow(s, key.exponent, key.modulus)
-  const em = i2osp(m, k)
+function checkSignatureEm(em: Uint8Array, k: number, digestHex: string, hashType: string): boolean {
   if (em[0] != 0 || em[1] != 1) {
     return false
   }
@@ -745,7 +673,347 @@ export function rsaVerifyUts(digestHex: string, hashType: string, publicKey: str
   return true
 }
 
+// ---- Android 原生实现（绕开纯 UTS 大数运算在原生端的性能灾难） ----
+//
+// ⚠️ 为什么 Android 必须走原生（真机实测踩坑）：
+// UTS 在 Android 上把 `Uint8Array` 编译成 io.dcloud.uts.TypedArray，**元素是装箱的 java.lang.Number**：
+// 每次 `arr[i]` 读写都要过 checkNotNullParameter + compareTo 越界检查 + UTSNumber 装箱，
+// `number` 的 `+ - * >> & |` 也全是装箱运算符（NumberKt 静态方法，每次运算都 new 一个 Number）。
+// 纯 UTS 的 bigModPow 做 1024 位私钥解密时内层循环约 5000 万次、每次十几回装箱读写，
+// 相当于上亿次辅助调用 + 十几 GB 垃圾对象，真机上点「私钥解密」直接卡死（ANR），
+// 而同一份代码在 H5 上只要 100 多毫秒（JS 的 number 是原生类型，不存在装箱）。
+// 因此 Android 侧一律改用 java.security / javax.crypto 原生实现（密钥生成本来就已是原生），
+// H5 / 小程序 / iOS / 鸿蒙 仍走上面的纯 UTS 实现。
+
+// #ifdef APP-ANDROID
+import Cipher from 'javax.crypto.Cipher'
+import KeyFactory from 'java.security.KeyFactory'
+import X509EncodedKeySpec from 'java.security.spec.X509EncodedKeySpec'
+import PKCS8EncodedKeySpec from 'java.security.spec.PKCS8EncodedKeySpec'
+import AndroidBase64 from 'android.util.Base64'
+
+/**
+ * 给内容套上 DER 标签头（长度支持 1~3 字节写法）
+ * @param tag DER 标签（如 0x03 BIT STRING、0x04 OCTET STRING）
+ * @param content 标签内容
+ * @returns 完整的 DER 元素
+ */
+function derTagged(tag: number, content: Uint8Array): Uint8Array {
+  const len = content.length
+  const headerLen = len < 128 ? 2 : (len < 256 ? 3 : 4)
+  const out = new Uint8Array(headerLen + len)
+  out[0] = tag
+  if (headerLen == 2) {
+    out[1] = len
+  }
+  else if (headerLen == 3) {
+    out[1] = 0x81
+    out[2] = len
+  }
+  else {
+    out[1] = 0x82
+    out[2] = Math.floor(len / 256)
+    out[3] = len % 256
+  }
+  for (let i = 0; i < len; i++) {
+    out[headerLen + i] = content[i]
+  }
+  return out
+}
+
+/**
+ * 取出公钥的 PKCS#1 DER（自动识别 PKCS#1 / SPKI）
+ * @param pem 公钥 PEM 或 Base64
+ * @returns PKCS#1 DER（SEQUENCE { INTEGER n, INTEGER e }）
+ */
+function pkcs1DerOfPublicKey(pem: string): Uint8Array {
+  const der = base64DecodeToBytes(pem)
+  const outer = derReadElement(der, 0)
+  const content = subBytes(der, outer.contentStart, outer.contentStart + outer.contentLen)
+  const first = derReadElement(content, 0)
+  if (first.tag == 0x02) {
+    // 本身就是 PKCS#1
+    return der
+  }
+  // SPKI：SEQUENCE { SEQUENCE 算法, BIT STRING { 0x00, PKCS#1 } }
+  const algo = derReadElement(content, 0)
+  const bit = derReadElement(content, algo.nextStart)
+  return subBytes(content, bit.contentStart + 1, bit.contentStart + bit.contentLen)
+}
+
+/**
+ * 取出私钥的 PKCS#1 DER（自动识别 PKCS#1 / PKCS#8）
+ * @param pem 私钥 PEM 或 Base64
+ * @returns PKCS#1 DER
+ */
+function pkcs1DerOfPrivateKey(pem: string): Uint8Array {
+  const der = base64DecodeToBytes(pem)
+  const outer = derReadElement(der, 0)
+  const content = subBytes(der, outer.contentStart, outer.contentStart + outer.contentLen)
+  const first = derReadElement(content, 0)
+  if (first.tag != 0x02) {
+    throw new Error('无法识别的私钥格式，请使用 PKCS#1 或 PKCS#8 密钥')
+  }
+  const second = derReadElement(content, first.nextStart)
+  if (second.tag == 0x02) {
+    // PKCS#1：version, n, e, d, ...
+    return der
+  }
+  // PKCS#8：version, SEQUENCE 算法, OCTET STRING { PKCS#1 }
+  const octet = derReadElement(content, second.nextStart)
+  return subBytes(content, octet.contentStart, octet.contentStart + octet.contentLen)
+}
+
+/**
+ * PKCS#1 公钥包装为 SPKI（X.509 SubjectPublicKeyInfo）
+ * @param pkcs1 PKCS#1 DER
+ * @returns SPKI DER
+ */
+function wrapPkcs1AsSpki(pkcs1: Uint8Array): Uint8Array {
+  const bitStringContent = new Uint8Array(pkcs1.length + 1)
+  bitStringContent[0] = 0
+  for (let i = 0; i < pkcs1.length; i++) {
+    bitStringContent[i + 1] = pkcs1[i]
+  }
+  return derSequence([hexToBytes(RSA_ALGO_DER), derTagged(0x03, bitStringContent)])
+}
+
+/**
+ * PKCS#1 私钥包装为 PKCS#8
+ * @param pkcs1 PKCS#1 DER
+ * @returns PKCS#8 DER
+ */
+function wrapPkcs1AsPkcs8(pkcs1: Uint8Array): Uint8Array {
+  return derSequence([hexToBytes(RSA_VERSION_0_DER), hexToBytes(RSA_ALGO_DER), derTagged(0x04, pkcs1)])
+}
+
+/**
+ * 读取 PKCS#1 里的模数字节数 k
+ * @param pkcs1 PKCS#1 DER
+ * @param publicFirst 公钥的首个 INTEGER 即模数；私钥的模数紧随 version 之后
+ * @returns 模数字节数
+ */
+function modulusLenOfPkcs1(pkcs1: Uint8Array, publicFirst: boolean): number {
+  const outer = derReadElement(pkcs1, 0)
+  const content = subBytes(pkcs1, outer.contentStart, outer.contentStart + outer.contentLen)
+  const first = derReadElement(content, 0)
+  let nElem = first
+  if (!publicFirst) {
+    nElem = derReadElement(content, first.nextStart)
+  }
+  return trimZero(subBytes(content, nElem.contentStart, nElem.contentStart + nElem.contentLen)).length
+}
+
+/**
+ * Android：RSA 公钥加密（原生 RSA/ECB/PKCS1Padding）
+ * @param text 明文（UTF-8）
+ * @param publicKey 公钥（PEM 或 Base64，PKCS#1 / SPKI）
+ * @returns 密文十六进制字符串
+ */
+function rsaEncryptAndroid(text: string, publicKey: string): string {
+  // UTS 的 Uint8Array 不是 Java 的 byte[]，统一用 Base64 字符串过桥，别让两种类型混用
+  const spkiB64 = b64Encode(wrapPkcs1AsSpki(pkcs1DerOfPublicKey(publicKey)))
+  const pubSpec = new X509EncodedKeySpec(AndroidBase64.decode(spkiB64, AndroidBase64.DEFAULT))
+  const pubKey = KeyFactory.getInstance('RSA').generatePublic(pubSpec)
+  const cipher = Cipher.getInstance('RSA/ECB/PKCS1Padding')
+  cipher.init(Cipher.ENCRYPT_MODE, pubKey)
+  const data = AndroidBase64.decode(b64Encode(textToBytes(text)), AndroidBase64.DEFAULT)
+  const encrypted = cipher.doFinal(data)
+  return bytesToHex(b64Decode(AndroidBase64.encodeToString(encrypted, AndroidBase64.NO_WRAP)))
+}
+
+/**
+ * Android：RSA 私钥解密（原生 RSA/ECB/PKCS1Padding）
+ * @param hex 密文十六进制字符串
+ * @param privateKey 私钥（PEM 或 Base64，PKCS#1 / PKCS#8）
+ * @returns 明文（UTF-8）
+ */
+function rsaDecryptAndroid(hex: string, privateKey: string): string {
+  const pkcs8B64 = b64Encode(wrapPkcs1AsPkcs8(pkcs1DerOfPrivateKey(privateKey)))
+  const priSpec = new PKCS8EncodedKeySpec(AndroidBase64.decode(pkcs8B64, AndroidBase64.DEFAULT))
+  const priKey = KeyFactory.getInstance('RSA').generatePrivate(priSpec)
+  const cipher = Cipher.getInstance('RSA/ECB/PKCS1Padding')
+  cipher.init(Cipher.DECRYPT_MODE, priKey)
+  const data = AndroidBase64.decode(b64Encode(hexToBytes(hex)), AndroidBase64.DEFAULT)
+  const decrypted = cipher.doFinal(data)
+  return bytesToText(b64Decode(AndroidBase64.encodeToString(decrypted, AndroidBase64.NO_WRAP)))
+}
+
+/**
+ * Android：RSA 私钥签名（EMSA-PKCS1-v1_5：本地拼 EM，再交给原生做裸私钥运算）
+ * @param digestHex 摘要十六进制字符串
+ * @param hashType 摘要算法名（MD5 / SHA-1 / SHA-256）
+ * @param privateKey 私钥（PEM 或 Base64，PKCS#1 / PKCS#8）
+ * @returns 签名十六进制字符串
+ */
+function rsaSignAndroid(digestHex: string, hashType: string, privateKey: string): string {
+  // 说明：这里不用 java.security.Signature，因为本库的签名入参是「摘要」而不是原文，
+  // 而 Signature 只接受原文；用 RSA/ECB/NoPadding 做裸私钥运算（m = EM^d mod n），
+  // 结果与上行纯 UTS 实现逐字节一致。
+  const pkcs1 = pkcs1DerOfPrivateKey(privateKey)
+  const em = buildSignatureEm(digestHex, hashType, modulusLenOfPkcs1(pkcs1, false))
+  const pkcs8B64 = b64Encode(wrapPkcs1AsPkcs8(pkcs1))
+  const priSpec = new PKCS8EncodedKeySpec(AndroidBase64.decode(pkcs8B64, AndroidBase64.DEFAULT))
+  const priKey = KeyFactory.getInstance('RSA').generatePrivate(priSpec)
+  const cipher = Cipher.getInstance('RSA/ECB/NoPadding')
+  cipher.init(Cipher.DECRYPT_MODE, priKey)
+  const data = AndroidBase64.decode(b64Encode(em), AndroidBase64.DEFAULT)
+  const signature = cipher.doFinal(data)
+  return bytesToHex(b64Decode(AndroidBase64.encodeToString(signature, AndroidBase64.NO_WRAP)))
+}
+
+/**
+ * Android：RSA 公钥验签（EMSA-PKCS1-v1_5：原生裸公钥运算还原 EM 后本地比对）
+ * @param digestHex 摘要十六进制字符串
+ * @param hashType 摘要算法名（MD5 / SHA-1 / SHA-256）
+ * @param publicKey 公钥（PEM 或 Base64，PKCS#1 / SPKI）
+ * @param sigHex 签名十六进制字符串
+ * @returns 验签是否通过
+ */
+function rsaVerifyAndroid(digestHex: string, hashType: string, publicKey: string, sigHex: string): boolean {
+  const pkcs1 = pkcs1DerOfPublicKey(publicKey)
+  const k = modulusLenOfPkcs1(pkcs1, true)
+  const s = hexToBytes(sigHex)
+  if (s.length != k) {
+    return false
+  }
+  const spkiB64 = b64Encode(wrapPkcs1AsSpki(pkcs1))
+  const pubSpec = new X509EncodedKeySpec(AndroidBase64.decode(spkiB64, AndroidBase64.DEFAULT))
+  const pubKey = KeyFactory.getInstance('RSA').generatePublic(pubSpec)
+  const cipher = Cipher.getInstance('RSA/ECB/NoPadding')
+  cipher.init(Cipher.ENCRYPT_MODE, pubKey)
+  const data = AndroidBase64.decode(b64Encode(s), AndroidBase64.DEFAULT)
+  const em = b64Decode(AndroidBase64.encodeToString(cipher.doFinal(data), AndroidBase64.NO_WRAP))
+  return checkSignatureEm(em, k, digestHex, hashType)
+}
+// #endif
+
+// ---- 对外导出 ----
+
+/**
+ * RSA 公钥加密（EME-PKCS1-v1_5）
+ * @param text 明文（UTF-8）
+ * @param publicKey 公钥（PEM 或 Base64，PKCS#1 / SPKI）
+ * @returns 密文十六进制字符串
+ */
+export function rsaEncryptUts(text: string, publicKey: string): string {
+  // #ifdef APP-ANDROID
+  return rsaEncryptAndroid(text, publicKey)
+  // #endif
+
+  // #ifndef APP-ANDROID
+  const key = parsePublicKey(publicKey)
+  const k = key.modulus.length
+  const m = textToBytes(text)
+  const mLen = m.length
+  if (mLen > k - 11) {
+    throw new Error('RSA 明文过长：最长 ' + (k - 11) + ' 字节，当前 ' + mLen + ' 字节')
+  }
+  const em = new Uint8Array(k)
+  em[0] = 0
+  em[1] = 2
+  const psLen = k - mLen - 3
+  for (let i = 0; i < psLen; i++) {
+    em[2 + i] = Math.floor(Math.random() * 255) + 1
+  }
+  em[k - mLen - 1] = 0
+  for (let i = 0; i < mLen; i++) {
+    em[k - mLen + i] = m[i]
+  }
+  const c = bigModPow(em, key.exponent, key.modulus)
+  return bytesToHex(i2osp(c, k))
+  // #endif
+}
+
+/**
+ * RSA 私钥解密（EME-PKCS1-v1_5）
+ * @param hex 密文十六进制字符串
+ * @param privateKey 私钥（PEM 或 Base64，PKCS#1 / PKCS#8）
+ * @returns 明文（UTF-8）
+ */
+export function rsaDecryptUts(hex: string, privateKey: string): string {
+  // #ifdef APP-ANDROID
+  return rsaDecryptAndroid(hex, privateKey)
+  // #endif
+
+  // #ifndef APP-ANDROID
+  const key = parsePrivateKey(privateKey)
+  const k = key.modulus.length
+  const c = hexToBytes(hex)
+  if (c.length != k) {
+    throw new Error('RSA 密文长度不正确：应为 ' + k + ' 字节，实际 ' + c.length + ' 字节')
+  }
+  const m = bigModPow(c, key.privateExponent, key.modulus)
+  const em = i2osp(m, k)
+  if (em[0] != 0 || em[1] != 2) {
+    throw new Error('RSA 解密失败：填充头无效')
+  }
+  let sep = -1
+  for (let i = 2; i < k; i++) {
+    if (em[i] == 0) {
+      sep = i
+      break
+    }
+  }
+  if (sep < 10) {
+    throw new Error('RSA 解密失败：填充无效')
+  }
+  return bytesToText(subBytes(em, sep + 1, k))
+  // #endif
+}
+
+/**
+ * RSA 私钥签名（EMSA-PKCS1-v1_5）
+ * @param digestHex 摘要十六进制字符串
+ * @param hashType 摘要算法名（MD5 / SHA-1 / SHA-256）
+ * @param privateKey 私钥（PEM 或 Base64，PKCS#1 / PKCS#8）
+ * @returns 签名十六进制字符串
+ */
+export function rsaSignUts(digestHex: string, hashType: string, privateKey: string): string {
+  // #ifdef APP-ANDROID
+  return rsaSignAndroid(digestHex, hashType, privateKey)
+  // #endif
+
+  // #ifndef APP-ANDROID
+  const key = parsePrivateKey(privateKey)
+  const k = key.modulus.length
+  const em = buildSignatureEm(digestHex, hashType, k)
+  const s = bigModPow(em, key.privateExponent, key.modulus)
+  return bytesToHex(i2osp(s, k))
+  // #endif
+}
+
+/**
+ * RSA 公钥验签（EMSA-PKCS1-v1_5）
+ * @param digestHex 摘要十六进制字符串
+ * @param hashType 摘要算法名（MD5 / SHA-1 / SHA-256）
+ * @param publicKey 公钥（PEM 或 Base64，PKCS#1 / SPKI）
+ * @param sigHex 签名十六进制字符串
+ * @returns 验签是否通过
+ */
+export function rsaVerifyUts(digestHex: string, hashType: string, publicKey: string, sigHex: string): boolean {
+  // #ifdef APP-ANDROID
+  return rsaVerifyAndroid(digestHex, hashType, publicKey, sigHex)
+  // #endif
+
+  // #ifndef APP-ANDROID
+  const key = parsePublicKey(publicKey)
+  const k = key.modulus.length
+  const s = hexToBytes(sigHex)
+  if (s.length != k) {
+    return false
+  }
+  const m = bigModPow(s, key.exponent, key.modulus)
+  return checkSignatureEm(i2osp(m, k), k, digestHex, hashType)
+  // #endif
+}
+
 // ---- RSA 密钥对生成（纯 JS / BigInt，支持微信小程序 / H5 / 全端） ----
+
+/** rsaEncryption 的 AlgorithmIdentifier（OID 1.2.840.113549.1.1.1 + NULL 参数） */
+const RSA_ALGO_DER = '300d06092a864886f70d0101010500'
+/** PKCS#1 / PKCS#8 里固定的 version = 0 */
+const RSA_VERSION_0_DER = '020100'
 
 function bigIntToDerInteger(n: any): Uint8Array {
   let hex: string = n.toString(16)
@@ -946,7 +1214,7 @@ function rsaGenerateKeyPairJs(bits: number): string {
 
   // 构造 SPKI 公钥
   const pkcs1Pub = derSequence([bigIntToDerInteger(n), bigIntToDerInteger(e)])
-  const algo = hexToBytes('300d06092a864886f70d0101010500')
+  const algo = hexToBytes(RSA_ALGO_DER)
   const bitStringContent = new Uint8Array(1 + pkcs1Pub.length)
   bitStringContent[0] = 0x00
   for (let i = 0; i < pkcs1Pub.length; i++) bitStringContent[1 + i] = pkcs1Pub[i]
@@ -962,10 +1230,10 @@ function rsaGenerateKeyPairJs(bits: number): string {
   for (let i = 0; i < bitStringContent.length; i++) bitString[bitHeader.length + i] = bitStringContent[i]
 
   const spkiDer = derSequence([algo, bitString])
-  const pubB64 = uni.arrayBufferToBase64(spkiDer.buffer as ArrayBuffer)
+  const pubB64 = b64Encode(spkiDer)
 
   // 构造 PKCS#8 私钥
-  const version0 = hexToBytes('020100')
+  const version0 = hexToBytes(RSA_VERSION_0_DER)
   const pkcs1Pri = derSequence([
     version0,
     bigIntToDerInteger(n),
@@ -989,7 +1257,7 @@ function rsaGenerateKeyPairJs(bits: number): string {
   for (let i = 0; i < pkcs1Pri.length; i++) octString[octHeader.length + i] = pkcs1Pri[i]
 
   const pkcs8Der = derSequence([version0, algo, octString])
-  const priB64 = uni.arrayBufferToBase64(pkcs8Der.buffer as ArrayBuffer)
+  const priB64 = b64Encode(pkcs8Der)
 
   return '{"publicKey":"' + pubB64 + '","privateKey":"' + priB64 + '"}'
 }

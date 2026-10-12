@@ -1,0 +1,544 @@
+<template>
+  <view class="flex flex-col p-[16px] bg-[#f8fafc]">
+    <view
+      class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid border-[#edf2f7] bg-[#ffffff]"
+    >
+      <!-- 标题区域 -->
+      <view class="flex flex-row items-center mb-[16px]">
+        <view
+          class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#0ea5e9]"
+        />
+        <text class="text-[16px] font-bold text-[#2d3748]">大数据运算 (BigNumber)</text>
+      </view>
+
+      <!-- 1. 加减乘除 -->
+      <view class="rounded-[12px] p-[16px] mb-[16px] border-[1px] border-solid border-[#e2e8f0]">
+        <text class="text-[13px] font-bold text-[#1e293b] mb-[8px]">1. 加减乘除（基础四则）</text>
+        <input
+          v-model="inputA"
+          placeholder="操作数 A，例如 0.1"
+          class="h-[38px] bg-white rounded-[6px] px-[12px] border-[1px] border-solid border-[#cbd5e1] text-[13px] text-[#334155] mb-[8px]"
+        />
+        <input
+          v-model="inputB"
+          placeholder="操作数 B，例如 0.2"
+          class="h-[38px] bg-white rounded-[6px] px-[12px] border-[1px] border-solid border-[#cbd5e1] text-[13px] text-[#334155] mb-[12px]"
+        />
+        <view class="flex flex-row items-center mb-[8px]">
+          <view
+            class="flex-1 h-[36px] rounded-[8px] bg-[#0ea5e9] flex flex-row items-center justify-center mr-[8px]"
+            @click="handlePlus"
+          >
+            <text class="text-[#ffffff] text-[13px] font-bold">加 plus</text>
+          </view>
+          <view
+            class="flex-1 h-[36px] rounded-[8px] bg-[#14b8a6] flex flex-row items-center justify-center"
+            @click="handleMinus"
+          >
+            <text class="text-[#ffffff] text-[13px] font-bold">减 minus</text>
+          </view>
+        </view>
+        <view class="flex flex-row items-center mb-[12px]">
+          <view
+            class="flex-1 h-[36px] rounded-[8px] bg-[#6366f1] flex flex-row items-center justify-center mr-[8px]"
+            @click="handleTimes"
+          >
+            <text class="text-[#ffffff] text-[13px] font-bold">乘 times</text>
+          </view>
+          <view
+            class="flex-1 h-[36px] rounded-[8px] bg-[#f59e0b] flex flex-row items-center justify-center"
+            @click="handleDiv"
+          >
+            <text class="text-[#ffffff] text-[13px] font-bold">除 div</text>
+          </view>
+        </view>
+        <text class="text-[12px] text-[#64748b]">A + B：</text>
+        <text class="result-text text-[12px] font-medium text-[#0f766e] mt-[2px]" style="font-family: monospace;">{{ plusResult }}</text>
+        <text class="text-[12px] text-[#64748b] mt-[8px]">A − B：</text>
+        <text class="result-text text-[12px] font-medium text-[#0f766e] mt-[2px]" style="font-family: monospace;">{{ minusResult }}</text>
+        <text class="text-[12px] text-[#64748b] mt-[8px]">A × B：</text>
+        <text class="result-text text-[12px] font-medium text-[#0f766e] mt-[2px]" style="font-family: monospace;">{{ timesResult }}</text>
+        <text class="text-[12px] text-[#64748b] mt-[8px]">A ÷ B：</text>
+        <text class="result-text text-[12px] font-medium text-[#0f766e] mt-[2px]" style="font-family: monospace;">{{ divResult }}</text>
+      </view>
+
+      <!-- 2. 浮点误差对照 -->
+      <view class="rounded-[12px] p-[16px] mb-[16px] border-[1px] border-solid border-[#e2e8f0]">
+        <text class="text-[13px] font-bold text-[#1e293b] mb-[8px]">2. 浮点误差：原生 number vs BigNumber</text>
+        <view
+          class="w-full h-[36px] rounded-[8px] bg-[#ef4444] flex flex-row items-center justify-center mb-[12px]"
+          @click="handleFloatDemo"
+        >
+          <text class="text-[#ffffff] text-[13px] font-bold">跑一遍对照</text>
+        </view>
+        <text class="text-[12px] text-[#64748b]">原生 number 计算 0.1 + 0.2：</text>
+        <text class="result-text text-[12px] font-medium text-[#dc2626] mt-[2px]" style="font-family: monospace;">{{ nativeFloatResult }}</text>
+        <text class="text-[12px] text-[#64748b] mt-[8px]">原生 number 结果是否等于 0.3：</text>
+        <text class="result-text text-[12px] font-medium text-[#dc2626] mt-[2px]" style="font-family: monospace;">{{ nativeFloatEqual }}</text>
+        <text class="text-[12px] text-[#64748b] mt-[8px]">BigNumber 计算 0.1 + 0.2：</text>
+        <text class="result-text text-[12px] font-medium text-[#059669] mt-[2px]" style="font-family: monospace;">{{ bigFloatResult }}</text>
+        <text class="text-[12px] text-[#64748b] mt-[8px]">超大整数加 1（原生丢精度 / BigNumber 精确）：</text>
+        <text class="result-text text-[12px] font-medium text-[#dc2626] mt-[2px]" style="font-family: monospace;">{{ nativeBigResult }}</text>
+        <text class="result-text text-[12px] font-medium text-[#059669] mt-[2px]" style="font-family: monospace;">{{ bigBigResult }}</text>
+      </view>
+
+      <!-- 3. 除法精度与小数位 -->
+      <view class="rounded-[12px] p-[16px] mb-[16px] border-[1px] border-solid border-[#e2e8f0]">
+        <text class="text-[13px] font-bold text-[#1e293b] mb-[8px]">3. 除法精度与小数位（A ÷ B）</text>
+        <view
+          class="w-full h-[36px] rounded-[8px] bg-[#8b5cf6] flex flex-row items-center justify-center mb-[12px]"
+          @click="handlePrecision"
+        >
+          <text class="text-[#ffffff] text-[13px] font-bold">按不同精度计算</text>
+        </view>
+        <text class="text-[12px] text-[#64748b]">默认精度（DECIMAL_PLACES = 20）：</text>
+        <text class="result-text text-[12px] font-medium text-[#6d28d9] mt-[2px]" style="font-family: monospace;">{{ precDefault }}</text>
+        <text class="text-[12px] text-[#64748b] mt-[8px]">toFixed(2)：</text>
+        <text class="result-text text-[12px] font-medium text-[#6d28d9] mt-[2px]" style="font-family: monospace;">{{ prec2 }}</text>
+        <text class="text-[12px] text-[#64748b] mt-[8px]">toFixed(6)：</text>
+        <text class="result-text text-[12px] font-medium text-[#6d28d9] mt-[2px]" style="font-family: monospace;">{{ prec6 }}</text>
+        <text class="text-[12px] text-[#64748b] mt-[8px]">整数部分（向零截断）：</text>
+        <text class="result-text text-[12px] font-medium text-[#6d28d9] mt-[2px]" style="font-family: monospace;">{{ precInt }}</text>
+      </view>
+
+      <!-- 4. 幂 / 开方 / 取模 -->
+      <view class="rounded-[12px] p-[16px] mb-[16px] border-[1px] border-solid border-[#e2e8f0]">
+        <text class="text-[13px] font-bold text-[#1e293b] mb-[8px]">4. 幂、开方与取模</text>
+        <view class="flex flex-row items-center mb-[8px]">
+          <view
+            class="flex-1 h-[36px] rounded-[8px] bg-[#ec4899] flex flex-row items-center justify-center mr-[8px]"
+            @click="handlePow"
+          >
+            <text class="text-[#ffffff] text-[13px] font-bold">幂 A³</text>
+          </view>
+          <view
+            class="flex-1 h-[36px] rounded-[8px] bg-[#22c55e] flex flex-row items-center justify-center"
+            @click="handleSqrt"
+          >
+            <text class="text-[#ffffff] text-[13px] font-bold">开方 √A</text>
+          </view>
+        </view>
+        <view class="flex flex-row items-center mb-[12px]">
+          <view
+            class="flex-1 h-[36px] rounded-[8px] bg-[#0891b2] flex flex-row items-center justify-center mr-[8px]"
+            @click="handleMod"
+          >
+            <text class="text-[#ffffff] text-[13px] font-bold">取模 A mod B</text>
+          </view>
+          <view
+            class="flex-1 h-[36px] rounded-[8px] bg-[#a16207] flex flex-row items-center justify-center"
+            @click="handlePowMod"
+          >
+            <text class="text-[#ffffff] text-[13px] font-bold">模幂 A³ mod 7</text>
+          </view>
+        </view>
+        <text class="text-[12px] text-[#64748b]">A³：</text>
+        <text class="result-text text-[12px] font-medium text-[#be185d] mt-[2px]" style="font-family: monospace;">{{ powResult }}</text>
+        <text class="text-[12px] text-[#64748b] mt-[8px]">√A：</text>
+        <text class="result-text text-[12px] font-medium text-[#be185d] mt-[2px]" style="font-family: monospace;">{{ sqrtResult }}</text>
+        <text class="text-[12px] text-[#64748b] mt-[8px]">A mod B：</text>
+        <text class="result-text text-[12px] font-medium text-[#be185d] mt-[2px]" style="font-family: monospace;">{{ modResult }}</text>
+        <text class="text-[12px] text-[#64748b] mt-[8px]">A³ mod 7：</text>
+        <text class="result-text text-[12px] font-medium text-[#be185d] mt-[2px]" style="font-family: monospace;">{{ powModResult }}</text>
+      </view>
+
+      <!-- 5. 比较与判定 -->
+      <view class="rounded-[12px] p-[16px] mb-[16px] border-[1px] border-solid border-[#e2e8f0]">
+        <text class="text-[13px] font-bold text-[#1e293b] mb-[8px]">5. 比较与类型判定（A 与 B）</text>
+        <view
+          class="w-full h-[36px] rounded-[8px] bg-[#2563eb] flex flex-row items-center justify-center mb-[12px]"
+          @click="handleCompare"
+        >
+          <text class="text-[#ffffff] text-[13px] font-bold">比较 A 与 B</text>
+        </view>
+        <text class="text-[12px] text-[#64748b]">A isEqualTo B：</text>
+        <text class="result-text text-[12px] font-medium text-[#1d4ed8] mt-[2px]" style="font-family: monospace;">{{ cmpEq }}</text>
+        <text class="text-[12px] text-[#64748b] mt-[8px]">A isGreaterThan B：</text>
+        <text class="result-text text-[12px] font-medium text-[#1d4ed8] mt-[2px]" style="font-family: monospace;">{{ cmpGt }}</text>
+        <text class="text-[12px] text-[#64748b] mt-[8px]">A isLessThan B：</text>
+        <text class="result-text text-[12px] font-medium text-[#1d4ed8] mt-[2px]" style="font-family: monospace;">{{ cmpLt }}</text>
+        <text class="text-[12px] text-[#64748b] mt-[8px]">A isInteger / isZero / isNegative：</text>
+        <text class="result-text text-[12px] font-medium text-[#1d4ed8] mt-[2px]" style="font-family: monospace;">{{ cmpFlags }}</text>
+      </view>
+
+      <!-- 6. 进制转换 -->
+      <view class="rounded-[12px] p-[16px] mb-[16px] border-[1px] border-solid border-[#e2e8f0]">
+        <text class="text-[13px] font-bold text-[#1e293b] mb-[8px]">6. 进制转换（对 A 取 toString(base)）</text>
+        <view
+          class="w-full h-[36px] rounded-[8px] bg-[#0f766e] flex flex-row items-center justify-center mb-[12px]"
+          @click="handleBaseConvert"
+        >
+          <text class="text-[#ffffff] text-[13px] font-bold">转换 A</text>
+        </view>
+        <text class="text-[12px] text-[#64748b]">二进制 base 2：</text>
+        <text class="result-text text-[12px] font-medium text-[#115e59] mt-[2px]" style="font-family: monospace;">{{ base2Result }}</text>
+        <text class="text-[12px] text-[#64748b] mt-[8px]">八进制 base 8：</text>
+        <text class="result-text text-[12px] font-medium text-[#115e59] mt-[2px]" style="font-family: monospace;">{{ base8Result }}</text>
+        <text class="text-[12px] text-[#64748b] mt-[8px]">十六进制 base 16：</text>
+        <text class="result-text text-[12px] font-medium text-[#115e59] mt-[2px]" style="font-family: monospace;">{{ base16Result }}</text>
+        <text class="text-[12px] text-[#64748b] mt-[8px]">三十六进制 base 36：</text>
+        <text class="result-text text-[12px] font-medium text-[#115e59] mt-[2px]" style="font-family: monospace;">{{ base36Result }}</text>
+      </view>
+
+      <!-- 7. 格式化 -->
+      <view class="rounded-[12px] p-[16px] mb-[16px] border-[1px] border-solid border-[#e2e8f0]">
+        <text class="text-[13px] font-bold text-[#1e293b] mb-[8px]">7. 千分位格式化 toFormat</text>
+        <view
+          class="w-full h-[36px] rounded-[8px] bg-[#db2777] flex flex-row items-center justify-center mb-[12px]"
+          @click="handleFormat"
+        >
+          <text class="text-[#ffffff] text-[13px] font-bold">格式化 A</text>
+        </view>
+        <text class="text-[12px] text-[#64748b]">toFormat(2)：</text>
+        <text class="result-text text-[12px] font-medium text-[#9d174d] mt-[2px]" style="font-family: monospace;">{{ formatResult }}</text>
+      </view>
+
+      <!-- 8. 九种舍入模式 -->
+      <view class="rounded-[12px] p-[16px] mb-[16px] border-[1px] border-solid border-[#e2e8f0]">
+        <text class="text-[13px] font-bold text-[#1e293b] mb-[8px]">8. 九种舍入模式（对 0.125 取 2 位小数）</text>
+        <view
+          class="w-full h-[36px] rounded-[8px] bg-[#4f46e5] flex flex-row items-center justify-center mb-[12px]"
+          @click="handleRoundModes"
+        >
+          <text class="text-[#ffffff] text-[13px] font-bold">列出九种结果</text>
+        </view>
+        <view
+          v-for="item in roundModeList"
+          :key="item.name"
+          class="flex flex-row items-center mb-[6px]"
+        >
+          <text class="text-[12px] text-[#64748b] w-[190px]">{{ item.name }}</text>
+          <text class="text-[12px] font-medium text-[#3730a3]" style="font-family: monospace;">{{ item.result }}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { ref } from 'vue';
+import { BigNumber, ROUND_CEIL, ROUND_DOWN, ROUND_FLOOR, ROUND_HALF_CEIL, ROUND_HALF_DOWN, ROUND_HALF_EVEN, ROUND_HALF_FLOOR, ROUND_HALF_UP, ROUND_UP } from '@/uni_modules/unix-Bignumber';
+import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/layouts/navbar/utils/index.uts';
+
+definePage({
+  debug: false,
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
+  style: {
+    navigationBarTitleText: 'BigNumber 大数据运算',
+    navigationStyle: 'custom'
+  }
+});
+
+/** 九种舍入模式的一行结果 */
+type RoundModeItem = {
+  mode: number;
+  name: string;
+  result: string;
+};
+
+// 1. 加减乘除
+const inputA = ref<string>('0.1');
+const inputB = ref<string>('0.2');
+const plusResult = ref<string>('');
+const minusResult = ref<string>('');
+const timesResult = ref<string>('');
+const divResult = ref<string>('');
+
+// 2. 浮点误差对照
+const nativeFloatResult = ref<string>('');
+const nativeFloatEqual = ref<string>('');
+const bigFloatResult = ref<string>('');
+const nativeBigResult = ref<string>('');
+const bigBigResult = ref<string>('');
+
+// 3. 除法精度
+const precDefault = ref<string>('');
+const prec2 = ref<string>('');
+const prec6 = ref<string>('');
+const precInt = ref<string>('');
+
+// 4. 幂 / 开方 / 取模
+const powResult = ref<string>('');
+const sqrtResult = ref<string>('');
+const modResult = ref<string>('');
+const powModResult = ref<string>('');
+
+// 5. 比较与判定
+const cmpEq = ref<string>('');
+const cmpGt = ref<string>('');
+const cmpLt = ref<string>('');
+const cmpFlags = ref<string>('');
+
+// 6. 进制转换
+const base2Result = ref<string>('');
+const base8Result = ref<string>('');
+const base16Result = ref<string>('');
+const base36Result = ref<string>('');
+
+// 7. 格式化
+const formatResult = ref<string>('');
+
+// 8. 九种舍入模式
+const roundModeList = ref<RoundModeItem[]>([]);
+
+/** 对照用的超大整数（32 位十进制，已远超 number 的安全整数范围） */
+const BIG_INT_TEXT: string = '99999999999999999999999999999999';
+/** 舍入模式演示用的样本值 */
+const ROUND_SAMPLE: string = '0.125';
+/** 九种舍入模式的取值，顺序与常量定义一致 */
+const ROUND_MODES: Array<number> = [
+  ROUND_UP,
+  ROUND_DOWN,
+  ROUND_CEIL,
+  ROUND_FLOOR,
+  ROUND_HALF_UP,
+  ROUND_HALF_DOWN,
+  ROUND_HALF_EVEN,
+  ROUND_HALF_CEIL,
+  ROUND_HALF_FLOOR
+];
+
+/**
+ * 统一提取异常信息
+ * @param e 捕获到的异常
+ * @returns 可展示的错误文本
+ */
+function errorMessage(e: any): string {
+  if (e instanceof Error) {
+    return e.message;
+  }
+  return JSON.stringify(e);
+}
+
+/**
+ * 布尔转展示文本（避免模板里出现隐式真假判断）
+ * @param value 布尔值
+ * @returns 'true' 或 'false'
+ */
+function boolText(value: boolean): string {
+  if (value == true) {
+    return 'true';
+  }
+  return 'false';
+}
+
+/**
+ * 取舍入模式的中文名
+ * @param mode 模式常量
+ * @returns 展示名称
+ */
+function roundModeName(mode: number): string {
+  if (mode == ROUND_UP) {
+    return 'ROUND_UP 远离零';
+  }
+  if (mode == ROUND_DOWN) {
+    return 'ROUND_DOWN 趋向零';
+  }
+  if (mode == ROUND_CEIL) {
+    return 'ROUND_CEIL 向正无穷';
+  }
+  if (mode == ROUND_FLOOR) {
+    return 'ROUND_FLOOR 向负无穷';
+  }
+  if (mode == ROUND_HALF_UP) {
+    return 'ROUND_HALF_UP 四舍五入';
+  }
+  if (mode == ROUND_HALF_DOWN) {
+    return 'ROUND_HALF_DOWN 五舍';
+  }
+  if (mode == ROUND_HALF_EVEN) {
+    return 'ROUND_HALF_EVEN 银行家舍入';
+  }
+  if (mode == ROUND_HALF_CEIL) {
+    return 'ROUND_HALF_CEIL 半值向正无穷';
+  }
+  return 'ROUND_HALF_FLOOR 半值向负无穷';
+}
+
+// 1. 加减乘除
+function handlePlus(): void {
+  try {
+    plusResult.value = new BigNumber(inputA.value).plus(inputB.value).toString();
+  }
+  catch (e: any) {
+    plusResult.value = errorMessage(e);
+  }
+}
+
+function handleMinus(): void {
+  try {
+    minusResult.value = new BigNumber(inputA.value).minus(inputB.value).toString();
+  }
+  catch (e: any) {
+    minusResult.value = errorMessage(e);
+  }
+}
+
+function handleTimes(): void {
+  try {
+    timesResult.value = new BigNumber(inputA.value).times(inputB.value).toString();
+  }
+  catch (e: any) {
+    timesResult.value = errorMessage(e);
+  }
+}
+
+function handleDiv(): void {
+  try {
+    divResult.value = new BigNumber(inputA.value).div(inputB.value).toString();
+  }
+  catch (e: any) {
+    divResult.value = errorMessage(e);
+  }
+}
+
+// 2. 浮点误差对照
+function handleFloatDemo(): void {
+  try {
+    const nativeSum: number = 0.1 + 0.2;
+    nativeFloatResult.value = nativeSum.toString();
+    nativeFloatEqual.value = boolText(nativeSum == 0.3);
+    bigFloatResult.value = new BigNumber('0.1').plus('0.2').toString();
+
+    const nativeBig: number = new BigNumber(BIG_INT_TEXT).toNumber();
+    nativeBigResult.value = nativeBig.toString();
+    bigBigResult.value = new BigNumber(BIG_INT_TEXT).plus(1).toString();
+  }
+  catch (e: any) {
+    nativeFloatResult.value = errorMessage(e);
+  }
+}
+
+// 3. 除法精度
+function handlePrecision(): void {
+  try {
+    const quotient: BigNumber = new BigNumber(inputA.value).dividedBy(inputB.value);
+    precDefault.value = quotient.toString();
+    prec2.value = quotient.toFixed(2);
+    prec6.value = quotient.toFixed(6);
+    precInt.value = quotient.integerValue().toString();
+  }
+  catch (e: any) {
+    precDefault.value = errorMessage(e);
+  }
+}
+
+// 4. 幂 / 开方 / 取模
+function handlePow(): void {
+  try {
+    powResult.value = new BigNumber(inputA.value).exponentiatedBy(3).toString();
+  }
+  catch (e: any) {
+    powResult.value = errorMessage(e);
+  }
+}
+
+function handleSqrt(): void {
+  try {
+    sqrtResult.value = new BigNumber(inputA.value).sqrt().toString();
+  }
+  catch (e: any) {
+    sqrtResult.value = errorMessage(e);
+  }
+}
+
+function handleMod(): void {
+  try {
+    modResult.value = new BigNumber(inputA.value).modulo(inputB.value).toString();
+  }
+  catch (e: any) {
+    modResult.value = errorMessage(e);
+  }
+}
+
+function handlePowMod(): void {
+  try {
+    powModResult.value = new BigNumber(inputA.value).exponentiatedBy(3, 7).toString();
+  }
+  catch (e: any) {
+    powModResult.value = errorMessage(e);
+  }
+}
+
+// 5. 比较与判定
+function handleCompare(): void {
+  try {
+    const a: BigNumber = new BigNumber(inputA.value);
+    const b: BigNumber = new BigNumber(inputB.value);
+    cmpEq.value = boolText(a.isEqualTo(b));
+    cmpGt.value = boolText(a.isGreaterThan(b));
+    cmpLt.value = boolText(a.isLessThan(b));
+    const flags: Array<string> = [];
+    flags.push(`isInteger=${boolText(a.isInteger())}`);
+    flags.push(`isZero=${boolText(a.isZero())}`);
+    flags.push(`isNegative=${boolText(a.isNegative())}`);
+    cmpFlags.value = flags.join(' / ');
+  }
+  catch (e: any) {
+    cmpEq.value = errorMessage(e);
+  }
+}
+
+// 6. 进制转换
+function handleBaseConvert(): void {
+  try {
+    const a: BigNumber = new BigNumber(inputA.value);
+    base2Result.value = a.toString(2);
+    base8Result.value = a.toString(8);
+    base16Result.value = a.toString(16);
+    base36Result.value = a.toString(36);
+  }
+  catch (e: any) {
+    base2Result.value = errorMessage(e);
+  }
+}
+
+// 7. 格式化
+function handleFormat(): void {
+  try {
+    formatResult.value = new BigNumber(inputA.value).toFormat(2);
+  }
+  catch (e: any) {
+    formatResult.value = errorMessage(e);
+  }
+}
+
+// 8. 九种舍入模式
+function handleRoundModes(): void {
+  try {
+    const base: BigNumber = new BigNumber(ROUND_SAMPLE);
+    const list: RoundModeItem[] = [];
+    for (let i: number = 0; i < ROUND_MODES.length; i++) {
+      const modeValue: number = ROUND_MODES[i];
+      list.push({
+        mode: modeValue,
+        name: roundModeName(modeValue),
+        result: base.toFixed(2, modeValue)
+      } as RoundModeItem);
+    }
+    roundModeList.value = list;
+  }
+  catch (e: any) {
+    const failed: RoundModeItem[] = [];
+    failed.push({ mode: -1, name: 'error', result: errorMessage(e) } as RoundModeItem);
+    roundModeList.value = failed;
+  }
+}
+
+onNavbarPullDownRefresh(() => {
+  setTimeout(() => {
+    stopNavbarPullDownRefresh();
+  }, 800);
+});
+</script>
+
+<style scoped>
+/* #ifdef H5 || MP-WEIXIN */
+.result-text {
+  word-break: break-all;
+}
+/* #endif */
+</style>
