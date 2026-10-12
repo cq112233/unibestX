@@ -45,7 +45,6 @@ unibestX/
 ├── uni_modules/              # uni-app 扩展插件模块
 │   ├── unix-crypto/          #   全端跨平台加密解密与安全工具库
 │   ├── z-paging-x/           #   uni-app X 深度定制分页列表组件
-│   ├── iRainna-lodash/       #   UTS 版 Lodash 工具库
 │   ├── lime-request/         #   HTTP 请求库
 │   ├── lime-signature/       #   手写签名板组件
 │   └── e-chart/              #   ECharts 图表适配组件

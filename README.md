@@ -532,11 +532,10 @@ unibestX/
 │       ├── i18n/                 #   多语言辅助工具（t / $t）
 │       ├── backPress/            #   Android 物理返回键双击退出
 │       └── rxjs-lite/            #   轻量流式处理工具
-├── uni_modules/                  # uni-app 扩展插件模块（精简收敛为 16 个核心插件）
+├── uni_modules/                  # uni-app 扩展插件模块（精简收敛为 17 个核心插件）
 │   ├── z-paging-x/               #   深度优化适配的分页组件
 │   ├── unix-crypto/              #   跨端加密解密库（AES/DES/RSA/MD5/SHA/HMAC/Base64/UUID）
 │   ├── x-pinia-s/                #   UTS 版 Pinia（VDOM 模式使用）
-│   ├── iRainna-lodash/           #   UTS 版 Lodash 工具库
 │   ├── lime-request/             #   HTTP 请求核心库
 │   ├── lime-i18n/                #   国际化核心库
 │   ├── lime-signature/           #   手写签名板组件

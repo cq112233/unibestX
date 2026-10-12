@@ -72,25 +72,6 @@ declare module '@/uni_modules/lime-dayuts' {
   export function dayuts(...args: any[]): any;
 }
 
-// ---------- iRainna-lodash ----------
-// 真源：uni_modules/iRainna-lodash/index.uts（具名导出清单见文件末尾 export 块）
-declare module '@/uni_modules/iRainna-lodash' {
-  export function uniq(array: any[]): any[];
-  export function chunk(array: any[], size?: number): any[][];
-  export function shuffle(array: any[]): any[];
-  export function get(obj: any, path: any, defaultValue?: any): any;
-  export function cloneDeep<T>(value: T): T;
-  export function camelCase(text: string): string;
-  export function kebabCase(text: string): string;
-  export function capitalize(text: string): string;
-  export function debounce(fn: any, wait?: number, options?: any): any;
-  export function random(...args: any[]): number;
-  export function isEqual(a: any, b: any): boolean;
-  export function merge(...args: any[]): any;
-  export function initLodash(): any;
-  export default initLodash;
-}
-
 // ---------- unix-crypto ----------
 // 真源：uni_modules/unix-crypto/index.uts
 declare module '@/uni_modules/unix-crypto' {
