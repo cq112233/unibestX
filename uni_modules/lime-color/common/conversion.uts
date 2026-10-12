@@ -1,0 +1,307 @@
+/**
+ * 颜色转换工具类
+ * 提供各种颜色空间之间的转换函数，如 RGB、HSL、HSV 等
+ */
+// @ts-nocheck
+import type { RGB,HSL,HSV } from '../utssdk/interface.uts';
+import { bound01, pad2 } from './util.uts';
+
+
+/**
+ * 处理 RGB 颜色值的边界检查，确保值在有效范围内
+ * 处理边界/百分比检查以符合 CSS 颜色规范
+ * <http://www.w3.org/TR/css3-color/>
+ * *Assumes:* r, g, b 在 [0, 255] 或 [0, 1] 范围内
+ * *Returns:* { r, g, b } 在 [0, 255] 范围内
+ */
+
+export function rgbToRgb(r: string|number, g: string|number, b: string|number) : RGB {
+	const _r = bound01(r, 255);
+	const _g = bound01(g, 255);
+	const _b = bound01(b, 255);
+	return {
+		r: _r * 255,
+		g: _g * 255,
+		b: _b * 255,
+	} as RGB;
+}
+/**
+ * Converts an RGB color value to HSL.
+ * 将 RGB 颜色值转换为 HSL。
+ * *Assumes:* r, g, and b are contained in [0, 255] or [0, 1]
+ * *Returns:* { h, s, l } in [0,1]
+ */
+
+export function rgbToHsl(r : string|number, g : string|number, b : string|number) : HSL {
+	const _r = bound01(r, 255);
+	const _g = bound01(g, 255);
+	const _b = bound01(b, 255);
+
+	const max = Math.max(_r, _g, _b);
+	const min = Math.min(_r, _g, _b);
+	let h = 0;
+	let s:number// = 0;
+	const l = (max + min) / 2;
+
+	if (max == min) {
+		s = 0;
+		h = 0; // achromatic
+	} else {
+		const d = max - min;
+		s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+		switch (max) {
+			case _r:
+				h = (_g - _b) / d + (_g < _b ? 6 : 0);
+				break;
+			case _g:
+				h = (_b - _r) / d + 2;
+				break;
+			case _b:
+				h = (_r - _g) / d + 4;
+				break;
+			default:
+				console.log('h')
+				break;
+		}
+
+		h /= 6;
+	}
+
+	return { h, s, l } as HSL;
+}
+
+
+
+/**
+ * 将色相值转换为 RGB 分量值
+ * 这是一个辅助函数，用于 HSL 和 HSV 到 RGB 的转换
+ * @param p - 中间值1
+ * @param q - 中间值2
+ * @param t - 色相分量
+ * @returns RGB 分量值，范围 [0, 1]
+ */
+export function hue2rgb(p : number, q : number, t : number) : number {
+	let _t = t
+	if (_t < 0) {
+		_t += 1;
+	}
+
+	if (_t > 1) {
+		_t -= 1;
+	}
+
+	if (_t < 1 / 6) {
+		return p + (q - p) * (6 * _t);
+	}
+
+	if (_t < 1 / 2) {
+		return q;
+	}
+
+	if (_t < 2 / 3) {
+		return p + (q - p) * (2 / 3 - _t) * 6;
+	}
+
+	return p;
+}
+
+/**
+ * Converts an HSL color value to RGB.
+ * 将 HSL 颜色值转换为 RGB。
+ * *Assumes:* h is contained in [0, 1] or [0, 360] and s and l are contained [0, 1] or [0, 100]
+ * *Returns:* { r, g, b } in the set [0, 255]
+ */ 
+export function hslToRgb(h : string|number,s : string|number,l : string|number) : RGB {
+	let r : number;
+	let g : number;
+	let b : number;
+	const _h = bound01(h, 360);
+	const _s = bound01(s, 100);
+	const _l = bound01(l, 100);
+	
+	if (_s == 0) {
+		// achromatic
+		g = _l;
+		b = _l;
+		r = _l;
+	} else {
+		const q = _l < 0.5 ? _l * (1 + _s) : _l + _s - _l * _s;
+		const p = 2 * _l - q;
+		r = hue2rgb(p, q, _h + 1 / 3);
+		g = hue2rgb(p, q, _h);
+		b = hue2rgb(p, q, _h - 1 / 3);
+	}
+
+	return { r: r * 255, g: g * 255, b: b * 255 } as RGB;
+}
+/**
+ * Converts an RGB color value to HSV
+ * 将RGB颜色值转换为HSV颜色值
+ * *Assumes:* r, g, and b are contained in the set [0, 255] or [0, 1]
+ * *Returns:* { h, s, v } in [0,1]
+ */
+export function rgbToHsv(r : number, g : number, b : number) : HSV {
+	const _r = bound01(r, 255);
+	const _g = bound01(g, 255);
+	const _b = bound01(b, 255);
+
+	const max = Math.max(_r, _g, _b);
+	const min = Math.min(_r, _g, _b);
+	let h = 0;
+	const v = max;
+	const d = max - min;
+	const s = max == 0 ? 0 : d / max;
+
+	if (max == min) {
+		h = 0; // achromatic
+	} else {
+		switch (max) {
+			case _r:
+				h = (_g - _b) / d + (_g < _b ? 6 : 0);
+				break;
+			case _g:
+				h = (_b - _r) / d + 2;
+				break;
+			case _b:
+				h = (_r - _g) / d + 4;
+				break;
+			default:
+				console.log('1')
+				break;
+		}
+
+		h /= 6;
+	}
+
+	return { h, s, v } as HSV;
+}
+
+/**
+ * Converts an HSV color value to RGB.
+ * 将HSV颜色值转换为RGB。
+ * *Assumes:* h is contained in [0, 1] or [0, 360] and s and v are contained in [0, 1] or [0, 100]
+ * *Returns:* { r, g, b } in the set [0, 255]
+ */
+
+export function hsvToRgb( h : string|number, s : string|number, v : string|number) : RGB {
+	const _h = bound01(h, 360) * 6;
+	const _s = bound01(s, 100);
+	const _v = bound01(v, 100);
+
+	const i = Math.floor(_h);
+	const f = _h - i;
+	const p = _v * (1 - _s);
+	const q = _v * (1 - f * _s);
+	const t = _v * (1 - (1 - f) * _s);
+	const mod = i % 6;
+	const r = [_v, q, p, p, t, _v][mod];
+	const g = [t, _v, _v, q, p, p][mod];
+	const b = [p, p, t, _v, _v, q][mod];
+
+	return { r: r * 255, g: g * 255, b: b * 255 } as RGB;
+}
+/**
+ * Converts an RGB color to hex
+ * 将RGB颜色转换为十六进制。
+ * Assumes r, g, and b are contained in the set [0, 255]
+ * Returns a 3 or 6 character hex
+ */
+export function rgbToHex(r : number, g : number, b : number, allow3Char : boolean = false) : string {
+	const hex = [
+		pad2(Math.round(r).toString(16)),
+		pad2(Math.round(g).toString(16)),
+		pad2(Math.round(b).toString(16)),
+	];
+
+	// Return a 3 character hex if possible
+	if (
+		allow3Char &&
+		hex[0].startsWith(hex[0].charAt(1)) &&
+		hex[1].startsWith(hex[1].charAt(1)) &&
+		hex[2].startsWith(hex[2].charAt(1))
+	) {
+		return hex[0].charAt(0) + hex[1].charAt(0) + hex[2].charAt(0);
+	}
+
+	return hex.join('');
+}
+
+/**
+ * Converts an RGBA color plus alpha transparency to hex
+ * 将带有透明度的RGBA颜色转换为十六进制。
+ * Assumes r, g, b are contained in the set [0, 255] and
+ * a in [0, 1]. Returns a 4 or 8 character rgba hex
+ */
+export function rgbaToHex(r : number, g : number, b : number, a : number, allow4Char : boolean = false) : string {
+	const hex = [
+		pad2(Math.round(r).toString(16)),
+		pad2(Math.round(g).toString(16)),
+		pad2(Math.round(b).toString(16)),
+		pad2(convertDecimalToHex(a)),
+	];
+
+	// Return a 4 character hex if possible
+	if (
+		allow4Char &&
+		hex[0].startsWith(hex[0].charAt(1)) &&
+		hex[1].startsWith(hex[1].charAt(1)) &&
+		hex[2].startsWith(hex[2].charAt(1)) &&
+		hex[3].startsWith(hex[3].charAt(1))
+	) {
+		return hex[0].charAt(0) + hex[1].charAt(0) + hex[2].charAt(0) + hex[3].charAt(0);
+	}
+
+	return hex.join('');
+}
+
+/**
+ * Converts an RGBA color to an ARGB Hex8 string
+ * 将RGBA颜色转换为ARGB十六进制字符串。
+ * Rarely used, but required for "toFilter()"
+ */
+export function rgbaToArgbHex(r : number, g : number, b : number, a : number) : string {
+	const hex = [
+		pad2(convertDecimalToHex(a)),
+		pad2(Math.round(r).toString(16)),
+		pad2(Math.round(g).toString(16)),
+		pad2(Math.round(b).toString(16)),
+	];
+
+	return hex.join('');
+}
+
+/** Converts a decimal to a hex value */
+/** 将十进制转换为十六进制值。 */
+export function convertDecimalToHex(d : string|number) : string {
+	return Math.round(parseFloat(`${d}`) * 255).toString(16);
+}
+/**
+ * 将十六进制值转换为十进制值
+ * @param h - 十六进制字符串
+ * @returns 十进制值，范围 [0, 1]
+ */
+export function convertHexToDecimal(h : string) : number {
+	return parseIntFromHex(h) / 255;
+}
+
+/**
+ * 将十六进制字符串解析为十进制整数
+ * @param val - 十六进制字符串
+ * @returns 十进制整数
+ */
+export function parseIntFromHex(val : string) : number {
+	return parseInt(val, 16);
+}
+
+/**
+ * 将数字类型的颜色输入转换为 RGB 对象
+ * @param color - 数字类型的颜色值
+ * @returns RGB 对象，包含 r, g, b 分量
+ */
+export function numberInputToObject(color : number) : RGB {
+	return {
+		r: color >> 16,
+		g: (color & 0xff00) >> 8,
+		b: color & 0xff,
+	} as RGB;
+}

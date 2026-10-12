@@ -1,7 +1,30 @@
 import { reactive } from 'vue';
 import { defineStore } from 'pinia';
 // 类型统一来自 src/store/types.uts（唯一真源），本文件严禁再 export type 同名类型
-import type { IDoubleTokenRes, ISingleTokenRes, ITokenState } from '../types.d.uts';
+// ⚠️ 因 TS 侧 `.uts` 只有通配 any 声明（见 src/types/uts-shim.d.ts），无法 `import type`
+//    具名类型（会报 TS2709），故此处内联镜像；真源改动时需同步本处。
+type ISingleTokenRes = {
+  token: string;
+  expiresIn: number;
+};
+
+type IDoubleTokenRes = {
+  accessToken: string;
+  accessExpiresIn: number;
+  refreshToken: string;
+  refreshExpiresIn: number;
+};
+
+type ITokenState = {
+  token: string;
+  expiresIn: number;
+  accessToken: string;
+  accessExpiresIn: number;
+  refreshToken: string;
+  refreshExpiresIn: number;
+  tokenExpireTime: number;
+  refreshTokenExpireTime: number;
+};
 
 export const useTokenStore = defineStore('token', () => {
   // 1. 响应式状态

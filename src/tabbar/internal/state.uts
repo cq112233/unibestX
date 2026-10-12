@@ -78,7 +78,11 @@ export const curIdx = ref(0);
  */
 export const activeTabTitle = ref('');
 
-/** 设置当前索引并持久化 */
+/**
+ * 设置当前索引并持久化
+ * @param idx 目标 Tab 下标，**从 0 开始、对应含 midButton 的完整列表位置**；
+ *            只赋值并写入 storage，**不触发路由跳转** —— 要跳转请配合 `switchTabbar(url)`
+ */
 export function setCurIdx(idx: number): void {
   curIdx.value = idx;
   uni.setStorageSync('app-tabbar-index', idx);
@@ -101,14 +105,22 @@ export function setCurIdxByKey(key: string): void {
   setCurIdx(index);
 }
 
-/** 设置某项的 badge */
+/**
+ * 设置某项的 badge
+ * @param idx 目标 Tab 下标；**越界时静默忽略**（函数体只做 `length > idx` 校验，不抛错）
+ * @param badge 角标内容：数字 = 显示红点数字，字符串 `'dot'` = 只显示小圆点不带数字
+ */
 export function setTabbarItemBadge(idx: number, badge: CustomTabBarItemBadge): void {
   if (tabbarList.length > idx) {
     tabbarList[idx].badge = badge;
   }
 }
 
-/** 根据给定的页面路径手动同步索引 */
+/**
+ * 根据给定的页面路径手动同步索引
+ * @param path 页面路径，**带不带前导斜杠都可以**（内部先 `cleanPath` 规范化再与 pagePath 比对）；
+ *             未命中任何 Tab 时**保持当前索引不变**，因此在非 tabbar 页面调用是安全的空操作
+ */
 export function setCurIdxByPath(path: string): void {
   const targetPath = cleanPath(path);
   for (let i = 0; i < tabbarList.length; i++) {
@@ -128,7 +140,11 @@ export function syncCurIdxByCurrentPage(): void {
   setCurIdxByPath(currentPath);
 }
 
-/** 判断是否是 tabbar 页面 */
+/**
+ * 判断是否是 tabbar 页面
+ * @param path 页面路径，同样允许省略前导斜杠，查询串（`?a=1`）会先被 `cleanPath` 剥掉；
+ *             与 tabbarList 的 pagePath 做**全路径**比对（不是子串包含）
+ */
 export function isPageTabbar(path: string): boolean {
   const targetPath = cleanPath(path);
   for (let i = 0; i < tabbarList.length; i++) {

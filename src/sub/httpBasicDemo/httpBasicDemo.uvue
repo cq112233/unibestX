@@ -99,7 +99,7 @@
             <text class="text-[16px] font-bold text-[#2d3748]">Mock 数据列表（ID 为任意类型）</text>
           </view>
           <text class="text-[12px] text-[#64748b] leading-[19px] mb-[4px]">
-            在 src/api/example.uts 中定义，由 getFooList() 直接返回，无需网络即可演示列表渲染。
+            在 src/api/example.uts 中定义，由 fetchFooList() 直接返回，无需网络即可演示列表渲染。
           </text>
           <view v-for="(item, index) in mockList" :key="index" class="flex-row items-center py-[10px] px-[12px] bg-[#f1f5f9] rounded-[8px] mt-[8px]">
             <view class="w-[28px] h-[28px] rounded-[14px] bg-[#3182ce] justify-center items-center mr-[10px]">
@@ -381,8 +381,8 @@
 <script setup lang="uts">
 /* eslint-disable dot-notation */
 import { computed, ref } from 'vue';
-import { downloadFooFile, foo, FOO_DOWNLOAD_URL, FOO_UPLOAD_PATH, getFooList, uploadFooFile } from '@/src/api/example.uts';
-import type { IFoo } from '@/src/api/example.uts';
+import { downloadFooFile, fetchFooList, fetchFooRemote, FOO_DOWNLOAD_URL, FOO_UPLOAD_PATH, uploadFooFile } from '@/src/api/example.uts';
+import type { FooItem } from '@/src/api/example.uts';
 import { getOssBaseUrl } from '@/src/config/index.uts';
 import { toast, toastSuccess } from '@/src/utils/toast/index.uts';
 import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/layouts/navbar/utils/index.uts';
@@ -402,10 +402,10 @@ definePage({
 // ==========================================
 // 响应式状态
 // ==========================================
-const mockList = ref<IFoo[]>([]);
+const mockList = ref<FooItem[]>([]);
 const loading = ref<boolean>(false);
 const requestStatus = ref<string>('idle'); // idle | loading | success | error
-const responseData = ref<IFoo | null>(null);
+const responseData = ref<FooItem | null>(null);
 const errorMsg = ref<string>('');
 const userInfo = ref<string>('');
 const cloudLoading = ref<boolean>(false);
@@ -548,9 +548,9 @@ const isDownloadImage = computed((): boolean => {
  */
 async function loadMockData() {
   try {
-    const list = await getFooList();
-    mockList.value = list;
-    // toastSuccess(`加载了 ${list.length} 条数据`)
+    const pageResult = await fetchFooList(1, 100, '');
+    mockList.value = pageResult.list;
+    // toastSuccess(`加载了 ${pageResult.list.length} 条数据`)
   }
   catch (err) {
     console.error('loadMockData error:', err);
@@ -568,7 +568,7 @@ async function fetchRealApi() {
   errorMsg.value = '';
 
   try {
-    const res = await foo();
+    const res = await fetchFooRemote();
     responseData.value = res;
     requestStatus.value = 'success';
   }

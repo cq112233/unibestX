@@ -83,7 +83,10 @@ export function resolveErrorMessage(rawMessage: string, code: number = -1): AppE
   return { kind: 'unknown', message: msg.length > 0 ? msg : MSG_NETWORK, code } as AppErrorInfo;
 }
 
-/** 列表 / 页面失败时的默认提示 */
+/**
+ * 列表 / 页面失败时的默认提示
+ * @param rawMessage 后端或原生回调给的原始文案；传空字符串时按网络异常兜底
+ */
 export function defaultFailMessage(rawMessage: string = ''): string {
   return resolveErrorMessage(rawMessage, -1).message;
 }

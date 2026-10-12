@@ -1,0 +1,36 @@
+<!-- useCodeTimer 组件示例 -->
+<!-- 这是一个使用 useCodeTimer 组合式函数的示例组件，展示了验证码倒计时的基本用法 -->
+<template>
+	<view class="bg-white p-4 mb-4 rounded">
+		<text class="text-lg font-bold mb-4">useCodeTimer 示例</text>
+		<view class="flex-row">
+			<button type="primary" :disabled="!canGetCode" @click="start">{{tip}}</button>
+			<button class="ml-4" @click="reset">重置</button>
+		</view>
+	</view>
+</template>
+
+<script setup>
+	// 导入 useCodeTimer 组合式函数和类型定义
+	import { useCodeTimer, type UseCodeTimerOptions} from '@/uni_modules/lime-use'
+	
+	// 使用 useCodeTimer 组合式函数
+	const { tip, start, reset, canGetCode } = useCodeTimer({
+		seconds: 60, // 倒计时总秒数
+		startText: '获取验证码', // 倒计时开始前显示的文本
+		changeText: '重新获取 (X秒)', // 倒计时进行中显示的文本，X会被替换为剩余秒数
+		endText: '重新获取', // 倒计时结束后显示的文本
+		keepRunning: true, // 是否在页面刷新后保持倒计时状态
+		uniqueKey: 'myCodeTimer', // 用于本地存储的唯一键名，避免多个倒计时冲突
+		onStart: () => {
+		  console.log('倒计时开始') // 倒计时开始时的回调函数
+		},
+		onEnd: () => {
+		  console.log('倒计时结束') // 倒计时结束时的回调函数
+		}
+	} as UseCodeTimerOptions)
+</script>
+
+<style lang="scss">
+	@import '@/uni_modules/lime-style/atomic.scss';
+</style>

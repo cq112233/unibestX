@@ -7,9 +7,29 @@
     "manifest.json": "jsonc"
   },
 
-  // uni-app x: 启用 Volar 对 .uvue 文件的基本解析（如跳转定义），但在下面通过 [vue] block 禁用其模板类型报错
-  "vue.server.additionalExtensions": [
-    "uvue"
+  // uni-app x: 启用 Volar 对 .uts / .uvue 文件的解析（跳转定义、补全、类型提示）。
+  //
+  // 为什么必须显式把 "uts" 加进来：
+  //   Volar 客户端处理文档前会先做一次语言过滤 ——
+  //     if (!includeLanguages.includes(document.languageId)) return;
+  //   `vue.server.includeLanguages` 的默认值只有 ["vue"]。而 `files.associations`
+  //   把 `*.uvue` 映射成 languageId `vue`（所以 uvue 天然被接管、一直能跳），
+  //   却把 `*.uts` 映射成 languageId `uts`（不在默认列表 → Volar 直接 return）。
+  //   于是 .uts 只能落到 DCloud 的 `hbuilderx-language-services`，它走的是异步增量
+  //   索引：索引就绪时能跳，被文件监听打回后立刻失效 ——
+  //   这正是「重启能点、过一会儿点不动」「uvue 能跳、uts 不能跳」的根因。
+  //
+  // 注意：不存在 `vue.server.additionalExtensions` 这个配置项（Volar 3.3.13 无此键），
+  // 写它不报错但也完全无效，必须用 `vue.server.includeLanguages`。
+  // 改完需要重启扩展宿主（Volar 会弹「Please restart extension host」提示）。
+  //
+  // 配套依赖（缺一不可）：
+  //   1) tsconfig.json 的 `vueCompilerOptions.extensions` 含 ".uts"
+  //   2) .vscode/uts-volar-plugin/index.cjs 把 .uts 当 TS script 解析
+  "vue.server.includeLanguages": [
+    "vue",
+    "uvue",
+    "uts"
   ],
 
   // 启用内置 TS/JS 验证，支持函数必填参数与参数类型校验报错提示
@@ -40,10 +60,7 @@
     "docker.md": "Dockerfile,docker*.md,nginx*,.dockerignore",
     "pages.config.ts": "manifest.config.ts,openapi-ts-request.config.ts",
     "package.json": "tsconfig.json,pnpm-lock.yaml,pnpm-workspace.yaml,LICENSE,.gitattributes,.gitignore,.gitpod.yml,CNAME,.npmrc,.browserslistrc",
-    "eslint.config.mjs": ".commitlintrc.*,.prettier*,.editorconfig,.commitlint.cjs,.eslint*",
-    // 把 .uts 的类型声明文件折叠到 .uts 下面，避免两行同名文件造成混淆
-    // （声明文件必须与 .uts 同目录同名，由 scripts/gen-uts-dts.mjs 生成）
-    "*.uts": "${capture}.d.uts.ts"
+    "eslint.config.mjs": ".commitlintrc.*,.prettier*,.editorconfig,.commitlint.cjs,.eslint*"
   },
 
   "stylelint.enable": true,

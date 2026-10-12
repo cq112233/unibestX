@@ -68,6 +68,8 @@ const MOCK_LOGIN_RESULT: LoginResult = {
  * 用户登录接口
  * 运行 pnpm dev:mock 时发起网络请求并由根目录 mock/auth.ts 拦截响应
  * 离线无服务时平滑降级回退到本地 UTS Mock 数据
+ * @param params 登录表单（username / password，两者都不可为空）；
+ *               该请求带 `extra.ignoreAuth`，**不注入 token、401 也不会触发刷新**
  */
 export function login(params: LoginQuery): Promise<LoginResult> {
   return http.post<UTSJSONObject>('/auth/login', params, {
@@ -76,6 +78,11 @@ export function login(params: LoginQuery): Promise<LoginResult> {
     } as UTSJSONObject
   } as LimeRequestConfig).then((data: UTSJSONObject): LoginResult => {
     const rawUser = data.get('userInfo') as UTSJSONObject | null;
+    // ⚠️ 必须写 `getArray<string>(...)`：UTS 无法从默认值反推元素类型，省略泛型实参会被
+    // Kotlin 编译拒绝（`推断类型是 UTSArray<*>`，预期 `UTSArray<String>?`，实测于 app-android）。
+    // 代价：TS 侧 UTSJSONObject 是纯索引签名声明（见 src/types/uni.d.ts），其 getArray 为 any，
+    // 对 any 传类型实参报 TS2347 —— 故用 @ts-expect-error 抑制；UTS 编译不受影响。
+    // @ts-expect-error UTS 编译要求显式泛型实参；TS 侧 getArray 为 any 会报 TS2347
     const rawRoles = rawUser?.getArray<string>('roles', [] as Array<string>) ?? ([] as Array<string>);
 
     return {
@@ -114,6 +121,8 @@ export function login(params: LoginQuery): Promise<LoginResult> {
  */
 export function fetchUserInfo(): Promise<AuthUserInfo> {
   return http.get<UTSJSONObject>('/user/info').then((data: UTSJSONObject): AuthUserInfo => {
+    // ⚠️ 同上：必须写 `getArray<string>(...)`（UTS 要求显式泛型实参，TS 侧靠 @ts-expect-error 抑制 TS2347）
+    // @ts-expect-error UTS 编译要求显式泛型实参；TS 侧 getArray 为 any 会报 TS2347
     const rawRoles = data.getArray<string>('roles', [] as Array<string>) ?? ([] as Array<string>);
     return {
       userId: data.getNumber('userId') ?? 1001,
@@ -132,6 +141,7 @@ export function fetchUserInfo(): Promise<AuthUserInfo> {
  *
  * ⚠️ extra.skipRefresh 必须保留：该标记让 request.uts 的拦截器在本次请求 401 时
  * 直接失败、不再触发刷新，否则刷新接口自身 401 会形成无限递归。
+ * @param params 刷新凭证，只需 `refreshToken`（一般取自 tokenStore 里持久化的那一份）
  */
 export function refreshAccessToken(params: RefreshTokenQuery): Promise<RefreshTokenResult> {
   return http.post<UTSJSONObject>('/auth/refresh', params, {

@@ -1,7 +1,18 @@
 import { reactive } from 'vue';
 import { defineStore } from 'pinia';
 // 类型统一来自 src/store/types.uts（唯一真源），本文件严禁再 export type 同名类型
-import type { IUserInfo, IUserState } from '../types.d.uts';
+// ⚠️ 因 TS 侧 `.uts` 只有通配 any 声明（见 src/types/uts-shim.d.ts），无法 `import type`
+//    具名类型（会报 TS2709），故此处内联镜像；真源改动时需同步本处。
+type IUserInfo = {
+  userId: number;
+  username: string;
+  nickname: string;
+  avatar: string;
+};
+
+type IUserState = {
+  userInfo: IUserInfo;
+};
 
 const DEFAULT_AVATAR = '/static/logo.png';
 

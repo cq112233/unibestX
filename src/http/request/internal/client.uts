@@ -112,6 +112,8 @@ export const REFRESHABLE_401: string = '__REFRESHABLE_401__';
 /**
  * 从未知错误对象中安全提取错误文案。
  * 兼容 Error 实例、LimeRequestFail、UTSJSONObject、普通 JS 对象与字符串。
+ * @param err 任意形态的错误值（Error / lime-request fail 对象 / 字符串 / null 均可）；
+ *            识别不出任何文案时返回空字符串，**不抛错**
  */
 export function extractErrorMessage(err: any): string {
   if (err == null) {
@@ -151,7 +153,11 @@ export function extractErrorMessage(err: any): string {
   return '';
 }
 
-/** 判断错误是否为拦截器抛出的「可刷新 401」哨兵 */
+/**
+ * 判断错误是否为拦截器抛出的「可刷新 401」哨兵
+ * @param err 拦截链路上游抛出的任意错误值；只有其文案恰好等于 `REFRESHABLE_401` 时才返回 true，
+ *            因此业务自己返回的 401 文案不会被误判
+ */
 export function isRefreshable401(err: any): boolean {
   if (err == null) {
     return false;
@@ -160,7 +166,11 @@ export function isRefreshable401(err: any): boolean {
   return msg == REFRESHABLE_401;
 }
 
-/** 浅拷贝请求配置：重放时不能复用已被拦截器改写的对象，同时保留 getTask 等回调字段 */
+/**
+ * 浅拷贝请求配置：重放时不能复用已被拦截器改写的对象，同时保留 getTask 等回调字段
+ * @param config 原始请求配置；**只拷贝白名单内的字段**，未在函数体里列出的字段不会进入副本，
+ *               新增配置项时必须同步补进拷贝列表，否则重放会丢配置
+ */
 export function cloneConfig(config: LimeRequestConfig): LimeRequestConfig {
   return {
     url: config.url,
@@ -188,6 +198,7 @@ export function cloneConfig(config: LimeRequestConfig): LimeRequestConfig {
 
 /**
  * 把任意错误（包括 LimeRequestFail）安全地转成 Error，供抛出使用。
+ * @param err 任意错误值；null 或提取不出文案时，退化为文案为「请求失败」的 Error
  */
 export function toError(err: any): Error {
   if (err == null) {

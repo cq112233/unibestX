@@ -262,7 +262,10 @@ export function simulateStream(
     // 回调体里引用了 timerId 自己，Kotlin 端会报「找不到名称 timerId」
     // （变量在自身初始化表达式中不可见；JS 因为回调延后执行才侥幸能跑）。
     let timerId: number = 0;
-    timerId = setInterval((): void => {
+    // ⚠️ 外层 `as any) as number` 不可省：DOM lib 的 setInterval 返回 number（UTS 侧同样为 number），
+    // 但 @types/node（经 vite.config.ts 引入）把返回值声明为 Timeout，TS 侧直接赋值报
+    // TS2322「不能将类型 Timeout 分配给类型 number」。同写法先例：src/sub/timeFunctionDemo/timeFunctionDemo.uvue:151
+    timerId = (setInterval((): void => {
       const remain = totalLen - cursor;
       const size = remain < chunkSize ? remain : chunkSize;
       const piece = text.substring(cursor, cursor + size);
@@ -277,7 +280,7 @@ export function simulateStream(
         clearInterval(timerId);
         subscriber.complete();
       }
-    }, intervalMs);
+    }, intervalMs) as any) as number;
     return (): void => {
       clearInterval(timerId);
     };

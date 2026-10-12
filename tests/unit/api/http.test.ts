@@ -12,6 +12,16 @@ import {
   RequestLifecycle
 } from '@/src/http/index.uts';
 
+/**
+ * 测试内的 HttpClient 实例类型别名
+ *
+ * ⚠️ 为什么不直接把导入的 `HttpClient` 用在类型位：TS 侧 `.uts` 只有通配 `any`
+ * 声明（见 `src/types/uts-shim.d.ts`），用在类型位会报 TS2709
+ * 「Cannot use namespace 'HttpClient' as a type」。这里由工厂函数返回值反推，
+ * 语义等价于「任意 HttpClient 实例」（其值导入仍保留，供 `new HttpClient(...)` 使用）。
+ */
+type HttpClientInstance = ReturnType<typeof createHttpClient>;
+
 describe('httpClient beforeRequest & afterResponse hooks', () => {
   beforeEach(() => {
     http.clearBeforeRequest();
@@ -380,7 +390,7 @@ describe('httpClient downloadFile', () => {
   function createMockDownloadClient(
     result: any,
     onDownload?: (url: string, config: any) => void
-  ): HttpClient {
+  ): HttpClientInstance {
     const rawClient = defaultRequestAdapter({ baseURL: 'https://download.example.com' } as any);
     (rawClient as any).download = (url: string, config: any) => {
       if (onDownload != null) {
@@ -521,7 +531,7 @@ describe('httpClient 401 refresh replay', () => {
     beforeRequest?: (config: any) => void;
     refreshToken?: () => Promise<boolean>;
     header?: any;
-  }): HttpClient {
+  }): HttpClientInstance {
     const rawClient = defaultRequestAdapter({ baseURL: 'https://replay.example.com' } as any);
     let callCount = 0;
     (rawClient as any).request = (config: any) => {
@@ -580,7 +590,9 @@ describe('httpClient 401 refresh replay', () => {
       }
     });
 
-    await client.get<any>('/protected');
+    // ⚠️ 不能写 `client.get<any>(...)`：client 经 `.uts` 通配 any 声明解析后即为 any，
+    // 对未类型化的调用传类型实参会报 TS2347（见 src/types/uts-shim.d.ts）。
+    await client.get('/protected');
 
     // 首轮带旧 token，重放必须带刷新后的新 token
     expect(sentTokens).toEqual(['old-token', 'new-token']);
@@ -615,7 +627,8 @@ describe('httpClient 401 refresh replay', () => {
     });
 
     // 显式携带非鉴权业务头，随重放保留
-    await client.get<any>('/protected', { header: { 'X-Tenant': 'tenant-1' } } as any);
+    // ⚠️ 同上：不能写 `client.get<any>(...)`（TS2347）。
+    await client.get('/protected', { header: { 'X-Tenant': 'tenant-1' } } as any);
 
     // 非鉴权字段保留
     expect(replayHeader['X-Tenant']).toBe('tenant-1');

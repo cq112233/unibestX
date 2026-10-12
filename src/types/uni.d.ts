@@ -250,15 +250,28 @@ declare global {
   // ==========================================
   // uni-app X / UTS 核心对象与生命周期全局声明
   // ==========================================
-  type UTSJSONObject = Record<string, any> & {
-    getString?: (key: string) => string | null;
-    getNumber?: (key: string) => number | null;
-    getBoolean?: (key: string) => boolean | null;
-    getJSON?: (key: string) => UTSJSONObject | null;
-    getArray?: (key: string) => any[] | null;
-    get?: (key: string) => any;
-    set?: (key: string, value: any) => void;
-  };
+  // UTSJSONObject：UTS 内置的 JSON 对象类型（uni.request 返回体、_serialize/_hydrate 等）。
+  //
+  // ⚠️ 只能声明为纯索引签名（等价 Record<string, any>），不得附加具名方法，否则必踩以下坑：
+  //   - 交叉 + 方法可选（`Record<string, any> & { getString?: ... }`）：
+  //     `obj['k']` / `obj.k` 可用，但 `data.getNumber('id')` 报 TS2722
+  //     「不能调用可能是未定义的对象」（src/api/example.uts 曾如此）。
+  //   - 交叉 + 方法必选（`Record<string, any> & { getString: ... }`）：
+  //     调用可用，但 `{ ... } as UTSJSONObject` 报 TS2352、赋值报 TS2739 / TS2322
+  //     （字面量缺 getString 等必选成员）—— 项目内此类断言逾百处。
+  //     （已实测：TS 的索引签名无法满足具名必选属性，故「必选方法 + 索引签名」也不可行。）
+  //   - 方法集 | Record<string, any>（联合）：调用与断言可用，但 `obj['k']` / `obj.k`
+  //     报 TS7053 / TS2339（联合的每个成员都须具备该索引签名 / 属性）。
+  // 故取纯索引签名：`obj['k']`、`obj.k`、`data.getNumber('id')`、`as UTSJSONObject`、
+  // `= {}` 五种写法全部通过。代价是具名方法调用结果为 any（项目已接受该取舍）。
+  //
+  // ⚠️ 附带代价：**不能给这些方法传泛型实参**。`obj.getArray` 经索引签名解析为 any，
+  //    写 `data.getArray<string>('roles', [])` 会报 TS2347「非类型化函数调用不能接受类型参数」。
+  //    需要元素类型时，改用带类型标注的默认值反推，例如：
+  //      const defaultRoles: Array<string> = [];
+  //      const roles = data.getArray('roles', defaultRoles) ?? defaultRoles;
+  //    （UTS 真源侧 `getArray<T>(key, defaultValue)` 本身支持泛型，仅 TS 侧声明受限。）
+  type UTSJSONObject = Record<string, any>;
   const UTSJSONObject: {
     new (obj?: any): UTSJSONObject;
     (obj?: any): UTSJSONObject;
@@ -576,6 +589,168 @@ declare global {
     scrollToBottom: (animate: boolean) => void;
     scrollToY: (y: number, animate: boolean) => void;
   };
+
+  // ==========================================
+  // uni-app X 原生异步任务类型（uni.request / uploadFile / downloadFile 的返回值）
+  //
+  // 为什么需要补这份声明：
+  //   1) HBuilderX 编辑器与真机编译用的是它自带的 uni-app x dts，其中这三个类型
+  //      已通过 `declare global` 暴露为全局（HBuilderX 内置
+  //      @dcloudio/uni-app-x/types/uni/uts-plugin-api/lib/uni-network/utssdk/global.d.ts:56,70），
+  //      所以 HBuilderX 里裸写 `RequestTask` 不报错。
+  //   2) VSCode / tsconfig 侧挂的是 npm 包 `@dcloudio/types`，它把三者关在
+  //      `declare namespace UniNamespace` 内（base/request.d.ts:1,113），**未提升到全局**，
+  //      于是 .uts 里裸写 `RequestTask` 会报 TS2304「找不到名称」。
+  //   3) 不能改用 `UniNamespace.RequestTask` 绕开：`declare namespace` 只是 TS 的 d.ts 语法，
+  //      并非 UTS 运行时语法，写进 .uts 源码会被 HBuilderX 编译报错。
+  //
+  // 故按 HBuilderX 真源签名补齐全局声明（真源：utssdk/interface.d.ts:1760 起）。
+  // ⚠️ 必须用 `type` 而非 `interface`：scripts/gen-uts-dts.mjs 注明「项目禁用 interface」。
+  // ==========================================
+
+  /** uni.request 的返回值，可用于中断请求、监听响应头 / 分块数据 */
+  type RequestTask = {
+    /** 中断请求任务 */
+    abort: () => void;
+    /** 监听 Transfer-Encoding Chunk Received 事件，返回监听器 id */
+    onChunkReceived: (listener: (result: { data: ArrayBuffer }) => void) => number;
+    /** 移除分块数据监听（不传参则移除全部） */
+    offChunkReceived: (listener?: number | ((result: { data: ArrayBuffer }) => void) | null) => void;
+    /** 监听 HTTP Response Header 事件，返回监听器 id */
+    onHeadersReceived: (listener: (result: { header: any; cookies: string[]; statusCode: number }) => void) => number;
+    /** 移除响应头监听（不传参则移除全部） */
+    offHeadersReceived: (listener?: number | ((result: { header: any; cookies: string[]; statusCode: number }) => void) | null) => void;
+  };
+
+  /** uni.uploadFile 的返回值，可用于中断上传、监听上传进度 */
+  type UploadTask = {
+    /** 中断上传任务 */
+    abort: () => void;
+    /** 监听上传进度变化 */
+    onProgressUpdate: (callback: (result: {
+      progress: number;
+      totalBytesSent: number;
+      totalBytesExpectedToSend: number;
+    }) => void) => void;
+  };
+
+  /** uni.downloadFile 的返回值，可用于中断下载、监听下载进度 */
+  type DownloadTask = {
+    /** 中断下载任务 */
+    abort: () => void;
+    /** 监听下载进度变化 */
+    onProgressUpdate: (callback: (result: {
+      progress: number;
+      totalBytesWritten: number;
+      totalBytesExpectedToWrite: number;
+    }) => void) => void;
+  };
+
+  /** uni.uploadFile 的 onProgressUpdate 回调入参 */
+  type OnProgressUpdateResult = {
+    /** 上传进度百分比 */
+    progress: number;
+    /** 已上传的数据长度，单位 Bytes */
+    totalBytesSent: number;
+    /** 预期需要上传的数据总长度，单位 Bytes */
+    totalBytesExpectedToSend: number;
+  };
+
+  /** uni.downloadFile 的 onProgressUpdate 回调入参 */
+  type OnProgressDownloadResult = {
+    /** 下载进度百分比 */
+    progress: number;
+    /** 已下载的数据长度，单位 Bytes */
+    totalBytesWritten: number;
+    /** 预期需要下载的数据总长度，单位 Bytes */
+    totalBytesExpectedToWrite: number;
+  };
+
+  // ==========================================
+  // 给 @dcloudio/types 的 UniNamespace.RequestTask 补齐分块接收 API
+  //
+  // `uni.request(...)` 的返回类型是 `UniNamespace.RequestTask`（来自 @dcloudio/types，
+  // 即 Vue2 时代 uni-app 的类型），它只有 abort / onHeadersReceived / offHeadersReceived，
+  // **没有** uni-app X 才有的 `onChunkReceived` —— 于是 stream.uts 里
+  // `task.onChunkReceived(...)` 报 TS2339「RequestTask 上不存在属性 onChunkReceived」。
+  //
+  // 用声明合并（interface 可合并）就地补齐，无需改动 @dcloudio/types。
+  // 真源签名同上方全局 `RequestTask`（HBuilderX 内置 uni-app x dts）。
+  // ==========================================
+  namespace UniNamespace {
+    interface RequestTask {
+      /** 监听 Transfer-Encoding Chunk Received 事件，返回监听器 id */
+      onChunkReceived: (listener: (result: { data: ArrayBuffer }) => void) => number;
+      /** 移除分块数据监听（不传参则移除全部） */
+      offChunkReceived: (listener?: number | ((result: { data: ArrayBuffer }) => void) | null) => void;
+    }
+  }
+
+  // ==========================================
+  // Vite 环境变量：import.meta.env.*
+  //
+  // 项目 tsconfig 的 `types` 白名单仅含 "@dcloudio/types"（未引入 "vite/client"），
+  // 故 VSCode / tsc 下 `import.meta.env.VITE_*` 报 TS2339「ImportMeta 上不存在 env」。
+  // 此处按 vite/client 的声明形式补齐。
+  //
+  // ⚠️ 必须用 interface 以与 lib.es5 的全局 `interface ImportMeta` 做声明合并，
+  //    改成 type 会因重名报错（interface 可合并，type 不可）。
+  // ==========================================
+  interface ImportMetaEnv {
+    readonly [key: string]: any;
+    readonly BASE_URL: string;
+    readonly MODE: string;
+    readonly DEV: boolean;
+    readonly PROD: boolean;
+    readonly SSR: boolean;
+
+    // —— 以下为项目自定义变量（真源：仓库根 .env / .env.development / .env.production / .env.test）
+    // ⚠️ 一律声明为可选：同一变量并非每个模式文件都有（如 VITE_ENV_NAME 只在 .development/.test/.production 中），
+    //    且 .env 中被注释掉的项在运行时确实不存在。声明为必选会让 `${x ?? 'default'}` 的兜底写法失去意义，
+    //    并可能触发 no-unnecessary-condition 类告警。
+
+    // 取自 .env
+    readonly VITE_APP_TITLE?: string;
+    readonly VITE_APP_VERSION?: string;
+    readonly VITE_DEFAULT_LOCALE?: string;
+    readonly VITE_DEFAULT_THEME?: string;
+    readonly VITE_DEFAULT_THEME_MODE?: string;
+    readonly VITE_DEV_SANDBOX?: string;
+    readonly VITE_DEV_SANDBOX_PAGES?: string;
+    readonly VITE_H5_USE_PROXY?: string;
+    readonly VITE_SHOW_VCONSOLE?: string;
+    readonly VITE_STREAM_URL?: string;
+    readonly VITE_TABBAR_MODE?: string;
+    readonly VITE_USE_MOCK?: string;
+
+    // 取自 .env.development / .env.production / .env.test
+    readonly VITE_ENV_NAME?: string;
+    readonly VITE_ENV_TYPE?: string;
+    readonly VITE_SERVER_BASEURL?: string;
+    readonly VITE_SERVER_BASEURL_SECONDARY?: string;
+    readonly VITE_UPLOAD_BASEURL?: string;
+    readonly VITE_UPLOAD_PATH?: string;
+
+    // 非 .env 声明，由 vite 构建期插件注入
+    readonly VITE_BUILD_TIME?: string;
+    readonly VITE_GIT_BRANCH?: string;
+    readonly VITE_GIT_COMMIT_HASH?: string;
+  }
+
+  interface ImportMeta {
+    readonly env: ImportMetaEnv;
+  }
+
+  // ==========================================
+  // UTS 扩展的 JSON 静态方法
+  //
+  // HBuilderX 内置 UTS 运行时提供 `JSON.parseObject`（把字符串解析为 UTSJSONObject，
+  // 解析失败返回 null），但 @dcloudio/types 未覆盖。此处合并进全局 JSON 接口。
+  // 真源用法：src/store/vdom/i18n.uts:16、src/http/request/request.uts:124 等。
+  // ==========================================
+  interface JSON {
+    parseObject: (text: string) => any;
+  }
 }
 
 declare module '*.uvue' {

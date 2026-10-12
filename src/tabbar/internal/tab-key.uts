@@ -32,7 +32,11 @@ function getSourceList(): CustomTabBarItem[] {
 /** 由 state.uts 注入的「完整列表」getter（含 midButton 插入项） */
 let fullTabbarListGetter: (() => CustomTabBarItem[] | null) | null = null;
 
-/** 由 state.uts 注册完整列表 getter，供本模块解析 index 时取用（仅内部使用） */
+/**
+ * 由 state.uts 注册完整列表 getter，供本模块解析 index 时取用（仅内部使用）
+ * @param getter 返回「含 midButton 插入项」完整列表的函数，为 null 时本模块回退到 config.uts 的静态列表；
+ *               只在模块初始化时注册一次，**重复调用会覆盖前一个**，业务侧不要直接调用
+ */
 export function registerFullTabbarListGetter(getter: () => CustomTabBarItem[] | null): void {
   fullTabbarListGetter = getter;
 }
