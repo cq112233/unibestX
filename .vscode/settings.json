@@ -7,9 +7,29 @@
     "manifest.json": "jsonc"
   },
 
-  // uni-app x: 启用 Volar 对 .uvue 文件的基本解析（如跳转定义），但在下面通过 [vue] block 禁用其模板类型报错
-  "vue.server.additionalExtensions": [
-    "uvue"
+  // uni-app x: 启用 Volar 对 .uts / .uvue 文件的解析（跳转定义、补全、类型提示）。
+  //
+  // 为什么必须显式把 "uts" 加进来：
+  //   Volar 客户端处理文档前会先做一次语言过滤 ——
+  //     if (!includeLanguages.includes(document.languageId)) return;
+  //   `vue.server.includeLanguages` 的默认值只有 ["vue"]。而 `files.associations`
+  //   把 `*.uvue` 映射成 languageId `vue`（所以 uvue 天然被接管、一直能跳），
+  //   却把 `*.uts` 映射成 languageId `uts`（不在默认列表 → Volar 直接 return）。
+  //   于是 .uts 只能落到 DCloud 的 `hbuilderx-language-services`，它走的是异步增量
+  //   索引：索引就绪时能跳，被文件监听打回后立刻失效 ——
+  //   这正是「重启能点、过一会儿点不动」「uvue 能跳、uts 不能跳」的根因。
+  //
+  // 注意：不存在 `vue.server.additionalExtensions` 这个配置项（Volar 3.3.13 无此键），
+  // 写它不报错但也完全无效，必须用 `vue.server.includeLanguages`。
+  // 改完需要重启扩展宿主（Volar 会弹「Please restart extension host」提示）。
+  //
+  // 配套依赖（缺一不可）：
+  //   1) tsconfig.json 的 `vueCompilerOptions.extensions` 含 ".uts"
+  //   2) .vscode/uts-volar-plugin/index.cjs 把 .uts 当 TS script 解析
+  "vue.server.includeLanguages": [
+    "vue",
+    "uvue",
+    "uts"
   ],
 
   // 启用内置 TS/JS 验证，支持函数必填参数与参数类型校验报错提示
@@ -17,6 +37,34 @@
   "javascript.validate.enable": true,
   "typescript.suggest.paths": true,
   "javascript.suggest.paths": true,
+
+  // uni-app x: 关掉 DCloud 扩展的「条件编译置灰」，否则 .uts 里不匹配当前目标平台的条件编译块会整块变暗。
+  //
+  // 现象：`.uts` 里第一个 `// #ifdef` 之后的成片分支看起来"亮度不对"，像被禁用。
+  // 它**不是**主题问题，也**不是** VSCode 对未使用代码的淡化，而是
+  // dcloud-ide.hbuilderx-language-services 自带的功能（该扩展只贡献了这一个设置项，默认 true）。
+  // 实现在扩展的 jsservice/out/hxHandler.js：
+  //     handleConditionalCompilationChange()
+  //       → requestTsServer("getDisableTextRanges")   // 向它的 TS 服务要「被条件编译禁用」的行范围
+  //       → applyDecoration(..., ranges, editor)      // 对整行设 decoration
+  //       → createTextEditorDecorationType({ isWholeLine: true,
+  //             backgroundColor: "editor.embeddedCodeBackground",
+  //             color: "editor.embeddedCodeForeground" })
+  // 因为是**整行**刷底色 + 前景色，观感就是"整块变暗"，而不是某个标识符变暗。
+  // 范围**不是** TS 的 7027，而是它按「当前目标平台」（TargetManager.target()，本机未配置时默认
+  // APP-ANDROID）把文件过一遍预处理器算出来的「该平台编不出来」的行，见扩展里
+  // uniapp/out/target/target_highlight_controler.js 的 getDisableTextRanges()：
+  // 逐行判断该行是否落在当前平台编译产物的 sourceRanges 里，不在就整行刷灰。
+  // 所以代码里一切多分支 `#ifdef` 派发函数（getCompilePlatform / isVaporMode / getCompileMode …）整片都会被刷。
+  //
+  // 置灰本意是提示"当前平台跑不到的分支"，但本项目大量用 #ifdef 做平台派发，通篇置灰反而干扰阅读；
+  // 要看平台差异时用条件编译高亮（uni-helper.uni-highlight）就够了。想恢复提示删掉本行即可。
+  "enable.conditional.compilation.graying": false,
+
+  // 必须保持 true：6133（声明未使用）的淡化靠它。另一路会淡化代码的 7027（#ifdef 多分支派发被 TS
+  // 误判成「不可达」）已在**代码侧**消除 —— 见 src/config/env/env.uts 的 isVaporMode()/getCompilePlatform()
+  // 等 5 处「条件编译段只赋值、统一 return」的写法。所以在 .uts 里保持 true 也不会再误伤条件编译段。
+  "editor.showUnused": true,
 
   // 路径别名补全插件配置 (Path Intellisense / Path Autocomplete)
   "path-intellisense.mappings": {
@@ -40,10 +88,7 @@
     "docker.md": "Dockerfile,docker*.md,nginx*,.dockerignore",
     "pages.config.ts": "manifest.config.ts,openapi-ts-request.config.ts",
     "package.json": "tsconfig.json,pnpm-lock.yaml,pnpm-workspace.yaml,LICENSE,.gitattributes,.gitignore,.gitpod.yml,CNAME,.npmrc,.browserslistrc",
-    "eslint.config.mjs": ".commitlintrc.*,.prettier*,.editorconfig,.commitlint.cjs,.eslint*",
-    // 把 .uts 的类型声明文件折叠到 .uts 下面，避免两行同名文件造成混淆
-    // （声明文件必须与 .uts 同目录同名，由 scripts/gen-uts-dts.mjs 生成）
-    "*.uts": "${capture}.d.uts.ts"
+    "eslint.config.mjs": ".commitlintrc.*,.prettier*,.editorconfig,.commitlint.cjs,.eslint*"
   },
 
   "stylelint.enable": true,

@@ -1,0 +1,457 @@
+<template>
+  <view class="flex flex-col items-center flex-1 px-[16px] pt-[12px] pb-[24px]">
+    <scroll-view direction="vertical" class="w-full flex flex-col flex-1" :style="{ maxWidth: '560px' }">
+      <!-- 模块说明：来源、演示范围与补充说明 -->
+      <view class="w-full rounded-[16px] bg-[#ffffff] border-[1px] border-solid border-[#e2e8f0] p-[16px] mb-[12px]">
+        <text class="text-[15px] font-bold text-[#1e293b]">lime-shared 工具函数</text>
+        <text class="text-[12px] leading-[18px] text-[#64748b] mt-[6px]">uni_modules/lime-shared 提供的通用工具函数（90+ 个模块，按平台分文件实现）。本页演示其中常用的一部分：其中 uniq、chunk、get、capitalize、isEqual 为项目在模块内补充实现（lime-shared 原生未提供），其余均为模块自带。</text>
+      </view>
+
+      <!-- 1. 浮点精度运算 -->
+      <view class="w-full rounded-[16px] bg-[#ffffff] border-[1px] border-solid border-[#e2e8f0] p-[16px] mb-[12px]">
+        <view class="flex flex-row items-center mb-[10px]">
+          <view class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#2563eb]" />
+          <text class="text-[14px] font-bold text-[#1e293b]">1. 浮点精度运算</text>
+        </view>
+        <text class="text-[12px] text-[#64748b]">演示用的两个小数：a = {{ rawFloatA }}，b = {{ rawFloatB }}</text>
+        <view class="w-full rounded-[12px] bg-[#f8fafc] p-[12px] mt-[10px]">
+          <view class="flex flex-row items-center justify-between mb-[6px]">
+            <text class="text-[12px] text-[#64748b]">原生 a + b（精度丢失）</text>
+            <text class="text-[13px] font-bold text-[#dc2626]" style="font-family: monospace;">{{ nativeFloatSum }}</text>
+          </view>
+          <view class="flex flex-row items-center justify-between mb-[6px]">
+            <text class="text-[12px] text-[#64748b]">floatAdd(a, b)</text>
+            <text class="text-[13px] font-bold text-[#059669]" style="font-family: monospace;">{{ floatAddText }}</text>
+          </view>
+          <view class="flex flex-row items-center justify-between mb-[6px]">
+            <text class="text-[12px] text-[#64748b]">floatSub(a, b)</text>
+            <text class="text-[13px] font-bold text-[#1d4ed8]" style="font-family: monospace;">{{ floatSubText }}</text>
+          </view>
+          <view class="flex flex-row items-center justify-between mb-[6px]">
+            <text class="text-[12px] text-[#64748b]">floatMul(a, b)</text>
+            <text class="text-[13px] font-bold text-[#1d4ed8]" style="font-family: monospace;">{{ floatMulText }}</text>
+          </view>
+          <view class="flex flex-row items-center justify-between">
+            <text class="text-[12px] text-[#64748b]">floatDiv(a, b)</text>
+            <text class="text-[13px] font-bold text-[#1d4ed8]" style="font-family: monospace;">{{ floatDivText }}</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 2. 序列生成与编号补齐 -->
+      <view class="w-full rounded-[16px] bg-[#ffffff] border-[1px] border-solid border-[#e2e8f0] p-[16px] mb-[12px]">
+        <view class="flex flex-row items-center mb-[10px]">
+          <view class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#7c3aed]" />
+          <text class="text-[14px] font-bold text-[#1e293b]">2. 序列生成与编号补齐</text>
+        </view>
+        <text class="text-[12px] text-[#64748b]">range(start, end, step, fromRight) 生成等差数列，fillZero(number, length) 把数字补零到指定位数。</text>
+        <view class="w-full rounded-[12px] bg-[#f8fafc] p-[12px] mt-[10px]">
+          <view class="flex flex-row items-center justify-between mb-[6px]">
+            <text class="text-[12px] text-[#64748b]">range(1, 6)</text>
+            <text class="text-[13px] font-bold text-[#6d28d9]" style="font-family: monospace;">{{ rangeText }}</text>
+          </view>
+          <view class="flex flex-row items-center justify-between mb-[6px]">
+            <text class="text-[12px] text-[#64748b]">range(1, 10, 2, true) 反向步长</text>
+            <text class="text-[13px] font-bold text-[#6d28d9]" style="font-family: monospace;">{{ rangeRightText }}</text>
+          </view>
+          <view class="flex flex-row items-center justify-between mb-[6px]">
+            <text class="text-[12px] text-[#64748b]">fillZero(7, 4)</text>
+            <text class="text-[13px] font-bold text-[#6d28d9]" style="font-family: monospace;">{{ fillZeroText }}</text>
+          </view>
+          <view class="flex flex-row items-center justify-between">
+            <text class="text-[12px] text-[#64748b]">fillZero(7) 默认 2 位</text>
+            <text class="text-[13px] font-bold text-[#6d28d9]" style="font-family: monospace;">{{ fillZeroDefaultText }}</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 3. 唯一标识生成 -->
+      <view class="w-full rounded-[16px] bg-[#ffffff] border-[1px] border-solid border-[#e2e8f0] p-[16px] mb-[12px]">
+        <view class="flex flex-row items-center mb-[10px]">
+          <view class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#d97706]" />
+          <text class="text-[14px] font-bold text-[#1e293b]">3. 唯一标识生成</text>
+        </view>
+        <text class="text-[12px] text-[#64748b]">guid(len) 生成指定长度的伪随机串（Web 端优先走 crypto.randomUUID）；uniqid(prefix) 用「时间戳 + 随机数 + 自增计数器」保证同一次运行内不重复。</text>
+        <view class="w-full rounded-[12px] bg-[#f8fafc] p-[12px] mt-[10px]">
+          <view class="flex flex-row items-center justify-between mb-[6px]">
+            <text class="text-[12px] text-[#64748b]">guid(16)</text>
+            <text class="text-[13px] font-bold text-[#b45309]" style="font-family: monospace;">{{ guidText }}</text>
+          </view>
+          <view class="flex flex-row items-center justify-between mb-[6px]">
+            <text class="text-[12px] text-[#64748b]">guid() 默认 32 位</text>
+            <text class="text-[13px] font-bold text-[#b45309]" style="font-family: monospace;">{{ guidDefaultText }}</text>
+          </view>
+          <view class="flex flex-row items-center justify-between">
+            <text class="text-[12px] text-[#64748b]">uniqid('lime')</text>
+            <text class="text-[13px] font-bold text-[#b45309]" style="font-family: monospace;">{{ uniqidText }}</text>
+          </view>
+        </view>
+        <view class="w-full h-[34px] flex flex-row items-center justify-center rounded-[8px] bg-[#d97706] mt-[10px]" @click="onRefreshIdentity">
+          <text class="text-[12px] font-bold text-[#ffffff]">重新生成</text>
+        </view>
+      </view>
+
+      <!-- 4. 数值约束与单位补全 -->
+      <view class="w-full rounded-[16px] bg-[#ffffff] border-[1px] border-solid border-[#e2e8f0] p-[16px] mb-[12px]">
+        <view class="flex flex-row items-center mb-[10px]">
+          <view class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#059669]" />
+          <text class="text-[14px] font-bold text-[#1e293b]">4. 数值约束与单位补全</text>
+        </view>
+        <text class="text-[12px] text-[#64748b]">clamp(val, min, max) 把数值夹到区间内，addUnit(value) 给纯数字补上 px、已带单位的原样返回。</text>
+        <view class="w-full rounded-[12px] bg-[#f8fafc] p-[12px] mt-[10px]">
+          <view class="flex flex-row items-center justify-between mb-[6px]">
+            <text class="text-[12px] text-[#64748b]">clamp(138, 0, 100) 超上限</text>
+            <text class="text-[13px] font-bold text-[#047857]" style="font-family: monospace;">{{ clampedHighText }}</text>
+          </view>
+          <view class="flex flex-row items-center justify-between mb-[6px]">
+            <text class="text-[12px] text-[#64748b]">clamp(-5, 0, 10) 低于下限</text>
+            <text class="text-[13px] font-bold text-[#047857]" style="font-family: monospace;">{{ clampedLowText }}</text>
+          </view>
+          <view class="flex flex-row items-center justify-between mb-[6px]">
+            <text class="text-[12px] text-[#64748b]">clamp(12, 0, 100) 区间内</text>
+            <text class="text-[13px] font-bold text-[#047857]" style="font-family: monospace;">{{ clampedInRangeText }}</text>
+          </view>
+          <view class="flex flex-row items-center justify-between mb-[6px]">
+            <text class="text-[12px] text-[#64748b]">addUnit(120)</text>
+            <text class="text-[13px] font-bold text-[#047857]" style="font-family: monospace;">{{ addUnitNumberText }}</text>
+          </view>
+          <view class="flex flex-row items-center justify-between mb-[6px]">
+            <text class="text-[12px] text-[#64748b]">addUnit('50%')</text>
+            <text class="text-[13px] font-bold text-[#047857]" style="font-family: monospace;">{{ addUnitStringText }}</text>
+          </view>
+          <view class="flex flex-row items-center justify-between">
+            <text class="text-[12px] text-[#64748b]">addUnit('300px') 已带单位</text>
+            <text class="text-[13px] font-bold text-[#047857]" style="font-family: monospace;">{{ addUnitAlreadyUnitText }}</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 5. 数组去重与切片分组 -->
+      <view class="w-full rounded-[16px] bg-[#ffffff] border-[1px] border-solid border-[#e2e8f0] p-[16px] mb-[12px]">
+        <view class="flex flex-row items-center mb-[10px]">
+          <view class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#0ea5e9]" />
+          <text class="text-[14px] font-bold text-[#1e293b]">5. 数组去重与切片分组</text>
+        </view>
+        <text class="text-[12px] text-[#64748b]">uniq(array) 按首次出现顺序去重，chunk(array, size) 按固定长度分组（最后一组不足也保留）。</text>
+        <view class="w-full rounded-[12px] bg-[#f8fafc] p-[12px] mt-[10px]">
+          <text class="text-[12px] text-[#64748b]">原始数组（含重复元素）</text>
+          <view class="w-full rounded-[8px] bg-[#ffffff] p-[8px] mt-[4px]">
+            <text class="text-[12px] font-medium text-[#0369a1]" style="font-family: monospace;">{{ rawNumbersText }}</text>
+          </view>
+          <text class="text-[12px] text-[#64748b] mt-[8px]">uniq(原始数组)</text>
+          <view class="w-full rounded-[8px] bg-[#ffffff] p-[8px] mt-[4px]">
+            <text class="text-[12px] font-bold text-[#0369a1]" style="font-family: monospace;">{{ uniqNumbersText }}</text>
+          </view>
+          <text class="text-[12px] text-[#64748b] mt-[8px]">chunk(去重结果, 3)</text>
+          <view class="w-full rounded-[8px] bg-[#ffffff] p-[8px] mt-[4px]">
+            <text class="text-[12px] font-bold text-[#0369a1]" style="font-family: monospace;">{{ chunkNumbersText }}</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 6. 数组随机与拷贝隔离 -->
+      <view class="w-full rounded-[16px] bg-[#ffffff] border-[1px] border-solid border-[#e2e8f0] p-[16px] mb-[12px]">
+        <view class="flex flex-row items-center mb-[10px]">
+          <view class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#ec4899]" />
+          <text class="text-[14px] font-bold text-[#1e293b]">6. 数组随机与拷贝隔离</text>
+        </view>
+        <text class="text-[12px] text-[#64748b]">shuffle(array) 原地洗牌（演示里先复制一份再打乱）；cloneDeep(obj) 复制对象，改副本不影响原对象（卡片只演示顶层字段隔离）。</text>
+        <view class="w-full rounded-[12px] bg-[#f8fafc] p-[12px] mt-[10px]">
+          <text class="text-[12px] text-[#64748b]">shuffle(去重后的数组)</text>
+          <view class="w-full rounded-[8px] bg-[#ffffff] p-[8px] mt-[4px]">
+            <text class="text-[12px] font-bold text-[#be185d]" style="font-family: monospace;">{{ shuffledNumbersText }}</text>
+          </view>
+          <view class="w-full h-[34px] flex flex-row items-center justify-center rounded-[8px] bg-[#fce7f3] mt-[8px]" @click="onShuffleNumbers">
+            <text class="text-[12px] font-bold text-[#be185d]">点击 shuffle 打乱</text>
+          </view>
+          <view class="h-[1px] bg-[#e2e8f0] my-[10px]" />
+          <view class="flex flex-row items-center justify-between mb-[6px]">
+            <text class="text-[12px] text-[#64748b]">原对象 age</text>
+            <text class="text-[13px] font-bold text-[#334155]">{{ rawUserAge }}</text>
+          </view>
+          <view class="flex flex-row items-center justify-between">
+            <text class="text-[12px] text-[#64748b]">cloneDeep 副本 age</text>
+            <text class="text-[13px] font-bold text-[#be185d]">{{ clonedUserAge }}</text>
+          </view>
+          <view class="w-full h-[34px] flex flex-row items-center justify-center rounded-[8px] bg-[#fce7f3] mt-[8px]" @click="onMutateClonedUser">
+            <text class="text-[12px] font-bold text-[#be185d]">修改副本 age (+1)</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 7. 对象路径安全取值 -->
+      <view class="w-full rounded-[16px] bg-[#ffffff] border-[1px] border-solid border-[#e2e8f0] p-[16px] mb-[12px]">
+        <view class="flex flex-row items-center mb-[10px]">
+          <view class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#14b8a6]" />
+          <text class="text-[14px] font-bold text-[#1e293b]">7. 对象路径安全取值</text>
+        </view>
+        <text class="text-[12px] text-[#64748b]">get(obj, path, defaultValue) 按 'a.b.c' 路径取值，路径不存在时返回兜底值，不会因中间层缺失而报错。</text>
+        <view class="w-full rounded-[12px] bg-[#f8fafc] p-[12px] mt-[10px]">
+          <view class="flex flex-row items-center justify-between mb-[6px]">
+            <text class="text-[12px] text-[#64748b]">get(obj, 'user.info.name')</text>
+            <text class="text-[13px] font-bold text-[#0f766e]" style="font-family: monospace;">{{ getNameText }}</text>
+          </view>
+          <view class="flex flex-row items-center justify-between">
+            <text class="text-[12px] text-[#64748b]">get(obj, 'user.invalid.path')</text>
+            <text class="text-[13px] font-bold text-[#0f766e]" style="font-family: monospace;">{{ getFallbackText }}</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 8. 文本命名转换 -->
+      <view class="w-full rounded-[16px] bg-[#ffffff] border-[1px] border-solid border-[#e2e8f0] p-[16px] mb-[12px]">
+        <view class="flex flex-row items-center mb-[10px]">
+          <view class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#8b5cf6]" />
+          <text class="text-[14px] font-bold text-[#1e293b]">8. 文本命名转换</text>
+        </view>
+        <text class="text-[12px] text-[#64748b]">camelCase(str, isPascalCase) 转驼峰（第二参为 true 转大驼峰），kebabCase(str, separator) 转连接符命名，capitalize(str) 仅首字母大写。</text>
+        <view class="w-full rounded-[12px] bg-[#f8fafc] p-[12px] mt-[10px]">
+          <text class="text-[12px] text-[#64748b]">输入文本</text>
+          <input v-model="inputText" class="w-full h-[36px] px-[12px] mt-[4px] rounded-[6px] border-[1px] border-solid border-[#cbd5e1] text-[13px] text-[#1e293b]" placeholder="请输入待转换文本" />
+          <view class="flex flex-row items-center justify-between mt-[8px] mb-[6px]">
+            <text class="text-[12px] text-[#64748b]">camelCase</text>
+            <text class="text-[13px] font-bold text-[#6d28d9]" style="font-family: monospace;">{{ camelCaseText }}</text>
+          </view>
+          <view class="flex flex-row items-center justify-between mb-[6px]">
+            <text class="text-[12px] text-[#64748b]">camelCase(str, true)</text>
+            <text class="text-[13px] font-bold text-[#6d28d9]" style="font-family: monospace;">{{ pascalCaseText }}</text>
+          </view>
+          <view class="flex flex-row items-center justify-between mb-[6px]">
+            <text class="text-[12px] text-[#64748b]">kebabCase</text>
+            <text class="text-[13px] font-bold text-[#6d28d9]" style="font-family: monospace;">{{ kebabCaseText }}</text>
+          </view>
+          <view class="flex flex-row items-center justify-between">
+            <text class="text-[12px] text-[#64748b]">capitalize</text>
+            <text class="text-[13px] font-bold text-[#6d28d9]" style="font-family: monospace;">{{ capitalizeText }}</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 9. 深比较 -->
+      <view class="w-full rounded-[16px] bg-[#ffffff] border-[1px] border-solid border-[#e2e8f0] p-[16px] mb-[12px]">
+        <view class="flex flex-row items-center mb-[10px]">
+          <view class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#f59e0b]" />
+          <text class="text-[14px] font-bold text-[#1e293b]">9. 深比较</text>
+        </view>
+        <text class="text-[12px] text-[#64748b]">isEqual(a, b) 比较两个值是否相等（对象与数组按 JSON 文本比较，仅比较浅层数组时可用 arrayEqual）。</text>
+        <view class="w-full rounded-[12px] bg-[#f8fafc] p-[12px] mt-[10px]">
+          <view class="flex flex-row items-center justify-between mb-[6px]">
+            <text class="text-[12px] text-[#64748b]">内容相同的两个对象</text>
+            <text class="text-[13px] font-bold text-[#b45309]" style="font-family: monospace;">{{ isEqualSameText }}</text>
+          </view>
+          <view class="flex flex-row items-center justify-between mb-[6px]">
+            <text class="text-[12px] text-[#64748b]">版本号不同的两个对象</text>
+            <text class="text-[13px] font-bold text-[#b45309]" style="font-family: monospace;">{{ isEqualDiffText }}</text>
+          </view>
+          <view class="flex flex-row items-center justify-between">
+            <text class="text-[12px] text-[#64748b]">isEqual(null, null)</text>
+            <text class="text-[13px] font-bold text-[#b45309]" style="font-family: monospace;">{{ isEqualNullText }}</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 10. 防抖与随机数 -->
+      <view class="w-full rounded-[16px] bg-[#ffffff] border-[1px] border-solid border-[#e2e8f0] p-[16px] mb-[12px]">
+        <view class="flex flex-row items-center mb-[10px]">
+          <view class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#6366f1]" />
+          <text class="text-[14px] font-bold text-[#1e293b]">10. 防抖与随机数</text>
+        </view>
+        <text class="text-[12px] text-[#64748b]">debounce(fn, wait) 连续触发只在停止后执行一次，random(min, max, fixed) 生成区间内的随机数。</text>
+        <view class="w-full rounded-[12px] bg-[#f8fafc] p-[12px] mt-[10px]">
+          <view class="flex flex-row items-center justify-between mb-[8px]">
+            <text class="text-[12px] text-[#64748b]">防抖计数（停止 400ms 后 +1）</text>
+            <text class="text-[16px] font-bold text-[#4338ca]">{{ debouncedCount }}</text>
+          </view>
+          <view class="w-full h-[34px] flex flex-row items-center justify-center rounded-[8px] bg-[#e0e7ff]" @click="onDebounceClick">
+            <text class="text-[12px] font-bold text-[#4338ca]">快速连击测试防抖</text>
+          </view>
+          <view class="h-[1px] bg-[#e2e8f0] my-[10px]" />
+          <view class="flex flex-row items-center justify-between">
+            <text class="text-[12px] text-[#64748b]">random(1, 100)</text>
+            <view class="flex flex-row items-center">
+              <text class="text-[14px] font-bold text-[#4338ca] mr-[10px]" style="font-family: monospace;">{{ randomValue }}</text>
+              <view class="px-[8px] py-[4px] rounded-[4px] bg-[#e0e7ff]" @click="onRefreshRandom">
+                <text class="text-[11px] font-bold text-[#4338ca]">重新生成</text>
+              </view>
+            </view>
+          </view>
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed, ref } from 'vue';
+import { addUnit } from '@/uni_modules/lime-shared/addUnit';
+import { camelCase } from '@/uni_modules/lime-shared/camelCase';
+import { capitalize } from '@/uni_modules/lime-shared/capitalize';
+import { chunk } from '@/uni_modules/lime-shared/chunk';
+import { clamp } from '@/uni_modules/lime-shared/clamp';
+import { cloneDeep } from '@/uni_modules/lime-shared/cloneDeep';
+import { debounce } from '@/uni_modules/lime-shared/debounce';
+import { fillZero } from '@/uni_modules/lime-shared/fillZero';
+import { floatAdd } from '@/uni_modules/lime-shared/floatAdd';
+import { floatDiv } from '@/uni_modules/lime-shared/floatDiv';
+import { floatMul } from '@/uni_modules/lime-shared/floatMul';
+import { floatSub } from '@/uni_modules/lime-shared/floatSub';
+import { get } from '@/uni_modules/lime-shared/get';
+import { guid } from '@/uni_modules/lime-shared/guid';
+import { isEqual } from '@/uni_modules/lime-shared/isEqual';
+import { kebabCase } from '@/uni_modules/lime-shared/kebabCase';
+import { random } from '@/uni_modules/lime-shared/random';
+import { range } from '@/uni_modules/lime-shared/range';
+import { shuffle } from '@/uni_modules/lime-shared/shuffle';
+import { uniq } from '@/uni_modules/lime-shared/uniq';
+import { uniqid } from '@/uni_modules/lime-shared/uniqid';
+
+definePage({
+  debug: false,
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
+  style: {
+    navigationBarTitleText: 'lime-shared 工具函数',
+    navigationStyle: 'custom'
+  }
+});
+
+// =========================================================================
+// 【可选删除】以下内容仅供 lime-shared 演示使用，接入真实业务时可整段删除。
+// 演示数据属于「页面结构级只读常量」（随页面固化、不由后端下发），故内联在本文件。
+// =========================================================================
+/** 待运算的两个小数，用于演示 floatAdd / floatSub / floatMul / floatDiv */
+const rawFloatA: number = 0.1;
+const rawFloatB: number = 0.2;
+
+// —— 第 1 张卡：浮点精度运算（原生相加与四种精度运算对照）
+const nativeFloatSum: number = rawFloatA + rawFloatB;
+const floatAddText: string = floatAdd(rawFloatA, rawFloatB).toString();
+const floatSubText: string = floatSub(rawFloatA, rawFloatB).toString();
+const floatMulText: string = floatMul(rawFloatA, rawFloatB).toString();
+const floatDivText: string = floatDiv(rawFloatA, rawFloatB).toString();
+
+// —— 第 2 张卡：序列生成与编号补齐
+const rangeText: string = JSON.stringify(range(1, 6));
+const rangeRightText: string = JSON.stringify(range(1, 10, 2, true));
+const fillZeroText: string = fillZero(7, 4);
+const fillZeroDefaultText: string = fillZero(7);
+
+// —— 第 3 张卡：唯一标识生成（可重新生成，因此用响应式变量）
+const guidText = ref<string>('');
+const guidDefaultText = ref<string>('');
+const uniqidText = ref<string>('');
+
+// —— 第 4 张卡：数值约束与单位补全
+const clampedHighText: string = clamp(138, 0, 100).toString();
+const clampedLowText: string = clamp(-5, 0, 10).toString();
+const clampedInRangeText: string = clamp(12, 0, 100).toString();
+const addUnitNumberText: string = addUnit(120) ?? '';
+const addUnitStringText: string = addUnit('50%') ?? '';
+const addUnitAlreadyUnitText: string = addUnit('300px') ?? '';
+
+// —— 第 5 张卡：数组去重与切片分组
+const rawNumbers: Array<number> = [1, 2, 2, 3, 4, 4, 5, 6, 7, 8];
+const uniqNumbers: Array<number> = uniq<number>(rawNumbers);
+const rawNumbersText: string = JSON.stringify(rawNumbers);
+const uniqNumbersText: string = JSON.stringify(uniqNumbers);
+const chunkNumbersText: string = JSON.stringify(chunk<number>(uniqNumbers, 3));
+
+// —— 第 6 张卡：数组随机与拷贝隔离
+/** shuffle 是原地打乱，故每次先复制一份再打乱，避免改动上面的 uniqNumbers */
+const shuffledNumbersText = ref<string>(JSON.stringify(uniqNumbers));
+/** 待拷贝的原始对象：只演示顶层字段隔离，故用扁平结构 */
+const rawUserObj: UTSJSONObject = { name: 'unibestX', age: 25 };
+const rawUserAge = ref<number>(get(rawUserObj, 'age', 0) as number);
+const clonedUserObj = ref<UTSJSONObject>(cloneDeep<UTSJSONObject>(rawUserObj));
+const clonedUserAge = ref<number>(get(clonedUserObj.value, 'age', 0) as number);
+
+// —— 第 7 张卡：对象路径安全取值
+const profileObj: UTSJSONObject = {
+  user: {
+    info: {
+      name: 'UniAppX Developer',
+      age: 25
+    }
+  }
+};
+const getNameText: string = get(profileObj, 'user.info.name', '未找到') as string;
+const getFallbackText: string = get(profileObj, 'user.invalid.path', '兜底值：路径不存在') as string;
+
+// —— 第 8 张卡：文本命名转换（输入即算，故用 computed）
+const inputText = ref<string>('hello_world unibestx-demo');
+const camelCaseText = computed((): string => {
+  return camelCase(inputText.value);
+});
+const pascalCaseText = computed((): string => {
+  return camelCase(inputText.value, true);
+});
+const kebabCaseText = computed((): string => {
+  return kebabCase(inputText.value);
+});
+const capitalizeText = computed((): string => {
+  return capitalize(inputText.value);
+});
+
+/** 把布尔结果转成中文文案，避免在模板里写三元表达式（必须定义在调用点之前） */
+function equalText(flag: boolean): string {
+  if (flag) {
+    return '相等';
+  }
+  return '不相等';
+}
+
+// —— 第 9 张卡：深比较
+const equalObjA: UTSJSONObject = { name: 'unibestX', version: 1 };
+const equalObjB: UTSJSONObject = { name: 'unibestX', version: 1 };
+const equalObjC: UTSJSONObject = { name: 'unibestX', version: 2 };
+const isEqualSameText: string = equalText(isEqual(equalObjA, equalObjB));
+const isEqualDiffText: string = equalText(isEqual(equalObjA, equalObjC));
+const isEqualNullText: string = equalText(isEqual(null, null));
+
+// —— 第 10 张卡：防抖与随机数
+const debouncedCount = ref<number>(0);
+const randomValue = ref<number>(random(1, 100));
+
+/** 重新生成 guid 与 uniqid，用于观察唯一标识随每次调用变化 */
+function onRefreshIdentity(): void {
+  guidText.value = guid(16);
+  guidDefaultText.value = guid();
+  uniqidText.value = uniqid('lime');
+}
+
+/** 打乱数组（复制一份再交给 shuffle，避免原地改动源数组） */
+function onShuffleNumbers(): void {
+  shuffledNumbersText.value = JSON.stringify(shuffle<number>(uniqNumbers.slice()));
+}
+
+/** 修改深拷贝副本的 age，用于验证副本与原对象互不影响 */
+function onMutateClonedUser(): void {
+  const nextAge: number = (get(clonedUserObj.value, 'age', 0) as number) + 1;
+  /* eslint-disable dot-notation */
+  clonedUserObj.value['age'] = nextAge;
+  /* eslint-enable dot-notation */
+  clonedUserAge.value = nextAge;
+}
+
+/** 防抖计数：连续点击只在停止 400ms 后累加一次 */
+const debouncedIncrement = debounce<number>((step: number): void => {
+  debouncedCount.value = debouncedCount.value + step;
+}, 400);
+
+function onDebounceClick(): void {
+  debouncedIncrement(1);
+}
+
+/** 重新生成随机数 */
+function onRefreshRandom(): void {
+  randomValue.value = random(1, 100);
+}
+
+/** 首次进入页面即生成一组唯一标识 */
+onRefreshIdentity();
+// =================== 【可选删除】lime-shared 工具函数演示 结束 ===================
+</script>
+
+<style scoped></style>

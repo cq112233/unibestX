@@ -299,7 +299,7 @@ configs.push({
 
 configs.push({
   files: ['**/*.vue', '**/*.uvue', '**/*.uts', '**/*.ts', '**/*.js'],
-  ignores: ['**/*.d.ts', '**/*.d.uts.ts'],
+  ignores: ['**/*.d.ts'],
   rules: {
 
     'eqeqeq': 'off',

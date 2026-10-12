@@ -36,12 +36,6 @@ export type PageResult<T> = {
   total: number;
 };
 
-export type FooPageResult = PageResult<FooItem>;
-
-// 兼容历史类型别名
-export type IFoo = FooItem;
-export type IFooList = FooPageResult;
-
 // ==========================================
 // 2. 本地模拟数据集（模块内私有闭环）
 // ==========================================
@@ -66,7 +60,7 @@ const MOCK_FOO_LIST: Array<FooItem> = [
  * @param pageSize 分页大小（默认 10）
  * @param keyword 搜索关键字（默认空字符串）
  */
-export function fetchFooList(pageNo: number = 1, pageSize: number = 10, keyword: string = ''): Promise<FooPageResult> {
+export function fetchFooList(pageNo: number = 1, pageSize: number = 10, keyword: string = ''): Promise<PageResult<FooItem>> {
   let filtered = MOCK_FOO_LIST;
   if (keyword.length > 0) {
     filtered = MOCK_FOO_LIST.filter((item: FooItem): boolean => {
@@ -79,10 +73,11 @@ export function fetchFooList(pageNo: number = 1, pageSize: number = 10, keyword:
     ? filtered.slice(offset, offset + pageSize)
     : [] as Array<FooItem>;
 
-  // ⚠️ 断言必须直接写泛型本体 `PageResult<FooItem>`，严禁写别名 `as FooPageResult`：
-  // UTS 会把「泛型实例化别名」的断言编译成 `new FooPageResult({...})`，而产物里只生成了
-  // `class PageResult`，别名在运行时不存在 ⇒ 小程序/App 端抛 `ReferenceError: FooPageResult is not defined`。
-  // 别名 `FooPageResult` 只能出现在类型位置（返回值标注 / 回调参数标注），不得出现在断言或构造位置。
+  // ⚠️ 断言必须直接写泛型本体、实参写全 `PageResult<FooItem>`，严禁改用泛型实例化别名：
+  // 若定义 `type FooPageResult = PageResult<FooItem>` 后写 `as FooPageResult`，UTS 会把该断言
+  // 编译成构造调用 `new FooPageResult({...})`，而产物里只生成了 `class PageResult`
+  // （别名只是编译期 type、没有运行期绑定）⇒ 小程序 / App 端抛 `ReferenceError: FooPageResult is not defined`。
+  // 口诀：`as` / `new` 后面不许出现泛型实例化别名，类型位置（返回值标注 / 回调参数标注）才可以用别名。
   return Promise.resolve({
     list,
     hasMore: offset + pageSize < filtered.length,
@@ -92,6 +87,7 @@ export function fetchFooList(pageNo: number = 1, pageSize: number = 10, keyword:
 
 /**
  * 根据 ID 查询单条 Foo 详情
+ * @param id Foo 的主键；**查不到时 resolve 为 null 而非 reject**，调用方必须自行判空
  */
 export function fetchFooById(id: number): Promise<FooItem | null> {
   const found = MOCK_FOO_LIST.find((item: FooItem): boolean => item.id == id);
@@ -100,6 +96,7 @@ export function fetchFooById(id: number): Promise<FooItem | null> {
 
 /**
  * 新增 Foo
+ * @param data 待新增的 Foo；`id <= 0` 时由本地用 `Date.now()` 兜底生成，大于 0 则沿用传入值
  */
 export function createFoo(data: FooItem): Promise<FooItem> {
   const newItem: FooItem = {
@@ -113,6 +110,8 @@ export function createFoo(data: FooItem): Promise<FooItem> {
 
 /**
  * 更新 Foo
+ * @param id 目标 Foo 主键；**匹配不到时不做报错，直接把入参 data 原样返回**
+ * @param data 新字段值（整条替换 name / desc，最终 id 以形参 id 为准）
  */
 export function updateFoo(id: number, data: FooItem): Promise<FooItem> {
   const index = MOCK_FOO_LIST.findIndex((item: FooItem): boolean => item.id == id);
@@ -125,6 +124,7 @@ export function updateFoo(id: number, data: FooItem): Promise<FooItem> {
 
 /**
  * 删除 Foo
+ * @param id 目标 Foo 主键；**主键不存在时同样 resolve(true)** —— mock 阶段不区分「删成功」与「本就不存在」
  */
 export function deleteFoo(id: number): Promise<boolean> {
   const index = MOCK_FOO_LIST.findIndex((item: FooItem): boolean => item.id == id);
@@ -149,6 +149,8 @@ export function fetchFooRemote(): Promise<FooItem> {
       ignoreAuth: true
     } as UTSJSONObject
   } as LimeRequestConfig).then((data: UTSJSONObject): FooItem => {
+    // ⚠️ `??` 兜底不可省：getNumber / getString 返回的是可空类型（`Number?` / `String?`），
+    // 直接赋给 FooItem 的非空字段会被 Kotlin 编译拒绝（error17 参数类型不匹配）。
     return {
       id: data.getNumber('id') ?? 1,
       name: data.getString('name') ?? '',
@@ -211,21 +213,4 @@ export function downloadFooFile(
     }
   } as LimeRequestConfig;
   return http.downloadFile(url, config);
-}
-
-// ==========================================
-// 历史兼容调用别名
-// ==========================================
-
-export function getFooList(params: UTSJSONObject | null = null): Promise<Array<FooItem>> {
-  const keyword = params?.getString('name') ?? '';
-  return fetchFooList(1, 100, keyword).then((res: FooPageResult): Array<FooItem> => res.list);
-}
-
-export function getFooById(id: number): Promise<FooItem | null> {
-  return fetchFooById(id);
-}
-
-export function foo(): Promise<FooItem> {
-  return fetchFooRemote();
 }

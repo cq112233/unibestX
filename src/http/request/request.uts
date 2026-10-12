@@ -47,6 +47,8 @@ const DEFAULT_API_URL: string = 'https://ukw0y1.laf.run';
 const directBaseUrl: string = getApiBaseUrl();
 const directSecondaryUrl: string = getApiSecondaryUrl();
 
+// 环境变量给的是以 / 开头的相对路径时，说明语义本来就不是「直连」（H5 走同源代理、或开发态 mock），
+// 此时直连域名回退到云端默认地址；只有配了完整域名才采用环境变量里的值
 let defaultUrl: string = directBaseUrl.startsWith('/') ? DEFAULT_API_URL : directBaseUrl;
 let secondaryUrl: string = directSecondaryUrl.startsWith('/') ? DEFAULT_API_URL : directSecondaryUrl;
 
@@ -59,11 +61,13 @@ if (useH5Proxy) {
 }
 // #endif
 
+/** 域名表契约：主域名与备用域名 */
 export type ApiDomainConfig = {
   DEFAULT: string;
   SECONDARY: string;
 };
 
+/** 对外暴露的域名表；临时切域名时用 `config.baseURL = API_DOMAINS.SECONDARY` 覆盖单次请求 */
 export const API_DOMAINS: ApiDomainConfig = {
   DEFAULT: defaultUrl,
   SECONDARY: secondaryUrl
@@ -75,6 +79,8 @@ export const API_DOMAINS: ApiDomainConfig = {
 
 /**
  * 默认请求适配器：基于 lime-request 实例化底层网络驱动客户端
+ * @param config 本次请求的完整配置（baseURL / method / header / timeout 等）；
+ *               适配器只把它交给底层驱动，**不修改入参**
  */
 export function defaultRequestAdapter(config: LimeRequestConfig): Request {
   return new Request(config);
@@ -82,6 +88,9 @@ export function defaultRequestAdapter(config: LimeRequestConfig): Request {
 
 /**
  * 业务默认请求前置拦截钩子：处理业务 Token 鉴权与注入
+ * @param config 会被**原地改写**的请求配置，函数体做两件事：
+ *               - `extra.ignoreAuth === true` ⇒ 跳过鉴权（登录 / 刷新 token 这类接口必须开）；
+ *               - 否则把 token 写进 `config.header`，本地无 token 时直接抛「未登录」中断本次请求。
  */
 export function defaultBusinessBeforeRequest(config: LimeRequestConfig): void {
   if (config.header == null) {
@@ -116,6 +125,9 @@ export function defaultBusinessBeforeRequest(config: LimeRequestConfig): void {
 
 /**
  * 业务默认响应成功钩子：状态码判定、业务 code 校验、Toast 提示、业务 401 标记与数据解包
+ * @param data 底层驱动返回的**原始响应体（尚未拆包）**，函数返回的是 `data.data` 内层业务数据
+ * @param config 本次请求配置，只读其中 `extra` 的两个开关：
+ *               `extra.toast === false` 抑制错误提示；`extra.skipRefresh === true` 时 401 不再抛可刷新哨兵（刷新接口自身必须开，否则无限递归）
  */
 export function defaultBusinessAfterSuccess(data: any, config: LimeRequestConfig): any {
   if (data == null) {
@@ -168,6 +180,9 @@ export function defaultBusinessAfterSuccess(data: any, config: LimeRequestConfig
 
 /**
  * 业务默认响应失败钩子：统一网络错误提示
+ * @param err 底层驱动抛出的失败对象，经 `extractErrorMessage` 取文案后弹 toast；
+ *            主动取消的请求（文案含 `abort`）静默返回，不打扰用户
+ * @param _config 形参带下划线前缀 = 默认实现不消费，保留仅为对齐 `responded.onError` 的三方签名
  */
 export function defaultBusinessAfterError(err: any, _config: LimeRequestConfig): void {
   console.error('request error ===>', err);
@@ -180,6 +195,8 @@ export function defaultBusinessAfterError(err: any, _config: LimeRequestConfig):
 
 /**
  * 业务默认响应完成钩子：请求收尾处理（无论成功、失败或命中缓存均会执行）
+ * @param _config 形参带下划线前缀 = 默认实现为空，保留仅为对齐 `responded.onComplete` 签名；
+ *                业务接入时在这里统一收尾（关 loading、统计耗时等）
  */
 export function defaultBusinessAfterComplete(_config: LimeRequestConfig): void {
   // 默认收尾逻辑，供全局业务扩展（如统一关闭 loading、统计请求耗时等）
@@ -232,6 +249,8 @@ export const DEFAULT_HTTP_OPTIONS: HttpClientOptions = {
 
 /**
  * 工厂函数：统一创建并生成 HttpClient 实例
+ * @param options 客户端配置；传 null 直接复用 `DEFAULT_HTTP_OPTIONS`，传对象时会在其上补齐缺省的
+ *                `requestAdapter`（**传入对象会被就地改写**，别把只读常量传进来）
  */
 export function createHttpClient(options: HttpClientOptions | null = null): HttpClient {
   if (options == null) {
@@ -250,6 +269,8 @@ export const http: HttpClient = createHttpClient(DEFAULT_HTTP_OPTIONS);
 
 /**
  * 便捷函数：取消指定 requestKey 的在飞请求（委托给默认 http 实例）
+ * @param requestKey 发请求时登记在 `extra.requestKey` 的键；同一个键被复用时生命周期里只留最后登记的
+ *                   那个 RequestTask（后登记覆盖先登记），键从没登记过也不报错，只是白留一个取消标记
  */
 export function abortHttp(requestKey: string): void {
   http.abort(requestKey);
@@ -264,6 +285,8 @@ export function abortAllHttp(): void {
 
 /**
  * 便捷函数：清除缓存（委托给默认 http 实例）
+ * @param fingerprint 缓存指纹，由 `http.getLifecycle().buildRequestKey(config)` 算出；
+ *                    传空字符串表示**清空全部缓存**
  */
 export function clearCache(fingerprint: string = ''): void {
   http.clearCache(fingerprint);
@@ -271,6 +294,9 @@ export function clearCache(fingerprint: string = ''): void {
 
 /**
  * 便捷函数：文件上传（委托给默认 http 实例）
+ * @param url 上传地址：支持完整 `http(s)://` 地址，相对路径会与配置里的 baseURL 拼接
+ * @param config 覆盖项（必须带 `filePath` / `name`，可选 `extra`、`getTask` 取上传进度），传 null 走默认配置
+ * @returns 后端返回的业务数据，类型由调用方用 `uploadHttp<T>(...)` 指定（T 无法从入参推断，**必须显式写**）
  */
 export function uploadHttp<T>(url: string, config: LimeRequestConfig | null = null): Promise<T> {
   return http.upload<T>(url, config);
@@ -280,6 +306,9 @@ export function uploadHttp<T>(url: string, config: LimeRequestConfig | null = nu
  * 便捷函数：文件下载（委托给默认 http 实例）
  *
  * 自动携带 Token，返回临时文件路径与 HTTP 状态码。
+ *
+ * @param url 下载地址：支持完整 `http(s)://` 地址，相对路径会与配置里的 baseURL 拼接
+ * @param config 覆盖项（超时 / header / progress 相关的 getTask 等），传 null 走默认配置
  */
 export function downloadHttp(url: string, config: LimeRequestConfig | null = null): Promise<DownloadResult> {
   return http.downloadFile(url, config);

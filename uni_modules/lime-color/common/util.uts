@@ -1,0 +1,198 @@
+/**
+ * 工具函数库
+ * 提供类型判断、数值处理、颜色值转换等通用工具函数
+ */
+// @ts-nocheck
+// #ifdef APP-ANDROID && !VUE3-VAPOR
+import BigDecimal from 'java.math.BigDecimal'
+// #endif
+/**
+ * 判断值是否为数字类型
+ * @param value - 要判断的值
+ * @returns 如果值是数字类型，返回 true；否则返回 false
+ */
+export function isNumber(value: any|null):boolean{
+	// #ifdef APP-ANDROID
+	return ['Byte', 'UByte','Short','UShort','Int','UInt','Long','ULong','Float','Double','number'].includes(typeof value)
+	// #endif
+	// #ifdef APP-IOS
+	return ['Int8', 'UInt8','Int16','UInt16','Int32','UInt32','Int64','UInt64','Int','UInt','Float','Float16','Float32','Float64','Double', 'number'].includes(typeof value)
+	// #endif
+	// #ifndef APP-ANDROID || APP-IOS
+	return typeof value == 'number' && !isNaN(value);
+	// #endif
+}
+/**
+ * 判断值是否为字符串类型
+ * @param value - 要判断的值
+ * @returns 如果值是字符串类型，返回 true；否则返回 false
+ */
+export function isString(value: any|null):boolean{
+	return typeof value == 'string';
+}
+/**
+ * 判断值是否为数值类型（数字或数字字符串）
+ * @param value - 要判断的值
+ * @returns 如果值是数值类型，返回 true；否则返回 false
+ */
+export function isNumeric(value: any|null):boolean{
+	if(isNumber(value)) {
+		return true
+	} else if(isString(value)) {
+		// const regex = "-?\\d+(\\.\\d+)?".toRegex()
+		const regex = new RegExp("^(-)?\\d+(\\.\\d+)?$")
+		return  regex.test(value as string) //regex.matches(value as string) 
+	}
+	return false
+}
+/**
+ * 将值转换为布尔类型
+ * @param value - 要转换的值
+ * @returns 转换后的布尔值
+ */
+export function toBoolean(value: any|null):boolean{
+	
+	// #ifdef APP
+	// 根据输入值的类型，返回相应的布尔值
+	if(isNumber(value)){
+		return (value as number) != 0;
+	}
+	if(isString(value)){
+		return `${value}`.length > 0;
+	}
+	if(typeof value == 'boolean'){
+		return value as boolean;
+	}
+	
+	return value != null
+	// #endif
+	
+	// #ifndef APP
+	return  Boolean(value)
+	// #endif
+}
+/**
+ * 检查传入的值是否为百分比字符串
+ * @param n - 要检查的值
+ * @returns 如果值是包含 % 符号的字符串，返回 true；否则返回 false
+ */
+export function isPercentage(n : any) : boolean {
+	return isString(n) && (n as string).indexOf('%') != -1;
+}
+/**
+ * 检查值是否为 "1.0" 格式的字符串
+ * 需要特殊处理 1.0 为 100%，因为一旦它是数字，它与 1 没有区别
+ * <http://stackoverflow.com/questions/7422072/javascript-how-to-detect-number-as-a-decimal-including-1-0>
+ * @param n - 要检查的值
+ * @returns 如果值是包含小数点且值为 1 的字符串，返回 true；否则返回 false
+ */
+export function isOnePointZero(n : any) : boolean {
+	return isString(n) && (n as string).indexOf('.') != -1 && parseFloat(n as string) == 1;
+}
+/**
+ * 将输入值从 [0, n] 转换为 [0, 1] 范围
+ * @param n - 输入值
+ * @param max - 输入值的最大值
+ * @returns 转换后的值，范围为 [0, 1]
+ */
+export function bound01(n : string|number, max : number) : number {
+	if(!(isNumber(n) || isString(n))){
+		return 1
+	}
+	let _n = n;
+	if (isOnePointZero(_n)) {
+		_n = '100%';
+	}
+	const isPercent = isPercentage(_n);
+	let numericValue = 0;
+	if (isNumber(_n)) {
+		numericValue = _n as number;
+	} else if (isString(_n)) {
+		numericValue = parseFloat(_n as string);
+	}
+	numericValue = max == 360 ? numericValue : Math.min(max, Math.max(0, numericValue));
+	// Automatically convert percentage into number
+	// 自动将百分比转换为数字
+	if (isPercent) {
+		numericValue = parseInt(`${Math.min(numericValue, 100) * max}`, 10) / 100;
+	}
+	// Handle floating point rounding errors
+	//  处理浮点数舍入误差
+	
+	if ( Math.abs(numericValue - max) < 0.000001) {
+		return 1;
+	}
+	// Convert into [0, 1] range if it isn't already
+	// 如果它还不是，将其转换为 [0, 1] 范围
+	if (max == 360) {
+		// If n is a hue given in degrees,
+		// wrap around out-of-range values into [0, 360] range
+		// then convert into [0, 1].
+		// 如果 n 是以度为单位的色调，
+		// 将超出范围的值环绕到 [0, 360] 范围内
+		// 然后将其转换为 [0, 1]。
+		numericValue = (numericValue < 0 ? (numericValue % max) + max : numericValue % max) / max;
+	} else {
+		// If n not a hue given in degrees
+		// Convert into [0, 1] range if it isn't already.
+		// 如果 n 不是以度为单位的色调
+		// 如果它还不是，将其转换为 [0, 1] 范围。
+		numericValue = (numericValue % max) / max;
+	}
+	return numericValue;
+}
+/**
+ * 将数字限制在 0 和 1 之间
+ * @param val - 要限制的数字
+ * @returns 限制后的值，范围为 [0, 1]
+ */
+export function clamp01(val : number) : number {
+	return Math.min(1, Math.max(0, val));
+}
+/**
+ * 返回一个有效的 alpha 值 [0,1]，将所有无效值设置为 1
+ * @param a - 要处理的 alpha 值
+ * @returns 处理后的 alpha 值，范围为 [0, 1]
+ */
+function boundAlpha(a: number|string|null) : number {
+	let _n = a == null ? 1 : (isString(a) ? parseFloat(a as string) : a as number)
+	if (isNaN(_n) || _n < 0 || _n > 1) {
+		_n = 1;
+	}
+	return _n;
+}
+export {
+	boundAlpha
+}
+/**
+ * 将小数转换为百分比值
+ * @param n - 要转换的值
+ * @returns 转换后的百分比字符串或原始值
+ */
+export function convertToPercentage(n:number|string): number | string {
+	let _n = n;
+	// #ifdef APP-ANDROID && !VUE3-VAPOR
+	_n = isNumeric(_n) 
+		? parseFloat(typeof _n == 'string' 
+			? _n as string 
+			: BigDecimal.valueOf((_n as number).toDouble()).toPlainString()) 
+		: _n
+	// #endif
+	
+	// #ifndef APP-ANDROID && !VUE3-VAPOR
+	_n = isNumeric(_n) ? parseFloat(`${_n}`) : _n
+	// #endif
+	
+	if(isNumber(_n) &&  (_n as number) <= 1){
+		return `${_n * 100}%`.replace('.0%','%');
+	}
+	return _n;
+}
+/**
+ * 确保十六进制值具有 2 个字符
+ * @param c - 十六进制字符串
+ * @returns 长度为 2 的十六进制字符串
+ */
+export function pad2(c : string) : string {
+	return c.length == 1 ? '0' + c : `${c}`;
+}

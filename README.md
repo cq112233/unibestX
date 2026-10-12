@@ -250,8 +250,6 @@ pnpm lint:style     # Stylelint 样式检查（支持 SCSS / CSS / UVUE <style>�
 pnpm lint:style:fix # Stylelint 样式自动修复
 pnpm lint:all       # 全量代码与样式校验（ESLint + Stylelint）
 pnpm docs:dev       # 本地启动 VitePress 文档站
-pnpm gen:uts-dts    # 生成 UTS 类型声明（.d.uts.ts）
-pnpm check:uts-dts  # 校验 UTS 类型声明是否为最新（CI 用）
 ```
 
 ---
@@ -429,7 +427,6 @@ unibestX/
 ├── scripts/                      # 构建与环境切换脚本
 │   ├── build-h5.mjs              #   H5 打包（调用 HBuilderX cli publish）
 │   ├── switch-env.mjs            #   env:test / env:prod 环境切换
-│   ├── gen-uts-dts.mjs           #   UTS 类型声明生成与校验
 │   ├── check-tabbar-surface.mjs  #   TabBar 接口面校验
 │   └── router-guard-test/        #   路由守卫决策矩阵测试（node 直跑，无需测试框架）
 ├── tests/                        # 自动化测试目录（Vitest）
@@ -492,7 +489,6 @@ unibestX/
 │   ├── store/                    # 状态管理（双模式自适应）
 │   │   ├── index.uts             #   门面：按平台条件编译路由到 vapor / vdom
 │   │   ├── types.uts             #   共享类型（与平台无关，恒定向外转发）
-│   │   ├── types.d.uts.ts        #   类型声明
 │   │   ├── vapor/                #   官方 Pinia 实现（App Vapor / H5 / Web / 小程序）
 │   │   │   ├── index.ts          #     Pinia 实例 + pinia-plugin-persistedstate
 │   │   │   ├── app.ts            #     应用全局状态（主题、语言等）
@@ -536,11 +532,10 @@ unibestX/
 │       ├── i18n/                 #   多语言辅助工具（t / $t）
 │       ├── backPress/            #   Android 物理返回键双击退出
 │       └── rxjs-lite/            #   轻量流式处理工具
-├── uni_modules/                  # uni-app 扩展插件模块（精简收敛为 16 个核心插件）
+├── uni_modules/                  # uni-app 扩展插件模块（精简收敛为 17 个核心插件）
 │   ├── z-paging-x/               #   深度优化适配的分页组件
 │   ├── unix-crypto/              #   跨端加密解密库（AES/DES/RSA/MD5/SHA/HMAC/Base64/UUID）
 │   ├── x-pinia-s/                #   UTS 版 Pinia（VDOM 模式使用）
-│   ├── iRainna-lodash/           #   UTS 版 Lodash 工具库
 │   ├── lime-request/             #   HTTP 请求核心库
 │   ├── lime-i18n/                #   国际化核心库
 │   ├── lime-signature/           #   手写签名板组件
@@ -592,8 +587,6 @@ import { sys } from '@/src/utils/systemInfo/index.uts';
 | `rxjs-lite/` | 轻量流式处理（不依赖 RxJS 全量包） | `Observable` `Subject` `Subscription`；创建 `fromArray` `interval` `timer` `throwError`；算子 `map` `scan` `filter` `toArray` `distinctUntilChanged` `debounceTime` `throttleTime` `take` `takeUntil` `tap` `startWith` `catchError` `finalize` `unsubscribeAll` |
 | `layouts/navbar/utils/` | 下拉刷新、滚动到底与导航栏联动的跨端控制器 | `onNavbarPageScroll(cb)` `onNavbarReachBottom(cb)` `onNavbarPullDownRefresh(cb)` `stopNavbarPullDownRefresh()` `setNavbarTitle(t)` `setNavbarVisible(v)` `setHideNavbar(h)` `setHideStatusBar(h)` |
 | `router/` | 路由守卫、URL 参数解析、路径规范化与登录拦截 | `cleanPath(path)` `getCurrentPath()` `getCurrentRoute()` `isSamePath(a, b)` `parseUrlToObj(url)` `toLoginPage()` `LOGIN_PAGE`；实例 `route` |
-
-> 💡 每个工具模块都配有 `index.d.uts.ts` 类型声明文件，供编辑器补全；修改模块后可用 `pnpm gen:uts-dts` 重新生成、`pnpm check:uts-dts` 校验。
 
 ### 环境变量配置（`.env`）
 
@@ -1183,13 +1176,12 @@ pnpm typecheck       # 运行严格类型检查（tsc --noEmit，0 报错门禁�
 
 #### 6. GitHub Actions CI 持续集成流水线 (`.github/workflows/ci.yml`)
 
-项目已预置生产级 CI 自动化工作流，在开发者向 `main` / `base` 分支发起 Push 或 Pull Request 时自动并行执行五大质量门禁：
+项目已预置生产级 CI 自动化工作流，在开发者向 `main` / `base` 分支发起 Push 或 Pull Request 时自动并行执行四大质量门禁：
 
 1. **ESLint 检查**（`pnpm lint`）
 2. **Stylelint 检查**（`pnpm lint:style`）
-3. **UTS 声明同步校验**（`pnpm check:uts-dts`）
-4. **TypeScript 严格类型检查**（`pnpm typecheck`）
-5. **Vitest 自动化单元测试**（`pnpm test`）
+3. **TypeScript 严格类型检查**（`pnpm typecheck`）
+4. **Vitest 自动化单元测试**（`pnpm test`）
 
 #### 7. 常用命令与跳过机制
 

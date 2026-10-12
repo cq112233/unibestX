@@ -30,9 +30,11 @@ export const ContentTypeEnum = {
 };
 
 /**
- * 根据状态码，生成对应的错误信息
- * @param status 状态码
- * @returns 错误信息
+ * 把 HTTP 状态码映射成统一的中文错误文案
+ * @param status 网络传输层状态码（HTTP status，**不是**响应体里的业务 code）；表内未收录的码落到
+ *               default 分支拼成「连接出错(n)!」，不会抛错
+ * @returns 完整提示语；末尾自带的「，请检查网络或联系管理员！」是文案的一部分，调用方直接透传即可，
+ *          别再补标点或加前缀
  */
 export function ShowMessage(status: number): string {
   let message: string;

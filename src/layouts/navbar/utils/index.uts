@@ -36,6 +36,9 @@ export const EVENT_REACH_BOTTOM: string = 'onNavbarReachBottom';
 
 /**
  * 监听 NavBar 布局内的页面滚动事件（在页面采用了 navbar 布局时替代原生的 onPageScroll）
+ * @param callback 滚动回调，入参 `scrollTop` 为距顶部距离；事件缺字段时按 0 兜底。
+ *                 **必须在组件 setup 期间调用**——注册与注销分别挂在 onMounted / onUnmounted 上，
+ *                 页面卸载会自动 `$off`，无需手动清理
  */
 export function onNavbarPageScroll(callback: (e: PageScrollDetail) => void): void {
   const handler = (data: any | null): void => {
@@ -60,6 +63,7 @@ export function onNavbarPageScroll(callback: (e: PageScrollDetail) => void): voi
 
 /**
  * 监听 NavBar 布局内的触底事件（在页面采用了 navbar 布局时替代原生的 onReachBottom）
+ * @param callback 触底回调，无参；同样**只能在 setup 期间调用**，卸载时自动注销
  */
 export function onNavbarReachBottom(callback: () => void): void {
   onMounted(() => {
@@ -79,6 +83,8 @@ export const EVENT_STOP_PULL_DOWN_REFRESH: string = 'stopPagePullDownRefresh';
 
 /**
  * 监听 NavBar 布局下拉刷新事件
+ * @param callback 下拉刷新回调，无参；数据加载结束后**必须自行调用 `stopNavbarPullDownRefresh()`**，
+ *                 否则刷新动画不会收起（框架不会替你结束）。同样只能在 setup 期间调用
  */
 export function onNavbarPullDownRefresh(callback: () => void): void {
   onMounted(() => {

@@ -47,7 +47,7 @@ graph TD
 5. **滚动区域实现**：需要滚动的区域在根内自写 `<scroll-view direction="vertical" class="flex-1 flex flex-col">`；
 6. **组件库优先**：若需求功能与 `uni_modules/` 下已有组件/库匹配（如图标使用 `<uni-icons>`/`<lime-icon>`，图表使用 `<e-chart>`，分页列表使用 `<z-paging-x>`，富文本使用 `<mp-html>`，富文本编辑器使用 `<sp-editor>`，二维码使用 `<lime-qrcode>`，签名使用 `<lime-signature>`，折叠面板使用 `<uni-collapse-x>`，评分使用 `<uni-rate-x>` 等），必须优先使用已有组件，严禁脱离生态手写重复且低效的原生结构；且模板中直接使用短横线标签调用，严禁手动 import easycom 范围内的组件；
 7. **同步建出页面接口层（必产步骤，铁律级）**：页面与组件内部严禁直接硬编码大段模拟数据或假数据对象（如在 `<script setup>` 中写死数据数组）；新增页面时**必须在同一次改动里建出「页面同名目录 + 页面同名接口文件」** `src/pages/mall/` ⇒ `src/api/mall/mall.uts`（`src/sub/ball/` ⇒ `src/api/ball/ball.uts`），用 `type` 定义数据模型（**严禁 `interface`**），把数据封装为返回 `Promise<T>` 的标准接口函数（开发期 `return Promise.resolve(MOCK_X)`）。页面端一律通过异步接口函数拉取数据，后期对接真实后端时页面业务层零修改：
-   - **目录形态（按体量递进，三选一）**：① 小页面 —— 类型 / 数据集 / 函数三块内联在 `<page>.uts` 里按模块分段（**默认**，此时不建 `types.uts` 与 `mock/`）；② 该文件预计 ≥ 400 行 —— 数据集拆进 `src/api/<page>/mock/<模块>.uts`、契约类型收进 `src/api/<page>/types.uts`，`<page>.uts` 只留接口函数；③ 某个接口域已贴 500 行上限 —— 在 `src/api/<page>/` 下另开兄弟文件，每个文件自带「类型 + 数据集 + 函数」三块；
+   - **目录形态（三选一）**：① **默认** —— 类型 / 数据集 / 函数三块内联在 `<page>.uts` 里按模块分段，此时不建 `types.uts` 与 `mock/`；② **类型被多段共用** ⇒ 契约类型收进 `src/api/<page>/types.uts`；**数据集过大** ⇒ 拆进 `src/api/<page>/mock/<模块>.uts`，`<page>.uts` 只留接口函数；③ 某个接口域已贴 500 行上限 ⇒ 在 `src/api/<page>/` 下另开兄弟文件，每个文件自带「类型 + 数据集 + 函数」三块；⚠️ 抽 `types.uts` 的依据是「共用」而非「行数」—— 类型通常只占 0~13%，抽了并不减行；
    - **命名与写法**：`fetchXxxList` / `fetchXxxDetail` / `createXxx`、`MOCK_<模块>_<用途>`、分页容器 `PageResult<T>`、分页入参统一 `(pageNo, pageSize, keyword)` 并给默认值；
    - **页面目录下严禁出现 `mock.uts`**；`.uvue` 里**严禁** `ref([...])` 写死数据；
    - **完整模板、契约类型铁律、mock 造数规则、`http` 请求与后端对接细则，一律以分册 [7-api-spec.md](7-api-spec.md) 为准**（本清单只列必产项，不重复细则）。
@@ -195,7 +195,12 @@ const MOCK_A_GOODS: Array<MallGoodsItem> = [
 ];
 
 // 3. 接口函数（统一返回 Promise<T>，与真实 API 签名 100% 对齐）
-/** 获取模块 A 商品列表 */
+/**
+ * 获取模块 A 商品列表（分页三件套固定顺序：页码 / 每页条数 / 关键字）
+ * @param pageNo 目标页码，从 1 开始计数（不传即第 1 页）
+ * @param pageSize 单页条数（不传按 10 条）
+ * @param keyword 标题关键词，传空字符串表示不加筛选条件
+ */
 export function fetchGoodsList(pageNo: number = 1, pageSize: number = 10, keyword: string = ''): Promise<Array<MallGoodsItem>> {
   return Promise.resolve(MOCK_A_GOODS);
 }

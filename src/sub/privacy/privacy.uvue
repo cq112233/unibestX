@@ -161,7 +161,6 @@ function onAgree(): void {
 /** App 端直接退出；其它端无法退出应用，提示后停留 */
 function onReject(): void {
   // #ifdef APP
-  // @ts-expect-error uni.exit 为 UTS 原生 API，TS 类型桩未覆盖（项目内 backPress 亦如此调用）
   uni.exit();
   // #endif
   // #ifndef APP

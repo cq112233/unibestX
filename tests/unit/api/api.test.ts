@@ -1,7 +1,19 @@
 import { describe, expect, it } from 'vitest';
 import { createFoo, deleteFoo, fetchFooById, fetchFooList, updateFoo } from '@/src/api/example.uts';
-import type { FooItem } from '@/src/api/example.uts';
 import { fetchUserInfo, login, logout } from '@/src/api/auth/auth.uts';
+
+/**
+ * 类型镜像自唯一真源 `@/src/api/example.uts` 的 `FooItem`
+ *
+ * ⚠️ 为什么不 `import type` 那个 `.uts`：TS 侧 `.uts` 只有通配 `any` 声明
+ * （见 `src/types/uts-shim.d.ts`），具名类型导入会被当作命名空间而报 TS2709，
+ * 故此处内联镜像。真源改动时需同步本处。
+ */
+type FooItem = {
+  id: number;
+  name: string;
+  desc: string;
+};
 
 describe('src/api spec compliant tests', () => {
   describe('foo api module', () => {

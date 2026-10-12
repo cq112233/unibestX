@@ -13,7 +13,7 @@
 import type { LimeRequestConfig, LimeRequestTask } from '@/uni_modules/lime-request';
 
 /**
- * 在飞请求任务类型
+ * 在飞请求任务句柄：可被 abort() 取消的底层 RequestTask
  */
 export type AbortableTask = RequestTask;
 
@@ -36,10 +36,15 @@ export class RequestLifecycle {
 
   // ==========================================
   // 1. requestKey 读写
+  // —— extra 的运行时形态随平台而变：UTSJSONObject 带 getString/getNumber/getBoolean，
+  //    纯 JS 对象只有下标，故每个读取器都写「有方法走方法、否则走下标的双路取值」
   // ==========================================
 
   /**
    * 从 config.extra 读取字符串字段，缺失返回空串。
+   * @param config 本次请求配置；extra 为空视为「该字段一律没传」
+   * @param key extra 里的字段名（如 `requestKey`）
+   * @returns 取不到时返回空串而非 null —— 调用方（如 requestKey 是否登记）据此省掉一层判空
    */
   static readExtraString(config: LimeRequestConfig, key: string): string {
     const extra = config.extra;
@@ -54,13 +59,18 @@ export class RequestLifecycle {
   }
 
   /**
-   * 实例方法：从 config.extra 读取字符串字段
+   * 实例入口：转发静态 readExtraString（语义、参数与返回值完全一致）
    */
   readExtraString(config: LimeRequestConfig, key: string): string {
     return RequestLifecycle.readExtraString(config, key);
   }
 
-  /** 从 config.extra 读取数字字段，缺失返回 0 */
+  /**
+   * 从 config.extra 读取数字字段，缺失返回 0。
+   * @param config 本次请求配置
+   * @param key extra 里的字段名（如 `cacheTtl`）
+   * @returns 缺失或类型不符时返回 0 —— 0 在这些字段上天然表示「不启用」，无需再区分「没传」与「传了 0」
+   */
   static readExtraNumber(config: LimeRequestConfig, key: string): number {
     const extra = config.extra;
     if (extra == null) {
@@ -73,12 +83,19 @@ export class RequestLifecycle {
     return v != null ? v : 0;
   }
 
-  /** 实例方法：从 config.extra 读取数字字段 */
+  /**
+   * 实例入口：转发静态 readExtraNumber（语义、参数与返回值完全一致）
+   */
   readExtraNumber(config: LimeRequestConfig, key: string): number {
     return RequestLifecycle.readExtraNumber(config, key);
   }
 
-  /** 从 config.extra 读取布尔字段，缺失返回 false */
+  /**
+   * 从 config.extra 读取布尔字段，缺失返回 false。
+   * @param config 本次请求配置
+   * @param key extra 里的字段名（如 `skipRefresh`）
+   * @returns **只有显式 true 才算 true** —— 缺失、类型不符、传字符串 'true' 都返回 false，避免误开开关
+   */
   static readExtraBoolean(config: LimeRequestConfig, key: string): boolean {
     const extra = config.extra;
     if (extra == null) {
@@ -91,7 +108,9 @@ export class RequestLifecycle {
     return v != null && v == true;
   }
 
-  /** 实例方法：从 config.extra 读取布尔字段 */
+  /**
+   * 实例入口：转发静态 readExtraBoolean（语义、参数与返回值完全一致）
+   */
   readExtraBoolean(config: LimeRequestConfig, key: string): boolean {
     return RequestLifecycle.readExtraBoolean(config, key);
   }
@@ -101,7 +120,9 @@ export class RequestLifecycle {
   // ==========================================
 
   /**
-   * 登记在飞请求，供后续 abort。
+   * 登记在飞请求，供后续 abort 通过 requestKey 找回来。
+   * @param requestKey 发请求前写进 `extra.requestKey` 的键；传空串表示本次不登记（未登记的请求无法被取消）
+   * @param task 底层驱动给的 RequestTask；这里只持有引用，真正的 abort 发生在 abort()
    */
   registerTask(requestKey: string, task: LimeRequestTask): void {
     if (requestKey == '') {
@@ -110,7 +131,10 @@ export class RequestLifecycle {
     this.taskMap.set(requestKey, task as AbortableTask);
   }
 
-  /** 请求结束后摘除登记（成功或失败都要调，避免 Map 泄漏） */
+  /**
+   * 请求结束后摘除登记（成功或失败都要调，避免 Map 随请求次数无限增长）
+   * @param requestKey 与 registerTask 登记时同一个键；删一个没登记过的键是空操作，调用前无需判存在
+   */
   clearTask(requestKey: string): void {
     if (requestKey == '') {
       return;
@@ -118,7 +142,10 @@ export class RequestLifecycle {
     this.taskMap.delete(requestKey);
   }
 
-  /** 该 requestKey 是否已被标记取消 */
+  /**
+   * 该 requestKey 是否已被标记取消
+   * @param requestKey 待判定的键，既可能是 extra.requestKey，也可能是请求指纹；空串一律返回 false
+   */
   isAborted(requestKey: string): boolean {
     if (requestKey == '') {
       return false;
@@ -127,7 +154,11 @@ export class RequestLifecycle {
     return v != null && v == true;
   }
 
-  /** 消费取消标记：读取并清除，避免污染同 key 的下一次请求 */
+  /**
+   * 消费取消标记：读取并清除，避免污染同 key 的下一次请求
+   * @param requestKey 待消费的键
+   * @returns true 表示本次确实消费到了一个取消标记（调用方据此把请求判为「已取消」）
+   */
   consumeAborted(requestKey: string): boolean {
     if (requestKey == '') {
       return false;
@@ -141,6 +172,7 @@ export class RequestLifecycle {
 
   /**
    * 取消指定 requestKey 的在飞请求。
+   * @param requestKey 登记时用的键；传空串静默无操作
    */
   abort(requestKey: string): void {
     if (requestKey == '') {
@@ -176,7 +208,11 @@ export class RequestLifecycle {
   // 3. 并发去重（GET）
   // ==========================================
 
-  /** 生成请求指纹：method + url + 序列化后的 data */
+  /**
+   * 生成请求指纹：method + url + 序列化后的 data
+   * @param config 本次请求配置；data 序列化不了（如含循环引用）时降级为空串参与拼接，不抛错
+   * @returns 指纹串；**并发去重与 TTL 缓存共用同一把**，两处口径必须保持一致，否则去重命中而缓存不命中
+   */
   static buildRequestKey(config: LimeRequestConfig): string {
     const method = config.method != null ? config.method : 'GET';
     const url = config.url != null ? config.url : '';
@@ -192,12 +228,18 @@ export class RequestLifecycle {
     return `${method}|${url}|${dataPart}`;
   }
 
-  /** 实例方法：生成请求指纹 */
+  /**
+   * 实例入口：转发静态 buildRequestKey（语义、参数与返回值完全一致）
+   */
   buildRequestKey(config: LimeRequestConfig): string {
     return RequestLifecycle.buildRequestKey(config);
   }
 
-  /** 取进行中的同指纹请求（没有则返回 null） */
+  /**
+   * 取进行中的同指纹请求
+   * @param fingerprint buildRequestKey 算出的指纹
+   * @returns 在飞的 Promise；没有同指纹请求时返回 null（是 null 不是 reject，调用方要判空）
+   */
   getInflight<T>(fingerprint: string): Promise<T> | null {
     const p = this.inflightMap.get(fingerprint);
     if (p == null) {
@@ -206,7 +248,11 @@ export class RequestLifecycle {
     return p as Promise<T>;
   }
 
-  /** 登记进行中的请求，结束后自动摘除（成功失败都要摘） */
+  /**
+   * 登记进行中的请求，结束后自动摘除（成功失败都要摘）
+   * @param fingerprint buildRequestKey 算出的指纹
+   * @param task 首个发起方的 Promise；摘除时会比对是不是自己，避免把后来者的登记误删
+   */
   setInflight<T>(fingerprint: string, task: Promise<T>): void {
     this.inflightMap.set(fingerprint, task);
     task.then(
@@ -227,7 +273,12 @@ export class RequestLifecycle {
   // 4. 内存 TTL 缓存
   // ==========================================
 
-  /** 写入缓存；ttlMs <= 0 不写 */
+  /**
+   * 写入 TTL 缓存
+   * @param fingerprint buildRequestKey 算出的指纹
+   * @param value 已序列化的响应数据（字符串）—— 存字符串而非对象，免得缓存持有一份对象引用被后续改动
+   * @param ttlMs 存活毫秒数；<= 0 直接不写，这就是「本次不缓存」的开关
+   */
   setCache(fingerprint: string, value: string, ttlMs: number): void {
     if (fingerprint == '' || ttlMs <= 0) {
       return;
@@ -238,7 +289,11 @@ export class RequestLifecycle {
     } as CacheEntry);
   }
 
-  /** 读取缓存；过期则删除并返回 null */
+  /**
+   * 读取缓存；过期则顺便删除
+   * @param fingerprint buildRequestKey 算出的指纹
+   * @returns 命中的字符串值；未命中或已过期都返回 null
+   */
   getCache(fingerprint: string): string | null {
     if (fingerprint == '') {
       return null;
@@ -254,7 +309,10 @@ export class RequestLifecycle {
     return entry.value;
   }
 
-  /** 手动清缓存：不传 key 清全部，传 key 清单条 */
+  /**
+   * 手动清缓存
+   * @param fingerprint 要清的指纹；默认空串 = 清空全部
+   */
   clearCache(fingerprint: string = ''): void {
     if (fingerprint == '') {
       this.cacheMap.clear();
@@ -265,11 +323,14 @@ export class RequestLifecycle {
 }
 
 /**
- * 别名类：HttpLifecycle
+ * 别名类：与 RequestLifecycle 完全同义，只是多给一个叫法
  */
 export class HttpLifecycle extends RequestLifecycle {}
 
 /**
- * 默认全局请求生命周期单例
+ * 默认全局请求生命周期单例。
+ *
+ * 默认客户端共享同一份 —— 取消、并发去重与 TTL 缓存必须跨实例口径一致，
+ * 各自 new 一个会让 abort() 找不到另一个实例发出去的请求。
  */
 export const defaultLifecycle: RequestLifecycle = new RequestLifecycle();

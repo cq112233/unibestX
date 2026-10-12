@@ -22,7 +22,11 @@ export type ErrorReportPayload = {
 /** 上报地址；为空表示未配置，只打本地日志 */
 let reportUrl: string = '';
 
-/** 配置上报地址（空则只打本地日志） */
+/**
+ * 配置上报地址（空则只打本地日志）
+ * @param url 上报接口的完整地址；传空字符串等于**关闭上报**（stub 直接 return，连本地日志都不打），
+ *            另外 stub 还要求处于生产环境才会真正发送
+ */
 export function setErrorReportUrl(url: string): void {
   reportUrl = url;
 }
@@ -77,6 +81,8 @@ const SENSITIVE_KEYS: Array<string> = ['token', 'accessToken', 'refreshToken', '
  * 抹掉文本中的敏感信息。
  *
  * 覆盖两种常见形态：JSON 里的 "key":"value"，以及 key=value 形式的串。
+ * @param text 待脱敏的原始文本（请求头 / 请求体 / 错误信息等）；返回**新字符串，不改动入参**。
+ *             脱敏对象 = 手机号 + `SENSITIVE_KEYS` 里列出的字段名（token / password / authorization 等）
  */
 export function maskSensitive(text: string): string {
   let out = maskMobile(text);
@@ -125,6 +131,8 @@ export function maskSensitive(text: string): string {
 /**
  * 业务覆盖此 stub 实现真实上报（保持签名，勿改为传函数引用注册）。
  * 默认只在已配置 reportUrl 且生产环境时提示，不会误打到未知域名。
+ * @param payload 已组装好的上报载荷（message / page / time 等，敏感内容已脱敏）；
+ *                默认实现只打一条 console.log，对接真实通道时**替换本函数体、签名保持不变**即可
  */
 export function onErrorReportStub(payload: ErrorReportPayload): void {
   if (reportUrl.length == 0) {
@@ -206,7 +214,11 @@ export function reportError(err: any | null, extraMessage: string = ''): void {
   }
 }
 
-/** 仅上报文案（无 Error 对象） */
+/**
+ * 仅上报文案（无 Error 对象）
+ * @param message 错误说明文案；内部转调 `reportError(null, message)`，最终 message 即上报内容，
+ *                **传空字符串时上报内容会退化成 `'unknown'`**
+ */
 export function reportErrorMessage(message: string): void {
   reportError(null, message);
 }
