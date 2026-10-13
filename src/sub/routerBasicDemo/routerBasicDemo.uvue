@@ -205,12 +205,6 @@ const route = useRoute();
 /** 2) useRouter()：导航器（底层仍是 uni 导航 API，全局拦截器照常生效） */
 const router = useRouter();
 
-console.log(route, 'route');
-
-onMounted(() => {
-  console.log(route, 'route');
-});
-
 // route.meta 不需要在任何地方手写注册：构建期插件会把本页 definePage 的字段
 // 原样写进 pages.json，并同步生成一份路由表（src/router/generated/page-meta.uts），
 // useRoute() 按当前路径自动取到 —— 即「pages.json 里这个页面的配置项就是 meta」。

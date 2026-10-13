@@ -143,6 +143,36 @@ export function getCurrentRoute(): string {
 }
 
 /**
+ * 获取当前栈顶页面的路由参数对象（UniPage.options，即进入该页时带的 query）
+ *
+ * 为什么需要它：`uni.onAppRoute` 在**目标页 onShow 之后**才触发，且 App 端页面栈本身有滞后，
+ * 冷启动 / 返回 / 页面重新显示这些「稳定时机」需要一个不依赖事件的当前页参数来源。
+ * `options` 与 `route` 同属官方 UniPage 属性，平台支持：
+ * Android unixVer 4.31 / iOS 4.31 / Web 4.31 / 微信小程序 √。
+ *
+ * @returns 栈顶页面的参数对象；页面栈为空、平台未实现或参数为空时返回 null
+ */
+export function getCurrentPageOptions(): UTSJSONObject | null {
+  try {
+    const pages = getCurrentPages();
+    if (pages.length > 0) {
+      const page = pages[pages.length - 1];
+      // `?? null` 不能省：声明侧 options 是可选属性（真源在部分平台未实现），
+      // 直接赋值会因 `undefined` 报 TS2322（同 getCurrentRoute 的 `route ?? ''`）
+      const options: UTSJSONObject | null = page.options ?? null;
+      if (options == null) {
+        return null;
+      }
+      return options;
+    }
+  }
+  catch {
+    // ignore
+  }
+  return null;
+}
+
+/**
  * 获取当前栈顶页面的规范化路径（统一带前导 "/"，且去除 URL 参数）
  * 例如："/pages/index/index"
  * @returns 规范化路径字符串，未获取到时返回空字符串 ""
@@ -317,6 +347,11 @@ export class RouteUtils {
   /** 获取当前栈顶页面的原生 route 字符串 */
   getCurrentRoute(): string {
     return getCurrentRoute();
+  }
+
+  /** 获取当前栈顶页面的路由参数对象（UniPage.options） */
+  getCurrentPageOptions(): UTSJSONObject | null {
+    return getCurrentPageOptions();
   }
 
   /** 获取当前页面栈层数 */

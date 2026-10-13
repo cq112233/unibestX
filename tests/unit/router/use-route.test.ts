@@ -1,3 +1,4 @@
+import { onPageShow } from '@dcloudio/uni-app';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { utsObject } from './helpers';
 
@@ -28,9 +29,24 @@ function lastAppRouteListener(): (event: any) => void {
   return calls[calls.length - 1][0];
 }
 
-/** 让页面栈停在指定路由 */
-function setPageStack(route: string): void {
-  (globalThis as any).getCurrentPages = vi.fn(() => [{ route }]);
+/**
+ * 让页面栈停在指定路由
+ *
+ * `options` 对应真机 UniPage 的 `options`（路由参数，见 src/router/utils/utils.uts 的
+ * getCurrentPageOptions）—— 不传时真机拿到的是 undefined，此处保持一致。
+ */
+function setPageStack(route: string, options?: Record<string, any>): void {
+  const page: Record<string, any> = { route };
+  if (options != null) {
+    page.options = utsObject(options);
+  }
+  (globalThis as any).getCurrentPages = vi.fn(() => [page]);
+}
+
+/** 取 useRoute 注册到 onPageShow 上的回调（页面重新显示时回读路由） */
+function lastPageShowHandler(): () => void {
+  const calls = (onPageShow as unknown as { mock: { calls: any[][] } }).mock.calls;
+  return calls[calls.length - 1][0];
 }
 
 describe('useRoute Unit Tests', () => {
@@ -118,6 +134,68 @@ describe('useRoute Unit Tests', () => {
     expect(route.path).toBe('/src/pages/me/me');
     expect(route.query.size).toBe(0);
     expect(route.fullPath).toBe('/src/pages/me/me');
+  });
+
+  it('syncRouteState 从页面栈的 options 拿到 query（App 端没有 onAppRoute，这是 query 的唯一来源）', async () => {
+    const { useRoute, syncRouteState } = await loadRouteState();
+    const route = useRoute();
+
+    setPageStack('src/sub/routerBasicDemo/routerBasicDemo', { id: 2001, from: 'self' });
+    syncRouteState();
+
+    expect(route.path).toBe('/src/sub/routerBasicDemo/routerBasicDemo');
+    expect(route.query.get('id')).toBe('2001');
+    expect(route.query.get('from')).toBe('self');
+    expect(route.fullPath).toBe('/src/sub/routerBasicDemo/routerBasicDemo?id=2001&from=self');
+  });
+
+  it('状态非空时 useRoute 不再回读页面栈：栈顶还停在上一页也不会把目标路由覆盖回去', async () => {
+    const { useRoute, applyRouteFromUrl } = await loadRouteState();
+    const route = useRoute();
+
+    // 页面栈顶仍是上一页（App 端新页面入栈有滞后）；目标路由由导航发起方写入
+    setPageStack('src/pages/index/index');
+    applyRouteFromUrl('/src/sub/routerBasicDemo/routerBasicDemo?id=2001');
+
+    // 新页面 setup 里再次调用 useRoute
+    useRoute();
+
+    expect(route.path).toBe('/src/sub/routerBasicDemo/routerBasicDemo');
+    expect(route.query.get('id')).toBe('2001');
+  });
+
+  it('冷启动时页面栈还没建立：ensureRouteReady 延后一拍补读一次', async () => {
+    vi.useFakeTimers();
+    try {
+      (globalThis as any).getCurrentPages = vi.fn(() => []);
+      const { useRoute } = await loadRouteState();
+      const route = useRoute();
+      expect(route.path).toBe('');
+
+      setPageStack('src/pages/index/index');
+      vi.runAllTimers();
+
+      expect(route.path).toBe('/src/pages/index/index');
+    }
+    finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('useRoute 注册 onPageShow：页面重新显示时回读页面栈（返回上一页 / 物理返回键）', async () => {
+    const { useRoute, applyRouteFromUrl } = await loadRouteState();
+    const route = useRoute();
+
+    applyRouteFromUrl('/src/sub/routerBasicDemo/routerBasicDemo?id=2001');
+    expect(route.query.get('id')).toBe('2001');
+
+    // 点返回：栈顶回到首页（无参数）—— 只有 onPageShow 这个时机能看到栈已经变了
+    setPageStack('src/pages/index/index');
+    lastPageShowHandler()();
+
+    expect(route.path).toBe('/src/pages/index/index');
+    expect(route.query.size).toBe(0);
+    expect(route.fullPath).toBe('/src/pages/index/index');
   });
 
   it('meta 两级数据源：未注册时回退 pages.json 页面配置，setRouteMeta 注册后覆盖它', async () => {

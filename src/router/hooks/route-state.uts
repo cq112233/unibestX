@@ -4,17 +4,36 @@
  * 页面/组件通过 `useRoute()`（见 ./useRoute.uts）读取当前路由，读取到的是响应式对象，
  * 路由变化时依赖它的模板 / computed 会自动更新。
  *
- * ## 状态从哪来（三层，互为兜底）
+ * ## 状态从哪来（四层，互为兜底）
  *
- * 1. **主**：`uni.onAppRoute` 官方「路由完成」事件 —— 覆盖 navigateTo / redirectTo /
- *    reLaunch / switchTab / navigateBack、安卓物理返回键、H5 浏览器后退、点击原生 Tab。
- *    平台支持：App(Android/iOS/鸿蒙) 5.25+、Web 4.0+、微信小程序 3.5.5+、支付宝 5.25+。
- * 2. **备**：导航拦截器 success 回调（见 ../interceptor/interceptor.uts）延迟回读页面栈 ——
- *    用于上述平台之外、或 onAppRoute 未触发的场景（只兜住路径，query 可能滞后一帧）。
- * 3. **兜底**：`useRoute()` 初始化与手动 `syncRouteState()` 从页面栈回读。
+ * 1. **主**：导航发起方在跳转前写入目标 url（见 ../interceptor/interceptor.uts 的 invoke）——
+ *    「发起方知道自己要去哪」，不依赖任何平台回调时序，App / H5 / 小程序一致。
+ *    必要原因见下方「onAppRoute 在目标页 onShow 之后才触发」。
+ * 2. **主**：`uni.onAppRoute` 官方「路由完成」事件 —— 全端支持：App-Android / App-iOS /
+ *    Web / 微信 / 支付宝 / 鸿蒙 均为 unixVer 5.25 起（本项目基座 5.26，真机实测**会触发**）。
+ *    类型声明不在项目的 `node_modules/@dcloudio/*` 里（那里没有 uni-app-x 包），真源在
+ *    HBuilderX 内置 dts：`builtin-dts/uniappx/node_modules/@dcloudio/uni-app-x/types/
+ *    uni/uts-plugin-api/lib/uni-route/utssdk/interface.d.ts`（`OnAppRoute` / `AppRouteEvent`）。
+ *    事件载荷带 `path`（不含前导斜杠）、`query`、`openType`（navigateTo / navigateBack /
+ *    redirectTo / reLaunch / switchTab / appLaunch）、`notFound`、`routeEventId`、`timeStamp`，
+ *    因此**返回上一页、切 Tab、reLaunch 也会触发**，是这些场景最可靠的校正源。
+ * 3. **兜底**：页面栈回读 `syncRouteState()` —— 读栈顶页面的 `route` + `options`，
+ *    用于冷启动 / 返回上一页 / 导航失败回滚 / 页面重新显示（`useRoute()` 里注册的 onPageShow）。
+ * 4. **兜底**：`useRoute()` 首次调用时的页面栈回读（仅在状态还是空的时候，见 ensureRouteReady）。
  *
- * 三层写入的是同一个 `routeState`，写入点唯一收敛在 `commitRoute()`；
- * 且「路径未变化时不覆盖」的规则保证 onAppRoute 写入的 query 不会被兜底回读抹掉。
+ * 四层写入的是同一个 `routeState`，写入点唯一收敛在 `commitRoute()`。
+ *
+ * ⚠️ **onAppRoute 在目标页 onShow 之后才触发**（官方事件时序：请求 → onBeforeAppRoute →
+ * 执行路由 → 目标页 onShow → onAppRoute）。也就是说**目标页 setup 的那一刻，事件还没到**，
+ * 状态里存的仍是上一页 —— 单靠事件，新页面首帧会读到上一页的路由（曾经的 BUG：
+ * 进入 routerBasicDemo 后 route.path 恒为 /src/pages/index/index）。所以导航发起方必须
+ * 在请求时就写入目标路由（第 1 层），onAppRoute 只负责「事后校正」。
+ *
+ * ⚠️ **App 端页面栈有滞后**（实测 5.26 基座）：页面刚入栈的那一小段时间里，
+ * `getCurrentPages()` 栈顶仍指向**上一页** —— 页面 setup 时读到的是上一页、
+ * `navigateTo` 的 success 回调 + `setTimeout(0)` 读到的还是上一页。
+ * 因此「页面 setup / 导航 success 时回读页面栈」这种写法在 App 上必然**整体慢一页**，
+ * 页面栈只能在「确定的稳定时机」读：冷启动、返回、页面 onPageShow。
  *
  * ## 路径口径
  *
@@ -24,7 +43,14 @@
  */
 import { reactive } from 'vue';
 import { PAGE_META_JSON } from '../generated/page-meta.uts';
-import { cleanPath, getCurrentPath, getQueryString, parseUrlToObj, queryValueToString } from '../utils/utils.uts';
+import {
+  cleanPath,
+  getCurrentPageOptions,
+  getCurrentPath,
+  getQueryString,
+  parseUrlToObj,
+  queryValueToString
+} from '../utils/utils.uts';
 
 /**
  * 路由位置对象（对齐 vue-router 的 RouteLocationNormalized）
@@ -282,20 +308,56 @@ export function applyRouteFromUrl(url: string): void {
 }
 
 /**
- * 从页面栈回读当前路由（onAppRoute 未触发时的兜底）
+ * 把 `{ key: value }` 形态的对象（onAppRoute 事件载荷 / UniPage.options）转成 query Map
  *
- * ⚠️ 页面栈只能拿到路径、拿不到 query，因此**路径未变化时直接跳过**（不覆盖已有 query），
- *    只有路径确实变了才落一个空 query；这类场景下 query 由 onAppRoute / 拦截器补齐。
+ * ⚠️ 这里必须用「UTSJSONObject.keys() + 下标访问」，**不要**用实例方法 getAny()/getJSON()：
+ *    H5 / 蒸汽模式的运行时下发的是纯 JS 对象（uni-h5 内部 `Object.assign({}, event.query)`），
+ *    没有 UTSJSONObject 的实例方法，getAny() 会抛 `rawQuery.getAny is not a function`；
+ *    该异常又被运行时的 try/catch 吞掉（只在 console.error 出现），
+ *    表现为「路由状态整体不更新、query 恒为空」（2026-10-13 实测，见分册 1 的 getJSON/getAny 说明）。
+ *    UTSJSONObject.keys 在 H5 侧就是 Object.keys，下标访问两端都成立。
+ *
+ * @param raw 参数对象；为 null 时返回空 Map
+ */
+function queryMapFromObject(raw: UTSJSONObject | null): Map<string, string> {
+  const query = new Map<string, string>();
+  if (raw == null) {
+    return query;
+  }
+  const keys = UTSJSONObject.keys(raw);
+  for (let i = 0; i < keys.length; i++) {
+    const key = keys[i];
+    const value = raw[key];
+    if (value == null) {
+      continue;
+    }
+    query.set(key, queryValueToString(value));
+  }
+  return query;
+}
+
+/**
+ * 从页面栈回读当前路由（冷启动 / 返回上一页 / 导航失败回滚 / 页面重新显示时的兜底）
+ *
+ * 路径与参数都来自**同一个**栈顶页面：`route` 给路径、`options` 给参数（UniPage 的官方属性，
+ * 见 utils 的 getCurrentPageOptions），因此不再有「回读必然丢失 query」的先天缺陷。
+ *
+ * ⚠️ **调用时机必须落在页面栈已稳定的时刻**：App 端页面刚入栈时栈顶仍是上一页
+ *    （详见本文件头部说明），此刻回读会把状态改回上一页。所以本函数**不**在页面 setup /
+ *    导航 success 时调用，新增页面的初始状态由导航发起方直接写入（`applyRouteFromUrl`）。
+ *
+ * ⚠️ 「同一页面且这次没读到参数」时跳过：否则会用空 query 抹掉导航发起方写入的参数。
  */
 export function syncRouteState(): void {
   const currentPath = getCurrentPath();
   if (currentPath == '') {
     return;
   }
-  if (currentPath == routeState.path) {
+  const query = queryMapFromObject(getCurrentPageOptions());
+  if (currentPath == routeState.path && query.size == 0) {
     return;
   }
-  commitRoute(currentPath, new Map<string, string>(), currentPath);
+  commitRoute(currentPath, query, buildFullPath(currentPath, query));
 }
 
 // ==========================================
@@ -313,25 +375,7 @@ function handleAppRoute(event: AppRouteEvent): void {
     return;
   }
   const normalizedPath = cleanPath(rawPath);
-  const query = new Map<string, string>();
-  const rawQuery = event.query;
-  if (rawQuery != null) {
-    // ⚠️ 这里必须用「UTSJSONObject.keys() + 下标访问」，**不要**用实例方法 getAny()：
-    //    H5 / 蒸汽模式的运行时下发的是纯 JS 对象（uni-h5 内部 `Object.assign({}, event.query)`），
-    //    没有 UTSJSONObject 的实例方法，getAny() 会抛 `rawQuery.getAny is not a function`；
-    //    该异常又被运行时的 try/catch 吞掉（只在 console.error 出现），
-    //    表现为「路由状态整体不更新、query 恒为空」（2026-10-13 实测，见分册 1 的 getJSON/getAny 说明）。
-    //    UTSJSONObject.keys 在 H5 侧就是 Object.keys，下标访问两端都成立。
-    const keys = UTSJSONObject.keys(rawQuery);
-    for (let i = 0; i < keys.length; i++) {
-      const key = keys[i];
-      const value = rawQuery[key];
-      if (value == null) {
-        continue;
-      }
-      query.set(key, queryValueToString(value));
-    }
-  }
+  const query = queryMapFromObject(event.query);
   commitRoute(normalizedPath, query, buildFullPath(normalizedPath, query));
 }
 
@@ -366,10 +410,25 @@ export function uninstallRouteStateListener(): void {
 }
 
 /**
- * 确保路由状态已就绪：安装监听 + 首次从页面栈回读
+ * 确保路由状态已就绪：安装监听 + （仅状态为空时）从页面栈回读
  * （useRoute / useRouter 内部调用，业务侧一般不需要直接调用）
+ *
+ * ⚠️ 回读**只在状态还是空的时候**做。理由见本文件头部「App 端页面栈有滞后」：
+ *    页面 setup 时栈顶可能还停在上一页，无条件回读会把刚由导航发起方写好的目标路由
+ *    覆盖回上一页（这正是「安卓上进入新页面却显示上一页路由信息」的直接成因）。
+ *    状态非空说明已经有人写过当前路由，就不要再读了。
  */
 export function ensureRouteReady(): void {
   installRouteStateListener();
+  if (routeState.path != '') {
+    return;
+  }
+  // 冷启动 / 直链进入：还没有任何导航写入过状态，此时栈顶就是当前页，回读是安全的
   syncRouteState();
+  // App 端首个页面入栈可能晚于本函数执行，延后一拍再补一次（仍以「状态为空」为前提）
+  setTimeout((): void => {
+    if (routeState.path == '') {
+      syncRouteState();
+    }
+  }, 0);
 }

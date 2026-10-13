@@ -15,13 +15,14 @@
  * </template>
  * ```
  */
+import { onPageShow } from '@dcloudio/uni-app';
 import type { RouteLocation } from './route-state.uts';
-import { ensureRouteReady, routeState } from './route-state.uts';
+import { ensureRouteReady, routeState, syncRouteState } from './route-state.uts';
 
 /**
  * 获取当前路由（响应式）
  *
- * 首次调用会自动安装全局路由完成监听，并从页面栈回读一次当前路由，
+ * 首次调用会自动安装全局路由完成监听，并在状态为空时从页面栈回读一次当前路由，
  * 因此**在页面 / 组件的 setup 中直接调用即可**，不需要额外的初始化代码。
  *
  * ⚠️ 返回的是全局共享的状态对象，**只读**；要改路由请用 `useRouter()` 的导航方法。
@@ -30,5 +31,14 @@ import { ensureRouteReady, routeState } from './route-state.uts';
  */
 export function useRoute(): RouteLocation {
   ensureRouteReady();
+  // 页面每次「重新显示」都回读一次页面栈。这是**唯一**能覆盖这些场景的时机：
+  // 返回上一页（含安卓物理返回键，它不走任何 uni 导航 API、因此拦截器看不到）、
+  // 从子页面返回、App 回到前台、外部直链进入。
+  // 此刻页面栈顶就是本页，读到的 route + options 一定是对的（详见 route-state.uts 头部）。
+  // onPageShow 是 uni-app X 的**全端**组件级页面生命周期（对应页面 onShow），
+  // 与 layouts/navbar 用的是同一套机制。
+  onPageShow((): void => {
+    syncRouteState();
+  });
   return routeState;
 }

@@ -1005,6 +1005,33 @@ declare global {
       /** 设备内存大小，单位 MB（App-Android 4.18+） */
       memorySize?: string | null;
     }
+
+  }
+
+  // ==========================================
+  // 给 @dcloudio/types 的 Page.PageInstanceBaseProps 补齐 `options`
+  //
+  // `getCurrentPages()` 在 VSCode 里解析出的是 @dcloudio/types（uni-app 经典版）的
+  // `Page.PageInstance[]`（见该包 uni-app/page.d.ts 末尾的 `declare const getCurrentPages:
+  // Page.GetCurrentPages`），它只有 route / $vm / $getAppWebview，**没有** uni-app X 才有的
+  // `options`（页面的路由参数信息），于是 `pages[i].options` 报
+  // TS2339「类型"PageInstance<AnyObject, {}>"上不存在属性"options"」。
+  //
+  // 真源：HBuilderX uni-app x dts
+  //   @dcloudio/uni-app-x/types/native/UniPage.d.ts → `options: UTSJSONObject`
+  // 平台矩阵（真源 @uniPlatform）：Android unixVer 4.31 / iOS 4.31 / Web 4.31 / 微信小程序 √。
+  // 真源是 `interface`，这里同样用声明合并补齐（注意类型参数要与原声明逐字一致，否则无法合并）；
+  // 该 interface 属于 `declare namespace Page`（不是 UniNamespace），故补在 Page 命名空间下。
+  //
+  // ⚠️ 这是 src/router/utils/utils.uts 的 getCurrentPageOptions() 赖以取到 query 的字段：
+  //    uni.onAppRoute 要等目标页 onShow 之后才触发，冷启动 / 返回 / 页面重新显示时
+  //    需要一个不依赖事件的当前页参数来源，走的就是这个 `options`。
+  // ==========================================
+  namespace Page {
+    interface PageInstanceBaseProps<D extends AnyObject = any> {
+      /** 页面的路由参数信息（App 4.31+ / Web 4.31+ / 微信小程序） */
+      options?: UTSJSONObject;
+    }
   }
 
   // ==========================================

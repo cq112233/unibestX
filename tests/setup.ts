@@ -191,3 +191,12 @@ vi.mock('@/src/i18n', () => ({
   getLocale: () => 'zh-Hans',
   setLocale: vi.fn()
 }));
+
+// Mock uni-app 的组件级页面生命周期：真源要在组件实例上下文里注册，单测里没有实例。
+// useRoute() 每次调用都会注册 onPageShow（页面重新显示时回读路由），故必须打桩。
+vi.mock('@dcloudio/uni-app', () => ({
+  onPageShow: vi.fn(),
+  onPageHide: vi.fn(),
+  onLoad: vi.fn(),
+  onReady: vi.fn()
+}));
