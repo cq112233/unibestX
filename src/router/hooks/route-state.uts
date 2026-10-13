@@ -1,0 +1,273 @@
+/**
+ * 路由响应式状态（等价 vue-router 的 currentRoute）
+ *
+ * 页面/组件通过 `useRoute()`（见 ./useRoute.uts）读取当前路由，读取到的是响应式对象，
+ * 路由变化时依赖它的模板 / computed 会自动更新。
+ *
+ * ## 状态从哪来（三层，互为兜底）
+ *
+ * 1. **主**：`uni.onAppRoute` 官方「路由完成」事件 —— 覆盖 navigateTo / redirectTo /
+ *    reLaunch / switchTab / navigateBack、安卓物理返回键、H5 浏览器后退、点击原生 Tab。
+ *    平台支持：App(Android/iOS/鸿蒙) 5.25+、Web 4.0+、微信小程序 3.5.5+、支付宝 5.25+。
+ * 2. **备**：导航拦截器 success 回调（见 ../interceptor/interceptor.uts）延迟回读页面栈 ——
+ *    用于上述平台之外、或 onAppRoute 未触发的场景（只兜住路径，query 可能滞后一帧）。
+ * 3. **兜底**：`useRoute()` 初始化与手动 `syncRouteState()` 从页面栈回读。
+ *
+ * 三层写入的是同一个 `routeState`，写入点唯一收敛在 `commitRoute()`；
+ * 且「路径未变化时不覆盖」的规则保证 onAppRoute 写入的 query 不会被兜底回读抹掉。
+ *
+ * ## 路径口径
+ *
+ * `path` 统一走 `cleanPath()`：带前导 `/`、不带 query、不做 `src/` 前缀的增删
+ * （页面栈原始 route 为 `src/pages/index/index`，onAppRoute 的 path 为 `src/pages/index/index`
+ * 之外还可能不带 `src/`，两者都以调用方传入的原文为准、只补前导斜杠）。
+ */
+import { reactive } from 'vue';
+import { cleanPath, getCurrentPath, getQueryString, parseUrlToObj, queryValueToString } from '../utils/utils.uts';
+
+/**
+ * 路由位置对象（对齐 vue-router 的 RouteLocationNormalized）
+ */
+export type RouteLocation = {
+  /** 规范化路径（带前导 `/`，不含 query），如 `/src/pages/index/index` */
+  path: string;
+  /** 完整路径（path + 原始 query 串），如 `/src/pages/index/index?tab=2` */
+  fullPath: string;
+  /** 查询参数（键值均为 string，值已 URL 解码） */
+  query: Map<string, string>;
+  /** 恒为空 Map：uni-app X 无动态路由段，仅为与 vue-router 形态保持一致 */
+  params: Map<string, string>;
+  /** 路由元信息：由 setRouteMeta() 注册，未注册为 null */
+  meta: UTSJSONObject | null;
+  /** 路由名：取自 meta 的 `name` 字段，未注册为 null */
+  name: string | null;
+};
+
+/** 构造一个空路由（保持与 RouteLocation 同构，供 reactive 初始化） */
+function createEmptyRoute(): RouteLocation {
+  return {
+    path: '',
+    fullPath: '',
+    query: new Map<string, string>(),
+    params: new Map<string, string>(),
+    meta: null,
+    name: null
+  } as RouteLocation;
+}
+
+/**
+ * 当前路由（响应式）
+ *
+ * ⚠️ 只读：外部**不要**直接赋值/改字段，那会让状态与真实页面栈脱节；
+ *    请通过 `router.push()` 等导航方法或 `syncRouteState()` 驱动它更新。
+ */
+export const routeState: RouteLocation = reactive(createEmptyRoute());
+
+// ==========================================
+// 路由元信息注册表（可选的轻量路由表）
+// ==========================================
+
+/** 路径 → meta 的注册表（key 为 cleanPath 规范化后的路径） */
+const routeMetaMap: Map<string, UTSJSONObject> = new Map<string, UTSJSONObject>();
+
+/**
+ * 注册某个页面的路由元信息，注册后 `useRoute().meta / .name` 即可读到
+ *
+ * @param path 页面路径，可省略前导 `/` 与 `src/` 前缀
+ * @param meta 元信息对象字面量，约定字段：`name`（路由名）、`title`（页面标题）、
+ *             `requireAuth`（是否需要登录）等，字段可自由扩展
+ *
+ * @example
+ * ```uts
+ * setRouteMeta('/src/pages/me/me', { name: 'me', title: '我的', requireAuth: true });
+ * ```
+ */
+export function setRouteMeta(path: string, meta: UTSJSONObject): void {
+  const key = cleanPath(path);
+  if (key == '') {
+    return;
+  }
+  routeMetaMap.set(key, meta);
+}
+
+/** 移除某个页面的路由元信息注册 */
+export function removeRouteMeta(path: string): void {
+  routeMetaMap.delete(cleanPath(path));
+}
+
+/**
+ * 按路径读取路由元信息
+ *
+ * 先按规范化后的完整路径精确匹配；未命中时自动在 `pages/x/x` 与 `/src/pages/x/x`
+ * 两种前缀写法之间再换一次（兼容历史路径写法）。
+ *
+ * @param path 页面路径
+ * @returns 元信息对象；未注册返回 null
+ */
+export function getRouteMeta(path: string): UTSJSONObject | null {
+  const key = cleanPath(path);
+  const exact = routeMetaMap.get(key);
+  if (exact != null) {
+    return exact;
+  }
+  const swapped = key.startsWith('/src/') ? key.substring(4) : `/src${key}`;
+  const matched = routeMetaMap.get(swapped);
+  if (matched != null) {
+    return matched;
+  }
+  return null;
+}
+
+// ==========================================
+// 状态写入（唯一收敛点）
+// ==========================================
+
+/** 把 query Map 拼回 query 串（值做 URL 编码） */
+function buildFullPath(path: string, query: Map<string, string>): string {
+  if (query.size == 0) {
+    return path;
+  }
+  const parts: Array<string> = [];
+  query.forEach((value: string, key: string): void => {
+    parts.push(`${key}=${encodeURIComponent(value)}`);
+  });
+  return `${path}?${parts.join('&')}`;
+}
+
+/**
+ * 唯一的状态写入点：路径 + query + meta 一次性落盘
+ *
+ * 路径为空时整体忽略（避免页面栈尚未建立时把状态清空）。
+ */
+function commitRoute(path: string, query: Map<string, string>, fullPath: string): void {
+  const normalizedPath = cleanPath(path);
+  if (normalizedPath == '') {
+    return;
+  }
+  const meta = getRouteMeta(normalizedPath);
+  routeState.path = normalizedPath;
+  routeState.fullPath = fullPath;
+  routeState.query = query;
+  routeState.meta = meta;
+  if (meta == null) {
+    routeState.name = null;
+  }
+  else {
+    routeState.name = meta.getString('name');
+  }
+}
+
+/**
+ * 用 url 字符串同步路由状态（导航拦截器与业务侧手动刷新用）
+ *
+ * @param url 目标 url，如 `/src/pages/detail/detail?id=1`、`src/pages/index/index?tab=2`
+ */
+export function applyRouteFromUrl(url: string): void {
+  if (url == '') {
+    return;
+  }
+  const urlObj = parseUrlToObj(url);
+  const normalizedPath = cleanPath(urlObj.path);
+  if (normalizedPath == '') {
+    return;
+  }
+  const queryStr = getQueryString(url);
+  if (queryStr == '') {
+    commitRoute(normalizedPath, urlObj.query, normalizedPath);
+    return;
+  }
+  commitRoute(normalizedPath, urlObj.query, `${normalizedPath}?${queryStr}`);
+}
+
+/**
+ * 从页面栈回读当前路由（onAppRoute 未触发时的兜底）
+ *
+ * ⚠️ 页面栈只能拿到路径、拿不到 query，因此**路径未变化时直接跳过**（不覆盖已有 query），
+ *    只有路径确实变了才落一个空 query；这类场景下 query 由 onAppRoute / 拦截器补齐。
+ */
+export function syncRouteState(): void {
+  const currentPath = getCurrentPath();
+  if (currentPath == '') {
+    return;
+  }
+  if (currentPath == routeState.path) {
+    return;
+  }
+  commitRoute(currentPath, new Map<string, string>(), currentPath);
+}
+
+// ==========================================
+// 全局路由完成监听（主数据源）
+// ==========================================
+
+/**
+ * 处理 onAppRoute 事件：把官方事件载荷落进 routeState
+ *
+ * 注意 `event.path` 官方口径为「不含开头的斜杠」，由 cleanPath 统一补上。
+ */
+function handleAppRoute(event: AppRouteEvent): void {
+  const rawPath = event.path;
+  if (rawPath == '') {
+    return;
+  }
+  const normalizedPath = cleanPath(rawPath);
+  const query = new Map<string, string>();
+  const rawQuery = event.query;
+  if (rawQuery != null) {
+    // ⚠️ 这里必须用「UTSJSONObject.keys() + 下标访问」，**不要**用实例方法 getAny()：
+    //    H5 / 蒸汽模式的运行时下发的是纯 JS 对象（uni-h5 内部 `Object.assign({}, event.query)`），
+    //    没有 UTSJSONObject 的实例方法，getAny() 会抛 `rawQuery.getAny is not a function`；
+    //    该异常又被运行时的 try/catch 吞掉（只在 console.error 出现），
+    //    表现为「路由状态整体不更新、query 恒为空」（2026-10-13 实测，见分册 1 的 getJSON/getAny 说明）。
+    //    UTSJSONObject.keys 在 H5 侧就是 Object.keys，下标访问两端都成立。
+    const keys = UTSJSONObject.keys(rawQuery);
+    for (let i = 0; i < keys.length; i++) {
+      const key = keys[i];
+      const value = rawQuery[key];
+      if (value == null) {
+        continue;
+      }
+      query.set(key, queryValueToString(value));
+    }
+  }
+  commitRoute(normalizedPath, query, buildFullPath(normalizedPath, query));
+}
+
+/** 监听是否已安装（幂等标记，避免重复注册导致回调叠加） */
+let routeListenerInstalled: boolean = false;
+
+/**
+ * 安装全局「路由完成」监听（幂等，由 useRoute / useRouter 自动调用）
+ */
+export function installRouteStateListener(): void {
+  if (routeListenerInstalled) {
+    return;
+  }
+  routeListenerInstalled = true;
+  uni.onAppRoute((event: AppRouteEvent): void => {
+    handleAppRoute(event);
+  });
+}
+
+/**
+ * 卸载全局「路由完成」监听（一般无需调用，主要供单测复位）
+ *
+ * ⚠️ 这里按官方签名不传回调，会移除**所有** onAppRoute 监听；
+ *    若业务另有 onAppRoute 监听，请勿调用本方法。
+ */
+export function uninstallRouteStateListener(): void {
+  if (!routeListenerInstalled) {
+    return;
+  }
+  routeListenerInstalled = false;
+  uni.offAppRoute();
+}
+
+/**
+ * 确保路由状态已就绪：安装监听 + 首次从页面栈回读
+ * （useRoute / useRouter 内部调用，业务侧一般不需要直接调用）
+ */
+export function ensureRouteReady(): void {
+  installRouteStateListener();
+  syncRouteState();
+}

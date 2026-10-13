@@ -1,51 +1,162 @@
 <template>
   <view class="flex flex-col flex-1 bg-[#f8fafc]">
     <scroll-view direction="vertical" class="flex-1 flex flex-col p-[16px]">
-      <view
-        class="rounded-[16px] p-[20px] mb-[16px] border-[1px] border-solid border-[#edf2f7] bg-[#ffffff]"
-      >
-        <!-- 标题区域 -->
-        <view class="flex flex-row items-center mb-[16px]">
-          <view
-            class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#3182ce]"
-          />
-          <text class="text-[16px] font-bold text-[#2d3748]">路由拦截与传参测试</text>
+      <!-- 用法说明 + 一行代码 -->
+      <view class="w-full rounded-[16px] bg-[#ffffff] border-[1px] border-solid border-[#e2e8f0] p-[16px] mb-[12px]">
+        <view class="flex flex-row items-center mb-[10px]">
+          <view class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#2563eb]" />
+          <text class="text-[15px] font-bold text-[#1e293b]">路由 hooks（vue-router 形态）</text>
+        </view>
+        <text class="text-[12px] leading-[18px] text-[#64748b]">useRoute() 读当前路由（响应式、只读），useRouter() 做跳转。底层仍走 uni 原生导航 API，所以 main.uts 里安装的全局登录拦截器照常生效。</text>
+        <view class="w-full rounded-[10px] bg-[#0f172a] p-[12px] mt-[10px]">
+          <text class="text-[11px] leading-[18px] text-[#e2e8f0]" style="font-family: monospace;">import { useRoute, useRouter } from '@/src/router/index.uts';</text>
+          <text class="text-[11px] leading-[18px] text-[#38bdf8] mt-[2px]" style="font-family: monospace;">const route = useRoute();</text>
+          <text class="text-[11px] leading-[18px] text-[#38bdf8] mt-[2px]" style="font-family: monospace;">const router = useRouter();</text>
+        </view>
+      </view>
+
+      <!-- 1. useRoute：读当前路由 -->
+      <view class="w-full rounded-[16px] bg-[#ffffff] border-[1px] border-solid border-[#e2e8f0] p-[16px] mb-[12px]">
+        <view class="flex flex-row items-center mb-[10px]">
+          <view class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#0d9488]" />
+          <text class="text-[14px] font-bold text-[#1e293b]">1. useRoute() 读当前路由</text>
         </view>
 
-        <!-- 状态展示 -->
-        <view
-          class="rounded-[12px] p-[16px] mb-[16px] border-[1px] border-solid border-[#e2e8f0]"
-        >
-          <view class="flex-row justify-between items-center mb-[8px]">
-            <text class="text-[14px] text-[#64748b]">当前登录状态:</text>
-            <text :style="{ fontSize: '14px', fontWeight: 'bold', color: hasLogin ? '#10b981' : '#f43f5e' }">
-              {{ hasLogin ? '已登录' : '未登录' }}
-            </text>
+        <view class="flex flex-row items-start justify-between mb-[6px]">
+          <text class="text-[12px] text-[#64748b] mr-[10px]">route.path</text>
+          <text class="text-[12px] font-bold text-[#1e293b] flex-1 text-right">{{ route.path }}</text>
+        </view>
+        <view class="flex flex-row items-start justify-between mb-[6px]">
+          <text class="text-[12px] text-[#64748b] mr-[10px]">route.fullPath</text>
+          <text class="text-[12px] font-bold text-[#1e293b] flex-1 text-right">{{ route.fullPath }}</text>
+        </view>
+        <view class="flex flex-row items-center justify-between mb-[6px]">
+          <text class="text-[12px] text-[#64748b] mr-[10px]">route.name</text>
+          <text class="text-[12px] font-bold text-[#1e293b]">{{ routeNameText }}</text>
+        </view>
+        <view class="flex flex-row items-center justify-between mb-[6px]">
+          <text class="text-[12px] text-[#64748b] mr-[10px]">route.params.size</text>
+          <text class="text-[12px] text-[#1e293b]">{{ route.params.size }}（uni 无动态路由段，恒为空）</text>
+        </view>
+        <view class="flex flex-row items-start justify-between mb-[6px]">
+          <text class="text-[12px] text-[#64748b] mr-[10px]">route.meta</text>
+          <text class="text-[12px] font-bold text-[#1e293b] flex-1 text-right" style="font-family: monospace;">{{ metaText }}</text>
+        </view>
+
+        <!-- query 列表：随路由变化实时刷新 -->
+        <view class="w-full rounded-[12px] bg-[#f8fafc] p-[12px] mt-[6px]">
+          <text class="text-[12px] font-bold text-[#475569]">route.query（{{ route.query.size }} 项）</text>
+          <view v-for="line in queryLines" :key="line.key" class="flex flex-row items-center justify-between mt-[6px]">
+            <text class="text-[12px] text-[#64748b] mr-[10px]" style="font-family: monospace;">{{ line.key }}</text>
+            <text class="text-[12px] font-bold text-[#2563eb] flex-1 text-right" style="font-family: monospace;">{{ line.value }}</text>
           </view>
-          <text class="text-[12px] leading-normal text-[#94a3b8]">
-            测试场景说明：参数接收页属于需登录拦截页面。未登录时点击跳转将拦截并重定向到登录页，登录成功后会自动跳回目标页并解析 query 传参。
+          <text v-if="queryLines.length == 0" class="text-[12px] leading-[18px] text-[#94a3b8] mt-[6px]">当前无 query 参数 —— 点下方按钮带参数重进本页，回到本页时列表会实时出现。</text>
+        </view>
+
+        <view class="flex flex-row items-center mt-[10px]">
+          <view class="flex-1 h-[34px] flex flex-row items-center justify-center rounded-[8px] bg-[#0d9488] mr-[8px]" @click="onPushSelfWithQuery">
+            <text class="text-[12px] font-bold text-[#ffffff]">带参数重进本页</text>
+          </view>
+          <view class="flex-1 h-[34px] flex flex-row items-center justify-center rounded-[8px] bg-[#e2e8f0]" @click="onReplaceSelfWithoutQuery">
+            <text class="text-[12px] font-bold text-[#475569]">无参重进本页</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 2. useRouter：导航方法 -->
+      <view class="w-full rounded-[16px] bg-[#ffffff] border-[1px] border-solid border-[#e2e8f0] p-[16px] mb-[12px]">
+        <view class="flex flex-row items-center mb-[10px]">
+          <view class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#7c3aed]" />
+          <text class="text-[14px] font-bold text-[#1e293b]">2. useRouter() 导航方法</text>
+        </view>
+
+        <!-- push 字符串形态 -->
+        <view class="w-full rounded-[12px] bg-[#f8fafc] p-[12px] mb-[10px]">
+          <text class="text-[12px] font-bold text-[#1e293b]" style="font-family: monospace;">router.push(字符串 url)</text>
+          <text class="text-[11px] leading-[16px] text-[#64748b] mt-[4px]">最常用：目标页入栈、当前页保留，返回键可回到本页。</text>
+          <view class="h-[32px] flex flex-row items-center justify-center rounded-[8px] bg-[#7c3aed] mt-[8px]" @click="onPushByString">
+            <text class="text-[12px] font-bold text-[#ffffff]">跳到参数页（带 id=1001）</text>
+          </view>
+        </view>
+
+        <!-- push 对象形态 -->
+        <view class="w-full rounded-[12px] bg-[#f8fafc] p-[12px] mb-[10px]">
+          <text class="text-[12px] font-bold text-[#1e293b]" style="font-family: monospace;">router.push({ path, query })</text>
+          <text class="text-[11px] leading-[16px] text-[#64748b] mt-[4px]">对象形态：query 自动拼成 url 串，值会做 URL 编码。必须写成对象字面量，别先声明成变量再传。</text>
+          <view class="h-[32px] flex flex-row items-center justify-center rounded-[8px] bg-[#7c3aed] mt-[8px]" @click="onPushByObject">
+            <text class="text-[12px] font-bold text-[#ffffff]">跳到参数页（对象 + 中文参数）</text>
+          </view>
+        </view>
+
+        <!-- replace -->
+        <view class="w-full rounded-[12px] bg-[#f8fafc] p-[12px] mb-[10px]">
+          <text class="text-[12px] font-bold text-[#1e293b]" style="font-family: monospace;">router.replace(to)</text>
+          <text class="text-[11px] leading-[16px] text-[#64748b] mt-[4px]">关掉当前页再打开目标页：返回键不会回到本页（登录后跳回原页常用它）。</text>
+          <view class="h-[32px] flex flex-row items-center justify-center rounded-[8px] bg-[#7c3aed] mt-[8px]" @click="onReplaceByObject">
+            <text class="text-[12px] font-bold text-[#ffffff]">replace 到参数页</text>
+          </view>
+        </view>
+
+        <!-- relaunch -->
+        <view class="w-full rounded-[12px] bg-[#f8fafc] p-[12px] mb-[10px]">
+          <text class="text-[12px] font-bold text-[#1e293b]" style="font-family: monospace;">router.relaunch(to)</text>
+          <text class="text-[11px] leading-[16px] text-[#64748b] mt-[4px]">关闭所有页面、只留目标页（回首页、退出登录后重置栈常用）。</text>
+          <view class="h-[32px] flex flex-row items-center justify-center rounded-[8px] bg-[#7c3aed] mt-[8px]" @click="onRelaunchHome">
+            <text class="text-[12px] font-bold text-[#ffffff]">relaunch 回首页</text>
+          </view>
+        </view>
+
+        <!-- back / go -->
+        <view class="w-full rounded-[12px] bg-[#f8fafc] p-[12px] mb-[10px]">
+          <text class="text-[12px] font-bold text-[#1e293b]" style="font-family: monospace;">router.back(delta) / router.go(-delta)</text>
+          <text class="text-[11px] leading-[16px] text-[#64748b] mt-[4px]">back(1) 与 go(-1) 等价；go 只支持负数，传正数会被忽略并打印一条告警（uni 没有「前进」API）。</text>
+          <view class="flex flex-row items-center mt-[8px]">
+            <view class="flex-1 h-[32px] flex flex-row items-center justify-center rounded-[8px] bg-[#7c3aed] mr-[8px]" @click="onBack">
+              <text class="text-[12px] font-bold text-[#ffffff]">back()</text>
+            </view>
+            <view class="flex-1 h-[32px] flex flex-row items-center justify-center rounded-[8px] bg-[#7c3aed]" @click="onGoBackTwo">
+              <text class="text-[12px] font-bold text-[#ffffff]">go(-2)</text>
+            </view>
+          </view>
+        </view>
+
+        <!-- resolve -->
+        <view class="w-full rounded-[12px] bg-[#f8fafc] p-[12px] mb-[10px]">
+          <text class="text-[12px] font-bold text-[#1e293b]" style="font-family: monospace;">router.resolve(to)</text>
+          <text class="text-[11px] leading-[16px] text-[#64748b] mt-[4px]">只把目标拼成 uni 可用的 url 串、不跳转，便于提前校验或打日志。</text>
+          <view class="h-[32px] flex flex-row items-center justify-center rounded-[8px] bg-[#334155] mt-[8px]" @click="onResolveTarget">
+            <text class="text-[12px] font-bold text-[#ffffff]">解析并弹出 url</text>
+          </view>
+        </view>
+
+        <!-- switchTab 说明（本项目无原生 tabBar，不提供按钮） -->
+        <view class="w-full rounded-[12px] bg-[#fffbeb] border-[1px] border-solid border-[#fef3c7] p-[12px]">
+          <text class="text-[12px] font-bold text-[#b45309]" style="font-family: monospace;">router.switchTab(to)</text>
+          <text class="text-[11px] leading-[16px] text-[#b45309] mt-[4px]">只对 pages.json 里声明了原生 tabBar 的页面有效。本项目的 TabBar 是自定义实现（src/tabbar），没有原生 tabBar，故这里不给按钮 —— 切 Tab 请用 router.push / relaunch 或 switchTabbar()。</text>
+        </view>
+      </view>
+
+      <!-- 3. 与登录拦截器协同 -->
+      <view class="w-full rounded-[16px] bg-[#ffffff] border-[1px] border-solid border-[#e2e8f0] p-[16px] mb-[12px]">
+        <view class="flex flex-row items-center mb-[10px]">
+          <view class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#f59e0b]" />
+          <text class="text-[14px] font-bold text-[#1e293b]">3. 与登录拦截器协同</text>
+        </view>
+
+        <view class="flex flex-row items-center justify-between mb-[8px]">
+          <text class="text-[13px] text-[#64748b]">当前登录状态</text>
+          <text :style="{ fontSize: '13px', fontWeight: 'bold', color: hasLogin ? '#10b981' : '#f43f5e' }">
+            {{ hasLogin ? '已登录' : '未登录' }}
           </text>
         </view>
+        <text class="text-[12px] leading-[18px] text-[#94a3b8]">参数接收页属于需登录拦截页面（见 src/router/config/config.uts 的黑名单）：未登录时 useRouter().push 同样会被拦到登录页，登录成功后自动跳回目标页并解析 query。这说明 hooks 没有绕开拦截器。</text>
 
-        <!-- 操作按钮区 -->
-        <view class="flex-row justify-between">
-          <view class="flex-1 mr-[6px]">
-            <button
-              class="w-full bg-[#3182ce] rounded-[8px] h-[42px] text-center text-[#ffffff] text-[14px] font-bold"
-              :style="{ lineHeight: '42px' }"
-              @click="jumpToTest"
-            >
-              跳转参数接收页 (传参)
-            </button>
+        <view class="flex flex-row items-center mt-[12px]">
+          <view class="flex-1 h-[38px] flex flex-row items-center justify-center rounded-[8px] bg-[#2563eb] mr-[8px]" @click="jumpToTest">
+            <text class="text-[12px] font-bold text-[#ffffff]">跳转参数页（走拦截）</text>
           </view>
-          <view class="flex-1 ml-[6px]">
-            <button
-              class="w-full bg-[#ef4444] rounded-[8px] h-[42px] text-center text-[#ffffff] text-[14px] font-bold"
-              :style="{ lineHeight: '42px' }"
-              @click="handleLogout"
-            >
-              清除登录状态
-            </button>
+          <view class="flex-1 h-[38px] flex flex-row items-center justify-center rounded-[8px] bg-[#ef4444]" @click="handleLogout">
+            <text class="text-[12px] font-bold text-[#ffffff]">清除登录状态</text>
           </view>
         </view>
       </view>
@@ -55,8 +166,9 @@
 
 <script setup lang="uts">
 import { computed } from 'vue';
+import { useRoute, useRouter } from '@/src/router/index.uts';
 import { useTokenStore, useUserStore } from '@/src/store/index.uts';
-import { toastSuccess } from '@/src/utils/toast/index.uts';
+import { toast, toastSuccess } from '@/src/utils/toast/index.uts';
 
 definePage({
   debug: false,
@@ -65,11 +177,124 @@ definePage({
   hideNavbar: false,
   enablePullDownRefresh: false,
   style: {
-    navigationBarTitleText: '路由拦截与传参',
+    navigationBarTitleText: '路由 hooks 用法',
     navigationStyle: 'custom'
   }
 });
 
+// =========================================================================
+// 【可选删除】以下内容仅供路由 hooks 演示使用，接入真实业务时可整段删除。
+// 演示路径属于「页面结构级只读常量」（随页面固化、不由后端下发），故内联在本文件。
+// =========================================================================
+
+/** 参数接收页（已在 config.uts 的登录拦截黑名单中） */
+const PARAMS_DEMO_PAGE: string = '/src/sub/routerParamsBasicDemo/routerParamsBasicDemo';
+/** 本页路径（演示「带参数重进本页」） */
+const SELF_PAGE: string = '/src/sub/routerBasicDemo/routerBasicDemo';
+/** 首页 */
+const HOME_PAGE: string = '/src/pages/index/index';
+
+// 注册本页的路由元信息（可选路由表）：注册后 useRoute().meta / .name 才读得到。
+// 真实项目建议在路由表文件里集中注册；这里为演示就近放在页面模块顶部。
+// setRouteMeta(SELF_PAGE, { name: 'routerBasicDemo', title: '路由 hooks 用法', requireAuth: false });
+
+/** 1) useRoute()：当前路由（全局响应式状态，只读） */
+const route = useRoute();
+/** 2) useRouter()：导航器（底层仍是 uni 导航 API，全局拦截器照常生效） */
+const router = useRouter();
+
+console.log(route, 'route');
+
+onMounted(() => {
+  console.log(route, 'route');
+});
+
+/** route.name 可能为 null，展示前先兜底 */
+const routeNameText = computed((): string => {
+  const name = route.name;
+  if (name == null) {
+    return 'null（未注册 meta）';
+  }
+  return name;
+});
+
+/** route.meta 序列化展示 */
+const metaText = computed((): string => {
+  const meta = route.meta;
+  if (meta == null) {
+    return 'null';
+  }
+  const raw = JSON.stringify(meta);
+  if (raw == null) {
+    return '{}';
+  }
+  return raw;
+});
+
+/** query 键值对展示行 */
+type QueryLine = {
+  key: string;
+  value: string;
+};
+
+/** route.query 是 Map，先摊成数组再交给 v-for */
+const queryLines = computed((): QueryLine[] => {
+  const lines: QueryLine[] = [];
+  route.query.forEach((value: string, key: string): void => {
+    lines.push({ key, value } as QueryLine);
+  });
+  return lines;
+});
+
+// —— 1) useRoute 演示：带参数 / 不带参数重进本页
+/** 带 query 重进本页：新的页面实例里 route.query 会实时出现两个键 */
+function onPushSelfWithQuery(): void {
+  router.push({ path: SELF_PAGE, query: { id: 2001, from: 'self' } });
+}
+
+/** 无 query 重进本页（replace 掉当前这层） */
+function onReplaceSelfWithoutQuery(): void {
+  router.replace(SELF_PAGE);
+}
+
+// —— 2) useRouter 演示：各导航方法的实际效果
+/** push 字符串形态 */
+function onPushByString(): void {
+  router.push(`${PARAMS_DEMO_PAGE}?id=1001&from=push-string`);
+}
+
+/** push 对象形态（query 会自动拼串并编码） */
+function onPushByObject(): void {
+  router.push({ path: PARAMS_DEMO_PAGE, query: { id: 1002, name: '对象参数', from: 'push-object' } });
+}
+
+/** replace：关掉当前页再打开 */
+function onReplaceByObject(): void {
+  router.replace({ path: PARAMS_DEMO_PAGE, query: { id: 2002, from: 'replace' } });
+}
+
+/** relaunch：关闭所有页面回首页 */
+function onRelaunchHome(): void {
+  router.relaunch(HOME_PAGE);
+}
+
+/** back(1) */
+function onBack(): void {
+  router.back();
+}
+
+/** go(-2)：负数后退两层 */
+function onGoBackTwo(): void {
+  router.go(-2);
+}
+
+/** resolve：只拼 url 不跳转 */
+function onResolveTarget(): void {
+  const url = router.resolve({ path: PARAMS_DEMO_PAGE, query: { id: 3001, from: 'resolve' } });
+  toast(`resolve → ${url}`);
+}
+
+// —— 3) 拦截器协同演示
 const tokenStore = useTokenStore();
 const userStore = useUserStore();
 
@@ -77,18 +302,17 @@ const hasLogin = computed((): boolean => {
   return tokenStore.hasValidLogin();
 });
 
+/** 用 hooks 跳需要登录的页面，观察是否被拦截 */
 function jumpToTest(): void {
-  uni.navigateTo({
-    url: '/src/sub/routerParamsBasicDemo/routerParamsBasicDemo?id=999&name=UNIX'
-  });
+  router.push(`${PARAMS_DEMO_PAGE}?id=999&name=UNIX`);
 }
 
-function handleLogout() {
+function handleLogout(): void {
   tokenStore.clearToken();
   userStore.clearUserInfo();
   toastSuccess('已清除登录状态');
 }
+// =================== 【可选删除】路由 hooks 演示 结束 ===================
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

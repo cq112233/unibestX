@@ -27,6 +27,10 @@ const mockUni: any = {
   reLaunch: vi.fn(),
   switchTab: vi.fn(),
 
+  // 路由完成事件（useRoute 状态源，见 src/router/hooks/route-state.uts）
+  onAppRoute: vi.fn(),
+  offAppRoute: vi.fn(),
+
   getWindowInfo: vi.fn(() => ({
     windowWidth: 375,
     windowHeight: 812,
@@ -63,6 +67,21 @@ const mockUni: any = {
 (globalThis as any).uni = mockUni;
 (globalThis as any).getCurrentPages = vi.fn(() => []);
 
+/**
+ * 真源里嵌套的 JSON 值取出来仍是 UTSJSONObject（带 getString / keys 等方法）；
+ * 裸 JS 字面量没有这些方法，取值时补一层包装，否则 `query.getAny(k)` 这类调用会崩。
+ * 数组保持原样（`isArray` 判定与 `,` 拼接依赖它）。
+ */
+function wrapJsonValue(val: any): any {
+  if (val == null || typeof val !== 'object' || Array.isArray(val)) {
+    return val;
+  }
+  if (val instanceof MockUTSJSONObject) {
+    return val;
+  }
+  return Object.assign(new MockUTSJSONObject(), val as Record<string, any>);
+}
+
 class MockUTSJSONObject extends Object {
   get(key: string) {
     return (this as any)[key];
@@ -90,6 +109,31 @@ class MockUTSJSONObject extends Object {
   getArray(key: string, defaultValue: any = null) {
     const val = (this as any)[key];
     return Array.isArray(val) ? val : defaultValue;
+  }
+
+  /**
+   * 对齐 UTS 真源 `UTSJSONObject.getAny(key)`：取任意类型值，字段缺失返回 null。
+   * 路由状态模块用 `UTSJSONObject.keys() + getAny()` 遍历 query（见分册 1.14）。
+   */
+  getAny(key: string) {
+    return wrapJsonValue(Object.hasOwn(this, key) ? (this as any)[key] : null);
+  }
+
+  /**
+   * 对齐 UTS 真源 `UTSJSONObject.getJSON(key)`：取嵌套对象，非对象 / 缺失返回 null。
+   * （路由器的 `{ path, query }` 形态靠它取 query 子对象）
+   */
+  getJSON(key: string) {
+    const val = Object.hasOwn(this, key) ? (this as any)[key] : null;
+    if (val == null || typeof val !== 'object' || Array.isArray(val)) {
+      return null;
+    }
+    return wrapJsonValue(val);
+  }
+
+  /** 对齐 UTS 真源静态方法 `UTSJSONObject.keys(obj)` */
+  static keys(obj: any) {
+    return obj == null ? [] : Object.keys(obj);
   }
 
   toMap() {

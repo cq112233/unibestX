@@ -1,7 +1,24 @@
 import { useTokenStore } from '@/src/store/index.uts';
 import { isPageTabbar, switchTabbar } from '@/src/tabbar/index.uts';
 import { EXCLUDE_LOGIN_PATH_LIST, isNeedLoginMode, LOGIN_PAGE } from '../config/config.uts';
+import { installRouteStateListener, syncRouteState } from '../hooks/route-state.uts';
 import { parseUrlToObj } from '../utils/utils.uts';
+
+/**
+ * 路由状态兜底回读
+ *
+ * 这是 useRoute() 状态源的**第二层**（第一层是 uni.onAppRoute，见 ../hooks/route-state.uts 头部说明）：
+ * onAppRoute 在 App(5.25+)/Web(4.0+)/微信(3.5.5+)/支付宝(5.25+) 均受支持，此处只是保险。
+ *
+ * 放在 success（跳转确实成功）而非 invoke（即将跳转）里，且延后一拍执行 ——
+ * invoke 阶段新页面还没入栈，此刻回读会读到旧页面。
+ * 回读内部有「路径未变化就跳过」的保护，因此不会覆盖 onAppRoute 写入的 query。
+ */
+function syncRouteStateDeferred(): void {
+  setTimeout(() => {
+    syncRouteState();
+  }, 0);
+}
 
 // #ifndef APP
 export type Interceptor = {
@@ -138,6 +155,9 @@ export const navigateToInterceptor: Interceptor = {
       // #endif
     }
     return doIntercept(url);
+  },
+  success(_res: any): void {
+    syncRouteStateDeferred();
   }
 };
 
@@ -155,6 +175,9 @@ export const redirectToInterceptor: Interceptor = {
       // #endif
     }
     return doIntercept(url);
+  },
+  success(_res: any): void {
+    syncRouteStateDeferred();
   }
 };
 
@@ -172,6 +195,9 @@ export const reLaunchInterceptor: Interceptor = {
       // #endif
     }
     return doIntercept(url);
+  },
+  success(_res: any): void {
+    syncRouteStateDeferred();
   }
 };
 
@@ -189,6 +215,9 @@ export const switchTabInterceptor: Interceptor = {
       // #endif
     }
     return doIntercept(url);
+  },
+  success(_res: any): void {
+    syncRouteStateDeferred();
   }
 };
 
@@ -205,6 +234,8 @@ export const chooseLocationInterceptor: Interceptor = {
  * 全局路由拦截安装器
  */
 export function installRouteInterceptor() {
+  // TEMP-KOTLIN-VERIFY: 逼出 handleAppRoute 的 Kotlin 产物，验证后立即删除
+  installRouteStateListener();
   uni.addInterceptor('navigateTo', navigateToInterceptor);
   uni.addInterceptor('reLaunch', reLaunchInterceptor);
   uni.addInterceptor('redirectTo', redirectToInterceptor);

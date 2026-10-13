@@ -430,6 +430,56 @@ declare global {
     };
   };
 
+  // ==========================================
+  // 补充：应用「路由完成」事件（uni.onAppRoute 的回调参数）
+  //
+  // 真源：HBuilderX @dcloudio/uni-app-x/types/uni/uts-plugin-api/lib/uni-route/utssdk/
+  //       interface.d.ts 的 `declare global { type AppRouteEvent = ... }`
+  //       （platformMatrix：App 5.25+ / Web 4.0+ / 微信小程序 3.5.5+ / 支付宝 5.25+）。
+  //
+  // 为什么还要在这里补：
+  //   · `uni.onAppRoute` / `uni.offAppRoute` 在编辑器里**能**解析 —— 走的是
+  //     @dcloudio/types 的 uni-patches/wx（`onAppRoute(listener: UniNamespace.OnAppRouteCallback)`），
+  //     那个回调参数类型是命名空间内的，**没有**提升成全局名；
+  //   · 于是 `.uts` 里写 `(event: AppRouteEvent)` 报 TS2304「找不到名称」，
+  //     而 UTS→Kotlin 编译是过的（Kotlin 侧真源认它）—— 只瞎编辑器，不瞎编译。
+  //
+  // ⚠️ `openType` 真源是内置全局联合类型 `AppRouteOpenType`
+  //    （`'appLaunch' | 'navigateTo' | 'navigateBack' | 'redirectTo' | 'reLaunch' | 'switchTab'`），
+  //    但这里**只能写宽成 `string`**：编辑器解析出的 `uni.onAppRoute` 来自微信 patch 类型
+  //    （`OnAppRouteCallback = (result: OnAppRouteListenerResult) => void`，其 `openType: string`），
+  //    回调参数是**逆变**检查的 —— 写窄成联合类型会立刻报 TS2345
+  //    「不能将 OnAppRouteListenerResult 分配给 AppRouteEvent」。
+  //
+  // ⚠️ 其余字段必须与 `OnAppRouteListenerResult` **同名同类且不多required**：
+  //    它要求 notFound / page / path / pipMode / query / renderer / routeEventId / timeStamp / webviewId
+  //    全部存在（`page`/`query` 是 `any`，`pipMode`/`renderer` 是不带 null 的联合），
+  //    所以本类型也用可选字段兜住，别把某个字段写成自己独有的必填项。
+  // ==========================================
+  /** 应用路由完成事件（uni.onAppRoute 的回调参数） */
+  type AppRouteEvent = {
+    /** 路由页面路径，**不含开头的斜杠**（官方口径，由 route-state.uts 的 cleanPath 归一补上） */
+    path: string;
+    /** 页面参数（键值对，无参数时为空对象） */
+    query: UTSJSONObject;
+    /** 触发来源（真源为 AppRouteOpenType 联合，此处受限于回调逆变只能放宽成 string，见上） */
+    openType: string;
+    /** 路由目标页面是否存在 */
+    notFound: boolean;
+    /** 事件时间戳 */
+    timeStamp: number;
+    /** 路由事件唯一标识 */
+    routeEventId: string;
+    /** 触发路由的页面实例（可空） */
+    page?: UTSJSONObject | null;
+    /** 画中画模式（可空） */
+    pipMode?: 'min' | 'max' | null;
+    /** 渲染引擎（可空） */
+    renderer?: 'webview' | 'skyline' | 'xr-frame' | null;
+    /** webview 实例 id（可空） */
+    webviewId?: number | null;
+  };
+
   /** uni.onKeyboardHeightChange 的回调参数 */
   type OnKeyboardHeightChangeCallbackResult = {
     height: number;
