@@ -36,7 +36,9 @@ import { ensureRouteReady } from './route-state.uts';
 export class Router {
   /**
    * 新页面入栈（保留当前页，可返回）
+   *
    * @param to 字符串 url 或 `{ path, query }` 字面量
+   * @returns `uni.navigateTo` 的 Promise；入参为空 / 缺 path 时返回 null
    */
   push(to: any | null): any | null {
     const url = resolveUrl(to);
@@ -48,7 +50,9 @@ export class Router {
 
   /**
    * 关闭当前页并打开新页（当前页不保留）
+   *
    * @param to 字符串 url 或 `{ path, query }` 字面量
+   * @returns `uni.redirectTo` 的 Promise；入参为空 / 缺 path 时返回 null
    */
   replace(to: any | null): any | null {
     const url = resolveUrl(to);
@@ -60,7 +64,9 @@ export class Router {
 
   /**
    * 关闭所有页面再打开目标页
+   *
    * @param to 字符串 url 或 `{ path, query }` 字面量
+   * @returns `uni.reLaunch` 的 Promise；入参为空 / 缺 path 时返回 null
    */
   relaunch(to: any | null): any | null {
     const url = resolveUrl(to);
@@ -72,7 +78,9 @@ export class Router {
 
   /**
    * 跳转到 TabBar 页面（目标必须在 pages.json 的 tabBar 中声明）
+   *
    * @param to 字符串 url 或 `{ path, query }` 字面量
+   * @returns `uni.switchTab` 的 Promise；入参为空 / 缺 path 时返回 null
    */
   switchTab(to: any | null): any | null {
     const url = resolveUrl(to);
@@ -84,6 +92,7 @@ export class Router {
 
   /**
    * 返回上一页 / 前 n 页
+   *
    * @param delta 返回的层数，默认 1；超出页面栈层数时回到首页
    */
   back(delta: number = 1): void {
@@ -107,6 +116,7 @@ export class Router {
 
   /**
    * 把导航目标解析为 uni 可用的 url 字符串（不执行跳转）
+   *
    * @param to 字符串 url 或 `{ path, query }` 字面量
    * @returns 归一化后的 url；入参为空或缺 path 时返回空串 ""
    */
@@ -122,6 +132,8 @@ export const router = new Router();
  * 获取路由导航器（全局单例，可在任意 setup / 普通函数中调用）
  *
  * 首次调用会顺带确保路由状态已就绪（安装全局路由完成监听 + 回读一次当前路由）。
+ *
+ * @returns 全局唯一的 `Router` 实例（每次都返回同一个，可安全长期持有）
  */
 export function useRouter(): Router {
   ensureRouteReady();

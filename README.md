@@ -14,7 +14,7 @@
 [![GitHub forks](https://img.shields.io/github/forks/cq112233/unibestX?style=flat&logo=github)](https://github.com/cq112233/unibestX)
 ![node version](https://img.shields.io/badge/node-%3E%3D22.22.2-green)
 ![pnpm version](https://img.shields.io/badge/pnpm-%3E%3D7.30-green)
-![HBuilderX version](https://img.shields.io/badge/HBuilderX-%3E%3D5.24-blue)
+![HBuilderX version](https://img.shields.io/badge/HBuilderX-%3E%3D5.26-blue)
 [![Vitest](https://img.shields.io/badge/tested_with-vitest-yellow?logo=vitest)](https://vitest.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8-blue?logo=typescript)](https://www.typescriptlang.org/)
 ![GitHub package.json version](https://img.shields.io/github/package-json/v/cq112233/unibestX)
@@ -135,7 +135,7 @@ pnpm install
 支持 **命令行 CLI** 与 **HBuilderX 图形界面** 两种开发方式。
 
 > [!WARNING]
-> **使用 CLI 命令前，必须先启动 HBuilderX**（需 **5.24 及以上**）。CLI 命令本质是通过正在运行的 HBuilderX 来编译运行项目，未打开时会报「未找到 HBuilderX」。App 端（Android / iOS / 鸿蒙）编译只能由 HBuilderX 完成。
+> **使用 CLI 命令前，必须先启动 HBuilderX**（需 **5.26 及以上**）。CLI 命令本质是通过正在运行的 HBuilderX 来编译运行项目，未打开时会报「未找到 HBuilderX」。App 端（Android / iOS / 鸿蒙）编译只能由 HBuilderX 完成。
 
 #### 🖥️ 方式一：命令行 CLI
 
@@ -283,7 +283,7 @@ pnpm docs:dev       # 本地启动 VitePress 文档站
 | :--- | :--- |
 | Node | `^22.22.2`（或 `^24.15.0`、`>=26.0.0`） |
 | pnpm | >= 7.30 |
-| HBuilderX | **5.24 及以上**（Android 蒸汽模式需 >= 5.21，iOS 需 >= 5.11；支付宝小程序需 >= 5.31） |
+| HBuilderX | **5.26 及以上**（Android 蒸汽模式需 >= 5.21，iOS 需 >= 5.11；支付宝小程序需 >= 5.31） |
 | Vue Official | >= 2.1.10 |
 | TypeScript | >= 5.0 |
 | JDK | >= 17（Android 平台） |

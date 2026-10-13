@@ -37,20 +37,12 @@
  *
  * ## 谁读到什么：`useRoute()` 返回的是**本页快照**，不是下面这个 routeState
  *
- * `routeState` 是**全局唯一一份**（四层数据源都写它），语义是「应用当前 / 正在导航到的路由」，
- * 框架侧（拦截器、回读、单测）看这一份。
+ * `routeState`（本文件）是**全局唯一一份**（四层数据源都写它），语义是「应用当前 / 正在导航到的
+ * 路由」，框架侧（拦截器、回读、单测）看这一份。
  *
- * 业务侧 `useRoute()` 返回的**不是**它，而是**本次调用所在页面的独立快照**（见下方
- * 「每个调用点各自的路由快照」）。原因：全局那份在**跳转请求发出时**就被写成了目标路由
- * （第 1 层数据源），而上一页此刻还挂在页面栈上、还在屏幕上（App 端要等新页盖上来）——
- * 两边共用一份的话，上一页的 `route.fullPath` 会在新页进入动画期间就翻成新页的值，
- * 同页带参重进尤其明显（path / name / meta 全一样，只有 fullPath / query 当场变）。
- * 拆成快照后：
- *
- * - **上一页**：导航**请求**发出时的那次预写（或路径/可见性不符的落地提交）一律动不了它 →
- *   新页进入期间纹丝不动，直到自己重新显示；
- * - **新页**：创建快照时全局里已经是它的目标路由（拦截器在请求时就写了）→ 首帧就准，
- *   不需要任何回调兜底。
+ * 业务侧 `useRoute()` 返回的**不是**它，而是**本次调用所在页面的独立快照**（快照的模型、两道闸
+ * 与生命周期全在同目录的 ./route-snapshot.uts，本文件只负责在提交时把全局那份推给它）。
+ * 为什么要拆、拆完各自的行为，见那个文件的头部说明。
  *
  * ## 路径口径
  *
@@ -76,36 +68,9 @@ import {
   parseUrlToObj,
   queryValueToString
 } from '../utils/utils.uts';
-
-/**
- * 路由位置对象（对齐 vue-router 的 RouteLocationNormalized）
- */
-export type RouteLocation = {
-  /** 规范化路径（带前导 `/`，不含 query），如 `/src/pages/index/index` */
-  path: string;
-  /** 完整路径（path + 原始 query 串），如 `/src/pages/index/index?tab=2` */
-  fullPath: string;
-  /** 查询参数（键值均为 string，值已 URL 解码） */
-  query: Map<string, string>;
-  /** 恒为空 Map：uni-app X 无动态路由段，仅为与 vue-router 形态保持一致 */
-  params: Map<string, string>;
-  /** 路由元信息：优先取 setRouteMeta() 注册值，未注册时回退到 pages.json 里该页面的配置项，都没有为 null */
-  meta: UTSJSONObject | null;
-  /** 路由名：取自 meta 的 `name` 字段（在页面 definePage 里声明），未声明为 null */
-  name: string | null;
-};
-
-/** 构造一个空路由（保持与 RouteLocation 同构，供 reactive 初始化） */
-function createEmptyRoute(): RouteLocation {
-  return {
-    path: '',
-    fullPath: '',
-    query: new Map<string, string>(),
-    params: new Map<string, string>(),
-    meta: null,
-    name: null
-  } as RouteLocation;
-}
+import { publishRoute } from './route-snapshot.uts';
+import { createEmptyRoute } from './route-types.uts';
+import type { RouteLocation } from './route-types.uts';
 
 /**
  * 当前路由（响应式）—— **全局唯一一份**，语义是「应用当前 / 正在导航到的路由」
@@ -149,6 +114,8 @@ export function setRouteMeta(path: string, meta: UTSJSONObject): void {
  *
  * ⚠️ 两种 `src/` 前缀写法都要删：注册时按调用方原文存 key，而查询（getRouteMeta）两种写法都能命中，
  *    只删一种会留下「换一种写法注册过、按另一种写法撤不掉」的幽灵注册值。
+ *
+ * @param path 页面路径，写法与 `setRouteMeta()` 注册时一致即可
  */
 export function removeRouteMeta(path: string): void {
   const key = cleanPath(path);
@@ -158,6 +125,9 @@ export function removeRouteMeta(path: string): void {
 
 /**
  * 把路径换成另一种 `src/` 前缀写法（`/src/pages/x` ↔ `/pages/x`），用于兼容历史路径写法
+ *
+ * @param key cleanPath 规范化后的路径
+ * @returns 换成另一种写法的路径（原本带 `/src/` 就去掉，原本不带就补上）
  */
 function swapSrcPrefix(key: string): string {
   return key.startsWith('/src/') ? key.substring(4) : `/src${key}`;
@@ -176,7 +146,11 @@ function swapSrcPrefix(key: string): string {
  */
 let pageConfigTable: Map<string, UTSJSONObject> | null = null;
 
-/** 从生成的 JSON 常量解析出页面配置表（懒加载，只解析一次） */
+/**
+ * 从生成的 JSON 常量解析出页面配置表（懒加载，只解析一次）
+ *
+ * @returns 路径 → 页面配置项的 Map；表为空时返回空 Map（不返回 null）
+ */
 function ensurePageConfigTable(): Map<string, UTSJSONObject> {
   // ⚠️ 必须先拷进局部 const 再判空：`pageConfigTable` 是模块级可变属性，Kotlin 不对
   //    「可能被并发改写的属性」做智能转换，直接写 `return pageConfigTable` 会报
@@ -237,6 +211,10 @@ export function getPageConfig(path: string): UTSJSONObject | null {
  *
  * ⚠️ 用下标访问 + queryValueToString，而不是 `meta.getString()`：
  *    meta 可能来自 JSON.parseObject（H5 侧为普通 JS 对象），实例方法不保证存在。
+ *
+ * @param meta 元信息对象（setRouteMeta 注册值或 pages.json 配置项）
+ * @param key 要读的字段名，如 `name`
+ * @returns 字段的字符串值；字段不存在或转换后为空串时返回 null
  */
 function readMetaString(meta: UTSJSONObject, key: string): string | null {
   const value = meta[key];
@@ -277,7 +255,13 @@ export function getRouteMeta(path: string): UTSJSONObject | null {
 // 状态写入（唯一收敛点）
 // ==========================================
 
-/** 把 query Map 拼回 query 串（值做 URL 编码） */
+/**
+ * 把 query Map 拼回 query 串（值做 URL 编码）
+ *
+ * @param path 规范化路径（带前导 `/`）
+ * @param query 查询参数 Map
+ * @returns `path?k=v&k2=v2`；query 为空时原样返回 path
+ */
 function buildFullPath(path: string, query: Map<string, string>): string {
   if (query.size == 0) {
     return path;
@@ -294,7 +278,10 @@ function buildFullPath(path: string, query: Map<string, string>): string {
  *
  * 路径为空时整体忽略（避免页面栈尚未建立时把状态清空）。
  *
- * @param includeClaimed 本次提交是不是「落地」真值（见 publishRoute 的说明）：
+ * @param path 目标路径（可省略前导 `/` 与 `src/` 前缀，内部走 cleanPath 归一）
+ * @param query 查询参数 Map（值已是解码态）
+ * @param fullPath 完整路径（含 query 串），由调用方拼好传入
+ * @param includeClaimed 本次提交是不是「落地」真值（见 route-snapshot.uts 的 publishRoute）：
  *                       `false` = 导航请求发出时的预写，不打扰任何已认领的快照
  */
 function commitRoute(path: string, query: Map<string, string>, fullPath: string, includeClaimed: boolean): void {
@@ -313,169 +300,14 @@ function commitRoute(path: string, query: Map<string, string>, fullPath: string,
   else {
     routeState.name = readMetaString(meta, 'name');
   }
-  publishRoute(normalizedPath, includeClaimed);
-}
-
-// ==========================================
-// 每个调用点各自的路由快照（useRoute() 返回的就是它）
-// ==========================================
-
-/**
- * 一份 `useRoute()` 快照
- *
- * 为什么不能所有调用点共用全局 `routeState` 那一份：全局状态在**跳转请求发出时**就被写成了
- * 目标路由（第 1 层数据源），而上一页此刻还挂在页面栈上、还在屏幕上，共用一份就会让上一页
- * 提前翻（详见文件头「谁读到什么」）。所以每个调用点持有**属于自己的快照**：只吃「本页路径」的
- * **落地**提交（请求预写一律不吃），且只在本页可见时吃（两道闸都在 publishRoute）。
- */
-type RouteSnapshot = {
-  /** 本调用点读到的路由（reactive，模板直接读它的字段） */
-  route: RouteLocation;
-  /** 本页路径：认领后即定格（页面实例存活期内不变）；空串 = 还没认领 */
-  path: string;
-  /** 本页当前是否在前台：onPageShow 置真、onPageHide 置假 */
-  visible: boolean;
-};
-
-/**
- * 快照登记表：key 为自增 id
- *
- * 用数字 id 而不是对象本身作 key —— reactive 返回的是代理对象，跨运行时（H5 的 Proxy /
- * Kotlin 侧的包装类）比较身份不可靠，id 两端都稳。
- */
-const snapshots: Map<number, RouteSnapshot> = new Map<number, RouteSnapshot>();
-let snapshotSeq: number = 0;
-
-/**
- * 把全局路由的字段整体拷进快照
- *
- * `query` / `params` 直接共用同一个 Map 实例：提交时是**整体替换**（见 commitRoute），
- * 不是原地改，所以共享引用不会被别处写脏。
- */
-function copyRoute(target: RouteLocation, source: RouteLocation): void {
-  target.path = source.path;
-  target.fullPath = source.fullPath;
-  target.query = source.query;
-  target.params = source.params;
-  target.meta = source.meta;
-  target.name = source.name;
-}
-
-/**
- * 把刚提交的路由推给「该收到它的」快照（「上一页不提前翻」的全部实现）
- *
- * 提交分两类，只有**落地**类才是「这就是当前路由了」的真值：
- *
- * - **导航请求**发出时的预写（`includeClaimed == false`，见 applyTargetRouteFromUrl）：此刻全局里是
- *   「正要盖到自己头上的下一页」的目标路由 —— 只喂还没认领路径的快照（冷启动 / H5 直链靠它兜底），
- *   已认领的一律不动。同页带参重进时上一页不提前翻靠的就是这一条：那时上一页还没 onPageHide
- *   （可见性仍是真），光靠可见性拦不住；
- * - **落地**（`includeClaimed == true`：onAppRoute 事件 / 页面栈回读 / 业务主动刷新）：推给
- *   「未认领」（还不知道自己属于哪一页，先跟着全局走，等本页首次 onPageShow 认领路径）或
- *   「已认领 + 本页在前台 + 路径与本次提交一致」的快照。
- */
-function publishRoute(path: string, includeClaimed: boolean): void {
-  snapshots.forEach((snapshot: RouteSnapshot, _id: number): void => {
-    if (snapshot.path == '') {
-      copyRoute(snapshot.route, routeState);
-      return;
-    }
-    if (includeClaimed && snapshot.visible && snapshot.path == path) {
-      copyRoute(snapshot.route, routeState);
-    }
-  });
-}
-
-/**
- * 为当前调用点新建一份路由快照（`useRoute()` 内部调用，业务侧不要直接用）
- *
- * 初始值 = 此刻的全局路由。新页面的 setup 里调用时，全局里已经是它的目标路由
- * （拦截器在请求发出时就写了），所以**新页首帧就是对的**，不依赖任何回调时序。
- *
- * @returns 快照 id（`showRouteSnapshot` / `hideRouteSnapshot` / `closeRouteSnapshot` 用）
- */
-export function openRouteSnapshot(): number {
-  snapshotSeq += 1;
-  const id = snapshotSeq;
-  const route = reactive(createEmptyRoute());
-  copyRoute(route, routeState);
-  const snapshot: RouteSnapshot = {
-    route,
-    path: routeState.path,
-    // 此刻本页还没显示（onPageShow 时才置真）：创建到显示之间不吃任何提交也够用 ——
-    // 初始值已经从全局拷过来了，就是本次导航的目标路由
-    visible: false
-  } as RouteSnapshot;
-  snapshots.set(id, snapshot);
-  return id;
-}
-
-/** 取快照对象（调用方长期持有它，模板直接读字段） */
-export function readRouteSnapshot(id: number): RouteLocation {
-  const snapshot = snapshots.get(id);
-  if (snapshot == null) {
-    // 已注销（正常不会：onUnmounted 早于任何后续读取）：退化成全局那份，宁可读到全局也别崩
-    return routeState;
-  }
-  return snapshot.route;
-}
-
-/**
- * 本页重新显示：认领路径（创建时全局还是空的那种）+ 从此刻的全局路由刷新一次
- *
- * 调用时机：`useRoute()` 注册的 onPageShow 里，**先** `syncRouteState()` 回读页面栈（返回上一页 /
- * 物理返回键 / App 回前台 / 直链进入只有这个时机看得到），**再**调本函数。
- *
- * ⚠️ 已认领的快照只在「全局路径与自己一致」时才刷新：页面栈回读滞后、或本页刚显示就被又一次
- *    跳转顶掉时，全局里可能是别的页面 —— 那种情况下本页宁可保持自己那份（拦截器写进来的目标
- *    路由），也不能把别人的路由灌进来。
- */
-export function showRouteSnapshot(id: number): void {
-  const snapshot = snapshots.get(id);
-  if (snapshot == null) {
-    return;
-  }
-  const globalPath = routeState.path;
-  if (snapshot.path == '') {
-    // 还没认领：以此刻的全局路由为准（全局也还空就先不动，等下一次 onPageShow）
-    if (globalPath == '') {
-      return;
-    }
-    snapshot.path = globalPath;
-    snapshot.visible = true;
-    copyRoute(snapshot.route, routeState);
-    return;
-  }
-  snapshot.visible = true;
-  if (globalPath == snapshot.path) {
-    copyRoute(snapshot.route, routeState);
-  }
-}
-
-/**
- * 本页不再显示（被新页盖住 / 切到后台 / 切了 Tab）
- *
- * 冻结快照：此后**落地**提交也改不到它 —— 哪怕「同一路径再进一层」（提交的路径与本页相同），
- * 因为那次的落地只该由新那层页面收（它是唯一还 visible 的那个）。
- * 请求预写那一道闸不依赖本函数（那时本页可能还没 onPageHide）。
- */
-export function hideRouteSnapshot(id: number): void {
-  const snapshot = snapshots.get(id);
-  if (snapshot != null) {
-    snapshot.visible = false;
-  }
-}
-
-/** 注销快照（页面 / 组件 onUnmounted 时调用，避免登记表随往返次数越积越长） */
-export function closeRouteSnapshot(id: number): void {
-  snapshots.delete(id);
+  publishRoute(routeState, normalizedPath, includeClaimed);
 }
 
 /**
  * 用 url 字符串解析出路由并落盘
  *
  * @param url 目标 url
- * @param includeClaimed 是否按「落地」真值处理（见 commitRoute / publishRoute）
+ * @param includeClaimed 是否按「落地」真值处理（见 commitRoute / route-snapshot.uts 的 publishRoute）
  */
 function commitRouteFromUrl(url: string, includeClaimed: boolean): void {
   if (url == '') {
@@ -538,6 +370,7 @@ export function applyTargetRouteFromUrl(url: string): void {
  *    非字符串值（number / boolean / JSON 串）走 stringify 后不再解码。
  *
  * @param raw 参数对象；为 null 时返回空 Map
+ * @returns 解码归一后的 query Map（非字符串值走 stringify，不再解码）
  */
 function queryMapFromObject(raw: UTSJSONObject | null): Map<string, string> {
   const query = new Map<string, string>();
@@ -589,6 +422,8 @@ export function syncRouteState(): void {
  * 处理 onAppRoute 事件：把官方事件载荷落进 routeState
  *
  * 注意 `event.path` 官方口径为「不含开头的斜杠」，由 cleanPath 统一补上。
+ *
+ * @param event onAppRoute 事件载荷（path / query / openType 等）
  */
 function handleAppRoute(event: AppRouteEvent): void {
   const rawPath = event.path;
@@ -612,7 +447,6 @@ export function installRouteStateListener(): void {
   }
   routeListenerInstalled = true;
   uni.onAppRoute((event: AppRouteEvent): void => {
-    console.log(event, 'event');
     handleAppRoute(event);
   });
 }

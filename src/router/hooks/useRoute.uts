@@ -3,7 +3,8 @@
  *
  * 返回的**不是**全局那一份路由状态，而是**属于本次调用所在页面**的快照：上一页不会被
  * 「正在进入的下一页」改写（全局那份在跳转请求发出时就变成目标路由了）。
- * 完整模型与「为什么」见 ./route-state.uts 文件头的「谁读到什么」与「每个调用点各自的路由快照」。
+ * 完整模型与「为什么」见 ./route-snapshot.uts 文件头（快照本体与两道闸）与 ./route-state.uts
+ * 文件头的「谁读到什么」（全局那份的定位）。
  *
  * @example
  * ```uts
@@ -21,16 +22,15 @@
  */
 import { onPageHide, onPageShow } from '@dcloudio/uni-app';
 import { getCurrentInstance, onUnmounted } from 'vue';
-import type { RouteLocation } from './route-state.uts';
+import type { RouteLocation } from './route-types.uts';
+import { ensureRouteReady, routeState, syncRouteState } from './route-state.uts';
 import {
   closeRouteSnapshot,
-  ensureRouteReady,
   hideRouteSnapshot,
   openRouteSnapshot,
   readRouteSnapshot,
-  showRouteSnapshot,
-  syncRouteState
-} from './route-state.uts';
+  showRouteSnapshot
+} from './route-snapshot.uts';
 
 /**
  * 获取**本页**路由（响应式、只读）
@@ -49,7 +49,7 @@ export function useRoute(): RouteLocation {
   ensureRouteReady();
 
   // 本调用点自己的快照：创建即定值（新页 setup 时全局里已是它的目标路由，首帧就准）
-  const snapshotId = openRouteSnapshot();
+  const snapshotId = openRouteSnapshot(routeState);
 
   // 页面每次「重新显示」都回读一次页面栈，再把结果刷进本页快照。这是**唯一**能覆盖这些场景的时机：
   // 返回上一页（含安卓物理返回键，它不走任何 uni 导航 API、因此拦截器看不到）、
@@ -59,11 +59,11 @@ export function useRoute(): RouteLocation {
   // 与 layouts/navbar 用的是同一套机制。
   onPageShow((): void => {
     syncRouteState();
-    showRouteSnapshot(snapshotId);
+    showRouteSnapshot(snapshotId, routeState);
   });
 
   // 本页被盖住 / 切到后台 / 切了 Tab：冻结快照 —— 之后别的页面（哪怕同路径再进一层）的路由提交
-  // 都不再改它。同页带参重进时的「提前翻」靠的就是这一步（见 route-state.uts 的 publishRoute）
+  // 都不再改它。同页带参重进时的「提前翻」靠的就是这一步（见 route-snapshot.uts 的 publishRoute）
   onPageHide((): void => {
     hideRouteSnapshot(snapshotId);
   });
@@ -76,5 +76,12 @@ export function useRoute(): RouteLocation {
     });
   }
 
-  return readRouteSnapshot(snapshotId);
+  // 快照已被注销（正常不会：onUnmounted 早于任何后续读取）：退化成全局那份，宁可读到全局也别崩
+  const snapshotRoute = readRouteSnapshot(snapshotId);
+  console.log(snapshotRoute, 'snapshotRoute');
+  if (snapshotRoute != null) {
+    return snapshotRoute;
+  }
+  console.log(routeState, 'routeState');
+  return routeState;
 }

@@ -344,11 +344,11 @@ export function resolveUrl(to: any | null): string {
  *
  * @example
  * ```uts
- * // 方式 1：标准具名导入
- * import { cleanPath, getCurrentPath, parseUrlToObj } from '@/src/router';
+ * // 方式 1：标准具名导入（精准导入本叶子文件，别穿 @/src/router 门面）
+ * import { cleanPath, getCurrentPath, parseUrlToObj } from '@/src/router/utils/utils.uts';
  *
  * // 方式 2：对象单例导入（一目了然）
- * import { route } from '@/src/router';
+ * import { route } from '@/src/router/utils/utils.uts';
  * console.log(route.getCurrentPath());
  * ```
  */

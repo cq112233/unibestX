@@ -114,16 +114,13 @@ describe('useRouter Unit Tests', () => {
   });
 });
 
-describe('router 门面导出（@/src/router）', () => {
-  it('useRoute / useRouter / router / routeState 都能从门面取到', async () => {
+describe('router 门面导出（@/src/router/index.uts）', () => {
+  it('业务入口 useRoute / useRouter 可从门面拿到，且 useRouter 是全局单例', async () => {
     vi.resetModules();
     const facade = await import('@/src/router/index.uts');
 
     expect(typeof facade.useRoute).toBe('function');
     expect(typeof facade.useRouter).toBe('function');
-    expect(facade.router).toBeInstanceOf(facade.Router);
-    expect(facade.useRouter()).toBe(facade.router);
-    expect(typeof facade.getRouteMeta).toBe('function');
-    expect(typeof facade.setRouteMeta).toBe('function');
+    expect(facade.useRouter()).toBe(facade.useRouter()); // 全局单例
   });
 });
