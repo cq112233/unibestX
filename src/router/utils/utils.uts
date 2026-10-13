@@ -14,8 +14,39 @@ export type UrlObj = {
 };
 
 /**
+ * query 参数值的 URL 解码（容错版，路由状态入库前统一走它）
+ *
+ * 各端交到我们手里的 query 值形态**不一致**，所以这里不能省成「无脑解一次」：
+ * - **编码态**：拦截器解析的 url、以及**微信小程序的页面 `options`** —— 微信官方口径是
+ *   路由参数以 URL 编码传递、需自行 `decodeURIComponent`（MP 运行时把 `onLoad(query)`
+ *   原样存成 `this.options`，见 uni-mp-weixin 的 `uni.mp.esm.js`）。真机实测：
+ *   小程序上 `useRoute()` 曾直接显示 `%E5%AF%B9%E8%B1%A1...`（中文 name 参数）。
+ * - **解码态**：`uni.onAppRoute` 的 `event.query`（H5 侧源码即 `decodedQuery(query)`）与
+ *   App 端页面 options。已解码的值通常不含 `%`，直接跳过，不会被二次解码破坏。
+ * - **真含字面量 `%`**（如 `100%`）：JS 运行时会抛 `URIError`、UTS 原生侧返回 null，
+ *   两端都要兜住并保留原文 —— 而不是退化成空串（原实现 `?? ''` 会把这个参数悄悄抹掉）。
+ *
+ * @param value query 原始值
+ * @returns 解码后的值；不含 `%` 或解码失败时原样返回
+ */
+export function decodeQueryValue(value: string): string {
+  if (!value.includes('%')) {
+    return value;
+  }
+  try {
+    const decoded = decodeURIComponent(value);
+    return decoded != null ? decoded : value;
+  }
+  catch {
+    return value;
+  }
+}
+
+/**
  * 解析 URL 字符串为路径与参数键值对
  * 例如: "/src/pages/login?redirect=index" -> { path: "/src/pages/login", query: { redirect: "index" } }
+ *
+ * 值统一过 decodeQueryValue，保证与页面 options / onAppRoute 事件同口径（都是解码态）。
  *
  * @param url 待解析的 URL 字符串
  * @returns 包含 path 和 query Map 的 UrlObj
@@ -31,12 +62,7 @@ export function parseUrlToObj(url: string): UrlObj {
       const pair = pairs[i].split('=');
       if (pair.length > 1) {
         const key = pair[0];
-        let value = pair[1];
-        // 解码包含百分号转义的参数值
-        if (value.includes('%')) {
-          value = decodeURIComponent(value) ?? '';
-        }
-        query.set(key, value);
+        query.set(key, decodeQueryValue(pair[1]));
       }
       else if (pair.length > 0) {
         query.set(pair[0], '');
@@ -149,6 +175,9 @@ export function getCurrentRoute(): string {
  * 冷启动 / 返回 / 页面重新显示这些「稳定时机」需要一个不依赖事件的当前页参数来源。
  * `options` 与 `route` 同属官方 UniPage 属性，平台支持：
  * Android unixVer 4.31 / iOS 4.31 / Web 4.31 / 微信小程序 √。
+ *
+ * ⚠️ **各端给出的值编码态不一致**：微信小程序的 `options` 是 **URL 编码态**（微信官方口径），
+ *    App / H5 多为解码态。取到值后必须过 decodeQueryValue 归一，不要直接塞进路由状态。
  *
  * @returns 栈顶页面的参数对象；页面栈为空、平台未实现或参数为空时返回 null
  */
@@ -377,6 +406,11 @@ export class RouteUtils {
   /** 把 `{ path, query }` 对象序列化为 query 串（值做 URL 编码） */
   serializeQuery(query: UTSJSONObject | null): string {
     return serializeQuery(query);
+  }
+
+  /** query 参数值的 URL 解码（容错：不含 `%` 或解码失败时原样返回） */
+  decodeQueryValue(value: string): string {
+    return decodeQueryValue(value);
   }
 
   /** query 值的字符串化（string / number / boolean / 数组 / 对象 通用） */

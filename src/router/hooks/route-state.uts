@@ -40,11 +40,19 @@
  * `path` 统一走 `cleanPath()`：带前导 `/`、不带 query、不做 `src/` 前缀的增删
  * （页面栈原始 route 为 `src/pages/index/index`，onAppRoute 的 path 为 `src/pages/index/index`
  * 之外还可能不带 `src/`，两者都以调用方传入的原文为准、只补前导斜杠）。
+ *
+ * ## query 口径
+ *
+ * `route.query` 的值**一律是解码态**。四个数据源里，url 字符串（拦截器）与平台给出的参数对象
+ * （onAppRoute 的 `event.query`、页面 `options`）编码态并不一致 —— 后者在微信小程序上是
+ * URL 编码态 —— 故**所有入口统一过 `decodeQueryValue()`**（见 utils.uts），
+ * 页面侧拿到 `route.query.get('name')` 即是可直接展示的中文。
  */
 import { reactive } from 'vue';
 import { PAGE_META_JSON } from '../generated/page-meta.uts';
 import {
   cleanPath,
+  decodeQueryValue,
   getCurrentPageOptions,
   getCurrentPath,
   getQueryString,
@@ -317,6 +325,13 @@ export function applyRouteFromUrl(url: string): void {
  *    表现为「路由状态整体不更新、query 恒为空」（2026-10-13 实测，见分册 1 的 getJSON/getAny 说明）。
  *    UTSJSONObject.keys 在 H5 侧就是 Object.keys，下标访问两端都成立。
  *
+ * ⚠️ 各端交来的**值编码态不一致**，必须过 decodeQueryValue 归一（只对字符串解）：
+ *    微信小程序的页面 `options` 是 URL 编码态（微信官方口径「路由参数以 URL 编码传递，
+ *    需自行 decodeURIComponent」，MP 运行时 `this.options = onLoad(query)` 原样转存），
+ *    而 `onAppRoute` 事件 / App 页面 options 多为解码态 —— 不归一就会出现
+ *    「小程序上中文 name 参数显示成 `%E5%AF%B9%E8%B1%A1...`」。
+ *    非字符串值（number / boolean / JSON 串）走 stringify 后不再解码。
+ *
  * @param raw 参数对象；为 null 时返回空 Map
  */
 function queryMapFromObject(raw: UTSJSONObject | null): Map<string, string> {
@@ -331,7 +346,8 @@ function queryMapFromObject(raw: UTSJSONObject | null): Map<string, string> {
     if (value == null) {
       continue;
     }
-    query.set(key, queryValueToString(value));
+    const text = queryValueToString(value);
+    query.set(key, typeof value == 'string' ? decodeQueryValue(text) : text);
   }
   return query;
 }
@@ -391,6 +407,7 @@ export function installRouteStateListener(): void {
   }
   routeListenerInstalled = true;
   uni.onAppRoute((event: AppRouteEvent): void => {
+    console.log(event, 'event');
     handleAppRoute(event);
   });
 }
