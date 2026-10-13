@@ -7,7 +7,7 @@
           <view class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#2563eb]" />
           <text class="text-[15px] font-bold text-[#1e293b]">路由 hooks（vue-router 形态）</text>
         </view>
-        <text class="text-[12px] leading-[18px] text-[#64748b]">useRoute() 读当前路由（响应式、只读），useRouter() 做跳转。底层仍走 uni 原生导航 API，所以 main.uts 里安装的全局登录拦截器照常生效。</text>
+        <text class="text-[12px] leading-[18px] text-[#64748b]">useRoute() 读当前路由（响应式、只读），useRouter() 做跳转。底层仍走 uni 原生导航 API，所以 main.uts 里安装的全局登录拦截器照常生效。route.meta / route.name 无需手写注册——本页 definePage 里的字段会被写进 pages.json，就是 meta 本身。</text>
         <view class="w-full rounded-[10px] bg-[#0f172a] p-[12px] mt-[10px]">
           <text class="text-[11px] leading-[18px] text-[#e2e8f0]" style="font-family: monospace;">import { useRoute, useRouter } from '@/src/router/index.uts';</text>
           <text class="text-[11px] leading-[18px] text-[#38bdf8] mt-[2px]" style="font-family: monospace;">const route = useRoute();</text>
@@ -31,7 +31,7 @@
           <text class="text-[12px] font-bold text-[#1e293b] flex-1 text-right">{{ route.fullPath }}</text>
         </view>
         <view class="flex flex-row items-center justify-between mb-[6px]">
-          <text class="text-[12px] text-[#64748b] mr-[10px]">route.name</text>
+          <text class="text-[12px] text-[#64748b] mr-[10px]">route.name（definePage）</text>
           <text class="text-[12px] font-bold text-[#1e293b]">{{ routeNameText }}</text>
         </view>
         <view class="flex flex-row items-center justify-between mb-[6px]">
@@ -39,8 +39,12 @@
           <text class="text-[12px] text-[#1e293b]">{{ route.params.size }}（uni 无动态路由段，恒为空）</text>
         </view>
         <view class="flex flex-row items-start justify-between mb-[6px]">
-          <text class="text-[12px] text-[#64748b] mr-[10px]">route.meta</text>
-          <text class="text-[12px] font-bold text-[#1e293b] flex-1 text-right" style="font-family: monospace;">{{ metaText }}</text>
+          <text class="text-[12px] text-[#64748b] mr-[10px]">route.meta 的键</text>
+          <text class="text-[12px] font-bold text-[#1e293b] flex-1 text-right" style="font-family: monospace;">{{ metaKeysText }}</text>
+        </view>
+        <view class="flex flex-row items-start justify-between mb-[6px]">
+          <text class="text-[12px] text-[#64748b] mr-[10px]">route.meta.style 的标题</text>
+          <text class="text-[12px] font-bold text-[#1e293b] flex-1 text-right">{{ metaTitleText }}</text>
         </view>
 
         <!-- query 列表：随路由变化实时刷新 -->
@@ -172,6 +176,8 @@ import { toast, toastSuccess } from '@/src/utils/toast/index.uts';
 
 definePage({
   debug: false,
+  // 路由名：声明在这里就会被写进 pages.json，运行时 useRoute().name 直接读得到
+  name: 'routerBasicDemo',
   layout: 'navbar',
   showBack: true,
   hideNavbar: false,
@@ -194,10 +200,6 @@ const SELF_PAGE: string = '/src/sub/routerBasicDemo/routerBasicDemo';
 /** 首页 */
 const HOME_PAGE: string = '/src/pages/index/index';
 
-// 注册本页的路由元信息（可选路由表）：注册后 useRoute().meta / .name 才读得到。
-// 真实项目建议在路由表文件里集中注册；这里为演示就近放在页面模块顶部。
-// setRouteMeta(SELF_PAGE, { name: 'routerBasicDemo', title: '路由 hooks 用法', requireAuth: false });
-
 /** 1) useRoute()：当前路由（全局响应式状态，只读） */
 const route = useRoute();
 /** 2) useRouter()：导航器（底层仍是 uni 导航 API，全局拦截器照常生效） */
@@ -209,26 +211,46 @@ onMounted(() => {
   console.log(route, 'route');
 });
 
+// route.meta 不需要在任何地方手写注册：构建期插件会把本页 definePage 的字段
+// 原样写进 pages.json，并同步生成一份路由表（src/router/generated/page-meta.uts），
+// useRoute() 按当前路径自动取到 —— 即「pages.json 里这个页面的配置项就是 meta」。
+
 /** route.name 可能为 null，展示前先兜底 */
 const routeNameText = computed((): string => {
   const name = route.name;
   if (name == null) {
-    return 'null（未注册 meta）';
+    return 'null（definePage 未声明 name）';
   }
   return name;
 });
 
-/** route.meta 序列化展示 */
-const metaText = computed((): string => {
+/** route.meta 的键列表：直观体现「页面配置项有什么，meta 就有什么」 */
+const metaKeysText = computed((): string => {
   const meta = route.meta;
   if (meta == null) {
     return 'null';
   }
-  const raw = JSON.stringify(meta);
-  if (raw == null) {
-    return '{}';
+  return UTSJSONObject.keys(meta).join(', ');
+});
+
+/** route.meta.title：取自 pages.json 的 style.navigationBarTitleText */
+const metaTitleText = computed((): string => {
+  const meta = route.meta;
+  if (meta == null) {
+    return 'null';
   }
-  return raw;
+  // UTSJSONObject 只能下标取值（点号在 Kotlin 端取不到动态键），故关掉 dot-notation 规则
+  /* eslint-disable dot-notation */
+  const style = meta['style'];
+  if (style == null) {
+    return 'null';
+  }
+  const styleObj = style as UTSJSONObject;
+  const title = styleObj['navigationBarTitleText'];
+  if (title == null) {
+    return 'null';
+  }
+  return `${title}`;
 });
 
 /** query 键值对展示行 */

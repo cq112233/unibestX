@@ -1143,7 +1143,12 @@ export class HttpClient {
         aborted = true;
         const current = task;
         if (current != null) {
-          current.abort();
+          // ⚠️ 必须断言成 RequestTask 再调 abort：`task` 的静态类型 LimeRequestTask 是
+          //    `UploadTask | DownloadTask | RequestTask` 联合类型，Kotlin 端在联合类型上解析不出
+          //    成员方法，直接 `current.abort()` 报 error18「找不到名称"abort"」。
+          //    这里装的只可能是 `uni.request()` 的返回值，断言到 RequestTask 是精确的。
+          //    （同写法先例：uni_modules/lime-request/components/lime-request/KLDRequestTool.uts:119）
+          (current as RequestTask).abort();
         }
         finish(null);
       }

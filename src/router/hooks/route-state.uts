@@ -23,6 +23,7 @@
  * 之外还可能不带 `src/`，两者都以调用方传入的原文为准、只补前导斜杠）。
  */
 import { reactive } from 'vue';
+import { PAGE_META_JSON } from '../generated/page-meta.uts';
 import { cleanPath, getCurrentPath, getQueryString, parseUrlToObj, queryValueToString } from '../utils/utils.uts';
 
 /**
@@ -37,9 +38,9 @@ export type RouteLocation = {
   query: Map<string, string>;
   /** 恒为空 Map：uni-app X 无动态路由段，仅为与 vue-router 形态保持一致 */
   params: Map<string, string>;
-  /** 路由元信息：由 setRouteMeta() 注册，未注册为 null */
+  /** 路由元信息：优先取 setRouteMeta() 注册值，未注册时回退到 pages.json 里该页面的配置项，都没有为 null */
   meta: UTSJSONObject | null;
-  /** 路由名：取自 meta 的 `name` 字段，未注册为 null */
+  /** 路由名：取自 meta 的 `name` 字段（在页面 definePage 里声明），未声明为 null */
   name: string | null;
 };
 
@@ -90,32 +91,133 @@ export function setRouteMeta(path: string, meta: UTSJSONObject): void {
   routeMetaMap.set(key, meta);
 }
 
-/** 移除某个页面的路由元信息注册 */
+/**
+ * 移除某个页面的路由元信息注册
+ *
+ * ⚠️ 两种 `src/` 前缀写法都要删：注册时按调用方原文存 key，而查询（getRouteMeta）两种写法都能命中，
+ *    只删一种会留下「换一种写法注册过、按另一种写法撤不掉」的幽灵注册值。
+ */
 export function removeRouteMeta(path: string): void {
-  routeMetaMap.delete(cleanPath(path));
+  const key = cleanPath(path);
+  routeMetaMap.delete(key);
+  routeMetaMap.delete(swapSrcPrefix(key));
+}
+
+/**
+ * 把路径换成另一种 `src/` 前缀写法（`/src/pages/x` ↔ `/pages/x`），用于兼容历史路径写法
+ */
+function swapSrcPrefix(key: string): string {
+  return key.startsWith('/src/') ? key.substring(4) : `/src${key}`;
+}
+
+// ==========================================
+// pages.json 页面配置（route.meta 的默认数据源）
+// ==========================================
+
+/**
+ * pages.json 页面配置表：路径 → 该页面的完整配置项
+ *
+ * 内容由构建期插件生成（plugins/vite-plugin-uni-pages.ts → src/router/generated/page-meta.uts），
+ * 即「页面的 definePage 里写了什么，这里就是什么」，所以**不需要**在业务页面里手写 setRouteMeta。
+ * 首次使用时解析一次并缓存；表为空（老工程未接入生成器）时静默退化为 null。
+ */
+let pageConfigTable: Map<string, UTSJSONObject> | null = null;
+
+/** 从生成的 JSON 常量解析出页面配置表（懒加载，只解析一次） */
+function ensurePageConfigTable(): Map<string, UTSJSONObject> {
+  // ⚠️ 必须先拷进局部 const 再判空：`pageConfigTable` 是模块级可变属性，Kotlin 不对
+  //    「可能被并发改写的属性」做智能转换，直接写 `return pageConfigTable` 会报
+  //    `Smart cast to 'Map<String, UTSJSONObject>' is impossible`（Android 编译期）。
+  const cached = pageConfigTable;
+  if (cached != null) {
+    return cached;
+  }
+  const table = new Map<string, UTSJSONObject>();
+  pageConfigTable = table;
+  if (PAGE_META_JSON == '') {
+    return table;
+  }
+  const parsed = JSON.parseObject(PAGE_META_JSON);
+  if (parsed == null) {
+    return table;
+  }
+  // ⚠️ 遍历用「UTSJSONObject.keys() + 下标访问」而非实例方法：H5 / 蒸汽模式跑的是 JS 运行时，
+  //    这里的值可能是纯 JS 对象（无 getJSON/getAny 等实例方法），下标访问两端都成立。
+  const keys = UTSJSONObject.keys(parsed);
+  for (let i = 0; i < keys.length; i++) {
+    const oneKey = keys[i];
+    const oneValue = parsed[oneKey];
+    if (oneValue == null) {
+      continue;
+    }
+    table.set(oneKey, oneValue as UTSJSONObject);
+  }
+  return table;
+}
+
+/**
+ * 读取某个页面在 pages.json 里的配置项（页面 definePage 声明的字段）
+ *
+ * @param path 页面路径
+ * @returns 该页面的配置项；查不到返回 null
+ */
+export function getPageConfig(path: string): UTSJSONObject | null {
+  const key = cleanPath(path);
+  if (key == '') {
+    return null;
+  }
+  const table = ensurePageConfigTable();
+  const exact = table.get(key);
+  if (exact != null) {
+    return exact;
+  }
+  // 先落局部变量再判空：Map.get 的类型是 `T | undefined`，直接 return 会报 TS2322
+  const swapped = table.get(swapSrcPrefix(key));
+  if (swapped != null) {
+    return swapped;
+  }
+  return null;
+}
+
+/**
+ * 从 meta 对象里读一个字符串字段
+ *
+ * ⚠️ 用下标访问 + queryValueToString，而不是 `meta.getString()`：
+ *    meta 可能来自 JSON.parseObject（H5 侧为普通 JS 对象），实例方法不保证存在。
+ */
+function readMetaString(meta: UTSJSONObject, key: string): string | null {
+  const value = meta[key];
+  if (value == null) {
+    return null;
+  }
+  const text = queryValueToString(value);
+  return text == '' ? null : text;
 }
 
 /**
  * 按路径读取路由元信息
  *
- * 先按规范化后的完整路径精确匹配；未命中时自动在 `pages/x/x` 与 `/src/pages/x/x`
- * 两种前缀写法之间再换一次（兼容历史路径写法）。
+ * 两级数据源，就近优先：
+ * 1. `setRouteMeta()` 手写注册（可覆盖 / 补充 pages.json 里的配置）；
+ * 2. pages.json 里该页面的配置项（构建期生成，见 ./route-state.uts 顶部说明）。
  *
  * @param path 页面路径
- * @returns 元信息对象；未注册返回 null
+ * @returns 元信息对象；两级都没命中返回 null
  */
 export function getRouteMeta(path: string): UTSJSONObject | null {
   const key = cleanPath(path);
-  const exact = routeMetaMap.get(key);
-  if (exact != null) {
-    return exact;
+  if (key == '') {
+    return null;
   }
-  const swapped = key.startsWith('/src/') ? key.substring(4) : `/src${key}`;
-  const matched = routeMetaMap.get(swapped);
-  if (matched != null) {
-    return matched;
+  const registered = routeMetaMap.get(key);
+  if (registered != null) {
+    return registered;
   }
-  return null;
+  const registeredSwapped = routeMetaMap.get(swapSrcPrefix(key));
+  if (registeredSwapped != null) {
+    return registeredSwapped;
+  }
+  return getPageConfig(key);
 }
 
 // ==========================================
@@ -153,7 +255,7 @@ function commitRoute(path: string, query: Map<string, string>, fullPath: string)
     routeState.name = null;
   }
   else {
-    routeState.name = meta.getString('name');
+    routeState.name = readMetaString(meta, 'name');
   }
 }
 

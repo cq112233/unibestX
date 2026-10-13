@@ -142,11 +142,34 @@ class MockUTSJSONObject extends Object {
 }
 (globalThis as any).UTSJSONObject = MockUTSJSONObject;
 
+/**
+ * 真源 `JSON.parseObject` 会把**内层**对象与数组也包成 UTSJSONObject（H5 实现同样深度包装），
+ * 所以这里递归包装：否则 `table[key].getString(...)` 这类内层取值在单测里会
+ * `getString is not a function`，而真机上是好的（假阴性）。
+ * 数组保持数组本身，只包装其中的对象元素 —— `Array.isArray` 判定必须继续成立。
+ */
+function deepWrapJsonValue(val: any): any {
+  if (val == null || typeof val !== 'object') {
+    return val;
+  }
+  if (Array.isArray(val)) {
+    return val.map((item: any) => deepWrapJsonValue(item));
+  }
+  if (val instanceof MockUTSJSONObject) {
+    return val;
+  }
+  const wrapped = new MockUTSJSONObject();
+  const entries = Object.entries(val as Record<string, any>);
+  for (let i = 0; i < entries.length; i++) {
+    (wrapped as any)[entries[i][0]] = deepWrapJsonValue(entries[i][1]);
+  }
+  return wrapped;
+}
+
 if (typeof (JSON as any).parseObject !== 'function') {
   (JSON as any).parseObject = (str: string) => {
     try {
-      const obj = JSON.parse(str);
-      return Object.assign(new MockUTSJSONObject(), obj);
+      return deepWrapJsonValue(JSON.parse(str));
     }
     catch {
       return null;

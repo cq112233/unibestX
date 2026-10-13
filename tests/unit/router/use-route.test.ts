@@ -120,28 +120,38 @@ describe('useRoute Unit Tests', () => {
     expect(route.fullPath).toBe('/src/pages/me/me');
   });
 
-  it('setRouteMeta 注册的元信息会落进 meta / name（兼容带不带 /src 前缀两种写法）', async () => {
-    const { useRoute, setRouteMeta, getRouteMeta, syncRouteState } = await loadRouteState();
+  it('meta 两级数据源：未注册时回退 pages.json 页面配置，setRouteMeta 注册后覆盖它', async () => {
+    const { useRoute, setRouteMeta, removeRouteMeta, getRouteMeta, getPageConfig, applyRouteFromUrl } = await loadRouteState();
     const route = useRoute();
 
-    setRouteMeta('pages/me/me', utsObject({ name: 'me', title: '我的', requireAuth: true }));
-    setPageStack('src/pages/me/me');
-    syncRouteState();
+    // 一级（默认）：pages.json 里该页面的配置项（构建期生成，见 src/router/generated/page-meta.uts）
+    applyRouteFromUrl('/src/pages/index/index');
+    expect(route.meta).not.toBeNull();
+    expect(getPageConfig('/src/pages/index/index')?.getString('path')).toBe('/src/pages/index/index');
 
-    expect(route.name).toBe('me');
-    expect(route.meta?.getString('title')).toBe('我的');
-    expect(getRouteMeta('/src/pages/me/me')?.getBoolean('requireAuth')).toBe(true);
-    expect(getRouteMeta('/src/pages/index/index')).toBeNull();
+    // 二级（覆盖）：手写注册优先，兼容带不带 /src 前缀两种写法
+    setRouteMeta('pages/index/index', utsObject({ name: 'home', title: '首页', requireAuth: false }));
+    applyRouteFromUrl('/src/pages/index/index');
+    expect(route.name).toBe('home');
+    expect(route.meta?.getString('title')).toBe('首页');
+    expect(getRouteMeta('/src/pages/index/index')?.getBoolean('requireAuth')).toBe(false);
+
+    // 移除注册后又回落到 pages.json 的配置项
+    removeRouteMeta('/src/pages/index/index');
+    const fallback = getRouteMeta('/src/pages/index/index');
+    expect(fallback).not.toBeNull();
+    expect(fallback?.getString('title')).toBeNull();
+    expect(fallback?.getString('path')).toBe('/src/pages/index/index');
   });
 
-  it('params 恒为空 Map，未注册 meta 时 meta / name 为 null', async () => {
+  it('params 恒为空 Map；definePage 未声明 name 时 name 为 null', async () => {
     const { useRoute, applyRouteFromUrl } = await loadRouteState();
     const route = useRoute();
 
     applyRouteFromUrl('/src/pages/function/function');
 
     expect(route.params.size).toBe(0);
-    expect(route.meta).toBeNull();
+    expect(route.meta).not.toBeNull();
     expect(route.name).toBeNull();
   });
 

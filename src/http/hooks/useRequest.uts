@@ -36,7 +36,8 @@
  *   的 `resolve` 带出。让回调直接 `return` 结果会报 TS2322「不能将类型 `Promise<T | null>` 分配给类型 `T`」
  *   （Volar / `ts-plugin` 诊断），重试链上是两处都踩；
  * - **`ref<T | null>()` 不能直接标注成 `Ref<T | null>`**：Vue 签名是 `Ref<UnwrapRef<T>>`，`T` 为自由
- *   泛型时 `UnwrapRef<T>` 归约不回 `T`。先落一个 `any` 再窄化，别写 `as Ref<T | null>`（红线 41）；
+ *   泛型时 `UnwrapRef<T>` 归约不回 `T`（TS2322）；而 Kotlin 侧 `ref<T | null>()` 的返回被推成 `Any`，
+ *   不显式断言同样过不去。固定写法：先落一个 `any`，再 `as Ref<T | null>`（断言直写泛型本体，不触红线 41）；
  * - 重试的「延时后又发一次」与 `runAttempt` 互相引用，靠前置的 `attemptRunner` 句柄打破循环
  *   （Kotlin 局部声明不提升，自引用报 `error18`）。
  */
@@ -194,12 +195,16 @@ export function useRequest<T>(
   }
 
   // ---------- 3. 响应式状态 ----------
-  // ⚠️ `dataRef` 必须先落一个 `any` 再窄化，不能直接写 `const dataRef: Ref<T | null> = ref<T | null>(...)`：
-  // Vue 的 `ref<T>()` 签名是 `Ref<UnwrapRef<T>>`，而 `T` 在这里是自由泛型，TS 无法把 `UnwrapRef<T>`
-  // 归约回 `T`，直接标注报 TS2322（`Ref<UnwrapRef<T> | null>` 不能赋给 `Ref<T | null>`）。
-  // 承载体仍是同一个 ref 对象，只是绕开一次纯类型层面的不收敛；也不写 `as Ref<T | null>`（红线 41）。
+  // ⚠️ `dataRef` 这里两步都省不掉，两端各卡一次：
+  //   1. 不能直接写 `const dataRef: Ref<T | null> = ref<T | null>(...)`：TS 侧 Vue 的签名是
+  //      `Ref<UnwrapRef<T>>`，而 `T` 是自由泛型时 `UnwrapRef<T>` 归约不回 `T`，报 TS2322
+  //      （`Ref<UnwrapRef<T> | null>` 不能赋给 `Ref<T | null>`）；
+  //   2. 也不能只落一个 `any` 就交差：Kotlin 侧 `ref<T | null>(...)` 的返回被推成 `Any`，
+  //      赋给 `Ref<T | null>` 报 `Initializer type mismatch ... actual 'Any'`（不做隐式收窄）。
+  //   断言里写的是泛型本体 `Ref<T | null>`（不是泛型实例化别名），不触发红线 41 的构造调用改写；
+  //   承载体始终是同一个 ref 对象，两步都只是类型层面的事。
   const dataRefAny: any = ref<T | null>(seedData);
-  const dataRef: Ref<T | null> = dataRefAny;
+  const dataRef: Ref<T | null> = dataRefAny as Ref<T | null>;
   const loadingRef: Ref<boolean> = ref<boolean>(false);
   const refreshingRef: Ref<boolean> = ref<boolean>(false);
   const errorRef: Ref<Error | null> = ref<Error | null>(null);
@@ -311,7 +316,12 @@ export function useRequest<T>(
     if (cb == null) {
       return;
     }
-    const event: UseRequestEvent<T> = { args, data: null, error };
+    // ⚠️ `data` 不能就地写字面量 `null`：Kotlin 会把对象字面量里的裸 `null` 推成 `Nothing`，
+    //    于是整个字面量成了 `UseRequestEvent<Nothing>`，`cb(event)` 报 error17 参数类型不匹配
+    //    （实际 `UseRequestEvent<Nothing>`，预期 `UseRequestEvent<T>`）。
+    //    先落一个带 `T | null` 标注的局部量，字面量的泛型实参才能被推成 `T`。
+    const emptyData: T | null = null;
+    const event: UseRequestEvent<T> = { args, data: emptyData, error };
     cb(event);
   };
 
