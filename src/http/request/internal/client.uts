@@ -401,7 +401,10 @@ export class HttpClient {
           return response;
         }
         const statusCode = response.statusCode;
-        if (statusCode != ResultEnum.Success200) {
+        // ⚠️ 必须按 2xx 区间判定，**不能写 `!= 200`**：REST 里 201 Created（新增成功）、
+        //    202 Accepted、204 No Content（删除成功）都是正常成功码，按 `!= 200` 会把它们
+        //    当成失败、弹「连接出错(201)!」。本文件另一处原始 XHR 分支用的就是同样的区间写法。
+        if (statusCode < 200 || statusCode >= 300) {
           if (statusCode == ResultEnum.Unauthorized) {
             let skipRefresh = false;
             if (extra != null) {

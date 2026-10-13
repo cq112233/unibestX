@@ -46,7 +46,7 @@
     "lint:all": "pnpm lint && pnpm lint:style",
     "test": "vitest run",
     "test:watch": "vitest",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit -p tsconfig.typecheck.json",
     "sync:hbuilderx": "node scripts/sync-hbuilderx.mjs",
     "sync:hbuilderx:check": "node scripts/sync-hbuilderx.mjs --check",
     "sandbox:reset": "node scripts/reset-sandbox.mjs",
@@ -55,10 +55,10 @@
     "prepare": "husky"
   },
   "dependencies": {
-    "@dcloudio/uni-app": "3.0.0-alpha-5030120260930001",
-    "@dcloudio/uni-cli-shared": "3.0.0-alpha-5030120260930001",
-    "@dcloudio/uni-components": "3.0.0-alpha-5030120260930001",
-    "@dcloudio/vite-plugin-uni": "3.0.0-alpha-5030120260930001",
+    "@dcloudio/uni-app": "3.0.0-5020620260917001",
+    "@dcloudio/uni-cli-shared": "3.0.0-5020620260917001",
+    "@dcloudio/uni-components": "3.0.0-5020620260917001",
+    "@dcloudio/vite-plugin-uni": "3.0.0-5020620260917001",
     "crypto-js": "^4.2.0",
     "json5": "^2.2.3",
     "minimatch": "^10.2.5",

@@ -242,7 +242,7 @@ pnpm docker:down
 ```bash
 pnpm test           # Vitest 自动化单元测试（含 UVUE / Vue 组件与核心工具库）
 pnpm test:watch     # Vitest 交互式监听测试模式
-pnpm typecheck      # TypeScript 严格类型检查（tsc --noEmit，0 报错门禁）
+pnpm typecheck      # 严格类型检查（tsc --noEmit -p tsconfig.typecheck.json，仅 src/，0 报错门禁）
 pnpm analyze        # 构建产物体积分析报告并自动在浏览器打开（stats.html）
 pnpm lint           # ESLint 检查（含 UTS 强类型与 UVUE 模板规则）
 pnpm lint:fix       # ESLint 自动修复
@@ -312,7 +312,7 @@ pnpm docs:dev       # 本地启动 VitePress 文档站
 - 🐳 **H5 Docker 极速部署** — 宿主机构建 + Nginx:alpine 轻量容器运行（~25MB，秒级打包），内置动态环境变量反代与 Hash 路由兜底
 - 🧪 **完整单元测试体系** — 内置 **Vitest + @vue/test-utils + happy-dom**，原生支持 UTS 核心工具类、自定义构建插件与 `.uvue` 页面组件挂载测试，单测 100% 覆盖核心逻辑
 - 📊 **产物体积可视化分析** — 整合 **rollup-plugin-visualizer**，`pnpm analyze` 一键生成交互式 Treemap 产物分析报告，支持 Gzip / Brotli 压缩体积真实对比
-- 🛡️ **严格类型检查 (TypeCheck)** — `pnpm typecheck` 一键运行 `tsc --noEmit`，0 报错门禁，杜绝类型隐式推导退化与插件配置类型漂移
+- 🛡️ **严格类型检查 (TypeCheck)** — `pnpm typecheck` 一键运行 `tsc --noEmit -p tsconfig.typecheck.json`（作用域限定 `src/`），0 报错门禁，杜绝类型隐式推导退化
 - 🤖 **AI 原生开发模板** — 内置 `unibestX-skill`（1 入口 + 8 分册），AI Agent 克隆即可按项目规范写代码；运行时自带 AI 对话页与 SSE 流式传输
 - 🔍 **工程化代码规范、Git 拦截与 CI 流水线** — 深度整合 **ESLint**（内置针对 UTS 强类型与 UVUE 模板的自定义规则）、**Stylelint**（针对 SCSS、uni-app 特有单位与标签适配）、**Husky**、**lint-staged**、**Commitlint** 以及 **GitHub Actions CI**，把跨端隐患拦截在本地提交与代码合并前
 - 🧰 **官方脚手架** — `pnpm create unibestx` 一键创建项目：UI 库三选一、功能与 12 个演示分包按需裁剪，生成后自动跑四查自检
@@ -553,7 +553,8 @@ unibestX/
 ├── manifest.json                 # 应用配置清单（多端 AppID、权限、vapor 开关等）
 ├── vite.config.ts                # Vite 构建配置（Tailwind 与 5 个自定义插件）
 ├── uni.scss                      # 全局 SCSS 变量与主题注入
-└── tsconfig.json                 # TypeScript / UTS 编译配置
+├── tsconfig.json                 # TypeScript / UTS 编译配置（含 VSCode 全量诊断范围）
+└── tsconfig.typecheck.json       # pnpm typecheck 专用配置（仅纳入 src/）
 ```
 
 > [!WARNING]
@@ -1149,11 +1150,14 @@ graph LR
 
 #### 3. TypeScript 严格类型检查 (TypeCheck)
 
-针对全工程 TypeScript、构建插件与配置运行 `tsc --noEmit`，杜绝类型隐式推导退化：
+针对 `src/` 目录运行 `tsc --noEmit`，杜绝类型隐式推导退化：
 
 ```bash
-pnpm typecheck       # 运行严格类型检查（tsc --noEmit，0 报错门禁）
+pnpm typecheck       # 运行严格类型检查（tsc --noEmit -p tsconfig.typecheck.json，0 报错门禁）
 ```
+
+> [!NOTE]
+> 该门禁只覆盖 `src/`（配置见 [tsconfig.typecheck.json](tsconfig.typecheck.json)）；根目录的 `vite.config.ts`、`plugins/`、`mock/`、`tests/`、`uni_modules/` 不在其内。另外 `tsc` 不识别 `.uts` / `.uvue`，这两类文件的类型信号来自 VSCode 的 Volar 插件与 HBuilderX 真编译。
 
 #### 4. Husky + lint-staged 增量校验
 

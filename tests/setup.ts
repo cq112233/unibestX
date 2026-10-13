@@ -83,6 +83,15 @@ class MockUTSJSONObject extends Object {
     return typeof val === 'boolean' ? val : null;
   }
 
+  /**
+   * 对齐 UTS 真源的两参形式 `getArray<T>(key, defaultValue)`：
+   * 字段不是数组（缺失 / 类型不符）时回落默认值 —— 传了默认值时不会返回 null。
+   */
+  getArray(key: string, defaultValue: any = null) {
+    const val = (this as any)[key];
+    return Array.isArray(val) ? val : defaultValue;
+  }
+
   toMap() {
     return new Map(Object.entries(this));
   }

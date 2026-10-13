@@ -54,12 +54,19 @@ import type { LimeRequestConfig } from '@/uni_modules/lime-request';
  * @param keyword 搜索关键词，空串表示不按关键词过滤
  */
 export function fetchFooList(pageNo: number = 1, pageSize: number = 10, keyword: string = ''): Promise<PageResult<FooItem>> {
-  return http.get<UTSJSONObject>('/foo/list', {
-    params: { pageNo, pageSize, keyword } as UTSJSONObject
+  return http.get<UTSJSONObject>('/foo', {
+    params: { name: keyword, page: pageNo, pageSize } as UTSJSONObject
   } as LimeRequestConfig).then((data: UTSJSONObject): PageResult<FooItem> => {
+    // ⚠️ `getArray<T>(key, 默认值)` 的泛型实参必须显式写全：UTS 不从默认值反推元素类型，
+    //    省略后 Kotlin 侧推断成 `UTSArray<*>` 直接拒绝编译；代价是 TS 侧 getArray 经索引签名
+    //    解析为 any、传类型实参报 TS2347，故用 @ts-expect-error 抑制（详见 src/api/example.uts）
+    // @ts-expect-error UTS 编译要求显式泛型实参；TS 侧 getArray 为 any 会报 TS2347
+    const rawList = data.getArray<UTSJSONObject>('list', [] as Array<UTSJSONObject>);
+    const total = data.getNumber('total') ?? 0;
     // ⚠️ getNumber / getString 返回的是可空类型，`??` 兜底不可省，
     //    否则赋给非空字段会被 Kotlin 以 error17「参数类型不匹配」拒绝
-    const rawList = data.getArray<UTSJSONObject>('list', [] as Array<UTSJSONObject>);
+    const page = data.getNumber('page') ?? pageNo;
+    const size = data.getNumber('pageSize') ?? pageSize;
     return {
       list: rawList.map((item: UTSJSONObject): FooItem => {
         return {
@@ -67,8 +74,8 @@ export function fetchFooList(pageNo: number = 1, pageSize: number = 10, keyword:
           name: item.getString('name') ?? ''
         } as FooItem;
       }),
-      hasMore: data.getBoolean('hasMore') ?? false,
-      total: data.getNumber('total') ?? 0
+      hasMore: page * size < total,
+      total: total
     } as PageResult<FooItem>;
   });
 }
@@ -264,7 +271,7 @@ clearCache();
 
 | 情况 | 拦截器行为 |
 | :--- | :--- |
-| HTTP 状态码 `!= 200` | `ShowMessage(statusCode)` 文案 toast 并 reject |
+| HTTP 状态码非 2xx（`< 200 \|\| >= 300`） | `ShowMessage(statusCode)` 文案 toast 并 reject（200 / 201 / 202 / 204 等都算成功） |
 | HTTP `401` | 清 token → `reLaunch` 登录页；带 refreshToken 时**先静默刷新再重放原请求**（并发 401 单飞，只打一次刷新接口） |
 | 业务码 `code != 0 && code != 200` | toast 后端返回的 `message` / `msg` 并抛 `BusinessError`（`extra.toast: false` 可关） |
 | 业务码 `401` | 同样清 token 并跳登录页 |
