@@ -1,0 +1,581 @@
+/**
+ * useRequest —— 组合式请求状态机（对标 Alova 的 useRequest）
+ *
+ * 把「请求状态 + 发起/取消/刷新 + 生命周期回调」收进一个组合式 hook，替掉页面里
+ * 手写的那套 `xxxLoading = ref<boolean>(false)` + 手动翻转 loading 的样板。
+ *
+ * ## 与 http 层 GET 去重的交互（使用前必读）
+ *
+ * `internal/client.uts` 对 **GET 默认按指纹去重**，指纹是 `method|url|JSON.stringify(data)`，
+ * **不含 `requestKey`**；命中时直接复用同一份在飞 Promise，不再发新请求：
+ *
+ * - `abort()` 在去重命中时只有**逻辑取消**（`seq` 代次守卫让迟到响应写不进状态），
+ *   底层请求不会被 `abortHttp` 真掐断 —— 第二次请求根本没执行到登记 requestKey 的那段。
+ *   POST / PUT / DELETE 不受影响，这些方法上 abort 是真取消。
+ * - `refresh()` / 轮询在去重命中时**不会真的重发**，拿回的是同一份在飞 Promise。
+ *
+ * 本 hook 刻意**不覆盖调用方的 `extra.dedupe`**（那是调用方在 `extra` 里的地盘）。
+ * 确实需要「每次必发」的，由调用方自己传 `extra: { dedupe: false }`。
+ *
+ * ## 错误策略（与 Alova 的一处刻意偏离）
+ *
+ * `send()` / `refresh()` **失败也 resolve `null`，从不 reject**。错误只走 `error` 状态与
+ * `onError` 绑定函数：http 层已经统一弹过 toast，多数调用方不关心失败，而原生端一个没人
+ * `catch` 的 rejected promise 会变成 unhandled rejection，比 H5 更难排查。
+ * 代价是 `await send()` 拿到 `null` 时分不清「失败」与「被取消 / 竞态丢弃」，要区分看 `error`。
+ *
+ * ## UTS / Kotlin 侧避坑（改本文件前先读）
+ *
+ * - 联合类型上不写三元表达式（红线 34），一律拆 `if`；
+ * - 不写链式 `.catch()`（红线 35），只写双参 `.then(onFulfilled, onRejected)`；
+ * - 剩余参数不能内联在对象类型的属性上（红线 25），已抽成顶层 `UseRequestSender<T>` 别名；
+ * - 泛型实例化别名不进 `as` 断言位置（红线 41），返回处用「先声明带类型标注的变量再 return」；
+ * - 可空函数句柄先拷进局部 `const` 再判空调用 —— Kotlin 不对「被闭包改写的局部变量」做智能转换；
+ * - 定时器句柄先声明后赋值，绝不在自身初始化表达式里引用自己（红线 17）；
+ * - **泛型 `Promise.then` 的回调一律标 `void` 返回**，结果由外层自己 `new Promise<T | null>(resolve)`
+ *   的 `resolve` 带出。让回调直接 `return` 结果会报 TS2322「不能将类型 `Promise<T | null>` 分配给类型 `T`」
+ *   （Volar / `ts-plugin` 诊断），重试链上是两处都踩；
+ * - **`ref<T | null>()` 不能直接标注成 `Ref<T | null>`**：Vue 签名是 `Ref<UnwrapRef<T>>`，`T` 为自由
+ *   泛型时 `UnwrapRef<T>` 归约不回 `T`。先落一个 `any` 再窄化，别写 `as Ref<T | null>`（红线 41）；
+ * - 重试的「延时后又发一次」与 `runAttempt` 互相引用，靠前置的 `attemptRunner` 句柄打破循环
+ *   （Kotlin 局部声明不提升，自引用报 `error18`）。
+ */
+
+import { onUnmounted, ref } from 'vue';
+import type { Ref } from 'vue';
+import { abortHttp } from '../request/request.uts';
+import { toError } from '../request/internal/client.uts';
+import { BusinessError } from '../error/error.uts';
+
+// ==========================================
+// 顶层 type 别名
+// ==========================================
+
+/**
+ * 可变参发送函数
+ *
+ * 必须抽成顶层别名：剩余参数 `...args` 写在对象类型的属性位置会被 UTS 拒收
+ * （`Function type parameters cannot have modifiers.`，见红线 25）。
+ */
+export type UseRequestSender<T> = (...args: Array<any>) => Promise<T | null>;
+
+/** 三个生命周期回调解收到的统一事件对象 */
+export type UseRequestEvent<T> = {
+  /** 本次 send 透传给请求函数的参数 */
+  args: Array<any>;
+  /** 成功时有值；失败与被取消时都是 null */
+  data: T | null;
+  /** 失败时有值；成功与被取消时都是 null */
+  error: Error | null;
+};
+
+/** 生命周期回调本体 */
+export type UseRequestCallback<T> = (event: UseRequestEvent<T>) => void;
+
+/** 回调绑定函数：拿到 hook 返回值后调用它才完成绑定 */
+export type UseRequestBinder<T> = (cb: UseRequestCallback<T>) => void;
+
+/** 请求函数收到的上下文 */
+export type UseRequestContext = {
+  /** 本次请求的取消键，交给 `extra.requestKey` 后 `abort()` 才能作用于它 */
+  requestKey: string;
+  /** `send(1, 2, 3)` 传进来的参数，原样透传 */
+  args: Array<any>;
+};
+
+/** 配置项（全部可选，传 null 即为全默认） */
+export type UseRequestOptions<T> = {
+  /** 是否在 `useRequest()` 调用当下自动发一次（无参）；默认 true */
+  immediate?: boolean;
+  /** 静态初始值，默认 null */
+  initialData?: T | null;
+  /** 同步求初始值（如从 storage 读）；与 initialData 同时给时以本项为准 */
+  initialDataFn?: () => T | null;
+  /** 防抖毫秒数，默认 0（关闭） */
+  debounce?: number;
+  /** 失败重试次数，默认 0（不重试）；只对网络层失败生效，业务码失败不重试 */
+  retry?: number;
+  /** 重试间隔毫秒，默认 0 */
+  retryDelay?: number;
+  /** 轮询间隔毫秒，默认 0（关闭） */
+  polling?: number;
+};
+
+/**
+ * 单次尝试的执行器签名
+ *
+ * 只为一件事存在：打破「重试延时到期后要再发一次」与「发起一次尝试」之间的循环引用。
+ * Kotlin 局部声明不提升，`runAttempt` 不能在自己的初始化表达式里引用自己（红线 17），
+ * 所以把它先挂到一个前置的 `let` 句柄上，延时代码只认句柄、不认 `runAttempt`。
+ */
+export type UseRequestAttemptRunner<T> = (seqVal: number, attempt: number, args: Array<any>) => Promise<T | null>;
+
+/** hook 返回值 */
+export type UseRequestResult<T> = {
+  data: Ref<T | null>;
+  /** 有请求在飞（含首次、重试、轮询） */
+  loading: Ref<boolean>;
+  /** `loading == true` 且 `data != null`，即「已有内容时的刷新中」 */
+  refreshing: Ref<boolean>;
+  error: Ref<Error | null>;
+  send: UseRequestSender<T>;
+  abort: () => void;
+  refresh: () => Promise<T | null>;
+  onSuccess: UseRequestBinder<T>;
+  onError: UseRequestBinder<T>;
+  onComplete: UseRequestBinder<T>;
+  startPolling: () => void;
+  stopPolling: () => void;
+};
+
+// ==========================================
+// 模块级状态
+// ==========================================
+
+/**
+ * 实例自增种子
+ *
+ * `abortHttp(requestKey)` 作用在全局共享的 lifecycle 上，键一旦跨实例重复，abort 一个会连带
+ * 掐掉另一个 hook 实例的请求，所以键必须全局唯一。名字带 `useRequest` 前缀是为了避开 UTS 把
+ * 多个 .uts 合并进同一个 Kotlin 文件时可能发生的顶层符号撞名。
+ */
+let useRequestInstanceSeed: number = 0;
+
+// ==========================================
+// 主体
+// ==========================================
+
+/**
+ * 组合式请求状态机
+ *
+ * @param fn 请求函数。**必须把 `ctx.requestKey` 交给 `extra.requestKey`**，否则 `abort()` 掐不到它
+ * @param options 配置项，传 null 用全默认
+ * @returns 状态与操作句柄；三个回调通过 `onSuccess` / `onError` / `onComplete` 绑定
+ */
+export function useRequest<T>(
+  fn: (ctx: UseRequestContext) => Promise<T>,
+  options: UseRequestOptions<T> | null = null
+): UseRequestResult<T> {
+  // ---------- 1. 读配置 ----------
+  // 可选字段一律「先赋默认值，再在 if 里覆盖」。不写三元：联合类型上的三元在 UTS 里会在
+  // 窄化之前被解析，判据对另一分支非法就直接报 Expression expected（红线 34）。
+  let optImmediate: boolean = true;
+  let optDebounce: number = 0;
+  let optRetry: number = 0;
+  let optRetryDelay: number = 0;
+  let optPolling: number = 0;
+  if (options != null) {
+    if (options.immediate != null) {
+      optImmediate = options.immediate;
+    }
+    if (options.debounce != null) {
+      optDebounce = options.debounce;
+    }
+    if (options.retry != null) {
+      optRetry = options.retry;
+    }
+    if (options.retryDelay != null) {
+      optRetryDelay = options.retryDelay;
+    }
+    if (options.polling != null) {
+      optPolling = options.polling;
+    }
+  }
+
+  // ---------- 2. 初始值 ----------
+  let seedData: T | null = null;
+  if (options != null) {
+    if (options.initialDataFn != null) {
+      seedData = options.initialDataFn();
+    }
+    else if (options.initialData != null) {
+      seedData = options.initialData;
+    }
+  }
+
+  // ---------- 3. 响应式状态 ----------
+  // ⚠️ `dataRef` 必须先落一个 `any` 再窄化，不能直接写 `const dataRef: Ref<T | null> = ref<T | null>(...)`：
+  // Vue 的 `ref<T>()` 签名是 `Ref<UnwrapRef<T>>`，而 `T` 在这里是自由泛型，TS 无法把 `UnwrapRef<T>`
+  // 归约回 `T`，直接标注报 TS2322（`Ref<UnwrapRef<T> | null>` 不能赋给 `Ref<T | null>`）。
+  // 承载体仍是同一个 ref 对象，只是绕开一次纯类型层面的不收敛；也不写 `as Ref<T | null>`（红线 41）。
+  const dataRefAny: any = ref<T | null>(seedData);
+  const dataRef: Ref<T | null> = dataRefAny;
+  const loadingRef: Ref<boolean> = ref<boolean>(false);
+  const refreshingRef: Ref<boolean> = ref<boolean>(false);
+  const errorRef: Ref<Error | null> = ref<Error | null>(null);
+
+  // ---------- 4. 非响应式内部状态 ----------
+  /** 竞态代次：每次触发自增；响应回来只有代次相等才允许写状态 */
+  let seq: number = 0;
+  /** 卸载标记：挡住「防抖延迟到卸载之后才触发」与迟到的响应 */
+  let disposed: boolean = false;
+  /** 上一次 send 的参数，refresh 与轮询复用 */
+  let lastArgs: Array<any> = [];
+  /** 当前在飞请求的取消键，空串表示没有 */
+  let currentKey: string = '';
+  /** 轮询定时器句柄；0 表示未在轮询 */
+  let pollingTimer: number = 0;
+  /** 本实例的键序号 */
+  let keySeed: number = 0;
+  let successCb: UseRequestCallback<T> | null = null;
+  let errorCb: UseRequestCallback<T> | null = null;
+  let completeCb: UseRequestCallback<T> | null = null;
+  /** 单次尝试执行器句柄，在 `runAttempt` 定义完成后立刻回填（见「7. 核心」末尾） */
+  let attemptRunner: UseRequestAttemptRunner<T> | null = null;
+
+  useRequestInstanceSeed = useRequestInstanceSeed + 1;
+  const instanceTag: string = `${useRequestInstanceSeed}`;
+
+  // ---------- 5. 基础工具（局部箭头常量，按「定义在调用点之前」的顺序排列）----------
+
+  /** 生成本次请求的全局唯一取消键 */
+  const makeKey = (): string => {
+    keySeed = keySeed + 1;
+    return `useRequest_${instanceTag}_${keySeed}`;
+  };
+
+  /**
+   * 一个已 resolve 的 `Promise<T | null>`
+   *
+   * 不能写 `Promise.resolve(null)`：UTS 泛型不协变，推出来的 `Promise<null>` 赋给
+   * `Promise<T | null>` 会报类型不匹配，只能走构造器把类型实参写全。
+   */
+  const resolvedNull = (): Promise<T | null> => {
+    return new Promise<T | null>((resolve) => {
+      resolve(null);
+    });
+  };
+
+  /**
+   * 延时 `ms` 后执行第 `attempt` 次尝试，并把它的结果原样带出去
+   *
+   * 刻意不写成 `waitFor(ms).then(...)`：本仓 TS 环境对泛型 `Promise` 的 `.then` 单参重载不收敛
+   * （报「不能将类型 Promise<T | null> 分配给类型 T」），而对 `Promise<void>` 更是两处都踩。
+   * 这里改用本文件已验证过的 `new Promise<T | null>(executor)` 形态，整段不依赖 `.then` 的类型推演。
+   *
+   * `fire` 走 lambda 包装（红线 24：局部函数不能当值传给 `setTimeout`），
+   * 且它只引用前置的 `attemptRunner` 句柄、不引用任何承载自身的变量（红线 17）。
+   */
+  const retryAfter = (ms: number, seqVal: number, attempt: number, args: Array<any>): Promise<T | null> => {
+    return new Promise<T | null>((resolve) => {
+      const fire = (): void => {
+        const runner = attemptRunner;
+        if (runner == null) {
+          resolve(null);
+          return;
+        }
+        // 双参 .then：单参重载同样不收敛（红线 35 的同源问题）
+        runner(seqVal, attempt, args).then(
+          (r: T | null): void => {
+            resolve(r);
+          },
+          (_retryErr: any): void => {
+            resolve(null);
+          }
+        );
+      };
+      if (ms <= 0) {
+        fire();
+        return;
+      }
+      setTimeout((): void => {
+        fire();
+      }, ms);
+    });
+  };
+
+  // ---------- 6. 回调派发 ----------
+  // 先把可空句柄拷进局部 const 再判空：Kotlin 拒绝对「被闭包改写的局部变量」做智能转换，
+  // 直接 `if (successCb != null) { successCb(e) }` 会在编译期报类型不匹配。
+
+  const emitComplete = (args: Array<any>, data: T | null, error: Error | null): void => {
+    const cb: UseRequestCallback<T> | null = completeCb;
+    if (cb == null) {
+      return;
+    }
+    const event: UseRequestEvent<T> = { args, data, error };
+    cb(event);
+  };
+
+  const emitSuccess = (args: Array<any>, data: T): void => {
+    const cb: UseRequestCallback<T> | null = successCb;
+    if (cb == null) {
+      return;
+    }
+    const event: UseRequestEvent<T> = { args, data, error: null };
+    cb(event);
+  };
+
+  const emitError = (args: Array<any>, error: Error): void => {
+    const cb: UseRequestCallback<T> | null = errorCb;
+    if (cb == null) {
+      return;
+    }
+    const event: UseRequestEvent<T> = { args, data: null, error };
+    cb(event);
+  };
+
+  // ---------- 7. 核心：一次请求（含重试） ----------
+
+  /**
+   * 发起第 `attempt` 次尝试并处理结果
+   *
+   * 所有状态写入都收在这里，且**每处写之前都重新校验代次**：代次对不上（被新的 send /
+   * 轮询顶掉、被 abort 顶掉、组件已卸载）就静默丢弃，既不写状态也不触发回调。
+   *
+   * @returns 成功时是业务数据；失败、被取消、被顶掉都是 null
+   */
+  const runAttempt = (seqVal: number, attempt: number, args: Array<any>): Promise<T | null> => {
+    // 卸载后、或代次已被顶掉，一个请求都不该再发（覆盖「防抖 / 重试延时期间被 abort」）
+    if (disposed == true || seqVal != seq) {
+      return resolvedNull();
+    }
+
+    const requestKey: string = makeKey();
+    currentKey = requestKey;
+    const ctx: UseRequestContext = { requestKey, args };
+
+    // ⚠️ 外层自己 `new Promise<T | null>`，两个 `.then` 回调一律标 `void` 返回、由 `resolve` 带出结果。
+    // 不能让回调直接 `return` 结果：本仓 TS 环境对泛型 `Promise.then` 的回调返回值推演不收敛
+    // （报「不能将类型 Promise<T | null> 分配给类型 T」）。回调返回 void 就完全绕开了那层推演。
+    return new Promise<T | null>((resolve) => {
+      fn(ctx).then(
+        (data: T): void => {
+          if (disposed == true || seqVal != seq) {
+            resolve(null);
+            return;
+          }
+          errorRef.value = null;
+          dataRef.value = data;
+          loadingRef.value = false;
+          refreshingRef.value = false;
+          emitComplete(args, data, null);
+          emitSuccess(args, data);
+          resolve(data);
+        },
+        (err: any): void => {
+          if (disposed == true || seqVal != seq) {
+            resolve(null);
+            return;
+          }
+          const e: Error = toError(err);
+          // 只重试网络层失败：业务码失败重试纯属浪费（且大概率重试还是同样的错）。
+          // 主动 abort 已经被上面的代次守卫拦掉，走不到这条重试分支。
+          const canRetry: boolean = !(e instanceof BusinessError) && attempt < optRetry;
+          if (canRetry == true) {
+            // 重试期间保持 loading，不把 refreshing 翻回去；下一次尝试的结果原样透出
+            retryAfter(optRetryDelay, seqVal, attempt + 1, args).then(
+              (r: T | null): void => {
+                resolve(r);
+              },
+              (_retryErr: any): void => {
+                resolve(null);
+              }
+            );
+            return;
+          }
+          errorRef.value = e;
+          loadingRef.value = false;
+          refreshingRef.value = false;
+          emitComplete(args, null, e);
+          emitError(args, e);
+          resolve(null);
+        }
+      );
+    });
+  };
+
+  // 句柄回填：`retryAfter` 只能通过它够到 `runAttempt`（见文件头「UTS / Kotlin 侧避坑」）
+  attemptRunner = runAttempt;
+
+  /**
+   * 立即发起一次请求（防抖后的真正入口）
+   *
+   * 与轮询的区别：这里会置 `loading`、会重置 `error`、失败会触发回调。
+   */
+  const invokeSend = (args: Array<any>): Promise<T | null> => {
+    if (disposed == true) {
+      return resolvedNull();
+    }
+    lastArgs = args;
+    seq = seq + 1;
+    const seqVal: number = seq;
+    errorRef.value = null;
+    loadingRef.value = true;
+    refreshingRef.value = dataRef.value != null;
+    return runAttempt(seqVal, 0, args);
+  };
+
+  // ---------- 8. 防抖 ----------
+  // 自己实现而不引 lime-shared 的 debounce：该项目级封装会把「替换实现」这件事藏在模块入口的
+  // 条件编译注释里，纯 JS 解析下两条 export 同时生效直接报重名，且它没有 cancel()，取消只能靠
+  // 代次兜底。这里只有「一个带取消的延时器」这一种形态，就地写开反而更小更可控。
+  //
+  // 红线 17 / 24：计时器句柄必须先 `let` 声明再赋值（回调里引用承载自身的 const 会报 error18）；
+  // 局部函数不能当值传给 setTimeout，必须包一层 lambda。
+  let debounceTimer: number = 0;
+  let pendingArgs: Array<any> = [];
+  let hasPending: boolean = false;
+
+  /** 撤掉已入队但还没触发的防抖调用 */
+  const cancelDebounce = (): void => {
+    if (debounceTimer > 0) {
+      clearTimeout(debounceTimer);
+      debounceTimer = 0;
+    }
+    hasPending = false;
+  };
+
+  /** 防抖窗口到期：把最后一次入参真正发出去 */
+  const flushDebounce = (): void => {
+    debounceTimer = 0;
+    if (hasPending == false) {
+      return;
+    }
+    hasPending = false;
+    const args: Array<any> = pendingArgs;
+    invokeSend(args);
+  };
+
+  // ---------- 9. 对外操作 ----------
+
+  const send: UseRequestSender<T> = (...args: Array<any>): Promise<T | null> => {
+    if (optDebounce > 0) {
+      // 开了防抖时本次调用不产生结果，只重置窗口；等最后一次调用在窗口结束后真正发出
+      pendingArgs = args;
+      hasPending = true;
+      if (debounceTimer > 0) {
+        clearTimeout(debounceTimer);
+      }
+      // ⚠️ 外层 `as any` 不可省：@types/node（经 vite.config.ts 引入）把 setTimeout 的返回值
+      // 声明为 Timeout，而 UTS 侧是 number，直接赋值 TS 报 TS2322。同写法先例见
+      // src/http/stream/stream.uts:275。
+      debounceTimer = (setTimeout((): void => {
+        flushDebounce();
+      }, optDebounce) as any) as number;
+      return resolvedNull();
+    }
+    return invokeSend(args);
+  };
+
+  const refresh = (): Promise<T | null> => {
+    // 从未 send 过（如 immediate: false 且还没手动发）时等价于无参发起一次
+    return invokeSend(lastArgs);
+  };
+
+  const abort = (): void => {
+    // 顶掉代次：既作废在途响应，也让重试延时到期后的下一次尝试自我取消
+    seq = seq + 1;
+    // 已入队但还没到窗口的防抖调用直接撤掉，否则 abort 之后它还会真的发出去
+    cancelDebounce();
+    if (currentKey != '') {
+      abortHttp(currentKey);
+      currentKey = '';
+    }
+    loadingRef.value = false;
+    refreshingRef.value = false;
+    // 取消不是错误：不触发 onError，但照常收尾，data 与 error 都是 null
+    emitComplete(lastArgs, null, null);
+  };
+
+  // ---------- 10. 轮询 ----------
+  // 轮询刻意不碰 loading（否则页面会一直转圈），失败也静默（不写 error、不触发 onError、
+  // 不重试），等下一个周期。成功则照常刷新 data 并触发 onSuccess / onComplete。
+  //
+  // 注意：错误提示的 toast 由 http 层的 defaultBusinessAfterError 统一决定，本 hook 管不了。
+  // 轮询若也想安静，需要在业务侧自行处理 afterError 钩子。
+
+  const triggerPoll = (): void => {
+    if (disposed == true) {
+      return;
+    }
+    seq = seq + 1;
+    const seqVal: number = seq;
+    const args: Array<any> = lastArgs;
+    const requestKey: string = makeKey();
+    currentKey = requestKey;
+    const ctx: UseRequestContext = { requestKey, args };
+
+    fn(ctx).then(
+      (data: T): void => {
+        if (disposed == true || seqVal != seq) {
+          return;
+        }
+        errorRef.value = null;
+        dataRef.value = data;
+        emitComplete(args, data, null);
+        emitSuccess(args, data);
+      },
+      (_err: any): void => {
+        // 轮询失败静默：不写 error、不触发 onError、不重试
+      }
+    );
+  };
+
+  const stopPolling = (): void => {
+    if (pollingTimer > 0) {
+      clearInterval(pollingTimer);
+      pollingTimer = 0;
+    }
+  };
+
+  const startPolling = (): void => {
+    if (optPolling <= 0) {
+      return;
+    }
+    stopPolling();
+    pollingTimer = (setInterval((): void => {
+      triggerPoll();
+    }, optPolling) as any) as number;
+  };
+
+  // ---------- 11. 回调绑定 ----------
+
+  const onSuccess: UseRequestBinder<T> = (cb: UseRequestCallback<T>): void => {
+    successCb = cb;
+  };
+
+  const onError: UseRequestBinder<T> = (cb: UseRequestCallback<T>): void => {
+    errorCb = cb;
+  };
+
+  const onComplete: UseRequestBinder<T> = (cb: UseRequestCallback<T>): void => {
+    completeCb = cb;
+  };
+
+  // ---------- 12. 卸载清理 ----------
+  onUnmounted((): void => {
+    disposed = true;
+    abort();
+    stopPolling();
+  });
+
+  // ---------- 13. 首次触发 ----------
+  // immediate 在「hook 被调用的当下」同步发起（不等到 onMounted），与 Alova 一致，
+  // 让请求尽早与首屏渲染并行。
+  if (optImmediate == true) {
+    invokeSend([]);
+    if (optPolling > 0) {
+      startPolling();
+    }
+  }
+
+  // ---------- 14. 装配返回值 ----------
+  // 用「带类型标注的变量 + return」而不是 `as` 断言：红线 41（泛型实例化别名进 as 位置
+  // 会被编译成无运行期绑定的 new，编译期不报、运行期 ReferenceError）。
+  const result: UseRequestResult<T> = {
+    data: dataRef,
+    loading: loadingRef,
+    refreshing: refreshingRef,
+    error: errorRef,
+    send,
+    abort,
+    refresh,
+    onSuccess,
+    onError,
+    onComplete,
+    startPolling,
+    stopPolling
+  };
+  return result;
+}

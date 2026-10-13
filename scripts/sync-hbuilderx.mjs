@@ -830,10 +830,27 @@ function main() {
   runSync();
 }
 
-try {
-  main();
+/**
+ * 只在「被 node 直接执行」时跑主流程。
+ *
+ * scripts/build-h5.mjs 会 import 本模块复用 detectIde() —— 探测编辑器安装位置这件事
+ * 只该有一份实现（cli 与编辑器必须同属一套安装，两边各写一份迟早给出不同答案）。
+ * 被 import 时绝不能有副作用：联网查版本、改写 package.json、pnpm install 都只属于
+ * 「直接运行本脚本」这条路径。
+ */
+function isDirectRun() {
+  const entry = process.argv[1];
+  return Boolean(entry) && path.resolve(entry) === fileURLToPath(import.meta.url);
 }
-catch (err) {
-  console.error('❌ 同步脚本执行异常:', err);
-  process.exit(1);
+
+if (isDirectRun()) {
+  try {
+    main();
+  }
+  catch (err) {
+    console.error('❌ 同步脚本执行异常:', err);
+    process.exit(1);
+  }
 }
+
+export { detectIde };

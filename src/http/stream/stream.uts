@@ -1,8 +1,13 @@
 /**
- * 流式请求封装 —— 基于 uni.request 的 chunked 分块接收，输出为 Observable 流
+ * 流式请求封装 —— 基于 `HttpClient.stream` 的 chunked 分块接收，输出为 Observable 流
  *
  * 设计目标：把「真实 SSE 分块接口」与「本地模拟流」统一成同一个 Observable<StreamChunk>，
  * 页面侧只需要切换数据源，下游的流处理逻辑（map / scan / takeUntil / catchError）完全复用。
+ *
+ * 请求侧统一走 http 层（`@/src/http/request/request.uts`）：自动携带鉴权头、相对路径自动拼
+ * baseURL、`extra.domain` 可临时切域名 —— 因此本模块不再自己调 `uni.request`。
+ * 响应侧**刻意不经过** http 层的业务码拆包（流式响应体不是 `{ code, data }` 包装），
+ * 只把原始字节块交给下面的增量解码器，细节见 `HttpClient.stream` 的注释。
  *
  * 平台支持：uni.request 的 enableChunked 与 RequestTask.onChunkReceived
  * 在 Web / Android / iOS / 鸿蒙 4.71+ 均可用（本项目 uni-app X 版本远高于此）。
@@ -12,7 +17,8 @@
  * import { requestStream, simulateStream } from '@/src/http/stream/stream.uts';
  * import { scan, takeUntil } from '@/src/utils/rxjs-lite/index.uts';
  *
- * const source = requestStream(url, body, null, 60000);
+ * // 相对路径会自动拼上 baseURL，token 由默认前置钩子注入
+ * const source = requestStream('/api/v1/chat/stream', body, null, 60000);
  * const sub = source
  *   .pipe(scan((acc: string, chunk: StreamChunk): string => acc + chunk.text, ''))
  *   .subscribe((full: string): void => { content.value = full; });
@@ -21,6 +27,8 @@
 
 import { Observable } from '@/src/utils/rxjs-lite/index.uts';
 import type { Subscriber, TeardownFn } from '@/src/utils/rxjs-lite/index.uts';
+import { http } from '@/src/http/request/request.uts';
+import type { LimeRequestConfig } from '@/uni_modules/lime-request';
 
 // ==========================================
 // 类型定义（禁止 interface，统一使用 type）
@@ -151,12 +159,16 @@ export class Utf8StreamDecoder {
 /**
  * 发起一个 chunked 流式 POST 请求，返回逐块吐出文本的 Observable。
  *
- * 订阅时立即发起请求；取消订阅（unsubscribe）会 abort 掉底层 RequestTask，
+ * 订阅时立即发起请求；取消订阅（unsubscribe）会 abort 掉底层请求，
  * 流正常完成或出错时也会自动释放。
  *
- * @param url 完整请求地址
+ * 鉴权与域名由 http 层的前置钩子统一处理：token 自动注入，相对路径自动拼 baseURL ——
+ * 因此这里的 url **既可传完整地址，也可传 `/api/v1/...` 这样的相对路径**。
+ * 需要跳过鉴权（如公开接口）时改走 `streamHttp` 并传 `extra.ignoreAuth`。
+ *
+ * @param url 请求地址：完整 `http(s)://` 地址，或与 baseURL 拼接的相对路径
  * @param body 请求体（字符串，通常是 JSON.stringify 的结果）
- * @param header 请求头，不需要时传 null
+ * @param header 请求头，不需要时传 null（走 SSE 默认头）
  * @param timeout 超时时间（毫秒）
  */
 export function requestStream(
@@ -190,32 +202,21 @@ export function requestStream(
           'Content-Type': 'application/json',
           'Accept': 'text/event-stream, application/x-ndjson, application/json'
         } as UTSJSONObject;
-    const task = uni.request({
+    // 请求侧交给 http 层（token 注入 / baseURL 拼接 / extra.domain 换域名）；
+    // method 固定 POST、enableChunked / responseType / dataType 也由 HttpClient.stream 固定写好，
+    // 这里不再重复声明，避免「写了却不生效」的错觉。
+    const streamTask = http.stream({
       url,
       method: 'POST',
       data: body,
       header: requestHeader,
-      timeout,
-      enableChunked: true,
-      responseType: 'arraybuffer',
-      dataType: 'text',
-      success: (_res) => {
-        settle(null);
-      },
-      fail: (err) => {
-        let msg = '网络请求失败';
-        if (err != null && err.errMsg != null) {
-          msg = `${err.errMsg}`;
-        }
-        settle(msg);
-      }
-    });
-    // 逐块接收：解码 → 累积 → 推送
-    task.onChunkReceived((result) => {
+      timeout
+    } as LimeRequestConfig, (data: ArrayBuffer): void => {
+      // 逐块接收：解码 → 累积 → 推送
       if (settled) {
         return;
       }
-      const text = decoder.decodeChunk(result.data);
+      const text = decoder.decodeChunk(data);
       if (text.length <= 0) {
         return;
       }
@@ -225,11 +226,13 @@ export function requestStream(
         receivedLength: receivedText.length,
         elapsedMs: Date.now() - startTime
       } as StreamChunk);
+    }, (errMsg: string | null): void => {
+      settle(errMsg);
     });
     // 取消订阅时中断底层请求
     return (): void => {
       settled = true;
-      task.abort();
+      streamTask.abort();
     };
   });
 }

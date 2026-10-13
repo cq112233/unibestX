@@ -370,6 +370,114 @@
           </view>
         </view>
 
+        <!-- ============ 6. useRequest 组合式请求 ============ -->
+        <view
+          class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid border-[#edf2f7] bg-[#ffffff]"
+        >
+          <!-- 标题区域 -->
+          <view class="flex flex-row items-center mb-[16px]">
+            <view class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#8b5cf6]" />
+            <text class="text-[16px] font-bold text-[#2d3748]">useRequest 组合式请求（对标 Alova）</text>
+          </view>
+          <text class="text-[12px] text-[#64748b] leading-[18px] mb-[12px]">第 3 张卡那一套手写的 loading / error 样板，这里全部由 hook 托管：状态流转、并发竞态、失败重试、防抖、轮询、取消一次配齐。</text>
+
+          <!-- 6.1 成功路径：本地 mock -->
+          <view class="rounded-[10px] p-[12px] mb-[12px] border-[1px] border-solid border-[#e2e8f0]">
+            <view class="flex-row justify-between items-center mb-[6px]">
+              <text class="text-[13px] text-[#64748b]">fetchFooList（本地 mock）</text>
+              <view class="px-[8px] py-[2px] rounded-[10px]" :class="listStatusBgClass">
+                <text class="text-[12px]" :class="listStatusTextClass">{{ listStatusText }}</text>
+              </view>
+            </view>
+            <text class="text-[12px] text-[#475569]">{{ listDataText }}</text>
+            <text class="text-[11px] text-[#94a3b8]">onComplete 已触发 {{ listTick }} 次</text>
+          </view>
+          <view class="flex-row mb-[12px]">
+            <view class="flex-1 mr-[10px]">
+              <view
+                class="bg-[#8b5cf6] rounded-[8px] h-[42px] w-full flex flex-row items-center justify-center"
+                @click="sendListRequest"
+              >
+                <text class="text-[#ffffff] text-[14px]">send('uni')</text>
+              </view>
+            </view>
+            <view class="flex-1 mr-[10px]">
+              <view
+                class="bg-[#10b981] rounded-[8px] h-[42px] w-full flex flex-row items-center justify-center"
+                @click="refreshListRequest"
+              >
+                <text class="text-[#ffffff] text-[14px]">refresh()</text>
+              </view>
+            </view>
+            <view class="flex-1">
+              <view
+                class="bg-[#ef4444] rounded-[8px] h-[42px] w-full flex flex-row items-center justify-center"
+                @click="abortListRequest"
+              >
+                <text class="text-[#ffffff] text-[14px]">abort()</text>
+              </view>
+            </view>
+          </view>
+
+          <!-- 6.2 失败与取消路径：真实接口 + 重试 -->
+          <view class="rounded-[10px] p-[12px] mb-[12px] border-[1px] border-solid border-[#e2e8f0]">
+            <view class="flex-row justify-between items-center mb-[6px]">
+              <text class="text-[13px] text-[#64748b]">fetchFooRemote（真实接口 · retry 2）</text>
+              <view class="px-[8px] py-[2px] rounded-[10px]" :class="remoteStatusBgClass">
+                <text class="text-[12px]" :class="remoteStatusTextClass">{{ remoteStatusText }}</text>
+              </view>
+            </view>
+            <text class="text-[12px] text-[#475569]">{{ remoteDetailText }}</text>
+            <text class="text-[11px] text-[#94a3b8]">onError 已触发 {{ remoteErrorTick }} 次 · 请求函数实际被调用 {{ remoteCalls }} 次</text>
+          </view>
+          <view class="flex-row mb-[12px]">
+            <view class="flex-1 mr-[10px]">
+              <view
+                class="bg-[#0ea5e9] rounded-[8px] h-[42px] w-full flex flex-row items-center justify-center"
+                @click="sendRemoteRequest"
+              >
+                <text class="text-[#ffffff] text-[14px]">发起请求</text>
+              </view>
+            </view>
+            <view class="flex-1">
+              <view
+                class="bg-[#ef4444] rounded-[8px] h-[42px] w-full flex flex-row items-center justify-center"
+                @click="abortRemoteRequest"
+              >
+                <text class="text-[#ffffff] text-[14px]">abort() 取消</text>
+              </view>
+            </view>
+          </view>
+
+          <!-- 6.3 防抖：连续输入只发一次 -->
+          <view class="rounded-[10px] p-[12px] mb-[12px] border-[1px] border-solid border-[#e2e8f0]">
+            <text class="text-[13px] text-[#64748b] mb-[8px]">防抖 400ms —— 连续输入只在停手后发一次</text>
+            <input
+              v-model="searchKeyword"
+              placeholder="输入关键字，观察下方只发一次"
+              class="h-[38px] bg-white rounded-[6px] px-[12px] border-[1px] border-solid border-[#cbd5e1] text-[13px] text-[#334155] mb-[8px]"
+              @input="handleSearchInput"
+            />
+            <text class="text-[12px] text-[#475569]">请求函数实际被调用 {{ searchCalls }} 次</text>
+            <text class="text-[11px] text-[#94a3b8]">最后一次发出的关键字「{{ searchLastKeyword }}」</text>
+          </view>
+
+          <!-- 6.4 轮询：不翻 loading、失败静默 -->
+          <view class="rounded-[10px] p-[12px] border-[1px] border-solid border-[#e2e8f0]">
+            <view class="flex-row justify-between items-center mb-[8px]">
+              <text class="text-[13px] text-[#64748b]">轮询 3s（不翻 loading、失败静默）</text>
+              <text class="text-[12px] text-[#475569]">已轮询 {{ pollingTick }} 次</text>
+            </view>
+            <view
+              class="h-[42px] w-full rounded-[8px] flex flex-row items-center justify-center"
+              :class="pollingButtonClass"
+              @click="togglePolling"
+            >
+              <text class="text-[#ffffff] text-[14px]">{{ pollingButtonText }}</text>
+            </view>
+          </view>
+        </view>
+
         <view class="flex-col items-center py-[16px]">
           <text class="text-[12px] text-[#94a3b8]">已触底 {{ reachBottomCount }} 次 · 内容结束</text>
         </view>
@@ -382,7 +490,10 @@
 /* eslint-disable dot-notation */
 import { computed, ref } from 'vue';
 import { downloadFooFile, fetchFooList, fetchFooRemote, FOO_DOWNLOAD_URL, FOO_UPLOAD_PATH, uploadFooFile } from '@/src/api/example.uts';
-import type { FooItem } from '@/src/api/example.uts';
+import type { FooItem, PageResult } from '@/src/api/example.uts';
+// useRequest 走精准导入（红线 36）：不经门面 `index.uts` 二次转发
+import { useRequest } from '@/src/http/hooks/useRequest.uts';
+import type { UseRequestContext, UseRequestEvent } from '@/src/http/hooks/useRequest.uts';
 import { getOssBaseUrl } from '@/src/config/index.uts';
 import { toast, toastSuccess } from '@/src/utils/toast/index.uts';
 import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/layouts/navbar/utils/index.uts';
@@ -421,6 +532,83 @@ const downloadFilePath = ref<string>('');
 const downloadStatusCode = ref<number>(0);
 const downloadError = ref<string>('');
 const reachBottomCount = ref<number>(0);
+
+// ==========================================
+// 第 6 张卡：useRequest 组合式请求
+// 与第 3 张卡（手写 loading / error）是同一件事的两种写法，对照着看
+// ==========================================
+const listTick = ref<number>(0);
+const remoteErrorTick = ref<number>(0);
+const remoteCalls = ref<number>(0);
+const searchKeyword = ref<string>('');
+const searchCalls = ref<number>(0);
+const searchLastKeyword = ref<string>('');
+const pollingOn = ref<boolean>(false);
+const pollingTick = ref<number>(0);
+
+/**
+ * 成功路径：本地 mock，`immediate: false` 让它不在页面挂载时就发（否则一进页面就白跑一次）
+ *
+ * 演示 `send` 带参 / `refresh` 复用上次入参 / `abort` 取消 / `refreshing` 与 `loading` 的区别。
+ */
+const listRequest = useRequest<PageResult<FooItem>>((ctx: UseRequestContext): Promise<PageResult<FooItem>> => {
+  let keyword: string = '';
+  if (ctx.args.length > 0) {
+    keyword = ctx.args[0] as string;
+  }
+  return fetchFooList(1, 5, keyword);
+}, {
+  immediate: false
+});
+listRequest.onComplete((_e: UseRequestEvent<PageResult<FooItem>>): void => {
+  listTick.value = listTick.value + 1;
+});
+
+/**
+ * 失败与取消路径：真实接口 + `retry: 2`
+ *
+ * 无后端时正好演示「网络层失败自动重试」与 `error` 状态；有后端时演示 `abort()` 真取消。
+ * 每次尝试都计入 `remoteCalls`，重试有没有生效一眼可见。
+ */
+const remoteRequest = useRequest<FooItem>((_ctx: UseRequestContext): Promise<FooItem> => {
+  remoteCalls.value = remoteCalls.value + 1;
+  return fetchFooRemote();
+}, {
+  immediate: false,
+  retry: 2,
+  retryDelay: 600
+});
+remoteRequest.onError((_e: UseRequestEvent<FooItem>): void => {
+  remoteErrorTick.value = remoteErrorTick.value + 1;
+});
+
+/**
+ * 防抖：连续输入只在停手 400ms 后发一次
+ *
+ * 注意入参取的是 `searchKeyword.value` 而不是 `ctx.args`：`@input` 触发时 v-model 已同步，
+ * 而防抖窗口结束时用户可能又敲了新字符，这里始终以「当前输入」为准。
+ */
+const searchRequest = useRequest<PageResult<FooItem>>((): Promise<PageResult<FooItem>> => {
+  searchCalls.value = searchCalls.value + 1;
+  searchLastKeyword.value = searchKeyword.value;
+  return fetchFooList(1, 5, searchKeyword.value);
+}, {
+  immediate: false,
+  debounce: 400
+});
+
+/**
+ * 轮询：3s 一次，不翻 loading、失败静默
+ *
+ * `immediate: false` 只影响首帧自动触发，不会阻止 `startPolling()`，所以这里可以纯手动开关。
+ */
+const pollingRequest = useRequest<PageResult<FooItem>>((): Promise<PageResult<FooItem>> => {
+  pollingTick.value = pollingTick.value + 1;
+  return fetchFooList(1, 3, '');
+}, {
+  immediate: false,
+  polling: 3000
+});
 
 // ==========================================
 // 计算属性
@@ -823,6 +1011,170 @@ function openDownloadedFile() {
   // #ifndef APP || MP-WEIXIN
   toast('当前平台不支持文档预览，可在真机上体验');
   // #endif
+}
+
+// ==========================================
+// 第 6 张卡：状态文案与操作函数
+// 状态键一律由 hook 的 data / loading / refreshing / error 推导，页面不再自己维护 loading 布尔值
+// ==========================================
+
+/** 主请求状态键：error > refreshing > loading > success > idle，优先级即页面该显示的语义 */
+const listStatusKey = computed((): string => {
+  if (listRequest.error.value != null) {
+    return 'error';
+  }
+  if (listRequest.loading.value == true) {
+    if (listRequest.refreshing.value == true) {
+      return 'refreshing';
+    }
+    return 'loading';
+  }
+  if (listRequest.data.value != null) {
+    return 'success';
+  }
+  return 'idle';
+});
+
+const listStatusText = computed((): string => {
+  switch (listStatusKey.value) {
+    case 'loading': return '加载中';
+    // refreshing 与 loading 在页面上是两种体验：前者可以继续展示旧内容，后者只能空着等
+    case 'refreshing': return '刷新中';
+    case 'success': return '成功';
+    case 'error': return '失败';
+    default: return '待发起';
+  }
+});
+
+const listStatusTextClass = computed((): string => {
+  switch (listStatusKey.value) {
+    case 'loading': return 'text-[#d97706]';
+    case 'refreshing': return 'text-[#2563eb]';
+    case 'success': return 'text-[#059669]';
+    case 'error': return 'text-[#dc2626]';
+    default: return 'text-[#94a3b8]';
+  }
+});
+
+const listStatusBgClass = computed((): string => {
+  switch (listStatusKey.value) {
+    case 'loading': return 'bg-[#fef9c3]';
+    case 'refreshing': return 'bg-[#dbeafe]';
+    case 'success': return 'bg-[#d1fae5]';
+    case 'error': return 'bg-[#fee2e2]';
+    default: return 'bg-[#f1f5f9]';
+  }
+});
+
+const listDataText = computed((): string => {
+  const data = listRequest.data.value;
+  if (data == null) {
+    return '暂无数据';
+  }
+  return `共 ${data.total} 条 · 本页 ${data.list.length} 条`;
+});
+
+const remoteStatusText = computed((): string => {
+  if (remoteRequest.loading.value == true) {
+    return `请求中（第 ${remoteCalls.value} 次尝试）`;
+  }
+  if (remoteRequest.error.value != null) {
+    return '已重试后仍失败';
+  }
+  if (remoteRequest.data.value != null) {
+    return '成功';
+  }
+  return '待发起';
+});
+
+const remoteStatusTextClass = computed((): string => {
+  if (remoteRequest.loading.value == true) {
+    return 'text-[#d97706]';
+  }
+  if (remoteRequest.error.value != null) {
+    return 'text-[#dc2626]';
+  }
+  if (remoteRequest.data.value != null) {
+    return 'text-[#059669]';
+  }
+  return 'text-[#94a3b8]';
+});
+
+const remoteStatusBgClass = computed((): string => {
+  if (remoteRequest.loading.value == true) {
+    return 'bg-[#fef9c3]';
+  }
+  if (remoteRequest.error.value != null) {
+    return 'bg-[#fee2e2]';
+  }
+  if (remoteRequest.data.value != null) {
+    return 'bg-[#d1fae5]';
+  }
+  return 'bg-[#f1f5f9]';
+});
+
+const remoteDetailText = computed((): string => {
+  const err = remoteRequest.error.value;
+  if (err != null) {
+    return `错误：${err.message}`;
+  }
+  const data = remoteRequest.data.value;
+  if (data != null) {
+    return `id: ${data.id}, name: ${data.name}`;
+  }
+  return '未配置后端时走失败分支，正好演示重试与 error 状态';
+});
+
+const pollingButtonText = computed((): string => {
+  if (pollingOn.value == true) {
+    return '停止轮询';
+  }
+  return '开始轮询';
+});
+
+const pollingButtonClass = computed((): string => {
+  if (pollingOn.value == true) {
+    return 'bg-[#ef4444]';
+  }
+  return 'bg-[#8b5cf6]';
+});
+
+/** 发起主请求（带参），演示 send 的入参透传 */
+function sendListRequest(): void {
+  listRequest.send('uni');
+}
+
+/** 复用上一次 send 的入参再发一次 */
+function refreshListRequest(): void {
+  listRequest.refresh();
+}
+
+function abortListRequest(): void {
+  listRequest.abort();
+}
+
+function sendRemoteRequest(): void {
+  remoteCalls.value = 0;
+  remoteRequest.send();
+}
+
+function abortRemoteRequest(): void {
+  remoteRequest.abort();
+}
+
+/** 输入即送进防抖队列，窗口内的连续调用只会真正发一次 */
+function handleSearchInput(): void {
+  searchRequest.send(searchKeyword.value);
+}
+
+function togglePolling(): void {
+  if (pollingOn.value == true) {
+    pollingRequest.stopPolling();
+    pollingOn.value = false;
+    return;
+  }
+  pollingRequest.startPolling();
+  pollingOn.value = true;
 }
 
 // ==========================================
