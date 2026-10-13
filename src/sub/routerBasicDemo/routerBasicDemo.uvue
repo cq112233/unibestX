@@ -200,7 +200,7 @@ const SELF_PAGE: string = '/src/sub/routerBasicDemo/routerBasicDemo';
 /** 首页 */
 const HOME_PAGE: string = '/src/pages/index/index';
 
-/** 1) useRoute()：当前路由（全局响应式状态，只读） */
+/** 1) useRoute()：本页路由（响应式、只读；每次调用一份属于本页的快照，上一页不会被下一页改写） */
 const route = useRoute();
 /** 2) useRouter()：导航器（底层仍是 uni 导航 API，全局拦截器照常生效） */
 const router = useRouter();

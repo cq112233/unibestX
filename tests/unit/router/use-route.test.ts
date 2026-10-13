@@ -1,4 +1,4 @@
-import { onPageShow } from '@dcloudio/uni-app';
+import { onPageHide, onPageShow } from '@dcloudio/uni-app';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { utsObject } from './helpers';
 
@@ -49,6 +49,22 @@ function lastPageShowHandler(): () => void {
   return calls[calls.length - 1][0];
 }
 
+/**
+ * 取第 index 次 useRoute 注册的 onPageShow / onPageHide 回调
+ *
+ * 第 index 次调用 = 第 index 份快照（useRoute 每次调用建一份，见 route-state.uts），
+ * 所以按序号取就是在模拟「哪一页显示 / 被盖住」。
+ */
+function pageShowHandlerAt(index: number): () => void {
+  const calls = (onPageShow as unknown as { mock: { calls: any[][] } }).mock.calls;
+  return calls[index][0];
+}
+
+function pageHideHandlerAt(index: number): () => void {
+  const calls = (onPageHide as unknown as { mock: { calls: any[][] } }).mock.calls;
+  return calls[index][0];
+}
+
 describe('useRoute Unit Tests', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -66,14 +82,16 @@ describe('useRoute Unit Tests', () => {
     expect(route.fullPath).toBe('/src/pages/index/index');
   });
 
-  it('重复调用只安装一次监听，且返回同一个共享对象', async () => {
+  it('重复调用只安装一次监听；每次调用返回各自一份快照（值相同、互不影响）', async () => {
     const { useRoute } = await loadRouteState();
 
     const first = useRoute();
     const second = useRoute();
 
     expect(uni.onAppRoute).toHaveBeenCalledTimes(1);
-    expect(first).toBe(second);
+    // 不再共用同一个对象：页面里调一次、子组件里再调一次，就是两份快照（见 route-state.uts 的说明）
+    expect(first).not.toBe(second);
+    expect(first.path).toBe(second.path);
   });
 
   it('onAppRoute 事件会把 path / query / fullPath 落进状态（path 自动补前导斜杠）', async () => {
@@ -283,5 +301,107 @@ describe('useRoute Unit Tests', () => {
 
     useRoute();
     expect(uni.onAppRoute).toHaveBeenCalledTimes(2);
+  });
+
+  describe('每页一份快照：上一页不被「正在进入的下一页」改写', () => {
+    it('上一页纹丝不动；新页快照首帧就是目标路由（不依赖任何回调）', async () => {
+      const { useRoute, applyTargetRouteFromUrl, routeState } = await loadRouteState();
+      setPageStack('src/pages/index/index');
+
+      const homeRoute = useRoute(); // 首页里的调用点
+      pageShowHandlerAt(0)(); // 首页显示：认领路径 + 刷一次
+      expect(homeRoute.path).toBe('/src/pages/index/index');
+
+      // 首页里点了「进详情」：拦截器在**请求发出时**用 applyTargetRouteFromUrl 写目标路由。
+      // 此刻 App 端页面栈顶仍是首页、首页还在屏幕上（新页要等动画盖上来）
+      applyTargetRouteFromUrl('/src/sub/routerBasicDemo/routerBasicDemo?id=2001&from=self');
+
+      // 全局那份确实已经变成目标路由（新页首帧靠它），但首页那份不在其中
+      expect(routeState.path).toBe('/src/sub/routerBasicDemo/routerBasicDemo');
+      expect(homeRoute.path).toBe('/src/pages/index/index'); // ← 上一页不提前翻
+      expect(homeRoute.fullPath).toBe('/src/pages/index/index');
+      expect(homeRoute.query.size).toBe(0);
+
+      // 新页 setup：新建的快照直接从全局目标路由起手（这才是它首帧能读对的原因）
+      const detailRoute = useRoute();
+      expect(detailRoute.path).toBe('/src/sub/routerBasicDemo/routerBasicDemo');
+      expect(detailRoute.query.get('id')).toBe('2001');
+      expect(detailRoute.fullPath).toBe('/src/sub/routerBasicDemo/routerBasicDemo?id=2001&from=self');
+    });
+
+    it('同页带参重进：上一页的 fullPath / query 不提前翻（预写 + 落地两道闸）', async () => {
+      const { useRoute, applyTargetRouteFromUrl } = await loadRouteState();
+      setPageStack('src/sub/routerBasicDemo/routerBasicDemo');
+
+      const first = useRoute();
+      pageShowHandlerAt(0)();
+      expect(first.query.size).toBe(0);
+
+      // 「带 query 重进本页」：path / name / meta 全都一样，只有 fullPath / query 会变 ——
+      // 共用一份全局状态时，这里就是当场翻给用户看的那一格
+      applyTargetRouteFromUrl('/src/sub/routerBasicDemo/routerBasicDemo?id=2001&from=self');
+
+      // 第一道闸：请求预写不碰已认领的快照（此刻上一页还没 onPageHide，可见性拦不住）
+      expect(first.fullPath).toBe('/src/sub/routerBasicDemo/routerBasicDemo');
+      expect(first.query.size).toBe(0);
+
+      pageHideHandlerAt(0)(); // 首页被盖住：第二道闸（可见性）生效
+      lastAppRouteListener()(utsObject({
+        path: 'src/sub/routerBasicDemo/routerBasicDemo',
+        query: utsObject({ id: '2001', from: 'self' }),
+        openType: 'navigateTo'
+      }));
+
+      // 落地真值同路径也改不动它（本页已不在前台）
+      expect(first.fullPath).toBe('/src/sub/routerBasicDemo/routerBasicDemo');
+      expect(first.query.size).toBe(0);
+
+      const second = useRoute();
+      pageShowHandlerAt(1)();
+      expect(second.query.get('id')).toBe('2001');
+      expect(second.fullPath).toBe('/src/sub/routerBasicDemo/routerBasicDemo?id=2001&from=self');
+    });
+
+    it('创建时全局还是空的（冷启动）：先跟着全局走，本页显示时认领路径', async () => {
+      (globalThis as any).getCurrentPages = vi.fn(() => []); // 栈还没建立
+      const { useRoute, applyRouteFromUrl } = await loadRouteState();
+
+      const route = useRoute();
+      expect(route.path).toBe('');
+
+      // 还没认领路径：它还不知道自己属于哪一页，先跟着全局走
+      applyRouteFromUrl('/src/pages/index/index');
+      expect(route.path).toBe('/src/pages/index/index');
+
+      // 本页显示：认领路径 + 刷一次
+      setPageStack('src/pages/index/index');
+      pageShowHandlerAt(0)();
+      expect(route.fullPath).toBe('/src/pages/index/index');
+
+      // 认领之后就不再随便跟随：别的页面进来动不了它
+      applyRouteFromUrl('/src/sub/detail/detail?id=1');
+      expect(route.path).toBe('/src/pages/index/index');
+    });
+
+    it('返回上一页：首页快照在 onPageShow 时刷新回自己', async () => {
+      const { useRoute, applyTargetRouteFromUrl } = await loadRouteState();
+      setPageStack('src/pages/index/index');
+      const homeRoute = useRoute();
+      pageShowHandlerAt(0)();
+
+      applyTargetRouteFromUrl('/src/sub/detail/detail?id=1');
+      pageHideHandlerAt(0)();
+      const detailRoute = useRoute();
+      pageShowHandlerAt(1)();
+      expect(detailRoute.path).toBe('/src/sub/detail/detail');
+
+      // 点返回：栈顶回到首页（无参数），只有首页的 onPageShow 这个时机看得到栈已经变了
+      setPageStack('src/pages/index/index');
+      pageShowHandlerAt(0)();
+
+      expect(homeRoute.path).toBe('/src/pages/index/index');
+      expect(homeRoute.query.size).toBe(0);
+      expect(homeRoute.fullPath).toBe('/src/pages/index/index');
+    });
   });
 });

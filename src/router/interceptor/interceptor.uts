@@ -1,8 +1,21 @@
-import { useTokenStore } from '@/src/store/index.uts';
 import { isPageTabbar, switchTabbar } from '@/src/tabbar/index.uts';
-import { EXCLUDE_LOGIN_PATH_LIST, isNeedLoginMode, LOGIN_PAGE } from '../config/config.uts';
-import { applyRouteFromUrl, installRouteStateListener, syncRouteState } from '../hooks/route-state.uts';
+import { runRouterGuard } from '../guard/index.uts';
+import type { RouteTarget } from '../guard/types.uts';
+import { applyTargetRouteFromUrl, installRouteStateListener, syncRouteState } from '../hooks/route-state.uts';
 import { getQueryString, parseUrlToObj } from '../utils/utils.uts';
+
+/**
+ * 本文件是**框架侧**：只负责「读 uni 导航入参 → 归一化 URL → 交给业务守卫裁决 →
+ * 按裁决放行 / 改跳 → 维护 useRoute() 路由状态」。
+ *
+ * 准入校验这类**业务规则一律不写在这里**，统一去 ../guard/（业务开发者主战场：一条规则一个文件，
+ * 目录约定见 ../guard/index.uts；模板升级不覆盖）。加一条路由规则 = 在 ../guard/ 里新建一个
+ * guardXxx.uts 并挂进编排，本文件不动。
+ *
+ * ⚠️ 本文件**只认 ../guard/index.uts 的 runRouterGuard() 这一个符号**，且注释里不出现任何业务名词
+ *    （本文件通篇只谈 URL、路由状态、跳转派发这些管道概念）。一旦这里开始写得出某个具体业务
+ *    的名字，就说明它漏回框架侧了 —— 有回归测试盯着。
+ */
 
 /**
  * 路由状态兜底回读（延后一拍，等页面栈稳定）
@@ -30,7 +43,11 @@ function syncRouteStateDeferred(): void {
  *    回读必然整体慢一页（曾经的表现：进入 routerBasicDemo 后 path 恒为 /src/pages/index/index）。
  * 发起方自己知道目标 url，直接写上最可靠，且三端行为一致。事件到达后会写入同样的值，互为兜底。
  *
- * ⚠️ 只在**确实放行**时写：被登录校验拦下并改跳登录页时，路由状态交给那次登录页跳转自己写。
+ * ⚠️ 只在**确实放行**时写：被业务守卫拦下并改跳时，路由状态交给**那次改跳**自己写 ——
+ *    写这里反而是错的（这里写的是用户其实没去成的页面）。
+ * ⚠️ 用 applyTargetRouteFromUrl（**请求预写**）而不是 applyRouteFromUrl：此刻上一页还在屏幕上，
+ *    预写只喂「还没认领路径」的快照，已认领的一律不动 —— 上一页不会在下一页进入期间提前变
+ *    （同页带参重进尤其明显）。路由状态那侧的口径见 ../hooks/route-state.uts。
  * ⚠️ `plugin://` / `http(s)://` 不是本应用页面，不进路由状态。
  */
 function markTargetRoute(url: string): void {
@@ -41,15 +58,17 @@ function markTargetRoute(url: string): void {
   if (resolved.startsWith('plugin://') || resolved.startsWith('http://') || resolved.startsWith('https://')) {
     return;
   }
-  applyRouteFromUrl(resolved);
+  applyTargetRouteFromUrl(resolved);
 }
 
 /**
- * 登录校验通过则放行并写入目标路由；被拦下时不写（拦截器已改跳登录页，
- * 那次跳转自己会把路由写成登录页，写这里反而是错的）
+ * 守卫裁决通过则放行并写入目标路由；被拦下时不写（框架已改跳守卫给出的目标页，
+ * 那次跳转自己会把路由写成目标页，写这里反而是错的）
+ * @param url 导航 url
+ * @param api 触发本次跳转的 uni API 名，透传给守卫
  */
-function allowNavigation(url: string): boolean {
-  const allowed = doIntercept(url);
+function allowNavigation(url: string, api: string): boolean {
+  const allowed = doIntercept(url, api);
   if (allowed) {
     markTargetRoute(url);
   }
@@ -66,22 +85,26 @@ export type Interceptor = {
 // #endif
 
 /**
- * 判断路径是否符合排除登录校验名单 (EXCLUDE_LOGIN_PATH_LIST)
- * @param path 页面路径，可省略前导斜杠（`src/xxx` 会补成 `/src/xxx` 后再比）；
- *             与名单做**全等匹配**，不支持前缀 / 通配 —— 加白名单必须写完整路径
+ * 把 query Map 还原成 query 串（值已是解码态，这里不做任何编解码）
+ *
+ * 存在的意义：守卫可能需要「原地址」去拼改跳参数，且必须与 path / query **同口径**
+ * （都经 parseUrlToObj 解过一次码）；直接拿原始 url 串会让下游多编一次码。
  */
-export function judgeIsExcludePath(path: string): boolean {
-  let normalizedPath = path;
-  if (normalizedPath.startsWith('src/')) {
-    normalizedPath = `/${normalizedPath}`;
+function joinQueryString(query: Map<string, string>): string {
+  if (query.size == 0) {
+    return '';
   }
-  return EXCLUDE_LOGIN_PATH_LIST.includes(normalizedPath);
+  const paramsList: Array<string> = [];
+  query.forEach((val, key) => {
+    paramsList.push(`${key}=${val}`);
+  });
+  return paramsList.join('&');
 }
 
 /**
  * 把导航 url 归一化为「绝对路径 + 原始 query 串」的形式（相对路径按当前页面所在目录解析）
  *
- * 抽取出来的原因：登录校验（doIntercept）与「跳转时写入目标路由」（markTargetRoute）
+ * 抽取出来的原因：守卫裁决（doIntercept）与「跳转时写入目标路由」（markTargetRoute）
  * 必须用**同一套**路径口径，否则会出现「拦截器按 A 页面放行、路由状态写的是 B 页面」的错位。
  *
  * @param url 导航 url，如 `/src/pages/me/me?tab=1`、`subDetail?id=1`
@@ -137,69 +160,74 @@ function resolveAbsoluteUrl(url: string): string {
 }
 
 /**
- * 核心拦截业务逻辑函数
+ * 执行守卫给出的改跳目标
+ *
+ * 守卫只表达意图（`block('url')`），跳转一律由这里发出。原因：拦截器只在**放行**时才写
+ * 路由状态（见 allowNavigation / markTargetRoute），守卫自己调 uni API 会绕过这个不变量。
+ *
+ * ⚠️ TabBar 页面必须走 switchTab：`uni.navigateTo` 跳 TabBar 页面会被框架直接拒绝。
+ * ⚠️ `redirect` 为 null / 空串 → 静默拦截，不做任何跳转。
  */
-function doIntercept(url: string): boolean {
+function dispatchRedirect(target: string | null): void {
+  if (target == null || target == '') {
+    return;
+  }
+  if (isPageTabbar(target)) {
+    switchTabbar(target);
+    return;
+  }
+  uni.navigateTo({ url: target });
+}
+
+/**
+ * 核心拦截流程：归一化 url → 交给业务守卫裁决 → 放行或改跳
+ *
+ * 本函数**不含任何业务规则**：上下文里装哪些业务信号、什么条件算通过、被拦下跳哪儿，全在
+ * ../guard/（`runRouterGuard()` 是那边的唯一入口，装配与规则链都在它后面收口）——
+ * 业务开发者改那个目录，本文件不动，也读不到任何业务细节。
+ *
+ * @param url 导航 url（可能带 query、可能是相对路径）
+ * @param api 触发本次跳转的 uni API 名，透传给守卫（守卫可按 API 差异化裁决）
+ */
+function doIntercept(url: string, api: string): boolean {
   if (url == null || url == '') {
     return true;
   }
-  const urlObj = parseUrlToObj(resolveAbsoluteUrl(url));
-  const path = urlObj.path;
-  const query = urlObj.query;
+  const resolvedUrl = resolveAbsoluteUrl(url);
+  const urlObj = parseUrlToObj(resolvedUrl);
 
-  // 3. 检查 Token 登录有效性
-  const tokenStore = useTokenStore();
-  const hasLogin = tokenStore.hasValidLogin();
-  if (hasLogin) {
-    // 已经登录：若目标不是登录页直接放行
-    if (path != LOGIN_PAGE) {
-      return true;
-    }
-    // 已登录但再次访问登录页，重定向至来源页面或首页
-    const redirect = query.get('redirect');
-    const redirectUrl = (redirect != null && redirect != '') ? redirect : '/src/pages/index/index';
-    if (isPageTabbar(redirectUrl)) {
-      switchTabbar(redirectUrl);
-    }
-    else {
-      uni.navigateTo({ url: redirectUrl });
-    }
-    return false;
+  // fullPath 由 path + 解码后的 query 重拼（而不是直接用 resolvedUrl）：保持「解码态」口径，
+  // 守卫拿它去 encodeURIComponent 时正好只编码一次
+  const queryStr = joinQueryString(urlObj.query);
+  let fullPath = urlObj.path;
+  if (queryStr != '') {
+    fullPath += `?${queryStr}`;
   }
 
-  // 4. 未登录情况下拼装重定向参数
-  let fullPath = path;
-  if (query.size > 0) {
-    const paramsList: string[] = [];
-    query.forEach((val, key) => {
-      paramsList.push(`${key}=${val}`);
-    });
-    fullPath += `?${paramsList.join('&')}`;
-  }
-  const redirectUrl = `${LOGIN_PAGE}?redirect=${encodeURIComponent(fullPath)}`;
+  // 对象字面量按仓库既有先例写成「类型化变量 + as」（如 tabbar 的 buildFullTabbarList）：
+  // 嵌套字面量直传给 type 字段没有先例，Kotlin 侧推断不可靠，这里显式落到具体类型上
+  const target: RouteTarget = {
+    path: urlObj.path,
+    query: urlObj.query,
+    fullPath
+  } as RouteTarget;
 
-  // 白名单策略模式：仅 EXCLUDE_LOGIN_PATH_LIST 中页面免登录
-  if (isNeedLoginMode) {
-    if (judgeIsExcludePath(path)) {
-      return true;
-    }
-    if (path == LOGIN_PAGE) {
-      return true;
-    }
-    uni.navigateTo({ url: redirectUrl });
-    return false;
-  }
+  // 框架交出的只有两样中立的输入（归一化后的 URL 事实 + api 名），拿回来的只有裁决：
+  // 上下文怎么装配、有哪些业务信号、按什么顺序判，全在 ../guard/ 里，框架不碰也不想知道
+  const decision = runRouterGuard(target, api);
 
-  // 黑名单策略模式（默认）：EXCLUDE_LOGIN_PATH_LIST 中页面必须登录
-  if (judgeIsExcludePath(path)) {
-    uni.navigateTo({ url: redirectUrl });
-    return false;
+  if (decision.pass) {
+    return true;
   }
-  return true;
+  dispatchRedirect(decision.redirect);
+  return false;
 }
 
 /**
  * 路由 API 独立拦截器
+ *
+ * 各 API 的差异只有「怎么从 options 里取 url」（App 原生端需按各自的 Options 强转），
+ * 取到 url 后一律走 allowNavigation(url, api)；api 名透传给业务守卫，便于按 API 差异化裁决。
  */
 export const navigateToInterceptor: Interceptor = {
   invoke(options: any): boolean {
@@ -214,7 +242,7 @@ export const navigateToInterceptor: Interceptor = {
       url = (urlObj.url != null) ? (urlObj.url as string) : '';
       // #endif
     }
-    return allowNavigation(url);
+    return allowNavigation(url, 'navigateTo');
   },
   fail(_err: any): void {
     syncRouteStateDeferred();
@@ -234,7 +262,7 @@ export const redirectToInterceptor: Interceptor = {
       url = (urlObj.url != null) ? (urlObj.url as string) : '';
       // #endif
     }
-    return allowNavigation(url);
+    return allowNavigation(url, 'redirectTo');
   },
   fail(_err: any): void {
     syncRouteStateDeferred();
@@ -254,7 +282,7 @@ export const reLaunchInterceptor: Interceptor = {
       url = (urlObj.url != null) ? (urlObj.url as string) : '';
       // #endif
     }
-    return allowNavigation(url);
+    return allowNavigation(url, 'reLaunch');
   },
   fail(_err: any): void {
     syncRouteStateDeferred();
@@ -274,7 +302,7 @@ export const switchTabInterceptor: Interceptor = {
       url = (urlObj.url != null) ? (urlObj.url as string) : '';
       // #endif
     }
-    return allowNavigation(url);
+    return allowNavigation(url, 'switchTab');
   },
   fail(_err: any): void {
     syncRouteStateDeferred();

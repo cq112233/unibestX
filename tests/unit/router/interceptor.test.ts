@@ -122,6 +122,67 @@ describe('路由拦截器 Unit Tests', () => {
     expect(routeState.path).toBe('');
   });
 
+  it('已登录却进登录页时，按守卫裁决改跳 redirect 指向的页面，且本次不写目标路由', async () => {
+    // 登录态由框架侧算好送给守卫（守卫本身是纯函数），这里把 store 打成「已登录」
+    vi.resetModules();
+    vi.doMock('@/src/store/index.uts', () => ({
+      useTokenStore: () => ({ hasValidLogin: () => true })
+    }));
+    try {
+      const { navigateToInterceptor, routeState } = await loadInterceptor();
+      // 用一个非 TabBar 页面当回跳目标：TabBar 目标会改走 switchTabbar，另有用例覆盖
+      const target = '/src/sub/routerBasicDemo/routerBasicDemo?tab=2';
+
+      const allowed = navigateToInterceptor.invoke({ url: `/src/sub/auth/login?redirect=${encodeURIComponent(target)}` });
+
+      expect(allowed).toBe(false);
+      // 被拦下时不能写路由状态：改跳那次跳转自己会写，写这里会把状态写成登录页
+      expect(routeState.path).toBe('');
+      expect(uni.navigateTo).toHaveBeenCalledTimes(1);
+      expect((uni.navigateTo as any).mock.calls[0][0].url).toBe(target);
+    }
+    finally {
+      vi.doUnmock('@/src/store/index.uts');
+    }
+  });
+
+  it('守卫返回的改跳目标原样派发（框架不参与登录业务判断）', async () => {
+    const { navigateToInterceptor, routeState } = await loadInterceptor();
+    const { LOGIN_PAGE } = await import('@/src/router/config/config.uts');
+
+    // 未登录 + 命中排除名单 → 守卫给出「登录页?redirect=原地址」，框架只负责跳
+    const originalPath = '/src/sub/routerParamsBasicDemo/routerParamsBasicDemo?id=1';
+    const allowed = navigateToInterceptor.invoke({ url: originalPath });
+
+    expect(allowed).toBe(false);
+    expect(routeState.path).toBe('');
+    expect((uni.navigateTo as any).mock.calls[0][0].url)
+      .toBe(`${LOGIN_PAGE}?redirect=${encodeURIComponent(originalPath)}`);
+  });
+
+  it('守卫的改跳目标命中 TabBar 页面时不走 navigateTo（改由 switchTabbar 派发）', async () => {
+    vi.resetModules();
+    vi.doMock('@/src/store/index.uts', () => ({
+      useTokenStore: () => ({ hasValidLogin: () => true })
+    }));
+    try {
+      const { navigateToInterceptor } = await loadInterceptor();
+
+      // 已登录进登录页、没带 redirect → 守卫兜底回首页（首页是 TabBar 页）
+      const allowed = navigateToInterceptor.invoke({ url: '/src/sub/auth/login' });
+
+      expect(allowed).toBe(false);
+      // uni.navigateTo 跳 TabBar 页面会被框架拒绝，必须让 switchTabbar 接手
+      // （它按当前 TabBar 策略走 switchTab / redirectTo，故这里只断言「没走 navigateTo」）
+      expect(uni.navigateTo).not.toHaveBeenCalled();
+      const dispatched: number = (uni.switchTab as any).mock.calls.length + (uni.redirectTo as any).mock.calls.length;
+      expect(dispatched).toBeGreaterThan(0);
+    }
+    finally {
+      vi.doUnmock('@/src/store/index.uts');
+    }
+  });
+
   it('已被登录拦下的 url 不会被写进状态（登录页跳转由它自己那次 invoke 负责）', async () => {
     const { navigateToInterceptor, routeState } = await loadInterceptor();
 
