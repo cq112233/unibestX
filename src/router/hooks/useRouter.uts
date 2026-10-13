@@ -17,14 +17,18 @@
  *
  * ## 两条必须知道的约束
  *
- * 1. **对象形态必须写成对象字面量**。`{ path, query }` 字面量在 UTS 里编译为 `UTSJSONObject`，
- *    而先声明成带 `type` 标注的变量再传会被编译成原生对象（Kotlin data class），
- *    内部 `as UTSJSONObject` 会在真机抛 `ClassCastException`（H5 / 单测不复现）。
- *    本模块因此**不导出**对象形态的类型别名，避免诱导出那种写法。
+ * 1. **对象形态收 `RouteLocationRaw`**（`@/src/router/utils/utils.uts`）：
+ *    字面量 `{ path, query }` 与 `RouteLocationRaw` 变量都可以，两者在 UTS 下编译成同一个
+ *    原生对象，`resolveUrl()` 按字段直读 —— 不再有「必须写字面量，否则真机 ClassCastException」
+ *    那条约束。参数标成 `any` 时编辑器给不出字段补全，标 `UTSJSONObject` 只弹它的成员方法，
+ *    所以这里必须是具名类型（VSCode / Volar 里 `pa` 能补出 `path`)。
+ *    反过来说，**裸的 `UTSJSONObject`（如 `JSON.parseObject()` 的返回值）不再被接受**，
+ *    会被类型检查挡在编译期 —— 这是有意的收紧。
  * 2. **TabBar 页面必须用 `switchTab()`**，`push()` 走的是 `uni.navigateTo`，
  *    跳 TabBar 页面会被框架拒绝（TabBar 页面列表由 `src/tabbar` 维护，这里不反向依赖它）。
  */
 import { resolveUrl } from '../utils/utils.uts';
+import type { RouteLocationRaw } from '../utils/utils.uts';
 import { ensureRouteReady } from './route-state.uts';
 
 /**
@@ -40,7 +44,7 @@ export class Router {
    * @param to 字符串 url 或 `{ path, query }` 字面量
    * @returns `uni.navigateTo` 的 Promise；入参为空 / 缺 path 时返回 null
    */
-  push(to: any | null): any | null {
+  push(to: string | RouteLocationRaw | null): any | null {
     const url = resolveUrl(to);
     if (url == '') {
       return null;
@@ -54,7 +58,7 @@ export class Router {
    * @param to 字符串 url 或 `{ path, query }` 字面量
    * @returns `uni.redirectTo` 的 Promise；入参为空 / 缺 path 时返回 null
    */
-  replace(to: any | null): any | null {
+  replace(to: string | RouteLocationRaw | null): any | null {
     const url = resolveUrl(to);
     if (url == '') {
       return null;
@@ -68,7 +72,7 @@ export class Router {
    * @param to 字符串 url 或 `{ path, query }` 字面量
    * @returns `uni.reLaunch` 的 Promise；入参为空 / 缺 path 时返回 null
    */
-  relaunch(to: any | null): any | null {
+  relaunch(to: string | RouteLocationRaw | null): any | null {
     const url = resolveUrl(to);
     if (url == '') {
       return null;
@@ -82,7 +86,7 @@ export class Router {
    * @param to 字符串 url 或 `{ path, query }` 字面量
    * @returns `uni.switchTab` 的 Promise；入参为空 / 缺 path 时返回 null
    */
-  switchTab(to: any | null): any | null {
+  switchTab(to: string | RouteLocationRaw | null): any | null {
     const url = resolveUrl(to);
     if (url == '') {
       return null;
@@ -120,7 +124,7 @@ export class Router {
    * @param to 字符串 url 或 `{ path, query }` 字面量
    * @returns 归一化后的 url；入参为空或缺 path 时返回空串 ""
    */
-  resolve(to: any | null): string {
+  resolve(to: string | RouteLocationRaw | null): string {
     return resolveUrl(to);
   }
 }

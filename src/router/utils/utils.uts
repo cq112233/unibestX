@@ -14,6 +14,36 @@ export type UrlObj = {
 };
 
 /**
+ * 导航入参对象（对标 vue-router 的 `RouteLocationRaw`）—— 只用于 `router.push()` 这类「想去哪」的入参
+ *
+ * 【为什么必须有这个具名类型，而不是让 `push(to: any)` 收着】
+ * 参数标成 `any` 时，VSCode / Volar 在 `router.push({ ... })` 里**一个字段都补不全**
+ * （实测：`any` 弹的是一堆全局符号，`UTSJSONObject` 只弹 `getString` 之类的成员方法），
+ * 只有具名对象类型才把 `path` / `query` 这些键喂给编辑器。
+ *
+ * 【⚠️ 与 route-types.uts 的 RouteLocation 的区别】
+ * 那个是框架**归一化后读出来**的「当前位置」（query 已是 `Map`，值已解码）；
+ * 这个是调用方**传进去**的「想去哪」（query 是原始 JSON 对象，值还没编码）。
+ * 两个方向不要混用。
+ *
+ * 【⚠️ 语义变化：对象形态的约束从「必须是字面量」放宽为「字面量或本类型变量都行」】
+ * 改动前 `resolveUrl()` 内部是 `to as UTSJSONObject`，而 `UTSJSONObject` 与具名 `type`
+ * 在 UTS 里会生成**两个不同的运行期 class**（产物里分别 `new UTSJSONObject({...})` /
+ * `new XxxRaw({...})`），所以那时只能收字面量，带类型标注的变量会在真机抛
+ * `ClassCastException`（H5 / 单测不复现）。
+ * 现在 `resolveUrl()` 直接按字段读 `to.path` / `to.query`，不再做强转 ——
+ * 字面量与变量都被编译成同一个原生对象，那条崩溃来路就此消失。
+ * 代价：**不能再传裸的 `UTSJSONObject`**（如 `JSON.parseObject()` 的返回值）；
+ * 那会被类型检查挡在**编译期**，而不是拖到真机才崩 —— 这是有意的收紧。
+ */
+export type RouteLocationRaw = {
+  /** 目标页面路径；可以是纯 path，也可以自带 query 串（如 `/a/b?x=1`） */
+  path: string;
+  /** query 参数；省略表示不带参数（值由 serializeQuery 负责编码） */
+  query?: UTSJSONObject;
+};
+
+/**
  * query 参数值的 URL 解码（容错版，路由状态入库前统一走它）
  *
  * 各端交到我们手里的 query 值形态**不一致**，所以这里不能省成「无脑解一次」：
@@ -306,27 +336,31 @@ export function serializeQuery(query: UTSJSONObject | null): string {
  * - 字符串：`'/src/pages/index/index'`、`'subDetail?id=1'`
  * - 对象：`{ path: '/src/pages/detail/detail', query: { id: 1 } }`
  *
- * ⚠️ 对象形态**必须写成对象字面量**：字面量在 UTS 里编译为 `UTSJSONObject`；
- *    若先声明成带 `type` 标注的变量再传，会编译成原生对象（Kotlin data class），
- *    这里 `as UTSJSONObject` 会在真机抛 ClassCastException（H5 / 单测不复现）。
- *    因此本模块**不导出**对象形态的类型别名，避免诱导出那种写法。
+ * ⚠️ 对象形态用的是具名类型 `RouteLocationRaw`（不是 `any`、也不是 `UTSJSONObject`）：
+ *    参数标 `any` 时编辑器给不出任何字段补全，标 `UTSJSONObject` 只会弹它的成员方法；
+ *    只有具名对象类型才补得出 `path` / `query`。字面量与 `RouteLocationRaw` 变量都行 ——
+ *    两者在 UTS 下编译成同一个原生对象，这里按字段直读，不做 `as UTSJSONObject` 强转
+ *    （那个强转正是改动前「必须写字面量、否则真机 ClassCastException」的根源）。
  *
- * @param to 导航目标（字符串 url 或 `{ path, query }` 字面量）
- * @returns 归一化后的 url；空对象或缺 path 时返回空串 ""
+ * @param to 导航目标（字符串 url，或 `{ path, query }` 字面量 / `RouteLocationRaw` 变量）
+ * @returns 归一化后的 url；入参为空或缺 path 时返回空串 ""
  */
-export function resolveUrl(to: any | null): string {
+export function resolveUrl(to: string | RouteLocationRaw | null): string {
   if (to == null) {
     return '';
   }
   if (typeof to == 'string') {
     return to as string;
   }
-  const obj = to as UTSJSONObject;
-  const path = obj.getString('path') ?? '';
+  const target = to as RouteLocationRaw;
+  // 宽化到 `string | null` 再判空：类型上 path 是必填，但 JS / 单测侧可能整块缺字段，
+  // 这里保留「缺 path 返回空串」的兜底（等价于改动前的 `obj.getString('path') ?? ''`）
+  const rawPath: string | null = target.path;
+  const path = rawPath ?? '';
   if (path == '') {
     return '';
   }
-  const queryStr = serializeQuery(obj.getJSON('query'));
+  const queryStr = serializeQuery(target.query ?? null);
   if (queryStr == '') {
     return path;
   }
@@ -418,8 +452,8 @@ export class RouteUtils {
     return queryValueToString(value);
   }
 
-  /** 把导航目标（字符串 url 或 `{ path, query }` 字面量）归一化为 url 字符串 */
-  resolveUrl(to: any | null): string {
+  /** 把导航目标（字符串 url 或 `{ path, query }` 字面量 / `RouteLocationRaw` 变量）归一化为 url 字符串 */
+  resolveUrl(to: string | RouteLocationRaw | null): string {
     return resolveUrl(to);
   }
 }
