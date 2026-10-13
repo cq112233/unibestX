@@ -21,7 +21,8 @@ import {
 import type {
   DownloadResult,
   HttpClientOptions,
-  RespondedOptions
+  RespondedOptions,
+  StreamTask
 } from './internal/client.uts';
 import { getApiBaseUrl, getApiSecondaryUrl, getH5UseProxy } from '@/src/config/index.uts';
 
@@ -321,6 +322,36 @@ export function uploadHttp<T>(url: string, config: LimeRequestConfig | null = nu
  */
 export function downloadHttp(url: string, config: LimeRequestConfig | null = null): Promise<DownloadResult> {
   return http.downloadFile(url, config);
+}
+
+/**
+ * 便捷函数：chunked 流式请求（委托给默认 http 实例），**方法固定为 POST**
+ *
+ * 只复用请求侧的鉴权注入与域名拼接；响应侧不走业务码拆包（流式响应体不是 `{ code, data }`
+ * 包装，硬套会在流收完的那一刻误报），原因详见 `HttpClient.stream` 的注释。
+ * 需要 Observable 形态时用 `@/src/http/stream/stream.uts` 的 `requestStream`。
+ *
+ * @param url 请求地址：支持完整 `http(s)://` 地址，相对路径会与配置里的 baseURL 拼接
+ * @param body 请求体（字符串，通常是 JSON.stringify 的结果）
+ * @param onChunk 每收到一个原始字节块回调一次（ArrayBuffer）
+ * @param onEnd 流收尾回调：null = 正常结束，非 null = 失败文案
+ * @param config 覆盖项（header / timeout / extra.ignoreAuth / extra.requestKey 等），传 null 走默认配置
+ */
+export function streamHttp(
+  url: string,
+  body: string,
+  onChunk: (data: ArrayBuffer) => void,
+  onEnd: (errMsg: string | null) => void,
+  config: LimeRequestConfig | null = null
+): StreamTask {
+  const _config = (config ?? {}) as LimeRequestConfig;
+  _config.url = url;
+  _config.data = body;
+  _config.method = 'POST';
+  _config.enableChunked = true;
+  _config.responseType = 'arraybuffer';
+  _config.dataType = 'text';
+  return http.stream(_config, onChunk, onEnd);
 }
 
 export default http;
