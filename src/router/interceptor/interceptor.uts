@@ -1,7 +1,7 @@
 import { isPageTabbar, switchTabbar } from '@/src/tabbar/index.uts';
 import { runRouterGuard } from '../guard/index.uts';
 import type { RouteTarget } from '../guard/types.uts';
-import { applyRouteFromUrl, installRouteStateListener, syncRouteState } from '../hooks/route-state.uts';
+import { applyTargetRouteFromUrl, installRouteStateListener, syncRouteState } from '../hooks/route-state.uts';
 import { getQueryString, parseUrlToObj } from '../utils/utils.uts';
 
 /**
@@ -45,6 +45,9 @@ function syncRouteStateDeferred(): void {
  *
  * ⚠️ 只在**确实放行**时写：被业务守卫拦下并改跳时，路由状态交给**那次改跳**自己写 ——
  *    写这里反而是错的（这里写的是用户其实没去成的页面）。
+ * ⚠️ 用 applyTargetRouteFromUrl（**请求预写**）而不是 applyRouteFromUrl：此刻上一页还在屏幕上，
+ *    预写只喂「还没认领路径」的快照，已认领的一律不动 —— 上一页不会在下一页进入期间提前变
+ *    （同页带参重进尤其明显）。路由状态那侧的口径见 ../hooks/route-state.uts。
  * ⚠️ `plugin://` / `http(s)://` 不是本应用页面，不进路由状态。
  */
 function markTargetRoute(url: string): void {
@@ -55,7 +58,7 @@ function markTargetRoute(url: string): void {
   if (resolved.startsWith('plugin://') || resolved.startsWith('http://') || resolved.startsWith('https://')) {
     return;
   }
-  applyRouteFromUrl(resolved);
+  applyTargetRouteFromUrl(resolved);
 }
 
 /**
