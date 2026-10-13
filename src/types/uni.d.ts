@@ -137,6 +137,12 @@ declare global {
      * 导航栏左侧是否显示返回箭头（配合 navbar 布局使用，默认 true）
      */
     showBack?: boolean;
+
+    /**
+     *  是否隐藏顶状态栏（配合 navbar 布局使用，默认 false）
+     */
+    hideStatusBar?: boolean;
+
     /**
      * 是否隐藏顶部导航栏（配合 navbar 布局使用，默认 false）
      */

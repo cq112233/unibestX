@@ -10,17 +10,18 @@
 </template>
 
 <script setup lang="uts">
-/* eslint-disable dot-notation */
 import { ref } from 'vue';
 
 definePage({
   debug: false,
   layout: 'navbar',
   showBack: true,
-  hideNavbar: false,
   enablePullDownRefresh: false,
+  hideNavbar: false,
+  hideStatusBar: false,
   style: {
-    navigationBarTitleText: '浏览网页'
+    navigationBarTitleText: '浏览网页',
+    navigationStyle: 'custom'
   }
 });
 
@@ -29,12 +30,12 @@ const targetUrl = ref<string>(defaultUrl);
 
 onLoad((options: UTSJSONObject | null) => {
   if (options != null) {
-    const raw = options['url'] as string | null;
+    const raw = options.url as string | null;
     if (raw != null && raw != '') {
       const decoded = decodeURIComponent(raw);
       targetUrl.value = decoded != null ? decoded : raw;
     }
-    const pageTitle = options['title'] as string | null;
+    const pageTitle = options.title as string | null;
     if (pageTitle != null && pageTitle != '') {
       uni.setNavigationBarTitle({
         title: pageTitle
@@ -48,12 +49,12 @@ function onWebviewMessage(event: UniWebViewMessageEvent): void {
   const data = detail.data;
   if (data != null && data.length > 0) {
     const lastItem = data[data.length - 1] as UTSJSONObject;
-    const msgType = lastItem['type'] as string | null;
+    const msgType = lastItem.type as string | null;
     if (msgType === 'NAVIGATE_BACK') {
       uni.navigateBack();
       return;
     }
-    const title = (lastItem['title'] as string | null) ?? (lastItem['content'] as string | null) ?? '收到网页消息';
+    const title = (lastItem.title as string | null) ?? (lastItem.content as string | null) ?? '收到网页消息';
     uni.showToast({
       title,
       icon: 'none'

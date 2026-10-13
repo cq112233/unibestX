@@ -8,6 +8,8 @@
       最好用的 uni-appX 开发模板
     </text>
 
+    {{ route }}
+
     <!-- 运行环境状态卡片 -->
     <view
       class="mx-[16px] mt-[14px] px-[6px] py-[10px] rounded-[12px] border-[1px] border-solid border-[#e2e8f0] bg-[#ffffff] flex flex-row items-center justify-between"
@@ -212,6 +214,9 @@ import { systemInfo as systemInfoRef } from '@/src/utils/systemInfo/index.uts';
 import type { SystemInfoType } from '@/src/utils/systemInfo/index.uts';
 import { curIdx, onTabPageShow, onTabShow, resolveTabIndexByKey } from '@/src/tabbar/index.uts';
 import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/layouts/navbar/utils/index.uts';
+import { useRoute } from '@/src/router/index.uts';
+
+const route = useRoute();
 
 type FeatureItem = {
   id: string;
