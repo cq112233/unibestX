@@ -149,6 +149,47 @@ describe('useRoute Unit Tests', () => {
     expect(route.fullPath).toBe('/src/sub/routerBasicDemo/routerBasicDemo?id=2001&from=self');
   });
 
+  it('页面栈 options 里的 URL 编码值会被解码（微信小程序的原生口径就是编码态）', async () => {
+    const { useRoute, syncRouteState } = await loadRouteState();
+    const route = useRoute();
+
+    // 小程序上 page.options 就是 onLoad(query) 的原始对象，微信不做解码：
+    // 中文成了 %E5%AF%B9%E8%B1%A1%E5%8F%82%E6%95%B0
+    setPageStack('src/sub/routerParamsBasicDemo/routerParamsBasicDemo', {
+      id: '1002',
+      name: '%E5%AF%B9%E8%B1%A1%E5%8F%82%E6%95%B0',
+      from: 'push-object'
+    });
+    syncRouteState();
+
+    expect(route.query.get('name')).toBe('对象参数');
+    expect(route.query.get('from')).toBe('push-object');
+    // fullPath 重新编码回原始形态
+    expect(route.fullPath).toBe('/src/sub/routerParamsBasicDemo/routerParamsBasicDemo?id=1002&name=%E5%AF%B9%E8%B1%A1%E5%8F%82%E6%95%B0&from=push-object');
+  });
+
+  it('已是解码态的值不会被二次解码（App / H5 的 options 与 onAppRoute 事件）', async () => {
+    const { useRoute } = await loadRouteState();
+    const route = useRoute();
+
+    lastAppRouteListener()(utsObject({
+      path: 'src/sub/routerParamsBasicDemo/routerParamsBasicDemo',
+      query: utsObject({ name: '对象参数', from: 'push-object' }),
+      openType: 'navigateTo'
+    }));
+
+    expect(route.query.get('name')).toBe('对象参数');
+  });
+
+  it('字面量 % 的参数不被解码抹掉（decodeURIComponent 抛 URIError 时保留原文）', async () => {
+    const { applyRouteFromUrl, routeState } = await loadRouteState();
+
+    applyRouteFromUrl('/src/pages/me/me?rate=100%25&raw=100%');
+
+    expect(routeState.query.get('rate')).toBe('100%');
+    expect(routeState.query.get('raw')).toBe('100%');
+  });
+
   it('状态非空时 useRoute 不再回读页面栈：栈顶还停在上一页也不会把目标路由覆盖回去', async () => {
     const { useRoute, applyRouteFromUrl } = await loadRouteState();
     const route = useRoute();
