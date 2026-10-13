@@ -2,7 +2,7 @@
 
 > **本文件是 `unibestX-skill` 的参考分册**，由 [SKILL.md](../SKILL.md) 按需引用，收录本部分全部铁律的完整正反例与实测结论。
 >
-> **何时读本文件**：定义对象结构与类型标注、写 `export` / `class` / 闭包 / 定时器回调 / 集合遍历，或遇到 `UTS110111163`、`UTS110111119`、`UTS110111120`、`error1`、`error17`、`error18`、`NoSuchMethodError`、`ClassCastException` 等编译与运行时报错时。
+> **何时读本文件**：定义对象结构与类型标注、写 `export` / `class` / 闭包 / 定时器回调 / 集合遍历，或遇到 `UTS110111163`、`UTS110111119`、`UTS110111120`、`error1`、`error17`、`error18`、`NoSuchMethodError`、`ClassCastException`、VSCode 里的 `TS2322` / `TS2352` 等编译、运行期与编辑器诊断报错时。
 
 ## 1.1 一律禁止使用 `interface`，全面统一使用 `type`
 
@@ -924,5 +924,70 @@ export * from './vdom/user.uts';
 
 - **验证方式（本项目实测有效）**：
   单测走的是 esbuild 转译，**不会**复现 UTS 这一层编译行为，因此这类问题单测全绿也照样存在。必须落到产物上：重新编译目标平台后 `grep` 产物，确认「坏引用」已消失、只剩 `new PageResult({...})`（判定方法见 3.15）。
+
+---
+
+## 1.26 定时器句柄报 `TS2322 不能将类型"Timeout"分配给类型"number"` —— **这不是 UTS 编译错误**，是 VSCode / Volar 类型检查；调用点必须就地双层强转 `(setInterval(...) as any) as number`
+
+- **报错现象**（本项目实测，`src/http/hooks/useRequest.uts` 轮询与防抖两处；编辑器内红线画在**被赋值的那个变量**上，而不是 `setInterval` 上）：
+
+  ```text
+  pollingTimer = setInterval((): void => {
+  ~~~~~~~~~~~~ 不能将类型"Timeout"分配给类型"number"。
+    triggerPoll();
+  }, optPolling);
+  ```
+
+- **先分清是谁在报错（本条最关键的一点）**：这是 **TS / Volar（`ts-plugin`）诊断**，**不是 UTS 编译器报错**。
+  - UTS 侧 `setTimeout` / `setInterval` 返回的**确实是 `number`**（HBuilderX `uts-types/common/timers.d.ts`，`clearTimeout(id: number | undefined)` 同理）—— 所以 **UTS 编译、真机运行都毫无问题**；
+  - `pnpm typecheck`（`tsc --noEmit`）**也不会报** —— 它压根不加载 `.uts` 文件（`tsc` 的 `include` 只吃到 11 个 `src` 文件，`.uts` 一个都不在列）。
+  - 因此：**别因为编辑器一片红就以为代码要炸，也别因为 `typecheck` 全绿就以为编辑器不会红**，两者都不是判据。判据只有一个 —— **VSCode 的 `ts-plugin` 诊断清空**。
+
+- **成因**：`tsconfig.json` 的 `types: ["@dcloudio/types"]` 白名单**挡不住** @types/node —— 只要程序里**有一个被 `include` 的文件**显式 import 了 Node 内置模块（本项目就是 `vite.config.ts`），@types/node 的**全局** `setTimeout` / `setInterval` 声明就整包进程序，其返回类型 `NodeJS.Timeout` 与 UTS 真源的 `number` 直接冲突。
+
+- **触发条件（极易漏判）**：**必须存在显式的 `: number` 标注**才会报。
+  - `const timer = setTimeout(...)`（完全交给推断）**不报** —— 项目里 `src/sub/fontBasicDemo/fontBasicDemo.uvue:612`、`:730` 就是这么写的；
+  - 一旦按 **1.13** 写成 `let timerId: number = 0;` 再 `timerId = setTimeout(...)`，**就必报**。
+  - 结论：**1.13 与 1.26 会同时命中同一个定时器变量** —— 1.13 逼你「先声明后赋值」，先声明就得写类型标注，写了 `number` 标注就撞上本条。两条必须一起处理才干净。
+
+- **强制规范**：**调用点就地双层强转**，只影响类型、不影响产物：
+
+  ```uts
+  // ❌ 错误：显式 number 标注 + 直接赋值 → TS2322 不能将类型"Timeout"分配给类型"number"
+  pollingTimer = setInterval((): void => {
+    triggerPoll();
+  }, optPolling);
+
+  // ❌ 错误：单层强转也不行 → TS2352 Conversion of type 'Timeout' to type 'number' may be a mistake
+  //    because neither type sufficiently overlaps with the other
+  pollingTimer = setInterval((): void => { triggerPoll(); }, optPolling) as number;
+
+  // ✅ 正确：`(…) as any` 再 `as number`
+  pollingTimer = (setInterval((): void => {
+    triggerPoll();
+  }, optPolling) as any) as number;
+  ```
+
+- **别走这条弯路（已实测无效）**：在 `src/types/*.d.ts` 里补一条全局 `function setTimeout(...): number` 声明**压不住** —— 全局重载合并后 TS 取**先声明**的那支，@types/node 那支始终排在项目声明之前，仍然报 TS2322。
+
+- **项目内先例（改之前先照抄，严禁发明新写法）**：
+
+  | 位置 | 说明 |
+  | :--- | :--- |
+  | `src/http/stream/stream.uts:272` | 注释写得最全；同处还命中 1.13（回调里 `clearInterval(timerId)` 引用自身） |
+  | `src/http/hooks/useRequest.uts:391` / `:465` | 防抖 `debounceTimer` / 轮询 `pollingTimer` |
+  | `src/utils/rxjs-lite/index.uts:569` | RxJS lite 的 delayer 句柄 |
+  | `src/components/NestedScroll/NestedScroll.uvue:383` | 下拉刷新超时句柄 |
+  | `src/sub/timeFunctionDemo/timeFunctionDemo.uvue:153` | 官方 API 演示页 |
+
+- **排查手法**（一条命令扫全仓，防复发）。注意**不能用 `grep -A`**：双层强转是多行语句，`as any) as number` 落在三行之后，`grep -v` 是逐行过滤、根本滤不掉，会把所有**正确**写法都当成漏网报出来。必须按**括号配对**把整条赋值语句切出来再看：
+
+  ```bash
+  perl -ne 'if (/^\s*\w+\s*=\s*\(?set(?:Timeout|Interval)\(/) { $b=$_; $d=()=$b=~/\(/g; $d-=()=$b=~/\)/g; while ($d>0 && defined($l=<ARGV>)) { $b.=$l; $d+=()=$l=~/\(/g; $d-=()=$l=~/\)/g; } print "$ARGV: $b\n" unless $b=~/as any\) as number/ }' $(git ls-files 'src/**/*.uts' 'src/**/*.uvue')
+  ```
+
+  命中即为漏网。**2026-10-13 全仓实扫结果：0 命中**（`const timer = setTimeout(...)` 这类无类型标注的写法不在此列，它本来就不报错）。
+
+- **验证方式**：改完必须落到 **VSCode 的 `ts-plugin` 诊断**上确认已清空 —— `pnpm typecheck` 扫不到 `.uts`（全绿不代表修好），UTS 编译也从来不会因为这个报错（编译成功不代表编辑器不红）。
 
 ---
