@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import process from 'node:process';
 import JSON5 from 'json5';
+import { writeRouteMetaFile } from './uni-pages-route-meta';
 
 // ==========================================
 // 类型定义
@@ -1056,6 +1057,8 @@ function generatePagesJson(
 
   // 7. 写入 pages.json
   const jsonStr = `${JSON.stringify(output, null, 2)}\n`;
+  // 同步路由元信息表（useRoute().meta / .name 的数据源，见 plugins/uni-pages-route-meta.ts）
+  writeRouteMetaFile(output, projectRoot);
   let existing = '';
   if (fs.existsSync(outPath)) {
     existing = fs.readFileSync(outPath, 'utf-8');

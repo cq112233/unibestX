@@ -143,6 +143,36 @@ export function getCurrentRoute(): string {
 }
 
 /**
+ * 获取当前栈顶页面的路由参数对象（UniPage.options，即进入该页时带的 query）
+ *
+ * 为什么需要它：`uni.onAppRoute` 在**目标页 onShow 之后**才触发，且 App 端页面栈本身有滞后，
+ * 冷启动 / 返回 / 页面重新显示这些「稳定时机」需要一个不依赖事件的当前页参数来源。
+ * `options` 与 `route` 同属官方 UniPage 属性，平台支持：
+ * Android unixVer 4.31 / iOS 4.31 / Web 4.31 / 微信小程序 √。
+ *
+ * @returns 栈顶页面的参数对象；页面栈为空、平台未实现或参数为空时返回 null
+ */
+export function getCurrentPageOptions(): UTSJSONObject | null {
+  try {
+    const pages = getCurrentPages();
+    if (pages.length > 0) {
+      const page = pages[pages.length - 1];
+      // `?? null` 不能省：声明侧 options 是可选属性（真源在部分平台未实现），
+      // 直接赋值会因 `undefined` 报 TS2322（同 getCurrentRoute 的 `route ?? ''`）
+      const options: UTSJSONObject | null = page.options ?? null;
+      if (options == null) {
+        return null;
+      }
+      return options;
+    }
+  }
+  catch {
+    // ignore
+  }
+  return null;
+}
+
+/**
  * 获取当前栈顶页面的规范化路径（统一带前导 "/"，且去除 URL 参数）
  * 例如："/pages/index/index"
  * @returns 规范化路径字符串，未获取到时返回空字符串 ""
@@ -181,6 +211,97 @@ export function getPageStackLength(): number {
   catch {
     return 0;
   }
+}
+
+/**
+ * query 值的字符串化：string / number / boolean 直转，数组用 `,` 连接，其余走 JSON
+ *
+ * @param value 任意 query 值
+ * @returns 字符串形态；对象序列化失败时返回空串
+ */
+export function queryValueToString(value: any): string {
+  if (Array.isArray(value)) {
+    const arr = value as Array<any>;
+    const items: Array<string> = [];
+    for (let i = 0; i < arr.length; i++) {
+      items.push(queryValueToString(arr[i]));
+    }
+    return items.join(',');
+  }
+  const valueType = typeof value;
+  if (valueType == 'string') {
+    return value as string;
+  }
+  if (valueType == 'number') {
+    return `${value as number}`;
+  }
+  if (valueType == 'boolean') {
+    return (value as boolean) ? 'true' : 'false';
+  }
+  if (valueType == 'object') {
+    return JSON.stringify(value) ?? '';
+  }
+  return '';
+}
+
+/**
+ * 把 `{ key: value }` 形态的 query 对象序列化为 query 串（值做 URL 编码）
+ *
+ * ⚠️ 键遍历必须用 `UTSJSONObject.keys()` + `getAny()`：写成
+ *    `query.toMap().forEach((value: any, key: string) => {})` 会因给 any 值参数
+ *    显式标注类型而在 Kotlin 端报 error17（详见分册 1.14）。
+ *
+ * @param query query 对象，值为 null 的键按「忽略」处理
+ * @returns 形如 `id=1&tab=home` 的 query 串，无有效键时返回空串
+ */
+export function serializeQuery(query: UTSJSONObject | null): string {
+  if (query == null) {
+    return '';
+  }
+  const parts: Array<string> = [];
+  const keys = UTSJSONObject.keys(query);
+  for (let i = 0; i < keys.length; i++) {
+    const key = keys[i];
+    const value = query.getAny(key);
+    if (value == null) {
+      continue;
+    }
+    parts.push(`${key}=${encodeURIComponent(queryValueToString(value))}`);
+  }
+  return parts.join('&');
+}
+
+/**
+ * 把导航目标归一化为 uni 导航 API 可直接使用的 url 字符串
+ * 支持两种形态（与 vue-router 的 router.push 一致）：
+ * - 字符串：`'/src/pages/index/index'`、`'subDetail?id=1'`
+ * - 对象：`{ path: '/src/pages/detail/detail', query: { id: 1 } }`
+ *
+ * ⚠️ 对象形态**必须写成对象字面量**：字面量在 UTS 里编译为 `UTSJSONObject`；
+ *    若先声明成带 `type` 标注的变量再传，会编译成原生对象（Kotlin data class），
+ *    这里 `as UTSJSONObject` 会在真机抛 ClassCastException（H5 / 单测不复现）。
+ *    因此本模块**不导出**对象形态的类型别名，避免诱导出那种写法。
+ *
+ * @param to 导航目标（字符串 url 或 `{ path, query }` 字面量）
+ * @returns 归一化后的 url；空对象或缺 path 时返回空串 ""
+ */
+export function resolveUrl(to: any | null): string {
+  if (to == null) {
+    return '';
+  }
+  if (typeof to == 'string') {
+    return to as string;
+  }
+  const obj = to as UTSJSONObject;
+  const path = obj.getString('path') ?? '';
+  if (path == '') {
+    return '';
+  }
+  const queryStr = serializeQuery(obj.getJSON('query'));
+  if (queryStr == '') {
+    return path;
+  }
+  return `${path}?${queryStr}`;
 }
 
 // ==========================================
@@ -228,6 +349,11 @@ export class RouteUtils {
     return getCurrentRoute();
   }
 
+  /** 获取当前栈顶页面的路由参数对象（UniPage.options） */
+  getCurrentPageOptions(): UTSJSONObject | null {
+    return getCurrentPageOptions();
+  }
+
   /** 获取当前页面栈层数 */
   getPageStackLength(): number {
     return getPageStackLength();
@@ -246,6 +372,21 @@ export class RouteUtils {
   /** 去除路径的前导斜杠 "/" */
   removeLeadingSlash(path: string): string {
     return removeLeadingSlash(path);
+  }
+
+  /** 把 `{ path, query }` 对象序列化为 query 串（值做 URL 编码） */
+  serializeQuery(query: UTSJSONObject | null): string {
+    return serializeQuery(query);
+  }
+
+  /** query 值的字符串化（string / number / boolean / 数组 / 对象 通用） */
+  queryValueToString(value: any): string {
+    return queryValueToString(value);
+  }
+
+  /** 把导航目标（字符串 url 或 `{ path, query }` 字面量）归一化为 url 字符串 */
+  resolveUrl(to: any | null): string {
+    return resolveUrl(to);
   }
 }
 
