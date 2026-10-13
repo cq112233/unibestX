@@ -171,6 +171,16 @@ describe('http status code survives the interceptor chain', () => {
     expect(failure.cause.statusCode).toBe(500);
   });
 
+  it('should treat the whole 2xx range as success', async () => {
+    // ⚠️ 曾经写成 `statusCode != 200`：201 Created（新增成功）、204 No Content（删除成功）
+    //    都会被判失败并弹「连接出错(201)!」，只有 200 能过
+    expect(await driveResponseInterceptor(200)).toBeNull();
+    expect(await driveResponseInterceptor(201)).toBeNull();
+    expect(await driveResponseInterceptor(204)).toBeNull();
+    // 非 2xx 仍然要失败
+    expect(await driveResponseInterceptor(304)).not.toBeNull();
+  });
+
   it('should normalize a 408 http failure into the timeout copy', async () => {
     const failure = await driveResponseInterceptor(408);
     const showToast = (globalThis as any).uni.showToast;

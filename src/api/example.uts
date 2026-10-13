@@ -1,24 +1,33 @@
 // ==========================================
-// 接口层写法参照（非页面接口层，不对应任何页面）
+// 接口层写法参照（同时是 httpBasicDemo 演示页的接口层）
 //
-// 本文件不对应具体页面，因此不受分册 7 的「一页一目录」落位约束；
-// 它的用途是演示 api 层的标准写法：契约类型 / mock 数据集 / 接口函数三块，
-// 以及 http.get / http.upload / http.download 的正确调用方式，供新增页面时照抄。
+// 本文件演示 api 层的标准写法：契约类型 / 接口函数两块，以及
+// http.get / http.post / http.put / http.delete / http.upload / http.download
+// 的正确调用方式，供新增页面时照抄。
 //
-// 新增真实页面请一律建 src/api/<页面目录名>/<页面目录名>.uts，不要改本文件。
+// ⚠️ 它被演示页 src/sub/httpBasicDemo/httpBasicDemo.uvue 直接引用，是「一页一目录」的**唯一例外**：
+//    那个页面只是演示 http 用法的靶子，刻意不为它单独建 src/api/httpBasicDemo/。
+//    新增真实页面请一律建 src/api/<页面目录名>/<页面目录名>.uts，不要改本文件。
+//
+// CRUD 五函数打的是一个**公网真实 REST 服务**（dummyjson 的 /posts 资源，地址就写死在下面的
+// `FOO_BASE_URL` 常量里），演示页开箱即有数据、五个动词都能打通：
+//   GET    /posts?limit=&skip=           列表（回包带 total）
+//   GET    /posts/search?q=&limit=&skip= 按关键字搜索（同样带 total）
+//   GET    /posts/:id                    详情
+//   POST   /posts/add                    新增
+//   PUT    /posts/:id                    更新
+//   DELETE /posts/:id                    删除
+//
+// ⚠️ 这是**纯演示用的公网假数据服务**，与项目自身后端无关，故地址**故意硬编码在本文件**
+//    （不写进 .env，也不是环境变量）：真实业务接口的域名一律走 `@/src/config/env`，
+//    而这里只是个开箱即用的演示靶子。写操作只回模拟结果、**不会真正落库**，所以增删改后
+//    列表不会变化（演示页已如实标注）。要换靶子，改下面那一行常量即可 —— 其余一个字不用动。
 // ==========================================
 
 import { getOssUploadPath } from '@/src/config/index.uts';
 import { API_DOMAINS, http } from '@/src/http/index.uts';
 import type { DownloadResult } from '@/src/http/index.uts';
 import type { LimeRequestConfig, LimeRequestTask } from '@/uni_modules/lime-request';
-
-export const FOO_UPLOAD_PATH: string = getOssUploadPath();
-
-/**
- * 下载演示用的示例资源地址（公开可访问的图片，供下载 Demo 直接使用）
- */
-export const FOO_DOWNLOAD_URL: string = 'https://web-assets.dcloud.net.cn/unidoc/zh/unicloudlogo.png';
 
 // ==========================================
 // 1. 类型定义（遵循规范：一律使用 type，严禁 interface）
@@ -37,105 +46,228 @@ export type PageResult<T> = {
 };
 
 // ==========================================
-// 2. 本地模拟数据集（模块内私有闭环）
-// ==========================================
-
-const MOCK_FOO_LIST: Array<FooItem> = [
-  { id: 1, name: 'unix', desc: 'uni-app X 核心架构' },
-  { id: 2, name: 'UnibestX', desc: '最好用的 uni-app X 跨端开发模板' },
-  { id: 3, name: 'lime-request', desc: '高性能轻量级网络请求库' },
-  { id: 4, name: 'weapp-tailwindcss', desc: '全平台原子化样式解决方案' },
-  { id: 5, name: 'vitest', desc: '极速轻量单元测试框架' }
-];
-
-// ==========================================
-// 3. API 接口函数
-// 遵循规范：开发期返回本地 Mock，后端就绪只换函数体，签名冻结
+// 2. 内部工具（模块内私有，不对外导出）
 // ==========================================
 
 /**
- * 分页查询 Foo 列表（支持关键字筛选与分页）
- * 分页三件套按规范顺序 (pageNo, pageSize, keyword)，默认值齐全、后端就绪不改签名
- * @param pageNo 当前页码（默认 1）
- * @param pageSize 分页大小（默认 10）
- * @param keyword 搜索关键字（默认空字符串）
+ * 演示 API 的根地址：dummyjson 这个公开假数据服务，**故意写死在这里**。
+ *
+ * 它跟项目自身后端无关，只是给演示页一个开箱即用的靶子，所以不进 `.env`、不走
+ * `@/src/config/env`（真实业务域名才必须走环境变量）。各处请求用 `config.baseURL`
+ * 单次覆盖它，不动全局 `DEFAULT_HTTP_OPTIONS`，因此换靶子只需改这一行。
+ */
+const FOO_BASE_URL: string = 'https://dummyjson.com';
+
+/**
+ * 把 http 回包规范化成**带访问方法**的 `UTSJSONObject`
+ *
+ * ⚠️ 为什么必须做这一步（只在 H5 端翻车的坑）：
+ *    request 拦截器解包时，若回包**没有 `{ code, data }` 外壳**（dummyjson 这种裸 REST
+ *    就是），它会原样返回浏览器自己 JSON.parse 出来的**普通 JS 对象** —— 那个对象上
+ *    **没有** `getArray` / `getNumber` / `getString`，直接调用会抛
+ *    `data.getArray is not a function`（列表渲染不出来、卡片只留一行错误）。
+ *    App / 小程序端回包本就是 `UTSJSONObject`，不受影响，所以这个坑只在 Web 端复现。
+ *    再走一次 `JSON.parseObject` 就能拿回带方法的对象（H5 实现会**深度包装**内层对象与数组），
+ *    三端行为从此一致。
+ *
+ * @param raw http 回包数据（可能是 UTSJSONObject，也可能是 H5 的普通对象）
+ */
+function toJsonObject(raw: UTSJSONObject): UTSJSONObject {
+  // 已经带方法（App / 小程序，或 H5 里带了 `{ code, data }` 外壳的接口）就直接用，省一次序列化
+  if (raw instanceof UTSJSONObject) {
+    return raw;
+  }
+  const parsed = JSON.parseObject(JSON.stringify(raw));
+  return parsed != null ? parsed : raw;
+}
+
+/**
+ * 把后端返回的弱类型对象就地映射成强类型 `FooItem`
+ *
+ * 字段映射：接口的 `title` → 页面的 `name`，接口的 `body` → 页面的 `desc`。
+ *
+ * 分册 7.2 铁律：**`UTSJSONObject` 严禁出 api 层** —— 弱类型必须在这里用
+ * `getNumber` / `getString` + `??` 兜底转成强类型 DTO 再 return，否则页面模板里
+ * 必然踩 `UTS110111163` / `error17` / 运行期 `ClassCastException`。
+ *
+ * @param raw 解包后的业务数据（http 拦截器已剥掉 `{ code, data }` 外壳）
+ */
+function toFooItem(raw: UTSJSONObject): FooItem {
+  const obj = toJsonObject(raw);
+  // ⚠️ `??` 兜底不可省：getNumber / getString 返回的是可空类型（`Number?` / `String?`），
+  //    直接赋给 FooItem 的非空字段会被 Kotlin 编译拒绝（error17 参数类型不匹配）。
+  return {
+    id: obj.getNumber('id') ?? 0,
+    name: obj.getString('title') ?? '',
+    desc: obj.getString('body') ?? ''
+  } as FooItem;
+}
+
+// ==========================================
+// 3. API 接口函数（真实接口）
+//
+// ⚠️ 五个 CRUD 都带 `extra.ignoreAuth: true`：本文件的演示接口公开、未登录也能跑通演示页。
+//    真实业务接口**请去掉这一项**，让 request.uts 的默认前置钩子自动注入 token
+//    （缺 token 时它会抛「未登录」中断请求，这正是业务接口想要的）。
+// ==========================================
+
+/**
+ * 分页查询 Foo 列表（`GET /posts`；带关键字时走 `GET /posts/search`）
+ *
+ * 分页三件套按规范顺序 (pageNo, pageSize, keyword)，默认值齐全；函数签名与入参顺序冻结，
+ * 换后端 / 换 mock 都不改这一个字。
+ *
+ * @param pageNo 当前页码（默认 1），换算成接口的 `skip = (pageNo - 1) * pageSize`
+ * @param pageSize 分页大小（默认 10），对应查询参数 `limit`
+ * @param keyword 搜索关键字（默认空字符串）。空串走列表接口，非空走搜索接口的 `q` 参数
  */
 export function fetchFooList(pageNo: number = 1, pageSize: number = 10, keyword: string = ''): Promise<PageResult<FooItem>> {
-  let filtered = MOCK_FOO_LIST;
-  if (keyword.length > 0) {
-    filtered = MOCK_FOO_LIST.filter((item: FooItem): boolean => {
-      return item.name.toLowerCase().includes(keyword.toLowerCase());
-    });
+  // 接口分页是「偏移量」而不是页码，这里就地换算，对外契约仍是 pageNo
+  const skip = (pageNo - 1) * pageSize;
+  const isSearch = keyword != '';
+  const path = isSearch ? '/posts/search' : '/posts';
+  // ⚠️ 这里刻意用两个对象字面量、而不是 `params.set('q', keyword)`：
+  //    对象字面量强转 `as UTSJSONObject` 只发生在**真编译**里，本仓单测跑在纯 JS 环境
+  //    （vitest + esbuild），那边它就是个普通对象、没有 `set` 方法，会直接报
+  //    `params.set is not a function`。
+  let params = {
+    limit: pageSize,
+    skip
+  } as UTSJSONObject;
+  if (isSearch) {
+    params = {
+      limit: pageSize,
+      skip,
+      q: keyword
+    } as UTSJSONObject;
   }
 
-  const offset = (pageNo - 1) * pageSize;
-  const list = offset < filtered.length
-    ? filtered.slice(offset, offset + pageSize)
-    : [] as Array<FooItem>;
+  return http.get<UTSJSONObject>(path, {
+    params,
+    baseURL: FOO_BASE_URL,
+    extra: {
+      ignoreAuth: true
+    } as UTSJSONObject
+  } as LimeRequestConfig).then((data: UTSJSONObject): PageResult<FooItem> => {
+    // 裸 REST 回包在 H5 是普通对象，先规范化成带 getArray / getNumber 的 UTSJSONObject（见 toJsonObject）
+    const obj = toJsonObject(data);
+    // ⚠️ `getArray<T>(key, 默认值)` 的泛型实参必须显式写全：UTS **不从默认值反推元素类型**，
+    //    省略后 Kotlin 侧推断成 `UTSArray<*>`（预期 `UTSArray<UTSJSONObject>`）直接拒绝编译。
+    //    代价是 TS 侧 UTSJSONObject 只有纯索引签名声明（见 src/types/uni.d.ts），`getArray` 解析为 any、
+    //    传类型实参报 TS2347 —— 故用 @ts-expect-error 抑制；UTS 真编译不受影响。
+    // @ts-expect-error UTS 编译要求显式泛型实参；TS 侧 getArray 为 any 会报 TS2347
+    const rawList = obj.getArray<UTSJSONObject>('posts', [] as Array<UTSJSONObject>);
+    const list = rawList.map((item: UTSJSONObject): FooItem => toFooItem(item));
+    // 回包缺 total 时退回本页条数，避免算成 0 导致列表提前判定「没有更多」
+    const total = obj.getNumber('total') ?? list.length;
 
-  // ⚠️ 断言必须直接写泛型本体、实参写全 `PageResult<FooItem>`，严禁改用泛型实例化别名：
-  // 若定义 `type FooPageResult = PageResult<FooItem>` 后写 `as FooPageResult`，UTS 会把该断言
-  // 编译成构造调用 `new FooPageResult({...})`，而产物里只生成了 `class PageResult`
-  // （别名只是编译期 type、没有运行期绑定）⇒ 小程序 / App 端抛 `ReferenceError: FooPageResult is not defined`。
-  // 口诀：`as` / `new` 后面不许出现泛型实例化别名，类型位置（返回值标注 / 回调参数标注）才可以用别名。
-  return Promise.resolve({
-    list,
-    hasMore: offset + pageSize < filtered.length,
-    total: filtered.length
-  } as PageResult<FooItem>);
+    // ⚠️ 断言必须直接写泛型本体、实参写全 `PageResult<FooItem>`，严禁改用泛型实例化别名：
+    // 若定义 `type FooPageResult = PageResult<FooItem>` 后写 `as FooPageResult`，UTS 会把该断言
+    // 编译成构造调用 `new FooPageResult({...})`，而产物里只生成了 `class PageResult`
+    // （别名只是编译期 type、没有运行期绑定）⇒ 小程序 / App 端抛 `ReferenceError: FooPageResult is not defined`。
+    // 口诀：`as` / `new` 后面不许出现泛型实例化别名，类型位置（返回值标注 / 回调参数标注）才可以用别名。
+    return {
+      list,
+      hasMore: skip + list.length < total,
+      total
+    } as PageResult<FooItem>;
+  });
 }
 
 /**
- * 根据 ID 查询单条 Foo 详情
- * @param id Foo 的主键；**查不到时 resolve 为 null 而非 reject**，调用方必须自行判空
+ * 根据 ID 查询单条 Foo 详情（`GET /posts/:id`）
+ * @param id Foo 的主键
+ * @returns 后端回包解包后为空时 resolve 为 `null`（**调用方必须自行判空**）；
+ *          HTTP 4xx/5xx 与业务码非 0 仍由 http 拦截器统一 toast 并 reject，不会走到 null 分支
  */
 export function fetchFooById(id: number): Promise<FooItem | null> {
-  const found = MOCK_FOO_LIST.find((item: FooItem): boolean => item.id == id);
-  return Promise.resolve(found != null ? found : null);
+  return http.get<UTSJSONObject>(`/posts/${id}`, {
+    baseURL: FOO_BASE_URL,
+    extra: {
+      ignoreAuth: true
+    } as UTSJSONObject
+  } as LimeRequestConfig).then((data: UTSJSONObject): FooItem | null => {
+    if (data == null) {
+      return null;
+    }
+    return toFooItem(data);
+  });
 }
 
 /**
- * 新增 Foo
- * @param data 待新增的 Foo；`id <= 0` 时由本地用 `Date.now()` 兜底生成，大于 0 则沿用传入值
+ * 新增 Foo（`POST /posts/add`）
+ * @param data 待新增的 Foo；页面字段按接口契约映射成请求体 `{ title, body, userId }`
+ * @returns 接口回包里的新记录（**新记录的 id 由后端生成**，以回包里的值为准）
  */
 export function createFoo(data: FooItem): Promise<FooItem> {
-  const newItem: FooItem = {
-    id: data.id > 0 ? data.id : Date.now(),
-    name: data.name,
-    desc: data.desc
-  };
-  MOCK_FOO_LIST.unshift(newItem);
-  return Promise.resolve(newItem);
+  const payload = {
+    title: data.name,
+    body: data.desc,
+    userId: 1
+  } as UTSJSONObject;
+  return http.post<UTSJSONObject>('/posts/add', payload, {
+    baseURL: FOO_BASE_URL,
+    extra: {
+      ignoreAuth: true
+    } as UTSJSONObject
+  } as LimeRequestConfig).then((res: UTSJSONObject): FooItem => {
+    return toFooItem(res);
+  });
 }
 
 /**
- * 更新 Foo
- * @param id 目标 Foo 主键；**匹配不到时不做报错，直接把入参 data 原样返回**
- * @param data 新字段值（整条替换 name / desc，最终 id 以形参 id 为准）
+ * 更新 Foo（`PUT /posts/:id`）
+ * @param id 目标 Foo 主键（拼进 URL，是本次更新的唯一定位依据）
+ * @param data 新字段值（按接口契约映射成请求体 `{ title, body }`）
+ * @returns 后端回包里的最新记录
  */
 export function updateFoo(id: number, data: FooItem): Promise<FooItem> {
-  const index = MOCK_FOO_LIST.findIndex((item: FooItem): boolean => item.id == id);
-  if (index >= 0) {
-    MOCK_FOO_LIST[index] = { id, name: data.name, desc: data.desc } as FooItem;
-    return Promise.resolve(MOCK_FOO_LIST[index]);
-  }
-  return Promise.resolve(data);
+  const payload = {
+    title: data.name,
+    body: data.desc
+  } as UTSJSONObject;
+  return http.put<UTSJSONObject>(`/posts/${id}`, payload, {
+    baseURL: FOO_BASE_URL,
+    extra: {
+      ignoreAuth: true
+    } as UTSJSONObject
+  } as LimeRequestConfig).then((res: UTSJSONObject): FooItem => {
+    return toFooItem(res);
+  });
 }
 
 /**
- * 删除 Foo
- * @param id 目标 Foo 主键；**主键不存在时同样 resolve(true)** —— mock 阶段不区分「删成功」与「本就不存在」
+ * 删除 Foo（`DELETE /posts/:id`）
+ * @param id 目标 Foo 主键（拼进 URL）
+ * @returns 请求成功即 resolve(true)；删除失败由 http 拦截器统一 toast 并 reject
  */
 export function deleteFoo(id: number): Promise<boolean> {
-  const index = MOCK_FOO_LIST.findIndex((item: FooItem): boolean => item.id == id);
-  if (index >= 0) {
-    MOCK_FOO_LIST.splice(index, 1);
-  }
-  return Promise.resolve(true);
+  return http.delete<UTSJSONObject>(`/posts/${id}`, null, {
+    baseURL: FOO_BASE_URL,
+    extra: {
+      ignoreAuth: true
+    } as UTSJSONObject
+  } as LimeRequestConfig).then((_res: UTSJSONObject): boolean => {
+    return true;
+  });
 }
 
+// ==========================================
+// 4. 远程调用与文件上传下载
+// ==========================================
+
+export const FOO_UPLOAD_PATH: string = getOssUploadPath();
+
 /**
- * 真实远程接口调用示范（http.get）
+ * 下载演示用的示例资源地址（公开可访问的图片，供下载 Demo 直接使用）
+ */
+export const FOO_DOWNLOAD_URL: string = 'https://web-assets.dcloud.net.cn/unidoc/zh/unicloudlogo.png';
+
+/**
+ * 换备用域名调用同一个接口（`extra.domain` / `config.baseURL` 的用法示范）
+ *
+ * 演示「临时切域名」：默认走 `DEFAULT_HTTP_OPTIONS` 的主域名，
+ * 这里显式用 `API_DOMAINS.SECONDARY` 覆盖单次请求。
  */
 export function fetchFooRemote(): Promise<FooItem> {
   return http.get<UTSJSONObject>('/foo', {
@@ -149,21 +281,22 @@ export function fetchFooRemote(): Promise<FooItem> {
       ignoreAuth: true
     } as UTSJSONObject
   } as LimeRequestConfig).then((data: UTSJSONObject): FooItem => {
+    const obj = toJsonObject(data);
     // ⚠️ `??` 兜底不可省：getNumber / getString 返回的是可空类型（`Number?` / `String?`），
     // 直接赋给 FooItem 的非空字段会被 Kotlin 编译拒绝（error17 参数类型不匹配）。
     return {
-      id: data.getNumber('id') ?? 1,
-      name: data.getString('name') ?? '',
-      desc: data.getString('desc') ?? ''
+      id: obj.getNumber('id') ?? 1,
+      name: obj.getString('name') ?? '',
+      desc: obj.getString('desc') ?? ''
     } as FooItem;
   });
 }
 
 /**
- * 上传文件示例
+ * 上传文件（`http.upload` → lime-request 的 UPLOAD 分支）
  * @param filePath 本地文件路径
- * @param ignoreAuth 是否跳过鉴权
- * @param uploadPathOrUrl 上传目标路径
+ * @param ignoreAuth 是否跳过鉴权，演示接口传 true
+ * @param uploadPathOrUrl 上传目标路径，默认取环境变量里的 OSS 地址
  */
 export function uploadFooFile(
   filePath: string,
@@ -183,7 +316,7 @@ export function uploadFooFile(
 }
 
 /**
- * 下载文件示例（http.downloadFile）
+ * 下载文件（`http.downloadFile`）
  *
  * 底层走 lime-request 的 DOWNLOAD 分支（内部 uni.downloadFile），
  * 自动复用统一的鉴权头注入、错误提示与完成钩子，成功后返回
