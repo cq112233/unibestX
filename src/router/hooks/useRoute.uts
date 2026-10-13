@@ -78,10 +78,10 @@ export function useRoute(): RouteLocation {
 
   // 快照已被注销（正常不会：onUnmounted 早于任何后续读取）：退化成全局那份，宁可读到全局也别崩
   const snapshotRoute = readRouteSnapshot(snapshotId);
-  console.log(snapshotRoute, 'snapshotRoute');
+
   if (snapshotRoute != null) {
     return snapshotRoute;
   }
-  console.log(routeState, 'routeState');
+
   return routeState;
 }

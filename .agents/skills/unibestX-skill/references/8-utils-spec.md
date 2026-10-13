@@ -177,19 +177,22 @@ if (isDev()) {
   - `hideLoading()`：关闭加载遮罩。
 - **规则**：严禁散落手写 `uni.showToast({ title: '...', icon: 'none' })`，统一使用 `toast(msg)` 或 `toastSuccess(msg)`。
 
-### 8.4.2 路由与页面跳转：`@/src/router/index.uts`
+### 8.4.2 路由与页面跳转：`src/router/`
 
-- **架构定位**：采用与 `@/src/http` 镜像对称的子模块化架构（`config/`、`interceptor/`、`toLoginPage/`、`utils/`），统一从 `@/src/router/index.uts` 导出。
-- **导出方法 / 单例**：
-  - `cleanPath(path: string)`：清洗并规范化页面路径（去除 `?` 参数，补全前导 `/`）。
-  - `getCurrentPath(): string`：获取当前栈顶页面的规范化路径。
-  - `getCurrentRoute(): string`：获取当前栈顶页面的原生 route 字符串。
-  - `isSamePath(path1: string, path2: string): boolean`：判断两路径是否指向同一页面。
-  - `parseUrlToObj(url: string): UrlObj`：解析 URL 为路径和参数 Map。
-  - `toLoginPage(options?: UTSJSONObject)`：带防抖节流的登录重定向（自动防重复跳转自身）。
-  - `LOGIN_PAGE`：登录页路由常量。
-  - `route` / `routeUtils`：路由工具全局单例。
-- **规则**：优先使用 `@/src/router/index.uts` 导出的路由工具方法，统一享受拦截与页面栈保护。
+- **架构定位**：采用与 `@/src/http` 镜像对称的子模块化架构（`config/`、`guard/`、`hooks/`、`interceptor/`、`toLoginPage/`、`utils/`）。
+- **⚠️ 门面很窄**：`@/src/router/index.uts` **只转发四块** —— `config`、`useRoute`、`useRouter`、`interceptor`。其余符号一律**精准导入具体实现文件**（门面宽转发会让底层符号全成公共 API，调用方穿越门面引用，正撞 Kotlin `<clinit>` 循环死锁，见分册 1.22 / 红线 36）。
+- **符号来源对照**：
+
+  | 符号 | 从哪拿 |
+  | :--- | :--- |
+  | `useRoute()` / `useRouter()` | `@/src/router/index.uts` |
+  | `cleanPath(path)`、`getCurrentPath()`、`getCurrentRoute()`、`getCurrentPageOptions()`、`getPageStackLength()`、`isSamePath(a, b)`、`parseUrlToObj(url)`、`resolveUrl(to)`、`route` / `routeUtils` 单例 | `@/src/router/utils/utils.uts` |
+  | `toLoginPage(options?)`（带 1s 节流的登录重定向，自动防重复跳转自身） | `@/src/router/toLoginPage/toLoginPage.uts` |
+  | `LOGIN_PAGE`、`REGISTER_PAGE`、`EXCLUDE_LOGIN_PATH_LIST`、`LOGIN_STRATEGY`、`isNeedLoginMode` | `@/src/router/config/config.uts` |
+  | `routeState`、`setRouteMeta()` / `removeRouteMeta()` / `getRouteMeta()` | `@/src/router/hooks/route-state.uts` |
+  | `installRouteInterceptor()`、`checkDirectEntry(options)` | `@/src/router/interceptor/interceptor.uts` |
+
+- **规则**：跳转与取路由**必须**走组合式 hooks（`useRouter()` / `useRoute()`），严禁在页面里直接调原生导航 API —— 完整正反例与红线见**分册 9**。
 
 ### 8.4.3 Navbar 布局页面滚动监听：`@/src/layouts/navbar/utils/index.uts`
 
@@ -325,7 +328,7 @@ import { addUnit } from '../../uni_modules/lime-shared/addUnit';
 - [ ] **红线 5**：严禁在业务页面中散落调用原生 `uni.showToast({ title, icon: 'none' })`，必须统一使用 `toast(msg)` 或 `showToast(...)`。
 - [ ] **红线 6**：有自定义导航栏需要避让状态栏时，必须绑定 `:style="{ height: statusBarHeight + 'px' }"`，严禁硬编码 `20px` / `44px`。
 - [ ] **红线 7**：在 `navbar` 布局下监听整页滚动，必须使用 `onNavbarPageScroll` / `onNavbarReachBottom`，不可使用原生 `onPageScroll`。
-- [ ] **红线 8**：页面跳转与路径处理必须使用 `@/src/router/index.uts` 提供的路由方法（`toLoginPage`、`cleanPath`、`getCurrentPath` 等）或 `route` 单例，确保参数安全与平台守卫生效。
+- [ ] **红线 8**：页面 / 组件里的跳转与取路由必须走组合式 hooks —— 跳转一律 `useRouter()`（`@/src/router/index.uts`），路由信息一律 `useRoute()`，**严禁直接调原生 `uni.navigateTo` / `uni.switchTab` / `uni.navigateBack`**；路径与 URL 工具（`cleanPath`、`getCurrentPath`、`parseUrlToObj`）与 `route` 单例从 `@/src/router/utils/utils.uts` 精准导入，`toLoginPage` 从 `@/src/router/toLoginPage/toLoginPage.uts` 精准导入（它们**不在** `index.uts` 门面上），完整规范见**分册 9**。
 - [ ] **红线 9**：引用工具库必须采用 `@/src/utils/<module>/index.uts` 形式，严禁跨层深层相对路径穿透。
 - [ ] **红线 10**：实现新功能前，必须首先在 `@/src/utils/` 中查验已有工具，严禁在局部重新手写已有的通用方法（如防抖、格式化、URL解析等）。
 - [ ] **红线 11**：通用算法能力（大数 / 精度运算、加解密与哈希、日期时间、颜色处理、数组与对象工具函数、组合式 hooks）必须先查 `uni_modules/` 下的 6 个生态库并优先复用，严禁直接手写（如自己实现 `md5`、手拼日期格式化、用 `+` 直接做大数运算）；且 `lime-shared` 必须**深引入到具体函数文件**（其桶入口 `index.ts` 的导出全体被注释，`import { addUnit } from '@/uni_modules/lime-shared'` 取不到值），见 8.5。
