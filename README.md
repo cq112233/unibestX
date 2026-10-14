@@ -14,7 +14,7 @@
 [![GitHub forks](https://img.shields.io/github/forks/cq112233/unibestX?style=flat&logo=github)](https://github.com/cq112233/unibestX)
 ![node version](https://img.shields.io/badge/node-%3E%3D22.22.2-green)
 ![pnpm version](https://img.shields.io/badge/pnpm-%3E%3D7.30-green)
-![HBuilderX version](https://img.shields.io/badge/HBuilderX-%3E%3D5.24-blue)
+![HBuilderX version](https://img.shields.io/badge/HBuilderX-%3E%3D5.26-blue)
 [![Vitest](https://img.shields.io/badge/tested_with-vitest-yellow?logo=vitest)](https://vitest.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8-blue?logo=typescript)](https://www.typescriptlang.org/)
 ![GitHub package.json version](https://img.shields.io/github/package-json/v/cq112233/unibestX)
@@ -26,7 +26,7 @@
 
 内置 `自定义 TabBar`、`Layout 布局`、`请求封装`、`登录拦截`、`路由守卫`、`Tailwind CSS`、`i18n 多语言`、`主题切换`、`沙盒极速调试` 等基础能力，并提供 `代码提示`、`自动格式化`、`统一配置` 等辅助功能，让你编写 `uni-app X` 拥有 `best` 体验。
 
-🤖 **同时它也是一套「AI 原生」开发模板**：项目自带 **`unibestX-skill`**（「1 个入口 + 8 个分册」的 uni-app X / UTS 规范知识库），Claude Code、Codex 等 AI Agent 克隆即可直接按项目规范写代码、生成页面骨架、自动排查跨端编译报错；运行时亦内置 **AI 对话页**与 **SSE / Chunk 跨端流式传输**能力。详见 [🤖 AI 与 Skill 体系](#-ai-与-skill-体系)。
+🤖 **同时它也是一套「AI 原生」开发模板**：项目自带 **`unibestX-skill`**（「1 个入口 + 9 个分册」的 uni-app X / UTS 规范知识库），Claude Code、Codex 等 AI Agent 克隆即可直接按项目规范写代码、生成页面骨架、自动排查跨端编译报错；运行时亦内置 **AI 对话页**与 **SSE / Chunk 跨端流式传输**能力。详见 [🤖 AI 与 Skill 体系](#-ai-与-skill-体系)。
 
 | 👉 在线 H5 演示 | 📖 官方文档 | 🐙 GitHub | 🍊 Gitee 镜像 |
 | :---: | :---: | :---: | :---: |
@@ -135,7 +135,7 @@ pnpm install
 支持 **命令行 CLI** 与 **HBuilderX 图形界面** 两种开发方式。
 
 > [!WARNING]
-> **使用 CLI 命令前，必须先启动 HBuilderX**（需 **5.24 及以上**）。CLI 命令本质是通过正在运行的 HBuilderX 来编译运行项目，未打开时会报「未找到 HBuilderX」。App 端（Android / iOS / 鸿蒙）编译只能由 HBuilderX 完成。
+> **使用 CLI 命令前，必须先启动 HBuilderX**（需 **5.26 及以上**）。CLI 命令本质是通过正在运行的 HBuilderX 来编译运行项目，未打开时会报「未找到 HBuilderX」。App 端（Android / iOS / 鸿蒙）编译只能由 HBuilderX 完成。
 
 #### 🖥️ 方式一：命令行 CLI
 
@@ -283,7 +283,7 @@ pnpm docs:dev       # 本地启动 VitePress 文档站
 | :--- | :--- |
 | Node | `^22.22.2`（或 `^24.15.0`、`>=26.0.0`） |
 | pnpm | >= 7.30 |
-| HBuilderX | **5.24 及以上**（Android 蒸汽模式需 >= 5.21，iOS 需 >= 5.11；支付宝小程序需 >= 5.31） |
+| HBuilderX | **5.26 及以上**（Android 蒸汽模式需 >= 5.21，iOS 需 >= 5.11；支付宝小程序需 >= 5.31） |
 | Vue Official | >= 2.1.10 |
 | TypeScript | >= 5.0 |
 | JDK | >= 17（Android 平台） |
@@ -336,7 +336,7 @@ pnpm docs:dev       # 本地启动 VitePress 文档站
 
 ### 1. `unibestX-skill` — 项目专属 uni-app X / UTS 规范库
 
-这是与项目强绑定的核心技能，也是仓库中**唯一保留的技能**，采用 **「1 个入口 + 8 个分册」** 结构，把 UTS 强类型约束、跨端样式限制与本项目的生产级写法沉淀成可被 AI 直接检索的知识库。
+这是与项目强绑定的核心技能，也是仓库中**唯一保留的技能**，采用 **「1 个入口 + 9 个分册」** 结构，把 UTS 强类型约束、跨端样式限制与本项目的生产级写法沉淀成可被 AI 直接检索的知识库。
 
 | 分册 | 内容 |
 | :--- | :--- |
@@ -349,6 +349,7 @@ pnpm docs:dev       # 本地启动 VitePress 文档站
 | `6-page-component-spec.md` | AI 页面层级与组件设计规范（页面高内聚、三级防过度拆分、容器与纯展示解耦、Mock 接口契约化） |
 | `7-api-spec.md` | API 接口层规范（一页一目录、契约类型用 `type`、Mock 数据集与接口函数同层、后端就绪只换函数体） |
 | `8-utils-spec.md` | 项目核心工具库使用规范（系统信息 `src/utils/systemInfo`、环境变量 `src/utils/env`、通用工具优先原则） |
+| `9-router-spec.md` | 路由导航规范（跳转一律 `useRouter()`、路由信息一律 `useRoute()`、禁止原生导航 API、门面精准导入） |
 
 **工作机制**：入口文件只常驻导航与红线清单，AI 命中条目后**必须继续读取对应分册**核对完整正反例才允许改代码。
 
@@ -484,6 +485,8 @@ unibestX/
 │   │   └── me/                   #   个人中心与系统设置
 │   ├── router/                   # 路由守卫与导航控制（模块化架构）
 │   │   ├── config/               #   页面登录白名单 / 黑名单策略
+│   │   ├── guard/                #   业务路由规则（登录等，一条规则一个文件）
+│   │   ├── hooks/                #   useRoute / useRouter 组合式 hooks
 │   │   ├── interceptor/          #   全局路由跳转拦截守卫
 │   │   ├── toLoginPage/          #   登录页重定向防抖控制
 │   │   ├── utils/                #   路径规范化与 URL 解析工具
@@ -927,7 +930,7 @@ src/tabbar/config.uts (唯一样本源)
 - **白名单模式**：除指定页面外，全部需要登录
 - 支持登录后自动跳回原页面
 
-相关文件：`src/router/`（统一从 `@/src/router/index.uts` 导出，子模块化拆分为 `config/`、`interceptor/`、`toLoginPage/`、`utils/`）。
+相关文件：`src/router/`，子模块化拆分为 `config/`（登录策略与黑白名单）、`guard/`（**业务规则主战场**，一条规则一个文件）、`hooks/`（`useRoute()` / `useRouter()` 组合式 hooks）、`interceptor/`（导航管道）、`toLoginPage/`、`utils/`。门面 `@/src/router/index.uts` **只转发 `config` + `useRoute` + `useRouter` + `interceptor` 四块**，其余符号须精准导入（详见 [src/router/README.md](src/router/README.md)）。
 
 ### 请求封装
 

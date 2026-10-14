@@ -28,7 +28,7 @@
     -->
     <!-- 1. 支付宝小程序专享：手势模拟下拉刷新（解决支付宝小程序无原生 refresher 问题） -->
     <scroll-view
-      v-if="isAlipayMp"
+      v-if="isMpAlipay"
       :key="`alipay-${refresherKey}`"
       direction="vertical"
       class="tab-content-scroll"
@@ -89,7 +89,7 @@
 import { computed, onMounted, onUnmounted, provide, ref, watch } from 'vue';
 import { activeTabTitle, curIdx, formatTabbarText, themeTokens } from '@/src/tabbar/index.uts';
 import TabbarPlaceholder from './TabbarPlaceholder.uvue';
-import { isAlipayMp } from '@/src/utils/systemInfo/index.uts';
+import { isMpAlipay } from '@/src/config/env/platform.uts';
 import {
   isPageRefresherDisabled,
   isPageScrollDisabled,
@@ -262,7 +262,7 @@ let currentScrollTop: number = 0;
  * 支付宝手势下拉刷新 Header 动态样式
  */
 const alipayHeaderStyle = computed((): string => {
-  if (!isAlipayMp) {
+  if (!isMpAlipay) {
     return 'height: 0px;';
   }
   const trans = isAlipayTouching.value ? 'none' : 'height 0.25s ease';
@@ -270,7 +270,7 @@ const alipayHeaderStyle = computed((): string => {
 });
 
 function handleAlipayTouchStart(e: UniTouchEvent) {
-  if (!isAlipayMp || !isActive.value || !props.enablePullDownRefresh) {
+  if (!isMpAlipay || !isActive.value || !props.enablePullDownRefresh) {
     return;
   }
   if (currentScrollTop <= 2 && !isTriggered.value) {
@@ -284,7 +284,7 @@ function handleAlipayTouchStart(e: UniTouchEvent) {
 }
 
 function handleAlipayTouchMove(e: UniTouchEvent) {
-  if (!isAlipayMp || !isAlipayTouching.value || isTriggered.value || currentScrollTop > 2) {
+  if (!isMpAlipay || !isAlipayTouching.value || isTriggered.value || currentScrollTop > 2) {
     return;
   }
   const touches = e.touches;
@@ -301,7 +301,7 @@ function handleAlipayTouchMove(e: UniTouchEvent) {
 }
 
 function handleAlipayTouchEnd() {
-  if (!isAlipayMp || !isAlipayTouching.value) {
+  if (!isMpAlipay || !isAlipayTouching.value) {
     return;
   }
   isAlipayTouching.value = false;
@@ -347,7 +347,7 @@ function handleScroll(e: UniScrollEvent): void {
     return;
   }
   const scrollTop = e.detail.scrollTop;
-  if (isAlipayMp) {
+  if (isMpAlipay) {
     currentScrollTop = Math.ceil(scrollTop);
   }
   uni.$emit('onNavbarPageScroll', {

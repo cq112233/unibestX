@@ -47,7 +47,8 @@ function syncRouteStateDeferred(): void {
  *    写这里反而是错的（这里写的是用户其实没去成的页面）。
  * ⚠️ 用 applyTargetRouteFromUrl（**请求预写**）而不是 applyRouteFromUrl：此刻上一页还在屏幕上，
  *    预写只喂「还没认领路径」的快照，已认领的一律不动 —— 上一页不会在下一页进入期间提前变
- *    （同页带参重进尤其明显）。路由状态那侧的口径见 ../hooks/route-state.uts。
+ *    （同页带参重进尤其明显）。路由状态那侧的口径见 ../hooks/route-state.uts，
+ *    快照与两道闸见 ../hooks/route-snapshot.uts。
  * ⚠️ `plugin://` / `http(s)://` 不是本应用页面，不进路由状态。
  */
 function markTargetRoute(url: string): void {

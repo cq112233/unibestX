@@ -14,14 +14,15 @@ description: Use when developing, compiling, refactoring, or troubleshooting uni
 uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直接编译为原生代码（Android 编译为 Kotlin，iOS 插件编译为 Swift，鸿蒙插件编译为 ArkTS，Web/小程序编译为 JS）。  
 与宽容的 TypeScript/JavaScript 不同，UTS 采用**名义强类型系统（Nominal Strong Typing）**与**原生渲染规范**。
 
-本文档按六大维度组织，采用 **「1 个入口 + 8 个分册」** 结构：
+本文档按七大维度组织，采用 **「1 个入口 + 9 个分册」** 结构：
 
 1. **UTS 与原生规范**：语法与严格类型（分册 1）、CSS / Tailwind 样式引擎限制（分册 2）、跨端运行时铁律（分册 3）；
 2. **项目正确案例**：来自本项目的生产级标杆案例（分册 4）——页面骨架、TabBar、二级详情页、滚动与下拉刷新、组件与生态库优先范式；
 3. **项目代码生成规范**：生成流程与模板（分册 5）、本文件常驻的 A.1 对照表与 A.2 红线清单；
 4. **AI 页面层级与组件设计规范**：页面高内聚自包含、最多三级封顶、容器与纯展示解耦、Mock 接口契约化（分册 6）——**AI 生成复杂页面与拆分组件前必读**；
 5. **API 接口层规范**：一页一目录落位、契约类型（`type`）与 Mock 数据集同层、后端就绪只换函数体（分册 7）——**新增页面与对接后端前必读**；
-6. **项目核心工具库规范**：系统信息（`src/utils/systemInfo`）、环境变量（`src/config/env`）与基础通用工具（分册 8）——**页面开发与调用通用能力前必读**。
+6. **项目核心工具库规范**：系统信息（`src/utils/systemInfo`）、环境变量（`src/config/env`）与基础通用工具（分册 8）——**页面开发与调用通用能力前必读**；
+7. **路由导航规范**：跳转一律走 `useRouter()`、路由信息一律从 `useRoute()` 读、门面精准导入（分册 9）——**写任何跳转与取路由参数前必读**。
 
 ---
 
@@ -31,7 +32,8 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 - 规划或生成新页面结构、骨架布局与视口高度（`availableHeight`）时
 - **新增页面并同步建 `src/api/<page>/` 接口层（接口函数 + `types.uts` + `mock/`）时**、把页面里的假数据抽成接口函数时
 - 对接后端真实接口、写 `http` 请求 / 文件上传 / SSE 流式接口时
-- **获取系统信息、视口高度、状态栏/导航栏高度，或读取环境变量、API 域名、调用 Toast / Router 时**
+- **获取系统信息、视口高度、状态栏/导航栏高度，或读取环境变量、API 域名、调用 Toast 时**
+- **在页面 / 组件里做跳转（push / replace / switchTab / back）或读当前路由信息（path / query / meta / name）时**（跳转一律 `useRouter()`、取路由一律 `useRoute()`，见分册 9）
 - 使用 Tailwind CSS 编写跨端 UI、按钮排版、文本颜色与安全区适配时
 - 遇到 UTS 强类型编译错误（`UTS110111163`、`UTS110111119`、`UTS110111120`、`UTS100006`、`error17`）
 - 遇到 Android/iOS 原生运行时报错（`ClassCastException: Map cannot be cast to UTSJSONObject`）
@@ -53,7 +55,8 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 | [references/5-codegen.md](references/5-codegen.md) | **5.1 新增页面生成流程**、**5.2 页面代码标准模板** | 生成新页面 / 组件前走流程、需要复制标准页面模板；**新增页面时必产接口层**（接口文件模板见分册 7） |
 | [references/6-page-component-spec.md](references/6-page-component-spec.md) | **6 AI 页面层级与组件设计规范**（页面高内聚 · 数据所有权下沉 · 容器/视图分离 · Mock 收拢进页面接口目录 · 后端就绪只换函数体，附八大铁律与 19 条自检红线） | 规划新页面结构、拆分复杂页面组件、组织页面内 `components/common/` 与模块私有视图、把 mock 收拢进 `src/api/<page>/`、对接后端真实接口时必读 |
 | [references/7-api-spec.md](references/7-api-spec.md) | **7 API 接口层规范**（一页一目录落位 · 命名约定 · 契约类型铁律 · 按模块独立造数 · `http` 单例 / 上传 / SSE 用法 · 后端就绪只换函数体，附 12 条接口层自检红线） | **新增页面同步建 `src/api/<page>/` 时**、抽接口函数时、写 mock 数据集与契约类型时、对接后端真实接口时必读 |
-| [references/8-utils-spec.md](references/8-utils-spec.md) | **8 项目核心工具库规范**（系统信息 `src/utils/systemInfo` · 环境变量 `src/config/env` · `uni_modules/` 生态工具库优先原则 · 基础通用工具优先原则，附完整 API 矩阵与 11 条红线） | 获取屏幕/窗口尺寸、状态栏/导航栏/TabBar高度、计算内容可用高度（`availableHeight`）；判断开发/生产环境、获取接口基础地址；使用 Toast、Loading、路由跳转、主题与返回键时必读；**要写大数运算 / 加解密与哈希 / 日期时间 / 颜色处理 / 数组对象工具 / 组合式 hooks 前必读（先查 `uni_modules/` 生态库，不要手写）** |
+| [references/8-utils-spec.md](references/8-utils-spec.md) | **8 项目核心工具库规范**（系统信息 `src/utils/systemInfo` · 环境变量 `src/config/env` · `uni_modules/` 生态工具库优先原则 · 基础通用工具优先原则，附完整 API 矩阵与 11 条红线） | 获取屏幕/窗口尺寸、状态栏/导航栏/TabBar高度、计算内容可用高度（`availableHeight`）；判断开发/生产环境、获取接口基础地址；使用 Toast、Loading、主题与返回键时必读；**要写大数运算 / 加解密与哈希 / 日期时间 / 颜色处理 / 数组对象工具 / 组合式 hooks 前必读（先查 `uni_modules/` 生态库，不要手写）** |
+| [references/9-router-spec.md](references/9-router-spec.md) | **9 路由导航规范**（跳转一律 `useRouter()` · 路由信息一律 `useRoute()` · 禁止原生导航 API · 门面精准导入，附正反例与 9 条自检红线） | **页面 / 组件里要做任何跳转（push / replace / switchTab / back）、要读当前路由信息（path / query / meta / name）、准备写 `onLoad(options)` 取参数或手写 `getCurrentPages()` 时必读** |
 
 > 📌 **A.1 快速排查对照表**与 **A.2 代码生成红线清单** 因使用频率最高，常驻在本文件下方，无需额外 Read。
 
@@ -107,7 +110,7 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 | **链式 `.catch()`（`error25 None of the following candidates is applicable`）** | `.then(done).catch((err: any) => {...})`（UTSPromise 的三个 `.catch` 重载在 Kotlin 端均无法收敛；**与回调返回类型、是否 `throw` 无关**，单一返回类型的回调照样报错） | 改为双参 `.then(onFulfilled, onRejected)`，拒绝回调并进第二参；要表达「抛出」时用 `Promise.reject(toError(err)) as Promise<T>` 而非 `throw`（`Promise.resolve(...)` 包裹也一并去掉，详见 **1.21**） |
 | **系统尺寸与高度获取** | 散落调用 `uni.getSystemInfoSync()` 或样式手写 `100vh`（损耗性能、非响应式、原生端不支持 vh 且易被 TabBar/导航栏遮挡） | 优先引入 `@/src/utils/systemInfo/index.uts` 中的响应式变量（`availableHeight`、`statusBarHeight`、`navBarHeight`、`safeAreaBottom`）或使用 `sys` 单例（详见 **分册 8**） |
 | **环境变量与服务地址读取** | 手写 `process.env` / `import.meta.env` 或在代码里硬编码域名 IP（原生平台无法识别且切换环境易出错） | 统一从 `@/src/config/env/env.uts` 引入具名方法（`getApiBaseUrl()`、`getOssBaseUrl()`、`isDev()`、`isProd()`、`isVaporMode()`）（详见 **分册 8**） |
-| **页面跳转与路由控制** | 直接调用原生 `uni.navigateTo` 等且未做参数编码与越界防护 | 优先引入 `@/src/router/index.uts` 的路由封装方法（如 `toLoginPage()`、`cleanPath()`、`getCurrentPath()`、`parseUrlToObj()` 或 `route` 单例，详见 **分册 8**） |
+| **页面跳转与路由控制** | 直接调用原生 `uni.navigateTo` / `uni.switchTab` / `uni.navigateBack`；或用 `onLoad((options) => {...})` 取参数、手写 `getCurrentPages()` 读当前页 | 跳转一律 `useRouter().push / replace / relaunch / switchTab / back`（`@/src/router/index.uts`）；路由信息一律 `useRoute()`（`query` 已是解码态 `Map`）。⚠️ **`cleanPath` / `getCurrentPath` / `parseUrlToObj` / `toLoginPage` / `route` 单例并不在 `@/src/router/index.uts` 门面上**，须从 `@/src/router/utils/utils.uts`、`@/src/router/toLoginPage/toLoginPage.uts` 精准导入（详见 **分册 9**） |
 | **LeakCanary 报 Activity 内存泄漏（`mDestroyed = true`）** | 页面或根容器组件（如 `App.ku.uvue`）通过 `uni.$on` 注册全局监听但**未在 `onUnmounted` 中通过 `uni.$off` 注销**（或直接传入匿名函数无法解绑）；全局单例 `IndexKt.emitter` 永久持有页面回调，导致退出页面后原生 Activity 无法被 GC 回收 | 回调函数必须抽离为**具名函数**，`onMounted` 注册，`onUnmounted` 必须严格调用 `uni.$off(eventName, handler)` 注销（详见 **3.26**） |
 | **`ReferenceError: XxxPageResult is not defined`**（**编译期零报错，运行期才炸**，且常被页面的 `try/catch` 吞成「列表渲染不出来 + 一条 `console.error`」） | 在 `as` 断言位置写「**泛型实例化别名**」：`} as FooPageResult);`（而 `type FooPageResult = PageResult<FooItem>`）—— UTS 把 `as` 断言**编译成构造调用** `new FooPageResult({...})`，但别名只是编译期 `type`、**没有任何运行期绑定**（编译器只为泛型本体生成 `class PageResult`）⇒ 产物里留下一个指向不存在标识符的 `new` | 断言**直写泛型本体、实参写全**：`} as PageResult<FooItem>);`；别名只允许出现在**类型位置**（返回值标注 / 回调参数标注）。口诀：**`as` / `new` 后面不许出现泛型实例化别名，`:` 后面可以**。判据必须落到产物上：`grep -rn "new [A-Za-z_]*PageResult(" unpackage/dist/dev/mp-weixin/src/api/*.js`（单测走 esbuild 转译、**不复现**这一层，全绿也照样有坑；详见 **1.25**） |
 
@@ -160,3 +163,4 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 - [ ] **41. 「泛型实例化别名」（如 `type FooPageResult = PageResult<FooItem>`）严禁出现在 `as` 断言位置**（UTS 把 `as` 断言编译成**构造调用**，写 `} as FooPageResult);` 会生成 `new FooPageResult({...})`，而别名只是编译期 `type`、**没有任何运行期绑定**（编译器只为泛型本体生成 `class PageResult`）⇒ 产物里留下指向不存在标识符的 `new`，**编译期零报错零警告**、运行期抛 `ReferenceError: FooPageResult is not defined`，且常被页面 `try/catch` 吞成「列表渲染不出来 + 一条 `console.error`」而被误判为网络问题；断言必须**直写泛型本体、实参写全** `} as PageResult<FooItem>);`，别名只允许出现在类型位置（返回值标注 / 回调参数标注）；口诀「`as` / `new` 后面不许出现泛型实例化别名，`:` 后面可以」。**判据必须落到产物上**：`grep -rn "new [A-Za-z_]*PageResult(" unpackage/dist/dev/mp-weixin/src/api/*.js` —— 单测走 esbuild 转译、**不复现**这一层，全绿也照样有坑，见 1.25）
 - [ ] **42. 通用算法能力严禁直接手写**（如自己实现 `md5` / SHA-256、手拼日期格式化、用 `+` 或 `*` 直接做大数运算、手写颜色空间转换）：必须先查 `uni_modules/` 下 6 个生态库并优先复用 —— `lime-shared`（91 个纯函数模块）、`lime-use`（组合式 hooks）、`lime-color`（颜色）、`lime-dayuts`（日期）、`unix-Bignumber`（任意精度）、`unix-crypto`（加解密 / 哈希 / UUID），每库自带 `readme.md` 与项目内演示页（`src/sub/*FunctionDemo/`）。**注意两点**：① `lime-shared` 必须**深引入到具体函数文件**（其桶入口 `index.ts` 的 26 条导出**全被注释**，`import { addUnit } from '@/uni_modules/lime-shared'` 取不到值）；② 该模块的 `uniq` / `chunk` / `get` / `capitalize` / `isEqual` 是**项目本地补进去的**，升级 `lime-shared` 会被覆盖，升级后必须回来核对（见分册 8.5）
 - [ ] **43. 定时器句柄（`setTimeout` / `setInterval`）在显式 `number` 标注下必须就地双层强转 `(…) as any) as number`**（@types/node 经 `vite.config.ts` 进程序后，把全局 `setTimeout` / `setInterval` 的返回值判为 `Timeout`，直接赋值报 `TS2322 不能将类型“Timeout”分配给类型“number”`，单层 `as number` 报 `TS2352`；**这是 VSCode / Volar 编辑器诊断，不是 UTS 编译错误** —— UTS 真源返回的就是 `number`，UTS 编译与 `pnpm typecheck` 都不会报，故判据只能落到 `ts-plugin` 诊断上；在 `.d.ts` 里补全局声明无效（重载取先声明那支）；与 1.13 会同时命中同一个定时器变量；先例 `src/http/stream/stream.uts:272`，见 1.26）
+- [ ] **44. 页面 / 组件里的跳转与取路由必须走组合式 hooks**（跳转一律 `useRouter().push / replace / relaunch / switchTab / back`，**严禁直接调用 `uni.navigateTo` / `uni.switchTab` / `uni.navigateBack`**，绕过守卫会让登录拦截、TabBar 分流、路由状态同步同时失效；跳 TabBar 页必须 `switchTab()` 不能 `push()`）；路由信息一律 `useRoute()`（**严禁 `onLoad((options) => {...})` 取参数** —— 它不响应式、且微信小程序端 options 是编码态与其它端口径不一致；**严禁手写 `getCurrentPages()` 判断当前页**；页面展示禁用全局 `routeState`，它是「正在导航到的路由」；`useRoute()` 只能在组件 `setup` 内调用且每次返回新快照，禁止身份比较）；且这些符号**不在** `@/src/router/index.uts` 门面上、须精准导入并保留 `.uts` 后缀，见分册 9）
