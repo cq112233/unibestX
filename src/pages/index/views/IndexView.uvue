@@ -114,6 +114,50 @@
       </view>
     </view>
 
+    <!-- 推荐开发 IDE（VSCode 及其二次开发编辑器） -->
+    <view class="mt-[16px] mx-[16px]">
+      <view class="flex flex-row items-center justify-between mb-[10px]">
+        <text class="text-[14px] font-bold text-[#1e293b]">💻 推荐开发 IDE</text>
+        <text class="text-[11px] text-[#94a3b8]">VSCode · 二开通用</text>
+      </view>
+
+      <view
+        class="p-[14px] rounded-[12px] border-[1px] border-solid bg-[#f8fafc] border-[#e2e8f0]"
+      >
+        <text class="text-[12px] leading-[22px] text-[#475569]">
+          推荐使用 VSCode 或基于 VSCode 二次开发的编辑器（Trae / Cursor / Antigravity 等）开发本项目：仓库已内置完整的编辑器配置，打开即得 .uts / .uvue 的类型提示与跳转定义，保存时自动格式化，并附带开箱即用的代码片段与智能补全。
+        </text>
+
+        <!-- 适用编辑器 -->
+        <view class="flex flex-row flex-wrap mt-[8px]">
+          <text
+            v-for="name in ideNameList"
+            :key="name"
+            class="text-[10px] font-medium px-[6px] py-[1px] mr-[6px] mb-[6px] rounded-[4px] text-[#4f46e5] bg-[#6366f114]"
+          >
+            {{ name }}
+          </text>
+        </view>
+
+        <!-- 编辑器能力清单 -->
+        <view v-for="item in ideFeatureList" :key="item.id" class="flex flex-row mt-[10px]">
+          <text class="text-[12px] mr-[6px]">{{ item.icon }}</text>
+          <view class="flex-1 flex flex-col">
+            <text class="text-[12px] font-bold text-[#1e293b]">
+              {{ item.title }}
+            </text>
+            <text class="text-[11px] leading-[16px] mt-[2px] text-[#64748b]">
+              {{ item.desc }}
+            </text>
+          </view>
+        </view>
+
+        <text class="text-[10px] mt-[10px] text-[#94a3b8]" style="font-family: monospace;">
+          .vscode/settings.json · extensions.json · unibest.code-snippets
+        </text>
+      </view>
+    </view>
+
     <!-- 核心特性（2列紧凑卡片网格） -->
     <view class="mt-[16px] mx-[16px]">
       <view class="flex flex-row items-center justify-between mb-[10px]">
@@ -432,6 +476,44 @@ const toolLibList: Array<ToolLibItem> = [
     textColor: '#15803d'
   }
 ];
+
+type IdeFeatureItem = {
+  id: string;
+  icon: string;
+  title: string;
+  desc: string;
+};
+
+// 推荐编辑器能力清单（配置见 .vscode/）
+const ideFeatureList: Array<IdeFeatureItem> = [
+  {
+    id: 'types',
+    icon: '🧠',
+    title: '类型提示与跳转定义',
+    desc: '内置 uts-volar-plugin 与 Volar 配置，.uts / .uvue 均支持补全、跳转定义与实时类型诊断'
+  },
+  {
+    id: 'format',
+    icon: '✨',
+    title: '保存自动格式化',
+    desc: 'ESLint + Stylelint 保存即自动修复，缩进、引号与样式写法全仓统一'
+  },
+  {
+    id: 'snippets',
+    icon: '⚡',
+    title: '代码片段一键生成',
+    desc: 'v3 / v3c 秒出页面与组件骨架，definePage、defineProps 等 30 个片段开箱可用'
+  },
+  {
+    id: 'extensions',
+    icon: '🔌',
+    title: '推荐扩展一键安装',
+    desc: '16 个推荐插件写入 extensions.json，打开项目即提示安装，环境一次配齐'
+  }
+];
+
+// 适用编辑器（VSCode 及其二次开发版本）
+const ideNameList: Array<string> = ['VSCode', 'Trae', 'Cursor', 'Antigravity'];
 
 const systemInfo = computed<SystemInfoType | null>((): SystemInfoType | null => systemInfoRef.value);
 
