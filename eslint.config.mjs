@@ -270,6 +270,13 @@ configs.push({
     uts: pluginUts
   },
   rules: {
+    // e18e 的 `if (x == null) x = y` → `x ??= y` 建议在 UTS 侧不采纳：
+    // `??=`（逻辑赋值运算符）在本仓库含 uni_modules 在内**零先例**，UTS → Kotlin/ArkTS
+    // 的编译支持未经实测，而 .uts/.uvue 一改就要付整端编译验证的成本；
+    // 显式 null 判断在 UTS 里也更贴合「空值必须显式兜底」的既有写法。
+    // 纯 node 侧（tests / plugins / scripts）仍按规则改代码，见 .ts/.mjs/.js 文件。
+    'e18e/prefer-nullish-coalescing': 'off',
+
     // UTS 强类型系统与原生规范（仅作用于 .uts 与 .uvue）
     'uts/no-interface': 'error',
     'uts/no-undefined': 'error',

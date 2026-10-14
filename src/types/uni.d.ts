@@ -108,6 +108,10 @@ declare global {
 
   export interface DefinePageOptions {
     /**
+     * -route名字
+     */
+    name?: string;
+    /**
      * 沙盒独立调试模式标记：
      * - true: 本地开发时仅编译此页面（及其关联的 debug 页面），跳过无关页面与 TabBar，极大提升编译速度
      * - ⚠️ 提示: 调试完成后记得关闭（设为 false 或删除），以还原全量页面
@@ -137,6 +141,12 @@ declare global {
      * 导航栏左侧是否显示返回箭头（配合 navbar 布局使用，默认 true）
      */
     showBack?: boolean;
+
+    /**
+     *  是否隐藏顶状态栏（配合 navbar 布局使用，默认 false）
+     */
+    hideStatusBar?: boolean;
+
     /**
      * 是否隐藏顶部导航栏（配合 navbar 布局使用，默认 false）
      */
@@ -428,6 +438,56 @@ declare global {
     detail: {
       data: Array<UTSJSONObject>;
     };
+  };
+
+  // ==========================================
+  // 补充：应用「路由完成」事件（uni.onAppRoute 的回调参数）
+  //
+  // 真源：HBuilderX @dcloudio/uni-app-x/types/uni/uts-plugin-api/lib/uni-route/utssdk/
+  //       interface.d.ts 的 `declare global { type AppRouteEvent = ... }`
+  //       （platformMatrix：App 5.25+ / Web 4.0+ / 微信小程序 3.5.5+ / 支付宝 5.25+）。
+  //
+  // 为什么还要在这里补：
+  //   · `uni.onAppRoute` / `uni.offAppRoute` 在编辑器里**能**解析 —— 走的是
+  //     @dcloudio/types 的 uni-patches/wx（`onAppRoute(listener: UniNamespace.OnAppRouteCallback)`），
+  //     那个回调参数类型是命名空间内的，**没有**提升成全局名；
+  //   · 于是 `.uts` 里写 `(event: AppRouteEvent)` 报 TS2304「找不到名称」，
+  //     而 UTS→Kotlin 编译是过的（Kotlin 侧真源认它）—— 只瞎编辑器，不瞎编译。
+  //
+  // ⚠️ `openType` 真源是内置全局联合类型 `AppRouteOpenType`
+  //    （`'appLaunch' | 'navigateTo' | 'navigateBack' | 'redirectTo' | 'reLaunch' | 'switchTab'`），
+  //    但这里**只能写宽成 `string`**：编辑器解析出的 `uni.onAppRoute` 来自微信 patch 类型
+  //    （`OnAppRouteCallback = (result: OnAppRouteListenerResult) => void`，其 `openType: string`），
+  //    回调参数是**逆变**检查的 —— 写窄成联合类型会立刻报 TS2345
+  //    「不能将 OnAppRouteListenerResult 分配给 AppRouteEvent」。
+  //
+  // ⚠️ 其余字段必须与 `OnAppRouteListenerResult` **同名同类且不多required**：
+  //    它要求 notFound / page / path / pipMode / query / renderer / routeEventId / timeStamp / webviewId
+  //    全部存在（`page`/`query` 是 `any`，`pipMode`/`renderer` 是不带 null 的联合），
+  //    所以本类型也用可选字段兜住，别把某个字段写成自己独有的必填项。
+  // ==========================================
+  /** 应用路由完成事件（uni.onAppRoute 的回调参数） */
+  type AppRouteEvent = {
+    /** 路由页面路径，**不含开头的斜杠**（官方口径，由 route-state.uts 的 cleanPath 归一补上） */
+    path: string;
+    /** 页面参数（键值对，无参数时为空对象） */
+    query: UTSJSONObject;
+    /** 触发来源（真源为 AppRouteOpenType 联合，此处受限于回调逆变只能放宽成 string，见上） */
+    openType: string;
+    /** 路由目标页面是否存在 */
+    notFound: boolean;
+    /** 事件时间戳 */
+    timeStamp: number;
+    /** 路由事件唯一标识 */
+    routeEventId: string;
+    /** 触发路由的页面实例（可空） */
+    page?: UTSJSONObject | null;
+    /** 画中画模式（可空） */
+    pipMode?: 'min' | 'max' | null;
+    /** 渲染引擎（可空） */
+    renderer?: 'webview' | 'skyline' | 'xr-frame' | null;
+    /** webview 实例 id（可空） */
+    webviewId?: number | null;
   };
 
   /** uni.onKeyboardHeightChange 的回调参数 */
@@ -954,6 +1014,33 @@ declare global {
       benchmarkLevel?: number | null;
       /** 设备内存大小，单位 MB（App-Android 4.18+） */
       memorySize?: string | null;
+    }
+
+  }
+
+  // ==========================================
+  // 给 @dcloudio/types 的 Page.PageInstanceBaseProps 补齐 `options`
+  //
+  // `getCurrentPages()` 在 VSCode 里解析出的是 @dcloudio/types（uni-app 经典版）的
+  // `Page.PageInstance[]`（见该包 uni-app/page.d.ts 末尾的 `declare const getCurrentPages:
+  // Page.GetCurrentPages`），它只有 route / $vm / $getAppWebview，**没有** uni-app X 才有的
+  // `options`（页面的路由参数信息），于是 `pages[i].options` 报
+  // TS2339「类型"PageInstance<AnyObject, {}>"上不存在属性"options"」。
+  //
+  // 真源：HBuilderX uni-app x dts
+  //   @dcloudio/uni-app-x/types/native/UniPage.d.ts → `options: UTSJSONObject`
+  // 平台矩阵（真源 @uniPlatform）：Android unixVer 4.31 / iOS 4.31 / Web 4.31 / 微信小程序 √。
+  // 真源是 `interface`，这里同样用声明合并补齐（注意类型参数要与原声明逐字一致，否则无法合并）；
+  // 该 interface 属于 `declare namespace Page`（不是 UniNamespace），故补在 Page 命名空间下。
+  //
+  // ⚠️ 这是 src/router/utils/utils.uts 的 getCurrentPageOptions() 赖以取到 query 的字段：
+  //    uni.onAppRoute 要等目标页 onShow 之后才触发，冷启动 / 返回 / 页面重新显示时
+  //    需要一个不依赖事件的当前页参数来源，走的就是这个 `options`。
+  // ==========================================
+  namespace Page {
+    interface PageInstanceBaseProps<D extends AnyObject = any> {
+      /** 页面的路由参数信息（App 4.31+ / Web 4.31+ / 微信小程序） */
+      options?: UTSJSONObject;
     }
   }
 

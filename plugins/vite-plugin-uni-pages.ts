@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import process from 'node:process';
 import JSON5 from 'json5';
+import { writeRouteMetaFile } from './uni-pages-route-meta';
 
 // ==========================================
 // 类型定义
@@ -1056,6 +1057,8 @@ function generatePagesJson(
 
   // 7. 写入 pages.json
   const jsonStr = `${JSON.stringify(output, null, 2)}\n`;
+  // 同步路由元信息表（useRoute().meta / .name 的数据源，见 plugins/uni-pages-route-meta.ts）
+  writeRouteMetaFile(output, projectRoot);
   let existing = '';
   if (fs.existsSync(outPath)) {
     existing = fs.readFileSync(outPath, 'utf-8');
@@ -1117,9 +1120,7 @@ function generatePagesJson(
     }
 
     // 2) 同步分包（新增、修改、剔除已删除）
-    if (currentConfig.subPackages == null) {
-      currentConfig.subPackages = [];
-    }
+    currentConfig.subPackages ??= [];
     for (let s = 0; s < scannedSubPkgs.length; s++) {
       const spkg = scannedSubPkgs[s];
       const targetSub = currentConfig.subPackages.find(cp => cp.root === spkg.root);

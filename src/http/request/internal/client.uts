@@ -78,6 +78,18 @@ export type DownloadResult = {
 };
 
 /**
+ * 流式请求中断句柄
+ *
+ * 为什么不是一个裸的 RequestTask：`stream()` 要先跑异步前置钩子（注入 token）才能发请求，
+ * task 到那时才存在，而订阅方完全可能在这之前就取消 —— 句柄必须自己稳定，不能把
+ * 一个「此刻还是 null」的 task 透出去。
+ */
+export type StreamTask = {
+  /** 中断底层请求；前置钩子还没解析完时调用同样生效（解析完会直接跳过发送） */
+  abort: () => void;
+};
+
+/**
  * 请求适配器函数类型（接收基础配置，返回底层 Request 实例，对齐 Alova requestAdapter 规范）
  */
 export type HttpRequestAdapter = (config: LimeRequestConfig) => Request;
@@ -270,6 +282,8 @@ export class HttpClient {
   private afterCompleteHooks: Array<AfterResponseCompleteHook> = [];
   private refreshTokenHandler: RefreshTokenFn | null = null;
   private unauthorizedHandler: UnauthorizedFn | null = null;
+  /** 客户端默认基础地址：stream() 要自己拼 URL（不经 lime-request 的 mergeUrl），得自留一份 */
+  private baseURL: string = '';
 
   /**
    * @param options 客户端配置；不传或传 null = 全默认（baseURL 空串、timeout 5000、dataType json、
@@ -306,6 +320,8 @@ export class HttpClient {
       sslVerify: options != null && options.sslVerify != null ? (options.sslVerify as boolean) : true,
       withCredentials: options != null && options.withCredentials != null ? (options.withCredentials as boolean) : false
     } as LimeRequestConfig;
+
+    this.baseURL = baseConfig.baseURL != null ? (baseConfig.baseURL as string) : '';
 
     if (options != null && options.client != null) {
       this.client = options.client as Request;
@@ -385,7 +401,10 @@ export class HttpClient {
           return response;
         }
         const statusCode = response.statusCode;
-        if (statusCode != ResultEnum.Success200) {
+        // ⚠️ 必须按 2xx 区间判定，**不能写 `!= 200`**：REST 里 201 Created（新增成功）、
+        //    202 Accepted、204 No Content（删除成功）都是正常成功码，按 `!= 200` 会把它们
+        //    当成失败、弹「连接出错(201)!」。本文件另一处原始 XHR 分支用的就是同样的区间写法。
+        if (statusCode < 200 || statusCode >= 300) {
           if (statusCode == ResultEnum.Unauthorized) {
             let skipRefresh = false;
             if (extra != null) {
@@ -1014,5 +1033,159 @@ export class HttpClient {
    */
   download(url: string, config: LimeRequestConfig | null = null): Promise<DownloadResult> {
     return this.downloadFile(url, config);
+  }
+
+  /**
+   * 发起 enableChunked 流式请求（SSE / NDJSON 这类「边收边吐」的接口），**方法固定为 POST**
+   *
+   * 与 request() 的分工 —— **只复用请求侧能力**：前置钩子（注入 token）、baseURL / extra.domain
+   * 域名拼接、`extra.requestKey` 取消登记。响应侧刻意不走 lime-request 的 Promise 链，原因有二：
+   *   1. lime-request 的 default 分支不把 `responseType` / `dataType` 转发给 uni.request，
+   *      流式必需的 `responseType: 'arraybuffer'` 会在中途丢掉；
+   *   2. 流式响应体不是 `{ code, data }` 业务包装，若走 applyAfterSuccess，defaultBusinessAfterSuccess
+   *      的 JSON 拆包会在**流已经收完的那一刻**抛错并弹 toast，把一次成功的流变成「内容到齐 + 报错」。
+   * 所以这里自己发 uni.request，把原始字节块交给调用方自行解码。
+   *
+   * @param config 请求配置（url / data / header / timeout …）；
+   *               `extra.ignoreAuth` 跳过鉴权、`extra.requestKey` 登记取消键、`extra.domain` 换域名
+   * @param onChunk 每收到一个原始字节块回调一次，入参即 onChunkReceived 的 ArrayBuffer
+   * @param onEnd 流收尾回调：null = 正常结束，非 null = 失败文案（网络失败 / 钩子抛错 / 被取消都归到此处）
+   * @returns 中断句柄；前置钩子还没解析完时调用 abort() 同样生效（解析完会直接跳过发送）
+   */
+  stream(
+    config: LimeRequestConfig,
+    onChunk: (data: ArrayBuffer) => void,
+    onEnd: (errMsg: string | null) => void
+  ): StreamTask {
+    const finalConfig = (config ?? {}) as LimeRequestConfig;
+    const requestKey = this.lifecycle.readExtraString(finalConfig, 'requestKey');
+    // ⚠️ 这里必须用 LimeRequestTask 而非全局 RequestTask 承接：VSCode 侧 `uni.request()` 的返回类型是
+    // @dcloudio/types 的 `UniNamespace.RequestTask`，其 onHeadersReceived 返回 void，与 src/types/uni.d.ts
+    // 里按 HBuilderX 真源补的全局 RequestTask（返回监听器 id，number）结构不兼容，直接标注全局类型报 TS2322；
+    // 而 LimeRequestTask 在 VSCode 侧是 any 桩、在 HBuilderX 真源里正是「含全局 RequestTask 的联合」，两边都成立。
+    let task: LimeRequestTask | null = null;
+    let settled = false;
+    let aborted = false;
+    const finish = (errMsg: string | null): void => {
+      if (settled) {
+        return;
+      }
+      settled = true;
+      if (requestKey != '') {
+        this.lifecycle.clearTask(requestKey);
+      }
+      // 主动取消不算失败：订阅方多半已经拆掉了接收端，再抛一次错只会变成噪音
+      if (aborted) {
+        return;
+      }
+      onEnd(errMsg);
+    };
+
+    this.applyBeforeRequest(finalConfig).then(
+      (readyConfig: LimeRequestConfig): void => {
+        // 钩子链解析期间已被取消：不再发请求
+        if (aborted) {
+          return;
+        }
+        const header = readyConfig.header != null ? (readyConfig.header as UTSJSONObject) : ({} as UTSJSONObject);
+        if (header['Content-Type'] == null) {
+          header['Content-Type'] = ContentTypeEnum.AppJson;
+        }
+        if (header.Accept == null) {
+          header.Accept = 'application/json, text/plain, */*';
+        }
+        const rawUrl = readyConfig.url != null ? (readyConfig.url as string) : '';
+        const requestTask = uni.request({
+          url: this.buildStreamUrl(rawUrl, readyConfig),
+          method: 'POST',
+          data: readyConfig.data,
+          header,
+          timeout: readyConfig.timeout != null ? (readyConfig.timeout as number) : 60000,
+          enableChunked: true,
+          responseType: 'arraybuffer',
+          dataType: 'text',
+          success: (_res) => {
+            finish(null);
+          },
+          fail: (err) => {
+            let msg = '网络请求失败';
+            if (err != null && err.errMsg != null) {
+              msg = `${err.errMsg}`;
+            }
+            // 与 defaultBusinessAfterError 同口径：文案含 abort 视为主动取消，静默收尾
+            if (msg.toLowerCase().includes('abort')) {
+              aborted = true;
+              finish(null);
+              return;
+            }
+            finish(msg);
+          }
+        });
+        task = requestTask;
+        if (requestKey != '') {
+          this.lifecycle.registerTask(requestKey, requestTask);
+        }
+        requestTask.onChunkReceived((result) => {
+          if (settled) {
+            return;
+          }
+          onChunk(result.data);
+        });
+      },
+      (hookErr: any): void => {
+        const hookMsg = extractErrorMessage(hookErr);
+        finish(hookMsg != '' ? hookMsg : '请求失败');
+      }
+    );
+
+    return {
+      abort: (): void => {
+        aborted = true;
+        const current = task;
+        if (current != null) {
+          // ⚠️ 必须断言成 RequestTask 再调 abort：`task` 的静态类型 LimeRequestTask 是
+          //    `UploadTask | DownloadTask | RequestTask` 联合类型，Kotlin 端在联合类型上解析不出
+          //    成员方法，直接 `current.abort()` 报 error18「找不到名称"abort"」。
+          //    这里装的只可能是 `uni.request()` 的返回值，断言到 RequestTask 是精确的。
+          //    （同写法先例：uni_modules/lime-request/components/lime-request/KLDRequestTool.uts:119）
+          (current as RequestTask).abort();
+        }
+        finish(null);
+      }
+    } as StreamTask;
+  }
+
+  /**
+   * 流式请求的 URL 拼接：复刻 lime-request mergeUrl 的语义（本方法只处理「不带 params」这一路）
+   *
+   * 优先级 `extra.domain` > `config.baseURL` > 客户端 baseURL —— 与拦截器链一致：
+   * 拦截器是在 mergeConfig **之后**回写 `config.baseURL = extra.domain`，所以 domain 最优先。
+   *
+   * @param url 原始 url；`http://` / `https://` / `//` 开头视为绝对地址，原样返回
+   * @param config 请求配置，只读 `baseURL` 与 `extra.domain`
+   */
+  private buildStreamUrl(url: string, config: LimeRequestConfig): string {
+    let baseURL = this.baseURL;
+    const configBase = config.baseURL != null ? (config.baseURL as string) : '';
+    if (configBase != '') {
+      baseURL = configBase;
+    }
+    const extra = config.extra;
+    if (extra != null) {
+      const domain = (extra as UTSJSONObject).domain as string | null;
+      if (domain != null && domain != '') {
+        baseURL = domain;
+      }
+    }
+    if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('//')) {
+      return url;
+    }
+    if (baseURL != '' && url != '') {
+      return `${baseURL.replace(/\/+$/, '')}${url}`;
+    }
+    if (baseURL != '') {
+      return baseURL;
+    }
+    return url;
   }
 }

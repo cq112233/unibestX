@@ -1,0 +1,87 @@
+/**
+ * useRoute —— 读取**本页路由**的响应式组合式函数（对标 vue-router 的 useRoute）
+ *
+ * 返回的**不是**全局那一份路由状态，而是**属于本次调用所在页面**的快照：上一页不会被
+ * 「正在进入的下一页」改写（全局那份在跳转请求发出时就变成目标路由了）。
+ * 完整模型与「为什么」见 ./route-snapshot.uts 文件头（快照本体与两道闸）与 ./route-state.uts
+ * 文件头的「谁读到什么」（全局那份的定位）。
+ *
+ * @example
+ * ```uts
+ * <script setup lang="uts">
+ * import { useRoute } from '@/src/router/index.uts';
+ *
+ * const route = useRoute();
+ * </script>
+ *
+ * <template>
+ *   <text>{{ route.path }}</text>
+ *   <text>{{ route.query.get('id') }}</text>
+ * </template>
+ * ```
+ */
+import { onPageHide, onPageShow } from '@dcloudio/uni-app';
+import { getCurrentInstance, onUnmounted } from 'vue';
+import type { RouteLocation } from './route-types.uts';
+import { ensureRouteReady, routeState, syncRouteState } from './route-state.uts';
+import {
+  closeRouteSnapshot,
+  hideRouteSnapshot,
+  openRouteSnapshot,
+  readRouteSnapshot,
+  showRouteSnapshot
+} from './route-snapshot.uts';
+
+/**
+ * 获取**本页**路由（响应式、只读）
+ *
+ * 首次调用会自动安装全局路由完成监听，并在状态为空时从页面栈回读一次当前路由，
+ * 因此**在页面 / 组件的 setup 中直接调用即可**，不需要额外的初始化代码。
+ *
+ * ⚠️ 每次调用都会新建一份快照（含页面里与子组件里各调一次就是各一份），它们**值相同、
+ *    互不影响**：本页的路由变了，本页所有快照一起变；别的页面变了，本页一份都不动。
+ *    别用 `useRoute() === useRoute()` 这类身份判断。
+ * ⚠️ 返回的对象**只读**：要改路由请用 `useRouter()` 的导航方法。
+ *
+ * @returns 本页路由对象（path / fullPath / query / params / meta / name）
+ */
+export function useRoute(): RouteLocation {
+  ensureRouteReady();
+
+  // 本调用点自己的快照：创建即定值（新页 setup 时全局里已是它的目标路由，首帧就准）
+  const snapshotId = openRouteSnapshot(routeState);
+
+  // 页面每次「重新显示」都回读一次页面栈，再把结果刷进本页快照。这是**唯一**能覆盖这些场景的时机：
+  // 返回上一页（含安卓物理返回键，它不走任何 uni 导航 API、因此拦截器看不到）、
+  // 从子页面返回、App 回到前台、外部直链进入。
+  // 此刻页面栈顶就是本页，读到的 route + options 一定是对的（详见 route-state.uts 头部）。
+  // onPageShow 是 uni-app X 的**全端**组件级页面生命周期（对应页面 onShow），
+  // 与 layouts/navbar 用的是同一套机制。
+  onPageShow((): void => {
+    syncRouteState();
+    showRouteSnapshot(snapshotId, routeState);
+  });
+
+  // 本页被盖住 / 切到后台 / 切了 Tab：冻结快照 —— 之后别的页面（哪怕同路径再进一层）的路由提交
+  // 都不再改它。同页带参重进时的「提前翻」靠的就是这一步（见 route-snapshot.uts 的 publishRoute）
+  onPageHide((): void => {
+    hideRouteSnapshot(snapshotId);
+  });
+
+  // 页面 / 组件卸载：注销快照，别让登记表随页面往返越积越长。
+  // 没有组件实例时（单测，或业务在 setup 之外调用）不注册 —— 否则 Vue 会告警
+  if (getCurrentInstance() != null) {
+    onUnmounted((): void => {
+      closeRouteSnapshot(snapshotId);
+    });
+  }
+
+  // 快照已被注销（正常不会：onUnmounted 早于任何后续读取）：退化成全局那份，宁可读到全局也别崩
+  const snapshotRoute = readRouteSnapshot(snapshotId);
+
+  if (snapshotRoute != null) {
+    return snapshotRoute;
+  }
+
+  return routeState;
+}

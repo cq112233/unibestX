@@ -15,7 +15,7 @@ export function currentPagePath(): string {
       return '';
     }
     const r = `${route}`;
-    return r.indexOf('/') == 0 ? r : `/${r}`;
+    return r.startsWith('/') ? r : `/${r}`;
   }
   catch (_) {
     return '';

@@ -1,0 +1,289 @@
+/**
+ * 平台判断模块（uni-app X 版 @uni-helper/uni-env）
+ *
+ * 变量名与取值口径**完全对齐 `@uni-helper/uni-env`**，因此原先按 uni-env 写的调用代码
+ * 只需把 import 路径从 `@uni-helper/uni-env` 换成 `@/src/config/env/platform.uts` 即可照搬。
+ *
+ * ⚠️ 为什么不能直接用 `@uni-helper/uni-env`：它整套平台判断都建立在「构建期 Vite define
+ *    静态替换 `process.env.UNI_PLATFORM`」之上。uni-app X 的原生端（Kotlin / Swift / ArkTS）
+ *    不经过这层 define —— 实测 App-Android 产物里 `process.env` 被编译成**空对象**
+ *    （app-service.js 中的 `var define_process_env_default = {}`），于是 uni-env 的
+ *    `isH5` / `isAppAndroid` 等在真机上恒为 false。uni-app X 只能在编译期用条件编译分流，
+ *    因此这一层由本项目自己实现。
+ *
+ * 本文件是**零依赖叶子模块**：不 import 任何其它模块，只依赖条件编译，保证可被任何层安全引入
+ * （反向依赖会造成 Kotlin `<clinit>` 循环死锁，见铁律 1.22 / 红线 36）。
+ * 下面所有导出都是**编译期常量**而非函数：每个平台只保留一支分支，无运行期开销，也天然可 tree-shaking，
+ * 故直接具名导入即可，无需再包一层单例。
+ */
+
+/**
+ * 解析当前编译目标平台标识（取值对齐 uni-app 构建期注入的 `process.env.UNI_PLATFORM`）
+ *
+ * ⚠️ H5 端必须写 `H5 || WEB`：本项目 `pnpm dev` 与 `build:h5` 走的是 `platform === 'web'`，
+ *    该上下文里 `WEB = true` 而 `H5 = false`（已用框架自带预处理器逐平台求值实测），
+ *    只写 `#ifdef H5` 会把整个 Web 构建漏掉。
+ *
+ * ⚠️ 条件编译段内只赋值、最后统一 return。赋值带「当前还是空串才写」的哨兵判断：真编译按平台只剩
+ *    一支生效；单测（vitest）不做条件编译剔除，所有分支都会作为普通代码执行，此时必须是
+ *    **第一个命中的分支生效**，才与原来的 `#ifdef ... return` 语义一致。
+ */
+function resolveUniPlatform(): string {
+  let resolved = '';
+  // #ifdef APP-ANDROID
+  if (resolved == '') {
+    resolved = 'app-android';
+  }
+  // #endif
+  // #ifdef APP-IOS
+  if (resolved == '') {
+    resolved = 'app-ios';
+  }
+  // #endif
+  // #ifdef APP-HARMONY
+  if (resolved == '') {
+    resolved = 'app-harmony';
+  }
+  // #endif
+  // #ifdef H5 || WEB
+  if (resolved == '') {
+    resolved = 'web';
+  }
+  // #endif
+  // #ifdef MP-WEIXIN
+  if (resolved == '') {
+    resolved = 'mp-weixin';
+  }
+  // #endif
+  // #ifdef MP-ALIPAY
+  if (resolved == '') {
+    resolved = 'mp-alipay';
+  }
+  // #endif
+  // #ifdef MP-BAIDU
+  if (resolved == '') {
+    resolved = 'mp-baidu';
+  }
+  // #endif
+  // #ifdef MP-TOUTIAO
+  if (resolved == '') {
+    resolved = 'mp-toutiao';
+  }
+  // #endif
+  // #ifdef MP-KUAISHOU
+  if (resolved == '') {
+    resolved = 'mp-kuaishou';
+  }
+  // #endif
+  // #ifdef MP-QQ
+  if (resolved == '') {
+    resolved = 'mp-qq';
+  }
+  // #endif
+  // #ifdef MP-LARK
+  if (resolved == '') {
+    resolved = 'mp-lark';
+  }
+  // #endif
+  // #ifdef MP-JD
+  if (resolved == '') {
+    resolved = 'mp-jd';
+  }
+  // #endif
+  // #ifdef MP-XHS
+  if (resolved == '') {
+    resolved = 'mp-xhs';
+  }
+  // #endif
+  // #ifdef MP-360
+  if (resolved == '') {
+    resolved = 'mp-360';
+  }
+  // #endif
+  // #ifdef MP-HARMONY
+  if (resolved == '') {
+    resolved = 'mp-harmony';
+  }
+  // #endif
+  return resolved;
+}
+
+/**
+ * 当前编译目标平台标识（对标 `process.env.UNI_PLATFORM`）
+ *
+ * 取值：`app-android` / `app-ios` / `app-harmony` / `web` / `mp-weixin` / `mp-alipay` / …
+ * 未收录的平台返回空串（此时可回退到 `getCompilePlatform()` 的运行时兜底）。
+ */
+export const platform: string = resolveUniPlatform();
+
+/**
+ * 解析当前原生 App 子平台标识
+ */
+function resolveAppPlatform(): string {
+  if (platform == 'app-android') {
+    return 'android';
+  }
+  if (platform == 'app-ios') {
+    return 'ios';
+  }
+  if (platform == 'app-harmony') {
+    return 'harmony';
+  }
+  return '';
+}
+
+/**
+ * 当前原生 App 子平台标识（对标 `process.env.UNI_APP_PLATFORM`）
+ *
+ * 取值：`android` / `ios` / `harmony`；非 App 端为空串。
+ */
+export const appPlatform: string = resolveAppPlatform();
+
+/**
+ * 解析当前 UVue 编译目标语言
+ */
+function resolveUvueTargetLanguage(): string {
+  if (platform == 'app-android') {
+    return 'kotlin';
+  }
+  if (platform == 'app-ios') {
+    return 'swift';
+  }
+  if (platform == 'app-harmony') {
+    return 'arkts';
+  }
+  return 'javascript';
+}
+
+/**
+ * 当前 UVue 编译目标语言
+ *
+ * 取值：`kotlin`（Android）/ `swift`（iOS）/ `arkts`（鸿蒙）/ `javascript`（Web 与小程序）。
+ */
+export const uvueTargetLanguage: string = resolveUvueTargetLanguage();
+
+/** 当前 UTS 目标平台（uni-app X 下与 `platform` 同值） */
+export const utsPlatform: string = platform;
+
+/** 是否为 H5 / Web 端 */
+export const isH5: boolean = platform == 'web' || platform == 'h5';
+
+/** 是否为 Web 端（与 `isH5` 同义，两个名字都保留只为对齐 uni-env） */
+export const isWeb: boolean = isH5;
+
+/** 是否为 Android App 原生端 */
+export const isAppAndroid: boolean = platform == 'app-android';
+
+/** 是否为 iOS App 原生端 */
+export const isAppIOS: boolean = platform == 'app-ios';
+
+/** 是否为 HarmonyOS (鸿蒙) App 原生端 */
+export const isAppHarmony: boolean = platform == 'app-harmony';
+
+/** 是否为 App 原生端（Android / iOS / HarmonyOS 任一） */
+export const isApp: boolean = isAppAndroid || isAppIOS || isAppHarmony;
+
+/** 是否为 `app-plus` 端 —— uni-app X 无此平台，恒为 false（保留只为对齐 uni-env 命名） */
+export const isAppPlus: boolean = false;
+
+/** 是否为小程序端（任一 `mp-*` 平台） */
+export const isMp: boolean = platform.startsWith('mp-');
+
+/** 是否为微信小程序端 */
+export const isMpWeixin: boolean = platform == 'mp-weixin';
+
+/** 是否为支付宝小程序端 */
+export const isMpAlipay: boolean = platform == 'mp-alipay';
+
+/** 是否为百度小程序端 */
+export const isMpBaidu: boolean = platform == 'mp-baidu';
+
+/** 是否为字节（抖音）小程序端 */
+export const isMpToutiao: boolean = platform == 'mp-toutiao';
+
+/** 是否为快手小程序端 */
+export const isMpKuaishou: boolean = platform == 'mp-kuaishou';
+
+/** 是否为 QQ 小程序端 */
+export const isMpQQ: boolean = platform == 'mp-qq';
+
+/** 是否为飞书（Lark）小程序端 */
+export const isMpLark: boolean = platform == 'mp-lark';
+
+/** 是否为京东小程序端 */
+export const isMpJD: boolean = platform == 'mp-jd';
+
+/** 是否为小红书小程序端 */
+export const isMpXHS: boolean = platform == 'mp-xhs';
+
+/** 是否为 360 小程序端 */
+export const isMp360: boolean = platform == 'mp-360';
+
+/** 是否为鸿蒙元服务端 */
+export const isMpHarmony: boolean = platform == 'mp-harmony';
+
+/**
+ * 解析是否为 uni-app X 工程（对标 `process.env.UNI_APP_X`）
+ */
+function resolveIsAppX(): boolean {
+  let isX = false;
+  // #ifdef UNI-APP-X
+  isX = true;
+  // #endif
+  return isX;
+}
+
+/** 是否为 uni-app X 工程（本项目的 `.uvue` / `.uts` 恒为 true，保留该命名只为对齐 uni-env） */
+export const isAppX: boolean = resolveIsAppX();
+
+/** 是否编译为 UVue（uni-app X 恒为 true，保留该命名只为对齐 uni-env） */
+export const isUVue: boolean = isAppX;
+
+/**
+ * 解析当前是否为蒸汽（Vapor）渲染模式
+ *
+ * ⚠️ 条件编译段内只赋值、最后统一 return（写成「每个 `#ifdef` 里各自 return」会被 TS 判成不可达
+ *    代码 TS7027，VSCode 按 DiagnosticTag.Unnecessary 整片淡化）。
+ */
+function resolveIsAppXVapor(): boolean {
+  let isVapor = false;
+  // #ifdef VUE3-VAPOR
+  isVapor = true;
+  // #endif
+  return isVapor;
+}
+
+/**
+ * 当前是否处于蒸汽（Vapor）渲染模式（对标 `process.env.UNI_APP_X_VAPOR`）
+ *
+ * 这是全项目 `#ifdef VUE3-VAPOR` 判定的**唯一真源**，`env.uts` 的 `isVaporMode()` 也由它派生。
+ */
+export const isAppXVapor: boolean = resolveIsAppXVapor();
+
+/**
+ * 解析 H5 端的浏览器 UA（仅 H5 / Web 端有值，其余端恒为空串）
+ */
+function resolveH5UserAgent(): string {
+  let ua = '';
+  // #ifdef H5 || WEB
+  try {
+    ua = typeof navigator != 'undefined' ? navigator.userAgent.toLowerCase() : '';
+  }
+  catch {
+    ua = '';
+  }
+  // #endif
+  return ua;
+}
+
+/** H5 端浏览器 UA（小写），仅 H5 / Web 端有值 */
+const h5UserAgent: string = resolveH5UserAgent();
+
+/** 是否运行在微信内置浏览器（仅在 H5 端可能为 true） */
+export const isH5Weixin: boolean = isH5 && h5UserAgent.includes('micromessenger');
+
+/** 是否运行在微博客户端内置浏览器（仅在 H5 端可能为 true） */
+export const isH5Weibo: boolean = isH5 && h5UserAgent.includes('weibo');
+
+/** 是否运行在支付宝客户端内置浏览器（仅在 H5 端可能为 true） */
+export const isH5Alipay: boolean = isH5 && h5UserAgent.includes('alipayclient');

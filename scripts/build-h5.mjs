@@ -14,6 +14,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { runOptimizer } from './optimize-images.mjs';
+import { detectIde } from './sync-hbuilderx.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const pagesFile = path.join(root, 'pages.json');
@@ -95,13 +96,23 @@ function setupEnv() {
 }
 
 // ---------- 查找 HBuilderX CLI ----------
+// 必须先找「正在运行的那个编辑器」自带的 cli：HBuilderX 的 cli 只服务于同一套安装里的
+// 编辑器进程，跨安装调用不报错也不干活，只打印一句「当前运行的cli与正在运行的HBuilderX不匹配」
+// （实测：装着 HBuilderX-Alpha 并运行时去调稳定版的 cli，既拿不到版本号，publish 也不会真正编译）。
+// 所以这里复用 scripts/sync-hbuilderx.mjs 的 detectIde() —— 它按「显式指定 → 运行中的进程 →
+// 系统索引 → 默认路径」四轮探测，比写死路径靠谱；两处各自维护一份迟早给出互相矛盾的答案。
 function findCli() {
   if (process.env.HBUILDERX_CLI_PATH && fs.existsSync(process.env.HBUILDERX_CLI_PATH)) {
     return process.env.HBUILDERX_CLI_PATH;
   }
+  const detected = detectIde().hx?.cliPath;
+  if (detected && fs.existsSync(detected)) {
+    return detected;
+  }
   const candidates = [
     // macOS
     '/Applications/HBuilderX.app/Contents/MacOS/cli',
+    '/Applications/HBuilderX-Alpha.app/Contents/MacOS/cli',
     // Linux（HBuilderX 官方 Linux 版常见安装目录）
     '/opt/hbuilderx/HBuilderX/cli',
     '/opt/HBuilderX/cli',
@@ -183,6 +194,15 @@ try {
   // ---------- 2. 检查并确保 HBuilderX 处于运行状态 ----------
   const checkRes = spawnSync(cli, ['--version'], { encoding: 'utf8' });
   const checkOutput = `${checkRes.stdout ?? ''} ${checkRes.stderr ?? ''}`;
+  // cli 跨安装调用时是「退出码 0 + 一句提示」，不拦就会一路走到 publish 空转，
+  // 最后卡在等产物那 3 分钟超时上，报错还看不出根因。这里提前点破。
+  if (checkOutput.includes('不匹配')) {
+    console.error('❌ 所用的 CLI 与正在运行的 HBuilderX 不是同一套安装，它不会真正执行任何命令。');
+    console.error(`   当前 CLI: ${cli}`);
+    console.error(`   ${checkOutput.trim().split('\n')[0]}`);
+    console.error('   修法：用上面提示里那个目录下的 cli，或设置 HBUILDERX_CLI_PATH 直接指定。');
+    process.exit(1);
+  }
   if (checkOutput.includes('未检测到已打开的HBuilderX')) {
     console.log('⏳ 检测到 HBuilderX 尚未运行，正在自动启动 HBuilderX 并等待就绪...');
     spawnSync(cli, ['open'], { stdio: 'ignore' });

@@ -242,9 +242,9 @@ for (let i = 0; i < args.length; i++) {
     wantExpect = true;
     expectRaw = args[++i];
   }
-  else if (usageError == null) {
+  else {
     // 只报第一个不认识的 token：这通常就是拼错的那个，后续 token 多是它的连带参数
-    usageError = `✗ 无法识别的参数：${arg}`;
+    usageError ??= `✗ 无法识别的参数：${arg}`;
   }
 }
 

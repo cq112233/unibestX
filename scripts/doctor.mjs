@@ -166,7 +166,7 @@ function checkTypeScript() {
     return;
   }
 
-  const result = runCmd('npx tsc --noEmit');
+  const result = runCmd('npx tsc --noEmit -p tsconfig.typecheck.json');
   if (result.ok) {
     pass('TypeScript 类型检查通过 (0 errors)');
   }
@@ -259,6 +259,7 @@ function checkConfigIntegrity() {
     ['package.json', '项目配置入口'],
     ['vite.config.ts', 'Vite 构建配置'],
     ['tsconfig.json', 'TypeScript 配置'],
+    ['tsconfig.typecheck.json', 'typecheck 作用域配置（仅 src）'],
     ['eslint.config.mjs', 'ESLint 配置'],
     ['stylelint.config.mjs', 'Stylelint 配置'],
     ['pages.config.json', '页面路由配置'],

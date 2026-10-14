@@ -18,7 +18,7 @@
         <view class="flex flex-row items-center justify-between bg-[#f8fafc] rounded-[12px] p-[12px]">
           <view class="flex-col">
             <text class="text-[12px] text-[#64748b]">解析参数数量</text>
-            <text class="text-[20px] font-bold text-[#1e293b] mt-[2px]">{{ optionKeys.length }}</text>
+            <text class="text-[20px] font-bold text-[#1e293b] mt-[2px]">{{ queryRows.length }}</text>
           </view>
           <view class="flex-row items-center">
             <view class="bg-[#3182ce] rounded-[20px] px-[14px] py-[6px]">
@@ -37,19 +37,19 @@
 
         <!-- 参数列表 -->
         <view
-          v-for="key in optionKeys"
-          :key="key"
+          v-for="row in queryRows"
+          :key="row.key"
           class="flex flex-row items-center justify-between py-[12px] border-b-[1px] border-bottom-style-solid border-bottom-color-[#f1f5f9]"
         >
           <view class="flex-row items-center mr-[12px]">
             <view class="w-[6px] h-[6px] rounded-[3px] bg-[#3182ce] mr-[8px]" />
-            <text class="text-[14px] text-[#64748b] font-medium">{{ key }}</text>
+            <text class="text-[14px] text-[#64748b] font-medium">{{ row.key }}</text>
           </view>
-          <text class="text-[14px] text-[#334155] font-semibold">{{ getOptionValue(key) }}</text>
+          <text class="text-[14px] text-[#334155] font-semibold">{{ row.value }}</text>
         </view>
 
         <!-- 空态 -->
-        <view v-if="optionKeys.length == 0" class="flex flex-col items-center py-[32px]">
+        <view v-if="queryRows.length == 0" class="flex flex-col items-center py-[32px]">
           <view class="w-[56px] h-[56px] rounded-[16px] bg-[#f8fafc] items-center justify-center">
             <uni-icons type="info" size="28" color="#cbd5e1" />
           </view>
@@ -67,8 +67,9 @@
 </template>
 
 <script setup lang="uts">
-import { computed, ref } from 'vue';
+import { computed } from 'vue';
 import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/layouts/navbar/utils/index.uts';
+import { useRoute } from '@/src/router/index.uts';
 
 definePage({
   debug: false,
@@ -82,19 +83,29 @@ definePage({
   }
 });
 
-const optionKeys = ref<string[]>([]);
-const queryOptions = ref<UTSJSONObject | null>(null);
+// 参数统一从 useRoute() 读，不再写 onLoad((options) => {...})：
+// 两者都能拿到 query，但 route.query 口径与其它页面一致（Map<string, string>，值已 URL 解码）；
+// 而且它是**本页自己的快照** —— 本页重新显示（onPageShow）/ 同名路径落地提交时刷新，
+// 别的页面跳转改不到它（见 src/router/hooks/route-state.uts 的「谁读到什么」）。
+const route = useRoute();
 
-const countLabel = computed((): string => {
-  return optionKeys.value.length > 0 ? '已解析' : '待解析';
+/** query 键值对展示行 */
+type QueryRow = {
+  key: string;
+  value: string;
+};
+
+/** route.query 是 Map，先摊成数组再交给 v-for（Map 直接遍历拿不到稳定的下标渲染） */
+const queryRows = computed((): QueryRow[] => {
+  const rows: QueryRow[] = [];
+  route.query.forEach((value: string, key: string): void => {
+    rows.push({ key, value } as QueryRow);
+  });
+  return rows;
 });
 
-onLoad((options: UTSJSONObject | null) => {
-  console.log('routerParamsBasicDemo page onLoad options:', options);
-  if (options != null) {
-    queryOptions.value = options;
-    optionKeys.value = UTSJSONObject.keys(options);
-  }
+const countLabel = computed((): string => {
+  return queryRows.value.length > 0 ? '已解析' : '待解析';
 });
 
 onNavbarPullDownRefresh(() => {
@@ -102,17 +113,6 @@ onNavbarPullDownRefresh(() => {
     stopNavbarPullDownRefresh();
   }, 800);
 });
-
-function getOptionValue(key: string): string {
-  const options = queryOptions.value;
-  if (options != null) {
-    const val = options[key];
-    if (val != null) {
-      return `${val}`;
-    }
-  }
-  return '';
-}
 </script>
 
 <style>

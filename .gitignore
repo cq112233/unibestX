@@ -15,8 +15,11 @@ unpackage/
 # 由 uni-layouts 插件自动生成的 App 端样式适配代理目录，勿提交
 src/components/_layouts/
 
-# npm-lock.yaml 勿提交（uni-app X 项目不锁定依赖版本，避免多端依赖冲突）
-pnpm-lock.yaml
+# pnpm-lock.yaml 自 2026-10-12 起纳入版本控制（CI 改用 pnpm install --frozen-lockfile）。
+# 旧策略「不锁定依赖」会让每次 CI 重新解析依赖树：上游插件一升级，
+# 就出现「CI 报一堆 lint error、本地却复现不出来」的假红，
+# 且无法判断某个失败是代码引入的还是依赖漂移引入的。
+# 各分支 package.json 基本一致（变体组件库都在 uni_modules/ 里），合并锁文件不会大面积冲突。
 
 # VitePress 官网打包与缓存产物
 docs/.vitepress/dist/

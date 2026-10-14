@@ -28,7 +28,7 @@
     <!-- 当开启自定义下拉刷新时（原生未开启且当前布局开启） -->
     <!-- 1. 支付宝小程序专享：手势下拉刷新（解决支付宝小程序无原生 refresher 问题） -->
     <scroll-view
-      v-else-if="useCustomRefresher && isAlipayMp"
+      v-else-if="useCustomRefresher && isMpAlipay"
       :direction="pageScrollDirection"
       class="navbar-scroll-view"
       :lower-threshold="50"
@@ -94,7 +94,7 @@ import NavBar from '@/src/components/NavBar/NavBar.uvue';
 import TabbarPlaceholder from '@/src/tabbar/components/TabbarPlaceholder.uvue';
 import { formatNavbarTitle, isPageRefresherDisabled, isPageScrollDisabled, refresherBackground } from './utils/index.uts';
 import { activeTabTitle, curIdx, isPageTabbar, isSinglePageTabbar, tabbarList } from '@/src/tabbar/index.uts';
-import { isAlipayMp } from '@/src/utils/systemInfo/index.uts';
+import { isMpAlipay } from '@/src/config/env/platform.uts';
 import { onPageHide, onPageShow } from '@dcloudio/uni-app';
 
 /**
@@ -373,7 +373,7 @@ const alipayPullHeight = ref(0);
  */
 function onStopRefresh() {
   isTriggered.value = false;
-  if (isAlipayMp) {
+  if (isMpAlipay) {
     alipayPullHeight.value = 0;
   }
 }
@@ -386,7 +386,7 @@ let currentScrollTop: number = 0;
  * 支付宝手势下拉刷新 Header 动态样式
  */
 const alipayHeaderStyle = computed((): string => {
-  if (!isAlipayMp) {
+  if (!isMpAlipay) {
     return 'height: 0px;';
   }
   const trans = isAlipayTouching.value ? 'none' : 'height 0.25s ease';
@@ -394,7 +394,7 @@ const alipayHeaderStyle = computed((): string => {
 });
 
 function handleAlipayTouchStart(e: UniTouchEvent) {
-  if (!isAlipayMp) {
+  if (!isMpAlipay) {
     return;
   }
   if (currentScrollTop <= 2 && !isTriggered.value) {
@@ -408,7 +408,7 @@ function handleAlipayTouchStart(e: UniTouchEvent) {
 }
 
 function handleAlipayTouchMove(e: UniTouchEvent) {
-  if (!isAlipayMp || !isAlipayTouching.value || isTriggered.value || currentScrollTop > 2) {
+  if (!isMpAlipay || !isAlipayTouching.value || isTriggered.value || currentScrollTop > 2) {
     return;
   }
   const touches = e.touches;
@@ -425,7 +425,7 @@ function handleAlipayTouchMove(e: UniTouchEvent) {
 }
 
 function handleAlipayTouchEnd() {
-  if (!isAlipayMp || !isAlipayTouching.value) {
+  if (!isMpAlipay || !isAlipayTouching.value) {
     return;
   }
   isAlipayTouching.value = false;
@@ -518,7 +518,7 @@ onUnmounted(() => {
  */
 function handleScroll(e: UniScrollEvent): void {
   const scrollTop = e.detail.scrollTop;
-  if (isAlipayMp) {
+  if (isMpAlipay) {
     currentScrollTop = Math.ceil(scrollTop);
   }
   uni.$emit('onNavbarPageScroll', {

@@ -10,23 +10,20 @@
           <text class="text-[11px] text-[#94a3b8] ml-[8px] px-[6px] py-[2px] rounded-[4px] bg-[#f1f5f9]">独立页</text>
         </view>
         <text class="text-[13px] text-[#64748b] leading-[19px]">
-          基于 lime-request 封装的 http 请求演示，包含 Mock 数据、真实接口请求、uniCloud 云对象、OSS 文件上传与文件下载五种模式。
+          基于 lime-request 封装的 http 请求演示，包含真实请求（CRUD 增删改查）、OSS 文件上传、文件下载与 useRequest 组合式请求四种模式。
         </text>
         <view class="flex-row flex-wrap mt-[12px]">
-          <view class="rounded-[6px] px-[8px] py-[4px] bg-[#eff6ff] mr-[8px] mb-[8px]">
-            <text class="text-[11px] text-[#1d4ed8]">Mock 数据</text>
-          </view>
           <view class="rounded-[6px] px-[8px] py-[4px] bg-[#ecfdf5] mr-[8px] mb-[8px]">
-            <text class="text-[11px] text-[#065f46]">真实 API</text>
-          </view>
-          <view class="rounded-[6px] px-[8px] py-[4px] bg-[#f0fdfa] mr-[8px] mb-[8px]">
-            <text class="text-[11px] text-[#0f766e]">uniCloud</text>
+            <text class="text-[11px] text-[#065f46]">真实请求</text>
           </view>
           <view class="rounded-[6px] px-[8px] py-[4px] bg-[#fff7ed] mr-[8px] mb-[8px]">
             <text class="text-[11px] text-[#c2410c]">文件上传</text>
           </view>
           <view class="rounded-[6px] px-[8px] py-[4px] bg-[#eef2ff] mr-[8px] mb-[8px]">
             <text class="text-[11px] text-[#4338ca]">文件下载</text>
+          </view>
+          <view class="rounded-[6px] px-[8px] py-[4px] bg-[#f5f3ff] mr-[8px] mb-[8px]">
+            <text class="text-[11px] text-[#6d28d9]">useRequest</text>
           </view>
         </view>
       </view>
@@ -38,128 +35,127 @@
       :lower-threshold="50" @scroll="handleScroll" @scrolltolower="handleScrollToLower"
     >
       <view class="flex flex-col">
-        <!-- ============ 1. uniCloud 云对象 ============ -->
+        <!-- ============ 1. 真实请求（CRUD 增删改查） ============ -->
         <view
           class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid border-[#edf2f7] bg-[#ffffff]"
         >
           <!-- 标题区域 -->
           <view class="flex flex-row items-center mb-[16px]">
             <view
-              class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#3182ce]"
+              class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#06b6d4]"
             />
-            <text class="text-[16px] font-bold text-[#2d3748]">uniCloud 云对象</text>
-          </view>
-          <view class="mb-[16px]">
-            <view class="flex-row items-center justify-between mb-[10px]">
-              <view class="flex-row items-center">
-                <view class="w-[32px] h-[32px] rounded-[8px] bg-[#e6fffb] border-[1px] border-solid border-[#99f6e4] items-center justify-center mr-[10px]">
-                  <text class="text-[12px] font-bold text-[#0f766e]">UC</text>
-                </view>
-                <view>
-                  <text class="text-[14px] font-bold text-[#1e293b]">uniCloud 云对象</text>
-                  <text class="text-[11px] text-[#64748b] mt-[2px]">user.getUserInfo</text>
-                </view>
-              </view>
-              <view class="flex-row items-center px-[8px] py-[4px] rounded-[10px]" :class="cloudStatusBgClass">
-                <view class="w-[6px] h-[6px] rounded-[3px] mr-[5px]" :class="cloudStatusDotClass" />
-                <text class="text-[11px]" :class="cloudStatusTextClass">{{ cloudStatusText }}</text>
-              </view>
-            </view>
-
-            <view class="rounded-[8px] bg-[#f8fafc] border-[1px] border-solid border-[#cbd5e1] overflow-hidden">
-              <view class="h-[3px] bg-[#14b8a6]" />
-              <view class="p-[12px]">
-                <view class="flex-row items-center justify-between mb-[8px]">
-                  <text class="text-[11px] text-[#64748b]">响应数据</text>
-                  <text class="text-[10px] text-[#94a3b8]">JSON</text>
-                </view>
-                <text v-if="cloudLoading" class="text-[12px] text-[#0f766e]">正在连接云端服务...</text>
-                <text v-else-if="hasCloudError" class="text-[12px] text-[#dc2626]">{{ cloudErrorMsg }}</text>
-                <text v-else class="text-[12px] text-[#334155] leading-[20px]">{{ userInfo }}</text>
-
-                <view v-if="hasCloudError" class="mt-[10px] flex-row">
-                  <view class="h-[32px] px-[12px] rounded-[6px] bg-[#0f766e] items-center justify-center" @click="getUserInfo">
-                    <text class="text-[12px] text-[#ffffff]">重新获取</text>
-                  </view>
-                </view>
-              </view>
-            </view>
-          </view>
-        </view>
-
-        <!-- ============ 2. Mock 数据列表 ============ -->
-        <view
-          class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid border-[#edf2f7] bg-[#ffffff]"
-        >
-          <!-- 标题区域 -->
-          <view class="flex flex-row items-center mb-[16px]">
-            <view
-              class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#3182ce]"
-            />
-            <text class="text-[16px] font-bold text-[#2d3748]">Mock 数据列表（ID 为任意类型）</text>
+            <text class="text-[16px] font-bold text-[#2d3748]">真实请求（CRUD 增删改查）</text>
           </view>
           <text class="text-[12px] text-[#64748b] leading-[19px] mb-[4px]">
-            在 src/api/example.uts 中定义，由 fetchFooList() 直接返回，无需网络即可演示列表渲染。
+            由 src/api/example.uts 打公网真实接口（dummyjson 的 /posts，地址写死在该文件的 FOO_BASE_URL）：五个动词都真实发出并回包，name / desc 对应接口的 title / body。增删改后就地改前端列表，点「重置」回服务端真源（该服务不落库，本地改动会没）。
           </text>
-          <view v-for="(item, index) in mockList" :key="index" class="flex-row items-center py-[10px] px-[12px] bg-[#f1f5f9] rounded-[8px] mt-[8px]">
-            <view class="w-[28px] h-[28px] rounded-[14px] bg-[#3182ce] justify-center items-center mr-[10px]">
-              <text class="text-[12px] text-[#ffffff] font-bold">{{ item.id }}</text>
-            </view>
-            <text class="text-[14px] text-[#334155]">{{ item.name }}</text>
-          </view>
-        </view>
 
-        <!-- ============ 3. 真实接口请求状态 ============ -->
-        <view
-          class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid border-[#edf2f7] bg-[#ffffff]"
-        >
-          <!-- 标题区域 -->
-          <view class="flex flex-row items-center mb-[16px]">
-            <view
-              class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#3182ce]"
+          <!-- 2.1 表单区：新增与编辑共用一套输入框，crudEditingId > 0 即编辑态 -->
+          <view class="rounded-[10px] p-[12px] mt-[12px] border-[1px] border-solid border-[#e2e8f0]">
+            <view class="flex-row items-center justify-between mb-[8px]">
+              <text class="text-[13px] text-[#64748b]">{{ crudFormTitle }}</text>
+              <view class="px-[8px] py-[2px] rounded-[10px]" :class="crudFormModeBgClass">
+                <text class="text-[12px]" :class="crudFormModeTextClass">{{ crudFormModeText }}</text>
+              </view>
+            </view>
+            <input
+              v-model="crudName"
+              placeholder="title（映射为 name），例如 He was an expert"
+              class="h-[38px] bg-white rounded-[6px] px-[12px] border-[1px] border-solid border-[#cbd5e1] text-[13px] text-[#334155] mb-[8px]"
             />
-            <text class="text-[16px] font-bold text-[#2d3748]">真实 API 请求（拦截器 + 错误处理）</text>
-          </view>
-          <view class="rounded-[10px] p-[12px] mb-[16px] border-[1px] border-solid border-[#e2e8f0]">
-            <view class="flex-row justify-between items-center mb-[6px]">
-              <text class="text-[13px] text-[#64748b]">接口请求状态:</text>
-              <view class="px-[8px] py-[2px] rounded-[10px]" :class="statusBgClass">
-                <text class="text-[12px]" :class="statusTextClass">{{ statusText }}</text>
+            <input
+              v-model="crudDesc"
+              placeholder="body（映射为 desc），例如 一段正文……"
+              class="h-[38px] bg-white rounded-[6px] px-[12px] border-[1px] border-solid border-[#cbd5e1] text-[13px] text-[#334155] mb-[10px]"
+            />
+            <!-- 操作按钮：用 margin-right 代替 gap -->
+            <view class="flex-row">
+              <view :class="crudSubmitWrapClass">
+                <view
+                  class="rounded-[8px] h-[42px] w-full flex flex-row items-center justify-center"
+                  :class="crudSubmitBgClass"
+                  @click="submitCrud"
+                >
+                  <text class="text-[#ffffff] text-[14px]">{{ crudSubmitText }}</text>
+                </view>
               </view>
-            </view>
-            <view
-              v-if="hasResponseData"
-              class="rounded-[8px] p-[10px] border-[1px] border-solid bg-[#ffffff] border-[#e2e8f0]"
-            >
-              <text class="text-[12px] text-[#475569]">{{ responseText }}</text>
-            </view>
-            <view v-if="hasErrorMsg" class="bg-[#fff5f5] rounded-[8px] p-[10px] border-[1px] border-solid border-[#fecaca] mt-[6px]">
-              <text class="text-[12px] text-[#ef4444]">错误：{{ errorMsg }}</text>
+              <view v-if="crudEditing" class="flex-1">
+                <view
+                  class="bg-[#94a3b8] rounded-[8px] h-[42px] w-full flex flex-row items-center justify-center"
+                  @click="cancelCrudEdit"
+                >
+                  <text class="text-[#ffffff] text-[14px]">取消编辑</text>
+                </view>
+              </view>
             </view>
           </view>
 
-          <!-- 操作按钮：用 margin-right 代替 gap -->
-          <view class="flex-row">
-            <view class="flex-1 mr-[10px]">
-              <view
-                class="bg-[#3182ce] rounded-[8px] h-[42px] w-full flex flex-row items-center justify-center"
-                @click="loadMockData"
-              >
-                <text class="text-[#ffffff] text-[14px]">加载 Mock 数据</text>
+          <!-- 2.2 数据列表：每行挂「详情 / 编辑 / 删除」三个操作 -->
+          <view class="mt-[12px]">
+            <view class="flex-row items-center justify-between mb-[8px]">
+              <text class="text-[13px] text-[#64748b]">当前列表（GET /posts）</text>
+              <view class="flex-row items-center">
+                <text class="text-[12px] text-[#94a3b8] mr-[8px]">{{ crudListCountText }}</text>
+                <view class="px-[8px] py-[3px] rounded-[4px] bg-[#0ea5e9] flex-row items-center" @click="resetCrudDemo">
+                  <text class="text-[10px] text-[#ffffff] font-medium">{{ crudLoading ? '加载中…' : '重置' }}</text>
+                </view>
               </view>
             </view>
-            <view class="flex-1">
-              <view
-                class="bg-[#10b981] rounded-[8px] h-[42px] w-full flex flex-row items-center justify-center"
-                @click="fetchRealApi"
-              >
-                <text class="text-[#ffffff] text-[14px]">{{ loading ? '请求中...' : '真实 API 请求' }}</text>
+
+            <text v-if="crudList.length == 0" class="text-[12px] text-[#94a3b8]">暂无数据，可在上方表单新增一条</text>
+
+            <view
+              v-for="item in crudList"
+              :key="item.id"
+              class="flex-row items-center py-[10px] px-[10px] bg-[#f8fafc] rounded-[8px] mb-[8px]"
+            >
+              <view class="flex-1 mr-[8px]">
+                <view class="flex-row items-center">
+                  <text class="text-[13px] font-bold text-[#334155]">{{ item.name }}</text>
+                  <text class="text-[11px] text-[#94a3b8] ml-[6px]">#{{ item.id }}</text>
+                  <text v-if="item.id == crudEditingId" class="text-[10px] text-[#0ea5e9] ml-[6px]">编辑中</text>
+                </view>
+                <text class="text-[11px] text-[#64748b] mt-[2px]">{{ crudDescPreview(item.desc) }}</text>
+              </view>
+              <view class="flex-row items-center">
+                <view class="px-[8px] py-[4px] rounded-[4px] bg-[#e0e7ff] mr-[6px]" @click="loadCrudDetail(item)">
+                  <text class="text-[11px] text-[#4338ca]">详情</text>
+                </view>
+                <view class="px-[8px] py-[4px] rounded-[4px] bg-[#dbeafe] mr-[6px]" @click="startCrudEdit(item)">
+                  <text class="text-[11px] text-[#1d4ed8]">编辑</text>
+                </view>
+                <view class="px-[8px] py-[4px] rounded-[4px] bg-[#fee2e2]" @click="removeCrud(item)">
+                  <text class="text-[11px] text-[#b91c1c]">删除</text>
+                </view>
               </view>
             </view>
+          </view>
+
+          <!-- 2.3 详情结果面板（GET /posts/:id） -->
+          <view
+            v-if="hasCrudDetail"
+            class="mt-[12px] rounded-[8px] bg-[#f8fafc] border-[1px] border-solid border-[#cbd5e1] overflow-hidden"
+          >
+            <view class="h-[3px] bg-[#6366f1]" />
+            <view class="p-[12px]">
+              <view class="flex-row items-center justify-between mb-[6px]">
+                <text class="text-[11px] text-[#64748b]">详情结果</text>
+                <text class="text-[10px] text-[#94a3b8]">GET /posts/:id</text>
+              </view>
+              <text class="text-[12px] text-[#334155] leading-[20px]">{{ crudDetailText }}</text>
+            </view>
+          </view>
+
+          <!-- 2.4 失败兜底：http 拦截器已统一 toast，这里只留卡片内的一行提示 -->
+          <view
+            v-if="hasCrudError"
+            class="mt-[10px] bg-[#fff5f5] rounded-[8px] p-[10px] border-[1px] border-solid border-[#fecaca]"
+          >
+            <text class="text-[12px] text-[#ef4444]">{{ crudError }}</text>
           </view>
         </view>
 
-        <!-- ============ 4. 文件上传 ============ -->
+        <!-- ============ 2. 文件上传 ============ -->
         <view
           class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid border-[#edf2f7] bg-[#ffffff]"
         >
@@ -249,7 +245,7 @@
           </view>
         </view>
 
-        <!-- ============ 5. 文件下载 ============ -->
+        <!-- ============ 3. 文件下载 ============ -->
         <view
           class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid border-[#edf2f7] bg-[#ffffff]"
         >
@@ -370,6 +366,114 @@
           </view>
         </view>
 
+        <!-- ============ 4. useRequest 组合式请求 ============ -->
+        <view
+          class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid border-[#edf2f7] bg-[#ffffff]"
+        >
+          <!-- 标题区域 -->
+          <view class="flex flex-row items-center mb-[16px]">
+            <view class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#8b5cf6]" />
+            <text class="text-[16px] font-bold text-[#2d3748]">useRequest 组合式请求（对标 Alova）</text>
+          </view>
+          <text class="text-[12px] text-[#64748b] leading-[18px] mb-[12px]">手写的 loading / error 样板全部由 hook 托管：状态流转、并发竞态、失败重试、防抖、轮询、取消一次配齐。</text>
+
+          <!-- 5.1 成功路径：列表接口 -->
+          <view class="rounded-[10px] p-[12px] mb-[12px] border-[1px] border-solid border-[#e2e8f0]">
+            <view class="flex-row justify-between items-center mb-[6px]">
+              <text class="text-[13px] text-[#64748b]">fetchFooList（GET /posts）</text>
+              <view class="px-[8px] py-[2px] rounded-[10px]" :class="listStatusBgClass">
+                <text class="text-[12px]" :class="listStatusTextClass">{{ listStatusText }}</text>
+              </view>
+            </view>
+            <text class="text-[12px] text-[#475569]">{{ listDataText }}</text>
+            <text class="text-[11px] text-[#94a3b8]">onComplete 已触发 {{ listTick }} 次</text>
+          </view>
+          <view class="flex-row mb-[12px]">
+            <view class="flex-1 mr-[10px]">
+              <view
+                class="bg-[#8b5cf6] rounded-[8px] h-[42px] w-full flex flex-row items-center justify-center"
+                @click="sendListRequest"
+              >
+                <text class="text-[#ffffff] text-[14px]">send('uni')</text>
+              </view>
+            </view>
+            <view class="flex-1 mr-[10px]">
+              <view
+                class="bg-[#10b981] rounded-[8px] h-[42px] w-full flex flex-row items-center justify-center"
+                @click="refreshListRequest"
+              >
+                <text class="text-[#ffffff] text-[14px]">refresh()</text>
+              </view>
+            </view>
+            <view class="flex-1">
+              <view
+                class="bg-[#ef4444] rounded-[8px] h-[42px] w-full flex flex-row items-center justify-center"
+                @click="abortListRequest"
+              >
+                <text class="text-[#ffffff] text-[14px]">abort()</text>
+              </view>
+            </view>
+          </view>
+
+          <!-- 5.2 失败与取消路径：真实接口 + 重试 -->
+          <view class="rounded-[10px] p-[12px] mb-[12px] border-[1px] border-solid border-[#e2e8f0]">
+            <view class="flex-row justify-between items-center mb-[6px]">
+              <text class="text-[13px] text-[#64748b]">fetchFooRemote（真实接口 · retry 2）</text>
+              <view class="px-[8px] py-[2px] rounded-[10px]" :class="remoteStatusBgClass">
+                <text class="text-[12px]" :class="remoteStatusTextClass">{{ remoteStatusText }}</text>
+              </view>
+            </view>
+            <text class="text-[12px] text-[#475569]">{{ remoteDetailText }}</text>
+            <text class="text-[11px] text-[#94a3b8]">onError 已触发 {{ remoteErrorTick }} 次 · 请求函数实际被调用 {{ remoteCalls }} 次</text>
+          </view>
+          <view class="flex-row mb-[12px]">
+            <view class="flex-1 mr-[10px]">
+              <view
+                class="bg-[#0ea5e9] rounded-[8px] h-[42px] w-full flex flex-row items-center justify-center"
+                @click="sendRemoteRequest"
+              >
+                <text class="text-[#ffffff] text-[14px]">发起请求</text>
+              </view>
+            </view>
+            <view class="flex-1">
+              <view
+                class="bg-[#ef4444] rounded-[8px] h-[42px] w-full flex flex-row items-center justify-center"
+                @click="abortRemoteRequest"
+              >
+                <text class="text-[#ffffff] text-[14px]">abort() 取消</text>
+              </view>
+            </view>
+          </view>
+
+          <!-- 5.3 防抖：连续输入只发一次 -->
+          <view class="rounded-[10px] p-[12px] mb-[12px] border-[1px] border-solid border-[#e2e8f0]">
+            <text class="text-[13px] text-[#64748b] mb-[8px]">防抖 400ms —— 连续输入只在停手后发一次</text>
+            <input
+              v-model="searchKeyword"
+              placeholder="输入关键字，观察下方只发一次"
+              class="h-[38px] bg-white rounded-[6px] px-[12px] border-[1px] border-solid border-[#cbd5e1] text-[13px] text-[#334155] mb-[8px]"
+              @input="handleSearchInput"
+            />
+            <text class="text-[12px] text-[#475569]">请求函数实际被调用 {{ searchCalls }} 次</text>
+            <text class="text-[11px] text-[#94a3b8]">最后一次发出的关键字「{{ searchLastKeyword }}」</text>
+          </view>
+
+          <!-- 5.4 轮询：不翻 loading、失败静默 -->
+          <view class="rounded-[10px] p-[12px] border-[1px] border-solid border-[#e2e8f0]">
+            <view class="flex-row justify-between items-center mb-[8px]">
+              <text class="text-[13px] text-[#64748b]">轮询 3s（不翻 loading、失败静默）</text>
+              <text class="text-[12px] text-[#475569]">已轮询 {{ pollingTick }} 次</text>
+            </view>
+            <view
+              class="h-[42px] w-full rounded-[8px] flex flex-row items-center justify-center"
+              :class="pollingButtonClass"
+              @click="togglePolling"
+            >
+              <text class="text-[#ffffff] text-[14px]">{{ pollingButtonText }}</text>
+            </view>
+          </view>
+        </view>
+
         <view class="flex-col items-center py-[16px]">
           <text class="text-[12px] text-[#94a3b8]">已触底 {{ reachBottomCount }} 次 · 内容结束</text>
         </view>
@@ -381,8 +485,11 @@
 <script setup lang="uts">
 /* eslint-disable dot-notation */
 import { computed, ref } from 'vue';
-import { downloadFooFile, fetchFooList, fetchFooRemote, FOO_DOWNLOAD_URL, FOO_UPLOAD_PATH, uploadFooFile } from '@/src/api/example.uts';
-import type { FooItem } from '@/src/api/example.uts';
+import { createFoo, deleteFoo, downloadFooFile, fetchFooById, fetchFooList, fetchFooRemote, FOO_DOWNLOAD_URL, FOO_UPLOAD_PATH, updateFoo, uploadFooFile } from '@/src/api/example.uts';
+import type { FooItem, PageResult } from '@/src/api/example.uts';
+// useRequest 走精准导入（红线 36）：不经门面 `index.uts` 二次转发
+import { useRequest } from '@/src/http/hooks/useRequest.uts';
+import type { UseRequestContext, UseRequestEvent } from '@/src/http/hooks/useRequest.uts';
 import { getOssBaseUrl } from '@/src/config/index.uts';
 import { toast, toastSuccess } from '@/src/utils/toast/index.uts';
 import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/layouts/navbar/utils/index.uts';
@@ -402,14 +509,6 @@ definePage({
 // ==========================================
 // 响应式状态
 // ==========================================
-const mockList = ref<FooItem[]>([]);
-const loading = ref<boolean>(false);
-const requestStatus = ref<string>('idle'); // idle | loading | success | error
-const responseData = ref<FooItem | null>(null);
-const errorMsg = ref<string>('');
-const userInfo = ref<string>('');
-const cloudLoading = ref<boolean>(false);
-const cloudErrorMsg = ref<string>('');
 const uploadPath = ref<string>(FOO_UPLOAD_PATH);
 const uploadLoading = ref<boolean>(false);
 const uploadResult = ref<string>('');
@@ -423,87 +522,97 @@ const downloadError = ref<string>('');
 const reachBottomCount = ref<number>(0);
 
 // ==========================================
+// 第 5 张卡：useRequest 组合式请求
+// ==========================================
+const listTick = ref<number>(0);
+const remoteErrorTick = ref<number>(0);
+const remoteCalls = ref<number>(0);
+const searchKeyword = ref<string>('');
+const searchCalls = ref<number>(0);
+const searchLastKeyword = ref<string>('');
+const pollingOn = ref<boolean>(false);
+const pollingTick = ref<number>(0);
+
+// ==========================================
+// 第 2 张卡：真实请求（CRUD 增删改查）
+// 表单在「新增」与「编辑」之间复用，`crudEditingId > 0`（即 crudEditing）就是编辑态
+// ==========================================
+const crudList = ref<FooItem[]>([]);
+const crudLoading = ref<boolean>(false);
+const crudSubmitting = ref<boolean>(false);
+const crudName = ref<string>('');
+const crudDesc = ref<string>('');
+const crudEditingId = ref<number>(0);
+const crudDetailText = ref<string>('');
+const crudError = ref<string>('');
+
+/**
+ * 成功路径：列表接口，`immediate: false` 让它不在页面挂载时就发（否则一进页面就白跑一次）
+ *
+ * 演示 `send` 带参 / `refresh` 复用上次入参 / `abort` 取消 / `refreshing` 与 `loading` 的区别。
+ */
+const listRequest = useRequest<PageResult<FooItem>>((ctx: UseRequestContext): Promise<PageResult<FooItem>> => {
+  let keyword: string = '';
+  if (ctx.args.length > 0) {
+    keyword = ctx.args[0] as string;
+  }
+  return fetchFooList(1, 5, keyword);
+}, {
+  immediate: false
+});
+listRequest.onComplete((_e: UseRequestEvent<PageResult<FooItem>>): void => {
+  listTick.value = listTick.value + 1;
+});
+
+/**
+ * 失败与取消路径：真实接口 + `retry: 2`
+ *
+ * 无后端时正好演示「网络层失败自动重试」与 `error` 状态；有后端时演示 `abort()` 真取消。
+ * 每次尝试都计入 `remoteCalls`，重试有没有生效一眼可见。
+ */
+const remoteRequest = useRequest<FooItem>((_ctx: UseRequestContext): Promise<FooItem> => {
+  remoteCalls.value = remoteCalls.value + 1;
+  return fetchFooRemote();
+}, {
+  immediate: false,
+  retry: 2,
+  retryDelay: 600
+});
+remoteRequest.onError((_e: UseRequestEvent<FooItem>): void => {
+  remoteErrorTick.value = remoteErrorTick.value + 1;
+});
+
+/**
+ * 防抖：连续输入只在停手 400ms 后发一次
+ *
+ * 注意入参取的是 `searchKeyword.value` 而不是 `ctx.args`：`@input` 触发时 v-model 已同步，
+ * 而防抖窗口结束时用户可能又敲了新字符，这里始终以「当前输入」为准。
+ */
+const searchRequest = useRequest<PageResult<FooItem>>((): Promise<PageResult<FooItem>> => {
+  searchCalls.value = searchCalls.value + 1;
+  searchLastKeyword.value = searchKeyword.value;
+  return fetchFooList(1, 5, searchKeyword.value);
+}, {
+  immediate: false,
+  debounce: 400
+});
+
+/**
+ * 轮询：3s 一次，不翻 loading、失败静默
+ *
+ * `immediate: false` 只影响首帧自动触发，不会阻止 `startPolling()`，所以这里可以纯手动开关。
+ */
+const pollingRequest = useRequest<PageResult<FooItem>>((): Promise<PageResult<FooItem>> => {
+  pollingTick.value = pollingTick.value + 1;
+  return fetchFooList(1, 3, '');
+}, {
+  immediate: false,
+  polling: 3000
+});
+
+// ==========================================
 // 计算属性
 // ==========================================
-const statusText = computed((): string => {
-  switch (requestStatus.value) {
-    case 'loading': return '请求中';
-    case 'success': return '请求成功';
-    case 'error': return '请求失败';
-    default: return '待请求';
-  }
-});
-
-const statusTextClass = computed((): string => {
-  switch (requestStatus.value) {
-    case 'loading': return 'text-[#d97706]';
-    case 'success': return 'text-[#059669]';
-    case 'error': return 'text-[#dc2626]';
-    default: return 'text-[#94a3b8]';
-  }
-});
-
-const statusBgClass = computed((): string => {
-  switch (requestStatus.value) {
-    case 'loading': return 'bg-[#fef9c3]';
-    case 'success': return 'bg-[#d1fae5]';
-    case 'error': return 'bg-[#fee2e2]';
-    default: return 'bg-[#f1f5f9]';
-  }
-});
-
-// 用显式 boolean 计算属性替换模板里的 != null / != '' 条件判断
-const hasResponseData = computed((): boolean => {
-  return responseData.value != null;
-});
-
-const hasErrorMsg = computed((): boolean => {
-  return errorMsg.value.length > 0;
-});
-
-const responseText = computed((): string => {
-  const data = responseData.value;
-  if (data == null)
-    return '';
-  return `id: ${data.id}, name: ${data.name}`;
-});
-
-const hasCloudError = computed((): boolean => {
-  return cloudErrorMsg.value.length > 0;
-});
-
-const cloudStatusText = computed((): string => {
-  if (cloudLoading.value)
-    return '连接中';
-  if (hasCloudError.value)
-    return '连接失败';
-  return '已连接';
-});
-
-const cloudStatusBgClass = computed((): string => {
-  if (cloudLoading.value)
-    return 'bg-[#fef9c3]';
-  if (hasCloudError.value)
-    return 'bg-[#fee2e2]';
-  return 'bg-[#ccfbf1]';
-});
-
-const cloudStatusDotClass = computed((): string => {
-  if (cloudLoading.value)
-    return 'bg-[#d97706]';
-  if (hasCloudError.value)
-    return 'bg-[#dc2626]';
-  return 'bg-[#0d9488]';
-});
-
-const cloudStatusTextClass = computed((): string => {
-  if (cloudLoading.value)
-    return 'text-[#a16207]';
-  if (hasCloudError.value)
-    return 'text-[#b91c1c]';
-  return 'text-[#0f766e]';
-});
-
 const hasUploadError = computed((): boolean => {
   return uploadError.value.length > 0;
 });
@@ -542,80 +651,6 @@ const isDownloadImage = computed((): boolean => {
 // ==========================================
 // 方法
 // ==========================================
-
-/**
- * 加载 Mock 数据（本地，无需网络）
- */
-async function loadMockData() {
-  try {
-    const pageResult = await fetchFooList(1, 100, '');
-    mockList.value = pageResult.list;
-    // toastSuccess(`加载了 ${pageResult.list.length} 条数据`)
-  }
-  catch (err) {
-    console.error('loadMockData error:', err);
-  }
-}
-
-/**
- * 发起真实 API 请求（演示拦截器与错误处理）
- * 使用 async/await 与 try/catch，这在 UTS 中类型推导更稳定
- */
-async function fetchRealApi() {
-  loading.value = true;
-  requestStatus.value = 'loading';
-  responseData.value = null;
-  errorMsg.value = '';
-
-  try {
-    const res = await fetchFooRemote();
-    responseData.value = res;
-    requestStatus.value = 'success';
-  }
-  catch (err) {
-    console.log(err, 'err');
-    requestStatus.value = 'error';
-    let msg = '请求失败';
-    if (err instanceof Error) {
-      msg = (err as Error).message;
-    }
-    else if (err instanceof UTSJSONObject) {
-      // 用下标取值而非 getString：getString 在 TS 类型桩里被标为可能 undefined，
-      // 与本项目其它位置（如 login.uvue 读 options）保持同一种写法
-      const errObj = err as UTSJSONObject;
-      const errMsg = (errObj['message'] as string | null) ?? (errObj['msg'] as string | null) ?? (errObj['errMsg'] as string | null);
-      if (errMsg != null) {
-        msg = errMsg;
-      }
-      else {
-        msg = JSON.stringify(err);
-      }
-    }
-    else if (err != null) {
-      msg = `${err}`;
-    }
-    errorMsg.value = msg;
-  }
-
-  loading.value = false;
-}
-
-async function getUserInfo() {
-  cloudLoading.value = true;
-  cloudErrorMsg.value = '';
-
-  try {
-    const res = await uniCloud.importObject('user').getUserInfo();
-    userInfo.value = JSON.stringify((res as UTSJSONObject)['data'] ?? res);
-    console.log('res', res);
-  }
-  catch (err) {
-    cloudErrorMsg.value = '云端数据获取失败，请检查 uniCloud 配置后重试';
-    console.error('getUserInfo error:', err);
-  }
-
-  cloudLoading.value = false;
-}
 
 /**
  * 执行上传并展示结果
@@ -826,6 +861,468 @@ function openDownloadedFile() {
 }
 
 // ==========================================
+// 第 5 张卡：状态文案与操作函数
+// 状态键一律由 hook 的 data / loading / refreshing / error 推导，页面不再自己维护 loading 布尔值
+// ==========================================
+
+/** 主请求状态键：error > refreshing > loading > success > idle，优先级即页面该显示的语义 */
+const listStatusKey = computed((): string => {
+  if (listRequest.error.value != null) {
+    return 'error';
+  }
+  if (listRequest.loading.value == true) {
+    if (listRequest.refreshing.value == true) {
+      return 'refreshing';
+    }
+    return 'loading';
+  }
+  if (listRequest.data.value != null) {
+    return 'success';
+  }
+  return 'idle';
+});
+
+const listStatusText = computed((): string => {
+  switch (listStatusKey.value) {
+    case 'loading': return '加载中';
+    // refreshing 与 loading 在页面上是两种体验：前者可以继续展示旧内容，后者只能空着等
+    case 'refreshing': return '刷新中';
+    case 'success': return '成功';
+    case 'error': return '失败';
+    default: return '待发起';
+  }
+});
+
+const listStatusTextClass = computed((): string => {
+  switch (listStatusKey.value) {
+    case 'loading': return 'text-[#d97706]';
+    case 'refreshing': return 'text-[#2563eb]';
+    case 'success': return 'text-[#059669]';
+    case 'error': return 'text-[#dc2626]';
+    default: return 'text-[#94a3b8]';
+  }
+});
+
+const listStatusBgClass = computed((): string => {
+  switch (listStatusKey.value) {
+    case 'loading': return 'bg-[#fef9c3]';
+    case 'refreshing': return 'bg-[#dbeafe]';
+    case 'success': return 'bg-[#d1fae5]';
+    case 'error': return 'bg-[#fee2e2]';
+    default: return 'bg-[#f1f5f9]';
+  }
+});
+
+const listDataText = computed((): string => {
+  const data = listRequest.data.value;
+  if (data == null) {
+    return '暂无数据';
+  }
+  return `共 ${data.total} 条 · 本页 ${data.list.length} 条`;
+});
+
+const remoteStatusText = computed((): string => {
+  if (remoteRequest.loading.value == true) {
+    return `请求中（第 ${remoteCalls.value} 次尝试）`;
+  }
+  if (remoteRequest.error.value != null) {
+    return '已重试后仍失败';
+  }
+  if (remoteRequest.data.value != null) {
+    return '成功';
+  }
+  return '待发起';
+});
+
+const remoteStatusTextClass = computed((): string => {
+  if (remoteRequest.loading.value == true) {
+    return 'text-[#d97706]';
+  }
+  if (remoteRequest.error.value != null) {
+    return 'text-[#dc2626]';
+  }
+  if (remoteRequest.data.value != null) {
+    return 'text-[#059669]';
+  }
+  return 'text-[#94a3b8]';
+});
+
+const remoteStatusBgClass = computed((): string => {
+  if (remoteRequest.loading.value == true) {
+    return 'bg-[#fef9c3]';
+  }
+  if (remoteRequest.error.value != null) {
+    return 'bg-[#fee2e2]';
+  }
+  if (remoteRequest.data.value != null) {
+    return 'bg-[#d1fae5]';
+  }
+  return 'bg-[#f1f5f9]';
+});
+
+const remoteDetailText = computed((): string => {
+  const err = remoteRequest.error.value;
+  if (err != null) {
+    return `错误：${err.message}`;
+  }
+  const data = remoteRequest.data.value;
+  if (data != null) {
+    return `id: ${data.id}, name: ${data.name}`;
+  }
+  return '未配置后端时走失败分支，正好演示重试与 error 状态';
+});
+
+const pollingButtonText = computed((): string => {
+  if (pollingOn.value == true) {
+    return '停止轮询';
+  }
+  return '开始轮询';
+});
+
+const pollingButtonClass = computed((): string => {
+  if (pollingOn.value == true) {
+    return 'bg-[#ef4444]';
+  }
+  return 'bg-[#8b5cf6]';
+});
+
+// —— 第 2 张卡：CRUD 的文案与配色，全部由 crudEditingId 推导
+const crudEditing = computed((): boolean => {
+  return crudEditingId.value > 0;
+});
+
+const crudFormTitle = computed((): string => {
+  if (crudEditing.value) {
+    return `编辑 #${crudEditingId.value}（PUT /posts/:id）`;
+  }
+  return '新增一条（POST /posts/add）';
+});
+
+const crudFormModeText = computed((): string => {
+  if (crudEditing.value) {
+    return '编辑态';
+  }
+  return '新增态';
+});
+
+const crudFormModeBgClass = computed((): string => {
+  if (crudEditing.value) {
+    return 'bg-[#dbeafe]';
+  }
+  return 'bg-[#e0f2fe]';
+});
+
+const crudFormModeTextClass = computed((): string => {
+  if (crudEditing.value) {
+    return 'text-[#1d4ed8]';
+  }
+  return 'text-[#0369a1]';
+});
+
+/** 新增态按钮独占一行，编辑态要多留出「取消编辑」的位置 */
+const crudSubmitWrapClass = computed((): string => {
+  if (crudEditing.value) {
+    return 'flex-1 mr-[10px]';
+  }
+  return 'flex-1';
+});
+
+const crudSubmitBgClass = computed((): string => {
+  if (crudEditing.value) {
+    return 'bg-[#10b981]';
+  }
+  return 'bg-[#0ea5e9]';
+});
+
+const crudSubmitText = computed((): string => {
+  if (crudSubmitting.value) {
+    return '提交中…';
+  }
+  if (crudEditing.value) {
+    return '保存修改';
+  }
+  return '新增';
+});
+
+const crudListCountText = computed((): string => {
+  return `共 ${crudList.value.length} 条`;
+});
+
+const hasCrudDetail = computed((): boolean => {
+  return crudDetailText.value.length > 0;
+});
+
+const hasCrudError = computed((): boolean => {
+  return crudError.value.length > 0;
+});
+
+/** 发起主请求（带参），演示 send 的入参透传 */
+function sendListRequest(): void {
+  listRequest.send('uni');
+}
+
+/** 复用上一次 send 的入参再发一次 */
+function refreshListRequest(): void {
+  listRequest.refresh();
+}
+
+function abortListRequest(): void {
+  listRequest.abort();
+}
+
+function sendRemoteRequest(): void {
+  remoteCalls.value = 0;
+  remoteRequest.send();
+}
+
+function abortRemoteRequest(): void {
+  remoteRequest.abort();
+}
+
+/** 输入即送进防抖队列，窗口内的连续调用只会真正发一次 */
+function handleSearchInput(): void {
+  searchRequest.send(searchKeyword.value);
+}
+
+function togglePolling(): void {
+  if (pollingOn.value == true) {
+    pollingRequest.stopPolling();
+    pollingOn.value = false;
+    return;
+  }
+  pollingRequest.startPolling();
+  pollingOn.value = true;
+}
+
+// ==========================================
+// 第 2 张卡：CRUD 方法
+// 三类写操作（POST / PUT / DELETE）成功后「就地改前端这份列表」（新增插到最前、编辑按 id
+// 替换、删除按 id 移掉），不再回调 loadCrudList() 重拉 —— 少一次 GET，界面即时反馈。
+// 想回到服务端真源（dummyjson 不落库，本地改动都会没）走右上角「重置」。
+// ==========================================
+
+/**
+ * 统一提取写操作捕获到的异常信息
+ * @param e 捕获到的异常（UTS 的 catch 变量是 any，只能按类型逐个收窄）
+ * @param fallback 兜底文案，异常里取不到 message 时使用
+ * @returns 可直接渲染的错误文本
+ */
+function crudErrorMessage(e: any, fallback: string): string {
+  if (e instanceof Error) {
+    return e.message;
+  }
+  if (e instanceof UTSJSONObject) {
+    const errObj = e as UTSJSONObject;
+    const msg = (errObj['message'] as string | null) ?? (errObj['msg'] as string | null) ?? (errObj['errMsg'] as string | null);
+    if (msg != null) {
+      return msg;
+    }
+    return JSON.stringify(e);
+  }
+  if (e != null) {
+    return `${e}`;
+  }
+  return fallback;
+}
+
+/**
+ * 列表行里的正文预览：接口的 `body` 动辄两三百字，整段铺进列表行会把卡片撑爆，
+ * 这里截到 40 字再展示；完整内容走「详情」按钮（GET /posts/:id）看
+ * @param text 接口回包里的正文原文
+ */
+function crudDescPreview(text: string): string {
+  if (text.length <= 40) {
+    return text;
+  }
+  return `${text.substring(0, 40)}…`;
+}
+
+/**
+ * 拉取 CRUD 列表（服务端真源）
+ *
+ * 只在页面挂载、下拉刷新与「重置」三处调用；增删改成功后是就地改列表，不再走这里。
+ */
+async function loadCrudList(): Promise<void> {
+  if (crudLoading.value == true) {
+    return;
+  }
+  crudLoading.value = true;
+  crudError.value = '';
+
+  try {
+    // 演示页只查一条（limit=1）：卡片是拿来演示五个动词的，列表铺满反而把表单挤下去
+    const pageResult = await fetchFooList(1, 1, '');
+    crudList.value = pageResult.list;
+  }
+  catch (err) {
+    crudError.value = crudErrorMessage(err, '列表加载失败');
+  }
+
+  crudLoading.value = false;
+}
+
+/** 清空表单并退回新增态（提交成功与取消编辑共用） */
+function resetCrudForm(): void {
+  crudEditingId.value = 0;
+  crudName.value = '';
+  crudDesc.value = '';
+}
+
+/**
+ * 重置整张卡：清空表单、退出编辑态、收起详情与错误，再重拉一次服务端列表
+ *
+ * 这是本卡唯一会把列表推回服务端真源的入口 —— 增删改都是就地改前端数据的，
+ * 而 dummyjson 的写操作并不落库，所以重拉一次即可把本地那些「假改动」全部抹掉。
+ */
+async function resetCrudDemo(): Promise<void> {
+  resetCrudForm();
+  crudDetailText.value = '';
+  crudError.value = '';
+  await loadCrudList();
+}
+
+/**
+ * 执行删除，成功后按 id 把该行从列表里移掉（与确认弹窗分开放，避免把异步逻辑堆进回调）
+ * @param id 目标条目主键
+ */
+async function deleteCrudItem(id: number): Promise<void> {
+  crudSubmitting.value = true;
+  crudError.value = '';
+
+  try {
+    await deleteFoo(id);
+    // 删掉的正好是当前正在编辑的那条，顺手退回新增态，避免表单指向一条不存在的数据
+    if (crudEditingId.value == id) {
+      resetCrudForm();
+    }
+    crudDetailText.value = '';
+    // ⚠️ 用 findIndex + splice 就地删，而不是 `crudList.value = crudList.value.filter(...)`：
+    //    UTS 里整份替换虽然也能触发刷新，但会丢掉行的复用；splice 是 Vue 明确追踪的变更。
+    //    findIndex 的回调参数必须显式标注类型，否则 Kotlin 侧推断不出元素类型。
+    const removedIndex = crudList.value.findIndex((row: FooItem): boolean => row.id == id);
+    if (removedIndex >= 0) {
+      crudList.value.splice(removedIndex, 1);
+    }
+    toastSuccess('已删除');
+  }
+  catch (err) {
+    crudError.value = crudErrorMessage(err, '删除失败');
+  }
+
+  crudSubmitting.value = false;
+}
+
+/**
+ * 删除（DELETE /posts/:id）：先弹确认框，确认后才真正发请求
+ * @param item 待删除的条目，取其 id 拼进请求地址
+ */
+function removeCrud(item: FooItem): void {
+  if (crudSubmitting.value == true) {
+    return;
+  }
+  uni.showModal({
+    title: '删除确认',
+    content: `确认删除 #${item.id} ${item.name} 吗？此操作不可撤销。`,
+    confirmText: '删除',
+    cancelText: '取消',
+    confirmColor: '#dc2626',
+    success: (modalRes) => {
+      if (modalRes.confirm == true) {
+        deleteCrudItem(item.id);
+      }
+    }
+  });
+}
+
+/**
+ * 查询单条详情（GET /posts/:id），结果渲染在卡片底部的详情面板
+ * @param item 目标条目，取 id 发起查询
+ */
+async function loadCrudDetail(item: FooItem): Promise<void> {
+  crudError.value = '';
+  crudDetailText.value = '';
+
+  try {
+    const detail = await fetchFooById(item.id);
+    // 接口契约：查不到时 resolve null 而非 reject，调用方必须自行判空
+    if (detail == null) {
+      crudDetailText.value = `#${item.id} 查无数据`;
+      return;
+    }
+    crudDetailText.value = `id: ${detail.id} · name: ${detail.name} · desc: ${detail.desc}`;
+  }
+  catch (err) {
+    crudError.value = crudErrorMessage(err, '详情加载失败');
+  }
+}
+
+/**
+ * 进入编辑态：把该行数据回填进表单，提交时走 PUT /posts/:id
+ * @param item 待编辑的条目
+ */
+function startCrudEdit(item: FooItem): void {
+  crudEditingId.value = item.id;
+  crudName.value = item.name;
+  crudDesc.value = item.desc;
+  crudError.value = '';
+}
+
+/** 退出编辑态并清空表单（不动已拉取到的列表） */
+function cancelCrudEdit(): void {
+  resetCrudForm();
+  crudError.value = '';
+}
+
+/**
+ * 提交表单：编辑态走 PUT /posts/:id，新增态走 POST /posts/add
+ *
+ * 成功后不重拉列表，而是拿接口回包就地改：新增把回包插到列表最前（新数据放最上面
+ * 才看得见），编辑按 id 找到原行替换掉。两处改的都是同一份 crudList，改完清空表单退回新增态。
+ *
+ * 新增时 id 一律传 0 占位 —— 真实主键由后端生成，以回包里的 id 为准。
+ */
+async function submitCrud(): Promise<void> {
+  if (crudSubmitting.value == true) {
+    return;
+  }
+  const name = crudName.value.trim();
+  const desc = crudDesc.value.trim();
+  if (name == '') {
+    toast('请先填写 name');
+    return;
+  }
+
+  crudSubmitting.value = true;
+  crudError.value = '';
+
+  try {
+    if (crudEditingId.value > 0) {
+      const updated = await updateFoo(crudEditingId.value, { id: crudEditingId.value, name, desc } as FooItem);
+      // 就地替换原行（splice 是 Vue 明确追踪的数组变更；findIndex 回调参数须显式标类型）
+      const updatedIndex = crudList.value.findIndex((row: FooItem): boolean => row.id == updated.id);
+      if (updatedIndex >= 0) {
+        crudList.value.splice(updatedIndex, 1, updated);
+      }
+      crudDetailText.value = `已更新 #${updated.id} · name: ${updated.name}`;
+      toastSuccess('修改成功');
+    }
+    else {
+      const created = await createFoo({ id: 0, name, desc } as FooItem);
+      // 新增插到最前：列表只展示一屏，追加到末尾等于「点了没反应」
+      crudList.value.unshift(created);
+      crudDetailText.value = `已新增 #${created.id} · name: ${created.name}`;
+      toastSuccess('新增成功');
+    }
+    resetCrudForm();
+  }
+  catch (err) {
+    crudError.value = crudErrorMessage(err, '提交失败');
+  }
+
+  crudSubmitting.value = false;
+}
+
+// ==========================================
 // 滚动与下拉刷新
 // ==========================================
 function handleScroll(e: UniScrollEvent): void {
@@ -841,16 +1338,15 @@ function handleScrollToLower(): void {
 }
 
 onNavbarPullDownRefresh(() => {
-  loadMockData();
+  loadCrudList();
   setTimeout(() => {
     stopNavbarPullDownRefresh();
   }, 600);
 });
 
-// 页面挂载时自动加载 Mock 数据
+// 页面挂载时加载真实请求卡的列表（该卡自己取自己的数，与其它卡不共享）
 onMounted(() => {
-  loadMockData();
-  // getUserInfo();
+  loadCrudList();
 });
 </script>
 
