@@ -900,7 +900,9 @@ src/tabbar/config.uts (唯一样本源)
 
 模块唯一入口为 [src/tabbar/index.uts](src/tabbar/index.uts)（单层 `export *` 门面），内部实现位于 `internal/`，**请勿绕过门面直接引用内部模块**。
 
-- **`switchTabbar(url: string)`** — 全局统一 TabBar 跳转方法。单页面模式下直接切换索引，多页面模式下自动调度 `switchTab` 或 `redirectTo`（内置 250ms 节流锁，防止快速连击卡死）
+> 📖 **完整文档见 [src/tabbar/README.md](src/tabbar/README.md)**：配置项、五种模式对照、UI 形态扩展、插件与 `config.uts` 的配合细节、全部运行时 API。
+
+- **`switchTabbar(url: string)`** — 全局统一 TabBar 跳转方法。单页面模式下直接切换索引，多页面模式下自动调度 `switchTab` 或 `redirectTo`（250ms 防连击锁在 `handleTabbarClick()` 里，点 tab 走它；直接调 `switchTabbar()` 不触发节流）
 - **`onTabShow(target, callback, immediate?)`** — 监听特定 Tab 项激活显示，完美解决单页面模式下子视图没有原生 `onShow` 的问题（可在切换回该 Tab 时触发数据重新请求与刷新）。`target` 推荐直接写 `config.uts` 中该项的 **`tabType` 业务标识**（如 `onTabShow('index', ...)`），不再依赖下标顺序；同时兼容数字下标 `0`、下标字符串 `'0'` 与 `pagePath`。标识无法解析时会在控制台告警，便于发现写错的 `tabType`
 - **`onTabPageShow(target, callback, immediate?)`** — 监听特定 Tab **页面显示**（要求「页面可见」且「当前激活 Tab 命中」），是 `onTabShow` 的超集 —— 除切换 Tab 外，还覆盖 `onTabShow` 够不到的「页面回来了」：从子页面 `navigateBack` 返回、App 从后台回到前台。它同时修掉 `onTabShow` 的一个时序坑：在子页面里调 `switchTabbar` 时 `curIdx` 立刻变化，`onTabShow` 会在容器页仍不可见时提前回调，而 `onTabPageShow` 会抑制这次并推迟到页面真正返回时再补发一次。`target` 写法与 `onTabShow` 完全一致
 - **`syncCurIdxByCurrentPage()`** — 自动从当前页面路由同步激活 Tab 项索引
