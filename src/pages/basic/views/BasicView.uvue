@@ -9,8 +9,20 @@
           本页面所有卡片均为 unibestX 基础能力演示 Demo。开发正式业务时，可直接删除本列表与对应的 /src/sub/*BasicDemo 分包目录。
         </text>
         <text class="text-[12px] leading-[18px] mt-[2px] text-[#2563eb]">
-          也可执行 pnpm clean:demo 一键清除全部 Demo 内容（含演示页面目录、分包路由与各 Tab 页的卡片列表），加 -- --dry-run 可先预览删除范围。
+          也可执行下方命令一键清除全部 Demo 内容（含演示页面目录、分包路由与各 Tab 页的卡片列表），加 -- --dry-run 可先预览删除范围。
         </text>
+        <!-- 一键清除 Demo 命令（点击复制，样式对齐首页 CLI 命令块） -->
+        <view
+          class="mt-[8px] px-[10px] py-[8px] rounded-[6px] bg-[#0f172a] flex flex-row items-center justify-between active:opacity-90"
+          @click="copyCleanDemoCommand"
+        >
+          <text class="text-[11px] text-[#38bdf8] flex-1" style="font-family: monospace;">
+            pnpm clean:demo
+          </text>
+          <text class="text-[10px] text-[#94a3b8] ml-[8px]">
+            点击复制
+          </text>
+        </view>
       </view>
     </view>
 
@@ -179,6 +191,19 @@ function navigateToDemo(url: string): void {
     url,
     fail: (err) => {
       console.error('navigateToDemo fail:', err);
+    }
+  });
+}
+
+// 复制一键清除 Demo 命令
+function copyCleanDemoCommand(): void {
+  uni.setClipboardData({
+    data: 'pnpm clean:demo',
+    success: () => {
+      uni.showToast({
+        title: '已复制清除命令',
+        icon: 'success'
+      });
     }
   });
 }
