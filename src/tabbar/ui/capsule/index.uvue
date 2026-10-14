@@ -94,13 +94,13 @@ const sliderWidthPercent = computed<number>((): number => {
 });
 
 /**
- * 滑块是否启用平滑过渡动画
+ * 滑块平滑过渡动画：开关已下沉到样式层，由条件编译分流，无需 JS 参与。
  *
- * false（默认）：滑块直接跳到目标位置，无 transition —— 规避 App 原生端快速连点
- *               时 transform 动画被反复打断、滑块停在中间位置的问题。
- * true：恢复 220ms 平滑滑动（等价于给滑块挂上 .capsule-slider--animated）。
+ * - 非 App 端（H5 / Web / 各小程序）：`.capsule-slider` 保留 220ms transform 过渡，平滑滑动；
+ * - App 原生端（APP-ANDROID / APP-IOS / APP-HARMONY）：由样式里的 `#ifndef APP` 条件编译
+ *   整段剔除过渡，滑块直接跳到目标位置 —— 规避快速连续切换 Tab 时 transition 被反复打断、
+ *   滑块有几率停在中间位置 / 与 curIdx 不一致的问题。
  */
-const sliderAnimated = false;
 
 /**
  * 动态滑块平移动画样式（transition 声明在静态类里，此处只下发 transform）
@@ -205,7 +205,6 @@ const bottom = computed(() => {
       <view class="capsule-slider-track">
         <view
           class="capsule-slider"
-          :class="{ 'capsule-slider--animated': sliderAnimated }"
           :style="sliderStyle"
         >
           <view class="capsule-slider-pill" :style="{ backgroundColor: activeItemBgColor, opacity: activeItemBgOpacity }" />
@@ -306,25 +305,20 @@ const bottom = computed(() => {
   pointer-events: none;
 }
 
-/* 滑块单元：默认【无过渡动画】直接定位（快速连点时不会出现动画未收敛的错位） */
+/* 滑块单元：非 App 端【220ms 平滑过渡】，App 原生端【无过渡】直接定位 */
 .capsule-slider {
   justify-content: center;
   align-items: center;
   width: 25%;
   height: 100%;
-  /* ⚠️ 动画暂时关闭：App 原生端在快速连续切换 Tab 时，transform 的 transition 会被反复打断，
-     有几率停在中间位置 / 与 curIdx 不一致，故默认改为无动画直接跳转。
-     需要恢复 220ms 平滑滑动时，解开下面三行（或改挂 .capsule-slider--animated 类）。 */
-  /* transition-property: transform; */
-  /* transition-duration: 220ms; */
-  /* transition-timing-function: cubic-bezier(0.25, 1, 0.5, 1); */
-}
-
-/* 【备用·开启动画】滑块平移过渡：挂到 .capsule-slider 上即恢复 220ms 平滑滑动 */
-.capsule-slider--animated {
+  /* ⚠️ App 原生端（APP-ANDROID / APP-IOS / APP-HARMONY）关闭过渡动画：
+     快速连续切换 Tab 时 transform 的 transition 会被反复打断，有几率停在中间位置 / 与 curIdx 不一致。
+     故用 #ifndef APP 把整段过渡从 App 端产物中剔除，只有 H5 / Web / 小程序保留 220ms 平滑滑动。 */
+  /* #ifndef APP */
   transition-property: transform;
   transition-duration: 220ms;
   transition-timing-function: cubic-bezier(0.25, 1, 0.5, 1);
+  /* #endif */
 }
 
 /* 动态滑块本体胶囊（高亮背景） */
