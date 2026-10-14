@@ -108,6 +108,10 @@ declare global {
 
   export interface DefinePageOptions {
     /**
+     * -route名字
+     */
+    name?: string;
+    /**
      * 沙盒独立调试模式标记：
      * - true: 本地开发时仅编译此页面（及其关联的 debug 页面），跳过无关页面与 TabBar，极大提升编译速度
      * - ⚠️ 提示: 调试完成后记得关闭（设为 false 或删除），以还原全量页面
