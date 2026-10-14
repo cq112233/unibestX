@@ -1,0 +1,117 @@
+name: Release on Tag
+
+# 触发方式：
+#   1. 推送 v* 标签（如 v1.0.0）时自动打包并创建 GitHub Release
+#   2. 手动 workflow_dispatch，指定一个已存在的标签，用于补发 / 重发
+#
+# 产物是什么：把该标签对应的**项目源码**打成一个 zip，解压后即为可直接导入的完整工程。
+#   不是 APK，也不是 H5 产物 —— App 打包必须走 HBuilderX 的「发行 → 原生App-云打包 / 本地打包」，
+#   命令行产不出 apk：本仓库 uni-app x 的编译只是把 .uts 编译成 kotlin / swift / arkts 源码
+#   （UNI_UTS_TARGET_LANGUAGE），后续的签名与组包在 HBuilderX / 云打包服务里完成。
+#
+# 为什么用 git archive 取内容而不是直接 zip 工作区：
+#   只导出该标签**已跟踪**的文件，自动排除 node_modules / unpackage 等被忽略的构建产物与本地
+#   临时文件，产物可复现，同时保证 zip 内容与标签严格一致。
+#
+# 为什么用 python3 的 zipfile 压缩而不是 zip 命令：
+#   本项目有中文文件名、也有被跟踪的软链接，Info-ZIP 的 zip 这两点都处理不好（文件名不带
+#   UTF-8 标志位、软链接被存成「内容是路径」的文本文件），Windows 用户解压会踩坑。
+#   具体实测依据见下方打包步骤内的注释。
+
+on:
+  push:
+    tags:
+      - 'v*' # 匹配 v1.0.0、v2.1.3 等标签格式
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 要打包发布的标签（需已存在，如 v1.0.0）
+        required: true
+        type: string
+
+# 创建 Release 需要写仓库内容的权限
+permissions:
+  contents: write
+
+# 同一标签同时只跑一个发布流程，避免并发重发互相覆盖附件
+concurrency:
+  group: release-${{ github.event.inputs.tag || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  package-and-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          # 手动触发时按输入的标签检出；标签推送时 github.ref_name 就是标签名
+          ref: ${{ github.event.inputs.tag || github.ref_name }}
+          fetch-depth: 0
+
+      - name: Package project source into zip
+        id: pack
+        run: |
+          set -euo pipefail
+
+          TAG="${{ github.event.inputs.tag || github.ref_name }}"
+          # 标签理论上可能带斜杠（如 release/v1.0.0），替换掉以免生成非法文件名
+          NAME="unibestX-${TAG//\//-}"
+          # 一律用绝对路径：相对路径会让下面几步依赖「当前目录恰好是 GITHUB_WORKSPACE」这个隐含前提
+          ZIP="${GITHUB_WORKSPACE}/${NAME}.zip"
+
+          echo "📦 正在打包：${TAG} → $(basename "${ZIP}")"
+
+          # 只导出该标签已跟踪的文件；node_modules / unpackage 等被忽略的目录不会进来
+          STAGE="$(mktemp -d)"
+          git archive --prefix="${NAME}/" HEAD | tar -x -C "${STAGE}"
+
+          # 用 python3 的 zipfile 而不是 zip 命令来压缩，两点都是实测出来的：
+          #   1. 文件名编码：本项目存在中文文件名（如 lime-use/…- 副本.uvue）。Info-ZIP 的 zip
+          #      不写 zip 的 UTF-8 标志位（实测 1197 个条目全为 0），Windows 解压会按本地代码页
+          #      解码成乱码；zipfile 对非 ASCII 名会自动置上该标志，各平台都能还原。
+          #   2. 软链接：仓库跟踪了 3 个软链接（.claude/skills/unibestX-skill、.trae/skills/
+          #      unibestX-skill、.trae/rules/uniappx.md）。直接打包软链接时，Windows 解压只能得到
+          #      一个「内容是目标路径」的普通文件，AI 技能库在 Windows 上等于丢失。
+          #      os.walk(followlinks=True) 配合 write() 会把软链接解引用成实体文件。
+          python3 - "${STAGE}" "${NAME}" "${ZIP}" <<'PY'
+          import os, sys, zipfile
+
+          stage, name, out = sys.argv[1], sys.argv[2], sys.argv[3]
+          root = os.path.join(stage, name)
+          count = 0
+
+          with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED, compresslevel=9) as zf:
+              for dirpath, dirnames, filenames in os.walk(root, followlinks=True):
+                  dirnames.sort()
+                  for f in sorted(filenames):
+                      full = os.path.join(dirpath, f)
+                      arcname = name + "/" + os.path.relpath(full, root).replace(os.sep, "/")
+                      zf.write(full, arcname)
+                      count += 1
+
+          # 兜底自检：包必须带项目根文件，否则说明归档方式出了问题，宁可失败也别发出空包
+          with zipfile.ZipFile(out) as zf:
+              names = set(zf.namelist())
+          if name + "/package.json" not in names:
+              sys.exit("::error::打包结果缺少 %s/package.json，归档内容异常" % name)
+          print("   条目 %d 个" % count)
+          PY
+
+          echo "✅ 打包完成：$(du -h "${ZIP}" | cut -f1) → $(basename "${ZIP}")"
+          echo "zip=${ZIP}" >> "$GITHUB_OUTPUT"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event.inputs.tag || github.ref_name }}
+          name: unibestX ${{ github.event.inputs.tag || github.ref_name }}
+          files: ${{ steps.pack.outputs.zip }}
+          generate_release_notes: true
+          # 没匹配到附件就直接失败，避免发出一个没有产物的空 Release
+          fail_on_unmatched_files: true
+          # 带 - 的标签（如 v1.1.0-beta.1）自动标记为预发布
+          prerelease: ${{ contains(github.event.inputs.tag || github.ref_name, '-') }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

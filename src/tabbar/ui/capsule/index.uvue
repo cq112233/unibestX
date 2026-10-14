@@ -93,14 +93,27 @@ const sliderWidthPercent = computed<number>((): number => {
   return 100 / tabbarList.length;
 });
 
-/** 动态滑块平移动画样式（transition 声明在静态类里，此处只下发 transform） */
-const sliderStyle = computed<UTSJSONObject>((): UTSJSONObject => {
+/**
+ * 滑块是否启用平滑过渡动画
+ *
+ * false（默认）：滑块直接跳到目标位置，无 transition —— 规避 App 原生端快速连点
+ *               时 transform 动画被反复打断、滑块停在中间位置的问题。
+ * true：恢复 220ms 平滑滑动（等价于给滑块挂上 .capsule-slider--animated）。
+ */
+const sliderAnimated = false;
+
+/**
+ * 动态滑块平移动画样式（transition 声明在静态类里，此处只下发 transform）
+ *
+ * ⚠️ 必须返回字符串：App 端（5.31 蒸汽模式 / 字节码，真机与云打包均复现）把
+ * 「值类型为 UTSJSONObject 的 computed/ref」直接绑给 :style 时，整条样式会被静默丢弃，
+ * 滑块恒定停在第 0 项；返回字符串、或把对象字面量内联进模板，均正常。
+ */
+const sliderStyle = computed<string>((): string => {
   const widthPct = sliderWidthPercent.value;
   const offsetPct = curIdx.value * 100;
-  return {
-    width: `${widthPct}%`,
-    transform: `translateX(${offsetPct}%)`
-  } as UTSJSONObject;
+  console.log('[SLIDER] calc curIdx=', curIdx.value, '=>', `translateX(${offsetPct}%)`);
+  return `width: ${widthPct}%;transform: translateX(${offsetPct}%);`;
 });
 
 // 挂载时同步激活索引并确保原生 TabBar 隐藏
@@ -190,7 +203,11 @@ const bottom = computed(() => {
     >
       <!-- 滑动滑块：在各 Tab 底部平滑移动 (Animated Slider Pill) -->
       <view class="capsule-slider-track">
-        <view class="capsule-slider" :style="sliderStyle">
+        <view
+          class="capsule-slider"
+          :class="{ 'capsule-slider--animated': sliderAnimated }"
+          :style="sliderStyle"
+        >
           <view class="capsule-slider-pill" :style="{ backgroundColor: activeItemBgColor, opacity: activeItemBgOpacity }" />
         </view>
       </view>
@@ -289,12 +306,22 @@ const bottom = computed(() => {
   pointer-events: none;
 }
 
-/* 滑块单元（负责平移动画：在静态 CSS 中声明硬件加速过渡，禁止挪进动态 :style） */
+/* 滑块单元：默认【无过渡动画】直接定位（快速连点时不会出现动画未收敛的错位） */
 .capsule-slider {
   justify-content: center;
   align-items: center;
   width: 25%;
   height: 100%;
+  /* ⚠️ 动画暂时关闭：App 原生端在快速连续切换 Tab 时，transform 的 transition 会被反复打断，
+     有几率停在中间位置 / 与 curIdx 不一致，故默认改为无动画直接跳转。
+     需要恢复 220ms 平滑滑动时，解开下面三行（或改挂 .capsule-slider--animated 类）。 */
+  /* transition-property: transform; */
+  /* transition-duration: 220ms; */
+  /* transition-timing-function: cubic-bezier(0.25, 1, 0.5, 1); */
+}
+
+/* 【备用·开启动画】滑块平移过渡：挂到 .capsule-slider 上即恢复 220ms 平滑滑动 */
+.capsule-slider--animated {
   transition-property: transform;
   transition-duration: 220ms;
   transition-timing-function: cubic-bezier(0.25, 1, 0.5, 1);
