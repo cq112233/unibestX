@@ -20,7 +20,7 @@ export function createApp() {
   // 注册 i18n 国际化插件
   app.use(i18n);
   // 注册 uview-ultra UI 组件库并传入自定义初始化配置项
-  app.use(ultraUI, () => {
+  app.use(ultraUI as any, () => {
     return {
       options: {
         config: {
