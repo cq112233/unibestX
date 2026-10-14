@@ -112,7 +112,7 @@ const sliderAnimated = false;
 const sliderStyle = computed<string>((): string => {
   const widthPct = sliderWidthPercent.value;
   const offsetPct = curIdx.value * 100;
-  console.log('[SLIDER] calc curIdx=', curIdx.value, '=>', `translateX(${offsetPct}%)`);
+  // console.log('[SLIDER] calc curIdx=', curIdx.value, '=>', `translateX(${offsetPct}%)`);
   return `width: ${widthPct}%;transform: translateX(${offsetPct}%);`;
 });
 
