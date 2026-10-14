@@ -3,7 +3,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { transformWithEsbuild } from 'vite';
 import { afterAll, describe, expect, it } from 'vitest';
-import { ROUTE_META_FILE, writeRouteMetaFile } from '../../../plugins/uni-pages-route-meta';
+import { ROUTE_META_FILE, writeRouteMetaFile } from '../../../plugins/vite-plugin-uni-pages-route-meta';
 
 /**
  * 路由元信息表生成器行为验证
@@ -30,7 +30,7 @@ function generate(output: Record<string, any>): { dir: string; file: string; sou
 
 /**
  * 把生成的字面量还原成字符串：
- * 生成器只转义 `\` 与 `'`（见 uni-pages-route-meta.ts 的注释），所以去掉一层转义即可。
+ * 生成器只转义 `\` 与 `'`（见 vite-plugin-uni-pages-route-meta.ts 的注释），所以去掉一层转义即可。
  * 转义若漏了一类字符，还原结果就不再是合法 JSON，下面的 JSON.parse 会直接失败。
  */
 function literalToString(literal: string): string {
@@ -143,7 +143,7 @@ describe('uni-pages-route-meta unit tests', () => {
   it('生成文件头部标注真实来源文件，且导出签名稳定', () => {
     const { source } = generate({ pages: [{ path: 'pages/index/index' }] });
 
-    expect(source).toContain('本文件由 plugins/uni-pages-route-meta.ts 自动生成');
+    expect(source).toContain('本文件由 plugins/vite-plugin-uni-pages-route-meta.ts 自动生成');
     expect(source).toContain('export const PAGE_META_JSON: string = ');
   });
 });

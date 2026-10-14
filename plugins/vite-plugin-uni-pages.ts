@@ -2,30 +2,51 @@ import fs from 'node:fs';
 import path from 'node:path';
 import process from 'node:process';
 import JSON5 from 'json5';
-import { writeRouteMetaFile } from './uni-pages-route-meta';
+
+/**
+ * uni-pages 核心插件：扫描 src/pages 与 src/sub 下的 .uvue，解析页面内的
+ * `<route>` / `definePage({...})` 声明，与 pages.config.json 合并，生成 pages.json。
+ *
+ * 本文件**自包含**：页面扫描、宏解析、.env 读取、落盘都在这里，不依赖任何 plugins/ 下的共享模块。
+ *
+ * ## 与三个卫星插件（sandbox / tabbar / route-meta）的关系
+ *
+ * 它们是各自独立的 Vite 插件（各自一个文件、各自在 vite.config.ts 注册），但**不是** Vite 生命周期
+ * 独立的：它们必须在**同一次生成 pass** 内、按固定顺序、对同一份可变构建状态做变换。因此本插件在
+ * `configResolved` 时从 `config.plugins` 里发现所有携带 `uniPagesStage` 属性的插件，按 `order` 升序收集，
+ * 并在每次生成里依次运行 —— 于是「恰好执行一次、顺序固定、route-meta 一定看到最终结果」结构性成立，
+ * 不依赖任何 Vite 时序假设。卫星只需在自己的插件对象上挂一个 `uniPagesStage` 字段即可被发现。
+ */
 
 // ==========================================
-// 类型定义
+// 类型（自包含；卫星各自定义结构等价的类型，无需 import）
 // ==========================================
 
-type PageConfig = {
+export type PageConfig = {
   path: string;
   style?: Record<string, any>;
   [key: string]: any;
 };
 
-type SubPackageConfig = {
+export type SubPackageConfig = {
   root: string;
   pages: PageConfig[];
 };
 
-type BaseConfig = {
+export type BaseConfig = {
   homePage?: string;
   pages?: PageConfig[];
   subPackages?: SubPackageConfig[];
   globalStyle?: Record<string, any>;
   tabBar?: Record<string, any>;
   easycom?: Record<string, any>;
+  [key: string]: any;
+};
+
+export type PagesJsonOutput = {
+  pages: PageConfig[];
+  subPackages?: SubPackageConfig[];
+  tabBar?: Record<string, any>;
   [key: string]: any;
 };
 
@@ -50,8 +71,117 @@ export type UniPagesOptions = {
   homePage?: string;
 };
 
+export type ResolvedUniPagesOptions = {
+  enabled: boolean;
+  dir: string;
+  subPackages: string[];
+  exclude: string[];
+  outFile: string;
+  configFile: string;
+  homePage: string;
+};
+
+export type PagesBuildFlags = {
+  /** 沙盒裁剪已生效（原实现里的 `isSandboxMode && sandboxMainPages.length > 0`） */
+  sandboxActive: boolean;
+  /** 本次 pass 结束后是否禁止回写 pages.config.json（沙盒生效时禁止） */
+  skipConfigWriteback: boolean;
+};
+
+export type PagesBuildStats = {
+  /** 主包页面数（sandbox 之前的全量口径，与旧日志一致） */
+  pageCount: number;
+  /** 分包数 */
+  subPackageCount: number;
+};
+
+export type PagesBuildState = {
+  root: string;
+  isProduction: boolean;
+  options: ResolvedUniPagesOptions;
+
+  baseConfig: BaseConfig;
+  baseConfigParseOk: boolean;
+  configPath: string;
+  outputPath: string;
+
+  /** 已有 pages.json（编辑中途语法错时的兜底），path → page */
+  existingPagesMap: Map<string, PageConfig>;
+
+  /** 主包：已合并 + 首页置顶 + alipay 归一 */
+  finalPages: PageConfig[];
+  /** 分包：已合并 + alipay 归一 */
+  scannedSubPkgs: SubPackageConfig[];
+
+  /** 页面内声明了 debug/debugHome/only/isDev 的路径（沙盒用） */
+  debugAnnotatedPages: string[];
+  /** 页面内声明了 debugHome 的路径（沙盒用） */
+  debugHomeAnnotatedPages: string[];
+
+  /** ★ 即将落盘的对象；stages 直接改它 */
+  output: PagesJsonOutput;
+
+  flags: PagesBuildFlags;
+  stats: PagesBuildStats;
+};
+
+export type PagesStageContext = {
+  root: string;
+  isProduction: boolean;
+};
+
+/**
+ * 卫星插件在自身插件对象上挂载的阶段描述。
+ *
+ * 约定：`order` 升序执行。sandbox=100 / tabbar=200 / route-meta=300。
+ */
+export type PagesStage = {
+  name: string;
+  order: number;
+  run: (state: PagesBuildState, ctx: PagesStageContext) => void;
+};
+
+/** 卫星用于被核心发现的属性名 */
+export const UNI_PAGES_STAGE_PROP = 'uniPagesStage';
+
+/** 项目内官方阶段名（用于核心做「遗漏注册」自检） */
+const KNOWN_PAGES_STAGES: string[] = [
+  'uni-pages:sandbox',
+  'uni-pages:tabbar',
+  'uni-pages:route-meta'
+];
+
 // ==========================================
-// 工具函数
+// 选项与常量
+// ==========================================
+
+const DEFAULT_DIR = 'src/pages';
+const DEFAULT_OUT_FILE = 'pages.json';
+const DEFAULT_CONFIG_FILE = 'pages.config.json';
+
+/** 文件变更后等待多久再重新生成（合并一次保存引发的多次事件） */
+const DEBOUNCE_MS = 80;
+
+/** 模式 2 下原生 tabBar 会被自定义组件接管，先把宿主 tabbar 隐藏掉，避免切换瞬间闪烁 */
+const HIDE_NATIVE_TABBAR_STYLE = '<style id="uni-tabbar-hide-zero-flash">uni-tabbar, uni-tabbar *, .uni-tabbar, .uni-tabbar *, .uni-tabbar-bottom, .uni-tabbar-bottom *, .uni-tabbar__icon, .uni-tabbar__label { display: none !important; visibility: hidden !important; height: 0 !important; min-height: 0 !important; max-height: 0 !important; opacity: 0 !important; pointer-events: none !important; position: absolute !important; bottom: -9999px !important; }</style>';
+
+/** 默认排除目录（components / views 不当页面扫描） */
+const DEFAULT_EXCLUDES: string[] = ['**/components/**/*.*', '**/views/**/*.*'];
+
+export function resolveOptions(userOptions: UniPagesOptions = {}): ResolvedUniPagesOptions {
+  return {
+    enabled: userOptions.enabled ?? true,
+    dir: userOptions.dir ?? DEFAULT_DIR,
+    subPackages: userOptions.subPackages ?? [],
+    exclude: userOptions.exclude ?? [],
+    outFile: userOptions.outFile ?? DEFAULT_OUT_FILE,
+    configFile: userOptions.configFile ?? DEFAULT_CONFIG_FILE,
+    homePage: userOptions.homePage ?? ''
+  };
+}
+
+// ==========================================
+// 底层工具：glob / 扫描 / 宏解析 / env / 写盘
 // ==========================================
 
 /** 轻量级匹配 glob 模式，避免外部模块导出兼容性问题 */
@@ -71,77 +201,126 @@ function matchGlob(filePath: string, pattern: string): boolean {
   return new RegExp(`^${regexStr}$`).test(filePath);
 }
 
-/** 读取 Tabbar 策略模式配置（0=无Tabbar, 1=原生Tabbar, 2=自定义Tabbar） */
-function getTabbarMode(projectRoot: string): string {
-  if (process.env.VITE_TABBAR_MODE != null && process.env.VITE_TABBAR_MODE !== '') {
-    return process.env.VITE_TABBAR_MODE.trim();
+/** 递归扫描 .uvue 文件，支持 exclude 模式 */
+function scanUvueFiles(dir: string, excludes: string[] = [], projectRoot: string = ''): string[] {
+  const results: string[] = [];
+  if (!fs.existsSync(dir)) {
+    return results;
   }
-  try {
-    const envPath = path.resolve(projectRoot, '.env');
-    if (fs.existsSync(envPath)) {
-      const content = fs.readFileSync(envPath, 'utf-8');
-      const match = content.match(/^VITE_TABBAR_MODE\s*=\s*['"]?([^'"\r\n]+)['"]?/m);
-      if (match != null && match[1] != null) {
-        return match[1].trim();
+
+  const allExcludes = [...DEFAULT_EXCLUDES, ...excludes];
+
+  const entries = fs.readdirSync(dir, { withFileTypes: true });
+  for (let i = 0; i < entries.length; i++) {
+    const entry = entries[i];
+    const fullPath = path.join(dir, entry.name);
+
+    if (entry.isDirectory()) {
+      // 跳过默认的 components 和 views 目录
+      if (entry.name === 'components' || entry.name === 'views') {
+        continue;
+      }
+      results.push(...scanUvueFiles(fullPath, excludes, projectRoot));
+    }
+    else if (entry.name.endsWith('.uvue')) {
+      const relPath = projectRoot ? path.relative(projectRoot, fullPath).replace(/\\/g, '/') : fullPath.replace(/\\/g, '/');
+      let excluded = false;
+      for (let e = 0; e < allExcludes.length; e++) {
+        if (matchGlob(relPath, allExcludes[e])) {
+          excluded = true;
+          break;
+        }
+      }
+      if (!excluded) {
+        results.push(fullPath);
       }
     }
   }
-  catch {
-    // 忽略异常
-  }
-  return '1';
+  return results;
 }
 
-/** 读取沙盒独立调试模式配置（优先 process.env，其次实时读取 .env 文件） */
-function getSandboxConfig(projectRoot: string): { enabled: boolean; pagePaths: string[] } {
-  let enabledStr = process.env.VITE_DEV_SANDBOX ?? process.env.VITE_DEV_SINGLE_PAGE ?? '';
-  let pathStr = process.env.VITE_DEV_SANDBOX_PAGES ?? process.env.VITE_DEV_SINGLE_PATH ?? '';
+/** 文件路径 → 页面路由 path */
+function fileToPagePath(filePath: string, pagesDir: string, projectRoot: string): string {
+  const absPages = path.resolve(projectRoot, pagesDir);
+  const rel = path.relative(absPages, filePath).replace(/\\/g, '/');
+  const withoutExt = rel.replace(/\.uvue$/, '');
+  return path.posix.join(pagesDir, withoutExt);
+}
 
-  if (!enabledStr || !pathStr) {
-    try {
-      const envPath = path.resolve(projectRoot, '.env');
-      if (fs.existsSync(envPath)) {
-        const content = fs.readFileSync(envPath, 'utf-8');
-        if (!enabledStr) {
-          const mEnabled = content.match(/^(?:VITE_DEV_SANDBOX|VITE_DEV_SINGLE_PAGE)\s*=\s*['"]?([^'"\r\n]+)['"]?/m);
-          if (mEnabled != null && mEnabled[1] != null) {
-            enabledStr = mEnabled[1].trim();
-          }
+/** 一次 definePage 宏调用在源码中的位置 */
+type DefinePageCallSite = {
+  start: number;
+  openParen: number;
+  closeParen: number;
+};
+
+/**
+ * 定位源码中第一次 `definePage({...})` 调用的括号位置。
+ * 括号计数会跳过字符串与注释，因此对象字面量里的括号 / 引号 / 注释不会误判边界。
+ */
+function scanDefinePageCall(code: string): DefinePageCallSite | null {
+  const startRegex = /definePage\s*\(\s*\{/;
+  const match = code.match(startRegex);
+  if (match == null || match.index == null) {
+    return null;
+  }
+
+  const openParen = code.indexOf('(', match.index);
+  if (openParen === -1) {
+    return null;
+  }
+
+  let depth = 0;
+  let inString = false;
+  let stringChar = '';
+  for (let i = openParen + 1; i < code.length; i++) {
+    const ch = code[i];
+    const prev = i > 0 ? code[i - 1] : '';
+
+    if (inString) {
+      if (ch === stringChar && prev !== '\\') {
+        inString = false;
+      }
+      continue;
+    }
+
+    if (ch === '"' || ch === '\'' || ch === '`') {
+      inString = true;
+      stringChar = ch;
+      continue;
+    }
+
+    // 跳过注释
+    if (ch === '/' && i + 1 < code.length) {
+      if (code[i + 1] === '/') {
+        const newline = code.indexOf('\n', i);
+        if (newline === -1) {
+          break;
         }
-        if (!pathStr) {
-          const mPath = content.match(/^(?:VITE_DEV_SANDBOX_PAGES|VITE_DEV_SINGLE_PATH)\s*=\s*['"]?([^'"\r\n]+)['"]?/m);
-          if (mPath != null && mPath[1] != null) {
-            pathStr = mPath[1].trim();
-          }
+        i = newline;
+        continue;
+      }
+      if (code[i + 1] === '*') {
+        const end = code.indexOf('*/', i + 2);
+        if (end === -1) {
+          break;
         }
+        i = end + 1;
+        continue;
       }
     }
-    catch {
-      // 忽略异常
+
+    if (ch === '{' || ch === '(') {
+      depth++;
+    }
+    if (ch === '}' || ch === ')') {
+      depth--;
+      if (depth < 0) {
+        return { start: match.index, openParen, closeParen: i };
+      }
     }
   }
-
-  const enabled = enabledStr.toLowerCase() === 'true' || enabledStr === '1';
-  // 支持逗号、分号或换行分隔多个页面路径
-  const pagePaths = pathStr
-    .split(/[,;\n\r]+/)
-    .map(s => s.trim())
-    .filter(Boolean);
-
-  return {
-    enabled,
-    pagePaths
-  };
-}
-
-/** 规范化页面路径用于比对 */
-function normalizePagePath(p: string): string {
-  return p
-    .trim()
-    .replace(/\\/g, '/')
-    .replace(/^\.\//, '')
-    .replace(/^\//, '')
-    .replace(/\.(uvue|vue|uts|ts|js)$/, '');
+  return null;
 }
 
 /** 解析 <route> 块（JSON5 格式） */
@@ -169,89 +348,19 @@ function parseDefinePage(content: string): Record<string, any> | null {
     targetContent = scriptMatch[1];
   }
 
-  // 匹配 definePage( 开头
-  const startRegex = /definePage\s*\(\s*\{/;
-  const match = targetContent.match(startRegex);
-  if (match == null || match.index == null) {
+  const site = scanDefinePageCall(targetContent);
+  if (site == null) {
     return null;
   }
 
-  // 从第一个 { 开始，追踪括号深度
-  const openParen = targetContent.indexOf('(', match.index);
-  if (openParen === -1) {
-    return null;
-  }
-
-  let depth = 0;
-  let inString = false;
-  let stringChar = '';
-  let i = openParen + 1;
-
-  for (; i < targetContent.length; i++) {
-    const ch = targetContent[i];
-    const prev = i > 0 ? targetContent[i - 1] : '';
-
-    if (inString) {
-      if (ch === stringChar && prev !== '\\') {
-        inString = false;
-      }
-      continue;
+  const arg = targetContent.slice(site.openParen + 1, site.closeParen).trim();
+  if (arg.startsWith('{')) {
+    try {
+      return JSON5.parse(arg) as Record<string, any>;
     }
-
-    if (ch === '"' || ch === '\'' || ch === '`') {
-      inString = true;
-      stringChar = ch;
-      continue;
-    }
-
-    // 跳过注释
-    if (ch === '/' && i + 1 < targetContent.length) {
-      if (targetContent[i + 1] === '/') {
-        // 单行注释，跳到行尾
-        const newline = targetContent.indexOf('\n', i);
-        if (newline === -1) {
-          break;
-        }
-        i = newline;
-        continue;
-      }
-      if (targetContent[i + 1] === '*') {
-        // 多行注释
-        const end = targetContent.indexOf('*/', i + 2);
-        if (end === -1) {
-          break;
-        }
-        i = end + 1;
-        continue;
-      }
-    }
-
-    if (ch === '{') {
-      depth++;
-    }
-    if (ch === '}') {
-      depth--;
-    }
-    if (ch === '(') {
-      depth++;
-    }
-    if (ch === ')') {
-      depth--;
-      if (depth < 0) {
-        // 找到了 definePage 参数的结束位置
-        const arg = targetContent.slice(openParen + 1, i).trim();
-        // 去掉外层花括号如果是对象形式
-        if (arg.startsWith('{')) {
-          try {
-            return JSON5.parse(arg) as Record<string, any>;
-          }
-          catch (e) {
-            console.warn('[uni-pages] Failed to parse definePage argument:', e);
-            return null;
-          }
-        }
-        return null;
-      }
+    catch (e) {
+      console.warn('[uni-pages] Failed to parse definePage argument:', e);
+      return null;
     }
   }
   return null;
@@ -266,71 +375,225 @@ function parsePageMeta(content: string): Record<string, any> | null {
   return parseDefinePage(content);
 }
 
-/** 递归扫描 .uvue 文件，支持 exclude 模式 */
-function scanUvueFiles(dir: string, excludes: string[] = [], projectRoot: string = ''): string[] {
-  const results: string[] = [];
-  if (!fs.existsSync(dir)) {
-    return results;
+/** 移除 definePage(...) 宏调用，避免运行时报错；未命中时返回 null */
+function stripDefinePageMacro(code: string): string | null {
+  const site = scanDefinePageCall(code);
+  if (site == null) {
+    return null;
   }
 
-  const defaultExcludes = ['**/components/**/*.*', '**/views/**/*.*'];
-  const allExcludes = [...defaultExcludes, ...excludes];
+  let start = site.start;
+  let endIdx = site.closeParen + 1;
 
-  const entries = fs.readdirSync(dir, { withFileTypes: true });
-  for (let i = 0; i < entries.length; i++) {
-    const entry = entries[i];
-    const fullPath = path.join(dir, entry.name);
-
-    if (entry.isDirectory()) {
-      // 跳过默认的 components 和 views 目录
-      if (entry.name === 'components' || entry.name === 'views') {
-        continue;
-      }
-      results.push(...scanUvueFiles(fullPath, excludes, projectRoot));
+  // 往前清除多余换行
+  if (start > 0 && code[start - 1] === '\n') {
+    start--;
+    if (start > 0 && code[start - 1] === '\r') {
+      start--;
     }
-    else if (entry.name.endsWith('.uvue')) {
-      // 检查 exclude 模式
-      const relPath = projectRoot ? path.relative(projectRoot, fullPath).replace(/\\/g, '/') : fullPath.replace(/\\/g, '/');
-      let excluded = false;
-      for (let e = 0; e < allExcludes.length; e++) {
-        if (matchGlob(relPath, allExcludes[e])) {
-          excluded = true;
-          break;
-        }
-      }
-      if (!excluded) {
-        results.push(fullPath);
+  }
+  while (endIdx < code.length && (code[endIdx] === '\n' || code[endIdx] === '\r')) {
+    endIdx++;
+  }
+
+  return code.slice(0, start) + code.slice(endIdx);
+}
+
+/** 读取 Tabbar 策略模式配置（0=无Tabbar, 1=原生Tabbar, 2=自定义Tabbar） */
+function getTabbarMode(projectRoot: string): string {
+  if (process.env.VITE_TABBAR_MODE != null && process.env.VITE_TABBAR_MODE !== '') {
+    return process.env.VITE_TABBAR_MODE.trim();
+  }
+  try {
+    const envPath = path.resolve(projectRoot, '.env');
+    if (fs.existsSync(envPath)) {
+      const content = fs.readFileSync(envPath, 'utf-8');
+      const match = content.match(/^VITE_TABBAR_MODE\s*=\s*['"]?([^'"\r\n]+)['"]?/m);
+      if (match != null && match[1] != null) {
+        return match[1].trim();
       }
     }
   }
-  return results;
+  catch {
+    // 忽略异常
+  }
+  return '1';
 }
 
-/** 文件路径 → 页面路由 path */
-function fileToPagePath(filePath: string, pagesDir: string, projectRoot: string): string {
-  const absPages = path.resolve(projectRoot, pagesDir);
-  const rel = path.relative(absPages, filePath).replace(/\\/g, '/');
-  const withoutExt = rel.replace(/\.uvue$/, '');
-  return path.posix.join(pagesDir, withoutExt);
+/** 判断一个绝对路径是否是需要触发重新生成的页面文件（供 watcher 用） */
+function isPageFile(
+  filePath: string,
+  dir: string,
+  subPackages: string[],
+  exclude: string[],
+  projectRoot: string
+): boolean {
+  const n = filePath.replace(/\\/g, '/');
+  if (!n.endsWith('.uvue') || n.includes('?')) {
+    return false;
+  }
+  const allExcludes = [...DEFAULT_EXCLUDES, ...exclude];
+  const relPath = projectRoot ? path.relative(projectRoot, filePath).replace(/\\/g, '/') : n;
+  for (let e = 0; e < allExcludes.length; e++) {
+    if (matchGlob(relPath, allExcludes[e])) {
+      return false;
+    }
+  }
+  // 带 / 边界匹配，避免 src/pages 误匹配 src/pages-xxx
+  if (n.includes(`${dir.replace(/\\/g, '/')}/`)) {
+    return true;
+  }
+  for (let i = 0; i < subPackages.length; i++) {
+    if (n.includes(`${subPackages[i].replace(/\\/g, '/')}/`)) {
+      return true;
+    }
+  }
+  return false;
 }
 
-/** 最近一次成功解析的 pages.config.json，用于语法错误时的防崩缓存兜底 */
+/** 自动为支付宝小程序适配自定义导航栏（transparentTitle + titlePenetrate + defaultTitle） */
+function normalizeCustomNavForAlipay(p: PageConfig): void {
+  const topMpAlipay = (p as any)['mp-alipay'];
+  if (topMpAlipay != null) {
+    p.style = p.style ?? {};
+    p.style['mp-alipay'] = { ...(p.style['mp-alipay'] ?? {}), ...topMpAlipay };
+    delete (p as any)['mp-alipay'];
+  }
+  if (p.style?.navigationStyle === 'custom') {
+    p.style['mp-alipay'] = {
+      transparentTitle: 'always',
+      titlePenetrate: 'YES',
+      defaultTitle: '',
+      ...(p.style['mp-alipay'] ?? {})
+    };
+  }
+}
+
+/** 剥离写盘前的内部临时标记属性 */
+function cleanTempProps(page: PageConfig): void {
+  delete (page as any)._hasMeta;
+  if ((page as any).type === 'home') {
+    delete (page as any).type;
+  }
+  delete (page as any).debug;
+  delete (page as any).debugHome;
+  delete (page as any).only;
+  delete (page as any).isDev;
+}
+
+/** 序列化并写入 pages.json；内容未变化时不写。返回是否发生了写入 */
+function writePagesJson(output: PagesJsonOutput, outputPath: string): boolean {
+  const jsonStr = `${JSON.stringify(output, null, 2)}\n`;
+  let existing = '';
+  if (fs.existsSync(outputPath)) {
+    existing = fs.readFileSync(outputPath, 'utf-8');
+  }
+  if (jsonStr !== existing) {
+    fs.writeFileSync(outputPath, jsonStr, 'utf-8');
+    return true;
+  }
+  return false;
+}
+
+/** 把「本次扫描 + 合并」的结果同步回 pages.config.json，保证手写配置与磁盘页面双向一致 */
+function writeBackConfig(
+  configPath: string,
+  finalPages: PageConfig[],
+  scannedSubPkgs: SubPackageConfig[]
+): boolean {
+  if (!fs.existsSync(configPath)) {
+    return false;
+  }
+
+  let configUpdated = false;
+  const currentConfigRaw = fs.readFileSync(configPath, 'utf-8');
+  let currentConfig: BaseConfig = {};
+  try {
+    currentConfig = JSON5.parse(currentConfigRaw) as BaseConfig;
+  }
+  catch {}
+
+  // 1) 同步主包（新增、修改、剔除已删除）
+  const newMainPages: PageConfig[] = [];
+  for (let i = 0; i < finalPages.length; i++) {
+    newMainPages.push(finalPages[i]);
+  }
+  if (currentConfig.pages == null || JSON.stringify(currentConfig.pages) !== JSON.stringify(newMainPages)) {
+    currentConfig.pages = newMainPages;
+    configUpdated = true;
+  }
+
+  // 2) 同步分包（新增、修改、剔除已删除）
+  currentConfig.subPackages ??= [];
+  for (let s = 0; s < scannedSubPkgs.length; s++) {
+    const spkg = scannedSubPkgs[s];
+    const targetSub = currentConfig.subPackages.find(cp => cp.root === spkg.root);
+    if (targetSub == null) {
+      currentConfig.subPackages.push({ root: spkg.root, pages: spkg.pages });
+      configUpdated = true;
+    }
+    else {
+      if (JSON.stringify(targetSub.pages) !== JSON.stringify(spkg.pages)) {
+        targetSub.pages = spkg.pages;
+        configUpdated = true;
+      }
+    }
+  }
+
+  if (configUpdated) {
+    const newConfigJson = `${JSON.stringify(currentConfig, null, 2)}\n`;
+    if (newConfigJson !== currentConfigRaw) {
+      fs.writeFileSync(configPath, newConfigJson, 'utf-8');
+      return true;
+    }
+  }
+  return false;
+}
+
+/** 最近一次成功解析的 pages.config.json，用于语法错误时的防崩缓存兜底（需跨多次生成存活） */
 let lastGoodBaseConfig: BaseConfig | null = null;
 
 // ==========================================
-// 核心：生成 pages.json
+// 从插件数组中发现卫星阶段
 // ==========================================
 
-function generatePagesJson(
-  opts: { dir: string; subPackages: string[]; exclude: string[]; outFile: string; configFile: string; homePage: string },
-  projectRoot: string,
-  isProduction: boolean = false,
-  server?: any
-): void {
+/** 从（已解析的）插件数组里收集所有携带 `uniPagesStage` 的卫星阶段，按 order 升序 */
+export function collectStagesFromPlugins(plugins: readonly any[]): PagesStage[] {
+  const stages: PagesStage[] = [];
+  for (let i = 0; i < plugins.length; i++) {
+    const stage = plugins[i]?.[UNI_PAGES_STAGE_PROP];
+    if (stage != null) {
+      stages.push(stage as PagesStage);
+    }
+  }
+  return stages.sort((a, b) => a.order - b.order || a.name.localeCompare(b.name));
+}
+
+// ==========================================
+// 核心：构建状态（不落盘）
+// ==========================================
+
+/**
+ * 扫描 → 合并 → 装配 → 按序跑 stages，产出**即将落盘**的构建状态。
+ *
+ * 刻意不触碰磁盘产物（不写 pages.json、不回写 pages.config.json），因此既被 dev/build 生命周期调用，
+ * 也被逐字节回归单测直接驱动。
+ *
+ * @returns 正常时返回状态；pages.config.json 语法错误且无缓存可兜底时返回 null。
+ */
+export function buildPages(
+  userOptions: UniPagesOptions,
+  ctx: PagesStageContext,
+  stages: PagesStage[] = []
+): PagesBuildState | null {
+  const options = resolveOptions(userOptions);
+  const root = ctx.root;
+  const isProduction = ctx.isProduction;
+
   // 1. 读取基础配置
   let baseConfig: BaseConfig = {};
   let configParseFailed = false;
-  const configPath = path.resolve(projectRoot, opts.configFile);
+  const configPath = path.resolve(root, options.configFile);
   if (fs.existsSync(configPath)) {
     try {
       const raw = fs.readFileSync(configPath, 'utf-8');
@@ -338,28 +601,27 @@ function generatePagesJson(
       lastGoodBaseConfig = baseConfig;
     }
     catch (e) {
-      // 配置存在语法错误（通常为用户正在编辑中途）：用上次成功的配置兜底，
-      // 本次生成绝不同步回写，避免覆盖用户正在编辑的文件导致 globalStyle/tabBar/easycom 与格式丢失
+      // 配置存在语法错误（通常为用户正在编辑中途）：用上次成功的配置兜底，本次生成绝不同步回写
       configParseFailed = true;
       if (lastGoodBaseConfig != null) {
         baseConfig = lastGoodBaseConfig;
       }
-      console.warn(`[uni-pages] ${opts.configFile} has syntax errors, using last good cache and skipping write-back:`, (e as Error).message);
+      console.warn(`[uni-pages] ${options.configFile} has syntax errors, using last good cache and skipping write-back:`, (e as Error).message);
     }
   }
 
   // 无缓存可用时直接中止，保持 pages.config.json 与 pages.json 原样，等待用户修复语法
   if (configParseFailed && lastGoodBaseConfig == null) {
-    console.error(`[uni-pages] Aborted: ${opts.configFile} has syntax errors and no cached config is available. Fix the file first.`);
-    return;
+    console.error(`[uni-pages] Aborted: ${options.configFile} has syntax errors and no cached config is available. Fix the file first.`);
+    return null;
   }
 
-  // 读取已有的 pages.json 作为回退兜底，防止编辑中途语法错误导致配置丢失而频繁重载
-  const outPath = path.resolve(projectRoot, opts.outFile);
+  // 读取已有的 pages.json 作为回退兜底
+  const outputPath = path.resolve(root, options.outFile);
   const existingPagesMap = new Map<string, PageConfig>();
-  if (fs.existsSync(outPath)) {
+  if (fs.existsSync(outputPath)) {
     try {
-      const existingData = JSON.parse(fs.readFileSync(outPath, 'utf-8'));
+      const existingData = JSON.parse(fs.readFileSync(outputPath, 'utf-8'));
       if (Array.isArray(existingData.pages)) {
         existingData.pages.forEach((p: PageConfig) => {
           if (p.path) {
@@ -372,8 +634,8 @@ function generatePagesJson(
   }
 
   // 2. 扫描主包 .uvue 文件
-  const pagesDir = path.resolve(projectRoot, opts.dir);
-  const files = scanUvueFiles(pagesDir, opts.exclude, projectRoot);
+  const pagesDir = path.resolve(root, options.dir);
+  const files = scanUvueFiles(pagesDir, options.exclude, root);
   files.sort();
 
   const scanned: (PageConfig & { _hasMeta?: boolean })[] = [];
@@ -383,7 +645,7 @@ function generatePagesJson(
   for (let i = 0; i < files.length; i++) {
     const raw = fs.readFileSync(files[i], 'utf-8');
     const meta = parsePageMeta(raw);
-    const pagePath = fileToPagePath(files[i], opts.dir, projectRoot);
+    const pagePath = fileToPagePath(files[i], options.dir, root);
 
     const page: PageConfig & { _hasMeta?: boolean } = { path: pagePath };
     if (meta != null) {
@@ -403,7 +665,6 @@ function generatePagesJson(
       }
     }
     else if (raw.includes('definePage(') || raw.includes('<route')) {
-      // 临时语法错误时保留之前的配置，避免 pages.json 内容变动触发重载
       const old = existingPagesMap.get(pagePath);
       if (old != null) {
         Object.assign(page, old);
@@ -417,21 +678,20 @@ function generatePagesJson(
   const configSubPkgs = baseConfig.subPackages ?? [];
   const scannedSubPkgs: SubPackageConfig[] = [];
 
-  for (let s = 0; s < opts.subPackages.length; s++) {
-    const subDir = opts.subPackages[s];
-    const absSubDir = path.resolve(projectRoot, subDir);
+  for (let s = 0; s < options.subPackages.length; s++) {
+    const subDir = options.subPackages[s];
+    const absSubDir = path.resolve(root, subDir);
     if (!fs.existsSync(absSubDir)) {
       continue;
     }
 
-    const subFiles = scanUvueFiles(absSubDir, opts.exclude, projectRoot);
+    const subFiles = scanUvueFiles(absSubDir, options.exclude, root);
     subFiles.sort();
 
     const subPages: (PageConfig & { _hasMeta?: boolean })[] = [];
     for (let j = 0; j < subFiles.length; j++) {
       const raw = fs.readFileSync(subFiles[j], 'utf-8');
       const meta = parsePageMeta(raw);
-      // 分包路径：去掉 subDir 前缀，如 src/sub/auth/login
       const relPath = path.relative(absSubDir, subFiles[j]).replace(/\\/g, '/').replace(/\.uvue$/, '');
       const fullSubPath = `${subDir}/${relPath}`;
 
@@ -440,7 +700,6 @@ function generatePagesJson(
         Object.assign(page, meta);
         page._hasMeta = true;
 
-        // 规则：debug: false 具有最高否决权；显式配置 debug: false 时直接彻底排除沙盒调试
         if (meta.debug !== false) {
           const isDebugHome = meta.debugHome === true || meta.debug === 'home';
           const isDebug = isDebugHome || meta.debug === true || meta.only === true || meta.isDev === true;
@@ -477,7 +736,6 @@ function generatePagesJson(
       const sp = subPages[k];
       const manual = existingMap.get(sp.path);
       if (sp._hasMeta) {
-        // 页面中显式声明了 definePage 或 <route>，以页面内的声明为唯一真实数据源（支持删除字段）
         mergedPages.push(sp);
       }
       else if (manual != null) {
@@ -514,7 +772,6 @@ function generatePagesJson(
     const sp = scanned[k];
     const manual = manualPagesMap.get(sp.path);
     if (sp._hasMeta) {
-      // 页面中显式声明了 definePage 或 <route>，以页面内的声明为唯一真实数据源（支持删除字段）
       finalPages.push(sp);
     }
     else if (manual != null) {
@@ -534,20 +791,20 @@ function generatePagesJson(
     if (finalPages.some(p => p.path === mp.path)) {
       continue;
     }
-    if (fs.existsSync(path.resolve(projectRoot, `${mp.path}.uvue`))) {
+    if (fs.existsSync(path.resolve(root, `${mp.path}.uvue`))) {
       finalPages.push(mp);
     }
   }
 
-  // 5. 首页排最前（在 uni-app 中 pages.json 的第一项 pages[0] 即为应用默认启动首页）
+  // 5. 首页排最前（pages.json 的第一项 pages[0] 即为应用默认启动首页）
   // 优先级：definePage type: 'home' / isHome: true（页面内显式声明最高）> opts.homePage（插件选项）> baseConfig.homePage（配置文件）
   let home = '';
   const homeItem = scanned.find(p => (p as any).type === 'home' || (p as any).isHome === true);
   if (homeItem != null) {
     home = homeItem.path;
   }
-  else if (opts.homePage !== '') {
-    home = opts.homePage;
+  else if (options.homePage !== '') {
+    home = options.homePage;
   }
   else if (baseConfig.homePage != null && baseConfig.homePage !== '') {
     home = baseConfig.homePage;
@@ -561,23 +818,7 @@ function generatePagesJson(
     }
   }
 
-  // 自动为支付宝小程序适配自定义导航栏（transparentTitle + titlePenetrate + defaultTitle）
-  const normalizeCustomNavForAlipay = (p: PageConfig) => {
-    const topMpAlipay = (p as any)['mp-alipay'];
-    if (topMpAlipay != null) {
-      p.style = p.style ?? {};
-      p.style['mp-alipay'] = { ...(p.style['mp-alipay'] ?? {}), ...topMpAlipay };
-      delete (p as any)['mp-alipay'];
-    }
-    if (p.style?.navigationStyle === 'custom') {
-      p.style['mp-alipay'] = {
-        transparentTitle: 'always',
-        titlePenetrate: 'YES',
-        defaultTitle: '',
-        ...(p.style['mp-alipay'] ?? {})
-      };
-    }
-  };
+  // 6. 支付宝自定义导航栏归一 + 剥离临时标记
   finalPages.forEach(normalizeCustomNavForAlipay);
   scannedSubPkgs.forEach((pkg) => {
     pkg.pages.forEach(normalizeCustomNavForAlipay);
@@ -590,156 +831,13 @@ function generatePagesJson(
     };
   }
 
-  // 清理临时标记属性
-  finalPages.forEach((p) => {
-    delete (p as any)._hasMeta;
-    if ((p as any).type === 'home') {
-      delete (p as any).type;
-    }
-    delete (p as any).debug;
-    delete (p as any).debugHome;
-    delete (p as any).only;
-    delete (p as any).isDev;
-  });
+  finalPages.forEach(cleanTempProps);
   scannedSubPkgs.forEach((pkg) => {
-    pkg.pages.forEach((p) => {
-      delete (p as any)._hasMeta;
-      delete (p as any).debug;
-      delete (p as any).debugHome;
-      delete (p as any).only;
-      delete (p as any).isDev;
-    });
+    pkg.pages.forEach(cleanTempProps);
   });
 
-  // 6. 检查是否开启沙盒独立调试模式（生产环境强制熔断禁用，开发环境支持 .env 配置与 definePage({ debug: true })）
-  const sandboxConfig = getSandboxConfig(projectRoot);
-  const hasEnvTargets = sandboxConfig.enabled && sandboxConfig.pagePaths.length > 0;
-
-  if (debugHomeAnnotatedPages.length > 1) {
-    console.warn(`\x1B[33m⚠️ [uni-pages] 检测到多个页面同时配置了 debugHome: true (${debugHomeAnnotatedPages.join(', ')})，全局仅允许 1 个启动首页，已采用第一个: ${debugHomeAnnotatedPages[0]}\x1B[0m`);
-  }
-  const combinedCodeDebug = [...debugHomeAnnotatedPages, ...debugAnnotatedPages];
-  const hasCodeDebug = combinedCodeDebug.length > 0;
-  const isSandboxMode = !isProduction && (hasEnvTargets || hasCodeDebug);
-
-  const sandboxMainPages: PageConfig[] = [];
-  const sandboxSubPkgs: SubPackageConfig[] = [];
-
-  if (isSandboxMode) {
-    // 优先级：.env 显式配置 > definePage({ debug: true }) 代码内标记
-    const targets = hasEnvTargets ? sandboxConfig.pagePaths : combinedCodeDebug;
-
-    // 辅助匹配函数：判断页面路径是否命中某个 target
-    const matchTarget = (fullPath: string, relSubPath: string, target: string): boolean => {
-      const targetNorm = normalizePagePath(target);
-      const targetNormWithoutSrc = targetNorm.replace(/^src\//, '');
-      const fullNorm = normalizePagePath(fullPath);
-      const fullNormWithoutSrc = fullNorm.replace(/^src\//, '');
-      const relNorm = normalizePagePath(relSubPath);
-
-      // 通配符匹配 / 目录前缀匹配（如 src/sub/auth/* 或 sub/auth）
-      if (target.includes('*') || !target.includes('.')) {
-        const cleanPrefix = targetNormWithoutSrc.replace(/\/\*$/, '').replace(/\*$/, '');
-        if (cleanPrefix) {
-          if (fullNormWithoutSrc.startsWith(cleanPrefix) || relNorm.startsWith(cleanPrefix)) {
-            return true;
-          }
-        }
-      }
-
-      // 精确或相对匹配
-      return (
-        fullNorm === targetNorm
-        || fullNormWithoutSrc === targetNormWithoutSrc
-        || relNorm === targetNormWithoutSrc
-        || fullNormWithoutSrc.endsWith(`/${targetNormWithoutSrc}`)
-      );
-    };
-
-    // 记录已经匹配到的页面 path，避免重复
-    const matchedPagePaths = new Set<string>();
-
-    // 按 targets 顺序逐一查找，确保用户写在第一项的页面作为首页
-    for (let t = 0; t < targets.length; t++) {
-      const target = targets[t];
-
-      // 1) 在主包中匹配
-      for (let i = 0; i < finalPages.length; i++) {
-        const p = finalPages[i];
-        if (matchedPagePaths.has(p.path))
-          continue;
-        if (matchTarget(p.path, p.path, target)) {
-          matchedPagePaths.add(p.path);
-          sandboxMainPages.push({ ...p });
-        }
-      }
-
-      // 2) 在分包中匹配
-      for (let s = 0; s < scannedSubPkgs.length; s++) {
-        const spkg = scannedSubPkgs[s];
-        for (let j = 0; j < spkg.pages.length; j++) {
-          const sp = spkg.pages[j];
-          const fullSubPath = `${spkg.root}/${sp.path}`;
-          if (matchedPagePaths.has(fullSubPath))
-            continue;
-
-          if (matchTarget(fullSubPath, sp.path, target)) {
-            matchedPagePaths.add(fullSubPath);
-
-            // 若目前主包没有任何页面，将这第一个匹配到的分包页面提升为主包 pages[0]（作为应用启动首页）
-            if (sandboxMainPages.length === 0) {
-              sandboxMainPages.push({
-                ...sp,
-                path: fullSubPath
-              });
-            }
-            else {
-              // 放入对应分包中保持分包路由结构
-              let targetSubPkg = sandboxSubPkgs.find(pkg => pkg.root === spkg.root);
-              if (targetSubPkg == null) {
-                targetSubPkg = { root: spkg.root, pages: [] };
-                sandboxSubPkgs.push(targetSubPkg);
-              }
-              targetSubPkg.pages.push({ ...sp });
-            }
-          }
-        }
-      }
-
-      // 3) 兜底：从磁盘文件直接匹配（若有新创建还未在标准列表里的页面）
-      if (!target.includes('*')) {
-        let resolvedPath = normalizePagePath(target);
-        if (!resolvedPath.startsWith('src/')) {
-          resolvedPath = `src/${resolvedPath}`;
-        }
-        if (!matchedPagePaths.has(resolvedPath)) {
-          const absFilePath = path.resolve(projectRoot, `${resolvedPath}.uvue`);
-          if (fs.existsSync(absFilePath)) {
-            const raw = fs.readFileSync(absFilePath, 'utf-8');
-            const meta = parsePageMeta(raw);
-            matchedPagePaths.add(resolvedPath);
-            sandboxMainPages.push({
-              path: resolvedPath,
-              ...(meta ?? {})
-            });
-          }
-        }
-      }
-    }
-
-    if (sandboxMainPages.length === 0) {
-      console.warn(`\x1B[31m[uni-pages] 沙盒调试模式未找到任何匹配页面: ${targets.join(', ')}\x1B[0m`);
-    }
-  }
-
-  // 7. 构建输出（pages 放第一位）
-  const output: Record<string, any> = {};
-  if (isSandboxMode && sandboxMainPages.length > 0) {
-    output.pages = sandboxMainPages;
-  }
-  else {
-    output.pages = finalPages;
-  }
+  // 7. 装配待落盘对象（subPackages 由 stages 之后的 finalize 统一补，保证键序）
+  const output = { pages: finalPages } as PagesJsonOutput;
   const keys = Object.keys(baseConfig);
   for (let i = 0; i < keys.length; i++) {
     const k = keys[i];
@@ -748,339 +846,71 @@ function generatePagesJson(
     }
   }
 
-  function parseCustomTabbarConfig(projectRoot: string): {
-    color?: string;
-    selectedColor?: string;
-    backgroundColor?: string;
-    borderStyle?: string;
-    borderColor?: string;
-    fontSize?: string;
-    iconWidth?: string;
-    spacing?: string;
-    height?: string;
-    midButton?: any;
-    list: Array<{ tabType?: string; pagePath: string; text: string; iconPath: string; selectedIconPath: string }>;
-  } {
-    const configPath = path.resolve(projectRoot, 'src/tabbar/config.uts');
-    if (!fs.existsSync(configPath)) {
-      return { list: [] };
+  const state: PagesBuildState = {
+    root,
+    isProduction,
+    options,
+    baseConfig,
+    baseConfigParseOk: !configParseFailed,
+    configPath,
+    outputPath,
+    existingPagesMap,
+    finalPages,
+    scannedSubPkgs,
+    debugAnnotatedPages,
+    debugHomeAnnotatedPages,
+    output,
+    flags: {
+      sandboxActive: false,
+      skipConfigWriteback: false
+    },
+    stats: {
+      pageCount: finalPages.length,
+      subPackageCount: scannedSubPkgs.length
     }
-    const rawContent = fs.readFileSync(configPath, 'utf-8');
-    // 过滤多行注释与单行注释，避免注释掉的属性（如 midButton 等）被误解析
-    const content = rawContent
-      .replace(/\/\*[\s\S]*?\*\//g, '')
-      .replace(/\/\/.*$/gm, '');
+  };
 
-    // 读取中文翻译字典
-    let zhDict: Record<string, any> = {};
-    const zhPath = path.resolve(projectRoot, 'src/i18n/locales/zh-CN.json');
-    if (fs.existsSync(zhPath)) {
-      try {
-        zhDict = JSON.parse(fs.readFileSync(zhPath, 'utf-8'));
-      }
-      catch {}
-    }
-
-    const colorMatch = content.match(/color\s*:\s*['"`](.*?)['"`]/);
-    const selectedColorMatch = content.match(/selectedColor\s*:\s*['"`](.*?)['"`]/);
-    const backgroundColorMatch = content.match(/backgroundColor\s*:\s*['"`](.*?)['"`]/);
-    const borderStyleMatch = content.match(/borderStyle\s*:\s*['"`](.*?)['"`]/);
-    const borderColorMatch = content.match(/borderColor\s*:\s*['"`](.*?)['"`]/);
-    const fontSizeMatch = content.match(/fontSize\s*:\s*['"`](.*?)['"`]/);
-    const iconWidthMatch = content.match(/iconWidth\s*:\s*['"`](.*?)['"`]/);
-    const spacingMatch = content.match(/spacing\s*:\s*['"`](.*?)['"`]/);
-    const heightMatch = content.match(/height\s*:\s*['"`](.*?)['"`]/);
-
-    const midButtonMatch = content.match(/midButton\s*:\s*\{([\s\S]*?)\}/);
-    let midButton: Record<string, string> | undefined;
-    if (midButtonMatch) {
-      const block = midButtonMatch[1];
-      const width = block.match(/width\s*:\s*['"`](.*?)['"`]/);
-      const height = block.match(/height\s*:\s*['"`](.*?)['"`]/);
-      const text = block.match(/text\s*:\s*['"`](.*?)['"`]/);
-      const iconPath = block.match(/iconPath\s*:\s*['"`](.*?)['"`]/);
-      const iconWidth = block.match(/iconWidth\s*:\s*['"`](.*?)['"`]/);
-      const backgroundImage = block.match(/backgroundImage\s*:\s*['"`](.*?)['"`]/);
-      const mb: Record<string, string> = {};
-      if (width && width[1].trim())
-        mb.width = width[1].trim();
-      if (height && height[1].trim())
-        mb.height = height[1].trim();
-      if (text && text[1].trim()) {
-        const textKey = text[1].trim();
-        let translatedText = textKey;
-        if (textKey.startsWith('tabbar.')) {
-          const subKey = textKey.replace('tabbar.', '');
-          translatedText = zhDict.tabbar?.[subKey] ?? textKey;
-        }
-        mb.text = translatedText;
-      }
-      if (iconPath && iconPath[1].trim())
-        mb.iconPath = iconPath[1].trim();
-      if (iconWidth && iconWidth[1].trim())
-        mb.iconWidth = iconWidth[1].trim();
-      if (backgroundImage && backgroundImage[1].trim())
-        mb.backgroundImage = backgroundImage[1].trim();
-
-      const iconfontMatch = block.match(/iconfont\s*:\s*\{([\s\S]*?)\}/);
-      if (iconfontMatch) {
-        const ifBlock = iconfontMatch[1];
-        const ifText = ifBlock.match(/text\s*:\s*['"`](.*?)['"`]/);
-        const ifSelectedText = ifBlock.match(/selectedText\s*:\s*['"`](.*?)['"`]/);
-        const ifFontSize = ifBlock.match(/fontSize\s*:\s*['"`](.*?)['"`]/);
-        const ifColor = ifBlock.match(/color\s*:\s*['"`](.*?)['"`]/);
-        const ifSelectedColor = ifBlock.match(/selectedColor\s*:\s*['"`](.*?)['"`]/);
-        const iconfontObj: Record<string, string> = {};
-        if (ifText && ifText[1].trim())
-          iconfontObj.text = ifText[1].trim();
-        if (ifSelectedText && ifSelectedText[1].trim())
-          iconfontObj.selectedText = ifSelectedText[1].trim();
-        if (ifFontSize && ifFontSize[1].trim())
-          iconfontObj.fontSize = ifFontSize[1].trim();
-        if (ifColor && ifColor[1].trim())
-          iconfontObj.color = ifColor[1].trim();
-        if (ifSelectedColor && ifSelectedColor[1].trim())
-          iconfontObj.selectedColor = ifSelectedColor[1].trim();
-        (mb as any).iconfont = iconfontObj;
-      }
-      midButton = mb;
-    }
-
-    const listMatch = content.match(/list\s*:\s*\[([\s\S]*?)\]/);
-    const listResult: Array<{ tabType?: string; pagePath: string; text: string; iconPath: string; selectedIconPath: string }> = [];
-    if (listMatch) {
-      const listBlock = listMatch[1];
-      const itemRegex = /\{([\s\S]*?)\}/g;
-      let m = itemRegex.exec(listBlock);
-      while (m !== null) {
-        const itemBlock = m[1];
-        const itemType = itemBlock.match(/tabType\s*:\s*['"`](.*?)['"`]/);
-        const pagePath = itemBlock.match(/pagePath\s*:\s*['"`](.*?)['"`]/);
-        const text = itemBlock.match(/text\s*:\s*['"`](.*?)['"`]/);
-        const iconPath = itemBlock.match(/iconPath\s*:\s*['"`](.*?)['"`]/);
-        const selectedIconPath = itemBlock.match(/selectedIconPath\s*:\s*['"`](.*?)['"`]/);
-        if (pagePath && text) {
-          const textKey = text[1].trim();
-          let translatedText = textKey;
-          if (textKey.startsWith('tabbar.')) {
-            const subKey = textKey.replace('tabbar.', '');
-            translatedText = zhDict.tabbar?.[subKey] ?? textKey;
-          }
-
-          const itemObj: Record<string, any> = {
-            pagePath: pagePath[1].trim().replace(/^\//, ''),
-            text: translatedText,
-            iconPath: iconPath ? iconPath[1].trim() : '',
-            selectedIconPath: selectedIconPath ? selectedIconPath[1].trim() : ''
-          };
-
-          // 业务标识（type）：仅回写为页面级唯一键，供原生 tabBar 页面互跳去重
-          if (itemType && itemType[1].trim())
-            itemObj.tabType = itemType[1].trim();
-
-          const iconfontMatch = itemBlock.match(/iconfont\s*:\s*\{([\s\S]*?)\}/);
-          if (iconfontMatch) {
-            const ifBlock = iconfontMatch[1];
-            const ifText = ifBlock.match(/text\s*:\s*['"`](.*?)['"`]/);
-            const ifSelectedText = ifBlock.match(/selectedText\s*:\s*['"`](.*?)['"`]/);
-            const ifFontSize = ifBlock.match(/fontSize\s*:\s*['"`](.*?)['"`]/);
-            const ifColor = ifBlock.match(/color\s*:\s*['"`](.*?)['"`]/);
-            const ifSelectedColor = ifBlock.match(/selectedColor\s*:\s*['"`](.*?)['"`]/);
-            const iconfontObj: Record<string, string> = {};
-            if (ifText && ifText[1].trim())
-              iconfontObj.text = ifText[1].trim();
-            if (ifSelectedText && ifSelectedText[1].trim())
-              iconfontObj.selectedText = ifSelectedText[1].trim();
-            if (ifFontSize && ifFontSize[1].trim())
-              iconfontObj.fontSize = ifFontSize[1].trim();
-            if (ifColor && ifColor[1].trim())
-              iconfontObj.color = ifColor[1].trim();
-            if (ifSelectedColor && ifSelectedColor[1].trim())
-              iconfontObj.selectedColor = ifSelectedColor[1].trim();
-            itemObj.iconfont = iconfontObj;
-          }
-
-          listResult.push(itemObj as any);
-        }
-        m = itemRegex.exec(listBlock);
-      }
-    }
-
-    return {
-      color: colorMatch ? colorMatch[1].trim() : '@tabBarColor',
-      selectedColor: selectedColorMatch ? selectedColorMatch[1].trim() : '@tabBarSelectedColor',
-      backgroundColor: backgroundColorMatch ? backgroundColorMatch[1].trim() : '@tabBarBackgroundColor',
-      borderStyle: borderStyleMatch ? borderStyleMatch[1].trim() : '@tabBarBorderStyle',
-      borderColor: borderColorMatch ? borderColorMatch[1].trim() : undefined,
-      fontSize: fontSizeMatch ? fontSizeMatch[1].trim() : undefined,
-      iconWidth: iconWidthMatch ? iconWidthMatch[1].trim() : undefined,
-      spacing: spacingMatch ? spacingMatch[1].trim() : undefined,
-      height: heightMatch ? heightMatch[1].trim() : undefined,
-      midButton,
-      list: listResult
-    };
+  // 8. 按序跑 stages（sandbox → tabbar → route-meta）：唯一调用点，顺序结构性固定
+  for (let i = 0; i < stages.length; i++) {
+    stages[i].run(state, ctx);
   }
 
-  // 根据沙盒调试模式或 VITE_TABBAR_MODE 处理 Tabbar 模式
-  if (isSandboxMode && sandboxMainPages.length > 0) {
-    const parsedConfig = parseCustomTabbarConfig(projectRoot);
-    // 过滤出当前沙盒编译中真实存在的 TabBar 页面项
-    const validSandboxTabList = parsedConfig.list.filter(item =>
-      sandboxMainPages.some(p =>
-        p.path === item.pagePath
-        || p.path === `src/${item.pagePath}`
-        || `src/${p.path}` === item.pagePath
-        || normalizePagePath(p.path) === normalizePagePath(item.pagePath)
-      )
-    );
-
-    // uni-app 及微信小程序底层规范：tabBar.list 数量必须在 2 ~ 5 项之间
-    // 若沙盒中同时调试了 >= 2 个 Tab 页面，自动生成合法的 tabBar 节点供原生切换
-    // 若仅调试 1 个 Tab 页面，移除系统级 tabBar 节点避免报路由缺失错误（界面由 App.ku 自定义 TabBar 负责视觉呈现）
-    if (validSandboxTabList.length >= 2) {
-      const tabbarMode = getTabbarMode(projectRoot);
-      const isCustom = tabbarMode !== '1' && tabbarMode !== 'NATIVE_TABBAR';
-      output.tabBar = {
-        ...(isCustom ? { custom: true } : {}),
-        color: parsedConfig.color,
-        selectedColor: parsedConfig.selectedColor,
-        backgroundColor: parsedConfig.backgroundColor,
-        borderStyle: parsedConfig.borderStyle,
-        list: validSandboxTabList
-      };
-      if (parsedConfig.borderColor)
-        output.tabBar.borderColor = parsedConfig.borderColor;
-      if (parsedConfig.fontSize)
-        output.tabBar.fontSize = parsedConfig.fontSize;
-      if (parsedConfig.iconWidth)
-        output.tabBar.iconWidth = parsedConfig.iconWidth;
-      if (parsedConfig.spacing)
-        output.tabBar.spacing = parsedConfig.spacing;
-      if (parsedConfig.height)
-        output.tabBar.height = parsedConfig.height;
-      if (parsedConfig.midButton)
-        output.tabBar.midButton = parsedConfig.midButton;
-    }
-    else {
-      delete output.tabBar;
-    }
+  // 9. finalize：subPackages 最后赋值，保证键序为 pages → 基座键 → subPackages
+  if (state.scannedSubPkgs.length > 0) {
+    output.subPackages = state.scannedSubPkgs;
   }
   else {
-    const tabbarMode = getTabbarMode(projectRoot);
-    if (tabbarMode === '0' || tabbarMode === 'NO_TABBAR') {
-      delete output.tabBar;
-    }
-    else if (tabbarMode === '1' || tabbarMode === 'NATIVE_TABBAR') {
-      // 模式1（原生模式）：从 src/tabbar/config.uts 的 customTabbarConfig 动态提取生成原生 tabBar 配置
-      const parsedConfig = parseCustomTabbarConfig(projectRoot);
-      if (output.tabBar == null) {
-        output.tabBar = {
-          color: parsedConfig.color,
-          selectedColor: parsedConfig.selectedColor,
-          backgroundColor: parsedConfig.backgroundColor,
-          borderStyle: parsedConfig.borderStyle,
-          list: parsedConfig.list
-        };
-        if (parsedConfig.borderColor)
-          output.tabBar.borderColor = parsedConfig.borderColor;
-        if (parsedConfig.fontSize)
-          output.tabBar.fontSize = parsedConfig.fontSize;
-        if (parsedConfig.iconWidth)
-          output.tabBar.iconWidth = parsedConfig.iconWidth;
-        if (parsedConfig.spacing)
-          output.tabBar.spacing = parsedConfig.spacing;
-        if (parsedConfig.height)
-          output.tabBar.height = parsedConfig.height;
-        if (parsedConfig.midButton)
-          output.tabBar.midButton = parsedConfig.midButton;
-      }
-      else {
-        delete output.tabBar.custom;
-        if (parsedConfig.list.length > 0 && (output.tabBar.list == null || output.tabBar.list.length === 0)) {
-          output.tabBar.list = parsedConfig.list;
-        }
-        if (parsedConfig.midButton)
-          output.tabBar.midButton = parsedConfig.midButton;
-      }
-    }
-    else if (tabbarMode === '2' || tabbarMode === 'CUSTOM_TABBAR_WITH_NATIVE' || tabbarMode === 'CUSTOM_TABBAR') {
-      // 模式2（带原生配置的自定义 TabBar）：生成包含 custom: true 的 pages.json tabBar 配置，通过 switchTab 跳转
-      const parsedConfig = parseCustomTabbarConfig(projectRoot);
-      if (output.tabBar == null) {
-        output.tabBar = {
-          custom: true,
-          color: parsedConfig.color,
-          selectedColor: parsedConfig.selectedColor,
-          backgroundColor: parsedConfig.backgroundColor,
-          borderStyle: parsedConfig.borderStyle,
-          list: parsedConfig.list
-        };
-        if (parsedConfig.borderColor)
-          output.tabBar.borderColor = parsedConfig.borderColor;
-        if (parsedConfig.fontSize)
-          output.tabBar.fontSize = parsedConfig.fontSize;
-        if (parsedConfig.iconWidth)
-          output.tabBar.iconWidth = parsedConfig.iconWidth;
-        if (parsedConfig.spacing)
-          output.tabBar.spacing = parsedConfig.spacing;
-        if (parsedConfig.height)
-          output.tabBar.height = parsedConfig.height;
-        if (parsedConfig.midButton)
-          output.tabBar.midButton = parsedConfig.midButton;
-      }
-      else {
-        output.tabBar.custom = true;
-        if (parsedConfig.list.length > 0 && (output.tabBar.list == null || output.tabBar.list.length === 0)) {
-          output.tabBar.list = parsedConfig.list;
-        }
-        if (parsedConfig.midButton)
-          output.tabBar.midButton = parsedConfig.midButton;
-      }
-    }
-    else if (tabbarMode === '3' || tabbarMode === 'CUSTOM_TABBAR_WITHOUT_NATIVE' || tabbarMode === '4' || tabbarMode === 'SINGLE_PAGE_TABBAR') {
-      // 模式3（纯自定义 TabBar，无原生配置）与 模式4（单页面 TabBar 容器模式）：完全删除 pages.json 中的 tabBar
-      delete output.tabBar;
-    }
+    delete output.subPackages;
   }
 
-  if (isSandboxMode && sandboxMainPages.length > 0) {
-    if (sandboxSubPkgs.length > 0) {
-      output.subPackages = sandboxSubPkgs;
-    }
-    else {
-      delete output.subPackages;
-    }
-  }
-  else if (scannedSubPkgs.length > 0) {
-    output.subPackages = scannedSubPkgs;
-  }
+  return state;
+}
 
-  // 7. 写入 pages.json
-  const jsonStr = `${JSON.stringify(output, null, 2)}\n`;
-  // 同步路由元信息表（useRoute().meta / .name 的数据源，见 plugins/uni-pages-route-meta.ts）
-  writeRouteMetaFile(output, projectRoot);
-  let existing = '';
-  if (fs.existsSync(outPath)) {
-    existing = fs.readFileSync(outPath, 'utf-8');
-  }
-  if (jsonStr !== existing) {
-    fs.writeFileSync(outPath, jsonStr, 'utf-8');
-    if (isSandboxMode && sandboxMainPages.length > 0) {
+// ==========================================
+// 核心：落盘
+// ==========================================
+
+/** 把构建结果落盘：写 pages.json（内容不变则跳过）+ ws 全量刷新 + 回写 pages.config.json */
+export function commitPages(state: PagesBuildState, server: any = null): void {
+  const changed = writePagesJson(state.output, state.outputPath);
+
+  if (changed) {
+    if (state.flags.sandboxActive) {
       const allPaths = [
-        ...sandboxMainPages.map(p => p.path),
-        ...sandboxSubPkgs.flatMap(s => s.pages.map(p => `${s.root}/${p.path}`))
+        ...state.output.pages.map((p: PageConfig) => p.path),
+        ...state.scannedSubPkgs.flatMap(s => s.pages.map(p => `${s.root}/${p.path}`))
       ];
-      console.log(`\x1B[33m⚡ [uni-pages] 沙盒独立调试模式已生效: 共 ${allPaths.length} 个页面 (首页: ${sandboxMainPages[0].path})\x1B[0m`);
+      console.log(`\x1B[33m⚡ [uni-pages] 沙盒独立调试模式已生效: 共 ${allPaths.length} 个页面 (首页: ${state.output.pages[0].path})\x1B[0m`);
       console.log(`\x1B[33m   包含页面: ${allPaths.join(' | ')}\x1B[0m`);
     }
     else {
-      console.log(`[uni-pages] Generated ${opts.outFile} (${finalPages.length} pages, ${scannedSubPkgs.length} subpackages)`);
+      console.log(`[uni-pages] Generated ${state.options.outFile} (${state.stats.pageCount} pages, ${state.stats.subPackageCount} subpackages)`);
     }
 
     // 触发 Vite 开发服务器全量热重载，通知 H5 / App 开发客户端立即刷新路由
     if (server != null) {
       try {
-        const mod = server.moduleGraph.getModuleById(outPath);
+        const mod = server.moduleGraph.getModuleById(state.outputPath);
         if (mod != null) {
           server.moduleGraph.invalidateModule(mod);
         }
@@ -1093,55 +923,10 @@ function generatePagesJson(
     }
   }
 
-  // 8. 自动同步回写 pages.config.json（保证手动配置文件与新建/删除/修改页面完全双向同步）
-  // ⚠️ 沙盒调试模式下【绝不回写】，避免破坏或裁剪 pages.config.json 的完整全量配置
-  if (isSandboxMode && sandboxMainPages.length > 0) {
-    return;
-  }
-
-  // 配置文件存在语法错误时绝不回写，避免破坏用户正在编辑的文件
-  if (fs.existsSync(configPath) && !configParseFailed) {
-    let configUpdated = false;
-    const currentConfigRaw = fs.readFileSync(configPath, 'utf-8');
-    let currentConfig: BaseConfig = {};
-    try {
-      currentConfig = JSON5.parse(currentConfigRaw) as BaseConfig;
-    }
-    catch {}
-
-    // 1) 同步主包（新增、修改、剔除已删除）
-    const newMainPages: PageConfig[] = [];
-    for (let i = 0; i < finalPages.length; i++) {
-      newMainPages.push(finalPages[i]);
-    }
-    if (currentConfig.pages == null || JSON.stringify(currentConfig.pages) !== JSON.stringify(newMainPages)) {
-      currentConfig.pages = newMainPages;
-      configUpdated = true;
-    }
-
-    // 2) 同步分包（新增、修改、剔除已删除）
-    currentConfig.subPackages ??= [];
-    for (let s = 0; s < scannedSubPkgs.length; s++) {
-      const spkg = scannedSubPkgs[s];
-      const targetSub = currentConfig.subPackages.find(cp => cp.root === spkg.root);
-      if (targetSub == null) {
-        currentConfig.subPackages.push({ root: spkg.root, pages: spkg.pages });
-        configUpdated = true;
-      }
-      else {
-        if (JSON.stringify(targetSub.pages) !== JSON.stringify(spkg.pages)) {
-          targetSub.pages = spkg.pages;
-          configUpdated = true;
-        }
-      }
-    }
-
-    if (configUpdated) {
-      const newConfigJson = `${JSON.stringify(currentConfig, null, 2)}\n`;
-      if (newConfigJson !== currentConfigRaw) {
-        fs.writeFileSync(configPath, newConfigJson, 'utf-8');
-        console.log(`[uni-pages] Automatically synced changes into ${opts.configFile}`);
-      }
+  // 回写 pages.config.json：沙盒生效或基座语法错误时绝不回写
+  if (!state.flags.skipConfigWriteback && state.baseConfigParseOk) {
+    if (writeBackConfig(state.configPath, state.finalPages, state.scannedSubPkgs)) {
+      console.log(`[uni-pages] Automatically synced changes into ${state.options.configFile}`);
     }
   }
 }
@@ -1150,29 +935,56 @@ function generatePagesJson(
 // Vite 插件导出
 // ==========================================
 
-export default function uniPagesPlugin(options: UniPagesOptions = {}) {
-  const opts = {
-    enabled: options.enabled ?? true,
-    dir: options.dir ?? 'src/pages',
-    subPackages: options.subPackages ?? [],
-    exclude: options.exclude ?? [],
-    outFile: options.outFile ?? 'pages.json',
-    configFile: options.configFile ?? 'pages.config.json',
-    homePage: options.homePage ?? ''
-  };
+export default function uniPagesPlugin(userOptions: UniPagesOptions = {}) {
+  const options = resolveOptions(userOptions);
 
   let projectRoot = process.cwd();
   let server: any = null;
   let isProduction = false;
   let timeoutId: ReturnType<typeof setTimeout> | null = null;
+  let generation: Promise<void> = Promise.resolve();
+  let stages: PagesStage[] = [];
+  let stageChecked = false;
 
-  function debouncedGenerate() {
+  function runGenerate(): void {
+    if (!options.enabled) {
+      return;
+    }
+    const ctx: PagesStageContext = { root: projectRoot, isProduction };
+
+    // 能力自检（仅开发期一次）：卫星是独立可选插件，缺失只告警不阻断
+    if (!isProduction && !stageChecked) {
+      stageChecked = true;
+      const present = new Set(stages.map(s => s.name));
+      for (let i = 0; i < KNOWN_PAGES_STAGES.length; i++) {
+        const known = KNOWN_PAGES_STAGES[i];
+        if (!present.has(known)) {
+          console.warn(`\x1B[33m[uni-pages] 阶段 ${known} 未注册，对应功能（sandbox / tabBar / route-meta）将不生效\x1B[0m`);
+        }
+      }
+    }
+
+    const state = buildPages(userOptions, ctx, stages);
+    if (state == null) {
+      // pages.config.json 语法错误且无缓存：保持现状，等用户修好
+      return;
+    }
+    commitPages(state, server);
+  }
+
+  function enqueueGenerate(): Promise<void> {
+    generation = generation.then(runGenerate, runGenerate);
+    return generation;
+  }
+
+  function debouncedGenerate(): void {
     if (timeoutId != null) {
       clearTimeout(timeoutId);
     }
     timeoutId = setTimeout(() => {
-      generatePagesJson(opts, projectRoot, isProduction, server);
-    }, 80);
+      timeoutId = null;
+      void enqueueGenerate();
+    }, DEBOUNCE_MS);
   }
 
   return {
@@ -1180,8 +992,10 @@ export default function uniPagesPlugin(options: UniPagesOptions = {}) {
 
     configResolved(config: any) {
       projectRoot = config.root ?? process.cwd();
+      // 发现所有独立注册的卫星插件
+      stages = collectStagesFromPlugins(config.plugins ?? []);
       // 只有在明确的生产发版打包构建（非 watch 开发模式）时才判定为生产模式
-      // 本地开发调试（无论是 H5 的 dev serve 还是 iOS / Android / HarmonyOS 的本地原生基座编译）均允许沙盒模式正常生效
+      // 本地开发调试（H5 dev serve 与 iOS / Android / HarmonyOS 本地原生基座编译）均允许沙盒模式生效
       const mode = config.mode ?? process.env.NODE_ENV ?? 'development';
       const isExplicitProd = mode === 'production' || process.env.NODE_ENV === 'production';
       const isWatch = Boolean(config.build?.watch || process.env.UNI_WATCH || process.env.UNI_APP_WATCH);
@@ -1189,10 +1003,10 @@ export default function uniPagesPlugin(options: UniPagesOptions = {}) {
     },
 
     buildStart() {
-      if (!opts.enabled) {
+      if (!options.enabled) {
         return;
       }
-      generatePagesJson(opts, projectRoot, isProduction, server);
+      runGenerate();
     },
 
     /** 移除 definePage(...) 宏调用，避免运行时报错 */
@@ -1204,106 +1018,28 @@ export default function uniPagesPlugin(options: UniPagesOptions = {}) {
       if (!rawId.endsWith('.uvue') && !rawId.endsWith('.vue')) {
         return null;
       }
-
-      const startRegex = /definePage\s*\(\s*\{/;
-      const match = code.match(startRegex);
-      if (match == null || match.index == null) {
+      const newCode = stripDefinePageMacro(code);
+      if (newCode == null) {
         return null;
       }
-
-      const openParen = code.indexOf('(', match.index);
-      if (openParen === -1) {
-        return null;
-      }
-
-      // 从 openParen+1 开始追踪，与 parseDefinePage 逻辑一致
-      let depth = 0;
-      let inString = false;
-      let stringChar = '';
-      let endIdx = -1;
-
-      for (let i = openParen + 1; i < code.length; i++) {
-        const ch = code[i];
-        const prev = i > 0 ? code[i - 1] : '';
-
-        if (inString) {
-          if (ch === stringChar && prev !== '\\') {
-            inString = false;
-          }
-          continue;
-        }
-        if (ch === '"' || ch === '\'' || ch === '`') {
-          inString = true;
-          stringChar = ch;
-          continue;
-        }
-        if (ch === '/' && i + 1 < code.length) {
-          if (code[i + 1] === '/') {
-            const nl = code.indexOf('\n', i);
-            if (nl === -1) {
-              break;
-            }
-            i = nl;
-            continue;
-          }
-          if (code[i + 1] === '*') {
-            const e = code.indexOf('*/', i + 2);
-            if (e === -1) {
-              break;
-            }
-            i = e + 1;
-            continue;
-          }
-        }
-        if (ch === '{' || ch === '(') {
-          depth++;
-        }
-        if (ch === '}' || ch === ')') {
-          depth--;
-          if (depth < 0) {
-            endIdx = i + 1;
-            break;
-          }
-        }
-      }
-
-      if (endIdx === -1) {
-        return null;
-      }
-
-      // endIdx 指向 `)` 之后一个字符，即 definePage 调用的结束
-      // 往前清除多余换行
-      let start = match.index;
-      if (start > 0 && code[start - 1] === '\n') {
-        start--;
-        if (start > 0 && code[start - 1] === '\r') {
-          start--;
-        }
-      }
-      while (endIdx < code.length && (code[endIdx] === '\n' || code[endIdx] === '\r')) {
-        endIdx++;
-      }
-
-      const newCode = code.slice(0, start) + code.slice(endIdx);
       return { code: newCode, map: null };
     },
 
     configureServer(s: any) {
-      if (!opts.enabled) {
+      if (!options.enabled) {
         return;
       }
       server = s;
-      const pagesDir = path.resolve(projectRoot, opts.dir);
-      const configPath = path.resolve(projectRoot, opts.configFile);
+      const pagesDir = path.resolve(projectRoot, options.dir);
+      const configPath = path.resolve(projectRoot, options.configFile);
       const tabbarConfigPath = path.resolve(projectRoot, 'src/tabbar/config.uts');
       const envPath = path.resolve(projectRoot, '.env');
 
       if (fs.existsSync(pagesDir)) {
         server.watcher.add(pagesDir);
       }
-      // 监听分包目录
-      for (let i = 0; i < opts.subPackages.length; i++) {
-        const subDir = path.resolve(projectRoot, opts.subPackages[i]);
+      for (let i = 0; i < options.subPackages.length; i++) {
+        const subDir = path.resolve(projectRoot, options.subPackages[i]);
         if (fs.existsSync(subDir)) {
           server.watcher.add(subDir);
         }
@@ -1318,45 +1054,21 @@ export default function uniPagesPlugin(options: UniPagesOptions = {}) {
         server.watcher.add(envPath);
       }
 
-      const isPageFile = (fp: string): boolean => {
-        const n = fp.replace(/\\/g, '/');
-        if (!n.endsWith('.uvue') || n.includes('?')) {
-          return false;
-        }
-        // 检查是否被 exclude（如 components、views 等）
-        const allExcludes = ['**/components/**/*.*', '**/views/**/*.*', ...opts.exclude];
-        const relPath = projectRoot ? path.relative(projectRoot, fp).replace(/\\/g, '/') : n;
-        for (let e = 0; e < allExcludes.length; e++) {
-          if (matchGlob(relPath, allExcludes[e])) {
-            return false;
-          }
-        }
-        // 带 / 边界匹配，避免 src/pages 误匹配 src/pages-xxx
-        if (n.includes(`${opts.dir.replace(/\\/g, '/')}/`)) {
-          return true;
-        }
-        // 检查是否在分包目录中
-        for (let i = 0; i < opts.subPackages.length; i++) {
-          if (n.includes(`${opts.subPackages[i].replace(/\\/g, '/')}/`)) {
-            return true;
-          }
-        }
-        return false;
-      };
+      const matchesPage = (filePath: string): boolean =>
+        isPageFile(filePath, options.dir, options.subPackages, options.exclude, projectRoot);
 
       server.watcher.on('add', (filePath: string) => {
-        if (isPageFile(filePath)) {
+        if (matchesPage(filePath)) {
           debouncedGenerate();
         }
       });
       server.watcher.on('unlink', (filePath: string) => {
-        if (isPageFile(filePath)) {
+        if (matchesPage(filePath)) {
           debouncedGenerate();
         }
       });
       server.watcher.on('change', (filePath: string) => {
         const normalized = filePath.replace(/\\/g, '/');
-        // 配置文件或环境变量变化
         if (
           normalized === configPath.replace(/\\/g, '/')
           || normalized.includes('pages.config')
@@ -1365,17 +1077,16 @@ export default function uniPagesPlugin(options: UniPagesOptions = {}) {
         ) {
           debouncedGenerate();
         }
-        // 页面文件变化
-        if (isPageFile(filePath)) {
+        if (matchesPage(filePath)) {
           debouncedGenerate();
         }
       });
     },
+
     transformIndexHtml(html: string) {
       const mode = getTabbarMode(projectRoot);
       if (mode === '2' || mode === 'CUSTOM_TABBAR_WITH_NATIVE' || mode === 'CUSTOM_TABBAR') {
-        const hideStyle = '<style id="uni-tabbar-hide-zero-flash">uni-tabbar, uni-tabbar *, .uni-tabbar, .uni-tabbar *, .uni-tabbar-bottom, .uni-tabbar-bottom *, .uni-tabbar__icon, .uni-tabbar__label { display: none !important; visibility: hidden !important; height: 0 !important; min-height: 0 !important; max-height: 0 !important; opacity: 0 !important; pointer-events: none !important; position: absolute !important; bottom: -9999px !important; }</style>';
-        return html.replace('</head>', `${hideStyle}\n</head>`);
+        return html.replace('</head>', `${HIDE_NATIVE_TABBAR_STYLE}\n</head>`);
       }
       return html;
     }

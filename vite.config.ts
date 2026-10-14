@@ -17,6 +17,9 @@ import h5OptimizeDepsPlugin from './plugins/vite-plugin-h5-optimize-deps';
 import uniLayoutsPlugin from './plugins/uni-layouts-plugin';
 import tabbarViewsPlugin from './plugins/vite-plugin-tabbar-views';
 import uniPagesPlugin from './plugins/vite-plugin-uni-pages';
+import uniPagesSandboxPlugin from './plugins/vite-plugin-uni-pages-sandbox';
+import uniPagesTabbarPlugin from './plugins/vite-plugin-uni-pages-tabbar';
+import uniPagesRouteMetaPlugin from './plugins/vite-plugin-uni-pages-route-meta';
 import { execSync } from 'node:child_process';
 import { viteMockServe } from 'vite-plugin-mock';
 import { viteVConsole } from 'vite-plugin-vconsole';
@@ -249,6 +252,12 @@ export default defineConfig({
       // 【强制指定首页】：若指定则优先以该路由为主包第一个首页；留空时默认取 pages.config.json 首项或扫描的第一项
       homePage: ''
     }),
+    // uni-pages 的三个独立卫星插件：各自一个文件、各自独立注册，核心插件通过 configResolved
+    // 从插件数组里发现它们携带的 uniPagesStage 属性，在同一次生成 pass 内按 order 依次运行。
+    // 注意：必须无条件并列注册，禁止写成 `...(cond ? [x()] : [])`，否则对应功能会静默失效。
+    uniPagesSandboxPlugin(), // 沙盒独立调试模式（VITE_DEV_SANDBOX / definePage({ debug })）
+    uniPagesTabbarPlugin(), // TabBar 策略（VITE_TABBAR_MODE 0–4）
+    uniPagesRouteMetaPlugin(), // 生成 src/router/generated/page-meta.uts（useRoute().meta/.name 数据源）
     // 单页 TabBar 基础脚手架与视图组件辅助生成插件（按需根据 src/tabbar/config.uts 辅助创建基础 TabViews）
     tabbarViewsPlugin({
       enabled: true,
