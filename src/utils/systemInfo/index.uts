@@ -13,6 +13,11 @@ import {
   isVaporMode
 } from '@/src/config/index.uts';
 
+// 平台判断常量（isAppAndroid / isMpWeixin / isH5 …）不在本模块，统一在
+// `@/src/config/env/platform.uts`（零依赖叶子模块，变量名对齐 @uni-helper/uni-env）。
+// 本模块曾自行维护过一份条件编译分流，已删除 —— 那份写法用的是 `#ifdef H5`，而本项目
+// `pnpm dev` / `build:h5` 的平台是 `web`（`H5` 为 false），整段落空；两份口径也必然漂移。
+
 /**
  * NavBar 内容区默认基准高度（不含状态栏，单位 px，标准 44px）
  */
@@ -22,89 +27,6 @@ export const NAVBAR_CONTENT_HEIGHT: number = 44;
  * TabBar 默认基准高度（单位 px，标准 50px）
  */
 export const TABBAR_BASE_HEIGHT: number = 50;
-
-/**
- * 解析当前运行平台标识（对齐 uni-app 的 uniPlatform 取值：app-android / app-ios / app-harmony / web / mp-xxx）
- *
- * ⚠️ 不再调用 `uni.getSystemInfoSync()` —— 微信小程序基础库已将其标记废弃，调用会在控制台打印
- *    「wx.getSystemInfoSync is deprecated. Please use wx.getSystemSetting / wx.getDeviceInfo /
- *    wx.getWindowInfo / wx.getAppBaseInfo instead」告警。这里改为编译期条件编译注入常量：
- *    零运行时桥接开销，且与 `getCompilePlatform()` 的平台分流口径保持一致。
- *
- * ⚠️ 条件编译段内只赋值、最后统一 return：写成「每个 `#ifdef` 里各自 return」会被 TS 判成
- *    「不可达代码」（TS7027），编辑器整片变灰（理由见 `src/config/env/env.uts` 的 isVaporMode()）。
- *
- * ⚠️ 赋值必须带「空值哨兵」判断：真编译会按平台剔除分支，只剩一支生效；但单测（vitest）环境
- *    不做条件编译剔除，`#ifdef` 只是普通注释，所有分支都会执行 —— 那时必须是**第一个命中的分支生效**，
- *    才与原来的 `#ifdef ... return` 语义一致（否则最后一个分支会覆盖前面的，测试里平台判断全错）。
- */
-function resolveCurrentPlatform(): string {
-  let platform = '';
-  // #ifdef APP-ANDROID
-  if (platform == '') {
-    platform = 'app-android';
-  }
-  // #endif
-  // #ifdef APP-IOS
-  if (platform == '') {
-    platform = 'app-ios';
-  }
-  // #endif
-  // #ifdef APP-HARMONY
-  if (platform == '') {
-    platform = 'app-harmony';
-  }
-  // #endif
-  // #ifdef H5
-  if (platform == '') {
-    platform = 'web';
-  }
-  // #endif
-  // #ifdef MP-WEIXIN
-  if (platform == '') {
-    platform = 'mp-weixin';
-  }
-  // #endif
-  // #ifdef MP-ALIPAY
-  if (platform == '') {
-    platform = 'mp-alipay';
-  }
-  // #endif
-  return platform;
-}
-
-const currentPlatform: string = resolveCurrentPlatform();
-
-/** 是否为 Android App 原生平台 */
-export const isAppAndroid: boolean = currentPlatform == 'app-android';
-
-/** 是否为 iOS App 原生平台 */
-export const isAppIos: boolean = currentPlatform == 'app-ios';
-
-/** 是否为 HarmonyOS (鸿蒙) App 原生平台 */
-export const isAppHarmony: boolean = currentPlatform == 'app-harmony';
-
-/** 是否为 Web / H5 平台 */
-export const isWeb: boolean = currentPlatform == 'web';
-
-/** 是否为 微信小程序平台 */
-export const isWeixinMp: boolean = currentPlatform == 'mp-weixin';
-
-/** 是否为 支付宝小程序平台 */
-export const isAlipayMp: boolean = currentPlatform == 'mp-alipay';
-
-/** 是否为 App 原生平台（Android / iOS / HarmonyOS） */
-export const isApp: boolean = isAppAndroid || isAppIos || isAppHarmony;
-
-/** 是否为 小程序平台（微信 / 支付宝） */
-export const isMp: boolean = isWeixinMp || isAlipayMp;
-
-/** 别名兼容导出 */
-export const isAndroid: boolean = isAppAndroid;
-export const isIos: boolean = isAppIos;
-export const isHarmony: boolean = isAppHarmony;
-export const isH5: boolean = isWeb;
-export const isWechatMp: boolean = isWeixinMp;
 
 // eslint-disable-next-line import/no-mutable-exports
 export let systemId: number = 0;
@@ -615,36 +537,9 @@ export class SystemUtils {
   /** 底部安全区高度响应式 computed（px），未初始化时为 0 */
   readonly safeAreaBottom = safeAreaBottom;
 
-  /** 是否为 Android App 原生平台 */
-  readonly isAppAndroid = isAppAndroid;
-
-  /** 是否为 iOS App 原生平台 */
-  readonly isAppIos = isAppIos;
-
-  /** 是否为 HarmonyOS (鸿蒙) App 原生平台 */
-  readonly isAppHarmony = isAppHarmony;
-
-  /** 是否为 Web / H5 平台 */
-  readonly isWeb = isWeb;
-
-  /** 是否为 微信小程序平台 */
-  readonly isWeixinMp = isWeixinMp;
-
-  /** 是否为 支付宝小程序平台 */
-  readonly isAlipayMp = isAlipayMp;
-
-  /** 是否为 App 原生平台（Android / iOS / HarmonyOS） */
-  readonly isApp = isApp;
-
-  /** 是否为 小程序平台（微信 / 支付宝） */
-  readonly isMp = isMp;
-
-  /** 别名兼容 */
-  readonly isAndroid = isAppAndroid;
-  readonly isIos = isAppIos;
-  readonly isHarmony = isAppHarmony;
-  readonly isH5 = isWeb;
-  readonly isWechatMp = isWeixinMp;
+  // 平台判断常量不在本类暴露：它们由 src/config/env/platform.uts 以编译期常量提供（名字对齐
+  // @uni-helper/uni-env），直接具名导入即可，挂到单例上反而会掩盖「每端只剩一支分支」的优化。
+  // 形如 import { isAppAndroid, isMpWeixin } from '@/src/config/env/platform.uts';
 
   /** 刷新并更新系统全局信息响应式状态 */
   updateSystemInfo(): void {
