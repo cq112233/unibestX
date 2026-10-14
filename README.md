@@ -120,6 +120,7 @@
 | 微信小程序 | [微信公众平台](https://mp.weixin.qq.com/) → 注册小程序，获取 `wx` 开头的 AppID | [manifest.json](manifest.json) 的 `mp-weixin.appid` |
 
 - 用 HBuilderX 打开项目后，双击 `manifest.json` 可视化界面也可直接填写，App 端点击「重新获取」可自动申请一个新的 DCloud AppID。
+  ⚠️ **但填完请把改动同步回 `manifest.config.ts`**：根目录的 `manifest.json` 由 [manifest.config.ts](manifest.config.ts) 生成，只要两个文件不一致，构建时就会被覆盖掉（原因见下文「manifest.json 由 TypeScript 生成」）。
 - 微信小程序还需在微信公众平台后台配置 **request 合法域名**（对应 `.env` 的 `VITE_SERVER_BASEURL`）后才能正常请求接口。
 
 ### 3. 安装依赖
@@ -553,7 +554,8 @@ unibestX/
 ├── theme.json                    # ⭐ 明暗主题色板唯一真源（light / dark）
 ├── pages.config.json             # ⭐ 页面路由与全局配置（路由与页面配置请改这里）
 ├── pages.json                    # ⚠️ 自动生成的页面路由表（编译产物，请勿手动编辑）
-├── manifest.json                 # 应用配置清单（多端 AppID、权限、vapor 开关等）
+├── manifest.config.ts            # ⭐ 应用配置真源（多端 AppID、权限、vapor 开关等，请改这里）
+├── manifest.json                 # ⚠️ 由 manifest.config.ts 生成（勿手动编辑，改了会被覆盖）
 ├── vite.config.ts                # Vite 构建配置（Tailwind 与 5 个自定义插件）
 ├── uni.scss                      # 全局 SCSS 变量与主题注入
 ├── tsconfig.json                 # TypeScript / UTS 编译配置（含 VSCode 全量诊断范围）
@@ -751,6 +753,16 @@ VITE_DEV_SANDBOX_PAGES=src/sub/auth/login,src/pages/me/me
 5. **生产发版打包安全熔断**
    - 执行 `pnpm build:h5` 或正式打包发版时，插件会自动判定生产模式并**强制熔断沙盒模式**，100% 输出完整项目全量页面，绝无将调试配置带入线上的风险！
 
+### manifest.json 由 TypeScript 生成（manifest.config.ts）
+
+根目录的 `manifest.json` **不是手写的**，它由 [manifest.config.ts](manifest.config.ts) 生成（基于 `@uni-helper/vite-plugin-uni-manifest`，配置项带完整类型提示与补全）：
+
+- **改配置改 `manifest.config.ts`**，`manifest.json` 由构建时的插件自动重写，不需要手动执行任何命令。
+- ⚠️ **`manifest.json` 是编译期真源，必须跟着 `manifest.config.ts` 一起提交**。uni-app 在编译进程启动时（vite 之前）就读取它并做进程级缓存，插件的写盘永远晚一步 —— 改完 `manifest.config.ts` 后，**本次编译用的仍是磁盘上的旧值，要再跑一次才生效**；发版场景下这意味着可能打出旧 `appid` / `versionCode`。
+- 插件注册在 `vite.config.ts` 里，且必须在 `uni()` 之前：dev server 运行期间改 `manifest.config.ts`，插件会在一秒内把 `manifest.json` 重写为新内容（实测），只是**已在运行的编译进程不会重新读取**，重启后生效。
+- **不要用 HBuilderX 的 `manifest.json` 可视化界面改配置** —— 它写的是 `manifest.json`，下一次和 `manifest.config.ts` 不一致时就会被覆盖回去。必须用可视化界面时，改完记得把改动回填到 `manifest.config.ts`。
+- 生成物会包含 [manifest.config.ts](manifest.config.ts) 之外的少量既有默认项（`transformPx`、`app-plus`、`mp-harmony`），来自插件内置的 uni-app 官方预设，不影响 uni-app x 各端编译。
+
 ### VDOM 模式与 Vapor 蒸汽模式切换
 
 #### 什么是 Vapor 蒸汽模式？
@@ -764,7 +776,7 @@ uni-app X 推出了新一代的 **蒸汽模式（Vapor）**。新版渲染引擎
 
 > 🚀 从 **2026 年起**，新的[**蒸汽模式**](https://doc.dcloud.net.cn/uni-app-x/app-vapor.html)将逐渐替代老的 VDOM 模式。
 
-本项目 `main` 分支全面兼通两种模式，**默认采用 Vapor 蒸汽模式**。当前生效值来自根目录 `manifest.json`：
+本项目 `main` 分支全面兼通两种模式，**默认采用 Vapor 蒸汽模式**。当前生效值来自根目录 `manifest.json`（由 `manifest.config.ts` 生成）：
 
 ```json
 {
