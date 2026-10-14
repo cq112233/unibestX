@@ -131,7 +131,7 @@
 import { ref, computed, watch, onMounted, getCurrentInstance, nextTick } from 'vue'
 import type { Ref } from 'vue'
 import { upGetRect } from '../../libs/function/index.uts'
-import { useAppStore } from '@/src/store'
+import config from '../../libs/config/config'
 
 type Point = {
 	x: number,
@@ -322,13 +322,12 @@ const normalizedCommonColors = computed<Array<string>>(() => {
 	return defaultColors()
 })
 
-const appStore = useAppStore()
-
 const confirmColorComputed = computed<string>((): string => {
 	if (props.confirmColor.length > 0) {
 		return props.confirmColor;
 	}
-	const theme = appStore.state.theme;
+	// 组件库不依赖宿主工程 store：默认主色取组件库自带 config（与 up-button 同源）
+	const theme = config.getString('color.up-primary') ?? '';
 	if (theme.length > 0) {
 		return theme;
 	}

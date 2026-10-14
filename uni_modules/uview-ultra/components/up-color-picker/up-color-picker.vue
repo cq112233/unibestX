@@ -169,7 +169,7 @@
 </template>
 
 <script>
-import { useAppStore } from '@/src/store'
+import config from '../../libs/config/config'
 
 export default {
 	name: 'up-color-picker',
@@ -261,17 +261,15 @@ export default {
             console.log(this.editingGradientIndex)
 			return this.currentColor;
 		},
-		// 主题主色
+		// 主题主色（组件库不依赖宿主工程 store，默认主色取组件库自带 config，与 up-button 同源）
 		themePrimaryColor() {
 			if (this.confirmColor && this.confirmColor.length > 0) {
 				return this.confirmColor;
 			}
-			try {
-				const store = useAppStore();
-				if (store && store.state && store.state.theme) {
-					return store.state.theme;
-				}
-			} catch (e) {}
+			const theme = config.color['up-primary'];
+			if (theme) {
+				return theme;
+			}
 			return '#2979ff';
 		}
 	},

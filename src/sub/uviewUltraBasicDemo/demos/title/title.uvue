@@ -70,7 +70,7 @@
 
 <script setup lang="uts">
 import { computed } from 'vue';
-import { useAppStore } from '@/src/store/index.uts';
+import { useThemeStore } from '@/src/store/index.uts';
 
 definePage({
   layout: 'navbar',
@@ -83,8 +83,8 @@ definePage({
   }
 });
 
-const appStore = useAppStore();
-const themeColor = computed<string>(() => appStore.state.theme);
+const themeStore = useThemeStore();
+const themeColor = computed<string>((): string => themeStore.state.theme);
 </script>
 
 <style lang="scss" scoped>
