@@ -13,6 +13,25 @@
   },
   "basic": {
     "langTitle": "语言设置",
-    "langPreview": "多语言文本预览"
+    "langPreview": "多语言文本预览",
+    "langUsageTitle": "i18n 多语言（vue-i18n 形态）",
+    "langUsageDesc": "文案集中在 src/i18n/locales 的 zh-CN.json / en-US.json，用 $t 或 getI18nText 取值；切换语言只需调用 useI18nStore().setLocale()，全页响应式刷新，并由插件自动持久化。",
+    "langCurLocale": "当前语言",
+    "langCardTrans": "1. $t() 基础翻译",
+    "langCardTransDesc": "$t(key) 按当前语言取文案；key 不存在时原样返回 key 本身，方便肉眼发现漏配（不抛错、也不返回空串）。",
+    "langFallback": "未命中 key 的回退",
+    "langCardNamed": "2. 具名插值",
+    "langCardNamedDesc": "文案里用 {msg} 占位，调用时传入同名命名参数即可替换；两种语言各写一份带占位符的文案。",
+    "langCardTextUtil": "3. getI18nText 与 key 形态判断",
+    "langCardTextUtilDesc": "getI18nText 会自动识别「key 形态」（含点号且全为可打印 ASCII）并翻译；中文标题等展示原文原样返回，避免被当成缺失 key 打控制台噪音。显式 %key% 包装则强制走翻译。",
+    "langPlainText": "中文原文（非 key 形态）",
+    "langCardTitle": "4. 动态设置导航栏标题",
+    "langCardTitleDesc": "setNavigationBarTitle(key) 按当前语言设置原生导航栏标题，并广播 setNavbarTitle 事件给自定义 navbar 同步。",
+    "langSetTitleBtn": "按 key 设标题",
+    "langSetPreviewBtn": "设成预览文案",
+    "langCardSwitch": "5. 切换语言（联动 TabBar）",
+    "langCardSwitchDesc": "setLocale() 会同步 vue-i18n 全局语言并持久化；自定义 TabBar 文案由 setTabbarItem() 刷新。",
+    "langSwitchZh": "切换到简体中文",
+    "langSwitchEn": "Switch to English"
   }
 }
