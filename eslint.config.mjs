@@ -1,5 +1,5 @@
 import uniHelper from '@uni-helper/eslint-config';
-import { pluginUts } from './plugins/eslint-plugin-uts.mjs';
+import { pluginUts } from './eslint/eslint-plugin-uts.mjs';
 
 const composer = uniHelper({
   // 关闭「编辑器模式」：@antfu/eslint-config 检测到 VSCODE_PID/VSCODE_CWD 时，

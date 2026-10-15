@@ -424,7 +424,6 @@ unibestX/
 │   ├── uni-layouts-plugin.ts     #   跨端 Layout 布局插件（default / empty / navbar）
 │   ├── vite-plugin-tabbar-views.ts # 单页 TabBar 脚手架与视图自动生成插件
 │   ├── vite-plugin-clean-logger.ts # 过滤编译期控制台噪音日志
-│   ├── vite-plugin-tailwind-hmr.ts # Tailwind 入口 CSS 变更的热更新加速
 │   └── root-plugin.ts            #   自动包裹 App.ku.uvue 全局根骨架组件
 ├── scripts/                      # 构建与环境切换脚本
 │   ├── build-h5.mjs              #   H5 打包（调用 HBuilderX cli publish）
@@ -1148,7 +1147,7 @@ graph LR
     I --> M[Vitest 全量单元测试]
 ```
 
-#### 1. ESLint & UTS 平台专属规则插件 (`plugins/eslint-plugin-uts.mjs`)
+#### 1. ESLint & UTS 平台专属规则插件 (`eslint/eslint-plugin-uts.mjs`)
 
 针对 uni-app X 跨端原生编译对 UTS 类型与模板语法的严苛要求，内置 12 条专项规则：
 
