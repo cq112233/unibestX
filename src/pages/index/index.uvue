@@ -21,21 +21,9 @@ import Tabbar from '@/src/tabbar/tabbar.uvue';
 import { isSinglePageTabbar, notifyPageHide, notifyPageShow, setCurIdxByKey } from '@/src/tabbar/index.uts';
 import { handleBackPressExit } from '@/src/utils/backPress/index.uts';
 
-definePage(async (options) => {
-  const { env, platform } = options;
-  const { isH5, isAppIOS, isAppAndroid, isAppHarmony, isMpAlipay } = platform;
-
-  console.log('env title:', env.VITE_APP_TITLE, isH5);
-
-  // 比如如果我要在这里调用接口
-  const p = new Promise((resolve) => {
-    setTimeout(() => {
-      resolve('1');
-    }, 100);
-  });
-
-  const res = await p;
-
+definePage((options) => {
+  const { platform } = options;
+  const { isH5, isAppIOS, isAppAndroid, isAppHarmony, isMpAlipay, isMpWeixin } = platform;
   return {
     customPageClass: 'init-page', // 页面根容器自定义类名（配合 layout 布局使用，支持配置全局样式类）
     customPageStyle: 'background-color: transparent;', // 页面根容器自定义行内样式（穿透任何样式隔离，全端绝对生效）
@@ -47,10 +35,10 @@ definePage(async (options) => {
     showBack: false, // 导航栏左侧是否显示返回箭头（TabBar 首页无需返回按钮）
     hideStatusBar: false, // 是否隐藏状态栏（true 为隐藏）
     hideNavbar: false, // 是否隐藏顶部导航栏（false 为正常显示）
-    enablePullDownRefresh: true, // 是否开启自定义下拉刷新（由 navbar 布局内的 scroll-view 驱动）
+    enablePullDownRefresh: !isH5, // 是否开启自定义下拉刷新（由 navbar 布局内的 scroll-view 驱动）
     style: {
       navigationBarTitleText: isH5
-        ? res
+        ? 'h5'
         : isAppIOS
           ? 'ios'
           : isAppAndroid
@@ -59,7 +47,9 @@ definePage(async (options) => {
               ? 'harmony'
               : isMpAlipay
                 ? 'alipay'
-                : 'tabbar.home', // 页面与导航栏标题文本（支持 i18n 自动翻译）
+                : isMpWeixin
+                  ? 'weixin'
+                  : 'tabbar.home', // 页面与导航栏标题文本（支持 i18n 自动翻译）
       navigationStyle: 'custom' // 导航栏样式设为自定义（隐藏系统原生导航栏）
     }
   };

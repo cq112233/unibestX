@@ -70,14 +70,14 @@
       "showBack": false,
       "hideStatusBar": false,
       "hideNavbar": false,
-      "enablePullDownRefresh": true,
+      "enablePullDownRefresh": false,
       "style": {
-        "navigationBarTitleText": "1",
+        "navigationBarTitleText": "h5",
         "navigationStyle": "custom"
       }
     },
     // #endif
-    // #ifdef MP-360 || MP-BAIDU || MP-HARMONY || MP-JD || MP-KUAISHOU || MP-LARK || MP-QQ || MP-TOUTIAO || MP-WEIXIN || MP-XHS
+    // #ifdef MP-360 || MP-BAIDU || MP-HARMONY || MP-JD || MP-KUAISHOU || MP-LARK || MP-QQ || MP-TOUTIAO || MP-XHS
     {
       "path": "src/pages/index/index",
       "customPageClass": "init-page",
@@ -109,6 +109,24 @@
       "enablePullDownRefresh": true,
       "style": {
         "navigationBarTitleText": "alipay",
+        "navigationStyle": "custom"
+      }
+    },
+    // #endif
+    // #ifdef MP-WEIXIN
+    {
+      "path": "src/pages/index/index",
+      "customPageClass": "init-page",
+      "customPageStyle": "background-color: transparent;",
+      "name": "index",
+      "type": "home",
+      "layout": "navbar",
+      "showBack": false,
+      "hideStatusBar": false,
+      "hideNavbar": false,
+      "enablePullDownRefresh": true,
+      "style": {
+        "navigationBarTitleText": "weixin",
         "navigationStyle": "custom"
       }
     },

@@ -429,6 +429,57 @@ definePage((options) => {
       fs.rmSync(tmpDir, { recursive: true, force: true });
     }
   });
+
+  it('uniPagesPlugin 冷启动时 configResolved 与 buildStart 仅触发一次生成，避免重复扫描', async () => {
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'uni-pages-lifecycle-'));
+    try {
+      const pagesDir = path.join(tmpDir, 'src', 'pages', 'home');
+      fs.mkdirSync(pagesDir, { recursive: true });
+
+      let evalCount = 0;
+      (globalThis as any).__TEST_EVAL_COUNT = () => {
+        evalCount++;
+      };
+
+      const pageCode = `
+<template><view>Home</view></template>
+<script setup lang="ts">
+definePage(() => {
+  if (typeof globalThis.__TEST_EVAL_COUNT === 'function') {
+    globalThis.__TEST_EVAL_COUNT();
+  }
+  return { name: 'home' };
 });
+</script>
+`;
+      fs.writeFileSync(path.join(pagesDir, 'index.uvue'), pageCode, 'utf-8');
+
+      const plugin = uniPagesPlugin({
+        dir: 'src/pages',
+        outFile: 'pages.json',
+        configFile: 'pages.config.json'
+      });
+
+      // 1. 模拟 Vite 的 configResolved 钩子
+      await (plugin as any).configResolved({ root: tmpDir, plugins: [] });
+      // 1 次当前平台执行 + 15 次跨端矩阵采样 = 16 次求值
+      expect(evalCount).toBe(16);
+
+      // 2. 紧接着模拟 Vite 紧随其后的 buildStart 钩子（首轮启动）
+      await (plugin as any).buildStart();
+      // 防重机制生效，首轮跳过重复生成，计数保持 16 而非 32
+      expect(evalCount).toBe(16);
+
+      // 3. 模拟后续 watch 模式触发的第二次 buildStart（如差量编译/重新构建）
+      await (plugin as any).buildStart();
+      expect(evalCount).toBe(32);
+    }
+    finally {
+      delete (globalThis as any).__TEST_EVAL_COUNT;
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    }
+  });
+});
+
 
 

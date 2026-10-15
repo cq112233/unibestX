@@ -92,15 +92,28 @@
   .template-corpus-apply {
     display: flex;
     align-items: center;
+    padding-top: 10px;
+    padding-right: 18px;
+    padding-bottom: 10px;
+    padding-left: 18px;
     border-radius: 20px;
     background-color: #9e58e9;
-    padding-left: 18px;
-    padding-right: 18px;
-    padding-top: 10px;
-    padding-bottom: 10px;
     color: #fff;
     font-size: 26px;
   }
+}
+
+@utility flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@utility flex-col-center {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 /* #ifdef H5 || WEB */

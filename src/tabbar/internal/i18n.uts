@@ -1,5 +1,6 @@
 import { $t, getI18nText } from '@/src/i18n/utils/index.uts';
-import { tabbarList } from './state.uts';
+import { getCurrentRoute } from '@/src/router/utils/utils.uts';
+import { isPageTabbar, tabbarList } from './state.uts';
 import { isNativeTabbar, needHideNativeTabbar } from './strategy.uts';
 
 /**
@@ -21,13 +22,21 @@ export function setTabbarItem(): void {
   if (!isNativeTabbar && !needHideNativeTabbar) {
     return;
   }
+  // 只有当前已处于 TabBar 页面时才执行 uni.setTabBarItem；在启动期或非 TabBar 子页面直接跳过，杜绝报错
+  const route = getCurrentRoute();
+  if (route.length == 0 || !isPageTabbar(route)) {
+    return;
+  }
   for (let i = 0; i < tabbarList.length; i++) {
     const item = tabbarList[i];
     const text = getI18nText(item.text);
     try {
       uni.setTabBarItem({
         index: i,
-        text
+        text,
+        fail: (_err: any) => {
+          // 静默处理非 TabBar 页面调用 setTabBarItem 导致的失败，避免控制台抛出 UniError
+        }
       } as SetTabBarItemOptions);
     }
     catch {

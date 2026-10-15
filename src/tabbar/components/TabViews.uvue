@@ -16,17 +16,22 @@
     </TabContent>
     <!-- #endif -->
     <!-- #ifdef H5 -->
-    <TabContent :content-index="0" title="1" :enable-pull-down-refresh="true" custom-page-class="init-page" custom-page-style="background-color: transparent;">
+    <TabContent :content-index="0" title="h5" :enable-pull-down-refresh="false" custom-page-class="init-page" custom-page-style="background-color: transparent;">
       <IndexView />
     </TabContent>
     <!-- #endif -->
-    <!-- #ifdef MP-360 || MP-BAIDU || MP-HARMONY || MP-JD || MP-KUAISHOU || MP-LARK || MP-QQ || MP-TOUTIAO || MP-WEIXIN || MP-XHS -->
+    <!-- #ifdef MP-360 || MP-BAIDU || MP-HARMONY || MP-JD || MP-KUAISHOU || MP-LARK || MP-QQ || MP-TOUTIAO || MP-XHS -->
     <TabContent :content-index="0" title="tabbar.home" :enable-pull-down-refresh="true" custom-page-class="init-page" custom-page-style="background-color: transparent;">
       <IndexView />
     </TabContent>
     <!-- #endif -->
     <!-- #ifdef MP-ALIPAY -->
     <TabContent :content-index="0" title="alipay" :enable-pull-down-refresh="true" custom-page-class="init-page" custom-page-style="background-color: transparent;">
+      <IndexView />
+    </TabContent>
+    <!-- #endif -->
+    <!-- #ifdef MP-WEIXIN -->
+    <TabContent :content-index="0" title="weixin" :enable-pull-down-refresh="true" custom-page-class="init-page" custom-page-style="background-color: transparent;">
       <IndexView />
     </TabContent>
     <!-- #endif -->

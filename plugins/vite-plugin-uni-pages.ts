@@ -1264,7 +1264,7 @@ export function mergePlatformItems<T extends object>(
         continue;
       }
 
-      if (list.length > 1 && platformStr !== platformUnionStr) {
+      if (list.length > 1) {
         resArray[Symbol.for(`before:${currIdx}`)] = [
           ...(resArray[Symbol.for(`before:${currIdx}`)] || []),
           lineComment(` #ifdef ${platformStr}`)
@@ -1990,6 +1990,7 @@ export default function uniPagesPlugin(userOptions: UniPagesOptions = {}) {
   let generation: Promise<void> = Promise.resolve();
   let stages: PagesStage[] = [];
   let stageChecked = false;
+  let hasGeneratedInConfigResolved = false;
 
   async function runGenerate(): Promise<void> {
     if (!options.enabled) {
@@ -2049,11 +2050,18 @@ export default function uniPagesPlugin(userOptions: UniPagesOptions = {}) {
 
       if (options.enabled) {
         await enqueueGenerate();
+        hasGeneratedInConfigResolved = true;
       }
     },
 
     async buildStart() {
       if (!options.enabled) {
+        return;
+      }
+      if (hasGeneratedInConfigResolved) {
+        // 首次构建已在 configResolved 阶段完成生成，跳过 buildStart 的重复初始执行；
+        // 重置标记以确保后续 watch 模式下的重新构建（如 app-android / mp-* 的 watch rebuild）仍能触发
+        hasGeneratedInConfigResolved = false;
         return;
       }
       await enqueueGenerate();
