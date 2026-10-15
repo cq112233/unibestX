@@ -179,7 +179,7 @@ export default defineConfig({
   },
   server: {
     host: '0.0.0.0',
-    port: 8080,
+    port: 9527,
     // 启用快速文件系统状态缓存，减少启动与热重载时重复 stat 系统调用
     fs: {
       cachedChecks: true

@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import process from 'node:process';
 import type { Plugin } from 'vite';
+import { loadPlatformPagesJson } from './pages-json-util';
 
 /**
  * 驼峰转连字符 helper（与 uni-layouts-plugin 中保持一致）
@@ -120,9 +121,7 @@ export function uniRootX(options: UniRootXOptions = {}): Plugin {
       return paramsByPath;
     }
     try {
-      const rawContent = fs.readFileSync(pagesJsonPath, 'utf-8');
-      const cleanJson = rawContent.replace(/\/\*[\s\S]*?\*\/|([^\\:]|^)\/\/.*$/gm, '$1');
-      const data = JSON.parse(cleanJson) as { pages?: any[]; subPackages?: any[] };
+      const data = loadPlatformPagesJson(pagesJsonPath);
 
       const collect = (page: any) => {
         if (page == null || typeof page.path !== 'string') {

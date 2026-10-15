@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import process from 'node:process';
 import JSON5 from 'json5';
+import { loadPlatformPagesJson } from './pages-json-util';
 
 /**
  * 驼峰转连字符 helper
@@ -151,9 +152,7 @@ export function uniLayoutsPlugin(options: UniLayoutsOptions = {}) {
     }
 
     try {
-      const rawContent = fs.readFileSync(pagesJsonPath, 'utf-8');
-      const cleanJson = rawContent.replace(/\/\*[\s\S]*?\*\/|([^\\:]|^)\/\/.*$/gm, '$1');
-      const data = JSON.parse(cleanJson) as PagesJson;
+      const data = loadPlatformPagesJson(pagesJsonPath) as PagesJson;
 
       // 1. 解析主包页面
       if (Array.isArray(data.pages)) {

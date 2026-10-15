@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import process from 'node:process';
 import type { Plugin } from 'vite';
+import { loadAllPlatformPageVariants, loadPlatformPagesJson } from './pages-json-util';
 
 export type TabbarViewsOptions = {
   /** 是否启用本插件，默认 true */
@@ -121,9 +122,7 @@ export function generateTabViews(projectRoot: string, options: TabbarViewsOption
   const pagesJsonPath = path.resolve(projectRoot, 'pages.json');
   if (fs.existsSync(pagesJsonPath)) {
     try {
-      const rawJson = fs.readFileSync(pagesJsonPath, 'utf-8');
-      const cleanJson = rawJson.replace(/\/\*[\s\S]*?\*\/|([^\\:]|^)\/\/.*$/gm, '$1');
-      const data = JSON.parse(cleanJson) as { pages?: any[]; subPackages?: any[] };
+      const data = loadPlatformPagesJson(pagesJsonPath);
       if (Array.isArray(data.pages)) {
         data.pages.forEach((p: any) => {
           if (p && typeof p.path === 'string') {
@@ -136,15 +135,22 @@ export function generateTabViews(projectRoot: string, options: TabbarViewsOption
     catch {}
   }
 
-  const viewsEntries: Array<{
-    importName: string;
-    importPath: string;
+  const allVariantsMap = loadAllPlatformPageVariants(pagesJsonPath);
+
+  type ViewEntryVariant = {
+    condition: string | null;
     title: string;
     hideNavbar: boolean;
     hideStatusBar: boolean;
     enablePullDownRefresh: boolean;
     customPageClass: string;
     customPageStyle: string;
+  };
+
+  const viewsEntries: Array<{
+    importName: string;
+    importPath: string;
+    variants: ViewEntryVariant[];
   }> = [];
   const usedNames = new Set<string>();
 
@@ -241,64 +247,72 @@ onNavbarPullDownRefresh(() => {
       }
     }
 
-    // 优先从 pages.json 读取对应页面在 definePage 中的完整参数配置
+    // 优先从 pages.json 读取对应页面在 definePage 中的各平台变体配置
     const normTarget = rawPath.replace(/\\/g, '/').replace(/^\//, '').replace(/\.(uvue|vue)$/, '');
+    const variants = allVariantsMap.get(normTarget)
+      || allVariantsMap.get(`src/${normTarget}`)
+      || allVariantsMap.get(normTarget.replace(/^src\//, ''))
+      || [];
+
     const pageConfig = pagesJsonMap.get(normTarget)
       || pagesJsonMap.get(`src/${normTarget}`)
       || pagesJsonMap.get(normTarget.replace(/^src\//, ''))
       || null;
 
-    let hideNavbar = pageConfig?.hideNavbar === true;
-    let hideStatusBar = pageConfig?.hideStatusBar === true;
-    let enablePullDownRefresh = typeof pageConfig?.enablePullDownRefresh === 'boolean' ? pageConfig.enablePullDownRefresh : true;
-    let title = typeof pageConfig?.style?.navigationBarTitleText === 'string'
-      ? pageConfig.style.navigationBarTitleText
-      : (typeof pageConfig?.title === 'string' ? pageConfig.title : '');
-    let customPageClass = typeof pageConfig?.customPageClass === 'string'
-      ? pageConfig.customPageClass
-      : (typeof pageConfig?.class === 'string' ? pageConfig.class : '');
-    let customPageStyle = typeof pageConfig?.customPageStyle === 'string'
-      ? pageConfig.customPageStyle
-      : (typeof pageConfig?.customStyle === 'string' ? pageConfig.customStyle : '');
+    let sourceVariants: Array<{ condition: string | null; page: Record<string, any> | null }> = [];
+    if (variants.length > 0) {
+      sourceVariants = variants;
+    }
+    else {
+      sourceVariants = [{ condition: null, page: pageConfig }];
+    }
+
+    const entryVariants: ViewEntryVariant[] = sourceVariants.map((v) => {
+      const p = v.page;
+      return {
+        condition: v.condition,
+        hideNavbar: p?.hideNavbar === true,
+        hideStatusBar: p?.hideStatusBar === true,
+        enablePullDownRefresh: typeof p?.enablePullDownRefresh === 'boolean' ? p.enablePullDownRefresh : true,
+        title: typeof p?.style?.navigationBarTitleText === 'string'
+          ? p.style.navigationBarTitleText
+          : (typeof p?.title === 'string' ? p.title : ''),
+        customPageClass: typeof p?.customPageClass === 'string'
+          ? p.customPageClass
+          : (typeof p?.class === 'string' ? p.class : ''),
+        customPageStyle: typeof p?.customPageStyle === 'string'
+          ? p.customPageStyle
+          : (typeof p?.customStyle === 'string' ? p.customStyle : '')
+      };
+    });
 
     const absPageFile = path.resolve(projectRoot, rawPath.endsWith('.uvue') ? rawPath : `${rawPath}.uvue`);
     watchedTabPages.add(absPageFile);
 
-    // 兜底直接解析对应主页面源码（针对开发过程中即时编辑 definePage 的场景）
-    if (options.syncNavbarConfig !== false && fs.existsSync(absPageFile)) {
+    // 兜底直接解析对应主页面源码（仅在无多平台变体且为单默认变体时作为源码即时编辑的兜底）
+    if (options.syncNavbarConfig !== false && fs.existsSync(absPageFile) && entryVariants.length === 1 && !entryVariants[0].condition) {
       try {
         const pageCode = fs.readFileSync(absPageFile, 'utf-8');
-        // 1. hideNavbar
+        const v = entryVariants[0];
         const mHide = pageCode.match(/hideNavbar\s*:\s*(true|false)/i);
-        if (mHide) {
-          hideNavbar = mHide[1].toLowerCase() === 'true';
-        }
-        // 2. hideStatusBar
+        if (mHide)
+          v.hideNavbar = mHide[1].toLowerCase() === 'true';
         const mStatus = pageCode.match(/hideStatusBar\s*:\s*(true|false)/i);
-        if (mStatus) {
-          hideStatusBar = mStatus[1].toLowerCase() === 'true';
-        }
-        // 3. enablePullDownRefresh
+        if (mStatus)
+          v.hideStatusBar = mStatus[1].toLowerCase() === 'true';
         const mRefresh = pageCode.match(/enablePullDownRefresh\s*:\s*(true|false)/i);
-        if (mRefresh) {
-          enablePullDownRefresh = mRefresh[1].toLowerCase() === 'true';
-        }
-        // 4. navigationBarTitleText / title
+        if (mRefresh)
+          v.enablePullDownRefresh = mRefresh[1].toLowerCase() === 'true';
         const mTitle = pageCode.match(/navigationBarTitleText\s*:\s*['"`](.*?)['"`]/i)
           || pageCode.match(/\btitle\s*:\s*['"`](.*?)['"`]/i);
-        if (mTitle) {
-          title = mTitle[1].trim();
-        }
-        // 5. customPageClass
+        if (mTitle)
+          v.title = mTitle[1].trim();
         const mClass = pageCode.match(/customPageClass\s*:\s*['"`](.*?)['"`]/i);
-        if (mClass) {
-          customPageClass = mClass[1].trim();
-        }
-        // 6. customPageStyle
+        if (mClass)
+          v.customPageClass = mClass[1].trim();
         const mStyle = pageCode.match(/customPageStyle\s*:\s*['"`](.*?)['"`]/i);
-        if (mStyle) {
-          customPageStyle = mStyle[1].trim();
-        }
+        if (mStyle)
+          v.customPageStyle = mStyle[1].trim();
       }
       catch {}
     }
@@ -313,12 +327,7 @@ onNavbarPullDownRefresh(() => {
     viewsEntries.push({
       importName: finalCompName,
       importPath: `@/${actualRelPath.replace(/\\/g, '/')}`,
-      title,
-      hideNavbar,
-      hideStatusBar,
-      enablePullDownRefresh,
-      customPageClass,
-      customPageStyle
+      variants: entryVariants
     });
   }
 
@@ -332,28 +341,51 @@ onNavbarPullDownRefresh(() => {
     .map(item => `import ${item.importName} from '${item.importPath}';`)
     .join('\n');
 
+  function renderTabContentTag(index: number, importName: string, v: ViewEntryVariant): string {
+    let attrs = ` :content-index="${index}"`;
+    if (v.title) {
+      attrs += ` title="${v.title.replace(/"/g, '&quot;')}"`;
+    }
+    if (v.enablePullDownRefresh !== undefined) {
+      attrs += ` :enable-pull-down-refresh="${v.enablePullDownRefresh}"`;
+    }
+    if (v.hideNavbar) {
+      attrs += ` :hide-navbar="true"`;
+    }
+    if (v.hideStatusBar) {
+      attrs += ` :hide-status-bar="true"`;
+    }
+    if (v.customPageClass) {
+      attrs += ` custom-page-class="${v.customPageClass.replace(/"/g, '&quot;')}"`;
+    }
+    if (v.customPageStyle) {
+      attrs += ` custom-page-style="${v.customPageStyle.replace(/"/g, '&quot;')}"`;
+    }
+    return `    <TabContent${attrs}>\n      <${importName} />\n    </TabContent>`;
+  }
+
   const contentBlocks = viewsEntries
     .map((item, index) => {
-      let attrs = ` :content-index="${index}"`;
-      if (item.title) {
-        attrs += ` title="${item.title.replace(/"/g, '&quot;')}"`;
+      const renderedTags = item.variants.map(v => ({
+        condition: v.condition,
+        tag: renderTabContentTag(index, item.importName, v)
+      }));
+
+      // 判断所有变体的 tag 是否完全相同
+      const uniqueTags = new Set(renderedTags.map(r => r.tag));
+      if (uniqueTags.size <= 1) {
+        return renderedTags[0].tag;
       }
-      if (item.enablePullDownRefresh !== undefined) {
-        attrs += ` :enable-pull-down-refresh="${item.enablePullDownRefresh}"`;
-      }
-      if (item.hideNavbar) {
-        attrs += ` :hide-navbar="true"`;
-      }
-      if (item.hideStatusBar) {
-        attrs += ` :hide-status-bar="true"`;
-      }
-      if (item.customPageClass) {
-        attrs += ` custom-page-class="${item.customPageClass.replace(/"/g, '&quot;')}"`;
-      }
-      if (item.customPageStyle) {
-        attrs += ` custom-page-style="${item.customPageStyle.replace(/"/g, '&quot;')}"`;
-      }
-      return `    <TabContent${attrs}>\n      <${item.importName} />\n    </TabContent>`;
+
+      // 存在多平台差异，按条件输出 <!-- #ifdef -->
+      return renderedTags
+        .map(({ condition, tag }) => {
+          if (condition) {
+            return `    <!-- #ifdef ${condition} -->\n${tag}\n    <!-- #endif -->`;
+          }
+          return tag;
+        })
+        .join('\n');
     })
     .join('\n');
 

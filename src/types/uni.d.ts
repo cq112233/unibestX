@@ -196,10 +196,62 @@ declare global {
     [key: string]: any;
   }
 
+  type DefinePageContext = {
+    platform: string;
+    isH5: boolean;
+    isWeb: boolean;
+    isMp: boolean;
+    isMpWeixin: boolean;
+    isMpAlipay: boolean;
+    isMpBaidu: boolean;
+    isMpToutiao: boolean;
+    isMpQQ: boolean;
+    isMpKuaishou: boolean;
+    isMpLark: boolean;
+    isMpJD: boolean;
+    isMpXHS: boolean;
+    isMp360: boolean;
+    isMpHarmony: boolean;
+    isApp: boolean;
+    isAppAndroid: boolean;
+    isAppIOS: boolean;
+    isAppHarmony: boolean;
+    define: (base: DefinePageOptions) => any;
+  };
+
+  type DefinePageHandler = (
+    context: DefinePageContext
+  ) => DefinePageOptions | null | void | Promise<DefinePageOptions | null | void>;
+
+  /**
+   * 跨端全局环境变量（由 vite-plugin-uni-pages 宏执行沙箱注入）
+   */
+  const isH5: boolean;
+  const isWeb: boolean;
+  const isMp: boolean;
+  const isMpWeixin: boolean;
+  const isMpAlipay: boolean;
+  const isMpBaidu: boolean;
+  const isMpToutiao: boolean;
+  const isMpQQ: boolean;
+  const isMpKuaishou: boolean;
+  const isMpLark: boolean;
+  const isMpJD: boolean;
+  const isMpXHS: boolean;
+  const isMp360: boolean;
+  const isMpHarmony: boolean;
+  const isApp: boolean;
+  const isAppAndroid: boolean;
+  const isAppIOS: boolean;
+  const isAppHarmony: boolean;
+
   /**
    * uni-pages 宏函数：在单文件组件内部声明页面配置与路由信息
+   * 支持传入对象字面量、函数（含 async 函数）、null，支持通过 isH5 / platform 等环境变量进行跨端条件配置
    */
-  function definePage(options: DefinePageOptions): void;
+  function definePage(
+    options: DefinePageOptions | null | DefinePageHandler
+  ): void;
 
   // ==========================================
   // Vue 宏函数全局声明（保证在 uvue / uts / ts 环境中获得完整 IDE 智能补全与参数提示）
@@ -1038,7 +1090,7 @@ declare global {
   //    需要一个不依赖事件的当前页参数来源，走的就是这个 `options`。
   // ==========================================
   namespace Page {
-    interface PageInstanceBaseProps<D extends AnyObject = any> {
+    interface PageInstanceBaseProps<_D extends AnyObject = any> {
       /** 页面的路由参数信息（App 4.31+ / Web 4.31+ / 微信小程序） */
       options?: UTSJSONObject;
     }

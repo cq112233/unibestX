@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { extractDistinctPlatformConditions, loadPlatformPagesJson } from './pages-json-util';
 
 /**
  * uni-pages 路由元信息表插件（卫星）。
@@ -69,7 +70,9 @@ export function buildRouteMetaTable(output: Record<string, any>): Record<string,
     }
     const routePath = toRuntimeRoutePath(prefix === '' ? page.path : `${prefix}/${page.path}`);
     // 深拷贝一份并把 path 规范成运行时口径，避免与 pages.json 的相对 path 混淆
-    table[routePath] = { ...page, path: routePath };
+    const copy = { ...page, path: routePath };
+    delete copy._variants;
+    table[routePath] = copy;
   };
 
   const mainPages = output.pages;
@@ -114,8 +117,56 @@ export function renderRouteMetaSource(table: Record<string, PageConfig>): string
  * 返回是否发生了写入。
  */
 export function writeRouteMetaFile(output: Record<string, any>, projectRoot: string): boolean {
-  const table = buildRouteMetaTable(output);
-  const content = renderRouteMetaSource(table);
+  const pagesJsonPath = path.resolve(projectRoot, 'pages.json');
+  const conditions = extractDistinctPlatformConditions(pagesJsonPath);
+
+  let content = '';
+
+  if (conditions.length > 0 && fs.existsSync(pagesJsonPath)) {
+    // 收集各条件编译块对应的 meta table
+    const tableByCond = new Map<string, string>();
+    for (const cond of conditions) {
+      const platforms = cond.split('||').map(p => p.trim());
+      const repPlatform = platforms[0].toLowerCase();
+      const parsedPages = loadPlatformPagesJson(pagesJsonPath, repPlatform);
+      const table = buildRouteMetaTable(parsedPages);
+      tableByCond.set(cond, JSON.stringify(table));
+    }
+
+    const uniqueTables = new Set(tableByCond.values());
+    if (uniqueTables.size > 1) {
+      const lines = [
+        '/**',
+        ' * ⚠️ 本文件由 plugins/vite-plugin-uni-pages-route-meta.ts 自动生成，请勿手动修改。',
+        ' *',
+        ' * 内容：pages.json 里每个页面的**完整配置项**（支持多平台条件编译），',
+        ' *      供 `useRoute().meta / .name` 读取，见 src/router/hooks/route-state.uts。',
+        ' * 生成时机：每次生成 / 更新 pages.json 时同步重写。',
+        ' */'
+      ];
+      lines.push('function resolvePageMetaJson(): string {');
+      lines.push('  let meta = \'\';');
+      for (const [cond, jsonText] of tableByCond.entries()) {
+        const stringLiteral = `'${jsonText.replace(/\\/g, '\\\\').replace(/'/g, '\\\'')}'`;
+        lines.push(`  // #ifdef ${cond}`);
+        lines.push('  if (meta == \'\') {');
+        lines.push(`    meta = ${stringLiteral};`);
+        lines.push('  }');
+        lines.push('  // #endif');
+      }
+      lines.push('  return meta;');
+      lines.push('}');
+      lines.push('');
+      lines.push('export const PAGE_META_JSON: string = resolvePageMetaJson();');
+      lines.push('');
+      content = lines.join('\n');
+    }
+  }
+
+  if (!content) {
+    const table = buildRouteMetaTable(output);
+    content = renderRouteMetaSource(table);
+  }
 
   const targetPath = path.resolve(projectRoot, ROUTE_META_FILE);
   const targetDir = path.dirname(targetPath);
@@ -125,7 +176,7 @@ export function writeRouteMetaFile(output: Record<string, any>, projectRoot: str
   const oldContent = fs.existsSync(targetPath) ? fs.readFileSync(targetPath, 'utf-8') : '';
   if (content !== oldContent) {
     fs.writeFileSync(targetPath, content, 'utf-8');
-    console.log(`[uni-pages] Generated ${ROUTE_META_FILE} (${Object.keys(table).length} routes)`);
+    console.log(`[uni-pages] Generated ${ROUTE_META_FILE}`);
     return true;
   }
   return false;
