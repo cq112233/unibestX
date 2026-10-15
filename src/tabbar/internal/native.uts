@@ -38,3 +38,31 @@ export function safeHideNativeTabBar(): void {
   }
   // #endif
 }
+
+/**
+ * 还原系统原生 TabBar 并清理 H5 注入的样式
+ */
+export function safeRestoreNativeTabBar(): void {
+  // #ifdef H5
+  try {
+    if (typeof document != 'undefined') {
+      const style = document.getElementById('hide-native-tabbar-style');
+      if (style != null) {
+        style.remove();
+      }
+    }
+  }
+  catch { }
+  // #endif
+  // #ifndef MP-WEIXIN
+  if (needHideNativeTabbar) {
+    try {
+      uni.showTabBar({
+        animation: false,
+        fail: (_err: any) => { }
+      });
+    }
+    catch { }
+  }
+  // #endif
+}

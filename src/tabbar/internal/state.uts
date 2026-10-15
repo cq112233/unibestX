@@ -1,4 +1,4 @@
-import { watch } from 'vue';
+import { onUnmounted, watch } from 'vue';
 import type { CustomTabBarItem, CustomTabBarItemBadge, TabBarConfig } from '../types.uts';
 import { customTabbarConfig } from '../config.uts';
 import { cleanPath, getCurrentPath, isSamePath } from '@/src/router/utils/utils.uts';
@@ -59,6 +59,8 @@ function normalizeList(): CustomTabBarItem[] {
       iconType: item.iconType,
       icon: item.icon,
       iconActive: item.iconActive,
+      iconPath: item.iconPath,
+      selectedIconPath: item.selectedIconPath,
       badge: item.badge,
       isBulge: item.isBulge
     });
@@ -172,7 +174,17 @@ export function onTabShow(target: number | string, callback: () => void, immedia
   if (immediate && curIdx.value == index) {
     callback();
   }
-  watch(curIdx, (newVal: number, oldVal: number) => {
+  let stopWatch: (() => void) | null = null;
+  try {
+    onUnmounted(() => {
+      if (stopWatch != null) {
+        stopWatch!();
+        stopWatch = null;
+      }
+    });
+  }
+  catch { }
+  stopWatch = watch(curIdx, (newVal: number, oldVal: number) => {
     if (newVal == index && oldVal != index) {
       callback();
     }
