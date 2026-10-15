@@ -1,0 +1,5038 @@
+{
+  "$ref": "#/definitions/ManifestConfig",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "AndroidFeature": {
+      "type": "string"
+    },
+    "AndroidPermission": {
+      "type": "string"
+    },
+    "AndroidPermissionOrFeature": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/AndroidPermission"
+        },
+        {
+          "$ref": "#/definitions/AndroidFeature"
+        }
+      ]
+    },
+    "App": {
+      "description": "uni-app-x App 平台（原生 App）配置\n\n详见 <https://doc.dcloud.net.cn/uni-app-x/collocation/manifest.html#manifest-app>",
+      "properties": {
+        "defaultAppTheme": {
+          "default": "light",
+          "description": "应用默认主题，可取值 light/dark/auto",
+          "enum": ["auto", "light", "dark"],
+          "type": "string"
+        },
+        "distribute": {
+          "$ref": "#/definitions/AppDistribute",
+          "description": "App 平台发布配置"
+        },
+        "initPrivacyAuthorization": {
+          "default": "auto",
+          "description": "隐私协议初始状态，可取值 auto/agree/disagree",
+          "enum": ["auto", "agree", "disagree"],
+          "type": "string"
+        },
+        "splashScreen": {
+          "$ref": "#/definitions/AppSplashScreen",
+          "description": "启动界面关闭时机配置，HBuilderX 4.71 以下版本配置于 app 节点\n\n详见 <https://doc.dcloud.net.cn/uni-app-x/collocation/manifest-android.html#android平台splash关闭时机>"
+        }
+      },
+      "type": "object"
+    },
+    "AppAndroid": {
+      "description": "uni-app-x App-Android 平台配置\n\n详见 <https://doc.dcloud.net.cn/uni-app-x/collocation/manifest.html#manifest-app-android>",
+      "properties": {
+        "defaultAppTheme": {
+          "default": "light",
+          "description": "应用默认主题，可取值 light/dark/auto",
+          "enum": ["auto", "light", "dark"],
+          "type": "string"
+        },
+        "distribute": {
+          "$ref": "#/definitions/AppAndroidDistribute",
+          "description": "Android 平台发布配置\n\n详见 <https://doc.dcloud.net.cn/uni-app-x/collocation/manifest.html#app-android-distribute>"
+        },
+        "initPrivacyAuthorization": {
+          "default": "auto",
+          "description": "隐私协议初始状态，可取值 auto/agree/disagree",
+          "enum": ["auto", "agree", "disagree"],
+          "type": "string"
+        },
+        "splashScreen": {
+          "$ref": "#/definitions/AppSplashScreen",
+          "description": "启动界面关闭时机配置，HBuilderX 4.71 及以上版本配置于 app-android 节点\n\n详见 <https://doc.dcloud.net.cn/uni-app-x/collocation/manifest-android.html#android平台splash关闭时机>"
+        }
+      },
+      "type": "object"
+    },
+    "AppAndroidDistribute": {
+      "description": "uni-app-x Android 平台发布配置\n\n详见 <https://doc.dcloud.net.cn/uni-app-x/collocation/manifest.html#app-android-distribute>",
+      "properties": {
+        "aaptOptions": {
+          "description": "aaptOptions 配置项\n\n详见 <https://doc.dcloud.net.cn/uni-app-x/collocation/manifest-android.html#aaptoptions>",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "abiFilters": {
+          "default": ["arm64-v8a"],
+          "description": "应用支持的 CPU 类型\n\n详见 <https://doc.dcloud.net.cn/uni-app-x/collocation/manifest-android.html#abifilters>",
+          "items": {
+            "enum": ["armeabi-v7a", "arm64-v8a", "x86", "x86_64"],
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "buildFeatures": {
+          "description": "buildFeatures 配置项\n\n详见 <https://doc.dcloud.net.cn/uni-app-x/collocation/manifest-android.html#buildfeatures>",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "disableLegacyPackaging": {
+          "default": false,
+          "description": "是否不压缩原生库（.so 文件），设置为 true 时 .so 文件以未压缩方式打包",
+          "type": "boolean"
+        },
+        "enableResourceOptimizations": {
+          "description": "是否开启 Android 原生 res 资源文件优化，开启后 res 资源文件名称会被混淆\n\n详见 <https://doc.dcloud.net.cn/uni-app-x/collocation/manifest-android.html#enableresourceoptimizations>",
+          "type": "boolean"
+        },
+        "excludePermissions": {
+          "description": "强制移除的权限\n\n详见 <https://doc.dcloud.net.cn/uni-app-x/collocation/manifest-android.html#excludepermissions>",
+          "items": {
+            "$ref": "#/definitions/AndroidPermissionOrFeature"
+          },
+          "type": "array"
+        },
+        "icons": {
+          "$ref": "#/definitions/AppIconsAndroid",
+          "description": "Android 平台应用图标配置，云端打包后生效"
+        },
+        "minSdkVersion": {
+          "default": 21,
+          "description": "应用兼容的最低 Android 版本（API 等级）\n\n详见 <https://doc.dcloud.net.cn/uni-app-x/collocation/manifest-android.html#minsdkversion>",
+          "type": "number"
+        },
+        "modules": {
+          "$ref": "#/definitions/AppModules",
+          "description": "Android 内置模块配置"
+        },
+        "packagingOptions": {
+          "description": "packagingOptions 配置项\n\n详见 <https://doc.dcloud.net.cn/uni-app-x/collocation/manifest-android.html#packagingoptions>",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "permissions": {
+          "description": "额外添加的权限\n\n详见 <https://doc.dcloud.net.cn/uni-app-x/collocation/manifest-android.html#incloudpermissions>",
+          "items": {
+            "$ref": "#/definitions/AndroidPermissionOrFeature"
+          },
+          "type": "array"
+        },
+        "splashScreens": {
+          "$ref": "#/definitions/AppSplashScreensAndroid",
+          "description": "Android 平台应用启动界面配置，云端打包后生效"
+        },
+        "syncDebug": {
+          "default": false,
+          "description": "是否为自定义调试基座",
+          "type": "boolean"
+        },
+        "targetSdkVersion": {
+          "default": 32,
+          "description": "应用适配的目标 Android 版本（API 等级），部分应用市场要求设置较高的 targetSdkVersion 才能提交审核\n\n详见 <https://doc.dcloud.net.cn/uni-app-x/collocation/manifest-android.html#targetsdkversion>",
+          "type": "number"
+        }
+      },
+      "type": "object"
+    },
+    "AppDistribute": {
+      "description": "uni-app-x App 平台发布配置\n\n详见 <https://doc.dcloud.net.cn/uni-app-x/collocation/manifest.html#app-distribute>",
+      "properties": {
+        "android": {
+          "$ref": "#/definitions/AppDistributeAndroid",
+          "description": "App-Android 平台发布配置\n\n详见 <https://doc.dcloud.net.cn/uni-app-x/collocation/manifest.html#distribute-android>"
+        },
+        "icons": {
+          "$ref": "#/definitions/AppIcons",
+          "description": "Android、iOS 平台应用图标配置，云端打包后生效\n\n详见 <https://doc.dcloud.net.cn/uni-app-x/collocation/manifest.html#distribute-icons>"
+        },
+        "ios": {
+          "$ref": "#/definitions/AppDistributeIos",
+          "description": "iOS 平台发布配置\n\n详见 <https://doc.dcloud.net.cn/uni-app-x/collocation/manifest.html#distribute-ios>"
+        },
+        "modules": {
+          "$ref": "#/definitions/AppModules",
+          "description": "app 内置模块配置\n\n详见 <https://doc.dcloud.net.cn/uni-app-x/collocation/manifest.html#distribute-modules>"
+        },
+        "splashScreens": {
+          "$ref": "#/definitions/AppSplashScreens",
+          "description": "Android、iOS 平台应用启动界面配置，云端打包后生效\n\n详见 <https://doc.dcloud.net.cn/uni-app-x/collocation/manifest.html#distribute-splashscreens>"
+        },
+        "syncDebug": {
+          "default": false,
+          "description": "是否为自定义调试基座",
+          "type": "boolean"
+        }
+      },
+      "type": "object"
+    },
+    "AppDistributeAndroid": {
+      "description": "uni-app-x App-Android 平台发布配置\n\n详见 <https://doc.dcloud.net.cn/uni-app-x/collocation/manifest.html#distribute-android>",
+      "properties": {
+        "aaptOptions": {
+          "description": "aaptOptions 配置项\n\n详见 <https://doc.dcloud.net.cn/uni-app-x/collocation/manifest-android.html#aaptoptions>",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "abiFilters": {
+          "default": ["arm64-v8a"],
+          "description": "应用支持的 CPU 类型\n\n详见 <https://doc.dcloud.net.cn/uni-app-x/collocation/manifest-android.html#abifilters>",
+          "items": {
+            "enum": ["armeabi-v7a", "arm64-v8a", "x86", "x86_64"],
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "buildFeatures": {
+          "description": "buildFeatures 配置项\n\n详见 <https://doc.dcloud.net.cn/uni-app-x/collocation/manifest-android.html#buildfeatures>",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "disableLegacyPackaging": {
+          "default": false,
+          "description": "是否不压缩原生库（.so 文件），设置为 true 时 .so 文件以未压缩方式打包",
+          "type": "boolean"
+        },
+        "enableResourceOptimizations": {
+          "description": "是否开启 Android 原生 res 资源文件优化，开启后 res 资源文件名称会被混淆\n\n详见 <https://doc.dcloud.net.cn/uni-app-x/collocation/manifest-android.html#enableresourceoptimizations>",
+          "type": "boolean"
+        },
+        "excludePermissions": {
+          "description": "强制移除的权限\n\n详见 <https://doc.dcloud.net.cn/uni-app-x/collocation/manifest-android.html#excludepermissions>",
+          "items": {
+            "$ref": "#/definitions/AndroidPermissionOrFeature"
+          },
+          "type": "array"
+        },
+        "minSdkVersion": {
+          "default": 21,
+          "description": "应用兼容的最低 Android 版本（API 等级）\n\n详见 <https://doc.dcloud.net.cn/uni-app-x/collocation/manifest-android.html#minsdkversion>",
+          "type": "number"
+        },
+        "packagingOptions": {
+          "description": "packagingOptions 配置项\n\n详见 <https://doc.dcloud.net.cn/uni-app-x/collocation/manifest-android.html#packagingoptions>",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "permissions": {
+          "description": "额外添加的权限\n\n详见 <https://doc.dcloud.net.cn/uni-app-x/collocation/manifest-android.html#incloudpermissions>",
+          "items": {
+            "$ref": "#/definitions/AndroidPermissionOrFeature"
+          },
+          "type": "array"
+        },
+        "targetSdkVersion": {
+          "default": 32,
+          "description": "应用适配的目标 Android 版本（API 等级），部分应用市场要求设置较高的 targetSdkVersion 才能提交审核\n\n详见 <https://doc.dcloud.net.cn/uni-app-x/collocation/manifest-android.html#targetsdkversion>",
+          "type": "number"
+        }
+      },
+      "type": "object"
+    },
+    "AppDistributeIos": {
+      "description": "uni-app-x iOS 平台发布配置\n\n详见 <https://doc.dcloud.net.cn/uni-app-x/collocation/manifest.html#distribute-ios>",
+      "properties": {
+        "CFBundleName": {
+          "default": "UniAppX",
+          "description": "应用内部名称（可作为开发者标识），最多可使用 15 个字符\n\n详见 <https://doc.dcloud.net.cn/uni-app-x/collocation/manifest-ios.html#cfbundlename>",
+          "type": "string"
+        },
+        "UIRequiresFullScreen": {
+          "default": false,
+          "description": "在 iPad 设备是否全屏显示，设置为 false 表示应用能够与其他应用共享屏幕显示（分屏显示）\n\n详见 <https://doc.dcloud.net.cn/uni-app-x/collocation/manifest-ios.html#uirequiresfullscreen>",
+          "type": "boolean"
+        },
+        "devices": {
+          "default": "auto",
+          "description": "iOS 支持的设备",
+          "enum": ["auto", "iphone", "ipad", "universal"],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "AppHarmony": {
+      "additionalProperties": {
+        "description": "其他扩展配置\n\n支持其他 HarmonyOS 平台特有的配置项"
+      },
+      "description": "uni-app-x App HarmonyOS 应用配置\n\n详见 <https://doc.dcloud.net.cn/uni-app-x/collocation/manifest.html#manifest-app-harmony>",
+      "properties": {
+        "darkmode": {
+          "default": false,
+          "description": "是否开启暗黑模式\n\n详见 <https://uniapp.dcloud.net.cn/tutorial/darkmode#app-harmony>",
+          "type": "boolean"
+        },
+        "distribute": {
+          "$ref": "#/definitions/AppHarmonyDistribute",
+          "description": "HarmonyOS 分发配置\n\n详见 <https://uniapp.dcloud.net.cn/collocation/manifest.html#app-harmony-distribute> 和 <https://doc.dcloud.net.cn/uni-app-x/collocation/manifest.html#app-harmony-distribute>"
+        },
+        "safearea": {
+          "$ref": "#/definitions/AppHarmonySafearea",
+          "description": "底部安全区域配置\n\n详见 <https://uniapp.dcloud.net.cn/tutorial/darkmode.html#app-harmony-safearea-bottom>"
+        },
+        "themeLocation": {
+          "default": "theme.json",
+          "description": "主题配置文件路径\n\n详见 <https://uniapp.dcloud.net.cn/tutorial/darkmode.html#app-harmony>",
+          "type": "string"
+        },
+        "useragent": {
+          "$ref": "#/definitions/AppHarmonyUserAgent",
+          "description": "UserAgent 配置，配置应用的 UserAgent 相关设置\n\n详见 <https://uniapp.dcloud.net.cn/collocation/manifest.html#app-harmony-useragent>"
+        }
+      },
+      "type": "object"
+    },
+    "AppHarmonyDistribute": {
+      "additionalProperties": {
+        "description": "其他分发相关配置"
+      },
+      "description": "HarmonyOS 分发配置\n\n详见 <https://uniapp.dcloud.net.cn/collocation/manifest.html#app-harmony-distribute> 和 <https://doc.dcloud.net.cn/uni-app-x/collocation/manifest.html#app-harmony-distribute>",
+      "properties": {
+        "bundleName": {
+          "description": "应用包名\n\nHarmonyOS 应用的唯一标识符，格式为反向域名",
+          "type": "string"
+        },
+        "icons": {
+          "$ref": "#/definitions/AppHarmonyIcons",
+          "description": "应用图标配置\n\n配置应用的前景图和背景图，详见 <https://uniapp.dcloud.net.cn/collocation/manifest.html#app-harmony-icons>"
+        },
+        "modules": {
+          "$ref": "#/definitions/AppHarmonyModules",
+          "description": "模块配置\n\n配置各种功能模块的相关参数，详见 <https://uniapp.dcloud.net.cn/collocation/manifest.html#app-harmony-modules>"
+        },
+        "signingConfigs": {
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/AppHarmonyDistributeSigningConfig"
+              },
+              {
+                "not": {}
+              }
+            ],
+            "description": "其他自定义签名配置"
+          },
+          "description": "证书签名配置\n\n配置鸿蒙打包时使用的数字签名证书信息，可分别配置调试证书和发布证书\n\n详见 <https://uniapp.dcloud.net.cn/collocation/manifest.html#app-harmony-signingconfigs>",
+          "properties": {
+            "default": {
+              "$ref": "#/definitions/AppHarmonyDistributeSigningConfig",
+              "description": "调试证书配置"
+            },
+            "release": {
+              "$ref": "#/definitions/AppHarmonyDistributeSigningConfig",
+              "description": "发布证书配置"
+            }
+          },
+          "type": "object"
+        },
+        "splashScreens": {
+          "$ref": "#/definitions/AppHarmonySplashScreens",
+          "description": "启动界面配置\n\n配置启动界面的背景色和中部图标，详见 <https://uniapp.dcloud.net.cn/collocation/manifest.html#app-harmony-splashscreens>"
+        }
+      },
+      "type": "object"
+    },
+    "AppHarmonyDistributeSigningConfig": {
+      "additionalProperties": false,
+      "description": "HarmonyOS 签名配置\n\n详见 <https://uniapp.dcloud.net.cn/collocation/manifest.html#app-harmony-signingconfigs>",
+      "properties": {
+        "certpath": {
+          "description": "证书文件",
+          "type": "string"
+        },
+        "keyAlias": {
+          "description": "私钥库里面的私钥别名",
+          "type": "string"
+        },
+        "keyPassword": {
+          "description": "私钥访问密码",
+          "type": "string"
+        },
+        "profile": {
+          "description": "签名描述文件",
+          "type": "string"
+        },
+        "signAlg": {
+          "description": "签名算法，固定为 \"SHA256withECDSA\"",
+          "type": "string"
+        },
+        "storeFile": {
+          "description": "私钥库文件",
+          "type": "string"
+        },
+        "storePassword": {
+          "description": "私钥库访问密码",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "AppHarmonyIcons": {
+      "description": "HarmonyOS 应用图标配置\n\n详见 <https://uniapp.dcloud.net.cn/collocation/manifest.html#app-harmony-icons>",
+      "properties": {
+        "background": {
+          "description": "背景图，以相对路径指向一个图片文件",
+          "type": "string"
+        },
+        "foreground": {
+          "description": "前景图，以相对路径指向一个图片文件",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "AppHarmonyModules": {
+      "description": "HarmonyOS 模块配置\n\n详见 <https://uniapp.dcloud.net.cn/collocation/manifest.html#app-harmony-modules> 和 <https://doc.dcloud.net.cn/uni-app-x/collocation/manifest.html#distribute-modules-3>",
+      "properties": {
+        "uni-facialVerify": {
+          "description": "uni 实人认证模块（uni-app x）",
+          "type": "object"
+        },
+        "uni-location": {
+          "description": "定位模块相关参数",
+          "type": "object"
+        },
+        "uni-location-system": {
+          "description": "系统定位模块（uni-app x）",
+          "type": "object"
+        },
+        "uni-map": {
+          "description": "地图模块相关参数",
+          "type": "object"
+        },
+        "uni-map-tencent": {
+          "description": "腾讯地图模块（uni-app x）",
+          "type": "object"
+        },
+        "uni-oauth": {
+          "description": "登录鉴权模块相关参数",
+          "properties": {
+            "huawei": {
+              "description": "华为 OAuth 模块",
+              "type": "object"
+            },
+            "weixin": {
+              "description": "微信 OAuth 模块",
+              "properties": {
+                "appid": {
+                  "description": "微信开放平台申请的应用 ID（AppID）",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        },
+        "uni-payment": {
+          "description": "支付模块相关参数",
+          "type": "object"
+        },
+        "uni-payment-alipay": {
+          "description": "支付宝支付模块（uni-app x）",
+          "type": "object"
+        },
+        "uni-payment-wxpay": {
+          "description": "微信支付模块（uni-app x）",
+          "type": "object"
+        },
+        "uni-push": {
+          "description": "统一推送模块（uni-app x）",
+          "type": "object"
+        },
+        "uni-share": {
+          "description": "分享模块相关参数",
+          "properties": {
+            "weixin": {
+              "description": "微信分享模块",
+              "properties": {
+                "appid": {
+                  "description": "微信开放平台申请的应用 ID（AppID）",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        },
+        "uni-verify": {
+          "description": "一键登录模块（uni-app x）",
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "AppHarmonySafearea": {
+      "additionalProperties": false,
+      "description": "HarmonyOS 底部安全区域配置\n\n详见 <https://uniapp.dcloud.net.cn/tutorial/darkmode.html#app-harmony-safearea-bottom>",
+      "properties": {
+        "background": {
+          "$ref": "#/definitions/HEXColor",
+          "description": "底部安全区域背景色",
+          "format": "color"
+        },
+        "backgroundDark": {
+          "$ref": "#/definitions/HEXColor",
+          "description": "暗黑模式下底部安全区域背景色",
+          "format": "color"
+        },
+        "bottom": {
+          "additionalProperties": false,
+          "properties": {
+            "offset": {
+              "const": "none",
+              "description": "底部区域占位方式，目前仅支持 none（无 tabBar 时不占位）",
+              "type": "string"
+            }
+          },
+          "required": ["offset"],
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "AppHarmonySplashScreens": {
+      "description": "HarmonyOS 启动界面配置\n\n详见 <https://uniapp.dcloud.net.cn/collocation/manifest.html#app-harmony-splashscreens>",
+      "properties": {
+        "startWindowBackground": {
+          "$ref": "#/definitions/HEXColor",
+          "description": "启动界面背景色",
+          "format": "color"
+        },
+        "startWindowIcon": {
+          "description": "启动界面中部图标，以相对路径指向一个图片文件",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "AppHarmonyUserAgent": {
+      "additionalProperties": false,
+      "description": "HarmonyOS UserAgent 配置，配置应用的 UserAgent 相关设置\n\n详见 <https://uniapp.dcloud.net.cn/collocation/manifest.html#app-harmony-useragent>",
+      "properties": {
+        "concatenate": {
+          "default": false,
+          "description": "是否将 value 值作为追加值连接到系统默认 userAgent 值之后",
+          "type": "boolean"
+        },
+        "value": {
+          "description": "UserAgent 值\n\n应用 UserAgent 相关配置，默认值为系统 UserAgent",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "AppIcons": {
+      "description": "uni-app-x App 端图标配置\n\n详见 <https://doc.dcloud.net.cn/uni-app-x/collocation/manifest.html#distribute-icons>",
+      "properties": {
+        "android": {
+          "$ref": "#/definitions/AppIconsAndroid",
+          "description": "Android 图标配置"
+        },
+        "ios": {
+          "$ref": "#/definitions/AppIconsIos",
+          "description": "iOS 图标配置"
+        }
+      },
+      "type": "object"
+    },
+    "AppIconsAndroid": {
+      "description": "uni-app-x Android 图标配置\n\n详见 <https://doc.dcloud.net.cn/uni-app-x/collocation/manifest.html#icons-android>",
+      "properties": {
+        "hdpi": {
+          "description": "高分屏设备应用图标，分辨率要求 72x72，PNG 格式",
+          "type": "string"
+        },
+        "xhdpi": {
+          "description": "720P 高分屏设备应用图标，分辨率要求 96x96，PNG 格式",
+          "type": "string"
+        },
+        "xxhdpi": {
+          "description": "1080P 高分屏设备应用图标，分辨率要求 144x144，PNG 格式",
+          "type": "string"
+        },
+        "xxxhdpi": {
+          "description": "2K 屏设备应用图标，分辨率要求 192x192，PNG 格式",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "AppIconsIos": {
+      "description": "uni-app-x iOS 图标配置\n\n详见 <https://doc.dcloud.net.cn/uni-app-x/collocation/manifest.html#icons-ios>",
+      "properties": {
+        "appstore": {
+          "description": "iPhone/iPad 设备应用图标，分辨率要求 1024x1024，PNG 格式，不能存在透明区域",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "AppIos": {
+      "description": "uni-app-x iOS App 平台配置\n\n详见 <https://doc.dcloud.net.cn/uni-app-x/collocation/manifest.html#manifest-app-ios>",
+      "properties": {
+        "defaultAppTheme": {
+          "default": "light",
+          "description": "应用默认主题，可取值 light/dark/auto",
+          "enum": ["auto", "light", "dark"],
+          "type": "string"
+        },
+        "distribute": {
+          "$ref": "#/definitions/AppIosDistribute",
+          "description": "iOS 平台发布配置\n\n详见 <https://doc.dcloud.net.cn/uni-app-x/collocation/manifest.html#app-ios-distribute>"
+        },
+        "initPrivacyAuthorization": {
+          "default": "auto",
+          "description": "隐私协议初始状态，可取值 auto/agree/disagree",
+          "enum": ["auto", "agree", "disagree"],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "AppIosDistribute": {
+      "description": "uni-app-x iOS 平台发布配置\n\n详见 <https://doc.dcloud.net.cn/uni-app-x/collocation/manifest.html#app-ios-distribute>",
+      "properties": {
+        "CFBundleName": {
+          "default": "UniAppX",
+          "description": "应用内部名称（可作为开发者标识），最多可使用 15 个字符\n\n详见 <https://doc.dcloud.net.cn/uni-app-x/collocation/manifest-ios.html#cfbundlename>",
+          "type": "string"
+        },
+        "UIRequiresFullScreen": {
+          "default": false,
+          "description": "在 iPad 设备是否全屏显示，设置为 false 表示应用能够与其他应用共享屏幕显示（分屏显示）\n\n详见 <https://doc.dcloud.net.cn/uni-app-x/collocation/manifest-ios.html#uirequiresfullscreen>",
+          "type": "boolean"
+        },
+        "devices": {
+          "default": "auto",
+          "description": "iOS 支持的设备",
+          "enum": ["auto", "iphone", "ipad", "universal"],
+          "type": "string"
+        },
+        "icons": {
+          "$ref": "#/definitions/AppIconsIos",
+          "description": "iOS 平台应用图标配置，云端打包后生效"
+        },
+        "modules": {
+          "$ref": "#/definitions/AppModules",
+          "description": "app 内置模块配置"
+        },
+        "splashScreens": {
+          "$ref": "#/definitions/AppSplashScreensIos",
+          "description": "iOS 平台应用启动界面配置，云端打包后生效"
+        },
+        "syncDebug": {
+          "default": false,
+          "description": "是否为自定义调试基座",
+          "type": "boolean"
+        }
+      },
+      "type": "object"
+    },
+    "AppModules": {
+      "description": "uni-app-x app 内置模块配置\n\n详见 <https://doc.dcloud.net.cn/uni-app-x/collocation/manifest.html#distribute-modules>",
+      "properties": {
+        "uni-ad": {
+          "$ref": "#/definitions/AppModulesUniAd",
+          "description": "uni-ad 广告联盟模块\n\n详见 <https://uniad.dcloud.net.cn/>"
+        },
+        "uni-canvas": {
+          "description": "canvas 画布组件模块（HBuilderX 4.25+）\n\n详见 <https://doc.dcloud.net.cn/uni-app-x/component/canvas.html>",
+          "type": "object"
+        },
+        "uni-cloud-client": {
+          "description": "uniCloud 云函数/云对象模块（HBuilderX 4.25+）\n\n详见 <https://doc.dcloud.net.cn/uniCloud/cf-functions.html>",
+          "type": "object"
+        },
+        "uni-createRequestPermissionListener": {
+          "description": "监听权限申请模块（HBuilderX 4.0+）\n\n详见 <https://doc.dcloud.net.cn/uni-app-x/api/create-request-permission-listener.html>",
+          "type": "object"
+        },
+        "uni-createWebviewContext": {
+          "description": "创建 web-view 组件的上下文对象模块\n\n详见 <https://doc.dcloud.net.cn/uni-app-x/api/create-webview-context.html>",
+          "type": "object"
+        },
+        "uni-facialRecognitionVerify": {
+          "description": "uni 实人认证模块\n\n详见 <https://doc.dcloud.net.cn/uni-app-x/api/facial-recognition-meta-info.html>",
+          "type": "object"
+        },
+        "uni-fileSystemManager": {
+          "description": "文件管理模块\n\n详见 <https://doc.dcloud.net.cn/uni-app-x/api/get-file-system-manager.html>",
+          "type": "object"
+        },
+        "uni-getNetworkType": {
+          "description": "获取网络类型模块\n\n详见 <https://doc.dcloud.net.cn/uni-app-x/api/get-network-type.html>",
+          "type": "object"
+        },
+        "uni-getProvider": {
+          "description": "获取服务供应商模块\n\n详见 <https://doc.dcloud.net.cn/uni-app-x/api/get-provider.html#getprovider>",
+          "type": "object"
+        },
+        "uni-installApk": {
+          "description": "安装 apk 模块\n\n详见 <https://doc.dcloud.net.cn/uni-app-x/api/install-apk.html>",
+          "type": "object"
+        },
+        "uni-location": {
+          "$ref": "#/definitions/AppModulesUniLocation",
+          "description": "系统定位模块，HBuilderX 4.61 以下版本名为 uni-getLocation\n\n详见 <https://doc.dcloud.net.cn/uni-app-x/api/get-location.html>"
+        },
+        "uni-map": {
+          "$ref": "#/definitions/AppModulesUniMap",
+          "description": "地图模块"
+        },
+        "uni-media": {
+          "description": "多媒体模块\n\n详见 <https://doc.dcloud.net.cn/uni-app-x/api/choose-image.html>",
+          "type": "object"
+        },
+        "uni-network": {
+          "description": "网络请求（文件上传/下载）模块\n\n详见 <https://doc.dcloud.net.cn/uni-app-x/api/network-summarize.html>",
+          "type": "object"
+        },
+        "uni-payment": {
+          "$ref": "#/definitions/AppModulesUniPayment",
+          "description": "请求支付模块\n\n详见 <https://doc.dcloud.net.cn/uni-app-x/api/request-payment.html>"
+        },
+        "uni-push": {
+          "description": "统一推送模块\n\n详见 <https://doc.dcloud.net.cn/uni-app-x/api/uni-push.html>",
+          "type": "object"
+        },
+        "uni-verify": {
+          "description": "一键登录模块\n\n详见 <https://doc.dcloud.net.cn/uni-app-x/api/get-univerify-manager.html>",
+          "type": "object"
+        },
+        "uni-video": {
+          "description": "video 视频组件模块\n\n详见 <https://doc.dcloud.net.cn/uni-app-x/component/video.html>",
+          "type": "object"
+        },
+        "uni-virtualPayment": {
+          "description": "虚拟支付模块\n\n详见 <https://doc.dcloud.net.cn/uni-app-x/api/virtual-payment.html>",
+          "type": "object"
+        },
+        "uni-websocket": {
+          "description": "WebSocket 模块\n\n详见 <https://doc.dcloud.net.cn/uni-app-x/api/websocket.html>",
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "AppModulesUniAd": {
+      "description": "uni-app-x uni-ad 广告联盟配置",
+      "properties": {
+        "bd": {
+          "description": "百度百青藤广告联盟",
+          "type": "object"
+        },
+        "gdt": {
+          "description": "腾讯优量汇广告联盟",
+          "type": "object"
+        },
+        "gm": {
+          "description": "穿山甲 GroMore",
+          "type": "object"
+        },
+        "ks": {
+          "description": "快手广告联盟",
+          "type": "object"
+        },
+        "sgm": {
+          "description": "Sigmob 广告联盟",
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "AppModulesUniLocation": {
+      "description": "uni-app-x uni-location（定位）模块 Provider 配置",
+      "properties": {
+        "system": {
+          "description": "系统定位",
+          "type": "object"
+        },
+        "tencent": {
+          "description": "腾讯定位",
+          "properties": {
+            "key": {
+              "description": "腾讯位置服务后台申请的 Key",
+              "type": "string"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "AppModulesUniMap": {
+      "description": "uni-app-x uni-map（地图）模块 Provider 配置",
+      "properties": {
+        "tencent": {
+          "description": "腾讯地图",
+          "properties": {
+            "key": {
+              "description": "腾讯位置服务后台申请的 Key",
+              "type": "string"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "AppModulesUniPayment": {
+      "description": "uni-app-x uni-payment（支付）模块 Provider 配置",
+      "properties": {
+        "alipay": {
+          "description": "支付宝支付",
+          "type": "object"
+        },
+        "wxpay": {
+          "$ref": "#/definitions/AppModulesUniPaymentWxpay",
+          "description": "微信支付"
+        }
+      },
+      "type": "object"
+    },
+    "AppModulesUniPaymentWxpay": {
+      "description": "uni-app-x uni-payment wxpay 配置",
+      "properties": {
+        "android": {
+          "description": "Android 平台微信支付配置信息",
+          "type": "object"
+        },
+        "ios": {
+          "description": "iOS 平台微信支付配置信息",
+          "properties": {
+            "appid": {
+              "description": "微信开放平台申请的应用 ID（AppID）",
+              "type": "string"
+            },
+            "universalLink": {
+              "description": "通用链接（Universal Link），配置方式参考 <https://uniapp.dcloud.net.cn/tutorial/app-ios-capabilities.html#%E9%80%9A%E7%94%A8%E9%93%BE%E6%8E%A5-universal-link>",
+              "type": "string"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "AppPlus": {
+      "properties": {
+        "allowFileAccessFromFileURLs": {
+          "description": "是否允许本地文件跨域访问其他本地文件，仅 iOS 生效",
+          "type": "boolean"
+        },
+        "allowsInlineMediaPlayback": {
+          "default": true,
+          "description": "是否允许 H5 中视频非全屏播放，仅 iOS 生效",
+          "type": "boolean"
+        },
+        "cache": {
+          "deprecated": true,
+          "description": "webview 窗口默认使用的缓存模式，uni-app 项目已废弃",
+          "properties": {
+            "mode": {
+              "default": "default",
+              "enum": ["default", "cacheElseNetwork", "noCache", "cacheOnly"],
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "cers": {
+          "description": "应用的异常崩溃与错误报告系统配置",
+          "properties": {
+            "crash": {
+              "description": "是否提交应用异常崩溃信息",
+              "type": "boolean"
+            }
+          },
+          "type": "object"
+        },
+        "channel": {
+          "description": "渠道标识",
+          "type": "string"
+        },
+        "checkPermissionDenied": {
+          "default": false,
+          "description": "是否校验已拒绝权限，如果拒绝则不会再申请\n\ntrue 校验已拒绝权限\n\nfalse 不校验已拒绝权限",
+          "type": "boolean"
+        },
+        "compatible": {
+          "description": "编译器兼容性配置，详见 <https://ask.dcloud.net.cn/article/35627>",
+          "properties": {
+            "compilerVersion": {
+              "description": "编译环境版本号，通常配置为当前 HBuilderX 的版本号或 cli 编译器版本，不可以配置多个",
+              "type": "string"
+            },
+            "ignoreVersion": {
+              "default": false,
+              "description": "是否忽略运行环境与编译环境不一致的问题",
+              "type": "boolean"
+            },
+            "runtimeVersion": {
+              "description": "应用兼容的 uni-app 运行环境版本号，可以配置多个版本号，使用英文字符 `,` 分隔",
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "compilerVersion": {
+          "default": 2,
+          "description": "编译器版本，详见 <https://ask.dcloud.net.cn/article/36599>",
+          "enum": [2, 3],
+          "type": "number"
+        },
+        "confusion": {
+          "description": "原生混淆加密配置，详见 <https://uniapp.dcloud.net.cn/tutorial/app-sec-confusion.html>",
+          "properties": {
+            "description": {
+              "description": "原生混淆描述",
+              "type": "string"
+            },
+            "resources": {
+              "additionalProperties": {
+                "type": "object"
+              },
+              "description": "原生混淆文件配置",
+              "type": "object"
+            }
+          },
+          "type": "object"
+        },
+        "darkmode": {
+          "description": "是否开启暗黑模式，详见 <https://uniapp.dcloud.net.cn/tutorial/darkmode.html#app-plus>",
+          "type": "boolean"
+        },
+        "distribute": {
+          "description": "APP 云端打包配置",
+          "properties": {
+            "android": {
+              "description": "Android 平台云端打包配置",
+              "properties": {
+                "abiFilters": {
+                  "description": "Android 平台 APP 支持的 CPU 类型，详见 <https://uniapp.dcloud.net.cn/tutorial/app-android-abifilters>",
+                  "items": {
+                    "enum": ["armeabi-v7a", "arm64-v8a", "x86", "x86_64"],
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "aliasname": {
+                  "description": "Android 签名证书别名",
+                  "type": "string"
+                },
+                "buildFeatures": {
+                  "description": "Android 平台云端打包时 build.gradle 的 buildFeatures 配置项，详见 <https://uniapp.dcloud.net.cn/collocation/manifest-app.html#buildfeatures>",
+                  "properties": {
+                    "dataBinding": {
+                      "default": false,
+                      "description": "是否设置 dataBinding",
+                      "type": "boolean"
+                    },
+                    "viewBinding": {
+                      "default": false,
+                      "description": "是否设置 viewBinding",
+                      "type": "boolean"
+                    }
+                  },
+                  "type": "object"
+                },
+                "custompermissions": {
+                  "description": "是否自定义 Android 权限配置",
+                  "type": "boolean"
+                },
+                "debuggable": {
+                  "default": false,
+                  "description": "是否开启 Android 调试开关",
+                  "type": "boolean"
+                },
+                "enableOAID": {
+                  "default": true,
+                  "description": "是否支持获取 OAID（匿名设备标识符），详见 <https://uniapp.dcloud.net.cn/collocation/manifest-app.html#enableoaid>",
+                  "type": "boolean"
+                },
+                "excludePermissions": {
+                  "description": "Android 平台 APP 不使用的权限，详见 <https://uniapp.dcloud.net.cn/tutorial/app-permission-android.html> 和 <https://uniapp.dcloud.net.cn/tutorial/app-nativeresource-android.html>",
+                  "items": {
+                    "$ref": "#/definitions/AndroidPermissionOrFeature"
+                  },
+                  "type": "array"
+                },
+                "forceDarkAllowed": {
+                  "default": false,
+                  "description": "是否强制允许暗黑模式",
+                  "type": "boolean"
+                },
+                "hasTaskAffinity": {
+                  "default": false,
+                  "description": "是否设置 android: taskAffinity，详见 <https://uniapp.dcloud.net.cn/tutorial/app-sec-android.html#strandhogg%E6%BC%8F%E6%B4%9E>",
+                  "type": "boolean"
+                },
+                "jsEngine": {
+                  "deprecated": true,
+                  "description": "uni-app 使用的 JS 引擎",
+                  "enum": ["v8", "jsc"],
+                  "type": "string"
+                },
+                "keystore": {
+                  "description": "Android 签名证书文件路径",
+                  "type": "string"
+                },
+                "locale": {
+                  "description": "应用的默认语言",
+                  "type": "string"
+                },
+                "minSdkVersion": {
+                  "description": "Android 平台最低支持版本，详见 <https://uniapp.dcloud.net.cn/tutorial/app-android-minsdkversion>",
+                  "type": "number"
+                },
+                "packagename": {
+                  "description": "Android 平台云端打包包名",
+                  "type": "string"
+                },
+                "packagingOptions": {
+                  "description": "Android 平台云端打包时 build.gradle 的 packagingOptions 配置项",
+                  "examples": [["doNotStrip '/armeabi-v7a/.so'"]],
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "password": {
+                  "description": "Android 签名证书文件密码",
+                  "type": "string"
+                },
+                "permissionExternalStorage": {
+                  "$ref": "#/definitions/AppPlusPermissionPrompt",
+                  "description": "Android 平台 APP 启动时申请读写手机存储权限策略配置，详见 <https://ask.dcloud.net.cn/article/36549>"
+                },
+                "permissionPhoneState": {
+                  "$ref": "#/definitions/AppPlusPermissionPrompt",
+                  "description": "Android 平台 APP 启动时申请读取设备信息权限配置，详见 <https://ask.dcloud.net.cn/article/36549>"
+                },
+                "permissions": {
+                  "description": "Android 平台 APP 使用的权限，详见 <https://uniapp.dcloud.net.cn/tutorial/app-permission-android.html> 和 <https://uniapp.dcloud.net.cn/tutorial/app-nativeresource-android.html>",
+                  "items": {
+                    "$ref": "#/definitions/AndroidPermissionOrFeature"
+                  },
+                  "type": "array"
+                },
+                "pushRegisterMode": {
+                  "const": "manual",
+                  "description": "延迟初始化 uni-push 的配置，当配置此项值为 manual 后 uni-push 不会初始化，直到首次调用 getPushClientId、getClientInfo、getClientInfoAsync 时才会初始化\n\n调用获取 cid 的方法后，下次 APP 启动不再延迟初始化 uni-push",
+                  "type": "string"
+                },
+                "resizeableActivity": {
+                  "default": false,
+                  "description": "是否支持分屏调整窗口大小",
+                  "type": "boolean"
+                },
+                "schemes": {
+                  "description": "Android 平台 APP 注册的 scheme，多个 scheme 使用 `,` 分隔，详见 <https://uniapp.dcloud.net.cn/tutorial/app-android-schemes>",
+                  "type": "string"
+                },
+                "targetSdkVersion": {
+                  "description": "Android 平台目标版本，详见 <https://uniapp.dcloud.net.cn/tutorial/app-android-targetsdkversion>",
+                  "type": "number"
+                }
+              },
+              "type": "object"
+            },
+            "icons": {
+              "additionalProperties": false,
+              "description": "APP 图标配置，详见 <https://uniapp.dcloud.net.cn/tutorial/app-icons.html>\n\n注意事项：\n\n- 必须使用 PNG 格式，其它格式需要使用图片工具转换，不要直接将 PNG 等其它格式直接改为 PNG\n- Android 系统没有对图标分辨率进行限制，按照建议的分辨率配置即可\n- Android 图片支持透明区域，建议使用圆角图标\n- iOS 图标必须是直角，不要使用圆角图标，否则不过审\n- iOS 打包提交 App Store 时，必须配置分辨率 1024x1024 AppStore 图标，云端打包机默认使用纯白色图标\n- iOS 所有图标不要包含透明信息（alpha 通道），否则提交 AppStore 会报错",
+              "properties": {
+                "android": {
+                  "description": "Android 平台图标配置，详见 <https://uniapp.dcloud.net.cn/tutorial/app-icons.html#android%E5%B9%B3%E5%8F%B0>\n\n注意事项：\n\n- 必须使用 PNG 格式，其它格式需要使用图片工具转换，不要直接将 PNG 等其它格式直接改为 PNG\n- 系统没有对图标分辨率进行限制，按照建议的分辨率配置即可\n- 图片支持透明区域，建议使用圆角图标",
+                  "properties": {
+                    "hdpi": {
+                      "$ref": "#/definitions/PNG",
+                      "description": "高分屏设备程序图标，分辨率 72x72"
+                    },
+                    "ldpi": {
+                      "$ref": "#/definitions/PNG",
+                      "deprecated": true,
+                      "description": "普通屏设备程序图标，分辨率 48x48"
+                    },
+                    "mdpi": {
+                      "$ref": "#/definitions/PNG",
+                      "deprecated": true,
+                      "description": "大屏设备程序图标，分辨率 48x48"
+                    },
+                    "xhdpi": {
+                      "$ref": "#/definitions/PNG",
+                      "description": "720P 高分屏设备程序图标，分辨率 96x96"
+                    },
+                    "xxhdpi": {
+                      "$ref": "#/definitions/PNG",
+                      "description": "1080P 高分屏设备程序图标，分辨率 144x144"
+                    },
+                    "xxxhdpi": {
+                      "$ref": "#/definitions/PNG",
+                      "description": "2K 屏设备程序图标，分辨率 192x192"
+                    }
+                  },
+                  "type": "object"
+                },
+                "ios": {
+                  "description": "iOS 平台图标配置，详见 <https://uniapp.dcloud.net.cn/tutorial/app-icons.html#ios%E5%B9%B3%E5%8F%B0>\n\n注意事项：\n\n- 必须使用 PNG 格式，其它格式需要使用图片工具转换，不要直接将 PNG 等其它格式直接改为 PNG\n- 图标必须是直角，不要使用圆角图标，否则不过审\n- 打包提交 App Store 时，必须配置分辨率 1024x1024 AppStore 图标，云端打包机默认使用纯白色图标\n- 所有图标不要包含透明信息（alpha 通道），否则提交 AppStore 会报错",
+                  "properties": {
+                    "appstore": {
+                      "$ref": "#/definitions/PNG",
+                      "description": "App Store 图标路径，分辨率 1024x1024"
+                    },
+                    "ipad": {
+                      "description": "iPad 设备程序图标",
+                      "properties": {
+                        "app": {
+                          "$ref": "#/definitions/PNG",
+                          "description": "iOS7+ 设备程序主图标，分辨率 76x76"
+                        },
+                        "app@2x": {
+                          "$ref": "#/definitions/PNG",
+                          "description": "iOS7+ 设备程序主图标，分辨率 152x152"
+                        },
+                        "notification": {
+                          "$ref": "#/definitions/PNG",
+                          "description": "iOS7+ 设备通知栏图标，分辨率 20x20"
+                        },
+                        "notification@2x": {
+                          "$ref": "#/definitions/PNG",
+                          "description": "iOS7+ 高分屏设备通知栏图标，分辨率 40x40"
+                        },
+                        "proapp@2x": {
+                          "$ref": "#/definitions/PNG",
+                          "description": "iOS9+ iPad Pro（12.9英寸）设备程序主图标，分辨率 167x167"
+                        },
+                        "settings": {
+                          "$ref": "#/definitions/PNG",
+                          "description": "iOS5+ 设备 Settings 设置图标，分辨率 29x29"
+                        },
+                        "settings@2x": {
+                          "$ref": "#/definitions/PNG",
+                          "description": "iOS5+ 高分屏设备 Settings 设置图标，分辨率 58x58"
+                        },
+                        "spotlight": {
+                          "$ref": "#/definitions/PNG",
+                          "description": "iOS7+ 设备 Spotlight 搜索图标，分辨率 40x40"
+                        },
+                        "spotlight@2x": {
+                          "$ref": "#/definitions/PNG",
+                          "description": "iOS7+ 高分屏设备 Spotlight 搜索图标，分辨率 80x80"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "iphone": {
+                      "description": "iPhone 设备程序图标",
+                      "properties": {
+                        "app@2x": {
+                          "$ref": "#/definitions/PNG",
+                          "description": "iOS7+ 设备程序主图标，分辨率 120x120"
+                        },
+                        "app@3x": {
+                          "$ref": "#/definitions/PNG",
+                          "description": "iOS7+ 设备程序主图标，分辨率 180x180"
+                        },
+                        "notification@2x": {
+                          "$ref": "#/definitions/PNG",
+                          "description": "iOS7+ 设备通知栏图标，分辨率 40x40"
+                        },
+                        "notification@3x": {
+                          "$ref": "#/definitions/PNG",
+                          "description": "iOS7+ 设备通知栏图标，分辨率 60x60"
+                        },
+                        "settings@2x": {
+                          "$ref": "#/definitions/PNG",
+                          "description": "iOS7+ 设备 Settings 设置图标，分辨率 58x58"
+                        },
+                        "settings@3x": {
+                          "$ref": "#/definitions/PNG",
+                          "description": "iOS7+ 设备 Settings 设置图标，分辨率 87x87"
+                        },
+                        "spotlight@2x": {
+                          "$ref": "#/definitions/PNG",
+                          "description": "iOS7+ 设备 Spotlight 搜索图标，分辨率 80x80"
+                        },
+                        "spotlight@3x": {
+                          "$ref": "#/definitions/PNG",
+                          "description": "iOS7+ 设备 Spotlight 搜索图标，分辨率 120x120"
+                        }
+                      },
+                      "required": [
+                        "app@2x",
+                        "app@3x",
+                        "spotlight@2x",
+                        "spotlight@3x",
+                        "settings@2x",
+                        "settings@3x",
+                        "notification@2x",
+                        "notification@3x"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "type": "object"
+                }
+              },
+              "type": "object"
+            },
+            "ios": {
+              "description": "iOS 平台云端打包配置",
+              "properties": {
+                "CFBundleName": {
+                  "default": "HBuilder",
+                  "description": "应用的CFBundleName名称",
+                  "type": "string"
+                },
+                "UIBackgroundModes": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/definitions/MaybeArray%3C(%22audio%22%7C%22bluetooth-central%22%7C%22bluetooth-peripheral%22%7C%22external-accessory%22%7C%22fetch%22%7C%22location%22%7C%22nearby-interaction%22%7C%22network-authentication%22%7C%22newsstand-content%22%7C%22processing%22%7C%22push-to-talk%22%7C%22remote-notification%22%7C%22voip%22)%3E"
+                    },
+                    {
+                      "type": "string"
+                    }
+                  ],
+                  "description": "应用后台运行模式，详见 <https://uniapp.dcloud.net.cn/tutorial/app-ios-uibackgroundmodes.html> 和 <https://developer.apple.com/documentation/bundleresources/information-property-list/uibackgroundmodes>\n\n\"audio\" 后台播放音乐\n\n\"location\" 后台定位"
+                },
+                "appid": {
+                  "description": "iOS 平台云端打包使用的 Bundle ID",
+                  "type": "string"
+                },
+                "capabilities": {
+                  "additionalProperties": false,
+                  "description": "应用的能力配置（Capabilities），根据 XCode 规范分别配置到 entitlements 和 plist 文件中",
+                  "properties": {
+                    "entitlements": {
+                      "description": "合并到工程 entitlements 文件的数据，json 格式",
+                      "type": "object"
+                    },
+                    "plists": {
+                      "description": "合并到工程 Info.plist 文件的数据，json 格式",
+                      "type": "object"
+                    }
+                  },
+                  "type": "object"
+                },
+                "deploymentTarget": {
+                  "description": "iOS 支持的最低版本",
+                  "type": "string"
+                },
+                "devices": {
+                  "description": "iOS 支持的设备类型\n\n\"iphone\" 仅支持 iPhone 设备\n\n\"ipad\" 仅支持 iPad 设备\n\n\"universal\" 同时支持 iPhone 和 iPad 设备",
+                  "enum": ["iphone", "ipad", "universal"],
+                  "type": "string"
+                },
+                "frameworks": {
+                  "deprecated": true,
+                  "description": "依赖的系统库，推荐使用 uni 原生插件扩展使用系统依赖库",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "idfa": {
+                  "default": true,
+                  "description": "是否使用广告标识",
+                  "type": "boolean"
+                },
+                "mobileprovision": {
+                  "description": "iOS 平台云端打包使用的 profile 文件路径",
+                  "type": "string"
+                },
+                "p12": {
+                  "description": "iOS 平台云端打包使用的证书文件路径",
+                  "type": "string"
+                },
+                "password": {
+                  "description": "iOS 打包使用的证书密码",
+                  "type": "string"
+                },
+                "privacyDescription": {
+                  "description": "iOS 隐私信息访问的许可描述",
+                  "properties": {
+                    "NFCReaderUsageDescription": {
+                      "description": "使用 NFC 权限描述",
+                      "type": "string"
+                    },
+                    "NSAppleMusicUsageDescription": {
+                      "description": "使用媒体资料库权限描述",
+                      "type": "string"
+                    },
+                    "NSBluetoothAlwaysUsageDescription": {
+                      "description": "后台使用蓝牙权限描述",
+                      "type": "string"
+                    },
+                    "NSBluetoothPeripheralUsageDescription": {
+                      "description": "使用蓝牙权限描述",
+                      "type": "string"
+                    },
+                    "NSCalendarsUsageDescription": {
+                      "description": "使用日历权限描述",
+                      "type": "string"
+                    },
+                    "NSCameraUsageDescription": {
+                      "description": "摄像头使用权限描述",
+                      "type": "string"
+                    },
+                    "NSContactsUsageDescription": {
+                      "description": "使用通讯录权限描述",
+                      "type": "string"
+                    },
+                    "NSFaceIDUsageDescription": {
+                      "description": "使用 FaceID 权限描述",
+                      "type": "string"
+                    },
+                    "NSHealthClinicalHealthRecordsShareUsageDescription": {
+                      "description": "访问临床记录权限描述",
+                      "type": "string"
+                    },
+                    "NSHealthShareUsageDescription": {
+                      "description": "使用健康分享权限描述",
+                      "type": "string"
+                    },
+                    "NSHealthUpdateUsageDescription": {
+                      "description": "使用健康更新权限描述",
+                      "type": "string"
+                    },
+                    "NSHomeKitUsageDescription": {
+                      "description": "访问 HomeKit 权限描述",
+                      "type": "string"
+                    },
+                    "NSLocalNetworkUsageDescription": {
+                      "description": "访问本地网络权限描述",
+                      "type": "string"
+                    },
+                    "NSLocationAlwaysAndWhenInUseUsageDescription": {
+                      "description": "运行期后后台访问位置权限描述",
+                      "type": "string"
+                    },
+                    "NSLocationAlwaysUsageDescription": {
+                      "description": "后台运行访问位置权限描述",
+                      "type": "string"
+                    },
+                    "NSLocationWhenInUseUsageDescription": {
+                      "description": "运行期访问位置权限描述",
+                      "type": "string"
+                    },
+                    "NSMicrophoneUsageDescription": {
+                      "description": "麦克风使用权限描述",
+                      "type": "string"
+                    },
+                    "NSMotionUsageDescription": {
+                      "description": "使用运动与健康权限描述",
+                      "type": "string"
+                    },
+                    "NSPhotoLibraryAddUsageDescription": {
+                      "description": "相册写入权限描述",
+                      "type": "string"
+                    },
+                    "NSPhotoLibraryUsageDescription": {
+                      "description": "相册读取权限描述",
+                      "type": "string"
+                    },
+                    "NSRemindersUsageDescription": {
+                      "description": "系统提醒事项权限描述",
+                      "type": "string"
+                    },
+                    "NSSiriUsageDescription": {
+                      "description": "访问 Siri 权限描述",
+                      "type": "string"
+                    },
+                    "NSSpeechRecognitionUsageDescription": {
+                      "description": "系统语音识别权限描述",
+                      "type": "string"
+                    },
+                    "NSUserTrackingUsageDescription": {
+                      "description": "跟踪用户活动权限描述",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "privacyRegisterMode": {
+                  "description": "\"manual\" 用户同意隐私政策后才获取相关隐私信息\n\n其它 应用启动时自动获取\n\n详见 <https://uniapp.dcloud.net.cn/collocation/manifest#privacyRegisterMode>",
+                  "type": "string"
+                },
+                "pushRegisterMode": {
+                  "description": "使用 Push（消息推送）模块时申请系统推送权限模式\n\n\"manual\" 调用 push 相关 API 时申请\n\n其它 应用启动时自动申请",
+                  "type": "string"
+                },
+                "urlschemewhitelist": {
+                  "description": "应用访问白名单列表，多个白名单使用 `,` 分隔，详见 <https://uniapp.dcloud.net.cn/tutorial/app-ios-schemewhitelist>",
+                  "type": "string"
+                },
+                "urltypes": {
+                  "description": "iOS 平台 APP 注册的 scheme，多个 scheme 使用 `,` 分隔，详见 <https://uniapp.dcloud.net.cn/tutorial/app-ios-schemes>",
+                  "type": "string"
+                },
+                "validArchitectures": {
+                  "description": "编译时支持的 CPU 指令",
+                  "items": {
+                    "enum": ["arm64", "arm64e", "armv7", "armv7s", "x86_64"],
+                    "type": "string"
+                  },
+                  "type": "array"
+                }
+              },
+              "type": "object"
+            },
+            "orientation": {
+              "deprecated": "使用 screenOrientation 替代",
+              "description": "重力感应、横竖屏配置",
+              "items": {
+                "$ref": "#/definitions/AppPlusScreenOrientation"
+              },
+              "type": "array"
+            },
+            "sdkConfigs": {
+              "description": "SDK 配置，仅打包生效",
+              "properties": {
+                "ad": {
+                  "description": "uni-ad 配置",
+                  "properties": {
+                    "360": {
+                      "description": "360 广告联盟",
+                      "type": "object"
+                    },
+                    "BXM-AD": {
+                      "description": "互动游戏（变现猫）",
+                      "type": "object"
+                    },
+                    "bd": {
+                      "description": "百度百青藤广告联盟",
+                      "type": "object"
+                    },
+                    "bz": {
+                      "description": "AdScope 倍孜广告联盟",
+                      "type": "object"
+                    },
+                    "csj": {
+                      "description": "今日头条穿山甲广告联盟",
+                      "type": "object"
+                    },
+                    "fl": {
+                      "description": "泛连广告联盟",
+                      "type": "object"
+                    },
+                    "gdt": {
+                      "description": "腾讯优量汇广告联盟",
+                      "type": "object"
+                    },
+                    "gg": {
+                      "description": "Google AdMob",
+                      "type": "object"
+                    },
+                    "hw": {
+                      "description": "华为广告联盟",
+                      "type": "object"
+                    },
+                    "inmobi": {
+                      "description": "InMobi 广告联盟",
+                      "type": "object"
+                    },
+                    "ironsource": {
+                      "description": "ironSource 广告联盟",
+                      "type": "object"
+                    },
+                    "jl": {
+                      "description": "聚力广告联盟",
+                      "type": "object"
+                    },
+                    "ks": {
+                      "description": "快手广告联盟",
+                      "type": "object"
+                    },
+                    "ks-content": {
+                      "description": "快手内容联盟",
+                      "type": "object"
+                    },
+                    "liftoff": {
+                      "description": "Liftoff 广告联盟",
+                      "type": "object"
+                    },
+                    "mintegral": {
+                      "description": "Mintegral 广告联盟",
+                      "type": "object"
+                    },
+                    "pg": {
+                      "description": "Pangle（海外穿山甲）",
+                      "type": "object"
+                    },
+                    "sigmob": {
+                      "description": "Sigmob 广告联盟",
+                      "type": "object"
+                    },
+                    "unity": {
+                      "description": "Unity Ads 广告联盟",
+                      "type": "object"
+                    },
+                    "zy": {
+                      "description": "Octopus 章鱼移动广告联盟",
+                      "type": "object"
+                    }
+                  },
+                  "type": "object"
+                },
+                "geolocation": {
+                  "additionalProperties": false,
+                  "description": "定位，依赖三方 SDK，上架到国内应用市场需要在隐私协议中添加相应条款\n\n详见 <https://uniapp.dcloud.net.cn/tutorial/app-geolocation.html>",
+                  "properties": {
+                    "amap": {
+                      "description": "高德定位，需要申请高德服务并配置，高德地图和高德定位配置信息应保持一致",
+                      "properties": {
+                        "__platform__": {
+                          "description": "支持平台，至少选一个",
+                          "items": {
+                            "enum": ["ios", "android"],
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "appkey_android": {
+                          "description": "Android 平台高德定位地图应用 key",
+                          "type": "string"
+                        },
+                        "appkey_ios": {
+                          "description": "iOS 平台高德定位地图应用 key",
+                          "type": "string"
+                        },
+                        "name": {
+                          "description": "高德用户名",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "baidu": {
+                      "description": "百度定位，需要申请百度服务并配置，百度地图和百度定位配置信息应保持一致",
+                      "properties": {
+                        "__platform__": {
+                          "description": "支持平台，至少选一个",
+                          "items": {
+                            "enum": ["ios", "android"],
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "appkey_android": {
+                          "description": "Android 平台百度地图应用 key",
+                          "type": "string"
+                        },
+                        "appkey_ios": {
+                          "description": "iOS 平台百度地图应用 key",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "system": {
+                      "description": "系统定位，由手机厂商提供定位服务，无需商业授权",
+                      "properties": {
+                        "__platform__": {
+                          "description": "支持平台，至少选一个",
+                          "items": {
+                            "enum": ["ios", "android"],
+                            "type": "string"
+                          },
+                          "type": "array"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  },
+                  "type": "object"
+                },
+                "maps": {
+                  "description": "地图，只能选一个，部分国产 Android 手机获取位置必须申请定位服务商的SDK\n\n依赖三方 SDK，上架到国内应用市场需要在隐私协议中添加相应条款\n\n详见 <https://uniapp.dcloud.net.cn/tutorial/app-maps.html>",
+                  "properties": {
+                    "amap": {
+                      "description": "高德地图，需要申请高德服务并配置，高德地图和高德定位配置信息应保持一致",
+                      "properties": {
+                        "appkey_android": {
+                          "description": "Android 平台高德地图应用 key",
+                          "type": "string"
+                        },
+                        "appkey_ios": {
+                          "description": "iOS 平台高德地图应用 key",
+                          "type": "string"
+                        },
+                        "name": {
+                          "description": "高德用户名",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "baidu": {
+                      "description": "百度地图，需要申请百度服务并配置，百度地图和百度定位配置信息应保持一致\n\n不支持 nvue",
+                      "properties": {
+                        "appkey_android": {
+                          "description": "Android 平台百度地图应用 key",
+                          "type": "string"
+                        },
+                        "appkey_ios": {
+                          "description": "iOS 平台百度地图应用 key",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "google": {
+                      "description": "Google 地图",
+                      "properties": {
+                        "APIKey_android": {
+                          "description": "Android 平台 Google 地图 API 密钥",
+                          "type": "string"
+                        },
+                        "APIKey_ios": {
+                          "description": "iOS 平台 Google 地图 API 密钥",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  },
+                  "type": "object"
+                },
+                "oauth": {
+                  "description": "登录鉴权，依赖三方 SDK，上架到国内应用市场需要在隐私协议中添加相应条款\n\n详见 <https://uniapp.dcloud.net.cn/tutorial/app-oauth.html>",
+                  "properties": {
+                    "apple": {
+                      "description": "苹果登录，iOS 13+ 支持\n\n如果开发者提供任何第三方登录，则必须同时提供苹果登录",
+                      "type": "object"
+                    },
+                    "facebook": {
+                      "description": "Facebook 脸书登录",
+                      "properties": {
+                        "appid": {
+                          "description": "Facebook 开发者中心获取的应用编号",
+                          "type": "string"
+                        },
+                        "client_token": {
+                          "description": "Facebook 开发者中心获取的 client_token",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "google": {
+                      "description": "Google登录",
+                      "properties": {
+                        "clientid": {
+                          "description": "Google API Console 项目中获取的 OAuth 客户端 ID",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "qq": {
+                      "description": "QQ 登录，QQ 登录和 QQ 分享的配置信息应保持一致",
+                      "properties": {
+                        "UniversalLinks": {
+                          "description": "腾讯 QQ 开放平台申请应用时配置的 Universal Links",
+                          "type": "string"
+                        },
+                        "appid": {
+                          "description": "腾讯 QQ 开放平台申请应用的 AppID 值",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "sina": {
+                      "description": "新浪微博登录，新浪微博登录和新浪微博分享的配置信息应保持一致",
+                      "properties": {
+                        "UniversalLinks": {
+                          "description": "新浪微博开放平台申请应用时配置的 Universal Links",
+                          "type": "string"
+                        },
+                        "appkey": {
+                          "description": "新浪微博开放平台应用 appkey",
+                          "type": "string"
+                        },
+                        "redirect_uri": {
+                          "description": "新浪微博开放平台应用授权回调页地址",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "univerify": {
+                      "description": "一键登录",
+                      "type": "object"
+                    },
+                    "weixin": {
+                      "description": "微信登录，微信登录、微信分享和微信支付的配置信息应保持一致",
+                      "properties": {
+                        "UniversalLinks": {
+                          "description": "微信开放平台申请应用时配置的 Universal Links",
+                          "type": "string"
+                        },
+                        "appid": {
+                          "description": "微信开放平台申请应用的 AppID 值",
+                          "type": "string"
+                        },
+                        "appsecret": {
+                          "description": "微信开放平台申请应用的 AppSecret 值",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  },
+                  "type": "object"
+                },
+                "payment": {
+                  "description": "支付，依赖三方 SDK，上架到国内应用市场需要在隐私协议中添加相应条款\n\n详见 <https://uniapp.dcloud.net.cn/tutorial/app-payment.html>",
+                  "properties": {
+                    "alipay": {
+                      "additionalProperties": false,
+                      "description": "支付宝支付",
+                      "properties": {
+                        "__platform__": {
+                          "description": "支持平台，至少选一个",
+                          "items": {
+                            "enum": ["ios", "android"],
+                            "type": "string"
+                          },
+                          "type": "array"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "appleiap": {
+                      "description": "Apple 应用内支付，仅 iOS 支持",
+                      "type": "object"
+                    },
+                    "google": {
+                      "description": "Google 支付",
+                      "type": "object"
+                    },
+                    "paypal": {
+                      "properties": {
+                        "__platform__": {
+                          "description": "支持平台，至少选一个",
+                          "items": {
+                            "enum": ["ios", "android"],
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "returnURL_android": {
+                          "description": "Android 平台返回 URL 地址，推荐使用 `包名+://paypalpay`，要求使用小写",
+                          "type": "string"
+                        },
+                        "returnURL_ios": {
+                          "description": "iOS 平台返回 URL 地址，推荐使用 `包名+://paypalpay`，要求使用小写",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "stripe": {
+                      "properties": {
+                        "__platform__": {
+                          "description": "支持平台，至少选一个",
+                          "items": {
+                            "enum": ["ios", "android"],
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "returnURL_ios": {
+                          "description": "iOS 平台返回 URL 地址，格式为 `协议名称://stripe`",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "weixin": {
+                      "description": "微信支付，微信登录、微信分享和微信支付的配置信息应保持一致",
+                      "properties": {
+                        "UniversalLinks": {
+                          "description": "微信开放平台申请应用时配置的 Universal Links",
+                          "type": "string"
+                        },
+                        "__platform__": {
+                          "description": "支持平台，至少选一个",
+                          "items": {
+                            "enum": ["ios", "android"],
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "appid": {
+                          "description": "微信开放平台申请应用的 AppID 值",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  },
+                  "type": "object"
+                },
+                "push": {
+                  "description": "消息推送\n\n详见 <https://uniapp.dcloud.net.cn/tutorial/app-push.html> 和 <https://uniapp.dcloud.net.cn/tutorial/app-push-unipush.html>",
+                  "properties": {
+                    "unipush": {
+                      "description": "uni-push 配置",
+                      "properties": {
+                        "fcm": {
+                          "description": "Google FCM 推送 SDK，上线国内应用市场需在 APP 隐私协议中添加条款",
+                          "type": "object"
+                        },
+                        "hms": {
+                          "description": "华为推送 SDK，上线国内应用市场需在 APP 隐私协议中添加条款",
+                          "type": "object"
+                        },
+                        "honor": {
+                          "description": "荣耀推送 SDK，上线国内应用市场需在 APP 隐私协议中添加条款",
+                          "type": "object"
+                        },
+                        "icons": {
+                          "properties": {
+                            "push": {
+                              "description": "图标配置",
+                              "properties": {
+                                "hdpi": {
+                                  "description": "72x72",
+                                  "type": "string"
+                                },
+                                "ldpi": {
+                                  "description": "48x48",
+                                  "type": "string"
+                                },
+                                "mdpi": {
+                                  "description": "48x48",
+                                  "type": "string"
+                                },
+                                "xhdpi": {
+                                  "description": "96x96",
+                                  "type": "string"
+                                },
+                                "xxhdpi": {
+                                  "description": "144x144",
+                                  "type": "string"
+                                },
+                                "xxxhdpi": {
+                                  "description": "192x192",
+                                  "type": "string"
+                                }
+                              },
+                              "type": "object"
+                            },
+                            "small": {
+                              "description": "小图标配置",
+                              "properties": {
+                                "hdpi": {
+                                  "description": "36x36",
+                                  "type": "string"
+                                },
+                                "ldpi": {
+                                  "description": "18x18",
+                                  "type": "string"
+                                },
+                                "mdpi": {
+                                  "description": "24x24",
+                                  "type": "string"
+                                },
+                                "xhdpi": {
+                                  "description": "48x48",
+                                  "type": "string"
+                                },
+                                "xxhdpi": {
+                                  "description": "72x72",
+                                  "type": "string"
+                                },
+                                "xxxhdpi": {
+                                  "description": "96x96",
+                                  "type": "string"
+                                }
+                              },
+                              "type": "object"
+                            }
+                          },
+                          "type": "object"
+                        },
+                        "meizu": {
+                          "description": "魅族推送 SDK，上线国内应用市场需在 APP 隐私协议中添加条款",
+                          "type": "object"
+                        },
+                        "mi": {
+                          "description": "小米推送 SDK，上线国内应用市场需在 APP 隐私协议中添加条款",
+                          "type": "object"
+                        },
+                        "offline": {
+                          "default": false,
+                          "description": "APP 离线推送，APP 离线时适用，推送消息进入手机通知栏\n\nSDK 体积 1024K\n\nuni-push v2 支持",
+                          "type": "boolean"
+                        },
+                        "oppo": {
+                          "description": "OPPO 推送 SDK，上线国内应用市场需在 APP 隐私协议中添加条款",
+                          "type": "object"
+                        },
+                        "version": {
+                          "default": "1",
+                          "description": "uni-push 版本",
+                          "enum": ["1", "2"],
+                          "type": "string"
+                        },
+                        "vivo": {
+                          "description": "VIVO 推送 SDK，上线国内应用市场需在 APP 隐私协议中添加条款",
+                          "type": "object"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  },
+                  "type": "object"
+                },
+                "share": {
+                  "additionalProperties": false,
+                  "description": "分享，依赖三方 SDK，上架到国内应用市场需要在隐私协议中添加相应条款\n\n详见 <https://uniapp.dcloud.net.cn/tutorial/app-share.html>",
+                  "properties": {
+                    "qq": {
+                      "description": "QQ 分享，QQ 登录和 QQ 分享的配置信息应保持一致",
+                      "properties": {
+                        "UniversalLinks": {
+                          "description": "腾讯 QQ 开放平台申请应用时配置的 Universal Links",
+                          "type": "string"
+                        },
+                        "appid": {
+                          "description": "腾讯 QQ 开放平台申请应用的 AppID 值",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "sina": {
+                      "description": "新浪微博分享，新浪微博登录和新浪微博分享的配置信息应保持一致",
+                      "properties": {
+                        "UniversalLinks": {
+                          "description": "新浪微博开放平台申请应用时配置的 Universal Links",
+                          "type": "string"
+                        },
+                        "appkey": {
+                          "description": "新浪微博开放平台应用 appkey",
+                          "type": "string"
+                        },
+                        "redirect_uri": {
+                          "description": "新浪微博开放平台应用授权回调页地址",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "weixin": {
+                      "description": "微信分享，微信登录、微信分享和微信支付的配置信息应保持一致",
+                      "properties": {
+                        "UniversalLinks": {
+                          "description": "微信开放平台申请应用时配置的 Universal Links",
+                          "type": "string"
+                        },
+                        "appid": {
+                          "description": "微信开放平台申请应用的 AppID 值",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  },
+                  "type": "object"
+                },
+                "speech": {
+                  "description": "语音输入\n\n详见 <https://uniapp.dcloud.net.cn/tutorial/app-speech.html>",
+                  "properties": {
+                    "baidu": {
+                      "description": "百度语音识别",
+                      "properties": {
+                        "apikey": {
+                          "description": "百度开放平台申请的 ApiKey 值",
+                          "type": "string"
+                        },
+                        "appid": {
+                          "description": "百度开放平台申请的 AppID 值",
+                          "type": "string"
+                        },
+                        "secretkey": {
+                          "description": "百度开放平台申请的 SecretKey 值",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  },
+                  "type": "object"
+                },
+                "statics": {
+                  "description": "统计，依赖三方 SDK，上架到国内应用市场需要在隐私协议中添加相应条款\n\n详见 <https://uniapp.dcloud.net.cn/tutorial/app-statistic.html>",
+                  "properties": {
+                    "google": {
+                      "description": "Google Analytics for Firebase",
+                      "properties": {
+                        "config_android": {
+                          "description": "Android 平台 Google Analytics 的配置文件",
+                          "type": "string"
+                        },
+                        "config_ios": {
+                          "description": "iOS 平台 Google Analytics 的配置文件",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "umeng": {
+                      "description": "友盟统计",
+                      "properties": {
+                        "appkey_android": {
+                          "description": "Android 平台友盟 appkey",
+                          "type": "string"
+                        },
+                        "appkey_ios": {
+                          "description": "iOS 平台友盟 appkey",
+                          "type": "string"
+                        },
+                        "channelid_android": {
+                          "description": "Android 平台友盟渠道 id",
+                          "type": "string"
+                        },
+                        "channelid_ios": {
+                          "description": "iOS 平台友盟渠道 id",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  },
+                  "type": "object"
+                }
+              },
+              "type": "object"
+            },
+            "splashscreen": {
+              "additionalProperties": false,
+              "description": "启动界面配置",
+              "properties": {
+                "android": {
+                  "additionalProperties": false,
+                  "description": "Android 平台启动图片配置， androidStyle 为 \"default\" 时生效",
+                  "properties": {
+                    "hdpi": {
+                      "description": "高密度屏幕启动图片路径，480x762",
+                      "type": "string"
+                    },
+                    "ldpi": {
+                      "deprecated": true,
+                      "description": "低密度屏幕启动图片路径，320x442",
+                      "type": "string"
+                    },
+                    "mdpi": {
+                      "deprecated": true,
+                      "description": "中密度屏幕启动图片路径，240x282",
+                      "type": "string"
+                    },
+                    "xhdpi": {
+                      "description": "720P 高密度屏幕启动图片路径，720x1242",
+                      "type": "string"
+                    },
+                    "xxhdpi": {
+                      "description": "1080P 高密度屏幕启动图片路径，1080x1882",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "androidNavigationBarColor": {
+                  "$ref": "#/definitions/HEXColor",
+                  "description": "Android 平台启动界面导航栏颜色，要求颜色值与启动图背景颜色相近",
+                  "format": "color"
+                },
+                "androidStyle": {
+                  "default": "common",
+                  "description": "Android 平台启动界面样式",
+                  "enum": ["common", "default"],
+                  "type": "string"
+                },
+                "ios": {
+                  "description": "iOS 平台启动界面配置",
+                  "properties": {
+                    "ipad": {
+                      "additionalProperties": false,
+                      "description": "iPad 设备启动图配置，iosStyle 为 \"default\" 时生效",
+                      "properties": {
+                        "landscape": {
+                          "deprecated": true,
+                          "description": "分辨率 1024x748，iPad 横屏启动图片路径",
+                          "type": "string"
+                        },
+                        "landscape-1112h@2x": {
+                          "description": "分辨率 2224x1668，10.5 英寸 iPad Pro 横屏启动图片路径",
+                          "type": "string"
+                        },
+                        "landscape-1194h@2x": {
+                          "description": "分辨率 2388x1668，11 英寸 iPad Pro 横屏启动图片路径",
+                          "type": "string"
+                        },
+                        "landscape-1366h@2x": {
+                          "description": "分辨率 2732x2048，12.9 英寸 iPad Pro 横屏启动图片路径",
+                          "type": "string"
+                        },
+                        "landscape-retina": {
+                          "deprecated": true,
+                          "description": "分辨率 2048x1496，iPad 高分屏横屏启动图片路径",
+                          "type": "string"
+                        },
+                        "landscape-retina7": {
+                          "description": "分辨率 2048x1536，9.7/7.9 英寸 iPad/mini 高分屏横屏启动图片路径",
+                          "type": "string"
+                        },
+                        "landscape7": {
+                          "description": "分辨率 1024x768，9.7/7.9 英寸 iPad/mini 横屏启动图片路径",
+                          "type": "string"
+                        },
+                        "portrait": {
+                          "deprecated": true,
+                          "description": "分辨率 768x1004，iPad 竖屏启动图片路径",
+                          "type": "string"
+                        },
+                        "portrait-1112h@2x": {
+                          "description": "分辨率 1668x2224，10.5 英寸 iPad Pro 竖屏启动图片路径",
+                          "type": "string"
+                        },
+                        "portrait-1194h@2x": {
+                          "description": "分辨率 1668x2388，11 英寸 iPad Pro 竖屏启动图片路径",
+                          "type": "string"
+                        },
+                        "portrait-1366h@2x": {
+                          "description": "分辨率 2048x2732，12.9 英寸 iPad Pro 竖屏启动图片路径",
+                          "type": "string"
+                        },
+                        "portrait-retina": {
+                          "deprecated": true,
+                          "description": "分辨率 1536x2008，iPad 高分屏竖屏启动图片路径",
+                          "type": "string"
+                        },
+                        "portrait-retina7": {
+                          "description": "分辨率 1536x2048，9.7/7.9 英寸 iPad/mini 高分屏竖屏图片路径",
+                          "type": "string"
+                        },
+                        "portrait7": {
+                          "description": "分辨率 768x1024，9.7/7.9 英寸 iPad/mini 竖屏启动图片路径",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "iphone": {
+                      "description": "iPhone 设备启动图配置，iosStyle 为 \"default\" 时生效",
+                      "properties": {
+                        "default": {
+                          "deprecated": true,
+                          "description": "分辨率 320x480，iPhone3（G/GS）启动图片路径",
+                          "type": "string"
+                        },
+                        "iphonex": {
+                          "description": "分辨率 1125x2436，5.8英寸设备（iPhoneX/XS）启动图片路径",
+                          "type": "string"
+                        },
+                        "iphonexl": {
+                          "description": "分辨率 2436x1125，5.8英寸设备（iPhoneX/XS）横屏启动图片路径",
+                          "type": "string"
+                        },
+                        "landscape-896h@2x": {
+                          "description": "分辨率 1792x828，6.1英寸设备（iPhoneXR）横屏启动图片路径",
+                          "type": "string"
+                        },
+                        "landscape-896h@3x": {
+                          "description": "分辨率 2688x1242，6.5英寸设备（iPhoneXS Max）横屏启动图片路径",
+                          "type": "string"
+                        },
+                        "portrait-896h@2x": {
+                          "description": "分辨率 828x1792，6.1英寸设备（iPhoneXR）启动图片路径",
+                          "type": "string"
+                        },
+                        "portrait-896h@3x": {
+                          "description": "分辨率 1242x2688，6.5英寸设备（iPhoneXS Max）横屏启动图片路径",
+                          "type": "string"
+                        },
+                        "retina35": {
+                          "deprecated": true,
+                          "description": "分辨率 640x960，3.5 英寸设备（iPhone4/4S）启动图片路径",
+                          "type": "string"
+                        },
+                        "retina40": {
+                          "description": "分辨率 640x1136，4.0 英寸设备（iPhone5/5S）启动图片路径",
+                          "type": "string"
+                        },
+                        "retina40l": {
+                          "description": "分辨率 1136x640，4.0 英寸设备（iPhone5/5S）横屏启动图片路径",
+                          "type": "string"
+                        },
+                        "retina47": {
+                          "description": "分辨率 750x1334，4.7 英寸设备（iPhone6/7/8）启动图片路径",
+                          "type": "string"
+                        },
+                        "retina47l": {
+                          "description": "分辨率 1334x750，5.5 英寸设备（iPhone6/7/8）启动图片路径",
+                          "type": "string"
+                        },
+                        "retina55": {
+                          "description": "分辨率 1242x2208，5.5英寸设备（iPhone6/7/8Plus）启动图片路径",
+                          "type": "string"
+                        },
+                        "retina55l": {
+                          "description": "分辨率 2208x1242，5.5英寸设备（iPhone6/7/8Plus）横屏启动图片路径",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "storyboard": {
+                      "description": "自定义 storyboard 启动界面文件路径，iosStyle 为 \"storyboard\" 时生效",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "iosStyle": {
+                  "default": "common",
+                  "description": "iOS 平台启动界面样式",
+                  "enum": ["common", "default", "storyboard"],
+                  "type": "string"
+                },
+                "useOriginalMsgbox": {
+                  "description": "是否使用原生隐私政策提示框，仅支持 Android\n\n详见 <https://uniapp.dcloud.net.cn/tutorial/app-privacy-android.html>",
+                  "type": "boolean"
+                }
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        },
+        "error": {
+          "description": "页面加载错误配置，uni-app 项目仅对 webview 组件有效，详见 <https://uniapp.dcloud.net.cn/tutorial/app-webview-error.html>",
+          "properties": {
+            "url": {
+              "description": "webview 页面错误时跳转的页面地址",
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "kernel": {
+          "description": "iOS webview 内核配置",
+          "properties": {
+            "ios": {
+              "default": "WKWebview",
+              "description": "iOS 平台使用的 webview 内核",
+              "enum": ["WKWebview", "UIWebview"],
+              "type": "string"
+            },
+            "recovery": {
+              "default": "reload",
+              "description": "iOS 平台使用 WKWebview 时，内核崩溃后的处理逻辑",
+              "enum": ["reload", "restart", "none"],
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "launchwebview": {
+          "description": "应用首页相关配置，uni-app 项目不建议手动修改",
+          "properties": {
+            "additionalHttpHeaders": {
+              "description": "运行环境额外添加HTTP请求头",
+              "type": "object"
+            },
+            "backButtonAutoControl": {
+              "default": "none",
+              "description": "运行环境自动处理返回键的控制逻辑",
+              "enum": ["none", "hide", "close"],
+              "type": "string"
+            },
+            "bottom": {
+              "default": "0px",
+              "description": "Webview 底部偏移量，仅在未同时设置 top 和 height 属性时生效",
+              "type": "string"
+            },
+            "height": {
+              "anyOf": [
+                {
+                  "$ref": "#/definitions/PxSize"
+                },
+                {
+                  "$ref": "#/definitions/PercentageSize"
+                }
+              ],
+              "default": "100%",
+              "description": "Webview 窗口高度"
+            },
+            "injection": {
+              "default": false,
+              "description": "是否提前注入 plus API",
+              "type": "boolean"
+            },
+            "overrideresource": {
+              "description": "应用首页的拦截资源相关配置",
+              "items": {
+                "properties": {
+                  "encoding": {
+                    "description": "拦截资源的数据编码",
+                    "type": "string"
+                  },
+                  "header": {
+                    "description": "拦截资源的 http 头数据",
+                    "type": "object"
+                  },
+                  "match": {
+                    "description": "匹配拦截的资源 url 地址的正则表达式字符串",
+                    "type": "string"
+                  },
+                  "mime": {
+                    "description": "拦截资源的数据类型 mime",
+                    "type": "string"
+                  },
+                  "redirect": {
+                    "description": "拦截资源的重定向地址",
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "overrideurl": {
+              "description": "应用首页的拦截链接请求处理逻辑",
+              "properties": {
+                "exclude": {
+                  "description": "排除拦截理规则",
+                  "enum": ["none", "redirect"],
+                  "type": "string"
+                },
+                "match": {
+                  "description": "匹配拦截规则，支持正则表达式",
+                  "type": "string"
+                },
+                "mode": {
+                  "description": "拦截模式",
+                  "enum": ["reject", "allow"],
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "plusrequire": {
+              "default": "normal",
+              "description": "加载 plus API 时机",
+              "enum": ["normal", "later", "ahead", "none"],
+              "type": "string"
+            },
+            "replacewebapi": {
+              "description": "是否重写 Web API 实现相关配置",
+              "properties": {
+                "geolocation": {
+                  "description": "重写标准定位API",
+                  "enum": ["none", "alldevice", "auto"],
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "statusbar": {
+              "description": "状态栏配置",
+              "properties": {
+                "background": {
+                  "$ref": "#/definitions/HEXColor",
+                  "description": "沉浸式状态栏样式下系统状态栏背景颜色",
+                  "format": "color"
+                }
+              },
+              "type": "object"
+            },
+            "subNViews": {
+              "deprecated": true,
+              "description": "首页原生 View 相关配置",
+              "items": {
+                "properties": {
+                  "id": {
+                    "description": "原生 View 标识",
+                    "type": "string"
+                  },
+                  "styles": {
+                    "description": "原生 View 样式",
+                    "type": "object"
+                  },
+                  "tags": {
+                    "description": "原生 View 中包含的 tag 标签列表",
+                    "items": {
+                      "type": "object"
+                    },
+                    "type": "array"
+                  }
+                },
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "titleNView": {
+              "additionalProperties": false,
+              "description": "标题栏相关配置",
+              "properties": {
+                "autoBackButton": {
+                  "default": true,
+                  "description": "是否显示标题栏上返回键",
+                  "type": "boolean"
+                },
+                "backButton": {
+                  "description": "返回按钮样式",
+                  "properties": {
+                    "backgournd": {
+                      "$ref": "#/definitions/HEXColor",
+                      "description": "返回按钮背景颜色",
+                      "format": "color"
+                    },
+                    "color": {
+                      "$ref": "#/definitions/HEXColor",
+                      "description": "返回图标颜色",
+                      "format": "color"
+                    },
+                    "colorPressed": {
+                      "$ref": "#/definitions/HEXColor",
+                      "description": "返回图标按下时的颜色",
+                      "format": "color"
+                    }
+                  },
+                  "type": "object"
+                },
+                "backgroundColor": {
+                  "$ref": "#/definitions/HEXColor",
+                  "description": "标题栏背景颜色",
+                  "format": "color"
+                },
+                "buttons": {
+                  "description": "标题栏按钮配置",
+                  "items": {
+                    "properties": {
+                      "color": {
+                        "$ref": "#/definitions/HEXColor",
+                        "description": "按钮文字颜色",
+                        "format": "color"
+                      },
+                      "colorPressed": {
+                        "$ref": "#/definitions/HEXColor",
+                        "description": "按钮按下状态文字颜色",
+                        "format": "color"
+                      },
+                      "float": {
+                        "description": "按钮显示位置",
+                        "enum": ["left", "right"],
+                        "type": "string"
+                      },
+                      "fontSize": {
+                        "default": "22px",
+                        "description": "按钮文字大小",
+                        "type": "string"
+                      },
+                      "fontSrc": {
+                        "description": "按钮上文字使用的字体文件路径",
+                        "type": "string"
+                      },
+                      "fontWeight": {
+                        "default": "normal",
+                        "description": "按钮文字粗细",
+                        "enum": ["normal", "bold"],
+                        "type": "string"
+                      },
+                      "text": {
+                        "description": "按钮显示文字",
+                        "type": "string"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "splitLine": {
+                  "description": "标题栏分割线样式",
+                  "properties": {
+                    "color": {
+                      "$ref": "#/definitions/HEXColor",
+                      "description": "分割线颜色",
+                      "format": "color"
+                    },
+                    "height": {
+                      "default": "1px",
+                      "description": "分割线高度",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "titleColor": {
+                  "$ref": "#/definitions/HEXColor",
+                  "description": "标题栏标题文字颜色",
+                  "format": "color"
+                },
+                "titleSize": {
+                  "default": "17px",
+                  "description": "标题字体大小",
+                  "type": "string"
+                },
+                "titleText": {
+                  "description": "标题栏标题文字内容",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "top": {
+              "anyOf": [
+                {
+                  "$ref": "#/definitions/PxSize"
+                },
+                {
+                  "$ref": "#/definitions/PercentageSize"
+                }
+              ],
+              "default": "0px",
+              "description": "Webview 顶部偏移量"
+            }
+          },
+          "type": "object"
+        },
+        "mediaPlaybackRequiresUserAction": {
+          "default": false,
+          "description": "H5 中的音视频是否需要用户操作允许播放，仅 iOS 生效\n\ntrue 需要用户操作允许\n\nfalse 允许 API 控制自动播放",
+          "type": "boolean"
+        },
+        "modules": {
+          "description": "APP 权限模块，仅云打包生效，本地打包需自行在原生工程中配置\n\n详见 <https://uniapp.dcloud.net.cn/tutorial/app-modules.html>",
+          "properties": {
+            "Barcode": {
+              "description": "扫码",
+              "type": "object"
+            },
+            "Bluetooth": {
+              "description": "低功耗蓝牙",
+              "type": "object"
+            },
+            "Camera": {
+              "description": "相机和相册",
+              "type": "object"
+            },
+            "Contacts": {
+              "description": "系统通讯录",
+              "type": "object"
+            },
+            "FaceId": {
+              "description": "人脸识别，仅 iOS 支持",
+              "type": "object"
+            },
+            "FacialRecognitionVerify": {
+              "description": "实人认证",
+              "type": "object"
+            },
+            "Fingerprint": {
+              "description": "指纹识别",
+              "type": "object"
+            },
+            "Geolocation": {
+              "description": "定位，依赖三方 SDK，上架到国内应用市场需要在隐私协议中添加相应条款\n\n详见 <https://uniapp.dcloud.net.cn/tutorial/app-geolocation.html>",
+              "type": "object"
+            },
+            "LivePusher": {
+              "description": "直播推流",
+              "type": "object"
+            },
+            "Maps": {
+              "description": "地图，只能选一个，部分国产 Android 手机获取位置必须申请定位服务商的SDK\n\n依赖三方 SDK，上架到国内应用市场需要在隐私协议中添加相应条款\n\n详见 <https://uniapp.dcloud.net.cn/tutorial/app-maps.html>",
+              "type": "object"
+            },
+            "Messaging": {
+              "description": "短彩邮件消息",
+              "type": "object"
+            },
+            "OAuth": {
+              "description": "登录鉴权，依赖三方 SDK，上架到国内应用市场需要在隐私协议中添加相应条款\n\n详见 <https://uniapp.dcloud.net.cn/tutorial/app-oauth.html>",
+              "type": "object"
+            },
+            "Payment": {
+              "description": "支付，依赖三方 SDK，上架到国内应用市场需要在隐私协议中添加相应条款\n\n详见 <https://uniapp.dcloud.net.cn/tutorial/app-payment.html>",
+              "type": "object"
+            },
+            "Push": {
+              "description": "消息推送\n\n详见 <https://uniapp.dcloud.net.cn/tutorial/app-push.html> 和 <https://uniapp.dcloud.net.cn/tutorial/app-push-unipush.html>",
+              "type": "object"
+            },
+            "Record": {
+              "description": "录音",
+              "type": "object"
+            },
+            "SQLite": {
+              "description": "SQLite 数据库",
+              "type": "object"
+            },
+            "SecureNetwork": {
+              "description": "uni 云端一体安全网络",
+              "type": "object"
+            },
+            "Share": {
+              "description": "分享，依赖三方 SDK，上架到国内应用市场需要在隐私协议中添加相应条款\n\n详见 <https://uniapp.dcloud.net.cn/tutorial/app-share.html>",
+              "type": "object"
+            },
+            "Speech": {
+              "description": "语音输入\n\n详见 <https://uniapp.dcloud.net.cn/tutorial/app-speech.html>",
+              "type": "object"
+            },
+            "Statistic": {
+              "description": "统计，依赖三方 SDK，上架到国内应用市场需要在隐私协议中添加相应条款\n\n详见 <https://uniapp.dcloud.net.cn/tutorial/app-statistic.html>",
+              "type": "object"
+            },
+            "UIWebview": {
+              "description": "iOS UIWebview\n\n详见 <https://uniapp.dcloud.net.cn/tutorial/app-ios-uiwebview.html>",
+              "type": "object"
+            },
+            "VideoPlayer": {
+              "description": "视频播放",
+              "type": "object"
+            },
+            "Webview-x5": {
+              "description": "Android X5 Webview，依赖腾讯 TBS SDK，上架到国内应用市场需要在隐私协议中添加相应条款\n\n详见 <https://uniapp.dcloud.net.cn/tutorial/app-android-x5.html>",
+              "type": "object"
+            },
+            "iBeacon": {
+              "type": "object"
+            }
+          },
+          "type": "object"
+        },
+        "nativePlugins": {
+          "additionalProperties": {
+            "type": "object"
+          },
+          "description": "uni 原生插件配置，详见 <https://nativesupport.dcloud.net.cn/NativePlugin/use/use_local_plugin.html>",
+          "type": "object"
+        },
+        "nvue": {
+          "additionalProperties": false,
+          "description": "nvue 页面布局初始配置",
+          "properties": {
+            "flex-direction": {
+              "default": "column",
+              "description": "flex 项目的排列方向\n\n\"row\" 从左到右\n\n\"row-reverse\" 从右到左\n\n\"column\" 从上到下\n\n\"column-reverse\" 从下到上",
+              "enum": ["row", "row-reverse", "column", "column-reverse"],
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "nvueCompiler": {
+          "default": "uni-app",
+          "description": "nvue 编译模式，区别详见 <https://ask.dcloud.net.cn/article/36074>",
+          "enum": ["weex", "uni-app"],
+          "type": "string"
+        },
+        "nvueLaunchMode": {
+          "default": "normal",
+          "description": "nvue 首页启动模式，详见 <https://ask.dcloud.net.cn/article/36749>",
+          "enum": ["normal", "fast"],
+          "type": "string"
+        },
+        "nvueStyleCompiler": {
+          "default": "weex",
+          "description": "nvue 样式编译模式，区别详见 <https://ask.dcloud.net.cn/article/38751>",
+          "enum": ["weex", "uni-app"],
+          "type": "string"
+        },
+        "optimization": {
+          "description": "分包配置，可以减轻启动时加载的脚本数量，提升启动速度，详见 <https://uniapp.dcloud.net.cn/collocation/manifest.html#app-vue-optimization>",
+          "properties": {
+            "subPackages": {
+              "description": "是否开启分包配置\n\n为 true 时必须设置 app-plus.runmode 为 \"liberate\"",
+              "type": "boolean"
+            }
+          },
+          "type": "object"
+        },
+        "popGesture": {
+          "default": "none",
+          "description": "窗口侧滑返回默认效果",
+          "enum": ["none", "close", "hide"],
+          "type": "string"
+        },
+        "renderer": {
+          "const": "native",
+          "description": "运行框架\n\n\"native\" 不加载基于 webview 的运行框架，减少包体积、提升启动速度",
+          "type": "string"
+        },
+        "runmode": {
+          "default": "normal",
+          "description": "运行模式，分包时必须设置为 \"liberate\"\n\n\"normal\" 默认模式\n\n\"liberate\" 资源释放模式",
+          "enum": ["normal", "liberate"],
+          "type": "string"
+        },
+        "safearea": {
+          "description": "安全区域配置",
+          "properties": {
+            "background": {
+              "$ref": "#/definitions/HEXColor",
+              "description": "安全区域背景颜色",
+              "format": "color"
+            },
+            "backgroundDark": {
+              "$ref": "#/definitions/HEXColor",
+              "description": "暗黑模式安全区域背景颜色",
+              "format": "color"
+            },
+            "bottom": {
+              "description": "底部安全区域配置",
+              "properties": {
+                "offset": {
+                  "default": "none",
+                  "description": "安全区域偏移值",
+                  "enum": ["none", "auto"],
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "left": {
+              "description": "左侧安全区域配置",
+              "properties": {
+                "offset": {
+                  "default": "none",
+                  "description": "安全区域偏移值",
+                  "enum": ["none", "auto"],
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "right": {
+              "description": "右侧安全区域配置",
+              "properties": {
+                "offset": {
+                  "default": "none",
+                  "description": "安全区域偏移值",
+                  "enum": ["none", "auto"],
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        },
+        "screenOrientation": {
+          "description": "重力感应、横竖屏配置",
+          "items": {
+            "$ref": "#/definitions/AppPlusScreenOrientation"
+          },
+          "type": "array"
+        },
+        "softinput": {
+          "description": "软键盘相关配置",
+          "properties": {
+            "auxiliary": {
+              "default": false,
+              "description": "是否开启辅助输入功能",
+              "type": "boolean"
+            },
+            "mode": {
+              "default": "adjustResize",
+              "description": "弹出系统软键盘模式",
+              "enum": ["adjustResize", "adjustPan"],
+              "type": "string"
+            },
+            "navBar": {
+              "default": "auto",
+              "description": "iOS 平台软键盘上导航条的显示模式",
+              "enum": ["auto", "none"],
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "splashscreen": {
+          "description": "APP 启动界面信息，详见 <https://uniapp.dcloud.net.cn/tutorial/app-splashscreen.html>",
+          "properties": {
+            "ads": {
+              "description": "开屏广告配置",
+              "properties": {
+                "background": {
+                  "$ref": "#/definitions/HEXColor",
+                  "description": "开屏广告背景颜色，支持 HEX 颜色",
+                  "format": "color"
+                },
+                "image": {
+                  "description": "底部图片地址，相对应用资源目录路径",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "alwaysShowBeforeRender": {
+              "default": true,
+              "description": "是否等待首页渲染完毕后再关闭启动界面",
+              "type": "boolean"
+            },
+            "androidTranslucent": {
+              "default": false,
+              "description": "使用“自定义启动图”启动界面时是否显示透明过渡界面，可解决点击桌面图标延时启动应用的效果",
+              "type": "boolean"
+            },
+            "autoclose": {
+              "default": true,
+              "description": "是否自动关闭启动界面，仅当 alwaysShowBeforeRender 为 false 时生效\n\n如需要手动关闭启动界面，需设置 alwaysShowBeforeRender 和 autoclose 为 false\n\n详见 <https://uniapp.dcloud.net.cn/tutorial/app-splashscreen.html>",
+              "type": "boolean"
+            },
+            "delay": {
+              "deprecated": true,
+              "description": "延迟自动关闭启动时间，单位为 ms",
+              "type": "number"
+            },
+            "event": {
+              "default": "loaded",
+              "deprecated": true,
+              "description": "不明属性",
+              "enum": ["titleUpdate", "rendering", "loaded"],
+              "type": "string"
+            },
+            "target": {
+              "default": "default",
+              "deprecated": true,
+              "description": "不明属性",
+              "enum": ["default", "second"],
+              "type": "string"
+            },
+            "waiting": {
+              "default": true,
+              "description": "是否在程序启动界面显示等待圈或雪花",
+              "type": "boolean"
+            }
+          },
+          "type": "object"
+        },
+        "ssl": {
+          "description": "ssl 相关设置",
+          "properties": {
+            "untrustedca": {
+              "default": "accept",
+              "description": "https 请求时服务器非受信证书的处理逻辑",
+              "enum": ["accept", "refuse", "warning"],
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "statusbar": {
+          "description": "应用启动后的系统状态栏相关配置",
+          "properties": {
+            "background": {
+              "$ref": "#/definitions/HEXColor",
+              "description": "系统状态栏背景颜色",
+              "format": "color"
+            },
+            "immersed": {
+              "default": "none",
+              "description": "沉浸式状态栏样式",
+              "enum": ["none", "suggestedDevice", "supportedDevice"],
+              "type": "string"
+            },
+            "style": {
+              "default": "light",
+              "description": "系统状态栏样式（前景颜色）",
+              "enum": ["light", "dark"],
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "themeLocation": {
+          "default": "theme.json",
+          "description": "主题配置文件路径，darkmode 开启时生效",
+          "type": "string"
+        },
+        "uniStatistics": {
+          "$ref": "#/definitions/PlatformUniStatistics",
+          "description": "uni 统计配置项"
+        },
+        "useragent": {
+          "$ref": "#/definitions/AppPlusUserAgent",
+          "default": "系统 UserAgent，并添加 `uni-app Html5Plus/1.0`",
+          "description": "应用 UserAgent 相关配置"
+        },
+        "useragent_android": {
+          "$ref": "#/definitions/AppPlusUserAgent",
+          "description": "Android 平台应用 UserAgent 相关配置，优先级高于 UserAgent 配置"
+        },
+        "useragent_ios": {
+          "$ref": "#/definitions/AppPlusUserAgent",
+          "description": "iOS 平台应用 UserAgent 相关配置，优先级高于 UserAgent 配置"
+        },
+        "webView": {
+          "description": "系统 webview 低于指定版本时，会弹出提示，或者下载 x5 内核后继续启动，仅 Android 支持",
+          "properties": {
+            "minUserAgentVersion": {
+              "description": "最小 webview 版本\n\n当低于最小版本要求时，显示弹框，点击确定退出应用\n\nVue3 要求 Android 系统 webview 最低版本为 64.0.3282.116",
+              "examples": ["64.0.3282.116"],
+              "type": "string"
+            },
+            "x5": {
+              "description": "X5 内核配置，启用 Android X5 Webview 模块后生效",
+              "properties": {
+                "allowDownloadWithoutWiFi": {
+                  "default": false,
+                  "description": "是否允许用户在非 WiFi 网络时直接下载 X5 内核\n\ntrue 不弹框询问用户直接下载\n\nfalse 且 showTipsWithoutWifi 为 true，弹框询问用户，确认再下载\n\nfalse 且 showTipsWithoutWifi 为 false，不弹框不下载",
+                  "type": "boolean"
+                },
+                "showTipsWithoutWifi": {
+                  "default": false,
+                  "description": "是否在非 WiFi 网络环境时弹框询问用户是否确认下载 X5 内核\n\ntrue 弹框\n\nfalse 不弹框",
+                  "type": "boolean"
+                },
+                "timeOut": {
+                  "default": 3000,
+                  "description": "超时时间",
+                  "type": "number"
+                }
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "AppPlusPermissionPrompt": {
+      "description": "App 平台权限申请策略配置",
+      "properties": {
+        "prompt": {
+          "description": "用户拒绝时弹出提示框上的内容，国际化配置参考 <https://ask.dcloud.net.cn/article/35860#strings>",
+          "type": "string"
+        },
+        "request": {
+          "description": "权限申请策略\n\n\"none\" 启动时不申请\n\n\"once\" 第一次启动时申请，用户可以拒绝\n\n\"always\" 每次启动都申请，用户必须允许，用户拒绝时弹出提示框引导用户重新允许",
+          "enum": ["none", "once", "always"],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "AppPlusScreenOrientation": {
+      "description": "重力感应、横竖屏方向\n\n\"portrait-primary\" 竖屏正方向\n\n\"portrait-secondary\" 竖屏反方向\n\n\"landscape-primary\" 横屏正方向\n\n\"landscape-secondary\" 横屏反方向",
+      "enum": [
+        "portrait-primary",
+        "portrait-secondary",
+        "landscape-primary",
+        "landscape-secondary"
+      ],
+      "type": "string"
+    },
+    "AppPlusUserAgent": {
+      "description": "App 平台 UserAgent 相关配置",
+      "properties": {
+        "concatenate": {
+          "default": false,
+          "description": "是否将 value 值作为追加值连接到系统默认 UserAgent 值之后",
+          "type": "boolean"
+        },
+        "value": {
+          "description": "设置的默认 UserAgent 值",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "AppSplashScreen": {
+      "description": "uni-app-x 启动界面关闭时机配置\n\n详见 <https://doc.dcloud.net.cn/uni-app-x/collocation/manifest-android.html#android平台splash关闭时机>",
+      "properties": {
+        "autoClose": {
+          "default": "onShow",
+          "description": "启动界面关闭时机",
+          "enum": ["onShow", "onReady"],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "AppSplashScreens": {
+      "description": "uni-app-x App 端启动界面配置\n\n详见 <https://doc.dcloud.net.cn/uni-app-x/collocation/manifest.html#distribute-splashscreens>",
+      "properties": {
+        "android": {
+          "$ref": "#/definitions/AppSplashScreensAndroid",
+          "description": "Android 平台启动界面配置"
+        },
+        "android12": {
+          "$ref": "#/definitions/AppSplashScreensAndroid12",
+          "description": "Android12 启动界面配置，无此配置项表示不适配支持 Android12 启动界面"
+        },
+        "ios": {
+          "$ref": "#/definitions/AppSplashScreensIos",
+          "description": "iOS 平台启动界面配置"
+        }
+      },
+      "type": "object"
+    },
+    "AppSplashScreensAndroid": {
+      "description": "uni-app-x Android 平台启动界面配置\n\n详见 <https://doc.dcloud.net.cn/uni-app-x/collocation/manifest.html#splashscreens-android>",
+      "properties": {
+        "background@night": {
+          "description": "暗色模式下的启动界面背景色，仅 Android12 及以上设备生效\n\n详见 <https://doc.dcloud.net.cn/uni-app-x/collocation/manifest-android.html#配置启动界面背景颜色>",
+          "type": "string"
+        },
+        "hdpi": {
+          "description": "适用于（hdpi）密度屏幕（~240dpi），建议分辨率 480x800，通常可以不用设置这项",
+          "type": "string"
+        },
+        "ldpi": {
+          "description": "适用于（ldpi）密度屏幕（~120dpi），建议分辨率 240x320，通常可以不用设置这项",
+          "type": "string"
+        },
+        "mdpi": {
+          "description": "适用于（mdpi）密度屏幕（~160dpi），建议分辨率 320x480，通常可以不用设置这项",
+          "type": "string"
+        },
+        "xhdpi": {
+          "description": "适用于（xhdpi）密度屏幕（~320dpi），建议分辨率 720x1280",
+          "type": "string"
+        },
+        "xxhdpi": {
+          "description": "适用于（xxhdpi）密度屏幕（~480dpi），建议分辨率 1080x1920",
+          "type": "string"
+        },
+        "xxxhdpi": {
+          "description": "适用于（xxxhdpi）密度屏幕（~640dpi），建议分辨率 2160x3840",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "AppSplashScreensAndroid12": {
+      "description": "uni-app-x Android12 启动界面配置\n\n详见 <https://doc.dcloud.net.cn/uni-app-x/collocation/manifest.html#splashscreen-android12>",
+      "properties": {
+        "background": {
+          "description": "仅在 Android12 及以上设备生效，默认值为白色",
+          "type": "string"
+        },
+        "brand": {
+          "$ref": "#/definitions/AppSplashScreensAndroid12Brand",
+          "description": "Android12 启动界面底部品牌图标"
+        },
+        "icon": {
+          "$ref": "#/definitions/AppSplashScreensAndroid12Icon",
+          "description": "Android12 启动界面中部 Logo 图标"
+        }
+      },
+      "type": "object"
+    },
+    "AppSplashScreensAndroid12Brand": {
+      "description": "uni-app-x Android12 启动界面底部品牌图标配置\n\n详见 <https://doc.dcloud.net.cn/uni-app-x/collocation/manifest.html#android12-brand>",
+      "properties": {
+        "xhdpi": {
+          "description": "适用于（xhdpi）密度屏幕（~320dpi），建议分辨率 400x160",
+          "type": "string"
+        },
+        "xxhdpi": {
+          "description": "适用于（xxhdpi）密度屏幕（~480dpi），建议分辨率 600x240",
+          "type": "string"
+        },
+        "xxxhdpi": {
+          "description": "适用于（xxxhdpi）密度屏幕（~640dpi），建议分辨率 800x320",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "AppSplashScreensAndroid12Icon": {
+      "description": "uni-app-x Android12 启动界面 Logo 图标配置\n\n详见 <https://doc.dcloud.net.cn/uni-app-x/collocation/manifest.html#android12-icon>",
+      "properties": {
+        "xhdpi": {
+          "description": "适用于（xhdpi）密度屏幕（~320dpi），建议分辨率 480x480",
+          "type": "string"
+        },
+        "xxhdpi": {
+          "description": "适用于（xxhdpi）密度屏幕（~480dpi），建议分辨率 720x720",
+          "type": "string"
+        },
+        "xxxhdpi": {
+          "description": "适用于（xxxhdpi）密度屏幕（~640dpi），建议分辨率 960x960",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "AppSplashScreensIos": {
+      "description": "uni-app-x iOS 平台启动界面配置\n\n详见 <https://doc.dcloud.net.cn/uni-app-x/collocation/manifest.html#distribute-splashscreens-3>",
+      "properties": {
+        "storyboard": {
+          "description": "用于 iOS 平台自定义 storyboard 启动界面",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "H5": {
+      "properties": {
+        "async": {
+          "description": "加载相关设置，详见 <https://uniapp.dcloud.net.cn/collocation/manifest.html#h5-async>",
+          "properties": {
+            "delay": {
+              "default": 200,
+              "description": "显示加载中组件的延时时间，如果在延时内加载完成，则不会显示加载中组件，单位为 ms",
+              "type": "number"
+            },
+            "error": {
+              "default": "AsyncError",
+              "description": "页面 JavaScript 加载失败时使用的组件，需注册为全局组件",
+              "type": "string"
+            },
+            "loading": {
+              "default": "AsyncLoading",
+              "description": "页面 JavaScript 加载时使用的组件，需注册为全局组件",
+              "type": "string"
+            },
+            "timeout": {
+              "default": 60000,
+              "description": "加载超时时间，如果超时，则显示加载失败组件，单位为 ms",
+              "type": "number"
+            }
+          },
+          "type": "object"
+        },
+        "darkmode": {
+          "description": "是否开启暗黑模式，详见 <https://uniapp.dcloud.net.cn/tutorial/darkmode.html#h5>",
+          "type": "boolean"
+        },
+        "devServer": {
+          "description": "开发环境 server 设置，详见 <https://uniapp.dcloud.net.cn/collocation/manifest.html#devserver>",
+          "properties": {
+            "disableHostCheck": {
+              "default": false,
+              "description": "是否禁用 host 检查",
+              "type": "boolean"
+            },
+            "https": {
+              "default": false,
+              "description": "是否启用 HTTPS 协议",
+              "type": "boolean"
+            },
+            "port": {
+              "default": "Vue2 8080, Vue3 3000",
+              "description": "开发服务端口",
+              "type": "number"
+            }
+          },
+          "type": "object"
+        },
+        "optimization": {
+          "description": "打包优化配置，详见 <https://uniapp.dcloud.net.cn/collocation/manifest.html#optimization>",
+          "properties": {
+            "prefetch": {
+              "default": false,
+              "description": "资源预获取",
+              "type": "boolean"
+            },
+            "preload": {
+              "default": false,
+              "description": "资源预加载",
+              "type": "boolean"
+            },
+            "treeShaking": {
+              "description": "摇树优化，详见 <https://uniapp.dcloud.net.cn/collocation/manifest.html#treeshaking>",
+              "properties": {
+                "enable": {
+                  "default": false,
+                  "description": "是否开启摇树优化",
+                  "type": "boolean"
+                }
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        },
+        "publicPath": {
+          "description": "引用资源的地址前缀，仅 Vue2 发布时生效，详见 <https://uniapp.dcloud.net.cn/collocation/manifest.html#publicpath>",
+          "type": "string"
+        },
+        "router": {
+          "description": "路由设置，详见 <https://uniapp.dcloud.net.cn/collocation/manifest.html#h5-router>",
+          "properties": {
+            "base": {
+              "default": "/",
+              "description": "应用基础路径",
+              "type": "string"
+            },
+            "mode": {
+              "default": "hash",
+              "description": "路由跳转模式",
+              "enum": ["hash", "history"],
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "sdkConfigs": {
+          "description": "SDK 配置",
+          "properties": {
+            "maps": {
+              "description": "地图服务商 SDK 配置，使用地图以及位置（IP 定位及坐标转换）需要配置此项",
+              "properties": {
+                "amap": {
+                  "description": "高德地图，HBuilderX 3.6.0+",
+                  "properties": {
+                    "key": {
+                      "description": "高德地图密钥，申请地址 <https://console.amap.com/dev/key/app>",
+                      "type": "string"
+                    },
+                    "securityJsCode": {
+                      "description": "高德地图安全密钥，申请地址 <https://console.amap.com/dev/key/app>",
+                      "type": "string"
+                    },
+                    "serviceHost": {
+                      "description": "高德地图安全密钥代理服务器地址，参考 <https://lbs.amap.com/api/jsapi-v2/guide/abc/prepare>",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "bmap": {
+                  "description": "百度地图，HBuilderX 3.99+",
+                  "properties": {
+                    "key": {
+                      "description": "百度地图密钥，申请地址 <http://lbsyun.baidu.com/apiconsole/key#/home>",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "google": {
+                  "description": "谷歌地图，HBuilderX 3.2.10+",
+                  "properties": {
+                    "key": {
+                      "description": "谷歌地图密钥，申请地址 <https://developers.google.com/maps/documentation/javascript/get-api-key>",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "qqmap": {
+                  "description": "腾讯地图，HBuilderX 4.36 以下版本使用",
+                  "properties": {
+                    "key": {
+                      "description": "腾讯地图密钥，申请地址 <https://lbs.qq.com/dev/console/key/manage>",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "tencent": {
+                  "description": "腾讯地图，HBuilderX 4.36 及以上版本使用",
+                  "properties": {
+                    "key": {
+                      "description": "腾讯地图密钥，申请地址 <https://lbs.qq.com/dev/console/key/manage>",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        },
+        "template": {
+          "description": "相对于应用根目录的 index.html 模板路径，可定制生成的 HTML 代码，详见 <https://uniapp.dcloud.net.cn/collocation/manifest.html#h5-template>\n\nVue3 暂不支持",
+          "type": "string"
+        },
+        "themeLocation": {
+          "default": "theme.json",
+          "description": "主题配置文件路径，darkmode 开启时生效",
+          "type": "string"
+        },
+        "title": {
+          "description": "页面标题，默认使用顶层 name 字段",
+          "type": "string"
+        },
+        "uniStatistics": {
+          "$ref": "#/definitions/PlatformUniStatistics",
+          "description": "uni 统计配置项"
+        }
+      },
+      "type": "object"
+    },
+    "HBuilderX": {
+      "properties": {
+        "channel_list": {
+          "description": "云端打包时配置的自定义渠道信息",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "HEXColor": {
+      "type": "string"
+    },
+    "ManifestConfig": {
+      "description": "应用的配置文件，用于指定应用的名称、图标、权限等\n\nHBuilderX 创建的工程此文件在根目录，CLI 创建的工程此文件在 src 目录",
+      "properties": {
+        "__hbuilderx": {
+          "$ref": "#/definitions/HBuilderX",
+          "description": "HBuilderX 可视化界面相关操作配置"
+        },
+        "app": {
+          "$ref": "#/definitions/App",
+          "description": "uni-app x App 平台（原生 App）配置"
+        },
+        "app-android": {
+          "$ref": "#/definitions/AppAndroid",
+          "description": "uni-app x App-Android 平台配置"
+        },
+        "app-harmony": {
+          "$ref": "#/definitions/AppHarmony",
+          "description": "HarmonyOS 应用配置"
+        },
+        "app-ios": {
+          "$ref": "#/definitions/AppIos",
+          "description": "uni-app x iOS App 平台配置"
+        },
+        "app-plus": {
+          "$ref": "#/definitions/AppPlus",
+          "description": "APP 特有配置"
+        },
+        "appid": {
+          "description": "应用标识，由 DCloud 云端分配，详见 <https://ask.dcloud.net.cn/article/35907>",
+          "type": "string"
+        },
+        "debug": {
+          "default": false,
+          "description": "是否开启 debug 模式，开启后调试信息以 `info` 的形式给出，其信息有页面注册、页面路由、数据更新、事件触发等",
+          "type": "boolean"
+        },
+        "description": {
+          "description": "应用描述",
+          "type": "string"
+        },
+        "fallbackLocale": {
+          "description": "默认回退语言，当 locale 指定的语言不可用时使用",
+          "type": "string"
+        },
+        "h5": {
+          "$ref": "#/definitions/H5",
+          "description": "H5 配置"
+        },
+        "locale": {
+          "default": "auto",
+          "description": "当前默认语言，详见 <https://uniapp.dcloud.net.cn/api/ui/locale.html>",
+          "type": "string"
+        },
+        "mp-alipay": {
+          "$ref": "#/definitions/MpAlipay",
+          "description": "支付宝小程序特有配置"
+        },
+        "mp-baidu": {
+          "$ref": "#/definitions/MpBaidu",
+          "description": "百度小程序特有配置"
+        },
+        "mp-harmony": {
+          "$ref": "#/definitions/MpHarmony",
+          "description": "HarmonyOS 元服务配置"
+        },
+        "mp-kuaishou": {
+          "$ref": "#/definitions/MpKuaishou",
+          "description": "快手小程序特有配置"
+        },
+        "mp-lark": {
+          "$ref": "#/definitions/MpLark",
+          "description": "飞书小程序特有配置"
+        },
+        "mp-qq": {
+          "$ref": "#/definitions/MpQq",
+          "description": "QQ 小程序特有配置"
+        },
+        "mp-toutiao": {
+          "$ref": "#/definitions/MpToutiao",
+          "description": "字节跳动小程序特有配置"
+        },
+        "mp-weixin": {
+          "$ref": "#/definitions/MpWeixin",
+          "description": "微信小程序特有配置"
+        },
+        "mp-xhs": {
+          "$ref": "#/definitions/MpXhs",
+          "description": "小红书小程序特有配置"
+        },
+        "name": {
+          "description": "应用名称，安装 APP 后显示的名称",
+          "type": "string"
+        },
+        "networkTimeout": {
+          "description": "网络超时时间",
+          "properties": {
+            "connectSocket": {
+              "default": 60000,
+              "description": "uni.connectSocket 超时时间，单位为 ms",
+              "type": "number"
+            },
+            "downloadFile": {
+              "default": 60000,
+              "description": "uni.downloadFile 超时时间，单位为 ms",
+              "type": "number"
+            },
+            "request": {
+              "default": 60000,
+              "description": "uni.request 超时时间，单位为 ms",
+              "type": "number"
+            },
+            "uploadFile": {
+              "default": 60000,
+              "description": "uni.uploadFile 超时时间，单位为 ms",
+              "type": "number"
+            }
+          },
+          "type": "object"
+        },
+        "quickapp": {
+          "description": "快应用特有配置，即将支持",
+          "type": "object"
+        },
+        "quickapp-webview": {
+          "$ref": "#/definitions/QuickappWebview",
+          "description": "快应用特有配置"
+        },
+        "quickapp-webview-huawei": {
+          "$ref": "#/definitions/QuickappWebviewHuawei",
+          "description": "快应用华为特有配置"
+        },
+        "quickapp-webview-union": {
+          "$ref": "#/definitions/QuickappWebviewUnion",
+          "description": "快应用联盟特有配置"
+        },
+        "sassImplementationName": {
+          "default": "dart-sass",
+          "description": "使用的 SCSS 预编译库，仅限 Vue2 项目",
+          "enum": ["dart-sass", "node-sass"],
+          "type": "string"
+        },
+        "transformPx": {
+          "default": true,
+          "deprecated": true,
+          "description": "是否转换 px 为 rpx，仅部分平台支持，不推荐新项目启用此配置，建议设为 false",
+          "type": "boolean"
+        },
+        "uni-app-x": {
+          "$ref": "#/definitions/UniAppX",
+          "description": "存在 uni-app-x 节点则表示为 uni-app x 项目，uni-app x 独有配置\n\n详见 <https://doc.dcloud.net.cn/uni-app-x/collocation/manifest.html#manifest-uni-app-x>"
+        },
+        "uniStatistics": {
+          "$ref": "#/definitions/UniStatistics",
+          "description": "uni 统计配置 更多信息查看 <https://uniapp.dcloud.net.cn/uni-stat-v1.html> 和 <https://uniapp.dcloud.net.cn/uni-stat-v2.html>"
+        },
+        "versionCode": {
+          "description": "版本号",
+          "type": ["string", "number"]
+        },
+        "versionName": {
+          "description": "版本名称，在云打包和生成 wgt 资源时使用",
+          "type": "string"
+        },
+        "web": {
+          "$ref": "#/definitions/Web",
+          "description": "uni-app x Web 平台配置"
+        }
+      },
+      "required": [
+        "name",
+        "appid",
+        "description",
+        "versionName",
+        "versionCode"
+      ],
+      "type": "object"
+    },
+    "MaybeArray<(\"audio\"|\"bluetooth-central\"|\"bluetooth-peripheral\"|\"external-accessory\"|\"fetch\"|\"location\"|\"nearby-interaction\"|\"network-authentication\"|\"newsstand-content\"|\"processing\"|\"push-to-talk\"|\"remote-notification\"|\"voip\")>": {
+      "anyOf": [
+        {
+          "const": "audio",
+          "type": "string"
+        },
+        {
+          "const": "bluetooth-central",
+          "type": "string"
+        },
+        {
+          "const": "bluetooth-peripheral",
+          "type": "string"
+        },
+        {
+          "const": "external-accessory",
+          "type": "string"
+        },
+        {
+          "const": "fetch",
+          "type": "string"
+        },
+        {
+          "const": "location",
+          "type": "string"
+        },
+        {
+          "const": "nearby-interaction",
+          "type": "string"
+        },
+        {
+          "const": "network-authentication",
+          "type": "string"
+        },
+        {
+          "const": "newsstand-content",
+          "type": "string"
+        },
+        {
+          "const": "processing",
+          "type": "string"
+        },
+        {
+          "const": "push-to-talk",
+          "type": "string"
+        },
+        {
+          "const": "remote-notification",
+          "type": "string"
+        },
+        {
+          "const": "voip",
+          "type": "string"
+        },
+        {
+          "items": {
+            "enum": [
+              "audio",
+              "bluetooth-central",
+              "bluetooth-peripheral",
+              "external-accessory",
+              "fetch",
+              "location",
+              "nearby-interaction",
+              "network-authentication",
+              "newsstand-content",
+              "processing",
+              "push-to-talk",
+              "remote-notification",
+              "voip"
+            ],
+            "type": "string"
+          },
+          "type": "array"
+        }
+      ]
+    },
+    "MpAlipay": {
+      "properties": {
+        "assetsInclude": {
+          "description": "新版项目配置，用户构建后需要打包至产物中的资产\n\n字段接受一个字符串数组，支持 glob 语法，底层使用 minimatch 3.0.4 版本进行匹配",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "axmlStrictCheck": {
+          "default": false,
+          "description": "旧版项目配置，是否开启 axml 严格语法检查",
+          "type": "boolean"
+        },
+        "compileOptions": {
+          "description": "新版项目配置，编译相关的配置",
+          "properties": {
+            "component2": {
+              "default": false,
+              "description": "自定义组件是否开启新的生命周期运行模型，详见 <https://opendocs.alipay.com/mini/framework/component-lifecycle>\n\n如果在 app.json 中开启了 plugins 或 useDynamicPlugins 则会强制开启 component2 运行模式",
+              "type": "boolean"
+            },
+            "globalObjectMode": {
+              "description": "小程序全局对象（global/globalThis）访问策略，详见 <https://opendocs.alipay.com/mini/03dbc3#globalObjectMode>\n\n\"legacy\" 禁止访问全局对象\n\n\"enable\" 可访问到真实的小程序 JavaScript 全局对象  global 与 globalThis\n\n\"fake\" 可访问到一个全局挂载的虚拟空对象",
+              "enum": ["legacy", "enable", "fake"],
+              "type": "string"
+            },
+            "less": {
+              "default": false,
+              "description": "小程序是否启用 less 支持，详见 <https://opendocs.alipay.com/mini/02zko2>",
+              "type": "boolean"
+            },
+            "resolveAlias": {
+              "additionalProperties": {
+                "type": "string"
+              },
+              "description": "IDE 3.7.5 开始支持路径别名配置，详见 <https://opendocs.alipay.com/mini/03dbc3#resolveAlias>",
+              "type": "object"
+            },
+            "transpile": {
+              "description": "小程序代码转 ES5 配置（新），详见 <https://opendocs.alipay.com/mini/03dbc3#transpile>",
+              "properties": {
+                "script": {
+                  "description": "小程序代码转 ES5 配置",
+                  "properties": {
+                    "ignore": {
+                      "description": "通过 glob 规则跳过某些文件/目录的转译",
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "type": "object"
+                }
+              },
+              "type": "object"
+            },
+            "treeShaking": {
+              "default": false,
+              "description": "是否在生产构建时进行 tree shaking 优化",
+              "type": "boolean"
+            },
+            "typescript": {
+              "default": false,
+              "description": "小程序是否启用 typescript 支持，详见 <https://opendocs.alipay.com/mini/02zko2>",
+              "type": "boolean"
+            }
+          },
+          "type": "object"
+        },
+        "component2": {
+          "default": true,
+          "description": "旧版项目配置，是否启用 component2 编译，详见 <https://opendocs.alipay.com/mini/framework/custom-component-overview>",
+          "type": "boolean"
+        },
+        "developOptions": {
+          "description": "新版项目配置，本地开发的相关配置，详见 <https://opendocs.alipay.com/mini/03dbc3#developOptions>",
+          "properties": {
+            "hotReload": {
+              "default": false,
+              "description": "是否开启产物热更新，配置后开启模拟器热更新，支持 AXML、ACSS、JS 文件中的 method",
+              "type": "boolean"
+            },
+            "lazyCompile": {
+              "default": false,
+              "description": "IDE 3.8.8 开始支持，是否按需编译页面，以加快开发时构建速度\n\n必须在 app.json 中同时开启 lazyCodeLoading",
+              "type": "boolean"
+            },
+            "minify": {
+              "default": true,
+              "description": "IDE 3.8.1 开始支持，是否开启代码压缩",
+              "type": "boolean"
+            },
+            "parallel": {
+              "default": true,
+              "description": "是否开启多进程构建",
+              "type": "boolean"
+            },
+            "skipTranspile": {
+              "default": false,
+              "description": "IDE 3.8.8 开始支持，是否跳过 ES5 转译，以加快开发时构建速度",
+              "type": "boolean"
+            },
+            "sourcemap": {
+              "default": true,
+              "description": "IDE 3.8.1 开始支持，是否开启生成 sourcemap",
+              "type": "boolean"
+            }
+          },
+          "type": "object"
+        },
+        "enableAppxNg": {
+          "default": true,
+          "description": "旧版项目配置，是否启用小程序基础库 2.0 构建，详见 <https://opendocs.alipay.com/mini/framework/project>",
+          "type": "boolean"
+        },
+        "enableDistFileMinify": {
+          "default": false,
+          "description": "旧版项目配置，是否压缩编译产物，仅在真机预览/真机调试时生效",
+          "type": "boolean"
+        },
+        "enableNodeModuleBabelTransform": {
+          "default": true,
+          "description": "旧版项目配置， appx 2.0 特性，对 node_modules 中的模块做 babel 编译",
+          "type": "boolean"
+        },
+        "enableParallelLoader": {
+          "default": false,
+          "description": "旧版项目配置，是否启用多进程编译",
+          "type": "boolean"
+        },
+        "exclude": {
+          "description": "旧版项目配置，打包时需要忽略的文件/文件夹，遵循 Glob 语法，详见 <https://opendocs.alipay.com/mini/framework/project#exclude%20%E6%89%93%E5%8C%85%E9%BB%91%E5%90%8D%E5%8D%95>",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "format": {
+          "const": 2,
+          "description": "是否使用新版项目配置",
+          "type": "number"
+        },
+        "include": {
+          "description": "旧版项目配置，打包时需要包含的文件/文件夹，遵循 Glob 语法，详见 <https://opendocs.alipay.com/mini/framework/project#include%20%E6%89%93%E5%8C%85%E7%99%BD%E5%90%8D%E5%8D%95>",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "lazyCodeLoading": {
+          "description": "是否开启代码按需执行，详见 <https://opendocs.alipay.com/mini/framework/app-json#lazyCodeLoading>\n\n\"requiredComponents\" 按需加载页面\n\n\"renderedComponents\" 按需加载页面和组件",
+          "enum": ["requiredComponents", "renderedComponents"],
+          "type": "string"
+        },
+        "mergeVirtualHostAttributes": {
+          "description": "是否合并组件虚拟节点外层属性，uni-app 3.5.1+ 开始支持\n\n目前支持 id（v4.42+）、style（v3.5.1+）、class（v3.5.1+）以及 v-show 指令生成的 hidden（v4.41+）属性",
+          "type": "boolean"
+        },
+        "nativeTags": {
+          "description": "支付宝小程序平台的原生组件",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "nonLoadingIndicator": {
+          "default": true,
+          "description": "旧版项目配置，初始化小程序时，是否隐藏默认 loading 动画",
+          "type": "boolean"
+        },
+        "pluginResolution": {
+          "description": "新版项目配置，插件联调选项，详见 <https://opendocs.alipay.com/mini/03dbc3#pluginResolution>",
+          "properties": {
+            "dynamicPlugins": {
+              "additionalProperties": {
+                "properties": {
+                  "version": {
+                    "description": "插件联调版本信息",
+                    "type": "string"
+                  }
+                },
+                "required": ["version"],
+                "type": "object"
+              },
+              "description": "指定插件联调的动态插件版本",
+              "type": "object"
+            },
+            "enable": {
+              "default": false,
+              "description": "是否启用调试配置",
+              "type": "boolean"
+            },
+            "plugins": {
+              "additionalProperties": {
+                "properties": {
+                  "version": {
+                    "description": "插件联调版本信息",
+                    "type": "string"
+                  }
+                },
+                "required": ["version"],
+                "type": "object"
+              },
+              "description": "指定插件联调的静态插件版本",
+              "type": "object"
+            }
+          },
+          "type": "object"
+        },
+        "plugins": {
+          "additionalProperties": {
+            "type": "object"
+          },
+          "description": "使用到的插件，详见 <https://opendocs.alipay.com/mini/plugin/plugin-usage>",
+          "type": "object"
+        },
+        "scopedSlotsCompiler": {
+          "default": "auto",
+          "description": "Vue2 作用域插槽编译模式",
+          "enum": ["auto", "legacy", "augmented"],
+          "type": "string"
+        },
+        "scripts": {
+          "additionalProperties": false,
+          "description": "自定义预处理脚本，详见 <https://opendocs.alipay.com/mini/framework/project#%E9%A2%84%E5%A4%84%E7%90%86%E8%84%9A%E6%9C%AC>",
+          "properties": {
+            "beforeCompile": {
+              "type": "string"
+            },
+            "beforePreview": {
+              "type": "string"
+            },
+            "beforeUpload": {
+              "type": "string"
+            },
+            "watch": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "watch",
+            "beforeCompile",
+            "beforePreview",
+            "beforeUpload"
+          ],
+          "type": "object"
+        },
+        "slotMultipleInstance": {
+          "description": "模拟单个作用域插槽渲染为多个实例，此配置仅限 Vue2 环境 3.7.12+，Vue3 环境已默认支持",
+          "type": "boolean"
+        },
+        "styleIsolation": {
+          "default": "apply-shared",
+          "description": "组件样式隔离方式，uni-app 3.99+ 开始支持，详见 <https://opendocs.alipay.com/mini/framework/page-acss>",
+          "enum": ["apply-shared", "shared"],
+          "type": "string"
+        },
+        "uniStatistics": {
+          "$ref": "#/definitions/PlatformUniStatistics",
+          "description": "uni 统计配置项"
+        },
+        "uploadExclude": {
+          "description": "新版项目配置，用户本地代码上传时需要忽略的文件\n\n字段接受一个字符串数组，支持 glob 语法，底层使用 minimatch 3.0.4 版本进行匹配",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "MpBaidu": {
+      "properties": {
+        "appid": {
+          "description": "百度小程序的 appid",
+          "type": "string"
+        },
+        "dynamicLib": {
+          "additionalProperties": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "description": "动态库，详见 <https://smartprogram.baidu.com/docs/develop/framework/dynamiclib_use/>",
+          "type": "object"
+        },
+        "nativeTags": {
+          "description": "百度小程序平台的原生组件",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "optimization": {
+          "description": "优化配置",
+          "properties": {
+            "subPackages": {
+              "description": "是否开启分包优化",
+              "type": "boolean"
+            }
+          },
+          "type": "object"
+        },
+        "prefetches": {
+          "description": "预请求的所有 url 的列表，详见 <https://smartprogram.baidu.com/docs/develop/tutorial/process/#prefetches>",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "projectname": {
+          "description": "项目名称",
+          "type": "string"
+        },
+        "requiredBackgroundModes": {
+          "description": "需要在后台使用的能力\n\n\"audio\" 背景音频播放",
+          "items": {
+            "const": "audio",
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "scopedSlotsCompiler": {
+          "default": "auto",
+          "description": "Vue2 作用域插槽编译模式，uni-app 3.1.19+ 开始支持",
+          "enum": ["auto", "legacy", "augmented"],
+          "type": "string"
+        },
+        "slotMultipleInstance": {
+          "description": "模拟单个作用域插槽渲染为多个实例，此配置仅限 Vue2 环境 3.7.12+，Vue3 环境已默认支持",
+          "type": "boolean"
+        },
+        "uniStatistics": {
+          "$ref": "#/definitions/PlatformUniStatistics",
+          "description": "uni 统计配置项"
+        }
+      },
+      "type": "object"
+    },
+    "MpHarmony": {
+      "additionalProperties": {
+        "description": "其他扩展配置\n\n支持其他 HarmonyOS 元服务平台特有的配置项"
+      },
+      "description": "HarmonyOS 元服务配置\n\n鸿蒙元服务项目设置，目前只支持一个 distribute 属性",
+      "properties": {
+        "distribute": {
+          "$ref": "#/definitions/MpHarmonyDistribute",
+          "description": "HarmonyOS 元服务分发配置\n\n包含元服务包名、签名配置、原生组件等分发相关的设置"
+        }
+      },
+      "type": "object"
+    },
+    "MpHarmonyDistribute": {
+      "additionalProperties": false,
+      "description": "HarmonyOS 元服务分发配置",
+      "properties": {
+        "bundleName": {
+          "description": "元服务包名\n\n固定格式为 com.atomicservice.[纯数字 appId]",
+          "type": "string"
+        },
+        "nativeTags": {
+          "description": "鸿蒙元服务平台的原生组件\n\n支持版本：4.81+",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "signingConfigs": {
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/MpHarmonySigningConfig"
+              },
+              {
+                "not": {}
+              }
+            ],
+            "description": "其他签名配置"
+          },
+          "description": "证书签名配置\n\n用于配置鸿蒙打包时使用的数字签名证书信息，可分别配置调试证书和发布证书两组信息",
+          "properties": {
+            "default": {
+              "$ref": "#/definitions/MpHarmonySigningConfig",
+              "description": "调试证书配置"
+            },
+            "release": {
+              "$ref": "#/definitions/MpHarmonySigningConfig",
+              "description": "发布证书配置"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "MpHarmonySigningConfig": {
+      "additionalProperties": false,
+      "description": "HarmonyOS 元服务签名配置",
+      "properties": {
+        "certpath": {
+          "description": "证书文件\n\n指向 .cer 证书文件的路径",
+          "type": "string"
+        },
+        "keyAlias": {
+          "description": "私钥库里面的私钥别名\n\n用于标识密钥的别名，如 debugKey",
+          "type": "string"
+        },
+        "keyPassword": {
+          "description": "私钥访问密码\n\n用于访问私钥的加密密码",
+          "type": "string"
+        },
+        "profile": {
+          "description": "签名描述文件",
+          "type": "string"
+        },
+        "signAlg": {
+          "description": "签名算法，固定为 \"SHA256withECDSA\"",
+          "type": "string"
+        },
+        "storeFile": {
+          "description": "私钥库文件",
+          "type": "string"
+        },
+        "storePassword": {
+          "description": "私钥库访问密码\n\n用于访问密钥库的加密密码",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "MpKuaishou": {
+      "properties": {
+        "appid": {
+          "description": "快手小程序的 appid",
+          "type": "string"
+        },
+        "nativeTags": {
+          "description": "快手小程序平台的原生组件",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "optimization": {
+          "description": "优化配置",
+          "properties": {
+            "subPackages": {
+              "description": "是否开启分包优化",
+              "type": "boolean"
+            }
+          },
+          "type": "object"
+        },
+        "projectname": {
+          "description": "项目名称",
+          "type": "string"
+        },
+        "scopedSlotsCompiler": {
+          "default": "augmented",
+          "description": "Vue2 作用域插槽编译模式，uni-app 3.1.19+ 开始支持",
+          "enum": ["auto", "legacy", "augmented"],
+          "type": "string"
+        },
+        "slotMultipleInstance": {
+          "description": "模拟单个作用域插槽渲染为多个实例，此配置仅限 Vue2 环境 3.7.12+，Vue3 环境已默认支持",
+          "type": "boolean"
+        },
+        "uniStatistics": {
+          "$ref": "#/definitions/PlatformUniStatistics",
+          "description": "uni 统计配置项"
+        }
+      },
+      "type": "object"
+    },
+    "MpLark": {
+      "properties": {
+        "appid": {
+          "description": "飞书小程序的 appid",
+          "type": "string"
+        },
+        "nativeTags": {
+          "description": "飞书小程序平台的原生组件",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "projectname": {
+          "description": "项目名称",
+          "type": "string"
+        },
+        "scopedSlotsCompiler": {
+          "default": "auto",
+          "description": "Vue2 作用域插槽编译模式，uni-app 3.1.19+ 开始支持",
+          "enum": ["auto", "legacy", "augmented"],
+          "type": "string"
+        },
+        "setting": {
+          "description": "飞书小程序项目设置",
+          "properties": {
+            "babelSetting": {
+              "additionalProperties": false,
+              "description": "Babel 的配置项",
+              "properties": {
+                "ignore": {
+                  "description": "需要跳过 Babel 编译（包括代码压缩）处理的文件或目录",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                }
+              },
+              "type": "object"
+            },
+            "es6": {
+              "default": true,
+              "description": "是否启用 ES6 转 ES5",
+              "type": "boolean"
+            },
+            "minified": {
+              "default": true,
+              "description": "上传代码时是否自动压缩",
+              "type": "boolean"
+            },
+            "postcss": {
+              "description": "上传代码时样式是否自动补全",
+              "type": "boolean"
+            },
+            "urlCheck": {
+              "description": "是否校验合法域名、web-view（业务域名）、TLS 版本以及 HTTPS 证书",
+              "type": "boolean"
+            }
+          },
+          "type": "object"
+        },
+        "slotMultipleInstance": {
+          "description": "模拟单个作用域插槽渲染为多个实例，此配置仅限 Vue2 环境 3.7.12+，Vue3 环境已默认支持",
+          "type": "boolean"
+        },
+        "uniStatistics": {
+          "$ref": "#/definitions/PlatformUniStatistics",
+          "description": "uni 统计配置项"
+        }
+      },
+      "type": "object"
+    },
+    "MpQq": {
+      "properties": {
+        "appid": {
+          "description": "QQ 小程序的 appid",
+          "type": "string"
+        },
+        "groupIdList": {
+          "description": "需要打开群资料卡的群号列表，详见 <https://q.qq.com/wiki/develop/miniprogram/frame/dispose.html#groupidlist>",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "nativeTags": {
+          "description": "QQ 小程序平台的原生组件",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "navigateToMiniProgramAppIdList": {
+          "description": "需要跳转的 QQ 小程序列表，详见 <https://q.qq.com/wiki/develop/miniprogram/frame/dispose.html#navigatetominiprogramappidlist>",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "optimization": {
+          "description": "优化配置",
+          "properties": {
+            "subPackages": {
+              "description": "是否开启分包优化",
+              "type": "boolean"
+            }
+          },
+          "type": "object"
+        },
+        "permission": {
+          "additionalProperties": false,
+          "description": "接口权限设置，详见 <https://q.qq.com/wiki/develop/miniprogram/frame/dispose.html#permission>",
+          "properties": {
+            "scope.userLocation": {
+              "additionalProperties": false,
+              "properties": {
+                "desc": {
+                  "description": "小程序获取权限时展示的接口用途说明",
+                  "type": "string"
+                }
+              },
+              "required": ["desc"],
+              "type": "object"
+            }
+          },
+          "required": ["scope.userLocation"],
+          "type": "object"
+        },
+        "projectname": {
+          "description": "项目名称",
+          "type": "string"
+        },
+        "requiredBackgroundModes": {
+          "description": "需要在后台使用的能力，详见 <https://q.qq.com/wiki/develop/miniprogram/frame/dispose.html#requiredbackgroundmodes>\n\n\"audio\" 后台音乐播放",
+          "items": {
+            "const": "audio",
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "scopedSlotsCompiler": {
+          "default": "auto",
+          "description": "Vue2 作用域插槽编译模式，uni-app 3.1.19+ 开始支持",
+          "enum": ["auto", "legacy", "augmented"],
+          "type": "string"
+        },
+        "slotMultipleInstance": {
+          "description": "模拟单个作用域插槽渲染为多个实例，此配置仅限 Vue2 环境 3.7.12+，Vue3 环境已默认支持",
+          "type": "boolean"
+        },
+        "uniStatistics": {
+          "$ref": "#/definitions/PlatformUniStatistics",
+          "description": "uni 统计配置项"
+        },
+        "workers": {
+          "description": "Worker 代码目录，详见 <https://q.qq.com/wiki/develop/miniprogram/frame/dispose.html#workers>",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "MpToutiao": {
+      "properties": {
+        "appid": {
+          "description": "字节跳动小程序的 appid",
+          "type": "string"
+        },
+        "nativeTags": {
+          "description": "字节跳动小程序平台的原生组件",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "navigateToMiniProgramAppIdList": {
+          "description": "需要跳转的字节跳动小程序列表",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "optimization": {
+          "description": "优化配置",
+          "properties": {
+            "subPackages": {
+              "description": "是否开启分包优化",
+              "type": "boolean"
+            }
+          },
+          "type": "object"
+        },
+        "projectname": {
+          "description": "项目名称",
+          "type": "string"
+        },
+        "scopedSlotsCompiler": {
+          "default": "auto",
+          "description": "Vue2 作用域插槽编译模式，uni-app 3.1.19+ 开始支持",
+          "enum": ["auto", "legacy", "augmented"],
+          "type": "string"
+        },
+        "setting": {
+          "description": "字节跳动小程序项目设置",
+          "properties": {
+            "autoCompile": {
+              "description": "修改文件的时候是否自动编译",
+              "type": "boolean"
+            },
+            "es6": {
+              "description": "是否启用 ES6 转 ES5",
+              "type": "boolean"
+            },
+            "minified": {
+              "description": "上传代码时是否自动压缩脚本文件",
+              "type": "boolean"
+            },
+            "mockLogin": {
+              "description": "是否开启宿主登录模拟",
+              "type": "boolean"
+            },
+            "mockUpdate": {
+              "description": "下次编译是否模拟更新",
+              "type": "boolean"
+            },
+            "postcss": {
+              "description": "上传代码时样式是否自动补全",
+              "type": "boolean"
+            },
+            "scripts": {
+              "description": "是否启动自定义处理命令",
+              "type": "boolean"
+            },
+            "urlCheck": {
+              "description": "是否校验合法域名、web-view（业务域名）、TLS 版本以及 HTTPS 证书",
+              "type": "boolean"
+            }
+          },
+          "type": "object"
+        },
+        "slotMultipleInstance": {
+          "description": "模拟单个作用域插槽渲染为多个实例，此配置仅限 Vue2 环境 3.7.12+，Vue3 环境已默认支持",
+          "type": "boolean"
+        },
+        "uniStatistics": {
+          "$ref": "#/definitions/PlatformUniStatistics",
+          "description": "uni 统计配置项"
+        }
+      },
+      "type": "object"
+    },
+    "MpWeixin": {
+      "properties": {
+        "appid": {
+          "description": "微信小程序的 appid",
+          "type": "string"
+        },
+        "cloudfunctionRoot": {
+          "description": "云开发代码目录，详见 <https://uniapp.dcloud.net.cn/collocation/manifest.html#cloudfunctionroot>",
+          "type": "string"
+        },
+        "darkmode": {
+          "description": "是否开启暗黑模式，详见 <https://uniapp.dcloud.net.cn/tutorial/darkmode.html#mp-weixin>",
+          "type": "boolean"
+        },
+        "embeddedAppIdList": {
+          "description": "要半屏跳转的小程序 appid，详见 <https://developers.weixin.qq.com/miniprogram/dev/framework/open-ability/openEmbeddedMiniProgram.html>",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "enableVirtualHost": {
+          "default": true,
+          "description": "是否为组件启用 virtualHost，默认启用",
+          "type": "boolean"
+        },
+        "functionalPages": {
+          "default": false,
+          "description": "是否启用插件功能页",
+          "type": "boolean"
+        },
+        "independent": {
+          "description": "vue2 微信小程序是否开启独立分包",
+          "type": "boolean"
+        },
+        "lazyCodeLoading": {
+          "const": "requiredComponents",
+          "description": "目前仅支持值 \"requiredComponents\"，代表开启小程序按需注入特性，详见 <https://developers.weixin.qq.com/miniprogram/dev/reference/configuration/app.html#lazyCodeLoading>",
+          "type": "string"
+        },
+        "libVersion": {
+          "description": "基础库版本",
+          "type": "string"
+        },
+        "mergeVirtualHostAttributes": {
+          "description": "是否合并组件虚拟节点外层属性，uni-app 3.5.1+ 开始支持\n\n目前支持 id（v4.42+）、style（v3.5.1+）、class（v3.5.1+）以及 v-show 指令生成的 hidden（v4.41+）属性",
+          "type": "boolean"
+        },
+        "nativeTags": {
+          "description": "微信小程序平台的原生组件，详见 <https://uniapp.dcloud.net.cn/collocation/manifest.html#mp-weixin>",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "navigateToMiniProgramAppIdList": {
+          "description": "需要跳转的微信小程序列表，详见 <https://developers.weixin.qq.com/minigame/dev/reference/configuration/app.html#navigateToMiniProgramAppIdList>",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "optimization": {
+          "description": "优化配置",
+          "properties": {
+            "subPackages": {
+              "description": "是否开启分包优化",
+              "type": "boolean"
+            }
+          },
+          "type": "object"
+        },
+        "permission": {
+          "additionalProperties": false,
+          "description": "接口权限设置，详见 <https://developers.weixin.qq.com/miniprogram/dev/reference/configuration/app.html#permission>",
+          "properties": {
+            "scope.userFuzzyLocation": {
+              "additionalProperties": false,
+              "properties": {
+                "desc": {
+                  "description": "小程序获取权限时展示的接口用途说明",
+                  "type": "string"
+                }
+              },
+              "required": ["desc"],
+              "type": "object"
+            },
+            "scope.userLocation": {
+              "additionalProperties": false,
+              "properties": {
+                "desc": {
+                  "description": "小程序获取权限时展示的接口用途说明",
+                  "type": "string"
+                }
+              },
+              "required": ["desc"],
+              "type": "object"
+            },
+            "scope.userLocationBackground": {
+              "additionalProperties": false,
+              "properties": {
+                "desc": {
+                  "description": "小程序获取权限时展示的接口用途说明",
+                  "type": "string"
+                }
+              },
+              "required": ["desc"],
+              "type": "object"
+            }
+          },
+          "type": "object"
+        },
+        "plugins": {
+          "additionalProperties": {
+            "type": "object"
+          },
+          "description": "使用到的插件",
+          "type": "object"
+        },
+        "projectname": {
+          "description": "项目名称",
+          "type": "string"
+        },
+        "requiredBackgroundModes": {
+          "description": "需要在后台使用的能力，详见 <https://developers.weixin.qq.com/miniprogram/dev/reference/configuration/app.html#requiredBackgroundModes>\n\n\"audio\" 后台音乐播放\n\n\"location\" 后台定位",
+          "items": {
+            "enum": ["audio", "location"],
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "requiredPrivateInfos": {
+          "description": "地理位置相关接口，详见 <https://developers.weixin.qq.com/miniprogram/dev/reference/configuration/app.html#requiredPrivateInfos>",
+          "items": {
+            "enum": [
+              "getFuzzyLocation",
+              "getLocation",
+              "onLocationChange",
+              "startLocationUpdate",
+              "startLocationUpdateBackground",
+              "chooseLocation",
+              "choosePoi",
+              "chooseAddress"
+            ],
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "resizable": {
+          "default": false,
+          "description": "在 iPad 上小程序是否支持屏幕旋转",
+          "type": "boolean"
+        },
+        "scopedSlotsCompiler": {
+          "default": "auto",
+          "description": "Vue2 作用域插槽编译模式，uni-app 3.1.19+ 开始支持",
+          "enum": ["auto", "legacy", "augmented"],
+          "type": "string"
+        },
+        "setting": {
+          "additionalProperties": false,
+          "description": "微信小程序项目设置，详见 <https://developers.weixin.qq.com/miniprogram/dev/devtools/projectconfig.html#setting>",
+          "properties": {
+            "autoAudits": {
+              "description": "是否自动运行体验评分",
+              "type": "boolean"
+            },
+            "babelSetting": {
+              "description": "增强编译 Babel 的配置项",
+              "properties": {
+                "ignore": {
+                  "description": "需要跳过 Babel 编译（包括代码压缩）处理的文件或目录",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "outputPath": {
+                  "default": "@babel/runtime",
+                  "description": "Babel 辅助函数的输出目录",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "bigPackageSizeSupport": {
+              "default": true,
+              "description": "预览及真机调试的时主包、分包体积上限是否调整为小程序 4M、小游戏 8M",
+              "type": "boolean"
+            },
+            "checkInvalidKey": {
+              "description": "是否展示 JSON 文件校验错误信息",
+              "type": "boolean"
+            },
+            "checkSiteMap": {
+              "description": "是否检查 SiteMap 索引",
+              "type": "boolean"
+            },
+            "compileHotReLoad": {
+              "description": "是否启用代码自动热重载",
+              "type": "boolean"
+            },
+            "condition": {
+              "description": "是否启用条件编译，详见 <https://dev.weixin.qq.com/docs/framework/dev/framework/operation/condition-compile.html>",
+              "type": "boolean"
+            },
+            "coverView": {
+              "description": "是否使用工具渲染 CoverView",
+              "type": "boolean"
+            },
+            "disableUseStrict": {
+              "description": "将 JS 编译成 ES5 时，是否禁用严格模式",
+              "type": "boolean"
+            },
+            "enableEngineNative": {
+              "description": "是否在游戏引擎项目中开启支持引用 node 原生模块的底层加速特性",
+              "type": "boolean"
+            },
+            "enhance": {
+              "description": "是否使用增强编译\n\n`es6` 和 `enhance` 需同时为 true/false，对应于 `将 JS 编译成 ES5`",
+              "type": "boolean"
+            },
+            "es6": {
+              "description": "是否启用 ES6 转 ES5\n\n`es6` 和 `enhance` 需同时为 true/false，对应于 `将 JS 编译成 ES5`",
+              "type": "boolean"
+            },
+            "es7": {
+              "description": "是否使用增强编译，支持 ES7 语法，详见 <https://developers.weixin.qq.com/community/develop/doc/0002ce07a58000a57c5da5e6456c09>",
+              "type": "boolean"
+            },
+            "ignoreCodeQuality": {
+              "default": false,
+              "description": "预览、真机调试上传等开发阶段是否不执行代码质量检测",
+              "type": "boolean"
+            },
+            "ignoreDevUnusedFiles": {
+              "default": true,
+              "description": "预览、真机调试和本地模拟器等开发阶段是否过滤无依赖文件",
+              "type": "boolean"
+            },
+            "ignoreUploadUnusedFiles": {
+              "description": "上传时是否过滤无依赖文件",
+              "type": "boolean"
+            },
+            "lazyloadPlaceholderEnable": {
+              "description": "是否启用懒注入占位组件调试",
+              "type": "boolean"
+            },
+            "localPlugins": {
+              "description": "在小游戏插件项目中，是否启用\"以本地目录为插件资源来源\"特性",
+              "type": "boolean"
+            },
+            "minified": {
+              "description": "上传代码时是否自动压缩脚本文件",
+              "type": "boolean"
+            },
+            "minifyWXML": {
+              "description": "上传代码时是否自动压缩 WXML 文件",
+              "type": "boolean"
+            },
+            "minifyWXMLSetting": {
+              "additionalProperties": false,
+              "description": "压缩 wxml 的配置项",
+              "properties": {
+                "collapseWhitespace": {
+                  "default": true,
+                  "description": "是否压缩空格\n\ntrue: 标签内所有连续空白符会被压缩成 1 个空格，换行的情况按 preserveLineBreaks 处理",
+                  "type": "boolean"
+                },
+                "conservativeCollapse": {
+                  "default": false,
+                  "description": "false: 标签前后不保留空格\n\ntrue: 如果有空格，标签前后会保留一个空格",
+                  "type": "boolean"
+                },
+                "preserveLineBreaks": {
+                  "default": false,
+                  "description": "false: 按 collapseWhitespace 处理\n\ntrue: 所有换行都会被保留",
+                  "type": "boolean"
+                }
+              },
+              "type": "object"
+            },
+            "minifyWXSS": {
+              "description": "上传代码时是否自动压缩样式文件",
+              "type": "boolean"
+            },
+            "packNpmManually": {
+              "description": "是否手动配置构建 npm 的路径",
+              "type": "boolean"
+            },
+            "packNpmRelationList": {
+              "description": "仅 packNpmManually 为 true 时生效，详见 <https://developers.weixin.qq.com/miniprogram/dev/devtools/npm.html>",
+              "items": {
+                "properties": {
+                  "miniprogramNpmDistDir": {
+                    "description": "node_modules 的构建结果目标位置",
+                    "type": "string"
+                  },
+                  "packageJsonPath": {
+                    "description": "node_modules 源对应的 package.json",
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "postcss": {
+              "description": "上传代码时样式是否自动补全",
+              "type": "boolean"
+            },
+            "preloadBackgroundData": {
+              "description": "是否启用数据预拉取",
+              "type": "boolean"
+            },
+            "showES6CompileOption": {
+              "description": "是否在本地设置中展示传统的 ES6 转 ES5 开关（对应 es6），增强编译开关（对应 enhance）",
+              "type": "boolean"
+            },
+            "showShadowRootInWxmlPanel": {
+              "description": "是否开启调试器 WXML 面板展示 shadow-root",
+              "type": "boolean"
+            },
+            "skylineRenderEnable": {
+              "description": "是否开启 skyline 渲染调试",
+              "type": "boolean"
+            },
+            "swc": {
+              "default": false,
+              "description": "开启 swc 编译模式",
+              "type": "boolean"
+            },
+            "uglifyFileName": {
+              "description": "上传时是否代码保护",
+              "type": "boolean"
+            },
+            "uploadWithSourceMap": {
+              "default": true,
+              "description": "上传时是否带上 sourcemap",
+              "type": "boolean"
+            },
+            "urlCheck": {
+              "description": "是否检查安全域名和 TLS 版本",
+              "type": "boolean"
+            },
+            "useApiHook": {
+              "description": "是否启用 API Hook 功能",
+              "type": "boolean"
+            },
+            "useApiHostProcess": {
+              "description": "是否在额外的进程处理一些小程序 API",
+              "type": "boolean"
+            },
+            "useCompilerPlugins": {
+              "anyOf": [
+                {
+                  "const": false,
+                  "type": "boolean"
+                },
+                {
+                  "items": {
+                    "enum": ["typescript", "less", "sass"],
+                    "type": "string"
+                  },
+                  "type": "array"
+                }
+              ],
+              "description": "编译插件配置"
+            },
+            "useIsolateContext": {
+              "description": "是否开启小程序独立域调试特性",
+              "type": "boolean"
+            },
+            "useLanDebug": {
+              "description": "小游戏有效，是否开启局域网调试服务器",
+              "type": "boolean"
+            },
+            "useMultiFrameRuntime": {
+              "description": "是否开启模拟器预先载入小程序的某些资源，设置为 false 时会导致 useIsolateContext 失效",
+              "type": "boolean"
+            },
+            "useStaticServer": {
+              "description": "小游戏项目有效，是否开启静态资源服务器",
+              "type": "boolean"
+            }
+          },
+          "type": "object"
+        },
+        "slotMultipleInstance": {
+          "description": "模拟单个作用域插槽渲染为多个实例，此配置仅限 Vue2 环境 3.7.12+，Vue3 环境已默认支持",
+          "type": "boolean"
+        },
+        "themeLocation": {
+          "default": "theme.json",
+          "description": "主题配置文件路径，darkmode 开启时生效",
+          "type": "string"
+        },
+        "uniStatistics": {
+          "$ref": "#/definitions/PlatformUniStatistics",
+          "description": "uni 统计配置项"
+        },
+        "workers": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "properties": {
+                "isSubpackage": {
+                  "description": "是否打包为分包",
+                  "type": "boolean"
+                },
+                "path": {
+                  "type": "string"
+                }
+              },
+              "required": ["path"],
+              "type": "object"
+            }
+          ],
+          "description": "Worker 代码目录，详见 <https://developers.weixin.qq.com/miniprogram/dev/framework/workers.html>"
+        }
+      },
+      "type": "object"
+    },
+    "MpXhs": {
+      "properties": {
+        "appid": {
+          "description": "小红书小程序的 appid",
+          "type": "string"
+        },
+        "compileType": {
+          "description": "项目的编译模式",
+          "type": "string"
+        },
+        "condition": {
+          "description": "启用条件编译",
+          "type": "object"
+        },
+        "description": {
+          "description": "项目描述",
+          "type": "string"
+        },
+        "libVersion": {
+          "description": "基础库版本",
+          "type": "string"
+        },
+        "nativeTags": {
+          "description": "小红书小程序平台的原生组件",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "optimization": {
+          "description": "优化配置",
+          "properties": {
+            "subPackages": {
+              "description": "是否开启分包优化",
+              "type": "boolean"
+            }
+          },
+          "type": "object"
+        },
+        "packOptions": {
+          "description": "打包配置选项",
+          "type": "object"
+        },
+        "projectname": {
+          "description": "项目名称",
+          "type": "string"
+        },
+        "setting": {
+          "description": "项目设置，详见 <https://miniapp.xiaohongshu.com/doc/DC977105#anchorId-setting>",
+          "type": "object"
+        },
+        "uniStatistics": {
+          "$ref": "#/definitions/PlatformUniStatistics",
+          "description": "uni 统计配置项"
+        }
+      },
+      "type": "object"
+    },
+    "PNG": {
+      "type": ["string"]
+    },
+    "PercentageSize": {
+      "type": "string"
+    },
+    "PlatformUniStatistics": {
+      "additionalProperties": false,
+      "properties": {
+        "enable": {
+          "default": false,
+          "description": "是否开启 uni 统计",
+          "type": "boolean"
+        }
+      },
+      "type": "object"
+    },
+    "PxSize": {
+      "type": "string"
+    },
+    "QuickappWebview": {
+      "properties": {
+        "icon": {
+          "description": "应用图标，华为推荐 192x192",
+          "type": "string"
+        },
+        "minPlatformVersion": {
+          "description": "最小平台运行支持，快应用联盟最低 1063，快应用华为最低 1070",
+          "type": "number"
+        },
+        "package": {
+          "description": "应用包名",
+          "type": "string"
+        },
+        "versionCode": {
+          "description": "版本号",
+          "type": "number"
+        },
+        "versionName": {
+          "description": "版本名称",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "QuickappWebviewHuawei": {
+      "additionalProperties": false,
+      "properties": {
+        "minPlatformVersion": {
+          "description": "最小平台支持，最低 1070",
+          "type": "number"
+        }
+      },
+      "type": "object"
+    },
+    "QuickappWebviewUnion": {
+      "additionalProperties": false,
+      "properties": {
+        "minPlatformVersion": {
+          "description": "最小平台支持，最低 1063",
+          "type": "number"
+        }
+      },
+      "type": "object"
+    },
+    "UniAppX": {
+      "description": "存在 uni-app-x 节点则表示为 uni-app x 项目，uni-app x 独有配置\n\n详见 <https://doc.dcloud.net.cn/uni-app-x/collocation/manifest.html#manifest-uni-app-x>",
+      "properties": {
+        "flex-direction": {
+          "default": "column",
+          "description": "uvue 页面默认 flex 排列方向",
+          "enum": ["row", "row-reverse", "column", "column-reverse"],
+          "type": "string"
+        },
+        "styleIsolationVersion": {
+          "const": "2",
+          "default": "2",
+          "description": "样式隔离策略",
+          "type": "string"
+        },
+        "vapor": {
+          "default": false,
+          "description": "是否启用蒸汽模式",
+          "type": "boolean"
+        },
+        "vapor-render-target": {
+          "default": "bytecode",
+          "description": "视图层编译目标",
+          "enum": ["bytecode", "nativecode"],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "UniStatistics": {
+      "additionalProperties": false,
+      "properties": {
+        "collectItems": {
+          "description": "采集项配置",
+          "properties": {
+            "uniPushClientID": {
+              "default": false,
+              "description": "是否开启推送 `PushClientID` 的采集",
+              "type": "boolean"
+            },
+            "uniStatPageLog": {
+              "default": true,
+              "description": "是否开启页面数据采集",
+              "type": "boolean"
+            }
+          },
+          "type": "object"
+        },
+        "debug": {
+          "default": false,
+          "description": "是否开启统计调试模式\n\n开启后会产生大量日志，在开发阶段上报数据，应用发布请关闭此项",
+          "type": "boolean"
+        },
+        "enable": {
+          "default": false,
+          "description": "是否开启 uni 统计",
+          "type": "boolean"
+        },
+        "reportInterval": {
+          "default": 10,
+          "description": "前端数据上报周期",
+          "type": "number"
+        },
+        "version": {
+          "default": "1",
+          "description": "uni 统计版本",
+          "enum": ["1", "2"],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "Web": {
+      "description": "Web 平台配置（uni-app x）\n\n详见 <https://doc.dcloud.net.cn/uni-app-x/collocation/manifest.html#web>",
+      "properties": {
+        "darkmode": {
+          "description": "是否开启暗黑模式，详见 <https://doc.dcloud.net.cn/uni-app-x/api/theme-change.html>",
+          "type": "boolean"
+        },
+        "devServer": {
+          "description": "开发环境 server 配置",
+          "properties": {
+            "https": {
+              "description": "是否启用 HTTPS 协议",
+              "type": "boolean"
+            },
+            "port": {
+              "description": "开发服务端口",
+              "type": "number"
+            }
+          },
+          "type": "object"
+        },
+        "optimization": {
+          "description": "打包优化配置",
+          "properties": {
+            "treeShaking": {
+              "description": "摇树优化",
+              "properties": {
+                "enable": {
+                  "description": "是否开启摇树优化",
+                  "type": "boolean"
+                }
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        },
+        "router": {
+          "description": "路由配置",
+          "properties": {
+            "base": {
+              "description": "应用基础路径，如设为 ./，则代表相对路径，支持 file 协议打开，此时路由模式强制为 hash 模式",
+              "type": "string"
+            },
+            "mode": {
+              "description": "路由跳转模式，hash、history 二选一",
+              "enum": ["hash", "history"],
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "sdkConfigs": {
+          "description": "SDK 配置",
+          "properties": {
+            "maps": {
+              "description": "定位和地图（只能选一个）",
+              "properties": {
+                "amap": {
+                  "description": "高德地图",
+                  "properties": {
+                    "key": {
+                      "description": "高德地图密钥，申请地址 <https://console.amap.com/dev/key/app>",
+                      "type": "string"
+                    },
+                    "securityJsCode": {
+                      "description": "高德地图安全密钥，申请地址 <https://console.amap.com/dev/key/app>",
+                      "type": "string"
+                    },
+                    "serviceHost": {
+                      "description": "高德地图安全密钥代理服务器地址，参考 <https://lbs.amap.com/api/jsapi-v2/guide/abc/prepare>",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "google": {
+                  "description": "谷歌地图",
+                  "properties": {
+                    "key": {
+                      "description": "谷歌地图密钥，申请地址 <https://developers.google.com/maps/documentation/javascript/get-api-key>",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "tencent": {
+                  "description": "腾讯地图，旧配置项为 qqmap",
+                  "properties": {
+                    "key": {
+                      "description": "腾讯地图密钥，申请地址 <https://lbs.qq.com/dev/console/key/manage>",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        },
+        "template": {
+          "description": "可定制生成的 HTML 代码，参考 <https://uniapp.dcloud.net.cn/collocation/manifest.html#h5-template>",
+          "type": "string"
+        },
+        "title": {
+          "description": "页面标题，默认为应用名称",
+          "type": "string"
+        },
+        "unipush": {
+          "description": "uni-push 配置",
+          "properties": {
+            "enable": {
+              "description": "是否启用 uni-push",
+              "type": "boolean"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    }
+  }
+}

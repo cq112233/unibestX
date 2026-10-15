@@ -1345,6 +1345,12 @@ export function mergePagesJson(
 
   // 构造最终对象
   const finalJson: any = {};
+  finalJson[Symbol.for('before:pages')] = [
+    lineComment(' =============================================================================='),
+    lineComment(' ⚠️ 提示：本文件由 vite-plugin-uni-pages 自动生成，请勿手动修改（手动修改会被覆盖）！'),
+    lineComment(' 📌 如需配置页面路由与样式，请前往 pages.config.json 或页面 .uvue 的 definePage 中配置。'),
+    lineComment(' ==============================================================================')
+  ];
   finalJson.pages = mergedPages;
 
   // 复制 baseConfig 或 output 上的其他顶层字段
