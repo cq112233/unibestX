@@ -312,7 +312,9 @@ configs.push({
     // 只需黄色警告，不应中断 CI（warn 仍会产出报告，快速修复 Code Action 不受等级影响）。
     'uts/auto-import-symbol': 'warn',
     // 启用 UVUE/Vue 模板静态 class 属性与标签内部多余换行、连续空行与首尾空格自动收敛清理
-    'uts/uvue-clean-template-whitespace': 'error'
+    'uts/uvue-clean-template-whitespace': 'error',
+    // 禁止在 definePage 宏内引用外部声明的变量或函数（避免编译期执行宏报 ReferenceError）
+    'uts/define-page-no-outer-variables': 'error'
   }
 });
 

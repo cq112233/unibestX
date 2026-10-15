@@ -196,8 +196,36 @@ declare global {
     [key: string]: any;
   }
 
-  type DefinePageContext = {
+  type DefinePagePlatform = {
+    /** 平台标识字符串：'h5' | 'app-android' | 'app-ios' | 'app-harmony' | 'mp-weixin' 等 */
+    name: string;
     platform: string;
+    isH5: boolean;
+    isWeb: boolean;
+    isMp: boolean;
+    isMpWeixin: boolean;
+    isMpAlipay: boolean;
+    isMpBaidu: boolean;
+    isMpToutiao: boolean;
+    isMpQQ: boolean;
+    isMpKuaishou: boolean;
+    isMpLark: boolean;
+    isMpJD: boolean;
+    isMpXHS: boolean;
+    isMp360: boolean;
+    isMpHarmony: boolean;
+    isApp: boolean;
+    isAppAndroid: boolean;
+    isAppIOS: boolean;
+    isAppHarmony: boolean;
+    [key: string]: any;
+  };
+
+  type DefinePageContext = {
+    /** 当前项目的环境变量（由 .env / .env.[mode] / process.env 加载） */
+    env: Record<string, string>;
+    /** 当前编译目标平台信息（包含 isH5, isAppIOS, isAppAndroid 等） */
+    platform: DefinePagePlatform;
     isH5: boolean;
     isWeb: boolean;
     isMp: boolean;

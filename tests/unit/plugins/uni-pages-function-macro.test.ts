@@ -61,7 +61,7 @@ describe('uni-pages 函数式 definePage 与跨端条件编译', () => {
     expect(h5.middlewares).toBeUndefined();
   });
 
-  it('支持在临时目录下扫描并求值函数式与异步 definePage 宏（带 isH5 条件判断）', () => {
+  it('支持在临时目录下扫描并求值函数式与异步 definePage 宏（带 isH5 条件判断）', async () => {
     const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'uni-pages-fn-test-'));
     try {
       const pagesDir = path.join(tmpDir, 'src', 'pages', 'index');
@@ -94,7 +94,7 @@ definePage(async () => {
 
       // 1. 在 H5 环境下构建
       process.env.UNI_PLATFORM = 'h5';
-      const h5State = buildPages(
+      const h5State = await buildPages(
         { dir: 'src/pages', outFile: 'pages.json', configFile: 'pages.config.json' },
         { root: tmpDir, isProduction: false }
       );
@@ -107,7 +107,7 @@ definePage(async () => {
 
       // 2. 在 mp-weixin 环境下构建
       process.env.UNI_PLATFORM = 'mp-weixin';
-      const wxState = buildPages(
+      const wxState = await buildPages(
         { dir: 'src/pages', outFile: 'pages.json', configFile: 'pages.config.json' },
         { root: tmpDir, isProduction: false }
       );
@@ -116,6 +116,63 @@ definePage(async () => {
       expect(wxPage).toBeDefined();
       expect(wxPage!.style?.navigationBarTitleText).toBe('非 H5 环境');
       expect(wxPage!.type).toBe('home');
+    }
+    finally {
+      delete process.env.UNI_PLATFORM;
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    }
+  });
+
+  it('支持在 definePage 宏内真正执行异步操作（await Promise / setTimeout）再生成配置', async () => {
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'uni-pages-async-await-'));
+    try {
+      const pagesDir = path.join(tmpDir, 'src', 'pages', 'async-demo');
+      fs.mkdirSync(pagesDir, { recursive: true });
+
+      const pageCode = `
+<template>
+  <view>Async Demo</view>
+</template>
+
+<script setup lang="ts">
+definePage(async (options) => {
+  const { isH5, isAppIOS, isAppAndroid } = options;
+
+  // 模拟异步接口请求或延时任务
+  let fetchedData = '';
+  await new Promise<void>((resolve) => {
+    setTimeout(() => {
+      fetchedData = 'async-success';
+      resolve();
+    }, 50);
+  });
+
+  return {
+    name: 'async-page',
+    style: {
+      navigationBarTitleText: isH5 ? \`\${fetchedData}-h5\` : \`\${fetchedData}-app\`
+    }
+  };
+});
+</script>
+`;
+      fs.writeFileSync(path.join(pagesDir, 'index.uvue'), pageCode, 'utf-8');
+
+      process.env.UNI_PLATFORM = 'h5';
+      const state = await buildPages(
+        { dir: 'src/pages', outFile: 'pages.json', configFile: 'pages.config.json' },
+        { root: tmpDir, isProduction: false }
+      );
+      expect(state).not.toBeNull();
+      const page = state!.finalPages.find(p => p.path.includes('async-demo'));
+      expect(page).toBeDefined();
+      expect(page!.name).toBe('async-page');
+      expect(page!.style?.navigationBarTitleText).toBe('async-success-h5');
+
+      const variants = (page as any)._variants as Array<{ platform: string; page: any }>;
+      expect(variants).toBeDefined();
+      const iosVariant = variants.find(v => v.platform === 'APP-IOS');
+      expect(iosVariant?.page.style.navigationBarTitleText).toBe('async-success-app');
     }
     finally {
       delete process.env.UNI_PLATFORM;
@@ -201,7 +258,7 @@ definePage(async () => {
     expect(res2.code).not.toContain('definePage');
   });
 
-  it('支持针对鸿蒙(HarmonyOS)与支付宝(Alipay)及其他小程序独立生成条件编译块', () => {
+  it('支持针对鸿蒙(HarmonyOS)与支付宝(Alipay)及其他小程序独立生成条件编译块', async () => {
     const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'uni-pages-harmony-alipay-'));
     try {
       const pagesDir = path.join(tmpDir, 'src', 'pages', 'detail');
@@ -238,7 +295,7 @@ definePage((options) => {
       fs.writeFileSync(path.join(pagesDir, 'detail.uvue'), pageCode, 'utf-8');
 
       // 验证构建出的变体包含细粒度的鸿蒙与支付宝
-      const state = buildPages(
+      const state = await buildPages(
         { dir: 'src/pages', outFile: 'pages.json', configFile: 'pages.config.json' },
         { root: tmpDir, isProduction: false }
       );
@@ -271,4 +328,107 @@ definePage((options) => {
       fs.rmSync(tmpDir, { recursive: true, force: true });
     }
   });
+
+  it('多页面同时声明异步 definePage 宏时全量并发执行（耗时并发重叠且路由顺序恒定）', async () => {
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'uni-pages-multi-async-'));
+    try {
+      const page1Dir = path.join(tmpDir, 'src', 'pages', 'page1');
+      const page2Dir = path.join(tmpDir, 'src', 'pages', 'page2');
+      const page3Dir = path.join(tmpDir, 'src', 'pages', 'page3');
+      fs.mkdirSync(page1Dir, { recursive: true });
+      fs.mkdirSync(page2Dir, { recursive: true });
+      fs.mkdirSync(page3Dir, { recursive: true });
+
+      // 3 个页面均有 80ms 异步，如果串行则耗时至少 240ms，若并发则约为 80~120ms
+      const makeCode = (title: string, delayMs: number) => `
+<template><view>${title}</view></template>
+<script setup lang="ts">
+definePage(async () => {
+  await new Promise<void>((resolve) => setTimeout(resolve, ${delayMs}));
+  return {
+    style: {
+      navigationBarTitleText: '${title}'
+    }
+  };
 });
+</script>
+`;
+      fs.writeFileSync(path.join(page1Dir, 'index.uvue'), makeCode('Page-One', 80), 'utf-8');
+      fs.writeFileSync(path.join(page2Dir, 'index.uvue'), makeCode('Page-Two', 80), 'utf-8');
+      fs.writeFileSync(path.join(page3Dir, 'index.uvue'), makeCode('Page-Three', 80), 'utf-8');
+
+      const start = Date.now();
+      const state = await buildPages(
+        { dir: 'src/pages', outFile: 'pages.json', configFile: 'pages.config.json' },
+        { root: tmpDir, isProduction: false }
+      );
+      const elapsed = Date.now() - start;
+
+      expect(state).not.toBeNull();
+      expect(state!.finalPages.length).toBe(3);
+
+      const p1 = state!.finalPages.find(p => p.path.includes('page1'));
+      const p2 = state!.finalPages.find(p => p.path.includes('page2'));
+      const p3 = state!.finalPages.find(p => p.path.includes('page3'));
+
+      expect(p1?.style?.navigationBarTitleText).toBe('Page-One');
+      expect(p2?.style?.navigationBarTitleText).toBe('Page-Two');
+      expect(p3?.style?.navigationBarTitleText).toBe('Page-Three');
+
+      // 验证并发执行：总耗时显著小于 3 个页面的串行累加（240ms）
+      expect(elapsed).toBeLessThan(220);
+    }
+    finally {
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    }
+  });
+
+  it('options 包含 env 环境变量对象与 platform 子对象（支持解构 isH5、isAppIOS 等）', async () => {
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'uni-pages-env-platform-'));
+    try {
+      const pagesDir = path.join(tmpDir, 'src', 'pages', 'env-demo');
+      fs.mkdirSync(pagesDir, { recursive: true });
+
+      // 写入 .env 文件
+      fs.writeFileSync(path.join(tmpDir, '.env'), 'VITE_DEMO_TITLE=MyAwesomeTitle\n', 'utf-8');
+
+      const pageCode = `
+<template>
+  <view>Env Demo</view>
+</template>
+
+<script setup lang="ts">
+definePage((options) => {
+  const { env, platform } = options;
+  const { isH5, isAppAndroid } = platform;
+
+  return {
+    name: 'env-demo',
+    style: {
+      navigationBarTitleText: isH5 ? env.VITE_DEMO_TITLE : 'other'
+    }
+  };
+});
+</script>
+`;
+      fs.writeFileSync(path.join(pagesDir, 'index.uvue'), pageCode, 'utf-8');
+
+      process.env.UNI_PLATFORM = 'h5';
+      const state = await buildPages(
+        { dir: 'src/pages', outFile: 'pages.json', configFile: 'pages.config.json' },
+        { root: tmpDir, isProduction: false }
+      );
+
+      expect(state).not.toBeNull();
+      const page = state!.finalPages.find(p => p.path.includes('env-demo'));
+      expect(page).toBeDefined();
+      expect(page!.style?.navigationBarTitleText).toBe('MyAwesomeTitle');
+    }
+    finally {
+      delete process.env.UNI_PLATFORM;
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    }
+  });
+});
+
+

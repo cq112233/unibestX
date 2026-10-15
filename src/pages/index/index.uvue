@@ -21,9 +21,21 @@ import Tabbar from '@/src/tabbar/tabbar.uvue';
 import { isSinglePageTabbar, notifyPageHide, notifyPageShow, setCurIdxByKey } from '@/src/tabbar/index.uts';
 import { handleBackPressExit } from '@/src/utils/backPress/index.uts';
 
-definePage((options) => {
-  console.log('options: ', options);
-  const { isH5, isAppIOS, isAppAndroid, isAppHarmony, isMpAlipay } = options;
+definePage(async (options) => {
+  const { env, platform } = options;
+  const { isH5, isAppIOS, isAppAndroid, isAppHarmony, isMpAlipay } = platform;
+
+  console.log('env title:', env.VITE_APP_TITLE, isH5);
+
+  // 比如如果我要在这里调用接口
+  const p = new Promise((resolve) => {
+    setTimeout(() => {
+      resolve('1');
+    }, 100);
+  });
+
+  const res = await p;
+
   return {
     customPageClass: 'init-page', // 页面根容器自定义类名（配合 layout 布局使用，支持配置全局样式类）
     customPageStyle: 'background-color: transparent;', // 页面根容器自定义行内样式（穿透任何样式隔离，全端绝对生效）
@@ -38,7 +50,7 @@ definePage((options) => {
     enablePullDownRefresh: true, // 是否开启自定义下拉刷新（由 navbar 布局内的 scroll-view 驱动）
     style: {
       navigationBarTitleText: isH5
-        ? 'h5'
+        ? res
         : isAppIOS
           ? 'ios'
           : isAppAndroid

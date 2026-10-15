@@ -1463,6 +1463,92 @@ export const pluginUts = {
           }
         });
       }
+    },
+
+    /** 14. 禁止在 definePage 宏内引用外部声明的变量或函数（避免编译期执行宏报 ReferenceError） */
+    'define-page-no-outer-variables': {
+      meta: {
+        type: 'problem',
+        docs: {
+          description: 'definePage 属于编译期宏并在独立沙箱中执行，禁止引用外部 script 中声明的变量或函数（避免构建期执行宏时报 ReferenceError）'
+        },
+        messages: {
+          noOuterVariable: '[UTS规范] definePage 属于编译期宏并在独立沙箱中执行，禁止引用外部 script 中声明的变量或函数 "{{name}}"（避免构建期执行宏报 ReferenceError）'
+        }
+      },
+      create(context) {
+        const filename = context.filename || context.getFilename?.() || '';
+        if (filename.endsWith('.d.ts') || filename.endsWith('.d.uts.ts')) {
+          return {};
+        }
+
+        return {
+          'CallExpression[callee.name="definePage"]': function (node) {
+            const [callStart, callEnd] = node.range;
+            const scopeManager = context.sourceCode.scopeManager;
+            if (!scopeManager || !scopeManager.globalScope) {
+              return;
+            }
+
+            // 递归遍历作用域树，检查位于 definePage 调用节点范围内的所有变量引用
+            function checkScope(scope) {
+              for (const ref of scope.references) {
+                // 忽略 callee 自身（即 definePage 标识符）
+                if (ref.identifier === node.callee) {
+                  continue;
+                }
+
+                const [idStart, idEnd] = ref.identifier.range;
+                if (idStart >= callStart && idEnd <= callEnd) {
+                  // 忽略纯类型引用（TS 类型注解在编译期会被擦除，不会引发运行时错误）
+                  if (ref.isTypeReference) {
+                    continue;
+                  }
+
+                  // 检查引用的变量
+                  const resolved = ref.resolved;
+                  if (resolved) {
+                    // 若变量声明在全局作用域且无本地 defs（如 console, setTimeout, Promise, Math, uni 等内置/全局符号）
+                    if (!resolved.defs || resolved.defs.length === 0) {
+                      continue;
+                    }
+
+                    // 1. 若定义为 import 导入（ImportBinding），则合规（因为 vite-plugin-uni-pages 会将 import 注入宏沙箱）
+                    const isImport = resolved.defs.some(d => d.type === 'ImportBinding');
+                    if (isImport) {
+                      continue;
+                    }
+
+                    // 2. 检查定义节点是否在 definePage 内部声明（如形参 options、内部 const、内部箭头函数参数等）
+                    const isDefinedInside = resolved.defs.some((d) => {
+                      const defRange = d.node?.range;
+                      return defRange && defRange[0] >= callStart && defRange[1] <= callEnd;
+                    });
+                    if (isDefinedInside) {
+                      continue;
+                    }
+
+                    // 否则，该变量/函数定义在外部（<script> 或 <script setup> 中声明的本地变量/函数/类），宏沙箱中不存在，报错！
+                    context.report({
+                      node: ref.identifier,
+                      messageId: 'noOuterVariable',
+                      data: {
+                        name: ref.identifier.name
+                      }
+                    });
+                  }
+                }
+              }
+
+              for (const child of scope.childScopes) {
+                checkScope(child);
+              }
+            }
+
+            checkScope(scopeManager.globalScope);
+          }
+        };
+      }
     }
   }
 };

@@ -25,16 +25,27 @@ const tokenStore = useTokenStore();
 const userStore = useUserStore();
 const redirectUrl = ref<string>('');
 
-definePage({
-  debug: false,
-  layout: 'navbar',
-  showBack: true,
-  hideNavbar: false,
-  enablePullDownRefresh: false,
-  style: {
-    navigationBarTitleText: '登录',
-    navigationStyle: 'custom'
-  }
+definePage(async () => {
+  // 比如如果我要在这里调用接口
+  const p = new Promise((resolve) => {
+    setTimeout(() => {
+      resolve('haha');
+    }, 100);
+  });
+
+  const res = await p;
+
+  return {
+    debug: false,
+    layout: 'navbar',
+    showBack: true,
+    hideNavbar: false,
+    enablePullDownRefresh: false,
+    style: {
+      navigationBarTitleText: res,
+      navigationStyle: 'custom'
+    }
+  };
 });
 
 onLoad((options: UTSJSONObject | null) => {

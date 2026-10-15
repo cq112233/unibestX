@@ -3,7 +3,6 @@ import path from 'node:path';
 import process from 'node:process';
 import vm from 'node:vm';
 import { createRequire } from 'node:module';
-import { execFileSync } from 'node:child_process';
 import JSON5 from 'json5';
 import {
   parse as cjParse,
@@ -11,6 +10,7 @@ import {
   CommentArray
 } from 'comment-json';
 import * as ts from 'typescript';
+import { loadEnv } from 'vite';
 import { loadAllPlatformPageVariants } from './pages-json-util';
 
 /**
@@ -457,6 +457,32 @@ export function getPlatformEnv(platformInput?: string) {
   };
 }
 
+/** 缓存读取当前项目的环境变量 */
+let cachedLoadedEnv: Record<string, string> | null = null;
+let cachedEnvRoot: string = '';
+
+export function getLoadedEnv(projectRoot: string = process.cwd(), mode?: string): Record<string, string> {
+  const currentMode = mode || process.env.NODE_ENV || 'development';
+  if (cachedLoadedEnv != null && cachedEnvRoot === projectRoot) {
+    return cachedLoadedEnv;
+  }
+  try {
+    const loaded = loadEnv(currentMode, projectRoot, '');
+    cachedLoadedEnv = { ...process.env, ...loaded } as Record<string, string>;
+    cachedEnvRoot = projectRoot;
+    return cachedLoadedEnv;
+  }
+  catch {
+    return { ...process.env } as Record<string, string>;
+  }
+}
+
+/** 清理环境变量缓存 */
+export function clearLoadedEnvCache(): void {
+  cachedLoadedEnv = null;
+  cachedEnvRoot = '';
+}
+
 /**
  * 定位源码中第一次 `definePage(...)` 调用的括号位置。
  * 括号计数会跳过字符串与注释，准确捕获对象字面量、普通函数、箭头函数与 async 函数等各种宏参数边界。
@@ -545,12 +571,14 @@ function parseRouteBlock(content: string): Record<string, any> | null {
 /**
  * 从源码中提取 definePage(...) 的配置。
  * 支持对象字面量、普通函数、箭头函数、async 异步函数以及 null，并向宏沙箱注入 platform、isH5 等全套跨端环境。
+ * 若宏函数为 async 或返回 Promise，会先执行异步操作并 await 其结果。
  */
-function parseDefinePage(
+async function parseDefinePage(
   content: string,
   filename: string = 'page.uvue',
-  currentPlatform: string = ''
-): Record<string, any> | null {
+  currentPlatform: string = '',
+  projectRoot: string = process.cwd()
+): Promise<Record<string, any> | null> {
   let targetContent = content;
   const scriptMatch = content.match(/<script[^>]*>([\s\S]*?)<\/script>/);
   if (scriptMatch != null && scriptMatch[1] != null) {
@@ -610,36 +638,31 @@ function parseDefinePage(
     const dir = path.dirname(filename);
 
     const macroCode = arg;
-    const syncAttemptCode = macroCode.replace(/^\s*async\s*(?=\(|\bfunction\b)/, '');
     const buildCode = (codeStr: string) => `${imports.join('\n')}\nexport default (${codeStr});`;
 
-    let jsCode = '';
-    try {
-      jsCode = ts.transpileModule(buildCode(syncAttemptCode), {
-        compilerOptions: {
-          module: ts.ModuleKind.CommonJS,
-          target: ts.ScriptTarget.ES2022,
-          esModuleInterop: true,
-          allowJs: true,
-          skipLibCheck: true
-        }
-      }).outputText;
-    }
-    catch {
-      jsCode = ts.transpileModule(buildCode(macroCode), {
-        compilerOptions: {
-          module: ts.ModuleKind.CommonJS,
-          target: ts.ScriptTarget.ES2022,
-          esModuleInterop: true,
-          allowJs: true,
-          skipLibCheck: true
-        }
-      }).outputText;
-    }
+    const jsCode = ts.transpileModule(buildCode(macroCode), {
+      compilerOptions: {
+        module: ts.ModuleKind.CommonJS,
+        target: ts.ScriptTarget.ES2022,
+        esModuleInterop: true,
+        allowJs: true,
+        skipLibCheck: true
+      }
+    }).outputText;
 
     const defineHelper = (base: Record<string, any>) => new DefineConditional(base);
+    const envVars = getLoadedEnv(projectRoot);
+    const platformObj = {
+      ...platformEnv,
+      name: platformEnv.platform,
+      toString: () => platformEnv.platform,
+      valueOf: () => platformEnv.platform
+    };
+
     const macroCtx = {
       ...platformEnv,
+      platform: platformObj,
+      env: envVars,
       define: defineHelper
     };
 
@@ -656,13 +679,18 @@ function parseDefinePage(
       clearTimeout,
       setInterval,
       clearInterval,
+      setImmediate,
+      clearImmediate,
+      fetch: (globalThis as any).fetch,
+      process,
+      Promise,
       global: globalThis,
       globalThis,
       ...macroCtx
     };
 
     const script = new vm.Script(jsCode, { filename });
-    script.runInNewContext(vmContext, { timeout: 2000 });
+    script.runInNewContext(vmContext, { timeout: 15000 });
 
     const exportsObj = vmContext.exports as any;
     const parsed = 'default' in exportsObj ? exportsObj.default : exportsObj;
@@ -670,79 +698,69 @@ function parseDefinePage(
     let result: any = null;
     let variants: Array<{ platform: string; page: any }> | null = null;
     if (typeof parsed === 'function') {
-      result = parsed(macroCtx);
+      // 1. 先执行当前平台的求值（支持 async 函数及 Promise 返回）
+      result = await parsed(macroCtx);
 
       // 针对函数式宏，主动按全端跨端矩阵进行静态采样求值（App: Android/iOS/鸿蒙, Web/H5, 小程序: 微信/支付宝/百度/抖音/QQ/快手/飞书/京东/小红书/360/鸿蒙等），
       // 一步到位抽取出各端的差异化配置，彻底杜绝不同平台竞争同一标签导致的来回覆写翻转
       try {
-        const sampled: Array<{ platform: string; page: any }> = [];
-        for (const p of AUTO_EVAL_PLATFORMS) {
+        // 在跨端矩阵采样阶段静默 console，避免将页面内部的 console.log 打印 15 次
+        const quietConsole = {
+          ...console,
+          log: () => {},
+          info: () => {},
+          debug: () => {},
+          warn: () => {},
+          error: () => {}
+        };
+        (vmContext as any).console = quietConsole;
+
+        const sampledPromises = AUTO_EVAL_PLATFORMS.map(async (p) => {
           const pEnv = getPlatformEnv(p);
-          const pCtx = { ...pEnv, define: defineHelper };
+          const pPlatformObj = {
+            ...pEnv,
+            name: pEnv.platform,
+            toString: () => pEnv.platform,
+            valueOf: () => pEnv.platform
+          };
+          const pCtx = {
+            ...pEnv,
+            platform: pPlatformObj,
+            env: envVars,
+            define: defineHelper
+          };
           let pRes = parsed(pCtx);
+          if (pRes != null && typeof pRes.then === 'function') {
+            pRes = await pRes;
+          }
           if (pRes instanceof DefineConditional) {
             pRes = pRes.resolve(pEnv.platform);
           }
           if (pRes != null && typeof pRes === 'object' && !Array.isArray(pRes)) {
-            sampled.push({
+            return {
               platform: p.toUpperCase(),
               page: pRes
-            });
+            };
           }
-        }
-        if (sampled.length > 0) {
-          variants = sampled;
+          return null;
+        });
+        const sampledResults = await Promise.all(sampledPromises);
+        const validSampled = sampledResults.filter(Boolean) as Array<{ platform: string; page: any }>;
+        if (validSampled.length > 0) {
+          variants = validSampled;
         }
       }
       catch {}
+      finally {
+        (vmContext as any).console = console;
+      }
     }
     else {
       result = parsed;
     }
 
-    // 如果宏返回 Promise（如未被同步化的真实 await 异步调用），使用子进程同步等待解析
     if (result != null && typeof result.then === 'function') {
-      const scriptPayload = `
-        const ts = require('typescript');
-        const vm = require('node:vm');
-        const path = require('node:path');
-        const { createRequire } = require('node:module');
-
-        ${DefineConditional.toString()}
-        const platformEnv = ${JSON.stringify(platformEnv)};
-        const macroCode = ${JSON.stringify(macroCode)};
-        const imports = ${JSON.stringify(imports)};
-        const filename = ${JSON.stringify(filename)};
-        const dir = path.dirname(filename);
-
-        async function run() {
-          const tmpCode = imports.join('\\n') + '\\nexport default (' + macroCode + ');';
-          const jsCode = ts.transpileModule(tmpCode, {
-            compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 }
-          }).outputText;
-
-          const defineHelper = (base) => new DefineConditional(base);
-          const macroCtx = { ...platformEnv, define: defineHelper };
-          const vmContext = {
-            module: {}, exports: {}, __filename: filename, __dirname: dir,
-            require: createRequire(path.join(dir, 'define-page.mjs')),
-            console, URL, URLSearchParams, global: globalThis, globalThis,
-            ...macroCtx
-          };
-          const s = new vm.Script(jsCode, { filename });
-          s.runInNewContext(vmContext);
-          const exp = 'default' in vmContext.exports ? vmContext.exports.default : vmContext.exports;
-          const res = typeof exp === 'function' ? await exp(macroCtx) : exp;
-          const finalVal = res instanceof DefineConditional ? res.resolve(platformEnv.platform) : res;
-          process.stdout.write(JSON.stringify(finalVal));
-        }
-        run().catch(e => { process.stderr.write(e.message); process.exit(1); });
-      `;
-      const out = execFileSync(process.execPath, ['-e', scriptPayload], {
-        encoding: 'utf-8',
-        timeout: 5000
-      });
-      result = out ? JSON.parse(out) : null;
+      result = await result;
     }
 
     if (result instanceof DefineConditional) {
@@ -771,16 +789,17 @@ function parseDefinePage(
 }
 
 /** 解析页面 meta：优先 <route> 块，其次 definePage */
-function parsePageMeta(
+async function parsePageMeta(
   content: string,
   filename: string = 'page.uvue',
-  currentPlatform: string = ''
-): Record<string, any> | null {
+  currentPlatform: string = '',
+  projectRoot: string = process.cwd()
+): Promise<Record<string, any> | null> {
   const route = parseRouteBlock(content);
   if (route != null) {
     return route;
   }
-  return parseDefinePage(content, filename, currentPlatform);
+  return await parseDefinePage(content, filename, currentPlatform, projectRoot);
 }
 
 /** 移除 definePage(...) 宏调用，避免运行时报错；未命中时返回 null */
@@ -1570,14 +1589,15 @@ export function collectStagesFromPlugins(plugins: readonly any[]): PagesStage[] 
  *
  * @returns 正常时返回状态；pages.config.json 语法错误且无缓存可兜底时返回 null。
  */
-export function buildPages(
+export async function buildPages(
   userOptions: UniPagesOptions,
   ctx: PagesStageContext,
   stages: PagesStage[] = []
-): PagesBuildState | null {
+): Promise<PagesBuildState | null> {
   const options = resolveOptions(userOptions);
   const root = ctx.root;
   const isProduction = ctx.isProduction;
+  clearLoadedEnvCache();
 
   // 1. 读取基础配置
   let baseConfig: BaseConfig = {};
@@ -1622,22 +1642,28 @@ export function buildPages(
     catch {}
   }
 
-  // 2. 扫描主包 .uvue 文件
+  // 2. 扫描主包 .uvue 文件（并发解析多个页面的 definePage 宏）
   const pagesDir = path.resolve(root, options.dir);
   const files = scanUvueFiles(pagesDir, options.exclude, root);
   files.sort();
+
+  const scannedResults = await Promise.all(
+    files.map(async (file) => {
+      const raw = fs.readFileSync(file, 'utf-8');
+      const meta = await parsePageMeta(raw, file, process.env.UNI_PLATFORM, root);
+      return { file, raw, meta };
+    })
+  );
 
   const scanned: (PageConfig & { _hasMeta?: boolean })[] = [];
   const debugAnnotatedPages: string[] = [];
   const debugHomeAnnotatedPages: string[] = [];
 
-  for (let i = 0; i < files.length; i++) {
-    const raw = fs.readFileSync(files[i], 'utf-8');
-    const meta = parsePageMeta(raw, files[i], process.env.UNI_PLATFORM);
+  for (const { file, raw, meta } of scannedResults) {
     if ((meta as any)?._skipPage === true) {
       continue;
     }
-    const pagePath = fileToPagePath(files[i], options.dir, root);
+    const pagePath = fileToPagePath(file, options.dir, root);
 
     const page: PageConfig & { _hasMeta?: boolean } = { path: pagePath };
     if (meta != null) {
@@ -1666,7 +1692,7 @@ export function buildPages(
     scanned.push(page);
   }
 
-  // 3. 扫描分包
+  // 3. 扫描分包（并发解析每个分包下的所有页面）
   const configSubPkgs = baseConfig.subPackages ?? [];
   const scannedSubPkgs: SubPackageConfig[] = [];
 
@@ -1680,14 +1706,20 @@ export function buildPages(
     const subFiles = scanUvueFiles(absSubDir, options.exclude, root);
     subFiles.sort();
 
+    const subResults = await Promise.all(
+      subFiles.map(async (subFile) => {
+        const raw = fs.readFileSync(subFile, 'utf-8');
+        const meta = await parsePageMeta(raw, subFile, process.env.UNI_PLATFORM, root);
+        return { subFile, raw, meta };
+      })
+    );
+
     const subPages: (PageConfig & { _hasMeta?: boolean })[] = [];
-    for (let j = 0; j < subFiles.length; j++) {
-      const raw = fs.readFileSync(subFiles[j], 'utf-8');
-      const meta = parsePageMeta(subFiles[j], subFiles[j], process.env.UNI_PLATFORM);
+    for (const { subFile, raw, meta } of subResults) {
       if ((meta as any)?._skipPage === true) {
         continue;
       }
-      const relPath = path.relative(absSubDir, subFiles[j]).replace(/\\/g, '/').replace(/\.uvue$/, '');
+      const relPath = path.relative(absSubDir, subFile).replace(/\\/g, '/').replace(/\.uvue$/, '');
       const fullSubPath = `${subDir}/${relPath}`;
 
       const page: PageConfig & { _hasMeta?: boolean } = { path: relPath };
@@ -1959,7 +1991,7 @@ export default function uniPagesPlugin(userOptions: UniPagesOptions = {}) {
   let stages: PagesStage[] = [];
   let stageChecked = false;
 
-  function runGenerate(): void {
+  async function runGenerate(): Promise<void> {
     if (!options.enabled) {
       return;
     }
@@ -1977,7 +2009,7 @@ export default function uniPagesPlugin(userOptions: UniPagesOptions = {}) {
       }
     }
 
-    const state = buildPages(userOptions, ctx, stages);
+    const state = await buildPages(userOptions, ctx, stages);
     if (state == null) {
       // pages.config.json 语法错误且无缓存：保持现状，等用户修好
       return;
@@ -2002,8 +2034,9 @@ export default function uniPagesPlugin(userOptions: UniPagesOptions = {}) {
 
   return {
     name: 'uni-pages',
+    enforce: 'pre',
 
-    configResolved(config: any) {
+    async configResolved(config: any) {
       projectRoot = config.root ?? process.cwd();
       // 发现所有独立注册的卫星插件
       stages = collectStagesFromPlugins(config.plugins ?? []);
@@ -2013,13 +2046,17 @@ export default function uniPagesPlugin(userOptions: UniPagesOptions = {}) {
       const isExplicitProd = mode === 'production' || process.env.NODE_ENV === 'production';
       const isWatch = Boolean(config.build?.watch || process.env.UNI_WATCH || process.env.UNI_APP_WATCH);
       isProduction = isExplicitProd && !isWatch;
+
+      if (options.enabled) {
+        await enqueueGenerate();
+      }
     },
 
-    buildStart() {
+    async buildStart() {
       if (!options.enabled) {
         return;
       }
-      runGenerate();
+      await enqueueGenerate();
     },
 
     /** 移除 definePage(...) 宏调用，避免运行时报错 */

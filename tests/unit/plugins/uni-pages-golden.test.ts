@@ -83,10 +83,10 @@ describe('uni-pages 四插件拆分逐字节回归', () => {
     ]);
   });
 
-  it('pages.json 与 HEAD 逐字节一致（沙盒/非沙盒默认口径）', () => {
+  it('pages.json 与 HEAD 逐字节一致（沙盒/非沙盒默认口径）', async () => {
     // pages.json 的对比只需要 core + sandbox + tabbar（route-meta 会落盘，单独验）
     const stages = collectStagesFromPlugins(allPlugins()).filter(s => s.name !== 'uni-pages:route-meta');
-    const state = buildPages(OPTIONS, { root: ROOT, isProduction: false }, stages);
+    const state = await buildPages(OPTIONS, { root: ROOT, isProduction: false }, stages);
     expect(state).not.toBeNull();
 
     const ours = `${JSON.stringify(state!.output, null, 2)}\n`;
@@ -94,9 +94,9 @@ describe('uni-pages 四插件拆分逐字节回归', () => {
     expect(ours).toBe(baseline);
   });
 
-  it('page-meta.uts 与 HEAD 一致（仅来源标注行允许不同）', () => {
+  it('page-meta.uts 与 HEAD 一致（仅来源标注行允许不同）', async () => {
     const stages = collectStagesFromPlugins(allPlugins()).filter(s => s.name !== 'uni-pages:route-meta');
-    const state = buildPages(OPTIONS, { root: ROOT, isProduction: false }, stages);
+    const state = await buildPages(OPTIONS, { root: ROOT, isProduction: false }, stages);
     expect(state).not.toBeNull();
 
     const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'uni-pages-golden-'));
