@@ -10,6 +10,7 @@ import {
   CommentArray
 } from 'comment-json';
 import * as ts from 'typescript';
+import type { Plugin } from 'vite';
 import { loadEnv } from 'vite';
 import { loadAllPlatformPageVariants } from './pages-json-util';
 
@@ -897,8 +898,10 @@ function normalizeCustomNavForAlipay(p: PageConfig): void {
 }
 
 /** 剥离写盘前的内部临时标记属性 */
-function cleanTempProps(page: PageConfig): void {
-  delete (page as any)._hasMeta;
+function cleanTempProps(page: PageConfig, cleanMeta: boolean = false): void {
+  if (cleanMeta) {
+    delete (page as any)._hasMeta;
+  }
   delete (page as any)._skipPage;
   if ((page as any)._keepType !== true && (page as any).type === 'home' && (page as any)._isStaticMacro === true) {
     delete (page as any).type;
@@ -932,30 +935,6 @@ function isGenerationMarker(token: any): boolean {
   );
 }
 
-function platformsExcluding(platformList: string, currentPlatform: string): string[] {
-  return platformList
-    .split('||')
-    .map(p => p.trim())
-    .filter(p => p && p !== currentPlatform)
-    .sort();
-}
-
-function extractLastPlatforms(src: any, currentPlatform: string): string[] {
-  let lastPlatforms: string[] = [];
-  const before0 = src ? src[Symbol.for('before:0')] : undefined;
-  if (Array.isArray(before0)) {
-    for (const comment of before0) {
-      if (comment && comment.type !== 'BlankLine' && typeof comment.value === 'string') {
-        const trimmed = comment.value.trim();
-        if (trimmed.startsWith(GENERATION_MARKER_PREFIX)) {
-          lastPlatforms = platformsExcluding(trimmed.slice(GENERATION_MARKER_PREFIX.length), currentPlatform);
-        }
-      }
-    }
-  }
-  return lastPlatforms;
-}
-
 function simplifyPlatformList(platforms: string[]): string[] {
   const set = new Set(platforms);
 
@@ -981,6 +960,58 @@ function simplifyPlatformList(platforms: string[]): string[] {
   }
 
   return [...set].sort();
+}
+
+function expandPlatformTokens(tokens: string[]): string[] {
+  const result: string[] = [];
+  for (const token of tokens) {
+    if (token === 'APP') {
+      result.push(...ALL_APP_PLATFORMS);
+    }
+    else if (token === 'MP') {
+      result.push(...ALL_MP_PLATFORMS);
+    }
+    else {
+      result.push(token);
+    }
+  }
+  return [...new Set(result)];
+}
+
+function platformsExcluding(platformList: string, currentPlatform: string): string[] {
+  const rawTokens = platformList
+    .split('||')
+    .map(p => p.trim())
+    .filter(Boolean);
+  const expanded = expandPlatformTokens(rawTokens);
+
+  const toExclude = new Set<string>();
+  toExclude.add(currentPlatform);
+  if (currentPlatform === 'MP') {
+    ALL_MP_PLATFORMS.forEach(p => toExclude.add(p));
+  }
+  if (currentPlatform === 'APP') {
+    ALL_APP_PLATFORMS.forEach(p => toExclude.add(p));
+  }
+
+  const remaining = expanded.filter(p => !toExclude.has(p));
+  return simplifyPlatformList(remaining);
+}
+
+function extractLastPlatforms(src: any, currentPlatform: string): string[] {
+  let lastPlatforms: string[] = [];
+  const before0 = src ? src[Symbol.for('before:0')] : undefined;
+  if (Array.isArray(before0)) {
+    for (const comment of before0) {
+      if (comment && comment.type !== 'BlankLine' && typeof comment.value === 'string') {
+        const trimmed = comment.value.trim();
+        if (trimmed.startsWith(GENERATION_MARKER_PREFIX)) {
+          lastPlatforms = platformsExcluding(trimmed.slice(GENERATION_MARKER_PREFIX.length), currentPlatform);
+        }
+      }
+    }
+  }
+  return lastPlatforms;
 }
 
 function stringifyForCompare<T extends object>(val: T): string {
@@ -1144,7 +1175,7 @@ export function mergePlatformItems<T extends object>(
   const allowedKeys = sandboxActive ? new Set(items.map(item => (item as any)[uniqueKeyName])) : null;
   const fullMacroKeys = new Set(
     items
-      .filter(item => Array.isArray((item as any)._variants) && (item as any)._variants.length > 0)
+      .filter(item => (Array.isArray((item as any)._variants) && (item as any)._variants.length > 0) || (item as any)._hasMeta === true)
       .map(item => (item as any)[uniqueKeyName])
   );
 
@@ -1216,7 +1247,7 @@ export function mergePlatformItems<T extends object>(
       for (const v of variantsList) {
         const vPayload = { ...item, ...v.page };
         delete (vPayload as any)._variants;
-        cleanTempProps(vPayload as any);
+        cleanTempProps(vPayload as any, true);
         upsertCurrentVariant(
           variantsOf(uniqueKey),
           vPayload,
@@ -1229,7 +1260,7 @@ export function mergePlatformItems<T extends object>(
     else {
       const cleanItem = { ...item };
       delete (cleanItem as any)._variants;
-      cleanTempProps(cleanItem as any);
+      cleanTempProps(cleanItem as any, true);
       upsertCurrentVariant(variantsOf(uniqueKey), cleanItem, stringifyForCompare(cleanItem), currentPlatform, homeStatusCompatible);
     }
   }
@@ -1494,12 +1525,14 @@ function writeBackConfig(
       return cpNorm === norm || cpNorm === `src/${norm}` || `src/${cpNorm}` === norm;
     });
 
-    if (existingInConfig && isMultiPlatform) {
+    if (existingInConfig && isMultiPlatform && !(p as any)._hasMeta) {
       // 保持 pages.config.json 中的原配置不变，避免单端运行覆盖多端配置触发 watcher 恶性循环
       newMainPages.push(existingInConfig);
     }
     else {
-      newMainPages.push(p);
+      const cleanP = { ...p };
+      cleanTempProps(cleanP, true);
+      newMainPages.push(cleanP);
     }
   }
   if (currentConfig.pages == null || JSON.stringify(currentConfig.pages) !== JSON.stringify(newMainPages)) {
@@ -1527,11 +1560,13 @@ function writeBackConfig(
           return cpNorm === p.path.replace(/\\/g, '/').replace(/^\//, '');
         });
 
-        if (existingInSub && isMultiPlatform) {
+        if (existingInSub && isMultiPlatform && !(p as any)._hasMeta) {
           newSubPages.push(existingInSub);
         }
         else {
-          newSubPages.push(p);
+          const cleanP = { ...p };
+          cleanTempProps(cleanP, true);
+          newSubPages.push(cleanP);
         }
       }
 
@@ -1858,9 +1893,9 @@ export async function buildPages(
     };
   }
 
-  finalPages.forEach(cleanTempProps);
+  finalPages.forEach(p => cleanTempProps(p, false));
   scannedSubPkgs.forEach((pkg) => {
-    pkg.pages.forEach(cleanTempProps);
+    pkg.pages.forEach(p => cleanTempProps(p, false));
   });
 
   // 7. 装配待落盘对象（subPackages 由 stages 之后的 finalize 统一补，保证键序）
@@ -1980,7 +2015,7 @@ export function commitPages(state: PagesBuildState, server: any = null): void {
 // Vite 插件导出
 // ==========================================
 
-export default function uniPagesPlugin(userOptions: UniPagesOptions = {}) {
+export default function uniPagesPlugin(userOptions: UniPagesOptions = {}): Plugin {
   const options = resolveOptions(userOptions);
 
   let projectRoot = process.cwd();
@@ -2035,7 +2070,7 @@ export default function uniPagesPlugin(userOptions: UniPagesOptions = {}) {
 
   return {
     name: 'uni-pages',
-    enforce: 'pre',
+    enforce: 'pre' as const,
 
     async configResolved(config: any) {
       projectRoot = config.root ?? process.cwd();

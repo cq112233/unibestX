@@ -1577,7 +1577,7 @@ function shouldLintFile(context) {
 
   // 3. 仅检测 src 目录下文件或项目根入口文件
   const isSrc = /(?:^|\/)src\//.test(normalized);
-  const isRootEntry = /(?:^|\/)(?:App|App\.ku)\.uvue$/.test(normalized) || /(?:^|\/)main\.uts$/.test(normalized);
+  const isRootEntry = /(?:^|\/)(?:App|AppRoot|App\.ku)\.uvue$/.test(normalized) || /(?:^|\/)main\.uts$/.test(normalized);
 
   return isSrc || isRootEntry;
 }

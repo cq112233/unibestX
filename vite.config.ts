@@ -296,7 +296,7 @@ export default defineConfig({
     }),
     uniRootX({
       enabledGlobalRef: false,
-      rootFileName: 'App.ku'
+      rootFileName: 'src/AppRoot'
     }),
     // manifest.json 由 manifest.config.ts 生成（必须在 uni() 之前注册）。
     // ⚠️ 注意时序：uni-app 在编译进程启动时（vite 之前）就读走 manifest.json 并缓存成进程级 once，

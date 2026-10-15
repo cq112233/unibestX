@@ -79,7 +79,7 @@ export type UniRootXOptions = {
   enabledGlobalRef?: boolean;
   /**
    * 根文件名，无需携带扩展名，如 'AppRoot' 或 'App.ku'
-   * @default 'App.ku'
+   * @default 'AppRoot'
    */
   rootFileName?: string;
   /**
@@ -96,12 +96,12 @@ export type UniRootXOptions = {
 export function uniRootX(options: UniRootXOptions = {}): Plugin {
   const {
     enabledGlobalRef = false,
-    rootFileName = 'App.ku',
+    rootFileName = 'src/AppRoot',
     excludePages
   } = options;
 
   const rawRootFileName = rootFileName.replace(/\.(uvue|vue)$/, '');
-  const componentName = toPascalCase(rawRootFileName);
+  const componentName = toPascalCase(path.basename(rawRootFileName));
 
   const excludeList = excludePages
     ? (Array.isArray(excludePages) ? excludePages : [excludePages])
@@ -208,37 +208,36 @@ export function uniRootX(options: UniRootXOptions = {}): Plugin {
         return null;
       }
 
-      // 自动检测并生成根组件文件于项目根目录
+      // 自动检测根组件文件位置（优先探测 src/ 目录，保证小程序端在 src/ 内部合法寻址）
       let targetFileExt = '.uvue';
-      const uvuePath = path.join(projectRoot, `${rawRootFileName}.uvue`);
-      const vuePath = path.join(projectRoot, `${rawRootFileName}.vue`);
-      if (fs.existsSync(vuePath) && !fs.existsSync(uvuePath)) {
-        targetFileExt = '.vue';
-      }
-      const targetFilePath = path.join(projectRoot, `${rawRootFileName}${targetFileExt}`);
+      const baseName = path.basename(rawRootFileName);
+      const srcUvuePath = path.join(projectRoot, 'src', `${baseName}.uvue`);
+      const srcVuePath = path.join(projectRoot, 'src', `${baseName}.vue`);
+      const rootUvuePath = path.join(projectRoot, `${rawRootFileName}.uvue`);
+      const rootVuePath = path.join(projectRoot, `${rawRootFileName}.vue`);
 
-      if (!fs.existsSync(targetFilePath)) {
-        // 若存在现有的 App.ku.uvue，优先复制作为基础以保留已有的布局和主题能力
-        const legacyPath = path.join(projectRoot, 'App.ku.uvue');
-        if (fs.existsSync(legacyPath)) {
-          try {
-            fs.copyFileSync(legacyPath, targetFilePath);
-            console.log(`[uniRootX] 已基于 App.ku.uvue 自动生成 ${rawRootFileName}${targetFileExt} 文件`);
-          }
-          catch (e) {
-            console.error(`[uniRootX] 复制生成 ${rawRootFileName}${targetFileExt} 失败:`, e);
-          }
-        }
-        else {
-          const defaultContent = `<template>\n\t<view class="root-container" style="flex: 1;">\n\t\t<slot></slot>\n\t</view>\n</template>\n\n<script setup lang="uts">\nconst props = defineProps({\n\tlayout: { type: String, default: '' },\n\tshowBack: { type: Boolean, default: true },\n\thideNavbar: { type: Boolean, default: false },\n\thideStatusBar: { type: Boolean, default: false },\n\tenablePullDownRefresh: { type: Boolean, default: false },\n\tcustomPageClass: { type: String, default: '' },\n\tcustomPageStyle: { type: String, default: '' },\n\tpageStyle: { type: Object, default: () => ({}) }\n});\n</script>\n\n<style lang="scss" scoped>\n.root-container {\n\tflex: 1;\n}\n</style>\n`;
-          try {
-            fs.writeFileSync(targetFilePath, defaultContent, 'utf-8');
-            console.log(`[uniRootX] 自动生成了缺少的 ${rawRootFileName}${targetFileExt} 文件`);
-          }
-          catch (e) {
-            console.error(`[uniRootX] 自动生成 ${rawRootFileName}${targetFileExt} 失败:`, e);
-          }
-        }
+      let importRelPath = `src/${baseName}`;
+
+      if (fs.existsSync(srcUvuePath)) {
+        targetFileExt = '.uvue';
+        importRelPath = `src/${baseName}`;
+      }
+      else if (fs.existsSync(srcVuePath)) {
+        targetFileExt = '.vue';
+        importRelPath = `src/${baseName}`;
+      }
+      else if (fs.existsSync(rootUvuePath)) {
+        targetFileExt = '.uvue';
+        importRelPath = rawRootFileName;
+      }
+      else if (fs.existsSync(rootVuePath)) {
+        targetFileExt = '.vue';
+        importRelPath = rawRootFileName;
+      }
+      else {
+        targetFileExt = '.uvue';
+        importRelPath = `src/${baseName}`;
+        console.warn(`[uniRootX] 未找到根包裹组件 ${srcUvuePath}，请确保该组件存在`);
       }
 
       // 依据 pages.json 查找当前页面的自定义参数（与 uni-layouts-plugin 同源），生成注入到根组件的 props
@@ -311,7 +310,7 @@ export function uniRootX(options: UniRootXOptions = {}): Plugin {
       }
 
       // 2. 在 script setup 内引入根组件
-      const importStatement = `import ${componentName} from '@/${rawRootFileName}${targetFileExt}'`;
+      const importStatement = `import ${componentName} from '@/${importRelPath}${targetFileExt}'`;
       const scriptSetupRegex = /<script\s[^>]*\bsetup\b[^>]*>/;
       if (scriptSetupRegex.test(newCode)) {
         newCode = newCode.replace(scriptSetupRegex, (match) => {
