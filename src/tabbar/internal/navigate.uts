@@ -78,6 +78,18 @@ export function switchTabbar(url: string): void {
 
 /** 路由切换节流锁，防止快速连击导致原生视图切换重叠错乱 */
 let isSwitchingTab = false;
+let switchTabTimer: number | null = null;
+
+/**
+ * 重置路由切换节流锁，清理未完成的异步定时器
+ */
+export function resetTabSwitchThrottle(): void {
+  if (switchTabTimer != null) {
+    clearTimeout(switchTabTimer as any);
+    switchTabTimer = null;
+  }
+  isSwitchingTab = false;
+}
 
 /**
  * 点击 tab 切换路由跳转逻辑
@@ -104,9 +116,13 @@ export function handleTabbarClick(index: number): void {
   const url = list[index].pagePath;
   setCurIdx(index);
   switchTabbar(url);
-  setTimeout(() => {
+  if (switchTabTimer != null) {
+    clearTimeout(switchTabTimer as any);
+  }
+  switchTabTimer = (setTimeout((): void => {
     isSwitchingTab = false;
-  }, 250);
+    switchTabTimer = null;
+  }, 250) as any) as number;
 }
 
 /**
