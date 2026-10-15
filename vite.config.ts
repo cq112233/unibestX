@@ -7,6 +7,7 @@ import { defineConfig, loadEnv } from 'vite';
 import { uniEasycomPlugin } from '@dcloudio/uni-cli-shared/dist/vite/plugins/easycom.js';
 import { UNI_EASYCOM_EXCLUDE } from '@dcloudio/uni-cli-shared';
 import uniModule from '@dcloudio/vite-plugin-uni';
+import UniManifest from '@uni-helper/vite-plugin-uni-manifest';
 import { uniAppX } from 'weapp-tailwindcss/presets';
 import { WeappTailwindcss } from 'weapp-tailwindcss/vite';
 import { visualizer } from 'rollup-plugin-visualizer';
@@ -28,6 +29,25 @@ import { ViteImageOptimizer } from 'vite-plugin-image-optimizer';
 
 const uni = (uniModule as typeof uniModule & { default?: typeof uniModule }).default ?? uniModule;
 const projectRoot = dirname(fileURLToPath(import.meta.url));
+
+/**
+ * manifest.config.ts → manifest.json 的生成选项。
+ *
+ * outDir 显式钉在项目根：普通 uni-app 工程的输入目录是 `src/`，但 unibestX 是 HBuilderX 工程，
+ * 项目根就是输入目录（manifest.json / pages.json / App.uvue 都在根上），依赖 UNI_INPUT_DIR 迟早踩空。
+ * Tab 缩进 + 补齐末尾换行是为了贴合 HBuilderX 自己写出的格式：编辑器界面哪天回写了 manifest.json，
+ * 也不会因为格式差异产生满屏噪音 diff。
+ *
+ * 标注类型是必要的：不标注时 `eol` 会被推成宽泛的 string，传给 UniManifest() 报 TS2345
+ * （要求 '\n' | '\r\n' 字面量）。
+ */
+const manifestPluginOptions: import('@uni-helper/vite-plugin-uni-manifest').UserOptions = {
+  cwd: projectRoot,
+  outDir: projectRoot,
+  indent: '\t',
+  eol: '\n',
+  insertFinalNewline: true
+};
 
 /**
  * 解析 H5 运行时（uni-h5 / uni-h5-vue）的真实磁盘路径。
@@ -278,6 +298,12 @@ export default defineConfig({
       enabledGlobalRef: false,
       rootFileName: 'App.ku'
     }),
+    // manifest.json 由 manifest.config.ts 生成（必须在 uni() 之前注册）。
+    // ⚠️ 注意时序：uni-app 在编译进程启动时（vite 之前）就读走 manifest.json 并缓存成进程级 once，
+    // 本插件写盘发生在 configResolved，永远晚一步 —— 改了 manifest.config.ts 后，本次编译用的
+    // 仍是磁盘上的旧 manifest.json，要再跑一次才生效。所以 manifest.json 必须跟着配置一起提交
+    // （尤其发版前：它决定产物里的 appid / versionCode）。
+    UniManifest(manifestPluginOptions),
     uni(),
     ...weappTailwindcssPlugins,
     ...(isVisualizer

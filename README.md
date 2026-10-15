@@ -120,6 +120,7 @@
 | 微信小程序 | [微信公众平台](https://mp.weixin.qq.com/) → 注册小程序，获取 `wx` 开头的 AppID | [manifest.json](manifest.json) 的 `mp-weixin.appid` |
 
 - 用 HBuilderX 打开项目后，双击 `manifest.json` 可视化界面也可直接填写，App 端点击「重新获取」可自动申请一个新的 DCloud AppID。
+  ⚠️ **但填完请把改动同步回 `manifest.config.ts`**：根目录的 `manifest.json` 由 [manifest.config.ts](manifest.config.ts) 生成，只要两个文件不一致，构建时就会被覆盖掉（原因见下文「manifest.json 由 TypeScript 生成」）。
 - 微信小程序还需在微信公众平台后台配置 **request 合法域名**（对应 `.env` 的 `VITE_SERVER_BASEURL`）后才能正常请求接口。
 
 ### 3. 安装依赖
@@ -553,7 +554,8 @@ unibestX/
 ├── theme.json                    # ⭐ 明暗主题色板唯一真源（light / dark）
 ├── pages.config.json             # ⭐ 页面路由与全局配置（路由与页面配置请改这里）
 ├── pages.json                    # ⚠️ 自动生成的页面路由表（编译产物，请勿手动编辑）
-├── manifest.json                 # 应用配置清单（多端 AppID、权限、vapor 开关等）
+├── manifest.config.ts            # ⭐ 应用配置真源（多端 AppID、权限、vapor 开关等，请改这里）
+├── manifest.json                 # ⚠️ 由 manifest.config.ts 生成（勿手动编辑，改了会被覆盖）
 ├── vite.config.ts                # Vite 构建配置（Tailwind 与 5 个自定义插件）
 ├── uni.scss                      # 全局 SCSS 变量与主题注入
 ├── tsconfig.json                 # TypeScript / UTS 编译配置（含 VSCode 全量诊断范围）
@@ -751,6 +753,16 @@ VITE_DEV_SANDBOX_PAGES=src/sub/auth/login,src/pages/me/me
 5. **生产发版打包安全熔断**
    - 执行 `pnpm build:h5` 或正式打包发版时，插件会自动判定生产模式并**强制熔断沙盒模式**，100% 输出完整项目全量页面，绝无将调试配置带入线上的风险！
 
+### manifest.json 由 TypeScript 生成（manifest.config.ts）
+
+根目录的 `manifest.json` **不是手写的**，它由 [manifest.config.ts](manifest.config.ts) 生成（基于 `@uni-helper/vite-plugin-uni-manifest`，配置项带完整类型提示与补全）：
+
+- **改配置改 `manifest.config.ts`**，`manifest.json` 由构建时的插件自动重写，不需要手动执行任何命令。
+- ⚠️ **`manifest.json` 是编译期真源，必须跟着 `manifest.config.ts` 一起提交**。uni-app 在编译进程启动时（vite 之前）就读取它并做进程级缓存，插件的写盘永远晚一步 —— 改完 `manifest.config.ts` 后，**本次编译用的仍是磁盘上的旧值，要再跑一次才生效**；发版场景下这意味着可能打出旧 `appid` / `versionCode`。
+- 插件注册在 `vite.config.ts` 里，且必须在 `uni()` 之前：dev server 运行期间改 `manifest.config.ts`，插件会在一秒内把 `manifest.json` 重写为新内容（实测），只是**已在运行的编译进程不会重新读取**，重启后生效。
+- **不要用 HBuilderX 的 `manifest.json` 可视化界面改配置** —— 它写的是 `manifest.json`，下一次和 `manifest.config.ts` 不一致时就会被覆盖回去。必须用可视化界面时，改完记得把改动回填到 `manifest.config.ts`。
+- 生成物会包含 [manifest.config.ts](manifest.config.ts) 之外的少量既有默认项（`transformPx`、`app-plus`、`mp-harmony`），来自插件内置的 uni-app 官方预设，不影响 uni-app x 各端编译。
+
 ### VDOM 模式与 Vapor 蒸汽模式切换
 
 #### 什么是 Vapor 蒸汽模式？
@@ -764,7 +776,7 @@ uni-app X 推出了新一代的 **蒸汽模式（Vapor）**。新版渲染引擎
 
 > 🚀 从 **2026 年起**，新的[**蒸汽模式**](https://doc.dcloud.net.cn/uni-app-x/app-vapor.html)将逐渐替代老的 VDOM 模式。
 
-本项目 `main` 分支全面兼通两种模式，**默认采用 Vapor 蒸汽模式**。当前生效值来自根目录 `manifest.json`：
+本项目 `main` 分支全面兼通两种模式，**默认采用 Vapor 蒸汽模式**。当前生效值来自根目录 `manifest.json`（由 `manifest.config.ts` 生成）：
 
 ```json
 {
@@ -888,7 +900,9 @@ src/tabbar/config.uts (唯一样本源)
 
 模块唯一入口为 [src/tabbar/index.uts](src/tabbar/index.uts)（单层 `export *` 门面），内部实现位于 `internal/`，**请勿绕过门面直接引用内部模块**。
 
-- **`switchTabbar(url: string)`** — 全局统一 TabBar 跳转方法。单页面模式下直接切换索引，多页面模式下自动调度 `switchTab` 或 `redirectTo`（内置 250ms 节流锁，防止快速连击卡死）
+> 📖 **完整文档见 [src/tabbar/README.md](src/tabbar/README.md)**：配置项、五种模式对照、UI 形态扩展、插件与 `config.uts` 的配合细节、全部运行时 API。
+
+- **`switchTabbar(url: string)`** — 全局统一 TabBar 跳转方法。单页面模式下直接切换索引，多页面模式下自动调度 `switchTab` 或 `redirectTo`（250ms 防连击锁在 `handleTabbarClick()` 里，点 tab 走它；直接调 `switchTabbar()` 不触发节流）
 - **`onTabShow(target, callback, immediate?)`** — 监听特定 Tab 项激活显示，完美解决单页面模式下子视图没有原生 `onShow` 的问题（可在切换回该 Tab 时触发数据重新请求与刷新）。`target` 推荐直接写 `config.uts` 中该项的 **`tabType` 业务标识**（如 `onTabShow('index', ...)`），不再依赖下标顺序；同时兼容数字下标 `0`、下标字符串 `'0'` 与 `pagePath`。标识无法解析时会在控制台告警，便于发现写错的 `tabType`
 - **`onTabPageShow(target, callback, immediate?)`** — 监听特定 Tab **页面显示**（要求「页面可见」且「当前激活 Tab 命中」），是 `onTabShow` 的超集 —— 除切换 Tab 外，还覆盖 `onTabShow` 够不到的「页面回来了」：从子页面 `navigateBack` 返回、App 从后台回到前台。它同时修掉 `onTabShow` 的一个时序坑：在子页面里调 `switchTabbar` 时 `curIdx` 立刻变化，`onTabShow` 会在容器页仍不可见时提前回调，而 `onTabPageShow` 会抑制这次并推迟到页面真正返回时再补发一次。`target` 写法与 `onTabShow` 完全一致
 - **`syncCurIdxByCurrentPage()`** — 自动从当前页面路由同步激活 Tab 项索引

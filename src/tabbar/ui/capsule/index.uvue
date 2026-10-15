@@ -5,6 +5,7 @@
   ========================================================================
 -->
 <script setup lang="uts">
+import { computed, onMounted, onUnmounted } from 'vue';
 import {
   activeThemeColor,
   curIdx,
@@ -12,7 +13,9 @@ import {
   formatTabbarText,
   handleTabbarClick,
   isDark,
+  resetTabSwitchThrottle,
   safeHideNativeTabBar,
+  safeRestoreNativeTabBar,
   syncCurIdxByCurrentPage,
   tabbarList,
   themeTokens
@@ -93,24 +96,50 @@ const sliderWidthPercent = computed<number>((): number => {
   return 100 / tabbarList.length;
 });
 
-/** 动态滑块平移动画样式（transition 声明在静态类里，此处只下发 transform） */
-const sliderStyle = computed<UTSJSONObject>((): UTSJSONObject => {
+/**
+ * 滑块平滑过渡动画：开关已下沉到样式层，由条件编译分流，无需 JS 参与。
+ *
+ * - 非 App 端（H5 / Web / 各小程序）：`.capsule-slider` 保留 220ms transform 过渡，平滑滑动；
+ * - App 原生端（APP-ANDROID / APP-IOS / APP-HARMONY）：由样式里的 `#ifndef APP` 条件编译
+ *   整段剔除过渡，滑块直接跳到目标位置 —— 规避快速连续切换 Tab 时 transition 被反复打断、
+ *   滑块有几率停在中间位置 / 与 curIdx 不一致的问题。
+ */
+
+/**
+ * 动态滑块平移动画样式（transition 声明在静态类里，此处只下发 transform）
+ *
+ * ⚠️ 必须返回字符串：App 端（5.31 蒸汽模式 / 字节码，真机与云打包均复现）把
+ * 「值类型为 UTSJSONObject 的 computed/ref」直接绑给 :style 时，整条样式会被静默丢弃，
+ * 滑块恒定停在第 0 项；返回字符串、或把对象字面量内联进模板，均正常。
+ */
+const sliderStyle = computed<string>((): string => {
   const widthPct = sliderWidthPercent.value;
   const offsetPct = curIdx.value * 100;
-  return {
-    width: `${widthPct}%`,
-    transform: `translateX(${offsetPct}%)`
-  } as UTSJSONObject;
+  // console.log('[SLIDER] calc curIdx=', curIdx.value, '=>', `translateX(${offsetPct}%)`);
+  return `width: ${widthPct}%;transform: translateX(${offsetPct}%);`;
 });
+
+let isMounted = false;
 
 // 挂载时同步激活索引并确保原生 TabBar 隐藏
 onMounted(() => {
+  isMounted = true;
   syncCurIdxByCurrentPage();
   safeHideNativeTabBar();
 });
 
+// 卸载时彻底清理异步资源、还原原生 TabBar 并重置切换节流锁
+onUnmounted(() => {
+  isMounted = false;
+  safeRestoreNativeTabBar();
+  resetTabSwitchThrottle();
+});
+
 /** 处理 Tab 点击 */
 function onTabClick(index: number) {
+  if (!isMounted) {
+    return;
+  }
   handleTabbarClick(index);
 }
 
@@ -190,7 +219,10 @@ const bottom = computed(() => {
     >
       <!-- 滑动滑块：在各 Tab 底部平滑移动 (Animated Slider Pill) -->
       <view class="capsule-slider-track">
-        <view class="capsule-slider" :style="sliderStyle">
+        <view
+          class="capsule-slider"
+          :style="sliderStyle"
+        >
           <view class="capsule-slider-pill" :style="{ backgroundColor: activeItemBgColor, opacity: activeItemBgOpacity }" />
         </view>
       </view>
@@ -198,7 +230,7 @@ const bottom = computed(() => {
       <!-- 各 Tab 交互格位 -->
       <view
         v-for="(item, index) in tabbarList"
-        :key="index"
+        :key="item.pagePath.length > 0 ? item.pagePath : `${item.text}_${index}`"
         class="capsule-item-slot"
         @click="onTabClick(index)"
       >
@@ -289,15 +321,20 @@ const bottom = computed(() => {
   pointer-events: none;
 }
 
-/* 滑块单元（负责平移动画：在静态 CSS 中声明硬件加速过渡，禁止挪进动态 :style） */
+/* 滑块单元：非 App 端【220ms 平滑过渡】，App 原生端【无过渡】直接定位 */
 .capsule-slider {
   justify-content: center;
   align-items: center;
   width: 25%;
   height: 100%;
+  /* ⚠️ App 原生端（APP-ANDROID / APP-IOS / APP-HARMONY）关闭过渡动画：
+     快速连续切换 Tab 时 transform 的 transition 会被反复打断，有几率停在中间位置 / 与 curIdx 不一致。
+     故用 #ifndef APP 把整段过渡从 App 端产物中剔除，只有 H5 / Web / 小程序保留 220ms 平滑滑动。 */
+  /* #ifndef APP */
   transition-property: transform;
   transition-duration: 220ms;
   transition-timing-function: cubic-bezier(0.25, 1, 0.5, 1);
+  /* #endif */
 }
 
 /* 动态滑块本体胶囊（高亮背景） */

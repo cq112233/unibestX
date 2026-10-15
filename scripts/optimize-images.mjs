@@ -167,8 +167,10 @@ export async function runOptimizer(options = {}) {
       const result = await compressImage(file);
       totalOriginal += result.originalSize;
 
-      // 仅当压缩后体积确实变小时才采纳
-      if (result.savedBytes > 0) {
+      // 仅当压缩后体积确实变小且具有实际压缩价值时才采纳（节约至少 512B 或降幅达到 1%）
+      // 避免因有损重编码产生数十字节微小浮动而频繁反复改写原图并损失画质
+      const hasSignificantSaving = result.savedBytes >= 512 || (result.savedBytes > 0 && Number(result.savedRatio) >= 1.0);
+      if (hasSignificantSaving) {
         totalCompressed += result.compressedSize;
         optimizedCount++;
 
