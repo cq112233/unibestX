@@ -137,7 +137,7 @@ console.log(`📌 HBuilderX CLI: ${cli}`);
 // ---------- 备份 pages.json 与环境设置 ----------
 setupEnv();
 
-// ---------- 静态图片自动化压缩优化（带智能缓存，0毫秒无感跳过） ----------
+// ---------- 静态图片自动化压缩优化（带智能缓存与阈值判定，已最优则无感跳过） ----------
 await runOptimizer();
 
 const hadPages = fs.existsSync(pagesFile);
