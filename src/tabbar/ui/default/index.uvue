@@ -1,9 +1,12 @@
 <script setup lang="uts">
+import { onMounted, onUnmounted } from 'vue';
 import {
   handleTabbarClick,
   isVersionGte525,
+  resetTabSwitchThrottle,
   safeAreaBottom,
   safeHideNativeTabBar,
+  safeRestoreNativeTabBar,
   syncCurIdxByCurrentPage,
   TABBAR_CONTAINER_HEIGHT,
   TABBAR_HEIGHT,
@@ -13,14 +16,27 @@ import {
 } from '@/src/tabbar/index.uts';
 import TabbarItem from './TabbarItem.uvue';
 
+let isMounted = false;
+
 // 首次挂载时同步索引并隐藏原生 TabBar
 onMounted(() => {
+  isMounted = true;
   syncCurIdxByCurrentPage();
   safeHideNativeTabBar();
 });
 
+// 卸载时彻底清理异步资源、还原原生 TabBar 并重置切换节流锁
+onUnmounted(() => {
+  isMounted = false;
+  safeRestoreNativeTabBar();
+  resetTabSwitchThrottle();
+});
+
 /** 处理 Tab 点击 */
 function onTabClick(index: number) {
+  if (!isMounted) {
+    return;
+  }
   handleTabbarClick(index);
 }
 </script>

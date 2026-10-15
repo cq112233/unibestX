@@ -39,8 +39,9 @@ function shouldGateByVisibility(): boolean {
 
 /** 逐一通知关注指定 Tab 索引的订阅者 */
 function notifySubscribers(index: number): void {
-  for (let i = 0; i < subscribers.length; i++) {
-    const subscriber = subscribers[i];
+  const list = subscribers.slice();
+  for (let i = 0; i < list.length; i++) {
+    const subscriber = list[i];
     if (subscriber.index == index) {
       subscriber.callback();
     }
@@ -97,15 +98,23 @@ export function onTabPageShow(target: number | string, callback: () => void, imm
     callback
   };
   subscribers.push(subscriber);
-  onUnmounted(() => {
-    for (let i = 0; i < subscribers.length; i++) {
-      if (subscribers[i].id == id) {
-        subscribers.splice(i, 1);
-        break;
+  let stopWatch: (() => void) | null = null;
+  try {
+    onUnmounted(() => {
+      if (stopWatch != null) {
+        stopWatch!();
+        stopWatch = null;
       }
-    }
-  });
-  watch(curIdx, (newVal: number, oldVal: number) => {
+      for (let i = 0; i < subscribers.length; i++) {
+        if (subscribers[i].id == id) {
+          subscribers.splice(i, 1);
+          break;
+        }
+      }
+    });
+  }
+  catch { }
+  stopWatch = watch(curIdx, (newVal: number, oldVal: number) => {
     if (newVal != index || oldVal == index) {
       return;
     }

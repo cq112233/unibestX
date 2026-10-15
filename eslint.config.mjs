@@ -168,6 +168,18 @@ for (const config of configs) {
     }
   }
 
+  // 将 JS/MJS/CJS/JSX 文件同样纳入 TypeScript parser 作用范围，
+  // 避免 unused-imports/no-unused-vars（底层依赖 @typescript-eslint/no-unused-vars）
+  // 在 ESLint 默认 espree 解析器下因缺少 isValueReference 标记，
+  // 导致所有正常引用的 JS 变量被荒谬误判为 "only used as a type"
+  if (
+    (config.name === 'antfu/typescript/parser' || config.languageOptions?.parser?.meta?.name === 'typescript-eslint/parser')
+    && config.files
+  ) {
+    const files = Array.isArray(config.files) ? config.files : [config.files];
+    config.files = Array.from(new Set([...files, '**/*.?([cm])js', '**/*.?([cm])jsx']));
+  }
+
   // Also make sure extraFileExtensions contains .uvue and .uts
   if (config.languageOptions?.parserOptions) {
     const parserOptions = config.languageOptions.parserOptions;
