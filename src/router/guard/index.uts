@@ -28,7 +28,7 @@
  */
 import { guardLogin } from './guardLogin.uts';
 import { createEmptyRouteTarget, next } from './types.uts';
-import type { GuardResult, RouteGuardContext, RouteTarget } from './types.uts';
+import type { GuardResult, RouteGuardContext, RouteGuardHandler, RouteTarget } from './types.uts';
 
 /**
  * 装配一次导航的守卫上下文（中立的路由事实 + next 裁决构造器）
@@ -85,12 +85,27 @@ export function runRouterGuard(to: RouteTarget, from: RouteTarget | null, api: s
  * @returns 第一条拦下它的规则给出的裁决；全部通过则为 next()
  */
 export function guardRoute(ctx: RouteGuardContext): GuardResult {
-  // 规则 1：登录
-  const login = guardLogin(ctx);
-  if (!login.pass) {
-    return login;
+  /**
+   * 守卫链列表：按数组顺序从上到下依次执行。
+   *
+   * 这么设计的好处：
+   * 1. 【天然优先级与短路】：越核心的规则排越前（如登录）。前面一旦拦截，后续规则直接短路跳过，避免无效计算与越权异常；
+   * 2. 【高内聚与纯函数】：每个守卫都是独立的纯函数文件，各司其职且互不污染，易于编写确定性的单元测试；
+   * 3. 【极简横向扩展】：后续新增业务规则（如 guardRole / guardVip），只需在数组中按序追加一行，对已有代码零侵入；
+   * 4. 【UTS 强类型安全】：统一遵循 RouteGuardHandler 签名契约，数组顺序执行避免复杂的动态黑魔法，全端编译稳定。
+   */
+  const guards: RouteGuardHandler[] = [
+    guardLogin
+    // guardRole, // 示例：角色权限校验（依赖已登录）
+    // guardVip,  // 示例：会员/付费门槛校验
+  ];
+
+  for (let i = 0; i < guards.length; i++) {
+    const res = guards[i](ctx);
+    if (!res.pass) {
+      return res; // 只要有一项未通过，立即短路中断并返回拦截/重定向裁决
+    }
   }
 
-  // 规则 2、3…… 按同样三行节奏往下接（新建 ./guardXxx.uts → import → 插在这里）
   return ctx.next();
 }

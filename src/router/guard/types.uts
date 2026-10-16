@@ -88,3 +88,6 @@ export type RouteGuardContext = {
   /** 对齐 vue-router 的裁决构造函数，可直接从 ctx 解构使用：const { to, next } = ctx */
   next: (location?: any | null) => GuardResult;
 };
+
+/** 守卫函数签名：接收 RouteGuardContext，返回 GuardResult */
+export type RouteGuardHandler = (ctx: RouteGuardContext) => GuardResult;
