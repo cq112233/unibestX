@@ -3,9 +3,12 @@ import {
   createEmptyRoute,
   createRouter,
   createRouterError,
+  decodeQueryValue,
+  decodeSafe,
   getRouteMeta,
   getRouterErrorMessage,
   isNavigationFailure,
+  parseUrlToObj,
   resetRegisteredAfterHooks,
   resetRegisteredErrorHandlers,
   resetRegisteredGuards,
@@ -227,5 +230,30 @@ describe('route-bestX uni_modules 插件核心验证', () => {
     });
     expect(resolvePathByName('cart')).toBe('/pages/cart/index');
     expect(getRouteMeta('/pages/cart/index')?.title).toBe('购物车');
+  });
+
+  it('decodeSafe 与 decodeQueryValue 支持多层编码安全解码与异常防护', () => {
+    // 1. 无需解码的普通文本
+    expect(decodeSafe('hello')).toBe('hello');
+    expect(decodeQueryValue('hello')).toBe('hello');
+
+    // 2. 单层 URL 编码
+    expect(decodeSafe('%2Fpages%2Findex')).toBe('/pages/index');
+    expect(decodeQueryValue('%2Fpages%2Findex')).toBe('/pages/index');
+
+    // 3. 多层/嵌套编码（例如二次编码的 redirect 参数）
+    expect(decodeSafe('%252Fsub%252Fdetail%253Fid%253D123%2526name%253Dabc')).toBe(
+      '/sub/detail?id=123&name=abc'
+    );
+    expect(decodeSafe('%252fsub%252fdetail%253fid%253d123')).toBe('/sub/detail?id=123');
+
+    // 4. 非法或字面量百分号（异常防护不崩溃，保留原文）
+    expect(decodeSafe('100%')).toBe('100%');
+    expect(decodeSafe('%E0%A4%A')).toBe('%E0%A4%A');
+
+    // 5. parseUrlToObj 自动调用 decodeSafe 使得路由参数直接获得最终解码值
+    const parsed = parseUrlToObj('/sub/auth/login?redirect=%252Fsub%252Fdetail%253Fid%253D1');
+    expect(parsed.path).toBe('/sub/auth/login');
+    expect(parsed.query.get('redirect')).toBe('/sub/detail?id=1');
   });
 });

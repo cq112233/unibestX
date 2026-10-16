@@ -52,32 +52,57 @@ export type RouteLocationRaw = {
 };
 
 /**
- * query 参数值的 URL 解码（容错版，路由状态入库前统一走它）
+ * 安全 URL 解码（支持多层编码容错与异常防护）
  *
- * 各端交到我们手里的 query 值形态**不一致**，所以这里不能省成「无脑解一次」：
- * - **编码态**：拦截器解析的 url、以及**微信小程序的页面 `options`** —— 微信官方口径是
- *   路由参数以 URL 编码传递、需自行 `decodeURIComponent`（MP 运行时把 `onLoad(query)`
- *   原样存成 `this.options`，见 uni-mp-weixin 的 `uni.mp.esm.js`）。真机实测：
- *   小程序上 `useRoute()` 曾直接显示 `%E5%AF%B9%E8%B1%A1...`（中文 name 参数）。
- * - **解码态**：`uni.onAppRoute` 的 `event.query`（H5 侧源码即 `decodedQuery(query)`）与
- *   App 端页面 options。已解码的值通常不含 `%`，直接跳过，不会被二次解码破坏。
+ * 各端交到我们手里的 query 值形态**不一致**，特别是带路径的重定向参数（如 redirect）：
+ * - **编码态**：拦截器解析的 url、以及微信小程序/支付宝小程序的页面 options。
+ * - **嵌套/多层编码态**：如拦截器跳转时 redirect 作为参数又被整体编码了一次
+ *   （`%252F` -> 第一层解出 `%2F`，需二次解码为 `/`），若只解一次会导致回跳路径仍带有 URL 编码。
  * - **真含字面量 `%`**（如 `100%`）：JS 运行时会抛 `URIError`、UTS 原生侧返回 null，
- *   两端都要兜住并保留原文 —— 而不是退化成空串（原实现 `?? ''` 会把这个参数悄悄抹掉）。
+ *   两端都要兜住并保留原文 —— 而不是退化成空串或崩溃。
+ *
+ * @param value 待解码的原始字符串
+ * @returns 解码后的值；不含 `%` 或解码失败时原样返回
+ */
+export function decodeSafe(value: string): string {
+  let res = value;
+  if (!res.includes('%')) {
+    return res;
+  }
+  try {
+    const firstDecoded = decodeURIComponent(res);
+    if (firstDecoded != null) {
+      res = firstDecoded;
+      // 容错多层编码：若解完一层仍残留常见的 URL 元字符编码（/、?、=、&），再尝试解一层
+      if (
+        res.includes('%2F') || res.includes('%2f')
+        || res.includes('%3F') || res.includes('%3f')
+        || res.includes('%3D') || res.includes('%3d')
+        || res.includes('%26')
+      ) {
+        try {
+          const secondDecoded = decodeURIComponent(res);
+          if (secondDecoded != null) {
+            res = secondDecoded;
+          }
+        }
+        catch {}
+      }
+    }
+  }
+  catch {}
+  return res;
+}
+
+/**
+ * query 参数值的 URL 解码（容错版，路由状态入库前统一走它）
+ * 内部统一走 decodeSafe，实现单层与嵌套多层编码的自动安全解码。
  *
  * @param value query 原始值
  * @returns 解码后的值；不含 `%` 或解码失败时原样返回
  */
 export function decodeQueryValue(value: string): string {
-  if (!value.includes('%')) {
-    return value;
-  }
-  try {
-    const decoded = decodeURIComponent(value);
-    return decoded != null ? decoded : value;
-  }
-  catch {
-    return value;
-  }
+  return decodeSafe(value);
 }
 
 /**
@@ -528,6 +553,11 @@ export class RouteUtils {
   /** 把 `{ path, query }` 对象序列化为 query 串（值做 URL 编码） */
   serializeQuery(query: UTSJSONObject | null): string {
     return serializeQuery(query);
+  }
+
+  /** 安全 URL 解码（支持多层编码容错，如 %252F -> %2F -> /） */
+  decodeSafe(value: string): string {
+    return decodeSafe(value);
   }
 
   /** query 参数值的 URL 解码（容错：不含 `%` 或解码失败时原样返回） */

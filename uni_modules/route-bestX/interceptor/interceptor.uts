@@ -14,6 +14,7 @@ import {
   cleanPath,
   getCurrentPageOptions,
   getCurrentPath,
+  getPageStackLength,
   getQueryString,
   isSamePath,
   parseUrlToObj
@@ -780,27 +781,6 @@ export function checkAndInterceptPageShow(targetPath: string = ''): boolean {
     return true;
   }
 
-  // 2. 若当前栈顶页面与当前记录的 routeState 相同，说明正常进入或已被同步，无需重复校验
-  if (isSamePath(routeState.path, currentPath)) {
-    return true;
-  }
-
-  // 3. 防抖去重：如果最近 500ms 内已被 navigateBackInterceptor 或 onAppRoute 处理过，跳过
-  if (isSamePath(lastHandledNavigateBackTarget, currentPath) && (Date.now() - lastHandledNavigateBackTime) < 500) {
-    return true;
-  }
-
-  // 4. 此时检测到状态脱节：用户原先在 routeState.path，通过手势直接返回到了 currentPath
-  lastHandledNavigateBackTarget = currentPath;
-  lastHandledNavigateBackTime = Date.now();
-
-  // 构建来源路由快照（用户刚刚离开的上一活跃页面）
-  const fromTarget: RouteTarget = {
-    path: routeState.path,
-    query: routeState.query,
-    fullPath: routeState.fullPath
-  } as RouteTarget;
-
   // 构建目标页面完整 URL（包含 query）
   const optObj = getCurrentPageOptions();
   let toUrl = currentPath;
@@ -820,6 +800,32 @@ export function checkAndInterceptPageShow(targetPath: string = ''): boolean {
       }
     }
   }
+
+  const stackLen = getPageStackLength();
+  const isBackByStack = routeState.pages.length > 0 && stackLen > 0 && stackLen < routeState.pages.length;
+
+  // 2. 若当前栈顶页面与当前记录的 routeState 相同：
+  // 必须明确检测到页面栈出栈减少（isBackByStack）才判定为同路径手势返回；
+  // 否则属于正常前进进入或已被同步，直接放行，严禁重复触发 navigateBack 守卫！
+  if (isSamePath(routeState.path, currentPath) && !isBackByStack) {
+    return true;
+  }
+
+  // 3. 防抖去重：如果最近 500ms 内已被 navigateBackInterceptor 或 onAppRoute 处理过，跳过
+  if (isSamePath(lastHandledNavigateBackTarget, currentPath) && (Date.now() - lastHandledNavigateBackTime) < 500 && !isBackByStack) {
+    return true;
+  }
+
+  // 4. 此时检测到状态脱节：用户原先在 routeState.path，通过手势直接返回到了 currentPath
+  lastHandledNavigateBackTarget = currentPath;
+  lastHandledNavigateBackTime = Date.now();
+
+  // 构建来源路由快照（用户刚刚离开的上一活跃页面）
+  const fromTarget: RouteTarget = {
+    path: routeState.path,
+    query: routeState.query,
+    fullPath: routeState.fullPath
+  } as RouteTarget;
 
   // 执行路由守卫拦截
   const allowed = doIntercept(toUrl, 'navigateBack', fromTarget);

@@ -279,4 +279,50 @@ describe('路由拦截器 Unit Tests', () => {
     expect(uni.navigateTo).toHaveBeenCalledTimes(1);
     expect((uni.navigateTo as any).mock.calls[0][0].url.startsWith(LOGIN_PAGE)).toBe(true);
   });
+
+  it('checkAndInterceptPageShow 能够识别同路径页面带参数重进后的手势返回', async () => {
+    const { checkAndInterceptPageShow, resetLastHandledNavigateBackTarget, routeState } = await loadInterceptor();
+    resetLastHandledNavigateBackTarget();
+
+    // 假设用户原先带参重进了 /src/sub/routerBasicDemo/routerBasicDemo
+    routeState.path = '/src/sub/routerBasicDemo/routerBasicDemo';
+    routeState.fullPath = '/src/sub/routerBasicDemo/routerBasicDemo?id=2001&from=self';
+    routeState.pages = [
+      { route: 'src/pages/index/index' },
+      { route: 'src/sub/routerBasicDemo/routerBasicDemo', options: {} },
+      { route: 'src/sub/routerBasicDemo/routerBasicDemo', options: { id: '2001', from: 'self' } }
+    ];
+
+    // 模拟手势返回出栈：页面栈从 3 减为 2，栈顶变为无参的上一层实例
+    (globalThis as any).getCurrentPages = vi.fn(() => [
+      { route: 'src/pages/index/index' },
+      { route: 'src/sub/routerBasicDemo/routerBasicDemo', options: {} }
+    ]);
+
+    const allowed = checkAndInterceptPageShow();
+    expect(allowed).toBe(true);
+  });
+
+  it('checkAndInterceptPageShow 在同路径新页面初次进入（栈深增加）时直接放行，不会误触发 navigateBack', async () => {
+    const { checkAndInterceptPageShow, resetLastHandledNavigateBackTarget, routeState } = await loadInterceptor();
+    resetLastHandledNavigateBackTarget();
+
+    // 假设原先在第 1 层页面栈
+    routeState.path = '/src/sub/routerBasicDemo/routerBasicDemo';
+    routeState.fullPath = '/src/sub/routerBasicDemo/routerBasicDemo';
+    routeState.pages = [
+      { route: 'src/pages/index/index' },
+      { route: 'src/sub/routerBasicDemo/routerBasicDemo', options: {} }
+    ];
+
+    // 新页面打开：页面栈增加到 3，新页面初次渲染
+    (globalThis as any).getCurrentPages = vi.fn(() => [
+      { route: 'src/pages/index/index' },
+      { route: 'src/sub/routerBasicDemo/routerBasicDemo', options: {} },
+      { route: 'src/sub/routerBasicDemo/routerBasicDemo', options: { from: 'self', id: '2001' } }
+    ]);
+
+    const allowed = checkAndInterceptPageShow();
+    expect(allowed).toBe(true);
+  });
 });

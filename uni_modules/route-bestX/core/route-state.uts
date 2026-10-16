@@ -75,6 +75,7 @@ import {
   decodeQueryValue,
   getCurrentPageOptions,
   getCurrentPath,
+  getPageStackLength,
   getQueryString,
   parseUrlToObj,
   queryValueToString,
@@ -615,7 +616,10 @@ export function syncRouteState(): void {
     }
   }
   const query = queryMapFromObject(getCurrentPageOptions());
-  if (currentPath == routeState.path && query.size == 0) {
+  const stackLen = getPageStackLength();
+  const isBack = routeState.pages.length > 0 && stackLen > 0 && stackLen < routeState.pages.length;
+  // 仅在非出栈返回、且同路径、且本次参数为空时跳过（避免新页初载 options 延迟冲掉发起方写入的 query）
+  if (!isBack && currentPath == routeState.path && query.size == 0) {
     return;
   }
   commitRoute(currentPath, query, buildFullPath(currentPath, query), true);
