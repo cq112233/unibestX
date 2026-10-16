@@ -806,15 +806,39 @@ async function parsePageMeta(
   return await parseDefinePage(content, filename, currentPlatform, projectRoot);
 }
 
-/** 移除 definePage(...) 宏调用，避免运行时报错；未命中时返回 null */
-function stripDefinePageMacro(code: string): string | null {
-  const site = scanDefinePageCall(code);
+/** 定位 <script> 块内容在整份源码中的区间（definePage 是脚本级宏，模板里的同名文本不是宏调用） */
+function findScriptBlocks(code: string): Array<{ start: number; end: number }> {
+  const blocks: Array<{ start: number; end: number }> = [];
+  const openRegex = /<script\b[^>]*>/g;
+  let match = openRegex.exec(code);
+  while (match != null) {
+    const start = match.index + match[0].length;
+    const close = code.indexOf('</script>', start);
+    if (close === -1) {
+      break;
+    }
+    blocks.push({ start, end: close });
+    openRegex.lastIndex = close;
+    match = openRegex.exec(code);
+  }
+  return blocks;
+}
+
+/**
+ * 移除 definePage(...) 宏调用，避免运行时报错；未命中时返回 null。
+ *
+ * 搜索范围限定在 [from, to)：调用方传入 <script> 块区间后，模板中作为文档展示的
+ * `definePage({...})` 文本不会被误删（曾把 `IndexView.uvue` 说明卡片里的示例整段删掉，
+ * 留下一个内容为空的 <text>）。
+ */
+function stripDefinePageMacro(code: string, from: number = 0, to: number = code.length): string | null {
+  const site = scanDefinePageCall(code.slice(from, to));
   if (site == null) {
     return null;
   }
 
-  let start = site.start;
-  let endIdx = site.closeParen + 1;
+  let start = from + site.start;
+  let endIdx = from + site.closeParen + 1;
 
   // 往前清除多余换行
   if (start > 0 && code[start - 1] === '\n') {
@@ -2188,7 +2212,13 @@ export default function uniPagesPlugin(userOptions: UniPagesOptions = {}): Plugi
       await enqueueGenerate();
     },
 
-    /** 移除 definePage(...) 宏调用，避免运行时报错 */
+    /**
+     * 移除 definePage(...) 宏调用，避免运行时报错。
+     *
+     * definePage 是脚本级宏，所以整份 SFC 源码里只在 <script> 块内搜索：模板中作为文档
+     * 展示的 `definePage({...})` 文本必须原样保留。已被拆出的纯脚本子模块没有 <script>
+     * 标签，此时退回整段搜索，保持原行为。
+     */
     transform(code: string, id: string) {
       if (!code.includes('definePage(')) {
         return null;
@@ -2197,11 +2227,23 @@ export default function uniPagesPlugin(userOptions: UniPagesOptions = {}): Plugi
       if (!rawId.endsWith('.uvue') && !rawId.endsWith('.vue')) {
         return null;
       }
-      const newCode = stripDefinePageMacro(code);
-      if (newCode == null) {
-        return null;
+
+      const scriptBlocks = findScriptBlocks(code);
+      if (scriptBlocks.length === 0) {
+        const newCode = stripDefinePageMacro(code);
+        if (newCode == null) {
+          return null;
+        }
+        return { code: newCode, map: null };
       }
-      return { code: newCode, map: null };
+
+      for (let i = 0; i < scriptBlocks.length; i++) {
+        const newCode = stripDefinePageMacro(code, scriptBlocks[i].start, scriptBlocks[i].end);
+        if (newCode != null) {
+          return { code: newCode, map: null };
+        }
+      }
+      return null;
     },
 
     configureServer(s: any) {

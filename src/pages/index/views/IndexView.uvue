@@ -181,11 +181,67 @@
         </view>
       </view>
 
+      <!-- 沙盒独立调试（页面过多时的提速手段） -->
+      <view class="mt-[10px] p-[10px] rounded-[10px] bg-[#f5f3ff] border-[1px] border-solid border-[#ddd6fe]">
+        <view class="flex flex-row items-center mb-[8px]">
+          <text class="text-[12px] mr-[6px]">🧪</text>
+          <text class="text-[12px] font-bold text-[#5b21b6]">页面太多？开启沙盒调试</text>
+          <view class="px-[6px] py-[1px] rounded-[4px] bg-[#7c3aed14] ml-[6px]">
+            <text class="text-[10px] font-bold text-[#6d28d9]">只编译目标页</text>
+          </view>
+        </view>
+
+        <text class="text-[11px] leading-[17px] text-[#4c1d95]">
+          页面与分包变多以后，每次热更新都要全量编译。沙盒模式把编译范围锁定到单个页面或某个模块，冷启动直达目标页，秒级完成编译，也不易被其他页面的报错打断。
+        </text>
+
+        <!-- 方式一：页面内代码标记 -->
+        <view class="flex flex-row items-start mt-[8px]">
+          <view class="px-[5px] py-[1px] rounded-[4px] bg-[#ede9fe] mr-[6px] mt-[1px]">
+            <text class="text-[10px] font-bold text-[#6d28d9]">方式一</text>
+          </view>
+          <view class="flex-1 flex flex-col">
+            <text class="text-[11px] leading-[16px] text-[#334155]">
+              在目标页面内声明代码标记，调试单页最省事
+            </text>
+            <view class="mt-[4px] px-[6px] py-[4px] rounded-[4px] bg-[#0f172a] flex flex-col">
+              <text class="text-[10px] text-[#c4b5fd]" style="font-family: monospace;">
+                definePage({ debug: true, debugHome: true })
+              </text>
+            </view>
+          </view>
+        </view>
+
+        <!-- 方式二：.env 环境变量 -->
+        <view class="flex flex-row items-start mt-[8px]">
+          <view class="px-[5px] py-[1px] rounded-[4px] bg-[#ede9fe] mr-[6px] mt-[1px]">
+            <text class="text-[10px] font-bold text-[#6d28d9]">方式二</text>
+          </view>
+          <view class="flex-1 flex flex-col">
+            <text class="text-[11px] leading-[16px] text-[#334155]">
+              改用 .env 环境变量，支持多页与通配，优先级高于代码标记
+            </text>
+            <view class="mt-[4px] px-[6px] py-[4px] rounded-[4px] bg-[#0f172a] flex flex-col">
+              <text class="text-[10px] text-[#c4b5fd] mb-[2px]" style="font-family: monospace;">
+                VITE_DEV_SANDBOX=true
+              </text>
+              <text class="text-[10px] text-[#c4b5fd]" style="font-family: monospace;">
+                VITE_DEV_SANDBOX_PAGES=src/sub/auth/*
+              </text>
+            </view>
+          </view>
+        </view>
+
+        <text class="text-[10px] leading-[15px] mt-[8px] text-[#7c3aed]">
+          多个页面用逗号分隔（首个为启动首页），也可用 src/sub/auth/* 通配整个模块；调试完把 debug 改回 false 即恢复全量，正式打包会自动熔断沙盒。
+        </text>
+      </view>
+
       <!-- 底部建议 -->
       <view class="mt-[10px] p-[8px] rounded-[8px] bg-[#eff6ff] border-[1px] border-solid border-[#bfdbfe] flex flex-row items-start">
         <text class="text-[12px] mr-[4px]">💡</text>
         <text class="text-[11px] leading-[17px] text-[#1d4ed8] flex-1">
-          建议：业务开发优先使用 H5（pnpm dev:h5）调样式与逻辑；在 VITE_TABBAR_MODE=4 模式下除 H5 均会重置到首页。功能稳定后再切真机或小程序做多端兼容验收。
+          建议：业务开发优先使用 H5（pnpm dev:h5）调样式与逻辑；页面或分包较多时开启沙盒调试，只编译当前目标页；在 VITE_TABBAR_MODE=4 模式下除 H5 均会重置到首页。功能稳定后再切真机或小程序做多端兼容验收。
         </text>
       </view>
     </view>
@@ -346,8 +402,8 @@ type FeatureItem = {
 const featureList: Array<FeatureItem> = [
   {
     id: 'tabbar',
-    title: '🚀 单页 TabBar',
-    desc: '0ms 秒切保活・零白屏',
+    title: '🚀 多策略 TabBar',
+    desc: '5 种策略・单页保活零白屏',
     configPath: 'src/tabbar/config.uts',
     bgColor: '#10b9810f',
     borderColor: '#10b98126',
