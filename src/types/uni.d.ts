@@ -567,82 +567,9 @@ declare global {
   };
 
   // ==========================================
-  // uni-app X 路由 API 的 Options 类型（navigateTo / redirectTo / reLaunch / switchTab）
-  //
-  // 为什么要补（与上方 RequestTask 完全同一成因，只是换了个 API 分组）：
-  //   1) HBuilderX 自带 uni-app x dts 已把四者提升为全局
-  //      （HBuilderX 内置 @dcloudio/uni-app-x/types/uni/uts-plugin-api/lib/uni-route/
-  //       utssdk/global.d.ts:65,69,73,80），故 HBuilderX 里写 `options as NavigateToOptions` 不报错；
-  //   2) VSCode / tsconfig 侧挂的 npm 包 `@dcloudio/types` 把四者关在
-  //      `declare namespace UniNamespace` 内（uni/legacy/uni.d.ts:5276 起），**未提升到全局**，
-  //      于是 .uts 里裸写名字报 TS2304「找不到名称」；
-  //   3) 同样不能改用 `UniNamespace.NavigateToOptions` 绕开（`declare namespace` 非 UTS 语法，
-  //      写进 .uts 源码会被 HBuilderX 编译报错）。
-  //
-  // 真源：uni-route/utssdk/interface.d.ts 的 NavigateToOptions:842 / RedirectToOptions:1637 /
-  //       ReLaunchOptions:1919 / SwitchTabOptions:2203；三个回调入参在真源里统一取自
-  //       AsyncApiResult（native/AsyncApiResult.d.ts:5，即 `{ errMsg: string }`），失败回参另带 errCode。
-  // ⚠️ 必须用 `type` 而非 `interface`：scripts/gen-uts-dts.mjs 注明「项目禁用 interface」。
-  // ⚠️ 这里的 `url` 只留 `string`：真源标注是 `string | string.PageURIString`（品牌化字符串），
-  //    UTS 侧可直接赋给 string；VSCode 侧若照抄该联合类型，`url = opt.url` 会反过来报 TS2322。
+  // uni-app X 路由 API 的 Options 类型（navigateTo / redirectTo / reLaunch / switchTab / navigateBack）
+  // ⚠️ 已收敛移入 uni_modules/route-bestX/types.d.ts 插件目录内部，保证插件自包含
   // ==========================================
-
-  /** 路由 API 成功 / 完成回调的入参 */
-  type UniRouteApiResult = {
-    errMsg: string;
-  };
-
-  /** 路由 API 失败回调的入参（真源 errCode 为字面量 `4`，这里放宽为 number） */
-  type UniRouteApiFailResult = {
-    errMsg: string;
-    errCode: number;
-  };
-
-  type NavigateToOptions = {
-    url: string;
-    animationType?:
-      | 'auto'
-      | 'none'
-      | 'slide-in-right'
-      | 'slide-in-left'
-      | 'slide-in-top'
-      | 'slide-in-bottom'
-      | 'fade-in'
-      | 'zoom-out'
-      | 'zoom-fade-out'
-      | 'pop-in'
-      | null;
-    animationDuration?: number | null;
-    events?: any | null;
-    success?: ((result: UniRouteApiResult) => void) | null;
-    fail?: ((result: UniRouteApiFailResult) => void) | null;
-    complete?: ((result: UniRouteApiResult) => void) | null;
-    routeConfig?: any | null;
-    routeOptions?: any | null;
-    routeType?: string | null;
-    withOpenContainer?: any | null;
-  };
-
-  type RedirectToOptions = {
-    url: string;
-    success?: ((result: UniRouteApiResult) => void) | null;
-    fail?: ((result: UniRouteApiFailResult) => void) | null;
-    complete?: ((result: UniRouteApiResult) => void) | null;
-  };
-
-  type ReLaunchOptions = {
-    url: string;
-    success?: ((result: UniRouteApiResult) => void) | null;
-    fail?: ((result: UniRouteApiFailResult) => void) | null;
-    complete?: ((result: UniRouteApiResult) => void) | null;
-  };
-
-  type SwitchTabOptions = {
-    url: string;
-    success?: ((result: UniRouteApiResult) => void) | null;
-    fail?: ((result: UniRouteApiFailResult) => void) | null;
-    complete?: ((result: UniRouteApiResult) => void) | null;
-  };
 
   // ==========================================
   // 给 @dcloudio/types 的 UniNamespace.RequestTask 补齐分块接收 API

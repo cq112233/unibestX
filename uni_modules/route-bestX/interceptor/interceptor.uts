@@ -566,11 +566,26 @@ export const navigateBackInterceptor: Interceptor = {
     const pages = getCurrentPages();
     let delta = 1;
     if (options != null) {
-      const optMap = options as UTSJSONObject;
-      const d = optMap.delta as number | null;
-      if (d != null && d > 0) {
-        delta = d;
+      // #ifdef APP
+      try {
+        const opt = options as NavigateBackOptions;
+        const d = opt.delta;
+        if (d != null && d > 0) {
+          delta = d;
+        }
       }
+      catch { }
+      // #endif
+      // #ifndef APP
+      try {
+        const optMap = options as UTSJSONObject;
+        const d = optMap.delta as number | null;
+        if (d != null && d > 0) {
+          delta = d;
+        }
+      }
+      catch { }
+      // #endif
     }
     const targetIdx = pages.length - 1 - delta;
     if (targetIdx < 0 && pages.length > 0) {
