@@ -78,6 +78,9 @@ export type PagesJsonOutput = {
   [key: string]: any;
 };
 
+export type UniPagesContextFn = (baseContext: Record<string, any>) => Record<string, any>;
+export type UniPagesUserContext = Record<string, any> | UniPagesContextFn;
+
 export type UniPagesOptions = {
   /**
    * 是否启用插件扫描与 pages.json 自动生成总开关
@@ -97,6 +100,11 @@ export type UniPagesOptions = {
   configFile?: string;
   /** 首页路径 */
   homePage?: string;
+  /**
+   * 自定义扩展注入到 definePage((options) => ...) 宏沙箱环境中的上下文对象或生成函数
+   * 支持静态对象，或接收基础上下文 ({ platform, env, define, ... }) 返回扩展对象的函数
+   */
+  context?: UniPagesUserContext;
 };
 
 export type ResolvedUniPagesOptions = {
@@ -107,6 +115,7 @@ export type ResolvedUniPagesOptions = {
   outFile: string;
   configFile: string;
   homePage: string;
+  context?: UniPagesUserContext;
 };
 
 export type PagesBuildFlags = {
@@ -204,7 +213,8 @@ export function resolveOptions(userOptions: UniPagesOptions = {}): ResolvedUniPa
     exclude: userOptions.exclude ?? [],
     outFile: userOptions.outFile ?? DEFAULT_OUT_FILE,
     configFile: userOptions.configFile ?? DEFAULT_CONFIG_FILE,
-    homePage: userOptions.homePage ?? ''
+    homePage: userOptions.homePage ?? '',
+    context: userOptions.context
   };
 }
 
@@ -578,7 +588,8 @@ async function parseDefinePage(
   content: string,
   filename: string = 'page.uvue',
   currentPlatform: string = '',
-  projectRoot: string = process.cwd()
+  projectRoot: string = process.cwd(),
+  extraContext?: UniPagesUserContext
 ): Promise<Record<string, any> | null> {
   let targetContent = content;
   const scriptMatch = content.match(/<script[^>]*>([\s\S]*?)<\/script>/);
@@ -660,11 +671,16 @@ async function parseDefinePage(
       valueOf: () => platformEnv.platform
     };
 
-    const macroCtx = {
+    const baseCtx = {
       ...platformEnv,
       platform: platformObj,
       env: envVars,
       define: defineHelper
+    };
+    const userCtx = typeof extraContext === 'function' ? extraContext(baseCtx) : (extraContext ?? {});
+    const macroCtx = {
+      ...baseCtx,
+      ...userCtx
     };
 
     const vmContext = {
@@ -724,11 +740,16 @@ async function parseDefinePage(
             toString: () => pEnv.platform,
             valueOf: () => pEnv.platform
           };
-          const pCtx = {
+          const pBaseCtx = {
             ...pEnv,
             platform: pPlatformObj,
             env: envVars,
             define: defineHelper
+          };
+          const pUserCtx = typeof extraContext === 'function' ? extraContext(pBaseCtx) : (extraContext ?? {});
+          const pCtx = {
+            ...pBaseCtx,
+            ...pUserCtx
           };
           let pRes = parsed(pCtx);
           if (pRes != null && typeof pRes.then === 'function') {
@@ -797,13 +818,14 @@ async function parsePageMeta(
   content: string,
   filename: string = 'page.uvue',
   currentPlatform: string = '',
-  projectRoot: string = process.cwd()
+  projectRoot: string = process.cwd(),
+  extraContext?: UniPagesUserContext
 ): Promise<Record<string, any> | null> {
   const route = parseRouteBlock(content);
   if (route != null) {
     return route;
   }
-  return await parseDefinePage(content, filename, currentPlatform, projectRoot);
+  return await parseDefinePage(content, filename, currentPlatform, projectRoot, extraContext);
 }
 
 /** 定位 <script> 块内容在整份源码中的区间（definePage 是脚本级宏，模板里的同名文本不是宏调用） */
@@ -1756,7 +1778,7 @@ export async function buildPages(
   const scannedResults = await Promise.all(
     files.map(async (file) => {
       const raw = fs.readFileSync(file, 'utf-8');
-      const meta = await parsePageMeta(raw, file, process.env.UNI_PLATFORM, root);
+      const meta = await parsePageMeta(raw, file, process.env.UNI_PLATFORM, root, options.context);
       return { file, raw, meta };
     })
   );
@@ -1815,7 +1837,7 @@ export async function buildPages(
     const subResults = await Promise.all(
       subFiles.map(async (subFile) => {
         const raw = fs.readFileSync(subFile, 'utf-8');
-        const meta = await parsePageMeta(raw, subFile, process.env.UNI_PLATFORM, root);
+        const meta = await parsePageMeta(raw, subFile, process.env.UNI_PLATFORM, root, options.context);
         return { subFile, raw, meta };
       })
     );

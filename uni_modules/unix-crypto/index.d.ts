@@ -1,0 +1,16 @@
+export function base64Encode(text: string): Promise<string>;
+export function base64Decode(base64: string): Promise<string>;
+export function md5(text: string): Promise<string>;
+export function sha256(text: string): Promise<string>;
+export function hmacSha1(text: string, key: string): Promise<string>;
+export function aesEncrypt(text: string, key: string): Promise<string>;
+export function aesDecrypt(hex: string, key: string): Promise<string>;
+export function desEncrypt(text: string, key: string): Promise<string>;
+export function desDecrypt(hex: string, key: string): Promise<string>;
+export function rsaGenerateKeyPair(bits: number): Promise<string>;
+export function rsaEncrypt(text: string, publicKey: string): Promise<string>;
+export function rsaDecrypt(hex: string, privateKey: string): Promise<string>;
+export function rsaSign(text: string, privateKey: string, hashType: string): Promise<string>;
+export function rsaVerify(text: string, publicKey: string, sigHex: string, hashType: string): Promise<boolean>;
+export function generateUUID(): string;
+export function uuid(): string;

@@ -479,4 +479,51 @@ definePage(() => {
       fs.rmSync(tmpDir, { recursive: true, force: true });
     }
   });
+
+  it('支持通过 options.context 扩展注入自定义数据与方法到 definePage 宏', async () => {
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'uni-pages-custom-context-'));
+    try {
+      const pagesDir = path.join(tmpDir, 'src', 'pages', 'test-context');
+      fs.mkdirSync(pagesDir, { recursive: true });
+
+      const pageCode = `
+<template><view>Context Demo</view></template>
+<script setup lang="ts">
+definePage((options) => {
+  const { appName, tenantId, buildYear } = options;
+  return {
+    name: 'test-context',
+    style: {
+      navigationBarTitleText: \`\${appName}-\${tenantId}-\${buildYear}\`
+    }
+  };
+});
+</script>
+`;
+      fs.writeFileSync(path.join(pagesDir, 'index.uvue'), pageCode, 'utf-8');
+
+      // 静态对象与函数式扩展注入均支持
+      const state = await buildPages(
+        {
+          dir: 'src/pages',
+          outFile: 'pages.json',
+          configFile: 'pages.config.json',
+          context: baseCtx => ({
+            appName: 'UnibestXPro',
+            tenantId: baseCtx.env.TEST_TENANT ?? 'tenant-999',
+            buildYear: 2026
+          })
+        },
+        { root: tmpDir, isProduction: false }
+      );
+
+      expect(state).not.toBeNull();
+      const page = state!.finalPages.find(p => p.path.includes('test-context'));
+      expect(page).toBeDefined();
+      expect(page!.style?.navigationBarTitleText).toBe('UnibestXPro-tenant-999-2026');
+    }
+    finally {
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    }
+  });
 });

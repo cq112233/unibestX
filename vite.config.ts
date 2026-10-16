@@ -268,7 +268,16 @@ export default defineConfig({
       configFile: 'pages.config.json',
 
       // 【强制指定首页】：若指定则优先以该路由为主包第一个首页；留空时默认取 pages.config.json 首项或扫描的第一项
-      homePage: ''
+      homePage: '',
+
+      // 【自定义上下文扩展注入】：向 definePage((options) => ...) 的 options 注入业务自定义属性
+      // 支持静态对象或函数 (_baseCtx => ({ ... }))，可在页面中解构 options.xxx 读取
+      context: _baseCtx => ({
+        // 可自由注入业务常量、环境变量、构建参数或辅助方法
+        appName: env.VITE_APP_TITLE || 'unibestX',
+        isProduction,
+        buildVersion: process.env.VITE_APP_VERSION || '1.0.0'
+      })
     }),
     // uni-pages 的三个独立卫星插件：各自一个文件、各自独立注册，核心插件通过 configResolved
     // 从插件数组里发现它们携带的 uniPagesStage 属性，在同一次生成 pass 内按 order 依次运行。

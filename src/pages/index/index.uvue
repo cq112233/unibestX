@@ -22,7 +22,8 @@ import { isSinglePageTabbar, notifyPageHide, notifyPageShow, setCurIdxByKey } fr
 import { handleBackPressExit } from '@/src/utils/backPress/index.uts';
 
 definePage((options) => {
-  const { platform } = options;
+  // options 支持解构出内置 platform，以及 vite.config.ts 中 uniPagesPlugin.context 注入的自定义属性（如 appName、isProduction 等）
+  const { platform, appName: _appName } = options;
   const { isH5, isAppIOS, isAppAndroid, isAppHarmony, isMpAlipay, isMpWeixin } = platform;
   return {
     customPageClass: 'init-page', // 页面根容器自定义类名（配合 layout 布局使用，支持配置全局样式类）
