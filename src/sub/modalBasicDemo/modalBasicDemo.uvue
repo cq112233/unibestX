@@ -148,14 +148,6 @@ import { useModalStore } from '@/src/store/index.uts';
 import TabbarMaskModal from '@/src/components/TabbarMaskModal/TabbarMaskModal.uvue';
 import SwiperModalTrigger from './components/SwiperModalTrigger.uvue';
 
-// const router = useRouter();
-// const route = useRoute();
-
-// console.log(route);
-// console.log(router.currentRoute);
-
-console.log(getCurrentPages());
-
 definePage({
   debug: false,
   layout: 'navbar',
@@ -163,8 +155,8 @@ definePage({
   hideNavbar: false,
   enablePullDownRefresh: false,
   style: {
-    navigationBarTitleText: '全屏遮罩弹窗'
-    // navigationStyle: 'custom'
+    navigationBarTitleText: '全屏遮罩弹窗',
+    navigationStyle: 'custom'
   }
 });
 
