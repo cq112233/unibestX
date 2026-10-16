@@ -15,6 +15,7 @@
 </template>
 
 <script setup lang="uts">
+import { getCurrentInstance } from 'vue';
 import HomeView from './views/IndexView.uvue';
 import TabViews from '@/src/tabbar/components/TabViews.uvue';
 import Tabbar from '@/src/tabbar/tabbar.uvue';
@@ -30,6 +31,11 @@ console.log(route, 'route');
 console.log(route.path, 'route.path');
 console.log(route.fullPath, 'route.fullPath');
 console.log(router, 'router');
+
+// 方式 B：通过 getCurrentInstance() 访问全局挂载的 $router
+const instance = getCurrentInstance();
+const globalRouter = instance?.appContext.config.globalProperties.$router;
+console.log(globalRouter, 'globalRouter from getCurrentInstance');
 
 // definePage 支持「静态对象」与「函数式（含 async 异步）」写法：
 // 1. 跨端条件配置：基于 options.platform 进行多端分支判断，构建期会自动生成 pages.json 中的条件编译块（#ifdef / #endif）
