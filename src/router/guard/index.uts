@@ -101,9 +101,16 @@ export function guardRoute(ctx: RouteGuardContext): GuardResult {
   ];
 
   for (let i = 0; i < guards.length; i++) {
-    const res = guards[i](ctx);
-    if (!res.pass) {
-      return res; // 只要有一项未通过，立即短路中断并返回拦截/重定向裁决
+    try {
+      const res = guards[i](ctx);
+      if (!res.pass) {
+        return res; // 只要有一项未通过，立即短路中断并返回拦截/重定向裁决
+      }
+    }
+    catch (err: any) {
+      console.error(`[RouterGuard] 执行第 ${i} 项守卫异常:`, err);
+      // 安全兜底：守卫发生异常时静默拦截本次跳转，防止越权或不可控行为
+      return ctx.next(false);
     }
   }
 
