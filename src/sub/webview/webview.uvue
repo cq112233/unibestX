@@ -11,6 +11,9 @@
 
 <script setup lang="uts">
 import { ref } from 'vue';
+import { useRouter } from '@/uni_modules/route-bestX/index.uts';
+
+const router = useRouter();
 
 definePage({
   debug: false,
@@ -50,8 +53,8 @@ function onWebviewMessage(event: UniWebViewMessageEvent): void {
   if (data != null && data.length > 0) {
     const lastItem = data[data.length - 1] as UTSJSONObject;
     const msgType = lastItem.type as string | null;
-    if (msgType === 'NAVIGATE_BACK') {
-      uni.navigateBack();
+    if (msgType == 'NAVIGATE_BACK') {
+      router.back();
       return;
     }
     const title = (lastItem.title as string | null) ?? (lastItem.content as string | null) ?? '收到网页消息';
