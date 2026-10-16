@@ -1,0 +1,86 @@
+/**
+ * 业务守卫规则编排中心 (src/router/guards)
+ *
+ * 聚合所有业务守卫规则（停服维护、登录鉴权、角色权限等），通过流水线责任链统一挂载至 router.beforeEach。
+ */
+import type {
+  NextFunction,
+  Router,
+  RouteTarget
+} from '@/uni_modules/route-bestX/index.uts';
+import { buildGuardContext } from '@/uni_modules/route-bestX/index.uts';
+import { guardMaintenance } from './guardMaintenance.uts';
+import { guardLogin } from './guardLogin.uts';
+import { guardPermission } from './guardPermission.uts';
+
+/**
+ * ## 业务前置守卫规则队列（责任链流水线模式）
+ *
+ * 核心执行机制：
+ * 1. 数组内的规则按**自上而下**的顺序依次执行；
+ * 2. 遇到任一未放行规则（`decision.pass == false`）立即改跳并短路中断，后续规则不再跑；
+ * 3. 全部规则通过后，自动调用 `next()` 放行本次路由。
+ *
+ * ---
+ *
+ * 执行优先级排序：
+ * 1. guardMaintenance: 系统维护公告拦截（最高优先级，停服维护时所有业务页面全部拦下跳转维护页）
+ * 2. guardLogin: 登录认证与黑白名单策略拦截（基础身份校验）
+ * 3. guardPermission: 角色与权限拦截（业务细粒度准入校验）
+ */
+/**
+ * 守卫责任链流水线执行函数
+ */
+function runGuardsPipeline(to: RouteTarget, from: RouteTarget, next: NextFunction, api?: string): void {
+  // 统一装配中立的上下文事实
+  const ctx = buildGuardContext(to, from, api ?? 'navigateTo');
+
+  // 1. 系统维护公告拦截（最高优先级）
+  const r1 = guardMaintenance(ctx);
+  if (!r1.pass) {
+    next(r1.redirect);
+    return;
+  }
+
+  // 2. 登录认证拦截
+  const r2 = guardLogin(ctx);
+  if (!r2.pass) {
+    next(r2.redirect);
+    return;
+  }
+
+  // 3. 权限与角色准入拦截
+  const r3 = guardPermission(ctx);
+  if (!r3.pass) {
+    next(r3.redirect);
+    return;
+  }
+
+  // 全部规则放行
+  next();
+}
+
+/**
+ * 安装业务全局路由守卫与生命周期钩子（挂载至路由实例，幂等防重由 route-bestX 插件底层保障）
+ */
+export function setupRouteGuards(router: Router): void {
+  // 1. 注册全局前置守卫（责任链流水线）
+  router.beforeEach((to: RouteTarget, from: RouteTarget, next: NextFunction, api?: string): any | null => {
+    runGuardsPipeline(to, from, next, api);
+    return null;
+  });
+
+  // 2. 注册全局后置钩子（页面跳转完成、数据统计与埋点上报）
+  router.afterEach((to: RouteTarget, from: RouteTarget, failure?: any | null) => {
+    console.log(to, from, failure, 'afterEach');
+    if (failure != null) {
+      console.warn('[Router afterEach] 导航中断/异常:', failure);
+      return;
+    }
+  });
+
+  // 3. 注册全局路由错误捕获回调
+  router.onError((error: any, to?: RouteTarget | null, from?: RouteTarget | null) => {
+    console.error('[Router onError] 路由异常:', error, 'to:', to?.path, 'from:', from?.path);
+  });
+}

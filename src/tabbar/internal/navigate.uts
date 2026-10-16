@@ -85,7 +85,7 @@ let switchTabTimer: number | null = null;
  */
 export function resetTabSwitchThrottle(): void {
   if (switchTabTimer != null) {
-    clearTimeout(switchTabTimer as any);
+    clearTimeout(switchTabTimer as number);
     switchTabTimer = null;
   }
   isSwitchingTab = false;
@@ -117,12 +117,12 @@ export function handleTabbarClick(index: number): void {
   setCurIdx(index);
   switchTabbar(url);
   if (switchTabTimer != null) {
-    clearTimeout(switchTabTimer as any);
+    clearTimeout(switchTabTimer as number);
   }
-  switchTabTimer = (setTimeout((): void => {
+  switchTabTimer = setTimeout((): void => {
     isSwitchingTab = false;
     switchTabTimer = null;
-  }, 250) as any) as number;
+  }, 250);
 }
 
 /**

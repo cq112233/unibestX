@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import process from 'node:process';
 import JSON5 from 'json5';
+import { loadPlatformPagesJson } from './pages-json-util';
 
 /**
  * 驼峰转连字符 helper
@@ -12,13 +13,18 @@ function kebabCase(str: string): string {
 
 /** 从源码中提取 definePage({...}) 的配置对象 */
 function parseDefinePage(content: string): Record<string, any> | null {
+  // definePage 是脚本级宏：只在 <script> 块内搜索，否则模板里作为文档展示的
+  // definePage({...}) 示例文本会被当成宏调用解析出错误的 layout / 路由参数
+  const scriptMatch = content.match(/<script[^>]*>([\s\S]*?)<\/script>/);
+  const source = scriptMatch != null && scriptMatch[1] != null ? scriptMatch[1] : content;
+
   const startRegex = /definePage\s*\(\s*\{/;
-  const match = content.match(startRegex);
+  const match = source.match(startRegex);
   if (match == null || match.index == null) {
     return null;
   }
 
-  const openParen = content.indexOf('(', match.index);
+  const openParen = source.indexOf('(', match.index);
   if (openParen === -1) {
     return null;
   }
@@ -28,9 +34,9 @@ function parseDefinePage(content: string): Record<string, any> | null {
   let stringChar = '';
   let i = openParen + 1;
 
-  for (; i < content.length; i++) {
-    const ch = content[i];
-    const prev = i > 0 ? content[i - 1] : '';
+  for (; i < source.length; i++) {
+    const ch = source[i];
+    const prev = i > 0 ? source[i - 1] : '';
 
     if (inString) {
       if (ch === stringChar && prev !== '\\') {
@@ -45,17 +51,17 @@ function parseDefinePage(content: string): Record<string, any> | null {
       continue;
     }
 
-    if (ch === '/' && i + 1 < content.length) {
-      if (content[i + 1] === '/') {
-        const newline = content.indexOf('\n', i);
+    if (ch === '/' && i + 1 < source.length) {
+      if (source[i + 1] === '/') {
+        const newline = source.indexOf('\n', i);
         if (newline === -1) {
           break;
         }
         i = newline;
         continue;
       }
-      if (content[i + 1] === '*') {
-        const end = content.indexOf('*/', i + 2);
+      if (source[i + 1] === '*') {
+        const end = source.indexOf('*/', i + 2);
         if (end === -1) {
           break;
         }
@@ -70,7 +76,7 @@ function parseDefinePage(content: string): Record<string, any> | null {
     if (ch === '}' || ch === ')') {
       depth--;
       if (depth < 0) {
-        const arg = content.slice(openParen + 1, i).trim();
+        const arg = source.slice(openParen + 1, i).trim();
         if (arg.startsWith('{')) {
           try {
             return JSON5.parse(arg) as Record<string, any>;
@@ -151,9 +157,7 @@ export function uniLayoutsPlugin(options: UniLayoutsOptions = {}) {
     }
 
     try {
-      const rawContent = fs.readFileSync(pagesJsonPath, 'utf-8');
-      const cleanJson = rawContent.replace(/\/\*[\s\S]*?\*\/|([^\\:]|^)\/\/.*$/gm, '$1');
-      const data = JSON.parse(cleanJson) as PagesJson;
+      const data = loadPlatformPagesJson(pagesJsonPath) as PagesJson;
 
       // 1. 解析主包页面
       if (Array.isArray(data.pages)) {

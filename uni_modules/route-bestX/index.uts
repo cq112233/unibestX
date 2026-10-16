@@ -1,0 +1,104 @@
+/**
+ * route-bestX - uni-app X 极简高性能跨端路由引擎
+ *
+ * 专为 uni-app X / UTS 强类型架构打造的跨端路由解决方案。
+ * 支持：全平台导航守卫、手势返回拦截、页面快照隔离、Vue Router 标准语法。
+ */
+
+// 1. 核心导航器与组合式 Hooks
+export * from './hooks/useRoute.uts';
+export * from './hooks/useRouter.uts';
+
+// 2. 全局守卫与生命周期钩子
+export {
+  afterEach,
+  beforeEach,
+  buildGuardContext,
+  onError,
+  registerAfterEach,
+  registerBeforeEach,
+  registerOnError,
+  resetRegisteredAfterHooks,
+  resetRegisteredErrorHandlers,
+  resetRegisteredGuards,
+  runAfterEachHooks,
+  runOnErrorHandlers,
+  runRouterGuard
+} from './guard/index.uts';
+export type {
+  GuardResult,
+  NavigationErrorHandler,
+  NavigationGuard,
+  NavigationHookAfter,
+  NextFunction,
+  RouteGuardContext,
+  RouteGuardHandler,
+  RouteTarget
+} from './guard/types.uts';
+
+// 3. 拦截器与生命周期
+export {
+  checkAndInterceptPageShow,
+  checkDirectEntry,
+  chooseLocationInterceptor,
+  installRouteInterceptor,
+  isBypassInterceptorOnce,
+  navigateBackInterceptor,
+  navigateToInterceptor,
+  redirectToInterceptor,
+  registerTabbarHandler,
+  reLaunchInterceptor,
+  setBypassInterceptorOnce,
+  switchTabInterceptor
+} from './interceptor/interceptor.uts';
+export type { TabbarHandler } from './interceptor/interceptor.uts';
+
+// 4. 路由状态与核心算法
+export {
+  ensureRouteReady,
+  getRouteMeta,
+  previousRouteState,
+  removeRouteMeta,
+  routeState,
+  setPageMetaJson,
+  setRouteMeta,
+  setRoutes,
+  setRoutesMeta,
+  syncRouteState
+} from './core/route-state.uts';
+export type { RouteLocation, RouteRecordRaw } from './core/route-types.uts';
+export { createEmptyRoute } from './core/route-types.uts';
+
+// 5. 工具库
+export type { RouteLocationRaw, UrlObj } from './utils/utils.uts';
+export {
+  cleanPath,
+  decodeQueryValue,
+  decodeSafe,
+  ensureLeadingSlash,
+  getCurrentPageOptions,
+  getCurrentPath,
+  getCurrentRoute,
+  getPageStackLength,
+  getQueryString,
+  isSamePath,
+  parseUrlToObj,
+  queryValueToString,
+  removeLeadingSlash,
+  resolvePathByName,
+  resolveUrl,
+  route,
+  serializeQuery,
+  setNameToPathResolver
+} from './utils/utils.uts';
+
+// 6. 路由错误与导航失败规范
+export {
+  ROUTER_ERROR_CODE,
+  createRouterError,
+  getRouterErrorMessage,
+  isNavigationFailure,
+  isRouterError
+} from './core/router-error.uts';
+export type { RouterError } from './core/router-error.uts';
+

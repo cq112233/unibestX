@@ -18,8 +18,10 @@ import { utsObject } from './helpers';
 /** 取一份全新的 route-state 模块（模块级状态在用例间会串，必须逐用例重置） */
 async function loadRouteState() {
   vi.resetModules();
-  const mod = await import('@/src/router/hooks/route-state.uts');
-  const useRouteMod = await import('@/src/router/hooks/useRoute.uts');
+  const mod = await import('@/uni_modules/route-bestX/core/route-state.uts');
+  const useRouteMod = await import('@/uni_modules/route-bestX/hooks/useRoute.uts');
+  const { PAGE_META_JSON } = await import('@/src/router/generated/page-meta.uts');
+  mod.setPageMetaJson(PAGE_META_JSON);
   return { ...mod, useRoute: useRouteMod.useRoute };
 }
 
@@ -80,6 +82,8 @@ describe('useRoute Unit Tests', () => {
     expect(uni.onAppRoute).toHaveBeenCalledTimes(1);
     expect(route.path).toBe('/src/pages/index/index');
     expect(route.fullPath).toBe('/src/pages/index/index');
+    expect(route.pages).toHaveLength(1);
+    expect(route.page).toBeDefined();
   });
 
   it('重复调用只安装一次监听；每次调用返回各自一份快照（值相同、互不影响）', async () => {
@@ -281,7 +285,7 @@ describe('useRoute Unit Tests', () => {
     expect(fallback?.getString('path')).toBe('/src/pages/index/index');
   });
 
-  it('params 恒为空 Map；definePage 未声明 name 时 name 为 null', async () => {
+  it('params 恒为空 Map；definePage 未声明 name 时默认读取路径最后一个单词', async () => {
     const { useRoute, applyRouteFromUrl } = await loadRouteState();
     const route = useRoute();
 
@@ -289,7 +293,7 @@ describe('useRoute Unit Tests', () => {
 
     expect(route.params.size).toBe(0);
     expect(route.meta).not.toBeNull();
-    expect(route.name).toBeNull();
+    expect(route.name).toBe('function');
   });
 
   it('uninstallRouteStateListener 后重新调用 useRoute 会再次安装', async () => {

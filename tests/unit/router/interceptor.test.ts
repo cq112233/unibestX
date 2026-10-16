@@ -14,12 +14,12 @@ import { utsObject } from './helpers';
  * 的类型分支、ClassCastException）单测**不复现**，那部分靠真机把关。
  */
 
-/** 取一份全新的模块（route-state 有模块级状态，逐用例重置） */
 async function loadInterceptor() {
   vi.resetModules();
-  const interceptorMod = await import('@/src/router/interceptor/interceptor.uts');
-  const stateMod = await import('@/src/router/hooks/route-state.uts');
-  return { ...interceptorMod, ...stateMod };
+  const { router } = await import('@/src/router/index.uts');
+  const interceptorMod = await import('@/uni_modules/route-bestX/interceptor/interceptor.uts');
+  const stateMod = await import('@/uni_modules/route-bestX/core/route-state.uts');
+  return { ...interceptorMod, ...stateMod, router };
 }
 
 /** 让页面栈停在指定路由 */
@@ -71,7 +71,7 @@ describe('路由拦截器 Unit Tests', () => {
 
   it('被登录校验拦下时不写目标路由（拦截器已改跳登录页，路由交给那次跳转自己写）', async () => {
     const { navigateToInterceptor, routeState } = await loadInterceptor();
-    const { LOGIN_PAGE } = await import('@/src/router/config/config.uts');
+    const { LOGIN_PAGE } = await import('@/src/router/config.uts');
 
     // 黑名单模式：EXCLUDE_LOGIN_PATH_LIST 里的页面在未登录时被拦下并跳登录页
     const allowed = navigateToInterceptor.invoke({ url: '/src/sub/routerParamsBasicDemo/routerParamsBasicDemo' });
@@ -148,7 +148,7 @@ describe('路由拦截器 Unit Tests', () => {
 
   it('守卫返回的改跳目标原样派发（框架不参与登录业务判断）', async () => {
     const { navigateToInterceptor, routeState } = await loadInterceptor();
-    const { LOGIN_PAGE } = await import('@/src/router/config/config.uts');
+    const { LOGIN_PAGE } = await import('@/src/router/config.uts');
 
     // 未登录 + 命中排除名单 → 守卫给出「登录页?redirect=原地址」，框架只负责跳
     const originalPath = '/src/sub/routerParamsBasicDemo/routerParamsBasicDemo?id=1';
@@ -191,5 +191,168 @@ describe('路由拦截器 Unit Tests', () => {
     expect(routeState.path).toBe('/src/sub/auth/login');
     expect(routeState.query.get('redirect')).toBe('/src/pages/me/me');
     expect(utsObject({ redirect: routeState.query.get('redirect') }).getString('redirect')).toBe('/src/pages/me/me');
+  });
+
+  it('navigateBackInterceptor 能够根据页面栈解析目标页面并交由守卫拦截/放行', async () => {
+    const { navigateBackInterceptor, routeState } = await loadInterceptor();
+
+    (globalThis as any).getCurrentPages = vi.fn(() => [
+      { route: 'src/pages/index/index' },
+      { route: 'src/pages/me/me' }
+    ]);
+
+    const allowed = navigateBackInterceptor.invoke({ delta: 1 });
+    expect(allowed).toBe(true);
+    expect(routeState.path).toBe('/src/pages/index/index');
+  });
+
+  it('checkDirectEntry 能够处理 App 冷启动进入首屏（options 为空或无 path）并跑守卫', async () => {
+    const { checkDirectEntry, resetInitialEntryChecked, routeState } = await loadInterceptor();
+    resetInitialEntryChecked();
+
+    (globalThis as any).getCurrentPages = vi.fn(() => [
+      { route: 'src/pages/index/index' }
+    ]);
+
+    // 冷启动普通进入：options 为 null
+    checkDirectEntry(null);
+    expect(routeState.path).toBe('/src/pages/index/index');
+  });
+
+  it('checkDirectEntry 外部直达带需要登录的路径时，未登录会改跳登录页', async () => {
+    const { checkDirectEntry, resetInitialEntryChecked } = await loadInterceptor();
+    resetInitialEntryChecked();
+    const { LOGIN_PAGE } = await import('@/src/router/config.uts');
+
+    checkDirectEntry({ path: 'src/sub/routerParamsBasicDemo/routerParamsBasicDemo' } as any);
+    expect(uni.navigateTo).toHaveBeenCalledTimes(1);
+    expect((uni.navigateTo as any).mock.calls[0][0].url.startsWith(LOGIN_PAGE)).toBe(true);
+  });
+
+  it('routeState 变化时会正确记录 previousRouteState 作为前序离开页', async () => {
+    const { navigateToInterceptor, routeState } = await loadInterceptor();
+    const { previousRouteState } = await import('@/uni_modules/route-bestX/core/route-state.uts');
+
+    (globalThis as any).getCurrentPages = vi.fn(() => [{ route: 'src/pages/index/index' }]);
+    navigateToInterceptor.invoke({ url: '/src/pages/me/me' });
+
+    expect(routeState.path).toBe('/src/pages/me/me');
+    expect(previousRouteState.path).toBe('/src/pages/index/index');
+  });
+
+  it('checkAndInterceptPageShow 能够拦截支付宝侧滑手势返回，自动触发 navigateBack 守卫', async () => {
+    const { checkAndInterceptPageShow, resetLastHandledNavigateBackTarget, routeState } = await loadInterceptor();
+    resetLastHandledNavigateBackTarget();
+
+    // 假设用户原先处于 /src/pages/me/me
+    (globalThis as any).getCurrentPages = vi.fn(() => [{ route: 'src/pages/me/me' }]);
+    routeState.path = '/src/pages/me/me';
+    routeState.fullPath = '/src/pages/me/me';
+
+    // 模拟支付宝原生侧滑返回到了 /src/pages/index/index（此时未触发 uni.onAppRoute，routeState 滞留）
+    (globalThis as any).getCurrentPages = vi.fn(() => [{ route: 'src/pages/index/index' }]);
+
+    const allowed = checkAndInterceptPageShow();
+    expect(allowed).toBe(true);
+
+    // 500ms 内再次调用会被防抖去重直接放行
+    const allowedTwice = checkAndInterceptPageShow();
+    expect(allowedTwice).toBe(true);
+  });
+
+  it('checkAndInterceptPageShow 当返回到需要登录的页面时，未登录会自动拦截并重定向', async () => {
+    const { checkAndInterceptPageShow, resetLastHandledNavigateBackTarget, routeState } = await loadInterceptor();
+    resetLastHandledNavigateBackTarget();
+    const { LOGIN_PAGE } = await import('@/src/router/config.uts');
+
+    // 假设用户原先处于免登录页面 /src/pages/index/index
+    routeState.path = '/src/pages/index/index';
+    routeState.fullPath = '/src/pages/index/index';
+
+    // 模拟手势返回到了需要登录的受保护页面 /src/sub/routerParamsBasicDemo/routerParamsBasicDemo
+    (globalThis as any).getCurrentPages = vi.fn(() => [
+      { route: 'src/sub/routerParamsBasicDemo/routerParamsBasicDemo' }
+    ]);
+
+    const allowed = checkAndInterceptPageShow();
+    expect(allowed).toBe(false);
+    expect(uni.navigateTo).toHaveBeenCalledTimes(1);
+    expect((uni.navigateTo as any).mock.calls[0][0].url.startsWith(LOGIN_PAGE)).toBe(true);
+  });
+
+  it('checkAndInterceptPageShow 能够识别同路径页面带参数重进后的手势返回', async () => {
+    const { checkAndInterceptPageShow, resetLastHandledNavigateBackTarget, routeState } = await loadInterceptor();
+    resetLastHandledNavigateBackTarget();
+
+    // 假设用户原先带参重进了 /src/sub/routerBasicDemo/routerBasicDemo
+    routeState.path = '/src/sub/routerBasicDemo/routerBasicDemo';
+    routeState.fullPath = '/src/sub/routerBasicDemo/routerBasicDemo?id=2001&from=self';
+    routeState.pages = [
+      { route: 'src/pages/index/index' },
+      { route: 'src/sub/routerBasicDemo/routerBasicDemo', options: {} },
+      { route: 'src/sub/routerBasicDemo/routerBasicDemo', options: { id: '2001', from: 'self' } }
+    ];
+
+    // 模拟手势返回出栈：页面栈从 3 减为 2，栈顶变为无参的上一层实例
+    (globalThis as any).getCurrentPages = vi.fn(() => [
+      { route: 'src/pages/index/index' },
+      { route: 'src/sub/routerBasicDemo/routerBasicDemo', options: {} }
+    ]);
+
+    const allowed = checkAndInterceptPageShow();
+    expect(allowed).toBe(true);
+  });
+
+  it('checkAndInterceptPageShow 在同路径新页面初次进入（栈深增加）时直接放行，不会误触发 navigateBack', async () => {
+    const { checkAndInterceptPageShow, resetLastHandledNavigateBackTarget, routeState } = await loadInterceptor();
+    resetLastHandledNavigateBackTarget();
+
+    // 假设原先在第 1 层页面栈
+    routeState.path = '/src/sub/routerBasicDemo/routerBasicDemo';
+    routeState.fullPath = '/src/sub/routerBasicDemo/routerBasicDemo';
+    routeState.pages = [
+      { route: 'src/pages/index/index' },
+      { route: 'src/sub/routerBasicDemo/routerBasicDemo', options: {} }
+    ];
+
+    // 新页面打开：页面栈增加到 3，新页面初次渲染
+    (globalThis as any).getCurrentPages = vi.fn(() => [
+      { route: 'src/pages/index/index' },
+      { route: 'src/sub/routerBasicDemo/routerBasicDemo', options: {} },
+      { route: 'src/sub/routerBasicDemo/routerBasicDemo', options: { from: 'self', id: '2001' } }
+    ]);
+
+    const allowed = checkAndInterceptPageShow();
+    expect(allowed).toBe(true);
+  });
+
+  it('navigateBackInterceptor 执行后紧随其后的 checkAndInterceptPageShow 命中防抖不重复跑守卫', async () => {
+    const { navigateBackInterceptor, checkAndInterceptPageShow, resetLastHandledNavigateBackTarget, routeState } = await loadInterceptor();
+    resetLastHandledNavigateBackTarget();
+
+    routeState.path = '/src/sub/routerBasicDemo/routerBasicDemo';
+    routeState.fullPath = '/src/sub/routerBasicDemo/routerBasicDemo?id=2001&from=self';
+    routeState.pages = [
+      { route: 'src/pages/index/index' },
+      { route: 'src/sub/routerBasicDemo/routerBasicDemo', options: {} },
+      { route: 'src/sub/routerBasicDemo/routerBasicDemo', options: { id: '2001', from: 'self' } }
+    ];
+
+    // 1. 点击 navbar 返回：触发 navigateBackInterceptor
+    (globalThis as any).getCurrentPages = vi.fn(() => [
+      { route: 'src/pages/index/index' },
+      { route: 'src/sub/routerBasicDemo/routerBasicDemo', options: {} },
+      { route: 'src/sub/routerBasicDemo/routerBasicDemo', options: { id: '2001', from: 'self' } }
+    ]);
+    const allowed = navigateBackInterceptor.invoke({ delta: 1 });
+    expect(allowed).toBe(true);
+
+    // 2. 出栈后页面 onPageShow 触发 checkAndInterceptPageShow
+    (globalThis as any).getCurrentPages = vi.fn(() => [
+      { route: 'src/pages/index/index' },
+      { route: 'src/sub/routerBasicDemo/routerBasicDemo', options: {} }
+    ]);
+    const showAllowed = checkAndInterceptPageShow();
+    expect(showAllowed).toBe(true);
   });
 });

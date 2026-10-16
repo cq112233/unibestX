@@ -6,6 +6,7 @@
 import BasicView from './views/BasicView.uvue';
 import { handleBackPressExit } from '@/src/utils/backPress/index.uts';
 import { notifyPageHide, notifyPageShow, setCurIdxByKey } from '@/src/tabbar/index.uts';
+import { isApp } from '@/src/config/env/platform.uts';
 
 definePage({
   debug: false,
@@ -31,11 +32,9 @@ onHide(() => {
 });
 
 onBackPress((options: OnBackPressOptions): boolean => {
-  // #ifdef APP
-  if (options.from == 'backbutton') {
+  if (isApp && options.from == 'backbutton') {
     return handleBackPressExit();
   }
-  // #endif
   return false;
 });
 </script>

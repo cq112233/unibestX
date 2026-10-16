@@ -1,0 +1,342 @@
+/**
+ * useRouter —— 路由导航器（对标 vue-router 的 useRouter）
+ *
+ * 底层仍然走 uni 原生跳转 API，**因此 main.uts 里安装的全局路由拦截器（登录校验等）照常生效**。
+ *
+ * ## 用法
+ *
+ * ```uts
+ * import { useRouter } from '@/src/router/index.uts';
+ *
+ * const router = useRouter();
+ * router.push('/src/sub/auth/login');
+ * router.push({ path: '/src/pages/detail/detail', query: { id: 1, tab: 'a' } });
+ * router.push({ name: 'modalBasicDemo', params: { id: 1 } }); // 自动匹配路径并将 params 转为 query
+ * router.replace({ name: 'index' });
+ * router.back();          // 等价 back(1)
+ * ```
+ *
+ * ## 两条必须知道的约束
+ *
+ * 1. **对象形态收 `RouteLocationRaw`**（`@/src/router/utils/utils.uts`）：
+ *    支持 `{ path, query }` 或 `{ name, params }` 字面量与 `RouteLocationRaw` 变量，
+ *    按 `name` 会自动检索页面完整路径并将 `params` 转为 query 拼接到 url 上。
+ *    参数标成 `any` 时编辑器给不出字段补全，标 `UTSJSONObject` 只弹它的成员方法，
+ *    所以这里必须是具名类型（VSCode / Volar 里 `na` 能补出 `name`，`pa` 能补出 `path` / `params`）。
+ *    反过来说，**裸的 `UTSJSONObject`（如 `JSON.parseObject()` 的返回值）不再被接受**，
+ *    会被类型检查挡在编译期 —— 这是有意的收紧。
+ * 2. **TabBar 页面必须用 `switchTab()`**，`push()` 走的是 `uni.navigateTo`，
+ *    跳 TabBar 页面会被框架拒绝（TabBar 页面列表由 `src/tabbar` 维护，这里不反向依赖它）。
+ */
+import { cleanPath, resolveUrl } from '../utils/utils.uts';
+import type { RouteLocationRaw } from '../utils/utils.uts';
+import { ensureRouteReady, routeState, setRoutes } from '../core/route-state.uts';
+import type { RouteLocation, RouteRecordRaw } from '../core/route-types.uts';
+import { registerAfterEach, registerBeforeEach, registerOnError } from '../guard/index.uts';
+import type { NavigationErrorHandler, NavigationGuard, NavigationHookAfter } from '../guard/types.uts';
+import { getTabbarHandler, installRouteInterceptor, registerTabbarHandler, setBypassInterceptorOnce } from '../interceptor/interceptor.uts';
+import type { TabbarHandler } from '../interceptor/interceptor.uts';
+
+/**
+ * 判断本次导航是否需要走拦截器
+ */
+function shouldIntercept(to: string | RouteLocationRaw | null, intercept: boolean): boolean {
+  if (!intercept) {
+    return false;
+  }
+  if (to != null && typeof to == 'object') {
+    const raw = to as RouteLocationRaw;
+    if (raw.intercept == false) {
+      return false;
+    }
+  }
+  return true;
+}
+
+/**
+ * 路由器创建配置项契约
+ */
+export type RouterOptions = {
+  /** 路由表列表配置（对标 vue-router 的 routes） */
+  routes?: RouteRecordRaw[] | null;
+  /** TabBar 页面路径列表，如 ['/src/pages/index/index', ...] */
+  tabbarPath?: string[] | null;
+  /** TabBar 页面判定函数（如 isPageTabbar） */
+  isTabbar?: ((url: string) => boolean) | null;
+  /** TabBar 页面跳转动作（如 switchTabbar，未提供时默认走 uni.switchTab 兜底） */
+  switchTab?: ((url: string) => void) | null;
+  /** 完整 TabBar 处理器对象契约 */
+  tabbar?: TabbarHandler | null;
+};
+
+/**
+ * 路由导航器
+ *
+ * 每个方法都返回该 uni API 的 Promise（入参为空、什么都没做时返回 null），
+ * 调用方需要处理失败时可以用 `.then(onFulfilled, onRejected)`。
+ */
+export class Router {
+  /**
+   * 当前全局路由对象（响应式）
+   */
+  get currentRoute(): RouteLocation {
+    ensureRouteReady();
+    return routeState;
+  }
+
+  /**
+   * 新页面入栈（保留当前页，可返回）
+   * 内部自动识别 TabBar 页面并安全纠偏为 switchTab
+   *
+   * @param to 字符串 url 或 `{ path, name, query, params }` 字面量 / `RouteLocationRaw` 变量
+   * @param intercept 是否走拦截器与路由守卫，默认 true；传入 false 时跳过拦截器直接放行
+   * @returns `uni.navigateTo` 的 Promise；入参为空 / 无法解析路径时返回 null
+   */
+  push(to: string | RouteLocationRaw | null, intercept: boolean = true): any | null {
+    const url = resolveUrl(to);
+    if (url == '') {
+      return null;
+    }
+    const handler = getTabbarHandler();
+    if (handler != null && handler.isTabbar(url)) {
+      return this.switchTab(to, intercept);
+    }
+    if (!shouldIntercept(to, intercept)) {
+      setBypassInterceptorOnce(true);
+    }
+    return uni.navigateTo({ url });
+  }
+
+  /**
+   * 关闭当前页并打开新页（当前页不保留）
+   * 内部自动识别 TabBar 页面并安全纠偏为 switchTab
+   *
+   * @param to 字符串 url 或 `{ path, name, query, params }` 字面量 / `RouteLocationRaw` 变量
+   * @param intercept 是否走拦截器与路由守卫，默认 true；传入 false 时跳过拦截器直接放行
+   * @returns `uni.redirectTo` 的 Promise；入参为空 / 无法解析路径时返回 null
+   */
+  replace(to: string | RouteLocationRaw | null, intercept: boolean = true): any | null {
+    const url = resolveUrl(to);
+    if (url == '') {
+      return null;
+    }
+    const handler = getTabbarHandler();
+    if (handler != null && handler.isTabbar(url)) {
+      return this.switchTab(to, intercept);
+    }
+    if (!shouldIntercept(to, intercept)) {
+      setBypassInterceptorOnce(true);
+    }
+    return uni.redirectTo({ url });
+  }
+
+  /**
+   * 关闭所有页面再打开目标页
+   *
+   * @param to 字符串 url 或 `{ path, name, query, params }` 字面量 / `RouteLocationRaw` 变量
+   * @param intercept 是否走拦截器与路由守卫，默认 true；传入 false 时跳过拦截器直接放行
+   * @returns `uni.reLaunch` 的 Promise；入参为空 / 无法解析路径时返回 null
+   */
+  relaunch(to: string | RouteLocationRaw | null, intercept: boolean = true): any | null {
+    const url = resolveUrl(to);
+    if (url == '') {
+      return null;
+    }
+    if (!shouldIntercept(to, intercept)) {
+      setBypassInterceptorOnce(true);
+    }
+    return uni.reLaunch({ url });
+  }
+
+  /**
+   * 跳转到 TabBar 页面
+   * 优先使用注册的业务 TabBar 处理器（以联动高亮 curIdx），未配置时自动降级走 uni.switchTab
+   *
+   * @param to 字符串 url 或 `{ path, name, query, params }` 字面量 / `RouteLocationRaw` 变量
+   * @param intercept 是否走拦截器与路由守卫，默认 true；传入 false 时跳过拦截器直接放行
+   * @returns `uni.switchTab` 的 Promise 或 null
+   */
+  switchTab(to: string | RouteLocationRaw | null, intercept: boolean = true): any | null {
+    const url = resolveUrl(to);
+    if (url == '') {
+      return null;
+    }
+    if (!shouldIntercept(to, intercept)) {
+      setBypassInterceptorOnce(true);
+    }
+    const handler = getTabbarHandler();
+    if (handler != null) {
+      handler.switchTab(url);
+      return null;
+    }
+    return uni.switchTab({ url });
+  }
+
+  /**
+   * 返回上一页 / 前 n 页
+   *
+   * @param delta 返回的层数，默认 1；超出页面栈层数时回到首页
+   * @param intercept 是否走拦截器与路由守卫，默认 true；传入 false 时跳过拦截器直接放行
+   */
+  back(delta: number = 1, intercept: boolean = true): void {
+    if (!intercept) {
+      setBypassInterceptorOnce(true);
+    }
+    uni.navigateBack({ delta });
+  }
+
+  /**
+   * vue-router 形态的 `go()`：只支持**负数**（等价 `back(-delta)`）
+   *
+   * uni-app X 没有「前进」API，`go()` 传正数时打印一条告警后忽略，不做任何跳转。
+   *
+   * @param delta 负数表示后退层数，默认 -1
+   * @param intercept 是否走拦截器与路由守卫，默认 true；传入 false 时跳过拦截器直接放行
+   */
+  go(delta: number = -1, intercept: boolean = true): void {
+    if (delta < 0) {
+      if (!intercept) {
+        setBypassInterceptorOnce(true);
+      }
+      uni.navigateBack({ delta: -delta });
+      return;
+    }
+    console.warn('[router] uni-app X 无「前进」API，router.go(正数) 已忽略：', delta);
+  }
+
+  /**
+   * 把导航目标解析为 uni 可用的 url 字符串（不执行跳转）
+   *
+   * @param to 字符串 url 或 `{ path, name, query, params }` 字面量 / `RouteLocationRaw` 变量
+   * @returns 归一化后的 url；入参为空或无法解析路径时返回空串 ""
+   */
+  resolve(to: string | RouteLocationRaw | null): string {
+    return resolveUrl(to);
+  }
+
+  /**
+   * 注册全局前置路由守卫（对标 vue-router 的 router.beforeEach）
+   * @param guard 守卫回调函数 (to, from, next) => void
+   */
+  beforeEach(guard: NavigationGuard): void {
+    registerBeforeEach(guard);
+  }
+
+  /**
+   * 注册全局后置路由钩子（对标 vue-router 的 router.afterEach）
+   * 在导航成功或跳转完成后触发，常用于页面访问统计、埋点上报等。
+   *
+   * @param hook 后置回调函数 (to, from, failure) => void
+   */
+  afterEach(hook: NavigationHookAfter): void {
+    registerAfterEach(hook);
+  }
+
+  /**
+   * 注册全局路由错误回调（对标 vue-router 的 router.onError）
+   * 在守卫执行抛出异常或底层路由跳转失败时触发。
+   *
+   * @param handler 错误处理回调 (error, to, from) => void
+   */
+  onError(handler: NavigationErrorHandler): void {
+    registerOnError(handler);
+  }
+
+  /**
+   * Vue 插件安装方法（支持 app.use(router) 对标 Vue Router 标准）
+   * @param app Vue 应用程序实例
+   */
+  install(app: any): void {
+    installRouteInterceptor();
+    ensureRouteReady();
+    // #ifndef APP
+    if (app != null) {
+      try {
+        const anyApp = app as any;
+        if (anyApp.config != null && anyApp.config.globalProperties != null) {
+          anyApp.config.globalProperties.$router = this;
+          anyApp.config.globalProperties.$route = this.currentRoute;
+        }
+      }
+      catch {
+        // ignore
+      }
+    }
+    // #endif
+  }
+}
+
+/** 路由导航器全局单例 */
+export const router = new Router();
+
+/**
+ * 获取路由导航器（全局单例，可在任意 setup / 普通函数中调用）
+ *
+ * 首次调用会顺带确保路由状态已就绪（安装全局路由完成监听 + 回读一次当前路由）。
+ *
+ * @returns 全局唯一的 `Router` 实例（每次都返回同一个，可安全长期持有）
+ */
+export function useRouter(): Router {
+  ensureRouteReady();
+  return router;
+}
+
+/**
+ * 创建/获取路由器实例（对标 vue-router 的 createRouter，内部自动安装全局拦截器并支持声明式 TabBar 兼容）
+ *
+ * @param options 可选配置项，支持 tabbarPath、isTabbar、switchTab 等
+ */
+export function createRouter(options: RouterOptions | null = null): Router {
+  installRouteInterceptor();
+  ensureRouteReady();
+
+  if (options != null) {
+    if (options.routes != null && options.routes!.length > 0) {
+      setRoutes(options.routes!);
+    }
+    if (options.tabbar != null) {
+      registerTabbarHandler(options.tabbar);
+    }
+    else if (options.isTabbar != null || options.tabbarPath != null || options.switchTab != null) {
+      const customIsTabbar = options.isTabbar;
+      const rawPaths = options.tabbarPath;
+      const cleanedPaths: string[] = [];
+      if (rawPaths != null) {
+        for (let i = 0; i < rawPaths.length; i++) {
+          cleanedPaths.push(cleanPath(rawPaths[i]));
+        }
+      }
+
+      const isTabbarFn = (url: string): boolean => {
+        if (customIsTabbar != null && customIsTabbar(url)) {
+          return true;
+        }
+        if (cleanedPaths.length > 0) {
+          const cleaned = cleanPath(url);
+          for (let i = 0; i < cleanedPaths.length; i++) {
+            if (cleanedPaths[i] == cleaned) {
+              return true;
+            }
+          }
+        }
+        return false;
+      };
+
+      const customSwitchTab = options.switchTab;
+      const switchTabFn = (url: string): void => {
+        if (customSwitchTab != null) {
+          customSwitchTab(url);
+          return;
+        }
+        uni.switchTab({ url });
+      };
+
+      registerTabbarHandler({
+        isTabbar: isTabbarFn,
+        switchTab: switchTabFn
+      } as TabbarHandler);
+    }
+  }
+
+  return router;
+}

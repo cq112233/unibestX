@@ -20,8 +20,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const PORT = process.env.PORT || '8080';
-const BASE = `http://127.0.0.1:${PORT}/`;
+const PORT = process.env.PORT || '9527';
+let actualPort = PORT;
 // 冷启动时前几次请求是"痛苦期"（首次 1.1s、第二次 1.9s，并发抢 CPU），实测第 5 次才收敛到 40ms。
 // 打 4 发足够越过痛苦期；每发之间留间隔，避免自身并发反而拖慢。
 const WARMUP_HITS = Number(process.env.DEV_WARMUP_HITS || 4);
@@ -193,6 +193,11 @@ let buffer = '';
 
 function scanForReady(chunk) {
   process.stdout.write(chunk);
+  const text = chunk.toString();
+  const portMatch = text.match(/Local:\s+http:\/\/localhost:(\d+)\//i);
+  if (portMatch && portMatch[1]) {
+    actualPort = portMatch[1];
+  }
   if (readyHandled) {
     return;
   }
@@ -209,12 +214,13 @@ child.stderr.on('data', chunk => process.stderr.write(chunk));
 async function warmup() {
   // ready 那行打印时，中间件可能尚未完全挂载，给一个极短的让位
   await sleep(300);
+  const base = `http://127.0.0.1:${actualPort}/`;
   const t0 = Date.now();
   let failed = 0;
   for (let i = 1; i <= WARMUP_HITS; i++) {
     try {
       const t = Date.now();
-      const res = await fetch(BASE, { headers: { 'user-agent': 'dev-warmup' } });
+      const res = await fetch(base, { headers: { 'user-agent': 'dev-warmup' } });
       await res.text();
       if (VERBOSE) {
         console.log(`[dev-warmup] 预热 ${i}/${WARMUP_HITS}  ${Date.now() - t}ms  [${res.status}]`);
@@ -241,5 +247,22 @@ setTimeout(() => {
     console.log('[dev-warmup] 未在超时内检测到 "ready in"，跳过预热（不影响 dev 正常使用）');
   }
 }, READY_TIMEOUT_MS).unref();
+
+function cleanupAndExit() {
+  const targetPort = actualPort || PORT;
+  try {
+    if (process.platform === 'win32') {
+      execSync(`for /f "tokens=5" %a in ('netstat -aon ^| findstr :${targetPort}') do taskkill /F /PID %a`, { stdio: 'ignore' });
+    }
+    else {
+      execSync(`lsof -ti:${targetPort} | xargs kill -9`, { stdio: 'ignore' });
+    }
+  }
+  catch {}
+  process.exit(0);
+}
+
+process.on('SIGINT', cleanupAndExit);
+process.on('SIGTERM', cleanupAndExit);
 
 child.on('exit', code => process.exit(code ?? 0));

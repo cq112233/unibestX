@@ -1,0 +1,70 @@
+import type { GuardResult, RouteGuardContext } from '@/uni_modules/route-bestX/index.uts';
+
+/**
+ * 系统停服维护页面路由路径
+ */
+export const MAINTENANCE_PAGE: string = '/src/sub/maintenance/maintenance';
+
+/**
+ * 停服维护期间免拦截白名单页面（维护公告页本身必须放行，防止死循环重定向）
+ */
+let maintenanceWhiteList: string[] = [MAINTENANCE_PAGE];
+
+/**
+ * 是否开启系统停服维护模式（默认为 false）
+ */
+let isMaintenanceMode: boolean = false;
+
+/**
+ * 设置是否开启系统维护模式
+ */
+export function setMaintenanceMode(enabled: boolean): void {
+  isMaintenanceMode = enabled;
+}
+
+/**
+ * 获取当前系统维护模式状态
+ */
+export function getMaintenanceMode(): boolean {
+  return isMaintenanceMode;
+}
+
+/**
+ * 设置维护白名单路径列表
+ */
+export function setMaintenanceWhiteList(paths: string[]): void {
+  maintenanceWhiteList = paths;
+}
+
+/**
+ * 获取维护白名单路径列表
+ */
+export function getMaintenanceWhiteList(): string[] {
+  return maintenanceWhiteList;
+}
+
+/**
+ * 系统停服维护守卫（纯函数）：优先级最高（前置于登录守卫）
+ *
+ * 裁决逻辑：
+ * 1. 若未开启维护模式 (isMaintenanceMode = false)，直接放行
+ * 2. 若已开启维护模式：
+ *    - 目标为维护公告页或白名单页面 -> 直接放行
+ *    - 目标为其他任意业务页面 -> 统一重定向至维护公告页
+ */
+export function guardMaintenance(ctx: RouteGuardContext): GuardResult {
+  const { to, next } = ctx;
+
+  console.log(ctx, 'guardMaintenance');
+
+  if (!isMaintenanceMode) {
+    return next();
+  }
+
+  const path = to.path;
+  if (maintenanceWhiteList.includes(path) || path == MAINTENANCE_PAGE) {
+    return next();
+  }
+
+  return next(MAINTENANCE_PAGE);
+}

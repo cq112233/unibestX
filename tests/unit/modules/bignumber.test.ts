@@ -1,8 +1,8 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { BigNumber, getConfig, ROUND_CEIL, ROUND_DOWN, ROUND_FLOOR, ROUND_HALF_DOWN, ROUND_HALF_EVEN, ROUND_HALF_UP, ROUND_UP } from '@/uni_modules/unix-Bignumber/index.uts';
+import { BigNumber, getConfig, ROUND_CEIL, ROUND_DOWN, ROUND_FLOOR, ROUND_HALF_DOWN, ROUND_HALF_EVEN, ROUND_HALF_UP, ROUND_UP } from '@/uni_modules/bignumber-bestX/index.uts';
 
 /**
- * unix-Bignumber 单元测试
+ * bignumberx 单元测试
  *
  * ⚠️ `.uts` 在 TS 侧只有通配 any 声明（见 src/types/uts-shim.d.ts），
  * 因此这里不写类型实参、也不依赖 TS 推导，只校验运行期行为。
@@ -13,7 +13,7 @@ afterEach(() => {
   getConfig();
 });
 
-describe('unix-Bignumber 四则运算', () => {
+describe('bignumberx 四则运算', () => {
   it('解决浮点误差：0.1 + 0.2 === 0.3', () => {
     expect(new BigNumber(0.1).plus(0.2).toString()).toBe('0.3');
     expect(new BigNumber(0.3).minus(0.1).toString()).toBe('0.2');
@@ -54,7 +54,7 @@ describe('unix-Bignumber 四则运算', () => {
   });
 });
 
-describe('unix-Bignumber 开方与比较', () => {
+describe('bignumberx 开方与比较', () => {
   it('开方结果与 pow(0.5) 一致', () => {
     expect(new BigNumber(16).sqrt().toString()).toBe('4');
     expect(new BigNumber(2).sqrt().toString()).toBe('1.4142135623730950488');
@@ -84,7 +84,7 @@ describe('unix-Bignumber 开方与比较', () => {
   });
 });
 
-describe('unix-Bignumber 舍入模式', () => {
+describe('bignumberx 舍入模式', () => {
   it('九种舍入模式语义正确', () => {
     expect(new BigNumber('1.5').integerValue(ROUND_UP).toString()).toBe('2');
     expect(new BigNumber('-1.5').integerValue(ROUND_UP).toString()).toBe('-2');
@@ -110,7 +110,7 @@ describe('unix-Bignumber 舍入模式', () => {
   });
 });
 
-describe('unix-Bignumber 进制、格式与统计', () => {
+describe('bignumberx 进制、格式与统计', () => {
   it('支持 2~36 进制构造与输出', () => {
     expect(new BigNumber('ff', 16).toString()).toBe('255');
     expect(new BigNumber(255).toString(16)).toBe('ff');

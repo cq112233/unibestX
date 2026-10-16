@@ -4,8 +4,26 @@
     "*.uvue": "vue",
     "*.uts": "uts",
     "pages.json": "jsonc",
+    "pages.config.json": "jsonc",
     "manifest.json": "jsonc"
   },
+
+  // 绑定官方 uni-app 与 unibestX 扩展的 JSON Schema，让 pages.config.json / pages.json 拥有完整代码提示与悬浮文档
+  "json.schemas": [
+    {
+      "fileMatch": [
+        "pages.json",
+        "pages.config.json"
+      ],
+      "url": "./.vscode/schemas/pages.json"
+    },
+    {
+      "fileMatch": [
+        "manifest.json"
+      ],
+      "url": "./.vscode/schemas/manifest.json"
+    }
+  ],
 
   // uni-app x: 启用 Volar 对 .uts / .uvue 文件的解析（跳转定义、补全、类型提示）。
   //

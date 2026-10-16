@@ -35,15 +35,16 @@ unibestX/
 │   ├── i18n/                 # 国际化多语言配置（zh-Hans / en 语言包）
 │   ├── layouts/              # 页面布局模板（如 default.uvue / empty.uvue）
 │   ├── pages/                # 主应用页面（首页、基础组件展示、原生能力展示、AI助手、个人中心）
-│   ├── router/               # 全局路由拦截器与登录白名单策略
 │   ├── store/                # Pinia 状态管理与持久化（app, token, user）
 │   ├── style/                # 全局样式（Tailwind CSS / SCSS）
 │   ├── sub/                  # 应用分包页面（auth, paging, tailwindcss, test, uiTest 等）
 │   ├── tabbar/               # 自定义 TabBar 组件与状态配置
 │   ├── types/                # 全局类型定义（uni.d.ts 等）
-│   └── utils/                # 全局工具函数（toast, systemInfo, env, backPress 等）
+│   └── utils/                # 全局工具函数（toast, systemInfo, env, backPress, auth 等）
 ├── uni_modules/              # uni-app 扩展插件模块
-│   ├── unix-crypto/          #   全端跨平台加密解密与安全工具库
+│   ├── route-bestX/          #   uni-app X 极简高性能跨端路由引擎（导航守卫/快照隔离）
+│   ├── bignumber-bestX/      #   全端高精度大数据运算库（十进制/四则运算/金融格式化）
+│   ├── crypto-bestX/         #   全端跨平台加密解密与安全工具库
 │   ├── z-paging-x/           #   uni-app X 深度定制分页列表组件
 │   ├── lime-request/         #   HTTP 请求库
 │   ├── lime-signature/       #   手写签名板组件

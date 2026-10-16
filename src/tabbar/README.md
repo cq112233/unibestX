@@ -228,4 +228,4 @@ import { switchTabbar, onTabShow, onTabPageShow, curIdx } from '@/src/tabbar/ind
 
 - ⚠️ **`.uts` / `.uvue` 后缀必须保留**（`@/src/tabbar/index.uts`，不是 `@/src/tabbar`）：去掉后缀 TS 侧会丢补全并报 TS2307。`@` 指向项目根。
 - ⚠️ **[internal/](internal/) 下的模块不要从业务代码直接引**：它们是运行时实现细节，且彼此之间已用精准导入互相引用（`./state.uts` / `../config.uts`），从门面反向穿透会形成自环，在 Kotlin 端表现为类初始化死锁。
-- ⚠️ **页面跳转一律走 `useRouter()` / `switchTabbar()`**，不要直接写 `uni.switchTab` / `uni.navigateTo`——绕过守卫会让登录拦截、TabBar 分流、路由状态同步同时失效。详见 [src/router/README.md](../router/README.md)。
+- ⚠️ **页面跳转一律走 `useRouter()` / `switchTabbar()`**，不要直接写 `uni.switchTab` / `uni.navigateTo`——绕过守卫会让登录拦截、TabBar 分流、路由状态同步同时失效。详见 `uni_modules/route-bestX`。
