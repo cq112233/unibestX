@@ -325,4 +325,34 @@ describe('路由拦截器 Unit Tests', () => {
     const allowed = checkAndInterceptPageShow();
     expect(allowed).toBe(true);
   });
+
+  it('navigateBackInterceptor 执行后紧随其后的 checkAndInterceptPageShow 命中防抖不重复跑守卫', async () => {
+    const { navigateBackInterceptor, checkAndInterceptPageShow, resetLastHandledNavigateBackTarget, routeState } = await loadInterceptor();
+    resetLastHandledNavigateBackTarget();
+
+    routeState.path = '/src/sub/routerBasicDemo/routerBasicDemo';
+    routeState.fullPath = '/src/sub/routerBasicDemo/routerBasicDemo?id=2001&from=self';
+    routeState.pages = [
+      { route: 'src/pages/index/index' },
+      { route: 'src/sub/routerBasicDemo/routerBasicDemo', options: {} },
+      { route: 'src/sub/routerBasicDemo/routerBasicDemo', options: { id: '2001', from: 'self' } }
+    ];
+
+    // 1. 点击 navbar 返回：触发 navigateBackInterceptor
+    (globalThis as any).getCurrentPages = vi.fn(() => [
+      { route: 'src/pages/index/index' },
+      { route: 'src/sub/routerBasicDemo/routerBasicDemo', options: {} },
+      { route: 'src/sub/routerBasicDemo/routerBasicDemo', options: { id: '2001', from: 'self' } }
+    ]);
+    const allowed = navigateBackInterceptor.invoke({ delta: 1 });
+    expect(allowed).toBe(true);
+
+    // 2. 出栈后页面 onPageShow 触发 checkAndInterceptPageShow
+    (globalThis as any).getCurrentPages = vi.fn(() => [
+      { route: 'src/pages/index/index' },
+      { route: 'src/sub/routerBasicDemo/routerBasicDemo', options: {} }
+    ]);
+    const showAllowed = checkAndInterceptPageShow();
+    expect(showAllowed).toBe(true);
+  });
 });

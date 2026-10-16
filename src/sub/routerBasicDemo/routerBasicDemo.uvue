@@ -205,6 +205,15 @@ definePage({
   }
 });
 
+/** 1) useRoute()：本页路由（响应式、只读；每次调用一份属于本页的快照，上一页不会被下一页改写） */
+const route = useRoute();
+/** 2) useRouter()：导航器（底层仍是 uni 导航 API，全局拦截器照常生效） */
+const router = useRouter();
+
+onShow(() => {
+  console.log('routerBasicDemo页面创建了');
+});
+
 // =========================================================================
 // 【可选删除】以下内容仅供路由 hooks 演示使用，接入真实业务时可整段删除。
 // 演示路径属于「页面结构级只读常量」（随页面固化、不由后端下发），故内联在本文件。
@@ -216,11 +225,6 @@ const PARAMS_DEMO_PAGE: string = '/src/sub/routerParamsBasicDemo/routerParamsBas
 const SELF_PAGE: string = '/src/sub/routerBasicDemo/routerBasicDemo';
 /** 首页 */
 const HOME_PAGE: string = '/src/pages/index/index';
-
-/** 1) useRoute()：本页路由（响应式、只读；每次调用一份属于本页的快照，上一页不会被下一页改写） */
-const route = useRoute();
-/** 2) useRouter()：导航器（底层仍是 uni 导航 API，全局拦截器照常生效） */
-const router = useRouter();
 
 // route.meta 不需要在任何地方手写注册：构建期插件会把本页 definePage 的字段
 // 原样写进 pages.json，并同步生成一份路由表（src/router/generated/page-meta.uts），

@@ -726,8 +726,7 @@ function installMpNavigateBackListener(): void {
       const targetPath = cleanPath(rawPath);
 
       // 防抖去重：如果最近 500ms 内已被 navigateBackInterceptor（如微信点击左上角返回）校验放行过，跳过重复校验
-      if (lastHandledNavigateBackTarget == targetPath && (Date.now() - lastHandledNavigateBackTime) < 500) {
-        lastHandledNavigateBackTarget = '';
+      if (isSamePath(lastHandledNavigateBackTarget, targetPath) && (Date.now() - lastHandledNavigateBackTime) < 500) {
         return;
       }
 
@@ -812,7 +811,7 @@ export function checkAndInterceptPageShow(targetPath: string = ''): boolean {
   }
 
   // 3. 防抖去重：如果最近 500ms 内已被 navigateBackInterceptor 或 onAppRoute 处理过，跳过
-  if (isSamePath(lastHandledNavigateBackTarget, currentPath) && (Date.now() - lastHandledNavigateBackTime) < 500 && !isBackByStack) {
+  if (isSamePath(lastHandledNavigateBackTarget, currentPath) && (Date.now() - lastHandledNavigateBackTime) < 500) {
     return true;
   }
 
