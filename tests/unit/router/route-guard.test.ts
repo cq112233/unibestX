@@ -263,6 +263,23 @@ describe('路由守卫（业务层）决策矩阵', () => {
       expect(guardRoute(ctx)).toEqual(first);
       expect(guardRoute(ctx).redirect).toBe(`${LOGIN_PAGE}?redirect=${encodeURIComponent(fullPath)}`);
     });
+
+    it('守卫执行抛出未捕获异常时：触发 try-catch 兜底，安全拦截且 pass 为 false', async () => {
+      const { guardRoute } = await loadGuard(false);
+      const brokenCtx = {
+        to: null as any,
+        from: null as any,
+        api: 'navigateTo',
+        next: (loc: any = null) => ({ pass: loc == null || loc === true, redirect: null })
+      };
+
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const result = guardRoute(brokenCtx);
+      expect(result.pass).toBe(false);
+      expect(result.redirect).toBe(null);
+      expect(errorSpy).toHaveBeenCalled();
+      errorSpy.mockRestore();
+    });
   });
 
   describe('上下文装配 buildGuardContext（中立路由事实）', () => {
