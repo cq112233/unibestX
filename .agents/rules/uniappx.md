@@ -17,6 +17,10 @@ description: uni-app X (UTS) 开发规范与踩坑避坑指南，适用于跨端
     *   *正确做法*：通过 Vue 的 `:style` 响应式数据绑定，或使用 uni-app X 提供的跨端 API 进行操作。
 *   **UTS 与原生组件生命周期**：
     `onShow`, `onHide`, `onLaunch` 等生命周期在不同平台下表现可能略有差异，UTS 编译为 Native Code 时对非标准类型及生命周期内异步调用的时序要求更严苛，务必尽早进行真机或基座运行检查。
+*   **全局跨端平台判断规范（统一使用 `@/src/config` 常量，严禁在 `src/` 散落手写 `#ifdef`）**：
+    在 `src/` 目录下（除 `src/tabbar/components/TabViews.uvue` 模板级静态裁切特许豁免外），**严禁在业务逻辑中散落手写 `// #ifdef ...` 条件编译宏**。
+    *   *错误做法*：在组件与页面方法中手写 `// #ifdef APP`、`// #ifdef WEB`
+    *   *正确做法*：统一从 `@/src/config/env/platform.uts` 引入 `isH5`、`isApp`、`isMpAlipay`、`isMpWeixin` 等编译期常量执行常规 `if` 分支（详见 `unibestX-skill` 分册 3.27）。这能彻底规避预处理器解析崩溃、平台漏判问题，同时被打包器精准 Tree-Shaking 消除无效分支。
 
 ---
 

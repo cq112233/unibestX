@@ -30,9 +30,17 @@
           <text class="text-[12px] text-[#64748b] mr-[10px]">route.fullPath</text>
           <text class="text-[12px] font-bold text-[#1e293b] flex-1 text-right">{{ route.fullPath }}</text>
         </view>
+        <view class="flex flex-row items-start justify-between mb-[6px]">
+          <text class="text-[12px] text-[#64748b] mr-[10px]">router.currentRoute.path</text>
+          <text class="text-[12px] font-bold text-[#2563eb] flex-1 text-right">{{ router.currentRoute.path }}</text>
+        </view>
         <view class="flex flex-row items-center justify-between mb-[6px]">
-          <text class="text-[12px] text-[#64748b] mr-[10px]">route.name（definePage）</text>
+          <text class="text-[12px] text-[#64748b] mr-[10px]">route.name</text>
           <text class="text-[12px] font-bold text-[#1e293b]">{{ routeNameText }}</text>
+        </view>
+        <view class="flex flex-row items-center justify-between mb-[6px]">
+          <text class="text-[12px] text-[#64748b] mr-[10px]">route.pages.length（页面栈深度）</text>
+          <text class="text-[12px] font-bold text-[#1e293b]">{{ route.pages.length }}</text>
         </view>
         <view class="flex flex-row items-center justify-between mb-[6px]">
           <text class="text-[12px] text-[#64748b] mr-[10px]">route.params.size</text>
@@ -89,6 +97,15 @@
           <text class="text-[11px] leading-[16px] text-[#64748b] mt-[4px]">对象形态：query 自动拼成 url 串，值会做 URL 编码。必须写成对象字面量，别先声明成变量再传。</text>
           <view class="h-[32px] flex flex-row items-center justify-center rounded-[8px] bg-[#7c3aed] mt-[8px]" @click="onPushByObject">
             <text class="text-[12px] font-bold text-[#ffffff]">跳到参数页（对象 + 中文参数）</text>
+          </view>
+        </view>
+
+        <!-- push 命名路由形态 -->
+        <view class="w-full rounded-[12px] bg-[#f8fafc] p-[12px] mb-[10px]">
+          <text class="text-[12px] font-bold text-[#1e293b]" style="font-family: monospace;">router.push({ name, params })</text>
+          <text class="text-[11px] leading-[16px] text-[#64748b] mt-[4px]">命名路由：通过 definePage 声明的 name 匹配路径，params 自动转为 query 拼入 URL。</text>
+          <view class="h-[32px] flex flex-row items-center justify-center rounded-[8px] bg-[#7c3aed] mt-[8px]" @click="onPushByName">
+            <text class="text-[12px] font-bold text-[#ffffff]">跳到参数页（name + params 参数）</text>
           </view>
         </view>
 
@@ -282,6 +299,11 @@ function onPushByString(): void {
 /** push 对象形态（query 会自动拼串并编码） */
 function onPushByObject(): void {
   router.push({ path: PARAMS_DEMO_PAGE, query: { id: 1002, name: '对象参数', from: 'push-object' } });
+}
+
+/** push 命名路由形态（name 匹配 + params 自动转 query） */
+function onPushByName(): void {
+  router.push({ name: 'routerParamsBasicDemo', params: { id: 1003, name: '命名路由', from: 'push-name' } });
 }
 
 /** replace：关掉当前页再打开 */

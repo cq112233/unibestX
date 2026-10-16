@@ -80,6 +80,8 @@ describe('useRoute Unit Tests', () => {
     expect(uni.onAppRoute).toHaveBeenCalledTimes(1);
     expect(route.path).toBe('/src/pages/index/index');
     expect(route.fullPath).toBe('/src/pages/index/index');
+    expect(route.pages).toHaveLength(1);
+    expect(route.page).toBeDefined();
   });
 
   it('重复调用只安装一次监听；每次调用返回各自一份快照（值相同、互不影响）', async () => {

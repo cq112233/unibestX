@@ -26,6 +26,10 @@ export type RouteLocation = {
   meta: UTSJSONObject | null;
   /** 路由名：取自 meta 的 `name` 字段（在页面 definePage 里声明），未声明为 null */
   name: string | null;
+  /** 当前栈顶页面实例（UniPage，栈空时为 null） */
+  page: any | null;
+  /** 当前页面栈实例数组（等价于 getCurrentPages()） */
+  pages: any[];
 };
 
 /**
@@ -34,15 +38,24 @@ export type RouteLocation = {
  * 全局那份用它做 reactive 初始化，快照那份用它承接全局值 —— 字段清单只在这里维护一份。
  *
  * @returns 各字段为初始值的 `RouteLocation`（`path` / `fullPath` 为空串，`query` / `params` 为空 Map，
- *          `meta` / `name` 为 null）
+ *          `meta` / `name` / `page` 为 null，`pages` 为页面栈数组）
  */
 export function createEmptyRoute(): RouteLocation {
+  let initialPages: any[] = [];
+  try {
+    initialPages = getCurrentPages();
+  }
+  catch {
+    initialPages = [];
+  }
   return {
     path: '',
     fullPath: '',
     query: new Map<string, string>(),
     params: new Map<string, string>(),
     meta: null,
-    name: null
+    name: null,
+    page: initialPages.length > 0 ? initialPages[initialPages.length - 1] : null,
+    pages: initialPages
   } as RouteLocation;
 }

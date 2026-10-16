@@ -83,6 +83,15 @@ function copyRoute(target: RouteLocation, source: RouteLocation): void {
   target.params = source.params;
   target.meta = source.meta;
   target.name = source.name;
+  let currentStack: any[] = [];
+  try {
+    currentStack = getCurrentPages();
+  }
+  catch {
+    currentStack = source.pages;
+  }
+  target.pages = currentStack;
+  target.page = currentStack.length > 0 ? currentStack[currentStack.length - 1] : null;
 }
 
 /**

@@ -887,3 +887,62 @@ onUnmounted(() => {
 });
 ```
 
+---
+
+## 3.27 全局跨端平台判断规范（src 目录下优先使用 @/src/config 常量，严禁散落手写 #ifdef 条件编译）
+
+- **核心规范**：
+  在 `src/` 目录下编写任何业务代码（包括 `.uvue`、`.uts`、`.ts` 文件，尤其是 `<script>`、业务逻辑、方法、生命周期中）：
+  **严禁散落手写 `// #ifdef WEB`、`// #ifdef MP-ALIPAY`、`// #ifdef APP-ANDROID`、`// #ifndef ...` 等条件编译宏！**
+  **必须统一引入 `@/src/config/env/platform.uts` 导出的平台布尔常量（`isH5` / `isWeb`、`isMpAlipay`、`isMpWeixin`、`isAppAndroid`、`isAppIOS`、`isAppHarmony`、`isApp`、`isMp`）进行普通 `if` 逻辑分支！**
+
+- **唯一豁免白名单**：
+  - **唯一特许豁免文件**：`src/tabbar/components/TabViews.uvue`；
+  - **豁免原因**：该文件在 `<template>` 视图层必须根据不同编译目标平台静态裁切并挂载对应的首屏 TabContent 容器，避免在编译期向特定平台打包不需要的原生组件视图节点。除此以外，其他所有组件和页面的业务逻辑一律不得滥用条件编译。
+
+- **底层原理与为什么严禁散落 `#ifdef`**：
+  1. **规避预处理器解析大坑**：
+     - **注释敏感**：预处理器对注释极度敏感，在块注释 `/** ... */` 中若不慎带斜杠写了形如 `// #ifdef` 会直接触发预处理器 `Unbalanced right delimiter` 编译崩溃（详见 **3.12**）；
+     - **宏求值抛错静默吞没**：预处理器通过 `new Function('with(context){ return (A || B) }')` 对多条件求值，若操作数中有未预置宏会直接抛 `ReferenceError` 并静默吞为 `false`，导致代码块无声消失；
+     - **平台别名漏判**：本项目 `pnpm dev` 与 `build:h5` 走的是 `platform === 'web'` 上下文，手写 `#ifdef H5` 会因为上下文里 `WEB = true` 而 `H5 = false` 导致**漏掉整个 Web 构建**！而 `platform.uts` 内部已彻底封装好 `platform == 'web' || platform == 'h5'` 的完备映射。
+  2. **零运行时开销与精准 Tree-Shaking**：
+     - `@/src/config/env/platform.uts` 导出的平台常量在各端均为**编译期定值**（叶子模块零反向引用，无 Kotlin `<clinit>` 循环死锁风险）；
+     - Vite / Rollup 在产物打包时会自动执行静态死分支消除（DCE），未命中平台的 `if (false)` 逻辑会被完全剔除，产物体积与直接手写条件编译完全相同。
+  3. **代码可维护性与语法分析健全**：
+     - 手写 `#ifdef` 会导致未命中的平台代码在 IDE 中整片变灰，重构时无法全局重命名符号，也无法享受 TypeScript / UTS 强类型语法检查，容易潜藏低级语法疏漏；
+     - 使用常量 `if (isH5)` 是标准语言控制流，编辑器语法树分析完整，语义清晰易读。
+
+- **平台独有 API 调用的安全防御规范**：
+  在 `if (isH5)` 或 `if (isMpAlipay)` 分支内调用特定端特有全局对象时（如 H5 的 `window`、支付宝的 `my`、微信的 `wx`），在 UTS 跨端环境下需配合基础存在性检查：
+  - Web 端 API：配合 `typeof window != 'undefined'`；
+  - 支付宝端 API：配合 `typeof my != 'undefined'`；
+  - 微信端 API：配合 `typeof wx != 'undefined'`。
+
+- **代码正反例对比**：
+
+```uts
+// ❌ 错误：在 .uvue 页面中散落手写条件编译，不仅容易遗漏 WEB/H5 差异，且 IDE 失去语法检查
+function openGithub(): void {
+  const url = 'https://github.com/cq112233/unibestX';
+  // #ifdef WEB
+  window.open(url, '_blank');
+  // #endif
+  // #ifndef WEB
+  uni.navigateTo({ url: `/src/sub/webview/webview?url=${encodeURIComponent(url)}` });
+  // #endif
+}
+
+// ✅ 正确：统一从 @/src/config/env/platform.uts 引入编译期常量走标准 if 分支
+import { isH5 } from '@/src/config/env/platform.uts';
+
+function openGithub(): void {
+  const url = 'https://github.com/cq112233/unibestX';
+  if (isH5) {
+    if (typeof window != 'undefined') {
+      window.open(url, '_blank');
+    }
+  } else {
+    uni.navigateTo({ url: `/src/sub/webview/webview?url=${encodeURIComponent(url)}` });
+  }
+}
+```

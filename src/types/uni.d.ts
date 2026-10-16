@@ -383,6 +383,17 @@ declare global {
   function getCurrentPages(): any[];
   function getApp(): any;
 
+  /** 支付宝小程序全局对象 */
+  const my: {
+    hideBackHome?: (options?: any) => void;
+    [key: string]: any;
+  };
+
+  /** 微信小程序全局对象 */
+  const wx: {
+    [key: string]: any;
+  };
+
   type AppThemeChangeResult = {
     appTheme: 'light' | 'dark' | string;
   };

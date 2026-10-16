@@ -45,6 +45,19 @@ describe('useRouter Unit Tests', () => {
     expect(useRouter().currentRoute.path).toBe('/src/pages/index/index');
   });
 
+  it('router.currentRoute.pages / page 获取页面栈与当前页面', async () => {
+    const mockPages = [
+      { route: 'src/pages/index/index' },
+      { route: 'src/sub/routerBasicDemo/routerBasicDemo' }
+    ];
+    (globalThis as any).getCurrentPages = vi.fn(() => mockPages);
+    const { useRouter, router } = await loadRouter();
+
+    expect(router.currentRoute.pages).toHaveLength(2);
+    expect(router.currentRoute.page).toEqual({ route: 'src/sub/routerBasicDemo/routerBasicDemo' });
+    expect(useRouter().currentRoute.pages).toHaveLength(2);
+  });
+
   it('push 字符串形态：原样透传给 uni.navigateTo', async () => {
     const { useRouter } = await loadRouter();
 

@@ -21,14 +21,13 @@ import Tabbar from '@/src/tabbar/tabbar.uvue';
 import { isSinglePageTabbar, notifyPageHide, notifyPageShow, setCurIdxByKey } from '@/src/tabbar/index.uts';
 import { handleBackPressExit } from '@/src/utils/backPress/index.uts';
 import { useRoute, useRouter } from '@/src/router/index.uts';
+import { isApp, isMpAlipay } from '@/src/config/env/platform.uts';
 
 const router = useRouter();
 const route = useRoute();
 
 console.log(route);
-console.log(router.currentRoute);
-
-console.log(getCurrentPages());
+console.log(router);
 
 // definePage 支持「静态对象」与「函数式（含 async 异步）」写法：
 // 1. 跨端条件配置：基于 options.platform 进行多端分支判断，构建期会自动生成 pages.json 中的条件编译块（#ifdef / #endif）
@@ -69,14 +68,12 @@ definePage((options) => {
 
 // 把页面 onShow / onHide 桥接给 TabBar：onTabPageShow 靠它覆盖「从子页面返回 / 前台恢复」
 onShow(() => {
-  // #ifdef MP-ALIPAY
   // 隐藏支付宝小程序左侧原生的“返回首页”按钮
-  // @ts-expect-error 支付宝全局对象类型兼容
-  if (typeof my != 'undefined' && typeof my.hideBackHome == 'function') {
-    // @ts-expect-error 支付宝全局对象类型兼容
-    my.hideBackHome();
+  if (isMpAlipay) {
+    if (typeof my != 'undefined' && typeof my.hideBackHome == 'function') {
+      my.hideBackHome();
+    }
   }
-  // #endif
   if (!isSinglePageTabbar) {
     setCurIdxByKey('index');
   }
@@ -88,11 +85,9 @@ onHide(() => {
 });
 
 onBackPress((options: OnBackPressOptions): boolean => {
-  // #ifdef APP
-  if (options.from == 'backbutton') {
+  if (isApp && options.from == 'backbutton') {
     return handleBackPressExit();
   }
-  // #endif
   return false;
 });
 </script>

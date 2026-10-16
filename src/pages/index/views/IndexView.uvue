@@ -1,5 +1,5 @@
 <template>
-  <view class="content-container flex flex-col">
+  <view class="flex flex-col w-full">
     <image class="w-[90px] h-[90px] mx-auto mt-[16px] rounded-[18px]" src="/static/logo.png" />
     <text class="text-[24px] font-semibold mx-auto mt-[8px] text-[#d14328]">
       {{ systemInfo?.appTitle ?? '' }}
@@ -111,6 +111,128 @@
             点击复制
           </text>
         </view>
+      </view>
+    </view>
+
+    <!-- 推荐开发 IDE（VSCode 及其二次开发编辑器） -->
+    <view class="mt-[16px] mx-[16px]">
+      <view class="flex flex-row items-center justify-between mb-[10px]">
+        <text class="text-[14px] font-bold text-[#1e293b]">💻 推荐开发 IDE</text>
+        <text class="text-[11px] text-[#94a3b8]">VSCode · 二开通用</text>
+      </view>
+
+      <view
+        class="p-[14px] rounded-[12px] border-[1px] border-solid bg-[#f8fafc] border-[#e2e8f0]"
+      >
+        <text class="text-[12px] leading-[22px] text-[#475569]">
+          推荐使用 VSCode 或基于 VSCode 二次开发的编辑器（Trae / Cursor / Antigravity 等）开发本项目：仓库已内置完整的编辑器配置，打开即得 .uts / .uvue 的类型提示与跳转定义，保存时自动格式化，并附带开箱即用的代码片段与智能补全。
+        </text>
+
+        <!-- 适用编辑器 -->
+        <view class="flex flex-row flex-wrap mt-[8px]">
+          <text
+            v-for="name in ideNameList"
+            :key="name"
+            class="text-[10px] font-medium px-[6px] py-[1px] mr-[6px] mb-[6px] rounded-[4px] text-[#4f46e5] bg-[#6366f114]"
+          >
+            {{ name }}
+          </text>
+        </view>
+
+        <!-- 编辑器能力清单 -->
+        <view v-for="item in ideFeatureList" :key="item.id" class="flex flex-row mt-[10px]">
+          <text class="text-[12px] mr-[6px]">{{ item.icon }}</text>
+          <view class="flex-1 flex flex-col">
+            <text class="text-[12px] font-bold text-[#1e293b]">
+              {{ item.title }}
+            </text>
+            <text class="text-[11px] leading-[16px] mt-[2px] text-[#64748b]">
+              {{ item.desc }}
+            </text>
+          </view>
+        </view>
+
+        <text class="text-[10px] mt-[10px] text-[#94a3b8]" style="font-family: monospace;">
+          .vscode/settings.json · extensions.json · unibest.code-snippets
+        </text>
+      </view>
+    </view>
+
+    <!-- 核心特性（2列紧凑卡片网格） -->
+    <view class="mt-[16px] mx-[16px]">
+      <view class="flex flex-row items-center justify-between mb-[10px]">
+        <text class="text-[14px] font-bold text-[#1e293b]">⚡ 核心特性</text>
+        <text class="text-[11px] text-[#94a3b8]">Vue3 + UTS + Vite</text>
+      </view>
+
+      <view class="flex flex-row flex-wrap justify-between">
+        <view
+          v-for="item in featureList"
+          :key="item.id"
+          class="w-[48.5%] p-[12px] mb-[10px] rounded-[10px] border-[1px] border-solid flex flex-col justify-between"
+          :style="{ backgroundColor: item.bgColor, borderColor: item.borderColor }"
+        >
+          <view class="flex flex-col">
+            <text class="text-[13px] font-bold" :style="{ color: item.textColor }">
+              {{ item.title }}
+            </text>
+            <text class="text-[11px] mt-[4px] leading-[16px] text-[#64748b]">
+              {{ item.desc }}
+            </text>
+          </view>
+          <text
+            class="text-[10px] mt-[6px]"
+            :style="{ color: item.textColor, fontFamily: 'monospace' }"
+          >
+            {{ item.configPath }}
+          </text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 内置工具库（lime-shared / lime-use / lime-color / lime-dayuts / unix-crypto） -->
+    <view class="mt-[16px] mx-[16px]">
+      <view class="flex flex-row items-center justify-between mb-[10px]">
+        <text class="text-[14px] font-bold text-[#1e293b]">🧰 内置工具库</text>
+        <text class="text-[11px] text-[#94a3b8]">uni_modules · CLI 可选配</text>
+      </view>
+
+      <view
+        v-for="item in toolLibList"
+        :key="item.id"
+        class="p-[12px] mb-[10px] rounded-[10px] border-[1px] border-solid flex flex-col"
+        :style="{ backgroundColor: item.bgColor, borderColor: item.borderColor }"
+      >
+        <view class="flex flex-row items-center mb-[6px]">
+          <view
+            class="w-[3px] h-[14px] rounded-[2px] mr-[6px]"
+            :style="{ backgroundColor: item.textColor }"
+          />
+          <text class="text-[13px] font-bold mr-[6px]" :style="{ color: item.textColor }">
+            {{ item.title }}
+          </text>
+          <text class="text-[10px] font-medium px-[5px] py-[1px] rounded-[4px] text-[#64748b] bg-[#ffffff]">
+            {{ item.tag }}
+          </text>
+        </view>
+
+        <text class="text-[11px] leading-[16px] text-[#64748b] mb-[8px]">
+          {{ item.desc }}
+        </text>
+
+        <view class="flex flex-row flex-wrap">
+          <text
+            v-for="chip in item.chips"
+            :key="chip"
+            class="text-[10px] px-[6px] py-[1px] mr-[6px] mb-[6px] rounded-[4px] text-[#475569] bg-[#ffffff]"
+          >
+            {{ chip }}
+          </text>
+        </view>
+
+        <text class="text-[10px] text-[#94a3b8]" style="font-family: monospace;">
+          {{ item.configPath }}
+        </text>
       </view>
     </view>
 
@@ -246,128 +368,6 @@
       </view>
     </view>
 
-    <!-- 推荐开发 IDE（VSCode 及其二次开发编辑器） -->
-    <view class="mt-[16px] mx-[16px]">
-      <view class="flex flex-row items-center justify-between mb-[10px]">
-        <text class="text-[14px] font-bold text-[#1e293b]">💻 推荐开发 IDE</text>
-        <text class="text-[11px] text-[#94a3b8]">VSCode · 二开通用</text>
-      </view>
-
-      <view
-        class="p-[14px] rounded-[12px] border-[1px] border-solid bg-[#f8fafc] border-[#e2e8f0]"
-      >
-        <text class="text-[12px] leading-[22px] text-[#475569]">
-          推荐使用 VSCode 或基于 VSCode 二次开发的编辑器（Trae / Cursor / Antigravity 等）开发本项目：仓库已内置完整的编辑器配置，打开即得 .uts / .uvue 的类型提示与跳转定义，保存时自动格式化，并附带开箱即用的代码片段与智能补全。
-        </text>
-
-        <!-- 适用编辑器 -->
-        <view class="flex flex-row flex-wrap mt-[8px]">
-          <text
-            v-for="name in ideNameList"
-            :key="name"
-            class="text-[10px] font-medium px-[6px] py-[1px] mr-[6px] mb-[6px] rounded-[4px] text-[#4f46e5] bg-[#6366f114]"
-          >
-            {{ name }}
-          </text>
-        </view>
-
-        <!-- 编辑器能力清单 -->
-        <view v-for="item in ideFeatureList" :key="item.id" class="flex flex-row mt-[10px]">
-          <text class="text-[12px] mr-[6px]">{{ item.icon }}</text>
-          <view class="flex-1 flex flex-col">
-            <text class="text-[12px] font-bold text-[#1e293b]">
-              {{ item.title }}
-            </text>
-            <text class="text-[11px] leading-[16px] mt-[2px] text-[#64748b]">
-              {{ item.desc }}
-            </text>
-          </view>
-        </view>
-
-        <text class="text-[10px] mt-[10px] text-[#94a3b8]" style="font-family: monospace;">
-          .vscode/settings.json · extensions.json · unibest.code-snippets
-        </text>
-      </view>
-    </view>
-
-    <!-- 核心特性（2列紧凑卡片网格） -->
-    <view class="mt-[16px] mx-[16px]">
-      <view class="flex flex-row items-center justify-between mb-[10px]">
-        <text class="text-[14px] font-bold text-[#1e293b]">⚡ 核心特性</text>
-        <text class="text-[11px] text-[#94a3b8]">Vue3 + UTS + Vite</text>
-      </view>
-
-      <view class="flex flex-row flex-wrap justify-between">
-        <view
-          v-for="item in featureList"
-          :key="item.id"
-          class="w-[48.5%] p-[12px] mb-[10px] rounded-[10px] border-[1px] border-solid flex flex-col justify-between"
-          :style="{ backgroundColor: item.bgColor, borderColor: item.borderColor }"
-        >
-          <view class="flex flex-col">
-            <text class="text-[13px] font-bold" :style="{ color: item.textColor }">
-              {{ item.title }}
-            </text>
-            <text class="text-[11px] mt-[4px] leading-[16px] text-[#64748b]">
-              {{ item.desc }}
-            </text>
-          </view>
-          <text
-            class="text-[10px] mt-[6px]"
-            :style="{ color: item.textColor, fontFamily: 'monospace' }"
-          >
-            {{ item.configPath }}
-          </text>
-        </view>
-      </view>
-    </view>
-
-    <!-- 内置工具库（lime-shared / lime-use / lime-color / lime-dayuts / unix-crypto） -->
-    <view class="mt-[16px] mx-[16px]">
-      <view class="flex flex-row items-center justify-between mb-[10px]">
-        <text class="text-[14px] font-bold text-[#1e293b]">🧰 内置工具库</text>
-        <text class="text-[11px] text-[#94a3b8]">uni_modules · CLI 可选配</text>
-      </view>
-
-      <view
-        v-for="item in toolLibList"
-        :key="item.id"
-        class="p-[12px] mb-[10px] rounded-[10px] border-[1px] border-solid flex flex-col"
-        :style="{ backgroundColor: item.bgColor, borderColor: item.borderColor }"
-      >
-        <view class="flex flex-row items-center mb-[6px]">
-          <view
-            class="w-[3px] h-[14px] rounded-[2px] mr-[6px]"
-            :style="{ backgroundColor: item.textColor }"
-          />
-          <text class="text-[13px] font-bold mr-[6px]" :style="{ color: item.textColor }">
-            {{ item.title }}
-          </text>
-          <text class="text-[10px] font-medium px-[5px] py-[1px] rounded-[4px] text-[#64748b] bg-[#ffffff]">
-            {{ item.tag }}
-          </text>
-        </view>
-
-        <text class="text-[11px] leading-[16px] text-[#64748b] mb-[8px]">
-          {{ item.desc }}
-        </text>
-
-        <view class="flex flex-row flex-wrap">
-          <text
-            v-for="chip in item.chips"
-            :key="chip"
-            class="text-[10px] px-[6px] py-[1px] mr-[6px] mb-[6px] rounded-[4px] text-[#475569] bg-[#ffffff]"
-          >
-            {{ chip }}
-          </text>
-        </view>
-
-        <text class="text-[10px] text-[#94a3b8]" style="font-family: monospace;">
-          {{ item.configPath }}
-        </text>
-      </view>
-    </view>
-
     <!-- 底部提示 -->
     <view
       class="mx-[16px] mt-[14px] mb-[24px] px-[14px] py-[10px] rounded-[10px] border-[1px] border-solid flex flex-row items-center bg-[#f8fafc] border-[#e2e8f0]"
@@ -388,6 +388,7 @@ import { systemInfo as systemInfoRef } from '@/src/utils/systemInfo/index.uts';
 import type { SystemInfoType } from '@/src/utils/systemInfo/index.uts';
 import { curIdx, onTabPageShow, onTabShow, resolveTabIndexByKey } from '@/src/tabbar/index.uts';
 import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/layouts/navbar/utils/index.uts';
+import { isH5 } from '@/src/config/env/platform.uts';
 
 type FeatureItem = {
   id: string;
@@ -665,25 +666,27 @@ function copyCliCommand(): void {
 // 打开 GitHub 官方仓库地址
 function openGithub(): void {
   const url = 'https://github.com/cq112233/unibestX';
-  // #ifdef WEB
-  window.open(url, '_blank');
-  // #endif
-  // #ifndef WEB
-  uni.navigateTo({
-    url: `/src/sub/webview/webview?url=${encodeURIComponent(url)}&title=unibestX`,
-    fail: () => {
-      uni.setClipboardData({
-        data: url,
-        success: () => {
-          uni.showToast({
-            title: '已复制 GitHub 链接',
-            icon: 'none'
-          });
-        }
-      });
+  if (isH5) {
+    if (typeof window != 'undefined') {
+      window.open(url, '_blank');
     }
-  });
-  // #endif
+  }
+  else {
+    uni.navigateTo({
+      url: `/src/sub/webview/webview?url=${encodeURIComponent(url)}&title=unibestX`,
+      fail: () => {
+        uni.setClipboardData({
+          data: url,
+          success: () => {
+            uni.showToast({
+              title: '已复制 GitHub 链接',
+              icon: 'none'
+            });
+          }
+        });
+      }
+    });
+  }
 }
 
 // 页面数据加载/刷新方法
@@ -726,8 +729,4 @@ onUnmounted(() => {
 });
 </script>
 
-<style scoped>
-.content-container {
-  width: 100%;
-}
-</style>
+<style scoped lang="scss"></style>
