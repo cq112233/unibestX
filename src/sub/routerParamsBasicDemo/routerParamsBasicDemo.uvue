@@ -69,7 +69,7 @@
 <script setup lang="uts">
 import { computed } from 'vue';
 import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/layouts/navbar/utils/index.uts';
-import { useRoute } from '@/src/router/index.uts';
+import { useRoute } from '@/uni_modules/route-bestX/index.uts';
 
 definePage({
   debug: false,
@@ -86,7 +86,7 @@ definePage({
 // 参数统一从 useRoute() 读，不再写 onLoad((options) => {...})：
 // 两者都能拿到 query，但 route.query 口径与其它页面一致（Map<string, string>，值已 URL 解码）；
 // 而且它是**本页自己的快照** —— 本页重新显示（onPageShow）/ 同名路径落地提交时刷新，
-// 别的页面跳转改不到它（见 src/router/hooks/route-state.uts 的「谁读到什么」）。
+// 别的页面跳转改不到它（见 src/router/core/route-state.uts 的「谁读到什么」）。
 const route = useRoute();
 
 /** query 键值对展示行 */

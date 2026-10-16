@@ -7,95 +7,126 @@
       class="w-[200px] h-[44px] rounded-[8px] bg-[#3b82f6] flex flex-row items-center justify-center"
       @click="doLogin"
     >
-      <text class="text-[#ffffff] text-[14px] font-bold">点击模拟登录</text>
+      <text class="text-[#ffffff] text-[14px] font-bold">点击登录</text>
     </view>
   </view>
 </template>
 
 <script setup lang="uts">
-/* eslint-disable dot-notation */
-import { ref } from 'vue';
 import type { IDoubleTokenRes, IUserInfo } from '@/src/store/index.uts';
 import { useTokenStore, useUserStore } from '@/src/store/index.uts';
 import { isPageTabbar, switchTabbar } from '@/src/tabbar/index.uts';
-import { login } from '@/src/api/auth/auth.uts';
-import type { LoginQuery, LoginResult } from '@/src/api/auth/auth.uts';
+import type { AuthUserInfo, LoginResult } from '@/src/api/auth/auth.uts';
+import { useRoute, useRouter } from '@/uni_modules/route-bestX/index.uts';
+import { DEFAULT_HOME_PAGE } from '@/src/router/config.uts';
 
+const router = useRouter();
+const route = useRoute();
 const tokenStore = useTokenStore();
 const userStore = useUserStore();
-const redirectUrl = ref<string>('');
 
-definePage({
-  debug: false,
-  layout: 'navbar',
-  showBack: true,
-  hideNavbar: false,
-  enablePullDownRefresh: false,
-  style: {
-    navigationBarTitleText: '登录',
-    navigationStyle: 'custom'
-  }
-});
+definePage(async () => {
+  // 比如如果我要在这里调用接口
+  const p = new Promise((resolve) => {
+    setTimeout(() => {
+      resolve('登录');
+    }, 100);
+  });
 
-onLoad((options: UTSJSONObject | null) => {
-  if (options != null) {
-    const redirect = options['redirect'] as string | null;
-    if (redirect != null) {
-      redirectUrl.value = redirect;
+  const res = await p;
+
+  return {
+    debug: false,
+    layout: 'navbar',
+    showBack: true,
+    hideNavbar: false,
+    enablePullDownRefresh: false,
+    style: {
+      navigationBarTitleText: res,
+      navigationStyle: 'custom'
     }
-  }
+  };
 });
 
-function doLogin() {
-  if (tokenStore.hasValidLogin()) {
-    if (redirectUrl.value != '') {
-      const targetUrl = decodeURIComponent(redirectUrl.value) ?? '';
-      if (isPageTabbar(targetUrl)) {
-        switchTabbar(targetUrl);
-      }
-      else {
-        uni.redirectTo({ url: targetUrl });
-      }
+/**
+ * 获取重定向回跳地址（统一从 route-bestX 路由快照中读取已自动解码的目标路径）
+ */
+function getRedirectTarget(): string {
+  const redirect = route.query.get('redirect');
+  return redirect != null ? redirect : '';
+}
+
+/**
+ * 执行回跳目标页面
+ */
+function navigateToTarget() {
+  const target = getRedirectTarget();
+  if (target != '') {
+    if (isPageTabbar(target)) {
+      switchTabbar(target);
     }
     else {
-      uni.navigateBack();
+      router.replace(target);
     }
+  }
+  else {
+    // 若无明确回跳地址，默认回跳首页
+    if (isPageTabbar(DEFAULT_HOME_PAGE)) {
+      switchTabbar(DEFAULT_HOME_PAGE);
+    }
+    else {
+      router.replace(DEFAULT_HOME_PAGE);
+    }
+  }
+}
+
+/**
+ * 登录成功后统一状态写入与延迟回跳
+ */
+function onLoginSuccess(res: LoginResult) {
+  tokenStore.setDoubleToken({
+    accessToken: res.token,
+    accessExpiresIn: res.expiresIn,
+    refreshToken: res.refreshToken,
+    refreshExpiresIn: res.refreshExpiresIn
+  } as IDoubleTokenRes);
+  userStore.setUserInfo({
+    userId: res.userInfo.userId,
+    username: res.userInfo.username,
+    nickname: res.userInfo.nickname,
+    avatar: res.userInfo.avatar
+  } as IUserInfo);
+  uni.showToast({
+    title: '登录成功',
+    icon: 'success'
+  });
+  setTimeout(() => {
+    navigateToTarget();
+  }, 800);
+}
+
+/**
+ * 本地模拟登录：纯前端生成有效 Token 与用户信息，不发任何网络请求，
+ * 彻底杜绝小程序控制台报「未配置域名白名单」错误，用于演示与页面跳转流程验证。
+ */
+function doLogin() {
+  if (tokenStore.hasValidLogin()) {
+    navigateToTarget();
     return;
   }
-  login({
-    username: 'UNIX',
-    password: 'admin'
-  } as LoginQuery).then((res: LoginResult) => {
-    tokenStore.setDoubleToken({
-      accessToken: res.token,
-      accessExpiresIn: res.expiresIn,
-      refreshToken: res.refreshToken,
-      refreshExpiresIn: res.refreshExpiresIn
-    } as IDoubleTokenRes);
-    userStore.setUserInfo({
-      userId: res.userInfo.userId,
-      username: res.userInfo.username,
-      nickname: res.userInfo.nickname,
-      avatar: res.userInfo.avatar
-    } as IUserInfo);
-    uni.showToast({
-      title: '登录成功',
-      icon: 'success'
-    });
-    setTimeout(() => {
-      if (redirectUrl.value != '') {
-        const targetUrl = decodeURIComponent(redirectUrl.value) ?? '';
-        if (isPageTabbar(targetUrl)) {
-          switchTabbar(targetUrl);
-        }
-        else {
-          uni.redirectTo({ url: targetUrl });
-        }
-      }
-      else {
-        uni.navigateBack();
-      }
-    }, 1000);
-  });
+  const mockRes: LoginResult = {
+    token: `mock-token-${Date.now()}`,
+    expiresIn: 7200,
+    refreshToken: `mock-refresh-${Date.now()}`,
+    refreshExpiresIn: 604800,
+    userInfo: {
+      userId: 1001,
+      username: 'UNIX',
+      nickname: 'UNIX 开发者',
+      avatar: '/static/logo.png',
+      roles: ['admin']
+    } as AuthUserInfo
+  } as LoginResult;
+  onLoginSuccess(mockRes);
 }
 </script>

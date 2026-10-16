@@ -1,0 +1,75 @@
+/**
+ * TabBar 内部专用路径与路由识别工具
+ * 完全自包含，零外部路由库依赖与耦合
+ */
+
+/**
+ * 清除路径中的参数并保证以 / 开头
+ */
+export function cleanPath(path: string): string {
+  if (path.length == 0) {
+    return '';
+  }
+  let p = path.trim();
+  const queryIdx = p.indexOf('?');
+  if (queryIdx >= 0) {
+    p = p.substring(0, queryIdx);
+  }
+  return p.startsWith('/') ? p : `/${p}`;
+}
+
+/**
+ * 去除路径前导斜杠
+ */
+export function removeLeadingSlash(path: string): string {
+  let p = path;
+  while (p.startsWith('/')) {
+    p = p.substring(1);
+  }
+  return p;
+}
+
+/**
+ * 比较两个页面路径是否指向同一页面（容错前后导斜杠与参数）
+ */
+export function isSamePath(path1: string, path2: string): boolean {
+  const p1 = cleanPath(path1);
+  const p2 = cleanPath(path2);
+  if (p1 == p2) {
+    return true;
+  }
+  const raw1 = removeLeadingSlash(p1);
+  const raw2 = removeLeadingSlash(p2);
+  if (raw1 == raw2) {
+    return true;
+  }
+  return raw1.endsWith(raw2) || raw2.endsWith(raw1);
+}
+
+/**
+ * 获取当前栈顶页面的原生 route 路径字符串
+ */
+export function getCurrentRoute(): string {
+  try {
+    const pages = getCurrentPages();
+    if (pages.length > 0) {
+      const page = pages[pages.length - 1];
+      return page.route ?? '';
+    }
+  }
+  catch {
+    // ignore
+  }
+  return '';
+}
+
+/**
+ * 获取当前栈顶页面的规范化路径（统一带前导 "/"）
+ */
+export function getCurrentPath(): string {
+  const route = getCurrentRoute();
+  if (route.length == 0) {
+    return '';
+  }
+  return cleanPath(route);
+}

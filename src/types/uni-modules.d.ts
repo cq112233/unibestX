@@ -72,105 +72,6 @@ declare module '@/uni_modules/lime-dayuts' {
   export function dayuts(...args: any[]): any;
 }
 
-// ---------- unix-Bignumber ----------
-// 真源：uni_modules/unix-Bignumber/index.uts
-// 说明：入参与返回值类型在真源里多为 `any`（对应 bignumber.js 的宽松签名），
-// 这里如实照抄，避免 TS 侧宣称比真源更严格的类型。
-declare module '@/uni_modules/unix-Bignumber' {
-  export const ROUND_UP: number;
-  export const ROUND_DOWN: number;
-  export const ROUND_CEIL: number;
-  export const ROUND_FLOOR: number;
-  export const ROUND_HALF_UP: number;
-  export const ROUND_HALF_DOWN: number;
-  export const ROUND_HALF_EVEN: number;
-  export const ROUND_HALF_CEIL: number;
-  export const ROUND_HALF_FLOOR: number;
-  export const MODULO_MODE_DOWN: number;
-  export const MODULO_MODE_EUCLID: number;
-
-  export type BigNumberFormat = any;
-  export type BigNumberFormatInput = any;
-  export type BigNumberConfigInput = any;
-  export type BigNumberConfigOutput = any;
-
-  export function config(cfg: any): any;
-  export function getConfig(): any;
-
-  export class BigNumber {
-    constructor(value: any, base?: number);
-    plus(value: any): BigNumber;
-    minus(value: any): BigNumber;
-    multipliedBy(value: any): BigNumber;
-    dividedBy(value: any): BigNumber;
-    dividedToIntegerBy(value: any): BigNumber;
-    modulo(value: any): BigNumber;
-    exponentiatedBy(value: any, modulus?: any): BigNumber;
-    sqrt(): BigNumber;
-    comparedTo(value: any): any;
-    isEqualTo(value: any): boolean;
-    isGreaterThan(value: any): boolean;
-    isGreaterThanOrEqualTo(value: any): boolean;
-    isLessThan(value: any): boolean;
-    isLessThanOrEqualTo(value: any): boolean;
-    isFinite(): boolean;
-    isInteger(): boolean;
-    isNaN(): boolean;
-    isNegative(): boolean;
-    isPositive(): boolean;
-    isZero(): boolean;
-    absoluteValue(): BigNumber;
-    negated(): BigNumber;
-    integerValue(rm?: number): BigNumber;
-    decimalPlaces(dp?: number, rm?: number): any;
-    sd(significantDigits?: any, rm?: any): any;
-    precision(significantDigits?: any, rm?: any): any;
-    shiftedBy(places: number): BigNumber;
-    toString(base?: number): string;
-    toFixed(dp?: number, rm?: number): string;
-    toFormat(dp?: number, rm?: number, format?: any): string;
-    toNumber(): number;
-    toJSON(): string;
-    valueOf(): string;
-    times(value: any): BigNumber;
-    div(value: any): BigNumber;
-    idiv(value: any): BigNumber;
-    mod(value: any): BigNumber;
-    pow(value: any, modulus?: any): BigNumber;
-    eq(value: any): boolean;
-    gt(value: any): boolean;
-    gte(value: any): boolean;
-    lt(value: any): boolean;
-    lte(value: any): boolean;
-    abs(): BigNumber;
-    static isBigNumber(value: any): boolean;
-    static config(cfg: any): any;
-    static getConfig(): any;
-    static of(value: any, base?: number): BigNumber;
-  }
-}
-
-// ---------- unix-crypto ----------
-// 真源：uni_modules/unix-crypto/index.uts
-declare module '@/uni_modules/unix-crypto' {
-  export function base64Encode(text: string): Promise<string>;
-  export function base64Decode(base64: string): Promise<string>;
-  export function md5(text: string): Promise<string>;
-  export function sha256(text: string): Promise<string>;
-  export function hmacSha1(text: string, key: string): Promise<string>;
-  export function aesEncrypt(text: string, key: string): Promise<string>;
-  export function aesDecrypt(hex: string, key: string): Promise<string>;
-  export function desEncrypt(text: string, key: string): Promise<string>;
-  export function desDecrypt(hex: string, key: string): Promise<string>;
-  export function rsaGenerateKeyPair(bits: number): Promise<string>;
-  export function rsaEncrypt(text: string, publicKey: string): Promise<string>;
-  export function rsaDecrypt(hex: string, privateKey: string): Promise<string>;
-  export function rsaSign(text: string, privateKey: string, hashType: string): Promise<string>;
-  export function rsaVerify(text: string, publicKey: string, sigHex: string, hashType: string): Promise<boolean>;
-  export function generateUUID(): string;
-  export function uuid(): string;
-}
-
 // ---------- x-pinia-s：uni-app-x 严格类型版 Pinia ----------
 // 真源：uni_modules/x-pinia-s/index.uts、instans/storeBase.uts、instans/defineStore.uts
 declare module '@/uni_modules/x-pinia-s' {
@@ -206,3 +107,19 @@ declare module '@/uni_modules/x-pinia-s/instans/types.uts' {
   export type PersistOptions = any;
   export type PersistSerializer = any;
 }
+
+// ---------- z-paging-x 组件实例类型（<z-paging-x ref="pagingX"> 中 ref 的类型） ----------
+// 真源：uni_modules/z-paging-x/components/z-paging-x/types/index.uts 的 ZPagingXInstance
+type ZPagingXComponentPublicInstance = import('vue').ComponentPublicInstance & {
+  reload: () => void;
+  refresh: () => void;
+  complete: (data: any[] | null) => void;
+  completeByTotal: (data: any[] | null, total: number) => void;
+  completeByNoMore: (data: any[] | null, nomore: boolean) => void;
+  completeByError: () => void;
+  endRefresh: () => void;
+  clear: () => void;
+  scrollToTop: (animate: boolean) => void;
+  scrollToBottom: (animate: boolean) => void;
+  scrollToY: (y: number, animate: boolean) => void;
+};

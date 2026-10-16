@@ -1,0 +1,71 @@
+import type { GuardResult, RouteGuardContext } from '@/uni_modules/route-bestX/index.uts';
+import { useTokenStore } from '@/src/store/index.uts';
+import {
+  DEFAULT_HOME_PAGE,
+  EXCLUDE_LOGIN_PATH_LIST,
+  isNeedLoginMode,
+  LOGIN_PAGE,
+  LOGIN_PAGE_LIST
+} from '../config.uts';
+
+/**
+ * 判断路径是否符合策略名单 (EXCLUDE_LOGIN_PATH_LIST)
+ * @param path 页面路径，自动兼容前导斜杠
+ */
+export function judgeIsExcludePath(path: string): boolean {
+  let normalizedPath = path;
+  if (normalizedPath.startsWith('src/')) {
+    normalizedPath = `/${normalizedPath}`;
+  }
+  return EXCLUDE_LOGIN_PATH_LIST.includes(normalizedPath);
+}
+
+/**
+ * 登录拦截规则（纯函数）：裁决本次导航是否放行（登录态 × 黑白名单策略）
+ *
+ * 裁决矩阵：
+ * 1. 已登录：
+ *    - 目标为认证页面（登录/注册等）-> 重定向回 redirect 参数或首页 (DEFAULT_HOME_PAGE)
+ *    - 目标为其他业务页面 -> 直接放行
+ * 2. 未登录：
+ *    - 白名单策略 (isNeedLoginMode = true)：仅名单内页面与认证页面放行，其余全拦
+ *    - 黑名单策略 (isNeedLoginMode = false)：仅名单内页面拦截，其余全部放行
+ */
+export function guardLogin(ctx: RouteGuardContext): GuardResult {
+  const { to, next } = ctx;
+  const path = to.path;
+
+  console.log(ctx, 'guardLogin');
+
+  const isLoggedIn = useTokenStore().hasValidLogin();
+
+  // 1. 已登录
+  if (isLoggedIn) {
+    if (LOGIN_PAGE_LIST.includes(path) || path == LOGIN_PAGE) {
+      const redirect = to.query.get('redirect');
+      if (redirect != null && redirect != '') {
+        return next(redirect);
+      }
+      return next(DEFAULT_HOME_PAGE);
+    }
+    return next();
+  }
+
+  // 2. 未登录
+  const loginUrl = `${LOGIN_PAGE}?redirect=${encodeURIComponent(to.fullPath)}`;
+
+  // 2.1 白名单策略：默认全拦，仅名单内页面与登录/注册页面本身放行
+  if (isNeedLoginMode) {
+    if (judgeIsExcludePath(path) || LOGIN_PAGE_LIST.includes(path)) {
+      return next();
+    }
+    return next(loginUrl);
+  }
+
+  // 2.2 黑名单策略（默认）：默认放行，仅名单内页面需要登录
+  if (judgeIsExcludePath(path)) {
+    return next(loginUrl);
+  }
+
+  return next();
+}

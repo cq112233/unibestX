@@ -116,6 +116,109 @@ let user: string | undefined;
     });
   });
 
+  describe('define-page-no-outer-variables rule', () => {
+    it('should report error when variable declared in script is referenced in definePage', async () => {
+      const code = `<script setup lang="uts">
+const a = 5;
+
+definePage(async (options) => {
+  const p = new Promise((resolve) => {
+    resolve(a);
+  });
+});
+</script>
+`;
+
+      const [res] = await eslint.lintText(code, { filePath: 'src/pages/test/test.uvue' });
+      const errors = res.messages.filter(m => m.ruleId === 'uts/define-page-no-outer-variables');
+
+      expect(errors.length).toBe(1);
+      expect(errors[0].message).toContain('"a"');
+      expect(errors[0].message).toContain('ReferenceError');
+    });
+
+    it('should report error when function declared in script is called in definePage', async () => {
+      const code = `<script setup lang="uts">
+function getTitle() {
+  return 'title';
+}
+
+definePage({
+  style: {
+    navigationBarTitleText: getTitle()
+  }
+});
+</script>
+`;
+
+      const [res] = await eslint.lintText(code, { filePath: 'src/pages/test/test.uvue' });
+      const errors = res.messages.filter(m => m.ruleId === 'uts/define-page-no-outer-variables');
+
+      expect(errors.length).toBe(1);
+      expect(errors[0].message).toContain('"getTitle"');
+    });
+
+    it('should allow imports used inside definePage', async () => {
+      const code = `<script setup lang="uts">
+import { TITLE } from './constants';
+
+definePage({
+  style: {
+    navigationBarTitleText: TITLE
+  }
+});
+</script>
+`;
+
+      const [res] = await eslint.lintText(code, { filePath: 'src/pages/test/test.uvue' });
+      const errors = res.messages.filter(m => m.ruleId === 'uts/define-page-no-outer-variables');
+
+      expect(errors.length).toBe(0);
+    });
+
+    it('should allow variables declared inside definePage or options parameter', async () => {
+      const code = `<script setup lang="uts">
+definePage(async (options) => {
+  const { isH5 } = options;
+  const localVal = 'home';
+  return {
+    style: {
+      navigationBarTitleText: isH5 ? localVal : 'app'
+    }
+  };
+});
+</script>
+`;
+
+      const [res] = await eslint.lintText(code, { filePath: 'src/pages/test/test.uvue' });
+      const errors = res.messages.filter(m => m.ruleId === 'uts/define-page-no-outer-variables');
+
+      expect(errors.length).toBe(0);
+    });
+
+    it('should allow global built-ins like setTimeout, Promise, console, Math', async () => {
+      const code = `<script setup lang="uts">
+definePage(async () => {
+  console.log('init');
+  const p = new Promise((resolve) => {
+    setTimeout(() => {
+      resolve('ok');
+    }, 100);
+  });
+  return {
+    debug: false
+  };
+});
+</script>
+`;
+
+      const [res] = await eslint.lintText(code, { filePath: 'src/pages/test/test.uvue' });
+      const errors = res.messages.filter(m => m.ruleId === 'uts/define-page-no-outer-variables');
+
+      expect(errors.length).toBe(0);
+    });
+  });
+
   describe('file scope restriction', () => {
     it('should completely ignore files in uni_modules', async () => {
       const code = `

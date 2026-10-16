@@ -1,0 +1,65 @@
+/**
+ * 业务路由配置中心（黑白名单策略与页面路径）
+ */
+
+export type LoginStrategyMap = {
+  /** 黑名单策略：默认无需登录，只在特定页面拦截 */
+  DEFAULT_NO_NEED_LOGIN: number;
+  /** 白名单策略：默认全部拦截，仅在特定免登录页面直接放行 */
+  DEFAULT_NEED_LOGIN: number;
+};
+
+/**
+ * 登录拦截策略映射
+ */
+export const LOGIN_STRATEGY_MAP: LoginStrategyMap = {
+  /** 黑名单策略：默认无需登录，只在特定页面拦截 */
+  DEFAULT_NO_NEED_LOGIN: 0,
+  /** 白名单策略：默认全部拦截，仅在特定免登录页面直接放行 */
+  DEFAULT_NEED_LOGIN: 1
+};
+
+/**
+ * 选中的全局登录策略（默认采用黑名单策略）
+ */
+export const LOGIN_STRATEGY: number = LOGIN_STRATEGY_MAP.DEFAULT_NO_NEED_LOGIN;
+
+/**
+ * 是否启用强制登录策略（白名单策略）
+ */
+export const isNeedLoginMode: boolean = LOGIN_STRATEGY == LOGIN_STRATEGY_MAP.DEFAULT_NEED_LOGIN;
+
+/**
+ * 登录页面绝对路由路径
+ */
+export const LOGIN_PAGE: string = '/src/sub/auth/login';
+
+/**
+ * 注册页面绝对路由路径
+ */
+export const REGISTER_PAGE: string = '/src/sub/auth/register';
+
+/**
+ * 登录认证相关页面路径列表（登录、注册等）
+ */
+export const LOGIN_PAGE_LIST: string[] = [LOGIN_PAGE, REGISTER_PAGE];
+
+/**
+ * 已登录访问登录页时的兜底回跳首页路径
+ */
+export const DEFAULT_HOME_PAGE: string = '/src/pages/index/index';
+
+/**
+ * 策略页面名单列表：
+ * - 白名单模式下（isNeedLoginMode = true）：作为【免登录白名单】，名单内的页面直接放行免登，名单外的页面未登录时全部拦截并跳转登录页；
+ * - 黑名单模式下（isNeedLoginMode = false）：作为【需登录黑名单】，名单内的页面必须登录才能访问，名单外的页面直接放行。
+ */
+export const EXCLUDE_LOGIN_PATH_LIST: string[] = [
+  '/src/sub/routerParamsBasicDemo/routerParamsBasicDemo'
+];
+
+/**
+ * 语义化别名（方便按开发心智直观引用，与 EXCLUDE_LOGIN_PATH_LIST 共享同一份数组）
+ */
+export const BLACK_LIST: string[] = EXCLUDE_LOGIN_PATH_LIST;
+export const WHITE_LIST: string[] = EXCLUDE_LOGIN_PATH_LIST;

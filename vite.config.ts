@@ -19,6 +19,9 @@ import uniAppXBorderFixPlugin from './plugins/vite-plugin-uni-app-x-border-fix';
 import uniLayoutsPlugin from './plugins/uni-layouts-plugin';
 import tabbarViewsPlugin from './plugins/vite-plugin-tabbar-views';
 import uniPagesPlugin from './plugins/vite-plugin-uni-pages';
+import uniPagesSandboxPlugin from './plugins/vite-plugin-uni-pages-sandbox';
+import uniPagesTabbarPlugin from './plugins/vite-plugin-uni-pages-tabbar';
+import uniPagesRouteMetaPlugin from './plugins/vite-plugin-uni-pages-route-meta';
 import { execSync } from 'node:child_process';
 import { viteMockServe } from 'vite-plugin-mock';
 import { viteVConsole } from 'vite-plugin-vconsole';
@@ -177,7 +180,7 @@ export default defineConfig({
   },
   server: {
     host: '0.0.0.0',
-    port: 8080,
+    port: 9527,
     // 启用快速文件系统状态缓存，减少启动与热重载时重复 stat 系统调用
     fs: {
       cachedChecks: true
@@ -245,8 +248,6 @@ export default defineConfig({
     // extraIncludes 透传 isVConsole 时的 vconsole：vite-plugin-vconsole 在 transform 钩子里动态注入
     // `import VConsole from 'vconsole'` 到 main.uts，scanner 看不到，需显式 include 让 scanner 预构建。
     h5OptimizeDepsPlugin({ debug: false, extraIncludes: isVConsole ? ['vconsole'] : [] }),
-    // 修复 H5 模式下外部或 AI 修改 .uvue/.uts 时 Tailwind CSS v4 样式热更新丢失的联动补丁插件
-    // tailwindHmrPlugin(),
     // 自动扫描与路由生成插件（基于 pages.config.json + 页面内 <route>/definePage 声明）
     uniPagesPlugin({
       // 【总控开关】：是否启用插件自动扫描与 pages.json 生成（设为 false 则完全失效，不扫描、不写入 pages.json、不监听文件变化）
@@ -268,8 +269,23 @@ export default defineConfig({
       configFile: 'pages.config.json',
 
       // 【强制指定首页】：若指定则优先以该路由为主包第一个首页；留空时默认取 pages.config.json 首项或扫描的第一项
-      homePage: ''
+      homePage: '',
+
+      // 【自定义上下文扩展注入】：向 definePage((options) => ...) 的 options 注入业务自定义属性
+      // 支持静态对象或函数 (_baseCtx => ({ ... }))，可在页面中解构 options.xxx 读取
+      context: _baseCtx => ({
+        // 可自由注入业务常量、环境变量、构建参数或辅助方法
+        appName: env.VITE_APP_TITLE || 'unibestX',
+        isProduction,
+        buildVersion: process.env.VITE_APP_VERSION || '1.0.0'
+      })
     }),
+    // uni-pages 的三个独立卫星插件：各自一个文件、各自独立注册，核心插件通过 configResolved
+    // 从插件数组里发现它们携带的 uniPagesStage 属性，在同一次生成 pass 内按 order 依次运行。
+    // 注意：必须无条件并列注册，禁止写成 `...(cond ? [x()] : [])`，否则对应功能会静默失效。
+    uniPagesSandboxPlugin(), // 沙盒独立调试模式（VITE_DEV_SANDBOX / definePage({ debug })）
+    uniPagesTabbarPlugin(), // TabBar 策略（VITE_TABBAR_MODE 0–4）
+    uniPagesRouteMetaPlugin(), // 生成 src/router/generated/page-meta.uts（useRoute().meta/.name 数据源）
     // 单页 TabBar 基础脚手架与视图组件辅助生成插件（按需根据 src/tabbar/config.uts 辅助创建基础 TabViews）
     tabbarViewsPlugin({
       enabled: true,
@@ -288,7 +304,7 @@ export default defineConfig({
     }),
     uniRootX({
       enabledGlobalRef: false,
-      rootFileName: 'App.ku'
+      rootFileName: 'src/AppRoot'
     }),
     // manifest.json 由 manifest.config.ts 生成（必须在 uni() 之前注册）。
     // ⚠️ 注意时序：uni-app 在编译进程启动时（vite 之前）就读走 manifest.json 并缓存成进程级 once，

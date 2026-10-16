@@ -1,11 +1,11 @@
 <template>
-  <view class="content-container flex flex-col">
+  <view class="flex flex-col w-full">
     <image class="w-[90px] h-[90px] mx-auto mt-[16px] rounded-[18px]" src="/static/logo.png" />
     <text class="text-[24px] font-semibold mx-auto mt-[8px] text-[#d14328]">
       {{ systemInfo?.appTitle ?? '' }}
     </text>
     <text class="text-center text-[15px] font-medium mt-[4px] text-[#475569]">
-      最好用的 uni-appX 开发模板
+      最好用的 uni-appX 开发模板。
     </text>
 
     <!-- 运行环境状态卡片 -->
@@ -98,7 +98,7 @@
           <text class="text-[10px] text-[#64748b]">交互式一键创建</text>
         </view>
         <text class="text-[11px] text-[#64748b] leading-[18px] mb-[8px]">
-          支持交互式选择 UI 组件库（Rice UI / uview-ultra / 原生）、内置工具库（lime-shared / lime-use / lime-color / unix-crypto）、按需功能裁剪与完整性自检：
+          支持交互式选择 UI 组件库（Rice UI / uview-ultra / 原生）、内置工具库（lime-shared / lime-use / lime-color / crypto-bestX）、按需功能裁剪与完整性自检：
         </text>
         <view
           class="px-[10px] py-[8px] rounded-[6px] bg-[#0f172a] flex flex-row items-center justify-between active:opacity-90"
@@ -190,7 +190,7 @@
       </view>
     </view>
 
-    <!-- 内置工具库（lime-shared / lime-use / lime-color / lime-dayuts / unix-crypto） -->
+    <!-- 内置工具库（lime-shared / lime-use / lime-color / lime-dayuts / crypto-bestX） -->
     <view class="mt-[16px] mx-[16px]">
       <view class="flex flex-row items-center justify-between mb-[10px]">
         <text class="text-[14px] font-bold text-[#1e293b]">🧰 内置工具库</text>
@@ -236,6 +236,138 @@
       </view>
     </view>
 
+    <!-- 多端热更与开发调试指南卡片 -->
+    <view
+      class="mt-[14px] mx-[16px] p-[14px] rounded-[14px] border-[1px] border-solid bg-[#ffffff] border-[#e2e8f0] flex flex-col"
+    >
+      <view class="flex flex-row items-center justify-between mb-[12px]">
+        <view class="flex flex-row items-center">
+          <text class="text-[14px] mr-[6px]">⚡</text>
+          <text class="text-[13px] font-bold text-[#1e293b]">多端热重载与调试体验指南</text>
+        </view>
+        <view class="px-[6px] py-[2px] rounded-[4px] bg-[#6366f114]">
+          <text class="text-[10px] font-bold text-[#4f46e5]">推荐工作流</text>
+        </view>
+      </view>
+
+      <!-- 各端表现清单 -->
+      <view class="flex flex-col bg-[#f8fafc] rounded-[10px] p-[10px] border-[1px] border-solid border-[#e2e8f0]">
+        <!-- H5 -->
+        <view class="flex flex-row items-start mb-[8px]">
+          <view class="px-[6px] py-[1px] rounded-[4px] bg-[#dcfce7] mr-[8px] mt-[1px]">
+            <text class="text-[10px] font-bold text-[#15803d]">H5 (最优)</text>
+          </view>
+          <text class="text-[11px] leading-[16px] text-[#334155] flex-1">
+            差量更新不重载，热更新稳定停留在当前页，页面布局与组件调试首选推荐。
+          </text>
+        </view>
+
+        <!-- iOS -->
+        <view class="flex flex-row items-start mb-[8px]">
+          <view class="px-[6px] py-[1px] rounded-[4px] bg-[#e0f2fe] mr-[8px] mt-[1px]">
+            <text class="text-[10px] font-bold text-[#0369a1]">iOS</text>
+          </view>
+          <text class="text-[11px] leading-[16px] text-[#334155] flex-1">
+            差量更新无感替换，热更新平滑保留在当前调试页面。
+          </text>
+        </view>
+
+        <!-- Android -->
+        <view class="flex flex-row items-start mb-[8px]">
+          <view class="px-[6px] py-[1px] rounded-[4px] bg-[#e0f2fe] mr-[8px] mt-[1px]">
+            <text class="text-[10px] font-bold text-[#0369a1]">Android</text>
+          </view>
+          <text class="text-[11px] leading-[16px] text-[#334155] flex-1">
+            差量更新会热重构重启基座，热重载保持在当前停留页。
+          </text>
+        </view>
+
+        <!-- 小程序 -->
+        <view class="flex flex-row items-start mb-[8px]">
+          <view class="px-[6px] py-[1px] rounded-[4px] bg-[#fef3c7] mr-[8px] mt-[1px]">
+            <text class="text-[10px] font-bold text-[#b45309]">小程序</text>
+          </view>
+          <text class="text-[11px] leading-[16px] text-[#334155] flex-1">
+            受宿主开发者工具限制，代码保存后均会整包重载回到首页。
+          </text>
+        </view>
+
+        <!-- 鸿蒙 -->
+        <view class="flex flex-row items-start">
+          <view class="px-[6px] py-[1px] rounded-[4px] bg-[#fef3c7] mr-[8px] mt-[1px]">
+            <text class="text-[10px] font-bold text-[#b45309]">鸿蒙</text>
+          </view>
+          <text class="text-[11px] leading-[16px] text-[#334155] flex-1">
+            原生运行时差量编译后会重启基座，调试状态重置回到首页。
+          </text>
+        </view>
+      </view>
+
+      <!-- 沙盒独立调试（页面过多时的提速手段） -->
+      <view class="mt-[10px] p-[10px] rounded-[10px] bg-[#f5f3ff] border-[1px] border-solid border-[#ddd6fe]">
+        <view class="flex flex-row items-center mb-[8px]">
+          <text class="text-[12px] mr-[6px]">🧪</text>
+          <text class="text-[12px] font-bold text-[#5b21b6]">页面太多？开启沙盒调试</text>
+          <view class="px-[6px] py-[1px] rounded-[4px] bg-[#7c3aed14] ml-[6px]">
+            <text class="text-[10px] font-bold text-[#6d28d9]">只编译目标页</text>
+          </view>
+        </view>
+
+        <text class="text-[11px] leading-[17px] text-[#4c1d95]">
+          页面与分包变多以后，每次热更新都要全量编译。沙盒模式把编译范围锁定到单个页面或某个模块，冷启动直达目标页，秒级完成编译，也不易被其他页面的报错打断。
+        </text>
+
+        <!-- 方式一：页面内代码标记 -->
+        <view class="flex flex-row items-start mt-[8px]">
+          <view class="px-[5px] py-[1px] rounded-[4px] bg-[#ede9fe] mr-[6px] mt-[1px]">
+            <text class="text-[10px] font-bold text-[#6d28d9]">方式一</text>
+          </view>
+          <view class="flex-1 flex flex-col">
+            <text class="text-[11px] leading-[16px] text-[#334155]">
+              在目标页面内声明代码标记，调试单页最省事
+            </text>
+            <view class="mt-[4px] px-[6px] py-[4px] rounded-[4px] bg-[#0f172a] flex flex-col">
+              <text class="text-[10px] text-[#c4b5fd]" style="font-family: monospace;">
+                definePage({ debug: true, debugHome: true })
+              </text>
+            </view>
+          </view>
+        </view>
+
+        <!-- 方式二：.env 环境变量 -->
+        <view class="flex flex-row items-start mt-[8px]">
+          <view class="px-[5px] py-[1px] rounded-[4px] bg-[#ede9fe] mr-[6px] mt-[1px]">
+            <text class="text-[10px] font-bold text-[#6d28d9]">方式二</text>
+          </view>
+          <view class="flex-1 flex flex-col">
+            <text class="text-[11px] leading-[16px] text-[#334155]">
+              改用 .env 环境变量，支持多页与通配，优先级高于代码标记
+            </text>
+            <view class="mt-[4px] px-[6px] py-[4px] rounded-[4px] bg-[#0f172a] flex flex-col">
+              <text class="text-[10px] text-[#c4b5fd] mb-[2px]" style="font-family: monospace;">
+                VITE_DEV_SANDBOX=true
+              </text>
+              <text class="text-[10px] text-[#c4b5fd]" style="font-family: monospace;">
+                VITE_DEV_SANDBOX_PAGES=src/sub/auth/*
+              </text>
+            </view>
+          </view>
+        </view>
+
+        <text class="text-[10px] leading-[15px] mt-[8px] text-[#7c3aed]">
+          多个页面用逗号分隔（首个为启动首页），也可用 src/sub/auth/* 通配整个模块；调试完把 debug 改回 false 即恢复全量，正式打包会自动熔断沙盒。
+        </text>
+      </view>
+
+      <!-- 底部建议 -->
+      <view class="mt-[10px] p-[8px] rounded-[8px] bg-[#eff6ff] border-[1px] border-solid border-[#bfdbfe] flex flex-row items-start">
+        <text class="text-[12px] mr-[4px]">💡</text>
+        <text class="text-[11px] leading-[17px] text-[#1d4ed8] flex-1">
+          建议：业务开发优先使用 H5（pnpm dev:h5）调样式与逻辑；页面或分包较多时开启沙盒调试，只编译当前目标页；在 VITE_TABBAR_MODE=4 模式下除 H5 均会重置到首页。功能稳定后再切真机或小程序做多端兼容验收。
+        </text>
+      </view>
+    </view>
+
     <!-- 底部提示 -->
     <view
       class="mx-[16px] mt-[14px] mb-[24px] px-[14px] py-[10px] rounded-[10px] border-[1px] border-solid flex flex-row items-center bg-[#f8fafc] border-[#e2e8f0]"
@@ -270,8 +402,8 @@ type FeatureItem = {
 const featureList: Array<FeatureItem> = [
   {
     id: 'tabbar',
-    title: '🚀 单页 TabBar',
-    desc: '0ms 秒切保活・零白屏',
+    title: '🚀 多策略 TabBar',
+    desc: '5 种策略・单页保活零白屏',
     configPath: 'src/tabbar/config.uts',
     bgColor: '#10b9810f',
     borderColor: '#10b98126',
@@ -280,8 +412,8 @@ const featureList: Array<FeatureItem> = [
   {
     id: 'router',
     title: '📄 路由与拦截守卫',
-    desc: '黑白名单免登・全局鉴权',
-    configPath: 'src/router/config/config.uts',
+    desc: 'route-bestX 路由引擎・导航守卫',
+    configPath: 'uni_modules/route-bestX',
     bgColor: '#f59e0b0f',
     borderColor: '#f59e0b26',
     textColor: '#d97706'
@@ -289,8 +421,8 @@ const featureList: Array<FeatureItem> = [
   {
     id: 'route-hooks',
     title: '🧩 组合式路由 Hooks',
-    desc: 'useRoute/useRouter 双 Hook',
-    configPath: 'src/router/hooks',
+    desc: 'useRoute / useRouter 双 Hook',
+    configPath: 'uni_modules/route-bestX',
     bgColor: '#c026d30f',
     borderColor: '#c026d326',
     textColor: '#a21caf'
@@ -454,23 +586,23 @@ const toolLibList: Array<ToolLibItem> = [
     textColor: '#4338ca'
   },
   {
-    id: 'unix-Bignumber',
-    title: '🧮 unix-Bignumber',
+    id: 'bignumber-bestX',
+    title: '🧮 bignumber-bestX',
     tag: '大数据运算',
     desc: '任意精度十进制运算库，覆盖加减乘除、取模、幂与开方，支持 2~36 进制、九种舍入模式与千分位格式化，彻底解决 0.1 + 0.2 ≠ 0.3 的浮点误差。',
     chips: ['任意精度', '四则运算', '幂与开方', '2~36 进制', '九种舍入', '千分位'],
-    configPath: 'uni_modules/unix-Bignumber',
+    configPath: 'uni_modules/bignumber-bestX',
     bgColor: '#7c3aed0f',
     borderColor: '#7c3aed26',
     textColor: '#7c3aed'
   },
   {
-    id: 'unix-crypto',
-    title: '🔐 unix-crypto',
+    id: 'crypto-bestX',
+    title: '🔐 crypto-bestX',
     tag: '加密解密',
     desc: '跨端加密解密套件，涵盖 Base64 编解码、MD5 与 SHA-256 摘要、HMAC 签名、AES / DES 对称加解密、RSA 非对称加解密与验签，以及 UUID 生成。',
     chips: ['Base64', 'MD5 / SHA-256', 'HMAC', 'AES / DES', 'RSA 验签', 'UUID'],
-    configPath: 'uni_modules/unix-crypto',
+    configPath: 'uni_modules/crypto-bestX',
     bgColor: '#15803d0f',
     borderColor: '#15803d26',
     textColor: '#15803d'
@@ -594,8 +726,4 @@ onUnmounted(() => {
 });
 </script>
 
-<style scoped>
-.content-container {
-  width: 100%;
-}
-</style>
+<style scoped lang="scss"></style>

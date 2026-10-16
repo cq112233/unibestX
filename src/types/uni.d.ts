@@ -44,250 +44,6 @@ declare global {
     } | null) => void;
   }
 
-  export interface PageStyle {
-    /** 导航栏标题文字内容 */
-    'navigationBarTitleText'?: string;
-    /** 导航栏背景颜色（同颜色十六进制） */
-    'navigationBarBackgroundColor'?: string;
-    /** 导航栏标题颜色及状态栏前景颜色，仅支持 black/white */
-    'navigationBarTextStyle'?: 'black' | 'white';
-    /** 导航栏样式，仅支持 default/custom */
-    'navigationStyle'?: 'default' | 'custom';
-    /** 窗口的背景颜色 */
-    'backgroundColor'?: string;
-    /** 下拉背景字体、loading 图标的样式，仅支持 dark/light */
-    'backgroundTextStyle'?: 'dark' | 'light';
-    /** 顶部窗口的背景色（仅 iOS） */
-    'backgroundColorTop'?: string;
-    /** 底部窗口的背景色（仅 iOS） */
-    'backgroundColorBottom'?: string;
-    /** 页面内容背景颜色 */
-    'backgroundColorContent'?: string;
-    /** 是否开启下拉刷新 */
-    'enablePullDownRefresh'?: boolean;
-    /** 页面上拉触底事件触发时距页面底部距离，单位为 px */
-    'onReachBottomDistance'?: number;
-    /** 设置为 true 则禁用页面滚动 */
-    'disableScroll'?: boolean;
-    /** 是否禁用侧滑返回手势（仅 iOS） */
-    'disableSwipeBack'?: boolean;
-    /** 导航栏图片地址（仅部分平台支持） */
-    'titleImage'?: string;
-    /** 导航栏透明设置。支持 always、auto、none */
-    'transparentTitle'?: 'always' | 'auto' | 'none';
-    /** 导航栏点击穿透 */
-    'titlePenetrate'?: 'YES' | 'NO';
-    /** 窗口显示的动画效果 */
-    'animationType'?:
-      | 'auto'
-      | 'none'
-      | 'slide-in-right'
-      | 'slide-in-left'
-      | 'slide-in-top'
-      | 'slide-in-bottom'
-      | 'fade-in'
-      | 'zoom-out'
-      | 'zoom-fade-out'
-      | 'pop-in'
-      | (string & {});
-    /** 窗口显示动画的持续时间 */
-    'animationDuration'?: number;
-    /** App 原生端特有样式配置 */
-    'app-plus'?: Record<string, any>;
-    /** H5 平台特有样式配置 */
-    'h5'?: Record<string, any>;
-    /** 微信小程序特有样式配置 */
-    'mp-weixin'?: Record<string, any>;
-    /** 支付宝小程序特有样式配置 */
-    'mp-alipay'?: Record<string, any>;
-    /** 页面自定义组件配置 */
-    'usingComponents'?: Record<string, string>;
-    /** 允许的任意其他 style 配置 */
-    [key: string]: any;
-  }
-
-  export interface DefinePageOptions {
-    /**
-     * -route名字
-     */
-    name?: string;
-    /**
-     * 沙盒独立调试模式标记：
-     * - true: 本地开发时仅编译此页面（及其关联的 debug 页面），跳过无关页面与 TabBar，极大提升编译速度
-     * - ⚠️ 提示: 调试完成后记得关闭（设为 false 或删除），以还原全量页面
-     */
-    debug?: boolean;
-    /**
-     * 沙盒调试模式启动首页标记：
-     * - true: 本地沙盒调试时，将当前页面显式指定为应用默认启动首页（排在 pages.json 第 1 位）
-     * - ⚠️ 提示: 全局仅允许 1 个页面设置为 true；调试完成后记得关闭（设为 false 或删除）
-     */
-    debugHome?: boolean;
-    /**
-     * 页面类型标记：
-     * - 'home': 标记当前页面为应用首页（自动排在 pages.json 第 1 位）
-     */
-    type?: 'home' | string;
-    /**
-     * 页面使用的布局模版：
-     * - 'navbar': 使用 src/layouts/navbar.uvue（支持顶部导航栏、自定义下拉刷新）
-     * - 'default': 使用 src/layouts/default.uvue
-     * - 'empty': 使用 src/layouts/empty.uvue
-     * - false: 禁用 layout 布局包裹
-     * - string: 自定义 layout 名称（对应 src/layouts/[name].uvue）
-     */
-    layout?: 'navbar' | 'default' | 'empty' | (string & {}) | boolean;
-    /**
-     * 导航栏左侧是否显示返回箭头（配合 navbar 布局使用，默认 true）
-     */
-    showBack?: boolean;
-
-    /**
-     *  是否隐藏顶状态栏（配合 navbar 布局使用，默认 false）
-     */
-    hideStatusBar?: boolean;
-
-    /**
-     * 是否隐藏顶部导航栏（配合 navbar 布局使用，默认 false）
-     */
-    hideNavbar?: boolean;
-    /**
-     * 是否显示顶部导航栏（配合 navbar 布局使用，默认 true）
-     */
-    showNavbar?: boolean;
-    /**
-     * 是否开启自定义下拉刷新（配合 navbar 布局使用，由 scroll-view 驱动）
-     */
-    enablePullDownRefresh?: boolean;
-    /**
-     * 页面布局根容器自定义 class 类名（配合 layout 布局使用，推荐使用全局原子类如 'bg-white'、'p-[16px]'）
-     */
-    customPageClass?: string;
-    /**
-     * 页面布局根容器自定义内联样式（全端绝对兼容，穿透任何样式隔离，如 'background-color: transparent;'）
-     */
-    customPageStyle?: string;
-    /**
-     * 兼容别名：自定义 class
-     */
-    class?: string;
-    customClass?: string;
-    layoutClass?: string;
-    /**
-     * 兼容别名：自定义 style
-     */
-    customStyle?: string;
-    layoutStyle?: string;
-    /**
-     * 页面窗口表现样式配置（对应 pages.json 中的 style）
-     */
-    style?: PageStyle;
-    /**
-     * 是否需要登录拦截校验
-     */
-    needLogin?: boolean;
-    /**
-     * 页面标题（简写）
-     */
-    title?: string;
-    /**
-     * 允许的任意自定义页面元数据
-     */
-    [key: string]: any;
-  }
-
-  /**
-   * uni-pages 宏函数：在单文件组件内部声明页面配置与路由信息
-   */
-  function definePage(options: DefinePageOptions): void;
-
-  // ==========================================
-  // Vue 宏函数全局声明（保证在 uvue / uts / ts 环境中获得完整 IDE 智能补全与参数提示）
-  // ==========================================
-
-  /**
-   * Vue 3 / UTS <script setup> 宏函数：定义组件可触发的自定义事件
-   *
-   * 示例：
-   * ```uts
-   * const emit = defineEmits(['change', 'update'])
-   * const emit = defineEmits<{
-   *   (e: 'change', id: number): void
-   *   (e: 'update', value: string): void
-   * }>()
-   * ```
-   */
-  function defineEmits<EE extends string = string>(
-    emit: EE[]
-  ): (event: EE, ...args: any[]) => void;
-  function defineEmits<T extends (...args: any[]) => any>(): T;
-  function defineEmits<T extends Record<string, any>>(
-    emit: T
-  ): (event: keyof T, ...args: any[]) => void;
-
-  /**
-   * Vue 3 / UTS <script setup> 宏函数：定义组件的 Props 属性
-   *
-   * 示例：
-   * ```uts
-   * const props = defineProps({
-   *   title: { type: String, default: '' }
-   * })
-   * const props = defineProps<{ title?: string }>()
-   * ```
-   */
-  function defineProps<T extends Record<string, any>>(): T;
-  function defineProps<T extends Record<string, any>>(props: T): any;
-
-  /**
-   * Vue 3 / UTS <script setup> 宏函数：显式暴露组件内部属性/方法给父组件（通过 ref 访问）
-   */
-  function defineExpose(exposed?: Record<string, any>): void;
-
-  /**
-   * Vue 3 / UTS <script setup> 宏函数：声明组件选项（如 name, inheritAttrs 等）
-   */
-  function defineOptions(options?: Record<string, any>): void;
-
-  /**
-   * Vue 3 / UTS <script setup> 宏函数：为基于类型的 defineProps 声明提供默认值
-   */
-  function withDefaults<T extends Record<string, any>>(
-    props: T,
-    defaults: Partial<T>
-  ): T;
-
-  /**
-   * Vue 3 / UTS <script setup> 宏函数：定义组件插槽类型
-   */
-  function defineSlots<T extends Record<string, any>>(): T;
-
-  /**
-   * Vue 3 / UTS <script setup> 宏函数：声明双向绑定 prop
-   */
-  function defineModel<T = any>(name?: string, options?: Record<string, any>): import('vue').Ref<T>;
-
-  // ==========================================
-  // Vue 核心响应式与生命周期 API 全局声明（全工程免 import 自动推导）
-  // ==========================================
-  const ref: typeof import('vue')['ref'];
-  const reactive: typeof import('vue')['reactive'];
-  const computed: typeof import('vue')['computed'];
-  const watch: typeof import('vue')['watch'];
-  const watchEffect: typeof import('vue')['watchEffect'];
-  const shallowRef: typeof import('vue')['shallowRef'];
-  const shallowReactive: typeof import('vue')['shallowReactive'];
-  const toRef: typeof import('vue')['toRef'];
-  const toRefs: typeof import('vue')['toRefs'];
-  const toValue: typeof import('vue')['toValue'];
-  const unref: typeof import('vue')['unref'];
-  const nextTick: typeof import('vue')['nextTick'];
-  const onMounted: typeof import('vue')['onMounted'];
-  const onUpdated: typeof import('vue')['onUpdated'];
-  const onUnmounted: typeof import('vue')['onUnmounted'];
-  const provide: typeof import('vue')['provide'];
-  const inject: typeof import('vue')['inject'];
-
   // ==========================================
   // uni-app X / UTS 核心对象与生命周期全局声明
   // ==========================================
@@ -624,8 +380,21 @@ declare global {
   function onError(callback: (error: any) => void): void;
   /** 未处理 Promise 拒绝监听（App.uvue 专用）：仅 Web 与小程序支持，App 原生端不支持须 #ifdef WEB || MP 隔离 */
   function onUnhandledRejection(callback: (result: { promise: Promise<any>; reason: any }) => void): void;
-  function getCurrentPages(): any[];
+  type UniPage = any;
+  type OnShowOptions = any;
+  function getCurrentPages(): UniPage[];
   function getApp(): any;
+
+  /** 支付宝小程序全局对象 */
+  const my: {
+    hideBackHome?: (options?: any) => void;
+    [key: string]: any;
+  };
+
+  /** 微信小程序全局对象 */
+  const wx: {
+    [key: string]: any;
+  };
 
   type AppThemeChangeResult = {
     appTheme: 'light' | 'dark' | string;
@@ -721,28 +490,6 @@ declare global {
     }) => void;
   }
 
-  /**
-   * z-paging-x 组件实例类型（`<z-paging-x ref="pagingX">` 中 ref 的类型）。
-   *
-   * uni-app X 在 HBuilderX 侧会为 uvue 组件生成 `<组件名>ComponentPublicInstance` 实例类型
-   * （插件市场里组件的「插件类型」就是这个命名），VSCode / tsconfig 拿不到这份编译产物，
-   * 直接写会报 TS2304「找不到名称」。这里补一份等价声明，让编辑器能识别。
-   * 方法签名真源：uni_modules/z-paging-x/components/z-paging-x/types/index.uts 的 ZPagingXInstance。
-   */
-  type ZPagingXComponentPublicInstance = import('vue').ComponentPublicInstance & {
-    reload: () => void;
-    refresh: () => void;
-    complete: (data: any[] | null) => void;
-    completeByTotal: (data: any[] | null, total: number) => void;
-    completeByNoMore: (data: any[] | null, nomore: boolean) => void;
-    completeByError: () => void;
-    endRefresh: () => void;
-    clear: () => void;
-    scrollToTop: (animate: boolean) => void;
-    scrollToBottom: (animate: boolean) => void;
-    scrollToY: (y: number, animate: boolean) => void;
-  };
-
   // ==========================================
   // uni-app X 原生异步任务类型（uni.request / uploadFile / downloadFile 的返回值）
   //
@@ -820,82 +567,9 @@ declare global {
   };
 
   // ==========================================
-  // uni-app X 路由 API 的 Options 类型（navigateTo / redirectTo / reLaunch / switchTab）
-  //
-  // 为什么要补（与上方 RequestTask 完全同一成因，只是换了个 API 分组）：
-  //   1) HBuilderX 自带 uni-app x dts 已把四者提升为全局
-  //      （HBuilderX 内置 @dcloudio/uni-app-x/types/uni/uts-plugin-api/lib/uni-route/
-  //       utssdk/global.d.ts:65,69,73,80），故 HBuilderX 里写 `options as NavigateToOptions` 不报错；
-  //   2) VSCode / tsconfig 侧挂的 npm 包 `@dcloudio/types` 把四者关在
-  //      `declare namespace UniNamespace` 内（uni/legacy/uni.d.ts:5276 起），**未提升到全局**，
-  //      于是 .uts 里裸写名字报 TS2304「找不到名称」；
-  //   3) 同样不能改用 `UniNamespace.NavigateToOptions` 绕开（`declare namespace` 非 UTS 语法，
-  //      写进 .uts 源码会被 HBuilderX 编译报错）。
-  //
-  // 真源：uni-route/utssdk/interface.d.ts 的 NavigateToOptions:842 / RedirectToOptions:1637 /
-  //       ReLaunchOptions:1919 / SwitchTabOptions:2203；三个回调入参在真源里统一取自
-  //       AsyncApiResult（native/AsyncApiResult.d.ts:5，即 `{ errMsg: string }`），失败回参另带 errCode。
-  // ⚠️ 必须用 `type` 而非 `interface`：scripts/gen-uts-dts.mjs 注明「项目禁用 interface」。
-  // ⚠️ 这里的 `url` 只留 `string`：真源标注是 `string | string.PageURIString`（品牌化字符串），
-  //    UTS 侧可直接赋给 string；VSCode 侧若照抄该联合类型，`url = opt.url` 会反过来报 TS2322。
+  // uni-app X 路由 API 的 Options 类型（navigateTo / redirectTo / reLaunch / switchTab / navigateBack）
+  // ⚠️ 已收敛移入 uni_modules/route-bestX/types.d.ts 插件目录内部，保证插件自包含
   // ==========================================
-
-  /** 路由 API 成功 / 完成回调的入参 */
-  type UniRouteApiResult = {
-    errMsg: string;
-  };
-
-  /** 路由 API 失败回调的入参（真源 errCode 为字面量 `4`，这里放宽为 number） */
-  type UniRouteApiFailResult = {
-    errMsg: string;
-    errCode: number;
-  };
-
-  type NavigateToOptions = {
-    url: string;
-    animationType?:
-      | 'auto'
-      | 'none'
-      | 'slide-in-right'
-      | 'slide-in-left'
-      | 'slide-in-top'
-      | 'slide-in-bottom'
-      | 'fade-in'
-      | 'zoom-out'
-      | 'zoom-fade-out'
-      | 'pop-in'
-      | null;
-    animationDuration?: number | null;
-    events?: any | null;
-    success?: ((result: UniRouteApiResult) => void) | null;
-    fail?: ((result: UniRouteApiFailResult) => void) | null;
-    complete?: ((result: UniRouteApiResult) => void) | null;
-    routeConfig?: any | null;
-    routeOptions?: any | null;
-    routeType?: string | null;
-    withOpenContainer?: any | null;
-  };
-
-  type RedirectToOptions = {
-    url: string;
-    success?: ((result: UniRouteApiResult) => void) | null;
-    fail?: ((result: UniRouteApiFailResult) => void) | null;
-    complete?: ((result: UniRouteApiResult) => void) | null;
-  };
-
-  type ReLaunchOptions = {
-    url: string;
-    success?: ((result: UniRouteApiResult) => void) | null;
-    fail?: ((result: UniRouteApiFailResult) => void) | null;
-    complete?: ((result: UniRouteApiResult) => void) | null;
-  };
-
-  type SwitchTabOptions = {
-    url: string;
-    success?: ((result: UniRouteApiResult) => void) | null;
-    fail?: ((result: UniRouteApiFailResult) => void) | null;
-    complete?: ((result: UniRouteApiResult) => void) | null;
-  };
 
   // ==========================================
   // 给 @dcloudio/types 的 UniNamespace.RequestTask 补齐分块接收 API
@@ -1038,65 +712,10 @@ declare global {
   //    需要一个不依赖事件的当前页参数来源，走的就是这个 `options`。
   // ==========================================
   namespace Page {
-    interface PageInstanceBaseProps<D extends AnyObject = any> {
+    interface PageInstanceBaseProps<_D extends AnyObject = any> {
       /** 页面的路由参数信息（App 4.31+ / Web 4.31+ / 微信小程序） */
       options?: UTSJSONObject;
     }
-  }
-
-  // ==========================================
-  // Vite 环境变量：import.meta.env.*
-  //
-  // 项目 tsconfig 的 `types` 白名单仅含 "@dcloudio/types"（未引入 "vite/client"），
-  // 故 VSCode / tsc 下 `import.meta.env.VITE_*` 报 TS2339「ImportMeta 上不存在 env」。
-  // 此处按 vite/client 的声明形式补齐。
-  //
-  // ⚠️ 必须用 interface 以与 lib.es5 的全局 `interface ImportMeta` 做声明合并，
-  //    改成 type 会因重名报错（interface 可合并，type 不可）。
-  // ==========================================
-  interface ImportMetaEnv {
-    readonly [key: string]: any;
-    readonly BASE_URL: string;
-    readonly MODE: string;
-    readonly DEV: boolean;
-    readonly PROD: boolean;
-    readonly SSR: boolean;
-
-    // —— 以下为项目自定义变量（真源：仓库根 .env / .env.development / .env.production / .env.test）
-    // ⚠️ 一律声明为可选：同一变量并非每个模式文件都有（如 VITE_ENV_NAME 只在 .development/.test/.production 中），
-    //    且 .env 中被注释掉的项在运行时确实不存在。声明为必选会让 `${x ?? 'default'}` 的兜底写法失去意义，
-    //    并可能触发 no-unnecessary-condition 类告警。
-
-    // 取自 .env
-    readonly VITE_APP_TITLE?: string;
-    readonly VITE_APP_VERSION?: string;
-    readonly VITE_DEFAULT_LOCALE?: string;
-    readonly VITE_DEFAULT_THEME?: string;
-    readonly VITE_DEFAULT_THEME_MODE?: string;
-    readonly VITE_DEV_SANDBOX?: string;
-    readonly VITE_DEV_SANDBOX_PAGES?: string;
-    readonly VITE_H5_USE_PROXY?: string;
-    readonly VITE_SHOW_VCONSOLE?: string;
-    readonly VITE_STREAM_URL?: string;
-    readonly VITE_TABBAR_MODE?: string;
-    readonly VITE_USE_MOCK?: string;
-
-    // 取自 .env.development / .env.production / .env.test
-    readonly VITE_ENV_NAME?: string;
-    readonly VITE_ENV_TYPE?: string;
-    readonly VITE_SERVER_BASEURL?: string;
-    readonly VITE_SERVER_BASEURL_SECONDARY?: string;
-    readonly VITE_UPLOAD_BASEURL?: string;
-    readonly VITE_UPLOAD_PATH?: string;
-
-    // 非 .env 声明，由 vite 构建期插件注入
-    readonly VITE_BUILD_TIME?: string;
-    readonly VITE_GIT_BRANCH?: string;
-    readonly VITE_GIT_COMMIT_HASH?: string;
-  }
-
-  interface ImportMeta {
-    readonly env: ImportMetaEnv;
   }
 
   // ==========================================
@@ -1108,52 +727,6 @@ declare global {
   // ==========================================
   interface JSON {
     parseObject: (text: string) => any;
-  }
-}
-
-declare module '*.uvue' {
-  const component: import('vue').DefineComponent<{}, {}, any>;
-  export default component;
-}
-
-declare module '@/src/router' {
-  export * from '@/src/router/index.uts';
-}
-
-declare module './src/router' {
-  export * from '@/src/router/index.uts';
-}
-
-declare module '@/src/router/interceptor' {
-  export * from '@/src/router/interceptor/interceptor.uts';
-}
-
-declare module './src/router/interceptor' {
-  export * from '@/src/router/interceptor/interceptor.uts';
-}
-
-declare module '@/src/tabbar' {
-  export * from '@/src/tabbar/index.uts';
-}
-
-declare module './src/tabbar' {
-  export * from '@/src/tabbar/index.uts';
-}
-
-declare module 'vue' {
-  export interface ComponentCustomProperties {
-    $callMethod: (name: string, ...args: any[]) => any;
-  }
-}
-
-declare module '@vue/runtime-core' {
-  export interface ComponentCustomProperties {
-    $callMethod: (name: string, ...args: any[]) => any;
-  }
-  export interface GlobalComponents {
-    A1: typeof import('../components/A1/A1.uvue')['default'];
-    NavBar: typeof import('../components/NavBar/NavBar.uvue')['default'];
-    TabbarMaskModal: typeof import('../components/TabbarMaskModal/TabbarMaskModal.uvue')['default'];
   }
 }
 

@@ -587,6 +587,64 @@ function pickTargetVersion(versionsByPackage, prefixes) {
   return null;
 }
 
+/**
+ * 当编辑器版本未在 npm 完整发布时，挑出 registry 上 4 个包都存在的最优最新版本（兜底用）
+ */
+function pickLatestCommonVersion(versionsByPackage) {
+  const primary = versionsByPackage.get(UNI_PACKAGES[0]) || [];
+  const re = /^3\.0\.0-(alpha-)?(\d{5})(\d+)$/;
+
+  const common = primary
+    .map((version) => {
+      const m = re.exec(version);
+      return m ? { version, alpha: Boolean(m[1]), prefix: m[2], build: Number(m[3]) } : null;
+    })
+    .filter(Boolean)
+    .filter(v => UNI_PACKAGES.every(p => (versionsByPackage.get(p) || []).includes(v.version)))
+    .sort((a, b) => {
+      const pDiff = Number(b.prefix) - Number(a.prefix);
+      if (pDiff !== 0) {
+        return pDiff;
+      }
+      if (a.alpha === b.alpha) {
+        return b.build - a.build;
+      }
+      return preferAlpha ? Number(b.alpha) - Number(a.alpha) : Number(a.alpha) - Number(b.alpha);
+    });
+
+  if (common.length > 0) {
+    return common[0];
+  }
+  return null;
+}
+
+const syncCacheDir = path.join(root, 'node_modules', '.cache');
+const syncCacheFile = path.join(syncCacheDir, 'hbuilderx-version-sync.json');
+
+function saveSyncCache(data) {
+  try {
+    if (!fs.existsSync(syncCacheDir)) {
+      fs.mkdirSync(syncCacheDir, { recursive: true });
+    }
+    fs.writeFileSync(syncCacheFile, JSON.stringify({ ...data, timestamp: Date.now() }, null, 2), 'utf-8');
+  }
+  catch {
+    // 忽略缓存写入失败
+  }
+}
+
+function readSyncCache() {
+  try {
+    if (fs.existsSync(syncCacheFile)) {
+      return JSON.parse(fs.readFileSync(syncCacheFile, 'utf-8'));
+    }
+  }
+  catch {
+    // 忽略坏缓存
+  }
+  return null;
+}
+
 // ==================== package.json 读写 ====================
 
 /** 行级替换，避免 JSON.parse / stringify 重排整个 package.json 造成无谓 diff */
@@ -624,6 +682,17 @@ function currentPinnedPrefix(source) {
   return null;
 }
 
+/** 从 package.json 现有内容里取出这 4 个依赖当前的完整版本号 */
+function currentPinnedFullVersion(source) {
+  for (const pkg of UNI_PACKAGES) {
+    const m = new RegExp(`^\\s*"${escapeRe(pkg)}":\\s*"([^"]+)"`, 'm').exec(source);
+    if (m) {
+      return m[1];
+    }
+  }
+  return null;
+}
+
 /**
  * 本地快速比对：编辑器版本推出的候选前缀，是否与 package.json 当前 pin 的前缀一致。
  *
@@ -643,9 +712,37 @@ function fastCheck() {
     return { status: 'no-prefix', hx };
   }
 
-  const pinned = currentPinnedPrefix(fs.readFileSync(pkgFile, 'utf-8'));
+  const currentPkg = fs.readFileSync(pkgFile, 'utf-8');
+  const pinned = currentPinnedPrefix(currentPkg);
   if (!pinned) {
     return { status: 'no-pin', hx };
+  }
+
+  if (prefixes.includes(pinned)) {
+    return {
+      status: 'aligned',
+      hx,
+      prefixes,
+      pinned
+    };
+  }
+
+  // 命中回退缓存：若近期（30分钟内）已联网探测过该编辑器版本且确认 npm 尚未齐备，且 package.json 处于回退版本，直接放行
+  const cache = readSyncCache();
+  const fullPinned = currentPinnedFullVersion(currentPkg);
+  if (
+    cache
+    && cache.editorVersion === hx.rawVersion
+    && cache.status === 'unreleased'
+    && cache.pinnedVersion === fullPinned
+    && (Date.now() - cache.timestamp) < 30 * 60 * 1000
+  ) {
+    return {
+      status: 'aligned',
+      hx,
+      prefixes,
+      pinned
+    };
   }
 
   return {
@@ -747,20 +844,31 @@ function runSync() {
     versionsByPackage.set(pkg, versions);
   }
 
-  const target = pickTargetVersion(versionsByPackage, prefixes);
-  if (!target) {
-    console.error(`\n❌ registry 上找不到匹配 ${prefixes.join(' / ')} 的版本（且 4 个包都发布过的）。`);
-    const newest = (versionsByPackage.get(UNI_PACKAGES[0]) || []).slice(-5);
-    console.error(`   ${UNI_PACKAGES[0]} 目前最新的几个版本：`);
-    for (const v of newest) {
-      console.error(`     - ${v}`);
-    }
-    console.error('   说明该编辑器版本尚未发 npm 构建（或镜像未同步）。可稍后重试，或改用 --alpha。');
-    process.exit(2);
-  }
+  let target = pickTargetVersion(versionsByPackage, prefixes);
+  let isFallback = false;
 
-  const channel = target.alpha ? 'alpha' : '稳定版';
-  console.log(`\n🎯 匹配版本: ${target.version}  (前缀 ${target.prefix}，${channel})`);
+  if (!target) {
+    console.warn(`\n⚠️  registry 上未找到匹配 ${prefixes.join(' / ')} 的版本（4 个包未完全发布）。`);
+    const newest = (versionsByPackage.get(UNI_PACKAGES[0]) || []).slice(-5);
+    console.log(`   ${UNI_PACKAGES[0]} 目前最新的几个版本：`);
+    for (const v of newest) {
+      console.log(`     - ${v}`);
+    }
+
+    const latestCommon = pickLatestCommonVersion(versionsByPackage);
+    if (!latestCommon) {
+      console.error('\n❌ registry 上未找到 4 个包都共同发布的可用版本，请检查网络或镜像。');
+      process.exit(2);
+    }
+
+    target = latestCommon;
+    isFallback = true;
+    console.log(`\n💡 自动回退策略：编辑器版本尚未完全发布，使用 registry 上 4 包齐全的最新可用版本 ${target.version} (前缀 ${target.prefix})`);
+  }
+  else {
+    const channel = target.alpha ? 'alpha' : '稳定版';
+    console.log(`\n🎯 匹配版本: ${target.version}  (前缀 ${target.prefix}，${channel})`);
+  }
 
   // 3. 对比并改写
   const source = fs.readFileSync(pkgFile, 'utf-8');
@@ -769,7 +877,22 @@ function runSync() {
 
   const drifted = applied.filter(a => a.from !== a.to);
   if (drifted.length === 0) {
+    if (isFallback) {
+      console.log(`\n✅ package.json 当前版本已是最新可用版本 (${target.version})，无需改动，保持原样继续运行。`);
+      saveSyncCache({
+        editorVersion: hx.rawVersion,
+        pinnedVersion: target.version,
+        status: 'unreleased'
+      });
+      console.log('');
+      process.exit(0);
+    }
     console.log('\n✅ package.json 已对齐，无需改动。');
+    saveSyncCache({
+      editorVersion: hx.rawVersion,
+      pinnedVersion: target.version,
+      status: 'aligned'
+    });
     console.log('');
     process.exit(0);
   }
@@ -784,6 +907,10 @@ function runSync() {
   }
 
   if (isCheck) {
+    if (isFallback) {
+      console.log(`\nℹ️  编辑器版本尚未在 npm 完整发布，当前已对齐至最新可用版本 ${target.version}。`);
+      process.exit(0);
+    }
     console.log('\n❌ 版本未对齐（--check 模式，不落盘）。');
     console.log('   执行 pnpm sync:hbuilderx 进行同步。');
     console.log('');
@@ -798,6 +925,11 @@ function runSync() {
 
   fs.writeFileSync(pkgFile, next, 'utf-8');
   console.log(`\n✅ 已更新 package.json（4 处依赖 → ${target.version}）`);
+  saveSyncCache({
+    editorVersion: hx.rawVersion,
+    pinnedVersion: target.version,
+    status: isFallback ? 'unreleased' : 'aligned'
+  });
 
   if (skipInstall) {
     console.log('⏭  已跳过 pnpm install（--no-install）。');

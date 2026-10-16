@@ -1,7 +1,7 @@
 {
   "name": "unibestx",
   "type": "module",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "packageManager": "pnpm@10.6.1",
   "description": "unibestX - 最好的 uni-app X 开发框架",
   "engines": {
@@ -10,8 +10,8 @@
   },
   "scripts": {
     "dev": "node scripts/sync-hbuilderx.mjs --ensure && node scripts/dev-warmup.mjs web",
-    "dev:mp-weixin": "node scripts/sync-hbuilderx.mjs --ensure && uni-launch mp-weixin",
-    "dev:mp-alipay": "node scripts/sync-hbuilderx.mjs --ensure && uni-launch mp-alipay",
+    "dev:mp-weixin": "node scripts/sync-hbuilderx.mjs --ensure && node scripts/dev-mp.mjs mp-weixin",
+    "dev:mp-alipay": "node scripts/sync-hbuilderx.mjs --ensure && node scripts/dev-mp.mjs mp-alipay",
     "dev:app-android": "node scripts/sync-hbuilderx.mjs --ensure && uni-launch app-android",
     "dev:app-harmony": "node scripts/sync-hbuilderx.mjs --ensure && uni-launch app-harmony",
     "dev:app-ios": "node scripts/sync-hbuilderx.mjs --ensure && uni-launch app-ios --iosTarget simulator",
@@ -84,6 +84,7 @@
     "@uni-helper/vite-plugin-uni-manifest": "^0.6.0",
     "@vue/test-utils": "^2.5.1",
     "@vue/typescript-plugin": "3.3.11",
+    "comment-json": "^5.0.0",
     "depcheck": "^1.4.7",
     "eslint": "^9.39.4",
     "eslint-plugin-format": "^1.5.0",
@@ -140,13 +141,13 @@
     "src/**/*.{js,jsx,ts,tsx,uts,vue,uvue,mjs,cjs,json}": [
       "eslint --fix"
     ],
-    "{App.uvue,App.ku.uvue,main.uts}": [
+    "{App.uvue,main.uts}": [
       "eslint --fix"
     ],
     "src/**/*.{css,scss,vue,uvue}": [
       "stylelint --fix --allow-empty-input"
     ],
-    "{App.uvue,App.ku.uvue}": [
+    "App.uvue": [
       "stylelint --fix --allow-empty-input"
     ]
   }

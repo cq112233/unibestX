@@ -1,30 +1,29 @@
 /**
- * 路由模块统一入口 (Router Suite)
+ * 业务路由配置模块 (src/router)
  *
- * ⚠️ **只转发这四块**：配置 (config)、两个组合式 hooks (useRoute / useRouter) 与拦截器 (interceptor)。
- *    其余一切（`routeState` / 快照 / `RouteUtils` / 守卫契约 / `toLoginPage`）一律**精准导入**
- *    具体实现文件，别从本入口转 —— 门面一整包转发会让底层符号全成公共 API，调用方顺手穿越门面
- *    引用，正撞 `unibestX-skill` 1.22 的 Kotlin `<clinit>` 循环死锁红线（红线 36）。
- *
- *    常用精准导入路径：
- *    | 你要的 | 从哪拿 |
- *    | :--- | :--- |
- *    | 读本页路由 / 导航器 | 本入口，或 `@/src/router/hooks/useRoute.uts` / `useRouter.uts` |
- *    | 登录页地址、黑白名单策略 | `@/src/router/config/config.uts` |
- *    | 安装全局拦截器、H5 直链入口 | `@/src/router/interceptor/interceptor.uts` |
- *    | 跳登录页 | `@/src/router/toLoginPage/toLoginPage.uts` |
- *    | 路径 / URL 工具 | `@/src/router/utils/utils.uts` |
- *    | 全局路由状态、快照机制 | `@/src/router/hooks/route-state.uts` / `route-snapshot.uts` |
- *    | 业务守卫规则 | `@/src/router/guard/`（目录约定见 ./guard/index.uts） |
- *
- * ⚠️ 每个符号**只在这里转发一层**（子模块之间不互相 `export *`），避免 Kotlin 端
- *    符号被改名成 `xxx__1` 报 error18 / 运行期 NoSuchMethodError。
- * ⚠️ 业务规则（登录判定 / 白名单 / 放行裁决）一律写在 `./guard/` 里（业务开发者主战场，
- *    目录约定见 ./guard/index.uts），别往本文件加业务代码；反过来 `./guard/` 里的文件也不要
- *    import 本入口 —— 本入口转出的 interceptor 会把 guard 拉进来，互相 import 就成自环
- *    （Kotlin 端类初始化死锁）。
+ * 底层基于 @/uni_modules/route-bestX 极简高性能路由引擎，
+ * 负责组装应用的全局前置守卫（登录态拦截）、TabBar 代理桥接与初始化。
  */
-export * from './config/config.uts';
-export * from './hooks/useRoute.uts';
-export * from './hooks/useRouter.uts';
-export * from './interceptor/interceptor.uts';
+import {
+  createRouter,
+  setPageMetaJson
+} from '@/uni_modules/route-bestX/index.uts';
+import { isPageTabbar, switchTabbar } from '@/src/tabbar/index.uts';
+import { setupRouteGuards } from './guards/index.uts';
+import { PAGE_META_JSON } from './generated/page-meta.uts';
+
+// 0. 初始化页面元数据表（支持 pages.json 静态配置与 useRoute.meta / useRoute.name）
+setPageMetaJson(PAGE_META_JSON);
+
+// 1. 全局单例路由器（桥接业务 TabBar 动态判定与切换，内部全自动调度与兜底）
+export const router = createRouter({
+  isTabbar: (url: string): boolean => isPageTabbar(url),
+  switchTab: (url: string): void => {
+    switchTabbar(url);
+  }
+});
+
+// 2. 自动注册业务全局守卫与生命周期钩子
+setupRouteGuards(router);
+
+export default router;

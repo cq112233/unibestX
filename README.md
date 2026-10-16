@@ -424,7 +424,6 @@ unibestX/
 │   ├── uni-layouts-plugin.ts     #   跨端 Layout 布局插件（default / empty / navbar）
 │   ├── vite-plugin-tabbar-views.ts # 单页 TabBar 脚手架与视图自动生成插件
 │   ├── vite-plugin-clean-logger.ts # 过滤编译期控制台噪音日志
-│   ├── vite-plugin-tailwind-hmr.ts # Tailwind 入口 CSS 变更的热更新加速
 │   └── root-plugin.ts            #   自动包裹 App.ku.uvue 全局根骨架组件
 ├── scripts/                      # 构建与环境切换脚本
 │   ├── build-h5.mjs              #   H5 打包（调用 HBuilderX cli publish）
@@ -540,7 +539,9 @@ unibestX/
 │       └── rxjs-lite/            #   轻量流式处理工具
 ├── uni_modules/                  # uni-app 扩展插件模块（精简收敛为 17 个核心插件）
 │   ├── z-paging-x/               #   深度优化适配的分页组件
-│   ├── unix-crypto/              #   跨端加密解密库（AES/DES/RSA/MD5/SHA/HMAC/Base64/UUID）
+│   ├── route-bestX/              #   uni-app X 极简高性能跨端路由引擎（导航守卫/快照隔离）
+│   ├── bignumber-bestX/          #   全端高精度大数据运算库（十进制/四则运算/金融格式化）
+│   ├── crypto-bestX/             #   跨端加密解密库（AES/DES/RSA/MD5/SHA/HMAC/Base64/UUID）
 │   ├── x-pinia-s/                #   UTS 版 Pinia（VDOM 模式使用）
 │   ├── lime-request/             #   HTTP 请求核心库
 │   ├── lime-i18n/                #   国际化核心库
@@ -1148,7 +1149,7 @@ graph LR
     I --> M[Vitest 全量单元测试]
 ```
 
-#### 1. ESLint & UTS 平台专属规则插件 (`plugins/eslint-plugin-uts.mjs`)
+#### 1. ESLint & UTS 平台专属规则插件 (`eslint/eslint-plugin-uts.mjs`)
 
 针对 uni-app X 跨端原生编译对 UTS 类型与模板语法的严苛要求，内置 12 条专项规则：
 

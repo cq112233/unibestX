@@ -1,0 +1,1019 @@
+import { runAfterEachHooks, runOnErrorHandlers, runRouterGuard } from '../guard/index.uts';
+import { createEmptyRouteTarget } from '../guard/types.uts';
+import type { RouteTarget } from '../guard/types.uts';
+import { ROUTER_ERROR_CODE, createRouterError } from '../core/router-error.uts';
+import {
+  applyTargetRouteFromUrl,
+  installRouteStateListener,
+  previousRouteState,
+  routeState,
+  setBeforeSyncRouteHook,
+  syncRouteState
+} from '../core/route-state.uts';
+import {
+  cleanPath,
+  getCurrentPageOptions,
+  getCurrentPath,
+  getPageStackLength,
+  getQueryString,
+  isSamePath,
+  parseUrlToObj
+} from '../utils/utils.uts';
+
+/**
+ * 本文件是**框架侧**：只负责「读 uni 导航入参 → 归一化 URL → 交给业务守卫裁决 →
+ * 按裁决放行 / 改跳 → 维护 useRoute() 路由状态」。
+ *
+ * 准入校验这类**业务规则一律不写在这里**，统一去 ../guard/（业务开发者主战场：一条规则一个文件，
+ * 目录约定见 ../guard/index.uts；模板升级不覆盖）。加一条路由规则 = 在 ../guard/ 里新建一个
+ * guardXxx.uts 并挂进编排，本文件不动。
+ *
+ * ⚠️ 本文件**只认 ../guard/index.uts 的 runRouterGuard() 这一个符号**，且注释里不出现任何业务名词
+ *    （本文件通篇只谈 URL、路由状态、跳转派发这些管道概念）。一旦这里开始写得出某个具体业务
+ *    的名字，就说明它漏回框架侧了 —— 有回归测试盯着。
+ */
+
+/**
+ * 路由状态兜底回读（延后一拍，等页面栈稳定）
+ *
+ * 只用在**跳转失败**的时候：跳转没发生，当前页没变，回读栈顶一定是对的，
+ * 用来把 invoke 阶段提前写入的目标路由回滚掉。
+ *
+ * ⚠️ 不要拿它当「跳转成功后同步路由」用：App 端页面栈有滞后（新页面入栈后
+ *    栈顶还会停在上一页一段时间），success 阶段回读到的仍是**上一页**，
+ *    会把刚写好的目标路由覆盖回去。详见 ../core/route-state.uts 头部说明。
+ */
+function syncRouteStateDeferred(): void {
+  setTimeout(() => {
+    syncRouteState();
+  }, 0);
+}
+
+/**
+ * 把「即将跳转到的目标路由」写进 useRoute() 的状态（useRoute 状态源的第一层）
+ *
+ * 为什么必须在**跳转发起时**写，而不是等页面起来再回读页面栈：
+ * 1. `uni.onAppRoute` 在**目标页 onShow 之后**才触发（官方事件时序），目标页 setup 时事件还没到，
+ *    状态里存的仍是上一页 —— 只靠事件，新页面首帧会读到上一页的路由；
+ * 2. App 端页面栈有滞后 —— 新页面 setup 时 `getCurrentPages()` 栈顶仍是上一页，
+ *    回读必然整体慢一页（曾经的表现：进入 routerBasicDemo 后 path 恒为 /src/pages/index/index）。
+ * 发起方自己知道目标 url，直接写上最可靠，且三端行为一致。事件到达后会写入同样的值，互为兜底。
+ *
+ * ⚠️ 只在**确实放行**时写：被业务守卫拦下并改跳时，路由状态交给**那次改跳**自己写 ——
+ *    写这里反而是错的（这里写的是用户其实没去成的页面）。
+ * ⚠️ 用 applyTargetRouteFromUrl（**请求预写**）而不是 applyRouteFromUrl：此刻上一页还在屏幕上，
+ *    预写只喂「还没认领路径」的快照，已认领的一律不动 —— 上一页不会在下一页进入期间提前变
+ *    （同页带参重进尤其明显）。路由状态那侧的口径见 ../core/route-state.uts，
+ *    快照与两道闸见 ../core/route-snapshot.uts。
+ * ⚠️ `plugin://` / `http(s)://` 不是本应用页面，不进路由状态。
+ */
+function markTargetRoute(url: string): void {
+  const resolved = resolveAbsoluteUrl(url);
+  if (resolved == '') {
+    return;
+  }
+  if (resolved.startsWith('plugin://') || resolved.startsWith('http://') || resolved.startsWith('https://')) {
+    return;
+  }
+  applyTargetRouteFromUrl(resolved);
+}
+
+let bypassInterceptorOnce: boolean = false;
+
+/**
+ * 设置是否跳过下一次路由拦截器（针对 router.push(url, false) 等指令式跳过场景）
+ */
+export function setBypassInterceptorOnce(bypass: boolean): void {
+  bypassInterceptorOnce = bypass;
+}
+
+/**
+ * 读取当前是否跳过下一次路由拦截器
+ */
+export function isBypassInterceptorOnce(): boolean {
+  return bypassInterceptorOnce;
+}
+
+/**
+ * 守卫裁决通过则放行并写入目标路由；被拦下时不写（框架已改跳守卫给出的目标页，
+ * 那次跳转自己会把路由写成目标页，写这里反而是错的）
+ * @param url 导航 url
+ * @param api 触发本次跳转的 uni API 名，透传给守卫
+ */
+function allowNavigation(url: string, api: string): boolean {
+  if (bypassInterceptorOnce) {
+    bypassInterceptorOnce = false;
+    markTargetRoute(url);
+    return true;
+  }
+  const allowed = doIntercept(url, api);
+  if (allowed) {
+    markTargetRoute(url);
+  }
+  return allowed;
+}
+
+// #ifndef APP
+export type Interceptor = {
+  invoke: (options: any) => boolean;
+  success?: (res: any) => void;
+  fail?: (err: any) => void;
+  complete?: (res: any) => void;
+};
+// #endif
+
+/**
+ * 把 query Map 还原成 query 串（值已是解码态，这里不做任何编解码）
+ *
+ * 存在的意义：守卫可能需要「原地址」去拼改跳参数，且必须与 path / query **同口径**
+ * （都经 parseUrlToObj 解过一次码）；直接拿原始 url 串会让下游多编一次码。
+ */
+function joinQueryString(query: Map<string, string>): string {
+  if (query.size == 0) {
+    return '';
+  }
+  const paramsList: Array<string> = [];
+  query.forEach((val, key) => {
+    paramsList.push(`${key}=${val}`);
+  });
+  return paramsList.join('&');
+}
+
+/**
+ * 把导航 url 归一化为「绝对路径 + 原始 query 串」的形式（相对路径按当前页面所在目录解析）
+ *
+ * 抽取出来的原因：守卫裁决（doIntercept）与「跳转时写入目标路由」（markTargetRoute）
+ * 必须用**同一套**路径口径，否则会出现「拦截器按 A 页面放行、路由状态写的是 B 页面」的错位。
+ *
+ * @param url 导航 url，如 `/src/pages/me/me?tab=1`、`subDetail?id=1`
+ * @returns 归一化后的 url；入参为空返回空串，`plugin://` / `http(s)://` 原样返回
+ */
+function resolveAbsoluteUrl(url: string): string {
+  if (url == null || url == '') {
+    return '';
+  }
+  const urlObj = parseUrlToObj(url);
+  let path = urlObj.path;
+
+  // 1. 规范化路径：如果以 'src/' 开头，补充前导 '/' 使其变为 '/src/'
+  if (path.startsWith('src/')) {
+    path = `/${path}`;
+  }
+
+  // 2. 相对路径解析：将 "subpage" 转换为基于当前页面所在目录的绝对路径
+  if (!path.startsWith('/') && !path.startsWith('plugin://') && !path.startsWith('http://') && !path.startsWith('https://')) {
+    const pages = getCurrentPages();
+    let currentPath = '';
+    if (pages.length > 0) {
+      // route 在 npm @dcloudio/types 侧被标为可选（不兜底会报 TS2322），
+      // 真源（HBuilderX dts）里是非空 string，故沿用 router/utils、layouts/navbar 的 `?? ''` 写法兼顾两侧
+      currentPath = pages[pages.length - 1].route ?? '';
+    }
+    let normalizedCurrentPath = currentPath;
+    if (normalizedCurrentPath.startsWith('src/')) {
+      normalizedCurrentPath = `/${normalizedCurrentPath}`;
+    }
+    if (!normalizedCurrentPath.startsWith('/')) {
+      normalizedCurrentPath = `/${normalizedCurrentPath}`;
+    }
+    const lastSlashIdx = normalizedCurrentPath.lastIndexOf('/');
+    let baseDir = '';
+    if (lastSlashIdx >= 0) {
+      baseDir = normalizedCurrentPath.substring(0, lastSlashIdx);
+    }
+    path = `${baseDir}/${path}`;
+  }
+
+  // 确保最终 path 也是以 '/' 开头的绝对路径形式
+  if (path.startsWith('src/')) {
+    path = `/${path}`;
+  }
+
+  // query 串原样保留（不做编解码，避免二次转义）
+  const queryStr = getQueryString(url);
+  if (queryStr == '') {
+    return path;
+  }
+  return `${path}?${queryStr}`;
+}
+
+/**
+ * 执行守卫给出的改跳目标
+ *
+ * 守卫只表达意图（`block('url')`），跳转一律由这里发出。原因：拦截器只在**放行**时才写
+ * 路由状态（见 allowNavigation / markTargetRoute），守卫自己调 uni API 会绕过这个不变量。
+ *
+ * ⚠️ TabBar 页面必须走 switchTab：`uni.navigateTo` 跳 TabBar 页面会被框架直接拒绝。
+/**
+ * TabBar 跳转与判定处理器契约
+ */
+export type TabbarHandler = {
+  isTabbar: (url: string) => boolean;
+  switchTab: (url: string) => void;
+};
+
+let customTabbarHandler: TabbarHandler | null = null;
+
+/**
+ * 注册 TabBar 处理器（供自定义 TabBar 框架注入）
+ */
+export function registerTabbarHandler(handler: TabbarHandler | null): void {
+  customTabbarHandler = handler;
+}
+
+/**
+ * 获取当前注册的 TabBar 处理器
+ */
+export function getTabbarHandler(): TabbarHandler | null {
+  return customTabbarHandler;
+}
+
+let redirectDepth: number = 0;
+const MAX_REDIRECT_DEPTH: number = 10;
+
+/**
+ * 执行守卫给出的改跳目标
+ *
+ * 守卫只表达意图（`block('url')`），跳转一律由这里发出。原因：拦截器只在**放行**时才写
+ * 路由状态（见 allowNavigation / markTargetRoute），守卫自己调 uni API 会绕过这个不变量。
+ *
+ * ⚠️ TabBar 页面必须走 switchTab：`uni.navigateTo` 跳 TabBar 页面会被框架直接拒绝。
+ * ⚠️ `redirect` 为 null / 空串 → 静默拦截，不做任何跳转。
+ */
+function dispatchRedirect(target: string | null, isReplace: boolean = false): void {
+  // 101: 导航被守卫 cancel() 取消
+  if (target == null || target == '') {
+    redirectDepth = 0;
+    const err = createRouterError(
+      ROUTER_ERROR_CODE.GUARD_CANCELLED as number,
+      lastNavigatingTarget,
+      lastNavigatingFrom,
+      'guard'
+    );
+    runOnErrorHandlers(err, lastNavigatingTarget, lastNavigatingFrom);
+    runAfterEachHooks(lastNavigatingTarget, lastNavigatingFrom, err);
+    return;
+  }
+
+  // 102: 重定向次数超过上限（默认 10 层，防死循环）
+  redirectDepth++;
+  if (redirectDepth > MAX_REDIRECT_DEPTH) {
+    redirectDepth = 0;
+    const err = createRouterError(
+      ROUTER_ERROR_CODE.MAX_REDIRECT_EXCEEDED as number,
+      lastNavigatingTarget,
+      lastNavigatingFrom,
+      'redirect'
+    );
+    console.error(`[route-bestX] 导航失败: ${err.message} (超过 ${MAX_REDIRECT_DEPTH} 层)`);
+    runOnErrorHandlers(err, lastNavigatingTarget, lastNavigatingFrom);
+    runAfterEachHooks(lastNavigatingTarget, lastNavigatingFrom, err);
+    return;
+  }
+
+  if (customTabbarHandler != null && customTabbarHandler!.isTabbar(target)) {
+    redirectDepth = 0;
+    customTabbarHandler!.switchTab(target);
+    return;
+  }
+  if (isReplace) {
+    uni.redirectTo({
+      url: target,
+      fail: () => {
+        try {
+          uni.switchTab({ url: target });
+        }
+        catch { }
+      }
+    });
+    return;
+  }
+  uni.navigateTo({
+    url: target,
+    fail: () => {
+      try {
+        uni.switchTab({ url: target });
+      }
+      catch { }
+    }
+  });
+}
+
+/**
+ * 解析来源页面（上一个页面）的路由目标事实
+ * 优先取全局已稳定的 routeState；若尚未就绪（如应用冷启动首跳），则尝试从当前页面栈回读；否则给空兜底
+ */
+function resolveFromRouteTarget(): RouteTarget {
+  if (routeState.path != '') {
+    return {
+      path: routeState.path,
+      query: routeState.query,
+      fullPath: routeState.fullPath
+    } as RouteTarget;
+  }
+  const pages = getCurrentPages();
+  if (pages.length > 0) {
+    const page = pages[pages.length - 1];
+    const route = page.route ?? '';
+    if (route != '') {
+      let path = route;
+      if (path.startsWith('src/')) {
+        path = `/${path}`;
+      }
+      if (!path.startsWith('/')) {
+        path = `/${path}`;
+      }
+      const options: UTSJSONObject | null = page.options ?? null;
+      const query = new Map<string, string>();
+      if (options != null) {
+        const keys = UTSJSONObject.keys(options);
+        for (let i = 0; i < keys.length; i++) {
+          const k = keys[i];
+          const v = options[k];
+          if (v != null) {
+            query.set(k, `${v}`);
+          }
+        }
+      }
+      const queryStr = joinQueryString(query);
+      const fullPath = queryStr != '' ? `${path}?${queryStr}` : path;
+      return {
+        path,
+        query,
+        fullPath
+      } as RouteTarget;
+    }
+  }
+  return {
+    path: '',
+    query: new Map<string, string>(),
+    fullPath: ''
+  } as RouteTarget;
+}
+
+/** 最近一次正在发起的导航目标与来源（用于 afterEach / onError 钩子传参） */
+let lastNavigatingTarget: RouteTarget = createEmptyRouteTarget();
+let lastNavigatingFrom: RouteTarget = createEmptyRouteTarget();
+
+/**
+ * 核心拦截流程：归一化 url → 交给业务守卫裁决 → 放行或改跳
+ *
+ * 本函数**不含任何业务规则**：上下文里装哪些业务信号、什么条件算通过、被拦下跳哪儿，全在
+ * ../guard/（`runRouterGuard()` 是那边的唯一入口，装配与规则链都在它后面收口）——
+ * 业务开发者改那个目录，本文件不动，也读不到任何业务细节。
+ *
+ * @param url 导航 url（可能带 query、可能是相对路径）
+ * @param api 触发本次跳转的 uni API 名，透传给守卫（守卫可按 API 差异化裁决）
+ * @param fromOverride 来源路由显式覆盖项（可选，供支付宝等在路由完成事件中捕获的旧状态传入）
+ */
+function doIntercept(url: string, api: string, fromOverride: RouteTarget | null = null): boolean {
+  if (url == null || url == '') {
+    return true;
+  }
+  const resolvedUrl = resolveAbsoluteUrl(url);
+  const urlObj = parseUrlToObj(resolvedUrl);
+
+  // fullPath 由 path + 解码后的 query 重拼（而不是直接用 resolvedUrl）：保持「解码态」口径，
+  // 守卫拿它去 encodeURIComponent 时正好只编码一次
+  const queryStr = joinQueryString(urlObj.query);
+  let fullPath = urlObj.path;
+  if (queryStr != '') {
+    fullPath += `?${queryStr}`;
+  }
+
+  // 对象字面量按仓库既有先例写成「类型化变量 + as」（如 tabbar 的 buildFullTabbarList）：
+  // 嵌套字面量直传给 type 字段没有先例，Kotlin 侧推断不可靠，这里显式落到具体类型上
+  const target: RouteTarget = {
+    path: urlObj.path,
+    query: urlObj.query,
+    fullPath
+  } as RouteTarget;
+
+  // 获取当前来源页面路由（from）：若显式传入（如支付宝原生返回补丁），优先采用；否则由全局状态解析
+  let fromTarget: RouteTarget = (fromOverride != null && fromOverride.path != '')
+    ? fromOverride
+    : resolveFromRouteTarget();
+
+  // ⚠️ 核心防御：若是 navigateBack 场景且 from.path 与 target.path 相同（即状态已被目标页提前覆盖），
+  // 则自动从 previousRouteState 恢复真实离开页！
+  if (api == 'navigateBack' && fromTarget.path == target.path) {
+    if (previousRouteState.path != '' && previousRouteState.path != target.path) {
+      fromTarget = {
+        path: previousRouteState.path,
+        query: previousRouteState.query,
+        fullPath: previousRouteState.fullPath
+      } as RouteTarget;
+    }
+  }
+
+  // 框架交出的只有三样中立的输入（归一化后的目标 URL 事实 + 来源 URL 事实 + api 名），拿回来的只有裁决：
+  // 上下文怎么装配、有哪些业务信号、按什么顺序判，全在 ../guard/ 里，框架不碰也不想知道
+  lastNavigatingTarget = target;
+  lastNavigatingFrom = fromTarget;
+
+  const decision = runRouterGuard(target, fromTarget, api);
+
+  if (decision.pass) {
+    redirectDepth = 0;
+    runAfterEachHooks(target, fromTarget, null);
+    return true;
+  }
+  dispatchRedirect(decision.redirect, decision.replace == true);
+  return false;
+}
+
+/**
+ * 路由 API 独立拦截器
+ *
+ * 各 API 的差异只有「怎么从 options 里取 url」（App 原生端需按各自的 Options 强转），
+ * 取到 url 后一律走 allowNavigation(url, api)；api 名透传给业务守卫，便于按 API 差异化裁决。
+ */
+export const navigateToInterceptor: Interceptor = {
+  invoke(options: any): boolean {
+    let url = '';
+    if (options != null) {
+      // #ifdef APP
+      const opt = options as NavigateToOptions;
+      url = opt.url;
+      // #endif
+      // #ifndef APP
+      const urlObj = options as UTSJSONObject;
+      url = (urlObj.url != null) ? (urlObj.url as string) : '';
+      // #endif
+    }
+    return allowNavigation(url, 'navigateTo');
+  },
+  fail(err: any): void {
+    syncRouteStateDeferred();
+    const routerErr = createRouterError(
+      ROUTER_ERROR_CODE.NAVIGATE_TO_FAILED as number,
+      lastNavigatingTarget,
+      lastNavigatingFrom,
+      'navigateTo',
+      err
+    );
+    runOnErrorHandlers(routerErr, lastNavigatingTarget, lastNavigatingFrom);
+    runAfterEachHooks(lastNavigatingTarget, lastNavigatingFrom, routerErr);
+  }
+};
+
+export const redirectToInterceptor: Interceptor = {
+  invoke(options: any): boolean {
+    let url = '';
+    if (options != null) {
+      // #ifdef APP
+      const opt = options as RedirectToOptions;
+      url = opt.url;
+      // #endif
+      // #ifndef APP
+      const urlObj = options as UTSJSONObject;
+      url = (urlObj.url != null) ? (urlObj.url as string) : '';
+      // #endif
+    }
+    return allowNavigation(url, 'redirectTo');
+  },
+  fail(err: any): void {
+    syncRouteStateDeferred();
+    const routerErr = createRouterError(
+      ROUTER_ERROR_CODE.REDIRECT_TO_FAILED as number,
+      lastNavigatingTarget,
+      lastNavigatingFrom,
+      'redirectTo',
+      err
+    );
+    runOnErrorHandlers(routerErr, lastNavigatingTarget, lastNavigatingFrom);
+    runAfterEachHooks(lastNavigatingTarget, lastNavigatingFrom, routerErr);
+  }
+};
+
+export const reLaunchInterceptor: Interceptor = {
+  invoke(options: any): boolean {
+    let url = '';
+    if (options != null) {
+      // #ifdef APP
+      const opt = options as ReLaunchOptions;
+      url = opt.url;
+      // #endif
+      // #ifndef APP
+      const urlObj = options as UTSJSONObject;
+      url = (urlObj.url != null) ? (urlObj.url as string) : '';
+      // #endif
+    }
+    return allowNavigation(url, 'reLaunch');
+  },
+  fail(err: any): void {
+    syncRouteStateDeferred();
+    const routerErr = createRouterError(
+      ROUTER_ERROR_CODE.RELAUNCH_FAILED as number,
+      lastNavigatingTarget,
+      lastNavigatingFrom,
+      'reLaunch',
+      err
+    );
+    runOnErrorHandlers(routerErr, lastNavigatingTarget, lastNavigatingFrom);
+    runAfterEachHooks(lastNavigatingTarget, lastNavigatingFrom, routerErr);
+  }
+};
+
+export const switchTabInterceptor: Interceptor = {
+  invoke(options: any): boolean {
+    let url = '';
+    if (options != null) {
+      // #ifdef APP
+      const opt = options as SwitchTabOptions;
+      url = opt.url;
+      // #endif
+      // #ifndef APP
+      const urlObj = options as UTSJSONObject;
+      url = (urlObj.url != null) ? (urlObj.url as string) : '';
+      // #endif
+    }
+    return allowNavigation(url, 'switchTab');
+  },
+  fail(err: any): void {
+    syncRouteStateDeferred();
+    const routerErr = createRouterError(
+      ROUTER_ERROR_CODE.SWITCH_TAB_FAILED as number,
+      lastNavigatingTarget,
+      lastNavigatingFrom,
+      'switchTab',
+      err
+    );
+    runOnErrorHandlers(routerErr, lastNavigatingTarget, lastNavigatingFrom);
+    runAfterEachHooks(lastNavigatingTarget, lastNavigatingFrom, routerErr);
+  }
+};
+
+/** 最近一次由 navigateBack 拦截/守卫处理放行的目标 url（用于防重复校验） */
+let lastHandledNavigateBackTarget: string = '';
+/** 最近一次由 navigateBack 拦截/守卫处理放行的时间戳 */
+let lastHandledNavigateBackTime: number = 0;
+
+/**
+ * 重置 navigateBack 防重复记录（供单测等环境复位）
+ */
+export function resetLastHandledNavigateBackTarget(): void {
+  lastHandledNavigateBackTarget = '';
+  lastHandledNavigateBackTime = 0;
+}
+
+/**
+ * 页面返回调用拦截器（uni.navigateBack 与 router.back()）
+ * 计算返回的目标页面在当前页面栈的位置，交由守卫裁决
+ */
+export const navigateBackInterceptor: Interceptor = {
+  invoke(options: any): boolean {
+    const pages = getCurrentPages();
+    let delta = 1;
+    if (options != null) {
+      // #ifdef APP
+      try {
+        const opt = options as NavigateBackOptions;
+        const d = opt.delta;
+        if (d != null && d > 0) {
+          delta = d;
+        }
+      }
+      catch { }
+      // #endif
+      // #ifndef APP
+      try {
+        const optMap = options as UTSJSONObject;
+        const d = optMap.delta as number | null;
+        if (d != null && d > 0) {
+          delta = d;
+        }
+      }
+      catch { }
+      // #endif
+    }
+    const targetIdx = pages.length - 1 - delta;
+    if (targetIdx < 0 && pages.length > 0) {
+      const err = createRouterError(
+        ROUTER_ERROR_CODE.BACK_STACK_DEPTH_INVALID as number,
+        null,
+        resolveFromRouteTarget(),
+        'navigateBack'
+      );
+      runOnErrorHandlers(err, null, resolveFromRouteTarget());
+      runAfterEachHooks(createEmptyRouteTarget(), resolveFromRouteTarget(), err);
+    }
+    if (targetIdx >= 0 && targetIdx < pages.length) {
+      const targetPage = pages[targetIdx];
+      const targetRoute = targetPage.route ?? '';
+      if (targetRoute != '') {
+        let path = targetRoute;
+        if (path.startsWith('src/')) {
+          path = `/${path}`;
+        }
+        if (!path.startsWith('/')) {
+          path = `/${path}`;
+        }
+        const optObj: UTSJSONObject | null = targetPage.options ?? null;
+        let queryStr = '';
+        if (optObj != null) {
+          const keys = UTSJSONObject.keys(optObj);
+          const pairs: string[] = [];
+          for (let i = 0; i < keys.length; i++) {
+            const k = keys[i];
+            const v = optObj[k];
+            if (v != null) {
+              pairs.push(`${k}=${encodeURIComponent(`${v}`)}`);
+            }
+          }
+          queryStr = pairs.join('&');
+        }
+        const url = queryStr != '' ? `${path}?${queryStr}` : path;
+        const allowed = allowNavigation(url, 'navigateBack');
+        if (allowed) {
+          lastHandledNavigateBackTarget = cleanPath(path);
+          lastHandledNavigateBackTime = Date.now();
+        }
+        return allowed;
+      }
+    }
+    return true;
+  },
+  fail(err: any): void {
+    syncRouteStateDeferred();
+    const routerErr = createRouterError(
+      ROUTER_ERROR_CODE.NAVIGATE_BACK_FAILED as number,
+      lastNavigatingTarget,
+      lastNavigatingFrom,
+      'navigateBack',
+      err
+    );
+    runOnErrorHandlers(routerErr, lastNavigatingTarget, lastNavigatingFrom);
+    runAfterEachHooks(lastNavigatingTarget, lastNavigatingFrom, routerErr);
+  }
+};
+
+/**
+ * 地图选点调用拦截器（默认直接放行）
+ */
+export const chooseLocationInterceptor: Interceptor = {
+  invoke(_options: any): boolean {
+    return true;
+  }
+};
+
+// #ifdef H5 || WEB
+/**
+ * 监听 H5 浏览器历史前进/后退操作（popstate）
+ * 当用户点击浏览器自带的前进/后退按钮时触发守卫校验
+ */
+function installH5PopstateListener(): void {
+  if (typeof window != 'undefined') {
+    window.addEventListener('popstate', () => {
+      let h5Url = '';
+      const hash = window.location.hash;
+      if (hash.startsWith('#/')) {
+        h5Url = hash.substring(1);
+      }
+      else {
+        h5Url = window.location.pathname + window.location.search;
+      }
+      if (h5Url != '' && h5Url != '/') {
+        const targetPath = cleanPath(h5Url);
+        // 防抖去重：如果最近 500ms 内已被 navigateBackInterceptor 处理过，跳过重复校验
+        if (isSamePath(lastHandledNavigateBackTarget, targetPath) && (Date.now() - lastHandledNavigateBackTime) < 500) {
+          lastHandledNavigateBackTarget = '';
+          return;
+        }
+        lastHandledNavigateBackTarget = targetPath;
+        lastHandledNavigateBackTime = Date.now();
+        // 同步执行守卫裁决并在放行时预写目标路由，确保后续挂载的目标页面 setup 中第一帧读到正确的新路由
+        allowNavigation(h5Url, 'popstate');
+      }
+    }, true);
+  }
+}
+// #endif
+
+// #ifdef MP-WEIXIN || MP-ALIPAY
+/**
+ * 监听小程序页面返回操作（onAppRoute）
+ * 解决小程序原生返回（左上角返回按钮、边缘侧滑返回手势）绕过 navigateBack 拦截器的问题
+ *
+ * 覆盖平台：微信小程序（MP-WEIXIN）、支付宝小程序（MP-ALIPAY）
+ *
+ * ⚠️ 关键时序与平台机制：
+ * 1. 微信小程序点击导航栏返回会走 navigateBack 拦截器，而侧滑手势返回直接由宿主 Native 出栈绕过拦截器；
+ * 2. 支付宝小程序无论是点击导航栏还是手势返回，均由宿主 Native 出栈绕过 navigateBack 拦截器；
+ * 3. 本监听必须先于 installRouteStateListener 注册，确保在 routeState 被 handleAppRoute 冲刷前
+ *    先提取离开前的原始来源路由快照（fromTarget），避免出现 to 与 from 相同的时序覆盖 Bug；
+ * 4. 配合 lastHandledNavigateBackTarget 防抖去重，防止微信等平台点击返回触发拦截器后又在 onAppRoute 重复执行守卫。
+ */
+function installMpNavigateBackListener(): void {
+  uni.onAppRoute((event: AppRouteEvent): void => {
+    const isOpenTypeBack = event.openType == 'navigateBack' || event.openType == 'pageBack'
+      || (event.openType != 'navigateTo' && event.openType != 'redirectTo' && event.openType != 'reLaunch' && event.openType != 'switchTab' && event.openType != 'appLaunch');
+    if (isOpenTypeBack) {
+      const rawPath = event.path;
+      if (rawPath == '') {
+        return;
+      }
+      let url = rawPath;
+      if (url.startsWith('src/')) {
+        url = `/${url}`;
+      }
+      if (!url.startsWith('/')) {
+        url = `/${url}`;
+      }
+      const queryObj: UTSJSONObject | null = event.query ?? null;
+      if (queryObj != null) {
+        const keys = UTSJSONObject.keys(queryObj);
+        if (keys.length > 0) {
+          const pairs: string[] = [];
+          for (let i = 0; i < keys.length; i++) {
+            const k = keys[i];
+            const v = queryObj[k];
+            if (v != null) {
+              pairs.push(`${k}=${encodeURIComponent(`${v}`)}`);
+            }
+          }
+          if (pairs.length > 0) {
+            url = `${url}?${pairs.join('&')}`;
+          }
+        }
+      }
+
+      const targetPath = cleanPath(rawPath);
+
+      // 防抖去重：如果最近 500ms 内已被 navigateBackInterceptor（如微信点击左上角返回）校验放行过，跳过重复校验
+      if (isSamePath(lastHandledNavigateBackTarget, targetPath) && (Date.now() - lastHandledNavigateBackTime) < 500) {
+        return;
+      }
+
+      lastHandledNavigateBackTarget = targetPath;
+      lastHandledNavigateBackTime = Date.now();
+
+      // 捕获返回前的真实来源路由快照：
+      // 1. 若当前 routeState.path 尚未被覆盖（不等于 targetPath），则 routeState 依然是离开页；
+      // 2. 若当前 routeState.path 已经被 onPageShow 冲刷成了目标页，则从 previousRouteState 取真实的离开页！
+      let fromTarget: RouteTarget | null = null;
+      if (routeState.path != '' && routeState.path != targetPath) {
+        fromTarget = {
+          path: routeState.path,
+          query: routeState.query,
+          fullPath: routeState.fullPath
+        } as RouteTarget;
+      }
+      else if (previousRouteState.path != '' && previousRouteState.path != targetPath) {
+        fromTarget = {
+          path: previousRouteState.path,
+          query: previousRouteState.query,
+          fullPath: previousRouteState.fullPath
+        } as RouteTarget;
+      }
+
+      doIntercept(url, 'navigateBack', fromTarget);
+    }
+  });
+}
+// #endif
+
+/**
+ * 校验页面重新显示（onShow / onPageShow / onTabPageShow）时的路由流转
+ * 专为解决支付宝小程序等端「侧滑手势返回」不触发 uni.onAppRoute 与 navigateBack 拦截器的问题。
+ *
+ * 当页面显示时，若检测到当前栈顶真实页面（currentPath）与全局 routeState 记录的上一活跃页不一致，
+ * 且最近 500ms 内未被 navigateBack 拦截器处理过，则说明发生了一次底层的原生手势出栈返回。
+ * 此时自动构造路由守卫上下文，执行 navigateBack 守卫裁决；若守卫拦截，自动改跳重定向目标。
+ *
+ * @param targetPath 可选，当前页面路径（默认通过 getCurrentPath() 获取）
+ * @returns 守卫是否放行当前页面显示
+ */
+export function checkAndInterceptPageShow(targetPath: string = ''): boolean {
+  const currentPath = targetPath != '' ? cleanPath(targetPath) : getCurrentPath();
+  if (currentPath == '') {
+    return true;
+  }
+
+  // 1. 若全局路由状态尚未建立（冷启动），由 checkDirectEntry 负责，此处跳过
+  if (routeState.path == '') {
+    return true;
+  }
+
+  // 构建目标页面完整 URL（包含 query）
+  const optObj = getCurrentPageOptions();
+  let toUrl = currentPath;
+  if (optObj != null) {
+    const keys = UTSJSONObject.keys(optObj);
+    if (keys.length > 0) {
+      const pairs: string[] = [];
+      for (let i = 0; i < keys.length; i++) {
+        const k = keys[i];
+        const v = optObj[k];
+        if (v != null) {
+          pairs.push(`${k}=${encodeURIComponent(`${v}`)}`);
+        }
+      }
+      if (pairs.length > 0) {
+        toUrl = `${toUrl}?${pairs.join('&')}`;
+      }
+    }
+  }
+
+  const stackLen = getPageStackLength();
+  const isBackByStack = routeState.pages.length > 0 && stackLen > 0 && stackLen < routeState.pages.length;
+
+  // 2. 若当前栈顶页面与当前记录的 routeState 相同：
+  // 必须明确检测到页面栈出栈减少（isBackByStack）才判定为同路径手势返回；
+  // 否则属于正常前进进入或已被同步，直接放行，严禁重复触发 navigateBack 守卫！
+  if (isSamePath(routeState.path, currentPath) && !isBackByStack) {
+    return true;
+  }
+
+  // 3. 防抖去重：如果最近 500ms 内已被 navigateBackInterceptor 或 onAppRoute 处理过，跳过
+  if (isSamePath(lastHandledNavigateBackTarget, currentPath) && (Date.now() - lastHandledNavigateBackTime) < 500) {
+    return true;
+  }
+
+  // 4. 此时检测到状态脱节：用户原先在 routeState.path，通过手势直接返回到了 currentPath
+  lastHandledNavigateBackTarget = currentPath;
+  lastHandledNavigateBackTime = Date.now();
+
+  // 构建来源路由快照（用户刚刚离开的上一活跃页面）
+  const fromTarget: RouteTarget = {
+    path: routeState.path,
+    query: routeState.query,
+    fullPath: routeState.fullPath
+  } as RouteTarget;
+
+  // 执行路由守卫拦截
+  const allowed = doIntercept(toUrl, 'navigateBack', fromTarget);
+  if (!allowed) {
+    return false;
+  }
+
+  return true;
+}
+
+/** 记录是否已安装拦截器（幂等防护） */
+let routeInterceptorInstalled: boolean = false;
+
+/**
+ * 全局路由拦截安装器（幂等：已安装时自动跳过）
+ */
+export function installRouteInterceptor(): void {
+  if (routeInterceptorInstalled) {
+    return;
+  }
+  routeInterceptorInstalled = true;
+
+  // 挂接页面栈同步前置钩子：拦截手势返回未走拦截器的情况（如支付宝小程序侧滑手势返回）
+  setBeforeSyncRouteHook((currentPath: string): boolean => {
+    return checkAndInterceptPageShow(currentPath);
+  });
+  // #ifdef MP-WEIXIN || MP-ALIPAY
+  // 必须优先于 routeState 监听器注册：确保小程序返回时在 routeState 被冲刷前捕获准确的 from 来源页
+  installMpNavigateBackListener();
+  // #endif
+  // 路由状态监听在本处（main.uts 创建应用时）安装：必须早于任何页面 setup，
+  // 否则首个页面要靠 ensureRouteReady 冷启动回读才拿到路由
+  installRouteStateListener();
+  uni.addInterceptor('navigateTo', navigateToInterceptor);
+  uni.addInterceptor('reLaunch', reLaunchInterceptor);
+  uni.addInterceptor('redirectTo', redirectToInterceptor);
+  uni.addInterceptor('switchTab', switchTabInterceptor);
+  uni.addInterceptor('navigateBack', navigateBackInterceptor);
+  uni.addInterceptor('chooseLocation', chooseLocationInterceptor);
+  // #ifdef H5 || WEB
+  installH5PopstateListener();
+  // #endif
+}
+
+/** 记录是否已经完成过初始冷启动入口检查（避免 App 后台切前台时重复检查普通入口） */
+let initialEntryChecked: boolean = false;
+
+/**
+ * 重置入口检查标记（主要供单测环境复位）
+ */
+export function resetInitialEntryChecked(): void {
+  initialEntryChecked = false;
+}
+
+/**
+ * 校验并处理直接进入（如 App 冷启动首屏、H5 直链、小程序分享链接等）的路由场景，补充权限守卫校验
+ * @param options 直链参数对象，取 `options.path` 作为目标路径；
+ *                H5 端随后会用 `location.hash` / `pathname` 覆盖它，直链地址优先以免丢查询串；
+ */
+export function checkDirectEntry(options: any | null = null) {
+  // 1. 如果已有外部直链参数，优先使用直达路径
+  let targetPath = '';
+  if (options != null) {
+    let rawPath: string | null = null;
+    // #ifdef APP
+    try {
+      const opt = options as OnShowOptions;
+      rawPath = opt.path;
+    }
+    catch {
+      rawPath = null;
+    }
+    // #endif
+    // #ifndef APP
+    try {
+      const optObj = options as UTSJSONObject;
+      const p = optObj['path'];
+      if (p != null) {
+        rawPath = `${p}`;
+      }
+    }
+    catch {
+      rawPath = null;
+    }
+    // #endif
+    if (rawPath != null && rawPath != '') {
+      targetPath = rawPath;
+    }
+  }
+
+  // 2. H5 端优先提取浏览器地址栏真实路由
+  // #ifdef H5 || WEB
+  if (typeof window != 'undefined') {
+    let h5Url = '';
+    const hash = window.location.hash;
+    if (hash.startsWith('#/')) {
+      h5Url = hash.substring(1);
+    }
+    else {
+      h5Url = window.location.pathname + window.location.search;
+    }
+    if (h5Url != '' && h5Url != '/') {
+      targetPath = h5Url;
+    }
+  }
+  // #endif
+
+  // 3. 如果既无直达 path 也不是 H5 定向地址，针对冷启动首屏（如 App 打开）做一次准入校验
+  if (targetPath == '') {
+    if (initialEntryChecked) {
+      return;
+    }
+    const pages = getCurrentPages();
+    if (pages.length > 0) {
+      const pageRoute = pages[0].route ?? '';
+      if (pageRoute != '') {
+        targetPath = pageRoute;
+      }
+    }
+    if (targetPath == '') {
+      targetPath = '/src/pages/index/index';
+    }
+  }
+
+  initialEntryChecked = true;
+
+  let url = targetPath;
+  if (url.startsWith('src/')) {
+    url = `/${url}`;
+  }
+  if (!url.startsWith('/')) {
+    url = `/${url}`;
+  }
+
+  // 如果 options 携带参数且 url 尚未包含 query，拼接参数
+  if (options != null && !url.includes('?')) {
+    let queryMap: UTSJSONObject | null = null;
+    // #ifdef APP
+    try {
+      const opt = options as OnShowOptions;
+      queryMap = opt.query;
+    }
+    catch {
+      queryMap = null;
+    }
+    // #endif
+    // #ifndef APP
+    try {
+      const optObj = options as UTSJSONObject;
+      queryMap = optObj['query'] as UTSJSONObject | null;
+    }
+    catch {
+      queryMap = null;
+    }
+    // #endif
+    if (queryMap != null) {
+      const keys = UTSJSONObject.keys(queryMap);
+      const pairs: string[] = [];
+      for (let i = 0; i < keys.length; i++) {
+        const k = keys[i];
+        const v = queryMap[k];
+        if (v != null) {
+          pairs.push(`${k}=${encodeURIComponent(`${v}`)}`);
+        }
+      }
+      if (pairs.length > 0) {
+        url = `${url}?${pairs.join('&')}`;
+      }
+    }
+  }
+
+  // 执行路由守卫裁决（'appLaunch' 语义）
+  const allowed = doIntercept(url, 'appLaunch');
+  if (allowed) {
+    markTargetRoute(url);
+  }
+}

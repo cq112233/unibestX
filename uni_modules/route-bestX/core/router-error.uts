@@ -1,0 +1,134 @@
+/**
+ * 路由错误与导航失败规范 (Routex Navigation Failure & Error Codes)
+ *
+ * 统一路由系统全流程错误码与错误对象，供 afterEach(to, from, failure) 与 onError(err, to, from) 使用。
+ */
+import type { RouteTarget } from '../guard/types.uts';
+
+/**
+ * 路由错误状态码表结构类型
+ */
+export type RouterErrorCodeMap = {
+  /** 101: 导航被守卫 next(false) 主动取消 */
+  GUARD_CANCELLED: number;
+  /** 102: 重定向次数超过上限（默认 10 层，防死循环） */
+  MAX_REDIRECT_EXCEEDED: number;
+  /** 201: back 失败：页面栈深度不足 */
+  BACK_STACK_DEPTH_INVALID: number;
+  /** 202: uni.navigateBack 调用失败 */
+  NAVIGATE_BACK_FAILED: number;
+  /** 301: uni.navigateTo 调用失败（页面未注册 / 栈超 10 层等） */
+  NAVIGATE_TO_FAILED: number;
+  /** 302: uni.redirectTo 调用失败 */
+  REDIRECT_TO_FAILED: number;
+  /** 303: uni.reLaunch 调用失败 */
+  RELAUNCH_FAILED: number;
+  /** 304: uni.switchTab 调用失败（目标页不在 tabBar 等） */
+  SWITCH_TAB_FAILED: number;
+};
+
+/**
+ * 路由错误状态码常量表
+ */
+export const ROUTER_ERROR_CODE: RouterErrorCodeMap = {
+  GUARD_CANCELLED: 101,
+  MAX_REDIRECT_EXCEEDED: 102,
+  BACK_STACK_DEPTH_INVALID: 201,
+  NAVIGATE_BACK_FAILED: 202,
+  NAVIGATE_TO_FAILED: 301,
+  REDIRECT_TO_FAILED: 302,
+  RELAUNCH_FAILED: 303,
+  SWITCH_TAB_FAILED: 304
+};
+
+/**
+ * 路由错误标准描述文案获取函数
+ */
+export function getRouterErrorMessage(code: number): string {
+  switch (code) {
+    case 101:
+      return '导航被守卫 next(false) 主动取消';
+    case 102:
+      return '重定向次数超过上限（默认 10 层，防死循环）';
+    case 201:
+      return 'back 失败：页面栈深度不足';
+    case 202:
+      return 'uni.navigateBack 调用失败';
+    case 301:
+      return 'uni.navigateTo 调用失败（页面未注册 / 栈超 10 层等）';
+    case 302:
+      return 'uni.redirectTo 调用失败';
+    case 303:
+      return 'uni.reLaunch 调用失败';
+    case 304:
+      return 'uni.switchTab 调用失败（目标页不在 tabBar 等）';
+    default:
+      return '未知路由导航异常';
+  }
+}
+
+/**
+ * 标准路由导航失败对象契约
+ */
+export type RouterError = {
+  /** 错误状态码（如 101, 102, 201 等） */
+  code: number;
+  /** 错误描述文案 */
+  message: string;
+  /** 触发异常时的目标路由 */
+  to?: RouteTarget | null;
+  /** 触发异常时的来源路由 */
+  from?: RouteTarget | null;
+  /** 触发失败的底层 API 名（如 navigateTo / navigateBack 等） */
+  api?: string | null;
+  /** 原生底层报错对象（可选） */
+  cause?: any | null;
+};
+
+/**
+ * 构造标准 RouterError 实例
+ */
+export function createRouterError(
+  code: number,
+  to: RouteTarget | null = null,
+  from: RouteTarget | null = null,
+  api: string | null = null,
+  cause: any | null = null
+): RouterError {
+  return {
+    code,
+    message: getRouterErrorMessage(code),
+    to,
+    from,
+    api,
+    cause
+  } as RouterError;
+}
+
+/**
+ * 判断一个对象是否为标准 RouterError
+ */
+export function isRouterError(error: any): boolean {
+  if (error != null && typeof error == 'object') {
+    const obj = error as UTSJSONObject;
+    return obj.code != null && obj.message != null;
+  }
+  return false;
+}
+
+/**
+ * 判断是否为导航失败（对标 vue-router 的 isNavigationFailure）
+ *
+ * @param error 待检测的异常对象
+ * @param code 可选指定错误码，若传入则额外校验 code 是否匹配
+ */
+export function isNavigationFailure(error: any, code: number | null = null): boolean {
+  if (!isRouterError(error)) {
+    return false;
+  }
+  if (code != null) {
+    const obj = error as UTSJSONObject;
+    return obj.code == code;
+  }
+  return true;
+}
