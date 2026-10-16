@@ -129,20 +129,4 @@ function doLogin() {
   } as LoginResult;
   onLoginSuccess(mockRes);
 }
-
-function doApiLogin() {
-  if (tokenStore.hasValidLogin()) {
-    navigateToTarget();
-    return;
-  }
-  login({
-    username: 'UNIX',
-    password: 'admin'
-  } as LoginQuery).then((res: LoginResult) => {
-    onLoginSuccess(res);
-  }).catch((_err: any) => {
-    console.warn('[login] 接口请求异常，回退至模拟登录放行:', _err);
-    doLogin();
-  });
-}
 </script>
