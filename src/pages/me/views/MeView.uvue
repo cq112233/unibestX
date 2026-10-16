@@ -48,6 +48,9 @@ import { useTokenStore, useUserStore } from '@/src/store/index.uts';
 import { LOGIN_PAGE } from '@/src/utils/auth/toLoginPage.uts';
 import { curIdx, onTabPageShow, onTabShow, resolveTabIndexByKey, switchTabbar } from '@/src/tabbar/index.uts';
 import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/layouts/navbar/utils/index.uts';
+import { useRouter } from '@/uni_modules/route-bestX/index.uts';
+
+const router = useRouter();
 
 // 页面数据加载/刷新方法
 function refreshData(): void {
@@ -97,9 +100,7 @@ const userInfoJson = computed((): string => {
 
 // 登录
 function handleLogin() {
-  uni.navigateTo({
-    url: LOGIN_PAGE
-  });
+  router.push(LOGIN_PAGE);
 }
 
 // 退出登录

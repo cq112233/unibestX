@@ -91,6 +91,9 @@
 import { curIdx, onTabPageShow, onTabShow, resolveTabIndexByKey } from '@/src/tabbar/index.uts';
 import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/layouts/navbar/utils/index.uts';
 import { systemInfo } from '@/src/utils/systemInfo/index.uts';
+import { useRouter } from '@/uni_modules/route-bestX/index.uts';
+
+const router = useRouter();
 
 // =========================================================================
 // 【可选删除】以下数据与方法仅供脚手架基础功能演示使用。
@@ -180,12 +183,7 @@ const demoList: Array<BasicDemoItem> = [
 ];
 
 function navigateToDemo(url: string): void {
-  uni.navigateTo({
-    url,
-    fail: (err) => {
-      console.error('navigateToDemo fail:', err);
-    }
-  });
+  router.push(url);
 }
 
 // 复制一键清除 Demo 命令

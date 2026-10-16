@@ -1,4 +1,4 @@
-import { getCurrentPath } from '@/uni_modules/route-bestX/index.uts';
+import { getCurrentPath, useRouter } from '@/uni_modules/route-bestX/index.uts';
 
 /**
  * 登录页面绝对路由路径
@@ -34,11 +34,12 @@ export function toLoginPage(options: UTSJSONObject | null = null) {
   if (currentPath == LOGIN_PAGE || currentPath.endsWith(LOGIN_PAGE)) {
     return;
   }
+  const router = useRouter();
   if (mode == 'navigateTo') {
-    uni.navigateTo({ url });
+    router.push(url);
   }
   else {
-    uni.reLaunch({ url });
+    router.relaunch(url);
   }
 }
 

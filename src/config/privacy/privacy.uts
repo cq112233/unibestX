@@ -5,7 +5,7 @@
  * 2. 运行时授权：hasPrivacyAgreed / setPrivacyAgreed / needsPrivacyReconfirm / runPrivacyGate。
  */
 
-import { getCurrentPath } from '@/uni_modules/route-bestX/index.uts';
+import { getCurrentPath, useRouter } from '@/uni_modules/route-bestX/index.uts';
 
 export type PrivacyConfig = {
   /** 《用户协议》链接 */
@@ -95,13 +95,14 @@ export function runPrivacyGate(): boolean {
   if (getCurrentPath() == PRIVACY_PAGE) {
     return false;
   }
+  const router = useRouter();
   // 隐私页走 reLaunch：不保留启动栈，用户同意后由隐私页自行进入首页
   if (!hasPrivacyAgreed()) {
-    uni.reLaunch({ url: PRIVACY_PAGE });
+    router.relaunch(PRIVACY_PAGE);
     return false;
   }
   if (needsPrivacyReconfirm()) {
-    uni.reLaunch({ url: `${PRIVACY_PAGE}?mode=${MODE_RECONFIRM}` });
+    router.relaunch(`${PRIVACY_PAGE}?mode=${MODE_RECONFIRM}`);
     return false;
   }
   return true;

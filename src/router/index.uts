@@ -26,4 +26,10 @@ export const router = createRouter({
 // 2. 自动注册业务全局守卫与生命周期钩子
 setupRouteGuards(router);
 
+// 3. 导出核心路由组合式 Hooks，支持 import { useRoute, useRouter } from '@/src/router/index.uts'
+export {
+  useRoute,
+  useRouter
+} from '@/uni_modules/route-bestX/index.uts';
+
 export default router;
