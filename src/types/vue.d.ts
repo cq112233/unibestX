@@ -94,6 +94,8 @@ declare global {
 declare module 'vue' {
   export interface ComponentCustomProperties {
     $callMethod: (name: string, ...args: any[]) => any;
+    $router: import('@/uni_modules/route-bestX/index.uts').Router;
+    $route: import('@/uni_modules/route-bestX/index.uts').RouteLocation;
   }
 }
 

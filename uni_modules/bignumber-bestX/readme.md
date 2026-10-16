@@ -1,4 +1,4 @@
-# unix-Bignumber
+# bignumberx
 
 uni-app X 全端跨平台任意精度高精度数学库，提供与 bignumber.js 一致的 API 风格与默认配置，兼容 Android、iOS、鸿蒙、H5、微信小程序等全平台。
 
@@ -41,7 +41,7 @@ uni-app X 全端跨平台任意精度高精度数学库，提供与 bignumber.js
 ## 📖 使用方式与代码示例
 
 ```uts
-import { BigNumber, config, getConfig, ROUND_DOWN, ROUND_HALF_EVEN } from '@/uni_modules/unix-Bignumber'
+import { BigNumber, config, getConfig, ROUND_DOWN, ROUND_HALF_EVEN } from '@/uni_modules/bignumberx'
 
 // ==========================================
 // 1. 构造与浮点误差消除

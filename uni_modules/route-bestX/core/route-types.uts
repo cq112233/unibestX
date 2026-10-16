@@ -1,0 +1,58 @@
+/**
+ * 路由位置对象（RouteLocation）的定义与空值构造
+ * 纯叶子文件：零外部依赖
+ */
+export type RouteLocation = {
+  /** 规范化路径（带前导 `/`，不含 query），如 `/src/pages/index/index` */
+  path: string;
+  /** 完整路径（path + 原始 query 串），如 `/src/pages/index/index?tab=2` */
+  fullPath: string;
+  /** 查询参数（键值均为 string，值已 URL 解码） */
+  query: Map<string, string>;
+  /** 恒为空 Map：uni-app X 无动态路由段，仅为与 vue-router 形态保持一致 */
+  params: Map<string, string>;
+  /** 路由元信息：由 setRouteMeta() 注册提供，未注册为 null */
+  meta: UTSJSONObject | null;
+  /** 路由名：未声明为 null */
+  name: string | null;
+  /** 当前栈顶页面实例（UniPage，栈空时为 null） */
+  page: any | null;
+  /** 当前页面栈实例数组（等价于 getCurrentPages()） */
+  pages: any[];
+};
+
+/**
+ * 构造一个空路由（保持与 RouteLocation 同构）
+ */
+export function createEmptyRoute(): RouteLocation {
+  let initialPages: any[] = [];
+  try {
+    initialPages = getCurrentPages();
+  }
+  catch {
+    initialPages = [];
+  }
+  return {
+    path: '',
+    fullPath: '',
+    query: new Map<string, string>(),
+    params: new Map<string, string>(),
+    meta: null,
+    name: null,
+    page: initialPages.length > 0 ? initialPages[initialPages.length - 1] : null,
+    pages: initialPages
+  } as RouteLocation;
+}
+
+/**
+ * 路由表条目契约（对标 vue-router 的 RouteRecordRaw）
+ */
+export type RouteRecordRaw = {
+  /** 页面绝对路径，如 '/pages/index/index' */
+  path: string;
+  /** 路由名称，供 router.push({ name: '...' }) 检索 */
+  name?: string;
+  /** 页面元数据（扩展字段如 title、requireAuth 等） */
+  meta?: UTSJSONObject;
+};
+

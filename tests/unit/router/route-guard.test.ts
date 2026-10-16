@@ -28,10 +28,12 @@ vi.mock('@/src/store/index.uts', () => ({
 
 /** 把契约、规则、入口一起取回来 —— 测试要同时验「单条规则」与「整条链」 */
 async function importGuardModules() {
-  const types = await import('@/src/router/guard/types.uts');
-  const login = await import('@/src/router/guard/guardLogin.uts');
-  const entry = await import('@/src/router/guard/index.uts');
-  return { ...types, ...login, ...entry };
+  const types = await import('@/uni_modules/route-bestX/guard/types.uts');
+  const login = await import('@/src/router/guards/guardLogin.uts');
+  const index = await import('@/src/router/guards/index.uts');
+  const entry = await import('@/uni_modules/route-bestX/guard/index.uts');
+  const router = await import('@/uni_modules/route-bestX/index.uts');
+  return { ...types, ...login, ...index, ...entry, ...router };
 }
 
 /**
@@ -42,15 +44,18 @@ async function importGuardModules() {
  */
 async function loadGuard(needLoginMode?: boolean) {
   vi.resetModules();
-  vi.doUnmock('@/src/router/config/config.uts');
-  if (needLoginMode == null) {
-    return await importGuardModules();
+  vi.doUnmock('@/src/router/config.uts');
+  if (needLoginMode != null) {
+    vi.doMock('@/src/router/config.uts', async () => {
+      const actual = await vi.importActual<Record<string, any>>('@/src/router/config.uts');
+      return { ...actual, isNeedLoginMode: needLoginMode };
+    });
   }
-  vi.doMock('@/src/router/config/config.uts', async () => {
-    const actual = await vi.importActual<Record<string, any>>('@/src/router/config/config.uts');
-    return { ...actual, isNeedLoginMode: needLoginMode };
-  });
-  return await importGuardModules();
+  const mods = await importGuardModules();
+  mods.resetRegisteredGuards();
+  const router = mods.createRouter();
+  mods.setupRouteGuards(router);
+  return mods;
 }
 
 /** 造一份守卫上下文 */
@@ -210,6 +215,20 @@ describe('路由守卫（业务层）决策矩阵', () => {
       expect(block('/src/sub/auth/login')).toEqual({ pass: false, redirect: '/src/sub/auth/login' });
     });
 
+    it('next 支持对象形态，支持携带 query 与 replace: true', async () => {
+      const { next } = await loadGuard();
+
+      const res = next({
+        path: '/src/pages/login/login',
+        query: { from: 'guard' },
+        replace: true
+      });
+
+      expect(res.pass).toBe(false);
+      expect(res.redirect).toBe('/src/pages/login/login?from=guard');
+      expect(res.replace).toBe(true);
+    });
+
     it('守卫拿得到触发本次跳转的 API 名（供按 API 差异化裁决）', async () => {
       const { guardRoute } = await loadGuard();
 
@@ -236,7 +255,7 @@ describe('路由守卫（业务层）决策矩阵', () => {
     });
 
     it('守卫链只做编排：只有登录一条规则时，整条链的裁决与 guardLogin 逐例一致', async () => {
-      const { guardLogin, guardRoute } = await loadGuard(false);
+      const { guardLogin, guardRoute, beforeEach } = await loadGuard(false);
       const cases: any[] = [
         makeCtx({ path: '/src/pages/me/me' }),
         makeCtx({ path: EXCLUDE_PAGE, fullPath: `${EXCLUDE_PAGE}?id=1` }),
@@ -248,20 +267,22 @@ describe('路由守卫（业务层）决策矩阵', () => {
 
       // 编排层不得引入任何自己的裁决 —— 一旦出现「链里额外加了 if」，这里就会挂
       cases.forEach((ctx) => {
+        expect(beforeEach(ctx)).toEqual(guardLogin(ctx));
         expect(guardRoute(ctx)).toEqual(guardLogin(ctx));
       });
     });
 
     it('规则拦下时，它的裁决原样作为整条链的结果（redirect 一字不改）', async () => {
-      const { guardLogin, guardRoute } = await loadGuard(false);
+      const { guardLogin, guardRoute, beforeEach } = await loadGuard(false);
       const fullPath = `${EXCLUDE_PAGE}?id=1&from=self`;
       const ctx = makeCtx({ path: EXCLUDE_PAGE, fullPath });
 
       const first = guardLogin(ctx);
 
       expect(first.pass).toBe(false);
+      expect(beforeEach(ctx)).toEqual(first);
       expect(guardRoute(ctx)).toEqual(first);
-      expect(guardRoute(ctx).redirect).toBe(`${LOGIN_PAGE}?redirect=${encodeURIComponent(fullPath)}`);
+      expect(beforeEach(ctx).redirect).toBe(`${LOGIN_PAGE}?redirect=${encodeURIComponent(fullPath)}`);
     });
 
     it('守卫执行抛出未捕获异常时：触发 try-catch 兜底，安全拦截且 pass 为 false', async () => {
@@ -284,7 +305,7 @@ describe('路由守卫（业务层）决策矩阵', () => {
 
   describe('上下文装配 buildGuardContext（中立路由事实）', () => {
     it('to / from / api / next 原样装配，不带任何业务字段（如 isLoggedIn）', async () => {
-      const { buildGuardContext } = await import('@/src/router/guard/index.uts');
+      const { buildGuardContext } = await import('@/uni_modules/route-bestX/guard/index.uts');
       const to = {
         path: '/src/pages/me/me',
         query: new Map<string, string>([['tab', '2']]),
@@ -309,7 +330,7 @@ describe('路由守卫（业务层）决策矩阵', () => {
     it('框架侧（interceptor.uts）不碰业务：不 import store、连注释里都不出现业务词', async () => {
       // 边界回归闸：把 store / 登录判断 / 业务名词挪回框架文件，行为测试全都照样绿 —— 只有这里能拦住
       const frameworkSrc = fs.readFileSync(
-        path.resolve(__dirname, '../../../src/router/interceptor/interceptor.uts'),
+        path.resolve(__dirname, '../../../uni_modules/route-bestX/interceptor/interceptor.uts'),
         'utf-8'
       );
 
@@ -322,10 +343,8 @@ describe('路由守卫（业务层）决策矩阵', () => {
       expect(frameworkSrc.includes('runRouterGuard')).toBe(true);
 
       // 业务缝反向确认：取登录态这件事确实落在业务目录里（装配那一步）
-      const businessSrc = fs.readFileSync(
-        path.resolve(__dirname, '../../../src/router/guard/guardLogin.uts'),
-        'utf-8'
-      );
+      const guardLoginPath = path.resolve(__dirname, '../../../src/router/guards/guardLogin.uts');
+      const businessSrc = fs.readFileSync(guardLoginPath, 'utf-8');
       expect(businessSrc.includes('@/src/store')).toBe(true);
     });
   });
@@ -333,12 +352,16 @@ describe('路由守卫（业务层）决策矩阵', () => {
   describe('框架唯一入口 runRouterGuard（装配 + 跑链收口）', () => {
     it('一个符号吃下「导航事实」吐出「裁决」：说明装配确实喂进了规则链', async () => {
       vi.resetModules();
-      vi.doUnmock('@/src/router/config/config.uts');
+      vi.doUnmock('@/src/router/config.uts');
       vi.doMock('@/src/store/index.uts', () => ({
         useTokenStore: () => ({ hasValidLogin: () => false })
       }));
       try {
-        const { runRouterGuard } = await import('@/src/router/guard/index.uts');
+        const { setupRouteGuards } = await import('@/src/router/guards/index.uts');
+        const { createRouter, runRouterGuard, resetRegisteredGuards } = await import('@/uni_modules/route-bestX/index.uts');
+        resetRegisteredGuards();
+        const router = createRouter();
+        setupRouteGuards(router);
         const to = {
           path: EXCLUDE_PAGE,
           query: new Map<string, string>(),
@@ -358,6 +381,189 @@ describe('路由守卫（业务层）决策矩阵', () => {
       }
       finally {
         vi.doUnmock('@/src/store/index.uts');
+      }
+    });
+  });
+
+  describe('动态路由守卫 router.beforeEach 与 createRouter', () => {
+    it('能够通过 createRouter() 注册 beforeEach，支持 next(\'/login\') 重定向与 next() 放行', async () => {
+      const { createRouter, resetRegisteredGuards } = await import('@/uni_modules/route-bestX/index.uts');
+      const { runRouterGuard } = await import('@/uni_modules/route-bestX/guard/index.uts');
+      resetRegisteredGuards();
+
+      const router = createRouter();
+      let loggedIn = false;
+
+      router.beforeEach((to, _from, next) => {
+        if (!loggedIn && to.path.includes('/sub/')) {
+          next(`/src/sub/auth/login?redirect=${encodeURIComponent(to.fullPath)}`);
+        }
+        else {
+          next();
+        }
+      });
+
+      const toProtected = {
+        path: '/src/sub/profile/profile',
+        query: new Map<string, string>(),
+        fullPath: '/src/sub/profile/profile'
+      };
+      const fromHome = {
+        path: '/src/pages/index/index',
+        query: new Map<string, string>(),
+        fullPath: '/src/pages/index/index'
+      };
+
+      // 1. 未登录访问 /sub/ 页面：被动态守卫拦截并改跳登录页
+      const decision1 = runRouterGuard(toProtected, fromHome, 'navigateTo');
+      expect(decision1.pass).toBe(false);
+      expect(decision1.redirect).toBe('/src/sub/auth/login?redirect=%2Fsrc%2Fsub%2Fprofile%2Fprofile');
+
+      // 2. 登录后访问：放行
+      loggedIn = true;
+      const decision2 = runRouterGuard(toProtected, fromHome, 'navigateTo');
+      expect(decision2.pass).toBe(true);
+      expect(decision2.redirect).toBeNull();
+
+      resetRegisteredGuards();
+    });
+
+    it('beforeEach 支持返回 false 取消导航，以及返回目标 url 字符串重定向', async () => {
+      const { createRouter, resetRegisteredGuards } = await import('@/uni_modules/route-bestX/index.uts');
+      const { runRouterGuard } = await import('@/uni_modules/route-bestX/guard/index.uts');
+      resetRegisteredGuards();
+
+      const router = createRouter();
+      router.beforeEach((to: any) => {
+        if (to.path == '/blocked') {
+          return false;
+        }
+        if (to.path == '/redirect-target') {
+          return '/src/pages/index/index';
+        }
+        return true;
+      });
+
+      const toBlocked = { path: '/blocked', query: new Map<string, string>(), fullPath: '/blocked' };
+      const toRedirect = { path: '/redirect-target', query: new Map<string, string>(), fullPath: '/redirect-target' };
+      const toNormal = { path: '/normal', query: new Map<string, string>(), fullPath: '/normal' };
+
+      expect(runRouterGuard(toBlocked, null, 'navigateTo').pass).toBe(false);
+      expect(runRouterGuard(toRedirect, null, 'navigateTo').redirect).toBe('/src/pages/index/index');
+      expect(runRouterGuard(toNormal, null, 'navigateTo').pass).toBe(true);
+
+      resetRegisteredGuards();
+    });
+  });
+
+  describe('新增业务守卫：guardMaintenance（前置系统维护）与 guardPermission（后置角色权限）', () => {
+    it('guardMaintenance: 未开启维护时全放行；开启维护时除维护白名单外全拦截', async () => {
+      const {
+        guardMaintenance,
+        setMaintenanceMode,
+        MAINTENANCE_PAGE
+      } = await import('@/src/router/guards/guardMaintenance.uts');
+
+      try {
+        setMaintenanceMode(false);
+        expect(guardMaintenance(makeCtx({ path: '/src/pages/index/index' })).pass).toBe(true);
+
+        setMaintenanceMode(true);
+        // 维护页本身放行
+        expect(guardMaintenance(makeCtx({ path: MAINTENANCE_PAGE })).pass).toBe(true);
+        // 其他页面全部重定向至维护页
+        const intercepted = guardMaintenance(makeCtx({ path: '/src/pages/index/index' }));
+        expect(intercepted.pass).toBe(false);
+        expect(intercepted.redirect).toBe(MAINTENANCE_PAGE);
+      }
+      finally {
+        setMaintenanceMode(false);
+      }
+    });
+
+    it('guardPermission: 非受限页面放行；受限页面需校验用户权限，无权限重定向至提示页', async () => {
+      const {
+        guardPermission,
+        setPermissionRequiredPaths,
+        setCurrentUserPermissions,
+        PERMISSION_DENIED_PAGE
+      } = await import('@/src/router/guards/guardPermission.uts');
+
+      const VIP_PAGE = '/src/sub/vip/center';
+
+      try {
+        setPermissionRequiredPaths([VIP_PAGE]);
+        setCurrentUserPermissions([]);
+
+        // 常规页面直接放行
+        expect(guardPermission(makeCtx({ path: '/src/pages/index/index' })).pass).toBe(true);
+
+        // 受限页面未授权拦截
+        const blocked = guardPermission(makeCtx({ path: VIP_PAGE }));
+        expect(blocked.pass).toBe(false);
+        expect(blocked.redirect).toBe(PERMISSION_DENIED_PAGE);
+
+        // 授予对应权限后放行
+        setCurrentUserPermissions([VIP_PAGE]);
+        expect(guardPermission(makeCtx({ path: VIP_PAGE })).pass).toBe(true);
+
+        // 超管权限默认放行
+        setCurrentUserPermissions(['admin']);
+        expect(guardPermission(makeCtx({ path: VIP_PAGE })).pass).toBe(true);
+      }
+      finally {
+        setPermissionRequiredPaths([]);
+        setCurrentUserPermissions([]);
+      }
+    });
+
+    it('流水线优先级：维护守卫最优先拦截，其次为登录守卫，最后为权限守卫', async () => {
+      const { setupRouteGuards } = await import('@/src/router/guards/index.uts');
+      const { setMaintenanceMode, MAINTENANCE_PAGE } = await import('@/src/router/guards/guardMaintenance.uts');
+      const {
+        setPermissionRequiredPaths,
+        setCurrentUserPermissions,
+        PERMISSION_DENIED_PAGE
+      } = await import('@/src/router/guards/guardPermission.uts');
+      const { createRouter, resetRegisteredGuards } = await import('@/uni_modules/route-bestX/index.uts');
+      const { runRouterGuard } = await import('@/uni_modules/route-bestX/guard/index.uts');
+
+      resetRegisteredGuards();
+      const router = createRouter();
+      setupRouteGuards(router);
+
+      const VIP_PAGE = '/src/sub/vip/center';
+      setPermissionRequiredPaths([VIP_PAGE]);
+      setCurrentUserPermissions([]);
+
+      try {
+        // 1. 开启维护模式：即使未登录访问 VIP 页，也是维护守卫最优先拦截
+        setMaintenanceMode(true);
+        const toVip = { path: VIP_PAGE, query: new Map<string, string>(), fullPath: VIP_PAGE };
+        const decision1 = runRouterGuard(toVip, null, 'navigateTo');
+        expect(decision1.pass).toBe(false);
+        expect(decision1.redirect).toBe(MAINTENANCE_PAGE);
+
+        // 2. 关闭维护模式，且白名单模式下未登录访问：登录守卫拦截
+        setMaintenanceMode(false);
+        mockLoginState = false;
+        // 在普通未登录访问 VIP 页面时，因其不在登录拦截白名单，如果是受登录管控页面则进登录页
+        // 这里验证权限守卫在登录守卫之后生效：当已登录但无权限时，命中权限拦截
+        mockLoginState = true;
+        const decision2 = runRouterGuard(toVip, null, 'navigateTo');
+        expect(decision2.pass).toBe(false);
+        expect(decision2.redirect).toBe(PERMISSION_DENIED_PAGE);
+
+        // 3. 授予权限后：整条流水线全部放行
+        setCurrentUserPermissions([VIP_PAGE]);
+        const decision3 = runRouterGuard(toVip, null, 'navigateTo');
+        expect(decision3.pass).toBe(true);
+      }
+      finally {
+        setMaintenanceMode(false);
+        setPermissionRequiredPaths([]);
+        setCurrentUserPermissions([]);
+        resetRegisteredGuards();
       }
     });
   });

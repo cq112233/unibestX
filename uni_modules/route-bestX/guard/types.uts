@@ -33,6 +33,9 @@ export function createEmptyRouteTarget(): RouteTarget {
   } as RouteTarget;
 }
 
+import { resolveUrl } from '../utils/utils.uts';
+import type { RouteLocationRaw } from '../utils/utils.uts';
+
 /**
  * 守卫裁决结果
  */
@@ -41,6 +44,8 @@ export type GuardResult = {
   pass: boolean;
   /** 不放行时的改跳目标 url（可带 query）；`null` = 静默拦截（不跳任何页面） */
   redirect: string | null;
+  /** 是否以 replace 方式重定向（true 则走 uni.redirectTo，默认为 false 走 uni.navigateTo） */
+  replace?: boolean;
 };
 
 /**
@@ -48,6 +53,7 @@ export type GuardResult = {
  * - `next()` / `next(true)`：放行本次导航（等价于 `allow()`）
  * - `next(false)`：拦截并取消本次导航（等价于 `block(null)`）
  * - `next('/login')`：重定向改跳至目标地址（等价于 `block('/login')`）
+ * - `next({ path: '/login', query: { ... }, replace: true })`：支持对象形态与 replace 重定向
  */
 export function next(location: any | null = null): GuardResult {
   if (location == null) {
@@ -59,7 +65,31 @@ export function next(location: any | null = null): GuardResult {
     }
     return { pass: false, redirect: null } as GuardResult;
   }
-  return { pass: false, redirect: `${location}` } as GuardResult;
+  if (typeof location == 'string') {
+    return { pass: false, redirect: location as string } as GuardResult;
+  }
+  // 支持对象形态：{ path, name, query, params, replace }
+  let isReplace = false;
+  if (typeof location == 'object') {
+    const obj = location as UTSJSONObject;
+    // eslint-disable-next-line dot-notation
+    if (obj['replace'] == true) {
+      isReplace = true;
+    }
+  }
+  const resolved = resolveUrl(location as RouteLocationRaw);
+  const redirectTarget = resolved != '' ? resolved : null;
+  if (isReplace) {
+    return {
+      pass: false,
+      redirect: redirectTarget,
+      replace: true
+    } as GuardResult;
+  }
+  return {
+    pass: false,
+    redirect: redirectTarget
+  } as GuardResult;
 }
 
 /** 构造放行裁决（对齐 vue-router 的 next()） */
@@ -91,3 +121,36 @@ export type RouteGuardContext = {
 
 /** 守卫函数签名：接收 RouteGuardContext，返回 GuardResult */
 export type RouteGuardHandler = (ctx: RouteGuardContext) => GuardResult;
+
+/**
+ * 标准路由导航 next 回调函数签名
+ * - `next()` / `next(true)`：放行本次导航
+ * - `next(false)`：拦截并取消本次导航
+ * - `next('/login')`：重定向改跳至目标地址
+ */
+export type NextFunction = (location?: any | null) => void;
+
+/**
+ * 标准全局前置守卫函数签名（对齐 vue-router 的 beforeEach）
+ * @param to 目标路由
+ * @param from 来源路由
+ * @param next 裁决回调（或直接同步 return boolean / string 重定向）
+ */
+export type NavigationGuard = (to: RouteTarget, from: RouteTarget, next: NextFunction, api?: string) => any | null;
+
+/**
+ * 标准全局后置路由钩子签名（对齐 vue-router 的 afterEach）
+ * @param to 目标路由
+ * @param from 来源路由
+ * @param failure 导航异常或取消信息（成功放行完成时为 null）
+ */
+export type NavigationHookAfter = (to: RouteTarget, from: RouteTarget, failure?: any | null) => void;
+
+/**
+ * 标准全局路由错误回调签名（对齐 vue-router 的 onError）
+ * @param error 捕获到的异常或错误对象
+ * @param to 目标路由（可能为空）
+ * @param from 来源路由（可能为空）
+ */
+export type NavigationErrorHandler = (error: any, to?: RouteTarget | null, from?: RouteTarget | null) => void;
+

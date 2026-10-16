@@ -1,0 +1,245 @@
+/**
+ * 路由守卫执行与调度引擎 (Routex Guard)
+ * 纯粹的调度中心：不含任何业务代码与 store 依赖
+ */
+import { createEmptyRouteTarget, next } from './types.uts';
+import type {
+  GuardResult,
+  NavigationErrorHandler,
+  NavigationGuard,
+  NavigationHookAfter,
+  NextFunction,
+  RouteGuardContext,
+  RouteTarget
+} from './types.uts';
+
+/** 用户通过 router.beforeEach 注册的动态前置守卫列表 */
+const registeredGuards: NavigationGuard[] = [];
+
+/** 用户通过 router.afterEach 注册的动态后置钩子列表 */
+const registeredAfterHooks: NavigationHookAfter[] = [];
+
+/** 用户通过 router.onError 注册的全局错误回调列表 */
+const registeredErrorHandlers: NavigationErrorHandler[] = [];
+
+/**
+ * 注册全局前置路由守卫（对标 vue-router 的 beforeEach，内置幂等排重）
+ * @param guard 守卫回调函数 (to, from, next)
+ */
+export function registerBeforeEach(guard: NavigationGuard): void {
+  for (let i = 0; i < registeredGuards.length; i++) {
+    if (registeredGuards[i] == guard) {
+      return;
+    }
+  }
+  registeredGuards.push(guard);
+}
+
+/**
+ * 注册全局后置路由钩子（对标 vue-router 的 afterEach，内置幂等排重）
+ * @param hook 后置回调函数 (to, from, failure)
+ */
+export function registerAfterEach(hook: NavigationHookAfter): void {
+  for (let i = 0; i < registeredAfterHooks.length; i++) {
+    if (registeredAfterHooks[i] == hook) {
+      return;
+    }
+  }
+  registeredAfterHooks.push(hook);
+}
+
+/**
+ * 注册全局路由错误回调（对标 vue-router 的 onError，内置幂等排重）
+ * @param handler 错误处理回调 (error, to, from)
+ */
+export function registerOnError(handler: NavigationErrorHandler): void {
+  for (let i = 0; i < registeredErrorHandlers.length; i++) {
+    if (registeredErrorHandlers[i] == handler) {
+      return;
+    }
+  }
+  registeredErrorHandlers.push(handler);
+}
+
+/**
+ * 清空已注册的动态守卫（主要供单测环境隔离复位）
+ */
+export function resetRegisteredGuards(): void {
+  registeredGuards.length = 0;
+}
+
+/**
+ * 清空已注册的动态后置钩子（主要供单测环境隔离复位）
+ */
+export function resetRegisteredAfterHooks(): void {
+  registeredAfterHooks.length = 0;
+}
+
+/**
+ * 清空已注册的错误处理回调（主要供单测环境隔离复位）
+ */
+export function resetRegisteredErrorHandlers(): void {
+  registeredErrorHandlers.length = 0;
+}
+
+/**
+ * 执行已注册的后置钩子队列
+ *
+ * @param to 目标路由
+ * @param from 来源路由
+ * @param failure 异常信息（正常放行完成时为 null）
+ */
+export function runAfterEachHooks(to: RouteTarget, from: RouteTarget, failure: any | null = null): void {
+  for (let i = 0; i < registeredAfterHooks.length; i++) {
+    try {
+      registeredAfterHooks[i](to, from, failure);
+    }
+    catch (err: any) {
+      console.error(`[route-bestX] 执行第 ${i} 项 afterEach 钩子异常:`, err);
+      runOnErrorHandlers(err, to, from);
+    }
+  }
+}
+
+/**
+ * 执行已注册的全局错误处理回调
+ *
+ * @param error 异常或错误对象
+ * @param to 目标路由（可选）
+ * @param from 来源路由（可选）
+ */
+export function runOnErrorHandlers(error: any, to: RouteTarget | null = null, from: RouteTarget | null = null): void {
+  for (let i = 0; i < registeredErrorHandlers.length; i++) {
+    try {
+      registeredErrorHandlers[i](error, to, from);
+    }
+    catch (err: any) {
+      console.error(`[route-bestX] 执行第 ${i} 项 onError 回调异常:`, err);
+    }
+  }
+}
+
+/**
+ * 注册 beforeEach 快捷别名（或直接传入上下文执行守卫链）
+ */
+export function beforeEach(target: any): any {
+  if (typeof target == 'function') {
+    registerBeforeEach(target as NavigationGuard);
+    return;
+  }
+  return guardRoute(target as RouteGuardContext);
+}
+
+/**
+ * 注册 afterEach 快捷别名
+ */
+export function afterEach(hook: NavigationHookAfter): void {
+  registerAfterEach(hook);
+}
+
+/**
+ * 注册 onError 快捷别名
+ */
+export function onError(handler: NavigationErrorHandler): void {
+  registerOnError(handler);
+}
+
+/**
+ * 装配一次导航的守卫上下文（中立的路由事实 + next 裁决构造器）
+ *
+ * @param to 本次导航目标（框架已归一化好的绝对路径 / query / fullPath）
+ * @param from 本次导航来源页面（若为首次进入可能为空 RouteTarget）
+ * @param api 触发本次跳转的 uni API 名
+ */
+export function buildGuardContext(to: RouteTarget, from: RouteTarget | null, api: string = 'navigateTo'): RouteGuardContext {
+  let safeFrom: RouteTarget;
+  if (from != null) {
+    safeFrom = from;
+  }
+  else {
+    safeFrom = createEmptyRouteTarget();
+  }
+  return {
+    to,
+    from: safeFrom,
+    api,
+    next: (location: any | null = null): GuardResult => {
+      return next(location);
+    }
+  } as RouteGuardContext;
+}
+
+/**
+ * 路由守卫唯一执行入口（框架拦截器调用）：交出导航事实 → 装配上下文 → 跑规则链 → 给出裁决
+ *
+ * 1. 若用户通过 `router.beforeEach(...)` 注册了守卫，按序执行守卫链；
+ * 2. 若未注册任何守卫，默认放行本次跳转。
+ *
+ * @param to 归一化后的目标路由（框架给出的中立 URL 事实）
+ * @param from 来源页面路由（上一个页面事实，若无则为 null）
+ * @param _api 触发本次跳转的 uni API 名
+ */
+export function runRouterGuard(to: RouteTarget, from: RouteTarget | null, _api: string): GuardResult {
+  let safeFrom: RouteTarget;
+  if (from != null) {
+    safeFrom = from;
+  }
+  else {
+    safeFrom = createEmptyRouteTarget();
+  }
+
+  if (registeredGuards.length > 0) {
+    for (let i = 0; i < registeredGuards.length; i++) {
+      let decision: GuardResult | null = null;
+      const nextFn: NextFunction = (location: any | null = null): void => {
+        decision = next(location);
+      };
+
+      try {
+        const ret = registeredGuards[i](to, safeFrom, nextFn, _api);
+        // 如果守卫没有显式调用 next()，但通过 return 返回了 boolean 或 string（对标 vue-router 4）
+        if (decision == null) {
+          if (typeof ret == 'boolean') {
+            decision = next(ret as boolean);
+          }
+          else if (typeof ret == 'string' && ret != '') {
+            decision = next(ret as string);
+          }
+        }
+
+        // 只要有一项未放行，立即短路中断
+        if (decision != null && !decision!.pass) {
+          return decision!;
+        }
+      }
+      catch (err: any) {
+        console.error(`[Routex] 执行第 ${i} 项动态守卫异常:`, err);
+        runOnErrorHandlers(err, to, safeFrom);
+        return next(false);
+      }
+    }
+    return next();
+  }
+
+  // 默认放行
+  return next();
+}
+
+/**
+ * 守卫执行别名，直接接收 RouteGuardContext
+ */
+export function guardRoute(ctx: RouteGuardContext): GuardResult {
+  try {
+    if (ctx.to == null) {
+      console.error('[route-bestX] guardRoute 异常: ctx.to 为 null');
+      runOnErrorHandlers('ctx.to is null', null, ctx.from);
+      return next(false);
+    }
+    return runRouterGuard(ctx.to, ctx.from, ctx.api);
+  }
+  catch (err: any) {
+    console.error('[route-bestX] guardRoute 异常:', err);
+    runOnErrorHandlers(err, ctx.to, ctx.from);
+    return next(false);
+  }
+}

@@ -14,12 +14,12 @@ import { utsObject } from './helpers';
  * 的类型分支、ClassCastException）单测**不复现**，那部分靠真机把关。
  */
 
-/** 取一份全新的模块（route-state 有模块级状态，逐用例重置） */
 async function loadInterceptor() {
   vi.resetModules();
-  const interceptorMod = await import('@/src/router/interceptor/interceptor.uts');
-  const stateMod = await import('@/src/router/core/route-state.uts');
-  return { ...interceptorMod, ...stateMod };
+  const { router } = await import('@/src/router/index.uts');
+  const interceptorMod = await import('@/uni_modules/route-bestX/interceptor/interceptor.uts');
+  const stateMod = await import('@/uni_modules/route-bestX/core/route-state.uts');
+  return { ...interceptorMod, ...stateMod, router };
 }
 
 /** 让页面栈停在指定路由 */
@@ -71,7 +71,7 @@ describe('路由拦截器 Unit Tests', () => {
 
   it('被登录校验拦下时不写目标路由（拦截器已改跳登录页，路由交给那次跳转自己写）', async () => {
     const { navigateToInterceptor, routeState } = await loadInterceptor();
-    const { LOGIN_PAGE } = await import('@/src/router/config/config.uts');
+    const { LOGIN_PAGE } = await import('@/src/router/config.uts');
 
     // 黑名单模式：EXCLUDE_LOGIN_PATH_LIST 里的页面在未登录时被拦下并跳登录页
     const allowed = navigateToInterceptor.invoke({ url: '/src/sub/routerParamsBasicDemo/routerParamsBasicDemo' });
@@ -148,7 +148,7 @@ describe('路由拦截器 Unit Tests', () => {
 
   it('守卫返回的改跳目标原样派发（框架不参与登录业务判断）', async () => {
     const { navigateToInterceptor, routeState } = await loadInterceptor();
-    const { LOGIN_PAGE } = await import('@/src/router/config/config.uts');
+    const { LOGIN_PAGE } = await import('@/src/router/config.uts');
 
     // 未登录 + 命中排除名单 → 守卫给出「登录页?redirect=原地址」，框架只负责跳
     const originalPath = '/src/sub/routerParamsBasicDemo/routerParamsBasicDemo?id=1';
@@ -222,7 +222,7 @@ describe('路由拦截器 Unit Tests', () => {
   it('checkDirectEntry 外部直达带需要登录的路径时，未登录会改跳登录页', async () => {
     const { checkDirectEntry, resetInitialEntryChecked } = await loadInterceptor();
     resetInitialEntryChecked();
-    const { LOGIN_PAGE } = await import('@/src/router/config/config.uts');
+    const { LOGIN_PAGE } = await import('@/src/router/config.uts');
 
     checkDirectEntry({ path: 'src/sub/routerParamsBasicDemo/routerParamsBasicDemo' } as any);
     expect(uni.navigateTo).toHaveBeenCalledTimes(1);
@@ -231,7 +231,7 @@ describe('路由拦截器 Unit Tests', () => {
 
   it('routeState 变化时会正确记录 previousRouteState 作为前序离开页', async () => {
     const { navigateToInterceptor, routeState } = await loadInterceptor();
-    const { previousRouteState } = await import('@/src/router/core/route-state.uts');
+    const { previousRouteState } = await import('@/uni_modules/route-bestX/core/route-state.uts');
 
     (globalThis as any).getCurrentPages = vi.fn(() => [{ route: 'src/pages/index/index' }]);
     navigateToInterceptor.invoke({ url: '/src/pages/me/me' });
@@ -263,7 +263,7 @@ describe('路由拦截器 Unit Tests', () => {
   it('checkAndInterceptPageShow 当返回到需要登录的页面时，未登录会自动拦截并重定向', async () => {
     const { checkAndInterceptPageShow, resetLastHandledNavigateBackTarget, routeState } = await loadInterceptor();
     resetLastHandledNavigateBackTarget();
-    const { LOGIN_PAGE } = await import('@/src/router/config/config.uts');
+    const { LOGIN_PAGE } = await import('@/src/router/config.uts');
 
     // 假设用户原先处于免登录页面 /src/pages/index/index
     routeState.path = '/src/pages/index/index';

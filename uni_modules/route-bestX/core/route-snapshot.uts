@@ -1,0 +1,128 @@
+/**
+ * 每个调用点各自的路由快照（useRoute() 返回的就是它）
+ * 核心隔离引擎：实现上一页不提前翻、同页带参重进不污染
+ */
+import { reactive } from 'vue';
+import { createEmptyRoute } from './route-types.uts';
+import type { RouteLocation } from './route-types.uts';
+
+/**
+ * 一份 `useRoute()` 快照
+ */
+type RouteSnapshot = {
+  /** 本调用点读到的路由（reactive，模板直接读它的字段） */
+  route: RouteLocation;
+  /** 本页路径：认领后即定格（页面实例存活期内不变）；空串 = 还没认领 */
+  path: string;
+  /** 本页当前是否在前台：onPageShow 置真、onPageHide 置假 */
+  visible: boolean;
+};
+
+/** 快照登记表：key 为自增 id */
+const snapshots: Map<number, RouteSnapshot> = new Map<number, RouteSnapshot>();
+let snapshotSeq: number = 0;
+
+/**
+ * 把全局路由的字段整体拷进快照
+ */
+function copyRoute(target: RouteLocation, source: RouteLocation): void {
+  target.path = source.path;
+  target.fullPath = source.fullPath;
+  target.query = source.query;
+  target.params = source.params;
+  target.meta = source.meta;
+  target.name = source.name;
+  let currentStack: any[] = [];
+  try {
+    currentStack = getCurrentPages();
+  }
+  catch {
+    currentStack = source.pages;
+  }
+  target.pages = currentStack;
+  target.page = currentStack.length > 0 ? currentStack[currentStack.length - 1] : null;
+}
+
+/**
+ * 把刚提交的路由推给「该收到它的」快照
+ */
+export function publishRoute(globalRoute: RouteLocation, path: string, includeClaimed: boolean): void {
+  snapshots.forEach((snapshot: RouteSnapshot, _id: number): void => {
+    if (snapshot.path == '') {
+      copyRoute(snapshot.route, globalRoute);
+      return;
+    }
+    if (includeClaimed && snapshot.visible && snapshot.path == path) {
+      copyRoute(snapshot.route, globalRoute);
+    }
+  });
+}
+
+/**
+ * 为当前调用点新建一份路由快照
+ */
+export function openRouteSnapshot(globalRoute: RouteLocation): number {
+  snapshotSeq += 1;
+  const id = snapshotSeq;
+  const route = reactive(createEmptyRoute());
+  copyRoute(route, globalRoute);
+  const snapshot: RouteSnapshot = {
+    route,
+    path: globalRoute.path,
+    visible: false
+  } as RouteSnapshot;
+  snapshots.set(id, snapshot);
+  return id;
+}
+
+/**
+ * 取快照对象
+ */
+export function readRouteSnapshot(id: number): RouteLocation | null {
+  const snapshot = snapshots.get(id);
+  if (snapshot == null) {
+    return null;
+  }
+  return snapshot.route;
+}
+
+/**
+ * 本页重新显示：认领路径 + 从此刻的全局路由刷新一次
+ */
+export function showRouteSnapshot(id: number, globalRoute: RouteLocation): void {
+  const snapshot = snapshots.get(id);
+  if (snapshot == null) {
+    return;
+  }
+  const globalPath = globalRoute.path;
+  if (snapshot.path == '') {
+    if (globalPath == '') {
+      return;
+    }
+    snapshot.path = globalPath;
+    snapshot.visible = true;
+    copyRoute(snapshot.route, globalRoute);
+    return;
+  }
+  snapshot.visible = true;
+  if (globalPath == snapshot.path) {
+    copyRoute(snapshot.route, globalRoute);
+  }
+}
+
+/**
+ * 本页不再显示（被新页盖住 / 切到后台 / 切了 Tab）
+ */
+export function hideRouteSnapshot(id: number): void {
+  const snapshot = snapshots.get(id);
+  if (snapshot != null) {
+    snapshot.visible = false;
+  }
+}
+
+/**
+ * 注销快照
+ */
+export function closeRouteSnapshot(id: number): void {
+  snapshots.delete(id);
+}

@@ -1,4 +1,4 @@
-# unix-crypto
+# crypto-bestX
 
 uni-app X 全端跨平台加密解密与安全工具库，提供异步 Promise 风格的密码学方法与常用安全工具，兼容 Android、iOS、鸿蒙、H5、微信小程序等全平台。
 
@@ -53,7 +53,7 @@ import {
   rsaDecrypt,
   rsaSign,
   rsaVerify,
-} from '@/uni_modules/unix-crypto'
+} from '@/uni_modules/crypto-bestX'
 
 // ==========================================
 // 1. UUID 生成（同步）

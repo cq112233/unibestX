@@ -17,9 +17,13 @@ import { utsObject } from './helpers';
 /** 取一份全新的模块（route-state 有模块级状态，逐用例重置） */
 async function loadRouter() {
   vi.resetModules();
-  const useRouterMod = await import('@/src/router/hooks/useRouter.uts');
-  const utilsMod = await import('@/src/router/utils/utils.uts');
-  return { ...useRouterMod, ...utilsMod };
+  const { setPageMetaJson } = await import('@/uni_modules/route-bestX/core/route-state.uts');
+  const { PAGE_META_JSON } = await import('@/src/router/generated/page-meta.uts');
+  setPageMetaJson(PAGE_META_JSON);
+  const useRouterMod = await import('@/uni_modules/route-bestX/hooks/useRouter.uts');
+  const utilsMod = await import('@/uni_modules/route-bestX/utils/utils.uts');
+  const interceptorMod = await import('@/uni_modules/route-bestX/interceptor/interceptor.uts');
+  return { ...useRouterMod, ...utilsMod, ...interceptorMod };
 }
 
 describe('useRouter Unit Tests', () => {
@@ -187,13 +191,110 @@ describe('useRouter Unit Tests', () => {
   });
 });
 
-describe('router 门面导出（@/src/router/index.uts）', () => {
-  it('业务入口 useRoute / useRouter 可从门面拿到，且 useRouter 是全局单例', async () => {
-    vi.resetModules();
-    const facade = await import('@/src/router/index.uts');
+describe('router 门面导出与 createRouter 配置（@/src/router/index.uts）', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
 
-    expect(typeof facade.useRoute).toBe('function');
-    expect(typeof facade.useRouter).toBe('function');
-    expect(facade.useRouter()).toBe(facade.useRouter()); // 全局单例
+  it('业务入口 router 单例与 default 导出正确', async () => {
+    vi.resetModules();
+    const routerMod = await import('@/src/router/index.uts');
+
+    expect(routerMod.router).toBeDefined();
+    expect(routerMod.default).toBe(routerMod.router);
+  });
+
+  it('createRouter({ tabbarPath })：push 和 replace 自动转为 switchTab，普通路径保持 navigateTo', async () => {
+    const { createRouter, registerTabbarHandler } = await loadRouter();
+    registerTabbarHandler(null);
+
+    const router = createRouter({
+      tabbarPath: ['/src/pages/index/index', '/src/pages/me/me']
+    });
+
+    // 1. push 到 TabBar 路径，自动转为 switchTab
+    router.push('/src/pages/index/index');
+    expect(uni.switchTab).toHaveBeenCalledWith({ url: '/src/pages/index/index' });
+    expect(uni.navigateTo).not.toHaveBeenCalled();
+
+    // 2. replace 到 TabBar 路径，同样自动纠偏为 switchTab
+    router.replace('/src/pages/me/me');
+    expect(uni.switchTab).toHaveBeenCalledWith({ url: '/src/pages/me/me' });
+    expect(uni.redirectTo).not.toHaveBeenCalled();
+
+    // 3. 普通非 TabBar 路径，照常使用 navigateTo
+    router.push('/src/sub/auth/login');
+    expect(uni.navigateTo).toHaveBeenCalledWith({ url: '/src/sub/auth/login' });
+
+    registerTabbarHandler(null);
+  });
+
+  it('createRouter 同时配置 tabbarPath、isTabbar 与 switchTab：三者联动生效', async () => {
+    const { createRouter, registerTabbarHandler } = await loadRouter();
+    registerTabbarHandler(null);
+
+    const customSwitchTab = vi.fn();
+    const customIsTabbar = vi.fn((url: string) => url.includes('/src/pages/special'));
+
+    const router = createRouter({
+      tabbarPath: ['/src/pages/index/index'],
+      isTabbar: customIsTabbar,
+      switchTab: customSwitchTab
+    });
+
+    // 1. 命中 tabbarPath，触发自定义 switchTab
+    router.push('/src/pages/index/index');
+    expect(customSwitchTab).toHaveBeenCalledWith('/src/pages/index/index');
+
+    // 2. 命中 isTabbar 自定义判定，同样触发自定义 switchTab
+    router.push('/src/pages/special/custom');
+    expect(customSwitchTab).toHaveBeenCalledWith('/src/pages/special/custom');
+
+    // 3. 未命中任何 TabBar 条件，正常走 navigateTo
+    router.push('/src/sub/auth/login');
+    expect(uni.navigateTo).toHaveBeenCalledWith({ url: '/src/sub/auth/login' });
+
+    registerTabbarHandler(null);
+  });
+
+  it('支持传入 intercept: false 跳过拦截器 (push, replace, relaunch, switchTab, back)', async () => {
+    const { useRouter, isBypassInterceptorOnce, navigateToInterceptor, setBypassInterceptorOnce } = await loadRouter();
+    const router = useRouter();
+
+    // 1. push 传入 false，会设置 bypassInterceptorOnce
+    router.push('/src/sub/auth/login', false);
+    expect(isBypassInterceptorOnce()).toBe(true);
+    // 拦截器 invoke 执行时直接放行并复位
+    expect(navigateToInterceptor.invoke({ url: '/src/sub/auth/login' })).toBe(true);
+    expect(isBypassInterceptorOnce()).toBe(false);
+
+    // 2. replace 传入 false
+    router.replace('/src/sub/auth/login', false);
+    expect(isBypassInterceptorOnce()).toBe(true);
+    setBypassInterceptorOnce(false);
+
+    // 3. relaunch 传入 false
+    router.relaunch('/src/pages/index/index', false);
+    expect(isBypassInterceptorOnce()).toBe(true);
+    setBypassInterceptorOnce(false);
+
+    // 4. switchTab 传入 false
+    router.switchTab('/src/pages/index/index', false);
+    expect(isBypassInterceptorOnce()).toBe(true);
+    setBypassInterceptorOnce(false);
+
+    // 5. back 传入 false
+    router.back(1, false);
+    expect(isBypassInterceptorOnce()).toBe(true);
+    setBypassInterceptorOnce(false);
+
+    // 6. 对象形态传 { intercept: false }
+    router.push({ path: '/src/sub/auth/login', intercept: false });
+    expect(isBypassInterceptorOnce()).toBe(true);
+    setBypassInterceptorOnce(false);
+
+    // 7. 默认 intercept 为 true，不跳过拦截器
+    router.push('/src/sub/auth/login');
+    expect(isBypassInterceptorOnce()).toBe(false);
   });
 });

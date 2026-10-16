@@ -1,8 +1,13 @@
 import * as vue from 'vue';
 import { vi } from 'vitest';
+import { PAGE_META_JSON } from '@/src/router/generated/page-meta.uts';
+import { setPageMetaJson } from '@/uni_modules/route-bestX/index.uts';
 
 // uni-app X 原生环境将 Vue 核心 API 注入全局作用域
 Object.assign(globalThis, vue);
+
+// 初始化路由元数据表供单测使用
+setPageMetaJson(PAGE_META_JSON);
 
 // ========================================================
 // uni-app X 跨端环境全局 Mock
@@ -30,6 +35,8 @@ const mockUni: any = {
   // 路由完成事件（useRoute 状态源，见 src/router/core/route-state.uts）
   onAppRoute: vi.fn(),
   offAppRoute: vi.fn(),
+  addInterceptor: vi.fn(),
+  removeInterceptor: vi.fn(),
 
   getWindowInfo: vi.fn(() => ({
     windowWidth: 375,

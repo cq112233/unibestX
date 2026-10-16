@@ -147,7 +147,7 @@ import type { ComponentPublicInstance } from 'vue';
 import { useModalStore } from '@/src/store/index.uts';
 import TabbarMaskModal from '@/src/components/TabbarMaskModal/TabbarMaskModal.uvue';
 import SwiperModalTrigger from './components/SwiperModalTrigger.uvue';
-import { useRoute, useRouter } from '@/src/router/index.uts';
+import { useRoute, useRouter } from '@/uni_modules/route-bestX/index.uts';
 
 const router = useRouter();
 const route = useRoute();
@@ -164,8 +164,8 @@ definePage({
   hideNavbar: false,
   enablePullDownRefresh: false,
   style: {
-    navigationBarTitleText: '全屏遮罩弹窗',
-    navigationStyle: 'custom'
+    navigationBarTitleText: '全屏遮罩弹窗'
+    // navigationStyle: 'custom'
   }
 });
 

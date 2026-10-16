@@ -9,7 +9,7 @@
         </view>
         <text class="text-[12px] leading-[18px] text-[#64748b]">useRoute() 读当前路由（响应式、只读），useRouter() 做跳转。底层仍走 uni 原生导航 API，所以 main.uts 里安装的全局登录拦截器照常生效。route.meta / route.name 无需手写注册——本页 definePage 里的字段会被写进 pages.json，就是 meta 本身。</text>
         <view class="w-full rounded-[10px] bg-[#0f172a] p-[12px] mt-[10px]">
-          <text class="text-[11px] leading-[18px] text-[#e2e8f0]" style="font-family: monospace;">import { useRoute, useRouter } from '@/src/router/index.uts';</text>
+          <text class="text-[11px] leading-[18px] text-[#e2e8f0]" style="font-family: monospace;">import { useRoute, useRouter } from '@/uni_modules/route-bestX/index.uts';</text>
           <text class="text-[11px] leading-[18px] text-[#38bdf8] mt-[2px]" style="font-family: monospace;">const route = useRoute();</text>
           <text class="text-[11px] leading-[18px] text-[#38bdf8] mt-[2px]" style="font-family: monospace;">const router = useRouter();</text>
         </view>
@@ -187,7 +187,7 @@
 
 <script setup lang="uts">
 import { computed } from 'vue';
-import { useRoute, useRouter } from '@/src/router/index.uts';
+import { useRoute, useRouter } from '@/uni_modules/route-bestX/index.uts';
 import { useTokenStore, useUserStore } from '@/src/store/index.uts';
 import { toast, toastSuccess } from '@/src/utils/toast/index.uts';
 

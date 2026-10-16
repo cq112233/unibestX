@@ -60,7 +60,16 @@
  * 页面侧拿到 `route.query.get('name')` 即是可直接展示的中文。
  */
 import { reactive } from 'vue';
-import { PAGE_META_JSON } from '../generated/page-meta.uts';
+
+let pageMetaJsonString: string = '';
+
+/**
+ * 设置页面元信息 JSON 字符串（可选注入）
+ */
+export function setPageMetaJson(jsonStr: string): void {
+  pageMetaJsonString = jsonStr;
+  pageConfigTable = null;
+}
 import {
   cleanPath,
   decodeQueryValue,
@@ -73,7 +82,7 @@ import {
 } from '../utils/utils.uts';
 import { publishRoute } from './route-snapshot.uts';
 import { createEmptyRoute } from './route-types.uts';
-import type { RouteLocation } from './route-types.uts';
+import type { RouteLocation, RouteRecordRaw } from './route-types.uts';
 import type { RouteTarget } from '../guard/types.uts';
 
 /**
@@ -121,6 +130,47 @@ export function setRouteMeta(path: string, meta: UTSJSONObject): void {
     return;
   }
   routeMetaMap.set(key, meta);
+  nameToPathCache.clear();
+}
+
+/**
+ * 批量注册路由元信息（通过对象字典形式：路径 -> 元信息对象）
+ *
+ * @param metaMap 形如 { '/pages/detail/detail': { name: 'detail', title: '详情' } }
+ */
+export function setRoutesMeta(metaMap: UTSJSONObject): void {
+  const keys = UTSJSONObject.keys(metaMap);
+  for (let i = 0; i < keys.length; i++) {
+    const path = keys[i];
+    const meta = metaMap[path];
+    if (meta != null && typeof meta == 'object') {
+      const key = cleanPath(path);
+      if (key != '') {
+        routeMetaMap.set(key, meta as UTSJSONObject);
+      }
+    }
+  }
+  nameToPathCache.clear();
+}
+
+/**
+ * 批量注册路由表列表（通过 RouteRecordRaw 数组形式，对标 vue-router 的 routes 配置）
+ *
+ * @param routes 形如 [{ path: '/pages/detail/detail', name: 'detail', meta: { title: '详情' } }]
+ */
+export function setRoutes(routes: RouteRecordRaw[]): void {
+  for (let i = 0; i < routes.length; i++) {
+    const item = routes[i];
+    const key = cleanPath(item.path);
+    if (key == '') {
+      continue;
+    }
+    const metaObj = item.meta != null ? item.meta! : new UTSJSONObject();
+    if (item.name != null && item.name != '') {
+      metaObj['name'] = item.name;
+    }
+    routeMetaMap.set(key, metaObj);
+  }
   nameToPathCache.clear();
 }
 
@@ -270,10 +320,10 @@ function ensurePageConfigTable(): Map<string, UTSJSONObject> {
   }
   const table = new Map<string, UTSJSONObject>();
   pageConfigTable = table;
-  if (PAGE_META_JSON == '') {
+  if (pageMetaJsonString == '') {
     return table;
   }
-  const parsed = JSON.parseObject(PAGE_META_JSON);
+  const parsed = JSON.parseObject(pageMetaJsonString);
   if (parsed == null) {
     return table;
   }
@@ -428,6 +478,17 @@ function commitRoute(path: string, query: Map<string, string>, fullPath: string,
     routeName = getDefaultRouteName(normalizedPath);
   }
   routeState.name = routeName;
+  let currentStack: any[] = [];
+  try {
+    currentStack = getCurrentPages();
+  }
+  catch {
+    currentStack = [];
+  }
+  if (currentStack.length > 0 || routeState.pages.length == 0) {
+    routeState.pages = currentStack;
+    routeState.page = currentStack.length > 0 ? currentStack[currentStack.length - 1] : null;
+  }
   publishRoute(routeState, normalizedPath, includeClaimed);
 }
 
@@ -622,6 +683,17 @@ export function uninstallRouteStateListener(): void {
  */
 export function ensureRouteReady(): void {
   installRouteStateListener();
+  let currentStack: any[] = [];
+  try {
+    currentStack = getCurrentPages();
+  }
+  catch {
+    currentStack = [];
+  }
+  if (currentStack.length > 0) {
+    routeState.pages = currentStack;
+    routeState.page = currentStack[currentStack.length - 1];
+  }
   if (routeState.path != '') {
     return;
   }

@@ -5,7 +5,7 @@ import {
   isSamePath,
   parseUrlToObj,
   removeLeadingSlash
-} from '@/src/router/utils/utils.uts';
+} from '@/uni_modules/route-bestX/utils/utils.uts';
 
 describe('route utils Unit Tests', () => {
   describe('ensureLeadingSlash', () => {

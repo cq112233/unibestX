@@ -539,7 +539,9 @@ unibestX/
 │       └── rxjs-lite/            #   轻量流式处理工具
 ├── uni_modules/                  # uni-app 扩展插件模块（精简收敛为 17 个核心插件）
 │   ├── z-paging-x/               #   深度优化适配的分页组件
-│   ├── unix-crypto/              #   跨端加密解密库（AES/DES/RSA/MD5/SHA/HMAC/Base64/UUID）
+│   ├── route-bestX/              #   uni-app X 极简高性能跨端路由引擎（导航守卫/快照隔离）
+│   ├── bignumber-bestX/          #   全端高精度大数据运算库（十进制/四则运算/金融格式化）
+│   ├── crypto-bestX/             #   跨端加密解密库（AES/DES/RSA/MD5/SHA/HMAC/Base64/UUID）
 │   ├── x-pinia-s/                #   UTS 版 Pinia（VDOM 模式使用）
 │   ├── lime-request/             #   HTTP 请求核心库
 │   ├── lime-i18n/                #   国际化核心库

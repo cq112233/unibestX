@@ -45,6 +45,10 @@ export type RouteLocationRaw = {
   query?: UTSJSONObject;
   /** 路由参数（对标 vue-router 的 params），直接转为 query 拼接到 url 上 */
   params?: UTSJSONObject;
+  /** 是否以 replace 方式跳转（替换当前页面历史，等价于 uni.redirectTo） */
+  replace?: boolean;
+  /** 是否走路由守卫/拦截器，默认 true；设为 false 时直接跳转并跳过拦截器 */
+  intercept?: boolean;
 };
 
 /**
@@ -169,6 +173,12 @@ export function cleanPath(path: string): string {
  * @returns 是否指向同一页面
  */
 export function isSamePath(path1: string, path2: string): boolean {
+  if (path1.length == 0 && path2.length == 0) {
+    return true;
+  }
+  if (path1.length == 0 || path2.length == 0) {
+    return false;
+  }
   const p1 = cleanPath(path1);
   const p2 = cleanPath(path2);
   if (p1 == p2) {
@@ -179,6 +189,9 @@ export function isSamePath(path1: string, path2: string): boolean {
   const raw2 = removeLeadingSlash(p2);
   if (raw1 == raw2) {
     return true;
+  }
+  if (raw1.length == 0 || raw2.length == 0) {
+    return false;
   }
   // 支持末尾路由包含匹配（处理带或不带 src/ 前缀的场景）
   return raw1.endsWith(raw2) || raw2.endsWith(raw1);
@@ -325,7 +338,7 @@ export function serializeQuery(query: UTSJSONObject | null): string {
   const keys = UTSJSONObject.keys(query);
   for (let i = 0; i < keys.length; i++) {
     const key = keys[i];
-    const value = query.getAny(key);
+    const value = query[key];
     if (value == null) {
       continue;
     }
@@ -384,12 +397,12 @@ function extractLocationQuery(target: RouteLocationRaw): UTSJSONObject | null {
   const queryKeys = UTSJSONObject.keys(query);
   for (let i = 0; i < queryKeys.length; i++) {
     const k = queryKeys[i];
-    merged[k] = query.getAny(k);
+    merged[k] = query[k];
   }
   const paramsKeys = UTSJSONObject.keys(params);
   for (let i = 0; i < paramsKeys.length; i++) {
     const k = paramsKeys[i];
-    merged[k] = params.getAny(k);
+    merged[k] = params[k];
   }
   return merged;
 }

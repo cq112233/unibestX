@@ -18,8 +18,10 @@ import { utsObject } from './helpers';
 /** 取一份全新的 route-state 模块（模块级状态在用例间会串，必须逐用例重置） */
 async function loadRouteState() {
   vi.resetModules();
-  const mod = await import('@/src/router/core/route-state.uts');
-  const useRouteMod = await import('@/src/router/hooks/useRoute.uts');
+  const mod = await import('@/uni_modules/route-bestX/core/route-state.uts');
+  const useRouteMod = await import('@/uni_modules/route-bestX/hooks/useRoute.uts');
+  const { PAGE_META_JSON } = await import('@/src/router/generated/page-meta.uts');
+  mod.setPageMetaJson(PAGE_META_JSON);
   return { ...mod, useRoute: useRouteMod.useRoute };
 }
 

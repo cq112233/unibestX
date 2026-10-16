@@ -98,7 +98,7 @@
           <text class="text-[10px] text-[#64748b]">交互式一键创建</text>
         </view>
         <text class="text-[11px] text-[#64748b] leading-[18px] mb-[8px]">
-          支持交互式选择 UI 组件库（Rice UI / uview-ultra / 原生）、内置工具库（lime-shared / lime-use / lime-color / unix-crypto）、按需功能裁剪与完整性自检：
+          支持交互式选择 UI 组件库（Rice UI / uview-ultra / 原生）、内置工具库（lime-shared / lime-use / lime-color / crypto-bestX）、按需功能裁剪与完整性自检：
         </text>
         <view
           class="px-[10px] py-[8px] rounded-[6px] bg-[#0f172a] flex flex-row items-center justify-between active:opacity-90"
@@ -190,7 +190,7 @@
       </view>
     </view>
 
-    <!-- 内置工具库（lime-shared / lime-use / lime-color / lime-dayuts / unix-crypto） -->
+    <!-- 内置工具库（lime-shared / lime-use / lime-color / lime-dayuts / crypto-bestX） -->
     <view class="mt-[16px] mx-[16px]">
       <view class="flex flex-row items-center justify-between mb-[10px]">
         <text class="text-[14px] font-bold text-[#1e293b]">🧰 内置工具库</text>
@@ -413,8 +413,8 @@ const featureList: Array<FeatureItem> = [
   {
     id: 'router',
     title: '📄 路由与拦截守卫',
-    desc: '黑白名单免登・全局鉴权',
-    configPath: 'src/router/config/config.uts',
+    desc: 'route-bestX 路由引擎・导航守卫',
+    configPath: 'uni_modules/route-bestX',
     bgColor: '#f59e0b0f',
     borderColor: '#f59e0b26',
     textColor: '#d97706'
@@ -422,8 +422,8 @@ const featureList: Array<FeatureItem> = [
   {
     id: 'route-hooks',
     title: '🧩 组合式路由 Hooks',
-    desc: 'useRoute/useRouter 双 Hook',
-    configPath: 'src/router/hooks',
+    desc: 'useRoute / useRouter 双 Hook',
+    configPath: 'uni_modules/route-bestX',
     bgColor: '#c026d30f',
     borderColor: '#c026d326',
     textColor: '#a21caf'
@@ -587,23 +587,23 @@ const toolLibList: Array<ToolLibItem> = [
     textColor: '#4338ca'
   },
   {
-    id: 'unix-Bignumber',
-    title: '🧮 unix-Bignumber',
+    id: 'bignumber-bestX',
+    title: '🧮 bignumber-bestX',
     tag: '大数据运算',
     desc: '任意精度十进制运算库，覆盖加减乘除、取模、幂与开方，支持 2~36 进制、九种舍入模式与千分位格式化，彻底解决 0.1 + 0.2 ≠ 0.3 的浮点误差。',
     chips: ['任意精度', '四则运算', '幂与开方', '2~36 进制', '九种舍入', '千分位'],
-    configPath: 'uni_modules/unix-Bignumber',
+    configPath: 'uni_modules/bignumber-bestX',
     bgColor: '#7c3aed0f',
     borderColor: '#7c3aed26',
     textColor: '#7c3aed'
   },
   {
-    id: 'unix-crypto',
-    title: '🔐 unix-crypto',
+    id: 'crypto-bestX',
+    title: '🔐 crypto-bestX',
     tag: '加密解密',
     desc: '跨端加密解密套件，涵盖 Base64 编解码、MD5 与 SHA-256 摘要、HMAC 签名、AES / DES 对称加解密、RSA 非对称加解密与验签，以及 UUID 生成。',
     chips: ['Base64', 'MD5 / SHA-256', 'HMAC', 'AES / DES', 'RSA 验签', 'UUID'],
-    configPath: 'uni_modules/unix-crypto',
+    configPath: 'uni_modules/crypto-bestX',
     bgColor: '#15803d0f',
     borderColor: '#15803d26',
     textColor: '#15803d'
