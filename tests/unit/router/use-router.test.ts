@@ -35,6 +35,16 @@ describe('useRouter Unit Tests', () => {
     expect(uni.onAppRoute).toHaveBeenCalledTimes(1);
   });
 
+  it('router.currentRoute 等价于 useRoute() 的返回值', async () => {
+    (globalThis as any).getCurrentPages = vi.fn(() => [{ route: 'src/pages/index/index' }]);
+    const { useRouter, router } = await loadRouter();
+
+    expect(router.currentRoute).toBeDefined();
+    expect(router.currentRoute.path).toBe('/src/pages/index/index');
+    expect(router.currentRoute.name).toBe('index');
+    expect(useRouter().currentRoute.path).toBe('/src/pages/index/index');
+  });
+
   it('push 字符串形态：原样透传给 uni.navigateTo', async () => {
     const { useRouter } = await loadRouter();
 
@@ -111,6 +121,56 @@ describe('useRouter Unit Tests', () => {
     expect(resolveUrl('src/pages/index/index?tab=2')).toBe('src/pages/index/index?tab=2');
     expect(resolveUrl(utsObject({ path: '/a', query: { ids: [1, 2], skip: null } }))).toBe('/a?ids=1%2C2');
     expect(serializeQuery(null)).toBe('');
+  });
+
+  it('push 命名路由形态：按 name 匹配路径，params 直接转 query（与 path + query 完全一致）', async () => {
+    const { useRouter } = await loadRouter();
+    const router = useRouter();
+
+    // 匹配 definePage 显式声明了 name: 'routerBasicDemo' 的页面
+    router.push(utsObject({ name: 'routerBasicDemo', params: { tab: 'a', id: 101 } }));
+
+    expect(uni.navigateTo).toHaveBeenCalledWith({
+      url: '/src/sub/routerBasicDemo/routerBasicDemo?tab=a&id=101'
+    });
+  });
+
+  it('push 命名路由形态：未显式声明 name 时按路径最后一个单词匹配（如 modalBasicDemo）', async () => {
+    const { useRouter } = await loadRouter();
+    const router = useRouter();
+
+    // modalBasicDemo 页面未显式写 name，按路径最后一个单词 modalBasicDemo 匹配
+    router.push(utsObject({ name: 'modalBasicDemo', params: { from: 'test' } }));
+
+    expect(uni.navigateTo).toHaveBeenCalledWith({
+      url: '/src/sub/modalBasicDemo/modalBasicDemo?from=test'
+    });
+  });
+
+  it('replace / resolve 命名路由形态：落到 redirectTo 与纯解析', async () => {
+    const { useRouter } = await loadRouter();
+    const router = useRouter();
+
+    router.replace(utsObject({ name: 'index', params: { tab: 1 } }));
+    expect(uni.redirectTo).toHaveBeenCalledWith({
+      url: '/src/pages/index/index?tab=1'
+    });
+
+    const resolved = router.resolve(utsObject({ name: 'modalBasicDemo', params: { foo: 'bar' } }));
+    expect(resolved).toBe('/src/sub/modalBasicDemo/modalBasicDemo?foo=bar');
+  });
+
+  it('push 命名路由形态：查无此 name 时警告并返回 null，不触发任何跳转', async () => {
+    const { useRouter } = await loadRouter();
+    const router = useRouter();
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    const res = router.push(utsObject({ name: 'nonExistentPageName', params: { a: 1 } }));
+
+    expect(res).toBeNull();
+    expect(uni.navigateTo).not.toHaveBeenCalled();
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('未找到路由名称「nonExistentPageName」'));
+    warnSpy.mockRestore();
   });
 });
 

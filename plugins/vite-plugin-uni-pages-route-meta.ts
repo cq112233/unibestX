@@ -72,6 +72,13 @@ export function buildRouteMetaTable(output: Record<string, any>): Record<string,
     // 深拷贝一份并把 path 规范成运行时口径，避免与 pages.json 的相对 path 混淆
     const copy = { ...page, path: routePath };
     delete copy._variants;
+    // 路由名：优先取 definePage 声明的 name，未声明则默认读取路径最后一个单词（如 modalBasicDemo）
+    if (typeof copy.name !== 'string' || copy.name.trim() === '') {
+      const segments = routePath.split('?')[0].split('/').filter(Boolean);
+      if (segments.length > 0) {
+        copy.name = segments[segments.length - 1];
+      }
+    }
     table[routePath] = copy;
   };
 

@@ -20,15 +20,26 @@ import TabViews from '@/src/tabbar/components/TabViews.uvue';
 import Tabbar from '@/src/tabbar/tabbar.uvue';
 import { isSinglePageTabbar, notifyPageHide, notifyPageShow, setCurIdxByKey } from '@/src/tabbar/index.uts';
 import { handleBackPressExit } from '@/src/utils/backPress/index.uts';
+import { useRoute, useRouter } from '@/src/router/index.uts';
 
+const router = useRouter();
+const route = useRoute();
+
+console.log(route);
+console.log(router.currentRoute);
+
+console.log(getCurrentPages());
+
+// definePage 支持「静态对象」与「函数式（含 async 异步）」写法：
+// 1. 跨端条件配置：基于 options.platform 进行多端分支判断，构建期会自动生成 pages.json 中的条件编译块（#ifdef / #endif）
+// 2. 自定义上下文扩展：支持解构 vite.config.ts 中 uniPagesPlugin.context 注入的自定义属性（如 appName、isProduction 等）
 definePage((options) => {
-  // options 支持解构出内置 platform，以及 vite.config.ts 中 uniPagesPlugin.context 注入的自定义属性（如 appName、isProduction 等）
   const { platform, appName: _appName } = options;
   const { isH5, isAppIOS, isAppAndroid, isAppHarmony, isMpAlipay, isMpWeixin } = platform;
   return {
     customPageClass: 'init-page', // 页面根容器自定义类名（配合 layout 布局使用，支持配置全局样式类）
     customPageStyle: 'background-color: transparent;', // 页面根容器自定义行内样式（穿透任何样式隔离，全端绝对生效）
-    name: 'index', // 路由名，useRoute().name 读取此值（不声明则为 null）
+    name: 'index', // 路由名：useRoute().name 优先读取此值，未显式声明时默认读取路径最后一个单词（如 index）
     debug: false, // 是否开启当前页面沙盒独立调试（设为 true 可单独调试此页；⚠️ 调试完成后改回 false）
     debugHome: false, // 沙盒调试模式下是否将当前页面指定为启动首页（全局仅允许 1 个页面设为 true，排在 pages[0]）
     type: 'home', // 页面类型标识（仅首页配置 'home'，标记当前页面为应用全局启动首页，自动排在 pages[0]）

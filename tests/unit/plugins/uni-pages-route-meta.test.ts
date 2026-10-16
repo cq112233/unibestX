@@ -146,4 +146,23 @@ describe('uni-pages-route-meta unit tests', () => {
     expect(source).toContain('本文件由 plugins/vite-plugin-uni-pages-route-meta.ts 自动生成');
     expect(source).toContain('export const PAGE_META_JSON: string = ');
   });
+
+  it('未声明 name 的页面，自动提取路径最后一个单词作为默认 name；显式声明的保持原样', () => {
+    const { source } = generate({
+      pages: [
+        { path: 'pages/index/index', name: 'customIndex' },
+        { path: 'pages/me/me' }
+      ],
+      subPackages: [
+        { root: 'src/sub', pages: [{ path: 'modalBasicDemo/modalBasicDemo' }] }
+      ]
+    });
+
+    const table = parseGenerated(source);
+    // 显式声明的保持原样
+    expect(table['/pages/index/index'].name).toBe('customIndex');
+    // 未显式声明的自动读取路径最后单词
+    expect(table['/pages/me/me'].name).toBe('me');
+    expect(table['/src/sub/modalBasicDemo/modalBasicDemo'].name).toBe('modalBasicDemo');
+  });
 });

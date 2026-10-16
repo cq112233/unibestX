@@ -281,7 +281,7 @@ describe('useRoute Unit Tests', () => {
     expect(fallback?.getString('path')).toBe('/src/pages/index/index');
   });
 
-  it('params 恒为空 Map；definePage 未声明 name 时 name 为 null', async () => {
+  it('params 恒为空 Map；definePage 未声明 name 时默认读取路径最后一个单词', async () => {
     const { useRoute, applyRouteFromUrl } = await loadRouteState();
     const route = useRoute();
 
@@ -289,7 +289,7 @@ describe('useRoute Unit Tests', () => {
 
     expect(route.params.size).toBe(0);
     expect(route.meta).not.toBeNull();
-    expect(route.name).toBeNull();
+    expect(route.name).toBe('function');
   });
 
   it('uninstallRouteStateListener 后重新调用 useRoute 会再次安装', async () => {

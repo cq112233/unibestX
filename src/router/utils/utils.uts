@@ -38,9 +38,13 @@ export type UrlObj = {
  */
 export type RouteLocationRaw = {
   /** 目标页面路径；可以是纯 path，也可以自带 query 串（如 `/a/b?x=1`） */
-  path: string;
+  path?: string;
+  /** 路由名称；若未提供 path，可根据 name 去匹配获取路径 */
+  name?: string;
   /** query 参数；省略表示不带参数（值由 serializeQuery 负责编码） */
   query?: UTSJSONObject;
+  /** 路由参数（对标 vue-router 的 params），直接转为 query 拼接到 url 上 */
+  params?: UTSJSONObject;
 };
 
 /**
@@ -330,20 +334,75 @@ export function serializeQuery(query: UTSJSONObject | null): string {
   return parts.join('&');
 }
 
+/** 路由名称到路径解析器函数类型 */
+export type NameToPathResolver = (name: string) => string | null;
+
+let nameToPathResolver: NameToPathResolver | null = null;
+
+/**
+ * 注册路由名 → 页面路径解析器（由 route-state.uts 初始化时注入）
+ *
+ * @param resolver 解析器函数，入参为 name，返回对应的页面路径或 null
+ */
+export function setNameToPathResolver(resolver: NameToPathResolver | null): void {
+  nameToPathResolver = resolver;
+}
+
+/**
+ * 根据路由名称查找对应的页面路径
+ *
+ * @param name 路由名称
+ * @returns 页面规范化路径；未找到返回 null
+ */
+export function resolvePathByName(name: string): string | null {
+  if (name == '') {
+    return null;
+  }
+  const resolver = nameToPathResolver;
+  if (resolver != null) {
+    return resolver(name);
+  }
+  return null;
+}
+
+/**
+ * 提取或合并 RouteLocationRaw 中的 query / params 参数对象
+ *
+ * @param target 导航目标对象
+ * @returns 合并后的 UTSJSONObject，无任何参数时返回 null
+ */
+function extractLocationQuery(target: RouteLocationRaw): UTSJSONObject | null {
+  const query = target.query;
+  const params = target.params;
+  if (query == null) {
+    return params != null ? params : null;
+  }
+  if (params == null) {
+    return query;
+  }
+  const merged = new UTSJSONObject();
+  const queryKeys = UTSJSONObject.keys(query);
+  for (let i = 0; i < queryKeys.length; i++) {
+    const k = queryKeys[i];
+    merged[k] = query.getAny(k);
+  }
+  const paramsKeys = UTSJSONObject.keys(params);
+  for (let i = 0; i < paramsKeys.length; i++) {
+    const k = paramsKeys[i];
+    merged[k] = params.getAny(k);
+  }
+  return merged;
+}
+
 /**
  * 把导航目标归一化为 uni 导航 API 可直接使用的 url 字符串
- * 支持两种形态（与 vue-router 的 router.push 一致）：
+ * 支持三种形态（与 vue-router 的 router.push 一致）：
  * - 字符串：`'/src/pages/index/index'`、`'subDetail?id=1'`
- * - 对象：`{ path: '/src/pages/detail/detail', query: { id: 1 } }`
+ * - 路径对象：`{ path: '/src/pages/detail/detail', query: { id: 1 } }`
+ * - 命名路由对象：`{ name: 'modalBasicDemo', params: { id: 1 } }`（通过 name 匹配路径，params 自动转 query）
  *
- * ⚠️ 对象形态用的是具名类型 `RouteLocationRaw`（不是 `any`、也不是 `UTSJSONObject`）：
- *    参数标 `any` 时编辑器给不出任何字段补全，标 `UTSJSONObject` 只会弹它的成员方法；
- *    只有具名对象类型才补得出 `path` / `query`。字面量与 `RouteLocationRaw` 变量都行 ——
- *    两者在 UTS 下编译成同一个原生对象，这里按字段直读，不做 `as UTSJSONObject` 强转
- *    （那个强转正是改动前「必须写字面量、否则真机 ClassCastException」的根源）。
- *
- * @param to 导航目标（字符串 url，或 `{ path, query }` 字面量 / `RouteLocationRaw` 变量）
- * @returns 归一化后的 url；入参为空或缺 path 时返回空串 ""
+ * @param to 导航目标（字符串 url，或 `{ path, name, query, params }` 字面量 / `RouteLocationRaw` 变量）
+ * @returns 归一化后的 url；入参为空或缺 path/name 时返回空串 ""
  */
 export function resolveUrl(to: string | RouteLocationRaw | null): string {
   if (to == null) {
@@ -353,18 +412,34 @@ export function resolveUrl(to: string | RouteLocationRaw | null): string {
     return to as string;
   }
   const target = to as RouteLocationRaw;
-  // 宽化到 `string | null` 再判空：类型上 path 是必填，但 JS / 单测侧可能整块缺字段，
-  // 这里保留「缺 path 返回空串」的兜底（等价于改动前的 `obj.getString('path') ?? ''`）
-  const rawPath: string | null = target.path;
-  const path = rawPath ?? '';
+  const rawPath = target.path;
+  let path = rawPath != null ? rawPath : '';
+
+  // 若未提供 path，但提供了 name，根据 name 查找对应路径
+  if (path == '') {
+    const rawName = target.name;
+    const name = rawName != null ? rawName : '';
+    if (name != '') {
+      const matched = resolvePathByName(name);
+      if (matched != null && matched != '') {
+        path = matched;
+      }
+      else {
+        console.warn(`[router] 未找到路由名称「${name}」对应的页面路径`);
+      }
+    }
+  }
+
   if (path == '') {
     return '';
   }
-  const queryStr = serializeQuery(target.query ?? null);
+
+  const queryObj = extractLocationQuery(target);
+  const queryStr = serializeQuery(queryObj);
   if (queryStr == '') {
     return path;
   }
-  return `${path}?${queryStr}`;
+  return path.includes('?') ? `${path}&${queryStr}` : `${path}?${queryStr}`;
 }
 
 // ==========================================
@@ -452,7 +527,17 @@ export class RouteUtils {
     return queryValueToString(value);
   }
 
-  /** 把导航目标（字符串 url 或 `{ path, query }` 字面量 / `RouteLocationRaw` 变量）归一化为 url 字符串 */
+  /** 注册路由名称到路径的解析器 */
+  setNameToPathResolver(resolver: NameToPathResolver | null): void {
+    setNameToPathResolver(resolver);
+  }
+
+  /** 根据路由名称查找对应的页面路径 */
+  resolvePathByName(name: string): string | null {
+    return resolvePathByName(name);
+  }
+
+  /** 把导航目标（字符串 url 或 `{ path, name, query, params }` 字面量 / `RouteLocationRaw` 变量）归一化为 url 字符串 */
   resolveUrl(to: string | RouteLocationRaw | null): string {
     return resolveUrl(to);
   }

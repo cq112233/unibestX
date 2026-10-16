@@ -66,7 +66,8 @@ import {
   getCurrentPath,
   getQueryString,
   parseUrlToObj,
-  queryValueToString
+  queryValueToString,
+  setNameToPathResolver
 } from '../utils/utils.uts';
 import { publishRoute } from './route-snapshot.uts';
 import { createEmptyRoute } from './route-types.uts';
@@ -89,6 +90,9 @@ export const routeState: RouteLocation = reactive(createEmptyRoute());
 /** 路径 → meta 的注册表（key 为 cleanPath 规范化后的路径） */
 const routeMetaMap: Map<string, UTSJSONObject> = new Map<string, UTSJSONObject>();
 
+/** 路由名称 → 规范化路径的缓存字典 */
+const nameToPathCache = new Map<string, string>();
+
 /**
  * 注册某个页面的路由元信息，注册后 `useRoute().meta / .name` 即可读到
  *
@@ -107,6 +111,7 @@ export function setRouteMeta(path: string, meta: UTSJSONObject): void {
     return;
   }
   routeMetaMap.set(key, meta);
+  nameToPathCache.clear();
 }
 
 /**
@@ -121,6 +126,7 @@ export function removeRouteMeta(path: string): void {
   const key = cleanPath(path);
   routeMetaMap.delete(key);
   routeMetaMap.delete(swapSrcPrefix(key));
+  nameToPathCache.clear();
 }
 
 /**
@@ -145,6 +151,99 @@ function swapSrcPrefix(key: string): string {
  * 首次使用时解析一次并缓存；表为空（老工程未接入生成器）时静默退化为 null。
  */
 let pageConfigTable: Map<string, UTSJSONObject> | null = null;
+
+/**
+ * 从路径中提取默认的路由名（路径最后一个单词）
+ * 例如：/src/sub/modalBasicDemo/modalBasicDemo -> modalBasicDemo
+ *
+ * @param path 页面路径
+ * @returns 路径最后一个单词，路径为空时返回 null
+ */
+export function getDefaultRouteName(path: string): string | null {
+  if (path == '') {
+    return null;
+  }
+  const clean = path.includes('?') ? path.substring(0, path.indexOf('?')) : path;
+  const parts = clean.split('/');
+  for (let i = parts.length - 1; i >= 0; i--) {
+    const part = parts[i].trim();
+    if (part != '') {
+      return part;
+    }
+  }
+  return null;
+}
+
+/**
+ * 根据路由名称查找对应的页面路径
+ *
+ * 匹配优先级：
+ * 1. 动态注册表（setRouteMeta 注册的 meta 中的 name）
+ * 2. 静态页面配置表（PAGE_META_JSON 中 definePage 声明的 name）
+ * 3. 兜底匹配：未显式声明 name 时的路径最后一个单词（如 /src/sub/modalBasicDemo/modalBasicDemo -> modalBasicDemo）
+ *
+ * @param name 路由名称
+ * @returns 匹配到的规范化页面路径（如 /src/sub/modalBasicDemo/modalBasicDemo），未匹配到返回 null
+ */
+export function findPathByName(name: string): string | null {
+  if (name == '') {
+    return null;
+  }
+  // 1. 检查缓存
+  const cached = nameToPathCache.get(name);
+  if (cached != null) {
+    return cached;
+  }
+
+  // 2. 查动态注册表 (routeMetaMap)
+  let foundDynamic: string | null = null;
+  routeMetaMap.forEach((meta: UTSJSONObject, pathKey: string): void => {
+    if (foundDynamic != null) {
+      return;
+    }
+    const metaName = readMetaString(meta, 'name');
+    if (metaName == name) {
+      foundDynamic = pathKey;
+    }
+  });
+  if (foundDynamic != null) {
+    nameToPathCache.set(name, foundDynamic!);
+    return foundDynamic;
+  }
+
+  // 3. 查静态页面配置表 (PAGE_META_JSON)
+  const table = ensurePageConfigTable();
+  let foundStatic: string | null = null;
+  let fallbackMatch: string | null = null;
+
+  table.forEach((config: UTSJSONObject, pathKey: string): void => {
+    if (foundStatic != null) {
+      return;
+    }
+    const pageName = readMetaString(config, 'name');
+    if (pageName == name) {
+      foundStatic = pathKey;
+      return;
+    }
+    // 兜底记录：路径最后一段匹配
+    if (fallbackMatch == null && getDefaultRouteName(pathKey) == name) {
+      fallbackMatch = pathKey;
+    }
+  });
+
+  if (foundStatic != null) {
+    nameToPathCache.set(name, foundStatic!);
+    return foundStatic;
+  }
+
+  // 4. 兜底命中路径末尾单词
+  if (fallbackMatch != null) {
+    nameToPathCache.set(name, fallbackMatch!);
+    return fallbackMatch;
+  }
+
+  return null;
+}
 
 /**
  * 从生成的 JSON 常量解析出页面配置表（懒加载，只解析一次）
@@ -294,12 +393,14 @@ function commitRoute(path: string, query: Map<string, string>, fullPath: string,
   routeState.fullPath = fullPath;
   routeState.query = query;
   routeState.meta = meta;
-  if (meta == null) {
-    routeState.name = null;
+  let routeName: string | null = null;
+  if (meta != null) {
+    routeName = readMetaString(meta, 'name');
   }
-  else {
-    routeState.name = readMetaString(meta, 'name');
+  if (routeName == null || routeName == '') {
+    routeName = getDefaultRouteName(normalizedPath);
   }
+  routeState.name = routeName;
   publishRoute(routeState, normalizedPath, includeClaimed);
 }
 
@@ -488,3 +589,8 @@ export function ensureRouteReady(): void {
     }
   }, 0);
 }
+
+// 注册全局路由名称 → 页面路径解析器（供 utils.resolveUrl 使用）
+setNameToPathResolver((name: string): string | null => {
+  return findPathByName(name);
+});
