@@ -432,10 +432,10 @@ export const pluginUts = {
       meta: {
         type: 'suggestion',
         docs: {
-          description: '原生平台 VDOM 模式下 <view> 元素不支持文字颜色样式（color 仅支持 <text>|<button>|<input>|<textarea>）'
+          description: '<view> 元素不支持文字颜色样式（color 仅支持 <text>|<button>|<input>|<textarea>）'
         },
         messages: {
-          noViewTextColor: '[VDOM不兼容提示] 原生 VDOM 模式下 <view> 元素不支持文字颜色样式（color 仅支持 <text>|<button>|<input>|<textarea>）；Vapor 模式虽可透传，但建议将类名 "{{cls}}" 移至内部 <text> 保持跨端渲染一致'
+          noViewTextColor: '[App不兼容提示] <view> 元素不支持文字颜色样式（color 仅支持 <text>|<button>|<input>|<textarea>）；建议将类名 "{{cls}}" 移至内部 <text> 保持跨端渲染一致'
         }
       },
       create(context) {

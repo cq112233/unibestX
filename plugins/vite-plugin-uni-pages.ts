@@ -738,6 +738,9 @@ async function parseDefinePage(
             pRes = pRes.resolve(pEnv.platform);
           }
           if (pRes != null && typeof pRes === 'object' && !Array.isArray(pRes)) {
+            if (p.toUpperCase() === 'MP-ALIPAY' || p.toUpperCase() === 'MP') {
+              normalizeCustomNavForAlipay(pRes as any);
+            }
             return {
               platform: p.toUpperCase(),
               page: pRes
@@ -901,6 +904,7 @@ function normalizeCustomNavForAlipay(p: PageConfig): void {
 function cleanTempProps(page: PageConfig, cleanMeta: boolean = false): void {
   if (cleanMeta) {
     delete (page as any)._hasMeta;
+    delete (page as any)._variants;
   }
   delete (page as any)._skipPage;
   if ((page as any)._keepType !== true && (page as any).type === 'home' && (page as any)._isStaticMacro === true) {
@@ -1247,6 +1251,9 @@ export function mergePlatformItems<T extends object>(
       for (const v of variantsList) {
         const vPayload = { ...item, ...v.page };
         delete (vPayload as any)._variants;
+        if (v.platform.includes('MP-ALIPAY') || v.platform === 'MP') {
+          normalizeCustomNavForAlipay(vPayload as any);
+        }
         cleanTempProps(vPayload as any, true);
         upsertCurrentVariant(
           variantsOf(uniqueKey),
@@ -1260,6 +1267,9 @@ export function mergePlatformItems<T extends object>(
     else {
       const cleanItem = { ...item };
       delete (cleanItem as any)._variants;
+      if (currentPlatform.toUpperCase().includes('MP-ALIPAY') || currentPlatform.toUpperCase() === 'MP') {
+        normalizeCustomNavForAlipay(cleanItem as any);
+      }
       cleanTempProps(cleanItem as any, true);
       upsertCurrentVariant(variantsOf(uniqueKey), cleanItem, stringifyForCompare(cleanItem), currentPlatform, homeStatusCompatible);
     }
@@ -1474,6 +1484,32 @@ function writePagesJson(
   return false;
 }
 
+/** 安全提取 JSONC / 带注释文件的头部注释块，避免正则表达式灾难性回溯 */
+function extractHeaderComments(raw: string): string {
+  let index = 0;
+  const len = raw.length;
+  while (index < len) {
+    while (index < len && (raw[index] === ' ' || raw[index] === '\t' || raw[index] === '\r' || raw[index] === '\n')) {
+      index++;
+    }
+    if (index >= len) {
+      break;
+    }
+    if (raw[index] === '/' && raw[index + 1] === '/') {
+      const nextLine = raw.indexOf('\n', index);
+      index = nextLine === -1 ? len : nextLine + 1;
+    }
+    else if (raw[index] === '/' && raw[index + 1] === '*') {
+      const endBlock = raw.indexOf('*/', index + 2);
+      index = endBlock === -1 ? len : endBlock + 2;
+    }
+    else {
+      break;
+    }
+  }
+  return raw.slice(0, index);
+}
+
 /** 把「本次扫描 + 合并」的结果同步回 pages.config.json，保证手写配置与磁盘页面双向一致 */
 function writeBackConfig(
   configPath: string,
@@ -1487,6 +1523,8 @@ function writeBackConfig(
 
   let configUpdated = false;
   const currentConfigRaw = fs.readFileSync(configPath, 'utf-8');
+  const headerComments = extractHeaderComments(currentConfigRaw);
+
   let currentConfig: BaseConfig = {};
   try {
     currentConfig = cjParse(currentConfigRaw) as BaseConfig;
@@ -1519,15 +1557,18 @@ function writeBackConfig(
   for (let i = 0; i < finalPages.length; i++) {
     const p = finalPages[i];
     const norm = p.path.replace(/\\/g, '/').replace(/^\//, '');
-    const isMultiPlatform = multiPlatformPages.has(norm) || multiPlatformPages.has(`src/${norm}`);
+    const hasVariants = Array.isArray((p as any)._variants) && (p as any)._variants.length > 1;
+    const isMultiPlatform = hasVariants || multiPlatformPages.has(norm) || multiPlatformPages.has(`src/${norm}`);
     const existingInConfig = currentConfig.pages?.find((cp) => {
       const cpNorm = cp.path.replace(/\\/g, '/').replace(/^\//, '');
       return cpNorm === norm || cpNorm === `src/${norm}` || `src/${cpNorm}` === norm;
     });
 
-    if (existingInConfig && isMultiPlatform && !(p as any)._hasMeta) {
+    if (existingInConfig && isMultiPlatform) {
       // 保持 pages.config.json 中的原配置不变，避免单端运行覆盖多端配置触发 watcher 恶性循环
-      newMainPages.push(existingInConfig);
+      const cleanExisting = { ...existingInConfig };
+      cleanTempProps(cleanExisting, true);
+      newMainPages.push(cleanExisting);
     }
     else {
       const cleanP = { ...p };
@@ -1554,14 +1595,17 @@ function writeBackConfig(
       for (let pIdx = 0; pIdx < spkg.pages.length; pIdx++) {
         const p = spkg.pages[pIdx];
         const fullRel = `${spkg.root}/${p.path}`.replace(/\\/g, '/').replace(/^\//, '');
-        const isMultiPlatform = multiPlatformPages.has(fullRel) || multiPlatformPages.has(`src/${fullRel}`);
+        const hasVariants = Array.isArray((p as any)._variants) && (p as any)._variants.length > 1;
+        const isMultiPlatform = hasVariants || multiPlatformPages.has(fullRel) || multiPlatformPages.has(`src/${fullRel}`);
         const existingInSub = targetSub.pages?.find((cp) => {
           const cpNorm = cp.path.replace(/\\/g, '/').replace(/^\//, '');
           return cpNorm === p.path.replace(/\\/g, '/').replace(/^\//, '');
         });
 
-        if (existingInSub && isMultiPlatform && !(p as any)._hasMeta) {
-          newSubPages.push(existingInSub);
+        if (existingInSub && isMultiPlatform) {
+          const cleanExisting = { ...existingInSub };
+          cleanTempProps(cleanExisting, true);
+          newSubPages.push(cleanExisting);
         }
         else {
           const cleanP = { ...p };
@@ -1584,6 +1628,9 @@ function writeBackConfig(
     }
     catch {
       newConfigJson = `${JSON.stringify(currentConfig, null, 2)}\n`;
+    }
+    if (headerComments && !newConfigJson.startsWith('//') && !newConfigJson.startsWith('/*')) {
+      newConfigJson = headerComments + newConfigJson.replace(/^\s*/, '');
     }
     if (newConfigJson !== currentConfigRaw) {
       fs.writeFileSync(configPath, newConfigJson, 'utf-8');
@@ -2068,6 +2115,27 @@ export default function uniPagesPlugin(userOptions: UniPagesOptions = {}): Plugi
     }, DEBOUNCE_MS);
   }
 
+  let hasWatchedChanges = false;
+  let hasRelevantRouteChanges = false;
+
+  const matchesPage = (filePath: string): boolean =>
+    isPageFile(filePath, options.dir, options.subPackages, options.exclude, projectRoot);
+
+  const isConfigFile = (filePath: string): boolean => {
+    const normalized = filePath.replace(/\\/g, '/');
+    const configPath = path.resolve(projectRoot, options.configFile).replace(/\\/g, '/');
+    const tabbarConfigPath = path.resolve(projectRoot, 'src/tabbar/config.uts').replace(/\\/g, '/');
+    const envPath = path.resolve(projectRoot, '.env').replace(/\\/g, '/');
+    return (
+      normalized === configPath
+      || normalized === tabbarConfigPath
+      || normalized === envPath
+      || normalized.includes('pages.config')
+      || normalized.includes('tabbar/config')
+      || normalized.endsWith('.env')
+    );
+  };
+
   return {
     name: 'uni-pages',
     enforce: 'pre' as const,
@@ -2089,16 +2157,34 @@ export default function uniPagesPlugin(userOptions: UniPagesOptions = {}): Plugi
       }
     },
 
+    watchChange(id: string) {
+      if (!options.enabled) {
+        return;
+      }
+      hasWatchedChanges = true;
+      const normalized = id.replace(/\\/g, '/');
+      if (isConfigFile(normalized) || matchesPage(normalized)) {
+        hasRelevantRouteChanges = true;
+      }
+    },
+
     async buildStart() {
       if (!options.enabled) {
         return;
       }
       if (hasGeneratedInConfigResolved) {
         // 首次构建已在 configResolved 阶段完成生成，跳过 buildStart 的重复初始执行；
-        // 重置标记以确保后续 watch 模式下的重新构建（如 app-android / mp-* 的 watch rebuild）仍能触发
         hasGeneratedInConfigResolved = false;
         return;
       }
+      // 在 watch 重新构建阶段，如果明确捕获到了文件变动且变动的文件全部与页面/路由无关（如 views/**、components/**），
+      // 则坚决跳过本次路由重新生成与写盘，避免修改普通组件引发无谓的全量路由重写与多端互踩
+      if (hasWatchedChanges && !hasRelevantRouteChanges) {
+        hasWatchedChanges = false;
+        return;
+      }
+      hasWatchedChanges = false;
+      hasRelevantRouteChanges = false;
       await enqueueGenerate();
     },
 
@@ -2147,9 +2233,6 @@ export default function uniPagesPlugin(userOptions: UniPagesOptions = {}): Plugi
         server.watcher.add(envPath);
       }
 
-      const matchesPage = (filePath: string): boolean =>
-        isPageFile(filePath, options.dir, options.subPackages, options.exclude, projectRoot);
-
       server.watcher.on('add', (filePath: string) => {
         if (matchesPage(filePath)) {
           debouncedGenerate();
@@ -2161,16 +2244,7 @@ export default function uniPagesPlugin(userOptions: UniPagesOptions = {}): Plugi
         }
       });
       server.watcher.on('change', (filePath: string) => {
-        const normalized = filePath.replace(/\\/g, '/');
-        if (
-          normalized === configPath.replace(/\\/g, '/')
-          || normalized.includes('pages.config')
-          || normalized.includes('tabbar/config')
-          || normalized.endsWith('.env')
-        ) {
-          debouncedGenerate();
-        }
-        if (matchesPage(filePath)) {
+        if (isConfigFile(filePath) || matchesPage(filePath)) {
           debouncedGenerate();
         }
       });

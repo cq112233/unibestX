@@ -17,8 +17,8 @@ export function matchesPlatform(conditionStr: string, targetPlatform: string): b
   if (!normTarget) {
     normTarget = (process.env.UNI_PLATFORM || 'H5').trim().toUpperCase();
   }
-  if ((normTarget === 'APP' || normTarget === 'APP-PLUS') && process.env.UNI_APP_PLATFORM) {
-    normTarget = `APP-${process.env.UNI_APP_PLATFORM.toUpperCase()}`;
+  if (normTarget === 'APP' || normTarget === 'APP-PLUS') {
+    normTarget = process.env.UNI_APP_PLATFORM ? `APP-${process.env.UNI_APP_PLATFORM.toUpperCase()}` : 'APP-ANDROID';
   }
   const platforms = conditionStr.split('||').map(p => p.trim().toUpperCase()).filter(Boolean);
 
@@ -36,10 +36,6 @@ export function matchesPlatform(conditionStr: string, targetPlatform: string): b
     }
     // APP / APP-PLUS 通配所有 App (APP-ANDROID, APP-IOS, APP-HARMONY)
     if ((p === 'APP' || p === 'APP-PLUS') && (normTarget.startsWith('APP') || normTarget === 'APP-PLUS')) {
-      return true;
-    }
-    // 当目标仅为通用 APP 且未指定子平台时，允许子平台作为通用 App 兜底
-    if ((p === 'APP-ANDROID' || p === 'APP-IOS' || p === 'APP-HARMONY') && (normTarget === 'APP' && !process.env.UNI_APP_PLATFORM)) {
       return true;
     }
     return false;

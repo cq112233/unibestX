@@ -123,11 +123,16 @@ export function writeRouteMetaFile(output: Record<string, any>, projectRoot: str
   let content = '';
 
   if (conditions.length > 0 && fs.existsSync(pagesJsonPath)) {
+    // 确定性排序，确保无论哪个端解析 pages.json，遍历与生成顺序完全一致
+    const sortedConditions = Array.from(new Set(conditions)).sort((a, b) => a.localeCompare(b));
     // 收集各条件编译块对应的 meta table
     const tableByCond = new Map<string, string>();
-    for (const cond of conditions) {
+    for (const cond of sortedConditions) {
       const platforms = cond.split('||').map(p => p.trim());
-      const repPlatform = platforms[0].toLowerCase();
+      let repPlatform = platforms[0].toLowerCase();
+      if (repPlatform === 'app' || repPlatform === 'app-plus') {
+        repPlatform = 'app-android';
+      }
       const parsedPages = loadPlatformPagesJson(pagesJsonPath, repPlatform);
       const table = buildRouteMetaTable(parsedPages);
       tableByCond.set(cond, JSON.stringify(table));
@@ -146,7 +151,11 @@ export function writeRouteMetaFile(output: Record<string, any>, projectRoot: str
       ];
       lines.push('function resolvePageMetaJson(): string {');
       lines.push('  let meta = \'\';');
-      for (const [cond, jsonText] of tableByCond.entries()) {
+      for (const cond of sortedConditions) {
+        const jsonText = tableByCond.get(cond);
+        if (!jsonText) {
+          continue;
+        }
         const stringLiteral = `'${jsonText.replace(/\\/g, '\\\\').replace(/'/g, '\\\'')}'`;
         lines.push(`  // #ifdef ${cond}`);
         lines.push('  if (meta == \'\') {');
