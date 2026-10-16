@@ -27,7 +27,7 @@ const mockUni: any = {
   reLaunch: vi.fn(),
   switchTab: vi.fn(),
 
-  // 路由完成事件（useRoute 状态源，见 src/router/hooks/route-state.uts）
+  // 路由完成事件（useRoute 状态源，见 src/router/core/route-state.uts）
   onAppRoute: vi.fn(),
   offAppRoute: vi.fn(),
 

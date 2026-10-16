@@ -88,10 +88,10 @@ definePage({
 });
 ```
 
-需要补充 / 覆盖时用 `setRouteMeta()`（优先级高于 pages.json，从 [hooks/route-state.uts](hooks/route-state.uts) 精准导入）：
+需要补充 / 覆盖时用 `setRouteMeta()`（优先级高于 pages.json，从 [core/route-state.uts](core/route-state.uts) 精准导入）：
 
 ```uts
-import { setRouteMeta, removeRouteMeta } from '@/src/router/hooks/route-state.uts';
+import { setRouteMeta, removeRouteMeta } from '@/src/router/core/route-state.uts';
 
 setRouteMeta('/src/pages/me/me', { name: 'me', title: '我的', requireAuth: true });
 removeRouteMeta('/src/pages/me/me');   // 移除后回落到 pages.json 的配置项
@@ -99,7 +99,7 @@ removeRouteMeta('/src/pages/me/me');   // 移除后回落到 pages.json 的配�
 
 > ⚠️ **`useRoute()` 返回的是「本页快照」，不是全局那一份。** 每次调用都新建一份，同一页面里页面与子组件各调一次就是各一份，它们**值相同、互不影响**：本页路由变了本页所有快照一起变，别的页面变了本页一份都不动。别用 `useRoute() === useRoute()` 做身份判断。
 >
-> 这么设计是为了治「上一页提前翻页」：全局那份在**跳转请求发出时**就被写成了目标路由，而上一页此刻还在屏幕上；拆成快照后，上一页在重新显示之前纹丝不动，新页面首帧又能直接读到自己的路由。模型细节见 [hooks/route-snapshot.uts](hooks/route-snapshot.uts) 文件头。
+> 这么设计是为了治「上一页提前翻页」：全局那份在**跳转请求发出时**就被写成了目标路由，而上一页此刻还在屏幕上；拆成快照后，上一页在重新显示之前纹丝不动，新页面首帧又能直接读到自己的路由。模型细节见 [core/route-snapshot.uts](core/route-snapshot.uts) 文件头。
 
 ### 2. 导航 `useRouter()`
 
@@ -248,7 +248,7 @@ export const EXCLUDE_LOGIN_PATH_LIST: string[] = [
 | 安装全局拦截器、H5 直链入口 | `@/src/router/interceptor/interceptor.uts` |
 | 跳登录页 | `@/src/router/toLoginPage/toLoginPage.uts` |
 | 路径 / URL 工具、`route` 单例 | `@/src/router/utils/utils.uts` |
-| 路由状态、`setRouteMeta()` | `@/src/router/hooks/route-state.uts` |
+| 路由状态、`setRouteMeta()` | `@/src/router/core/route-state.uts` |
 | 业务守卫规则 | `@/src/router/guard/` |
 
 ⚠️ **`.uts` 后缀必须保留**（`@/src/router/index.uts`，不是 `@/src/router`）：去掉后缀 TS 侧会丢补全并报 TS2307。`@` 指向项目根，所以要写 `@/src/...`。

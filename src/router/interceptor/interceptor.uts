@@ -1,8 +1,21 @@
 import { isPageTabbar, switchTabbar } from '@/src/tabbar/index.uts';
 import { runRouterGuard } from '../guard/index.uts';
 import type { RouteTarget } from '../guard/types.uts';
-import { applyTargetRouteFromUrl, installRouteStateListener, routeState, syncRouteState } from '../hooks/route-state.uts';
-import { getQueryString, parseUrlToObj } from '../utils/utils.uts';
+import {
+  applyTargetRouteFromUrl,
+  installRouteStateListener,
+  previousRouteState,
+  routeState,
+  setBeforeSyncRouteHook,
+  syncRouteState
+} from '../core/route-state.uts';
+import {
+  cleanPath,
+  getCurrentPageOptions,
+  getCurrentPath,
+  getQueryString,
+  parseUrlToObj
+} from '../utils/utils.uts';
 
 /**
  * 本文件是**框架侧**：只负责「读 uni 导航入参 → 归一化 URL → 交给业务守卫裁决 →
@@ -25,7 +38,7 @@ import { getQueryString, parseUrlToObj } from '../utils/utils.uts';
  *
  * ⚠️ 不要拿它当「跳转成功后同步路由」用：App 端页面栈有滞后（新页面入栈后
  *    栈顶还会停在上一页一段时间），success 阶段回读到的仍是**上一页**，
- *    会把刚写好的目标路由覆盖回去。详见 ../hooks/route-state.uts 头部说明。
+ *    会把刚写好的目标路由覆盖回去。详见 ../core/route-state.uts 头部说明。
  */
 function syncRouteStateDeferred(): void {
   setTimeout(() => {
@@ -47,8 +60,8 @@ function syncRouteStateDeferred(): void {
  *    写这里反而是错的（这里写的是用户其实没去成的页面）。
  * ⚠️ 用 applyTargetRouteFromUrl（**请求预写**）而不是 applyRouteFromUrl：此刻上一页还在屏幕上，
  *    预写只喂「还没认领路径」的快照，已认领的一律不动 —— 上一页不会在下一页进入期间提前变
- *    （同页带参重进尤其明显）。路由状态那侧的口径见 ../hooks/route-state.uts，
- *    快照与两道闸见 ../hooks/route-snapshot.uts。
+ *    （同页带参重进尤其明显）。路由状态那侧的口径见 ../core/route-state.uts，
+ *    快照与两道闸见 ../core/route-snapshot.uts。
  * ⚠️ `plugin://` / `http(s)://` 不是本应用页面，不进路由状态。
  */
 function markTargetRoute(url: string): void {
@@ -241,8 +254,9 @@ function resolveFromRouteTarget(): RouteTarget {
  *
  * @param url 导航 url（可能带 query、可能是相对路径）
  * @param api 触发本次跳转的 uni API 名，透传给守卫（守卫可按 API 差异化裁决）
+ * @param fromOverride 来源路由显式覆盖项（可选，供支付宝等在路由完成事件中捕获的旧状态传入）
  */
-function doIntercept(url: string, api: string): boolean {
+function doIntercept(url: string, api: string, fromOverride: RouteTarget | null = null): boolean {
   if (url == null || url == '') {
     return true;
   }
@@ -265,8 +279,22 @@ function doIntercept(url: string, api: string): boolean {
     fullPath
   } as RouteTarget;
 
-  // 获取当前来源页面路由（from）
-  const fromTarget: RouteTarget = resolveFromRouteTarget();
+  // 获取当前来源页面路由（from）：若显式传入（如支付宝原生返回补丁），优先采用；否则由全局状态解析
+  let fromTarget: RouteTarget = (fromOverride != null && fromOverride.path != '')
+    ? fromOverride
+    : resolveFromRouteTarget();
+
+  // ⚠️ 核心防御：若是 navigateBack 场景且 from.path 与 target.path 相同（即状态已被目标页提前覆盖），
+  // 则自动从 previousRouteState 恢复真实离开页！
+  if (api == 'navigateBack' && fromTarget.path == target.path) {
+    if (previousRouteState.path != '' && previousRouteState.path != target.path) {
+      fromTarget = {
+        path: previousRouteState.path,
+        query: previousRouteState.query,
+        fullPath: previousRouteState.fullPath
+      } as RouteTarget;
+    }
+  }
 
   // 框架交出的只有三样中立的输入（归一化后的目标 URL 事实 + 来源 URL 事实 + api 名），拿回来的只有裁决：
   // 上下文怎么装配、有哪些业务信号、按什么顺序判，全在 ../guard/ 里，框架不碰也不想知道
@@ -365,6 +393,19 @@ export const switchTabInterceptor: Interceptor = {
   }
 };
 
+/** 最近一次由 navigateBack 拦截/守卫处理放行的目标 url（用于防重复校验） */
+let lastHandledNavigateBackTarget: string = '';
+/** 最近一次由 navigateBack 拦截/守卫处理放行的时间戳 */
+let lastHandledNavigateBackTime: number = 0;
+
+/**
+ * 重置 navigateBack 防重复记录（供单测等环境复位）
+ */
+export function resetLastHandledNavigateBackTarget(): void {
+  lastHandledNavigateBackTarget = '';
+  lastHandledNavigateBackTime = 0;
+}
+
 /**
  * 页面返回调用拦截器（uni.navigateBack 与 router.back()）
  * 计算返回的目标页面在当前页面栈的位置，交由守卫裁决
@@ -407,7 +448,12 @@ export const navigateBackInterceptor: Interceptor = {
           queryStr = pairs.join('&');
         }
         const url = queryStr != '' ? `${path}?${queryStr}` : path;
-        return allowNavigation(url, 'navigateBack');
+        const allowed = allowNavigation(url, 'navigateBack');
+        if (allowed) {
+          lastHandledNavigateBackTarget = cleanPath(path);
+          lastHandledNavigateBackTime = Date.now();
+        }
+        return allowed;
       }
     }
     return true;
@@ -452,14 +498,25 @@ function installH5PopstateListener(): void {
 }
 // #endif
 
-// #ifdef MP-ALIPAY
+// #ifdef MP-WEIXIN || MP-ALIPAY
 /**
- * 监听支付宝小程序页面返回操作（onAppRoute）
- * 解决支付宝小程序原生返回（左上角返回按钮、边缘侧滑返回手势）绕过 navigateBack 拦截器的问题
+ * 监听小程序页面返回操作（onAppRoute）
+ * 解决小程序原生返回（左上角返回按钮、边缘侧滑返回手势）绕过 navigateBack 拦截器的问题
+ *
+ * 覆盖平台：微信小程序（MP-WEIXIN）、支付宝小程序（MP-ALIPAY）
+ *
+ * ⚠️ 关键时序与平台机制：
+ * 1. 微信小程序点击导航栏返回会走 navigateBack 拦截器，而侧滑手势返回直接由宿主 Native 出栈绕过拦截器；
+ * 2. 支付宝小程序无论是点击导航栏还是手势返回，均由宿主 Native 出栈绕过 navigateBack 拦截器；
+ * 3. 本监听必须先于 installRouteStateListener 注册，确保在 routeState 被 handleAppRoute 冲刷前
+ *    先提取离开前的原始来源路由快照（fromTarget），避免出现 to 与 from 相同的时序覆盖 Bug；
+ * 4. 配合 lastHandledNavigateBackTarget 防抖去重，防止微信等平台点击返回触发拦截器后又在 onAppRoute 重复执行守卫。
  */
-function installAlipayNavigateBackListener(): void {
+function installMpNavigateBackListener(): void {
   uni.onAppRoute((event: AppRouteEvent): void => {
-    if (event.openType == 'navigateBack') {
+    const isOpenTypeBack = event.openType == 'navigateBack' || event.openType == 'pageBack'
+      || (event.openType != 'navigateTo' && event.openType != 'redirectTo' && event.openType != 'reLaunch' && event.openType != 'switchTab' && event.openType != 'appLaunch');
+    if (isOpenTypeBack) {
       const rawPath = event.path;
       if (rawPath == '') {
         return;
@@ -488,16 +545,127 @@ function installAlipayNavigateBackListener(): void {
           }
         }
       }
-      doIntercept(url, 'navigateBack');
+
+      const targetPath = cleanPath(rawPath);
+
+      // 防抖去重：如果最近 500ms 内已被 navigateBackInterceptor（如微信点击左上角返回）校验放行过，跳过重复校验
+      if (lastHandledNavigateBackTarget == targetPath && (Date.now() - lastHandledNavigateBackTime) < 500) {
+        lastHandledNavigateBackTarget = '';
+        return;
+      }
+
+      lastHandledNavigateBackTarget = targetPath;
+      lastHandledNavigateBackTime = Date.now();
+
+      // 捕获返回前的真实来源路由快照：
+      // 1. 若当前 routeState.path 尚未被覆盖（不等于 targetPath），则 routeState 依然是离开页；
+      // 2. 若当前 routeState.path 已经被 onPageShow 冲刷成了目标页，则从 previousRouteState 取真实的离开页！
+      let fromTarget: RouteTarget | null = null;
+      if (routeState.path != '' && routeState.path != targetPath) {
+        fromTarget = {
+          path: routeState.path,
+          query: routeState.query,
+          fullPath: routeState.fullPath
+        } as RouteTarget;
+      }
+      else if (previousRouteState.path != '' && previousRouteState.path != targetPath) {
+        fromTarget = {
+          path: previousRouteState.path,
+          query: previousRouteState.query,
+          fullPath: previousRouteState.fullPath
+        } as RouteTarget;
+      }
+
+      doIntercept(url, 'navigateBack', fromTarget);
     }
   });
 }
 // #endif
 
 /**
+ * 校验页面重新显示（onShow / onPageShow / onTabPageShow）时的路由流转
+ * 专为解决支付宝小程序等端「侧滑手势返回」不触发 uni.onAppRoute 与 navigateBack 拦截器的问题。
+ *
+ * 当页面显示时，若检测到当前栈顶真实页面（currentPath）与全局 routeState 记录的上一活跃页不一致，
+ * 且最近 500ms 内未被 navigateBack 拦截器处理过，则说明发生了一次底层的原生手势出栈返回。
+ * 此时自动构造路由守卫上下文，执行 navigateBack 守卫裁决；若守卫拦截，自动改跳重定向目标。
+ *
+ * @param targetPath 可选，当前页面路径（默认通过 getCurrentPath() 获取）
+ * @returns 守卫是否放行当前页面显示
+ */
+export function checkAndInterceptPageShow(targetPath: string = ''): boolean {
+  const currentPath = targetPath != '' ? cleanPath(targetPath) : getCurrentPath();
+  if (currentPath == '') {
+    return true;
+  }
+
+  // 1. 若全局路由状态尚未建立（冷启动），由 checkDirectEntry 负责，此处跳过
+  if (routeState.path == '') {
+    return true;
+  }
+
+  // 2. 若当前栈顶页面与当前记录的 routeState 相同，说明正常进入或已被同步，无需重复校验
+  if (routeState.path == currentPath) {
+    return true;
+  }
+
+  // 3. 防抖去重：如果最近 500ms 内已被 navigateBackInterceptor 或 onAppRoute 处理过，跳过
+  if (lastHandledNavigateBackTarget == currentPath && (Date.now() - lastHandledNavigateBackTime) < 500) {
+    return true;
+  }
+
+  // 4. 此时检测到状态脱节：用户原先在 routeState.path，通过手势直接返回到了 currentPath
+  lastHandledNavigateBackTarget = currentPath;
+  lastHandledNavigateBackTime = Date.now();
+
+  // 构建来源路由快照（用户刚刚离开的上一活跃页面）
+  const fromTarget: RouteTarget = {
+    path: routeState.path,
+    query: routeState.query,
+    fullPath: routeState.fullPath
+  } as RouteTarget;
+
+  // 构建目标页面完整 URL（包含 query）
+  const optObj = getCurrentPageOptions();
+  let toUrl = currentPath;
+  if (optObj != null) {
+    const keys = UTSJSONObject.keys(optObj);
+    if (keys.length > 0) {
+      const pairs: string[] = [];
+      for (let i = 0; i < keys.length; i++) {
+        const k = keys[i];
+        const v = optObj[k];
+        if (v != null) {
+          pairs.push(`${k}=${encodeURIComponent(`${v}`)}`);
+        }
+      }
+      if (pairs.length > 0) {
+        toUrl = `${toUrl}?${pairs.join('&')}`;
+      }
+    }
+  }
+
+  // 执行路由守卫拦截
+  const allowed = doIntercept(toUrl, 'navigateBack', fromTarget);
+  if (!allowed) {
+    return false;
+  }
+
+  return true;
+}
+
+/**
  * 全局路由拦截安装器
  */
 export function installRouteInterceptor() {
+  // 挂接页面栈同步前置钩子：拦截手势返回未走拦截器的情况（如支付宝小程序侧滑手势返回）
+  setBeforeSyncRouteHook((currentPath: string): boolean => {
+    return checkAndInterceptPageShow(currentPath);
+  });
+  // #ifdef MP-WEIXIN || MP-ALIPAY
+  // 必须优先于 routeState 监听器注册：确保小程序返回时在 routeState 被冲刷前捕获准确的 from 来源页
+  installMpNavigateBackListener();
+  // #endif
   // 路由状态监听在本处（main.uts 创建应用时）安装：必须早于任何页面 setup，
   // 否则首个页面要靠 ensureRouteReady 冷启动回读才拿到路由
   installRouteStateListener();
@@ -509,9 +677,6 @@ export function installRouteInterceptor() {
   uni.addInterceptor('chooseLocation', chooseLocationInterceptor);
   // #ifdef H5 || WEB
   installH5PopstateListener();
-  // #endif
-  // #ifdef MP-ALIPAY
-  installAlipayNavigateBackListener();
   // #endif
 }
 

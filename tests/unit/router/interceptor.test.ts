@@ -18,7 +18,7 @@ import { utsObject } from './helpers';
 async function loadInterceptor() {
   vi.resetModules();
   const interceptorMod = await import('@/src/router/interceptor/interceptor.uts');
-  const stateMod = await import('@/src/router/hooks/route-state.uts');
+  const stateMod = await import('@/src/router/core/route-state.uts');
   return { ...interceptorMod, ...stateMod };
 }
 
@@ -225,6 +225,57 @@ describe('路由拦截器 Unit Tests', () => {
     const { LOGIN_PAGE } = await import('@/src/router/config/config.uts');
 
     checkDirectEntry({ path: 'src/sub/routerParamsBasicDemo/routerParamsBasicDemo' } as any);
+    expect(uni.navigateTo).toHaveBeenCalledTimes(1);
+    expect((uni.navigateTo as any).mock.calls[0][0].url.startsWith(LOGIN_PAGE)).toBe(true);
+  });
+
+  it('routeState 变化时会正确记录 previousRouteState 作为前序离开页', async () => {
+    const { navigateToInterceptor, routeState } = await loadInterceptor();
+    const { previousRouteState } = await import('@/src/router/core/route-state.uts');
+
+    (globalThis as any).getCurrentPages = vi.fn(() => [{ route: 'src/pages/index/index' }]);
+    navigateToInterceptor.invoke({ url: '/src/pages/me/me' });
+
+    expect(routeState.path).toBe('/src/pages/me/me');
+    expect(previousRouteState.path).toBe('/src/pages/index/index');
+  });
+
+  it('checkAndInterceptPageShow 能够拦截支付宝侧滑手势返回，自动触发 navigateBack 守卫', async () => {
+    const { checkAndInterceptPageShow, resetLastHandledNavigateBackTarget, routeState } = await loadInterceptor();
+    resetLastHandledNavigateBackTarget();
+
+    // 假设用户原先处于 /src/pages/me/me
+    (globalThis as any).getCurrentPages = vi.fn(() => [{ route: 'src/pages/me/me' }]);
+    routeState.path = '/src/pages/me/me';
+    routeState.fullPath = '/src/pages/me/me';
+
+    // 模拟支付宝原生侧滑返回到了 /src/pages/index/index（此时未触发 uni.onAppRoute，routeState 滞留）
+    (globalThis as any).getCurrentPages = vi.fn(() => [{ route: 'src/pages/index/index' }]);
+
+    const allowed = checkAndInterceptPageShow();
+    expect(allowed).toBe(true);
+
+    // 500ms 内再次调用会被防抖去重直接放行
+    const allowedTwice = checkAndInterceptPageShow();
+    expect(allowedTwice).toBe(true);
+  });
+
+  it('checkAndInterceptPageShow 当返回到需要登录的页面时，未登录会自动拦截并重定向', async () => {
+    const { checkAndInterceptPageShow, resetLastHandledNavigateBackTarget, routeState } = await loadInterceptor();
+    resetLastHandledNavigateBackTarget();
+    const { LOGIN_PAGE } = await import('@/src/router/config/config.uts');
+
+    // 假设用户原先处于免登录页面 /src/pages/index/index
+    routeState.path = '/src/pages/index/index';
+    routeState.fullPath = '/src/pages/index/index';
+
+    // 模拟手势返回到了需要登录的受保护页面 /src/sub/routerParamsBasicDemo/routerParamsBasicDemo
+    (globalThis as any).getCurrentPages = vi.fn(() => [
+      { route: 'src/sub/routerParamsBasicDemo/routerParamsBasicDemo' }
+    ]);
+
+    const allowed = checkAndInterceptPageShow();
+    expect(allowed).toBe(false);
     expect(uni.navigateTo).toHaveBeenCalledTimes(1);
     expect((uni.navigateTo as any).mock.calls[0][0].url.startsWith(LOGIN_PAGE)).toBe(true);
   });

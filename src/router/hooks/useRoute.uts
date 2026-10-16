@@ -22,15 +22,15 @@
  */
 import { onPageHide, onPageShow } from '@dcloudio/uni-app';
 import { getCurrentInstance, onUnmounted } from 'vue';
-import type { RouteLocation } from './route-types.uts';
-import { ensureRouteReady, routeState, syncRouteState } from './route-state.uts';
+import type { RouteLocation } from '../core/route-types.uts';
+import { ensureRouteReady, routeState, syncRouteState } from '../core/route-state.uts';
 import {
   closeRouteSnapshot,
   hideRouteSnapshot,
   openRouteSnapshot,
   readRouteSnapshot,
   showRouteSnapshot
-} from './route-snapshot.uts';
+} from '../core/route-snapshot.uts';
 
 /**
  * 获取**本页**路由（响应式、只读）

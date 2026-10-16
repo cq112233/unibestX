@@ -18,7 +18,7 @@ import { utsObject } from './helpers';
 /** 取一份全新的 route-state 模块（模块级状态在用例间会串，必须逐用例重置） */
 async function loadRouteState() {
   vi.resetModules();
-  const mod = await import('@/src/router/hooks/route-state.uts');
+  const mod = await import('@/src/router/core/route-state.uts');
   const useRouteMod = await import('@/src/router/hooks/useRoute.uts');
   return { ...mod, useRoute: useRouteMod.useRoute };
 }

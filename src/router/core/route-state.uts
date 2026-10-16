@@ -10,7 +10,9 @@
  *    「发起方知道自己要去哪」，不依赖任何平台回调时序，App / H5 / 小程序一致。
  *    必要原因见下方「onAppRoute 在目标页 onShow 之后才触发」。
  * 2. **主**：`uni.onAppRoute` 官方「路由完成」事件 —— 全端支持：App-Android / App-iOS /
- *    Web / 微信 / 支付宝 / 鸿蒙 均为 unixVer 5.25 起（本项目基座 5.26，真机实测**会触发**）。
+ *    Web / 微信 / 鸿蒙（unixVer 5.25 起，本项目基座 5.26，真机实测**会触发**）；
+ *    支付宝小程序自 HBuilderX 5.31 起支持（底层依赖 my.createRouteObserver，模拟器中未提供，需在真机环境测试；
+ *    目标页不存在时不触发 onAppRoute 但会触发 onBeforeAppRoute）。
  *    类型声明不在项目的 `node_modules/@dcloudio/*` 里（那里没有 uni-app-x 包），真源在
  *    HBuilderX 内置 dts：`builtin-dts/uniappx/node_modules/@dcloudio/uni-app-x/types/
  *    uni/uts-plugin-api/lib/uni-route/utssdk/interface.d.ts`（`OnAppRoute` / `AppRouteEvent`）。
@@ -72,6 +74,7 @@ import {
 import { publishRoute } from './route-snapshot.uts';
 import { createEmptyRoute } from './route-types.uts';
 import type { RouteLocation } from './route-types.uts';
+import type { RouteTarget } from '../guard/types.uts';
 
 /**
  * 当前路由（响应式）—— **全局唯一一份**，语义是「应用当前 / 正在导航到的路由」
@@ -82,6 +85,13 @@ import type { RouteLocation } from './route-types.uts';
  *    请通过 `router.push()` 等导航方法或 `syncRouteState()` 驱动它更新。
  */
 export const routeState: RouteLocation = reactive(createEmptyRoute());
+
+/** 记录上一个已生效的稳定路由快照（用于在返回或目标页已冲刷状态时取到真正的离开页） */
+export const previousRouteState: RouteTarget = {
+  path: '',
+  query: new Map<string, string>(),
+  fullPath: ''
+} as RouteTarget;
 
 // ==========================================
 // 路由元信息注册表（可选的轻量路由表）
@@ -388,6 +398,23 @@ function commitRoute(path: string, query: Map<string, string>, fullPath: string,
   if (normalizedPath == '') {
     return;
   }
+  // 在全局 routeState 被改写前，若原路径非空且与新路径不同，暂存为上一个路由快照
+  if (routeState.path != '' && routeState.path != normalizedPath) {
+    previousRouteState.path = routeState.path;
+    previousRouteState.fullPath = routeState.fullPath;
+    const prevQuery = new Map<string, string>();
+    routeState.query.forEach((v: string, k: string) => {
+      prevQuery.set(k, v);
+    });
+    previousRouteState.query = prevQuery;
+  }
+  else if (routeState.path == '' && previousRouteState.path == '') {
+    const cur = getCurrentPath();
+    if (cur != '' && cur != normalizedPath) {
+      previousRouteState.path = cur;
+      previousRouteState.fullPath = cur;
+    }
+  }
   const meta = getRouteMeta(normalizedPath);
   routeState.path = normalizedPath;
   routeState.fullPath = fullPath;
@@ -491,6 +518,18 @@ function queryMapFromObject(raw: UTSJSONObject | null): Map<string, string> {
   return query;
 }
 
+/** 页面栈回读同步前的拦截守卫钩子（返回 false 表示拦截并不再继续提交路由状态） */
+export type BeforeSyncRouteHook = (currentPath: string) => boolean;
+
+let beforeSyncRouteHook: BeforeSyncRouteHook | null = null;
+
+/**
+ * 注册 syncRouteState 执行前置钩子（供 interceptor.uts 挂接页面返回守卫校验）
+ */
+export function setBeforeSyncRouteHook(hook: BeforeSyncRouteHook | null): void {
+  beforeSyncRouteHook = hook;
+}
+
 /**
  * 从页面栈回读当前路由（冷启动 / 返回上一页 / 导航失败回滚 / 页面重新显示时的兜底）
  *
@@ -507,6 +546,12 @@ export function syncRouteState(): void {
   const currentPath = getCurrentPath();
   if (currentPath == '') {
     return;
+  }
+  if (beforeSyncRouteHook != null) {
+    const allowed = beforeSyncRouteHook!(currentPath);
+    if (!allowed) {
+      return;
+    }
   }
   const query = queryMapFromObject(getCurrentPageOptions());
   if (currentPath == routeState.path && query.size == 0) {

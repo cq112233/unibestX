@@ -17,7 +17,7 @@ import { extractDistinctPlatformConditions, loadPlatformPagesJson } from './page
  *
  * 但运行时没有任何 API 能整条读出页面配置 —— 官方的 `$getPageStyle()` 只返回 style 节点；pages.json
  * 本身也不随产物分发（小程序侧被编译成 app.json，且自定义字段全被丢掉）。所以只能构建期整表落成一个
- * .uts 字符串常量，由 src/router/hooks/route-state.uts 首用时 `JSON.parseObject` 解析并缓存。
+ * .uts 字符串常量，由 src/router/core/route-state.uts 首用时 `JSON.parseObject` 解析并缓存。
  *
  * 本阶段在核心写完 pages.json 之前运行，直接复用即将被序列化的那个 output 对象 —— 于是
  * 「pages.json 里是什么，表里就是什么」是结构上成立的，不依赖任何时序假设。
@@ -111,7 +111,7 @@ export function renderRouteMetaSource(table: Record<string, PageConfig>): string
     ' * ⚠️ 本文件由 plugins/vite-plugin-uni-pages-route-meta.ts 自动生成，请勿手动修改。',
     ' *',
     ' * 内容：pages.json 里每个页面的**完整配置项**（页面 definePage 声明什么，这里就是什么），',
-    ' *      供 `useRoute().meta / .name` 读取，见 src/router/hooks/route-state.uts。',
+    ' *      供 `useRoute().meta / .name` 读取，见 src/router/core/route-state.uts。',
     ' * 生成时机：每次生成 / 更新 pages.json 时同步重写。',
     ' */',
     `export const PAGE_META_JSON: string = ${stringLiteral};`,
@@ -152,7 +152,7 @@ export function writeRouteMetaFile(output: Record<string, any>, projectRoot: str
         ' * ⚠️ 本文件由 plugins/vite-plugin-uni-pages-route-meta.ts 自动生成，请勿手动修改。',
         ' *',
         ' * 内容：pages.json 里每个页面的**完整配置项**（支持多平台条件编译），',
-        ' *      供 `useRoute().meta / .name` 读取，见 src/router/hooks/route-state.uts。',
+        ' *      供 `useRoute().meta / .name` 读取，见 src/router/core/route-state.uts。',
         ' * 生成时机：每次生成 / 更新 pages.json 时同步重写。',
         ' */'
       ];
