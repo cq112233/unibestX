@@ -26,8 +26,10 @@ import { isApp, isMpAlipay } from '@/src/config/env/platform.uts';
 const router = useRouter();
 const route = useRoute();
 
-console.log(route);
-console.log(router);
+console.log(route, 'route');
+console.log(route.path, 'route.path');
+console.log(route.fullPath, 'route.fullPath');
+console.log(router, 'router');
 
 // definePage 支持「静态对象」与「函数式（含 async 异步）」写法：
 // 1. 跨端条件配置：基于 options.platform 进行多端分支判断，构建期会自动生成 pages.json 中的条件编译块（#ifdef / #endif）

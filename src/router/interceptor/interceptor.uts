@@ -3,6 +3,7 @@ import { runRouterGuard } from '../guard/index.uts';
 import type { RouteTarget } from '../guard/types.uts';
 import { applyTargetRouteFromUrl, installRouteStateListener, routeState, syncRouteState } from '../hooks/route-state.uts';
 import { getQueryString, parseUrlToObj } from '../utils/utils.uts';
+import { isH5 } from '@/src/config/env/platform.uts';
 
 /**
  * 本文件是**框架侧**：只负责「读 uni 导航入参 → 归一化 URL → 交给业务守卫裁决 →
@@ -366,6 +367,58 @@ export const switchTabInterceptor: Interceptor = {
 };
 
 /**
+ * 页面返回调用拦截器（uni.navigateBack 与 router.back()）
+ * 计算返回的目标页面在当前页面栈的位置，交由守卫裁决
+ */
+export const navigateBackInterceptor: Interceptor = {
+  invoke(options: any): boolean {
+    const pages = getCurrentPages();
+    let delta = 1;
+    if (options != null) {
+      const optMap = options as UTSJSONObject;
+      const d = optMap.delta as number | null;
+      if (d != null && d > 0) {
+        delta = d;
+      }
+    }
+    const targetIdx = pages.length - 1 - delta;
+    if (targetIdx >= 0 && targetIdx < pages.length) {
+      const targetPage = pages[targetIdx];
+      const targetRoute = targetPage.route ?? '';
+      if (targetRoute != '') {
+        let path = targetRoute;
+        if (path.startsWith('src/')) {
+          path = `/${path}`;
+        }
+        if (!path.startsWith('/')) {
+          path = `/${path}`;
+        }
+        const optObj: UTSJSONObject | null = targetPage.options ?? null;
+        let queryStr = '';
+        if (optObj != null) {
+          const keys = UTSJSONObject.keys(optObj);
+          const pairs: string[] = [];
+          for (let i = 0; i < keys.length; i++) {
+            const k = keys[i];
+            const v = optObj[k];
+            if (v != null) {
+              pairs.push(`${k}=${encodeURIComponent(`${v}`)}`);
+            }
+          }
+          queryStr = pairs.join('&');
+        }
+        const url = queryStr != '' ? `${path}?${queryStr}` : path;
+        return allowNavigation(url, 'navigateBack');
+      }
+    }
+    return true;
+  },
+  fail(_err: any): void {
+    syncRouteStateDeferred();
+  }
+};
+
+/**
  * 地图选点调用拦截器（默认直接放行）
  */
 export const chooseLocationInterceptor: Interceptor = {
@@ -373,6 +426,32 @@ export const chooseLocationInterceptor: Interceptor = {
     return true;
   }
 };
+
+/**
+ * 监听 H5 浏览器历史前进/后退操作（popstate）
+ * 当用户点击浏览器自带的前进/后退按钮时触发守卫校验
+ */
+function installH5PopstateListener(): void {
+  if (isH5) {
+    if (typeof window != 'undefined') {
+      window.addEventListener('popstate', () => {
+        setTimeout(() => {
+          let h5Url = '';
+          const hash = window.location.hash;
+          if (hash.startsWith('#/')) {
+            h5Url = hash.substring(1);
+          }
+          else {
+            h5Url = window.location.pathname + window.location.search;
+          }
+          if (h5Url != '' && h5Url != '/') {
+            doIntercept(h5Url, 'popstate');
+          }
+        }, 0);
+      });
+    }
+  }
+}
 
 /**
  * 全局路由拦截安装器
@@ -385,21 +464,39 @@ export function installRouteInterceptor() {
   uni.addInterceptor('reLaunch', reLaunchInterceptor);
   uni.addInterceptor('redirectTo', redirectToInterceptor);
   uni.addInterceptor('switchTab', switchTabInterceptor);
+  uni.addInterceptor('navigateBack', navigateBackInterceptor);
   uni.addInterceptor('chooseLocation', chooseLocationInterceptor);
+  installH5PopstateListener();
+}
+
+/** 记录是否已经完成过初始冷启动入口检查（避免 App 后台切前台时重复检查普通入口） */
+let initialEntryChecked: boolean = false;
+
+/**
+ * 重置入口检查标记（主要供单测环境复位）
+ */
+export function resetInitialEntryChecked(): void {
+  initialEntryChecked = false;
 }
 
 /**
- * 校验并处理直接进入（如 H5 直链、小程序分享链接等）的路由场景，补充权限校验
- * @param options 直链参数对象，取 `options.path` 作为目标路径（不带前导 `/` 时会补上）；
+ * 校验并处理直接进入（如 App 冷启动首屏、H5 直链、小程序分享链接等）的路由场景，补充权限守卫校验
+ * @param options 直链参数对象，取 `options.path` 作为目标路径；
  *                H5 端随后会用 `location.hash` / `pathname` 覆盖它，直链地址优先以免丢查询串；
- *                传 null 或 path 为空时**直接返回**，不触发任何拦截校验
  */
 export function checkDirectEntry(options: UTSJSONObject | null) {
+  // 1. 如果已有外部直链参数，优先使用直达路径
+  let targetPath = '';
   if (options != null) {
     const pathVal = options.path as string | null;
     if (pathVal != null && pathVal != '') {
-      let url = `/${pathVal}`;
-      // #ifdef H5
+      targetPath = pathVal;
+    }
+  }
+
+  // 2. H5 端优先提取浏览器地址栏真实路由
+  if (isH5) {
+    if (typeof window != 'undefined') {
       let h5Url = '';
       const hash = window.location.hash;
       if (hash.startsWith('#/')) {
@@ -409,10 +506,60 @@ export function checkDirectEntry(options: UTSJSONObject | null) {
         h5Url = window.location.pathname + window.location.search;
       }
       if (h5Url != '' && h5Url != '/') {
-        url = h5Url;
+        targetPath = h5Url;
       }
-      // #endif
-      navigateToInterceptor.invoke({ url } as any);
     }
+  }
+
+  // 3. 如果既无直达 path 也不是 H5 定向地址，针对冷启动首屏（如 App 打开）做一次准入校验
+  if (targetPath == '') {
+    if (initialEntryChecked) {
+      return;
+    }
+    const pages = getCurrentPages();
+    if (pages.length > 0) {
+      const pageRoute = pages[0].route ?? '';
+      if (pageRoute != '') {
+        targetPath = pageRoute;
+      }
+    }
+    if (targetPath == '') {
+      targetPath = '/src/pages/index/index';
+    }
+  }
+
+  initialEntryChecked = true;
+
+  let url = targetPath;
+  if (url.startsWith('src/')) {
+    url = `/${url}`;
+  }
+  if (!url.startsWith('/')) {
+    url = `/${url}`;
+  }
+
+  // 如果 options 携带参数且 url 尚未包含 query，拼接参数
+  if (options != null && !url.includes('?')) {
+    const queryMap = options.query as UTSJSONObject | null;
+    if (queryMap != null) {
+      const keys = UTSJSONObject.keys(queryMap);
+      const pairs: string[] = [];
+      for (let i = 0; i < keys.length; i++) {
+        const k = keys[i];
+        const v = queryMap[k];
+        if (v != null) {
+          pairs.push(`${k}=${encodeURIComponent(`${v}`)}`);
+        }
+      }
+      if (pairs.length > 0) {
+        url = `${url}?${pairs.join('&')}`;
+      }
+    }
+  }
+
+  // 执行路由守卫裁决（'appLaunch' 语义）
+  const allowed = doIntercept(url, 'appLaunch');
+  if (allowed) {
+    markTargetRoute(url);
   }
 }

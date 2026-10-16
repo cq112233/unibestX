@@ -192,4 +192,40 @@ describe('路由拦截器 Unit Tests', () => {
     expect(routeState.query.get('redirect')).toBe('/src/pages/me/me');
     expect(utsObject({ redirect: routeState.query.get('redirect') }).getString('redirect')).toBe('/src/pages/me/me');
   });
+
+  it('navigateBackInterceptor 能够根据页面栈解析目标页面并交由守卫拦截/放行', async () => {
+    const { navigateBackInterceptor, routeState } = await loadInterceptor();
+
+    (globalThis as any).getCurrentPages = vi.fn(() => [
+      { route: 'src/pages/index/index' },
+      { route: 'src/pages/me/me' }
+    ]);
+
+    const allowed = navigateBackInterceptor.invoke({ delta: 1 });
+    expect(allowed).toBe(true);
+    expect(routeState.path).toBe('/src/pages/index/index');
+  });
+
+  it('checkDirectEntry 能够处理 App 冷启动进入首屏（options 为空或无 path）并跑守卫', async () => {
+    const { checkDirectEntry, resetInitialEntryChecked, routeState } = await loadInterceptor();
+    resetInitialEntryChecked();
+
+    (globalThis as any).getCurrentPages = vi.fn(() => [
+      { route: 'src/pages/index/index' }
+    ]);
+
+    // 冷启动普通进入：options 为 null
+    checkDirectEntry(null);
+    expect(routeState.path).toBe('/src/pages/index/index');
+  });
+
+  it('checkDirectEntry 外部直达带需要登录的路径时，未登录会改跳登录页', async () => {
+    const { checkDirectEntry, resetInitialEntryChecked } = await loadInterceptor();
+    resetInitialEntryChecked();
+    const { LOGIN_PAGE } = await import('@/src/router/config/config.uts');
+
+    checkDirectEntry({ path: 'src/sub/routerParamsBasicDemo/routerParamsBasicDemo' } as any);
+    expect(uni.navigateTo).toHaveBeenCalledTimes(1);
+    expect((uni.navigateTo as any).mock.calls[0][0].url.startsWith(LOGIN_PAGE)).toBe(true);
+  });
 });

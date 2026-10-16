@@ -2,7 +2,7 @@
  * 守卫契约：类型与裁决构造器 —— 零依赖叶子文件
  *
  * 为什么单独一个文件：规则文件（./guardLogin.uts 之类）与入口（./index.uts）都要用这几个类型
- * 和 `allow()` / `block()`。若把它们放进 index.uts，规则文件就得反过来 import index.uts ——
+ * 和 `allow()` / `block()` / `next()`。若把它们放进 index.uts，规则文件就得反过来 import index.uts ——
  * 入口与规则互相 import 会成环（Kotlin 端类静态初始化死锁）。放这里，两边都只单向依赖它。
  *
  * ⚠️ 本文件保持**零依赖**（不 import 任何模块），也别往里写业务规则。
@@ -24,20 +24,6 @@ export type RouteTarget = {
   fullPath: string;
 };
 
-/**
- * 守卫上下文：框架归一化 URL → buildGuardContext() 装配业务信号 → 交给规则裁决
- */
-export type RouteGuardContext = {
-  /** 本次跳转的目标 */
-  to: RouteTarget;
-  /** 上一个页面（来源页面）路由；若为冷启动首跳或无前序页面，各字段为空（path 为 ''） */
-  from: RouteTarget;
-  /** 触发本次跳转的 uni API 名：`navigateTo` / `redirectTo` / `reLaunch` / `switchTab` */
-  api: string;
-  /** 当前登录态快照（由 ./guardLogin.uts 的 buildGuardContext() 装配；口径见那里的说明） */
-  isLoggedIn: boolean;
-};
-
 /** 构造空的 RouteTarget（用于首屏 / 无来源页面时的 from 兜底） */
 export function createEmptyRouteTarget(): RouteTarget {
   return {
@@ -57,12 +43,48 @@ export type GuardResult = {
   redirect: string | null;
 };
 
-/** 构造放行裁决 */
-export function allow(): GuardResult {
-  return { pass: true, redirect: null } as GuardResult;
+/**
+ * 对齐 vue-router 的 next() 构造裁决
+ * - `next()` / `next(true)`：放行本次导航（等价于 `allow()`）
+ * - `next(false)`：拦截并取消本次导航（等价于 `block(null)`）
+ * - `next('/login')`：重定向改跳至目标地址（等价于 `block('/login')`）
+ */
+export function next(location: any | null = null): GuardResult {
+  if (location == null) {
+    return { pass: true, redirect: null } as GuardResult;
+  }
+  if (typeof location == 'boolean') {
+    if (location == true) {
+      return { pass: true, redirect: null } as GuardResult;
+    }
+    return { pass: false, redirect: null } as GuardResult;
+  }
+  return { pass: false, redirect: `${location}` } as GuardResult;
 }
 
-/** 构造拦截裁决；`redirect` 传 null 表示静默拦截（不做任何跳转） */
-export function block(redirect: string | null = null): GuardResult {
-  return { pass: false, redirect } as GuardResult;
+/** 构造放行裁决（对齐 vue-router 的 next()） */
+export function allow(): GuardResult {
+  return next();
 }
+
+/** 构造拦截裁决；`redirect` 传 null 表示静默拦截，传 url 表示改跳（对齐 vue-router 的 next(redirect)） */
+export function block(redirect: string | null = null): GuardResult {
+  if (redirect == null) {
+    return next(false);
+  }
+  return next(redirect);
+}
+
+/**
+ * 守卫上下文：通用路由事实与裁决构造器（业务无关的纯粹上下文）
+ */
+export type RouteGuardContext = {
+  /** 本次跳转的目标 */
+  to: RouteTarget;
+  /** 上一个页面（来源页面）路由；若为冷启动首跳或无前序页面，各字段为空（path 为 ''） */
+  from: RouteTarget;
+  /** 触发本次跳转的 uni API 名：`navigateTo` / `redirectTo` / `reLaunch` / `switchTab` / `appLaunch` */
+  api: string;
+  /** 对齐 vue-router 的裁决构造函数，可直接从 ctx 解构使用：const { to, next } = ctx */
+  next: (location?: any | null) => GuardResult;
+};

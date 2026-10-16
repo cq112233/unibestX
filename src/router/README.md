@@ -158,7 +158,7 @@ toLoginPage({ queryString: '?redirect=%2Fsrc%2Fpages%2Fme%2Fme' } as UTSJSONObje
 
 **业务规则一律写在 [guard/](guard/)**——一条规则一个文件，各自可单测，模板升级不覆盖。框架侧代码与注释里**不出现任何业务词**（登录、权限、会员……），有回归测试盯着。
 
-### 裁决契约
+### 裁决契约（对齐 vue-router 的 `next()`）
 
 ```uts
 type GuardResult = {
@@ -166,23 +166,26 @@ type GuardResult = {
   redirect: string | null;    // 不放行时的改跳目标；null = 静默拦截（不跳任何页面）
 };
 
-allow();                    // 放行
-block();                    // 静默拦截
-block('/src/sub/auth/login?redirect=%2Fsrc%2Fpages%2Fme%2Fme');   // 拦截并改跳
+// 规则内推荐直接从 ctx 解构使用：
+const { to, next } = ctx;
+
+next();                     // 放行（等价于 allow()）
+next(false);                // 静默拦截（等价于 block()）
+next('/src/sub/auth/login?redirect=%2Fsrc%2Fpages%2Fme%2Fme');   // 拦截并改跳（等价于 block('...')）
 ```
 
-框架只调 [guard/index.uts](guard/index.uts) 的 `runRouterGuard(to, api)` 这一个符号，它内部先 `buildGuardContext()` 装配上下文（**全项目唯一读 store 的地方**），再按优先级跑规则链——**前面拦下后，后面的规则完全不执行**。
+框架只调 [guard/index.uts](guard/index.uts) 的 `runRouterGuard(to, from, api)` 这一个符号，它内部先 `buildGuardContext()` 装配上下文（**全项目唯一读 store 的地方**），再按优先级跑规则链——**前面拦下后，后面的规则完全不执行**。
 
 ### 登录规则（`guardLogin.uts`）
 
 | 登录态 | 策略 | 目标页面 | 结果 |
 | :--- | :--- | :--- | :--- |
-| 已登录 | — | 非登录页 | `allow()` |
-| 已登录 | — | 登录页 | `block(redirect 参数 ?? 首页)` |
-| 未登录 | 白名单 | 名单内页面 / 登录页 | `allow()` |
-| 未登录 | 白名单 | 其余页面 | `block(登录页?redirect=原地址)` |
-| 未登录 | 黑名单 | 名单内页面 | `block(登录页?redirect=原地址)` |
-| 未登录 | 黑名单 | 其余页面 | `allow()` |
+| 已登录 | — | 非登录页 | `next()` |
+| 已登录 | — | 登录页 | `next(redirect 参数 ?? 首页)` |
+| 未登录 | 白名单 | 名单内页面 / 登录页 | `next()` |
+| 未登录 | 白名单 | 其余页面 | `next(登录页?redirect=原地址)` |
+| 未登录 | 黑名单 | 名单内页面 | `next(登录页?redirect=原地址)` |
+| 未登录 | 黑名单 | 其余页面 | `next()` |
 
 被拦下跳登录页时，守卫会把**原地址**编码进 `?redirect=`，登录成功由 [login.uvue](../sub/auth/login.uvue) 解出来 `redirectTo` 回原页。
 

@@ -36,43 +36,7 @@
  */
 import { useTokenStore } from '@/src/store/index.uts';
 import { EXCLUDE_LOGIN_PATH_LIST, isNeedLoginMode, LOGIN_PAGE } from '../config/config.uts';
-import { allow, block } from './types.uts';
-import type { GuardResult, RouteGuardContext, RouteTarget } from './types.uts';
-
-/**
- * 装配一次导航的守卫上下文 —— **上下文里装哪些业务信号，由业务侧说了算**
- *
- * 框架只交出三样中立的输入：本次导航目标 `to`、来源页面 `from` 和触发 API 名 `api`。
- * 「当前算不算登录」这类**业务信号一律在这里取** —— 于是框架侧不 import
- * store、也不碰登录态，它只把这三样原样递给 ./index.uts 的 runRouterGuard()。
- *
- * ⚠️ 「什么算已登录」的**口径在 store**（src/store/vdom/token.uts、vapor/token.uts 的
- *    `hasValidLogin()`：token 存在且未过期）。本函数只负责取，别在这里重写一份判断；
- *    ⚠️只能同步取：调用链上游是 `uni.addInterceptor` 的 invoke（必须同步返回 boolean）。
- *
- * @param to 本次导航目标（框架已归一化好的绝对路径 / query / fullPath）
- * @param from 本次导航来源页面（若为首次进入可能为空 RouteTarget）
- * @param api 触发本次跳转的 uni API 名
- */
-export function buildGuardContext(to: RouteTarget, from: RouteTarget | null, api: string): RouteGuardContext {
-  let safeFrom: RouteTarget;
-  if (from != null) {
-    safeFrom = from;
-  }
-  else {
-    safeFrom = {
-      path: '',
-      query: new Map<string, string>(),
-      fullPath: ''
-    } as RouteTarget;
-  }
-  return {
-    to,
-    from: safeFrom,
-    api,
-    isLoggedIn: useTokenStore().hasValidLogin()
-  } as RouteGuardContext;
-}
+import type { GuardResult, RouteGuardContext } from './types.uts';
 
 /** 已登录却又点进登录页、且没带 redirect 参数时的兜底目标 */
 export const DEFAULT_HOME_PAGE = '/src/pages/index/index';
@@ -93,56 +57,60 @@ export function judgeIsExcludePath(path: string): boolean {
 /**
  * 登录规则：裁决本次导航是否放行（登录态 × 黑白名单策略）
  *
- * 纯函数：只看 ctx、只返回裁决 —— 不用起真机、不用打桩 store 就能把六种组合跑完。
- * 要改登录口径就改这里（或上面「改规则改哪儿」里点名的那两处），别在别处加登录判断。
+ * 登录态直接由本业务守卫调用 tokenStore 获取，不污染通用的 RouteGuardContext 契约。
+ * 要改登录口径就改 store（hasValidLogin），别在别处加登录判断。
  *
- * @param ctx 守卫上下文（目标路由 / 触发 API / 当前登录态）
- * @returns 放行或拦截裁决；拦截时 redirect 为改跳目标，null 为静默拦截
+ * @param ctx 守卫上下文（目标路由 / 触发 API / next 构造器）
+ * @returns 放行或拦截裁决（对齐 vue-router 的 next()）；拦截时 redirect 为改跳目标，null 为静默拦截
  *
  * ## 裁决矩阵
  * | 登录态 | 策略 | 目标页面 | 结果 |
  * | --- | --- | --- | --- |
- * | 已登录 | — | 非登录页 | `allow()` |
- * | 已登录 | — | 登录页 | `block(redirect 参数 ?? DEFAULT_HOME_PAGE)` |
- * | 未登录 | 白名单 | 名单内页面 / 登录页 | `allow()` |
- * | 未登录 | 白名单 | 其余页面 | `block(登录页?redirect=原地址)` |
- * | 未登录 | 黑名单 | 名单内页面 | `block(登录页?redirect=原地址)` |
- * | 未登录 | 黑名单 | 其余页面 | `allow()` |
+ * | 已登录 | — | 非登录页 | `next()` |
+ * | 已登录 | — | 登录页 | `next(redirect 参数 ?? DEFAULT_HOME_PAGE)` |
+ * | 未登录 | 白名单 | 名单内页面 / 登录页 | `next()` |
+ * | 未登录 | 白名单 | 其余页面 | `next(登录页?redirect=原地址)` |
+ * | 未登录 | 黑名单 | 名单内页面 | `next(登录页?redirect=原地址)` |
+ * | 未登录 | 黑名单 | 其余页面 | `next()` |
  */
 export function guardLogin(ctx: RouteGuardContext): GuardResult {
+  const { from: _from, to, next } = ctx;
+  const path = to.path;
+
   console.log(ctx, 'ctx');
-  const path = ctx.to.path;
+
+  const isLoggedIn = useTokenStore().hasValidLogin();
 
   // 1. 已登录
-  if (ctx.isLoggedIn) {
+  if (isLoggedIn) {
     // 1.1 目标不是登录页 → 直接放行
     if (path != LOGIN_PAGE) {
-      return allow();
+      return next();
     }
     // 1.2 已登录却又点进登录页 → 送回来源页（redirect 参数），没带就回首页
-    const redirect = ctx.to.query.get('redirect');
+    const redirect = to.query.get('redirect');
     if (redirect != null && redirect != '') {
-      return block(redirect);
+      return next(redirect);
     }
-    return block(DEFAULT_HOME_PAGE);
+    return next(DEFAULT_HOME_PAGE);
   }
 
   // 2. 未登录：备好「登录页 + 回跳原地址」。整串（连 ? = 一起）encodeURIComponent 是刻意的：
   //    登录页那边 query.get('redirect') 会整体解码一次（见 ../utils/utils.uts 的 decodeQueryValue），
   //    正好还原成本项目统一的「解码态」口径，不会二次转义 —— 别改成只编码值或改用 decodeURI
-  const loginUrl = `${LOGIN_PAGE}?redirect=${encodeURIComponent(ctx.to.fullPath)}`;
+  const loginUrl = `${LOGIN_PAGE}?redirect=${encodeURIComponent(to.fullPath)}`;
 
   // 2.1 白名单策略：默认全拦，仅名单内页面与登录页本身放行
   if (isNeedLoginMode) {
     if (judgeIsExcludePath(path) || path == LOGIN_PAGE) {
-      return allow();
+      return next();
     }
-    return block(loginUrl);
+    return next(loginUrl);
   }
 
   // 2.2 黑名单策略（默认）：默认放行，仅名单内页面需要登录
   if (judgeIsExcludePath(path)) {
-    return block(loginUrl);
+    return next(loginUrl);
   }
-  return allow();
+  return next();
 }

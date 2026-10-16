@@ -18,6 +18,14 @@ const LOGIN_PAGE = '/src/sub/auth/login';
 const HOME_PAGE = '/src/pages/index/index';
 const EXCLUDE_PAGE = '/src/sub/routerParamsBasicDemo/routerParamsBasicDemo';
 
+let mockLoginState = false;
+
+vi.mock('@/src/store/index.uts', () => ({
+  useTokenStore: () => ({
+    hasValidLogin: () => mockLoginState
+  })
+}));
+
 /** 把契约、规则、入口一起取回来 —— 测试要同时验「单条规则」与「整条链」 */
 async function importGuardModules() {
   const types = await import('@/src/router/guard/types.uts');
@@ -47,16 +55,31 @@ async function loadGuard(needLoginMode?: boolean) {
 
 /** 造一份守卫上下文 */
 function makeCtx(over: Record<string, any> = {}): any {
+  if (over.isLoggedIn != null) {
+    mockLoginState = over.isLoggedIn;
+  }
+  else {
+    mockLoginState = false;
+  }
   const path: string = over.path ?? '/src/pages/me/me';
   const query: Map<string, string> = new Map(Object.entries(over.query ?? {}));
   const fromPath: string = over.fromPath ?? '/src/pages/index/index';
   const fromQuery: Map<string, string> = new Map(Object.entries(over.fromQuery ?? {}));
   const from = over.from ?? { path: fromPath, query: fromQuery, fullPath: over.fromFullPath ?? fromPath };
+  const nextFn = over.next ?? ((location: any = null) => {
+    if (location == null || location === true) {
+      return { pass: true, redirect: null };
+    }
+    if (location === false) {
+      return { pass: false, redirect: null };
+    }
+    return { pass: false, redirect: `${location}` };
+  });
   return {
     to: { path, query, fullPath: over.fullPath ?? path },
     from,
     api: over.api ?? 'navigateTo',
-    isLoggedIn: over.isLoggedIn ?? false
+    next: nextFn
   };
 }
 
@@ -242,40 +265,28 @@ describe('路由守卫（业务层）决策矩阵', () => {
     });
   });
 
-  describe('上下文装配 buildGuardContext（业务信号的唯一取处）', () => {
-    it('登录态取自 tokenStore.hasValidLogin()，to / from / api 原样带过去', async () => {
-      vi.resetModules();
-      // 打桩值可变：写死一边过不了两边，才算真验了委派
-      let storedLogin = false;
-      vi.doMock('@/src/store/index.uts', () => ({
-        useTokenStore: () => ({ hasValidLogin: () => storedLogin })
-      }));
-      try {
-        const { buildGuardContext } = await import('@/src/router/guard/guardLogin.uts');
-        const to = {
-          path: '/src/pages/me/me',
-          query: new Map<string, string>([['tab', '2']]),
-          fullPath: '/src/pages/me/me?tab=2'
-        };
-        const from = {
-          path: '/src/pages/index/index',
-          query: new Map<string, string>(),
-          fullPath: '/src/pages/index/index'
-        };
+  describe('上下文装配 buildGuardContext（中立路由事实）', () => {
+    it('to / from / api / next 原样装配，不带任何业务字段（如 isLoggedIn）', async () => {
+      const { buildGuardContext } = await import('@/src/router/guard/index.uts');
+      const to = {
+        path: '/src/pages/me/me',
+        query: new Map<string, string>([['tab', '2']]),
+        fullPath: '/src/pages/me/me?tab=2'
+      };
+      const from = {
+        path: '/src/pages/index/index',
+        query: new Map<string, string>(),
+        fullPath: '/src/pages/index/index'
+      };
 
-        const ctx = buildGuardContext(to, from, 'switchTab');
+      const ctx = buildGuardContext(to, from, 'switchTab');
 
-        expect(ctx.isLoggedIn).toBe(false);
-        expect(ctx.to).toBe(to); // 框架给的 URL 事实原样透传，业务侧不做二次归一化
-        expect(ctx.from).toBe(from); // 来源页面路由原样透传
-        expect(ctx.api).toBe('switchTab');
-
-        storedLogin = true;
-        expect(buildGuardContext(to, from, 'navigateTo').isLoggedIn).toBe(true);
-      }
-      finally {
-        vi.doUnmock('@/src/store/index.uts');
-      }
+      expect(ctx.to).toBe(to); // 框架给的 URL 事实原样透传，业务侧不做二次归一化
+      expect(ctx.from).toBe(from); // 来源页面路由原样透传
+      expect(ctx.api).toBe('switchTab');
+      expect(typeof ctx.next).toBe('function');
+      expect(ctx.next().pass).toBe(true);
+      expect((ctx as any).isLoggedIn).toBeUndefined(); // 解耦确认：通用上下文不包含业务状态
     });
 
     it('框架侧（interceptor.uts）不碰业务：不 import store、连注释里都不出现业务词', async () => {

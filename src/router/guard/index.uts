@@ -26,17 +26,41 @@
  * （见 tests/unit/router/route-guard.test.ts）。别为了省一行把 store 调用挪进规则里 ——
  * 那样这层就再也测不了了。
  */
-import { buildGuardContext, guardLogin } from './guardLogin.uts';
-import { allow } from './types.uts';
+import { guardLogin } from './guardLogin.uts';
+import { createEmptyRouteTarget, next } from './types.uts';
 import type { GuardResult, RouteGuardContext, RouteTarget } from './types.uts';
+
+/**
+ * 装配一次导航的守卫上下文（中立的路由事实 + next 裁决构造器）
+ *
+ * @param to 本次导航目标（框架已归一化好的绝对路径 / query / fullPath）
+ * @param from 本次导航来源页面（若为首次进入可能为空 RouteTarget）
+ * @param api 触发本次跳转的 uni API 名
+ */
+export function buildGuardContext(to: RouteTarget, from: RouteTarget | null, api: string): RouteGuardContext {
+  let safeFrom: RouteTarget;
+  if (from != null) {
+    safeFrom = from;
+  }
+  else {
+    safeFrom = createEmptyRouteTarget();
+  }
+  return {
+    to,
+    from: safeFrom,
+    api,
+    next: (location: any | null = null): GuardResult => {
+      return next(location);
+    }
+  } as RouteGuardContext;
+}
 
 /**
  * 路由守卫**唯一入口**（框架侧调的就是它）：交出导航事实 → 装配上下文 → 跑规则链 → 给出裁决
  *
- * 为什么要有这一层：框架只需要「入参进、裁决出」，不必知道上下文里装了哪些业务信号、
- * 更不必知道第一条规则是什么。所以上下文装配与规则链都收在本文件后面，框架**只 import 这一个符号**
- * —— 这样「框架文件里出现 'guardLogin' / '登录态'」这类漏耦合在代码层面就不可能发生。
- * 新增业务信号或规则都在 ./ 目录内消化，本函数签名冻结。
+ * 为什么要有这一层：框架只需要「入参进、裁决出」，不必知道规则链里有哪些具体规则。
+ * 所以上下文装配与规则链都收在本文件后面，框架**只 import 这一个符号**。
+ * 新增业务规则都在 ./ 目录内消化，本函数签名冻结。
  *
  * @param to 归一化后的目标路由（框架给出的中立 URL 事实，原样透传给装配，不做二次归一化）
  * @param from 来源页面路由（上一个页面事实，若无则为 null）
@@ -58,7 +82,7 @@ export function runRouterGuard(to: RouteTarget, from: RouteTarget | null, api: s
  *    那时才值 UTS 上「函数当值 / 对象字面量带函数」的复杂度。
  *
  * @param ctx 守卫上下文（目标路由 / 触发 API / 当前登录态，由 buildGuardContext() 装配）
- * @returns 第一条拦下它的规则给出的裁决；全部通过则为 allow()
+ * @returns 第一条拦下它的规则给出的裁决；全部通过则为 next()
  */
 export function guardRoute(ctx: RouteGuardContext): GuardResult {
   // 规则 1：登录
@@ -68,5 +92,5 @@ export function guardRoute(ctx: RouteGuardContext): GuardResult {
   }
 
   // 规则 2、3…… 按同样三行节奏往下接（新建 ./guardXxx.uts → import → 插在这里）
-  return allow();
+  return ctx.next();
 }
