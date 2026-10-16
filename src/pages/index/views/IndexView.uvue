@@ -8,12 +8,6 @@
       最好用的 uni-appX 开发模板。
     </text>
 
-    <view class="w-[300px] h-[100px] bg-[#ff0000] flex-col-center" flatten>
-      <text class="text-[12px] text-[#ffff00]">
-        1
-      </text>
-    </view>
-
     <!-- 运行环境状态卡片 -->
     <view
       class="mx-[16px] mt-[14px] px-[6px] py-[10px] rounded-[12px] border-[1px] border-solid border-[#e2e8f0] bg-[#ffffff] flex flex-row items-center justify-between"
@@ -117,6 +111,82 @@
             点击复制
           </text>
         </view>
+      </view>
+    </view>
+
+    <!-- 多端热更与开发调试指南卡片 -->
+    <view
+      class="mt-[14px] mx-[16px] p-[14px] rounded-[14px] border-[1px] border-solid bg-[#ffffff] border-[#e2e8f0] flex flex-col"
+    >
+      <view class="flex flex-row items-center justify-between mb-[12px]">
+        <view class="flex flex-row items-center">
+          <text class="text-[14px] mr-[6px]">⚡</text>
+          <text class="text-[13px] font-bold text-[#1e293b]">多端热重载与调试体验指南</text>
+        </view>
+        <view class="px-[6px] py-[2px] rounded-[4px] bg-[#6366f114]">
+          <text class="text-[10px] font-bold text-[#4f46e5]">推荐工作流</text>
+        </view>
+      </view>
+
+      <!-- 各端表现清单 -->
+      <view class="flex flex-col bg-[#f8fafc] rounded-[10px] p-[10px] border-[1px] border-solid border-[#e2e8f0]">
+        <!-- H5 -->
+        <view class="flex flex-row items-start mb-[8px]">
+          <view class="px-[6px] py-[1px] rounded-[4px] bg-[#dcfce7] mr-[8px] mt-[1px]">
+            <text class="text-[10px] font-bold text-[#15803d]">H5 (最优)</text>
+          </view>
+          <text class="text-[11px] leading-[16px] text-[#334155] flex-1">
+            差量更新不重载，热更新稳定停留在当前页，页面布局与组件调试首选推荐。
+          </text>
+        </view>
+
+        <!-- iOS -->
+        <view class="flex flex-row items-start mb-[8px]">
+          <view class="px-[6px] py-[1px] rounded-[4px] bg-[#e0f2fe] mr-[8px] mt-[1px]">
+            <text class="text-[10px] font-bold text-[#0369a1]">iOS</text>
+          </view>
+          <text class="text-[11px] leading-[16px] text-[#334155] flex-1">
+            差量更新无感替换，热更新平滑保留在当前调试页面。
+          </text>
+        </view>
+
+        <!-- Android -->
+        <view class="flex flex-row items-start mb-[8px]">
+          <view class="px-[6px] py-[1px] rounded-[4px] bg-[#e0f2fe] mr-[8px] mt-[1px]">
+            <text class="text-[10px] font-bold text-[#0369a1]">Android</text>
+          </view>
+          <text class="text-[11px] leading-[16px] text-[#334155] flex-1">
+            差量更新会热重构重启基座，热重载保持在当前停留页。
+          </text>
+        </view>
+
+        <!-- 小程序 -->
+        <view class="flex flex-row items-start mb-[8px]">
+          <view class="px-[6px] py-[1px] rounded-[4px] bg-[#fef3c7] mr-[8px] mt-[1px]">
+            <text class="text-[10px] font-bold text-[#b45309]">小程序</text>
+          </view>
+          <text class="text-[11px] leading-[16px] text-[#334155] flex-1">
+            受宿主开发者工具限制，代码保存后均会整包重载回到首页。
+          </text>
+        </view>
+
+        <!-- 鸿蒙 -->
+        <view class="flex flex-row items-start">
+          <view class="px-[6px] py-[1px] rounded-[4px] bg-[#fef3c7] mr-[8px] mt-[1px]">
+            <text class="text-[10px] font-bold text-[#b45309]">鸿蒙</text>
+          </view>
+          <text class="text-[11px] leading-[16px] text-[#334155] flex-1">
+            原生运行时差量编译后会重启基座，调试状态重置回到首页。
+          </text>
+        </view>
+      </view>
+
+      <!-- 底部建议 -->
+      <view class="mt-[10px] p-[8px] rounded-[8px] bg-[#eff6ff] border-[1px] border-solid border-[#bfdbfe] flex flex-row items-start">
+        <text class="text-[12px] mr-[4px]">💡</text>
+        <text class="text-[11px] leading-[17px] text-[#1d4ed8] flex-1">
+          建议：业务开发优先使用 H5（pnpm dev:h5）调样式与逻辑；在 VITE_TABBAR_MODE=4 模式下除 H5 均会重置到首页。功能稳定后再切真机或小程序做多端兼容验收。
+        </text>
       </view>
     </view>
 
