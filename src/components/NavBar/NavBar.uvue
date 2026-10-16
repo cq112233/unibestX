@@ -69,6 +69,7 @@ import { NAVBAR_CONTENT_HEIGHT, safeAreaInsets, systemInfo } from '@/src/utils/s
 import { useThemeStore } from '@/src/store/index.uts';
 import { getThemeTokens } from '@/src/theme/index.uts';
 import type { ThemeTokens } from '@/src/theme/index.uts';
+import { useRouter } from '@/uni_modules/route-bestX/index.uts';
 
 // 定义组件参数类型
 const props = defineProps({
@@ -149,6 +150,8 @@ const statusBarHeight = computed<number>((): number => {
   return 0;
 });
 
+const router = useRouter();
+
 // 处理返回事件
 function handleBack() {
   if (!props.showBack) {
@@ -156,14 +159,10 @@ function handleBack() {
   }
   const pages = getCurrentPages();
   if (pages.length > 1) {
-    uni.navigateBack({
-      delta: 1
-    });
+    router.back();
   }
   else {
-    uni.reLaunch({
-      url: '/src/pages/index/index'
-    });
+    router.relaunch('/src/pages/index/index');
   }
 }
 </script>

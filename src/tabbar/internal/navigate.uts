@@ -1,12 +1,11 @@
 import { curIdx, setCurIdx, setCurIdxByPath, tabbarList } from './state.uts';
 import { isNativeTabbar, isSinglePageTabbar, selectedTabbarStrategy, TABBAR_STRATEGY_MAP } from './strategy.uts';
 import { customTabbarConfig } from '../config.uts';
+import { useRouter } from '@/uni_modules/route-bestX/index.uts';
 
 /** 中间鼓包 tabbarItem 点击事件 */
 function handleClickBulge(url: string = '/src/pages/ai/ai'): void {
-  uni.navigateTo({
-    url
-  });
+  useRouter().push(url);
 }
 
 /**
@@ -119,10 +118,10 @@ export function handleTabbarClick(index: number): void {
   if (switchTabTimer != null) {
     clearTimeout(switchTabTimer as number);
   }
-  switchTabTimer = setTimeout((): void => {
+  switchTabTimer = (setTimeout((): void => {
     isSwitchingTab = false;
     switchTabTimer = null;
-  }, 250);
+  }, 250) as any) as number;
 }
 
 /**
