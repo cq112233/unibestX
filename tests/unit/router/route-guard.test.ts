@@ -49,8 +49,12 @@ async function loadGuard(needLoginMode?: boolean) {
 function makeCtx(over: Record<string, any> = {}): any {
   const path: string = over.path ?? '/src/pages/me/me';
   const query: Map<string, string> = new Map(Object.entries(over.query ?? {}));
+  const fromPath: string = over.fromPath ?? '/src/pages/index/index';
+  const fromQuery: Map<string, string> = new Map(Object.entries(over.fromQuery ?? {}));
+  const from = over.from ?? { path: fromPath, query: fromQuery, fullPath: over.fromFullPath ?? fromPath };
   return {
     to: { path, query, fullPath: over.fullPath ?? path },
+    from,
     api: over.api ?? 'navigateTo',
     isLoggedIn: over.isLoggedIn ?? false
   };
@@ -239,7 +243,7 @@ describe('路由守卫（业务层）决策矩阵', () => {
   });
 
   describe('上下文装配 buildGuardContext（业务信号的唯一取处）', () => {
-    it('登录态取自 tokenStore.hasValidLogin()，to / api 原样带过去', async () => {
+    it('登录态取自 tokenStore.hasValidLogin()，to / from / api 原样带过去', async () => {
       vi.resetModules();
       // 打桩值可变：写死一边过不了两边，才算真验了委派
       let storedLogin = false;
@@ -253,15 +257,21 @@ describe('路由守卫（业务层）决策矩阵', () => {
           query: new Map<string, string>([['tab', '2']]),
           fullPath: '/src/pages/me/me?tab=2'
         };
+        const from = {
+          path: '/src/pages/index/index',
+          query: new Map<string, string>(),
+          fullPath: '/src/pages/index/index'
+        };
 
-        const ctx = buildGuardContext(to, 'switchTab');
+        const ctx = buildGuardContext(to, from, 'switchTab');
 
         expect(ctx.isLoggedIn).toBe(false);
         expect(ctx.to).toBe(to); // 框架给的 URL 事实原样透传，业务侧不做二次归一化
+        expect(ctx.from).toBe(from); // 来源页面路由原样透传
         expect(ctx.api).toBe('switchTab');
 
         storedLogin = true;
-        expect(buildGuardContext(to, 'navigateTo').isLoggedIn).toBe(true);
+        expect(buildGuardContext(to, from, 'navigateTo').isLoggedIn).toBe(true);
       }
       finally {
         vi.doUnmock('@/src/store/index.uts');
@@ -306,9 +316,14 @@ describe('路由守卫（业务层）决策矩阵', () => {
           query: new Map<string, string>(),
           fullPath: EXCLUDE_PAGE
         };
+        const from = {
+          path: '/src/pages/index/index',
+          query: new Map<string, string>(),
+          fullPath: '/src/pages/index/index'
+        };
 
         // 默认黑名单策略 + 未登录 + 名单内页面 → 拦下并改跳登录页
-        const decision = runRouterGuard(to, 'navigateTo');
+        const decision = runRouterGuard(to, from, 'navigateTo');
 
         expect(decision.pass).toBe(false);
         expect(decision.redirect).toBe(`${LOGIN_PAGE}?redirect=${encodeURIComponent(EXCLUDE_PAGE)}`);

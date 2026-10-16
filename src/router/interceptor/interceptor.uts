@@ -1,7 +1,7 @@
 import { isPageTabbar, switchTabbar } from '@/src/tabbar/index.uts';
 import { runRouterGuard } from '../guard/index.uts';
 import type { RouteTarget } from '../guard/types.uts';
-import { applyTargetRouteFromUrl, installRouteStateListener, syncRouteState } from '../hooks/route-state.uts';
+import { applyTargetRouteFromUrl, installRouteStateListener, routeState, syncRouteState } from '../hooks/route-state.uts';
 import { getQueryString, parseUrlToObj } from '../utils/utils.uts';
 
 /**
@@ -181,6 +181,58 @@ function dispatchRedirect(target: string | null): void {
 }
 
 /**
+ * 解析来源页面（上一个页面）的路由目标事实
+ * 优先取全局已稳定的 routeState；若尚未就绪（如应用冷启动首跳），则尝试从当前页面栈回读；否则给空兜底
+ */
+function resolveFromRouteTarget(): RouteTarget {
+  if (routeState.path != '') {
+    return {
+      path: routeState.path,
+      query: routeState.query,
+      fullPath: routeState.fullPath
+    } as RouteTarget;
+  }
+  const pages = getCurrentPages();
+  if (pages.length > 0) {
+    const page = pages[pages.length - 1];
+    const route = page.route ?? '';
+    if (route != '') {
+      let path = route;
+      if (path.startsWith('src/')) {
+        path = `/${path}`;
+      }
+      if (!path.startsWith('/')) {
+        path = `/${path}`;
+      }
+      const options: UTSJSONObject | null = page.options ?? null;
+      const query = new Map<string, string>();
+      if (options != null) {
+        const keys = UTSJSONObject.keys(options);
+        for (let i = 0; i < keys.length; i++) {
+          const k = keys[i];
+          const v = options[k];
+          if (v != null) {
+            query.set(k, `${v}`);
+          }
+        }
+      }
+      const queryStr = joinQueryString(query);
+      const fullPath = queryStr != '' ? `${path}?${queryStr}` : path;
+      return {
+        path,
+        query,
+        fullPath
+      } as RouteTarget;
+    }
+  }
+  return {
+    path: '',
+    query: new Map<string, string>(),
+    fullPath: ''
+  } as RouteTarget;
+}
+
+/**
  * 核心拦截流程：归一化 url → 交给业务守卫裁决 → 放行或改跳
  *
  * 本函数**不含任何业务规则**：上下文里装哪些业务信号、什么条件算通过、被拦下跳哪儿，全在
@@ -213,9 +265,12 @@ function doIntercept(url: string, api: string): boolean {
     fullPath
   } as RouteTarget;
 
-  // 框架交出的只有两样中立的输入（归一化后的 URL 事实 + api 名），拿回来的只有裁决：
+  // 获取当前来源页面路由（from）
+  const fromTarget: RouteTarget = resolveFromRouteTarget();
+
+  // 框架交出的只有三样中立的输入（归一化后的目标 URL 事实 + 来源 URL 事实 + api 名），拿回来的只有裁决：
   // 上下文怎么装配、有哪些业务信号、按什么顺序判，全在 ../guard/ 里，框架不碰也不想知道
-  const decision = runRouterGuard(target, api);
+  const decision = runRouterGuard(target, fromTarget, api);
 
   if (decision.pass) {
     return true;

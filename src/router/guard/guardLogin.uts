@@ -42,20 +42,33 @@ import type { GuardResult, RouteGuardContext, RouteTarget } from './types.uts';
 /**
  * 装配一次导航的守卫上下文 —— **上下文里装哪些业务信号，由业务侧说了算**
  *
- * 框架只交出两样中立的输入：本次导航目标 `to`（框架归一化 URL 得到，路由状态那边也用同一套口径）
- * 和触发 API 名 `api`。「当前算不算登录」这类**业务信号一律在这里取** —— 于是框架侧不 import
- * store、也不碰登录态，它只把这两样原样递给 ./index.uts 的 runRouterGuard()。
+ * 框架只交出三样中立的输入：本次导航目标 `to`、来源页面 `from` 和触发 API 名 `api`。
+ * 「当前算不算登录」这类**业务信号一律在这里取** —— 于是框架侧不 import
+ * store、也不碰登录态，它只把这三样原样递给 ./index.uts 的 runRouterGuard()。
  *
  * ⚠️ 「什么算已登录」的**口径在 store**（src/store/vdom/token.uts、vapor/token.uts 的
  *    `hasValidLogin()`：token 存在且未过期）。本函数只负责取，别在这里重写一份判断；
  *    ⚠️只能同步取：调用链上游是 `uni.addInterceptor` 的 invoke（必须同步返回 boolean）。
  *
  * @param to 本次导航目标（框架已归一化好的绝对路径 / query / fullPath）
+ * @param from 本次导航来源页面（若为首次进入可能为空 RouteTarget）
  * @param api 触发本次跳转的 uni API 名
  */
-export function buildGuardContext(to: RouteTarget, api: string): RouteGuardContext {
+export function buildGuardContext(to: RouteTarget, from: RouteTarget | null, api: string): RouteGuardContext {
+  let safeFrom: RouteTarget;
+  if (from != null) {
+    safeFrom = from;
+  }
+  else {
+    safeFrom = {
+      path: '',
+      query: new Map<string, string>(),
+      fullPath: ''
+    } as RouteTarget;
+  }
   return {
     to,
+    from: safeFrom,
     api,
     isLoggedIn: useTokenStore().hasValidLogin()
   } as RouteGuardContext;
@@ -97,6 +110,7 @@ export function judgeIsExcludePath(path: string): boolean {
  * | 未登录 | 黑名单 | 其余页面 | `allow()` |
  */
 export function guardLogin(ctx: RouteGuardContext): GuardResult {
+  console.log(ctx, 'ctx');
   const path = ctx.to.path;
 
   // 1. 已登录

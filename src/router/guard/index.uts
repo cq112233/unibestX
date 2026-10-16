@@ -39,10 +39,11 @@ import type { GuardResult, RouteGuardContext, RouteTarget } from './types.uts';
  * 新增业务信号或规则都在 ./ 目录内消化，本函数签名冻结。
  *
  * @param to 归一化后的目标路由（框架给出的中立 URL 事实，原样透传给装配，不做二次归一化）
+ * @param from 来源页面路由（上一个页面事实，若无则为 null）
  * @param api 触发本次跳转的 uni API 名
  */
-export function runRouterGuard(to: RouteTarget, api: string): GuardResult {
-  return guardRoute(buildGuardContext(to, api));
+export function runRouterGuard(to: RouteTarget, from: RouteTarget | null, api: string): GuardResult {
+  return guardRoute(buildGuardContext(to, from, api));
 }
 
 /**
