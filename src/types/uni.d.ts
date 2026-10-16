@@ -380,7 +380,9 @@ declare global {
   function onError(callback: (error: any) => void): void;
   /** 未处理 Promise 拒绝监听（App.uvue 专用）：仅 Web 与小程序支持，App 原生端不支持须 #ifdef WEB || MP 隔离 */
   function onUnhandledRejection(callback: (result: { promise: Promise<any>; reason: any }) => void): void;
-  function getCurrentPages(): any[];
+  type UniPage = any;
+  type OnShowOptions = any;
+  function getCurrentPages(): UniPage[];
   function getApp(): any;
 
   /** 支付宝小程序全局对象 */

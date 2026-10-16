@@ -17,8 +17,10 @@ setPageMetaJson(PAGE_META_JSON);
 
 // 1. 全局单例路由器（桥接业务 TabBar 动态判定与切换，内部全自动调度与兜底）
 export const router = createRouter({
-  isTabbar: isPageTabbar,
-  switchTab: switchTabbar
+  isTabbar: (url: string): boolean => isPageTabbar(url),
+  switchTab: (url: string): void => {
+    switchTabbar(url);
+  }
 });
 
 // 2. 自动注册业务全局守卫与生命周期钩子

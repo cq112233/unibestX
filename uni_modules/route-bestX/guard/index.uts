@@ -163,7 +163,7 @@ export function buildGuardContext(to: RouteTarget, from: RouteTarget | null, api
     to,
     from: safeFrom,
     api,
-    next: (location: any | null = null): GuardResult => {
+    next: (location: any | null): GuardResult => {
       return next(location);
     }
   } as RouteGuardContext;
@@ -191,7 +191,7 @@ export function runRouterGuard(to: RouteTarget, from: RouteTarget | null, _api: 
   if (registeredGuards.length > 0) {
     for (let i = 0; i < registeredGuards.length; i++) {
       let decision: GuardResult | null = null;
-      const nextFn: NextFunction = (location: any | null = null): void => {
+      const nextFn: NextFunction = (location: any | null): void => {
         decision = next(location);
       };
 

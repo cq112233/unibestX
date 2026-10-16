@@ -15,14 +15,13 @@
 </template>
 
 <script setup lang="uts">
-import { getCurrentInstance } from 'vue';
 import HomeView from './views/IndexView.uvue';
 import TabViews from '@/src/tabbar/components/TabViews.uvue';
 import Tabbar from '@/src/tabbar/tabbar.uvue';
 import { isSinglePageTabbar, notifyPageHide, notifyPageShow, setCurIdxByKey } from '@/src/tabbar/index.uts';
 import { handleBackPressExit } from '@/src/utils/backPress/index.uts';
 import { useRoute, useRouter } from '@/uni_modules/route-bestX/index.uts';
-import { isApp, isMpAlipay } from '@/src/config/env/platform.uts';
+import { isApp } from '@/src/config/env/platform.uts';
 
 const router = useRouter();
 const route = useRoute();
@@ -31,11 +30,6 @@ console.log(route, 'route');
 console.log(route.path, 'route.path');
 console.log(route.fullPath, 'route.fullPath');
 console.log(router, 'router');
-
-// 方式 B：通过 getCurrentInstance() 访问全局挂载的 $router
-const instance = getCurrentInstance();
-const globalRouter = instance?.appContext.config.globalProperties.$router;
-console.log(globalRouter, 'globalRouter from getCurrentInstance');
 
 // definePage 支持「静态对象」与「函数式（含 async 异步）」写法：
 // 1. 跨端条件配置：基于 options.platform 进行多端分支判断，构建期会自动生成 pages.json 中的条件编译块（#ifdef / #endif）
@@ -76,12 +70,12 @@ definePage((options) => {
 
 // 把页面 onShow / onHide 桥接给 TabBar：onTabPageShow 靠它覆盖「从子页面返回 / 前台恢复」
 onShow(() => {
+  // #ifdef MP-ALIPAY
   // 隐藏支付宝小程序左侧原生的“返回首页”按钮
-  if (isMpAlipay) {
-    if (typeof my != 'undefined' && typeof my.hideBackHome == 'function') {
-      my.hideBackHome();
-    }
+  if (typeof my != 'undefined' && typeof my.hideBackHome == 'function') {
+    my.hideBackHome();
   }
+  // #endif
   if (!isSinglePageTabbar) {
     setCurIdxByKey('index');
   }

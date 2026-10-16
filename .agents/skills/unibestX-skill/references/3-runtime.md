@@ -889,18 +889,22 @@ onUnmounted(() => {
 
 ---
 
-## 3.27 全局跨端平台判断规范（src 目录下优先使用 @/src/config 常量，严禁散落手写 #ifdef 条件编译）
+## 3.27 全局跨端平台判断规范（两级分层治理：常规业务逻辑用 @/src/config 常量，端专属原生未声明符号强制 #ifdef 物理隔离）
 
-- **核心规范**：
-  在 `src/` 目录下编写任何业务代码（包括 `.uvue`、`.uts`、`.ts` 文件，尤其是 `<script>`、业务逻辑、方法、生命周期中）：
-  **严禁散落手写 `// #ifdef WEB`、`// #ifdef MP-ALIPAY`、`// #ifdef APP-ANDROID`、`// #ifndef ...` 等条件编译宏！**
-  **必须统一引入 `@/src/config/env/platform.uts` 导出的平台布尔常量（`isH5` / `isWeb`、`isMpAlipay`、`isMpWeixin`、`isAppAndroid`、`isAppIOS`、`isAppHarmony`、`isApp`、`isMp`）进行普通 `if` 逻辑分支！**
+- **核心规范（两级分层治理原则）**：
+  在 `src/` 目录下进行跨端开发时，必须明确区分**「常规跨端业务逻辑」**与**「端专属未声明原生全局符号」**，严格遵循两级分层治理原则：
 
-- **唯一豁免白名单**：
-  - **唯一特许豁免文件**：`src/tabbar/components/TabViews.uvue`；
-  - **豁免原因**：该文件在 `<template>` 视图层必须根据不同编译目标平台静态裁切并挂载对应的首屏 TabContent 容器，避免在编译期向特定平台打包不需要的原生组件视图节点。除此以外，其他所有组件和页面的业务逻辑一律不得滥用条件编译。
+  1. **第一层：常规跨端业务逻辑 / 流程分流（样式差异、业务参数、接口行为、标准跨端 API 调用等）**：
+     - **严禁散落手写 `// #ifdef ...` 条件编译宏**！
+     - **必须统一引入 `@/src/config/env/platform.uts` 导出的平台布尔常量（`isH5` / `isWeb`、`isMpAlipay`、`isMpWeixin`、`isAppAndroid`、`isAppIOS`、`isAppHarmony`、`isApp`、`isMp`）进行普通 `if` 逻辑分支！**
+     - 享有完备的 IDE 强类型检查，杜绝注释敏感崩溃、宏求值静默吞没与 WEB/H5 宏名混淆漏判风险，并由打包器进行精准 Tree-Shaking 消除未命中死分支。
 
-- **底层原理与为什么严禁散落 `#ifdef`**：
+  2. **第二层：端专属未在全平台声明的原生全局符号与特定专属 API（支付宝 `my`、微信 `wx`、浏览器 `window` / `document`、5+ 原生 `plus`、App 原生未实现 API 如 `uni.onKeyboardHeightChange`、Vue 应用级非 App 属性如 `app.config.globalProperties`、以及模板级静态裁切如 `TabViews.uvue`）**：
+     - **必须且只能使用 `// #ifdef ...` 条件编译宏进行物理隔离！**
+     - **底层根因**：Android (Kotlin) / iOS 原生编译器在编译期执行的是**静态符号解析（Static Symbol Resolution）**。即使在运行时包裹在 `if (isMpAlipay)` 或 `if (isH5)` 或 `typeof my != 'undefined'` 内，由于底层 Kotlin 编译器在编译期构建语法树并绑定符号，未声明的符号在语法树分析阶段就会直接抛出 `error: 找不到名称“xxx” (error18)` 崩溃！
+     - 普通 `if` 控制流无法阻止原生编译期的静态符号解析；**唯有 `// #ifdef ...` 预编译指令能在进入原生编译器前物理切除该代码块**，保护 Kotlin / Swift 编译器不被未定义符号击溃。
+
+- **为什么严禁在常规业务逻辑中散落 `#ifdef`**：
   1. **规避预处理器解析大坑**：
      - **注释敏感**：预处理器对注释极度敏感，在块注释 `/** ... */` 中若不慎带斜杠写了形如 `// #ifdef` 会直接触发预处理器 `Unbalanced right delimiter` 编译崩溃（详见 **3.12**）；
      - **宏求值抛错静默吞没**：预处理器通过 `new Function('with(context){ return (A || B) }')` 对多条件求值，若操作数中有未预置宏会直接抛 `ReferenceError` 并静默吞为 `false`，导致代码块无声消失；
@@ -909,19 +913,31 @@ onUnmounted(() => {
      - `@/src/config/env/platform.uts` 导出的平台常量在各端均为**编译期定值**（叶子模块零反向引用，无 Kotlin `<clinit>` 循环死锁风险）；
      - Vite / Rollup 在产物打包时会自动执行静态死分支消除（DCE），未命中平台的 `if (false)` 逻辑会被完全剔除，产物体积与直接手写条件编译完全相同。
   3. **代码可维护性与语法分析健全**：
-     - 手写 `#ifdef` 会导致未命中的平台代码在 IDE 中整片变灰，重构时无法全局重命名符号，也无法享受 TypeScript / UTS 强类型语法检查，容易潜藏低级语法疏漏；
-     - 使用常量 `if (isH5)` 是标准语言控制流，编辑器语法树分析完整，语义清晰易读。
-
-- **平台独有 API 调用的安全防御规范**：
-  在 `if (isH5)` 或 `if (isMpAlipay)` 分支内调用特定端特有全局对象时（如 H5 的 `window`、支付宝的 `my`、微信的 `wx`），在 UTS 跨端环境下需配合基础存在性检查：
-  - Web 端 API：配合 `typeof window != 'undefined'`；
-  - 支付宝端 API：配合 `typeof my != 'undefined'`；
-  - 微信端 API：配合 `typeof wx != 'undefined'`。
+     - 手写 `#ifdef` 会导致未命中的平台代码在 IDE 中整片变灰，重构时无法全局重命名符号，也无法享受 TypeScript / UTS 强类型语法检查，容易潜藏低级语法疏漏。
 
 - **代码正反例对比**：
 
 ```uts
-// ❌ 错误：在 .uvue 页面中散落手写条件编译，不仅容易遗漏 WEB/H5 差异，且 IDE 失去语法检查
+// ❌ 错误做法 1：企图在通用 if (isH5) 或 typeof window 中直接引用端专属未声明原生符号
+// 结果：在 Android App 编译时，Kotlin 静态符号解析失败，抛出 error: 找不到名称“window” (error18)
+function openGithub(): void {
+  const url = 'https://github.com/cq112233/unibestX';
+  if (isH5) {
+    if (typeof window != 'undefined') {
+      window.open(url, '_blank'); // 💥 Kotlin 报 找不到名称“window”
+    }
+  }
+}
+
+// ❌ 错误做法 2：企图在通用 if (isMpAlipay) 中直接引用端专属未声明原生符号
+// 结果：在 Android App 编译时，Kotlin 静态符号解析失败，抛出 error: 找不到名称“my” (error18)
+function hideAlipayHome(): void {
+  if (isMpAlipay && typeof my != 'undefined') {
+    my.hideBackHome(); // 💥 Kotlin 报 找不到名称“my”
+  }
+}
+
+// ✅ 正确做法（第二层：端专属未声明原生符号，必须使用条件编译物理隔离）
 function openGithub(): void {
   const url = 'https://github.com/cq112233/unibestX';
   // #ifdef WEB
@@ -932,17 +948,23 @@ function openGithub(): void {
   // #endif
 }
 
-// ✅ 正确：统一从 @/src/config/env/platform.uts 引入编译期常量走标准 if 分支
-import { isH5 } from '@/src/config/env/platform.uts';
-
-function openGithub(): void {
-  const url = 'https://github.com/cq112233/unibestX';
-  if (isH5) {
-    if (typeof window != 'undefined') {
-      window.open(url, '_blank');
-    }
-  } else {
-    uni.navigateTo({ url: `/src/sub/webview/webview?url=${encodeURIComponent(url)}` });
+function hideAlipayHome(): void {
+  // #ifdef MP-ALIPAY
+  if (typeof my != 'undefined' && typeof my.hideBackHome == 'function') {
+    my.hideBackHome();
   }
+  // #endif
+}
+
+// ✅ 正确做法（第一层：常规跨端业务逻辑，统一引入 platform 常量走常规 if）
+import { isH5, isApp } from '@/src/config/env/platform.uts';
+
+function getSharePath(): string {
+  if (isH5) {
+    return '/pages/h5/share';
+  } else if (isApp) {
+    return '/pages/app/share';
+  }
+  return '/pages/mp/share';
 }
 ```

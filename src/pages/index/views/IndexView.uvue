@@ -388,7 +388,6 @@ import { systemInfo as systemInfoRef } from '@/src/utils/systemInfo/index.uts';
 import type { SystemInfoType } from '@/src/utils/systemInfo/index.uts';
 import { curIdx, onTabPageShow, onTabShow, resolveTabIndexByKey } from '@/src/tabbar/index.uts';
 import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/layouts/navbar/utils/index.uts';
-import { isH5 } from '@/src/config/env/platform.uts';
 
 type FeatureItem = {
   id: string;
@@ -666,27 +665,25 @@ function copyCliCommand(): void {
 // 打开 GitHub 官方仓库地址
 function openGithub(): void {
   const url = 'https://github.com/cq112233/unibestX';
-  if (isH5) {
-    if (typeof window != 'undefined') {
-      window.open(url, '_blank');
+  // #ifdef WEB
+  window.open(url, '_blank');
+  // #endif
+  // #ifndef WEB
+  uni.navigateTo({
+    url: `/src/sub/webview/webview?url=${encodeURIComponent(url)}&title=unibestX`,
+    fail: () => {
+      uni.setClipboardData({
+        data: url,
+        success: () => {
+          uni.showToast({
+            title: '已复制 GitHub 链接',
+            icon: 'none'
+          });
+        }
+      });
     }
-  }
-  else {
-    uni.navigateTo({
-      url: `/src/sub/webview/webview?url=${encodeURIComponent(url)}&title=unibestX`,
-      fail: () => {
-        uni.setClipboardData({
-          data: url,
-          success: () => {
-            uni.showToast({
-              title: '已复制 GitHub 链接',
-              icon: 'none'
-            });
-          }
-        });
-      }
-    });
-  }
+  });
+  // #endif
 }
 
 // 页面数据加载/刷新方法

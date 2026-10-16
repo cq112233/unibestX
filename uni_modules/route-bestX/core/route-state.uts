@@ -479,12 +479,12 @@ function commitRoute(path: string, query: Map<string, string>, fullPath: string,
     routeName = getDefaultRouteName(normalizedPath);
   }
   routeState.name = routeName;
-  let currentStack: any[] = [];
+  let currentStack: UniPage[] = [];
   try {
     currentStack = getCurrentPages();
   }
   catch {
-    currentStack = [];
+    currentStack = [] as UniPage[];
   }
   if (currentStack.length > 0 || routeState.pages.length == 0) {
     routeState.pages = currentStack;
@@ -687,12 +687,12 @@ export function uninstallRouteStateListener(): void {
  */
 export function ensureRouteReady(): void {
   installRouteStateListener();
-  let currentStack: any[] = [];
+  let currentStack: UniPage[] = [];
   try {
     currentStack = getCurrentPages();
   }
   catch {
-    currentStack = [];
+    currentStack = [] as UniPage[];
   }
   if (currentStack.length > 0) {
     routeState.pages = currentStack;

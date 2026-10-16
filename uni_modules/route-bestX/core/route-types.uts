@@ -18,19 +18,19 @@ export type RouteLocation = {
   /** 当前栈顶页面实例（UniPage，栈空时为 null） */
   page: any | null;
   /** 当前页面栈实例数组（等价于 getCurrentPages()） */
-  pages: any[];
+  pages: UniPage[];
 };
 
 /**
  * 构造一个空路由（保持与 RouteLocation 同构）
  */
 export function createEmptyRoute(): RouteLocation {
-  let initialPages: any[] = [];
+  let initialPages: UniPage[] = [];
   try {
     initialPages = getCurrentPages();
   }
   catch {
-    initialPages = [];
+    initialPages = [] as UniPage[];
   }
   return {
     path: '',

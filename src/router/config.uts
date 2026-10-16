@@ -2,10 +2,17 @@
  * 业务路由配置中心（黑白名单策略与页面路径）
  */
 
+export type LoginStrategyMap = {
+  /** 黑名单策略：默认无需登录，只在特定页面拦截 */
+  DEFAULT_NO_NEED_LOGIN: number;
+  /** 白名单策略：默认全部拦截，仅在特定免登录页面直接放行 */
+  DEFAULT_NEED_LOGIN: number;
+};
+
 /**
  * 登录拦截策略映射
  */
-export const LOGIN_STRATEGY_MAP = {
+export const LOGIN_STRATEGY_MAP: LoginStrategyMap = {
   /** 黑名单策略：默认无需登录，只在特定页面拦截 */
   DEFAULT_NO_NEED_LOGIN: 0,
   /** 白名单策略：默认全部拦截，仅在特定免登录页面直接放行 */

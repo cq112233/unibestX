@@ -249,10 +249,20 @@ export class Router {
   install(app: any): void {
     installRouteInterceptor();
     ensureRouteReady();
-    if (app != null && app.config != null && app.config.globalProperties != null) {
-      app.config.globalProperties.$router = this;
-      app.config.globalProperties.$route = this.currentRoute;
+    // #ifndef APP
+    if (app != null) {
+      try {
+        const anyApp = app as any;
+        if (anyApp.config != null && anyApp.config.globalProperties != null) {
+          anyApp.config.globalProperties.$router = this;
+          anyApp.config.globalProperties.$route = this.currentRoute;
+        }
+      }
+      catch {
+        // ignore
+      }
     }
+    // #endif
   }
 }
 

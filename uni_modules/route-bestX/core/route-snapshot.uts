@@ -32,7 +32,7 @@ function copyRoute(target: RouteLocation, source: RouteLocation): void {
   target.params = source.params;
   target.meta = source.meta;
   target.name = source.name;
-  let currentStack: any[] = [];
+  let currentStack: UniPage[] = [];
   try {
     currentStack = getCurrentPages();
   }

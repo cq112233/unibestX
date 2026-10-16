@@ -9,8 +9,10 @@
 
 - 🎯 **对标 Vue Router 标准规范**：支持 `createRouter()`、`useRouter()`、`useRoute()`、`app.use(router)`
 - 🛡️ **完备的导航守卫流水线**：支持全局前置守卫 `beforeEach`、全局后置钩子 `afterEach`、全局异常捕获 `onError`
+- 🖐️ **手势返回与侧滑全域拦截**：原生抹平小程序侧滑手势、物理返回与导航栏返回，自带防抖去重与离开页快照还原
 - ⚡ **独立快照隔离引擎**：组件页面级专属路由快照，防止多层页面切换时上一页数据被提前冲刷覆盖
 - 🔄 **TabBar 智能兼容**：支持传入通用 TabBar 页面清单或判定规则，`router.push()` 时自动识别并平滑分流
+- 🔒 **URL 编解码安全容错**：内置 `decodeSafe` 容错多层嵌套编码（如 `redirect` 参数）与特殊字符，防止参数乱码或异常
 - 💎 **纯 UTS 原生强类型**：零第三方构建依赖，跨端全兼容：`App (Android / iOS / HarmonyOS)`、`Web (H5)`、`微信小程序`、`支付宝小程序`
 
 ---
@@ -321,6 +323,70 @@ router.beforeEach((to, from) => {
   // 返回 true 或不返回代表正常放行
   return true;
 });
+```
+
+---
+
+## 🖐️ 手势返回、物理按键与全域返回拦截
+
+跨端开发（特别是微信小程序、支付宝小程序与 iOS 原生 App）面临一个长期痛点：**用户通过边缘手势侧滑返回或点击系统自带物理返回键时，底层并不调用 `uni.navigateBack` API**，导致常规路由拦截器直接被绕过，返回页面丢失权限校验。
+
+`route-bestX` 底层深度整合了页面栈监听与生命周期拦截体系，实现了**真正的全域返回保护**：
+
+### 1. 手势返回与普通返回双轨闭环
+
+- **API 显式返回**：调用 `router.back()` 或 `uni.navigateBack()` 时，由 `navigateBackInterceptor` 即时拦截并交由守卫裁决；
+- **原生手势/物理返回**：用户边缘侧滑或点击物理返回键时，底层自动捕获返回动作，装配 `api: 'navigateBack'` 上下文并触发全局前置守卫校验。若未放行，立即改跳至受控目标页。
+
+### 2. 500ms 智能防抖去重机制
+
+当用户在页面顶部自定义 Navbar 点击返回按钮（触发了 `uni.navigateBack` 拦截器放行）后，紧随其后的原生页面显现钩子会自动触发。  
+`route-bestX` 内部通过**目标路径全比对 + 500ms 动态时间窗口**自动识别同一动作，**绝对不会重复跑两次守卫或触发两次 `afterEach`**。
+
+### 3. 真实离开页（`from`）快照恢复
+
+在多端环境手势返回时，系统事件分发往往存在时序差异（部分平台在派发事件时，全局栈顶状态已被提前覆盖为返回后的页面）。  
+`route-bestX` 会自动从 `previousRouteState` 前序快照中逆向恢复真实的离开页面，保证守卫中读取到的 `from`（实际离开的页面）与 `to`（返回到达的目标页面）**100% 真实准确**。
+
+---
+
+## 💡 最佳实践与踩坑防范
+
+### 1. 路由 Hook 推荐在 setup 最顶部初始化
+
+在页面 `.uvue` 组件的 `<script setup>` 中，**推荐将 `useRoute()` 与 `useRouter()` 置于最顶部声明**：
+
+```html
+<script setup lang="uts">
+// ⭐ 推荐：最先声明路由 Hook，确保页面返回与各生命周期中路由快照最先就绪
+const route = useRoute();
+const router = useRouter();
+
+// 随后再写页面业务代码与生命周期监听
+onShow(() => {
+  // 此处读取 route.path / route.query 绝对稳定
+});
+</script>
+```
+
+### 2. 嵌套多层 URL 编码安全防护
+
+在重定向回跳场景中（如 `login?redirect=%2Fpages%2Forder%2Flist`），下游参数可能被再次编码（变为 `%252F` 嵌套态）。  
+`route-bestX` 内部针对所有参数提取内置了 `decodeSafe` 容错处理：
+
+- 自动智能解开多层嵌套 URL 编码，回跳路径不再残留 `%2F`；
+- 原生包含字面量 `%`（如 `discount=100%`）时安全兜底，两端绝不抛出 `URIError`。
+
+### 3. 全自动页面元信息同步 (`setPageMetaJson`)
+
+若配合 `vite-plugin-uni-pages` 等构建插件，可在项目入口通过 `setPageMetaJson` 一行代码直接同步 `pages.json` 生成的元数据：
+
+```uts
+import { setPageMetaJson } from '@/uni_modules/route-bestX';
+import { PAGE_META_JSON } from '@/src/router/generated/page-meta.uts';
+
+// 全自动同步：页面中 definePage 配置的 style、name 等字段直接映射至 route.meta / route.name
+setPageMetaJson(PAGE_META_JSON);
 ```
 
 ---

@@ -245,7 +245,7 @@ function dispatchRedirect(target: string | null, isReplace: boolean = false): vo
   if (target == null || target == '') {
     redirectDepth = 0;
     const err = createRouterError(
-      ROUTER_ERROR_CODE.GUARD_CANCELLED,
+      ROUTER_ERROR_CODE.GUARD_CANCELLED as number,
       lastNavigatingTarget,
       lastNavigatingFrom,
       'guard'
@@ -260,7 +260,7 @@ function dispatchRedirect(target: string | null, isReplace: boolean = false): vo
   if (redirectDepth > MAX_REDIRECT_DEPTH) {
     redirectDepth = 0;
     const err = createRouterError(
-      ROUTER_ERROR_CODE.MAX_REDIRECT_EXCEEDED,
+      ROUTER_ERROR_CODE.MAX_REDIRECT_EXCEEDED as number,
       lastNavigatingTarget,
       lastNavigatingFrom,
       'redirect'
@@ -446,7 +446,7 @@ export const navigateToInterceptor: Interceptor = {
   fail(err: any): void {
     syncRouteStateDeferred();
     const routerErr = createRouterError(
-      ROUTER_ERROR_CODE.NAVIGATE_TO_FAILED,
+      ROUTER_ERROR_CODE.NAVIGATE_TO_FAILED as number,
       lastNavigatingTarget,
       lastNavigatingFrom,
       'navigateTo',
@@ -475,7 +475,7 @@ export const redirectToInterceptor: Interceptor = {
   fail(err: any): void {
     syncRouteStateDeferred();
     const routerErr = createRouterError(
-      ROUTER_ERROR_CODE.REDIRECT_TO_FAILED,
+      ROUTER_ERROR_CODE.REDIRECT_TO_FAILED as number,
       lastNavigatingTarget,
       lastNavigatingFrom,
       'redirectTo',
@@ -504,7 +504,7 @@ export const reLaunchInterceptor: Interceptor = {
   fail(err: any): void {
     syncRouteStateDeferred();
     const routerErr = createRouterError(
-      ROUTER_ERROR_CODE.RELAUNCH_FAILED,
+      ROUTER_ERROR_CODE.RELAUNCH_FAILED as number,
       lastNavigatingTarget,
       lastNavigatingFrom,
       'reLaunch',
@@ -533,7 +533,7 @@ export const switchTabInterceptor: Interceptor = {
   fail(err: any): void {
     syncRouteStateDeferred();
     const routerErr = createRouterError(
-      ROUTER_ERROR_CODE.SWITCH_TAB_FAILED,
+      ROUTER_ERROR_CODE.SWITCH_TAB_FAILED as number,
       lastNavigatingTarget,
       lastNavigatingFrom,
       'switchTab',
@@ -575,7 +575,7 @@ export const navigateBackInterceptor: Interceptor = {
     const targetIdx = pages.length - 1 - delta;
     if (targetIdx < 0 && pages.length > 0) {
       const err = createRouterError(
-        ROUTER_ERROR_CODE.BACK_STACK_DEPTH_INVALID,
+        ROUTER_ERROR_CODE.BACK_STACK_DEPTH_INVALID as number,
         null,
         resolveFromRouteTarget(),
         'navigateBack'
@@ -622,7 +622,7 @@ export const navigateBackInterceptor: Interceptor = {
   fail(err: any): void {
     syncRouteStateDeferred();
     const routerErr = createRouterError(
-      ROUTER_ERROR_CODE.NAVIGATE_BACK_FAILED,
+      ROUTER_ERROR_CODE.NAVIGATE_BACK_FAILED as number,
       lastNavigatingTarget,
       lastNavigatingFrom,
       'navigateBack',
@@ -884,13 +884,34 @@ export function resetInitialEntryChecked(): void {
  * @param options 直链参数对象，取 `options.path` 作为目标路径；
  *                H5 端随后会用 `location.hash` / `pathname` 覆盖它，直链地址优先以免丢查询串；
  */
-export function checkDirectEntry(options: UTSJSONObject | null) {
+export function checkDirectEntry(options: any | null = null) {
   // 1. 如果已有外部直链参数，优先使用直达路径
   let targetPath = '';
   if (options != null) {
-    const pathVal = options.path as string | null;
-    if (pathVal != null && pathVal != '') {
-      targetPath = pathVal;
+    let rawPath: string | null = null;
+    // #ifdef APP
+    try {
+      const opt = options as OnShowOptions;
+      rawPath = opt.path;
+    }
+    catch {
+      rawPath = null;
+    }
+    // #endif
+    // #ifndef APP
+    try {
+      const optObj = options as UTSJSONObject;
+      const p = optObj['path'];
+      if (p != null) {
+        rawPath = `${p}`;
+      }
+    }
+    catch {
+      rawPath = null;
+    }
+    // #endif
+    if (rawPath != null && rawPath != '') {
+      targetPath = rawPath;
     }
   }
 
@@ -940,7 +961,25 @@ export function checkDirectEntry(options: UTSJSONObject | null) {
 
   // 如果 options 携带参数且 url 尚未包含 query，拼接参数
   if (options != null && !url.includes('?')) {
-    const queryMap = options.query as UTSJSONObject | null;
+    let queryMap: UTSJSONObject | null = null;
+    // #ifdef APP
+    try {
+      const opt = options as OnShowOptions;
+      queryMap = opt.query;
+    }
+    catch {
+      queryMap = null;
+    }
+    // #endif
+    // #ifndef APP
+    try {
+      const optObj = options as UTSJSONObject;
+      queryMap = optObj['query'] as UTSJSONObject | null;
+    }
+    catch {
+      queryMap = null;
+    }
+    // #endif
     if (queryMap != null) {
       const keys = UTSJSONObject.keys(queryMap);
       const pairs: string[] = [];

@@ -6,24 +6,38 @@
 import type { RouteTarget } from '../guard/types.uts';
 
 /**
+ * 路由错误状态码表结构类型
+ */
+export type RouterErrorCodeMap = {
+  /** 101: 导航被守卫 next(false) 主动取消 */
+  GUARD_CANCELLED: number;
+  /** 102: 重定向次数超过上限（默认 10 层，防死循环） */
+  MAX_REDIRECT_EXCEEDED: number;
+  /** 201: back 失败：页面栈深度不足 */
+  BACK_STACK_DEPTH_INVALID: number;
+  /** 202: uni.navigateBack 调用失败 */
+  NAVIGATE_BACK_FAILED: number;
+  /** 301: uni.navigateTo 调用失败（页面未注册 / 栈超 10 层等） */
+  NAVIGATE_TO_FAILED: number;
+  /** 302: uni.redirectTo 调用失败 */
+  REDIRECT_TO_FAILED: number;
+  /** 303: uni.reLaunch 调用失败 */
+  RELAUNCH_FAILED: number;
+  /** 304: uni.switchTab 调用失败（目标页不在 tabBar 等） */
+  SWITCH_TAB_FAILED: number;
+};
+
+/**
  * 路由错误状态码常量表
  */
-export const ROUTER_ERROR_CODE = {
-  /** 101: 导航被守卫 next(false) 主动取消 */
+export const ROUTER_ERROR_CODE: RouterErrorCodeMap = {
   GUARD_CANCELLED: 101,
-  /** 102: 重定向次数超过上限（默认 10 层，防死循环） */
   MAX_REDIRECT_EXCEEDED: 102,
-  /** 201: back 失败：页面栈深度不足 */
   BACK_STACK_DEPTH_INVALID: 201,
-  /** 202: uni.navigateBack 调用失败 */
   NAVIGATE_BACK_FAILED: 202,
-  /** 301: uni.navigateTo 调用失败（页面未注册 / 栈超 10 层等） */
   NAVIGATE_TO_FAILED: 301,
-  /** 302: uni.redirectTo 调用失败 */
   REDIRECT_TO_FAILED: 302,
-  /** 303: uni.reLaunch 调用失败 */
   RELAUNCH_FAILED: 303,
-  /** 304: uni.switchTab 调用失败（目标页不在 tabBar 等） */
   SWITCH_TAB_FAILED: 304
 };
 
