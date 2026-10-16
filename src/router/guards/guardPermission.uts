@@ -68,8 +68,6 @@ export function guardPermission(ctx: RouteGuardContext): GuardResult {
   const { to, next } = ctx;
   const path = to.path;
 
-  console.log(ctx, 'guardPermission');
-
   // 1. 无需权限校验的常规页面直接放行
   if (!permissionRequiredPaths.includes(path)) {
     return next();

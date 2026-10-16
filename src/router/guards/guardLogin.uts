@@ -35,8 +35,6 @@ export function guardLogin(ctx: RouteGuardContext): GuardResult {
   const { to, next } = ctx;
   const path = to.path;
 
-  console.log(ctx, 'guardLogin');
-
   const isLoggedIn = useTokenStore().hasValidLogin();
 
   // 1. 已登录

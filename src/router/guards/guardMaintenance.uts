@@ -55,8 +55,6 @@ export function getMaintenanceWhiteList(): string[] {
 export function guardMaintenance(ctx: RouteGuardContext): GuardResult {
   const { to, next } = ctx;
 
-  console.log(ctx, 'guardMaintenance');
-
   if (!isMaintenanceMode) {
     return next();
   }
