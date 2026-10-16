@@ -4,16 +4,10 @@
       <text class="text-[20px] font-bold text-[#1e293b]">登录页</text>
     </view>
     <view
-      class="w-[200px] h-[44px] rounded-[8px] bg-[#3b82f6] flex flex-row items-center justify-center mb-[14px]"
+      class="w-[200px] h-[44px] rounded-[8px] bg-[#3b82f6] flex flex-row items-center justify-center"
       @click="doLogin"
     >
-      <text class="text-[#ffffff] text-[14px] font-bold">点击模拟登录</text>
-    </view>
-    <view
-      class="w-[200px] h-[44px] rounded-[8px] border-[1px] border-solid border-[#cbd5e1] flex flex-row items-center justify-center"
-      @click="doApiLogin"
-    >
-      <text class="text-[#64748b] text-[14px] font-medium">真实接口登录</text>
+      <text class="text-[#ffffff] text-[14px] font-bold">点击登录</text>
     </view>
   </view>
 </template>
@@ -22,8 +16,7 @@
 import type { IDoubleTokenRes, IUserInfo } from '@/src/store/index.uts';
 import { useTokenStore, useUserStore } from '@/src/store/index.uts';
 import { isPageTabbar, switchTabbar } from '@/src/tabbar/index.uts';
-import { login } from '@/src/api/auth/auth.uts';
-import type { AuthUserInfo, LoginQuery, LoginResult } from '@/src/api/auth/auth.uts';
+import type { AuthUserInfo, LoginResult } from '@/src/api/auth/auth.uts';
 import { useRoute, useRouter } from '@/uni_modules/route-bestX/index.uts';
 import { DEFAULT_HOME_PAGE } from '@/src/router/config.uts';
 
