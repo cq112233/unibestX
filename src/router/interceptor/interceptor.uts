@@ -3,7 +3,6 @@ import { runRouterGuard } from '../guard/index.uts';
 import type { RouteTarget } from '../guard/types.uts';
 import { applyTargetRouteFromUrl, installRouteStateListener, routeState, syncRouteState } from '../hooks/route-state.uts';
 import { getQueryString, parseUrlToObj } from '../utils/utils.uts';
-import { isH5 } from '@/src/config/env/platform.uts';
 
 /**
  * 本文件是**框架侧**：只负责「读 uni 导航入参 → 归一化 URL → 交给业务守卫裁决 →
@@ -427,31 +426,73 @@ export const chooseLocationInterceptor: Interceptor = {
   }
 };
 
+// #ifdef H5 || WEB
 /**
  * 监听 H5 浏览器历史前进/后退操作（popstate）
  * 当用户点击浏览器自带的前进/后退按钮时触发守卫校验
  */
 function installH5PopstateListener(): void {
-  if (isH5) {
-    if (typeof window != 'undefined') {
-      window.addEventListener('popstate', () => {
-        setTimeout(() => {
-          let h5Url = '';
-          const hash = window.location.hash;
-          if (hash.startsWith('#/')) {
-            h5Url = hash.substring(1);
-          }
-          else {
-            h5Url = window.location.pathname + window.location.search;
-          }
-          if (h5Url != '' && h5Url != '/') {
-            doIntercept(h5Url, 'popstate');
-          }
-        }, 0);
-      });
-    }
+  if (typeof window != 'undefined') {
+    window.addEventListener('popstate', () => {
+      setTimeout(() => {
+        let h5Url = '';
+        const hash = window.location.hash;
+        if (hash.startsWith('#/')) {
+          h5Url = hash.substring(1);
+        }
+        else {
+          h5Url = window.location.pathname + window.location.search;
+        }
+        if (h5Url != '' && h5Url != '/') {
+          doIntercept(h5Url, 'popstate');
+        }
+      }, 0);
+    });
   }
 }
+// #endif
+
+// #ifdef MP-ALIPAY
+/**
+ * 监听支付宝小程序页面返回操作（onAppRoute）
+ * 解决支付宝小程序原生返回（左上角返回按钮、边缘侧滑返回手势）绕过 navigateBack 拦截器的问题
+ */
+function installAlipayNavigateBackListener(): void {
+  uni.onAppRoute((event: AppRouteEvent): void => {
+    if (event.openType == 'navigateBack') {
+      const rawPath = event.path;
+      if (rawPath == '') {
+        return;
+      }
+      let url = rawPath;
+      if (url.startsWith('src/')) {
+        url = `/${url}`;
+      }
+      if (!url.startsWith('/')) {
+        url = `/${url}`;
+      }
+      const queryObj: UTSJSONObject | null = event.query ?? null;
+      if (queryObj != null) {
+        const keys = UTSJSONObject.keys(queryObj);
+        if (keys.length > 0) {
+          const pairs: string[] = [];
+          for (let i = 0; i < keys.length; i++) {
+            const k = keys[i];
+            const v = queryObj[k];
+            if (v != null) {
+              pairs.push(`${k}=${encodeURIComponent(`${v}`)}`);
+            }
+          }
+          if (pairs.length > 0) {
+            url = `${url}?${pairs.join('&')}`;
+          }
+        }
+      }
+      doIntercept(url, 'navigateBack');
+    }
+  });
+}
+// #endif
 
 /**
  * 全局路由拦截安装器
@@ -466,7 +507,12 @@ export function installRouteInterceptor() {
   uni.addInterceptor('switchTab', switchTabInterceptor);
   uni.addInterceptor('navigateBack', navigateBackInterceptor);
   uni.addInterceptor('chooseLocation', chooseLocationInterceptor);
+  // #ifdef H5 || WEB
   installH5PopstateListener();
+  // #endif
+  // #ifdef MP-ALIPAY
+  installAlipayNavigateBackListener();
+  // #endif
 }
 
 /** 记录是否已经完成过初始冷启动入口检查（避免 App 后台切前台时重复检查普通入口） */
@@ -495,21 +541,21 @@ export function checkDirectEntry(options: UTSJSONObject | null) {
   }
 
   // 2. H5 端优先提取浏览器地址栏真实路由
-  if (isH5) {
-    if (typeof window != 'undefined') {
-      let h5Url = '';
-      const hash = window.location.hash;
-      if (hash.startsWith('#/')) {
-        h5Url = hash.substring(1);
-      }
-      else {
-        h5Url = window.location.pathname + window.location.search;
-      }
-      if (h5Url != '' && h5Url != '/') {
-        targetPath = h5Url;
-      }
+  // #ifdef H5 || WEB
+  if (typeof window != 'undefined') {
+    let h5Url = '';
+    const hash = window.location.hash;
+    if (hash.startsWith('#/')) {
+      h5Url = hash.substring(1);
+    }
+    else {
+      h5Url = window.location.pathname + window.location.search;
+    }
+    if (h5Url != '' && h5Url != '/') {
+      targetPath = h5Url;
     }
   }
+  // #endif
 
   // 3. 如果既无直达 path 也不是 H5 定向地址，针对冷启动首屏（如 App 打开）做一次准入校验
   if (targetPath == '') {
