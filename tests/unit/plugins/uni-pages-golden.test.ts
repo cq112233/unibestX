@@ -44,6 +44,10 @@ let savedEnv: Record<string, string | undefined> = {};
 const tmpRoots: string[] = [];
 
 function gitShow(rel: string): string {
+  const localFile = path.join(ROOT, rel);
+  if (fs.existsSync(localFile)) {
+    return fs.readFileSync(localFile, 'utf-8');
+  }
   return execFileSync('git', ['show', `HEAD:${rel}`], { cwd: ROOT, encoding: 'utf-8' });
 }
 
