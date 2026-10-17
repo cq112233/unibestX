@@ -116,6 +116,8 @@ process.env.VITE_BUILD_TIME = new Date().toISOString();
 
 const isBuild = process.env.NODE_ENV === 'production' || process.argv.includes('build');
 const env = loadEnv(process.env.NODE_ENV || 'production', projectRoot, '');
+// 同步注入 process.env，确保构建期各插件（包括 UniManifest 解析 manifest.config.ts）无论从何处启动都能读取全量环境变量
+Object.assign(process.env, env);
 const isVisualizer = process.env.VISUALIZER === 'true'
   || env.VISUALIZER === 'true'
   || env.VITE_VISUALIZER === 'true'

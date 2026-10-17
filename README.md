@@ -65,7 +65,7 @@
   - [底部 TabBar 体系](#底部-tabbar-体系)
   - [主题切换（暗黑模式）](#主题切换暗黑模式)
   - [路由守卫](#路由守卫)
-  - [请求封装](#请求封装)
+  - [请求封装与 OpenAPI 强类型接口生成](#请求封装与-openapi-强类型接口生成)
   - [文件上传](#文件上传)
   - [状态管理](#状态管理)
   - [i18n 多语言](#i18n-多语言)
@@ -137,6 +137,13 @@ pnpm install
 
 > [!WARNING]
 > **使用 CLI 命令前，必须先启动 HBuilderX**（需 **5.26 及以上**）。CLI 命令本质是通过正在运行的 HBuilderX 来编译运行项目，未打开时会报「未找到 HBuilderX」。App 端（Android / iOS / 鸿蒙）编译只能由 HBuilderX 完成。
+
+<!-- -->
+
+> [!TIP]
+> **💡 关于开发 IDE 与 HBuilder V 现状**：
+> 官方基于 VSCode 架构的新一代编辑器 **HBuilder V** 目前处于 Alpha 早期阶段，插件生态和稳定性尚在快速演进中。
+> 现阶段最推荐的工作流组合为：**VSCode / Trae / Cursor / Antigravity 编写代码与业务** + **HBuilderX 后台负责底层编译运行与原生基座**，双剑合璧体验最丝滑稳定；等后续 HBuilder V 迭代成熟稳定后再平滑全量切换。
 
 #### 🖥️ 方式一：命令行 CLI
 
@@ -241,6 +248,8 @@ pnpm docker:down
 #### 其他常用脚本
 
 ```bash
+pnpm api:gen        # 根据 OpenAPI / Apifox 规范一键生成全端 UTS 强类型接口与数据模型
+pnpm manifest       # 一键将 manifest.config.ts 编译同步至 manifest.json（敏感凭证读取 .env.local）
 pnpm test           # Vitest 自动化单元测试（含 UVUE / Vue 组件与核心工具库）
 pnpm test:watch     # Vitest 交互式监听测试模式
 pnpm typecheck      # 严格类型检查（tsc --noEmit -p tsconfig.typecheck.json，仅 src/，0 报错门禁）
@@ -273,8 +282,11 @@ pnpm docs:dev       # 本地启动 VitePress 文档站
 | 10 | 🚀 **Vapor / VDOM 渲染** | [manifest.json](manifest.json) / [vite.config.ts](vite.config.ts) | 原生渲染引擎模式切换，默认开启高性能 Vapor 蒸汽模式（无虚拟 DOM 原生极速渲染），兼容传统 VDOM |
 | 11 | ⚡ **沙盒独立调试** | [pages.json](pages.json) / [.env](.env) | 开发阶段通过 `VITE_DEV_SANDBOX=true` 或 `definePage({ debug: true })` 仅编译单页面，冷启动秒级直达 |
 | 12 | 📦 **配套生态组件** | [uni_modules/](uni_modules/) | 内置经过作者深度兼容性定制与修复的 `z-paging-x`、`e-chart`、`uni-icons`、加密库等，开箱稳定可用 |
+| 13 | 🧬 **OpenAPI 接口生成** | [openapi-ts-request.config.ts](openapi-ts-request.config.ts) | 配置 Apifox / Swagger 规范来源，执行 `pnpm api:gen` 自动生成全端 UTS 强类型 API 客户端与数据模型 |
+| 14 | 🔐 **敏感凭证隔离** | [.env.local](.env.local.example) / [manifest.config.ts](manifest.config.ts) | 隔离 DCloud AppID、uniCloud 密钥、小程序 AppID 与鸿蒙私钥密码，执行 `pnpm manifest` 自动同步 |
+| 15 | 🛡️ **工程化质量规范** | [stylelint.config.mjs](stylelint.config.mjs) / [.commitlintrc.cjs](.commitlintrc.cjs) / [cspell.json](cspell.json) | Stylelint 样式规约（适配 rpx/upx 与原生组件）、Commitlint 提交信息校验与 CSpell 专有词库拼写检查 |
 
-> 💡 **移动端查看建议**：首页（Tab 1）已内嵌以上 12 项卡片速查表，开发时在真机或模拟器可随时对照浏览。
+> 💡 **移动端查看建议**：首页（Tab 1）已内嵌核心卡片速查表，开发时在真机或模拟器可随时对照浏览。
 
 ---
 
@@ -309,6 +321,8 @@ pnpm docs:dev       # 本地启动 VitePress 文档站
 - 🌈 **动态主题** — `theme.json` 单源色板，CSS 变量驱动的明暗主题切换
 - 📊 **ECharts** — 图表组件支持
 - 🔌 **请求封装** — 基于 `lime-request`，支持多域名、Token 自动续期、SSE 流式传输
+- 🧬 **OpenAPI / Apifox 强类型生成** — 基于 `openapi-ts-request` 与智能逆向推导，`pnpm api:gen` 一键生成 UTS 强类型接口与完整数据模型，告别手写胶水代码
+- 🔐 **敏感凭证隔离** — 支持 `.env.local` 独立保护 DCloud AppID、uniCloud 密钥、小程序 AppID 与鸿蒙证书密码，配合 `pnpm manifest` 零泄露同步构建
 - 📤 **文件上传** — 基于原生 `uni.uploadFile` 统一封装，支持 OSS 上传与进度回调
 - 🐳 **H5 Docker 极速部署** — 宿主机构建 + Nginx:alpine 轻量容器运行（~25MB，秒级打包），内置动态环境变量反代与 Hash 路由兜底
 - 🧪 **完整单元测试体系** — 内置 **Vitest + @vue/test-utils + happy-dom**，原生支持 UTS 核心工具类、自定义构建插件与 `.uvue` 页面组件挂载测试，单测 100% 覆盖核心逻辑
@@ -460,6 +474,7 @@ unibestX/
 ├── CLAUDE.md / AGENTS.md         # AI Agent 会话级规约（技能路由、内置工具优先复用等）
 ├── src/
 │   ├── api/                      # API 请求模块（foo.uts / user.uts / auth.uts 等）
+│   │   └── generated/            #   ⭐ OpenAPI / Apifox 自动生成的强类型 UTS 接口与类型定义
 │   ├── assets/                   # 静态资源（图标、图片等）
 │   ├── components/               # 公共业务组件
 │   │   ├── NavBar/               #   自定义通用导航栏组件
@@ -467,6 +482,7 @@ unibestX/
 │   │   └── TabbarMaskModal/      #   TabBar 遮罩弹层
 │   ├── http/                     # HTTP 客户端封装（基于 lime-request）
 │   │   ├── request.uts           #   HttpClient 核心类与拦截器
+│   │   ├── openapi.uts           #   ⭐ OpenAPI 代码生成专属 UTS 强类型适配器
 │   │   ├── stream.uts            #   SSE / Chunk 流式请求封装
 │   │   ├── types.uts             #   HTTP 响应与请求类型定义
 │   │   └── tools/enum.uts        #   HTTP 状态码与业务枚举
@@ -555,8 +571,17 @@ unibestX/
 ├── theme.json                    # ⭐ 明暗主题色板唯一真源（light / dark）
 ├── pages.config.json             # ⭐ 页面路由与全局配置（路由与页面配置请改这里）
 ├── pages.json                    # ⚠️ 自动生成的页面路由表（编译产物，请勿手动编辑）
+├── openapi-ts-request.config.ts  # ⭐ OpenAPI / Apifox 接口代码生成器配置
+├── .env.local.example            # ⭐ 本地私有敏感变量示例模板（Token、AppID、证书密码等）
+├── scripts/
+│   ├── api-generate.mjs          #   OpenAPI 逆向推导与 UTS 代码生成脚本
+│   └── generate-manifest.mjs     #   manifest.json 一键同步编译脚本
 ├── manifest.config.ts            # ⭐ 应用配置真源（多端 AppID、权限、vapor 开关等，请改这里）
 ├── manifest.json                 # ⚠️ 由 manifest.config.ts 生成（勿手动编辑，改了会被覆盖）
+├── stylelint.config.mjs          # ⭐ Stylelint 样式规则（适配 SCSS、rpx/upx 与原生组件）
+├── .commitlintrc.cjs             # ⭐ Commitlint 提交信息规范配置（Angular 格式）
+├── cspell.json                   # ⭐ CSpell 专有词库拼写检查配置
+├── .husky/                       # ⭐ Git 提交拦截钩子（pre-commit / commit-msg）
 ├── vite.config.ts                # Vite 构建配置（Tailwind 与 5 个自定义插件）
 ├── uni.scss                      # 全局 SCSS 变量与主题注入
 ├── tsconfig.json                 # TypeScript / UTS 编译配置（含 VSCode 全量诊断范围）
@@ -755,13 +780,14 @@ VITE_DEV_SANDBOX_PAGES=src/sub/auth/login,src/pages/me/me
 5. **生产发版打包安全熔断**
    - 执行 `pnpm build:h5` 或正式打包发版时，插件会自动判定生产模式并**强制熔断沙盒模式**，100% 输出完整项目全量页面，绝无将调试配置带入线上的风险！
 
-### manifest.json 由 TypeScript 生成（manifest.config.ts）
+### manifest.json 由 TypeScript 生成（manifest.config.ts）与敏感凭证隔离
 
 根目录的 `manifest.json` **不是手写的**，它由 [manifest.config.ts](manifest.config.ts) 生成（基于 `@uni-helper/vite-plugin-uni-manifest`，配置项带完整类型提示与补全）：
 
-- **改配置改 `manifest.config.ts`**，`manifest.json` 由构建时的插件自动重写，不需要手动执行任何命令。
-- ⚠️ **`manifest.json` 是编译期真源，必须跟着 `manifest.config.ts` 一起提交**。uni-app 在编译进程启动时（vite 之前）就读取它并做进程级缓存，插件的写盘永远晚一步 —— 改完 `manifest.config.ts` 后，**本次编译用的仍是磁盘上的旧值，要再跑一次才生效**；发版场景下这意味着可能打出旧 `appid` / `versionCode`。
-- 插件注册在 `vite.config.ts` 里，且必须在 `uni()` 之前：dev server 运行期间改 `manifest.config.ts`，插件会在一秒内把 `manifest.json` 重写为新内容（实测），只是**已在运行的编译进程不会重新读取**，重启后生效。
+- **改配置改 `manifest.config.ts`**，`manifest.json` 由构建时的插件自动重写。
+- 🔐 **敏感凭证隔离（.env.local）**：若需避免个人真实 AppID 或密钥提交到公共仓库，可在根目录创建 `.env.local`（参考 [.env.local.example](.env.local.example)），配置 `VITE_DCLOUD_APPID`、`VITE_WX_APPID`、`VITE_UNICLOUD_*` 等；`manifest.config.ts` 会自动读取并注入。
+- ⚡ **一键手动同步生成（pnpm manifest）**：无需启动 dev/build 服务，执行 `pnpm manifest` 即可瞬间根据当前环境配置重新生成 `manifest.json`，且生成格式与 HBuilderX 原生 Tab 缩进及末尾换行严格对齐（0 噪音 diff）。
+- ⚠️ **`manifest.json` 是编译期真源，必须跟着 `manifest.config.ts` 一起提交**。uni-app 在编译进程启动时（vite 之前）就读取它并做进程级缓存，插件的写盘永远晚一步 —— 改完 `manifest.config.ts` 后，**本次编译用的仍是磁盘上的旧值，要再跑一次才生效**；发版场景下建议先执行 `pnpm manifest`。
 - **不要用 HBuilderX 的 `manifest.json` 可视化界面改配置** —— 它写的是 `manifest.json`，下一次和 `manifest.config.ts` 不一致时就会被覆盖回去。必须用可视化界面时，改完记得把改动回填到 `manifest.config.ts`。
 - 生成物会包含 [manifest.config.ts](manifest.config.ts) 之外的少量既有默认项（`transformPx`、`app-plus`、`mp-harmony`），来自插件内置的 uni-app 官方预设，不影响 uni-app x 各端编译。
 
@@ -948,7 +974,9 @@ src/tabbar/config.uts (唯一样本源)
 
 相关文件：`src/router/`，子模块化拆分为 `config/`（登录策略与黑白名单）、`guard/`（**业务规则主战场**，一条规则一个文件）、`hooks/`（`useRoute()` / `useRouter()` 组合式 hooks）、`interceptor/`（导航管道）、`toLoginPage/`、`utils/`。门面 `@/src/router/index.uts` **只转发 `config` + `useRoute` + `useRouter` + `interceptor` 四块**，其余符号须精准导入（详见 [src/router/README.md](src/router/README.md)）。
 
-### 请求封装
+### 请求封装与 OpenAPI 强类型接口生成
+
+#### 1. 基础请求封装
 
 基于 `lime-request` 封装的 HTTP 客户端（`src/http/request.uts`）：
 
@@ -960,6 +988,23 @@ src/tabbar/config.uts (唯一样本源)
 - 另有 `src/http/stream.uts` 提供 SSE / Chunk 流式请求能力
 
 > ⚠️ **严禁自己写 `uni.request`** —— 鉴权头、业务码判定、401 跳登录都在 `src/http/request.uts` 的拦截器里统一处理。
+
+#### 2. OpenAPI / Apifox 强类型客户端生成（pnpm api:gen）
+
+项目集成了 `openapi-ts-request` 与智能逆向推导引擎（[scripts/api-generate.mjs](scripts/api-generate.mjs) 与 [openapi-ts-request.config.ts](openapi-ts-request.config.ts)），可一键将远程 Apifox / Swagger / OpenAPI 规范转换为高质量的 UTS 强类型接口：
+
+- **智能推导补全**：针对 Apifox 用户仅在接口示例中提供 JSON 数据而未定义 schema 的痛点，内置智能逆向递归推导器，从 `example` 中自动推导字段结构与类型，杜绝类型退化为 `Record<string, unknown>`。
+- **UTS 强类型铁律规范**：自动将生成的 `interface` 严格转换为 `type` 别名（解决 UTS110111163 报错），保留精确的相对导入（如 `./types.uts`），彻底杜绝微信小程序 uts2js 编译时的纯类型导出丢失。
+- **与核心请求库无缝协同**：底层请求适配器接入 [src/http/openapi.uts](src/http/openapi.uts)，完整复用现有的 TokenStore 鉴权、响应拦截、错误轻提示与多域名配置。
+- **敏感 Token 隔离**：Apifox 的 Token 与 Project ID 配置在 `.env.local` 中，无需担心密钥随 Git 泄露。
+
+**执行命令**：
+
+```bash
+pnpm api:gen
+```
+
+生成产物自动输出到 `src/api/generated/`，直接导入使用即可获得完整的字段代码提示与类型约束。
 
 ### 文件上传
 

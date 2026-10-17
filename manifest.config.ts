@@ -1,12 +1,15 @@
-import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { defineManifestConfig } from '@uni-helper/vite-plugin-uni-manifest';
+import { loadEnv } from 'vite';
 
-// 优先尝试加载本地私有环境变量 .env.local（若有配置，可无感覆盖下面的默认敏感参数）
-const envLocalPath = path.resolve(process.cwd(), '.env.local');
-if (fs.existsSync(envLocalPath) && typeof process.loadEnvFile === 'function') {
-  process.loadEnvFile(envLocalPath);
-}
+// 准确定位项目根目录，通过 Vite 的 loadEnv 优先加载包含 .env.local 在内的所有环境配置
+const projectRoot = path.dirname(fileURLToPath(import.meta.url));
+const envMode = process.env.NODE_ENV || 'production';
+const env = {
+  ...loadEnv(envMode, projectRoot, ''),
+  ...process.env
+};
 
 /**
  * manifest.json 的唯一真源（Single Source of Truth）。
@@ -29,14 +32,14 @@ export default defineManifestConfig({
   'name': 'unibestX',
 
   // 1. DCloud / HBuilderX 应用唯一标识（可在 HBuilderX 菜单中重新获取，或通过 VITE_DCLOUD_APPID 覆盖）
-  'appid': process.env.VITE_DCLOUD_APPID || '',
+  'appid': env.VITE_DCLOUD_APPID || '__UNI__B120614',
 
   // 2. uniCloud 阿里云/支付宝云空间配置（敏感凭证建议置于 .env.local 中）
   'uniCloud': {
     provider: 'alipay',
-    spaceId: process.env.VITE_UNICLOUD_SPACE_ID || '',
-    accessKey: process.env.VITE_UNICLOUD_ACCESS_KEY || '',
-    secretKey: process.env.VITE_UNICLOUD_SECRET_KEY || ''
+    spaceId: env.VITE_UNICLOUD_SPACE_ID || 'env-00jy6p9vat6w',
+    accessKey: env.VITE_UNICLOUD_ACCESS_KEY || 'v1hNSO9cKet13BIZ',
+    secretKey: env.VITE_UNICLOUD_SECRET_KEY || 'KCHJ9hiSZqvmd8Yx'
   },
 
   'description': '',
@@ -55,7 +58,7 @@ export default defineManifestConfig({
 
   // 3. 微信小程序平台配置（可在微信公众平台获取，或通过 VITE_WX_APPID 覆盖）
   'mp-weixin': {
-    appid: process.env.VITE_WX_APPID || 'wx6d379a8c0aff3ea3',
+    appid: env.VITE_WX_APPID || 'wx6d379a8c0aff3ea3',
     darkmode: true,
     optimization: {
       subpackages: true
@@ -73,7 +76,7 @@ export default defineManifestConfig({
   // 4. 支付宝小程序平台配置（可在支付宝开放平台获取，或通过 VITE_ALIPAY_APPID 覆盖）
   'mp-alipay': {
     usingComponents: true,
-    appid: process.env.VITE_ALIPAY_APPID,
+    appid: env.VITE_ALIPAY_APPID || '2021007104619426',
     component2: true,
     enableAppxNg: true,
     unipush: {
@@ -142,16 +145,16 @@ export default defineManifestConfig({
   // 5. 鸿蒙（HarmonyOS）构建与证书签名配置（支持环境变量动态注入与本地默认证书）
   'app-harmony': {
     distribute: {
-      bundleName: process.env.VITE_HARMONY_BUNDLE_NAME || 'com.bigScreen.qizhi',
+      bundleName: env.VITE_HARMONY_BUNDLE_NAME || 'com.bigScreen.qizhi',
       signingConfigs: {
         default: {
-          certpath: process.env.VITE_HARMONY_CERTPATH || '/Users/chenqi/Library/Application Support/HBuilder X/extensions/launcher/agc-certs/1785394649196.cer',
-          keyAlias: process.env.VITE_HARMONY_KEY_ALIAS || 'debugKey',
-          keyPassword: process.env.VITE_HARMONY_KEY_PASSWORD || '0000001B93BBB9B62A487A04FD8306E077C8FE542BDFD995CE951E13BEF4E7ED88666ED9C3FFE6BA2C3ED6',
-          profile: process.env.VITE_HARMONY_PROFILE || '/Users/chenqi/Library/Application Support/HBuilder X/extensions/launcher/agc-certs/1786603228952.p7b',
+          certpath: env.VITE_HARMONY_CERTPATH || '/Users/chenqi/Library/Application Support/HBuilder X/extensions/launcher/agc-certs/1785394649196.cer',
+          keyAlias: env.VITE_HARMONY_KEY_ALIAS || 'debugKey',
+          keyPassword: env.VITE_HARMONY_KEY_PASSWORD || '0000001B93BBB9B62A487A04FD8306E077C8FE542BDFD995CE951E13BEF4E7ED88666ED9C3FFE6BA2C3ED6',
+          profile: env.VITE_HARMONY_PROFILE || '/Users/chenqi/Library/Application Support/HBuilder X/extensions/launcher/agc-certs/1786603228952.p7b',
           signAlg: 'SHA256withECDSA',
-          storeFile: process.env.VITE_HARMONY_STORE_FILE || '/Users/chenqi/Library/Application Support/HBuilder X/extensions/launcher/agc-certs/1785394649196.p12',
-          storePassword: process.env.VITE_HARMONY_STORE_PASSWORD || '0000001B93BBB9B62A487A04FD8306E077C8FE542BDFD995CE951E13BEF4E7ED88666ED9C3FFE6BA2C3ED6'
+          storeFile: env.VITE_HARMONY_STORE_FILE || '/Users/chenqi/Library/Application Support/HBuilder X/extensions/launcher/agc-certs/1785394649196.p12',
+          storePassword: env.VITE_HARMONY_STORE_PASSWORD || '0000001B93BBB9B62A487A04FD8306E077C8FE542BDFD995CE951E13BEF4E7ED88666ED9C3FFE6BA2C3ED6'
         }
       }
     }

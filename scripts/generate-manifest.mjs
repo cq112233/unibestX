@@ -9,7 +9,7 @@ const watcher = await createManifestWatcher({
   outDir: projectRoot,
   indent: '\t',
   eol: '\n',
-  insertFinalNewline: true,
+  insertFinalNewline: true
 });
 
 await watcher.unwatch();
