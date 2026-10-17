@@ -369,6 +369,7 @@ configs.push({
       OnBackPressOptions: 'readonly',
       onPageScroll: 'readonly',
       onResize: 'readonly',
+      OnResizeOptions: 'readonly',
       onTabItemTap: 'readonly',
       onError: 'readonly',
       onUnhandledRejection: 'readonly',

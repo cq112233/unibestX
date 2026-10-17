@@ -17,321 +17,38 @@
 </template>
 
 <script setup lang="uts">
-type TitleOption = {
-  text?: string
-  color?: string
-  show?: boolean
-  fontSize?: number
-  align?: string
-  left?: number
-  top?: number
-}
+import {
+  CanvasTextAlign,
+  TitleOption,
+  GridOption,
+  AxisLabelOption,
+  AxisLineOption,
+  SplitLineOption,
+  AxisOption,
+  LegendOption,
+  LabelOption,
+  PieLabelOption,
+  RadarIndicatorOption,
+  RadarOption,
+  LineStyleOption,
+  MarkLineOption,
+  MarkPointOption,
+  MarkAreaOption,
+  LineColorRangeOption,
+  ItemStyleOption,
+  ChartSeries,
+  HitRegion,
+  TooltipOption,
+  TooltipData,
+  TooltipItem,
+  ChartOption,
+  Point,
+  PieOutsideLabel,
+  PieInsideLabel
+} from './types.uts'
 
-type GridOption = {
-  left?: number
-  right?: number
-  top?: number
-  bottom?: number
-  show?: boolean
-  color?: string
-  backgroundColor?: string
-  borderColor?: string
-  showHorizontal?: boolean
-  showVertical?: boolean
-}
 
-type AxisLabelOption = {
-  interval?: number
-  format?: string
-  rotate?: number
-  color?: string
-  show?: boolean
-  fontSize?: number
-}
-
-type AxisLineOption = {
-  show?: boolean
-  color?: string
-}
-
-type SplitLineOption = {
-  show?: boolean
-  color?: string
-}
-
-type AxisOption = {
-  data?: string[]
-  min?: number
-  max?: number
-  color?: string
-  axisLabel?: AxisLabelOption
-  axisLine?: AxisLineOption
-  splitLine?: SplitLineOption
-  valueSuffix?: string
-}
-
-type LegendOption = {
-  show?: boolean
-  textColor?: string
-  toggleable?: boolean
-  fontSize?: number
-  iconSize?: number
-  itemGap?: number
-  rowGap?: number
-  position?: string
-  barLayout?: string
-}
-
-type LabelOption = {
-  show?: boolean
-  color?: string
-  fontSize?: number
-  position?: string
-}
-
-type PieLabelOption = {
-  show?: boolean
-  color?: string
-  position?: string
-  showPercent?: boolean
-  showLine?: boolean
-  lineColor?: string
-}
-
-type RadarIndicatorOption = {
-  name: string
-  max: number
-}
-
-type RadarOption = {
-  indicator: RadarIndicatorOption[]
-}
-
-type LineStyleOption = {
-  color?: string
-  width?: number
-  type?: string
-  opacity?: number
-}
-
-type MarkLineOption = {
-  value: number
-  label?: string
-  color?: string
-  startIndex?: number
-}
-
-type MarkPointOption = {
-  type?: string
-  dataIndex?: number
-  label?: string
-  color?: string
-}
-
-type MarkAreaOption = {
-  startIndex: number
-  endIndex: number
-  label?: string
-  color?: string
-}
-
-type LineColorRangeOption = {
-  startIndex: number
-  endIndex: number
-  color: string
-}
-
-type ItemStyleOption = {
-  borderRadius?: number
-  opacity?: number
-  borderWidth?: number
-  borderColor?: string
-  backgroundColor?: string
-  pattern?: string
-  patternColor?: string
-  patternSize?: number
-  patternWidth?: number
-}
-
-type ChartSeries = {
-  name?: string
-  type: string
-  data: number[]
-  scatterData?: number[][]
-  boxplotData?: number[][]
-  candlestickData?: number[][]
-  color?: string
-  colors?: string[]
-  itemColors?: string[]
-  startIndex?: number
-  barWidth?: number | string
-  orient?: string
-  stack?: string
-  realtimeSort?: boolean
-  symbolSize?: number
-  radius?: number | string
-  innerRadius?: number | string
-  startAngle?: number
-  pieStyle?: string
-  roseType?: string
-  selectedMode?: boolean
-  selectedOffset?: number
-  showLabel?: boolean
-  showPercent?: boolean
-  labelPosition?: string
-  showLabelLine?: boolean
-  labelLineLength?: number
-  labelLineLength2?: number
-  labelLineColor?: string
-  labelColor?: string
-  labelFormat?: string
-  labelAvoidOverlap?: boolean
-  labelMinGap?: number
-  labelMaxWidth?: number
-  borderWidth?: number
-  borderColor?: string
-  smooth?: boolean
-  step?: string
-  showSymbol?: boolean
-  symbolStyle?: string
-  lineStyle?: LineStyleOption
-  markLine?: MarkLineOption[]
-  markPoint?: MarkPointOption[]
-  markArea?: MarkAreaOption[]
-  lineColorRanges?: LineColorRangeOption[]
-  areaStyle?: boolean
-  itemStyle?: ItemStyleOption
-  label?: LabelOption
-  overlay?: boolean
-  gradientColors?: string[]
-  progressMax?: number
-  progressGap?: number
-  progressRound?: boolean
-  progressBackgroundColor?: string
-  centerText?: string
-  centerValue?: string
-  centerTextColor?: string
-  centerValueColor?: string
-  centerValueFontSize?: number
-  gaugeStyle?: string
-  gaugeGradientColors?: string[]
-  gaugeBackgroundColor?: string
-  gaugeWidth?: number
-  pointerColor?: string
-  gaugeStartAngle?: number
-  gaugeEndAngle?: number
-  gaugeRound?: boolean
-  gaugeShowPointer?: boolean
-  gaugeShowTicks?: boolean
-  gaugeTickCount?: number
-}
-
-type HitRegion = {
-  type: string
-  seriesIndex: number
-  dataIndex: number
-  name: string
-  value: number
-  x: number
-  y: number
-  width: number
-  height: number
-  centerX: number
-  centerY: number
-  radius: number
-  startAngle: number
-  endAngle: number
-  innerRadius?: number
-}
-
-type TooltipOption = {
-  show?: boolean
-  merge?: boolean
-  trigger?: string
-  axisLineColor?: string
-  axisLineLabelColor?: string
-  axisLineLabelBgColor?: string
-  showAxisLine?: boolean
-  axisPointerLineColor?: string
-  axisPointerLabelColor?: string
-  axisPointerLabelBgColor?: string
-  showAxisPointer?: boolean
-  duration?: number
-  backgroundColor?: string
-  textColor?: string
-  borderRadius?: number
-  showMarker?: boolean
-  respectLegend?: boolean
-}
-
-type TooltipData = {
-  dataIndex: number
-  seriesIndex: number
-  x: number
-  y: number
-  categoryLabel: string
-  items: TooltipItem[]
-}
-
-type TooltipItem = {
-  seriesName: string
-  value: number
-  color: string
-  y: number
-}
-
-type ChartOption = {
-  title?: TitleOption
-  grid?: GridOption
-  xAxis?: AxisOption
-  yAxis?: AxisOption
-  radar?: RadarOption
-  legend?: LegendOption
-  label?: LabelOption
-  tooltip?: TooltipOption
-  series: ChartSeries[]
-  backgroundColor?: string
-  textColor?: string
-  animation?: boolean
-  animationDuration?: number
-  animationEasing?: string
-  animationMode?: string
-  scatterBarMode?: string
-}
-
-type ChartClickEvent = {
-  x: number
-  y: number
-  type: string
-  seriesIndex: number
-  dataIndex: number
-  seriesName: string
-  value: number
-}
-
-type Point = {
-  x: number
-  y: number
-}
-
-type PieOutsideLabel = {
-  text: string
-  color: string
-  angle: number
-  centerX: number
-  centerY: number
-  radius: number
-  labelY?: number
-}
-
-type PieInsideLabel = {
-  text: string
-  x: number
-  y: number
-  color: string
-  fontSize: number
-}
-
+// XTF-Charts Component Props
 const props = withDefaults(defineProps<{
   option: ChartOption
   canvasId?: string
@@ -351,7 +68,7 @@ const props = withDefaults(defineProps<{
 
 const emit = defineEmits<{
   ready: []
-  click: [event: ChartClickEvent]
+  click: [event: UTSJSONObject]
 }>()
 
 const instance = getCurrentInstance()!.proxy!
@@ -370,12 +87,12 @@ let touchStartX = 0
 let touchStartY = 0
 let isHorizontalPanning = false
 let activeTooltip: TooltipData | null = null
-let tooltipTimer: ReturnType<typeof setTimeout> | null = null
+let tooltipTimer: number | null = null
 let hiddenSeries: Set<number> = new Set()
 let previousRealtimeCategoryLabels: string[] = []
 let previousRealtimeSeriesData: number[][] = []
 let previousScatterBarMode = ''
-let cartesianLayout: {
+type XtfCartesianLayout = {
   left: number
   top: number
   plotWidth: number
@@ -388,7 +105,8 @@ let cartesianLayout: {
   categoryCount: number
   minValue: number
   maxValue: number
-} | null = null
+}
+let cartesianLayout: XtfCartesianLayout | null = null
 
 function numberOrDefault(value: number | null, fallback: number): number {
   return value ?? fallback
@@ -433,16 +151,31 @@ function formatValue(value: number): string {
 }
 
 function getCanvasSize(): void {
-  if (canvas == null) {
+  const currentCanvas = canvas
+  if (currentCanvas == null) {
     return
   }
-  const canvasObj = canvas as any
   const configuredWidth = canvasStyleWidth.value
   let parsedWidth = 0
   if (configuredWidth.endsWith('px')) {
     parsedWidth = parseFloat(configuredWidth)
-  } else if (canvasObj != null && canvasObj.offsetWidth != null) {
-    parsedWidth = canvasObj.offsetWidth as number
+  }
+  // #ifdef WEB
+  if (parsedWidth <= 0) {
+    const canvasObj = currentCanvas as any
+    if (canvasObj != null && canvasObj.offsetWidth != null) {
+      const offsetW = canvasObj.offsetWidth as number
+      if (!isNaN(offsetW) && offsetW > 0) {
+        parsedWidth = offsetW
+      }
+    }
+  }
+  // #endif
+  if (parsedWidth <= 0) {
+    const rect = currentCanvas.getBoundingClientRect()
+    if (rect != null && rect.width > 0) {
+      parsedWidth = rect.width
+    }
   }
   if (isNaN(parsedWidth) || parsedWidth <= 0) {
     const sysWinWidth = uni.getWindowInfo().windowWidth
@@ -451,12 +184,24 @@ function getCanvasSize(): void {
   canvasWidth = parsedWidth
 
   let parsedHeight = 0
-  if (canvasObj != null && canvasObj.offsetHeight != null) {
-    parsedHeight = canvasObj.offsetHeight as number
+  if (props.height.endsWith('px')) {
+    parsedHeight = parseFloat(props.height)
   }
-  if (isNaN(parsedHeight) || parsedHeight <= 0) {
-    if (props.height.endsWith('px')) {
-      parsedHeight = parseFloat(props.height)
+  // #ifdef WEB
+  if (parsedHeight <= 0) {
+    const canvasObj = currentCanvas as any
+    if (canvasObj != null && canvasObj.offsetHeight != null) {
+      const offsetH = canvasObj.offsetHeight as number
+      if (!isNaN(offsetH) && offsetH > 0) {
+        parsedHeight = offsetH
+      }
+    }
+  }
+  // #endif
+  if (parsedHeight <= 0) {
+    const rect = currentCanvas.getBoundingClientRect()
+    if (rect != null && rect.height > 0) {
+      parsedHeight = rect.height
     }
   }
   if (isNaN(parsedHeight) || parsedHeight <= 0) {
@@ -468,9 +213,12 @@ function getCanvasSize(): void {
   if (devicePixelRatio <= 0 || isNaN(devicePixelRatio)) {
     devicePixelRatio = 1
   }
-  canvas.width = canvasWidth * devicePixelRatio
-  canvas.height = canvasHeight * devicePixelRatio
-  renderingContext!.scale(devicePixelRatio, devicePixelRatio)
+  currentCanvas.width = canvasWidth * devicePixelRatio
+  currentCanvas.height = canvasHeight * devicePixelRatio
+  const ctx = renderingContext
+  if (ctx != null) {
+    ctx.scale(devicePixelRatio, devicePixelRatio)
+  }
 }
 
 function getCategoryCount(option: ChartOption): number {
@@ -2618,8 +2366,9 @@ function drawTooltip(ctx: CanvasRenderingContext2D): void {
     boxY = canvasHeight - 8 - boxHeight
   }
   const enableAxisLine = tooltipOption.showAxisLine != false
-  if (enableAxisLine && cartesianLayout != null) {
-    const layout = cartesianLayout
+  const axisLineLayout = cartesianLayout
+  if (enableAxisLine && axisLineLayout != null) {
+    const layout = axisLineLayout
     ctx.strokeStyle = axisLineColor
     ctx.lineWidth = 1
     ctx.setLineDash([4, 3])
@@ -2660,8 +2409,9 @@ function drawTooltip(ctx: CanvasRenderingContext2D): void {
     ctx.fillText(xLabelText, xLabelBoxX + xLabelBoxW / 2, xLabelBoxY + xLabelBoxH / 2)
   }
   const showAxisPointer = tooltipOption.showAxisPointer != false
-  if (showAxisPointer && cartesianLayout != null && tooltip.items.length > 0) {
-    const layout = cartesianLayout
+  const axisPointerLayout = cartesianLayout
+  if (showAxisPointer && axisPointerLayout != null && tooltip.items.length > 0) {
+    const layout = axisPointerLayout
     const pointerLineColor = stringOrDefault(tooltipOption.axisPointerLineColor, axisLineColor)
     const pointerLabelColor = stringOrDefault(tooltipOption.axisPointerLabelColor, '#ffffff')
     const pointerLabelBgColor = stringOrDefault(tooltipOption.axisPointerLabelBgColor, axisLineColor)
@@ -2836,17 +2586,110 @@ function render(progress: number = 1): void {
   drawTooltip(ctx)
 }
 
+function cancelAnimation(): void {
+  const ctx = canvasContext
+  if (animationFrameId != 0 && ctx != null) {
+    ctx.cancelAnimationFrame(animationFrameId)
+    animationFrameId = 0
+  }
+}
+
+function startAnimation(): void {
+  cancelAnimation()
+  const ctx = canvasContext
+  if (ctx == null || currentOption.animation == false) {
+    render(1)
+    return
+  }
+  const duration = Math.max(0, currentOption.animationDuration ?? 500)
+  if (duration == 0) {
+    render(1)
+    return
+  }
+  const startTime = Date.now()
+  let renderFrame: ((timestamp: number) => void) | null = null
+  renderFrame = (_timestamp: number): void => {
+    const elapsed = Date.now() - startTime
+    const linearProgress = Math.min(1, elapsed / duration)
+    const progress = currentOption.animationEasing == 'linear' ? linearProgress : 1 - Math.pow(1 - linearProgress, 3)
+    render(progress)
+    const currentCtx = canvasContext
+    if (linearProgress < 1 && currentCtx != null) {
+      animationFrameId = currentCtx.requestAnimationFrame((ts: number) => {
+        const fn = renderFrame
+        if (fn != null) {
+          fn(ts)
+        }
+      })
+    } else {
+      animationFrameId = 0
+    }
+  }
+  const initialFn = renderFrame
+  if (initialFn != null) {
+    animationFrameId = ctx.requestAnimationFrame((ts: number) => {
+      const fn = renderFrame
+      if (fn != null) {
+        fn(ts)
+      }
+    })
+  }
+}
+
+function clearTooltipTimer(): void {
+  const timer = tooltipTimer
+  if (timer != null) {
+    clearTimeout(timer)
+    tooltipTimer = null
+  }
+}
+
+function hideTooltip(): void {
+  if (activeTooltip != null) {
+    activeTooltip = null
+    render(1)
+  }
+}
+
+function getDataURL(): string {
+  const cvs = canvas
+  if (cvs == null) {
+    return ''
+  }
+  return cvs.toDataURL('image/png')
+}
+
+function isHit(region: HitRegion, x: number, y: number): boolean {
+  if (region.type != 'pie') {
+    return x >= region.x && x <= region.x + region.width && y >= region.y && y <= region.y + region.height
+  }
+  const distanceX = x - region.centerX
+  const distanceY = y - region.centerY
+  const distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY)
+  const innerRadius = region.innerRadius ?? 0
+  if (distance > innerRadius && distance <= region.radius) {
+    let angle = Math.atan2(distanceY, distanceX)
+    let relativeAngle = angle - region.startAngle
+    while (relativeAngle < 0) {
+      relativeAngle += Math.PI * 2
+    }
+    return relativeAngle <= region.endAngle - region.startAngle
+  }
+  return false
+}
+
 function initCanvas(): void {
   uni.createCanvasContextAsync({
     id: props.canvasId,
     component: instance,
     success: (context: CanvasContext) => {
       canvasContext = context
-      renderingContext = context.getContext('2d')
-      if (renderingContext == null) {
+      const ctx = context.getContext('2d')
+      if (ctx == null) {
         return
       }
-      canvas = renderingContext.canvas
+      renderingContext = ctx
+      canvas = ctx.canvas
       updateCanvasStyleWidth()
       getCanvasSize()
       startAnimation()
@@ -2899,8 +2742,9 @@ function setOption(option: ChartOption): void {
 function clear(): void {
   cancelAnimation()
   clearTooltipTimer()
-  if (renderingContext != null) {
-    renderingContext.clearRect(0, 0, canvasWidth, canvasHeight)
+  const ctx = renderingContext
+  if (ctx != null) {
+    ctx.clearRect(0, 0, canvasWidth, canvasHeight)
   }
   hitRegions = []
   activeTooltip = null
@@ -2914,79 +2758,6 @@ function resize(): void {
   }
   getCanvasSize()
   render()
-}
-
-function cancelAnimation(): void {
-  if (animationFrameId != 0 && canvasContext != null) {
-    canvasContext.cancelAnimationFrame(animationFrameId)
-    animationFrameId = 0
-  }
-}
-
-function startAnimation(): void {
-  cancelAnimation()
-  if (canvasContext == null || currentOption.animation == false) {
-    render(1)
-    return
-  }
-  const duration = Math.max(0, currentOption.animationDuration ?? 500)
-  if (duration == 0) {
-    render(1)
-    return
-  }
-  const startTime = Date.now()
-  const renderFrame = (_timestamp: number): void => {
-    const elapsed = Date.now() - startTime
-    const linearProgress = Math.min(1, elapsed / duration)
-    const progress = currentOption.animationEasing == 'linear' ? linearProgress : 1 - Math.pow(1 - linearProgress, 3)
-    render(progress)
-    if (linearProgress < 1 && canvasContext != null) {
-      animationFrameId = canvasContext.requestAnimationFrame(renderFrame)
-    } else {
-      animationFrameId = 0
-    }
-  }
-  animationFrameId = canvasContext.requestAnimationFrame(renderFrame)
-}
-
-function getDataURL(): string {
-  if (canvas == null) {
-    return ''
-  }
-  return canvas.toDataURL('image/png')
-}
-
-function isHit(region: HitRegion, x: number, y: number): boolean {
-  if (region.type != 'pie') {
-    return x >= region.x && x <= region.x + region.width && y >= region.y && y <= region.y + region.height
-  }
-  const distanceX = x - region.centerX
-  const distanceY = y - region.centerY
-  const distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY)
-  const innerRadius = region.innerRadius ?? 0
-  if (distance > innerRadius && distance <= region.radius) {
-    let angle = Math.atan2(distanceY, distanceX)
-    let relativeAngle = angle - region.startAngle
-    while (relativeAngle < 0) {
-      relativeAngle += Math.PI * 2
-    }
-    return relativeAngle <= region.endAngle - region.startAngle
-  }
-  return false
-}
-
-function clearTooltipTimer(): void {
-  if (tooltipTimer != null) {
-    clearTimeout(tooltipTimer)
-    tooltipTimer = null
-  }
-}
-
-function hideTooltip(): void {
-  if (activeTooltip != null) {
-    activeTooltip = null
-    render(1)
-  }
 }
 
 function showTooltipForDataIndex(dataIndex: number, touchX: number, touchY: number): void {
@@ -3009,8 +2780,9 @@ function showTooltipForDataIndex(dataIndex: number, touchX: number, touchY: numb
     if (dataIndex < item.data.length) {
       const color = stringOrDefault(item.color, si % 2 == 0 ? '#2f80ed' : '#27ae60')
       let itemY = touchY
-      if (cartesianLayout != null) {
-        const layout = cartesianLayout
+      const itemLayout = cartesianLayout
+      if (itemLayout != null) {
+        const layout = itemLayout
         if (layout.horizontal) {
           itemY = layout.top + layout.categoryHeight * (dataIndex + 0.5)
         } else {
@@ -3030,8 +2802,9 @@ function showTooltipForDataIndex(dataIndex: number, touchX: number, touchY: numb
     return
   }
   let tooltipX = touchX
-  if (cartesianLayout != null) {
-    const layout = cartesianLayout
+  const tooltipLayout = cartesianLayout
+  if (tooltipLayout != null) {
+    const layout = tooltipLayout
     if (layout.horizontal && items.length > 0) {
       tooltipX = layout.left + (items[0].value - layout.minValue) / (layout.maxValue - layout.minValue) * layout.plotWidth
     } else if (layout.hasBarSeries) {
@@ -3052,17 +2825,17 @@ function showTooltipForDataIndex(dataIndex: number, touchX: number, touchY: numb
   clearTooltipTimer()
   const duration = numberOrDefault(tooltipOption.duration, 1800)
   if (duration > 0) {
-    tooltipTimer = setTimeout(() => {
+    tooltipTimer = ((setTimeout(() => {
       hideTooltip()
-    }, duration)
+    }, duration) as any) as number)
   }
 }
 
 function findDataIndexByX(x: number): number {
-  if (cartesianLayout == null) {
+  const layout = cartesianLayout
+  if (layout == null) {
     return -1
   }
-  const layout = cartesianLayout
   if (x < layout.left || x > layout.left + layout.plotWidth) {
     return -1
   }
@@ -3078,10 +2851,10 @@ function findDataIndexByX(x: number): number {
 }
 
 function findDataIndexByY(y: number): number {
-  if (cartesianLayout == null) {
+  const layout = cartesianLayout
+  if (layout == null) {
     return -1
   }
-  const layout = cartesianLayout
   if (y < layout.top || y > layout.top + layout.plotHeight) {
     return -1
   }
@@ -3095,32 +2868,22 @@ function handleTouchEnd(event: TouchEvent): void {
     isHorizontalPanning = false
     return
   }
-  const touch = event.changedTouches.length > 0 ? event.changedTouches[0] : null
+  const touch = event.changedTouches.length > 0 ? event.changedTouches[0] : (event.touches.length > 0 ? event.touches[0] : null)
   if (touch == null) {
     return
   }
-  const touchAny = touch as any
-  let x = 0
-  let y = 0
-  if (touchAny.x != null && touchAny.y != null) {
-    x = (touchAny.x as number) ?? 0
-    y = (touchAny.y as number) ?? 0
-  } else {
-    let left = 0
-    let top = 0
-    const canvasObj = canvas as any
-    if (canvasObj != null && typeof canvasObj.getBoundingClientRect == 'function') {
-      const rect = canvasObj.getBoundingClientRect() as any
-      if (rect != null) {
-        left = (rect.left as number) ?? 0
-        top = (rect.top as number) ?? 0
-      }
+  let left = 0
+  let top = 0
+  const currentCanvas = canvas
+  if (currentCanvas != null) {
+    const rect = currentCanvas.getBoundingClientRect()
+    if (rect != null) {
+      left = rect.left
+      top = rect.top
     }
-    const clientX = (touchAny.clientX as number | null) ?? 0
-    const clientY = (touchAny.clientY as number | null) ?? 0
-    x = clientX - left
-    y = clientY - top
   }
+  const x = touch.clientX - left
+  const y = touch.clientY - top
   const tooltipOption = currentOption.tooltip
   const tooltipEnabled = tooltipOption != null && tooltipOption.show != false
   let selectedRegion: HitRegion | null = null
@@ -3170,8 +2933,9 @@ function handleTouchEnd(event: TouchEvent): void {
     })
   } else {
     let axisDataIndex = -1
-    if (tooltipEnabled && cartesianLayout != null) {
-      const layout = cartesianLayout
+    const clickAxisLayout = cartesianLayout
+    if (tooltipEnabled && clickAxisLayout != null) {
+      const layout = clickAxisLayout
       if (x < layout.left && y >= layout.top && y <= layout.top + layout.plotHeight) {
         axisDataIndex = findDataIndexByY(y)
       } else if (x >= layout.left && x <= layout.left + layout.plotWidth && y >= layout.top && y <= layout.top + layout.plotHeight) {
@@ -3229,11 +2993,11 @@ function handleTouchMove(event: TouchEvent): void {
   }
 }
 
-watch(() => props.option, (option: ChartOption) => {
+watch((): ChartOption => props.option, (option: ChartOption) => {
   setOption(option)
 }, { deep: true })
 
-watch(() => props.scrollable, (_value: boolean) => {
+watch((): boolean => props.scrollable, (_value: boolean) => {
   updateCanvasStyleWidth()
   if (renderingContext != null) {
     nextTick(() => {

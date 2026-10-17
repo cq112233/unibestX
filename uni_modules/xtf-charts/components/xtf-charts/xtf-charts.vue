@@ -370,12 +370,12 @@ let touchStartY = 0
 let isHorizontalPanning = false
 let lastTouchEndTimestamp = 0
 let activeTooltip: TooltipData | null = null
-let tooltipTimer: ReturnType<typeof setTimeout> | null = null
+let tooltipTimer: number | null = null
 let hiddenSeries: Set<number> = new Set()
 let previousRealtimeCategoryLabels: string[] = []
 let previousRealtimeSeriesData: number[][] = []
 let previousScatterBarMode = ''
-let cartesianLayout: {
+type XtfCartesianLayout = {
   left: number
   top: number
   plotWidth: number
@@ -388,7 +388,8 @@ let cartesianLayout: {
   categoryCount: number
   minValue: number
   maxValue: number
-} | null = null
+}
+let cartesianLayout: XtfCartesianLayout | null = null
 
 function numberOrDefault(value: number | null, fallback: number): number {
   return value ?? fallback
@@ -3139,7 +3140,7 @@ function showTooltipForDataIndex(dataIndex: number, touchX: number, touchY: numb
   if (duration > 0) {
     tooltipTimer = setTimeout(() => {
       hideTooltip()
-    }, duration)
+    }, duration) as any
   }
 }
 

@@ -114,7 +114,7 @@
           <XtfCharts
             ref="chartRef"
             canvas-id="xtf-charts-demo-canvas"
-            :option="currentOption as any"
+            :option="currentOption"
             height="280px"
             @click="handleChartClick"
           />
@@ -182,6 +182,11 @@ import type { ComponentPublicInstance } from 'vue';
 import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { systemUtils } from '@/src/utils/systemInfo/index.uts';
 import XtfCharts from '@/uni_modules/xtf-charts/components/xtf-charts/xtf-charts.uvue';
+import type {
+  ChartOption,
+  ChartSeries,
+  RadarIndicatorOption
+} from '@/uni_modules/xtf-charts/components/xtf-charts/types.uts';
 
 definePage({
   debug: false,
@@ -195,58 +200,9 @@ definePage({
   }
 });
 
-type ScreenSizeInfo = {
-  windowWidth: number;
-  windowHeight: number;
-};
-
-type PageResizeEvent = {
-  size: ScreenSizeInfo;
-};
-
 type ChartTypeItem = {
   key: string;
   name: string;
-};
-
-type SeriesItem = {
-  name: string;
-  type: string;
-  data: number[];
-  color?: string;
-  colors?: string[];
-  smooth?: boolean;
-  areaStyle?: boolean;
-  showSymbol?: boolean;
-  barWidth?: number | string;
-  itemStyle?: UTSJSONObject;
-  pieStyle?: string;
-  innerRadius?: string;
-  showLabel?: boolean;
-  showPercent?: boolean;
-  labelPosition?: string;
-  showLabelLine?: boolean;
-  centerText?: string;
-  centerValue?: string;
-  centerValueColor?: string;
-  centerValueFontSize?: number;
-  gaugeStyle?: string;
-  gaugeRound?: boolean;
-  gaugeShowTicks?: boolean;
-  gaugeTickCount?: number;
-  gaugeShowPointer?: boolean;
-  gaugeGradientColors?: string[];
-};
-
-type DemoChartOption = {
-  title?: UTSJSONObject;
-  tooltip?: UTSJSONObject;
-  legend?: UTSJSONObject;
-  grid?: UTSJSONObject;
-  xAxis?: UTSJSONObject;
-  yAxis?: UTSJSONObject;
-  radar?: UTSJSONObject;
-  series: SeriesItem[];
 };
 
 const chartRef = ref<ComponentPublicInstance | null>(null);
@@ -271,21 +227,21 @@ const chartTypes: ChartTypeItem[] = [
 const activeType = ref<string>('line');
 const lastClickInfo = ref<string>('点击图表任意图形区域可查看交互事件');
 
-// 1. 折线图配置
-const lineOption = ref<DemoChartOption>({
-  title: { text: '近 7 日销售趋势', color: '#1e293b', fontSize: 14 } as UTSJSONObject,
-  tooltip: { show: true, merge: true, trigger: 'axis', duration: 1800 } as UTSJSONObject,
+// 1. 折线图配置 (XTF-Charts)
+const lineOption = ref<ChartOption>({
+  title: { text: '近 7 日销售趋势', color: '#1e293b', fontSize: 14 },
+  tooltip: { show: true, merge: true, trigger: 'axis', duration: 1800 },
   xAxis: {
     data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
     axisLine: { show: true, color: '#cbd5e1' },
     axisLabel: { color: '#64748b' }
-  } as UTSJSONObject,
+  },
   yAxis: {
     min: 0,
     max: 320,
     splitLine: { show: true, color: '#f1f5f9' },
     axisLabel: { color: '#64748b' }
-  } as UTSJSONObject,
+  },
   series: [
     {
       name: '线上订单',
@@ -295,7 +251,7 @@ const lineOption = ref<DemoChartOption>({
       smooth: true,
       areaStyle: true,
       showSymbol: true
-    },
+    } as ChartSeries,
     {
       name: '线下门店',
       type: 'line',
@@ -304,26 +260,26 @@ const lineOption = ref<DemoChartOption>({
       smooth: true,
       areaStyle: false,
       showSymbol: true
-    }
+    } as ChartSeries
   ]
 });
 
 // 2. 柱状图配置
-const barOption = ref<DemoChartOption>({
-  title: { text: '渠道季度业绩对比', color: '#1e293b', fontSize: 14 } as UTSJSONObject,
-  tooltip: { show: true, merge: true, duration: 1800 } as UTSJSONObject,
-  legend: { show: true, textColor: '#64748b' } as UTSJSONObject,
+const barOption = ref<ChartOption>({
+  title: { text: '渠道季度业绩对比', color: '#1e293b', fontSize: 14 },
+  tooltip: { show: true, merge: true, duration: 1800 },
+  legend: { show: true, textColor: '#64748b' },
   xAxis: {
     data: ['一季度', '二季度', '三季度', '四季度'],
     axisLine: { show: true, color: '#cbd5e1' },
     axisLabel: { color: '#64748b' }
-  } as UTSJSONObject,
+  },
   yAxis: {
     min: 0,
     max: 300,
     splitLine: { show: true, color: '#f1f5f9' },
     axisLabel: { color: '#64748b' }
-  } as UTSJSONObject,
+  },
   series: [
     {
       name: '直营店',
@@ -331,25 +287,25 @@ const barOption = ref<DemoChartOption>({
       data: [180, 240, 210, 280],
       color: '#0957de',
       barWidth: 18,
-      itemStyle: { borderRadius: 6 } as UTSJSONObject
-    },
+      itemStyle: { borderRadius: 6 }
+    } as ChartSeries,
     {
       name: '加盟店',
       type: 'bar',
       data: [120, 170, 150, 220],
       color: '#38bdf8',
       barWidth: 18,
-      itemStyle: { borderRadius: 6 } as UTSJSONObject
-    }
+      itemStyle: { borderRadius: 6 }
+    } as ChartSeries
   ]
 });
 
 // 3. 环形饼图配置
-const pieOption = ref<DemoChartOption>({
-  title: { text: '营收构成分布', color: '#1e293b', fontSize: 14 } as UTSJSONObject,
-  tooltip: { show: true, duration: 1800 } as UTSJSONObject,
-  legend: { show: true, textColor: '#64748b' } as UTSJSONObject,
-  xAxis: { data: ['云服务', '硬件产品', '咨询服务', '生态分成'] } as UTSJSONObject,
+const pieOption = ref<ChartOption>({
+  title: { text: '营收构成分布', color: '#1e293b', fontSize: 14 },
+  tooltip: { show: true, duration: 1800 },
+  legend: { show: true, textColor: '#64748b' },
+  xAxis: { data: ['云服务', '硬件产品', '咨询服务', '生态分成'] },
   series: [
     {
       name: '营收占比',
@@ -366,44 +322,44 @@ const pieOption = ref<DemoChartOption>({
       centerValue: '100%',
       centerValueColor: '#0957de',
       centerValueFontSize: 18
-    }
+    } as ChartSeries
   ]
 });
 
 // 4. 雷达图配置
-const radarOption = ref<DemoChartOption>({
-  title: { text: '产品综合能力模型', color: '#1e293b', fontSize: 14 } as UTSJSONObject,
-  tooltip: { show: true, duration: 1800 } as UTSJSONObject,
+const radarOption = ref<ChartOption>({
+  title: { text: '产品综合能力模型', color: '#1e293b', fontSize: 14 },
+  tooltip: { show: true, duration: 1800 },
   radar: {
     indicator: [
-      { name: '性能', max: 100 },
-      { name: '安全性', max: 100 },
-      { name: '易用性', max: 100 },
-      { name: '跨端兼容', max: 100 },
-      { name: '社区活跃', max: 100 }
+      { name: '性能', max: 100 } as RadarIndicatorOption,
+      { name: '安全性', max: 100 } as RadarIndicatorOption,
+      { name: '易用性', max: 100 } as RadarIndicatorOption,
+      { name: '跨端兼容', max: 100 } as RadarIndicatorOption,
+      { name: '社区活跃', max: 100 } as RadarIndicatorOption
     ]
-  } as UTSJSONObject,
+  },
   series: [
     {
       name: 'unibestX 方案',
       type: 'radar',
       data: [96, 92, 90, 98, 88],
       color: '#0957de'
-    },
+    } as ChartSeries,
     {
       name: '基线标准',
       type: 'radar',
       data: [75, 70, 80, 65, 70],
       color: '#10b981'
-    }
+    } as ChartSeries
   ]
 });
 
 // 5. 仪表盘配置
-const gaugeOption = ref<DemoChartOption>({
-  title: { text: '系统实时健康度', color: '#1e293b', fontSize: 14 } as UTSJSONObject,
-  tooltip: { show: true, duration: 1800 } as UTSJSONObject,
-  yAxis: { min: 0, max: 100 } as UTSJSONObject,
+const gaugeOption = ref<ChartOption>({
+  title: { text: '系统实时健康度', color: '#1e293b', fontSize: 14 },
+  tooltip: { show: true, duration: 1800 },
+  yAxis: { min: 0, max: 100 },
   series: [
     {
       name: '健康指标',
@@ -420,12 +376,12 @@ const gaugeOption = ref<DemoChartOption>({
       centerValue: '92 分',
       centerValueColor: '#10b981',
       centerValueFontSize: 20
-    }
+    } as ChartSeries
   ]
 });
 
 // 当前激活的配置
-const currentOption = computed((): DemoChartOption => {
+const currentOption = computed((): ChartOption => {
   if (activeType.value === 'bar') {
     return barOption.value;
   }
@@ -512,19 +468,11 @@ function randomizeData(): void {
   }
 }
 
-type ChartClickDetail = {
-  seriesName?: string;
-  value?: number;
-};
-
 // 点击图表区域事件
-function handleChartClick(event: any): void {
-  if (event != null) {
-    const e = event as ChartClickDetail;
-    const sName = e.seriesName ?? '';
-    const val = e.value != null ? `${e.value}` : '';
-    lastClickInfo.value = `点击目标: [${sName}] 数值: ${val}`;
-  }
+function handleChartClick(event: UTSJSONObject): void {
+  const sName = event.getString('seriesName') ?? '';
+  const val = event.get('value') != null ? `${event.get('value')}` : '';
+  lastClickInfo.value = `点击目标: [${sName}] 数值: ${val}`;
 }
 
 let resizeDebounceTimer: number = 0;
@@ -555,8 +503,8 @@ function performChartResize(newWidth: number, newHeight: number): void {
 }
 
 // 页面级生命周期监听屏幕尺寸/旋转变化
-onResize((event: PageResizeEvent) => {
-  const size = event.size;
+onResize((options: OnResizeOptions) => {
+  const size = options.size;
   performChartResize(size.windowWidth, size.windowHeight);
 });
 
