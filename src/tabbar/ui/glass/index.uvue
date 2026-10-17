@@ -86,20 +86,20 @@ const resolvedTintColor = computed<string>((): string => {
   return '';
 });
 
-/** 降级平台底座背景色（半透明通透质感） */
-const fallbackBgColor = computed<string>((): string => {
+/** 悬浮液态玻璃底座背景色（半透明通透质感，确保在浅色背景下清晰可见） */
+const glassBgColor = computed<string>((): string => {
   if (isDark.value) {
-    return 'rgba(15, 23, 42, 0.78)';
+    return 'rgba(15, 23, 42, 0.85)';
   }
-  return 'rgba(255, 255, 255, 0.82)';
+  return 'rgba(255, 255, 255, 0.88)';
 });
 
-/** 降级平台底座边框色（液态流光微边框） */
-const fallbackBorderColor = computed<string>((): string => {
+/** 悬浮液态玻璃底座边框色（液态流光微反差边框） */
+const glassBorderColor = computed<string>((): string => {
   if (isDark.value) {
-    return 'rgba(255, 255, 255, 0.16)';
+    return 'rgba(255, 255, 255, 0.18)';
   }
-  return 'rgba(255, 255, 255, 0.7)';
+  return 'rgba(226, 232, 240, 0.95)';
 });
 
 /** 安全区底部高度 */
@@ -116,9 +116,9 @@ const activeItemBgColor = computed<string>((): string => {
   return activeThemeColor.value;
 });
 
-/** 激活项高亮流体气泡的不透明度 */
+/** 激活项高亮流体气泡的不透明度（适当增强至 0.18，确保激活状态底色清晰饱满） */
 const activeItemBgOpacity = computed<number>((): number => {
-  return isDark.value ? 0.16 : 0.12;
+  return isDark.value ? 0.2 : 0.18;
 });
 
 /** 滑块单项宽度占比（百分比） */
@@ -223,63 +223,71 @@ const bottom = computed<string>((): string => {
     />
 
     <!-- #ifdef APP-IOS -->
-    <!-- iOS 原生液态玻璃视图容器 (iOS 26+ 原生系统级液态玻璃 / iOS <26 系统毛玻璃降级) -->
-    <glass-effect-view
+    <!-- iOS 原生液态玻璃视图容器 (外层使用标准 view 胶囊外壳强制 34px 圆角裁切与边框投影，内部承载原生液态玻璃) -->
+    <view
       class="custom-glass-container"
-      :glass-style="resolvedGlassStyle"
-      :interactive="resolvedInteractive"
-      :tint-color="resolvedTintColor"
       :style="{
         bottom: `${bottom}px`,
-        height: `${height}px`
+        height: `${height}px`,
+        borderColor: glassBorderColor
       }"
     >
-      <!-- 滑动滑块：在各 Tab 底部平滑移动的流体高光气泡 -->
-      <view class="glass-slider-track">
-        <view class="glass-slider" :style="sliderStyle">
-          <view class="glass-slider-pill" :style="{ backgroundColor: activeItemBgColor, opacity: activeItemBgOpacity }" />
-        </view>
-      </view>
-
-      <!-- 各 Tab 交互格位 -->
-      <view
-        v-for="(item, index) in tabbarList"
-        :key="item.pagePath.length > 0 ? item.pagePath : `${item.text}_${index}`"
-        class="glass-item-slot"
-        hover-class="glass-item-hover"
-        :hover-stay-time="100"
-        @click="onTabClick(index)"
+      <glass-effect-view
+        class="custom-glass-inner"
+        :glass-style="resolvedGlassStyle"
+        :interactive="resolvedInteractive"
+        :tint-color="resolvedTintColor"
+        :style="{
+          backgroundColor: glassBgColor
+        }"
       >
-        <view class="glass-item-inner">
-          <view class="glass-icon-wrap">
-            <uni-icons
-              v-if="item.iconType == 'icon'"
-              :type="getItemIcon(index)"
-              :size="22"
-              :color="getItemIconColor(index)"
-            />
-            <image
-              v-else
-              :src="getItemIconPath(index)"
-              class="glass-icon-image"
-            />
-            <view v-if="item.badge != null && `${item.badge}` == 'dot'" class="glass-badge-dot" />
-            <view v-else-if="item.badge != null && `${item.badge}` != 'dot'" class="glass-badge-text">
-              <text class="glass-badge-label">{{ item.badge }}</text>
-            </view>
+        <!-- 滑动滑块：在各 Tab 底部平滑移动的流体高光气泡 -->
+        <view class="glass-slider-track">
+          <view class="glass-slider" :style="sliderStyle">
+            <view class="glass-slider-pill" :style="{ backgroundColor: activeItemBgColor, opacity: activeItemBgOpacity }" />
           </view>
-          <text
-            class="glass-item-text"
-            :style="{
-              color: getItemTextColor(index),
-              fontWeight: getItemFontWeight(index)
-            }"
-          >
-            {{ getText(item.text) }}
-          </text>
         </view>
-      </view>
-    </glass-effect-view>
+
+        <!-- 各 Tab 交互格位 -->
+        <view
+          v-for="(item, index) in tabbarList"
+          :key="item.pagePath.length > 0 ? item.pagePath : `${item.text}_${index}`"
+          class="glass-item-slot"
+          hover-class="glass-item-hover"
+          :hover-stay-time="100"
+          @click="onTabClick(index)"
+        >
+          <view class="glass-item-inner">
+            <view class="glass-icon-wrap">
+              <uni-icons
+                v-if="item.iconType == 'icon'"
+                :type="getItemIcon(index)"
+                :size="22"
+                :color="getItemIconColor(index)"
+              />
+              <image
+                v-else
+                :src="getItemIconPath(index)"
+                class="glass-icon-image"
+              />
+              <view v-if="item.badge != null && `${item.badge}` == 'dot'" class="glass-badge-dot" />
+              <view v-else-if="item.badge != null && `${item.badge}` != 'dot'" class="glass-badge-text">
+                <text class="glass-badge-label">{{ item.badge }}</text>
+              </view>
+            </view>
+            <text
+              class="glass-item-text"
+              :style="{
+                color: getItemTextColor(index),
+                fontWeight: getItemFontWeight(index)
+              }"
+            >
+              {{ getText(item.text) }}
+            </text>
+          </view>
+        </view>
+      </glass-effect-view>
+    </view>
     <!-- #endif -->
 
     <!-- #ifndef APP-IOS -->
@@ -289,8 +297,8 @@ const bottom = computed<string>((): string => {
       :style="{
         bottom: `${bottom}px`,
         height: `${height}px`,
-        backgroundColor: fallbackBgColor,
-        borderColor: fallbackBorderColor
+        backgroundColor: glassBgColor,
+        borderColor: glassBorderColor
       }"
     >
       <!-- 滑动滑块：在各 Tab 底部平滑移动的流体高光气泡 -->
@@ -343,10 +351,12 @@ const bottom = computed<string>((): string => {
   </view>
 </template>
 
-<style scoped>
-/* 整个 TabBar 最外层包裹器 */
+<style>
+/* 整个 TabBar 最外层包裹器：作为内部 absolute 容器的定位基准 */
 .custom-glass-wrapper {
+  position: relative;
   width: 100%;
+  overflow: visible;
 }
 
 /* 占位填充块 */
@@ -354,32 +364,38 @@ const bottom = computed<string>((): string => {
   width: 100%;
 }
 
-/* 悬浮液态玻璃底座主容器 */
+/* 悬浮液态玻璃底座主容器（全端统一使用 view 胶囊外壳，强制 34px 圆角裁切、边框与浮雕投影） */
 .custom-glass-container {
-  position: fixed;
+  position: absolute;
   right: 16px;
   left: 16px;
   z-index: 999;
   flex-direction: row;
+  justify-content: space-around;
   align-items: center;
+  border-width: 1px;
+  border-style: solid;
+  border-radius: 34px;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+/* iOS 原生液态玻璃内部容器（撑满外壳并继承 34px 胶囊圆角） */
+.custom-glass-inner {
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+  flex: 1;
+  width: 100%;
+  height: 100%;
   padding: 4px 6px;
   border-radius: 34px;
   overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 }
-
-/* #ifdef APP-IOS */
-.custom-glass-container {
-  border-width: 1px;
-  border-style: solid;
-  border-color: rgba(255, 255, 255, 0.35);
-}
-/* #endif */
 
 /* 多端优雅降级毛玻璃磨砂效果（Web / 小程序 / Android / HarmonyOS） */
 .glass-fallback {
-  border-width: 1px;
-  border-style: solid;
+  padding: 4px 6px;
   /* #ifdef WEB || MP-WEIXIN */
   backdrop-filter: blur(25px);
   /* #endif */
@@ -405,7 +421,7 @@ const bottom = computed<string>((): string => {
   height: 100%;
   /* #ifndef APP */
   transition-property: transform;
-  transition-duration: 260ms;
+  transition-duration: 220ms;
   transition-timing-function: cubic-bezier(0.25, 1, 0.5, 1);
   /* #endif */
 }
