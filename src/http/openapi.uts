@@ -1,0 +1,62 @@
+/**
+ * openapi-ts-request 网络驱动适配器
+ *
+ * 抹平 openapi-ts-request 生成代码的统一调用风格 (url, options)
+ * 与 unibestX 内置强类型 http 客户端单例 (LimeRequestConfig) 的差异。
+ */
+
+import { http } from '@/src/http/request/request.uts';
+import type { LimeRequestConfig } from '@/uni_modules/lime-request';
+
+/**
+ * openapi-ts-request 请求参数选项
+ */
+export type OpenApiRequestOptions = {
+  method?: string | null;
+  params?: any | null;
+  data?: any | null;
+  headers?: any | null;
+  [key: string]: any | null;
+};
+
+/**
+ * 专供 openapi 代码生成调用的泛型请求函数
+ * @param url 接口相对或绝对路径
+ * @param options 请求选项（包含 method, params, data, headers 等）
+ */
+export function request<T>(url: string, options: OpenApiRequestOptions | null = null): Promise<T> {
+  const config = {} as LimeRequestConfig;
+  config.url = url;
+
+  if (options != null) {
+    const methodVal = options.method;
+    if (methodVal != null && methodVal != '') {
+      config.method = methodVal.toUpperCase();
+    }
+    else {
+      config.method = 'GET';
+    }
+
+    const paramsVal = options.params;
+    if (paramsVal != null) {
+      config.params = paramsVal as UTSJSONObject;
+    }
+
+    const dataVal = options.data;
+    if (dataVal != null) {
+      config.data = dataVal;
+    }
+
+    const headersVal = options.headers;
+    if (headersVal != null) {
+      config.header = headersVal as UTSJSONObject;
+    }
+  }
+  else {
+    config.method = 'GET';
+  }
+
+  return http.request<T>(config);
+}
+
+export default request;
