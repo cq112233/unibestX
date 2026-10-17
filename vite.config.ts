@@ -180,8 +180,8 @@ export default defineConfig({
       : []
   },
   define: {
-    __X_STYLE_ISOLATION__: false,
-    __X_STYLE_ISOLATION_UP_ARROW__: false,
+    '__X_STYLE_ISOLATION__': false,
+    '__X_STYLE_ISOLATION_UP_ARROW__': false,
     'import.meta.env.VITE_TEMPLATE_VERSION': JSON.stringify(pkgVersion),
     'import.meta.env.VITE_PKG_VERSION': JSON.stringify(pkgVersion)
   },

@@ -101,8 +101,7 @@
   "easycom": {
     "autoscan": true,
     "custom": {
-      "^TabbarMaskModal$": "@/src/components/TabbarMaskModal/TabbarMaskModal.uvue",
-      "^e-chart$": "@/uni_modules/e-chart/components/e-chart/e-chart.uvue"
+      "^TabbarMaskModal$": "@/src/components/TabbarMaskModal/TabbarMaskModal.uvue"
     }
   },
   "subPackages": [
@@ -133,6 +132,22 @@
           "enablePullDownRefresh": false,
           "style": {
             "navigationBarTitleText": "BigNumber 大数据运算",
+            "navigationStyle": "custom",
+            "mp-alipay": {
+              "transparentTitle": "always",
+              "titlePenetrate": "YES",
+              "defaultTitle": ""
+            }
+          }
+        },
+        {
+          "path": "chartsFunctionDemo/chartsFunctionDemo",
+          "layout": "navbar",
+          "showBack": true,
+          "hideNavbar": false,
+          "enablePullDownRefresh": false,
+          "style": {
+            "navigationBarTitleText": "XTF-Charts 图表",
             "navigationStyle": "custom",
             "mp-alipay": {
               "transparentTitle": "always",

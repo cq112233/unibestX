@@ -104,7 +104,9 @@ const DEPCHECK_IGNORE_DEV = new Set([
   'stylelint-config-standard-vue', // stylelint.config 隐式引用
   'stylelint-order', // stylelint.config 隐式引用
   'vconsole', // vite-plugin-vconsole peerDependency
-  'vue-tsc' // typecheck 隐式使用
+  'vue-tsc', // typecheck 隐式使用
+  'bumpp', // release 发版工具
+  'conventional-changelog-cli' // changelog 生成工具
 ]);
 
 async function checkDependencies() {
@@ -252,8 +254,28 @@ function checkImageOptimization() {
   }
 }
 
+function checkBundleSizeBudget() {
+  console.log('\n📊 [6/7] 小程序包体积预算门禁检查');
+
+  const res = runCmd('node scripts/check-bundle-size.mjs --warn-only');
+  if (res.ok) {
+    if (res.output.includes('门禁检查通过')) {
+      pass('小程序主包与分包体积符合规范 (主包 ≤ 2MB)');
+    }
+    else if (res.output.includes('未在项目中发现小程序编译产物')) {
+      pass('无小程序编译产物，static/ 静态资源已完成扫描');
+    }
+    else {
+      warn('小程序体积接近预警线', '运行 pnpm size:check 查看详情');
+    }
+  }
+  else {
+    fail('小程序包体积超标', '运行 pnpm size:check 排查大文件并做分包迁移');
+  }
+}
+
 function checkConfigIntegrity() {
-  console.log('\n📦 [6/6] 关键配置文件完整性校验');
+  console.log('\n📦 [7/7] 关键配置文件完整性校验');
 
   const requiredFiles = [
     ['package.json', '项目配置入口'],
@@ -338,6 +360,7 @@ async function main() {
   checkEslint();
   checkTests();
   checkImageOptimization();
+  checkBundleSizeBudget();
   checkConfigIntegrity();
 
   const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
