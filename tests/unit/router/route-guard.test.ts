@@ -45,12 +45,16 @@ async function importGuardModules() {
 async function loadGuard(needLoginMode?: boolean) {
   vi.resetModules();
   vi.doUnmock('@/src/router/config.uts');
-  if (needLoginMode != null) {
-    vi.doMock('@/src/router/config.uts', async () => {
-      const actual = await vi.importActual<Record<string, any>>('@/src/router/config.uts');
-      return { ...actual, isNeedLoginMode: needLoginMode };
-    });
-  }
+  vi.doMock('@/src/router/config.uts', async () => {
+    const actual = await vi.importActual<Record<string, any>>('@/src/router/config.uts');
+    return {
+      ...actual,
+      ...(needLoginMode != null ? { isNeedLoginMode: needLoginMode } : {}),
+      EXCLUDE_LOGIN_PATH_LIST: [EXCLUDE_PAGE],
+      BLACK_LIST: [EXCLUDE_PAGE],
+      WHITE_LIST: [EXCLUDE_PAGE]
+    };
+  });
   const mods = await importGuardModules();
   mods.resetRegisteredGuards();
   const router = mods.createRouter();
@@ -352,7 +356,15 @@ describe('路由守卫（业务层）决策矩阵', () => {
   describe('框架唯一入口 runRouterGuard（装配 + 跑链收口）', () => {
     it('一个符号吃下「导航事实」吐出「裁决」：说明装配确实喂进了规则链', async () => {
       vi.resetModules();
-      vi.doUnmock('@/src/router/config.uts');
+      vi.doMock('@/src/router/config.uts', async () => {
+        const actual = await vi.importActual<Record<string, any>>('@/src/router/config.uts');
+        return {
+          ...actual,
+          EXCLUDE_LOGIN_PATH_LIST: [EXCLUDE_PAGE],
+          BLACK_LIST: [EXCLUDE_PAGE],
+          WHITE_LIST: [EXCLUDE_PAGE]
+        };
+      });
       vi.doMock('@/src/store/index.uts', () => ({
         useTokenStore: () => ({ hasValidLogin: () => false })
       }));

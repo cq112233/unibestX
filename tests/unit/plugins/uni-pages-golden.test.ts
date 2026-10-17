@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { buildPages, collectStagesFromPlugins } from '../../../plugins/vite-plugin-uni-pages';
+import { buildPages, collectStagesFromPlugins, mergePagesJson } from '../../../plugins/vite-plugin-uni-pages';
 import uniPagesRouteMetaPlugin, { ROUTE_META_FILE } from '../../../plugins/vite-plugin-uni-pages-route-meta';
 import uniPagesSandboxPlugin from '../../../plugins/vite-plugin-uni-pages-sandbox';
 import uniPagesTabbarPlugin from '../../../plugins/vite-plugin-uni-pages-tabbar';
@@ -89,8 +89,8 @@ describe('uni-pages 四插件拆分逐字节回归', () => {
     const state = await buildPages(OPTIONS, { root: ROOT, isProduction: false }, stages);
     expect(state).not.toBeNull();
 
-    const ours = `${JSON.stringify(state!.output, null, 2)}\n`;
     const baseline = gitShow('pages.json');
+    const ours = mergePagesJson(baseline, state!.output, 'H5', false, ['APP']);
     expect(ours).toBe(baseline);
   });
 
@@ -101,6 +101,7 @@ describe('uni-pages 四插件拆分逐字节回归', () => {
 
     const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'uni-pages-golden-'));
     tmpRoots.push(dir);
+    fs.writeFileSync(path.join(dir, 'pages.json'), gitShow('pages.json'), 'utf-8');
 
     // 直接驱动 route-meta 阶段，并模拟真实流水线口径：该阶段运行时核心尚未把
     // scannedSubPkgs 挂到 output.subPackages（finalize 在 stages 之后），因此这里刻意只给 pages。

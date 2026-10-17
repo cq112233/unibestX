@@ -75,7 +75,7 @@
       <text
         class="text-[12px] leading-[22px] text-[#475569]"
       >
-        unibestX 是一个集成了多种工具与技术的 uni-appX 开发模板，由 cq112233 开发，基于 uni-appX + Vue3 + UTS + weapp-tailwindcss + VSCode 构建，完美兼容 vapor / vdom 双模式，模板具有代码提示、自动格式化、统一配置、代码片段等功能，并内置了 ECharts 图表、主题配置、暗黑模式、加密方式配置等常用功能与基本组件，让你开发 uni-appX 拥有极致的体验。
+        unibestX 是一个集成了多种工具与技术的 uni-appX 开发模板，由 cq112233 开发，基于 uni-appX + Vue3 + UTS + weapp-tailwindcss + VSCode 构建，完美兼容 vapor / vdom 双模式，模板具有代码提示、自动格式化、统一配置、代码片段等功能，并内置了路由守卫、请求封装、状态持久化等常用功能与基础能力，让你开发 uni-appX 拥有极致的体验。
       </text>
 
       <!-- 环境版本要求 -->
@@ -190,11 +190,11 @@
       </view>
     </view>
 
-    <!-- 内置工具库（lime-shared / lime-use / lime-color / lime-dayuts / crypto-bestX） -->
+    <!-- 内置工具库（lime-dayuts / lime-request / route-bestX / z-paging-x / x-pinia-s / uni-icons） -->
     <view class="mt-[16px] mx-[16px]">
       <view class="flex flex-row items-center justify-between mb-[10px]">
-        <text class="text-[14px] font-bold text-[#1e293b]">🧰 内置工具库</text>
-        <text class="text-[11px] text-[#94a3b8]">uni_modules · CLI 可选配</text>
+        <text class="text-[14px] font-bold text-[#1e293b]">🧰 内置核心库</text>
+        <text class="text-[11px] text-[#94a3b8]">uni_modules · 极致精简</text>
       </view>
 
       <view
@@ -278,7 +278,7 @@
             <text class="text-[10px] font-bold text-[#0369a1]">Android</text>
           </view>
           <text class="text-[11px] leading-[16px] text-[#334155] flex-1">
-            差量更新会热重构重启基座，热重载保持在当前停留页。
+            差量更新无感替换，热更新平滑保留在当前调试页面。
           </text>
         </view>
 
@@ -383,14 +383,14 @@
 </template>
 
 <script setup lang="uts">
-import { computed } from 'vue';
+import { computed, onMounted, onUnmounted } from 'vue';
 import { systemInfo as systemInfoRef } from '@/src/utils/systemInfo/index.uts';
 import type { SystemInfoType } from '@/src/utils/systemInfo/index.uts';
 import { curIdx, onTabPageShow, onTabShow, resolveTabIndexByKey } from '@/src/tabbar/index.uts';
 import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/layouts/navbar/utils/index.uts';
 import { useRouter } from '@/uni_modules/route-bestX/index.uts';
 
-const router = useRouter();
+const _router = useRouter();
 
 type FeatureItem = {
   id: string;
@@ -476,22 +476,13 @@ const featureList: Array<FeatureItem> = [
     textColor: '#ea580c'
   },
   {
-    id: 'theme',
-    title: '🎨 主题与暗黑模式',
-    desc: '主色调换肤・跟随系统外观',
-    configPath: 'src/theme/index.uts',
+    id: 'layouts',
+    title: '📐 灵活通用布局',
+    desc: '页面布局模板・自适应计算',
+    configPath: 'src/layouts',
     bgColor: '#a855f70f',
     borderColor: '#a855f726',
     textColor: '#9333ea'
-  },
-  {
-    id: 'i18n',
-    title: '🌍 i18n 国际化',
-    desc: '中英多语言・即时动态切换',
-    configPath: 'src/i18n/index.uts',
-    bgColor: '#e11d480f',
-    borderColor: '#e11d4826',
-    textColor: '#e11d48'
   },
   {
     id: 'tailwind',
@@ -519,15 +510,6 @@ const featureList: Array<FeatureItem> = [
     bgColor: '#6366f10f',
     borderColor: '#6366f126',
     textColor: '#4f46e5'
-  },
-  {
-    id: 'ecosystem',
-    title: '🛠️ 完善配套能力',
-    desc: '图表/分页/加密/UI组件',
-    configPath: 'uni_modules 开箱即用',
-    bgColor: '#14b8a60f',
-    borderColor: '#14b8a626',
-    textColor: '#0f766e'
   }
 ];
 
@@ -545,70 +527,70 @@ type ToolLibItem = {
 
 const toolLibList: Array<ToolLibItem> = [
   {
-    id: 'lime-shared',
-    title: '🧰 lime-shared',
-    tag: '工具函数库',
-    desc: '零依赖的纯函数集合，覆盖浮点精度运算、序列生成与编号补齐、唯一标识、数组去重与切片分组、对象路径安全取值、命名转换、深比较，以及防抖与随机数。',
-    chips: ['浮点精度', '去重切片', '路径取值', '深比较', '防抖'],
-    configPath: 'uni_modules/lime-shared',
-    bgColor: '#0369a10f',
-    borderColor: '#0369a126',
-    textColor: '#0369a1'
-  },
-  {
-    id: 'lime-use',
-    title: '🧩 lime-use',
-    tag: '组合式函数',
-    desc: '基于 Vue3 组合式 API 的常用逻辑封装，内置倒计时、验证码计时、精准定时器与层级管理，可直接在业务页面中复用，无需重复造轮子。',
-    chips: ['useCountDown', 'useCodeTimer', 'useTimeout', 'useZIndex'],
-    configPath: 'uni_modules/lime-use',
-    bgColor: '#b453090f',
-    borderColor: '#b4530926',
-    textColor: '#b45309'
-  },
-  {
-    id: 'lime-color',
-    title: '🎨 lime-color',
-    tag: '颜色工具',
-    desc: '颜色格式互转、亮度与饱和度调整、配色方案生成与 Ant Design 主题色阶，可直接用于换肤、主题推导与图表配色等场景。',
-    chips: ['格式互转', '亮度调整', '配色方案', 'Ant 色阶'],
-    configPath: 'uni_modules/lime-color',
-    bgColor: '#db27770f',
-    borderColor: '#db277726',
-    textColor: '#db2777'
-  },
-  {
     id: 'lime-dayuts',
     title: '📅 lime-dayuts',
     tag: '日期时间库',
-    desc: 'dayjs 的 UTS 移植版，几乎保持一致的调用风格，覆盖日期解析、格式化与取值赋值、加减与起止（startOf / endOf）、时间差计算与比较查询，并内置中英双语 locale。',
-    chips: ['解析/格式化', '加减与起止', 'diff 时间差', '比较查询', '中英 locale'],
+    desc: 'dayjs 的 UTS 移植版，几乎保持一致的调用风格，覆盖日期解析、格式化与取值赋值、加减与起止（startOf / endOf）、时间差计算与比较查询，并内置双语支持。',
+    chips: ['解析/格式化', '加减与起止', 'diff 时间差', '比较查询'],
     configPath: 'uni_modules/lime-dayuts',
     bgColor: '#4338ca0f',
     borderColor: '#4338ca26',
     textColor: '#4338ca'
   },
   {
-    id: 'bignumber-bestX',
-    title: '🧮 bignumber-bestX',
-    tag: '大数据运算',
-    desc: '任意精度十进制运算库，覆盖加减乘除、取模、幂与开方，支持 2~36 进制、九种舍入模式与千分位格式化，彻底解决 0.1 + 0.2 ≠ 0.3 的浮点误差。',
-    chips: ['任意精度', '四则运算', '幂与开方', '2~36 进制', '九种舍入', '千分位'],
-    configPath: 'uni_modules/bignumber-bestX',
+    id: 'lime-request',
+    title: '📡 lime-request',
+    tag: '网络请求',
+    desc: '极简且功能完备的原生网络请求封装，支持请求与响应拦截器、Token 无感传递、401 统一重定向拦截，支持强类型响应数据。',
+    chips: ['拦截器', 'Token 处理', '状态码处理', '全端兼容'],
+    configPath: 'src/http/index.uts',
+    bgColor: '#0369a10f',
+    borderColor: '#0369a126',
+    textColor: '#0369a1'
+  },
+  {
+    id: 'route-bestX',
+    title: '🧭 route-bestX',
+    tag: '路由引擎',
+    desc: '对齐 vue-router 的原生跨端路由管理库，内置 useRouter / useRoute 组合式函数、路由白名单与黑名单守卫、动态参数序列化解析。',
+    chips: ['useRouter', 'useRoute', '路由守卫', '黑白名单'],
+    configPath: 'uni_modules/route-bestX',
+    bgColor: '#b453090f',
+    borderColor: '#b4530926',
+    textColor: '#b45309'
+  },
+  {
+    id: 'z-paging-x',
+    title: '📜 z-paging-x',
+    tag: '原生高性能列表',
+    desc: 'uni-app X 专属原生高性能下拉刷新与分页列表组件，底层映射原生虚拟复用池，杜绝大列表滑动掉帧与内存暴增。',
+    chips: ['虚拟复用', '下拉刷新', '上拉加载', '缺省页占位'],
+    configPath: 'uni_modules/z-paging-x',
     bgColor: '#7c3aed0f',
     borderColor: '#7c3aed26',
     textColor: '#7c3aed'
   },
   {
-    id: 'crypto-bestX',
-    title: '🔐 crypto-bestX',
-    tag: '加密解密',
-    desc: '跨端加密解密套件，涵盖 Base64 编解码、MD5 与 SHA-256 摘要、HMAC 签名、AES / DES 对称加解密、RSA 非对称加解密与验签，以及 UUID 生成。',
-    chips: ['Base64', 'MD5 / SHA-256', 'HMAC', 'AES / DES', 'RSA 验签', 'UUID'],
-    configPath: 'uni_modules/crypto-bestX',
+    id: 'x-pinia-s',
+    title: '📦 x-pinia-s',
+    tag: '状态管理',
+    desc: '专为 uni-app X 打造的超轻量响应式 Pinia 状态管理器，跨平台支持 Vapor 蒸汽模式与 VDOM 虚拟 DOM 模式，支持状态本地持久化。',
+    chips: ['响应式状态', '本地持久化', '双模式适配', '轻量零依赖'],
+    configPath: 'uni_modules/x-pinia-s',
     bgColor: '#15803d0f',
     borderColor: '#15803d26',
     textColor: '#15803d'
+  },
+  {
+    id: 'uni-icons',
+    title: '🎨 uni-icons',
+    tag: '官方矢量图标',
+    desc: 'DCloud 官方提供的常用矢量图标库，支持 easycom 零 import 自动按需导入，原生跨端高保真矢量渲染。',
+    chips: ['easycom 自动导入', '矢量高保真', '多种常用图标'],
+    configPath: 'uni_modules/uni-icons',
+    bgColor: '#db27770f',
+    borderColor: '#db277726',
+    textColor: '#db2777'
   }
 ];
 
@@ -672,11 +654,13 @@ function openGithub(): void {
   window.open(url, '_blank');
   // #endif
   // #ifndef WEB
-  router.push({
-    path: '/src/sub/webview/webview',
-    query: {
-      url,
-      title: 'unibestX'
+  uni.setClipboardData({
+    data: url,
+    success: () => {
+      uni.showToast({
+        title: '已复制开源地址',
+        icon: 'success'
+      });
     }
   });
   // #endif

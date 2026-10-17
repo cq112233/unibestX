@@ -12,10 +12,10 @@ export const customTabbarConfig: TabBarConfig = {
    */
 
   type: 'capsule',
-  color: '@tabBarColor',
-  selectedColor: '@tabBarSelectedColor',
-  backgroundColor: '@tabBarBackgroundColor',
-  borderStyle: '@tabBarBorderStyle',
+  color: '#94a3b8',
+  selectedColor: '#10b981',
+  backgroundColor: '#ffffff',
+  borderStyle: 'black',
   glassEffect: false, // ios26 以上液态玻璃
   /**
    * ⚠️ 中间鼓包按钮 (midButton)
@@ -31,11 +31,10 @@ export const customTabbarConfig: TabBarConfig = {
    * 💡 提示：若不需要 midButton，直接用行注释（//）或块注释把该属性包起来即可，插件已自动过滤注释，不会同步到 pages.json
    */
   // midButton: {
-  //   tabType: 'ai',
   //   width: '50px',
   //   height: '50px',
-  //   text: 'tabbar.ai',
-  //   pagePath: 'src/pages/ai/ai',
+  //   text: '首页',
+  //   pagePath: 'src/pages/index/index',
   //   iconType: 'icon',
   //   icon: 'chatboxes',
   //   iconActive: 'chatboxes-filled',
@@ -55,7 +54,7 @@ export const customTabbarConfig: TabBarConfig = {
   list: [
     {
       tabType: 'index',
-      text: 'tabbar.home',
+      text: '首页',
       pagePath: 'src/pages/index/index',
       iconType: 'icon',
       icon: 'home',
@@ -66,32 +65,8 @@ export const customTabbarConfig: TabBarConfig = {
       isBulge: false
     },
     {
-      tabType: 'basic',
-      text: 'tabbar.basic',
-      pagePath: 'src/pages/basic/basic',
-      iconType: 'icon',
-      icon: 'tune',
-      iconActive: 'tune-filled',
-      iconPath: 'static/tabbar/tune.png',
-      selectedIconPath: 'static/tabbar/tune_fill.png',
-      badge: null,
-      isBulge: false
-    },
-    {
-      tabType: 'function',
-      text: 'tabbar.function',
-      pagePath: 'src/pages/function/function',
-      iconType: 'icon',
-      icon: 'gear',
-      iconActive: 'gear-filled',
-      iconPath: 'static/tabbar/gear.png',
-      selectedIconPath: 'static/tabbar/gear_fill.png',
-      badge: null,
-      isBulge: false
-    },
-    {
       tabType: 'me',
-      text: 'tabbar.me',
+      text: '我的',
       pagePath: 'src/pages/me/me',
       iconType: 'icon',
       icon: 'person',

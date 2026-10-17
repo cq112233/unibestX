@@ -144,23 +144,23 @@ describe('useRouter Unit Tests', () => {
     const { useRouter } = await loadRouter();
     const router = useRouter();
 
-    // 匹配 definePage 显式声明了 name: 'routerBasicDemo' 的页面
-    router.push(utsObject({ name: 'routerBasicDemo', params: { tab: 'a', id: 101 } }));
+    // 匹配 login 页面
+    router.push(utsObject({ name: 'login', params: { tab: 'a', id: 101 } }));
 
     expect(uni.navigateTo).toHaveBeenCalledWith({
-      url: '/src/sub/routerBasicDemo/routerBasicDemo?tab=a&id=101'
+      url: '/src/sub/auth/login?tab=a&id=101'
     });
   });
 
-  it('push 命名路由形态：未显式声明 name 时按路径最后一个单词匹配（如 modalBasicDemo）', async () => {
+  it('push 命名路由形态：未显式声明 name 时按路径最后一个单词匹配（如 me）', async () => {
     const { useRouter } = await loadRouter();
     const router = useRouter();
 
-    // modalBasicDemo 页面未显式写 name，按路径最后一个单词 modalBasicDemo 匹配
-    router.push(utsObject({ name: 'modalBasicDemo', params: { from: 'test' } }));
+    // me 页面未显式写 name，按路径最后一个单词 me 匹配
+    router.push(utsObject({ name: 'me', params: { from: 'test' } }));
 
     expect(uni.navigateTo).toHaveBeenCalledWith({
-      url: '/src/sub/modalBasicDemo/modalBasicDemo?from=test'
+      url: '/src/pages/me/me?from=test'
     });
   });
 
@@ -173,8 +173,8 @@ describe('useRouter Unit Tests', () => {
       url: '/src/pages/index/index?tab=1'
     });
 
-    const resolved = router.resolve(utsObject({ name: 'modalBasicDemo', params: { foo: 'bar' } }));
-    expect(resolved).toBe('/src/sub/modalBasicDemo/modalBasicDemo?foo=bar');
+    const resolved = router.resolve(utsObject({ name: 'login', params: { foo: 'bar' } }));
+    expect(resolved).toBe('/src/sub/auth/login?foo=bar');
   });
 
   it('push 命名路由形态：查无此 name 时警告并返回 null，不触发任何跳转', async () => {

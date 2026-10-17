@@ -289,11 +289,11 @@ describe('useRoute Unit Tests', () => {
     const { useRoute, applyRouteFromUrl } = await loadRouteState();
     const route = useRoute();
 
-    applyRouteFromUrl('/src/pages/function/function');
+    applyRouteFromUrl('/src/pages/me/me');
 
     expect(route.params.size).toBe(0);
     expect(route.meta).not.toBeNull();
-    expect(route.name).toBe('function');
+    expect(route.name).toBe('me');
   });
 
   it('uninstallRouteStateListener 后重新调用 useRoute 会再次安装', async () => {

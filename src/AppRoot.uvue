@@ -1,10 +1,8 @@
 <template>
-  <!-- 应用全局骨架与皮肤容器，通过 CSS 变量绑定响应式主题色 / 暗黑模式 -->
+  <!-- 应用全局骨架容器 -->
   <view
     class="root-container"
     style="display: flex; flex-direction: column;flex: 1;"
-    :class="themeStore.state.isDark ? 'dark' : ''"
-    :style="themeStyle"
   >
     <!-- 页面内容滚动容器 -->
     <scroll-view direction="vertical" class="root-scroll-view" style="flex: 1;">
@@ -18,8 +16,6 @@
 <script setup lang="uts">
 import Tabbar from '@/src/tabbar/tabbar.uvue';
 import { customTabbarEnable, isPageTabbar, selectedTabbarStrategy, syncCurIdxByCurrentPage } from '@/src/tabbar/index.uts';
-import { useThemeStore } from '@/src/store/index.uts';
-import { applyNavbarTheme, getRootThemeStyle } from '@/src/theme/index.uts';
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { updateAvailableHeight } from '@/src/utils/systemInfo/index.uts';
 
@@ -71,9 +67,6 @@ const props = defineProps({
   }
 });
 
-// 激活主题状态管理 Store
-const themeStore = useThemeStore();
-
 /**
  * 获取 pageStyle 对象
  */
@@ -81,17 +74,11 @@ const _pageStyleObj = computed((): UTSJSONObject => {
   return (props.pageStyle ?? {}) as UTSJSONObject;
 });
 
-// 主题样式变量：亮 / 暗两套，跟随 themeStore.state.isDark 响应式切换
-const themeStyle = computed((): UTSJSONObject => {
-  return getRootThemeStyle(themeStore.state.theme, themeStore.state.isDark);
-});
-
 // 控制当前页面是否需要显示底部导航栏
 const isCurrentPageTabbar = ref(false);
 
-// 组件挂载时：同步 H5 / 小程序原生导航栏主题与路由状态
+// 组件挂载时：同步路由状态
 onMounted(() => {
-  applyNavbarTheme(themeStore.state.isDark);
   try {
     const pages = getCurrentPages();
     if (pages.length > 0) {
@@ -107,11 +94,6 @@ onMounted(() => {
     }
   }
   catch { }
-});
-
-// 主题模式 / 系统深浅色变化时，当前页面不切换也实时同步导航栏
-watch((): boolean => themeStore.state.isDark, (newVal: boolean) => {
-  applyNavbarTheme(newVal);
 });
 
 let activeHideNavbar: boolean = props.hideNavbar;
@@ -183,7 +165,7 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   flex: 1;
-  background-color: var(--bg-color, #f5f6fa);
+  background-color: #f8fafc;
 }
 
 .root-scroll-view {

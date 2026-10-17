@@ -14,6 +14,18 @@ import { utsObject } from './helpers';
  * 的类型分支、ClassCastException）单测**不复现**，那部分靠真机把关。
  */
 
+const EXCLUDE_PAGE = '/src/sub/routerParamsBasicDemo/routerParamsBasicDemo';
+
+vi.mock('@/src/router/config.uts', async () => {
+  const actual = await vi.importActual<Record<string, any>>('@/src/router/config.uts');
+  return {
+    ...actual,
+    EXCLUDE_LOGIN_PATH_LIST: [EXCLUDE_PAGE],
+    BLACK_LIST: [EXCLUDE_PAGE],
+    WHITE_LIST: [EXCLUDE_PAGE]
+  };
+});
+
 async function loadInterceptor() {
   vi.resetModules();
   const { router } = await import('@/src/router/index.uts');

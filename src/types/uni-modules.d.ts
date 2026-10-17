@@ -59,13 +59,6 @@ declare module '@/uni_modules/lime-request' {
   export type LimeRequestSource = any;
 }
 
-// ---------- lime-i18n ----------
-// 真源：uni_modules/lime-i18n/common/index.uts
-declare module '@/uni_modules/lime-i18n' {
-  export function createI18n(options?: any): any;
-  export function useI18n(options?: any): any;
-}
-
 // ---------- lime-dayuts ----------
 // 真源：uni_modules/lime-dayuts/index.ts
 declare module '@/uni_modules/lime-dayuts' {

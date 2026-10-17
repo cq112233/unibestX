@@ -35,21 +35,13 @@
       <IndexView />
     </TabContent>
     <!-- #endif -->
-    <TabContent :content-index="1" title="tabbar.basic" :enable-pull-down-refresh="true">
-      <BasicView />
-    </TabContent>
-    <TabContent :content-index="2" title="tabbar.function" :enable-pull-down-refresh="true">
-      <FunctionView />
-    </TabContent>
-    <TabContent :content-index="3" title="tabbar.me" :enable-pull-down-refresh="true">
+    <TabContent :content-index="1" title="tabbar.me" :enable-pull-down-refresh="true">
       <MeView />
     </TabContent>
   </view>
 </template>
 
 <script setup lang="uts">
-import BasicView from '@/src/pages/basic/views/BasicView.uvue';
-import FunctionView from '@/src/pages/function/views/FunctionView.uvue';
 import IndexView from '@/src/pages/index/views/IndexView.uvue';
 import MeView from '@/src/pages/me/views/MeView.uvue';
 import TabContent from './TabContent.uvue';
