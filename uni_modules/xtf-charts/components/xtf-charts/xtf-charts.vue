@@ -1740,17 +1740,22 @@ function drawGauge(ctx: CanvasRenderingContext2D, titleHeight: number, progress:
     const tickCount = Math.max(2, item.gaugeTickCount ?? 10)
     ctx.strokeStyle = stringOrDefault(item.pointerColor, '#455a64')
     ctx.lineWidth = 1
+    ctx.lineCap = 'butt'
+    const gaugeWidth = item.gaugeWidth ?? 18
+    const tickInnerRadius = radius - (gaugeWidth * 7 / 18)
+    const tickOuterRadius = radius + (gaugeWidth * 4 / 18)
     for (let index = 0; index <= tickCount; index++) {
       const angle = startAngle + (endAngle - startAngle) * index / tickCount
       ctx.beginPath()
-      ctx.moveTo(centerX + Math.cos(angle) * (radius - ctx.lineWidth * 7), centerY + Math.sin(angle) * (radius - ctx.lineWidth * 7))
-      ctx.lineTo(centerX + Math.cos(angle) * (radius + ctx.lineWidth * 4), centerY + Math.sin(angle) * (radius + ctx.lineWidth * 4))
+      ctx.moveTo(centerX + Math.cos(angle) * tickInnerRadius, centerY + Math.sin(angle) * tickInnerRadius)
+      ctx.lineTo(centerX + Math.cos(angle) * tickOuterRadius, centerY + Math.sin(angle) * tickOuterRadius)
       ctx.stroke()
     }
   }
   if (item.gaugeShowPointer != false) {
     ctx.strokeStyle = stringOrDefault(item.pointerColor, '#455a64')
     ctx.lineWidth = 3
+    ctx.lineCap = 'round'
     ctx.beginPath()
     ctx.moveTo(centerX, centerY)
     ctx.lineTo(centerX + Math.cos(valueAngle) * radius * 0.8, centerY + Math.sin(valueAngle) * radius * 0.8)
