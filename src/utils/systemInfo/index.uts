@@ -9,6 +9,7 @@ import {
   getCurrentEnv,
   getCurrentEnvName,
   getTabbarStrategyNum,
+  getTemplateVersion,
   isNativeTabBar,
   isVaporMode
 } from '@/src/config/index.uts';
@@ -115,8 +116,10 @@ export type SystemInfoType = {
   // ---- 应用与环境变量 ----
   /** 应用名称 */
   appTitle: string;
-  /** 应用版本号 */
+  /** 业务应用版本号 */
   appVersion: string;
+  /** 模板工程版本号 */
+  templateVersion: string;
   /** 接口 BaseURL 地址（来自环境变量） */
   apiBaseUrl: string;
   /** 运行环境标识：development / test / production */
@@ -265,7 +268,8 @@ export function updateSystemInfo() {
     compileMode: getCompileMode(), // 编译运行模式（Vapor / VDOM + 环境）
     platformName: getCompilePlatform(), // 编译目标平台
     appTitle: getAppTitle(), // 应用名称
-    appVersion: getAppVersion(), // 应用版本号
+    appVersion: getAppVersion(), // 业务应用版本号
+    templateVersion: getTemplateVersion(), // 模板工程版本号
     apiBaseUrl: getApiBaseUrl(), // 接口 BaseURL 地址
     env: getCurrentEnv(), // 运行环境标识（development / test / production）
     envName: getCurrentEnvName(), // 运行环境中文名称

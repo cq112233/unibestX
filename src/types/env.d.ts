@@ -37,6 +37,8 @@ declare global {
     readonly VITE_UPLOAD_PATH?: string;
 
     // 非 .env 声明，由 vite 构建期插件动态注入
+    readonly VITE_TEMPLATE_VERSION?: string;
+    readonly VITE_PKG_VERSION?: string;
     readonly VITE_BUILD_TIME?: string;
     readonly VITE_GIT_BRANCH?: string;
     readonly VITE_GIT_COMMIT_HASH?: string;

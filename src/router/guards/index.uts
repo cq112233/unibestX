@@ -71,10 +71,9 @@ export function setupRouteGuards(router: Router): void {
   });
 
   // 2. 注册全局后置钩子（页面跳转完成、数据统计与埋点上报）
-  router.afterEach((to: RouteTarget, from: RouteTarget, failure?: any | null) => {
-    console.log(to, from, failure, 'afterEach');
-    if (failure != null) {
-      console.warn('[Router afterEach] 导航中断/异常:', failure);
+  router.afterEach((_to: RouteTarget, _from: RouteTarget, _failure?: any | null) => {
+    if (_failure != null) {
+      console.warn('[Router afterEach] 导航中断/异常:', _failure);
       return;
     }
   });

@@ -53,6 +53,7 @@ export default {
           'picker',
           'picker-view',
           'picker-view-column',
+          'glass-effect-view',
           'cover-view',
           'cover-image',
           'rich-text',

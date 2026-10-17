@@ -606,7 +606,8 @@ import { sys } from '@/src/utils/systemInfo/index.uts';
 | 变量 | 默认值 | 说明 |
 | :--- | :--- | :--- |
 | `VITE_APP_TITLE` | `unibestX` | 应用名称（H5 标题等） |
-| `VITE_APP_VERSION` | `1.0.0` | 应用版本号。⚠️ 构建时会被 `vite.config.ts` 从 `package.json` 的 `version` 覆盖 |
+| `VITE_APP_VERSION` | `1.0.0` | 业务应用版本号（真源：根目录 `.env`） |
+| `VITE_TEMPLATE_VERSION` | `1.0.0` | 模板工程版本号（真源：根目录 `package.json`，构建期自动注入） |
 | `VITE_TABBAR_MODE` | `4` | TabBar 运行策略，`0`～`4`，详见[底部 TabBar 体系](#底部-tabbar-体系) |
 | `VITE_DEFAULT_THEME` | `#37c2bc` | 默认主题主色调（十六进制色值） |
 | `VITE_DEFAULT_LOCALE` | `zh-CN` | 默认语言（`zh-CN` / `en-US`） |
