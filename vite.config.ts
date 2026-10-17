@@ -91,15 +91,17 @@ const _uniRuntimeFiles = [
   resolveUniRuntimePath('uni-h5-vue/dist-x/vue.runtime.esm.js')
 ].filter((p): p is string => !!p);
 
-// 读取 package.json 与 Git 元信息，编译阶段注入环境变量供 import.meta.env 全端安全访问
+// 读取 package.json 模板版本与 Git 元信息，编译阶段注入环境变量供 import.meta.env 全端安全访问
+let pkgVersion = '1.0.0';
 try {
   const pkgRaw = fs.readFileSync(resolve(projectRoot, 'package.json'), 'utf-8');
   const pkg = JSON.parse(pkgRaw);
-  process.env.VITE_APP_VERSION = pkg.version ?? '1.0.0';
+  pkgVersion = pkg.version ?? '1.0.0';
 }
 catch {
-  process.env.VITE_APP_VERSION = '1.0.0';
+  pkgVersion = '1.0.0';
 }
+process.env.VITE_PKG_VERSION = pkgVersion;
 
 try {
   process.env.VITE_GIT_COMMIT_HASH = execSync('git rev-parse --short HEAD', { stdio: ['pipe', 'pipe', 'ignore'] }).toString().trim();
@@ -276,7 +278,8 @@ export default defineConfig({
         // 可自由注入业务常量、环境变量、构建参数或辅助方法
         appName: env.VITE_APP_TITLE || 'unibestX',
         isProduction,
-        buildVersion: process.env.VITE_APP_VERSION || '1.0.0'
+        buildVersion: env.VITE_APP_VERSION || process.env.VITE_APP_VERSION || '1.0.0',
+        templateVersion: process.env.VITE_TEMPLATE_VERSION || '1.0.0'
       })
     }),
     // uni-pages 的三个独立卫星插件：各自一个文件、各自独立注册，核心插件通过 configResolved
