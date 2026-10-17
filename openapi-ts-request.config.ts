@@ -20,7 +20,7 @@ export default defineConfig({
   // 1. Apifox 官方 API 直连配置（敏感信息从本地 .env.local 或环境变量中读取）
   apifoxConfig: {
     projectId: process.env.APIFOX_PROJECT_ID || '8697068',
-    apifoxToken: process.env.APIFOX_TOKEN || '',
+    apifoxToken: process.env.APIFOX_TOKEN || ''
   },
 
   // 2. 生成代码输出目录（统一收拢在 src/api/generated/ 下）
@@ -28,12 +28,12 @@ export default defineConfig({
 
   // 3. 抹平 unibestX 网络层的统一请求客户端适配器
   requestLibPath: '@/src/http/openapi.uts',
-  requestImportStatement: "import { request } from '@/src/http/openapi.uts';\nimport type { OpenApiRequestOptions } from '@/src/http/openapi.uts';",
+  requestImportStatement: 'import { request } from \'@/src/http/openapi.uts\';\nimport type { OpenApiRequestOptions } from \'@/src/http/openapi.uts\';',
   requestOptionsType: 'OpenApiRequestOptions',
 
   // 4. 函数与文件采用小驼峰命名
   isCamelCase: true,
 
   // 5. 是否只生成 TypeScript/UTS 类型定义（设为 true 则不生成请求函数）
-  isOnlyGenTypeScriptType: false,
+  isOnlyGenTypeScriptType: false
 });
