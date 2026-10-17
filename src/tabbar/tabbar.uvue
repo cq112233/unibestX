@@ -2,12 +2,7 @@
   <!-- 悬浮胶囊风格 (type: 'capsule') -->
   <CapsuleTabbar v-if="activeType == 'capsule'" />
   <!-- 液态玻璃风格 (type: 'glass') -->
-  <GlassTabbar
-    v-else-if="activeType == 'glass'"
-    :glass-style="glassStyle"
-    :interactive="interactive"
-    :tint-color="tintColor"
-  />
+  <GlassTabbar v-else-if="activeType == 'glass'" />
   <!-- 标准底座风格 (type: 'default') -->
   <DefaultTabbar v-else-if="activeType == 'default'" />
   <!-- 兜底使用标准底座风格（若扩展了其他自定义风格，可在此继续添加分支） -->
@@ -24,21 +19,6 @@ import { tabbarType } from '@/src/tabbar/index.uts';
 const props = defineProps({
   /** 自定义 TabBar 风格形态（若不指定则默认读取 config.uts 中的 type） */
   type: {
-    type: String,
-    default: ''
-  },
-  /** 液态玻璃样式：'regular'（常规）| 'clear'（通透）（液态玻璃形态下生效） */
-  glassStyle: {
-    type: String,
-    default: 'regular'
-  },
-  /** 是否启用液态玻璃交互行为（iOS 26+ 生效） */
-  interactive: {
-    type: Boolean,
-    default: true
-  },
-  /** 施加在液态玻璃效果上的着色（iOS 26+ 生效） */
-  tintColor: {
     type: String,
     default: ''
   }

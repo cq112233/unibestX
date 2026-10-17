@@ -67,15 +67,12 @@ const resolvedGlassStyle = computed<string>((): string => {
   return 'regular';
 });
 
-/** 是否启用液态玻璃交互（优先取 prop，未传时读取 config.uts 中的 interactive） */
+/** 是否启用液态玻璃交互（优先读取 config.uts 中的 interactive，未配时使用 prop 默认值） */
 const resolvedInteractive = computed<boolean>((): boolean => {
-  if (props.interactive != null) {
-    return props.interactive;
-  }
   if (customTabbarConfig.interactive != null) {
     return customTabbarConfig.interactive!;
   }
-  return true;
+  return props.interactive;
 });
 
 /** 解析液态玻璃着色（优先取 prop，未传时读取 config.uts 中的 tintColor） */
