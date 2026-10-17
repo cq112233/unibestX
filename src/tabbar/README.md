@@ -55,6 +55,7 @@ src/tabbar/
 └── ui/
     ├── template.uvue             # 新 UI 形态的模板（复制它来扩展）
     ├── capsule/index.uvue        # 悬浮胶囊岛屿形态（type: 'capsule'）
+    ├── glass/index.uvue          # 悬浮液态玻璃形态（type: 'glass' / 'liquid-glass'，iOS 26+ 原生 glass-effect-view + 多端降级）
     └── default/                  # 标准贴底形态（type: 'default'）
         ├── index.uvue
         └── TabbarItem.uvue
@@ -64,8 +65,8 @@ src/tabbar/
 | :--- | :--- |
 | 加 / 删 Tab、换文字图标路径 | [config.uts](config.uts) |
 | 切换 TabBar 模式（原生 / 自定义 / 单页） | [.env](../../.env) 的 `VITE_TABBAR_MODE` |
-| 切换 UI 形态（胶囊 / 贴底） | [config.uts](config.uts) 的 `type` |
-| 扩展第三种 UI 形态 | 复制 [ui/template.uvue](ui/template.uvue) → 在 [tabbar.uvue](tabbar.uvue) 加分支 |
+| 切换 UI 形态（胶囊 / 贴底 / 液态玻璃） | [config.uts](config.uts) 的 `type` |
+| 扩展第四种 UI 形态 | 复制 [ui/template.uvue](ui/template.uvue) → 在 [tabbar.uvue](tabbar.uvue) 加分支 |
 | 页面里切 Tab / 监听 Tab | [index.uts](index.uts) 导出的 `switchTabbar` / `onTabShow` / `onTabPageShow` |
 | 改 Tab 页面标题、是否显示导航栏、下拉刷新 | 对应页面的 `definePage`（插件会自动同步进 `TabViews.uvue`） |
 | 调整生成行为（关掉自动建脚手架等） | [vite.config.ts](../../vite.config.ts) 里 `tabbarViewsPlugin({...})` |

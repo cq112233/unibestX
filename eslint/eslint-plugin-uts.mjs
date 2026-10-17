@@ -817,6 +817,7 @@ export const pluginUts = {
         // 忽略的内置/基础/uni-app/Vue 原生标签
         const defaultIgnore = new Set([
           'view',
+          'glass-effect-view',
           'scroll-view',
           'swiper',
           'swiper-item',

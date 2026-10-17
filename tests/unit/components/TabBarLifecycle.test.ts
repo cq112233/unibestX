@@ -2,6 +2,7 @@ import { mount } from '@vue/test-utils';
 import { defineComponent, nextTick } from 'vue';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import CapsuleTabbar from '@/src/tabbar/ui/capsule/index.uvue';
+import GlassTabbar from '@/src/tabbar/ui/glass/index.uvue';
 import {
   notifyPageShow,
   onTabPageShow,
@@ -96,6 +97,14 @@ describe('tabBar Lifecycle & Cleanup Tests', () => {
 
   it('capsuleTabbar component mounts, cleans up on unmount, and restores native tabbar', () => {
     const wrapper = mount(CapsuleTabbar);
+    expect(document.getElementById('hide-native-tabbar-style')).not.toBeNull();
+
+    wrapper.unmount();
+    expect(document.getElementById('hide-native-tabbar-style')).toBeNull();
+  });
+
+  it('glassTabbar component mounts, cleans up on unmount, and restores native tabbar', () => {
+    const wrapper = mount(GlassTabbar);
     expect(document.getElementById('hide-native-tabbar-style')).not.toBeNull();
 
     wrapper.unmount();
