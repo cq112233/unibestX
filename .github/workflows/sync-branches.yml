@@ -1,22 +1,21 @@
 name: Sync Branches
 
 # 触发方式：
-#   1. push 到 base / main 时自动同步到其余目标分支（GitHub 与 Gitee 同时同步）
-#   2. 手动 workflow_dispatch，可指定源分支
+#   1. push 到 main 时自动同步到 UI 选型分支（uniX-rice-ui、uniX-uview-ultra，GitHub 与 Gitee 同时同步）
+#   2. 手动 workflow_dispatch，可指定源分支（默认为 main）
+#   注意：base 分支为独立极简纯净基线，不参与向其他分支的自动同步与自动合并
 on:
   push:
     branches:
-      - base
       - main
   workflow_dispatch:
     inputs:
       source_branch:
-        description: 指定源分支（base 或 main）
+        description: 指定源分支（main）
         required: false
-        default: base
+        default: main
         type: choice
         options:
-          - base
           - main
 
 # contents: write      → git fetch / 读取分支状态
@@ -26,7 +25,7 @@ permissions:
   contents: write
   pull-requests: write
 
-# 串行执行：base 触发的同步合并完成后再跑 main 触发的同步，避免同一目标分支被并发合并
+# 串行执行：避免同一目标分支被并发合并
 concurrency:
   group: sync-branches
   cancel-in-progress: false
@@ -43,7 +42,6 @@ jobs:
           - github
           - gitee
         target:
-          - main
           - uniX-rice-ui
           - uniX-uview-ultra
     env:
@@ -88,7 +86,6 @@ jobs:
 
           SRC_REF="${REF_NS}/${SOURCE}"
           TGT_REF="${REF_NS}/${TARGET}"
-          BASE_REF="${REF_NS}/base"
           REPO_HTML="$([ "${REMOTE}" = "gitee" ] && echo "${GITEE_HTML}" || echo "https://github.com/${GITHUB_REPOSITORY}")"
 
           echo "📥 拉取 ${REMOTE} 全部分支..."
@@ -103,19 +100,6 @@ jobs:
           if ! git rev-parse --verify --quiet "${TGT_REF}" >/dev/null; then
             echo "⚠️ ${REMOTE} 不存在分支 ${TARGET}，跳过"
             exit 0
-          fi
-
-          # ---------- 2. 去重：main → UI 分支只在 base 这条路覆盖不到时才执行 ----------
-          # push base 会同时产生 base→T 与（base→main 合并后）main→T 两个内容重复的同步。
-          # 若 main 相对 T 的额外提交全部来自 base，说明 main 自身没有独立内容，
-          # base→T 那条链路已覆盖，main→T 纯属重复。
-          # 判据只看 ref 历史（base / main / T 均为本次 fetch 后的最新状态），不受并发合并时序影响。
-          if [ "${SOURCE}" = "main" ] && [ "${TARGET}" != "main" ]; then
-            MAIN_ONLY=$(git rev-list --count --no-merges "${TGT_REF}..${SRC_REF}" --not "${BASE_REF}" || echo 0)
-            if [ "${MAIN_ONLY}" -eq 0 ]; then
-              echo "ℹ️ main 相对 ${TARGET} 的改动全部来自 base，与 base → ${TARGET} 重复，跳过"
-              exit 0
-            fi
           fi
 
           AHEAD=$(git rev-list --count "${TGT_REF}..${SRC_REF}")
