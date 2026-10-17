@@ -44,6 +44,7 @@ type ParsedTabBarConfig = {
   spacing?: string;
   height?: string;
   midButton?: any;
+  glassEffect?: boolean;
   list: TabBarItem[];
 };
 
@@ -131,6 +132,7 @@ function parseCustomTabbarConfig(projectRoot: string): ParsedTabBarConfig {
   const iconWidthMatch = content.match(/iconWidth\s*:\s*['"`](.*?)['"`]/);
   const spacingMatch = content.match(/spacing\s*:\s*['"`](.*?)['"`]/);
   const heightMatch = content.match(/height\s*:\s*['"`](.*?)['"`]/);
+  const glassEffectMatch = content.match(/glassEffect\s*:\s*(true|false)/);
 
   const midButtonMatch = content.match(/midButton\s*:\s*\{([\s\S]*?)\}/);
   let midButton: Record<string, any> | undefined;
@@ -257,6 +259,7 @@ function parseCustomTabbarConfig(projectRoot: string): ParsedTabBarConfig {
     iconWidth: iconWidthMatch ? iconWidthMatch[1].trim() : undefined,
     spacing: spacingMatch ? spacingMatch[1].trim() : undefined,
     height: heightMatch ? heightMatch[1].trim() : undefined,
+    glassEffect: glassEffectMatch ? glassEffectMatch[1] === 'true' : undefined,
     midButton,
     list: listResult
   };
@@ -276,6 +279,8 @@ function appendOptionalTabBarFields(tabBar: Record<string, any>, parsedConfig: P
     tabBar.height = parsedConfig.height;
   if (parsedConfig.midButton)
     tabBar.midButton = parsedConfig.midButton;
+  if (parsedConfig.glassEffect !== undefined)
+    tabBar.glassEffect = parsedConfig.glassEffect;
 }
 
 // ==========================================
@@ -345,6 +350,8 @@ function runTabBar(state: PagesBuildState): void {
       }
       if (parsedConfig.midButton)
         output.tabBar.midButton = parsedConfig.midButton;
+      if (parsedConfig.glassEffect !== undefined)
+        output.tabBar.glassEffect = parsedConfig.glassEffect;
     }
   }
   else if (tabbarMode === '2' || tabbarMode === 'CUSTOM_TABBAR_WITH_NATIVE' || tabbarMode === 'CUSTOM_TABBAR') {
@@ -368,6 +375,8 @@ function runTabBar(state: PagesBuildState): void {
       }
       if (parsedConfig.midButton)
         output.tabBar.midButton = parsedConfig.midButton;
+      if (parsedConfig.glassEffect !== undefined)
+        output.tabBar.glassEffect = parsedConfig.glassEffect;
     }
   }
   else if (tabbarMode === '3' || tabbarMode === 'CUSTOM_TABBAR_WITHOUT_NATIVE' || tabbarMode === '4' || tabbarMode === 'SINGLE_PAGE_TABBAR') {
