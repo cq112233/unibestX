@@ -1,0 +1,1 @@
+import{l as t}from"./index-CPBqWj9g.js";let e=0;function o(){const o=Date.now();return 0==e||o-e>2e3?(e=o,t({title:"再按一次退出应用",position:"bottom"}),setTimeout(()=>{e==o&&(e=0)},2e3),!0):(uni.exit(),!1)}export{o as h};
