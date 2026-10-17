@@ -1,3 +1,10 @@
+## [1.1.4](https://github.com/cq112233/unibestX/compare/v1.1.3...v1.1.4) (2026-10-17)
+
+
+### Features
+
+* 添加bumpp自动化version版本管理 ([dc9e9bf](https://github.com/cq112233/unibestX/commit/dc9e9bf67751771f95847538a97214a822622292))
+* 集成 openapi-ts-request，用于生成 API 客户端和类型定义 ([507be99](https://github.com/cq112233/unibestX/commit/507be99ecca0d25a193a1e5fcd7bd114b4171da9))
 ## [1.1.3](https://github.com/cq112233/unibestX/compare/v1.1.2...v1.1.3) (2026-10-17)
 
 
