@@ -324,6 +324,14 @@ type PieOutsideLabel = {
   labelY?: number
 }
 
+type PieInsideLabel = {
+  text: string
+  x: number
+  y: number
+  color: string
+  fontSize: number
+}
+
 const props = withDefaults(defineProps<{
   option: ChartOption
   canvasId?: string
@@ -428,17 +436,36 @@ function getCanvasSize(): void {
   if (canvas == null) {
     return
   }
+  const canvasObj = canvas as any
   const configuredWidth = canvasStyleWidth.value
-  canvasWidth = configuredWidth.endsWith('px') ? parseFloat(configuredWidth) : canvas.offsetWidth
-  canvasHeight = canvas.offsetHeight
-  if (canvasWidth <= 0) {
-    canvasWidth = 300
+  let parsedWidth = 0
+  if (configuredWidth.endsWith('px')) {
+    parsedWidth = parseFloat(configuredWidth)
+  } else if (canvasObj != null && canvasObj.offsetWidth != null) {
+    parsedWidth = canvasObj.offsetWidth as number
   }
-  if (canvasHeight <= 0) {
-    canvasHeight = 300
+  if (isNaN(parsedWidth) || parsedWidth <= 0) {
+    const sysWinWidth = uni.getWindowInfo().windowWidth
+    parsedWidth = sysWinWidth > 32 ? (sysWinWidth - 32) : 300
   }
+  canvasWidth = parsedWidth
+
+  let parsedHeight = 0
+  if (canvasObj != null && canvasObj.offsetHeight != null) {
+    parsedHeight = canvasObj.offsetHeight as number
+  }
+  if (isNaN(parsedHeight) || parsedHeight <= 0) {
+    if (props.height.endsWith('px')) {
+      parsedHeight = parseFloat(props.height)
+    }
+  }
+  if (isNaN(parsedHeight) || parsedHeight <= 0) {
+    parsedHeight = 280
+  }
+  canvasHeight = parsedHeight
+
   devicePixelRatio = uni.getWindowInfo().pixelRatio
-  if (devicePixelRatio <= 0) {
+  if (devicePixelRatio <= 0 || isNaN(devicePixelRatio)) {
     devicePixelRatio = 1
   }
   canvas.width = canvasWidth * devicePixelRatio
@@ -1471,18 +1498,23 @@ function drawPie(ctx: CanvasRenderingContext2D, titleHeight: number, progress: n
   const showPercent = item.showPercent == true
   const labelPosition = stringOrDefault(item.labelPosition, 'inside')
   const isOutsideLabel = showLabels && labelPosition == 'outside'
-  const legendWidth = canvasWidth > 330 ? canvasWidth * 0.34 : 0
-  const chartWidth = legendWidth > 0 ? canvasWidth - legendWidth - 18 : canvasWidth
+  const hasLegendOption = currentOption.legend != null && currentOption.legend?.show == true
+  // 关键跨端适配：降低侧边图例展示门槛至 canvasWidth >= 220，让窄屏机型与安卓端（280px左右）也能完整展示右侧图例
+  const shouldShowSideLegend = hasLegendOption && !isOutsideLabel && canvasWidth >= 220
+  const legendWidth = shouldShowSideLegend
+    ? (canvasWidth < 320 ? Math.min(118, Math.floor(canvasWidth * 0.40)) : Math.min(142, Math.floor(canvasWidth * 0.35)))
+    : 0
+  const chartWidth = legendWidth > 0 ? canvasWidth - legendWidth - 8 : canvasWidth
   const availableHeight = Math.max(1, canvasHeight - headerBottom - 12)
-  const radiusFactor = isOutsideLabel ? 0.30 : 0.39
-  const maxRadius = Math.max(1, Math.min(chartWidth * (isOutsideLabel ? 0.22 : 0.43), availableHeight * (isHalf ? 0.30 : radiusFactor)))
+  const radiusFactor = isOutsideLabel ? 0.32 : 0.42
+  const maxRadius = Math.max(1, Math.min(chartWidth * (isOutsideLabel ? 0.28 : 0.44), availableHeight * (isHalf ? 0.30 : radiusFactor)))
   const radius = resolvePieRadius(item.radius ?? null, maxRadius, maxRadius)
-  const innerFallback = isRing ? radius * 0.58 : 0
+  const innerFallback = isRing ? radius * 0.56 : 0
   const innerRadius = Math.min(radius - 1, resolvePieRadius(item.innerRadius ?? null, innerFallback, radius - 1))
   const centerX = chartWidth / 2
   const centerY = isHalf
     ? headerBottom + availableHeight * 0.61
-    : headerBottom + availableHeight * 0.52
+    : headerBottom + availableHeight * 0.50
   const startDegrees = item.startAngle ?? (isHalf ? 180 : -90)
   const totalAngle = isHalf ? Math.PI : Math.PI * 2
   const startAngle = startDegrees * Math.PI / 180
@@ -1491,6 +1523,7 @@ function drawPie(ctx: CanvasRenderingContext2D, titleHeight: number, progress: n
   const borderWidth = item.borderWidth ?? 2
   const borderColor = stringOrDefault(item.borderColor, '#ffffff')
   const outsideLabels: PieOutsideLabel[] = []
+  const insideLabels: PieInsideLabel[] = []
 
   for (let index = 0; index < item.data.length; index++) {
     const value = Math.max(0, item.data[index])
@@ -1543,8 +1576,17 @@ function drawPie(ctx: CanvasRenderingContext2D, titleHeight: number, progress: n
       const labelRadius = innerRadius > 0 ? (innerRadius + sectorRadius) / 2 : sectorRadius * 0.66
       const labelX = sectorCenterX + Math.cos(middleAngle) * labelRadius
       const labelY = sectorCenterY + Math.sin(middleAngle) * labelRadius
-      const labelText = formatPieLabel(item.labelFormat ?? null, label, value, total, showPercent)
-      drawText(ctx, labelText, labelX, labelY, innerRadius > 0 ? '#ffffff' : '#263238', 'center')
+      // 避免文字过长超出环壁被遮挡：有侧边图例时，环形内部直接优雅展示百分比，无侧边图例时显示完整格式
+      const labelText = (shouldShowSideLegend || isRing) && showPercent
+        ? formatPercent(value, total)
+        : formatPieLabel(item.labelFormat ?? null, label, value, total, showPercent)
+      insideLabels.push({
+        text: labelText,
+        x: labelX,
+        y: labelY,
+        color: innerRadius > 0 ? '#ffffff' : '#263238',
+        fontSize: 11
+      })
     }
     if (showLabels && visibleEnd && sliceAngle > 0.08 && isOutsideLabel) {
       const labelText = formatPieLabel(item.labelFormat ?? null, label, value, total, showPercent)
@@ -1630,14 +1672,17 @@ function drawPie(ctx: CanvasRenderingContext2D, titleHeight: number, progress: n
     }
   }
 
+  // 1. 优先绘制中心白底遮罩圆与中心文字，确保绝不遮挡扇区上的白色文字
   if (innerRadius > 0) {
     ctx.fillStyle = stringOrDefault(currentOption.backgroundColor, '#ffffff')
     ctx.beginPath()
     ctx.arc(centerX, centerY, innerRadius * 0.98, 0, Math.PI * 2)
     ctx.fill()
     if (item.centerText != null || item.centerValue != null) {
-      drawText(ctx, stringOrDefault(item.centerText, stringOrDefault(item.name, '')), centerX, centerY - 8, stringOrDefault(item.centerTextColor, legendTextColor()), 'center')
-      drawText(ctx, stringOrDefault(item.centerValue, ''), centerX, centerY + 10, stringOrDefault(item.centerValueColor, textColor('#263238')), 'center', item.centerValueFontSize ?? 16)
+      const valSize = Math.min(item.centerValueFontSize ?? 16, Math.max(12, Math.floor(innerRadius * 0.36)))
+      const titleSize = Math.max(10, Math.floor(valSize * 0.75))
+      drawText(ctx, stringOrDefault(item.centerText, stringOrDefault(item.name, '')), centerX, centerY - Math.floor(valSize * 0.45), stringOrDefault(item.centerTextColor, legendTextColor()), 'center', titleSize)
+      drawText(ctx, stringOrDefault(item.centerValue, ''), centerX, centerY + Math.floor(valSize * 0.65), stringOrDefault(item.centerValueColor, textColor('#263238')), 'center', valSize)
     } else if (selectedIndex >= 0 && selectedIndex < item.data.length) {
       const selectedLabel = selectedIndex < labels.length ? labels[selectedIndex] : '数据 ' + (selectedIndex + 1).toFixed(0)
       drawText(ctx, selectedLabel, centerX, centerY - 8, legendTextColor(), 'center')
@@ -1645,22 +1690,51 @@ function drawPie(ctx: CanvasRenderingContext2D, titleHeight: number, progress: n
     }
   }
 
+  // 2. 绘制扇区内部百分比标签（浮在最顶层，彻底解决文字被白圆盖住半边的 Bug）
+  for (const insideLabel of insideLabels) {
+    drawText(ctx, insideLabel.text, insideLabel.x, insideLabel.y, insideLabel.color, 'center', insideLabel.fontSize)
+  }
+
   if (selectedIndex >= 0 && selectedIndex < item.data.length && innerRadius <= 0) {
     const selectedLabel = selectedIndex < labels.length ? labels[selectedIndex] : '数据 ' + (selectedIndex + 1).toFixed(0)
     drawText(ctx, '已选: ' + selectedLabel + '  ' + formatValue(item.data[selectedIndex]), chartWidth / 2, canvasHeight - 10, textColor('#263238'), 'center')
   }
 
-  if (legendWidth > 0 && currentOption.legend?.show != false) {
-    const legendX = chartWidth + 10
-    const legendTop = headerBottom + 20
+  // 3. 绘制右侧图例（所有端统一呈现，垂直居中对齐，响应点击交互）
+  if (shouldShowSideLegend) {
+    const legendFontSize = canvasWidth < 310 ? 11 : 12
+    const itemRowHeight = canvasWidth < 310 ? 22 : 24
+    const legendTotalHeight = item.data.length * itemRowHeight
+    const legendTop = Math.max(headerBottom + 6, centerY - legendTotalHeight / 2 + 10)
+    const legendX = chartWidth + 6
     const legendColor = legendTextColor()
     for (let index = 0; index < item.data.length; index++) {
       const label = index < labels.length ? labels[index] : '数据 ' + (index + 1).toFixed(0)
-      const y = legendTop + index * 24
+      const y = legendTop + index * itemRowHeight
       ctx.fillStyle = colors[index % colors.length]
-      ctx.fillRect(legendX, y - 5, 10, 10)
-      const legendText = label + '  ' + formatValue(item.data[index]) + '  ' + formatPercent(item.data[index], total)
-      drawText(ctx, legendText, legendX + 16, y, selectedIndex == index ? textColor('#263238') : legendColor, 'left')
+      ctx.fillRect(legendX, y - 5, 8, 8)
+      const valStr = formatValue(item.data[index])
+      const pctStr = formatPercent(item.data[index], total)
+      const legendText = canvasWidth < 310
+        ? label + ' ' + valStr + ' ' + pctStr
+        : label + '  ' + valStr + '  ' + pctStr
+      drawText(ctx, legendText, legendX + 13, y, selectedIndex == index ? textColor('#263238') : legendColor, 'left', legendFontSize)
+      hitRegions.push({
+        type: 'legend',
+        seriesIndex: 0,
+        dataIndex: index,
+        name: label,
+        value: item.data[index],
+        x: legendX,
+        y: y - 8,
+        width: legendWidth,
+        height: itemRowHeight,
+        centerX: 0,
+        centerY: 0,
+        radius: 0,
+        startAngle: 0,
+        endAngle: 0
+      })
     }
   }
 }
@@ -3025,11 +3099,28 @@ function handleTouchEnd(event: TouchEvent): void {
   if (touch == null) {
     return
   }
-  const rect = canvas?.getBoundingClientRect()
-  const left = rect?.left ?? 0
-  const top = rect?.top ?? 0
-  const x = touch.clientX - left
-  const y = touch.clientY - top
+  const touchAny = touch as any
+  let x = 0
+  let y = 0
+  if (touchAny.x != null && touchAny.y != null) {
+    x = (touchAny.x as number) ?? 0
+    y = (touchAny.y as number) ?? 0
+  } else {
+    let left = 0
+    let top = 0
+    const canvasObj = canvas as any
+    if (canvasObj != null && typeof canvasObj.getBoundingClientRect == 'function') {
+      const rect = canvasObj.getBoundingClientRect() as any
+      if (rect != null) {
+        left = (rect.left as number) ?? 0
+        top = (rect.top as number) ?? 0
+      }
+    }
+    const clientX = (touchAny.clientX as number | null) ?? 0
+    const clientY = (touchAny.clientY as number | null) ?? 0
+    x = clientX - left
+    y = clientY - top
+  }
   const tooltipOption = currentOption.tooltip
   const tooltipEnabled = tooltipOption != null && tooltipOption.show != false
   let selectedRegion: HitRegion | null = null

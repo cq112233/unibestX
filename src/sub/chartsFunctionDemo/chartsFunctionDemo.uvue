@@ -251,8 +251,8 @@ type DemoChartOption = {
 
 const chartRef = ref<ComponentPublicInstance | null>(null);
 const initialWindow = uni.getWindowInfo();
-const screenWidthVal = ref<number>(initialWindow.windowWidth);
-const screenHeightVal = ref<number>(initialWindow.windowHeight);
+const screenWidthVal = ref<number>(Math.round(initialWindow.windowWidth));
+const screenHeightVal = ref<number>(Math.round(initialWindow.windowHeight));
 const resizeCount = ref<number>(0);
 const isLandscape = computed<boolean>((): boolean => screenWidthVal.value > screenHeightVal.value);
 const orientationText = computed<string>((): string => {
@@ -348,6 +348,7 @@ const barOption = ref<DemoChartOption>({
 const pieOption = ref<DemoChartOption>({
   title: { text: '营收构成分布', color: '#1e293b', fontSize: 14 } as UTSJSONObject,
   tooltip: { show: true, duration: 1800 } as UTSJSONObject,
+  legend: { show: true, textColor: '#64748b' } as UTSJSONObject,
   xAxis: { data: ['云服务', '硬件产品', '咨询服务', '生态分成'] } as UTSJSONObject,
   series: [
     {
@@ -357,11 +358,10 @@ const pieOption = ref<DemoChartOption>({
       color: '#0957de',
       colors: ['#0957de', '#10b981', '#f59e0b', '#8b5cf6'],
       pieStyle: 'ring',
-      innerRadius: '50%',
+      innerRadius: '56%',
       showLabel: true,
       showPercent: true,
-      labelPosition: 'outside',
-      showLabelLine: true,
+      labelPosition: 'inside',
       centerText: '总销售',
       centerValue: '100%',
       centerValueColor: '#0957de',
@@ -485,6 +485,18 @@ function randomizeData(): void {
       lastClickInfo.value = '柱状图各季度对比数据已随机更新';
     }
   }
+  else if (activeType.value === 'pie') {
+    const v1 = Math.floor(Math.random() * 30) + 25;
+    const v2 = Math.floor(Math.random() * 25) + 20;
+    const v3 = Math.floor(Math.random() * 20) + 15;
+    const v4 = Math.floor(Math.random() * 15) + 10;
+    const seriesList = pieOption.value.series;
+    if (seriesList.length > 0) {
+      seriesList[0].data = [v1, v2, v3, v4];
+      pieOption.value = { ...pieOption.value };
+      lastClickInfo.value = `环形占比数据已更新：${v1}, ${v2}, ${v3}, ${v4}`;
+    }
+  }
   else if (activeType.value === 'gauge') {
     const newScore = Math.floor(Math.random() * 40) + 60;
     const seriesList = gaugeOption.value.series;
@@ -519,10 +531,12 @@ let resizeDebounceTimer: number = 0;
 
 // 执行图表尺寸重算与重新渲染
 function performChartResize(newWidth: number, newHeight: number): void {
-  screenWidthVal.value = newWidth;
-  screenHeightVal.value = newHeight;
+  const roundedWidth = Math.round(newWidth);
+  const roundedHeight = Math.round(newHeight);
+  screenWidthVal.value = roundedWidth;
+  screenHeightVal.value = roundedHeight;
   resizeCount.value++;
-  resizeInfo.value = `检测到屏幕变换 (${newWidth}×${newHeight})，正在重绘...`;
+  resizeInfo.value = `检测到屏幕变换 (${roundedWidth}×${roundedHeight})，正在重绘...`;
 
   if (resizeDebounceTimer != 0) {
     clearTimeout(resizeDebounceTimer);
@@ -536,7 +550,7 @@ function performChartResize(newWidth: number, newHeight: number): void {
     if (chart != null) {
       chart.$callMethod('resize');
     }
-    resizeInfo.value = `自适应重绘完成 (${newWidth}×${newHeight} ${isLandscape.value ? '横屏' : '竖屏'})`;
+    resizeInfo.value = `自适应重绘完成 (${roundedWidth}×${roundedHeight} ${isLandscape.value ? '横屏' : '竖屏'})`;
   }, 120) as any) as number;
 }
 
