@@ -103,6 +103,7 @@ catch {
   pkgVersion = '1.0.0';
 }
 process.env.VITE_PKG_VERSION = pkgVersion;
+process.env.VITE_TEMPLATE_VERSION = pkgVersion;
 
 try {
   process.env.VITE_GIT_COMMIT_HASH = execSync('git rev-parse --short HEAD', { stdio: ['pipe', 'pipe', 'ignore'] }).toString().trim();
@@ -180,7 +181,9 @@ export default defineConfig({
   },
   define: {
     __X_STYLE_ISOLATION__: false,
-    __X_STYLE_ISOLATION_UP_ARROW__: false
+    __X_STYLE_ISOLATION_UP_ARROW__: false,
+    'import.meta.env.VITE_TEMPLATE_VERSION': JSON.stringify(pkgVersion),
+    'import.meta.env.VITE_PKG_VERSION': JSON.stringify(pkgVersion)
   },
   server: {
     host: '0.0.0.0',
@@ -282,7 +285,7 @@ export default defineConfig({
         appName: env.VITE_APP_TITLE || 'unibestX',
         isProduction,
         buildVersion: env.VITE_APP_VERSION || process.env.VITE_APP_VERSION || '1.0.0',
-        templateVersion: process.env.VITE_TEMPLATE_VERSION || '1.0.0'
+        templateVersion: pkgVersion
       })
     }),
     // uni-pages 的三个独立卫星插件：各自一个文件、各自独立注册，核心插件通过 configResolved
