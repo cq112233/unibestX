@@ -32,14 +32,14 @@ export default defineManifestConfig({
   'name': 'unibestX',
 
   // 1. DCloud / HBuilderX 应用唯一标识（可在 HBuilderX 菜单中重新获取，或通过 VITE_DCLOUD_APPID 覆盖）
-  'appid': env.VITE_DCLOUD_APPID || '__UNI__B120614',
+  'appid': env.VITE_DCLOUD_APPID || '',
 
   // 2. uniCloud 阿里云/支付宝云空间配置（敏感凭证建议置于 .env.local 中）
   'uniCloud': {
     provider: 'alipay',
-    spaceId: env.VITE_UNICLOUD_SPACE_ID || 'env-00jy6p9vat6w',
-    accessKey: env.VITE_UNICLOUD_ACCESS_KEY || 'v1hNSO9cKet13BIZ',
-    secretKey: env.VITE_UNICLOUD_SECRET_KEY || 'KCHJ9hiSZqvmd8Yx'
+    spaceId: env.VITE_UNICLOUD_SPACE_ID || '',
+    accessKey: env.VITE_UNICLOUD_ACCESS_KEY || '',
+    secretKey: env.VITE_UNICLOUD_SECRET_KEY || ''
   },
 
   'description': '',

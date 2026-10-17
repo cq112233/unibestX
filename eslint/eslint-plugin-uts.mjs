@@ -1207,6 +1207,7 @@ export const pluginUts = {
               'AppThemeChangeResult',
               'OsThemeChangeResult',
               'OnBackPressOptions',
+              'OnResizeOptions',
               'console',
               'setTimeout',
               'clearTimeout',

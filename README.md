@@ -254,11 +254,13 @@ pnpm test           # Vitest 自动化单元测试（含 UVUE / Vue 组件与核
 pnpm test:watch     # Vitest 交互式监听测试模式
 pnpm typecheck      # 严格类型检查（tsc --noEmit -p tsconfig.typecheck.json，仅 src/，0 报错门禁）
 pnpm analyze        # 构建产物体积分析报告并自动在浏览器打开（stats.html）
+pnpm size:check     # 小程序包体积预算门禁（自动核算主包/分包体积，超过 2MB 强制拦截）
 pnpm lint           # ESLint 检查（含 UTS 强类型与 UVUE 模板规则）
 pnpm lint:fix       # ESLint 自动修复
 pnpm lint:style     # Stylelint 样式检查（支持 SCSS / CSS / UVUE <style>）
 pnpm lint:style:fix # Stylelint 样式自动修复
-pnpm lint:all       # 全量代码与样式校验（ESLint + Stylelint）
+pnpm release       # 工业级交互式版本发布（基于 bumpp + conventional-changelog 自动生成 CHANGELOG、Commit、打 Tag 并推送触发 GitHub Actions）
+pnpm changelog     # 根据 Conventional Commits 规范增量提取并生成/追加到 CHANGELOG.md
 pnpm docs:dev       # 本地启动 VitePress 文档站
 ```
 

@@ -289,6 +289,88 @@
           </text>
         </view>
       </view>
+
+      <!-- 卡片三：脚手架全方位体检与包体积门禁 -->
+      <view class="p-[14px] mt-[10px] rounded-[12px] border-[1px] border-solid bg-[#eff6ff] border-[#bfdbfe] flex flex-col">
+        <view class="flex flex-row items-center justify-between mb-[6px]">
+          <view class="flex flex-row items-center">
+            <text class="text-[13px] font-bold text-[#1e40af]">🩺 全方位健康体检与包体积门禁</text>
+            <text class="text-[10px] font-medium px-[6px] py-[1px] rounded-[4px] ml-[6px] text-[#1d4ed8] bg-[#dbeafe]">
+              质量保障与发布把关
+            </text>
+          </view>
+        </view>
+        <text class="text-[11px] leading-[18px] text-[#1e3a8a] mb-[8px]">
+          一键自动化体检关键配置文件、未用依赖、测试覆盖、大图优化；实时核算微信小程序主包 ≤ 2MB 预算，超标阻断发布并精准定位大体积文件：
+        </text>
+
+        <!-- 快捷命令组 -->
+        <view class="flex flex-col">
+          <view
+            class="px-[10px] py-[8px] mb-[6px] rounded-[6px] bg-[#0f172a] flex flex-row items-center justify-between active:opacity-90"
+            @click="copyHealthCommand"
+          >
+            <text class="text-[11px] text-[#38bdf8] flex-1" style="font-family: monospace;">
+              pnpm health / health:quick
+            </text>
+            <text class="text-[10px] text-[#94a3b8] ml-[8px]">
+              点击复制体检命令
+            </text>
+          </view>
+          <view
+            class="px-[10px] py-[8px] rounded-[6px] bg-[#0f172a] flex flex-row items-center justify-between active:opacity-90"
+            @click="copySizeCheckCommand"
+          >
+            <text class="text-[11px] text-[#fbbf24] flex-1" style="font-family: monospace;">
+              pnpm size:check
+            </text>
+            <text class="text-[10px] text-[#94a3b8] ml-[8px]">
+              点击复制包体积检查
+            </text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 卡片四：自动化交互式发版与 H5 Docker 部署 -->
+      <view class="p-[14px] mt-[10px] rounded-[12px] border-[1px] border-solid bg-[#faf5ff] border-[#e9d5ff] flex flex-col">
+        <view class="flex flex-row items-center justify-between mb-[6px]">
+          <view class="flex flex-row items-center">
+            <text class="text-[13px] font-bold text-[#6b21a8]">🚀 自动化发版与 H5 Docker 容器化</text>
+            <text class="text-[10px] font-medium px-[6px] py-[1px] rounded-[4px] ml-[6px] text-[#7e22ce] bg-[#f3e8ff]">
+              DevOps 自动化交付
+            </text>
+          </view>
+        </view>
+        <text class="text-[11px] leading-[18px] text-[#581c87] mb-[8px]">
+          集成 Bumpp 语义化发版与标准 Changelog 生成；内置轻量 Nginx Alpine（~25MB）H5 生产/测试双环境 Docker 容器与接口反向代理：
+        </text>
+
+        <!-- 快捷命令组 -->
+        <view class="flex flex-col">
+          <view
+            class="px-[10px] py-[8px] mb-[6px] rounded-[6px] bg-[#0f172a] flex flex-row items-center justify-between active:opacity-90"
+            @click="copyReleaseCommand"
+          >
+            <text class="text-[11px] text-[#c084fc] flex-1" style="font-family: monospace;">
+              pnpm release
+            </text>
+            <text class="text-[10px] text-[#94a3b8] ml-[8px]">
+              点击复制发版命令
+            </text>
+          </view>
+          <view
+            class="px-[10px] py-[8px] rounded-[6px] bg-[#0f172a] flex flex-row items-center justify-between active:opacity-90"
+            @click="copyDockerCommand"
+          >
+            <text class="text-[11px] text-[#38bdf8] flex-1" style="font-family: monospace;">
+              pnpm docker:build:prod
+            </text>
+            <text class="text-[10px] text-[#94a3b8] ml-[8px]">
+              点击复制 Docker 部署命令
+            </text>
+          </view>
+        </view>
+      </view>
     </view>
 
     <!-- 内置工具库（lime-shared / lime-use / lime-color / lime-dayuts / crypto-bestX） -->
@@ -647,6 +729,42 @@ const featureList: Array<FeatureItem> = [
     bgColor: '#be185d0f',
     borderColor: '#be185d26',
     textColor: '#be185d'
+  },
+  {
+    id: 'health',
+    title: '🩺 项目全方位体检',
+    desc: '7大门禁一键扫描・自动诊断',
+    configPath: 'pnpm health / health:quick',
+    bgColor: '#0284c70f',
+    borderColor: '#0284c726',
+    textColor: '#0369a1'
+  },
+  {
+    id: 'size-check',
+    title: '📊 包体积预算门禁',
+    desc: '主包 ≤2MB 限制・超标拦截',
+    configPath: 'pnpm size:check',
+    bgColor: '#f59e0b0f',
+    borderColor: '#f59e0b26',
+    textColor: '#d97706'
+  },
+  {
+    id: 'release',
+    title: '🚀 自动化发版工作流',
+    desc: 'Bumpp 版本自增・Changelog・Tag',
+    configPath: 'pnpm release',
+    bgColor: '#8b5cf60f',
+    borderColor: '#8b5cf626',
+    textColor: '#7c3aed'
+  },
+  {
+    id: 'docker',
+    title: '🐳 Docker 容器化部署',
+    desc: 'Nginx Alpine 镜像・Gzip/反代',
+    configPath: 'pnpm docker:build:prod',
+    bgColor: '#0ea5e90f',
+    borderColor: '#0ea5e926',
+    textColor: '#0284c7'
   }
 ];
 
@@ -865,6 +983,58 @@ function copyLintCommand(): void {
     success: () => {
       uni.showToast({
         title: '已复制 lint:all 命令',
+        icon: 'success'
+      });
+    }
+  });
+}
+
+// 复制脚手架体检命令
+function copyHealthCommand(): void {
+  uni.setClipboardData({
+    data: 'pnpm health',
+    success: () => {
+      uni.showToast({
+        title: '已复制 health 命令',
+        icon: 'success'
+      });
+    }
+  });
+}
+
+// 复制包体积预算门禁检查命令
+function copySizeCheckCommand(): void {
+  uni.setClipboardData({
+    data: 'pnpm size:check',
+    success: () => {
+      uni.showToast({
+        title: '已复制 size:check 命令',
+        icon: 'success'
+      });
+    }
+  });
+}
+
+// 复制自动化发版命令
+function copyReleaseCommand(): void {
+  uni.setClipboardData({
+    data: 'pnpm release',
+    success: () => {
+      uni.showToast({
+        title: '已复制 release 命令',
+        icon: 'success'
+      });
+    }
+  });
+}
+
+// 复制 H5 Docker 生产构建与启动命令
+function copyDockerCommand(): void {
+  uni.setClipboardData({
+    data: 'pnpm docker:build:prod',
+    success: () => {
+      uni.showToast({
+        title: '已复制 docker:build:prod',
         icon: 'success'
       });
     }

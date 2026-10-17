@@ -1,0 +1,542 @@
+<template>
+  <view class="flex flex-col flex-1 bg-[#f8fafc] p-[16px]">
+    <scroll-view direction="vertical" class="flex-1 flex flex-col">
+      <!-- 页面顶部描述卡片 -->
+      <view class="rounded-[16px] p-[20px] mb-[16px] border-[1px] border-solid bg-[#ffffff] border-[#edf2f7]">
+        <view class="flex flex-row items-center mb-[10px]">
+          <view class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#0957de]" />
+          <text class="text-[17px] font-bold text-[#1e293b]">XTF-Charts 原生跨端图表</text>
+        </view>
+        <text class="text-[13px] leading-[20px] text-[#64748b]">
+          基于 Canvas 2D 零依赖原生轻量图表组件，无需加载外部庞大 JS 库（体积缩减 90%+），全平台支持折线、柱状、环形饼图、雷达与仪表盘。
+        </text>
+      </view>
+
+      <!-- 图表类型切换选项卡 -->
+      <view class="rounded-[16px] p-[16px] mb-[16px] border-[1px] border-solid bg-[#ffffff] border-[#edf2f7]">
+        <text class="text-[12px] font-bold text-[#94a3b8] mb-[12px]">图表类型切换</text>
+        <view class="flex flex-row justify-between mb-[8px]">
+          <view
+            v-for="item in chartTypes.slice(0, 3)"
+            :key="item.key"
+            class="flex-1 mr-[8px] last:mr-0"
+          >
+            <view
+              class="w-full h-[38px] rounded-[8px] flex flex-row items-center justify-center"
+              :class="activeType === item.key ? 'bg-[#0957de]' : 'bg-[#f1f5f9]'"
+              @click="switchType(item.key)"
+            >
+              <text
+                class="text-[13px] font-bold"
+                :class="activeType === item.key ? 'text-[#ffffff]' : 'text-[#475569]'"
+              >
+                {{ item.name }}
+              </text>
+            </view>
+          </view>
+        </view>
+        <view class="flex flex-row justify-between">
+          <view
+            v-for="item in chartTypes.slice(3, 5)"
+            :key="item.key"
+            class="flex-1 mr-[8px] last:mr-0"
+          >
+            <view
+              class="w-full h-[38px] rounded-[8px] flex flex-row items-center justify-center"
+              :class="activeType === item.key ? 'bg-[#0957de]' : 'bg-[#f1f5f9]'"
+              @click="switchType(item.key)"
+            >
+              <text
+                class="text-[13px] font-bold"
+                :class="activeType === item.key ? 'text-[#ffffff]' : 'text-[#475569]'"
+              >
+                {{ item.name }}
+              </text>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 屏幕监听与自适应重绘状态栏 -->
+      <view class="rounded-[16px] p-[16px] mb-[16px] border-[1px] border-solid bg-[#ffffff] border-[#edf2f7]">
+        <view class="flex flex-row items-center justify-between mb-[10px]">
+          <view class="flex flex-row items-center">
+            <view class="w-[8px] h-[8px] rounded-[4px] mr-[8px]" :class="isLandscape ? 'bg-[#f59e0b]' : 'bg-[#10b981]'" />
+            <text class="text-[14px] font-bold text-[#1e293b]">屏幕自适应监听</text>
+          </view>
+          <!-- 屏幕方向标签 -->
+          <view class="px-[8px] py-[3px] rounded-[4px] flex flex-row items-center" :class="isLandscape ? 'bg-[#fef3c7]' : 'bg-[#ecfdf5]'">
+            <text class="text-[11px] font-bold" :class="isLandscape ? 'text-[#b45309]' : 'text-[#047857]'">
+              {{ orientationText }}
+            </text>
+          </view>
+        </view>
+
+        <view class="p-[10px] rounded-[8px] bg-[#f8fafc] border-[1px] border-solid border-[#f1f5f9] mb-[10px]">
+          <view class="flex flex-row items-center justify-between mb-[4px]">
+            <text class="text-[12px] text-[#64748b]">视口尺寸:</text>
+            <text class="text-[12px] font-bold text-[#334155]">{{ screenWidthVal }}px × {{ screenHeightVal }}px</text>
+          </view>
+          <view class="flex flex-row items-center justify-between">
+            <text class="text-[12px] text-[#64748b]">重绘状态:</text>
+            <text class="text-[12px] font-medium text-[#0957de]">{{ resizeInfo }}</text>
+          </view>
+        </view>
+
+        <view class="flex flex-row items-center justify-between">
+          <text class="text-[11px] text-[#94a3b8]">已响应变换: {{ resizeCount }} 次</text>
+          <view
+            class="px-[12px] py-[6px] rounded-[6px] bg-[#f1f5f9] active:opacity-80"
+            @click="triggerManualResize"
+          >
+            <text class="text-[12px] font-medium text-[#475569]">重新计算重绘</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 图表主渲染卡片 -->
+      <view class="rounded-[16px] p-[16px] mb-[16px] border-[1px] border-solid bg-[#ffffff] border-[#edf2f7]">
+        <view class="flex flex-row items-center justify-between mb-[14px]">
+          <view class="flex flex-row items-center">
+            <view class="w-[8px] h-[8px] rounded-[4px] mr-[8px] bg-[#10b981]" />
+            <text class="text-[15px] font-bold text-[#1e293b]">{{ currentTitle }}</text>
+          </view>
+          <view
+            class="px-[12px] py-[6px] rounded-[6px] bg-[#e0edff] active:opacity-80"
+            @click="randomizeData"
+          >
+            <text class="text-[12px] font-medium text-[#0957de]">随机更新数据</text>
+          </view>
+        </view>
+
+        <!-- XTF-Charts 组件 -->
+        <view class="w-full h-[280px]">
+          <XtfCharts
+            ref="chartRef"
+            canvas-id="xtf-charts-demo-canvas"
+            :option="currentOption"
+            height="280px"
+            @click="handleChartClick"
+          />
+        </view>
+
+        <!-- 交互反馈条 -->
+        <view class="mt-[12px] p-[10px] rounded-[8px] bg-[#f8fafc] border-[1px] border-solid border-[#f1f5f9] flex flex-row items-center">
+          <text class="text-[12px] text-[#64748b] mr-[6px]">交互触发:</text>
+          <text class="text-[12px] font-bold text-[#0957de]">{{ lastClickInfo }}</text>
+        </view>
+      </view>
+
+      <!-- 特性说明与架构优势卡片 -->
+      <view class="rounded-[16px] p-[18px] mb-[16px] border-[1px] border-solid bg-[#ffffff] border-[#edf2f7]">
+        <text class="text-[14px] font-bold text-[#1e293b] mb-[12px]">XTF-Charts 架构特性对比</text>
+
+        <view class="flex flex-col">
+          <view class="flex flex-row items-start mb-[10px]">
+            <view class="w-[6px] h-[6px] rounded-[3px] mt-[6px] mr-[8px] bg-[#0957de]" />
+            <view class="flex-1 flex flex-col">
+              <text class="text-[13px] font-bold text-[#334155]">轻量零依赖（直降 90% 包体积）</text>
+              <text class="text-[12px] text-[#64748b] leading-[18px]">
+                源码仅 ~110KB，无外部打包依赖；彻底避免 ECharts (1.44MB) 撑爆小程序 2MB 主包限制。
+              </text>
+            </view>
+          </view>
+
+          <view class="flex flex-row items-start mb-[10px]">
+            <view class="w-[6px] h-[6px] rounded-[3px] mt-[6px] mr-[8px] bg-[#10b981]" />
+            <view class="flex-1 flex flex-col">
+              <text class="text-[13px] font-bold text-[#334155]">Canvas 2D 原生渲染</text>
+              <text class="text-[12px] text-[#64748b] leading-[18px]">
+                基于跨端标准 Canvas 2D 上下文直接绘制，无需 WebView/renderjs 跨进程通讯，手势与帧率极其稳定。
+              </text>
+            </view>
+          </view>
+
+          <view class="flex flex-row items-start mb-[10px]">
+            <view class="w-[6px] h-[6px] rounded-[3px] mt-[6px] mr-[8px] bg-[#f59e0b]" />
+            <view class="flex-1 flex flex-col">
+              <text class="text-[13px] font-bold text-[#334155]">ECharts 风格声明式 API</text>
+              <text class="text-[12px] text-[#64748b] leading-[18px]">
+                兼容主流 option 配置体系（title, xAxis, yAxis, series, tooltip, legend），迁移与学习成本极低。
+              </text>
+            </view>
+          </view>
+
+          <view class="flex flex-row items-start">
+            <view class="w-[6px] h-[6px] rounded-[3px] mt-[6px] mr-[8px] bg-[#8b5cf6]" />
+            <view class="flex-1 flex flex-col">
+              <text class="text-[13px] font-bold text-[#334155]">全平台原生运行</text>
+              <text class="text-[12px] text-[#64748b] leading-[18px]">
+                完美适配 App-Android、App-iOS、App-HarmonyOS、Web 以及微信/支付宝各端小程序。
+              </text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import type { ComponentPublicInstance } from 'vue';
+import { computed, onMounted, onUnmounted, ref } from 'vue';
+import { systemUtils } from '@/src/utils/systemInfo/index.uts';
+import XtfCharts from '@/uni_modules/xtf-charts/components/xtf-charts/xtf-charts.uvue';
+import type {
+  ChartOption,
+  ChartSeries,
+  RadarIndicatorOption
+} from '@/uni_modules/xtf-charts/components/xtf-charts/types.uts';
+
+definePage({
+  debug: false,
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
+  style: {
+    navigationBarTitleText: 'XTF-Charts 图表',
+    navigationStyle: 'custom'
+  }
+});
+
+type ChartTypeItem = {
+  key: string;
+  name: string;
+};
+
+const chartRef = ref<ComponentPublicInstance | null>(null);
+const initialWindow = uni.getWindowInfo();
+const screenWidthVal = ref<number>(Math.round(initialWindow.windowWidth));
+const screenHeightVal = ref<number>(Math.round(initialWindow.windowHeight));
+const resizeCount = ref<number>(0);
+const isLandscape = computed<boolean>((): boolean => screenWidthVal.value > screenHeightVal.value);
+const orientationText = computed<string>((): string => {
+  return isLandscape.value ? '横屏 (Landscape)' : '竖屏 (Portrait)';
+});
+const resizeInfo = ref<string>('监听就绪：旋转设备或调整窗口可自动重绘');
+
+const chartTypes: ChartTypeItem[] = [
+  { key: 'line', name: '平滑折线' },
+  { key: 'bar', name: '多维柱状' },
+  { key: 'pie', name: '环形占比' },
+  { key: 'radar', name: '能力雷达' },
+  { key: 'gauge', name: '速度仪表' }
+];
+
+const activeType = ref<string>('line');
+const lastClickInfo = ref<string>('点击图表任意图形区域可查看交互事件');
+
+// 1. 折线图配置 (XTF-Charts)
+const lineOption = ref<ChartOption>({
+  title: { text: '近 7 日销售趋势', color: '#1e293b', fontSize: 14 },
+  tooltip: { show: true, merge: true, trigger: 'axis', duration: 1800 },
+  xAxis: {
+    data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
+    axisLine: { show: true, color: '#cbd5e1' },
+    axisLabel: { color: '#64748b' }
+  },
+  yAxis: {
+    min: 0,
+    max: 320,
+    splitLine: { show: true, color: '#f1f5f9' },
+    axisLabel: { color: '#64748b' }
+  },
+  series: [
+    {
+      name: '线上订单',
+      type: 'line',
+      data: [120, 185, 140, 240, 210, 290, 260],
+      color: '#0957de',
+      smooth: true,
+      areaStyle: true,
+      showSymbol: true
+    } as ChartSeries,
+    {
+      name: '线下门店',
+      type: 'line',
+      data: [80, 120, 110, 160, 145, 190, 175],
+      color: '#10b981',
+      smooth: true,
+      areaStyle: false,
+      showSymbol: true
+    } as ChartSeries
+  ]
+});
+
+// 2. 柱状图配置
+const barOption = ref<ChartOption>({
+  title: { text: '渠道季度业绩对比', color: '#1e293b', fontSize: 14 },
+  tooltip: { show: true, merge: true, duration: 1800 },
+  legend: { show: true, textColor: '#64748b' },
+  xAxis: {
+    data: ['一季度', '二季度', '三季度', '四季度'],
+    axisLine: { show: true, color: '#cbd5e1' },
+    axisLabel: { color: '#64748b' }
+  },
+  yAxis: {
+    min: 0,
+    max: 300,
+    splitLine: { show: true, color: '#f1f5f9' },
+    axisLabel: { color: '#64748b' }
+  },
+  series: [
+    {
+      name: '直营店',
+      type: 'bar',
+      data: [180, 240, 210, 280],
+      color: '#0957de',
+      barWidth: 18,
+      itemStyle: { borderRadius: 6 }
+    } as ChartSeries,
+    {
+      name: '加盟店',
+      type: 'bar',
+      data: [120, 170, 150, 220],
+      color: '#38bdf8',
+      barWidth: 18,
+      itemStyle: { borderRadius: 6 }
+    } as ChartSeries
+  ]
+});
+
+// 3. 环形饼图配置
+const pieOption = ref<ChartOption>({
+  title: { text: '营收构成分布', color: '#1e293b', fontSize: 14 },
+  tooltip: { show: true, duration: 1800 },
+  legend: { show: true, textColor: '#64748b' },
+  xAxis: { data: ['云服务', '硬件产品', '咨询服务', '生态分成'] },
+  series: [
+    {
+      name: '营收占比',
+      type: 'pie',
+      data: [42, 28, 18, 12],
+      color: '#0957de',
+      colors: ['#0957de', '#10b981', '#f59e0b', '#8b5cf6'],
+      pieStyle: 'ring',
+      innerRadius: '56%',
+      showLabel: true,
+      showPercent: true,
+      labelPosition: 'inside',
+      centerText: '总销售',
+      centerValue: '100%',
+      centerValueColor: '#0957de',
+      centerValueFontSize: 18
+    } as ChartSeries
+  ]
+});
+
+// 4. 雷达图配置
+const radarOption = ref<ChartOption>({
+  title: { text: '产品综合能力模型', color: '#1e293b', fontSize: 14 },
+  tooltip: { show: true, duration: 1800 },
+  radar: {
+    indicator: [
+      { name: '性能', max: 100 } as RadarIndicatorOption,
+      { name: '安全性', max: 100 } as RadarIndicatorOption,
+      { name: '易用性', max: 100 } as RadarIndicatorOption,
+      { name: '跨端兼容', max: 100 } as RadarIndicatorOption,
+      { name: '社区活跃', max: 100 } as RadarIndicatorOption
+    ]
+  },
+  series: [
+    {
+      name: 'unibestX 方案',
+      type: 'radar',
+      data: [96, 92, 90, 98, 88],
+      color: '#0957de'
+    } as ChartSeries,
+    {
+      name: '基线标准',
+      type: 'radar',
+      data: [75, 70, 80, 65, 70],
+      color: '#10b981'
+    } as ChartSeries
+  ]
+});
+
+// 5. 仪表盘配置
+const gaugeOption = ref<ChartOption>({
+  title: { text: '系统实时健康度', color: '#1e293b', fontSize: 14 },
+  tooltip: { show: true, duration: 1800 },
+  yAxis: { min: 0, max: 100 },
+  series: [
+    {
+      name: '健康指标',
+      type: 'gauge',
+      data: [92],
+      color: '#10b981',
+      gaugeStyle: 'arc',
+      gaugeRound: true,
+      gaugeShowTicks: true,
+      gaugeTickCount: 10,
+      gaugeShowPointer: true,
+      gaugeGradientColors: ['#34d399', '#059669'],
+      centerText: '运行良好',
+      centerValue: '92 分',
+      centerValueColor: '#10b981',
+      centerValueFontSize: 20
+    } as ChartSeries
+  ]
+});
+
+// 当前激活的配置
+const currentOption = computed((): ChartOption => {
+  if (activeType.value === 'bar') {
+    return barOption.value;
+  }
+  if (activeType.value === 'pie') {
+    return pieOption.value;
+  }
+  if (activeType.value === 'radar') {
+    return radarOption.value;
+  }
+  if (activeType.value === 'gauge') {
+    return gaugeOption.value;
+  }
+  return lineOption.value;
+});
+
+const currentTitle = computed((): string => {
+  for (let i = 0; i < chartTypes.length; i++) {
+    if (chartTypes[i].key === activeType.value) {
+      return chartTypes[i].name;
+    }
+  }
+  return '平滑折线';
+});
+
+// 切换类型
+function switchType(typeKey: string): void {
+  activeType.value = typeKey;
+  lastClickInfo.value = `已切换至 ${currentTitle.value} 模式`;
+}
+
+// 随机数据生成演示
+function randomizeData(): void {
+  if (activeType.value === 'line') {
+    const newData: number[] = [];
+    for (let i = 0; i < 7; i++) {
+      newData.push(Math.floor(Math.random() * 200) + 80);
+    }
+    const seriesList = lineOption.value.series;
+    if (seriesList.length > 0) {
+      seriesList[0].data = newData;
+      lineOption.value = { ...lineOption.value };
+      lastClickInfo.value = `折线数据已刷新：${newData.join(', ')}`;
+    }
+  }
+  else if (activeType.value === 'bar') {
+    const newDataA: number[] = [];
+    const newDataB: number[] = [];
+    for (let i = 0; i < 4; i++) {
+      newDataA.push(Math.floor(Math.random() * 180) + 100);
+      newDataB.push(Math.floor(Math.random() * 150) + 80);
+    }
+    const seriesList = barOption.value.series;
+    if (seriesList.length >= 2) {
+      seriesList[0].data = newDataA;
+      seriesList[1].data = newDataB;
+      barOption.value = { ...barOption.value };
+      lastClickInfo.value = '柱状图各季度对比数据已随机更新';
+    }
+  }
+  else if (activeType.value === 'pie') {
+    const v1 = Math.floor(Math.random() * 30) + 25;
+    const v2 = Math.floor(Math.random() * 25) + 20;
+    const v3 = Math.floor(Math.random() * 20) + 15;
+    const v4 = Math.floor(Math.random() * 15) + 10;
+    const seriesList = pieOption.value.series;
+    if (seriesList.length > 0) {
+      seriesList[0].data = [v1, v2, v3, v4];
+      pieOption.value = { ...pieOption.value };
+      lastClickInfo.value = `环形占比数据已更新：${v1}, ${v2}, ${v3}, ${v4}`;
+    }
+  }
+  else if (activeType.value === 'gauge') {
+    const newScore = Math.floor(Math.random() * 40) + 60;
+    const seriesList = gaugeOption.value.series;
+    if (seriesList.length > 0) {
+      seriesList[0].data = [newScore];
+      seriesList[0].centerValue = `${newScore} 分`;
+      gaugeOption.value = { ...gaugeOption.value };
+      lastClickInfo.value = `健康度指标更新为：${newScore} 分`;
+    }
+  }
+  else {
+    lastClickInfo.value = '当前图表已刷新呈现';
+  }
+}
+
+// 点击图表区域事件
+function handleChartClick(event: UTSJSONObject): void {
+  const sName = event.getString('seriesName') ?? '';
+  const val = event.get('value') != null ? `${event.get('value')}` : '';
+  lastClickInfo.value = `点击目标: [${sName}] 数值: ${val}`;
+}
+
+let resizeDebounceTimer: number = 0;
+
+// 执行图表尺寸重算与重新渲染
+function performChartResize(newWidth: number, newHeight: number): void {
+  const roundedWidth = Math.round(newWidth);
+  const roundedHeight = Math.round(newHeight);
+  screenWidthVal.value = roundedWidth;
+  screenHeightVal.value = roundedHeight;
+  resizeCount.value++;
+  resizeInfo.value = `检测到屏幕变换 (${roundedWidth}×${roundedHeight})，正在重绘...`;
+
+  if (resizeDebounceTimer != 0) {
+    clearTimeout(resizeDebounceTimer);
+    resizeDebounceTimer = 0;
+  }
+
+  // 防抖 120ms 等待原生布局与视口重排完成
+  resizeDebounceTimer = (setTimeout((): void => {
+    systemUtils.updateSystemInfo();
+    const chart = chartRef.value;
+    if (chart != null) {
+      chart.$callMethod('resize');
+    }
+    resizeInfo.value = `自适应重绘完成 (${roundedWidth}×${roundedHeight} ${isLandscape.value ? '横屏' : '竖屏'})`;
+  }, 120) as any) as number;
+}
+
+// 页面级生命周期监听屏幕尺寸/旋转变化
+onResize((options: OnResizeOptions) => {
+  const size = options.size;
+  performChartResize(size.windowWidth, size.windowHeight);
+});
+
+// 手动触发重新渲染测试
+function triggerManualResize(): void {
+  const win = uni.getWindowInfo();
+  performChartResize(win.windowWidth, win.windowHeight);
+  lastClickInfo.value = `已手动重算并重绘图表 (当前尺寸: ${win.windowWidth}×${win.windowHeight})`;
+}
+
+// #ifdef WEB
+let webResizeListener: (() => void) | null = null;
+// #endif
+
+onMounted(() => {
+  // #ifdef WEB
+  webResizeListener = () => {
+    const win = uni.getWindowInfo();
+    performChartResize(win.windowWidth, win.windowHeight);
+  };
+  window.addEventListener('resize', webResizeListener as any);
+  // #endif
+});
+
+onUnmounted(() => {
+  if (resizeDebounceTimer != 0) {
+    clearTimeout(resizeDebounceTimer);
+  }
+  // #ifdef WEB
+  if (webResizeListener != null) {
+    window.removeEventListener('resize', webResizeListener as any);
+  }
+  // #endif
+});
+</script>

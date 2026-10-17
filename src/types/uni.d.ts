@@ -374,7 +374,17 @@ declare global {
   function onPullDownRefresh(callback: () => void): void;
   function onReachBottom(callback: () => void): void;
   function onPageScroll(callback: (options: { scrollTop: number }) => void): void;
-  function onResize(callback: (options: { size: { windowWidth: number; windowHeight: number } }) => void): void;
+  type OnResizeSize = {
+    windowWidth: number;
+    windowHeight: number;
+    screenWidth?: number;
+    screenHeight?: number;
+  };
+  type OnResizeOptions = {
+    size: OnResizeSize;
+    deviceOrientation?: string;
+  };
+  function onResize(callback: (options: OnResizeOptions) => void): void;
   function onTabItemTap(callback: (options: { index: number; pagePath: string; text: string }) => void): void;
   /** 全局错误监听（App.uvue 专用）：全平台支持，参数为错误信息（含堆栈） */
   function onError(callback: (error: any) => void): void;

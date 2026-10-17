@@ -118,6 +118,19 @@ async function initMP(option: UTSJSONObject) {
         opt.series.progressive = 0
       }
     }
+    if (opt && opt.tooltip) {
+      if (opt.tooltip.confine === undefined) {
+        opt.tooltip.confine = true
+      }
+      if (!opt.tooltip.triggerOn) {
+        opt.tooltip.triggerOn = 'mousemove|click'
+      }
+      // #ifndef WEB
+      if (!opt.tooltip.renderMode) {
+        opt.tooltip.renderMode = 'richText'
+      }
+      // #endif
+    }
   })
 
   if (echarts.setPlatformAPI) {

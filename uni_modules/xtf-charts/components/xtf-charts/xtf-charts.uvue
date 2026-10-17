@@ -1,0 +1,3027 @@
+<template>
+  <scroll-view
+    class="xtf-charts-scroll"
+    direction="horizontal"
+    :show-scrollbar="showScrollbar"
+    :style="{ width: '100%', height: height }"
+  >
+    <canvas
+      :id="canvasId"
+      class="xtf-charts-canvas"
+      :style="{ width: canvasStyleWidth, height: height }"
+      @touchstart="handleTouchStart"
+      @touchmove="handleTouchMove"
+      @touchend="handleTouchEnd"
+    ></canvas>
+  </scroll-view>
+</template>
+
+<script setup lang="uts">
+import {
+  CanvasTextAlign,
+  TitleOption,
+  GridOption,
+  AxisLabelOption,
+  AxisLineOption,
+  SplitLineOption,
+  AxisOption,
+  LegendOption,
+  LabelOption,
+  PieLabelOption,
+  RadarIndicatorOption,
+  RadarOption,
+  LineStyleOption,
+  MarkLineOption,
+  MarkPointOption,
+  MarkAreaOption,
+  LineColorRangeOption,
+  ItemStyleOption,
+  ChartSeries,
+  HitRegion,
+  TooltipOption,
+  TooltipData,
+  TooltipItem,
+  ChartOption,
+  Point,
+  PieOutsideLabel,
+  PieInsideLabel
+} from './types.uts'
+
+
+// XTF-Charts Component Props
+const props = withDefaults(defineProps<{
+  option: ChartOption
+  canvasId?: string
+  width?: string
+  height?: string
+  showScrollbar?: boolean
+  scrollable?: boolean
+  gestureScroll?: boolean
+}>(), {
+  canvasId: 'xtf-charts-canvas',
+  width: '100%',
+  height: '300px',
+  showScrollbar: false,
+  scrollable: true,
+  gestureScroll: false
+})
+
+const emit = defineEmits<{
+  ready: []
+  click: [event: UTSJSONObject]
+}>()
+
+const instance = getCurrentInstance()!.proxy!
+let renderingContext: CanvasRenderingContext2D | null = null
+let canvas: UniCanvasElement | null = null
+let canvasContext: CanvasContext | null = null
+let currentOption: ChartOption = props.option
+let canvasWidth = 0
+let canvasHeight = 0
+let devicePixelRatio = 1
+const canvasStyleWidth = ref(props.width)
+let animationFrameId = 0
+let hitRegions: HitRegion[] = []
+let selectedPieIndex = -1
+let touchStartX = 0
+let touchStartY = 0
+let isHorizontalPanning = false
+let activeTooltip: TooltipData | null = null
+let tooltipTimer: number | null = null
+let hiddenSeries: Set<number> = new Set()
+let previousRealtimeCategoryLabels: string[] = []
+let previousRealtimeSeriesData: number[][] = []
+let previousScatterBarMode = ''
+type XtfCartesianLayout = {
+  left: number
+  top: number
+  plotWidth: number
+  plotHeight: number
+  categoryWidth: number
+  categoryHeight: number
+  step: number
+  hasBarSeries: boolean
+  horizontal: boolean
+  categoryCount: number
+  minValue: number
+  maxValue: number
+}
+let cartesianLayout: XtfCartesianLayout | null = null
+
+function numberOrDefault(value: number | null, fallback: number): number {
+  return value ?? fallback
+}
+
+function stringOrDefault(value: string | null, fallback: string): string {
+  return value ?? fallback
+}
+
+function textColor(fallback: string): string {
+  return stringOrDefault(currentOption.textColor, fallback)
+}
+
+function legendTextColor(): string {
+  return stringOrDefault(currentOption.legend?.textColor, textColor('#607d8b'))
+}
+
+function getBarWidth(value: number | string | null, slotWidth: number, categoryWidth: number): number {
+  if (value == null) {
+    return Math.max(1, slotWidth - 3)
+  }
+  if (typeof value == 'number') {
+    return Math.min(slotWidth, Math.max(1, value))
+  }
+  if (value.endsWith('%')) {
+    const percent = parseFloat(value)
+    if (percent > 0) {
+      return Math.min(slotWidth, Math.max(1, categoryWidth * percent / 100))
+    }
+  }
+  return Math.max(1, slotWidth - 3)
+}
+
+function formatValue(value: number): string {
+  if (Math.abs(value) >= 1000) {
+    return value.toFixed(0)
+  }
+  if (value % 1 == 0) {
+    return value.toFixed(0)
+  }
+  return value.toFixed(1)
+}
+
+function getCanvasSize(): void {
+  const currentCanvas = canvas
+  if (currentCanvas == null) {
+    return
+  }
+  const configuredWidth = canvasStyleWidth.value
+  let parsedWidth = 0
+  if (configuredWidth.endsWith('px')) {
+    parsedWidth = parseFloat(configuredWidth)
+  }
+  // #ifdef WEB
+  if (parsedWidth <= 0) {
+    const canvasObj = currentCanvas as any
+    if (canvasObj != null && canvasObj.offsetWidth != null) {
+      const offsetW = canvasObj.offsetWidth as number
+      if (!isNaN(offsetW) && offsetW > 0) {
+        parsedWidth = offsetW
+      }
+    }
+  }
+  // #endif
+  if (parsedWidth <= 0) {
+    const rect = currentCanvas.getBoundingClientRect()
+    if (rect != null && rect.width > 0) {
+      parsedWidth = rect.width
+    }
+  }
+  if (isNaN(parsedWidth) || parsedWidth <= 0) {
+    const sysWinWidth = uni.getWindowInfo().windowWidth
+    parsedWidth = sysWinWidth > 32 ? (sysWinWidth - 32) : 300
+  }
+  canvasWidth = parsedWidth
+
+  let parsedHeight = 0
+  if (props.height.endsWith('px')) {
+    parsedHeight = parseFloat(props.height)
+  }
+  // #ifdef WEB
+  if (parsedHeight <= 0) {
+    const canvasObj = currentCanvas as any
+    if (canvasObj != null && canvasObj.offsetHeight != null) {
+      const offsetH = canvasObj.offsetHeight as number
+      if (!isNaN(offsetH) && offsetH > 0) {
+        parsedHeight = offsetH
+      }
+    }
+  }
+  // #endif
+  if (parsedHeight <= 0) {
+    const rect = currentCanvas.getBoundingClientRect()
+    if (rect != null && rect.height > 0) {
+      parsedHeight = rect.height
+    }
+  }
+  if (isNaN(parsedHeight) || parsedHeight <= 0) {
+    parsedHeight = 280
+  }
+  canvasHeight = parsedHeight
+
+  devicePixelRatio = uni.getWindowInfo().pixelRatio
+  if (devicePixelRatio <= 0 || isNaN(devicePixelRatio)) {
+    devicePixelRatio = 1
+  }
+  currentCanvas.width = canvasWidth * devicePixelRatio
+  currentCanvas.height = canvasHeight * devicePixelRatio
+  const ctx = renderingContext
+  if (ctx != null) {
+    ctx.scale(devicePixelRatio, devicePixelRatio)
+  }
+}
+
+function getCategoryCount(option: ChartOption): number {
+  let count = option.xAxis?.data?.length ?? 0
+  if (option.yAxis?.data != null && option.yAxis.data.length > count) {
+    count = option.yAxis.data.length
+  }
+  for (const item of option.series) {
+    if (item.data.length > count) {
+      count = item.data.length
+    }
+    if (item.candlestickData != null && item.candlestickData.length > count) {
+      count = item.candlestickData.length
+    }
+  }
+  return count
+}
+
+function updateCanvasStyleWidth(): void {
+  const categoryCount = getCategoryCount(currentOption)
+  if (props.scrollable == true && categoryCount > 12 && props.width == '100%') {
+    const minimumWidth = categoryCount * 56 + 66
+    canvasStyleWidth.value = minimumWidth.toFixed(0) + 'px'
+  } else {
+    canvasStyleWidth.value = props.width
+  }
+}
+
+function drawText(ctx: CanvasRenderingContext2D, text: string, x: number, y: number, color: string, align: CanvasTextAlign, fontSize: number = 12): void {
+  ctx.fillStyle = color
+  ctx.font = fontSize.toFixed(0) + 'px sans-serif'
+  ctx.textAlign = align
+  ctx.textBaseline = 'middle'
+  ctx.fillText(text, x, y)
+}
+
+function formatAxisLabel(label: string, format: string | null): string {
+  if (format == 'month' && label.length >= 7 && label.substring(4, 5) == '-') {
+    return label.substring(5, 7) + '月'
+  }
+  if (format == 'day' && label.length >= 10 && label.substring(4, 5) == '-') {
+    return label.substring(8, 10) + '日'
+  }
+  if (format == 'month-day' && label.length >= 10 && label.substring(4, 5) == '-') {
+    return label.substring(5, 10).replace('-', '/')
+  }
+  return label
+}
+
+function drawAxisLabel(ctx: CanvasRenderingContext2D, text: string, x: number, y: number, color: string, rotate: number, align: CanvasTextAlign = 'center', fontSize: number = 12): void {
+  if (rotate == 0) {
+    drawText(ctx, text, x, y, color, align, fontSize)
+    return
+  }
+  ctx.save()
+  ctx.translate(x, y)
+  ctx.rotate(rotate * Math.PI / 180)
+  drawText(ctx, text, 0, 0, color, align, fontSize)
+  ctx.restore()
+}
+
+function drawRoundedRect(ctx: CanvasRenderingContext2D, x: number, y: number, width: number, height: number, radius: number): void {
+  const actualRadius = Math.min(Math.max(0, radius), Math.min(width, height) / 2)
+  if (actualRadius == 0) {
+    ctx.rect(x, y, width, height)
+    return
+  }
+  ctx.moveTo(x + actualRadius, y)
+  ctx.lineTo(x + width - actualRadius, y)
+  ctx.arcTo(x + width, y, x + width, y + actualRadius, actualRadius)
+  ctx.lineTo(x + width, y + height - actualRadius)
+  ctx.arcTo(x + width, y + height, x + width - actualRadius, y + height, actualRadius)
+  ctx.lineTo(x + actualRadius, y + height)
+  ctx.arcTo(x, y + height, x, y + height - actualRadius, actualRadius)
+  ctx.lineTo(x, y + actualRadius)
+  ctx.arcTo(x, y, x + actualRadius, y, actualRadius)
+  ctx.closePath()
+}
+
+function drawBarTexture(ctx: CanvasRenderingContext2D, x: number, y: number, width: number, height: number, itemStyle: ItemStyleOption | null): void {
+  const pattern = itemStyle?.pattern
+  if (pattern == null || pattern == 'none') {
+    return
+  }
+  const size = Math.max(4, itemStyle?.patternSize ?? 8)
+  ctx.save()
+  ctx.beginPath()
+  drawRoundedRect(ctx, x, y, width, height, itemStyle?.borderRadius ?? 0)
+  ctx.clip()
+  ctx.strokeStyle = stringOrDefault(itemStyle?.patternColor, 'rgba(0,0,0,0.22)')
+  ctx.lineWidth = Math.max(0.5, itemStyle?.patternWidth ?? 1)
+  if (pattern == 'horizontal') {
+    for (let offset = 0; offset <= height; offset += size) {
+      ctx.beginPath()
+      ctx.moveTo(x, y + offset)
+      ctx.lineTo(x + width, y + offset)
+      ctx.stroke()
+    }
+  } else if (pattern == 'vertical') {
+    for (let offset = 0; offset <= width; offset += size) {
+      ctx.beginPath()
+      ctx.moveTo(x + offset, y)
+      ctx.lineTo(x + offset, y + height)
+      ctx.stroke()
+    }
+  } else {
+    if (pattern != 'diagonal-reverse') {
+      for (let offset = -height; offset < width + height; offset += size) {
+        ctx.beginPath()
+        ctx.moveTo(x + offset, y)
+        ctx.lineTo(x + offset + height, y + height)
+        ctx.stroke()
+      }
+    }
+    if (pattern == 'cross' || pattern == 'diagonal-reverse') {
+      for (let offset = -height; offset < width + height; offset += size) {
+        ctx.beginPath()
+        ctx.moveTo(x + offset, y + height)
+        ctx.lineTo(x + offset + height, y)
+        ctx.stroke()
+      }
+    }
+  }
+  ctx.restore()
+}
+
+function drawTitle(ctx: CanvasRenderingContext2D): number {
+  const title = currentOption.title
+  if (title == null || title.show == false || title.text == null || title.text.length == 0) {
+    return 0
+  }
+  const color = stringOrDefault(title.color, textColor('#263238'))
+  ctx.fillStyle = color
+  ctx.font = '600 ' + (title.fontSize ?? 16).toFixed(0) + 'px sans-serif'
+  ctx.textAlign = title.align == 'center' ? 'center' : (title.align == 'right' ? 'right' : 'left')
+  ctx.textBaseline = 'middle'
+  const x = title.left ?? (title.align == 'center' ? canvasWidth / 2 : (title.align == 'right' ? canvasWidth - 16 : 16))
+  ctx.fillText(title.text, x, title.top ?? 20)
+  return Math.max(28, (title.top ?? 20) + (title.fontSize ?? 16) / 2 + 8)
+}
+
+function getSeriesMax(series: ChartSeries[]): number {
+  let maxValue = 0
+  for (let i = 0; i < series.length; i++) {
+    if (hiddenSeries.has(i)) {
+      continue
+    }
+    for (const value of series[i].data) {
+      if (value > maxValue) {
+        maxValue = value
+      }
+    }
+  }
+  return maxValue
+}
+
+function getSeriesMin(series: ChartSeries[]): number {
+  let minValue = 0
+  for (let i = 0; i < series.length; i++) {
+    if (hiddenSeries.has(i)) {
+      continue
+    }
+    for (const value of series[i].data) {
+      if (value < minValue) {
+        minValue = value
+      }
+    }
+  }
+  return minValue
+}
+
+function drawLegend(ctx: CanvasRenderingContext2D, series: ChartSeries[], top: number, maxWidth: number): number {
+  if (currentOption.legend?.show == false) {
+    return 0
+  }
+  const toggleable = currentOption.legend?.toggleable != false
+  const startX = 16
+  const itemGap = currentOption.legend?.itemGap ?? 16
+  const rowGap = currentOption.legend?.rowGap ?? 8
+  const iconSize = currentOption.legend?.iconSize ?? 10
+  const fontSize = currentOption.legend?.fontSize ?? 12
+  const itemHeight = Math.max(18, iconSize + 8)
+  let x = startX
+  let y = top
+  let hasItem = false
+  ctx.font = fontSize.toFixed(0) + 'px sans-serif'
+  const labelColor = legendTextColor()
+  const disabledColor = '#c0c0c0'
+  for (let seriesIndex = 0; seriesIndex < series.length; seriesIndex++) {
+    const item = series[seriesIndex]
+    const color = stringOrDefault(item.color, '#2f80ed')
+    const label = stringOrDefault(item.name, item.type)
+    const isHidden = hiddenSeries.has(seriesIndex)
+    const textWidth = ctx.measureText(label).width
+    const itemWidth = iconSize + 6 + textWidth + itemGap
+    if (x > startX && x + itemWidth > maxWidth) {
+      x = startX
+      y += itemHeight + rowGap
+    }
+    if (isHidden) {
+      ctx.fillStyle = disabledColor
+      ctx.fillRect(x, y - iconSize / 2, iconSize, iconSize)
+      ctx.strokeStyle = disabledColor
+      ctx.lineWidth = 1
+      ctx.beginPath()
+      ctx.moveTo(x, y - 5)
+      ctx.lineTo(x + iconSize, y + iconSize / 2)
+      ctx.stroke()
+      drawText(ctx, label, x + iconSize + 6, y, disabledColor, 'left', fontSize)
+    } else {
+      ctx.fillStyle = color
+      ctx.fillRect(x, y - iconSize / 2, iconSize, iconSize)
+      drawText(ctx, label, x + iconSize + 6, y, labelColor, 'left', fontSize)
+    }
+    if (toggleable) {
+      hitRegions.push({
+        type: 'legend',
+        seriesIndex,
+        dataIndex: -1,
+        name: label,
+        value: 0,
+        x,
+        y: y - 6,
+        width: iconSize + 6 + textWidth,
+        height: 12,
+        centerX: 0,
+        centerY: 0,
+        radius: 0,
+        startAngle: 0,
+        endAngle: 0
+      })
+    }
+    x += itemWidth
+    hasItem = true
+  }
+  if (hasItem == false) {
+    return 0
+  }
+  return y - top + itemHeight
+}
+
+function drawHeader(ctx: CanvasRenderingContext2D, series: ChartSeries[], withLegend: boolean = true, legendMaxWidth: number = 0): number {
+  const titleHeight = drawTitle(ctx)
+  let bottom = titleHeight
+  if (withLegend == true && series.length > 0 && currentOption.legend?.position != 'bottom') {
+    const top = titleHeight > 0 ? titleHeight + 10 : 14
+    const legendWidth = legendMaxWidth > 0 ? legendMaxWidth : canvasWidth - 32
+    const legendHeight = drawLegend(ctx, series, top, legendWidth)
+    if (legendHeight > 0) {
+      bottom = top + legendHeight
+    }
+  }
+  return bottom + 8
+}
+
+function drawLinePath(ctx: CanvasRenderingContext2D, points: Point[], smooth: boolean, step: string | null, moveToFirst: boolean = true): void {
+  if (points.length == 0) {
+    return
+  }
+  if (moveToFirst) {
+    ctx.moveTo(points[0].x, points[0].y)
+  } else {
+    ctx.lineTo(points[0].x, points[0].y)
+  }
+  if (smooth == false || step != null || points.length == 1) {
+    for (let index = 1; index < points.length; index++) {
+      const current = points[index - 1]
+      const next = points[index]
+      if (step == 'start') {
+        ctx.lineTo(next.x, current.y)
+      } else if (step == 'middle') {
+        const middleX = (current.x + next.x) / 2
+        ctx.lineTo(middleX, current.y)
+        ctx.lineTo(middleX, next.y)
+      } else if (step == 'end') {
+        ctx.lineTo(current.x, next.y)
+      }
+      ctx.lineTo(next.x, next.y)
+    }
+    return
+  }
+  // 使用 Catmull-Rom 控制点转换，确保曲线经过每一个真实数据点。
+  const controlFactor = 1 / 6
+  for (let index = 0; index < points.length - 1; index++) {
+    const previous = index == 0 ? points[index] : points[index - 1]
+    const current = points[index]
+    const next = points[index + 1]
+    const following = index + 2 < points.length ? points[index + 2] : next
+    const controlOne: Point = {
+      x: current.x + (next.x - previous.x) * controlFactor,
+      y: current.y + (next.y - previous.y) * controlFactor
+    }
+    const controlTwo: Point = {
+      x: next.x - (following.x - current.x) * controlFactor,
+      y: next.y - (following.y - current.y) * controlFactor
+    }
+    ctx.bezierCurveTo(controlOne.x, controlOne.y, controlTwo.x, controlTwo.y, next.x, next.y)
+  }
+}
+
+function getVisiblePoints(points: Point[], progress: number, leftToRight: boolean): Point[] {
+  if (leftToRight == false || progress >= 1) {
+    return points
+  }
+  if (progress <= 0 || points.length == 0) {
+    return []
+  }
+  if (points.length == 1) {
+    return [points[0]]
+  }
+  const position = (points.length - 1) * progress
+  const lastIndex = Math.floor(position)
+  const visible: Point[] = []
+  for (let index = 0; index <= lastIndex && index < points.length; index++) {
+    visible.push(points[index])
+  }
+  if (lastIndex < points.length - 1) {
+    const next = points[lastIndex + 1]
+    const current = points[lastIndex]
+    const factor = position - lastIndex
+    visible.push({
+      x: current.x + (next.x - current.x) * factor,
+      y: current.y + (next.y - current.y) * factor
+    })
+  }
+  return visible
+}
+
+function drawCartesian(ctx: CanvasRenderingContext2D, titleHeight: number, progress: number): void {
+  const grid = currentOption.grid
+  const left = numberOrDefault(grid?.left, 48)
+  const right = numberOrDefault(grid?.right, 18)
+  const headerBottom = drawHeader(ctx, currentOption.series, true, canvasWidth - 32)
+  const top = headerBottom + numberOrDefault(grid?.top, 8)
+  const legendAtBottom = currentOption.legend?.position == 'bottom'
+  const bottom = numberOrDefault(grid?.bottom, 34) + (legendAtBottom ? 30 : 0)
+  const plotWidth = Math.max(1, canvasWidth - left - right)
+  const plotHeight = Math.max(1, canvasHeight - top - bottom)
+  const series = currentOption.series
+  const xAxis = currentOption.xAxis
+  const yAxis = currentOption.yAxis
+  let minValue = getSeriesMin(series)
+  let maxValue = getSeriesMax(series)
+  if (yAxis?.min != null) {
+    minValue = yAxis.min
+  }
+  if (yAxis?.max != null) {
+    maxValue = yAxis.max
+  }
+  if (maxValue <= minValue) {
+    maxValue = minValue + 1
+  }
+  const axisColor = stringOrDefault(yAxis?.color, stringOrDefault(yAxis?.axisLine?.color, '#90a4ae'))
+  const labelColor = stringOrDefault(xAxis?.axisLabel?.color, textColor('#78909c'))
+  const splitShow = grid?.showHorizontal == false ? false : (grid?.show == true || yAxis?.splitLine?.show != false)
+  const splitColor = stringOrDefault(yAxis?.splitLine?.color, '#e5eaee')
+  const showValueLabels = yAxis?.axisLabel?.show != false
+  const axisLineShow = yAxis?.axisLine?.show != false
+
+  if (grid?.backgroundColor != null) {
+    ctx.fillStyle = grid.backgroundColor
+    ctx.fillRect(left, top, plotWidth, plotHeight)
+  }
+
+  ctx.strokeStyle = splitColor
+  ctx.lineWidth = 1
+  for (let index = 0; index <= 4; index++) {
+    const y = top + plotHeight * index / 4
+    if (splitShow) {
+      ctx.beginPath()
+      ctx.moveTo(left, y)
+      ctx.lineTo(left + plotWidth, y)
+      ctx.stroke()
+    }
+    if (showValueLabels) {
+      const value = maxValue - (maxValue - minValue) * index / 4
+      drawText(ctx, formatValue(value) + stringOrDefault(yAxis?.valueSuffix, ''), left - 8, y, stringOrDefault(yAxis?.axisLabel?.color, labelColor), 'right', yAxis?.axisLabel?.fontSize ?? 12)
+    }
+  }
+  if (axisLineShow) {
+    ctx.strokeStyle = axisColor
+    ctx.beginPath()
+    ctx.moveTo(left, top)
+    ctx.lineTo(left, top + plotHeight)
+    ctx.lineTo(left + plotWidth, top + plotHeight)
+    ctx.stroke()
+  }
+
+  let categoryCount = 0
+  if (xAxis?.data != null) {
+    categoryCount = xAxis.data.length
+  }
+  for (let i = 0; i < series.length; i++) {
+    if (hiddenSeries.has(i)) {
+      continue
+    }
+    if (series[i].data.length > categoryCount) {
+      categoryCount = series[i].data.length
+    }
+  }
+  if (categoryCount <= 0) {
+    return
+  }
+  const step = categoryCount == 1 ? plotWidth : plotWidth / (categoryCount - 1)
+  const categoryWidth = plotWidth / categoryCount
+  let hasBarSeries = false
+  for (let si = 0; si < series.length; si++) {
+    if (hiddenSeries.has(si)) {
+      continue
+    }
+    if (series[si].type == 'bar') {
+      hasBarSeries = true
+    }
+  }
+  cartesianLayout = { left, top, plotWidth, plotHeight, categoryWidth, categoryHeight: 0, step, hasBarSeries, horizontal: false, categoryCount, minValue, maxValue }
+  const verticalGridShow = grid?.showVertical == true || grid?.show == true || xAxis?.splitLine?.show == true
+  const verticalGridColor = stringOrDefault(xAxis?.splitLine?.color, stringOrDefault(grid?.color, splitColor))
+  if (verticalGridShow) {
+    ctx.strokeStyle = verticalGridColor
+    ctx.lineWidth = 1
+    for (let index = 0; index < categoryCount; index++) {
+      const x = hasBarSeries
+        ? left + categoryWidth * index
+        : (categoryCount == 1 ? left + plotWidth / 2 : left + step * index)
+      ctx.beginPath()
+      ctx.moveTo(x, top)
+      ctx.lineTo(x, top + plotHeight)
+      ctx.stroke()
+    }
+    if (hasBarSeries) {
+      ctx.beginPath()
+      ctx.moveTo(left + plotWidth, top)
+      ctx.lineTo(left + plotWidth, top + plotHeight)
+      ctx.stroke()
+    }
+  }
+  if (grid?.borderColor != null) {
+    ctx.strokeStyle = grid.borderColor
+    ctx.lineWidth = 1
+    ctx.strokeRect(left, top, plotWidth, plotHeight)
+  }
+  if (xAxis?.data != null) {
+    const labelInterval = xAxis.axisLabel?.interval ?? (categoryCount > 12 ? Math.ceil(categoryCount / 8) - 1 : 0)
+    const labelFormat = xAxis.axisLabel?.format ?? ''
+    const labelRotate = xAxis.axisLabel?.rotate ?? 0
+    const labelShow = xAxis.axisLabel?.show != false
+    for (let index = 0; index < xAxis.data.length; index++) {
+      if (labelShow == false) {
+        break
+      }
+      if (labelInterval > 0 && index % (labelInterval + 1) != 0) {
+        continue
+      }
+      const x = hasBarSeries
+        ? left + categoryWidth * (index + 0.5)
+        : (categoryCount == 1 ? left + plotWidth / 2 : left + step * index)
+      const label = formatAxisLabel(xAxis.data[index], labelFormat)
+      drawAxisLabel(ctx, label, x, top + plotHeight + 18, stringOrDefault(xAxis.axisLabel?.color, labelColor), labelRotate, 'center', xAxis.axisLabel?.fontSize ?? 12)
+    }
+  }
+
+  let barSeriesCount = 0
+  let totalBarSeriesCount = 0
+  for (let si = 0; si < series.length; si++) {
+    const item = series[si]
+    if (item.type == 'bar' && item.stack == null && item.overlay != true) {
+      totalBarSeriesCount += 1
+      if (hiddenSeries.has(si) == false) {
+        barSeriesCount += 1
+      }
+    }
+  }
+  const barGroupWidth = categoryWidth * 0.72
+  const preserveBarWidth = currentOption.legend?.barLayout == 'preserve'
+  const zeroY = top + (maxValue / (maxValue - minValue)) * plotHeight
+  for (let seriesIndex = 0; seriesIndex < series.length; seriesIndex++) {
+    if (hiddenSeries.has(seriesIndex)) {
+      continue
+    }
+    const item = series[seriesIndex]
+    const color = stringOrDefault(item.color, seriesIndex % 2 == 0 ? '#2f80ed' : '#27ae60')
+    const labelOption = item.label ?? currentOption.label
+    if (item.type == 'bar') {
+      let barIndex = 0
+      for (let previousIndex = 0; previousIndex < seriesIndex; previousIndex++) {
+        if (hiddenSeries.has(previousIndex) == false && series[previousIndex].type == 'bar' && series[previousIndex].stack == null && series[previousIndex].overlay != true) {
+          barIndex += 1
+        }
+      }
+      const barSlotWidth = barGroupWidth / Math.max(1, preserveBarWidth ? totalBarSeriesCount : barSeriesCount)
+      const visibleGroupWidth = preserveBarWidth ? barSlotWidth * barSeriesCount : barGroupWidth
+      for (let index = 0; index < item.data.length; index++) {
+        const value = item.data[index] * progress
+        let stackBase = 0
+        if (item.stack != null) {
+          for (let previousIndex = 0; previousIndex < seriesIndex; previousIndex++) {
+            if (hiddenSeries.has(previousIndex)) {
+              continue
+            }
+            const previous = series[previousIndex]
+            if (previous.type == 'bar' && previous.stack == item.stack && index < previous.data.length) {
+              const previousValue = previous.data[index]
+              if (value >= 0 && previousValue > 0) {
+                stackBase += previousValue * progress
+              } else if (value < 0 && previousValue < 0) {
+                stackBase += previousValue * progress
+              }
+            }
+          }
+        }
+        const actualSlotWidth = item.overlay == true ? barGroupWidth : (item.stack == null ? barSlotWidth : barGroupWidth)
+        const actualBarWidth = getBarWidth(item.barWidth ?? null, actualSlotWidth, categoryWidth)
+        const x = left + categoryWidth * (index + 0.5) - (item.overlay == true || item.stack != null ? barGroupWidth : visibleGroupWidth) / 2 + (item.overlay == true ? (barGroupWidth - actualBarWidth) / 2 : (item.stack == null ? barIndex * barSlotWidth + (barSlotWidth - actualBarWidth) / 2 : (barGroupWidth - actualBarWidth) / 2))
+        const y = top + (maxValue - (stackBase + Math.max(value, 0))) / (maxValue - minValue) * plotHeight
+        const endY = top + (maxValue - (stackBase + Math.min(value, 0))) / (maxValue - minValue) * plotHeight
+        const barY = Math.min(y, endY)
+        const barWidth = Math.max(1, actualBarWidth - 3)
+        const barHeight = Math.max(1, Math.abs(endY - y))
+        const itemStyle = item.itemStyle
+        const itemColor = item.itemColors != null && index < item.itemColors.length ? item.itemColors[index] : null
+        ctx.save()
+        ctx.globalAlpha = itemStyle?.opacity ?? 1
+        const gradientColors = item.gradientColors ?? item.colors
+        if (itemColor != null) {
+          ctx.fillStyle = itemColor
+        } else if (gradientColors != null && gradientColors.length > 1) {
+          const gradient = ctx.createLinearGradient(x, barY, x, barY + barHeight)
+          gradient.addColorStop(0, gradientColors[0])
+          gradient.addColorStop(1, gradientColors[1])
+          ctx.fillStyle = gradient
+        } else {
+          ctx.fillStyle = stringOrDefault(itemStyle?.backgroundColor, color)
+        }
+        ctx.beginPath()
+        drawRoundedRect(ctx, x, barY, barWidth, barHeight, itemStyle?.borderRadius ?? 0)
+        ctx.fill()
+        drawBarTexture(ctx, x, barY, barWidth, barHeight, itemStyle ?? null)
+        if ((itemStyle?.borderWidth ?? 0) > 0) {
+          ctx.strokeStyle = stringOrDefault(itemStyle?.borderColor, stringOrDefault(itemColor, color))
+          ctx.lineWidth = itemStyle?.borderWidth ?? 0
+          ctx.stroke()
+        }
+        ctx.restore()
+        if (labelOption?.show == true) {
+          const labelY = labelOption.position == 'inside' ? barY + barHeight / 2 : (value >= 0 ? barY - 9 : barY + barHeight + 9)
+          drawText(ctx, formatValue(item.data[index]), x + barWidth / 2, labelY, stringOrDefault(labelOption.color, textColor('#37474f')), 'center', labelOption.fontSize ?? 12)
+        }
+        hitRegions.push({
+          type: 'bar',
+          seriesIndex,
+          dataIndex: index,
+          name: stringOrDefault(item.name, 'bar'),
+          value: item.data[index],
+          x,
+          y: barY,
+          width: barWidth,
+          height: barHeight,
+          centerX: 0,
+          centerY: 0,
+          radius: 0,
+          startAngle: 0,
+          endAngle: 0
+        })
+      }
+    } else if (item.type == 'line') {
+      const lineColor = stringOrDefault(item.lineStyle?.color, color)
+      const leftToRight = currentOption.animationMode == 'left-to-right'
+      const points: Point[] = []
+      const baselinePoints: Point[] = []
+      for (let index = 0; index < item.data.length; index++) {
+        const value = leftToRight ? item.data[index] : item.data[index] * progress
+        let stackBase = 0
+        if (item.stack != null) {
+          for (let previousIndex = 0; previousIndex < seriesIndex; previousIndex++) {
+            if (hiddenSeries.has(previousIndex)) {
+              continue
+            }
+            const previous = series[previousIndex]
+            if (previous.type == 'line' && previous.stack == item.stack && index < previous.data.length) {
+              const previousValue = leftToRight ? previous.data[index] : previous.data[index] * progress
+              if (value >= 0 && previousValue > 0) {
+                stackBase += previousValue
+              } else if (value < 0 && previousValue < 0) {
+                stackBase += previousValue
+              }
+            }
+          }
+        }
+        const x = hasBarSeries
+          ? left + categoryWidth * (index + 0.5)
+          : left + (categoryCount == 1 ? plotWidth / 2 : step * index)
+        const y = top + (maxValue - stackBase - value) / (maxValue - minValue) * plotHeight
+        points.push({ x, y })
+        baselinePoints.push({ x, y: top + (maxValue - stackBase) / (maxValue - minValue) * plotHeight })
+      }
+      const visiblePoints = getVisiblePoints(points, progress, leftToRight)
+      if (item.markArea != null) {
+        for (let markAreaIndex = 0; markAreaIndex < item.markArea.length; markAreaIndex++) {
+          const markArea = item.markArea[markAreaIndex]
+          const startIndex = Math.max(0, Math.min(categoryCount - 1, markArea.startIndex))
+          const endIndex = Math.max(startIndex, Math.min(categoryCount - 1, markArea.endIndex))
+          const startX = hasBarSeries ? left + categoryWidth * startIndex : (categoryCount == 1 ? left : left + step * startIndex)
+          const endX = hasBarSeries ? left + categoryWidth * (endIndex + 1) : (categoryCount == 1 ? left + plotWidth : left + step * endIndex)
+          ctx.save()
+          ctx.globalAlpha = 0.18
+          ctx.fillStyle = stringOrDefault(markArea.color, '#ef5350')
+          ctx.fillRect(startX, top, Math.max(1, endX - startX), plotHeight)
+          ctx.restore()
+          if (markArea.label != null) {
+            drawText(ctx, markArea.label, (startX + endX) / 2, top - 12, textColor('#455a64'), 'center', 12)
+          }
+        }
+      }
+      ctx.strokeStyle = lineColor
+      ctx.lineWidth = numberOrDefault(item.lineStyle?.width, 2)
+      ctx.globalAlpha = item.lineStyle?.opacity ?? 1
+      ctx.lineCap = 'round'
+      ctx.lineJoin = 'round'
+      const lineType = stringOrDefault(item.lineStyle?.type, 'solid')
+      if (lineType == 'dashed') {
+        ctx.setLineDash([6, 4])
+      } else if (lineType == 'dotted') {
+        ctx.setLineDash([2, 4])
+      } else {
+        ctx.setLineDash([])
+      }
+      if (item.markLine != null) {
+        for (let markLineIndex = 0; markLineIndex < item.markLine.length; markLineIndex++) {
+          const markLine = item.markLine[markLineIndex]
+          const markerY = top + (maxValue - markLine.value) / (maxValue - minValue) * plotHeight
+          const startIndex = Math.max(0, Math.min(categoryCount - 1, markLine.startIndex ?? 0))
+          const startX = hasBarSeries ? left + categoryWidth * (startIndex + 0.5) : (categoryCount == 1 ? left + plotWidth / 2 : left + step * startIndex)
+          const endX = left + plotWidth
+          const markColor = stringOrDefault(markLine.color, lineColor)
+          ctx.strokeStyle = markColor
+          ctx.lineWidth = 1
+          ctx.setLineDash([4, 3])
+          ctx.beginPath()
+          ctx.moveTo(startX, markerY)
+          ctx.lineTo(endX - 8, markerY)
+          ctx.stroke()
+          ctx.setLineDash([])
+          ctx.fillStyle = markColor
+          ctx.beginPath()
+          ctx.moveTo(endX - 8, markerY - 6)
+          ctx.lineTo(endX, markerY)
+          ctx.lineTo(endX - 8, markerY + 6)
+          ctx.closePath()
+          ctx.fill()
+          if (startIndex == 0) {
+            ctx.beginPath()
+            ctx.arc(startX, markerY, 4, 0, Math.PI * 2)
+            ctx.fill()
+          }
+          if (markLine.label != null) {
+            drawText(ctx, markLine.label, endX - 12, markerY, textColor('#455a64'), 'right', 11)
+          }
+        }
+      }
+      ctx.beginPath()
+      drawLinePath(ctx, visiblePoints, item.smooth == true, item.step ?? null)
+      ctx.stroke()
+      if (item.lineColorRanges != null) {
+        for (let rangeIndex = 0; rangeIndex < item.lineColorRanges.length; rangeIndex++) {
+          const range = item.lineColorRanges[rangeIndex]
+          const startIndex = Math.max(0, Math.min(visiblePoints.length - 1, range.startIndex))
+          const endIndex = Math.max(startIndex, Math.min(visiblePoints.length - 1, range.endIndex))
+          if (endIndex <= startIndex) {
+            continue
+          }
+          const rangePoints: Point[] = []
+          for (let pointIndex = startIndex; pointIndex <= endIndex; pointIndex++) {
+            rangePoints.push(visiblePoints[pointIndex])
+          }
+          ctx.strokeStyle = range.color
+          ctx.beginPath()
+          drawLinePath(ctx, rangePoints, item.smooth == true, item.step ?? null)
+          ctx.stroke()
+        }
+      }
+      ctx.setLineDash([])
+      ctx.globalAlpha = 1
+      if (item.areaStyle == true && visiblePoints.length > 0) {
+        const gradientColors = item.gradientColors ?? item.colors
+        ctx.globalAlpha = gradientColors != null && gradientColors.length > 1 ? 0.8 : 0.12
+        if (gradientColors != null && gradientColors.length > 1) {
+          const gradient = ctx.createLinearGradient(0, top + plotHeight, 0, top)
+          for (let gradientIndex = 0; gradientIndex < gradientColors.length; gradientIndex++) {
+            gradient.addColorStop(gradientIndex / Math.max(1, gradientColors.length - 1), gradientColors[gradientIndex])
+          }
+          ctx.fillStyle = gradient
+        } else {
+          ctx.fillStyle = lineColor
+        }
+        ctx.beginPath()
+        drawLinePath(ctx, visiblePoints, item.smooth == true, item.step ?? null)
+        const visibleBaseline: Point[] = []
+        for (let baselineIndex = visiblePoints.length - 1; baselineIndex >= 0; baselineIndex--) {
+          visibleBaseline.push(baselinePoints[baselineIndex])
+        }
+        drawLinePath(ctx, visibleBaseline, item.smooth == true, item.step ?? null, false)
+        ctx.closePath()
+        ctx.fill()
+        ctx.globalAlpha = 1
+      }
+      const symbolStyle = item.showSymbol == false ? 'none' : stringOrDefault(item.symbolStyle, 'hollow')
+      if (labelOption?.show == true) {
+        const labelOffset = labelOption.position == 'bottom' ? 12 : -12
+        for (let pointIndex = 0; pointIndex < points.length; pointIndex++) {
+          const point = points[pointIndex]
+          drawText(ctx, formatValue(item.data[pointIndex]), point.x, point.y + labelOffset, stringOrDefault(labelOption.color, lineColor), 'center', labelOption.fontSize ?? 12)
+        }
+      }
+      if (symbolStyle != 'none') {
+        const visibleEndX = visiblePoints.length > 0 ? visiblePoints[visiblePoints.length - 1].x : -1
+        for (let pointIndex = 0; pointIndex < points.length; pointIndex++) {
+          const point = points[pointIndex]
+          if (point.x > visibleEndX) {
+            continue
+          }
+          ctx.beginPath()
+          ctx.arc(point.x, point.y, 4, 0, Math.PI * 2)
+          if (symbolStyle == 'solid') {
+            ctx.fillStyle = lineColor
+            ctx.fill()
+          } else {
+            ctx.fillStyle = '#ffffff'
+            ctx.fill()
+            ctx.strokeStyle = lineColor
+            ctx.lineWidth = 2
+            ctx.stroke()
+          }
+          hitRegions.push({
+            type: 'line',
+            seriesIndex,
+            dataIndex: pointIndex,
+            name: stringOrDefault(item.name, 'line'),
+            value: item.data[pointIndex],
+            x: point.x - 10,
+            y: point.y - 10,
+            width: 20,
+            height: 20,
+            centerX: 0,
+            centerY: 0,
+            radius: 0,
+            startAngle: 0,
+            endAngle: 0
+          })
+        }
+      }
+      if (item.markPoint != null) {
+        for (let markPointIndex = 0; markPointIndex < item.markPoint.length; markPointIndex++) {
+          const markPoint = item.markPoint[markPointIndex]
+          let dataIndex = markPoint.dataIndex ?? -1
+          if (dataIndex < 0) {
+            let selectedValue = markPoint.type == 'min' ? Number.MAX_VALUE : -Number.MAX_VALUE
+            for (let valueIndex = 0; valueIndex < item.data.length; valueIndex++) {
+              if ((markPoint.type == 'min' && item.data[valueIndex] < selectedValue) || (markPoint.type != 'min' && item.data[valueIndex] > selectedValue)) {
+                selectedValue = item.data[valueIndex]
+                dataIndex = valueIndex
+              }
+            }
+          }
+          if (dataIndex < 0 || dataIndex >= points.length) {
+            continue
+          }
+          const point = points[dataIndex]
+          const markerColor = stringOrDefault(markPoint.color, lineColor)
+          const bubbleY = Math.max(top + 18, point.y - 30)
+          ctx.fillStyle = markerColor
+          ctx.beginPath()
+          ctx.arc(point.x, bubbleY, 16, 0, Math.PI * 2)
+          ctx.fill()
+          ctx.beginPath()
+          ctx.moveTo(point.x - 5, bubbleY + 11)
+          ctx.lineTo(point.x + 5, bubbleY + 11)
+          ctx.lineTo(point.x, point.y - 3)
+          ctx.closePath()
+          ctx.fill()
+          drawText(ctx, stringOrDefault(markPoint.label, formatValue(item.data[dataIndex])), point.x, bubbleY, '#ffffff', 'center', 12)
+        }
+      }
+    } else if (item.type == 'scatter') {
+      const pointSize = numberOrDefault(item.symbolSize, 8)
+      for (let index = 0; index < item.data.length; index++) {
+        const value = item.data[index] * progress
+        const x = hasBarSeries
+          ? left + categoryWidth * (index + 0.5)
+          : left + (categoryCount == 1 ? plotWidth / 2 : step * index)
+        const y = top + (maxValue - value) / (maxValue - minValue) * plotHeight
+        ctx.fillStyle = color
+        ctx.beginPath()
+        ctx.arc(x, y, pointSize / 2, 0, Math.PI * 2)
+        ctx.fill()
+        hitRegions.push({
+          type: 'scatter',
+          seriesIndex,
+          dataIndex: index,
+          name: stringOrDefault(item.name, 'scatter'),
+          value: item.data[index],
+          x: x - pointSize,
+          y: y - pointSize,
+          width: pointSize * 2,
+          height: pointSize * 2,
+          centerX: 0,
+          centerY: 0,
+          radius: 0,
+          startAngle: 0,
+          endAngle: 0
+        })
+      }
+    }
+  }
+  if (legendAtBottom) {
+    drawLegend(ctx, series, top + plotHeight + 36, canvasWidth - 16)
+  }
+}
+
+function drawScatterBar(ctx: CanvasRenderingContext2D, titleHeight: number, progress: number): void {
+  const grid = currentOption.grid
+  const left = numberOrDefault(grid?.left, 48)
+  const right = numberOrDefault(grid?.right, 18)
+  const headerBottom = drawHeader(ctx, currentOption.series, true, canvasWidth - 32)
+  const top = headerBottom + numberOrDefault(grid?.top, 8)
+  const bottom = numberOrDefault(grid?.bottom, 34)
+  const plotWidth = Math.max(1, canvasWidth - left - right)
+  const plotHeight = Math.max(1, canvasHeight - top - bottom)
+  const series = currentOption.series
+  const scatterMode = currentOption.scatterBarMode != 'bar'
+  const isTransition = previousScatterBarMode.length > 0 && previousScatterBarMode != currentOption.scatterBarMode && progress < 1
+  let scatterMinX = Number.MAX_VALUE
+  let scatterMaxX = -Number.MAX_VALUE
+  let scatterMinY = Number.MAX_VALUE
+  let scatterMaxY = -Number.MAX_VALUE
+  let barMax = 1
+  for (let seriesIndex = 0; seriesIndex < series.length; seriesIndex++) {
+    if (hiddenSeries.has(seriesIndex)) {
+      continue
+    }
+    const points = series[seriesIndex].scatterData ?? []
+    let total = 0
+    for (let pointIndex = 0; pointIndex < points.length; pointIndex++) {
+      const point = points[pointIndex]
+      scatterMinX = Math.min(scatterMinX, point[0])
+      scatterMaxX = Math.max(scatterMaxX, point[0])
+      scatterMinY = Math.min(scatterMinY, point[1])
+      scatterMaxY = Math.max(scatterMaxY, point[1])
+      total += point[0]
+    }
+    if (points.length > 0) {
+      barMax = Math.max(barMax, total / points.length)
+    }
+  }
+  const xMin = currentOption.xAxis?.min ?? Math.floor(scatterMinX - 5)
+  const xMax = currentOption.xAxis?.max ?? Math.ceil(scatterMaxX + 5)
+  const yMin = currentOption.yAxis?.min ?? Math.floor(scatterMinY - 5)
+  const yMax = currentOption.yAxis?.max ?? Math.ceil(scatterMaxY + 5)
+  const barAxisMax = Math.ceil(barMax / 10) * 10 + 10
+  const valueToScatterX = function (value: number): number {
+    return left + (value - xMin) / Math.max(1, xMax - xMin) * plotWidth
+  }
+  const valueToScatterY = function (value: number): number {
+    return top + (yMax - value) / Math.max(1, yMax - yMin) * plotHeight
+  }
+  const valueToBarY = function (value: number): number {
+    return top + (barAxisMax - value) / Math.max(1, barAxisMax) * plotHeight
+  }
+  const useBarAxis = scatterMode == false && isTransition == false
+  ctx.strokeStyle = stringOrDefault(currentOption.yAxis?.splitLine?.color, '#e5eaee')
+  ctx.lineWidth = 1
+  for (let tick = 0; tick <= 4; tick++) {
+    const y = top + plotHeight * tick / 4
+    ctx.beginPath()
+    ctx.moveTo(left, y)
+    ctx.lineTo(left + plotWidth, y)
+    ctx.stroke()
+    const value = useBarAxis ? barAxisMax - barAxisMax * tick / 4 : yMax - (yMax - yMin) * tick / 4
+    drawText(ctx, formatValue(value), left - 8, y, textColor('#78909c'), 'right')
+  }
+  for (let tick = 0; tick <= 4; tick++) {
+    const x = left + plotWidth * tick / 4
+    const value = useBarAxis ? '' : formatValue(xMin + (xMax - xMin) * tick / 4)
+    if (value.length > 0) {
+      drawText(ctx, value, x, top + plotHeight + 18, textColor('#78909c'), 'center')
+    }
+  }
+  ctx.strokeStyle = '#90a4ae'
+  ctx.beginPath()
+  ctx.moveTo(left, top)
+  ctx.lineTo(left, top + plotHeight)
+  ctx.lineTo(left + plotWidth, top + plotHeight)
+  ctx.stroke()
+
+  const transitionToBar = scatterMode == false
+  const scatterAlpha = isTransition ? (transitionToBar ? 1 - progress : progress) : (scatterMode ? 1 : 0)
+  const barAlpha = isTransition ? (transitionToBar ? progress : 1 - progress) : (scatterMode ? 0 : 1)
+  const barProgress = isTransition ? (transitionToBar ? progress : 1 - progress) : (scatterMode ? 0 : 1)
+  const barWidth = Math.min(72, plotWidth / Math.max(1, series.length) * 0.56)
+  for (let seriesIndex = 0; seriesIndex < series.length; seriesIndex++) {
+    if (hiddenSeries.has(seriesIndex)) {
+      continue
+    }
+    const item = series[seriesIndex]
+    const points = item.scatterData ?? []
+    if (points.length == 0) {
+      continue
+    }
+    const color = stringOrDefault(item.color, seriesIndex % 2 == 0 ? '#e77d72' : '#5478ee')
+    let total = 0
+    for (let pointIndex = 0; pointIndex < points.length; pointIndex++) {
+      total += points[pointIndex][0]
+    }
+    const average = total / points.length
+    const barCenterX = left + plotWidth * (seriesIndex + 0.5) / series.length
+    const barTop = valueToBarY(average)
+    if (barAlpha > 0) {
+      ctx.save()
+      ctx.globalAlpha = barAlpha
+      ctx.fillStyle = color
+      ctx.fillRect(barCenterX - barWidth / 2, top + plotHeight - (top + plotHeight - barTop) * barProgress, barWidth, (top + plotHeight - barTop) * barProgress)
+      drawText(ctx, formatValue(average), barCenterX, barTop - 10, color, 'center')
+      drawText(ctx, stringOrDefault(item.name, '组 ' + (seriesIndex + 1).toFixed(0)), barCenterX, top + plotHeight + 18, textColor('#78909c'), 'center')
+      ctx.restore()
+    }
+    if (scatterAlpha > 0) {
+      ctx.save()
+      ctx.globalAlpha = scatterAlpha
+      ctx.fillStyle = color
+      for (let pointIndex = 0; pointIndex < points.length; pointIndex++) {
+        const point = points[pointIndex]
+        const scatterX = valueToScatterX(point[0])
+        const scatterY = valueToScatterY(point[1])
+        const targetX = barCenterX
+        const targetY = barTop
+        const pointX = isTransition ? (transitionToBar ? scatterX + (targetX - scatterX) * progress : targetX + (scatterX - targetX) * progress) : scatterX
+        const pointY = isTransition ? (transitionToBar ? scatterY + (targetY - scatterY) * progress : targetY + (scatterY - targetY) * progress) : scatterY
+        ctx.beginPath()
+        ctx.arc(pointX, pointY, numberOrDefault(item.symbolSize, 6) / 2, 0, Math.PI * 2)
+        ctx.fill()
+      }
+      ctx.restore()
+    }
+  }
+}
+
+function resolvePieRadius(value: number | string | null, fallback: number, limit: number): number {
+  if (value == null) {
+    return fallback
+  }
+  if (typeof value == 'number') {
+    return Math.min(limit, Math.max(1, value))
+  }
+  if (value.endsWith('%')) {
+    const percent = parseFloat(value)
+    if (percent > 0) {
+      return Math.min(limit, Math.max(1, limit * percent / 100))
+    }
+  }
+  return fallback
+}
+
+function formatPercent(value: number, total: number): string {
+  if (total <= 0) {
+    return '0%'
+  }
+  return (value / total * 100).toFixed(1) + '%'
+}
+
+function fitText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string {
+  if (ctx.measureText(text).width <= maxWidth) {
+    return text
+  }
+  const ellipsis = '...'
+  let length = text.length
+  while (length > 0 && ctx.measureText(text.substring(0, length) + ellipsis).width > maxWidth) {
+    length -= 1
+  }
+  return length > 0 ? text.substring(0, length) + ellipsis : ellipsis
+}
+
+function layoutPieOutsideLabels(labels: PieOutsideLabel[], minY: number, maxY: number, minGap: number): void {
+  if (labels.length == 0) {
+    return
+  }
+  labels.sort((first: PieOutsideLabel, second: PieOutsideLabel): number => {
+    return (first.centerY + Math.sin(first.angle) * (first.radius + 14)) - (second.centerY + Math.sin(second.angle) * (second.radius + 14))
+  })
+  let previousY = minY - minGap
+  for (const label of labels) {
+    const preferredY = Math.min(maxY, Math.max(minY, label.centerY + Math.sin(label.angle) * (label.radius + 14)))
+    label.labelY = Math.max(preferredY, previousY + minGap)
+    previousY = label.labelY
+  }
+  if (previousY > maxY) {
+    for (let index = labels.length - 1; index >= 0; index--) {
+      const nextY = index + 1 < labels.length ? labels[index + 1].labelY ?? maxY : maxY + minGap
+      labels[index].labelY = Math.min(labels[index].labelY ?? maxY, nextY - minGap)
+    }
+  }
+}
+
+function formatPieLabel(template: string | null, name: string, value: number, total: number, showPercent: boolean): string {
+  if (template != null && template.length > 0) {
+    return template.replace('{name}', name).replace('{value}', formatValue(value)).replace('{percent}', formatPercent(value, total))
+  }
+  return showPercent ? name + ' ' + formatPercent(value, total) : name + ' ' + formatValue(value)
+}
+
+function drawPie(ctx: CanvasRenderingContext2D, titleHeight: number, progress: number): void {
+  const item = currentOption.series.length > 0 ? currentOption.series[0] : null
+  if (item == null || item.data.length == 0) {
+    return
+  }
+  const total = item.data.reduce((sum: number, value: number): number => sum + Math.max(0, value), 0)
+  if (total <= 0) {
+    return
+  }
+  const headerBottom = drawHeader(ctx, currentOption.series, false)
+  const labels = currentOption.xAxis?.data ?? []
+  const colors = item.colors ?? ['#2f80ed', '#27ae60', '#f2c94c', '#eb5757', '#9b51e0', '#56ccf2', '#00a6a6']
+  const pieType = stringOrDefault(item.pieStyle, item.roseType == 'radius' ? 'rose' : 'normal')
+  const isHalf = pieType == 'half' || pieType == 'half-ring'
+  const isRing = pieType == 'ring' || pieType == 'doughnut' || pieType == 'half-ring'
+  const showLabels = item.showLabel == true
+  const showPercent = item.showPercent == true
+  const labelPosition = stringOrDefault(item.labelPosition, 'inside')
+  const isOutsideLabel = showLabels && labelPosition == 'outside'
+  const hasLegendOption = currentOption.legend != null && currentOption.legend?.show == true
+  // 关键跨端适配：降低侧边图例展示门槛至 canvasWidth >= 220，让窄屏机型与安卓端（280px左右）也能完整展示右侧图例
+  const shouldShowSideLegend = hasLegendOption && !isOutsideLabel && canvasWidth >= 220
+  const legendWidth = shouldShowSideLegend
+    ? (canvasWidth < 320 ? Math.min(118, Math.floor(canvasWidth * 0.40)) : Math.min(142, Math.floor(canvasWidth * 0.35)))
+    : 0
+  const chartWidth = legendWidth > 0 ? canvasWidth - legendWidth - 8 : canvasWidth
+  const availableHeight = Math.max(1, canvasHeight - headerBottom - 12)
+  const radiusFactor = isOutsideLabel ? 0.32 : 0.42
+  const maxRadius = Math.max(1, Math.min(chartWidth * (isOutsideLabel ? 0.28 : 0.44), availableHeight * (isHalf ? 0.30 : radiusFactor)))
+  const radius = resolvePieRadius(item.radius ?? null, maxRadius, maxRadius)
+  const innerFallback = isRing ? radius * 0.56 : 0
+  const innerRadius = Math.min(radius - 1, resolvePieRadius(item.innerRadius ?? null, innerFallback, radius - 1))
+  const centerX = chartWidth / 2
+  const centerY = isHalf
+    ? headerBottom + availableHeight * 0.61
+    : headerBottom + availableHeight * 0.50
+  const startDegrees = item.startAngle ?? (isHalf ? 180 : -90)
+  const totalAngle = isHalf ? Math.PI : Math.PI * 2
+  const startAngle = startDegrees * Math.PI / 180
+  let currentAngle = startAngle
+  const selectedIndex = selectedPieIndex
+  const borderWidth = item.borderWidth ?? 2
+  const borderColor = stringOrDefault(item.borderColor, '#ffffff')
+  const outsideLabels: PieOutsideLabel[] = []
+  const insideLabels: PieInsideLabel[] = []
+
+  for (let index = 0; index < item.data.length; index++) {
+    const value = Math.max(0, item.data[index])
+    const sliceAngle = value / total * totalAngle * progress
+    const endAngle = currentAngle + sliceAngle
+    const normalizedRatio = Math.max(0.2, value / Math.max(1, getSeriesMax([item])))
+    const sectorRadius = pieType == 'rose' ? radius * (0.52 + normalizedRatio * 0.48) : radius
+    const selected = selectedIndex == index && item.selectedMode == true
+    const offset = selected ? (item.selectedOffset ?? 8) : 0
+    const middleAngle = currentAngle + sliceAngle / 2
+    const sectorCenterX = centerX + Math.cos(middleAngle) * offset
+    const sectorCenterY = centerY + Math.sin(middleAngle) * offset
+    const label = index < labels.length ? labels[index] : '数据 ' + (index + 1).toFixed(0)
+    const visibleEnd = endAngle > currentAngle
+    if (visibleEnd) {
+      ctx.fillStyle = colors[index % colors.length]
+      ctx.beginPath()
+      if (innerRadius > 0) {
+        ctx.moveTo(sectorCenterX + Math.cos(currentAngle) * innerRadius, sectorCenterY + Math.sin(currentAngle) * innerRadius)
+        ctx.arc(sectorCenterX, sectorCenterY, sectorRadius, currentAngle, endAngle)
+        ctx.arc(sectorCenterX, sectorCenterY, innerRadius, endAngle, currentAngle, true)
+      } else {
+        ctx.moveTo(sectorCenterX, sectorCenterY)
+        ctx.arc(sectorCenterX, sectorCenterY, sectorRadius, currentAngle, endAngle)
+      }
+      ctx.closePath()
+      ctx.fill()
+      ctx.strokeStyle = borderColor
+      ctx.lineWidth = selected ? borderWidth : borderWidth
+      ctx.stroke()
+    }
+    hitRegions.push({
+      type: 'pie',
+      seriesIndex: 0,
+      dataIndex: index,
+      name: label,
+      value: item.data[index],
+      x: 0,
+      y: 0,
+      width: 0,
+      height: 0,
+      centerX: sectorCenterX,
+      centerY: sectorCenterY,
+      radius: sectorRadius,
+      startAngle: currentAngle,
+      endAngle,
+      innerRadius
+    })
+    if (showLabels && visibleEnd && sliceAngle > 0.12 && isOutsideLabel == false) {
+      const labelRadius = innerRadius > 0 ? (innerRadius + sectorRadius) / 2 : sectorRadius * 0.66
+      const labelX = sectorCenterX + Math.cos(middleAngle) * labelRadius
+      const labelY = sectorCenterY + Math.sin(middleAngle) * labelRadius
+      // 避免文字过长超出环壁被遮挡：有侧边图例时，环形内部直接优雅展示百分比，无侧边图例时显示完整格式
+      const labelText = (shouldShowSideLegend || isRing) && showPercent
+        ? formatPercent(value, total)
+        : formatPieLabel(item.labelFormat ?? null, label, value, total, showPercent)
+      insideLabels.push({
+        text: labelText,
+        x: labelX,
+        y: labelY,
+        color: innerRadius > 0 ? '#ffffff' : '#263238',
+        fontSize: 11
+      })
+    }
+    if (showLabels && visibleEnd && sliceAngle > 0.08 && isOutsideLabel) {
+      const labelText = formatPieLabel(item.labelFormat ?? null, label, value, total, showPercent)
+      outsideLabels.push({
+        text: labelText,
+        color: colors[index % colors.length],
+        angle: middleAngle,
+        centerX: sectorCenterX,
+        centerY: sectorCenterY,
+        radius: sectorRadius
+      })
+    }
+    currentAngle = endAngle
+  }
+
+  if (isOutsideLabel) {
+    const lineLength = item.labelLineLength ?? 14
+    const lineLength2 = item.labelLineLength2 ?? 18
+    const lineColor = stringOrDefault(item.labelLineColor, '#90a4ae')
+    const showLabelLine = item.showLabelLine != false
+    const textPadding = 10
+    const maxTextWidth = item.labelMaxWidth ?? Math.max(42, canvasWidth * 0.23)
+    const minY = headerBottom + 12
+    const maxY = canvasHeight - 14
+    if (item.labelAvoidOverlap != false) {
+      const leftLabels: PieOutsideLabel[] = []
+      const rightLabels: PieOutsideLabel[] = []
+      for (const label of outsideLabels) {
+        if (Math.cos(label.angle) >= 0) {
+          rightLabels.push(label)
+        } else {
+          leftLabels.push(label)
+        }
+      }
+      const minGap = Math.max(12, item.labelMinGap ?? 18)
+      layoutPieOutsideLabels(leftLabels, minY, maxY, minGap)
+      layoutPieOutsideLabels(rightLabels, minY, maxY, minGap)
+    }
+    ctx.font = '12px sans-serif'
+    if (showLabelLine) {
+      for (const outsideLabel of outsideLabels) {
+        const direction = Math.cos(outsideLabel.angle) >= 0 ? 1 : -1
+        const startX = outsideLabel.centerX + Math.cos(outsideLabel.angle) * (outsideLabel.radius + 2)
+        const startY = outsideLabel.centerY + Math.sin(outsideLabel.angle) * (outsideLabel.radius + 2)
+        const bendX = outsideLabel.centerX + Math.cos(outsideLabel.angle) * (outsideLabel.radius + lineLength)
+        const bendY = outsideLabel.centerY + Math.sin(outsideLabel.angle) * (outsideLabel.radius + lineLength)
+        const preferredEndX = bendX + direction * lineLength2
+        const endY = outsideLabel.labelY ?? Math.min(maxY, Math.max(minY, bendY))
+        const labelText = fitText(ctx, outsideLabel.text, maxTextWidth)
+        const textWidth = ctx.measureText(labelText).width
+        const textX = direction > 0
+          ? Math.min(canvasWidth - textPadding - textWidth, preferredEndX + 5)
+          : Math.max(textPadding + textWidth, preferredEndX - 5)
+        const endX = direction > 0 ? textX - 5 : textX + 5
+        ctx.strokeStyle = lineColor
+        ctx.lineWidth = 1
+        ctx.beginPath()
+        ctx.moveTo(startX, startY)
+        ctx.lineTo(bendX, bendY)
+        ctx.lineTo(endX, endY)
+        ctx.stroke()
+        ctx.fillStyle = lineColor
+        ctx.beginPath()
+        ctx.moveTo(endX, endY)
+        ctx.lineTo(endX - direction * 5, endY - 3)
+        ctx.lineTo(endX - direction * 5, endY + 3)
+        ctx.closePath()
+        ctx.fill()
+      }
+    }
+    for (const outsideLabel of outsideLabels) {
+      const direction = Math.cos(outsideLabel.angle) >= 0 ? 1 : -1
+      const bendX = outsideLabel.centerX + Math.cos(outsideLabel.angle) * (outsideLabel.radius + lineLength)
+      const bendY = outsideLabel.centerY + Math.sin(outsideLabel.angle) * (outsideLabel.radius + lineLength)
+      const preferredEndX = bendX + direction * lineLength2
+      const endY = outsideLabel.labelY ?? Math.min(maxY, Math.max(minY, bendY))
+      const labelText = fitText(ctx, outsideLabel.text, maxTextWidth)
+      const textWidth = ctx.measureText(labelText).width
+      const textX = direction > 0
+        ? Math.min(canvasWidth - textPadding - textWidth, preferredEndX + 5)
+        : Math.max(textPadding + textWidth, preferredEndX - 5)
+      drawText(ctx, labelText, textX, endY, stringOrDefault(item.labelColor, textColor('#37474f')), direction > 0 ? 'left' : 'right')
+    }
+  }
+
+  // 1. 优先绘制中心白底遮罩圆与中心文字，确保绝不遮挡扇区上的白色文字
+  if (innerRadius > 0) {
+    ctx.fillStyle = stringOrDefault(currentOption.backgroundColor, '#ffffff')
+    ctx.beginPath()
+    ctx.arc(centerX, centerY, innerRadius * 0.98, 0, Math.PI * 2)
+    ctx.fill()
+    if (item.centerText != null || item.centerValue != null) {
+      const valSize = Math.min(item.centerValueFontSize ?? 16, Math.max(12, Math.floor(innerRadius * 0.36)))
+      const titleSize = Math.max(10, Math.floor(valSize * 0.75))
+      drawText(ctx, stringOrDefault(item.centerText, stringOrDefault(item.name, '')), centerX, centerY - Math.floor(valSize * 0.45), stringOrDefault(item.centerTextColor, legendTextColor()), 'center', titleSize)
+      drawText(ctx, stringOrDefault(item.centerValue, ''), centerX, centerY + Math.floor(valSize * 0.65), stringOrDefault(item.centerValueColor, textColor('#263238')), 'center', valSize)
+    } else if (selectedIndex >= 0 && selectedIndex < item.data.length) {
+      const selectedLabel = selectedIndex < labels.length ? labels[selectedIndex] : '数据 ' + (selectedIndex + 1).toFixed(0)
+      drawText(ctx, selectedLabel, centerX, centerY - 8, legendTextColor(), 'center')
+      drawText(ctx, formatValue(item.data[selectedIndex]), centerX, centerY + 10, textColor('#263238'), 'center')
+    }
+  }
+
+  // 2. 绘制扇区内部百分比标签（浮在最顶层，彻底解决文字被白圆盖住半边的 Bug）
+  for (const insideLabel of insideLabels) {
+    drawText(ctx, insideLabel.text, insideLabel.x, insideLabel.y, insideLabel.color, 'center', insideLabel.fontSize)
+  }
+
+  if (selectedIndex >= 0 && selectedIndex < item.data.length && innerRadius <= 0) {
+    const selectedLabel = selectedIndex < labels.length ? labels[selectedIndex] : '数据 ' + (selectedIndex + 1).toFixed(0)
+    drawText(ctx, '已选: ' + selectedLabel + '  ' + formatValue(item.data[selectedIndex]), chartWidth / 2, canvasHeight - 10, textColor('#263238'), 'center')
+  }
+
+  // 3. 绘制右侧图例（所有端统一呈现，垂直居中对齐，响应点击交互）
+  if (shouldShowSideLegend) {
+    const legendFontSize = canvasWidth < 310 ? 11 : 12
+    const itemRowHeight = canvasWidth < 310 ? 22 : 24
+    const legendTotalHeight = item.data.length * itemRowHeight
+    const legendTop = Math.max(headerBottom + 6, centerY - legendTotalHeight / 2 + 10)
+    const legendX = chartWidth + 6
+    const legendColor = legendTextColor()
+    for (let index = 0; index < item.data.length; index++) {
+      const label = index < labels.length ? labels[index] : '数据 ' + (index + 1).toFixed(0)
+      const y = legendTop + index * itemRowHeight
+      ctx.fillStyle = colors[index % colors.length]
+      ctx.fillRect(legendX, y - 5, 8, 8)
+      const valStr = formatValue(item.data[index])
+      const pctStr = formatPercent(item.data[index], total)
+      const legendText = canvasWidth < 310
+        ? label + ' ' + valStr + ' ' + pctStr
+        : label + '  ' + valStr + '  ' + pctStr
+      drawText(ctx, legendText, legendX + 13, y, selectedIndex == index ? textColor('#263238') : legendColor, 'left', legendFontSize)
+      hitRegions.push({
+        type: 'legend',
+        seriesIndex: 0,
+        dataIndex: index,
+        name: label,
+        value: item.data[index],
+        x: legendX,
+        y: y - 8,
+        width: legendWidth,
+        height: itemRowHeight,
+        centerX: 0,
+        centerY: 0,
+        radius: 0,
+        startAngle: 0,
+        endAngle: 0
+      })
+    }
+  }
+}
+
+function drawGauge(ctx: CanvasRenderingContext2D, titleHeight: number, progress: number): void {
+  const item = currentOption.series.length > 0 ? currentOption.series[0] : null
+  if (item == null || item.data.length == 0) {
+    return
+  }
+  const yAxis = currentOption.yAxis
+  const minValue = yAxis?.min ?? 0
+  const maxValue = yAxis?.max ?? 100
+  const value = Math.min(maxValue, Math.max(minValue, item.data[0]))
+  const animatedValue = minValue + (value - minValue) * progress
+  const headerBottom = drawHeader(ctx, currentOption.series, false)
+  const centerX = canvasWidth / 2
+  const centerY = headerBottom + (canvasHeight - headerBottom) * 0.62
+  const radius = Math.min(canvasWidth * 0.36, canvasHeight * 0.38)
+  const isCircle = item.gaugeStyle == 'circle'
+  const startAngle = (item.gaugeStartAngle ?? (isCircle ? -90 : 135)) * Math.PI / 180
+  const endAngle = (item.gaugeEndAngle ?? (isCircle ? 270 : 405)) * Math.PI / 180
+  const valueAngle = startAngle + (animatedValue - minValue) / Math.max(1, maxValue - minValue) * (endAngle - startAngle)
+  ctx.lineWidth = item.gaugeWidth ?? 18
+  ctx.lineCap = item.gaugeRound == false ? 'butt' : 'round'
+  ctx.strokeStyle = stringOrDefault(item.gaugeBackgroundColor, '#e8edf1')
+  ctx.beginPath()
+  ctx.arc(centerX, centerY, radius, startAngle, endAngle)
+  ctx.stroke()
+  if (item.gaugeGradientColors != null && item.gaugeGradientColors.length > 1) {
+    const gradient = ctx.createLinearGradient(centerX - radius, centerY, centerX + radius, centerY)
+    gradient.addColorStop(0, item.gaugeGradientColors[0])
+    gradient.addColorStop(1, item.gaugeGradientColors[1])
+    ctx.strokeStyle = gradient
+  } else {
+    ctx.strokeStyle = stringOrDefault(item.color, '#2f80ed')
+  }
+  ctx.beginPath()
+  ctx.arc(centerX, centerY, radius, startAngle, valueAngle)
+  ctx.stroke()
+  if (item.gaugeShowTicks == true) {
+    const tickCount = Math.max(2, item.gaugeTickCount ?? 10)
+    ctx.strokeStyle = stringOrDefault(item.pointerColor, '#455a64')
+    ctx.lineWidth = 1
+    ctx.lineCap = 'butt'
+    const gaugeWidth = item.gaugeWidth ?? 18
+    const tickInnerRadius = radius - (gaugeWidth * 7 / 18)
+    const tickOuterRadius = radius + (gaugeWidth * 4 / 18)
+    for (let index = 0; index <= tickCount; index++) {
+      const angle = startAngle + (endAngle - startAngle) * index / tickCount
+      ctx.beginPath()
+      ctx.moveTo(centerX + Math.cos(angle) * tickInnerRadius, centerY + Math.sin(angle) * tickInnerRadius)
+      ctx.lineTo(centerX + Math.cos(angle) * tickOuterRadius, centerY + Math.sin(angle) * tickOuterRadius)
+      ctx.stroke()
+    }
+  }
+  if (item.gaugeShowPointer != false) {
+    ctx.strokeStyle = stringOrDefault(item.pointerColor, '#455a64')
+    ctx.lineWidth = 3
+    ctx.lineCap = 'round'
+    ctx.beginPath()
+    ctx.moveTo(centerX, centerY)
+    ctx.lineTo(centerX + Math.cos(valueAngle) * radius * 0.8, centerY + Math.sin(valueAngle) * radius * 0.8)
+    ctx.stroke()
+    ctx.fillStyle = stringOrDefault(item.pointerColor, '#455a64')
+    ctx.beginPath()
+    ctx.arc(centerX, centerY, 6, 0, Math.PI * 2)
+    ctx.fill()
+  }
+  drawText(ctx, stringOrDefault(item.centerText, stringOrDefault(item.name, '')), centerX, centerY + 10, stringOrDefault(item.centerTextColor, '#607d8b'), 'center')
+  drawText(ctx, stringOrDefault(item.centerValue, formatValue(value)), centerX, centerY + 30, stringOrDefault(item.centerValueColor, textColor('#263238')), 'center', item.centerValueFontSize ?? 18)
+  hitRegions.push({
+    type: 'gauge',
+    seriesIndex: 0,
+    dataIndex: 0,
+    name: stringOrDefault(item.name, 'gauge'),
+    value,
+    x: centerX - radius,
+    y: centerY - radius,
+    width: radius * 2,
+    height: radius * 2,
+    centerX: 0,
+    centerY: 0,
+    radius: 0,
+    startAngle: 0,
+    endAngle: 0
+  })
+}
+
+function drawProgress(ctx: CanvasRenderingContext2D, titleHeight: number, progress: number): void {
+  const series = currentOption.series
+  if (series.length == 0) {
+    return
+  }
+  const first = series[0]
+  const style = stringOrDefault(first.pieStyle, 'progress')
+  const multi = style == 'multi-progress' || style == 'reverse-multi-progress'
+  const reverse = style == 'reverse-progress' || style == 'reverse-multi-progress'
+  const rounded = style == 'rounded-progress' || first.progressRound == true
+  const headerBottom = drawHeader(ctx, series, false)
+  const centerX = canvasWidth / 2
+  const centerY = headerBottom + (canvasHeight - headerBottom) * 0.54
+  const radius = Math.min(canvasWidth * 0.34, (canvasHeight - headerBottom) * 0.36)
+  const activeSeries = multi ? series : [first]
+  const gap = first.progressGap ?? 7
+  const width = multi ? Math.max(9, (radius * 0.66 - gap * (activeSeries.length - 1)) / activeSeries.length) : 16
+  const start = reverse ? Math.PI / 2 : -Math.PI / 2
+  for (let index = 0; index < activeSeries.length; index++) {
+    const item = activeSeries[index]
+    const value = Math.max(0, Math.min(item.progressMax ?? 100, item.data.length > 0 ? item.data[0] : 0))
+    const max = Math.max(1, item.progressMax ?? 100)
+    const ringRadius = multi ? radius - index * (width + gap) - width / 2 : radius
+    const end = reverse ? start - Math.PI * 2 * value / max * progress : start + Math.PI * 2 * value / max * progress
+    ctx.lineWidth = width
+    ctx.lineCap = rounded ? 'round' : 'butt'
+    ctx.strokeStyle = stringOrDefault(item.progressBackgroundColor, '#e8eaed')
+    ctx.beginPath()
+    ctx.arc(centerX, centerY, ringRadius, start, reverse ? start - Math.PI * 2 : start + Math.PI * 2, reverse)
+    ctx.stroke()
+    if (item.gradientColors != null && item.gradientColors.length > 1) {
+      const gradient = ctx.createLinearGradient(centerX - ringRadius, centerY, centerX + ringRadius, centerY)
+      gradient.addColorStop(0, item.gradientColors[0])
+      gradient.addColorStop(1, item.gradientColors[1])
+      ctx.strokeStyle = gradient
+    } else {
+      ctx.strokeStyle = stringOrDefault(item.color, '#27ae60')
+    }
+    ctx.beginPath()
+    ctx.arc(centerX, centerY, ringRadius, start, end, reverse)
+    ctx.stroke()
+  }
+  drawText(ctx, stringOrDefault(first.centerText, stringOrDefault(first.name, '指标')), centerX, centerY - 9, stringOrDefault(first.centerTextColor, '#607d8b'), 'center')
+  ctx.fillStyle = stringOrDefault(first.centerValueColor, stringOrDefault(first.color, '#27ae60'))
+  ctx.font = (first.centerValueFontSize ?? 26).toFixed(0) + 'px sans-serif'
+  ctx.textAlign = 'center'
+  ctx.textBaseline = 'middle'
+  ctx.fillText(stringOrDefault(first.centerValue, formatValue(first.data.length > 0 ? first.data[0] : 0) + '%'), centerX, centerY + 18)
+}
+
+function drawRadar(ctx: CanvasRenderingContext2D, titleHeight: number, progress: number): void {
+  const radar = currentOption.radar
+  if (radar == null || radar.indicator.length == 0) {
+    return
+  }
+  const headerBottom = drawHeader(ctx, currentOption.series, true, canvasWidth - 32)
+  const centerX = canvasWidth / 2
+  const centerY = headerBottom + (canvasHeight - headerBottom) * 0.56
+  const radius = Math.min(canvasWidth * 0.32, (canvasHeight - headerBottom) * 0.28)
+  const count = radar.indicator.length
+  const angleStart = -Math.PI / 2
+  ctx.strokeStyle = '#e5eaee'
+  ctx.lineWidth = 1
+  for (let ring = 1; ring <= 4; ring++) {
+    const ringRadius = radius * ring / 4
+    ctx.beginPath()
+    for (let index = 0; index < count; index++) {
+      const angle = angleStart + Math.PI * 2 * index / count
+      const x = centerX + Math.cos(angle) * ringRadius
+      const y = centerY + Math.sin(angle) * ringRadius
+      if (index == 0) {
+        ctx.moveTo(x, y)
+      } else {
+        ctx.lineTo(x, y)
+      }
+    }
+    ctx.closePath()
+    ctx.stroke()
+  }
+  for (let index = 0; index < count; index++) {
+    const angle = angleStart + Math.PI * 2 * index / count
+    const x = centerX + Math.cos(angle) * radius
+    const y = centerY + Math.sin(angle) * radius
+    ctx.beginPath()
+    ctx.moveTo(centerX, centerY)
+    ctx.lineTo(x, y)
+    ctx.stroke()
+    drawText(ctx, radar.indicator[index].name, centerX + Math.cos(angle) * (radius + 22), centerY + Math.sin(angle) * (radius + 18), legendTextColor(), 'center')
+  }
+  for (let seriesIndex = 0; seriesIndex < currentOption.series.length; seriesIndex++) {
+    const item = currentOption.series[seriesIndex]
+    if (item.type != 'radar') {
+      continue
+    }
+    const color = stringOrDefault(item.color, seriesIndex % 2 == 0 ? '#2f80ed' : '#27ae60')
+    ctx.strokeStyle = color
+    ctx.fillStyle = color
+    ctx.globalAlpha = 0.18
+    ctx.beginPath()
+    for (let index = 0; index < count && index < item.data.length; index++) {
+      const indicatorMax = Math.max(1, radar.indicator[index].max)
+      const ratio = Math.min(1, Math.max(0, item.data[index] / indicatorMax)) * progress
+      const angle = angleStart + Math.PI * 2 * index / count
+      const x = centerX + Math.cos(angle) * radius * ratio
+      const y = centerY + Math.sin(angle) * radius * ratio
+      if (index == 0) {
+        ctx.moveTo(x, y)
+      } else {
+        ctx.lineTo(x, y)
+      }
+    }
+    ctx.closePath()
+    ctx.fill()
+    ctx.globalAlpha = 1
+    ctx.stroke()
+    hitRegions.push({
+      type: 'radar',
+      seriesIndex,
+      dataIndex: 0,
+      name: stringOrDefault(item.name, 'radar'),
+      value: item.data.length > 0 ? item.data[0] : 0,
+      x: centerX - radius,
+      y: centerY - radius,
+      width: radius * 2,
+      height: radius * 2,
+      centerX: 0,
+      centerY: 0,
+      radius: 0,
+      startAngle: 0,
+      endAngle: 0
+    })
+  }
+}
+
+function drawFunnel(ctx: CanvasRenderingContext2D, titleHeight: number, progress: number): void {
+  const item = currentOption.series.length > 0 ? currentOption.series[0] : null
+  if (item == null || item.data.length == 0) {
+    return
+  }
+  const labels = currentOption.xAxis?.data ?? []
+  const maxValue = Math.max(1, getSeriesMax([item]))
+  const headerBottom = drawHeader(ctx, currentOption.series, true, canvasWidth - 32)
+  const left = 36
+  const right = 36
+  const top = headerBottom + 24
+  const plotWidth = canvasWidth - left - right
+  const itemHeight = Math.max(26, (canvasHeight - top - 28) / item.data.length)
+  const colors = item.colors ?? (item.color != null ? [item.color] : ['#2f80ed', '#27ae60', '#f2c94c', '#eb5757', '#9b51e0', '#56ccf2'])
+  for (let index = 0; index < item.data.length; index++) {
+    const currentRatio = Math.max(0.08, item.data[index] / maxValue) * progress
+    const nextRatio = index + 1 < item.data.length ? Math.max(0.08, item.data[index + 1] / maxValue) * progress : currentRatio * 0.72
+    const y = top + index * itemHeight
+    const w1 = plotWidth * currentRatio
+    const w2 = plotWidth * nextRatio
+    const x1 = left + (plotWidth - w1) / 2
+    const x2 = left + (plotWidth - w2) / 2
+    ctx.fillStyle = colors[index % colors.length]
+    ctx.beginPath()
+    ctx.moveTo(x1, y)
+    ctx.lineTo(x1 + w1, y)
+    ctx.lineTo(x2 + w2, y + itemHeight - 4)
+    ctx.lineTo(x2, y + itemHeight - 4)
+    ctx.closePath()
+    ctx.fill()
+    const label = index < labels.length ? labels[index] : '步骤' + (index + 1).toFixed(0)
+    drawText(ctx, label + ' ' + formatValue(item.data[index]), canvasWidth / 2, y + itemHeight / 2, '#ffffff', 'center')
+    hitRegions.push({
+      type: 'funnel',
+      seriesIndex: 0,
+      dataIndex: index,
+      name: label,
+      value: item.data[index],
+      x: x1,
+      y,
+      width: w1,
+      height: itemHeight,
+      centerX: 0,
+      centerY: 0,
+      radius: 0,
+      startAngle: 0,
+      endAngle: 0
+    })
+  }
+}
+
+function drawBoxplot(ctx: CanvasRenderingContext2D, titleHeight: number, progress: number): void {
+  const item = currentOption.series.length > 0 ? currentOption.series[0] : null
+  if (item == null || item.boxplotData == null || item.boxplotData.length == 0) {
+    return
+  }
+  const boxes = item.boxplotData
+  const labels = currentOption.xAxis?.data ?? []
+  const grid = currentOption.grid
+  const left = numberOrDefault(grid?.left, 48)
+  const right = numberOrDefault(grid?.right, 18)
+  const headerBottom = drawHeader(ctx, currentOption.series, true, canvasWidth - 32)
+  const top = headerBottom + numberOrDefault(grid?.top, 8)
+  const bottom = numberOrDefault(grid?.bottom, 34)
+  const plotWidth = Math.max(1, canvasWidth - left - right)
+  const plotHeight = Math.max(1, canvasHeight - top - bottom)
+  let minValue = boxes[0][0]
+  let maxValue = boxes[0][4]
+  for (const box of boxes) {
+    if (box.length >= 5) {
+      minValue = Math.min(minValue, box[0])
+      maxValue = Math.max(maxValue, box[4])
+    }
+  }
+  if (maxValue <= minValue) {
+    maxValue = minValue + 1
+  }
+  const splitShow = currentOption.yAxis?.splitLine?.show != false
+  const splitColor = stringOrDefault(currentOption.yAxis?.splitLine?.color, '#e5eaee')
+  const showValueLabels = currentOption.yAxis?.axisLabel?.show != false
+  ctx.strokeStyle = splitColor
+  ctx.lineWidth = 1
+  for (let index = 0; index <= 4; index++) {
+    const y = top + plotHeight * index / 4
+    if (splitShow) {
+      ctx.beginPath()
+      ctx.moveTo(left, y)
+      ctx.lineTo(left + plotWidth, y)
+      ctx.stroke()
+    }
+    if (showValueLabels) {
+      drawText(ctx, formatValue(maxValue - (maxValue - minValue) * index / 4), left - 8, y, textColor('#78909c'), 'right')
+    }
+  }
+  ctx.strokeStyle = stringOrDefault(currentOption.yAxis?.axisLine?.color, '#90a4ae')
+  ctx.beginPath()
+  ctx.moveTo(left, top)
+  ctx.lineTo(left, top + plotHeight)
+  ctx.lineTo(left + plotWidth, top + plotHeight)
+  ctx.stroke()
+  const categoryWidth = plotWidth / boxes.length
+  const color = stringOrDefault(item.color, '#2f80ed')
+  for (let index = 0; index < boxes.length; index++) {
+    const box = boxes[index]
+    if (box.length < 5) {
+      continue
+    }
+    const centerX = left + categoryWidth * (index + 0.5)
+    const boxWidth = categoryWidth * 0.46
+    const minY = top + (maxValue - (minValue + (box[0] - minValue) * progress)) / (maxValue - minValue) * plotHeight
+    const q1Y = top + (maxValue - (minValue + (box[1] - minValue) * progress)) / (maxValue - minValue) * plotHeight
+    const medianY = top + (maxValue - (minValue + (box[2] - minValue) * progress)) / (maxValue - minValue) * plotHeight
+    const q3Y = top + (maxValue - (minValue + (box[3] - minValue) * progress)) / (maxValue - minValue) * plotHeight
+    const maxY = top + (maxValue - (minValue + (box[4] - minValue) * progress)) / (maxValue - minValue) * plotHeight
+    ctx.strokeStyle = color
+    ctx.fillStyle = '#ffffff'
+    ctx.lineWidth = 2
+    ctx.beginPath()
+    ctx.moveTo(centerX, maxY)
+    ctx.lineTo(centerX, q3Y)
+    ctx.moveTo(centerX, q1Y)
+    ctx.lineTo(centerX, minY)
+    ctx.moveTo(centerX - boxWidth / 2, maxY)
+    ctx.lineTo(centerX + boxWidth / 2, maxY)
+    ctx.moveTo(centerX - boxWidth / 2, minY)
+    ctx.lineTo(centerX + boxWidth / 2, minY)
+    ctx.stroke()
+    ctx.fillRect(centerX - boxWidth / 2, q3Y, boxWidth, q1Y - q3Y)
+    ctx.strokeRect(centerX - boxWidth / 2, q3Y, boxWidth, q1Y - q3Y)
+    ctx.beginPath()
+    ctx.moveTo(centerX - boxWidth / 2, medianY)
+    ctx.lineTo(centerX + boxWidth / 2, medianY)
+    ctx.stroke()
+    if (index < labels.length && currentOption.xAxis?.axisLabel?.show != false) {
+      drawText(ctx, labels[index], centerX, top + plotHeight + 18, stringOrDefault(currentOption.xAxis?.axisLabel?.color, textColor('#78909c')), 'center')
+    }
+    hitRegions.push({
+      type: 'boxplot',
+      seriesIndex: 0,
+      dataIndex: index,
+      name: index < labels.length ? labels[index] : 'boxplot',
+      value: box[2],
+      x: centerX - boxWidth,
+      y: maxY,
+      width: boxWidth * 2,
+      height: minY - maxY,
+      centerX: 0,
+      centerY: 0,
+      radius: 0,
+      startAngle: 0,
+      endAngle: 0
+    })
+  }
+}
+
+function drawCandlestick(ctx: CanvasRenderingContext2D, titleHeight: number, progress: number): void {
+  const item = currentOption.series.length > 0 ? currentOption.series[0] : null
+  if (item == null || item.candlestickData == null || item.candlestickData.length == 0) {
+    return
+  }
+  const candles = item.candlestickData
+  const labels = currentOption.xAxis?.data ?? []
+  const grid = currentOption.grid
+  const left = numberOrDefault(grid?.left, 48)
+  const right = numberOrDefault(grid?.right, 18)
+  const headerBottom = drawHeader(ctx, currentOption.series, true, canvasWidth - 32)
+  const top = headerBottom + numberOrDefault(grid?.top, 8)
+  const bottom = numberOrDefault(grid?.bottom, 34)
+  const plotWidth = Math.max(1, canvasWidth - left - right)
+  const plotHeight = Math.max(1, canvasHeight - top - bottom)
+  let minValue = candles[0][2]
+  let maxValue = candles[0][3]
+  for (const candle of candles) {
+    if (candle.length >= 4) {
+      minValue = Math.min(minValue, candle[2])
+      maxValue = Math.max(maxValue, candle[3])
+    }
+  }
+  minValue = currentOption.yAxis?.min ?? minValue
+  maxValue = currentOption.yAxis?.max ?? maxValue
+  if (maxValue <= minValue) {
+    maxValue = minValue + 1
+  }
+  const valueToY = function (value: number): number {
+    return top + (maxValue - value) / (maxValue - minValue) * plotHeight
+  }
+  ctx.strokeStyle = stringOrDefault(currentOption.yAxis?.splitLine?.color, '#e5eaee')
+  ctx.lineWidth = 1
+  for (let index = 0; index <= 5; index++) {
+    const y = top + plotHeight * index / 5
+    ctx.beginPath()
+    ctx.moveTo(left, y)
+    ctx.lineTo(left + plotWidth, y)
+    ctx.stroke()
+    drawText(ctx, formatValue(maxValue - (maxValue - minValue) * index / 5), left - 8, y, textColor('#78909c'), 'right')
+  }
+  ctx.strokeStyle = stringOrDefault(currentOption.yAxis?.axisLine?.color, '#90a4ae')
+  ctx.beginPath()
+  ctx.moveTo(left, top)
+  ctx.lineTo(left, top + plotHeight)
+  ctx.lineTo(left + plotWidth, top + plotHeight)
+  ctx.stroke()
+  const categoryWidth = plotWidth / candles.length
+  const bodyWidth = Math.max(6, categoryWidth * 0.5)
+  const xAxisLabel = currentOption.xAxis?.axisLabel
+  const labelInterval = xAxisLabel?.interval ?? (candles.length > 16 ? Math.ceil(candles.length / 6) - 1 : 0)
+  const labelFormat = xAxisLabel?.format ?? null
+  const labelColor = stringOrDefault(xAxisLabel?.color, textColor('#78909c'))
+  const labelRotate = xAxisLabel?.rotate ?? 0
+  const labelFontSize = xAxisLabel?.fontSize ?? 12
+  for (let index = 0; index < candles.length; index++) {
+    const candle = candles[index]
+    if (candle.length < 4) {
+      continue
+    }
+    const open = candle[0]
+    const close = candle[1]
+    const low = candle[2]
+    const high = candle[3]
+    const centerX = left + categoryWidth * (index + 0.5)
+    const animatedClose = open + (close - open) * progress
+    const animatedLow = open + (low - open) * progress
+    const animatedHigh = open + (high - open) * progress
+    const openY = valueToY(open)
+    const closeY = valueToY(animatedClose)
+    const lowY = valueToY(animatedLow)
+    const highY = valueToY(animatedHigh)
+    const upColor = item.colors != null && item.colors.length > 0 ? item.colors[0] : stringOrDefault(item.color, '#ef5350')
+    const downColor = item.colors != null && item.colors.length > 1 ? item.colors[1] : '#45b36b'
+    const color = item.itemColors != null && index < item.itemColors.length ? item.itemColors[index] : (close >= open ? upColor : downColor)
+    ctx.strokeStyle = color
+    ctx.lineWidth = 1.5
+    ctx.beginPath()
+    ctx.moveTo(centerX, highY)
+    ctx.lineTo(centerX, lowY)
+    ctx.stroke()
+    ctx.fillStyle = color
+    ctx.fillRect(centerX - bodyWidth / 2, Math.min(openY, closeY), bodyWidth, Math.max(1, Math.abs(closeY - openY)))
+    if (index < labels.length && xAxisLabel?.show != false && (labelInterval == 0 || index % (labelInterval + 1) == 0)) {
+      drawAxisLabel(ctx, formatAxisLabel(labels[index], labelFormat), centerX, top + plotHeight + 18, labelColor, labelRotate, 'center', labelFontSize)
+    }
+    hitRegions.push({
+      type: 'candlestick',
+      seriesIndex: 0,
+      dataIndex: index,
+      name: index < labels.length ? labels[index] : 'candlestick',
+      value: close,
+      x: centerX - bodyWidth / 2,
+      y: highY,
+      width: bodyWidth,
+      height: Math.max(1, lowY - highY),
+      centerX: 0,
+      centerY: 0,
+      radius: 0,
+      startAngle: 0,
+      endAngle: 0
+    })
+  }
+  for (let seriesIndex = 0; seriesIndex < currentOption.series.length; seriesIndex++) {
+    if (hiddenSeries.has(seriesIndex)) {
+      continue
+    }
+    const line = currentOption.series[seriesIndex]
+    if (line.type != 'line') {
+      continue
+    }
+    const points: Point[] = []
+    const startIndex = Math.max(0, line.startIndex ?? 0)
+    for (let index = startIndex; index < line.data.length && index < candles.length; index++) {
+      const centerX = left + categoryWidth * (index + 0.5)
+      const value = line.data[index] * progress
+      points.push({ x: centerX, y: valueToY(value) })
+    }
+    if (points.length == 0) {
+      continue
+    }
+    ctx.save()
+    ctx.globalAlpha = line.lineStyle?.opacity ?? 1
+    ctx.strokeStyle = stringOrDefault(line.lineStyle?.color, stringOrDefault(line.color, '#2f80ed'))
+    ctx.lineWidth = numberOrDefault(line.lineStyle?.width, 1.5)
+    ctx.lineCap = 'round'
+    ctx.lineJoin = 'round'
+    const lineType = stringOrDefault(line.lineStyle?.type, 'solid')
+    if (lineType == 'dashed') {
+      ctx.setLineDash([6, 4])
+    } else if (lineType == 'dotted') {
+      ctx.setLineDash([2, 4])
+    } else {
+      ctx.setLineDash([])
+    }
+    ctx.beginPath()
+    drawLinePath(ctx, points, line.smooth == true, line.step ?? null)
+    ctx.stroke()
+    ctx.restore()
+  }
+}
+
+function drawHorizontalCartesian(ctx: CanvasRenderingContext2D, titleHeight: number, progress: number): void {
+  const grid = currentOption.grid
+  const left = numberOrDefault(grid?.left, 72)
+  const right = numberOrDefault(grid?.right, 18)
+  const headerBottom = drawHeader(ctx, currentOption.series, true, canvasWidth - 32)
+  const top = headerBottom + numberOrDefault(grid?.top, 8)
+  const bottom = numberOrDefault(grid?.bottom, 34)
+  const plotWidth = Math.max(1, canvasWidth - left - right)
+  const plotHeight = Math.max(1, canvasHeight - top - bottom)
+  const series = currentOption.series
+  const xAxis = currentOption.xAxis
+  const yAxis = currentOption.yAxis
+  const categoryAxis = yAxis?.data != null && yAxis.data.length > 0 ? yAxis : xAxis
+  const valueAxis = yAxis?.data != null && yAxis.data.length > 0 ? xAxis : yAxis
+  let minValue = getSeriesMin(series)
+  let maxValue = getSeriesMax(series)
+  if (valueAxis?.min != null) {
+    minValue = valueAxis.min
+  }
+  if (valueAxis?.max != null) {
+    maxValue = valueAxis.max
+  }
+  if (maxValue <= minValue) {
+    maxValue = minValue + 1
+  }
+  const axisColor = stringOrDefault(valueAxis?.color, stringOrDefault(valueAxis?.axisLine?.color, '#90a4ae'))
+  const labelColor = stringOrDefault(categoryAxis?.axisLabel?.color, textColor('#78909c'))
+  const splitColor = stringOrDefault(valueAxis?.splitLine?.color, '#e5eaee')
+  const splitShow = valueAxis?.splitLine?.show != false
+  const showValueLabels = valueAxis?.axisLabel?.show != false
+  const axisLineShow = valueAxis?.axisLine?.show != false
+  const mirrorLayout = valueAxis?.mirror == true
+
+  ctx.strokeStyle = splitColor
+  ctx.lineWidth = 1
+  for (let index = 0; index <= 4; index++) {
+    const x = left + plotWidth * index / 4
+    if (splitShow) {
+      ctx.beginPath()
+      ctx.moveTo(x, top)
+      ctx.lineTo(x, top + plotHeight)
+      ctx.stroke()
+    }
+    if (showValueLabels) {
+      const value = minValue + (maxValue - minValue) * index / 4
+      drawText(ctx, formatValue(value), x, top + plotHeight + 18, labelColor, 'center', valueAxis?.axisLabel?.fontSize ?? 12)
+    }
+  }
+  if (axisLineShow) {
+    ctx.strokeStyle = axisColor
+    ctx.beginPath()
+    ctx.moveTo(left, top)
+    ctx.lineTo(left, top + plotHeight)
+    ctx.lineTo(left + plotWidth, top + plotHeight)
+    ctx.stroke()
+  }
+
+  let categoryCount = 0
+  if (categoryAxis?.data != null) {
+    categoryCount = categoryAxis.data.length
+  }
+  for (let i = 0; i < series.length; i++) {
+    if (hiddenSeries.has(i)) {
+      continue
+    }
+    if ((series[i].type == 'bar' || (series[i].type == 'line' && series[i].orient == 'horizontal')) && series[i].data.length > categoryCount) {
+      categoryCount = series[i].data.length
+    }
+  }
+  if (categoryCount <= 0) {
+    return
+  }
+  const categoryHeight = plotHeight / categoryCount
+  cartesianLayout = { left, top, plotWidth, plotHeight, categoryWidth: 0, categoryHeight, step: 0, hasBarSeries: false, horizontal: true, categoryCount, minValue, maxValue }
+  if (categoryAxis?.data != null) {
+    const labelInterval = categoryAxis.axisLabel?.interval ?? (categoryCount > 12 ? Math.ceil(categoryCount / 8) - 1 : 0)
+    const labelFormat = categoryAxis.axisLabel?.format ?? ''
+    const labelRotate = categoryAxis.axisLabel?.rotate ?? 0
+    const labelShow = categoryAxis.axisLabel?.show != false
+    for (let index = 0; index < categoryAxis.data.length; index++) {
+      if (labelShow == false) {
+        break
+      }
+      if (labelInterval > 0 && index % (labelInterval + 1) != 0) {
+        continue
+      }
+      let y = top + categoryHeight * (index + 0.5)
+      let hasRealtimeSort = false
+      for (let seriesIndex = 0; seriesIndex < series.length; seriesIndex++) {
+        if (series[seriesIndex].type == 'bar' && series[seriesIndex].orient == 'horizontal' && series[seriesIndex].realtimeSort == true) {
+          hasRealtimeSort = true
+          break
+        }
+      }
+      if (hasRealtimeSort && progress < 1) {
+        const previousIndex = previousRealtimeCategoryLabels.indexOf(categoryAxis.data[index])
+        if (previousIndex >= 0) {
+          const previousY = top + categoryHeight * (previousIndex + 0.5)
+          y = previousY + (y - previousY) * progress
+        }
+      }
+      const label = formatAxisLabel(categoryAxis.data[index], labelFormat)
+      drawAxisLabel(ctx, label, left - 8, y, stringOrDefault(categoryAxis.axisLabel?.color, labelColor), labelRotate, 'right', categoryAxis.axisLabel?.fontSize ?? 12)
+    }
+  }
+
+  let barSeriesCount = 0
+  let totalBarSeriesCount = 0
+  for (let si = 0; si < series.length; si++) {
+    const item = series[si]
+    if (item.type == 'bar' && item.orient == 'horizontal' && item.stack == null) {
+      totalBarSeriesCount += 1
+      if (hiddenSeries.has(si) == false) {
+        barSeriesCount += 1
+      }
+    }
+  }
+  if (mirrorLayout) {
+    barSeriesCount = 1
+  }
+  const barGroupHeight = categoryHeight * 0.72
+  const preserveBarWidth = currentOption.legend?.barLayout == 'preserve'
+  const valueToX = function (value: number): number {
+    if (mirrorLayout) {
+      const mirrorLimit = Math.max(Math.abs(minValue), Math.abs(maxValue))
+      return left + plotWidth / 2 + value / Math.max(1, mirrorLimit) * (plotWidth / 2)
+    }
+    return left + (value - minValue) / (maxValue - minValue) * plotWidth
+  }
+
+  if (mirrorLayout) {
+    ctx.strokeStyle = axisColor
+    ctx.lineWidth = 1.5
+    ctx.beginPath()
+    ctx.moveTo(left + plotWidth / 2, top)
+    ctx.lineTo(left + plotWidth / 2, top + plotHeight)
+    ctx.stroke()
+  }
+
+  for (let seriesIndex = 0; seriesIndex < series.length; seriesIndex++) {
+    if (hiddenSeries.has(seriesIndex)) {
+      continue
+    }
+    const item = series[seriesIndex]
+    if (item.type != 'bar' || item.orient != 'horizontal') {
+      continue
+    }
+    const color = stringOrDefault(item.color, seriesIndex % 2 == 0 ? '#2f80ed' : '#27ae60')
+    let barIndex = 0
+    for (let previousIndex = 0; previousIndex < seriesIndex; previousIndex++) {
+      if (hiddenSeries.has(previousIndex) == false && series[previousIndex].type == 'bar' && series[previousIndex].orient == 'horizontal' && series[previousIndex].stack == null) {
+        barIndex += 1
+      }
+    }
+    const barSlotHeight = barGroupHeight / Math.max(1, preserveBarWidth ? totalBarSeriesCount : barSeriesCount)
+    const visibleGroupHeight = preserveBarWidth ? barSlotHeight * barSeriesCount : barGroupHeight
+    for (let index = 0; index < item.data.length; index++) {
+      let value = (item.mirror == true ? -item.data[index] : item.data[index]) * progress
+      const categoryLabel = categoryAxis?.data != null && index < categoryAxis.data.length ? categoryAxis.data[index] : ''
+      let previousCategoryIndex = -1
+      if (item.realtimeSort == true) {
+        previousCategoryIndex = previousRealtimeCategoryLabels.indexOf(categoryLabel)
+        if (previousCategoryIndex >= 0 && seriesIndex < previousRealtimeSeriesData.length && previousCategoryIndex < previousRealtimeSeriesData[seriesIndex].length) {
+          const previousValue = item.mirror == true ? -previousRealtimeSeriesData[seriesIndex][previousCategoryIndex] : previousRealtimeSeriesData[seriesIndex][previousCategoryIndex]
+          const currentValue = item.mirror == true ? -item.data[index] : item.data[index]
+          value = previousValue + (currentValue - previousValue) * progress
+        }
+      }
+      let stackBase = 0
+      if (item.stack != null) {
+        for (let previousIndex = 0; previousIndex < seriesIndex; previousIndex++) {
+          if (hiddenSeries.has(previousIndex)) {
+            continue
+          }
+          const previous = series[previousIndex]
+          if (previous.type == 'bar' && previous.orient == 'horizontal' && previous.stack == item.stack && index < previous.data.length) {
+            const previousValue = previous.data[index] * progress
+            if (value >= 0 && previousValue > 0) {
+              stackBase += previousValue
+            } else if (value < 0 && previousValue < 0) {
+              stackBase += previousValue
+            }
+          }
+        }
+      }
+      const actualSlotHeight = mirrorLayout ? barGroupHeight : (item.stack == null ? barSlotHeight : barGroupHeight)
+      const actualBarHeight = getBarWidth(item.barWidth ?? null, actualSlotHeight, categoryHeight)
+      const currentY = top + categoryHeight * (index + 0.5) - (mirrorLayout || item.stack != null ? barGroupHeight : visibleGroupHeight) / 2 + (mirrorLayout ? (barGroupHeight - actualBarHeight) / 2 : (item.stack == null ? barIndex * barSlotHeight + (barSlotHeight - actualBarHeight) / 2 : (barGroupHeight - actualBarHeight) / 2))
+      let y = currentY
+      if (item.realtimeSort == true && previousCategoryIndex >= 0) {
+        const previousY = top + categoryHeight * (previousCategoryIndex + 0.5) - (mirrorLayout || item.stack != null ? barGroupHeight : visibleGroupHeight) / 2 + (mirrorLayout ? (barGroupHeight - actualBarHeight) / 2 : (item.stack == null ? barIndex * barSlotHeight + (barSlotHeight - actualBarHeight) / 2 : (barGroupHeight - actualBarHeight) / 2))
+        y = previousY + (currentY - previousY) * progress
+      }
+      const baseX = valueToX(stackBase)
+      const endX = valueToX(stackBase + value)
+      const x = Math.min(baseX, endX)
+      const width = Math.max(1, Math.abs(endX - baseX))
+      const barHeight = Math.max(1, actualBarHeight - 3)
+      const itemStyle = item.itemStyle
+      const itemColor = item.itemColors != null && index < item.itemColors.length ? item.itemColors[index] : null
+      ctx.save()
+      ctx.globalAlpha = itemStyle?.opacity ?? 1
+      const gradientColors = item.gradientColors ?? item.colors
+      if (itemColor != null) {
+        ctx.fillStyle = itemColor
+      } else if (gradientColors != null && gradientColors.length > 1) {
+        const gradient = ctx.createLinearGradient(x, y, x + width, y)
+        gradient.addColorStop(0, gradientColors[0])
+        gradient.addColorStop(1, gradientColors[1])
+        ctx.fillStyle = gradient
+      } else {
+        ctx.fillStyle = stringOrDefault(itemStyle?.backgroundColor, color)
+      }
+      ctx.beginPath()
+      drawRoundedRect(ctx, x, y, width, barHeight, itemStyle?.borderRadius ?? 0)
+      ctx.fill()
+      drawBarTexture(ctx, x, y, width, barHeight, itemStyle ?? null)
+      if ((itemStyle?.borderWidth ?? 0) > 0) {
+        ctx.strokeStyle = stringOrDefault(itemStyle?.borderColor, stringOrDefault(itemColor, color))
+        ctx.lineWidth = itemStyle?.borderWidth ?? 0
+        ctx.stroke()
+      }
+      ctx.restore()
+      if (item.label?.show == true) {
+        const labelX = item.label.position == 'inside' ? x + width / 2 : (value >= 0 ? x + width + 8 : x - 8)
+        drawText(ctx, formatValue(item.data[index]), labelX, y + barHeight / 2, stringOrDefault(item.label.color, textColor('#37474f')), value >= 0 ? (item.label.position == 'inside' ? 'center' : 'left') : 'right', item.label.fontSize ?? 12)
+      }
+      hitRegions.push({
+        type: 'bar',
+        seriesIndex,
+        dataIndex: index,
+        name: stringOrDefault(item.name, 'bar'),
+        value: item.data[index],
+        x,
+        y,
+        width,
+        height: barHeight,
+        centerX: 0,
+        centerY: 0,
+        radius: 0,
+        startAngle: 0,
+        endAngle: 0
+      })
+    }
+  }
+  for (let seriesIndex = 0; seriesIndex < series.length; seriesIndex++) {
+    if (hiddenSeries.has(seriesIndex)) {
+      continue
+    }
+    const item = series[seriesIndex]
+    if (item.type != 'line' || item.orient != 'horizontal') {
+      continue
+    }
+    const lineColor = stringOrDefault(item.lineStyle?.color, stringOrDefault(item.color, seriesIndex % 2 == 0 ? '#2f80ed' : '#27ae60'))
+    const points: Point[] = []
+    for (let index = 0; index < item.data.length; index++) {
+      points.push({ x: valueToX(item.data[index] * progress), y: top + categoryHeight * (index + 0.5) })
+    }
+    const visiblePoints = getVisiblePoints(points, progress, false)
+    ctx.strokeStyle = lineColor
+    ctx.lineWidth = numberOrDefault(item.lineStyle?.width, 2)
+    ctx.lineCap = 'round'
+    ctx.lineJoin = 'round'
+    const lineType = stringOrDefault(item.lineStyle?.type, 'solid')
+    if (lineType == 'dashed') {
+      ctx.setLineDash([6, 4])
+    } else if (lineType == 'dotted') {
+      ctx.setLineDash([2, 4])
+    } else {
+      ctx.setLineDash([])
+    }
+    ctx.beginPath()
+    drawLinePath(ctx, visiblePoints, item.smooth == true, item.step ?? null)
+    ctx.stroke()
+    ctx.setLineDash([])
+    const symbolStyle = item.showSymbol == false ? 'none' : stringOrDefault(item.symbolStyle, 'hollow')
+    if (symbolStyle == 'none') {
+      continue
+    }
+    const visibleCount = visiblePoints.length
+    for (let pointIndex = 0; pointIndex < visibleCount; pointIndex++) {
+      const point = points[pointIndex]
+      ctx.beginPath()
+      ctx.arc(point.x, point.y, 4, 0, Math.PI * 2)
+      if (symbolStyle == 'solid') {
+        ctx.fillStyle = lineColor
+        ctx.fill()
+      } else {
+        ctx.fillStyle = '#ffffff'
+        ctx.fill()
+        ctx.strokeStyle = lineColor
+        ctx.lineWidth = 2
+        ctx.stroke()
+      }
+      hitRegions.push({
+        type: 'line',
+        seriesIndex,
+        dataIndex: pointIndex,
+        name: stringOrDefault(item.name, 'line'),
+        value: item.data[pointIndex],
+        x: point.x - 10,
+        y: point.y - 10,
+        width: 20,
+        height: 20,
+        centerX: 0,
+        centerY: 0,
+        radius: 0,
+        startAngle: 0,
+        endAngle: 0
+      })
+    }
+  }
+  if (mirrorLayout && minValue < 0 && maxValue > 0) {
+    ctx.strokeStyle = axisColor
+    ctx.lineWidth = 1.5
+    ctx.beginPath()
+    ctx.moveTo(valueToX(0), top)
+    ctx.lineTo(valueToX(0), top + plotHeight)
+    ctx.stroke()
+  }
+}
+
+function drawTooltip(ctx: CanvasRenderingContext2D): void {
+  const tooltip = activeTooltip
+  if (tooltip == null) {
+    return
+  }
+  const tooltipOption = currentOption.tooltip
+  if (tooltipOption == null || tooltipOption.show == false) {
+    return
+  }
+  const bgColor = stringOrDefault(tooltipOption.backgroundColor, 'rgba(38,50,56,0.92)')
+  const txtColor = stringOrDefault(tooltipOption.textColor, '#ffffff')
+  const cornerRadius = numberOrDefault(tooltipOption.borderRadius, 4)
+  const axisLineColor = stringOrDefault(tooltipOption.axisLineColor, '#90a4ae')
+  const padding = 10
+  const lineHeight = 20
+  const colorBlockSize = 10
+  const colorBlockGap = 6
+  const headerGap = 6
+  ctx.font = '12px sans-serif'
+  let maxWidth = 0
+  const headerText = tooltip.categoryLabel
+  const headerWidth = ctx.measureText(headerText).width
+  if (headerWidth > maxWidth) {
+    maxWidth = headerWidth
+  }
+  for (const item of tooltip.items) {
+    const text = item.seriesName + ': ' + formatValue(item.value)
+    const textWidth = ctx.measureText(text).width
+    const rowWidth = colorBlockSize + colorBlockGap + textWidth
+    if (rowWidth > maxWidth) {
+      maxWidth = rowWidth
+    }
+  }
+  const boxWidth = maxWidth + padding * 2
+  const boxHeight = padding * 2 + lineHeight + headerGap + tooltip.items.length * lineHeight
+  let boxX = tooltip.x + 12
+  let boxY = tooltip.y - boxHeight / 2
+  if (boxX + boxWidth > canvasWidth - 8) {
+    boxX = tooltip.x - boxWidth - 12
+  }
+  if (boxY < 8) {
+    boxY = 8
+  }
+  if (boxY + boxHeight > canvasHeight - 8) {
+    boxY = canvasHeight - 8 - boxHeight
+  }
+  const enableAxisLine = tooltipOption.showAxisLine != false
+  const axisLineLayout = cartesianLayout
+  if (enableAxisLine && axisLineLayout != null) {
+    const layout = axisLineLayout
+    ctx.strokeStyle = axisLineColor
+    ctx.lineWidth = 1
+    ctx.setLineDash([4, 3])
+    ctx.beginPath()
+    ctx.moveTo(tooltip.x, layout.top)
+    ctx.lineTo(tooltip.x, layout.top + layout.plotHeight)
+    ctx.stroke()
+    ctx.setLineDash([])
+    const axisLineLabelColor = stringOrDefault(tooltipOption.axisLineLabelColor, '#ffffff')
+    const axisLineLabelBgColor = stringOrDefault(tooltipOption.axisLineLabelBgColor, axisLineColor)
+    const xLabelText = tooltip.categoryLabel
+    ctx.font = '11px sans-serif'
+    const xLabelWidth = ctx.measureText(xLabelText).width
+    const xLabelPadX = 6
+    const xLabelPadY = 3
+    const xLabelBoxW = xLabelWidth + xLabelPadX * 2
+    const xLabelBoxH = 14 + xLabelPadY * 2
+    const xLabelBoxX = tooltip.x - xLabelBoxW / 2
+    const xLabelBoxY = layout.top + layout.plotHeight + 6
+    ctx.fillStyle = axisLineLabelBgColor
+    ctx.beginPath()
+    const xlr = 3
+    ctx.moveTo(xLabelBoxX + xlr, xLabelBoxY)
+    ctx.lineTo(xLabelBoxX + xLabelBoxW - xlr, xLabelBoxY)
+    ctx.arcTo(xLabelBoxX + xLabelBoxW, xLabelBoxY, xLabelBoxX + xLabelBoxW, xLabelBoxY + xlr, xlr)
+    ctx.lineTo(xLabelBoxX + xLabelBoxW, xLabelBoxY + xLabelBoxH - xlr)
+    ctx.arcTo(xLabelBoxX + xLabelBoxW, xLabelBoxY + xLabelBoxH, xLabelBoxX + xLabelBoxW - xlr, xLabelBoxY + xLabelBoxH, xlr)
+    ctx.lineTo(xLabelBoxX + xlr, xLabelBoxY + xLabelBoxH)
+    ctx.arcTo(xLabelBoxX, xLabelBoxY + xLabelBoxH, xLabelBoxX, xLabelBoxY + xLabelBoxH - xlr, xlr)
+    ctx.lineTo(xLabelBoxX, xLabelBoxY + xlr)
+    ctx.arcTo(xLabelBoxX, xLabelBoxY, xLabelBoxX + xlr, xLabelBoxY, xlr)
+    ctx.closePath()
+    ctx.fill()
+    ctx.fillStyle = axisLineLabelColor
+    ctx.font = '11px sans-serif'
+    ctx.textAlign = 'center'
+    ctx.textBaseline = 'middle'
+    ctx.fillText(xLabelText, xLabelBoxX + xLabelBoxW / 2, xLabelBoxY + xLabelBoxH / 2)
+  }
+  const showAxisPointer = tooltipOption.showAxisPointer != false
+  const axisPointerLayout = cartesianLayout
+  if (showAxisPointer && axisPointerLayout != null && tooltip.items.length > 0) {
+    const layout = axisPointerLayout
+    const pointerLineColor = stringOrDefault(tooltipOption.axisPointerLineColor, axisLineColor)
+    const pointerLabelColor = stringOrDefault(tooltipOption.axisPointerLabelColor, '#ffffff')
+    const pointerLabelBgColor = stringOrDefault(tooltipOption.axisPointerLabelBgColor, axisLineColor)
+    for (const tipItem of tooltip.items) {
+      const itemY = tipItem.y
+      if (itemY < layout.top || itemY > layout.top + layout.plotHeight) {
+        continue
+      }
+      ctx.strokeStyle = pointerLineColor
+      ctx.lineWidth = 1
+      ctx.setLineDash([4, 3])
+      ctx.beginPath()
+      ctx.moveTo(layout.left, itemY)
+      ctx.lineTo(layout.left + layout.plotWidth, itemY)
+      ctx.stroke()
+      ctx.setLineDash([])
+      ctx.fillStyle = tipItem.color
+      ctx.beginPath()
+      ctx.arc(tooltip.x, itemY, 4, 0, Math.PI * 2)
+      ctx.fill()
+      ctx.fillStyle = '#ffffff'
+      ctx.beginPath()
+      ctx.arc(tooltip.x, itemY, 2, 0, Math.PI * 2)
+      ctx.fill()
+      const labelText = formatValue(tipItem.value)
+      ctx.font = '11px sans-serif'
+      const labelWidth = ctx.measureText(labelText).width
+      const labelPadX = 5
+      const labelPadY = 3
+      const labelBoxW = labelWidth + labelPadX * 2
+      const labelBoxH = 14 + labelPadY * 2
+      const labelBoxX = layout.left - labelBoxW - 4
+      const labelBoxY = itemY - labelBoxH / 2
+      ctx.fillStyle = pointerLabelBgColor
+      ctx.beginPath()
+      const lr = 3
+      ctx.moveTo(labelBoxX + lr, labelBoxY)
+      ctx.lineTo(labelBoxX + labelBoxW - lr, labelBoxY)
+      ctx.arcTo(labelBoxX + labelBoxW, labelBoxY, labelBoxX + labelBoxW, labelBoxY + lr, lr)
+      ctx.lineTo(labelBoxX + labelBoxW, labelBoxY + labelBoxH - lr)
+      ctx.arcTo(labelBoxX + labelBoxW, labelBoxY + labelBoxH, labelBoxX + labelBoxW - lr, labelBoxY + labelBoxH, lr)
+      ctx.lineTo(labelBoxX + lr, labelBoxY + labelBoxH)
+      ctx.arcTo(labelBoxX, labelBoxY + labelBoxH, labelBoxX, labelBoxY + labelBoxH - lr, lr)
+      ctx.lineTo(labelBoxX, labelBoxY + lr)
+      ctx.arcTo(labelBoxX, labelBoxY, labelBoxX + lr, labelBoxY, lr)
+      ctx.closePath()
+      ctx.fill()
+      ctx.fillStyle = pointerLabelColor
+      ctx.font = '11px sans-serif'
+      ctx.textAlign = 'center'
+      ctx.textBaseline = 'middle'
+      ctx.fillText(labelText, labelBoxX + labelBoxW / 2, labelBoxY + labelBoxH / 2)
+    }
+  }
+  ctx.fillStyle = bgColor
+  ctx.beginPath()
+  if (cornerRadius > 0) {
+    ctx.moveTo(boxX + cornerRadius, boxY)
+    ctx.lineTo(boxX + boxWidth - cornerRadius, boxY)
+    ctx.arcTo(boxX + boxWidth, boxY, boxX + boxWidth, boxY + cornerRadius, cornerRadius)
+    ctx.lineTo(boxX + boxWidth, boxY + boxHeight - cornerRadius)
+    ctx.arcTo(boxX + boxWidth, boxY + boxHeight, boxX + boxWidth - cornerRadius, boxY + boxHeight, cornerRadius)
+    ctx.lineTo(boxX + cornerRadius, boxY + boxHeight)
+    ctx.arcTo(boxX, boxY + boxHeight, boxX, boxY + boxHeight - cornerRadius, cornerRadius)
+    ctx.lineTo(boxX, boxY + cornerRadius)
+    ctx.arcTo(boxX, boxY, boxX + cornerRadius, boxY, cornerRadius)
+  } else {
+    ctx.rect(boxX, boxY, boxWidth, boxHeight)
+  }
+  ctx.closePath()
+  ctx.fill()
+  let textY = boxY + padding + lineHeight / 2
+  ctx.fillStyle = txtColor
+  ctx.font = '600 12px sans-serif'
+  ctx.textAlign = 'left'
+  ctx.textBaseline = 'middle'
+  ctx.fillText(headerText, boxX + padding, textY)
+  ctx.font = '12px sans-serif'
+  textY += lineHeight + headerGap
+  const showMarker = tooltipOption.showMarker != false
+  for (const item of tooltip.items) {
+    if (showMarker) {
+      ctx.fillStyle = item.color
+      ctx.fillRect(boxX + padding, textY - colorBlockSize / 2, colorBlockSize, colorBlockSize)
+    }
+    ctx.fillStyle = txtColor
+    ctx.textAlign = 'left'
+    ctx.textBaseline = 'middle'
+    const rowText = item.seriesName + ': ' + formatValue(item.value)
+    ctx.fillText(rowText, boxX + padding + (showMarker ? colorBlockSize + colorBlockGap : 0), textY)
+    textY += lineHeight
+  }
+}
+
+function render(progress: number = 1): void {
+  const ctx = renderingContext
+  if (ctx == null) {
+    return
+  }
+  ctx.clearRect(0, 0, canvasWidth, canvasHeight)
+  hitRegions = []
+  ctx.fillStyle = stringOrDefault(currentOption.backgroundColor, '#ffffff')
+  ctx.fillRect(0, 0, canvasWidth, canvasHeight)
+  const titleHeight = 0
+  let hasPie = false
+  let hasGauge = false
+  let hasRadar = false
+  let hasFunnel = false
+  let hasBoxplot = false
+  let hasCandlestick = false
+  let hasHorizontalBar = false
+  let hasHorizontalLine = false
+  let hasProgress = false
+  let hasScatterBar = false
+  for (let i = 0; i < currentOption.series.length; i++) {
+    if (hiddenSeries.has(i)) {
+      continue
+    }
+    const item = currentOption.series[i]
+    if (item.type == 'pie') {
+      hasPie = true
+    }
+    if (item.type == 'gauge') {
+      hasGauge = true
+    }
+    if (item.type == 'radar') {
+      hasRadar = true
+    }
+    if (item.type == 'funnel') {
+      hasFunnel = true
+    }
+    if (item.type == 'boxplot') {
+      hasBoxplot = true
+    }
+    if (item.type == 'candlestick') {
+      hasCandlestick = true
+    }
+    if (item.type == 'bar' && item.orient == 'horizontal') {
+      hasHorizontalBar = true
+    }
+    if (item.type == 'line' && item.orient == 'horizontal') {
+      hasHorizontalLine = true
+    }
+    if (item.type == 'progress') {
+      hasProgress = true
+    }
+    if (item.scatterData != null && item.scatterData.length > 0) {
+      hasScatterBar = true
+    }
+  }
+  if (hasProgress) {
+    drawProgress(ctx, titleHeight, progress)
+  } else if (hasRadar) {
+    drawRadar(ctx, titleHeight, progress)
+  } else if (hasFunnel) {
+    drawFunnel(ctx, titleHeight, progress)
+  } else if (hasBoxplot) {
+    drawBoxplot(ctx, titleHeight, progress)
+  } else if (hasCandlestick) {
+    drawCandlestick(ctx, titleHeight, progress)
+  } else if (hasGauge) {
+    drawGauge(ctx, titleHeight, progress)
+  } else if (hasPie) {
+    drawPie(ctx, titleHeight, progress)
+  } else if (hasScatterBar) {
+    drawScatterBar(ctx, titleHeight, progress)
+  } else if (hasHorizontalBar || hasHorizontalLine) {
+    drawHorizontalCartesian(ctx, titleHeight, progress)
+  } else {
+    drawCartesian(ctx, titleHeight, progress)
+  }
+  drawTooltip(ctx)
+}
+
+function cancelAnimation(): void {
+  const ctx = canvasContext
+  if (animationFrameId != 0 && ctx != null) {
+    ctx.cancelAnimationFrame(animationFrameId)
+    animationFrameId = 0
+  }
+}
+
+function startAnimation(): void {
+  cancelAnimation()
+  const ctx = canvasContext
+  if (ctx == null || currentOption.animation == false) {
+    render(1)
+    return
+  }
+  const duration = Math.max(0, currentOption.animationDuration ?? 500)
+  if (duration == 0) {
+    render(1)
+    return
+  }
+  const startTime = Date.now()
+  let renderFrame: ((timestamp: number) => void) | null = null
+  renderFrame = (_timestamp: number): void => {
+    const elapsed = Date.now() - startTime
+    const linearProgress = Math.min(1, elapsed / duration)
+    const progress = currentOption.animationEasing == 'linear' ? linearProgress : 1 - Math.pow(1 - linearProgress, 3)
+    render(progress)
+    const currentCtx = canvasContext
+    if (linearProgress < 1 && currentCtx != null) {
+      animationFrameId = currentCtx.requestAnimationFrame((ts: number) => {
+        const fn = renderFrame
+        if (fn != null) {
+          fn(ts)
+        }
+      })
+    } else {
+      animationFrameId = 0
+    }
+  }
+  const initialFn = renderFrame
+  if (initialFn != null) {
+    animationFrameId = ctx.requestAnimationFrame((ts: number) => {
+      const fn = renderFrame
+      if (fn != null) {
+        fn(ts)
+      }
+    })
+  }
+}
+
+function clearTooltipTimer(): void {
+  const timer = tooltipTimer
+  if (timer != null) {
+    clearTimeout(timer)
+    tooltipTimer = null
+  }
+}
+
+function hideTooltip(): void {
+  if (activeTooltip != null) {
+    activeTooltip = null
+    render(1)
+  }
+}
+
+function getDataURL(): string {
+  const cvs = canvas
+  if (cvs == null) {
+    return ''
+  }
+  return cvs.toDataURL('image/png')
+}
+
+function isHit(region: HitRegion, x: number, y: number): boolean {
+  if (region.type != 'pie') {
+    return x >= region.x && x <= region.x + region.width && y >= region.y && y <= region.y + region.height
+  }
+  const distanceX = x - region.centerX
+  const distanceY = y - region.centerY
+  const distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY)
+  const innerRadius = region.innerRadius ?? 0
+  if (distance > innerRadius && distance <= region.radius) {
+    let angle = Math.atan2(distanceY, distanceX)
+    let relativeAngle = angle - region.startAngle
+    while (relativeAngle < 0) {
+      relativeAngle += Math.PI * 2
+    }
+    return relativeAngle <= region.endAngle - region.startAngle
+  }
+  return false
+}
+
+function initCanvas(): void {
+  uni.createCanvasContextAsync({
+    id: props.canvasId,
+    component: instance,
+    success: (context: CanvasContext) => {
+      canvasContext = context
+      const ctx = context.getContext('2d')
+      if (ctx == null) {
+        return
+      }
+      renderingContext = ctx
+      canvas = ctx.canvas
+      updateCanvasStyleWidth()
+      getCanvasSize()
+      startAnimation()
+      emit('ready')
+    }
+  })
+}
+
+function setOption(option: ChartOption): void {
+  const previousWidth = canvasStyleWidth.value
+  let hasRealtimeSort = false
+  for (let seriesIndex = 0; seriesIndex < option.series.length; seriesIndex++) {
+    if (option.series[seriesIndex].realtimeSort == true) {
+      hasRealtimeSort = true
+      break
+    }
+  }
+  if (hasRealtimeSort) {
+    previousRealtimeCategoryLabels = currentOption.yAxis?.data?.slice() ?? []
+    previousRealtimeSeriesData = []
+    for (let seriesIndex = 0; seriesIndex < currentOption.series.length; seriesIndex++) {
+      previousRealtimeSeriesData.push(currentOption.series[seriesIndex].data.slice())
+    }
+  } else {
+    previousRealtimeCategoryLabels = []
+    previousRealtimeSeriesData = []
+  }
+  if (option.scatterBarMode != null) {
+    previousScatterBarMode = currentOption.scatterBarMode ?? ''
+  } else {
+    previousScatterBarMode = ''
+  }
+  currentOption = option
+  selectedPieIndex = -1
+  activeTooltip = null
+  clearTooltipTimer()
+  cartesianLayout = null
+  hiddenSeries = new Set()
+  updateCanvasStyleWidth()
+  if (renderingContext != null && previousWidth != canvasStyleWidth.value) {
+    nextTick(() => {
+      getCanvasSize()
+      startAnimation()
+    })
+  } else {
+    startAnimation()
+  }
+}
+
+function clear(): void {
+  cancelAnimation()
+  clearTooltipTimer()
+  const ctx = renderingContext
+  if (ctx != null) {
+    ctx.clearRect(0, 0, canvasWidth, canvasHeight)
+  }
+  hitRegions = []
+  activeTooltip = null
+  cartesianLayout = null
+  hiddenSeries = new Set()
+}
+
+function resize(): void {
+  if (renderingContext == null) {
+    return
+  }
+  getCanvasSize()
+  render()
+}
+
+function showTooltipForDataIndex(dataIndex: number, touchX: number, touchY: number): void {
+  const tooltipOption = currentOption.tooltip
+  if (tooltipOption == null || tooltipOption.show == false) {
+    return
+  }
+  const series = currentOption.series
+  const xAxis = currentOption.xAxis
+  const yAxis = currentOption.yAxis
+  const labels = cartesianLayout?.horizontal == true ? (yAxis?.data ?? []) : (xAxis?.data ?? [])
+  const categoryLabel = dataIndex < labels.length ? labels[dataIndex] : '第 ' + (dataIndex + 1).toFixed(0) + ' 项'
+  const items: TooltipItem[] = []
+  const respectLegend = tooltipOption.respectLegend != false
+  for (let si = 0; si < series.length; si++) {
+    if (respectLegend && hiddenSeries.has(si)) {
+      continue
+    }
+    const item = series[si]
+    if (dataIndex < item.data.length) {
+      const color = stringOrDefault(item.color, si % 2 == 0 ? '#2f80ed' : '#27ae60')
+      let itemY = touchY
+      const itemLayout = cartesianLayout
+      if (itemLayout != null) {
+        const layout = itemLayout
+        if (layout.horizontal) {
+          itemY = layout.top + layout.categoryHeight * (dataIndex + 0.5)
+        } else {
+          const value = item.data[dataIndex]
+          itemY = layout.top + (layout.maxValue - value) / (layout.maxValue - layout.minValue) * layout.plotHeight
+        }
+      }
+      items.push({
+        seriesName: stringOrDefault(item.name, item.type),
+        value: item.data[dataIndex],
+        color,
+        y: itemY
+      })
+    }
+  }
+  if (items.length == 0) {
+    return
+  }
+  let tooltipX = touchX
+  const tooltipLayout = cartesianLayout
+  if (tooltipLayout != null) {
+    const layout = tooltipLayout
+    if (layout.horizontal && items.length > 0) {
+      tooltipX = layout.left + (items[0].value - layout.minValue) / (layout.maxValue - layout.minValue) * layout.plotWidth
+    } else if (layout.hasBarSeries) {
+      tooltipX = layout.left + layout.categoryWidth * (dataIndex + 0.5)
+    } else {
+      tooltipX = layout.categoryCount == 1 ? layout.left + layout.plotWidth / 2 : layout.left + layout.step * dataIndex
+    }
+  }
+  activeTooltip = {
+    dataIndex,
+    seriesIndex: 0,
+    x: tooltipX,
+    y: cartesianLayout?.horizontal == true && items.length > 0 ? items[0].y : touchY,
+    categoryLabel,
+    items
+  }
+  render(1)
+  clearTooltipTimer()
+  const duration = numberOrDefault(tooltipOption.duration, 1800)
+  if (duration > 0) {
+    tooltipTimer = ((setTimeout(() => {
+      hideTooltip()
+    }, duration) as any) as number)
+  }
+}
+
+function findDataIndexByX(x: number): number {
+  const layout = cartesianLayout
+  if (layout == null) {
+    return -1
+  }
+  if (x < layout.left || x > layout.left + layout.plotWidth) {
+    return -1
+  }
+  if (layout.hasBarSeries) {
+    const index = Math.floor((x - layout.left) / layout.categoryWidth)
+    return Math.max(0, Math.min(layout.categoryCount - 1, index))
+  }
+  if (layout.categoryCount <= 1) {
+    return 0
+  }
+  const index = Math.round((x - layout.left) / layout.step)
+  return Math.max(0, Math.min(layout.categoryCount - 1, index))
+}
+
+function findDataIndexByY(y: number): number {
+  const layout = cartesianLayout
+  if (layout == null) {
+    return -1
+  }
+  if (y < layout.top || y > layout.top + layout.plotHeight) {
+    return -1
+  }
+  const categoryHeight = layout.plotHeight / layout.categoryCount
+  const index = Math.floor((y - layout.top) / categoryHeight)
+  return Math.max(0, Math.min(layout.categoryCount - 1, index))
+}
+
+function handleTouchEnd(event: TouchEvent): void {
+  if (props.gestureScroll && isHorizontalPanning) {
+    isHorizontalPanning = false
+    return
+  }
+  const touch = event.changedTouches.length > 0 ? event.changedTouches[0] : (event.touches.length > 0 ? event.touches[0] : null)
+  if (touch == null) {
+    return
+  }
+  let left = 0
+  let top = 0
+  const currentCanvas = canvas
+  if (currentCanvas != null) {
+    const rect = currentCanvas.getBoundingClientRect()
+    if (rect != null) {
+      left = rect.left
+      top = rect.top
+    }
+  }
+  const x = touch.clientX - left
+  const y = touch.clientY - top
+  const tooltipOption = currentOption.tooltip
+  const tooltipEnabled = tooltipOption != null && tooltipOption.show != false
+  let selectedRegion: HitRegion | null = null
+  for (let index = hitRegions.length - 1; index >= 0; index--) {
+    if (isHit(hitRegions[index], x, y)) {
+      selectedRegion = hitRegions[index]
+      break
+    }
+  }
+  if (selectedRegion != null) {
+    if (selectedRegion.type == 'legend') {
+      const si = selectedRegion.seriesIndex
+      if (hiddenSeries.has(si)) {
+        hiddenSeries.delete(si)
+      } else {
+        hiddenSeries.add(si)
+      }
+      hideTooltip()
+      render(1)
+      emit('click', {
+        x,
+        y,
+        type: 'legend',
+        seriesIndex: si,
+        dataIndex: -1,
+        seriesName: selectedRegion.name,
+        value: 0
+      })
+      return
+    }
+    if (selectedRegion.type == 'pie') {
+      selectedPieIndex = selectedRegion.dataIndex
+      render(1)
+    }
+    if (tooltipEnabled && selectedRegion.type != 'pie') {
+      clearTooltipTimer()
+      showTooltipForDataIndex(selectedRegion.dataIndex, x, y)
+    }
+    emit('click', {
+      x,
+      y,
+      type: selectedRegion.type,
+      seriesIndex: selectedRegion.seriesIndex,
+      dataIndex: selectedRegion.dataIndex,
+      seriesName: selectedRegion.name,
+      value: selectedRegion.value
+    })
+  } else {
+    let axisDataIndex = -1
+    const clickAxisLayout = cartesianLayout
+    if (tooltipEnabled && clickAxisLayout != null) {
+      const layout = clickAxisLayout
+      if (x < layout.left && y >= layout.top && y <= layout.top + layout.plotHeight) {
+        axisDataIndex = findDataIndexByY(y)
+      } else if (x >= layout.left && x <= layout.left + layout.plotWidth && y >= layout.top && y <= layout.top + layout.plotHeight) {
+        axisDataIndex = layout.horizontal ? findDataIndexByY(y) : findDataIndexByX(x)
+      }
+    }
+    if (axisDataIndex >= 0) {
+      clearTooltipTimer()
+      showTooltipForDataIndex(axisDataIndex, x, y)
+      emit('click', {
+        x,
+        y,
+        type: 'axis',
+        seriesIndex: -1,
+        dataIndex: axisDataIndex,
+        seriesName: '',
+        value: 0
+      })
+    } else {
+      if (tooltipEnabled) {
+        hideTooltip()
+      }
+      emit('click', {
+        x,
+        y,
+        type: 'none',
+        seriesIndex: -1,
+        dataIndex: -1,
+        seriesName: '',
+        value: 0
+      })
+    }
+  }
+}
+
+function handleTouchStart(event: TouchEvent): void {
+  if (props.gestureScroll == false || event.touches.length == 0) {
+    return
+  }
+  const touch = event.touches[0]
+  touchStartX = touch.clientX
+  touchStartY = touch.clientY
+  isHorizontalPanning = false
+}
+
+function handleTouchMove(event: TouchEvent): void {
+  if (props.gestureScroll == false || event.touches.length == 0 || isHorizontalPanning) {
+    return
+  }
+  const touch = event.touches[0]
+  const deltaX = Math.abs(touch.clientX - touchStartX)
+  const deltaY = Math.abs(touch.clientY - touchStartY)
+  if (deltaX > 8 && deltaX > deltaY) {
+    isHorizontalPanning = true
+  }
+}
+
+watch((): ChartOption => props.option, (option: ChartOption) => {
+  setOption(option)
+}, { deep: true })
+
+watch((): boolean => props.scrollable, (_value: boolean) => {
+  updateCanvasStyleWidth()
+  if (renderingContext != null) {
+    nextTick(() => {
+      getCanvasSize()
+      render()
+    })
+  }
+})
+
+onMounted(() => {
+  nextTick(() => {
+    initCanvas()
+  })
+})
+
+defineExpose({
+  setOption,
+  clear,
+  resize,
+  getDataURL
+})
+</script>
