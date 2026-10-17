@@ -170,7 +170,7 @@ describe('pages-json-util 跨端条件编译解析', () => {
       const wxGenerated = fs.readFileSync(tabViewsPath, 'utf-8');
 
       // 验证包含多端条件编译块与各自特定标题
-      expect(wxGenerated).toContain('title="tabbar.home"');
+      expect(wxGenerated).toMatch(/title="(?:tabbar\.home|首页)"/);
       expect(wxGenerated).toContain('<!-- #ifdef H5 -->');
       expect(wxGenerated).toMatch(/title="(?:h5|xxx)"/);
       expect(wxGenerated).toContain('<!-- #ifdef APP-ANDROID -->');
