@@ -47,8 +47,8 @@ export const tabbarBottomPaddingHeight = computed<number>((): number => {
     return 0;
   }
   const safeBottom = safeAreaBottom.value;
-  // 胶囊悬浮岛样式 (默认高度 64 + 底部偏移 12 + 安全区 + 4px 缓冲间距)
-  if (tabbarType == 'capsule') {
+  // 胶囊悬浮岛与液态玻璃浮岛样式 (默认高度 64 + 底部偏移 12 + 安全区 + 4px 缓冲间距)
+  if (tabbarType == 'capsule' || tabbarType == 'glass') {
     return 64 + 12 + safeBottom + 4;
   }
   // 非 H5 端（App / 小程序）：标准贴底底座 (default) 自身已作为普通文档流元素（tabbar-placeholder）

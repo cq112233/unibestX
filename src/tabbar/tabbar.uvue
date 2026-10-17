@@ -1,6 +1,8 @@
 <template>
   <!-- 悬浮胶囊风格 (type: 'capsule') -->
-  <CapsuleTabbar v-if="activeType == 'capsule'" :glass-effect="glassEffect" />
+  <CapsuleTabbar v-if="activeType == 'capsule'" />
+  <!-- 液态玻璃风格 (type: 'glass') -->
+  <GlassTabbar v-else-if="activeType == 'glass'" />
   <!-- 标准底座风格 (type: 'default') -->
   <DefaultTabbar v-else-if="activeType == 'default'" />
   <!-- 兜底使用标准底座风格（若扩展了其他自定义风格，可在此继续添加分支） -->
@@ -11,6 +13,7 @@
 import { computed } from 'vue';
 import CapsuleTabbar from './ui/capsule/index.uvue';
 import DefaultTabbar from './ui/default/index.uvue';
+import GlassTabbar from './ui/glass/index.uvue';
 import { tabbarType } from '@/src/tabbar/index.uts';
 
 const props = defineProps({
@@ -18,11 +21,6 @@ const props = defineProps({
   type: {
     type: String,
     default: ''
-  },
-  /** 是否开启毛玻璃效果（默认 false，胶囊形态下生效） */
-  glassEffect: {
-    type: Boolean,
-    default: false
   }
 });
 
