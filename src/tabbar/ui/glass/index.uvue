@@ -44,10 +44,10 @@ const props = defineProps({
     type: String,
     default: 'regular'
   },
-  /** 是否启用液态玻璃交互行为（仅 iOS 26+ 生效） */
+  /** 是否启用液态玻璃交互行为（仅 iOS 26+ 生效，底座 TabBar 默认设为 false 避免原生拦截点击手势） */
   interactive: {
     type: Boolean,
-    default: true
+    default: false
   },
   /** 施加在液态玻璃效果上的着色（仅 iOS 26+ 生效） */
   tintColor: {
@@ -253,8 +253,6 @@ const bottom = computed<string>((): string => {
           v-for="(item, index) in tabbarList"
           :key="item.pagePath.length > 0 ? item.pagePath : `${item.text}_${index}`"
           class="glass-item-slot"
-          hover-class="glass-item-hover"
-          :hover-stay-time="100"
           @click="onTabClick(index)"
         >
           <view class="glass-item-inner">
@@ -313,8 +311,6 @@ const bottom = computed<string>((): string => {
         v-for="(item, index) in tabbarList"
         :key="item.pagePath.length > 0 ? item.pagePath : `${item.text}_${index}`"
         class="glass-item-slot"
-        hover-class="glass-item-hover"
-        :hover-stay-time="100"
         @click="onTabClick(index)"
       >
         <view class="glass-item-inner">
@@ -364,7 +360,7 @@ const bottom = computed<string>((): string => {
   width: 100%;
 }
 
-/* 悬浮液态玻璃底座主容器（全端统一使用 view 胶囊外壳，强制 34px 圆角裁切、边框与浮雕投影） */
+/* 悬浮液态玻璃底座主容器（全端统一使用 view 胶囊外壳，强制 34px 圆角裁切、边框与轻量投影） */
 .custom-glass-container {
   position: absolute;
   right: 16px;
@@ -377,7 +373,8 @@ const bottom = computed<string>((): string => {
   border-style: solid;
   border-radius: 34px;
   overflow: hidden;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  /* 轻量弱阴影，规避 Android 原生端阴影重绘掉帧 */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 /* iOS 原生液态玻璃内部容器（撑满外壳并继承 34px 胶囊圆角） */
@@ -419,9 +416,10 @@ const bottom = computed<string>((): string => {
   align-items: center;
   width: 25%;
   height: 100%;
+  pointer-events: none;
   /* #ifndef APP */
   transition-property: transform;
-  transition-duration: 220ms;
+  transition-duration: 120ms;
   transition-timing-function: cubic-bezier(0.25, 1, 0.5, 1);
   /* #endif */
 }
@@ -431,6 +429,7 @@ const bottom = computed<string>((): string => {
   width: 90%;
   height: 84%;
   border-radius: 20px;
+  pointer-events: none;
 }
 
 /* 单个 Tab 格位 */
@@ -441,7 +440,7 @@ const bottom = computed<string>((): string => {
   align-items: center;
   flex: 1;
   height: 100%;
-  background-color: transparent;
+  background-color: rgba(0, 0, 0, 0);
 }
 
 /* 原生点击轻触反馈态 */
