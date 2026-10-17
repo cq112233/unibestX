@@ -1,6 +1,6 @@
 <template>
   <!-- 悬浮胶囊风格 (type: 'capsule') -->
-  <CapsuleTabbar v-if="activeType == 'capsule'" :glass-effect="glassEffect" />
+  <CapsuleTabbar v-if="activeType == 'capsule'" />
   <!-- 液态玻璃风格 (type: 'glass' 或 'liquid-glass') -->
   <GlassTabbar
     v-else-if="activeType == 'glass' || activeType == 'liquid-glass'"
@@ -26,11 +26,6 @@ const props = defineProps({
   type: {
     type: String,
     default: ''
-  },
-  /** 是否开启毛玻璃效果（默认 false，胶囊形态下生效） */
-  glassEffect: {
-    type: Boolean,
-    default: false
   },
   /** 液态玻璃样式：'regular'（常规）| 'clear'（通透）（液态玻璃形态下生效） */
   glassStyle: {
