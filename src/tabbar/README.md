@@ -55,7 +55,7 @@ src/tabbar/
 └── ui/
     ├── template.uvue             # 新 UI 形态的模板（复制它来扩展）
     ├── capsule/index.uvue        # 悬浮胶囊岛屿形态（type: 'capsule'）
-    ├── glass/index.uvue          # 悬浮液态玻璃形态（type: 'glass' / 'liquid-glass'，iOS 26+ 原生 glass-effect-view + 多端降级）
+    ├── glass/index.uvue          # 悬浮液态玻璃形态（type: 'glass'，iOS 26+ 原生 glass-effect-view + 多端降级）
     └── default/                  # 标准贴底形态（type: 'default'）
         ├── index.uvue
         └── TabbarItem.uvue

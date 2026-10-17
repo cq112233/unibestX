@@ -1,9 +1,9 @@
 <template>
   <!-- 悬浮胶囊风格 (type: 'capsule') -->
   <CapsuleTabbar v-if="activeType == 'capsule'" />
-  <!-- 液态玻璃风格 (type: 'glass' 或 'liquid-glass') -->
+  <!-- 液态玻璃风格 (type: 'glass') -->
   <GlassTabbar
-    v-else-if="activeType == 'glass' || activeType == 'liquid-glass'"
+    v-else-if="activeType == 'glass'"
     :glass-style="glassStyle"
     :interactive="interactive"
     :tint-color="tintColor"
