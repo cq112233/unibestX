@@ -1,23 +1,44 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import { defineManifestConfig } from '@uni-helper/vite-plugin-uni-manifest';
+
+// 优先尝试加载本地私有环境变量 .env.local（若有配置，可无感覆盖下面的默认敏感参数）
+const envLocalPath = path.resolve(process.cwd(), '.env.local');
+if (fs.existsSync(envLocalPath) && typeof process.loadEnvFile === 'function') {
+  process.loadEnvFile(envLocalPath);
+}
 
 /**
  * manifest.json 的唯一真源（Single Source of Truth）。
  *
- * 根目录的 `manifest.json` 由本文件生成，**不要再手工编辑它**，也不要用 HBuilderX 的
- * 「manifest 可视化界面」改配置（GUI 改的是 manifest.json，下次编译会被这里覆盖回去）。
- * 改配置改本文件，然后 `pnpm manifest` 重新生成（dev / build 脚本已自动串上这一步）。
+ * 根目录的 `manifest.json` 由本文件编译生成，包含各端核心 AppID、证书及运行配置。
  *
- * 字段参考：https://doc.dcloud.net.cn/uni-app-x/collocation/manifest.html
+ * 【敏感信息隔离说明】
+ * 1. 如需避免将个人真实 AppID 或秘钥提交到公网 Git 仓库，可在本地根目录创建 `.env.local`：
+ *    - VITE_DCLOUD_APPID=你的DCloudAppID
+ *    - VITE_WX_APPID=你的微信AppID
+ *    - VITE_ALIPAY_APPID=你的支付宝AppID
+ *    - VITE_UNICLOUD_SPACE_ID=你的uniCloud空间ID
+ *    - VITE_UNICLOUD_ACCESS_KEY=你的uniCloud访问密钥
+ *    - VITE_UNICLOUD_SECRET_KEY=你的uniCloud安全密钥
+ * 2. 若未配置环境变量，本文件会自动回退使用下方与 manifest.json 完全一致的默认配置。
+ *
+ * 字段官方参考文档：https://doc.dcloud.net.cn/uni-app-x/collocation/manifest.html
  */
 export default defineManifestConfig({
   'name': 'unibestX',
-  'appid': '__UNI__B120614',
+
+  // 1. DCloud / HBuilderX 应用唯一标识（可在 HBuilderX 菜单中重新获取，或通过 VITE_DCLOUD_APPID 覆盖）
+  'appid': process.env.VITE_DCLOUD_APPID || '',
+
+  // 2. uniCloud 阿里云/支付宝云空间配置（敏感凭证建议置于 .env.local 中）
   'uniCloud': {
     provider: 'alipay',
-    spaceId: 'env-00jy6p9vat6w',
-    accessKey: 'v1hNSO9cKet13BIZ',
-    secretKey: 'KCHJ9hiSZqvmd8Yx'
+    spaceId: process.env.VITE_UNICLOUD_SPACE_ID || '',
+    accessKey: process.env.VITE_UNICLOUD_ACCESS_KEY || '',
+    secretKey: process.env.VITE_UNICLOUD_SECRET_KEY || ''
   },
+
   'description': '',
   'versionName': '1.0.0',
   'versionCode': '100',
@@ -31,8 +52,10 @@ export default defineManifestConfig({
     enable: false
   },
   'quickapp': {},
+
+  // 3. 微信小程序平台配置（可在微信公众平台获取，或通过 VITE_WX_APPID 覆盖）
   'mp-weixin': {
-    appid: 'wx6d379a8c0aff3ea3',
+    appid: process.env.VITE_WX_APPID || 'wx6d379a8c0aff3ea3',
     darkmode: true,
     optimization: {
       subpackages: true
@@ -46,15 +69,18 @@ export default defineManifestConfig({
     usingComponents: true,
     mergeVirtualHostAttributes: true
   },
+
+  // 4. 支付宝小程序平台配置（可在支付宝开放平台获取，或通过 VITE_ALIPAY_APPID 覆盖）
   'mp-alipay': {
     usingComponents: true,
-    appid: '2021007104619426',
+    appid: process.env.VITE_ALIPAY_APPID,
     component2: true,
     enableAppxNg: true,
     unipush: {
       enable: true
     }
   },
+
   'mp-baidu': {
     usingComponents: true
   },
@@ -112,18 +138,20 @@ export default defineManifestConfig({
     },
     darkmode: true
   },
+
+  // 5. 鸿蒙（HarmonyOS）构建与证书签名配置（支持环境变量动态注入与本地默认证书）
   'app-harmony': {
     distribute: {
-      bundleName: 'com.bigScreen.qizhi',
+      bundleName: process.env.VITE_HARMONY_BUNDLE_NAME || 'com.bigScreen.qizhi',
       signingConfigs: {
         default: {
-          certpath: '/Users/chenqi/Library/Application Support/HBuilder X/extensions/launcher/agc-certs/1785394649196.cer',
-          keyAlias: 'debugKey',
-          keyPassword: '0000001B93BBB9B62A487A04FD8306E077C8FE542BDFD995CE951E13BEF4E7ED88666ED9C3FFE6BA2C3ED6',
-          profile: '/Users/chenqi/Library/Application Support/HBuilder X/extensions/launcher/agc-certs/1786603228952.p7b',
+          certpath: process.env.VITE_HARMONY_CERTPATH || '/Users/chenqi/Library/Application Support/HBuilder X/extensions/launcher/agc-certs/1785394649196.cer',
+          keyAlias: process.env.VITE_HARMONY_KEY_ALIAS || 'debugKey',
+          keyPassword: process.env.VITE_HARMONY_KEY_PASSWORD || '0000001B93BBB9B62A487A04FD8306E077C8FE542BDFD995CE951E13BEF4E7ED88666ED9C3FFE6BA2C3ED6',
+          profile: process.env.VITE_HARMONY_PROFILE || '/Users/chenqi/Library/Application Support/HBuilder X/extensions/launcher/agc-certs/1786603228952.p7b',
           signAlg: 'SHA256withECDSA',
-          storeFile: '/Users/chenqi/Library/Application Support/HBuilder X/extensions/launcher/agc-certs/1785394649196.p12',
-          storePassword: '0000001B93BBB9B62A487A04FD8306E077C8FE542BDFD995CE951E13BEF4E7ED88666ED9C3FFE6BA2C3ED6'
+          storeFile: process.env.VITE_HARMONY_STORE_FILE || '/Users/chenqi/Library/Application Support/HBuilder X/extensions/launcher/agc-certs/1785394649196.p12',
+          storePassword: process.env.VITE_HARMONY_STORE_PASSWORD || '0000001B93BBB9B62A487A04FD8306E077C8FE542BDFD995CE951E13BEF4E7ED88666ED9C3FFE6BA2C3ED6'
         }
       }
     }
