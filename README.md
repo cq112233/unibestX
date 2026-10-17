@@ -258,7 +258,8 @@ pnpm lint           # ESLint 检查（含 UTS 强类型与 UVUE 模板规则）
 pnpm lint:fix       # ESLint 自动修复
 pnpm lint:style     # Stylelint 样式检查（支持 SCSS / CSS / UVUE <style>）
 pnpm lint:style:fix # Stylelint 样式自动修复
-pnpm lint:all       # 全量代码与样式校验（ESLint + Stylelint）
+pnpm release       # 工业级交互式版本发布（基于 bumpp + conventional-changelog 自动生成 CHANGELOG、Commit、打 Tag 并推送触发 GitHub Actions）
+pnpm changelog     # 根据 Conventional Commits 规范增量提取并生成/追加到 CHANGELOG.md
 pnpm docs:dev       # 本地启动 VitePress 文档站
 ```
 
