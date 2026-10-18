@@ -1,0 +1,71 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    // =========================================================================
+    // 🧪 Vitest 单元测试断点调试 (支持源码行打红点断点单步调试)
+    // =========================================================================
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "🧪 Vitest: 智能断点调试 (当前单测/全量兜底)",
+      "autoAttachChildProcesses": true,
+      "skipFiles": [
+        "<node_internals>/**",
+        "**/node_modules/**"
+      ],
+      "program": "${workspaceFolder}/scripts/debug-test.mjs",
+      "args": [
+        "${relativeFile}"
+      ],
+      "smartStep": true,
+      "console": "integratedTerminal"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "🧪 Vitest: Debug 全部单元测试",
+      "autoAttachChildProcesses": true,
+      "skipFiles": [
+        "<node_internals>/**",
+        "**/node_modules/**"
+      ],
+      "program": "${workspaceFolder}/node_modules/vitest/vitest.mjs",
+      "args": [
+        "run"
+      ],
+      "smartStep": true,
+      "console": "integratedTerminal"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "🧪 Vitest: Debug 监听交互模式 (Watch)",
+      "autoAttachChildProcesses": true,
+      "skipFiles": [
+        "<node_internals>/**",
+        "**/node_modules/**"
+      ],
+      "program": "${workspaceFolder}/scripts/debug-test.mjs",
+      "args": [
+        "${relativeFile}",
+        "--watch"
+      ],
+      "console": "integratedTerminal"
+    },
+
+    // =========================================================================
+    // 🛠️ Node.js 脚本断点调试 (针对 scripts/ 下的工程化脚本)
+    // =========================================================================
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "🛠️ Node: Debug 当前运行脚本 (${fileBasename})",
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "program": "${file}",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal"
+    }
+  ]
+}
