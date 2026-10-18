@@ -1,0 +1,27 @@
+/* eslint-disable */
+// @ts-ignore
+import { request } from '@/src/http/openapi.uts';
+import type { OpenApiRequestOptions } from '@/src/http/openapi.uts';
+
+import * as API from './types.uts';
+
+/** 餐饮具消毒记录 POST /gateway/tablewareDisinfectionReport/page */
+export function tablewareDisinfectionReportPageUsingPost({
+  body,
+  options,
+}: {
+  body: API.TablewareDisinfectionReportPageUsingPostBody;
+  options?: OpenApiRequestOptions;
+}) {
+  return request<API.TablewareDisinfectionReportPageUsingPostResponse>(
+    '/gateway/tablewareDisinfectionReport/page',
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      data: body,
+      ...(options || {}),
+    }
+  );
+}

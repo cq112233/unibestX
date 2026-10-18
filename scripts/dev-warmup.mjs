@@ -42,6 +42,56 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const CLI_CACHE_FILE = path.join(ROOT, 'node_modules', '.hbuilderx-cli-path');
 
 /**
+ * 自动填充 HBUILDERX_CLI_PATH 环境变量：
+ * 避免在 macOS / Linux 上 HBuilderX 未开启时，uni-launch 找不到 cli 路径报错退出。
+ */
+function populateHbuilderxCliEnv() {
+  if (process.env.HBUILDERX_CLI_PATH && fs.existsSync(process.env.HBUILDERX_CLI_PATH)) {
+    return;
+  }
+
+  // 1. 尝试从 process.env 或 .env 文件的 HBUILDERX_PLUGINS_PATH 反推 cli
+  let pluginsPath = process.env.HBUILDERX_PLUGINS_PATH;
+  if (!pluginsPath) {
+    const envFile = path.join(ROOT, '.env');
+    if (fs.existsSync(envFile)) {
+      try {
+        const envContent = fs.readFileSync(envFile, 'utf-8');
+        const match = envContent.match(/^HBUILDERX_PLUGINS_PATH=(.+)$/m);
+        if (match && match[1]) {
+          pluginsPath = match[1].trim();
+        }
+      }
+      catch {}
+    }
+  }
+
+  if (pluginsPath) {
+    const candidate = path.resolve(pluginsPath, '..', '..', 'MacOS', 'cli');
+    if (fs.existsSync(candidate)) {
+      process.env.HBUILDERX_CLI_PATH = candidate;
+      return;
+    }
+  }
+
+  // 2. macOS 常见位置推导（优先 Alpha，再稳定版）
+  if (process.platform === 'darwin') {
+    const macCandidates = [
+      '/Applications/HBuilderX-Alpha.app/Contents/MacOS/cli',
+      '/Applications/HBuilderX.app/Contents/MacOS/cli'
+    ];
+    for (const p of macCandidates) {
+      if (fs.existsSync(p)) {
+        process.env.HBUILDERX_CLI_PATH = p;
+        return;
+      }
+    }
+  }
+}
+
+populateHbuilderxCliEnv();
+
+/**
  * 确认 HBuilderX 在运行，并把它的 cli.exe 交给 uni-launch；没在运行就直接拦下。
  *
  * 为什么要自己拦这一步：uni-launch 拿到 cli 路径后，只要它认为「HBuilderX 没在运行」
@@ -248,17 +298,68 @@ setTimeout(() => {
   }
 }, READY_TIMEOUT_MS).unref();
 
-function cleanupAndExit() {
-  const targetPort = actualPort || PORT;
+/**
+ * 杀死占用指定端口的服务端进程（仅针对 LISTENING 状态，严禁误杀客户端进程或 HBuilderX）
+ */
+function killPortProcesses(port) {
+  const targetPort = port || actualPort || PORT;
   try {
     if (process.platform === 'win32') {
-      execSync(`for /f "tokens=5" %a in ('netstat -aon ^| findstr :${targetPort}') do taskkill /F /PID %a`, { stdio: 'ignore' });
+      const out = execSync(`netstat -ano -p tcp | findstr /R /C:":${targetPort} .*LISTENING"`, {
+        encoding: 'utf-8',
+        stdio: ['ignore', 'pipe', 'ignore']
+      });
+      const pids = out.split(/\r?\n/)
+        .map(line => line.trim().split(/\s+/).pop())
+        .filter(pid => pid && /^\d+$/.test(pid) && pid !== '0');
+      for (const pid of pids) {
+        try {
+          const procName = execSync(`tasklist /FI "PID eq ${pid}" /FO CSV /NH`, {
+            encoding: 'utf-8',
+            stdio: ['ignore', 'pipe', 'ignore']
+          });
+          if (/hbuilder/i.test(procName)) {
+            continue;
+          }
+          execSync(`taskkill /F /PID ${pid}`, { stdio: 'ignore' });
+        }
+        catch {}
+      }
     }
     else {
-      execSync(`lsof -ti:${targetPort} | xargs kill -9`, { stdio: 'ignore' });
+      // 必须加 -sTCP:LISTEN！绝不查 ESTABLISHED 等客户端连接（否则会命中并误杀 HBuilderX 内置浏览器进程）
+      const out = execSync(`lsof -ti tcp:${targetPort} -sTCP:LISTEN`, {
+        encoding: 'utf-8',
+        stdio: ['ignore', 'pipe', 'ignore']
+      });
+      const pids = out.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+      for (const pid of pids) {
+        try {
+          const comm = execSync(`ps -p ${pid} -o comm=`, {
+            encoding: 'utf-8',
+            stdio: ['ignore', 'pipe', 'ignore']
+          });
+          // 绝对不能误杀 HBuilderX 进程
+          if (/hbuilder/i.test(comm)) {
+            continue;
+          }
+          process.kill(Number(pid), 'SIGKILL');
+        }
+        catch {}
+      }
     }
   }
   catch {}
+}
+
+function cleanupAndExit() {
+  if (child && !child.killed) {
+    try {
+      child.kill('SIGINT');
+    }
+    catch {}
+  }
+  killPortProcesses(actualPort || PORT);
   process.exit(0);
 }
 

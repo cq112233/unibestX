@@ -1,0 +1,257 @@
+/**
+ * 业务 HTTP 实例工厂 (Business HTTP Instance Factory)
+ *
+ * 职责：
+ * 1. 封装业务 Token 鉴权、无感刷新、统一 Toast 提示与业务错误码解包；
+ * 2. 提供 `createApiInstance` 与 `buildApiInstanceOptions`，支持为不同 API 基础地址创建专用的独立 HttpClient 实例与配置。
+ */
+
+import type { LimeRequestConfig, Request } from '@/uni_modules/lime-request';
+import { useTokenStore } from '@/src/store/index.uts';
+import { toLoginPage } from '@/src/utils/auth/toLoginPage.uts';
+import {
+  ContentTypeEnum,
+  createHttpClient,
+  defaultLifecycle,
+  defaultRequestAdapter,
+  extractErrorMessage,
+  extractStatusCode,
+  ResultEnum
+} from '../../request/request.uts';
+import type {
+  HttpClient,
+  HttpClientOptions,
+  RespondedOptions
+} from '../../request/request.uts';
+import {
+  BusinessError,
+  resolveErrorMessage
+} from '../../error/error.uts';
+import { tryRefreshToken } from '../../request/internal/refresh.uts';
+import { getApiBaseUrl, getH5UseProxy } from '@/src/config/index.uts';
+import { resolveServiceBaseUrl } from './config.uts';
+
+// ==========================================
+// 业务拦截器生成函数
+// ==========================================
+
+/**
+ * 业务默认请求前置拦截钩子：处理业务 Token 鉴权注入
+ * @param config 会被原地改写的请求配置
+ */
+export function defaultBusinessBeforeRequest(config: LimeRequestConfig): void {
+  // 业务 Token 鉴权与自动注入
+  if (config.header == null) {
+    config.header = {} as UTSJSONObject;
+  }
+  const header = config.header as UTSJSONObject;
+  const extra = config.extra;
+  let ignoreAuth = false;
+  if (extra != null) {
+    const extraObj = extra as UTSJSONObject;
+    const authVal = typeof extraObj.getBoolean == 'function'
+      ? extraObj.getBoolean('ignoreAuth')
+      : (extraObj.ignoreAuth as boolean | null);
+    if (authVal == true) {
+      ignoreAuth = true;
+    }
+  }
+  if (!ignoreAuth) {
+    const existingToken = typeof header.getString == 'function'
+      ? header.getString('token')
+      : (header.token as string | null);
+    if (existingToken == null || existingToken == '') {
+      const tokenStore = useTokenStore();
+      const token = tokenStore.getToken();
+      if (token == '') {
+        throw new Error('[请求错误]：未登录');
+      }
+      header.token = token;
+    }
+  }
+}
+
+/**
+ * 业务默认响应成功钩子：状态码判定、业务 code 校验、Toast 提示、业务 401 标记与数据解包
+ */
+export function defaultBusinessAfterSuccess(data: any, config: LimeRequestConfig): any {
+  if (data == null) {
+    throw new Error('返回的响应数据为空');
+  }
+  const resultObj = JSON.parseObject(JSON.stringify(data));
+  if (resultObj != null) {
+    const code = resultObj.getNumber('code');
+    if (code != null) {
+      const codeVal = code as number;
+      if (codeVal != ResultEnum.Success0 && codeVal != ResultEnum.Success200) {
+        const msgByKey = resultObj.message as string | null;
+        const msgByMsg = resultObj.msg as string | null;
+        const message: string = msgByKey != null ? msgByKey : (msgByMsg != null ? msgByMsg : '未知错误');
+
+        const extra = config.extra;
+        let toastEnabled = true;
+        if (extra != null) {
+          const toastVal = (extra as UTSJSONObject).getBoolean('toast');
+          if (toastVal == false) {
+            toastEnabled = false;
+          }
+        }
+        if (toastEnabled) {
+          uni.showToast({ title: message, icon: 'none' });
+        }
+        if (codeVal == ResultEnum.Unauthorized) {
+          let skipRefresh = false;
+          if (extra != null) {
+            const skipVal = (extra as UTSJSONObject).getBoolean('skipRefresh');
+            if (skipVal == true) {
+              skipRefresh = true;
+            }
+          }
+          if (skipRefresh) {
+            throw new BusinessError(message, codeVal);
+          }
+          throw new Error('__REFRESHABLE_401__');
+        }
+        throw new BusinessError(message, codeVal);
+      }
+    }
+    const innerData = resultObj.get('data');
+    if (innerData != null) {
+      return innerData;
+    }
+  }
+  return data;
+}
+
+/**
+ * 业务默认响应失败钩子：统一网络错误提示
+ */
+export function defaultBusinessAfterError(err: any, _config: LimeRequestConfig): void {
+  console.error('request error ===>', err);
+  const rawMsg = extractErrorMessage(err);
+  if (rawMsg.toLowerCase().includes('abort')) {
+    return;
+  }
+  if (err instanceof BusinessError) {
+    return;
+  }
+  uni.showToast({ title: resolveErrorMessage(rawMsg, -1, extractStatusCode(err)).message, icon: 'none' });
+}
+
+/**
+ * 业务默认响应完成钩子：请求收尾处理
+ */
+export function defaultBusinessAfterComplete(_config: LimeRequestConfig): void {
+  // 默认收尾钩子，供业务埋点、关闭全屏 loading 等扩展
+}
+
+// ==========================================
+// 实例配置构建与工厂函数
+// ==========================================
+
+/**
+ * 构建针对特定 API 基础地址的业务 HttpClientOptions 配置项
+ *
+ * 自动装配业务标准能力（Token 鉴权、401 无感刷新、业务 code 校验拆包、网络错误统一提示），
+ * 支持传入不同的 baseURL 以及自定义 H5 代理字段。
+ *
+ * @param baseURL API 服务根地址（默认 getApiBaseUrl()）
+ * @param proxyPrefix H5 开启代理时的代理前缀字段（默认第一个字段 '/api'，第二个参数可指定自定义代理字段）
+ * @param customOptions 可选的个性化定制参数（可覆盖 header / timeout / 拦截钩子等）
+ * @returns 完整的业务 HttpClientOptions 配置项
+ */
+export function buildApiInstanceOptions(
+  baseURL: string = '',
+  proxyPrefix: string = '',
+  customOptions: HttpClientOptions | null = null
+): HttpClientOptions {
+  const targetBaseUrl = baseURL != '' ? baseURL : getApiBaseUrl();
+  let effectiveBaseUrl: string = targetBaseUrl;
+  // #ifdef H5
+  if (getH5UseProxy()) {
+    effectiveBaseUrl = resolveServiceBaseUrl(targetBaseUrl, proxyPrefix);
+  }
+  // #endif
+
+  const options: HttpClientOptions = {
+    baseURL: effectiveBaseUrl,
+    timeout: customOptions?.timeout ?? 5000,
+    header: (customOptions?.header ?? {
+      'Content-Type': ContentTypeEnum.AppJson,
+      'Accept': 'application/json, text/plain, */*'
+    } as UTSJSONObject) as UTSJSONObject,
+    requestAdapter: (config: LimeRequestConfig): Request => {
+      if (customOptions?.requestAdapter != null) {
+        return customOptions.requestAdapter!(config);
+      }
+      return defaultRequestAdapter(config);
+    },
+    lifecycle: customOptions?.lifecycle ?? defaultLifecycle,
+    beforeRequest: (config: LimeRequestConfig): void => {
+      if (customOptions?.beforeRequest != null) {
+        customOptions.beforeRequest!(config);
+      }
+      else {
+        defaultBusinessBeforeRequest(config);
+      }
+    },
+    responded: {
+      onSuccess: (data: any, config: LimeRequestConfig): any => {
+        if (customOptions?.responded?.onSuccess != null) {
+          return customOptions.responded.onSuccess!(data, config);
+        }
+        return defaultBusinessAfterSuccess(data, config);
+      },
+      onError: (err: any, config: LimeRequestConfig): void => {
+        if (customOptions?.responded?.onError != null) {
+          customOptions.responded.onError!(err, config);
+        }
+        else {
+          defaultBusinessAfterError(err, config);
+        }
+      },
+      onComplete: (config: LimeRequestConfig): void => {
+        if (customOptions?.responded?.onComplete != null) {
+          customOptions.responded.onComplete!(config);
+        }
+        else {
+          defaultBusinessAfterComplete(config);
+        }
+      }
+    } as RespondedOptions,
+    refreshToken: (): Promise<boolean> => {
+      if (customOptions?.refreshToken != null) {
+        return customOptions.refreshToken!();
+      }
+      return tryRefreshToken();
+    },
+    onUnauthorized: () => {
+      if (customOptions?.onUnauthorized != null) {
+        customOptions.onUnauthorized!();
+      }
+      else {
+        const tokenStore = useTokenStore();
+        tokenStore.clearToken();
+        toLoginPage({ mode: 'reLaunch' } as UTSJSONObject);
+      }
+    }
+  };
+
+  return options;
+}
+
+/**
+ * 创建针对特定 API 基础地址的业务 HttpClient 实例
+ *
+ * @param baseURL API 服务根地址（默认 getApiBaseUrl()）
+ * @param proxyPrefix H5 开启代理时的代理前缀字段（默认第一个字段 '/api'，第二个参数可指定自定义代理字段）
+ * @param customOptions 可选的个性化定制参数（可覆盖 header / timeout / 拦截钩子等）
+ * @returns 独立的 HttpClient 实例
+ */
+export function createApiInstance(
+  baseURL: string = '',
+  proxyPrefix: string = '',
+  customOptions: HttpClientOptions | null = null
+): HttpClient {
+  return createHttpClient(buildApiInstanceOptions(baseURL, proxyPrefix, customOptions));
+}

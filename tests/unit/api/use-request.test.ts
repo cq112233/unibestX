@@ -5,7 +5,7 @@ import { useRequest } from '@/src/http/hooks/useRequest.uts';
 import { BusinessError } from '@/src/http/error/error.uts';
 // 精准导入（红线 36）：经门面 `index.uts` 的 `export *` 拿 `http` 时，与 @vue/test-utils 同文件
 // 导入会命中 esbuild 的命名绑定解析问题，`http` 变成 undefined。深层路径正常，也是本仓测试的既有写法。
-import { http } from '@/src/http/request/request.uts';
+import { http } from '@/src/http/instances/index.uts';
 
 /**
  * useRequest（组合式请求 hook）行为验证

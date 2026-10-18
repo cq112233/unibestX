@@ -1,0 +1,14 @@
+/**
+ * 副业务 HTTP 实例 (Secondary HTTP Instance)
+ *
+ * 接口基础地址指向 VITE_SERVER_BASEURL_SECONDARY
+ */
+
+import { getApiSecondaryUrl } from '@/src/config/index.uts';
+import type { HttpClient } from '../request/request.uts';
+import { createApiInstance } from './internal/factory.uts';
+
+/**
+ * 备用/副业务 HTTP 客户端单例（指向 VITE_SERVER_BASEURL_SECONDARY，H5 代理时走指定字段 /api-secondary）
+ */
+export const secondaryHttp: HttpClient = createApiInstance(getApiSecondaryUrl(), '/api-secondary');

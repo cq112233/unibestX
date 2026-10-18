@@ -1,0 +1,42 @@
+/**
+ * 业务 API 域名与服务解析配置 (Business API Domain Config)
+ */
+
+import { getApiBaseUrl, getH5UseProxy } from '@/src/config/index.uts';
+
+/**
+ * 根据请求路径和指定代理字段，解析目标 BaseURL
+ *
+ * @param url 接口路径或完整地址
+ * @param proxyPrefix H5 开启代理时的代理前缀（默认空字符串，有则走代理前缀，无则返回空字符串）
+ */
+export function resolveServiceBaseUrl(url: string = '', proxyPrefix: string = ''): string {
+  // #ifdef H5
+  if (getH5UseProxy()) {
+    let prefix = proxyPrefix.trim();
+    if (prefix != '' && !prefix.startsWith('/')) {
+      prefix = `/${prefix}`;
+    }
+
+    if (prefix == '' && url.includes('/gateway')) {
+      prefix = '/gateway';
+    }
+
+    if (prefix == '') {
+      return '';
+    }
+
+    // 若 url 中已自带代理前缀，返回空串避免重复；未带则返回该代理前缀
+    if (url.includes(prefix)) {
+      return '';
+    }
+    return prefix;
+  }
+  // #endif
+
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    return '';
+  }
+
+  return getApiBaseUrl();
+}

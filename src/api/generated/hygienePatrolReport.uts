@@ -1,0 +1,27 @@
+/* eslint-disable */
+// @ts-ignore
+import { request } from '@/src/http/openapi.uts';
+import type { OpenApiRequestOptions } from '@/src/http/openapi.uts';
+
+import * as API from './types.uts';
+
+/** 卫生巡查记录 POST /gateway/hygienePatrolReport/page */
+export function hygienePatrolReportPageUsingPost({
+  body,
+  options,
+}: {
+  body: API.HygienePatrolReportPageUsingPostBody;
+  options?: OpenApiRequestOptions;
+}) {
+  return request<API.HygienePatrolReportPageUsingPostResponse>(
+    '/gateway/hygienePatrolReport/page',
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      data: body,
+      ...(options || {}),
+    }
+  );
+}
