@@ -265,7 +265,7 @@ const currentTheme = computed((): string => themeStore.state.theme);
 const currentMode = computed((): string => themeStore.state.themeMode);
 const isDark = computed((): boolean => themeStore.state.isDark);
 /** 全局响应式主题色 ref（与 store.state.theme 同步，供非 store 场景读取） */
-const globalThemeColor = computed((): string => themeColor.value);
+const _globalThemeColor = computed((): string => themeColor.value);
 
 // —— 暗黑模式自适应配色（供本页样式绑定） ——
 const pageBg = computed((): string => isDark.value ? '#0f172a' : '#f8fafc');

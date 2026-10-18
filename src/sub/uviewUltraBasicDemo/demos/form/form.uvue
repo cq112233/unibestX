@@ -264,7 +264,7 @@ const uploadList = ref([] as UTSJSONObject[]);
 function submitForm() {
   const form = uForm.value;
   if (form != null) {
-    (form.$callMethod('validate') as Promise<any>).then((res: any) => {
+    (form.$callMethod('validate') as Promise<any>).then((_res: any) => {
       uni.showToast({
         title: '验证通过，提交成功！',
         icon: 'success'
@@ -347,7 +347,7 @@ function onPickerConfirm(e: UTSJSONObject): void {
 
 // ==================== 出生日期选择 (DatetimePicker) ====================
 const datetimePickerShow = ref(false);
-const datetimePickerValue = ref(new Date().getTime() as any);
+const datetimePickerValue = ref(Date.now() as any);
 
 function onDatetimePickerConfirm(e: UTSJSONObject): void {
   // eslint-disable-next-line dot-notation
