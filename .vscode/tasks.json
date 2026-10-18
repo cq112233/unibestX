@@ -1,0 +1,286 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    // =========================================================================
+    // 🚀 平台开发服务 (Dev Servers)
+    // =========================================================================
+    {
+      "label": "🚀 启动 H5 开发服务 (Web: 9527)",
+      "type": "npm",
+      "script": "dev:web",
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "vite",
+        "pattern": {
+          "regexp": "^$"
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "开始差量编译|正在编译|vite|ready in",
+          "endsPattern": "ready in|Local:|Network:"
+        }
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      }
+    },
+    {
+      "label": "📱 启动 微信小程序开发服务",
+      "type": "npm",
+      "script": "dev:mp-weixin",
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "uni-mp-weixin",
+        "pattern": {
+          "regexp": "^$"
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "正在编译|编译中",
+          "endsPattern": "编译成功|监听中"
+        }
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true
+      }
+    },
+    {
+      "label": "💳 启动 支付宝小程序开发服务",
+      "type": "npm",
+      "script": "dev:mp-alipay",
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "uni-mp-alipay",
+        "pattern": {
+          "regexp": "^$"
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "正在编译|编译中",
+          "endsPattern": "编译成功|监听中"
+        }
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true
+      }
+    },
+    {
+      "label": "🤖 启动 Android 原生基座调试",
+      "type": "npm",
+      "script": "dev:app-android",
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "uni-app-android",
+        "pattern": {
+          "regexp": "^$"
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "正在编译|sync-hbuilderx",
+          "endsPattern": "编译完成|运行中"
+        }
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true
+      }
+    },
+    {
+      "label": "🎭 启动 本地 Mock 联调服务 (Web)",
+      "type": "npm",
+      "script": "dev:mock",
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "vite-mock",
+        "pattern": {
+          "regexp": "^$"
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "开始差量编译|正在编译|vite|ready in",
+          "endsPattern": "ready in|Local:|Network:"
+        }
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true
+      }
+    },
+
+    // =========================================================================
+    // 📡 接口生成与工程同步 (Codegen & Sync)
+    // =========================================================================
+    {
+      "label": "📡 OpenAPI: 一键生成 API 与 UTS 强类型",
+      "type": "npm",
+      "script": "api:gen",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "showReuseMessage": true
+      }
+    },
+    {
+      "label": "📄 Manifest: 同步更新 manifest.json",
+      "type": "npm",
+      "script": "manifest",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true
+      }
+    },
+    {
+      "label": "🔄 HBuilderX: 同步工程别名与分包配置",
+      "type": "npm",
+      "script": "sync:hbuilderx",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true
+      }
+    },
+
+    // =========================================================================
+    // 🩺 质量保障与健康体检 (Quality & Health)
+    // =========================================================================
+    {
+      "label": "🩺 项目健康体检 (快速版: 依赖/图片/配置)",
+      "type": "npm",
+      "script": "health:quick",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "showReuseMessage": true
+      }
+    },
+    {
+      "label": "🏥 项目健康体检 (全量版: 包含全平台编译校验)",
+      "type": "npm",
+      "script": "health",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "showReuseMessage": true
+      }
+    },
+    {
+      "label": "📦 小程序包体积预算门禁 (Size Budget Check)",
+      "type": "npm",
+      "script": "size:check",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "showReuseMessage": true
+      }
+    },
+    {
+      "label": "🧹 代码全量自动修复 (ESLint + Stylelint)",
+      "type": "shell",
+      "command": "pnpm lint:fix && pnpm lint:style:fix",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true
+      }
+    },
+    {
+      "label": "🏷️ UTS / TypeScript 严格强类型检查",
+      "type": "npm",
+      "script": "typecheck",
+      "problemMatcher": ["$tsc"],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true
+      }
+    },
+    {
+      "label": "🧪 运行全量单元测试 (Vitest)",
+      "type": "npm",
+      "script": "test",
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "showReuseMessage": true
+      }
+    },
+
+    // =========================================================================
+    // 🏗️ 生产构建 (Build)
+    // =========================================================================
+    {
+      "label": "🏗️ 构建 H5 生产产物 (build:h5)",
+      "type": "npm",
+      "script": "build:h5",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "showReuseMessage": true
+      }
+    },
+    {
+      "label": "📊 构建 H5 并分析包体积 (build:analyze)",
+      "type": "npm",
+      "script": "build:analyze",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "showReuseMessage": true
+      }
+    }
+  ]
+}
