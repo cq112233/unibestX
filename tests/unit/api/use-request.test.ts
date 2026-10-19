@@ -1,8 +1,9 @@
 import { mount } from '@vue/test-utils';
-import { defineComponent, h } from 'vue';
+import { defineComponent, h, ref } from 'vue';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   defaultQueryClient,
+  onlineManager,
   QueryClient,
   useMutation,
   useQuery,
@@ -211,6 +212,31 @@ describe('useQuery 基础状态流转与缓存', () => {
     await result.refetch();
     expect(calls).toBe(1);
     expect(result.data.value).toBe('ready');
+  });
+
+  it('响应式 queryKey：包含 Ref 的数组，当页码变动时自动重新发起请求', async () => {
+    const page = ref(1);
+    const fetchedPages: number[] = [];
+    const client = new QueryClient();
+
+    const result = withSetup(() => useQuery<string>({
+      queryKey: ['list', page],
+      queryFn: () => {
+        fetchedPages.push(page.value);
+        return Promise.resolve(`page-${page.value}-data`);
+      }
+    } as QueryOptions<string>), client);
+
+    await flush();
+    expect(fetchedPages).toEqual([1]);
+    expect(result.data.value).toBe('page-1-data');
+
+    // 修改页码：page.value++
+    page.value = 2;
+    await flush();
+
+    expect(fetchedPages).toEqual([1, 2]);
+    expect(result.data.value).toBe('page-2-data');
   });
 });
 
@@ -489,5 +515,36 @@ describe('useQuery 依赖查询 (Dependent Queries / 先后顺序)', () => {
 
     expect(userQuery.data.value?.name).toBe('Alice');
     expect(ordersQuery.data.value).toEqual(['order_for_888']);
+  });
+
+  it('refetchOnReconnect：当网络断开后重新连上时，自动触发重新拉取数据', async () => {
+    let calls = 0;
+    const client = new QueryClient();
+
+    const result = withSetup(() => useQuery<string>({
+      queryKey: ['reconnectTest'],
+      queryFn: () => {
+        calls++;
+        return Promise.resolve(`call-${calls}`);
+      },
+      refetchOnReconnect: true
+    } as QueryOptions<string>), client);
+
+    await flush();
+    expect(calls).toBe(1);
+    expect(result.data.value).toBe('call-1');
+
+    // 模拟网络断开
+    onlineManager.setOnline(false);
+    await flush();
+    expect(calls).toBe(1);
+
+    // 模拟网络重连上线！
+    onlineManager.setOnline(true);
+    await flush();
+
+    // 验证自动触发了新一轮数据拉取！
+    expect(calls).toBe(2);
+    expect(result.data.value).toBe('call-2');
   });
 });

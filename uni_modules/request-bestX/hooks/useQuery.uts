@@ -13,7 +13,7 @@ import { isRef, onUnmounted, ref, watch } from 'vue';
 import type { Ref } from 'vue';
 import { abortRequest } from '../core/lifecycle.uts';
 import { toError } from '../util/helper.uts';
-import { useQueryClient } from './queryClient.uts';
+import { onlineManager, serializeQueryKey, useQueryClient } from './queryClient.uts';
 import type { QueryClient } from './queryClient.uts';
 import type { QueryFunctionContext, QueryKey, QueryOptions, QueryResult, QueryStatus } from './types.uts';
 
@@ -42,6 +42,40 @@ function isBusinessError(e: any): boolean {
 }
 
 /**
+ * 解包提取 QueryKey 的纯数据快照（若包含 Ref 或 Getter 函数则动态取值）
+ */
+function unwrapQueryKey(rawKey: any): any {
+  if (rawKey == null) {
+    return '';
+  }
+  let target: any = rawKey;
+  if (typeof target === 'function') {
+    try {
+      target = (target as () => any)();
+    }
+    catch (_) {}
+  }
+  if (isRef(target)) {
+    target = (target as Ref<any>).value;
+  }
+  if (Array.isArray(target)) {
+    const arr = target as Array<any>;
+    const unwrapped: Array<any> = [];
+    for (let i = 0; i < arr.length; i = i + 1) {
+      const item: any = arr[i];
+      if (isRef(item)) {
+        unwrapped.push((item as Ref<any>).value);
+      }
+      else {
+        unwrapped.push(item);
+      }
+    }
+    return unwrapped;
+  }
+  return target;
+}
+
+/**
  * 规范化 QueryKey 为数组
  */
 function normalizeKeyArray(key: QueryKey): Array<any> {
@@ -64,7 +98,7 @@ export function useQuery<T>(
   const client: QueryClient = useQueryClient(customClient);
 
   // ---------- 1. 解析配置 ----------
-  const optKey: QueryKey = options.queryKey;
+  let currentOptKey: QueryKey = unwrapQueryKey(options.queryKey);
   const optFn = options.queryFn;
 
   const resolveEnabled = (): boolean => {
@@ -99,10 +133,14 @@ export function useQuery<T>(
   if (options.refetchInterval != null) {
     optRefetchInterval = options.refetchInterval!;
   }
+  let optRefetchOnReconnect: boolean = true;
+  if (options.refetchOnReconnect != null) {
+    optRefetchOnReconnect = options.refetchOnReconnect!;
+  }
 
   // ---------- 2. 初始值与缓存状态读取 ----------
   let seedData: T | null = null;
-  const cachedState = client.getQueryState<T>(optKey);
+  const cachedState = client.getQueryState<T>(currentOptKey);
   let initialStatus: QueryStatus = 'pending';
 
   if (cachedState != null && cachedState.data != null) {
@@ -184,7 +222,7 @@ export function useQuery<T>(
       abortRequest(currentKey);
       currentKey = '';
     }
-    client.removeInflightPromise(optKey);
+    client.removeInflightPromise(currentOptKey);
     isFetchingRef.value = false;
     isLoadingRef.value = false;
   };
@@ -197,7 +235,7 @@ export function useQuery<T>(
 
     // 检查缓存新鲜度 (staleTime 校验)：若数据仍处于新鲜窗口且非强制 refetch，直接复用当前缓存
     if (isForce == false && optStaleTime > 0) {
-      const currentCache = client.getQueryState<T>(optKey);
+      const currentCache = client.getQueryState<T>(currentOptKey);
       if (currentCache != null && currentCache.data != null) {
         const age = Date.now() - currentCache.dataUpdatedAt;
         if (age < optStaleTime) {
@@ -208,7 +246,7 @@ export function useQuery<T>(
     }
 
     // 跨组件在飞请求复用 (Inflight Deduplication)
-    const activePromise = client.getInflightPromise<T>(optKey);
+    const activePromise = client.getInflightPromise<T>(currentOptKey);
     if (activePromise != null) {
       isFetchingRef.value = true;
       return activePromise.then(
@@ -233,7 +271,7 @@ export function useQuery<T>(
     const requestKey = makeRequestKey();
     currentKey = requestKey;
     const ctx: QueryFunctionContext = {
-      queryKey: normalizeKeyArray(optKey),
+      queryKey: normalizeKeyArray(currentOptKey),
       signal: {
         requestKey
       },
@@ -242,7 +280,7 @@ export function useQuery<T>(
     };
 
     const taskSeq = seq;
-    const cancelUnregister = client.registerCancelHandler(optKey, (): void => {
+    const cancelUnregister = client.registerCancelHandler(currentOptKey, (): void => {
       abort();
     });
 
@@ -270,22 +308,22 @@ export function useQuery<T>(
     };
 
     const fetchPromise = attemptRun(0);
-    client.setInflightPromise(optKey, fetchPromise);
+    client.setInflightPromise(currentOptKey, fetchPromise);
 
     return fetchPromise.then(
       (resultData: T): T | null => {
         cancelUnregister();
-        client.removeInflightPromise(optKey);
+        client.removeInflightPromise(currentOptKey);
         if (disposed == true || taskSeq !== seq) {
           return null;
         }
         applySuccess(resultData);
-        client.setQueryData(optKey, resultData);
+        client.setQueryData(currentOptKey, resultData);
         return resultData;
       },
       (err: any): T | null => {
         cancelUnregister();
-        client.removeInflightPromise(optKey);
+        client.removeInflightPromise(currentOptKey);
         if (disposed == true || taskSeq !== seq) {
           return null;
         }
@@ -302,11 +340,11 @@ export function useQuery<T>(
   };
 
   // ---------- 10. 缓存同步监听 ----------
-  const unsubscribe = client.subscribe(optKey, (): void => {
+  const handleCacheSync = (): void => {
     if (disposed == true) {
       return;
     }
-    const state = client.getQueryState<T>(optKey);
+    const state = client.getQueryState<T>(currentOptKey);
     if (state != null) {
       if (state.data != null && state.data !== dataRef.value) {
         applySuccess(state.data!);
@@ -316,9 +354,62 @@ export function useQuery<T>(
         executeFetch(true);
       }
     }
-  });
+  };
 
-  // ---------- 10. 轮询定时器 ----------
+  let unsubscribe: (() => void) = client.subscribe(currentOptKey, handleCacheSync);
+
+  // ---------- 11. 动态监听 queryKey 变化 (响应式自动重新拉取) ----------
+  let stopWatchKey: (() => void) | null = null;
+  const rawKey: any = options.queryKey;
+  let isKeyReactive = false;
+  if (typeof rawKey === 'function' || isRef(rawKey)) {
+    isKeyReactive = true;
+  }
+  else if (Array.isArray(rawKey)) {
+    const arr = rawKey as Array<any>;
+    for (let i = 0; i < arr.length; i = i + 1) {
+      if (isRef(arr[i])) {
+        isKeyReactive = true;
+        break;
+      }
+    }
+  }
+
+  if (isKeyReactive == true) {
+    stopWatchKey = watch(
+      (): string => {
+        return serializeQueryKey(unwrapQueryKey(rawKey));
+      },
+      (newHash: string, oldHash: string): void => {
+        if (newHash !== oldHash && disposed != true) {
+          abort();
+          unsubscribe();
+          currentOptKey = unwrapQueryKey(rawKey);
+          unsubscribe = client.subscribe(currentOptKey, handleCacheSync);
+
+          const state = client.getQueryState<T>(currentOptKey);
+          if (state != null && state.data != null) {
+            applySuccess(state.data!);
+          }
+          else {
+            if (options.initialData != null) {
+              applySuccess(options.initialData!);
+            }
+            else {
+              dataRef.value = null;
+              isLoadingRef.value = true;
+            }
+          }
+
+          if (resolveEnabled()) {
+            executeFetch(false);
+          }
+        }
+      }
+    );
+  }
+
+  // ---------- 12. 轮询定时器 ----------
   const startInterval = (): void => {
     if (optRefetchInterval > 0) {
       if (intervalTimer > 0) {
@@ -332,7 +423,7 @@ export function useQuery<T>(
     }
   };
 
-  // ---------- 11. 动态监听 enabled 变化 (支持依赖查询) ----------
+  // ---------- 13. 动态监听 enabled 变化 (支持依赖查询) ----------
   let stopWatchEnabled: (() => void) | null = null;
   const rawEnabled: any = options.enabled;
   if (rawEnabled != null) {
@@ -370,7 +461,17 @@ export function useQuery<T>(
     }
   }
 
-  // ---------- 12. 生命周期挂载与清理 ----------
+  // ---------- 14. 网络重连自动刷新 (refetchOnReconnect) ----------
+  let stopWatchReconnect: (() => void) | null = null;
+  if (optRefetchOnReconnect == true) {
+    stopWatchReconnect = onlineManager.subscribe((isOnline: boolean): void => {
+      if (isOnline == true && disposed != true && resolveEnabled()) {
+        executeFetch(false);
+      }
+    });
+  }
+
+  // ---------- 15. 生命周期挂载与清理 ----------
   onUnmounted((): void => {
     disposed = true;
     abort();
@@ -378,14 +479,22 @@ export function useQuery<T>(
       clearInterval(intervalTimer);
       intervalTimer = 0;
     }
+    if (stopWatchKey != null) {
+      stopWatchKey!();
+      stopWatchKey = null;
+    }
     if (stopWatchEnabled != null) {
       stopWatchEnabled!();
       stopWatchEnabled = null;
     }
+    if (stopWatchReconnect != null) {
+      stopWatchReconnect!();
+      stopWatchReconnect = null;
+    }
     unsubscribe();
   });
 
-  // ---------- 13. 首次触发 ----------
+  // ---------- 15. 首次触发 ----------
   if (initialEnabled == true) {
     executeFetch(false);
     startInterval();

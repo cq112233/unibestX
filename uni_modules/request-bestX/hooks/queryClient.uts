@@ -499,3 +499,85 @@ export const VueQueryPlugin = {
     }
   }
 };
+
+/**
+ * 全局网络状态在线管理器 (OnlineManager)
+ * 深度对接 uni.onNetworkStatusChange，支持断网重连自动广播与恢复
+ */
+export class OnlineManager {
+  private isOnline: boolean = true;
+  private listeners: Array<(isOnline: boolean) => void> = [];
+  private setupDone: boolean = false;
+
+  constructor() {
+    this.setupListener();
+  }
+
+  private setupListener(): void {
+    if (this.setupDone == true) {
+      return;
+    }
+    this.setupDone = true;
+    try {
+      if (typeof uni !== 'undefined' && typeof uni.onNetworkStatusChange === 'function') {
+        uni.onNetworkStatusChange((res) => {
+          const connected = res.isConnected;
+          const wasOnline = this.isOnline;
+          this.isOnline = connected;
+          if (connected == true && wasOnline == false) {
+            this.notify(true);
+          }
+          else if (connected == false && wasOnline == true) {
+            this.notify(false);
+          }
+        });
+      }
+    }
+    catch (_) {}
+  }
+
+  /**
+   * 当前设备是否处于在线状态
+   */
+  isNetworkOnline(): boolean {
+    return this.isOnline;
+  }
+
+  /**
+   * 手动模拟或覆盖网络在线状态（常用于测试或平台自定义桥接）
+   */
+  setOnline(online: boolean): void {
+    const prev = this.isOnline;
+    this.isOnline = online;
+    if (online != prev) {
+      this.notify(online);
+    }
+  }
+
+  /**
+   * 订阅网络在线状态改变
+   */
+  subscribe(listener: (isOnline: boolean) => void): () => void {
+    this.listeners.push(listener);
+    return (): void => {
+      const idx = this.listeners.indexOf(listener);
+      if (idx !== -1) {
+        this.listeners.splice(idx, 1);
+      }
+    };
+  }
+
+  private notify(online: boolean): void {
+    for (let i = 0; i < this.listeners.length; i = i + 1) {
+      try {
+        this.listeners[i](online);
+      }
+      catch (e) {
+        console.warn('[OnlineManager] listener error', e);
+      }
+    }
+  }
+}
+
+/** 全局网络状态管理器单例 (对标 TanStack Query onlineManager) */
+export const onlineManager: OnlineManager = new OnlineManager();

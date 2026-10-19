@@ -14,8 +14,8 @@ export type QueryStatus = 'pending' | 'success' | 'error';
 /** 变更操作状态：未激活 / 执行中 / 成功 / 失败 */
 export type MutationStatus = 'idle' | 'pending' | 'success' | 'error';
 
-/** 查询键类型：支持字符串或结构化数组 */
-export type QueryKey = Array<any> | string;
+/** 查询键类型：支持字符串、结构化数组、包含 Ref 的组合或动态 Getter 函数 */
+export type QueryKey = any;
 
 /** 查询过滤器（对标 TanStack QueryFilters） */
 export type QueryFilters = {
@@ -67,6 +67,8 @@ export type QueryOptions<T> = {
   initialDataFn?: () => T | null;
   /** 自定义错误是否允许重试判定（默认非业务码错误允许重试） */
   isRetryable?: (err: any) => boolean;
+  /** 网络断线重连时是否自动刷新，默认 true */
+  refetchOnReconnect?: boolean;
   /** 附加元数据 */
   meta?: UTSJSONObject;
 };
