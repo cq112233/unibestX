@@ -41,9 +41,8 @@ const launchArgs = process.argv.slice(2);
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const CLI_CACHE_FILE = path.join(ROOT, 'node_modules', '.hbuilderx-cli-path');
 
-// 解决 HBuilderX CLI 跨进程启动导致命令行环境变量丢失的问题：
-// 当以 pnpm dev:mock（VITE_USE_MOCK=true）启动时，自动写入最高优先级的 .env.development.local，
-// 这样即使 .env.local 中配置了 VITE_USE_MOCK=false 也不会被冲掉；进程退出时自动清理，不污染 git。
+// 自动打通 pnpm dev:mock 到 HBuilderX 编译进程：
+// 当运行 dev:mock 时，临时注入最高优先级的开发配置，退出时自动清理，保证零配置即开即用
 const DEV_MOCK_ENV_FILE = path.join(ROOT, '.env.development.local');
 const isMockMode = process.env.VITE_USE_MOCK === 'true';
 
@@ -51,9 +50,10 @@ if (isMockMode) {
   try {
     fs.writeFileSync(
       DEV_MOCK_ENV_FILE,
-      '# ===== 由 pnpm dev:mock 自动生成，进程退出时自动销毁 =====\nVITE_USE_MOCK=true\nVITE_H5_USE_PROXY=true\n',
+      '# ===== 由 pnpm dev:mock 自动注入，进程退出时自动销毁 =====\nVITE_USE_MOCK=true\nVITE_H5_USE_PROXY=true\n',
       'utf-8'
     );
+    console.log('\x1B[32m[dev:mock] 🚀 本地 Mock 模式已激活（已自动切换为 H5 代理模式）\x1B[0m');
   }
   catch {}
 }
