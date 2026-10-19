@@ -1,14 +1,16 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import {
   buildApiInstanceOptions,
-  createHttpClient,
   defaultBusinessAfterComplete,
   defaultBusinessAfterSuccess,
   defaultBusinessBeforeRequest,
-  http,
+  http
+} from '@/src/http/index.uts';
+import {
+  createHttpClient,
   HttpClient,
   RequestLifecycle
-} from '@/src/http/index.uts';
+} from '@/uni_modules/request-bestX/index.uts';
 
 /**
  * 测试内的 HttpClient 实例类型别名

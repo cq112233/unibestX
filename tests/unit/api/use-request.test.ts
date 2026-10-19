@@ -9,12 +9,12 @@ import {
   useQueryClient,
   VUE_QUERY_CLIENT_KEY,
   VueQueryPlugin
-} from '@/src/http/request/hooks/index.uts';
+} from '@/uni_modules/request-bestX/index.uts';
 import type {
   MutationOptions,
   QueryFunctionContext,
   QueryOptions
-} from '@/src/http/request/hooks/index.uts';
+} from '@/uni_modules/request-bestX/index.uts';
 import { BusinessError } from '@/src/http/error/error.uts';
 import { http } from '@/src/http/instances/index.uts';
 

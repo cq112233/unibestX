@@ -84,12 +84,19 @@ export type AbortableTask = {
  * 记录 HTTP 传输层状态码与错误信息，零业务逻辑
  */
 export class HttpError extends Error {
-  /** HTTP 状态码（传输层，非业务码） */
+  /** HTTP 状态码（传输层或服务端状态码） */
   statusCode: number = 0;
+  /** 服务端返回的原始/完整响应数据（包含全部字段） */
+  data: any | null = null;
+  /** 兼容别名：服务端返回的完整响应数据 */
+  response: any | null = null;
 
-  constructor(message: string, statusCode: number = 0) {
+  constructor(message: string, statusCode: number = 0, data: any | null = null) {
     super(message);
+    this.name = 'HttpError';
     this.statusCode = statusCode;
+    this.data = data;
+    this.response = data;
   }
 }
 

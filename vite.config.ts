@@ -230,6 +230,11 @@ export default defineConfig({
         target: env.VITE_SERVER_BASEURL_SECONDARY || env.VITE_GATEWAY_BASEURL || env.VITE_SERVER_BASEURL || 'http://localhost:8080',
         changeOrigin: true,
         rewrite: p => p.replace(/^\/api-secondary/, '')
+      },
+      '/api-bigScreen': {
+        target: env.VITE_SERVER_BASEURL_BIGSCREEN || 'http://localhost:3000',
+        changeOrigin: true,
+        rewrite: p => p.replace(/^\/api-bigScreen/, '')
       }
     },
     hmr: true,

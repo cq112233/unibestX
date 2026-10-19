@@ -3,12 +3,14 @@ import { maskSensitive } from '@/src/utils/report/index.uts';
 import {
   buildApiInstanceOptions,
   BusinessError,
-  createHttpClient,
   defaultBusinessAfterError,
   defaultBusinessAfterSuccess,
-  HttpError,
   resolveErrorMessage
 } from '@/src/http/index.uts';
+import {
+  createHttpClient,
+  HttpError
+} from '@/uni_modules/request-bestX/index.uts';
 
 describe('error-report masking', () => {
   it('should mask mobile numbers', () => {

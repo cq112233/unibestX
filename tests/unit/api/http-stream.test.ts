@@ -1,10 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { http } from '@/src/http/index.uts';
 import {
   createHttpClient,
-  http,
   requestStream,
   simulateStream
-} from '@/src/http/index.uts';
+} from '@/uni_modules/request-bestX/index.uts';
 
 /**
  * 流式请求（HttpClient.stream / streamHttp）的行为验证

@@ -22,16 +22,13 @@
         <CrudDemoCard />
 
         <!-- 2. 文件上传 -->
-        <UploadDemoCard />
+        <!-- <UploadDemoCard /> -->
 
         <!-- 3. 文件下载 -->
-        <DownloadDemoCard />
+        <!-- <DownloadDemoCard /> -->
 
-        <!-- 4. Vue Query 组合式状态机 (TanStack Vue Query) -->
-        <VueQueryDemoCard />
-
-        <!-- 5. 本地 Mock 拦截与契约挡板 -->
-        <MockDemoCard />
+        <!-- 4. 大屏 / 副业务接口 -->
+        <BigScreenDemoCard />
 
         <view class="flex-col items-center py-[16px]">
           <text class="text-[12px] text-[#94a3b8]">已触底 {{ reachBottomCount }} 次 · 内容结束</text>
@@ -43,12 +40,9 @@
 
 <script setup lang="uts">
 import { ref } from 'vue';
-import CrudDemoCard from './components/CrudDemoCard.uvue';
-import DownloadDemoCard from './components/DownloadDemoCard.uvue';
-import MockDemoCard from './components/MockDemoCard.uvue';
-import UploadDemoCard from './components/UploadDemoCard.uvue';
-import VueQueryDemoCard from './components/VueQueryDemoCard.uvue';
+import BigScreenDemoCard from './components/BigScreenDemoCard.uvue';
 import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/layouts/navbar/utils/index.uts';
+import CrudDemoCard from '@/src/sub/httpBasicDemo/components/CrudDemoCard.uvue';
 
 definePage({
   debug: false,

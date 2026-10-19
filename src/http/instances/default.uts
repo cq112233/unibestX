@@ -5,7 +5,7 @@
  */
 
 import { getApiBaseUrl } from '@/src/config/index.uts';
-import type { HttpClient } from '../request/core/client.uts';
+import type { HttpClient } from '@/uni_modules/request-bestX/index.uts';
 import {
   createApiInstance
 } from './internal/factory.uts';
@@ -47,4 +47,7 @@ import {
  * } as HttpClientOptions);
  * ```
  */
+import { setDefaultStreamClient } from '@/uni_modules/request-bestX/index.uts';
+
 export const http: HttpClient = createApiInstance(getApiBaseUrl(), '/api');
+setDefaultStreamClient(http);

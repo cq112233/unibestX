@@ -12,7 +12,7 @@
  *
  * @example
  * ```uts
- * import { requestStream, type StreamChunk } from '@/src/http';
+ * import { requestStream, type StreamChunk } from '@/uni_modules/request-bestX/index.uts';
  *
  * const task = requestStream({
  *   url: '/api/v1/chat/stream',
@@ -30,12 +30,26 @@
 
 import type { HttpClient } from '../core/client.uts';
 import type { HttpRequestConfig, StreamTask } from '../core/types.uts';
-import { http } from '@/src/http/instances/default.uts';
 
 let defaultHttpInstance: HttpClient | null = null;
+
+/**
+ * 注册默认的流式 HttpClient 实例（可在应用初始化或业务层调用）
+ */
+export function setDefaultStreamClient(client: HttpClient): void {
+  defaultHttpInstance = client;
+}
+
+/**
+ * 获取当前注册的默认 HttpClient 实例
+ */
+export function getDefaultStreamClient(): HttpClient | null {
+  return defaultHttpInstance;
+}
+
 function getDefaultHttp(): HttpClient {
   if (defaultHttpInstance == null) {
-    defaultHttpInstance = http;
+    throw new Error('[requestStream] 未指定 HttpClient 实例，请传入 client 或先调用 setDefaultStreamClient(client)');
   }
   return defaultHttpInstance!;
 }

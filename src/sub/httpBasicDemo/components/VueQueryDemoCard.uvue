@@ -112,8 +112,8 @@
 import { computed, ref } from 'vue';
 import { fetchFooList, fetchFooRemote } from '@/src/api/example.uts';
 import type { FooItem, PageResult } from '@/src/api/example.uts';
-import { defaultQueryClient, useMutation, useQuery } from '@/src/http/request/hooks/index.uts';
-import type { MutationOptions, QueryFunctionContext, QueryOptions } from '@/src/http/request/hooks/index.uts';
+import { defaultQueryClient, useMutation, useQuery } from '@/uni_modules/request-bestX/index.uts';
+import type { MutationOptions, QueryFunctionContext, QueryOptions } from '@/uni_modules/request-bestX/index.uts';
 
 const listTick = ref<number>(0);
 const remoteErrorTick = ref<number>(0);

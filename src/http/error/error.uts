@@ -1,4 +1,4 @@
-import { HttpError } from '../request/core/types.uts';
+import { HttpError } from '@/uni_modules/request-bestX/index.uts';
 
 /**
  * 统一错误文案归一
@@ -32,11 +32,17 @@ export type AppErrorInfo = {
 export class BusinessError extends Error {
   /** 后端业务码（响应体里的 code，非 HTTP 状态码） */
   code: number = 0;
+  /** 服务端返回的原始/完整响应数据（包含全部字段） */
+  data: any | null = null;
+  /** 兼容别名：服务端返回的完整响应数据 */
+  response: any | null = null;
 
-  constructor(message: string, code: number) {
+  constructor(message: string, code: number, data: any | null = null) {
     super(message);
     this.name = 'BusinessError';
     this.code = code;
+    this.data = data;
+    this.response = data;
   }
 }
 

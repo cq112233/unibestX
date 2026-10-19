@@ -10,18 +10,18 @@ import { useTokenStore } from '@/src/store/index.uts';
 import { toLoginPage } from '@/src/utils/auth/toLoginPage.uts';
 import {
   cloneConfig,
+  ContentTypeEnum,
+  createHttpClient,
+  defaultLifecycle,
   extractErrorMessage,
   extractStatusCode
-} from '../../request/util/helper.uts';
-import { ContentTypeEnum } from '../../request/core/enum.uts';
-import { defaultLifecycle } from '../../request/core/lifecycle.uts';
-import { createHttpClient } from '../../request/core/client.uts';
-import type { HttpClient } from '../../request/core/client.uts';
+} from '@/uni_modules/request-bestX/index.uts';
 import type {
+  HttpClient,
   HttpClientOptions,
   HttpRequestConfig,
   RespondedOptions
-} from '../../request/core/types.uts';
+} from '@/uni_modules/request-bestX/index.uts';
 import {
   BusinessError,
   HttpError,
@@ -87,8 +87,10 @@ export function defaultBusinessAfterSuccess(
   const resultObj = JSON.parseObject(JSON.stringify(data));
   if (resultObj != null) {
     const code = resultObj.getNumber('code');
+    // 有code 字段, 返回data
     if (code != null) {
       const codeVal = code as number;
+      // code不是成功码, 直接抛出异常
       if (codeVal != ResultEnum.Success0 && codeVal != ResultEnum.Success200) {
         const msgByKey = resultObj.message as string | null;
         const msgByMsg = resultObj.msg as string | null;
@@ -105,6 +107,7 @@ export function defaultBusinessAfterSuccess(
         if (toastEnabled) {
           uni.showToast({ title: message, icon: 'none' });
         }
+        // 401 未授权，触发刷新令牌并重试
         if (codeVal >= 400 && codeVal <= 599) {
           if (codeVal == ResultEnum.Unauthorized) {
             let skipRefresh = false;
@@ -131,7 +134,8 @@ export function defaultBusinessAfterSuccess(
                 tokenStore.clearToken();
                 toLoginPage({ mode: 'reLaunch' } as UTSJSONObject);
               }
-              throw new HttpError(`未授权[${ResultEnum.Unauthorized}]：${message}`, codeVal);
+              const fullData = resultObj != null ? resultObj : data;
+              throw new HttpError(`未授权[${ResultEnum.Unauthorized}]：${message}`, codeVal, fullData);
             }
 
             // 触发业务刷新令牌并重试
@@ -150,7 +154,8 @@ export function defaultBusinessAfterSuccess(
                   tokenStore.clearToken();
                   toLoginPage({ mode: 'reLaunch' } as UTSJSONObject);
                 }
-                return Promise.reject(new HttpError(`未授权[${ResultEnum.Unauthorized}]：${message}`, codeVal));
+                const fullData = resultObj != null ? resultObj : data;
+                return Promise.reject(new HttpError(`未授权[${ResultEnum.Unauthorized}]：${message}`, codeVal, fullData));
               }
 
               // 准备重放配置
@@ -173,18 +178,24 @@ export function defaultBusinessAfterSuccess(
             });
           }
           const errorMessage = ShowMessage(codeVal);
-          throw new HttpError(`${errorMessage}：${message}`, codeVal);
+          const fullData = resultObj != null ? resultObj : data;
+          throw new HttpError(`${errorMessage}：${message}`, codeVal, fullData);
         }
-        throw new BusinessError(message, codeVal);
+        const fullData = resultObj != null ? resultObj : data;
+        throw new BusinessError(message, codeVal, fullData);
       }
     }
+    // 无code 字段, 返回data
     const innerData = resultObj.get('data');
+
+    // 有可能内层的data也是
     if (innerData != null) {
       const wrapped = JSON.parseObject(JSON.stringify(innerData));
       return wrapped != null ? wrapped : innerData;
     }
   }
   const fallbackWrapped = JSON.parseObject(JSON.stringify(data));
+
   return fallbackWrapped != null ? fallbackWrapped : data;
 }
 

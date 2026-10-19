@@ -2,9 +2,9 @@
 
 全项目**唯一的网络出口**。基于纯原生 `uni.request` / `uni.uploadFile` / `uni.downloadFile` 驱动，零第三方库依赖。
 
-底层核心模块（`src/http/request`）为纯净基础设施调度引擎，不含任何业务代码；业务层（`src/http/instances`）负责 Token 鉴权注入、401 静默刷新与重放、统一错误提示与数据解包。
+底层核心调度引擎与通用能力已沉淀至独立模块 `uni_modules/request-bestX`；`src/http` 专注于业务层（`instances`、`error`、`openapi`），负责 Token 鉴权注入、401 静默刷新与重放、统一错误提示与数据解包。
 
-> 🚨 **业务与页面一律不直接调 `uni.request` / `uni.uploadFile` / `uni.downloadFile`**。统一通过 `src/http` 提供的 `http` 实例或各业务专属客户端发起请求。
+> 🚨 **业务与页面一律不直接调 `uni.request` / `uni.uploadFile` / `uni.downloadFile`**。统一通过 `src/http` 提供的 `http` 实例发起业务请求；通用能力（如 `useQuery`、`useMutation`、`requestStream` 与通用类型）从 `@/uni_modules/request-bestX` 引入。
 
 ---
 
@@ -12,24 +12,9 @@
 
 ```text
 src/http/
-├── index.uts                     # 统一门面：re-export 核心库、业务实例与 Vue Query Hooks
-├── request/                      # 纯净原生 HTTP 核心调度库（可独立沉淀）
-│   ├── index.uts                 # 核心门面：createHttpClient、HttpClient、QueryClient、useQuery、useMutation...
-│   ├── core/                     # 核心层
-│   │   ├── client.uts            # HttpClient 核心调度引擎（钩子链 / 取消 / 去重 / TTL 缓存 / stream）
-│   │   ├── lifecycle.uts         # RequestLifecycle：取消登记 + 并发去重 + TTL 缓存 + 请求指纹
-│   │   ├── types.uts             # HttpRequestConfig / HttpResponse / HttpError / AbortableTask / 钩子类型
-│   │   └── enum.uts              # ContentTypeEnum（仅网络传输层标准常量）
-│   ├── hooks/                    # Vue Query 风格组合式请求与数据中枢层
-│   │   ├── index.uts             # Hooks 门面导出
-│   │   ├── types.uts             # QueryKey / QueryOptions / MutationOptions / QueryClient 等强类型定义
-│   │   ├── queryClient.uts       # QueryClient 缓存调度中枢、useQueryClient 与 VueQueryPlugin
-│   │   ├── useQuery.uts          # useQuery 声明式查询（staleTime / 轮询 / 自动重试 / abort / 响应式）
-│   │   └── useMutation.uts       # useMutation 变更状态机（乐观更新 onMutate / mutateAsync / 状态管理）
-│   └── util/                     # 工具层
-│       ├── url.uts               # URL 路径拼接与 Query 序列化
-│       └── helper.uts            # 错误提取、状态码解析、配置克隆
+├── index.uts                     # 统一业务门面：导出业务实例 (http/secondaryHttp) 与业务错误/枚举
 ├── instances/                    # 业务 HTTP 客户端实例与业务规则层
+│   ├── index.uts                 # 业务实例导出
 │   ├── default.uts               # 默认主业务 http 单例
 │   ├── secondary.uts             # 辅助域名 secondaryHttp 单例
 │   └── internal/
@@ -37,10 +22,9 @@ src/http/
 │       ├── refresh.uts           # 业务 Token 静默刷新（单飞，并发 401 仅刷新一次）
 │       ├── enum.uts              # ResultEnum / ShowMessage / IResponse
 │       └── config.uts            # 业务多域名与 H5 代理路径映射
-├── stream/
-│   └── stream.uts                # requestStream(Observable) / Utf8StreamDecoder / simulateStream
-└── error/
-    └── error.uts                 # 统一错误归一：AppErrorInfo / BusinessError / HttpError / resolveErrorMessage
+├── error/
+│   └── error.uts                 # 统一错误归一：AppErrorInfo / BusinessError / resolveErrorMessage
+└── openapi.uts                   # openapi-ts-request 驱动适配器
 ```
 
 ---
@@ -52,7 +36,7 @@ src/http/
 ```uts
 // src/api/<page>/<page>.uts
 import { http } from '@/src/http/index.uts';
-import type { HttpRequestConfig } from '@/src/http/index.uts';
+import type { HttpRequestConfig } from '@/uni_modules/request-bestX/index.uts';
 
 /**
  * 分页拉取列表
@@ -103,7 +87,7 @@ export function fetchFooList(pageNo: number = 1, pageSize: number = 10, keyword:
 
 ```uts
 import { http } from '@/src/http/index.uts';
-import type { HttpRequestConfig } from '@/src/http/index.uts';
+import type { HttpRequestConfig } from '@/uni_modules/request-bestX/index.uts';
 
 /**
  * 上传单个文件到 OSS
@@ -122,7 +106,7 @@ export function uploadFooFile(filePath: string): Promise<string> {
 
 ```uts
 import { http } from '@/src/http/index.uts';
-import type { DownloadResult, HttpRequestConfig } from '@/src/http/index.uts';
+import type { DownloadResult, HttpRequestConfig } from '@/uni_modules/request-bestX/index.uts';
 
 export function downloadFooFile(
   url: string,
