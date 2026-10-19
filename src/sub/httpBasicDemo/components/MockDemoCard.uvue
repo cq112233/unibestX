@@ -73,6 +73,33 @@
       </view>
     </view>
 
+    <!-- 3. OpenAPI 契约接口：留样记录菜品明细 (POST /gateway/foodSampleReport/dishDetail) -->
+    <view class="rounded-[10px] p-[12px] mt-[12px] border-[1px] border-solid border-[#e2e8f0] bg-[#f8fafc]">
+      <view class="flex-row items-center justify-between mb-[8px]">
+        <text class="text-[13px] font-bold text-[#334155]">3. OpenAPI 生成接口 Mock</text>
+        <view class="px-[6px] py-[2px] rounded-[4px]" :class="dishStatusBgClass">
+          <text class="text-[10px] font-medium" :class="dishStatusTextClass">{{ dishStatusText }}</text>
+        </view>
+      </view>
+
+      <view class="mb-[8px]">
+        <text class="text-[11px] text-[#64748b] leading-[17px]">
+          调用由 OpenAPI 规范自动生成的 foodSampleReportDishDetailUsingPost() 强类型接口，走本地契约挡板 Mock 拦截。
+        </text>
+      </view>
+
+      <view
+        class="rounded-[8px] h-[38px] w-full flex flex-row items-center justify-center bg-[#0284c7] mb-[8px]"
+        @click="requestDishDetail"
+      >
+        <text class="text-[#ffffff] text-[13px] font-medium">{{ isDishLoading ? '请求中…' : '请求留样明细（POST /gateway/foodSampleReport/dishDetail）' }}</text>
+      </view>
+
+      <view v-if="dishSummary != ''" class="rounded-[8px] bg-[#ffffff] p-[10px] border-[1px] border-solid border-[#e2e8f0]">
+        <text class="text-[11px] text-[#0369a1] leading-[18px]">{{ dishSummary }}</text>
+      </view>
+    </view>
+
     <!-- 失败兜底：拦截未命中 / 真实服务器报错都在这里提示 -->
     <view
       v-if="hasMockError"
@@ -87,11 +114,20 @@
 import { computed, ref } from 'vue';
 import { fetchMockFooList, fetchMockLogin } from '@/src/api/example.uts';
 import type { FooItem, MockLoginParams, MockLoginResult, PageResult } from '@/src/api/example.uts';
+import { foodSampleReportDishDetailUsingPost } from '@/src/api/generated/index.uts';
+import type { FoodSampleReportDishDetailUsingPostBody, FoodSampleReportDishDetailUsingPostResponse } from '@/src/api/generated/index.uts';
 import { useMutation, useQuery } from '@/uni_modules/request-bestX/index.uts';
 import type { MutationOptions, QueryFunctionContext, QueryOptions } from '@/uni_modules/request-bestX/index.uts';
 
 const mockUsername = ref<string>('admin');
 const mockPassword = ref<string>('123456');
+
+// ==========================================
+// 0. OpenAPI 契约接口：留样记录菜品明细
+// ==========================================
+const isDishLoading = ref<boolean>(false);
+const dishData = ref<UTSJSONObject | null>(null);
+const dishErrorMsg = ref<string>('');
 
 // ==========================================
 // 1. useQuery：Mock 列表（enabled=false，由按钮手动 refetch）
@@ -232,8 +268,83 @@ const loginSummary = computed((): string => {
   return `登录成功 · ${data.nickname}（${data.username}）· token: ${data.token} · 有效期 ${data.expiresIn}s`;
 });
 
+const dishStatusText = computed((): string => {
+  if (dishErrorMsg.value != '') {
+    return 'error';
+  }
+  if (isDishLoading.value == true) {
+    return 'fetching';
+  }
+  if (dishData.value != null) {
+    return 'success';
+  }
+  return 'idle';
+});
+
+const dishStatusBgClass = computed((): string => {
+  const status = dishStatusText.value;
+  if (status == 'error') {
+    return 'bg-[#fee2e2]';
+  }
+  if (status == 'fetching') {
+    return 'bg-[#dbeafe]';
+  }
+  if (status == 'success') {
+    return 'bg-[#d1fae5]';
+  }
+  return 'bg-[#f1f5f9]';
+});
+
+const dishStatusTextClass = computed((): string => {
+  const status = dishStatusText.value;
+  if (status == 'error') {
+    return 'text-[#dc2626]';
+  }
+  if (status == 'fetching') {
+    return 'text-[#2563eb]';
+  }
+  if (status == 'success') {
+    return 'text-[#059669]';
+  }
+  return 'text-[#94a3b8]';
+});
+
+/** 留样明细摘要：把 foodSampleReportDishDetailUsingPost 返回数据映射成摘要 */
+const dishSummary = computed((): string => {
+  const raw = dishData.value;
+  if (raw == null) {
+    return '';
+  }
+  let list = raw.getArray('data') as UTSJSONObject[] | null;
+  if (list == null) {
+    const inner = raw.getJSON('data');
+    if (inner != null) {
+      list = inner.getArray('data') as UTSJSONObject[] | null;
+    }
+  }
+  const items = list ?? ([] as UTSJSONObject[]);
+  if (items.length == 0) {
+    return '已拦截成功，留样记录暂无菜品明细';
+  }
+  let details = '';
+  for (let i = 0; i < items.length; i++) {
+    if (i > 0) {
+      details += ' · ';
+    }
+    const item = items[i];
+    const diningHall = item.getString('diningHallName') ?? '';
+    const person = item.getString('personName') ?? '';
+    const temp = item.getString('temperature') ?? '';
+    details += `${diningHall}(${person} ${temp})`;
+  }
+  return `留样记录获取成功 · 共 ${items.length} 条：${details}`;
+});
+
 /** 错误文案：查询错误与 mutation 错误都会展示 */
 const mockErrorText = computed((): string => {
+  if (dishErrorMsg.value != '') {
+    return dishErrorMsg.value;
+  }
   const loginError = loginMutation.error.value;
   if (loginError != null) {
     return loginError.message;
@@ -266,5 +377,31 @@ function submitMockLogin(): void {
     username: mockUsername.value.trim(),
     password: mockPassword.value.trim()
   } as MockLoginParams);
+}
+
+function requestDishDetail(): void {
+  if (isDishLoading.value == true) {
+    return;
+  }
+  isDishLoading.value = true;
+  dishErrorMsg.value = '';
+  dishData.value = null;
+
+  foodSampleReportDishDetailUsingPost({
+    body: {
+      recordId: 1001,
+      sampled: 1
+    } as FoodSampleReportDishDetailUsingPostBody
+  })
+    .then((res: FoodSampleReportDishDetailUsingPostResponse) => {
+      console.log(111, res);
+      dishData.value = JSON.parseObject(JSON.stringify(res));
+    })
+    .catch((err: any) => {
+      dishErrorMsg.value = err?.message ?? '请求留样明细失败';
+    })
+    .finally(() => {
+      isDishLoading.value = false;
+    });
 }
 </script>

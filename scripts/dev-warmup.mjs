@@ -41,27 +41,36 @@ const launchArgs = process.argv.slice(2);
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const CLI_CACHE_FILE = path.join(ROOT, 'node_modules', '.hbuilderx-cli-path');
 
-// 自动打通 pnpm dev:mock 到 HBuilderX 编译进程：
-// 当运行 dev:mock 时，临时注入最高优先级的开发配置，退出时自动清理，保证零配置即开即用
-const DEV_MOCK_ENV_FILE = path.join(ROOT, '.env.development.local');
+const MOCK_CACHE_DIR = path.join(ROOT, 'node_modules', '.cache');
+const MOCK_ACTIVE_FILE = path.join(MOCK_CACHE_DIR, 'mock-active.json');
 const isMockMode = process.env.VITE_USE_MOCK === 'true';
 
 if (isMockMode) {
   try {
-    fs.writeFileSync(
-      DEV_MOCK_ENV_FILE,
-      '# ===== 由 pnpm dev:mock 自动注入，进程退出时自动销毁 =====\nVITE_USE_MOCK=true\nVITE_H5_USE_PROXY=true\n',
-      'utf-8'
-    );
+    if (!fs.existsSync(MOCK_CACHE_DIR)) {
+      fs.mkdirSync(MOCK_CACHE_DIR, { recursive: true });
+    }
+    fs.writeFileSync(MOCK_ACTIVE_FILE, JSON.stringify({ pid: process.pid, time: Date.now() }), 'utf-8');
     console.log('\x1B[32m[dev:mock] 🚀 本地 Mock 模式已激活（已自动切换为 H5 代理模式）\x1B[0m');
   }
   catch {}
 }
+else {
+  // 普通开发模式，确保清理残留的 mock 标记
+  try {
+    if (fs.existsSync(MOCK_ACTIVE_FILE)) {
+      fs.unlinkSync(MOCK_ACTIVE_FILE);
+    }
+  }
+  catch {}
+}
 
-function cleanupDevMockEnv() {
-  if (isMockMode && fs.existsSync(DEV_MOCK_ENV_FILE)) {
+function cleanupMockActiveFile() {
+  if (isMockMode) {
     try {
-      fs.unlinkSync(DEV_MOCK_ENV_FILE);
+      if (fs.existsSync(MOCK_ACTIVE_FILE)) {
+        fs.unlinkSync(MOCK_ACTIVE_FILE);
+      }
     }
     catch {}
   }
@@ -379,7 +388,7 @@ function killPortProcesses(port) {
 }
 
 function cleanupAndExit() {
-  cleanupDevMockEnv();
+  cleanupMockActiveFile();
   if (child && !child.killed) {
     try {
       child.kill('SIGINT');
@@ -392,9 +401,9 @@ function cleanupAndExit() {
 
 process.on('SIGINT', cleanupAndExit);
 process.on('SIGTERM', cleanupAndExit);
-process.on('exit', cleanupDevMockEnv);
+process.on('exit', cleanupMockActiveFile);
 
 child.on('exit', (code) => {
-  cleanupDevMockEnv();
+  cleanupMockActiveFile();
   process.exit(code ?? 0);
 });

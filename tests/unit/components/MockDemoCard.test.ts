@@ -11,10 +11,11 @@ import MockDemoCard from '@/src/sub/httpBasicDemo/components/MockDemoCard.uvue';
  * 3. 登录 mutation 成功 / 失败分别反映到徽标与文案。
  */
 
-const { fetchMockFooListMock, fetchMockLoginMock } = vi.hoisted(() => {
+const { fetchMockFooListMock, fetchMockLoginMock, foodSampleMock } = vi.hoisted(() => {
   return {
     fetchMockFooListMock: vi.fn(),
-    fetchMockLoginMock: vi.fn()
+    fetchMockLoginMock: vi.fn(),
+    foodSampleMock: vi.fn()
   };
 });
 
@@ -22,6 +23,12 @@ vi.mock('@/src/api/example.uts', () => {
   return {
     fetchMockFooList: fetchMockFooListMock,
     fetchMockLogin: fetchMockLoginMock
+  };
+});
+
+vi.mock('@/src/api/generated/index.uts', () => {
+  return {
+    foodSampleReportDishDetailUsingPost: foodSampleMock
   };
 });
 
@@ -136,5 +143,30 @@ describe('mockDemoCard (vite-plugin-mock + hooks)', () => {
 
     expect(wrapper.text()).toContain('error');
     expect(wrapper.text()).toContain('pnpm dev:mock');
+  });
+
+  it('点击 OpenAPI 契约 Mock 按钮成功获取留样记录明细', async () => {
+    foodSampleMock.mockResolvedValue({
+      code: 200,
+      data: [
+        {
+          diningHallName: '第一教工餐厅',
+          personName: '张留样员',
+          temperature: '36.5℃'
+        }
+      ]
+    });
+
+    const wrapper = mount(MockDemoCard);
+    const button = findButton(wrapper, 'bg-[#0284c7]');
+    expect(button).not.toBeNull();
+
+    await button!.trigger('click');
+    await flush();
+
+    expect(foodSampleMock).toHaveBeenCalledTimes(1);
+    expect(wrapper.text()).toContain('success');
+    expect(wrapper.text()).toContain('留样记录获取成功 · 共 1 条');
+    expect(wrapper.text()).toContain('第一教工餐厅(张留样员 36.5℃)');
   });
 });

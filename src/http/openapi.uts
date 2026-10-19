@@ -16,6 +16,7 @@ export type OpenApiRequestOptions = {
   params?: any | null;
   data?: any | null;
   headers?: any | null;
+  extra?: any | null;
   [key: string]: any | null;
 };
 
@@ -50,6 +51,11 @@ export function request<T>(url: string, options: OpenApiRequestOptions | null = 
     const headersVal = options.headers;
     if (headersVal != null) {
       config.header = headersVal as UTSJSONObject;
+    }
+
+    const extraVal = options.extra;
+    if (extraVal != null) {
+      config.extra = extraVal as UTSJSONObject;
     }
   }
   else {
