@@ -8,7 +8,7 @@
  */
 
 import { inject } from 'vue';
-import type { QueryCacheRecord, QueryKey, QueryStatus, VueQueryPluginOptions } from './types.uts';
+import type { QueryCacheRecord, QueryFilterParam, QueryFilters, QueryKey, QueryStatus, VueQueryPluginOptions } from './types.uts';
 
 /** 全局 Vue provide / inject 标识键 */
 export const VUE_QUERY_CLIENT_KEY: string = 'VUE_QUERY_CLIENT';
@@ -29,6 +29,29 @@ export function serializeQueryKey(key: QueryKey): string {
 }
 
 /**
+ * 从 QueryFilterParam 解析出 QueryKey
+ */
+export function resolveQueryKeyFromParam(param: QueryFilterParam | null): QueryKey | null {
+  if (param == null) {
+    return null;
+  }
+  if (typeof param == 'string') {
+    return param as string;
+  }
+  if (Array.isArray(param)) {
+    return param as Array<any>;
+  }
+  try {
+    const obj = param as QueryFilters;
+    if (obj.queryKey != null) {
+      return obj.queryKey!;
+    }
+  }
+  catch (_) {}
+  return null;
+}
+
+/**
  * 查询客户端中枢 (QueryClient)
  */
 export class QueryClient {
@@ -38,6 +61,8 @@ export class QueryClient {
   private listeners: Map<string, Array<() => void>> = new Map();
   /** 在飞请求 Promise 字典：实现跨组件相同 queryKey 并发合并去重 */
   private inflight: Map<string, Promise<any>> = new Map();
+  /** 在飞请求取消回调队列：支持 cancelQueries(filters) 掐断底层真实网络任务 */
+  private cancelHandlers: Map<string, Array<() => void>> = new Map();
 
   /**
    * 从缓存中读取指定 queryKey 的数据
@@ -95,11 +120,82 @@ export class QueryClient {
   }
 
   /**
-   * 使匹配的查询失效（标记为过期并触发重新拉取）
-   * @param key 可选，不传则失效所有缓存
+   * 注册指定 queryKey 的请求取消回调
    */
-  invalidateQueries(key: QueryKey | null = null): void {
-    if (key == null) {
+  registerCancelHandler(key: QueryKey, handler: () => void): () => void {
+    const hash = serializeQueryKey(key);
+    let handlers = this.cancelHandlers.get(hash);
+    if (handlers == null) {
+      handlers = [];
+      this.cancelHandlers.set(hash, handlers);
+    }
+    handlers.push(handler);
+
+    return (): void => {
+      const cur = this.cancelHandlers.get(hash);
+      if (cur != null) {
+        const idx = cur.indexOf(handler);
+        if (idx !== -1) {
+          cur.splice(idx, 1);
+        }
+        if (cur.length === 0) {
+          this.cancelHandlers.delete(hash);
+        }
+      }
+    };
+  }
+
+  /**
+   * 取消匹配的查询（对标 TanStack Query cancelQueries）
+   * @param filters 可选目标查询键或过滤器对象，不传则取消全部在飞查询
+   */
+  cancelQueries(filters: QueryFilterParam | null = null): void {
+    const targetKey = resolveQueryKeyFromParam(filters);
+    if (targetKey == null) {
+      // 全量取消
+      this.cancelHandlers.forEach((handlers) => {
+        for (let i = 0; i < handlers.length; i = i + 1) {
+          try {
+            handlers[i]();
+          }
+          catch (e) {
+            console.warn('[queryClient] cancelHandler error', e);
+          }
+        }
+      });
+      this.cancelHandlers.clear();
+      this.inflight.clear();
+      return;
+    }
+
+    const hash = serializeQueryKey(targetKey);
+    const handlers = this.cancelHandlers.get(hash);
+    if (handlers != null) {
+      for (let i = 0; i < handlers.length; i = i + 1) {
+        try {
+          handlers[i]();
+        }
+        catch (e) {
+          console.warn('[queryClient] cancelHandler error', e);
+        }
+      }
+      this.cancelHandlers.delete(hash);
+    }
+    this.inflight.delete(hash);
+
+    const record = this.cache.get(hash);
+    if (record != null) {
+      record.isFetching = false;
+    }
+  }
+
+  /**
+   * 使匹配的查询失效（标记为过期并触发重新拉取，对标 TanStack Query invalidateQueries）
+   * @param filters 可选目标查询键或过滤器对象，不传则失效所有缓存
+   */
+  invalidateQueries(filters: QueryFilterParam | null = null): void {
+    const targetKey = resolveQueryKeyFromParam(filters);
+    if (targetKey == null) {
       // 全量失效
       this.cache.forEach((record) => {
         record.dataUpdatedAt = 0;
@@ -112,12 +208,39 @@ export class QueryClient {
       return;
     }
 
-    const hash = serializeQueryKey(key);
+    const hash = serializeQueryKey(targetKey);
     const record = this.cache.get(hash);
     if (record != null) {
       record.dataUpdatedAt = 0;
     }
-    this.notify(key);
+    this.notify(targetKey);
+  }
+
+  /**
+   * 移除匹配的查询缓存（对标 TanStack Query removeQueries）
+   */
+  removeQueries(filters: QueryFilterParam | null = null): void {
+    const targetKey = resolveQueryKeyFromParam(filters);
+    if (targetKey == null) {
+      this.cache.clear();
+      return;
+    }
+    const hash = serializeQueryKey(targetKey);
+    this.cache.delete(hash);
+  }
+
+  /**
+   * 重置查询为初始状态（对标 TanStack Query resetQueries）
+   */
+  resetQueries(filters: QueryFilterParam | null = null): void {
+    this.invalidateQueries(filters);
+  }
+
+  /**
+   * 重新拉取匹配的查询（对标 TanStack Query refetchQueries）
+   */
+  refetchQueries(filters: QueryFilterParam | null = null): void {
+    this.invalidateQueries(filters);
   }
 
   /**
@@ -192,9 +315,11 @@ export class QueryClient {
    * 清空所有查询缓存与在飞请求
    */
   clear(): void {
+    this.cancelQueries(null);
     this.cache.clear();
     this.listeners.clear();
     this.inflight.clear();
+    this.cancelHandlers.clear();
   }
 }
 

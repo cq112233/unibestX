@@ -17,10 +17,23 @@ export type MutationStatus = 'idle' | 'pending' | 'success' | 'error';
 /** 查询键类型：支持字符串或结构化数组 */
 export type QueryKey = Array<any> | string;
 
-/** 查询函数上下文 */
+/** 查询过滤器（对标 TanStack QueryFilters） */
+export type QueryFilters = {
+  /** 匹配的目标查询键 */
+  queryKey?: QueryKey;
+  /** 是否精确匹配（默认 false） */
+  exact?: boolean;
+};
+
+/** 支持直接传 QueryKey 或 QueryFilters 过滤器对象 */
+export type QueryFilterParam = QueryFilters | QueryKey;
+
+/** 查询函数上下文（对标 TanStack QueryFunctionContext） */
 export type QueryFunctionContext = {
   /** 规范化后的查询键数组 */
   queryKey: Array<any>;
+  /** 中断信号标识（对标 TanStack AbortSignal / 信号标识） */
+  signal?: any;
   /** 当前查询分配的全局唯一请求取消键（传给 extra.requestKey 可实现自动取消） */
   requestKey: string;
   /** 自定义元信息 */
@@ -76,7 +89,9 @@ export type QueryResult<T> = {
   isError: Ref<boolean>;
   /** 手动触发重新查询（无论缓存是否新鲜均强制向服务端请求） */
   refetch: () => Promise<T | null>;
-  /** 取消当前正在执行的在飞请求 */
+  /** 取消当前正在执行的在飞请求（对标 TanStack Query） */
+  cancel: () => void;
+  /** 取消当前正在执行的在飞请求（cancel 的别名） */
   abort: () => void;
 };
 

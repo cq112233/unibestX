@@ -43,7 +43,7 @@
           class="bg-[#ef4444] rounded-[8px] h-[42px] w-full flex flex-row items-center justify-center"
           @click="abortListRequest"
         >
-          <text class="text-[#ffffff] text-[14px]">abort()</text>
+          <text class="text-[#ffffff] text-[13px]">cancelQueries()</text>
         </view>
       </view>
     </view>
@@ -73,7 +73,7 @@
           class="bg-[#ef4444] rounded-[8px] h-[42px] w-full flex flex-row items-center justify-center"
           @click="abortRemoteRequest"
         >
-          <text class="text-[#ffffff] text-[14px]">abort() 取消</text>
+          <text class="text-[#ffffff] text-[13px]">cancelQueries()</text>
         </view>
       </view>
     </view>
@@ -291,7 +291,8 @@ function refreshListRequest(): void {
 }
 
 function abortListRequest(): void {
-  listQuery.abort();
+  // 对标 TanStack Query 规范：queryClient.cancelQueries({ queryKey })
+  defaultQueryClient.cancelQueries({ queryKey: ['fooList', 'uni'] });
 }
 
 function sendRemoteRequest(): void {
@@ -305,7 +306,8 @@ function sendRemoteRequest(): void {
 }
 
 function abortRemoteRequest(): void {
-  remoteQuery.abort();
+  // 对标 TanStack Query 规范：queryClient.cancelQueries({ queryKey })
+  defaultQueryClient.cancelQueries({ queryKey: ['fooRemote'] });
 }
 
 function handleSearchInput(): void {

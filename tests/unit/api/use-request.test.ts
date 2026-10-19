@@ -257,10 +257,10 @@ describe('useQuery 重试机制', () => {
 });
 
 describe('useQuery abort 取消联动', () => {
-  it('abort 能正确停止在飞请求并取消底层任务', async () => {
+  it('abort 与 cancel 能正确停止在飞请求并取消底层任务', async () => {
     const tasks: Array<any> = [];
     (globalThis as any).uni.request = vi.fn(() => {
-      const task = { abort: vi.fn(), onChunkReceived: vi.fn(), offChunkReceived: vi.fn() };
+      const task = { abort: vi.fn(), offChunkReceived: vi.fn(), onChunkReceived: vi.fn() };
       tasks.push(task);
       return task;
     });
@@ -279,7 +279,40 @@ describe('useQuery abort 取消联动', () => {
       expect(tasks.length).toBe(1);
       expect(tasks[0].abort).not.toHaveBeenCalled();
 
-      result.abort();
+      // 对标 TanStack Query 的 cancel / abort
+      result.cancel();
+      expect(tasks[0].abort).toHaveBeenCalledTimes(1);
+      expect(result.isFetching.value).toBe(false);
+    }
+    finally {
+      delete (globalThis as any).uni.request;
+    }
+  });
+
+  it('queryClient.cancelQueries 对标 TanStack Query 规范取消在飞任务', async () => {
+    const tasks: Array<any> = [];
+    (globalThis as any).uni.request = vi.fn(() => {
+      const task = { abort: vi.fn(), offChunkReceived: vi.fn(), onChunkReceived: vi.fn() };
+      tasks.push(task);
+      return task;
+    });
+
+    try {
+      const result = withSetup(() => useQuery<any>({
+        queryKey: ['tanstackCancelDemo'],
+        queryFn: (ctx: QueryFunctionContext) => {
+          return http.get<any>('/demo/tanstack-cancel', {
+            extra: { ignoreAuth: true, requestKey: ctx.requestKey }
+          } as any);
+        }
+      } as QueryOptions<any>));
+
+      await flush(5);
+      expect(tasks.length).toBe(1);
+      expect(tasks[0].abort).not.toHaveBeenCalled();
+
+      // 支持对象传参：queryClient.cancelQueries({ queryKey: [...] })
+      defaultQueryClient.cancelQueries({ queryKey: ['tanstackCancelDemo'] });
       expect(tasks[0].abort).toHaveBeenCalledTimes(1);
       expect(result.isFetching.value).toBe(false);
     }

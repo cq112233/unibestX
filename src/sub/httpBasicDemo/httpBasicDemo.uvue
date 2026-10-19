@@ -18,9 +18,6 @@
       :lower-threshold="50" @scroll="handleScroll" @scrolltolower="handleScrollToLower"
     >
       <view class="flex flex-col">
-        <!-- 0. 页面加载与接口请求（自执行与生命周期） -->
-        <PageInitDemoCard />
-
         <!-- 1. 真实请求（CRUD 增删改查） -->
         <CrudDemoCard />
 
@@ -49,7 +46,6 @@ import { ref } from 'vue';
 import CrudDemoCard from './components/CrudDemoCard.uvue';
 import DownloadDemoCard from './components/DownloadDemoCard.uvue';
 import MockDemoCard from './components/MockDemoCard.uvue';
-import PageInitDemoCard from './components/PageInitDemoCard.uvue';
 import UploadDemoCard from './components/UploadDemoCard.uvue';
 import VueQueryDemoCard from './components/VueQueryDemoCard.uvue';
 import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/layouts/navbar/utils/index.uts';

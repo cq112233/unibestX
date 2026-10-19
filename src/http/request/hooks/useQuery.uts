@@ -164,7 +164,19 @@ export function useQuery<T>(
     });
   };
 
-  // ---------- 7. 核心执行器 (执行单次拉取与重试) ----------
+  // ---------- 7. 取消方法定义 ----------
+  const abort = (): void => {
+    seq = seq + 1;
+    if (currentKey !== '') {
+      abortRequest(currentKey);
+      currentKey = '';
+    }
+    client.removeInflightPromise(optKey);
+    isFetchingRef.value = false;
+    isLoadingRef.value = false;
+  };
+
+  // ---------- 8. 核心执行器 (执行单次拉取与重试) ----------
   const executeFetch = (isForce: boolean): Promise<T | null> => {
     if (disposed == true) {
       return Promise.resolve(null);
@@ -209,11 +221,17 @@ export function useQuery<T>(
     currentKey = requestKey;
     const ctx: QueryFunctionContext = {
       queryKey: normalizeKeyArray(optKey),
+      signal: {
+        requestKey
+      },
       requestKey,
       meta: options.meta
     };
 
     const taskSeq = seq;
+    const cancelUnregister = client.registerCancelHandler(optKey, (): void => {
+      abort();
+    });
 
     // 单次尝试逻辑包装
     const attemptRun = (attemptCount: number): Promise<T> => {
@@ -243,6 +261,7 @@ export function useQuery<T>(
 
     return fetchPromise.then(
       (resultData: T): T | null => {
+        cancelUnregister();
         client.removeInflightPromise(optKey);
         if (disposed == true || taskSeq !== seq) {
           return null;
@@ -252,6 +271,7 @@ export function useQuery<T>(
         return resultData;
       },
       (err: any): T | null => {
+        cancelUnregister();
         client.removeInflightPromise(optKey);
         if (disposed == true || taskSeq !== seq) {
           return null;
@@ -263,22 +283,12 @@ export function useQuery<T>(
     );
   };
 
-  // ---------- 8. 对外操作方法 ----------
+  // ---------- 9. 对外操作方法 ----------
   const refetch = (): Promise<T | null> => {
     return executeFetch(true);
   };
 
-  const abort = (): void => {
-    seq = seq + 1;
-    if (currentKey !== '') {
-      abortRequest(currentKey);
-      currentKey = '';
-    }
-    isFetchingRef.value = false;
-    isLoadingRef.value = false;
-  };
-
-  // ---------- 9. 缓存同步监听 ----------
+  // ---------- 10. 缓存同步监听 ----------
   const unsubscribe = client.subscribe(optKey, (): void => {
     if (disposed == true) {
       return;
@@ -336,6 +346,7 @@ export function useQuery<T>(
     isSuccess: isSuccessRef,
     isError: isErrorRef,
     refetch,
+    cancel: abort,
     abort
   };
 
