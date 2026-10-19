@@ -49,8 +49,8 @@ export type QueryOptions<T> = {
   queryKey: QueryKey;
   /** 执行请求并返回数据的异步函数 */
   queryFn: QueryFunction<T>;
-  /** 是否自动发起请求，默认 true */
-  enabled?: boolean;
+  /** 是否自动发起请求，默认 true；支持传入布尔值、Ref<boolean> 或 getter 函数实现依赖查询 */
+  enabled?: any;
   /** 数据判定为新鲜的时间窗口（毫秒），窗口内重复触发直接命中缓存，默认 0 */
   staleTime?: number;
   /** 缓存驻留最大时长（毫秒），过期将自动垃圾回收，默认 5 分钟 (300000ms) */
@@ -95,11 +95,27 @@ export type QueryResult<T> = {
   abort: () => void;
 };
 
+/** 变更标识键类型（对标 TanStack MutationKey） */
+export type MutationKey = Array<any> | string;
+
+/** 变更过滤器（对标 TanStack MutationFilters） */
+export type MutationFilters = {
+  /** 匹配的目标变更键 */
+  mutationKey?: MutationKey;
+  /** 是否精确匹配（默认 false） */
+  exact?: boolean;
+};
+
+/** 支持直接传 MutationKey 或 MutationFilters 对象 */
+export type MutationFilterParam = MutationFilters | MutationKey;
+
 /** 变更函数签名 */
 export type MutationFunction<TData, TVariables> = (variables: TVariables) => Promise<TData>;
 
 /** useMutation 配置项 */
 export type MutationOptions<TData, TVariables> = {
+  /** 变更唯一标识键（对标 TanStack Query，可选） */
+  mutationKey?: MutationKey;
   /** 执行数据变更写入的异步函数 */
   mutationFn: MutationFunction<TData, TVariables>;
   /** 发起变更前的钩子（常用于乐观更新或前置校验，返回值将透传为 context） */
@@ -122,6 +138,8 @@ export type MutationOptions<TData, TVariables> = {
 export type MutationResult<TData, TVariables> = {
   /** 变更成功后的返回数据 */
   data: Ref<TData | null>;
+  /** 当前或最近一次执行变更传入的变量参数（对标 TanStack Query） */
+  variables: Ref<TVariables | null>;
   /** 变更失败后的异常对象 */
   error: Ref<Error | null>;
   /** 当前变更状态 ('idle' | 'pending' | 'success' | 'error') */

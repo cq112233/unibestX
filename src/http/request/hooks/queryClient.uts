@@ -8,7 +8,17 @@
  */
 
 import { inject } from 'vue';
-import type { QueryCacheRecord, QueryFilterParam, QueryFilters, QueryKey, QueryStatus, VueQueryPluginOptions } from './types.uts';
+import type {
+  MutationFilterParam,
+  MutationFilters,
+  MutationKey,
+  QueryCacheRecord,
+  QueryFilterParam,
+  QueryFilters,
+  QueryKey,
+  QueryStatus,
+  VueQueryPluginOptions
+} from './types.uts';
 
 /** 全局 Vue provide / inject 标识键 */
 export const VUE_QUERY_CLIENT_KEY: string = 'VUE_QUERY_CLIENT';
@@ -45,6 +55,29 @@ export function resolveQueryKeyFromParam(param: QueryFilterParam | null): QueryK
     const obj = param as QueryFilters;
     if (obj.queryKey != null) {
       return obj.queryKey!;
+    }
+  }
+  catch (_) {}
+  return null;
+}
+
+/**
+ * 从 MutationFilterParam 解析出 MutationKey
+ */
+export function resolveMutationKeyFromParam(param: MutationFilterParam | null): MutationKey | null {
+  if (param == null) {
+    return null;
+  }
+  if (typeof param == 'string') {
+    return param as string;
+  }
+  if (Array.isArray(param)) {
+    return param as Array<any>;
+  }
+  try {
+    const obj = param as MutationFilters;
+    if (obj.mutationKey != null) {
+      return obj.mutationKey!;
     }
   }
   catch (_) {}
@@ -101,6 +134,10 @@ export class QueryClient {
   private inflight: Map<string, Promise<any>> = new Map();
   /** 在飞请求取消回调队列：支持 cancelQueries(filters) 掐断底层真实网络任务 */
   private cancelHandlers: Map<string, Array<() => void>> = new Map();
+  /** 全局当前执行中的 Mutation 总数 */
+  private totalMutatingCount: number = 0;
+  /** 按 mutationKey 分组统计执行中的 Mutation 计数 */
+  private activeMutations: Map<string, number> = new Map();
 
   /**
    * 从缓存中读取指定 queryKey 的数据
@@ -372,6 +409,53 @@ export class QueryClient {
   }
 
   /**
+   * 登记变更操作启动并维护 isMutating 计数
+   */
+  registerMutation(key: MutationKey | null = null): () => void {
+    this.totalMutatingCount = this.totalMutatingCount + 1;
+    let hash: string = '';
+    if (key != null) {
+      hash = serializeQueryKey(key as QueryKey);
+      const cur = this.activeMutations.get(hash) ?? 0;
+      this.activeMutations.set(hash, cur + 1);
+    }
+
+    let unregistered = false;
+    return (): void => {
+      if (unregistered == true) {
+        return;
+      }
+      unregistered = true;
+      if (this.totalMutatingCount > 0) {
+        this.totalMutatingCount = this.totalMutatingCount - 1;
+      }
+      if (hash.length > 0) {
+        const count = this.activeMutations.get(hash) ?? 0;
+        if (count <= 1) {
+          this.activeMutations.delete(hash);
+        }
+        else {
+          this.activeMutations.set(hash, count - 1);
+        }
+      }
+    };
+  }
+
+  /**
+   * 探测当前是否有执行中的 Mutation 变更（对标 TanStack Query isMutating）
+   * @param filters 可选过滤条件或变更键，不传则返回全局正在执行的变更总数
+   * @returns 匹配的正在执行中的变更数量（0 表示当前无变更）
+   */
+  isMutating(filters: MutationFilterParam | null = null): number {
+    const targetKey = resolveMutationKeyFromParam(filters);
+    if (targetKey == null) {
+      return this.totalMutatingCount;
+    }
+    const hash = serializeQueryKey(targetKey as QueryKey);
+    return this.activeMutations.get(hash) ?? 0;
+  }
+
+  /**
    * 清空所有查询缓存与在飞请求
    */
   clear(): void {
@@ -380,6 +464,8 @@ export class QueryClient {
     this.listeners.clear();
     this.inflight.clear();
     this.cancelHandlers.clear();
+    this.activeMutations.clear();
+    this.totalMutatingCount = 0;
   }
 }
 

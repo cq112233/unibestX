@@ -11,16 +11,21 @@
 import { ref } from 'vue';
 import type { Ref } from 'vue';
 import { toError } from '../util/helper.uts';
+import { useQueryClient } from './queryClient.uts';
+import type { QueryClient } from './queryClient.uts';
 import type { MutationOptions, MutationResult, MutationStatus } from './types.uts';
 
 /**
  * 声明式变更 Hook (useMutation)
  *
- * @param options 变更配置项（含 mutationFn 与生命周期回调）
+ * @param options 变更配置项（含 mutationKey、mutationFn 与生命周期回调）
+ * @param customClient 可选自定义 QueryClient（默认使用全局或注入的单例）
  */
 export function useMutation<TData, TVariables>(
-  options: MutationOptions<TData, TVariables>
+  options: MutationOptions<TData, TVariables>,
+  customClient: QueryClient | null = null
 ): MutationResult<TData, TVariables> {
+  const client: QueryClient = useQueryClient(customClient);
   const optFn = options.mutationFn;
   let optRetry: number = 0;
   if (options.retry != null) {
@@ -34,6 +39,8 @@ export function useMutation<TData, TVariables>(
   // ---------- 1. 响应式状态声明 ----------
   const dataRefAny: any = ref<TData | null>(null);
   const dataRef: Ref<TData | null> = dataRefAny as Ref<TData | null>;
+  const variablesRefAny: any = ref<TVariables | null>(null);
+  const variablesRef: Ref<TVariables | null> = variablesRefAny as Ref<TVariables | null>;
   const errorRef: Ref<Error | null> = ref<Error | null>(null);
   const statusRef: Ref<MutationStatus> = ref<MutationStatus>('idle');
 
@@ -44,6 +51,7 @@ export function useMutation<TData, TVariables>(
   // ---------- 2. 重置方法 ----------
   const reset = (): void => {
     dataRef.value = null;
+    variablesRef.value = null;
     errorRef.value = null;
     statusRef.value = 'idle';
     isPendingRef.value = false;
@@ -66,11 +74,14 @@ export function useMutation<TData, TVariables>(
 
   // ---------- 4. 异步执行器 (mutateAsync) ----------
   const mutateAsync = (variables: TVariables): Promise<TData> => {
+    variablesRef.value = variables;
     statusRef.value = 'pending';
     isPendingRef.value = true;
     isSuccessRef.value = false;
     isErrorRef.value = false;
     errorRef.value = null;
+
+    const unregisterMutation = client.registerMutation(options.mutationKey);
 
     // 执行 onMutate 钩子（获取乐观更新上下文）
     let mutateContext: any = null;
@@ -102,6 +113,7 @@ export function useMutation<TData, TVariables>(
 
     return runAttempt(0).then(
       (resData: TData): TData => {
+        unregisterMutation();
         dataRef.value = resData;
         statusRef.value = 'success';
         isPendingRef.value = false;
@@ -117,6 +129,7 @@ export function useMutation<TData, TVariables>(
         return resData;
       },
       (err: any): Promise<TData> => {
+        unregisterMutation();
         const errorObj = toError(err);
         errorRef.value = errorObj;
         statusRef.value = 'error';
@@ -145,6 +158,7 @@ export function useMutation<TData, TVariables>(
   // ---------- 6. 返回结果 ----------
   const result: MutationResult<TData, TVariables> = {
     data: dataRef,
+    variables: variablesRef,
     error: errorRef,
     status: statusRef,
     isPending: isPendingRef,

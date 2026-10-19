@@ -412,4 +412,82 @@ describe('useMutation 变更操作', () => {
     await mutation.mutateAsync('test');
     expect(receivedContext).toBe('context_for_test');
   });
+
+  it('支持 mutationKey、variables 与 queryClient.isMutating 联动', async () => {
+    let resolveFn: ((val: string) => void) | null = null;
+    const mutation = withSetup(() => useMutation<string, string>({
+      mutationKey: ['addTodo'],
+      mutationFn: _text => new Promise<string>((resolve) => {
+        resolveFn = resolve;
+      })
+    } as MutationOptions<string, string>));
+
+    expect(defaultQueryClient.isMutating()).toBe(0);
+    expect(defaultQueryClient.isMutating({ mutationKey: ['addTodo'] })).toBe(0);
+
+    const promise = mutation.mutateAsync('new-item');
+    expect(mutation.variables.value).toBe('new-item');
+    expect(defaultQueryClient.isMutating()).toBe(1);
+    expect(defaultQueryClient.isMutating({ mutationKey: ['addTodo'] })).toBe(1);
+    expect(defaultQueryClient.isMutating({ mutationKey: ['otherKey'] })).toBe(0);
+
+    resolveFn!('done');
+    await promise;
+
+    expect(defaultQueryClient.isMutating()).toBe(0);
+    expect(defaultQueryClient.isMutating({ mutationKey: ['addTodo'] })).toBe(0);
+
+    mutation.reset();
+    expect(mutation.variables.value).toBe(null);
+  });
+});
+
+describe('useQuery 依赖查询 (Dependent Queries / 先后顺序)', () => {
+  it('支持传入响应式 enabled (Ref/computed)，由 false 变 true 时自动触发请求', async () => {
+    let callCount = 0;
+    const isReady = ref(false);
+
+    const query = withSetup(() => useQuery<string>({
+      queryKey: ['dependentQueryDemo'],
+      queryFn: () => {
+        callCount++;
+        return Promise.resolve(`data_${callCount}`);
+      },
+      enabled: isReady
+    } as QueryOptions<string>));
+
+    await flush(5);
+    // 初始 enabled 为 false，不应发起任何请求
+    expect(callCount).toBe(0);
+    expect(query.data.value).toBe(null);
+    expect(query.isLoading.value).toBe(false);
+
+    // 依赖满足，变为 true
+    isReady.value = true;
+    await flush(10);
+
+    expect(callCount).toBe(1);
+    expect(query.data.value).toBe('data_1');
+    expect(query.isSuccess.value).toBe(true);
+  });
+
+  it('两个查询按先后顺序联动 (Query B 依赖 Query A 的返回结果)', async () => {
+    // 模拟第一个接口：获取用户信息
+    const userQuery = withSetup(() => useQuery<{ id: number; name: string }>({
+      queryKey: ['userProfile'],
+      queryFn: () => Promise.resolve({ id: 888, name: 'Alice' })
+    } as QueryOptions<{ id: number; name: string }>));
+
+    // 模拟第二个接口：依赖 userQuery 的 id
+    const ordersQuery = withSetup(() => useQuery<Array<string>>({
+      queryKey: ['userOrders'],
+      queryFn: () => Promise.resolve([`order_for_${userQuery.data.value!.id}`]),
+      enabled: () => userQuery.data.value != null
+    } as QueryOptions<Array<string>>));
+
+    await flush(10);
+
+    expect(userQuery.data.value?.name).toBe('Alice');
+    expect(ordersQuery.data.value).toEqual(['order_for_888']);
+  });
 });
