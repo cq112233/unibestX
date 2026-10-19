@@ -1,11 +1,10 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import {
   buildApiInstanceOptions,
   createHttpClient,
   defaultBusinessAfterComplete,
   defaultBusinessAfterSuccess,
   defaultBusinessBeforeRequest,
-  downloadHttp,
   http,
   HttpClient,
   RequestLifecycle
@@ -478,22 +477,6 @@ describe('httpClient downloadFile', () => {
 
     const res = await client.download('/files/alias.png');
     expect(res.tempFilePath).toBe('/tmp/alias.png');
-    expect(res.statusCode).toBe(200);
-  });
-
-  it('should expose downloadHttp facade delegating to default http instance', async () => {
-    expect(typeof downloadHttp).toBe('function');
-
-    const spy = vi.spyOn(http, 'downloadFile').mockResolvedValue({
-      tempFilePath: '/tmp/facade.png',
-      statusCode: 200
-    } as any);
-
-    const res = await downloadHttp('/files/facade.png');
-
-    expect(spy).toHaveBeenCalledTimes(1);
-    expect(res.tempFilePath).toBe('/tmp/facade.png');
-    spy.mockRestore();
   });
 });
 

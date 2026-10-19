@@ -2,7 +2,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   createHttpClient,
   http,
-  streamHttp
+  requestStream,
+  simulateStream
 } from '@/src/http/index.uts';
 
 /**
@@ -218,7 +219,7 @@ describe('http 单例的 stream 复用前置钩子链', () => {
   });
 });
 
-describe('streamHttp', () => {
+describe('http.stream', () => {
   let fake: ReturnType<typeof installFakeRequest>;
 
   beforeEach(() => {
@@ -229,10 +230,14 @@ describe('streamHttp', () => {
     delete (globalThis as any).uni.request;
   });
 
-  it('固定 POST 与 chunked 参数后委托给默认实例', async () => {
-    const handle = streamHttp('/sse', 'body', () => {}, () => {}, {
+  it('固定 POST 与 chunked 参数后由 http.stream 调度', async () => {
+    const handle = http.stream({
+      url: '/sse',
+      method: 'POST',
+      data: 'body',
+      enableChunked: true,
       extra: { ignoreAuth: true } as any
-    } as any);
+    } as any, () => {}, () => {});
     await flush();
 
     expect(fake.calls.length).toBe(1);
@@ -240,5 +245,106 @@ describe('streamHttp', () => {
     expect(fake.calls[0].data).toBe('body');
     expect(fake.calls[0].enableChunked).toBe(true);
     expect(typeof handle.abort).toBe('function');
+  });
+});
+
+describe('requestStream & simulateStream (纯回调流式)', () => {
+  let fake: ReturnType<typeof installFakeRequest>;
+
+  beforeEach(() => {
+    fake = installFakeRequest();
+  });
+
+  afterEach(() => {
+    delete (globalThis as any).uni.request;
+  });
+
+  it('requestStream 逐块回调文本并在完成时触发 onComplete', async () => {
+    const chunks: Array<string> = [];
+    let completed = false;
+
+    const task = requestStream({
+      url: '/chat/simple',
+      body: JSON.stringify({ message: 'hi' }),
+      extra: { ignoreAuth: true } as any,
+      onChunk: (chunk: any) => {
+        chunks.push(chunk.text);
+      },
+      onComplete: () => {
+        completed = true;
+      }
+    });
+
+    await flush();
+
+    expect(fake.calls.length).toBe(1);
+    expect(fake.calls[0].url).toContain('/chat/simple');
+    expect(typeof task.abort).toBe('function');
+
+    // 模拟服务端推了两块 UTF-8 数据
+    const enc = new TextEncoder();
+    fake.emitChunk(0, enc.encode('你好').buffer as ArrayBuffer);
+    fake.emitChunk(0, enc.encode('世界').buffer as ArrayBuffer);
+
+    expect(chunks).toEqual(['你好', '世界']);
+    expect(completed).toBe(false);
+
+    // 服务端响应完成
+    fake.fireSuccess(0);
+    expect(completed).toBe(true);
+  });
+
+  it('requestStream 调用 abort() 中断底层任务', async () => {
+    let errorCaught = '';
+    const task = requestStream({
+      url: '/chat/abort-test',
+      body: '',
+      extra: { ignoreAuth: true } as any,
+      onChunk: () => {},
+      onError: (err: Error) => {
+        errorCaught = err.message;
+      }
+    });
+
+    await flush();
+    expect(fake.tasks.length).toBe(1);
+
+    task.abort();
+    expect(fake.tasks[0].abort).toHaveBeenCalledTimes(1);
+    // 静默丢弃后续 fail
+    fake.fireFail(0, 'request:fail abort');
+    expect(errorCaught).toBe('');
+  });
+
+  it('simulateStream 本地模拟打字机逐块吐字', async () => {
+    vi.useFakeTimers();
+    try {
+      const output: Array<string> = [];
+      let isDone = false;
+
+      simulateStream('Hello World', (chunk: any) => {
+        output.push(chunk.text);
+      }, () => {
+        isDone = true;
+      }, 5, 50);
+
+      expect(output.length).toBe(0);
+
+      // 第一段 50ms
+      vi.advanceTimersByTime(50);
+      expect(output).toEqual(['Hello']);
+
+      // 第二段 50ms
+      vi.advanceTimersByTime(50);
+      expect(output).toEqual(['Hello', ' Worl']);
+
+      // 第三段 50ms (剩余 d)
+      vi.advanceTimersByTime(50);
+      expect(output).toEqual(['Hello', ' Worl', 'd']);
+      expect(isDone).toBe(true);
+    }
+    finally {
+      vi.useRealTimers();
+    }
   });
 });

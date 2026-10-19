@@ -10,18 +10,18 @@ import { useTokenStore } from '@/src/store/index.uts';
 import { toLoginPage } from '@/src/utils/auth/toLoginPage.uts';
 import {
   cloneConfig,
-  ContentTypeEnum,
-  createHttpClient,
-  defaultLifecycle,
   extractErrorMessage,
   extractStatusCode
-} from '../../request/index.uts';
+} from '../../request/util/helper.uts';
+import { ContentTypeEnum } from '../../request/core/enum.uts';
+import { defaultLifecycle } from '../../request/core/lifecycle.uts';
+import { createHttpClient } from '../../request/core/client.uts';
+import type { HttpClient } from '../../request/core/client.uts';
 import type {
-  HttpClient,
   HttpClientOptions,
   HttpRequestConfig,
   RespondedOptions
-} from '../../request/index.uts';
+} from '../../request/core/types.uts';
 import {
   BusinessError,
   HttpError,

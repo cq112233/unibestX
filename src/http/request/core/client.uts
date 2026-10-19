@@ -10,7 +10,7 @@
  */
 
 import { ContentTypeEnum } from './enum.uts';
-import { RequestLifecycle } from './lifecycle.uts';
+import { defaultLifecycle, RequestLifecycle } from './lifecycle.uts';
 import type {
   AbortableTask,
   AfterResponseCompleteHook,
@@ -903,4 +903,24 @@ export class HttpClient {
       }
     };
   }
+}
+
+/**
+ * 工厂函数：统一创建并生成 HttpClient 原生底层客户端实例（纯净基础设施引擎，无预置业务代码）
+ * @param options 客户端配置；传 null 时初始化一个纯净无业务拦截的基础实例
+ */
+export function createHttpClient(options: HttpClientOptions | null = null): HttpClient {
+  if (options == null) {
+    const pureOptions: HttpClientOptions = {
+      baseURL: '',
+      timeout: 5000,
+      header: {
+        'Content-Type': ContentTypeEnum.AppJson,
+        'Accept': 'application/json, text/plain, */*'
+      } as UTSJSONObject,
+      lifecycle: defaultLifecycle
+    };
+    return new HttpClient(pureOptions);
+  }
+  return new HttpClient(options);
 }

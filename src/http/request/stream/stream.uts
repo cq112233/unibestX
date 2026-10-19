@@ -1,38 +1,50 @@
 /**
- * 流式请求封装 —— 基于 `HttpClient.stream` 的 chunked 分块接收，输出为 Observable 流
+ * 流式请求封装 —— 基于 `HttpClient.stream` 的 chunked 分块接收，纯回调风格（零 Rx 依赖）
  *
- * 设计目标：把「真实 SSE 分块接口」与「本地模拟流」统一成同一个 Observable<StreamChunk>，
- * 页面侧只需要切换数据源，下游的流处理逻辑（map / scan / takeUntil / catchError）完全复用。
+ * 设计目标：把「真实 SSE 分块接口」与「本地模拟打字机」封装为统一清晰的 callback 风格，
+ * 内部自持增量 UTF-8 状态机（`Utf8StreamDecoder`），彻底防止中文或 Emoji 被 chunk 截断产生乱码。
  *
  * 请求侧统一走 http 层（`@/src/http/request/index.uts`）：自动携带鉴权头、相对路径自动拼
  * baseURL、`extra.domain` 可临时切域名 —— 因此本模块不再自己调 `uni.request`。
- * 响应侧**刻意不经过** http 层的业务码拆包（流式响应体不是 `{ code, data }` 包装），
- * 只把原始字节块交给下面的增量解码器，细节见 `HttpClient.stream` 的注释。
  *
  * 平台支持：uni.request 的 enableChunked 与 RequestTask.onChunkReceived
- * 在 Web / Android / iOS / 鸿蒙 4.71+ 均可用（本项目 uni-app X 版本远高于此）。
+ * 在 Web / Android / iOS / 鸿蒙 4.71+ 均可用。
  *
  * @example
  * ```uts
- * import { requestStream, simulateStream } from '@/src/http/stream/stream.uts';
- * import { scan, takeUntil } from '@/src/utils/rxjs-lite/index.uts';
+ * import { requestStream, type StreamChunk } from '@/src/http';
  *
- * // 相对路径会自动拼上 baseURL，token 由默认前置钩子注入
- * const source = requestStream('/api/v1/chat/stream', body, null, 60000);
- * const sub = source
- *   .pipe(scan((acc: string, chunk: StreamChunk): string => acc + chunk.text, ''))
- *   .subscribe((full: string): void => { content.value = full; });
+ * const task = requestStream({
+ *   url: '/api/v1/chat/stream',
+ *   body: JSON.stringify({ prompt: '你好' }),
+ *   onChunk: (chunk: StreamChunk): void => {
+ *     content.value += chunk.text;
+ *   },
+ *   onComplete: (): void => {
+ *     console.log('完成');
+ *   }
+ * });
+ * task.abort();
  * ```
  */
 
-import { Observable } from '@/src/utils/rxjs-lite/index.uts';
-import type { Subscriber, TeardownFn } from '@/src/utils/rxjs-lite/index.uts';
-import { http } from '@/src/http/instances/index.uts';
-import type { HttpRequestConfig } from '@/src/http/index.uts';
+import type { HttpClient } from '../core/client.uts';
+import type { HttpRequestConfig, StreamTask } from '../core/types.uts';
+import { http } from '@/src/http/instances/default.uts';
+
+let defaultHttpInstance: HttpClient | null = null;
+function getDefaultHttp(): HttpClient {
+  if (defaultHttpInstance == null) {
+    defaultHttpInstance = http;
+  }
+  return defaultHttpInstance!;
+}
 
 // ==========================================
 // 类型定义（禁止 interface，统一使用 type）
 // ==========================================
+
+export type { StreamTask } from '../core/types.uts';
 
 /** 流式数据块 */
 export type StreamChunk = {
@@ -43,6 +55,32 @@ export type StreamChunk = {
   /** 从发起请求到收到该块的耗时（毫秒） */
   elapsedMs: number;
 };
+
+/** 纯回调流式配置项 */
+export type StreamOptions = {
+  /** 请求地址：完整 http(s):// 地址，或与 baseURL 拼接的相对路径 */
+  url: string;
+  /** 请求体（字符串，通常是 JSON.stringify 的结果） */
+  body: string;
+  /** 请求头，可选（默认走 SSE 请求头） */
+  header?: UTSJSONObject | null;
+  /** 附加参数，可选（如 extra.ignoreAuth 跳过业务 Token 校验，extra.domain 切换域名） */
+  extra?: UTSJSONObject | null;
+  /** 超时时间（毫秒），默认 60000 */
+  timeout?: number;
+  /** 逐块接收到新文本片段时的回调（已自动完成 UTF-8 防乱码解码） */
+  onChunk: (chunk: StreamChunk) => void;
+  /** 流正常接收完毕时的回调，可选 */
+  onComplete?: () => void;
+  /** 流发生错误时的回调，可选 */
+  onError?: (err: Error) => void;
+};
+
+/** 兼容别名 */
+export type StreamSimpleOptions = StreamOptions;
+
+/** 兼容别名 */
+export type StreamSimpleTask = StreamTask;
 
 // ==========================================
 // 增量 UTF-8 解码器
@@ -153,143 +191,190 @@ export class Utf8StreamDecoder {
 }
 
 // ==========================================
-// 真实流式请求
+// 真实流式请求 (纯回调风格)
 // ==========================================
 
 /**
- * 发起一个 chunked 流式 POST 请求，返回逐块吐出文本的 Observable。
+ * 流式请求 (requestStream) —— 纯回调风格，零外部依赖
  *
- * 订阅时立即发起请求；取消订阅（unsubscribe）会 abort 掉底层请求，
- * 流正常完成或出错时也会自动释放。
+ * 结合了 Utf8StreamDecoder（防中文被 chunk 截断乱码）与 http 层的自动鉴权和 baseURL 拼接，
+ * 无需引入 Observable / RxJS，直接通过清晰直观的回调接收数据。
  *
- * 鉴权与域名由 http 层的前置钩子统一处理：token 自动注入，相对路径自动拼 baseURL ——
- * 因此这里的 url **既可传完整地址，也可传 `/api/v1/...` 这样的相对路径**。
- * 需要跳过鉴权（如公开接口）时改走 `streamHttp` 并传 `extra.ignoreAuth`。
+ * @param options 流式配置项及 onChunk / onComplete / onError 回调
+ * @returns 包含 abort() 方法的 StreamTask 对象
  *
- * @param url 请求地址：完整 `http(s)://` 地址，或与 baseURL 拼接的相对路径
- * @param body 请求体（字符串，通常是 JSON.stringify 的结果）
- * @param header 请求头，不需要时传 null（走 SSE 默认头）
- * @param timeout 超时时间（毫秒）
+ * @example
+ * ```uts
+ * const task = requestStream({
+ *   url: '/api/v1/chat/completions',
+ *   body: JSON.stringify({ prompt: '你好' }),
+ *   onChunk: (chunk: StreamChunk): void => {
+ *     content.value += chunk.text;
+ *   },
+ *   onComplete: (): void => {
+ *     console.log('流接收完毕');
+ *   },
+ *   onError: (err: Error): void => {
+ *     console.error('流发生错误:', err.message);
+ *   }
+ * });
+ *
+ * // 中断取消
+ * task.abort();
+ * ```
  */
 export function requestStream(
-  url: string,
-  body: string,
-  header: UTSJSONObject | null = null,
-  timeout: number = 60000
-): Observable<StreamChunk> {
-  return new Observable<StreamChunk>((subscriber: Subscriber<StreamChunk>): TeardownFn | null => {
-    const startTime: number = Date.now();
-    const decoder = new Utf8StreamDecoder();
-    let receivedText: string = '';
-    let settled: boolean = false;
-    // 错误统一以 Error 实例下沉，页面侧用 `err instanceof Error` 即可安全取文案，
-    // 规避 UTS 中对象字面量 / UTSJSONObject 类型断言的运行时不确定性
-    const settle = (errMsg: string | null): void => {
-      if (settled) {
-        return;
+  options: StreamOptions,
+  customClient: HttpClient | null = null
+): StreamTask {
+  const client: HttpClient = customClient != null ? customClient! : getDefaultHttp();
+  const startTime: number = Date.now();
+  const decoder = new Utf8StreamDecoder();
+  let receivedText: string = '';
+  let settled: boolean = false;
+  let aborted: boolean = false;
+
+  const requestHeader: UTSJSONObject = options.header != null
+    ? options.header!
+    : ({
+        'Content-Type': 'application/json',
+        'Accept': 'text/event-stream, application/x-ndjson, application/json'
+      } as UTSJSONObject);
+
+  const timeout = options.timeout != null ? options.timeout! : 60000;
+
+  const streamTask = client.stream({
+    url: options.url,
+    method: 'POST',
+    data: options.body,
+    header: requestHeader,
+    extra: options.extra,
+    timeout
+  } as HttpRequestConfig, (data: ArrayBuffer): void => {
+    if (settled || aborted) {
+      return;
+    }
+    const text = decoder.decodeChunk(data);
+    if (text.length <= 0) {
+      return;
+    }
+    receivedText = receivedText + text;
+    options.onChunk({
+      text,
+      receivedLength: receivedText.length,
+      elapsedMs: Date.now() - startTime
+    } as StreamChunk);
+  }, (errMsg: string | null): void => {
+    if (settled || aborted) {
+      return;
+    }
+    settled = true;
+    if (errMsg == null) {
+      if (options.onComplete != null) {
+        options.onComplete!();
       }
-      settled = true;
-      if (errMsg == null) {
-        subscriber.complete();
+    }
+    else {
+      if (options.onError != null) {
+        options.onError!(new Error(errMsg));
       }
-      else {
-        subscriber.error(new Error(errMsg));
-      }
-    };
-    const requestHeader: UTSJSONObject = header != null
-      ? header
-      : {
-          'Content-Type': 'application/json',
-          'Accept': 'text/event-stream, application/x-ndjson, application/json'
-        } as UTSJSONObject;
-    // 请求侧交给 http 层（token 注入 / baseURL 拼接 / extra.domain 换域名）；
-    // method 固定 POST、enableChunked / responseType / dataType 也由 HttpClient.stream 固定写好，
-    // 这里不再重复声明，避免「写了却不生效」的错觉。
-    const streamTask = http.stream({
-      url,
-      method: 'POST',
-      data: body,
-      header: requestHeader,
-      timeout
-    } as HttpRequestConfig, (data: ArrayBuffer): void => {
-      // 逐块接收：解码 → 累积 → 推送
-      if (settled) {
-        return;
-      }
-      const text = decoder.decodeChunk(data);
-      if (text.length <= 0) {
-        return;
-      }
-      receivedText = receivedText + text;
-      subscriber.next({
-        text,
-        receivedLength: receivedText.length,
-        elapsedMs: Date.now() - startTime
-      } as StreamChunk);
-    }, (errMsg: string | null): void => {
-      settle(errMsg);
-    });
-    // 取消订阅时中断底层请求
-    return (): void => {
-      settled = true;
-      streamTask.abort();
-    };
+    }
   });
+
+  return {
+    abort: (): void => {
+      if (!aborted && !settled) {
+        aborted = true;
+        streamTask.abort();
+      }
+    }
+  } as StreamTask;
+}
+
+/** 兼容别名：免 Rx 纯回调流式请求 */
+export function requestStreamSimple(
+  options: StreamOptions,
+  customClient: HttpClient | null = null
+): StreamTask {
+  return requestStream(options, customClient);
 }
 
 // ==========================================
-// 本地模拟流
+// 本地模拟流 (纯回调风格)
 // ==========================================
 
 /**
- * 本地模拟流：把一段完整文本按 chunkSize 切片、以 intervalMs 为间隔逐块吐出。
- *
- * 与 requestStream 返回完全相同的 Observable<StreamChunk> 类型，
- * 因此可作为「真实接口不可用」时的降级数据源（配合 catchError 使用）。
+ * 本地打字机模拟 (simulateStream) —— 纯回调风格
  *
  * @param text 要模拟输出的完整文本
- * @param chunkSize 每块字符数（默认 6）
- * @param intervalMs 每块间隔毫秒数（默认 90）
+ * @param onChunk 逐块吐字回调
+ * @param onComplete 完成回调，可选
+ * @param chunkSize 每块字符数，默认 6
+ * @param intervalMs 每块间隔毫秒数，默认 90
  */
 export function simulateStream(
   text: string,
+  onChunk: (chunk: StreamChunk) => void,
+  onComplete: (() => void) | null = null,
   chunkSize: number = 6,
   intervalMs: number = 90
-): Observable<StreamChunk> {
-  return new Observable<StreamChunk>((subscriber: Subscriber<StreamChunk>): TeardownFn | null => {
-    const startTime: number = Date.now();
-    const totalLen = text.length;
-    if (totalLen <= 0) {
-      subscriber.complete();
-      return null;
+): StreamTask {
+  const startTime: number = Date.now();
+  const totalLen = text.length;
+  if (totalLen <= 0) {
+    if (onComplete != null) {
+      onComplete!();
     }
-    let cursor: number = 0;
-    let receivedLength: number = 0;
-    // 必须先声明再赋值，不能写成 `const timerId = setInterval(() => { ... clearInterval(timerId) ... })`：
-    // 回调体里引用了 timerId 自己，Kotlin 端会报「找不到名称 timerId」
-    // （变量在自身初始化表达式中不可见；JS 因为回调延后执行才侥幸能跑）。
-    let timerId: number = 0;
-    // ⚠️ 外层 `as any) as number` 不可省：DOM lib 的 setInterval 返回 number（UTS 侧同样为 number），
-    // 但 @types/node（经 vite.config.ts 引入）把返回值声明为 Timeout，TS 侧直接赋值报
-    // TS2322「不能将类型 Timeout 分配给类型 number」。同写法先例：src/sub/timeFunctionDemo/timeFunctionDemo.uvue:151
-    timerId = (setInterval((): void => {
-      const remain = totalLen - cursor;
-      const size = remain < chunkSize ? remain : chunkSize;
-      const piece = text.substring(cursor, cursor + size);
-      cursor = cursor + size;
-      receivedLength = receivedLength + piece.length;
-      subscriber.next({
-        text: piece,
-        receivedLength,
-        elapsedMs: Date.now() - startTime
-      } as StreamChunk);
-      if (cursor >= totalLen) {
-        clearInterval(timerId);
-        subscriber.complete();
-      }
-    }, intervalMs) as any) as number;
-    return (): void => {
+    return {
+      abort: (): void => {}
+    } as StreamTask;
+  }
+
+  let cursor: number = 0;
+  let receivedLength: number = 0;
+  let timerId: number = 0;
+  let aborted: boolean = false;
+
+  timerId = (setInterval((): void => {
+    if (aborted) {
+      return;
+    }
+    const remain = totalLen - cursor;
+    const size = remain < chunkSize ? remain : chunkSize;
+    const piece = text.substring(cursor, cursor + size);
+    cursor = cursor + size;
+    receivedLength = receivedLength + piece.length;
+    onChunk({
+      text: piece,
+      receivedLength,
+      elapsedMs: Date.now() - startTime
+    } as StreamChunk);
+    if (cursor >= totalLen) {
       clearInterval(timerId);
-    };
-  });
+      if (onComplete != null) {
+        onComplete!();
+      }
+    }
+  }, intervalMs) as any) as number;
+
+  return {
+    abort: (): void => {
+      aborted = true;
+      if (timerId > 0) {
+        clearInterval(timerId);
+        timerId = 0;
+      }
+    }
+  } as StreamTask;
+}
+
+/** 兼容别名：免 Rx 纯回调本地模拟流 */
+export function simulateStreamSimple(
+  text: string,
+  onChunk: (chunk: StreamChunk) => void,
+  onComplete: (() => void) | null = null,
+  chunkSize: number = 6,
+  intervalMs: number = 90
+): StreamTask {
+  return simulateStream(text, onChunk, onComplete, chunkSize, intervalMs);
 }

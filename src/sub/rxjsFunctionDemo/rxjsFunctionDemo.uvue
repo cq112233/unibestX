@@ -56,8 +56,8 @@
 import { computed, onUnmounted, ref } from 'vue';
 import { simulateStream } from '@/src/http/index.uts';
 import type { StreamChunk } from '@/src/http/index.uts';
-import type { Subscription } from '@/src/utils/rxjs-lite/index.uts';
-import { scan } from '@/src/utils/rxjs-lite/index.uts';
+import { Observable, scan } from '@/src/utils/rxjs-lite/index.uts';
+import type { Subscriber, Subscription, TeardownFn } from '@/src/utils/rxjs-lite/index.uts';
 import MpHtml from '@/uni_modules/mp-html/components/mp-html/mp-html.uvue';
 import { markdownToHtml } from '@/uni_modules/mp-html/index.uts';
 
@@ -150,13 +150,26 @@ function stopStream(): void {
   streamPlaying.value = false;
 }
 
+function createDemoStream(text: string): Observable<StreamChunk> {
+  return new Observable<StreamChunk>((subscriber: Subscriber<StreamChunk>): TeardownFn | null => {
+    const task = simulateStream(text, (chunk: StreamChunk): void => {
+      subscriber.next(chunk);
+    }, (): void => {
+      subscriber.complete();
+    }, 8, 90);
+    return (): void => {
+      task.abort();
+    };
+  });
+}
+
 function startStream(): void {
   stopStream();
   resetStreamState();
   streamPlaying.value = true;
   // 吐字节奏：8 字/块 × 90ms ≈ 89 字/秒；原 40ms 一块约 200 字/秒，滚动太快跟不上阅读。
   // 分块大小保持 8 —— lastBlockBoundary 的注释也是按 8 字一块写的。
-  streamSub = simulateStream(DEMO_TEXT, 8, 90)
+  streamSub = createDemoStream(DEMO_TEXT)
     .pipe(scan((acc: string, chunk: StreamChunk): string => acc + chunk.text, ''))
     .subscribe((full: string): void => {
       receivedText = full;
