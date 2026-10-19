@@ -3,36 +3,98 @@
   "displayName": "rxjs-bestX - 面向 uni-app X 的极简响应式流库",
   "version": "1.0.0",
   "main": "index.uts",
-  "description": "纯 UTS 实现的极简响应式流库，API 语义对齐 RxJS，提供 Observable / Subject / Subscription 与常用操作符，可在 Android / iOS / 鸿蒙 / H5 / 小程序全端一致运行",
+  "description": "纯 UTS 实现的极简响应式流库，API 语义对齐 RxJS，提供 Observable / Subject / Subscription 与常用操作符",
   "keywords": [
-    "rxjs",
-    "observable",
-    "subject",
-    "stream",
-    "reactive",
-    "debounce",
-    "throttle",
-    "uts",
-    "uni-app-x"
-  ],
+    "rxjs,uni-app-x"
+],
   "engines": {
     "HBuilderX": "^4.0.0",
-    "uni-app-x": "^4.0.0"
+    "uni-app-x": "^5.26",
+    "uni-app": ""
   },
   "uni_modules": {
     "dependencies": [],
     "encrypt": [],
     "platforms": {
       "client": {
-        "App": {
-          "app-android": "√",
-          "app-ios": "√",
-          "app-harmony": "√"
+        "uni-app": {
+          "vue": {
+            "vue2": "-",
+            "vue3": "-"
+          },
+          "web": {
+            "safari": "-",
+            "chrome": "-"
+          },
+          "app": {
+            "vue": "-",
+            "nvue": "-",
+            "android": "-",
+            "ios": "-",
+            "harmony": "-"
+          },
+          "mp": {
+            "weixin": "-",
+            "alipay": "-",
+            "toutiao": "-",
+            "baidu": "-",
+            "kuaishou": "-",
+            "jd": "-",
+            "harmony": "-",
+            "qq": "-",
+            "lark": "-",
+            "xhs": "-"
+          },
+          "quickapp": {
+            "huawei": "-",
+            "union": "-"
+          }
         },
-        "web": "√",
-        "mp-weixin": "√",
-        "mp-alipay": "√"
+        "uni-app-x": {
+          "web": {
+            "safari": "√",
+            "chrome": "√"
+          },
+          "app": {
+            "android": "√",
+            "ios": "√",
+            "harmony": "√"
+          },
+          "mp": {
+            "weixin": "√"
+          }
+        }
+      },
+      "cloud": {
+        "tcb": "x",
+        "aliyun": "x",
+        "alipay": "x"
       }
     }
-  }
+  },
+  "dcloudext": {
+    "type": "sdk-js",
+    "sale": {
+      "regular": {
+        "price": "0.00"
+      },
+      "sourcecode": {
+        "price": "0.00"
+      }
+    },
+    "contact": {
+      "qq": ""
+    },
+    "declaration": {
+      "ads": "无",
+      "data": "无",
+      "permissions": "无"
+    },
+    "npmurl": "",
+    "vapor": "√",
+    "darkmode": "x",
+    "i18n": "x",
+    "widescreen": "x"
+},
+"repository": ""
 }

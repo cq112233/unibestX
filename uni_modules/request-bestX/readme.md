@@ -20,10 +20,11 @@
 ## 📖 快速导航目录
 
 - [一、基础请求客户端 (HttpClient)](#一基础请求客户端-httpclient)
-  - [1.1 常用调用示例](#11-常用调用示例)
-  - [1.2 createHttpClient 配置参数 (HttpClientOptions)](#12-createhttpclient-配置参数-httpclientoptions)
-  - [1.3 请求配置参数 (HttpRequestConfig)](#13-请求配置参数-httprequestconfig)
-  - [1.4 响应结果对象 (HttpResponse / DownloadResult / HttpError)](#14-响应结果对象-httpresponse--downloadresult--httperror)
+  - [1.1 基础创建 HTTP 实例](#11-基础创建-http-实例)
+  - [1.2 常用调用示例](#12-常用调用示例)
+  - [1.3 createHttpClient 配置参数 (HttpClientOptions)](#13-createhttpclient-配置参数-httpclientoptions)
+  - [1.4 请求配置参数 (HttpRequestConfig)](#14-请求配置参数-httprequestconfig)
+  - [1.5 响应结果对象 (HttpResponse / DownloadResult / HttpError)](#15-响应结果对象-httpresponse--downloadresult--httperror)
 - [二、声明式查询状态机 (useQuery)](#二声明式查询状态机-usequery)
   - [2.1 常用调用示例](#21-常用调用示例)
   - [2.2 响应式动态参数 (分页/搜索联动)](#22-响应式动态参数-分页搜索联动)
@@ -49,11 +50,90 @@
 
 适用于常规命令式 API 请求调用，提供类似 Axios 的单例/多实例管理、URL 拼接序列化与全局拦截器。
 
-### 1.1 常用调用示例
+### 1.1 基础创建 HTTP 实例
+
+最小可用示例：只需要一个 `baseURL` 就能创建实例，其余配置全部可选。
 
 ```uts
-import { createHttpClient } from '@/uni_modules/request-bestX';
-import type { HttpRequestConfig } from '@/uni_modules/request-bestX';
+// src/http/instances/default.uts
+import { createHttpClient } from '@/uni_modules/request-bestX/index.uts';
+import type {
+  HttpClient,
+  HttpClientOptions,
+  HttpRequestConfig,
+  RespondedOptions
+} from '@/uni_modules/request-bestX/index.uts';
+
+const options: HttpClientOptions = {
+  // 必填：接口根地址（App / 小程序直连；H5 跨域建议走 vite 代理或后端 CORS）
+  baseURL: 'https://api.example.com',
+  // 可选：超时时间，默认 60000ms
+  timeout: 10000,
+  // 可选：全局默认请求头
+  header: {
+    'Content-Type': 'application/json'
+  } as UTSJSONObject,
+  // 可选：前置拦截器，每次请求发出前执行（支持同步或返回 Promise）
+  beforeRequest: (config: HttpRequestConfig): void => {
+    const header: UTSJSONObject = config.header ?? ({} as UTSJSONObject);
+    const token = uni.getStorageSync('token');
+    if (token != null && `${token}` != '') {
+      header['Authorization'] = 'Bearer ' + `${token}`;
+    }
+    config.header = header;
+  },
+  // 可选：后置拦截器，统一处理成功 / 失败 / 完成
+  responded: {
+    onSuccess: (data: any, _config: HttpRequestConfig): any => {
+      // 可在此统一解包 { code, data, message }，直接返回业务数据
+      return data;
+    },
+    onError: (err: any, _config: HttpRequestConfig): void => {
+      console.error('[http] 请求失败：', err);
+    },
+    onComplete: (_config: HttpRequestConfig): void => {
+      // 统一收尾，例如关闭全屏 loading
+    }
+  } as RespondedOptions
+} as HttpClientOptions;
+
+// 导出单例：整个应用共用同一个实例（拦截器、缓存、去重都挂在这个实例上）
+export const http: HttpClient = createHttpClient(options);
+```
+
+在 api 层统一从这里导入并发起请求：
+
+```uts
+// src/api/user/user.uts
+import { http } from '@/src/http/instances/default.uts';
+import type { HttpRequestConfig } from '@/uni_modules/request-bestX/index.uts';
+
+export function fetchUserInfo(id: number): Promise<UTSJSONObject> {
+  return http.get<UTSJSONObject>('/user/info', {
+    params: { id } as UTSJSONObject
+  } as HttpRequestConfig);
+}
+```
+
+**多实例 / 多域名**：不同服务各建一个实例即可，它们之间的拦截器、缓存与并发去重互相隔离：
+
+```uts
+export const secondaryHttp: HttpClient = createHttpClient({
+  baseURL: 'https://api-secondary.example.com',
+  timeout: 15000
+} as HttpClientOptions);
+```
+
+> 💡 两个小提示：
+>
+> - 使用 `requestStream` 且不想每次传 `customClient` 时，创建完实例后调用 `setDefaultStreamClient(http)` 注册为默认流式客户端。
+> - 在 `.uvue` / `.uts` 中导入本模块时，建议写全 `@/uni_modules/request-bestX/index.uts`，可避免编辑器类型补全丢失。
+
+### 1.2 常用调用示例
+
+```uts
+import { createHttpClient } from '@/uni_modules/request-bestX/index.uts';
+import type { HttpRequestConfig } from '@/uni_modules/request-bestX/index.uts';
 
 const client = createHttpClient({
   baseURL: 'https://api.example.com',
@@ -82,18 +162,18 @@ const dl = await client.downloadFile('https://example.com/file.pdf');
 console.log('文件临时保存路径:', dl.tempFilePath);
 ```
 
-### 1.2 createHttpClient 配置参数 (HttpClientOptions)
+### 1.3 createHttpClient 配置参数 (HttpClientOptions)
 
 | 选项名 | 类型 | 必填 | 默认值 | 说明 |
 | :--- | :--- | :---: | :---: | :--- |
 | `baseURL` | `string` | 否 | `''` | 接口基础公共前缀地址 |
 | `timeout` | `number` | 否 | `60000` | 超时时间（毫秒） |
 | `header` | `UTSJSONObject` | 否 | `{}` | 全局默认请求头 |
-| `adapter` | `HttpRequestAdapter` | 否 | 原生适配器 | 底层请求驱动适配器函数 |
+| `requestAdapter` | `HttpRequestAdapter` | 否 | 原生适配器 | 底层请求驱动适配器函数（自定义传输或单测 Mock 时使用） |
 | `beforeRequest` | `BeforeRequestHook` | 否 | `null` | 前置拦截器（支持同步或返回 Promise 的异步函数） |
 | `responded` | `RespondedOptions` | 否 | `null` | 后置拦截器对象（含 `onSuccess`, `onError`, `onComplete`） |
 
-### 1.3 请求配置参数 (HttpRequestConfig)
+### 1.4 请求配置参数 (HttpRequestConfig)
 
 在调用 `client.request`、`client.get`、`client.post`、`client.upload`、`client.downloadFile` 时传入的配置对象：
 
@@ -113,7 +193,7 @@ console.log('文件临时保存路径:', dl.tempFilePath);
 | `getTask` | `(task: any) => void` | 否 | 任务句柄监听（如监听下载进度 `onProgressUpdate`） |
 | `extra` | `any` | 否 | 自定义扩展参数，拦截器可自由读取 |
 
-### 1.4 响应结果对象 (HttpResponse / DownloadResult / HttpError)
+### 1.5 响应结果对象 (HttpResponse / DownloadResult / HttpError)
 
 #### `HttpResponse<T>` (client.request 的完整返回值)
 - `data: T`：服务端响应体数据（已解包业务数据或原始 JSON）

@@ -1,7 +1,7 @@
 <template>
   <!-- ============ 1. 真实请求（CRUD 增删改查） ============ -->
   <view
-    class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid border-[#edf2f7] bg-[#ffffff]"
+    class="rounded-[16px] p-[20px] my-[16px] border-[1px] border-solid border-[#edf2f7] bg-[#ffffff]"
   >
     <!-- 标题区域 -->
     <view class="flex flex-row items-center mb-[16px]">
@@ -9,7 +9,7 @@
       <text class="text-[16px] font-bold text-[#2d3748]">真实请求（CRUD 增删改查）</text>
     </view>
     <text class="text-[12px] text-[#64748b] leading-[19px] mb-[4px]">
-      由 src/api/example.uts 打公网真实接口（dummyjson 的 /posts，地址写死在该文件的 FOO_BASE_URL）：五个动词都真实发出并回包，name / desc 对应接口的 title / body。增删改后就地改前端列表，点「重置」回服务端真源（该服务不落库，本地改动会没）。
+      由 src/api/example.uts 打 mockapi.io 的 /test 资源（地址写死在该文件的 FOO_BASE_URL）：列表与详情走 useQuery 自动加载与缓存，增删改走 useMutation 状态机，成功后自动重拉列表。五个动词都真实发出并落库持久化。
     </text>
 
     <!-- 2.1 表单区：新增与编辑共用一套输入框，crudEditingId > 0 即编辑态 -->
@@ -22,12 +22,12 @@
       </view>
       <input
         v-model="crudName"
-        placeholder="title（映射为 name），例如 He was an expert"
+        placeholder="name，例如 He was an expert"
         class="h-[38px] bg-white rounded-[6px] px-[12px] border-[1px] border-solid border-[#cbd5e1] text-[13px] text-[#334155] mb-[8px]"
       />
       <input
         v-model="crudDesc"
-        placeholder="body（映射为 desc），例如 一段正文……"
+        placeholder="desc，例如 一段正文……"
         class="h-[38px] bg-white rounded-[6px] px-[12px] border-[1px] border-solid border-[#cbd5e1] text-[13px] text-[#334155] mb-[10px]"
       />
       <!-- 操作按钮：用 margin-right 代替 gap -->
@@ -54,18 +54,21 @@
 
     <!-- 2.2 数据列表：每行挂「详情 / 编辑 / 删除」三个操作 -->
     <view class="mt-[12px]">
+      <!-- 窄屏（375）下标题 + 状态 + 条数 + 按钮一行放不下，会把「重置」挤没，故拆成两行 -->
+      <view class="flex-row items-center justify-between mb-[6px]">
+        <text class="text-[13px] text-[#64748b]">最近 2 条（useQuery · GET /test）</text>
+        <view class="px-[6px] py-[2px] rounded-[4px] ml-[8px]" :class="crudListStatusBgClass">
+          <text class="text-[10px] font-medium" :class="crudListStatusTextClass">{{ crudListStatusText }}</text>
+        </view>
+      </view>
       <view class="flex-row items-center justify-between mb-[8px]">
-        <text class="text-[13px] text-[#64748b]">当前列表（GET /posts）</text>
-        <view class="flex-row items-center">
-          <text class="text-[12px] text-[#94a3b8] mr-[8px]">{{ crudListCountText }}</text>
-          <view class="px-[8px] py-[3px] rounded-[4px] bg-[#0ea5e9] flex-row items-center" @click="resetCrudDemo">
-            <text class="text-[10px] text-[#ffffff] font-medium">{{ crudLoading ? '加载中…' : '重置' }}</text>
-          </view>
+        <text class="text-[12px] text-[#94a3b8]">{{ crudListCountText }}</text>
+        <view class="px-[10px] py-[4px] rounded-[4px] bg-[#0ea5e9] flex-row items-center" @click="resetCrudDemo">
+          <text class="text-[11px] text-[#ffffff] font-medium">{{ crudLoading ? '加载中…' : '重置' }}</text>
         </view>
       </view>
 
       <text v-if="crudList.length == 0" class="text-[12px] text-[#94a3b8]">暂无数据，可在上方表单新增一条</text>
-
       <view
         v-for="item in crudList"
         :key="item.id"
@@ -93,7 +96,7 @@
       </view>
     </view>
 
-    <!-- 2.3 详情结果面板（GET /posts/:id） -->
+    <!-- 2.3 详情结果面板（GET /test/:id） -->
     <view
       v-if="hasCrudDetail"
       class="mt-[12px] rounded-[8px] bg-[#f8fafc] border-[1px] border-solid border-[#cbd5e1] overflow-hidden"
@@ -102,7 +105,7 @@
       <view class="p-[12px]">
         <view class="flex-row items-center justify-between mb-[6px]">
           <text class="text-[11px] text-[#64748b]">详情结果</text>
-          <text class="text-[10px] text-[#94a3b8]">GET /posts/:id</text>
+          <text class="text-[10px] text-[#94a3b8]">GET /test/:id</text>
         </view>
         <text class="text-[12px] text-[#334155] leading-[20px]">{{ crudDetailText }}</text>
       </view>
@@ -113,25 +116,148 @@
       v-if="hasCrudError"
       class="mt-[10px] bg-[#fff5f5] rounded-[8px] p-[10px] border-[1px] border-solid border-[#fecaca]"
     >
-      <text class="text-[12px] text-[#ef4444]">{{ crudError }}</text>
+      <text class="text-[12px] text-[#ef4444]">{{ crudErrorText }}</text>
     </view>
   </view>
 </template>
 
 <script setup lang="uts">
-import { computed, onMounted, ref } from 'vue';
-import { createFoo, deleteFoo, fetchFooById, fetchFooList, updateFoo } from '@/src/api/example.uts';
-import type { FooItem } from '@/src/api/example.uts';
+import { computed, ref } from 'vue';
+import { createFoo, deleteFoo, fetchFooById, fetchFooLatest, updateFoo } from '@/src/api/example.uts';
+import type { FooItem, PageResult } from '@/src/api/example.uts';
+import { useMutation, useQuery } from '@/uni_modules/request-bestX/index.uts';
+import type { MutationOptions, QueryFunctionContext, QueryOptions } from '@/uni_modules/request-bestX/index.uts';
 import { toast, toastSuccess } from '@/src/utils/toast/index.uts';
 
-const crudList = ref<FooItem[]>([]);
-const crudLoading = ref<boolean>(false);
-const crudSubmitting = ref<boolean>(false);
+// ==========================================
+// 1. 表单状态
+// ==========================================
+
 const crudName = ref<string>('');
 const crudDesc = ref<string>('');
 const crudEditingId = ref<number>(0);
-const crudDetailText = ref<string>('');
+/** 详情查询的目标 id：0 表示不查询（配合 useQuery 的 enabled 依赖） */
+const crudDetailId = ref<number>(0);
+/** 仅承载 mutation 的本地错误文案；查询错误直接读 query.error */
 const crudError = ref<string>('');
+
+function resetCrudForm(): void {
+  crudEditingId.value = 0;
+  crudName.value = '';
+  crudDesc.value = '';
+}
+
+// ==========================================
+// 2. useQuery：声明式查询（自动加载 / 缓存 / 响应式 key）
+// ==========================================
+
+/**
+ * 列表查询：setup 阶段即自动发起（enabled 默认 true），无需 onMounted 手动拉取。
+ * 只取**最近新增的 2 条**（服务端按 createdAt 倒序），queryKey 固定，
+ * 组件内 refetch() 与 invalidateQueries 都会命中同一份缓存。
+ */
+const listQuery = useQuery<PageResult<FooItem>>({
+  queryKey: ['fooList', 'crudDemo', 'latest2'],
+  queryFn: (_ctx: QueryFunctionContext): Promise<PageResult<FooItem>> => {
+    return fetchFooLatest(2);
+  }
+} as QueryOptions<PageResult<FooItem>>);
+
+/**
+ * 详情查询：queryKey 里放的是 Ref，crudDetailId 一变 useQuery 就自动取消旧请求并重拉；
+ * enabled 为 getter，id 归零时不会再发请求（对标 TanStack Query 的 dependent query）。
+ *
+ * 泛型用 `FooItem` 而不是 `FooItem | null`：`fetchFooById` 的半包空值在这里转成
+ * rejection（「查无数据」走 query.error 展示），避免给 hook 传联合类型实参。
+ */
+const detailQuery = useQuery<FooItem>({
+  queryKey: ['fooDetail', crudDetailId],
+  queryFn: (_ctx: QueryFunctionContext): Promise<FooItem> => {
+    const targetId = crudDetailId.value;
+    return fetchFooById(targetId).then((detail: FooItem | null): Promise<FooItem> => {
+      if (detail == null) {
+        return Promise.reject(new Error(`#${targetId} 查无数据`)) as Promise<FooItem>;
+      }
+      return Promise.resolve(detail);
+    });
+  },
+  enabled: (): boolean => crudDetailId.value > 0
+} as QueryOptions<FooItem>);
+
+// ==========================================
+// 3. useMutation：声明式变更（isPending / onSuccess / onError）
+// ==========================================
+
+/** 新增：成功后清空表单，并把详情查询指向新记录（自动触发详情 useQuery） */
+const createMutation = useMutation<FooItem, FooItem>({
+  mutationKey: ['crudCreate'],
+  mutationFn: (payload: FooItem): Promise<FooItem> => {
+    return createFoo(payload);
+  },
+  onSuccess: (created: FooItem, _variables: FooItem, _context: any): void => {
+    toastSuccess('新增成功');
+    resetCrudForm();
+    crudDetailId.value = created.id;
+    listQuery.refetch();
+  },
+  onError: (error: Error, _variables: FooItem, _context: any): void => {
+    crudError.value = error.message;
+  }
+} as MutationOptions<FooItem, FooItem>);
+
+/** 编辑保存：成功后退出编辑态并刷新列表 */
+const updateMutation = useMutation<FooItem, FooItem>({
+  mutationKey: ['crudUpdate'],
+  mutationFn: (payload: FooItem): Promise<FooItem> => {
+    return updateFoo(payload.id, payload);
+  },
+  onSuccess: (updated: FooItem, _variables: FooItem, _context: any): void => {
+    toastSuccess('修改成功');
+    resetCrudForm();
+    crudDetailId.value = updated.id;
+    listQuery.refetch();
+  },
+  onError: (error: Error, _variables: FooItem, _context: any): void => {
+    crudError.value = error.message;
+  }
+} as MutationOptions<FooItem, FooItem>);
+
+/** 删除：成功后清掉编辑/详情状态并刷新列表 */
+const deleteMutation = useMutation<boolean, FooItem>({
+  mutationKey: ['crudDelete'],
+  mutationFn: (item: FooItem): Promise<boolean> => {
+    return deleteFoo(item.id);
+  },
+  onSuccess: (_deleted: boolean, _variables: FooItem, _context: any): void => {
+    toastSuccess('已删除');
+    resetCrudForm();
+    crudDetailId.value = 0;
+    listQuery.refetch();
+  },
+  onError: (error: Error, _variables: FooItem, _context: any): void => {
+    crudError.value = error.message;
+  }
+} as MutationOptions<boolean, FooItem>);
+
+// ==========================================
+// 4. 派生状态（全部从 hook 的响应式字段计算，不再手写 loading 开关）
+// ==========================================
+
+const crudList = computed((): Array<FooItem> => {
+  const data = listQuery.data.value;
+  if (data == null) {
+    return [] as Array<FooItem>;
+  }
+  return data.list;
+});
+
+const crudLoading = computed((): boolean => {
+  return listQuery.isFetching.value == true;
+});
+
+const crudSubmitting = computed((): boolean => {
+  return createMutation.isPending.value == true || updateMutation.isPending.value == true || deleteMutation.isPending.value == true;
+});
 
 const crudEditing = computed((): boolean => {
   return crudEditingId.value > 0;
@@ -139,9 +265,9 @@ const crudEditing = computed((): boolean => {
 
 const crudFormTitle = computed((): string => {
   if (crudEditing.value) {
-    return `编辑 #${crudEditingId.value}（PUT /posts/:id）`;
+    return `编辑 #${crudEditingId.value}（PUT /test/:id）`;
   }
-  return '新增一条（POST /posts/add）';
+  return '新增一条（POST /test）';
 });
 
 const crudFormModeText = computed((): string => {
@@ -190,34 +316,94 @@ const crudSubmitText = computed((): string => {
 });
 
 const crudListCountText = computed((): string => {
-  return `共 ${crudList.value.length} 条`;
+  const data = listQuery.data.value;
+  if (data == null) {
+    return '—';
+  }
+  return `共 ${data.total} 条`;
+});
+
+const crudListStatusText = computed((): string => {
+  if (listQuery.isError.value == true) {
+    return 'error';
+  }
+  if (listQuery.isFetching.value == true) {
+    return 'fetching';
+  }
+  if (listQuery.data.value != null) {
+    return 'success';
+  }
+  return 'pending';
+});
+
+const crudListStatusBgClass = computed((): string => {
+  if (listQuery.isError.value == true) {
+    return 'bg-[#fee2e2]';
+  }
+  if (listQuery.isFetching.value == true) {
+    return 'bg-[#dbeafe]';
+  }
+  if (listQuery.data.value != null) {
+    return 'bg-[#d1fae5]';
+  }
+  return 'bg-[#f1f5f9]';
+});
+
+const crudListStatusTextClass = computed((): string => {
+  if (listQuery.isError.value == true) {
+    return 'text-[#dc2626]';
+  }
+  if (listQuery.isFetching.value == true) {
+    return 'text-[#2563eb]';
+  }
+  if (listQuery.data.value != null) {
+    return 'text-[#059669]';
+  }
+  return 'text-[#94a3b8]';
+});
+
+/** 详情面板文案：直接由 detailQuery 的状态驱动（加载中 / 查无 / 详情） */
+const crudDetailText = computed((): string => {
+  const targetId = crudDetailId.value;
+  if (targetId <= 0) {
+    return '';
+  }
+  if (detailQuery.isError.value == true) {
+    return '';
+  }
+  if (detailQuery.isFetching.value == true) {
+    return `正在查询 #${targetId}…`;
+  }
+  const detail = detailQuery.data.value;
+  if (detail == null) {
+    return `#${targetId} 查无数据`;
+  }
+  return `id: ${detail.id} · name: ${detail.name} · desc: ${detail.desc}`;
 });
 
 const hasCrudDetail = computed((): boolean => {
   return crudDetailText.value.length > 0;
 });
 
-const hasCrudError = computed((): boolean => {
-  return crudError.value.length > 0;
+/** 错误提示：mutation 的本地文案优先，其次取两个 query 的 error */
+const crudErrorText = computed((): string => {
+  if (crudError.value.length > 0) {
+    return crudError.value;
+  }
+  const listError = listQuery.error.value;
+  if (listError != null) {
+    return listError.message;
+  }
+  const detailError = detailQuery.error.value;
+  if (detailError != null) {
+    return detailError.message;
+  }
+  return '';
 });
 
-function crudErrorMessage(e: any, fallback: string): string {
-  if (e instanceof Error) {
-    return e.message;
-  }
-  if (e instanceof UTSJSONObject) {
-    const errObj = e as UTSJSONObject;
-    const msg = (errObj.message as string | null) ?? (errObj.msg as string | null) ?? (errObj.errMsg as string | null);
-    if (msg != null) {
-      return msg;
-    }
-    return JSON.stringify(e);
-  }
-  if (e != null) {
-    return `${e}`;
-  }
-  return fallback;
-}
+const hasCrudError = computed((): boolean => {
+  return crudErrorText.value.length > 0;
+});
 
 function crudDescPreview(text: string): string {
   if (text.length <= 40) {
@@ -226,62 +412,19 @@ function crudDescPreview(text: string): string {
   return `${text.substring(0, 40)}…`;
 }
 
-async function loadCrudList(): Promise<void> {
-  if (crudLoading.value == true) {
-    return;
-  }
-  crudLoading.value = true;
-  crudError.value = '';
+// ==========================================
+// 5. 交互动作：只改状态 / 调 mutate，不再手写请求与 try-catch
+// ==========================================
 
-  try {
-    const pageResult = await fetchFooList(1, 1, '');
-    crudList.value = pageResult.list;
-  }
-  catch (err) {
-    crudError.value = crudErrorMessage(err, '列表加载失败');
-  }
-
-  crudLoading.value = false;
-}
-
-function resetCrudForm(): void {
-  crudEditingId.value = 0;
-  crudName.value = '';
-  crudDesc.value = '';
-}
-
-async function resetCrudDemo(): Promise<void> {
+function resetCrudDemo(): void {
   resetCrudForm();
-  crudDetailText.value = '';
+  crudDetailId.value = 0;
   crudError.value = '';
-  await loadCrudList();
-}
-
-async function deleteCrudItem(id: number): Promise<void> {
-  crudSubmitting.value = true;
-  crudError.value = '';
-
-  try {
-    await deleteFoo(id);
-    if (crudEditingId.value == id) {
-      resetCrudForm();
-    }
-    crudDetailText.value = '';
-    const removedIndex = crudList.value.findIndex((row: FooItem): boolean => row.id == id);
-    if (removedIndex >= 0) {
-      crudList.value.splice(removedIndex, 1);
-    }
-    toastSuccess('已删除');
-  }
-  catch (err) {
-    crudError.value = crudErrorMessage(err, '删除失败');
-  }
-
-  crudSubmitting.value = false;
+  listQuery.refetch();
 }
 
 function removeCrud(item: FooItem): void {
-  if (crudSubmitting.value == true) {
+  if (deleteMutation.isPending.value == true) {
     return;
   }
   uni.showModal({
@@ -292,26 +435,20 @@ function removeCrud(item: FooItem): void {
     confirmColor: '#dc2626',
     success: (modalRes) => {
       if (modalRes.confirm == true) {
-        deleteCrudItem(item.id);
+        deleteMutation.mutate(item);
       }
     }
   });
 }
 
-async function loadCrudDetail(item: FooItem): Promise<void> {
+/** 点击「详情」只改 crudDetailId，请求由 detailQuery 自己发起 */
+function loadCrudDetail(item: FooItem): void {
   crudError.value = '';
-  crudDetailText.value = '';
-
-  try {
-    const detail = await fetchFooById(item.id);
-    if (detail == null) {
-      crudDetailText.value = `#${item.id} 查无数据`;
-      return;
-    }
-    crudDetailText.value = `id: ${detail.id} · name: ${detail.name} · desc: ${detail.desc}`;
+  if (crudDetailId.value == item.id) {
+    detailQuery.refetch();
   }
-  catch (err) {
-    crudError.value = crudErrorMessage(err, '详情加载失败');
+  else {
+    crudDetailId.value = item.id;
   }
 }
 
@@ -327,7 +464,7 @@ function cancelCrudEdit(): void {
   crudError.value = '';
 }
 
-async function submitCrud(): Promise<void> {
+function submitCrud(): void {
   if (crudSubmitting.value == true) {
     return;
   }
@@ -338,35 +475,12 @@ async function submitCrud(): Promise<void> {
     return;
   }
 
-  crudSubmitting.value = true;
   crudError.value = '';
-
-  try {
-    if (crudEditingId.value > 0) {
-      const updated = await updateFoo(crudEditingId.value, { id: crudEditingId.value, name, desc } as FooItem);
-      const updatedIndex = crudList.value.findIndex((row: FooItem): boolean => row.id == updated.id);
-      if (updatedIndex >= 0) {
-        crudList.value.splice(updatedIndex, 1, updated);
-      }
-      crudDetailText.value = `已更新 #${updated.id} · name: ${updated.name}`;
-      toastSuccess('修改成功');
-    }
-    else {
-      const created = await createFoo({ id: 0, name, desc } as FooItem);
-      crudList.value.unshift(created);
-      crudDetailText.value = `已新增 #${created.id} · name: ${created.name}`;
-      toastSuccess('新增成功');
-    }
-    resetCrudForm();
+  if (crudEditingId.value > 0) {
+    updateMutation.mutate({ id: crudEditingId.value, name, desc } as FooItem);
   }
-  catch (err) {
-    crudError.value = crudErrorMessage(err, '提交失败');
+  else {
+    createMutation.mutate({ id: 0, name, desc } as FooItem);
   }
-
-  crudSubmitting.value = false;
 }
-
-onMounted(() => {
-  loadCrudList();
-});
 </script>
