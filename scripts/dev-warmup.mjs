@@ -41,6 +41,32 @@ const launchArgs = process.argv.slice(2);
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const CLI_CACHE_FILE = path.join(ROOT, 'node_modules', '.hbuilderx-cli-path');
 
+// 解决 HBuilderX CLI 跨进程启动导致命令行环境变量丢失的问题：
+// 当以 pnpm dev:mock（VITE_USE_MOCK=true）启动时，自动写入最高优先级的 .env.development.local，
+// 这样即使 .env.local 中配置了 VITE_USE_MOCK=false 也不会被冲掉；进程退出时自动清理，不污染 git。
+const DEV_MOCK_ENV_FILE = path.join(ROOT, '.env.development.local');
+const isMockMode = process.env.VITE_USE_MOCK === 'true';
+
+if (isMockMode) {
+  try {
+    fs.writeFileSync(
+      DEV_MOCK_ENV_FILE,
+      '# ===== 由 pnpm dev:mock 自动生成，进程退出时自动销毁 =====\nVITE_USE_MOCK=true\nVITE_H5_USE_PROXY=true\n',
+      'utf-8'
+    );
+  }
+  catch {}
+}
+
+function cleanupDevMockEnv() {
+  if (isMockMode && fs.existsSync(DEV_MOCK_ENV_FILE)) {
+    try {
+      fs.unlinkSync(DEV_MOCK_ENV_FILE);
+    }
+    catch {}
+  }
+}
+
 /**
  * 自动填充 HBUILDERX_CLI_PATH 环境变量：
  * 避免在 macOS / Linux 上 HBuilderX 未开启时，uni-launch 找不到 cli 路径报错退出。
@@ -353,6 +379,7 @@ function killPortProcesses(port) {
 }
 
 function cleanupAndExit() {
+  cleanupDevMockEnv();
   if (child && !child.killed) {
     try {
       child.kill('SIGINT');
@@ -365,5 +392,9 @@ function cleanupAndExit() {
 
 process.on('SIGINT', cleanupAndExit);
 process.on('SIGTERM', cleanupAndExit);
+process.on('exit', cleanupDevMockEnv);
 
-child.on('exit', code => process.exit(code ?? 0));
+child.on('exit', (code) => {
+  cleanupDevMockEnv();
+  process.exit(code ?? 0);
+});

@@ -1,173 +1,270 @@
 <template>
-  <!-- ============ 5. 本地 Mock 拦截与契约挡板 ============ -->
+  <!-- ============ 5. 本地 Mock 拦截（vite-plugin-mock + useQuery / useMutation） ============ -->
   <view
     class="rounded-[16px] p-[20px] my-[16px] border-[1px] border-solid border-[#edf2f7] bg-[#ffffff]"
   >
     <!-- 标题区域 -->
     <view class="flex flex-row items-center mb-[12px]">
-      <view
-        class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#f43f5e]"
-      />
-      <text class="text-[16px] font-bold text-[#2d3748]">本地 Mock 拦截（契约挡板）</text>
+      <view class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#f43f5e]" />
+      <text class="text-[16px] font-bold text-[#2d3748]">本地 Mock 拦截</text>
       <view class="ml-[8px] px-[6px] py-[2px] rounded-[4px] bg-[#fdf2f8] border-[1px] border-solid border-[#fbcfe8]">
-        <text class="text-[10px] font-bold text-[#db2777]">MOCK 挡板</text>
+        <text class="text-[10px] font-bold text-[#db2777]">vite-plugin-mock</text>
       </view>
     </view>
     <text class="text-[12px] text-[#64748b] leading-[19px] mb-[12px]">
-      演示本地假数据拦截能力。Web 端执行 pnpm dev:mock 即可启动 Vite 拦截器（vite-plugin-mock），请求不会打到真实公网服务器，直接秒级返回挡板假数据。
+      以 pnpm dev:mock 启动后，下面两个相对路径请求会被 Vite 中间件直接拦截、秒回挡板数据，完全不需要后端。列表走 useQuery 手动触发，登录走 useMutation 状态机。
     </text>
 
-    <!-- 提示条：环境说明 -->
+    <!-- 提示条 -->
     <view class="flex-row items-center bg-[#fdf2f8] p-[8px] rounded-[6px] mb-[12px] border-[1px] border-solid border-[#fce7f3]">
       <text class="text-[11px] text-[#be123c] leading-[16px] flex-1">
-        💡 纯前端无后端联调方案：覆盖「手写自定义 Mock」与「OpenAPI 契约自动挡板（pnpm api:gen）」。
+        💡 普通 dev 模式下这两个请求会打到 VITE_SERVER_BASEURL 指向的真实开发服务器；联调 Mock 请运行 pnpm dev:mock（VITE_USE_MOCK=true + VITE_H5_USE_PROXY=true）。路由定义见 mock/foo.ts 与 mock/auth.ts。
       </text>
     </view>
 
-    <!-- 触发按钮组 -->
-    <view class="flex flex-col mb-[12px]">
-      <view
-        class="rounded-[8px] h-[40px] w-full flex flex-row items-center justify-between px-[12px] bg-[#0ea5e9] mb-[8px]"
-        @click="fetchMockFooList"
-      >
-        <text class="text-[#ffffff] text-[13px] font-medium">1. 请求手写 Mock 列表</text>
-        <text class="text-[#e0f2fe] text-[11px]">GET /api/foo</text>
+    <!-- 1. useQuery：Mock 列表 (GET /api/foo) -->
+    <view class="rounded-[10px] p-[12px] mb-[12px] border-[1px] border-solid border-[#e2e8f0] bg-[#f8fafc]">
+      <view class="flex-row items-center justify-between mb-[8px]">
+        <text class="text-[13px] font-bold text-[#334155]">1. Mock 列表（useQuery）</text>
+        <view class="px-[6px] py-[2px] rounded-[4px]" :class="listStatusBgClass">
+          <text class="text-[10px] font-medium" :class="listStatusTextClass">{{ listStatusText }}</text>
+        </view>
       </view>
+      <text v-if="listSummary != ''" class="text-[12px] text-[#475569] leading-[18px] mb-[8px]">{{ listSummary }}</text>
       <view
-        class="rounded-[8px] h-[40px] w-full flex flex-row items-center justify-between px-[12px] bg-[#10b981] mb-[8px]"
-        @click="fetchContractMorningReport"
+        class="rounded-[8px] h-[38px] w-full flex flex-row items-center justify-center bg-[#ec4899]"
+        @click="requestMockList"
       >
-        <text class="text-[#ffffff] text-[13px] font-medium">2. 请求 OpenAPI 契约晨检数据</text>
-        <text class="text-[#d1fae5] text-[11px]">POST /gateway/morning...</text>
-      </view>
-      <view
-        class="rounded-[8px] h-[40px] w-full flex flex-row items-center justify-between px-[12px] bg-[#6366f1]"
-        @click="fetchMockAuthLogin"
-      >
-        <text class="text-[#ffffff] text-[13px] font-medium">3. 请求鉴权 Mock 登录</text>
-        <text class="text-[#e0e7ff] text-[11px]">POST /api/auth/login</text>
+        <text class="text-[#ffffff] text-[13px] font-medium">{{ listQuery.isFetching.value ? '拦截中…' : '请求 Mock 列表（GET /api/foo）' }}</text>
       </view>
     </view>
 
-    <!-- 响应展示区 -->
+    <!-- 2. useMutation：Mock 登录 (POST /api/auth/login) -->
     <view class="rounded-[10px] p-[12px] border-[1px] border-solid border-[#e2e8f0] bg-[#f8fafc]">
-      <view class="flex-row items-center justify-between mb-[6px]">
-        <view class="flex-row items-center">
-          <view v-if="mockResultText != '' && mockIsSuccess" class="px-[6px] py-[1px] rounded-[4px] bg-[#ecfdf5] border-[1px] border-solid border-[#a7f3d0] mr-[6px]">
-            <text class="text-[10px] font-bold text-[#059669]">MOCK 挡板回包</text>
-          </view>
-          <text class="text-[12px] font-bold text-[#334155] mr-[6px]">状态:</text>
-          <text
-            class="text-[12px]"
-            :class="mockIsSuccess ? 'text-[#059669]' : 'text-[#dc2626]'"
-          >
-            {{ mockStatusText }}
-          </text>
-        </view>
-        <view v-if="mockResultText != ''" class="px-[6px] py-[2px] rounded-[4px] bg-[#e2e8f0]" @click="clearMockResult">
-          <text class="text-[10px] text-[#475569]">清空</text>
+      <view class="flex-row items-center justify-between mb-[8px]">
+        <text class="text-[13px] font-bold text-[#334155]">2. Mock 登录（useMutation）</text>
+        <view class="px-[6px] py-[2px] rounded-[4px]" :class="loginStatusBgClass">
+          <text class="text-[10px] font-medium" :class="loginStatusTextClass">{{ loginStatusText }}</text>
         </view>
       </view>
-      <text v-if="mockEndpoint != ''" class="text-[11px] text-[#64748b] mb-[2px]">接口: {{ mockEndpoint }}</text>
-      <text v-if="mockSource != ''" class="text-[11px] text-[#be123c] mb-[4px]">来源: {{ mockSource }}</text>
-      <text v-if="mockLoading" class="text-[12px] text-[#0ea5e9] py-[8px]">请求发送中，等待本地 Mock 拦截回包…</text>
-      <text v-else-if="mockResultText != ''" class="text-[11px] text-[#334155] leading-[16px] break-all">
-        {{ mockResultText }}
-      </text>
-      <text v-else class="text-[11px] text-[#94a3b8] py-[4px]">
-        点击上方按钮触发请求，体验本地 Mock / 契约挡板即时拦截回包
-      </text>
+
+      <view class="flex-row items-center mb-[8px]">
+        <input
+          v-model="mockUsername"
+          placeholder="用户名（admin）"
+          class="h-[36px] flex-1 mr-[8px] bg-white rounded-[6px] px-[10px] border-[1px] border-solid border-[#cbd5e1] text-[12px] text-[#334155]"
+        />
+        <input
+          v-model="mockPassword"
+          placeholder="密码（123456 / admin）"
+          class="h-[36px] flex-1 bg-white rounded-[6px] px-[10px] border-[1px] border-solid border-[#cbd5e1] text-[12px] text-[#334155]"
+        />
+      </view>
+
+      <view
+        class="rounded-[8px] h-[38px] w-full flex flex-row items-center justify-center bg-[#6366f1] mb-[8px]"
+        @click="submitMockLogin"
+      >
+        <text class="text-[#ffffff] text-[13px] font-medium">{{ loginMutation.isPending.value ? '登录中…' : 'Mock 登录（POST /api/auth/login）' }}</text>
+      </view>
+
+      <view v-if="loginSummary != ''" class="rounded-[8px] bg-[#ffffff] p-[10px] border-[1px] border-solid border-[#e2e8f0]">
+        <text class="text-[11px] text-[#334155] leading-[18px]">{{ loginSummary }}</text>
+      </view>
+    </view>
+
+    <!-- 失败兜底：拦截未命中 / 真实服务器报错都在这里提示 -->
+    <view
+      v-if="hasMockError"
+      class="mt-[10px] bg-[#fff5f5] rounded-[8px] p-[10px] border-[1px] border-solid border-[#fecaca]"
+    >
+      <text class="text-[12px] text-[#ef4444] leading-[18px]">{{ mockErrorText }}</text>
     </view>
   </view>
 </template>
 
 <script setup lang="uts">
-import { ref } from 'vue';
-import { morningCheckReportPageUsingPost } from '@/src/api/generated/index.uts';
-import type { MorningCheckReportPageUsingPostBody, MorningCheckReportPageUsingPostResponse } from '@/src/api/generated/index.uts';
-import { http } from '@/src/http/index.uts';
-import { toast, toastSuccess } from '@/src/utils/toast/index.uts';
+import { computed, ref } from 'vue';
+import { fetchMockFooList, fetchMockLogin } from '@/src/api/example.uts';
+import type { FooItem, MockLoginParams, MockLoginResult, PageResult } from '@/src/api/example.uts';
+import { useMutation, useQuery } from '@/uni_modules/request-bestX/index.uts';
+import type { MutationOptions, QueryFunctionContext, QueryOptions } from '@/uni_modules/request-bestX/index.uts';
 
-const mockLoading = ref<boolean>(false);
-const mockEndpoint = ref<string>('');
-const mockSource = ref<string>('');
-const mockResultText = ref<string>('');
-const mockStatusText = ref<string>('待触发');
-const mockIsSuccess = ref<boolean>(true);
+const mockUsername = ref<string>('admin');
+const mockPassword = ref<string>('123456');
 
-function fetchMockFooList(): void {
-  mockLoading.value = true;
-  mockEndpoint.value = 'GET /api/foo';
-  mockSource.value = '手写业务 Mock 路由 (mock/example.ts)';
-  mockStatusText.value = '请求中…';
-  http.get<UTSJSONObject>('/api/foo').then((res: UTSJSONObject): void => {
-    mockLoading.value = false;
-    mockIsSuccess.value = true;
-    mockStatusText.value = 'Mock 拦截成功 (200)';
-    mockResultText.value = JSON.stringify(res);
-    toastSuccess('手写 Mock 拦截成功');
-  }, (err: any): void => {
-    mockLoading.value = false;
-    mockIsSuccess.value = false;
-    mockStatusText.value = '降级/未命中';
-    mockResultText.value = JSON.stringify(err);
-    toast('Mock 未开启或离线降级');
-  });
+// ==========================================
+// 1. useQuery：Mock 列表（enabled=false，由按钮手动 refetch）
+// ==========================================
+
+/**
+ * 演示「手动触发的查询」：默认 `enabled: false`，页面加载时不自动请求；
+ * 点击按钮调用 refetch() 才会真正发出请求并走 Mock 拦截。
+ */
+const listQuery = useQuery<PageResult<FooItem>>({
+  queryKey: ['mockFooList', 'demo'],
+  queryFn: (_ctx: QueryFunctionContext): Promise<PageResult<FooItem>> => {
+    return fetchMockFooList();
+  },
+  enabled: false
+} as QueryOptions<PageResult<FooItem>>);
+
+// ==========================================
+// 2. useMutation：Mock 登录
+// ==========================================
+
+const loginMutation = useMutation<MockLoginResult, MockLoginParams>({
+  mutationKey: ['mockLogin'],
+  mutationFn: (params: MockLoginParams): Promise<MockLoginResult> => {
+    return fetchMockLogin(params.username, params.password);
+  }
+} as MutationOptions<MockLoginResult, MockLoginParams>);
+
+// ==========================================
+// 3. 派生状态
+// ==========================================
+
+const listStatusText = computed((): string => {
+  if (listQuery.isError.value == true) {
+    return 'error';
+  }
+  if (listQuery.isFetching.value == true) {
+    return 'fetching';
+  }
+  if (listQuery.data.value != null) {
+    return 'success';
+  }
+  return 'idle';
+});
+
+const listStatusBgClass = computed((): string => {
+  const status = listStatusText.value;
+  if (status == 'error') {
+    return 'bg-[#fee2e2]';
+  }
+  if (status == 'fetching') {
+    return 'bg-[#dbeafe]';
+  }
+  if (status == 'success') {
+    return 'bg-[#d1fae5]';
+  }
+  return 'bg-[#f1f5f9]';
+});
+
+const listStatusTextClass = computed((): string => {
+  const status = listStatusText.value;
+  if (status == 'error') {
+    return 'text-[#dc2626]';
+  }
+  if (status == 'fetching') {
+    return 'text-[#2563eb]';
+  }
+  if (status == 'success') {
+    return 'text-[#059669]';
+  }
+  return 'text-[#94a3b8]';
+});
+
+const loginStatusText = computed((): string => {
+  const status = loginMutation.status.value;
+  if (status == 'pending') {
+    return 'pending';
+  }
+  if (status == 'success') {
+    return 'success';
+  }
+  if (status == 'error') {
+    return 'error';
+  }
+  return 'idle';
+});
+
+const loginStatusBgClass = computed((): string => {
+  const status = loginStatusText.value;
+  if (status == 'error') {
+    return 'bg-[#fee2e2]';
+  }
+  if (status == 'pending') {
+    return 'bg-[#dbeafe]';
+  }
+  if (status == 'success') {
+    return 'bg-[#d1fae5]';
+  }
+  return 'bg-[#f1f5f9]';
+});
+
+const loginStatusTextClass = computed((): string => {
+  const status = loginStatusText.value;
+  if (status == 'error') {
+    return 'text-[#dc2626]';
+  }
+  if (status == 'pending') {
+    return 'text-[#2563eb]';
+  }
+  if (status == 'success') {
+    return 'text-[#059669]';
+  }
+  return 'text-[#94a3b8]';
+});
+
+/** 列表摘要：把 useQuery.data 映射成一行人类可读文本 */
+const listSummary = computed((): string => {
+  const data = listQuery.data.value;
+  if (data == null) {
+    return '';
+  }
+  let names = '';
+  for (let i = 0; i < data.list.length; i++) {
+    if (i > 0) {
+      names += ' / ';
+    }
+    names += data.list[i].name;
+  }
+  return `共 ${data.total} 条 · 前 ${data.list.length} 条：${names}`;
+});
+
+/** 登录摘要：把 useMutation.data 映射成一行文本 */
+const loginSummary = computed((): string => {
+  const data = loginMutation.data.value;
+  if (data == null) {
+    return '';
+  }
+  return `登录成功 · ${data.nickname}（${data.username}）· token: ${data.token} · 有效期 ${data.expiresIn}s`;
+});
+
+/** 错误文案：查询错误与 mutation 错误都会展示 */
+const mockErrorText = computed((): string => {
+  const loginError = loginMutation.error.value;
+  if (loginError != null) {
+    return loginError.message;
+  }
+  const listError = listQuery.error.value;
+  if (listError != null) {
+    return `${listError.message}（若非以 pnpm dev:mock 启动，请求会落到真实开发服务器）`;
+  }
+  return '';
+});
+
+const hasMockError = computed((): boolean => {
+  return mockErrorText.value.length > 0;
+});
+
+// ==========================================
+// 4. 交互动作
+// ==========================================
+
+function requestMockList(): void {
+  // 每次都强制重拉（refetch 会绕过缓存新鲜度判定）
+  listQuery.refetch();
 }
 
-function fetchContractMorningReport(): void {
-  mockLoading.value = true;
-  mockEndpoint.value = 'POST /gateway/morningCheckReport/page';
-  mockSource.value = 'OpenAPI 自动契约挡板 (mock/generated.ts)';
-  mockStatusText.value = '请求中…';
-  const body = {
-    page: 1,
-    pageSize: 10
-  } as MorningCheckReportPageUsingPostBody;
-  morningCheckReportPageUsingPost({ body }).then((res: MorningCheckReportPageUsingPostResponse): void => {
-    mockLoading.value = false;
-    mockIsSuccess.value = true;
-    mockStatusText.value = '契约挡板回包 (200)';
-    mockResultText.value = JSON.stringify(res);
-    toastSuccess('OpenAPI 契约挡板已命中');
-  }, (err: any): void => {
-    mockLoading.value = false;
-    mockIsSuccess.value = false;
-    mockStatusText.value = '请求未拦截 (需开启 Mock)';
-    mockResultText.value = JSON.stringify(err);
-    toast('需在 Web 端运行 pnpm dev:mock');
-  });
-}
-
-function fetchMockAuthLogin(): void {
-  mockLoading.value = true;
-  mockEndpoint.value = 'POST /api/auth/login';
-  mockSource.value = '鉴权登录 Mock (mock/example.ts)';
-  mockStatusText.value = '请求中…';
-  const body = {
-    username: 'admin',
-    password: 'admin'
-  } as UTSJSONObject;
-  http.post<UTSJSONObject>('/api/auth/login', body).then((res: UTSJSONObject): void => {
-    mockLoading.value = false;
-    mockIsSuccess.value = true;
-    mockStatusText.value = '登录 Mock 成功 (200)';
-    mockResultText.value = JSON.stringify(res);
-    toastSuccess('获取 Mock Token 成功');
-  }, (err: any): void => {
-    mockLoading.value = false;
-    mockIsSuccess.value = false;
-    mockStatusText.value = '失败';
-    mockResultText.value = JSON.stringify(err);
-    toast('请求失败');
-  });
-}
-
-function clearMockResult(): void {
-  mockEndpoint.value = '';
-  mockSource.value = '';
-  mockResultText.value = '';
-  mockStatusText.value = '待触发';
-  mockIsSuccess.value = true;
+function submitMockLogin(): void {
+  if (loginMutation.isPending.value == true) {
+    return;
+  }
+  loginMutation.mutate({
+    username: mockUsername.value.trim(),
+    password: mockPassword.value.trim()
+  } as MockLoginParams);
 }
 </script>

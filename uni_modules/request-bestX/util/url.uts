@@ -67,7 +67,17 @@ export function buildRequestUrl(
       // 安全拼接：去掉 base 尾斜杠与 path 首斜杠
       const cleanBase = trimmedBase.endsWith('/') ? trimmedBase.slice(0, trimmedBase.length - 1) : trimmedBase;
       const cleanPath = trimmedPath.startsWith('/') ? trimmedPath.slice(1) : trimmedPath;
-      combinedUrl = `${cleanBase}/${cleanPath}`;
+
+      // 防重复前缀重叠：处理如 baseURL='/api' 且 path='/api/foo' 导致拼接成 '/api/api/foo' 的场景
+      const lastSlashIdx = cleanBase.lastIndexOf('/');
+      const baseTail = lastSlashIdx >= 0 ? cleanBase.slice(lastSlashIdx + 1) : cleanBase;
+      if (baseTail != '' && (cleanPath == baseTail || cleanPath.startsWith(`${baseTail}/`))) {
+        const basePrefix = lastSlashIdx >= 0 ? cleanBase.slice(0, lastSlashIdx) : '';
+        combinedUrl = `${basePrefix}/${cleanPath}`;
+      }
+      else {
+        combinedUrl = `${cleanBase}/${cleanPath}`;
+      }
     }
   }
 

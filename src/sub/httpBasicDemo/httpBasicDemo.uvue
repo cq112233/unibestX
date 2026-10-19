@@ -43,6 +43,10 @@
 
         <!-- 3. 文件下载 -->
         <DownloadDemoCard />
+
+        <!-- 4. 本地 Mock 拦截（useQuery / useMutation + vite-plugin-mock） -->
+        <MockDemoCard />
+
         <view class="flex-col items-center py-[16px]">
           <text class="text-[12px] text-[#94a3b8]">已触底 {{ reachBottomCount }} 次 · 内容结束</text>
         </view>
@@ -57,6 +61,7 @@ import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/layout
 import CrudDemoCard from '@/src/sub/httpBasicDemo/components/CrudDemoCard.uvue';
 import UploadDemoCard from '@/src/sub/httpBasicDemo/components/UploadDemoCard.uvue';
 import DownloadDemoCard from '@/src/sub/httpBasicDemo/components/DownloadDemoCard.uvue';
+import MockDemoCard from '@/src/sub/httpBasicDemo/components/MockDemoCard.uvue';
 
 definePage({
   debug: false,
@@ -83,7 +88,8 @@ const apiTags: Array<string> = [
   'http.get',
   'http.post / put / delete',
   'http.upload',
-  'http.downloadFile'
+  'http.downloadFile',
+  'vite-plugin-mock'
 ];
 
 function handleScroll(e: UniScrollEvent): void {

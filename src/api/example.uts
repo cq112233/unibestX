@@ -45,6 +45,20 @@ export type PageResult<T> = {
   total: number;
 };
 
+/** 本地 Mock 登录的入参（对应 mock/auth.ts 的 /api/auth/login） */
+export type MockLoginParams = {
+  username: string;
+  password: string;
+};
+
+/** 本地 Mock 登录的回包（已把嵌套 userInfo 拍平成强类型字段） */
+export type MockLoginResult = {
+  token: string;
+  expiresIn: number;
+  username: string;
+  nickname: string;
+};
+
 // ==========================================
 // 2. 内部工具（模块内私有，不对外导出）
 // ==========================================
@@ -119,6 +133,30 @@ function toJsonObject(raw: UTSJSONObject): UTSJSONObject {
   }
   const parsed = JSON.parseObject(JSON.stringify(raw));
   return parsed != null ? parsed : raw;
+}
+
+/**
+ * 尝试把回包解析成 JSON 对象，解析不出来时返回 null
+ *
+ * 与 `toJsonObject` 的区别：**纯文本**回包（HTTP 404 的 HTML 错误页、后端返回的
+ * "Function Not Found" 之类）会被判为 null，而不是把字符串原样返回 —— 后者会在后面
+ * 调 `getNumber` / `getArray` 时抛「xxx is not a function」，把真实错误掩盖掉。
+ *
+ * 注意 H5 的 `UTS.JSON.parseObject` 对字符串入参**会原样返回该字符串**（不是 null），
+ * 所以最后必须再用 `instanceof` 判一次。
+ */
+function toJsonObjectOrNull(raw: any): UTSJSONObject | null {
+  if (raw == null) {
+    return null;
+  }
+  if (raw instanceof UTSJSONObject) {
+    return raw;
+  }
+  const parsed = JSON.parseObject(JSON.stringify(raw));
+  if (parsed instanceof UTSJSONObject) {
+    return parsed;
+  }
+  return null;
 }
 
 /**
@@ -540,4 +578,89 @@ export function downloadFooFile(
     }
   } as HttpRequestConfig;
   return http.downloadFile(url, config);
+}
+
+// ==========================================
+// 5. 本地 Mock 演示（vite-plugin-mock）
+//
+// ⚠️ 只有以 `pnpm dev:mock` 启动（或 VITE_USE_MOCK=true + VITE_H5_USE_PROXY=true）时，
+//    下面两个相对路径请求才会被 Vite 中间件拦截并秒回挡板数据；普通 dev 模式下它们会
+//    打到 VITE_SERVER_BASEURL 指向的真实开发服务器（没有对应接口时会失败）。
+//
+// 这些接口**故意不覆盖 baseURL**：Mock 拦截依赖「请求打到 dev server 自身」（相对路径），
+// 一旦写死完整域名就绕过了 Vite 中间件。
+// 路由定义见 mock/foo.ts（GET /api/foo）与 mock/auth.ts（POST /api/auth/login）。
+// ==========================================
+
+/**
+ * Mock 未命中时的统一错误文案
+ *
+ * 普通 dev 模式下相对路径会落到 VITE_SERVER_BASEURL 指向的真实服务器，
+ * 拿到的往往不是 JSON（404 HTML / "Function Not Found"），这里转成可操作提示。
+ */
+const MOCK_MISS_HINT: string = 'Mock 接口未命中：响应不是 JSON。请用 pnpm dev:mock 启动（VITE_USE_MOCK=true + VITE_H5_USE_PROXY=true）';
+
+/**
+ * 请求本地 Mock 的 Foo 列表（`GET /api/foo`）
+ *
+ * 回包经 request 拦截器解包后是 `{ id, name, list, total, page, pageSize }`，
+ * 这里映射成与真实接口一致的 `PageResult<FooItem>`。
+ */
+export function fetchMockFooList(): Promise<PageResult<FooItem>> {
+  return http.get<UTSJSONObject>('/api/foo', {
+    params: {
+      page: 1,
+      pageSize: 10
+    } as UTSJSONObject,
+    extra: {
+      ignoreAuth: true
+    } as UTSJSONObject
+  } as HttpRequestConfig).then((data: UTSJSONObject): Promise<PageResult<FooItem>> => {
+    const obj = toJsonObjectOrNull(data);
+    if (obj == null) {
+      return Promise.reject(new Error(MOCK_MISS_HINT)) as Promise<PageResult<FooItem>>;
+    }
+    // ⚠️ `getArray<T>` 的泛型实参必须显式写全（UTS 不从默认值反推元素类型）；
+    //    TS 侧 getArray 解析为 any，传类型实参报 TS2347，故用 @ts-expect-error 抑制。
+    // @ts-expect-error UTS 编译要求显式泛型实参；TS 侧 getArray 为 any 会报 TS2347
+    const rawList = obj.getArray<UTSJSONObject>('list', [] as Array<UTSJSONObject>);
+    const list = toFooList(rawList);
+    const total = obj.getNumber('total') ?? list.length;
+    return Promise.resolve({
+      list,
+      hasMore: list.length < total,
+      total
+    } as PageResult<FooItem>);
+  });
+}
+
+/**
+ * 请求本地 Mock 的登录接口（`POST /api/auth/login`）
+ *
+ * mock/auth.ts 里密码只接受 `123456` / `admin`，其它密码会返回业务错误码，
+ * 由 request 拦截器统一 toast 并 reject（正好用来演示失败分支）。
+ */
+export function fetchMockLogin(username: string, password: string): Promise<MockLoginResult> {
+  const payload = {
+    username,
+    password
+  } as UTSJSONObject;
+  return http.post<UTSJSONObject>('/api/auth/login', payload, {
+    extra: {
+      ignoreAuth: true
+    } as UTSJSONObject
+  } as HttpRequestConfig).then((data: UTSJSONObject): Promise<MockLoginResult> => {
+    const obj = toJsonObjectOrNull(data);
+    if (obj == null) {
+      return Promise.reject(new Error(MOCK_MISS_HINT)) as Promise<MockLoginResult>;
+    }
+    const userRaw = obj.get('userInfo');
+    const user = userRaw != null ? toJsonObjectOrNull(userRaw) : null;
+    return Promise.resolve({
+      token: obj.getString('token') ?? '',
+      expiresIn: obj.getNumber('expiresIn') ?? 0,
+      username: user != null ? (user.getString('username') ?? '') : '',
+      nickname: user != null ? (user.getString('nickname') ?? '') : ''
+    } as MockLoginResult);
+  });
 }

@@ -84,7 +84,14 @@ export function defaultBusinessAfterSuccess(
   if (data == null) {
     throw new Error('返回的响应数据为空');
   }
-  const resultObj = JSON.parseObject(JSON.stringify(data));
+  // ⚠️ 必须判「是不是 JSON 对象」再取字段：
+  //    H5 的 UTS.JSON.parseObject 对**纯文本**回包会原样返回那个字符串（不是 null），
+  //    而字符串上没有 getNumber / get 等方法。HTTP 404 的 HTML 错误页、后端返回的
+  //    "Function Not Found" 这类纯文本就是这种形态，不判类型直接调用会抛
+  //    `resultObj.getNumber is not a function`，把真正的 HTTP 错误掩盖成一条无意义的 TypeError。
+  //    （App / 小程序端 parseObject 对非 JSON 文本返回 null，不受影响。）
+  const parsedResult = JSON.parseObject(JSON.stringify(data));
+  const resultObj: UTSJSONObject | null = parsedResult instanceof UTSJSONObject ? parsedResult : null;
   if (resultObj != null) {
     const code = resultObj.getNumber('code');
     // 有code 字段, 返回data

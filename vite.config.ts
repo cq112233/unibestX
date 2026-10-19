@@ -115,40 +115,23 @@ catch {
 process.env.VITE_BUILD_TIME = new Date().toISOString();
 
 const isBuild = process.env.NODE_ENV === 'production' || process.argv.includes('build');
-const env = loadEnv(process.env.NODE_ENV || 'production', projectRoot, '');
+const loadedEnv = loadEnv(process.env.NODE_ENV || 'production', projectRoot, '');
+// CLI 显式传入的环境变量（如 VITE_USE_MOCK=true / VITE_H5_USE_PROXY=true）优先于 .env 静态文件，避免被默认值冲掉
+const env = { ...loadedEnv, ...process.env };
 // 同步注入 process.env，确保构建期各插件（包括 UniManifest 解析 manifest.config.ts）无论从何处启动都能读取全量环境变量
 Object.assign(process.env, env);
-const isVisualizer = process.env.VISUALIZER === 'true'
-  || env.VISUALIZER === 'true'
-  || env.VITE_VISUALIZER === 'true'
-  || process.env.ANALYZE === 'true'
-  || env.ANALYZE === 'true'
-  || process.env.VITE_BUNDLE_ANALYZE === 'true'
-  || env.VITE_BUNDLE_ANALYZE === 'true'
-  || process.argv.includes('--visualizer')
-  || process.argv.includes('--analyze');
+const isVisualizer = env.VISUALIZER === 'true' || process.argv.includes('--visualizer');
 
-const isMock = process.env.VITE_USE_MOCK === 'true'
-  || env.VITE_USE_MOCK === 'true'
-  || process.env.MOCK === 'true'
-  || env.MOCK === 'true'
-  || process.argv.includes('--mock');
+const isMock = env.VITE_USE_MOCK === 'true' || process.argv.includes('--mock');
 
-const isWeb = process.env.UNI_PLATFORM === 'web'
-  || process.env.UNI_PLATFORM === 'h5'
-  || !process.env.UNI_PLATFORM;
+const isWeb = env.UNI_PLATFORM === 'web' || env.UNI_PLATFORM === 'h5';
 
 // 生产环境绝对严禁包含 vConsole（即使显式配置了开关或参数也强制屏蔽，防止线上泄漏）
 const isProduction = env.VITE_ENV_TYPE === 'production'
-  || process.env.VITE_ENV_TYPE === 'production'
   || (isBuild && env.VITE_ENV_TYPE !== 'test');
 
 const isVConsole = !isProduction && isWeb && (
-  process.env.VITE_SHOW_VCONSOLE === 'true'
-  || env.VITE_SHOW_VCONSOLE === 'true'
-  || process.env.VCONSOLE === 'true'
-  || env.VCONSOLE === 'true'
-  || process.argv.includes('--vconsole')
+  env.VITE_SHOW_VCONSOLE === 'true' || process.argv.includes('--vconsole')
 );
 
 const weappTailwindcssPlugins: PluginOption[] = (WeappTailwindcss(

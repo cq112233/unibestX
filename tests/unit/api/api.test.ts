@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { createFoo, deleteFoo, fetchFooById, fetchFooLatest, fetchFooList, FOO_UPLOAD_PATH, updateFoo, uploadFooFile } from '@/src/api/example.uts';
+import { createFoo, deleteFoo, fetchFooById, fetchFooLatest, fetchFooList, fetchMockFooList, fetchMockLogin, FOO_UPLOAD_PATH, updateFoo, uploadFooFile } from '@/src/api/example.uts';
 import { fetchUserInfo, login, logout } from '@/src/api/auth/auth.uts';
 import { http } from '@/src/http/index.uts';
 
@@ -346,6 +346,116 @@ describe('src/api spec compliant tests', () => {
       vi.spyOn(http, 'upload').mockRejectedValue(new Error('网络错误') as any);
 
       await expect(uploadFooFile('/tmp/test.png', true)).rejects.toThrow('网络错误');
+    });
+  });
+
+  describe('mock api module', () => {
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
+
+    function argOf(spy: any, callIndex: number, argIndex: number): any {
+      return spy.mock.calls[callIndex][argIndex];
+    }
+
+    function json(value: any): any {
+      const UTSJSONObjectCtor = (globalThis as any).UTSJSONObject;
+      if (Array.isArray(value)) {
+        return value.map((item: any) => json(item));
+      }
+      if (value != null && typeof value === 'object') {
+        const wrapped: any = new UTSJSONObjectCtor();
+        Object.keys(value).forEach((key: string) => {
+          wrapped[key] = json(value[key]);
+        });
+        return wrapped;
+      }
+      return value;
+    }
+
+    it('fetchMockFooList 请求相对路径 /api/foo，不覆盖 baseURL（否则绕过 Vite Mock 中间件）', async () => {
+      const spy = vi.spyOn(http, 'get').mockResolvedValue(json({
+        list: [
+          { id: 1, name: 'unix', desc: 'uni-app X 核心架构' },
+          { id: 2, name: 'UnibestX', desc: '最好的 uni-app X 跨端开发模板' }
+        ],
+        total: 2
+      }));
+
+      const res = await fetchMockFooList();
+
+      expect(argOf(spy, 0, 0)).toBe('/api/foo');
+      const config = argOf(spy, 0, 1);
+      expect(config.baseURL).toBeUndefined();
+      expect(config.params).toEqual({ page: 1, pageSize: 10 });
+      // Mock 登录态无关，必须免鉴权，否则前置钩子会抛「未登录」
+      expect(config.extra.ignoreAuth).toBe(true);
+      expect(res.list.length).toBe(2);
+      expect(res.list[0].name).toBe('unix');
+      expect(res.total).toBe(2);
+      expect(res.hasMore).toBe(false);
+    });
+
+    it('fetchMockFooList 回包缺 total 时退回本页条数', async () => {
+      vi.spyOn(http, 'get').mockResolvedValue(json({
+        list: [{ id: 1, name: 'a', desc: 'b' }]
+      }));
+
+      const res = await fetchMockFooList();
+
+      expect(res.total).toBe(1);
+      expect(res.hasMore).toBe(false);
+    });
+
+    it('fetchMockLogin 请求相对路径 /api/auth/login 并把嵌套 userInfo 拍平', async () => {
+      const spy = vi.spyOn(http, 'post').mockResolvedValue(json({
+        token: 'mock-token-123',
+        expiresIn: 7200,
+        userInfo: {
+          userId: 1001,
+          username: 'admin',
+          nickname: '超级管理员',
+          roles: ['admin']
+        }
+      }));
+
+      const res = await fetchMockLogin('admin', '123456');
+
+      expect(argOf(spy, 0, 0)).toBe('/api/auth/login');
+      const payload = argOf(spy, 0, 1);
+      expect(payload.username).toBe('admin');
+      expect(payload.password).toBe('123456');
+      expect(argOf(spy, 0, 2).baseURL).toBeUndefined();
+      expect(argOf(spy, 0, 2).extra.ignoreAuth).toBe(true);
+      expect(res.token).toBe('mock-token-123');
+      expect(res.expiresIn).toBe(7200);
+      expect(res.username).toBe('admin');
+      expect(res.nickname).toBe('超级管理员');
+    });
+
+    it('fetchMockLogin 回包缺 userInfo 时字段兜底成空串 / 0', async () => {
+      vi.spyOn(http, 'post').mockResolvedValue(json({ token: 't' }));
+
+      const res = await fetchMockLogin('admin', 'admin');
+
+      expect(res.token).toBe('t');
+      expect(res.expiresIn).toBe(0);
+      expect(res.username).toBe('');
+      expect(res.nickname).toBe('');
+    });
+
+    it('mock 未命中（回包是纯文本 404 页）时给出「请用 dev:mock 启动」的明确错误', async () => {
+      // ⚠️ H5 的 UTS.JSON.parseObject 对纯文本会原样返回字符串（不是 null），
+      //    所以这里刻意 mock 成字符串，验证 api 层不会在 getArray / get 上崩掉
+      vi.spyOn(http, 'get').mockResolvedValue('<html>404 Not Found</html>' as any);
+
+      await expect(fetchMockFooList()).rejects.toThrow('Mock 接口未命中');
+    });
+
+    it('mock 登录未命中（纯文本回包）时同样给出明确错误，而不是 TypeError', async () => {
+      vi.spyOn(http, 'post').mockResolvedValue('Function Not Found' as any);
+
+      await expect(fetchMockLogin('admin', '123456')).rejects.toThrow('Mock 接口未命中');
     });
   });
 });
