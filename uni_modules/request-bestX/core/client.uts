@@ -366,7 +366,7 @@ export class HttpClient {
         const k = defaultKeys[i];
         mergedHeader[k] = this.defaultHeader[k];
       }
-      const customHeader = (config.header ?? config.headers) as UTSJSONObject | null;
+      const customHeader = (config.headers ?? config.header) as UTSJSONObject | null;
       if (customHeader != null) {
         const customKeys = UTSJSONObject.keys(customHeader);
         for (let i = 0; i < customKeys.length; i = i + 1) {
@@ -465,10 +465,11 @@ export class HttpClient {
    */
   request<T>(config: HttpRequestConfig): Promise<T> {
     const finalConfig = (config ?? {}) as HttpRequestConfig;
-    if (finalConfig.header == null) {
-      finalConfig.header = {} as UTSJSONObject;
-    }
-    const targetHeader = finalConfig.header as UTSJSONObject;
+    const rawHeaders = (finalConfig.headers ?? finalConfig.header);
+    const targetHeader = (rawHeaders != null ? rawHeaders as UTSJSONObject : ({} as UTSJSONObject));
+    finalConfig.headers = targetHeader;
+    finalConfig.header = targetHeader;
+
     const defaultKeys = UTSJSONObject.keys(this.defaultHeader);
     for (let i = 0; i < defaultKeys.length; i = i + 1) {
       const k = defaultKeys[i];
@@ -622,7 +623,7 @@ export class HttpClient {
               mergedHeader[k] = this.defaultHeader[k];
             }
           }
-          const customHeader = (validConfig.header ?? validConfig.headers) as UTSJSONObject | null;
+          const customHeader = (validConfig.headers ?? validConfig.header) as UTSJSONObject | null;
           if (customHeader != null) {
             const customKeys = UTSJSONObject.keys(customHeader);
             for (let i = 0; i < customKeys.length; i = i + 1) {
@@ -712,7 +713,7 @@ export class HttpClient {
             const k = defaultKeys[i];
             mergedHeader[k] = this.defaultHeader[k];
           }
-          const customHeader = (validConfig.header ?? validConfig.headers) as UTSJSONObject | null;
+          const customHeader = (validConfig.headers ?? validConfig.header) as UTSJSONObject | null;
           if (customHeader != null) {
             const customKeys = UTSJSONObject.keys(customHeader);
             for (let i = 0; i < customKeys.length; i = i + 1) {
@@ -838,7 +839,8 @@ export class HttpClient {
         }
         const fullUrl = buildRequestUrl(effectiveBase, readyConfig.url ?? '', readyConfig.params);
 
-        const header = readyConfig.header != null ? (readyConfig.header as UTSJSONObject) : ({} as UTSJSONObject);
+        const rawStreamHeader = (readyConfig.headers ?? readyConfig.header);
+        const header = rawStreamHeader != null ? (rawStreamHeader as UTSJSONObject) : ({} as UTSJSONObject);
         if (header['Content-Type'] == null) {
           header['Content-Type'] = ContentTypeEnum.AppJson;
         }

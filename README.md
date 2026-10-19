@@ -511,8 +511,7 @@ unibestX/
 │   ├── http/                            # 业务网络层（全项目唯一网络出口）
 │   │   ├── index.uts                    #   门面：导出 http / secondaryHttp 与业务错误、枚举
 │   │   ├── instances/                   #   多域名实例、Token 注入、401 静默刷新与重放
-│   │   ├── error/                       #   错误归一（BusinessError / resolveErrorMessage）
-│   │   └── openapi.uts                  #   OpenAPI 代码生成专属 UTS 适配器
+│   │   └── error/                       #   错误归一（BusinessError / resolveErrorMessage）
 │   ├── i18n/                            # 国际化多语言
 │   │   ├── index.uts                    #   lime-i18n 实例与持久化恢复
 │   │   ├── locales/                     #   中英文语言包（zh-CN.json / en-US.json）
@@ -1024,7 +1023,7 @@ src/tabbar/config.uts (唯一样本源)
 
 - **智能推导补全**：针对 Apifox 用户仅在接口示例中提供 JSON 数据而未定义 schema 的痛点，内置智能逆向递归推导器，从 `example` 中自动推导字段结构与类型，杜绝类型退化为 `Record<string, unknown>`。
 - **UTS 强类型铁律规范**：自动将生成的 `interface` 严格转换为 `type` 别名（解决 UTS110111163 报错），保留精确的相对导入（如 `./types.uts`），彻底杜绝微信小程序 uts2js 编译时的纯类型导出丢失。
-- **与核心请求库无缝协同**：底层请求适配器接入 [src/http/openapi.uts](src/http/openapi.uts)，完整复用现有的 TokenStore 鉴权、响应拦截、错误轻提示与多域名配置。
+- **与核心请求库无缝协同**：底层请求适配器直接接入 `@/uni_modules/request-bestX`，完整复用现有的 TokenStore 鉴权、响应拦截、错误轻提示与多域名配置。
 - **敏感 Token 隔离**：Apifox 的 Token 与 Project ID 配置在 `.env.local` 中，无需担心密钥随 Git 泄露。
 
 **执行命令**：

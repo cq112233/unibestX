@@ -22,9 +22,8 @@ src/http/
 │       ├── refresh.uts           # 业务 Token 静默刷新（单飞，并发 401 仅刷新一次）
 │       ├── enum.uts              # ResultEnum / ShowMessage / IResponse
 │       └── config.uts            # 业务多域名与 H5 代理路径映射
-├── error/
-│   └── error.uts                 # 统一错误归一：AppErrorInfo / BusinessError / resolveErrorMessage
-└── openapi.uts                   # openapi-ts-request 驱动适配器
+└── error/
+    └── error.uts                 # 统一错误归一：AppErrorInfo / BusinessError / resolveErrorMessage
 ```
 
 ---

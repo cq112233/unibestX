@@ -97,6 +97,35 @@ describe('httpClient beforeRequest & afterResponse hooks', () => {
     expect(dummyConfig.header['X-Async-Id']).toBe('async-123');
   });
 
+  it('should support headers (plural) as well as header with full compatibility', async () => {
+    let capturedConfig: any = null;
+
+    http.beforeRequest((config: any) => {
+      capturedConfig = config;
+    });
+
+    const dummyConfig = {
+      url: '/test-headers',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Trace-Id': 'trace-abc-123'
+      },
+      extra: { ignoreAuth: true }
+    } as any;
+
+    try {
+      await http.request(dummyConfig);
+    }
+    catch (_) {}
+
+    expect(capturedConfig).not.toBeNull();
+    expect(capturedConfig.headers).toBeDefined();
+    expect(capturedConfig.header).toBeDefined();
+    expect(capturedConfig.headers['X-Trace-Id']).toBe('trace-abc-123');
+    expect(capturedConfig.header['X-Trace-Id']).toBe('trace-abc-123');
+  });
+
   it('should allow removing a specific hook and clearing all hooks', async () => {
     let callCount = 0;
     const hook = () => {

@@ -52,6 +52,12 @@ export default [
     response: () => mockDishDetail
   },
   {
+    url: '/api-secondary/gateway/foodSampleReport/dishDetail',
+    method: 'post',
+    timeout: 80,
+    response: () => mockDishDetail
+  },
+  {
     url: '/gateway/foodSampleReport/dishDetail',
     method: 'post',
     timeout: 80,
