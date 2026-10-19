@@ -1,0 +1,372 @@
+<template>
+  <!-- ============ 1. 真实请求（CRUD 增删改查） ============ -->
+  <view
+    class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid border-[#edf2f7] bg-[#ffffff]"
+  >
+    <!-- 标题区域 -->
+    <view class="flex flex-row items-center mb-[16px]">
+      <view class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#06b6d4]" />
+      <text class="text-[16px] font-bold text-[#2d3748]">真实请求（CRUD 增删改查）</text>
+    </view>
+    <text class="text-[12px] text-[#64748b] leading-[19px] mb-[4px]">
+      由 src/api/example.uts 打公网真实接口（dummyjson 的 /posts，地址写死在该文件的 FOO_BASE_URL）：五个动词都真实发出并回包，name / desc 对应接口的 title / body。增删改后就地改前端列表，点「重置」回服务端真源（该服务不落库，本地改动会没）。
+    </text>
+
+    <!-- 2.1 表单区：新增与编辑共用一套输入框，crudEditingId > 0 即编辑态 -->
+    <view class="rounded-[10px] p-[12px] mt-[12px] border-[1px] border-solid border-[#e2e8f0]">
+      <view class="flex-row items-center justify-between mb-[8px]">
+        <text class="text-[13px] text-[#64748b]">{{ crudFormTitle }}</text>
+        <view class="px-[8px] py-[2px] rounded-[10px]" :class="crudFormModeBgClass">
+          <text class="text-[12px]" :class="crudFormModeTextClass">{{ crudFormModeText }}</text>
+        </view>
+      </view>
+      <input
+        v-model="crudName"
+        placeholder="title（映射为 name），例如 He was an expert"
+        class="h-[38px] bg-white rounded-[6px] px-[12px] border-[1px] border-solid border-[#cbd5e1] text-[13px] text-[#334155] mb-[8px]"
+      />
+      <input
+        v-model="crudDesc"
+        placeholder="body（映射为 desc），例如 一段正文……"
+        class="h-[38px] bg-white rounded-[6px] px-[12px] border-[1px] border-solid border-[#cbd5e1] text-[13px] text-[#334155] mb-[10px]"
+      />
+      <!-- 操作按钮：用 margin-right 代替 gap -->
+      <view class="flex-row">
+        <view :class="crudSubmitWrapClass">
+          <view
+            class="rounded-[8px] h-[42px] w-full flex flex-row items-center justify-center"
+            :class="crudSubmitBgClass"
+            @click="submitCrud"
+          >
+            <text class="text-[#ffffff] text-[14px]">{{ crudSubmitText }}</text>
+          </view>
+        </view>
+        <view v-if="crudEditing" class="flex-1">
+          <view
+            class="bg-[#94a3b8] rounded-[8px] h-[42px] w-full flex flex-row items-center justify-center"
+            @click="cancelCrudEdit"
+          >
+            <text class="text-[#ffffff] text-[14px]">取消编辑</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 2.2 数据列表：每行挂「详情 / 编辑 / 删除」三个操作 -->
+    <view class="mt-[12px]">
+      <view class="flex-row items-center justify-between mb-[8px]">
+        <text class="text-[13px] text-[#64748b]">当前列表（GET /posts）</text>
+        <view class="flex-row items-center">
+          <text class="text-[12px] text-[#94a3b8] mr-[8px]">{{ crudListCountText }}</text>
+          <view class="px-[8px] py-[3px] rounded-[4px] bg-[#0ea5e9] flex-row items-center" @click="resetCrudDemo">
+            <text class="text-[10px] text-[#ffffff] font-medium">{{ crudLoading ? '加载中…' : '重置' }}</text>
+          </view>
+        </view>
+      </view>
+
+      <text v-if="crudList.length == 0" class="text-[12px] text-[#94a3b8]">暂无数据，可在上方表单新增一条</text>
+
+      <view
+        v-for="item in crudList"
+        :key="item.id"
+        class="flex-row items-center py-[10px] px-[10px] bg-[#f8fafc] rounded-[8px] mb-[8px]"
+      >
+        <view class="flex-1 mr-[8px]">
+          <view class="flex-row items-center">
+            <text class="text-[13px] font-bold text-[#334155]">{{ item.name }}</text>
+            <text class="text-[11px] text-[#94a3b8] ml-[6px]">#{{ item.id }}</text>
+            <text v-if="item.id == crudEditingId" class="text-[10px] text-[#0ea5e9] ml-[6px]">编辑中</text>
+          </view>
+          <text class="text-[11px] text-[#64748b] mt-[2px]">{{ crudDescPreview(item.desc) }}</text>
+        </view>
+        <view class="flex-row items-center">
+          <view class="px-[8px] py-[4px] rounded-[4px] bg-[#e0e7ff] mr-[6px]" @click="loadCrudDetail(item)">
+            <text class="text-[11px] text-[#4338ca]">详情</text>
+          </view>
+          <view class="px-[8px] py-[4px] rounded-[4px] bg-[#dbeafe] mr-[6px]" @click="startCrudEdit(item)">
+            <text class="text-[11px] text-[#1d4ed8]">编辑</text>
+          </view>
+          <view class="px-[8px] py-[4px] rounded-[4px] bg-[#fee2e2]" @click="removeCrud(item)">
+            <text class="text-[11px] text-[#b91c1c]">删除</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 2.3 详情结果面板（GET /posts/:id） -->
+    <view
+      v-if="hasCrudDetail"
+      class="mt-[12px] rounded-[8px] bg-[#f8fafc] border-[1px] border-solid border-[#cbd5e1] overflow-hidden"
+    >
+      <view class="h-[3px] bg-[#6366f1]" />
+      <view class="p-[12px]">
+        <view class="flex-row items-center justify-between mb-[6px]">
+          <text class="text-[11px] text-[#64748b]">详情结果</text>
+          <text class="text-[10px] text-[#94a3b8]">GET /posts/:id</text>
+        </view>
+        <text class="text-[12px] text-[#334155] leading-[20px]">{{ crudDetailText }}</text>
+      </view>
+    </view>
+
+    <!-- 2.4 失败兜底：http 拦截器已统一 toast，这里只留卡片内的一行提示 -->
+    <view
+      v-if="hasCrudError"
+      class="mt-[10px] bg-[#fff5f5] rounded-[8px] p-[10px] border-[1px] border-solid border-[#fecaca]"
+    >
+      <text class="text-[12px] text-[#ef4444]">{{ crudError }}</text>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed, onMounted, ref } from 'vue';
+import { createFoo, deleteFoo, fetchFooById, fetchFooList, updateFoo } from '@/src/api/example.uts';
+import type { FooItem } from '@/src/api/example.uts';
+import { toast, toastSuccess } from '@/src/utils/toast/index.uts';
+
+const crudList = ref<FooItem[]>([]);
+const crudLoading = ref<boolean>(false);
+const crudSubmitting = ref<boolean>(false);
+const crudName = ref<string>('');
+const crudDesc = ref<string>('');
+const crudEditingId = ref<number>(0);
+const crudDetailText = ref<string>('');
+const crudError = ref<string>('');
+
+const crudEditing = computed((): boolean => {
+  return crudEditingId.value > 0;
+});
+
+const crudFormTitle = computed((): string => {
+  if (crudEditing.value) {
+    return `编辑 #${crudEditingId.value}（PUT /posts/:id）`;
+  }
+  return '新增一条（POST /posts/add）';
+});
+
+const crudFormModeText = computed((): string => {
+  if (crudEditing.value) {
+    return '编辑态';
+  }
+  return '新增态';
+});
+
+const crudFormModeBgClass = computed((): string => {
+  if (crudEditing.value) {
+    return 'bg-[#dbeafe]';
+  }
+  return 'bg-[#e0f2fe]';
+});
+
+const crudFormModeTextClass = computed((): string => {
+  if (crudEditing.value) {
+    return 'text-[#1d4ed8]';
+  }
+  return 'text-[#0369a1]';
+});
+
+const crudSubmitWrapClass = computed((): string => {
+  if (crudEditing.value) {
+    return 'flex-1 mr-[10px]';
+  }
+  return 'w-full';
+});
+
+const crudSubmitBgClass = computed((): string => {
+  if (crudEditing.value) {
+    return 'bg-[#2563eb]';
+  }
+  return 'bg-[#0284c7]';
+});
+
+const crudSubmitText = computed((): string => {
+  if (crudSubmitting.value) {
+    return '提交中...';
+  }
+  if (crudEditing.value) {
+    return '保存修改';
+  }
+  return '新增';
+});
+
+const crudListCountText = computed((): string => {
+  return `共 ${crudList.value.length} 条`;
+});
+
+const hasCrudDetail = computed((): boolean => {
+  return crudDetailText.value.length > 0;
+});
+
+const hasCrudError = computed((): boolean => {
+  return crudError.value.length > 0;
+});
+
+function crudErrorMessage(e: any, fallback: string): string {
+  if (e instanceof Error) {
+    return e.message;
+  }
+  if (e instanceof UTSJSONObject) {
+    const errObj = e as UTSJSONObject;
+    const msg = (errObj.message as string | null) ?? (errObj.msg as string | null) ?? (errObj.errMsg as string | null);
+    if (msg != null) {
+      return msg;
+    }
+    return JSON.stringify(e);
+  }
+  if (e != null) {
+    return `${e}`;
+  }
+  return fallback;
+}
+
+function crudDescPreview(text: string): string {
+  if (text.length <= 40) {
+    return text;
+  }
+  return `${text.substring(0, 40)}…`;
+}
+
+async function loadCrudList(): Promise<void> {
+  if (crudLoading.value == true) {
+    return;
+  }
+  crudLoading.value = true;
+  crudError.value = '';
+
+  try {
+    const pageResult = await fetchFooList(1, 1, '');
+    crudList.value = pageResult.list;
+  }
+  catch (err) {
+    crudError.value = crudErrorMessage(err, '列表加载失败');
+  }
+
+  crudLoading.value = false;
+}
+
+function resetCrudForm(): void {
+  crudEditingId.value = 0;
+  crudName.value = '';
+  crudDesc.value = '';
+}
+
+async function resetCrudDemo(): Promise<void> {
+  resetCrudForm();
+  crudDetailText.value = '';
+  crudError.value = '';
+  await loadCrudList();
+}
+
+async function deleteCrudItem(id: number): Promise<void> {
+  crudSubmitting.value = true;
+  crudError.value = '';
+
+  try {
+    await deleteFoo(id);
+    if (crudEditingId.value == id) {
+      resetCrudForm();
+    }
+    crudDetailText.value = '';
+    const removedIndex = crudList.value.findIndex((row: FooItem): boolean => row.id == id);
+    if (removedIndex >= 0) {
+      crudList.value.splice(removedIndex, 1);
+    }
+    toastSuccess('已删除');
+  }
+  catch (err) {
+    crudError.value = crudErrorMessage(err, '删除失败');
+  }
+
+  crudSubmitting.value = false;
+}
+
+function removeCrud(item: FooItem): void {
+  if (crudSubmitting.value == true) {
+    return;
+  }
+  uni.showModal({
+    title: '删除确认',
+    content: `确认删除 #${item.id} ${item.name} 吗？此操作不可撤销。`,
+    confirmText: '删除',
+    cancelText: '取消',
+    confirmColor: '#dc2626',
+    success: (modalRes) => {
+      if (modalRes.confirm == true) {
+        deleteCrudItem(item.id);
+      }
+    }
+  });
+}
+
+async function loadCrudDetail(item: FooItem): Promise<void> {
+  crudError.value = '';
+  crudDetailText.value = '';
+
+  try {
+    const detail = await fetchFooById(item.id);
+    if (detail == null) {
+      crudDetailText.value = `#${item.id} 查无数据`;
+      return;
+    }
+    crudDetailText.value = `id: ${detail.id} · name: ${detail.name} · desc: ${detail.desc}`;
+  }
+  catch (err) {
+    crudError.value = crudErrorMessage(err, '详情加载失败');
+  }
+}
+
+function startCrudEdit(item: FooItem): void {
+  crudEditingId.value = item.id;
+  crudName.value = item.name;
+  crudDesc.value = item.desc;
+  crudError.value = '';
+}
+
+function cancelCrudEdit(): void {
+  resetCrudForm();
+  crudError.value = '';
+}
+
+async function submitCrud(): Promise<void> {
+  if (crudSubmitting.value == true) {
+    return;
+  }
+  const name = crudName.value.trim();
+  const desc = crudDesc.value.trim();
+  if (name == '') {
+    toast('请先填写 name');
+    return;
+  }
+
+  crudSubmitting.value = true;
+  crudError.value = '';
+
+  try {
+    if (crudEditingId.value > 0) {
+      const updated = await updateFoo(crudEditingId.value, { id: crudEditingId.value, name, desc } as FooItem);
+      const updatedIndex = crudList.value.findIndex((row: FooItem): boolean => row.id == updated.id);
+      if (updatedIndex >= 0) {
+        crudList.value.splice(updatedIndex, 1, updated);
+      }
+      crudDetailText.value = `已更新 #${updated.id} · name: ${updated.name}`;
+      toastSuccess('修改成功');
+    }
+    else {
+      const created = await createFoo({ id: 0, name, desc } as FooItem);
+      crudList.value.unshift(created);
+      crudDetailText.value = `已新增 #${created.id} · name: ${created.name}`;
+      toastSuccess('新增成功');
+    }
+    resetCrudForm();
+  }
+  catch (err) {
+    crudError.value = crudErrorMessage(err, '提交失败');
+  }
+
+  crudSubmitting.value = false;
+}
+
+onMounted(() => {
+  loadCrudList();
+});
+</script>

@@ -5,7 +5,6 @@ import {
   defaultBusinessAfterComplete,
   defaultBusinessAfterSuccess,
   defaultBusinessBeforeRequest,
-  defaultRequestAdapter,
   downloadHttp,
   http,
   HttpClient,
@@ -230,10 +229,8 @@ describe('httpClient beforeRequest & afterResponse hooks', () => {
     expect(typeof defaultBusinessBeforeRequest).toBe('function');
     expect(typeof defaultBusinessAfterSuccess).toBe('function');
     expect(typeof defaultBusinessAfterComplete).toBe('function');
-    expect(typeof defaultRequestAdapter).toBe('function');
     const defaultOptions = buildApiInstanceOptions();
     expect(typeof defaultOptions.beforeRequest).toBe('function');
-    expect(typeof defaultOptions.requestAdapter).toBe('function');
     expect(typeof defaultOptions.refreshToken).toBe('function');
     expect(typeof defaultOptions.onUnauthorized).toBe('function');
 
@@ -285,47 +282,24 @@ describe('httpClient beforeRequest & afterResponse hooks', () => {
     expect(shortcutCalled).toBe(false);
   });
 
-  it('should support custom requestAdapter in HttpClientOptions', () => {
-    let adapterCalled = false;
-    let passedConfig: any = null;
-
-    const customAdapter = (config: any) => {
-      adapterCalled = true;
-      passedConfig = config;
-      return defaultRequestAdapter(config);
-    };
-
+  it('should support creating independent client instances with custom baseURL', () => {
     const client = createHttpClient({
       baseURL: 'https://adapter.example.com',
-      timeout: 8888,
-      requestAdapter: customAdapter
+      timeout: 8888
     });
 
     expect(client).toBeDefined();
-    expect(adapterCalled).toBe(true);
-    expect(passedConfig).not.toBeNull();
-    expect(passedConfig.baseURL).toBe('https://adapter.example.com');
-    expect(passedConfig.timeout).toBe(8888);
+    expect(client.getBaseURL()).toBe('https://adapter.example.com');
   });
 
-  it('should support passing custom client instance directly', () => {
-    const rawClient = defaultRequestAdapter({
-      baseURL: 'https://direct-client.example.com'
-    } as any);
-
-    const client = createHttpClient({
+  it('should support instantiating HttpClient directly via constructor', () => {
+    const client = new HttpClient({
       baseURL: 'https://direct-client.example.com',
-      client: rawClient
+      timeout: 6000
     });
 
     expect(client).toBeDefined();
-    expect((client as any).client).toBe(rawClient);
-  });
-
-  it('should fallback to default Request client when neither requestAdapter nor client is provided', () => {
-    const client = new HttpClient({ baseURL: 'https://no-adapter.com' });
-    expect(client).toBeDefined();
-    expect((client as any).client).toBeDefined();
+    expect(client.getBaseURL()).toBe('https://direct-client.example.com');
   });
 
   it('should operate entirely through RequestLifecycle instance', () => {
@@ -389,16 +363,22 @@ describe('httpClient downloadFile', () => {
     result: any,
     onDownload?: (url: string, config: any) => void
   ): HttpClientInstance {
-    const rawClient = defaultRequestAdapter({ baseURL: 'https://download.example.com' } as any);
-    (rawClient as any).download = (url: string, config: any) => {
+    (globalThis as any).uni.downloadFile.mockImplementation((opts: any) => {
       if (onDownload != null) {
-        onDownload(url, config);
+        const rawUrl = typeof opts.url === 'string' ? opts.url.replace('https://download.example.com', '') : opts.url;
+        onDownload(rawUrl, { ...opts, method: 'DOWNLOAD' });
       }
-      return Promise.resolve(result);
-    };
+      if (result.statusCode >= 200 && result.statusCode < 300) {
+        opts.success?.(result);
+      }
+      else {
+        opts.fail?.({ errMsg: result.errMsg || 'downloadFile:fail' });
+      }
+      opts.complete?.();
+      return { abort: () => {}, onProgressUpdate: () => {} };
+    });
     return createHttpClient({
-      baseURL: 'https://download.example.com',
-      client: rawClient
+      baseURL: 'https://download.example.com'
     });
   }
 
@@ -528,24 +508,31 @@ describe('httpClient 401 refresh replay', () => {
     refreshToken?: () => Promise<boolean>;
     header?: any;
   }): HttpClientInstance {
-    const rawClient = defaultRequestAdapter({ baseURL: 'https://replay.example.com' } as any);
     let callCount = 0;
-    (rawClient as any).request = (config: any) => {
+    (globalThis as any).uni.request.mockImplementation((opts: any) => {
       callCount += 1;
-      options.onRequest(config, callCount);
+      options.onRequest(opts, callCount);
       if (callCount === 1) {
-        return Promise.reject(new Error('__REFRESHABLE_401__'));
+        opts.success?.({
+          statusCode: 401,
+          data: { code: 401, message: 'token expired' },
+          errMsg: 'request:ok'
+        });
       }
-      return Promise.resolve({
-        statusCode: 200,
-        data: { code: 0, data: 'ok' },
-        config
-      });
-    };
+      else {
+        opts.success?.({
+          statusCode: 200,
+          data: { code: 0, data: 'ok' },
+          errMsg: 'request:ok'
+        });
+      }
+      opts.complete?.();
+      return { abort: () => {} };
+    });
 
     const clientOptions: any = {
-      baseURL: 'https://replay.example.com',
-      client: rawClient
+      ...buildApiInstanceOptions(),
+      baseURL: 'https://replay.example.com'
     };
     if (options.header != null) {
       clientOptions.header = options.header;

@@ -1,0 +1,123 @@
+/**
+ * HTTP 通用辅助工具函数 (HTTP Helper Utilities)
+ */
+
+import { HttpError } from '../core/types.uts';
+import type { HttpRequestConfig } from '../core/types.uts';
+
+/**
+ * 从未知错误对象中安全提取错误文案
+ */
+export function extractErrorMessage(err: any): string {
+  if (err == null) {
+    return '';
+  }
+  if (typeof err == 'string') {
+    return err as string;
+  }
+  if (err instanceof Error) {
+    return (err as Error).message;
+  }
+  try {
+    const obj = err as UTSJSONObject;
+    let msg: string | null = null;
+    if (typeof obj.getString == 'function') {
+      msg = obj.getString('errMsg') ?? obj.getString('message') ?? obj.getString('msg');
+    }
+    else {
+      // eslint-disable-next-line dot-notation
+      msg = (obj['errMsg'] as string | null) ?? (obj['message'] as string | null) ?? (obj['msg'] as string | null);
+    }
+    if (msg != null && msg != '') {
+      return msg;
+    }
+    // eslint-disable-next-line dot-notation
+    const cause = obj['cause'];
+    if (cause != null) {
+      if (cause instanceof Error) {
+        return (cause as Error).message;
+      }
+      if (typeof cause == 'string') {
+        return cause as string;
+      }
+    }
+  }
+  catch (_) {}
+  return '';
+}
+
+/**
+ * 从未知错误对象中安全提取 HTTP 状态码
+ */
+export function extractStatusCode(err: any): number {
+  if (err == null) {
+    return 0;
+  }
+  if (err instanceof HttpError) {
+    return (err as HttpError).statusCode;
+  }
+  try {
+    const obj = err as UTSJSONObject;
+    // eslint-disable-next-line dot-notation
+    const code = obj['statusCode'];
+    if (typeof code == 'number') {
+      return code as number;
+    }
+    // eslint-disable-next-line dot-notation
+    const cause = obj['cause'];
+    if (cause != null && cause instanceof HttpError) {
+      return (cause as HttpError).statusCode;
+    }
+  }
+  catch (_) {}
+  return 0;
+}
+
+/**
+ * 浅拷贝请求配置
+ */
+export function cloneConfig(config: HttpRequestConfig): HttpRequestConfig {
+  return {
+    url: config.url,
+    method: config.method,
+    data: config.data,
+    params: config.params,
+    header: config.header,
+    headers: config.headers,
+    timeout: config.timeout,
+    baseURL: config.baseURL,
+    dataType: config.dataType,
+    responseType: config.responseType,
+    sslVerify: config.sslVerify,
+    withCredentials: config.withCredentials,
+    enableCache: config.enableCache,
+    enableChunked: config.enableChunked,
+    firstIpv4: config.firstIpv4,
+    filePath: config.filePath,
+    name: config.name,
+    formData: config.formData,
+    files: config.files,
+    getTask: config.getTask,
+    extra: config.extra
+  } as HttpRequestConfig;
+}
+
+/**
+ * 把任意错误安全地转成 Error 实例
+ */
+export function toError(err: any): Error {
+  if (err == null) {
+    return new Error('请求失败');
+  }
+  if (typeof err == 'string') {
+    return new Error(err as string);
+  }
+  if (err instanceof Error) {
+    return err as Error;
+  }
+  const msg = extractErrorMessage(err);
+  if (msg != '') {
+    return new Error(msg);
+  }
+  return new Error('请求失败');
+}

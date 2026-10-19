@@ -1,0 +1,230 @@
+/**
+ * QueryClient 与 Vue 插件调度中枢 (QueryClient & VueQueryPlugin)
+ *
+ * 职责：
+ * 1. 管理全局查询缓存池（QueryCache）与状态发布订阅；
+ * 2. 支持 app.use(VueQueryPlugin) 通过 Vue provide 全局注入；
+ * 3. 支持组件内 useQueryClient() 通过 inject 获取或回退全局单例。
+ */
+
+import { inject } from 'vue';
+import type { QueryCacheRecord, QueryKey, QueryStatus, VueQueryPluginOptions } from './types.uts';
+
+/** 全局 Vue provide / inject 标识键 */
+export const VUE_QUERY_CLIENT_KEY: string = 'VUE_QUERY_CLIENT';
+
+/**
+ * 序列化查询键为稳定字符串哈希
+ */
+export function serializeQueryKey(key: QueryKey): string {
+  if (typeof key == 'string') {
+    return key as string;
+  }
+  try {
+    return JSON.stringify(key);
+  }
+  catch (_) {
+    return `${key}`;
+  }
+}
+
+/**
+ * 查询客户端中枢 (QueryClient)
+ */
+export class QueryClient {
+  /** 内存缓存字典：存储所有 queryKey 对应的数据状态 */
+  private cache: Map<string, QueryCacheRecord<any>> = new Map();
+  /** 监听者队列：当某 key 数据变化或失效时通知对应 hooks */
+  private listeners: Map<string, Array<() => void>> = new Map();
+  /** 在飞请求 Promise 字典：实现跨组件相同 queryKey 并发合并去重 */
+  private inflight: Map<string, Promise<any>> = new Map();
+
+  /**
+   * 从缓存中读取指定 queryKey 的数据
+   */
+  getQueryData<T>(key: QueryKey): T | null {
+    const hash = serializeQueryKey(key);
+    const record = this.cache.get(hash);
+    if (record != null) {
+      return (record.data as any) as T;
+    }
+    return null;
+  }
+
+  /**
+   * 手动向指定 queryKey 写入或覆盖缓存数据
+   */
+  setQueryData<T>(key: QueryKey, data: T | null): void {
+    const hash = serializeQueryKey(key);
+    const existing = this.cache.get(hash);
+    const now = Date.now();
+    const updatedRecord: QueryCacheRecord<T> = {
+      data,
+      error: null,
+      dataUpdatedAt: now,
+      errorUpdatedAt: 0,
+      status: 'success' as QueryStatus,
+      isFetching: false
+    };
+    if (existing != null) {
+      updatedRecord.isFetching = existing.isFetching;
+    }
+    this.cache.set(hash, updatedRecord);
+    this.notify(key);
+  }
+
+  /**
+   * 获取指定 queryKey 的完整缓存状态（含时间戳、状态等）
+   */
+  getQueryState<T>(key: QueryKey): QueryCacheRecord<T> | null {
+    const hash = serializeQueryKey(key);
+    const record = this.cache.get(hash);
+    if (record != null) {
+      return (record as any) as QueryCacheRecord<T>;
+    }
+    return null;
+  }
+
+  /**
+   * 更新指定 queryKey 的内部缓存记录
+   */
+  setQueryState<T>(key: QueryKey, record: QueryCacheRecord<T>): void {
+    const hash = serializeQueryKey(key);
+    this.cache.set(hash, record);
+    this.notify(key);
+  }
+
+  /**
+   * 使匹配的查询失效（标记为过期并触发重新拉取）
+   * @param key 可选，不传则失效所有缓存
+   */
+  invalidateQueries(key: QueryKey | null = null): void {
+    if (key == null) {
+      // 全量失效
+      this.cache.forEach((record) => {
+        record.dataUpdatedAt = 0;
+      });
+      this.listeners.forEach((subscribers) => {
+        for (let i = 0; i < subscribers.length; i = i + 1) {
+          subscribers[i]();
+        }
+      });
+      return;
+    }
+
+    const hash = serializeQueryKey(key);
+    const record = this.cache.get(hash);
+    if (record != null) {
+      record.dataUpdatedAt = 0;
+    }
+    this.notify(key);
+  }
+
+  /**
+   * 注册查询键状态变更监听函数
+   */
+  subscribe(key: QueryKey, listener: () => void): () => void {
+    const hash = serializeQueryKey(key);
+    let subs = this.listeners.get(hash);
+    if (subs == null) {
+      subs = [];
+      this.listeners.set(hash, subs);
+    }
+    subs.push(listener);
+
+    // 返回取消订阅函数
+    return (): void => {
+      const current = this.listeners.get(hash);
+      if (current != null) {
+        const idx = current.indexOf(listener);
+        if (idx !== -1) {
+          current.splice(idx, 1);
+        }
+        if (current.length === 0) {
+          this.listeners.delete(hash);
+        }
+      }
+    };
+  }
+
+  /**
+   * 广播通知监听此 queryKey 的所有组件更新
+   */
+  notify(key: QueryKey): void {
+    const hash = serializeQueryKey(key);
+    const subs = this.listeners.get(hash);
+    if (subs != null) {
+      for (let i = 0; i < subs.length; i = i + 1) {
+        subs[i]();
+      }
+    }
+  }
+
+  /**
+   * 获取或复用同 key 的在飞 Promise
+   */
+  getInflightPromise<T>(key: QueryKey): Promise<T> | null {
+    const hash = serializeQueryKey(key);
+    const p = this.inflight.get(hash);
+    if (p != null) {
+      return (p as any) as Promise<T>;
+    }
+    return null;
+  }
+
+  /**
+   * 登记在飞 Promise
+   */
+  setInflightPromise<T>(key: QueryKey, promise: Promise<T>): void {
+    const hash = serializeQueryKey(key);
+    this.inflight.set(hash, promise);
+  }
+
+  /**
+   * 移除在飞 Promise
+   */
+  removeInflightPromise(key: QueryKey): void {
+    const hash = serializeQueryKey(key);
+    this.inflight.delete(hash);
+  }
+
+  /**
+   * 清空所有查询缓存与在飞请求
+   */
+  clear(): void {
+    this.cache.clear();
+    this.listeners.clear();
+    this.inflight.clear();
+  }
+}
+
+/** 默认全局 QueryClient 单例（无需强制使用插件即可开箱即用） */
+export const defaultQueryClient: QueryClient = new QueryClient();
+
+/**
+ * 获取当前上下文中的 QueryClient
+ * 优先从 Vue inject('VUE_QUERY_CLIENT') 读取，未提供时无缝回退到 defaultQueryClient
+ */
+export function useQueryClient(customClient: QueryClient | null = null): QueryClient {
+  if (customClient != null) {
+    return customClient;
+  }
+  const injected = inject<QueryClient | null>(VUE_QUERY_CLIENT_KEY, null);
+  if (injected != null) {
+    return injected;
+  }
+  return defaultQueryClient;
+}
+
+/**
+ * TanStack Vue Query 兼容插件
+ * 用于 app.use(VueQueryPlugin, { queryClient }) 全局注册
+ */
+export const VueQueryPlugin = {
+  install(app: any, options: VueQueryPluginOptions | null = null): void {
+    const client: QueryClient = options?.queryClient ?? defaultQueryClient;
+    if (app != null && typeof app.provide === 'function') {
+      app.provide(VUE_QUERY_CLIENT_KEY, client);
+    }
+  }
+};

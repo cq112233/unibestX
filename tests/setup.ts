@@ -38,6 +38,28 @@ const mockUni: any = {
   addInterceptor: vi.fn(),
   removeInterceptor: vi.fn(),
 
+  // 网络请求方法基础桩
+  request: vi.fn((options: any) => {
+    if (typeof options?.success === 'function') {
+      setTimeout(() => {
+        options.success({
+          statusCode: 200,
+          data: { code: 0, data: null, message: 'ok' },
+          header: {},
+          errMsg: 'request:ok'
+        });
+        options.complete?.();
+      }, 0);
+    }
+    return { abort: vi.fn() };
+  }),
+  uploadFile: vi.fn((_options: any) => {
+    return { abort: vi.fn(), onProgressUpdate: vi.fn() };
+  }),
+  downloadFile: vi.fn((_options: any) => {
+    return { abort: vi.fn(), onProgressUpdate: vi.fn() };
+  }),
+
   getWindowInfo: vi.fn(() => ({
     windowWidth: 375,
     windowHeight: 812,

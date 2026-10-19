@@ -1,0 +1,143 @@
+/**
+ * Vue Query 风格强类型定义 (Vue Query Type Definitions)
+ *
+ * 遵循 UTS 强类型规范：
+ * 1. 一律使用 type 别名，严禁使用 interface；
+ * 2. 避免深层递归推断，确保跨端 Kotlin / Swift / Web 编译无损。
+ */
+
+import type { Ref } from 'vue';
+
+/** 查询状态：等待中 / 成功 / 失败 */
+export type QueryStatus = 'pending' | 'success' | 'error';
+
+/** 变更操作状态：未激活 / 执行中 / 成功 / 失败 */
+export type MutationStatus = 'idle' | 'pending' | 'success' | 'error';
+
+/** 查询键类型：支持字符串或结构化数组 */
+export type QueryKey = Array<any> | string;
+
+/** 查询函数上下文 */
+export type QueryFunctionContext = {
+  /** 规范化后的查询键数组 */
+  queryKey: Array<any>;
+  /** 当前查询分配的全局唯一请求取消键（传给 extra.requestKey 可实现自动取消） */
+  requestKey: string;
+  /** 自定义元信息 */
+  meta?: UTSJSONObject;
+};
+
+/** 查询函数签名 */
+export type QueryFunction<T> = (context: QueryFunctionContext) => Promise<T>;
+
+/** useQuery 配置项 */
+export type QueryOptions<T> = {
+  /** 查询唯一标识键（如 ['user', userId] 或 'bannerList'） */
+  queryKey: QueryKey;
+  /** 执行请求并返回数据的异步函数 */
+  queryFn: QueryFunction<T>;
+  /** 是否自动发起请求，默认 true */
+  enabled?: boolean;
+  /** 数据判定为新鲜的时间窗口（毫秒），窗口内重复触发直接命中缓存，默认 0 */
+  staleTime?: number;
+  /** 缓存驻留最大时长（毫秒），过期将自动垃圾回收，默认 5 分钟 (300000ms) */
+  gcTime?: number;
+  /** 失败重试次数，默认 0（不重试）；只对网络层错误生效 */
+  retry?: number;
+  /** 重试间隔毫秒数，默认 0 */
+  retryDelay?: number;
+  /** 轮询间隔毫秒数，默认 0（不轮询） */
+  refetchInterval?: number;
+  /** 静态初始数据 */
+  initialData?: T | null;
+  /** 动态获取初始数据函数（如从本地 Storage 读取） */
+  initialDataFn?: () => T | null;
+  /** 自定义错误是否允许重试判定（默认非业务码错误允许重试） */
+  isRetryable?: (err: any) => boolean;
+  /** 附加元数据 */
+  meta?: UTSJSONObject;
+};
+
+/** useQuery 返回的状态与操作集合 */
+export type QueryResult<T> = {
+  /** 响应式查询数据 */
+  data: Ref<T | null>;
+  /** 响应式异常对象 */
+  error: Ref<Error | null>;
+  /** 响应式查询状态 ('pending' | 'success' | 'error') */
+  status: Ref<QueryStatus>;
+  /** 首次无有效缓存时的加载中标记 (status === 'pending' && isFetching) */
+  isLoading: Ref<boolean>;
+  /** 是否正在进行网络数据拉取（含后台刷新、轮询与重新激活） */
+  isFetching: Ref<boolean>;
+  /** 请求是否执行成功 */
+  isSuccess: Ref<boolean>;
+  /** 请求是否发生错误 */
+  isError: Ref<boolean>;
+  /** 手动触发重新查询（无论缓存是否新鲜均强制向服务端请求） */
+  refetch: () => Promise<T | null>;
+  /** 取消当前正在执行的在飞请求 */
+  abort: () => void;
+};
+
+/** 变更函数签名 */
+export type MutationFunction<TData, TVariables> = (variables: TVariables) => Promise<TData>;
+
+/** useMutation 配置项 */
+export type MutationOptions<TData, TVariables> = {
+  /** 执行数据变更写入的异步函数 */
+  mutationFn: MutationFunction<TData, TVariables>;
+  /** 发起变更前的钩子（常用于乐观更新或前置校验，返回值将透传为 context） */
+  onMutate?: (variables: TVariables) => any;
+  /** 变更成功时的回调 */
+  onSuccess?: (data: TData, variables: TVariables, context: any) => void;
+  /** 变更失败时的回调 */
+  onError?: (error: Error, variables: TVariables, context: any) => void;
+  /** 变更收尾时的回调（无论成功或失败均执行） */
+  onSettled?: (data: TData | null, error: Error | null, variables: TVariables, context: any) => void;
+  /** 失败重试次数，默认 0 */
+  retry?: number;
+  /** 重试延迟毫秒数，默认 0 */
+  retryDelay?: number;
+  /** 自定义错误是否允许重试判定 */
+  isRetryable?: (err: any) => boolean;
+};
+
+/** useMutation 返回的状态与操作集合 */
+export type MutationResult<TData, TVariables> = {
+  /** 变更成功后的返回数据 */
+  data: Ref<TData | null>;
+  /** 变更失败后的异常对象 */
+  error: Ref<Error | null>;
+  /** 当前变更状态 ('idle' | 'pending' | 'success' | 'error') */
+  status: Ref<MutationStatus>;
+  /** 变更是否执行中 (status === 'pending') */
+  isPending: Ref<boolean>;
+  /** isPending 的别名，满足不同开发者使用习惯 */
+  isLoading: Ref<boolean>;
+  /** 变更是否成功 */
+  isSuccess: Ref<boolean>;
+  /** 变更是否失败 */
+  isError: Ref<boolean>;
+  /** 触发变更（非阻塞，异常通过 onError 回调派发，不直接抛出） */
+  mutate: (variables: TVariables) => void;
+  /** 触发变更（返回 Promise，失败直接上抛供 await catch） */
+  mutateAsync: (variables: TVariables) => Promise<TData>;
+  /** 重置状态为初始 'idle' */
+  reset: () => void;
+};
+
+/** 内部缓存项结构 */
+export type QueryCacheRecord<T> = {
+  data: T | null;
+  error: Error | null;
+  dataUpdatedAt: number;
+  errorUpdatedAt: number;
+  status: QueryStatus;
+  isFetching: boolean;
+};
+
+/** VueQuery 插件选项 */
+export type VueQueryPluginOptions = {
+  queryClient?: any;
+};

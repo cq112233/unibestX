@@ -1,3 +1,5 @@
+import { HttpError } from '../request/index.uts';
+
 /**
  * 统一错误文案归一
  *
@@ -33,25 +35,12 @@ export class BusinessError extends Error {
 
   constructor(message: string, code: number) {
     super(message);
+    this.name = 'BusinessError';
     this.code = code;
   }
 }
 
-/**
- * HTTP 层失败错误：让真实状态码跟着错误对象一起上抛
- *
- * 客户端响应拦截器在非 200 时抛出，归一函数据此走「状态码优先」判定，
- * 不必再去嗅探「请求超时(408)」这类文案。
- */
-export class HttpError extends Error {
-  /** HTTP 状态码（传输层，非业务码） */
-  statusCode: number = 0;
-
-  constructor(message: string, statusCode: number) {
-    super(message);
-    this.statusCode = statusCode;
-  }
-}
+export { HttpError };
 
 // 文案集中在此，便于统一调整或后续接入 i18n
 const MSG_OFFLINE = '网络不可用，请检查网络连接';

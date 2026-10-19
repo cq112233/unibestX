@@ -27,8 +27,7 @@
 
 import { getOssUploadPath } from '@/src/config/index.uts';
 import { API_DOMAINS, http } from '@/src/http/index.uts';
-import type { DownloadResult } from '@/src/http/index.uts';
-import type { LimeRequestConfig, LimeRequestTask } from '@/uni_modules/lime-request';
+import type { AbortableTask, DownloadResult, HttpRequestConfig } from '@/src/http/index.uts';
 
 // ==========================================
 // 1. 类型定义（遵循规范：一律使用 type，严禁 interface）
@@ -149,7 +148,7 @@ export function fetchFooList(pageNo: number = 1, pageSize: number = 10, keyword:
     extra: {
       ignoreAuth: true
     } as UTSJSONObject
-  } as LimeRequestConfig).then((data: UTSJSONObject): PageResult<FooItem> => {
+  } as HttpRequestConfig).then((data: UTSJSONObject): PageResult<FooItem> => {
     // 裸 REST 回包在 H5 是普通对象，先规范化成带 getArray / getNumber 的 UTSJSONObject（见 toJsonObject）
     const obj = toJsonObject(data);
     // ⚠️ `getArray<T>(key, 默认值)` 的泛型实参必须显式写全：UTS **不从默认值反推元素类型**，
@@ -187,7 +186,7 @@ export function fetchFooById(id: number): Promise<FooItem | null> {
     extra: {
       ignoreAuth: true
     } as UTSJSONObject
-  } as LimeRequestConfig).then((data: UTSJSONObject): FooItem | null => {
+  } as HttpRequestConfig).then((data: UTSJSONObject): FooItem | null => {
     if (data == null) {
       return null;
     }
@@ -211,7 +210,7 @@ export function createFoo(data: FooItem): Promise<FooItem> {
     extra: {
       ignoreAuth: true
     } as UTSJSONObject
-  } as LimeRequestConfig).then((res: UTSJSONObject): FooItem => {
+  } as HttpRequestConfig).then((res: UTSJSONObject): FooItem => {
     return toFooItem(res);
   });
 }
@@ -232,7 +231,7 @@ export function updateFoo(id: number, data: FooItem): Promise<FooItem> {
     extra: {
       ignoreAuth: true
     } as UTSJSONObject
-  } as LimeRequestConfig).then((res: UTSJSONObject): FooItem => {
+  } as HttpRequestConfig).then((res: UTSJSONObject): FooItem => {
     return toFooItem(res);
   });
 }
@@ -248,7 +247,7 @@ export function deleteFoo(id: number): Promise<boolean> {
     extra: {
       ignoreAuth: true
     } as UTSJSONObject
-  } as LimeRequestConfig).then((_res: UTSJSONObject): boolean => {
+  } as HttpRequestConfig).then((_res: UTSJSONObject): boolean => {
     return true;
   });
 }
@@ -281,7 +280,7 @@ export function fetchFooRemote(): Promise<FooItem> {
     extra: {
       ignoreAuth: true
     } as UTSJSONObject
-  } as LimeRequestConfig).then((data: UTSJSONObject): FooItem => {
+  } as HttpRequestConfig).then((data: UTSJSONObject): FooItem => {
     const obj = toJsonObject(data);
     // ⚠️ `??` 兜底不可省：getNumber / getString 返回的是可空类型（`Number?` / `String?`），
     // 直接赋给 FooItem 的非空字段会被 Kotlin 编译拒绝（error17 参数类型不匹配）。
@@ -294,7 +293,7 @@ export function fetchFooRemote(): Promise<FooItem> {
 }
 
 /**
- * 上传文件（`http.upload` → lime-request 的 UPLOAD 分支）
+ * 上传文件（`http.upload` 原生 uni.uploadFile 驱动）
  * @param filePath 本地文件路径
  * @param ignoreAuth 是否跳过鉴权，演示接口传 true
  * @param uploadPathOrUrl 上传目标路径，默认取环境变量里的 OSS 地址
@@ -312,14 +311,14 @@ export function uploadFooFile(
     filePath,
     name: 'file',
     extra
-  } as LimeRequestConfig;
+  } as HttpRequestConfig;
   return http.upload<string>(uploadPathOrUrl, config);
 }
 
 /**
  * 下载文件（`http.downloadFile`）
  *
- * 底层走 lime-request 的 DOWNLOAD 分支（内部 uni.downloadFile），
+ * 底层基于 uni.downloadFile 原生封装，
  * 自动复用统一的鉴权头注入、错误提示与完成钩子，成功后返回
  * DownloadResult（临时文件路径 + HTTP 状态码）。
  *
@@ -336,7 +335,7 @@ export function downloadFooFile(
   const progressCallback = onProgress;
   const config = {
     extra,
-    getTask: (task: LimeRequestTask): void => {
+    getTask: (task: AbortableTask): void => {
       // 仅 DOWNLOAD 任务具备进度监听能力，把原生进度回调给业务层
       const downloadTask = task as DownloadTask;
       if (progressCallback != null) {
@@ -345,6 +344,6 @@ export function downloadFooFile(
         });
       }
     }
-  } as LimeRequestConfig;
+  } as HttpRequestConfig;
   return http.downloadFile(url, config);
 }

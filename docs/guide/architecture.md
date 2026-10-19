@@ -14,7 +14,7 @@
 | **UI 组件库** | 多分支方案 | main 分支无内置 UI 库（纯净底座）；开箱即用可选 `uniX-rice-ui`（Rice UI 40+）/ `uniX-uview-ultra`（uview-ultra 80+） |
 | **分页组件** | z-paging-x | 提供强大的下拉刷新与分页列表加载体验 |
 | **状态管理** | x-pinia-s | 兼容 uni-app X 的 Pinia 方案 |
-| **HTTP 请求** | lime-request | uni-app X 兼容的现代化请求库 |
+| **HTTP 请求** | 原生调度引擎 | uni-app X 兼容纯原生请求库 |
 | **国际化** | lime-i18n | 兼容 vue-i18n 生态的多语言方案 |
 | **图表库** | e-chart | ECharts 在 uni-app X 中的适配实现 |
 
@@ -31,7 +31,7 @@ unibestX/
 │   ├── api/                  # 业务模块 API 请求函数（foo.uts, user.uts, auth.uts 等）
 │   ├── assets/               # 静态资源（图标、图片）
 │   ├── components/           # 公共业务组件（NavBar 自定义通用导航栏）
-│   ├── http/                 # HTTP 客户端封装（基于 lime-request，拦截器与错误处理）
+│   ├── http/                 # HTTP 客户端封装（原生调度引擎与业务拦截器）
 │   ├── i18n/                 # 国际化多语言配置（zh-Hans / en 语言包）
 │   ├── layouts/              # 页面布局模板（如 default.uvue / empty.uvue）
 │   ├── pages/                # 主应用页面（首页、基础组件展示、原生能力展示、AI助手、个人中心）
@@ -46,7 +46,6 @@ unibestX/
 │   ├── bignumber-bestX/      #   全端高精度大数据运算库（十进制/四则运算/金融格式化）
 │   ├── crypto-bestX/         #   全端跨平台加密解密与安全工具库
 │   ├── z-paging-x/           #   uni-app X 深度定制分页列表组件
-│   ├── lime-request/         #   HTTP 请求库
 │   ├── lime-signature/       #   手写签名板组件
 │   └── e-chart/              #   ECharts 图表适配组件
 ├── js_sdk/                   # JS / UTS SDK 资源

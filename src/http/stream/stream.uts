@@ -4,7 +4,7 @@
  * 设计目标：把「真实 SSE 分块接口」与「本地模拟流」统一成同一个 Observable<StreamChunk>，
  * 页面侧只需要切换数据源，下游的流处理逻辑（map / scan / takeUntil / catchError）完全复用。
  *
- * 请求侧统一走 http 层（`@/src/http/request/request.uts`）：自动携带鉴权头、相对路径自动拼
+ * 请求侧统一走 http 层（`@/src/http/request/index.uts`）：自动携带鉴权头、相对路径自动拼
  * baseURL、`extra.domain` 可临时切域名 —— 因此本模块不再自己调 `uni.request`。
  * 响应侧**刻意不经过** http 层的业务码拆包（流式响应体不是 `{ code, data }` 包装），
  * 只把原始字节块交给下面的增量解码器，细节见 `HttpClient.stream` 的注释。
@@ -28,7 +28,7 @@
 import { Observable } from '@/src/utils/rxjs-lite/index.uts';
 import type { Subscriber, TeardownFn } from '@/src/utils/rxjs-lite/index.uts';
 import { http } from '@/src/http/instances/index.uts';
-import type { LimeRequestConfig } from '@/uni_modules/lime-request';
+import type { HttpRequestConfig } from '@/src/http/index.uts';
 
 // ==========================================
 // 类型定义（禁止 interface，统一使用 type）
@@ -211,7 +211,7 @@ export function requestStream(
       data: body,
       header: requestHeader,
       timeout
-    } as LimeRequestConfig, (data: ArrayBuffer): void => {
+    } as HttpRequestConfig, (data: ArrayBuffer): void => {
       // 逐块接收：解码 → 累积 → 推送
       if (settled) {
         return;

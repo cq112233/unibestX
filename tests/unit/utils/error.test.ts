@@ -6,7 +6,6 @@ import {
   createHttpClient,
   defaultBusinessAfterError,
   defaultBusinessAfterSuccess,
-  defaultRequestAdapter,
   HttpError,
   resolveErrorMessage
 } from '@/src/http/index.uts';
@@ -124,15 +123,17 @@ describe('business error carries its code end to end', () => {
   });
 
   it('should reject the request promise with the BusinessError carrying the code', async () => {
-    const rawClient: any = defaultRequestAdapter({ baseURL: 'https://business.example.com' } as any);
-    // 200 响应下客户端的响应拦截器是空操作，直接给结果即可，链路其余部分保持真实
-    rawClient.request = (_config: any) => Promise.resolve({
-      statusCode: 200,
-      data: { code: 5001, data: null, message: '余额不足' },
-      config: {}
+    (globalThis as any).uni.request.mockImplementation((opts: any) => {
+      opts.success?.({
+        statusCode: 200,
+        data: { code: 5001, data: null, message: '余额不足' },
+        errMsg: 'request:ok'
+      });
+      opts.complete?.();
+      return { abort: () => {} };
     });
-    // 带上真实的默认业务钩子，否则 defaultBusinessAfterSuccess / onError 根本没注册
-    const client = createHttpClient({ ...buildApiInstanceOptions(), client: rawClient } as any);
+    // 带上真实的默认业务钩子，包含 defaultBusinessAfterSuccess / onError
+    const client = createHttpClient({ ...buildApiInstanceOptions(), baseURL: 'https://business.example.com' });
 
     const showToast = (globalThis as any).uni.showToast;
     showToast.mockClear();
@@ -152,28 +153,36 @@ describe('business error carries its code end to end', () => {
 });
 
 describe('http status code survives the interceptor chain', () => {
-  /** 造一个真实 lime-request 实例并挂上默认业务拦截器，再直接驱动响应拦截器链路 */
+  /** 驱动原生请求响应，验证状态码校验与错误链路 */
   async function driveResponseInterceptor(statusCode: number): Promise<any> {
-    const rawClient: any = defaultRequestAdapter({ baseURL: 'https://status-code.example.com' } as any);
-    createHttpClient({ client: rawClient });
-    // lime-request 会把拦截器里抛出的错误包成 LimeRequestFail 并挂在 cause 上，
-    // 这里原样复现该包装行为，确保断言的是真实链路
-    const failure = await rawClient.interceptors.response
-      .resolve({ statusCode, errMsg: 'request:fail', config: {} })
+    (globalThis as any).uni.request.mockImplementation((opts: any) => {
+      opts.success?.({
+        statusCode,
+        data: statusCode >= 200 && statusCode < 300
+          ? { code: 0, data: 'ok', message: 'ok' }
+          : { code: statusCode, message: 'fail' },
+        errMsg: statusCode >= 200 && statusCode < 300 ? 'request:ok' : 'request:fail'
+      });
+      opts.complete?.();
+      return { abort: () => {} };
+    });
+    const client = createHttpClient({ ...buildApiInstanceOptions(), baseURL: 'https://status-code.example.com' });
+    const extra = Object.assign(new (globalThis as any).UTSJSONObject(), { ignoreAuth: true });
+    const failure = await client
+      .get('/status-test', { extra } as any)
       .then(() => null, (e: any) => e);
     return failure;
   }
 
-  it('should throw an HttpError wrapped by lime-request with the status code', async () => {
+  it('should throw an HttpError with the status code on non-2xx response', async () => {
     const failure = await driveResponseInterceptor(500);
     expect(failure).not.toBeNull();
-    expect(failure.cause).toBeInstanceOf(HttpError);
-    expect(failure.cause.statusCode).toBe(500);
+    expect(failure).toBeInstanceOf(HttpError);
+    expect(failure.statusCode).toBe(500);
   });
 
   it('should treat the whole 2xx range as success', async () => {
-    // ⚠️ 曾经写成 `statusCode != 200`：201 Created（新增成功）、204 No Content（删除成功）
-    //    都会被判失败并弹「连接出错(201)!」，只有 200 能过
+    // 200、201、204 均视为成功
     expect(await driveResponseInterceptor(200)).toBeNull();
     expect(await driveResponseInterceptor(201)).toBeNull();
     expect(await driveResponseInterceptor(204)).toBeNull();

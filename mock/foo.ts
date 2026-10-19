@@ -5,7 +5,7 @@ import { pagination, resultSuccess } from './_util';
 let fooList = [
   { id: 1, name: 'unix', desc: 'uni-app X 核心架构' },
   { id: 2, name: 'UnibestX', desc: '最好的 uni-app X 跨端开发模板' },
-  { id: 3, name: 'lime-request', desc: '高性能轻量级网络请求库' },
+  { id: 3, name: 'http-bestX', desc: '高性能轻量级网络请求库' },
   { id: 4, name: 'weapp-tailwindcss', desc: '全平台原子化样式解决方案' },
   { id: 5, name: 'vitest', desc: '极速轻量单元测试框架' }
 ];

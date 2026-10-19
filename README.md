@@ -275,7 +275,7 @@ pnpm docs:dev       # 本地启动 VitePress 文档站
 | 1 | 🏝️ **底部 TabBar** | [src/tabbar/config.uts](src/tabbar/config.uts) | 配置 Tab 页面路径、文案、图标、角标徽标、风格形态（`capsule` 悬浮胶囊 / `default` 贴底底座）及居中 `midButton` 鼓包按钮 |
 | 2 | 🛡️ **路由拦截守卫** | [src/router/config/config.uts](src/router/config/config.uts) | 配置页面登录白名单 / 黑名单策略；未登录拦截跳登录页及登录成功后原路返回 |
 | 3 | 🌐 **环境变量与域名** | [.env](.env) / `.env.*` | 配置 `VITE_SERVER_BASEURL` 接口主域名、`VITE_TABBAR_MODE` 运行策略、`VITE_DEFAULT_THEME` 默认主题等 |
-| 4 | 🔌 **网络请求客户端** | [src/http/index.uts](src/http/index.uts) | 基于 `lime-request` 封装，提供统一拦截器、自动带 Token、401 登出跳登录、多域名及 SSE 流式传输 |
+| 4 | 🔌 **网络请求客户端** | [src/http/index.uts](src/http/index.uts) | 原生驱动网络请求客户端，提供统一拦截器、自动带 Token、401 静默刷新与重放、多域名及 SSE 流式传输 |
 | 5 | 🔧 **Pinia 状态管理** | [src/store/index.uts](src/store/index.uts) | 双模式自动路由（Vapor 模式/Web/小程序走官方 Pinia，VDOM 原生走 `x-pinia-s`），开箱即用持久化存储 |
 | 6 | 📁 **分包页面与路由** | [pages.json](pages.json) / [pages.config.json](pages.config.json) | 由 `vite-plugin-uni-pages` 自动递归扫描 `src/pages` 与 `src/sub` 实时生成，新增页面保存即生效，免手写配置 |
 | 7 | 🌈 **主题换肤与色板** | [theme.json](theme.json) / [src/theme/index.uts](src/theme/index.uts) | `theme.json` 明暗色板唯一真源，CSS 变量与系统深浅色联动，全端原生导航与组件一致生效 |
@@ -322,7 +322,7 @@ pnpm docs:dev       # 本地启动 VitePress 文档站
 - 🛡️ **路由守卫** — 黑名单／白名单策略，灵活的登录拦截与登录后回跳
 - 🌈 **动态主题** — `theme.json` 单源色板，CSS 变量驱动的明暗主题切换
 - 📊 **ECharts** — 图表组件支持
-- 🔌 **请求封装** — 基于 `lime-request`，支持多域名、Token 自动续期、SSE 流式传输
+- 🔌 **请求封装** — 原生驱动网络请求客户端，支持多域名、Token 自动续期、SSE 流式传输
 - 🧬 **OpenAPI / Apifox 强类型生成** — 基于 `openapi-ts-request` 与智能逆向推导，`pnpm api:gen` 一键生成 UTS 强类型接口与完整数据模型，告别手写胶水代码
 - 🔐 **敏感凭证隔离** — 支持 `.env.local` 独立保护 DCloud AppID、uniCloud 密钥、小程序 AppID 与鸿蒙证书密码，配合 `pnpm manifest` 零泄露同步构建
 - 📤 **文件上传** — 基于原生 `uni.uploadFile` 统一封装，支持 OSS 上传与进度回调
@@ -482,7 +482,7 @@ unibestX/
 │   │   ├── NavBar/               #   自定义通用导航栏组件
 │   │   ├── NestedScroll/         #   自研嵌套滚动组件
 │   │   └── TabbarMaskModal/      #   TabBar 遮罩弹层
-│   ├── http/                     # HTTP 客户端封装（基于 lime-request）
+│   ├── http/                     # HTTP 客户端封装（原生底层调度引擎 + 业务实例）
 │   │   ├── request.uts           #   HttpClient 核心类与拦截器
 │   │   ├── openapi.uts           #   ⭐ OpenAPI 代码生成专属 UTS 强类型适配器
 │   │   ├── stream.uts            #   SSE / Chunk 流式请求封装
@@ -561,7 +561,6 @@ unibestX/
 │   ├── bignumber-bestX/          #   全端高精度大数据运算库（十进制/四则运算/金融格式化）
 │   ├── crypto-bestX/             #   跨端加密解密库（AES/DES/RSA/MD5/SHA/HMAC/Base64/UUID）
 │   ├── x-pinia-s/                #   UTS 版 Pinia（VDOM 模式使用）
-│   ├── lime-request/             #   HTTP 请求核心库
 │   ├── lime-i18n/                #   国际化核心库
 │   ├── lime-signature/           #   手写签名板组件
 │   ├── e-chart/                  #   ECharts 图表适配组件
@@ -980,7 +979,7 @@ src/tabbar/config.uts (唯一样本源)
 
 #### 1. 基础请求封装
 
-基于 `lime-request` 封装的 HTTP 客户端（`src/http/request.uts`）：
+原生驱动封装的 HTTP 客户端（`src/http/request/request.uts`）：
 
 - 自动携带 Token
 - 请求 / 响应拦截器
@@ -1376,7 +1375,7 @@ pnpm typecheck       # 运行严格类型检查（tsc --noEmit -p tsconfig.typec
 | UI 组件库 | 多分支选型 | — | `main` 分支无内置 UI 库（原生组件 + Tailwind）；`uniX-rice-ui` 集成 Rice UI（官方维护）、`uniX-uview-ultra` 内置深度修复版 uview-ultra |
 | 分页组件 | z-paging-x | 内置定制版 | 强大的下拉刷新 + 分页加载 |
 | 状态管理 | Pinia / x-pinia-s | ^3.0.4 / — | Vapor・Web・小程序走官方 Pinia；App VDOM 走 x-pinia-s |
-| HTTP 请求 | lime-request | — | uni-app X 兼容请求库 |
+| HTTP 请求 | 原生调度引擎 | — | uni-app X 兼容纯原生请求库 |
 | 国际化 | lime-i18n | — | vue-i18n 兼容方案 |
 | 图表 | e-chart | — | ECharts for uni-app X |
 | 图标 | uni-icons + lime-icon | — | 双图标方案 |

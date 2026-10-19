@@ -4,13 +4,13 @@
  * 接口基础地址指向 VITE_SERVER_BASEURL，H5 开启代理时默认走第一个代理字段 '/api'
  */
 
-import type { LimeRequestConfig } from '@/uni_modules/lime-request';
 import { getApiBaseUrl } from '@/src/config/index.uts';
 import type {
   DownloadResult,
   HttpClient,
+  HttpRequestConfig,
   StreamTask
-} from '../request/request.uts';
+} from '../request/index.uts';
 import {
   createApiInstance
 } from './internal/factory.uts';
@@ -48,14 +48,14 @@ export function clearCache(fingerprint: string = ''): void {
 /**
  * 便捷文件上传（委托给默认 http 实例）
  */
-export function uploadHttp<T>(url: string, config: LimeRequestConfig | null = null): Promise<T> {
+export function uploadHttp<T>(url: string, config: HttpRequestConfig | null = null): Promise<T> {
   return http.upload<T>(url, config);
 }
 
 /**
  * 便捷文件下载（委托给默认 http 实例）
  */
-export function downloadHttp(url: string, config: LimeRequestConfig | null = null): Promise<DownloadResult> {
+export function downloadHttp(url: string, config: HttpRequestConfig | null = null): Promise<DownloadResult> {
   return http.downloadFile(url, config);
 }
 
@@ -73,9 +73,9 @@ export function streamHttp(
   body: string,
   onChunk: (data: ArrayBuffer) => void,
   onEnd: (errMsg: string | null) => void,
-  config: LimeRequestConfig | null = null
+  config: HttpRequestConfig | null = null
 ): StreamTask {
-  const _config = (config ?? {}) as LimeRequestConfig;
+  const _config = (config ?? {}) as HttpRequestConfig;
   _config.url = url;
   _config.data = body;
   _config.method = 'POST';

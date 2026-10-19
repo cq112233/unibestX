@@ -1,4 +1,10 @@
 /**
+ * 业务状态码枚举与错误提示文案 (Business Result Codes & Messages)
+ *
+ * 属于业务层规范，不应耦合在通用底层 HTTP 核心库中。
+ */
+
+/**
  * 业务/HTTP 状态码枚举
  * 注意：UTS 中 enum 成员名不能与内置保留字冲突（如 Error），故使用普通 const 代替。
  */
@@ -17,16 +23,6 @@ export const ResultEnum = {
   ServiceUnavailable: 503,
   GatewayTimeout: 504,
   HttpVersionNotSupported: 505
-};
-
-/**
- * Content-Type 类型枚举
- * 注意：UTS 中 JSON 是内置全局对象，不能作为对象属性 key，故重命名为 AppJson。
- */
-export const ContentTypeEnum = {
-  AppJson: 'application/json;charset=UTF-8',
-  FormUrlEncoded: 'application/x-www-form-urlencoded;charset=UTF-8',
-  FormData: 'multipart/form-data;charset=UTF-8'
 };
 
 /**
@@ -77,3 +73,13 @@ export function ShowMessage(status: number): string {
   }
   return `${message}，请检查网络或联系管理员！`;
 }
+
+/**
+ * 业务通用响应数据包装格式（兼容 message 与 msg 字段）
+ */
+export type IResponse<T> = {
+  code: number;
+  data: T;
+  message: string;
+  msg?: string;
+};

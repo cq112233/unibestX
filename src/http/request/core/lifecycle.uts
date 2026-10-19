@@ -10,12 +10,7 @@
  * 全生命周期状态与操作统一收敛在实例中，彻底支持多实例隔离。
  */
 
-import type { LimeRequestConfig, LimeRequestTask } from '@/uni_modules/lime-request';
-
-/**
- * 在飞请求任务句柄：可被 abort() 取消的底层 RequestTask
- */
-export type AbortableTask = RequestTask;
+import type { AbortableTask, HttpRequestConfig } from './types.uts';
 
 /**
  * 内存 TTL 缓存条目类型：指纹 → { expireAt, value }
@@ -46,7 +41,7 @@ export class RequestLifecycle {
    * @param key extra 里的字段名（如 `requestKey`）
    * @returns 取不到时返回空串而非 null —— 调用方（如 requestKey 是否登记）据此省掉一层判空
    */
-  static readExtraString(config: LimeRequestConfig, key: string): string {
+  static readExtraString(config: HttpRequestConfig, key: string): string {
     const extra = config.extra;
     if (extra == null) {
       return '';
@@ -61,7 +56,7 @@ export class RequestLifecycle {
   /**
    * 实例入口：转发静态 readExtraString（语义、参数与返回值完全一致）
    */
-  readExtraString(config: LimeRequestConfig, key: string): string {
+  readExtraString(config: HttpRequestConfig, key: string): string {
     return RequestLifecycle.readExtraString(config, key);
   }
 
@@ -71,7 +66,7 @@ export class RequestLifecycle {
    * @param key extra 里的字段名（如 `cacheTtl`）
    * @returns 缺失或类型不符时返回 0 —— 0 在这些字段上天然表示「不启用」，无需再区分「没传」与「传了 0」
    */
-  static readExtraNumber(config: LimeRequestConfig, key: string): number {
+  static readExtraNumber(config: HttpRequestConfig, key: string): number {
     const extra = config.extra;
     if (extra == null) {
       return 0;
@@ -86,17 +81,17 @@ export class RequestLifecycle {
   /**
    * 实例入口：转发静态 readExtraNumber（语义、参数与返回值完全一致）
    */
-  readExtraNumber(config: LimeRequestConfig, key: string): number {
+  readExtraNumber(config: HttpRequestConfig, key: string): number {
     return RequestLifecycle.readExtraNumber(config, key);
   }
 
   /**
    * 从 config.extra 读取布尔字段，缺失返回 false。
    * @param config 本次请求配置
-   * @param key extra 里的字段名（如 `skipRefresh`）
+   * @param key extra 里的字段名（如 `dedupe`）
    * @returns **只有显式 true 才算 true** —— 缺失、类型不符、传字符串 'true' 都返回 false，避免误开开关
    */
-  static readExtraBoolean(config: LimeRequestConfig, key: string): boolean {
+  static readExtraBoolean(config: HttpRequestConfig, key: string): boolean {
     const extra = config.extra;
     if (extra == null) {
       return false;
@@ -111,7 +106,7 @@ export class RequestLifecycle {
   /**
    * 实例入口：转发静态 readExtraBoolean（语义、参数与返回值完全一致）
    */
-  readExtraBoolean(config: LimeRequestConfig, key: string): boolean {
+  readExtraBoolean(config: HttpRequestConfig, key: string): boolean {
     return RequestLifecycle.readExtraBoolean(config, key);
   }
 
@@ -124,8 +119,8 @@ export class RequestLifecycle {
    * @param requestKey 发请求前写进 `extra.requestKey` 的键；传空串表示本次不登记（未登记的请求无法被取消）
    * @param task 底层驱动给的 RequestTask；这里只持有引用，真正的 abort 发生在 abort()
    */
-  registerTask(requestKey: string, task: LimeRequestTask): void {
-    if (requestKey == '') {
+  registerTask(requestKey: string, task: any): void {
+    if (requestKey == '' || task == null) {
       return;
     }
     this.taskMap.set(requestKey, task as AbortableTask);
@@ -213,7 +208,7 @@ export class RequestLifecycle {
    * @param config 本次请求配置；data 序列化不了（如含循环引用）时降级为空串参与拼接，不抛错
    * @returns 指纹串；**并发去重与 TTL 缓存共用同一把**，两处口径必须保持一致，否则去重命中而缓存不命中
    */
-  static buildRequestKey(config: LimeRequestConfig): string {
+  static buildRequestKey(config: HttpRequestConfig): string {
     const method = config.method != null ? config.method : 'GET';
     const url = config.url != null ? config.url : '';
     let dataPart = '';
@@ -231,7 +226,7 @@ export class RequestLifecycle {
   /**
    * 实例入口：转发静态 buildRequestKey（语义、参数与返回值完全一致）
    */
-  buildRequestKey(config: LimeRequestConfig): string {
+  buildRequestKey(config: HttpRequestConfig): string {
     return RequestLifecycle.buildRequestKey(config);
   }
 
@@ -334,3 +329,10 @@ export class HttpLifecycle extends RequestLifecycle {}
  * 各自 new 一个会让 abort() 找不到另一个实例发出去的请求。
  */
 export const defaultLifecycle: RequestLifecycle = new RequestLifecycle();
+
+/**
+ * 按请求唯一键取消全局默认生命周期中的在飞请求任务
+ */
+export function abortRequest(requestKey: string): void {
+  defaultLifecycle.abort(requestKey);
+}

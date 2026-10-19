@@ -1,5 +1,7 @@
 /**
- * AccessToken 静默刷新（单飞）
+ * 业务 AccessToken 静默刷新与收尾 (Business Token Refresh)
+ *
+ * 属于业务层鉴权机制，解耦自底层通用 HTTP 请求库。
  *
  * - 并发多个 401 只触发一次刷新请求，其余复用同一个 inflight Promise
  * - 刷新失败时，由「首个」调用方执行一次收尾（清登录 + 跳登录页），
@@ -13,9 +15,6 @@ import { useTokenStore } from '@/src/store/index.uts';
 import type { IDoubleTokenRes } from '@/src/store/index.uts';
 
 // —— 单飞 + 失败收尾：
-// inflight 非空 = 已有刷新在飞，后来者直接复用同一个 Promise；
-// failureHandled 在 inflight 释放后置位，保证同一波并发 401 只有第一个调用方触发登出，
-// 不会 N 个请求各清一次 token、各跳一次登录页
 let inflight: Promise<boolean> | null = null;
 let failureHandled: boolean = false;
 
@@ -62,8 +61,6 @@ export function claimRefreshFailure(): boolean {
 
 /**
  * 真正发起一次刷新：本地没有 refreshToken 时直接判失败，不多打一次注定 401 的接口。
- *
- * 任何失败都归约为 false 而不向上抛 —— 401 是常态分支，抛错只会污染调用方的错误链路。
  */
 function doRefresh(): Promise<boolean> {
   const tokenStore = useTokenStore();

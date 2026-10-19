@@ -2,11 +2,11 @@
  * openapi-ts-request 网络驱动适配器
  *
  * 抹平 openapi-ts-request 生成代码的统一调用风格 (url, options)
- * 与 unibestX 内置强类型 http 客户端单例 (LimeRequestConfig) 的差异。
+ * 与 unibestX 内置强类型 http 客户端单例 (HttpRequestConfig) 的差异。
  */
 
 import { http } from '@/src/http/instances/index.uts';
-import type { LimeRequestConfig } from '@/uni_modules/lime-request';
+import type { HttpRequestConfig } from '@/src/http/index.uts';
 
 /**
  * openapi-ts-request 请求参数选项
@@ -25,7 +25,7 @@ export type OpenApiRequestOptions = {
  * @param options 请求选项（包含 method, params, data, headers 等）
  */
 export function request<T>(url: string, options: OpenApiRequestOptions | null = null): Promise<T> {
-  const config = {} as LimeRequestConfig;
+  const config = {} as HttpRequestConfig;
   config.url = url;
 
   if (options != null) {

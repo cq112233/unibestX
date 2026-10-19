@@ -6,28 +6,29 @@
  * 2. 提供 `createApiInstance` 与 `buildApiInstanceOptions`，支持为不同 API 基础地址创建专用的独立 HttpClient 实例与配置。
  */
 
-import type { LimeRequestConfig, Request } from '@/uni_modules/lime-request';
 import { useTokenStore } from '@/src/store/index.uts';
 import { toLoginPage } from '@/src/utils/auth/toLoginPage.uts';
 import {
+  cloneConfig,
   ContentTypeEnum,
   createHttpClient,
   defaultLifecycle,
-  defaultRequestAdapter,
   extractErrorMessage,
-  extractStatusCode,
-  ResultEnum
-} from '../../request/request.uts';
+  extractStatusCode
+} from '../../request/index.uts';
 import type {
   HttpClient,
   HttpClientOptions,
+  HttpRequestConfig,
   RespondedOptions
-} from '../../request/request.uts';
+} from '../../request/index.uts';
 import {
   BusinessError,
+  HttpError,
   resolveErrorMessage
 } from '../../error/error.uts';
-import { tryRefreshToken } from '../../request/internal/refresh.uts';
+import { ResultEnum, ShowMessage } from './enum.uts';
+import { tryRefreshToken } from './refresh.uts';
 import { getApiBaseUrl, getH5UseProxy } from '@/src/config/index.uts';
 import { resolveServiceBaseUrl } from './config.uts';
 
@@ -39,7 +40,7 @@ import { resolveServiceBaseUrl } from './config.uts';
  * 业务默认请求前置拦截钩子：处理业务 Token 鉴权注入
  * @param config 会被原地改写的请求配置
  */
-export function defaultBusinessBeforeRequest(config: LimeRequestConfig): void {
+export function defaultBusinessBeforeRequest(config: HttpRequestConfig): void {
   // 业务 Token 鉴权与自动注入
   if (config.header == null) {
     config.header = {} as UTSJSONObject;
@@ -72,9 +73,14 @@ export function defaultBusinessBeforeRequest(config: LimeRequestConfig): void {
 }
 
 /**
- * 业务默认响应成功钩子：状态码判定、业务 code 校验、Toast 提示、业务 401 标记与数据解包
+ * 业务默认响应成功钩子：状态码判定、业务 code 校验、Toast 提示、业务 401 令牌刷新/重放与数据解包
  */
-export function defaultBusinessAfterSuccess(data: any, config: LimeRequestConfig): any {
+export function defaultBusinessAfterSuccess(
+  data: any,
+  config: HttpRequestConfig,
+  client: any | null = null,
+  customOptions: HttpClientOptions | null = null
+): any {
   if (data == null) {
     throw new Error('返回的响应数据为空');
   }
@@ -99,34 +105,93 @@ export function defaultBusinessAfterSuccess(data: any, config: LimeRequestConfig
         if (toastEnabled) {
           uni.showToast({ title: message, icon: 'none' });
         }
-        if (codeVal == ResultEnum.Unauthorized) {
-          let skipRefresh = false;
-          if (extra != null) {
-            const skipVal = (extra as UTSJSONObject).getBoolean('skipRefresh');
-            if (skipVal == true) {
-              skipRefresh = true;
+        if (codeVal >= 400 && codeVal <= 599) {
+          if (codeVal == ResultEnum.Unauthorized) {
+            let skipRefresh = false;
+            if (extra != null) {
+              const extraObj = extra as UTSJSONObject;
+              const skipVal = typeof extraObj.getBoolean == 'function'
+                ? extraObj.getBoolean('skipRefresh')
+                : (extraObj.skipRefresh as boolean | null);
+              if (skipVal == true) {
+                skipRefresh = true;
+              }
             }
+            const activeOptions: HttpClientOptions | null = (client != null && typeof (client as any).getOptions == 'function')
+              ? ((client as any).getOptions() as HttpClientOptions | null)
+              : customOptions;
+
+            if (skipRefresh || client == null) {
+              const onUnauth = activeOptions?.onUnauthorized;
+              if (onUnauth != null) {
+                onUnauth();
+              }
+              else {
+                const tokenStore = useTokenStore();
+                tokenStore.clearToken();
+                toLoginPage({ mode: 'reLaunch' } as UTSJSONObject);
+              }
+              throw new HttpError(`未授权[${ResultEnum.Unauthorized}]：${message}`, codeVal);
+            }
+
+            // 触发业务刷新令牌并重试
+            const doRefresh = activeOptions?.refreshToken != null
+              ? activeOptions!.refreshToken!()
+              : tryRefreshToken();
+
+            return doRefresh.then((refreshOk: boolean): Promise<any> => {
+              if (!refreshOk) {
+                const onUnauth = activeOptions?.onUnauthorized;
+                if (onUnauth != null) {
+                  onUnauth();
+                }
+                else {
+                  const tokenStore = useTokenStore();
+                  tokenStore.clearToken();
+                  toLoginPage({ mode: 'reLaunch' } as UTSJSONObject);
+                }
+                return Promise.reject(new HttpError(`未授权[${ResultEnum.Unauthorized}]：${message}`, codeVal));
+              }
+
+              // 准备重放配置
+              const replayConfig = cloneConfig(config);
+              if (replayConfig.extra == null) {
+                replayConfig.extra = {} as UTSJSONObject;
+              }
+              const replayExtra = replayConfig.extra as UTSJSONObject;
+              replayExtra.skipRefresh = true;
+
+              // 摘掉旧 token，确保重放时 beforeRequest 能重新注入新 token
+              if (replayConfig.header != null) {
+                const h = replayConfig.header as UTSJSONObject;
+                // eslint-disable-next-line dot-notation
+                delete h['token'];
+              }
+
+              const targetClient = client as HttpClient;
+              return targetClient.request<any>(replayConfig);
+            });
           }
-          if (skipRefresh) {
-            throw new BusinessError(message, codeVal);
-          }
-          throw new Error('__REFRESHABLE_401__');
+          const errorMessage = ShowMessage(codeVal);
+          throw new HttpError(`${errorMessage}：${message}`, codeVal);
         }
         throw new BusinessError(message, codeVal);
       }
     }
     const innerData = resultObj.get('data');
     if (innerData != null) {
-      return innerData;
+      const wrapped = JSON.parseObject(JSON.stringify(innerData));
+      return wrapped != null ? wrapped : innerData;
     }
   }
-  return data;
+  const fallbackWrapped = JSON.parseObject(JSON.stringify(data));
+  return fallbackWrapped != null ? fallbackWrapped : data;
 }
 
 /**
  * 业务默认响应失败钩子：统一网络错误提示
  */
-export function defaultBusinessAfterError(err: any, _config: LimeRequestConfig): void {
+export function defaultBusinessAfterError(err: any, _config: HttpRequestConfig): void {
   console.error('request error ===>', err);
   const rawMsg = extractErrorMessage(err);
   if (rawMsg.toLowerCase().includes('abort')) {
@@ -141,7 +206,7 @@ export function defaultBusinessAfterError(err: any, _config: LimeRequestConfig):
 /**
  * 业务默认响应完成钩子：请求收尾处理
  */
-export function defaultBusinessAfterComplete(_config: LimeRequestConfig): void {
+export function defaultBusinessAfterComplete(_config: HttpRequestConfig): void {
   // 默认收尾钩子，供业务埋点、关闭全屏 loading 等扩展
 }
 
@@ -180,14 +245,9 @@ export function buildApiInstanceOptions(
       'Content-Type': ContentTypeEnum.AppJson,
       'Accept': 'application/json, text/plain, */*'
     } as UTSJSONObject) as UTSJSONObject,
-    requestAdapter: (config: LimeRequestConfig): Request => {
-      if (customOptions?.requestAdapter != null) {
-        return customOptions.requestAdapter!(config);
-      }
-      return defaultRequestAdapter(config);
-    },
+    requestAdapter: customOptions?.requestAdapter,
     lifecycle: customOptions?.lifecycle ?? defaultLifecycle,
-    beforeRequest: (config: LimeRequestConfig): void => {
+    beforeRequest: (config: HttpRequestConfig): void => {
       if (customOptions?.beforeRequest != null) {
         customOptions.beforeRequest!(config);
       }
@@ -196,13 +256,13 @@ export function buildApiInstanceOptions(
       }
     },
     responded: {
-      onSuccess: (data: any, config: LimeRequestConfig): any => {
+      onSuccess: (data: any, config: HttpRequestConfig, client?: any): any => {
         if (customOptions?.responded?.onSuccess != null) {
-          return customOptions.responded.onSuccess!(data, config);
+          return customOptions.responded.onSuccess!(data, config, client);
         }
-        return defaultBusinessAfterSuccess(data, config);
+        return defaultBusinessAfterSuccess(data, config, client, customOptions);
       },
-      onError: (err: any, config: LimeRequestConfig): void => {
+      onError: (err: any, config: HttpRequestConfig): void => {
         if (customOptions?.responded?.onError != null) {
           customOptions.responded.onError!(err, config);
         }
@@ -210,7 +270,7 @@ export function buildApiInstanceOptions(
           defaultBusinessAfterError(err, config);
         }
       },
-      onComplete: (config: LimeRequestConfig): void => {
+      onComplete: (config: HttpRequestConfig): void => {
         if (customOptions?.responded?.onComplete != null) {
           customOptions.responded.onComplete!(config);
         }

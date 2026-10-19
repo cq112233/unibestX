@@ -1,0 +1,255 @@
+<template>
+  <!-- ============ 3. 文件下载 ============ -->
+  <view
+    class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid border-[#edf2f7] bg-[#ffffff]"
+  >
+    <!-- 标题区域 -->
+    <view class="flex flex-row items-center mb-[16px]">
+      <view
+        class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#3182ce]"
+      />
+      <text class="text-[16px] font-bold text-[#2d3748]">文件下载（downloadFooFile → http.downloadFile）</text>
+    </view>
+    <view class="mb-[16px]">
+      <view class="flex-row items-center mb-[10px]">
+        <view class="w-[32px] h-[32px] rounded-[8px] bg-[#eef2ff] border-[1px] border-solid border-[#c7d2fe] items-center justify-center mr-[10px]">
+          <text class="text-[12px] font-bold text-[#4338ca]">DL</text>
+        </view>
+        <view class="flex-1">
+          <text class="text-[14px] font-bold text-[#1e293b]">文件下载</text>
+          <text class="text-[11px] text-[#64748b] mt-[2px]">GET · 自动携带 Token</text>
+        </view>
+      </view>
+
+      <view class="flex-row items-center bg-[#eef2ff] p-[8px] rounded-[6px] mb-[10px] border-[1px] border-solid border-[#e0e7ff]">
+        <text class="text-[11px] text-[#4338ca] leading-[16px] flex-1">
+          💡 下载成功后返回临时文件路径（tempFilePath），可直接预览图片或交给 uni.openDocument 打开文档
+        </text>
+      </view>
+
+      <view class="rounded-[8px] bg-[#f8fafc] border-[1px] border-solid border-[#cbd5e1] overflow-hidden">
+        <view class="h-[3px] bg-[#6366f1]" />
+        <view class="p-[12px]">
+          <view class="flex-row items-center justify-between mb-[8px]">
+            <text class="text-[11px] text-[#64748b]">下载结果</text>
+            <text class="text-[10px] text-[#94a3b8]">DOWNLOAD</text>
+          </view>
+
+          <!-- 下载中：展示进度条 -->
+          <view v-if="downloadLoading" class="flex flex-col">
+            <view class="flex-row items-center justify-between mb-[6px]">
+              <text class="text-[12px] text-[#4338ca]">正在下载...</text>
+              <text class="text-[12px] text-[#4338ca] font-bold">{{ downloadProgressText }}</text>
+            </view>
+            <view class="w-full h-[6px] rounded-[3px] bg-[#e2e8f0] overflow-hidden">
+              <view class="h-[6px] rounded-[3px] bg-[#6366f1]" :style="downloadProgressBarStyle" />
+            </view>
+          </view>
+
+          <text v-else-if="hasDownloadError" class="text-[12px] text-[#dc2626]">{{ downloadError }}</text>
+
+          <view v-else-if="hasDownloadResult" class="flex flex-col">
+            <view class="flex-row items-center mb-[8px]">
+              <view class="px-[8px] py-[2px] rounded-[4px] bg-[#e0e7ff] mr-[8px]">
+                <text class="text-[11px] text-[#4338ca]">HTTP {{ downloadStatusCode }}</text>
+              </view>
+              <text class="text-[11px] text-[#64748b]">已下载到本地临时文件</text>
+            </view>
+
+            <!-- 图片类资源：居中预览（支持点击放大） -->
+            <view
+              v-if="isDownloadImage"
+              class="items-center justify-center py-[10px] rounded-[8px] border-[1px] border-solid bg-[#ffffff] border-[#e2e8f0]"
+            >
+              <image
+                :src="downloadFilePath"
+                class="w-[120px] h-[120px] rounded-[8px]"
+                mode="aspectFit"
+                @click="previewDownloadedFile"
+              />
+              <text class="text-[10px] text-[#94a3b8] mt-[6px]">点击查看大图</text>
+            </view>
+
+            <!-- 本地路径展示卡片（支持一键复制） -->
+            <view
+              class="mt-[10px] p-[10px] rounded-[8px] border-[1px] border-solid bg-[#f8fafc] border-[#e2e8f0]"
+            >
+              <view class="flex-row items-center justify-between mb-[6px]">
+                <view class="flex-row items-center">
+                  <view class="w-[3px] h-[12px] bg-[#6366f1] rounded-[2px] mr-[6px]" />
+                  <text class="text-[11px] font-bold text-[#475569]">临时文件路径</text>
+                </view>
+                <view
+                  class="px-[8px] py-[3px] rounded-[4px] bg-[#4f46e5] flex-row items-center"
+                  @click="copyDownloadPath"
+                >
+                  <text class="text-[10px] text-[#ffffff] font-medium">复制路径</text>
+                </view>
+              </view>
+              <text
+                class="oss-url-text text-[11px] leading-[18px] text-[#334155]"
+                :selectable="true"
+              >
+                {{ downloadFilePath }}
+              </text>
+            </view>
+          </view>
+
+          <text v-else class="text-[12px] text-[#94a3b8]">尚未发起下载</text>
+        </view>
+      </view>
+
+      <view class="flex-row mt-[10px]">
+        <view class="flex-1 mr-[10px]">
+          <view
+            class="bg-[#6366f1] rounded-[8px] h-[42px] w-full flex flex-row items-center justify-center"
+            @click="downloadSampleFile"
+          >
+            <text class="text-[#ffffff] text-[14px]">{{ downloadLoading ? '下载中...' : '下载示例图片' }}</text>
+          </view>
+        </view>
+        <view class="flex-1">
+          <view
+            class="bg-[#0ea5e9] rounded-[8px] h-[42px] w-full flex flex-row items-center justify-center"
+            @click="openDownloadedFile"
+          >
+            <text class="text-[#ffffff] text-[14px]">打开已下载文件</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed, ref } from 'vue';
+import { downloadFooFile, FOO_DOWNLOAD_URL } from '@/src/api/example.uts';
+import { toast, toastSuccess } from '@/src/utils/toast/index.uts';
+
+const downloadLoading = ref<boolean>(false);
+const downloadProgress = ref<number>(0);
+const downloadFilePath = ref<string>('');
+const downloadStatusCode = ref<number>(0);
+const downloadError = ref<string>('');
+
+const hasDownloadError = computed((): boolean => {
+  return downloadError.value.length > 0;
+});
+
+const hasDownloadResult = computed((): boolean => {
+  return downloadFilePath.value.length > 0;
+});
+
+const downloadProgressText = computed((): string => {
+  return `${downloadProgress.value}%`;
+});
+
+const downloadProgressBarStyle = computed((): string => {
+  return `width: ${downloadProgress.value}%;`;
+});
+
+const isDownloadImage = computed((): boolean => {
+  const path = downloadFilePath.value.toLowerCase();
+  return path.endsWith('.png') || path.endsWith('.jpg') || path.endsWith('.jpeg') || path.endsWith('.gif') || path.endsWith('.webp');
+});
+
+async function downloadFileByUrl(url: string): Promise<void> {
+  if (downloadLoading.value) {
+    return;
+  }
+  if (url == '') {
+    downloadError.value = '下载地址为空';
+    return;
+  }
+
+  downloadLoading.value = true;
+  downloadProgress.value = 0;
+  downloadFilePath.value = '';
+  downloadStatusCode.value = 0;
+  downloadError.value = '';
+
+  try {
+    const res = await downloadFooFile(url, (progress: number) => {
+      downloadProgress.value = progress;
+    });
+    downloadFilePath.value = res.tempFilePath;
+    downloadStatusCode.value = res.statusCode;
+    downloadProgress.value = 100;
+    toastSuccess('下载完成');
+  }
+  catch (err) {
+    let msg = '下载失败';
+    if (err instanceof Error) {
+      msg = (err as Error).message;
+    }
+    else if (err != null) {
+      msg = `${err}`;
+    }
+    downloadError.value = msg;
+  }
+
+  downloadLoading.value = false;
+}
+
+function downloadSampleFile(): void {
+  downloadFileByUrl(FOO_DOWNLOAD_URL);
+}
+
+function copyDownloadPath(): void {
+  const path = downloadFilePath.value;
+  if (path == '') {
+    return;
+  }
+  uni.setClipboardData({
+    data: path,
+    showToast: false,
+    success: () => {
+      toastSuccess('路径已复制');
+    }
+  });
+}
+
+function previewDownloadedFile(): void {
+  const path = downloadFilePath.value;
+  if (path == '') {
+    return;
+  }
+  uni.previewImage({
+    urls: [path]
+  });
+}
+
+function openDownloadedFile(): void {
+  const path = downloadFilePath.value;
+  if (path == '') {
+    toast('请先下载文件');
+    return;
+  }
+  if (isDownloadImage.value) {
+    previewDownloadedFile();
+    return;
+  }
+  // #ifdef APP || MP-WEIXIN
+  uni.openDocument({
+    filePath: path,
+    success: () => {
+      toastSuccess('文件已打开');
+    },
+    fail: () => {
+      toast('当前环境无法打开该格式文件');
+    }
+  });
+  // #endif
+  // #ifndef APP || MP-WEIXIN
+  toast('当前平台不支持文档预览，可在真机上体验');
+  // #endif
+}
+</script>
+
+<style scoped>
+/* #ifdef H5 || MP-WEIXIN */
+.oss-url-text {
+  word-break: break-all;
+}
+/* #endif */
+</style>

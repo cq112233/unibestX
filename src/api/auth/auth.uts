@@ -1,5 +1,5 @@
 import { http } from '@/src/http/index.uts';
-import type { LimeRequestConfig } from '@/uni_modules/lime-request';
+import type { HttpRequestConfig } from '@/src/http/index.uts';
 
 // ==========================================
 // 1. 类型定义（遵循规范：一律使用 type，严禁 interface）
@@ -76,7 +76,7 @@ export function login(params: LoginQuery): Promise<LoginResult> {
     extra: {
       ignoreAuth: true
     } as UTSJSONObject
-  } as LimeRequestConfig).then((data: UTSJSONObject): LoginResult => {
+  } as HttpRequestConfig).then((data: UTSJSONObject): LoginResult => {
     const rawUser = data.get('userInfo') as UTSJSONObject | null;
     // ⚠️ 必须写 `getArray<string>(...)`：UTS 无法从默认值反推元素类型，省略泛型实参会被
     // Kotlin 编译拒绝（`推断类型是 UTSArray<*>`，预期 `UTSArray<String>?`，实测于 app-android）。
@@ -150,7 +150,7 @@ export function refreshAccessToken(params: RefreshTokenQuery): Promise<RefreshTo
       ignoreAuth: true,
       toast: false
     } as UTSJSONObject
-  } as LimeRequestConfig).then((data: UTSJSONObject): RefreshTokenResult => {
+  } as HttpRequestConfig).then((data: UTSJSONObject): RefreshTokenResult => {
     return {
       accessToken: data.getString('accessToken') ?? data.getString('token') ?? '',
       accessExpiresIn: data.getNumber('accessExpiresIn') ?? 7200,
