@@ -29,7 +29,7 @@ import {
 } from '../../error/error.uts';
 import { ResultEnum, ShowMessage } from './enum.uts';
 import { tryRefreshToken } from './refresh.uts';
-import { getApiBaseUrl, getH5UseProxy } from '@/src/config/index.uts';
+import { getApiBaseUrl, getH5UseProxy, getUseMock } from '@/src/config/index.uts';
 import { resolveServiceBaseUrl } from './config.uts';
 
 // ==========================================
@@ -65,6 +65,11 @@ export function defaultBusinessBeforeRequest(config: HttpRequestConfig): void {
       const tokenStore = useTokenStore();
       const token = tokenStore.getToken();
       if (token == '') {
+        // 本地 Mock 模式（pnpm dev:mock）免登录放行，自动注入 mock-token 便于离线联调
+        if (getUseMock()) {
+          header.token = 'mock-dev-token';
+          return;
+        }
         throw new Error('[请求错误]：未登录');
       }
       header.token = token;
