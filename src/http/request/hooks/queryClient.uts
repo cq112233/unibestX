@@ -52,11 +52,49 @@ export function resolveQueryKeyFromParam(param: QueryFilterParam | null): QueryK
 }
 
 /**
+ * 判断两个 QueryKey 是否匹配（支持前缀模糊匹配，对标 TanStack Query）
+ */
+export function matchesQueryKey(target: QueryKey, candidate: QueryKey, exact: boolean = false): boolean {
+  const targetHash = serializeQueryKey(target);
+  const candidateHash = serializeQueryKey(candidate);
+  if (targetHash === candidateHash) {
+    return true;
+  }
+  if (exact == true) {
+    return false;
+  }
+  // 数组前缀匹配：['todos'] 匹配 ['todos', 1]、['todos', { page: 1 }]
+  if (Array.isArray(target) && Array.isArray(candidate)) {
+    const targetArr = target as Array<any>;
+    const candidateArr = candidate as Array<any>;
+    if (targetArr.length > candidateArr.length) {
+      return false;
+    }
+    for (let i = 0; i < targetArr.length; i = i + 1) {
+      if (serializeQueryKey(targetArr[i]) !== serializeQueryKey(candidateArr[i])) {
+        return false;
+      }
+    }
+    return true;
+  }
+  // 字符串前缀匹配：'todos' 匹配 ['todos', 1]
+  if (typeof target == 'string' && Array.isArray(candidate)) {
+    const candidateArr = candidate as Array<any>;
+    if (candidateArr.length > 0 && serializeQueryKey(candidateArr[0]) === (target as string)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
  * 查询客户端中枢 (QueryClient)
  */
 export class QueryClient {
   /** 内存缓存字典：存储所有 queryKey 对应的数据状态 */
   private cache: Map<string, QueryCacheRecord<any>> = new Map();
+  /** 已登记的 QueryKey 原始结构字典（用于支持前缀范围匹配广播） */
+  private keyRegistry: Map<string, QueryKey> = new Map();
   /** 监听者队列：当某 key 数据变化或失效时通知对应 hooks */
   private listeners: Map<string, Array<() => void>> = new Map();
   /** 在飞请求 Promise 字典：实现跨组件相同 queryKey 并发合并去重 */
@@ -190,13 +228,13 @@ export class QueryClient {
   }
 
   /**
-   * 使匹配的查询失效（标记为过期并触发重新拉取，对标 TanStack Query invalidateQueries）
+   * 使匹配的查询失效（标记为过期并广播触发重新拉取，对标 TanStack Query invalidateQueries）
    * @param filters 可选目标查询键或过滤器对象，不传则失效所有缓存
    */
   invalidateQueries(filters: QueryFilterParam | null = null): void {
     const targetKey = resolveQueryKeyFromParam(filters);
     if (targetKey == null) {
-      // 全量失效
+      // 全量失效广播
       this.cache.forEach((record) => {
         record.dataUpdatedAt = 0;
       });
@@ -208,12 +246,32 @@ export class QueryClient {
       return;
     }
 
-    const hash = serializeQueryKey(targetKey);
-    const record = this.cache.get(hash);
-    if (record != null) {
-      record.dataUpdatedAt = 0;
+    // 匹配所有符合前缀范围的候选 key
+    const matchedHashes: Array<string> = [];
+    this.keyRegistry.forEach((registeredKey: QueryKey, hash: string) => {
+      if (matchesQueryKey(targetKey, registeredKey)) {
+        matchedHashes.push(hash);
+      }
+    });
+
+    const targetHash = serializeQueryKey(targetKey);
+    if (!matchedHashes.includes(targetHash)) {
+      matchedHashes.push(targetHash);
     }
-    this.notify(targetKey);
+
+    for (let i = 0; i < matchedHashes.length; i = i + 1) {
+      const h = matchedHashes[i];
+      const record = this.cache.get(h);
+      if (record != null) {
+        record.dataUpdatedAt = 0;
+      }
+      const subs = this.listeners.get(h);
+      if (subs != null) {
+        for (let j = 0; j < subs.length; j = j + 1) {
+          subs[j]();
+        }
+      }
+    }
   }
 
   /**
@@ -248,6 +306,7 @@ export class QueryClient {
    */
   subscribe(key: QueryKey, listener: () => void): () => void {
     const hash = serializeQueryKey(key);
+    this.keyRegistry.set(hash, key);
     let subs = this.listeners.get(hash);
     if (subs == null) {
       subs = [];
@@ -265,6 +324,7 @@ export class QueryClient {
         }
         if (current.length === 0) {
           this.listeners.delete(hash);
+          this.keyRegistry.delete(hash);
         }
       }
     };
