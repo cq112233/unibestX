@@ -39,8 +39,9 @@ unibestX/
 │   ├── style/                # 全局样式（Tailwind CSS / SCSS）
 │   ├── sub/                  # 应用分包页面（auth, paging, tailwindcss, test, uiTest 等）
 │   ├── tabbar/               # 自定义 TabBar 组件与状态配置
+│   ├── hooks/                # 应用级组合式 hook（页面生命周期封装，如 useBackPressExit）
 │   ├── types/                # 全局类型定义（uni.d.ts 等）
-│   └── utils/                # 全局工具函数（toast, systemInfo, env, backPress, auth 等）
+│   └── utils/                # 全局工具函数（toast, systemInfo, env, auth 等）
 ├── uni_modules/              # uni-app 扩展插件模块
 │   ├── route-bestX/          #   uni-app X 极简高性能跨端路由引擎（导航守卫/快照隔离）
 │   ├── bignumber-bestX/      #   全端高精度大数据运算库（十进制/四则运算/金融格式化）

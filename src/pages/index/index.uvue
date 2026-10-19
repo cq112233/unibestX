@@ -19,8 +19,7 @@ import HomeView from './views/IndexView.uvue';
 import TabViews from '@/src/tabbar/components/TabViews.uvue';
 import Tabbar from '@/src/tabbar/tabbar.uvue';
 import { isSinglePageTabbar, notifyPageHide, notifyPageShow, setCurIdxByKey } from '@/src/tabbar/index.uts';
-import { handleBackPressExit } from '@/src/utils/backPress/index.uts';
-import { isApp } from '@/src/config/env/platform.uts';
+import { useBackPressExit } from '@/src/hooks/useBackPressExit.uts';
 
 // definePage 支持「静态对象」与「函数式（含 async 异步）」写法：
 // 1. 跨端条件配置：基于 options.platform 进行多端分支判断，构建期会自动生成 pages.json 中的条件编译块（#ifdef / #endif）
@@ -77,12 +76,8 @@ onHide(() => {
   notifyPageHide();
 });
 
-onBackPress((options: OnBackPressOptions): boolean => {
-  if (isApp && options.from == 'backbutton') {
-    return handleBackPressExit();
-  }
-  return false;
-});
+// Android 物理返回键：再按一次退出应用
+useBackPressExit();
 </script>
 
 <style lang="scss" scoped></style>

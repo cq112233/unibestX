@@ -397,7 +397,7 @@ pnpm docs:dev       # 本地启动 VitePress 文档站
 模板同时预置了 AI 应用所需的运行时能力，可直接作为 AI 类 App 的起点：
 
 - **AI 对话页** — `src/pages/ai/`（含 TabBar 中间鼓包按钮入口 `AiView`）
-- **跨端流式传输** — [src/http/stream.uts](src/http/stream.uts) 提供 SSE / Chunk 流式请求；[src/utils/rxjs-lite/](src/utils/rxjs-lite/) 提供轻量流式算子，配套 `src/sub/rxjsFunctionDemo` 流式演示页
+- **跨端流式传输** — [src/http/stream.uts](src/http/stream.uts) 提供 SSE / Chunk 流式请求；[uni_modules/rxjs-bestX/](uni_modules/rxjs-bestX/) 提供轻量流式算子，配套 `src/sub/rxjsFunctionDemo` 流式演示页
 - **Markdown 渲染** — 内置 `mp-html` 与 `kux-marked`，支持 Markdown 排版与代码块展示
 - **流式接口配置** — 通过 `.env` 的 `VITE_STREAM_URL` 指定（留空时演示页自动使用本地模拟流）
 
@@ -450,7 +450,8 @@ unibestX/
 │   ├── setup.ts                  #   测试全局初始化（uni 跨端 API 桩与 Vue 运行时注入）
 │   └── unit/                     #   单元测试套件
 │       ├── components/           #     NavBar 等 UVue 组件挂载与交互断言
-│       ├── utils/                #     route、rxjs-lite 等核心工具库单测
+│       ├── modules/              #     bignumber、rxjs-bestX 等生态模块单测
+│       ├── utils/                #     route 等核心工具库单测
 │       └── plugins/              #     ESLint 专属规则与 clean-logger 插件单测
 ├── .github/                      # GitHub 自动化工作流
 │   └── workflows/ci.yml          #   CI 流水线（Lint / Style / DTS / TypeCheck / Test）
@@ -546,20 +547,21 @@ unibestX/
 │   │   └── types.uts             #   TabBar 强类型定义
 │   ├── types/                    # 全局 TypeScript / UTS 类型定义
 │   │   └── uni.d.ts              #   definePage 宏、Vue 宏与全局 API 类型补全
+│   ├── hooks/                    # 应用级组合式 hook（页面生命周期封装）
+│   │   └── useBackPressExit.uts  #   再按一次退出应用（注册页面 onBackPress）
 │   └── utils/                    # 全局工具函数（统一走 index.uts 导出的对象或纯函数）
 │       ├── env/                  #   环境变量读取（getApiBaseUrl / getTabBarMode 等）
 │       ├── systemInfo/           #   屏幕、安全区与系统信息
 │       ├── theme/                #   主题色与明暗模式工具
 │       ├── toast/                #   全局 Toast 轻提示（5 个轻量纯函数）
 │       ├── report/               #   数据埋点与异常监控上报（track / error）
-│       ├── i18n/                 #   多语言辅助工具（t / $t）
-│       ├── backPress/            #   Android 物理返回键双击退出
-│       └── rxjs-lite/            #   轻量流式处理工具
-├── uni_modules/                  # uni-app 扩展插件模块（精简收敛为 17 个核心插件）
+│       └── i18n/                 #   多语言辅助工具（t / $t）
+├── uni_modules/                  # uni-app 扩展插件模块（精简收敛为 18 个核心插件）
 │   ├── z-paging-x/               #   深度优化适配的分页组件
 │   ├── route-bestX/              #   uni-app X 极简高性能跨端路由引擎（导航守卫/快照隔离）
 │   ├── bignumber-bestX/          #   全端高精度大数据运算库（十进制/四则运算/金融格式化）
 │   ├── crypto-bestX/             #   跨端加密解密库（AES/DES/RSA/MD5/SHA/HMAC/Base64/UUID）
+│   ├── rxjs-bestX/               #   极简响应式流库（Observable / Subject / 常用操作符）
 │   ├── x-pinia-s/                #   UTS 版 Pinia（VDOM 模式使用）
 │   ├── lime-i18n/                #   国际化核心库
 │   ├── lime-signature/           #   手写签名板组件
@@ -618,8 +620,8 @@ import { sys } from '@/src/utils/systemInfo/index.uts';
 | `toast/` | 全局轻提示与 Loading（极简去油 5 个纯函数） | `toast(title)` `toastSuccess(title)` `toastError(title)` `showLoading(title?, mask?)` `hideLoading()` |
 | `report/` | 数据埋点上报与全局异常监控（合并整合） | `track(event, params?)` `reportError(error, context?)` `createBreadcrumb(category, message)`；实例 `tracker` `errorReporter` |
 | `i18n/` | 非 Vue 环境下的多语言文案与导航栏 / TabBar 文案设置 | `t(key, named)` `$t(key, named)` `getI18nText(key)` `setTabbarItem()` `setNavigationBarTitle(key)`；实例 `i18nUtils` |
-| `backPress/` | Android 物理返回键双击退出 | `handleBackPressExit(): boolean` |
-| `rxjs-lite/` | 轻量流式处理（不依赖 RxJS 全量包） | `Observable` `Subject` `Subscription`；创建 `fromArray` `interval` `timer` `throwError`；算子 `map` `scan` `filter` `toArray` `distinctUntilChanged` `debounceTime` `throttleTime` `take` `takeUntil` `tap` `startWith` `catchError` `finalize` `unsubscribeAll` |
+| `hooks/`（`src/hooks/`） | 应用级组合式 hook（页面生命周期封装） | `useBackPressExit(duration?)`（注册「再按一次退出应用」） |
+| `rxjs-bestX/`（`uni_modules/`） | 轻量流式处理（不依赖 RxJS 全量包） | `Observable` `Subject` `Subscription`；创建 `fromArray` `interval` `timer` `throwError`；算子 `map` `scan` `filter` `toArray` `distinctUntilChanged` `debounceTime` `throttleTime` `take` `takeUntil` `tap` `startWith` `catchError` `finalize` `unsubscribeAll` |
 | `layouts/navbar/utils/` | 下拉刷新、滚动到底与导航栏联动的跨端控制器 | `onNavbarPageScroll(cb)` `onNavbarReachBottom(cb)` `onNavbarPullDownRefresh(cb)` `stopNavbarPullDownRefresh()` `setNavbarTitle(t)` `setNavbarVisible(v)` `setHideNavbar(h)` `setHideStatusBar(h)` |
 | `router/` | 路由守卫、URL 参数解析、路径规范化与登录拦截 | `cleanPath(path)` `getCurrentPath()` `getCurrentRoute()` `isSamePath(a, b)` `parseUrlToObj(url)` `toLoginPage()` `LOGIN_PAGE`；实例 `route` |
 
@@ -1163,7 +1165,7 @@ graph LR
 测试用例位于 `tests/unit/` 目录，涵盖关键业务与工程环节：
 
 - **组件挂载测试 (`tests/unit/components/`)**：验证 [NavBar.uvue](src/components/NavBar/NavBar.uvue) 等组件的标题渲染、返回按钮展示、自定义插槽与事件响应；
-- **核心工具库测试 (`tests/unit/utils/`)**：验证 [route](src/utils/route/index.uts) 路由提取、[rxjs-lite](src/utils/rxjs-lite/index.uts) 响应式流处理与算子管道；
+- **核心工具库测试 (`tests/unit/utils/` / `tests/unit/modules/`)**：验证 [route](src/utils/route/index.uts) 路由提取、[rxjs-bestX](uni_modules/rxjs-bestX/index.uts) 响应式流处理与算子管道；
 - **工程构建插件测试 (`tests/unit/plugins/`)**：验证 `clean-logger` 告警净化插件以及 ESLint UTS 专属规则（十六进制颜色校验、接口规范、未定义检查）。
 
 #### 3. 常用测试命令

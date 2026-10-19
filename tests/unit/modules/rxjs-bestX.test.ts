@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { filter, fromArray, map, scan, Subject, take, tap } from '@/src/utils/rxjs-lite/index.uts';
+import { filter, fromArray, map, scan, Subject, take, tap } from '@/uni_modules/rxjs-bestX/index.uts';
 
-describe('rxjs-lite Unit Tests', () => {
+describe('rxjs-bestX Unit Tests', () => {
   it('should emit and transform values using fromArray and map', () => {
     const results: number[] = [];
     fromArray([1, 2, 3])

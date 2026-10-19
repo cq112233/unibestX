@@ -82,7 +82,7 @@ declare global {
   //
   // 为什么需要补：
   //   `#ifdef APP-ANDROID` 段里写的不是 `uni.*`，而是 UTS 直通原生的全局
-  //   （src/utils/backPress/index.uts:26、:34）。它们的声明由 HBuilderX 自带的 uts-types
+  //   （src/hooks/useBackPressExit.uts:63、:71）。它们的声明由 HBuilderX 自带的 uts-types
   //   提供，**不挂在** npm 包 @dcloudio/types 里：
   //     · UTSAndroid —— HBuilderX plugins/uniapp-uts-v1/uts-types/app-android/UTSAndroid.d.ts
   //                     文件末尾 `declare global { var UTSAndroid : UTSAndroid; }`；
