@@ -8,7 +8,8 @@ const defaultUserInfo: IUserInfo = {
   userId: -1,
   username: '',
   nickname: '',
-  avatar: DEFAULT_AVATAR
+  avatar: DEFAULT_AVATAR,
+  permissions: []
 };
 
 // ==========================================
@@ -22,7 +23,8 @@ export class UserStore extends PiniaStoreBase {
       userId: -1,
       username: '',
       nickname: '',
-      avatar: DEFAULT_AVATAR
+      avatar: DEFAULT_AVATAR,
+      permissions: []
     } as IUserInfo
   });
 
@@ -41,6 +43,7 @@ export class UserStore extends PiniaStoreBase {
     this.state.userInfo.username = defaultUserInfo.username;
     this.state.userInfo.nickname = defaultUserInfo.nickname;
     this.state.userInfo.avatar = defaultUserInfo.avatar;
+    this.state.userInfo.permissions = [];
   }
 
   override _hydrate(_data: UTSJSONObject): void {
@@ -53,6 +56,10 @@ export class UserStore extends PiniaStoreBase {
       this.state.userInfo.nickname = _data.nickname as string;
     if (_data.avatar != null)
       this.state.userInfo.avatar = _data.avatar as string;
+    // @ts-expect-error UTS 编译要求显式泛型实参；TS 侧 getArray 为 any 会报 TS2347
+    const rootPermissions = _data.getArray<string>('permissions', [] as Array<string>);
+    if (rootPermissions != null)
+      this.state.userInfo.permissions = rootPermissions;
     // 新版本嵌套结构
     if (_data.userInfo != null) {
       const infoObj = _data.userInfo as UTSJSONObject;
@@ -64,6 +71,10 @@ export class UserStore extends PiniaStoreBase {
         this.state.userInfo.nickname = infoObj.nickname as string;
       if (infoObj.avatar != null)
         this.state.userInfo.avatar = infoObj.avatar as string;
+      // @ts-expect-error UTS 编译要求显式泛型实参；TS 侧 getArray 为 any 会报 TS2347
+      const nestedPermissions = infoObj.getArray<string>('permissions', [] as Array<string>);
+      if (nestedPermissions != null)
+        this.state.userInfo.permissions = nestedPermissions;
     }
   }
 
@@ -72,7 +83,8 @@ export class UserStore extends PiniaStoreBase {
       userId: this.state.userInfo.userId,
       username: this.state.userInfo.username,
       nickname: this.state.userInfo.nickname,
-      avatar: this.state.userInfo.avatar
+      avatar: this.state.userInfo.avatar,
+      permissions: this.state.userInfo.permissions
     } as UTSJSONObject;
     return {
       userInfo: infoObj
@@ -87,11 +99,16 @@ export class UserStore extends PiniaStoreBase {
    * 设置用户信息，头像为空时使用默认头像
    */
   setUserInfo(info: IUserInfo): void {
+    const permissions: Array<string> = [];
+    for (let i = 0; i < info.permissions.length; i++) {
+      permissions.push(info.permissions[i]);
+    }
     this.state.userInfo = {
       userId: info.userId,
       username: info.username,
       nickname: info.nickname,
-      avatar: info.avatar != '' ? info.avatar : DEFAULT_AVATAR
+      avatar: info.avatar != '' ? info.avatar : DEFAULT_AVATAR,
+      permissions
     } as IUserInfo;
   }
 

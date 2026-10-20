@@ -1,7 +1,7 @@
 /**
  * 业务守卫规则编排中心 (src/router/guards)
  *
- * 聚合所有业务守卫规则（停服维护、登录鉴权、角色权限等），通过流水线责任链统一挂载至 router.beforeEach。
+ * 聚合所有业务守卫规则（停服维护、登录鉴权等），通过流水线责任链统一挂载至 router.beforeEach。
  */
 import type {
   NextFunction,
@@ -11,7 +11,6 @@ import type {
 import { buildGuardContext } from '@/uni_modules/route-bestX/index.uts';
 import { guardMaintenance } from './guardMaintenance.uts';
 import { guardLogin } from './guardLogin.uts';
-import { guardPermission } from './guardPermission.uts';
 
 /**
  * ## 业务前置守卫规则队列（责任链流水线模式）
@@ -26,7 +25,6 @@ import { guardPermission } from './guardPermission.uts';
  * 执行优先级排序：
  * 1. guardMaintenance: 系统维护公告拦截（最高优先级，停服维护时所有业务页面全部拦下跳转维护页）
  * 2. guardLogin: 登录认证与黑白名单策略拦截（基础身份校验）
- * 3. guardPermission: 角色与权限拦截（业务细粒度准入校验）
  */
 /**
  * 守卫责任链流水线执行函数
@@ -46,13 +44,6 @@ function runGuardsPipeline(to: RouteTarget, from: RouteTarget, next: NextFunctio
   const r2 = guardLogin(ctx);
   if (!r2.pass) {
     next(r2.redirect);
-    return;
-  }
-
-  // 3. 权限与角色准入拦截
-  const r3 = guardPermission(ctx);
-  if (!r3.pass) {
-    next(r3.redirect);
     return;
   }
 

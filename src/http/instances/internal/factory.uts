@@ -6,7 +6,7 @@
  * 2. 提供 `createApiInstance` 与 `buildApiInstanceOptions`，支持为不同 API 基础地址创建专用的独立 HttpClient 实例与配置。
  */
 
-import { useTokenStore } from '@/src/store/index.uts';
+import { useTokenStore, useUserStore } from '@/src/store/index.uts';
 import { toLoginPage } from '@/src/utils/auth/toLoginPage.uts';
 import {
   cloneConfig,
@@ -36,6 +36,14 @@ import { resolveServiceBaseUrl } from './config.uts';
 type HttpClientOptionsProvider = {
   getOptions: () => HttpClientOptions | null;
 };
+
+/**
+ * 清理完整登录态：Token 与用户信息必须同时清空，避免 401 后残留旧权限。
+ */
+function clearAuthSession(): void {
+  useTokenStore().clearToken();
+  useUserStore().clearUserInfo();
+}
 
 // ==========================================
 // 业务拦截器生成函数
@@ -75,6 +83,7 @@ export function defaultBusinessBeforeRequest(config: HttpRequestConfig): void {
           header.token = 'mock-dev-token';
           return;
         }
+        clearAuthSession();
         throw new Error('[请求错误]：未登录');
       }
       header.token = token;
@@ -144,12 +153,11 @@ export function defaultBusinessAfterSuccess(
 
             if (skipRefresh || client == null) {
               const onUnauth = activeOptions?.onUnauthorized;
+              clearAuthSession();
               if (onUnauth != null) {
                 onUnauth();
               }
               else {
-                const tokenStore = useTokenStore();
-                tokenStore.clearToken();
                 toLoginPage({ mode: 'reLaunch' } as UTSJSONObject);
               }
               const fullData = resultObj != null ? resultObj : data;
@@ -164,12 +172,11 @@ export function defaultBusinessAfterSuccess(
             return doRefresh.then((refreshOk: boolean): Promise<any> => {
               if (!refreshOk) {
                 const onUnauth = activeOptions?.onUnauthorized;
+                clearAuthSession();
                 if (onUnauth != null) {
                   onUnauth();
                 }
                 else {
-                  const tokenStore = useTokenStore();
-                  tokenStore.clearToken();
                   toLoginPage({ mode: 'reLaunch' } as UTSJSONObject);
                 }
                 const fullData = resultObj != null ? resultObj : data;
@@ -219,7 +226,7 @@ export function defaultBusinessAfterSuccess(
 /**
  * 业务默认响应失败钩子：统一网络错误提示
  */
-export function defaultBusinessAfterError(err: any, _config: HttpRequestConfig): void {
+export function defaultBusinessAfterError(err: any, config: HttpRequestConfig): void {
   console.error('request error ===>', err);
   const rawMsg = extractErrorMessage(err);
   if (rawMsg.toLowerCase().includes('abort')) {
@@ -227,6 +234,13 @@ export function defaultBusinessAfterError(err: any, _config: HttpRequestConfig):
   }
   if (err instanceof BusinessError) {
     return;
+  }
+  const extra = config.extra;
+  if (extra != null) {
+    const toastVal = (extra as UTSJSONObject).getBoolean('toast');
+    if (toastVal == false) {
+      return;
+    }
   }
   uni.showToast({ title: resolveErrorMessage(rawMsg, -1, extractStatusCode(err)).message, icon: 'none' });
 }
@@ -318,12 +332,11 @@ export function buildApiInstanceOptions(
       return tryRefreshToken();
     },
     onUnauthorized: () => {
+      clearAuthSession();
       if (customOptions?.onUnauthorized != null) {
         customOptions.onUnauthorized!();
       }
       else {
-        const tokenStore = useTokenStore();
-        tokenStore.clearToken();
         toLoginPage({ mode: 'reLaunch' } as UTSJSONObject);
       }
     }

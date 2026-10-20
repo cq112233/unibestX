@@ -103,6 +103,8 @@ export type IUserInfo = {
   username: string;
   nickname: string;
   avatar: string;
+  /** 权限码，如 report:read；`*` 表示全部权限 */
+  permissions: Array<string>;
 };
 
 export type IUserState = {
