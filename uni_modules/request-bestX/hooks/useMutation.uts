@@ -84,7 +84,7 @@ export function useMutation<TData, TVariables>(
     const unregisterMutation = client.registerMutation(options.mutationKey);
 
     // 执行 onMutate 钩子（获取乐观更新上下文）
-    let mutateContext: any = null;
+    let mutateContext: any = {} as any;
     if (options.onMutate != null) {
       try {
         mutateContext = options.onMutate!(variables);
@@ -94,22 +94,25 @@ export function useMutation<TData, TVariables>(
       }
     }
 
-    const runAttempt = (attempt: number): Promise<TData> => {
-      return optFn(variables).catch((err: any): Promise<TData> => {
-        const e: Error = toError(err);
-        let canRetry: boolean = attempt < optRetry;
-        if (canRetry == true && options.isRetryable != null) {
-          canRetry = options.isRetryable!(e);
-        }
+    function runAttempt(attempt: number): Promise<TData> {
+      return optFn(variables).then(
+        (resData: TData): TData => resData,
+        (err: any): Promise<TData> => {
+          const e: Error = toError(err);
+          let canRetry: boolean = attempt < optRetry;
+          if (canRetry == true && options.isRetryable != null) {
+            canRetry = options.isRetryable!(e);
+          }
 
-        if (canRetry == true) {
-          return delayPromise(optRetryDelay).then((): Promise<TData> => {
-            return runAttempt(attempt + 1);
-          });
+          if (canRetry == true) {
+            return delayPromise(optRetryDelay).then((): Promise<TData> => {
+              return runAttempt(attempt + 1);
+            });
+          }
+          return Promise.reject(e) as Promise<TData>;
         }
-        return Promise.reject(e);
-      });
-    };
+      );
+    }
 
     return runAttempt(0).then(
       (resData: TData): TData => {
@@ -143,23 +146,26 @@ export function useMutation<TData, TVariables>(
         if (options.onSettled != null) {
           options.onSettled!(null, errorObj, variables, mutateContext);
         }
-        return Promise.reject(errorObj);
+          return Promise.reject(errorObj) as Promise<TData>;
       }
     );
   };
 
   // ---------- 5. 静默执行器 (mutate) ----------
   const mutate = (variables: TVariables): void => {
-    mutateAsync(variables).catch((_err: any): void => {
-      // 静默吞掉未捕获的 rejection，错误统一由 onError / onSettled 与 errorRef 承载
-    });
+    mutateAsync(variables).then(
+      (_data: TData): void => {},
+      (_err: any): void => {
+        // 静默吞掉未捕获的 rejection，错误统一由 onError / onSettled 与 errorRef 承载
+      }
+    );
   };
 
   // ---------- 6. 返回结果 ----------
   const result: MutationResult<TData, TVariables> = {
     data: dataRef,
     variables: variablesRef,
-    error: errorRef,
+    lastError: errorRef,
     status: statusRef,
     isPending: isPendingRef,
     isLoading: isPendingRef, // 别名支持

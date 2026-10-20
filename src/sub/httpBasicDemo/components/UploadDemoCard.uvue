@@ -141,7 +141,7 @@ const uploadErrorText = computed((): string => {
   if (chooseError.value.length > 0) {
     return chooseError.value;
   }
-  const err = uploadMutation.error.value;
+  const err = uploadMutation.lastError.value;
   if (err != null) {
     return err.message;
   }

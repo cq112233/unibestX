@@ -390,11 +390,11 @@ const crudErrorText = computed((): string => {
   if (crudError.value.length > 0) {
     return crudError.value;
   }
-  const listError = listQuery.error.value;
+  const listError = listQuery.lastError.value;
   if (listError != null) {
     return listError.message;
   }
-  const detailError = detailQuery.error.value;
+  const detailError = detailQuery.lastError.value;
   if (detailError != null) {
     return detailError.message;
   }

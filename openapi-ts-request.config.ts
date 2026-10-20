@@ -28,7 +28,7 @@ export default defineConfig([
     serversPath: './src/api/generated/a-service1',
     requestLibPath: '@/src/http/openapi.uts',
     // 指向主服务 http（走 /api）
-    requestImportStatement: 'import { request } from \'@/src/http/openapi.uts\';\nimport type { OpenApiRequestOptions } from \'@/src/http/openapi.uts\';',
+    requestImportStatement: 'import { request, buildBodyRequestConfig } from \'@/src/http/openapi.uts\';\nimport type { OpenApiRequestOptions } from \'@/src/http/openapi.uts\';',
     requestOptionsType: 'OpenApiRequestOptions',
     isCamelCase: true
   },
@@ -44,7 +44,7 @@ export default defineConfig([
     serversPath: './src/api/generated/a-service2',
     requestLibPath: '@/src/http/openapi.uts',
     // 指向主服务 http（走 /api）
-    requestImportStatement: 'import { request } from \'@/src/http/openapi.uts\';\nimport type { OpenApiRequestOptions } from \'@/src/http/openapi.uts\';',
+    requestImportStatement: 'import { request, buildBodyRequestConfig } from \'@/src/http/openapi.uts\';\nimport type { OpenApiRequestOptions } from \'@/src/http/openapi.uts\';',
     requestOptionsType: 'OpenApiRequestOptions',
     isCamelCase: true
   },
@@ -60,7 +60,7 @@ export default defineConfig([
     serversPath: './src/api/generated/b-service1',
     requestLibPath: '@/src/http/openapi.uts',
     // 部署在副服务器，直接绑定 secondaryRequest（走 /api-secondary）
-    requestImportStatement: 'import { secondaryRequest as request } from \'@/src/http/openapi.uts\';\nimport type { OpenApiRequestOptions } from \'@/src/http/openapi.uts\';',
+    requestImportStatement: 'import { secondaryRequest as request, buildBodyRequestConfig } from \'@/src/http/openapi.uts\';\nimport type { OpenApiRequestOptions } from \'@/src/http/openapi.uts\';',
     requestOptionsType: 'OpenApiRequestOptions',
     isCamelCase: true
   },
@@ -74,7 +74,7 @@ export default defineConfig([
     serversPath: './src/api/generated/b-service2',
     requestLibPath: '@/src/http/openapi.uts',
     // 部署在副服务器，直接绑定 secondaryRequest（走 /api-secondary）
-    requestImportStatement: 'import { secondaryRequest as request } from \'@/src/http/openapi.uts\';\nimport type { OpenApiRequestOptions } from \'@/src/http/openapi.uts\';',
+    requestImportStatement: 'import { secondaryRequest as request, buildBodyRequestConfig } from \'@/src/http/openapi.uts\';\nimport type { OpenApiRequestOptions } from \'@/src/http/openapi.uts\';',
     requestOptionsType: 'OpenApiRequestOptions',
     isCamelCase: true
   }

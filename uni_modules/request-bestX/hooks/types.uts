@@ -78,7 +78,7 @@ export type QueryResult<T> = {
   /** 响应式查询数据 */
   data: Ref<T | null>;
   /** 响应式异常对象 */
-  error: Ref<Error | null>;
+  lastError: Ref<Error | null>;
   /** 响应式查询状态 ('pending' | 'success' | 'error') */
   status: Ref<QueryStatus>;
   /** 首次查询尚未完成（status === 'pending'），对标 TanStack Query v5 */
@@ -145,7 +145,7 @@ export type MutationResult<TData, TVariables> = {
   /** 当前或最近一次执行变更传入的变量参数（对标 TanStack Query） */
   variables: Ref<TVariables | null>;
   /** 变更失败后的异常对象 */
-  error: Ref<Error | null>;
+  lastError: Ref<Error | null>;
   /** 当前变更状态 ('idle' | 'pending' | 'success' | 'error') */
   status: Ref<MutationStatus>;
   /** 变更是否执行中 (status === 'pending') */

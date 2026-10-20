@@ -236,11 +236,8 @@ export class HttpClient {
       const hook = this.beforeRequestHooks[i];
       p = p.then((cfg: HttpRequestConfig): Promise<HttpRequestConfig> => {
         try {
-          const res = hook(cfg);
-          if (res != null && typeof (res as Promise<any>).then == 'function') {
-            return (res as Promise<any>).then((): HttpRequestConfig => cfg);
-          }
-          return Promise.resolve(cfg);
+          const res: any = hook(cfg);
+          return Promise.resolve(res).then((): HttpRequestConfig => cfg) as Promise<HttpRequestConfig>;
         }
         catch (err) {
           return Promise.reject(err) as Promise<HttpRequestConfig>;
@@ -254,19 +251,16 @@ export class HttpClient {
    * 依次执行响应成功后置钩子队列（支持将当前 HttpClient 实例传给 hook 以便业务层扩展重试）
    */
   private applyAfterSuccess<T>(data: T, config: HttpRequestConfig): Promise<T> {
-    let p = Promise.resolve<any>(data);
+    let p: Promise<any> = Promise.resolve(data as any);
     for (let i = 0; i < this.afterSuccessHooks.length; i = i + 1) {
       const hook = this.afterSuccessHooks[i];
       p = p.then((currentData: any): Promise<any> => {
         try {
-          const res = hook(currentData, config, this);
-          if (res != null && typeof (res as Promise<any>).then == 'function') {
-            return res as Promise<any>;
-          }
-          return Promise.resolve(res);
+          const res: any = hook(currentData, config, this);
+          return Promise.resolve(res) as Promise<any>;
         }
         catch (err) {
-          return Promise.reject(err);
+          return Promise.reject(err) as Promise<any>;
         }
       });
     }
@@ -277,21 +271,21 @@ export class HttpClient {
    * 依次执行响应失败后置钩子队列
    */
   private applyAfterError<T>(err: any, config: HttpRequestConfig): Promise<T> {
-    let p = Promise.reject<any>(err);
+    let p: Promise<any> = Promise.reject(err) as Promise<any>;
     for (let i = 0; i < this.afterErrorHooks.length; i = i + 1) {
       const hook = this.afterErrorHooks[i];
-      p = p.catch((currentErr: any): Promise<any> => {
-        try {
-          const res = hook(currentErr, config);
-          if (res != null && typeof (res as Promise<any>).then == 'function') {
-            return (res as Promise<any>).then((): Promise<any> => Promise.reject<any>(currentErr));
+      p = p.then(
+        (value: any): Promise<any> => Promise.reject(value) as Promise<any>,
+        (currentErr: any): Promise<any> => {
+          try {
+            const res: any = hook(currentErr, config);
+            return Promise.resolve(res).then((): Promise<any> => Promise.reject(currentErr) as Promise<any>);
           }
-          return Promise.reject<any>(currentErr);
+          catch (hookErr) {
+            return Promise.reject(hookErr) as Promise<any>;
+          }
         }
-        catch (hookErr) {
-          return Promise.reject<any>(hookErr);
-        }
-      });
+      );
     }
     return p as Promise<T>;
   }
@@ -305,11 +299,8 @@ export class HttpClient {
       const hook = this.afterCompleteHooks[i];
       p = p.then((): Promise<void> => {
         try {
-          const res = hook(config);
-          if (res != null && typeof (res as Promise<any>).then == 'function') {
-            return (res as Promise<any>).then((): void => {});
-          }
-          return Promise.resolve();
+          const res: any = hook(config);
+          return Promise.resolve(res).then((): void => {});
         }
         catch (err) {
           console.warn('[http] onComplete hook error:', err);
@@ -376,7 +367,7 @@ export class HttpClient {
       }
 
       // 4. 提取参数
-      const method = (config.method != null && config.method != '' ? config.method!.toUpperCase() : 'GET') as any;
+      const method: string = config.method != null && config.method != '' ? config.method!.toUpperCase() : 'GET';
       const timeout = config.timeout != null ? (config.timeout as number) : this.defaultTimeout;
       const dataType = config.dataType != null ? (config.dataType as string) : this.defaultDataType;
       const responseType = config.responseType != null ? (config.responseType as string) : this.defaultResponseType;
@@ -413,7 +404,6 @@ export class HttpClient {
             statusCode,
             header,
             cookies,
-            errMsg: res.errMsg,
             config
           };
           resolve(responseObj);
@@ -650,17 +640,17 @@ export class HttpClient {
             url: fullUrl,
             filePath: validConfig.filePath ?? '',
             name: validConfig.name ?? 'file',
-            formData: validConfig.formData ?? (validConfig.data as UTSJSONObject | null),
+            formData: (validConfig.formData ?? (validConfig.data as UTSJSONObject | null)) as UTSJSONObject | null,
             header: mergedHeader,
             timeout,
             success: (res) => {
               if (requestKey != '') {
                 this.lifecycle.clearTask(requestKey);
               }
-              let parsedData: any = res.data;
+              let parsedData: any | null = res.data as any | null;
               try {
                 if (typeof res.data == 'string') {
-                  parsedData = JSON.parse(res.data as string);
+                  parsedData = JSON.parse(res.data as string) as any | null;
                 }
               }
               catch (_) {}
@@ -747,7 +737,7 @@ export class HttpClient {
               }
               const statusCode = res.statusCode;
               if (statusCode < 200 || statusCode >= 300) {
-                const httpErr = new Error(`下载失败(${statusCode})：${res.errMsg}`);
+                const httpErr = new Error(`下载失败(${statusCode})`);
                 this.rejectDownload(httpErr, validConfig).then(resolve, reject);
                 return;
               }
@@ -817,7 +807,7 @@ export class HttpClient {
   ): StreamTask {
     const finalConfig = (config ?? {}) as HttpRequestConfig;
     const requestKey = this.lifecycle.readExtraString(finalConfig, 'requestKey');
-    let task: any = null;
+      let task: any | null = null;
     let settled = false;
     let aborted = false;
 

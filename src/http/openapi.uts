@@ -23,6 +23,37 @@ function executeRequest<T>(client: HttpClient, url: string, options: HttpRequest
 }
 
 /**
+ * 组装「带请求体」的请求配置（供 openapi-ts-request 生成的接口函数复用）
+ *
+ * 生成器默认产物是 `{ method, headers, data, ...(options || {}) }` 这种内联对象字面量 +
+ * 展开覆盖，UTS 既不允许在参数位置直接声明对象字面量类型，也不鼓励对强类型对象做展开。
+ * 因此统一收敛到本函数：先取 options 作为基底，缺省项再补默认值。
+ *
+ * @param method 默认 HTTP 方法（options 里已指定时以 options 为准）
+ * @param body 请求体（可空）
+ * @param options 调用方覆盖项（可空）
+ * @param contentType 默认 Content-Type（options.headers 非空时以 options 为准）
+ */
+export function buildBodyRequestConfig(
+  method: string,
+  body: any | null,
+  options: OpenApiRequestOptions | null,
+  contentType: string = 'application/json'
+): OpenApiRequestOptions {
+  const config: OpenApiRequestOptions = options != null ? options! : ({} as OpenApiRequestOptions);
+  if (config.method == null) {
+    config.method = method;
+  }
+  if (config.headers == null) {
+    config.headers = { 'Content-Type': contentType } as UTSJSONObject;
+  }
+  if (config.data == null) {
+    config.data = body;
+  }
+  return config;
+}
+
+/**
  * 主服务请求函数（默认走主服务器 http / /api）
  */
 export function request<T>(url: string, options: HttpRequestConfig | null = null): Promise<T> {

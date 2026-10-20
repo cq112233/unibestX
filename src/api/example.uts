@@ -27,7 +27,7 @@
 
 import { getOssBaseUrl, getOssUploadPath } from '@/src/config/index.uts';
 import { API_DOMAINS, http } from '@/src/http/index.uts';
-import type { AbortableTask, DownloadResult, HttpRequestConfig } from '@/uni_modules/request-bestX/index.uts';
+import type { DownloadResult, HttpRequestConfig } from '@/uni_modules/request-bestX/index.uts';
 
 // ==========================================
 // 1. 类型定义（遵循规范：一律使用 type，严禁 interface）
@@ -567,7 +567,7 @@ export function downloadFooFileApi(
   const progressCallback = onProgress;
   const config = {
     extra,
-    getTask: (task: AbortableTask): void => {
+    getTask: (task: any): void => {
       // 仅 DOWNLOAD 任务具备进度监听能力，把原生进度回调给业务层
       const downloadTask = task as DownloadTask;
       if (progressCallback != null) {

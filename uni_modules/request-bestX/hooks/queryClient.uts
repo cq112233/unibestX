@@ -169,7 +169,7 @@ export class QueryClient {
     if (existing != null) {
       updatedRecord.isFetching = existing.isFetching;
     }
-    this.cache.set(hash, updatedRecord);
+    this.cache.set(hash, updatedRecord as QueryCacheRecord<any>);
     this.notify(key);
   }
 
@@ -190,7 +190,7 @@ export class QueryClient {
    */
   setQueryState<T>(key: QueryKey, record: QueryCacheRecord<T>): void {
     const hash = serializeQueryKey(key);
-    this.cache.set(hash, record);
+    this.cache.set(hash, record as QueryCacheRecord<any>);
     this.notify(key);
   }
 
@@ -228,7 +228,7 @@ export class QueryClient {
     const targetKey = resolveQueryKeyFromParam(filters);
     if (targetKey == null) {
       // 全量取消
-      this.cancelHandlers.forEach((handlers) => {
+      this.cancelHandlers.forEach((handlers: Array<() => void>) => {
         for (let i = 0; i < handlers.length; i = i + 1) {
           try {
             handlers[i]();
@@ -272,10 +272,10 @@ export class QueryClient {
     const targetKey = resolveQueryKeyFromParam(filters);
     if (targetKey == null) {
       // 全量失效广播
-      this.cache.forEach((record) => {
+      this.cache.forEach((record: QueryCacheRecord<any>) => {
         record.dataUpdatedAt = 0;
       });
-      this.listeners.forEach((subscribers) => {
+      this.listeners.forEach((subscribers: Array<() => void>) => {
         for (let i = 0; i < subscribers.length; i = i + 1) {
           subscribers[i]();
         }
@@ -397,7 +397,7 @@ export class QueryClient {
    */
   setInflightPromise<T>(key: QueryKey, promise: Promise<T>): void {
     const hash = serializeQueryKey(key);
-    this.inflight.set(hash, promise);
+    this.inflight.set(hash, promise as Promise<any>);
   }
 
   /**
@@ -492,9 +492,11 @@ export function useQueryClient(customClient: QueryClient | null = null): QueryCl
  * 用于 app.use(VueQueryPlugin, { queryClient }) 全局注册
  */
 export const VueQueryPlugin = {
-  install(app: any, options: VueQueryPluginOptions | null = null): void {
-    const client: QueryClient = options?.queryClient ?? defaultQueryClient;
-    if (app != null && typeof app.provide === 'function') {
+  install(app: VueApp, options?: VueQueryPluginOptions | null): void {
+    const client: QueryClient = options != null && options.queryClient != null
+      ? options.queryClient as QueryClient
+      : defaultQueryClient;
+    if (app != null) {
       app.provide(VUE_QUERY_CLIENT_KEY, client);
     }
   }
@@ -519,19 +521,17 @@ export class OnlineManager {
     }
     this.setupDone = true;
     try {
-      if (typeof uni !== 'undefined' && typeof uni.onNetworkStatusChange === 'function') {
-        uni.onNetworkStatusChange((res) => {
-          const connected = res.isConnected;
-          const wasOnline = this.isOnline;
-          this.isOnline = connected;
-          if (connected == true && wasOnline == false) {
-            this.notify(true);
-          }
-          else if (connected == false && wasOnline == true) {
-            this.notify(false);
-          }
-        });
-      }
+      uni.onNetworkStatusChange((res) => {
+        const connected = res.isConnected;
+        const wasOnline = this.isOnline;
+        this.isOnline = connected;
+        if (connected == true && wasOnline == false) {
+          this.notify(true);
+        }
+        else if (connected == false && wasOnline == true) {
+          this.notify(false);
+        }
+      });
     }
     catch (_) {}
   }

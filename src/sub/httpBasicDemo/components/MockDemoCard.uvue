@@ -345,11 +345,11 @@ const mockErrorText = computed((): string => {
   if (dishErrorMsg.value != '') {
     return dishErrorMsg.value;
   }
-  const loginError = loginMutation.error.value;
+  const loginError = loginMutation.lastError.value;
   if (loginError != null) {
     return loginError.message;
   }
-  const listError = listQuery.error.value;
+  const listError = listQuery.lastError.value;
   if (listError != null) {
     return `${listError.message}（若非以 pnpm dev:mock 启动，请求会落到真实开发服务器）`;
   }
@@ -392,16 +392,17 @@ function requestDishDetail(): void {
       recordId: 1001,
       sampled: 1
     } as FoodSampleReportDishDetailUsingPostBody
-  })
-    .then((res: FoodSampleReportDishDetailUsingPostResponse) => {
+  }).then(
+    (res: FoodSampleReportDishDetailUsingPostResponse): void => {
       console.log(111, res);
       dishData.value = JSON.parseObject(JSON.stringify(res));
-    })
-    .catch((err: any) => {
-      dishErrorMsg.value = err?.message ?? '请求留样明细失败';
-    })
-    .finally(() => {
       isDishLoading.value = false;
-    });
+    },
+    (err: any): void => {
+      const message = (err as Error).message;
+      dishErrorMsg.value = message != null && message != '' ? message : '请求留样明细失败';
+      isDishLoading.value = false;
+    }
+  );
 }
 </script>

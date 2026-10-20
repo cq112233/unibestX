@@ -255,7 +255,7 @@ const remoteStatusBgClass = computed((): string => {
 });
 
 const remoteDetailText = computed((): string => {
-  const err = remoteQuery.error.value;
+  const err = remoteQuery.lastError.value;
   if (err != null) {
     return `错误：${err.message}`;
   }

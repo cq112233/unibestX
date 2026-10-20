@@ -178,5 +178,8 @@ export type HttpClientOptions = {
   afterResponse?: any;
   responded?: any;
   respondedOptions?: RespondedOptions;
-  [key: string]: any | null;
+  /** 401 未授权时的令牌刷新处理（可选，返回 true 表示刷新成功） */
+  refreshToken?: () => Promise<boolean>;
+  /** 401 且刷新失败时的兜底处理（可选） */
+  onUnauthorized?: () => void;
 };

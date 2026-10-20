@@ -1,27 +1,19 @@
 /* eslint-disable */
 // @ts-ignore
-import { request } from '@/src/http/openapi.uts';
+import { request, buildBodyRequestConfig } from '@/src/http/openapi.uts';
 import type { OpenApiRequestOptions } from '@/src/http/openapi.uts';
 
 import * as API from './types.uts';
 
 /** 专间消毒记录报表 POST /gateway/roomDisinfectionReport/page */
-export function roomDisinfectionReportPageUsingPost({
-  body,
-  options,
-}: {
+export type RoomDisinfectionReportPageUsingPostRequestParams = {
   body: API.RoomDisinfectionReportPageUsingPostBody;
   options?: OpenApiRequestOptions;
-}) {
+};
+
+export function roomDisinfectionReportPageUsingPost(requestParams: RoomDisinfectionReportPageUsingPostRequestParams) {
   return request<API.RoomDisinfectionReportPageUsingPostResponse>(
     '/gateway/roomDisinfectionReport/page',
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      data: body,
-      ...(options || {}),
-    }
+    buildBodyRequestConfig('POST', requestParams.body, requestParams.options)
   );
 }

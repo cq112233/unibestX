@@ -105,7 +105,7 @@ export function useQuery<T>(
     if (options.enabled == null) {
       return true;
     }
-    const raw: any = options.enabled;
+    const raw: any | null = options.enabled;
     if (isRef(raw)) {
       return (raw as Ref<boolean>).value == true;
     }
@@ -288,27 +288,30 @@ export function useQuery<T>(
     });
 
     // 单次尝试逻辑包装
-    const attemptRun = (attemptCount: number): Promise<T> => {
-      return optFn(ctx).catch((err: any): Promise<T> => {
-        const e: Error = toError(err);
-        let canRetry: boolean = attemptCount < optRetry;
-        if (canRetry == true) {
-          if (options.isRetryable != null) {
-            canRetry = options.isRetryable!(e);
+    function attemptRun(attemptCount: number): Promise<T> {
+      return optFn(ctx).then(
+        (resData: T): T => resData,
+        (err: any): Promise<T> => {
+          const e: Error = toError(err);
+          let canRetry: boolean = attemptCount < optRetry;
+          if (canRetry == true) {
+            if (options.isRetryable != null) {
+              canRetry = options.isRetryable!(e);
+            }
+            else {
+              canRetry = !isBusinessError(e);
+            }
           }
-          else {
-            canRetry = !isBusinessError(e);
-          }
-        }
 
-        if (canRetry == true && disposed != true && taskSeq === seq) {
-          return retryDelayPromise(optRetryDelay).then((): Promise<T> => {
-            return attemptRun(attemptCount + 1);
-          });
+          if (canRetry == true && disposed != true && taskSeq === seq) {
+            return retryDelayPromise(optRetryDelay).then((): Promise<T> => {
+              return attemptRun(attemptCount + 1);
+            });
+          }
+          return Promise.reject(e) as Promise<T>;
         }
-        return Promise.reject(e);
-      });
-    };
+      );
+    }
 
     const fetchPromise = attemptRun(0);
     client.setInflightPromise(currentOptKey, fetchPromise);
@@ -428,7 +431,7 @@ export function useQuery<T>(
 
   // ---------- 13. 动态监听 enabled 变化 (支持依赖查询) ----------
   let stopWatchEnabled: (() => void) | null = null;
-  const rawEnabled: any = options.enabled;
+    const rawEnabled: any | null = options.enabled;
   if (rawEnabled != null) {
     if (isRef(rawEnabled)) {
       stopWatchEnabled = watch(
@@ -506,7 +509,7 @@ export function useQuery<T>(
   // ---------- 13. 返回响应式结构 ----------
   const result: QueryResult<T> = {
     data: dataRef,
-    error: errorRef,
+    lastError: errorRef,
     status: statusRef,
     isPending: isPendingRef,
     isLoading: isLoadingRef,
