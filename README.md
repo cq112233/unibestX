@@ -13,7 +13,7 @@
 [![GitHub Repo stars](https://img.shields.io/github/stars/cq112233/unibestX?style=flat&logo=github)](https://github.com/cq112233/unibestX)
 [![GitHub forks](https://img.shields.io/github/forks/cq112233/unibestX?style=flat&logo=github)](https://github.com/cq112233/unibestX)
 ![node version](https://img.shields.io/badge/node-%3E%3D22.22.2-green)
-![pnpm version](https://img.shields.io/badge/pnpm-%3E%3D7.30-green)
+![pnpm version](https://img.shields.io/badge/pnpm-%3E%3D10.0.0-green)
 ![HBuilderX version](https://img.shields.io/badge/HBuilderX-%3E%3D5.26-blue)
 [![Vitest](https://img.shields.io/badge/tested_with-vitest-yellow?logo=vitest)](https://vitest.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8-blue?logo=typescript)](https://www.typescriptlang.org/)
@@ -24,9 +24,9 @@
 
 `unibestX` 由 **`uni-app X` + `Vue3` + `UTS` + `Vite5` + `Tailwind CSS` + `z-paging-x`** 构成，采用下一代 uni-app 原生开发技术栈，通过 `HBuilderX` 一键运行到 **Android / iOS / 鸿蒙 / H5 / 微信小程序 / 支付宝小程序** 六大平台。
 
-内置 `自定义 TabBar`、`Layout 布局`、`请求封装`、`登录拦截`、`路由守卫`、`Tailwind CSS`、`i18n 多语言`、`主题切换`、`沙盒极速调试` 等基础能力，并提供 `代码提示`、`自动格式化`、`统一配置` 等辅助功能，让你编写 `uni-app X` 拥有 `best` 体验。
+内置 `自定义 TabBar`、`Layout 布局`、`request-bestX 请求与状态机引擎`、`登录拦截`、`路由守卫`、`Tailwind CSS`、`i18n 多语言`、`主题切换`、`沙盒极速调试` 等基础能力，并提供 `代码提示`、`自动格式化`、`统一配置` 等辅助功能，让你编写 `uni-app X` 拥有 `best` 体验。
 
-🤖 **同时它也是一套「AI 原生」开发模板**：项目自带 **`unibestX-skill`**（「1 个入口 + 9 个分册」的 uni-app X / UTS 规范知识库），Claude Code、Codex 等 AI Agent 克隆即可直接按项目规范写代码、生成页面骨架、自动排查跨端编译报错；运行时亦内置 **AI 对话页**与 **SSE / Chunk 跨端流式传输**能力。详见 [🤖 AI 与 Skill 体系](#-ai-与-skill-体系)。
+🤖 **同时它也是一套「AI 原生」开发模板**：项目自带 **`unibestX-skill`**（「1 个入口 + 8 个分册」的 uni-app X / UTS 规范知识库），Claude Code、Codex 等 AI Agent 克隆即可直接按项目规范写代码、生成页面骨架、自动排查跨端编译报错；运行时亦内置 **AI 对话页**与 **SSE / Chunk 跨端流式传输**能力。详见 [🤖 AI 与 Skill 体系](#-ai-与-skill-体系)。
 
 | 👉 在线 H5 演示 | 📖 官方文档 | 🐙 GitHub | 🍊 Gitee 镜像 |
 | :---: | :---: | :---: | :---: |
@@ -57,7 +57,7 @@
 - [平台兼容性](#平台兼容性)
 - [📁 项目结构](#-项目结构)
 - [🧩 核心功能说明](#-核心功能说明)
-  - [内置工具库（src/utils）](#内置工具库srcutils)
+  - [内置工具库与配置中心](#内置工具库与配置中心)
   - [环境变量配置（.env）](#环境变量配置env)
   - [页面路由与配置](#页面路由与配置-uni-pages)
   - [沙盒独立调试模式](#沙盒独立调试模式-page-sandbox)
@@ -268,25 +268,26 @@ pnpm docs:dev       # 本地启动 VitePress 文档站
 
 ## 核心业务配置速查（做业务必改）
 
-> 📌 **做业务必改**：为让开发者在接手项目或开始编写业务时「改得快、找得准、不踩坑」，项目将 12 大关键业务配置进行了单源收敛与标准化。开发业务时，查阅并修改下表对应文件即可：
+> 📌 **做业务必改**：为让开发者在接手项目或开始编写业务时「改得快、找得准、不踩坑」，项目将 16 大关键业务配置进行了单源收敛与标准化。开发业务时，查阅并修改下表对应文件即可：
 
 | 序号 | 核心模块 | 核心配置文件 | 作用说明与业务修改指引 |
 | :---: | :--- | :--- | :--- |
 | 1 | 🏝️ **底部 TabBar** | [src/tabbar/config.uts](src/tabbar/config.uts) | 配置 Tab 页面路径、文案、图标、角标徽标、风格形态（`capsule` 悬浮胶囊 / `default` 贴底底座）及居中 `midButton` 鼓包按钮 |
-| 2 | 🛡️ **路由拦截守卫** | [src/router/config/config.uts](src/router/config/config.uts) | 配置页面登录白名单 / 黑名单策略；未登录拦截跳登录页及登录成功后原路返回 |
+| 2 | 🛡️ **路由拦截守卫** | [src/router/config.uts](src/router/config.uts) / [src/router/guards/](src/router/guards/) | 配置登录页 / 注册页与受保护页面名单；登录、维护、权限三条业务守卫统一编排，未登录拦截跳登录页及登录成功后原路返回 |
 | 3 | 🌐 **环境变量与域名** | [.env](.env) / `.env.*` | 配置 `VITE_SERVER_BASEURL` 接口主域名、`VITE_TABBAR_MODE` 运行策略、`VITE_DEFAULT_THEME` 默认主题等 |
-| 4 | 🔌 **网络请求客户端** | [src/http/index.uts](src/http/index.uts) | 基于 `lime-request` 封装，提供统一拦截器、自动带 Token、401 登出跳登录、多域名及 SSE 流式传输 |
+| 4 | 🔌 **网络请求客户端** | [src/http/index.uts](src/http/index.uts) | 业务网络统一出口：`http` / `secondaryHttp` 多域名实例、Token 注入、401 静默刷新与重放、统一错误提示与数据解包；底层引擎见 `uni_modules/request-bestX` |
 | 5 | 🔧 **Pinia 状态管理** | [src/store/index.uts](src/store/index.uts) | 双模式自动路由（Vapor 模式/Web/小程序走官方 Pinia，VDOM 原生走 `x-pinia-s`），开箱即用持久化存储 |
 | 6 | 📁 **分包页面与路由** | [pages.json](pages.json) / [pages.config.json](pages.config.json) | 由 `vite-plugin-uni-pages` 自动递归扫描 `src/pages` 与 `src/sub` 实时生成，新增页面保存即生效，免手写配置 |
 | 7 | 🌈 **主题换肤与色板** | [theme.json](theme.json) / [src/theme/index.uts](src/theme/index.uts) | `theme.json` 明暗色板唯一真源，CSS 变量与系统深浅色联动，全端原生导航与组件一致生效 |
 | 8 | 🌍 **i18n 国际化** | [src/i18n/index.uts](src/i18n/index.uts) | 基于 `lime-i18n`，内置中英文语言包（`src/i18n/locales/`），支持自适应系统语言与动态一键切换 |
-| 9 | 🎨 **Tailwind CSS** | [tailwind.config.ts](tailwind.config.ts) / [main.css](main.css) | 原子化 CSS 规则引擎，支持方括号任意值、预设 `p-safe` / `pt-safe` / `pb-safe` 全端安全区类名 |
+| 9 | 🎨 **Tailwind CSS** | [tailwind.config.js](tailwind.config.js) / [main.css](main.css) | 原子化 CSS 规则引擎，支持方括号任意值、预设 `p-safe` / `pt-safe` / `pb-safe` 全端安全区类名 |
 | 10 | 🚀 **Vapor / VDOM 渲染** | [manifest.json](manifest.json) / [vite.config.ts](vite.config.ts) | 原生渲染引擎模式切换，默认开启高性能 Vapor 蒸汽模式（无虚拟 DOM 原生极速渲染），兼容传统 VDOM |
 | 11 | ⚡ **沙盒独立调试** | [pages.json](pages.json) / [.env](.env) | 开发阶段通过 `VITE_DEV_SANDBOX=true` 或 `definePage({ debug: true })` 仅编译单页面，冷启动秒级直达 |
 | 12 | 📦 **配套生态组件** | [uni_modules/](uni_modules/) | 内置经过作者深度兼容性定制与修复的 `z-paging-x`、`e-chart`、`uni-icons`、加密库等，开箱稳定可用 |
 | 13 | 🧬 **OpenAPI 接口生成** | [openapi-ts-request.config.ts](openapi-ts-request.config.ts) | 配置 Apifox / Swagger 规范来源，执行 `pnpm api:gen` 自动生成全端 UTS 强类型 API 客户端与数据模型 |
 | 14 | 🔐 **敏感凭证隔离** | [.env.local](.env.local.example) / [manifest.config.ts](manifest.config.ts) | 隔离 DCloud AppID、uniCloud 密钥、小程序 AppID 与鸿蒙私钥密码，执行 `pnpm manifest` 自动同步 |
 | 15 | 🛡️ **工程化质量规范** | [stylelint.config.mjs](stylelint.config.mjs) / [.commitlintrc.cjs](.commitlintrc.cjs) / [cspell.json](cspell.json) | Stylelint 样式规约（适配 rpx/upx 与原生组件）、Commitlint 提交信息校验与 CSpell 专有词库拼写检查 |
+| 16 | 🧠 **请求与状态机引擎** | [uni_modules/request-bestX/](uni_modules/request-bestX/) | `createHttpClient` / `useQuery` / `useMutation` / `QueryClient`、并发去重、TTL 缓存、断网重连刷新与 `requestStream` 流式传输 |
 
 > 💡 **移动端查看建议**：首页（Tab 1）已内嵌核心卡片速查表，开发时在真机或模拟器可随时对照浏览。
 
@@ -297,7 +298,7 @@ pnpm docs:dev       # 本地启动 VitePress 文档站
 | 依赖 | 版本要求 |
 | :--- | :--- |
 | Node | `^22.22.2`（或 `^24.15.0`、`>=26.0.0`） |
-| pnpm | >= 7.30 |
+| pnpm | >= 10.0.0 |
 | HBuilderX | **5.26 及以上**（Android 蒸汽模式需 >= 5.21，iOS 需 >= 5.11；支付宝小程序需 >= 5.31） |
 | Vue Official | >= 2.1.10 |
 | TypeScript | >= 5.0 |
@@ -322,7 +323,8 @@ pnpm docs:dev       # 本地启动 VitePress 文档站
 - 🛡️ **路由守卫** — 黑名单／白名单策略，灵活的登录拦截与登录后回跳
 - 🌈 **动态主题** — `theme.json` 单源色板，CSS 变量驱动的明暗主题切换
 - 📊 **ECharts** — 图表组件支持
-- 🔌 **请求封装** — 基于 `lime-request`，支持多域名、Token 自动续期、SSE 流式传输
+- 🔌 **请求封装** — `src/http` 业务层统一出口，支持多域名实例、Token 自动注入与 401 静默刷新重放
+- 🧠 **request-bestX 请求与状态机引擎** — 纯原生 `uni.request` 驱动的独立 `uni_modules`：Axios 风格拦截器、GET 并发去重、TTL 缓存、断网重连自动刷新，以及对标 TanStack Vue Query 的 `useQuery` / `useMutation` / `QueryClient` 与 SSE 增量 UTF-8 流式解码
 - 🧬 **OpenAPI / Apifox 强类型生成** — 基于 `openapi-ts-request` 与智能逆向推导，`pnpm api:gen` 一键生成 UTS 强类型接口与完整数据模型，告别手写胶水代码
 - 🔐 **敏感凭证隔离** — 支持 `.env.local` 独立保护 DCloud AppID、uniCloud 密钥、小程序 AppID 与鸿蒙证书密码，配合 `pnpm manifest` 零泄露同步构建
 - 📤 **文件上传** — 基于原生 `uni.uploadFile` 统一封装，支持 OSS 上传与进度回调
@@ -330,7 +332,7 @@ pnpm docs:dev       # 本地启动 VitePress 文档站
 - 🧪 **完整单元测试体系** — 内置 **Vitest + @vue/test-utils + happy-dom**，原生支持 UTS 核心工具类、自定义构建插件与 `.uvue` 页面组件挂载测试，单测 100% 覆盖核心逻辑
 - 📊 **产物体积可视化分析** — 整合 **rollup-plugin-visualizer**，`pnpm analyze` 一键生成交互式 Treemap 产物分析报告，支持 Gzip / Brotli 压缩体积真实对比
 - 🛡️ **严格类型检查 (TypeCheck)** — `pnpm typecheck` 一键运行 `tsc --noEmit -p tsconfig.typecheck.json`（作用域限定 `src/`），0 报错门禁，杜绝类型隐式推导退化
-- 🤖 **AI 原生开发模板** — 内置 `unibestX-skill`（1 入口 + 8 分册），AI Agent 克隆即可按项目规范写代码；运行时自带 AI 对话页与 SSE 流式传输
+- 🤖 **AI 原生开发模板** — 内置 `unibestX-skill`（1 入口 + 9 分册），AI Agent 克隆即可按项目规范写代码；运行时自带 AI 对话页与 SSE 流式传输
 - 🔍 **工程化代码规范、Git 拦截与 CI 流水线** — 深度整合 **ESLint**（内置针对 UTS 强类型与 UVUE 模板的自定义规则）、**Stylelint**（针对 SCSS、uni-app 特有单位与标签适配）、**Husky**、**lint-staged**、**Commitlint** 以及 **GitHub Actions CI**，把跨端隐患拦截在本地提交与代码合并前
 - 🧰 **官方脚手架** — `pnpm create unibestx` 一键创建项目：UI 库三选一、功能与 12 个演示分包按需裁剪，生成后自动跑四查自检
 
@@ -353,20 +355,19 @@ pnpm docs:dev       # 本地启动 VitePress 文档站
 
 ### 1. `unibestX-skill` — 项目专属 uni-app X / UTS 规范库
 
-这是与项目强绑定的核心技能，也是仓库中**唯一保留的技能**，采用 **「1 个入口 + 9 个分册」** 结构，把 UTS 强类型约束、跨端样式限制与本项目的生产级写法沉淀成可被 AI 直接检索的知识库。
+这是与项目强绑定的核心技能，也是仓库中**唯一保留的技能**，采用 **「1 个入口 + 8 个分册」** 结构，把 UTS 强类型约束、跨端样式限制与本项目的生产级写法沉淀成可被 AI 直接检索的知识库。
 
 | 分册 | 内容 |
 | :--- | :--- |
-| `SKILL.md`（入口，常驻） | 概述 + 分册导航 + A.1 快速对照表 + A.2 红线清单 |
-| `1-uts-syntax.md` | UTS 强类型系统与语法核心铁律（`UTS110111163` 等报错成因） |
-| `2-styling.md` | CSS & Tailwind 样式引擎与原生渲染限制 |
-| `3-runtime.md` | 跨端运行时与 VDOM / Vapor 渲染模式约束 |
-| `4-examples.md` | 5 个项目内生产级标杆案例（页面骨架、TabBar、二级详情页、滚动与下拉刷新） |
-| `5-codegen.md` | 代码生成流程与标准页面模板 |
-| `6-page-component-spec.md` | AI 页面层级与组件设计规范（页面高内聚、三级防过度拆分、容器与纯展示解耦、Mock 接口契约化） |
-| `7-api-spec.md` | API 接口层规范（一页一目录、契约类型用 `type`、Mock 数据集与接口函数同层、后端就绪只换函数体） |
-| `8-utils-spec.md` | 项目核心工具库使用规范（系统信息 `src/utils/systemInfo`、环境变量 `src/utils/env`、通用工具优先原则） |
-| `9-router-spec.md` | 路由导航规范（跳转一律 `useRouter()`、路由信息一律 `useRoute()`、禁止原生导航 API、门面精准导入） |
+| `SKILL.md`（入口，常驻） | 任务目标 + 输出规范 + 操作步骤 + 交互流程 + 分册导航 + 注意事项 + 使用示例 + A.1 对照表 + A.2 红线清单 |
+| `1-uts-syntax.md` | UTS 强类型与语法手册（类型声明/导入、报错索引、完整示例、坑点） |
+| `2-styling.md` | 样式与原生渲染手册（能力矩阵、完整页面、坑点） |
+| `3-runtime.md` | 跨端运行时手册（渲染模式、平台分流、真机报错、编译验证） |
+| `4-page-component.md` | 页面与组件手册（骨架 + `definePage` + 标准业务页 + 组件写法 + 流程与交付） |
+| `5-page-structure.md` | 页面结构编排标准（分层结构、目录拓扑、组件放哪、拆几层、数据归属） |
+| `6-api-spec.md` | API 接口层规范（一页一目录、契约类型用 `type`、Mock 数据集与接口函数同层、后端就绪只换函数体） |
+| `7-utils-spec.md` | 项目核心工具库使用规范（系统信息 `src/utils/systemInfo`、环境变量 `src/config/env`、主题 `src/theme`、通用工具优先原则） |
+| `8-router-spec.md` | 路由导航规范（跳转一律 `useRouter()`、路由信息一律 `useRoute()`、禁止原生导航 API、门面精准导入） |
 
 **工作机制**：入口文件只常驻导航与红线清单，AI 命中条目后**必须继续读取对应分册**核对完整正反例才允许改代码。
 
@@ -388,7 +389,7 @@ pnpm docs:dev       # 本地启动 VitePress 文档站
 | :--- | :--- |
 | [CLAUDE.md](CLAUDE.md) | Claude Code 会话级规约（技能路由、内置工具优先复用、基础设施按既有配置走） |
 | [AGENTS.md](AGENTS.md) | 通用 AI Agent 规约（Codex 等） |
-| [.agents/rules/uniappx.md](.agents/rules/uniappx.md) | uni-app X 开发规范，编写 `.uvue` / `.uts` / `.ts` / `.scss` 前必读 |
+| [.agents/rules/](.agents/rules/) | 项目规则（按触发方式分层）：`base-lines`（Always On）· `api-standard` / `page-standard` / `router-standard`（Glob）· `naming-standard` / `commit-rule`（Model Decision）；用法与模板见 [unibestX-skill](.agents/skills/unibestX-skill/SKILL.md) |
 
 > 📌 **单物理源规范架构**：项目采用 **`.agents/` 作为唯一的规范与技能物理源目录**，`.trae` 与 `.claude` 均通过相对符号链接（Symlink：`../../.agents/...`）实现无感映射，彻底消除多副本维护成本与 Git 提交冲突。无论是 Claude Code、Trae、Cursor 还是 Antigravity，均自动读取同一份最新规范，日常开发与升级时只需维护 `.agents/` 目录。
 
@@ -397,7 +398,7 @@ pnpm docs:dev       # 本地启动 VitePress 文档站
 模板同时预置了 AI 应用所需的运行时能力，可直接作为 AI 类 App 的起点：
 
 - **AI 对话页** — `src/pages/ai/`（含 TabBar 中间鼓包按钮入口 `AiView`）
-- **跨端流式传输** — [src/http/stream.uts](src/http/stream.uts) 提供 SSE / Chunk 流式请求；[src/utils/rxjs-lite/](src/utils/rxjs-lite/) 提供轻量流式算子，配套 `src/sub/rxjsFunctionDemo` 流式演示页
+- **跨端流式传输** — [uni_modules/request-bestX/](uni_modules/request-bestX/) 的 `requestStream` / `Utf8StreamDecoder` 提供 SSE / Chunk 流式请求与增量解码，`src/sub/rxjsFunctionDemo` 结合 [uni_modules/rxjs-bestX/](uni_modules/rxjs-bestX/) 的流式算子演示打字机效果
 - **Markdown 渲染** — 内置 `mp-html` 与 `kux-marked`，支持 Markdown 排版与代码块展示
 - **流式接口配置** — 通过 `.env` 的 `VITE_STREAM_URL` 指定（留空时演示页自动使用本地模拟流）
 
@@ -435,159 +436,172 @@ pnpm docs:dev       # 本地启动 VitePress 文档站
 
 ```text
 unibestX/
-├── plugins/                      # Vite 构建插件
-│   ├── vite-plugin-uni-pages.ts  #   自动文件路由插件（生成 pages.json / definePage 支持）
-│   ├── uni-layouts-plugin.ts     #   跨端 Layout 布局插件（default / empty / navbar）
-│   ├── vite-plugin-tabbar-views.ts # 单页 TabBar 脚手架与视图自动生成插件
-│   ├── vite-plugin-clean-logger.ts # 过滤编译期控制台噪音日志
-│   └── root-plugin.ts            #   自动包裹 App.ku.uvue 全局根骨架组件
-├── scripts/                      # 构建与环境切换脚本
-│   ├── build-h5.mjs              #   H5 打包（调用 HBuilderX cli publish）
-│   ├── switch-env.mjs            #   env:test / env:prod 环境切换
-│   ├── check-tabbar-surface.mjs  #   TabBar 接口面校验
-│   └── router-guard-test/        #   路由守卫决策矩阵测试（node 直跑，无需测试框架）
-├── tests/                        # 自动化测试目录（Vitest）
-│   ├── setup.ts                  #   测试全局初始化（uni 跨端 API 桩与 Vue 运行时注入）
-│   └── unit/                     #   单元测试套件
-│       ├── components/           #     NavBar 等 UVue 组件挂载与交互断言
-│       ├── utils/                #     route、rxjs-lite 等核心工具库单测
-│       └── plugins/              #     ESLint 专属规则与 clean-logger 插件单测
-├── .github/                      # GitHub 自动化工作流
-│   └── workflows/ci.yml          #   CI 流水线（Lint / Style / DTS / TypeCheck / Test）
-├── .husky/                       # Git 提交钩子（pre-commit / commit-msg）
-├── .commitlintrc.cjs             # Commitlint 提交信息规范配置
-├── stylelint.config.mjs          # Stylelint 样式规范配置（支持 SCSS / UVUE）
-├── eslint.config.mjs             # ESLint 扁平化配置（含 UTS 专属规则插件）
-├── vitest.config.ts              # Vitest 配置文件（UVue 预转译与组件测试支持）
-├── docker/                       # H5 容器化部署配置（构建上下文仍为仓库根目录）
-│   ├── Dockerfile                #   nginx:alpine 生产部署轻量容器
-│   ├── Dockerfile.dockerignore   #   构建上下文白名单（须与 Dockerfile 同目录同名前缀）
-│   └── docker-compose.yml        #   H5 容器编排服务（h5-test / h5-prod）
-├── deploy/                       # 生产与测试部署配置
-│   ├── nginx.conf                #   Nginx 动态反代与静态托管配置
-│   ├── .env.test                 #   测试环境 Docker 变量配置
-│   └── .env.prod                 #   生产环境 Docker 变量配置
-├── docs/                         # VitePress 文档站源码（guide/ 下为各专题）
-├── .agents/                      # AI 规范与技能中心（唯一物理源）
-│   ├── skills/unibestX-skill/    #   核心知识库（1 入口 + 8 分册）
-│   └── rules/uniappx.md          #   uni-app X 开发规范（编写 .uvue/.uts 前必读）
-├── .claude/                      # Claude Code 目录（符号链接自动同步自 .agents）
-├── .trae/                        # Trae IDE 目录（符号链接自动同步自 .agents）
-├── CLAUDE.md / AGENTS.md         # AI Agent 会话级规约（技能路由、内置工具优先复用等）
+├── plugins/                             # Vite 构建插件
+│   ├── vite-plugin-uni-pages.ts         #   自动文件路由（pages.json / pages.config.json 双向同步）
+│   ├── vite-plugin-uni-pages-sandbox.ts #   沙盒独立调试（VITE_DEV_SANDBOX / definePage.debug）
+│   ├── vite-plugin-uni-pages-tabbar.ts  #   TabBar 策略与 pages.json tabBar 节点生成
+│   ├── vite-plugin-uni-pages-route-meta.ts # 生成 src/router/generated/page-meta.uts
+│   ├── pages-json-util.ts               #   pages.json 读写与平台分支工具
+│   ├── uni-layouts-plugin.ts            #   跨端 Layout 布局插件（default / empty / navbar）
+│   ├── vite-plugin-tabbar-views.ts      #   单页 TabBar 脚手架与视图自动生成
+│   ├── root-plugin.ts                   #   自动包裹 src/AppRoot.uvue 全局根骨架
+│   ├── vite-plugin-clean-logger.ts      #   过滤编译期控制台噪音日志
+│   ├── vite-plugin-editor-version.ts    #   IDE / HBuilderX 版本提示
+│   └── vite-plugin-h5-optimize-deps.ts  #   H5 依赖预构建与 warmup 优化
+├── eslint/
+│   └── eslint-plugin-uts.mjs            # UTS 专属 ESLint 规则插件（type / 颜色 / 模板红线）
+├── scripts/                             # 构建、环境与质量脚本
+│   ├── build-h5.mjs                     #   H5 打包（调用 HBuilderX cli publish）
+│   ├── dev-warmup.mjs / dev-mp.mjs      #   开发启动预热与小程序编译
+│   ├── switch-env.mjs                   #   env:test / env:prod 环境切换
+│   ├── sync-hbuilderx.mjs               #   HBuilderX 版本 / 插件路径同步
+│   ├── generate-manifest.mjs            #   manifest.config.ts → manifest.json
+│   ├── api-generate.mjs                 #   OpenAPI / Apifox → UTS 强类型接口
+│   ├── check-bundle-size.mjs            #   小程序包体积预算门禁
+│   ├── check-tabbar-surface.mjs         #   TabBar 接口面校验
+│   ├── doctor.mjs                       #   项目健康检查（pnpm health）
+│   ├── release.mjs                      #   交互式版本发布
+│   └── router-guard-test/               #   路由守卫决策矩阵测试（node 直跑，无需测试框架）
+├── tests/                               # 自动化测试目录（Vitest）
+│   ├── setup.ts                         #   全局初始化（uni 跨端 API 桩与 Vue 运行时注入）
+│   └── unit/                            #   单元测试套件
+│       ├── api/                         #     http / stream / useQuery 等网络层
+│       ├── components/                  #     NavBar、TabBar 生命周期等 UVue 组件
+│       ├── mock/                        #     Mock 服务
+│       ├── modules/                     #     bignumber、rxjs-bestX 等生态模块
+│       ├── plugins/                     #     构建插件与 UTS ESLint 规则
+│       ├── router/                      #     route-bestX、路由守卫与 hooks
+│       └── utils/                       #     核心工具库
+├── .github/                             # GitHub 自动化工作流
+│   └── workflows/ci.yml                 #   CI 流水线（Lint / Style / TypeCheck / Test）
+├── .husky/                              # Git 提交钩子（pre-commit / commit-msg）
+├── .commitlintrc.cjs                    # Commitlint 提交信息规范配置
+├── stylelint.config.mjs                 # Stylelint 样式规范配置（支持 SCSS / UVUE）
+├── eslint.config.mjs                    # ESLint 扁平化配置（含 UTS 专属规则插件）
+├── vitest.config.ts                     # Vitest 配置文件（UVue 预转译与组件测试支持）
+├── docker/                              # H5 容器化部署配置（构建上下文仍为仓库根目录）
+│   ├── Dockerfile                       #   nginx:alpine 生产部署轻量容器
+│   ├── Dockerfile.dockerignore          #   构建上下文白名单（须与 Dockerfile 同目录同名前缀）
+│   └── docker-compose.yml               #   H5 容器编排服务（h5-test / h5-prod）
+├── deploy/                              # 生产与测试部署配置
+│   ├── nginx.conf                       #   Nginx 动态反代与静态托管配置
+│   ├── .env.test                        #   测试环境 Docker 变量配置
+│   └── .env.prod                        #   生产环境 Docker 变量配置
+├── docs/                                # VitePress 文档站源码（guide/ 下为各专题）
+├── .agents/                             # AI 规范与技能中心（唯一物理源）
+│   ├── skills/unibestX-skill/           #   核心知识库（1 入口 + 9 分册）
+│   └── rules/                           #   项目规则：base-lines（Always On）+ api/page/router（Glob）+ naming/commit（Model Decision）
+├── .claude/                             # Claude Code 目录（符号链接自动同步自 .agents）
+├── .trae/                               # Trae IDE 目录（符号链接自动同步自 .agents）
+├── CLAUDE.md / AGENTS.md                # AI Agent 会话级规约（技能路由、内置工具优先复用等）
 ├── src/
-│   ├── api/                      # API 请求模块（foo.uts / user.uts / auth.uts 等）
-│   │   └── generated/            #   ⭐ OpenAPI / Apifox 自动生成的强类型 UTS 接口与类型定义
-│   ├── assets/                   # 静态资源（图标、图片等）
-│   ├── components/               # 公共业务组件
-│   │   ├── NavBar/               #   自定义通用导航栏组件
-│   │   ├── NestedScroll/         #   自研嵌套滚动组件
-│   │   └── TabbarMaskModal/      #   TabBar 遮罩弹层
-│   ├── http/                     # HTTP 客户端封装（基于 lime-request）
-│   │   ├── request.uts           #   HttpClient 核心类与拦截器
-│   │   ├── openapi.uts           #   ⭐ OpenAPI 代码生成专属 UTS 强类型适配器
-│   │   ├── stream.uts            #   SSE / Chunk 流式请求封装
-│   │   ├── types.uts             #   HTTP 响应与请求类型定义
-│   │   └── tools/enum.uts        #   HTTP 状态码与业务枚举
-│   ├── i18n/                     # 国际化多语言
-│   │   ├── index.uts             #   i18n 实例与响应式切换
-│   │   └── locales/              #   中英文语言包（zh-Hans / en）
-│   ├── layouts/                  # 页面布局模板与控制器
-│   │   ├── default.uvue          #   默认页面布局
-│   │   ├── empty.uvue            #   空白全屏布局
-│   │   └── navbar.uvue           #   自定义导航栏布局（需配 navigationStyle: 'custom'）
-│   ├── pages/                    # 主包页面（TabBar 页面）
-│   │   ├── index/                #   首页（概览、常用入口）
-│   │   ├── basic/                #   基础组件与工具演示
-│   │   ├── function/             #   原生能力展示（设备、系统信息、扫码等）
-│   │   ├── ai/                   #   AI 助手对话演示
-│   │   └── me/                   #   个人中心与系统设置
-│   ├── router/                   # 路由守卫与导航控制（模块化架构）
-│   │   ├── config/               #   页面登录白名单 / 黑名单策略
-│   │   ├── guard/                #   业务路由规则（登录等，一条规则一个文件）
-│   │   ├── hooks/                #   useRoute / useRouter 组合式 hooks
-│   │   ├── interceptor/          #   全局路由跳转拦截守卫
-│   │   ├── toLoginPage/          #   登录页重定向防抖控制
-│   │   ├── utils/                #   路径规范化与 URL 解析工具
-│   │   └── index.uts             #   统一门面入口
-│   ├── store/                    # 状态管理（双模式自适应）
-│   │   ├── index.uts             #   门面：按平台条件编译路由到 vapor / vdom
-│   │   ├── types.uts             #   共享类型（与平台无关，恒定向外转发）
-│   │   ├── vapor/                #   官方 Pinia 实现（App Vapor / H5 / Web / 小程序）
-│   │   │   ├── index.ts          #     Pinia 实例 + pinia-plugin-persistedstate
-│   │   │   ├── app.ts            #     应用全局状态（主题、语言等）
-│   │   │   ├── token.ts          #     Token 鉴权状态（单 / 双 Token 自动续期）
-│   │   │   └── user.ts           #     当前登录用户信息
-│   │   └── vdom/                 #   x-pinia-s 实现（App VDOM 原生端）
-│   │       ├── index.uts         #     Pinia 实例（UTS 强类型版）
-│   │       ├── app.uts / token.uts / user.uts
-│   │       └── ...
-│   ├── style/                    # 全局样式（Tailwind、变量等）
-│   ├── sub/                      # 应用分包页面（按需加载）
-│   │   ├── auth/                 #   ⭐【基础常驻】登录、注册、找回密码
-│   │   ├── privacy/              #   ⭐【基础常驻】服务条款与隐私政策详情
-│   │   ├── webview/              #   ⭐【基础常驻】通用内置 Webview 网页容器
-│   │   ├── *BasicDemo/           #   💡【演示 Demo】基础能力演练分包（如 httpBasicDemo 等）
-│   │   └── *FunctionDemo/        #   💡【演示 Demo】原生与功能演练分包（如 zpagingFunctionDemo 等）
-│   ├── tabbar/                   # 底部 TabBar 体系
-│   │   ├── internal/             #   模块内部实现（不对消费者暴露，请走 index.uts 门面）
-│   │   │   ├── strategy.uts      #     策略枚举与模式判定
-│   │   │   ├── metrics.uts       #     尺寸常量与视口 / 主题计算
-│   │   │   ├── state.uts         #     列表与激活状态、路径匹配、激活订阅
-│   │   │   ├── navigate.uts      #     跳转行为与原生中间按钮监听
-│   │   │   └── native.uts        #     平台桥接（隐藏原生 tabbar）
-│   │   ├── ui/                   #   TabBar 视图层
-│   │   │   ├── capsule/          #     悬浮胶囊风格
-│   │   │   ├── default/          #     标准贴底风格（含 midButton 鼓包）
-│   │   │   └── template.uvue     #     TabBar 视图模板
-│   │   ├── components/           #   容器与调度组件（TabViews、TabContent）
-│   │   ├── tabbar.uvue           #   TabBar 入口组件
-│   │   ├── index.uts             #   模块唯一门面（单层 export *）
-│   │   ├── config.uts            #   TabBar 统一配置（支持 type 风格切换与 midButton）
-│   │   └── types.uts             #   TabBar 强类型定义
-│   ├── types/                    # 全局 TypeScript / UTS 类型定义
-│   │   └── uni.d.ts              #   definePage 宏、Vue 宏与全局 API 类型补全
-│   └── utils/                    # 全局工具函数（统一走 index.uts 导出的对象或纯函数）
-│       ├── env/                  #   环境变量读取（getApiBaseUrl / getTabBarMode 等）
-│       ├── systemInfo/           #   屏幕、安全区与系统信息
-│       ├── theme/                #   主题色与明暗模式工具
-│       ├── toast/                #   全局 Toast 轻提示（5 个轻量纯函数）
-│       ├── report/               #   数据埋点与异常监控上报（track / error）
-│       ├── i18n/                 #   多语言辅助工具（t / $t）
-│       ├── backPress/            #   Android 物理返回键双击退出
-│       └── rxjs-lite/            #   轻量流式处理工具
-├── uni_modules/                  # uni-app 扩展插件模块（精简收敛为 17 个核心插件）
-│   ├── z-paging-x/               #   深度优化适配的分页组件
-│   ├── route-bestX/              #   uni-app X 极简高性能跨端路由引擎（导航守卫/快照隔离）
-│   ├── bignumber-bestX/          #   全端高精度大数据运算库（十进制/四则运算/金融格式化）
-│   ├── crypto-bestX/             #   跨端加密解密库（AES/DES/RSA/MD5/SHA/HMAC/Base64/UUID）
-│   ├── x-pinia-s/                #   UTS 版 Pinia（VDOM 模式使用）
-│   ├── lime-request/             #   HTTP 请求核心库
-│   ├── lime-i18n/                #   国际化核心库
-│   ├── lime-signature/           #   手写签名板组件
-│   ├── e-chart/                  #   ECharts 图表适配组件
-│   └── ...                       #   其他核心支持库（lime-icon、mp-html、kux-marked、uni-icons 等）
-├── js_sdk/                       # JS / UTS SDK 资源
-├── App.ku.uvue                   # 全局根包裹组件（动态主题注入、全局 Toast 容器）
-├── main.uts                      # 应用主入口文件
-├── main.css                      # Tailwind 入口样式（含 iconify）
-├── theme.json                    # ⭐ 明暗主题色板唯一真源（light / dark）
-├── pages.config.json             # ⭐ 页面路由与全局配置（路由与页面配置请改这里）
-├── pages.json                    # ⚠️ 自动生成的页面路由表（编译产物，请勿手动编辑）
-├── openapi-ts-request.config.ts  # ⭐ OpenAPI / Apifox 接口代码生成器配置
-├── .env.local.example            # ⭐ 本地私有敏感变量示例模板（Token、AppID、证书密码等）
-├── scripts/
-│   ├── api-generate.mjs          #   OpenAPI 逆向推导与 UTS 代码生成脚本
-│   └── generate-manifest.mjs     #   manifest.json 一键同步编译脚本
-├── manifest.config.ts            # ⭐ 应用配置真源（多端 AppID、权限、vapor 开关等，请改这里）
-├── manifest.json                 # ⚠️ 由 manifest.config.ts 生成（勿手动编辑，改了会被覆盖）
-├── stylelint.config.mjs          # ⭐ Stylelint 样式规则（适配 SCSS、rpx/upx 与原生组件）
-├── .commitlintrc.cjs             # ⭐ Commitlint 提交信息规范配置（Angular 格式）
-├── cspell.json                   # ⭐ CSpell 专有词库拼写检查配置
-├── .husky/                       # ⭐ Git 提交拦截钩子（pre-commit / commit-msg）
-├── vite.config.ts                # Vite 构建配置（Tailwind 与 5 个自定义插件）
-├── uni.scss                      # 全局 SCSS 变量与主题注入
-├── tsconfig.json                 # TypeScript / UTS 编译配置（含 VSCode 全量诊断范围）
-└── tsconfig.typecheck.json       # pnpm typecheck 专用配置（仅纳入 src/）
+│   ├── api/                             # API 请求模块（auth / bigScreen / privacy / example.uts）
+│   │   └── generated/                   #   ⭐ OpenAPI / Apifox 自动生成的强类型 UTS 接口与类型定义
+│   ├── assets/                          # 静态资源（图标、图片等）
+│   ├── components/                      # 公共业务组件
+│   │   ├── NavBar/                      #   自定义通用导航栏组件
+│   │   ├── NestedScroll/                #   自研嵌套滚动组件
+│   │   └── TabbarMaskModal/             #   TabBar 遮罩弹层
+│   ├── config/                          # ⭐ 全局配置中心（唯一出口 index.uts）
+│   │   ├── env/                         #   环境变量读取（env.uts）与平台判定（platform.uts）
+│   │   └── privacy/                     #   隐私协议闸门与同意状态
+│   ├── hooks/                           # 应用级组合式 hook（页面生命周期封装）
+│   │   └── useBackPressExit.uts         #   再按一次退出应用（注册页面 onBackPress）
+│   ├── http/                            # 业务网络层（全项目唯一网络出口）
+│   │   ├── index.uts                    #   门面：导出 http / secondaryHttp 与业务错误、枚举
+│   │   ├── instances/                   #   多域名实例、Token 注入、401 静默刷新与重放
+│   │   └── error/                       #   错误归一（BusinessError / resolveErrorMessage）
+│   ├── i18n/                            # 国际化多语言
+│   │   ├── index.uts                    #   lime-i18n 实例与持久化恢复
+│   │   ├── locales/                     #   中英文语言包（zh-CN.json / en-US.json）
+│   │   └── utils/                       #   非 Vue 环境 t / $t / getI18nText 等辅助函数
+│   ├── layouts/                         # 页面布局模板与控制器
+│   │   ├── default/default.uvue         #   默认页面布局
+│   │   ├── empty/empty.uvue             #   空白全屏布局
+│   │   └── navbar/                      #   自定义导航栏布局（需配 navigationStyle: 'custom'）
+│   ├── pages/                           # 主包页面（TabBar 页面）
+│   │   ├── index/                       #   首页（概览、常用入口）
+│   │   ├── basic/                       #   基础组件与工具演示
+│   │   ├── function/                    #   原生能力展示（设备、系统信息、扫码等）
+│   │   ├── ai/                          #   AI 助手对话演示
+│   │   └── me/                          #   个人中心与系统设置
+│   ├── router/                          # 业务路由层（基于 route-bestX）
+│   │   ├── index.uts                    #   router 单例、useRoute / useRouter
+│   │   ├── config.uts                   #   登录页 / 注册页 / 受保护页面配置
+│   │   ├── guards/                      #   登录、维护、权限三条业务守卫
+│   │   └── generated/                   #   构建期生成的 page-meta.uts（useRoute().meta 数据源）
+│   ├── store/                           # 状态管理（双模式自适应）
+│   │   ├── index.uts                    #   门面：按平台条件编译路由到 vapor / vdom
+│   │   ├── types.uts                    #   跨模式共享类型唯一真源（与平台无关）
+│   │   ├── vapor/                       #   官方 Pinia 实现（App Vapor / H5 / Web / 小程序）
+│   │   │   ├── index.uts                #     Pinia 实例 + pinia-plugin-persistedstate
+│   │   │   ├── app.uts / i18n.uts / modal.uts
+│   │   │   └── theme.uts / token.uts / user.uts
+│   │   └── vdom/                        #   x-pinia-s 实现（未开蒸汽模式的 App 原生端）
+│   │       └── （与 vapor/ 同名一一对应，行为一致）
+│   ├── style/                           # 全局样式（变量、基础样式等）
+│   ├── sub/                             # 应用分包页面（按需加载）
+│   │   ├── auth/                        #   ⭐【基础常驻】登录、注册、找回密码
+│   │   ├── privacy/                     #   ⭐【基础常驻】服务条款与隐私政策详情
+│   │   ├── webview/                     #   ⭐【基础常驻】通用内置 Webview 网页容器
+│   │   ├── *BasicDemo/                  #   💡【演示 Demo】基础能力演练分包（如 httpBasicDemo 等）
+│   │   └── *FunctionDemo/               #   💡【演示 Demo】原生与功能演练分包（如 rxjsFunctionDemo 等）
+│   ├── tabbar/                          # 底部 TabBar 体系
+│   │   ├── internal/                    #   模块内部实现（不对消费者暴露，请走 index.uts 门面）
+│   │   │   ├── strategy.uts             #     策略枚举与模式判定
+│   │   │   ├── metrics.uts              #     尺寸常量与视口 / 主题计算
+│   │   │   ├── state.uts                #     列表与激活状态、路径匹配、激活订阅
+│   │   │   ├── navigate.uts             #     跳转行为与原生中间按钮监听
+│   │   │   └── native.uts               #     平台桥接（隐藏原生 tabbar）
+│   │   ├── ui/                          #   TabBar 视图层
+│   │   │   ├── capsule/                 #     悬浮胶囊风格
+│   │   │   ├── default/                 #     标准贴底风格（含 midButton 鼓包）
+│   │   │   └── template.uvue            #     TabBar 视图模板
+│   │   ├── components/                  #   容器与调度组件（TabViews、TabContent）
+│   │   ├── tabbar.uvue                  #   TabBar 入口组件
+│   │   ├── index.uts                    #   模块唯一门面（单层 export *）
+│   │   ├── config.uts                   #   TabBar 统一配置（支持 type 风格切换与 midButton）
+│   │   └── types.uts                    #   TabBar 强类型定义
+│   ├── theme/                           # 主题令牌、换肤与深浅色（唯一文件 index.uts）
+│   ├── types/                           # 全局 TypeScript / UTS 类型定义
+│   │   └── uni.d.ts                     #   definePage 宏、Vue 宏与全局 API 类型补全
+│   ├── utils/                           # 基础工具模块
+│   │   ├── auth/                        #   登录页常量与 toLoginPage（LOGIN_PAGE / REGISTER_PAGE）
+│   │   ├── report/                      #   数据埋点与异常监控上报（track / error）
+│   │   ├── systemInfo/                  #   屏幕、安全区与导航栏 / TabBar 尺寸
+│   │   └── toast/                       #   全局 Toast 轻提示（5 个轻量纯函数）
+│   └── AppRoot.uvue                     # 全局根骨架（主题注入、可用高度计算、自定义 TabBar）
+├── uni_modules/                         # uni-app X 扩展插件模块（21 个核心插件）
+│   ├── request-bestX/                   #   跨端 HTTP 请求与 TanStack Query 状态机引擎
+│   ├── z-paging-x/                      #   深度优化适配的分页组件
+│   ├── route-bestX/                     #   uni-app X 极简高性能跨端路由引擎（导航守卫/快照隔离）
+│   ├── bignumber-bestX/                 #   全端高精度大数据运算库（十进制/四则运算/金融格式化）
+│   ├── crypto-bestX/                    #   跨端加密解密库（AES/DES/RSA/MD5/SHA/HMAC/Base64/UUID）
+│   ├── rxjs-bestX/                      #   极简响应式流库（Observable / Subject / 常用操作符）
+│   ├── x-pinia-s/                       #   UTS 版 Pinia（VDOM 模式使用）
+│   ├── lime-i18n/                       #   国际化核心库
+│   ├── lime-signature/                  #   手写签名板组件
+│   ├── e-chart/                         #   ECharts 图表适配组件
+│   └── ...                              #   其他核心支持库（lime-icon、mp-html、kux-marked、uni-icons 等）
+├── App.uvue                             # 应用入口（主题 / i18n 初始化、隐私闸门、全局错误监听）
+├── main.uts                             # 应用主入口文件
+├── main.css                             # Tailwind 入口样式
+├── tailwind.config.js                   # ⭐ Tailwind CSS 配置
+├── theme.json                           # ⭐ 明暗主题色板唯一真源（light / dark）
+├── pages.config.json                    # ⭐ 页面路由与全局配置（路由与页面配置请改这里）
+├── pages.json                           # ⚠️ 自动生成的页面路由表（编译产物，请勿手动编辑）
+├── openapi-ts-request.config.ts         # ⭐ OpenAPI / Apifox 接口代码生成器配置
+├── .env.local.example                   # ⭐ 本地私有敏感变量示例模板（Token、AppID、证书密码等）
+├── manifest.config.ts                   # ⭐ 应用配置真源（多端 AppID、权限、vapor 开关等，请改这里）
+├── manifest.json                        # ⚠️ 由 manifest.config.ts 生成（勿手动编辑，改了会被覆盖）
+├── stylelint.config.mjs                 # ⭐ Stylelint 样式规则（适配 SCSS、rpx/upx 与原生组件）
+├── .commitlintrc.cjs                    # ⭐ Commitlint 提交信息规范配置（Angular 格式）
+├── cspell.json                          # ⭐ CSpell 专有词库拼写检查配置
+├── .husky/                              # ⭐ Git 提交拦截钩子（pre-commit / commit-msg）
+├── vite.config.ts                       # Vite 构建配置（自定义插件、多端与产物分析）
+├── uni.scss                             # 全局 SCSS 变量与主题注入
+├── tsconfig.json                        # TypeScript / UTS 编译配置（含 VSCode 全量诊断范围）
+└── tsconfig.typecheck.json              # pnpm typecheck 专用配置（仅纳入 src/）
 ```
 
 > [!WARNING]
@@ -597,32 +611,35 @@ unibestX/
 
 ## 🧩 核心功能说明
 
-### 内置工具库（`src/utils` 与核心模块）
+### 内置工具库与配置中心
 
 > [!IMPORTANT]
-> **动手实现任何通用能力之前，先查这里。** 系统内已有开箱即用的工具模块，覆盖取路由与路径、取主题色、读环境变量、多语言文案、提示弹窗、返回键接管、下拉刷新与导航栏控制、系统与安全区尺寸、流式处理。
-> **严禁重复造轮子** —— 例如自己写 `uni.getSystemInfoSync()`、裸写 `setInterval` 做防抖、直接读 `import.meta.env.VITE_XXX`。
+> **动手实现任何通用能力之前，先查这里。** 系统内已有开箱即用的工具模块：环境变量与平台判定、系统与安全区尺寸、主题色与深浅色、多语言文案、提示弹窗、返回键接管、下拉刷新与导航栏控制、错误上报、路由与流式处理。
+> **严禁重复造轮子** —— 例如自己写 `uni.getSystemInfoSync()`、裸读 `import.meta.env.VITE_XXX`、直接调用 `uni.request`。
 
 **导入约定**（`@` 指向项目根，且 `.uts` 后缀**必须保留**，否则会丢类型补全并报 `TS2307`）：
 
 ```uts
 import { toast, toastSuccess } from '@/src/utils/toast/index.uts';
-import { getApiBaseUrl, isVaporMode } from '@/src/utils/env/index.uts';
+import { getApiBaseUrl, isVaporMode } from '@/src/config/env/env.uts';
 import { sys } from '@/src/utils/systemInfo/index.uts';
+import { useQuery } from '@/uni_modules/request-bestX/index.uts';
 ```
 
 | 模块 | 用途 | 主要 API / 纯函数 |
 | :--- | :--- | :--- |
-| `env/` | 环境变量统一读取（禁止裸读 `import.meta.env`） | `getApiBaseUrl()` `getApiSecondaryUrl()` `getAppTitle()` `getAppVersion()` `getTabBarMode()` `getCurrentEnv()` `getCurrentEnvName()` `isDev()` `isTest()` `isProd()` `isVaporMode()` `getStreamUrl()` `getOssUploadUrl()`；实例 `env` |
-| `systemInfo/` | 屏幕尺寸、安全区、导航栏 / TabBar 高度（响应式 `computed`） | `windowWidth` `windowHeight` `screenWidth` `screenHeight` `statusBarHeight` `navBarHeight` `tabBarHeight` `safeAreaBottom` `availableHeight` `menuRect` `updateSystemInfo()` `getScrollHeight()`；实例 `sys` |
-| `theme/` | 主题色与明暗模式：读取、应用、监听 | `themeColor` `isDarkMode(mode)` `getThemeTokens(isDark)` `getRootThemeStyle()` `applyThemeColor(color)` `applyThemeMode(mode, isDark)` `applyNavbarTheme(isDark)` `watchThemeChange(cb)`；实例 `theme` |
-| `toast/` | 全局轻提示与 Loading（极简去油 5 个纯函数） | `toast(title)` `toastSuccess(title)` `toastError(title)` `showLoading(title?, mask?)` `hideLoading()` |
-| `report/` | 数据埋点上报与全局异常监控（合并整合） | `track(event, params?)` `reportError(error, context?)` `createBreadcrumb(category, message)`；实例 `tracker` `errorReporter` |
-| `i18n/` | 非 Vue 环境下的多语言文案与导航栏 / TabBar 文案设置 | `t(key, named)` `$t(key, named)` `getI18nText(key)` `setTabbarItem()` `setNavigationBarTitle(key)`；实例 `i18nUtils` |
-| `backPress/` | Android 物理返回键双击退出 | `handleBackPressExit(): boolean` |
-| `rxjs-lite/` | 轻量流式处理（不依赖 RxJS 全量包） | `Observable` `Subject` `Subscription`；创建 `fromArray` `interval` `timer` `throwError`；算子 `map` `scan` `filter` `toArray` `distinctUntilChanged` `debounceTime` `throttleTime` `take` `takeUntil` `tap` `startWith` `catchError` `finalize` `unsubscribeAll` |
-| `layouts/navbar/utils/` | 下拉刷新、滚动到底与导航栏联动的跨端控制器 | `onNavbarPageScroll(cb)` `onNavbarReachBottom(cb)` `onNavbarPullDownRefresh(cb)` `stopNavbarPullDownRefresh()` `setNavbarTitle(t)` `setNavbarVisible(v)` `setHideNavbar(h)` `setHideStatusBar(h)` |
-| `router/` | 路由守卫、URL 参数解析、路径规范化与登录拦截 | `cleanPath(path)` `getCurrentPath()` `getCurrentRoute()` `isSamePath(a, b)` `parseUrlToObj(url)` `toLoginPage()` `LOGIN_PAGE`；实例 `route` |
+| `src/config/` | 环境变量、平台判定与隐私配置（唯一出口 `index.uts`） | `getApiBaseUrl()` `getApiSecondaryUrl()` `getGatewayBaseUrl()` `getAuthBaseUrl()` `getAppTitle()` `getAppVersion()` `getTabBarMode()` `getDefaultTheme()` `getDefaultLocale()` `getCurrentEnv()` `isDev()` `isTest()` `isProd()` `isVaporMode()` `getStreamUrl()` `getOssUploadUrl()`；平台常量 `isH5` `isApp` `isAppAndroid` `isAppIOS` `isAppHarmony` `isMp` `isAppXVapor`；隐私 `runPrivacyGate()` `hasPrivacyAgreed()`；实例 `env` |
+| `src/utils/systemInfo/` | 屏幕尺寸、安全区、导航栏 / TabBar 高度（响应式 `computed`） | `windowWidth` `windowHeight` `screenWidth` `screenHeight` `statusBarHeight` `navBarHeight` `tabBarHeight` `safeAreaBottom` `availableHeight` `menuRect` `updateSystemInfo()` `getScrollHeight()` `updateAvailableHeight()`；实例 `sys` |
+| `src/utils/toast/` | 全局轻提示与 Loading（极简去油 5 个纯函数） | `toast(title)` `toastSuccess(title)` `toastError(title)` `showLoading(title?, mask?)` `hideLoading()` |
+| `src/utils/report/` | 数据埋点上报与全局异常监控 | `track(event, propsJson?)` `trackPageView(page?)` `trackClick(name)` `reportError(err, extraMessage?)` `reportErrorMessage(message)` |
+| `src/utils/auth/` | 登录页常量与未登录跳转 | `LOGIN_PAGE` `REGISTER_PAGE` `toLoginPage(options?)` |
+| `src/theme/` | 主题色与明暗模式：令牌读取、应用、监听 | `themeColor` `isDarkMode(mode, systemTheme?)` `getThemeTokens(isDark)` `getRootThemeStyle(color, isDark)` `applyThemeColor(color)` `applyThemeMode(mode, isDark)` `applyNavbarTheme(isDark)` `watchThemeChange(cb)`；实例 `theme` |
+| `src/i18n/` + `src/i18n/utils/` | 多语言实例与非 Vue 环境文案工具 | `i18n`（默认导出）；`t(key, named?)` `$t(key, named?)` `getI18nText(key)` `setNavigationBarTitle(key)`；实例 `i18nUtils` |
+| `src/hooks/` | 应用级组合式 hook（页面生命周期封装） | `useBackPressExit(duration?)`（注册「再按一次退出应用」） |
+| `request-bestX/`（`uni_modules/`） | 跨端 HTTP 请求与声明式状态机 | `createHttpClient` `HttpClient` `HttpError`；`useQuery` `useMutation` `useQueryClient` `QueryClient` `onlineManager` `VueQueryPlugin`；流式 `requestStream` `requestStreamSimple` `simulateStream` `Utf8StreamDecoder` |
+| `rxjs-bestX/`（`uni_modules/`） | 轻量流式处理（不依赖 RxJS 全量包） | `Observable` `Subject` `Subscription`；创建 `fromArray` `interval` `timer` `throwError`；算子 `map` `scan` `filter` `toArray` `distinctUntilChanged` `debounceTime` `throttleTime` `take` `takeUntil` `tap` `startWith` `catchError` `finalize` `unsubscribeAll` |
+| `src/layouts/navbar/utils/` | 下拉刷新、滚动到底与导航栏联动的跨端控制器 | `onNavbarPageScroll(cb)` `onNavbarReachBottom(cb)` `onNavbarPullDownRefresh(cb)` `stopNavbarPullDownRefresh()` `setNavbarTitle(t)` `setNavbarVisible(v)` `setHideNavbar(h)` `setHideStatusBar(h)` |
+| `src/router/` | 路由守卫、URL 参数解析、路径规范化与登录拦截（基于 `route-bestX`） | `useRoute()` `useRouter()` `router`；底层工具 `cleanPath(path)` `parseUrlToObj(url)` `isSamePath(a, b)`；登录跳转 `toLoginPage()` / `LOGIN_PAGE` |
 
 ### 环境变量配置（`.env`）
 
@@ -636,9 +653,12 @@ import { sys } from '@/src/utils/systemInfo/index.uts';
 | `VITE_APP_VERSION` | `1.0.0` | 业务应用版本号（真源：根目录 `.env`） |
 | `VITE_TEMPLATE_VERSION` | `1.0.0` | 模板工程版本号（真源：根目录 `package.json`，构建期自动注入） |
 | `VITE_TABBAR_MODE` | `4` | TabBar 运行策略，`0`～`4`，详见[底部 TabBar 体系](#底部-tabbar-体系) |
-| `VITE_DEFAULT_THEME` | `#37c2bc` | 默认主题主色调（十六进制色值） |
+| `VITE_DEFAULT_THEME` | `"#37c2bc"` | 默认主题主色调（十六进制色值）。**值以 `#` 开头时必须用双引号包裹**，否则 dotenv 会把 `#` 之后当成行内注释，实际读到空串 |
+| `VITE_DEFAULT_THEME_MODE` | `auto` | 默认外观模式：`auto`（跟随系统）/ `light` / `dark` |
 | `VITE_DEFAULT_LOCALE` | `zh-CN` | 默认语言（`zh-CN` / `en-US`） |
 | `VITE_H5_USE_PROXY` | `false` | H5 是否走反向代理，**仅 H5 生效**；`true` 请求 `/api`，`false` 直连完整域名 |
+| `VITE_USE_MOCK` | `false` | 是否启用本地 Vite Mock 服务（`pnpm dev:mock` 会临时开启） |
+| `VITE_SHOW_VCONSOLE` | `true` | H5 移动端 vConsole 调试面板（生产默认关闭，`pnpm dev:vconsole` 可开启） |
 | `VITE_STREAM_URL` | `/stream/chat` | 流式演示接口，须支持 chunked / SSE；留空时演示页自动使用本地模拟流 |
 | `VITE_DEV_SANDBOX` | `false` | 沙盒独立调试开关，详见[沙盒独立调试模式](#沙盒独立调试模式-page-sandbox) |
 | `VITE_DEV_SANDBOX_PAGES` | — | 沙盒目标页面，支持单个 / 逗号分隔多个 / `目录/*` 通配 |
@@ -651,6 +671,8 @@ import { sys } from '@/src/utils/systemInfo/index.uts';
 | `VITE_ENV_NAME` | 环境中文名（`EnvCard` 等界面组件展示用） |
 | `VITE_SERVER_BASEURL` | 接口主域名（**完整域名**）。H5 直连、App、小程序均读取此值 |
 | `VITE_SERVER_BASEURL_SECONDARY` | 备用 / 第二接口域名，配合多域名请求使用 |
+| `VITE_GATEWAY_BASEURL` | 网关 / 微服务域名（可选，未配置时自动回退主域名） |
+| `VITE_AUTH_BASEURL` | 认证微服务域名（可选，未配置时自动回退主域名） |
 | `VITE_UPLOAD_BASEURL` | 上传接口基础域名，详见[文件上传](#文件上传) |
 | `VITE_UPLOAD_PATH` | 上传接口路由路径 |
 
@@ -662,9 +684,9 @@ pnpm env:prod    # 删除 .env.production.local → 恢复生产环境
 ```
 
 - 四个 env 文件**本身不会被脚本改写**，`env:test` 通过生成 `.env.production.local`（Vite 生产模式优先加载）覆盖生效。
-- **取值一律走 `src/utils/env/index.uts`**（如 `getApiBaseUrl()`），不要直接读 `import.meta.env.VITE_XXX` —— 模块内含兜底默认值与类型转换。
-- **App / 小程序固定直连完整域名**，不受 `VITE_H5_USE_PROXY` 影响。该平台分支下若 `VITE_SERVER_BASEURL` 误配成 `/api` 这类相对路径，[src/http/request.uts](src/http/request.uts) 会在编译期自动回退为默认完整域名（回退逻辑在请求层，不在 `env/index.uts`）。
-- 新增环境变量时，同步在 `src/utils/env/index.uts` 中补一个带兜底值的 getter。
+- **取值一律走 `src/config/env/env.uts`**（如 `getApiBaseUrl()`），不要直接读 `import.meta.env.VITE_XXX` —— 模块内含兜底默认值与类型转换。
+- **App / 小程序固定直连完整域名**，不受 `VITE_H5_USE_PROXY` 影响；`VITE_SERVER_BASEURL` 请填写 `https://...` 完整域名，不要填 `/api` 这类相对路径（相对路径只用于 H5 代理场景）。
+- 新增环境变量时，同步在 `src/config/env/env.uts` 中补一个带兜底值的 getter。
 
 ### 页面路由与配置 (uni-pages)
 
@@ -942,7 +964,7 @@ src/tabbar/config.uts (唯一样本源)
 
 ### 主题切换（暗黑模式）
 
-内置三种外观模式：`auto`（跟随系统）/ `light`（浅色）/ `dark`（深色）。入口位于「基础」页的主题切换卡片（`src/pages/basic/components/ThemeSwitchCard.uvue`），状态管理在 `src/store/`。
+内置三种外观模式：`auto`（跟随系统）/ `light`（浅色）/ `dark`（深色）。演示入口位于「基础」页的主题换肤卡片，实际页面为 `src/sub/themeBasicDemo/themeBasicDemo.uvue`；状态管理在 `src/store/`，主题运行时在 `src/theme/`。
 
 **各端跟随机制：**
 
@@ -958,7 +980,7 @@ src/tabbar/config.uts (唯一样本源)
 
 > 💡 **修改 `light` / `dark` 主题配色，请统一在根目录 [theme.json](theme.json) 中配置**（单源维护，`pages.json` 与自定义组件自动同步生效，勿在页面或组件中写死颜色）。
 
-> 💡 **全局导航栏如何跟随主题**：uni-app X 没有「运行时全局 navbar 配置」API，原生导航栏样式属于**编译期静态配置**（`pages.json` 的 `@变量`）。运行时切换主题时，由 `applyNavbarTheme()` 同步（挂载在全局根包裹组件 `App.ku.uvue` 的 `onShow` 与主题监听上，每个页面切换都会触发）：H5 直接修改 `uni-page-head` 的 DOM 样式（背景 / 文字 / 按钮色）；微信小程序无 DOM，走官方 `uni.setNavigationBarColor`；App 端由 `uni.setAppTheme` 系统级切换，自动跟随。`navigationStyle: custom` 的页面没有 `uni-page-head`，H5 自动跳过。
+> 💡 **全局导航栏如何跟随主题**：uni-app X 没有「运行时全局 navbar 配置」API，原生导航栏样式属于**编译期静态配置**（`pages.json` 的 `@变量`）。运行时切换主题时，由 `applyNavbarTheme()` 同步（挂载在全局根骨架组件 `src/AppRoot.uvue` 的 `onShow` 与主题监听上，每个页面切换都会触发）：H5 直接修改 `uni-page-head` 的 DOM 样式（背景 / 文字 / 按钮色）；微信小程序无 DOM，走官方 `uni.setNavigationBarColor`；App 端由 `uni.setAppTheme` 系统级切换，自动跟随。`navigationStyle: custom` 的页面没有 `uni-page-head`，H5 自动跳过。
 
 > [!IMPORTANT]
 > **平台限制说明**
@@ -974,22 +996,25 @@ src/tabbar/config.uts (唯一样本源)
 - **白名单模式**：除指定页面外，全部需要登录
 - 支持登录后自动跳回原页面
 
-相关文件：`src/router/`，子模块化拆分为 `config/`（登录策略与黑白名单）、`guard/`（**业务规则主战场**，一条规则一个文件）、`hooks/`（`useRoute()` / `useRouter()` 组合式 hooks）、`interceptor/`（导航管道）、`toLoginPage/`、`utils/`。门面 `@/src/router/index.uts` **只转发 `config` + `useRoute` + `useRouter` + `interceptor` 四块**，其余符号须精准导入（详见 [src/router/README.md](src/router/README.md)）。
+相关文件：`src/router/`，底层基于 [`uni_modules/route-bestX`](uni_modules/route-bestX/) 路由引擎。业务层拆分为 `config.uts`（登录页 / 注册页 / 受保护页面配置）、`guards/`（`guardLogin` / `guardMaintenance` / `guardPermission` 三条业务守卫）、`generated/page-meta.uts`（构建期生成，供 `useRoute().meta` / `name` 使用）；入口 [src/router/index.uts](src/router/index.uts) 创建 router 单例并导出 `useRoute()` / `useRouter()`（详见 [src/router/README.md](src/router/README.md)）。
 
 ### 请求封装与 OpenAPI 强类型接口生成
 
-#### 1. 基础请求封装
+#### 1. 网络分层：`request-bestX` 引擎 + `src/http` 业务层
 
-基于 `lime-request` 封装的 HTTP 客户端（`src/http/request.uts`）：
+- **底层引擎 [uni_modules/request-bestX/](uni_modules/request-bestX/)** — 纯原生 `uni.request` / `uni.uploadFile` / `uni.downloadFile` 驱动，零第三方依赖：
+  - Axios 风格拦截器链（`beforeRequest` / `responded.onSuccess` / `onError` / `onComplete`）
+  - GET 请求并发去重（Inflight Deduplication）与 TTL 内存缓存
+  - 断网重连自动刷新（`onlineManager` 对接 `uni.onNetworkStatusChange`）
+  - 声明式状态机 `useQuery` / `useMutation` / `QueryClient`（对标 TanStack Vue Query，含 staleTime、重试、轮询、依赖查询与失效）
+  - SSE / Chunk 流式传输 `requestStream` 与增量 `Utf8StreamDecoder`
+- **业务层 [src/http/index.uts](src/http/index.uts)** — 全项目唯一网络出口：
+  - `http` / `secondaryHttp` 多域名业务实例
+  - 自动注入 Token、401 静默刷新与重放（单飞，并发 401 只刷新一次）
+  - 业务码判定、统一错误提示与响应数据解包
+  - 文件上传 / 下载：`http.upload<T>` / `http.downloadFile`
 
-- 自动携带 Token
-- 请求 / 响应拦截器
-- 多域名支持
-- 401 自动登出
-- 支持忽略认证的请求
-- 另有 `src/http/stream.uts` 提供 SSE / Chunk 流式请求能力
-
-> ⚠️ **严禁自己写 `uni.request`** —— 鉴权头、业务码判定、401 跳登录都在 `src/http/request.uts` 的拦截器里统一处理。
+> ⚠️ **严禁自己写 `uni.request` / `uni.uploadFile` / `uni.downloadFile`** —— 业务请求统一走 `http` 实例；`useQuery` / `useMutation` / `requestStream` 等通用能力从 `@/uni_modules/request-bestX` 引入。
 
 #### 2. OpenAPI / Apifox 强类型客户端生成（pnpm api:gen）
 
@@ -997,7 +1022,7 @@ src/tabbar/config.uts (唯一样本源)
 
 - **智能推导补全**：针对 Apifox 用户仅在接口示例中提供 JSON 数据而未定义 schema 的痛点，内置智能逆向递归推导器，从 `example` 中自动推导字段结构与类型，杜绝类型退化为 `Record<string, unknown>`。
 - **UTS 强类型铁律规范**：自动将生成的 `interface` 严格转换为 `type` 别名（解决 UTS110111163 报错），保留精确的相对导入（如 `./types.uts`），彻底杜绝微信小程序 uts2js 编译时的纯类型导出丢失。
-- **与核心请求库无缝协同**：底层请求适配器接入 [src/http/openapi.uts](src/http/openapi.uts)，完整复用现有的 TokenStore 鉴权、响应拦截、错误轻提示与多域名配置。
+- **与核心请求库无缝协同**：底层请求适配器直接接入 `@/uni_modules/request-bestX`，完整复用现有的 TokenStore 鉴权、响应拦截、错误轻提示与多域名配置。
 - **敏感 Token 隔离**：Apifox 的 Token 与 Project ID 配置在 `.env.local` 中，无需担心密钥随 Git 泄露。
 
 **执行命令**：
@@ -1010,13 +1035,14 @@ pnpm api:gen
 
 ### 文件上传
 
-基于原生 `uni.uploadFile` 统一封装的高性能跨端文件上传模块（[src/http/upload.uts](src/http/upload.uts)）：
+基于 `request-bestX` 的 `uni.uploadFile` 封装，通过业务实例 `http.upload<T>` 调用：
 
 - **跨端原生适配**：全端通用（App Android / iOS / HarmonyOS、微信小程序、H5）
-- **统一鉴权**：自动从 `TokenStore` 注入 `header.token`（支持 `ignoreAuth: true` 跳过鉴权）
-- **智能路径拼接**：支持传入完整 URL 或仅传入相对接口路径（如 `/api/upload` 自动与基础域名拼接）
-- **上传进度监听**：支持 `onProgress` 进度回调
+- **统一鉴权**：自动注入 Token（支持 `ignoreAuth` 跳过鉴权）
+- **智能路径拼接**：支持传入完整 URL 或仅传入相对接口路径（自动与基础域名拼接）
+- **上传进度监听**：通过 `getTask` 获取 `UploadTask` 后监听 `onProgressUpdate`
 - **智能响应解析**：兼容 `code: 200`、`code: "10000"`、`success: true`、`data: "url"`、`data: { url: "..." }` 等多种后端返回格式，业务失败时自动提取错误信息
+- **环境变量读取**：OSS 地址统一走 `getOssUploadUrl()`（`@/src/config/env/env.uts`），禁止硬编码
 
 **配置说明（通过 `.env` 环境变量）**：
 
@@ -1027,31 +1053,33 @@ VITE_UPLOAD_BASEURL=https://xxx.com                # 上传基础域名
 VITE_UPLOAD_PATH=/gateway/user/sys/oss/upload/xxx  # 上传接口路由
 ```
 
-底层会自动从 `import.meta.env` 读取当前环境的配置，无需改动源码。
-
 **调用示例**：
 
 ```uts
-import { uploadOssFile, uploadFile } from '@/src/http/upload.uts';
+import { http } from '@/src/http/index.uts';
+import { getOssUploadUrl } from '@/src/config/env/env.uts';
+import type { HttpRequestConfig } from '@/uni_modules/request-bestX/index.uts';
 
-// 1. 快捷上传图片到 OSS
-uploadOssFile(filePath)
-  .then((ossUrl: string) => {
-    console.log('上传成功 OSS 地址:', ossUrl);
-  })
-  .catch((err: Error | null) => {
-    uni.showToast({ title: err?.message ?? '上传失败', icon: 'none' });
-  });
+// 1. 上传到 OSS（返回值已解包，直接是业务数据）
+http.upload<string>(getOssUploadUrl(), {
+  filePath,
+  name: 'file'
+} as HttpRequestConfig).then((ossUrl: string) => {
+  console.log('上传成功 OSS 地址:', ossUrl);
+}, (err: Error | null) => {
+  uni.showToast({ title: err?.message ?? '上传失败', icon: 'none' });
+});
 
-// 2. 自定义上传接口与进度监听
-uploadFile({
-  url: '/api/custom-upload', // 相对路径自动拼接 BaseURL，也可传完整 http(s) URL
+// 2. 自定义上传接口 + 进度监听
+http.upload<string>('/api/custom-upload', {
   filePath,
   name: 'file',
-  onProgress: (progress: number) => {
-    console.log(`当前上传进度: ${progress}%`);
+  getTask: (task: any): void => {
+    (task as UploadTask).onProgressUpdate((res: OnProgressUploadResult): void => {
+      console.log(`当前上传进度: ${res.progress}%`);
+    });
   }
-});
+} as HttpRequestConfig);
 ```
 
 ### 状态管理
@@ -1068,23 +1096,26 @@ src/store/index.uts  (门面：唯一转发层)
          未开启蒸汽模式的 App 原生端（如 Android VDOM）
 ```
 
-- `AppStore` — 主题色、语言设置
-- `TokenStore` — 支持单 Token 和双 Token（access + refresh）模式
-- `UserStore` — 用户信息管理
+- `useAppStore` — 应用底座上下文（当前 store 模式）
+- `useThemeStore` — 主题色、外观模式与 `isDark`
+- `useI18nStore` — 当前语言与切换
+- `useTokenStore` — 支持单 Token 和双 Token（access + refresh）模式
+- `useUserStore` — 用户信息管理
+- `useModalStore` — `TabbarMaskModal` 组件实例桥
 - 内置持久化，全端复用 `pinia-plugin-persistedstate`
 
 > 💡 **推荐优先选用 Vapor 模式**：可直接使用 Vue 官方 Pinia 组合式 API，无需繁琐的 UTS 类型约束与手工序列化 / 反序列化，并能直接复用官方持久化插件与成熟社区工具。
 >
-> ⚠️ **重导出红线**：同一顶层符号（`useAppStore` / `useTokenStore` / `useUserStore`）只允许在 `src/store/index.uts` 这一层门面 `export *` 转发，层层转发会让 UTS 在 Android 端生成 `useXxxStore__1` 重名符号并导致运行期 `NoSuchMethodError`。详见该文件头部注释。
+> ⚠️ **重导出红线**：同一顶层符号（`useAppStore` / `useThemeStore` / `useI18nStore` / `useModalStore` / `useTokenStore` / `useUserStore`）只允许在 `src/store/index.uts` 这一层门面 `export *` 转发，层层转发会让 UTS 在 Android 端生成 `useXxxStore__1` 重名符号并导致运行期 `NoSuchMethodError`。详见该文件头部注释。
 
 ### i18n 多语言
 
 基于 `lime-i18n` 的国际化方案：
 
-- 内置中文（zh-CN）和英文（en-US）
+- 内置中文（zh-CN）和英文（en-US），语言包位于 `src/i18n/locales/*.json`
 - 自动检测系统语言，也可通过 `.env` 的 `VITE_DEFAULT_LOCALE` 指定默认语言
 - 支持 VSCode i18n-ally 插件
-- 非 Vue 文件中也可通过 `src/utils/i18n/index.uts` 的 `t()` / `$t()` 使用翻译函数
+- 非 Vue 文件中也可通过 `src/i18n/utils/index.uts` 的 `t()` / `$t()` 使用翻译函数
 
 ### Layout 布局
 
@@ -1146,8 +1177,8 @@ graph LR
     B --> C[tests/setup.ts 全局运行时桩]
     C --> D[uni 跨端原生 API 模拟]
     C --> E[Vue 响应式全局对象注入]
-    A --> F[@vitejs/plugin-vue + UVue 预转译器]
-    F --> G[@vue/test-utils 挂载 .uvue 组件]
+    A --> F["@vitejs/plugin-vue + UVue 预转译器"]
+    F --> G["@vue/test-utils 挂载 .uvue 组件"]
 ```
 
 #### 1. 核心技术架构亮点
@@ -1163,9 +1194,11 @@ graph LR
 
 测试用例位于 `tests/unit/` 目录，涵盖关键业务与工程环节：
 
-- **组件挂载测试 (`tests/unit/components/`)**：验证 [NavBar.uvue](src/components/NavBar/NavBar.uvue) 等组件的标题渲染、返回按钮展示、自定义插槽与事件响应；
-- **核心工具库测试 (`tests/unit/utils/`)**：验证 [route](src/utils/route/index.uts) 路由提取、[rxjs-lite](src/utils/rxjs-lite/index.uts) 响应式流处理与算子管道；
-- **工程构建插件测试 (`tests/unit/plugins/`)**：验证 `clean-logger` 告警净化插件以及 ESLint UTS 专属规则（十六进制颜色校验、接口规范、未定义检查）。
+- **组件挂载测试 (`tests/unit/components/`)**：验证 [NavBar.uvue](src/components/NavBar/NavBar.uvue) 等组件的标题渲染、返回按钮展示、自定义插槽与事件响应，以及 TabBar 生命周期；
+- **网络层测试 (`tests/unit/api/`)**：验证 `http` 实例、流式传输与 `useQuery` / `useMutation` 状态机；
+- **路由测试 (`tests/unit/router/`)**：验证 `route-bestX` 引擎、路由守卫决策与 `useRoute` / `useRouter` hooks；
+- **核心工具与生态模块 (`tests/unit/utils/` / `tests/unit/modules/` / `tests/unit/mock/`)**：验证错误归一、i18n、[rxjs-bestX](uni_modules/rxjs-bestX/index.uts)、bignumber 与 Mock 服务；
+- **工程构建插件测试 (`tests/unit/plugins/`)**：验证 uni-pages 系列插件、`clean-logger`、产物分析 / 体积门禁以及 ESLint UTS 专属规则。
 
 #### 3. 常用测试命令
 
@@ -1191,15 +1224,16 @@ graph LR
     F --> G[verify-commit-msg 中文规范校验]
     G -->|符合规范| H[提交成功]
     H --> I[GitHub Actions CI 流水线]
-    I --> J[UTS DTS 同步检查]
-    I --> K[全量 ESLint & Stylelint]
+    I --> J[全量 ESLint]
+    I --> K[全量 Stylelint]
     I --> L[TypeScript 0 报错类型检查]
     I --> M[Vitest 全量单元测试]
+    I --> N[项目健康检查 pnpm health:quick]
 ```
 
 #### 1. ESLint & UTS 平台专属规则插件 (`eslint/eslint-plugin-uts.mjs`)
 
-针对 uni-app X 跨端原生编译对 UTS 类型与模板语法的严苛要求，内置 12 条专项规则：
+针对 uni-app X 跨端原生编译对 UTS 类型与模板语法的严苛要求，内置 11 条专项规则：
 
 - **强类型红线**：强制使用 `type` 禁止 `interface`（`uts/no-interface` 支持自动 `--fix`）、禁止 `undefined`、禁止 `map.keys()` 函数式调用；
 - **颜色十六进制规范**：要求颜色统一使用标准十六进制色值（`uts/uvue-prefer-hex-color` 支持自动 `--fix`），防止鸿蒙与原生端英文颜色解析异常；
@@ -1248,12 +1282,13 @@ pnpm typecheck       # 运行严格类型检查（tsc --noEmit -p tsconfig.typec
 
 #### 6. GitHub Actions CI 持续集成流水线 (`.github/workflows/ci.yml`)
 
-项目已预置生产级 CI 自动化工作流，在开发者向 `main` / `base` 分支发起 Push 或 Pull Request 时自动并行执行四大质量门禁：
+项目已预置生产级 CI 自动化工作流，在开发者向 `main` / `base` 分支发起 Push 或 Pull Request 时自动并行执行五大质量门禁：
 
 1. **ESLint 检查**（`pnpm lint`）
 2. **Stylelint 检查**（`pnpm lint:style`）
 3. **TypeScript 严格类型检查**（`pnpm typecheck`）
 4. **Vitest 自动化单元测试**（`pnpm test`）
+5. **项目健康检查**（`pnpm health:quick`：依赖、图片与配置体检）
 
 #### 7. 常用命令与跳过机制
 
@@ -1368,7 +1403,7 @@ pnpm typecheck       # 运行严格类型检查（tsc --noEmit -p tsconfig.typec
 
 | 类别 | 技术 | 版本 | 说明 |
 | :--- | :--- | :--- | :--- |
-| 框架 | uni-app X | 3.0.0-5020420260813002 | 下一代 uni-app，默认 Vapor 蒸汽模式渲染，全面兼容传统 VDOM 模式 |
+| 框架 | uni-app X | 3.0.0-5030220261016001 | 下一代 uni-app，默认 Vapor 蒸汽模式渲染，全面兼容传统 VDOM 模式 |
 | 语言 | UTS | — | uni-app Type Script，编译为原生 Kotlin / Swift |
 | 前端框架 | Vue 3 | ^3.5.13 | Composition API |
 | 构建工具 | Vite | 5.2.8 | 极速开发体验 |
@@ -1376,7 +1411,8 @@ pnpm typecheck       # 运行严格类型检查（tsc --noEmit -p tsconfig.typec
 | UI 组件库 | 多分支选型 | — | `main` 分支无内置 UI 库（原生组件 + Tailwind）；`uniX-rice-ui` 集成 Rice UI（官方维护）、`uniX-uview-ultra` 内置深度修复版 uview-ultra |
 | 分页组件 | z-paging-x | 内置定制版 | 强大的下拉刷新 + 分页加载 |
 | 状态管理 | Pinia / x-pinia-s | ^3.0.4 / — | Vapor・Web・小程序走官方 Pinia；App VDOM 走 x-pinia-s |
-| HTTP 请求 | lime-request | — | uni-app X 兼容请求库 |
+| HTTP 请求 | request-bestX | 内置定制版 | 纯原生驱动的跨端请求与状态机引擎（拦截器 / 去重 / 缓存 / useQuery / 流式） |
+| 请求状态机 | useQuery / useMutation | — | 对标 TanStack Vue Query 的声明式查询与变更状态机 |
 | 国际化 | lime-i18n | — | vue-i18n 兼容方案 |
 | 图表 | e-chart | — | ECharts for uni-app X |
 | 图标 | uni-icons + lime-icon | — | 双图标方案 |
@@ -1396,7 +1432,7 @@ pnpm typecheck       # 运行严格类型检查（tsc --noEmit -p tsconfig.typec
 5. **API 限制**：原生平台不支持浏览器 API（如 `window`、`document`、`localStorage` 等）
 6. **SCSS 变量**：支持 SCSS 变量，但动态覆盖需使用 CSS 变量方式
 7. **路由与页面配置**：`pages.json` 为自动构建产物（构建打包时会被覆盖）。页面中写有 `definePage` 或 `<route>` 时会自动双向同步 `pages.config.json` 与 `pages.json`；无配置时请在 `pages.config.json` 中配置，**切勿直接手动修改 `pages.json`**
-8. **内置工具优先复用**：动手实现通用能力（取路由与路径、取主题色、读环境变量、多语言文案、提示弹窗、返回键接管、下拉刷新、文件上传、系统与安全区尺寸、流式处理）前，**先查 `src/utils/`** —— 已有 10 个现成模块可直接调用，严禁重复造轮子（如自己写 `uni.getSystemInfoSync()`、裸写 `setInterval` 做防抖、直接读 `import.meta.env.VITE_XXX`）
+8. **内置工具优先复用**：动手实现通用能力（取路由与路径、取主题色、读环境变量、多语言文案、提示弹窗、返回键接管、下拉刷新、文件上传、系统与安全区尺寸、流式处理）前，**先查 `src/config/`、`src/utils/`、`src/theme/`、`src/i18n/` 与 `uni_modules/`** —— 已有现成模块可直接调用，严禁重复造轮子（如自己写 `uni.getSystemInfoSync()`、裸读 `import.meta.env.VITE_XXX`、直接调 `uni.request`）
 
 > [!IMPORTANT]
 > **安卓端语法最严**：Android 编译器的 UTS 类型与语法校验是所有平台中最严格的。一般如果 Android 端编译正常通过，其他平台（H5、微信小程序、iOS 等）通常都不会有大问题。

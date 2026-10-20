@@ -1,0 +1,182 @@
+/**
+ * HTTP 核心强类型与钩子定义 (HTTP Core Types)
+ *
+ * 遵循规范：
+ * 1. 一律使用 type（严禁 interface）；
+ * 2. 字段类型安全，可选属性显式标注 null 兜底；
+ * 3. 纯原生强类型设计，无任何第三方库依赖与业务逻辑耦合。
+ */
+
+/**
+ * HTTP 请求方法枚举联合类型
+ */
+export type HttpRequestMethod
+  = | 'GET'
+    | 'POST'
+    | 'PUT'
+    | 'PATCH'
+    | 'DELETE'
+    | 'CONNECT'
+    | 'HEAD'
+    | 'OPTIONS'
+    | 'TRACE'
+    | 'UPLOAD'
+    | 'DOWNLOAD';
+
+/**
+ * HTTP 请求配置项
+ */
+export type HttpRequestConfig = {
+  url?: string | null;
+  method?: string | null;
+  data?: any | null;
+  params?: any | null;
+  headers?: UTSJSONObject | null;
+  header?: UTSJSONObject | null;
+  timeout?: number | null;
+  baseURL?: string | null;
+  dataType?: string | null;
+  responseType?: string | null;
+  sslVerify?: boolean | null;
+  withCredentials?: boolean | null;
+  enableCache?: boolean | null;
+  enableChunked?: boolean | null;
+  firstIpv4?: boolean | null;
+  // 文件上传专有字段
+  filePath?: string | null;
+  name?: string | null;
+  formData?: any | null;
+  files?: Array<UTSJSONObject> | null;
+  // 任务句柄监听与扩展元数据
+  getTask?: ((task: any) => void) | null;
+  extra?: any | null;
+};
+
+/**
+ * HTTP 响应结果对象
+ */
+export type HttpResponse<T> = {
+  data: T;
+  statusCode: number;
+  header: UTSJSONObject;
+  cookies?: Array<string> | null;
+  errMsg?: string | null;
+  config: HttpRequestConfig;
+};
+
+/**
+ * HTTP 请求失败异常对象
+ */
+export type HttpFailResult = {
+  errMsg: string;
+  statusCode?: number | null;
+  cause?: any | null;
+};
+
+/**
+ * 可中断任务通用接口抽象
+ */
+export type AbortableTask = {
+  abort: () => void;
+};
+
+/**
+ * 通用 HTTP 层失败异常类 (HTTP Layer Error)
+ * 记录 HTTP 传输层状态码与错误信息，零业务逻辑
+ */
+export class HttpError extends Error {
+  /** HTTP 状态码（传输层或服务端状态码） */
+  statusCode: number = 0;
+  /** 服务端返回的原始/完整响应数据（包含全部字段） */
+  data: any | null = null;
+  /** 兼容别名：服务端返回的完整响应数据 */
+  response: any | null = null;
+
+  constructor(message: string, statusCode: number = 0, data: any | null = null) {
+    super(message);
+    this.name = 'HttpError';
+    this.statusCode = statusCode;
+    this.data = data;
+    this.response = data;
+  }
+}
+
+/**
+ * 下载结果类型
+ */
+export type DownloadResult = {
+  /** 临时文件路径（下载后的文件会存储到一个临时文件） */
+  tempFilePath: string;
+  /** HTTP 状态码 */
+  statusCode: number;
+};
+
+/**
+ * 流式请求中断句柄
+ */
+export type StreamTask = {
+  /** 中断底层请求 */
+  abort: () => void;
+};
+
+/**
+ * 底层网络驱动适配器接口
+ */
+export type HttpRequestAdapter = (config: HttpRequestConfig) => Promise<HttpResponse<any>>;
+
+/**
+ * 请求前置钩子函数类型（支持同步函数或返回 Promise 的 async 异步函数）
+ */
+export type BeforeRequestHook = (config: HttpRequestConfig) => any;
+
+/**
+ * 响应成功后置钩子函数类型（支持转换/解包数据、异步重试与链式 Promise，支持 async 异步函数）
+ */
+export type AfterResponseSuccessHook = (data: any, config: HttpRequestConfig, client?: any) => any;
+
+/**
+ * 响应失败后置钩子函数类型（可执行统一错误提示等副作用，支持 async 异步函数）
+ */
+export type AfterResponseErrorHook = (err: any, config: HttpRequestConfig) => any;
+
+/**
+ * 请求完成拦截钩子函数类型（无论成功、失败或命中缓存均触发）
+ */
+export type AfterResponseCompleteHook = (config: HttpRequestConfig) => any;
+
+/**
+ * 复合响应拦截器配置对象
+ */
+export type RespondedOptions = {
+  onSuccess?: AfterResponseSuccessHook;
+  onError?: AfterResponseErrorHook;
+  onComplete?: AfterResponseCompleteHook;
+};
+
+/**
+ * 兼容别名
+ */
+export type AfterResponseOptions = RespondedOptions;
+
+/**
+ * HttpClient 实例化配置选项
+ */
+export type HttpClientOptions = {
+  baseURL: string;
+  timeout?: number;
+  header?: UTSJSONObject;
+  dataType?: string;
+  responseType?: string;
+  sslVerify?: boolean;
+  withCredentials?: boolean;
+  firstIpv4?: boolean;
+  /** 自定义底层网络驱动适配器（可选，用于特殊环境扩展或单元测试 Mock） */
+  requestAdapter?: HttpRequestAdapter;
+  /** 请求生命周期管理器（可选，支持多实例共享生命周期） */
+  lifecycle?: any;
+  beforeRequest?: BeforeRequestHook;
+  afterResponse?: any;
+  responded?: any;
+  respondedOptions?: RespondedOptions;
+  [key: string]: any | null;
+};

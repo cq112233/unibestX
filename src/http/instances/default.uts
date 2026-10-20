@@ -4,83 +4,50 @@
  * 接口基础地址指向 VITE_SERVER_BASEURL，H5 开启代理时默认走第一个代理字段 '/api'
  */
 
-import type { LimeRequestConfig } from '@/uni_modules/lime-request';
 import { getApiBaseUrl } from '@/src/config/index.uts';
-import type {
-  DownloadResult,
-  HttpClient,
-  StreamTask
-} from '../request/request.uts';
+import type { HttpClient } from '@/uni_modules/request-bestX/index.uts';
 import {
   createApiInstance
 } from './internal/factory.uts';
 
 /**
  * 默认主业务 HTTP 客户端单例（指向 VITE_SERVER_BASEURL，H5 代理走第一个代理字段 /api）
- */
-export const http: HttpClient = createApiInstance(getApiBaseUrl(), '/api');
-
-// ==========================================
-// 便捷代理函数（默认委托给主业务 http 单例）
-// ==========================================
-
-/**
- * 取消指定 requestKey 的在飞请求（委托给默认 http 实例）
- */
-export function abortHttp(requestKey: string): void {
-  http.abort(requestKey);
-}
-
-/**
- * 取消全部在飞请求（委托给默认 http 实例）
- */
-export function abortAllHttp(): void {
-  http.abortAll();
-}
-
-/**
- * 清除缓存（委托给默认 http 实例）
- */
-export function clearCache(fingerprint: string = ''): void {
-  http.clearCache(fingerprint);
-}
-
-/**
- * 便捷文件上传（委托给默认 http 实例）
- */
-export function uploadHttp<T>(url: string, config: LimeRequestConfig | null = null): Promise<T> {
-  return http.upload<T>(url, config);
-}
-
-/**
- * 便捷文件下载（委托给默认 http 实例）
- */
-export function downloadHttp(url: string, config: LimeRequestConfig | null = null): Promise<DownloadResult> {
-  return http.downloadFile(url, config);
-}
-
-/**
- * 便捷函数：chunked 流式请求（委托给默认 http 实例），方法固定为 POST
  *
- * @param url 请求地址：支持完整 http(s):// 地址，相对路径会与配置里的 baseURL 拼接
- * @param body 请求体（通常是 JSON.stringify 的结果）
- * @param onChunk 字节块到达回调
- * @param onEnd 流收尾回调
- * @param config 覆盖项，传 null 走默认配置
+ * `createApiInstance` 参数说明：
+ * @param baseURL API 服务根地址，默认通过 `getApiBaseUrl()` 获取
+ * @param proxyPrefix H5 开启代理时的代理前缀字段，默认 `'/api'`。
+ *                    对应 `vite.config.ts` 中 `server.proxy` 的代理规则配置：
+ *                    ```ts
+ *                    // vite.config.ts
+ *                    server: {
+ *                      proxy: {
+ *                        '/api': {
+ *                          target: env.VITE_SERVER_BASEURL || 'http://localhost:3000',
+ *                          changeOrigin: true,
+ *                          rewrite: (p) => p.replace(/^\/api/, '')
+ *                        }
+ *                      }
+ *                    }
+ *                    ```
+ *                    当 `.env` 中 `VITE_H5_USE_PROXY=true` 时，H5 端请求将走此代理以解决跨域；App / 小程序端则直连 `baseURL`。
+ * @param customOptions 可选个性化定制参数（`HttpClientOptions`），用于覆盖基础配置与扩展钩子：
+ *                      - `timeout`: 自定义超时时间（默认 30000ms）
+ *                      - `header`: 自定义公共请求头
+ *                      - `lifecycle` / `beforeRequest` / `afterSuccess` / `afterError` / `afterComplete`: 自定义拦截器钩子
+ *
+ * 💡 提示：
+ * 若不传第三个参数（保持默认），多个业务实例（如 `http`、`secondaryHttp` 等）都统一走
+ * `./internal/factory.uts` 中的全局默认配置（包含通用的业务 Token 鉴权注入、401 无感刷新、
+ * 业务错误码统一 Toast 提示与结果解包等）。仅当某个实例需要单独覆盖特定配置时才传入第三个参数。
+ *
+ * 示例（传入第三个参数局部覆盖）：
+ * ```uts
+ * export const http: HttpClient = createApiInstance(getApiBaseUrl(), '/api', {
+ *   timeout: 15000
+ * } as HttpClientOptions);
+ * ```
  */
-export function streamHttp(
-  url: string,
-  body: string,
-  onChunk: (data: ArrayBuffer) => void,
-  onEnd: (errMsg: string | null) => void,
-  config: LimeRequestConfig | null = null
-): StreamTask {
-  const _config = (config ?? {}) as LimeRequestConfig;
-  _config.url = url;
-  _config.data = body;
-  _config.method = 'POST';
-  _config.enableChunked = true;
-  _config.responseType = 'arraybuffer';
-  _config.dataType = 'text';
-  return http.stream(_config, onChunk, onEnd);
-}
+import { setDefaultStreamClient } from '@/uni_modules/request-bestX/index.uts';
+
+export const http: HttpClient = createApiInstance(getApiBaseUrl(), '/api');
+setDefaultStreamClient(http);

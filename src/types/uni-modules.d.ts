@@ -4,7 +4,7 @@
 // 【为什么需要这个文件】
 // 这些 uni_modules 的入口是 `index.uts`（TS 不认识的扩展名），且其 package.json
 // 未声明 types / main，于是下列写法在 VSCode / tsc 下报 TS2307「找不到模块」：
-//     import { Request } from '@/uni_modules/lime-request'
+//     import { SomeModule } from '@/uni_modules/some-module'
 // 项目原靠每个 .uts 配套的 `<name>.d.uts.ts` 间接解决（allowArbitraryExtensions），
 // 该机制已按决策整体移除，故在此补回等价声明。
 //
@@ -28,35 +28,6 @@
 declare module '*.uvue' {
   const component: any;
   export default component;
-}
-
-// ---------- lime-request：底层网络请求库 ----------
-// 真源：uni_modules/lime-request/common/index.uts、utssdk/interface.uts
-declare module '@/uni_modules/lime-request' {
-  export class Request {
-    constructor(config: any);
-    defaultConfig: any;
-    interceptors: any;
-    request<_T = any>(config: any): Promise<any>;
-    get<_T = any>(url: string, config?: any): Promise<any>;
-    head<_T = any>(url: string, config?: any): Promise<any>;
-    connect<_T = any>(url: string, config?: any): Promise<any>;
-    trace<_T = any>(url: string, config?: any): Promise<any>;
-    post<_T = any>(url: string, data?: any, config?: any): Promise<any>;
-    put<_T = any>(url: string, data?: any, config?: any): Promise<any>;
-    delete<_T = any>(url: string, data?: any, config?: any): Promise<any>;
-    options<_T = any>(url: string, data?: any, config?: any): Promise<any>;
-    upload(url: string, config?: any): Promise<any>;
-    download(url: string, config?: any): Promise<any>;
-  }
-  export function getRequestFail(error: any): any;
-  export type LimeRequestConfig = any;
-  export type LimeRequestTask = any;
-  export type LimeRequestResponse<_T> = any;
-  export type LimeRequestFail = any;
-  export type LimeInterceptors<_T, _U> = any;
-  export type LimeeRequestRejected = any;
-  export type LimeRequestSource = any;
 }
 
 // ---------- lime-i18n ----------

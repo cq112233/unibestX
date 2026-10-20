@@ -2,7 +2,15 @@
  * 业务 API 域名与服务解析配置 (Business API Domain Config)
  */
 
-import { getApiBaseUrl, getH5UseProxy } from '@/src/config/index.uts';
+import { getApiBaseUrl, getApiSecondaryUrl, getH5UseProxy } from '@/src/config/index.uts';
+
+/**
+ * 业务常用 API 域名常量
+ */
+export const API_DOMAINS = {
+  DEFAULT: getApiBaseUrl(),
+  SECONDARY: getApiSecondaryUrl()
+};
 
 /**
  * 根据请求路径和指定代理字段，解析目标 BaseURL

@@ -1,0 +1,939 @@
+/**
+ * HttpClient 核心请求调度引擎 (Native Request Engine)
+ *
+ * 职责：
+ * 1. 原生基于 uni.request / uni.uploadFile / uni.downloadFile 驱动，零第三方库依赖；
+ * 2. 负责请求前置拦截钩子、响应后置成功/失败/完成钩子的注册与异步链式调度；
+ * 3. 负责主动取消、并发去重、TTL 缓存与底层 Task 生命周期协作；
+ * 4. 纯净网络层调度引擎，零业务逻辑耦合；
+ * 5. 全端强类型兼容，支持 App (Android Kotlin / iOS Swift)、Web 与小程序。
+ */
+
+import { ContentTypeEnum } from './enum.uts';
+import { defaultLifecycle, RequestLifecycle } from './lifecycle.uts';
+import type {
+  AbortableTask,
+  AfterResponseCompleteHook,
+  AfterResponseErrorHook,
+  AfterResponseSuccessHook,
+  BeforeRequestHook,
+  DownloadResult,
+  HttpClientOptions,
+  HttpRequestAdapter,
+  HttpRequestConfig,
+  HttpResponse,
+  RespondedOptions,
+  StreamTask
+} from './types.uts';
+import {
+  extractErrorMessage,
+  toError
+} from '../util/helper.uts';
+import { buildRequestUrl } from '../util/url.uts';
+
+/**
+ * 通用 HTTP 客户端控制器 (Pure Native HttpClient)
+ */
+export class HttpClient {
+  /** 客户端创建时传入的原始配置选项（供外部获取与扩展引用） */
+  private options: HttpClientOptions | null = null;
+  /** 请求生命周期控制器（管理在飞请求取消、并发去重与内存 TTL 缓存） */
+  private lifecycle: RequestLifecycle;
+  /** 请求前置拦截钩子队列（在发起底层网络请求前依次异步执行） */
+  private beforeRequestHooks: Array<BeforeRequestHook> = [];
+  /** 响应成功拦截钩子队列（在底层请求成功后依次异步执行） */
+  private afterSuccessHooks: Array<AfterResponseSuccessHook> = [];
+  /** 响应失败拦截钩子队列（在网络异常或响应出错时依次执行） */
+  private afterErrorHooks: Array<AfterResponseErrorHook> = [];
+  /** 请求完成收尾拦截钩子队列（无论成功或失败均触发） */
+  private afterCompleteHooks: Array<AfterResponseCompleteHook> = [];
+  /** 自定义底层网络驱动适配器（可选，用于特殊环境扩展或单元测试 Mock） */
+  private requestAdapter: HttpRequestAdapter | null = null;
+  /** 默认基础服务根地址（如 https://api.example.com） */
+  private baseURL: string = '';
+  /** 默认请求超时时间（单位：毫秒，默认 5000ms） */
+  private defaultTimeout: number = 5000;
+  /** 默认请求头配置（如 Content-Type、Accept 等） */
+  private defaultHeader: UTSJSONObject;
+  /** 默认期望返回的数据格式（默认 'json'） */
+  private defaultDataType: string = 'json';
+  /** 默认响应数据类型（默认 'text'） */
+  private defaultResponseType: string = 'text';
+  /** 是否验证 SSL 证书（默认 true） */
+  private defaultSslVerify: boolean = true;
+  /** 跨域请求时是否携带凭证（Cookie 等，默认 false） */
+  private defaultWithCredentials: boolean = false;
+  /** DNS 解析时是否优先使用 IPv4 地址（默认 false） */
+  private defaultFirstIpv4: boolean = false;
+
+  constructor(options: HttpClientOptions | null = null) {
+    this.options = options;
+    this.lifecycle = options != null && options.lifecycle != null
+      ? (options.lifecycle as RequestLifecycle)
+      : new RequestLifecycle();
+
+    this.defaultHeader = {
+      'Content-Type': ContentTypeEnum.AppJson,
+      'Accept': 'application/json, text/plain, */*'
+    } as UTSJSONObject;
+
+    if (options != null) {
+      if (options.baseURL != null) {
+        this.baseURL = options.baseURL as string;
+      }
+      if (options.timeout != null) {
+        this.defaultTimeout = options.timeout as number;
+      }
+      if (options.dataType != null) {
+        this.defaultDataType = options.dataType as string;
+      }
+      if (options.responseType != null) {
+        this.defaultResponseType = options.responseType as string;
+      }
+      if (options.sslVerify != null) {
+        this.defaultSslVerify = options.sslVerify as boolean;
+      }
+      if (options.withCredentials != null) {
+        this.defaultWithCredentials = options.withCredentials as boolean;
+      }
+      if (options.firstIpv4 != null) {
+        this.defaultFirstIpv4 = options.firstIpv4 as boolean;
+      }
+      if (options.header != null) {
+        const customHeader = options.header as UTSJSONObject;
+        const keys = UTSJSONObject.keys(customHeader);
+        for (let i = 0; i < keys.length; i = i + 1) {
+          const k = keys[i];
+          this.defaultHeader[k] = customHeader[k];
+        }
+      }
+      if (options.requestAdapter != null) {
+        this.requestAdapter = options.requestAdapter ?? null;
+      }
+      if (options.beforeRequest != null) {
+        this.beforeRequest(options.beforeRequest as BeforeRequestHook);
+      }
+      const resp = options.responded ?? options.afterResponse ?? options.respondedOptions;
+      if (resp != null) {
+        this.afterResponse(resp);
+      }
+    }
+  }
+
+  /**
+   * 注册请求前置拦截钩子
+   */
+  beforeRequest(hook: BeforeRequestHook): HttpClient {
+    this.beforeRequestHooks.push(hook);
+    return this;
+  }
+
+  /**
+   * 移除指定的前置拦截钩子
+   */
+  removeBeforeRequest(hook: BeforeRequestHook): void {
+    const idx = this.beforeRequestHooks.indexOf(hook);
+    if (idx >= 0) {
+      this.beforeRequestHooks.splice(idx, 1);
+    }
+  }
+
+  /**
+   * 清除所有前置拦截钩子
+   */
+  clearBeforeRequest(): void {
+    this.beforeRequestHooks = [];
+  }
+
+  /**
+   * 注册响应拦截钩子（支持对象或单个成功处理函数）
+   */
+  afterResponse(options: any): HttpClient {
+    if (options == null) {
+      return this;
+    }
+    if (typeof options == 'function') {
+      this.afterSuccessHooks.push(options as AfterResponseSuccessHook);
+      return this;
+    }
+    const opts = options as RespondedOptions;
+    if (opts.onSuccess != null) {
+      this.afterSuccessHooks.push(opts.onSuccess as AfterResponseSuccessHook);
+    }
+    if (opts.onError != null) {
+      this.afterErrorHooks.push(opts.onError as AfterResponseErrorHook);
+    }
+    if (opts.onComplete != null) {
+      this.afterCompleteHooks.push(opts.onComplete as AfterResponseCompleteHook);
+    }
+    return this;
+  }
+
+  /**
+   * Alova 风格响应拦截器别名
+   */
+  responded(options: any): HttpClient {
+    return this.afterResponse(options);
+  }
+
+  /**
+   * 清除所有后置拦截钩子
+   */
+  clearAfterResponse(): void {
+    this.afterSuccessHooks = [];
+    this.afterErrorHooks = [];
+    this.afterCompleteHooks = [];
+  }
+
+  /**
+   * 取消指定 requestKey 的在飞请求
+   */
+  abort(requestKey: string): void {
+    this.lifecycle.abort(requestKey);
+  }
+
+  /**
+   * 取消全部在飞请求
+   */
+  abortAll(): void {
+    this.lifecycle.abortAll();
+  }
+
+  /**
+   * 清除 TTL 缓存
+   */
+  clearCache(fingerprint: string = ''): void {
+    this.lifecycle.clearCache(fingerprint);
+  }
+
+  /**
+   * 获取生命周期管理器
+   */
+  getLifecycle(): RequestLifecycle {
+    return this.lifecycle;
+  }
+
+  /**
+   * 获取当前基础路径 baseURL
+   */
+  getBaseURL(): string {
+    return this.baseURL;
+  }
+
+  /**
+   * 获取客户端创建时的配置选项
+   */
+  getOptions(): HttpClientOptions | null {
+    return this.options;
+  }
+
+  /**
+   * 依次执行前置拦截钩子队列
+   */
+  private applyBeforeRequest(config: HttpRequestConfig): Promise<HttpRequestConfig> {
+    let p = Promise.resolve(config);
+    for (let i = 0; i < this.beforeRequestHooks.length; i = i + 1) {
+      const hook = this.beforeRequestHooks[i];
+      p = p.then((cfg: HttpRequestConfig): Promise<HttpRequestConfig> => {
+        try {
+          const res = hook(cfg);
+          if (res != null && typeof (res as Promise<any>).then == 'function') {
+            return (res as Promise<any>).then((): HttpRequestConfig => cfg);
+          }
+          return Promise.resolve(cfg);
+        }
+        catch (err) {
+          return Promise.reject(err) as Promise<HttpRequestConfig>;
+        }
+      });
+    }
+    return p;
+  }
+
+  /**
+   * 依次执行响应成功后置钩子队列（支持将当前 HttpClient 实例传给 hook 以便业务层扩展重试）
+   */
+  private applyAfterSuccess<T>(data: T, config: HttpRequestConfig): Promise<T> {
+    let p = Promise.resolve<any>(data);
+    for (let i = 0; i < this.afterSuccessHooks.length; i = i + 1) {
+      const hook = this.afterSuccessHooks[i];
+      p = p.then((currentData: any): Promise<any> => {
+        try {
+          const res = hook(currentData, config, this);
+          if (res != null && typeof (res as Promise<any>).then == 'function') {
+            return res as Promise<any>;
+          }
+          return Promise.resolve(res);
+        }
+        catch (err) {
+          return Promise.reject(err);
+        }
+      });
+    }
+    return p as Promise<T>;
+  }
+
+  /**
+   * 依次执行响应失败后置钩子队列
+   */
+  private applyAfterError<T>(err: any, config: HttpRequestConfig): Promise<T> {
+    let p = Promise.reject<any>(err);
+    for (let i = 0; i < this.afterErrorHooks.length; i = i + 1) {
+      const hook = this.afterErrorHooks[i];
+      p = p.catch((currentErr: any): Promise<any> => {
+        try {
+          const res = hook(currentErr, config);
+          if (res != null && typeof (res as Promise<any>).then == 'function') {
+            return (res as Promise<any>).then((): Promise<any> => Promise.reject<any>(currentErr));
+          }
+          return Promise.reject<any>(currentErr);
+        }
+        catch (hookErr) {
+          return Promise.reject<any>(hookErr);
+        }
+      });
+    }
+    return p as Promise<T>;
+  }
+
+  /**
+   * 依次执行完成收尾拦截钩子队列
+   */
+  private applyAfterComplete(config: HttpRequestConfig): Promise<void> {
+    let p = Promise.resolve();
+    for (let i = 0; i < this.afterCompleteHooks.length; i = i + 1) {
+      const hook = this.afterCompleteHooks[i];
+      p = p.then((): Promise<void> => {
+        try {
+          const res = hook(config);
+          if (res != null && typeof (res as Promise<any>).then == 'function') {
+            return (res as Promise<any>).then((): void => {});
+          }
+          return Promise.resolve();
+        }
+        catch (err) {
+          console.warn('[http] onComplete hook error:', err);
+          return Promise.resolve();
+        }
+      });
+    }
+    return p;
+  }
+
+  /**
+   * 按需写入内存 TTL 缓存
+   */
+  private cacheIfNeeded<T>(fingerprint: string, cacheTtl: number, data: T): void {
+    if (cacheTtl <= 0 || fingerprint == '' || data == null) {
+      return;
+    }
+    try {
+      const serialized = JSON.stringify(data);
+      this.lifecycle.setCache(fingerprint, serialized, cacheTtl);
+    }
+    catch (e) {
+      console.warn('[http] setCache failed', fingerprint, e);
+    }
+  }
+
+  /**
+   * 底层通用原生网络请求发射驱动（无第三方库，直通 uni.request）
+   */
+  private sendNativeRequest<T>(config: HttpRequestConfig): Promise<HttpResponse<T>> {
+    return new Promise<HttpResponse<T>>((resolve, reject) => {
+      // 1. 确定最终 BaseURL
+      let effectiveBase = this.baseURL;
+      if (config.baseURL != null && config.baseURL != '') {
+        effectiveBase = config.baseURL as string;
+      }
+      const extra = config.extra;
+      if (extra != null) {
+        const extraObj = extra as UTSJSONObject;
+        const domain = extraObj.domain as string | null;
+        if (domain != null && domain != '') {
+          effectiveBase = domain;
+        }
+      }
+
+      // 2. 拼接完整 URL 与 Query 参数
+      const rawUrl = config.url != null ? (config.url as string) : '';
+      const fullUrl = buildRequestUrl(effectiveBase, rawUrl, config.params);
+
+      // 3. 合并请求头
+      const mergedHeader = {} as UTSJSONObject;
+      const defaultKeys = UTSJSONObject.keys(this.defaultHeader);
+      for (let i = 0; i < defaultKeys.length; i = i + 1) {
+        const k = defaultKeys[i];
+        mergedHeader[k] = this.defaultHeader[k];
+      }
+      const customHeader = (config.headers ?? config.header) as UTSJSONObject | null;
+      if (customHeader != null) {
+        const customKeys = UTSJSONObject.keys(customHeader);
+        for (let i = 0; i < customKeys.length; i = i + 1) {
+          const k = customKeys[i];
+          mergedHeader[k] = customHeader[k];
+        }
+      }
+
+      // 4. 提取参数
+      const method = (config.method != null && config.method != '' ? config.method!.toUpperCase() : 'GET') as any;
+      const timeout = config.timeout != null ? (config.timeout as number) : this.defaultTimeout;
+      const dataType = config.dataType != null ? (config.dataType as string) : this.defaultDataType;
+      const responseType = config.responseType != null ? (config.responseType as string) : this.defaultResponseType;
+      const sslVerify = config.sslVerify != null ? (config.sslVerify as boolean) : this.defaultSslVerify;
+      const withCredentials = config.withCredentials != null ? (config.withCredentials as boolean) : this.defaultWithCredentials;
+      const firstIpv4 = config.firstIpv4 != null ? (config.firstIpv4 as boolean) : this.defaultFirstIpv4;
+      const enableChunked = config.enableChunked == true;
+
+      const requestKey = this.lifecycle.readExtraString(config, 'requestKey');
+
+      // 5. 调用原生 uni.request 发起请求
+      const requestTask = uni.request({
+        url: fullUrl,
+        method,
+        data: config.data,
+        header: mergedHeader,
+        timeout,
+        dataType,
+        responseType,
+        sslVerify,
+        withCredentials,
+        firstIpv4,
+        enableChunked,
+        success: (res) => {
+          if (requestKey != '') {
+            this.lifecycle.clearTask(requestKey);
+          }
+          const statusCode = res.statusCode;
+          const header = (res.header ?? ({} as UTSJSONObject)) as UTSJSONObject;
+          const cookies = res.cookies;
+
+          const responseObj: HttpResponse<T> = {
+            data: res.data as T,
+            statusCode,
+            header,
+            cookies,
+            errMsg: res.errMsg,
+            config
+          };
+          resolve(responseObj);
+        },
+        fail: (err) => {
+          if (requestKey != '') {
+            this.lifecycle.clearTask(requestKey);
+          }
+          const rawMsg = err.errMsg != null ? `${err.errMsg}` : '网络请求失败';
+          if (rawMsg.toLowerCase().includes('abort')) {
+            reject(new Error('请求已取消'));
+            return;
+          }
+          reject(toError(err));
+        }
+      });
+
+      // 登记在飞任务以便支持主动 abort 取消
+      if (requestTask != null) {
+        if (requestKey != '') {
+          this.lifecycle.registerTask(requestKey, requestTask);
+        }
+        if (config.getTask != null) {
+          config.getTask!(requestTask);
+        }
+      }
+    });
+  }
+
+  /**
+   * 单次发射：根据配置走自定义 requestAdapter 或原生网络驱动，并执行成功后置钩子链
+   */
+  private send<T>(config: HttpRequestConfig): Promise<T> {
+    const executePromise: Promise<HttpResponse<any>> = this.requestAdapter != null
+      ? this.requestAdapter!(config)
+      : this.sendNativeRequest<any>(config);
+
+    return executePromise.then((res: HttpResponse<any>): Promise<T> => {
+      const rawData = res.data;
+      if (rawData == null) {
+        return Promise.reject(new Error('响应数据为空')) as Promise<T>;
+      }
+      return this.applyAfterSuccess<T>(rawData as T, config);
+    });
+  }
+
+  /**
+   * 发起网络请求完整调度链路：前置钩子 → 取消判定 → GET 并发去重 → GET TTL 缓存 → 发送底层请求 → 后置拦截链
+   */
+  request<T>(config: HttpRequestConfig): Promise<T> {
+    const finalConfig = (config ?? {}) as HttpRequestConfig;
+    const rawHeaders = (finalConfig.headers ?? finalConfig.header);
+    const targetHeader = (rawHeaders != null ? rawHeaders as UTSJSONObject : ({} as UTSJSONObject));
+    finalConfig.headers = targetHeader;
+    finalConfig.header = targetHeader;
+
+    const defaultKeys = UTSJSONObject.keys(this.defaultHeader);
+    for (let i = 0; i < defaultKeys.length; i = i + 1) {
+      const k = defaultKeys[i];
+      if (targetHeader[k] == null) {
+        targetHeader[k] = this.defaultHeader[k];
+      }
+    }
+    return this.applyBeforeRequest(finalConfig).then(
+      (validConfig: HttpRequestConfig): Promise<T> => {
+        const fingerprint = this.lifecycle.buildRequestKey(validConfig);
+        const isGet = validConfig.method == null || validConfig.method == 'GET';
+
+        // 已被取消：直接失败，不发请求
+        if (this.lifecycle.isAborted(fingerprint)) {
+          this.lifecycle.consumeAborted(fingerprint);
+          return Promise.reject(new Error('请求已取消')) as Promise<T>;
+        }
+
+        // GET 默认并发去重：同指纹在飞请求复用同一个 Promise
+        const useDedupe = isGet && this.lifecycle.readExtraBoolean(validConfig, 'dedupe') != false;
+        if (useDedupe) {
+          const pending = this.lifecycle.getInflight<T>(fingerprint);
+          if (pending != null) {
+            return pending;
+          }
+        }
+
+        // GET TTL 缓存
+        const cacheTtl = isGet ? this.lifecycle.readExtraNumber(validConfig, 'cacheTtl') : 0;
+        if (cacheTtl > 0) {
+          const cached = this.lifecycle.getCache(fingerprint);
+          if (cached != null) {
+            try {
+              const parsed = JSON.parse(cached) as T;
+              return this.applyAfterComplete(validConfig).then((): T => parsed);
+            }
+            catch (_) {
+              this.lifecycle.clearCache(fingerprint);
+            }
+          }
+        }
+
+        const task = this.execute<T>(validConfig, fingerprint, cacheTtl).then(
+          (data: T): Promise<T> => {
+            return this.applyAfterComplete(validConfig).then((): T => data);
+          },
+          (err: any): Promise<T> => {
+            return this.applyAfterComplete(validConfig).then((): Promise<T> => {
+              return Promise.reject(toError(err)) as Promise<T>;
+            });
+          }
+        );
+
+        if (useDedupe) {
+          this.lifecycle.setInflight<T>(fingerprint, task);
+        }
+        return task;
+      },
+      (err: any): Promise<T> => {
+        return Promise.reject(toError(err)) as Promise<T>;
+      }
+    );
+  }
+
+  /**
+   * 真实请求执行链路：发送请求 → 清除 task → 写入缓存 → 响应失败后置钩子链
+   */
+  private execute<T>(config: HttpRequestConfig, fingerprint: string, cacheTtl: number): Promise<T> {
+    const requestKey = this.lifecycle.readExtraString(config, 'requestKey');
+    const done = (data: T): T => {
+      this.lifecycle.clearTask(requestKey);
+      this.cacheIfNeeded(fingerprint, cacheTtl, data);
+      return data;
+    };
+    const onRejected = (err: any): Promise<T> => {
+      this.lifecycle.clearTask(requestKey);
+      if (this.lifecycle.isAborted(requestKey) || this.lifecycle.isAborted(fingerprint)) {
+        this.lifecycle.consumeAborted(requestKey);
+        this.lifecycle.consumeAborted(fingerprint);
+        return Promise.reject(new Error('请求已取消')) as Promise<T>;
+      }
+      return this.applyAfterError<T>(err, config);
+    };
+    return this.send<T>(config).then(done, onRejected);
+  }
+
+  /**
+   * GET 请求
+   */
+  get<T>(url: string, config: HttpRequestConfig | null = null): Promise<T> {
+    const _config = (config ?? {}) as HttpRequestConfig;
+    _config.url = url;
+    _config.method = 'GET';
+    return this.request<T>(_config);
+  }
+
+  /**
+   * POST 请求
+   */
+  post<T>(url: string, data: any | null = null, config: HttpRequestConfig | null = null): Promise<T> {
+    const _config = (config ?? {}) as HttpRequestConfig;
+    _config.url = url;
+    _config.data = data;
+    _config.method = 'POST';
+    return this.request<T>(_config);
+  }
+
+  /**
+   * PUT 请求
+   */
+  put<T>(url: string, data: any | null = null, config: HttpRequestConfig | null = null): Promise<T> {
+    const _config = (config ?? {}) as HttpRequestConfig;
+    _config.url = url;
+    _config.data = data;
+    _config.method = 'PUT';
+    return this.request<T>(_config);
+  }
+
+  /**
+   * PATCH 请求（RESTful 局部更新：只传需要变更的字段，其余字段保持服务端现状）
+   */
+  patch<T>(url: string, data: any | null = null, config: HttpRequestConfig | null = null): Promise<T> {
+    const _config = (config ?? {}) as HttpRequestConfig;
+    _config.url = url;
+    _config.data = data;
+    _config.method = 'PATCH';
+    return this.request<T>(_config);
+  }
+
+  /**
+   * DELETE 请求
+   */
+  delete<T>(url: string, data: any | null = null, config: HttpRequestConfig | null = null): Promise<T> {
+    const _config = (config ?? {}) as HttpRequestConfig;
+    _config.url = url;
+    _config.data = data;
+    _config.method = 'DELETE';
+    return this.request<T>(_config);
+  }
+
+  /**
+   * 原生文件上传 (uni.uploadFile)
+   */
+  upload<T>(url: string, config: HttpRequestConfig | null = null): Promise<T> {
+    const _config = (config ?? {}) as HttpRequestConfig;
+    _config.url = url;
+    _config.method = 'UPLOAD';
+    return this.applyBeforeRequest(_config).then(
+      (validConfig: HttpRequestConfig): Promise<T> => {
+        return new Promise<T>((resolve, reject) => {
+          let effectiveBase = this.baseURL;
+          if (validConfig.baseURL != null && validConfig.baseURL != '') {
+            effectiveBase = validConfig.baseURL as string;
+          }
+          const fullUrl = buildRequestUrl(effectiveBase, validConfig.url ?? '', validConfig.params);
+
+          const mergedHeader = {} as UTSJSONObject;
+          const defaultKeys = UTSJSONObject.keys(this.defaultHeader);
+          for (let i = 0; i < defaultKeys.length; i = i + 1) {
+            const k = defaultKeys[i];
+            if (k != 'Content-Type') {
+              mergedHeader[k] = this.defaultHeader[k];
+            }
+          }
+          const customHeader = (validConfig.headers ?? validConfig.header) as UTSJSONObject | null;
+          if (customHeader != null) {
+            const customKeys = UTSJSONObject.keys(customHeader);
+            for (let i = 0; i < customKeys.length; i = i + 1) {
+              const k = customKeys[i];
+              mergedHeader[k] = customHeader[k];
+            }
+          }
+
+          const requestKey = this.lifecycle.readExtraString(validConfig, 'requestKey');
+          const timeout = validConfig.timeout != null ? (validConfig.timeout as number) : 60000;
+
+          const uploadTask = uni.uploadFile({
+            url: fullUrl,
+            filePath: validConfig.filePath ?? '',
+            name: validConfig.name ?? 'file',
+            formData: validConfig.formData ?? (validConfig.data as UTSJSONObject | null),
+            header: mergedHeader,
+            timeout,
+            success: (res) => {
+              if (requestKey != '') {
+                this.lifecycle.clearTask(requestKey);
+              }
+              let parsedData: any = res.data;
+              try {
+                if (typeof res.data == 'string') {
+                  parsedData = JSON.parse(res.data as string);
+                }
+              }
+              catch (_) {}
+              if (parsedData == null) {
+                reject(new Error('上传响应为空'));
+                return;
+              }
+              this.applyAfterSuccess<T>(parsedData as T, validConfig).then(
+                (data: T): Promise<T> => this.applyAfterComplete(validConfig).then((): T => data)
+              ).then(resolve, reject);
+            },
+            fail: (err) => {
+              if (requestKey != '') {
+                this.lifecycle.clearTask(requestKey);
+              }
+              const errMsg = err.errMsg != null ? `${err.errMsg}` : '文件上传失败';
+              this.applyAfterError<T>(new Error(errMsg), validConfig).then(
+                (data: T): Promise<T> => this.applyAfterComplete(validConfig).then((): T => data),
+                (finalErr: any): Promise<T> => this.applyAfterComplete(validConfig).then((): Promise<T> => {
+                  return Promise.reject(toError(finalErr)) as Promise<T>;
+                })
+              ).then(resolve, reject);
+            }
+          });
+
+          if (uploadTask != null) {
+            if (requestKey != '') {
+              this.lifecycle.registerTask(requestKey, uploadTask);
+            }
+            if (validConfig.getTask != null) {
+              validConfig.getTask!(uploadTask);
+            }
+          }
+        });
+      },
+      (err: any): Promise<T> => {
+        return Promise.reject(toError(err)) as Promise<T>;
+      }
+    );
+  }
+
+  /**
+   * 原生文件下载 (uni.downloadFile)
+   */
+  downloadFile(url: string, config: HttpRequestConfig | null = null): Promise<DownloadResult> {
+    const _config = (config ?? {}) as HttpRequestConfig;
+    _config.url = url;
+    _config.method = 'DOWNLOAD';
+    return this.applyBeforeRequest(_config).then(
+      (validConfig: HttpRequestConfig): Promise<DownloadResult> => {
+        return new Promise<DownloadResult>((resolve, reject) => {
+          let effectiveBase = this.baseURL;
+          if (validConfig.baseURL != null && validConfig.baseURL != '') {
+            effectiveBase = validConfig.baseURL as string;
+          }
+          const fullUrl = buildRequestUrl(effectiveBase, validConfig.url ?? '', validConfig.params);
+
+          const mergedHeader = {} as UTSJSONObject;
+          const defaultKeys = UTSJSONObject.keys(this.defaultHeader);
+          for (let i = 0; i < defaultKeys.length; i = i + 1) {
+            const k = defaultKeys[i];
+            mergedHeader[k] = this.defaultHeader[k];
+          }
+          const customHeader = (validConfig.headers ?? validConfig.header) as UTSJSONObject | null;
+          if (customHeader != null) {
+            const customKeys = UTSJSONObject.keys(customHeader);
+            for (let i = 0; i < customKeys.length; i = i + 1) {
+              const k = customKeys[i];
+              mergedHeader[k] = customHeader[k];
+            }
+          }
+
+          const requestKey = this.lifecycle.readExtraString(validConfig, 'requestKey');
+          const timeout = validConfig.timeout != null ? (validConfig.timeout as number) : 60000;
+
+          const downloadTask = uni.downloadFile({
+            url: fullUrl,
+            filePath: validConfig.filePath ?? '',
+            header: mergedHeader,
+            timeout,
+            success: (res) => {
+              if (requestKey != '') {
+                this.lifecycle.clearTask(requestKey);
+              }
+              const statusCode = res.statusCode;
+              if (statusCode < 200 || statusCode >= 300) {
+                const httpErr = new Error(`下载失败(${statusCode})：${res.errMsg}`);
+                this.rejectDownload(httpErr, validConfig).then(resolve, reject);
+                return;
+              }
+              const tempFilePath = res.tempFilePath;
+              if (tempFilePath == '') {
+                this.rejectDownload(new Error('下载响应为空'), validConfig).then(resolve, reject);
+                return;
+              }
+              const result: DownloadResult = {
+                tempFilePath,
+                statusCode
+              };
+              this.applyAfterComplete(validConfig).then((): DownloadResult => result).then(resolve, reject);
+            },
+            fail: (err) => {
+              if (requestKey != '') {
+                this.lifecycle.clearTask(requestKey);
+              }
+              const errMsg = err.errMsg != null ? `${err.errMsg}` : '文件下载失败';
+              this.rejectDownload(new Error(errMsg), validConfig).then(resolve, reject);
+            }
+          });
+
+          if (downloadTask != null) {
+            if (requestKey != '') {
+              this.lifecycle.registerTask(requestKey, downloadTask);
+            }
+            if (validConfig.getTask != null) {
+              validConfig.getTask!(downloadTask);
+            }
+          }
+        });
+      },
+      (err: any): Promise<DownloadResult> => {
+        return Promise.reject(toError(err)) as Promise<DownloadResult>;
+      }
+    );
+  }
+
+  private rejectDownload(err: Error, config: HttpRequestConfig): Promise<DownloadResult> {
+    return this.applyAfterError<DownloadResult>(err, config).then(
+      (data: DownloadResult): Promise<DownloadResult> => {
+        return this.applyAfterComplete(config).then((): DownloadResult => data);
+      },
+      (finalErr: any): Promise<DownloadResult> => {
+        return this.applyAfterComplete(config).then((): Promise<DownloadResult> => {
+          return Promise.reject(toError(finalErr)) as Promise<DownloadResult>;
+        });
+      }
+    );
+  }
+
+  /**
+   * 下载文件兼容别名
+   */
+  download(url: string, config: HttpRequestConfig | null = null): Promise<DownloadResult> {
+    return this.downloadFile(url, config);
+  }
+
+  /**
+   * 原生 enableChunked 流式请求（SSE / NDJSON 通信）
+   */
+  stream(
+    config: HttpRequestConfig,
+    onChunk: (data: ArrayBuffer) => void,
+    onEnd: (errMsg: string | null) => void
+  ): StreamTask {
+    const finalConfig = (config ?? {}) as HttpRequestConfig;
+    const requestKey = this.lifecycle.readExtraString(finalConfig, 'requestKey');
+    let task: any = null;
+    let settled = false;
+    let aborted = false;
+
+    const finish = (errMsg: string | null): void => {
+      if (settled) {
+        return;
+      }
+      settled = true;
+      if (requestKey != '') {
+        this.lifecycle.clearTask(requestKey);
+      }
+      if (aborted) {
+        return;
+      }
+      onEnd(errMsg);
+    };
+
+    this.applyBeforeRequest(finalConfig).then(
+      (readyConfig: HttpRequestConfig): void => {
+        if (aborted) {
+          return;
+        }
+        let effectiveBase = this.baseURL;
+        const extraDomain = this.lifecycle.readExtraString(readyConfig, 'domain');
+        if (extraDomain != '') {
+          effectiveBase = extraDomain;
+        }
+        else if (readyConfig.baseURL != null && readyConfig.baseURL != '') {
+          effectiveBase = readyConfig.baseURL as string;
+        }
+        const fullUrl = buildRequestUrl(effectiveBase, readyConfig.url ?? '', readyConfig.params);
+
+        const rawStreamHeader = (readyConfig.headers ?? readyConfig.header);
+        const header = rawStreamHeader != null ? (rawStreamHeader as UTSJSONObject) : ({} as UTSJSONObject);
+        if (header['Content-Type'] == null) {
+          header['Content-Type'] = ContentTypeEnum.AppJson;
+        }
+        if (header.Accept == null) {
+          header.Accept = 'application/json, text/plain, */*';
+        }
+
+        const requestTask = uni.request({
+          url: fullUrl,
+          method: 'POST',
+          data: readyConfig.data,
+          header,
+          timeout: readyConfig.timeout != null ? (readyConfig.timeout as number) : 60000,
+          enableChunked: true,
+          responseType: 'arraybuffer',
+          dataType: 'text',
+          success: (_res) => {
+            finish(null);
+          },
+          fail: (err) => {
+            let msg = '网络请求失败';
+            if (err != null && err.errMsg != null) {
+              msg = `${err.errMsg}`;
+            }
+            if (msg.toLowerCase().includes('abort')) {
+              aborted = true;
+              finish(null);
+              return;
+            }
+            finish(msg);
+          }
+        });
+        task = requestTask;
+        if (requestKey != '') {
+          this.lifecycle.registerTask(requestKey, requestTask);
+        }
+        requestTask.onChunkReceived((result) => {
+          if (settled) {
+            return;
+          }
+          onChunk(result.data);
+        });
+      },
+      (hookErr: any): void => {
+        const hookMsg = extractErrorMessage(hookErr);
+        finish(hookMsg != '' ? hookMsg : '请求失败');
+      }
+    );
+
+    return {
+      abort: (): void => {
+        aborted = true;
+        const current = task;
+        if (current != null) {
+          try {
+            (current as AbortableTask).abort();
+          }
+          catch (e) {
+            console.warn('[http] stream abort fail', e);
+          }
+        }
+      }
+    };
+  }
+}
+
+/**
+ * 工厂函数：统一创建并生成 HttpClient 原生底层客户端实例（纯净基础设施引擎，无预置业务代码）
+ * @param options 客户端配置；传 null 时初始化一个纯净无业务拦截的基础实例
+ */
+export function createHttpClient(options: HttpClientOptions | null = null): HttpClient {
+  if (options == null) {
+    const pureOptions: HttpClientOptions = {
+      baseURL: '',
+      timeout: 5000,
+      header: {
+        'Content-Type': ContentTypeEnum.AppJson,
+        'Accept': 'application/json, text/plain, */*'
+      } as UTSJSONObject,
+      lifecycle: defaultLifecycle
+    };
+    return new HttpClient(pureOptions);
+  }
+  return new HttpClient(options);
+}

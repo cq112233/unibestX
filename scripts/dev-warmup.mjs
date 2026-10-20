@@ -41,6 +41,41 @@ const launchArgs = process.argv.slice(2);
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const CLI_CACHE_FILE = path.join(ROOT, 'node_modules', '.hbuilderx-cli-path');
 
+const MOCK_CACHE_DIR = path.join(ROOT, 'node_modules', '.cache');
+const MOCK_ACTIVE_FILE = path.join(MOCK_CACHE_DIR, 'mock-active.json');
+const isMockMode = process.env.VITE_USE_MOCK === 'true';
+
+if (isMockMode) {
+  try {
+    if (!fs.existsSync(MOCK_CACHE_DIR)) {
+      fs.mkdirSync(MOCK_CACHE_DIR, { recursive: true });
+    }
+    fs.writeFileSync(MOCK_ACTIVE_FILE, JSON.stringify({ pid: process.pid, time: Date.now() }), 'utf-8');
+    console.log('\x1B[32m[dev:mock] 🚀 本地 Mock 模式已激活（已自动切换为 H5 代理模式）\x1B[0m');
+  }
+  catch {}
+}
+else {
+  // 普通开发模式，确保清理残留的 mock 标记
+  try {
+    if (fs.existsSync(MOCK_ACTIVE_FILE)) {
+      fs.unlinkSync(MOCK_ACTIVE_FILE);
+    }
+  }
+  catch {}
+}
+
+function cleanupMockActiveFile() {
+  if (isMockMode) {
+    try {
+      if (fs.existsSync(MOCK_ACTIVE_FILE)) {
+        fs.unlinkSync(MOCK_ACTIVE_FILE);
+      }
+    }
+    catch {}
+  }
+}
+
 /**
  * 自动填充 HBUILDERX_CLI_PATH 环境变量：
  * 避免在 macOS / Linux 上 HBuilderX 未开启时，uni-launch 找不到 cli 路径报错退出。
@@ -353,6 +388,7 @@ function killPortProcesses(port) {
 }
 
 function cleanupAndExit() {
+  cleanupMockActiveFile();
   if (child && !child.killed) {
     try {
       child.kill('SIGINT');
@@ -365,5 +401,9 @@ function cleanupAndExit() {
 
 process.on('SIGINT', cleanupAndExit);
 process.on('SIGTERM', cleanupAndExit);
+process.on('exit', cleanupMockActiveFile);
 
-child.on('exit', code => process.exit(code ?? 0));
+child.on('exit', (code) => {
+  cleanupMockActiveFile();
+  process.exit(code ?? 0);
+});

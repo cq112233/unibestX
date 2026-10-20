@@ -1,8 +1,14 @@
-# 3 跨端运行时与渲染模式约束
+# 3 跨端运行时手册（渲染模式 · 平台分流 · 真机报错 · 编译验证）
 
-> **本文件是 `unibestX-skill` 的参考分册**，由 [SKILL.md](../SKILL.md) 按需引用，收录本部分全部铁律的完整正反例与实测结论。
+> **本文件是 `unibestX-skill` 的参考分册**，由 [SKILL.md](../SKILL.md) 按需引用，收录跨端运行时的全部铁律、正反例与实测结论。
 >
 > **何时读本文件**：处理 VDOM / Android VDOM / Vapor（蒸汽模式）渲染差异、多平台门面分流与条件编译、UTS 插件与自定义基座、引入第三方组件前确认其写法是否可用（选项式 `.vue` 在蒸汽模式下不可编译）、Markdown 渲染、真机与 Kotlin 运行时报错、编译验证命令选择、`manifest.json` 渲染目标配置时。
+>
+> **与其它分册的分工**：本分册讲**「同一份代码在不同端为什么表现不同、怎么验证」**。纯语言语法看分册 1；纯样式限制看分册 2；页面骨架看分册 4。
+>
+> **30 秒速记**：常规平台分流用 `@/src/config/env/platform.uts` 常量；端专属未声明符号（`window` / `my` / `wx`）必须 `#ifdef` 物理隔离；长列表用 `list-view`；原生组件不能进半截流式快照；`flatten` 只给纯装饰；验证 Kotlin 必须看日志里 `编译为android class` ≥ 1。
+>
+> 📌 **3.1–3.29 是逐条铁律**（每条含现象、根因、修法、实测证据）；**3.30 起是手册部分**：完整示例（3.30）→ 多种场景写法（3.31）→ 坑点清单（3.32）→ 速查表（3.33：渲染模式 / 平台宏 / 假绿判定）→ 自检红线（3.34）。**「本地全绿但真机炸」先读 3.15 / 3.20 的假绿判定，再翻 3.32 坑点。**
 
 ## 3.1 `Map` / 原生 SDK 对象转 `UTSJSONObject` 的 ClassCastException 与 `:style` 类型安全
 
@@ -94,7 +100,7 @@
 
 - **陷阱**：分块接收（`uni.request` 的 `enableChunked` + `onChunkReceived`）时，若对每个 chunk 直接调用 `TextDecoder.decode(chunk)`，被 chunk 边界切断的多字节字符（中文、emoji）会被解成 U+FFFD「�」。
 - **根因**：Web 端靠 `decode(buf, { stream: true })` 保留跨块残字节，而 UTS 的 `TextDecoder` **只支持 `decode(input)` 单参数**，没有 stream 语义。
-- **正确做法**：自持一个尾部字节缓冲，手动判断尾部是否为不完整的 UTF-8 序列（最多向前回溯 4 字节，跳过 `0b10xxxxxx` 续接字节），只解码完整字符，残缺尾部留给下一块拼接。本项目实现见 `src/http/stream/stream.uts` 的 `Utf8StreamDecoder`。
+- **正确做法**：自持一个尾部字节缓冲，手动判断尾部是否为不完整的 UTF-8 序列（最多向前回溯 4 字节，跳过 `0b10xxxxxx` 续接字节），只解码完整字符，残缺尾部留给下一块拼接。本项目实现见 `uni_modules/request-bestX/stream/stream.uts` 的 `Utf8StreamDecoder`（此前位于 `src/http/stream/stream.uts`，随网络层重构迁入模块）。
 
 ## 3.8 判断「某平台能不能用某个 UTS 插件」，必须看**实际解析到哪个入口**，不能只看 `utssdk/app-<平台>/index.uts` 是否存在/是否为空
 
@@ -168,7 +174,7 @@
   3. `common/Tokenizer.uts` 顶部 `#ifdef APP-ANDROID` 的 `import JSReg from ...` —— **这个 import 在该文件里根本没被使用**。
 - **正确做法（本项目的落地方式，双管齐下，缺一不可）**：
   1. **页面 import 平台无关的 common 实现，不要用包根**：`import { useMarked } from '@/uni_modules/kux-marked/common/marked.uts'`，类型走纯类型 barrel `import type { I_Marked, TokensList } from '@/uni_modules/kux-marked/utssdk/interface.uts'`。其余平台（iOS / H5 / 鸿蒙 / 小程序）的包根本来也只是 `export * from '../../common/marked'`，所以走 common 与走包根**等价**，一路通用、不再需要 `#ifndef APP-ANDROID` 降级。
-  2. **把插件里那三处 jar 牵扯也按版本收窄**（`common/rules.uts`、`common/Tokenizer.uts` 各一处 import，加一层 `#ifdef uniVersion < 4.72` 包裹）。5.24 上等于删除，< 4.72 行为不变。
+  2. **把插件里那三处 jar 牵扯也按版本收窄**（`common/rules.uts`、`common/Tokenizer.uts` 各一处 import，加一层 `#ifdef uniVersion < 4.72` 包裹）。4.24 上等于删除，< 4.72 行为不变。
 - **负向对照（已实测）**：只改页面 import、**不打插件补丁** → 仍然 `Could not resolve "io.dcloud.uts.jsreg.JSReg"` 构建中断；两处都补 → `项目 unibestX 编译成功`。所以两者都必需，不能只做一半。
 - **产物级验证**：`unpackage/dist/dev/app-android/app-service.js` 里 `useMarked`/`blockquote`/`Lexer`/`Tokenizer` 分别出现 2/69/21/19 次（marked 确实被打进安卓包），`JSReg`/`callJSReg` 为 **0**（jar 依赖彻底消失）。
 - **红线**：
@@ -292,7 +298,7 @@
   | 命令 | 是否执行「编译为android class」 | 结论 |
   | :--- | :--- | :--- |
   | `cli launch app-android --project unibestX --compile true` | ❌ **否**（三轮日志 `grep -c` 均为 0） | 只走完 JS/字节码层。**据此宣称"编译成功"是假绿** —— 真实存在的两条 Kotlin 报错被完全掩盖 |
-  | `cli compile app-android --project unibestX --file src/http/stream/stream.uts` | ❌ 否 | 反证实测：对**故意写坏的**自引用 `const timerId` 也报 `编译成功`；产物 `unpackage/cache/uts_standard_android/.../index.kt` 里连 `simulateStream` 都没有（只打进了 import 图上的 `rxjs-lite`）。**它不校验文件本体** |
+  | `cli compile app-android --project unibestX --file <任意 .uts>` | ❌ 否 | 反证实测：对**故意写坏的**自引用 `const timerId` 也报 `编译成功`；产物 `unpackage/cache/uts_standard_android/.../index.kt` 里连 `simulateStream` 都没有（只打进了 import 图上的依赖模块）。**它不校验文件本体** |
   | ✅ `cli launch app-android --project unibestX --deviceId <序列号>`（**不带** `--compile`） | ✅ 是 | 真机运行流程会进 Kotlin 阶段 |
 
 - **关键澄清**：`--compile true` 的语义是"仅编译代码"（不装机），**恰恰少了 Kotlin 那一段**；`--compile` 不是"更彻底的编译"，而是"不装机的编译"。
@@ -584,8 +590,8 @@ cat unpackage/dist/dev/mp-weixin/src/i18n/index.d.uts.js   # → "use strict";
 
   | `uni-app-x` 配置 | 日志特征 | `grep -c "编译为android class"` | Kotlin 报错 | 结论 |
   | :--- | :--- | :--- | :--- | :--- |
-  | `{ "styleIsolationVersion": "2", "vapor": true, "vapor-render-target": "bytecode" }`（**HEAD 默认**） | `编译器版本：5.24（uni-app x）蒸汽模式` + `当前视图层编译目标：字节码` | **0** | 一条都没有（`[plugin:uni:app-uts]` 整段不出现） | 假绿：含 Kotlin 必炸代码也报「编译成功」，真机照跑 |
-  | `{ "styleIsolationVersion": "2" }`（临时删掉 `vapor`） | `编译器版本：5.24（uni-app x）VDOM模式` | **89** | 3 条真实 error（见 1.14 / 1.15） | ✅ 唯一可信的 Kotlin 通道 |
+  | `{ "styleIsolationVersion": "2", "vapor": true, "vapor-render-target": "bytecode" }`（**HEAD 默认**） | `编译器版本：4.24（uni-app x）蒸汽模式` + `当前视图层编译目标：字节码` | **0** | 一条都没有（`[plugin:uni:app-uts]` 整段不出现） | 假绿：含 Kotlin 必炸代码也报「编译成功」，真机照跑 |
+  | `{ "styleIsolationVersion": "2" }`（临时删掉 `vapor`） | `编译器版本：4.24（uni-app x）VDOM模式` | **89** | 3 条真实 error（见 1.14 / 1.15） | ✅ 唯一可信的 Kotlin 通道 |
 
 - **机理**：`vapor + bytecode` 下**整个应用走蒸汽模式**，视图层编译成字节码、UTS 逻辑层走 `uts2js`（产物在 `unpackage/cache/vapor/.app-android/.uts2js/`），**完全不进 Kotlin 编译阶段**。此时「编译成功」只代表字节码/JS 链路没报错。
 - **判定方法**：真机构建后先数那行，**`< 1` 就说明这轮没进 Kotlin，任何「编译成功」都不作数**：
@@ -624,7 +630,7 @@ cat unpackage/dist/dev/mp-weixin/src/i18n/index.d.uts.js   # → "use strict";
   1. **必须使用 `<list-view>` 的场景**：
      - 任何支持分页加载、无限追加的瀑布流或列表（如商品列表、动态 Feed 流、资讯列表、聊天记录等）；
      - 数据量不确定或潜在可能超过 20 条的数据展示；
-     - 业务推荐直接使用基于 `<list-view>` 构建的高级分页组件 `<z-paging-x>`（默认 `list-is="list-view"`）；
+     - **分页 / 触底加载场景优先直接使用 `<z-paging-x>`**（内置 `list-view` 虚拟复用、触底追加、下拉刷新、空态与 loading，默认 `list-is="list-view"`），只有它覆盖不了的布局才手写 `<list-view>`；
   2. **`<scroll-view>` 的合规场景（严禁用于长列表）**：
      - 有限短内容的整页或局部滚动（如系统设置页、详情页固定短表单）；
      - 顶部/横向滑动的分类筛选栏（`direction="horizontal"`）；
@@ -747,11 +753,11 @@ cat unpackage/dist/dev/mp-weixin/src/i18n/index.d.uts.js   # → "use strict";
   <text flatten>{{ title }}</text>
   ```
 
-- **前提：只有蒸汽模式认这个属性**，VDOM 模式不支持（写了不生效）。本项目 `manifest.json` 是 `"vapor": true` + `"vapor-render-target": "bytecode"`（HEAD 默认，见 3.20），编译器 5.24，版本门槛已满足：
+- **前提：只有蒸汽模式认这个属性**，VDOM 模式不支持（写了不生效）。本项目 `manifest.json` 是 `"vapor": true` + `"vapor-render-target": "bytecode"`（HEAD 默认，见 3.20），编译器 4.24，版本门槛已满足：
 
   | | Android(Vapor) | iOS(Vapor) | HarmonyOS(Vapor) |
   | --- | --- | --- | --- |
-  | 拍平引入版本 | 5.21 | 5.11 | 5.0 |
+  | 拍平引入版本 | 4.21 | 4.11 | 4.0 |
 
 - **红线一：拍平的元素不响应事件**（`click`、`touch` 全都没有），也不支持截图 API `takeSnapshot`、不支持 `pointer-events`。→ **凡是挂了 `@click` / `@tap` / `@touchstart` / `@touchmove` 的元素，一个字都不要加**。失败是**静默**的：编译不报错、运行不打警告，只是点了没反应 —— 排查时极难往「属性写多了」上想。
 
@@ -787,7 +793,7 @@ cat unpackage/dist/dev/mp-weixin/src/i18n/index.d.uts.js   # → "use strict";
   at uni_modules/xxx/components/xxx/xxx.vue:9:0
   ```
 
-- **底层原理**：本项目 `manifest.json` 视图层使用**蒸汽模式（Vapor）**编译（编译日志可见 `编译器版本：5.24（uni-app x）蒸汽模式`）。Vapor 模式下只接受 `<script setup>` 组合式写法，凡是 `export default { name, components, props, data, computed, methods }` 这种 **Options API 的 `.vue` 组件**（Vue 2 风格插件在 uni_modules 里非常常见）都会**在编译期被拒绝**，且报错定位在该组件文件上，容易误以为是自己的页面写错。
+- **底层原理**：本项目 `manifest.json` 视图层使用**蒸汽模式（Vapor）**编译（编译日志可见 `编译器版本：4.24（uni-app x）蒸汽模式`）。Vapor 模式下只接受 `<script setup>` 组合式写法，凡是 `export default { name, components, props, data, computed, methods }` 这种 **Options API 的 `.vue` 组件**（Vue 2 风格插件在 uni_modules 里非常常见）都会**在编译期被拒绝**，且报错定位在该组件文件上，容易误以为是自己的页面写错。
 - **强制规范**：
   1. 引入任何第三方组件前，先确认其主组件是 **`.uvue` + `<script setup>`**，而不是 `.vue` + 选项式；
   2. 若插件目录同时存在 `.vue` 与 `.uvue`（例如本项目的 `uni_modules/mp-html` 已提供 `mp-html.uvue` 适配版），**必须删掉/绕开 `.vue` 那份**，否则 easycom 会选中它并触发本错；
@@ -968,3 +974,412 @@ function getSharePath(): string {
   return '/pages/mp/share';
 }
 ```
+
+---
+
+## 3.28 禁止依赖浏览器特有 API；非全端 API 必须条件编译
+
+- **浏览器 API 禁令**：App 编译为原生 Kotlin / Swift，**不存在** `window`、`document`、`navigator`、`localStorage`、`sessionStorage`、`history` 等浏览器全局对象，Web / 小程序端可用的写法在 App 端会直接编译失败或在运行期炸掉。
+  - **替代方式**：样式用 Vue `:style` 响应式绑定（见 2.1），不要 `document.documentElement.style.setProperty()`；存储用 `uni.setStorageSync` / `uni.getStorageSync`；跳转用 `useRouter()`（见分册 8）。
+  - **确实要做 Web 专属逻辑**：按 3.27 的两级分层处理 —— 常规分支用 `@/src/config/env/platform.uts` 的 `isH5` 常量；`window` 这类未在全平台声明的符号必须 `// #ifdef H5` 物理隔离。
+- **非全端 API 必须先确认可用性**：例如 `uni.vibrateShort`、`uni.getLocale` 在 App-Android / iOS 上不被直接支持，裸调用会报 `请检查 xxx 的拼写是否正确`。
+  - **规范**：此类 API 必须用条件编译包裹（如 `// #ifdef H5 || MP-WEIXIN`），或改用全端支持的等价 API。
+- **安全获取系统语言**：App 端 `uni.getLocale()` 不可靠，应用当前语言用 `uni.getSystemInfoSync().appLanguage`，系统底层语言用 `uni.getDeviceInfo().osLanguage`。
+
+```ts
+// ❌ 错误：浏览器 API 与 App 端不支持的 API 裸调用
+document.documentElement.style.setProperty('--theme', color);
+const locale = uni.getLocale();
+uni.vibrateShort();
+
+// ✅ 正确：浏览器 API 用响应式绑定 / 物理隔离；语言走全端支持的字段
+// 主题：layout 根节点 :style="{ '--theme-color': color }"（见 2.1）
+// #ifdef H5
+document.documentElement.style.setProperty('--theme', color);
+// #endif
+const appLang = uni.getSystemInfoSync().appLanguage;
+const osLang = uni.getDeviceInfo().osLanguage;
+```
+
+---
+
+## 3.29 Vite 自定义页面插件开发约束
+
+编写自动包裹根布局、改写页面代码等 Vite 插件时，以下两条是硬约束（踩过即整页白屏 / 样式全丢）：
+
+- **精准过滤目标文件**：只处理 `src/pages/` 下的页面 `.uvue`，并且**必须排除** layout、页面子组件（`/components/`）与 `App.uvue`，否则会重复或非法转换。
+  - 判断路径前先把反斜杠 `\` 规范化为 `/`，否则 Windows 等环境下匹配失效。
+- **保护 `<style>` 与其它辅助标签**：自定义 `transform(code, id)` 时**严禁用模板字面量整体覆盖 `code`**。应通过正则只替换 `<template>` 与 `<script>` 节点内部的内容，确保 `<style>` 里的公共与局部 CSS 不丢失。
+
+```ts
+// ❌ 错误：整体覆盖 code —— <style> 被整段丢弃，页面样式全没
+return `<template><view class="page-wrap">${template}</view></template><script>${script}</script>`;
+
+// ✅ 正确：只替换 template / script 节点内部，其余原样保留
+let out = code;
+out = out.replace(/<template>([\s\S]*?)<\/template>/, (_m: string, inner: string): string => {
+  return `<template><view class="page-wrap">${inner}</view></template>`;
+});
+return out;
+```
+
+---
+
+## 3.30 完整示例：一个「跨端正确」的能力封装模块
+
+> 这份代码把 3.27（两级分层）、3.28（浏览器 API / 非全端 API）、3.24（拍平）、3.21（长列表）的约束落在同一个模块里。可作为 `src/utils/<module>/index.uts` 的跨端写法样板。
+
+```uts
+// src/utils/platform/index.uts —— 跨端能力分流的标准写法
+
+// ---------- 1. 常规跨端逻辑：用 platform 常量走普通 if ----------
+import { isApp, isH5, isMpWeixin } from '@/src/config/env/platform.uts';
+
+/** 返回分享落地页路径（常规分流，不要写 #ifdef） */
+export function getSharePath(): string {
+  if (isH5) {
+    return '/src/pages/h5/share';
+  }
+  if (isApp) {
+    return '/src/pages/app/share';
+  }
+  return '/src/pages/mp/share';
+}
+
+/** 本端是否支持「复制到剪贴板」的降级文案（普通 if，纯字符串） */
+export function getCopyTip(): string {
+  if (isMpWeixin) {
+    return '已复制，请到微信中粘贴';
+  }
+  return '已复制';
+}
+
+// ---------- 2. 端专属未声明符号：必须 #ifdef 物理隔离 ----------
+export function openExternal(url: string): void {
+  // #ifdef WEB
+  window.open(url, '_blank');
+  // #endif
+  // #ifndef WEB
+  uni.navigateTo({ url: `/src/sub/webview/webview?url=${encodeURIComponent(url)}` });
+  // #endif
+}
+
+export function hideAlipayHomeButton(): void {
+  // #ifdef MP-ALIPAY
+  if (typeof my != 'undefined' && typeof my.hideBackHome == 'function') {
+    my.hideBackHome();
+  }
+  // #endif
+}
+
+// ---------- 3. 非全端 API：包裹或换等价写法 ----------
+export function vibrateIfSupported(): void {
+  // #ifdef APP || WEB || MP-WEIXIN
+  uni.vibrateShort({});
+  // #endif
+}
+
+export function getAppLanguage(): string {
+  // App 端 getLocale() 不可靠，统一走系统信息字段
+  const sys = uni.getSystemInfoSync();
+  const lang = sys.appLanguage;
+  if (lang != null && lang != '') {
+    return lang;
+  }
+  return 'zh-Hans';
+}
+
+// ---------- 4. 长列表 / 滚动容器的选择判据 ----------
+/** 是否应该用 list-view（3.21）：分页、瀑布流、超过 20 条一律 true */
+export function shouldUseListView(itemCount: number, isPaging: boolean): boolean {
+  return isPaging || itemCount > 20;
+}
+```
+
+对应模板侧：
+
+```html
+<!-- ✅ 长列表：list-view 的直系子项必须是 list-item -->
+<list-view v-if="shouldUseListView(list.length, isPaging)" class="flex-1">
+  <list-item v-for="item in list" :key="item.id">
+    <view class="bg-[#ffffff] rounded-[10px] p-[12px] mx-[16px] mb-[10px]">
+      <text class="text-[14px] text-[#1e293b]">{{ item.title }}</text>
+    </view>
+  </list-item>
+</list-view>
+
+<!-- ✅ 短内容：允许 scroll-view -->
+<scroll-view v-else direction="vertical" class="flex-1">
+  <view class="flex flex-col"><!-- 不超过 20 条的短内容 --></view>
+</scroll-view>
+
+<!-- ✅ 拍平只给纯装饰（3.24）：无事件、不依赖 z-index / visibility -->
+<view class="w-full h-[1px] bg-[#f1f5f9]" flatten />
+```
+
+**验证这一步**（见 3.15 / 3.20）：
+
+```bash
+# 1) 真机跑一轮（不带 --compile），确认进了 Kotlin 阶段
+npx uni-launch app-android --deviceId <序列号>
+grep -c "编译为android class" <build.log>     # 必须 >= 1，否则本轮作废
+# 2) 蒸汽/字节码模式下再跑一轮，确认默认运行方式也正常
+```
+
+---
+
+## 3.31 多种场景写法（可直接复制）
+
+### 3.31.1 平台判断：先分流，再决定要不要 `#ifdef`
+
+```uts
+import { isApp, isH5, isMp } from '@/src/config/env/platform.uts';
+
+// ✅ 常规业务分支：常量 + 普通 if
+export function getPageSize(): number {
+  if (isH5) {
+    return 20;
+  }
+  if (isApp) {
+    return 10;
+  }
+  return 10;
+}
+
+// ✅ 端专属符号：物理隔离，不放进普通 if
+export function readWindowWidth(): number {
+  let width: number = 0;
+  // #ifdef WEB
+  width = window.innerWidth;
+  // #endif
+  // #ifndef WEB
+  width = uni.getWindowInfo().windowWidth;
+  // #endif
+  return width;
+}
+```
+
+### 3.31.2 渲染模式分流（门面）
+
+```uts
+// src/store/index.uts 的写法（3.18）：App 蒸汽 + Web + 小程序走官方 Pinia
+// #ifdef VUE3-VAPOR || H5 || WEB || MP
+import pinia from './vapor/index.uts';
+// #endif
+// #ifndef VUE3-VAPOR || H5 || WEB || MP
+import pinia from './vdom/index.uts';
+// #endif
+
+export default pinia;
+export * from './types.uts';   // 跨分支共享类型放 .uts 叶子，无条件转发
+```
+
+### 3.31.3 引入第三方组件前的三步检查
+
+```text
+① 看主组件是不是 .uvue + <script setup>（不是 .vue + export default）
+② 看插件目录里有没有同名 .vue 残留（有就绕开/删除，否则 easycom 会选中它）
+③ 看 package.json 的平台矩阵与 dcloudext.type（只有 uts 类型才是为 uni-app X 重写的）
+```
+
+### 3.31.4 引入依赖原生 jar 的插件
+
+```uts
+// ✅ 自定义基座就绪前：整段隔离，并写明何时打开
+// #ifndef APP-ANDROID
+// 做好自定义基座后再打开以下三行（见 3.6 / 3.10）
+// import { useMarked } from '@/uni_modules/kux-marked/common/marked.uts';
+// #endif
+```
+
+### 3.31.5 流式渲染：接收与渲染分离
+
+```uts
+let receivedText: string = '';
+
+/** 取最后一个完整块的结尾；没有完整块返回 -1（3.23） */
+function lastBlockBoundary(text: string): number {
+  const cut: number = text.lastIndexOf('\n\n');
+  return cut < 0 ? -1 : cut + 2;
+}
+
+export function onChunk(full: string, push: (snapshot: string) => void): void {
+  receivedText = full;
+  const boundary: number = lastBlockBoundary(full);
+  if (boundary > 0) {
+    push(full.substring(0, boundary));
+  }
+}
+
+export function onComplete(push: (snapshot: string) => void): void {
+  push(receivedText);
+}
+```
+
+### 3.31.6 全局事件：具名回调 + 卸载注销
+
+```uts
+import { onMounted, onUnmounted } from 'vue';
+
+function onThemeChanged(payload: any): void {
+  console.log('[theme] changed', payload);
+}
+
+onMounted((): void => {
+  uni.$on('setNavbarTitle', onThemeChanged);
+});
+
+onUnmounted((): void => {
+  uni.$off('setNavbarTitle', onThemeChanged);
+});
+```
+
+### 3.31.7 编译验证：三步法
+
+```bash
+# 第 1 步：确认本轮真的进了 Kotlin 阶段
+grep -c "编译为android class" <log>          # < 1 ⇒ 本轮作废
+
+# 第 2 步：看 Kotlin 阶段错误
+grep -nE "kotlin编译失败|error:" <log>
+
+# 第 3 步：判据落到产物上，不信退出码
+test -d unpackage/dist/dev/mp-weixin/src/store && echo "产物在"
+```
+
+---
+
+## 3.32 坑点清单（按踩坑频率排序）
+
+### ① 用普通 `if` 包裹端专属未声明符号
+
+```uts
+// ❌ Kotlin 静态符号解析失败：error18 找不到名称"window"
+if (isH5) {
+  window.open(url, '_blank');
+}
+
+// ✅ #ifdef 物理隔离
+// #ifdef WEB
+window.open(url, '_blank');
+// #endif
+```
+
+### ② 手写 `#ifdef H5` 漏掉 Web 构建
+
+本项目 `dev` / `build:h5` 的 `platform` 是 `web`，`H5` 宏为 false（3.18）。常规分流一律用 `isH5` 常量；确实要宏时写 `H5 || WEB`。
+
+### ③ 把 `VUE3-VAPOR` 当成「全端蒸汽」
+
+该宏只代表 App 蒸汽模式，H5 / 小程序恒 false（3.18）。要覆盖 Web 与小程序必须显式并列 `VUE3-VAPOR || H5 || WEB || MP`。
+
+### ④ 注释里写带斜杠的条件编译标记
+
+```uts
+// ❌ 块注释里出现「斜杠 + 标记名」→ Unbalanced right delimiter
+/* 见带斜杠的 ifdef 写法 */
+
+// ✅ 只写标记本身
+/* 见 #ifdef 用法 */
+```
+
+### ⑤ 用 `--compile true` 验证 Kotlin
+
+`--compile true` 只到 JS / 字节码层，**根本不进 Kotlin**（3.15）。验证必须用真机 `launch app-android`（不带 `--compile`）。
+
+### ⑥ 忽略 `vapor-render-target: "bytecode"`
+
+即使命令对了，只要 manifest 仍是 `vapor + bytecode`，整轮跳过 Kotlin（3.20）。判定前先 `grep -c "编译为android class"`。
+
+### ⑦ 靠退出码判断编译结果
+
+CLI 被 IDE 抢缓存时仍返回 exit 0（3.18）。判据必须落到产物目录。
+
+### ⑧ 把 `\p{...}` 正则写进 App 逻辑层
+
+模块求值即抛 `SyntaxError`，整块逻辑没跑起来（3.11）。用 `\uXXXX` 区间替代。
+
+### ⑨ 在 `#ifdef APP-ANDROID` 里写 Kotlin 专有 API
+
+蒸汽模式下这一支同样进 JS（3.12）。`getOrNull` / `@Suppress` / `toIntOrNull` 一律不用。
+
+### ⑩ 流式渲染直接 `streamText.value = full`
+
+半截块进渲染器 → 原生组件搬家 → `UTS instance N is not registered`（3.23）。按块边界推进快照。
+
+### ⑪ 给交互元素 / 遮罩层加 `flatten`
+
+事件与 `z-index` / `visibility` / `background-image` **静默失效**，编译不报错（3.24）。只给纯装饰加。
+
+### ⑫ 长列表用 `scroll-view`
+
+全量驻留内存，分页追加后 OOM（3.21）。**优先 `<z-paging-x>`**，覆盖不了才用 `list-view` + `list-item`。
+
+### ⑬ `uni.$on` 注册匿名函数且不注销
+
+全局 emitter 持有页面回调 → Activity 泄漏（3.26）。回调具名 + `onUnmounted` 里 `uni.$off`。
+
+### ⑭ 引入选项式 `.vue` 组件
+
+蒸汽模式只支持 `<script setup>`，编译直接中断（3.25）。先确认主组件是 `.uvue`。
+
+### ⑮ 下标越界 / 非空断言只在真机炸
+
+`tokens[i + 1]` 先读后判、`pre as boolean` 遇 null，JS 都不报（3.16 / 3.17）。边界与读取同表达式、断言前先判空。
+
+### ⑯ 判断不了「哪一端的问题」就猜业务逻辑
+
+「只有 App 崩、H5 与小程序正常」优先怀疑 UTS 类型系统四族：非空断言 / 下标越界 / 名称解析 / 原生对象强转（3.17）。
+
+---
+
+## 3.33 速查表
+
+### 3.32.1 渲染模式对照
+
+| 模式 | 触发 | 逻辑层 | 视图层 | 能暴露什么 | 本项目默认 |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| Vapor（蒸汽）+ bytecode | `manifest.json` 的 `vapor: true` + `vapor-render-target: "bytecode"` | `uts2js`（JS） | 字节码 | JS 运行时错误、蒸汽特有差异 | ✅ HEAD 默认 |
+| VDOM / Kotlin | 临时删掉 `vapor` 两个键 | Kotlin | 原生视图 | **全部 UTS→Kotlin 编译禁令** | 验证专用 |
+| VDOM（H5 / 小程序） | `VUE3-VAPOR` 在这些端恒为 false | JS | DOM / 小程序渲染 | Web 侧行为 | 按平台 |
+
+### 3.32.2 条件编译宏
+
+| 宏 | 覆盖范围 | 备注 |
+| :--- | :--- | :--- |
+| `APP` | 全部 App 端 | 含 Android / iOS / 鸿蒙 |
+| `APP-ANDROID` / `APP-IOS` / `APP-HARMONY` | 具体 App 端 | 蒸汽模式下这一支同样进 JS |
+| `VUE3-VAPOR` | **仅 App 蒸汽模式** | H5 / 小程序恒 false |
+| `H5` / `WEB` | Web（`H5` 蕴含 `WEB`） | 本项目 `dev` / `build:h5` 走 `web` 上下文 |
+| `MP` | 全部小程序 | 具体端用 `MP-WEIXIN` / `MP-ALIPAY` 等 |
+| `#ifndef A \|\| B` | `!(A \|\| B)` | 不要理解成 `!A \|\| B` |
+
+### 3.32.3 常见「本地全绿但真机炸」的判定
+
+| 现象 | 先查 |
+| :--- | :--- |
+| 编译成功但真机崩溃 | 3.15（命令是否进 Kotlin）、3.20（`vapor-render-target` 是否 `bytecode`） |
+| 只有 App 崩，H5 / 小程序正常 | 3.17 的四类：非空断言 / 下标越界 / 名称解析 / 原生对象强转 |
+| `ReferenceError: Xxx is not defined`（App 启动即报） | 3.11（`\p{...}`）/ 3.12（Kotlin-only API 进了 JS 层） |
+| 组件不渲染但编译通过 | 3.24（拍平吃事件）/ 3.25（选项式 `.vue`）/ 分册 4 的 easycom 前提 |
+| 流式内容到某一段必崩 | 3.23（半截块进渲染器） |
+| 页面退出后 Activity 泄漏 | 3.26（`uni.$on` 未注销） |
+
+---
+
+## 3.34 自检红线清单（运行时层）
+
+- [ ] **1. 常规平台分流用 `platform.uts` 常量** —— 业务代码里不散落手写 `#ifdef`
+- [ ] **2. 端专属未声明符号必须 `#ifdef`** —— `window` / `my` / `wx` / `plus` 不进普通 `if`
+- [ ] **3. 非全端 API 必须包裹或换等价写法** —— `uni.vibrateShort` / `uni.getLocale` 不裸调
+- [ ] **4. 条件编译标记不写斜杠前缀** —— 任何注释里都只写标记本身
+- [ ] **5. 不进 Kotlin 阶段就不算验证** —— `编译为android class` ≥ 1 才算数
+- [ ] **6. 不靠退出码判定编译结果** —— 判据落到产物目录
+- [ ] **7. 长列表用 `<list-view>` + `<list-item>`** —— 直系子项必须是 `list-item`
+- [ ] **8. 流式只推完整块快照** —— 半截块永不进富文本渲染器
+- [ ] **9. `flatten` 只给纯装饰** —— 有事件 / 依赖 `z-index` / `visibility` / 背景图的元素不加
+- [ ] **10. 第三方组件先确认写法** —— 只接受 `.uvue` + `<script setup>`
+- [ ] **11. 依赖原生 jar 的插件先准备自定义基座** —— 未就绪时整段 `#ifndef`
+- [ ] **12. `uni.$on` 必须配对 `uni.$off`** —— 回调具名，`onUnmounted` 注销
+- [ ] **13. App 启动即报错先查正则与 Kotlin-only API** —— 不用 `\p{...}`，不用 `getOrNull` 一类
+- [ ] **14. 同一份代码必须两种模式都跑** —— 蒸汽/字节码是默认，VDOM/Kotlin 是唯一暴露编译禁令的通道

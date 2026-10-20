@@ -1,62 +1,39 @@
 /**
- * openapi-ts-request 网络驱动适配器
+ * openapi-ts-request 业务网络驱动适配器
  *
- * 抹平 openapi-ts-request 生成代码的统一调用风格 (url, options)
- * 与 unibestX 内置强类型 http 客户端单例 (LimeRequestConfig) 的差异。
+ * 抹平 openapi-ts-request 自动生成代码的调用风格 (url, options)
+ * 与 unibestX 业务实例 (http / secondaryHttp) 的连接。
  */
 
-import { http } from '@/src/http/instances/index.uts';
-import type { LimeRequestConfig } from '@/uni_modules/lime-request';
-
-/**
- * openapi-ts-request 请求参数选项
- */
-export type OpenApiRequestOptions = {
-  method?: string | null;
-  params?: any | null;
-  data?: any | null;
-  headers?: any | null;
-  [key: string]: any | null;
-};
+import { http, secondaryHttp } from '@/src/http/instances/index.uts';
+import type { HttpClient, HttpRequestConfig } from '@/uni_modules/request-bestX/index.uts';
 
 /**
- * 专供 openapi 代码生成调用的泛型请求函数
- * @param url 接口相对或绝对路径
- * @param options 请求选项（包含 method, params, data, headers 等）
+ * openapi 请求参数类型（直接复用底层强类型的 HttpRequestConfig）
  */
-export function request<T>(url: string, options: OpenApiRequestOptions | null = null): Promise<T> {
-  const config = {} as LimeRequestConfig;
+export type OpenApiRequestOptions = HttpRequestConfig;
+
+/**
+ * 通用请求执行器：组装 url 与 options 并发起请求
+ */
+function executeRequest<T>(client: HttpClient, url: string, options: HttpRequestConfig | null = null): Promise<T> {
+  const config = (options != null ? options! : ({} as HttpRequestConfig));
   config.url = url;
+  return client.request<T>(config);
+}
 
-  if (options != null) {
-    const methodVal = options.method;
-    if (methodVal != null && methodVal != '') {
-      config.method = methodVal.toUpperCase();
-    }
-    else {
-      config.method = 'GET';
-    }
+/**
+ * 主服务请求函数（默认走主服务器 http / /api）
+ */
+export function request<T>(url: string, options: HttpRequestConfig | null = null): Promise<T> {
+  return executeRequest<T>(http, url, options);
+}
 
-    const paramsVal = options.params;
-    if (paramsVal != null) {
-      config.params = paramsVal as UTSJSONObject;
-    }
-
-    const dataVal = options.data;
-    if (dataVal != null) {
-      config.data = dataVal;
-    }
-
-    const headersVal = options.headers;
-    if (headersVal != null) {
-      config.header = headersVal as UTSJSONObject;
-    }
-  }
-  else {
-    config.method = 'GET';
-  }
-
-  return http.request<T>(config);
+/**
+ * 副服务请求函数（显式强制走副服务器 secondaryHttp / /api-secondary）
+ */
+export function secondaryRequest<T>(url: string, options: HttpRequestConfig | null = null): Promise<T> {
+  return executeRequest<T>(secondaryHttp, url, options);
 }
 
 export default request;

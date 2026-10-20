@@ -26,8 +26,14 @@ export function toLoginPage(options: UTSJSONObject | null = null) {
   }
   lastRedirectTime = now;
   const opts = options ?? ({} as UTSJSONObject);
-  const mode = (opts.getString('mode') ?? 'navigateTo') as string;
-  const queryString = (opts.getString('queryString') ?? '') as string;
+  const rawMode = typeof opts.getString == 'function'
+    ? opts.getString('mode')
+    : (opts.mode as string | null);
+  const mode = rawMode != null ? rawMode : 'navigateTo';
+  const rawQuery = typeof opts.getString == 'function'
+    ? opts.getString('queryString')
+    : (opts.queryString as string | null);
+  const queryString = rawQuery != null ? rawQuery : '';
   const url = `${LOGIN_PAGE}${queryString}`;
   // 判断当前页面是否已是登录页，避免重复跳转
   const currentPath = getCurrentPath();

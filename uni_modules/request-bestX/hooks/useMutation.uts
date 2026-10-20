@@ -1,0 +1,174 @@
+/**
+ * useMutation —— 声明式数据变更状态机 (TanStack Vue Query Style)
+ *
+ * 遵循 Vue Query 变更设计规范：
+ * 1. 专注写入操作（POST / PUT / DELETE 等会产生副作用的数据变更）；
+ * 2. 完备的生命周期钩子：onMutate（支持乐观更新 context） -> onSuccess / onError -> onSettled；
+ * 3. 双模触发：mutate() 静默派发（不抛异常）与 mutateAsync() 异步抛错（支持 await 捕获）；
+ * 4. 状态重置：支持 reset() 快速归位为初始 'idle' 态。
+ */
+
+import { ref } from 'vue';
+import type { Ref } from 'vue';
+import { toError } from '../util/helper.uts';
+import { useQueryClient } from './queryClient.uts';
+import type { QueryClient } from './queryClient.uts';
+import type { MutationOptions, MutationResult, MutationStatus } from './types.uts';
+
+/**
+ * 声明式变更 Hook (useMutation)
+ *
+ * @param options 变更配置项（含 mutationKey、mutationFn 与生命周期回调）
+ * @param customClient 可选自定义 QueryClient（默认使用全局或注入的单例）
+ */
+export function useMutation<TData, TVariables>(
+  options: MutationOptions<TData, TVariables>,
+  customClient: QueryClient | null = null
+): MutationResult<TData, TVariables> {
+  const client: QueryClient = useQueryClient(customClient);
+  const optFn = options.mutationFn;
+  let optRetry: number = 0;
+  if (options.retry != null) {
+    optRetry = options.retry!;
+  }
+  let optRetryDelay: number = 0;
+  if (options.retryDelay != null) {
+    optRetryDelay = options.retryDelay!;
+  }
+
+  // ---------- 1. 响应式状态声明 ----------
+  const dataRefAny: any = ref<TData | null>(null);
+  const dataRef: Ref<TData | null> = dataRefAny as Ref<TData | null>;
+  const variablesRefAny: any = ref<TVariables | null>(null);
+  const variablesRef: Ref<TVariables | null> = variablesRefAny as Ref<TVariables | null>;
+  const errorRef: Ref<Error | null> = ref<Error | null>(null);
+  const statusRef: Ref<MutationStatus> = ref<MutationStatus>('idle');
+
+  const isPendingRef: Ref<boolean> = ref<boolean>(false);
+  const isSuccessRef: Ref<boolean> = ref<boolean>(false);
+  const isErrorRef: Ref<boolean> = ref<boolean>(false);
+
+  // ---------- 2. 重置方法 ----------
+  const reset = (): void => {
+    dataRef.value = null;
+    variablesRef.value = null;
+    errorRef.value = null;
+    statusRef.value = 'idle';
+    isPendingRef.value = false;
+    isSuccessRef.value = false;
+    isErrorRef.value = false;
+  };
+
+  // ---------- 3. 延时工具 ----------
+  const delayPromise = (ms: number): Promise<void> => {
+    return new Promise<void>((resolve) => {
+      if (ms <= 0) {
+        resolve();
+        return;
+      }
+      setTimeout((): void => {
+        resolve();
+      }, ms);
+    });
+  };
+
+  // ---------- 4. 异步执行器 (mutateAsync) ----------
+  const mutateAsync = (variables: TVariables): Promise<TData> => {
+    variablesRef.value = variables;
+    statusRef.value = 'pending';
+    isPendingRef.value = true;
+    isSuccessRef.value = false;
+    isErrorRef.value = false;
+    errorRef.value = null;
+
+    const unregisterMutation = client.registerMutation(options.mutationKey);
+
+    // 执行 onMutate 钩子（获取乐观更新上下文）
+    let mutateContext: any = null;
+    if (options.onMutate != null) {
+      try {
+        mutateContext = options.onMutate!(variables);
+      }
+      catch (contextErr) {
+        console.error('onMutate 执行异常:', contextErr);
+      }
+    }
+
+    const runAttempt = (attempt: number): Promise<TData> => {
+      return optFn(variables).catch((err: any): Promise<TData> => {
+        const e: Error = toError(err);
+        let canRetry: boolean = attempt < optRetry;
+        if (canRetry == true && options.isRetryable != null) {
+          canRetry = options.isRetryable!(e);
+        }
+
+        if (canRetry == true) {
+          return delayPromise(optRetryDelay).then((): Promise<TData> => {
+            return runAttempt(attempt + 1);
+          });
+        }
+        return Promise.reject(e);
+      });
+    };
+
+    return runAttempt(0).then(
+      (resData: TData): TData => {
+        unregisterMutation();
+        dataRef.value = resData;
+        statusRef.value = 'success';
+        isPendingRef.value = false;
+        isSuccessRef.value = true;
+        isErrorRef.value = false;
+
+        if (options.onSuccess != null) {
+          options.onSuccess!(resData, variables, mutateContext);
+        }
+        if (options.onSettled != null) {
+          options.onSettled!(resData, null, variables, mutateContext);
+        }
+        return resData;
+      },
+      (err: any): Promise<TData> => {
+        unregisterMutation();
+        const errorObj = toError(err);
+        errorRef.value = errorObj;
+        statusRef.value = 'error';
+        isPendingRef.value = false;
+        isSuccessRef.value = false;
+        isErrorRef.value = true;
+
+        if (options.onError != null) {
+          options.onError!(errorObj, variables, mutateContext);
+        }
+        if (options.onSettled != null) {
+          options.onSettled!(null, errorObj, variables, mutateContext);
+        }
+        return Promise.reject(errorObj);
+      }
+    );
+  };
+
+  // ---------- 5. 静默执行器 (mutate) ----------
+  const mutate = (variables: TVariables): void => {
+    mutateAsync(variables).catch((_err: any): void => {
+      // 静默吞掉未捕获的 rejection，错误统一由 onError / onSettled 与 errorRef 承载
+    });
+  };
+
+  // ---------- 6. 返回结果 ----------
+  const result: MutationResult<TData, TVariables> = {
+    data: dataRef,
+    variables: variablesRef,
+    error: errorRef,
+    status: statusRef,
+    isPending: isPendingRef,
+    isLoading: isPendingRef, // 别名支持
+    isSuccess: isSuccessRef,
+    isError: isErrorRef,
+    mutate,
+    mutateAsync,
+    reset
+  };
+
+  return result;
+}

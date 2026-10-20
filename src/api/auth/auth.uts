@@ -1,5 +1,5 @@
 import { http } from '@/src/http/index.uts';
-import type { LimeRequestConfig } from '@/uni_modules/lime-request';
+import type { HttpRequestConfig } from '@/uni_modules/request-bestX/index.uts';
 
 // ==========================================
 // 1. 类型定义（遵循规范：一律使用 type，严禁 interface）
@@ -71,12 +71,12 @@ const MOCK_LOGIN_RESULT: LoginResult = {
  * @param params 登录表单（username / password，两者都不可为空）；
  *               该请求带 `extra.ignoreAuth`，**不注入 token、401 也不会触发刷新**
  */
-export function login(params: LoginQuery): Promise<LoginResult> {
+export function loginApi(params: LoginQuery): Promise<LoginResult> {
   return http.post<UTSJSONObject>('/auth/login', params, {
     extra: {
       ignoreAuth: true
     } as UTSJSONObject
-  } as LimeRequestConfig).then((data: UTSJSONObject): LoginResult => {
+  } as HttpRequestConfig).then((data: UTSJSONObject): LoginResult => {
     const rawUser = data.get('userInfo') as UTSJSONObject | null;
     // ⚠️ 必须写 `getArray<string>(...)`：UTS 无法从默认值反推元素类型，省略泛型实参会被
     // Kotlin 编译拒绝（`推断类型是 UTSArray<*>`，预期 `UTSArray<String>?`，实测于 app-android）。
@@ -119,7 +119,7 @@ export function login(params: LoginQuery): Promise<LoginResult> {
 /**
  * 获取当前登录用户信息
  */
-export function fetchUserInfo(): Promise<AuthUserInfo> {
+export function fetchUserInfoApi(): Promise<AuthUserInfo> {
   return http.get<UTSJSONObject>('/user/info').then((data: UTSJSONObject): AuthUserInfo => {
     // ⚠️ 同上：必须写 `getArray<string>(...)`（UTS 要求显式泛型实参，TS 侧靠 @ts-expect-error 抑制 TS2347）
     // @ts-expect-error UTS 编译要求显式泛型实参；TS 侧 getArray 为 any 会报 TS2347
@@ -143,14 +143,14 @@ export function fetchUserInfo(): Promise<AuthUserInfo> {
  * 直接失败、不再触发刷新，否则刷新接口自身 401 会形成无限递归。
  * @param params 刷新凭证，只需 `refreshToken`（一般取自 tokenStore 里持久化的那一份）
  */
-export function refreshAccessToken(params: RefreshTokenQuery): Promise<RefreshTokenResult> {
+export function refreshAccessTokenApi(params: RefreshTokenQuery): Promise<RefreshTokenResult> {
   return http.post<UTSJSONObject>('/auth/refresh', params, {
     extra: {
       skipRefresh: true,
       ignoreAuth: true,
       toast: false
     } as UTSJSONObject
-  } as LimeRequestConfig).then((data: UTSJSONObject): RefreshTokenResult => {
+  } as HttpRequestConfig).then((data: UTSJSONObject): RefreshTokenResult => {
     return {
       accessToken: data.getString('accessToken') ?? data.getString('token') ?? '',
       accessExpiresIn: data.getNumber('accessExpiresIn') ?? 7200,
@@ -171,10 +171,18 @@ export function refreshAccessToken(params: RefreshTokenQuery): Promise<RefreshTo
 /**
  * 退出登录接口
  */
-export function logout(): Promise<boolean> {
+export function logoutApi(): Promise<boolean> {
   return http.post<any>('/auth/logout').then((_data: any): boolean => {
     return true;
   }, (_err: any): boolean => {
     return true;
   });
 }
+
+// ==========================================
+// 4. 向下兼容别名导出（兼顾无 Api 后缀的旧调用与单测契约）
+// ==========================================
+export const login = loginApi;
+export const fetchUserInfo = fetchUserInfoApi;
+export const refreshAccessToken = refreshAccessTokenApi;
+export const logout = logoutApi;
