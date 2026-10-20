@@ -8,6 +8,7 @@ type IUserInfo = {
   username: string;
   nickname: string;
   avatar: string;
+  permissions: Array<string>;
 };
 
 type IUserState = {
@@ -20,7 +21,8 @@ const defaultUserInfo: IUserInfo = {
   userId: -1,
   username: '',
   nickname: '',
-  avatar: DEFAULT_AVATAR
+  avatar: DEFAULT_AVATAR,
+  permissions: []
 };
 
 export const useUserStore = defineStore('user', () => {
@@ -30,7 +32,8 @@ export const useUserStore = defineStore('user', () => {
       userId: defaultUserInfo.userId,
       username: defaultUserInfo.username,
       nickname: defaultUserInfo.nickname,
-      avatar: defaultUserInfo.avatar
+      avatar: defaultUserInfo.avatar,
+      permissions: []
     }
   });
 
@@ -39,11 +42,16 @@ export const useUserStore = defineStore('user', () => {
   // ==========================================
 
   function setUserInfo(info: IUserInfo): void {
+    const permissions: Array<string> = [];
+    for (let i = 0; i < info.permissions.length; i++) {
+      permissions.push(info.permissions[i]);
+    }
     state.userInfo = {
       userId: info.userId,
       username: info.username,
       nickname: info.nickname,
-      avatar: info.avatar != '' ? info.avatar : DEFAULT_AVATAR
+      avatar: info.avatar != '' ? info.avatar : DEFAULT_AVATAR,
+      permissions
     };
   }
 
@@ -56,7 +64,8 @@ export const useUserStore = defineStore('user', () => {
       userId: defaultUserInfo.userId,
       username: defaultUserInfo.username,
       nickname: defaultUserInfo.nickname,
-      avatar: defaultUserInfo.avatar
+      avatar: defaultUserInfo.avatar,
+      permissions: []
     };
   }
 

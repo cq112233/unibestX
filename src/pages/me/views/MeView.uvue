@@ -93,7 +93,8 @@ const userInfoJson = computed((): string => {
     userId: userStore.state.userInfo.userId,
     username: userStore.state.userInfo.username,
     nickname: userStore.state.userInfo.nickname,
-    avatar: userStore.state.userInfo.avatar
+    avatar: userStore.state.userInfo.avatar,
+    permissions: userStore.state.userInfo.permissions
   };
   return JSON.stringify(info, null, 2);
 });

@@ -103,6 +103,7 @@ const router = useRouter();
 // - tailwindcss: /src/sub/tailwindcssBasicDemo/
 // - theme:       /src/sub/themeBasicDemo/
 // - router:      /src/sub/routerBasicDemo/
+// - permission:  /src/sub/permissionDemo/
 // - lang:        /src/sub/langBasicDemo/
 // - font:        /src/sub/fontBasicDemo/
 // - icon:        /src/sub/iconBasicDemo/
@@ -151,6 +152,13 @@ const demoList: Array<BasicDemoItem> = [
     desc: '演示 useRoute / useRouter 组合式用法、导航方法、跨页传参与登录拦截。',
     btnText: '进入路由 hooks 与路由拦截功能',
     path: '/src/sub/routerBasicDemo/routerBasicDemo'
+  },
+  {
+    id: 'permission',
+    title: '页面与按钮权限',
+    desc: '用户信息直接返回权限结果，页面入口和操作按钮没有权限就不渲染。',
+    btnText: '进入页面与按钮权限演示',
+    path: '/src/sub/permissionDemo/permissionDemo'
   },
   {
     id: 'lang',

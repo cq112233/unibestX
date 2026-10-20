@@ -1,6 +1,9 @@
 <script setup lang="uts">
 import { checkDirectEntry } from '@/uni_modules/route-bestX/index.uts';
-import { useI18nStore, useThemeStore } from '@/src/store/index.uts';
+import { fetchUserInfoApi } from '@/src/api/auth/auth.uts';
+import type { AuthUserInfo } from '@/src/api/auth/auth.uts';
+import { useI18nStore, useThemeStore, useTokenStore, useUserStore } from '@/src/store/index.uts';
+import type { IUserInfo } from '@/src/store/index.uts';
 import { initNativeMidButtonTap, setTabbarItem } from '@/src/tabbar/index.uts';
 import { applyThemeColor, themeColor } from '@/src/theme/index.uts';
 import { reportError } from '@/src/utils/report/index.uts';
@@ -8,6 +11,36 @@ import { reportError } from '@/src/utils/report/index.uts';
 // #ifdef APP
 import { runPrivacyGate } from '@/src/config/index.uts';
 // #endif
+
+/**
+ * 已登录时静默刷新用户信息，确保服务端调整后的权限及时生效。
+ * 失败时保留本地缓存，401 由 HTTP 拦截器统一清理登录态。
+ */
+function refreshUserInfoIfNeeded(): void {
+  const tokenStore = useTokenStore();
+  const userStore = useUserStore();
+  if (!tokenStore.hasValidLogin()) {
+    userStore.clearUserInfo();
+    return;
+  }
+  fetchUserInfoApi().then((info: AuthUserInfo | null) => {
+    if (info != null) {
+      // 当前 /userInfo 接口不返回 permissions，缺失时保留登录后缓存的权限结果
+      const nextPermissions = info.permissions.length > 0
+        ? info.permissions
+        : userStore.state.userInfo.permissions;
+      userStore.setUserInfo({
+        userId: info.userId,
+        username: info.username,
+        nickname: info.nickname,
+        avatar: info.avatar,
+        permissions: nextPermissions
+      } as IUserInfo);
+    }
+  }, (_err: any) => {
+    // 静默失败，保留本地缓存；未授权场景已由 HTTP 拦截器清理
+  });
+}
 
 onLaunch(() => {
   // 提前实例化 Theme Store（含持久化还原），并初始化外观模式：跟随系统 / 浅色 / 深色
@@ -36,6 +69,9 @@ onLaunch(() => {
     return;
   }
   // #endif
+
+  // 权限属于用户信息的一部分，登录态恢复后静默拉取一次最新结果
+  refreshUserInfoIfNeeded();
 
   // #ifdef MP-WEIXIN
   // 微信小程序真机 @font-face 不生效，使用 uni.loadFontFace 加载 uni-icons 字体
