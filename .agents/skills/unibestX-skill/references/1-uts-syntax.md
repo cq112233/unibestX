@@ -1,8 +1,14 @@
-# 1 UTS 强类型系统与语法核心铁律
+# 1 UTS 强类型与语法手册（类型契约 · 完整示例 · 场景写法 · 报错索引）
 
-> **本文件是 `unibestX-skill` 的参考分册**，由 [SKILL.md](../SKILL.md) 按需引用，收录本部分全部铁律的完整正反例与实测结论。
+> **本文件是 `unibestX-skill` 的参考分册**，由 [SKILL.md](../SKILL.md) 按需引用，收录 UTS 语法与类型系统的全部铁律、正反例与实测结论。
 >
-> **何时读本文件**：定义对象结构与类型标注、写 `export` / `class` / 闭包 / 定时器回调 / 集合遍历，或遇到 `UTS110111163`、`UTS110111119`、`UTS110111120`、`error1`、`error17`、`error18`、`NoSuchMethodError`、`ClassCastException`、VSCode 里的 `TS2322` / `TS2352` 等编译、运行期与编辑器诊断报错时。
+> **何时读本文件**：定义对象结构与类型标注、写 `export` / `class` / 闭包 / 定时器回调 / 集合遍历，或遇到 `UTS110111163`、`UTS110111119`、`UTS110111120`、`error1`、`error17`、`error18`、`error25`、`NoSuchMethodError`、`ClassCastException`、VSCode 里的 `TS2322` / `TS2352` 等编译、运行期与编辑器诊断报错时。
+>
+> **与其它分册的分工**：本分册只讲**语言层**（类型怎么定义、值怎么比较、函数怎么写、模块怎么导出）。样式写法看分册 2，跨端运行期差异看分册 3，页面 / 接口 / 工具库 / 路由的工程规范分别看分册 4 / 5 / 6 / 7 / 8。
+>
+> **30 秒速记**：`type` 不用 `interface`；空值只用 `null`；条件写显式布尔；基础类型比较用 `==`；`number` / `Array` 显式标注；函数签名全标注；可空用 `?.` 与 `??`；异步用双参 `.then`，不写 `.catch`；`as` 后面不写泛型别名。
+>
+> 📌 **1.1–1.29 是逐条铁律**（每条含错误码、底层原理、强制规范、正反例）；**1.30 起是手册部分**：类型怎么声明与导入（1.30）→ 类型系统能表达什么（1.31）→ 完整可编译示例（1.32）→ 多种场景写法（1.33）→ 坑点清单（1.34）→ 报错索引（1.35）→ 速查表（1.36）→ 自检红线（1.37）。**上手先读 1.32，报错先查 1.35，排查先翻 1.34。**
 
 ## 1.1 一律禁止使用 `interface`，全面统一使用 `type`
 
@@ -204,7 +210,7 @@ function createUser(): UserInfo {
 }
 ```
 
-- **`super(...)` 构造实参中不能引用 `this`**：Kotlin 端父类构造先于子类字段初始化执行，`super(...)` 的实参里引用 `this` 会编译失败。需要把「子类自己的状态」交给父类构造时（典型如 `class Subject extends Observable`），**改用组合而非继承**：让 `Subject` 持有一个私有 `_observers` 数组，并额外提供 `asObservable(): Observable<T>` 返回一个由 `this` 闭包驱动的 `Observable` 供下游 `.pipe()` 使用。本项目实现见 `src/utils/rxjs-lite/index.uts` 的 `Subject`。
+- **`super(...)` 构造实参中不能引用 `this`**：Kotlin 端父类构造先于子类字段初始化执行，`super(...)` 的实参里引用 `this` 会编译失败。需要把「子类自己的状态」交给父类构造时（典型如 `class Subject extends Observable`），**改用组合而非继承**：让 `Subject` 持有一个私有 `_observers` 数组，并额外提供 `asObservable(): Observable<T>` 返回一个由 `this` 闭包驱动的 `Observable` 供下游 `.pipe()` 使用。本项目实现见 `uni_modules/rxjs-bestX/index.uts` 的 `Subject`。
 
 ## 1.10 严禁在对象字面量（UTSJSONObject）中放入顶层函数作为聚合对象导出
 
@@ -315,7 +321,7 @@ export * from './vdom/user.uts';
 
 ## 1.13 局部声明在**其自身的初始化表达式内不可见** —— `const timerId = setInterval(() => clearInterval(timerId))` 必炸
 
-- **错误码**（本项目实测，`src/http/stream/stream.uts`）：
+- **错误码**（历史案例，原 `src/http/stream/stream.uts`，该模块已随网络层重构迁到 `uni_modules/request-bestX/stream/stream.uts`；报错文本与规则不变）：
 
   ```text
   error: 找不到名称"timerId"。参考: https://doc.dcloud.net.cn/uni-app-x/uts/compiler-known-issues.html#error18
@@ -636,7 +642,7 @@ export * from './vdom/user.uts';
 
 ## 1.21 链式 `.catch()` 在 Kotlin 端**重载不可解析** —— 一律改用双参 `.then(onFulfilled, onRejected)`
 
-- **错误码**（本项目实测，2026-10-07，HBuilderX 5.26，真机 VDOM/Kotlin 通道）：
+- **错误码**（本项目实测，2026-10-07，HBuilderX 4.26，真机 VDOM/Kotlin 通道）：
 
   ```text
   [plugin:uni:app-uts] kotlin编译失败
@@ -645,7 +651,7 @@ export * from './vdom/user.uts';
   fun <R> catch(onRejected: () -> UTSPromise<R>): UTSPromise<R>
   fun <R> catch(onRejected: (@ParameterName(...) Any?) -> R): UTSPromise<R>
   fun <R> catch(onRejected: (@ParameterName(...) Any?) -> UTSPromise<R>): UTSPromise<R>
-  at src/http/request/request.uts:346:43
+  at src/http/instances/internal/factory.uts:346:43   （历史报错，模块重构后行号会变，报错文本不变）
     346 |      return this.send<T>(config).then(done).catch((err: any) => {
         |                                             ^
   ```
@@ -742,7 +748,8 @@ export * from './vdom/user.uts';
   JVM 虚拟机为防止无限递归，会强行返回未完成初始化的类，导致类顶层的常量与实例为 `null`，传入 Kotlin 生成的 `@NotNull` 属性 setter 时直接抛出 `NullPointerException`，进而触发 `ExceptionInInitializerError` 导致整个应用崩溃。
 
 - **强制规范**：
-  1. **全局开发坚持精准导入（Deep Import）**：所有工具函数、状态与配置导入，一律精准引入具体的实现文件（如 `@/src/config/env/env.uts`、`@/src/router/utils/utils.uts`、`@/src/i18n/utils/index.uts`），严禁跨底层模块引入 `index.uts` 聚合门面。
+  1. **全局开发坚持精准导入（Deep Import）**：所有工具函数、状态与配置导入，一律精准引入具体的实现文件（如 `@/src/config/env/env.uts`、`@/src/utils/systemInfo/index.uts`、`@/src/i18n/utils/index.uts`），严禁跨底层模块引入 `index.uts` 聚合门面。
+     - **第三方 `uni_modules` 模块例外**：从该模块**公开入口**导入（如 `@/uni_modules/route-bestX/index.uts`），它内部的文件间引用由模块自己保证单向；**业务代码严禁穿透进 `core/` / `hooks/` 等内部文件**。
   2. **总入口严禁反向导出形成自环**：主入口（如 `src/i18n/index.uts`）严禁再写 `export * from './utils/index.uts'`，彻底保持单向有向无环图（DAG）。
   3. **分层原则**：
      - **业务页面/组件**（`src/pages/`、`src/sub/`）：优先使用业务封装好的对外接口；
@@ -751,11 +758,11 @@ export * from './vdom/user.uts';
 - **正反例**：
 
   ```uts
-  // ❌ 错误：从路由聚合门面引入，连带拉起 interceptor、store，形成 config ➜ router ➜ store ➜ config 循环死锁
-  import { getCurrentPath } from '@/src/router/index.uts';
+  // ❌ 错误：从聚合门面引入，连带拉起 privacy / platform 等全部子模块的静态初始化
+  import { getApiBaseUrl } from '@/src/config/index.uts';
 
   // ✅ 正确：精准导入纯净的具体实现文件，0 额外依赖，杜绝循环引用
-  import { getCurrentPath } from '@/src/router/utils/utils.uts';
+  import { getApiBaseUrl } from '@/src/config/env/env.uts';
   ```
 
   ```uts
@@ -974,11 +981,10 @@ export * from './vdom/user.uts';
 
   | 位置 | 说明 |
   | :--- | :--- |
-  | `src/http/stream/stream.uts:272` | 注释写得最全；同处还命中 1.13（回调里 `clearInterval(timerId)` 引用自身） |
-  | `src/http/hooks/useRequest.uts:391` / `:465` | 防抖 `debounceTimer` / 轮询 `pollingTimer` |
-  | `src/utils/rxjs-lite/index.uts:569` | RxJS lite 的 delayer 句柄 |
-  | `src/components/NestedScroll/NestedScroll.uvue:383` | 下拉刷新超时句柄 |
-  | `src/sub/timeFunctionDemo/timeFunctionDemo.uvue:153` | 官方 API 演示页 |
+  | `src/components/NestedScroll/NestedScroll.uvue:383` | 下拉刷新超时句柄（6000ms） |
+  | `src/sub/timeFunctionDemo/timeFunctionDemo.uvue:153` | 官方 API 演示页（100ms） |
+  | `src/sub/chartsFunctionDemo/chartsFunctionDemo.uvue:502` | 图表轮播句柄（120ms） |
+  | `src/tabbar/internal/navigate.uts:124` | TabBar 切换节流句柄（250ms） |
 
 - **排查手法**（一条命令扫全仓，防复发）。注意**不能用 `grep -A`**：双层强转是多行语句，`as any) as number` 落在三行之后，`grep -v` 是逐行过滤、根本滤不掉，会把所有**正确**写法都当成漏网报出来。必须按**括号配对**把整条赋值语句切出来再看：
 
@@ -991,3 +997,708 @@ export * from './vdom/user.uts';
 - **验证方式**：改完必须落到 **VSCode 的 `ts-plugin` 诊断**上确认已清空 —— `pnpm typecheck` 扫不到 `.uts`（全绿不代表修好），UTS 编译也从来不会因为这个报错（编译成功不代表编辑器不红）。
 
 ---
+
+## 1.27 `UTSJSONObject` 未声明字段只能下标访问并断言，禁止点属性
+
+- **错误码**：无独立报错码，通常表现为编译期「属性不存在」或运行期取值恒为 `null`。
+- **底层原理**：UTS 在原生端把对象字面量编译成强类型类。**只有声明过字段的 `type` 才有 `obj.key` 这层静态成员**；未经声明的 `UTSJSONObject` 没有对应属性，点访问拿不到值，必须走下标 + 断言。
+- **强制规范**：对没有声明强类型字段的 `UTSJSONObject`，**禁止 `obj.key` 与 `obj.key.sub` 点访问**，统一下标访问并对取出的值做类型断言；多层结构逐层断言。
+
+```ts
+// ❌ 错误：config 是未声明字段的 UTSJSONObject，点访问取不到 color，嵌套写入更会丢
+config.color['up-primary'] = 'red'
+
+// ✅ 正确：逐层下标 + 断言
+const colorConfig = config['color'] as UTSJSONObject
+colorConfig['up-primary'] = 'red'
+
+// ✅ 取值同样要断言出目标类型
+const title = config['title'] as string
+```
+
+> ⚠️ 与 1.9 的界限：`Class` 实例**反过来**禁止 `obj[key]` 下标访问，只能点操作符。判据是「这个值的类型是 `Class` 还是 `UTSJSONObject`」，两者下标规则相反。
+
+---
+
+## 1.28 Pinia 自定义基类重写方法必须与父类签名严格一致
+
+- **错误码**：App-Android 端泛型基类方法校验失败（通常表现为重写方法「不存在」或参数不匹配）。
+- **底层原理**：项目的 Pinia 基类（`PiniaStoreBase`，来自 `@/uni_modules/x-pinia-s`，仅 x-pinia-s 分支）在 Kotlin 端是带泛型的强类型类，重写（覆写）内置方法（如 `_hydrate`）时，参数数量与类型都属于签名的一部分，与父类不一致就无法构成合法覆写。
+- **强制规范**：重写或覆写父类方法时，**参数数量与类型必须与父类类型签名逐一对齐**（参数名可以不同，项目内既有 `data` 与 `_data` 两种写法），并显式写 `override`；不得靠省略参数或放宽类型规避报错。
+
+```ts
+// ❌ 错误：擅自增减参数，泛型基类方法在 App-Android 端校验不过
+class UserStore extends PiniaStoreBase {
+  override _hydrate(data: UTSJSONObject, persisted: boolean): void { /* ... */ }
+}
+
+// ✅ 正确：与父类对齐（父类签名：`_hydrate(data: UTSJSONObject): void`）
+class UserStore extends PiniaStoreBase {
+  override _hydrate(data: UTSJSONObject): void { /* ... */ }
+}
+```
+
+---
+
+## 1.29 语句分隔与显式类型断言
+
+- **语句分隔**：多行书写时行尾分号 `;` 可省略；**同一行写多条语句必须以分号分隔**。
+- **显式类型断言**：在选项式组件 `data()` 定义中，或对 `any` 类型变量取值后，用 `as` 断言出确定类型，避免原生端把类型推成 `Any`/`Nothing`：
+
+  ```ts
+  const year = date.getFullYear() as number
+  ```
+
+- **注意**：断言不能拿来掩盖空值 —— 对可能为 `null` 的值做 `as` 非空断言前必须先判空（见 A.2 第 19 条）。
+
+---
+
+
+## 1.30 类型怎么声明、从哪导入
+
+### 1.30.1 类型声明：只写 `type`，只放文件顶层
+
+```uts
+// ✅ 顶层：对象结构 / 联合 / 函数类型，一律 type
+export type CouponItem = {
+  id: number,
+  title: string,
+  amount: number
+};
+
+// ✅ 联合类型：只与 null 联合
+export type CouponFilter = 'all' | 'active' | 'expired';
+export type CouponOrNull = CouponItem | null;
+
+// ✅ 函数类型：抽成顶层别名（不要写进对象属性，见 1.16）
+export type CouponHandler = (item: CouponItem, index: number) => void;
+
+// ✅ 泛型
+export type PageResult<T> = {
+  list: Array<T>,
+  hasMore: boolean,
+  total: number
+};
+```
+
+| 要定义什么 | 写法 | 禁止 |
+| :--- | :--- | :--- |
+| 对象结构 | `type X = { ... }` | `interface X { ... }`（1.1） |
+| 可选字段 | `field?: string \| null` | `field?: string \| undefined`（1.2） |
+| 联合 | 只允许 `T \| null` | `string \| number`（改用 `any` 或拆参数） |
+| 函数类型 | 顶层 `type Xxx = (...) => ...` | 写进对象属性且带剩余参数（1.16） |
+| 泛型容器 | `type PageResult<T> = {...}` | 泛型别名用在 `as` 后（1.25） |
+| 类型位置 | 文件顶层 | 函数 / 代码块内部（1.7，`UTS100006`） |
+
+### 1.30.2 类型从哪导入：四种来源
+
+| 来源 | 导入写法 | 说明 |
+| :--- | :--- | :--- |
+| 本项目类型 | `import type { CouponItem } from '@/src/api/coupon/coupon.uts'` | **必须带 `.uts` 后缀**，`@` 指向项目根 |
+| 同页私有类型 | `import type { QueryRow } from './types.uts'` | 页面目录内部用相对路径 |
+| 第三方模块类型 | `import type { RouteLocation } from '@/uni_modules/route-bestX/index.uts'` | 从**公开入口**导入，不穿透内部文件 |
+| 框架全局类型 | 无需导入 | `UTSJSONObject`、`UniScrollEvent`、`ComponentPublicInstance` 等 |
+
+```uts
+// ❌ 错误：type 与值混在一起用普通 import；无扩展名
+import { CouponItem } from '@/src/api/coupon/coupon';
+
+// ✅ 正确：类型用 `import type`，路径带 .uts
+import type { CouponItem } from '@/src/api/coupon/coupon.uts';
+```
+
+> ⚠️ **`import type` 在本项目不会被擦除成「零运行期成本」**：对象类型别名会生成运行期类（见记忆 `uts-import-type-is-not-erased`）。因此**类型要放在零依赖的叶子文件里**，不要跨文件反向引用实现模块，否则会形成运行期循环。
+
+---
+
+## 1.31 类型系统能表达什么
+
+### 1.31.1 可用类型一览
+
+| 类别 | 可用 | 说明 |
+| :--- | :--- | :--- |
+| 基础 | `string` / `number` / `boolean` | `string` / `boolean` 可字面量推导；`number` 必须标注（1.5） |
+| 空值 | `null` | 没有 `undefined`（1.2） |
+| 数组 | `Array<T>` / `T[]` | 必须显式标注元素类型 |
+| Map | `Map<K, V>` | 取用 `.get()` / `.set()`；`keys()` 是属性不是方法（1.14） |
+| JSON 对象 | `UTSJSONObject` | 未声明字段只能下标 + 断言（1.27） |
+| 联合 | `T \| null` | 只允许与 `null` 联合 |
+| 函数 | `(a: A) => B` | 顶层别名可带剩余参数，对象属性里不行（1.16） |
+| 泛型 | `type Box<T> = {...}` | 泛型**不协变**（1.18） |
+| 类 | `class` | 编译为原生类，遵守原生 OOP 规则（1.9） |
+| 任意 | `any` | 等价 Kotlin **非空** `Any`；可空返回要写 `any \| null`（1.18） |
+| 元组 | ❌ 不支持 | 用 `type` 对象或数组替代 |
+| `never` / `unknown` | ❌ 不用 | —— |
+| 索引签名 | ❌ 不支持 | 动态键走 `UTSJSONObject` |
+
+### 1.31.2 值语义：什么时候要断言、什么时候要判空
+
+```uts
+// ① 具名 type：对象字面量可以直接赋（不需要断言）
+const coupon: CouponItem = { id: 1, title: 'A', amount: 10 };
+
+// ② UTSJSONObject 取值：下标 + 断言
+const raw = config['amount'];
+const amount: number = raw != null ? (raw as number) : 0;
+
+// ③ 插槽变量（Any?）：模板调用点断言（1.8）
+// <text>{{ formatItem(item as UTSJSONObject) }}</text>
+
+// ④ any 返回值：先判空再断言（3.17）
+const maybe: any | null = map.get('key');
+const text: string = maybe != null ? `${maybe}` : '';
+```
+
+### 1.31.3 类型与运行期的对应关系（最容易误判的一张表）
+
+| 类型位置 | 是否产生运行期代码 | 能不能写泛型实例化别名 |
+| :--- | :--- | :--- |
+| `:` 后（变量 / 参数 / 返回值标注） | ❌ 不产生 | ✅ 可以（`Promise<FooPageResult>`） |
+| `as` 后 | ✅ 编译成 `new T(...)` | ❌ **禁止**（1.25） |
+| `import type` | ⚠️ 对象类型别名仍会生成类 | 类型放零依赖叶子文件 |
+| 泛型本体 `PageResult<T>` | ✅ 生成 `class PageResult` | —— |
+
+---
+
+## 1.32 完整示例：一个可直接编译的 `.uts` 工具模块
+
+> 下面这份代码把 1.1–1.29 的规则**全部落在同一个文件里**，可作为新建 `src/utils/<module>/index.uts` 的起点。复制后改业务即可，不要删掉类型标注与判空。
+
+```uts
+// src/utils/coupon/index.uts —— UTS 语法标准写法合集（可直接编译）
+
+// ---------- 1. 类型：只在文件顶层，一律 type ----------
+export type CouponItem = {
+  id: number,
+  title: string,
+  amount: number,
+  expiredAt: number,
+  tags: Array<string>
+};
+
+export type PageResult<T> = {
+  list: Array<T>,
+  hasMore: boolean,
+  total: number
+};
+
+// ---------- 2. 常量：number / Array 必须显式标注；空值用 null ----------
+const PAGE_SIZE: number = 10;
+const EMPTY_ITEMS: Array<CouponItem> = [];
+
+// ---------- 3. 函数：参数与返回值全标注，无返回值写 : void ----------
+export function isExpired(item: CouponItem, now: number): boolean {
+  return item.expiredAt > 0 && item.expiredAt < now;
+}
+
+export function formatAmount(amount: number): string {
+  return `¥${amount}`;
+}
+
+// ---------- 4. 可空：`?.` + `??` 兜底；条件必须显式布尔 ----------
+export function pickTitle(item: CouponItem | null): string {
+  if (item == null) {
+    return '';
+  }
+  const title: string = item.title.trim();
+  if (title == '') {
+    return '未命名优惠券';
+  }
+  return title;
+}
+
+// ---------- 5. 下标：边界检查与读取写在同一个短路表达式 ----------
+export function firstTag(item: CouponItem): string {
+  const tags: Array<string> = item.tags;
+  if (tags.length == 0 || tags[0] == null) {
+    return '';
+  }
+  const first: string = tags[0];
+  return first;
+}
+
+// ---------- 6. Map 遍历：值类型是 string 可标注；值类型是 any 时禁止标注 ----------
+export function joinQuery(query: Map<string, string>): string {
+  const parts: Array<string> = [];
+  query.forEach((value: string, key: string): void => {
+    parts.push(`${key}=${value}`);
+  });
+  return parts.join('&');
+}
+
+// ---------- 7. Promise：双参 .then(onFulfilled, onRejected)，严禁链式 .catch ----------
+export function fetchCouponList(pageNo: number = 1, pageSize: number = PAGE_SIZE): Promise<PageResult<CouponItem>> {
+  return Promise.resolve({
+    list: EMPTY_ITEMS,
+    hasMore: false,
+    total: 0
+  } as PageResult<CouponItem>);
+}
+
+export function fetchCouponDetail(id: number): Promise<CouponItem | null> {
+  return fetchCouponList(1, 1).then(
+    (res: PageResult<CouponItem>): CouponItem | null => {
+      if (res.list.length > 0) {
+        return res.list[0];
+      }
+      return null;
+    },
+    (err: any): CouponItem | null => {
+      console.error('[coupon] 详情加载失败', err);
+      return null;
+    }
+  );
+}
+
+// ---------- 8. 导出面：只用具名函数导出，绝不导出「包着函数的对象字面量」 ----------
+export function getCouponApiPath(): string {
+  return '/api/v1/coupon';
+}
+```
+
+**逐段对应关系**：类型顶层 + `type` → 1.1 / 1.7；常量标注 → 1.5；函数签名 → 1.6；可空处理 → 1.2 / 1.6 / 3.17；下标边界 → 3.16；Map 遍历 → 1.14；Promise → 1.21 / 1.18；导出面 → 1.10 / 1.11。
+
+---
+
+## 1.33 多种场景写法（可直接复制）
+
+### 1.33.1 定义 DTO + 默认值构造
+
+```uts
+export type CouponItem = {
+  id: number,
+  title: string,
+  amount: number
+};
+
+// ✅ 统一由工厂函数造默认值，避免每个调用点各写一份 null 判断
+export function createEmptyCoupon(): CouponItem {
+  return { id: 0, title: '', amount: 0 } as CouponItem;
+}
+
+// ✅ 可选字段：用 `?: T | null`，不要写 `| undefined`
+export type CouponQuery = {
+  keyword?: string | null,
+  pageNo?: number | null
+};
+```
+
+### 1.33.2 写异步函数：三种形态
+
+```uts
+// 形态 A：直接返回 Promise.resolve（mock / 同步逻辑）
+export function fetchList(): Promise<Array<CouponItem>> {
+  return Promise.resolve([] as Array<CouponItem>);
+}
+
+// 形态 B：链式 then —— 只用双参形式，失败即返回兜底值
+export function fetchTitle(id: number): Promise<string> {
+  return fetchDetail(id).then(
+    (item: CouponItem | null): string => {
+      if (item == null) {
+        return '';
+      }
+      return item.title;
+    },
+    (err: any): string => {
+      console.error('[coupon] fetchTitle 失败', err);
+      return '';
+    }
+  );
+}
+
+// 形态 C：需要「抛出」失败时用 Promise.reject，不要 throw
+export function fetchRequired(id: number): Promise<CouponItem> {
+  return fetchDetail(id).then(
+    (item: CouponItem | null): Promise<CouponItem> => {
+      if (item == null) {
+        return Promise.reject(new Error('优惠券不存在')) as Promise<CouponItem>;
+      }
+      return Promise.resolve(item);
+    },
+    (err: any): Promise<CouponItem> => {
+      return Promise.reject(err) as Promise<CouponItem>;
+    }
+  );
+}
+```
+
+### 1.33.3 遍历与转换
+
+```uts
+// 数组：map / filter 回调要标注参数与返回值
+export function toTitles(list: Array<CouponItem>): Array<string> {
+  return list.map((item: CouponItem): string => item.title);
+}
+
+// 过滤：条件必须显式布尔
+export function filterActive(list: Array<CouponItem>, now: number): Array<CouponItem> {
+  return list.filter((item: CouponItem): boolean => !isExpired(item, now));
+}
+
+// 索引循环：边界与读取同表达式
+export function sumAmount(list: Array<CouponItem>): number {
+  let total: number = 0;
+  for (let i = 0; i < list.length; i++) {
+    total += list[i].amount;
+  }
+  return total;
+}
+```
+
+### 1.33.4 `UTSJSONObject` 与 `Map`
+
+```uts
+// UTSJSONObject：未声明字段只能下标 + 断言（1.27）
+export function readConfig(config: UTSJSONObject): string {
+  const raw = config['theme'];
+  if (raw == null) {
+    return '';
+  }
+  return `${raw}`;
+}
+
+// UTSJSONObject 遍历：用 UTSJSONObject.keys()，不要 map.keys()
+export function dumpConfig(config: UTSJSONObject): Array<string> {
+  const keys: Array<string> = UTSJSONObject.keys(config);
+  const lines: Array<string> = [];
+  for (let i = 0; i < keys.length; i++) {
+    const key: string = keys[i];
+    const value = config[key];
+    if (value != null) {
+      lines.push(`${key}=${value}`);
+    }
+  }
+  return lines;
+}
+
+// Map<string, string>：可以标注 value: string（1.14 的范围界定）
+export function mapToLines(map: Map<string, string>): Array<string> {
+  const lines: Array<string> = [];
+  map.forEach((value: string, key: string): void => {
+    lines.push(`${key}:${value}`);
+  });
+  return lines;
+}
+```
+
+### 1.33.5 闭包与定时器
+
+```uts
+// ✅ 先声明、后赋值（1.13）；句柄显式 number 并做双层强转（1.26）
+let timerId: number = 0;
+
+export function startPolling(onTick: () => void, intervalMs: number = 1000): void {
+  stopPolling();
+  timerId = (setInterval((): void => {
+    onTick();
+  }, intervalMs) as any) as number;
+}
+
+export function stopPolling(): void {
+  if (timerId != 0) {
+    clearInterval(timerId);
+    timerId = 0;
+  }
+}
+
+// ✅ 局部函数不能当值传递（1.15）：包一层 lambda
+function onTimeout(): void {
+  stopPolling();
+}
+
+export function scheduleStop(delayMs: number): void {
+  setTimeout((): void => {
+    onTimeout();
+  }, delayMs);
+}
+```
+
+### 1.33.6 类与单例
+
+```uts
+// ✅ 原生类：private 不用 #；不写 static {}；继承显式 constructor + super
+export class CouponFormatter {
+  private prefix: string = '¥';
+
+  constructor(prefix: string = '¥') {
+    this.prefix = prefix;
+  }
+
+  format(amount: number): string {
+    return `${this.prefix}${amount}`;
+  }
+}
+
+// ✅ 对外提供单例（具名导出，不导出对象字面量）
+export const couponFormatter: CouponFormatter = new CouponFormatter();
+```
+
+### 1.33.7 模块导出面设计
+
+```uts
+// ✅ 一个模块 = 一组具名导出；需要门面时只做一层转发
+// src/utils/coupon/index.uts
+export * from './types.uts';      // 纯类型叶子，可以转发
+export * from './format.uts';     // 每个符号只在这一层转发一次
+
+// ❌ 不要：export const couponApi = { fetchList, fetchDetail }
+// ❌ 不要：子文件再 export * 一次（两层转发 → Kotlin 符号改名 __1）
+```
+
+---
+
+## 1.34 坑点清单（按踩坑频率排序）
+
+### ① 写了 `interface`
+
+```uts
+// ❌ interface 不能接收对象字面量：UTS110111163
+interface User { id: number }
+const u: User = { id: 1 };
+
+// ✅ type
+type User = { id: number };
+```
+
+### ② 用了 `undefined` 或可选参数 `?`
+
+```uts
+// ❌
+let name: string | undefined;
+function f(a?: string): void {}
+
+// ✅
+let name: string | null = null;
+function f(a: string | null): void {}
+```
+
+### ③ 条件位置给了非布尔值
+
+```uts
+// ❌ UTS110111120：数组、字符串、对象都不能直接当条件
+if (list) {}
+if (str) {}
+
+// ✅ 显式比较
+if (list.length > 0) {}
+if (str != null && str != '') {}
+```
+
+### ④ 基础类型用了 `===`
+
+```uts
+// ❌ Kotlin 端是引用比较，字符串内容相同也可能为 false
+if (code === 200) {}
+
+// ✅
+if (code == 200) {}
+```
+
+### ⑤ 数字 / 数组没标注类型
+
+```uts
+// ❌ 推导结果随平台漂移
+let count = 0;
+let list = [];
+
+// ✅
+let count: number = 0;
+let list: Array<string> = [];
+```
+
+### ⑥ 联调时把 `UTSJSONObject` 直接抛给页面
+
+```uts
+// ❌ 页面模板里必然踩 error17 / ClassCastException
+return data as UTSJSONObject;
+
+// ✅ 在 api 层就地转强类型（见分册 6）
+return { id: data.getNumber('id') ?? 0 } as CouponItem;
+```
+
+### ⑦ 联合类型上写三元
+
+```uts
+// ❌ 报 Expression expected（1.20）
+return target >= 0 ? target : -1;
+
+// ✅ 拆 if
+if (target >= 0) {
+  return target;
+}
+return -1;
+```
+
+### ⑧ 写了链式 `.catch()`
+
+```uts
+// ❌ Kotlin 端 error25
+p.then(ok).catch(err => {});
+
+// ✅ 双参 then
+p.then(ok, err => {});
+```
+
+### ⑨ 定时器句柄自引用
+
+```uts
+// ❌ error18
+const id = setInterval(() => clearInterval(id), 1000);
+
+// ✅ 先声明后赋值
+let id: number = 0;
+id = (setInterval(() => { clearInterval(id); }, 1000) as any) as number;
+```
+
+### ⑩ 遍历 `any` 值 Map 时标了 `any`
+
+```uts
+// ❌ error17
+map.toMap().forEach((v: any, k: string): void => {});
+
+// ✅ 去掉标注，或用 UTSJSONObject.keys()
+```
+
+### ⑪ `as` 后面写泛型实例化别名
+
+```uts
+// ❌ 产物里 new FooPageResult(...) → 运行期 ReferenceError
+} as FooPageResult);
+
+// ✅ 直写泛型本体
+} as PageResult<CouponItem>);
+```
+
+### ⑫ 把局部函数当值传递
+
+```uts
+// ❌ error18
+setTimeout(onDone, 1000);
+
+// ✅ 包 lambda
+setTimeout(() => { onDone(); }, 1000);
+```
+
+### ⑬ 同一函数不同块重名 `const`（H5 才炸）
+
+```uts
+// ❌ H5 报 Cannot access 'x' before initialization
+if (a) { const id = ...; }
+const id = ...;
+
+// ✅ 按语义改名
+if (a) { const bare = ...; }
+const sized = ...;
+```
+
+### ⑭ 导出「包着函数的对象字面量」
+
+```uts
+// ❌ Kotlin 报 Function invocation expected
+export const env = { getApiBaseUrl };
+
+// ✅ 具名函数导出
+export function getApiBaseUrl(): string { ... }
+```
+
+### ⑮ 顶层属性与同名 getter 并存
+
+```uts
+// ❌ NoSuchMethodError: getWindowHeight()...ComputedRef
+export const windowHeight = computed(...);
+export function getWindowHeight(): number { ... }
+
+// ✅ 需要面向对象调用就收敛到类实例方法
+class SystemUtils { getWindowHeight(): number { ... } }
+```
+
+---
+
+## 1.35 报错索引：现象 → 条目
+
+> 先按**报错码 / 现象**定位条目，再读该条的「底层原理」与正反例。同一现象可能命中多条（如 1.13 与 1.26 会同时命中同一个定时器变量）。
+
+| 报错码 / 现象 | 条目 |
+| :--- | :--- |
+| `UTS110111163` 对象字面量不支持 interface | 1.1 / 1.34① |
+| `UTS110111119`（`undefined` / 可选参数 `?`） | 1.2 / 1.34② |
+| `UTS110111120`（条件不是布尔） | 1.3 / 1.34③ |
+| Kotlin `warning: Identity equality ... implicit boxing` / `===` 判错 | 1.4 / 1.34④ |
+| 数字 / 数组类型推导漂移 | 1.5 / 1.34⑤ |
+| 函数签名 / 可空调用报错 | 1.6 |
+| `UTS100006`（type 写在函数内）/ `UTS110111166` | 1.7 |
+| `error17`：插槽变量是 `Any?` | 1.8 |
+| `UTS110111128/129/130/131/151`（`#prop` / 下标 / `static {}` / 继承 / 传递 Class） | 1.9 |
+| Kotlin `Function invocation expected`（对象字面量裹函数） | 1.10 / 1.34⑭ |
+| `NoSuchMethodError: getXxx()...ComputedRef`（顶层同名 getter） | 1.11 / 1.34⑮ |
+| Kotlin 符号被改名 `xxx__1` / `error18 找不到名称` | 1.12 |
+| `const timerId = setInterval(() => clearInterval(timerId))` 报 error18 | 1.13 / 1.34⑨ |
+| 遍历 `any` 值 Map 报 `error17` / `keys cannot be invoked as a function` | 1.14 / 1.34⑩ |
+| `setTimeout(localFn, ...)` 报 `error18` | 1.15 / 1.34⑫ |
+| `Function type parameters cannot have modifiers.` | 1.16 |
+| `error1 返回类型不匹配`（`decodeURIComponent` 等可空返回） | 1.17 |
+| `Return type mismatch: expected 'UTSPromise<Any>?'` | 1.18 |
+| H5 `Cannot access 'x' before initialization`（同函数重名 const） | 1.19 / 1.34⑬ |
+| 联合类型上的三元报 `Expression expected` | 1.20 / 1.34⑦ |
+| 链式 `.catch()` 报 `error25 None of the following candidates is applicable` | 1.21 / 1.34⑧ |
+| 原生端 `NullPointerException` / `ExceptionInInitializerError`（循环导入） | 1.22 |
+| `$callMethod` 报 `error18 找不到名称` | 1.23 |
+| `<web-view>` `@message` 读 `e.detail` 报 error18 | 1.24 |
+| 运行期 `ReferenceError: XxxPageResult is not defined` | 1.25 / 1.34⑪ |
+| VSCode `TS2322 不能将类型"Timeout"分配给类型"number"` | 1.26 |
+| `UTSJSONObject` 点属性取不到值 | 1.27 |
+| `PiniaStoreBase` 重写方法校验失败 | 1.28 |
+| 同行多语句未加分号 / 需要显式断言 | 1.29 |
+| 页面模板收到 `UTSJSONObject` 后崩 / 渲染不出 | 1.34⑥ + 分册 6.2 |
+
+---
+
+## 1.36 语法与类型速查表
+
+| 能力 | UTS 支持情况 | 标准写法 |
+| :--- | :--- | :--- |
+| 对象结构类型 | ✅ 只能用 `type` | `type User = { id: number }` |
+| `interface` | ❌ 禁止 | —— |
+| `undefined` | ❌ 不存在 | `string \| null` + `null` |
+| 可选参数 | ✅ 但含义是「可省略」 | `function f(a?: string)`；**不要**写 `a?: string \| undefined` |
+| 任意类型联合 | ❌ 只支持与 `null` 联合 | `string \| number` → 改 `any` 或拆两个参数 |
+| 基础类型比较 | `==` / `!=` | `code == 200`、`str == ''` |
+| 条件表达式 | 只能是 `boolean` | `if (obj != null)` |
+| 数字 / 数组声明 | 必须显式标注 | `let n: number = 0`、`let list: Array<string> = []` |
+| 函数签名 | 必须全标注 | `function f(a: number): boolean` |
+| 无返回值 | 写 `: void` | `function f(): void` |
+| 可空调用 | `?.` | `str?.length ?? 0` |
+| 类型断言 | `as T` | `raw as UTSJSONObject`（**不写泛型别名**） |
+| `Class` 实例取值 | 只能点操作符 | `obj.prop` |
+| `UTSJSONObject` 取值 | 只能下标 | `obj['prop']` |
+| Map 遍历 | `forEach`，`any` 值不标注 | `map.forEach((v, k): void => {})` |
+| Map 键集合 | `UTSJSONObject.keys()` | 不要 `map.keys()` |
+| 异步 | `Promise<T>` + 双参 `.then` | `.then(ok, err)` |
+| 链式 `.catch()` | ❌ Kotlin 端编不过 | 并入 `.then` 第二参 |
+| `throw` 于拒绝回调 | ❌ 返回类型会裂开 | `Promise.reject(err) as Promise<T>` |
+| 三元表达式 | 单类型可用；**联合类型禁用** | 联合类型拆 `if` |
+| 局部函数 | 必须先定义后调用、不可当值传 | 包 lambda |
+| 定时器句柄 | `number`，调用点双层强转 | `(setTimeout(...) as any) as number` |
+| 模块导出 | 只用具名导出 | `export function foo()` |
+| 类型定义位置 | 只能文件顶层 | 函数内 `type` 报 `UTS100006` |
+
+---
+
+## 1.37 自检红线清单（语言层）
+
+- [ ] **1. 零 `interface`** —— 所有对象结构、参数、返回值、状态一律 `type`
+- [ ] **2. 零 `undefined`** —— 变量必初始化，空值用 `null`，可选字段写 `T | null`
+- [ ] **3. 条件全显式** —— `if` / 三元判据只接受 `boolean`，与 `null` / 空串 / 数值显式比较
+- [ ] **4. 基础类型只比 `==` / `!=`** —— 字符串、数字、布尔严禁 `===` / `!==`
+- [ ] **5. 类型标注到位** —— `number` / `Array` 显式标注，函数参数与返回值全标注，无返回值写 `: void`
+- [ ] **6. 类型只在顶层** —— 函数体内不写 `type` / `interface`
+- [ ] **7. 可空必判** —— 可空成员用 `?.`，`as` 非空断言前先判空
+- [ ] **8. 下标先判边界** —— 边界检查与读取写在同一短路表达式，判断在前
+- [ ] **9. 导出面干净** —— 只用具名函数导出，不导出包着函数的对象字面量，不造同名 getter
+- [ ] **10. 导入精准** —— 项目模块引具体实现文件，第三方模块引公开入口，不穿透内部文件；类型用 `import type` 并保留 `.uts`
+- [ ] **11. 异步只用双参 `.then`** —— 严禁链式 `.catch()`；拒绝回调用 `Promise.reject(...) as Promise<T>`
+- [ ] **12. 联合类型不写三元** —— 拆成 `if` 提前 `return`；单类型上的三元不要机械替换
+- [ ] **13. `as` 后不写泛型实例化别名** —— 直写 `as PageResult<Item>`；别名只出现在类型位置
+- [ ] **14. 局部声明顺序正确** —— 先声明后使用；回调里不引用承载它自身的变量；局部函数不当值传递
+- [ ] **15. `UTSJSONObject` 下标取值** —— 不点属性；`Class` 实例反过来只点操作符；**`UTSJSONObject` 不出 api 层**

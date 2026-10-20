@@ -1,8 +1,14 @@
-# 2 样式 (CSS & Tailwind CSS) 与原生渲染铁律
+# 2 样式与原生渲染手册（Tailwind / CSS 能力矩阵 · 完整页面示例 · 场景写法 · 自检红线）
 
-> **本文件是 `unibestX-skill` 的参考分册**，由 [SKILL.md](../SKILL.md) 按需引用，收录本部分全部铁律的完整正反例与实测结论。
+> **本文件是 `unibestX-skill` 的参考分册**，由 [SKILL.md](../SKILL.md) 按需引用，收录本文件全部铁律的完整正反例与实测结论。
 >
-> **何时读本文件**：编写或调整 `.scss` / Tailwind 工具类、处理按钮与文本排版、安全区与高度单位、阴影与边框、字号与字重、行内嵌套样式、跨端样式不生效或表现不一致时。
+> **何时读本文件**：编写或调整 `.scss` / Tailwind 工具类；处理按钮与文本排版、安全区与高度单位、阴影与边框、字号与字重、行内嵌套样式、动画、跨端样式不生效或表现不一致时。
+>
+> **与其它分册的分工**：本分册只讲**样式怎么写得在原生端生效**。组件怎么拆、数据放哪看分册 5；页面骨架与整页布局看分册 4；平台判断与渲染模式差异看分册 3。
+>
+> **30 秒速记**：只用 flex（禁 grid / inline-block / sticky）；间距用 `mt-*` / `mb-*` / `mr-*` / `ml-*`（禁 `gap` / `space-*`）；`color` 只挂 `<text>`；颜色一律十六进制；字号单位只用 `px`；高度不用 `vh`；**分页 / 长列表优先 `<z-paging-x>`**（内部就是 list-view），阴影能不用就不用。
+>
+> 📌 **2.1–2.26 是逐条铁律**（每条含现象、根因、规避方式、正反例）；**2.27 起是手册部分**：完整页面示例（2.27）→ 多种场景写法（2.28）→ 坑点清单（2.29）→ 样式能力矩阵（2.30）→ 自检红线（2.31）。**写页面先抄 2.27，样式不生效先查 2.30，排查先翻 2.29。**
 
 ## 2.1 CSS 变量动态换肤与原生控件限制
 
@@ -289,7 +295,7 @@
   1. App 端**只支持 `underline` 与 `line-through` 两个值**，`overline` / `blink` / `spelling-error` / `grammar-error` 不要指望；
   2. App 端该属性**不支持继承** —— 必须落在**真正承载文字的那个组件**上，别指望套在容器上让子元素继承；
   3. 仅适用于 `text` 与 `button` 组件（`view` 上写无效）；
-  4. 版本：蒸汽模式下安卓需 **5.21+**、iOS 5.11+。
+  4. 版本：蒸汽模式下安卓需 **4.21+**、iOS 4.11+。
 - **红线**：**禁止在 `.uvue` / `.uts` 里写 `text-decoration:` 简写**；需要删除线/下划线时写 `text-decoration-line:`。排查「线不见了」时，**先看是不是简写**，再看是不是把属性挂在了容器上（继承限制）。
 - **真实案例（本项目已踩）**：Markdown 渲染器的行内样式表把 `~~删除线~~` 映射成 `text-decoration:line-through`，H5 正常、安卓无线；改成长属性后两端一致。见 3.9 改造 6。
 
@@ -681,3 +687,493 @@ warn: property value `100%` is not supported for `min-height` (supported values 
   line-height: 20px;
 }
 ```
+
+---
+
+## 2.25 安全区工具类与行高原子类
+
+- **安全区工具类**：项目已在 `tailwind.config.ts` 扩展安全区工具类，涉及底部 Home 条 / 顶部状态栏的容器直接用它们，**不要手写 `padding-bottom: env(safe-area-inset-bottom)`**：
+  - `p-safe` —— 四周安全区内边距；
+  - `pt-safe` —— 顶部安全区（状态栏）内边距；
+  - `pb-safe` —— 底部安全区（Home 条）内边距。
+- **行高**：`weapp-tailwindcss` 已完整支持 `leading-[26px]`、`leading-[20px]` 等原子化行高类名，**推荐直接用 `leading-[...]`**，不要在内联样式里手写 `line-height`。
+
+```html
+<!-- ❌ 错误：手写安全区变量，iOS / 鸿蒙表现不一致；行高靠零散内联样式 -->
+<view style="padding-bottom: env(safe-area-inset-bottom); line-height: 22px;">底部操作栏</view>
+
+<!-- ✅ 正确：安全区用项目工具类，行高用 leading-[...] -->
+<view class="pb-safe">
+  <text class="text-[14px] leading-[22px] text-[#334155]">底部操作栏</text>
+</view>
+```
+
+---
+
+## 2.26 SCSS 变量的运行时动态化（`uni.scss` 覆盖）
+
+- **场景**：在 `uni.scss` 里引入第三方组件库的 SCSS 变量后，需要把其中某些**编译期 SCSS 变量**转成**运行期动态 CSS 变量**（跟随主题切换）。
+- **规范**：在 `uni.scss` 的引入语句**之后**重新赋值，用 `var(--theme-color, 兜底值)` 覆盖原变量；不要试图直接改第三方库源码。
+
+```scss
+// uni.scss
+@import '@/uni_modules/xxx/uni.scss';
+
+// ✅ 在引入之后覆盖：编译期变量指向运行期 CSS 变量，主题切换即可生效
+$app-primary: var(--theme-color, #0957de);
+```
+
+> ⚠️ 与 2.1 的配合：动态变量仍必须在 layout 根 `view` 上内联绑定（`:style="{ '--theme-color': ... }"`）；映射到原生控件的元素（iOS `<button>` / `<input>`）不跟随 CSS 变量重绘，需另用行内样式直接给具体值。
+
+---
+
+## 2.27 完整页面示例：一个全端一致的卡片列表页
+
+> 这份模板把 2.1–2.26 的约束**全部落实到一份可运行页面**：flex 布局、无 gap、十六进制颜色、px 字号、`pb-safe` 安全区、无重阴影、长列表用 `list-view`。
+
+```html
+<template>
+  <view class="flex flex-col flex-1 bg-[#f8fafc]">
+
+    <!-- 顶部固定区：标题 + 说明（不随列表滚动） -->
+    <view class="w-full px-[16px] pt-[12px] pb-[8px]">
+      <view class="w-full bg-[#ffffff] border-[1px] border-solid border-[#e2e8f0] rounded-[12px] p-[16px]">
+        <text class="text-[16px] font-bold text-[#1e293b]">优惠券</text>
+        <text class="text-[12px] leading-[18px] text-[#64748b] mt-[4px]">共 {{ total }} 张 · 下拉可刷新</text>
+      </view>
+    </view>
+
+    <!-- 长列表：必须虚拟复用。有分页 / 触底加载时优先用 <z-paging-x>（3.21），此处演示最小 list-view 写法 -->
+    <list-view class="flex-1">
+      <list-item v-for="item in list" :key="item.id">
+        <!-- 卡片：浅边框 + 微反差背景做层级，不用重阴影（2.11） -->
+        <view class="flex flex-row items-center bg-[#ffffff] border-[1px] border-solid border-[#e2e8f0] rounded-[10px] p-[12px] mx-[16px] mb-[10px]">
+          <!-- 左侧金额徽标：水平间距用 mr-*，不用 gap（2.20） -->
+          <view class="w-[56px] h-[56px] rounded-[10px] bg-[#eff6ff] items-center justify-center mr-[12px]">
+            <text class="text-[16px] font-bold text-[#2563eb]">{{ formatAmount(item.amount) }}</text>
+          </view>
+
+          <view class="flex flex-col flex-1">
+            <text class="text-[14px] font-semibold text-[#1e293b]">{{ item.title }}</text>
+            <!-- 字号 px、行高 leading-[...]（2.13 / 2.25）；颜色挂 text（2.3） -->
+            <text class="text-[12px] leading-[18px] text-[#94a3b8] mt-[4px]">有效期至 {{ item.expiredText }}</text>
+          </view>
+
+          <!-- 原生 button 不挂 flex 对齐类（2.2）；这里用 view 承载点击 -->
+          <view class="h-[30px] px-[12px] rounded-[15px] bg-[#2563eb] items-center justify-center" @click="onUse(item)">
+            <text class="text-[12px] font-bold text-[#ffffff]">使用</text>
+          </view>
+        </view>
+      </list-item>
+
+      <!-- 空态：兄弟 text，不嵌套（2.4） -->
+      <list-item v-if="list.length == 0">
+        <view class="flex flex-col items-center py-[48px]">
+          <text class="text-[14px] text-[#94a3b8]">还没有可用优惠券</text>
+          <text class="text-[12px] text-[#cbd5e1] mt-[6px]">完成一单即可获得</text>
+        </view>
+      </list-item>
+    </list-view>
+
+    <!-- 底部操作条：安全区用 pb-safe（2.25），不用 env(...) 手写 -->
+    <view class="w-full bg-[#ffffff] border-t-[1px] border-t-solid border-t-[#e2e8f0] px-[16px] pt-[10px] pb-safe">
+      <view class="h-[40px] rounded-[20px] bg-[#0d9488] items-center justify-center" @click="onExchange">
+        <text class="text-[14px] font-bold text-[#ffffff]">兑换优惠券</text>
+      </view>
+    </view>
+
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed, ref } from 'vue';
+import { useRoute } from '@/uni_modules/route-bestX/index.uts';
+import { fetchCouponList } from '@/src/api/coupon/coupon.uts';
+import type { CouponItem } from '@/src/api/coupon/coupon.uts';
+import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/layouts/navbar/utils/index.uts';
+
+definePage({
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: true,
+  style: {
+    navigationBarTitleText: '优惠券',
+    navigationStyle: 'custom'
+  }
+});
+
+const route = useRoute();
+const list = ref<Array<CouponItem>>([]);
+const total = computed((): number => list.value.length);
+
+function formatAmount(amount: number): string {
+  return `¥${amount}`;
+}
+
+function loadList(): void {
+  fetchCouponList(1, 20).then(
+    (res: Array<CouponItem>): void => {
+      list.value = res;
+    },
+    (err: any): void => {
+      console.error('[coupon] 列表加载失败', err);
+    }
+  );
+}
+
+function onUse(item: CouponItem): void {
+  console.log('使用优惠券', item.id);
+}
+
+function onExchange(): void {
+  console.log('兑换优惠券');
+}
+
+onNavbarPullDownRefresh((): void => {
+  loadList();
+  stopNavbarPullDownRefresh();
+});
+
+loadList();
+</script>
+
+<style></style>
+```
+
+**这份模板里的样式决策**：
+
+| 写法 | 依据 |
+| :--- | :--- |
+| 根 `view flex flex-col flex-1` | 分册 4 骨架约定；不要用 `scroll-view` 当根 |
+| 列表 `list-view` + `list-item` | 2.21 / 3.21 长列表必须虚拟复用；**有分页时优先换 `<z-paging-x>`** |
+| 全部间距用 `mx-*` / `mb-*` / `mr-*` | 2.20 原生端不支持 `gap` / `space-*` |
+| 颜色全部 `#rrggbb` | 2.5 禁止命名颜色 |
+| 字号 `text-[14px]`、行高 `leading-[18px]` | 2.13 / 2.25 |
+| `pb-safe` | 2.25 安全区工具类 |
+| 卡片用边框 + 背景，不用 `shadow-*` | 2.11 阴影跨模式不一致 |
+| 文字颜色只在 `<text>` 上 | 2.3 |
+| `<style>` 为空 | 能用原子类就不写样式表 |
+
+---
+
+## 2.28 多种场景写法（可直接复制）
+
+### 2.28.1 等分列（不要用 `flex:1`）
+
+```uts
+/** 等分列单元格样式：显式百分比 + border-box（2.12） */
+function cellStyle(colCount: number): string {
+  const pct: number = colCount > 0 ? Math.round(10000 / colCount) / 100 : 100;
+  return `box-sizing:border-box;width:${pct}%;padding:4px 8px;`;
+}
+```
+
+```html
+<view class="flex flex-row">
+  <text :style="cellStyle(3)" class="text-[13px] text-[#334155]">左</text>
+  <text :style="cellStyle(3)" class="text-[13px] text-[#334155]">中</text>
+  <text :style="cellStyle(3)" class="text-[13px] text-[#334155]">右</text>
+</view>
+```
+
+### 2.28.2 两列卡片：用 `mr-*` / `ml-*` 造间距
+
+```html
+<view class="flex flex-row flex-wrap">
+  <view v-for="(item, index) in list" :key="item.id"
+        :class="index % 2 == 0 ? 'w-1/2 pr-[5px] mb-[10px]' : 'w-1/2 pl-[5px] mb-[10px]'">
+    <view class="bg-[#ffffff] border-[1px] border-solid border-[#e2e8f0] rounded-[10px] p-[10px]">
+      <text class="text-[13px] text-[#1e293b]">{{ item.title }}</text>
+    </view>
+  </view>
+</view>
+```
+
+### 2.28.3 横向滚动的分类条
+
+```html
+<!-- 横向短内容可以用 scroll-view（2.21 允许场景） -->
+<scroll-view direction="horizontal" class="w-full" :show-scrollbar="false">
+  <view class="flex flex-row items-center px-[16px] py-[8px]">
+    <view v-for="tab in tabs" :key="tab.id"
+          class="h-[30px] px-[14px] rounded-[15px] items-center justify-center mr-[8px]"
+          :class="tab.id == activeId ? 'bg-[#2563eb]' : 'bg-[#f1f5f9]'"
+          @click="onSelect(tab.id)">
+      <text class="text-[13px]" :class="tab.id == activeId ? 'text-[#ffffff]' : 'text-[#475569]'">{{ tab.name }}</text>
+    </view>
+  </view>
+</scroll-view>
+```
+
+### 2.28.4 吸底操作条：`absolute` 优先，`fixed` 必须 `v-if`
+
+```html
+<!-- 单页 TabBar 内：absolute + 父容器 relative（2.21） -->
+<view class="flex-1 relative">
+  <scroll-view direction="vertical" class="flex-1"><!-- 内容 --></scroll-view>
+  <view class="absolute bottom-[0px] left-[0px] w-full p-[12px] bg-[#ffffff] pb-safe">
+    <view class="h-[40px] rounded-[20px] bg-[#0d9488] items-center justify-center">
+      <text class="text-[14px] font-bold text-[#ffffff]">立即下单</text>
+    </view>
+  </view>
+</view>
+```
+
+### 2.28.5 主题色：CSS 变量 + 原生控件行内值
+
+```html
+<!-- layout 根节点绑定变量（2.1） -->
+<view :style="{ '--theme-color': themeColor }">
+  <text :style="{ color: 'var(--theme-color)' }">跟随主题</text>
+  <!-- 原生控件不继承变量重绘，直接给值 -->
+  <button :style="{ backgroundColor: themeColor }">按钮</button>
+</view>
+```
+
+### 2.28.6 动画：transition 固化在静态类
+
+```html
+<view class="capsule-slider" :style="'transform:translateX(' + offset + 'px)'">
+  <text :style="'color:' + (active ? '#2563eb' : '#64748b')">标签</text>
+</view>
+
+<style>
+/* transition 只写在静态类里（2.19） */
+.capsule-slider {
+  width: 72px;
+  height: 32px;
+  border-radius: 16px;
+  background-color: #ffffff;
+  transition-property: transform;
+  transition-duration: 220ms;
+  transition-timing-function: cubic-bezier(0.25, 1, 0.5, 1);
+}
+</style>
+```
+
+### 2.28.7 富文本 / 行内混排
+
+```html
+<!-- 行内连续段必须显式 row + wrap（2.17），长 token 用显式宽度或断行（2.12） -->
+<view class="flex flex-row flex-wrap items-center">
+  <text class="text-[14px] font-bold text-[#1e293b]">加粗</text>
+  <text class="text-[14px] text-[#334155]">普通</text>
+  <text class="text-[14px] text-[#334155]" style="font-family: monospace;">code</text>
+</view>
+```
+
+---
+
+## 2.29 坑点清单（按踩坑频率排序）
+
+### ① 用了 `gap` / `space-x-*` 做间距
+
+```html
+<!-- ❌ 原生端间距全丢，子元素挤在一起 -->
+<view class="flex flex-row gap-[12px]"><text>左</text><text>右</text></view>
+
+<!-- ✅ 间距写在子项 -->
+<view class="flex flex-row"><text class="mr-[12px]">左</text><text>右</text></view>
+```
+
+### ② 在 `<view>` 上写文字颜色
+
+```html
+<!-- ❌ 编译报错：color 只支持 text / button / input / textarea -->
+<view class="text-[#333]">标题</view>
+
+<!-- ✅ 颜色下沉到 text -->
+<text class="text-[#333]">标题</text>
+```
+
+### ③ 用 `flex:1` 做等分列
+
+```html
+<!-- ❌ 列宽下限是内容 min-content，长英文 token 把列顶开、最右被裁 -->
+<text class="flex-1">{{ a }}</text>
+
+<!-- ✅ 显式百分比 + border-box（2.12 / 2.28.1） -->
+<text :style="cellStyle(3)">{{ a }}</text>
+```
+
+### ④ 动态 `:style` 里用 `em`
+
+```html
+<!-- ❌ 原生无继承链，字号塌成 0，整行文字不可见 -->
+<text :style="'font-size:1.5em'">标题</text>
+
+<!-- ✅ 具体 px -->
+<text :style="'font-size:20px'">标题</text>
+```
+
+### ⑤ 写 `text-decoration` 简写
+
+```html
+<!-- ❌ App 端整个忽略，删除线不出现 -->
+<text style="text-decoration: line-through">已删除</text>
+
+<!-- ✅ 长属性 -->
+<text style="text-decoration-line: line-through">已删除</text>
+```
+
+### ⑥ 用 `vh` / `vw` / 百分比 `min-height`
+
+```html
+<!-- ❌ 原生不支持 vh；min-height 只认数字与 px -->
+<view style="height: 100vh; min-height: 100%"></view>
+
+<!-- ✅ flex-1 / computedAvailableHeight -->
+<view class="flex flex-col flex-1"></view>
+```
+
+### ⑦ 在原生 `<button>` 上挂 flex 对齐类
+
+```html
+<!-- ❌ 编译报错：justify-content / align-items 只支持 view 系 -->
+<button class="items-center justify-center">确定</button>
+
+<!-- ✅ 用 view 包裹 -->
+<view class="flex flex-row items-center justify-center"><text>确定</text></view>
+```
+
+### ⑧ 用 `h-full` 撑满 `flex-1` 父级
+
+```html
+<!-- ❌ 父级 flex-1 无固定高度，100% 被解析成 0，内容消失 -->
+<view class="flex-1"><view class="h-full"><text>看不见</text></view></view>
+
+<!-- ✅ 子级也用 flex-1 -->
+<view class="flex-1"><view class="flex-1"><text>正常</text></view></view>
+```
+
+### ⑨ 用英文命名颜色
+
+```html
+<!-- ❌ 原生解析不一致，鸿蒙/插槽里易变黑 -->
+<text class="text-white">白字</text>
+
+<!-- ✅ 十六进制（必要时叠加行内 style 双保险） -->
+<text class="text-[#ffffff]" :style="{ color: '#ffffff' }">白字</text>
+```
+
+### ⑩ 长列表用 `scroll-view`
+
+```html
+<!-- ❌ 全量渲染，内存随数据线性增长，最终 OOM -->
+<scroll-view><view v-for="item in list">{{ item.title }}</view></scroll-view>
+
+<!-- ✅ list-view + list-item -->
+<list-view><list-item v-for="item in list" :key="item.id">...</list-item></list-view>
+```
+
+### ⑪ `<list-view>` 下套一层 `view`
+
+```html
+<!-- ❌ 复用池失效 -->
+<list-view><view><view v-for="item in list">...</view></view></list-view>
+
+<!-- ✅ 直系子项必须是 list-item -->
+<list-view><list-item v-for="item in list" :key="item.id">...</list-item></list-view>
+```
+
+### ⑫ 单页 TabBar 内裸写 `fixed`
+
+```html
+<!-- ❌ iOS 脱壳提升，切走 Tab 依然悬浮 -->
+<view class="fixed bottom-[0px] w-full">悬浮条</view>
+
+<!-- ✅ absolute + relative 容器；必须 fixed 时挂 v-if -->
+<view class="flex-1 relative"><view class="absolute bottom-[0px] w-full">悬浮条</view></view>
+```
+
+### ⑬ 靠重阴影做层级
+
+```html
+<!-- ❌ VDOM 与 Vapor 阴影表现不一致，容易掉帧 -->
+<view class="shadow-[0_8px_24px_rgba(0,0,0,0.2)]"></view>
+
+<!-- ✅ 浅边框 + 背景微反差 -->
+<view class="border-[1px] border-solid border-[#e2e8f0] bg-[#ffffff]"></view>
+```
+
+### ⑭ 动画规则放进动态 `:style`
+
+```html
+<!-- ❌ 每帧重下发样式字典，无法预置 GPU 插值器 -->
+<view :style="'transition:transform 220ms;transform:translateX(' + x + 'px)'"></view>
+
+<!-- ✅ transition 固化静态类，动态只下发 transform -->
+<view class="capsule-slider" :style="'transform:translateX(' + x + 'px)'"></view>
+```
+
+### ⑮ 裸 `<view>` 承载行内混排
+
+```html
+<!-- ❌ 原生 view 默认 column，每个行内片段各占一行 -->
+<view><text>加粗</text><text>普通</text></view>
+
+<!-- ✅ 显式 row + wrap -->
+<view class="flex flex-row flex-wrap"><text>加粗</text><text>普通</text></view>
+```
+
+### ⑯ 把 `h-full` / `min-width` 百分比当兜底
+
+原生端 `min-*` / `max-*` 只认 `number` 与 `px`（2.23）：构建期只有一条 warn、运行期**静默忽略**。「至少撑满」写 `flex:1`、「至多铺满」写 `width:100%` 并补 `box-sizing:border-box`。
+
+### ⑰ 滚动容器中间套一层 view（H5 特有）
+
+H5 的 `uni-view` 自带 `overflow:hidden`，溢出元素必须**直挂**滚动容器并显式 `flex-shrink:0`；App 端 `flex-shrink` 默认 0、H5 默认 1（2.22）。
+
+---
+
+## 2.30 样式能力矩阵（写之前先查这张表）
+
+| 能力 | App（Kotlin / Swift / ArkTS） | H5 / 小程序 | 标准写法 |
+| :--- | :--- | :--- | :--- |
+| `display` | 仅 `flex` / `none` | 全支持 | 全用 flex 类名 |
+| `flex-direction` | `row` / `column`（`view` 默认 column） | 支持 | 显式 `flex-row` / `flex-col` |
+| `gap` / `space-*` | ❌ 不支持 | 支持 | 子项 `mr-*` / `mb-*` |
+| `align-items: baseline` | ❌ | 支持 | `items-end` / `items-center` |
+| `position: sticky` | ❌ | 支持 | `absolute` / `fixed` |
+| `position: fixed`（iOS 单页 Tab） | ⚠️ 脱壳提升，须 `v-if` | 正常 | 优先 `absolute` |
+| `vh` / `vw` | ❌ | 支持 | `flex-1` / `px` / `computedAvailableHeight` |
+| `min/max-width` 百分比 | ❌（只认数字与 px） | 支持 | `flex:1` / `width:100%` + `box-sizing` |
+| `font-size: em/rem/ex/%/关键字` | ❌（塌成 0） | 支持 | `px` |
+| `font-family` 工具类 | ❌（`parse-css-font` 报错） | 支持 | 内联 `font-family` |
+| `text-decoration` 简写 | ❌（静默忽略） | 支持 | `text-decoration-line` |
+| `vertical-align` | ❌（只警告） | 支持 | `margin` 位移 |
+| `color` | 仅 `text` / `button` / `input` / `textarea` | 任意元素 | 颜色类下沉到 `<text>` |
+| 命名颜色 | ❌ 解析不一致 | 支持 | 十六进制 |
+| `box-shadow` | ⚠️ VDOM / Vapor 表现不同 | 支持 | 浅边框 + 背景微反差 |
+| `transition` 动态 `:style` | ⚠️ 掉帧 | 正常 | 固化在静态类 |
+| `background-image` 于 `flatten` 元素 | ❌ | 支持 | 不拍平 |
+| `overflow`（H5 `uni-view`） | 默认可见 | **默认 hidden** | 溢出元素直挂滚动容器（2.22） |
+| `word-break` | ❌ 无兜底 | 支持 | 显式宽度 / 改内容 |
+
+> 判据：**任何样式在 App 上「没效果但不报错」时，先在这张表里找它**；表里没有的，按 2.16 的排查顺序（先证明样式有没有到元素，再怀疑值写法）定位，再回到 2.29 的坑点清单对一遍。
+
+---
+
+## 2.31 自检红线清单（样式层）
+
+- [ ] **1. 只写 flex** —— 不出现 `grid` / `inline-block` / `position: sticky`
+- [ ] **2. 不用 `gap` / `space-*`** —— 间距全部落在子项 `mr-*` / `ml-*` / `mt-*` / `mb-*`
+- [ ] **3. 等分列不用 `flex:1`** —— 显式百分比宽度 + `box-sizing:border-box`
+- [ ] **4. `color` 只挂文本元素** —— `<view>` 上不写文字颜色
+- [ ] **5. 颜色全十六进制** —— 无 `red` / `white` / `text-white`（白色写 `text-[#ffffff]`）
+- [ ] **6. 原生 `<button>` 不挂 flex 对齐类** —— 复杂按钮用 `<view>` 包裹
+- [ ] **7. 字号只用 px** —— 动态 `:style` 里不出现 `em` / `rem` / `%` / `smaller`
+- [ ] **8. 高度不用 `vh` / `vw`** —— 用 `flex-1` / `px` / `computedAvailableHeight`
+- [ ] **9. 安全区用 `p-safe` / `pt-safe` / `pb-safe`** —— 不手写 `env(safe-area-inset-*)`
+- [ ] **10. 行高用 `leading-[...]`** —— 不散写内联 `line-height`
+- [ ] **11. 边框三段齐全** —— `border-[1px] border-solid border-[#...]`
+- [ ] **12. 阴影克制** —— 层级优先浅边框 + 背景微反差
+- [ ] **13. `text-decoration` 用长属性** —— 写 `text-decoration-line`，不写简写
+- [ ] **14. `<text>` 不嵌套多文本** —— 多色文本用兄弟 `<text>`
+- [ ] **15. Void 元素自闭合** —— `<input />`、`<image />`
+- [ ] **16. 长列表用 `<list-view>` + `<list-item>`** —— 超过 20 条 / 分页 / 瀑布流一律虚拟列表
+- [ ] **17. 单页 TabBar 内不裸写 `fixed`** —— 优先 `absolute`，必须 `fixed` 时挂 `v-if`
+- [ ] **18. 动画规则固化在静态类** —— 动态 `:style` 只下发 `transform` 这类硬件加速属性
+- [ ] **19. `<style>` 能不用就不用** —— 空 `<style>` 删掉；必须写时按 8 阶顺序
+- [ ] **20. 富文本行内混排显式 `row + wrap`** —— 裸 `<view>` 在原生端是 column

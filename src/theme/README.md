@@ -65,7 +65,8 @@ const themeStyle = computed((): UTSJSONObject => {
 ```
 
 > ⚠️ **必须绑在根元素的内联 `:style` 上**，不能只写在 CSS 里。uni-app X 的原生端
-> 只有内联绑定的 CSS 变量才会随 JS 变量更新而重绘（详见 `.agents/rules/uniappx.md` 第 2 节）。
+> 只有内联绑定的 CSS 变量才会随 JS 变量更新而重绘（详见 `unibestX-skill` 分册 2.1
+> `.agents/skills/unibestX-skill/references/2-styling.md`）。
 
 ### 4. 换肤 / 切外观（走 store，别直调 apply）
 

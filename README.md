@@ -26,7 +26,7 @@
 
 内置 `自定义 TabBar`、`Layout 布局`、`request-bestX 请求与状态机引擎`、`登录拦截`、`路由守卫`、`Tailwind CSS`、`i18n 多语言`、`主题切换`、`沙盒极速调试` 等基础能力，并提供 `代码提示`、`自动格式化`、`统一配置` 等辅助功能，让你编写 `uni-app X` 拥有 `best` 体验。
 
-🤖 **同时它也是一套「AI 原生」开发模板**：项目自带 **`unibestX-skill`**（「1 个入口 + 9 个分册」的 uni-app X / UTS 规范知识库），Claude Code、Codex 等 AI Agent 克隆即可直接按项目规范写代码、生成页面骨架、自动排查跨端编译报错；运行时亦内置 **AI 对话页**与 **SSE / Chunk 跨端流式传输**能力。详见 [🤖 AI 与 Skill 体系](#-ai-与-skill-体系)。
+🤖 **同时它也是一套「AI 原生」开发模板**：项目自带 **`unibestX-skill`**（「1 个入口 + 8 个分册」的 uni-app X / UTS 规范知识库），Claude Code、Codex 等 AI Agent 克隆即可直接按项目规范写代码、生成页面骨架、自动排查跨端编译报错；运行时亦内置 **AI 对话页**与 **SSE / Chunk 跨端流式传输**能力。详见 [🤖 AI 与 Skill 体系](#-ai-与-skill-体系)。
 
 | 👉 在线 H5 演示 | 📖 官方文档 | 🐙 GitHub | 🍊 Gitee 镜像 |
 | :---: | :---: | :---: | :---: |
@@ -355,20 +355,19 @@ pnpm docs:dev       # 本地启动 VitePress 文档站
 
 ### 1. `unibestX-skill` — 项目专属 uni-app X / UTS 规范库
 
-这是与项目强绑定的核心技能，也是仓库中**唯一保留的技能**，采用 **「1 个入口 + 9 个分册」** 结构，把 UTS 强类型约束、跨端样式限制与本项目的生产级写法沉淀成可被 AI 直接检索的知识库。
+这是与项目强绑定的核心技能，也是仓库中**唯一保留的技能**，采用 **「1 个入口 + 8 个分册」** 结构，把 UTS 强类型约束、跨端样式限制与本项目的生产级写法沉淀成可被 AI 直接检索的知识库。
 
 | 分册 | 内容 |
 | :--- | :--- |
-| `SKILL.md`（入口，常驻） | 概述 + 分册导航 + A.1 快速对照表 + A.2 红线清单 |
-| `1-uts-syntax.md` | UTS 强类型系统与语法核心铁律（`UTS110111163` 等报错成因） |
-| `2-styling.md` | CSS & Tailwind 样式引擎与原生渲染限制 |
-| `3-runtime.md` | 跨端运行时与 VDOM / Vapor 渲染模式约束 |
-| `4-examples.md` | 5 个项目内生产级标杆案例（页面骨架、TabBar、二级详情页、滚动与下拉刷新） |
-| `5-codegen.md` | 代码生成流程与标准页面模板 |
-| `6-page-component-spec.md` | AI 页面层级与组件设计规范（页面高内聚、三级防过度拆分、容器与纯展示解耦、Mock 接口契约化） |
-| `7-api-spec.md` | API 接口层规范（一页一目录、契约类型用 `type`、Mock 数据集与接口函数同层、后端就绪只换函数体） |
-| `8-utils-spec.md` | 项目核心工具库使用规范（系统信息 `src/utils/systemInfo`、环境变量 `src/config/env`、主题 `src/theme`、通用工具优先原则） |
-| `9-router-spec.md` | 路由导航规范（跳转一律 `useRouter()`、路由信息一律 `useRoute()`、禁止原生导航 API、门面精准导入） |
+| `SKILL.md`（入口，常驻） | 任务目标 + 输出规范 + 操作步骤 + 交互流程 + 分册导航 + 注意事项 + 使用示例 + A.1 对照表 + A.2 红线清单 |
+| `1-uts-syntax.md` | UTS 强类型与语法手册（类型声明/导入、报错索引、完整示例、坑点） |
+| `2-styling.md` | 样式与原生渲染手册（能力矩阵、完整页面、坑点） |
+| `3-runtime.md` | 跨端运行时手册（渲染模式、平台分流、真机报错、编译验证） |
+| `4-page-component.md` | 页面与组件手册（骨架 + `definePage` + 标准业务页 + 组件写法 + 流程与交付） |
+| `5-page-structure.md` | 页面结构编排标准（分层结构、目录拓扑、组件放哪、拆几层、数据归属） |
+| `6-api-spec.md` | API 接口层规范（一页一目录、契约类型用 `type`、Mock 数据集与接口函数同层、后端就绪只换函数体） |
+| `7-utils-spec.md` | 项目核心工具库使用规范（系统信息 `src/utils/systemInfo`、环境变量 `src/config/env`、主题 `src/theme`、通用工具优先原则） |
+| `8-router-spec.md` | 路由导航规范（跳转一律 `useRouter()`、路由信息一律 `useRoute()`、禁止原生导航 API、门面精准导入） |
 
 **工作机制**：入口文件只常驻导航与红线清单，AI 命中条目后**必须继续读取对应分册**核对完整正反例才允许改代码。
 
@@ -390,7 +389,7 @@ pnpm docs:dev       # 本地启动 VitePress 文档站
 | :--- | :--- |
 | [CLAUDE.md](CLAUDE.md) | Claude Code 会话级规约（技能路由、内置工具优先复用、基础设施按既有配置走） |
 | [AGENTS.md](AGENTS.md) | 通用 AI Agent 规约（Codex 等） |
-| [.agents/rules/uniappx.md](.agents/rules/uniappx.md) | uni-app X 开发规范，编写 `.uvue` / `.uts` / `.ts` / `.scss` 前必读 |
+| [.agents/rules/](.agents/rules/) | 项目规则（按触发方式分层）：`base-lines`（Always On）· `api-standard` / `page-standard` / `router-standard`（Glob）· `naming-standard` / `commit-rule`（Model Decision）；用法与模板见 [unibestX-skill](.agents/skills/unibestX-skill/SKILL.md) |
 
 > 📌 **单物理源规范架构**：项目采用 **`.agents/` 作为唯一的规范与技能物理源目录**，`.trae` 与 `.claude` 均通过相对符号链接（Symlink：`../../.agents/...`）实现无感映射，彻底消除多副本维护成本与 Git 提交冲突。无论是 Claude Code、Trae、Cursor 还是 Antigravity，均自动读取同一份最新规范，日常开发与升级时只需维护 `.agents/` 目录。
 
@@ -491,7 +490,7 @@ unibestX/
 ├── docs/                                # VitePress 文档站源码（guide/ 下为各专题）
 ├── .agents/                             # AI 规范与技能中心（唯一物理源）
 │   ├── skills/unibestX-skill/           #   核心知识库（1 入口 + 9 分册）
-│   └── rules/uniappx.md                 #   uni-app X 开发规范（编写 .uvue/.uts 前必读）
+│   └── rules/                           #   项目规则：base-lines（Always On）+ api/page/router（Glob）+ naming/commit（Model Decision）
 ├── .claude/                             # Claude Code 目录（符号链接自动同步自 .agents）
 ├── .trae/                               # Trae IDE 目录（符号链接自动同步自 .agents）
 ├── CLAUDE.md / AGENTS.md                # AI Agent 会话级规约（技能路由、内置工具优先复用等）

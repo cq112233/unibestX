@@ -1,16 +1,18 @@
-# 7 API 接口层规范（一页一目录 · 契约类型与 Mock 数据同层 · 后端就绪只换函数体）
+# 6 API 接口层手册（一页一目录 · 契约类型与 Mock 同层 · 请求实现 · 后端就绪只换函数体）
 
 > **本文件是 `unibestX-skill` 的参考分册**，由 [SKILL.md](../SKILL.md) 按需引用。
 >
 > **何时读本文件**：**新增页面并要同步建接口层时**、把页面 / 组件里写死的假数据抽成接口函数时、设计 mock 数据集与契约类型时、对接后端真实接口时、写 `http` 请求 / 文件上传 / SSE 流式接口时 —— 必须首先阅读并严格遵循本分册。
 >
-> **与其它分册的分工**：页面层级与组件拆分规范看分册 6（铁律 5 讲「mock 必须收拢进接口层」，本分册讲「接口层自己怎么写」）；新增页面的整体生成流程与页面模板看分册 5；`http` / 上传等基础设施的配置说明另见分册 5-infra 口径（本分册只讲**怎么在 api 层正确使用它们**）。
+> **与其它分册的分工**：页面层级与组件拆分看分册 5（铁律 5 讲「mock 必须收拢进接口层」，本分册讲「接口层自己怎么写」）；新增页面的整体生成流程看分册 4；`http` / 上传 / 流式的底层能力与配置见 `uni_modules/request-bestX/readme.md`（本分册只讲**怎么在 api 层正确使用它们**）；跨端运行时差异看分册 3。
 >
 > **核心定位**：**页面只管「要什么数据」，api 层只管「数据从哪来」** —— 每个页面在 `src/api/<page>/` 下有一套自己的接口层（接口函数 + 契约类型 + 模拟数据集），页面组件通过 `@/src/api/<page>/<page>.uts` 引入返回 `Promise<T>` 的接口函数；开发期返回本地 mock、后端就绪后返回真实响应，**对调用方完全透明，对接时页面侧零改动**。
+>
+> 📌 **6.1–6.8 是规范与铁律**；**6.9 起是手册部分**：完整接口文件（含 mock→http 双实现）→ 场景写法 → 坑点 → 速查 → 自检红线。**新建接口层直接抄 6.9，写请求前查 6.12 速查。**
 
 ---
 
-## 7.1 落位与命名：一页一目录（新增页面必产接口层）
+## 6.1 落位与命名：一页一目录（新增页面必产接口层）
 
 ### 1. 路径映射：目录名与页面目录严格同名
 
@@ -23,7 +25,7 @@ $$\text{页面目录: } \texttt{src/pages/<page\_name>/} \text{ 或 } \texttt{sr
 | `src/sub/order-detail/` | `src/api/order-detail/` | `src/sub/qa-detail/` | `src/api/qa-detail/` |
 
 - **挂 `pages/` 还是 `sub/` 不影响接口目录名**，一律以页面目录名为准；目录名用 kebab-case（`order-detail`），与页面目录逐字一致；
-- **接口层属于全局层**：组件里一律写 `import { fetchXxx } from '@/src/api/<page>/<page>.uts'`，**严禁** `'../../api/<page>/<page>.uts'` 这类相对穿透（哪怕文件结构上够得着，见分册 6 铁律 1）。
+- **接口层属于全局层**：组件里一律写 `import { fetchXxx } from '@/src/api/<page>/<page>.uts'`，**严禁** `'../../api/<page>/<page>.uts'` 这类相对穿透（哪怕文件结构上够得着，见分册 5 铁律 1）。
 
 ### 2. 硬门槛：没有配套接口层的新页面，视为未交付
 
@@ -65,11 +67,11 @@ src/api/<page>/
 | 分页容器 | `PageResult<T>`（收在 `types.uts`，全页共用一份；带页面前缀的 `IndexPageResult<T>` 同样合法，**同一页只用一种**） | `PageResult<WallpaperItem>` |
 | 查询参数类型 | `<函数名>Query` 或复用 `<实体>Query` | `OriginalQuery` |
 
-- **分页函数签名统一为 `(pageNo, pageSize, keyword)` 三件套并给默认值**（如 `pageNo: number = 1, pageSize: number = 10, keyword: string = ''`），后端接好后**默认值与入参顺序一个字都不改**（见 7.5）。
+- **分页函数签名统一为 `(pageNo, pageSize, keyword)` 三件套并给默认值**（如 `pageNo: number = 1, pageSize: number = 10, keyword: string = ''`），后端接好后**默认值与入参顺序一个字都不改**（见 6.5）。
 
 ---
 
-## 7.2 契约类型铁律
+## 6.2 契约类型铁律
 
 - **一律 `type`，严禁 `interface`**：规避 UTS 对对象字面量赋值的 `UTS110111163` 编译错误（详见分册 1 与 `SKILL.md` A.2 第 1 条）；
 - **空值一律 `null`，严禁 `undefined`**：可选字段写成 `category?: string | null`，不要写 `category?: string | undefined`（规避 `UTS110111119`）；
@@ -91,10 +93,10 @@ src/api/<page>/
 
 ---
 
-## 7.3 Mock 数据集铁律（按模块独立造数）
+## 6.3 Mock 数据集铁律（按模块独立造数）
 
 - **数据集只在 api 层**：`mock/<模块>.uts` 或 `<page>.uts` 内，**严禁**出现在 `.uvue` 页面与组件里；
-- **按模块独立造数，严禁一份数据喂两个模块**：`MOCK_A_*` 与 `MOCK_B_*` 各造一份，哪怕结构看着一样；A 段的数组**不得**被 B 段的接口函数取用（分册 6 铁律 4 / 铁律 5）；
+- **按模块独立造数，严禁一份数据喂两个模块**：`MOCK_A_*` 与 `MOCK_B_*` 各造一份，哪怕结构看着一样；A 段的数组**不得**被 B 段的接口函数取用（分册 5 铁律 4 / 铁律 5）；
 - **数据集拆了文件要 `export`**：`mock/*.uts` 里的 `MOCK_*` 常量必须 `export`（拆出去就是为了给同目录的 `<page>.uts` 取数），但它**仍不得**被另一个模块的数据文件或接口函数引用；
 - **函数名与数据集必须一一对应**：`MOCK_WALLPAPERS` 只服务 `fetchWallpaperList`，**严禁**抽一个「通用 `fetchList(type)`」让多个模块共用 —— 一旦合并，某天 A 要加分页、B 要加筛选，函数立刻长出 `if (type == 'a')` 分支，模块独立性当场死亡；
 - **mock 函数体要长得像真接口**：该分页就分页（`startIndex` / `endIndex` / `hasMore` 全算出来），该筛选就筛选（`category != 'all'` 时 `filter`），该用 `setTimeout` 模拟延迟就用 —— **开发期就能暴露分页与筛选的真实行为**，别写成「无视入参返回整个数组」，否则联调时页面才第一次见到分页逻辑；
@@ -111,21 +113,21 @@ export const MOCK_WALLPAPERS: Array<WallpaperItem> = [
 
 ---
 
-## 7.4 请求实现：一律走 `src/http` 的 `http` 单例
+## 6.4 请求实现：一律走 `src/http` 的 `http` 单例
 
-> 🚨 **严禁自己写 `uni.request`**：鉴权头、业务码判定、401 清 token 并跳登录、错误 toast 全部已经收在 `src/http/request/request.uts` 的拦截器里，绕过去就等于把这些能力全部重写一遍，且必然漏掉其中一项。
+> 🚨 **严禁自己写 `uni.request`**：鉴权头、业务码判定、401 清 token 并跳登录、错误 toast 全部已经收在 `src/http/instances/internal/factory.uts` 的默认拦截器里，绕过去就等于把这些能力全部重写一遍，且必然漏掉其中一项。
 
-### 1. 单例 API（`import { http } from '@/src/http/request/request.uts'`）
+### 1. 单例 API（`import { http } from '@/src/http/index.uts'` 或精准导入 `'@/src/http/instances/default.uts'`）
 
 | 方法 | 签名 | 说明 |
 | :--- | :--- | :--- |
-| `http.get<T>` | `(url: string, config: LimeRequestConfig \| null)` | `params` 放查询串 |
+| `http.get<T>` | `(url: string, config: HttpRequestConfig \| null)` | `params` 放查询串 |
 | `http.post<T>` | `(url: string, data: any \| null, config)` | `data` 放请求体 |
 | `http.put<T>` / `http.delete<T>` | 同 `post` | —— |
-| `http.upload<T>` | `(url: string, config)` | 走 lime-request 的 UPLOAD，自动带 token |
+| `http.upload<T>` | `(url: string, config)` | 走 `uni.uploadFile`，自动带 token；`config` 放 `filePath` / `name` / `formData` |
 
 - **返回值已经被解包**：`http.get<T>` 内部会把响应里的 `{ code, data }` 拆开，`then` 拿到的是 **`data` 本身**（不是整个响应体）。因此 `T` 只标注**业务数据**的类型，别再写成 `IResponse<T>`；
-- **`config` 常用字段**（类型 `LimeRequestConfig`，来自 `@/uni_modules/lime-request`）：
+- **`config` 常用字段**（类型 `HttpRequestConfig`，来自 `@/uni_modules/request-bestX/index.uts`）：
 
   | 字段 | 用途 | 写法 |
   | :--- | :--- | :--- |
@@ -147,12 +149,12 @@ export const MOCK_WALLPAPERS: Array<WallpaperItem> = [
 
 ### 3. 文件上传与流式接口也走既有封装
 
-- **上传**：用 `http.upload<T>(url, config)` 或具名函数 `uploadHttp<T>(url, config)`（`@/src/http/request/request.uts`，底层走 lime-request 的 UPLOAD，自动带 token），`T` 无法从入参推断、**必须显式标注**（如 `http.upload<string>(...)`）；返回值是 OSS 地址字符串 —— 需要时在 api 层包一个语义化函数（如 `uploadAvatar(filePath): Promise<string>`）再暴露给页面，**严禁**页面里直接调 `uni.chooseImage` + `uni.uploadFile` 拼流程。OSS 直传地址读 `getOssUploadUrl()` / `getOssUploadPath()`（`@/src/config/env/env.uts`），严禁硬编码；
-- **SSE / 流式**：用 `requestStream`（`@/src/http/stream/stream.uts`，返回 `Observable<StreamChunk>`）或 `simulateStream`。**流式接口同样收在 api 层**：在 `<page>.uts` 里包一个 `fetchXxxStream(params, onChunk)` 形态的函数，页面只负责把 chunk 往渲染层喂；**半截块不进渲染器**（分册 3 的 3.23 有完整事故与结论）。
+- **上传**：用 `http.upload<T>(url, config)`（`@/src/http/index.uts` 的 `http` 单例，底层走 `uni.uploadFile`，自动带 token），`T` 无法从入参推断、**必须显式标注**（如 `http.upload<string>(...)`）；`config` 里放 `filePath` / `name` / `formData`（见 `uni_modules/request-bestX/readme.md` 1.4）；返回值是 OSS 地址字符串 —— 需要时在 api 层包一个语义化函数（如 `uploadAvatar(filePath): Promise<string>`）再暴露给页面，**严禁**页面里直接调 `uni.chooseImage` + `uni.uploadFile` 拼流程。OSS 直传地址读 `getOssUploadUrl()` / `getOssUploadPath()`（`@/src/config/env/env.uts`），严禁硬编码；
+- **SSE / 流式**：用 `requestStream(options, client = null)`（`@/uni_modules/request-bestX/index.uts`，返回 `StreamTask`，chunk 通过回调/订阅消费）或 `simulateStream`。**流式接口同样收在 api 层**：在 `<page>.uts` 里包一个 `fetchXxxStream(params, onChunk)` 形态的函数，页面只负责把 chunk 往渲染层喂；**半截块不进渲染器**（分册 3 的 3.23 有完整事故与结论）。
 
 ---
 
-## 7.5 后端就绪：只换函数体，签名一个字都不改
+## 6.5 后端就绪：只换函数体，签名一个字都不改
 
 对接后端时**不搬迁文件、不改 import 路径、不改函数名与入参**，只把函数体从「返回 mock」换成「发请求 + 类型转换」：
 
@@ -183,7 +185,7 @@ export function fetchWallpaperList(category: string = 'all', pageNo: number = 1,
 export function fetchWallpaperList(category: string = 'all', pageNo: number = 1, pageSize: number = 9): Promise<PageResult<WallpaperItem>> {
   return http.get<UTSJSONObject>('/api/v1/index/wallpaper/list', {
     params: { category, pageNo, pageSize } as UTSJSONObject
-  } as LimeRequestConfig).then((data: UTSJSONObject): PageResult<WallpaperItem> => {
+  } as HttpRequestConfig).then((data: UTSJSONObject): PageResult<WallpaperItem> => {
     // 弱类型就地转强类型：getString / getNumber + 默认值兜底，严禁把 UTSJSONObject 抛给页面
     // getArray 用「两参形式」直接给空数组默认值（官方 API：只写 key 时返回 Array<T> | null，需自行 ?? 兜底）
     const rawList = data.getArray<UTSJSONObject>('list', [] as Array<UTSJSONObject>);
@@ -218,7 +220,7 @@ import type { WallpaperItem } from '@/src/api/index/index.uts';
 
 ---
 
-## 7.6 新增页面时的接口层产出清单（照序执行）
+## 6.6 新增页面时的接口层产出清单（照序执行）
 
 1. 定页面目录名 → 建 `src/api/<page>/` 目录；
 2. 逐个数清这个页面的**业务模块**，每个模块想好「要哪几个接口」；
@@ -226,28 +228,28 @@ import type { WallpaperItem } from '@/src/api/index/index.uts';
 4. 判断形态：**类型被多段共用** ⇒ 拆 `types.uts`；**数据集过大** ⇒ 拆 `mock/<模块>.uts`（形态二）；某接口域已经独立到贴 500 行上限 ⇒ 拆兄弟文件（形态三）。⚠️ **别按「文件总行数」决定是否抽 `types.uts`** —— 类型通常只占 0~13%，抽了并不减行；
 5. 每个接口函数**现在就用 `Promise<T>` 签名**、入参写全（分页三件套给默认值），保证将来只换函数体；
 6. 页面 / 组件里**只**通过 `@/src/api/<page>/<page>.uts` 取数，删掉任何 `ref([...])` 假数据；
-7. 交付前 `wc -l` 自查：任何 `.uts` 不得超过 **500 行**（分册 6 铁律 2）；超了**按接口域拆兄弟文件**（形态三），而不是抽 `types.uts`。
+7. 交付前 `wc -l` 自查：任何 `.uts` 不得超过 **500 行**（分册 5 铁律 2）；超了**按接口域拆兄弟文件**（形态三），而不是抽 `types.uts`。
 
 ---
 
-## 7.7 接口层自检红线清单
+## 6.7 接口层自检红线清单
 
-- [ ] **1. 新页面必产 `src/api/<page>/<page>.uts`** —— 页面里每块后端数据都能顺到某个 `fetchXxx()`，否则视为未交付（7.1）
-- [ ] **2. 页面目录下严禁 `mock.uts`**，`.uvue` 里严禁 `ref([...])` 硬编码假数据（7.1 / 分册 6 铁律 5）
-- [ ] **3. 一律 `type`，严禁 `interface`**；空值一律 `null`，严禁 `undefined`（7.2 / A.2 第 1、2 条）
-- [ ] **4. 严禁 `UTSJSONObject` 出 api 层** —— 弱类型必须在 api 层用 `getString` / `getNumber` + `??` 映射成强类型 DTO 再返回（7.2 / 7.5）
-- [ ] **5. 后端 DTO 只放 api 层** —— 页面 `types.uts` 只留 UI 层类型，严禁页面侧反向给 api 层提供类型（7.2）
-- [ ] **6. Mock 按模块独立造数** —— 数据集与函数名一一对应、互不引用，严禁「通用 `fetchList(type)`」共用函数（7.3 / 分册 6 铁律 5）
-- [ ] **7. mock 函数体要像真接口** —— 分页 / 筛选 / 排序逻辑照写，别无视入参返回整个数组（7.3）
-- [ ] **8. 严禁自己写 `uni.request`** —— 一律走 `http` 单例 / `http.upload` / `requestStream`（7.4）
-- [ ] **9. 拦截器已处理的错误不要重复处理** —— api 层不写 `uni.showToast`、不判 401、不跳登录页（7.4）
-- [ ] **10. 对接后端只换函数体** —— 函数名 / 入参（含默认值）/ 返回类型一个字不改，mock 常量先留着（7.5）
-- [ ] **11. 接口引用一律 `@/src/api/<page>/<page>.uts`** —— 严禁相对路径穿透（7.1 / 分册 6 铁律 1）
-- [ ] **12. 单个接口文件严禁超 500 行** —— 只允许按接口域向下拆兄弟文件（拆兄弟文件才能真正减行），不允许为整齐而碎裂；⚠️ `types.uts` 的拆分依据是「类型被多处共用」，**不是**行数（7.1 / 分册 6 铁律 2）
+- [ ] **1. 新页面必产 `src/api/<page>/<page>.uts`** —— 页面里每块后端数据都能顺到某个 `fetchXxx()`，否则视为未交付（6.1）
+- [ ] **2. 页面目录下严禁 `mock.uts`**，`.uvue` 里严禁 `ref([...])` 硬编码假数据（6.1 / 分册 5 铁律 5）
+- [ ] **3. 一律 `type`，严禁 `interface`**；空值一律 `null`，严禁 `undefined`（6.2 / A.2 第 1、2 条）
+- [ ] **4. 严禁 `UTSJSONObject` 出 api 层** —— 弱类型必须在 api 层用 `getString` / `getNumber` + `??` 映射成强类型 DTO 再返回（6.2 / 6.5）
+- [ ] **5. 后端 DTO 只放 api 层** —— 页面 `types.uts` 只留 UI 层类型，严禁页面侧反向给 api 层提供类型（6.2）
+- [ ] **6. Mock 按模块独立造数** —— 数据集与函数名一一对应、互不引用，严禁「通用 `fetchList(type)`」共用函数（6.3 / 分册 5 铁律 5）
+- [ ] **7. mock 函数体要像真接口** —— 分页 / 筛选 / 排序逻辑照写，别无视入参返回整个数组（6.3）
+- [ ] **8. 严禁自己写 `uni.request`** —— 一律走 `http` 单例 / `http.upload` / `requestStream`（6.4）
+- [ ] **9. 拦截器已处理的错误不要重复处理** —— api 层不写 `uni.showToast`、不判 401、不跳登录页（6.4）
+- [ ] **10. 对接后端只换函数体** —— 函数名 / 入参（含默认值）/ 返回类型一个字不改，mock 常量先留着（6.5）
+- [ ] **11. 接口引用一律 `@/src/api/<page>/<page>.uts`** —— 严禁相对路径穿透（6.1 / 分册 5 铁律 1）
+- [ ] **12. 单个接口文件严禁超 500 行** —— 只允许按接口域向下拆兄弟文件（拆兄弟文件才能真正减行），不允许为整齐而碎裂；⚠️ `types.uts` 的拆分依据是「类型被多处共用」，**不是**行数（6.1 / 分册 5 铁律 2）
 
 ---
 
-## 7.8 真实标杆与现网现状（诚实清单）
+## 6.8 真实标杆与现网现状（诚实清单）
 
 **结构标杆（同一套规范的下游项目 Chaser，可直接对照）**：
 
@@ -265,3 +267,417 @@ Chaser/src/api/
 ```
 
 **本项目 unibestX 现状**：`src/api/` 下现有 `src/api/example.uts`（216 行，`FooItem` + 分页容器 `PageResult<T>`，含 `http.get` / `http.upload` / `http.downloadFile` 的完整调用示例，可作为**写法参照**）、`src/api/auth/auth.uts`、`src/api/privacy/privacy.uts`；页面级 `src/api/<page>/` 接口目录尚未逐页建立。**从今往后新建的页面一律按本分册直接落位，不再产生页面侧的 `mock.uts`。**
+
+---
+
+## 6.9 完整示例：一份可直接落地的接口文件（mock → http 双实现）
+
+> 新建 `src/api/order-list/order-list.uts` 时整体照抄。**上半是 mock 版，下半是后端就绪后的 http 版 —— 两版签名逐字相同，页面侧一行都不用改。**
+
+```uts
+// ==========================================
+// 文件位置：src/api/order-list/order-list.uts（对应页面 src/sub/order-list/）
+// 开发期返回本地 mock；后端就绪只换函数体，签名冻结
+// ==========================================
+import { http } from '@/src/http/index.uts';
+import type { HttpRequestConfig } from '@/uni_modules/request-bestX/index.uts';
+
+// ------------------------------------------
+// 【订单段】类型 / 数据集 / 函数三块相邻
+// ------------------------------------------
+
+/** 订单列表项 */
+export type OrderItem = {
+  id: number,
+  title: string,
+  amount: number,
+  statusText: string,
+  createdText: string
+};
+
+/** 分页容器（全页共用一份） */
+export type PageResult<T> = {
+  list: Array<T>,
+  hasMore: boolean,
+  total: number
+};
+
+/** 订单列表模拟数据（私有常量，不导出） */
+const MOCK_ORDER_LIST: Array<OrderItem> = [
+  { id: 1, title: '洗护套装', amount: 199, statusText: '待发货', createdText: '2026-10-20 09:12' },
+  { id: 2, title: '咖啡豆 500g', amount: 89, statusText: '已完成', createdText: '2026-10-19 18:40' }
+];
+
+/**
+ * 分页获取订单列表
+ * @param pageNo 页码，从 1 开始计数
+ * @param pageSize 单页条数，默认 10
+ * @param keyword 标题关键词，空串表示不筛选
+ */
+export function fetchOrderList(pageNo: number = 1, pageSize: number = 10, keyword: string = ''): Promise<PageResult<OrderItem>> {
+  // ---------- 【对接前】mock 实现：像真接口一样做分页与筛选 ----------
+  const filtered: Array<OrderItem> = keyword == ''
+    ? MOCK_ORDER_LIST
+    : MOCK_ORDER_LIST.filter((item: OrderItem): boolean => item.title.includes(keyword));
+  const startIndex: number = (pageNo - 1) * pageSize;
+  const endIndex: number = startIndex + pageSize;
+  const pageList: Array<OrderItem> = [];
+  for (let i = startIndex; i < filtered.length && i < endIndex; i++) {
+    pageList.push(filtered[i]);
+  }
+  return Promise.resolve({
+    list: pageList,
+    hasMore: endIndex < filtered.length,
+    total: filtered.length
+  } as PageResult<OrderItem>);
+}
+
+// ---------- 【对接后】http 实现（签名与上面逐字一致，替换函数体即可） ----------
+// export function fetchOrderList(pageNo: number = 1, pageSize: number = 10, keyword: string = ''): Promise<PageResult<OrderItem>> {
+//   return http.get<UTSJSONObject>('/api/v1/order/list', {
+//     params: { pageNo: pageNo, pageSize: pageSize, keyword: keyword } as UTSJSONObject
+//   } as HttpRequestConfig).then((data: UTSJSONObject): PageResult<OrderItem> => {
+//     const rawList = data.getArray<UTSJSONObject>('list', [] as Array<UTSJSONObject>);
+//     return {
+//       list: rawList.map((raw: UTSJSONObject): OrderItem => {
+//         return {
+//           id: raw.getNumber('id') ?? 0,
+//           title: raw.getString('title') ?? '',
+//           amount: raw.getNumber('amount') ?? 0,
+//           statusText: raw.getString('statusText') ?? '',
+//           createdText: raw.getString('createdText') ?? ''
+//         } as OrderItem;
+//       }),
+//       hasMore: data.getBoolean('hasMore') ?? false,
+//       total: data.getNumber('total') ?? 0
+//     } as PageResult<OrderItem>;
+//   });
+// }
+
+// ------------------------------------------
+// 【订单详情段】独立类型 / 独立函数，与列表段互不引用
+// ------------------------------------------
+
+/** 订单详情 */
+export type OrderDetail = {
+  id: number,
+  title: string,
+  amount: number,
+  address: string,
+  remark: string
+};
+
+/**
+ * 获取订单详情
+ * @param id 订单主键
+ */
+export function fetchOrderDetail(id: number): Promise<OrderDetail | null> {
+  // mock：从列表数据里取一条并补全字段
+  for (let i = 0; i < MOCK_ORDER_LIST.length; i++) {
+    const item: OrderItem = MOCK_ORDER_LIST[i];
+    if (item.id == id) {
+      return Promise.resolve({
+        id: item.id,
+        title: item.title,
+        amount: item.amount,
+        address: '上海市浦东新区示例路 1 号',
+        remark: ''
+      } as OrderDetail);
+    }
+  }
+  return Promise.resolve(null);
+}
+
+/**
+ * 取消订单
+ * @param id 订单主键
+ */
+export function cancelOrder(id: number): Promise<boolean> {
+  return Promise.resolve(true);
+}
+```
+
+**逐条对应**：一页一目录 → 6.1；`type` 契约 + `PageResult<T>` → 6.2；按模块独立造数 → 6.3；mock 像真接口（分页 / 筛选） → 6.3；http 单例 + 弱类型就地转换 → 6.4 / 6.5；`as PageResult<OrderItem>` 不用泛型别名 → 6.2。
+
+页面侧引用永远是这两行：
+
+```uts
+import { fetchOrderList } from '@/src/api/order-list/order-list.uts';
+import type { OrderItem } from '@/src/api/order-list/order-list.uts';
+```
+
+---
+
+## 6.10 多种场景写法（可直接复制）
+
+### 6.10.1 列表 + 分页
+
+```uts
+export function fetchGoodsList(pageNo: number = 1, pageSize: number = 10, keyword: string = ''): Promise<PageResult<GoodsItem>> {
+  return Promise.resolve({ list: [], hasMore: false, total: 0 } as PageResult<GoodsItem>);
+}
+```
+
+```uts
+// 页面 / 模块容器侧：追加还是重置由调用方决定
+function loadPage(append: boolean, pageNo: number): void {
+  fetchGoodsList(pageNo, 10, '').then(
+    (res: PageResult<GoodsItem>): void => {
+      list.value = append ? list.value.concat(res.list) : res.list;
+      hasMore.value = res.hasMore;
+    },
+    (err: any): void => {
+      console.error('[goods] 加载失败', err);
+    }
+  );
+}
+```
+
+### 6.10.2 详情（可能为 null）
+
+```uts
+export function fetchGoodsDetail(id: number): Promise<GoodsItem | null> {
+  return Promise.resolve(null);
+}
+```
+
+```uts
+fetchGoodsDetail(id).then(
+  (detail: GoodsItem | null): void => {
+    if (detail == null) {
+      toastError('商品不存在');
+      return;
+    }
+    item.value = detail;
+  },
+  (err: any): void => {
+    console.error('[goods] 详情失败', err);
+  }
+);
+```
+
+### 6.10.3 写操作（创建 / 更新 / 删除）
+
+```uts
+export function createGoods(payload: GoodsPayload): Promise<GoodsItem> {
+  return http.post<UTSJSONObject>('/api/v1/goods', payload as UTSJSONObject, {
+    // 写操作不要关掉错误 toast（默认可弹）
+  } as HttpRequestConfig).then((raw: UTSJSONObject): GoodsItem => {
+    return {
+      id: raw.getNumber('id') ?? 0,
+      title: raw.getString('title') ?? '',
+      price: raw.getNumber('price') ?? 0
+    } as GoodsItem;
+  });
+}
+```
+
+### 6.10.4 切备用域名 / 免登录接口
+
+```uts
+import { API_DOMAINS } from '@/src/http/index.uts';
+
+export function fetchRemoteGoods(): Promise<GoodsItem> {
+  return http.get<UTSJSONObject>('/foo', {
+    baseURL: API_DOMAINS.SECONDARY,
+    extra: { ignoreAuth: true } as UTSJSONObject
+  } as HttpRequestConfig).then((raw: UTSJSONObject): GoodsItem => {
+    return {
+      id: raw.getNumber('id') ?? 0,
+      title: raw.getString('title') ?? '',
+      price: raw.getNumber('price') ?? 0
+    } as GoodsItem;
+  });
+}
+```
+
+### 6.10.5 静默失败（轮询 / 可忽略错误）
+
+```uts
+export function pollStatus(id: number): Promise<number> {
+  return http.get<UTSJSONObject>('/api/v1/order/status', {
+    params: { id: id } as UTSJSONObject,
+    extra: { toast: false } as UTSJSONObject   // 关掉业务错误自动 toast
+  } as HttpRequestConfig).then(
+    (raw: UTSJSONObject): number => raw.getNumber('status') ?? 0,
+    (err: any): number => {
+      console.warn('[order] 状态轮询失败', err);
+      return 0;
+    }
+  );
+}
+```
+
+### 6.10.6 文件上传
+
+```uts
+import { getOssUploadUrl } from '@/src/config/env/env.uts';
+
+/**
+ * 上传头像
+ * @param filePath 本地临时文件路径（App 端为 file:// 绝对路径）
+ */
+export function uploadAvatar(filePath: string): Promise<string> {
+  return http.upload<string>(getOssUploadUrl(), {
+    filePath: filePath,
+    name: 'file'
+  } as HttpRequestConfig).then(
+    (url: string): string => url,
+    (err: any): string => {
+      console.error('[upload] 头像上传失败', err);
+      return '';
+    }
+  );
+}
+```
+
+### 6.10.7 流式接口（SSE）
+
+```uts
+import { requestStream } from '@/uni_modules/request-bestX/index.uts';
+import type { StreamChunk, StreamOptions } from '@/uni_modules/request-bestX/index.uts';
+
+/**
+ * 发起流式问答
+ * @param question 用户问题
+ * @param onChunk 每收到一块增量文本时回调
+ * @param onDone 流结束回调
+ */
+export function fetchAnswerStream(question: string, onChunk: (text: string) => void, onDone: () => void): void {
+  const options: StreamOptions = {
+    url: '/api/v1/ai/chat',
+    method: 'POST',
+    data: { question: question } as UTSJSONObject
+  } as StreamOptions;
+  requestStream(options).onChunk((chunk: StreamChunk): void => {
+    onChunk(chunk.text);
+  }).onComplete((): void => {
+    onDone();
+  });
+}
+```
+
+> ⚠️ 页面侧仍要遵守「半截块不进渲染器」（分册 3.23）。
+
+### 6.10.8 错误统一处理
+
+```uts
+// ❌ 不要在 api 层重复处理
+export function fetchX(): Promise<X> {
+  return http.get<X>('/x', null).then(
+    (data: X): X => data,
+    (err: any): X => {
+      uni.showToast({ title: '加载失败', icon: 'none' });  // ❌ 拦截器已处理
+      return null as any;
+    }
+  );
+}
+
+// ✅ 拦截器负责 toast / 401；api 层只做类型转换，页面只管自己的 loading
+```
+
+---
+
+## 6.11 坑点清单（接口层）
+
+### ① 页面里直接 `ref([...])` 假数据
+
+数据必须来自 `src/api/<page>/`，否则后端就绪时改动面爆炸（6.1）。
+
+### ② 接口目录名与页面目录不同名
+
+`src/sub/order-list/` ⇒ `src/api/order-list/`，逐字对应。
+
+### ③ 用 `interface` 定义 DTO
+
+`UTS110111163`（分册 1.1）。
+
+### ④ 把 `UTSJSONObject` 直接返回给页面
+
+页面模板里必然踩 `error17` / `ClassCastException`；必须在 api 层转强类型（6.2）。
+
+### ⑤ `getNumber()` 没做 `??` 兜底
+
+返回类型是 `number | null`，直接赋给非空字段 Kotlin 编译报错。
+
+### ⑥ 用泛型实例化别名做 `as` 断言
+
+`as WallpaperPageResult` 会在运行期抛 `ReferenceError`；直写 `as PageResult<WallpaperItem>`（6.2 / 分册 1.25）。
+
+### ⑦ mock 无视入参直接返回整份数据
+
+联调时页面才第一次见到分页 / 筛选逻辑，埋雷（6.3）。
+
+### ⑧ 一份 mock 数据喂两个模块
+
+A 段数据集被 B 段引用，后续 A 加字段 B 静默变形（6.3）。
+
+### ⑨ 抽一个「通用 `fetchList(type)`」
+
+模块独立性当场死亡（6.3）。
+
+### ⑩ 页面目录下放 `mock.uts`
+
+旧形态已废弃；数据集按模块进 `src/api/<page>/mock/`（6.1）。
+
+### ⑪ 自己写 `uni.request`
+
+绕过鉴权、401、业务码、toast 全套拦截器（6.4）。
+
+### ⑫ 在 api 层 / 页面层重复处理 401 与 toast
+
+拦截器已处理，重复处理会导致双 toast / 重复跳登录（6.4）。
+
+### ⑬ 对接后端时改了函数签名
+
+页面侧 `.then((data: Array<X>) => ...)` 当场编译报错；签名必须冻结（6.5）。
+
+### ⑭ 单个接口文件超 500 行还不拆
+
+按接口域拆兄弟文件；**不要**用抽 `types.uts` 当减行手段（6.1 / 6.6）。
+
+### ⑮ 接口函数引用用相对路径
+
+一律 `@/src/api/<page>/<page>.uts`（6.1）。
+
+### ⑯ 上传时 `T` 没显式标注
+
+`http.upload<T>` 无法从入参推断，必须写 `http.upload<string>(...)`。
+
+---
+
+## 6.12 接口层速查表
+
+| 我要什么 | 写法 | 从哪导入 |
+| :--- | :--- | :--- |
+| 发起 GET | `http.get<T>(url, { params } as HttpRequestConfig)` | `@/src/http/index.uts` |
+| 发起 POST | `http.post<T>(url, data, config)` | 同上 |
+| PUT / DELETE | `http.put<T>` / `http.delete<T>` | 同上 |
+| 上传文件 | `http.upload<string>(url, config)` | 同上 |
+| 下载文件 | `http.downloadFile(url, config)` | 同上 |
+| 切备用域名 | `baseURL: API_DOMAINS.SECONDARY` | `@/src/http/index.uts` |
+| 免登录接口 | `extra: { ignoreAuth: true } as UTSJSONObject` | —— |
+| 关业务错误 toast | `extra: { toast: false } as UTSJSONObject` | —— |
+| 流式接口 | `requestStream(options)` | `@/uni_modules/request-bestX/index.uts` |
+| OSS 上传地址 | `getOssUploadUrl()` / `getOssUploadPath()` | `@/src/config/env/env.uts` |
+| 分页容器 | `type PageResult<T> = { list, hasMore, total }` | 本页接口文件 / `types.uts` |
+| 弱类型取值 | `getString` / `getNumber` / `getBoolean` + `??` | `UTSJSONObject` 方法 |
+| 数组取值 | `getArray<T>('list', [] as Array<T>)` | 同上 |
+
+---
+
+## 6.13 接口层自检红线清单（补充 6.7）
+
+- [ ] **13. 新建页面同批建接口层** —— 页面里每块后端数据都能顺到某个 `fetchXxx()`
+- [ ] **14. 目录名逐字同名** —— `src/api/<page>/<page>.uts`
+- [ ] **15. 契约全 `type`** —— 零 `interface`，空值用 `null`
+- [ ] **16. `UTSJSONObject` 不出 api 层** —— 弱类型就地转强类型 DTO
+- [ ] **17. `as` 不写泛型别名** —— 直写 `as PageResult<Item>`
+- [ ] **18. mock 按模块独立造数** —— 数据集与函数一一对应，互不引用
+- [ ] **19. mock 行为像真接口** —— 分页 / 筛选 / 延迟照写
+- [ ] **20. 请求只走 `http` 单例** —— 不写 `uni.request`，不重复处理 401 / toast
+- [ ] **21. 对接后端只换函数体** —— 函数名 / 入参（含默认值）/ 返回类型冻结
+- [ ] **22. 分页签名统一** —— `(pageNo = 1, pageSize = 10, keyword = '')`
+- [ ] **23. 单文件 ≤ 500 行** —— 超了按接口域拆兄弟文件
+- [ ] **24. 引用走别名** —— `@/src/api/<page>/<page>.uts`
+- [ ] **25. 上传 / 流式有显式类型** —— `http.upload<string>`，流式走 `requestStream`
