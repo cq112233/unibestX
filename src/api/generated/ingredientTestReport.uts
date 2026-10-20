@@ -1,0 +1,27 @@
+/* eslint-disable */
+// @ts-ignore
+import { request } from '@/src/http/openapi.uts';
+import type { OpenApiRequestOptions } from '@/src/http/openapi.uts';
+
+import * as API from './types.uts';
+
+/** 食材检测记录报表 POST /gateway/ingredientTestReport/page */
+export function ingredientTestReportPageUsingPost({
+  body,
+  options,
+}: {
+  body: API.IngredientTestReportPageUsingPostBody;
+  options?: OpenApiRequestOptions;
+}) {
+  return request<API.IngredientTestReportPageUsingPostResponse>(
+    '/gateway/ingredientTestReport/page',
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      data: body,
+      ...(options || {}),
+    }
+  );
+}

@@ -3,7 +3,7 @@ import {
   createHttpClient,
   http,
   streamHttp
-} from '@/src/http/request/request.uts';
+} from '@/src/http/index.uts';
 
 /**
  * 流式请求（HttpClient.stream / streamHttp）的行为验证

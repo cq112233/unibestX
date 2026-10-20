@@ -1,0 +1,48 @@
+/* eslint-disable */
+// @ts-ignore
+import { request } from '@/src/http/openapi.uts';
+import type { OpenApiRequestOptions } from '@/src/http/openapi.uts';
+
+import * as API from './types.uts';
+
+/** 留样记录菜品明细 POST /gateway/foodSampleReport/dishDetail */
+export function foodSampleReportDishDetailUsingPost({
+  body,
+  options,
+}: {
+  body: API.FoodSampleReportDishDetailUsingPostBody;
+  options?: OpenApiRequestOptions;
+}) {
+  return request<API.FoodSampleReportDishDetailUsingPostResponse>(
+    '/gateway/foodSampleReport/dishDetail',
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      data: body,
+      ...(options || {}),
+    }
+  );
+}
+
+/**  留样记录报表分页列表 POST /gateway/foodSampleReport/page */
+export function foodSampleReportPageUsingPost({
+  body,
+  options,
+}: {
+  body: API.FoodSampleReportPageUsingPostBody;
+  options?: OpenApiRequestOptions;
+}) {
+  return request<API.FoodSampleReportPageUsingPostResponse>(
+    '/gateway/foodSampleReport/page',
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      data: body,
+      ...(options || {}),
+    }
+  );
+}

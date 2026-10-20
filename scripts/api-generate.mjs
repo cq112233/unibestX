@@ -1,3 +1,4 @@
+import { execSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -134,6 +135,253 @@ function postProcessUtsFiles(targetDir) {
   }
 }
 
+/**
+ * 解析 OpenAPI $ref 引用（如 #/components/schemas/Xxx 或 #/definitions/Xxx）
+ */
+function resolveOpenApiRef(ref, openAPIData) {
+  if (!ref || typeof ref !== 'string')
+    return null;
+  const parts = ref.replace(/^#\//, '').split('/');
+  let curr = openAPIData;
+  for (const part of parts) {
+    if (!curr)
+      return null;
+    curr = curr[part];
+  }
+  return curr;
+}
+
+/**
+ * 递归从 OpenAPI Schema 中构造 Mock 示例数据
+ */
+function generateMockFromSchema(schema, openAPIData, depth = 0) {
+  if (!schema || depth > 5)
+    return null;
+
+  if (schema.$ref) {
+    const resolved = resolveOpenApiRef(schema.$ref, openAPIData);
+    if (resolved) {
+      return generateMockFromSchema(resolved, openAPIData, depth + 1);
+    }
+  }
+
+  if (schema.example !== undefined) {
+    return schema.example;
+  }
+
+  const type = schema.type;
+  if (type === 'object' || schema.properties) {
+    const obj = {};
+    const props = schema.properties || {};
+    for (const [key, propSchema] of Object.entries(props)) {
+      obj[key] = generateMockValue(key, propSchema, openAPIData, depth + 1);
+    }
+    return obj;
+  }
+
+  if (type === 'array') {
+    const itemSchema = schema.items || {};
+    const item = generateMockFromSchema(itemSchema, openAPIData, depth + 1);
+    return item !== undefined ? [item] : [];
+  }
+
+  return generateMockValue('', schema, openAPIData, depth);
+}
+
+/**
+ * 根据字段名与类型生成智能语义化的 Mock 值
+ */
+function generateMockValue(name, schema, openAPIData, depth = 0) {
+  if (!schema)
+    return 'mock_val';
+  if (schema.$ref) {
+    const resolved = resolveOpenApiRef(schema.$ref, openAPIData);
+    if (resolved)
+      return generateMockFromSchema(resolved, openAPIData, depth + 1);
+  }
+  if (schema.example !== undefined)
+    return schema.example;
+
+  const type = schema.type;
+  const n = (name || '').toLowerCase();
+
+  if (type === 'integer' || type === 'number') {
+    if (n.includes('code') || n === 'status')
+      return 200;
+    if (n.includes('total'))
+      return 100;
+    if (n.includes('page') || n.includes('current'))
+      return 1;
+    if (n.includes('size'))
+      return 10;
+    if (n.includes('id'))
+      return 1;
+    return 1;
+  }
+
+  if (type === 'boolean') {
+    return true;
+  }
+
+  if (type === 'array') {
+    const item = generateMockFromSchema(schema.items || {}, openAPIData, depth + 1);
+    return item !== undefined ? [item] : [];
+  }
+
+  if (type === 'object' || schema.properties) {
+    return generateMockFromSchema(schema, openAPIData, depth + 1);
+  }
+
+  if (n.includes('time') || n.includes('date'))
+    return '2026-10-18 12:00:00';
+  if (n.includes('url') || n.includes('avatar') || n.includes('image') || n.includes('img') || n.includes('pic')) {
+    return '/static/logo.png';
+  }
+  if (n.includes('phone') || n.includes('mobile'))
+    return '13800138000';
+  if (n.includes('email') || n.includes('mail'))
+    return 'dev@unibestx.com';
+  if (n.includes('name') || n.includes('title'))
+    return `测试${name || '数据'}`;
+  if (n.includes('desc') || n.includes('content') || n.includes('remark'))
+    return `${name || '字段'}示例描述`;
+  if (n.includes('token'))
+    return 'mock-token-sample';
+  if (n.includes('id'))
+    return '1';
+
+  return `mock_${name || 'val'}`;
+}
+
+/**
+ * 扫描已有的手写 Mock 路由，避免生成的自动 Mock 覆盖手动定制的高级逻辑
+ */
+function scanExistingManualMocks(mockDir) {
+  const manualRoutes = new Set();
+  if (!fs.existsSync(mockDir))
+    return manualRoutes;
+
+  const files = fs.readdirSync(mockDir);
+  for (const file of files) {
+    // 忽略 generated.ts, _util.ts 及非 js/ts 文件
+    if (file === 'generated.ts' || file.startsWith('_') || (!file.endsWith('.ts') && !file.endsWith('.js'))) {
+      continue;
+    }
+    const content = fs.readFileSync(path.join(mockDir, file), 'utf8');
+    const urlMatches = content.matchAll(/url:\s*['"]([^'"]+)['"]/g);
+    for (const match of urlMatches) {
+      if (match[1]) {
+        manualRoutes.add(match[1]);
+      }
+    }
+  }
+  return manualRoutes;
+}
+
+/**
+ * 根据 OpenAPI 契约全自动生成 mock/generated.ts 拦截挡板
+ */
+function generateContractMockFile(openAPIData, targetRootDir) {
+  if (!openAPIData || !openAPIData.paths)
+    return;
+
+  const mockDir = path.join(targetRootDir, 'mock');
+  if (!fs.existsSync(mockDir)) {
+    fs.mkdirSync(mockDir, { recursive: true });
+  }
+
+  const manualRoutes = scanExistingManualMocks(mockDir);
+  const mockEntries = [];
+
+  for (const pathKey of Object.keys(openAPIData.paths)) {
+    // 将 OpenAPI 路径参数 {id} 转换为 Mock 路径参数 :id
+    const routeUrl = pathKey.replace(/\{([^}]+)\}/g, ':$1');
+    const pathItem = openAPIData.paths[pathKey];
+
+    for (const method of ['get', 'post', 'put', 'delete', 'patch']) {
+      const operation = pathItem[method];
+      if (!operation)
+        continue;
+
+      // 手动编写的 Mock 拥有最高优先级，自动跳过
+      if (manualRoutes.has(routeUrl)) {
+        continue;
+      }
+
+      const summary = operation.summary || operation.description || '';
+      const res200 = operation.responses?.['200'] || operation.responses?.['201'] || operation.responses?.default;
+      const resContent = res200?.content?.['application/json'];
+
+      let mockData = null;
+      if (resContent?.example) {
+        mockData = resContent.example;
+      }
+      else if (resContent?.schema) {
+        mockData = generateMockFromSchema(resContent.schema, openAPIData);
+      }
+
+      if (!mockData) {
+        mockData = {
+          code: 200,
+          message: 'ok',
+          data: null
+        };
+      }
+
+      // 判断 mockData 是否已经包含外层标准响应包装 (如 code, status, success)
+      const hasEnvelope = typeof mockData === 'object' && mockData !== null && !Array.isArray(mockData)
+        && ('code' in mockData || 'status' in mockData || 'success' in mockData);
+
+      mockEntries.push({
+        summary,
+        url: routeUrl,
+        method,
+        hasEnvelope,
+        data: mockData
+      });
+    }
+  }
+
+  if (mockEntries.length === 0)
+    return;
+
+  const codeBlocks = mockEntries.map((item) => {
+    const comment = item.summary ? `  // [${item.method.toUpperCase()}] ${item.url} - ${item.summary}` : `  // [${item.method.toUpperCase()}] ${item.url}`;
+    const returnExpr = item.hasEnvelope
+      ? `return ${JSON.stringify(item.data, null, 6).trim()};`
+      : `return resultSuccess(${JSON.stringify(item.data, null, 6).trim()});`;
+
+    return `${comment}\n  {\n    url: '${item.url}',\n    method: '${item.method}',\n    timeout: 50,\n    response: () => {\n      ${returnExpr}\n    }\n  }`;
+  });
+
+  const fileContent = `/**
+ * 契约自动挡板 Mock 文件 (Contract Mocking)
+ *
+ * ⚠️ 本文件由 scripts/api-generate.mjs 根据 Apifox / Swagger 契约规范全自动生成。
+ * ⚠️ 请勿手动修改本文件。后端契约更新后，运行 pnpm api:gen 会全自动同步更新。
+ * 💡 规则：手动编写的 Mock（如 mock/auth.ts, mock/foo.ts）拥有最高优先级，同名接口自动优先使用手写版。
+ */
+import type { MockMethod } from 'vite-plugin-mock';
+import { resultSuccess } from './_util';
+
+export default [
+${codeBlocks.join(',\n\n')}
+] as MockMethod[];
+`;
+
+  const outputPath = path.join(mockDir, 'generated.ts');
+  fs.writeFileSync(outputPath, fileContent, 'utf8');
+
+  try {
+    execSync('npx eslint mock/generated.ts --fix', { cwd: targetRootDir, stdio: 'ignore' });
+  }
+  catch {
+    // 忽略格式化错误
+  }
+
+  console.log(`📦 已自动生成本地 Mock 契约挡板: mock/generated.ts (共 ${mockEntries.length} 个接口)`);
+}
+
 async function main() {
   console.log('🚀 开始基于 openapi-ts-request 生成 uni-app X API 与类型代码...');
 
@@ -161,12 +409,15 @@ async function main() {
       ? path.resolve(rootDir, conf.serversPath)
       : path.resolve(rootDir, 'src/api/generated');
 
+    let capturedOpenAPIData = null;
+
     // 智能挂载 OpenAPI 数据初始化钩子：若后端未在 Apifox 中定义 schema 字段，自动从 example 推断生成完整类型
     const originHook = conf.hook?.afterOpenApiDataInited;
     conf.hook = {
       ...(conf.hook || {}),
       afterOpenApiDataInited: (openAPIData) => {
         const enhanced = enhanceOpenApiSchemaWithExamples(openAPIData);
+        capturedOpenAPIData = enhanced;
         if (originHook) {
           return originHook(enhanced) || enhanced;
         }
@@ -179,9 +430,14 @@ async function main() {
 
     console.log(`🔧 正在转换为 uni-app X 标准 .uts 格式并修正引用...`);
     postProcessUtsFiles(serversPath);
+
+    // 全自动生成本地 Mock 契约挡板
+    if (capturedOpenAPIData) {
+      generateContractMockFile(capturedOpenAPIData, rootDir);
+    }
   }
 
-  console.log('✨ API 接口与强类型定义生成完毕，完全兼容 UTS 强类型系统与多端编译！');
+  console.log('✨ API 接口、强类型定义与本地 Mock 契约挡板全部生成完毕！');
 }
 
 main().catch((err) => {

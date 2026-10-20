@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
+  buildApiInstanceOptions,
   createHttpClient,
-  DEFAULT_HTTP_OPTIONS,
   defaultBusinessAfterComplete,
   defaultBusinessAfterSuccess,
   defaultBusinessBeforeRequest,
@@ -33,9 +33,10 @@ describe('httpClient beforeRequest & afterResponse hooks', () => {
     http.clearAfterResponse();
   });
 
-  it('should export DEFAULT_HTTP_OPTIONS and instantiate http via createHttpClient', () => {
-    expect(DEFAULT_HTTP_OPTIONS).toBeDefined();
-    expect(DEFAULT_HTTP_OPTIONS.timeout).toBe(5000);
+  it('should build api instance options and instantiate http via createHttpClient', () => {
+    const options = buildApiInstanceOptions();
+    expect(options).toBeDefined();
+    expect(options.timeout).toBe(5000);
     expect(http).toBeDefined();
     expect(typeof http.get).toBe('function');
     expect(typeof http.post).toBe('function');
@@ -230,10 +231,11 @@ describe('httpClient beforeRequest & afterResponse hooks', () => {
     expect(typeof defaultBusinessAfterSuccess).toBe('function');
     expect(typeof defaultBusinessAfterComplete).toBe('function');
     expect(typeof defaultRequestAdapter).toBe('function');
-    expect(typeof DEFAULT_HTTP_OPTIONS.beforeRequest).toBe('function');
-    expect(typeof DEFAULT_HTTP_OPTIONS.requestAdapter).toBe('function');
-    expect(typeof DEFAULT_HTTP_OPTIONS.refreshToken).toBe('function');
-    expect(typeof DEFAULT_HTTP_OPTIONS.onUnauthorized).toBe('function');
+    const defaultOptions = buildApiInstanceOptions();
+    expect(typeof defaultOptions.beforeRequest).toBe('function');
+    expect(typeof defaultOptions.requestAdapter).toBe('function');
+    expect(typeof defaultOptions.refreshToken).toBe('function');
+    expect(typeof defaultOptions.onUnauthorized).toBe('function');
 
     // 测试业务解包
     const mockResponse = {

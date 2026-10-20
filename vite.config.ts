@@ -223,10 +223,14 @@ export default defineConfig({
     // H5 走代理模式时生效（.env 里 VITE_H5_USE_PROXY=true）；直连模式（false）请求不经过此代理
     proxy: {
       '/api': {
-        target: 'http://localhost:3000', // 改成你的后端地址
-        changeOrigin: true
-        // 如果后端接口路径本身不带 /api 前缀，放开下面这行去掉前缀
-        // rewrite: (p) => p.replace(/^\/api/, ''),
+        target: env.VITE_SERVER_BASEURL || 'http://localhost:3000',
+        changeOrigin: true,
+        rewrite: p => p.replace(/^\/api/, '')
+      },
+      '/api-secondary': {
+        target: env.VITE_SERVER_BASEURL_SECONDARY || env.VITE_GATEWAY_BASEURL || env.VITE_SERVER_BASEURL || 'http://localhost:8080',
+        changeOrigin: true,
+        rewrite: p => p.replace(/^\/api-secondary/, '')
       }
     },
     hmr: true,

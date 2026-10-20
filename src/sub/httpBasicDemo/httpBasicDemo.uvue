@@ -10,7 +10,7 @@
           <text class="text-[11px] text-[#94a3b8] ml-[8px] px-[6px] py-[2px] rounded-[4px] bg-[#f1f5f9]">独立页</text>
         </view>
         <text class="text-[13px] text-[#64748b] leading-[19px]">
-          基于 lime-request 封装的 http 请求演示，包含真实请求（CRUD 增删改查）、OSS 文件上传、文件下载与 useRequest 组合式请求四种模式。
+          基于 lime-request 封装的 http 请求演示，包含真实请求（CRUD 增删改查）、OSS 文件上传、文件下载、useRequest 组合式请求与本地 Mock 契约挡板五种模式。
         </text>
         <view class="flex-row flex-wrap mt-[12px]">
           <view class="rounded-[6px] px-[8px] py-[4px] bg-[#ecfdf5] mr-[8px] mb-[8px]">
@@ -24,6 +24,9 @@
           </view>
           <view class="rounded-[6px] px-[8px] py-[4px] bg-[#f5f3ff] mr-[8px] mb-[8px]">
             <text class="text-[11px] text-[#6d28d9]">useRequest</text>
+          </view>
+          <view class="rounded-[6px] px-[8px] py-[4px] bg-[#fff1f2] mr-[8px] mb-[8px]">
+            <text class="text-[11px] text-[#be123c]">本地 Mock</text>
           </view>
         </view>
       </view>
@@ -474,6 +477,87 @@
           </view>
         </view>
 
+        <!-- ============ 5. 本地 Mock 拦截与契约挡板 ============ -->
+        <view
+          class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid border-[#edf2f7] bg-[#ffffff]"
+        >
+          <!-- 标题区域 -->
+          <view class="flex flex-row items-center mb-[12px]">
+            <view
+              class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#f43f5e]"
+            />
+            <text class="text-[16px] font-bold text-[#2d3748]">本地 Mock 拦截（契约挡板）</text>
+            <view class="ml-[8px] px-[6px] py-[2px] rounded-[4px] bg-[#fdf2f8] border-[1px] border-solid border-[#fbcfe8]">
+              <text class="text-[10px] font-bold text-[#db2777]">MOCK 挡板</text>
+            </view>
+          </view>
+          <text class="text-[12px] text-[#64748b] leading-[19px] mb-[12px]">
+            演示本地假数据拦截能力。Web 端执行 pnpm dev:mock 即可启动 Vite 拦截器（vite-plugin-mock），请求不会打到真实公网服务器，直接秒级返回挡板假数据。
+          </text>
+
+          <!-- 提示条：环境说明 -->
+          <view class="flex-row items-center bg-[#fdf2f8] p-[8px] rounded-[6px] mb-[12px] border-[1px] border-solid border-[#fce7f3]">
+            <text class="text-[11px] text-[#be123c] leading-[16px] flex-1">
+              💡 纯前端无后端联调方案：覆盖「手写自定义 Mock」与「OpenAPI 契约自动挡板（pnpm api:gen）」。
+            </text>
+          </view>
+
+          <!-- 触发按钮组 -->
+          <view class="flex flex-col mb-[12px]">
+            <view
+              class="rounded-[8px] h-[40px] w-full flex flex-row items-center justify-between px-[12px] bg-[#0ea5e9] mb-[8px]"
+              @click="fetchMockFooList"
+            >
+              <text class="text-[#ffffff] text-[13px] font-medium">1. 请求手写 Mock 列表</text>
+              <text class="text-[#e0f2fe] text-[11px]">GET /api/foo</text>
+            </view>
+            <view
+              class="rounded-[8px] h-[40px] w-full flex flex-row items-center justify-between px-[12px] bg-[#10b981] mb-[8px]"
+              @click="fetchContractMorningReport"
+            >
+              <text class="text-[#ffffff] text-[13px] font-medium">2. 请求 OpenAPI 契约晨检数据</text>
+              <text class="text-[#d1fae5] text-[11px]">POST /gateway/morning...</text>
+            </view>
+            <view
+              class="rounded-[8px] h-[40px] w-full flex flex-row items-center justify-between px-[12px] bg-[#6366f1]"
+              @click="fetchMockAuthLogin"
+            >
+              <text class="text-[#ffffff] text-[13px] font-medium">3. 请求鉴权 Mock 登录</text>
+              <text class="text-[#e0e7ff] text-[11px]">POST /api/auth/login</text>
+            </view>
+          </view>
+
+          <!-- 响应展示区 -->
+          <view class="rounded-[10px] p-[12px] border-[1px] border-solid border-[#e2e8f0] bg-[#f8fafc]">
+            <view class="flex-row items-center justify-between mb-[6px]">
+              <view class="flex-row items-center">
+                <view v-if="mockResultText != '' && mockIsSuccess" class="px-[6px] py-[1px] rounded-[4px] bg-[#ecfdf5] border-[1px] border-solid border-[#a7f3d0] mr-[6px]">
+                  <text class="text-[10px] font-bold text-[#059669]">MOCK 挡板回包</text>
+                </view>
+                <text class="text-[12px] font-bold text-[#334155] mr-[6px]">状态:</text>
+                <text
+                  class="text-[12px]"
+                  :class="mockIsSuccess ? 'text-[#059669]' : 'text-[#dc2626]'"
+                >
+                  {{ mockStatusText }}
+                </text>
+              </view>
+              <view v-if="mockResultText != ''" class="px-[6px] py-[2px] rounded-[4px] bg-[#e2e8f0]" @click="clearMockResult">
+                <text class="text-[10px] text-[#475569]">清空</text>
+              </view>
+            </view>
+            <text v-if="mockEndpoint != ''" class="text-[11px] text-[#64748b] mb-[2px]">接口: {{ mockEndpoint }}</text>
+            <text v-if="mockSource != ''" class="text-[11px] text-[#be123c] mb-[4px]">来源: {{ mockSource }}</text>
+            <text v-if="mockLoading" class="text-[12px] text-[#0ea5e9] py-[8px]">请求发送中，等待本地 Mock 拦截回包…</text>
+            <text v-else-if="mockResultText != ''" class="text-[11px] text-[#334155] leading-[16px] break-all">
+              {{ mockResultText }}
+            </text>
+            <text v-else class="text-[11px] text-[#94a3b8] py-[4px]">
+              点击上方按钮触发请求，体验本地 Mock / 契约挡板即时拦截回包
+            </text>
+          </view>
+        </view>
+
         <view class="flex-col items-center py-[16px]">
           <text class="text-[12px] text-[#94a3b8]">已触底 {{ reachBottomCount }} 次 · 内容结束</text>
         </view>
@@ -487,10 +571,13 @@
 import { computed, ref } from 'vue';
 import { createFoo, deleteFoo, downloadFooFile, fetchFooById, fetchFooList, fetchFooRemote, FOO_DOWNLOAD_URL, FOO_UPLOAD_PATH, updateFoo, uploadFooFile } from '@/src/api/example.uts';
 import type { FooItem, PageResult } from '@/src/api/example.uts';
+import { morningCheckReportPageUsingPost } from '@/src/api/generated/index.uts';
+import type { MorningCheckReportPageUsingPostBody, MorningCheckReportPageUsingPostResponse } from '@/src/api/generated/index.uts';
 // useRequest 走精准导入（红线 36）：不经门面 `index.uts` 二次转发
 import { useRequest } from '@/src/http/hooks/useRequest.uts';
 import type { UseRequestContext, UseRequestEvent } from '@/src/http/hooks/useRequest.uts';
 import { getOssBaseUrl } from '@/src/config/index.uts';
+import { http } from '@/src/http/index.uts';
 import { toast, toastSuccess } from '@/src/utils/toast/index.uts';
 import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/layouts/navbar/utils/index.uts';
 
@@ -532,6 +619,16 @@ const searchCalls = ref<number>(0);
 const searchLastKeyword = ref<string>('');
 const pollingOn = ref<boolean>(false);
 const pollingTick = ref<number>(0);
+
+// ==========================================
+// 第 5 张卡：本地 Mock 拦截与契约挡板
+// ==========================================
+const mockLoading = ref<boolean>(false);
+const mockEndpoint = ref<string>('');
+const mockSource = ref<string>('');
+const mockResultText = ref<string>('');
+const mockStatusText = ref<string>('待触发');
+const mockIsSuccess = ref<boolean>(true);
 
 // ==========================================
 // 第 2 张卡：真实请求（CRUD 增删改查）
@@ -1331,6 +1428,85 @@ function handleScroll(e: UniScrollEvent): void {
   if (top < 0) {
     console.log('scrollTop:', top);
   }
+}
+
+// ==========================================
+// 5. 本地 Mock 拦截与契约挡板操作
+// ==========================================
+function fetchMockFooList(): void {
+  mockLoading.value = true;
+  mockEndpoint.value = 'GET /api/foo';
+  mockSource.value = '手写业务 Mock 路由 (mock/example.ts)';
+  mockStatusText.value = '请求中…';
+  http.get<UTSJSONObject>('/api/foo').then((res: UTSJSONObject): void => {
+    mockLoading.value = false;
+    mockIsSuccess.value = true;
+    mockStatusText.value = 'Mock 拦截成功 (200)';
+    mockResultText.value = JSON.stringify(res);
+    toastSuccess('手写 Mock 拦截成功');
+  }, (err: any): void => {
+    mockLoading.value = false;
+    mockIsSuccess.value = false;
+    mockStatusText.value = '降级/未命中';
+    mockResultText.value = JSON.stringify(err);
+    toast('Mock 未开启或离线降级');
+  });
+}
+
+function fetchContractMorningReport(): void {
+  mockLoading.value = true;
+  mockEndpoint.value = 'POST /gateway/morningCheckReport/page';
+  mockSource.value = 'OpenAPI 自动契约挡板 (mock/generated.ts)';
+  mockStatusText.value = '请求中…';
+  const body = {
+    page: 1,
+    pageSize: 10
+  } as MorningCheckReportPageUsingPostBody;
+  morningCheckReportPageUsingPost({ body }).then((res: MorningCheckReportPageUsingPostResponse): void => {
+    mockLoading.value = false;
+    mockIsSuccess.value = true;
+    mockStatusText.value = '契约挡板回包 (200)';
+    mockResultText.value = JSON.stringify(res);
+    toastSuccess('OpenAPI 契约挡板已命中');
+  }, (err: any): void => {
+    mockLoading.value = false;
+    mockIsSuccess.value = false;
+    mockStatusText.value = '请求未拦截 (需开启 Mock)';
+    mockResultText.value = JSON.stringify(err);
+    toast('需在 Web 端运行 pnpm dev:mock');
+  });
+}
+
+function fetchMockAuthLogin(): void {
+  mockLoading.value = true;
+  mockEndpoint.value = 'POST /api/auth/login';
+  mockSource.value = '鉴权登录 Mock (mock/example.ts)';
+  mockStatusText.value = '请求中…';
+  const body = {
+    username: 'admin',
+    password: 'admin'
+  } as UTSJSONObject;
+  http.post<UTSJSONObject>('/api/auth/login', body).then((res: UTSJSONObject): void => {
+    mockLoading.value = false;
+    mockIsSuccess.value = true;
+    mockStatusText.value = '登录 Mock 成功 (200)';
+    mockResultText.value = JSON.stringify(res);
+    toastSuccess('获取 Mock Token 成功');
+  }, (err: any): void => {
+    mockLoading.value = false;
+    mockIsSuccess.value = false;
+    mockStatusText.value = '失败';
+    mockResultText.value = JSON.stringify(err);
+    toast('请求失败');
+  });
+}
+
+function clearMockResult(): void {
+  mockEndpoint.value = '';
+  mockSource.value = '';
+  mockResultText.value = '';
+  mockStatusText.value = '待触发';
+  mockIsSuccess.value = true;
 }
 
 function handleScrollToLower(): void {
