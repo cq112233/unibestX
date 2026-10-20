@@ -56,7 +56,8 @@ type H5OptimizeDepsOptions = {
 const CORE_INCLUDES = [
   'pinia',
   'pinia-plugin-persistedstate',
-  'crypto-js'
+  'crypto-js',
+  'tslib'
 ];
 
 export default function h5OptimizeDepsPlugin(options: H5OptimizeDepsOptions = {}): Plugin {
