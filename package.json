@@ -26,6 +26,7 @@
     "env:prod": "node scripts/switch-env.mjs prod",
     "build:test": "node scripts/sync-hbuilderx.mjs --ensure && node scripts/build-h5.mjs --env test",
     "build:prod": "node scripts/sync-hbuilderx.mjs --ensure && node scripts/build-h5.mjs --env prod",
+    "deploy:h5": "node scripts/deploy-h5.mjs",
     "optimize:img": "node scripts/optimize-images.mjs",
     "optimize:img:check": "node scripts/optimize-images.mjs --check",
     "docker:build:test": "pnpm build:test && docker compose -f docker/docker-compose.yml build h5-test && pnpm docker:up:test",
