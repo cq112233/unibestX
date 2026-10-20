@@ -68,7 +68,7 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 
 - 编写、重构或新增 `.uvue`、`.uts`、`.ts`、`.scss` 文件时
 - 规划或生成新页面结构、骨架布局与视口高度（`availableHeight`）时
-- **新增页面并同步建 `src/api/<page>/` 接口层（接口函数 + `types.uts` + `mock/`）时**、把页面里的假数据抽成接口函数时
+- **新增页面并同步建 `src/api/<page>/` 接口层（接口函数 + 类型 + 数据集，按需拆 `types.uts`）时**、把页面里的假数据抽成接口函数时
 - 对接后端真实接口、写 `http` 请求 / 文件上传 / SSE 流式接口时
 - **获取系统信息、视口高度、状态栏 / 导航栏高度，或读取环境变量、API 域名、调用 Toast 时**
 - **在页面 / 组件里做跳转（push / replace / switchTab / back）或读当前路由信息（path / query / meta / name）时**（分册 8）
@@ -174,7 +174,7 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 | 项目开发规约 | [CLAUDE.md](../../../CLAUDE.md) | 任务复杂度分级门槛、新增页面必建接口层、禁止 `interface` |
 | 项目规则（分层加载） | [.agents/rules/](../../rules/)：`base-lines.md`（Always On）· `api-standard.md` / `page-standard.md` / `router-standard.md`（Glob）· `naming-standard.md` / `commit-rule.md`（Model Decision） | 规则只写「对错判定」；本 Skill 是其**按需展开版**（用法 / 类型 / 模板 / 正反例） |
 | 页面目录 | `src/pages/<page>/`、`src/sub/<page>/` | 页面与模块私有视图 |
-| 接口层 | `src/api/<page>/<page>.uts`（含 `types.uts`、`mock/`） | 一页一目录，后端就绪只换函数体（分册 6） |
+| 接口层 | `src/api/<page>/<page>.uts`（类型 / 数据集默认内联，按需拆 `types.uts`） | 一页一目录，后端就绪只换函数体（分册 6） |
 | 系统信息 | `src/utils/systemInfo/index.uts` | `availableHeight`、`statusBarHeight`、`navBarHeight`、`safeAreaBottom`（分册 7） |
 | 环境变量 | `src/config/env/env.uts`、`src/config/env/platform.uts` | `getApiBaseUrl()`、`isDev()`、`isH5` / `isApp` 等平台常量（分册 7） |
 | 路由 | `uni_modules/route-bestX/index.uts`（`useRoute` / `useRouter` / 路径工具 / `routeState`）、`src/router/index.uts`（业务门面与 `router` 单例）、`src/router/guards/`（业务守卫） | `useRoute()` / `useRouter()`（分册 8） |
@@ -218,7 +218,7 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 ### 示例 1：用户提出「新增一个订单列表页」
 
 - **用户**：帮我加一个订单列表页。
-- **助手**：判定为第 2 级任务 → Read 分册 4 / 5 / 6 / 8 → 照分册 4 模板建页面骨架（上固定 + 下滚动、`availableHeight`）→ 同批建 `src/api/order/order.uts` 及 `mock/` → 跳转走 `useRouter()` → 过 A.2 红线 → 跑编译验证后交付。
+- **助手**：判定为第 2 级任务 → Read 分册 4 / 5 / 6 / 8 → 照分册 4 模板建页面骨架（上固定 + 下滚动、`availableHeight`）→ 同批建 `src/api/order/order.uts`（类型与数据集内联） → 跳转走 `useRouter()` → 过 A.2 红线 → 跑编译验证后交付。
 
 ### 示例 2：用户贴出编译报错
 

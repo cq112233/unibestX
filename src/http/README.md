@@ -70,14 +70,14 @@ export function fetchFooList(pageNo: number = 1, pageSize: number = 10, keyword:
 三个必须知道的点：
 
 1. **返回值已经解包**。`http.get<T>` 内部把响应体的 `{ code, data, message }` 拆开了，`then` 拿到的就是 `data` 本身 —— 所以 `T` 只标注**业务数据**的类型（`http.get<UTSJSONObject>`）。
-2. **`http.post<T>(url, data, config)`**：请求体走第二参；`put` / `delete` 签名相同。
+2. **`http.post<T>(url, data, config)`**：请求体走第二参；`put` / `patch` / `delete` 签名相同。
 3. **页面侧用双参 `.then(ok, err)` 收尾，不要写链式 `.catch()`** —— 后者在 Kotlin 端报 `error25` 重载不可解析。关 `loading` 放 `finally`。
 
 | 方法 | 签名 | 说明 |
 | :--- | :--- | :--- |
 | `http.request<T>` | `(config: HttpRequestConfig)` | 需要完全自定义配置时使用 |
 | `http.get<T>` | `(url: string, config?: HttpRequestConfig \| null)` | 查询参数放 `config.params` |
-| `http.post<T>` / `put<T>` / `delete<T>` | `(url: string, data?: any \| null, config?)` | 常规变更请求 |
+| `http.post<T>` / `put<T>` / `patch<T>` / `delete<T>` | `(url: string, data?: any \| null, config?)` | 常规变更请求（`patch` 只传需变更的字段） |
 | `http.upload<T>` | `(url: string, config)` | 文件上传，`T` 无法从入参推断，需显式标注 |
 | `http.downloadFile` | `(url: string, config?) => Promise<DownloadResult>` | 文件下载 |
 | `http.stream` | `(config, onChunk, onEnd) => StreamTask` | 流式分块传输（SSE / NDJSON） |

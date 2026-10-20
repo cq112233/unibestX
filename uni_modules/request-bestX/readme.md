@@ -151,6 +151,9 @@ const users = await client.get<Array<User>>('/users', {
 // POST 请求 (第二参为请求体，第三参为配置项)
 const newUser = await client.post<User>('/users', { name: 'Alice' });
 
+// PATCH 请求 (RESTful 局部更新：只传需要变更的字段)
+const patchedUser = await client.patch<User>('/users/1', { name: 'Alice2' });
+
 // 文件上传
 const uploadUrl = await client.upload<string>('/upload', {
   filePath: 'file://path/to/avatar.png',
@@ -180,8 +183,8 @@ console.log('文件临时保存路径:', dl.tempFilePath);
 | 参数字段 | 类型 | 必填 | 说明 |
 | :--- | :--- | :---: | :--- |
 | `url` | `string` | 否 | 请求相对或绝对路径 |
-| `method` | `HttpRequestMethod` | 否 | 请求方法：`'GET'` \| `'POST'` \| `'PUT'` \| `'DELETE'` 等 |
-| `data` | `any` | 否 | POST / PUT / DELETE 的请求体负载数据 |
+| `method` | `HttpRequestMethod` | 否 | 请求方法：`'GET'` \| `'POST'` \| `'PUT'` \| `'PATCH'` \| `'DELETE'` 等 |
+| `data` | `any` | 否 | POST / PUT / PATCH / DELETE 的请求体负载数据 |
 | `params` | `any` | 否 | 查询参数对象，会自动拼接到 URL query 后 |
 | `header` / `headers` | `UTSJSONObject` | 否 | 本次请求专属自定义 Header |
 | `timeout` | `number` | 否 | 本次请求超时时间（毫秒） |

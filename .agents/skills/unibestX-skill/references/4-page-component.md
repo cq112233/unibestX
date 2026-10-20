@@ -687,7 +687,8 @@ cardRef.value?.$callMethod('scrollToTop');
 
 | 组件层 | 能否取数 | 说明 |
 | :--- | :--- | :--- |
-| L1 模块容器（`components/<模块>/<模块>.uvue`） | ✅ | 唯一允许调接口的一层，数据自持 |
+| L0 根视图（`views/XxxView.uvue` / 普通页入口） | ✅ | 仅**多模块共用**的接口；调一次后 Props 下发给各 L1 模块 |
+| L1 模块容器（`components/<模块>/<模块>.uvue`） | ✅ | 本模块专属接口，数据自持（`OrderModule` 调 order，`CouponModule` 调 coupon） |
 | L2 私有视图（`<模块>/components/*.uvue`） | ❌ | 只吃 Props、只抛 Emits |
 | `components/common/` | ❌ | 纯展示外壳 |
 | `src/components/`（全局组件） | ❌ | 同上；要请求能力就让调用方传回调 |
@@ -699,7 +700,7 @@ cardRef.value?.$callMethod('scrollToTop');
 - [ ] 对象型 prop 在组件内 `computed(() => props.x as XxxType)`
 - [ ] 事件用 `defineEmits<{...}>()`，需要时驼峰与短横线双写
 - [ ] 不直接改 props；只有需要暴露方法时才 `defineExpose`
-- [ ] L2 / common / 全局组件**不取数**，只有 L1 调接口
+- [ ] L2 / common / 全局组件**不取数**；接口只在根视图（共用接口）与 L1 模块容器（专属接口）里调
 - [ ] 组件顶部一句用途注释；模板功能块各一句；变量不写注释（分册 5 铁律 6）
 - [ ] 单文件 ≤ 500 行，层级 ≤ 3 级（分册 5 铁律 2）
 
