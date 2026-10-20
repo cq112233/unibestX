@@ -33,3 +33,10 @@ Skills 位于 `.agents/skills/` 目录，目前**只保留 `unibestX-skill` 一�
 - **核心工具库优先（Utils-First）**：获取系统尺寸与高度优先使用 `@/src/utils/systemInfo`，环境变量与接口域名优先使用 `@/src/utils/env`，开发中所需的基础通用方法优先使用 `@/src/utils/...`（详见分册 7）。
 - **必须遵守 `.agents/rules/` 下的项目规则**（按触发方式分层加载）：`base-lines.md`（Always On，最高底线）、`api-standard.md` / `page-standard.md` / `router-standard.md`（Glob，写对应文件时自动加载）、`naming-standard.md` / `commit-rule.md`（Model Decision，按需加载）。规则文件只写「对错判定」，**用法、类型、模板与正反例一律查 `unibestX-skill` 分册**，命中场景必须加载对应分册。
 - **一律禁止使用 `interface`**：在本项目中定义任何对象结构、状态、参数或返回值类型时，**一律禁止使用 `interface`**，**必须全部统一使用 `type`（类型别名）**，避免触发 UTS 底层对对象字面量赋值的 `UTS110111163` 编译错误。
+
+## 第三方依赖目录读取约束
+
+- **默认禁止搜索 / 批量读取 `uni_modules/`、`node_modules/`、`unpackage/`、`dist/`**：这些目录合计上千万行、数百万 token，一旦被读入上下文会在后续每一轮请求中重复发送，是 token 消耗的主要来源。
+- **`uni_modules/` 例外用法**：确需查看某个组件实现（如 `up-calendar`、`uni-layouts`）时，**按精确路径读取单个文件**（例如 `uni_modules/uview-ultra/components/up-calendar/up-calendar.uvue`），严禁对整个目录做 `rg`、`grep`、`find` 后全量读取。
+- **优先查阅 `unibestX-skill` 分册**获取组件用法，而不是翻 `uni_modules` 源码。
+- 搜索一律用 `rg`（会遵守根目录 `.ignore`），禁止 `grep -r` 直扫仓库根目录。
