@@ -22,7 +22,7 @@ export const showActionSheet = (options : ActionSheetProps) => {
 	const busEventName = baseEventName + '_bus'
 
 	//传递option参数
-	uni.$on(readyEventName, () => {
+	uni.$on(readyEventName, (_event: any | null): void => {
 		uni.$emit(optionsEventName, options)
 	})
 

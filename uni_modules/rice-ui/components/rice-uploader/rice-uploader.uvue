@@ -237,14 +237,15 @@
 					isSuccess ? uploadSuccess(res) : uploadFail(res.statusCode, '上传失败', res.data)
 				},
 				fail: err => {
-					const errData = typeof err.data == 'string' ? err.data : '上传失败'
+					const errData: string = typeof err.data == 'string' ? err.data as string : '上传失败'
 					// #ifndef MP
 					const errCode = err.errCode
 					// #endif
 					// #ifdef MP
 					const errCode = err.errCode ?? err.errno ?? -1
 					// #endif
-					uploadFail(errCode, err.errMsg, errData)
+					const errMsg: string = err.errMsg != null ? `${err.errMsg}` : '上传失败'
+					uploadFail(errCode, errMsg, errData)
 				},
 
 			})

@@ -22,7 +22,7 @@ export const showDialog = (options : DialogProps) => {
 	const optionsEventName = baseEventName + '_options'
 	const busEventName = baseEventName + '_bus'
 
-	uni.$on(readyEventName, () => {
+	uni.$on(readyEventName, (_event: any | null): void => {
 		uni.$emit(optionsEventName, options)
 	})
 
