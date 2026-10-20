@@ -266,7 +266,7 @@ Chaser/src/api/
 
 ---
 
-## 6.9 常用请求写法（GET / POST / PUT / PATCH / DELETE / 上传 / 下载 / 流式）
+## 6.9 常用请求写法（GET / POST / PUT / DELETE / 上传 / 下载 / 流式）
 
 > 全部收在 api 层，页面只调函数。`UTSJSONObject` → 强类型**就地转换**（见 6.5），严禁把弱类型抛给页面。
 
@@ -307,21 +307,7 @@ export function updateGoods(id: number, payload: GoodsPayload): Promise<boolean>
 }
 ```
 
-### 4. PATCH —— 局部更新
-
-```uts
-// ⚠️ request-bestX 的 HttpRequestMethod 联合暂无 'PATCH'（uni.request 部分端也不支持），
-// 落地前先确认；支持时在 core/types.uts 补 `| 'PATCH'` 再用下面的写法。
-export function patchGoods(id: number, patch: GoodsPatch): Promise<boolean> {
-  return http.request<UTSJSONObject>({
-    url: `/api/v1/goods/${id}`,
-    method: 'PATCH',
-    data: patch as UTSJSONObject
-  } as HttpRequestConfig).then((raw: UTSJSONObject): boolean => raw.getBoolean('success') ?? false);
-}
-```
-
-### 5. DELETE —— 删除
+### 4. DELETE —— 删除
 
 ```uts
 export function deleteGoods(id: number): Promise<boolean> {
@@ -330,7 +316,7 @@ export function deleteGoods(id: number): Promise<boolean> {
 }
 ```
 
-### 6. 上传
+### 5. 上传
 
 ```uts
 import { getOssUploadUrl } from '@/src/config/env/env.uts';
@@ -347,7 +333,7 @@ export function uploadAvatar(filePath: string): Promise<string> {
 }
 ```
 
-### 7. 下载
+### 6. 下载
 
 ```uts
 export function downloadReport(url: string, filePath: string): Promise<DownloadResult> {
@@ -357,7 +343,7 @@ export function downloadReport(url: string, filePath: string): Promise<DownloadR
 }
 ```
 
-### 8. 流式（SSE）
+### 7. 流式（SSE）
 
 ```uts
 import { requestStream } from '@/uni_modules/request-bestX/index.uts';
@@ -460,7 +446,7 @@ A 段数据集被 B 段引用，后续 A 加字段 B 静默变形（6.3）。
 | 发起 GET | `http.get<T>(url, { params } as HttpRequestConfig)` | `@/src/http/index.uts` |
 | 发起 POST | `http.post<T>(url, data, config)` | 同上 |
 | PUT / DELETE | `http.put<T>(url, data, config)` / `http.delete<T>(url, data, config)` | 同上 |
-| PATCH | `http.request<T>({ url, method: 'PATCH', data } as HttpRequestConfig)`，需先给类型补 `'PATCH'` | 同上 |
+| 局部更新 | 用 `http.post` 或 `http.put` 走整条更新（小程序 / App 端不支持的方法一律不用） | 同上 |
 | 上传文件 | `http.upload<string>(url, config)` | 同上 |
 | 下载文件 | `http.download(url, config)` → `Promise<DownloadResult>` | 同上 |
 | 切备用域名 | `baseURL: API_DOMAINS.SECONDARY` | `@/src/http/index.uts` |
