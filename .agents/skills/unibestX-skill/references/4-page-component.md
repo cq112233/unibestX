@@ -6,7 +6,7 @@
 >
 > **与其它分册的分工**：本分册讲**「页面与组件的文件怎么写」**。**组件放在哪个目录 → 分册 5.2**；页面目录怎么分层、数据归谁 → 分册 5；接口函数怎么写 → 分册 6；样式为什么这么写 → 分册 2；跨端差异 → 分册 3；`useRoute` / `useRouter` 细节 → 分册 8。
 >
-> **30 秒速记**：`definePage` 写全 → 根 `view + flex flex-col flex-1` → 内部 `scroll-view` → 读用 `useQuery`、写用 `useMutation`（**两者都解构 + 业务别名**）、成功后 `invalidateQueries` → 跳转 `useRouter()` → 同批建 `src/api/<page>/`。**组件：单根节点 + 运行时 props + `defineEmits<{...}>`。**
+> **30 秒速记**：`definePage` 写全 → 根 `view + flex flex-col flex-1` → 内部 `scroll-view` → 读用 `useQuery`、写用 `useMutation`（**两者都解构 + 业务别名**）、成功后 `invalidateQueries` → 跳转 `useRouter()` → 同批建 `src/api/<page>/`。**组件：单根节点 + 运行时 props + `defineEmits<{...}>`。注释：变量一行普通说明，方法写 JSDoc，`useQuery` / `useMutation` 用 `//` 普通注释。**
 >
 > 📌 **4.1 页面骨架** → **4.2 `definePage`** → **4.3 标准业务页（含 4.3.5 假数据写法）** → **4.4 组件引用** → **4.5 组件写法** → **4.6 流程与交付** → **4.7 坑点** → **4.8 速查** → **4.9 红线**。**新建页面抄 4.1 + 4.3，新建组件抄 4.5。**
 
@@ -242,8 +242,13 @@ definePage({
   }
 });
 
+/** 路由参数 */
 const route = useRoute();
+
+/** 路由跳转 */
 const router = useRouter();
+
+/** 全局查询客户端：变更成功后失效缓存 */
 const queryClient = useQueryClient();
 
 // ==========================================
@@ -255,6 +260,8 @@ const fromPage = computed((): string => route.query.get('from') ?? '');
 
 /** 搜索关键字：从路由参数初始化，之后由输入框接管 */
 const keyword = ref<string>(route.query.get('keyword') ?? '');
+
+/** 搜索框输入值 */
 const keywordInput = ref<string>(route.query.get('keyword') ?? '');
 
 // ==========================================
@@ -319,17 +326,25 @@ const {
 // 四、派生状态：全部从 hook 的 Ref 计算，页面不另存一份
 // ==========================================
 
+/** 是否正在首次加载 */
 const isLoading = computed((): boolean => listPending.value == true);
+
+/** 是否正在后台同步 */
 const isFetching = computed((): boolean => listFetching.value == true);
+
+/** 是否加载失败 */
 const isError = computed((): boolean => listError.value == true);
 
+/** 当前列表数据：空数据回落为空数组 */
 const list = computed((): Array<OrderItem> => {
   const data = listData.value;
   return data != null ? data : [] as Array<OrderItem>;
 });
 
+/** 当前列表总条数 */
 const total = computed((): number => list.value.length);
 
+/** 列表错误文案 */
 const errorText = computed((): string => {
   const err = listErrorObj.value;
   return err != null ? err.message : '加载失败';
@@ -339,14 +354,17 @@ const errorText = computed((): string => {
 // 五、交互：只改状态、调 mutate、走 router
 // ==========================================
 
+/** 提交搜索：keyword 在 queryKey 里，赋值即自动重拉 */
 function onSearch(): void {
-  keyword.value = keywordInput.value;   // keyword 在 queryKey 里，赋值即自动重拉
+  keyword.value = keywordInput.value;
 }
 
+/** 重新加载列表 */
 function onRetry(): void {
   refetchList();
 }
 
+/** 创建订单 */
 function onCreate(): void {
   if (creating.value) {
     return;
@@ -354,6 +372,10 @@ function onCreate(): void {
   createOrder('新订单');
 }
 
+/**
+ * 删除订单
+ * @param item 待删除的订单
+ */
 function onDelete(item: OrderItem): void {
   if (deleting.value) {
     return;
@@ -361,6 +383,10 @@ function onDelete(item: OrderItem): void {
   deleteOrder(item);
 }
 
+/**
+ * 打开订单详情
+ * @param item 被点击的订单
+ */
 function onOpenDetail(item: OrderItem): void {
   router.push({ path: '/src/sub/order-detail/order-detail', query: { id: item.id } });
 }
@@ -452,6 +478,7 @@ const loading = ref<boolean>(false);      // hook 已接管，重复维护必然
 - 如果该块数据必须展示 loading 骨架 / 首屏空态，不要用 `initialData` 把首屏伪装成成功态。
 
 ```uts
+/** 概览空结构：首屏占位 */
 const EMPTY_SUMMARY: TaskSummary = {
   total: 0,
   pending: 0,
@@ -459,6 +486,7 @@ const EMPTY_SUMMARY: TaskSummary = {
   completionRate: 0
 };
 
+// 概览查询：首屏用空结构占位
 const { data: summaryData, refetch: refetchSummary } = useQuery<TaskSummary>({
   queryKey: ['taskCenter', 'summary'],
   queryFn: (_ctx: QueryFunctionContext): Promise<TaskSummary> => {
@@ -473,8 +501,10 @@ const { data: summaryData, refetch: refetchSummary } = useQuery<TaskSummary>({
 
 ```uts
 // ✅ 列表 + 详情两个查询并存，各用各的别名
+/** 全局查询客户端：变更成功后失效缓存 */
 const queryClient = useQueryClient();
 
+// 列表查询
 const { isPending: listPending, data: listData } = useQuery<PageResult<NewPageItem>>({
   queryKey: ['newPage', 'list', keyword],
   queryFn: (_ctx: QueryFunctionContext): Promise<PageResult<NewPageItem>> => {
@@ -482,6 +512,7 @@ const { isPending: listPending, data: listData } = useQuery<PageResult<NewPageIt
   }
 } as QueryOptions<PageResult<NewPageItem>>);
 
+// 详情查询
 const { isPending: detailPending, data: detailData } = useQuery<NewPageItem>({
   queryKey: ['newPage', 'detail', id],
   queryFn: (_ctx: QueryFunctionContext): Promise<NewPageItem> => fetchNewPageDetailApi(id.value)
@@ -703,6 +734,7 @@ export function fetchOrderListApi(pageNo: number = 1, pageSize: number = 10, key
 import { computed } from 'vue';
 import type { OrderItem } from '@/src/api/order/order.uts';
 
+/** 组件入参 */
 const props = defineProps({
   /** 订单数据（一个业务对象一个 prop，不要摊平字段） */
   order: {
@@ -716,13 +748,15 @@ const props = defineProps({
   }
 });
 
-// 运行时 props 是弱类型，统一在组件内断言成强类型再用
+/** 订单数据：运行时 props 统一断言成强类型再用 */
 const order = computed((): OrderItem => props.order as OrderItem);
 
+/** 组件向上抛出的事件 */
 const emit = defineEmits<{
   (e: 'select', order: OrderItem): void;
 }>();
 
+/** 点击卡片时抛出 select 事件 */
 function onClick(): void {
   emit('select', order.value);
 }
@@ -739,6 +773,7 @@ function onClick(): void {
 
 ```uts
 // ✅ 仓库统一写法（NavBar / NestedScroll / TabbarMaskModal 等 14 处先例，全部是运行时对象）
+/** 组件入参 */
 const props = defineProps({
   /** 弹窗显隐控制 */
   visible: {
@@ -752,7 +787,7 @@ const props = defineProps({
   }
 });
 
-// 对象型 prop 用 computed 断言成强类型（仓库做法：TabbarItem / NavBar）
+/** 订单数据：对象型 prop 用 computed 断言成强类型 */
 const order = computed((): OrderItem => props.order as OrderItem);
 
 // ❌ 同一份数据的字段摊平成一串 prop：改一个字段，调用点全要改
@@ -812,15 +847,28 @@ cardRef.value?.$callMethod('scrollToTop');
 
 ### 4.5.6 注释与 JSDoc（所有方法必写）
 
-- **每一个方法都必须有注释，统一用 JSDoc**：事件处理函数、`computed`、`watch` 回调、`defineExpose` 暴露的方法、页面级工具函数、组合式函数（composable）、api 接口函数 —— 一个都不能裸奔。
+- **顶层变量用普通说明注释**：`ref` / `reactive` / 普通常量上方写一行 `/** 一句话说明 */`，只写用途或边界，**不写 `@param` / `@returns`**；不要逐个字段写注释，也不要逐行解释实现。
+- **每一个方法都必须用 JSDoc**：普通函数、事件处理函数、`computed`、`watch` 回调、`defineExpose` 暴露的方法、组合式函数（composable）、api 接口函数 —— 一个都不能裸奔。
 - JSDoc 三件套：
   1. **一句职责**：这个方法做什么，不写实现细节；
   2. **`@param` 逐参写全**：含义 + 默认值 + 不传时的行为（类型已由签名表达，不必重复）；
   3. **`@returns`**：有返回值就写，语义不显然时说明清楚（如「空串表示上传失败」）。
-- 组件内的状态变量（`ref` / `reactive`）不逐个注释；`computed` 属于方法，按 JSDoc 写。
+- **`useQuery` / `useMutation` 用 `//` 普通注释**：在调用块上方说明查询 / 变更用途与解构别名（如 `// 解构 + 业务别名：isPending → creating`），**不要写成 JSDoc**。
+- `computed` 属于方法，按 JSDoc 写；`ref` / `reactive` 属于变量，用一行普通说明注释。
 - 方法体内部不写逐行注释，只在关键分支写「为什么」（分册 5 铁律 6）。
 
 ```uts
+/** 搜索关键字输入值 */
+const keywordInput = ref<string>('');
+/** 是否处于提交中 */
+const submitting = ref<boolean>(false);
+
+// 列表查询：关键字变化时自动重拉
+const { data: listData, isPending: listPending } = useQuery<Array<OrderItem>>({
+  queryKey: ['order', 'list', keywordInput.value],
+  queryFn: (): Promise<Array<OrderItem>> => fetchOrderListApi(1, 20, keywordInput.value)
+} as QueryOptions<Array<OrderItem>>);
+
 // ❌ 裸方法：调用方看不出 append 的语义与 pageNo 的起始值
 function loadList(append: boolean, pageNo: number): void { ... }
 
@@ -864,7 +912,7 @@ function handleItemClick(item: OrderItem): void {
 - [ ] 事件用 `defineEmits<{...}>()`，需要时驼峰与短横线双写
 - [ ] 不直接改 props；只有需要暴露方法时才 `defineExpose`
 - [ ] L2 / common / 全局组件**不取数**；接口只在根视图（共用接口）与 L1 模块容器（专属接口）里调
-- [ ] 组件顶部一句用途注释；模板功能块各一句；**所有方法（事件 / `computed` / `watch` / `defineExpose`）都有 JSDoc**；变量不写注释（4.5.6 / 分册 5 铁律 6）
+- [ ] 组件顶部一句用途注释；模板功能块各一句；**每个顶层状态 / 常量变量有一行普通说明注释；所有方法（事件 / `computed` / `watch` / `defineExpose`）都有 JSDoc；`useQuery` / `useMutation` 用 `//` 普通注释**（4.5.6 / 分册 5 铁律 6）
 - [ ] 单文件 ≤ 500 行，层级 ≤ 3 级（分册 5 铁律 2）
 
 ---
@@ -949,5 +997,5 @@ pnpm lint && pnpm lint:style && pnpm test && pnpm typecheck
 - [ ] **15. 三态齐全** —— 加载 / 空 / 错误互斥
 - [ ] **16. easycom 优先** —— 页面私有组件手动 import
 - [ ] **17. 组件写法合规** —— 单根节点、运行时 props、一个业务对象一个 prop、`defineEmits<{...}>`、不直接改 props（4.5）
-- [ ] **18. 方法注释齐全** —— 每个方法都有 JSDoc（职责 + `@param` + `@returns`），无裸函数（4.5.6）
+- [ ] **18. 注释分层正确** —— 变量有一行普通说明注释；每个方法都有 JSDoc（职责 + `@param` + `@returns`）；`useQuery` / `useMutation` 用 `//` 普通注释；无裸函数（4.5.6）
 - [ ] **19. 验证有输出** —— 声称完成前给出命令与结果；未跑真机要写明
