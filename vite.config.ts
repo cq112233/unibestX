@@ -115,40 +115,64 @@ catch {
 process.env.VITE_BUILD_TIME = new Date().toISOString();
 
 const isBuild = process.env.NODE_ENV === 'production' || process.argv.includes('build');
-const env = loadEnv(process.env.NODE_ENV || 'production', projectRoot, '');
+const defaultMode = isBuild ? 'production' : 'development';
+const mode = process.env.NODE_ENV || defaultMode;
+process.env.NODE_ENV = mode;
+
+const loadedEnv = loadEnv(mode, projectRoot, '');
+// CLI 显式传入的环境变量（如 VITE_USE_MOCK=true / VITE_H5_USE_PROXY=true）优先于 .env 静态文件，避免被默认值冲掉
+const env = { ...loadedEnv, ...process.env };
+
+const isVisualizer = env.VISUALIZER === 'true' || process.argv.includes('--visualizer');
+
+function checkMockActive(): boolean {
+  if (env.VITE_USE_MOCK === 'true' || process.argv.includes('--mock')) {
+    return true;
+  }
+  try {
+    const activeFile = resolve(projectRoot, 'node_modules/.cache/mock-active.json');
+    if (fs.existsSync(activeFile)) {
+      const raw = fs.readFileSync(activeFile, 'utf-8');
+      const data = JSON.parse(raw);
+      if (data && typeof data.pid === 'number') {
+        try {
+          process.kill(data.pid, 0);
+          return true;
+        }
+        catch {
+          fs.unlinkSync(activeFile);
+        }
+      }
+    }
+  }
+  catch {}
+  return false;
+}
+
+const isMock = checkMockActive();
+if (isMock) {
+  env.VITE_USE_MOCK = 'true';
+  process.env.VITE_USE_MOCK = 'true';
+}
+
+// 🚀 本地 Mock 模式或显式配置代理时，自动切换为 H5 反向代理模式（走 /api 前缀，零心智负担）
+const isProxy = isMock || env.VITE_H5_USE_PROXY === 'true';
+if (isProxy) {
+  env.VITE_H5_USE_PROXY = 'true';
+  process.env.VITE_H5_USE_PROXY = 'true';
+}
+
 // 同步注入 process.env，确保构建期各插件（包括 UniManifest 解析 manifest.config.ts）无论从何处启动都能读取全量环境变量
 Object.assign(process.env, env);
-const isVisualizer = process.env.VISUALIZER === 'true'
-  || env.VISUALIZER === 'true'
-  || env.VITE_VISUALIZER === 'true'
-  || process.env.ANALYZE === 'true'
-  || env.ANALYZE === 'true'
-  || process.env.VITE_BUNDLE_ANALYZE === 'true'
-  || env.VITE_BUNDLE_ANALYZE === 'true'
-  || process.argv.includes('--visualizer')
-  || process.argv.includes('--analyze');
 
-const isMock = process.env.VITE_USE_MOCK === 'true'
-  || env.VITE_USE_MOCK === 'true'
-  || process.env.MOCK === 'true'
-  || env.MOCK === 'true'
-  || process.argv.includes('--mock');
-
-const isWeb = process.env.UNI_PLATFORM === 'web'
-  || process.env.UNI_PLATFORM === 'h5'
-  || !process.env.UNI_PLATFORM;
+const isWeb = env.UNI_PLATFORM === 'web' || env.UNI_PLATFORM === 'h5';
 
 // 生产环境绝对严禁包含 vConsole（即使显式配置了开关或参数也强制屏蔽，防止线上泄漏）
 const isProduction = env.VITE_ENV_TYPE === 'production'
-  || process.env.VITE_ENV_TYPE === 'production'
   || (isBuild && env.VITE_ENV_TYPE !== 'test');
 
 const isVConsole = !isProduction && isWeb && (
-  process.env.VITE_SHOW_VCONSOLE === 'true'
-  || env.VITE_SHOW_VCONSOLE === 'true'
-  || process.env.VCONSOLE === 'true'
-  || env.VCONSOLE === 'true'
-  || process.argv.includes('--vconsole')
+  env.VITE_SHOW_VCONSOLE === 'true' || process.argv.includes('--vconsole')
 );
 
 const weappTailwindcssPlugins: PluginOption[] = (WeappTailwindcss(
@@ -182,7 +206,9 @@ export default defineConfig({
     '__X_STYLE_ISOLATION__': false,
     '__X_STYLE_ISOLATION_UP_ARROW__': false,
     'import.meta.env.VITE_TEMPLATE_VERSION': JSON.stringify(pkgVersion),
-    'import.meta.env.VITE_PKG_VERSION': JSON.stringify(pkgVersion)
+    'import.meta.env.VITE_PKG_VERSION': JSON.stringify(pkgVersion),
+    ...(isMock ? { 'import.meta.env.VITE_USE_MOCK': JSON.stringify('true') } : {}),
+    ...(isProxy ? { 'import.meta.env.VITE_H5_USE_PROXY': JSON.stringify('true') } : {})
   },
   server: {
     host: '0.0.0.0',
@@ -358,13 +384,29 @@ export default defineConfig({
     ...(isMock
       ? [
           viteMockServe({
-            mockPath: 'mock',
+            mockPath: resolve(projectRoot, 'mock'),
             enable: true,
             watchFiles: true,
             logger: true
           }) as PluginOption
         ]
       : []),
+    // 本地 Mock / 代理模式终端状态提示插件（通过 configResolved 钩子确保在 HBuilderX 编译输出中稳定打印）
+    {
+      name: 'unibestx:mock-tip',
+      configResolved() {
+        if (!isBuild) {
+          if (isMock) {
+            console.log('✔ [mock] 本地 Mock 服务已开启 (vite-plugin-mock)，已自动切换为 H5 代理模式 (VITE_H5_USE_PROXY=true)');
+          }
+          else {
+            console.log(isProxy
+              ? 'ℹ [mock] 本地 Mock 服务已关闭（H5 代理模式生效中）'
+              : 'ℹ [mock] 本地 Mock 服务已关闭（直连模式）');
+          }
+        }
+      }
+    },
     // 移动端真机调试工具 vConsole（仅在 Web/H5 且开启时注入，如 pnpm dev:vconsole）
     ...(isVConsole
       ? [

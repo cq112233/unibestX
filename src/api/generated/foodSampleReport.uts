@@ -1,48 +1,32 @@
 /* eslint-disable */
 // @ts-ignore
-import { request } from '@/src/http/openapi.uts';
+import { request, buildBodyRequestConfig } from '@/src/http/openapi.uts';
 import type { OpenApiRequestOptions } from '@/src/http/openapi.uts';
 
 import * as API from './types.uts';
 
 /** 留样记录菜品明细 POST /gateway/foodSampleReport/dishDetail */
-export function foodSampleReportDishDetailUsingPost({
-  body,
-  options,
-}: {
+export type FoodSampleReportDishDetailUsingPostRequestParams = {
   body: API.FoodSampleReportDishDetailUsingPostBody;
   options?: OpenApiRequestOptions;
-}) {
+};
+
+export function foodSampleReportDishDetailUsingPost(requestParams: FoodSampleReportDishDetailUsingPostRequestParams) {
   return request<API.FoodSampleReportDishDetailUsingPostResponse>(
     '/gateway/foodSampleReport/dishDetail',
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      data: body,
-      ...(options || {}),
-    }
+    buildBodyRequestConfig('POST', requestParams.body, requestParams.options)
   );
 }
 
 /**  留样记录报表分页列表 POST /gateway/foodSampleReport/page */
-export function foodSampleReportPageUsingPost({
-  body,
-  options,
-}: {
+export type FoodSampleReportPageUsingPostRequestParams = {
   body: API.FoodSampleReportPageUsingPostBody;
   options?: OpenApiRequestOptions;
-}) {
+};
+
+export function foodSampleReportPageUsingPost(requestParams: FoodSampleReportPageUsingPostRequestParams) {
   return request<API.FoodSampleReportPageUsingPostResponse>(
     '/gateway/foodSampleReport/page',
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      data: body,
-      ...(options || {}),
-    }
+    buildBodyRequestConfig('POST', requestParams.body, requestParams.options)
   );
 }

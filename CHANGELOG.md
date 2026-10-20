@@ -1,3 +1,45 @@
+# [2.0.0](https://github.com/cq112233/unibestX/compare/v1.1.4...v2.0.0) (2026-10-20)
+
+
+### Bug Fixes
+
+* vite-plugin-uni-pages.ts新增物理文件校验机制 ([4a30982](https://github.com/cq112233/unibestX/commit/4a309828153e3a8bad71903c85830409ae7023ca))
+
+
+### Features
+
+* add VS Code configurations, tasks, extensions, and test debug script ([6530da6](https://github.com/cq112233/unibestX/commit/6530da66b5d47cad609a48c3720c36b00544831d))
+* http模块升级，改成符合后端微服务模式下的多实例方案 ([148bf15](https://github.com/cq112233/unibestX/commit/148bf15818f5a7d15eb3a1dd6e13d14cdc5d25ed))
+* http模块升级，改成符合后端微服务模式下的多实例方案，对标TanStack-Query hooks，提升请求体验 ([c7ff4e2](https://github.com/cq112233/unibestX/commit/c7ff4e24a97370d1b2c37aa4217395a47fcc7c67))
+* http模块升级，改成符合后端微服务模式下的多实例方案，对标TanStack-Query hooks，提升请求体验 ([a3911fc](https://github.com/cq112233/unibestX/commit/a3911fc254023b57d6c4d3d32ad37fa524770c25))
+* http模块升级，改成符合后端微服务模式下的多实例方案，对标TanStack-Query hooks，提升请求体验 ([1ef721b](https://github.com/cq112233/unibestX/commit/1ef721b8390904b9ae8a03482fb2d3463cd6f78a))
+* http模块升级，改成符合后端微服务模式下的多实例方案，对标TanStack-Query hooks，提升请求体验 ([262cabe](https://github.com/cq112233/unibestX/commit/262cabea8fb016e949dbff57749fffa0686a867c))
+* http模块升级，改成符合后端微服务模式下的多实例方案，对标TanStack-Query hooks，提升请求体验 ([5499bd4](https://github.com/cq112233/unibestX/commit/5499bd43e92db9df501369e206796c9b9b943096))
+* http模块升级，改成符合后端微服务模式下的多实例方案，对标TanStack-Query hooks，提升请求体验 ([62d0d95](https://github.com/cq112233/unibestX/commit/62d0d95513646553326a287556192c6b54d94ca4))
+* openapi 多人多服务多客户端 自动生成方案 ([eaf0971](https://github.com/cq112233/unibestX/commit/eaf0971c9f9c95ef06d438b753df1b37ca36b50b))
+* request-bestX 对标 TanStack-Query 状态机，自动取消请求，管理状态，减少服务器压力等 ([ce113a7](https://github.com/cq112233/unibestX/commit/ce113a792eb6f41361a5732ff2b0ef15aa8a9348))
+* request-bestX 对标 TanStack-Query 状态机，自动取消请求，管理状态，减少服务器压力等 ([619f054](https://github.com/cq112233/unibestX/commit/619f05458dd9050d59e04ad6ebc3ca1497de84b1))
+* request-bestX 对标 TanStack-Query 状态机，自动取消请求，管理状态，减少服务器压力等 ([3167798](https://github.com/cq112233/unibestX/commit/3167798afdd16360553ec652af08ff247127d332))
+* 新增deploy:h5，快速部署github h5脚本 ([8b7e7f4](https://github.com/cq112233/unibestX/commit/8b7e7f45865d03bc03faf2f83972329b1fc384ff))
+* 新增hooks文件夹和新增rxjs-bestX ([1432566](https://github.com/cq112233/unibestX/commit/1432566bd0c81431e794c7489a971030cd5b3252))
+* 新增hooks文件夹和新增rxjs-bestX ([6b3711e](https://github.com/cq112233/unibestX/commit/6b3711e2232063ef9bf016c1e0236efeb4e18121))
+* 新增hooks文件夹和新增rxjs-bestX ([2759b66](https://github.com/cq112233/unibestX/commit/2759b66d0602e791b68ddfa6cc8c4c71d5f13127))
+* 新增一件清除mock数据，一件清除单元测试脚本 ([0bc198a](https://github.com/cq112233/unibestX/commit/0bc198a6eb57df5326fe359237622295c1a7bd74))
+* 新增一件清除mock数据，一件清除单元测试脚本 ([90e9b52](https://github.com/cq112233/unibestX/commit/90e9b52c60a7d1366bf4ae9b09ea8b6be3e46a65))
+* 新增一件清除mock数据，一件清除单元测试脚本 ([8edf993](https://github.com/cq112233/unibestX/commit/8edf993580b76bc16b09089c56c5277fe8f13d7b))
+* 新增一件清除mock数据，一件清除单元测试脚本,抽离request-bestX模块，增加vue-query状态机管理，useQuery，useMutation，useQueryClient hooks，多实例对接方案，打通mock和真实环境无缝切换，重构skill，重构rules规则不规范导致token暴涨问题，极大提升开发体验 ([c6e92b3](https://github.com/cq112233/unibestX/commit/c6e92b3ea8b65299a04cde0c80a22c9b7b14518f))
+* 新增一件清除mock数据，一件清除单元测试脚本,抽离request-bestX模块，多实例方案，打通mock和真实环境无缝切换，重构skill，重构rules规则不规范导致token暴涨问题 ([b6b4935](https://github.com/cq112233/unibestX/commit/b6b49352350c715ccbd326c06180ee47339aa239))
+* 新增一件清除mock数据，一件清除单元测试脚本,抽离request-bestX模块，多实例方案，打通mock和真实环境无缝切换，重构skill，重构rules规则不规范导致token暴涨问题 ([06b8d17](https://github.com/cq112233/unibestX/commit/06b8d1759841e297a418a3614ccccb45b6c2fd67))
+* 添加bumpp自动化version版本管理 ([295c477](https://github.com/cq112233/unibestX/commit/295c477d29fee1510ccd648bfeb083491c479c01))
+* 添加bumpp自动化version版本管理 ([d1da3ea](https://github.com/cq112233/unibestX/commit/d1da3eae3168a682557f485d9b9300b30d301e40))
+* 添加xtf-charts ([71251f4](https://github.com/cq112233/unibestX/commit/71251f4fbd5af432a0238cde861c0e198732cb40))
+* 添加xtf-charts ([90550be](https://github.com/cq112233/unibestX/commit/90550be7589079928bdcab01c15f083a470380b9))
+* 添加xtf-charts ([a69995a](https://github.com/cq112233/unibestX/commit/a69995ab320a6bd5b4f9f9a0850b6409044f01cb))
+* 调试无缝切换mock调试和真实接口 ([321ac6d](https://github.com/cq112233/unibestX/commit/321ac6d4bf852547d63bc9116332501a994973f9))
+* 调试无缝切换mock调试和真实接口 ([120a353](https://github.com/cq112233/unibestX/commit/120a35326ae120847e172216fa96c13807af7436))
+* 调试无缝切换mock调试和真实接口 ([f8809ab](https://github.com/cq112233/unibestX/commit/f8809ab5a934833b826361e886737a129362290b))
+* 调试无缝切换mock调试和真实接口 ([2a20e8d](https://github.com/cq112233/unibestX/commit/2a20e8d6b48379c2f4fef85398512e15f63254f4))
+* 调试无缝切换mock调试和真实接口 ([4b83beb](https://github.com/cq112233/unibestX/commit/4b83beb7385649ceb156dff92b2654aa1871cfb0))
 ## [1.1.4](https://github.com/cq112233/unibestX/compare/v1.1.3...v1.1.4) (2026-10-17)
 
 

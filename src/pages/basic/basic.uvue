@@ -4,9 +4,8 @@
 
 <script setup lang="uts">
 import BasicView from './views/BasicView.uvue';
-import { handleBackPressExit } from '@/src/utils/backPress/index.uts';
+import { useBackPressExit } from '@/src/hooks/useBackPressExit.uts';
 import { notifyPageHide, notifyPageShow, setCurIdxByKey } from '@/src/tabbar/index.uts';
-import { isApp } from '@/src/config/env/platform.uts';
 
 definePage({
   debug: false,
@@ -31,12 +30,8 @@ onHide(() => {
   notifyPageHide();
 });
 
-onBackPress((options: OnBackPressOptions): boolean => {
-  if (isApp && options.from == 'backbutton') {
-    return handleBackPressExit();
-  }
-  return false;
-});
+// Android 物理返回键：再按一次退出应用
+useBackPressExit();
 </script>
 
 <style></style>

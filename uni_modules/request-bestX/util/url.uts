@@ -1,0 +1,92 @@
+/**
+ * HTTP URL 合并与 Query 参数序列化工具
+ */
+
+/**
+ * 序列化 Query 参数对象为 URL 查询串
+ * @param params 参数对象
+ * @returns 形如 key=value&key2=value2 的查询字符串
+ */
+export function stringifyQueryParams(params: any | null): string {
+  if (params == null) {
+    return '';
+  }
+  try {
+    const obj = params as UTSJSONObject;
+    const keys = UTSJSONObject.keys(obj);
+    if (keys.length == 0) {
+      return '';
+    }
+    const pairs: Array<string> = [];
+    for (let i = 0; i < keys.length; i = i + 1) {
+      const k = keys[i];
+      const val = obj[k];
+      if (val != null) {
+        // encodeURIComponent 处理特殊字符
+        const encodedKey = encodeURIComponent(k);
+        const encodedVal = encodeURIComponent(`${val}`);
+        pairs.push(`${encodedKey}=${encodedVal}`);
+      }
+    }
+    return pairs.join('&');
+  }
+  catch (_) {
+    return '';
+  }
+}
+
+/**
+ * 构建完整的请求 URL（合并 baseURL、path 与 params）
+ *
+ * @param baseURL 基础根地址（如 https://api.example.com 或 /api）
+ * @param path 相对或绝对接口路径（如 /user/info 或 https://...）
+ * @param params 可选的查询参数对象
+ * @returns 最终合法的完整请求地址
+ */
+export function buildRequestUrl(
+  baseURL: string = '',
+  path: string = '',
+  params: any | null = null
+): string {
+  let combinedUrl = '';
+  const trimmedPath = path.trim();
+
+  // 若 path 已经是绝对地址，直接使用，不拼 baseURL
+  if (trimmedPath.startsWith('http://') || trimmedPath.startsWith('https://')) {
+    combinedUrl = trimmedPath;
+  }
+  else {
+    const trimmedBase = baseURL.trim();
+    if (trimmedBase == '') {
+      combinedUrl = trimmedPath;
+    }
+    else if (trimmedPath == '') {
+      combinedUrl = trimmedBase;
+    }
+    else {
+      // 安全拼接：去掉 base 尾斜杠与 path 首斜杠
+      const cleanBase = trimmedBase.endsWith('/') ? trimmedBase.slice(0, trimmedBase.length - 1) : trimmedBase;
+      const cleanPath = trimmedPath.startsWith('/') ? trimmedPath.slice(1) : trimmedPath;
+
+      // 防重复前缀重叠：处理如 baseURL='/api' 且 path='/api/foo' 导致拼接成 '/api/api/foo' 的场景
+      const lastSlashIdx = cleanBase.lastIndexOf('/');
+      const baseTail = lastSlashIdx >= 0 ? cleanBase.slice(lastSlashIdx + 1) : cleanBase;
+      if (baseTail != '' && (cleanPath == baseTail || cleanPath.startsWith(`${baseTail}/`))) {
+        const basePrefix = lastSlashIdx >= 0 ? cleanBase.slice(0, lastSlashIdx) : '';
+        combinedUrl = `${basePrefix}/${cleanPath}`;
+      }
+      else {
+        combinedUrl = `${cleanBase}/${cleanPath}`;
+      }
+    }
+  }
+
+  // 拼接 Query 参数
+  const queryStr = stringifyQueryParams(params);
+  if (queryStr != '') {
+    const separator = combinedUrl.includes('?') ? '&' : '?';
+    combinedUrl = `${combinedUrl}${separator}${queryStr}`;
+  }
+
+  return combinedUrl;
+}

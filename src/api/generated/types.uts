@@ -6,31 +6,35 @@ export type FoodSampleReportDishDetailUsingPostBody = {
   sampled?: number;
 };
 
+export type FoodSampleReportDishDetailUsingPostResponseDataDataItem = {
+  checkDate?: string;
+  diningHallName?: string;
+  personName?: string;
+  completeStatus?: number;
+  checkResult?: number;
+  temperature?: string;
+  healthCertStatus?: number;
+  skinProblem?: string;
+  infectiousDisease?: string;
+  facilitatorName?: string;
+  createTime?: string;
+};
+
+export type FoodSampleReportDishDetailUsingPostResponseData = {
+  currentPage?: number;
+  pageSize?: number;
+  totalNum?: number;
+  isMore?: number;
+  totalPage?: number;
+  startIndex?: number;
+  data?: Array<FoodSampleReportDishDetailUsingPostResponseDataDataItem>;
+};
+
 export type FoodSampleReportDishDetailUsingPostResponse = {
   success?: boolean;
   code?: string;
   msg?: string;
-  data?: {
-    currentPage?: number;
-    pageSize?: number;
-    totalNum?: number;
-    isMore?: number;
-    totalPage?: number;
-    startIndex?: number;
-    data?: {
-      checkDate?: string;
-      diningHallName?: string;
-      personName?: string;
-      completeStatus?: number;
-      checkResult?: number;
-      temperature?: string;
-      healthCertStatus?: number;
-      skinProblem?: string;
-      infectiousDisease?: string;
-      facilitatorName?: string;
-      createTime?: string;
-    }[];
-  };
+  data?: FoodSampleReportDishDetailUsingPostResponseData;
   extra?: string;
 };
 
@@ -46,31 +50,35 @@ export type FoodSampleReportPageUsingPostBody = {
   endDate?: string;
 };
 
+export type FoodSampleReportPageUsingPostResponseDataDataItem = {
+  checkDate?: string;
+  diningHallName?: string;
+  personName?: string;
+  completeStatus?: number;
+  checkResult?: number;
+  temperature?: string;
+  healthCertStatus?: number;
+  skinProblem?: string;
+  infectiousDisease?: string;
+  facilitatorName?: string;
+  createTime?: string;
+};
+
+export type FoodSampleReportPageUsingPostResponseData = {
+  currentPage?: number;
+  pageSize?: number;
+  totalNum?: number;
+  isMore?: number;
+  totalPage?: number;
+  startIndex?: number;
+  data?: Array<FoodSampleReportPageUsingPostResponseDataDataItem>;
+};
+
 export type FoodSampleReportPageUsingPostResponse = {
   success?: boolean;
   code?: string;
   msg?: string;
-  data?: {
-    currentPage?: number;
-    pageSize?: number;
-    totalNum?: number;
-    isMore?: number;
-    totalPage?: number;
-    startIndex?: number;
-    data?: {
-      checkDate?: string;
-      diningHallName?: string;
-      personName?: string;
-      completeStatus?: number;
-      checkResult?: number;
-      temperature?: string;
-      healthCertStatus?: number;
-      skinProblem?: string;
-      infectiousDisease?: string;
-      facilitatorName?: string;
-      createTime?: string;
-    }[];
-  };
+  data?: FoodSampleReportPageUsingPostResponseData;
   extra?: string;
 };
 
@@ -86,31 +94,35 @@ export type HygienePatrolReportPageUsingPostBody = {
   endDate?: string;
 };
 
+export type HygienePatrolReportPageUsingPostResponseDataDataItem = {
+  checkDate?: string;
+  diningHallName?: string;
+  personName?: string;
+  completeStatus?: number;
+  checkResult?: number;
+  temperature?: string;
+  healthCertStatus?: number;
+  skinProblem?: string;
+  infectiousDisease?: string;
+  facilitatorName?: string;
+  createTime?: string;
+};
+
+export type HygienePatrolReportPageUsingPostResponseData = {
+  currentPage?: number;
+  pageSize?: number;
+  totalNum?: number;
+  isMore?: number;
+  totalPage?: number;
+  startIndex?: number;
+  data?: Array<HygienePatrolReportPageUsingPostResponseDataDataItem>;
+};
+
 export type HygienePatrolReportPageUsingPostResponse = {
   success?: boolean;
   code?: string;
   msg?: string;
-  data?: {
-    currentPage?: number;
-    pageSize?: number;
-    totalNum?: number;
-    isMore?: number;
-    totalPage?: number;
-    startIndex?: number;
-    data?: {
-      checkDate?: string;
-      diningHallName?: string;
-      personName?: string;
-      completeStatus?: number;
-      checkResult?: number;
-      temperature?: string;
-      healthCertStatus?: number;
-      skinProblem?: string;
-      infectiousDisease?: string;
-      facilitatorName?: string;
-      createTime?: string;
-    }[];
-  };
+  data?: HygienePatrolReportPageUsingPostResponseData;
   extra?: string;
 };
 
@@ -120,31 +132,35 @@ export type HygienePatrolReportPageUsingPostResponses = {
 
 export type IngredientTestReportPageUsingPostBody = Record<string, unknown>;
 
+export type IngredientTestReportPageUsingPostResponseDataDataItem = {
+  checkDate?: string;
+  diningHallName?: string;
+  personName?: string;
+  completeStatus?: number;
+  checkResult?: number;
+  temperature?: string;
+  healthCertStatus?: number;
+  skinProblem?: string;
+  infectiousDisease?: string;
+  facilitatorName?: string;
+  createTime?: string;
+};
+
+export type IngredientTestReportPageUsingPostResponseData = {
+  currentPage?: number;
+  pageSize?: number;
+  totalNum?: number;
+  isMore?: number;
+  totalPage?: number;
+  startIndex?: number;
+  data?: Array<IngredientTestReportPageUsingPostResponseDataDataItem>;
+};
+
 export type IngredientTestReportPageUsingPostResponse = {
   success?: boolean;
   code?: string;
   msg?: string;
-  data?: {
-    currentPage?: number;
-    pageSize?: number;
-    totalNum?: number;
-    isMore?: number;
-    totalPage?: number;
-    startIndex?: number;
-    data?: {
-      checkDate?: string;
-      diningHallName?: string;
-      personName?: string;
-      completeStatus?: number;
-      checkResult?: number;
-      temperature?: string;
-      healthCertStatus?: number;
-      skinProblem?: string;
-      infectiousDisease?: string;
-      facilitatorName?: string;
-      createTime?: string;
-    }[];
-  };
+  data?: IngredientTestReportPageUsingPostResponseData;
   extra?: string;
 };
 
@@ -160,31 +176,35 @@ export type MorningCheckReportPageUsingPostBody = {
   endDate?: string;
 };
 
+export type MorningCheckReportPageUsingPostResponseDataDataItem = {
+  checkDate?: string;
+  diningHallName?: string;
+  personName?: string;
+  completeStatus?: number;
+  checkResult?: number;
+  temperature?: string;
+  healthCertStatus?: number;
+  skinProblem?: string;
+  infectiousDisease?: string;
+  facilitatorName?: string;
+  createTime?: string;
+};
+
+export type MorningCheckReportPageUsingPostResponseData = {
+  currentPage?: number;
+  pageSize?: number;
+  totalNum?: number;
+  isMore?: number;
+  totalPage?: number;
+  startIndex?: number;
+  data?: Array<MorningCheckReportPageUsingPostResponseDataDataItem>;
+};
+
 export type MorningCheckReportPageUsingPostResponse = {
   success?: boolean;
   code?: string;
   msg?: string;
-  data?: {
-    currentPage?: number;
-    pageSize?: number;
-    totalNum?: number;
-    isMore?: number;
-    totalPage?: number;
-    startIndex?: number;
-    data?: {
-      checkDate?: string;
-      diningHallName?: string;
-      personName?: string;
-      completeStatus?: number;
-      checkResult?: number;
-      temperature?: string;
-      healthCertStatus?: number;
-      skinProblem?: string;
-      infectiousDisease?: string;
-      facilitatorName?: string;
-      createTime?: string;
-    }[];
-  };
+  data?: MorningCheckReportPageUsingPostResponseData;
   extra?: string;
 };
 
@@ -200,31 +220,35 @@ export type RoomDisinfectionReportPageUsingPostBody = {
   endDate?: string;
 };
 
+export type RoomDisinfectionReportPageUsingPostResponseDataDataItem = {
+  checkDate?: string;
+  diningHallName?: string;
+  personName?: string;
+  completeStatus?: number;
+  checkResult?: number;
+  temperature?: string;
+  healthCertStatus?: number;
+  skinProblem?: string;
+  infectiousDisease?: string;
+  facilitatorName?: string;
+  createTime?: string;
+};
+
+export type RoomDisinfectionReportPageUsingPostResponseData = {
+  currentPage?: number;
+  pageSize?: number;
+  totalNum?: number;
+  isMore?: number;
+  totalPage?: number;
+  startIndex?: number;
+  data?: Array<RoomDisinfectionReportPageUsingPostResponseDataDataItem>;
+};
+
 export type RoomDisinfectionReportPageUsingPostResponse = {
   success?: boolean;
   code?: string;
   msg?: string;
-  data?: {
-    currentPage?: number;
-    pageSize?: number;
-    totalNum?: number;
-    isMore?: number;
-    totalPage?: number;
-    startIndex?: number;
-    data?: {
-      checkDate?: string;
-      diningHallName?: string;
-      personName?: string;
-      completeStatus?: number;
-      checkResult?: number;
-      temperature?: string;
-      healthCertStatus?: number;
-      skinProblem?: string;
-      infectiousDisease?: string;
-      facilitatorName?: string;
-      createTime?: string;
-    }[];
-  };
+  data?: RoomDisinfectionReportPageUsingPostResponseData;
   extra?: string;
 };
 
@@ -240,31 +264,35 @@ export type TablewareDisinfectionReportPageUsingPostBody = {
   endDate?: string;
 };
 
+export type TablewareDisinfectionReportPageUsingPostResponseDataDataItem = {
+  checkDate?: string;
+  diningHallName?: string;
+  personName?: string;
+  completeStatus?: number;
+  checkResult?: number;
+  temperature?: string;
+  healthCertStatus?: number;
+  skinProblem?: string;
+  infectiousDisease?: string;
+  facilitatorName?: string;
+  createTime?: string;
+};
+
+export type TablewareDisinfectionReportPageUsingPostResponseData = {
+  currentPage?: number;
+  pageSize?: number;
+  totalNum?: number;
+  isMore?: number;
+  totalPage?: number;
+  startIndex?: number;
+  data?: Array<TablewareDisinfectionReportPageUsingPostResponseDataDataItem>;
+};
+
 export type TablewareDisinfectionReportPageUsingPostResponse = {
   success?: boolean;
   code?: string;
   msg?: string;
-  data?: {
-    currentPage?: number;
-    pageSize?: number;
-    totalNum?: number;
-    isMore?: number;
-    totalPage?: number;
-    startIndex?: number;
-    data?: {
-      checkDate?: string;
-      diningHallName?: string;
-      personName?: string;
-      completeStatus?: number;
-      checkResult?: number;
-      temperature?: string;
-      healthCertStatus?: number;
-      skinProblem?: string;
-      infectiousDisease?: string;
-      facilitatorName?: string;
-      createTime?: string;
-    }[];
-  };
+  data?: TablewareDisinfectionReportPageUsingPostResponseData;
   extra?: string;
 };
 

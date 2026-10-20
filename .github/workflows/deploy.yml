@@ -40,10 +40,11 @@ jobs:
           rm -rf publish
           mkdir -p publish
 
-          # 1. 尝试从 gh-pages 分支提取上一次已发布的静态资源，保留上一次的 H5 演示站
-          if git fetch origin gh-pages:gh-pages 2>/dev/null; then
-            echo "Found remote gh-pages branch, extracting previous H5 build..."
-            git archive gh-pages | tar -x -C publish/ 2>/dev/null || true
+          # 1. 尝试从 gh-pages 分支提取上一次已发布的静态资源，保留已发布的 H5 演示站
+          git fetch origin gh-pages --depth=1 2>/dev/null || true
+          if git rev-parse --verify origin/gh-pages >/dev/null 2>&1; then
+            echo "Found remote origin/gh-pages branch, extracting previous H5 build..."
+            git archive origin/gh-pages | tar -x -C publish/ 2>/dev/null || true
             # 清理旧的 docs 目录，由本次全新构建的 docs 替换
             rm -rf publish/docs
           fi
