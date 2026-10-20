@@ -71,7 +71,7 @@ const MOCK_LOGIN_RESULT: LoginResult = {
  * @param params 登录表单（username / password，两者都不可为空）；
  *               该请求带 `extra.ignoreAuth`，**不注入 token、401 也不会触发刷新**
  */
-export function login(params: LoginQuery): Promise<LoginResult> {
+export function loginApi(params: LoginQuery): Promise<LoginResult> {
   return http.post<UTSJSONObject>('/auth/login', params, {
     extra: {
       ignoreAuth: true
@@ -119,7 +119,7 @@ export function login(params: LoginQuery): Promise<LoginResult> {
 /**
  * 获取当前登录用户信息
  */
-export function fetchUserInfo(): Promise<AuthUserInfo> {
+export function fetchUserInfoApi(): Promise<AuthUserInfo> {
   return http.get<UTSJSONObject>('/user/info').then((data: UTSJSONObject): AuthUserInfo => {
     // ⚠️ 同上：必须写 `getArray<string>(...)`（UTS 要求显式泛型实参，TS 侧靠 @ts-expect-error 抑制 TS2347）
     // @ts-expect-error UTS 编译要求显式泛型实参；TS 侧 getArray 为 any 会报 TS2347
@@ -143,7 +143,7 @@ export function fetchUserInfo(): Promise<AuthUserInfo> {
  * 直接失败、不再触发刷新，否则刷新接口自身 401 会形成无限递归。
  * @param params 刷新凭证，只需 `refreshToken`（一般取自 tokenStore 里持久化的那一份）
  */
-export function refreshAccessToken(params: RefreshTokenQuery): Promise<RefreshTokenResult> {
+export function refreshAccessTokenApi(params: RefreshTokenQuery): Promise<RefreshTokenResult> {
   return http.post<UTSJSONObject>('/auth/refresh', params, {
     extra: {
       skipRefresh: true,
@@ -171,7 +171,7 @@ export function refreshAccessToken(params: RefreshTokenQuery): Promise<RefreshTo
 /**
  * 退出登录接口
  */
-export function logout(): Promise<boolean> {
+export function logoutApi(): Promise<boolean> {
   return http.post<any>('/auth/logout').then((_data: any): boolean => {
     return true;
   }, (_err: any): boolean => {

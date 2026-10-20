@@ -4,7 +4,7 @@
  * 遵循 Vue Query 经典设计：
  * 1. 声明式配置：传入 queryKey 与 queryFn，自动管理请求生命周期与全局缓存；
  * 2. 缓存时效：支持 staleTime（新鲜度窗口）与 gcTime（垃圾回收淘汰）；
- * 3. 状态完备：响应式暴露 data / error / status / isLoading / isFetching / isSuccess / isError；
+ * 3. 状态完备：响应式暴露 data / error / status / isPending / isLoading / isFetching / isSuccess / isError；
  * 4. 自动协同：同一 queryKey 在多组件间自动共享缓存数据与并发请求合并；
  * 5. 取消支持：abort() 与组件卸载时自动联动底层网络任务掐断。
  */
@@ -163,6 +163,7 @@ export function useQuery<T>(
   const dataRef: Ref<T | null> = dataRefAny as Ref<T | null>;
   const errorRef: Ref<Error | null> = ref<Error | null>(cachedState?.error ?? null);
   const statusRef: Ref<QueryStatus> = ref<QueryStatus>(initialStatus);
+  const isPendingRef: Ref<boolean> = ref<boolean>(initialStatus == 'pending');
 
   const isLoadingRef: Ref<boolean> = ref<boolean>(seedData == null && initialEnabled);
   const isFetchingRef: Ref<boolean> = ref<boolean>(false);
@@ -187,6 +188,7 @@ export function useQuery<T>(
     dataRef.value = data;
     errorRef.value = null;
     statusRef.value = 'success';
+    isPendingRef.value = false;
     isSuccessRef.value = true;
     isErrorRef.value = false;
     isLoadingRef.value = false;
@@ -196,6 +198,7 @@ export function useQuery<T>(
   const applyError = (err: Error): void => {
     errorRef.value = err;
     statusRef.value = 'error';
+    isPendingRef.value = false;
     isSuccessRef.value = false;
     isErrorRef.value = true;
     isLoadingRef.value = false;
@@ -505,6 +508,7 @@ export function useQuery<T>(
     data: dataRef,
     error: errorRef,
     status: statusRef,
+    isPending: isPendingRef,
     isLoading: isLoadingRef,
     isFetching: isFetchingRef,
     isSuccess: isSuccessRef,

@@ -123,7 +123,7 @@
 
 <script setup lang="uts">
 import { computed, ref } from 'vue';
-import { createFoo, deleteFoo, fetchFooById, fetchFooLatest, updateFoo } from '@/src/api/example.uts';
+import { createFooApi, deleteFooApi, fetchFooByIdApi, fetchFooLatestApi, updateFooApi } from '@/src/api/example.uts';
 import type { FooItem, PageResult } from '@/src/api/example.uts';
 import { useMutation, useQuery } from '@/uni_modules/request-bestX/index.uts';
 import type { MutationOptions, QueryFunctionContext, QueryOptions } from '@/uni_modules/request-bestX/index.uts';
@@ -159,7 +159,7 @@ function resetCrudForm(): void {
 const listQuery = useQuery<PageResult<FooItem>>({
   queryKey: ['fooList', 'crudDemo', 'latest2'],
   queryFn: (_ctx: QueryFunctionContext): Promise<PageResult<FooItem>> => {
-    return fetchFooLatest(2);
+    return fetchFooLatestApi(2);
   }
 } as QueryOptions<PageResult<FooItem>>);
 
@@ -167,14 +167,14 @@ const listQuery = useQuery<PageResult<FooItem>>({
  * 详情查询：queryKey 里放的是 Ref，crudDetailId 一变 useQuery 就自动取消旧请求并重拉；
  * enabled 为 getter，id 归零时不会再发请求（对标 TanStack Query 的 dependent query）。
  *
- * 泛型用 `FooItem` 而不是 `FooItem | null`：`fetchFooById` 的半包空值在这里转成
+ * 泛型用 `FooItem` 而不是 `FooItem | null`：`fetchFooByIdApi` 的半包空值在这里转成
  * rejection（「查无数据」走 query.error 展示），避免给 hook 传联合类型实参。
  */
 const detailQuery = useQuery<FooItem>({
   queryKey: ['fooDetail', crudDetailId],
   queryFn: (_ctx: QueryFunctionContext): Promise<FooItem> => {
     const targetId = crudDetailId.value;
-    return fetchFooById(targetId).then((detail: FooItem | null): Promise<FooItem> => {
+    return fetchFooByIdApi(targetId).then((detail: FooItem | null): Promise<FooItem> => {
       if (detail == null) {
         return Promise.reject(new Error(`#${targetId} 查无数据`)) as Promise<FooItem>;
       }
@@ -192,7 +192,7 @@ const detailQuery = useQuery<FooItem>({
 const createMutation = useMutation<FooItem, FooItem>({
   mutationKey: ['crudCreate'],
   mutationFn: (payload: FooItem): Promise<FooItem> => {
-    return createFoo(payload);
+    return createFooApi(payload);
   },
   onSuccess: (created: FooItem, _variables: FooItem, _context: any): void => {
     toastSuccess('新增成功');
@@ -209,7 +209,7 @@ const createMutation = useMutation<FooItem, FooItem>({
 const updateMutation = useMutation<FooItem, FooItem>({
   mutationKey: ['crudUpdate'],
   mutationFn: (payload: FooItem): Promise<FooItem> => {
-    return updateFoo(payload.id, payload);
+    return updateFooApi(payload.id, payload);
   },
   onSuccess: (updated: FooItem, _variables: FooItem, _context: any): void => {
     toastSuccess('修改成功');
@@ -226,7 +226,7 @@ const updateMutation = useMutation<FooItem, FooItem>({
 const deleteMutation = useMutation<boolean, FooItem>({
   mutationKey: ['crudDelete'],
   mutationFn: (item: FooItem): Promise<boolean> => {
-    return deleteFoo(item.id);
+    return deleteFooApi(item.id);
   },
   onSuccess: (_deleted: boolean, _variables: FooItem, _context: any): void => {
     toastSuccess('已删除');

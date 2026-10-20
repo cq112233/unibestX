@@ -8,7 +8,7 @@
       <view
         class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#3182ce]"
       />
-      <text class="text-[16px] font-bold text-[#2d3748]">文件下载（downloadFooFile → http.downloadFile）</text>
+      <text class="text-[16px] font-bold text-[#2d3748]">文件下载（downloadFooFileApi → http.downloadFile）</text>
     </view>
     <view class="mb-[16px]">
       <view class="flex-row items-center mb-[10px]">
@@ -123,7 +123,7 @@
 
 <script setup lang="uts">
 import { computed, ref } from 'vue';
-import { downloadFooFile, FOO_DOWNLOAD_URL } from '@/src/api/example.uts';
+import { downloadFooFileApi, FOO_DOWNLOAD_URL } from '@/src/api/example.uts';
 import { toast, toastSuccess } from '@/src/utils/toast/index.uts';
 
 const downloadLoading = ref<boolean>(false);
@@ -169,7 +169,7 @@ async function downloadFileByUrl(url: string): Promise<void> {
   downloadError.value = '';
 
   try {
-    const res = await downloadFooFile(url, (progress: number) => {
+    const res = await downloadFooFileApi(url, (progress: number) => {
       downloadProgress.value = progress;
     });
     downloadFilePath.value = res.tempFilePath;

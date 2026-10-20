@@ -6,7 +6,7 @@ globs: src/**/*.uts,src/**/*.ts,src/**/*.vue,src/**/*.uvue
 
 # page-standard（Glob：`src/**/*.{uts,ts,vue,uvue}`）
 
-> 只写「页面必须长什么样」。`definePage` 全字段、完整骨架、真实案例 → **unibestX-skill 分册 4 / 5**。
+> 只写「页面必须长什么样」。**页面内容与组件写法（骨架 / 状态 / 三态 / props / emits / expose / JSDoc）→ 分册 4**；**生成页面结构（目录树 / 组件拆分 / 接口归属 / 根视图与模块容器）→ 分册 5**。
 
 ## MUST
 
@@ -17,7 +17,9 @@ globs: src/**/*.uts,src/**/*.ts,src/**/*.vue,src/**/*.uvue
 - **下拉刷新开了就必须闭环**：配 `onNavbarPullDownRefresh` + `stopNavbarPullDownRefresh`，且只写在 `definePage` 顶层。
 - **分页 / 长列表一律优先用 `<z-paging-x>`**（内置 `list-view` 虚拟复用、触底自动追加、下拉刷新、空态与 loading）；只有 `<z-paging-x>` 覆盖不了的场景（非分页的纯长列表、瀑布流特殊布局）才手写 `<list-view>` + `<list-item>`。**严禁用 `<scroll-view>` 承载长列表。**
 - **组件库优先**：`uni_modules/*/components/` 与根 `components/` 的组件直接写短横线标签，不手动 import；**页面私有组件（`src/pages/*/components/`）必须手动 import**。
-- **数据一律经接口层**：页面 / 组件只调 `@/src/api/<page>/<page>.uts` 的 `fetchXxx()`，不直接 `http.get`、不写死假数据。
+- **数据一律经接口层**：页面 / 组件只调 `@/src/api/<page>/<page>.uts` 的 `fetchXxxApi()`，不直接 `http.get`、不写死假数据。
+- **页面结构按分册 5 生成**：先定「普通页 / TabBar 页 → 目录树 → 组件层级 → 谁调接口」，再写代码；简单页 ≤ 500 行不拆组件，禁止为拆而拆。
+- **页面内容与组件写法按分册 4 落地**：页面骨架、数据与三态、组件单根节点、运行时 props、`defineEmits`、`defineExpose`、方法 JSDoc 等，一律照分册 4 的模板写，不自创结构。
 - **路由参数用 `useRoute()` 读**（`query` 已是解码态 `Map`），禁止 `onLoad((options) => ...)`。
 
 ## MUST NOT
@@ -29,4 +31,6 @@ globs: src/**/*.uts,src/**/*.ts,src/**/*.vue,src/**/*.uvue
 
 ---
 
-> 📖 需要「上固定 + 下滚动」完整骨架、TabBar 页薄壳、加载 / 空 / 错误三态、`definePage` 全字段说明 → 加载 **unibestX-skill 分册 4**（`.claude/skills/unibestX-skill/references/4-page-component.md`）。
+> 📖 **写页面内容 / 组件前先读分册 4**：`definePage` 全字段、「上固定 + 下滚动」完整骨架、TabBar 页薄壳、加载 / 空 / 错误三态、组件写法（props / emits / expose / 方法 JSDoc）→ `.agents/skills/unibestX-skill/references/4-page-component.md`。
+>
+> 📖 **生成 / 改造页面结构时先读分册 5**：目录怎么摆、`views/` 要不要、组件拆几层、接口由根视图还是模块调用、数据归谁 → `.agents/skills/unibestX-skill/references/5-page-structure.md`。

@@ -302,6 +302,7 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 | **浏览器特有 API** | `document.documentElement.style.setProperty(...)`、`localStorage.getItem(...)`、`history.pushState(...)`（App 端无这些全局对象） | 样式用 `:style` 响应式绑定；存储用 `uni.setStorageSync` / `uni.getStorageSync`；跳转走 `useRouter()`；确需 Web 专属逻辑时 `// #ifdef H5` 物理隔离（详见 **3.28**） |
 | **非全端 API 裸调用** | `uni.getLocale()`、`uni.vibrateShort()`（App 端不直接支持，报「请检查 xxx 的拼写是否正确」） | 用条件编译包裹，或改用全端支持的等价 API；App 端取应用语言用 `uni.getSystemInfoSync().appLanguage`、取系统语言用 `uni.getDeviceInfo().osLanguage`（详见 **3.28**） |
 | **未声明字段的 `UTSJSONObject` 点属性访问** | `config.color['up-primary'] = 'red'`（`UTSJSONObject` 没有静态成员，点访问取不到值） | 逐层下标 + 断言：`const colorConfig = config['color'] as UTSJSONObject; colorConfig['up-primary'] = 'red'`（详见 **1.27**） |
+| **查询已有稳定默认结构仍包 `computed` 兜底** | `const summary = computed(() => data.value ?? EMPTY_SUMMARY)` | `useQuery({ initialData: EMPTY_SUMMARY })` 后模板直接读 `data`；只有真实计算 / 转换才用 `computed`（详见 **4.3.4**） |
 | **安全区 / 行高手写** | `style="padding-bottom: env(safe-area-inset-bottom); line-height: 22px"` | 项目工具类 `p-safe` / `pt-safe` / `pb-safe` + `leading-[22px]`（详见 **2.25**） |
 | **Easycom 组件手动 import** | `import UniIcons from '@/uni_modules/uni-icons/components/uni-icons/uni-icons.uvue'` 再用 `<UniIcons />` | `uni_modules/*/components/` 与根 `components/` 的组件直接写短横线标签 `<uni-icons />`，无需 import；**页面私有组件（`src/pages/*/components/`）不在扫描范围，必须手动 import**（详见 **4.4**） |
 

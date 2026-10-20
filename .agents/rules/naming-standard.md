@@ -17,7 +17,7 @@ description: 命名规范 —— 写新文件 / 新符号、或需要校验命�
 | 工具模块 | kebab-case 目录 + `index.uts` | `src/utils/systemInfo/index.uts` |
 | 组件文件 | PascalCase | `GoodsGrid.uvue` |
 | 类型文件 | `types.uts` / `<模块>.types.uts` | `src/api/order-list/types.uts` |
-| mock 数据集 | `mock/<模块>.uts` | `src/api/index/mock/wallpaper.uts` |
+| 模拟数据集 | 默认内联在 `<page>.uts`；过大才拆 `mock/<模块>.uts` | `LOCAL_WALLPAPERS` |
 
 ## 符号
 
@@ -25,9 +25,9 @@ description: 命名规范 —— 写新文件 / 新符号、或需要校验命�
 | :--- | :--- | :--- |
 | 类型 / 接口契约 | PascalCase，**必须 `type`** | `OrderItem`、`PageResult<T>` |
 | 函数（普通） | camelCase，动词开头 | `formatAmount`、`loadPage` |
-| 接口函数 | `fetchXxxList` / `fetchXxxDetail` / `createXxx` / `updateXxx` / `deleteXxx` | `fetchOrderList` |
+| 接口函数 | `fetchXxxListApi` / `fetchXxxDetailApi` / `createXxxApi` / `updateXxxApi` / `deleteXxxApi` | `fetchOrderListApi` |
 | composable | `use` + PascalCase | `useThemeStore`、`useBackPressExit` |
-| 常量 | UPPER_SNAKE | `PAGE_SIZE`、`MOCK_ORDER_LIST` |
+| 常量 | UPPER_SNAKE | `PAGE_SIZE`、`LOCAL_ORDER_LIST` |
 | 布尔变量 | `is` / `has` / `can` / `should` 开头 | `isLoading`、`hasMore` |
 | 事件处理 | `on` + 名词 + 动作 | `onSelectTab`、`onOpenDetail` |
 | 页面局部方法 | **加业务前缀**，避开框架全局名（`stop` / `effect` / `nextTick` / `trigger`） | `stopStream` 而非 `stop` |

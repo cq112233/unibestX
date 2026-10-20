@@ -13,7 +13,7 @@
     <!-- 5.1 成功路径：列表接口 -->
     <view class="rounded-[10px] p-[12px] mb-[12px] border-[1px] border-solid border-[#e2e8f0]">
       <view class="flex-row justify-between items-center mb-[6px]">
-        <text class="text-[13px] text-[#64748b]">fetchFooList（GET /test）</text>
+        <text class="text-[13px] text-[#64748b]">fetchFooListApi（GET /test）</text>
         <view class="px-[8px] py-[2px] rounded-[10px]" :class="listStatusBgClass">
           <text class="text-[12px]" :class="listStatusTextClass">{{ listStatusText }}</text>
         </view>
@@ -51,7 +51,7 @@
     <!-- 5.2 失败与取消路径：真实接口 + 重试 -->
     <view class="rounded-[10px] p-[12px] mb-[12px] border-[1px] border-solid border-[#e2e8f0]">
       <view class="flex-row justify-between items-center mb-[6px]">
-        <text class="text-[13px] text-[#64748b]">fetchFooRemote（真实接口 · retry 2）</text>
+        <text class="text-[13px] text-[#64748b]">fetchFooRemoteApi（真实接口 · retry 2）</text>
         <view class="px-[8px] py-[2px] rounded-[10px]" :class="remoteStatusBgClass">
           <text class="text-[12px]" :class="remoteStatusTextClass">{{ remoteStatusText }}</text>
         </view>
@@ -110,7 +110,7 @@
 
 <script setup lang="uts">
 import { computed, ref } from 'vue';
-import { fetchFooList, fetchFooRemote } from '@/src/api/example.uts';
+import { fetchFooListApi, fetchFooRemoteApi } from '@/src/api/example.uts';
 import type { FooItem, PageResult } from '@/src/api/example.uts';
 import { defaultQueryClient, useMutation, useQuery } from '@/uni_modules/request-bestX/index.uts';
 import type { MutationOptions, QueryFunctionContext, QueryOptions } from '@/uni_modules/request-bestX/index.uts';
@@ -127,7 +127,7 @@ const pollingTick = ref<number>(0);
 const listQuery = useQuery<PageResult<FooItem>>({
   queryKey: ['fooList', 'uni'],
   queryFn: (_ctx: QueryFunctionContext): Promise<PageResult<FooItem>> => {
-    return fetchFooList(1, 5, 'uni');
+    return fetchFooListApi(1, 5, 'uni');
   },
   enabled: false
 } as QueryOptions<PageResult<FooItem>>);
@@ -136,7 +136,7 @@ const remoteQuery = useQuery<FooItem>({
   queryKey: ['fooRemote'],
   queryFn: (_ctx: QueryFunctionContext): Promise<FooItem> => {
     remoteCalls.value = remoteCalls.value + 1;
-    return fetchFooRemote();
+    return fetchFooRemoteApi();
   },
   enabled: false,
   retry: 2,
@@ -147,7 +147,7 @@ const searchMutation = useMutation<PageResult<FooItem>, string>({
   mutationFn: (kw: string): Promise<PageResult<FooItem>> => {
     searchCalls.value = searchCalls.value + 1;
     searchLastKeyword.value = kw;
-    return fetchFooList(1, 5, kw);
+    return fetchFooListApi(1, 5, kw);
   }
 } as MutationOptions<PageResult<FooItem>, string>);
 
@@ -155,7 +155,7 @@ const pollingQuery = useQuery<PageResult<FooItem>>({
   queryKey: ['fooPolling'],
   queryFn: (_ctx: QueryFunctionContext): Promise<PageResult<FooItem>> => {
     pollingTick.value = pollingTick.value + 1;
-    return fetchFooList(1, 3, '');
+    return fetchFooListApi(1, 3, '');
   },
   enabled: false,
   refetchInterval: 3000

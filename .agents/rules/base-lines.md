@@ -5,7 +5,7 @@ description: unibestX 最高底线 —— 任何代码都不能违反的框架�
 
 # base-lines（Always On）
 
-> 只写**违规即错**的底线。具体怎么用、有哪些参数、完整模板，一律查 `.claude/skills/unibestX-skill/`（物理源 `.agents/skills/unibestX-skill/`，两者同一份）。
+> 只写**违规即错**的底线。具体怎么用、有哪些参数、完整模板，一律查 `.agents/skills/unibestX-skill/`。
 
 ## 1. 运行环境
 
@@ -37,7 +37,7 @@ description: unibestX 最高底线 —— 任何代码都不能违反的框架�
 ---
 
 > 📖 **本文件只是底线开关，不含用法。**
-> 需要类型定义、完整模板、正反例、踩坑结论时，用 Read 打开 `.claude/skills/unibestX-skill/SKILL.md` 定位分册，再读对应分册：
+> 需要类型定义、完整模板、正反例、踩坑结论时，用 Read 打开 `.agents/skills/unibestX-skill/SKILL.md` 定位分册，再读对应分册：
 > - UTS 语法与类型 → 分册 1
 > - 样式与布局 → 分册 2
 > - 跨端运行时与真机报错 → 分册 3

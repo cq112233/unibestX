@@ -9,7 +9,7 @@
  * - 刷新接口自身通过 extra.skipRefresh 旁路拦截器，杜绝无限递归
  */
 
-import { refreshAccessToken } from '@/src/api/auth/auth.uts';
+import { refreshAccessTokenApi } from '@/src/api/auth/auth.uts';
 import type { RefreshTokenQuery } from '@/src/api/auth/auth.uts';
 import { useTokenStore } from '@/src/store/index.uts';
 import type { IDoubleTokenRes } from '@/src/store/index.uts';
@@ -69,7 +69,7 @@ function doRefresh(): Promise<boolean> {
     return Promise.resolve(false);
   }
 
-  return refreshAccessToken({ refreshToken } as RefreshTokenQuery)
+  return refreshAccessTokenApi({ refreshToken } as RefreshTokenQuery)
     .then((res): boolean => {
       if (res.accessToken == '') {
         return false;

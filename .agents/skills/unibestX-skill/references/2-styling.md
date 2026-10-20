@@ -788,7 +788,7 @@ $app-primary: var(--theme-color, #0957de);
 <script setup lang="uts">
 import { computed, ref } from 'vue';
 import { useRoute } from '@/uni_modules/route-bestX/index.uts';
-import { fetchCouponList } from '@/src/api/coupon/coupon.uts';
+import { fetchCouponListApi } from '@/src/api/coupon/coupon.uts';
 import type { CouponItem } from '@/src/api/coupon/coupon.uts';
 import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/layouts/navbar/utils/index.uts';
 
@@ -812,7 +812,7 @@ function formatAmount(amount: number): string {
 }
 
 function loadList(): void {
-  fetchCouponList(1, 20).then(
+  fetchCouponListApi(1, 20).then(
     (res: Array<CouponItem>): void => {
       list.value = res;
     },

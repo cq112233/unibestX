@@ -8,7 +8,7 @@
       <view
         class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#3182ce]"
       />
-      <text class="text-[16px] font-bold text-[#2d3748]">文件上传（uploadFooFile → http.upload）</text>
+      <text class="text-[16px] font-bold text-[#2d3748]">文件上传（uploadFooFileApi → http.upload）</text>
     </view>
     <view class="mb-[16px]">
       <view class="flex-row items-center mb-[10px]">
@@ -94,7 +94,7 @@
 
 <script setup lang="uts">
 import { computed, ref } from 'vue';
-import { FOO_UPLOAD_PATH, uploadFooFile } from '@/src/api/example.uts';
+import { FOO_UPLOAD_PATH, uploadFooFileApi } from '@/src/api/example.uts';
 import { useMutation } from '@/uni_modules/request-bestX/index.uts';
 import type { MutationOptions } from '@/uni_modules/request-bestX/index.uts';
 import { toastSuccess } from '@/src/utils/toast/index.uts';
@@ -113,7 +113,7 @@ const chooseError = ref<string>('');
 const uploadMutation = useMutation<string, string>({
   mutationKey: ['demoUpload'],
   mutationFn: (filePath: string): Promise<string> => {
-    return uploadFooFile(filePath, true, uploadPath.value);
+    return uploadFooFileApi(filePath, true, uploadPath.value);
   },
   onSuccess: (_url: string, _variables: string, _context: any): void => {
     toastSuccess('上传成功');

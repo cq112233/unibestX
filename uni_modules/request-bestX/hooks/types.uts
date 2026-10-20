@@ -81,6 +81,8 @@ export type QueryResult<T> = {
   error: Ref<Error | null>;
   /** 响应式查询状态 ('pending' | 'success' | 'error') */
   status: Ref<QueryStatus>;
+  /** 首次查询尚未完成（status === 'pending'），对标 TanStack Query v5 */
+  isPending: Ref<boolean>;
   /** 首次无有效缓存时的加载中标记 (status === 'pending' && isFetching) */
   isLoading: Ref<boolean>;
   /** 是否正在进行网络数据拉取（含后台刷新、轮询与重新激活） */

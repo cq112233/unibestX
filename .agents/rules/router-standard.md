@@ -28,4 +28,4 @@ globs: src/**/*.uts,src/**/*.ts,src/**/*.vue,src/**/*.uvue
 
 ---
 
-> 📖 需要 `RouteLocation` 全字段、`RouteLocationRaw` 参数、10 类场景写法、14 条坑点 → 加载 **unibestX-skill 分册 8**（`.claude/skills/unibestX-skill/references/8-router-spec.md`）。
+> 📖 需要 `RouteLocation` 全字段、`RouteLocationRaw` 参数、10 类场景写法、14 条坑点 → 加载 **unibestX-skill 分册 8**（`.agents/skills/unibestX-skill/references/8-router-spec.md`）。

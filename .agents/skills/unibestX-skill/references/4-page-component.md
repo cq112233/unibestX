@@ -6,7 +6,7 @@
 >
 > **与其它分册的分工**：本分册讲**「页面与组件的文件怎么写」**。**组件放在哪个目录 → 分册 5.2**；页面目录怎么分层、数据归谁 → 分册 5；接口函数怎么写 → 分册 6；样式为什么这么写 → 分册 2；跨端差异 → 分册 3；`useRoute` / `useRouter` 细节 → 分册 8。
 >
-> **30 秒速记**：`definePage` 写全 → 根 `view + flex flex-col flex-1` → 内部 `scroll-view` → 读用 `useQuery`、写用 `useMutation`、成功后 `invalidateQueries` → 跳转 `useRouter()` → 同批建 `src/api/<page>/`。**组件：单根节点 + 运行时 props + `defineEmits<{...}>`。**
+> **30 秒速记**：`definePage` 写全 → 根 `view + flex flex-col flex-1` → 内部 `scroll-view` → 读用 `useQuery`、写用 `useMutation`（**两者都解构 + 业务别名**）、成功后 `invalidateQueries` → 跳转 `useRouter()` → 同批建 `src/api/<page>/`。**组件：单根节点 + 运行时 props + `defineEmits<{...}>`。**
 >
 > 📌 **4.1 页面骨架** → **4.2 `definePage`** → **4.3 标准业务页（含 4.3.5 假数据写法）** → **4.4 组件引用** → **4.5 组件写法** → **4.6 流程与交付** → **4.7 坑点** → **4.8 速查** → **4.9 红线**。**新建页面抄 4.1 + 4.3，新建组件抄 4.5。**
 
@@ -220,7 +220,7 @@ import { useQuery, useMutation, useQueryClient } from '@/uni_modules/request-bes
 import type { QueryFunctionContext, QueryOptions, MutationOptions } from '@/uni_modules/request-bestX/index.uts';
 
 // 3. 数据来源：接口层（分册 6），页面不直接 http.get、不写死假数据
-import { fetchOrderList, createOrder, deleteOrder } from '@/src/api/order/order.uts';
+import { fetchOrderListApi, createOrderApi, deleteOrderApi } from '@/src/api/order/order.uts';
 import type { OrderItem } from '@/src/api/order/order.uts';
 
 import { toastSuccess, toastError } from '@/src/utils/toast/index.uts';
@@ -258,25 +258,35 @@ const keyword = ref<string>(route.query.get('keyword') ?? '');
 const keywordInput = ref<string>(route.query.get('keyword') ?? '');
 
 // ==========================================
-// 二、useQuery：列表查询（queryKey 放 Ref 即自动重拉）
+// 二、useQuery：列表查询（解构 + 别名；queryKey 放 Ref 即自动重拉）
 // ==========================================
 
-const listQuery = useQuery<Array<OrderItem>>({
+// 解构 + 业务别名：同页多个 useQuery 并存时不撞名
+const {
+  isPending: listPending,
+  isFetching: listFetching,
+  isError: listError,
+  error: listErrorObj,
+  data: listData,
+  refetch: refetchList
+} = useQuery<Array<OrderItem>>({
   queryKey: ['order', 'list', keyword],
   queryFn: (_ctx: QueryFunctionContext): Promise<Array<OrderItem>> => {
-    return fetchOrderList(1, 20, keyword.value);
-  },
-  staleTime: 10000
+    return fetchOrderListApi(1, 20, keyword.value);
+  }
 } as QueryOptions<Array<OrderItem>>);
 
 // ==========================================
 // 三、useMutation：新建 / 删除（成功后失效缓存）
 // ==========================================
 
-const createMutation = useMutation<OrderItem, string>({
-  mutationKey: ['orderCreate'],
+// 解构 + 业务别名：isPending → creating，mutate → createOrder
+const {
+  isPending: creating,
+  mutate: createOrder
+} = useMutation<OrderItem, string>({
   mutationFn: (title: string): Promise<OrderItem> => {
-    return createOrder(title);
+    return createOrderApi(title);
   },
   onSuccess: (_created: OrderItem, _title: string, _ctx: any): void => {
     toastSuccess('创建成功');
@@ -288,10 +298,13 @@ const createMutation = useMutation<OrderItem, string>({
   }
 } as MutationOptions<OrderItem, string>);
 
-const deleteMutation = useMutation<boolean, OrderItem>({
-  mutationKey: ['orderDelete'],
+// 解构 + 业务别名：isPending → deleting，mutate → deleteOrder
+const {
+  isPending: deleting,
+  mutate: deleteOrder
+} = useMutation<boolean, OrderItem>({
   mutationFn: (item: OrderItem): Promise<boolean> => {
-    return deleteOrder(item.id);
+    return deleteOrderApi(item.id);
   },
   onSuccess: (_ok: boolean, _item: OrderItem, _ctx: any): void => {
     toastSuccess('已删除');
@@ -306,20 +319,19 @@ const deleteMutation = useMutation<boolean, OrderItem>({
 // 四、派生状态：全部从 hook 的 Ref 计算，页面不另存一份
 // ==========================================
 
-const isLoading = computed((): boolean => listQuery.isLoading.value == true);
-const isFetching = computed((): boolean => listQuery.isFetching.value == true);
-const isError = computed((): boolean => listQuery.isError.value == true);
-const creating = computed((): boolean => createMutation.isPending.value == true);
+const isLoading = computed((): boolean => listPending.value == true);
+const isFetching = computed((): boolean => listFetching.value == true);
+const isError = computed((): boolean => listError.value == true);
 
 const list = computed((): Array<OrderItem> => {
-  const data = listQuery.data.value;
+  const data = listData.value;
   return data != null ? data : [] as Array<OrderItem>;
 });
 
 const total = computed((): number => list.value.length);
 
 const errorText = computed((): string => {
-  const err = listQuery.error.value;
+  const err = listErrorObj.value;
   return err != null ? err.message : '加载失败';
 });
 
@@ -332,18 +344,21 @@ function onSearch(): void {
 }
 
 function onRetry(): void {
-  listQuery.refetch();
+  refetchList();
 }
 
 function onCreate(): void {
   if (creating.value) {
     return;
   }
-  createMutation.mutate('新订单');
+  createOrder('新订单');
 }
 
 function onDelete(item: OrderItem): void {
-  deleteMutation.mutate(item);
+  if (deleting.value) {
+    return;
+  }
+  deleteOrder(item);
 }
 
 function onOpenDetail(item: OrderItem): void {
@@ -359,23 +374,27 @@ function onOpenDetail(item: OrderItem): void {
 | 段落 | 做什么 | 关键约束 |
 | :--- | :--- | :--- |
 | 一 | `useRoute()` 读参 → `ref` | `query` 恒为 `string`，必须兜底 |
-| 二 | `useQuery` 声明 `queryKey + queryFn` | **Ref 放 `queryKey` 即自动重拉**，不要再写 `watch + refetch` |
-| 三 | `useMutation` + `onSuccess` 里 `invalidateQueries` | 传 queryKey **数组前缀**，不要拼字符串 |
-| 四 | 用 `computed` 把 `Ref` 派生给模板 | 页面**不另存** `loading` / `list` 副本 |
+| 二 | `useQuery` 声明 `queryKey + queryFn`，并**解构 + 业务别名** | **Ref 放 `queryKey` 即自动重拉**；`data → listData`、`isPending → listPending`，禁止裸字段名互相覆盖 |
+| 三 | `useMutation` 声明 `mutationFn`，并**解构 + 业务别名**；`onSuccess` 里 `invalidateQueries` | `isPending → creating`、`mutate → createOrder`；传 queryKey **数组前缀**，不要拼字符串 |
+| 四 | 有稳定空结构时用 `initialData`，直接读 `data`；只有真实派生才用 `computed` | **不要**为了 `data == null` 的纯兜底再包一层 `computed`；页面**不另存** `loading` / `list` 副本 |
 | 五 | 交互只做：改状态 / `mutate()` / `router.push()` | 页面不写 `try/catch`，不写请求 |
 
 ### 4.3.3 UTS 写法要点
 
 ```uts
 // ✅ 必须用 as QueryOptions<T> / as MutationOptions<TD, TV> 收口，泛型才推得出来
-const q = useQuery<FooItem>({ queryKey: ['foo', id], queryFn: ... } as QueryOptions<FooItem>);
+const {
+  isPending: detailPending,
+  data: detailData,
+  refetch: refetchDetail
+} = useQuery<FooItem>({ queryKey: ['foo', id], queryFn: ... } as QueryOptions<FooItem>);
 
 // ✅ 回调参数全标注；不用的参数加下划线前缀
 onSuccess: (_data: FooItem, _vars: FooItem, _ctx: any): void => { ... }
 
 // ✅ 可空详情：泛型用非空类型，把「查无数据」转成 rejection
 queryFn: (_ctx: QueryFunctionContext): Promise<FooItem> => {
-  return fetchFooById(id).then((detail: FooItem | null): Promise<FooItem> => {
+  return fetchFooByIdApi(id).then((detail: FooItem | null): Promise<FooItem> => {
     if (detail == null) {
       return Promise.reject(new Error('查无数据')) as Promise<FooItem>;
     }
@@ -404,6 +423,83 @@ const loading = ref<boolean>(false);      // hook 已接管，重复维护必然
 | 手动触发的一次性拉取 | `useQuery({ enabled: false })` + `refetch()` |
 | **接口还没好** | 接口函数先定型，函数体用 `new Promise` + 假数据（4.3.5） |
 
+**状态字段对照（照实取用，别混用）**：
+
+| 字段 | `useQuery` | `useMutation` |
+| :--- | :--- | :--- |
+| `isPending` | ✅ `status === 'pending'`（首次查询尚未完成） | ✅ 请求进行中 |
+| `isLoading` | ✅ 首次无有效缓存时的加载中（`status == 'pending' && isFetching`） | ✅ `isPending` 的别名 |
+| `isFetching` | ✅ 任何网络拉取进行中（含后台刷新、轮询、重新激活） | — |
+| `status` | ✅ `'pending' \| 'success' \| 'error'` | — |
+
+> 区分：`isPending` 只看「首次结果是否还没回来」；`isLoading` = `isPending && isFetching`；`isFetching` 覆盖后台刷新、轮询等在飞请求。
+
+**解构与别名（强制）**：
+
+- **每个 `useQuery` 的结果一律解构**，不要写 `const listQuery = useQuery(...)` 再到处 `listQuery.data.value`。
+- **字段必须起业务别名**，前缀用模块名：`data → listData`、`isPending → listPending`、`isError → listError`、`refetch → refetchList`；同页有「列表 + 详情」两个查询时不会撞名，也一眼看出属于哪块。
+- **`isPending` 不要裸命名为 `pending`**：多个查询并存必然冲突，统一 `<模块>Pending`。
+- **`useMutation` 同样解构 + 业务别名**：`isPending → creating / deleting`、`mutate → createOrder / deleteOrder`，与查询的 `listPending` 区分开；禁止到处写 `createMutation.isPending.value` / `createMutation.mutate()`。
+- **`mutationKey` / `onSettled` 默认不生成**：普通新建 / 删除只保留 `mutationFn` + `onSuccess` / `onError`；只有需要按 key 管理 mutation，或成功、失败必须统一收尾时，才按需添加。
+- 解构出来的是 Ref：script 里用 `.value`，模板里自动解包直接用。
+- **`staleTime` 默认不写**：页面模板交给 `useQuery` 默认值；只有业务明确要求缓存新鲜度时，才在对应查询上显式配置。
+
+**默认结构：优先 `initialData`，不要再包 `computed` 兜底**：
+
+- 查询结果有**稳定空结构**（如概览统计、配置对象、详情占位对象），在 `useQuery` 里传 `initialData: EMPTY_XXX`，模板直接使用解构出的 `data`。
+- `initialData` 只保证首屏有完整强类型默认值，**仍会正常发起首轮请求**；它不等于关闭请求。
+- 只有在需要**真实计算 / 转换 / 组合多个字段**时才用 `computed`；单纯写 `computed(() => data.value ?? EMPTY_XXX)` 属于重复派生。
+- 如果该块数据必须展示 loading 骨架 / 首屏空态，不要用 `initialData` 把首屏伪装成成功态。
+
+```uts
+const EMPTY_SUMMARY: TaskSummary = {
+  total: 0,
+  pending: 0,
+  done: 0,
+  completionRate: 0
+};
+
+const { data: summaryData, refetch: refetchSummary } = useQuery<TaskSummary>({
+  queryKey: ['taskCenter', 'summary'],
+  queryFn: (_ctx: QueryFunctionContext): Promise<TaskSummary> => {
+    return fetchTaskSummaryApi();
+  },
+  initialData: EMPTY_SUMMARY
+} as QueryOptions<TaskSummary>);
+
+// ✅ 模板直接 {{ summaryData.pending }}；筛选计数等真实派生再用 computed
+// ❌ 不要再写：const summary = computed(() => summaryData.value ?? EMPTY_SUMMARY)
+```
+
+```uts
+// ✅ 列表 + 详情两个查询并存，各用各的别名
+const queryClient = useQueryClient();
+
+const { isPending: listPending, data: listData } = useQuery<PageResult<NewPageItem>>({
+  queryKey: ['newPage', 'list', keyword],
+  queryFn: (_ctx: QueryFunctionContext): Promise<PageResult<NewPageItem>> => {
+    return fetchNewPageListApi(1, 20, keyword.value);
+  }
+} as QueryOptions<PageResult<NewPageItem>>);
+
+const { isPending: detailPending, data: detailData } = useQuery<NewPageItem>({
+  queryKey: ['newPage', 'detail', id],
+  queryFn: (_ctx: QueryFunctionContext): Promise<NewPageItem> => fetchNewPageDetailApi(id.value)
+} as QueryOptions<NewPageItem>);
+
+// ✅ mutation 同样解构：状态与动作都起业务别名
+const { isPending: creating, mutate: createOrder } = useMutation<OrderItem, string>({
+  mutationFn: (title: string): Promise<OrderItem> => createOrderApi(title),
+  onSuccess: (_created: OrderItem, _title: string, _ctx: any): void => {
+    queryClient.invalidateQueries(['order', 'list']);
+  }
+} as MutationOptions<OrderItem, string>);
+
+// ❌ 反例：多个查询共用一套裸字段名，直接重复声明报错
+// const { isPending, data } = useQuery(...);
+// const { isPending, data } = useQuery(...);
+```
+
 > 真实先例：`src/sub/httpBasicDemo/components/CrudDemoCard.uvue`、`VueQueryDemoCard.uvue`。
 
 ---
@@ -419,6 +515,7 @@ const loading = ref<boolean>(false);      // hook 已接管，重复维护必然
 3. 函数体统一用 `new Promise<T>((resolve) => { setTimeout(() => { resolve(MOCK) }, 300) })` —— **加 300ms 延迟**，才能验证页面的 loading / 骨架屏 / 空态；
 4. 假数据形态：**数组给 3 条**、**对象给一个完整实例 `{}`**、**布尔给 `true`**；
 5. 假数据常量放**本函数上方**，命名 `MOCK_<模块>_<用途>`，`Array<XxxItem>` 全量标注。
+6. 每个 `TODO 后端就绪后换成 ...` 下方保留一个**可直接取消注释**的请求片段；开发者先注释掉模拟 `return`，再打开片段并替换 `'.../xxxx'` 即可。项目签名是 `http.get<T>(url, config)`，不要写成单对象 `http.get({ url, params })`；同时补上 `import { http } from '@/src/http/index.uts';` 与 `import type { HttpRequestConfig } from '@/uni_modules/request-bestX/index.uts';`；
 
 ```uts
 // ==========================================
@@ -440,8 +537,12 @@ const MOCK_ORDER_LIST: Array<OrderItem> = [
  * @param keyword 标题关键词，空串表示不筛选
  * @returns 订单数组；后端就绪后改为返回分页容器时需同步改签名
  */
-export function fetchOrderList(pageNo: number = 1, pageSize: number = 10, keyword: string = ''): Promise<Array<OrderItem>> {
+export function fetchOrderListApi(pageNo: number = 1, pageSize: number = 10, keyword: string = ''): Promise<Array<OrderItem>> {
   // TODO 后端就绪后换成 http.get，签名不动
+  // 联调时：注释掉下方 Mock return，取消下面 3 行注释并替换 '.../xxxx' 即可
+  // return http.get<Array<OrderItem>>('.../xxxx', {
+  //   params: { pageNo: pageNo, pageSize: pageSize, keyword: keyword } as UTSJSONObject
+  // } as HttpRequestConfig);
   return new Promise<Array<OrderItem>>((resolve) => {
     setTimeout((): void => {
       resolve(MOCK_ORDER_LIST);
@@ -463,8 +564,12 @@ const MOCK_ORDER_DETAIL: OrderItem = {
  * @param id 订单主键（传 0 或负数时后端会返回 404，这里返回 null）
  * @returns 订单详情；不存在时为 null
  */
-export function fetchOrderDetail(id: number): Promise<OrderItem | null> {
+export function fetchOrderDetailApi(id: number): Promise<OrderItem | null> {
   // TODO 后端就绪后换成 http.get，签名不动
+  // 联调时：注释掉下方 Mock return，取消下面 3 行注释并替换 '.../xxxx' 即可
+  // return http.get<OrderItem | null>('.../xxxx', {
+  //   params: { id: id } as UTSJSONObject
+  // } as HttpRequestConfig);
   return new Promise<OrderItem | null>((resolve) => {
     setTimeout((): void => {
       // 两个分支类型不同，用 if 而不是三元（分册 1.20）
@@ -482,8 +587,14 @@ export function fetchOrderDetail(id: number): Promise<OrderItem | null> {
  * @param title 订单标题，不能为空
  * @returns 创建后的订单（含后端生成的 id）
  */
-export function createOrder(title: string): Promise<OrderItem> {
+export function createOrderApi(title: string): Promise<OrderItem> {
   // TODO 后端就绪后换成 http.post，签名不动
+  // 联调时：注释掉下方 Mock return，取消下面 5 行注释并替换 '.../xxxx' 即可
+  // return http.post<OrderItem>('.../xxxx', {
+  //   title: title
+  // } as UTSJSONObject, {
+  //   params: {} as UTSJSONObject
+  // } as HttpRequestConfig);
   return new Promise<OrderItem>((resolve) => {
     setTimeout((): void => {
       resolve({
@@ -502,8 +613,14 @@ export function createOrder(title: string): Promise<OrderItem> {
  * @param id 订单主键
  * @returns 是否删除成功
  */
-export function deleteOrder(id: number): Promise<boolean> {
+export function deleteOrderApi(id: number): Promise<boolean> {
   // TODO 后端就绪后换成 http.delete，签名不动
+  // 联调时：注释掉下方 Mock return，取消下面 5 行注释并替换 '.../xxxx' 即可
+  // return http.delete<boolean>('.../xxxx', {
+  //   id: id
+  // } as UTSJSONObject, {
+  //   params: {} as UTSJSONObject
+  // } as HttpRequestConfig);
   return new Promise<boolean>((resolve) => {
     setTimeout((): void => {
       resolve(true);
@@ -515,7 +632,7 @@ export function deleteOrder(id: number): Promise<boolean> {
 页面侧**完全不知道数据是假的**，4.3.1 的代码一行都不用改：
 
 ```uts
-import { fetchOrderList, createOrder, deleteOrder } from '@/src/api/order/order.uts';
+import { fetchOrderListApi, createOrderApi, deleteOrderApi } from '@/src/api/order/order.uts';
 ```
 
 **后端就绪时只替换函数体**（签名 / JSDoc 全部保留）：
@@ -528,7 +645,7 @@ import { fetchOrderList, createOrder, deleteOrder } from '@/src/api/order/order.
  * @param keyword 标题关键词，空串表示不筛选
  * @returns 订单数组
  */
-export function fetchOrderList(pageNo: number = 1, pageSize: number = 10, keyword: string = ''): Promise<Array<OrderItem>> {
+export function fetchOrderListApi(pageNo: number = 1, pageSize: number = 10, keyword: string = ''): Promise<Array<OrderItem>> {
   return http.get<UTSJSONObject>('/api/v1/order/list', {
     params: { pageNo: pageNo, pageSize: pageSize, keyword: keyword } as UTSJSONObject
   } as HttpRequestConfig).then((data: UTSJSONObject): Array<OrderItem> => {
@@ -693,7 +810,53 @@ cardRef.value?.$callMethod('scrollToTop');
 | `components/common/` | ❌ | 纯展示外壳 |
 | `src/components/`（全局组件） | ❌ | 同上；要请求能力就让调用方传回调 |
 
-### 4.5.6 组件自检
+### 4.5.6 注释与 JSDoc（所有方法必写）
+
+- **每一个方法都必须有注释，统一用 JSDoc**：事件处理函数、`computed`、`watch` 回调、`defineExpose` 暴露的方法、页面级工具函数、组合式函数（composable）、api 接口函数 —— 一个都不能裸奔。
+- JSDoc 三件套：
+  1. **一句职责**：这个方法做什么，不写实现细节；
+  2. **`@param` 逐参写全**：含义 + 默认值 + 不传时的行为（类型已由签名表达，不必重复）；
+  3. **`@returns`**：有返回值就写，语义不显然时说明清楚（如「空串表示上传失败」）。
+- 组件内的状态变量（`ref` / `reactive`）不逐个注释；`computed` 属于方法，按 JSDoc 写。
+- 方法体内部不写逐行注释，只在关键分支写「为什么」（分册 5 铁律 6）。
+
+```uts
+// ❌ 裸方法：调用方看不出 append 的语义与 pageNo 的起始值
+function loadList(append: boolean, pageNo: number): void { ... }
+
+// ✅ 职责 + 入参语义 + 默认行为
+/**
+ * 加载订单列表
+ * @param append true 追加到现有列表，false 重置列表（下拉刷新）
+ * @param pageNo 页码，从 1 开始
+ */
+function loadList(append: boolean, pageNo: number): void { ... }
+
+// ✅ 有返回值时补 @returns
+/**
+ * 计算订单总价
+ * @param list 订单明细
+ * @returns 总价（分），空列表返回 0
+ */
+function calcTotal(list: Array<OrderItem>): number { ... }
+```
+
+`computed` 与事件处理同样按这个格式写：
+
+```uts
+/** 是否展示空态：加载完成且列表为空 */
+const isEmpty = computed((): boolean => !loading.value && list.value.length == 0);
+
+/**
+ * 点击订单项
+ * @param item 被点击的订单
+ */
+function handleItemClick(item: OrderItem): void {
+  // 跳转逻辑
+}
+```
+
+### 4.5.7 组件自检
 
 - [ ] **单一根节点**，`<script setup lang="uts">`
 - [ ] props 用运行时对象，**一个业务对象一个 prop**，必填 `required: true`、布尔默认 `false`
@@ -701,7 +864,7 @@ cardRef.value?.$callMethod('scrollToTop');
 - [ ] 事件用 `defineEmits<{...}>()`，需要时驼峰与短横线双写
 - [ ] 不直接改 props；只有需要暴露方法时才 `defineExpose`
 - [ ] L2 / common / 全局组件**不取数**；接口只在根视图（共用接口）与 L1 模块容器（专属接口）里调
-- [ ] 组件顶部一句用途注释；模板功能块各一句；变量不写注释（分册 5 铁律 6）
+- [ ] 组件顶部一句用途注释；模板功能块各一句；**所有方法（事件 / `computed` / `watch` / `defineExpose`）都有 JSDoc**；变量不写注释（4.5.6 / 分册 5 铁律 6）
 - [ ] 单文件 ≤ 500 行，层级 ≤ 3 级（分册 5 铁律 2）
 
 ---
@@ -786,4 +949,5 @@ pnpm lint && pnpm lint:style && pnpm test && pnpm typecheck
 - [ ] **15. 三态齐全** —— 加载 / 空 / 错误互斥
 - [ ] **16. easycom 优先** —— 页面私有组件手动 import
 - [ ] **17. 组件写法合规** —— 单根节点、运行时 props、一个业务对象一个 prop、`defineEmits<{...}>`、不直接改 props（4.5）
-- [ ] **18. 验证有输出** —— 声称完成前给出命令与结果；未跑真机要写明
+- [ ] **18. 方法注释齐全** —— 每个方法都有 JSDoc（职责 + `@param` + `@returns`），无裸函数（4.5.6）
+- [ ] **19. 验证有输出** —— 声称完成前给出命令与结果；未跑真机要写明

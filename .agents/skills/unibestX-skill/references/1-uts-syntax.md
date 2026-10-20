@@ -850,7 +850,7 @@ export * from './vdom/user.uts';
   ```text
   httpBasicDemo.js:123 loadMockData error: <ReferenceError: FooPageResult is not defined>
   ReferenceError: FooPageResult is not defined
-      at fetchFooList (.../getmainpackagebundle.js:1136:32)
+      at fetchFooListApi (.../getmainpackagebundle.js:1136:32)
       at Object.getFooList (.../getmainpackagebundle.js:1231:12)
       at .../getsubpackagebundle_src%2Fsub%2F.js:1529:49
   ```
@@ -869,7 +869,7 @@ export * from './vdom/user.uts';
   // ⚠️ 泛型实例化别名：别名 = 泛型本体 + 实参
   export type FooPageResult = PageResult<FooItem>;
 
-  export function fetchFooList(): Promise<FooPageResult> {
+  export function fetchFooListApi(): Promise<FooPageResult> {
     return Promise.resolve({
       list,
       hasMore: false,
@@ -913,8 +913,8 @@ export * from './vdom/user.uts';
   } as PageResult<FooItem>);
 
   // ✅ 正确：别名用在类型位置（返回值标注 / 回调参数标注）是安全的
-  export function fetchFooList(): Promise<FooPageResult> {
-    return fetchFooListRaw().then((res: FooPageResult): Array<FooItem> => res.list);
+  export function fetchFooListApi(): Promise<FooPageResult> {
+    return fetchFooListRawApi().then((res: FooPageResult): Array<FooItem> => res.list);
   }
   ```
 
@@ -1227,7 +1227,7 @@ export function joinQuery(query: Map<string, string>): string {
 }
 
 // ---------- 7. Promise：双参 .then(onFulfilled, onRejected)，严禁链式 .catch ----------
-export function fetchCouponList(pageNo: number = 1, pageSize: number = PAGE_SIZE): Promise<PageResult<CouponItem>> {
+export function fetchCouponListApi(pageNo: number = 1, pageSize: number = PAGE_SIZE): Promise<PageResult<CouponItem>> {
   return Promise.resolve({
     list: EMPTY_ITEMS,
     hasMore: false,
@@ -1235,8 +1235,8 @@ export function fetchCouponList(pageNo: number = 1, pageSize: number = PAGE_SIZE
   } as PageResult<CouponItem>);
 }
 
-export function fetchCouponDetail(id: number): Promise<CouponItem | null> {
-  return fetchCouponList(1, 1).then(
+export function fetchCouponDetailApi(id: number): Promise<CouponItem | null> {
+  return fetchCouponListApi(1, 1).then(
     (res: PageResult<CouponItem>): CouponItem | null => {
       if (res.list.length > 0) {
         return res.list[0];
@@ -1287,13 +1287,13 @@ export type CouponQuery = {
 
 ```uts
 // 形态 A：直接返回 Promise.resolve（mock / 同步逻辑）
-export function fetchList(): Promise<Array<CouponItem>> {
+export function fetchListApi(): Promise<Array<CouponItem>> {
   return Promise.resolve([] as Array<CouponItem>);
 }
 
 // 形态 B：链式 then —— 只用双参形式，失败即返回兜底值
-export function fetchTitle(id: number): Promise<string> {
-  return fetchDetail(id).then(
+export function fetchTitleApi(id: number): Promise<string> {
+  return fetchDetailApi(id).then(
     (item: CouponItem | null): string => {
       if (item == null) {
         return '';
@@ -1301,15 +1301,15 @@ export function fetchTitle(id: number): Promise<string> {
       return item.title;
     },
     (err: any): string => {
-      console.error('[coupon] fetchTitle 失败', err);
+      console.error('[coupon] fetchTitleApi 失败', err);
       return '';
     }
   );
 }
 
 // 形态 C：需要「抛出」失败时用 Promise.reject，不要 throw
-export function fetchRequired(id: number): Promise<CouponItem> {
-  return fetchDetail(id).then(
+export function fetchRequiredApi(id: number): Promise<CouponItem> {
+  return fetchDetailApi(id).then(
     (item: CouponItem | null): Promise<CouponItem> => {
       if (item == null) {
         return Promise.reject(new Error('优惠券不存在')) as Promise<CouponItem>;
@@ -1442,7 +1442,7 @@ export const couponFormatter: CouponFormatter = new CouponFormatter();
 export * from './types.uts';      // 纯类型叶子，可以转发
 export * from './format.uts';     // 每个符号只在这一层转发一次
 
-// ❌ 不要：export const couponApi = { fetchList, fetchDetail }
+// ❌ 不要：export const couponApi = { fetchListApi, fetchDetailApi }
 // ❌ 不要：子文件再 export * 一次（两层转发 → Kotlin 符号改名 __1）
 ```
 

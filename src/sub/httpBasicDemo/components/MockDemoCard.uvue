@@ -112,7 +112,7 @@
 
 <script setup lang="uts">
 import { computed, ref } from 'vue';
-import { fetchMockFooList, fetchMockLogin } from '@/src/api/example.uts';
+import { fetchMockFooListApi, fetchMockLoginApi } from '@/src/api/example.uts';
 import type { FooItem, MockLoginParams, MockLoginResult, PageResult } from '@/src/api/example.uts';
 import { foodSampleReportDishDetailUsingPost } from '@/src/api/generated/index.uts';
 import type { FoodSampleReportDishDetailUsingPostBody, FoodSampleReportDishDetailUsingPostResponse } from '@/src/api/generated/index.uts';
@@ -140,7 +140,7 @@ const dishErrorMsg = ref<string>('');
 const listQuery = useQuery<PageResult<FooItem>>({
   queryKey: ['mockFooList', 'demo'],
   queryFn: (_ctx: QueryFunctionContext): Promise<PageResult<FooItem>> => {
-    return fetchMockFooList();
+    return fetchMockFooListApi();
   },
   enabled: false
 } as QueryOptions<PageResult<FooItem>>);
@@ -152,7 +152,7 @@ const listQuery = useQuery<PageResult<FooItem>>({
 const loginMutation = useMutation<MockLoginResult, MockLoginParams>({
   mutationKey: ['mockLogin'],
   mutationFn: (params: MockLoginParams): Promise<MockLoginResult> => {
-    return fetchMockLogin(params.username, params.password);
+    return fetchMockLoginApi(params.username, params.password);
   }
 } as MutationOptions<MockLoginResult, MockLoginParams>);
 

@@ -81,7 +81,7 @@ const FOO_RESOURCE: string = '/test';
  * 它是临时文件托管，不是真正的 OSS：
  *  - 单文件上限 100 MB；
  *  - 默认 1 小时过期，可通过表单字段 `expire` 延长到最多 172800 秒（48 小时），
- *    本文件里的 `uploadFooFile` 已带上 `expire=172800`；
+ *    本文件里的 `uploadFooFileApi` 已带上 `expire=172800`；
  *  - 上传成功返回 JSON：`{ status: 'success', data: { url: 'https://tmpfiles.org/<id>/<name>' } }`，
  *    其中 `url` 是**预览页**，图片直链要在域名后插入 `/dl/`（本文件自动转换）；
  *  - 文件是**公开可访问**的，别传隐私内容。
@@ -292,7 +292,7 @@ function queryFooPage(
  * @param pageSize 分页大小（默认 10），对应查询参数 `limit`
  * @param keyword 搜索关键字（默认空字符串）。空串不传，非空走接口的 `search` 参数
  */
-export function fetchFooList(pageNo: number = 1, pageSize: number = 10, keyword: string = ''): Promise<PageResult<FooItem>> {
+export function fetchFooListApi(pageNo: number = 1, pageSize: number = 10, keyword: string = ''): Promise<PageResult<FooItem>> {
   return queryFooPage(pageNo, pageSize, keyword);
 }
 
@@ -306,12 +306,12 @@ export function fetchFooList(pageNo: number = 1, pageSize: number = 10, keyword:
  * 因此改为一次拉全量（演示资源仅几十条）后按数字 id 取最大者；接真实后端时换成
  * `?sortBy=id&order=desc&limit=N` 之类服务端分页即可，函数签名不变。
  *
- * 与 `fetchFooList` 分开而不是给它追加排序参数，是为了保持后者已冻结的
+ * 与 `fetchFooListApi` 分开而不是给它追加排序参数，是为了保持后者已冻结的
  * (pageNo, pageSize, keyword) 签名不动。
  *
  * @param pageSize 取最近多少条（默认 2）
  */
-export function fetchFooLatest(pageSize: number = 2): Promise<PageResult<FooItem>> {
+export function fetchFooLatestApi(pageSize: number = 2): Promise<PageResult<FooItem>> {
   return http.get<Array<UTSJSONObject>>(FOO_RESOURCE, {
     params: { limit: 0 } as UTSJSONObject,
     baseURL: FOO_BASE_URL,
@@ -352,7 +352,7 @@ export function fetchFooLatest(pageSize: number = 2): Promise<PageResult<FooItem
  * @returns 后端回包解包后为空时 resolve 为 `null`（**调用方必须自行判空**）；
  *          HTTP 4xx/5xx 与业务码非 0 仍由 http 拦截器统一 toast 并 reject，不会走到 null 分支
  */
-export function fetchFooById(id: number): Promise<FooItem | null> {
+export function fetchFooByIdApi(id: number): Promise<FooItem | null> {
   return http.get<UTSJSONObject>(`${FOO_RESOURCE}/${id}`, {
     baseURL: FOO_BASE_URL,
     extra: {
@@ -372,7 +372,7 @@ export function fetchFooById(id: number): Promise<FooItem | null> {
  *             （mockapi 会为资源自带字段 `avatar` / `createdAt` 自动补值）
  * @returns 接口回包里的新记录（**新记录的 id 由后端生成**，以回包里的值为准）
  */
-export function createFoo(data: FooItem): Promise<FooItem> {
+export function createFooApi(data: FooItem): Promise<FooItem> {
   const payload = {
     name: data.name,
     desc: data.desc
@@ -393,7 +393,7 @@ export function createFoo(data: FooItem): Promise<FooItem> {
  * @param data 新字段值（按接口契约映射成请求体 `{ name, desc }`）
  * @returns 后端回包里的最新记录
  */
-export function updateFoo(id: number, data: FooItem): Promise<FooItem> {
+export function updateFooApi(id: number, data: FooItem): Promise<FooItem> {
   const payload = {
     name: data.name,
     desc: data.desc
@@ -413,7 +413,7 @@ export function updateFoo(id: number, data: FooItem): Promise<FooItem> {
  * @param id 目标 Foo 主键（拼进 URL）
  * @returns 请求成功即 resolve(true)；删除失败由 http 拦截器统一 toast 并 reject
  */
-export function deleteFoo(id: number): Promise<boolean> {
+export function deleteFooApi(id: number): Promise<boolean> {
   return http.delete<UTSJSONObject>(`${FOO_RESOURCE}/${id}`, null, {
     baseURL: FOO_BASE_URL,
     extra: {
@@ -446,7 +446,7 @@ export const FOO_DOWNLOAD_URL: string = 'https://web-assets.dcloud.net.cn/unidoc
  * 演示「临时切域名」：默认走 `DEFAULT_HTTP_OPTIONS` 的主域名，
  * 这里显式用 `API_DOMAINS.SECONDARY` 覆盖单次请求。
  */
-export function fetchFooRemote(): Promise<FooItem> {
+export function fetchFooRemoteApi(): Promise<FooItem> {
   return http.get<UTSJSONObject>('/foo', {
     params: {
       name: 'unix',
@@ -518,7 +518,7 @@ function parseUploadResponse(raw: any): string {
  * @param ignoreAuth 是否跳过鉴权，演示接口传 true
  * @param uploadPathOrUrl 上传目标地址（默认取 `FOO_UPLOAD_PATH`）
  */
-export function uploadFooFile(
+export function uploadFooFileApi(
   filePath: string,
   ignoreAuth: boolean = false,
   uploadPathOrUrl: string = FOO_UPLOAD_PATH
@@ -557,7 +557,7 @@ export function uploadFooFile(
  * @param url 下载地址（支持完整 http(s) 地址；相对路径会与 baseURL 拼接）
  * @param onProgress 下载进度回调（progress 为 0~100 的百分比），不需要进度时传 null
  */
-export function downloadFooFile(
+export function downloadFooFileApi(
   url: string,
   onProgress: ((progress: number) => void) | null = null
 ): Promise<DownloadResult> {
@@ -606,7 +606,7 @@ const MOCK_MISS_HINT: string = 'Mock 接口未命中：响应不是 JSON。请�
  * 回包经 request 拦截器解包后是 `{ id, name, list, total, page, pageSize }`，
  * 这里映射成与真实接口一致的 `PageResult<FooItem>`。
  */
-export function fetchMockFooList(): Promise<PageResult<FooItem>> {
+export function fetchMockFooListApi(): Promise<PageResult<FooItem>> {
   return http.get<UTSJSONObject>('/api/foo', {
     params: {
       page: 1,
@@ -640,7 +640,7 @@ export function fetchMockFooList(): Promise<PageResult<FooItem>> {
  * mock/auth.ts 里密码只接受 `123456` / `admin`，其它密码会返回业务错误码，
  * 由 request 拦截器统一 toast 并 reject（正好用来演示失败分支）。
  */
-export function fetchMockLogin(username: string, password: string): Promise<MockLoginResult> {
+export function fetchMockLoginApi(username: string, password: string): Promise<MockLoginResult> {
   const payload = {
     username,
     password
