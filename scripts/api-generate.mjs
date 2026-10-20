@@ -4,6 +4,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pkg from 'openapi-ts-request';
 import readConfigPkg from 'openapi-ts-request/dist/readConfig.js';
+import { transformGeneratedServiceCode, transformGeneratedTypesCode } from './openapi-uts-transform.mjs';
 
 const { generateService } = pkg;
 const { readConfig } = readConfigPkg;
@@ -114,6 +115,16 @@ function postProcessUtsFiles(targetDir) {
 
     if (entry.isFile() && entry.name.endsWith('.ts') && !entry.name.endsWith('.d.ts')) {
       let content = fs.readFileSync(fullPath, 'utf8');
+
+      // 0. 服务文件：把 UTS 不支持的内联对象字面量类型 / 对象展开改写成具名 type + 统一配置构造函数
+      if (content.includes('export function ')) {
+        content = transformGeneratedServiceCode(content);
+      }
+
+      // 0b. 数据模型文件：把嵌套的对象字面量类型递归提升为具名 type（UTS110111101）
+      if (entry.name === 'types.ts' || /^export type \w+ = \{\n[\s\S]*\n  \w+\??: \{/.test(content)) {
+        content = transformGeneratedTypesCode(content);
+      }
 
       // 1. 将相对导入补全为 .uts 后缀（满足 uni-app X 跨端编译及 uts2js 静态解析要求）
       content = content.replace(/from '(\.\/[^']+)'/g, (match, p1) => {

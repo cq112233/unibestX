@@ -1,0 +1,583 @@
+/**
+ * QueryClient 与 Vue 插件调度中枢 (QueryClient & VueQueryPlugin)
+ *
+ * 职责：
+ * 1. 管理全局查询缓存池（QueryCache）与状态发布订阅；
+ * 2. 支持 app.use(VueQueryPlugin) 通过 Vue provide 全局注入；
+ * 3. 支持组件内 useQueryClient() 通过 inject 获取或回退全局单例。
+ */
+
+import { inject } from 'vue';
+import type {
+  MutationFilterParam,
+  MutationFilters,
+  MutationKey,
+  QueryCacheRecord,
+  QueryFilterParam,
+  QueryFilters,
+  QueryKey,
+  QueryStatus,
+  VueQueryPluginOptions
+} from './types.uts';
+
+/** 全局 Vue provide / inject 标识键 */
+export const VUE_QUERY_CLIENT_KEY: string = 'VUE_QUERY_CLIENT';
+
+/**
+ * 序列化查询键为稳定字符串哈希
+ */
+export function serializeQueryKey(key: QueryKey): string {
+  if (typeof key == 'string') {
+    return key as string;
+  }
+  try {
+    return JSON.stringify(key);
+  }
+  catch (_) {
+    return `${key}`;
+  }
+}
+
+/**
+ * 从 QueryFilterParam 解析出 QueryKey
+ */
+export function resolveQueryKeyFromParam(param: QueryFilterParam | null): QueryKey | null {
+  if (param == null) {
+    return null;
+  }
+  if (typeof param == 'string') {
+    return param as string;
+  }
+  if (Array.isArray(param)) {
+    return param as Array<any>;
+  }
+  try {
+    const obj = param as QueryFilters;
+    if (obj.queryKey != null) {
+      return obj.queryKey!;
+    }
+  }
+  catch (_) {}
+  return null;
+}
+
+/**
+ * 从 MutationFilterParam 解析出 MutationKey
+ */
+export function resolveMutationKeyFromParam(param: MutationFilterParam | null): MutationKey | null {
+  if (param == null) {
+    return null;
+  }
+  if (typeof param == 'string') {
+    return param as string;
+  }
+  if (Array.isArray(param)) {
+    return param as Array<any>;
+  }
+  try {
+    const obj = param as MutationFilters;
+    if (obj.mutationKey != null) {
+      return obj.mutationKey!;
+    }
+  }
+  catch (_) {}
+  return null;
+}
+
+/**
+ * 判断两个 QueryKey 是否匹配（支持前缀模糊匹配，对标 TanStack Query）
+ */
+export function matchesQueryKey(target: QueryKey, candidate: QueryKey, exact: boolean = false): boolean {
+  const targetHash = serializeQueryKey(target);
+  const candidateHash = serializeQueryKey(candidate);
+  if (targetHash === candidateHash) {
+    return true;
+  }
+  if (exact == true) {
+    return false;
+  }
+  // 数组前缀匹配：['todos'] 匹配 ['todos', 1]、['todos', { page: 1 }]
+  if (Array.isArray(target) && Array.isArray(candidate)) {
+    const targetArr = target as Array<any>;
+    const candidateArr = candidate as Array<any>;
+    if (targetArr.length > candidateArr.length) {
+      return false;
+    }
+    for (let i = 0; i < targetArr.length; i = i + 1) {
+      if (serializeQueryKey(targetArr[i]) !== serializeQueryKey(candidateArr[i])) {
+        return false;
+      }
+    }
+    return true;
+  }
+  // 字符串前缀匹配：'todos' 匹配 ['todos', 1]
+  if (typeof target == 'string' && Array.isArray(candidate)) {
+    const candidateArr = candidate as Array<any>;
+    if (candidateArr.length > 0 && serializeQueryKey(candidateArr[0]) === (target as string)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * 查询客户端中枢 (QueryClient)
+ */
+export class QueryClient {
+  /** 内存缓存字典：存储所有 queryKey 对应的数据状态 */
+  private cache: Map<string, QueryCacheRecord<any>> = new Map();
+  /** 已登记的 QueryKey 原始结构字典（用于支持前缀范围匹配广播） */
+  private keyRegistry: Map<string, QueryKey> = new Map();
+  /** 监听者队列：当某 key 数据变化或失效时通知对应 hooks */
+  private listeners: Map<string, Array<() => void>> = new Map();
+  /** 在飞请求 Promise 字典：实现跨组件相同 queryKey 并发合并去重 */
+  private inflight: Map<string, Promise<any>> = new Map();
+  /** 在飞请求取消回调队列：支持 cancelQueries(filters) 掐断底层真实网络任务 */
+  private cancelHandlers: Map<string, Array<() => void>> = new Map();
+  /** 全局当前执行中的 Mutation 总数 */
+  private totalMutatingCount: number = 0;
+  /** 按 mutationKey 分组统计执行中的 Mutation 计数 */
+  private activeMutations: Map<string, number> = new Map();
+
+  /**
+   * 从缓存中读取指定 queryKey 的数据
+   */
+  getQueryData<T>(key: QueryKey): T | null {
+    const hash = serializeQueryKey(key);
+    const record = this.cache.get(hash);
+    if (record != null) {
+      return (record.data as any) as T;
+    }
+    return null;
+  }
+
+  /**
+   * 手动向指定 queryKey 写入或覆盖缓存数据
+   */
+  setQueryData<T>(key: QueryKey, data: T | null): void {
+    const hash = serializeQueryKey(key);
+    const existing = this.cache.get(hash);
+    const now = Date.now();
+    const updatedRecord: QueryCacheRecord<T> = {
+      data,
+      error: null,
+      dataUpdatedAt: now,
+      errorUpdatedAt: 0,
+      status: 'success' as QueryStatus,
+      isFetching: false
+    };
+    if (existing != null) {
+      updatedRecord.isFetching = existing.isFetching;
+    }
+    this.cache.set(hash, updatedRecord as QueryCacheRecord<any>);
+    this.notify(key);
+  }
+
+  /**
+   * 获取指定 queryKey 的完整缓存状态（含时间戳、状态等）
+   */
+  getQueryState<T>(key: QueryKey): QueryCacheRecord<T> | null {
+    const hash = serializeQueryKey(key);
+    const record = this.cache.get(hash);
+    if (record != null) {
+      return (record as any) as QueryCacheRecord<T>;
+    }
+    return null;
+  }
+
+  /**
+   * 更新指定 queryKey 的内部缓存记录
+   */
+  setQueryState<T>(key: QueryKey, record: QueryCacheRecord<T>): void {
+    const hash = serializeQueryKey(key);
+    this.cache.set(hash, record as QueryCacheRecord<any>);
+    this.notify(key);
+  }
+
+  /**
+   * 注册指定 queryKey 的请求取消回调
+   */
+  registerCancelHandler(key: QueryKey, handler: () => void): () => void {
+    const hash = serializeQueryKey(key);
+    let handlers = this.cancelHandlers.get(hash);
+    if (handlers == null) {
+      handlers = [];
+      this.cancelHandlers.set(hash, handlers);
+    }
+    handlers.push(handler);
+
+    return (): void => {
+      const cur = this.cancelHandlers.get(hash);
+      if (cur != null) {
+        const idx = cur.indexOf(handler);
+        if (idx !== -1) {
+          cur.splice(idx, 1);
+        }
+        if (cur.length === 0) {
+          this.cancelHandlers.delete(hash);
+        }
+      }
+    };
+  }
+
+  /**
+   * 取消匹配的查询（对标 TanStack Query cancelQueries）
+   * @param filters 可选目标查询键或过滤器对象，不传则取消全部在飞查询
+   */
+  cancelQueries(filters: QueryFilterParam | null = null): void {
+    const targetKey = resolveQueryKeyFromParam(filters);
+    if (targetKey == null) {
+      // 全量取消
+      this.cancelHandlers.forEach((handlers: Array<() => void>) => {
+        for (let i = 0; i < handlers.length; i = i + 1) {
+          try {
+            handlers[i]();
+          }
+          catch (e) {
+            console.warn('[queryClient] cancelHandler error', e);
+          }
+        }
+      });
+      this.cancelHandlers.clear();
+      this.inflight.clear();
+      return;
+    }
+
+    const hash = serializeQueryKey(targetKey);
+    const handlers = this.cancelHandlers.get(hash);
+    if (handlers != null) {
+      for (let i = 0; i < handlers.length; i = i + 1) {
+        try {
+          handlers[i]();
+        }
+        catch (e) {
+          console.warn('[queryClient] cancelHandler error', e);
+        }
+      }
+      this.cancelHandlers.delete(hash);
+    }
+    this.inflight.delete(hash);
+
+    const record = this.cache.get(hash);
+    if (record != null) {
+      record.isFetching = false;
+    }
+  }
+
+  /**
+   * 使匹配的查询失效（标记为过期并广播触发重新拉取，对标 TanStack Query invalidateQueries）
+   * @param filters 可选目标查询键或过滤器对象，不传则失效所有缓存
+   */
+  invalidateQueries(filters: QueryFilterParam | null = null): void {
+    const targetKey = resolveQueryKeyFromParam(filters);
+    if (targetKey == null) {
+      // 全量失效广播
+      this.cache.forEach((record: QueryCacheRecord<any>) => {
+        record.dataUpdatedAt = 0;
+      });
+      this.listeners.forEach((subscribers: Array<() => void>) => {
+        for (let i = 0; i < subscribers.length; i = i + 1) {
+          subscribers[i]();
+        }
+      });
+      return;
+    }
+
+    // 匹配所有符合前缀范围的候选 key
+    const matchedHashes: Array<string> = [];
+    this.keyRegistry.forEach((registeredKey: QueryKey, hash: string) => {
+      if (matchesQueryKey(targetKey, registeredKey)) {
+        matchedHashes.push(hash);
+      }
+    });
+
+    const targetHash = serializeQueryKey(targetKey);
+    if (!matchedHashes.includes(targetHash)) {
+      matchedHashes.push(targetHash);
+    }
+
+    for (let i = 0; i < matchedHashes.length; i = i + 1) {
+      const h = matchedHashes[i];
+      const record = this.cache.get(h);
+      if (record != null) {
+        record.dataUpdatedAt = 0;
+      }
+      const subs = this.listeners.get(h);
+      if (subs != null) {
+        for (let j = 0; j < subs.length; j = j + 1) {
+          subs[j]();
+        }
+      }
+    }
+  }
+
+  /**
+   * 移除匹配的查询缓存（对标 TanStack Query removeQueries）
+   */
+  removeQueries(filters: QueryFilterParam | null = null): void {
+    const targetKey = resolveQueryKeyFromParam(filters);
+    if (targetKey == null) {
+      this.cache.clear();
+      return;
+    }
+    const hash = serializeQueryKey(targetKey);
+    this.cache.delete(hash);
+  }
+
+  /**
+   * 重置查询为初始状态（对标 TanStack Query resetQueries）
+   */
+  resetQueries(filters: QueryFilterParam | null = null): void {
+    this.invalidateQueries(filters);
+  }
+
+  /**
+   * 重新拉取匹配的查询（对标 TanStack Query refetchQueries）
+   */
+  refetchQueries(filters: QueryFilterParam | null = null): void {
+    this.invalidateQueries(filters);
+  }
+
+  /**
+   * 注册查询键状态变更监听函数
+   */
+  subscribe(key: QueryKey, listener: () => void): () => void {
+    const hash = serializeQueryKey(key);
+    this.keyRegistry.set(hash, key);
+    let subs = this.listeners.get(hash);
+    if (subs == null) {
+      subs = [];
+      this.listeners.set(hash, subs);
+    }
+    subs.push(listener);
+
+    // 返回取消订阅函数
+    return (): void => {
+      const current = this.listeners.get(hash);
+      if (current != null) {
+        const idx = current.indexOf(listener);
+        if (idx !== -1) {
+          current.splice(idx, 1);
+        }
+        if (current.length === 0) {
+          this.listeners.delete(hash);
+          this.keyRegistry.delete(hash);
+        }
+      }
+    };
+  }
+
+  /**
+   * 广播通知监听此 queryKey 的所有组件更新
+   */
+  notify(key: QueryKey): void {
+    const hash = serializeQueryKey(key);
+    const subs = this.listeners.get(hash);
+    if (subs != null) {
+      for (let i = 0; i < subs.length; i = i + 1) {
+        subs[i]();
+      }
+    }
+  }
+
+  /**
+   * 获取或复用同 key 的在飞 Promise
+   */
+  getInflightPromise<T>(key: QueryKey): Promise<T> | null {
+    const hash = serializeQueryKey(key);
+    const p = this.inflight.get(hash);
+    if (p != null) {
+      return (p as any) as Promise<T>;
+    }
+    return null;
+  }
+
+  /**
+   * 登记在飞 Promise
+   */
+  setInflightPromise<T>(key: QueryKey, promise: Promise<T>): void {
+    const hash = serializeQueryKey(key);
+    this.inflight.set(hash, promise as Promise<any>);
+  }
+
+  /**
+   * 移除在飞 Promise
+   */
+  removeInflightPromise(key: QueryKey): void {
+    const hash = serializeQueryKey(key);
+    this.inflight.delete(hash);
+  }
+
+  /**
+   * 登记变更操作启动并维护 isMutating 计数
+   */
+  registerMutation(key: MutationKey | null = null): () => void {
+    this.totalMutatingCount = this.totalMutatingCount + 1;
+    let hash: string = '';
+    if (key != null) {
+      hash = serializeQueryKey(key as QueryKey);
+      const cur = this.activeMutations.get(hash) ?? 0;
+      this.activeMutations.set(hash, cur + 1);
+    }
+
+    let unregistered = false;
+    return (): void => {
+      if (unregistered == true) {
+        return;
+      }
+      unregistered = true;
+      if (this.totalMutatingCount > 0) {
+        this.totalMutatingCount = this.totalMutatingCount - 1;
+      }
+      if (hash.length > 0) {
+        const count = this.activeMutations.get(hash) ?? 0;
+        if (count <= 1) {
+          this.activeMutations.delete(hash);
+        }
+        else {
+          this.activeMutations.set(hash, count - 1);
+        }
+      }
+    };
+  }
+
+  /**
+   * 探测当前是否有执行中的 Mutation 变更（对标 TanStack Query isMutating）
+   * @param filters 可选过滤条件或变更键，不传则返回全局正在执行的变更总数
+   * @returns 匹配的正在执行中的变更数量（0 表示当前无变更）
+   */
+  isMutating(filters: MutationFilterParam | null = null): number {
+    const targetKey = resolveMutationKeyFromParam(filters);
+    if (targetKey == null) {
+      return this.totalMutatingCount;
+    }
+    const hash = serializeQueryKey(targetKey as QueryKey);
+    return this.activeMutations.get(hash) ?? 0;
+  }
+
+  /**
+   * 清空所有查询缓存与在飞请求
+   */
+  clear(): void {
+    this.cancelQueries(null);
+    this.cache.clear();
+    this.listeners.clear();
+    this.inflight.clear();
+    this.cancelHandlers.clear();
+    this.activeMutations.clear();
+    this.totalMutatingCount = 0;
+  }
+}
+
+/** 默认全局 QueryClient 单例（无需强制使用插件即可开箱即用） */
+export const defaultQueryClient: QueryClient = new QueryClient();
+
+/**
+ * 获取当前上下文中的 QueryClient
+ * 优先从 Vue inject('VUE_QUERY_CLIENT') 读取，未提供时无缝回退到 defaultQueryClient
+ */
+export function useQueryClient(customClient: QueryClient | null = null): QueryClient {
+  if (customClient != null) {
+    return customClient;
+  }
+  const injected = inject<QueryClient | null>(VUE_QUERY_CLIENT_KEY, null);
+  if (injected != null) {
+    return injected;
+  }
+  return defaultQueryClient;
+}
+
+/**
+ * TanStack Vue Query 兼容插件
+ * 用于 app.use(VueQueryPlugin, { queryClient }) 全局注册
+ */
+export const VueQueryPlugin = {
+  install(app: VueApp, options?: VueQueryPluginOptions | null): void {
+    const client: QueryClient = options != null && options.queryClient != null
+      ? options.queryClient as QueryClient
+      : defaultQueryClient;
+    if (app != null) {
+      app.provide(VUE_QUERY_CLIENT_KEY, client);
+    }
+  }
+};
+
+/**
+ * 全局网络状态在线管理器 (OnlineManager)
+ * 深度对接 uni.onNetworkStatusChange，支持断网重连自动广播与恢复
+ */
+export class OnlineManager {
+  private isOnline: boolean = true;
+  private listeners: Array<(isOnline: boolean) => void> = [];
+  private setupDone: boolean = false;
+
+  constructor() {
+    this.setupListener();
+  }
+
+  private setupListener(): void {
+    if (this.setupDone == true) {
+      return;
+    }
+    this.setupDone = true;
+    try {
+      uni.onNetworkStatusChange((res) => {
+        const connected = res.isConnected;
+        const wasOnline = this.isOnline;
+        this.isOnline = connected;
+        if (connected == true && wasOnline == false) {
+          this.notify(true);
+        }
+        else if (connected == false && wasOnline == true) {
+          this.notify(false);
+        }
+      });
+    }
+    catch (_) {}
+  }
+
+  /**
+   * 当前设备是否处于在线状态
+   */
+  isNetworkOnline(): boolean {
+    return this.isOnline;
+  }
+
+  /**
+   * 手动模拟或覆盖网络在线状态（常用于测试或平台自定义桥接）
+   */
+  setOnline(online: boolean): void {
+    const prev = this.isOnline;
+    this.isOnline = online;
+    if (online != prev) {
+      this.notify(online);
+    }
+  }
+
+  /**
+   * 订阅网络在线状态改变
+   */
+  subscribe(listener: (isOnline: boolean) => void): () => void {
+    this.listeners.push(listener);
+    return (): void => {
+      const idx = this.listeners.indexOf(listener);
+      if (idx !== -1) {
+        this.listeners.splice(idx, 1);
+      }
+    };
+  }
+
+  private notify(online: boolean): void {
+    for (let i = 0; i < this.listeners.length; i = i + 1) {
+      try {
+        this.listeners[i](online);
+      }
+      catch (e) {
+        console.warn('[OnlineManager] listener error', e);
+      }
+    }
+  }
+}
+
+/** 全局网络状态管理器单例 (对标 TanStack Query onlineManager) */
+export const onlineManager: OnlineManager = new OnlineManager();

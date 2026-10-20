@@ -82,7 +82,7 @@ declare global {
   //
   // 为什么需要补：
   //   `#ifdef APP-ANDROID` 段里写的不是 `uni.*`，而是 UTS 直通原生的全局
-  //   （src/utils/backPress/index.uts:26、:34）。它们的声明由 HBuilderX 自带的 uts-types
+  //   （src/hooks/useBackPressExit.uts:63、:71）。它们的声明由 HBuilderX 自带的 uts-types
   //   提供，**不挂在** npm 包 @dcloudio/types 里：
   //     · UTSAndroid —— HBuilderX plugins/uniapp-uts-v1/uts-types/app-android/UTSAndroid.d.ts
   //                     文件末尾 `declare global { var UTSAndroid : UTSAndroid; }`；
@@ -717,7 +717,7 @@ declare global {
   // 真源是 `interface`，这里同样用声明合并补齐（注意类型参数要与原声明逐字一致，否则无法合并）；
   // 该 interface 属于 `declare namespace Page`（不是 UniNamespace），故补在 Page 命名空间下。
   //
-  // ⚠️ 这是 src/router/utils/utils.uts 的 getCurrentPageOptions() 赖以取到 query 的字段：
+  // ⚠️ 这是 uni_modules/route-bestX/utils/utils.uts 的 getCurrentPageOptions() 赖以取到 query 的字段：
   //    uni.onAppRoute 要等目标页 onShow 之后才触发，冷启动 / 返回 / 页面重新显示时
   //    需要一个不依赖事件的当前页参数来源，走的就是这个 `options`。
   // ==========================================

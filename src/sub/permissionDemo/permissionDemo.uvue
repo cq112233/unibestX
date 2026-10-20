@@ -1,0 +1,118 @@
+<template>
+  <view class="flex flex-col flex-1 bg-[#f8fafc]">
+    <scroll-view direction="vertical" class="flex-1 flex flex-col p-[16px] pb-safe">
+      <view class="w-full rounded-[16px] bg-[#ffffff] border-[1px] border-solid border-[#e2e8f0] p-[16px] mb-[12px]">
+        <text class="text-[16px] font-bold text-[#1e293b]">用户信息中的权限结果</text>
+        <text class="text-[12px] leading-[19px] text-[#64748b] mt-[6px]">登录接口把 permissions 直接放进用户信息，页面和按钮读取同一份结果，不再额外维护权限配置。</text>
+        <view class="w-full rounded-[10px] bg-[#0f172a] p-[12px] mt-[10px]">
+          <text class="text-[11px] leading-[18px] text-[#38bdf8]" style="font-family: monospace;">permissions: {{ permissionText }}</text>
+        </view>
+        <view class="flex flex-row flex-wrap mt-[10px]">
+          <view
+            v-for="preset in presetList"
+            :key="preset.key"
+            class="px-[12px] h-[32px] rounded-[8px] bg-[#eff6ff] border-[1px] border-solid border-[#bfdbfe] flex flex-row items-center justify-center mr-[8px] mb-[8px]"
+            @click="applyPreset(preset)"
+          >
+            <text class="text-[12px] font-bold text-[#2563eb]">{{ preset.label }}</text>
+          </view>
+        </view>
+      </view>
+
+      <view class="w-full rounded-[16px] bg-[#ffffff] border-[1px] border-solid border-[#e2e8f0] p-[16px] mb-[12px]">
+        <text class="text-[15px] font-bold text-[#1e293b]">页面级控制</text>
+        <text class="text-[12px] leading-[19px] text-[#64748b] mt-[6px]">下面的「报表页面入口」只有具备 report:read 才渲染。</text>
+
+        <view v-if="canViewReport" class="w-full rounded-[12px] bg-[#ecfdf5] border-[1px] border-solid border-[#a7f3d0] p-[14px] mt-[12px]">
+          <text class="text-[14px] font-bold text-[#047857]">📊 报表页面入口</text>
+          <text class="text-[12px] leading-[18px] text-[#065f46] mt-[4px]">具备 report:read，入口与页面内容正常展示。</text>
+        </view>
+        <view v-else class="w-full rounded-[12px] bg-[#f8fafc] border-[1px] border-solid border-[#e2e8f0] p-[14px] mt-[12px]">
+          <text class="text-[12px] leading-[18px] text-[#94a3b8]">当前没有 report:read，报表页面入口没有渲染。</text>
+        </view>
+      </view>
+
+      <view class="w-full rounded-[16px] bg-[#ffffff] border-[1px] border-solid border-[#e2e8f0] p-[16px] mb-[12px]">
+        <text class="text-[15px] font-bold text-[#1e293b]">按钮级控制</text>
+        <text class="text-[12px] leading-[19px] text-[#64748b] mt-[6px]">每个按钮独立读取权限码，没有权限就不渲染，不做禁用态。</text>
+        <view class="flex flex-row flex-wrap mt-[12px]">
+          <view v-if="canEditReport" class="h-[36px] px-[16px] rounded-[8px] bg-[#2563eb] flex flex-row items-center justify-center mr-[8px] mb-[8px]">
+            <text class="text-[13px] font-bold text-[#ffffff]">编辑报表</text>
+          </view>
+          <view v-if="canDeleteReport" class="h-[36px] px-[16px] rounded-[8px] bg-[#dc2626] flex flex-row items-center justify-center mr-[8px] mb-[8px]">
+            <text class="text-[13px] font-bold text-[#ffffff]">删除报表</text>
+          </view>
+          <view v-if="canManageSystem" class="h-[36px] px-[16px] rounded-[8px] bg-[#7c3aed] flex flex-row items-center justify-center mr-[8px] mb-[8px]">
+            <text class="text-[13px] font-bold text-[#ffffff]">系统管理</text>
+          </view>
+        </view>
+        <text v-if="!canEditReport && !canDeleteReport && !canManageSystem" class="text-[12px] leading-[18px] text-[#94a3b8] mt-[8px]">当前权限下三个操作按钮都不会渲染。</text>
+      </view>
+
+      <view class="w-full rounded-[16px] bg-[#ffffff] border-[1px] border-solid border-[#e2e8f0] p-[16px]">
+        <text class="text-[15px] font-bold text-[#1e293b]">页面代码</text>
+        <view class="w-full rounded-[10px] bg-[#0f172a] p-[12px] mt-[10px]">
+          <text class="text-[11px] leading-[18px] text-[#e2e8f0]" style="font-family: monospace;">&lt;view v-if="hasPermission('report:edit')"&gt;</text>
+          <text class="text-[11px] leading-[18px] text-[#94a3b8]" style="font-family: monospace;">  编辑按钮</text>
+          <text class="text-[11px] leading-[18px] text-[#e2e8f0]" style="font-family: monospace;">&lt;/view&gt;</text>
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed } from 'vue';
+import type { IUserInfo } from '@/src/store/index.uts';
+import { useUserStore } from '@/src/store/index.uts';
+import { getPermissions, hasPermission } from '@/src/utils/permission/index.uts';
+import { toastSuccess } from '@/src/utils/toast/index.uts';
+
+definePage({
+  name: 'permissionDemo',
+  layout: 'navbar',
+  showBack: true,
+  hideStatusBar: false,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
+  style: {
+    navigationBarTitleText: '页面与按钮权限',
+    navigationStyle: 'custom'
+  }
+});
+
+type PermissionPreset = {
+  key: string;
+  label: string;
+  permissions: Array<string>;
+};
+
+const userStore = useUserStore();
+const presetList: Array<PermissionPreset> = [
+  { key: 'read', label: '只读', permissions: ['report:read'] },
+  { key: 'edit', label: '可编辑', permissions: ['report:read', 'report:edit'] },
+  { key: 'admin', label: '管理员', permissions: ['*'] }
+];
+
+const permissionText = computed((): string => {
+  const permissions = getPermissions();
+  return permissions.length > 0 ? permissions.join(' / ') : '无';
+});
+const canViewReport = computed((): boolean => hasPermission('report:read'));
+const canEditReport = computed((): boolean => hasPermission('report:edit'));
+const canDeleteReport = computed((): boolean => hasPermission('report:delete'));
+const canManageSystem = computed((): boolean => hasPermission('system:manage'));
+
+/** 演示切换用户信息里的权限结果 */
+function applyPreset(preset: PermissionPreset): void {
+  const info = userStore.state.userInfo;
+  userStore.setUserInfo({
+    userId: info.userId,
+    username: info.username,
+    nickname: info.nickname,
+    avatar: info.avatar,
+    permissions: preset.permissions
+  } as IUserInfo);
+  toastSuccess(`已切换为${preset.label}`);
+}
+</script>

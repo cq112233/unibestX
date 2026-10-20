@@ -1,5 +1,5 @@
 import { http } from '@/src/http/index.uts';
-import type { LimeRequestConfig } from '@/uni_modules/lime-request';
+import type { HttpRequestConfig } from '@/uni_modules/request-bestX/index.uts';
 
 // ==========================================
 // 1. 类型定义（遵循规范：一律使用 type，严禁 interface）
@@ -15,8 +15,7 @@ export type AuthUserInfo = {
   username: string;
   nickname: string;
   avatar: string;
-  roles: Array<string>;
-  permissions?: Array<string> | null;
+  permissions: Array<string>;
 };
 
 export type LoginResult = {
@@ -48,8 +47,7 @@ const MOCK_USER_INFO: AuthUserInfo = {
   username: 'UNIX',
   nickname: 'UNIX 开发者',
   avatar: '/static/logo.png',
-  roles: ['admin', 'developer'],
-  permissions: ['*']
+  permissions: ['report:read', 'report:edit']
 };
 
 const MOCK_LOGIN_RESULT: LoginResult = {
@@ -71,19 +69,19 @@ const MOCK_LOGIN_RESULT: LoginResult = {
  * @param params 登录表单（username / password，两者都不可为空）；
  *               该请求带 `extra.ignoreAuth`，**不注入 token、401 也不会触发刷新**
  */
-export function login(params: LoginQuery): Promise<LoginResult> {
+export function loginApi(params: LoginQuery): Promise<LoginResult> {
   return http.post<UTSJSONObject>('/auth/login', params, {
     extra: {
       ignoreAuth: true
     } as UTSJSONObject
-  } as LimeRequestConfig).then((data: UTSJSONObject): LoginResult => {
+  } as HttpRequestConfig).then((data: UTSJSONObject): LoginResult => {
     const rawUser = data.get('userInfo') as UTSJSONObject | null;
     // ⚠️ 必须写 `getArray<string>(...)`：UTS 无法从默认值反推元素类型，省略泛型实参会被
     // Kotlin 编译拒绝（`推断类型是 UTSArray<*>`，预期 `UTSArray<String>?`，实测于 app-android）。
     // 代价：TS 侧 UTSJSONObject 是纯索引签名声明（见 src/types/uni.d.ts），其 getArray 为 any，
     // 对 any 传类型实参报 TS2347 —— 故用 @ts-expect-error 抑制；UTS 编译不受影响。
     // @ts-expect-error UTS 编译要求显式泛型实参；TS 侧 getArray 为 any 会报 TS2347
-    const rawRoles = rawUser?.getArray<string>('roles', [] as Array<string>) ?? ([] as Array<string>);
+    const rawPermissions = rawUser?.getArray<string>('permissions', [] as Array<string>) ?? ([] as Array<string>);
 
     return {
       token: data.getString('token') ?? `mock-token-${Date.now()}`,
@@ -95,7 +93,7 @@ export function login(params: LoginQuery): Promise<LoginResult> {
         username: rawUser?.getString('username') ?? params.username,
         nickname: rawUser?.getString('nickname') ?? (params.username == 'admin' ? '超级管理员' : 'UNIX 开发者'),
         avatar: rawUser?.getString('avatar') ?? '/static/logo.png',
-        roles: rawRoles.length > 0 ? rawRoles : ['admin']
+        permissions: rawPermissions.length > 0 ? rawPermissions : MOCK_USER_INFO.permissions
       } as AuthUserInfo
     } as LoginResult;
   }, (_err: any): LoginResult => {
@@ -109,7 +107,7 @@ export function login(params: LoginQuery): Promise<LoginResult> {
         username: params.username.length > 0 ? params.username : MOCK_USER_INFO.username,
         nickname: params.username == 'admin' ? '超级管理员' : MOCK_USER_INFO.nickname,
         avatar: MOCK_USER_INFO.avatar,
-        roles: MOCK_USER_INFO.roles
+        permissions: MOCK_USER_INFO.permissions
       } as AuthUserInfo
     };
     return fallback;
@@ -118,21 +116,28 @@ export function login(params: LoginQuery): Promise<LoginResult> {
 
 /**
  * 获取当前登录用户信息
+ *
+ * 该接口用于登录后 / 启动时的静默刷新：失败返回 null，调用方保留本地缓存，
+ * 绝不能用本地 Mock 权限覆盖用户已缓存的真实权限；接口未返回 permissions 时按空权限处理。
  */
-export function fetchUserInfo(): Promise<AuthUserInfo> {
-  return http.get<UTSJSONObject>('/user/info').then((data: UTSJSONObject): AuthUserInfo => {
+export function fetchUserInfoApi(): Promise<AuthUserInfo | null> {
+  return http.get<UTSJSONObject>('/userInfo', {
+    extra: {
+      toast: false
+    } as UTSJSONObject
+  } as HttpRequestConfig).then((data: UTSJSONObject): AuthUserInfo => {
     // ⚠️ 同上：必须写 `getArray<string>(...)`（UTS 要求显式泛型实参，TS 侧靠 @ts-expect-error 抑制 TS2347）
     // @ts-expect-error UTS 编译要求显式泛型实参；TS 侧 getArray 为 any 会报 TS2347
-    const rawRoles = data.getArray<string>('roles', [] as Array<string>) ?? ([] as Array<string>);
+    const rawPermissions = data.getArray<string>('permissions', [] as Array<string>) ?? ([] as Array<string>);
     return {
       userId: data.getNumber('userId') ?? 1001,
       username: data.getString('username') ?? 'admin',
       nickname: data.getString('nickname') ?? 'UNIX 极客开发者',
       avatar: data.getString('avatar') ?? '/static/logo.png',
-      roles: rawRoles.length > 0 ? rawRoles : ['admin', 'developer']
+      permissions: rawPermissions
     } as AuthUserInfo;
-  }, (_err: any): AuthUserInfo => {
-    return MOCK_USER_INFO;
+  }, (_err: any): AuthUserInfo | null => {
+    return null;
   });
 }
 
@@ -143,14 +148,14 @@ export function fetchUserInfo(): Promise<AuthUserInfo> {
  * 直接失败、不再触发刷新，否则刷新接口自身 401 会形成无限递归。
  * @param params 刷新凭证，只需 `refreshToken`（一般取自 tokenStore 里持久化的那一份）
  */
-export function refreshAccessToken(params: RefreshTokenQuery): Promise<RefreshTokenResult> {
+export function refreshAccessTokenApi(params: RefreshTokenQuery): Promise<RefreshTokenResult> {
   return http.post<UTSJSONObject>('/auth/refresh', params, {
     extra: {
       skipRefresh: true,
       ignoreAuth: true,
       toast: false
     } as UTSJSONObject
-  } as LimeRequestConfig).then((data: UTSJSONObject): RefreshTokenResult => {
+  } as HttpRequestConfig).then((data: UTSJSONObject): RefreshTokenResult => {
     return {
       accessToken: data.getString('accessToken') ?? data.getString('token') ?? '',
       accessExpiresIn: data.getNumber('accessExpiresIn') ?? 7200,
@@ -171,10 +176,18 @@ export function refreshAccessToken(params: RefreshTokenQuery): Promise<RefreshTo
 /**
  * 退出登录接口
  */
-export function logout(): Promise<boolean> {
+export function logoutApi(): Promise<boolean> {
   return http.post<any>('/auth/logout').then((_data: any): boolean => {
     return true;
   }, (_err: any): boolean => {
     return true;
   });
 }
+
+// ==========================================
+// 4. 向下兼容别名导出（兼顾无 Api 后缀的旧调用与单测契约）
+// ==========================================
+export const login = loginApi;
+export const fetchUserInfo = fetchUserInfoApi;
+export const refreshAccessToken = refreshAccessTokenApi;
+export const logout = logoutApi;

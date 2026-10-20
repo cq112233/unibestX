@@ -1,7 +1,7 @@
 {
   "name": "unibestx",
   "type": "module",
-  "version": "1.1.4",
+  "version": "2.0.0",
   "packageManager": "pnpm@10.6.1",
   "description": "unibestX - 最好的 uni-app X 开发框架",
   "engines": {
@@ -26,6 +26,7 @@
     "env:prod": "node scripts/switch-env.mjs prod",
     "build:test": "node scripts/sync-hbuilderx.mjs --ensure && node scripts/build-h5.mjs --env test",
     "build:prod": "node scripts/sync-hbuilderx.mjs --ensure && node scripts/build-h5.mjs --env prod",
+    "deploy:h5": "node scripts/deploy-h5.mjs",
     "optimize:img": "node scripts/optimize-images.mjs",
     "optimize:img:check": "node scripts/optimize-images.mjs --check",
     "docker:build:test": "pnpm build:test && docker compose -f docker/docker-compose.yml build h5-test && pnpm docker:up:test",
@@ -52,6 +53,8 @@
     "sync:hbuilderx:check": "node scripts/sync-hbuilderx.mjs --check",
     "sandbox:reset": "node scripts/reset-sandbox.mjs",
     "clean:demo": "node scripts/clean-demo-pages.mjs",
+    "clean:mock": "node scripts/clean-mock.mjs",
+    "clean:tests": "node scripts/clean-tests.mjs",
     "health": "node scripts/doctor.mjs",
     "health:quick": "node scripts/doctor.mjs --quick",
     "api:gen": "node scripts/api-generate.mjs",

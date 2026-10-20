@@ -1,0 +1,394 @@
+/**
+ * 流式请求封装 —— 基于 `HttpClient.stream` 的 chunked 分块接收，纯回调风格（零 Rx 依赖）
+ *
+ * 设计目标：把「真实 SSE 分块接口」与「本地模拟打字机」封装为统一清晰的 callback 风格，
+ * 内部自持增量 UTF-8 状态机（`Utf8StreamDecoder`），彻底防止中文或 Emoji 被 chunk 截断产生乱码。
+ *
+ * 请求侧统一走 http 层（`@/src/http/request/index.uts`）：自动携带鉴权头、相对路径自动拼
+ * baseURL、`extra.domain` 可临时切域名 —— 因此本模块不再自己调 `uni.request`。
+ *
+ * 平台支持：uni.request 的 enableChunked 与 RequestTask.onChunkReceived
+ * 在 Web / Android / iOS / 鸿蒙 4.71+ 均可用。
+ *
+ * @example
+ * ```uts
+ * import { requestStream, type StreamChunk } from '@/uni_modules/request-bestX/index.uts';
+ *
+ * const task = requestStream({
+ *   url: '/api/v1/chat/stream',
+ *   body: JSON.stringify({ prompt: '你好' }),
+ *   onChunk: (chunk: StreamChunk): void => {
+ *     content.value += chunk.text;
+ *   },
+ *   onComplete: (): void => {
+ *     console.log('完成');
+ *   }
+ * });
+ * task.abort();
+ * ```
+ */
+
+import type { HttpClient } from '../core/client.uts';
+import type { HttpRequestConfig, StreamTask } from '../core/types.uts';
+
+let defaultHttpInstance: HttpClient | null = null;
+
+/**
+ * 注册默认的流式 HttpClient 实例（可在应用初始化或业务层调用）
+ */
+export function setDefaultStreamClient(client: HttpClient): void {
+  defaultHttpInstance = client;
+}
+
+/**
+ * 获取当前注册的默认 HttpClient 实例
+ */
+export function getDefaultStreamClient(): HttpClient | null {
+  return defaultHttpInstance;
+}
+
+function getDefaultHttp(): HttpClient {
+  if (defaultHttpInstance == null) {
+    throw new Error('[requestStream] 未指定 HttpClient 实例，请传入 client 或先调用 setDefaultStreamClient(client)');
+  }
+  return defaultHttpInstance!;
+}
+
+// ==========================================
+// 类型定义（禁止 interface，统一使用 type）
+// ==========================================
+
+export type { StreamTask } from '../core/types.uts';
+
+/** 流式数据块 */
+export type StreamChunk = {
+  /** 本次新到达的文本片段 */
+  text: string;
+  /** 累计已接收的字符数 */
+  receivedLength: number;
+  /** 从发起请求到收到该块的耗时（毫秒） */
+  elapsedMs: number;
+};
+
+/** 纯回调流式配置项 */
+export type StreamOptions = {
+  /** 请求地址：完整 http(s):// 地址，或与 baseURL 拼接的相对路径 */
+  url: string;
+  /** 请求体（字符串，通常是 JSON.stringify 的结果） */
+  body: string;
+  /** 请求头，可选（默认走 SSE 请求头） */
+  header?: UTSJSONObject | null;
+  /** 附加参数，可选（如 extra.ignoreAuth 跳过业务 Token 校验，extra.domain 切换域名） */
+  extra?: UTSJSONObject | null;
+  /** 超时时间（毫秒），默认 60000 */
+  timeout?: number;
+  /** 逐块接收到新文本片段时的回调（已自动完成 UTF-8 防乱码解码） */
+  onChunk: (chunk: StreamChunk) => void;
+  /** 流正常接收完毕时的回调，可选 */
+  onComplete?: () => void;
+  /** 流发生错误时的回调，可选 */
+  onError?: (err: Error) => void;
+};
+
+/** 兼容别名 */
+export type StreamSimpleOptions = StreamOptions;
+
+/** 兼容别名 */
+export type StreamSimpleTask = StreamTask;
+
+// ==========================================
+// 增量 UTF-8 解码器
+// ==========================================
+
+/**
+ * 增量 UTF-8 解码器
+ *
+ * 为什么需要它：UTS 内置的 TextDecoder.decode() 只有单参数签名（没有 Web 端的 `{ stream: true }`），
+ * 若直接对每个 chunk 调用 decode()，被 chunk 边界切断的多字节字符（中文、emoji）会被替换成
+ * U+FFFD「」。本类自持一个尾部字节缓冲，只解码完整的 UTF-8 字符序列，残缺尾部留给下一块拼接。
+ */
+export class Utf8StreamDecoder {
+  /** 上一块遗留的不完整多字节序列；不能直接丢弃，丢了那个字符就会解码成 U+FFFD */
+  private _pending: Array<number> = [];
+  private _decoder: TextDecoder = new TextDecoder('utf-8');
+
+  /**
+   * 解码一个 chunk
+   * @param buffer 本次到达的原始字节；平台给的是 ArrayBuffer，内部才转成 Uint8Array
+   * @returns 本次可安全输出的文本；返回空串表示这一块全是被截断的多字节字符 ——
+   *          那些字节已留在 _pending 里等下一块拼，调用方按「本次没有新文本」处理即可
+   */
+  decodeChunk(buffer: ArrayBuffer): string {
+    const incoming = new Uint8Array(buffer);
+    const merged: Array<number> = this._pending;
+    const incomingLen = incoming.length;
+    for (let i: number = 0; i < incomingLen; i++) {
+      merged.push(incoming[i]);
+    }
+    const total = merged.length;
+    const safeEnd = this._findSafeEnd(merged, total);
+    if (safeEnd <= 0) {
+      // 整段都还不完整，继续等下一块
+      this._pending = merged;
+      return '';
+    }
+    const safe = new Uint8Array(safeEnd);
+    for (let i: number = 0; i < safeEnd; i++) {
+      safe[i] = merged[i];
+    }
+    const rest: Array<number> = [];
+    for (let i: number = safeEnd; i < total; i++) {
+      rest.push(merged[i]);
+    }
+    this._pending = rest;
+    return this._decoder.decode(safe);
+  }
+
+  /** 清空缓冲（重新发起请求前调用） */
+  reset(): void {
+    this._pending = [];
+  }
+
+  /**
+   * 从尾部向前寻找可安全解码的结束位置。
+   * 末尾若存在被截断的多字节序列，则把该序列整体留给下一块。
+   * @param bytes 待扫描的字节缓冲（已含上一块遗留的残缺序列）
+   * @param total 缓冲总长度，取值与 bytes.length 相同
+   */
+  private _findSafeEnd(bytes: Array<number>, total: number): number {
+    if (total <= 0) {
+      return 0;
+    }
+    // 最多向前回溯 4 字节（UTF-8 单字符最长 4 字节），跳过续接字节 0b10xxxxxx
+    let contCount: number = 0;
+    let idx: number = total - 1;
+    let scanned: number = 0;
+    while (idx >= 0 && scanned < 4) {
+      const b: number = bytes[idx];
+      if ((b & 0xC0) == 0x80) {
+        contCount = contCount + 1;
+        idx = idx - 1;
+        scanned = scanned + 1;
+        continue;
+      }
+      break;
+    }
+    if (idx < 0) {
+      // 整段都是续接字节（异常数据），全部留待下一块
+      return 0;
+    }
+    const lead: number = bytes[idx];
+    let expected: number = 1;
+    if ((lead & 0x80) == 0x00) {
+      expected = 1;
+    }
+    else if ((lead & 0xE0) == 0xC0) {
+      expected = 2;
+    }
+    else if ((lead & 0xF0) == 0xE0) {
+      expected = 3;
+    }
+    else if ((lead & 0xF8) == 0xF0) {
+      expected = 4;
+    }
+    else {
+      // 非法起始字节，按单字节放行，交给 TextDecoder 输出 U+FFFD
+      expected = 1;
+    }
+    if (contCount + 1 >= expected) {
+      // 该字符已完整到达
+      return total;
+    }
+    // 该字符被截断，从它的起始字节处切开
+    return idx;
+  }
+}
+
+// ==========================================
+// 真实流式请求 (纯回调风格)
+// ==========================================
+
+/**
+ * 流式请求 (requestStream) —— 纯回调风格，零外部依赖
+ *
+ * 结合了 Utf8StreamDecoder（防中文被 chunk 截断乱码）与 http 层的自动鉴权和 baseURL 拼接，
+ * 无需引入 Observable / RxJS，直接通过清晰直观的回调接收数据。
+ *
+ * @param options 流式配置项及 onChunk / onComplete / onError 回调
+ * @returns 包含 abort() 方法的 StreamTask 对象
+ *
+ * @example
+ * ```uts
+ * const task = requestStream({
+ *   url: '/api/v1/chat/completions',
+ *   body: JSON.stringify({ prompt: '你好' }),
+ *   onChunk: (chunk: StreamChunk): void => {
+ *     content.value += chunk.text;
+ *   },
+ *   onComplete: (): void => {
+ *     console.log('流接收完毕');
+ *   },
+ *   onError: (err: Error): void => {
+ *     console.error('流发生错误:', err.message);
+ *   }
+ * });
+ *
+ * // 中断取消
+ * task.abort();
+ * ```
+ */
+export function requestStream(
+  options: StreamOptions,
+  customClient: HttpClient | null = null
+): StreamTask {
+  const client: HttpClient = customClient != null ? customClient! : getDefaultHttp();
+  const startTime: number = Date.now();
+  const decoder = new Utf8StreamDecoder();
+  let receivedText: string = '';
+  let settled: boolean = false;
+  let aborted: boolean = false;
+
+  const requestHeader: UTSJSONObject = options.header != null
+    ? options.header!
+    : ({
+        'Content-Type': 'application/json',
+        'Accept': 'text/event-stream, application/x-ndjson, application/json'
+      } as UTSJSONObject);
+
+  const timeout = options.timeout != null ? options.timeout! : 60000;
+
+  const streamTask = client.stream({
+    url: options.url,
+    method: 'POST',
+    data: options.body,
+    header: requestHeader,
+    extra: options.extra,
+    timeout
+  } as HttpRequestConfig, (data: ArrayBuffer): void => {
+    if (settled || aborted) {
+      return;
+    }
+    const text = decoder.decodeChunk(data);
+    if (text.length <= 0) {
+      return;
+    }
+    receivedText = receivedText + text;
+    options.onChunk({
+      text,
+      receivedLength: receivedText.length,
+      elapsedMs: Date.now() - startTime
+    } as StreamChunk);
+  }, (errMsg: string | null): void => {
+    if (settled || aborted) {
+      return;
+    }
+    settled = true;
+    if (errMsg == null) {
+      if (options.onComplete != null) {
+        options.onComplete!();
+      }
+    }
+    else {
+      if (options.onError != null) {
+        options.onError!(new Error(errMsg));
+      }
+    }
+  });
+
+  return {
+    abort: (): void => {
+      if (!aborted && !settled) {
+        aborted = true;
+        streamTask.abort();
+      }
+    }
+  } as StreamTask;
+}
+
+/** 兼容别名：免 Rx 纯回调流式请求 */
+export function requestStreamSimple(
+  options: StreamOptions,
+  customClient: HttpClient | null = null
+): StreamTask {
+  return requestStream(options, customClient);
+}
+
+// ==========================================
+// 本地模拟流 (纯回调风格)
+// ==========================================
+
+/**
+ * 本地打字机模拟 (simulateStream) —— 纯回调风格
+ *
+ * @param text 要模拟输出的完整文本
+ * @param onChunk 逐块吐字回调
+ * @param onComplete 完成回调，可选
+ * @param chunkSize 每块字符数，默认 6
+ * @param intervalMs 每块间隔毫秒数，默认 90
+ */
+export function simulateStream(
+  text: string,
+  onChunk: (chunk: StreamChunk) => void,
+  onComplete: (() => void) | null = null,
+  chunkSize: number = 6,
+  intervalMs: number = 90
+): StreamTask {
+  const startTime: number = Date.now();
+  const totalLen = text.length;
+  if (totalLen <= 0) {
+    if (onComplete != null) {
+      onComplete!();
+    }
+    return {
+      abort: (): void => {}
+    } as StreamTask;
+  }
+
+  let cursor: number = 0;
+  let receivedLength: number = 0;
+  let timerId: number = 0;
+  let aborted: boolean = false;
+
+  timerId = (setInterval((): void => {
+    if (aborted) {
+      return;
+    }
+    const remain = totalLen - cursor;
+    const size = remain < chunkSize ? remain : chunkSize;
+    const piece = text.substring(cursor, cursor + size);
+    cursor = cursor + size;
+    receivedLength = receivedLength + piece.length;
+    onChunk({
+      text: piece,
+      receivedLength,
+      elapsedMs: Date.now() - startTime
+    } as StreamChunk);
+    if (cursor >= totalLen) {
+      clearInterval(timerId);
+      if (onComplete != null) {
+        onComplete!();
+      }
+    }
+  }, intervalMs) as any) as number;
+
+  return {
+    abort: (): void => {
+      aborted = true;
+      if (timerId > 0) {
+        clearInterval(timerId);
+        timerId = 0;
+      }
+    }
+  } as StreamTask;
+}
+
+/** 兼容别名：免 Rx 纯回调本地模拟流 */
+export function simulateStreamSimple(
+  text: string,
+  onChunk: (chunk: StreamChunk) => void,
+  onComplete: (() => void) | null = null,
+  chunkSize: number = 6,
+  intervalMs: number = 90
+): StreamTask {
+  return simulateStream(text, onChunk, onComplete, chunkSize, intervalMs);
+}

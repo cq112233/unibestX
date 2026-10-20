@@ -1,27 +1,19 @@
 /* eslint-disable */
 // @ts-ignore
-import { request } from '@/src/http/openapi.uts';
+import { request, buildBodyRequestConfig } from '@/src/http/openapi.uts';
 import type { OpenApiRequestOptions } from '@/src/http/openapi.uts';
 
 import * as API from './types.uts';
 
 /** 晨间记录 POST /gateway/morningCheckReport/page */
-export function morningCheckReportPageUsingPost({
-  body,
-  options,
-}: {
+export type MorningCheckReportPageUsingPostRequestParams = {
   body: API.MorningCheckReportPageUsingPostBody;
   options?: OpenApiRequestOptions;
-}) {
+};
+
+export function morningCheckReportPageUsingPost(requestParams: MorningCheckReportPageUsingPostRequestParams) {
   return request<API.MorningCheckReportPageUsingPostResponse>(
     '/gateway/morningCheckReport/page',
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      data: body,
-      ...(options || {}),
-    }
+    buildBodyRequestConfig('POST', requestParams.body, requestParams.options)
   );
 }

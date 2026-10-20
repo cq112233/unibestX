@@ -1,0 +1,15 @@
+/**
+ * 通用 HTTP 通信枚举常量 (HTTP Enums)
+ *
+ * 仅包含网络传输层标准通用常量，不含业务状态码与提示文案。
+ */
+
+/**
+ * 标准 Content-Type 枚举
+ * 注意：UTS 中 JSON 是内置全局对象，不能作为对象属性 key，故使用 AppJson。
+ */
+export const ContentTypeEnum = {
+  AppJson: 'application/json;charset=UTF-8',
+  FormUrlEncoded: 'application/x-www-form-urlencoded;charset=UTF-8',
+  FormData: 'multipart/form-data;charset=UTF-8'
+};

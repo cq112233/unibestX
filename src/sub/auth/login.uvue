@@ -30,7 +30,7 @@ definePage(async () => {
   const p = new Promise((resolve) => {
     setTimeout(() => {
       resolve('登录');
-    }, 100);
+    }, 0);
   });
 
   const res = await p;
@@ -94,7 +94,8 @@ function onLoginSuccess(res: LoginResult) {
     userId: res.userInfo.userId,
     username: res.userInfo.username,
     nickname: res.userInfo.nickname,
-    avatar: res.userInfo.avatar
+    avatar: res.userInfo.avatar,
+    permissions: res.userInfo.permissions
   } as IUserInfo);
   uni.showToast({
     title: '登录成功',
@@ -124,7 +125,7 @@ function doLogin() {
       username: 'UNIX',
       nickname: 'UNIX 开发者',
       avatar: '/static/logo.png',
-      roles: ['admin']
+      permissions: ['report:read', 'report:edit']
     } as AuthUserInfo
   } as LoginResult;
   onLoginSuccess(mockRes);

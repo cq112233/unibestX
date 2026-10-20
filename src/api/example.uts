@@ -9,26 +9,25 @@
 //    那个页面只是演示 http 用法的靶子，刻意不为它单独建 src/api/httpBasicDemo/。
 //    新增真实页面请一律建 src/api/<页面目录名>/<页面目录名>.uts，不要改本文件。
 //
-// CRUD 五函数打的是一个**公网真实 REST 服务**（dummyjson 的 /posts 资源，地址就写死在下面的
-// `FOO_BASE_URL` 常量里），演示页开箱即有数据、五个动词都能打通：
-//   GET    /posts?limit=&skip=           列表（回包带 total）
-//   GET    /posts/search?q=&limit=&skip= 按关键字搜索（同样带 total）
-//   GET    /posts/:id                    详情
-//   POST   /posts/add                    新增
-//   PUT    /posts/:id                    更新
-//   DELETE /posts/:id                    删除
+// CRUD 五函数打的是 mockapi.io 上为本项目建的演示资源（`/test`，地址就写死在下面的
+// `FOO_BASE_URL` / `FOO_RESOURCE` 常量里），演示页开箱即有数据、五个动词都能打通且**真落库**：
+//   GET    /test?page=&limit=              列表（mockapi 不回 total，总数另发一次 ?limit=0 现算）
+//   GET    /test?search=&page=&limit=      按关键字搜索（同样要另发一次算总数）
+//   GET    /test/:id                       详情
+//   POST   /test                           新增
+//   PUT    /test/:id                       更新
+//   DELETE /test/:id                       删除
 //
 // ⚠️ 这是**纯演示用的公网假数据服务**，与项目自身后端无关，故地址**故意硬编码在本文件**
-//    （不写进 .env，也不是环境变量）：真实业务接口的域名一律走 `@/src/config/env`，
-//    而这里只是个开箱即用的演示靶子。写操作只回模拟结果、**不会真正落库**，所以演示页是拿
-//    回包**就地改前端列表**的（增/删/改后列表立刻变，但服务端没变），一点「重置」重拉就全没了。
-//    要换靶子，改下面那一行常量即可 —— 其余一个字不用动。
+//    （不写进 .env，也不是环境变量）：真实业务接口的域名一律走 `@/src/config/env`。
+//    与之前的 dummyjson 靶子不同，mockapi **写操作会真正保存**，所以增删改后刷新页面数据仍在；
+//    演示页仍会就地改前端列表，点「重置」重拉即以服务端为准。
+//    要换靶子，改下面那两行常量即可 —— 其余一个字不用动。
 // ==========================================
 
-import { getOssUploadPath } from '@/src/config/index.uts';
+import { getOssBaseUrl, getOssUploadPath } from '@/src/config/index.uts';
 import { API_DOMAINS, http } from '@/src/http/index.uts';
-import type { DownloadResult } from '@/src/http/index.uts';
-import type { LimeRequestConfig, LimeRequestTask } from '@/uni_modules/lime-request';
+import type { DownloadResult, HttpRequestConfig } from '@/uni_modules/request-bestX/index.uts';
 
 // ==========================================
 // 1. 类型定义（遵循规范：一律使用 type，严禁 interface）
@@ -46,24 +45,78 @@ export type PageResult<T> = {
   total: number;
 };
 
+/** 本地 Mock 登录的入参（对应 mock/auth.ts 的 /api/auth/login） */
+export type MockLoginParams = {
+  username: string;
+  password: string;
+};
+
+/** 本地 Mock 登录的回包（已把嵌套 userInfo 拍平成强类型字段） */
+export type MockLoginResult = {
+  token: string;
+  expiresIn: number;
+  username: string;
+  nickname: string;
+};
+
 // ==========================================
 // 2. 内部工具（模块内私有，不对外导出）
 // ==========================================
 
 /**
- * 演示 API 的根地址：dummyjson 这个公开假数据服务，**故意写死在这里**。
+ * 演示 API 的根地址：mockapi.io 上为本项目建的演示项目，**故意写死在这里**。
  *
- * 它跟项目自身后端无关，只是给演示页一个开箱即用的靶子，所以不进 `.env`、不走
- * `@/src/config/env`（真实业务域名才必须走环境变量）。各处请求用 `config.baseURL`
- * 单次覆盖它，不动全局 `DEFAULT_HTTP_OPTIONS`，因此换靶子只需改这一行。
+ * 它跟项目自身后端无关，只是给演示页一个开箱即用、且**写操作真落库**的靶子，所以不进
+ * `.env`、不走 `@/src/config/env`（真实业务域名才必须走环境变量）。各处请求用 `config.baseURL`
+ * 单次覆盖它，不动全局 `DEFAULT_HTTP_OPTIONS`，因此换靶子只需改这里两行。
  */
-const FOO_BASE_URL: string = 'https://dummyjson.com';
+const FOO_BASE_URL: string = 'https://6ad5d5e4f71f154ac4860ffe.mockapi.io/api';
+
+/** 演示资源名（mockapi 项目里那个 `test` 资源），换资源只改这一行 */
+const FOO_RESOURCE: string = '/test';
+
+/**
+ * 免费的演示用上传地址：tmpfiles.org（无需注册、无 API Key、已开 CORS）
+ *
+ * 它是临时文件托管，不是真正的 OSS：
+ *  - 单文件上限 100 MB；
+ *  - 默认 1 小时过期，可通过表单字段 `expire` 延长到最多 172800 秒（48 小时），
+ *    本文件里的 `uploadFooFileApi` 已带上 `expire=172800`；
+ *  - 上传成功返回 JSON：`{ status: 'success', data: { url: 'https://tmpfiles.org/<id>/<name>' } }`，
+ *    其中 `url` 是**预览页**，图片直链要在域名后插入 `/dl/`（本文件自动转换）；
+ *  - 文件是**公开可访问**的，别传隐私内容。
+ *
+ * 若在 `.env` 里配置了真实 OSS（VITE_UPLOAD_BASEURL / VITE_UPLOAD_PATH，且不含占位符 `xxx`），
+ * 会优先使用你自己的 OSS，见下方 `FOO_UPLOAD_PATH`。
+ *
+ * 备选（同样是免费、免注册，但各有取舍）：
+ *  - 0x0.st：字段 `file`、纯文本回 URL、保留 30 天~1 年；但没有 CORS 头，H5 端会跨域失败（App 端可用）。
+ *  - uguu.se：字段 `files[]`、3 小时过期；同样缺 CORS，仅 App 端可用。
+ *  - Cloudinary / ImgBB：免费额度、长期保留，但要注册账号并配置 upload preset / API Key。
+ */
+export const FOO_DEMO_UPLOAD_URL: string = 'https://tmpfiles.org/api/v1/upload';
+
+/**
+ * 上传目标地址：优先读环境变量里配置的真实 OSS，未配置时退回上面的免费演示图床
+ *
+ * 判定「已配置」的标准与演示页一致：baseURL / path 都不能为空、也不能是模板占位符 `xxx`。
+ */
+function resolveUploadTarget(): string {
+  const base = getOssBaseUrl();
+  const path = getOssUploadPath();
+  if (base == '' || base.includes('xxx') || path == '' || path.includes('xxx')) {
+    return FOO_DEMO_UPLOAD_URL;
+  }
+  const cleanBase = base.endsWith('/') ? base.substring(0, base.length - 1) : base;
+  const cleanPath = path.startsWith('/') ? path : `/${path}`;
+  return `${cleanBase}${cleanPath}`;
+}
 
 /**
  * 把 http 回包规范化成**带访问方法**的 `UTSJSONObject`
  *
  * ⚠️ 为什么必须做这一步（只在 H5 端翻车的坑）：
- *    request 拦截器解包时，若回包**没有 `{ code, data }` 外壳**（dummyjson 这种裸 REST
+ *    request 拦截器解包时，若回包**没有 `{ code, data }` 外壳**（mockapi 这种裸 REST
  *    就是），它会原样返回浏览器自己 JSON.parse 出来的**普通 JS 对象** —— 那个对象上
  *    **没有** `getArray` / `getNumber` / `getString`，直接调用会抛
  *    `data.getArray is not a function`（列表渲染不出来、卡片只留一行错误）。
@@ -83,9 +136,49 @@ function toJsonObject(raw: UTSJSONObject): UTSJSONObject {
 }
 
 /**
+ * 尝试把回包解析成 JSON 对象，解析不出来时返回 null
+ *
+ * 与 `toJsonObject` 的区别：**纯文本**回包（HTTP 404 的 HTML 错误页、后端返回的
+ * "Function Not Found" 之类）会被判为 null，而不是把字符串原样返回 —— 后者会在后面
+ * 调 `getNumber` / `getArray` 时抛「xxx is not a function」，把真实错误掩盖掉。
+ *
+ * 注意 H5 的 `UTS.JSON.parseObject` 对字符串入参**会原样返回该字符串**（不是 null），
+ * 所以最后必须再用 `instanceof` 判一次。
+ */
+function toJsonObjectOrNull(raw: any): UTSJSONObject | null {
+  if (raw == null) {
+    return null;
+  }
+  if (raw instanceof UTSJSONObject) {
+    return raw;
+  }
+  const parsed = JSON.parseObject(JSON.stringify(raw));
+  if (parsed instanceof UTSJSONObject) {
+    return parsed;
+  }
+  return null;
+}
+
+/**
+ * 读取 mockapi 记录主键
+ *
+ * mockapi 的 `id` 是**数字字符串**（如 `"51"`），而对外契约 `FooItem.id` 是 `number`
+ * （页面用它做编辑态判定与 URL 拼接）。这里优先按字符串解析，数字型回包再退回 `getNumber`，
+ * 保证换后端时签名不变。
+ */
+function toFooId(obj: UTSJSONObject): number {
+  const idText = obj.getString('id');
+  if (idText != null) {
+    return parseInt(idText, 10);
+  }
+  return obj.getNumber('id') ?? 0;
+}
+
+/**
  * 把后端返回的弱类型对象就地映射成强类型 `FooItem`
  *
- * 字段映射：接口的 `title` → 页面的 `name`，接口的 `body` → 页面的 `desc`。
+ * mockapi 的 `test` 资源自带 `name` / `avatar` 字段，`desc` 是本演示新增的自定义字段
+ * （mockapi 允许写任意字段并持久化；项目里预置的那批数据没有 `desc`，显示为空串）。
  *
  * 分册 7.2 铁律：**`UTSJSONObject` 严禁出 api 层** —— 弱类型必须在这里用
  * `getNumber` / `getString` + `??` 兜底转成强类型 DTO 再 return，否则页面模板里
@@ -98,9 +191,9 @@ function toFooItem(raw: UTSJSONObject): FooItem {
   // ⚠️ `??` 兜底不可省：getNumber / getString 返回的是可空类型（`Number?` / `String?`），
   //    直接赋给 FooItem 的非空字段会被 Kotlin 编译拒绝（error17 参数类型不匹配）。
   return {
-    id: obj.getNumber('id') ?? 0,
-    name: obj.getString('title') ?? '',
-    desc: obj.getString('body') ?? ''
+    id: toFooId(obj),
+    name: obj.getString('name') ?? '',
+    desc: obj.getString('desc') ?? ''
   } as FooItem;
 }
 
@@ -113,81 +206,159 @@ function toFooItem(raw: UTSJSONObject): FooItem {
 // ==========================================
 
 /**
- * 分页查询 Foo 列表（`GET /posts`；带关键字时走 `GET /posts/search`）
+ * 把 mockapi 的数组回包映射成强类型列表
  *
- * 分页三件套按规范顺序 (pageNo, pageSize, keyword)，默认值齐全；函数签名与入参顺序冻结，
- * 换后端 / 换 mock 都不改这一个字。
- *
- * @param pageNo 当前页码（默认 1），换算成接口的 `skip = (pageNo - 1) * pageSize`
- * @param pageSize 分页大小（默认 10），对应查询参数 `limit`
- * @param keyword 搜索关键字（默认空字符串）。空串走列表接口，非空走搜索接口的 `q` 参数
+ * mockapi 的列表接口直接返回 JSON 数组（不是 `{ list, total }` 外壳），故这里逐项走
+ * `toFooItem`；H5 下数组元素是浏览器 JSON.parse 出来的普通对象，`toFooItem` 内部的
+ * `toJsonObject` 会补上 `getString` 等访问方法（见上）。
  */
-export function fetchFooList(pageNo: number = 1, pageSize: number = 10, keyword: string = ''): Promise<PageResult<FooItem>> {
-  // 接口分页是「偏移量」而不是页码，这里就地换算，对外契约仍是 pageNo
+function toFooList(raw: Array<UTSJSONObject>): Array<FooItem> {
+  const list = [] as Array<FooItem>;
+  for (let i = 0; i < raw.length; i++) {
+    const item = raw[i];
+    if (item != null) {
+      list.push(toFooItem(item));
+    }
+  }
+  return list;
+}
+
+/**
+ * 分页查询的公共实现：先取本页，再发一次 `?limit=0` 取总数
+ *
+ * @param pageNo 页码（从 1 开始）
+ * @param pageSize 每页条数
+ * @param keyword 搜索关键字（空串不传）
+ */
+function queryFooPage(
+  pageNo: number,
+  pageSize: number,
+  keyword: string
+): Promise<PageResult<FooItem>> {
+  // 回包不带 total，hasMore 仍按「偏移量 + 本页条数 < 总数」现算
   const skip = (pageNo - 1) * pageSize;
   const isSearch = keyword != '';
-  const path = isSearch ? '/posts/search' : '/posts';
-  // ⚠️ 这里刻意用两个对象字面量、而不是 `params.set('q', keyword)`：
+  // ⚠️ 这里刻意用对象字面量分支、而不是 `params.set('search', keyword)`：
   //    对象字面量强转 `as UTSJSONObject` 只发生在**真编译**里，本仓单测跑在纯 JS 环境
   //    （vitest + esbuild），那边它就是个普通对象、没有 `set` 方法，会直接报
   //    `params.set is not a function`。
-  let params = {
-    limit: pageSize,
-    skip
-  } as UTSJSONObject;
-  if (isSearch) {
-    params = {
-      limit: pageSize,
-      skip,
-      q: keyword
-    } as UTSJSONObject;
-  }
+  const pageParams = isSearch
+    ? { page: pageNo, limit: pageSize, search: keyword } as UTSJSONObject
+    : { page: pageNo, limit: pageSize } as UTSJSONObject;
+  const countParams = isSearch
+    ? { limit: 0, search: keyword } as UTSJSONObject
+    : { limit: 0 } as UTSJSONObject;
 
-  return http.get<UTSJSONObject>(path, {
-    params,
+  return http.get<Array<UTSJSONObject>>(FOO_RESOURCE, {
+    params: pageParams,
     baseURL: FOO_BASE_URL,
     extra: {
       ignoreAuth: true
     } as UTSJSONObject
-  } as LimeRequestConfig).then((data: UTSJSONObject): PageResult<FooItem> => {
-    // 裸 REST 回包在 H5 是普通对象，先规范化成带 getArray / getNumber 的 UTSJSONObject（见 toJsonObject）
-    const obj = toJsonObject(data);
-    // ⚠️ `getArray<T>(key, 默认值)` 的泛型实参必须显式写全：UTS **不从默认值反推元素类型**，
-    //    省略后 Kotlin 侧推断成 `UTSArray<*>`（预期 `UTSArray<UTSJSONObject>`）直接拒绝编译。
-    //    代价是 TS 侧 UTSJSONObject 只有纯索引签名声明（见 src/types/uni.d.ts），`getArray` 解析为 any、
-    //    传类型实参报 TS2347 —— 故用 @ts-expect-error 抑制；UTS 真编译不受影响。
-    // @ts-expect-error UTS 编译要求显式泛型实参；TS 侧 getArray 为 any 会报 TS2347
-    const rawList = obj.getArray<UTSJSONObject>('posts', [] as Array<UTSJSONObject>);
-    const list = rawList.map((item: UTSJSONObject): FooItem => toFooItem(item));
-    // 回包缺 total 时退回本页条数，避免算成 0 导致列表提前判定「没有更多」
-    const total = obj.getNumber('total') ?? list.length;
+  } as HttpRequestConfig).then((data: Array<UTSJSONObject>): Promise<PageResult<FooItem>> => {
+    const list = toFooList(data);
+    // mockapi 不回 total、也没有 count 端点，只能再发一次 `?limit=0` 拉全量取长度。
+    // 演示资源规模很小（几十条），这点开销可接受；接真实后端时应直接读回包里的 total，
+    // 删掉这次请求即可（对外签名不变）。
+    return http.get<Array<UTSJSONObject>>(FOO_RESOURCE, {
+      params: countParams,
+      baseURL: FOO_BASE_URL,
+      extra: {
+        ignoreAuth: true
+      } as UTSJSONObject
+    } as HttpRequestConfig).then((all: Array<UTSJSONObject>): PageResult<FooItem> => {
+      const total = all.length;
+      // ⚠️ 断言必须直接写泛型本体、实参写全 `PageResult<FooItem>`，严禁改用泛型实例化别名：
+      // 若定义 `type FooPageResult = PageResult<FooItem>` 后写 `as FooPageResult`，UTS 会把该断言
+      // 编译成构造调用 `new FooPageResult({...})`，而产物里只生成了 `class PageResult`
+      // （别名只是编译期 type、没有运行期绑定）⇒ 小程序 / App 端抛 `ReferenceError: FooPageResult is not defined`。
+      // 口诀：`as` / `new` 后面不许出现泛型实例化别名，类型位置（返回值标注 / 回调参数标注）才可以用别名。
+      return {
+        list,
+        hasMore: skip + list.length < total,
+        total
+      } as PageResult<FooItem>;
+    });
+  });
+}
 
-    // ⚠️ 断言必须直接写泛型本体、实参写全 `PageResult<FooItem>`，严禁改用泛型实例化别名：
-    // 若定义 `type FooPageResult = PageResult<FooItem>` 后写 `as FooPageResult`，UTS 会把该断言
-    // 编译成构造调用 `new FooPageResult({...})`，而产物里只生成了 `class PageResult`
-    // （别名只是编译期 type、没有运行期绑定）⇒ 小程序 / App 端抛 `ReferenceError: FooPageResult is not defined`。
-    // 口诀：`as` / `new` 后面不许出现泛型实例化别名，类型位置（返回值标注 / 回调参数标注）才可以用别名。
+/**
+ * 分页查询 Foo 列表（`GET /test`；带关键字时加 `search` 参数）
+ *
+ * 分页三件套按规范顺序 (pageNo, pageSize, keyword)，默认值齐全；函数签名与入参顺序冻结，
+ * 换后端 / 换 mock 都不改这一个字。
+ *
+ * @param pageNo 当前页码（默认 1），对应 mockapi 的 `page`
+ * @param pageSize 分页大小（默认 10），对应查询参数 `limit`
+ * @param keyword 搜索关键字（默认空字符串）。空串不传，非空走接口的 `search` 参数
+ */
+export function fetchFooListApi(pageNo: number = 1, pageSize: number = 10, keyword: string = ''): Promise<PageResult<FooItem>> {
+  return queryFooPage(pageNo, pageSize, keyword);
+}
+
+/**
+ * 查询**最近新增**的若干条 Foo（单次 `GET /test?limit=0` 后在本地按 id 倒序取前 N 条）
+ *
+ * 为什么不在服务端排序：
+ *  - mockapi 的 `sortBy=createdAt` 对新建记录并不可靠（实测新建记录拿到的 `createdAt`
+ *    是随机假时间，不是创建时刻），排出来并不是「最新的在前」；
+ *  - `sortBy=id&order=desc` 是**字符串**比较，`9, 8, 7…` 会把 `50` 排到 `9` 后面，同样不对。
+ * 因此改为一次拉全量（演示资源仅几十条）后按数字 id 取最大者；接真实后端时换成
+ * `?sortBy=id&order=desc&limit=N` 之类服务端分页即可，函数签名不变。
+ *
+ * 与 `fetchFooListApi` 分开而不是给它追加排序参数，是为了保持后者已冻结的
+ * (pageNo, pageSize, keyword) 签名不动。
+ *
+ * @param pageSize 取最近多少条（默认 2）
+ */
+export function fetchFooLatestApi(pageSize: number = 2): Promise<PageResult<FooItem>> {
+  return http.get<Array<UTSJSONObject>>(FOO_RESOURCE, {
+    params: { limit: 0 } as UTSJSONObject,
+    baseURL: FOO_BASE_URL,
+    extra: {
+      ignoreAuth: true
+    } as UTSJSONObject
+  } as HttpRequestConfig).then((data: Array<UTSJSONObject>): PageResult<FooItem> => {
+    const all = toFooList(data);
+    // 保序插入：按 id 从大到小维护一个长度不超过 pageSize 的窗口，避免依赖 sort 比较器
+    const picked = [] as Array<FooItem>;
+    for (let i = 0; i < all.length; i++) {
+      const candidate = all[i];
+      let pos = picked.length;
+      for (let j = 0; j < picked.length; j++) {
+        if (candidate.id > picked[j].id) {
+          pos = j;
+          break;
+        }
+      }
+      if (pos < pageSize) {
+        picked.splice(pos, 0, candidate);
+        if (picked.length > pageSize) {
+          picked.pop();
+        }
+      }
+    }
     return {
-      list,
-      hasMore: skip + list.length < total,
-      total
+      list: picked,
+      hasMore: false,
+      total: all.length
     } as PageResult<FooItem>;
   });
 }
 
 /**
- * 根据 ID 查询单条 Foo 详情（`GET /posts/:id`）
+ * 根据 ID 查询单条 Foo 详情（`GET /test/:id`）
  * @param id Foo 的主键
  * @returns 后端回包解包后为空时 resolve 为 `null`（**调用方必须自行判空**）；
  *          HTTP 4xx/5xx 与业务码非 0 仍由 http 拦截器统一 toast 并 reject，不会走到 null 分支
  */
-export function fetchFooById(id: number): Promise<FooItem | null> {
-  return http.get<UTSJSONObject>(`/posts/${id}`, {
+export function fetchFooByIdApi(id: number): Promise<FooItem | null> {
+  return http.get<UTSJSONObject>(`${FOO_RESOURCE}/${id}`, {
     baseURL: FOO_BASE_URL,
     extra: {
       ignoreAuth: true
     } as UTSJSONObject
-  } as LimeRequestConfig).then((data: UTSJSONObject): FooItem | null => {
+  } as HttpRequestConfig).then((data: UTSJSONObject): FooItem | null => {
     if (data == null) {
       return null;
     }
@@ -196,59 +367,59 @@ export function fetchFooById(id: number): Promise<FooItem | null> {
 }
 
 /**
- * 新增 Foo（`POST /posts/add`）
- * @param data 待新增的 Foo；页面字段按接口契约映射成请求体 `{ title, body, userId }`
+ * 新增 Foo（`POST /test`）
+ * @param data 待新增的 Foo；页面字段按接口契约映射成请求体 `{ name, desc }`
+ *             （mockapi 会为资源自带字段 `avatar` / `createdAt` 自动补值）
  * @returns 接口回包里的新记录（**新记录的 id 由后端生成**，以回包里的值为准）
  */
-export function createFoo(data: FooItem): Promise<FooItem> {
+export function createFooApi(data: FooItem): Promise<FooItem> {
   const payload = {
-    title: data.name,
-    body: data.desc,
-    userId: 1
+    name: data.name,
+    desc: data.desc
   } as UTSJSONObject;
-  return http.post<UTSJSONObject>('/posts/add', payload, {
+  return http.post<UTSJSONObject>(FOO_RESOURCE, payload, {
     baseURL: FOO_BASE_URL,
     extra: {
       ignoreAuth: true
     } as UTSJSONObject
-  } as LimeRequestConfig).then((res: UTSJSONObject): FooItem => {
+  } as HttpRequestConfig).then((res: UTSJSONObject): FooItem => {
     return toFooItem(res);
   });
 }
 
 /**
- * 更新 Foo（`PUT /posts/:id`）
+ * 更新 Foo（`PUT /test/:id`）
  * @param id 目标 Foo 主键（拼进 URL，是本次更新的唯一定位依据）
- * @param data 新字段值（按接口契约映射成请求体 `{ title, body }`）
+ * @param data 新字段值（按接口契约映射成请求体 `{ name, desc }`）
  * @returns 后端回包里的最新记录
  */
-export function updateFoo(id: number, data: FooItem): Promise<FooItem> {
+export function updateFooApi(id: number, data: FooItem): Promise<FooItem> {
   const payload = {
-    title: data.name,
-    body: data.desc
+    name: data.name,
+    desc: data.desc
   } as UTSJSONObject;
-  return http.put<UTSJSONObject>(`/posts/${id}`, payload, {
+  return http.put<UTSJSONObject>(`${FOO_RESOURCE}/${id}`, payload, {
     baseURL: FOO_BASE_URL,
     extra: {
       ignoreAuth: true
     } as UTSJSONObject
-  } as LimeRequestConfig).then((res: UTSJSONObject): FooItem => {
+  } as HttpRequestConfig).then((res: UTSJSONObject): FooItem => {
     return toFooItem(res);
   });
 }
 
 /**
- * 删除 Foo（`DELETE /posts/:id`）
+ * 删除 Foo（`DELETE /test/:id`）
  * @param id 目标 Foo 主键（拼进 URL）
  * @returns 请求成功即 resolve(true)；删除失败由 http 拦截器统一 toast 并 reject
  */
-export function deleteFoo(id: number): Promise<boolean> {
-  return http.delete<UTSJSONObject>(`/posts/${id}`, null, {
+export function deleteFooApi(id: number): Promise<boolean> {
+  return http.delete<UTSJSONObject>(`${FOO_RESOURCE}/${id}`, null, {
     baseURL: FOO_BASE_URL,
     extra: {
       ignoreAuth: true
     } as UTSJSONObject
-  } as LimeRequestConfig).then((_res: UTSJSONObject): boolean => {
+  } as HttpRequestConfig).then((_res: UTSJSONObject): boolean => {
     return true;
   });
 }
@@ -257,7 +428,12 @@ export function deleteFoo(id: number): Promise<boolean> {
 // 4. 远程调用与文件上传下载
 // ==========================================
 
-export const FOO_UPLOAD_PATH: string = getOssUploadPath();
+/**
+ * 上传目标地址（绝对 URL）：
+ *  - `.env` 配置了真实 OSS → 用它；
+ *  - 否则 → 免费的演示图床 tmpfiles.org（见文件顶部的 `FOO_DEMO_UPLOAD_URL` 注释）。
+ */
+export const FOO_UPLOAD_PATH: string = resolveUploadTarget();
 
 /**
  * 下载演示用的示例资源地址（公开可访问的图片，供下载 Demo 直接使用）
@@ -270,7 +446,7 @@ export const FOO_DOWNLOAD_URL: string = 'https://web-assets.dcloud.net.cn/unidoc
  * 演示「临时切域名」：默认走 `DEFAULT_HTTP_OPTIONS` 的主域名，
  * 这里显式用 `API_DOMAINS.SECONDARY` 覆盖单次请求。
  */
-export function fetchFooRemote(): Promise<FooItem> {
+export function fetchFooRemoteApi(): Promise<FooItem> {
   return http.get<UTSJSONObject>('/foo', {
     params: {
       name: 'unix',
@@ -281,7 +457,7 @@ export function fetchFooRemote(): Promise<FooItem> {
     extra: {
       ignoreAuth: true
     } as UTSJSONObject
-  } as LimeRequestConfig).then((data: UTSJSONObject): FooItem => {
+  } as HttpRequestConfig).then((data: UTSJSONObject): FooItem => {
     const obj = toJsonObject(data);
     // ⚠️ `??` 兜底不可省：getNumber / getString 返回的是可空类型（`Number?` / `String?`），
     // 直接赋给 FooItem 的非空字段会被 Kotlin 编译拒绝（error17 参数类型不匹配）。
@@ -294,39 +470,94 @@ export function fetchFooRemote(): Promise<FooItem> {
 }
 
 /**
- * 上传文件（`http.upload` → lime-request 的 UPLOAD 分支）
+ * 把上传回包里的链接转成可直接访问的直链
+ *
+ * tmpfiles.org 回包里的 `url` 是**预览页**（`https://tmpfiles.org/<id>/<name>`），
+ * 图片直链是 `https://tmpfiles.org/dl/<id>/<name>`，这里自动补 `/dl/`。
+ */
+function toUploadDirectUrl(url: string): string {
+  if (url.startsWith('https://tmpfiles.org/') && !url.startsWith('https://tmpfiles.org/dl/')) {
+    return url.replace('https://tmpfiles.org/', 'https://tmpfiles.org/dl/');
+  }
+  return url;
+}
+
+/**
+ * 从上传回包里提取文件地址
+ *
+ * 不同免费图床的回包形态不同，统一在这里收口：
+ *  - tmpfiles.org：JSON `{ url }`（http 拦截器已剥掉外层 `{ status, data }` 外壳）
+ *  - 0x0.st / uguu 的文本模式：纯文本 URL
+ *  - 业务后端：通常是 `{ url }` / `{ path }` / `{ link }`
+ */
+function parseUploadResponse(raw: any): string {
+  if (raw == null) {
+    return '';
+  }
+  // 纯文本回包（0x0.st 等）：直接就是 URL
+  if (typeof raw == 'string') {
+    return toUploadDirectUrl(raw);
+  }
+  const obj = JSON.parseObject(JSON.stringify(raw));
+  if (obj != null) {
+    const url = obj.getString('url') ?? obj.getString('link') ?? obj.getString('path');
+    if (url != null && url != '') {
+      return toUploadDirectUrl(url);
+    }
+  }
+  return '';
+}
+
+/**
+ * 上传文件（`http.upload` 原生 uni.uploadFile 驱动）
+ *
+ * 默认打免费的演示图床 tmpfiles.org（见 `FOO_DEMO_UPLOAD_URL` 注释）；`.env` 里配置了
+ * 真实 OSS 时自动改打你的 OSS。回包统一映射成最终可访问的 URL 字符串。
+ *
  * @param filePath 本地文件路径
  * @param ignoreAuth 是否跳过鉴权，演示接口传 true
- * @param uploadPathOrUrl 上传目标路径，默认取环境变量里的 OSS 地址
+ * @param uploadPathOrUrl 上传目标地址（默认取 `FOO_UPLOAD_PATH`）
  */
-export function uploadFooFile(
+export function uploadFooFileApi(
   filePath: string,
   ignoreAuth: boolean = false,
   uploadPathOrUrl: string = FOO_UPLOAD_PATH
 ): Promise<string> {
-  const extra = {} as UTSJSONObject;
-  if (ignoreAuth) {
-    extra.set('ignoreAuth', true);
-  }
+  // ⚠️ 用对象字面量而不是 `extra.set(...)`：本仓单测跑在纯 JS 环境（vitest + esbuild），
+  //    对象字面量转 `as UTSJSONObject` 只在真编译里生效，那边没有 `set` 方法。
+  const extra = ignoreAuth
+    ? { ignoreAuth: true } as UTSJSONObject
+    : {} as UTSJSONObject;
   const config = {
     filePath,
     name: 'file',
     extra
-  } as LimeRequestConfig;
-  return http.upload<string>(uploadPathOrUrl, config);
+  } as HttpRequestConfig;
+  // tmpfiles.org 支持用 expire 字段延长保留时间（最大 172800 秒 = 48 小时）
+  if (uploadPathOrUrl.includes('tmpfiles.org')) {
+    config.formData = { expire: 172800 } as UTSJSONObject;
+  }
+  // ⚠️ 泛型用 any：纯文本回包与 JSON 回包都要兼容，不能固定成 UTSJSONObject
+  return http.upload<any>(uploadPathOrUrl, config).then((raw: any): Promise<string> => {
+    const url = parseUploadResponse(raw);
+    if (url == '') {
+      return Promise.reject(new Error('上传响应中未找到文件地址')) as Promise<string>;
+    }
+    return Promise.resolve(url);
+  });
 }
 
 /**
  * 下载文件（`http.downloadFile`）
  *
- * 底层走 lime-request 的 DOWNLOAD 分支（内部 uni.downloadFile），
+ * 底层基于 uni.downloadFile 原生封装，
  * 自动复用统一的鉴权头注入、错误提示与完成钩子，成功后返回
  * DownloadResult（临时文件路径 + HTTP 状态码）。
  *
  * @param url 下载地址（支持完整 http(s) 地址；相对路径会与 baseURL 拼接）
  * @param onProgress 下载进度回调（progress 为 0~100 的百分比），不需要进度时传 null
  */
-export function downloadFooFile(
+export function downloadFooFileApi(
   url: string,
   onProgress: ((progress: number) => void) | null = null
 ): Promise<DownloadResult> {
@@ -336,7 +567,7 @@ export function downloadFooFile(
   const progressCallback = onProgress;
   const config = {
     extra,
-    getTask: (task: LimeRequestTask): void => {
+    getTask: (task: any): void => {
       // 仅 DOWNLOAD 任务具备进度监听能力，把原生进度回调给业务层
       const downloadTask = task as DownloadTask;
       if (progressCallback != null) {
@@ -345,6 +576,106 @@ export function downloadFooFile(
         });
       }
     }
-  } as LimeRequestConfig;
+  } as HttpRequestConfig;
   return http.downloadFile(url, config);
 }
+
+// ==========================================
+// 5. 本地 Mock 演示（vite-plugin-mock）
+//
+// ⚠️ 只有以 `pnpm dev:mock` 启动（或 VITE_USE_MOCK=true + VITE_H5_USE_PROXY=true）时，
+//    下面两个相对路径请求才会被 Vite 中间件拦截并秒回挡板数据；普通 dev 模式下它们会
+//    打到 VITE_SERVER_BASEURL 指向的真实开发服务器（没有对应接口时会失败）。
+//
+// 这些接口**故意不覆盖 baseURL**：Mock 拦截依赖「请求打到 dev server 自身」（相对路径），
+// 一旦写死完整域名就绕过了 Vite 中间件。
+// 路由定义见 mock/foo.ts（GET /api/foo）与 mock/auth.ts（POST /api/auth/login）。
+// ==========================================
+
+/**
+ * Mock 未命中时的统一错误文案
+ *
+ * 普通 dev 模式下相对路径会落到 VITE_SERVER_BASEURL 指向的真实服务器，
+ * 拿到的往往不是 JSON（404 HTML / "Function Not Found"），这里转成可操作提示。
+ */
+const MOCK_MISS_HINT: string = 'Mock 接口未命中：响应不是 JSON。请用 pnpm dev:mock 启动（VITE_USE_MOCK=true + VITE_H5_USE_PROXY=true）';
+
+/**
+ * 请求本地 Mock 的 Foo 列表（`GET /api/foo`）
+ *
+ * 回包经 request 拦截器解包后是 `{ id, name, list, total, page, pageSize }`，
+ * 这里映射成与真实接口一致的 `PageResult<FooItem>`。
+ */
+export function fetchMockFooListApi(): Promise<PageResult<FooItem>> {
+  return http.get<UTSJSONObject>('/api/foo', {
+    params: {
+      page: 1,
+      pageSize: 10
+    } as UTSJSONObject,
+    extra: {
+      ignoreAuth: true
+    } as UTSJSONObject
+  } as HttpRequestConfig).then((data: UTSJSONObject): Promise<PageResult<FooItem>> => {
+    const obj = toJsonObjectOrNull(data);
+    if (obj == null) {
+      return Promise.reject(new Error(MOCK_MISS_HINT)) as Promise<PageResult<FooItem>>;
+    }
+    // ⚠️ `getArray<T>` 的泛型实参必须显式写全（UTS 不从默认值反推元素类型）；
+    //    TS 侧 getArray 解析为 any，传类型实参报 TS2347，故用 @ts-expect-error 抑制。
+    // @ts-expect-error UTS 编译要求显式泛型实参；TS 侧 getArray 为 any 会报 TS2347
+    const rawList = obj.getArray<UTSJSONObject>('list', [] as Array<UTSJSONObject>);
+    const list = toFooList(rawList);
+    const total = obj.getNumber('total') ?? list.length;
+    return Promise.resolve({
+      list,
+      hasMore: list.length < total,
+      total
+    } as PageResult<FooItem>);
+  });
+}
+
+/**
+ * 请求本地 Mock 的登录接口（`POST /api/auth/login`）
+ *
+ * mock/auth.ts 里密码只接受 `123456` / `admin`，其它密码会返回业务错误码，
+ * 由 request 拦截器统一 toast 并 reject（正好用来演示失败分支）。
+ */
+export function fetchMockLoginApi(username: string, password: string): Promise<MockLoginResult> {
+  const payload = {
+    username,
+    password
+  } as UTSJSONObject;
+  return http.post<UTSJSONObject>('/api/auth/login', payload, {
+    extra: {
+      ignoreAuth: true
+    } as UTSJSONObject
+  } as HttpRequestConfig).then((data: UTSJSONObject): Promise<MockLoginResult> => {
+    const obj = toJsonObjectOrNull(data);
+    if (obj == null) {
+      return Promise.reject(new Error(MOCK_MISS_HINT)) as Promise<MockLoginResult>;
+    }
+    const userRaw = obj.get('userInfo');
+    const user = userRaw != null ? toJsonObjectOrNull(userRaw) : null;
+    return Promise.resolve({
+      token: obj.getString('token') ?? '',
+      expiresIn: obj.getNumber('expiresIn') ?? 0,
+      username: user != null ? (user.getString('username') ?? '') : '',
+      nickname: user != null ? (user.getString('nickname') ?? '') : ''
+    } as MockLoginResult);
+  });
+}
+
+// ==========================================
+// 6. 向下兼容别名导出（兼顾无 Api 后缀的旧调用与单测契约）
+// ==========================================
+export const fetchFooList = fetchFooListApi;
+export const fetchFooLatest = fetchFooLatestApi;
+export const fetchFooById = fetchFooByIdApi;
+export const createFoo = createFooApi;
+export const updateFoo = updateFooApi;
+export const deleteFoo = deleteFooApi;
+export const fetchFooRemote = fetchFooRemoteApi;
+export const uploadFooFile = uploadFooFileApi;
+export const downloadFooFile = downloadFooFileApi;
+export const fetchMockFooList = fetchMockFooListApi;
+export const fetchMockLogin = fetchMockLoginApi;

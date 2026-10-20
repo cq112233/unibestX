@@ -1210,19 +1210,57 @@ function ensureAllPlatformsCovered<T extends object>(
   }
 }
 
+/**
+ * 校验页面对应的物理文件是否存在于磁盘上。
+ * 支持主包与分包路径格式，兼容 .uvue、.vue 及 /index 目录约定。
+ */
+export function isPagePhysicalFileExisted(
+  pagePath: string,
+  rootDir: string = '',
+  projectRoot: string = process.cwd()
+): boolean {
+  if (!pagePath || typeof pagePath !== 'string') {
+    return false;
+  }
+  const normalized = pagePath.replace(/\\/g, '/').replace(/^\//, '');
+  const candidates: string[] = [];
+
+  if (rootDir) {
+    const normRoot = rootDir.replace(/\\/g, '/').replace(/^\//, '');
+    candidates.push(
+      path.resolve(projectRoot, normRoot, `${normalized}.uvue`),
+      path.resolve(projectRoot, normRoot, `${normalized}.vue`),
+      path.resolve(projectRoot, normRoot, `${normalized}/index.uvue`),
+      path.resolve(projectRoot, normRoot, `${normalized}/index.vue`)
+    );
+  }
+
+  candidates.push(
+    path.resolve(projectRoot, `${normalized}.uvue`),
+    path.resolve(projectRoot, `${normalized}.vue`),
+    path.resolve(projectRoot, `${normalized}/index.uvue`),
+    path.resolve(projectRoot, `${normalized}/index.vue`)
+  );
+
+  return candidates.some(filePath => fs.existsSync(filePath));
+}
+
 export function mergePlatformItems<T extends object>(
   source: any,
   currentPlatform: string,
   items: T[],
   uniqueKeyName: string,
   sandboxActive: boolean = false,
-  extraPlatforms: string[] = []
+  extraPlatforms: string[] = [],
+  rootDir: string = '',
+  projectRoot: string = process.cwd()
 ): MergedPlatformItems {
   const src = source || new CommentArray();
   currentPlatform = currentPlatform.toUpperCase();
 
   const lastPlatforms = extractLastPlatforms(src, currentPlatform);
-  const allowedKeys = sandboxActive ? new Set(items.map(item => (item as any)[uniqueKeyName])) : null;
+  const itemsKeySet = new Set(items.map(item => (item as any)[uniqueKeyName]));
+  const allowedKeys = sandboxActive ? itemsKeySet : null;
   const fullMacroKeys = new Set(
     items
       .filter(item => (Array.isArray((item as any)._variants) && (item as any)._variants.length > 0) || (item as any)._hasMeta === true)
@@ -1248,6 +1286,11 @@ export function mergePlatformItems<T extends object>(
       continue;
     if (fullMacroKeys.has(uniqueKey))
       continue;
+
+    // 如果该项不在当前构建新生成的 items 中，且磁盘上物理文件已不存在，则视为已删除页面，不保留幽灵变体
+    if (!itemsKeySet.has(uniqueKey) && !isPagePhysicalFileExisted(uniqueKey, rootDir, projectRoot)) {
+      continue;
+    }
 
     const beforeComments = src[Symbol.for(`before:${i}`)] as any[] | undefined;
     const conditionalComment = beforeComments?.find(
@@ -1429,7 +1472,8 @@ export function mergePagesJson(
   output: PagesJsonOutput,
   currentPlatform: string,
   sandboxActive: boolean = false,
-  extraPlatforms: string[] = []
+  extraPlatforms: string[] = [],
+  projectRoot: string = process.cwd()
 ): string {
   let oldConfig: any = {};
   if (existingContent && existingContent.trim() !== '') {
@@ -1443,7 +1487,7 @@ export function mergePagesJson(
   }
 
   const oldPages = Array.isArray(oldConfig.pages) ? oldConfig.pages : undefined;
-  const mergedPagesRes = mergePlatformItems(oldPages, currentPlatform, output.pages, 'path', sandboxActive, extraPlatforms);
+  const mergedPagesRes = mergePlatformItems(oldPages, currentPlatform, output.pages, 'path', sandboxActive, extraPlatforms, '', projectRoot);
   const mergedPages = mergedPagesRes.items;
 
   // 首页置顶
@@ -1479,17 +1523,21 @@ export function mergePagesJson(
     for (const existingSub of oldSubPackages) {
       const sub = newSubMap.get(existingSub.root);
       if (sub) {
-        const subMerged = mergePlatformItems(existingSub.pages, currentPlatform, sub.pages, 'path', sandboxActive, extraPlatforms).items;
+        const root = existingSub.root;
+        const subMerged = mergePlatformItems(existingSub.pages, currentPlatform, sub.pages, 'path', sandboxActive, extraPlatforms, root, projectRoot).items;
         existingSub.pages = subMerged;
         mergedSubs.push(existingSub);
         newSubMap.delete(existingSub.root);
       }
       else if (!sandboxActive) {
-        mergedSubs.push(existingSub);
+        const absSubDir = path.resolve(projectRoot, existingSub.root);
+        if (fs.existsSync(absSubDir)) {
+          mergedSubs.push(existingSub);
+        }
       }
     }
     for (const remaining of newSubMap.values()) {
-      const subMerged = mergePlatformItems(undefined, currentPlatform, remaining.pages, 'path', sandboxActive, extraPlatforms).items;
+      const subMerged = mergePlatformItems(undefined, currentPlatform, remaining.pages, 'path', sandboxActive, extraPlatforms, remaining.root, projectRoot).items;
       mergedSubs.push({
         ...remaining,
         pages: subMerged
@@ -1517,11 +1565,12 @@ function writePagesJson(
     existing = fs.readFileSync(outputPath, 'utf-8');
   }
 
+  const projectRoot = path.dirname(path.resolve(outputPath));
   const currentPlatform = (currentPlatformStr || process.env.UNI_PLATFORM || 'h5').toUpperCase();
   // unibestX 作为 uni-app X 项目，APP（Android/iOS/Harmony）是核心编译底座。
   // 必须将 APP 纳入基线覆盖集，确保无论当前单端跑的是 H5 还是小程序，生成的 pages.json 始终保证 App-Android/iOS 有页可用，杜绝原生拦截报错
   const extraPlatforms = ['APP'];
-  const mergedContent = mergePagesJson(existing, output, currentPlatform, sandboxActive, extraPlatforms);
+  const mergedContent = mergePagesJson(existing, output, currentPlatform, sandboxActive, extraPlatforms, projectRoot);
 
   if (mergedContent !== existing) {
     fs.writeFileSync(outputPath, mergedContent, 'utf-8');

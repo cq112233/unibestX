@@ -73,6 +73,8 @@ else {
 
 // 4. 执行 bumpp 交互式版本递增 + CHANGELOG 自动生成
 console.log('\n📝 [2/3] 启动交互式版本管理与 CHANGELOG 自动提取...');
+console.log('   💡 交互说明：按 ↑ / ↓ 方向键可选择版本；选中最底部的「custom ...」回车即可自己输入任意版本号');
+console.log('   💡 命令行直传：也可以直接执行 pnpm release 1.2.0 或 pnpm release minor\n');
 
 const defaultOptions = [
   'exec',

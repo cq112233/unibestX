@@ -103,6 +103,7 @@ const router = useRouter();
 // - tailwindcss: /src/sub/tailwindcssBasicDemo/
 // - theme:       /src/sub/themeBasicDemo/
 // - router:      /src/sub/routerBasicDemo/
+// - permission:  /src/sub/permissionDemo/
 // - lang:        /src/sub/langBasicDemo/
 // - font:        /src/sub/fontBasicDemo/
 // - icon:        /src/sub/iconBasicDemo/
@@ -153,6 +154,13 @@ const demoList: Array<BasicDemoItem> = [
     path: '/src/sub/routerBasicDemo/routerBasicDemo'
   },
   {
+    id: 'permission',
+    title: '页面与按钮权限',
+    desc: '用户信息直接返回权限结果，页面入口和操作按钮没有权限就不渲染。',
+    btnText: '进入页面与按钮权限演示',
+    path: '/src/sub/permissionDemo/permissionDemo'
+  },
+  {
     id: 'lang',
     title: 'i18n 多语言国际化',
     desc: '演示基于 vue-i18n 的中英文多语言即时动态切换。',
@@ -176,7 +184,7 @@ const demoList: Array<BasicDemoItem> = [
   {
     id: 'http',
     title: 'HTTP 网络请求',
-    desc: '基于 lime-request 封装，包含 Mock、真实接口与文件上传。',
+    desc: '基于原生 uni.request 封装，包含 Mock、真实接口与文件上传。',
     btnText: '进入 HTTP 网络请求功能',
     path: '/src/sub/httpBasicDemo/httpBasicDemo'
   },

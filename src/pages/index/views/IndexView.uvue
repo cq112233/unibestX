@@ -222,7 +222,7 @@
           </view>
         </view>
         <text class="text-[11px] leading-[18px] text-[#14532d] mb-[8px]">
-          一键拉取 Apifox / Swagger / OpenAPI 接口规范，自动生成符合 UTS 强类型规范的 API 客户端与数据模型（严格使用 type 别名，杜绝 interface 编译报错，深度复用 lime-request 拦截器与 Token 鉴权）：
+          一键拉取 Apifox / Swagger / OpenAPI 接口规范，自动生成符合 UTS 强类型规范的 API 客户端与数据模型（严格使用 type 别名，杜绝 interface 编译报错，深度复用 HTTP 客户端拦截器与 Token 鉴权）：
         </text>
 
         <!-- 特色亮点 chips -->
@@ -587,6 +587,42 @@ type FeatureItem = {
 
 const featureList: Array<FeatureItem> = [
   {
+    id: 'vapor',
+    title: '⚡ Vapor 蒸汽渲染',
+    desc: '无虚拟 DOM 原生高性能',
+    configPath: 'vite.config.ts / 双模式',
+    bgColor: '#3b82f60f',
+    borderColor: '#3b82f626',
+    textColor: '#2563eb'
+  },
+  {
+    id: 'tailwind',
+    title: '🖌️ Tailwind CSS',
+    desc: '原子化样式・全端自适应',
+    configPath: 'tailwind.config.ts',
+    bgColor: '#0d94880f',
+    borderColor: '#0d948826',
+    textColor: '#0d9488'
+  },
+  {
+    id: 'pages',
+    title: '📑 页面与分包路由',
+    desc: '页面注册・SubPackages 分包',
+    configPath: 'pages.json',
+    bgColor: '#f973160f',
+    borderColor: '#f9731626',
+    textColor: '#ea580c'
+  },
+  {
+    id: 'store',
+    title: '📦 全局状态管理',
+    desc: 'Pinia・Vapor/VDOM双模式',
+    configPath: 'src/store/index.uts',
+    bgColor: '#8b5cf60f',
+    borderColor: '#8b5cf626',
+    textColor: '#7c3aed'
+  },
+  {
     id: 'tabbar',
     title: '🚀 多策略 TabBar',
     desc: '5 种策略・单页保活零白屏',
@@ -596,28 +632,10 @@ const featureList: Array<FeatureItem> = [
     textColor: '#059669'
   },
   {
-    id: 'router',
-    title: '📄 路由与拦截守卫',
-    desc: 'route-bestX 路由引擎・导航守卫',
-    configPath: 'uni_modules/route-bestX',
-    bgColor: '#f59e0b0f',
-    borderColor: '#f59e0b26',
-    textColor: '#d97706'
-  },
-  {
-    id: 'route-hooks',
-    title: '🧩 组合式路由 Hooks',
-    desc: 'useRoute / useRouter 双 Hook',
-    configPath: 'uni_modules/route-bestX',
-    bgColor: '#c026d30f',
-    borderColor: '#c026d326',
-    textColor: '#a21caf'
-  },
-  {
     id: 'env',
     title: '🌐 多环境变量体系',
-    desc: '多端跨平台接口与环境',
-    configPath: '.env',
+    desc: '四文件分层・Mock 代理与接口域名',
+    configPath: '.env / src/config/env',
     bgColor: '#0284c70f',
     borderColor: '#0284c726',
     textColor: '#0284c7'
@@ -632,31 +650,67 @@ const featureList: Array<FeatureItem> = [
     textColor: '#4d7c0f'
   },
   {
+    id: 'router',
+    title: '📄 路由与拦截守卫',
+    desc: 'route-bestX 路由引擎・导航守卫',
+    configPath: 'uni_modules/route-bestX',
+    bgColor: '#f59e0b0f',
+    borderColor: '#f59e0b26',
+    textColor: '#d97706'
+  },
+  {
+    id: 'permission',
+    title: '🔐 页面与按钮权限',
+    desc: '用户信息直出・入口与按钮按权限显示',
+    configPath: 'src/sub/permissionDemo',
+    bgColor: '#e11d480f',
+    borderColor: '#e11d4826',
+    textColor: '#be123c'
+  },
+  {
+    id: 'route-hooks',
+    title: '🧩 组合式路由 Hooks',
+    desc: 'useRoute / useRouter 双 Hook',
+    configPath: 'uni_modules/route-bestX',
+    bgColor: '#c026d30f',
+    borderColor: '#c026d326',
+    textColor: '#a21caf'
+  },
+  {
     id: 'http',
     title: '📡 网络请求与拦截',
-    desc: '统一拦截・Token・401处理',
-    configPath: 'src/http/index.uts',
+    desc: 'request-bestX・Token・401 处理',
+    configPath: 'uni_modules/request-bestX',
     bgColor: '#06b6d40f',
     borderColor: '#06b6d426',
     textColor: '#0891b2'
   },
   {
-    id: 'store',
-    title: '📦 全局状态管理',
-    desc: 'Pinia・Vapor/VDOM双模式',
-    configPath: 'src/store/index.uts',
-    bgColor: '#8b5cf60f',
-    borderColor: '#8b5cf626',
-    textColor: '#7c3aed'
+    id: 'request-hooks',
+    title: '🪝 request-bestX Hooks',
+    desc: '对标 TanStack Query・异步状态管理三件套',
+    configPath: 'request-bestX/hooks',
+    bgColor: '#0ea5e90f',
+    borderColor: '#0ea5e926',
+    textColor: '#0284c7'
   },
   {
-    id: 'pages',
-    title: '📑 页面与分包路由',
-    desc: '页面注册・SubPackages 分包',
-    configPath: 'pages.json',
-    bgColor: '#f973160f',
-    borderColor: '#f9731626',
-    textColor: '#ea580c'
+    id: 'mock',
+    title: '🧪 本地 Mock 联调',
+    desc: 'vite-plugin-mock・无后端离线开发',
+    configPath: 'mock/ · pnpm dev:mock',
+    bgColor: '#84cc160f',
+    borderColor: '#84cc1626',
+    textColor: '#3f6212'
+  },
+  {
+    id: 'openapi',
+    title: '🧬 OpenAPI 接口生成',
+    desc: 'openapi-ts-request・强类型客户端',
+    configPath: 'pnpm api:gen',
+    bgColor: '#065f460f',
+    borderColor: '#065f4626',
+    textColor: '#059669'
   },
   {
     id: 'theme',
@@ -677,24 +731,6 @@ const featureList: Array<FeatureItem> = [
     textColor: '#e11d48'
   },
   {
-    id: 'tailwind',
-    title: '🖌️ Tailwind CSS',
-    desc: '原子化样式・全端自适应',
-    configPath: 'tailwind.config.ts',
-    bgColor: '#0d94880f',
-    borderColor: '#0d948826',
-    textColor: '#0d9488'
-  },
-  {
-    id: 'vapor',
-    title: '⚡ Vapor 蒸汽渲染',
-    desc: '无虚拟 DOM 原生高性能',
-    configPath: 'vite.config.ts / 双模式',
-    bgColor: '#3b82f60f',
-    borderColor: '#3b82f626',
-    textColor: '#2563eb'
-  },
-  {
     id: 'sandbox',
     title: '🧪 沙盒独立调试',
     desc: '单页秒级编译・极速开发',
@@ -711,15 +747,6 @@ const featureList: Array<FeatureItem> = [
     bgColor: '#14b8a60f',
     borderColor: '#14b8a626',
     textColor: '#0f766e'
-  },
-  {
-    id: 'openapi',
-    title: '🧬 OpenAPI 接口生成',
-    desc: 'openapi-ts-request・强类型客户端',
-    configPath: 'pnpm api:gen',
-    bgColor: '#065f460f',
-    borderColor: '#065f4626',
-    textColor: '#059669'
   },
   {
     id: 'engineering',

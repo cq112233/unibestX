@@ -1,0 +1,56 @@
+/**
+ * 原生 HTTP 请求核心门面 (Native Request Facade)
+ *
+ * 聚合基础强类型定义、HttpClient 控制器与纯净工厂函数。
+ * 结构清晰分层：
+ * - core/  : 核心调度引擎、生命周期管理、传输常量与核心强类型
+ * - util/  : URL 合并序列化、错误提取与配置复制等工具函数
+ *
+ * 纯原生驱动，零第三方库依赖，零业务代码耦合，可直接独立发布为 uni_modules/http-bestX。
+ */
+
+// 1. 核心控制器与传输协议枚举
+export { createHttpClient, HttpClient } from './core/client.uts';
+export { ContentTypeEnum } from './core/enum.uts';
+export { abortRequest, defaultLifecycle, HttpLifecycle, RequestLifecycle } from './core/lifecycle.uts';
+export type { CacheEntry } from './core/lifecycle.uts';
+
+// 3. 核心强类型与异常类定义
+export {
+  HttpError
+} from './core/types.uts';
+
+export type {
+  AbortableTask,
+  AfterResponseCompleteHook,
+  AfterResponseErrorHook,
+  AfterResponseOptions,
+  AfterResponseSuccessHook,
+  BeforeRequestHook,
+  DownloadResult,
+  HttpClientOptions,
+  HttpFailResult,
+  HttpRequestAdapter,
+  HttpRequestConfig,
+  HttpRequestMethod,
+  HttpResponse,
+  RespondedOptions,
+  StreamTask
+} from './core/types.uts';
+// 2. 组合式请求 Hook
+export * from './hooks/index.uts';
+
+// 3. 流式分块传输与增量 UTF-8 解码 (Stream)
+export * from './stream/stream.uts';
+
+// 4. 通用工具函数
+export {
+  cloneConfig,
+  extractErrorMessage,
+  extractStatusCode,
+  toError
+} from './util/helper.uts';
+export {
+  buildRequestUrl,
+  stringifyQueryParams
+} from './util/url.uts';

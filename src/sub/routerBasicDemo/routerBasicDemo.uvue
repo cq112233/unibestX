@@ -94,7 +94,7 @@
         <!-- push 对象形态 -->
         <view class="w-full rounded-[12px] bg-[#f8fafc] p-[12px] mb-[10px]">
           <text class="text-[12px] font-bold text-[#1e293b]" style="font-family: monospace;">router.push({ path, query })</text>
-          <text class="text-[11px] leading-[16px] text-[#64748b] mt-[4px]">对象形态：query 自动拼成 url 串，值会做 URL 编码。必须写成对象字面量，别先声明成变量再传。</text>
+          <text class="text-[11px] leading-[16px] text-[#64748b] mt-[4px]">对象形态：query 自动拼成 url 串，值会做 URL 编码。可传对象字面量，也可传 `RouteLocationRaw` 类型的变量（裸 UTSJSONObject 会被编译期挡下）。</text>
           <view class="h-[32px] flex flex-row items-center justify-center rounded-[8px] bg-[#7c3aed] mt-[8px]" @click="onPushByObject">
             <text class="text-[12px] font-bold text-[#ffffff]">跳到参数页（对象 + 中文参数）</text>
           </view>
@@ -170,7 +170,7 @@
             {{ hasLogin ? '已登录' : '未登录' }}
           </text>
         </view>
-        <text class="text-[12px] leading-[18px] text-[#94a3b8]">参数接收页属于需登录拦截页面（见 src/router/config/config.uts 的黑名单）：未登录时 useRouter().push 同样会被拦到登录页，登录成功后自动跳回目标页并解析 query。这说明 hooks 没有绕开拦截器。</text>
+        <text class="text-[12px] leading-[18px] text-[#94a3b8]">参数接收页属于需登录拦截页面（见 src/router/config.uts 的黑名单）：未登录时 useRouter().push 同样会被拦到登录页，登录成功后自动跳回目标页并解析 query。这说明 hooks 没有绕开拦截器。</text>
 
         <view class="flex flex-row items-center mt-[12px]">
           <view class="flex-1 h-[38px] flex flex-row items-center justify-center rounded-[8px] bg-[#2563eb] mr-[8px]" @click="jumpToTest">

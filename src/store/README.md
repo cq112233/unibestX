@@ -48,7 +48,13 @@ const userStore = useUserStore();
 
 // 登录成功后
 tokenStore.setSingleToken({ token: 'xxx', expiresIn: 7200 } as ISingleTokenRes);
-userStore.setUserInfo({ userId: 1, username: 'unix', nickname: 'UNIX', avatar: '' } as IUserInfo);
+userStore.setUserInfo({
+  userId: 1,
+  username: 'unix',
+  nickname: 'UNIX',
+  avatar: '',
+  permissions: ['report:read']
+} as IUserInfo);
 
 // 退出登录
 tokenStore.clearToken();

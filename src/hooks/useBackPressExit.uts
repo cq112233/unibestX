@@ -1,0 +1,82 @@
+/**
+ * 跨端「再按一次退出应用」组合式 hook
+ *
+ * 页面 `<script setup>` 中调用一次即可，内部注册页面级 `onBackPress`：
+ * - 首次触发：弹「再按一次退出应用」并拦截本次返回；
+ * - 时间窗内再次触发：退出应用。
+ *
+ * Android 端先 `finishAffinity()` 播放退出动画，延迟后 `System.exit(0)` 彻底杀进程，
+ * 确保下次启动是干净冷启动，避免 re-entry 时 setupRenderEffect NPE。
+ *
+ * ⚠️ `onBackPress` 是**页面级**生命周期，只能在页面 setup 的同步调用栈中注册，
+ *    请勿在子组件里调用本 hook。
+ * ⚠️ 每调用一次都会注册一个处理器；同一个页面只调用一次。
+ */
+
+import { onBackPress } from '@dcloudio/uni-app';
+import { isApp } from '@/src/config/env/platform.uts';
+
+/**
+ * 注册「双击返回键退出应用」的页面返回拦截
+ * @param duration 双击判定时间窗（毫秒），默认 2000ms
+ */
+export function useBackPressExit(duration: number = 2000): void {
+  // 每个页面一份状态：同一时刻只有栈顶页面会收到 onBackPress，互不干扰
+  let firstBackTime = 0;
+
+  onBackPress((options: OnBackPressOptions): boolean => {
+    // 非 App 端或非物理返回键（如 navigateBack API）不拦截
+    if (!isApp || options.from != 'backbutton') {
+      return false;
+    }
+
+    const now = Date.now();
+    if (firstBackTime == 0 || now - firstBackTime > duration) {
+      firstBackTime = now;
+      uni.showToast({
+        title: '再按一次退出应用',
+        position: 'bottom'
+      });
+      setTimeout(() => {
+        // 时间窗内没有第二次触发则复位，避免过期时间窗被误判
+        if (firstBackTime == now) {
+          firstBackTime = 0;
+        }
+      }, duration);
+      return true;
+    }
+
+    // 时间窗内再次触发，退出应用
+    exitApplication();
+    return false;
+  });
+}
+
+/**
+ * 退出应用（仅 App 端会走到这里）
+ *
+ * 条件编译段内只做平台分支，禁止在注释里写带斜杠的预处理标记。
+ */
+function exitApplication(): void {
+  // #ifdef APP-ANDROID && !VUE3-VAPOR
+  try {
+    const activity = UTSAndroid.getUniActivity();
+    if (activity != null) {
+      // 先关闭 Activity（带退出动画）
+      activity.finishAffinity();
+    }
+    // 等退出动画播放完毕后，强制杀进程确保彻底退出
+    setTimeout(() => {
+      // #ifdef APP-ANDROID && !VUE3-VAPOR
+      java.lang.System.exit(0);
+      // #endif
+    }, 500);
+  }
+  catch {
+    uni.exit();
+  }
+  // #endif
+  // #ifndef APP-ANDROID && !VUE3-VAPOR
+  uni.exit();
+  // #endif
+}

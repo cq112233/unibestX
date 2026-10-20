@@ -6,30 +6,44 @@
  * 2. 提供 `createApiInstance` 与 `buildApiInstanceOptions`，支持为不同 API 基础地址创建专用的独立 HttpClient 实例与配置。
  */
 
-import type { LimeRequestConfig, Request } from '@/uni_modules/lime-request';
-import { useTokenStore } from '@/src/store/index.uts';
+import { useTokenStore, useUserStore } from '@/src/store/index.uts';
 import { toLoginPage } from '@/src/utils/auth/toLoginPage.uts';
 import {
+  cloneConfig,
   ContentTypeEnum,
   createHttpClient,
   defaultLifecycle,
-  defaultRequestAdapter,
   extractErrorMessage,
-  extractStatusCode,
-  ResultEnum
-} from '../../request/request.uts';
+  extractStatusCode
+} from '@/uni_modules/request-bestX/index.uts';
 import type {
   HttpClient,
   HttpClientOptions,
+  HttpRequestConfig,
   RespondedOptions
-} from '../../request/request.uts';
+} from '@/uni_modules/request-bestX/index.uts';
 import {
   BusinessError,
+  HttpError,
   resolveErrorMessage
 } from '../../error/error.uts';
-import { tryRefreshToken } from '../../request/internal/refresh.uts';
-import { getApiBaseUrl, getH5UseProxy } from '@/src/config/index.uts';
+import { ResultEnum, ShowMessage } from './enum.uts';
+import { tryRefreshToken } from './refresh.uts';
+import { getApiBaseUrl, getH5UseProxy, getUseMock } from '@/src/config/index.uts';
 import { resolveServiceBaseUrl } from './config.uts';
+
+/** 具备配置读取能力的客户端抽象（避免在 UTS 中对 any 做动态方法调用） */
+type HttpClientOptionsProvider = {
+  getOptions: () => HttpClientOptions | null;
+};
+
+/**
+ * 清理完整登录态：Token 与用户信息必须同时清空，避免 401 后残留旧权限。
+ */
+function clearAuthSession(): void {
+  useTokenStore().clearToken();
+  useUserStore().clearUserInfo();
+}
 
 // ==========================================
 // 业务拦截器生成函数
@@ -39,7 +53,7 @@ import { resolveServiceBaseUrl } from './config.uts';
  * 业务默认请求前置拦截钩子：处理业务 Token 鉴权注入
  * @param config 会被原地改写的请求配置
  */
-export function defaultBusinessBeforeRequest(config: LimeRequestConfig): void {
+export function defaultBusinessBeforeRequest(config: HttpRequestConfig): void {
   // 业务 Token 鉴权与自动注入
   if (config.header == null) {
     config.header = {} as UTSJSONObject;
@@ -64,6 +78,12 @@ export function defaultBusinessBeforeRequest(config: LimeRequestConfig): void {
       const tokenStore = useTokenStore();
       const token = tokenStore.getToken();
       if (token == '') {
+        // 本地 Mock 模式（pnpm dev:mock）免登录放行，自动注入 mock-token 便于离线联调
+        if (getUseMock()) {
+          header.token = 'mock-dev-token';
+          return;
+        }
+        clearAuthSession();
         throw new Error('[请求错误]：未登录');
       }
       header.token = token;
@@ -72,17 +92,31 @@ export function defaultBusinessBeforeRequest(config: LimeRequestConfig): void {
 }
 
 /**
- * 业务默认响应成功钩子：状态码判定、业务 code 校验、Toast 提示、业务 401 标记与数据解包
+ * 业务默认响应成功钩子：状态码判定、业务 code 校验、Toast 提示、业务 401 令牌刷新/重放与数据解包
  */
-export function defaultBusinessAfterSuccess(data: any, config: LimeRequestConfig): any {
+export function defaultBusinessAfterSuccess(
+  data: any,
+  config: HttpRequestConfig,
+  client: any | null = null,
+  customOptions: HttpClientOptions | null = null
+): any {
   if (data == null) {
     throw new Error('返回的响应数据为空');
   }
-  const resultObj = JSON.parseObject(JSON.stringify(data));
+  // ⚠️ 必须判「是不是 JSON 对象」再取字段：
+  //    H5 的 UTS.JSON.parseObject 对**纯文本**回包会原样返回那个字符串（不是 null），
+  //    而字符串上没有 getNumber / get 等方法。HTTP 404 的 HTML 错误页、后端返回的
+  //    "Function Not Found" 这类纯文本就是这种形态，不判类型直接调用会抛
+  //    `resultObj.getNumber is not a function`，把真正的 HTTP 错误掩盖成一条无意义的 TypeError。
+  //    （App / 小程序端 parseObject 对非 JSON 文本返回 null，不受影响。）
+  const parsedResult = JSON.parseObject(JSON.stringify(data));
+  const resultObj: UTSJSONObject | null = parsedResult instanceof UTSJSONObject ? parsedResult : null;
   if (resultObj != null) {
     const code = resultObj.getNumber('code');
+    // 有code 字段, 返回data
     if (code != null) {
       const codeVal = code as number;
+      // code不是成功码, 直接抛出异常
       if (codeVal != ResultEnum.Success0 && codeVal != ResultEnum.Success200) {
         const msgByKey = resultObj.message as string | null;
         const msgByMsg = resultObj.msg as string | null;
@@ -99,34 +133,100 @@ export function defaultBusinessAfterSuccess(data: any, config: LimeRequestConfig
         if (toastEnabled) {
           uni.showToast({ title: message, icon: 'none' });
         }
-        if (codeVal == ResultEnum.Unauthorized) {
-          let skipRefresh = false;
-          if (extra != null) {
-            const skipVal = (extra as UTSJSONObject).getBoolean('skipRefresh');
-            if (skipVal == true) {
-              skipRefresh = true;
+        // 401 未授权，触发刷新令牌并重试
+        if (codeVal >= 400 && codeVal <= 599) {
+          if (codeVal == ResultEnum.Unauthorized) {
+            let skipRefresh = false;
+            if (extra != null) {
+              const extraObj = extra as UTSJSONObject;
+              const skipVal = typeof extraObj.getBoolean == 'function'
+                ? extraObj.getBoolean('skipRefresh')
+                : (extraObj.skipRefresh as boolean | null);
+              if (skipVal == true) {
+                skipRefresh = true;
+              }
             }
+            let activeOptions: HttpClientOptions | null = customOptions;
+            if (client != null) {
+              activeOptions = (client as HttpClientOptionsProvider).getOptions();
+            }
+
+            if (skipRefresh || client == null) {
+              const onUnauth = activeOptions?.onUnauthorized;
+              clearAuthSession();
+              if (onUnauth != null) {
+                onUnauth();
+              }
+              else {
+                toLoginPage({ mode: 'reLaunch' } as UTSJSONObject);
+              }
+              const fullData = resultObj != null ? resultObj : data;
+              throw new HttpError(`未授权[${ResultEnum.Unauthorized}]：${message}`, codeVal, fullData);
+            }
+
+            // 触发业务刷新令牌并重试
+            const doRefresh = activeOptions?.refreshToken != null
+              ? activeOptions!.refreshToken!()
+              : tryRefreshToken();
+
+            return doRefresh.then((refreshOk: boolean): Promise<any> => {
+              if (!refreshOk) {
+                const onUnauth = activeOptions?.onUnauthorized;
+                clearAuthSession();
+                if (onUnauth != null) {
+                  onUnauth();
+                }
+                else {
+                  toLoginPage({ mode: 'reLaunch' } as UTSJSONObject);
+                }
+                const fullData = resultObj != null ? resultObj : data;
+                return Promise.reject(new HttpError(`未授权[${ResultEnum.Unauthorized}]：${message}`, codeVal, fullData)) as Promise<any>;
+              }
+
+              // 准备重放配置
+              const replayConfig = cloneConfig(config);
+              if (replayConfig.extra == null) {
+                replayConfig.extra = {} as UTSJSONObject;
+              }
+              const replayExtra = replayConfig.extra as UTSJSONObject;
+              replayExtra.skipRefresh = true;
+
+              // 清空旧 token，确保重放时 beforeRequest 能重新注入新 token
+              if (replayConfig.header != null) {
+                const h = replayConfig.header as UTSJSONObject;
+                h.token = '';
+              }
+
+              const targetClient = client as HttpClient;
+              return targetClient.request<any>(replayConfig);
+            });
           }
-          if (skipRefresh) {
-            throw new BusinessError(message, codeVal);
-          }
-          throw new Error('__REFRESHABLE_401__');
+          const errorMessage = ShowMessage(codeVal);
+          const fullData = resultObj != null ? resultObj : data;
+          throw new HttpError(`${errorMessage}：${message}`, codeVal, fullData);
         }
-        throw new BusinessError(message, codeVal);
+        const fullData = resultObj != null ? resultObj : data;
+        throw new BusinessError(message, codeVal, fullData);
       }
     }
+    // 无code 字段, 返回data
     const innerData = resultObj.get('data');
+
+    // 有可能内层的data也是
     if (innerData != null) {
-      return innerData;
+      const wrapped = JSON.parseObject(JSON.stringify(innerData));
+      return wrapped != null ? wrapped : innerData;
     }
   }
-  return data;
+  const fallbackWrapped = JSON.parseObject(JSON.stringify(data));
+
+  return fallbackWrapped != null ? fallbackWrapped : data;
 }
 
 /**
  * 业务默认响应失败钩子：统一网络错误提示
  */
-export function defaultBusinessAfterError(err: any, _config: LimeRequestConfig): void {
+export function defaultBusinessAfterError(err: any, config: HttpRequestConfig): void {
   console.error('request error ===>', err);
   const rawMsg = extractErrorMessage(err);
   if (rawMsg.toLowerCase().includes('abort')) {
@@ -135,13 +235,20 @@ export function defaultBusinessAfterError(err: any, _config: LimeRequestConfig):
   if (err instanceof BusinessError) {
     return;
   }
+  const extra = config.extra;
+  if (extra != null) {
+    const toastVal = (extra as UTSJSONObject).getBoolean('toast');
+    if (toastVal == false) {
+      return;
+    }
+  }
   uni.showToast({ title: resolveErrorMessage(rawMsg, -1, extractStatusCode(err)).message, icon: 'none' });
 }
 
 /**
  * 业务默认响应完成钩子：请求收尾处理
  */
-export function defaultBusinessAfterComplete(_config: LimeRequestConfig): void {
+export function defaultBusinessAfterComplete(_config: HttpRequestConfig): void {
   // 默认收尾钩子，供业务埋点、关闭全屏 loading 等扩展
 }
 
@@ -173,6 +280,10 @@ export function buildApiInstanceOptions(
   }
   // #endif
 
+  const respondedOptions: RespondedOptions | null = customOptions != null && customOptions.responded != null
+    ? customOptions.responded as RespondedOptions
+    : null;
+
   const options: HttpClientOptions = {
     baseURL: effectiveBaseUrl,
     timeout: customOptions?.timeout ?? 5000,
@@ -180,14 +291,9 @@ export function buildApiInstanceOptions(
       'Content-Type': ContentTypeEnum.AppJson,
       'Accept': 'application/json, text/plain, */*'
     } as UTSJSONObject) as UTSJSONObject,
-    requestAdapter: (config: LimeRequestConfig): Request => {
-      if (customOptions?.requestAdapter != null) {
-        return customOptions.requestAdapter!(config);
-      }
-      return defaultRequestAdapter(config);
-    },
+    requestAdapter: customOptions?.requestAdapter,
     lifecycle: customOptions?.lifecycle ?? defaultLifecycle,
-    beforeRequest: (config: LimeRequestConfig): void => {
+    beforeRequest: (config: HttpRequestConfig): void => {
       if (customOptions?.beforeRequest != null) {
         customOptions.beforeRequest!(config);
       }
@@ -196,23 +302,23 @@ export function buildApiInstanceOptions(
       }
     },
     responded: {
-      onSuccess: (data: any, config: LimeRequestConfig): any => {
-        if (customOptions?.responded?.onSuccess != null) {
-          return customOptions.responded.onSuccess!(data, config);
+      onSuccess: (data: any, config: HttpRequestConfig, client?: any): any => {
+        if (respondedOptions != null && respondedOptions.onSuccess != null) {
+          return respondedOptions.onSuccess!(data, config, client);
         }
-        return defaultBusinessAfterSuccess(data, config);
+        return defaultBusinessAfterSuccess(data, config, client, customOptions);
       },
-      onError: (err: any, config: LimeRequestConfig): void => {
-        if (customOptions?.responded?.onError != null) {
-          customOptions.responded.onError!(err, config);
+      onError: (err: any, config: HttpRequestConfig): void => {
+        if (respondedOptions != null && respondedOptions.onError != null) {
+          respondedOptions.onError!(err, config);
         }
         else {
           defaultBusinessAfterError(err, config);
         }
       },
-      onComplete: (config: LimeRequestConfig): void => {
-        if (customOptions?.responded?.onComplete != null) {
-          customOptions.responded.onComplete!(config);
+      onComplete: (config: HttpRequestConfig): void => {
+        if (respondedOptions != null && respondedOptions.onComplete != null) {
+          respondedOptions.onComplete!(config);
         }
         else {
           defaultBusinessAfterComplete(config);
@@ -226,12 +332,11 @@ export function buildApiInstanceOptions(
       return tryRefreshToken();
     },
     onUnauthorized: () => {
+      clearAuthSession();
       if (customOptions?.onUnauthorized != null) {
         customOptions.onUnauthorized!();
       }
       else {
-        const tokenStore = useTokenStore();
-        tokenStore.clearToken();
         toLoginPage({ mode: 'reLaunch' } as UTSJSONObject);
       }
     }
