@@ -178,3 +178,11 @@ export function logoutApi(): Promise<boolean> {
     return true;
   });
 }
+
+// ==========================================
+// 4. 向下兼容别名导出（兼顾无 Api 后缀的旧调用与单测契约）
+// ==========================================
+export const login = loginApi;
+export const fetchUserInfo = fetchUserInfoApi;
+export const refreshAccessToken = refreshAccessTokenApi;
+export const logout = logoutApi;

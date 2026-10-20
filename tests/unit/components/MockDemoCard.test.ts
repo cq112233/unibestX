@@ -21,8 +21,8 @@ const { fetchMockFooListMock, fetchMockLoginMock, foodSampleMock } = vi.hoisted(
 
 vi.mock('@/src/api/example.uts', () => {
   return {
-    fetchMockFooList: fetchMockFooListMock,
-    fetchMockLogin: fetchMockLoginMock
+    fetchMockFooListApi: fetchMockFooListMock,
+    fetchMockLoginApi: fetchMockLoginMock
   };
 });
 

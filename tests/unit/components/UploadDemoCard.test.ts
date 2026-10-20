@@ -21,7 +21,7 @@ const { uploadFooFileMock } = vi.hoisted(() => {
 vi.mock('@/src/api/example.uts', () => {
   return {
     FOO_UPLOAD_PATH: 'https://tmpfiles.org/api/v1/upload',
-    uploadFooFile: uploadFooFileMock
+    uploadFooFileApi: uploadFooFileMock
   };
 });
 

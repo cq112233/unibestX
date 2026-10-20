@@ -664,3 +664,18 @@ export function fetchMockLoginApi(username: string, password: string): Promise<M
     } as MockLoginResult);
   });
 }
+
+// ==========================================
+// 6. 向下兼容别名导出（兼顾无 Api 后缀的旧调用与单测契约）
+// ==========================================
+export const fetchFooList = fetchFooListApi;
+export const fetchFooLatest = fetchFooLatestApi;
+export const fetchFooById = fetchFooByIdApi;
+export const createFoo = createFooApi;
+export const updateFoo = updateFooApi;
+export const deleteFoo = deleteFooApi;
+export const fetchFooRemote = fetchFooRemoteApi;
+export const uploadFooFile = uploadFooFileApi;
+export const downloadFooFile = downloadFooFileApi;
+export const fetchMockFooList = fetchMockFooListApi;
+export const fetchMockLogin = fetchMockLoginApi;
