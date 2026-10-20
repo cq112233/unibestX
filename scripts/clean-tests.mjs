@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * 一键清除 tests/unit/ 下的单元测试与测试辅助文件（保留 tests/setup.ts 与 vitest 配置）
+ * 一键清除 tests/unit/ 下的单元测试与测试辅助文件（保留示例测试、tests/setup.ts 与 vitest 配置）
  * 用法: pnpm clean:tests 或 node scripts/clean-tests.mjs
  *
  * 参数:
@@ -13,6 +13,7 @@ import { fileURLToPath } from 'node:url';
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const unitTestDir = path.join(rootDir, 'tests', 'unit');
+const preservedFiles = [path.join(unitTestDir, 'example.test.ts')];
 
 /**
  * 解析命令行参数
@@ -47,6 +48,7 @@ function printHelp() {
   pnpm clean:tests -- --dry-run    # 只预览，不删除
 
 保留:
+  · tests/unit/example.test.ts（单测示例模板）
   · tests/setup.ts
   · vitest.config.ts
 `);
@@ -105,9 +107,10 @@ function main() {
     return;
   }
 
-  const { files, dirs } = collectEntries(unitTestDir);
+  const { files: allFiles, dirs } = collectEntries(unitTestDir);
+  const files = allFiles.filter(file => !preservedFiles.includes(file));
   if (files.length == 0) {
-    console.log('ℹ tests/unit/ 下没有可清理的文件');
+    console.log('ℹ tests/unit/ 下没有可清理的文件（tests/unit/example.test.ts 已保留）');
     return;
   }
 
@@ -115,6 +118,7 @@ function main() {
   const modeText = options.dryRun ? '预览（不会删除）' : '执行删除';
   console.log(`🧪 单测清理目录: ${path.relative(rootDir, unitTestDir)}`);
   console.log(`🧹 模式: ${modeText} · ${files.length} 个文件 · ${formatSize(totalBytes)}`);
+  console.log(`📌 保留: ${preservedFiles.map(file => path.relative(rootDir, file)).join(', ')}`);
 
   for (const file of files) {
     console.log(`  - ${path.relative(rootDir, file)}`);
@@ -136,7 +140,7 @@ function main() {
   }
 
   console.log(`\n✅ 已清除 tests/unit/ 下 ${files.length} 个文件`);
-  console.log('ℹ tests/setup.ts 与 vitest.config.ts 已保留');
+  console.log('ℹ tests/unit/example.test.ts、tests/setup.ts 与 vitest.config.ts 已保留');
 }
 
 try {

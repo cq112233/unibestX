@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * 一键清除 mock/ 下的所有文件（保留 mock/ 目录本身）
+ * 一键清除 mock/ 下的所有文件（保留 mock/ 目录与 mock/example.ts）
  * 用法: pnpm clean:mock 或 node scripts/clean-mock.mjs
  *
  * 参数:
@@ -13,6 +13,7 @@ import { fileURLToPath } from 'node:url';
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const mockDir = path.join(rootDir, 'mock');
+const preservedFiles = [path.join(mockDir, 'example.ts')];
 
 /**
  * 解析命令行参数
@@ -40,11 +41,14 @@ function parseArgs(argv) {
 
 function printHelp() {
   console.log(`
-一键清除 mock/ 下的所有文件（保留 mock/ 目录）
+一键清除 mock/ 下的所有文件（保留 mock/ 目录与 mock/example.ts）
 
 用法:
   pnpm clean:mock                 # 直接清除
   pnpm clean:mock -- --dry-run    # 只预览，不删除
+
+保留:
+  · mock/example.ts（Mock 示例模板）
 `);
 }
 
@@ -101,9 +105,10 @@ function main() {
     return;
   }
 
-  const { files, dirs } = collectEntries(mockDir);
+  const { files: allFiles, dirs } = collectEntries(mockDir);
+  const files = allFiles.filter(file => !preservedFiles.includes(file));
   if (files.length == 0) {
-    console.log('ℹ mock/ 下没有可清理的文件');
+    console.log('ℹ mock/ 下没有可清理的文件（mock/example.ts 已保留）');
     return;
   }
 
@@ -111,6 +116,7 @@ function main() {
   const modeText = options.dryRun ? '预览（不会删除）' : '执行删除';
   console.log(`📦 Mock 清理目录: ${path.relative(rootDir, mockDir)}`);
   console.log(`🧹 模式: ${modeText} · ${files.length} 个文件 · ${formatSize(totalBytes)}`);
+  console.log(`📌 保留: ${preservedFiles.map(file => path.relative(rootDir, file)).join(', ')}`);
 
   for (const file of files) {
     console.log(`  - ${path.relative(rootDir, file)}`);
