@@ -178,11 +178,10 @@ export function defaultBusinessAfterSuccess(
               const replayExtra = replayConfig.extra as UTSJSONObject;
               replayExtra.skipRefresh = true;
 
-              // 摘掉旧 token，确保重放时 beforeRequest 能重新注入新 token
+              // 清空旧 token，确保重放时 beforeRequest 能重新注入新 token
               if (replayConfig.header != null) {
                 const h = replayConfig.header as UTSJSONObject;
-                // eslint-disable-next-line dot-notation
-                delete h['token'];
+                h.token = '';
               }
 
               const targetClient = client as HttpClient;
