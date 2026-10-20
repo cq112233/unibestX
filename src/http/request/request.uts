@@ -1,30 +1,9 @@
-/**
- * HTTP 请求服务入口门面 (Request Facade)
- *
- * 聚合核心客户端 (HttpClient)、生命周期管理器 (RequestLifecycle)
- * 与业务默认拦截器、默认配置 (DEFAULT_HTTP_OPTIONS) 及单例实例。
- */
-
 import { Request } from '@/uni_modules/lime-request';
 import type { LimeRequestConfig } from '@/uni_modules/lime-request';
-import { useTokenStore } from '@/src/store/index.uts';
-import { toLoginPage } from '@/src/utils/auth/toLoginPage.uts';
-import { ContentTypeEnum, ResultEnum } from './internal/enum.uts';
-import { BusinessError, resolveErrorMessage } from '../error/error.uts';
-import { tryRefreshToken } from './internal/refresh.uts';
+import { ContentTypeEnum } from './internal/enum.uts';
 import { defaultLifecycle } from './internal/lifecycle.uts';
-import {
-  extractErrorMessage,
-  extractStatusCode,
-  HttpClient
-} from './internal/client.uts';
-import type {
-  DownloadResult,
-  HttpClientOptions,
-  RespondedOptions,
-  StreamTask
-} from './internal/client.uts';
-import { getApiBaseUrl, getApiSecondaryUrl, getH5UseProxy } from '@/src/config/index.uts';
+import { HttpClient } from './internal/client.uts';
+import type { HttpClientOptions } from './internal/client.uts';
 
 // 导出内部模块枚举与类型
 export * from './internal/client.uts';
@@ -42,316 +21,42 @@ export type IResponse<T> = {
 };
 
 // ==========================================
-// 域名配置（所有端统一从 Vite 环境变量读取）
-// ==========================================
-
-const DEFAULT_API_URL: string = 'https://ukw0y1.laf.run';
-const directBaseUrl: string = getApiBaseUrl();
-const directSecondaryUrl: string = getApiSecondaryUrl();
-
-// 环境变量给的是以 / 开头的相对路径时，说明语义本来就不是「直连」（H5 走同源代理、或开发态 mock），
-// 此时直连域名回退到云端默认地址；只有配了完整域名才采用环境变量里的值
-let defaultUrl: string = directBaseUrl.startsWith('/') ? DEFAULT_API_URL : directBaseUrl;
-let secondaryUrl: string = directSecondaryUrl.startsWith('/') ? DEFAULT_API_URL : directSecondaryUrl;
-
-// #ifdef H5
-// H5：VITE_H5_USE_PROXY=true 时走 /api 反向代理
-const useH5Proxy: boolean = getH5UseProxy();
-if (useH5Proxy) {
-  defaultUrl = '/api';
-  secondaryUrl = '/api';
-}
-// #endif
-
-/** 域名表契约：主域名与备用域名 */
-export type ApiDomainConfig = {
-  DEFAULT: string;
-  SECONDARY: string;
-};
-
-/** 对外暴露的域名表；临时切域名时用 `config.baseURL = API_DOMAINS.SECONDARY` 覆盖单次请求 */
-export const API_DOMAINS: ApiDomainConfig = {
-  DEFAULT: defaultUrl,
-  SECONDARY: secondaryUrl
-};
-
-// ==========================================
-// 业务默认适配器与拦截钩子
+// 核心适配器与纯净工厂函数
 // ==========================================
 
 /**
  * 默认请求适配器：基于 lime-request 实例化底层网络驱动客户端
  * @param config 本次请求的完整配置（baseURL / method / header / timeout 等）；
- *               适配器只把它交给底层驱动，**不修改入参**
+ *               适配器只把它交给底层驱动，不修改入参
  */
 export function defaultRequestAdapter(config: LimeRequestConfig): Request {
   return new Request(config);
 }
 
 /**
- * 业务默认请求前置拦截钩子：处理业务 Token 鉴权与注入
- * @param config 会被**原地改写**的请求配置，函数体做两件事：
- *               - `extra.ignoreAuth === true` ⇒ 跳过鉴权（登录 / 刷新 token 这类接口必须开）；
- *               - 否则把 token 写进 `config.header`，本地无 token 时直接抛「未登录」中断本次请求。
- */
-export function defaultBusinessBeforeRequest(config: LimeRequestConfig): void {
-  if (config.header == null) {
-    config.header = {} as UTSJSONObject;
-  }
-  const header = config.header as UTSJSONObject;
-  const extra = config.extra;
-  let ignoreAuth = false;
-  if (extra != null) {
-    const extraObj = extra as UTSJSONObject;
-    const authVal = typeof extraObj.getBoolean == 'function'
-      ? extraObj.getBoolean('ignoreAuth')
-      : (extraObj.ignoreAuth as boolean | null);
-    if (authVal == true) {
-      ignoreAuth = true;
-    }
-  }
-  if (!ignoreAuth) {
-    const existingToken = typeof header.getString == 'function'
-      ? header.getString('token')
-      : (header.token as string | null);
-    if (existingToken == null || existingToken == '') {
-      const tokenStore = useTokenStore();
-      const token = tokenStore.getToken();
-      if (token == '') {
-        throw new Error('[请求错误]：未登录');
-      }
-      header.token = token;
-    }
-  }
-}
-
-/**
- * 业务默认响应成功钩子：状态码判定、业务 code 校验、Toast 提示、业务 401 标记与数据解包
- * @param data 底层驱动返回的**原始响应体（尚未拆包）**，函数返回的是 `data.data` 内层业务数据
- * @param config 本次请求配置，只读其中 `extra` 的两个开关：
- *               `extra.toast === false` 抑制错误提示；`extra.skipRefresh === true` 时 401 不再抛可刷新哨兵（刷新接口自身必须开，否则无限递归）
- */
-export function defaultBusinessAfterSuccess(data: any, config: LimeRequestConfig): any {
-  if (data == null) {
-    throw new Error('返回的响应数据为空');
-  }
-  const resultObj = JSON.parseObject(JSON.stringify(data));
-  if (resultObj != null) {
-    const code = resultObj.getNumber('code');
-    if (code != null) {
-      const codeVal = code as number;
-      if (codeVal != ResultEnum.Success0 && codeVal != ResultEnum.Success200) {
-        const msgByKey = resultObj.message as string | null;
-        const msgByMsg = resultObj.msg as string | null;
-        const message: string = msgByKey != null ? msgByKey : (msgByMsg != null ? msgByMsg : '未知错误');
-
-        const extra = config.extra;
-        let toastEnabled = true;
-        if (extra != null) {
-          const toastVal = (extra as UTSJSONObject).getBoolean('toast');
-          if (toastVal == false) {
-            toastEnabled = false;
-          }
-        }
-        if (toastEnabled) {
-          uni.showToast({ title: message, icon: 'none' });
-        }
-        if (codeVal == ResultEnum.Unauthorized) {
-          let skipRefresh = false;
-          if (extra != null) {
-            const skipVal = (extra as UTSJSONObject).getBoolean('skipRefresh');
-            if (skipVal == true) {
-              skipRefresh = true;
-            }
-          }
-          if (skipRefresh) {
-            throw new BusinessError(message, codeVal);
-          }
-          throw new Error('__REFRESHABLE_401__');
-        }
-        // 用 BusinessError 而不是把业务码拍进文案：调用方与错误归一都还需要这个码
-        throw new BusinessError(message, codeVal);
-      }
-    }
-    const innerData = resultObj.get('data');
-    if (innerData != null) {
-      return innerData;
-    }
-  }
-  return data;
-}
-
-/**
- * 业务默认响应失败钩子：统一网络错误提示
- * @param err 底层驱动抛出的失败对象，经 `extractErrorMessage` 取文案后弹 toast；
- *            主动取消的请求（文案含 `abort`）静默返回，不打扰用户
- * @param _config 形参带下划线前缀 = 默认实现不消费，保留仅为对齐 `responded.onError` 的三方签名
- */
-export function defaultBusinessAfterError(err: any, _config: LimeRequestConfig): void {
-  console.error('request error ===>', err);
-  const rawMsg = extractErrorMessage(err);
-  if (rawMsg.toLowerCase().includes('abort')) {
-    return;
-  }
-  // 业务错误的文案已在 defaultBusinessAfterSuccess 里按后端原文提示过，
-  // 这里再弹一次只会把用户看不懂的内部标记透出去；业务码随 BusinessError 继续交给调用方
-  // （toError 对 Error 实例原样透传，调用方拿到的仍是这个带 code 的实例）
-  if (err instanceof BusinessError) {
-    return;
-  }
-  // HTTP 层失败带着真实状态码，作为首选判据；取不到再交给文案兜底
-  uni.showToast({ title: resolveErrorMessage(rawMsg, -1, extractStatusCode(err)).message, icon: 'none' });
-}
-
-/**
- * 业务默认响应完成钩子：请求收尾处理（无论成功、失败或命中缓存均会执行）
- * @param _config 形参带下划线前缀 = 默认实现为空，保留仅为对齐 `responded.onComplete` 签名；
- *                业务接入时在这里统一收尾（关 loading、统计耗时等）
- */
-export function defaultBusinessAfterComplete(_config: LimeRequestConfig): void {
-  // 默认收尾逻辑，供全局业务扩展（如统一关闭 loading、统计请求耗时等）
-}
-
-/**
- * 默认基础 HTTP 配置选项（集成业务 Token 注入、统一错误提示与无感刷新）
- */
-export const DEFAULT_HTTP_OPTIONS: HttpClientOptions = {
-  baseURL: API_DOMAINS.DEFAULT,
-  timeout: 5000,
-  header: {
-    'Content-Type': ContentTypeEnum.AppJson,
-    'Accept': 'application/json, text/plain, */*'
-  } as UTSJSONObject,
-  // 请求适配器（完全对齐 Alova 规范，解耦底层请求驱动）
-  // ⚠️ Kotlin 端严禁把顶层函数名裸放进对象字面量（会报 Function invocation expected + 类型不匹配），必须包一层 lambda 再传
-  requestAdapter: (config: LimeRequestConfig): Request => {
-    return defaultRequestAdapter(config);
-  },
-  // 共享默认全局生命周期管理器
-  lifecycle: defaultLifecycle,
-  beforeRequest: (config: LimeRequestConfig): void => {
-    defaultBusinessBeforeRequest(config);
-  },
-  // 使用 responded 对象分别指定请求成功、失败与完成拦截器（完全对齐 Alova 官方规范）
-  responded: {
-    // 请求成功的拦截器
-    onSuccess: (data: any, config: LimeRequestConfig): any => {
-      return defaultBusinessAfterSuccess(data, config);
-    },
-    // 请求失败的拦截器
-    onError: (err: any, config: LimeRequestConfig): void => {
-      defaultBusinessAfterError(err, config);
-    },
-    // 请求完成的拦截器（无论成功、失败或命中缓存均会执行）
-    onComplete: (config: LimeRequestConfig): void => {
-      defaultBusinessAfterComplete(config);
-    }
-  } as RespondedOptions,
-  refreshToken: (): Promise<boolean> => {
-    return tryRefreshToken();
-  },
-  onUnauthorized: () => {
-    const tokenStore = useTokenStore();
-    tokenStore.clearToken();
-    toLoginPage({ mode: 'reLaunch' } as UTSJSONObject);
-  }
-};
-
-/**
- * 工厂函数：统一创建并生成 HttpClient 实例
- * @param options 客户端配置；传 null 直接复用 `DEFAULT_HTTP_OPTIONS`，传对象时会在其上补齐缺省的
- *                `requestAdapter`（**传入对象会被就地改写**，别把只读常量传进来）
+ * 工厂函数：统一创建并生成 HttpClient 底层客户端实例（纯净基础设施引擎，无预置业务代码）
+ * @param options 客户端配置；传 null 时初始化一个纯净无业务拦截的基础实例
  */
 export function createHttpClient(options: HttpClientOptions | null = null): HttpClient {
   if (options == null) {
-    return new HttpClient(DEFAULT_HTTP_OPTIONS);
+    const pureOptions: HttpClientOptions = {
+      baseURL: '',
+      timeout: 5000,
+      header: {
+        'Content-Type': ContentTypeEnum.AppJson,
+        'Accept': 'application/json, text/plain, */*'
+      } as UTSJSONObject,
+      requestAdapter: (config: LimeRequestConfig): Request => {
+        return defaultRequestAdapter(config);
+      },
+      lifecycle: defaultLifecycle
+    };
+    return new HttpClient(pureOptions);
   }
   if (options.requestAdapter == null && options.client == null) {
-    options.requestAdapter = DEFAULT_HTTP_OPTIONS.requestAdapter;
+    options.requestAdapter = (config: LimeRequestConfig): Request => {
+      return defaultRequestAdapter(config);
+    };
   }
   return new HttpClient(options);
 }
-
-/**
- * 全局默认 HTTP 客户端单例（使用 createHttpClient 工厂模式创建生成）
- */
-export const http: HttpClient = createHttpClient(DEFAULT_HTTP_OPTIONS);
-
-/**
- * 便捷函数：取消指定 requestKey 的在飞请求（委托给默认 http 实例）
- * @param requestKey 发请求时登记在 `extra.requestKey` 的键；同一个键被复用时生命周期里只留最后登记的
- *                   那个 RequestTask（后登记覆盖先登记），键从没登记过也不报错，只是白留一个取消标记
- */
-export function abortHttp(requestKey: string): void {
-  http.abort(requestKey);
-}
-
-/**
- * 便捷函数：取消全部在飞请求（委托给默认 http 实例）
- */
-export function abortAllHttp(): void {
-  http.abortAll();
-}
-
-/**
- * 便捷函数：清除缓存（委托给默认 http 实例）
- * @param fingerprint 缓存指纹，由 `http.getLifecycle().buildRequestKey(config)` 算出；
- *                    传空字符串表示**清空全部缓存**
- */
-export function clearCache(fingerprint: string = ''): void {
-  http.clearCache(fingerprint);
-}
-
-/**
- * 便捷函数：文件上传（委托给默认 http 实例）
- * @param url 上传地址：支持完整 `http(s)://` 地址，相对路径会与配置里的 baseURL 拼接
- * @param config 覆盖项（必须带 `filePath` / `name`，可选 `extra`、`getTask` 取上传进度），传 null 走默认配置
- * @returns 后端返回的业务数据，类型由调用方用 `uploadHttp<T>(...)` 指定（T 无法从入参推断，**必须显式写**）
- */
-export function uploadHttp<T>(url: string, config: LimeRequestConfig | null = null): Promise<T> {
-  return http.upload<T>(url, config);
-}
-
-/**
- * 便捷函数：文件下载（委托给默认 http 实例）
- *
- * 自动携带 Token，返回临时文件路径与 HTTP 状态码。
- *
- * @param url 下载地址：支持完整 `http(s)://` 地址，相对路径会与配置里的 baseURL 拼接
- * @param config 覆盖项（超时 / header / progress 相关的 getTask 等），传 null 走默认配置
- */
-export function downloadHttp(url: string, config: LimeRequestConfig | null = null): Promise<DownloadResult> {
-  return http.downloadFile(url, config);
-}
-
-/**
- * 便捷函数：chunked 流式请求（委托给默认 http 实例），**方法固定为 POST**
- *
- * 只复用请求侧的鉴权注入与域名拼接；响应侧不走业务码拆包（流式响应体不是 `{ code, data }`
- * 包装，硬套会在流收完的那一刻误报），原因详见 `HttpClient.stream` 的注释。
- * 需要 Observable 形态时用 `@/src/http/stream/stream.uts` 的 `requestStream`。
- *
- * @param url 请求地址：支持完整 `http(s)://` 地址，相对路径会与配置里的 baseURL 拼接
- * @param body 请求体（字符串，通常是 JSON.stringify 的结果）
- * @param onChunk 每收到一个原始字节块回调一次（ArrayBuffer）
- * @param onEnd 流收尾回调：null = 正常结束，非 null = 失败文案
- * @param config 覆盖项（header / timeout / extra.ignoreAuth / extra.requestKey 等），传 null 走默认配置
- */
-export function streamHttp(
-  url: string,
-  body: string,
-  onChunk: (data: ArrayBuffer) => void,
-  onEnd: (errMsg: string | null) => void,
-  config: LimeRequestConfig | null = null
-): StreamTask {
-  const _config = (config ?? {}) as LimeRequestConfig;
-  _config.url = url;
-  _config.data = body;
-  _config.method = 'POST';
-  _config.enableChunked = true;
-  _config.responseType = 'arraybuffer';
-  _config.dataType = 'text';
-  return http.stream(_config, onChunk, onEnd);
-}
-
-export default http;

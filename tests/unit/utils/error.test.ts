@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { maskSensitive } from '@/src/utils/report/index.uts';
 import {
+  buildApiInstanceOptions,
   BusinessError,
   createHttpClient,
-  DEFAULT_HTTP_OPTIONS,
   defaultBusinessAfterError,
   defaultBusinessAfterSuccess,
   defaultRequestAdapter,
@@ -132,7 +132,7 @@ describe('business error carries its code end to end', () => {
       config: {}
     });
     // 带上真实的默认业务钩子，否则 defaultBusinessAfterSuccess / onError 根本没注册
-    const client = createHttpClient({ ...DEFAULT_HTTP_OPTIONS, client: rawClient } as any);
+    const client = createHttpClient({ ...buildApiInstanceOptions(), client: rawClient } as any);
 
     const showToast = (globalThis as any).uni.showToast;
     showToast.mockClear();

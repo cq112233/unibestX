@@ -63,4 +63,21 @@ describe('mock routes integration tests', () => {
       expect(res.data.roles).toContain('admin');
     });
   });
+
+  describe('generated contract mock routes', () => {
+    it('should load generated mock routes and return contract response', async () => {
+      const { default: generatedMock } = await import('../../../mock/generated');
+      expect(Array.isArray(generatedMock)).toBe(true);
+      expect(generatedMock.length).toBeGreaterThanOrEqual(1);
+
+      const morningCheck = generatedMock.find(m => m.url === '/gateway/morningCheckReport/page');
+      expect(morningCheck).toBeDefined();
+      expect(morningCheck?.method).toBe('post');
+
+      const res = (morningCheck?.response as any)();
+      expect(res.code).toBe('10000');
+      expect(res.success).toBe(true);
+      expect(res.data).toBeDefined();
+    });
+  });
 });
