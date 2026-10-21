@@ -9,6 +9,7 @@ import { computed, onMounted, onUnmounted } from 'vue';
 import {
   activeThemeColor,
   curIdx,
+  customTabbarConfig,
   formatTabbarText,
   handleTabbarClick,
   isDark,
@@ -39,14 +40,51 @@ const props = defineProps({
   }
 });
 
-/** 胶囊底座背景色 */
+/** 是否启用液态玻璃背景（由 config.uts 的 glassEffect 统一控制） */
+const glassEnabled = computed<boolean>((): boolean => {
+  return customTabbarConfig.glassEffect == true;
+});
+
+/** iOS 原生液态玻璃样式 */
+const resolvedGlassStyle = computed<string>((): string => {
+  return customTabbarConfig.glassStyle ?? 'regular';
+});
+
+/** 是否启用液态玻璃交互行为（仅 iOS 26+ 生效） */
+const resolvedGlassInteractive = computed<boolean>((): boolean => {
+  return customTabbarConfig.interactive ?? false;
+});
+
+/** 施加在液态玻璃上的着色（仅 iOS 26+ 生效） */
+const resolvedGlassTintColor = computed<string>((): string => {
+  return customTabbarConfig.tintColor ?? '';
+});
+
+/** 玻璃模式下的半透明背景色（非 iOS 端作为毛玻璃降级底色） */
+const glassBgColor = computed<string>((): string => {
+  return isDark.value ? 'rgba(15, 23, 42, 0.85)' : 'rgba(255, 255, 255, 0.88)';
+});
+
+/** 玻璃模式下的边框色 */
+const glassBorderColor = computed<string>((): string => {
+  return isDark.value ? 'rgba(255, 255, 255, 0.18)' : 'rgba(226, 232, 240, 0.95)';
+});
+
+/** 胶囊底座背景色：iOS 玻璃模式由原生 glass-effect-view 绘制 */
 const tabBgColor = computed<string>((): string => {
-  return themeTokens.value.tabBg;
+  if (!glassEnabled.value) {
+    return themeTokens.value.tabBg;
+  }
+  let color = glassBgColor.value;
+  // #ifdef APP-IOS
+  color = 'transparent';
+  // #endif
+  return color;
 });
 
 /** 胶囊底座边框色 */
 const tabBorderColor = computed<string>((): string => {
-  return themeTokens.value.tabBorder;
+  return glassEnabled.value ? glassBorderColor.value : themeTokens.value.tabBorder;
 });
 
 /** 安全区底部高度 */
@@ -189,6 +227,7 @@ const bottom = computed(() => {
     <!-- 悬浮胶囊底座主容器 -->
     <view
       class="custom-capsule-container"
+      :class="{ 'capsule-glass-fallback': glassEnabled }"
       :style="{
         bottom: `${bottom}px`,
         height: `${height}px`,
@@ -196,6 +235,17 @@ const bottom = computed(() => {
         borderColor: tabBorderColor
       }"
     >
+      <!-- #ifdef APP-IOS -->
+      <!-- 原生液态玻璃背景层：仅 iOS 渲染，内容仍由下方统一交互层承载 -->
+      <glass-effect-view
+        v-if="glassEnabled"
+        class="capsule-glass-layer"
+        :glass-style="resolvedGlassStyle"
+        :interactive="resolvedGlassInteractive"
+        :tint-color="resolvedGlassTintColor"
+      ></glass-effect-view>
+      <!-- #endif -->
+
       <!-- 滑动滑块：在各 Tab 底部平滑移动 (Animated Slider Pill) -->
       <view class="capsule-slider-track">
         <view
@@ -277,8 +327,28 @@ const bottom = computed(() => {
   border-width: 1px;
   border-style: solid;
   border-radius: 34px;
+  overflow: hidden;
   /* 轻量弱阴影，避免在原生 Android 端阴影重绘掉帧 */
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+/* iOS 原生液态玻璃背景层：铺满胶囊外壳，内容层保持在其上方 */
+.capsule-glass-layer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 0;
+  border-radius: 34px;
+  pointer-events: none;
+}
+
+/* 非 iOS 端的毛玻璃降级（仅 Web / 微信小程序支持 backdrop-filter） */
+.capsule-glass-fallback {
+  /* #ifdef WEB || MP-WEIXIN */
+  backdrop-filter: blur(25px);
+  /* #endif */
 }
 
 /* 动态滑块滑动轨道（与外层 4px 6px padding 区域对齐） */

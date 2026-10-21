@@ -9,15 +9,15 @@ export const customTabbarConfig: TabBarConfig = {
    * 自定义 TabBar 呈现风格形态：
    * - 'capsule': 悬浮胶囊岛屿样式
    * - 'default': 标准贴底样式（支持中间凸起鼓包 midButton）
-   * - 'glass': 悬浮液态玻璃样式（iOS 26+ 原生 glass-effect-view，其他平台优雅降级为毛玻璃）
+   * 液态玻璃不再是独立 type，由下方 glassEffect 开关统一叠加到当前形态。
    */
 
-  type: 'glass',
+  type: 'default',
   color: '@tabBarColor',
   selectedColor: '@tabBarSelectedColor',
   backgroundColor: '@tabBarBackgroundColor',
   borderStyle: '@tabBarBorderStyle',
-  glassEffect: true, // 官方原生 TabBar 模式下（pages.json），是否开启原生液态玻璃（iOS 生效）
+  glassEffect: true, // 是否开启液态玻璃：原生 TabBar 写入 pages.json；自定义 capsule/default 由组件层在 iOS 渲染 glass-effect-view
   /**
    * ⚠️ 中间鼓包按钮 (midButton)
    * 官方原生底层跨端兼容性提示：
