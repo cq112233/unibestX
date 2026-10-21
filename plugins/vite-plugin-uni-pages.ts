@@ -20,12 +20,12 @@ import { loadAllPlatformPageVariants } from './pages-json-util';
  *
  * 本文件**自包含**：页面扫描、宏解析、.env 读取、落盘都在这里，不依赖任何 plugins/ 下的共享模块。
  *
- * ## 与三个卫星插件（sandbox / tabbar / route-meta）的关系
+ * ## 与三个卫星插件（sandbox / tabbar / route-table）的关系
  *
  * 它们是各自独立的 Vite 插件（各自一个文件、各自在 vite.config.ts 注册），但**不是** Vite 生命周期
  * 独立的：它们必须在**同一次生成 pass** 内、按固定顺序、对同一份可变构建状态做变换。因此本插件在
  * `configResolved` 时从 `config.plugins` 里发现所有携带 `uniPagesStage` 属性的插件，按 `order` 升序收集，
- * 并在每次生成里依次运行 —— 于是「恰好执行一次、顺序固定、route-meta 一定看到最终结果」结构性成立，
+ * 并在每次生成里依次运行 —— 于是「恰好执行一次、顺序固定、route-table 一定看到最终结果」结构性成立，
  * 不依赖任何 Vite 时序假设。卫星只需在自己的插件对象上挂一个 `uniPagesStage` 字段即可被发现。
  */
 
@@ -170,7 +170,7 @@ export type PagesStageContext = {
 /**
  * 卫星插件在自身插件对象上挂载的阶段描述。
  *
- * 约定：`order` 升序执行。sandbox=100 / tabbar=200 / route-meta=300。
+ * 约定：`order` 升序执行。sandbox=100 / tabbar=200 / route-table=300。
  */
 export type PagesStage = {
   name: string;
@@ -185,7 +185,7 @@ export const UNI_PAGES_STAGE_PROP = 'uniPagesStage';
 const KNOWN_PAGES_STAGES: string[] = [
   'uni-pages:sandbox',
   'uni-pages:tabbar',
-  'uni-pages:route-meta'
+  'uni-pages:route-table'
 ];
 
 // ==========================================
@@ -2074,7 +2074,7 @@ export async function buildPages(
     }
   };
 
-  // 8. 按序跑 stages（sandbox → tabbar → route-meta）：唯一调用点，顺序结构性固定
+  // 8. 按序跑 stages（sandbox → tabbar → route-table）：唯一调用点，顺序结构性固定
   for (let i = 0; i < stages.length; i++) {
     stages[i].run(state, ctx);
   }
@@ -2182,7 +2182,7 @@ export default function uniPagesPlugin(userOptions: UniPagesOptions = {}): Plugi
       for (let i = 0; i < KNOWN_PAGES_STAGES.length; i++) {
         const known = KNOWN_PAGES_STAGES[i];
         if (!present.has(known)) {
-          console.warn(`\x1B[33m[uni-pages] 阶段 ${known} 未注册，对应功能（sandbox / tabBar / route-meta）将不生效\x1B[0m`);
+          console.warn(`\x1B[33m[uni-pages] 阶段 ${known} 未注册，对应功能（sandbox / tabBar / route-table）将不生效\x1B[0m`);
         }
       }
     }

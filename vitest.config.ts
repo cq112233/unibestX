@@ -2,6 +2,7 @@ import { resolve } from 'node:path';
 import vue from '@vitejs/plugin-vue';
 import { transformWithEsbuild } from 'vite';
 import { defineConfig } from 'vitest/config';
+import uniPagesRouteTablePlugin from './plugins/vite-plugin-uni-pages-route-table';
 
 export default defineConfig({
   resolve: {
@@ -12,6 +13,7 @@ export default defineConfig({
     extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json', '.uts', '.uvue', '.vue']
   },
   plugins: [
+    uniPagesRouteTablePlugin(),
     {
       name: 'uvue-script-lang-transform',
       enforce: 'pre',

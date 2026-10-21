@@ -7,8 +7,9 @@
  * 1. 删除 src/sub 下所有匹配 `*Demo` 的演示页面目录（默认不碰 auth / privacy / webview 等业务页）
  * 2. 移除 pages.config.json / pages.json 中对应的分包路由条目
  * 3. 清理 Tab 页里指向这些 Demo 的卡片列表（src/pages 下各 Tab 视图的模板区块与脚本区块）
- * 4. 同步刷新 src/router/generated/page-meta.uts 的路由元信息表
- * 5. 最后扫描 src 目录，报告残留引用（如 router 配置里的示例值），提醒手动确认
+ * 4. 最后扫描 src 目录，报告残留引用（如 router 配置里的示例值），提醒手动确认
+ *
+ * 页面路由表由 `virtual:uni-pages-route-table` 在构建期自动生成，不再产生物理文件，因此无需清理。
  *
  * 参数:
  *   --dry-run, -n        只预览将执行的操作，不落盘
@@ -25,9 +26,6 @@ const subDir = path.join(rootDir, 'src', 'sub');
 
 /** 页面路由配置文件（pages.json 是产物，pages.config.json 是源，两份都要同步） */
 const PAGE_CONFIG_FILES = ['pages.config.json', 'pages.json'];
-
-/** 自动生成的路由元信息表 */
-const PAGE_META_FILE = path.join('src', 'router', 'generated', 'page-meta.uts');
 
 /** 需要扫描残留引用的文件扩展名 */
 const SCAN_EXTS = ['.uvue', '.vue', '.uts', '.ts', '.mjs', '.json'];
@@ -76,7 +74,7 @@ function printHelp() {
   · src/sub/<name>Demo/                 页面目录
   · pages.config.json / pages.json      对应分包路由条目
   · src/pages/*/views/*View.uvue        指向这些 Demo 的卡片列表（模板 + 脚本区块）
-  · src/router/generated/page-meta.uts  对应路由元信息
+  · 页面路由表由 virtual:uni-pages-route-table 在构建期生成，无需清理
 `);
 }
 
@@ -315,44 +313,7 @@ function cleanDemoViews(demoDirs, dryRun) {
 }
 
 // ---------------------------------------------------------------------------
-// 4. 刷新自动生成的 page-meta.uts
-// ---------------------------------------------------------------------------
-function cleanPageMeta(dryRun) {
-  const filePath = path.join(rootDir, PAGE_META_FILE);
-  if (!fs.existsSync(filePath)) {
-    return 0;
-  }
-  const original = fs.readFileSync(filePath, 'utf8');
-  const matched = /(export const PAGE_META_JSON: string = )'([\s\S]*)';\s*$/.exec(original);
-  if (!matched) {
-    console.log('  ⚠️  page-meta.uts 结构不匹配，跳过（下次 dev/build 会自动重写）');
-    return 0;
-  }
-
-  const table = JSON.parse(matched[2]);
-  let removed = 0;
-  const kept = {};
-  for (const key of Object.keys(table)) {
-    if (isRemovedRoute(key.replace(/^\//, ''))) {
-      removed++;
-      continue;
-    }
-    kept[key] = table[key];
-  }
-  if (removed === 0) {
-    console.log('  ⏭️  page-meta.uts：没有需要移除的路由');
-    return 0;
-  }
-
-  console.log(`  ${dryRun ? '🔎' : '✅'} ${PAGE_META_FILE}：移除 ${removed} 条路由元信息`);
-  if (!dryRun) {
-    fs.writeFileSync(filePath, `${matched[1]}'${JSON.stringify(kept)}';\n`, 'utf8');
-  }
-  return removed;
-}
-
-// ---------------------------------------------------------------------------
-// 5. 残留引用扫描
+// 4. 残留引用扫描
 // ---------------------------------------------------------------------------
 function reportLeftovers(demoDirs) {
   const leftovers = [];
@@ -430,8 +391,7 @@ function run() {
     touchedViews = cleanDemoViews(demoDirs, options.dryRun);
   }
 
-  console.log('\n🗂️  刷新路由元信息：');
-  const removedMeta = cleanPageMeta(options.dryRun);
+  console.log('\n🗂️  页面路由表由 virtual:uni-pages-route-table 在构建期生成，无需清理。');
 
   if (!options.dryRun) {
     reportLeftovers(demoDirs);
@@ -443,8 +403,8 @@ function run() {
     console.log('   确认无误后去掉 --dry-run 重新执行即可落盘。');
   }
   else {
-    console.log(`🎉 清理完成：删除 ${demoDirs.length} 个 Demo 目录、${removedRoutes} 条路由、`
-      + `${removedMeta} 条路由元信息，同步更新 ${touchedViews} 个 Tab 页。`);
+    console.log(`🎉 清理完成：删除 ${demoDirs.length} 个 Demo 目录、${removedRoutes} 条路由，`
+      + `同步更新 ${touchedViews} 个 Tab 页。`);
     console.log('   提示：改动可随时用 git checkout / git restore 回滚；下次 dev/build 时 vite-plugin-uni-pages 会再校验一次路由。');
   }
   console.log('========================================\n');

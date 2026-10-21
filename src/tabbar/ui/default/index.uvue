@@ -1,16 +1,16 @@
 <script setup lang="uts">
 import { computed, onMounted, onUnmounted } from 'vue';
+import { isH5 } from '@/src/config/env/platform.uts';
 import {
   customTabbarConfig,
   handleTabbarClick,
   isDark,
-  isVersionGte525,
+  isSinglePageTabbar,
   resetTabSwitchThrottle,
   safeAreaBottom,
   safeHideNativeTabBar,
   safeRestoreNativeTabBar,
   syncCurIdxByCurrentPage,
-  TABBAR_CONTAINER_HEIGHT,
   TABBAR_HEIGHT,
   tabbarList,
   tabbarPlaceholderHeight,
@@ -96,15 +96,15 @@ function onTabClick(index: number) {
 </script>
 
 <template>
-  <!-- 占位块：仅在 5.25 及以上版本 H5 时使用 position: absolute，5.24及以下和App/小程序保持正常文档流占位 -->
+  <!-- 占位块：H5 或模式 4 单页 TabBar 使用 position: absolute，其余保持正常文档流占位 -->
   <view
     class="tabbar-placeholder"
-    :class="{ 'tabbar-placeholder-absolute': isVersionGte525 }"
+    :class="{ 'tabbar-placeholder-absolute': isH5 || isSinglePageTabbar }"
     :style="{ height: `${tabbarPlaceholderHeight}px` }"
   >
     <view
       class="tabbar-container"
-      :style="{ height: `${TABBAR_CONTAINER_HEIGHT + safeAreaBottom}px` }"
+      :style="{ height: `${TABBAR_HEIGHT + safeAreaBottom}px` }"
     >
       <!-- 【整体底板】覆盖「固定高度 + 安全区」的全部区域 -->
       <!-- #ifdef APP-IOS -->
@@ -131,12 +131,12 @@ function onTabClick(index: number) {
       <!-- #endif -->
 
       <!-- 【固定高度】tab 图标按钮区 -->
-      <view class="tabbar-inner">
+      <view class="tabbar-inner" :style="{ height: `${TABBAR_HEIGHT}px` }">
         <view
           v-for="(item, index) in tabbarList"
           :key="item.pagePath.length > 0 ? item.pagePath : `${item.text}_${index}`"
           class="tabbar-item"
-          :style="{ height: `${item.isBulge ? TABBAR_CONTAINER_HEIGHT : TABBAR_HEIGHT}px` }"
+          :style="{ height: `${TABBAR_HEIGHT}px` }"
           @click="onTabClick(index)"
         >
           <TabbarItem :item="item" :index="index" :is-bulge="item.isBulge" />
@@ -155,11 +155,12 @@ function onTabClick(index: number) {
   width: 100%;
 }
 
-/* 仅在 5.25 及以上版本 H5 时脱离文档流 */
+/* H5 与模式 4 单页 TabBar：容器固定悬浮，占位统一交给滚动内容内部 */
 .tabbar-placeholder-absolute {
-  /* #ifdef H5 */
   position: absolute;
-  /* #endif */
+  right: 0;
+  bottom: 0;
+  left: 0;
 }
 
 /* 固定在底部的容器，内部级联展示三个层 */
@@ -171,6 +172,7 @@ function onTabClick(index: number) {
   z-index: 1;
   flex-direction: column;
   background-color: transparent;
+  overflow: visible;
 }
 
 /* 【底板层】覆盖「固定高度 + 安全区」的底板，绑定高度动态设定 */
@@ -196,14 +198,15 @@ function onTabClick(index: number) {
   z-index: 2;
   flex-direction: row;
   align-items: flex-end;
-  height: 80px;
+  overflow: visible;
 }
 
-/* 单个 tab 项：flex 平分宽度；高度通过 :style 动态绑定（普通项 TABBAR_HEIGHT / 鼓包项 TABBAR_CONTAINER_HEIGHT） */
+/* 单个 tab 项：flex 平分宽度；交互区固定为 50px，鼓包圆形按钮通过自身向上溢出 */
 .tabbar-item {
   justify-content: center;
   align-items: center;
   flex: 1;
+  overflow: visible;
 }
 
 /* 【安全区层】底部安全区填充，高度动态设定 */
