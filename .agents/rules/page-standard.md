@@ -10,15 +10,19 @@ globs: src/**/*.uts,src/**/*.ts,src/**/*.vue,src/**/*.uvue
 
 ## MUST
 
-- **每个页面必须有 `definePage({...})`**，写在 `<script setup lang="uts">` 顶部，至少包含：`layout: 'navbar'`、`showBack`、`hideNavbar`、`enablePullDownRefresh`、`style.navigationBarTitleText`、`style.navigationStyle: 'custom'`。
+- **每个页面必须有 `definePage({...})`**，写在 `<script setup lang="uts">` 顶部，至少包含：`name`、`debug: false`、`debugHome: false`、`layout: 'navbar'`、`showBack`、`hideStatusBar: false`、`hideNavbar: false`、`enablePullDownRefresh`、`style.navigationBarTitleText`、`style.navigationStyle: 'custom'`。
+- **`definePage` 默认值固定**：`debug: false`、`debugHome: false`、`showBack: true`（TabBar 页与登录 / 隐私授权等禁止返回的入口页为 `false`）、`hideStatusBar: false`、`hideNavbar: false`、`enablePullDownRefresh: false`。只有页面明确需要对应能力时才改；`hideStatusBar` 仅在自定义 navbar 且不要状态栏、或纯空白页时开启；`hideNavbar` 仅在自定义 navbar 时开启。
 - **根容器是 `<view class="flex flex-col flex-1">`**；滚动区域在根内部自写 `<scroll-view direction="vertical">`。
 - **高度用 `flex-1` 撑满**，不写 `100vh` / `100%` 硬算高度。
 - **页面状态显式标注 UTS 类型**：`ref<Array<XxxItem>>([])`、`ref<boolean>(false)`、`ref<number>(0)`。
 - **下拉刷新开了就必须闭环**：配 `onNavbarPullDownRefresh` + `stopNavbarPullDownRefresh`，且只写在 `definePage` 顶层。
 - **分页 / 长列表一律优先用 `<z-paging-x>`**（内置 `list-view` 虚拟复用、触底自动追加、下拉刷新、空态与 loading）；只有 `<z-paging-x>` 覆盖不了的场景（非分页的纯长列表、瀑布流特殊布局）才手写 `<list-view>` + `<list-item>`。**严禁用 `<scroll-view>` 承载长列表。**
 - **组件库优先**：`uni_modules/*/components/` 与根 `components/` 的组件直接写短横线标签，不手动 import；**页面私有组件（`src/pages/*/components/`）必须手动 import**。
-- **数据一律经接口层**：页面 / 组件只调 `@/src/api/<page>/<page>.uts` 的 `fetchXxxApi()`，不直接 `http.get`、不写死假数据。
-- **页面结构按分册 5 生成**：先定「普通页 / TabBar 页 → 目录树 → 组件层级 → 谁调接口」，再写代码；简单页 ≤ 500 行不拆组件，禁止为拆而拆。
+- **数据一律经接口层**：页面根组件 / 模块组件只调 `@/src/api/<module>/<file>.uts` 的 `fetchXxxApi()`，不直接 `http.get`、不写死假数据。
+- **页面结构按分册 5**：TabBar 页是单页结构、根组件在 `views/<Page>View.uvue`；同一业务模块的多个非 TabBar 页面聚合在 `src/sub/<module>/<page>/`。
+- **取数边界**：只有页面根组件和 `modules/<block>/<Block>Module.uvue` 可以发请求；`components/`、`common/`、模块 `components/` 和 `src/components/` 只做纯展示。
+- **页面结构按分册 5 生成**：先定「普通页 / TabBar 页 → 目录树 → 组件层级 → 谁调接口」，再写代码；简单业务默认只写根页面，`components/`、`common/`、`modules/` 均按需创建，禁止为了拆而拆。
+- **`modules/` 是可选结构**：只有同一页面存在多个独立业务区块，且各区块需要独立状态 / 接口 / 分页 / 筛选时才创建；`modules/` 下不创建 `common/`。
 - **页面内容与组件写法按分册 4 落地**：页面骨架、数据与三态、组件单根节点、运行时 props、`defineEmits`、`defineExpose`、方法 JSDoc 等，一律照分册 4 的模板写，不自创结构。
 - **路由参数用 `useRoute()` 读**（`query` 已是解码态 `Map`），禁止 `onLoad((options) => ...)`。
 

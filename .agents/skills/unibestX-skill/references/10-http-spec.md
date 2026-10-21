@@ -17,7 +17,7 @@
   └─ 禁止：uni.request / 在页面直接拼请求
           │
           ▼
-src/api/<page>/<page>.uts          ← 接口函数：Promise<T> + 类型转换 + 模拟数据
+src/api/<module>/<file>.uts        ← 接口函数：Promise<T> + 类型转换 + 模拟数据
           │
           ▼
 src/http/instances                 ← 业务实例：Token、401 刷新、Toast、解包、多域名
@@ -54,7 +54,7 @@ import type {
 | 业务错误类型 / 错误归一 | `@/src/http/index.uts` |
 | `useQuery` / `useMutation` / `useQueryClient` | `@/uni_modules/request-bestX/index.uts` |
 | 请求配置 / 返回类型 | `@/uni_modules/request-bestX/index.uts` 的 `import type` |
-| 页面接口函数 | `@/src/api/<page>/<page>.uts` |
+| 页面接口函数 | `@/src/api/<module>/<file>.uts` |
 
 > 🚨 业务页面和组件**严禁直接调用** `uni.request` / `uni.uploadFile` / `uni.downloadFile`。连接口层都不应绕过 `src/http`。
 
@@ -200,7 +200,7 @@ export function deleteOrderApi(id: number): Promise<null> {
 - 签名固定后，后端就绪只换函数体，页面侧零改动。
 - 接口函数统一带 `Api` 后缀：`fetchXxxApi` / `createXxxApi` / `updateXxxApi` / `deleteXxxApi`。
 - 分页签名统一 `(pageNo = 1, pageSize = 10, keyword = '')`。
-- 新页面必须同批建 `src/api/<page>/<page>.uts`，页面里不能 `ref([...])` 直接造假数据。
+- 新页面必须接入 `src/api/<module>/<file>.uts`，页面里不能 `ref([...])` 直接造假数据。
 
 ---
 
@@ -271,6 +271,19 @@ const {
 </script>
 ```
 
+模板直接使用解构出的 Ref，由 Vue 自动解包：
+
+```html
+<view v-if="listPending">加载中…</view>
+<view v-else-if="listError">加载失败</view>
+<view v-else-if="listData != null">
+  <view v-for="item in listData.list" :key="item.id">{{ item.title }}</view>
+  <text>{{ listFetching ? '同步中…' : '没有更多了' }}</text>
+</view>
+```
+
+> 要展示 `lastError.message` 时，写一个 `errorText` 转换 `computed`；不要为 `isPending` / `isFetching` / `isError` 做纯转发。分页结果 `listData` 可空时，模板判 `listData != null` 后再遍历。
+
 规则：
 
 - `useQuery` / `useMutation` / `useQueryClient` 必须在组件 `setup` 内同步调用。
@@ -279,6 +292,9 @@ const {
 - 错误字段叫 `lastError`，不是 `error`。
 - `mutate` 不抛异常，错误交给 `onError` / `lastError`；需要 await 并捕获时用 `mutateAsync`。
 - 写成功后调用 `invalidateQueries([业务前缀])`，不要在页面维护列表副本。
+- 解构出的 `data` / `isPending` / `isFetching` / `isError` / `lastError` 本身就是 Ref：script 内读值用 `.value`，模板自动解包，不加 `.value`。
+- 禁止为纯转发创建 `computed`：不要写 `computed(() => isPending.value == true)`、`computed(() => isFetching.value == true)` 或 `computed(() => isError.value == true)`。
+- 只有真实转换 / 组合才使用 `computed`，例如错误对象转文案、多个响应式值合并、过滤 / 排序结果；列表长度直接写 `listData.length`。
 
 ### 10.4.3 缓存操作
 
@@ -406,6 +422,7 @@ fetchOrderListApi(1, 10, '').then(
 | ⑬ | 副服务也新建客户端 | 优先使用 `secondaryHttp` |
 | ⑭ | 业务直接 import `instances/internal/` | 从 `@/src/http/index.uts` 导入公开实例 |
 | ⑮ | 流式半截 chunk 直接渲染 | 先累积 / 分帧，再交给渲染层 |
+| ⑯ | 给 `isPending` / `isFetching` / `isError` 再包纯转发 `computed` | 模板直接用解构出的 Ref，script 内读值才用 `.value` |
 
 ---
 
@@ -442,3 +459,4 @@ git diff --check
 - [ ] **16. 流式分帧**：半截 chunk 不直接渲染。
 - [ ] **17. Mock 切换**：后端就绪只换函数体，签名、import、页面调用不变。
 - [ ] **18. 验证闭环**：至少跑 typecheck、test、ESLint；原生网络行为另跑真机验证。
+- [ ] **19. 状态直用**：`isPending` / `isFetching` / `isError` 不做纯转发 `computed`；模板不加 `.value`，script 内读值才加 `.value`。
