@@ -1,0 +1,15 @@
+import { formatTabbarText, setTabbarItem } from '../adapters/i18n.uts';
+
+/** TabBar 文案国际化与原生 TabBar 同步 */
+export type UseTabbarI18nResult = {
+  formatTabbarText: (text: string) => string;
+  setTabbarItem: () => void;
+};
+
+/** TabBar 国际化 hooks */
+export function useTabbarI18n(): UseTabbarI18nResult {
+  return {
+    formatTabbarText,
+    setTabbarItem
+  } as UseTabbarI18nResult;
+}

@@ -107,7 +107,7 @@ src/i18n/locales/*.json          ← 你改这里（文案唯一真源）
         │
         ├──► src/i18n/utils/index.uts      $t / getI18nText / setNavigationBarTitle
         │        ├─► src/layouts/navbar/utils/i18n.uts   formatNavbarTitle()（依赖 i18nStore.state.locale 建响应式）
-        │        └─► src/tabbar/internal/i18n.uts        formatTabbarText() / setTabbarItem()
+        │        └─► src/tabbar/adapters/i18n.uts        formatTabbarText() / setTabbarItem()
         │
         └──► src/store/*/i18n.uts          useI18nStore()（setLocale 是切语言的唯一入口）
 ```

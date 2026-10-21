@@ -89,14 +89,14 @@
 import { computed, onMounted, onUnmounted, provide, ref, watch } from 'vue';
 import { activeTabTitle, curIdx, formatTabbarText, themeTokens } from '@/src/tabbar/index.uts';
 import TabbarPlaceholder from './TabbarPlaceholder.uvue';
-import { isMpAlipay } from '@/src/config/env/platform.uts';
+import { isMpAlipay } from '@/src/tabbar/adapters/platform.uts';
 import {
   isPageRefresherDisabled,
   isPageScrollDisabled,
   setHideNavbar,
   setHideStatusBar,
   stopNavbarPullDownRefresh
-} from '@/src/layouts/navbar/utils/index.uts';
+} from '@/src/tabbar/adapters/navbar.uts';
 
 // ==========================================
 // 1. 组件 Props 属性定义

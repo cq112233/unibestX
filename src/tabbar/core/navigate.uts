@@ -1,9 +1,9 @@
 import { curIdx, setCurIdx, setCurIdxByPath, tabbarList } from './state.uts';
 import { isNativeTabbar, isSinglePageTabbar, selectedTabbarStrategy, TABBAR_STRATEGY_MAP } from './strategy.uts';
-import { customTabbarConfig } from '../config.uts';
+import { customTabbarConfig } from '../adapters/config.uts';
 import { useRouter } from '@/uni_modules/route-bestX/index.uts';
 
-/** 中间鼓包 tabbarItem 点击事件 */
+/** 中间鼓包 tabbarItem 点击事件（核心导航行为） */
 function handleClickBulge(url: string = '/src/pages/ai/ai'): void {
   useRouter().push(url);
 }

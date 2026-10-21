@@ -130,7 +130,7 @@ theme.json（亮/暗配色，唯一真源）
                ├──► App.ku.uvue                  根容器绑 CSS 变量 + applyNavbarTheme
                ├──► App.uvue                     useThemeStore().initThemeMode() + applyThemeColor
                ├──► src/store/*/theme.uts        useThemeStore()（setTheme / setThemeMode 是唯一写入口）
-               ├──► src/tabbar/internal/theme.uts   isDark / themeTokens / activeThemeColor
+               ├──► src/tabbar/adapters/theme.uts   isDark / themeTokens / activeThemeColor
                └──► src/layouts/navbar/utils/theme.uts  navbarThemeTokens / refresherBackground
 ```
 

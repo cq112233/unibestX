@@ -1,8 +1,8 @@
-import { customTabbarConfig } from '../config.uts';
-import type { CustomTabBarItem } from '../types.uts';
+import { customTabbarConfig } from '../adapters/config.uts';
+import type { CustomTabBarItem } from './types.uts';
 
 /**
- * Tab 标识（`CustomTabBarItem.tabType`）解析：
+ * Tab 标识（`CustomTabBarItem.tabType`）解析（核心标识归一）：
  * 订阅 API（onTabShow / onTabPageShow 等）允许直接传 `'index'` / `'me'` 这类业务标识，
  * 也保留原有的数字下标写法，两者在此统一归一为数字下标。
  */

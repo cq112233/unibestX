@@ -1,10 +1,10 @@
 import { onUnmounted, watch } from 'vue';
-import type { CustomTabBarItem, CustomTabBarItemBadge, TabBarConfig } from '../types.uts';
-import { customTabbarConfig } from '../config.uts';
+import type { CustomTabBarItem, CustomTabBarItemBadge, TabBarConfig } from './types.uts';
+import { customTabbarConfig } from '../adapters/config.uts';
 import { cleanPath, getCurrentPath, isSamePath } from './path.uts';
 import { registerFullTabbarListGetter, resolveTabIndex, resolveTabIndexByKey } from './tab-key.uts';
 
-/** 组合 list 与 midButton 供自定义 TabBar 渲染（自动将 midButton 插入居中位置） */
+/** 组合 list 与 midButton 供自定义 TabBar 渲染（自动将 midButton 插入居中位置，核心状态） */
 function buildFullTabbarList(config: TabBarConfig): CustomTabBarItem[] {
   const result: CustomTabBarItem[] = [];
   const list = config.list;

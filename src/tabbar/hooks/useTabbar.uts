@@ -1,0 +1,80 @@
+import type { Ref } from 'vue';
+import type { CustomTabBarItem, CustomTabBarItemBadge, TabBarConfig } from '../core/types.uts';
+import { customTabbarConfig } from '../adapters/config.uts';
+import {
+  handleTabbarClick,
+  initNativeMidButtonTap,
+  resetTabSwitchThrottle,
+  switchTabbar
+} from '../core/navigate.uts';
+import {
+  activeTabTitle,
+  curIdx,
+  isPageTabbar,
+  setCurIdx,
+  setCurIdxByKey,
+  setCurIdxByPath,
+  setTabbarItemBadge,
+  syncCurIdxByCurrentPage,
+  tabbarList
+} from '../core/state.uts';
+import {
+  customTabbarEnable,
+  isNativeTabbar,
+  isSinglePageTabbar,
+  needTabbarBottomPadding,
+  tabbarType
+} from '../core/strategy.uts';
+
+/** TabBar 全局状态、模式与导航动作 */
+export type UseTabbarResult = {
+  curIdx: Ref<number>;
+  tabbarList: CustomTabBarItem[];
+  activeTabTitle: Ref<string>;
+  customTabbarConfig: TabBarConfig;
+  isSinglePageTabbar: boolean;
+  isNativeTabbar: boolean;
+  customTabbarEnable: boolean;
+  needTabbarBottomPadding: boolean;
+  tabbarType: string;
+  setCurIdx: (idx: number) => void;
+  setCurIdxByKey: (key: string) => void;
+  setCurIdxByPath: (path: string) => void;
+  setTabbarItemBadge: (idx: number, badge: CustomTabBarItemBadge) => void;
+  syncCurIdxByCurrentPage: () => void;
+  isPageTabbar: (path: string) => boolean;
+  switchTabbar: (url: string) => void;
+  handleTabbarClick: (index: number) => void;
+  resetTabSwitchThrottle: () => void;
+  initNativeMidButtonTap: () => void;
+};
+
+/**
+ * TabBar 全局状态与导航 hooks
+ *
+ * 推荐业务组件统一通过本 hook 获取 tabbarList / curIdx / 切换动作，
+ * 避免在页面里散落大量底层函数导入。
+ */
+export function useTabbar(): UseTabbarResult {
+  return {
+    curIdx,
+    tabbarList,
+    activeTabTitle,
+    customTabbarConfig,
+    isSinglePageTabbar,
+    isNativeTabbar,
+    customTabbarEnable,
+    needTabbarBottomPadding,
+    tabbarType,
+    setCurIdx,
+    setCurIdxByKey,
+    setCurIdxByPath,
+    setTabbarItemBadge,
+    syncCurIdxByCurrentPage,
+    isPageTabbar,
+    switchTabbar,
+    handleTabbarClick,
+    resetTabSwitchThrottle,
+    initNativeMidButtonTap
+  } as UseTabbarResult;
+}

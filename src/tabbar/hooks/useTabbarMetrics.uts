@@ -1,0 +1,34 @@
+import type { Ref } from 'vue';
+import {
+  hasTabbarBulge,
+  safeAreaBottom,
+  TABBAR_CONTAINER_HEIGHT,
+  TABBAR_HEIGHT,
+  tabbarBottomPaddingHeight,
+  tabbarPlaceholderHeight
+} from '../core/metrics.uts';
+import { tabbarBottomPaddingClass } from '../core/strategy.uts';
+
+/** TabBar 尺寸、安全区与页面底部预留 */
+export type UseTabbarMetricsResult = {
+  TABBAR_HEIGHT: number;
+  TABBAR_CONTAINER_HEIGHT: number;
+  hasTabbarBulge: boolean;
+  safeAreaBottom: Ref<number>;
+  tabbarPlaceholderHeight: Ref<number>;
+  tabbarBottomPaddingHeight: Ref<number>;
+  tabbarBottomPaddingClass: string;
+};
+
+/** TabBar 尺寸与安全区 hooks */
+export function useTabbarMetrics(): UseTabbarMetricsResult {
+  return {
+    TABBAR_HEIGHT,
+    TABBAR_CONTAINER_HEIGHT,
+    hasTabbarBulge,
+    safeAreaBottom,
+    tabbarPlaceholderHeight,
+    tabbarBottomPaddingHeight,
+    tabbarBottomPaddingClass
+  } as UseTabbarMetricsResult;
+}
