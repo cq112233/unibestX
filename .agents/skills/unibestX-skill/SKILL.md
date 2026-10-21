@@ -13,7 +13,7 @@ description: Use when developing, compiling, refactoring, or troubleshooting uni
 - 排错以**根因 + 可复现证据**收尾，不靠猜测和「改改试试」。
 - 交付前必须过 A.2 红线清单与真实验证命令，**没有验证输出就不算完成**。
 
-> ⚠️ 本文件与 `references/` 下 8 个分册、下方 A.1 / A.2 同为强制约束；动手前先读「注意事项」与「A.2 代码生成红线清单」。
+> ⚠️ 本文件与 `references/` 下 10 个分册、下方 A.1 / A.2 同为强制约束；动手前先读「注意事项」与「A.2 代码生成红线清单」。
 
 ---
 
@@ -22,7 +22,7 @@ description: Use when developing, compiling, refactoring, or troubleshooting uni
 uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直接编译为原生代码（Android 编译为 Kotlin，iOS 插件编译为 Swift，鸿蒙插件编译为 ArkTS，Web / 小程序编译为 JS）。  
 与宽容的 TypeScript / JavaScript 不同，UTS 采用**名义强类型系统（Nominal Strong Typing）**与**原生渲染规范** —— 很多在 TS 里「只是警告」的写法，在 UTS 里是编译失败或真机崩溃。
 
-本 Skill 采用 **「1 个入口 + 8 个分册」** 结构：入口常驻任务目标、交互流程与 A.1 / A.2 速查；成体系的铁律、正反例与实测结论都在 `references/` 分册里，**命中即必须 Read**。
+本 Skill 采用 **「1 个入口 + 10 个分册」** 结构：入口常驻任务目标、交互流程与 A.1 / A.2 速查；成体系的铁律、正反例与实测结论都在 `references/` 分册里，**命中即必须 Read**。
 
 ---
 
@@ -70,6 +70,8 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 - 规划或生成新页面结构、骨架布局与视口高度（`availableHeight`）时
 - **新增页面并同步建 `src/api/<page>/` 接口层（接口函数 + 类型 + 数据集，按需拆 `types.uts`）时**、把页面里的假数据抽成接口函数时
 - 对接后端真实接口、写 `http` 请求 / 文件上传 / SSE 流式接口时
+- **使用 `src/http` 业务实例、`src/api` 接口层，或 `useQuery` / `useMutation` / `useQueryClient` 时**（分册 10）
+- **新增 / 删除 Tab、切换 TabBar 模式、调整 UI / 角标、监听 Tab 生命周期、处理底部安全区时**（分册 9）
 - **获取系统信息、视口高度、状态栏 / 导航栏高度，或读取环境变量、API 域名、调用 Toast 时**
 - **在页面 / 组件里做跳转（push / replace / switchTab / back）或读当前路由信息（path / query / meta / name）时**（分册 8）
 - 使用 Tailwind CSS 编写跨端 UI、按钮排版、文本颜色与安全区适配时
@@ -93,7 +95,7 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 **处理逻辑**：
 
 - 用 Read 工具打开对应分册并**核对完整正反例与实测结论**，不得只凭入口里的一行结论就改代码。
-- 同时命中多个分册时全部 Read（典型：新增页面 = 分册 4 + 6 + 7 + 8 + 9）。
+- 同时命中多个分册时全部 Read（典型：新增页面 = 分册 4 + 5 + 6 + 7 + 8；涉及 TabBar 加 9，涉及网络 / 异步 hooks 加 10）。
 - 分册没有覆盖的新问题：以项目现有代码与实测为准，**不要套用 TS / Vue 的通用经验臆断**。
 
 ### 3. 实现
@@ -135,10 +137,12 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 
 ## 可选分支
 
-- **新增页面 / 组件**：分册 4（流程与模板）→ 6（层级与拆分）→ 7（接口层）→ 8（工具库）→ 9（路由）→ 4（骨架照抄）。
+- **新增页面 / 组件**：分册 4（流程与模板）→ 5（层级与拆分）→ 6（接口层）→ 7（工具库）→ 8（路由）；涉及 TabBar 加 9，涉及网络 / 异步 hooks 加 10。
 - **编译 / 运行报错**：按报错码或现象定位分册 1（UTS 语法）或分册 3（跨端运行时）；先找根因，再改代码。
 - **样式 / 布局问题**：分册 2；先确认是哪个端、哪条引擎限制，再改。
-- **接口对接 / Mock 数据**：分册 6；后端就绪只换函数体，签名冻结。
+- **接口对接 / Mock 数据**：分册 6；涉及 `src/http` 实例、鉴权、错误归一或 Query hooks 时同时读分册 10；后端就绪只换函数体，签名冻结。
+- **TabBar 配置 / 模式 / 生命周期 / 底部避让**：分册 9；只改 `src/tabbar/config.uts`，业务优先使用 `useTabbar*` hooks。
+- **HTTP / 异步状态管理**：分册 10；页面 → `src/api` → `src/http`，读写分别用 `useQuery` / `useMutation`。
 - **跳转与路由参数**：分册 8；`useRouter()` / `useRoute()`，禁止原生 `uni.navigateTo` 与 `onLoad(options)`。
 - **跨端差异 / 条件编译**：分册 3；两级分层治理（常量分流 vs `#ifdef` 物理隔离）。
 - **通用算法能力**（加密、哈希、日期、颜色、大数、hooks）：先查 `uni_modules/` 六个生态库（分册 6.5），不要手写。
@@ -164,6 +168,8 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 | [references/6-api-spec.md](references/6-api-spec.md) | **6 API 接口层手册**（一页一目录 · 契约类型 · 按模块造数 · `http` 用法 · 完整 mock→http 双实现 + 8 类场景写法 + 16 条坑点 + 速查表 + 25 条红线） | **新增页面同步建 `src/api/<page>/` 时**、抽接口函数时、写 mock 数据集与契约类型时、对接后端真实接口时必读 |
 | [references/7-utils-spec.md](references/7-utils-spec.md) | **7 工具库使用手册**（系统信息 · 环境变量 · 通用工具 · 6 个生态库 + 能力对照示例 + 7 类场景写法 + 15 条坑点 + 「该用谁」速查表 + 23 条红线） | 获取屏幕/窗口尺寸、状态栏/导航栏/TabBar高度、计算内容可用高度（`availableHeight`）；判断开发/生产环境、获取接口基础地址；使用 Toast、Loading、主题与返回键时必读；**要写大数运算 / 加解密与哈希 / 日期时间 / 颜色处理 / 数组对象工具 / 组合式 hooks 前必读（先查 `uni_modules/` 生态库，不要手写）** |
 | [references/8-router-spec.md](references/8-router-spec.md) | **8 路由导航与 `useRoute` 手册**（导入口径 · `RouteLocation` 全字段与类型 · 完整 demo · 10 类场景写法 · 14 条坑点 · `useRouter` 速查 · 10 条自检红线） | **页面 / 组件里要做任何跳转（push / replace / switchTab / back）、要读当前路由信息（path / query / meta / name）、准备写 `onLoad(options)` 取参数或手写 `getCurrentPages()` 时必读** |
+| [references/9-tabbar-spec.md](references/9-tabbar-spec.md) | **9 TabBar 业务导航手册**（配置真源 · 五种模式 · `useTabbar` / `useTabbarPage` / `useTabbarTheme` / `useTabbarMetrics` / `useTabbarI18n` 契约 · 角标 / 生命周期 / 安全区写法 · 12 条坑点 · 15 条自检红线） | **新增 / 删除 Tab、切换 `VITE_TABBAR_MODE`、调整 UI 形态、设置角标、监听 Tab 显示、处理底部遮挡与安全区时必读** |
+| [references/10-http-spec.md](references/10-http-spec.md) | **10 HTTP 网络层手册**（`src/http` 业务实例 · `src/api` 三层边界 · `useQuery` / `useMutation` / `useQueryClient` · 上传 / 下载 / 流式 · 401 / Token / 多域名 · 15 条坑点 · 18 条自检红线） | **新增 / 修改接口函数、接入真实后端、使用异步请求 hooks、处理鉴权 / 401 / 统一错误提示时必读** |
 
 > 📌 **A.1 快速排查对照表**与 **A.2 代码生成红线清单** 因使用频率最高，常驻在本文件末尾，无需额外 Read。
 
@@ -178,6 +184,8 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 | 系统信息 | `src/utils/systemInfo/index.uts` | `availableHeight`、`statusBarHeight`、`navBarHeight`、`safeAreaBottom`（分册 7） |
 | 环境变量 | `src/config/env/env.uts`、`src/config/env/platform.uts` | `getApiBaseUrl()`、`isDev()`、`isH5` / `isApp` 等平台常量（分册 7） |
 | 路由 | `uni_modules/route-bestX/index.uts`（`useRoute` / `useRouter` / 路径工具 / `routeState`）、`src/router/index.uts`（业务门面与 `router` 单例）、`src/router/guards/`（业务守卫） | `useRoute()` / `useRouter()`（分册 8） |
+| TabBar | `src/tabbar/index.uts`（hooks 门面）、`src/tabbar/config.uts`（唯一配置真源）、`src/tabbar/components/TabViews.uvue`（生成物） | `useTabbar*` hooks、模式与底部避让（分册 9） |
+| HTTP 网络层 | `src/http/index.uts`（`http` / `secondaryHttp`）、`src/api/<page>/<page>.uts`（接口函数）、`uni_modules/request-bestX/index.uts`（hooks / 类型） | 页面 → api → http，读写用 Query hooks（分册 10） |
 | 生态工具库 | `uni_modules/`（`lime-shared`、`lime-use`、`lime-color`、`lime-dayuts`、`bignumber-bestX`、`crypto-bestX`） | 通用算法能力优先复用（分册 6.5） |
 | 生态库演示页 | `src/sub/*FunctionDemo/` | 对照真实用法，复制前先看这里的既有先例 |
 
@@ -296,6 +304,8 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 | **系统尺寸与高度获取** | 散落调用 `uni.getSystemInfoSync()` 或样式手写 `100vh`（损耗性能、非响应式、原生端不支持 vh 且易被 TabBar/导航栏遮挡） | 优先引入 `@/src/utils/systemInfo/index.uts` 中的响应式变量（`availableHeight`、`statusBarHeight`、`navBarHeight`、`safeAreaBottom`）或使用 `sys` 单例（详见 **分册 7**） |
 | **环境变量与服务地址读取** | 手写 `process.env` / `import.meta.env` 或在代码里硬编码域名 IP（原生平台无法识别且切换环境易出错） | 统一从 `@/src/config/env/env.uts` 引入具名方法（`getApiBaseUrl()`、`getOssBaseUrl()`、`isDev()`、`isProd()`、`isVaporMode()`）（详见 **分册 7**） |
 | **页面跳转与路由控制** | 直接调用原生 `uni.navigateTo` / `uni.switchTab` / `uni.navigateBack`；或用 `onLoad((options) => {...})` 取参数、手写 `getCurrentPages()` 读当前页 | 跳转一律 `useRouter().push / replace / relaunch / switchTab / back`；路由信息一律 `useRoute()`（`query` 已是解码态 `Map`，值为 `string`，需自行转类型）。所有路由符号从 `@/uni_modules/route-bestX/index.uts` 导入（**严禁 import 模块内部文件**）；`toLoginPage`、`LOGIN_PAGE`、黑白名单分别来自 `@/src/utils/auth/toLoginPage.uts`、`@/src/router/config.uts`（详见 **分册 8**） |
+| **TabBar 状态、生命周期与底部避让** | 直接 import `src/tabbar/core` / `adapters`、手改 `TabViews.uvue`、从 `useTabbar()` 解构 `activeThemeColor`、用固定 `50px/80px` 垫高 | 业务统一从 `@/src/tabbar/index.uts` 使用 `useTabbar*` hooks；Tab 配置只改 `src/tabbar/config.uts`；主题色走 `useTabbarTheme()`，尺寸与占位走 `useTabbarMetrics()` / `<TabbarPlaceholder>`（详见 **分册 9**） |
+| **HTTP 请求与异步状态管理** | 页面直接 `uni.request`；在页面里拼请求而不建 `src/api`；`useQuery` 里直接读 `error`；写操作后手改列表副本 | 页面 → `src/api/<page>/<page>.uts` → `src/http` 的 `http` / `secondaryHttp`；读用 `useQuery`、写用 `useMutation`，错误字段为 `lastError`，写成功后 `invalidateQueries`（详见 **分册 10**） |
 | **LeakCanary 报 Activity 内存泄漏（`mDestroyed = true`）** | 页面或根容器组件（如 `App.ku.uvue`）通过 `uni.$on` 注册全局监听但**未在 `onUnmounted` 中通过 `uni.$off` 注销**（或直接传入匿名函数无法解绑）；全局单例 `IndexKt.emitter` 永久持有页面回调，导致退出页面后原生 Activity 无法被 GC 回收 | 回调函数必须抽离为**具名函数**，`onMounted` 注册，`onUnmounted` 必须严格调用 `uni.$off(eventName, handler)` 注销（详见 **3.26**） |
 | **`ReferenceError: XxxPageResult is not defined`**（**编译期零报错，运行期才炸**，且常被页面的 `try/catch` 吞成「列表渲染不出来 + 一条 `console.error`」） | 在 `as` 断言位置写「**泛型实例化别名**」：`} as FooPageResult);`（而 `type FooPageResult = PageResult<FooItem>`）—— UTS 把 `as` 断言**编译成构造调用** `new FooPageResult({...})`，但别名只是编译期 `type`、**没有任何运行期绑定**（编译器只为泛型本体生成 `class PageResult`）⇒ 产物里留下一个指向不存在标识符的 `new` | 断言**直写泛型本体、实参写全**：`} as PageResult<FooItem>);`；别名只允许出现在**类型位置**（返回值标注 / 回调参数标注）。口诀：**`as` / `new` 后面不许出现泛型实例化别名，`:` 后面可以**。判据必须落到产物上：`grep -rn "new [A-Za-z_]*PageResult(" unpackage/dist/dev/mp-weixin/src/api/*.js`（单测走 esbuild 转译、**不复现**这一层，全绿也照样有坑；详见 **1.25**） |
 | **跨端平台判断（常规逻辑 vs 原生未声明符号）** | 在 `src/` 业务代码中散落手写 `// #ifdef ...`；或企图用 `if (isH5)` / `if (isMpAlipay)` 包裹端专属未声明原生符号（如 `window`、`my`、`wx`、`app.config`） | 遵循**两级分层治理**：① 常规跨端业务逻辑 / 参数差异一律引入 `@/src/config/env/platform.uts` 常量走普通 `if` 分支；② 端专属未在全平台声明的原生全局符号（`window`、`my`、`wx`、`uni.onKeyboardHeightChange`、`app.config` 等）或模板静态分流，**必须强制使用 `// #ifdef ...` 物理隔离**，规避原生 Kotlin 静态符号解析失败抛 `error18 找不到名称`（详见 **3.27**） |
