@@ -20,7 +20,7 @@ import tabbarViewsPlugin from './plugins/vite-plugin-tabbar-views';
 import uniPagesPlugin from './plugins/vite-plugin-uni-pages';
 import uniPagesSandboxPlugin from './plugins/vite-plugin-uni-pages-sandbox';
 import uniPagesTabbarPlugin from './plugins/vite-plugin-uni-pages-tabbar';
-import uniPagesRouteMetaPlugin from './plugins/vite-plugin-uni-pages-route-meta';
+import uniPagesRouteTablePlugin from './plugins/vite-plugin-uni-pages-route-table';
 import { execSync } from 'node:child_process';
 import { viteMockServe } from 'vite-plugin-mock';
 import { viteVConsole } from 'vite-plugin-vconsole';
@@ -248,7 +248,7 @@ export default defineConfig({
     // 注意：必须无条件并列注册，禁止写成 `...(cond ? [x()] : [])`，否则对应功能会静默失效。
     uniPagesSandboxPlugin(), // 沙盒独立调试模式（VITE_DEV_SANDBOX / definePage({ debug })）
     uniPagesTabbarPlugin(), // TabBar 策略（VITE_TABBAR_MODE 0–4）
-    uniPagesRouteMetaPlugin(), // 生成 src/router/generated/page-meta.uts（useRoute().meta/.name 数据源）
+    uniPagesRouteTablePlugin(), // 提供 virtual:uni-pages-route-table 虚拟模块（页面路由表数据源）
     // 单页 TabBar 基础脚手架与视图组件辅助生成插件（按需根据 src/tabbar/config.uts 辅助创建基础 TabViews）
     tabbarViewsPlugin({
       enabled: true,

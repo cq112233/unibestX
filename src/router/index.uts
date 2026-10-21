@@ -10,10 +10,11 @@ import {
 } from '@/uni_modules/route-bestX/index.uts';
 import { isPageTabbar, switchTabbar } from '@/src/tabbar/index.uts';
 import { setupRouteGuards } from './guards/index.uts';
-import { PAGE_META_JSON } from './generated/page-meta.uts';
+// 通过插件获取页面路由表
+import { PAGES_ROUTE_TABLE_JSON } from 'virtual:uni-pages-route-table';
 
-// 0. 初始化页面元数据表（支持 pages.json 静态配置与 useRoute.meta / useRoute.name）
-setPageMetaJson(PAGE_META_JSON);
+// 0. 初始化页面路由表（支持 pages.json 静态配置与 useRoute() 的页面配置 / name）
+setPageMetaJson(PAGES_ROUTE_TABLE_JSON);
 
 // 1. 全局单例路由器（桥接业务 TabBar 动态判定与切换，内部全自动调度与兜底）
 export const router = createRouter({

@@ -440,7 +440,7 @@ unibestX/
 │   ├── vite-plugin-uni-pages.ts         #   自动文件路由（pages.json / pages.config.json 双向同步）
 │   ├── vite-plugin-uni-pages-sandbox.ts #   沙盒独立调试（VITE_DEV_SANDBOX / definePage.debug）
 │   ├── vite-plugin-uni-pages-tabbar.ts  #   TabBar 策略与 pages.json tabBar 节点生成
-│   ├── vite-plugin-uni-pages-route-meta.ts # 生成 src/router/generated/page-meta.uts
+│   ├── vite-plugin-uni-pages-route-table.ts # 提供 virtual:uni-pages-route-table 虚拟模块
 │   ├── pages-json-util.ts               #   pages.json 读写与平台分支工具
 │   ├── uni-layouts-plugin.ts            #   跨端 Layout 布局插件（default / empty / navbar）
 │   ├── vite-plugin-tabbar-views.ts      #   单页 TabBar 脚手架与视图自动生成
@@ -528,8 +528,7 @@ unibestX/
 │   ├── router/                          # 业务路由层（基于 route-bestX）
 │   │   ├── index.uts                    #   router 单例、useRoute / useRouter
 │   │   ├── config.uts                   #   登录页 / 注册页 / 受保护页面配置
-│   │   ├── guards/                      #   登录、维护、权限三条业务守卫
-│   │   └── generated/                   #   构建期生成的 page-meta.uts（useRoute().meta 数据源）
+│   │   └── guards/                      #   登录、维护、权限三条业务守卫
 │   ├── store/                           # 状态管理（双模式自适应）
 │   │   ├── index.uts                    #   门面：按平台条件编译路由到 vapor / vdom
 │   │   ├── types.uts                    #   跨模式共享类型唯一真源（与平台无关）
@@ -997,7 +996,7 @@ src/tabbar/config.uts (唯一样本源)
 - **白名单模式**：除指定页面外，全部需要登录
 - 支持登录后自动跳回原页面
 
-相关文件：`src/router/`，底层基于 [`uni_modules/route-bestX`](uni_modules/route-bestX/) 路由引擎。业务层拆分为 `config.uts`（登录页 / 注册页 / 受保护页面配置）、`guards/`（`guardLogin` / `guardMaintenance` / `guardPermission` 三条业务守卫）、`generated/page-meta.uts`（构建期生成，供 `useRoute().meta` / `name` 使用）；入口 [src/router/index.uts](src/router/index.uts) 创建 router 单例并导出 `useRoute()` / `useRouter()`（详见 [src/router/README.md](src/router/README.md)）。
+相关文件：`src/router/`，底层基于 [`uni_modules/route-bestX`](uni_modules/route-bestX/) 路由引擎。业务层拆分为 `config.uts`（登录页 / 注册页 / 受保护页面配置）、`guards/`（`guardLogin` / `guardMaintenance` / `guardPermission` 三条业务守卫）、`virtual:uni-pages-route-table`（构建期虚拟模块，供 `useRoute()` 读取页面配置与路由名）；入口 [src/router/index.uts](src/router/index.uts) 创建 router 单例并导出 `useRoute()` / `useRouter()`（详见 [src/router/README.md](src/router/README.md)）。
 
 ### 请求封装与 OpenAPI 强类型接口生成
 

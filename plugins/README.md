@@ -12,7 +12,7 @@
    - 目录下的每个插件都是自包含的独立 `.ts` 模块，**插件之间严禁出现硬编码的交叉代码依赖（无循环 import）**。
    - 任何插件都可以随时在 `vite.config.ts` 的 `plugins: [...]` 数组中注释或拔除，**绝不会引发模块缺失或构建底层崩溃**。
 2. **微内核宿主机制（Stage 流水线）**：
-   - 庞大复杂的页面路由体系（主包/分包扫描、沙盒单页调试、TabBar 模式、页面元信息提取）不写成数千行的巨型单文件，而是拆分为 **「1 个核心主控 + 3 个卫星扩展」**。
+   - 庞大复杂的页面路由体系（主包/分包扫描、沙盒单页调试、TabBar 模式、页面路由表生成）不写成数千行的巨型单文件，而是拆分为 **「1 个核心主控 + 3 个卫星扩展」**。
    - 卫星扩展通过标准协议（挂载 `uniPagesStage` 属性）注册到 Vite 插件流水线中，由核心主控在 `configResolved` 阶段动态收集并按 `order` 顺序流水驱动。
 3. **单一职责与分层清晰**：
    - **Vite 构建插件**全部集中于此目录；
@@ -28,7 +28,7 @@
 | **`vite-plugin-uni-pages.ts`** | `uniPagesPlugin()` | **路由生成微内核主控**：扫描页面 SFC、解析 `definePage` 宏、合并 `pages.config.json`、调度卫星阶段并写入 `pages.json` | **可拔除** | 依赖 `pages-json-util.ts`；拔除后停止自动路由扫描，退回手动维护 `pages.json` |
 | **`vite-plugin-uni-pages-sandbox.ts`** | `uniPagesSandboxPlugin()` | **沙盒独立调试模式（卫星）**：当开启 `VITE_DEV_SANDBOX` 时，将页面路由裁剪为仅调试页面 | **可拔除** | **宿主依赖**：通过 `uniPagesStage (order: 100)` 挂载到核心主控运行；拔除后沙盒裁剪失效 |
 | **`vite-plugin-uni-pages-tabbar.ts`** | `uniPagesTabbarPlugin()` | **TabBar 策略注入（卫星）**：根据 `VITE_TABBAR_MODE (0~4)` 动态生成 pages.json 的 tabBar 节点 | **可拔除** | **宿主依赖**：通过 `uniPagesStage (order: 200)` 挂载到核心主控运行；拔除后 tabBar 不再动态计算 |
-| **`vite-plugin-uni-pages-route-meta.ts`** | `uniPagesRouteMetaPlugin()` | **路由元信息表生成（卫星）**：在写盘前落成 `src/router/generated/page-meta.uts`（`useRoute().meta` 数据源） | **可拔除** | **宿主依赖**：通过 `uniPagesStage (order: 300)` 挂载到核心主控运行；拔除后 meta 表停止更新 |
+| **`vite-plugin-uni-pages-route-table.ts`** | `uniPagesRouteTablePlugin()` | **页面路由表虚拟模块（卫星）**：在写盘前生成 `virtual:uni-pages-route-table`，按路径 map / 数组 list 两种形态分别导出 JSON 与对象（`useRoute()` 数据源），不产生物理文件 | **可拔除** | **宿主依赖**：通过 `uniPagesStage (order: 300)` 挂载到核心主控运行；拔除后页面配置表停止更新 |
 | **`uni-layouts-plugin.ts`** | `uniLayoutsPlugin()` | **跨端 Layout 布局包装**：解析页面 `layout` 配置并在 SFC 模板外层自动包裹布局组件（如 `<layout-default>`） | **可拔除** | **产物消费**：依赖 `pages.json` 数据；拔除后页面不再被包裹布局外壳 |
 | **`root-plugin.ts`** | `uniRootX()` | **全局根骨架组件包装**：自动给页面外层套上根组件（如 `<AppRoot>`）并透传页面参数 | **可拔除** | **产物消费**：依赖 `pages.json` 数据；拔除后页面不再包裹全局根组件 |
 | **`vite-plugin-tabbar-views.ts`** | `tabbarViewsPlugin()` | **单页 TabBar 视图脚手架**：根据 `src/tabbar/config.uts` 自动生成 `TabViews.uvue` 调度组件与视图骨架 | **可拔除** | **配置依赖**：依赖 `src/tabbar/config.uts` 和 `pages.json`；用于单页多视图模式 |
@@ -47,7 +47,7 @@ graph TD
     A[vite.config.ts 注册插件] --> B[uniPagesPlugin 核心主控]
     A -.-> C1[uniPagesSandboxPlugin order:100]
     A -.-> C2[uniPagesTabbarPlugin order:200]
-    A -.-> C3[uniPagesRouteMetaPlugin order:300]
+    A -.-> C3[uniPagesRouteTablePlugin order:300]
 
     B -- 1. configResolved --> D[从 config.plugins 发现挂有 .uniPagesStage 的扩展并排序]
     B -- 2. 扫描文件 --> E[并发扫描 src/pages & src/sub 解析 definePage]
@@ -55,13 +55,13 @@ graph TD
     
     F --> G1[Stage 100: Sandbox 裁剪调试页面]
     G1 --> G2[Stage 200: TabBar 生成与沙盒联动]
-    G2 --> G3[Stage 300: RouteMeta 写出 page-meta.uts]
+    G2 --> G3[Stage 300: RouteTable 生成虚拟模块]
     
     G3 -- 4. 最终写盘 --> H[生成项目根目录 pages.json]
 ```
 
 - **为什么卫星插件离开核心无法运行？**
-  卫星插件自身没有实现 Vite 的标准生命周期钩子（如 `transform`、`buildStart`），它们只导出了一个携带 `uniPagesStage` 描述的对象。Vite 本身不认识这个字段，只有核心主控会在合适时机调用 `stage.run(state)`。
+  `sandbox` / `tabbar` 只导出携带 `uniPagesStage` 描述的对象；`route-table` 额外实现了 `resolveId` / `load` 来提供虚拟模块。Vite 不认识 `uniPagesStage`，只有核心主控会在合适时机调用 `stage.run(state)`，因此路由表内容仍由核心扫描结果驱动。
 - **为什么核心主控离开卫星依然完好？**
   核心主控在执行前会自检阶段是否完整，若某阶段未注册，仅打印一条警告提示对应功能未生效，核心依然能完成全量页面扫描并输出标准 `pages.json`。
 
