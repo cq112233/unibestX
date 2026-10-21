@@ -611,6 +611,12 @@ const displayTitle = computed((): string => {
     if (activeTabTitle.value.length > 0) {
       return formatNavbarTitle(activeTabTitle.value);
     }
+    // 首次挂载时 TabContent 的 onMounted 尚未把当前 Tab 标题写入 activeTabTitle。
+    // 此时优先使用当前平台的页面标题（android / ios / h5），避免先闪一帧通用 Tab 文案（如“首页”）。
+    const initialStyleTitle = pageStyleObj.value.navigationBarTitleText;
+    if (initialStyleTitle != null) {
+      return formatNavbarTitle(`${initialStyleTitle}`);
+    }
     if (curIdx.value >= 0 && curIdx.value < tabbarList.length) {
       return formatNavbarTitle(tabbarList[curIdx.value].text);
     }
