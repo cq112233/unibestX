@@ -124,3 +124,153 @@ export function downloadFooFile(
   } as HttpRequestConfig);
 }
 ```
+
+---
+
+## 异步请求 Hooks（对标 TanStack Query）
+
+本项目 HTTP 层基于 `request-bestX` 模块开发，并直接复用其声明式异步状态管理能力。页面读取服务端数据用 `useQuery`，新增 / 修改 / 删除用 `useMutation`，再通过 `useQueryClient` 联动缓存。完整参数表见 [request-bestX](../../uni_modules/request-bestX/readme.md)。
+
+| Hook | 职责 |
+| :--- | :--- |
+| `useQuery` | 查询数据，自动维护 `data` / `isPending` / `isFetching` / `isError` / `lastError` 与缓存 |
+| `useMutation` | 执行写操作，提供 `isPending` / `mutate` / `mutateAsync` 与 `onSuccess` / `onError` 生命周期 |
+| `useQueryClient` | 读取、写入、失效或移除查询缓存 |
+
+### 1. 查询、变更与缓存联动
+
+```html
+<script setup lang="uts">
+import { ref } from 'vue';
+import {
+  useQuery,
+  useMutation,
+  useQueryClient
+} from '@/uni_modules/request-bestX/index.uts';
+import type {
+  MutationOptions,
+  QueryFunctionContext,
+  QueryOptions
+} from '@/uni_modules/request-bestX/index.uts';
+import { createFoo, fetchFooList } from '@/src/api/foo/foo.uts';
+import type { FooItem, PageResult } from '@/src/api/foo/foo.uts';
+
+/** 全局查询客户端：读取 / 失效缓存 */
+const queryClient = useQueryClient();
+
+/** 当前页码 */
+const page = ref<number>(1);
+
+/** 搜索关键字 */
+const keyword = ref<string>('');
+
+// useQuery：queryKey 中放 Ref，页码或关键字变化后自动取消旧请求并重新拉取
+const {
+  data: listData,
+  isPending: listPending,
+  isFetching: listFetching,
+  isError: listError,
+  lastError: listErrorObj,
+  refetch: refetchList
+} = useQuery<PageResult<FooItem>>({
+  queryKey: ['foo', 'list', page, keyword],
+  queryFn: (_ctx: QueryFunctionContext): Promise<PageResult<FooItem>> => {
+    return fetchFooList(page.value, 10, keyword.value);
+  },
+  staleTime: 30000,
+  retry: 2
+} as QueryOptions<PageResult<FooItem>>);
+
+// useMutation：成功后按 queryKey 前缀失效列表缓存
+const {
+  isPending: creatingFoo,
+  mutate: createFooItem
+} = useMutation<FooItem, string>({
+  mutationFn: (name: string): Promise<FooItem> => {
+    return createFoo(name);
+  },
+  onSuccess: (_created: FooItem, _name: string, _ctx: any): void => {
+    queryClient.invalidateQueries(['foo', 'list']);
+  },
+  onError: (err: Error, _name: string, _ctx: any): void => {
+    uni.showToast({ title: err.message, icon: 'none' });
+  }
+} as MutationOptions<FooItem, string>);
+
+/** 翻页：无需手写 watch，queryKey 变化会自动查询 */
+function nextPage(): void {
+  page.value = page.value + 1;
+}
+
+/** 新建：mutate 不抛出异常，失败统一走 onError */
+function submitFoo(name: string): void {
+  createFooItem(name);
+}
+</script>
+```
+
+### 2. 页面中消费响应式状态
+
+Vue 模板会自动解包 Hook 返回的 Ref：
+
+```html
+<view v-if="listPending">
+  <text>正在加载...</text>
+</view>
+
+<view v-else-if="listError">
+  <text>{{ listErrorObj?.message ?? '加载失败' }}</text>
+  <text @click="refetchList">点击重试</text>
+</view>
+
+<view v-else>
+  <text>共 {{ listData?.total ?? 0 }} 条{{ listFetching ? '（同步中）' : '' }}</text>
+  <text @click="nextPage">下一页</text>
+  <text @click="submitFoo('新条目')">{{ creatingFoo ? '提交中...' : '新建' }}</text>
+</view>
+```
+
+- `isPending`：首次查询尚未完成；`isFetching`：任意网络拉取中，包含后台刷新和轮询。
+- `lastError` 是当前 Hook 的异常字段；`refetch()` 会忽略 `staleTime`，强制请求服务端。
+- `queryFn` 只调用 `src/api` 接口函数，不在页面里直接使用 `http`。
+
+### 3. 缓存操作
+
+```uts
+import { useQueryClient } from '@/uni_modules/request-bestX/index.uts';
+import type { FooItem, PageResult } from '@/src/api/foo/foo.uts';
+
+// 沿用上例中的 page / keyword
+const queryClient = useQueryClient();
+
+// 前缀失效：所有 ['foo', 'list', ...] 查询都会重新拉取
+queryClient.invalidateQueries(['foo', 'list']);
+
+/** 乐观更新：把服务端返回的新列表写入当前查询缓存 */
+function updateFooCache(nextPageData: PageResult<FooItem>): void {
+  const listKey: Array<any> = ['foo', 'list', page.value, keyword.value];
+  queryClient.setQueryData<PageResult<FooItem>>(listKey, nextPageData);
+}
+
+/** 移除当前查询缓存 */
+function removeFooCache(): void {
+  const listKey: Array<any> = ['foo', 'list', page.value, keyword.value];
+  queryClient.removeQueries(listKey);
+}
+```
+
+| 方法 | 用途 |
+| :--- | :--- |
+| `invalidateQueries(filters)` | 将匹配缓存标记过期并通知活跃查询重新拉取，传数组时按前缀匹配 |
+| `refetchQueries(filters)` | 重新拉取匹配查询 |
+| `getQueryData(key)` | 同步读取指定 `queryKey` 的缓存数据 |
+| `setQueryData(key, data)` | 直接写入或覆盖指定缓存 |
+| `removeQueries(filters)` | 移除匹配缓存 |
+| `cancelQueries(filters)` | 取消匹配查询中正在执行的请求 |
+
+### 4. 使用约束
+
+- `useQuery` / `useMutation` / `useQueryClient` 必须在组件的 `setup` 内调用，不能放在普通函数或模块顶层。
+- `queryKey` 使用稳定数组：固定业务前缀在前，动态参数（`page`、`keyword` 等）直接放 Ref，变更后自动重查。
+- 查询用 `useQuery`，写操作用 `useMutation`；写成功后调用 `invalidateQueries([业务前缀])`，不要在页面手工维护列表副本。
+- `mutate` 不抛出异常，错误交给 `onError` / `lastError`；需要 `await` 并捕获异常时使用 `mutateAsync`。
