@@ -55,6 +55,12 @@ src/tabbar/
 │   ├── navbar.uts                #   navbar 显隐 / 下拉刷新桥接
 │   ├── platform.uts              #   H5 / 支付宝小程序等平台判断
 │   └── system.uts                #   安全区与系统尺寸
+├── hooks/                        # 组合式 API（业务侧推荐入口）
+│   ├── useTabbar.uts             #   全局状态、模式与导航动作
+│   ├── useTabbarPage.uts         #   onTabShow / onTabPageShow / 页面可见性
+│   ├── useTabbarTheme.uts        #   明暗主题令牌
+│   ├── useTabbarMetrics.uts      #   高度、安全区与底部预留
+│   └── useTabbarI18n.uts         #   文案国际化与原生 TabBar 同步
 ├── components/
 │   ├── TabViews.uvue             # ⚠️ 构建期自动生成（单页模式的 Tab 调度容器），勿手改
 │   ├── TabContent.uvue           #   单个 Tab 的容器（负责页面配置与下拉刷新包裹）
@@ -186,7 +192,24 @@ tabbarViewsPlugin({
 
 ## 运行时 API
 
-统一从门面导入：
+业务组件优先使用 hooks，统一从门面导入：
+
+```uts
+import { useTabbar, useTabbarPage } from '@/src/tabbar/index.uts';
+
+const { curIdx, tabbarList, switchTabbar, setTabbarItemBadge } = useTabbar();
+const { onTabShow, onTabPageShow, notifyPageShow, notifyPageHide } = useTabbarPage();
+```
+
+| Hook | 返回 / 用途 |
+| :--- | :--- |
+| `useTabbar()` | `curIdx`、`tabbarList`、`activeTabTitle`、模式开关、`switchTabbar()`、`handleTabbarClick()`、原生 TabBar 隐藏/恢复、角标与索引同步方法 |
+| `useTabbarPage()` | `onTabShow()`、`onTabPageShow()`、`notifyPageShow/Hide()`、页面可见性状态 |
+| `useTabbarTheme()` | `isDark`、`themeTokens`、`activeThemeColor` |
+| `useTabbarMetrics()` | `TABBAR_HEIGHT`、`safeAreaBottom`、`tabbarPlaceholderHeight`、`tabbarBottomPaddingClass` |
+| `useTabbarI18n()` | `formatTabbarText()`、`setTabbarItem()` |
+
+底层函数仍保留导出，兼容已有页面；新代码优先使用 hooks。
 
 ```uts
 import { switchTabbar, onTabShow, onTabPageShow, curIdx } from '@/src/tabbar/index.uts';

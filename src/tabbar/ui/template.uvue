@@ -90,17 +90,11 @@
 <script setup lang="uts">
 import { onMounted } from 'vue';
 import {
-  activeThemeColor,
-  curIdx,
-  formatTabbarText,
-  handleTabbarClick,
-  safeAreaBottom,
-  safeHideNativeTabBar,
-  syncCurIdxByCurrentPage,
   TABBAR_HEIGHT,
-  tabbarList,
-  tabbarPlaceholderHeight,
-  themeTokens
+  useTabbar,
+  useTabbarI18n,
+  useTabbarMetrics,
+  useTabbarTheme
 } from '@/src/tabbar/index.uts';
 import type { CustomTabBarItem } from '@/src/tabbar/index.uts';
 
@@ -123,6 +117,21 @@ defineProps({
     default: true
   }
 });
+
+/** TabBar 全局状态、配置与导航动作 */
+const {
+  curIdx,
+  handleTabbarClick,
+  safeHideNativeTabBar,
+  syncCurIdxByCurrentPage,
+  tabbarList
+} = useTabbar();
+/** TabBar 文案的多语言转换 */
+const { formatTabbarText } = useTabbarI18n();
+/** 当前主题颜色令牌 */
+const { activeThemeColor, themeTokens } = useTabbarTheme();
+/** 底部安全区与 TabBar 占位高度 */
+const { safeAreaBottom, tabbarPlaceholderHeight } = useTabbarMetrics();
 
 // ==========================================
 // 生命周期与初始同步

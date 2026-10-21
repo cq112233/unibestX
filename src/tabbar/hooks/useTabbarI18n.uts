@@ -2,14 +2,20 @@ import { formatTabbarText, setTabbarItem } from '../adapters/i18n.uts';
 
 /** TabBar 文案国际化与原生 TabBar 同步 */
 export type UseTabbarI18nResult = {
+  /** 将多语言 key 转换为当前语言文案 */
   formatTabbarText: (text: string) => string;
+  /** 将当前语言文案同步到系统原生 TabBar */
   setTabbarItem: () => void;
 };
 
 /** TabBar 国际化 hooks */
 export function useTabbarI18n(): UseTabbarI18nResult {
-  return {
-    formatTabbarText,
-    setTabbarItem
-  } as UseTabbarI18nResult;
+  const result: UseTabbarI18nResult = {
+    // 包一层 lambda，避免 UTS/Kotlin 对象字面量直接引用顶层函数
+    formatTabbarText: (text: string): string => formatTabbarText(text),
+    setTabbarItem: (): void => {
+      setTabbarItem();
+    }
+  };
+  return result;
 }

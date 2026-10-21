@@ -554,6 +554,7 @@ unibestX/
 │   │   │   ├── lifecycle.uts            #     页面可见性生命周期
 │   │   │   └── native.uts               #     平台桥接（隐藏原生 tabbar）
 │   │   ├── adapters/                    #   业务桥接层（主题、i18n、navbar、系统尺寸）
+│   │   ├── hooks/                       #   组合式 API（useTabbar / useTabbarPage 等）
 │   │   ├── ui/                          #   TabBar 视图层
 │   │   │   ├── capsule/                 #     悬浮胶囊风格
 │   │   │   ├── default/                 #     标准贴底风格（含 midButton 鼓包）
