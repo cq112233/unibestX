@@ -883,14 +883,15 @@ uni-app X 推出了新一代的 **蒸汽模式（Vapor）**。新版渲染引擎
 
 在自定义模式（模式 2 / 3 / 4）下，可通过 `src/tabbar/config.uts` 的 `type` 字段一键切换 UI 风格：
 
-- **`type: 'capsule'`（悬浮胶囊岛屿风格，当前默认）**
+- **`type: 'capsule'`（悬浮胶囊岛屿风格）**
   - 位于屏幕底部的悬空圆角 Dock 栏（`rounded-[34px]` + 柔和立体微阴影）；
   - 配备带贝塞尔弹性曲线（`cubic-bezier(0.25, 1, 0.5, 1)`）的滑块胶囊（Animated Slider Pill），切换时平滑穿梭；
   - 按下时具备 iOS 灵动触感反馈（整体微弹放大，松开回弹缩回）；
-  - 支持 `glassEffect` 开关（iOS 26+ 液态玻璃），完美适配亮色 / 暗黑主题与底部安全区。
+  - 两种 UI 形态都支持 `glassEffect` 开关：iOS 使用原生 `glass-effect-view`，其余端回退为半透明底色（Web / 微信小程序额外启用 `backdrop-filter`）。
 - **`type: 'default'`（标准贴底底座风格）**
   - 采用清晰的三层层叠结构（`tabbar-bg` 底板层 + `tabbar-inner` 图标层 + `safe-area-bg` 安全区层）；
-  - 全端 100% 支持立体凸起鼓包按钮（`midButton`，如居中 AI 交互按钮）、字体图标与小红点 / 数字徽标。
+  - 全端 100% 支持立体凸起鼓包按钮（`midButton`，如居中 AI 交互按钮）、字体图标与小红点 / 数字徽标；
+  - 同样支持 `glassEffect`，开启后玻璃背景覆盖完整底板与底部安全区。
 
 #### 3. 单页面 TabBar 自动化脚手架与 Vite 插件
 

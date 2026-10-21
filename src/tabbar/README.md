@@ -54,9 +54,8 @@ src/tabbar/
 │   └── TabbarPlaceholder.uvue    #   占位（配合 navbar 布局预留高度）
 └── ui/
     ├── template.uvue             # 新 UI 形态的模板（复制它来扩展）
-    ├── capsule/index.uvue        # 悬浮胶囊岛屿形态（type: 'capsule'）
-    ├── glass/index.uvue          # 悬浮液态玻璃形态（type: 'glass'，iOS 26+ 原生 glass-effect-view + 多端降级）
-    └── default/                  # 标准贴底形态（type: 'default'）
+    ├── capsule/index.uvue        # 悬浮胶囊岛屿形态（type: 'capsule'，支持 glassEffect）
+    └── default/                  # 标准贴底形态（type: 'default'，支持 glassEffect）
         ├── index.uvue
         └── TabbarItem.uvue
 ```
@@ -65,7 +64,8 @@ src/tabbar/
 | :--- | :--- |
 | 加 / 删 Tab、换文字图标路径 | [config.uts](config.uts) |
 | 切换 TabBar 模式（原生 / 自定义 / 单页） | [.env](../../.env) 的 `VITE_TABBAR_MODE` |
-| 切换 UI 形态（胶囊 / 贴底 / 液态玻璃） | [config.uts](config.uts) 的 `type` |
+| 切换 UI 形态（胶囊 / 贴底） | [config.uts](config.uts) 的 `type` |
+| 开关液态玻璃效果 | [config.uts](config.uts) 的 `glassEffect`（iOS 原生，其他端毛玻璃降级） |
 | 扩展第四种 UI 形态 | 复制 [ui/template.uvue](ui/template.uvue) → 在 [tabbar.uvue](tabbar.uvue) 加分支 |
 | 页面里切 Tab / 监听 Tab | [index.uts](index.uts) 导出的 `switchTabbar` / `onTabShow` / `onTabPageShow` |
 | 改 Tab 页面标题、是否显示导航栏、下拉刷新 | 对应页面的 `definePage`（插件会自动同步进 `TabViews.uvue`） |
@@ -142,7 +142,7 @@ src/tabbar/
 2. 在 [tabbar.uvue](tabbar.uvue) 加一个 `v-else-if` 分支；
 3. 把 `config.uts` 的 `type` 改成新值。
 
-`<Tabbar>` 也支持 `type` / `glass-effect` 两个 props 做局部覆盖（不传则读 `config.uts`）。
+`<Tabbar>` 支持 `type` prop 做形态局部覆盖（不传则读 `config.uts`）；液态玻璃统一由 `config.uts` 的 `glassEffect` 控制。
 
 ---
 
