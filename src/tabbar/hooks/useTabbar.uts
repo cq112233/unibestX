@@ -1,0 +1,131 @@
+import type { Ref } from 'vue';
+import type { CustomTabBarItem, CustomTabBarItemBadge, TabBarConfig } from '../core/types.uts';
+import { customTabbarConfig } from '../adapters/config.uts';
+import {
+  handleTabbarClick,
+  initNativeMidButtonTap,
+  resetTabSwitchThrottle,
+  switchTabbar
+} from '../core/navigate.uts';
+import { safeHideNativeTabBar, safeRestoreNativeTabBar } from '../core/native.uts';
+import {
+  activeTabTitle,
+  curIdx,
+  isPageTabbar,
+  setCurIdx,
+  setCurIdxByKey,
+  setCurIdxByPath,
+  setTabbarItemBadge,
+  syncCurIdxByCurrentPage,
+  tabbarList
+} from '../core/state.uts';
+import {
+  customTabbarEnable,
+  isNativeTabbar,
+  isSinglePageTabbar,
+  needTabbarBottomPadding,
+  tabbarType
+} from '../core/strategy.uts';
+
+/** TabBar 全局状态、模式与导航动作 */
+export type UseTabbarResult = {
+  /** 当前激活的 Tab 下标（从 0 开始，包含中间鼓包项） */
+  curIdx: Ref<number>;
+  /** 完整 Tab 列表（已合并中间鼓包项） */
+  tabbarList: CustomTabBarItem[];
+  /** 当前激活 Tab 的标题，供 Navbar 联动展示 */
+  activeTabTitle: Ref<string>;
+  /** TabBar 原始配置（文案、图标、鼓包与液态玻璃参数） */
+  customTabbarConfig: TabBarConfig;
+  /** 是否为单页保活模式（模式 4） */
+  isSinglePageTabbar: boolean;
+  /** 是否使用系统原生 TabBar（模式 1） */
+  isNativeTabbar: boolean;
+  /** 是否需要渲染自定义 TabBar（模式 2 / 3） */
+  customTabbarEnable: boolean;
+  /** 是否需要在页面底部预留 TabBar 高度 */
+  needTabbarBottomPadding: boolean;
+  /** 当前 TabBar UI 形态（default / capsule） */
+  tabbarType: string;
+  /** 直接设置当前 Tab 下标并持久化，不触发路由跳转 */
+  setCurIdx: (idx: number) => void;
+  /** 按业务标识（type）设置当前 Tab 下标 */
+  setCurIdxByKey: (key: string) => void;
+  /** 按页面路径设置当前 Tab 下标 */
+  setCurIdxByPath: (path: string) => void;
+  /** 设置指定 Tab 的数字角标或红点 */
+  setTabbarItemBadge: (idx: number, badge: CustomTabBarItemBadge) => void;
+  /** 根据当前页面路径同步激活下标 */
+  syncCurIdxByCurrentPage: () => void;
+  /** 判断指定路径是否为 TabBar 页面 */
+  isPageTabbar: (path: string) => boolean;
+  /** 按不同 TabBar 策略切换到目标页面 */
+  switchTabbar: (url: string) => void;
+  /** 处理 Tab 点击（内部自动区分单页切换与页面跳转） */
+  handleTabbarClick: (index: number) => void;
+  /** 重置 Tab 切换节流锁 */
+  resetTabSwitchThrottle: () => void;
+  /** 初始化原生 TabBar 中间按钮点击监听 */
+  initNativeMidButtonTap: () => void;
+  /** 安全隐藏系统原生 TabBar，避免与自定义 TabBar 重叠 */
+  safeHideNativeTabBar: () => void;
+  /** 安全恢复系统原生 TabBar */
+  safeRestoreNativeTabBar: () => void;
+};
+
+/**
+ * TabBar 全局状态与导航 hooks
+ *
+ * 推荐业务组件统一通过本 hook 获取 tabbarList / curIdx / 切换动作，
+ * 避免在页面里散落大量底层函数导入。
+ */
+export function useTabbar(): UseTabbarResult {
+  const result: UseTabbarResult = {
+    // ---- 响应式状态与只读配置：直接透出全局单例，保证所有组件共享同一份数据 ----
+    curIdx,
+    tabbarList,
+    activeTabTitle,
+    customTabbarConfig,
+    isSinglePageTabbar,
+    isNativeTabbar,
+    customTabbarEnable,
+    needTabbarBottomPadding,
+    tabbarType,
+    // ---- 操作方法：包一层局部 lambda，避免 UTS/Kotlin 对象字面量直接引用顶层函数 ----
+    setCurIdx: (idx: number): void => {
+      setCurIdx(idx);
+    },
+    setCurIdxByKey: (key: string): void => {
+      setCurIdxByKey(key);
+    },
+    setCurIdxByPath: (path: string): void => {
+      setCurIdxByPath(path);
+    },
+    setTabbarItemBadge: (idx: number, badge: CustomTabBarItemBadge): void => {
+      setTabbarItemBadge(idx, badge);
+    },
+    syncCurIdxByCurrentPage: (): void => {
+      syncCurIdxByCurrentPage();
+    },
+    isPageTabbar: (path: string): boolean => isPageTabbar(path),
+    switchTabbar: (url: string): void => {
+      switchTabbar(url);
+    },
+    handleTabbarClick: (index: number): void => {
+      handleTabbarClick(index);
+    },
+    resetTabSwitchThrottle: (): void => {
+      resetTabSwitchThrottle();
+    },
+    initNativeMidButtonTap: (): void => {
+      initNativeMidButtonTap();
+    },
+    safeHideNativeTabBar: (): void => {
+      safeHideNativeTabBar();
+    },
+    safeRestoreNativeTabBar: (): void => {
+      safeRestoreNativeTabBar();
+    }
+  };
+  return result;
+}

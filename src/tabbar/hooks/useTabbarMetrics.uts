@@ -1,0 +1,44 @@
+import type { Ref } from 'vue';
+import {
+  hasTabbarBulge,
+  safeAreaBottom,
+  TABBAR_CONTAINER_HEIGHT,
+  TABBAR_HEIGHT,
+  tabbarBottomPaddingHeight,
+  tabbarPlaceholderHeight
+} from '../core/metrics.uts';
+import { tabbarBottomPaddingClass } from '../core/strategy.uts';
+
+/** TabBar 尺寸、安全区与页面底部预留 */
+export type UseTabbarMetricsResult = {
+  /** TabBar 交互区基准高度（不含底部安全区） */
+  TABBAR_HEIGHT: number;
+  /** TabBar 容器总高度（包含鼓包突出部分） */
+  TABBAR_CONTAINER_HEIGHT: number;
+  /** 当前配置是否包含中间鼓包按钮 */
+  hasTabbarBulge: boolean;
+  /** 底部安全区高度（响应式） */
+  safeAreaBottom: Ref<number>;
+  /** TabBar 自身占位高度（交互区 + 底部安全区） */
+  tabbarPlaceholderHeight: Ref<number>;
+  /** 页面内容需要额外预留的底部高度 */
+  tabbarBottomPaddingHeight: Ref<number>;
+  /** 页面底部预留使用的工具类名 */
+  tabbarBottomPaddingClass: string;
+};
+
+/** TabBar 尺寸与安全区 hooks */
+export function useTabbarMetrics(): UseTabbarMetricsResult {
+  const result: UseTabbarMetricsResult = {
+    // ---- 固定尺寸与当前 TabBar 结构标记 ----
+    TABBAR_HEIGHT,
+    TABBAR_CONTAINER_HEIGHT,
+    hasTabbarBulge,
+    // ---- 随安全区/策略变化的响应式尺寸 ----
+    safeAreaBottom,
+    tabbarPlaceholderHeight,
+    tabbarBottomPaddingHeight,
+    tabbarBottomPaddingClass
+  };
+  return result;
+}

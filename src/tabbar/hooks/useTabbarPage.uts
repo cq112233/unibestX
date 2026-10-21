@@ -1,0 +1,57 @@
+import type { Ref } from 'vue';
+import {
+  isPageVisible,
+  notifyPageHide,
+  notifyPageShow,
+  onTabPageShow,
+  pageShowTimes
+} from '../core/lifecycle.uts';
+import { onTabShow } from '../core/state.uts';
+import { resolveTabIndexByKey } from '../core/tab-key.uts';
+
+/** TabBar 页面显示订阅与可见性状态 */
+export type UseTabbarPageResult = {
+  /** 当前页面是否可见（页面 onShow / onHide 的响应式状态） */
+  isPageVisible: Ref<boolean>;
+  /** 当前页面累计显示次数 */
+  pageShowTimes: Ref<number>;
+  /** 通知 TabBar：宿主页面已显示 */
+  notifyPageShow: () => void;
+  /** 通知 TabBar：宿主页面已隐藏 */
+  notifyPageHide: () => void;
+  /** 订阅指定 Tab 的切换显示事件 */
+  onTabShow: (target: number | string, callback: () => void, immediate?: boolean) => void;
+  /** 订阅指定 Tab 页面重新显示事件（覆盖从子页面返回等场景） */
+  onTabPageShow: (target: number | string, callback: () => void, immediate?: boolean) => void;
+  /** 将 Tab 业务标识解析为完整列表下标 */
+  resolveTabIndexByKey: (key: string) => number;
+};
+
+/**
+ * TabBar 页面生命周期 hooks
+ *
+ * 封装 onTabShow / onTabPageShow 与页面可见性通知，
+ * 业务页面不再直接组合 state + lifecycle 两个底层模块。
+ */
+export function useTabbarPage(): UseTabbarPageResult {
+  const result: UseTabbarPageResult = {
+    // ---- 页面可见性状态 ----
+    isPageVisible,
+    pageShowTimes,
+    // ---- 页面显示通知与 Tab 订阅方法 ----
+    notifyPageShow: (): void => {
+      notifyPageShow();
+    },
+    notifyPageHide: (): void => {
+      notifyPageHide();
+    },
+    onTabShow: (target: number | string, callback: () => void, immediate: boolean = false): void => {
+      onTabShow(target, callback, immediate);
+    },
+    onTabPageShow: (target: number | string, callback: () => void, immediate: boolean = false): void => {
+      onTabPageShow(target, callback, immediate);
+    },
+    resolveTabIndexByKey: (key: string): number => resolveTabIndexByKey(key)
+  };
+  return result;
+}

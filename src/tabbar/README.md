@@ -18,15 +18,16 @@ src/tabbar/config.uts        ← 你改这里（唯一真源）
         │        ├─ 自动生成 src/tabbar/components/TabViews.uvue（单页模式的调度容器）
         │        └─ 从各 Tab 页面的 definePage 同步 title / hideNavbar / 下拉刷新等
         │
-        └──► src/tabbar/internal/*        （运行时：状态、切换、生命周期、主题、尺寸）
-                 └─ 由 src/tabbar/index.uts 单层门面统一转发
+        └──► src/tabbar/core/*            （运行时：状态、切换、生命周期、尺寸）
+                 └─ 通过 src/tabbar/adapters/* 读取主题、i18n、navbar、系统与业务配置
+                    └─ 由 src/tabbar/index.uts 单层门面统一转发
 ```
 
 | 环节 | 文件 | 什么时候跑 |
 | :--- | :--- | :--- |
 | 配置声明 | [config.uts](config.uts) | 人写 |
 | 代码生成 | [plugins/vite-plugin-tabbar-views.ts](../../plugins/vite-plugin-tabbar-views.ts) | dev 启动 + 配置/页面/pages.json 变更时 |
-| 运行时 | [internal/](internal/) + [ui/](ui/) | 应用运行期 |
+| 运行时 | [core/](core/) + [adapters/](adapters/) + [ui/](ui/) | 应用运行期 |
 
 ---
 
@@ -34,20 +35,32 @@ src/tabbar/config.uts        ← 你改这里（唯一真源）
 
 ```text
 src/tabbar/
-├── index.uts                     # 门面：单层转发 config / types / internal 全部公开符号（业务侧 import 入口）
+├── index.uts                     # 门面：单层转发 config / core / adapters 的公开符号（业务侧 import 入口）
 ├── config.uts                    # ⭐ 唯一真源：Tab 列表、颜色、形态、midButton
-├── types.uts                     # 契约类型：TabBarConfig / CustomTabBarItem / TabBarMidButton
 ├── tabbar.uvue                   # TabBar 渲染入口（按 config.type 分发到具体 UI 形态）
-├── internal/                     # 运行时实现（业务侧不要直接引）
+├── core/                         # 核心运行逻辑（业务无关注入点尽量放这里）
+│   ├── types.uts                 #   契约类型：TabBarConfig / CustomTabBarItem / TabBarMidButton
 │   ├── state.uts                 #   tabbarList / curIdx / onTabShow / 角标 / 路径判断
 │   ├── strategy.uts              #   五种模式解析 + 各模式开关量
 │   ├── navigate.uts              #   switchTabbar() / handleTabbarClick() / 原生鼓包事件
 │   ├── lifecycle.uts             #   onTabPageShow() / 页面可见性通知
 │   ├── metrics.uts               #   TabBar 高度、安全区、底部预留内边距
 │   ├── tab-key.uts               #   业务标识(tabType) ⇄ 下标 的解析
+│   ├── path.uts                  #   路径规范化与当前路由读取
+│   └── native.uts                #   隐藏原生 tabBar
+├── adapters/                     # 业务桥接层（唯一允许依赖宿主业务的位置）
+│   ├── config.uts                #   注入 Tab 业务配置
 │   ├── theme.uts                 #   明暗主题色
 │   ├── i18n.uts                  #   Tab 文案国际化
-│   └── native.uts                #   隐藏原生 tabBar
+│   ├── navbar.uts                #   navbar 显隐 / 下拉刷新桥接
+│   ├── platform.uts              #   H5 / 支付宝小程序等平台判断
+│   └── system.uts                #   安全区与系统尺寸
+├── hooks/                        # 组合式 API（业务侧推荐入口）
+│   ├── useTabbar.uts             #   全局状态、模式与导航动作
+│   ├── useTabbarPage.uts         #   onTabShow / onTabPageShow / 页面可见性
+│   ├── useTabbarTheme.uts        #   明暗主题令牌
+│   ├── useTabbarMetrics.uts      #   高度、安全区与底部预留
+│   └── useTabbarI18n.uts         #   文案国际化与原生 TabBar 同步
 ├── components/
 │   ├── TabViews.uvue             # ⚠️ 构建期自动生成（单页模式的 Tab 调度容器），勿手改
 │   ├── TabContent.uvue           #   单个 Tab 的容器（负责页面配置与下拉刷新包裹）
@@ -125,7 +138,7 @@ src/tabbar/
 | `3` | 纯自定义 TabBar | ❌ 每次重载 | `uni.redirectTo` | **无 `tabBar` 节点**，[App.ku.uvue](../../App.ku.uvue) 渲染 |
 | `4` | 单页容器 TabBar | ✅ 天然保活、零闪烁 | 切容器内索引，**不跳路由** | **无 `tabBar` 节点**，[src/pages/index/index.uvue](../pages/index/index.uvue) 渲染 |
 
-本项目默认 `4`。模式解析在 [internal/strategy.uts](internal/strategy.uts)，业务侧判断当前模式用导出的 `isSinglePageTabbar` / `isNativeTabbar` / `customTabbarEnable` / `needTabbarBottomPadding`。模式 1 / 2 的 `tabBar` 节点由 [plugins/vite-plugin-uni-pages.ts](../../plugins/vite-plugin-uni-pages.ts) 从 [config.uts](config.uts) 生成。
+本项目默认 `4`。模式解析在 [core/strategy.uts](core/strategy.uts)，业务侧判断当前模式用导出的 `isSinglePageTabbar` / `isNativeTabbar` / `customTabbarEnable` / `needTabbarBottomPadding`。模式 1 / 2 的 `tabBar` 节点由 [plugins/vite-plugin-uni-pages.ts](../../plugins/vite-plugin-uni-pages.ts) 从 [config.uts](config.uts) 生成。
 
 > ⚠️ **模式 4 的入口页面只有一个**（`src/pages/index/index.uvue`），其余 Tab 页面在该模式下不参与路由，只作为视图组件被 `TabViews.uvue` 挂载。这也是它「零闪烁、状态天然保活」的原因。
 
@@ -179,7 +192,24 @@ tabbarViewsPlugin({
 
 ## 运行时 API
 
-统一从门面导入：
+业务组件优先使用 hooks，统一从门面导入：
+
+```uts
+import { useTabbar, useTabbarPage } from '@/src/tabbar/index.uts';
+
+const { curIdx, tabbarList, switchTabbar, setTabbarItemBadge } = useTabbar();
+const { onTabShow, onTabPageShow, notifyPageShow, notifyPageHide } = useTabbarPage();
+```
+
+| Hook | 返回 / 用途 |
+| :--- | :--- |
+| `useTabbar()` | `curIdx`、`tabbarList`、`activeTabTitle`、模式开关、`switchTabbar()`、`handleTabbarClick()`、原生 TabBar 隐藏/恢复、角标与索引同步方法 |
+| `useTabbarPage()` | `onTabShow()`、`onTabPageShow()`、`notifyPageShow/Hide()`、页面可见性状态 |
+| `useTabbarTheme()` | `isDark`、`themeTokens`、`activeThemeColor` |
+| `useTabbarMetrics()` | `TABBAR_HEIGHT`、`safeAreaBottom`、`tabbarPlaceholderHeight`、`tabbarBottomPaddingClass` |
+| `useTabbarI18n()` | `formatTabbarText()`、`setTabbarItem()` |
+
+底层函数仍保留导出，兼容已有页面；新代码优先使用 hooks。
 
 ```uts
 import { switchTabbar, onTabShow, onTabPageShow, curIdx } from '@/src/tabbar/index.uts';
@@ -228,5 +258,5 @@ import { switchTabbar, onTabShow, onTabPageShow, curIdx } from '@/src/tabbar/ind
 | 高度占位 | `@/src/tabbar/components/TabbarPlaceholder.uvue` |
 
 - ⚠️ **`.uts` / `.uvue` 后缀必须保留**（`@/src/tabbar/index.uts`，不是 `@/src/tabbar`）：去掉后缀 TS 侧会丢补全并报 TS2307。`@` 指向项目根。
-- ⚠️ **[internal/](internal/) 下的模块不要从业务代码直接引**：它们是运行时实现细节，且彼此之间已用精准导入互相引用（`./state.uts` / `../config.uts`），从门面反向穿透会形成自环，在 Kotlin 端表现为类初始化死锁。
+- ⚠️ **[core/](core/) 与 [adapters/](adapters/) 下的模块不要从业务代码直接引**：统一走门面，避免绕过公开 API 与形成反向依赖；`adapters/` 是宿主业务桥接层，未来抽成 `uni_modules` 时优先替换这里。
 - ⚠️ **页面跳转一律走 `useRouter()` / `switchTabbar()`**，不要直接写 `uni.switchTab` / `uni.navigateTo`——绕过守卫会让登录拦截、TabBar 分流、路由状态同步同时失效。详见 `uni_modules/route-bestX`。

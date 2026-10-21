@@ -2,7 +2,7 @@ import { onUnmounted, ref, watch } from 'vue';
 import { curIdx } from './state.uts';
 import { resolveTabIndex } from './tab-key.uts';
 
-/** 页面显示事件订阅项 */
+/** 页面显示事件订阅项（核心生命周期） */
 type PageShowSubscriber = {
   /** 订阅序号（注销时按序号匹配，避免依赖对象相等语义） */
   id: number;

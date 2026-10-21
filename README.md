@@ -546,12 +546,15 @@ unibestX/
 │   │   ├── *BasicDemo/                  #   💡【演示 Demo】基础能力演练分包（如 httpBasicDemo 等）
 │   │   └── *FunctionDemo/               #   💡【演示 Demo】原生与功能演练分包（如 rxjsFunctionDemo 等）
 │   ├── tabbar/                          # 底部 TabBar 体系
-│   │   ├── internal/                    #   模块内部实现（不对消费者暴露，请走 index.uts 门面）
-│   │   │   ├── strategy.uts             #     策略枚举与模式判定
-│   │   │   ├── metrics.uts              #     尺寸常量与视口 / 主题计算
+│   │   ├── core/                        #   核心运行逻辑（状态、策略、导航、生命周期）
+│   │   │   ├── types.uts                #     契约类型
 │   │   │   ├── state.uts                #     列表与激活状态、路径匹配、激活订阅
+│   │   │   ├── strategy.uts             #     策略枚举与模式判定
 │   │   │   ├── navigate.uts             #     跳转行为与原生中间按钮监听
+│   │   │   ├── lifecycle.uts            #     页面可见性生命周期
 │   │   │   └── native.uts               #     平台桥接（隐藏原生 tabbar）
+│   │   ├── adapters/                    #   业务桥接层（主题、i18n、navbar、系统尺寸）
+│   │   ├── hooks/                       #   组合式 API（useTabbar / useTabbarPage 等）
 │   │   ├── ui/                          #   TabBar 视图层
 │   │   │   ├── capsule/                 #     悬浮胶囊风格
 │   │   │   ├── default/                 #     标准贴底风格（含 midButton 鼓包）
@@ -559,8 +562,7 @@ unibestX/
 │   │   ├── components/                  #   容器与调度组件（TabViews、TabContent）
 │   │   ├── tabbar.uvue                  #   TabBar 入口组件
 │   │   ├── index.uts                    #   模块唯一门面（单层 export *）
-│   │   ├── config.uts                   #   TabBar 统一配置（支持 type 风格切换与 midButton）
-│   │   └── types.uts                    #   TabBar 强类型定义
+│   │   └── config.uts                   #   TabBar 统一配置（支持 type 风格切换与 midButton）
 │   ├── theme/                           # 主题令牌、换肤与深浅色（唯一文件 index.uts）
 │   ├── types/                           # 全局 TypeScript / UTS 类型定义
 │   │   └── uni.d.ts                     #   definePage 宏、Vue 宏与全局 API 类型补全
@@ -950,7 +952,7 @@ src/tabbar/config.uts (唯一样本源)
 
 #### 5. 统一路由跳转与安全 API（`src/tabbar`）
 
-模块唯一入口为 [src/tabbar/index.uts](src/tabbar/index.uts)（单层 `export *` 门面），内部实现位于 `internal/`，**请勿绕过门面直接引用内部模块**。
+模块唯一入口为 [src/tabbar/index.uts](src/tabbar/index.uts)（单层 `export *` 门面），核心实现位于 `core/`、业务桥接位于 `adapters/`，**请勿绕过门面直接引用内部模块**。
 
 > 📖 **完整文档见 [src/tabbar/README.md](src/tabbar/README.md)**：配置项、五种模式对照、UI 形态扩展、插件与 `config.uts` 的配合细节、全部运行时 API。
 

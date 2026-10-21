@@ -7,20 +7,11 @@
 <script setup lang="uts">
 import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue';
 import {
-  activeThemeColor,
-  curIdx,
-  customTabbarConfig,
-  formatTabbarText,
-  handleTabbarClick,
-  isDark,
-  resetTabSwitchThrottle,
-  safeHideNativeTabBar,
-  safeRestoreNativeTabBar,
-  syncCurIdxByCurrentPage,
-  tabbarList,
-  themeTokens
+  useTabbar,
+  useTabbarI18n,
+  useTabbarMetrics,
+  useTabbarTheme
 } from '@/src/tabbar/index.uts';
-import { safeAreaInsets } from '@/src/utils/systemInfo/index.uts';
 
 const props = defineProps({
   /** 悬浮 TabBar 容器高度（默认 64px） */
@@ -39,6 +30,24 @@ const props = defineProps({
     default: false
   }
 });
+
+/** TabBar 全局状态、配置与导航动作 */
+const {
+  curIdx,
+  customTabbarConfig,
+  handleTabbarClick,
+  resetTabSwitchThrottle,
+  safeHideNativeTabBar,
+  safeRestoreNativeTabBar,
+  syncCurIdxByCurrentPage,
+  tabbarList
+} = useTabbar();
+/** TabBar 文案的多语言转换 */
+const { formatTabbarText } = useTabbarI18n();
+/** 当前明暗模式与主题颜色令牌 */
+const { activeThemeColor, isDark, themeTokens } = useTabbarTheme();
+/** 底部安全区高度 */
+const { safeAreaBottom } = useTabbarMetrics();
 
 /** 是否启用液态玻璃背景（由 config.uts 的 glassEffect 统一控制） */
 const glassEnabled = computed<boolean>((): boolean => {
@@ -85,12 +94,6 @@ const tabBgColor = computed<string>((): string => {
 /** 胶囊底座边框色 */
 const tabBorderColor = computed<string>((): string => {
   return glassEnabled.value ? glassBorderColor.value : themeTokens.value.tabBorder;
-});
-
-/** 安全区底部高度 */
-const safeAreaBottom = computed<number>((): number => {
-  const insets = safeAreaInsets.value;
-  return insets != null ? insets.bottom : 0;
 });
 
 /** 激活项的高亮胶囊底色（暗黑模式白色，浅色模式主题色，透明度由 pill 节点通过 opacity 控制，杜绝 8 位 hex 在 iOS 原生下变成实心红） */

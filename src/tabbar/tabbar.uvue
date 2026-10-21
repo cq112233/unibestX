@@ -11,7 +11,7 @@
 import { computed } from 'vue';
 import CapsuleTabbar from './ui/capsule/index.uvue';
 import DefaultTabbar from './ui/default/index.uvue';
-import { tabbarType } from '@/src/tabbar/index.uts';
+import { useTabbar } from '@/src/tabbar/index.uts';
 
 const props = defineProps({
   /** 自定义 TabBar 风格形态（若不指定则默认读取 config.uts 中的 type） */
@@ -20,6 +20,9 @@ const props = defineProps({
     default: ''
   }
 });
+
+/** 当前 TabBar UI 形态（组件 type 优先，未传时读取全局配置） */
+const { tabbarType } = useTabbar();
 
 const activeType = computed((): string => {
   if (props.type != '') {
