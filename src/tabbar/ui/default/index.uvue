@@ -1,7 +1,9 @@
 <script setup lang="uts">
-import { onMounted, onUnmounted } from 'vue';
+import { computed, onMounted, onUnmounted } from 'vue';
 import {
+  customTabbarConfig,
   handleTabbarClick,
+  isDark,
   isVersionGte525,
   resetTabSwitchThrottle,
   safeAreaBottom,
@@ -15,6 +17,58 @@ import {
   themeTokens
 } from '@/src/tabbar/index.uts';
 import TabbarItem from './TabbarItem.uvue';
+
+/** 是否启用液态玻璃背景（由 config.uts 的 glassEffect 统一控制） */
+const glassEnabled = computed<boolean>((): boolean => {
+  return customTabbarConfig.glassEffect == true;
+});
+
+/** iOS 原生液态玻璃样式 */
+const resolvedGlassStyle = computed<string>((): string => {
+  return customTabbarConfig.glassStyle ?? 'regular';
+});
+
+/** 是否启用液态玻璃交互行为（仅 iOS 26+ 生效） */
+const resolvedGlassInteractive = computed<boolean>((): boolean => {
+  return customTabbarConfig.interactive ?? false;
+});
+
+/** 施加在液态玻璃上的着色（仅 iOS 26+ 生效） */
+const resolvedGlassTintColor = computed<string>((): string => {
+  return customTabbarConfig.tintColor ?? '';
+});
+
+/** 玻璃模式下的半透明背景色（非 iOS 端作为毛玻璃降级底色） */
+const glassBgColor = computed<string>((): string => {
+  return isDark.value ? 'rgba(15, 23, 42, 0.85)' : 'rgba(255, 255, 255, 0.88)';
+});
+
+/** 玻璃模式下的边框色 */
+const glassBorderColor = computed<string>((): string => {
+  return isDark.value ? 'rgba(255, 255, 255, 0.18)' : 'rgba(226, 232, 240, 0.95)';
+});
+
+/** TabBar 底板背景色：iOS 玻璃模式由原生 glass-effect-view 绘制 */
+const tabbarBgColor = computed<string>((): string => {
+  if (!glassEnabled.value) {
+    return themeTokens.value.tabBg;
+  }
+  let color = glassBgColor.value;
+  // #ifdef APP-IOS
+  color = 'transparent';
+  // #endif
+  return color;
+});
+
+/** TabBar 顶边框色 */
+const tabbarBorderColor = computed<string>((): string => {
+  return glassEnabled.value ? glassBorderColor.value : themeTokens.value.tabBorder;
+});
+
+/** 安全区填充色：玻璃层已经覆盖底部安全区 */
+const safeAreaBgColor = computed<string>((): string => {
+  return glassEnabled.value ? 'transparent' : themeTokens.value.tabBg;
+});
 
 let isMounted = false;
 
@@ -53,10 +107,28 @@ function onTabClick(index: number) {
       :style="{ height: `${TABBAR_CONTAINER_HEIGHT + safeAreaBottom}px` }"
     >
       <!-- 【整体底板】覆盖「固定高度 + 安全区」的全部区域 -->
+      <!-- #ifdef APP-IOS -->
+      <glass-effect-view
+        v-if="glassEnabled"
+        class="tabbar-bg"
+        :glass-style="resolvedGlassStyle"
+        :interactive="resolvedGlassInteractive"
+        :tint-color="resolvedGlassTintColor"
+        :style="{ height: `${TABBAR_HEIGHT + safeAreaBottom}px`, borderTopColor: tabbarBorderColor }"
+      ></glass-effect-view>
+      <view
+        v-else
+        class="tabbar-bg"
+        :style="{ height: `${TABBAR_HEIGHT + safeAreaBottom}px`, backgroundColor: tabbarBgColor, borderTopColor: tabbarBorderColor }"
+      ></view>
+      <!-- #endif -->
+      <!-- #ifndef APP-IOS -->
       <view
         class="tabbar-bg"
-        :style="{ height: `${TABBAR_HEIGHT + safeAreaBottom}px`, backgroundColor: themeTokens.tabBg, borderTopColor: themeTokens.tabBorder }"
+        :class="{ 'tabbar-bg-glass': glassEnabled }"
+        :style="{ height: `${TABBAR_HEIGHT + safeAreaBottom}px`, backgroundColor: tabbarBgColor, borderTopColor: tabbarBorderColor }"
       ></view>
+      <!-- #endif -->
 
       <!-- 【固定高度】tab 图标按钮区 -->
       <view class="tabbar-inner">
@@ -72,7 +144,7 @@ function onTabClick(index: number) {
       </view>
 
       <!-- 【安全区】底部安全区填充块 -->
-      <view class="safe-area-bg" :style="{ height: `${safeAreaBottom}px`, backgroundColor: themeTokens.tabBg }" />
+      <view class="safe-area-bg" :style="{ height: `${safeAreaBottom}px`, backgroundColor: safeAreaBgColor }" />
     </view>
   </view>
 </template>
@@ -110,6 +182,13 @@ function onTabClick(index: number) {
   z-index: 1;
   border-top-width: 1rpx;
   border-top-style: solid;
+}
+
+/* 非 iOS 端的毛玻璃降级（仅 Web / 微信小程序支持 backdrop-filter） */
+.tabbar-bg-glass {
+  /* #ifdef WEB || MP-WEIXIN */
+  backdrop-filter: blur(25px);
+  /* #endif */
 }
 
 /* 【固定高度层】tab 图标按钮区，与底板同高；鼓包由 TabbarItem 内绝对定位向上突出 */
