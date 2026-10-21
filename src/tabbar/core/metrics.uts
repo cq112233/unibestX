@@ -1,9 +1,9 @@
 import { computed } from 'vue';
-import { safeAreaInsets, TABBAR_BASE_HEIGHT } from '@/src/utils/systemInfo/index.uts';
-import { customTabbarConfig } from '../config.uts';
+import { safeAreaInsets, TABBAR_BASE_HEIGHT } from '../adapters/system.uts';
+import { customTabbarConfig } from '../adapters/config.uts';
 import { isSinglePageTabbar, needTabbarBottomPadding, tabbarType } from './strategy.uts';
 
-/** tabbar 白色底板高度（px），基准值统一引用 systemInfo 中的 TABBAR_BASE_HEIGHT */
+/** tabbar 白色底板高度（px），基准值来自系统适配层 */
 export const TABBAR_HEIGHT: number = TABBAR_BASE_HEIGHT;
 
 /** tabbar 容器总高度（包含鼓包突出的部分，px） */

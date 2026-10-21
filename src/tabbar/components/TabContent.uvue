@@ -87,16 +87,16 @@
 
 <script setup lang="uts">
 import { computed, onMounted, onUnmounted, provide, ref, watch } from 'vue';
-import { activeTabTitle, curIdx, formatTabbarText, themeTokens } from '@/src/tabbar/index.uts';
+import { useTabbar, useTabbarI18n, useTabbarTheme } from '@/src/tabbar/index.uts';
 import TabbarPlaceholder from './TabbarPlaceholder.uvue';
-import { isMpAlipay } from '@/src/config/env/platform.uts';
+import { isMpAlipay } from '@/src/tabbar/adapters/platform.uts';
 import {
   isPageRefresherDisabled,
   isPageScrollDisabled,
   setHideNavbar,
   setHideStatusBar,
   stopNavbarPullDownRefresh
-} from '@/src/layouts/navbar/utils/index.uts';
+} from '@/src/tabbar/adapters/navbar.uts';
 
 // ==========================================
 // 1. 组件 Props 属性定义
@@ -138,6 +138,13 @@ const props = defineProps({
     default: ''
   }
 });
+
+/** 当前激活 Tab 的下标与标题 */
+const { activeTabTitle, curIdx } = useTabbar();
+/** 页面标题与文案的多语言转换 */
+const { formatTabbarText } = useTabbarI18n();
+/** 下拉刷新等区域使用的主题令牌 */
+const { themeTokens } = useTabbarTheme();
 
 // ==========================================
 // 2. Tab 核心状态与激活控制

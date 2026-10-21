@@ -1,0 +1,24 @@
+import type { Ref } from 'vue';
+import type { ThemeTokens } from '@/src/theme/index.uts';
+import { activeThemeColor, isDark, themeTokens } from '../adapters/theme.uts';
+
+/** TabBar 主题响应式数据 */
+export type UseTabbarThemeResult = {
+  /** 当前是否为深色模式 */
+  isDark: Ref<boolean>;
+  /** 当前主题下的 TabBar 颜色令牌 */
+  themeTokens: Ref<ThemeTokens>;
+  /** 当前激活项使用的高亮主题色 */
+  activeThemeColor: Ref<string>;
+};
+
+/** TabBar 主题 hooks */
+export function useTabbarTheme(): UseTabbarThemeResult {
+  const result: UseTabbarThemeResult = {
+    // 主题数据本身是全局 computed，直接透出即可保持响应式联动
+    isDark,
+    themeTokens,
+    activeThemeColor
+  };
+  return result;
+}

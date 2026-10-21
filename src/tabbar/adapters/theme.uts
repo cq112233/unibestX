@@ -4,7 +4,7 @@ import { getThemeTokens, themeColor } from '@/src/theme/index.uts';
 import type { ThemeTokens } from '@/src/theme/index.uts';
 
 /**
- * 当前是否为深色模式（响应式）
+ * 当前是否为深色模式（响应式，由业务主题层提供）
  */
 export const isDark = computed<boolean>((): boolean => {
   return useThemeStore().state.isDark;

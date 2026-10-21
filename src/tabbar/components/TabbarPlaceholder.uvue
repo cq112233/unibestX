@@ -9,7 +9,7 @@
 
 <script setup lang="uts">
 import { computed } from 'vue';
-import { needTabbarBottomPadding, tabbarBottomPaddingHeight } from '@/src/tabbar/index.uts';
+import { useTabbar, useTabbarMetrics } from '@/src/tabbar/index.uts';
 
 const props = defineProps({
   /** 当前宿主页面是否属于 TabBar 页面（默认 true；在通用布局 navbar.uvue 中可动态传入 :is-tabbar-page="isTabbarPage"） */
@@ -18,6 +18,11 @@ const props = defineProps({
     default: true
   }
 });
+
+/** 当前 TabBar 模式是否需要页面底部预留空间 */
+const { needTabbarBottomPadding } = useTabbar();
+/** 根据 TabBar 形态和安全区计算实际预留高度 */
+const { tabbarBottomPaddingHeight } = useTabbarMetrics();
 
 /** 是否满足渲染垫高占位块的条件 */
 const shouldRender = computed((): boolean => {

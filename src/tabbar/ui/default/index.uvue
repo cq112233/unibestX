@@ -1,22 +1,28 @@
 <script setup lang="uts">
 import { computed, onMounted, onUnmounted } from 'vue';
-import { isH5 } from '@/src/config/env/platform.uts';
+import { isH5 } from '@/src/tabbar/adapters/platform.uts';
 import {
+  useTabbar,
+  useTabbarMetrics,
+  useTabbarTheme
+} from '@/src/tabbar/index.uts';
+import TabbarItem from './TabbarItem.uvue';
+
+/** TabBar 全局状态、配置与导航动作 */
+const {
   customTabbarConfig,
   handleTabbarClick,
-  isDark,
   isSinglePageTabbar,
   resetTabSwitchThrottle,
-  safeAreaBottom,
   safeHideNativeTabBar,
   safeRestoreNativeTabBar,
   syncCurIdxByCurrentPage,
-  TABBAR_HEIGHT,
-  tabbarList,
-  tabbarPlaceholderHeight,
-  themeTokens
-} from '@/src/tabbar/index.uts';
-import TabbarItem from './TabbarItem.uvue';
+  tabbarList
+} = useTabbar();
+/** 当前明暗模式与主题颜色令牌 */
+const { isDark, themeTokens } = useTabbarTheme();
+/** TabBar 高度、底部安全区与页面占位尺寸 */
+const { TABBAR_HEIGHT, safeAreaBottom, tabbarPlaceholderHeight } = useTabbarMetrics();
 
 /** 是否启用液态玻璃背景（由 config.uts 的 glassEffect 统一控制） */
 const glassEnabled = computed<boolean>((): boolean => {

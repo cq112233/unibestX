@@ -1,6 +1,6 @@
 <script setup lang="uts">
 import type { CustomTabBarItem } from '@/src/tabbar/index.uts';
-import { activeThemeColor, curIdx, formatTabbarText, themeTokens } from '@/src/tabbar/index.uts';
+import { useTabbar, useTabbarI18n, useTabbarTheme } from '@/src/tabbar/index.uts';
 
 const props = defineProps({
   item: {
@@ -16,6 +16,13 @@ const props = defineProps({
     default: false
   }
 });
+
+/** 当前激活的 Tab 下标 */
+const { curIdx } = useTabbar();
+/** 激活项高亮色与普通项主题色 */
+const { activeThemeColor, themeTokens } = useTabbarTheme();
+/** Tab 文案的多语言转换 */
+const { formatTabbarText } = useTabbarI18n();
 
 // 将 props.item 转换为强类型的 CustomTabBarItem
 const tabbarItem = computed((): CustomTabBarItem => {
