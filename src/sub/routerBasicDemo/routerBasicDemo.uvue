@@ -226,9 +226,9 @@ const SELF_PAGE: string = '/src/sub/routerBasicDemo/routerBasicDemo';
 /** 首页 */
 const HOME_PAGE: string = '/src/pages/index/index';
 
-// route.meta 不需要在任何地方手写注册：构建期插件会把本页 definePage 的字段
-// 原样写进 pages.json，并同步生成一份路由表（src/router/generated/page-meta.uts），
-// useRoute() 按当前路径自动取到 —— 即「pages.json 里这个页面的配置项就是 meta」。
+// 页面配置不需要在任何地方手写注册：构建期插件会把本页 definePage 的字段
+// 原样写进 pages.json，并在构建期生成虚拟模块（virtual:uni-pages-route-table），
+// useRoute() 按当前路径自动取到 —— 即「pages.json 里这个页面的配置项就是页面配置」。
 
 /** route.name 可能为 null，展示前先兜底 */
 const routeNameText = computed((): string => {

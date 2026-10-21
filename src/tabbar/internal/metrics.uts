@@ -1,13 +1,30 @@
 import { computed } from 'vue';
-import { isCompilerVersionGte, safeAreaInsets, TABBAR_BASE_HEIGHT } from '@/src/utils/systemInfo/index.uts';
+import { safeAreaInsets, TABBAR_BASE_HEIGHT } from '@/src/utils/systemInfo/index.uts';
 import { customTabbarConfig } from '../config.uts';
-import { needTabbarBottomPadding, tabbarType } from './strategy.uts';
+import { isSinglePageTabbar, needTabbarBottomPadding, tabbarType } from './strategy.uts';
 
 /** tabbar 白色底板高度（px），基准值统一引用 systemInfo 中的 TABBAR_BASE_HEIGHT */
 export const TABBAR_HEIGHT: number = TABBAR_BASE_HEIGHT;
 
 /** tabbar 容器总高度（包含鼓包突出的部分，px） */
 export const TABBAR_CONTAINER_HEIGHT: number = 80;
+
+/** 是否配置了中间鼓包按钮 */
+function resolveHasTabbarBulge(): boolean {
+  if (customTabbarConfig.midButton != null) {
+    return true;
+  }
+  const list = customTabbarConfig.list;
+  for (let i = 0; i < list.length; i++) {
+    if (list[i].isBulge == true) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/** 当前 TabBar 是否包含鼓包项 */
+export const hasTabbarBulge: boolean = resolveHasTabbarBulge();
 
 /** 安全区底部高度，从全局 systemInfo 工具中响应式读取 */
 export const safeAreaBottom = computed<number>((): number => {
@@ -19,19 +36,9 @@ export const safeAreaBottom = computed<number>((): number => {
 });
 
 /**
- * 是否为 5.25 及以上版本编译器（仅在 5.25 及以上 H5 启用 absolute 脱离文档流）
- *
- * ⚠️ 条件编译段内只赋值、最后统一 return（理由见 `src/config/env/env.uts` 的 isVaporMode()）
+ * 占位块高度：只占 TabBar 实际交互区 50px，再加底部安全区。
+ * 鼓包按钮向上溢出由自身处理，避免外层占位覆盖页面内容并拦截点击。
  */
-export const isVersionGte525 = computed<boolean>((): boolean => {
-  let gte = false;
-  // #ifdef H5
-  gte = isCompilerVersionGte('5.25');
-  // #endif
-  return gte;
-});
-
-/** 占位块高度：统一为 50 + 底部安全区，占据正常文档流防止遮挡滚动内容 */
 export const tabbarPlaceholderHeight = computed<number>((): number => {
   return TABBAR_HEIGHT + safeAreaBottom.value;
 });
@@ -51,29 +58,20 @@ export const tabbarBottomPaddingHeight = computed<number>((): number => {
   if (tabbarType == 'capsule') {
     return 64 + 12 + safeBottom + 4;
   }
+  // 单页 TabBar（模式 4）：TabBar 始终作为固定浮层，滚动内容内部统一预留 80px。
+  // 这样 App / H5 不再分别依赖「文档流占位」和「内容内边距」两套机制，位置保持一致。
+  if (isSinglePageTabbar) {
+    const baseH = hasTabbarBulge ? TABBAR_CONTAINER_HEIGHT : TABBAR_HEIGHT;
+    return baseH + safeBottom;
+  }
   // 非 H5 端（App / 小程序）：标准贴底底座 (default) 自身已作为普通文档流元素（tabbar-placeholder）
   // 占据高度，滚动容器天然位于 TabBar 上方，内部无需重复垫高，保持 0 避免底部空白。
-  // H5 端：若编译器 >= 5.25，DefaultTabbar 启用了 position: absolute 脱离文档流，需在滚动容器内部垫高。
+  // H5 端：DefaultTabbar 启用了 position: absolute 脱离文档流，需在滚动容器内部垫高。
   // ⚠️ 条件编译段内只赋值、最后统一 return（理由见 `src/config/env/env.uts` 的 isVaporMode()）
   let padding = 0;
   // #ifdef H5
-  if (isVersionGte525.value) {
-    let hasBulge = false;
-    if (customTabbarConfig.midButton != null) {
-      hasBulge = true;
-    }
-    else {
-      const list = customTabbarConfig.list;
-      for (let i = 0; i < list.length; i++) {
-        if (list[i].isBulge == true) {
-          hasBulge = true;
-          break;
-        }
-      }
-    }
-    const baseH = hasBulge ? TABBAR_CONTAINER_HEIGHT : TABBAR_HEIGHT;
-    padding = baseH + safeBottom;
-  }
+  const baseH = hasTabbarBulge ? TABBAR_CONTAINER_HEIGHT : TABBAR_HEIGHT;
+  padding = baseH + safeBottom;
   // #endif
   return padding;
 });

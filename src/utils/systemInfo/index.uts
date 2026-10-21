@@ -323,8 +323,8 @@ export function updateSystemInfo() {
 }
 
 /**
- * 判断当前 HBuilderX / uni-app 编译器版本是否大于等于指定版本（如 '5.25' 或 '4.25'）
- * @param targetVersion 目标版本号，**点分数字**形式（如 `'5.25'` / `'4.25'`）；
+ * 判断当前 HBuilderX / uni-app 编译器版本是否大于等于指定版本（如 '5.26' 或 '4.25'）
+ * @param targetVersion 目标版本号，**点分数字**形式（如 `'5.26'` / `'4.25'`）；
  *                      与当前编译器版本按段逐位比大小，缺位按 0 补齐，故 `'5.2'` 与 `'5.20'` 等价。
  *                      取不到当前版本（空串）时**直接返回 false**
  */
@@ -555,7 +555,7 @@ export class SystemUtils {
     return systemInfo.value;
   }
 
-  /** 判断当前 HBuilderX / uni-app 编译器版本是否大于等于指定版本（如 '5.25' 或 '4.25'） */
+  /** 判断当前 HBuilderX / uni-app 编译器版本是否大于等于指定版本（如 '5.26' 或 '4.25'） */
   isCompilerVersionGte(targetVersion: string): boolean {
     return isCompilerVersionGte(targetVersion);
   }

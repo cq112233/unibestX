@@ -1,10 +1,10 @@
 # src/router 业务路由层（基于 route-bestX）
 
-本项目路由系统**基于 [`route-bestX`](../../uni_modules/route-bestX/readme.md) 模块开发**，不是自研路由引擎。`src/router` 负责在模块能力之上组装业务守卫、登录鉴权、TabBar 桥接和页面元数据。
+本项目路由系统**基于 [`route-bestX`](../../uni_modules/route-bestX/readme.md) 模块开发**，不是自研路由引擎。`src/router` 负责在模块能力之上组装业务守卫、登录鉴权、TabBar 桥接和页面路由表。
 
 - **底层路由引擎**：[`@/uni_modules/route-bestX`](../../uni_modules/route-bestX/readme.md)（纯 UTS、对标 Vue Router 4、页面快照隔离、全平台导航拦截）
 - **业务路由层**：`src/router/`（初始化单例、注册守卫、维护登录策略、转发 Hooks）
-- **路由元数据**：`src/router/generated/page-meta.uts`（由构建插件生成，禁止手改）
+- **页面路由表**：Vite 虚拟模块 `virtual:uni-pages-route-table`（由构建插件按当前平台生成，不落盘）
 
 > 🚨 **业务页面禁止直接调用 `uni.navigateTo` / `uni.redirectTo` / `uni.reLaunch` / `uni.switchTab` / `uni.navigateBack`**。统一走 `useRouter()`，否则会绕过登录拦截、维护拦截、TabBar 分流与路由状态同步。
 
@@ -18,7 +18,7 @@
 | 业务门面 | `src/router/index.uts` | 创建全局 `router` 单例，注册 TabBar 桥接与业务守卫 |
 | 全局守卫 | `src/router/guards/` | 维护公告守卫、登录守卫及责任链编排 |
 | 业务配置 | `src/router/config.uts` | 登录页、注册页、首页、登录策略与黑白名单 |
-| 页面元数据 | `src/router/generated/page-meta.uts` | `definePage` / `pages.json` 配置生成，供 `useRoute().meta` 使用 |
+| 页面路由表 | `virtual:uni-pages-route-table` | 构建期按 `definePage` / `pages.json` 生成；导出 `PAGES_ROUTE_TABLE_JSON` / `PAGES_ROUTE_TABLE`（路径 map 的字符串与对象）以及 `PAGES_ROUTE_TABLE_LIST_JSON` / `PAGES_ROUTE_TABLE_LIST`（数组的字符串与对象） |
 
 页面里优先从业务门面导入：
 
@@ -46,8 +46,6 @@ src/router/
 │   ├── index.uts                 # 守卫责任链：维护守卫 -> 登录守卫 -> 放行
 │   ├── guardMaintenance.uts      # 系统停服维护拦截
 │   └── guardLogin.uts            # 登录态、黑白名单与登录页回跳
-├── generated/
-│   └── page-meta.uts             # definePage / pages.json 元数据（自动生成，禁止手改）
 └── README.md                     # 架构与使用文档
 ```
 
@@ -65,7 +63,7 @@ src/router/
 | `fullPath` | `string` | 路径 + query 串；query 值经过 URL 编码 |
 | `query` | `Map<string, string>` | 查询参数；值已解码，统一用 `.get('key')` 读取 |
 | `params` | `Map<string, string>` | uni-app X 无动态路由段，恒为空 Map |
-| `meta` | `UTSJSONObject \| null` | 页面元数据，来自 `definePage` / `pages.json` 配置 |
+| `meta` | `UTSJSONObject \| null` | 页面配置，来自 `definePage` / `pages.json` |
 | `name` | `string \| null` | 路由名；未声明时回落到路径最后一段 |
 | `page` | `any \| null` | 当前栈顶页面实例 |
 | `pages` | `UniPage[]` | 当前页面栈快照 |

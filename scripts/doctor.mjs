@@ -148,7 +148,8 @@ async function checkDependencies() {
   // 缺失的依赖
   const missingDeps = data.missing || {};
   const missingKeys = Object.keys(missingDeps).filter(d =>
-    d !== '@vitejs/plugin-vue' // vitest.config.ts 引用，由 @dcloudio 隐式提供
+    !d.startsWith('virtual:') // Vite 虚拟模块由插件注入，不是 npm 依赖
+    && d !== '@vitejs/plugin-vue' // vitest.config.ts 引用，由 @dcloudio 隐式提供
     && d !== 'color-name' // eslint-plugin-uts.mjs 编译产物中内联引用
     && d !== 'postcss' // eslint-plugin-uts.mjs 编译产物中内联引用
   );
