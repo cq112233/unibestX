@@ -739,7 +739,7 @@ $app-primary: var(--theme-color, #0957de);
     <view class="w-full px-[16px] pt-[12px] pb-[8px]">
       <view class="w-full bg-[#ffffff] border-[1px] border-solid border-[#e2e8f0] rounded-[12px] p-[16px]">
         <text class="text-[16px] font-bold text-[#1e293b]">优惠券</text>
-        <text class="text-[12px] leading-[18px] text-[#64748b] mt-[4px]">共 {{ total }} 张 · 下拉可刷新</text>
+        <text class="text-[12px] leading-[18px] text-[#64748b] mt-[4px]">共 {{ list.length }} 张 · 下拉可刷新</text>
       </view>
     </view>
 
@@ -786,17 +786,21 @@ $app-primary: var(--theme-color, #0957de);
 </template>
 
 <script setup lang="uts">
-import { computed, ref } from 'vue';
+import { ref } from 'vue';
 import { useRoute } from '@/uni_modules/route-bestX/index.uts';
 import { fetchCouponListApi } from '@/src/api/coupon/coupon.uts';
 import type { CouponItem } from '@/src/api/coupon/coupon.uts';
 import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/layouts/navbar/utils/index.uts';
 
 definePage({
+  name: 'coupon',
+  debug: false,
+  debugHome: false,
   layout: 'navbar',
   showBack: true,
+  hideStatusBar: false,
   hideNavbar: false,
-  enablePullDownRefresh: true,
+  enablePullDownRefresh: false,
   style: {
     navigationBarTitleText: '优惠券',
     navigationStyle: 'custom'
@@ -805,7 +809,6 @@ definePage({
 
 const route = useRoute();
 const list = ref<Array<CouponItem>>([]);
-const total = computed((): number => list.value.length);
 
 function formatAmount(amount: number): string {
   return `¥${amount}`;

@@ -11,13 +11,13 @@ description: 命名规范 —— 写新文件 / 新符号、或需要校验命�
 
 | 对象 | 规则 | 例 |
 | :--- | :--- | :--- |
-| 页面目录 | kebab-case，与路由段一致 | `src/sub/order-list/` |
-| 页面入口 | 与目录同名 | `src/sub/order-list/order-list.uvue` |
-| 接口层 | 与页面目录同名 | `src/api/order-list/order-list.uts` |
+| 页面目录 | kebab-case，与路由段一致 | `src/sub/order/list/` |
+| 页面入口 | 与页面目录同名 | `src/sub/order/list/list.uvue` |
+| 接口层 | 按业务模块聚合，按页面 / 接口域拆文件 | `src/api/order/list.uts` |
 | 工具模块 | kebab-case 目录 + `index.uts` | `src/utils/systemInfo/index.uts` |
 | 组件文件 | PascalCase | `GoodsGrid.uvue` |
-| 类型文件 | `types.uts` / `<模块>.types.uts` | `src/api/order-list/types.uts` |
-| 模拟数据集 | 默认内联在 `<page>.uts`；过大才拆 `mock/<模块>.uts` | `LOCAL_WALLPAPERS` |
+| 类型文件 | `types.uts` / `<模块>.types.uts` | `src/api/order/types.uts` |
+| 模拟数据集 | 默认内联在业务模块接口文件；过大才按接口域拆兄弟文件 | `LOCAL_WALLPAPERS` |
 
 ## 符号
 

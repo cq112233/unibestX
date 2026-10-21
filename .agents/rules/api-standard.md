@@ -1,6 +1,6 @@
 ---
 trigger: glob
-description: 接口层硬性契约 —— 一页一目录、只走 http 单例、弱类型不出 api 层
+description: 接口层硬性契约 —— 按业务模块聚合、只走 http 单例、弱类型不出 api 层
 globs: src/**/*.uts,src/**/*.ts,src/**/*.vue,src/**/*.uvue
 ---
 
@@ -10,7 +10,9 @@ globs: src/**/*.uts,src/**/*.ts,src/**/*.vue,src/**/*.uvue
 
 ## MUST
 
-- **新页面必须同批建接口层**：`src/pages/<page>/` 或 `src/sub/<page>/` ⇒ `src/api/<page>/<page>.uts`，目录名逐字同名。
+- **新页面必须接入接口层**：按业务模块归入 `src/api/<module>/<file>.uts`；已有接口可复用时不重复建目录。
+- **API 按业务模块聚合**：同一业务模块的 TabBar 页与非 TabBar 多页面共用 `src/api/<module>/`，不按页面机械复制目录。
+- **精准导入接口文件**：使用 `@/src/api/<module>/<file>.uts`，禁止 `index.uts` 聚合入口。
 - **请求只走 `http` 单例**：`import { http } from '@/src/http/index.uts'`（或精准导入 `@/src/http/instances/default.uts`）。
 - **接口函数一律以 `Api` 结尾**（`fetchXxxListApi` / `fetchXxxDetailApi` / `createXxxApi` / `updateXxxApi` / `deleteXxxApi`）。
 - **接口函数返回 `Promise<T>`**，分页入参统一 `(pageNo = 1, pageSize = 10, keyword = '')` 并给默认值。

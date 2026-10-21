@@ -1095,7 +1095,7 @@ export type PageResult<T> = {
 | 来源 | 导入写法 | 说明 |
 | :--- | :--- | :--- |
 | 本项目类型 | `import type { CouponItem } from '@/src/api/coupon/coupon.uts'` | **必须带 `.uts` 后缀**，`@` 指向项目根 |
-| 接口层同目录类型 | `import type { QueryRow } from './types.uts'` | 仅 `src/api/<page>/` 内部用相对路径；页面目录不设 `types.uts` |
+| 接口层同目录类型 | `import type { QueryRow } from './types.uts'` | 仅 `src/api/<module>/` 内部用相对路径；页面目录不设 `types.uts` |
 | 第三方模块类型 | `import type { RouteLocation } from '@/uni_modules/route-bestX/index.uts'` | 从**公开入口**导入，不穿透内部文件 |
 | 框架全局类型 | 无需导入 | `UTSJSONObject`、`UniScrollEvent`、`ComponentPublicInstance` 等 |
 
