@@ -80,7 +80,7 @@ src/tabbar/
 | 切换 UI 形态（胶囊 / 贴底） | [config.uts](config.uts) 的 `type` |
 | 开关液态玻璃效果 | [config.uts](config.uts) 的 `glassEffect`（iOS 原生，其他端毛玻璃降级） |
 | 扩展第四种 UI 形态 | 复制 [ui/template.uvue](ui/template.uvue) → 在 [tabbar.uvue](tabbar.uvue) 加分支 |
-| 页面里切 Tab / 监听 Tab | [index.uts](index.uts) 导出的 `switchTabbar` / `onTabShow` / `onTabPageShow` |
+| 页面里切 Tab / 监听 Tab | [index.uts](index.uts) 导出的 `useTabbar()` / `useTabbarPage()`（底层函数仍兼容） |
 | 改 Tab 页面标题、是否显示导航栏、下拉刷新 | 对应页面的 `definePage`（插件会自动同步进 `TabViews.uvue`） |
 | 调整生成行为（关掉自动建脚手架等） | [vite.config.ts](../../vite.config.ts) 里 `tabbarViewsPlugin({...})` |
 
@@ -190,26 +190,225 @@ tabbarViewsPlugin({
 
 ---
 
-## 运行时 API
+## Hooks 用法（推荐）
 
-业务组件优先使用 hooks，统一从门面导入：
+所有 hooks 都从 [index.uts](index.uts) 门面导入。它们读取的是**同一份全局 TabBar 状态**，不需要 `provide/inject`，也不会因为多个组件分别调用 `useTabbar()` 而产生多份 `curIdx`：
+
+```uts
+import {
+  useTabbar,
+  useTabbarPage,
+  useTabbarTheme,
+  useTabbarMetrics,
+  useTabbarI18n
+} from '@/src/tabbar/index.uts';
+```
+
+### 1. `useTabbar()`：状态、模式与导航
+
+适合页面、Navbar、自定义 TabBar UI 读取当前激活项，或执行 Tab 切换、角标更新等操作。
+
+```uts
+import { useTabbar } from '@/src/tabbar/index.uts';
+
+const {
+  curIdx,
+  tabbarList,
+  activeTabTitle,
+  isSinglePageTabbar,
+  switchTabbar,
+  handleTabbarClick,
+  setTabbarItemBadge
+} = useTabbar();
+```
+
+| 返回字段 | 类型 | 说明 |
+| :--- | :--- | :--- |
+| `curIdx` | `Ref<number>` | 当前激活的 Tab 下标，包含中间鼓包项 |
+| `tabbarList` | `CustomTabBarItem[]` | 完整 Tab 列表，已合并鼓包项并补齐 `pagePath` 前导 `/` |
+| `activeTabTitle` | `Ref<string>` | 当前激活 Tab 的标题，供 Navbar 联动 |
+| `customTabbarConfig` | `TabBarConfig` | TabBar 原始配置 |
+| `isSinglePageTabbar` | `boolean` | 是否为模式 4 单页保活 |
+| `isNativeTabbar` | `boolean` | 是否为模式 1 原生 TabBar |
+| `customTabbarEnable` | `boolean` | 是否需要渲染自定义 TabBar |
+| `needTabbarBottomPadding` | `boolean` | 页面是否需要底部预留空间 |
+| `tabbarType` | `string` | 当前 UI 形态，`default` / `capsule` |
+| `setCurIdx(idx)` | `void` | 直接设置激活下标并持久化，不跳路由 |
+| `setCurIdxByKey(key)` | `void` | 按业务标识设置激活项，推荐用于避免写死下标 |
+| `setCurIdxByPath(path)` | `void` | 按页面路径设置激活项 |
+| `syncCurIdxByCurrentPage()` | `void` | 根据当前页面路径同步激活项 |
+| `setTabbarItemBadge(idx, badge)` | `void` | 设置数字角标或 `'dot'` 红点 |
+| `isPageTabbar(path)` | `boolean` | 判断路径是否为 TabBar 页面 |
+| `switchTabbar(url)` | `void` | 按当前模式切换 Tab（单页切索引，多页面走 `switchTab` / `redirectTo`） |
+| `handleTabbarClick(index)` | `void` | 自定义 TabBar UI 的统一点击处理，内置防连击 |
+| `resetTabSwitchThrottle()` | `void` | 重置切换节流锁，通常在 TabBar 卸载时调用 |
+| `initNativeMidButtonTap()` | `void` | 初始化原生中间按钮点击监听 |
+| `safeHideNativeTabBar()` | `void` | 安全隐藏系统原生 TabBar |
+| `safeRestoreNativeTabBar()` | `void` | 安全恢复系统原生 TabBar |
+
+**点击切换示例：**
+
+```uts
+/** 自定义 TabBar 点击：交给统一处理器完成模式判断与防连击 */
+function onTabClick(index: number): void {
+  handleTabbarClick(index);
+}
+
+/** 明确跳转到某个 Tab 页时也可以直接调用 */
+function goMe(): void {
+  switchTabbar('/src/pages/me/me');
+}
+```
+
+**角标示例：**
 
 ```uts
 import { useTabbar, useTabbarPage } from '@/src/tabbar/index.uts';
 
-const { curIdx, tabbarList, switchTabbar, setTabbarItemBadge } = useTabbar();
-const { onTabShow, onTabPageShow, notifyPageShow, notifyPageHide } = useTabbarPage();
+const { setTabbarItemBadge } = useTabbar();
+const { resolveTabIndexByKey } = useTabbarPage();
+
+/** 通过业务标识找下标，避免增删 Tab 后数字下标失效 */
+const meIndex = resolveTabIndexByKey('me');
+if (meIndex >= 0) {
+  setTabbarItemBadge(meIndex, 6);
+}
 ```
 
-| Hook | 返回 / 用途 |
-| :--- | :--- |
-| `useTabbar()` | `curIdx`、`tabbarList`、`activeTabTitle`、模式开关、`switchTabbar()`、`handleTabbarClick()`、原生 TabBar 隐藏/恢复、角标与索引同步方法 |
-| `useTabbarPage()` | `onTabShow()`、`onTabPageShow()`、`notifyPageShow/Hide()`、页面可见性状态 |
-| `useTabbarTheme()` | `isDark`、`themeTokens`、`activeThemeColor` |
-| `useTabbarMetrics()` | `TABBAR_HEIGHT`、`safeAreaBottom`、`tabbarPlaceholderHeight`、`tabbarBottomPaddingClass` |
-| `useTabbarI18n()` | `formatTabbarText()`、`setTabbarItem()` |
+### 2. `useTabbarPage()`：页面显示与 Tab 生命周期
 
-底层函数仍保留导出，兼容已有页面；新代码优先使用 hooks。
+用于监听某个 Tab 被激活、页面重新显示，以及向上通知宿主页面的可见性变化。
+
+```uts
+import { useTabbarPage } from '@/src/tabbar/index.uts';
+
+const { onTabShow, onTabPageShow } = useTabbarPage();
+
+onTabShow('index', (): void => {
+  console.log('首页 Tab 被切换激活');
+});
+
+onTabPageShow('me', (): void => {
+  console.log('我的 Tab 页面重新显示');
+}, true);
+```
+
+| 返回字段 | 说明 |
+| :--- | :--- |
+| `isPageVisible` | 当前宿主页面是否可见 |
+| `pageShowTimes` | 当前页面累计显示次数 |
+| `notifyPageShow()` | 通知 TabBar：宿主页面已显示 |
+| `notifyPageHide()` | 通知 TabBar：宿主页面已隐藏 |
+| `onTabShow(target, callback, immediate?)` | 监听某个 Tab 被切换激活 |
+| `onTabPageShow(target, callback, immediate?)` | 监听某个 Tab 页面重新显示，覆盖从子页返回、App 回前台等场景 |
+| `resolveTabIndexByKey(key)` | 将业务标识解析为完整列表下标 |
+
+- **`target` 推荐写业务标识**：例如 `'index'`、`'me'`；也兼容数字下标、`pagePath` 和下标字符串。
+- **优先使用 `onTabPageShow()`**：它覆盖范围比 `onTabShow()` 更完整。尤其是从子页面返回时，前者会等宿主页面真正重新显示后再补发回调。
+- **`immediate = true`**：订阅时如果目标 Tab 已经处于激活且页面可见，会立即执行一次回调；默认 `false`。
+- **`notifyPageShow/Hide()` 只给宿主页面调用**：单页模式通常由 `src/pages/index/index.uvue` 的 `onShow` / `onHide` 桥接；普通 Tab 子视图不要重复通知。
+
+宿主页面桥接示例：
+
+```uts
+import { onHide, onShow } from '@dcloudio/uni-app';
+import { useTabbar, useTabbarPage } from '@/src/tabbar/index.uts';
+
+const { setCurIdxByKey } = useTabbar();
+const { notifyPageShow, notifyPageHide } = useTabbarPage();
+
+onShow((): void => {
+  setCurIdxByKey('index');
+  notifyPageShow();
+});
+
+onHide((): void => {
+  notifyPageHide();
+});
+```
+
+### 3. `useTabbarTheme()`：主题与高亮色
+
+```uts
+import { useTabbarTheme } from '@/src/tabbar/index.uts';
+
+const { isDark, themeTokens, activeThemeColor } = useTabbarTheme();
+```
+
+| 返回字段 | 类型 | 说明 |
+| :--- | :--- | :--- |
+| `isDark` | `Ref<boolean>` | 当前是否为深色模式 |
+| `themeTokens` | `Ref<ThemeTokens>` | TabBar 背景、边框、文字等颜色令牌 |
+| `activeThemeColor` | `Ref<string>` | 当前激活项使用的高亮主题色 |
+
+> ⚠️ **`activeThemeColor` 属于 `useTabbarTheme()`，不属于 `useTabbar()`。** 从错误的 hook 解构会报「`UseTabbarResult` 上不存在属性 `activeThemeColor`」。
+
+### 4. `useTabbarMetrics()`：尺寸、安全区与底部预留
+
+```uts
+import { useTabbarMetrics } from '@/src/tabbar/index.uts';
+
+const {
+  TABBAR_HEIGHT,
+  safeAreaBottom,
+  tabbarPlaceholderHeight,
+  tabbarBottomPaddingHeight,
+  tabbarBottomPaddingClass
+} = useTabbarMetrics();
+```
+
+| 返回字段 | 类型 | 说明 |
+| :--- | :--- | :--- |
+| `TABBAR_HEIGHT` | `number` | 交互区基准高度，不含底部安全区 |
+| `TABBAR_CONTAINER_HEIGHT` | `number` | 容器总高度，包含鼓包突出部分 |
+| `hasTabbarBulge` | `boolean` | 当前是否配置了鼓包按钮 |
+| `safeAreaBottom` | `Ref<number>` | 底部安全区高度 |
+| `tabbarPlaceholderHeight` | `Ref<number>` | TabBar 自身的占位高度 |
+| `tabbarBottomPaddingHeight` | `Ref<number>` | 页面内容需要额外预留的底部高度 |
+| `tabbarBottomPaddingClass` | `string` | 页面底部预留工具类名，如 `pb-[80px]` |
+
+- 模板中可直接写 `{{ tabbarPlaceholderHeight }}`，Vue 会自动解包 Ref。
+- 在 `.uts` 脚本中读取响应式尺寸要写 `safeAreaBottom.value`。
+- 页面底部避让优先使用 `<TabbarPlaceholder>`，不要自己重复手算高度。
+
+### 5. `useTabbarI18n()`：文案国际化与原生同步
+
+```uts
+import { useTabbarI18n } from '@/src/tabbar/index.uts';
+
+const { formatTabbarText, setTabbarItem } = useTabbarI18n();
+
+/** 将多语言 key 转成当前语言文案 */
+const homeText = formatTabbarText('tabbar.home');
+```
+
+| 返回字段 | 说明 |
+| :--- | :--- |
+| `formatTabbarText(text)` | 将多语言 key 转成当前语言文案 |
+| `setTabbarItem()` | 将当前语言文案同步到系统原生 TabBar，通常由 `App.uvue` 调用 |
+
+### 6. 按场景选择 Hook
+
+| 场景 | 推荐入口 |
+| :--- | :--- |
+| 读取当前 Tab 下标 / Tab 列表 | `useTabbar().curIdx` / `useTabbar().tabbarList` |
+| 切 Tab、更新角标、同步索引 | `useTabbar()` |
+| 监听切 Tab、从子页返回、App 回前台 | `useTabbarPage().onTabPageShow()` |
+| 读取明暗模式、主题令牌、高亮色 | `useTabbarTheme()` |
+| 计算 TabBar 高度、安全区、底部占位 | `useTabbarMetrics()` |
+| 转换 Tab 文案、同步原生 TabBar 文案 | `useTabbarI18n()` |
+
+**使用约束：**
+
+- hooks 在页面 / 组件的 `<script setup>` 中同步调用，不要放进条件分支或异步回调。
+- `onTabShow()` / `onTabPageShow()` 会注册订阅，同一次 `setup` 中只注册需要的事件，避免重复回调。
+- 业务代码统一从 `@/src/tabbar/index.uts` 导入；不要直接引用 `core/` 或 `adapters/` 内部文件。
+
+---
+
+## 底层 API（兼容入口）
+
+hooks 是对底层 API 的组合封装。以下具名函数仍保留导出，兼容已有页面与框架级代码；新业务代码优先使用 hooks。
 
 ```uts
 import { switchTabbar, onTabShow, onTabPageShow, curIdx } from '@/src/tabbar/index.uts';
@@ -251,7 +450,8 @@ import { switchTabbar, onTabShow, onTabPageShow, curIdx } from '@/src/tabbar/ind
 
 | 你要的 | 从哪拿 |
 | :--- | :--- |
-| 跳 Tab / 监听 Tab / 读激活项 | `@/src/tabbar/index.uts`（门面） |
+| 切 Tab / 监听 Tab / 读激活项 | `@/src/tabbar/index.uts` 的 `useTabbar()` / `useTabbarPage()`（门面，hooks 优先） |
+| 主题 / 尺寸 / 文案转换 | `@/src/tabbar/index.uts` 的 `useTabbarTheme()` / `useTabbarMetrics()` / `useTabbarI18n()` |
 | 只读配置项（如 `customTabbarConfig`） | `@/src/tabbar/config.uts`（精准导入，避免拉进整包） |
 | TabBar 组件本体 | `@/src/tabbar/tabbar.uvue` |
 | 单页调度容器 | `@/src/tabbar/components/TabViews.uvue` |
