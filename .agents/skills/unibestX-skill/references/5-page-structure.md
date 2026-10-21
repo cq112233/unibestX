@@ -1,269 +1,464 @@
-# 5 页面结构编排标准（分层 · 目录拓扑 · 拆分 · 数据归属）
+# 5 页面结构编排标准（业务模块 · 页面 · 视图 · 数据归属）
 
 > **本文件是 `unibestX-skill` 的参考分册**，由 [SKILL.md](../SKILL.md) 按需引用。
 >
-> **何时读本文件**：**规划一个页面的结构**时 —— 目录怎么摆、`views/` 要不要、组件拆几层、每个文件归谁管、谁可以取数、mock 与接口层落在哪。
+> **何时读本文件**：规划页面目录、确定业务模块归属、拆分页面区块、判断组件放在哪、决定谁可以发请求、确定接口文件落位时。
 >
-> **本分册只管结构编排，不管代码怎么写**：页面文件本身怎么写（骨架 / `definePage` / 请求）→ **分册 4**；组件文件本身怎么写（props / emits / expose）→ **分册 4.5**；接口函数内部怎么写 → **分册 6**。
+> **与其它分册的分工**：页面与组件的代码怎么写看**分册 4**；接口函数内部怎么写看**分册 6**；`http` / Query hooks 怎么用看**分册 10**。本分册只回答：**文件放哪、谁能取数、数据怎么流**。
 >
-> **30 秒速记**：模块专属接口模块内取数 → 多模块共用接口由根视图取一次再 Props 下发 → 私有视图只吃 Props → `common/` 只做展示 → 自定义弹窗必须抽组件 → 数据全在 `src/api/<page>/` → 三级封顶、页面 / 组件单文件 500 行。
+> **30 秒速记**：TabBar 页是独立单页，根组件在 `views/`；非 TabBar 多页面按业务模块聚合；`components/`、`common/`、`modules/` 全部按需创建，简单业务默认只写根页面；`modules/` 仅用于有独立状态或取数职责的复杂业务区块；只有根组件和模块组件能发请求；`modules/` 下不设 `common`；超过 2 个页面复用才提升到 `src/components/`；API 按业务模块聚合。
 
 ---
 
-## 5.1 分层结构
+## 5.1 四层心智模型
 
-```mermaid
-graph TD
-    Page[L0 根视图<br>TabBar 页 = views/XxxView.uvue<br>普通页 = 页面入口 xxx.uvue<br>结构编排：分区 / 下标 / 跳转<br>✅ 仅多模块共用接口取数<br>❌ 不持模块独有数据]
-    Page --> Common[L-Common<br>components/common/<br>卡片外壳 / 标题栏 / 空态<br>❌ 不调接口 ❌ 不持数据]
-    Page --> ModuleA[L1 模块 A 容器<br>components/A/A.uvue<br>✅ 调本模块接口<br>🔒 数据自持]
-    Page --> ModuleB[L1 模块 B 容器<br>components/B/B.uvue<br>✅ 调本模块接口<br>🔒 与 A 互不共享]
-
-    Page -.->|✅ 仅共用接口数据下灌<br>❌ 不灌模块独有数据| ModuleA
-
-    ModuleA --> A1[L2 A 私有视图<br>A/components/A-1.uvue<br>只吃 Props / 只抛 Emits]
-    ModuleB --> B1[L2 B 私有视图<br>B/components/B-1.uvue<br>只吃 Props / 只抛 Emits]
-
-    Api[(src/api/&lt;page&gt;/&lt;page&gt;.uts<br>A 段 / B 段各自独立造数)] -.->|后端就绪只换函数体| ModuleA
-    Api -.->|多模块共用接口：根视图调一次| Page
+```text
+业务模块
+  └── 页面
+      └── 页面内业务区块
+          └── 纯展示视图
 ```
 
-> **一句话**：根视图管「装」「切」，并负责**多模块共用接口**的统一取数与下发；模块自己管「数」和「取」；`common` 只管「长什么样」。
+但 **TabBar 页面是例外**：它本身就是独立单页，不参与“同一业务模块多页面聚合”。
 
-| 层级 | 目录 / 文件 | 职责 | 能调接口 | 能持模块数据 |
-| :--- | :--- | :--- | :--- | :--- |
-| **L0 根视图** | TabBar 页 = `views/XxxView.uvue`；普通页 = 页面入口 | 结构编排：分区 / 下标 / 跳转；**多模块共用接口的统一取数** | ✅ **仅共用接口** | ✅ 共享数据 + 结构级状态 |
-| **L-Common** | `components/common/*.uvue` | 页面内复用的纯展示外壳 | ❌ | ❌ |
-| **L1 模块容器** | `components/<模块>/<模块>.uvue` | 模块唯一决策中心：取数 / loading / 分页 / 筛选 | ✅ **本模块接口** | ✅ 只持本模块的 |
-| **L2 私有视图** | `components/<模块>/components/*.uvue` | 纯展示 | ❌ | ❌ |
-| **Data 层** | `src/api/<page>/`（`<page>.uts`；类型/数据集按需拆 `types.uts`、`mock/`） | 契约类型 + mock 数据集 + 接口函数 | —— 它本身是接口 | ✅ 只持本模块的 mock |
-
----
-
-## 5.2 八大铁律
-
-### 铁律 1：页面高内聚、自包含
-
-- 页面业务组件**必须内聚在当前页面自己的 `components/` 下**；严禁跨页面借用（如在 `src/pages/index/` 引用 `src/pages/mall/components/`）。
-- 只有**跨 3 个以上页面完全无差别复用**，才评估提升到 `src/components/`。
-- **引用路径**：页面目录内部用相对路径（`./components/X.uvue`）；**页面目录之外一律 `@/src/...`**，包括 `src/api/**`（哪怕它对应本页）。路径写错在 UTS / Vite 侧可能静默，运行期才暴露。
-
-### 铁律 2：三级封顶，单文件 500 行
-
-- 层级**最多 3 级**：页面入口 → 模块容器 → 私有叶子视图。**叶子下方严禁再开 `components/`**。
-- **页面 / 组件单文件硬上限 500 行**（`template + script + style` 全算，`wc -l` 口径）；400~500 行是预警区。
-- 超了**只能向下拆**（拆 L2 私有视图，或把纯逻辑抽到同目录 `.uts`）；严禁为了压行数挪去新页面或跨页面公共组件。
-- 页面 / 组件文件 500 行上限；**`src/api/` 下的接口文件不设行数上限**，拆兄弟文件只看接口域是否需要独立演进。⚠️ **抽 `types.uts` 不算减行手段**（类型只占 0~13%，抽不抽只看是否被多处共用）。
-
-### 铁律 3：容器与展示视图严格分离
-
-- **L1 容器**：模块的决策中心，负责**本模块专属接口**、局部状态、分页筛选，向下分发数据、向上接事件。
-- **L0 根视图**：结构编排；**只有多个模块共用同一接口时**才由它统一调用，再通过 Props 下发给各模块。
-- **L2 私有视图**：只做视图，**严禁调接口与异步请求**，只吃 Props、只抛 Emits。
-- **L-Common**：仅在本页内被多模块复用的外壳，不做业务逻辑、不绑定业务模型。
-- **Props 收敛**：容器给私有视图传参时**优先只传一个数据对象**，严禁把同一业务对象的字段摊成一串散参数；结构级意图（`:activeId`、`:maxCount`）可单独声明；全局态（主题 / 语言）由叶子直读 store，**不传**。
-- **弹窗必须组件化**：页面里只要出现自定义弹窗 / 弹层（modal、dialog、drawer、action-sheet、遮罩详情弹窗等），**必须抽成本页 `components/` 下的独立组件**；页面只保留显隐状态、接口调用与 `@close` / `@save` 等业务回调，**严禁把弹窗模板内联在页面入口**。`uni.showModal` 这类系统弹窗调用不属于自定义弹窗模板，不受此条约束。
-
-### 铁律 4：取数边界（谁用谁取，共用上提）
-
-- **接口只允许在这三处调用**：页面根视图（`order-list.uvue` / `views/XxxView.uvue`）、`OrderModule` 这类 L1 模块容器、`CouponModule` 这类 L1 模块容器。**L2 私有视图、`components/common/`、`src/components/` 全局组件一律是纯视图层**：不调接口、不做异步请求、不持业务数据。
-- **接口与模块高度耦合 → 模块内自己调**：`OrderModule` 调 order 段接口，`CouponModule` 调 coupon 段接口，各自持自己的 `list` / `loading` / `page` / `hasMore`，互不代劳。
-- **多个模块共用同一接口 → 上提到根视图**：`OrderModule` 与 `CouponModule` 都要用同一份数据时，由 `order-list.uvue` **统一调用一次**，再通过 Props 分发给两个模块；模块不再各自重复请求，也不共享内部状态。
-- **根视图只持「共享数据 + 结构级状态」**：共享接口的返回值、分区下标、swiper 锁、下拉信号、导航跳转；**不代持**只属于某个模块的 `list` / `loading` / 分页 / 筛选条件。
-- **判断标准**：这个接口是否被 **2 个及以上模块**使用 —— 是则上提根视图，否则留在模块内。跨模块联动仍只传结构级意图（切分区 / 跳转），不传模块私有数据。
-
-### 铁律 5：Mock 与接口层落位
-
-- 页面目录（`src/pages/<page>/`、`src/sub/<page>/`）下**严禁出现 `mock.uts`**。
-- 模拟数据集与接口函数**同层收拢**在 `src/api/<page>/`：
-
-  ```text
-  src/api/<page>/
-  ├── <page>.uts     # ★ 必须：接口函数 + 类型 + 数据集，按模块用注释分段
-  └── types.uts      # 仅类型被多段共用时拆出（只放 type）
-  ```
-
-- **新增页面必须在同一次改动里建出接口层**；页面里每一块将来由后端下发的数据，都要能顺到某个 `fetchXxxApi()`，否则视为未交付。
-- 数据集与接口函数**按模块独立**：A 段的数组不得被 B 段取用，严禁抽一个「通用 `fetchListApi(type)`」。
-- 接口层内部怎么写（命名 / 契约类型 / 造数 / http）→ **分册 6**。
-
-### 铁律 6：注释只落三处
-
-1. 组件文件顶部一句用途；
-2. 模板里每个自定义组件与功能块上方一句；
-3. 脚本顶层的每个状态 / 常量变量上方一行普通说明注释（`/** 一句话 */`，不写标签）；**所有方法一律写 JSDoc**（职责一句 + `@param` 逐参 + `@returns`），事件处理、`computed`、`watch`、composable 都算；`useQuery` / `useMutation` 用 `//` 普通注释说明用途与别名映射。
-
-严禁逐行注释；变量注释只写用途或边界，方法注释写职责与参数；只写「为什么 / 是什么」，不解释实现过程。
-
-### 铁律 7：生态优先
-
-`src/utils/` 与 `uni_modules/` 里已有能力的，**绝对优先复用**，严禁手写重复实现。具体清单与「该用谁」→ **分册 7**。
-
-### 铁律 8：可读性优先
-
-循环与 `if` 嵌套各不超两层、单处分支不超 3 个；复杂条件抽成具名布尔函数；相似逻辑出现两遍立刻抽函数。
-⚠️ 抽函数与调顺序必须同时满足「函数定义先于调用点」，冲突时以编译通过为准（分册 1.15）。
+```text
+TabBar 页面        = 单页结构，根组件在 views/<Page>View.uvue
+非 TabBar 单页     = 直接放在 src/sub/<page>/
+非 TabBar 多页面   = 聚合到 src/sub/<business-module>/<page>/
+API                = 始终按业务模块聚合到 src/api/<business-module>/
+```
 
 ---
 
-## 5.3 目录拓扑
+## 5.2 三类页面与目录
 
-### 1. 先判定页面形态：要不要 `views/`
+### 1. TabBar 页面
 
-| 页面形态 | 位置 | 入口 `.uvue` 的角色 | 要 `views/` 吗 |
+TabBar 页面是单页业务，不建 `src/sub/<module>/` 式页面分组。
+
+简单 TabBar 页面：
+
+```text
+src/pages/home/
+├── home.uvue                    # 薄壳：definePage + Tab 联动 + 生命周期
+└── views/
+    └── HomeView.uvue            # 根组件：页面内容 + 接口
+```
+
+页面较大、确实需要拆视图时：
+
+```text
+src/pages/order/
+├── order.uvue                    # 薄壳：definePage + Tab 联动 + 生命周期
+├── views/
+│   └── OrderView.uvue            # 根组件：页面结构 + 多模块共享接口
+├── components/                   # 根组件直属视图，纯展示
+│   ├── OrderHeader.uvue
+│   └── OrderFilter.uvue
+└── common/                       # 可选：页面级通用视图，纯展示
+    ├── StatusTag.uvue
+    └── SectionTitle.uvue
+```
+
+只有多个独立业务区块各自维护状态或请求时，才增加：
+
+```text
+src/pages/order/
+└── modules/
+    ├── order-list/
+    │   ├── OrderListModule.uvue  # 模块组件，可调本模块接口
+    │   └── components/           # 模块直属视图，纯展示
+    │       ├── OrderCell.uvue
+    │       └── OrderActions.uvue
+    └── order-filter/
+        ├── OrderFilterModule.uvue
+        └── components/
+            └── FilterChip.uvue
+```
+
+规则：
+
+1. `order.uvue` 只做薄壳，**不发 HTTP**。
+2. `views/OrderView.uvue` 是真正的页面根组件。
+3. `modules/<block>/` 是页面内业务区块，不是独立页面，也不是业务模块目录。
+4. `modules/` 下**不允许出现 `common/`**。
+5. `components/`、`common/`、`modules/` 都是按需创建，不能为了结构完整提前建空目录。
+
+### 2. 非 TabBar 单页
+
+只有一个页面、没有同业务模块的其他页面时，直接放在 `src/sub/<page>/`。
+
+简单页面默认只有根组件：
+
+```text
+src/sub/login/
+└── login.uvue                    # 根组件：页面结构 + 接口
+```
+
+页面变大、但仍只有一个业务块，且确有复用或独立维护价值时，才拆纯展示视图；没有拆分需求时仍只保留 `login.uvue`：
+
+```text
+src/sub/login/
+├── login.uvue                    # 根组件：页面结构 + 接口
+└── components/
+    ├── LoginForm.uvue            # 纯展示，Props / Emits
+    └── LoginField.uvue           # 纯展示，Props / Emits
+```
+
+登录页通常只有一个业务块，**不要创建 `modules/login-form/`**。`modules/` 只留给确实存在多个独立业务区块、且各区块需要独立状态或请求的复杂页面。
+
+### 3. 非 TabBar 多页面业务模块
+
+同一业务模块存在两个及以上非 TabBar 页面时，必须聚合到 `src/sub/<business-module>/`。页面内部仍按复杂度按需拆分：
+
+```text
+src/sub/order/
+├── list/
+│   ├── list.uvue                 # 根组件
+│   └── components/               # 可选：列表页私有视图
+├── detail/
+│   ├── detail.uvue               # 根组件
+│   └── components/               # 可选：详情页私有视图
+└── edit/
+    ├── edit.uvue                 # 根组件
+    └── components/               # 可选：编辑页私有视图
+```
+
+这里的 `list`、`detail`、`edit` 是三个页面，不是三个业务模块。
+
+### 4. 页面形态总表
+
+| 页面形态 | 页面目录 | 根组件 | 是否有 `views/` |
 | :--- | :--- | :--- | :--- |
-| **TabBar 页面** | `src/pages/<page>/` | **薄壳**：`definePage` + Tab 联动 + 生命周期 | ✅ **要**，真正的 L0 是 `views/XxxView.uvue` |
-| **普通页面（简单）** | `src/sub/**` 等 | **就是 L0 根视图** | ❌ 不要 |
-| **普通页面（复杂）** | `src/sub/**` 等 | **就是 L0 根视图**，编排模块容器 | ❌ 不要（其余规则与 TabBar 页相同） |
-
-> `views/` 是 **TabBar 页面的专属产物**（它被 `TabViews.uvue` 承载）；普通页入口自己就是根视图。
-
-### 2. 普通页面目录树（默认形态，`src/sub/**` 与单页）
-
-**普通页没有 `views/`**，入口 `.uvue` 本身就是 L0 根视图。以 `src/sub/order-list/` 为例：
-
-```text
-src/
-├── api/                              # 全局接口层（页面目录之外）
-│   └── order-list/                   # 目录名 = 页面目录名
-│       ├── order-list.uts            # ★ 接口函数 + 类型 + 数据集，按模块分段
-│       └── types.uts                 # 仅类型被多段共用时拆出（只放 type）
-│
-└── sub/
-    └── order-list/
-        ├── order-list.uvue           # ★ L0 根视图（页面骨架；仅共用接口在此取数）
-        └── components/               # 页面内聚组件根（严禁对外暴露）
-            ├── common/               # L-Common 纯展示外壳
-            ├── order/                # L1 模块「订单」
-            │   ├── OrderModule.uvue  #   取数 / loading / 分页，数据自持
-            │   └── components/       # L2 模块私有视图
-            │       ├── OrderCell.uvue
-            │       └── OrderEmpty.uvue
-            └── coupon/               # L1 模块「优惠券」（与 order 互不共享）
-                ├── CouponModule.uvue
-                └── components/
-```
-
-- **简单普通页可以更扁**：不拆模块时，`components/` 下直接平铺 `XxxCard.uvue`，不必建「模块/模块.uvue」两级（见第 5 节豁免）。
-- **入口文件的位置**：`src/sub/<page>/<page>.uvue`，与目录同名。
-- **`order-list.uvue` 里必须有页面内容**：上面这棵树只表示「内容该归到哪」，**不是「一上来就拆空」的施工顺序**。**简单页面（单一业务块）除自定义弹窗必须抽组件外，只要总行数 ≤ 500 行，一律不拆组件**，内容直接写在入口 `.uvue` 里；只有**超过 500 行**，或确实出现多个互不相干的业务块 / 需要独立状态时，才拆到 `components/`。无论拆不拆，根视图都要能看懂这一页 —— 顶部区（标题 / 筛选 / 搜索）、模块编排、整页级状态（空态 / 错误 / 骨架屏）等页面骨架必须有明确归属，**不能只剩一个自定义组件标签**。
-
-```html
-<!-- ❌ 反例：上来就拆，根视图只剩一个标签，页面结构信息全部丢失 -->
-<template>
-  <OrderModule />
-</template>
-
-<!-- ✅ 正例：根视图先落页面骨架，只把真正独立的大块内容下沉 -->
-<template>
-  <view class="page-order-list">
-    <view class="header">订单列表</view>
-    <view class="filter">全部 / 待付款 / 已完成</view>
-    <OrderModule />
-    <view v-if="isEmpty" class="empty">暂无订单</view>
-  </view>
-</template>
-```
-
-**硬规则**：**自定义弹窗一律抽成 `components/` 下的独立组件；除此之外，简单页面 ≤ 500 行不拆组件** —— 单一业务块直接写在入口 `.uvue`，禁止提前抽成 `components/Xxx.uvue`；`wc -l` 超过 500 行时才按 5.5 红线向下拆。**禁止「为了拆分而拆分」**：不按目录树长什么样来套，只要拆完入口变成 `<template><OrderModule /></template>` 这种只剩一个标签、页面结构信息无处可看，或先造一堆空壳组件再回填，就属于为拆而拆，必须把内容写回入口或让骨架有明确归属。
-
-### 3. TabBar 页面目录树（`src/pages/**`）
-
-**TabBar 页多一层薄壳 + `views/`**：入口只负责 `definePage` 与 Tab 联动，真正的 L0 根视图在 `views/`。以 `src/pages/index/` 为例：
-
-```text
-src/
-├── api/                              # 全局接口层（页面目录之外）
-│   └── index/                        # 目录名 = 页面目录名
-│       ├── index.uts                 # ★ 接口函数 + 类型 + 数据集，按模块分段
-│       └── types.uts                 # 仅类型被多段共用时拆出（只放 type）
-│
-└── pages/
-    └── index/
-        ├── index.uvue                # ★ 薄壳：definePage + Tab 联动 + 生命周期，模板只有一行 <IndexView />
-        ├── views/                    # ★ 仅 TabBar 页有：真正的 L0 根视图
-        │   └── IndexView.uvue        #   结构编排（分区 / 下标 / 跳转）+ 共用接口取数
-        └── components/               # 页面内聚组件根（严禁对外暴露）
-            ├── common/               # L-Common 纯展示外壳
-            ├── A/                    # L1 模块 A
-            │   ├── A.uvue            #   取数 / loading / 分页，数据自持
-            │   └── components/       # L2 模块 A 私有视图
-            └── B/                    # L1 模块 B（与 A 互不共享）
-                ├── B.uvue
-                └── components/
-```
-
-**两张树的唯一差别**：
-
-| | 普通页（第 2 节） | TabBar 页（第 3 节） |
-| :--- | :--- | :--- |
-| 入口 `.uvue` | **就是 L0 根视图** | **薄壳**（只写 `definePage` + Tab 联动） |
-| `views/` | ❌ 不要 | ✅ **必须有** |
-| 模块 / 公共组件结构 | 完全相同 | 完全相同 |
-
-**读写关系**（两张树通用）：
-
-```text
-✅ A.uvue ──调自己那段──> @/src/api/<page>/<page>.uts
-✅ A.uvue ──Props 下灌──> A-1.uvue ──Emits 上抛──> A.uvue
-✅ A / B ──复用纯 UI 外壳──> components/common/
-✅ 根视图 ──多模块共用接口：调一次，Props 下灌──> A / B
-✅ 根视图 ──只传结构级意图（切分区 / 跳转）──> A / B
-❌ 根视图 ──代 A 调「只有 A 用」的接口 / 持 A 的 loading、分页──> A
-❌ B ──读写 A 的状态 / 复用 A 的 mock 与 fetch──> A
-❌ components/common/ ──调接口 / 持业务数据──> 任何模块
-```
-
-### 4. 组件放哪（目录视角）
-
-| 位置 | 谁用 | 引用方式 | 命名 |
-| :--- | :--- | :--- | :--- |
-| `uni_modules/<lib>/components/<name>/<name>.uvue` | 全项目 | **easycom 自动** | 库规定 |
-| `src/components/<Name>/<Name>.uvue` | 全项目（3+ 页面才提升） | **easycom 自动** | 目录与文件**同名 PascalCase** |
-| `src/pages/<page>/components/`、`src/sub/<page>/components/` | 仅本页 | **必须手动 `import`** | PascalCase |
-
-> 组件的**写法**（props / emits / expose / 根节点）见分册 4.5；本节只定位置。
-
-### 5. 两个形态豁免
-
-- **模块容器允许不带子目录**：模块只有一个 UI 块时，`components/<模块>/<模块>.uvue` 本身就是 L1 叶子，不必硬拆 L2。
-- **扁平形态合法**：页面只有一个业务块、或各块彼此独立且很薄时，可直接 `components/Xxx.uvue` 平铺 —— **但铁律不倒**：谁持数据、谁调接口必须唯一且不共享。
-- **简单页面极简形态**：如 `src/sub/auth/login.uvue`，入口 = 根视图，内容全部写在 `.uvue` 内；**除自定义弹窗必须抽组件外，≤ 500 行不拆组件**。**禁止**为了「对齐规范」硬造 `views/`、空壳模块容器或提前抽组件；一旦超过 500 行或出现多个互不相干的业务数据块，才按复杂页拆。
+| TabBar 页面 | `src/pages/<page>/` | `views/<Page>View.uvue` | ✅ |
+| 非 TabBar 单页 | `src/sub/<page>/` | `<page>.uvue` | ❌ |
+| 非 TabBar 多页面 | `src/sub/<module>/<page>/` | `<page>.uvue` | ❌ |
 
 ---
 
-## 5.4 结构速查
+## 5.3 页面内可选结构
 
-| 我现在要决定的事 | 答案 |
+页面内部只有以下位置，但**不要求每个页面都创建**：
+
+```text
+<page>/
+├── <page>.uvue                  # 普通页根组件
+├── views/<Page>View.uvue        # TabBar 页根组件（仅 TabBar 页）
+├── components/                  # 可选：根组件直属视图，纯展示
+├── common/                      # 可选：页面级通用视图，纯展示
+└── modules/                     # 可选：复杂业务区块
+    └── <block>/
+        ├── <Block>Module.uvue   # 模块组件，可发本模块请求
+        └── components/          # 模块直属视图，纯展示
+```
+
+### 1. 先做拆分决策
+
+| 页面情况 | 推荐结构 | `components/` | `modules/` |
+| :--- | :--- | :--- | :--- |
+| 单一业务块，内容不多 | 只写根页面 | 不创建 | 不创建 |
+| 单一业务块，但局部 UI 确有复用或独立维护价值 | 根页面 + `components/` 纯展示视图 | 按需创建 | 不创建 |
+| 同一页面内有多个独立业务区块，各区块有独立状态 / 接口 / 分页 | 根页面 + `modules/<block>/` | 根组件仍有直属视图时才创建 | 创建 |
+| 多个区块共用同一接口 | 根页面请求，Props 下发给各区块 | 按需创建 | 仅在区块确需独立业务职责时创建 |
+
+判定顺序：
+
+1. 先问是否只有一个业务块。是，则默认留在根页面；确有可复用或可独立维护的 UI 时才拆到 `components/`。
+2. 再问拆出的区块是否需要独立请求、独立 loading、分页或筛选状态。否，则仍是纯展示视图；只有确有拆分价值时才放 `components/`。
+3. 只有“多个独立业务区块 + 各自维护业务状态或取数”同时成立，才创建 `modules/`。
+4. 不能因为页面有列表、表单、筛选区就机械创建 `modules/`；它们仍可能属于同一个业务块。
+
+### 2. 目录职责
+
+禁止：
+
+```text
+modules/common/                  # ❌ modules 下没有 common
+common/<Block>Module.uvue        # ❌ common 不能承载业务模块
+```
+
+| 位置 | 职责 | 能否发 HTTP | 能否持有业务状态 |
+| :--- | :--- | :--- | :--- |
+| 页面根组件 | 页面结构、分区、跳转、单业务块取数、多区块共享接口 | ✅ | ✅ 页面数据 + 结构级状态 |
+| `components/` | 可选：根组件直属视图，承接确有拆分价值的纯 UI | ❌ | ❌ |
+| `common/` | 可选：当前页面内多处复用的纯展示视图 | ❌ | ❌ |
+| `modules/<block>/<Block>Module.uvue` | 本区块接口、loading、分页、筛选 | ✅ 仅本区块接口 | ✅ 本区块数据 |
+| `modules/<block>/components/` | 模块直属视图 | ❌ | ❌ |
+| `src/components/` | 跨页面公共视图 | ❌ | ❌ |
+
+---
+
+## 5.4 取数边界
+
+### 1. 只有两类文件可以发请求
+
+```text
+页面根组件
+modules/<block>/<Block>Module.uvue
+```
+
+“发请求”包括直接调用 `src/api` 接口函数，也包括使用 `useQuery` / `useMutation`。
+
+以下位置**一律禁止**调用接口、使用请求 hooks 或持有业务数据：
+
+```text
+components/
+common/
+modules/<block>/components/
+src/components/
+```
+
+它们只接收 Props、抛出 Emits。
+
+### 2. 单业务块接口
+
+页面只有一个业务块时，由页面根组件直接请求，不为了请求再创建模块组件：
+
+```text
+login.uvue
+├── useMutation(fetchLoginApi)
+├── 持有表单提交状态
+└── Props / v-model -> components/LoginForm.uvue
+```
+
+根组件保留页面数据与业务状态；`components/LoginForm.uvue` 只负责展示和抛事件。表单不复杂时直接写在 `login.uvue`，不创建 `components/`。
+
+### 3. 复杂页面内的单模块接口
+
+页面已经存在多个独立业务区块，且接口只服务其中一个模块时，才由该模块组件自己请求：
+
+```text
+OrderListModule.uvue
+├── useQuery(fetchOrderListApi)
+├── 持有 list / loading / page / hasMore
+├── Props -> modules/order-list/components/OrderCell.uvue
+└── Props -> common/StatusTag.uvue
+```
+
+根组件不代持该模块的 `list`、`loading`、分页或筛选条件。
+
+### 4. 多模块共用接口
+
+两个及以上模块使用同一个接口时，由页面根组件统一请求一次，再通过 Props 下发：
+
+```text
+OrderView.uvue
+├── useQuery(fetchOrderSummaryApi)
+├── Props -> OrderListModule(summary)
+└── Props -> CouponModule(summary)
+```
+
+规则：
+
+1. 根组件只请求一次，各模块不得重复请求同一接口。
+2. 根组件持有共享接口的返回值。
+3. 共享数据需要刷新时，由根组件重新请求，再下发新 Props。
+4. 模块仍只维护自己的私有状态。
+
+### 5. 页面之间的接口共享
+
+两个页面使用同一接口不等于使用同一组件。接口可以共享，视图仍各自实现。
+
+```text
+src/sub/order/list/list.uvue
+src/sub/order/detail/detail.uvue
+        │
+        └── 都可以调用 src/api/order/order.uts
+```
+
+---
+
+## 5.5 组件拆分与提升
+
+### 1. 组件位置
+
+| 使用范围 | 位置 |
 | :--- | :--- |
-| 要不要建 `views/`？ | 只有 **TabBar 页面**要 |
-| 复杂页怎么拆？ | L0 根视图 → L1 模块容器 → L2 私有视图，最多三级 |
-| 组件放哪？ | 页面内聚在 `components/`；3+ 页面无差别复用才进 `src/components/` |
-| 什么时候才拆组件？ | **自定义弹窗一律必拆**；其余看情况定，禁止为了拆分而拆分（根视图只剩一个标签、造空壳组件） |
-| 谁能调接口？ | **只有根视图（多模块共用接口）与 L1 模块容器（本模块接口）**；L2 / `common/` / 全局组件都不取数 |
-| 共用接口怎么取？ | 根视图调一次，Props 下发给各模块；模块不重复请求 |
-| 根视图能持什么？ | 共享接口数据 + 结构级状态（分区 / 下标 / 跳转） |
-| 模块之间能共享数据吗？ | 不能，只能传结构级意图 |
-| mock 放哪？ | 默认内联 `<page>.uts`；数据集过大才拆 `src/api/<page>/mock/<模块>.uts`；页面目录下严禁 `mock.uts` |
-| 简单页面要拆组件吗？ | **自定义弹窗必须抽组件**；其余内容 ≤ 500 行不拆，直接写在入口 `.uvue`；超 500 行才拆 |
-| 文件多大要拆？ | 页面 / 组件文件 > 500 行必须拆；`src/api/` 接口文件不设行数上限 |
+| 根组件专属视图 | 页面 `components/`（按需） |
+| 当前页面多个视图共用 | 页面 `common/`（可选） |
+| 页面内某个业务区块专属 | `modules/<block>/components/` |
+| 页面内业务区块容器 | `modules/<block>/<Block>Module.uvue` |
+| 超过 2 个页面共用 | `src/components/<Name>/<Name>.uvue` |
+
+### 2. 超过 2 个页面才提升
+
+按**独立页面数**计算，不按模板循环渲染次数计算。
+
+| 页面数 | 处理方式 |
+| :--- | :--- |
+| 1 个页面 | 留在页面内部 |
+| 2 个页面 | 不提升，继续留在各自页面内部 |
+| 3 个及以上页面 | 提升到 `src/components/` |
+
+`src/components/` 中全部是纯视图组件：
+
+- 只接收 Props、抛出 Emits；
+- 不调用接口；
+- 不使用 `useQuery` / `useMutation`；
+- 不持有业务数据。
+
+如果只是接口相同、UI 不同，只共享 API，不抽公共组件。
+
+### 3. 自定义弹窗
+
+自定义 modal、dialog、drawer、action-sheet、遮罩详情弹窗必须抽成独立组件：
+
+- 页面级弹窗放页面 `components/`（没有该目录时随弹窗一起创建）；
+- 模块专属弹窗放 `modules/<block>/components/`；
+- 弹窗不取数，只接收 Props、抛出 `@close` / `@save` 等事件。
+
+### 4. 单文件上限
+
+- 页面 / 组件单文件不超过 **500 行**。
+- 超过 500 行时向下拆私有视图，或把纯逻辑抽到同目录 `.uts`。
+- `src/api/` 接口文件不设行数上限，按接口域拆分。
 
 ---
 
-## 5.5 自检红线清单（结构）
+## 5.6 API 目录结构
 
-- [ ] **1. 页面内聚** —— 没有跨页面借用业务组件；3+ 页面无差别复用才进 `src/components/`
-- [ ] **2. 路径规范** —— 页面目录内用相对路径，目录外一律 `@/src/...`（含 `src/api/`）
-- [ ] **3. 层级 ≤ 3 级** —— 叶子视图下不再开 `components/`
-- [ ] **4. 页面 / 组件文件 ≤ 500 行** —— 超了向下拆；`src/api/` 接口文件不限行数
-- [ ] **5. 取数位置合法** —— 只有根视图与 L1 模块容器调接口；L2 / `common/` / 全局组件都不取数
-- [ ] **6. 共用接口已上提** —— 2+ 模块共用的接口由根视图调一次并 Props 下发；模块独有接口仍由模块自己调，根视图不代持
-- [ ] **7. 模块之间零共享** —— 数据、loading、分页、mock、fetch 都只属于自己
-- [ ] **8. Props 收敛** —— 一个子视图一个数据对象，不摊平字段；全局态不传
-- [ ] **9. 接口层同批建出** —— `src/api/<page>/<page>.uts` 与页面目录逐字同名
-- [ ] **10. 页面目录无 `mock.uts`** —— 数据集默认内联在 `src/api/<page>/<page>.uts`
-- [ ] **11. 形态判定过** —— TabBar 页有 `views/`，普通页没有；简单页不硬拆
-- [ ] **12. 简单页不拆（弹窗除外）** —— 单一业务块且 ≤ 500 行时内容全在入口 `.uvue`；自定义弹窗必须抽成独立组件
-- [ ] **13. 不是为拆而拆** —— 拆完根视图仍能看出页面结构，骨架 / 筛选区 / 空态等有明确归属，不是只剩一个组件标签
-- [ ] **14. 弹窗已组件化** —— 自定义 modal / dialog / drawer / action-sheet / 遮罩详情弹窗都落在本页 `components/`，页面入口无内联弹窗模板
-- [ ] **15. 注释分层正确** —— 变量有普通说明注释，方法有 JSDoc，`useQuery` / `useMutation` 用 `//` 普通注释
+API 始终按**业务模块**聚合，不按 TabBar / 非 TabBar 分叉，也不按每个页面机械复制一套。
+
+### 1. 单页业务
+
+```text
+src/api/login/
+└── login.uts
+```
+
+### 2. 多页面业务模块
+
+```text
+src/api/order/
+├── types.uts          # 被多个文件共用的类型
+├── order.uts          # 多个页面共用的接口
+├── list.uts           # 仅订单列表页使用
+├── detail.uts         # 仅订单详情页使用
+└── edit.uts           # 仅订单编辑页使用
+```
+
+对应关系：
+
+```text
+src/sub/order/list/list.uvue
+    -> @/src/api/order/list.uts
+
+src/sub/order/detail/detail.uvue
+    -> @/src/api/order/detail.uts
+
+src/sub/order/edit/edit.uvue
+    -> @/src/api/order/edit.uts
+
+多个页面共用
+    -> @/src/api/order/order.uts
+```
+
+### 3. 拆分规则
+
+| 场景 | 文件位置 |
+| :--- | :--- |
+| 业务模块只有一个页面 | `src/api/<module>/<module>.uts` |
+| 某接口只服务一个页面 | `src/api/<module>/<page>.uts` |
+| 多个页面共用同一组接口 | `src/api/<module>/<module>.uts` |
+| 类型被两个以上文件共用 | `src/api/<module>/types.uts` |
+| 接口域需要独立演进 | `src/api/<module>/<domain>.uts` |
+
+禁止：
+
+- 为了页面整齐把每个接口函数拆成单独文件；
+- 所有页面接口都堆进一个巨型文件；
+- 建立 `src/api/<module>/index.uts` 聚合入口；
+- 页面目录内出现 `mock.uts` 或数据集文件。
+
+所有引用一律精准导入：
+
+```uts
+import { fetchOrderListApi } from '@/src/api/order/list.uts';
+import { fetchOrderDetailApi } from '@/src/api/order/detail.uts';
+import type { OrderItem } from '@/src/api/order/types.uts';
+```
+
+---
+
+## 5.7 路径与命名
+
+### 1. 路径引用
+
+- 页面目录内部使用相对路径，如 `./components/OrderHeader.uvue`。
+- 页面目录之外一律使用 `@/src/...`。
+- API 引用必须使用别名，如 `@/src/api/order/list.uts`。
+- 第三方模块只从其公开入口导入。
+
+### 2. 命名
+
+| 对象 | 约定 | 示例 |
+| :--- | :--- | :--- |
+| 业务模块目录 | kebab-case | `src/sub/order/`、`src/api/order/` |
+| 页面目录 | kebab-case | `src/sub/order/order-detail/` |
+| 页面入口 | 与页面目录同名 | `order-detail.uvue` |
+| 模块目录 | kebab-case | `modules/order-list/` |
+| 模块组件 | PascalCase + `Module` | `OrderListModule.uvue` |
+| 视图组件 | PascalCase | `OrderCell.uvue` |
+| 接口文件 | 与页面或接口域同名 | `list.uts`、`detail.uts` |
+| 接口函数 | `Api` 后缀 | `fetchOrderListApi` |
+
+---
+
+## 5.8 简单页面豁免
+
+结构树不是强制脚手架。简单页面遵守以下规则：
+
+1. 单一业务块默认内容直接写在根组件中；不超过 500 行时不拆。
+2. 不提前创建空的 `components/`、`common/`、`modules/`。
+3. 自定义弹窗仍必须抽组件。
+4. 超过 500 行或局部 UI 复杂时，优先拆到页面 `components/`，不要因此创建 `modules/`。
+5. 只有出现多个独立业务区块，且区块需要独立状态或取数时，才创建 `modules/`。
+6. 拆完后根组件仍要保留页面骨架，不能只剩一个模块标签。
+
+---
+
+## 5.9 结构速查
+
+| 问题 | 答案 |
+| :--- | :--- |
+| TabBar 页面怎么放？ | `src/pages/<page>/`，根组件在 `views/<Page>View.uvue` |
+| TabBar 入口做什么？ | 只做 `definePage`、Tab 联动和生命周期，不发 HTTP |
+| 非 TabBar 单页怎么放？ | `src/sub/<page>/<page>.uvue` |
+| 同一业务模块多个非 TabBar 页面怎么放？ | `src/sub/<module>/<page>/<page>.uvue` |
+| 简单页面要建哪些目录？ | 只建根页面，不预建空目录 |
+| 页面变大但只有一个业务块怎么办？ | 默认仍写根页面；确有可复用或可独立维护的 UI 时才用 `components/` |
+| 什么时候创建 `modules/`？ | 多个独立业务区块各自需要状态或取数时 |
+| 页面根组件直属视图放哪？ | `components/` |
+| 页面级通用视图放哪？ | `common/`（可选） |
+| 页面内业务区块放哪？ | `modules/<block>/<Block>Module.uvue` |
+| 模块直属视图放哪？ | `modules/<block>/components/` |
+| `modules/` 下有 `common` 吗？ | 没有 |
+| 谁能发 HTTP？ | 页面根组件、模块组件 |
+| 两个模块共用接口怎么办？ | 根组件请求一次，Props 下发 |
+| 组件何时提升到 `src/components/`？ | 超过 2 个页面使用，即第 3 个页面开始 |
+| 公共组件能发请求吗？ | 不能，只做纯展示 |
+| API 怎么组织？ | 按业务模块聚合到 `src/api/<module>/` |
+| API 目录能建 `index.uts` 聚合吗？ | 不能，使用精准导入 |
+| 页面 / 组件最大多少行？ | 500 行 |
+
+---
+
+## 5.10 自检红线清单
+
+- [ ] **1. 页面形态判定**：TabBar 页有 `views/`，非 TabBar 页没有。
+- [ ] **2. TabBar 薄壳**：入口 `.uvue` 不发 HTTP，根组件在 `views/<Page>View.uvue`。
+- [ ] **3. 业务模块聚合**：同一业务模块的多个非 TabBar 页面在 `src/sub/<module>/` 下。
+- [ ] **4. 页面内结构**：只使用 `components / common / modules` 这些约定位置；三者均按需创建，简单页可以只有根组件。
+- [ ] **5. 模块目录**：`modules/` 下只有业务区块，不存在 `common/`。
+- [ ] **6. 取数边界**：只有页面根组件与模块组件调用接口或使用请求 hooks。
+- [ ] **7. 纯展示边界**：`components/`、`common/`、模块 `components/`、`src/components/` 都不取数。
+- [ ] **8. 共享接口上提**：两个及以上模块共用接口时，由根组件请求一次并 Props 下发。
+- [ ] **9. 模块数据自持**：使用 `modules/` 时，模块独有接口、loading、分页、筛选只由该模块维护；单业务块仍由根页面维护。
+- [ ] **10. 组件提升门槛**：超过 2 个页面使用才进入 `src/components/`。
+- [ ] **11. 公共组件纯展示**：`src/components/` 只接收 Props、抛出 Emits。
+- [ ] **12. API 按模块聚合**：接口位于 `src/api/<module>/`，不按页面机械复制目录。
+- [ ] **13. API 精准导入**：使用具体 `.uts` 文件，不建 `index.uts` 聚合入口。
+- [ ] **14. 无页面数据集**：页面目录无 `mock.uts`，页面 / 组件无硬编码假数据。
+- [ ] **15. 不为拆而拆**：单一业务块默认留在根页面；`components/` 也只在确有复用或独立维护价值时创建，不为了拆视图而创建 `modules/`。
+- [ ] **16. 弹窗组件化**：自定义弹窗放在对应 `components/` 中，不内联在根组件。
+- [ ] **17. 文件行数**：页面 / 组件不超过 500 行；API 文件按接口域拆分。

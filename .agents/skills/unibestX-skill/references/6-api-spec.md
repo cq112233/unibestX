@@ -1,68 +1,75 @@
-# 6 API 接口层手册（一页一目录 · 契约类型与模拟数据同层 · 请求实现 · 后端就绪只换函数体）
+# 6 API 接口层手册（业务模块目录 · 契约类型与模拟数据同层 · 请求实现 · 后端就绪只换函数体）
 
 > **本文件是 `unibestX-skill` 的参考分册**，由 [SKILL.md](../SKILL.md) 按需引用。
 >
 > **何时读本文件**：**新增页面并要同步建接口层时**、把页面 / 组件里写死的假数据抽成接口函数时、设计模拟数据集与契约类型时、对接后端真实接口时、写 `http` 请求 / 文件上传 / SSE 流式接口时 —— 必须首先阅读并严格遵循本分册。
 >
-> **与其它分册的分工**：页面层级与组件拆分看分册 5（铁律 5 讲「模拟数据必须收拢进接口层」，本分册讲「接口层自己怎么写」）；新增页面的整体生成流程看分册 4；`http` / 上传 / 流式的底层能力与配置见 `uni_modules/request-bestX/readme.md`（本分册只讲**怎么在 api 层正确使用它们**）；跨端运行时差异看分册 3。
+> **与其它分册的分工**：页面层级、组件拆分与 API 目录归属看分册 5（5.6 讲「API 按业务模块聚合」，本分册讲「接口层自己怎么写」）；新增页面的整体生成流程看分册 4；`http` / 上传 / 流式的底层能力与配置见 `uni_modules/request-bestX/readme.md`（本分册只讲**怎么在 api 层正确使用它们**）；跨端运行时差异看分册 3。
 >
-> **核心定位**：**页面只管「要什么数据」，api 层只管「数据从哪来」** —— 每个页面在 `src/api/<page>/` 下有一套自己的接口层（接口函数 + 契约类型 + 模拟数据集），页面组件通过 `@/src/api/<page>/<page>.uts` 引入返回 `Promise<T>` 的接口函数；开发期返回本地模拟数据、后端就绪后返回真实响应，**对调用方完全透明，对接时页面侧零改动**。
+> **核心定位**：**页面只管「要什么数据」，api 层只管「数据从哪来」** —— 接口按**业务模块**收拢在 `src/api/<module>/` 下（接口函数 + 契约类型 + 模拟数据集），页面组件通过具体 `.uts` 文件引入返回 `Promise<T>` 的接口函数；开发期返回本地模拟数据、后端就绪后返回真实响应，**对调用方完全透明，对接时页面侧零改动**。
 >
 > 📌 **6.1–6.8 是规范与铁律**；**6.9 起是手册部分**：常用请求写法（8 种）→ 坑点 → 速查 → 自检红线。**新建接口层看 6.5（模拟→真实双实现），写请求查 6.9，速查看 6.11。**
 
 ---
 
-## 6.1 落位与命名：一页一目录（新增页面必产接口层）
+## 6.1 落位与命名：一业务模块一目录（新增页面必须接入接口层）
 
-### 1. 路径映射：目录名与页面目录严格同名
+### 1. 路径映射：接口按业务模块聚合
 
-$$\text{页面目录: } \texttt{src/pages/<page\_name>/} \text{ 或 } \texttt{src/sub/<page\_name>/} \quad \Longrightarrow \quad \text{接口目录: } \texttt{src/api/<page\_name>/}$$
+$$\text{业务模块: } \texttt{src/api/<module\_name>/} \quad \Longleftarrow \quad \text{该模块的页面: } \texttt{src/pages/<page>/} \text{ 或 } \texttt{src/sub/<module>/<page>/}$$
 
-| 页面 | 接口目录 | 页面 | 接口目录 |
+| 页面 | 接口文件 | 页面 | 接口文件 |
 | :--- | :--- | :--- | :--- |
-| `src/pages/index/` | `src/api/index/` | `src/pages/ball/` | `src/api/ball/` |
-| `src/pages/mall/` | `src/api/mall/` | `src/sub/cart/` | `src/api/cart/` |
-| `src/sub/order-detail/` | `src/api/order-detail/` | `src/sub/qa-detail/` | `src/api/qa-detail/` |
+| `src/pages/index/` | `src/api/index/index.uts` | `src/pages/ball/` | `src/api/ball/ball.uts` |
+| `src/sub/order/list/` | `src/api/order/list.uts` | `src/sub/order/detail/` | `src/api/order/detail.uts` |
+| `src/sub/order/edit/` | `src/api/order/edit.uts` | `src/sub/login/` | `src/api/login/login.uts` |
 
-- **挂 `pages/` 还是 `sub/` 不影响接口目录名**，一律以页面目录名为准；目录名用 kebab-case（`order-detail`），与页面目录逐字一致；
-- **接口层属于全局层**：组件里一律写 `import { fetchXxxApi } from '@/src/api/<page>/<page>.uts'`，**严禁** `'../../api/<page>/<page>.uts'` 这类相对穿透（哪怕文件结构上够得着，见分册 5 铁律 1）。
+- **TabBar 页与非 TabBar 页共用业务模块时，接口共用同一 `src/api/<module>/`**，不因路由容器不同而复制接口；
+- 目录名使用 kebab-case；接口文件按页面名或稳定接口域命名；
+- **接口层属于全局层**：调用方一律写 `import { fetchXxxApi } from '@/src/api/<module>/<file>.uts'`，**严禁** `'../../api/...'` 这类相对穿透；
+- **精准导入**：不使用 `src/api/<module>/index.uts` 聚合门面。
 
-### 2. 硬门槛：没有配套接口层的新页面，视为未交付
+### 2. 硬门槛：没有接口归属的新页面，视为未交付
 
-- 每新增一个页面，**必须在同一次改动里建出 `src/api/<page>/<page>.uts`**，哪怕当前只有一个接口、只有一屏数据；
+- 每新增一个页面，**必须在同一次改动里接入对应业务模块的接口文件**；已有接口可复用时不得重复建目录；
+- 业务模块首次出现时，建 `src/api/<module>/<module>.uts` 或按页面拆出 `<page>.uts`；
+- 若页面当前没有任何后端数据，接口层可暂不建文件，但不得用 `ref([...])` 伪造业务数据；
 - **严禁**在 `.uvue` 页面或组件里用 `ref([...])` / `reactive({...})` 硬编码假数据，也**严禁**留「等后端接好了再抽接口」的尾巴（届时的改动面会从「一个函数体」膨胀成「整页组件重排」）；
-- **交付前自查判据**：这个页面里每一块将来会由后端下发的数据，都能顺着「页面组件 → `@/src/api/<page>/<page>.uts` 里的某个 `fetchXxxApi()`」找到出处；找不到 ⇒ 接口层没建完。
+- **交付前自查判据**：页面里每一块将来会由后端下发的数据，都能顺着「页面组件 → `@/src/api/<module>/<file>.uts` 里的某个 `fetchXxxApi()`」找到出处；找不到 ⇒ 接口层没建完。
 
-### 3. 目录形态：默认单文件，按页面体量递进拆分
+### 3. 目录形态：按业务模块聚合，按接口域拆分
 
 ```text
-src/api/<page>/
-├── <page>.uts          # ★ 必须：接口函数 + 契约类型 + 模拟数据集（按模块用注释分段）
-└── types.uts           #   仅在类型被多段共用时拆出：只放 type（严禁 interface），不写函数、不写数据
+src/api/<module>/
+├── <module>.uts        # 多个页面共用接口；单页模块默认用此文件
+├── <page>.uts          # 仅某个页面使用的接口
+├── <domain>.uts        # 独立演进的接口域
+└── types.uts           # 仅类型被两个以上文件共用时拆出
 ```
 
 | 形态 | 触发条件 | 目录长什么样 |
 | :--- | :--- | :--- |
-| **形态一：单文件内联**（默认） | 类型只被本模块单一处消费 | 只有 `src/api/<page>/<page>.uts`，类型 / 模拟数据集 / 函数三块按模块分段全在里面，**不建** `types.uts` |
-| **形态二：类型下沉**（可选） | **类型要被多段共用** | `types.uts` 放契约类型，`<page>.uts` 只留接口函数与模拟数据集 |
-| **形态三：按接口域拆兄弟文件** | 同页有多个互不相干的接口域，且各自需要独立演进 | 在 `src/api/<page>/` 下再开 `src/api/<page>/<模块>.uts`，**每个文件自带「类型 + 模拟数据集 + 函数」三块** |
+| **形态一：模块单文件**（默认） | 业务模块只有一个页面，或各页面共用同一组接口 | 只有 `src/api/<module>/<module>.uts`，类型 / 模拟数据集 / 函数三块按接口域分段 |
+| **形态二：按页面拆兄弟文件** | 多个页面各有独立接口，且会独立演进 | `src/api/<module>/<page>.uts`，每个文件自带「类型 + 模拟数据集 + 函数」 |
+| **形态三：类型下沉**（可选） | **类型被两个以上文件共用** | `types.uts` 只放契约类型，其余文件保留接口与数据集 |
 
-- 🚨 **「类型抽不抽」看共用，不看行数**：类型通常只占文件 **0~13%** 行数，把它抽成 `types.uts` **并不减行**（实测 868 行的 `client.uts` 里类型只占 46 行，抽完还剩 822 行）。`types.uts` 的**唯一**触发条件是「类型被多处共用」（含跨 `.ts` / `.uts` 分支共用，见 `SKILL.md` A.2 第 20 条）；文件真的大到读不动时，正确做法是**按接口域拆兄弟文件（形态三）**，不是抽类型；
-- ⚠️ **数据集过大时按接口域拆兄弟文件**（形态三），但**严禁**为了「看起来更整齐」把三个函数拆成三个文件 —— 过度碎裂会让后端契约散落在多个文件里，联调时找不全；
+- 🚨 **「类型抽不抽」看共用，不看行数**：`types.uts` 的唯一触发条件是「类型被两个以上文件共用」（含跨 `.ts` / `.uts` 分支共用，见 `SKILL.md` A.2 第 20 条）；
+- ⚠️ **按页面 / 接口域拆文件，不按单个函数拆**：一个接口域内的类型、数据集、函数保持同文件，避免契约散落；
 - ❌ **旧形态已废弃**：把所有模块的数据集堆进一个共享文件不再使用；模拟数据按模块分段写在 `<page>.uts` 内，过大时按形态三拆兄弟文件。
 
 ### 4. 命名约定（照抄，别自创）
 
 | 对象 | 约定 | 例子 |
 | :--- | :--- | :--- |
-| 页面同名接口文件 | `<页面目录名>.uts` | `src/api/order-detail/order-detail.uts` |
+| 模块同名接口文件 | `<模块目录名>.uts` | `src/api/order/order.uts` |
+| 页面独立接口文件 | `<页面目录名>.uts` | `src/api/order/detail.uts` |
 | 接口函数后缀 | **一律以 `Api` 结尾** | `fetchOrderListApi`、`createOrderApi` |
 | 分页接口函数名 | `fetch<模块><实体>ListApi` | `fetchOrderListApi`、`fetchFollowListApi` |
 | 详情 / 单条接口函数名 | `fetch<实体>DetailApi` / `fetch<实体>ByIdApi` | `fetchQaDetailApi`、`getFooByIdApi` |
 | 写操作函数名 | `create<实体>Api` / `update<实体>Api` / `delete<实体>Api` | `createPostApi`、`updateAddressApi` |
 | 数据集常量名 | `LOCAL_<模块>_<用途>`（`export const`，`Array<XxxItem>` 全量标注） | `LOCAL_WALLPAPERS`、`LOCAL_FOLLOW_POSTS` |
 | DTO 类型名 | `<实体>Item` / `<实体>Detail`（**type，禁 interface**） | `WallpaperItem`、`QaQuestionDetail` |
-| 分页容器 | `PageResult<T>`（收在 `types.uts`，全页共用一份；带页面前缀的 `IndexPageResult<T>` 同样合法，**同一页只用一种**） | `PageResult<WallpaperItem>` |
+| 分页容器 | `PageResult<T>`（收在 `types.uts`，全模块共用一份；带页面前缀的 `IndexPageResult<T>` 同样合法，**同一模块只用一种**） | `PageResult<WallpaperItem>` |
 | 查询参数类型 | `<函数名>Query` 或复用 `<实体>Query` | `OriginalQuery` |
 
 - **分页函数签名统一为 `(pageNo, pageSize, keyword)` 三件套并给默认值**（如 `pageNo: number = 1, pageSize: number = 10, keyword: string = ''`），后端接好后**默认值与入参顺序一个字都不改**（见 6.5）。
@@ -73,11 +80,11 @@ src/api/<page>/
 
 - **一律 `type`，严禁 `interface`**：规避 UTS 对对象字面量赋值的 `UTS110111163` 编译错误（详见分册 1 与 `SKILL.md` A.2 第 1 条）；
 - **空值一律 `null`，严禁 `undefined`**：可选字段写成 `category?: string | null`，不要写 `category?: string | undefined`（规避 `UTS110111119`）；
-- **类型跟着接口走**：后端 DTO 收在 api 层（`<page>.uts` 对应段内，或 `types.uts`）；**页面目录不设 `types.uts`**：页面 / 组件的 UI 类型（分区项、下灌给子视图的展示模型、props 结构）直接写在对应 `.uvue` 的 `script` 里，被同页多个组件共用时放进该组件自己的模块文件，**严禁**从页面目录反向 import 类型进 api 层；
+- **类型跟着接口走**：后端 DTO 收在 api 层（接口文件对应段内，或 `types.uts`）；**页面目录不设 `types.uts`**：页面 / 组件的 UI 类型直接写在对应 `.uvue` 的 `script` 里，被同页多个组件共用时放进该组件自己的模块文件，**严禁**从页面目录反向 import 类型进 api 层；
 - **分页容器只有一份真源**：
 
   ```uts
-  // src/api/<page>/types.uts —— 只含 type 的叶子文件（不写函数、不写数据集）
+  // src/api/<module>/types.uts —— 只含 type 的叶子文件（不写函数、不写数据集）
   export type PageResult<T> = {
     list: Array<T>;
     hasMore: boolean;
@@ -93,16 +100,16 @@ src/api/<page>/
 
 ## 6.3 模拟数据集铁律（按模块独立造数）
 
-- **数据集只在 api 层**：默认内联在 `<page>.uts`，**严禁**出现在 `.uvue` 页面与组件里；
+- **数据集只在 api 层**：默认内联在对应业务模块的接口文件，**严禁**出现在 `.uvue` 页面与组件里；
 - **按模块独立造数，严禁一份数据喂两个模块**：`LOCAL_A_*` 与 `LOCAL_B_*` 各造一份，哪怕结构看着一样；A 段的数组**不得**被 B 段的接口函数取用（分册 5 铁律 4 / 铁律 5）；
-- **数据集与函数同文件时不导出**：只有拆到独立文件时才 `export` `LOCAL_*` 常量给同目录的 `<page>.uts` 取数，且**不得**被另一个模块的数据文件或接口函数引用；
+- **数据集与函数同文件时不导出**：只有拆到独立文件时才 `export` `LOCAL_*` 常量给同目录接口文件取数，且**不得**被另一个业务模块的数据文件或接口函数引用；
 - **函数名与数据集必须一一对应**：`LOCAL_WALLPAPERS` 只服务 `fetchWallpaperListApi`，**严禁**抽一个「通用 `fetchListApi(type)`」让多个模块共用 —— 一旦合并，某天 A 要加分页、B 要加筛选，函数立刻长出 `if (type == 'a')` 分支，模块独立性当场死亡；
 - **模拟实现默认最简**：3 条数据 + 直接返回 + `hasMore` 一行算出来，**不要**写筛选循环、数组切片、分页算法；只有当页面确实要验证分页 / 筛选 / 空态交互时，才把对应逻辑加进模拟实现（模板见 6.9 第 0 节）；
 - **数据集里的字段类型必须与契约类型逐字对齐**：`Array<WallpaperItem>` 全量标注，**严禁**用 `any` 或省略标注去做「先跑通再说」；类型对不上时错在编译期，比运行期崩在真机上好查得多。
 
 ```uts
 // src/api/index/index.uts【壁纸段】—— 数据集只服务壁纸段，禁止被其它模块引用
-import type { WallpaperItem } from '../types.uts';
+import type { WallpaperItem } from './types.uts';
 
 export const LOCAL_WALLPAPERS: Array<WallpaperItem> = [
   { id: 601, title: '球房晨光', url: 'https://img.example.com/601.jpg', category: 'star' }
@@ -209,7 +216,7 @@ export function fetchWallpaperListApi(category: string = 'all', pageNo: number =
 2. **弱类型就地转换**：`UTSJSONObject` → 强类型 DTO 的映射只写在 api 层（见上），**这是页面模板里 `UTS110111163` / `error17` / `ClassCastException` 的根治手段**；
 3. **模拟数据集先留着**：接口刚联调通、后端还在动的时候，`LOCAL_*` 常量与模拟实现不要删（后端挂了可以一行切回来）；等接口验收稳定后再连同常量一起清掉。
 
-页面侧的 import **自始至终是同一行，不区分模拟期与联调期**（L1 容器引函数、L2 私有视图只引类型）：
+页面侧的 import **自始至终是同一行，不区分模拟期与联调期**（根组件 / 模块组件引函数，视图组件只引类型）：
 
 ```uts
 import { fetchWallpaperListApi } from '@/src/api/index/index.uts';
@@ -220,19 +227,19 @@ import type { WallpaperItem } from '@/src/api/index/index.uts';
 
 ## 6.6 新增页面时的接口层产出清单（照序执行）
 
-1. 定页面目录名 → 建 `src/api/<page>/` 目录；
-2. 逐个数清这个页面的**业务模块**，每个模块想好「要哪几个接口」；
-3. 建 `src/api/<page>/<page>.uts`（**必产**），按模块用注释分段，每段写：类型 → 数据集 → 接口函数；模拟实现直接照 **6.9 第 0 节最小模板**，别写复杂分页 / 筛选；
-4. 判断形态：**类型被多段共用** ⇒ 拆 `types.uts`；某个接口域需要独立演进 ⇒ 拆兄弟文件（形态三）。⚠️ **接口文件不设行数上限**，拆分的依据是接口域边界，不是行数；`types.uts` 同理只看是否被多段共用；
+1. 定页面所属业务模块 → 找到或新建 `src/api/<module>/` 目录；
+2. 逐个数清页面内的**业务区块**，每个区块想好「要哪几个接口」；
+3. 新建或复用 `src/api/<module>/<module>.uts`；多个页面各有独立接口时按页面拆 `<page>.uts`，每个文件按接口域分段；
+4. 判断形态：**类型被两个以上文件共用** ⇒ 拆 `types.uts`；某个接口域需要独立演进 ⇒ 拆兄弟文件。⚠️ **接口文件不设行数上限**，拆分依据是接口域边界，不是行数；
 5. 每个接口函数**现在就用 `Promise<T>` 签名**、入参写全（分页三件套给默认值），保证将来只换函数体；
-6. 页面 / 组件里**只**通过 `@/src/api/<page>/<page>.uts` 取数，删掉任何 `ref([...])` 假数据；
+6. 页面 / 组件里**只**通过 `@/src/api/<module>/<file>.uts` 取数，删掉任何 `ref([...])` 假数据；
 7. 接口文件不设行数上限：只有想把某个接口域独立演进时才拆兄弟文件（形态三），**不要**为了整齐而碎裂。
 
 ---
 
 ## 6.7 接口层自检红线清单
 
-- [ ] **1. 新页面必产 `src/api/<page>/<page>.uts`** —— 页面里每块后端数据都能顺到某个 `fetchXxxApi()`，否则视为未交付（6.1）
+- [ ] **1. 新页面必须接入 `src/api/<module>/`** —— 页面里每块后端数据都能顺到某个 `fetchXxxApi()`，否则视为未交付（6.1）
 - [ ] **2. 页面目录下严禁放数据集文件**，`.uvue` 里严禁 `ref([...])` 硬编码假数据（6.1 / 分册 5 铁律 5）
 - [ ] **3. 一律 `type`，严禁 `interface`**；空值一律 `null`，严禁 `undefined`（6.2 / A.2 第 1、2 条）
 - [ ] **4. 严禁 `UTSJSONObject` 出 api 层** —— 弱类型必须在 api 层用 `getString` / `getNumber` + `??` 映射成强类型 DTO 再返回（6.2 / 6.5）
@@ -242,7 +249,7 @@ import type { WallpaperItem } from '@/src/api/index/index.uts';
 - [ ] **8. 严禁自己写 `uni.request`** —— 一律走 `http` 单例 / `http.upload` / `requestStream`（6.4）
 - [ ] **9. 拦截器已处理的错误不要重复处理** —— api 层不写 `uni.showToast`、不判 401、不跳登录页（6.4）
 - [ ] **10. 对接后端只换函数体** —— 函数名 / 入参（含默认值）/ 返回类型一个字不改，模拟数据常量先留着（6.5）
-- [ ] **11. 接口引用一律 `@/src/api/<page>/<page>.uts`** —— 严禁相对路径穿透（6.1 / 分册 5 铁律 1）
+- [ ] **11. 接口引用一律 `@/src/api/<module>/<file>.uts`** —— 严禁相对路径穿透，严禁 `index.uts` 聚合入口（6.1）
 - [ ] **12. 接口文件不按行数拆** —— `src/api/` 下的文件不设行数上限；拆兄弟文件的依据是接口域独立，`types.uts` 的依据是类型被多处共用（6.1）
 - [ ] **13. 函数名以 `Api` 结尾** —— `fetchXxxListApi` / `fetchXxxDetailApi` / `createXxxApi` / `updateXxxApi` / `deleteXxxApi`
 
@@ -264,7 +271,7 @@ Chaser/src/api/
 └── address/ auth/ ball/ cart/ mall/ order-*/ product/ search/ service/ zone/ ...
 ```
 
-**本项目 unibestX 现状**：`src/api/` 下现有 `src/api/example.uts`（216 行，`FooItem` + 分页容器 `PageResult<T>`，含 `http.get` / `http.upload` / `http.downloadFile` 的完整调用示例，可作为**写法参照**）、`src/api/auth/auth.uts`、`src/api/privacy/privacy.uts`；页面级 `src/api/<page>/` 接口目录尚未逐页建立。**从今往后新建的页面一律按本分册直接落位，不再产生页面侧的数据集文件。**
+**本项目 unibestX 现状**：`src/api/` 下现有 `src/api/example.uts`（`FooItem` + 分页容器 `PageResult<T>`，含 `http.get` / `http.upload` / `http.downloadFile` 的完整调用示例，可作为**写法参照**）、`src/api/auth/auth.uts`、`src/api/privacy/privacy.uts`；新接口一律按业务模块落位到 `src/api/<module>/`，不再产生页面侧的数据集文件。
 
 ---
 
@@ -457,11 +464,11 @@ export function fetchAnswerStreamApi(question: string, onChunk: (text: string) =
 
 ### ① 页面里直接 `ref([...])` 假数据
 
-数据必须来自 `src/api/<page>/`，否则后端就绪时改动面爆炸（6.1）。
+数据必须来自 `src/api/<module>/`，否则后端就绪时改动面爆炸（6.1）。
 
-### ② 接口目录名与页面目录不同名
+### ② 按页面机械复制接口目录
 
-`src/sub/order-list/` ⇒ `src/api/order-list/`，逐字对应。
+`src/sub/order/list/` 与 `src/sub/order/detail/` 各自复制一份 `src/api/order-list/`、`src/api/order-detail/`；应统一复用 `src/api/order/`。
 
 ### ③ 用 `interface` 定义 DTO
 
@@ -493,7 +500,7 @@ A 段数据集被 B 段引用，后续 A 加字段 B 静默变形（6.3）。
 
 ### ⑩ 页面目录下放数据集文件
 
-旧形态已废弃；数据集默认内联在 `src/api/<page>/<page>.uts`，过大时才按接口域拆兄弟文件（6.1）。
+旧形态已废弃；数据集默认内联在 `src/api/<module>/<file>.uts`，过大时才按接口域拆兄弟文件（6.1）。
 
 ### ⑪ 自己写 `uni.request`
 
@@ -509,7 +516,7 @@ A 段数据集被 B 段引用，后续 A 加字段 B 静默变形（6.3）。
 
 ### ⑭ 接口函数引用用相对路径
 
-一律 `@/src/api/<page>/<page>.uts`（6.1）。
+一律 `@/src/api/<module>/<file>.uts`（6.1）。
 
 ### ⑮ 上传时 `T` 没显式标注
 
@@ -532,7 +539,7 @@ A 段数据集被 B 段引用，后续 A 加字段 B 静默变形（6.3）。
 | 关业务错误 toast | `extra: { toast: false } as UTSJSONObject` | —— |
 | 流式接口 | `requestStream(options)` | `@/uni_modules/request-bestX/index.uts` |
 | OSS 上传地址 | `getOssUploadUrl()` / `getOssUploadPath()` | `@/src/config/env/env.uts` |
-| 分页容器 | `type PageResult<T> = { list, hasMore, total }` | 本页接口文件 / `types.uts` |
+| 分页容器 | `type PageResult<T> = { list, hasMore, total }` | 本业务模块接口文件 / `types.uts` |
 | 弱类型取值 | `getString` / `getNumber` / `getBoolean` + `??` | `UTSJSONObject` 方法 |
 | 数组取值 | `getArray<T>('list', [] as Array<T>)` | 同上 |
 
@@ -540,8 +547,8 @@ A 段数据集被 B 段引用，后续 A 加字段 B 静默变形（6.3）。
 
 ## 6.12 接口层自检红线清单（补充 6.7）
 
-- [ ] **13. 新建页面同批建接口层** —— 页面里每块后端数据都能顺到某个 `fetchXxxApi()`
-- [ ] **14. 目录名逐字同名** —— `src/api/<page>/<page>.uts`
+- [ ] **13. 新建页面接入业务模块接口** —— 页面里每块后端数据都能顺到某个 `fetchXxxApi()`
+- [ ] **14. 接口按业务模块聚合** —— `src/api/<module>/<file>.uts`
 - [ ] **15. 契约全 `type`** —— 零 `interface`，空值用 `null`
 - [ ] **16. `UTSJSONObject` 不出 api 层** —— 弱类型就地转强类型 DTO
 - [ ] **17. `as` 不写泛型别名** —— 直写 `as PageResult<Item>`
@@ -552,5 +559,5 @@ A 段数据集被 B 段引用，后续 A 加字段 B 静默变形（6.3）。
 - [ ] **22. 分页签名统一** —— `(pageNo = 1, pageSize = 10, keyword = '')`
 - [ ] **23. 接口函数名以 `Api` 结尾** —— `fetchXxxApi` / `createXxxApi` 等，一律带后缀
 - [ ] **24. 接口文件不设行数上限** —— 只在接口域需要独立演进时拆兄弟文件
-- [ ] **24. 引用走别名** —— `@/src/api/<page>/<page>.uts`
-- [ ] **25. 上传 / 流式有显式类型** —— `http.upload<string>`，流式走 `requestStream`
+- [ ] **25. 引用走别名** —— `@/src/api/<module>/<file>.uts`
+- [ ] **26. 上传 / 流式有显式类型** —— `http.upload<string>`，流式走 `requestStream`

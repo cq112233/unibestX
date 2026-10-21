@@ -106,7 +106,13 @@ const raw = route.fullPath;                  // '/src/sub/detail/detail?id=1&tit
 ```uts
 definePage({
   name: 'detail',                                       // → useRoute().name
+  debug: false,
+  debugHome: false,
   layout: 'navbar',                                     // → useRoute().meta['layout']
+  showBack: true,
+  hideStatusBar: false,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
   style: { navigationBarTitleText: '详情页' }            // → useRoute().meta['style']['navigationBarTitleText']
 });
 ```
@@ -220,8 +226,11 @@ import { useRoute } from '@/uni_modules/route-bestX/index.uts';
 
 definePage({
   name: 'detail',
+  debug: false,
+  debugHome: false,
   layout: 'navbar',
   showBack: true,
+  hideStatusBar: false,
   hideNavbar: false,
   enablePullDownRefresh: false,
   style: {
@@ -724,7 +733,7 @@ router.push({ name: 'detail', params: { id: 1 } });
 const url = router.resolve({ path: '/src/sub/detail/detail', query: { id: 1 } });
 ```
 
-> ⚠️ 命名路由的 `name` 来源：`definePage({ name: 'detail' })` 声明优先；未声明时回落到**路径最后一段**（`/src/sub/detail/detail` → `detail`）。所以 `name` 存在同名冲突风险（不同目录同名文件），**跨页面跳转建议用 `path`，`name` 只当便捷写法**。
+> ⚠️ 本项目规范要求每个页面都显式声明唯一的 `definePage({ name: 'detail' })`。运行时虽会回落到**路径最后一段**（`/src/sub/detail/detail` → `detail`），但不同目录可能同名冲突，**禁止依赖该兜底**。跨页面跳转仍建议优先用 `path`，`name` 只当便捷写法。
 
 ---
 
