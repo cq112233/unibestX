@@ -83,12 +83,12 @@ onNavbarPullDownRefresh(() => {
   }
   console.log('我的页面刷新中...');
   setTimeout(() => {
-    // 异步完成时再次门控：刷新期间若已切走则忽略结果
+    stopNavbarPullDownRefresh();
+    // 异步完成时再次门控：刷新期间若已切走则忽略后续业务逻辑
     if (curIdx.value != resolveTabIndexByKey('me')) {
       return;
     }
     console.log('我的页面刷新成功');
-    stopNavbarPullDownRefresh();
   }, 1000);
 });
 
@@ -106,6 +106,7 @@ onMeShow(() => {
 });
 
 onMeHide(() => {
+  stopNavbarPullDownRefresh();
   console.log('onMeHide', '我的 Tab 隐藏了👉');
 });
 

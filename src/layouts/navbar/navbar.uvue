@@ -708,6 +708,7 @@ onPageShow((): void => {
 
 onPageHide((): void => {
   pageActive.value = false;
+  isTriggered.value = false;
 });
 
 // #ifdef H5
@@ -719,8 +720,16 @@ onActivated((): void => {
 
 onDeactivated((): void => {
   pageActive.value = false;
+  isTriggered.value = false;
 });
 // #endif
+
+// 单页 TabBar 切换时，若当前正在下拉刷新，自动复位刷新状态，避免切走后一直转圈
+watch(curIdx, (_newIdx: number): void => {
+  if (isTriggered.value) {
+    isTriggered.value = false;
+  }
+});
 
 // 标题变化（含语言切换、单页 TabBar 切换、动态 setNavbarTitle）时同步页面标题
 watch(displayTitle, (newTitle: string): void => {

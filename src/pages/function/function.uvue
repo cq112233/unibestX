@@ -132,12 +132,12 @@ onNavbarPullDownRefresh(() => {
   }
   console.log('功能页面刷新中...');
   setTimeout(() => {
-    // 异步完成时再次门控：刷新期间若已切走则忽略结果
+    stopNavbarPullDownRefresh();
+    // 异步完成时再次门控：刷新期间若已切走则忽略后续业务逻辑
     if (curIdx.value != resolveTabIndexByKey('function')) {
       return;
     }
     console.log('功能页面刷新成功');
-    stopNavbarPullDownRefresh();
   }, 1000);
 });
 
@@ -155,6 +155,7 @@ onFunctionShow(() => {
 });
 
 onFunctionHide(() => {
+  stopNavbarPullDownRefresh();
   console.log('onFunctionHide', '功能 Tab 隐藏了👉');
 });
 

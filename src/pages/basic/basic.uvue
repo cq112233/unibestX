@@ -124,12 +124,12 @@ onNavbarPullDownRefresh(() => {
   }
   console.log('基础页面刷新中...');
   setTimeout(() => {
-    // 异步完成时再次门控：刷新期间若已切走则忽略结果
+    stopNavbarPullDownRefresh();
+    // 异步完成时再次门控：刷新期间若已切走则忽略后续业务逻辑
     if (curIdx.value != resolveTabIndexByKey('basic')) {
       return;
     }
     console.log('基础页面刷新成功');
-    stopNavbarPullDownRefresh();
   }, 1000);
 });
 
@@ -147,6 +147,7 @@ onBasicShow(() => {
 });
 
 onBasicHide(() => {
+  stopNavbarPullDownRefresh();
   console.log('onBasicHide', '基础 Tab 隐藏了👉');
 });
 

@@ -636,12 +636,12 @@ onNavbarPullDownRefresh(() => {
   }
   console.log('首页刷新中...');
   setTimeout(() => {
-    // 异步完成时再次门控：刷新期间若已切走则忽略结果
+    stopNavbarPullDownRefresh();
+    // 异步完成时再次门控：刷新期间若已切走则忽略后续业务逻辑
     if (curIdx.value != resolveTabIndexByKey('index')) {
       return;
     }
     console.log('首页刷新成功');
-    stopNavbarPullDownRefresh();
   }, 1000);
 });
 
@@ -659,6 +659,7 @@ onIndexShow(() => {
 });
 
 onIndexHide(() => {
+  stopNavbarPullDownRefresh();
   console.log('onIndexHide', '首页隐藏了👉');
 });
 
