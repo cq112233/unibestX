@@ -182,6 +182,13 @@ function sendMessage() {
 
 onAiLoad(() => {
   console.log('onAiLoad', 'AI 页面挂载了👋', aiRoute.value.fullPath);
+  // 初始问候语
+  messages.value.push({
+    id: 'welcome',
+    sender: 'ai',
+    content: '你好！我是 unibestX 体验助理，已就绪为您解答问题。',
+    time: getCurrentTime()
+  } as ChatMessage);
 });
 
 onAiShow(() => {
@@ -190,16 +197,6 @@ onAiShow(() => {
 
 onAiHide(() => {
   console.log('onAiHide', 'AI 页面隐藏了👉');
-});
-
-onMounted(() => {
-  // 初始问候语
-  messages.value.push({
-    id: 'welcome',
-    sender: 'ai',
-    content: '你好！我是 unibestX 体验助理，已就绪为您解答问题。',
-    time: getCurrentTime()
-  } as ChatMessage);
 });
 </script>
 
