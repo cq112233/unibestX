@@ -1,0 +1,115 @@
+import { parseUrlToObj } from '@/uni_modules/route-bestX/index.uts';
+import { cleanPath } from './path.uts';
+
+/**
+ * 模式 4 的 Tab 导航上下文。
+ *
+ * 它不是权限模型，只描述一次虚拟 Tab 切换的路由事实，供业务执行前置操作。
+ */
+export type TabNavigationContext = {
+  /** 来源 Tab 的完整 URL；没有来源时为 '' */
+  from: string;
+  /** 来源 Tab 的 path，不含 query */
+  fromPath: string;
+  /** 目标 Tab 的完整 URL */
+  to: string;
+  /** 目标 Tab 的 path，不含 query */
+  toPath: string;
+  /** 目标 URL 的 query（值已解码） */
+  query: Map<string, string>;
+  /** 触发来源：tabClick / router / hostQuery / switchTabbar */
+  api: string;
+};
+
+/** 前置操作完成后调用；true 放行切换，false 取消切换 */
+export type TabNavigationNext = (allowed: boolean) => void;
+
+/** Tab 导航前置钩子；支持同步或异步操作，完成后必须调用 next */
+export type TabNavigationGuard = (context: TabNavigationContext, next: TabNavigationNext) => void;
+
+let tabNavigationGuard: TabNavigationGuard | null = null;
+
+/** 每次新导航递增；异步操作完成时若已开始下一次导航，旧结果自动失效 */
+let navigationSequence: number = 0;
+
+/** 注册 Tab 导航前置钩子；传 null 可移除 */
+export function registerTabNavigationGuard(guard: TabNavigationGuard | null): void {
+  tabNavigationGuard = guard;
+}
+
+/** 保证非空 URL 带前导斜杠 */
+function normalizeUrl(url: string): string {
+  if (url.length == 0) {
+    return '';
+  }
+  if (url.startsWith('src/')) {
+    return `/${url}`;
+  }
+  return url.startsWith('/') ? url : `/${url}`;
+}
+
+/** 构造一次 Tab 导航的上下文事实 */
+export function createTabNavigationContext(fromUrl: string, toUrl: string, api: string): TabNavigationContext {
+  const from = normalizeUrl(fromUrl);
+  const to = normalizeUrl(toUrl);
+  const parsed = parseUrlToObj(to);
+  return {
+    from,
+    fromPath: from.length > 0 ? cleanPath(from) : '',
+    to,
+    toPath: parsed.path,
+    query: parsed.query,
+    api
+  } as TabNavigationContext;
+}
+
+/**
+ * 执行 Tab 导航前置钩子。
+ *
+ * - 未注册钩子时同步放行；
+ * - 钩子可同步调用 next，也可在请求等异步操作完成后调用 next；
+ * - 同一次切换中重复调用 next 只生效一次；
+ * - 用户已发起下一次 Tab 切换时，前一次异步结果会被忽略。
+ *
+ * @param fromUrl 来源 Tab 完整 URL
+ * @param toUrl 目标 Tab 完整 URL
+ * @param api 触发来源
+ * @param onComplete 放行 / 取消后的回调
+ */
+export function runTabNavigationGuard(
+  fromUrl: string,
+  toUrl: string,
+  api: string,
+  onComplete: (allowed: boolean) => void
+): void {
+  const context = createTabNavigationContext(fromUrl, toUrl, api);
+  const guard = tabNavigationGuard;
+  navigationSequence++;
+  const currentSequence = navigationSequence;
+  let settled: boolean = false;
+
+  // 必须用 lambda 而不是局部函数：UTS/Kotlin 中局部函数不能作为值传递。
+  const finish: TabNavigationNext = (allowed: boolean): void => {
+    if (settled) {
+      return;
+    }
+    settled = true;
+    if (currentSequence != navigationSequence) {
+      return;
+    }
+    onComplete(allowed);
+  };
+
+  if (guard == null) {
+    finish(true);
+    return;
+  }
+
+  try {
+    guard!(context, finish);
+  }
+  catch (err: any) {
+    console.error('[tabbar] Tab 导航前置钩子执行异常:', err);
+    finish(false);
+  }
+}

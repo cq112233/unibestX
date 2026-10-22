@@ -8,12 +8,12 @@
   4. 实现全端保活机制（移出视口 + visibility），并解决微信小程序与原生端切 Tab 时下拉刷新卡死问题。
 -->
 <template>
-  <!-- 根视图容器：当该 Tab 首次被激活并完成初始渲染后常驻保活，非激活状态通过 rootStyle 移出视口 -->
+  <!-- 根视图容器：当该 Tab 首次被激活并完成初始渲染后常驻保活，非激活状态通过 transform 移出视口 -->
   <view
     v-if="hasRendered"
-    :style="rootStyle"
+    :style="customPageStyle"
     class="tab-content-wrapper"
-    :class="customPageClass"
+    :class="[customPageClass, { 'tab-content-wrapper--active': isActive }]"
   >
     <!--
       纵向滚动容器：各 Tab 独立拥有独立的滚动区域
@@ -52,7 +52,7 @@
           <view class="wechat-pull-dot wechat-pull-dot--3"></view>
         </view>
       </view>
-      <!-- 插槽：放置对应 Tab 的具体业务视图组件（如 IndexView、BasicView 等） -->
+      <!-- 插槽：放置对应 Tab 的页面内容（宿主页为 #tabHost，普通 Tab 直接复用页面 .uvue） -->
       <slot />
 
       <!-- 底部 TabBar 统一占位垫高组件：根据 VITE_TABBAR_MODE、风格形态及安全区动态计算高度 -->
@@ -76,7 +76,7 @@
       @scroll="handleScroll"
       @scrolltolower="handleScrollToLower"
     >
-      <!-- 插槽：放置对应 Tab 的具体业务视图组件（如 IndexView、BasicView 等） -->
+      <!-- 插槽：放置对应 Tab 的页面内容（宿主页为 #tabHost，普通 Tab 直接复用页面 .uvue） -->
       <slot />
 
       <!-- 底部 TabBar 统一占位垫高组件：根据 VITE_TABBAR_MODE、风格形态及安全区动态计算高度 -->
@@ -87,14 +87,15 @@
 
 <script setup lang="uts">
 import { computed, onMounted, onUnmounted, provide, ref, watch } from 'vue';
-import { useTabbar, useTabbarI18n, useTabbarTheme } from '@/src/tabbar/index.uts';
+import { useTabbar, useTabbarI18n, useTabbarPage, useTabbarTheme } from '@/src/tabbar/index.uts';
 import TabbarPlaceholder from './TabbarPlaceholder.uvue';
 import { isMpAlipay } from '@/src/tabbar/adapters/platform.uts';
 import {
   isPageRefresherDisabled,
   isPageScrollDisabled,
-  setHideNavbar,
-  setHideStatusBar,
+  setTabbarHideNavbar,
+  setTabbarHideStatusBar,
+  setTabbarShowBack,
   stopNavbarPullDownRefresh
 } from '@/src/tabbar/adapters/navbar.uts';
 
@@ -122,6 +123,11 @@ const props = defineProps({
     type: Boolean,
     default: false
   },
+  /** 当前 Tab 的导航栏左侧是否显示返回按钮（由页面 definePage.showBack 同步） */
+  showBack: {
+    type: Boolean,
+    default: true
+  },
   /** 当前 Tab 是否启用自定义下拉刷新（默认 true） */
   enablePullDownRefresh: {
     type: Boolean,
@@ -145,15 +151,17 @@ const { activeTabTitle, curIdx } = useTabbar();
 const { formatTabbarText } = useTabbarI18n();
 /** 下拉刷新等区域使用的主题令牌 */
 const { themeTokens } = useTabbarTheme();
+/** 宿主页面可见性：进入普通子页面时后台 Tab 不得再同步导航栏全局状态 */
+const { isPageVisible } = useTabbarPage();
 
 // ==========================================
 // 2. Tab 核心状态与激活控制
 // ==========================================
-/** 当前 Tab 是否已挂载渲染（按需懒渲染，首次点击激活后即常驻保活，避免重复销毁重挂载开销） */
-const hasRendered = ref(false);
-
 /** 计算当前 Tab 是否正处于激活显示状态 */
 const isActive = computed<boolean>((): boolean => curIdx.value == props.contentIndex);
+
+/** 当前 Tab 是否已挂载渲染（外层已做懒挂载，首次创建时直接渲染，避免多一帧空白） */
+const hasRendered = ref(isActive.value);
 
 /** 标题与显隐相关的响应式计算属性（用于 watch 深度监听变更，支持多语言响应式联动） */
 const contentTitle = computed((): string => {
@@ -162,9 +170,6 @@ const contentTitle = computed((): string => {
   }
   return '';
 });
-const shouldHideNavbar = computed((): boolean => props.hideNavbar);
-const shouldHideStatusBar = computed((): boolean => props.hideStatusBar);
-
 /**
  * 向下跨层级注入当前 Tab 激活状态：
  * 供子组件内使用的 fixed 定位元素通过 inject('isTabActive') 配合 v-if 彻底在切走时销毁，
@@ -172,23 +177,15 @@ const shouldHideStatusBar = computed((): boolean => props.hideStatusBar);
  */
 provide('isTabActive', isActive);
 
+/**
+ * 向当前 Tab 的业务视图注入完整 tabbarList 下标。
+ * useTabPage() 依赖它识别“我是哪个 Tab”，业务视图不需要手写 tabType / pagePath。
+ */
+provide('tabPageIndex', props.contentIndex);
+
 // ==========================================
 // 3. 样式布局
 // ==========================================
-
-/**
- * 根节点行内样式：
- * 非激活 Tab 采用「left: -9999px + visibility: hidden」移出可视区域方案；
- * 相比直接 v-if 销毁或 display: none，能完美保证 Tab 视图层 DOM 与滚动状态全端常驻保活，0ms 丝滑秒切；
- * 并融合当前 Tab 页面自定义行内样式（customPageStyle）。
- */
-const rootStyle = computed((): string => {
-  let s = isActive.value ? 'left: 0px; visibility: visible;' : 'left: -9999px; visibility: hidden;';
-  if (props.customPageStyle.length > 0) {
-    s += (s.endsWith(';') ? ' ' : '; ') + props.customPageStyle;
-  }
-  return s;
-});
 
 // ==========================================
 // 4. 下拉刷新状态机与 Tab 切换容灾
@@ -213,7 +210,7 @@ let lastTabSwitchTime: number = 0;
  * 当前 Tab 是否允许下拉刷新：
  * ⚠️ 极其关键设计：此处严禁绑定 isActive！
  * 若切走 Tab 时将 enabled 动态变为 false，原生端与小程序会直接冻结正在运行的状态机，
- * 导致切回时永久卡在转圈中；保持 enabled 稳定，依靠 left: -9999px 防误触即可。
+ * 导致切回时永久卡在转圈中；保持 enabled 稳定，依靠位移与 visibility 防误触即可。
  */
 const isRefresherEnabled = computed<boolean>((): boolean => {
   return props.enablePullDownRefresh && !isPageScrollDisabled.value && !isPageRefresherDisabled.value;
@@ -338,9 +335,13 @@ function updateNavbarTitle(): void {
  * 完整同步当前 Tab 的导航栏标题、状态栏与导航栏显隐配置
  */
 function syncNavbarState(): void {
+  if (!isActive.value || !isPageVisible.value) {
+    return;
+  }
   updateNavbarTitle();
-  setHideNavbar(props.hideNavbar);
-  setHideStatusBar(props.hideStatusBar);
+  setTabbarHideNavbar(props.hideNavbar);
+  setTabbarHideStatusBar(props.hideStatusBar);
+  setTabbarShowBack(props.showBack);
 }
 
 // ==========================================
@@ -429,18 +430,37 @@ watch(contentTitle, (_newTitle: string) => {
 /**
  * 监听导航栏显隐动态变化
  */
-watch(shouldHideNavbar, (newVal: boolean) => {
-  if (isActive.value) {
-    setHideNavbar(newVal);
+watch((): boolean => props.hideNavbar, (newVal: boolean) => {
+  if (isActive.value && isPageVisible.value) {
+    setTabbarHideNavbar(newVal);
   }
 });
 
 /**
  * 监听状态栏显隐动态变化
  */
-watch(shouldHideStatusBar, (newVal: boolean) => {
-  if (isActive.value) {
-    setHideStatusBar(newVal);
+watch((): boolean => props.hideStatusBar, (newVal: boolean) => {
+  if (isActive.value && isPageVisible.value) {
+    setTabbarHideStatusBar(newVal);
+  }
+});
+
+/**
+ * 监听当前 Tab 的返回按钮配置变化
+ */
+watch((): boolean => props.showBack, (newVal: boolean) => {
+  if (isActive.value && isPageVisible.value) {
+    setTabbarShowBack(newVal);
+  }
+});
+
+/**
+ * 从普通子页面返回宿主页时，恢复当前 Tab 的导航栏配置。
+ * HMR 可能发生在子页面停留期间，此时后台 Tab 的同步会被 isPageVisible 拦截。
+ */
+watch(isPageVisible, (visible: boolean) => {
+  if (visible) {
+    syncNavbarState();
   }
 });
 
@@ -467,13 +487,30 @@ defineExpose({
 </script>
 
 <style lang="scss" scoped>
-/* Tab 视图绝对定位铺满容器，配合 left: -9999px 实现无感后台保活 */
+/* Tab 视图绝对定位铺满容器；非激活时只做合成层位移，避免 left 变化触发原生重新排版 */
 .tab-content-wrapper {
   position: absolute;
   top: 0;
+  left: 0;
   flex-direction: column;
   width: 100%;
   height: 100%;
+  visibility: hidden;
+  transform: translateX(-100%);
+  pointer-events: none;
+  /* #ifdef H5 */
+  contain: layout style;
+  content-visibility: hidden;
+  /* #endif */
+}
+
+.tab-content-wrapper--active {
+  visibility: visible;
+  transform: translateX(0%);
+  pointer-events: auto;
+  /* #ifdef H5 */
+  content-visibility: visible;
+  /* #endif */
 }
 
 .tab-content-scroll {

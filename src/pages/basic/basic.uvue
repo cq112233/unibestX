@@ -1,16 +1,100 @@
 <template>
-  <BasicView />
+  <view class="flex-col p-[16px]">
+    <!-- 顶部开发指引提示（正式业务可直接移除） -->
+    <view class="rounded-[12px] p-[12px] mb-[16px] bg-[#eff6ff] border-[1px] border-solid border-[#bfdbfe] flex flex-row items-start">
+      <text class="text-[14px] mr-[6px]">💡</text>
+      <view class="flex-1 flex flex-col">
+        <text class="text-[13px] font-bold text-[#1d4ed8] mb-[2px]">开发指引（可删除）：</text>
+        <text class="text-[12px] leading-[18px] text-[#2563eb]">
+          本页面所有卡片均为 unibestX 基础能力演示 Demo。开发正式业务时，可直接删除本列表与对应的 /src/sub/*BasicDemo 分包目录。
+        </text>
+        <text class="text-[12px] leading-[18px] mt-[2px] text-[#2563eb]">
+          也可执行下方命令一键清除全部 Demo 内容（含演示页面目录、分包路由与各 Tab 页的卡片列表），加 -- --dry-run 可先预览删除范围。
+        </text>
+        <!-- 一键清除 Demo 命令（点击复制，样式对齐首页 CLI 命令块） -->
+        <view
+          class="mt-[8px] px-[10px] py-[8px] rounded-[6px] bg-[#0f172a] flex flex-row items-center justify-between active:opacity-90"
+          @click="copyCleanDemoCommand"
+        >
+          <text class="text-[11px] text-[#38bdf8] flex-1" style="font-family: monospace;">
+            pnpm clean:demo
+          </text>
+          <text class="text-[10px] text-[#94a3b8] ml-[8px]">
+            点击复制
+          </text>
+        </view>
+      </view>
+    </view>
+    <!-- 基础能力演示列表（Card + 一行描述 + sub路径展示 + 原生按钮跳转） -->
+    <view
+      v-for="item in demoList"
+      :key="item.id"
+      class="rounded-[16px] p-[20px] mb-[16px] border-[1px] border-solid border-[#edf2f7] bg-[#ffffff]"
+    >
+      <!-- 标题区域 -->
+      <view class="flex flex-row items-center justify-between mb-[12px]">
+        <view class="flex flex-row items-center flex-1">
+          <view
+            class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#3b82f6]"
+          />
+          <text class="text-[16px] font-bold text-[#2d3748]">
+            {{ item.title }}
+          </text>
+        </view>
+        <!-- 可删除标识 -->
+        <view class="px-[6px] py-[2px] rounded-[4px] bg-[#fef2f2] border-[1px] border-solid border-[#fee2e2]">
+          <text class="text-[11px] font-medium text-[#ef4444]">
+            可删除 Demo
+          </text>
+        </view>
+      </view>
+
+      <!-- 一行功能描述 -->
+      <view class="flex-col mb-[12px]">
+        <text
+          class="text-[13px] leading-[18px] text-[#64748b]"
+        >
+          {{ item.desc }}
+        </text>
+      </view>
+
+      <!-- 对应 sub 路径及删除指引 -->
+      <view class="p-[10px] rounded-[8px] bg-[#f8fafc] border-[1px] border-solid border-[#e2e8f0] mb-[16px]">
+        <view class="flex flex-row items-center mb-[4px]">
+          <text class="text-[11px] font-bold text-[#475569] mr-[6px]">
+            对应 sub 路径:
+          </text>
+          <text class="text-[11px] text-[#2563eb]" style="font-family: monospace;">
+            {{ item.path }}
+          </text>
+        </view>
+        <text class="text-[11px] leading-[16px] text-[#94a3b8]">
+          提示：正式业务开发时，可删除此卡片及对应的 sub 演示目录与 pages.json 路由。
+        </text>
+      </view>
+
+      <!-- 跳转按钮 -->
+      <view
+        class="w-full h-[42px] flex flex-row items-center justify-center rounded-[8px] bg-[#3b82f6] active:opacity-90"
+        @click="navigateToDemo(item.path)"
+      >
+        <text class="text-[#ffffff] text-[14px] font-bold">
+          {{ item.btnText }}
+        </text>
+      </view>
+    </view>
+  </view>
 </template>
 
 <script setup lang="uts">
-import BasicView from './views/BasicView.uvue';
-import { useBackPressExit } from '@/src/hooks/useBackPressExit.uts';
-import { notifyPageHide, notifyPageShow, setCurIdxByKey } from '@/src/tabbar/index.uts';
+import { curIdx, resolveTabIndexByKey, useTabPage, useTabPageShell } from '@/src/tabbar/index.uts';
+import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/layouts/navbar/utils/index.uts';
+import { useRouter } from '@/uni_modules/route-bestX/index.uts';
 
 definePage({
   debug: false,
   layout: 'navbar',
-  showBack: false,
+  showBack: true,
   enablePullDownRefresh: true,
   hideStatusBar: false,
   hideNavbar: false,
@@ -20,18 +104,165 @@ definePage({
   }
 });
 
-// 独立页面模式下，切到当前基础页时同步当前 Tab 激活索引并通知页面可见
-onShow(() => {
-  setCurIdxByKey('basic');
-  notifyPageShow();
+// 页面文件同时可作为模式 4 的 Tab 子页使用：嵌套时由 useTabPage() 接管页面生命周期
+useTabPageShell('basic');
+
+const {
+  route: basicRoute,
+  onLoad: onBasicLoad,
+  onShow: onBasicShow,
+  onHide: onBasicHide
+} = useTabPage();
+
+const router = useRouter();
+
+// 监听 navbar 自定义下拉刷新事件
+onNavbarPullDownRefresh(() => {
+  // 所有已挂载 Tab 都会收到全局刷新事件，只处理当前激活的基础页
+  if (curIdx.value != resolveTabIndexByKey('basic')) {
+    return;
+  }
+  console.log('基础页面刷新中...');
+  setTimeout(() => {
+    stopNavbarPullDownRefresh();
+    // 异步完成时再次门控：刷新期间若已切走则忽略后续业务逻辑
+    if (curIdx.value != resolveTabIndexByKey('basic')) {
+      return;
+    }
+    console.log('基础页面刷新成功');
+  }, 1000);
 });
 
-onHide(() => {
-  notifyPageHide();
+// 与普通页面一致的首次进入 / 显示 / 隐藏生命周期
+onBasicLoad(() => {
+  // 💡 模式4的映射关系中，/basic.uvue 映射到的实际页面路由是/tab/index，这是因为tabbar/index.uts中定义了映射关系
+  // 💡 模式4 useRoute 获取的还是index的
+  // 🔔 模式4，tabbar切换时，不会走beforeEach，因为是index，是根容器, 如需拦截请自行处理src/tabbar/adapters/tab-navigation.uts，一般业务用不动，无需修改
+  console.log('基础页面路径', basicRoute.value.fullPath);
+  console.log('onBasicLoad', '基础 Tab 挂载了👋');
 });
 
-// Android 物理返回键：再按一次退出应用
-useBackPressExit();
+onBasicShow(() => {
+  console.log('onBasicShow', '基础 Tab 显示了👀');
+});
+
+onBasicHide(() => {
+  stopNavbarPullDownRefresh();
+  console.log('onBasicHide', '基础 Tab 隐藏了👉');
+});
+
+// =========================================================================
+// 【可选删除】以下数据与方法仅供脚手架基础功能演示使用。
+// 接入真实业务时可整段删除，并同步清理对应 sub 分包与 pages.json 路由：
+// - modal:       /src/sub/modalBasicDemo/
+// - layout:      /src/sub/layoutBasicDemo/
+// - tailwindcss: /src/sub/tailwindcssBasicDemo/
+// - theme:       /src/sub/themeBasicDemo/
+// - router:      /src/sub/routerBasicDemo/
+// - permission:  /src/sub/permissionDemo/
+// - lang:        /src/sub/langBasicDemo/
+// - font:        /src/sub/fontBasicDemo/
+// - icon:        /src/sub/iconBasicDemo/
+// - http:        /src/sub/httpBasicDemo/
+// =========================================================================
+type BasicDemoItem = {
+  id: string;
+  title: string;
+  desc: string;
+  btnText: string;
+  path: string;
+};
+
+const demoList: Array<BasicDemoItem> = [
+  {
+    id: 'modal',
+    title: '全屏弹窗与遮罩',
+    desc: '演示全屏遮罩弹窗、覆盖原生 TabBar 穿透及层级管理。',
+    btnText: '进入全屏弹窗与遮罩功能',
+    path: '/src/sub/modalBasicDemo/modalBasicDemo'
+  },
+  {
+    id: 'layout',
+    title: '页面布局骨架',
+    desc: '演示 navbar 与 default 布局下滚动容器与可用高度规范。',
+    btnText: '进入页面布局骨架功能',
+    path: '/src/sub/layoutBasicDemo/layoutBasicDemo'
+  },
+  {
+    id: 'tailwindcss',
+    title: 'Tailwind CSS 样式',
+    desc: '演示 weapp-tailwindcss v4 原子化类名、动态主题与样式规范。',
+    btnText: '进入 Tailwind CSS 样式功能',
+    path: '/src/sub/tailwindcssBasicDemo/tailwindcssBasicDemo'
+  },
+  {
+    id: 'theme',
+    title: '主题换肤与暗黑模式',
+    desc: '演示主题主色调切换、跟随系统外观及暗黑模式实时响应。',
+    btnText: '进入主题换肤与暗黑模式功能',
+    path: '/src/sub/themeBasicDemo/themeBasicDemo'
+  },
+  {
+    id: 'router',
+    title: '路由 hooks 与路由拦截',
+    desc: '演示 useRoute / useRouter 组合式用法、导航方法、跨页传参与登录拦截。',
+    btnText: '进入路由 hooks 与路由拦截功能',
+    path: '/src/sub/routerBasicDemo/routerBasicDemo'
+  },
+  {
+    id: 'permission',
+    title: '页面与按钮权限',
+    desc: '用户信息直接返回权限结果，页面入口和操作按钮没有权限就不渲染。',
+    btnText: '进入页面与按钮权限演示',
+    path: '/src/sub/permissionDemo/permissionDemo'
+  },
+  {
+    id: 'lang',
+    title: 'i18n 多语言国际化',
+    desc: '演示基于 vue-i18n 的中英文多语言即时动态切换。',
+    btnText: '进入 i18n 多语言国际化功能',
+    path: '/src/sub/langBasicDemo/langBasicDemo'
+  },
+  {
+    id: 'font',
+    title: '字体族与字号调节',
+    desc: '演示跨端字体族规约与多级动态字号调节渲染。',
+    btnText: '进入字体族与字号调节功能',
+    path: '/src/sub/fontBasicDemo/fontBasicDemo'
+  },
+  {
+    id: 'icon',
+    title: '通用图标库集成',
+    desc: '演示 easycom 图标库自动化导入、彩色图标与状态绑定。',
+    btnText: '进入通用图标库集成功能',
+    path: '/src/sub/iconBasicDemo/iconBasicDemo'
+  },
+  {
+    id: 'http',
+    title: 'HTTP 网络请求',
+    desc: '基于原生 uni.request 封装，包含 Mock、真实接口与文件上传。',
+    btnText: '进入 HTTP 网络请求功能',
+    path: '/src/sub/httpBasicDemo/httpBasicDemo'
+  }
+];
+
+function navigateToDemo(url: string): void {
+  router.push(url);
+}
+
+// 复制一键清除 Demo 命令
+function copyCleanDemoCommand(): void {
+  uni.setClipboardData({
+    data: 'pnpm clean:demo',
+    success: () => {
+      uni.showToast({
+        title: '已复制清除命令',
+        icon: 'success'
+      });
+    }
+  });
+}
+// =================== 【可选删除】基础演示 Demo 数据与跳转方法 结束 ===================
 </script>
 
-<style></style>
+<style scoped></style>

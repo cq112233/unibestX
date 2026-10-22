@@ -1,8 +1,17 @@
 import type { TabBarConfig } from './core/types.uts';
 
 /**
- * Tabbar 对象完整配置（完全对齐 uni-app 官方 pages.json tabBar 节点规范）
+ * =========================================================================
+ * 🌟 TabBar 核心对象配置（完全对齐 uni-app 官方 pages.json tabBar 节点规范）
  * 包含 color、selectedColor、backgroundColor、borderStyle、midButton 以及 list 列表等
+ * -------------------------------------------------------------------------
+ * ⚡【自动生成 Tab 页面提示】：
+ * 当你在下方的 `list` 列表或 `midButton` 中配置新增了尚不存在的 Tab 页面时
+ * （例如新增项指定了 `pagePath: 'src/pages/ai/ai'` 但该目录与 `.uvue` 页面尚未创建），
+ * Vite 构建插件会自动检测并自动为你生成规范的 Tab 页面脚手架模板！
+ * 包含：`definePage`、`useTabPage`、`useTabPageShell` 接入与完整生命周期，
+ * 无需手动建立目录与重复手写模板代码，保存配置后即可直接运行！
+ * =========================================================================
  */
 export const customTabbarConfig: TabBarConfig = {
   /**

@@ -14,8 +14,9 @@
 src/tabbar/config.uts        ← 你改这里（唯一真源）
         │
         ├──► plugins/vite-plugin-tabbar-views.ts   （构建期：解析配置 → 生成代码）
-        │        ├─ 自动补全 src/pages/<tab>/views/<Xxx>View.uvue 脚手架
         │        ├─ 自动生成 src/tabbar/components/TabViews.uvue（单页模式的调度容器）
+        │        ├─ 普通 Tab 直接复用各自的页面 .uvue，不再生成 views/*View.uvue
+        │        ├─ 宿主页（默认 src/pages/index/index）通过 #tabHost slot 注入，避免自引用
         │        └─ 从各 Tab 页面的 definePage 同步 title / hideNavbar / 下拉刷新等
         │
         └──► src/tabbar/core/*            （运行时：状态、切换、生命周期、尺寸）
@@ -43,6 +44,7 @@ src/tabbar/
 │   ├── state.uts                 #   tabbarList / curIdx / onTabShow / 角标 / 路径判断
 │   ├── strategy.uts              #   五种模式解析 + 各模式开关量
 │   ├── navigate.uts              #   switchTabbar() / handleTabbarClick() / 原生鼓包事件
+│   ├── tab-navigation.uts        #   Tab 切换前置钩子（来源上下文 / 同步或异步放行）
 │   ├── lifecycle.uts             #   onTabPageShow() / 页面可见性通知
 │   ├── metrics.uts               #   TabBar 高度、安全区、底部预留内边距
 │   ├── tab-key.uts               #   业务标识(tabType) ⇄ 下标 的解析
@@ -53,16 +55,20 @@ src/tabbar/
 │   ├── theme.uts                 #   明暗主题色
 │   ├── i18n.uts                  #   Tab 文案国际化
 │   ├── navbar.uts                #   navbar 显隐 / 下拉刷新桥接
+│   ├── tab-navigation.uts        #   Tab 切换前置处理入口（第三方接入 / 数据预取）
 │   ├── platform.uts              #   H5 / 支付宝小程序等平台判断
 │   └── system.uts                #   安全区与系统尺寸
 ├── hooks/                        # 组合式 API（业务侧推荐入口）
 │   ├── useTabbar.uts             #   全局状态、模式与导航动作
 │   ├── useTabbarPage.uts         #   onTabShow / onTabPageShow / 页面可见性
+│   ├── useTabPage.uts            #   模式 4：当前 Tab 的虚拟路由与页面生命周期
+│   ├── useTabPageShell.uts       #   页面文件双身份适配（真实页面 / Tab 子页）
 │   ├── useTabbarTheme.uts        #   明暗主题令牌
 │   ├── useTabbarMetrics.uts      #   高度、安全区与底部预留
 │   └── useTabbarI18n.uts         #   文案国际化与原生 TabBar 同步
 ├── components/
 │   ├── TabViews.uvue             # ⚠️ 构建期自动生成（单页模式的 Tab 调度容器），勿手改
+│   ├── TabPageHost.uvue          #   模式 4 宿主页壳：挂载 TabViews / Tabbar，普通模式直接透传内容
 │   ├── TabContent.uvue           #   单个 Tab 的容器（负责页面配置与下拉刷新包裹）
 │   └── TabbarPlaceholder.uvue    #   占位（配合 navbar 布局预留高度）
 └── ui/
@@ -107,14 +113,17 @@ src/tabbar/
    }
    ```
 
-2. 保存。插件会自动为该 `pagePath` 生成页面目录下的 `views/<Xxx>View.uvue` 脚手架（若还没有），并重新生成 [components/TabViews.uvue](components/TabViews.uvue)。
-3. 直接在生成的 `views/*View.uvue` 里写业务代码——**不用手写路由容器，也不用在任何地方注册**。
+2. 保存。插件会先检查 `pagePath` 对应的 `.uvue` 是否存在：缺失时按内置模板自动补建，随后重新生成 [components/TabViews.uvue](components/TabViews.uvue)。页面名取自 `pagePath` 最后一段，`tabType` 会自动写入 `useTabPageShell()` 与下拉刷新门控。
+3. 直接在页面 `.uvue` 里写业务内容。模式 4 下同一个文件既是真实页面，也是 Tab 子组件，不再维护 `views/*View.uvue`。
+4. 页面需要模式 4 的虚拟路由 / 生命周期时调用 `useTabPage()`；需要同时兼容真实页面与 Tab 子页身份时，再调用 `useTabPageShell('该 Tab 的 tabType')`。
 
 > 💡 **`tabType` 是业务标识**，供 `onTabShow('index', ...)` 这类订阅使用。它不随 `list` 顺序调整（增删 Tab、插 `midButton`）而失效，比写下标稳。建议全小写、全列表唯一；不配则回退 `tab-${下标}`。
+>
+> 🧹 **删除 Tab 不会删除页面文件**：自动补建只处理“缺失的文件”，不会覆盖已有页面，也不会因为从 `config.uts` 删除某一项而清理对应 `.uvue`。如需关闭自动补建，可在 `tabbarViewsPlugin` 配置中设置 `autoCreatePage: false`。
 
 ### 2. 中间鼓包按钮 `midButton`
 
-`config.uts` 里那段 `midButton` 默认是**注释掉的**——解开注释即启用，插件会自动把它按居中位置插进列表并生成对应视图组件；再注释掉即停用。
+`config.uts` 里那段 `midButton` 默认是**注释掉的**——解开注释即启用，插件会自动把它按居中位置插进列表并直接挂载对应页面；再注释掉即停用。
 
 **插件的注释处理**：解析前会剥掉 `//` 行注释与 `/* */` 块注释，所以**用注释来启停 `midButton` 是官方支持的写法**，不会污染生成的代码。
 
@@ -136,11 +145,13 @@ src/tabbar/
 | `1` | 原生 TabBar | ✅ | `uni.switchTab` | 生成原生 `tabBar` 节点，由框架渲染 |
 | `2` | 自定义 TabBar（带原生底座） | ✅ | `uni.switchTab` | 生成 `tabBar: { custom: true }`（原生被隐藏），[App.ku.uvue](../../App.ku.uvue) 渲染自定义 UI |
 | `3` | 纯自定义 TabBar | ❌ 每次重载 | `uni.redirectTo` | **无 `tabBar` 节点**，[App.ku.uvue](../../App.ku.uvue) 渲染 |
-| `4` | 单页容器 TabBar | ✅ 天然保活、零闪烁 | 切容器内索引，**不跳路由** | **无 `tabBar` 节点**，[src/pages/index/index.uvue](../pages/index/index.uvue) 渲染 |
+| `4` | 单页容器 TabBar | ✅ 天然保活、零闪烁 | 切容器内索引，**不跳路由** | **无 `tabBar` 节点，且仅宿主页注册真实路由**，[src/pages/index/index.uvue](../pages/index/index.uvue) 渲染 |
 
 本项目默认 `4`。模式解析在 [core/strategy.uts](core/strategy.uts)，业务侧判断当前模式用导出的 `isSinglePageTabbar` / `isNativeTabbar` / `customTabbarEnable` / `needTabbarBottomPadding`。模式 1 / 2 的 `tabBar` 节点由 [plugins/vite-plugin-uni-pages.ts](../../plugins/vite-plugin-uni-pages.ts) 从 [config.uts](config.uts) 生成。
 
-> ⚠️ **模式 4 的入口页面只有一个**（`src/pages/index/index.uvue`），其余 Tab 页面在该模式下不参与路由，只作为视图组件被 `TabViews.uvue` 挂载。这也是它「零闪烁、状态天然保活」的原因。
+> ⚠️ **模式 4 的入口页面只有一个**（`src/pages/index/index.uvue`），其余 Tab 页面在该模式下不参与路由，而是由 `TabViews.uvue` 直接导入页面 `.uvue` 作为子组件挂载。这也是它「零闪烁、状态天然保活」的原因；宿主页自身则通过 `TabPageHost` 的 `#tabHost` slot 注入，避免 `index.uvue → TabViews → index.uvue` 循环引用。
+>
+> 构建插件会把非宿主 Tab 页从 `pages.json` 的主包页面表中移除，只作为组件编译；否则支付宝小程序会为同一个 `.uvue` 同时生成 `createPage` 与 `createComponent`，并报「无 Component() 构造器调用，但 Page() 页面构造器被错误调用」。这些页面的配置仍会写入 `virtual:uni-pages-route-table`，因此 `useTabPage().route.meta / name` 不受影响。
 
 ### 4. UI 形态（`config.uts` 的 `type`）
 
@@ -166,8 +177,8 @@ src/tabbar/
 ```ts
 tabbarViewsPlugin({
   enabled: true,
-  autoCreateViews: !isBuild,          // 构建时不再新建文件（避免产物里凭空多出脚手架）
-  configFile: 'src/tabbar/config.uts'
+  configFile: 'src/tabbar/config.uts',
+  hostPage: 'src/pages/index/index'   // 模式 4 宿主页；通过 #tabHost slot 提供自身内容
 })
 ```
 
@@ -176,10 +187,11 @@ tabbarViewsPlugin({
 | 行为 | 细节 |
 | :--- | :--- |
 | 解析配置 | 读 `config.uts`，剥掉全部注释后解析 `list` 与 `midButton` |
-| 补齐页面脚手架 | 若某 Tab 页面目录下**没有任何 `.uvue`**，生成 `<Xxx>View.uvue`（含 `onTabShow` + 下拉刷新示例） |
-| 选已有组件 | 已有 `.uvue` 时优先取 `HomeView.uvue`（仅 `index` 目录）、其次同名 `<Xxx>View.uvue`、最后取第一个 |
+| 复用页面文件 | 按 `pagePath` 直接导入 `src/pages/<tab>/<tab>.uvue`，不再探测或生成 `views/*View.uvue`；模式 4 下非宿主 Tab 页会自动从 `pages.json` 路由中移除，只作为组件编译 |
+| 宿主页 slot | 检测到 `hostPage` 时不在 `TabViews` 中 import 宿主页，改为渲染 `<slot name="tabHost" />`，由 `TabPageHost` 注入内容 |
+| 避免重复包裹 | `uni-layouts-plugin` 与 `root-plugin` 在模式 4 都会跳过 `TabViews` 直接引用的 Tab 页面：前者不重复包 navbar，后者不重复包 `AppRoot`；宿主页自身仍保留唯一布局与根骨架 |
 | 生成调度容器 | 重写 [components/TabViews.uvue](components/TabViews.uvue)，按配置顺序（含 `midButton` 居中）排列 `<TabContent>` |
-| 同步页面配置 | 从 `pages.json` 与页面 `definePage` 源码里取 `title` / `hideNavbar` / `hideStatusBar` / `enablePullDownRefresh` / `customPageClass` / `customPageStyle`，写进 `<TabContent>` 的属性 |
+| 同步页面配置 | 优先从 `pages-meta-cache.ts` 的跨进程快照恢复完整多平台 `definePage` 变体，再以 `pages.json` 与页面源码兜底；把 `title` / `showBack` / `hideNavbar` / `hideStatusBar` / `enablePullDownRefresh` / `customPageClass` / `customPageStyle` 写进 `<TabContent>`，切换 Tab 时动态同步到宿主页唯一的 navbar |
 | 幂等写入 | 内容无变化时不写文件，不触发热重载 |
 
 **触发时机**：dev 启动时；以及这三个文件变更后（100ms 防抖）——`src/tabbar/config.uts`、各 Tab 主页面文件（如 `src/pages/me/me.uvue`）、根目录 `pages.json`。
@@ -196,6 +208,7 @@ tabbarViewsPlugin({
 
 ```uts
 import {
+  useTabPage,
   useTabbar,
   useTabbarPage,
   useTabbarTheme,
@@ -236,7 +249,7 @@ const {
 | `setCurIdx(idx)` | `void` | 直接设置激活下标并持久化，不跳路由 |
 | `setCurIdxByKey(key)` | `void` | 按业务标识设置激活项，推荐用于避免写死下标 |
 | `setCurIdxByPath(path)` | `void` | 按页面路径设置激活项 |
-| `syncCurIdxByCurrentPage()` | `void` | 根据当前页面路径同步激活项 |
+| `syncCurIdxByCurrentPage()` | `void` | 根据当前页面路径同步激活项；模式 4 下为空操作（宿主页路径无法代表当前 Tab） |
 | `setTabbarItemBadge(idx, badge)` | `void` | 设置数字角标或 `'dot'` 红点 |
 | `isPageTabbar(path)` | `boolean` | 判断路径是否为 TabBar 页面 |
 | `switchTabbar(url)` | `void` | 按当前模式切换 Tab（单页切索引，多页面走 `switchTab` / `redirectTo`） |
@@ -327,7 +340,111 @@ onHide((): void => {
 });
 ```
 
-### 3. `useTabbarTheme()`：主题与高亮色
+### 3. `useTabPage()`：模式 4 的普通页面开发体验
+
+模式 4 仍是单页保活，不会为每个 Tab 创建真实页面；但 Tab 页面 `.uvue` 可以通过 `useTabPage()` 获得与普通页面一致的页面语义：
+
+- `route.path` / `route.fullPath` / `route.query` / `route.meta` / `route.name` 都是**当前 Tab 自己的**，不是宿主页 `/src/pages/index/index`；
+- `onLoad` 首次进入执行一次，`onShow` 每次切回、从子页返回、App 回前台执行，`onHide` 切走 / 进子页 / 切后台执行，`onUnload` 在视图卸载时执行；
+- 跳转继续使用 `useRouter()`，命中 TabBar 路径时自动切 Tab，并把 query 写入该 Tab 的虚拟路由。
+
+```uts
+import { useRouter } from '@/uni_modules/route-bestX/index.uts';
+import { useTabPage } from '@/src/tabbar/index.uts';
+
+const router = useRouter();
+const {
+  route,
+  onLoad,
+  onShow,
+  onHide,
+  onUnload
+} = useTabPage();
+
+onLoad((): void => {
+  // 普通页面 onLoad：当前 Tab 自己的路径和参数
+  const id = route.value.query.get('id') ?? '';
+  console.log(route.value.path, id);
+});
+
+onShow((): void => {
+  // 切回当前 Tab / 从子页返回 / App 回前台
+});
+
+onHide((): void => {
+  // 切走当前 Tab / 进入子页 / App 切后台
+});
+
+onUnload((): void => {
+  // Tab 视图卸载
+});
+
+/** 普通页面写法跳转到另一个 Tab，并带上该 Tab 自己的 query */
+function openBasic(): void {
+  router.push({
+    path: '/src/pages/basic/basic',
+    query: { id: 1 }
+  });
+}
+```
+
+- 在模板里直接写 `{{ route.path }}` / `{{ route.query.get('id') }}`；在 `<script>` 中读取 `route.value`。
+- 该 hook 用于 Tab 页面 `.uvue`：普通 Tab 页面（如 `src/pages/basic/basic.uvue`）的下标由外层 `TabContent` 注入；模式 4 宿主首页则自动按自身路由匹配 Tab，无需额外传参。非 Tab 的普通页面调用时会自动回退到原生 `onLoad / onShow / onHide`，因此也可统一使用这套页面生命周期写法。
+- 页面入口深链使用 `?tab=basic&id=1`：`tab` 支持 `tabType` 或完整 `pagePath`，其余参数写入目标 Tab 的虚拟 query。
+- H5 下切换 Tab 会同步浏览器地址栏为 `?tab=basic&id=1`，刷新页面仍会恢复当前 Tab 及其 query；App / 小程序没有浏览器地址栏，不受影响。
+- 模式 4 的 Tab 切换和入口深链不触发 `router.beforeEach`，但会在写入虚拟状态前执行 Tab 导航前置钩子。钩子可读取来源 Tab、目标 Tab、query 与触发方式，并支持异步完成第三方接入、参数换取或数据预取；从 Tab 进入普通页面时，全局守卫看到的 `from` 仍是真实宿主页 `/src/pages/index/index`。
+- 模式 4 仍是“页面语义仿真”：系统级独立 URL、独立页面栈、原生分享地址和页面级原生路由转场仍不存在；需要这些能力时只能使用真实多页面模式。当前方案解决的问题是**业务开发写法**与**生命周期 / 参数读取**，不是伪造系统页面栈。
+
+#### 模式 4 的 Tab 切换前置钩子
+
+默认前置处理入口在 [adapters/tab-navigation.uts](adapters/tab-navigation.uts)，业务也可以直接注册自己的处理函数：
+
+```uts
+import type { TabNavigationContext, TabNavigationNext } from '@/src/tabbar/index.uts';
+import { registerTabNavigationGuard } from '@/src/tabbar/index.uts';
+
+registerTabNavigationGuard((context: TabNavigationContext, next: TabNavigationNext): void => {
+  if (context.api == 'hostQuery' && context.query.get('from') == 'third-party') {
+    prepareThirdPartyEntry(context.query).then((_res: any): void => {
+      next(true);
+    }, (_err: any): void => {
+      next(false);
+    });
+    return;
+  }
+  next(true);
+});
+```
+
+- `context.from` / `context.fromPath`：来源虚拟 Tab；普通点击时就是当前 Tab。
+- `context.to` / `context.toPath` / `context.query`：目标 Tab 与目标参数。
+- `context.api`：`tabClick`（TabBar 点击）、`router`（路由跳转）、`hostQuery`（`?tab=xxx` 入口深链）、`switchTabbar`（业务直接调用）。
+- 外部第三方来源通常从 `context.query` 读取（例如 `from=third-party`）；同时可用 `context.api == 'hostQuery'` 判断是否为入口直链。
+- 前置操作完成前不会修改当前 Tab、虚拟 query 或 H5 地址栏；异步操作必须调用且只调用一次 `next(true)` / `next(false)`。
+
+### 4. `useTabPageShell()`：页面文件双身份适配
+
+Tab 页面 `.uvue` 会同时承担「真实路由页面」与「模式 4 Tab 子组件」两种身份。`useTabPageShell()` 会自动区分：
+
+- 被 `TabContent` 嵌套时：跳过页面级 `onShow` / `onHide`，交给 `useTabPage()` 派发；
+- 作为模式 0-3 的真实页面运行时：同步 Tab 下标、通知页面可见性，并安装 Android 返回键处理；
+- 作为模式 4 的宿主页运行时：自动承接 `?tab=basic&id=1` 入口深链、通知页面可见性并安装 Android 返回键处理，不按宿主路由重置当前 Tab；
+- 支付宝小程序中同时隐藏原生「返回首页」按钮。
+
+```uts
+import { useTabPageShell } from '@/src/tabbar/index.uts';
+
+// 普通 Tab 页面：放在 <script setup> 顶层，参数与 config.uts 中的 tabType 一致
+useTabPageShell('basic');
+
+// 模式 4 宿主页：同样只调用这一处，入口深链与生命周期都由 hook 处理
+useTabPageShell('index');
+```
+
+- 不要在页面里重复写 `activateTabPageFromHostQuery()`、`setCurIdxByKey()`、`notifyPageShow/Hide()` 或 `useBackPressExit()`。
+- 普通真实页面不需要调用；只有同时作为 Tab 页面的 `.uvue` 才使用。
+
+### 5. `useTabbarTheme()`：主题与高亮色
 
 ```uts
 import { useTabbarTheme } from '@/src/tabbar/index.uts';
@@ -343,7 +460,7 @@ const { isDark, themeTokens, activeThemeColor } = useTabbarTheme();
 
 > ⚠️ **`activeThemeColor` 属于 `useTabbarTheme()`，不属于 `useTabbar()`。** 从错误的 hook 解构会报「`UseTabbarResult` 上不存在属性 `activeThemeColor`」。
 
-### 4. `useTabbarMetrics()`：尺寸、安全区与底部预留
+### 6. `useTabbarMetrics()`：尺寸、安全区与底部预留
 
 ```uts
 import { useTabbarMetrics } from '@/src/tabbar/index.uts';
@@ -371,7 +488,7 @@ const {
 - 在 `.uts` 脚本中读取响应式尺寸要写 `safeAreaBottom.value`。
 - 页面底部避让优先使用 `<TabbarPlaceholder>`，不要自己重复手算高度。
 
-### 5. `useTabbarI18n()`：文案国际化与原生同步
+### 7. `useTabbarI18n()`：文案国际化与原生同步
 
 ```uts
 import { useTabbarI18n } from '@/src/tabbar/index.uts';
@@ -387,13 +504,15 @@ const homeText = formatTabbarText('tabbar.home');
 | `formatTabbarText(text)` | 将多语言 key 转成当前语言文案 |
 | `setTabbarItem()` | 将当前语言文案同步到系统原生 TabBar，通常由 `App.uvue` 调用 |
 
-### 6. 按场景选择 Hook
+### 8. 按场景选择 Hook
 
 | 场景 | 推荐入口 |
 | :--- | :--- |
 | 读取当前 Tab 下标 / Tab 列表 | `useTabbar().curIdx` / `useTabbar().tabbarList` |
 | 切 Tab、更新角标、同步索引 | `useTabbar()` |
 | 监听切 Tab、从子页返回、App 回前台 | `useTabbarPage().onTabPageShow()` |
+| 模式 4 下按普通页面方式读路由 / 生命周期 | `useTabPage()` |
+| 页面文件同时兼容真实页面与模式 4 Tab 子页 | `useTabPageShell(tabType)` |
 | 读取明暗模式、主题令牌、高亮色 | `useTabbarTheme()` |
 | 计算 TabBar 高度、安全区、底部占位 | `useTabbarMetrics()` |
 | 转换 Tab 文案、同步原生 TabBar 文案 | `useTabbarI18n()` |
@@ -416,7 +535,8 @@ import { switchTabbar, onTabShow, onTabPageShow, curIdx } from '@/src/tabbar/ind
 
 | API | 说明 |
 | :--- | :--- |
-| `switchTabbar(url: string)` | **全局统一 Tab 跳转**。单页模式直接切索引，多页面模式自动选 `switchTab` / `redirectTo` |
+| `switchTabbar(url: string, api?: string)` | **全局统一 Tab 跳转**。单页模式先执行前置钩子，再更新虚拟 Tab 状态、query 与地址栏；多页面模式自动选 `switchTab` / `redirectTo`。`api` 用于标记 `tabClick` / `router` / `hostQuery` 等来源 |
+| `registerTabNavigationGuard(guard)` | 注册模式 4 的 Tab 切换前置钩子；传入 `null` 可移除 |
 | `onTabShow(target, cb, immediate?)` | 监听到**某个 Tab 被切换激活**。用于单页模式下补上子视图没有原生 `onShow` 的缺口（切回来时重新拉数据） |
 | `onTabPageShow(target, cb, immediate?)` | 监听**某个 Tab 页面重新显示**。是 `onTabShow` 的超集：除切 Tab 外还覆盖「从子页返回」「App 回前台」。它还会修掉 `onTabShow` 的时序坑——在子页面里调 `switchTabbar` 时 `curIdx` 立即变化，`onTabShow` 会在容器页仍不可见时就回调，而 `onTabPageShow` 会推迟到页面真正返回时补发 |
 | `curIdx` | 当前激活 Tab 的下标（响应式 `ref<number>`） |
@@ -438,7 +558,8 @@ import { switchTabbar, onTabShow, onTabPageShow, curIdx } from '@/src/tabbar/ind
 | 文件 | 负责 |
 | :--- | :--- |
 | [App.ku.uvue](../../App.ku.uvue) | 模式 2 / 3：全局渲染 `<Tabbar>`（仅当前页是 Tab 页时） |
-| [src/pages/index/index.uvue](../pages/index/index.uvue) | 模式 4：渲染 `<TabViews>` + `<Tabbar>` 的单页容器 |
+| [src/tabbar/components/TabPageHost.uvue](components/TabPageHost.uvue) | 模式 4：渲染 `<TabViews>` + `<Tabbar>`，并把宿主页业务内容注入 `#tabHost` slot |
+| [src/pages/index/index.uvue](../pages/index/index.uvue) | 模式 4 宿主页：通过 `<TabPageHost>` 提供唯一一份首页业务内容 |
 | [App.uvue](../../App.uvue) | 调用 `initNativeMidButtonTap()` / `setTabbarItem()` |
 | [src/layouts/navbar/navbar.uvue](../layouts/navbar/navbar.uvue) | 用 `<TabbarPlaceholder>` 预留底部高度 |
 
@@ -454,6 +575,7 @@ import { switchTabbar, onTabShow, onTabPageShow, curIdx } from '@/src/tabbar/ind
 | 主题 / 尺寸 / 文案转换 | `@/src/tabbar/index.uts` 的 `useTabbarTheme()` / `useTabbarMetrics()` / `useTabbarI18n()` |
 | 只读配置项（如 `customTabbarConfig`） | `@/src/tabbar/config.uts`（精准导入，避免拉进整包） |
 | TabBar 组件本体 | `@/src/tabbar/tabbar.uvue` |
+| 模式 4 宿主页壳 | `@/src/tabbar/components/TabPageHost.uvue` |
 | 单页调度容器 | `@/src/tabbar/components/TabViews.uvue` |
 | 高度占位 | `@/src/tabbar/components/TabbarPlaceholder.uvue` |
 

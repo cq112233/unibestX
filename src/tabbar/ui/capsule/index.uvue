@@ -36,6 +36,7 @@ const {
   curIdx,
   customTabbarConfig,
   handleTabbarClick,
+  isSinglePageTabbar,
   resetTabSwitchThrottle,
   safeHideNativeTabBar,
   safeRestoreNativeTabBar,
@@ -132,17 +133,19 @@ const sliderStyle = computed<string>((): string => {
 });
 
 let isMounted = false;
-/** 控制首次进入时胶囊底座从 scale(0) 展开，避免首帧直接定格 */
-const isReady = ref(false);
+/** 控制模式 4 首次进入时胶囊底座从 scale(0) 展开；模式 2/3 多页路由切换时直接定格，避免重复出现放大动画 */
+const isReady = ref(!isSinglePageTabbar);
 
 // 挂载时同步激活索引并确保原生 TabBar 隐藏
 onMounted(() => {
   isMounted = true;
   syncCurIdxByCurrentPage();
   safeHideNativeTabBar();
-  nextTick((): void => {
-    isReady.value = true;
-  });
+  if (isSinglePageTabbar) {
+    nextTick((): void => {
+      isReady.value = true;
+    });
+  }
 });
 
 // 卸载时彻底清理异步资源、还原原生 TabBar 并重置切换节流锁
@@ -221,7 +224,11 @@ const bottom = computed(() => {
     <!-- 悬浮胶囊底座主容器 -->
     <view
       class="custom-capsule-container"
-      :class="{ 'capsule-glass-fallback': glassEnabled, 'custom-capsule-container--show': isReady }"
+      :class="{
+        'capsule-glass-fallback': glassEnabled,
+        'capsule-scale-hide': isSinglePageTabbar && !isReady,
+        'capsule-scale-show': isSinglePageTabbar && isReady
+      }"
       :style="{
         bottom: `${bottom}px`,
         height: `${height}px`,
@@ -319,15 +326,21 @@ const bottom = computed(() => {
   border-style: solid;
   border-radius: 34px;
   overflow: hidden;
-  transform: scale(0);
-  transition-property: transform;
-  transition-duration: 300ms;
   /* 轻量弱阴影，避免在原生 Android 端阴影重绘掉帧 */
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
-.custom-capsule-container--show {
+/* 仅在模式 4 单页面模式首次进入时启用从 scale(0) 到 scale(1) 的入场放大动画 */
+.capsule-scale-hide {
+  transform: scale(0);
+  transition-property: transform;
+  transition-duration: 300ms;
+}
+
+.capsule-scale-show {
   transform: scale(1);
+  transition-property: transform;
+  transition-duration: 300ms;
 }
 
 /* iOS 原生液态玻璃背景层：铺满胶囊外壳，内容层保持在其上方 */

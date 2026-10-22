@@ -164,7 +164,7 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 | [references/2-styling.md](references/2-styling.md) | **2 样式与原生渲染手册**（26 条铁律 + 完整页面示例 + 7 类场景写法 + 17 条坑点 + 样式能力矩阵 + 20 条红线） | 写 `.scss` / Tailwind 工具类；处理按钮与文本排版、**安全区工具类 `p-safe` / `pt-safe` / `pb-safe`**、**行高 `leading-[...]`**、**SCSS 变量运行时动态化、`uni.scss` 覆盖**、高度单位、阴影边框、字号字重、行内嵌套样式、样式不生效或表现不一致 |
 | [references/3-runtime.md](references/3-runtime.md) | **3 跨端运行时手册**（29 条铁律 + 跨端能力封装示例 + 7 类场景写法 + 16 条坑点 + 渲染模式/条件编译宏/假绿判定速查 + 14 条红线） | VDOM / Android VDOM / Vapor 差异、多平台门面分流与条件编译、**全局跨端平台判断规范（统一使用 `@/src/config` 常量，除 TabViews.uvue 外严禁在 src/ 散落手写 `#ifdef`）**、**禁止浏览器特有 API `window` / `document` / `localStorage` 与非全端 API 裸调用（含 `getLocale` 安全取语言）**、**Vite 自定义页面插件开发约束**、UTS 插件与自定义基座、**第三方组件（选项式 `.vue`）是否可用**、Markdown 渲染、真机与 Kotlin 报错、编译验证命令选择 |
 | [references/4-page-component.md](references/4-page-component.md) | **4 页面与组件手册**（三种页面骨架 · `definePage` 全字段 · **标准业务页：`useRoute` / `useRouter` + `useQuery` / `useMutation` / `useQueryClient`** · easycom · **4.5 组件写法：根节点 / props / emits / expose / 取数边界** · 流程与交付 · 坑点 · 速查 · 红线） | **新建 / 改造页面或组件必读**：骨架怎么搭、`definePage` 写哪些字段、带接口的页面怎么写、**组件文件怎么写**、如何交付 —— **优先照抄，不要自创结构** |
-| [references/5-page-structure.md](references/5-page-structure.md) | **5 页面结构编排标准**（TabBar 单页 · 非 TabBar 业务模块聚合 · **存量页面 URL 保护** · 简单页与 `components / common / modules` 的按需选择 · 取数边界 · 组件提升 · API 归属 · 结构速查 · 18 条红线） | **规划页面结构**时必读：目录怎么摆、`views/` 要不要、何时才用 `modules/`、谁能调接口、数据归谁、mock 落哪。**新增页面与已有页面同属业务模块时，必须先询问是否聚合，不得擅自迁移旧页面或改变 URL**。**不含任何代码写法** —— 页面 / 组件怎么写看分册 4，接口函数看分册 6 |
+| [references/5-page-structure.md](references/5-page-structure.md) | **5 页面结构编排标准**（TabBar 单页 · 非 TabBar 业务模块聚合 · **存量页面 URL 保护** · 简单页与 `components / common / modules` 的按需选择 · 取数边界 · 组件提升 · API 归属 · 结构速查 · 18 条红线） | **规划页面结构**时必读：目录怎么摆、为什么 TabBar 页也没有 `views/`、何时才用 `modules/`、谁能调接口、数据归谁、mock 落哪。**新增页面与已有页面同属业务模块时，必须先询问是否聚合，不得擅自迁移旧页面或改变 URL**。**不含任何代码写法** —— 页面 / 组件怎么写看分册 4，接口函数看分册 6 |
 | [references/6-api-spec.md](references/6-api-spec.md) | **6 API 接口层手册**（业务模块目录 · 契约类型 · 按模块造数 · `http` 用法 · 完整 mock→http 双实现 + 8 类场景写法 + 16 条坑点 + 速查表 + 26 条红线） | **新增页面接入 `src/api/<module>/` 时**、抽接口函数时、写 mock 数据集与契约类型时、对接后端真实接口时必读 |
 | [references/7-utils-spec.md](references/7-utils-spec.md) | **7 工具库使用手册**（系统信息 · 环境变量 · 通用工具 · 6 个生态库 + 能力对照示例 + 7 类场景写法 + 15 条坑点 + 「该用谁」速查表 + 23 条红线） | 获取屏幕/窗口尺寸、状态栏/导航栏/TabBar高度、计算内容可用高度（`availableHeight`）；判断开发/生产环境、获取接口基础地址；使用 Toast、Loading、主题与返回键时必读；**要写大数运算 / 加解密与哈希 / 日期时间 / 颜色处理 / 数组对象工具 / 组合式 hooks 前必读（先查 `uni_modules/` 生态库，不要手写）** |
 | [references/8-router-spec.md](references/8-router-spec.md) | **8 路由导航与 `useRoute` 手册**（导入口径 · `RouteLocation` 全字段与类型 · 完整 demo · 10 类场景写法 · 14 条坑点 · `useRouter` 速查 · 10 条自检红线） | **页面 / 组件里要做任何跳转（push / replace / switchTab / back）、要读当前路由信息（path / query / meta / name）、准备写 `onLoad(options)` 取参数或手写 `getCurrentPages()` 时必读** |
@@ -266,10 +266,11 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 | **插槽变量传参 (`error17`)** | `<text>{{ fn(item) }}</text>` | `<text>{{ fn(item as UTSJSONObject) }}</text>`（插槽参数为 `Any?`，需显式强转） |
 | **动态 `:style` 属性强转崩溃** | `:style="parent['style'] as UTSJSONObject"`（Kotlin 运行期抛 `Map cannot be cast to UTSJSONObject`） | `:style="(parent['style'] ?? {}) as any"`（使用双问号空兜底并转 `as any`） |
 | **`<text>` 混合文本嵌套** | `<text>a<text>b</text>c</text>` | 外层 `view` 内放多个兄弟 `<text>` 节点（原生 `<text>` 不支持内嵌多文本） |
+| **纯文本插槽缺少 `<text>` 宿主** | `<slot>默认文案</slot>`，父级直接传入裸文本 | `<text><slot>默认文案</slot></text>`（接收纯文本的插槽必须由 `<text>` 承载；接收任意节点的插槽保持 `<slot />`，不要包 `<text>`） |
 | **Tailwind 边框解析限制** | `class="border border-gray-200"` | `class="border-[1px] border-solid border-[#e2e8f0]"`（需明确指定宽度、线型与颜色） |
 | **等宽字体显示 (`parse-css-font`)** | `class="font-mono"`（原生解析器缺 `font-size` 报错） | 内联 `style="font-family: monospace;"` |
 | **原生 `<button>` 布局限制** | `<button class="items-center justify-center">` | 用 `<view class="flex flex-row items-center justify-center">` 包裹 |
-| **`<view>` 设置文字颜色** | `<view class="text-[#333]">` | `<text class="text-[#333]">`（`color` 属性仅支持 `<text>`, `<button>`, `<input>`, `<textarea>`） |
+| **`<view>` 设置文字颜色或字体类样式** | `<view class="text-[#333] text-[30px] font-bold">` | `<text class="text-[#333] text-[30px] font-bold">`（所有端统一：颜色与字体类样式都必须由 `<text>` 承载，`<view>` 不承载） |
 | **Align-Items 属性限制** | `class="items-baseline"`（原生不支持 `baseline`） | `class="items-end"` 或 `class="items-center"` |
 | **原生端间距（gap 与 space）支持限制** | 原生 App 端依赖 `gap`、`gap-x-*`、`gap-y-*` 或 `space-x-*`、`space-y-*` | 严禁使用 `gap` 与 `space-*`；水平排列改用 `mr-*` / `ml-*`，垂直列表挂载 `mb-*` 或 `mt-*` |
 | **键盘高度全局监听与解绑平台限制** | App 端调用 `uni.onKeyboardHeightChange`（报错未定义 API / 拼写错误），或向 `uni.offKeyboardHeightChange` 传回调函数（类型不匹配），或事件参数标为 `UniInputKeyboardHeightChangeEventDetail`（抛 ClassCastException 崩溃） | App 端必须通过 `<input>`/`<textarea>` 监听 `@keyboardheightchange` 且参数标为 `UniInputKeyboardHeightChangeEvent`；全局 API 仅限微信小程序（`// #ifdef MP-WEIXIN`），且解绑时必须向 `off` 传入注册返回的 ID（`number`）（详见 **3.3**） |
@@ -330,7 +331,7 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 - [ ] **5. 模板作用域插槽调用点必须显式添加 `as` 类型断言**（避免 Kotlin 编译抛 `error17` 参数类型不匹配）
 - [ ] **6. 动态 `:style` 与属性严禁强转 `as UTSJSONObject`**（避免运行时抛 `ClassCastException: Map cannot be cast to UTSJSONObject`，统一使用 `(val ?? {}) as any`）
 - [ ] **7. 原生 `<button>` 上严禁挂载 flex 对齐类名**（复杂排版一律使用 `<view>` 包裹）
-- [ ] **8. `<view>` 上严禁挂载文字颜色样式**（`color` 类名必须下沉到子级 `<text>` 上）
+- [ ] **8. `<view>` 上严禁挂载文字颜色与字体类样式**（所有端统一：`color` / `font-size` / `font-weight` / `leading` / `tracking` / 斜体与下划线等都必须下沉到子级 `<text>`；字体类由 `uvue-no-view-font-style` 拦截）
 - [ ] **9. `<text>` 内部严禁混合嵌套多个文本节点**（多色文本排版一律使用兄弟 `<text>` 标签）
 - [ ] **10. 严禁使用 `font-mono` / `font-sans` 工具类**（等宽排版必须使用内联 `font-family: monospace;`）
 - [ ] **11. 严禁使用 `items-baseline`**（原生编译器不支持，必须改用 `items-end` 或 `items-center`）
@@ -375,4 +376,5 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 - [ ] **50. Easycom 范围内的组件严禁手动 import**（`uni_modules/*/components/` 与根 `components/` 直接写短横线标签）；反过来，**页面私有组件（`src/pages/*/components/`）不在扫描范围，必须手动 import**；改 easycom 配置时改 `pages.config.json`（`pages.json` 是生成物），且 `uniEasycomPlugin` 必须覆盖 App 与 Web（排除 mp-*），见 4.4
 - [ ] **51. hook 状态不做纯转发**：`useQuery` / `useMutation` 解构出的 `isPending` / `isFetching` / `isError` 本身是 Ref；模板自动解包直接写变量名，script 内读值才用 `.value`；严禁写 `computed(() => isPending.value == true)` 这类无新增语义的包装，只有真实转换 / 组合才用 `computed`（见 4.3.4 / 10.4.2）
 - [ ] **52. 已有页面不得擅自合并或迁移**：新增页面与已有页面同属一个业务模块时，**必须先询问开发者是否放到同一业务模块目录**；存量页面默认保持原路径与 URL，未经明确同意禁止移动、重构目录层级或合并页面。页面 URL 是历史链接、分享地址、埋点和外部跳转的契约，结构整理不能让已有业务断链（见 5.2 / 5.10）
+- [ ] **53. 纯文本插槽必须由 `<text>` 承载**：组件接收一段纯文本时必须写 `<text><slot>默认文案</slot></text>`，严禁写裸 `<slot>默认文案</slot>` 接收父级文本；若插槽契约是接收任意节点，则保持 `<slot />`，由父级提供完整 `<text>` / `<view>`，禁止统一包进 `<text>`（见 4.7.7）
 

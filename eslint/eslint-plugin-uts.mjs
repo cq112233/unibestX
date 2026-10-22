@@ -471,7 +471,62 @@ export const pluginUts = {
       }
     },
 
-    /** 7. UVUE 模板中原生 <button> 挂载 flex 对齐类名提示（VDOM 不兼容） */
+    /** 7. UVUE 模板中 <view> 挂载字体类样式提示（所有端统一） */
+    'uvue-no-view-font-style': {
+      meta: {
+        type: 'suggestion',
+        docs: {
+          description: '<view> 元素不承载字体类样式，所有端都必须由 <text> 承载'
+        },
+        messages: {
+          noViewFontStyle: '[UVUE规范] 字体类样式必须写在 <text> 上（所有端一致）；<view> 不承载类名 "{{cls}}"，请移至内部 <text>'
+        }
+      },
+      create(context) {
+        const fontStyleClsPatterns = [
+          // 字号：text-xs / text-2xl / text-[30px] / text-[length:20rpx]
+          /(?:^|\s)((?:[a-z0-9_-]+:)*!?text-(?:xs|sm|base|lg|xl|[2-9]xl|\[(?:length:)?-?(?:\d+(?:\.\d+)?|\.\d+)(?:px|rpx|rem|em|vw|vh|vmin|vmax|pt|pc|in|cm|mm|%)\]))(?=\s|$)/g,
+          // 字族 / 字重：font-bold / font-medium / font-[700]；font-mono / font-sans / font-serif 由独立规则处理
+          /(?:^|\s)((?:[a-z0-9_-]+:)*!?font-\S+)(?=\s|$)/g,
+          // 行高 / 字间距：leading-[20px] / tracking-wide
+          /(?:^|\s)((?:[a-z0-9_-]+:)*!?(?:leading|tracking)-\S+)(?=\s|$)/g,
+          // 字体形态与文字修饰：italic / underline / uppercase 等
+          /(?:^|\s)((?:[a-z0-9_-]+:)*!?(?:italic|not-italic|underline|overline|line-through|no-underline|uppercase|lowercase|capitalize|normal-case))(?=\s|$)/g
+        ];
+
+        if (!context.sourceCode.parserServices?.defineTemplateBodyVisitor) {
+          return {};
+        }
+
+        return context.sourceCode.parserServices.defineTemplateBodyVisitor({
+          VElement(node) {
+            if (node.rawName === 'view') {
+              const classList = getClassValues(node);
+              for (const { text, loc } of classList) {
+                for (const pattern of fontStyleClsPatterns) {
+                  pattern.lastIndex = 0;
+                  let match = pattern.exec(text);
+                  while (match !== null) {
+                    // font-mono / font-sans / font-serif 由 uvue-no-font-mono 单独提示，避免重复告警
+                    if (!/(?:^|:)!?font-(?:mono|sans|serif)$/.test(match[1])) {
+                      context.report({
+                        node,
+                        loc,
+                        messageId: 'noViewFontStyle',
+                        data: { cls: match[1] }
+                      });
+                    }
+                    match = pattern.exec(text);
+                  }
+                }
+              }
+            }
+          }
+        });
+      }
+    },
+
+    /** 8. UVUE 模板中原生 <button> 挂载 flex 对齐类名提示（VDOM 不兼容） */
     'uvue-no-button-flex': {
       meta: {
         type: 'suggestion',
@@ -512,7 +567,7 @@ export const pluginUts = {
       }
     },
 
-    /** 8. UVUE 模板中使用 gap 与 space 提示（VDOM 不兼容） */
+    /** 9. UVUE 模板中使用 gap 与 space 提示（VDOM 不兼容） */
     'uvue-no-gap-and-space': {
       meta: {
         type: 'suggestion',
@@ -551,7 +606,7 @@ export const pluginUts = {
       }
     },
 
-    /** 9. UVUE 模板中使用 font-mono / font-sans 提示（VDOM 解析器限制） */
+    /** 10. UVUE 模板中使用 font-mono / font-sans 提示（VDOM 解析器限制） */
     'uvue-no-font-mono': {
       meta: {
         type: 'suggestion',
@@ -590,7 +645,7 @@ export const pluginUts = {
       }
     },
 
-    /** 10. UVUE 模板中使用 items-baseline 提示（VDOM 编译器限制） */
+    /** 11. UVUE 模板中使用 items-baseline 提示（VDOM 编译器限制） */
     'uvue-no-items-baseline': {
       meta: {
         type: 'suggestion',
@@ -623,7 +678,7 @@ export const pluginUts = {
       }
     },
 
-    /** 11. UVUE 模板与样式中使用英文单词命名颜色提示与自动修复 */
+    /** 12. UVUE 模板与样式中使用英文单词命名颜色提示与自动修复 */
     'uvue-prefer-hex-color': {
       meta: {
         type: 'suggestion',
@@ -712,7 +767,7 @@ export const pluginUts = {
       }
     },
 
-    /** 12. UVUE 模板中严禁使用 ! 提高优先级修饰符（鸿蒙端编译报错） */
+    /** 13. UVUE 模板中严禁使用 ! 提高优先级修饰符（鸿蒙端编译报错） */
     'uvue-no-important-modifier': {
       meta: {
         type: 'problem',
@@ -1328,7 +1383,7 @@ export const pluginUts = {
       }
     },
 
-    /** 13. UVUE 模板中标签与属性格式自动化清理（消除属性内换行、标签与属性间多余空行） */
+    /** 14. UVUE 模板中标签与属性格式自动化清理（消除属性内换行、标签与属性间多余空行） */
     'uvue-clean-template-whitespace': {
       meta: {
         type: 'layout',
@@ -1467,7 +1522,7 @@ export const pluginUts = {
       }
     },
 
-    /** 14. 禁止在 definePage 宏内引用外部声明的变量或函数（避免编译期执行宏报 ReferenceError） */
+    /** 15. 禁止在 definePage 宏内引用外部声明的变量或函数（避免编译期执行宏报 ReferenceError） */
     'define-page-no-outer-variables': {
       meta: {
         type: 'problem',

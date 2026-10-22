@@ -210,6 +210,13 @@ export default defineConfig({
     // extraIncludes 透传 isVConsole 时的 vconsole：vite-plugin-vconsole 在 transform 钩子里动态注入
     // `import VConsole from 'vconsole'` 到 main.uts，scanner 看不到，需显式 include 让 scanner 预构建。
     h5OptimizeDepsPlugin({ debug: false, extraIncludes: isVConsole ? ['vconsole'] : [] }),
+    // Tab 页面补建与 TabViews 生成插件。
+    // 必须排在 uni-pages 之前：configResolved 阶段先补齐缺失的 Tab 页面，核心插件随后扫描时才能
+    // 在同一轮把新页面写入 pages.json。删除 Tab 配置不会触发任何页面删除。
+    tabbarViewsPlugin({
+      enabled: true,
+      configFile: 'src/tabbar/config.uts'
+    }),
     // 自动扫描与路由生成插件（基于 pages.config.json + 页面内 <route>/definePage 声明）
     uniPagesPlugin({
       // 【总控开关】：是否启用插件自动扫描与 pages.json 生成（设为 false 则完全失效，不扫描、不写入 pages.json、不监听文件变化）
@@ -254,12 +261,6 @@ export default defineConfig({
     uniPagesSandboxPlugin(), // 沙盒独立调试模式（VITE_DEV_SANDBOX / definePage({ debug })）
     uniPagesTabbarPlugin(), // TabBar 策略（VITE_TABBAR_MODE 0–4）
     uniPagesRouteTablePlugin(), // 提供 virtual:uni-pages-route-table 虚拟模块（页面路由表数据源）
-    // 单页 TabBar 基础脚手架与视图组件辅助生成插件（按需根据 src/tabbar/config.uts 辅助创建基础 TabViews）
-    tabbarViewsPlugin({
-      enabled: true,
-      autoCreateViews: !isBuild,
-      configFile: 'src/tabbar/config.uts'
-    }),
     // 手动补充 easycom 插件（限制非小程序端生效，含 App 与 Web）
     // 该插件内部名为 uni:app-easycom，负责在 App 蒸汽模式与 Web 端把模板里的 easycom 标签转成静态 import；
     // 小程序端（mp-*）由官方编译器基于 usingComponents 原生处理，挂载该插件会导致组件被转为未知动态组件并报错 resolveDynamicComponent。

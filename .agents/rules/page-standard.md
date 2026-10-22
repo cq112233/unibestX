@@ -19,7 +19,7 @@ globs: src/**/*.uts,src/**/*.ts,src/**/*.vue,src/**/*.uvue
 - **分页 / 长列表一律优先用 `<z-paging-x>`**（内置 `list-view` 虚拟复用、触底自动追加、下拉刷新、空态与 loading）；只有 `<z-paging-x>` 覆盖不了的场景（非分页的纯长列表、瀑布流特殊布局）才手写 `<list-view>` + `<list-item>`。**严禁用 `<scroll-view>` 承载长列表。**
 - **组件库优先**：`uni_modules/*/components/` 与根 `components/` 的组件直接写短横线标签，不手动 import；**页面私有组件（`src/pages/*/components/`）必须手动 import**。
 - **数据一律经接口层**：页面根组件 / 模块组件只调 `@/src/api/<module>/<file>.uts` 的 `fetchXxxApi()`，不直接 `http.get`、不写死假数据。
-- **页面结构按分册 5**：TabBar 页是单页结构、根组件在 `views/<Page>View.uvue`；同一业务模块的多个非 TabBar 页面聚合在 `src/sub/<module>/<page>/`。
+- **TabBar 页不建 `views/`**：页面 `.uvue` 本身就是根组件，模式 4 下由 `TabViews` 直接复用；需要虚拟路由 / 生命周期时调用 `useTabPage()`，需要兼容真实页面与 Tab 子页双身份时调用 `useTabPageShell(tabType)`。同一业务模块的多个非 TabBar 页面聚合在 `src/sub/<module>/<page>/`。
 - **取数边界**：只有页面根组件和 `modules/<block>/<Block>Module.uvue` 可以发请求；`components/`、`common/`、模块 `components/` 和 `src/components/` 只做纯展示。
 - **页面结构按分册 5 生成**：先定「普通页 / TabBar 页 → 目录树 → 组件层级 → 谁调接口」，再写代码；简单业务默认只写根页面，`components/`、`common/`、`modules/` 均按需创建，禁止为了拆而拆。
 - **`modules/` 是可选结构**：只有同一页面存在多个独立业务区块，且各区块需要独立状态 / 接口 / 分页 / 筛选时才创建；`modules/` 下不创建 `common/`。
@@ -37,4 +37,4 @@ globs: src/**/*.uts,src/**/*.ts,src/**/*.vue,src/**/*.uvue
 
 > 📖 **写页面内容 / 组件前先读分册 4**：`definePage` 全字段、「上固定 + 下滚动」完整骨架、TabBar 页薄壳、加载 / 空 / 错误三态、组件写法（props / emits / expose / 方法 JSDoc）→ `.agents/skills/unibestX-skill/references/4-page-component.md`。
 >
-> 📖 **生成 / 改造页面结构时先读分册 5**：目录怎么摆、`views/` 要不要、组件拆几层、接口由根视图还是模块调用、数据归谁 → `.agents/skills/unibestX-skill/references/5-page-structure.md`。
+> 📖 **生成 / 改造页面结构时先读分册 5**：目录怎么摆、组件拆几层、接口由根视图还是模块调用、数据归谁 → `.agents/skills/unibestX-skill/references/5-page-structure.md`。其中 TabBar 页的 `views/` 章节已被本项目当前实现取代，以本文件与 `src/tabbar/README.md` 为准。
