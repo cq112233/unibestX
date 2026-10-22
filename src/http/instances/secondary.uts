@@ -24,6 +24,7 @@ import { createApiInstance } from './internal/factory.uts';
  *   }
  * }
  * ```
- * 默认不传第三个参数，与主业务 `http` 实例共同继承 `./internal/factory.uts` 的全局统一配置。
+ * 默认不传第三个参数，与主业务 `http` 实例共同继承 `./internal/factory.uts` 的全局统一配置；
+ * 当前使用单 Token，默认不启用 401 静默刷新。
  */
 export const secondaryHttp: HttpClient = createApiInstance(getApiSecondaryUrl(), '/api-secondary');

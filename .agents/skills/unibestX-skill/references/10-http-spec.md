@@ -20,7 +20,7 @@
 src/api/<module>/<file>.uts        ← 接口函数：Promise<T> + 类型转换 + 模拟数据
           │
           ▼
-src/http/instances                 ← 业务实例：Token、401 刷新、Toast、解包、多域名
+src/http/instances                 ← 业务实例：Token、可选 401 刷新、Toast、解包、多域名
           │
           ▼
 uni_modules/request-bestX          ← 请求引擎：HttpClient、hooks、上传 / 下载 / 流式
@@ -52,6 +52,8 @@ import type {
 | 主业务请求实例 | `@/src/http/index.uts` 的 `http` |
 | 副业务请求实例 | `@/src/http/index.uts` 的 `secondaryHttp` |
 | 业务错误类型 / 错误归一 | `@/src/http/index.uts` |
+
+- `src/http/index.uts` 是**精简公共门面**，只导出 `http` / `secondaryHttp`、常用枚举和错误工具；禁止 `export *` 转发 `instances/internal/` 下的 `factory` / `refresh` 等内部实现。内部模块之间必须直接引用具体文件，否则会把业务 API、刷新逻辑与 HTTP 实例初始化串成循环依赖。
 | `useQuery` / `useMutation` / `useQueryClient` | `@/uni_modules/request-bestX/index.uts` |
 | 请求配置 / 返回类型 | `@/uni_modules/request-bestX/index.uts` 的 `import type` |
 | 页面接口函数 | `@/src/api/<module>/<file>.uts` |
@@ -87,7 +89,7 @@ secondaryHttp.get<UTSJSONObject>('/report/summary');
 | 能力 | 位置 | 业务侧注意 |
 | :--- | :--- | :--- |
 | Token 自动注入 | `instances/internal/factory.uts` | 默认自动加 `token`，不需要手写鉴权头 |
-| 401 静默刷新 / 重放 | `instances/internal/refresh.uts` | 并发 401 单飞刷新；业务不要重复刷新或重复跳登录 |
+| 401 静默刷新 / 重放（可选） | `instances/internal/refresh.uts` | 当前单 Token 项目默认未启用；接入双 Token 时再注入 `refreshToken` 回调 |
 | 业务 code 校验 | `factory.uts` | 非成功码统一抛错；默认 Toast，可用 `extra.toast=false` 关闭 |
 | 响应数据解包 | `factory.uts` | `http.get<T>` 的 `then` 直接拿业务 `data` |
 | 统一错误归一 | `error/error.uts` | 使用 `BusinessError` / `HttpError` / `resolveErrorMessage` |

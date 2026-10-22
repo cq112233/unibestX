@@ -3,13 +3,13 @@
  * 统一聚合常规请求驱动 (request)、多 API 地址业务实例 (instances)、组合式请求 hook (hooks)、流式通信 (stream) 与错误解析 (error)
  */
 
-import { http } from './instances/index.uts';
+import { http } from './instances/default.uts';
 
-export * from './error/error.uts';
-export * from './instances/index.uts';
-export * from './instances/internal/config.uts';
-export * from './instances/internal/enum.uts';
-export * from './instances/internal/factory.uts';
-export * from './instances/internal/refresh.uts';
+// 公共门面只暴露业务实例与常用工具，内部 factory / refresh 实现不再穿透导出
+export { BusinessError, HttpError, resolveErrorMessage } from './error/error.uts';
+export { http } from './instances/default.uts';
+export { API_DOMAINS, resolveServiceBaseUrl } from './instances/internal/config.uts';
+export { ResultEnum, ShowMessage } from './instances/internal/enum.uts';
+export { secondaryHttp } from './instances/secondary.uts';
 
 export default http;
