@@ -116,8 +116,12 @@ const userInfoJson = computed((): string => {
 });
 
 // 登录
-function handleLogin() {
-  router.push(LOGIN_PAGE);
+function handleLogin(): void {
+  // 模式 4 的真实页面栈只有宿主首页，登录成功后必须依靠 redirect 恢复来源虚拟 Tab。
+  router.push({
+    path: LOGIN_PAGE,
+    query: { redirect: meRoute.value.fullPath != '' ? meRoute.value.fullPath : ME_PAGE_PATH }
+  });
 }
 
 // 退出登录
@@ -147,11 +151,11 @@ function handleLogout() {
 
 // 与普通页面一致的首次进入 / 显示 / 隐藏生命周期
 onMeLoad(() => {
-  console.log('onMeLoad', '我 Tab 挂载了👋', meRoute.value.fullPath, meRoute.value);
+  console.log('onMeLoad', '我 Tab 挂载了👋', meRoute.value.fullPath, meRoute);
 });
 
 onMeShow(() => {
-  console.log('onMeShow', '我 Tab 显示了👀', meRoute.value.fullPath, meRoute.value);
+  console.log('onMeShow', '我 Tab 显示了👀', meRoute.value.fullPath, meRoute);
 });
 
 onMeHide(() => {

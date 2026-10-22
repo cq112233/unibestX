@@ -37,9 +37,11 @@ type PageConfig = {
 type PagesBuildState = {
   root: string;
   output: { pages: PageConfig[]; subPackages?: Array<{ root: string; pages: PageConfig[] }>; [key: string]: any };
+  /** 模式 4 的 Tab 页不注册真实路由，但仍保留在路由表中供 useTabPage() 读取 meta / name */
+  virtualPages?: PageConfig[];
   /** 生效的分包集合：核心在 finalize 阶段才把它挂到 output.subPackages，故本阶段直接从这里取 */
   scannedSubPkgs: Array<{ root: string; pages: PageConfig[] }>;
-  flags: { sandboxActive: boolean; skipConfigWriteback: boolean };
+  flags: { sandboxActive: boolean; strictMainPages: boolean; skipConfigWriteback: boolean };
 };
 
 type PagesStageContext = {
@@ -174,8 +176,17 @@ export default function uniPagesRouteTablePlugin(): Plugin & { uniPagesStage: Pa
     run(state) {
       // 本阶段在核心 finalize（把 scannedSubPkgs 挂到 output.subPackages）之前运行，
       // 故自行把分包补全成 output 形状再交给生成器 —— 与 pages.json 的最终口径保持一致。
+      const routePages = [...state.output.pages];
+      const routePagePaths = new Set(routePages.map(page => page.path));
+      const virtualPages = state.virtualPages ?? [];
+      virtualPages.forEach((page) => {
+        if (!routePagePaths.has(page.path)) {
+          routePages.push(page);
+          routePagePaths.add(page.path);
+        }
+      });
       const nextSource = renderPageRoutesSource(buildPageRoutesTable({
-        pages: state.output.pages,
+        pages: routePages,
         subPackages: state.scannedSubPkgs
       }));
       if (nextSource === moduleSource) {

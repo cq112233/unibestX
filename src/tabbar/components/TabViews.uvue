@@ -1,12 +1,12 @@
 <template>
   <view class="tab-views-container" style="position: relative; display: flex; flex-direction: column; flex: 1; height: 100%;">
-    <!-- #ifdef APP-ANDROID -->
-    <TabContent v-if="isTabRendered(0)" :content-index="0" title="android" :enable-pull-down-refresh="true" :show-back="false" custom-page-class="init-page" custom-page-style="background-color: transparent;">
+    <!-- #ifdef H5 -->
+    <TabContent v-if="isTabRendered(0)" :content-index="0" title="h5" :enable-pull-down-refresh="false" :show-back="false" custom-page-class="init-page" custom-page-style="background-color: transparent;">
       <slot name="tabHost" />
     </TabContent>
     <!-- #endif -->
-    <!-- #ifdef APP-HARMONY -->
-    <TabContent v-if="isTabRendered(0)" :content-index="0" title="harmony" :enable-pull-down-refresh="true" :show-back="false" custom-page-class="init-page" custom-page-style="background-color: transparent;">
+    <!-- #ifdef APP-ANDROID -->
+    <TabContent v-if="isTabRendered(0)" :content-index="0" title="android" :enable-pull-down-refresh="true" :show-back="false" custom-page-class="init-page" custom-page-style="background-color: transparent;">
       <slot name="tabHost" />
     </TabContent>
     <!-- #endif -->
@@ -15,18 +15,8 @@
       <slot name="tabHost" />
     </TabContent>
     <!-- #endif -->
-    <!-- #ifdef H5 -->
-    <TabContent v-if="isTabRendered(0)" :content-index="0" title="h5" :enable-pull-down-refresh="false" :show-back="false" custom-page-class="init-page" custom-page-style="background-color: transparent;">
-      <slot name="tabHost" />
-    </TabContent>
-    <!-- #endif -->
-    <!-- #ifdef MP-360 || MP-BAIDU || MP-HARMONY || MP-JD || MP-KUAISHOU || MP-LARK || MP-QQ || MP-TOUTIAO || MP-XHS -->
-    <TabContent v-if="isTabRendered(0)" :content-index="0" title="tabbar.home" :enable-pull-down-refresh="true" :show-back="false" custom-page-class="init-page" custom-page-style="background-color: transparent;">
-      <slot name="tabHost" />
-    </TabContent>
-    <!-- #endif -->
-    <!-- #ifdef MP-ALIPAY -->
-    <TabContent v-if="isTabRendered(0)" :content-index="0" title="alipay" :enable-pull-down-refresh="true" :show-back="false" custom-page-class="init-page" custom-page-style="background-color: transparent;">
+    <!-- #ifdef APP-HARMONY -->
+    <TabContent v-if="isTabRendered(0)" :content-index="0" title="harmony" :enable-pull-down-refresh="true" :show-back="false" custom-page-class="init-page" custom-page-style="background-color: transparent;">
       <slot name="tabHost" />
     </TabContent>
     <!-- #endif -->
@@ -35,20 +25,25 @@
       <slot name="tabHost" />
     </TabContent>
     <!-- #endif -->
+    <!-- #ifdef MP-ALIPAY -->
+    <TabContent v-if="isTabRendered(0)" :content-index="0" title="alipay" :enable-pull-down-refresh="true" :show-back="false" custom-page-class="init-page" custom-page-style="background-color: transparent;">
+      <slot name="tabHost" />
+    </TabContent>
+    <!-- #endif -->
+    <!-- #ifdef MP-BAIDU || MP-TOUTIAO || MP-QQ || MP-KUAISHOU || MP-LARK || MP-JD || MP-XHS || MP-360 || MP-HARMONY -->
+    <TabContent v-if="isTabRendered(0)" :content-index="0" title="tabbar.home" :enable-pull-down-refresh="true" :show-back="false" custom-page-class="init-page" custom-page-style="background-color: transparent;">
+      <slot name="tabHost" />
+    </TabContent>
+    <!-- #endif -->
     <TabContent v-if="isTabRendered(1)" :content-index="1" title="tabbar.basic" :enable-pull-down-refresh="true" :show-back="false">
       <BasicPage />
     </TabContent>
-    <!-- #ifdef APP || MP-360 || MP-BAIDU || MP-HARMONY || MP-JD || MP-KUAISHOU || MP-LARK || MP-QQ || MP-TOUTIAO || MP-WEIXIN || MP-XHS -->
-    <TabContent v-if="isTabRendered(2)" :content-index="2" title="tabbar.function" :enable-pull-down-refresh="true" :show-back="false" custom-page-class="init-page" custom-page-style="background-color: transparent;">
-      <FunctionPage />
-    </TabContent>
-    <!-- #endif -->
     <!-- #ifdef H5 -->
     <TabContent v-if="isTabRendered(2)" :content-index="2" title="😂" :enable-pull-down-refresh="true" :show-back="false" custom-page-class="init-page" custom-page-style="background-color: transparent;">
       <FunctionPage />
     </TabContent>
     <!-- #endif -->
-    <!-- #ifdef MP-ALIPAY -->
+    <!-- #ifdef APP-ANDROID || APP-IOS || APP-HARMONY || MP-WEIXIN || MP-ALIPAY || MP-BAIDU || MP-TOUTIAO || MP-QQ || MP-KUAISHOU || MP-LARK || MP-JD || MP-XHS || MP-360 || MP-HARMONY -->
     <TabContent v-if="isTabRendered(2)" :content-index="2" title="tabbar.function" :enable-pull-down-refresh="true" :show-back="false" custom-page-class="init-page" custom-page-style="background-color: transparent;">
       <FunctionPage />
     </TabContent>

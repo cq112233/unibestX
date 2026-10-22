@@ -141,11 +141,13 @@ src/tabbar/
 | `1` | 原生 TabBar | ✅ | `uni.switchTab` | 生成原生 `tabBar` 节点，由框架渲染 |
 | `2` | 自定义 TabBar（带原生底座） | ✅ | `uni.switchTab` | 生成 `tabBar: { custom: true }`（原生被隐藏），[App.ku.uvue](../../App.ku.uvue) 渲染自定义 UI |
 | `3` | 纯自定义 TabBar | ❌ 每次重载 | `uni.redirectTo` | **无 `tabBar` 节点**，[App.ku.uvue](../../App.ku.uvue) 渲染 |
-| `4` | 单页容器 TabBar | ✅ 天然保活、零闪烁 | 切容器内索引，**不跳路由** | **无 `tabBar` 节点**，[src/pages/index/index.uvue](../pages/index/index.uvue) 渲染 |
+| `4` | 单页容器 TabBar | ✅ 天然保活、零闪烁 | 切容器内索引，**不跳路由** | **无 `tabBar` 节点，且仅宿主页注册真实路由**，[src/pages/index/index.uvue](../pages/index/index.uvue) 渲染 |
 
 本项目默认 `4`。模式解析在 [core/strategy.uts](core/strategy.uts)，业务侧判断当前模式用导出的 `isSinglePageTabbar` / `isNativeTabbar` / `customTabbarEnable` / `needTabbarBottomPadding`。模式 1 / 2 的 `tabBar` 节点由 [plugins/vite-plugin-uni-pages.ts](../../plugins/vite-plugin-uni-pages.ts) 从 [config.uts](config.uts) 生成。
 
 > ⚠️ **模式 4 的入口页面只有一个**（`src/pages/index/index.uvue`），其余 Tab 页面在该模式下不参与路由，而是由 `TabViews.uvue` 直接导入页面 `.uvue` 作为子组件挂载。这也是它「零闪烁、状态天然保活」的原因；宿主页自身则通过 `TabPageHost` 的 `#tabHost` slot 注入，避免 `index.uvue → TabViews → index.uvue` 循环引用。
+>
+> 构建插件会把非宿主 Tab 页从 `pages.json` 的主包页面表中移除，只作为组件编译；否则支付宝小程序会为同一个 `.uvue` 同时生成 `createPage` 与 `createComponent`，并报「无 Component() 构造器调用，但 Page() 页面构造器被错误调用」。这些页面的配置仍会写入 `virtual:uni-pages-route-table`，因此 `useTabPage().route.meta / name` 不受影响。
 
 ### 4. UI 形态（`config.uts` 的 `type`）
 
@@ -181,11 +183,11 @@ tabbarViewsPlugin({
 | 行为 | 细节 |
 | :--- | :--- |
 | 解析配置 | 读 `config.uts`，剥掉全部注释后解析 `list` 与 `midButton` |
-| 复用页面文件 | 按 `pagePath` 直接导入 `src/pages/<tab>/<tab>.uvue`，不再探测或生成 `views/*View.uvue` |
+| 复用页面文件 | 按 `pagePath` 直接导入 `src/pages/<tab>/<tab>.uvue`，不再探测或生成 `views/*View.uvue`；模式 4 下非宿主 Tab 页会自动从 `pages.json` 路由中移除，只作为组件编译 |
 | 宿主页 slot | 检测到 `hostPage` 时不在 `TabViews` 中 import 宿主页，改为渲染 `<slot name="tabHost" />`，由 `TabPageHost` 注入内容 |
 | 避免重复包裹 | `uni-layouts-plugin` 与 `root-plugin` 在模式 4 都会跳过 `TabViews` 直接引用的 Tab 页面：前者不重复包 navbar，后者不重复包 `AppRoot`；宿主页自身仍保留唯一布局与根骨架 |
 | 生成调度容器 | 重写 [components/TabViews.uvue](components/TabViews.uvue)，按配置顺序（含 `midButton` 居中）排列 `<TabContent>` |
-| 同步页面配置 | 从 `pages.json` 与页面 `definePage` 源码里取 `title` / `showBack` / `hideNavbar` / `hideStatusBar` / `enablePullDownRefresh` / `customPageClass` / `customPageStyle`，写进 `<TabContent>` 的属性；切换 Tab 时动态同步到宿主页唯一的 navbar |
+| 同步页面配置 | 优先从 `pages-meta-cache.ts` 的跨进程快照恢复完整多平台 `definePage` 变体，再以 `pages.json` 与页面源码兜底；把 `title` / `showBack` / `hideNavbar` / `hideStatusBar` / `enablePullDownRefresh` / `customPageClass` / `customPageStyle` 写进 `<TabContent>`，切换 Tab 时动态同步到宿主页唯一的 navbar |
 | 幂等写入 | 内容无变化时不写文件，不触发热重载 |
 
 **触发时机**：dev 启动时；以及这三个文件变更后（100ms 防抖）——`src/tabbar/config.uts`、各 Tab 主页面文件（如 `src/pages/me/me.uvue`）、根目录 `pages.json`。
@@ -386,6 +388,7 @@ function openBasic(): void {
 - 该 hook 用于 Tab 页面 `.uvue`：普通 Tab 页面（如 `src/pages/basic/basic.uvue`）的下标由外层 `TabContent` 注入；模式 4 宿主首页则自动按自身路由匹配 Tab，无需额外传参。非 Tab 的普通页面调用时会自动回退到原生 `onLoad / onShow / onHide`，因此也可统一使用这套页面生命周期写法。
 - 页面入口深链使用 `?tab=basic&id=1`：`tab` 支持 `tabType` 或完整 `pagePath`，其余参数写入目标 Tab 的虚拟 query。
 - H5 下切换 Tab 会同步浏览器地址栏为 `?tab=basic&id=1`，刷新页面仍会恢复当前 Tab 及其 query；App / 小程序没有浏览器地址栏，不受影响。
+- 模式 4 的 Tab 切换和入口深链不进入 `src/router` 的全局守卫：`switchTabbar()` 只维护虚拟 Tab 状态、query 与 H5 地址栏。页面和按钮权限在页面内处理；从 Tab 进入普通页面时，全局守卫看到的 `from` 是真实宿主页 `/src/pages/index/index`。
 - 模式 4 仍是“页面语义仿真”：系统级独立 URL、独立页面栈、原生分享地址和页面级原生路由转场仍不存在；需要这些能力时只能使用真实多页面模式。当前方案解决的问题是**业务开发写法**与**生命周期 / 参数读取**，不是伪造系统页面栈。
 
 ### 4. `useTabPageShell()`：页面文件双身份适配
@@ -501,7 +504,7 @@ import { switchTabbar, onTabShow, onTabPageShow, curIdx } from '@/src/tabbar/ind
 
 | API | 说明 |
 | :--- | :--- |
-| `switchTabbar(url: string)` | **全局统一 Tab 跳转**。单页模式直接切索引，多页面模式自动选 `switchTab` / `redirectTo` |
+| `switchTabbar(url: string)` | **全局统一 Tab 跳转**。单页模式更新虚拟 Tab 状态、query 与地址栏，多页面模式自动选 `switchTab` / `redirectTo` |
 | `onTabShow(target, cb, immediate?)` | 监听到**某个 Tab 被切换激活**。用于单页模式下补上子视图没有原生 `onShow` 的缺口（切回来时重新拉数据） |
 | `onTabPageShow(target, cb, immediate?)` | 监听**某个 Tab 页面重新显示**。是 `onTabShow` 的超集：除切 Tab 外还覆盖「从子页返回」「App 回前台」。它还会修掉 `onTabShow` 的时序坑——在子页面里调 `switchTabbar` 时 `curIdx` 立即变化，`onTabShow` 会在容器页仍不可见时就回调，而 `onTabPageShow` 会推迟到页面真正返回时补发 |
 | `curIdx` | 当前激活 Tab 的下标（响应式 `ref<number>`） |

@@ -52,7 +52,8 @@ type PagesBuildState = {
   root: string;
   isProduction: boolean;
   output: { pages: PageConfig[]; tabBar?: Record<string, any>; [key: string]: any };
-  flags: { sandboxActive: boolean; skipConfigWriteback: boolean };
+  virtualPages: PageConfig[];
+  flags: { sandboxActive: boolean; strictMainPages: boolean; skipConfigWriteback: boolean };
 };
 
 type PagesStageContext = {
@@ -382,6 +383,36 @@ function runTabBar(state: PagesBuildState): void {
   else if (tabbarMode === '3' || tabbarMode === 'CUSTOM_TABBAR_WITHOUT_NATIVE' || tabbarMode === '4' || tabbarMode === 'SINGLE_PAGE_TABBAR') {
     // 模式3（纯自定义 TabBar，无原生配置）与 模式4（单页面 TabBar 容器模式）：完全删除 pages.json 中的 tabBar
     delete output.tabBar;
+
+    // 模式 4 只有宿主页是真实路由。其余 Tab 页必须从 pages.json 移除，否则小程序编译器会
+    // 为同一个 .uvue 同时生成 createPage 包装与组件实例；支付宝会优先加载前者并直接报
+    // 「无 Component() 构造器调用，但 Page() 页面构造器被错误调用」。
+    if (tabbarMode === '4' || tabbarMode === 'SINGLE_PAGE_TABBAR') {
+      const parsedConfig = parseCustomTabbarConfig(projectRoot);
+      const tabPagePaths = new Set<string>();
+      parsedConfig.list.forEach((item) => {
+        tabPagePaths.add(normalizePagePath(item.pagePath));
+      });
+      if (parsedConfig.midButton?.pagePath && typeof parsedConfig.midButton.pagePath === 'string') {
+        tabPagePaths.add(normalizePagePath(parsedConfig.midButton.pagePath));
+      }
+
+      const homePage = output.pages.find(page => page.type === 'home' || page.isHome === true);
+      const hostPath = normalizePagePath(homePage?.path ?? output.pages[0]?.path ?? '');
+      if (hostPath !== '') {
+        const virtualPages: PageConfig[] = [];
+        output.pages = output.pages.filter((page) => {
+          const pagePath = normalizePagePath(page.path);
+          if (pagePath !== hostPath && tabPagePaths.has(pagePath)) {
+            virtualPages.push(page);
+            return false;
+          }
+          return true;
+        });
+        state.virtualPages = virtualPages;
+        state.flags.strictMainPages = true;
+      }
+    }
   }
 }
 

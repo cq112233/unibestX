@@ -153,7 +153,8 @@ export function activateTabPageFromHostQuery(query: Map<string, string>): boolea
       pageQuery.set(key, value);
     }
   });
-  setTabPageQuery(tabbarList[index].pagePath, pageQuery);
+  const targetPath = tabbarList[index].pagePath;
+  setTabPageQuery(targetPath, pageQuery);
   setCurIdx(index);
   return true;
 }

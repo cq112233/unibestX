@@ -15,7 +15,7 @@ function handleClickBulge(url: string = '/src/pages/ai/ai'): void {
  * - 模式 0 / 模式 3 (无原生配置)：调用 uni.redirectTo
  * 内部自动同步激活索引
  * @param url 目标 tabbar 页面地址，**必须带前导斜杠**且已在 pages.json 的 tabBar 中声明；
- *            单一 tabbar（单页仿真）模式下该参数被忽略——固定回首页而不跳转；
+ *            单一 tabbar（单页仿真）模式下用于定位虚拟 Tab，并同步该 Tab 的 query；
  *            沙盒调试时目标页未编译，会退化为 toast 提示而非崩溃
  */
 export function switchTabbar(url: string): void {
@@ -41,9 +41,16 @@ export function switchTabbar(url: string): void {
     catch { }
     uni.redirectTo({
       url: '/src/pages/index/index',
+      success: (_res: any) => {
+        // redirectTo 会覆盖 H5 地址栏；宿主页加载完成后重新写回当前虚拟 Tab（?tab=xxx）
+        syncTabPageHostUrl(url);
+      },
       fail: (_err: any) => {
         uni.reLaunch({
-          url: '/src/pages/index/index'
+          url: '/src/pages/index/index',
+          success: (_res: any) => {
+            syncTabPageHostUrl(url);
+          }
         });
       }
     });
@@ -112,9 +119,8 @@ export function handleTabbarClick(index: number): void {
     return;
   }
   if (isSinglePageTabbar) {
-    setCurIdx(index);
-    // TabBar 点击不经过系统路由，同样需要同步 H5 地址栏
-    syncTabPageHostUrl(list[index].pagePath);
+    // 模式 4 点击与 switchTabbar() 共用同一条带守卫的虚拟导航链路
+    switchTabbar(list[index].pagePath);
     return;
   }
   if (list[index].isBulge) {

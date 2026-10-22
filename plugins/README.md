@@ -25,13 +25,14 @@
 | 文件名 | 插件名称 / 导出函数 | 定位与核心功能 | 独立性 (能否拔除) | 宿主 / 数据依赖 |
 | :--- | :--- | :--- | :---: | :--- |
 | **`pages-json-util.ts`** | *(公共工具模块)* | 平台条件编译过滤（`#ifdef`）、多平台 `pages.json` 解析与合并 | 基础工具 | 无插件依赖，被路由与布局插件共同引用 |
+| **`pages-meta-cache.ts`** | *(公共工具模块)* | 完整页面元数据的进程内 + 落盘快照；模式 4 裁剪 Tab 路由后，供 `TabViews` 在多端 dev 进程间恢复多平台 `definePage` 配置 | 基础工具 | 无插件依赖，被页面核心插件与 TabViews 插件共同引用 |
 | **`vite-plugin-uni-pages.ts`** | `uniPagesPlugin()` | **路由生成微内核主控**：扫描页面 SFC、解析 `definePage` 宏、合并 `pages.config.json`、调度卫星阶段并写入 `pages.json` | **可拔除** | 依赖 `pages-json-util.ts`；拔除后停止自动路由扫描，退回手动维护 `pages.json` |
 | **`vite-plugin-uni-pages-sandbox.ts`** | `uniPagesSandboxPlugin()` | **沙盒独立调试模式（卫星）**：当开启 `VITE_DEV_SANDBOX` 时，将页面路由裁剪为仅调试页面 | **可拔除** | **宿主依赖**：通过 `uniPagesStage (order: 100)` 挂载到核心主控运行；拔除后沙盒裁剪失效 |
-| **`vite-plugin-uni-pages-tabbar.ts`** | `uniPagesTabbarPlugin()` | **TabBar 策略注入（卫星）**：根据 `VITE_TABBAR_MODE (0~4)` 动态生成 pages.json 的 tabBar 节点 | **可拔除** | **宿主依赖**：通过 `uniPagesStage (order: 200)` 挂载到核心主控运行；拔除后 tabBar 不再动态计算 |
+| **`vite-plugin-uni-pages-tabbar.ts`** | `uniPagesTabbarPlugin()` | **TabBar 策略注入（卫星）**：根据 `VITE_TABBAR_MODE (0~4)` 动态生成 pages.json 的 tabBar 节点；模式 4 只保留宿主页路由，其余 Tab 页仅作为组件编译 | **可拔除** | **宿主依赖**：通过 `uniPagesStage (order: 200)` 挂载到核心主控运行；拔除后 tabBar 不再动态计算 |
 | **`vite-plugin-uni-pages-route-table.ts`** | `uniPagesRouteTablePlugin()` | **页面路由表虚拟模块（卫星）**：在写盘前生成 `virtual:uni-pages-route-table`，按路径 map / 数组 list 两种形态分别导出 JSON 与对象（`useRoute()` 数据源），不产生物理文件 | **可拔除** | **宿主依赖**：通过 `uniPagesStage (order: 300)` 挂载到核心主控运行；拔除后页面配置表停止更新 |
 | **`uni-layouts-plugin.ts`** | `uniLayoutsPlugin()` | **跨端 Layout 布局包装**：解析页面 `layout` 配置并在 SFC 模板外层自动包裹布局组件（如 `<layout-default>`） | **可拔除** | **产物消费**：依赖 `pages.json` 数据；拔除后页面不再被包裹布局外壳 |
 | **`root-plugin.ts`** | `uniRootX()` | **全局根骨架组件包装**：自动给页面外层套上根组件（如 `<AppRoot>`）并透传页面参数 | **可拔除** | **产物消费**：依赖 `pages.json` 数据；拔除后页面不再包裹全局根组件 |
-| **`vite-plugin-tabbar-views.ts`** | `tabbarViewsPlugin()` | **单页 TabBar 调度生成**：根据 `src/tabbar/config.uts` 自动生成 `TabViews.uvue`，普通 Tab 直接复用页面 `.uvue`，宿主页通过 `#tabHost` slot 注入 | **可拔除** | **配置依赖**：依赖 `src/tabbar/config.uts` 和 `pages.json`；用于单页保活模式 |
+| **`vite-plugin-tabbar-views.ts`** | `tabbarViewsPlugin()` | **单页 TabBar 调度生成**：根据 `src/tabbar/config.uts` 自动生成 `TabViews.uvue`，普通 Tab 直接复用页面 `.uvue`，宿主页通过 `#tabHost` slot 注入 | **可拔除** | **配置依赖**：依赖 `src/tabbar/config.uts`、`pages.json` 与 `pages-meta-cache.ts` 的跨进程快照；用于单页保活模式 |
 | **`vite-plugin-clean-logger.ts`** | `cleanLoggerPlugin()` | **控制台日志净化**：拦截并过滤 Vite / DCloud 编译期的 warning 告警、无意义栈帧与代码片段 | **完全独立** | 无任何外部依赖，即插即拔 |
 | **`vite-plugin-editor-version.ts`** | `editorVersionPlugin()` | **编辑器版本对齐检测**：构建前检查本机 HBuilderX 编译器与 `@dcloudio/*` 依赖版本是否一致并给出提示 | **完全独立** | 仅依赖 `scripts/sync-hbuilderx.mjs --preflight`，只提示不阻断 |
 | **`vite-plugin-h5-optimize-deps.ts`** | `h5OptimizeDepsPlugin()` | **H5 依赖预构建优化**：将核心大依赖（Pinia 等）纳入 esbuild 预构建，加速 H5 冷启动并规避 504 错误 | **完全独立** | 仅在 H5 / Web 开发模式生效，无其他插件依赖 |
@@ -64,6 +65,8 @@ graph TD
   `sandbox` / `tabbar` 只导出携带 `uniPagesStage` 描述的对象；`route-table` 额外实现了 `resolveId` / `load` 来提供虚拟模块。Vite 不认识 `uniPagesStage`，只有核心主控会在合适时机调用 `stage.run(state)`，因此路由表内容仍由核心扫描结果驱动。
 - **为什么核心主控离开卫星依然完好？**
   核心主控在执行前会自检阶段是否完整，若某阶段未注册，仅打印一条警告提示对应功能未生效，核心依然能完成全量页面扫描并输出标准 `pages.json`。
+- **模式 4 为什么需要跨进程元数据快照？**
+  非宿主 Tab 页会从 `pages.json` 移除，但多端 dev 进程可能同时监听同一份生成物。完整 `definePage` 变体会写入 `unpackage/cache/unibestx-pages-meta.json`，任一进程重新生成 `TabViews.uvue` 时都能恢复正确的平台标题与导航配置，不会被其他端的旧状态覆盖。
 
 ---
 
