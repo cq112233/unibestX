@@ -1,4 +1,5 @@
 <script setup lang="uts">
+import { onAppShow } from '@dcloudio/uni-app';
 import { checkDirectEntry } from '@/uni_modules/route-bestX/index.uts';
 import { useI18nStore, useThemeStore, useTokenStore, useUserStore } from '@/src/store/index.uts';
 import type { IUserInfo } from '@/src/store/index.uts';
@@ -88,7 +89,7 @@ onLaunch(() => {
   // #endif
 });
 
-onShow((options?) => {
+onAppShow((options: any | null): void => {
   checkDirectEntry(options);
 });
 

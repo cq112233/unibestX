@@ -42,12 +42,12 @@ export type UseTabPageResult = {
 };
 
 /** 读取当前页面栈；仅用于给虚拟 RouteLocation 补齐同构字段 */
-function readCurrentPages(): Array<any> {
+function readCurrentPages(): Array<UniPage> {
   try {
-    return getCurrentPages() as Array<any>;
+    return getCurrentPages();
   }
   catch {
-    return [] as Array<any>;
+    return [] as Array<UniPage>;
   }
 }
 
@@ -212,36 +212,36 @@ export function useTabPage(): UseTabPageResult {
   }
 
   /** 注册首次进入回调；若注册时页面已经可见则立即执行 */
-  function onLoad(callback: TabPageLifecycleCallback): void {
+  const registerLoad = (callback: TabPageLifecycleCallback): void => {
     loadCallbacks.push(callback);
     if (!hasLoaded && isCurrentTabVisible()) {
       hasLoaded = true;
       callback();
     }
-  }
+  };
 
   /** 注册页面显示回调；若注册时页面已经可见则立即执行 */
-  function onShow(callback: TabPageLifecycleCallback): void {
+  const registerShow = (callback: TabPageLifecycleCallback): void => {
     showCallbacks.push(callback);
     if (!hasShown && isCurrentTabVisible()) {
       hasShown = true;
       callback();
     }
-  }
+  };
 
   /** 注册页面隐藏回调；切走 Tab、进入子页或 App 切后台时执行 */
-  function onHide(callback: TabPageLifecycleCallback): void {
+  const registerHide = (callback: TabPageLifecycleCallback): void => {
     hideCallbacks.push(callback);
-  }
+  };
 
   /** 注册视图卸载回调 */
-  function onUnload(callback: TabPageLifecycleCallback): void {
+  const registerUnload = (callback: TabPageLifecycleCallback): void => {
     unloadCallbacks.push(callback);
-  }
+  };
 
   // 普通页面（非 Tab 页面）直接使用原生页面生命周期，保证同一套调用方式在普通页面同样生效
   if (pageIndex < 0) {
-    onPageLoad((): void => {
+    onPageLoad((_options: UTSJSONObject | null): void => {
       if (!hasLoaded) {
         hasLoaded = true;
         runCallbacks(loadCallbacks);
@@ -286,9 +286,17 @@ export function useTabPage(): UseTabPageResult {
     meta,
     isActive,
     isPageVisible,
-    onLoad,
-    onShow,
-    onHide,
-    onUnload
+    onLoad: (callback: TabPageLifecycleCallback): void => {
+      registerLoad(callback);
+    },
+    onShow: (callback: TabPageLifecycleCallback): void => {
+      registerShow(callback);
+    },
+    onHide: (callback: TabPageLifecycleCallback): void => {
+      registerHide(callback);
+    },
+    onUnload: (callback: TabPageLifecycleCallback): void => {
+      registerUnload(callback);
+    }
   };
 }

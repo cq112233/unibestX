@@ -55,6 +55,12 @@ type PagesStage = {
   run: (state: PagesBuildState, ctx: PagesStageContext) => void;
 };
 
+type PageRoutesValueName
+  = | 'PAGES_ROUTE_TABLE_JSON'
+    | 'PAGES_ROUTE_TABLE'
+    | 'PAGES_ROUTE_TABLE_LIST_JSON'
+    | 'PAGES_ROUTE_TABLE_LIST';
+
 /** 业务代码导入的公共虚拟模块 ID */
 export const PAGES_ROUTE_TABLE_MODULE_ID = 'virtual:uni-pages-route-table';
 
@@ -111,12 +117,26 @@ export function buildPageRoutesTable(output: Record<string, any>): Record<string
   return table;
 }
 
+/** 转义成 UTS 可消费的 JS 单引号字符串字面量 */
+function toJsStringLiteral(value: string): string {
+  return `'${value.replace(/\\/g, '\\\\').replace(/'/g, '\\\'')}'`;
+}
+
+/** 计算虚拟模块四个导出值；App 预编译与 H5 虚拟模块共用同一份生成口径 */
+function renderPageRoutesValues(table: Record<string, PageConfig>): Record<PageRoutesValueName, string> {
+  const jsonText = JSON.stringify(table);
+  const listJsonText = JSON.stringify(Object.values(table));
+  return {
+    PAGES_ROUTE_TABLE_JSON: toJsStringLiteral(jsonText),
+    PAGES_ROUTE_TABLE: jsonText,
+    PAGES_ROUTE_TABLE_LIST_JSON: toJsStringLiteral(listJsonText),
+    PAGES_ROUTE_TABLE_LIST: listJsonText
+  };
+}
+
 /** 把路由配置表渲染为虚拟模块源码（单引号字符串字面量，兼容 UTS 导入） */
 export function renderPageRoutesSource(table: Record<string, PageConfig>): string {
-  const jsonText = JSON.stringify(table);
-  const stringLiteral = `'${jsonText.replace(/\\/g, '\\\\').replace(/'/g, '\\\'')}'`;
-  const listJsonText = JSON.stringify(Object.values(table));
-  const listStringLiteral = `'${listJsonText.replace(/\\/g, '\\\\').replace(/'/g, '\\\'')}'`;
+  const values = renderPageRoutesValues(table);
 
   return [
     '/**',
@@ -128,24 +148,49 @@ export function renderPageRoutesSource(table: Record<string, PageConfig>): strin
     ' */',
     // 虚拟模块没有 .uts 后缀，Vite 会按 JS 解析；这里不写类型标注，UTS 与 JS 都能直接消费。
     '/** 路径 → 页面配置的 JSON 字符串 */',
-    `export const PAGES_ROUTE_TABLE_JSON = ${stringLiteral};`,
+    `export const PAGES_ROUTE_TABLE_JSON = ${values.PAGES_ROUTE_TABLE_JSON};`,
     '',
     '/** 路径 → 页面配置的对象形式 */',
-    `export const PAGES_ROUTE_TABLE = ${jsonText};`,
+    `export const PAGES_ROUTE_TABLE = ${values.PAGES_ROUTE_TABLE};`,
     '',
     '/** 页面配置数组的 JSON 字符串 */',
-    `export const PAGES_ROUTE_TABLE_LIST_JSON = ${listStringLiteral};`,
+    `export const PAGES_ROUTE_TABLE_LIST_JSON = ${values.PAGES_ROUTE_TABLE_LIST_JSON};`,
     '',
     '/** 页面配置数组形式，便于直接遍历 */',
-    `export const PAGES_ROUTE_TABLE_LIST = ${listJsonText};`,
+    `export const PAGES_ROUTE_TABLE_LIST = ${values.PAGES_ROUTE_TABLE_LIST};`,
     ''
   ].join('\n');
 }
 
-/** 核心插件未运行时（如单测）从磁盘 pages.json 生成同一份虚拟模块内容 */
-function readPageRoutesSourceFromPagesJson(projectRoot: string): string {
-  const parsed = loadPlatformPagesJson(path.resolve(projectRoot, 'pages.json'));
-  return renderPageRoutesSource(buildPageRoutesTable(parsed as Record<string, any>));
+/**
+ * 把具名导入内联为本地常量。
+ *
+ * DCloud 的 `uni:app-uts` 会把 `.uts` 源码复制到 `.uvue` 后单独交给 Kotlin 编译器，
+ * 这条链路只执行 Rollup `transform`，不会为 App 端解析 Vite 虚拟模块。必须在
+ * `uni:app-uts` 之前把 import 替换掉，否则 `virtual:` 会原样进入 UTS/Kotlin。
+ */
+export function inlinePageRoutesImport(code: string, table: Record<string, PageConfig>): string {
+  if (!code.includes(PAGES_ROUTE_TABLE_MODULE_ID)) {
+    return code;
+  }
+  const values = renderPageRoutesValues(table);
+  const importPattern = /import\s*\{([^}]*)\}\s*from\s*['"]virtual:uni-pages-route-table['"]\s*;?/g;
+  return code.replace(importPattern, (statement: string, importClause: string): string => {
+    const declarations: string[] = [];
+    importClause.split(',').forEach((specifier: string) => {
+      const parts = specifier.trim().split(/\s+as\s+/);
+      const exportedName = parts[0].trim();
+      if (!Object.hasOwn(values, exportedName)) {
+        return;
+      }
+      const localName = (parts.length > 1 ? parts[1] : parts[0]).trim();
+      if (localName == '') {
+        return;
+      }
+      declarations.push(`const ${localName} = ${values[exportedName as PageRoutesValueName]};`);
+    });
+    return declarations.length > 0 ? declarations.join('\n') : statement;
+  });
 }
 
 // ==========================================
@@ -155,7 +200,17 @@ function readPageRoutesSourceFromPagesJson(projectRoot: string): string {
 export default function uniPagesRouteTablePlugin(): Plugin & { uniPagesStage: PagesStage } {
   let projectRoot = process.cwd();
   let moduleSource = '';
+  let routeTable: Record<string, PageConfig> | null = null;
   let server: any = null;
+
+  const ensureRouteTable = (): Record<string, PageConfig> => {
+    if (routeTable != null) {
+      return routeTable;
+    }
+    const parsed = loadPlatformPagesJson(path.resolve(projectRoot, 'pages.json'));
+    routeTable = buildPageRoutesTable(parsed as Record<string, any>);
+    return routeTable;
+  };
 
   const invalidateVirtualModule = (): void => {
     if (server == null) {
@@ -185,10 +240,12 @@ export default function uniPagesRouteTablePlugin(): Plugin & { uniPagesStage: Pa
           routePagePaths.add(page.path);
         }
       });
-      const nextSource = renderPageRoutesSource(buildPageRoutesTable({
+      const nextTable = buildPageRoutesTable({
         pages: routePages,
         subPackages: state.scannedSubPkgs
-      }));
+      });
+      routeTable = nextTable;
+      const nextSource = renderPageRoutesSource(nextTable);
       if (nextSource === moduleSource) {
         return;
       }
@@ -222,9 +279,34 @@ export default function uniPagesRouteTablePlugin(): Plugin & { uniPagesStage: Pa
         return null;
       }
       if (moduleSource === '') {
-        moduleSource = readPageRoutesSourceFromPagesJson(projectRoot);
+        routeTable = buildPageRoutesTable(
+          loadPlatformPagesJson(path.resolve(projectRoot, 'pages.json')) as Record<string, any>
+        );
+        moduleSource = renderPageRoutesSource(routeTable);
       }
       return moduleSource;
+    },
+
+    transform(code: string, id: string) {
+      if (!code.includes(PAGES_ROUTE_TABLE_MODULE_ID)) {
+        return null;
+      }
+      const filename = id.split('?')[0].replace(/\\/g, '/');
+      if (
+        !filename.endsWith('.uts')
+        && !filename.endsWith('.uvue')
+        && !filename.endsWith('.vue')
+      ) {
+        return null;
+      }
+      const nextCode = inlinePageRoutesImport(code, ensureRouteTable());
+      if (nextCode === code) {
+        return null;
+      }
+      return {
+        code: nextCode,
+        map: null
+      };
     }
   };
 }
