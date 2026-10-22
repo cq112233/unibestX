@@ -63,7 +63,8 @@ definePage({
   }
 });
 
-const router = useRouter();
+// 页面文件同时可作为模式 4 的 Tab 子页使用：嵌套时由 useTabPage() 接管页面生命周期
+useTabPageShell('me');
 
 const {
   route: meRoute,
@@ -71,6 +72,8 @@ const {
   onShow: onMeShow,
   onHide: onMeHide
 } = useTabPage();
+
+const router = useRouter();
 
 // 监听 navbar 自定义下拉刷新事件（在 enablePullDownRefresh: true 且处于当前 Tab 时生效）
 onNavbarPullDownRefresh(() => {
@@ -87,6 +90,23 @@ onNavbarPullDownRefresh(() => {
     console.log('我的页面刷新成功');
     stopNavbarPullDownRefresh();
   }, 1000);
+});
+
+// 与普通页面一致的首次进入 / 显示 / 隐藏生命周期
+onMeLoad(() => {
+  // 💡 模式4的映射关系中，/me.uvue 映射到的实际页面路由是/tab/index，这是因为tabbar/index.uts中定义了映射关系
+  // 💡 模式4 useRoute 获取的还是index的
+  // 🔔 模式4，tabbar切换时，不会走beforeEach，因为是index，是根容器, 如需拦截请自行处理src/tabbar/adapters/tab-navigation.uts，一般业务用不动，无需修改
+  console.log('我的页面路径', meRoute.value.fullPath);
+  console.log('onMeLoad', '我的 Tab 挂载了👋');
+});
+
+onMeShow(() => {
+  console.log('onMeShow', '我的 Tab 显示了👀');
+});
+
+onMeHide(() => {
+  console.log('onMeHide', '我的 Tab 隐藏了👉');
 });
 
 const userStore = useUserStore();
@@ -148,22 +168,6 @@ function handleLogout() {
     }
   });
 }
-
-// 与普通页面一致的首次进入 / 显示 / 隐藏生命周期
-onMeLoad(() => {
-  console.log('onMeLoad', '我 Tab 挂载了👋', meRoute.value.fullPath);
-});
-
-onMeShow(() => {
-  console.log('onMeShow', '我 Tab 显示了👀', meRoute.value.fullPath);
-});
-
-onMeHide(() => {
-  console.log('onMeHide', '我 Tab 隐藏了👉');
-});
-
-// 页面文件同时可作为模式 4 的 Tab 子页使用：嵌套时由 useTabPage() 接管页面生命周期
-useTabPageShell('me');
 </script>
 
 <style scoped lang="scss"></style>

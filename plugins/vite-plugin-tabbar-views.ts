@@ -173,8 +173,11 @@ export function renderTabPageScaffold(entry: TabbarPageEntry): string {
 <script setup lang="uts">
 import { curIdx, resolveTabIndexByKey, useTabPage, useTabPageShell } from '@/src/tabbar/index.uts';
 import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/layouts/navbar/utils/index.uts';
+import { useRouter } from '@/uni_modules/route-bestX/index.uts';
 
-definePage(() => {
+definePage((options) => {
+  const { platform, appName: _appName } = options;
+  const { isH5 } = platform;
   return {
     customPageClass: 'init-page', // 页面根容器自定义类名（配合 layout 布局使用，支持配置全局样式类）
     customPageStyle: 'background-color: transparent;', // 页面根容器自定义行内样式（穿透任何样式隔离，全端绝对生效）
@@ -185,7 +188,6 @@ definePage(() => {
     showBack: false, // 导航栏左侧是否显示返回箭头（TabBar 首页无需返回按钮）
     hideStatusBar: false, // 是否隐藏状态栏（true 为隐藏）
     hideNavbar: false, // 是否隐藏顶部导航栏（false 为正常显示）
-    enablePullDownRefresh: false, // 是否启用下拉刷新，只有设置为false时才會触发自定义的下拉刷新事件
     style: {
       navigationBarTitleText: ${toSingleQuoted(title)},
       navigationStyle: 'custom'
@@ -193,12 +195,17 @@ definePage(() => {
   };
 });
 
+// 页面文件同时可作为模式 4 的 Tab 子页使用：嵌套时由 useTabPage() 接管页面生命周期
+useTabPageShell(${toSingleQuoted(entry.tabType)});
+
 const {
   route: ${routeVar},
   onLoad: on${pascalName}Load,
   onShow: on${pascalName}Show,
   onHide: on${pascalName}Hide
 } = useTabPage();
+
+const router = useRouter();
 
 // 监听 navbar 自定义下拉刷新事件
 onNavbarPullDownRefresh(() => {
@@ -219,19 +226,20 @@ onNavbarPullDownRefresh(() => {
 
 // 与普通页面一致的首次进入 / 显示 / 隐藏生命周期
 on${pascalName}Load(() => {
-  console.log(${toSingleQuoted(`on${pascalName}Load`)}, ${toSingleQuoted(`${safePageName} Tab 挂载了👋`)}, ${routeVar}.value.fullPath);
+  // 💡 模式4的映射关系中，/${safePageName}.uvue 映射到的实际页面路由是/tab/index，这是因为tabbar/index.uts中定义了映射关系
+  // 💡 模式4 useRoute 获取的还是index的
+  // 🔔 模式4，tabbar切换时，不会走beforeEach，因为是index，是根容器, 如需拦截请自行处理src/tabbar/adapters/tab-navigation.uts，一般业务用不动，无需修改
+  console.log(${toSingleQuoted(`${safePageName}页面路径`)}, ${routeVar}.value.fullPath);
+  console.log(${toSingleQuoted(`on${pascalName}Load`)}, ${toSingleQuoted(`${safePageName} Tab 挂载了👋`)});
 });
 
 on${pascalName}Show(() => {
-  console.log(${toSingleQuoted(`on${pascalName}Show`)}, ${toSingleQuoted(`${safePageName} Tab 显示了👀`)}, ${routeVar}.value.fullPath);
+  console.log(${toSingleQuoted(`on${pascalName}Show`)}, ${toSingleQuoted(`${safePageName} Tab 显示了👀`)});
 });
 
 on${pascalName}Hide(() => {
   console.log(${toSingleQuoted(`on${pascalName}Hide`)}, ${toSingleQuoted(`${safePageName} Tab 隐藏了👉`)});
 });
-
-// 页面文件同时可作为模式 4 的 Tab 子页使用：嵌套时由 useTabPage() 接管页面生命周期
-useTabPageShell(${toSingleQuoted(entry.tabType)});
 </script>
 
 <style scoped></style>

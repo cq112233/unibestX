@@ -1,0 +1,77 @@
+<template>
+  <view class="flex flex-col">
+    <text>Ai1View</text>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { curIdx, resolveTabIndexByKey, useTabPage, useTabPageShell } from '@/src/tabbar/index.uts';
+import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/layouts/navbar/utils/index.uts';
+import { useRouter } from '@/uni_modules/route-bestX/index.uts';
+
+definePage(() => {
+  return {
+    customPageClass: 'init-page', // 页面根容器自定义类名（配合 layout 布局使用，支持配置全局样式类）
+    customPageStyle: 'background-color: transparent;', // 页面根容器自定义行内样式（穿透任何样式隔离，全端绝对生效）
+    name: 'ai1', // 路由名：useRoute().name 优先读取此值，未显式声明时默认读取路径最后一个单词（如 index）
+    debug: false, // 是否开启当前页面沙盒独立调试（设为 true 可单独调试此页；⚠️ 调试完成后改回 false）
+    debugHome: false, // 沙盒调试模式下是否将当前页面指定为启动首页（全局仅允许 1 个页面设为 true，排在 pages[0]）
+    layout: 'navbar', // 页面通用布局模板（采用 navbar 布局接管顶部导航与下拉滚动容器）
+    showBack: false, // 导航栏左侧是否显示返回箭头（TabBar 首页无需返回按钮）
+    hideStatusBar: false, // 是否隐藏状态栏（true 为隐藏）
+    hideNavbar: false, // 是否隐藏顶部导航栏（false 为正常显示）
+    style: {
+      navigationBarTitleText: 'tabbar.ai',
+      navigationStyle: 'custom'
+    }
+  };
+});
+
+// 页面文件同时可作为模式 4 的 Tab 子页使用：嵌套时由 useTabPage() 接管页面生命周期
+useTabPageShell('ai1');
+
+const {
+  route: ai1Route,
+  onLoad: onAi1Load,
+  onShow: onAi1Show,
+  onHide: onAi1Hide
+} = useTabPage();
+
+const router = useRouter();
+
+// 监听 navbar 自定义下拉刷新事件
+onNavbarPullDownRefresh(() => {
+  // 所有已挂载 Tab 都会收到全局刷新事件，只处理当前激活的 Tab
+  if (curIdx.value != resolveTabIndexByKey('ai1')) {
+    return;
+  }
+  console.log('ai1页面刷新中...');
+  setTimeout(() => {
+    // 异步完成时再次门控：刷新期间若已切走则忽略结果
+    if (curIdx.value != resolveTabIndexByKey('ai1')) {
+      return;
+    }
+    console.log('ai1页面刷新成功');
+    stopNavbarPullDownRefresh();
+  }, 1000);
+});
+
+// 与普通页面一致的首次进入 / 显示 / 隐藏生命周期
+onAi1Load(() => {
+  // 💡 模式4的映射关系中，/ai1.uvue 映射到的实际页面路由是/tab/index，这是因为tabbar/index.uts中定义了映射关系
+  // 💡 模式4 useRoute 获取的还是index的
+  // 🔔 模式4，tabbar切换时，不会走beforeEach，因为是index，是根容器, 如需拦截请自行处理src/tabbar/adapters/tab-navigation.uts，一般业务用不动，无需修改
+  console.log('ai1页面路径', ai1Route.value.fullPath);
+  console.log('onAi1Load', 'ai1 Tab 挂载了👋');
+});
+
+onAi1Show(() => {
+  console.log('onAi1Show', 'ai1 Tab 显示了👀');
+});
+
+onAi1Hide(() => {
+  console.log('onAi1Hide', 'ai1 Tab 隐藏了👉');
+});
+</script>
+
+<style scoped></style>

@@ -138,9 +138,9 @@ export const customTabbarConfig = {
     expect(output).toContain('<text>MeView</text>');
     expect(output).toContain('name: \'me\'');
     expect(output).toContain('navigationBarTitleText: \'tabbar.me\'');
-    expect(output).toContain('enablePullDownRefresh: false');
-    expect(output).toContain('onMeLoad');
+    expect(output).toContain('useRouter()');
     expect(output).toContain('useTabPageShell(\'me\')');
+    expect(output).toContain('模式4的映射关系中');
     expect(output).not.toContain('xxxx');
     expect(output).not.toContain('console.log(router, route)');
   });

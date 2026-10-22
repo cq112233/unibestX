@@ -582,13 +582,6 @@ import { useRouter } from '@/uni_modules/route-bestX/index.uts';
 
 import TabPageHost from '@/src/tabbar/components/TabPageHost.uvue';
 
-const {
-  route: indexRoute,
-  onLoad: onIndexLoad,
-  onShow: onIndexShow,
-  onHide: onIndexHide
-} = useTabPage();
-
 definePage((options) => {
   const { platform, appName: _appName } = options;
   const { isH5, isAppIOS, isAppAndroid, isAppHarmony, isMpAlipay, isMpWeixin } = platform;
@@ -626,19 +619,48 @@ definePage((options) => {
 // 页面生命周期、入口深链、可见性桥接、模式判断与 Android 返回键统一由 TabBar hook 处理
 useTabPageShell('index');
 
+const {
+  route: indexRoute,
+  onLoad: onIndexLoad,
+  onShow: onIndexShow,
+  onHide: onIndexHide
+} = useTabPage();
+
+const router = useRouter();
+
+// 监听 navbar 自定义下拉刷新事件（在 enablePullDownRefresh: true 且处于当前 Tab 时生效）
+onNavbarPullDownRefresh(() => {
+  // 所有已挂载 Tab 都会收到全局刷新事件，只处理当前激活的首页
+  if (curIdx.value != resolveTabIndexByKey('index')) {
+    return;
+  }
+  console.log('首页刷新中...');
+  setTimeout(() => {
+    // 异步完成时再次门控：刷新期间若已切走则忽略结果
+    if (curIdx.value != resolveTabIndexByKey('index')) {
+      return;
+    }
+    console.log('首页刷新成功');
+    stopNavbarPullDownRefresh();
+  }, 1000);
+});
+
+// 与普通页面一致的首次进入 / 显示 / 隐藏生命周期
 onIndexLoad(() => {
-  console.log('onIndexLoad', '首页挂载了👋', indexRoute.value.fullPath);
+  // 💡 模式4的映射关系中，/index.uvue 映射到的实际页面路由是/tab/index，这是因为tabbar/index.uts中定义了映射关系
+  // 💡 模式4 useRoute 获取的还是index的
+  // 🔔 模式4，tabbar切换时，不会走beforeEach，因为是index，是根容器, 如需拦截请自行处理src/tabbar/adapters/tab-navigation.uts，一般业务用不动，无需修改
+  console.log('首页页面路径', indexRoute.value.fullPath);
+  console.log('onIndexLoad', '首页挂载了👋');
 });
 
 onIndexShow(() => {
-  console.log('onIndexShow', '首页显示了👀', indexRoute.value.fullPath);
+  console.log('onIndexShow', '首页显示了👀');
 });
 
 onIndexHide(() => {
   console.log('onIndexHide', '首页隐藏了👉');
 });
-
-const router = useRouter();
 
 type FeatureItem = {
   id: string;
@@ -1149,23 +1171,6 @@ function openGithub(): void {
   });
   // #endif
 }
-
-// 监听 navbar 自定义下拉刷新事件（在 enablePullDownRefresh: true 且处于当前 Tab 时生效）
-onNavbarPullDownRefresh(() => {
-  // 所有已挂载 Tab 都会收到全局刷新事件，只处理当前激活的首页
-  if (curIdx.value != resolveTabIndexByKey('index')) {
-    return;
-  }
-  console.log('首页刷新中...');
-  setTimeout(() => {
-    // 异步完成时再次门控：刷新期间若已切走则忽略结果
-    if (curIdx.value != resolveTabIndexByKey('index')) {
-      return;
-    }
-    console.log('首页刷新成功');
-    stopNavbarPullDownRefresh();
-  }, 1000);
-});
 </script>
 
 <style scoped lang="scss"></style>

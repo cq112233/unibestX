@@ -25,12 +25,6 @@
         </view>
       </view>
     </view>
-
-    <CompA />
-    <CompA>
-      111
-    </CompA>
-
     <!-- 基础能力演示列表（Card + 一行描述 + sub路径展示 + 原生按钮跳转） -->
     <view
       v-for="item in demoList"
@@ -96,7 +90,6 @@
 import { curIdx, resolveTabIndexByKey, useTabPage, useTabPageShell } from '@/src/tabbar/index.uts';
 import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/layouts/navbar/utils/index.uts';
 import { useRouter } from '@/uni_modules/route-bestX/index.uts';
-import CompA from './components/a.uvue';
 
 definePage({
   debug: false,
@@ -111,19 +104,51 @@ definePage({
   }
 });
 
-const router = useRouter();
+// 页面文件同时可作为模式 4 的 Tab 子页使用：嵌套时由 useTabPage() 接管页面生命周期
+useTabPageShell('basic');
 
-/**
- * 模式 4 的页面语义适配：
- * - route 提供当前 Tab 自己的 path / fullPath / query / meta / name
- * - onLoad / onShow / onHide / onUnload 与普通页面的生命周期语义一致
- */
 const {
   route: basicRoute,
   onLoad: onBasicLoad,
   onShow: onBasicShow,
   onHide: onBasicHide
 } = useTabPage();
+
+const router = useRouter();
+
+// 监听 navbar 自定义下拉刷新事件
+onNavbarPullDownRefresh(() => {
+  // 所有已挂载 Tab 都会收到全局刷新事件，只处理当前激活的基础页
+  if (curIdx.value != resolveTabIndexByKey('basic')) {
+    return;
+  }
+  console.log('基础页面刷新中...');
+  setTimeout(() => {
+    // 异步完成时再次门控：刷新期间若已切走则忽略结果
+    if (curIdx.value != resolveTabIndexByKey('basic')) {
+      return;
+    }
+    console.log('基础页面刷新成功');
+    stopNavbarPullDownRefresh();
+  }, 1000);
+});
+
+// 与普通页面一致的首次进入 / 显示 / 隐藏生命周期
+onBasicLoad(() => {
+  // 💡 模式4的映射关系中，/basic.uvue 映射到的实际页面路由是/tab/index，这是因为tabbar/index.uts中定义了映射关系
+  // 💡 模式4 useRoute 获取的还是index的
+  // 🔔 模式4，tabbar切换时，不会走beforeEach，因为是index，是根容器, 如需拦截请自行处理src/tabbar/adapters/tab-navigation.uts，一般业务用不动，无需修改
+  console.log('基础页面路径', basicRoute.value.fullPath);
+  console.log('onBasicLoad', '基础 Tab 挂载了👋');
+});
+
+onBasicShow(() => {
+  console.log('onBasicShow', '基础 Tab 显示了👀');
+});
+
+onBasicHide(() => {
+  console.log('onBasicHide', '基础 Tab 隐藏了👉');
+});
 
 // =========================================================================
 // 【可选删除】以下数据与方法仅供脚手架基础功能演示使用。
@@ -237,39 +262,6 @@ function copyCleanDemoCommand(): void {
   });
 }
 // =================== 【可选删除】基础演示 Demo 数据与跳转方法 结束 ===================
-
-// 监听 navbar 自定义下拉刷新事件
-onNavbarPullDownRefresh(() => {
-  // 所有已挂载 Tab 都会收到全局刷新事件，只处理当前激活的基础页
-  if (curIdx.value != resolveTabIndexByKey('basic')) {
-    return;
-  }
-  console.log('基础页面刷新中...');
-  setTimeout(() => {
-    // 异步完成时再次门控：刷新期间若已切走则忽略结果
-    if (curIdx.value != resolveTabIndexByKey('basic')) {
-      return;
-    }
-    console.log('基础页面刷新成功');
-    stopNavbarPullDownRefresh();
-  }, 1000);
-});
-
-// 与普通页面一致的首次进入 / 显示 / 隐藏生命周期
-onBasicLoad(() => {
-  console.log('onBasicLoad', '基础 Tab 挂载了👋', basicRoute.value.fullPath);
-});
-
-onBasicShow(() => {
-  console.log('onBasicShow', '基础 Tab 显示了👀', basicRoute.value.fullPath);
-});
-
-onBasicHide(() => {
-  console.log('onBasicHide', '基础 Tab 隐藏了👉');
-});
-
-// 页面文件同时可作为模式 4 的 Tab 子页使用：嵌套时由 useTabPage() 接管页面生命周期
-useTabPageShell('basic');
 </script>
 
 <style scoped></style>

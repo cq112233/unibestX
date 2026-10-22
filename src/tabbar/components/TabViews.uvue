@@ -38,23 +38,27 @@
     <TabContent v-if="isTabRendered(1)" :content-index="1" title="tabbar.basic" :enable-pull-down-refresh="true" :show-back="false">
       <BasicPage />
     </TabContent>
+    <TabContent v-if="isTabRendered(2)" :content-index="2" title="tabbar.ai" :enable-pull-down-refresh="true" :show-back="false" custom-page-class="init-page" custom-page-style="background-color: transparent;">
+      <Ai1Page />
+    </TabContent>
     <!-- #ifdef H5 -->
-    <TabContent v-if="isTabRendered(2)" :content-index="2" title="😂" :enable-pull-down-refresh="true" :show-back="false" custom-page-class="init-page" custom-page-style="background-color: transparent;">
+    <TabContent v-if="isTabRendered(3)" :content-index="3" title="😂" :enable-pull-down-refresh="true" :show-back="false" custom-page-class="init-page" custom-page-style="background-color: transparent;">
       <FunctionPage />
     </TabContent>
     <!-- #endif -->
     <!-- #ifdef APP-ANDROID || APP-IOS || APP-HARMONY || MP-WEIXIN || MP-ALIPAY || MP-BAIDU || MP-TOUTIAO || MP-QQ || MP-KUAISHOU || MP-LARK || MP-JD || MP-XHS || MP-360 || MP-HARMONY -->
-    <TabContent v-if="isTabRendered(2)" :content-index="2" title="tabbar.function" :enable-pull-down-refresh="true" :show-back="false" custom-page-class="init-page" custom-page-style="background-color: transparent;">
+    <TabContent v-if="isTabRendered(3)" :content-index="3" title="tabbar.function" :enable-pull-down-refresh="true" :show-back="false" custom-page-class="init-page" custom-page-style="background-color: transparent;">
       <FunctionPage />
     </TabContent>
     <!-- #endif -->
-    <TabContent v-if="isTabRendered(3)" :content-index="3" title="tabbar.me" :enable-pull-down-refresh="true" :show-back="false">
+    <TabContent v-if="isTabRendered(4)" :content-index="4" title="tabbar.me" :enable-pull-down-refresh="true" :show-back="false">
       <MePage />
     </TabContent>
   </view>
 </template>
 
 <script setup lang="uts">
+import Ai1Page from '@/src/pages/ai1/ai1.uvue';
 import BasicPage from '@/src/pages/basic/basic.uvue';
 import FunctionPage from '@/src/pages/function/function.uvue';
 import MePage from '@/src/pages/me/me.uvue';
@@ -63,7 +67,7 @@ import { reactive, watch } from 'vue';
 import { useTabbar } from '@/src/tabbar/index.uts';
 
 const { curIdx } = useTabbar();
-const renderedTabs: Array<boolean> = reactive([false, false, false, false]);
+const renderedTabs: Array<boolean> = reactive([false, false, false, false, false]);
 
 if (curIdx.value >= 0 && curIdx.value < renderedTabs.length) {
   renderedTabs[curIdx.value] = true;
