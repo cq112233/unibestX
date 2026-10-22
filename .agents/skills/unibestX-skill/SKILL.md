@@ -67,7 +67,7 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 **触发条件**（命中任一即触发本 Skill）：
 
 - 编写、重构或新增 `.uvue`、`.uts`、`.ts`、`.scss` 文件时
-- 规划或生成新页面结构、骨架布局与视口高度（`availableHeight`）时
+- 规划或生成新页面结构、骨架布局与视口高度（`availableHeight`）时；新增页面与已有页面同属业务模块时，先确认是否聚合，不得擅自迁移存量页面
 - **新增页面并接入 `src/api/<module>/` 业务模块接口层（接口函数 + 类型 + 数据集，按需拆 `types.uts`）时**、把页面里的假数据抽成接口函数时
 - 对接后端真实接口、写 `http` 请求 / 文件上传 / SSE 流式接口时
 - **使用 `src/http` 业务实例、`src/api` 接口层，或 `useQuery` / `useMutation` / `useQueryClient` 时**（分册 10）
@@ -164,7 +164,7 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 | [references/2-styling.md](references/2-styling.md) | **2 样式与原生渲染手册**（26 条铁律 + 完整页面示例 + 7 类场景写法 + 17 条坑点 + 样式能力矩阵 + 20 条红线） | 写 `.scss` / Tailwind 工具类；处理按钮与文本排版、**安全区工具类 `p-safe` / `pt-safe` / `pb-safe`**、**行高 `leading-[...]`**、**SCSS 变量运行时动态化、`uni.scss` 覆盖**、高度单位、阴影边框、字号字重、行内嵌套样式、样式不生效或表现不一致 |
 | [references/3-runtime.md](references/3-runtime.md) | **3 跨端运行时手册**（29 条铁律 + 跨端能力封装示例 + 7 类场景写法 + 16 条坑点 + 渲染模式/条件编译宏/假绿判定速查 + 14 条红线） | VDOM / Android VDOM / Vapor 差异、多平台门面分流与条件编译、**全局跨端平台判断规范（统一使用 `@/src/config` 常量，除 TabViews.uvue 外严禁在 src/ 散落手写 `#ifdef`）**、**禁止浏览器特有 API `window` / `document` / `localStorage` 与非全端 API 裸调用（含 `getLocale` 安全取语言）**、**Vite 自定义页面插件开发约束**、UTS 插件与自定义基座、**第三方组件（选项式 `.vue`）是否可用**、Markdown 渲染、真机与 Kotlin 报错、编译验证命令选择 |
 | [references/4-page-component.md](references/4-page-component.md) | **4 页面与组件手册**（三种页面骨架 · `definePage` 全字段 · **标准业务页：`useRoute` / `useRouter` + `useQuery` / `useMutation` / `useQueryClient`** · easycom · **4.5 组件写法：根节点 / props / emits / expose / 取数边界** · 流程与交付 · 坑点 · 速查 · 红线） | **新建 / 改造页面或组件必读**：骨架怎么搭、`definePage` 写哪些字段、带接口的页面怎么写、**组件文件怎么写**、如何交付 —— **优先照抄，不要自创结构** |
-| [references/5-page-structure.md](references/5-page-structure.md) | **5 页面结构编排标准**（TabBar 单页 · 非 TabBar 业务模块聚合 · 简单页与 `components / common / modules` 的按需选择 · 取数边界 · 组件提升 · API 归属 · 结构速查 · 17 条红线） | **规划页面结构**时必读：目录怎么摆、`views/` 要不要、何时才用 `modules/`、谁能调接口、数据归谁、mock 落哪。**不含任何代码写法** —— 页面 / 组件怎么写看分册 4，接口函数看分册 6 |
+| [references/5-page-structure.md](references/5-page-structure.md) | **5 页面结构编排标准**（TabBar 单页 · 非 TabBar 业务模块聚合 · **存量页面 URL 保护** · 简单页与 `components / common / modules` 的按需选择 · 取数边界 · 组件提升 · API 归属 · 结构速查 · 18 条红线） | **规划页面结构**时必读：目录怎么摆、`views/` 要不要、何时才用 `modules/`、谁能调接口、数据归谁、mock 落哪。**新增页面与已有页面同属业务模块时，必须先询问是否聚合，不得擅自迁移旧页面或改变 URL**。**不含任何代码写法** —— 页面 / 组件怎么写看分册 4，接口函数看分册 6 |
 | [references/6-api-spec.md](references/6-api-spec.md) | **6 API 接口层手册**（业务模块目录 · 契约类型 · 按模块造数 · `http` 用法 · 完整 mock→http 双实现 + 8 类场景写法 + 16 条坑点 + 速查表 + 26 条红线） | **新增页面接入 `src/api/<module>/` 时**、抽接口函数时、写 mock 数据集与契约类型时、对接后端真实接口时必读 |
 | [references/7-utils-spec.md](references/7-utils-spec.md) | **7 工具库使用手册**（系统信息 · 环境变量 · 通用工具 · 6 个生态库 + 能力对照示例 + 7 类场景写法 + 15 条坑点 + 「该用谁」速查表 + 23 条红线） | 获取屏幕/窗口尺寸、状态栏/导航栏/TabBar高度、计算内容可用高度（`availableHeight`）；判断开发/生产环境、获取接口基础地址；使用 Toast、Loading、主题与返回键时必读；**要写大数运算 / 加解密与哈希 / 日期时间 / 颜色处理 / 数组对象工具 / 组合式 hooks 前必读（先查 `uni_modules/` 生态库，不要手写）** |
 | [references/8-router-spec.md](references/8-router-spec.md) | **8 路由导航与 `useRoute` 手册**（导入口径 · `RouteLocation` 全字段与类型 · 完整 demo · 10 类场景写法 · 14 条坑点 · `useRouter` 速查 · 10 条自检红线） | **页面 / 组件里要做任何跳转（push / replace / switchTab / back）、要读当前路由信息（path / query / meta / name）、准备写 `onLoad(options)` 取参数或手写 `getCurrentPages()` 时必读** |
@@ -374,4 +374,5 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 - [ ] **49. 安全区与行高严禁手写**（`env(safe-area-inset-bottom)`、零散 `line-height` 内联样式）：安全区用项目工具类 `p-safe` / `pt-safe` / `pb-safe`，行高用 `leading-[...]` 原子类，见 2.25
 - [ ] **50. Easycom 范围内的组件严禁手动 import**（`uni_modules/*/components/` 与根 `components/` 直接写短横线标签）；反过来，**页面私有组件（`src/pages/*/components/`）不在扫描范围，必须手动 import**；改 easycom 配置时改 `pages.config.json`（`pages.json` 是生成物），且 `uniEasycomPlugin` 必须覆盖 App 与 Web（排除 mp-*），见 4.4
 - [ ] **51. hook 状态不做纯转发**：`useQuery` / `useMutation` 解构出的 `isPending` / `isFetching` / `isError` 本身是 Ref；模板自动解包直接写变量名，script 内读值才用 `.value`；严禁写 `computed(() => isPending.value == true)` 这类无新增语义的包装，只有真实转换 / 组合才用 `computed`（见 4.3.4 / 10.4.2）
+- [ ] **52. 已有页面不得擅自合并或迁移**：新增页面与已有页面同属一个业务模块时，**必须先询问开发者是否放到同一业务模块目录**；存量页面默认保持原路径与 URL，未经明确同意禁止移动、重构目录层级或合并页面。页面 URL 是历史链接、分享地址、埋点和外部跳转的契约，结构整理不能让已有业务断链（见 5.2 / 5.10）
 
