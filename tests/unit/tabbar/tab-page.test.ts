@@ -4,7 +4,8 @@ import {
   activateTabPageFromHostQuery,
   readTabPageQuery,
   resetTabPageQueries,
-  setTabPageUrl
+  setTabPageUrl,
+  syncTabPageHostUrl
 } from '@/src/tabbar/core/tab-page.uts';
 
 describe('tabbar virtual page route', () => {
@@ -47,5 +48,14 @@ describe('tabbar virtual page route', () => {
     query.set('id', 'changed');
 
     expect(readTabPageQuery('/src/pages/basic/basic').get('id')).toBe('1');
+  });
+
+  it('syncs the H5 host url after switching a virtual tab', () => {
+    window.location.hash = '#/?tab=function&a=1';
+    setTabPageUrl('/src/pages/basic/basic?id=3333');
+
+    syncTabPageHostUrl('/src/pages/basic/basic');
+
+    expect(window.location.hash).toBe('#/?tab=basic&id=3333');
   });
 });

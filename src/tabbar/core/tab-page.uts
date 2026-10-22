@@ -2,7 +2,7 @@ import { ref } from 'vue';
 import type { Ref } from 'vue';
 import { cleanPath, parseUrlToObj } from '@/uni_modules/route-bestX/index.uts';
 import { setCurIdx, tabbarList } from './state.uts';
-import { resolveTabIndexByKey } from './tab-key.uts';
+import { resolveTabIndexByKey, resolveTabKeyByPath } from './tab-key.uts';
 
 /**
  * 单页 TabBar（模式 4）的虚拟页面路由状态。
@@ -86,6 +86,47 @@ export function readTabPageFullPath(path: string, revision: number = 0): string 
   const query = readTabPageQuery(targetPath, revision);
   const queryText = serializeTabPageQuery(query);
   return queryText.length > 0 ? `${targetPath}?${queryText}` : targetPath;
+}
+
+/**
+ * 将当前虚拟 Tab 同步到 H5 浏览器地址栏。
+ *
+ * 模式 4 没有真实的 Tab 页面路由，切换 Tab 时页面栈顶始终是宿主首页。
+ * 如果不主动同步地址栏，用户会看到地址仍停留在旧 Tab，刷新页面也会按旧参数恢复。
+ * 这里使用 replaceState 只修正 URL，不触发新的导航，因此不会破坏单页保活。
+ *
+ * @param path 当前激活 Tab 的页面路径
+ */
+export function syncTabPageHostUrl(path: string): void {
+  // #ifdef H5 || WEB
+  if (typeof window == 'undefined') {
+    return;
+  }
+  const targetPath = cleanPath(path);
+  if (targetPath.length == 0) {
+    return;
+  }
+
+  const tabKey = resolveTabKeyByPath(targetPath);
+  const parts: Array<string> = [`tab=${encodeURIComponent(tabKey.length > 0 ? tabKey : targetPath)}`];
+  const query = readTabPageQuery(targetPath);
+  query.forEach((value: string, key: string): void => {
+    if (key == 'tab') {
+      return;
+    }
+    parts.push(`${key}=${encodeURIComponent(value)}`);
+  });
+
+  const queryText = parts.join('&');
+  let nextUrl = `#/?${queryText}`;
+  if (!window.location.hash.startsWith('#/')) {
+    nextUrl = `${window.location.pathname}?${queryText}`;
+  }
+  try {
+    window.history.replaceState(null, '', nextUrl);
+  }
+  catch { }
+  // #endif
 }
 
 /**

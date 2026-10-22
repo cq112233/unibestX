@@ -872,6 +872,39 @@ function calcTotal(list: Array<OrderItem>): number {
 }
 ```
 
+### 4.7.7 纯文本插槽必须由 `<text>` 承载
+
+组件契约是“接收一段纯文本”时，必须在组件侧提供 `<text>` 作为文本宿主，默认文案放在 `<slot>` 内部：
+
+```html
+<!-- ❌ 错误：父级传入的裸文本没有 <text> 宿主 -->
+<slot>11</slot>
+
+<!-- ✅ 正确：纯文本插槽由 <text> 承载 -->
+<text class="text-[14px] text-[#1e293b]"><slot>11</slot></text>
+```
+
+调用方直接传入文本：
+
+```html
+<MyText>11</MyText>
+```
+
+注意：
+
+- 纯文本插槽应成对使用 `<text>` 与 `<slot>`，不要在同一个 `<text>` 中混写固定前缀和插槽，如 `<text>前缀<slot /></text>`。这会违反 `<text>` 只能包含一个文本节点的限制。
+- 需要固定文案与插槽内容混排时，使用兄弟 `<text>`，并由外层 `<view>` 承载：
+
+```html
+<view class="flex flex-row">
+  <text>前缀</text>
+  <text><slot /></text>
+</view>
+```
+
+- 如果插槽设计为接收任意节点，例如完整 `<text>` 或 `<view>`，组件侧保持 `<slot />`，由调用方自行提供节点，不要把节点插槽统一包进 `<text>`。
+- 具名插槽同样按内容类型判断：纯文本具名插槽由 `<text>` 承载，任意节点具名插槽保持裸 `<slot name="xxx" />`。
+
 ---
 
 ## 4.8 数据来源与 API 接入
@@ -1001,6 +1034,7 @@ pnpm typecheck
 | 23 | 为 `listPending` / `listFetching` / `listError` 包 `computed` | 模板直接使用 Ref |
 | 24 | 列表写 `initialData: []` 还期待首屏 loading | 需要 loading 就不要设置 `initialData` |
 | 25 | 组件直接修改 props | 抛出 Emits，由父级修改 |
+| 26 | 纯文本插槽直接写 `<slot>11</slot>` | 用 `<text><slot>11</slot></text>` 承载纯文本；任意节点插槽保持 `<slot />` |
 
 ---
 
@@ -1053,4 +1087,5 @@ pnpm typecheck
 - [ ] Props 使用运行时对象，一个业务对象一个 prop；Emits 使用类型字面量。
 - [ ] 组件没有直接修改 props。
 - [ ] 变量有一行说明注释，方法有 JSDoc，Query / Mutation 使用普通注释。
+- [ ] 纯文本插槽由 `<text>` 承载；任意节点插槽保持 `<slot />`，没有被误包进 `<text>`。
 - [ ] 已运行 `git diff --check` 与 `pnpm typecheck`；原生相关另做真机验证。

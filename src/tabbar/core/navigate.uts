@@ -1,5 +1,5 @@
 import { curIdx, setCurIdx, setCurIdxByPath, tabbarList } from './state.uts';
-import { setTabPageUrl } from './tab-page.uts';
+import { setTabPageUrl, syncTabPageHostUrl } from './tab-page.uts';
 import { isNativeTabbar, isSinglePageTabbar, selectedTabbarStrategy, TABBAR_STRATEGY_MAP } from './strategy.uts';
 import { customTabbarConfig } from '../adapters/config.uts';
 import { useRouter } from '@/uni_modules/route-bestX/index.uts';
@@ -26,6 +26,8 @@ export function switchTabbar(url: string): void {
   }
   setCurIdxByPath(url);
   if (isSinglePageTabbar) {
+    // H5 下同步宿主页地址栏（?tab=basic&id=1），保证刷新后仍停留在当前 Tab
+    syncTabPageHostUrl(url);
     try {
       const pages = getCurrentPages();
       if (pages.length > 0) {
@@ -111,6 +113,8 @@ export function handleTabbarClick(index: number): void {
   }
   if (isSinglePageTabbar) {
     setCurIdx(index);
+    // TabBar 点击不经过系统路由，同样需要同步 H5 地址栏
+    syncTabPageHostUrl(list[index].pagePath);
     return;
   }
   if (list[index].isBulge) {

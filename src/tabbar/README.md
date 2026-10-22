@@ -385,6 +385,7 @@ function openBasic(): void {
 - 在模板里直接写 `{{ route.path }}` / `{{ route.query.get('id') }}`；在 `<script>` 中读取 `route.value`。
 - 该 hook 用于被 `TabViews` 挂载的 Tab 页面 `.uvue`（如 `src/pages/basic/basic.uvue`）；Tab 下标由外层 `TabContent` 注入。
 - 页面入口深链使用 `?tab=basic&id=1`：`tab` 支持 `tabType` 或完整 `pagePath`，其余参数写入目标 Tab 的虚拟 query。
+- H5 下切换 Tab 会同步浏览器地址栏为 `?tab=basic&id=1`，刷新页面仍会恢复当前 Tab 及其 query；App / 小程序没有浏览器地址栏，不受影响。
 - 模式 4 仍是“页面语义仿真”：系统级独立 URL、独立页面栈、原生分享地址和页面级原生路由转场仍不存在；需要这些能力时只能使用真实多页面模式。当前方案解决的问题是**业务开发写法**与**生命周期 / 参数读取**，不是伪造系统页面栈。
 
 ### 4. `useTabPageShell()`：页面文件双身份适配
@@ -393,7 +394,7 @@ Tab 页面 `.uvue` 会同时承担「真实路由页面」与「模式 4 Tab 子
 
 - 被 `TabContent` 嵌套时：跳过页面级 `onShow` / `onHide`，交给 `useTabPage()` 派发；
 - 作为模式 0-3 的真实页面运行时：同步 Tab 下标、通知页面可见性，并安装 Android 返回键处理；
-- 作为模式 4 的宿主页运行时：只通知页面可见性并安装 Android 返回键处理，不按宿主路由重置当前 Tab，避免切 Tab 后又被拉回首页；
+- 作为模式 4 的宿主页运行时：自动承接 `?tab=basic&id=1` 入口深链、通知页面可见性并安装 Android 返回键处理，不按宿主路由重置当前 Tab；
 - 支付宝小程序中同时隐藏原生「返回首页」按钮。
 
 ```uts
@@ -402,11 +403,11 @@ import { useTabPageShell } from '@/src/tabbar/index.uts';
 // 普通 Tab 页面：放在 <script setup> 顶层，参数与 config.uts 中的 tabType 一致
 useTabPageShell('basic');
 
-// 模式 4 宿主页：同样只调用这一处，无需再手写 onShow / onHide 桥接
+// 模式 4 宿主页：同样只调用这一处，入口深链与生命周期都由 hook 处理
 useTabPageShell('index');
 ```
 
-- 不要在页面里重复写 `setCurIdxByKey()`、`notifyPageShow/Hide()` 或 `useBackPressExit()`。
+- 不要在页面里重复写 `activateTabPageFromHostQuery()`、`setCurIdxByKey()`、`notifyPageShow/Hide()` 或 `useBackPressExit()`。
 - 普通真实页面不需要调用；只有同时作为 Tab 页面的 `.uvue` 才使用。
 
 ### 5. `useTabbarTheme()`：主题与高亮色

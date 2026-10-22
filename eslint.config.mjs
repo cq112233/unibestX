@@ -298,6 +298,7 @@ configs.push({
 
     // UVUE 模板平台规范校验（Vapor 模式优先，提示 VDOM 兼容性差异）
     'uts/uvue-no-view-text-color': 'warn',
+    'uts/uvue-no-view-font-style': 'warn',
     'uts/uvue-no-button-flex': 'warn',
     'uts/uvue-no-gap-and-space': 'warn',
     'uts/uvue-no-font-mono': 'warn',

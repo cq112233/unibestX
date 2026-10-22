@@ -26,6 +26,11 @@
       </view>
     </view>
 
+    <CompA />
+    <CompA>
+      111
+    </CompA>
+
     <!-- 基础能力演示列表（Card + 一行描述 + sub路径展示 + 原生按钮跳转） -->
     <view
       v-for="item in demoList"
@@ -92,6 +97,7 @@ import { curIdx, resolveTabIndexByKey, useTabPage, useTabPageShell } from '@/src
 import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/layouts/navbar/utils/index.uts';
 import { systemInfo } from '@/src/utils/systemInfo/index.uts';
 import { useRouter } from '@/uni_modules/route-bestX/index.uts';
+import CompA from './components/a.uvue';
 
 definePage({
   debug: false,

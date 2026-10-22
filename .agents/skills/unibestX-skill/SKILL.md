@@ -266,10 +266,11 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 | **插槽变量传参 (`error17`)** | `<text>{{ fn(item) }}</text>` | `<text>{{ fn(item as UTSJSONObject) }}</text>`（插槽参数为 `Any?`，需显式强转） |
 | **动态 `:style` 属性强转崩溃** | `:style="parent['style'] as UTSJSONObject"`（Kotlin 运行期抛 `Map cannot be cast to UTSJSONObject`） | `:style="(parent['style'] ?? {}) as any"`（使用双问号空兜底并转 `as any`） |
 | **`<text>` 混合文本嵌套** | `<text>a<text>b</text>c</text>` | 外层 `view` 内放多个兄弟 `<text>` 节点（原生 `<text>` 不支持内嵌多文本） |
+| **纯文本插槽缺少 `<text>` 宿主** | `<slot>默认文案</slot>`，父级直接传入裸文本 | `<text><slot>默认文案</slot></text>`（接收纯文本的插槽必须由 `<text>` 承载；接收任意节点的插槽保持 `<slot />`，不要包 `<text>`） |
 | **Tailwind 边框解析限制** | `class="border border-gray-200"` | `class="border-[1px] border-solid border-[#e2e8f0]"`（需明确指定宽度、线型与颜色） |
 | **等宽字体显示 (`parse-css-font`)** | `class="font-mono"`（原生解析器缺 `font-size` 报错） | 内联 `style="font-family: monospace;"` |
 | **原生 `<button>` 布局限制** | `<button class="items-center justify-center">` | 用 `<view class="flex flex-row items-center justify-center">` 包裹 |
-| **`<view>` 设置文字颜色** | `<view class="text-[#333]">` | `<text class="text-[#333]">`（`color` 属性仅支持 `<text>`, `<button>`, `<input>`, `<textarea>`） |
+| **`<view>` 设置文字颜色或字体类样式** | `<view class="text-[#333] text-[30px] font-bold">` | `<text class="text-[#333] text-[30px] font-bold">`（所有端统一：颜色与字体类样式都必须由 `<text>` 承载，`<view>` 不承载） |
 | **Align-Items 属性限制** | `class="items-baseline"`（原生不支持 `baseline`） | `class="items-end"` 或 `class="items-center"` |
 | **原生端间距（gap 与 space）支持限制** | 原生 App 端依赖 `gap`、`gap-x-*`、`gap-y-*` 或 `space-x-*`、`space-y-*` | 严禁使用 `gap` 与 `space-*`；水平排列改用 `mr-*` / `ml-*`，垂直列表挂载 `mb-*` 或 `mt-*` |
 | **键盘高度全局监听与解绑平台限制** | App 端调用 `uni.onKeyboardHeightChange`（报错未定义 API / 拼写错误），或向 `uni.offKeyboardHeightChange` 传回调函数（类型不匹配），或事件参数标为 `UniInputKeyboardHeightChangeEventDetail`（抛 ClassCastException 崩溃） | App 端必须通过 `<input>`/`<textarea>` 监听 `@keyboardheightchange` 且参数标为 `UniInputKeyboardHeightChangeEvent`；全局 API 仅限微信小程序（`// #ifdef MP-WEIXIN`），且解绑时必须向 `off` 传入注册返回的 ID（`number`）（详见 **3.3**） |
@@ -330,7 +331,7 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 - [ ] **5. 模板作用域插槽调用点必须显式添加 `as` 类型断言**（避免 Kotlin 编译抛 `error17` 参数类型不匹配）
 - [ ] **6. 动态 `:style` 与属性严禁强转 `as UTSJSONObject`**（避免运行时抛 `ClassCastException: Map cannot be cast to UTSJSONObject`，统一使用 `(val ?? {}) as any`）
 - [ ] **7. 原生 `<button>` 上严禁挂载 flex 对齐类名**（复杂排版一律使用 `<view>` 包裹）
-- [ ] **8. `<view>` 上严禁挂载文字颜色样式**（`color` 类名必须下沉到子级 `<text>` 上）
+- [ ] **8. `<view>` 上严禁挂载文字颜色与字体类样式**（所有端统一：`color` / `font-size` / `font-weight` / `leading` / `tracking` / 斜体与下划线等都必须下沉到子级 `<text>`；字体类由 `uvue-no-view-font-style` 拦截）
 - [ ] **9. `<text>` 内部严禁混合嵌套多个文本节点**（多色文本排版一律使用兄弟 `<text>` 标签）
 - [ ] **10. 严禁使用 `font-mono` / `font-sans` 工具类**（等宽排版必须使用内联 `font-family: monospace;`）
 - [ ] **11. 严禁使用 `items-baseline`**（原生编译器不支持，必须改用 `items-end` 或 `items-center`）
@@ -375,4 +376,5 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 - [ ] **50. Easycom 范围内的组件严禁手动 import**（`uni_modules/*/components/` 与根 `components/` 直接写短横线标签）；反过来，**页面私有组件（`src/pages/*/components/`）不在扫描范围，必须手动 import**；改 easycom 配置时改 `pages.config.json`（`pages.json` 是生成物），且 `uniEasycomPlugin` 必须覆盖 App 与 Web（排除 mp-*），见 4.4
 - [ ] **51. hook 状态不做纯转发**：`useQuery` / `useMutation` 解构出的 `isPending` / `isFetching` / `isError` 本身是 Ref；模板自动解包直接写变量名，script 内读值才用 `.value`；严禁写 `computed(() => isPending.value == true)` 这类无新增语义的包装，只有真实转换 / 组合才用 `computed`（见 4.3.4 / 10.4.2）
 - [ ] **52. 已有页面不得擅自合并或迁移**：新增页面与已有页面同属一个业务模块时，**必须先询问开发者是否放到同一业务模块目录**；存量页面默认保持原路径与 URL，未经明确同意禁止移动、重构目录层级或合并页面。页面 URL 是历史链接、分享地址、埋点和外部跳转的契约，结构整理不能让已有业务断链（见 5.2 / 5.10）
+- [ ] **53. 纯文本插槽必须由 `<text>` 承载**：组件接收一段纯文本时必须写 `<text><slot>默认文案</slot></text>`，严禁写裸 `<slot>默认文案</slot>` 接收父级文本；若插槽契约是接收任意节点，则保持 `<slot />`，由父级提供完整 `<text>` / `<view>`，禁止统一包进 `<text>`（见 4.7.7）
 

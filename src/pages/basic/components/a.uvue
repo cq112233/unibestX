@@ -1,0 +1,20 @@
+<script lang="uts" setup>
+defineOptions({
+  name: 'CompA',
+  styleIsolation: 'isolated' // 表示隔离，不受外部影响
+});
+</script>
+
+<template>
+  <view class="text-[40px]">
+    <text>CompA</text>
+    <text>
+      <slot>
+        11
+      </slot>
+    </text>
+  </view>
+</template>
+
+<style lang="scss" scoped>
+</style>

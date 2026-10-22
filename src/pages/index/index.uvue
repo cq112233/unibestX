@@ -572,7 +572,6 @@ import { computed } from 'vue';
 import { systemInfo as systemInfoRef } from '@/src/utils/systemInfo/index.uts';
 import type { SystemInfoType } from '@/src/utils/systemInfo/index.uts';
 import {
-  activateTabPageFromHostQuery,
   curIdx,
   onTabPageShow,
   onTabShow,
@@ -580,7 +579,7 @@ import {
   useTabPageShell
 } from '@/src/tabbar/index.uts';
 import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/layouts/navbar/utils/index.uts';
-import { useRoute, useRouter } from '@/uni_modules/route-bestX/index.uts';
+import { useRouter } from '@/uni_modules/route-bestX/index.uts';
 
 import TabPageHost from '@/src/tabbar/components/TabPageHost.uvue';
 
@@ -1168,12 +1167,8 @@ onMounted(() => {
 onUnmounted(() => {
   console.log('首页 Tab 卸载了');
 });
-// 模式 4 宿主页没有每个 Tab 自己的系统路由，这里承接入口深链：
-// /src/pages/index/index?tab=basic&id=1 -> 激活 basic 并写入它的虚拟 query。
-const hostRoute = useRoute();
-activateTabPageFromHostQuery(hostRoute.query);
 
-// 页面生命周期、可见性桥接、模式判断与 Android 返回键统一由 TabBar hook 处理
+// 页面生命周期、入口深链、可见性桥接、模式判断与 Android 返回键统一由 TabBar hook 处理
 useTabPageShell('index');
 </script>
 

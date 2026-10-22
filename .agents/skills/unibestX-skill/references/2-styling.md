@@ -72,6 +72,9 @@
   </view>
   ```
 
+- **字体类补充**：`text-[30px]`（字号）、`font-bold`（字重）、`leading-[20px]`（行高）、`tracking-wide`（字间距）、`italic` / `underline` 等字体相关类名，**所有端都必须写在 `<text>` 上**，不能挂在 `<view>`。
+- **Lint 拦截**：`<view>` 上的颜色类名由 `uvue-no-view-text-color` 拦截，字体类样式由 `uvue-no-view-font-style` 拦截。
+
 ## 2.4 `<text>` 元素只能包含单个文本节点
 
 - **铁律**：uni-app X 原生渲染引擎要求**一个 `<text>` 元素内部只能包含一个纯文本节点**。严禁在 `<text>` 内混合「裸文本 + 嵌套 `<text>` + 裸文本」，否则编译报错：`A <text> element can only contain one text node`。
@@ -980,14 +983,14 @@ function cellStyle(colCount: number): string {
 <view class="flex flex-row"><text class="mr-[12px]">左</text><text>右</text></view>
 ```
 
-### ② 在 `<view>` 上写文字颜色
+### ② 在 `<view>` 上写文字颜色或字体类样式
 
 ```html
 <!-- ❌ 编译报错：color 只支持 text / button / input / textarea -->
-<view class="text-[#333]">标题</view>
+<view class="text-[#333] text-[30px] font-bold leading-[36px]">标题</view>
 
-<!-- ✅ 颜色下沉到 text -->
-<text class="text-[#333]">标题</text>
+<!-- ✅ 颜色与字体类样式都下沉到 text -->
+<text class="text-[#333] text-[30px] font-bold leading-[36px]">标题</text>
 ```
 
 ### ③ 用 `flex:1` 做等分列
@@ -1163,7 +1166,7 @@ H5 的 `uni-view` 自带 `overflow:hidden`，溢出元素必须**直挂**滚动�
 - [ ] **1. 只写 flex** —— 不出现 `grid` / `inline-block` / `position: sticky`
 - [ ] **2. 不用 `gap` / `space-*`** —— 间距全部落在子项 `mr-*` / `ml-*` / `mt-*` / `mb-*`
 - [ ] **3. 等分列不用 `flex:1`** —— 显式百分比宽度 + `box-sizing:border-box`
-- [ ] **4. `color` 只挂文本元素** —— `<view>` 上不写文字颜色
+- [ ] **4. `color` 与字体类样式只挂文本元素** —— `<view>` 上不写文字颜色、字号、字重、行高等
 - [ ] **5. 颜色全十六进制** —— 无 `red` / `white` / `text-white`（白色写 `text-[#ffffff]`）
 - [ ] **6. 原生 `<button>` 不挂 flex 对齐类** —— 复杂按钮用 `<view>` 包裹
 - [ ] **7. 字号只用 px** —— 动态 `:style` 里不出现 `em` / `rem` / `%` / `smaller`
