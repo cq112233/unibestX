@@ -2,7 +2,7 @@
 
 全项目**唯一的网络出口**。基于纯原生 `uni.request` / `uni.uploadFile` / `uni.downloadFile` 驱动，零第三方库依赖。
 
-底层核心调度引擎与通用能力已沉淀至独立模块 `uni_modules/request-bestX`；`src/http` 专注于业务层（`instances`、`error`、`openapi`），负责 Token 鉴权注入、401 静默刷新与重放、统一错误提示与数据解包。
+底层核心调度引擎与通用能力已沉淀至独立模块 `uni_modules/request-bestX`；`src/http` 专注于业务层（`instances`、`error`、`openapi`），负责 Token 鉴权注入、统一错误提示与数据解包。401 静默刷新为可选能力，当前单 Token 项目默认未启用。
 
 > 🚨 **业务与页面一律不直接调 `uni.request` / `uni.uploadFile` / `uni.downloadFile`**。统一通过 `src/http` 提供的 `http` 实例发起业务请求；通用能力（如 `useQuery`、`useMutation`、`requestStream` 与通用类型）从 `@/uni_modules/request-bestX` 引入。
 
@@ -12,19 +12,21 @@
 
 ```text
 src/http/
-├── index.uts                     # 统一业务门面：导出业务实例 (http/secondaryHttp) 与业务错误/枚举
+├── index.uts                     # 精简业务门面：只导出业务实例 (http/secondaryHttp) 与常用错误/枚举
 ├── instances/                    # 业务 HTTP 客户端实例与业务规则层
 │   ├── index.uts                 # 业务实例导出
 │   ├── default.uts               # 默认主业务 http 单例
 │   ├── secondary.uts             # 辅助域名 secondaryHttp 单例
 │   └── internal/
-│       ├── factory.uts           # 业务实例配置工厂（注入 Token、401 刷新重试、统一 Toast、数据解包）
-│       ├── refresh.uts           # 业务 Token 静默刷新（单飞，并发 401 仅刷新一次）
+│       ├── factory.uts           # 业务实例配置工厂（注入 Token、可选 401 刷新、统一 Toast、数据解包）
+│       ├── refresh.uts           # 可选：双 Token 静默刷新（默认实例未启用）
 │       ├── enum.uts              # ResultEnum / ShowMessage / IResponse
 │       └── config.uts            # 业务多域名与 H5 代理路径映射
 └── error/
     └── error.uts                 # 统一错误归一：AppErrorInfo / BusinessError / resolveErrorMessage
 ```
+
+> `index.uts` 只作为公共门面，禁止再 `export *` 转发 `instances/internal/factory.uts`、`refresh.uts` 等内部实现；内部模块之间必须直接引用具体文件，避免循环依赖和无意加载。
 
 ---
 

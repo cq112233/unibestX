@@ -5,9 +5,8 @@
  */
 
 import { getApiSecondaryUrl } from '@/src/config/index.uts';
-import type { HttpClient, HttpClientOptions } from '@/uni_modules/request-bestX/index.uts';
+import type { HttpClient } from '@/uni_modules/request-bestX/index.uts';
 import { createApiInstance } from './internal/factory.uts';
-import { tryRefreshToken } from './internal/refresh.uts';
 
 /**
  * 备用/副业务 HTTP 客户端单例（指向 VITE_SERVER_BASEURL_SECONDARY，H5 代理时走指定字段 /api-secondary）
@@ -25,8 +24,7 @@ import { tryRefreshToken } from './internal/refresh.uts';
  *   }
  * }
  * ```
- * 默认不传第三个参数，与主业务 `http` 实例共同继承 `./internal/factory.uts` 的全局统一配置。
+ * 默认不传第三个参数，与主业务 `http` 实例共同继承 `./internal/factory.uts` 的全局统一配置；
+ * 当前使用单 Token，默认不启用 401 静默刷新。
  */
-export const secondaryHttp: HttpClient = createApiInstance(getApiSecondaryUrl(), '/api-secondary', {
-  refreshToken: (): Promise<boolean> => tryRefreshToken()
-} as HttpClientOptions);
+export const secondaryHttp: HttpClient = createApiInstance(getApiSecondaryUrl(), '/api-secondary');
