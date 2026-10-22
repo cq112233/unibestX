@@ -5,10 +5,11 @@
  */
 
 import { getApiBaseUrl } from '@/src/config/index.uts';
-import type { HttpClient } from '@/uni_modules/request-bestX/index.uts';
+import type { HttpClient, HttpClientOptions } from '@/uni_modules/request-bestX/index.uts';
 import {
   createApiInstance
 } from './internal/factory.uts';
+import { tryRefreshToken } from './internal/refresh.uts';
 
 /**
  * 默认主业务 HTTP 客户端单例（指向 VITE_SERVER_BASEURL，H5 代理走第一个代理字段 /api）
@@ -47,4 +48,6 @@ import {
  * } as HttpClientOptions);
  * ```
  */
-export const http: HttpClient = createApiInstance(getApiBaseUrl(), '/api');
+export const http: HttpClient = createApiInstance(getApiBaseUrl(), '/api', {
+  refreshToken: (): Promise<boolean> => tryRefreshToken()
+} as HttpClientOptions);
