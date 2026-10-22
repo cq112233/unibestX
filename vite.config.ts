@@ -223,7 +223,12 @@ export default defineConfig({
       subPackages: ['src/sub'],
 
       // 【排除扫描规则】：Glob 匹配规则数组，匹配到的文件/目录不会被当作页面路由扫描
-      exclude: ['**/components/**/*.*', '**/views/**/*.*'],
+      exclude: [
+        '**/components/**/*.*',
+        '**/views/**/*.*',
+        '**/common/**/*.*',
+        '**/modules/**/*.*'
+      ],
 
       // 【输出文件路径】：生成并同步的 pages.json 相对路径，默认 'pages.json'
       outFile: 'pages.json',
