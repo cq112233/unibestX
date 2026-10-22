@@ -113,11 +113,13 @@ src/tabbar/
    }
    ```
 
-2. 保存。插件会重新生成 [components/TabViews.uvue](components/TabViews.uvue)；普通 Tab 直接导入 `pagePath` 对应的页面 `.uvue`。
+2. 保存。插件会先检查 `pagePath` 对应的 `.uvue` 是否存在：缺失时按内置模板自动补建，随后重新生成 [components/TabViews.uvue](components/TabViews.uvue)。页面名取自 `pagePath` 最后一段，`tabType` 会自动写入 `useTabPageShell()` 与下拉刷新门控。
 3. 直接在页面 `.uvue` 里写业务内容。模式 4 下同一个文件既是真实页面，也是 Tab 子组件，不再维护 `views/*View.uvue`。
 4. 页面需要模式 4 的虚拟路由 / 生命周期时调用 `useTabPage()`；需要同时兼容真实页面与 Tab 子页身份时，再调用 `useTabPageShell('该 Tab 的 tabType')`。
 
 > 💡 **`tabType` 是业务标识**，供 `onTabShow('index', ...)` 这类订阅使用。它不随 `list` 顺序调整（增删 Tab、插 `midButton`）而失效，比写下标稳。建议全小写、全列表唯一；不配则回退 `tab-${下标}`。
+>
+> 🧹 **删除 Tab 不会删除页面文件**：自动补建只处理“缺失的文件”，不会覆盖已有页面，也不会因为从 `config.uts` 删除某一项而清理对应 `.uvue`。如需关闭自动补建，可在 `tabbarViewsPlugin` 配置中设置 `autoCreatePage: false`。
 
 ### 2. 中间鼓包按钮 `midButton`
 

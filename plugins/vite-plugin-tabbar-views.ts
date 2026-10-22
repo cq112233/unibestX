@@ -8,6 +8,8 @@ import { getPagesMetaSnapshot } from './pages-meta-cache';
 export type TabbarViewsOptions = {
   /** 是否启用本插件，默认 true */
   enabled?: boolean;
+  /** 缺失 Tab 页面时是否自动补建模板，默认 true；只会新增，不会覆盖或删除已有页面 */
+  autoCreatePage?: boolean;
   /** TabBar 配置文件路径，默认 'src/tabbar/config.uts' */
   configFile?: string;
   /** 生成的 TabViews 调度组件路径，默认 'src/tabbar/components/TabViews.uvue' */
@@ -38,6 +40,12 @@ type CachedPageEntry = {
   variants: CachedPageVariant[];
 };
 
+type TabbarPageEntry = {
+  pagePath: string;
+  tabType: string;
+  text: string;
+};
+
 /** 读取 TabBar 模式配置（0=无TabBar, 1=原生TabBar, 2=自定义TabBar, 4=单页TabBar） */
 function getTabbarMode(projectRoot: string): string {
   if (process.env.VITE_TABBAR_MODE != null && process.env.VITE_TABBAR_MODE !== '') {
@@ -63,6 +71,202 @@ export const watchedTabPages = new Set<string>();
 /** 归一化页面路径，兼容有无前导 `/`、有无扩展名 */
 function normalizeTabPagePath(pagePath: string): string {
   return pagePath.replace(/\\/g, '/').replace(/^\//, '').replace(/\.(uvue|vue)$/, '');
+}
+
+/** 过滤配置源码中的注释，避免把注释掉的 Tab 项当成有效配置 */
+function stripConfigComments(source: string): string {
+  return source
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .replace(/\/\/.*$/gm, '');
+}
+
+/** 从单个 Tab 配置块中提取补建页面所需字段 */
+function readTabbarPageEntry(block: string): TabbarPageEntry | null {
+  const pagePathMatch = block.match(/pagePath\s*:\s*['"`](.*?)['"`]/);
+  if (pagePathMatch == null || pagePathMatch[1].trim() == '') {
+    return null;
+  }
+  const tabTypeMatch = block.match(/tabType\s*:\s*['"`](.*?)['"`]/);
+  const textMatch = block.match(/text\s*:\s*['"`](.*?)['"`]/);
+  return {
+    pagePath: normalizeTabPagePath(pagePathMatch[1].trim()),
+    tabType: tabTypeMatch != null ? tabTypeMatch[1].trim() : '',
+    text: textMatch != null ? textMatch[1].trim() : ''
+  };
+}
+
+/** 读取 config.uts 中 list 与 midButton 的页面项 */
+function readTabbarPageEntries(projectRoot: string, configFile: string): TabbarPageEntry[] {
+  const configPath = path.resolve(projectRoot, configFile);
+  if (!fs.existsSync(configPath)) {
+    return [];
+  }
+  const content = stripConfigComments(fs.readFileSync(configPath, 'utf-8'));
+  const listMatch = content.match(/list\s*:\s*\[([\s\S]*?)\]/);
+  const list: TabbarPageEntry[] = [];
+  if (listMatch != null) {
+    const itemRegex = /\{([\s\S]*?)\}/g;
+    let match = itemRegex.exec(listMatch[1]);
+    while (match != null) {
+      const entry = readTabbarPageEntry(match[1]);
+      if (entry != null) {
+        list.push(entry);
+      }
+      match = itemRegex.exec(listMatch[1]);
+    }
+  }
+
+  const midButtonMatch = content.match(/midButton\s*:\s*\{([\s\S]*?)\}/);
+  const midButton = midButtonMatch != null ? readTabbarPageEntry(midButtonMatch[1]) : null;
+
+  const fullList: TabbarPageEntry[] = [];
+  if (midButton != null) {
+    const half = Math.floor(list.length / 2);
+    for (let i = 0; i < list.length; i++) {
+      if (i === half) {
+        fullList.push(midButton);
+      }
+      fullList.push(list[i]);
+    }
+    if (half >= list.length) {
+      fullList.push(midButton);
+    }
+  }
+  else {
+    fullList.push(...list);
+  }
+
+  return fullList.map((entry, index) => ({
+    ...entry,
+    tabType: entry.tabType != '' ? entry.tabType : `tab-${index}`
+  }));
+}
+
+/** 转换为可作为标识符使用的 PascalCase */
+function toPascalCase(value: string): string {
+  const parts = value.split(/[^a-z0-9]+/i).filter(part => part != '');
+  const result = parts.map(part => part.charAt(0).toUpperCase() + part.slice(1)).join('');
+  const safe = result != '' ? result : 'Tab';
+  return /^\d/.test(safe) ? `Tab${safe}` : safe;
+}
+
+/** 生成 UTS 单引号字符串字面量 */
+function toSingleQuoted(value: string): string {
+  return `'${value.replace(/\\/g, '\\\\').replace(/'/g, '\\\'')}'`;
+}
+
+/** 渲染缺失 Tab 页面的最小可运行模板 */
+export function renderTabPageScaffold(entry: TabbarPageEntry): string {
+  const pageName = path.basename(entry.pagePath);
+  const safePageName = pageName != '' ? pageName : entry.tabType;
+  const pascalName = toPascalCase(safePageName);
+  const camelName = pascalName.charAt(0).toLowerCase() + pascalName.slice(1);
+  const title = entry.text != '' ? entry.text : safePageName;
+  const routeVar = `${camelName}Route`;
+
+  return `<template>
+  <view class="flex flex-col">
+    <text>${pascalName}View</text>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { curIdx, resolveTabIndexByKey, useTabPage, useTabPageShell } from '@/src/tabbar/index.uts';
+import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/layouts/navbar/utils/index.uts';
+
+definePage(() => {
+  return {
+    customPageClass: 'init-page', // 页面根容器自定义类名（配合 layout 布局使用，支持配置全局样式类）
+    customPageStyle: 'background-color: transparent;', // 页面根容器自定义行内样式（穿透任何样式隔离，全端绝对生效）
+    name: ${toSingleQuoted(safePageName)}, // 路由名：useRoute().name 优先读取此值，未显式声明时默认读取路径最后一个单词（如 index）
+    debug: false, // 是否开启当前页面沙盒独立调试（设为 true 可单独调试此页；⚠️ 调试完成后改回 false）
+    debugHome: false, // 沙盒调试模式下是否将当前页面指定为启动首页（全局仅允许 1 个页面设为 true，排在 pages[0]）
+    layout: 'navbar', // 页面通用布局模板（采用 navbar 布局接管顶部导航与下拉滚动容器）
+    showBack: false, // 导航栏左侧是否显示返回箭头（TabBar 首页无需返回按钮）
+    hideStatusBar: false, // 是否隐藏状态栏（true 为隐藏）
+    hideNavbar: false, // 是否隐藏顶部导航栏（false 为正常显示）
+    style: {
+      navigationBarTitleText: ${toSingleQuoted(title)},
+      navigationStyle: 'custom'
+    }
+  };
+});
+
+const {
+  route: ${routeVar},
+  onLoad: on${pascalName}Load,
+  onShow: on${pascalName}Show,
+  onHide: on${pascalName}Hide
+} = useTabPage();
+
+// 监听 navbar 自定义下拉刷新事件
+onNavbarPullDownRefresh(() => {
+  // 所有已挂载 Tab 都会收到全局刷新事件，只处理当前激活的 Tab
+  if (curIdx.value != resolveTabIndexByKey(${toSingleQuoted(entry.tabType)})) {
+    return;
+  }
+  console.log(${toSingleQuoted(`${safePageName}页面刷新中...`)});
+  setTimeout(() => {
+    // 异步完成时再次门控：刷新期间若已切走则忽略结果
+    if (curIdx.value != resolveTabIndexByKey(${toSingleQuoted(entry.tabType)})) {
+      return;
+    }
+    console.log(${toSingleQuoted(`${safePageName}页面刷新成功`)});
+    stopNavbarPullDownRefresh();
+  }, 1000);
+});
+
+// 与普通页面一致的首次进入 / 显示 / 隐藏生命周期
+on${pascalName}Load(() => {
+  console.log(${toSingleQuoted(`on${pascalName}Load`)}, ${toSingleQuoted(`${safePageName} Tab 挂载了👋`)}, ${routeVar}.value.fullPath);
+});
+
+on${pascalName}Show(() => {
+  console.log(${toSingleQuoted(`on${pascalName}Show`)}, ${toSingleQuoted(`${safePageName} Tab 显示了👀`)}, ${routeVar}.value.fullPath);
+});
+
+on${pascalName}Hide(() => {
+  console.log(${toSingleQuoted(`on${pascalName}Hide`)}, ${toSingleQuoted(`${safePageName} Tab 隐藏了👉`)});
+});
+
+// 页面文件同时可作为模式 4 的 Tab 子页使用：嵌套时由 useTabPage() 接管页面生命周期
+useTabPageShell(${toSingleQuoted(entry.tabType)});
+</script>
+
+<style scoped></style>
+`;
+}
+
+/**
+ * 为 config.uts 中尚不存在页面文件的 Tab 补建模板。
+ *
+ * 只新增、不覆盖、不删除：已有页面保持不变；从 Tab 配置中删除某项后，其页面文件也不会被清理。
+ * @returns 本次新生成的页面相对路径
+ */
+export function scaffoldMissingTabPages(projectRoot: string, options: TabbarViewsOptions = {}): string[] {
+  if (options.autoCreatePage === false) {
+    return [];
+  }
+  const configFile = options.configFile ?? 'src/tabbar/config.uts';
+  const entries = readTabbarPageEntries(projectRoot, configFile);
+  const created: string[] = [];
+  for (let i = 0; i < entries.length; i++) {
+    const entry = entries[i];
+    if (entry.pagePath == '') {
+      continue;
+    }
+    const uvueFile = path.resolve(projectRoot, `${entry.pagePath}.uvue`);
+    const vueFile = path.resolve(projectRoot, `${entry.pagePath}.vue`);
+    if (fs.existsSync(uvueFile) || fs.existsSync(vueFile)) {
+      continue;
+    }
+    fs.mkdirSync(path.dirname(uvueFile), { recursive: true });
+    fs.writeFileSync(uvueFile, renderTabPageScaffold(entry), 'utf-8');
+    const relativePath = `${entry.pagePath}.uvue`;
+    created.push(relativePath);
+    console.log(`[tabbar-views] 已补建缺失 Tab 页面: ${relativePath}`);
+  }
+  return created;
 }
 
 /**
@@ -164,6 +368,9 @@ export function generateTabViews(projectRoot: string, options: TabbarViewsOption
   if (!fs.existsSync(configPath)) {
     return;
   }
+
+  // 直接调用本生成器（单测 / 独立脚本）时也补齐缺失页面；生产构建由 configResolved 更早执行。
+  scaffoldMissingTabPages(projectRoot, options);
 
   const rawContent = fs.readFileSync(configPath, 'utf-8');
   // 过滤多行注释与单行注释，避免注释项被解析
@@ -509,6 +716,19 @@ export default function tabbarViewsPlugin(options: TabbarViewsOptions = {}): Plu
     enforce: 'pre',
     configResolved(config) {
       projectRoot = config.root;
+      if (options.enabled === false || options.autoCreatePage === false) {
+        return;
+      }
+      const mode = getTabbarMode(projectRoot);
+      if (mode !== '0' && mode !== 'NO_TABBAR') {
+        try {
+          // 必须早于 uni-pages 的 configResolved 扫描执行，才能让新页面进入同一轮 pages.json。
+          scaffoldMissingTabPages(projectRoot, options);
+        }
+        catch (e) {
+          console.error('[tabbar-views] 自动补建 Tab 页面失败:', e);
+        }
+      }
     },
     buildStart() {
       if (options.enabled === false) {
@@ -535,6 +755,12 @@ export default function tabbarViewsPlugin(options: TabbarViewsOptions = {}): Plu
         const norm = path.resolve(file);
         // 1. config.uts 改动触发
         if (norm === configAbsPath) {
+          try {
+            scaffoldMissingTabPages(projectRoot, options);
+          }
+          catch (e) {
+            console.error('[tabbar-views] 自动补建 Tab 页面失败:', e);
+          }
           debouncedGenerate();
           return;
         }
@@ -548,6 +774,20 @@ export default function tabbarViewsPlugin(options: TabbarViewsOptions = {}): Plu
         if (norm === pagesJsonPath) {
           debouncedGenerate();
         }
+      });
+
+      server.watcher.on('unlink', (file) => {
+        const norm = path.resolve(file);
+        if (!watchedTabPages.has(norm)) {
+          return;
+        }
+        try {
+          scaffoldMissingTabPages(projectRoot, options);
+        }
+        catch (e) {
+          console.error('[tabbar-views] 自动补建 Tab 页面失败:', e);
+        }
+        debouncedGenerate();
       });
     }
   };

@@ -3,7 +3,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 import { setPagesMetaSnapshot } from '@/plugins/pages-meta-cache';
-import { generateTabViews } from '@/plugins/vite-plugin-tabbar-views';
+import { generateTabViews, scaffoldMissingTabPages } from '@/plugins/vite-plugin-tabbar-views';
 
 type FixtureProject = {
   root: string;
@@ -116,5 +116,67 @@ describe('generateTabViews', () => {
 
     const output = readGeneratedViews(project);
     expect(output).not.toContain('title="z-paging-x 原生分页"');
+  });
+});
+
+describe('scaffoldMissingTabPages', () => {
+  it('creates a missing tab page with pageName and tabType substitutions', () => {
+    const project = createFixtureProject();
+    fs.writeFileSync(path.join(project.root, 'src/tabbar/config.uts'), `
+export const customTabbarConfig = {
+  list: [
+    { tabType: 'index', text: 'tabbar.home', pagePath: 'src/pages/index/index' },
+    { tabType: 'me', text: 'tabbar.me', pagePath: 'src/pages/me/me' }
+  ]
+}
+`, 'utf-8');
+
+    const created = scaffoldMissingTabPages(project.root);
+    expect(created).toEqual(['src/pages/me/me.uvue']);
+
+    const output = fs.readFileSync(path.join(project.root, 'src/pages/me/me.uvue'), 'utf-8');
+    expect(output).toContain('<text>MeView</text>');
+    expect(output).toContain('name: \'me\'');
+    expect(output).toContain('navigationBarTitleText: \'tabbar.me\'');
+    expect(output).toContain('onMeLoad');
+    expect(output).toContain('useTabPageShell(\'me\')');
+    expect(output).not.toContain('xxxx');
+    expect(output).not.toContain('console.log(router, route)');
+  });
+
+  it('does not overwrite an existing tab page', () => {
+    const project = createFixtureProject();
+    const meFile = path.join(project.root, 'src/pages/me/me.uvue');
+    fs.mkdirSync(path.dirname(meFile), { recursive: true });
+    fs.writeFileSync(meFile, '<template><view>已有页面</view></template>', 'utf-8');
+    fs.writeFileSync(path.join(project.root, 'src/tabbar/config.uts'), `
+export const customTabbarConfig = {
+  list: [{ tabType: 'me', text: 'tabbar.me', pagePath: 'src/pages/me/me' }]
+}
+`, 'utf-8');
+
+    expect(scaffoldMissingTabPages(project.root)).toEqual([]);
+    expect(fs.readFileSync(meFile, 'utf-8')).toBe('<template><view>已有页面</view></template>');
+  });
+
+  it('never deletes a page when its tab item is removed from config', () => {
+    const project = createFixtureProject();
+    const configFile = path.join(project.root, 'src/tabbar/config.uts');
+    fs.writeFileSync(configFile, `
+export const customTabbarConfig = {
+  list: [{ tabType: 'me', text: 'tabbar.me', pagePath: 'src/pages/me/me' }]
+}
+`, 'utf-8');
+    scaffoldMissingTabPages(project.root);
+    const meFile = path.join(project.root, 'src/pages/me/me.uvue');
+    expect(fs.existsSync(meFile)).toBe(true);
+
+    fs.writeFileSync(configFile, `
+export const customTabbarConfig = {
+  list: [{ tabType: 'index', text: 'tabbar.home', pagePath: 'src/pages/index/index' }]
+}
+`, 'utf-8');
+    expect(scaffoldMissingTabPages(project.root)).toEqual([]);
+    expect(fs.existsSync(meFile)).toBe(true);
   });
 });
