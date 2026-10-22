@@ -1,4 +1,5 @@
 import { curIdx, setCurIdx, setCurIdxByPath, tabbarList } from './state.uts';
+import { setTabPageUrl } from './tab-page.uts';
 import { isNativeTabbar, isSinglePageTabbar, selectedTabbarStrategy, TABBAR_STRATEGY_MAP } from './strategy.uts';
 import { customTabbarConfig } from '../adapters/config.uts';
 import { useRouter } from '@/uni_modules/route-bestX/index.uts';
@@ -18,6 +19,11 @@ function handleClickBulge(url: string = '/src/pages/ai/ai'): void {
  *            沙盒调试时目标页未编译，会退化为 toast 提示而非崩溃
  */
 export function switchTabbar(url: string): void {
+  // 模式 4 没有真实页面切换：把路由 URL 中的 query 写入目标 Tab 的虚拟路由，
+  // 这样 useTabPage() 里的 route.query 仍与普通页面 push({ query }) 的行为一致。
+  if (isSinglePageTabbar) {
+    setTabPageUrl(url);
+  }
   setCurIdxByPath(url);
   if (isSinglePageTabbar) {
     try {

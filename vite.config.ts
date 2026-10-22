@@ -257,7 +257,6 @@ export default defineConfig({
     // 单页 TabBar 基础脚手架与视图组件辅助生成插件（按需根据 src/tabbar/config.uts 辅助创建基础 TabViews）
     tabbarViewsPlugin({
       enabled: true,
-      autoCreateViews: !isBuild,
       configFile: 'src/tabbar/config.uts'
     }),
     // 手动补充 easycom 插件（限制非小程序端生效，含 App 与 Web）

@@ -69,7 +69,7 @@ export type TabBarMidButton = {
   iconfont?: TabBarMidButtonIconfont;
   /** 点击跳转路径（自定义模式使用） */
   pagePath?: string;
-  /** 可选：单页 TabBar 模式对应视图组件路径（不填则自动探测对应页面的 views 组件） */
+  /** 可选：旧版自定义视图组件路径；当前单页调度默认直接复用 pagePath 对应的页面 .uvue */
   viewPath?: string;
   /** 图标类型，'icon' 为 uni-icons 字体图标，'image' 为本地图片 */
   iconType?: string;

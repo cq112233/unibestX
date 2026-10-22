@@ -4,6 +4,25 @@ import process from 'node:process';
 import type { Plugin } from 'vite';
 import { loadPlatformPagesJson } from './pages-json-util';
 
+/** 读取 VITE_TABBAR_MODE；优先环境变量，其次项目根目录 .env */
+function getTabbarMode(projectRoot: string): string {
+  if (process.env.VITE_TABBAR_MODE != null && process.env.VITE_TABBAR_MODE !== '') {
+    return process.env.VITE_TABBAR_MODE.trim();
+  }
+  try {
+    const envPath = path.resolve(projectRoot, '.env');
+    if (fs.existsSync(envPath)) {
+      const content = fs.readFileSync(envPath, 'utf-8');
+      const match = content.match(/^VITE_TABBAR_MODE\s*=\s*['"]?([^'"\r\n]+)['"]?/m);
+      if (match != null && match[1] != null) {
+        return match[1].trim();
+      }
+    }
+  }
+  catch {}
+  return '1';
+}
+
 /**
  * 驼峰转连字符 helper（与 uni-layouts-plugin 中保持一致）
  */
@@ -114,6 +133,11 @@ export function uniRootX(options: UniRootXOptions = {}): Plugin {
   let cachedPagesParams: Map<string, Record<string, any>> | null = null;
   let lastPagesJsonMTime = 0;
 
+  /** 模式 4 下由 TabViews 直接 import 的页面（这些页面只作为宿主内组件渲染，不再套全局根骨架） */
+  let cachedEmbeddedTabPages: Set<string> | null = null;
+  let lastTabViewsMTime = 0;
+  let tabbarMode = '1';
+
   // 解析 pages.json：主包 + 分包页面，提取除 path/layout 外的全部自定义参数
   function loadPagesParams() {
     const paramsByPath = new Map<string, Record<string, any>>();
@@ -178,11 +202,40 @@ export function uniRootX(options: UniRootXOptions = {}): Plugin {
     return cachedPagesParams;
   }
 
+  /** 解析生成的 TabViews.uvue，返回其中直接导入的页面路径集合 */
+  function getEmbeddedTabPages(): Set<string> {
+    const tabViewsPath = path.resolve(projectRoot, 'src/tabbar/components/TabViews.uvue');
+    if (!fs.existsSync(tabViewsPath)) {
+      return new Set();
+    }
+    try {
+      const stat = fs.statSync(tabViewsPath);
+      if (cachedEmbeddedTabPages != null && stat.mtimeMs == lastTabViewsMTime) {
+        return cachedEmbeddedTabPages;
+      }
+      const content = fs.readFileSync(tabViewsPath, 'utf-8');
+      const pages = new Set<string>();
+      const importRegex = /import\s+\w+\s+from\s+['"]@\/(src\/[^'"]+\.(?:uvue|vue))['"]/g;
+      let match = importRegex.exec(content);
+      while (match != null) {
+        pages.add(match[1].replace(/\.(uvue|vue)$/, ''));
+        match = importRegex.exec(content);
+      }
+      cachedEmbeddedTabPages = pages;
+      lastTabViewsMTime = stat.mtimeMs;
+      return pages;
+    }
+    catch {
+      return new Set();
+    }
+  }
+
   return {
     name: 'uniRootX',
     configResolved(config: any) {
       projectRoot = config.root || process.cwd();
       pagesJsonPath = path.resolve(projectRoot, 'pages.json');
+      tabbarMode = getTabbarMode(projectRoot);
     },
     transform(code: string, id: string) {
       const normalizedId = id.replace(/\\/g, '/');
@@ -243,6 +296,13 @@ export function uniRootX(options: UniRootXOptions = {}): Plugin {
       // 依据 pages.json 查找当前页面的自定义参数（与 uni-layouts-plugin 同源），生成注入到根组件的 props
       const relativeId = path.relative(projectRoot, normalizedId).replace(/\\/g, '/');
       const cleanRelativeId = relativeId.replace(/\.(uvue|vue)(\?.*)?$/, '');
+
+      // 模式 4：TabViews 直接复用的页面只作为宿主内组件渲染，不能再次套 AppRoot。
+      // 否则其 AppRoot.onMounted 会按系统页栈顶（始终是宿主首页）把 curIdx 重置回首页，
+      // 表现为首次打开某个尚未渲染过的 Tab 时又跳回首页。
+      if (tabbarMode == '4' && getEmbeddedTabPages().has(cleanRelativeId)) {
+        return null;
+      }
 
       // 排除排除列表中的页面
       if (excludeList.length > 0) {

@@ -1,0 +1,256 @@
+import { computed, inject, onUnmounted, watch } from 'vue';
+import type { ComputedRef, Ref } from 'vue';
+import type { RouteLocation } from '@/uni_modules/route-bestX/index.uts';
+import { getCurrentPath, getRouteMeta } from '@/uni_modules/route-bestX/index.uts';
+import { isPageVisible, pageShowTimes } from '../core/lifecycle.uts';
+import { curIdx, tabbarList } from '../core/state.uts';
+import {
+  readTabPageFullPath,
+  readTabPageQuery,
+  tabPageQueryRevision
+} from '../core/tab-page.uts';
+
+/** Tab 页面生命周期回调 */
+export type TabPageLifecycleCallback = () => void;
+
+/** 单页 TabBar 的页面语义适配结果 */
+export type UseTabPageResult = {
+  /** 当前 Tab 自己的虚拟路由（path / fullPath / query / meta / name） */
+  route: ComputedRef<RouteLocation>;
+  /** 当前 Tab 页面路径，等价于普通页面的 useRoute().path */
+  path: ComputedRef<string>;
+  /** 当前 Tab 页面 query，值为解码态 */
+  query: ComputedRef<Map<string, string>>;
+  /** 当前 Tab 页面名称 */
+  name: ComputedRef<string | null>;
+  /** 当前 Tab 页面元信息 */
+  meta: ComputedRef<UTSJSONObject | null>;
+  /** 当前 Tab 是否处于激活状态 */
+  isActive: ComputedRef<boolean>;
+  /** 宿主页面是否可见（App 切后台、进入子页面时为 false） */
+  isPageVisible: Ref<boolean>;
+  /** 首次进入该 Tab 时执行一次，等价页面 onLoad */
+  onLoad: (callback: TabPageLifecycleCallback) => void;
+  /** 每次切回该 Tab / 从子页返回 / App 回前台时执行，等价页面 onShow */
+  onShow: (callback: TabPageLifecycleCallback) => void;
+  /** 切走该 Tab / 进入子页 / App 切后台时执行，等价页面 onHide */
+  onHide: (callback: TabPageLifecycleCallback) => void;
+  /** Tab 视图卸载时执行，等价页面 onUnload */
+  onUnload: (callback: TabPageLifecycleCallback) => void;
+};
+
+/** 读取当前页面栈；仅用于给虚拟 RouteLocation 补齐同构字段 */
+function readCurrentPages(): Array<any> {
+  try {
+    return getCurrentPages() as Array<any>;
+  }
+  catch {
+    return [] as Array<any>;
+  }
+}
+
+/** 从页面路径取路由名兜底值 */
+function readFallbackRouteName(path: string): string | null {
+  if (path.length == 0) {
+    return null;
+  }
+  const parts = path.split('/');
+  const last = parts[parts.length - 1];
+  return last.length > 0 ? last : null;
+}
+
+/** 从页面元信息里取显式声明的路由名 */
+function readRouteName(meta: UTSJSONObject | null, path: string): string | null {
+  if (meta != null) {
+    // UTSJSONObject 来自 JSON.parseObject 时不能保证实例方法可用，按项目约定走下标读取。
+    // eslint-disable-next-line dot-notation
+    const rawName = meta['name'];
+    if (rawName != null) {
+      const name = `${rawName}`;
+      if (name.length > 0) {
+        return name;
+      }
+    }
+  }
+  return readFallbackRouteName(path);
+}
+
+/** 构造与 route-bestX 的 RouteLocation 同构的虚拟路由对象 */
+function buildTabPageLocation(path: string, query: Map<string, string>, fullPath: string): RouteLocation {
+  const meta = getRouteMeta(path);
+  const pages = readCurrentPages();
+  const page = pages.length > 0 ? pages[pages.length - 1] : null;
+  return {
+    path,
+    fullPath,
+    query,
+    params: new Map<string, string>(),
+    meta,
+    name: readRouteName(meta, path),
+    page,
+    pages
+  } as RouteLocation;
+}
+
+/**
+ * 单页 TabBar（模式 4）的页面语义适配 hook。
+ *
+ * 在 Tab 页面 `.uvue`（如 `src/pages/basic/basic.uvue`）中调用后，可以获得与普通页面一致的：
+ * - `route.path / route.query / route.meta / route.name`
+ * - `onLoad / onShow / onHide / onUnload`
+ *
+ * Tab 切换仍由单页容器完成，因此同时保留零闪烁与页面状态常驻。
+ * 跳转继续使用 `useRouter()`，命中 TabBar 路径时现有路由桥接会自动切 Tab 并同步 query。
+ *
+ * @example
+ * ```uts
+ * const {
+ *   route,
+ *   onLoad,
+ *   onShow,
+ *   onHide
+ * } = useTabPage();
+ *
+ * onLoad((): void => {
+ *   const id = route.value.query.get('id') ?? '';
+ * });
+ *
+ * onShow((): void => {
+ *   // 切回当前 Tab、从子页面返回、App 回前台
+ * });
+ * ```
+ */
+export function useTabPage(): UseTabPageResult {
+  // TabContent 在插槽外层注入当前 Tab 在完整 tabbarList 中的下标。
+  // 这样业务视图不需要手写 tabType / pagePath，也不会因 midButton 插位而错位。
+  const pageIndex = inject<number>('tabPageIndex', -1);
+
+  const path = computed<string>((): string => {
+    if (pageIndex >= 0 && pageIndex < tabbarList.length) {
+      return tabbarList[pageIndex].pagePath;
+    }
+    return getCurrentPath();
+  });
+  const isActive = computed<boolean>((): boolean => {
+    return pageIndex >= 0 && curIdx.value == pageIndex;
+  });
+  const query = computed<Map<string, string>>((): Map<string, string> => {
+    return readTabPageQuery(path.value, tabPageQueryRevision.value);
+  });
+  const meta = computed<UTSJSONObject | null>((): UTSJSONObject | null => {
+    return getRouteMeta(path.value);
+  });
+  const name = computed<string | null>((): string | null => {
+    return readRouteName(meta.value, path.value);
+  });
+  const route = computed<RouteLocation>((): RouteLocation => {
+    return buildTabPageLocation(
+      path.value,
+      query.value,
+      readTabPageFullPath(path.value, tabPageQueryRevision.value)
+    );
+  });
+
+  /** onLoad 已执行的标记：每个 Tab 视图实例只执行一次 */
+  let hasLoaded: boolean = false;
+  /** 当前是否已经向业务派发 onShow */
+  let hasShown: boolean = false;
+  const loadCallbacks: Array<TabPageLifecycleCallback> = [];
+  const showCallbacks: Array<TabPageLifecycleCallback> = [];
+  const hideCallbacks: Array<TabPageLifecycleCallback> = [];
+  const unloadCallbacks: Array<TabPageLifecycleCallback> = [];
+
+  /** 批量执行回调 */
+  function runCallbacks(callbacks: Array<TabPageLifecycleCallback>): void {
+    for (let i = 0; i < callbacks.length; i++) {
+      callbacks[i]();
+    }
+  }
+
+  /**
+   * 当前 Tab 是否处于“页面可见”状态。
+   * pageShowTimes == 0 时说明宿主尚未桥接 onShow；此时按首屏可见处理，
+   * 与 onTabPageShow 的既有无门控兜底保持一致。
+   */
+  function isCurrentTabVisible(): boolean {
+    return isActive.value && (isPageVisible.value || pageShowTimes.value == 0);
+  }
+
+  /** 激活 / 失活时统一派发 onLoad、onShow、onHide */
+  function syncLifecycle(): void {
+    if (isCurrentTabVisible()) {
+      if (!hasLoaded) {
+        hasLoaded = true;
+        runCallbacks(loadCallbacks);
+      }
+      if (!hasShown) {
+        hasShown = true;
+        runCallbacks(showCallbacks);
+      }
+      return;
+    }
+    if (hasShown) {
+      hasShown = false;
+      runCallbacks(hideCallbacks);
+    }
+  }
+
+  /** 注册首次进入回调；若注册时页面已经可见则立即执行 */
+  function onLoad(callback: TabPageLifecycleCallback): void {
+    loadCallbacks.push(callback);
+    if (!hasLoaded && isCurrentTabVisible()) {
+      hasLoaded = true;
+      callback();
+    }
+  }
+
+  /** 注册页面显示回调；若注册时页面已经可见则立即执行 */
+  function onShow(callback: TabPageLifecycleCallback): void {
+    showCallbacks.push(callback);
+    if (!hasShown && isCurrentTabVisible()) {
+      hasShown = true;
+      callback();
+    }
+  }
+
+  /** 注册页面隐藏回调；切走 Tab、进入子页或 App 切后台时执行 */
+  function onHide(callback: TabPageLifecycleCallback): void {
+    hideCallbacks.push(callback);
+  }
+
+  /** 注册视图卸载回调 */
+  function onUnload(callback: TabPageLifecycleCallback): void {
+    unloadCallbacks.push(callback);
+  }
+
+  const stopActiveWatch = watch(isActive, (_value: boolean): void => {
+    syncLifecycle();
+  });
+  const stopVisibleWatch = watch(isPageVisible, (_value: boolean): void => {
+    syncLifecycle();
+  });
+
+  onUnmounted((): void => {
+    stopActiveWatch();
+    stopVisibleWatch();
+    if (hasShown) {
+      hasShown = false;
+      runCallbacks(hideCallbacks);
+    }
+    runCallbacks(unloadCallbacks);
+  });
+
+  return {
+    route,
+    path,
+    query,
+    name,
+    meta,
+    isActive,
+    isPageVisible,
+    onLoad,
+    onShow,
+    onHide,
+    onUnload
+  };
+}

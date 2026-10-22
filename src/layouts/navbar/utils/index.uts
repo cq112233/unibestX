@@ -135,6 +135,8 @@ export function resetNavbarTitle(): void {
 export const EVENT_SET_NAVBAR_VISIBLE: string = 'setNavbarVisible';
 export const EVENT_SET_HIDE_NAVBAR: string = 'setHideNavbar';
 export const EVENT_RESET_NAVBAR_VISIBLE: string = 'resetNavbarVisible';
+export const EVENT_SET_SHOW_BACK: string = 'setShowBack';
+export const EVENT_RESET_SHOW_BACK: string = 'resetShowBack';
 
 /**
  * 动态控制 NavBar 布局导航栏的显示或隐藏
@@ -157,6 +159,21 @@ export function setHideNavbar(hide: boolean): void {
  */
 export function resetNavbarVisible(): void {
   uni.$emit(EVENT_RESET_NAVBAR_VISIBLE);
+}
+
+/**
+ * 动态控制 NavBar 左侧返回按钮是否显示
+ * @param show 是否显示返回按钮（true 显示，false 隐藏）
+ */
+export function setShowBack(show: boolean): void {
+  uni.$emit(EVENT_SET_SHOW_BACK, show);
+}
+
+/**
+ * 重置 NavBar 左侧返回按钮为页面初始配置
+ */
+export function resetShowBack(): void {
+  uni.$emit(EVENT_RESET_SHOW_BACK);
 }
 
 export const EVENT_SET_STATUS_BAR_VISIBLE: string = 'setStatusBarVisible';

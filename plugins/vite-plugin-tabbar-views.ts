@@ -11,8 +11,8 @@ export type TabbarViewsOptions = {
   configFile?: string;
   /** 生成的 TabViews 调度组件路径，默认 'src/tabbar/components/TabViews.uvue' */
   targetFile?: string;
-  /** 缺失对应 views 目录或视图组件时是否自动创建基础脚手架，默认 true */
-  autoCreateViews?: boolean;
+  /** 模式 4 的宿主页面路径，默认 'src/pages/index/index'（该页面通过 slot 提供自身内容） */
+  hostPage?: string;
   /** 是否自动从各 Tab 页面的 definePage 中同步 hideNavbar 配置，默认 true */
   syncNavbarConfig?: boolean;
 };
@@ -40,10 +40,13 @@ function getTabbarMode(projectRoot: string): string {
 export const watchedTabPages = new Set<string>();
 
 /**
- * 辅助生成单页 TabBar 调度容器 TabViews.uvue 以及补全缺失的 views 视图组件
+ * 生成单页 TabBar 调度容器 TabViews.uvue。
+ *
+ * 普通 Tab 直接复用页面 .uvue；宿主页通过 tabHost slot 注入，避免页面自引用。
  */
 export function generateTabViews(projectRoot: string, options: TabbarViewsOptions = {}): void {
   const configFile = options.configFile ?? 'src/tabbar/config.uts';
+  const hostPage = (options.hostPage ?? 'src/pages/index/index').replace(/\\/g, '/').replace(/^\//, '').replace(/\.(uvue|vue)$/, '');
   const configPath = path.resolve(projectRoot, configFile);
   if (!fs.existsSync(configPath)) {
     return;
@@ -64,18 +67,12 @@ export function generateTabViews(projectRoot: string, options: TabbarViewsOption
   const itemRegex = /\{([\s\S]*?)\}/g;
   let m = itemRegex.exec(listBlock);
   const tabPages: string[] = [];
-  /** pagePath → 业务标识（CustomTabBarItem.tabType），用于生成视图组件时按标识订阅 */
-  const tabPageKeys = new Map<string, string>();
-
   while (m !== null) {
     const itemBlock = m[1];
     const pagePathMatch = itemBlock.match(/pagePath\s*:\s*['"`](.*?)['"`]/);
     if (pagePathMatch) {
       const pagePath = pagePathMatch[1].trim().replace(/^\//, '');
       tabPages.push(pagePath);
-      const typeMatch = itemBlock.match(/tabType\s*:\s*['"`](.*?)['"`]/);
-      if (typeMatch && typeMatch[1].trim())
-        tabPageKeys.set(pagePath, typeMatch[1].trim());
     }
     m = itemRegex.exec(listBlock);
   }
@@ -142,13 +139,14 @@ export function generateTabViews(projectRoot: string, options: TabbarViewsOption
     title: string;
     hideNavbar: boolean;
     hideStatusBar: boolean;
+    showBack: boolean;
     enablePullDownRefresh: boolean;
     customPageClass: string;
     customPageStyle: string;
   };
 
   const viewsEntries: Array<{
-    importName: string;
+    importName: string | null;
     importPath: string;
     variants: ViewEntryVariant[];
   }> = [];
@@ -156,96 +154,14 @@ export function generateTabViews(projectRoot: string, options: TabbarViewsOption
 
   for (let idx = 0; idx < fullTabPages.length; idx++) {
     const rawPath = fullTabPages[idx];
-    const cleanPath = rawPath.replace(/^src\//, '');
-    // 业务标识按「带前导 src/ 的原始 pagePath」查表（cleanPath 已剥掉 src/，不能直接当 key）
-    const pagePathKey = rawPath.replace(/^\//, '');
-    const tabKey = tabPageKeys.get(pagePathKey);
-    const pageDirRel = path.dirname(cleanPath);
-    const absPageDir = path.resolve(projectRoot, 'src', pageDirRel);
-    const dirName = path.basename(absPageDir);
-    const pascalDirName = dirName.charAt(0).toUpperCase() + dirName.slice(1);
-    const expectedCompName = `${pascalDirName}View`;
-
-    const viewsDir = path.resolve(absPageDir, 'views');
-    const expectedViewFile = path.resolve(viewsDir, `${expectedCompName}.uvue`);
-
-    let actualCompName = expectedCompName;
-    let actualRelPath = `src/${pageDirRel}/views/${expectedCompName}.uvue`;
-
-    if (fs.existsSync(absPageDir)) {
-      if (!fs.existsSync(viewsDir)) {
-        if (options.autoCreateViews !== false) {
-          fs.mkdirSync(viewsDir, { recursive: true });
-        }
-      }
-
-      // 检查 views 目录下是否已经存在视图组件
-      let existingViews: string[] = [];
-      if (fs.existsSync(viewsDir)) {
-        try {
-          existingViews = fs.readdirSync(viewsDir).filter((f: string) => f.endsWith('.uvue'));
-        }
-        catch {}
-      }
-
-      if (existingViews.length > 0) {
-        // 已有视图组件：优先匹配 HomeView（针对 index 目录），其次匹配 expectedCompName，最后取第一个已有组件
-        const matchedView = (dirName === 'index' && existingViews.includes('HomeView.uvue'))
-          ? 'HomeView.uvue'
-          : (existingViews.find((f: string) => f === `${expectedCompName}.uvue`) ?? existingViews[0]);
-
-        const baseName = matchedView.replace(/\.uvue$/, '');
-        actualCompName = baseName;
-        actualRelPath = `src/${pageDirRel}/views/${matchedView}`;
-      }
-      else if (options.autoCreateViews !== false) {
-        // 没有任何视图组件时，才自动创建规范的 View.uvue
-        const viewTemplate = `<script lang="uts" setup>
-defineOptions({
-  name: '${expectedCompName}',
-  styleIsolation: 'isolated'
-});
-
-import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/layouts/navbar/utils/index.uts';
-import { curIdx, onTabShow } from '@/src/tabbar';
-
-// 页面数据加载/刷新方法
-function refreshData(): void {
-  console.log('${expectedCompName} 刷新中...');
-  setTimeout(() => {
-    console.log('${expectedCompName} 刷新成功');
-    // 数据加载完毕后，手动停止下拉刷新动画状态
-    stopNavbarPullDownRefresh();
-  }, 1000);
-}
-
-// 监听 Tab 切换（${tabKey ? `tabType: '${tabKey}'` : `索引 ${idx}`}）时触发刷新
-onTabShow(${tabKey ? `'${tabKey}'` : idx}, () => {
-  console.log('切换到了 ${expectedCompName} Tab');
-  refreshData();
-});
-
-// 监听 navbar 自定义下拉刷新事件（在处于当前 Tab 时生效）
-onNavbarPullDownRefresh(() => {
-  if (curIdx.value == ${idx}) {
-    refreshData();
-  }
-});
-</script>
-
-<template>
-  <view class="flex flex-col flex-1 p-[16px]">
-    <text class="text-[18px] font-bold text-[#1e293b]">${expectedCompName}</text>
-    <text class="text-[13px] text-[#64748b] mt-[6px]">当前为单页面 TabBar 视图组件</text>
-  </view>
-</template>
-
-<style lang="scss" scoped></style>
-`;
-        fs.writeFileSync(expectedViewFile, viewTemplate, 'utf-8');
-        console.log(`[tabbar-views] 自动为 TabBar 单页生成基础视图组件: ${path.relative(projectRoot, expectedViewFile)}`);
-      }
-    }
+    const pageRelPath = rawPath.replace(/^src\//, '').replace(/\.(uvue|vue)$/, '');
+    const pageBaseName = path.basename(pageRelPath);
+    const pascalPageName = pageBaseName.charAt(0).toUpperCase() + pageBaseName.slice(1);
+    // 模式 4 直接复用真实页面组件：普通 Tab 由 TabContent 注入 tabPageIndex；
+    // 宿主页改走 slot，避免 index.uvue 被 TabViews 反向 import。这样业务只需要维护一个 .uvue。
+    const isHostPage = pageRelPath == hostPage.replace(/^src\//, '');
+    const actualCompName = `${pascalPageName}Page`;
+    const actualRelPath = `src/${pageRelPath}.uvue`;
 
     // 优先从 pages.json 读取对应页面在 definePage 中的各平台变体配置
     const normTarget = rawPath.replace(/\\/g, '/').replace(/^\//, '').replace(/\.(uvue|vue)$/, '');
@@ -273,6 +189,7 @@ onNavbarPullDownRefresh(() => {
         condition: v.condition,
         hideNavbar: p?.hideNavbar === true,
         hideStatusBar: p?.hideStatusBar === true,
+        showBack: p?.showBack !== false,
         enablePullDownRefresh: typeof p?.enablePullDownRefresh === 'boolean' ? p.enablePullDownRefresh : true,
         title: typeof p?.style?.navigationBarTitleText === 'string'
           ? p.style.navigationBarTitleText
@@ -300,6 +217,9 @@ onNavbarPullDownRefresh(() => {
         const mStatus = pageCode.match(/hideStatusBar\s*:\s*(true|false)/i);
         if (mStatus)
           v.hideStatusBar = mStatus[1].toLowerCase() === 'true';
+        const mShowBack = pageCode.match(/showBack\s*:\s*(true|false)/i);
+        if (mShowBack)
+          v.showBack = mShowBack[1].toLowerCase() === 'true';
         const mRefresh = pageCode.match(/enablePullDownRefresh\s*:\s*(true|false)/i);
         if (mRefresh)
           v.enablePullDownRefresh = mRefresh[1].toLowerCase() === 'true';
@@ -320,12 +240,13 @@ onNavbarPullDownRefresh(() => {
     // 防止相同名称冲突
     let finalCompName = actualCompName;
     if (usedNames.has(finalCompName)) {
-      finalCompName = `${pascalDirName}${actualCompName}`;
+      finalCompName = `${pascalPageName}${actualCompName}`;
     }
     usedNames.add(finalCompName);
 
     viewsEntries.push({
-      importName: finalCompName,
+      // 宿主页不能 import 自身（index.uvue -> TabViews -> index.uvue），改由页面传入 slot。
+      importName: isHostPage ? null : finalCompName,
       importPath: `@/${actualRelPath.replace(/\\/g, '/')}`,
       variants: entryVariants
     });
@@ -336,12 +257,14 @@ onNavbarPullDownRefresh(() => {
   const tabViewsFilePath = path.resolve(projectRoot, targetFile);
 
   // 排序保持稳定性
-  const sortedImports = [...viewsEntries].sort((a, b) => a.importName.localeCompare(b.importName));
+  const sortedImports = viewsEntries
+    .filter(item => item.importName != null)
+    .sort((a, b) => (a.importName ?? '').localeCompare(b.importName ?? ''));
   const importLines = sortedImports
     .map(item => `import ${item.importName} from '${item.importPath}';`)
     .join('\n');
 
-  function renderTabContentTag(index: number, importName: string, v: ViewEntryVariant): string {
+  function renderTabContentTag(index: number, importName: string | null, v: ViewEntryVariant): string {
     let attrs = ` :content-index="${index}"`;
     if (v.title) {
       attrs += ` title="${v.title.replace(/"/g, '&quot;')}"`;
@@ -355,13 +278,17 @@ onNavbarPullDownRefresh(() => {
     if (v.hideStatusBar) {
       attrs += ` :hide-status-bar="true"`;
     }
+    attrs += ` :show-back="${v.showBack}"`;
     if (v.customPageClass) {
       attrs += ` custom-page-class="${v.customPageClass.replace(/"/g, '&quot;')}"`;
     }
     if (v.customPageStyle) {
       attrs += ` custom-page-style="${v.customPageStyle.replace(/"/g, '&quot;')}"`;
     }
-    return `    <TabContent${attrs}>\n      <${importName} />\n    </TabContent>`;
+    const content = importName == null
+      ? '      <slot name="tabHost" />'
+      : `      <${importName} />`;
+    return `    <TabContent${attrs}>\n${content}\n    </TabContent>`;
   }
 
   const contentBlocks = viewsEntries
@@ -390,7 +317,7 @@ onNavbarPullDownRefresh(() => {
     .join('\n');
 
   const tabViewsContent = `<template>
-  <view class="tab-views-container" style="position: relative;flex: 1;">
+  <view class="tab-views-container" style="position: relative; display: flex; flex-direction: column; flex: 1; height: 100%;">
 ${contentBlocks}
   </view>
 </template>
@@ -403,7 +330,10 @@ import TabContent from './TabContent.uvue';
 <style lang="scss" scoped>
 .tab-views-container {
   position: relative;
+  display: flex;
+  flex-direction: column;
   flex: 1;
+  height: 100%;
 }
 </style>
 `;
@@ -425,7 +355,7 @@ import TabContent from './TabContent.uvue';
 }
 
 /**
- * 辅助生成最基础的 TabViews.uvue 脚手架与视图组件插件
+ * 根据 config.uts 自动同步 TabViews.uvue 调度组件的插件
  */
 export default function tabbarViewsPlugin(options: TabbarViewsOptions = {}): Plugin {
   let projectRoot = '';

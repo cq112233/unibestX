@@ -52,7 +52,7 @@
           <view class="wechat-pull-dot wechat-pull-dot--3"></view>
         </view>
       </view>
-      <!-- 插槽：放置对应 Tab 的具体业务视图组件（如 IndexView、BasicView 等） -->
+      <!-- 插槽：放置对应 Tab 的页面内容（宿主页为 #tabHost，普通 Tab 直接复用页面 .uvue） -->
       <slot />
 
       <!-- 底部 TabBar 统一占位垫高组件：根据 VITE_TABBAR_MODE、风格形态及安全区动态计算高度 -->
@@ -76,7 +76,7 @@
       @scroll="handleScroll"
       @scrolltolower="handleScrollToLower"
     >
-      <!-- 插槽：放置对应 Tab 的具体业务视图组件（如 IndexView、BasicView 等） -->
+      <!-- 插槽：放置对应 Tab 的页面内容（宿主页为 #tabHost，普通 Tab 直接复用页面 .uvue） -->
       <slot />
 
       <!-- 底部 TabBar 统一占位垫高组件：根据 VITE_TABBAR_MODE、风格形态及安全区动态计算高度 -->
@@ -95,6 +95,7 @@ import {
   isPageScrollDisabled,
   setHideNavbar,
   setHideStatusBar,
+  setShowBack,
   stopNavbarPullDownRefresh
 } from '@/src/tabbar/adapters/navbar.uts';
 
@@ -121,6 +122,11 @@ const props = defineProps({
   hideStatusBar: {
     type: Boolean,
     default: false
+  },
+  /** 当前 Tab 的导航栏左侧是否显示返回按钮（由页面 definePage.showBack 同步） */
+  showBack: {
+    type: Boolean,
+    default: true
   },
   /** 当前 Tab 是否启用自定义下拉刷新（默认 true） */
   enablePullDownRefresh: {
@@ -164,6 +170,7 @@ const contentTitle = computed((): string => {
 });
 const shouldHideNavbar = computed((): boolean => props.hideNavbar);
 const shouldHideStatusBar = computed((): boolean => props.hideStatusBar);
+const shouldShowBack = computed((): boolean => props.showBack);
 
 /**
  * 向下跨层级注入当前 Tab 激活状态：
@@ -171,6 +178,12 @@ const shouldHideStatusBar = computed((): boolean => props.hideStatusBar);
  * 避免 iOS 原生引擎将 position: fixed 提升至 Page Root 无法被父级 CSS 隐藏的问题。
  */
 provide('isTabActive', isActive);
+
+/**
+ * 向当前 Tab 的业务视图注入完整 tabbarList 下标。
+ * useTabPage() 依赖它识别“我是哪个 Tab”，业务视图不需要手写 tabType / pagePath。
+ */
+provide('tabPageIndex', props.contentIndex);
 
 // ==========================================
 // 3. 样式布局
@@ -341,6 +354,7 @@ function syncNavbarState(): void {
   updateNavbarTitle();
   setHideNavbar(props.hideNavbar);
   setHideStatusBar(props.hideStatusBar);
+  setShowBack(props.showBack);
 }
 
 // ==========================================
@@ -441,6 +455,15 @@ watch(shouldHideNavbar, (newVal: boolean) => {
 watch(shouldHideStatusBar, (newVal: boolean) => {
   if (isActive.value) {
     setHideStatusBar(newVal);
+  }
+});
+
+/**
+ * 监听当前 Tab 的返回按钮配置变化
+ */
+watch(shouldShowBack, (newVal: boolean) => {
+  if (isActive.value) {
+    setShowBack(newVal);
   }
 });
 

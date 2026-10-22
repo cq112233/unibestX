@@ -31,7 +31,7 @@
 | **`vite-plugin-uni-pages-route-table.ts`** | `uniPagesRouteTablePlugin()` | **页面路由表虚拟模块（卫星）**：在写盘前生成 `virtual:uni-pages-route-table`，按路径 map / 数组 list 两种形态分别导出 JSON 与对象（`useRoute()` 数据源），不产生物理文件 | **可拔除** | **宿主依赖**：通过 `uniPagesStage (order: 300)` 挂载到核心主控运行；拔除后页面配置表停止更新 |
 | **`uni-layouts-plugin.ts`** | `uniLayoutsPlugin()` | **跨端 Layout 布局包装**：解析页面 `layout` 配置并在 SFC 模板外层自动包裹布局组件（如 `<layout-default>`） | **可拔除** | **产物消费**：依赖 `pages.json` 数据；拔除后页面不再被包裹布局外壳 |
 | **`root-plugin.ts`** | `uniRootX()` | **全局根骨架组件包装**：自动给页面外层套上根组件（如 `<AppRoot>`）并透传页面参数 | **可拔除** | **产物消费**：依赖 `pages.json` 数据；拔除后页面不再包裹全局根组件 |
-| **`vite-plugin-tabbar-views.ts`** | `tabbarViewsPlugin()` | **单页 TabBar 视图脚手架**：根据 `src/tabbar/config.uts` 自动生成 `TabViews.uvue` 调度组件与视图骨架 | **可拔除** | **配置依赖**：依赖 `src/tabbar/config.uts` 和 `pages.json`；用于单页多视图模式 |
+| **`vite-plugin-tabbar-views.ts`** | `tabbarViewsPlugin()` | **单页 TabBar 调度生成**：根据 `src/tabbar/config.uts` 自动生成 `TabViews.uvue`，普通 Tab 直接复用页面 `.uvue`，宿主页通过 `#tabHost` slot 注入 | **可拔除** | **配置依赖**：依赖 `src/tabbar/config.uts` 和 `pages.json`；用于单页保活模式 |
 | **`vite-plugin-clean-logger.ts`** | `cleanLoggerPlugin()` | **控制台日志净化**：拦截并过滤 Vite / DCloud 编译期的 warning 告警、无意义栈帧与代码片段 | **完全独立** | 无任何外部依赖，即插即拔 |
 | **`vite-plugin-editor-version.ts`** | `editorVersionPlugin()` | **编辑器版本对齐检测**：构建前检查本机 HBuilderX 编译器与 `@dcloudio/*` 依赖版本是否一致并给出提示 | **完全独立** | 仅依赖 `scripts/sync-hbuilderx.mjs --preflight`，只提示不阻断 |
 | **`vite-plugin-h5-optimize-deps.ts`** | `h5OptimizeDepsPlugin()` | **H5 依赖预构建优化**：将核心大依赖（Pinia 等）纳入 esbuild 预构建，加速 H5 冷启动并规避 504 错误 | **完全独立** | 仅在 H5 / Web 开发模式生效，无其他插件依赖 |
@@ -78,7 +78,8 @@ graph TD
 - **`root-plugin.ts` (`uniRootX`)**：
   1. 在布局组件外层进一步包裹统一的根骨架组件（默认路径为 `src/AppRoot.uvue`）；
   2. 从 `pages.json` 读取该页面的自定义参数（如 `showBack`、`hideNavbar`），通过 props 透传给根组件；
-  3. ⚠️ **注意**：如果当前工程没有创建 `src/AppRoot.uvue`，且不需要全局根组件包裹功能，请在 `vite.config.ts` 中将 `uniRootX` 注释掉。
+  3. 模式 4 下跳过 `TabViews.uvue` 直接复用的 Tab 页面，避免宿主内的 Tab 子页再次挂载 `AppRoot` 并触发重复同步；
+  4. ⚠️ **注意**：如果当前工程没有创建 `src/AppRoot.uvue`，且不需要全局根组件包裹功能，请在 `vite.config.ts` 中将 `uniRootX` 注释掉。
 
 ---
 

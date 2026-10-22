@@ -1,0 +1,125 @@
+import { ref } from 'vue';
+import type { Ref } from 'vue';
+import { cleanPath, parseUrlToObj } from '@/uni_modules/route-bestX/index.uts';
+import { setCurIdx, tabbarList } from './state.uts';
+import { resolveTabIndexByKey } from './tab-key.uts';
+
+/**
+ * 单页 TabBar（模式 4）的虚拟页面路由状态。
+ *
+ * 模式 4 没有为每个 Tab 创建真实页面，系统页面的 path / query 永远是宿主页。
+ * 这里按 Tab 配置中的 pagePath 保存各自的 query，让业务侧可以继续使用
+ * `router.push({ path: '/src/pages/basic/basic', query: { id: 1 } })` 这样的普通页面写法；
+ * 路由命中 TabBar 页面后由 `switchTabbar()` 把参数写入对应的虚拟 Tab 路由。
+ */
+const tabPageQueryMap: Map<string, Map<string, string>> = new Map<string, Map<string, string>>();
+
+/** 虚拟 Tab 路由版本号；query 更新后驱动 useTabPage() 的 computed 重新求值 */
+export const tabPageQueryRevision: Ref<number> = ref(0);
+
+/** 复制一份 query，避免业务侧修改路由对象时反向污染全局 Tab 路由状态 */
+function cloneTabPageQuery(query: Map<string, string>): Map<string, string> {
+  const result = new Map<string, string>();
+  query.forEach((value: string, key: string): void => {
+    result.set(key, value);
+  });
+  return result;
+}
+
+/** 把 query 对象编码回 fullPath 使用的查询串 */
+function serializeTabPageQuery(query: Map<string, string>): string {
+  const parts: Array<string> = [];
+  query.forEach((value: string, key: string): void => {
+    parts.push(`${key}=${encodeURIComponent(value)}`);
+  });
+  return parts.join('&');
+}
+
+/**
+ * 写入某个 Tab 的虚拟 query。
+ * @param path Tab 的页面路径，可不带前导斜杠
+ * @param query 已解码的 query Map；调用方传入的 Map 会被复制
+ */
+export function setTabPageQuery(path: string, query: Map<string, string>): void {
+  const targetPath = cleanPath(path);
+  if (targetPath.length == 0) {
+    return;
+  }
+  tabPageQueryMap.set(targetPath, cloneTabPageQuery(query));
+  tabPageQueryRevision.value++;
+}
+
+/**
+ * 从普通路由 URL 中同步虚拟 Tab query。
+ * 只有 URL 显式带 `?` 时才覆盖：普通点击 Tab（没有 URL 参数）应保留该 Tab 上一次的参数。
+ * @param url 路由 URL，如 `/src/pages/basic/basic?id=1`
+ */
+export function setTabPageUrl(url: string): void {
+  if (!url.includes('?')) {
+    return;
+  }
+  const parsed = parseUrlToObj(url);
+  setTabPageQuery(parsed.path, parsed.query);
+}
+
+/**
+ * 读取某个 Tab 的虚拟 query。
+ * @param path Tab 页面路径
+ * @param revision 调用方传入响应式版本号以建立依赖；由 useTabPage() 的 computed 使用
+ */
+export function readTabPageQuery(path: string, _revision: number = 0): Map<string, string> {
+  const targetPath = cleanPath(path);
+  const stored = tabPageQueryMap.get(targetPath);
+  if (stored != null) {
+    return cloneTabPageQuery(stored);
+  }
+  return new Map<string, string>();
+}
+
+/**
+ * 生成带 query 的虚拟 fullPath。
+ * @param path Tab 页面路径
+ * @param revision 虚拟路由版本号
+ */
+export function readTabPageFullPath(path: string, revision: number = 0): string {
+  const targetPath = cleanPath(path);
+  const query = readTabPageQuery(targetPath, revision);
+  const queryText = serializeTabPageQuery(query);
+  return queryText.length > 0 ? `${targetPath}?${queryText}` : targetPath;
+}
+
+/**
+ * 从宿主页入口 query 激活 Tab，支持 `?tab=basic&id=1` 这类深链。
+ *
+ * `tab` 支持 tabType（推荐）或完整 pagePath；其余 query 会写入目标 Tab 的虚拟路由。
+ * @param query 宿主页入口的 query Map
+ * @returns 是否成功命中并激活了某个 Tab
+ */
+export function activateTabPageFromHostQuery(query: Map<string, string>): boolean {
+  const target = query.get('tab');
+  if (target == null || target.length == 0) {
+    return false;
+  }
+  const index = resolveTabIndexByKey(target);
+  if (index < 0 || index >= tabbarList.length) {
+    console.warn(`[tabbar] 入口参数 tab=${target} 未匹配到任何 Tab，请检查 config.uts`);
+    return false;
+  }
+
+  const pageQuery = new Map<string, string>();
+  query.forEach((value: string, key: string): void => {
+    if (key != 'tab') {
+      pageQuery.set(key, value);
+    }
+  });
+  console.log(pageQuery, 'pageQuery', tabbarList[index].pagePath);
+  setTabPageQuery(tabbarList[index].pagePath, pageQuery);
+  setCurIdx(index);
+  return true;
+}
+
+/** 清空全部虚拟 Tab query（主要供测试与重置场景使用） */
+export function resetTabPageQueries(): void {
+  tabPageQueryMap.clear();
+  tabPageQueryRevision.value++;
+}
