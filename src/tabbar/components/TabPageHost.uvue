@@ -1,8 +1,8 @@
 <template>
   <view
     class="tab-page-host"
-    style="display: flex; flex-direction: column; flex: 1; height: 100%;"
-    :class="{ 'flex-1': isSinglePageTabbar, 'h-full': isSinglePageTabbar }"
+    :class="{ 'tab-page-host--single': isSinglePageTabbar, 'flex-1': isSinglePageTabbar, 'h-full': isSinglePageTabbar }"
+    :style="isSinglePageTabbar ? 'display: flex; flex-direction: column; flex: 1; height: 100%;' : ''"
   >
     <!-- 模式 4：宿主页只提供业务内容，Tab 容器与底部导航由这里统一挂载 -->
     <template v-if="isSinglePageTabbar">
@@ -33,6 +33,10 @@ const { isSinglePageTabbar } = useTabbar();
 .tab-page-host {
   display: flex;
   flex-direction: column;
+  width: 100%;
+}
+
+.tab-page-host--single {
   flex: 1;
   height: 100%;
 }

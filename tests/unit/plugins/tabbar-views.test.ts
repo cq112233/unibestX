@@ -138,6 +138,7 @@ export const customTabbarConfig = {
     expect(output).toContain('<text>MeView</text>');
     expect(output).toContain('name: \'me\'');
     expect(output).toContain('navigationBarTitleText: \'tabbar.me\'');
+    expect(output).toContain('enablePullDownRefresh: false');
     expect(output).toContain('onMeLoad');
     expect(output).toContain('useTabPageShell(\'me\')');
     expect(output).not.toContain('xxxx');
