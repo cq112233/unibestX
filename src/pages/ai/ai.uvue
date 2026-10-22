@@ -71,7 +71,7 @@
 
 <script setup lang="uts">
 import { safeAreaInsets } from '@/src/utils/systemInfo/index.uts';
-import { useTabPage } from '@/src/tabbar/index.uts';
+import { useTabPage, useTabPageShell } from '@/src/tabbar/index.uts';
 
 definePage({
   layout: 'navbar',
@@ -82,6 +82,9 @@ definePage({
     navigationStyle: 'custom'
   }
 });
+
+// 页面生命周期、入口深链、可见性桥接、模式判断与 Android 返回键统一由 TabBar hook 处理
+useTabPageShell('ai');
 
 // AI 当前是普通页面：useTabPage() 会自动回退到原生页面生命周期；后续若加入 TabBar 配置则自动使用 Tab 语义
 const {

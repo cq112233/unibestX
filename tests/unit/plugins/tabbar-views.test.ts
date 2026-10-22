@@ -140,7 +140,11 @@ export const customTabbarConfig = {
     expect(output).toContain('navigationBarTitleText: \'tabbar.me\'');
     expect(output).toContain('useRouter()');
     expect(output).toContain('useTabPageShell(\'me\')');
-    expect(output).toContain('模式4的映射关系中');
+    expect(output).toContain('definePage(() => {');
+    expect(output).not.toContain('curIdx');
+    expect(output).not.toContain('resolveTabIndexByKey');
+    expect(output).not.toContain('onNavbarPullDownRefresh');
+    expect(output).not.toContain('stopNavbarPullDownRefresh');
     expect(output).not.toContain('xxxx');
     expect(output).not.toContain('console.log(router, route)');
   });

@@ -171,13 +171,10 @@ export function renderTabPageScaffold(entry: TabbarPageEntry): string {
 </template>
 
 <script setup lang="uts">
-import { curIdx, resolveTabIndexByKey, useTabPage, useTabPageShell } from '@/src/tabbar/index.uts';
-import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/layouts/navbar/utils/index.uts';
+import { useTabPage, useTabPageShell } from '@/src/tabbar/index.uts';
 import { useRouter } from '@/uni_modules/route-bestX/index.uts';
 
-definePage((options) => {
-  const { platform, appName: _appName } = options;
-  const { isH5 } = platform;
+definePage(() => {
   return {
     customPageClass: 'init-page', // 页面根容器自定义类名（配合 layout 布局使用，支持配置全局样式类）
     customPageStyle: 'background-color: transparent;', // 页面根容器自定义行内样式（穿透任何样式隔离，全端绝对生效）
@@ -205,24 +202,8 @@ const {
   onHide: on${pascalName}Hide
 } = useTabPage();
 
-const router = useRouter();
-
-// 监听 navbar 自定义下拉刷新事件
-onNavbarPullDownRefresh(() => {
-  // 所有已挂载 Tab 都会收到全局刷新事件，只处理当前激活的 Tab
-  if (curIdx.value != resolveTabIndexByKey(${toSingleQuoted(entry.tabType)})) {
-    return;
-  }
-  console.log(${toSingleQuoted(`${safePageName}页面刷新中...`)});
-  setTimeout(() => {
-    // 异步完成时再次门控：刷新期间若已切走则忽略结果
-    if (curIdx.value != resolveTabIndexByKey(${toSingleQuoted(entry.tabType)})) {
-      return;
-    }
-    console.log(${toSingleQuoted(`${safePageName}页面刷新成功`)});
-    stopNavbarPullDownRefresh();
-  }, 1000);
-});
+// vue-router 使用
+const _router = useRouter();
 
 // 与普通页面一致的首次进入 / 显示 / 隐藏生命周期
 on${pascalName}Load(() => {
@@ -233,10 +214,12 @@ on${pascalName}Load(() => {
   console.log(${toSingleQuoted(`on${pascalName}Load`)}, ${toSingleQuoted(`${safePageName} Tab 挂载了👋`)});
 });
 
+// 显示触发
 on${pascalName}Show(() => {
   console.log(${toSingleQuoted(`on${pascalName}Show`)}, ${toSingleQuoted(`${safePageName} Tab 显示了👀`)});
 });
 
+// 隐藏触发
 on${pascalName}Hide(() => {
   console.log(${toSingleQuoted(`on${pascalName}Hide`)}, ${toSingleQuoted(`${safePageName} Tab 隐藏了👉`)});
 });
