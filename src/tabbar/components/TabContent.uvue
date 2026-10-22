@@ -87,15 +87,15 @@
 
 <script setup lang="uts">
 import { computed, onMounted, onUnmounted, provide, ref, watch } from 'vue';
-import { useTabbar, useTabbarI18n, useTabbarTheme } from '@/src/tabbar/index.uts';
+import { useTabbar, useTabbarI18n, useTabbarPage, useTabbarTheme } from '@/src/tabbar/index.uts';
 import TabbarPlaceholder from './TabbarPlaceholder.uvue';
 import { isMpAlipay } from '@/src/tabbar/adapters/platform.uts';
 import {
   isPageRefresherDisabled,
   isPageScrollDisabled,
-  setHideNavbar,
-  setHideStatusBar,
-  setShowBack,
+  setTabbarHideNavbar,
+  setTabbarHideStatusBar,
+  setTabbarShowBack,
   stopNavbarPullDownRefresh
 } from '@/src/tabbar/adapters/navbar.uts';
 
@@ -151,6 +151,8 @@ const { activeTabTitle, curIdx } = useTabbar();
 const { formatTabbarText } = useTabbarI18n();
 /** 下拉刷新等区域使用的主题令牌 */
 const { themeTokens } = useTabbarTheme();
+/** 宿主页面可见性：进入普通子页面时后台 Tab 不得再同步导航栏全局状态 */
+const { isPageVisible } = useTabbarPage();
 
 // ==========================================
 // 2. Tab 核心状态与激活控制
@@ -333,10 +335,13 @@ function updateNavbarTitle(): void {
  * 完整同步当前 Tab 的导航栏标题、状态栏与导航栏显隐配置
  */
 function syncNavbarState(): void {
+  if (!isActive.value || !isPageVisible.value) {
+    return;
+  }
   updateNavbarTitle();
-  setHideNavbar(props.hideNavbar);
-  setHideStatusBar(props.hideStatusBar);
-  setShowBack(props.showBack);
+  setTabbarHideNavbar(props.hideNavbar);
+  setTabbarHideStatusBar(props.hideStatusBar);
+  setTabbarShowBack(props.showBack);
 }
 
 // ==========================================
@@ -426,8 +431,8 @@ watch(contentTitle, (_newTitle: string) => {
  * 监听导航栏显隐动态变化
  */
 watch((): boolean => props.hideNavbar, (newVal: boolean) => {
-  if (isActive.value) {
-    setHideNavbar(newVal);
+  if (isActive.value && isPageVisible.value) {
+    setTabbarHideNavbar(newVal);
   }
 });
 
@@ -435,8 +440,8 @@ watch((): boolean => props.hideNavbar, (newVal: boolean) => {
  * 监听状态栏显隐动态变化
  */
 watch((): boolean => props.hideStatusBar, (newVal: boolean) => {
-  if (isActive.value) {
-    setHideStatusBar(newVal);
+  if (isActive.value && isPageVisible.value) {
+    setTabbarHideStatusBar(newVal);
   }
 });
 
@@ -444,8 +449,18 @@ watch((): boolean => props.hideStatusBar, (newVal: boolean) => {
  * 监听当前 Tab 的返回按钮配置变化
  */
 watch((): boolean => props.showBack, (newVal: boolean) => {
-  if (isActive.value) {
-    setShowBack(newVal);
+  if (isActive.value && isPageVisible.value) {
+    setTabbarShowBack(newVal);
+  }
+});
+
+/**
+ * 从普通子页面返回宿主页时，恢复当前 Tab 的导航栏配置。
+ * HMR 可能发生在子页面停留期间，此时后台 Tab 的同步会被 isPageVisible 拦截。
+ */
+watch(isPageVisible, (visible: boolean) => {
+  if (visible) {
+    syncNavbarState();
   }
 });
 

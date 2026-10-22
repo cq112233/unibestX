@@ -373,6 +373,31 @@ function onResetNavbarVisible(): void {
   dynamicHideNavbar.value = null;
 }
 
+/**
+ * 模式 4 宿主 Navbar 专用的 TabBar 状态同步。
+ * 普通页面 Navbar 不接收这些事件，避免后台 Tab 在 HMR 或保活期间污染子页面。
+ */
+function onTabbarSetHideNavbar(hide: any): void {
+  if (!isSinglePageTabbar || props.type != 'home' || typeof hide != 'boolean') {
+    return;
+  }
+  dynamicHideNavbar.value = hide as boolean;
+}
+
+function onTabbarSetShowBack(show: any): void {
+  if (!isSinglePageTabbar || props.type != 'home' || typeof show != 'boolean') {
+    return;
+  }
+  dynamicShowBack.value = show as boolean;
+}
+
+function onTabbarSetHideStatusBar(hide: any): void {
+  if (!isSinglePageTabbar || props.type != 'home' || typeof hide != 'boolean') {
+    return;
+  }
+  dynamicHideStatusBar.value = hide as boolean;
+}
+
 /** 下拉刷新状态控制：true 表示刷新中（展示 Loading），false 表示已复位收起 */
 const isTriggered = ref(false);
 
@@ -527,6 +552,9 @@ uni.$on('resetShowBack', onResetShowBack);
 uni.$on('setStatusBarVisible', onSetStatusBarVisible);
 uni.$on('setHideStatusBar', onSetHideStatusBar);
 uni.$on('resetStatusBarVisible', onResetStatusBarVisible);
+uni.$on('tabbarSetHideNavbar', onTabbarSetHideNavbar);
+uni.$on('tabbarSetShowBack', onTabbarSetShowBack);
+uni.$on('tabbarSetHideStatusBar', onTabbarSetHideStatusBar);
 
 // 卸载时移除全局事件监听，避免内存泄漏
 onUnmounted(() => {
@@ -541,6 +569,9 @@ onUnmounted(() => {
   uni.$off('setStatusBarVisible', onSetStatusBarVisible);
   uni.$off('setHideStatusBar', onSetHideStatusBar);
   uni.$off('resetStatusBarVisible', onResetStatusBarVisible);
+  uni.$off('tabbarSetHideNavbar', onTabbarSetHideNavbar);
+  uni.$off('tabbarSetShowBack', onTabbarSetShowBack);
+  uni.$off('tabbarSetHideStatusBar', onTabbarSetHideStatusBar);
 });
 
 /**
