@@ -185,6 +185,7 @@ definePage(() => {
     showBack: false, // 导航栏左侧是否显示返回箭头（TabBar 首页无需返回按钮）
     hideStatusBar: false, // 是否隐藏状态栏（true 为隐藏）
     hideNavbar: false, // 是否隐藏顶部导航栏（false 为正常显示）
+    enablePullDownRefresh: false, // 是否启用下拉刷新，只有设置为false时才會触发自定义的下拉刷新事件
     style: {
       navigationBarTitleText: ${toSingleQuoted(title)},
       navigationStyle: 'custom'
