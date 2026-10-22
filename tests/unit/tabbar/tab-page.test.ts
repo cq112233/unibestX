@@ -1,5 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { curIdx, setCurIdx } from '@/src/tabbar/core/state.uts';
+import type { TabNavigationContext, TabNavigationNext } from '@/src/tabbar/core/tab-navigation.uts';
+import { registerTabNavigationGuard } from '@/src/tabbar/core/tab-navigation.uts';
 import {
   activateTabPageFromHostQuery,
   readTabPageQuery,
@@ -10,6 +12,7 @@ import {
 
 describe('tabbar virtual page route', () => {
   beforeEach(() => {
+    registerTabNavigationGuard(null);
     resetTabPageQueries();
     setCurIdx(0);
   });
@@ -48,6 +51,28 @@ describe('tabbar virtual page route', () => {
     query.set('id', 'changed');
 
     expect(readTabPageQuery('/src/pages/basic/basic').get('id')).toBe('1');
+  });
+
+  it('runs the host-query pre-action before activating a virtual tab', () => {
+    let captured: TabNavigationContext | null = null;
+    registerTabNavigationGuard((context: TabNavigationContext, next: TabNavigationNext): void => {
+      captured = context;
+      next(false);
+    });
+
+    const activated = activateTabPageFromHostQuery(
+      new Map<string, string>([
+        ['tab', 'basic'],
+        ['from', 'third-party']
+      ])
+    );
+
+    expect(activated).toBe(false);
+    expect(captured).not.toBeNull();
+    expect(captured!.api).toBe('hostQuery');
+    expect(captured!.query.get('from')).toBe('third-party');
+    expect(curIdx.value).toBe(0);
+    expect(readTabPageQuery('/src/pages/basic/basic').has('from')).toBe(false);
   });
 
   it('syncs the H5 host url after switching a virtual tab', () => {

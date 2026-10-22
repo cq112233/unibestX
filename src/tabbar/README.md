@@ -44,6 +44,7 @@ src/tabbar/
 │   ├── state.uts                 #   tabbarList / curIdx / onTabShow / 角标 / 路径判断
 │   ├── strategy.uts              #   五种模式解析 + 各模式开关量
 │   ├── navigate.uts              #   switchTabbar() / handleTabbarClick() / 原生鼓包事件
+│   ├── tab-navigation.uts        #   Tab 切换前置钩子（来源上下文 / 同步或异步放行）
 │   ├── lifecycle.uts             #   onTabPageShow() / 页面可见性通知
 │   ├── metrics.uts               #   TabBar 高度、安全区、底部预留内边距
 │   ├── tab-key.uts               #   业务标识(tabType) ⇄ 下标 的解析
@@ -54,6 +55,7 @@ src/tabbar/
 │   ├── theme.uts                 #   明暗主题色
 │   ├── i18n.uts                  #   Tab 文案国际化
 │   ├── navbar.uts                #   navbar 显隐 / 下拉刷新桥接
+│   ├── tab-navigation.uts        #   Tab 切换前置处理入口（第三方接入 / 数据预取）
 │   ├── platform.uts              #   H5 / 支付宝小程序等平台判断
 │   └── system.uts                #   安全区与系统尺寸
 ├── hooks/                        # 组合式 API（业务侧推荐入口）
@@ -388,8 +390,35 @@ function openBasic(): void {
 - 该 hook 用于 Tab 页面 `.uvue`：普通 Tab 页面（如 `src/pages/basic/basic.uvue`）的下标由外层 `TabContent` 注入；模式 4 宿主首页则自动按自身路由匹配 Tab，无需额外传参。非 Tab 的普通页面调用时会自动回退到原生 `onLoad / onShow / onHide`，因此也可统一使用这套页面生命周期写法。
 - 页面入口深链使用 `?tab=basic&id=1`：`tab` 支持 `tabType` 或完整 `pagePath`，其余参数写入目标 Tab 的虚拟 query。
 - H5 下切换 Tab 会同步浏览器地址栏为 `?tab=basic&id=1`，刷新页面仍会恢复当前 Tab 及其 query；App / 小程序没有浏览器地址栏，不受影响。
-- 模式 4 的 Tab 切换和入口深链不进入 `src/router` 的全局守卫：`switchTabbar()` 只维护虚拟 Tab 状态、query 与 H5 地址栏。页面和按钮权限在页面内处理；从 Tab 进入普通页面时，全局守卫看到的 `from` 是真实宿主页 `/src/pages/index/index`。
+- 模式 4 的 Tab 切换和入口深链不触发 `router.beforeEach`，但会在写入虚拟状态前执行 Tab 导航前置钩子。钩子可读取来源 Tab、目标 Tab、query 与触发方式，并支持异步完成第三方接入、参数换取或数据预取；从 Tab 进入普通页面时，全局守卫看到的 `from` 仍是真实宿主页 `/src/pages/index/index`。
 - 模式 4 仍是“页面语义仿真”：系统级独立 URL、独立页面栈、原生分享地址和页面级原生路由转场仍不存在；需要这些能力时只能使用真实多页面模式。当前方案解决的问题是**业务开发写法**与**生命周期 / 参数读取**，不是伪造系统页面栈。
+
+#### 模式 4 的 Tab 切换前置钩子
+
+默认前置处理入口在 [adapters/tab-navigation.uts](adapters/tab-navigation.uts)，业务也可以直接注册自己的处理函数：
+
+```uts
+import type { TabNavigationContext, TabNavigationNext } from '@/src/tabbar/index.uts';
+import { registerTabNavigationGuard } from '@/src/tabbar/index.uts';
+
+registerTabNavigationGuard((context: TabNavigationContext, next: TabNavigationNext): void => {
+  if (context.api == 'hostQuery' && context.query.get('from') == 'third-party') {
+    prepareThirdPartyEntry(context.query).then((_res: any): void => {
+      next(true);
+    }, (_err: any): void => {
+      next(false);
+    });
+    return;
+  }
+  next(true);
+});
+```
+
+- `context.from` / `context.fromPath`：来源虚拟 Tab；普通点击时就是当前 Tab。
+- `context.to` / `context.toPath` / `context.query`：目标 Tab 与目标参数。
+- `context.api`：`tabClick`（TabBar 点击）、`router`（路由跳转）、`hostQuery`（`?tab=xxx` 入口深链）、`switchTabbar`（业务直接调用）。
+- 外部第三方来源通常从 `context.query` 读取（例如 `from=third-party`）；同时可用 `context.api == 'hostQuery'` 判断是否为入口直链。
+- 前置操作完成前不会修改当前 Tab、虚拟 query 或 H5 地址栏；异步操作必须调用且只调用一次 `next(true)` / `next(false)`。
 
 ### 4. `useTabPageShell()`：页面文件双身份适配
 
@@ -504,7 +533,8 @@ import { switchTabbar, onTabShow, onTabPageShow, curIdx } from '@/src/tabbar/ind
 
 | API | 说明 |
 | :--- | :--- |
-| `switchTabbar(url: string)` | **全局统一 Tab 跳转**。单页模式更新虚拟 Tab 状态、query 与地址栏，多页面模式自动选 `switchTab` / `redirectTo` |
+| `switchTabbar(url: string, api?: string)` | **全局统一 Tab 跳转**。单页模式先执行前置钩子，再更新虚拟 Tab 状态、query 与地址栏；多页面模式自动选 `switchTab` / `redirectTo`。`api` 用于标记 `tabClick` / `router` / `hostQuery` 等来源 |
+| `registerTabNavigationGuard(guard)` | 注册模式 4 的 Tab 切换前置钩子；传入 `null` 可移除 |
 | `onTabShow(target, cb, immediate?)` | 监听到**某个 Tab 被切换激活**。用于单页模式下补上子视图没有原生 `onShow` 的缺口（切回来时重新拉数据） |
 | `onTabPageShow(target, cb, immediate?)` | 监听**某个 Tab 页面重新显示**。是 `onTabShow` 的超集：除切 Tab 外还覆盖「从子页返回」「App 回前台」。它还会修掉 `onTabShow` 的时序坑——在子页面里调 `switchTabbar` 时 `curIdx` 立即变化，`onTabShow` 会在容器页仍不可见时就回调，而 `onTabPageShow` 会推迟到页面真正返回时补发 |
 | `curIdx` | 当前激活 Tab 的下标（响应式 `ref<number>`） |

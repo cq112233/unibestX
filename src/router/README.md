@@ -254,11 +254,40 @@ function runGuardsPipeline(
 | `next('/src/sub/auth/login')` | 中断原导航并改跳登录页 |
 | `next({ path: '/src/sub/auth/login', query: { redirect: to.fullPath }, replace: true })` | 改跳并替换当前页面，避免返回后再次被拦截 |
 
-#### 模式 4：单页 TabBar 不进入全局守卫
+#### 模式 4：虚拟 Tab 切换的前置钩子
 
-模式 4 的 Tab 切换发生在宿主页内部，不会调用 `uni.switchTab` 等系统导航 API，也不会触发 route-bestX 的全局 `beforeEach` / `afterEach`。`switchTabbar()` 只负责虚拟 Tab 状态、query 和 H5 地址栏同步，不再向全局路由层注册桥接。
+模式 4 的 Tab 切换发生在宿主页内部，不会调用 `uni.switchTab` 等系统导航 API，也不会触发 route-bestX 的全局 `beforeEach` / `afterEach`。需要前置处理时，使用 Tab 级导航钩子，而不是把虚拟切换重新桥接回全局路由。
 
-Tab → 普通页面（例如「我的 → 登录」）仍会走正常的全局守卫，但 `from` 是真实宿主页 `/src/pages/index/index`，不是虚拟 Tab 路径。登录回跳应显式使用页面自己的 `useTabPage().route.fullPath` 作为 `redirect`，页面与按钮权限则在页面内通过 `hasPermission()` 和 `v-if` 处理。
+默认入口在 `src/tabbar/adapters/tab-navigation.uts`，`src/router/index.uts` 只负责调用 `setupTabNavigationGuard()` 安装。业务也可以通过 `registerTabNavigationGuard()` 注册自己的前置处理：
+
+```uts
+import type { TabNavigationContext, TabNavigationNext } from '@/src/tabbar/index.uts';
+import { registerTabNavigationGuard } from '@/src/tabbar/index.uts';
+
+registerTabNavigationGuard((context: TabNavigationContext, next: TabNavigationNext): void => {
+  // 第三方入口：先换取会话 / 预取数据，再放行
+  if (context.api == 'hostQuery' && context.query.get('from') == 'third-party') {
+    exchangeThirdPartySession(context.query).then((_res: any): void => {
+      next(true);
+    }, (_err: any): void => {
+      next(false);
+    });
+    return;
+  }
+  next(true);
+});
+```
+
+| 上下文字段 | 说明 |
+| :--- | :--- |
+| `from` / `fromPath` | 来源虚拟 Tab 的完整 URL / path；用于判断从哪个 Tab 发起的切换 |
+| `to` / `toPath` | 目标虚拟 Tab 的完整 URL / path |
+| `query` | 目标 URL 的 query，值已解码；第三方来源参数也从这里读取 |
+| `api` | 触发来源：`tabClick` / `router` / `hostQuery` / `switchTabbar` |
+
+`next(true)` 后才会写入 `curIdx` / 虚拟 query / H5 地址栏；`next(false)` 保持原状。前置操作支持异步，但必须且只能完成一次。新的 Tab 切换开始后，上一次未完成的异步结果会被忽略。
+
+Tab → 普通页面（例如「我的 → 登录」）仍会走正常全局守卫，此时 `from` 是真实宿主页 `/src/pages/index/index`，不是虚拟 Tab 路径。
 
 新增业务守卫时：
 

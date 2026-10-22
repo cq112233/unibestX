@@ -1,8 +1,9 @@
 import { ref } from 'vue';
 import type { Ref } from 'vue';
 import { cleanPath, parseUrlToObj } from '@/uni_modules/route-bestX/index.uts';
-import { setCurIdx, tabbarList } from './state.uts';
+import { curIdx, setCurIdx, tabbarList } from './state.uts';
 import { resolveTabIndexByKey, resolveTabKeyByPath } from './tab-key.uts';
+import { runTabNavigationGuard } from './tab-navigation.uts';
 
 /**
  * 单页 TabBar（模式 4）的虚拟页面路由状态。
@@ -154,9 +155,25 @@ export function activateTabPageFromHostQuery(query: Map<string, string>): boolea
     }
   });
   const targetPath = tabbarList[index].pagePath;
-  setTabPageQuery(targetPath, pageQuery);
-  setCurIdx(index);
-  return true;
+  const queryText = serializeTabPageQuery(pageQuery);
+  const targetUrl = queryText.length > 0 ? `${targetPath}?${queryText}` : targetPath;
+  const currentIndex = curIdx.value;
+  const fromUrl = (currentIndex >= 0 && currentIndex < tabbarList.length)
+    ? readTabPageFullPath(tabbarList[currentIndex].pagePath)
+    : '';
+  let syncResult: boolean | null = null;
+
+  runTabNavigationGuard(fromUrl, targetUrl, 'hostQuery', (allowed: boolean): void => {
+    syncResult = allowed;
+    if (!allowed) {
+      return;
+    }
+    setTabPageQuery(targetPath, pageQuery);
+    setCurIdx(index);
+  });
+
+  // 同步钩子返回最终结果；异步钩子返回 true 表示已命中并开始执行前置操作。
+  return syncResult != null ? syncResult : true;
 }
 
 /** 清空全部虚拟 Tab query（主要供测试与重置场景使用） */
