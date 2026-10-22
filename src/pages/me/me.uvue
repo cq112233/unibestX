@@ -46,7 +46,7 @@
 import { computed } from 'vue';
 import { useTokenStore, useUserStore } from '@/src/store/index.uts';
 import { LOGIN_PAGE } from '@/src/utils/auth/toLoginPage.uts';
-import { curIdx, onTabPageShow, onTabShow, resolveTabIndexByKey, switchTabbar, useTabPageShell } from '@/src/tabbar/index.uts';
+import { curIdx, resolveTabIndexByKey, switchTabbar, useTabPage, useTabPageShell } from '@/src/tabbar/index.uts';
 import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/layouts/navbar/utils/index.uts';
 import { useRouter } from '@/uni_modules/route-bestX/index.uts';
 
@@ -65,25 +65,28 @@ definePage({
 
 const router = useRouter();
 
-// 页面数据加载/刷新方法
-function refreshData(): void {
+const {
+  route: meRoute,
+  onLoad: onMeLoad,
+  onShow: onMeShow,
+  onHide: onMeHide
+} = useTabPage();
+
+// 监听 navbar 自定义下拉刷新事件（在 enablePullDownRefresh: true 且处于当前 Tab 时生效）
+onNavbarPullDownRefresh(() => {
+  // 所有已挂载 Tab 都会收到全局刷新事件，只处理当前激活的「我的」页
+  if (curIdx.value != resolveTabIndexByKey('me')) {
+    return;
+  }
   console.log('我的页面刷新中...');
   setTimeout(() => {
-    // 门控检查：若刷新完成时用户已切到其他 Tab 则忽略
+    // 异步完成时再次门控：刷新期间若已切走则忽略结果
     if (curIdx.value != resolveTabIndexByKey('me')) {
       return;
     }
     console.log('我的页面刷新成功');
-    // 数据加载完毕后，手动停止下拉刷新动画状态
     stopNavbarPullDownRefresh();
   }, 1000);
-}
-
-// 监听 navbar 自定义下拉刷新事件（在 enablePullDownRefresh: true 且处于当前 Tab 时生效）
-onNavbarPullDownRefresh(() => {
-  if (curIdx.value == resolveTabIndexByKey('me')) {
-    refreshData();
-  }
 });
 
 const userStore = useUserStore();
@@ -142,22 +145,17 @@ function handleLogout() {
   });
 }
 
-// 监听 Tab 切换到当前功能页（config.uts 中 type: 'me'）时触发
-onTabShow('me', () => {
-  console.log('onTabShow 我 Tab 显示');
-}, true);
-
-// 监听我 Tab 页面显示（切 Tab、从子页面返回、前台恢复都会触发）
-onTabPageShow('me', () => {
-  console.log('onTabPageShow 我 Tab 显示');
-}, true);
-
-onMounted(() => {
-  console.log('我 Tab 挂载了');
+// 与普通页面一致的首次进入 / 显示 / 隐藏生命周期
+onMeLoad(() => {
+  console.log('onMeLoad', '我 Tab 挂载了👋', meRoute.value.fullPath, meRoute.value);
 });
 
-onUnmounted(() => {
-  console.log('我 Tab 卸载了');
+onMeShow(() => {
+  console.log('onMeShow', '我 Tab 显示了👀', meRoute.value.fullPath, meRoute.value);
+});
+
+onMeHide(() => {
+  console.log('onMeHide', '我 Tab 隐藏了👉');
 });
 
 // 页面文件同时可作为模式 4 的 Tab 子页使用：嵌套时由 useTabPage() 接管页面生命周期

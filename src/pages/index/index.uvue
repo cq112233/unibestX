@@ -573,15 +573,21 @@ import { systemInfo as systemInfoRef } from '@/src/utils/systemInfo/index.uts';
 import type { SystemInfoType } from '@/src/utils/systemInfo/index.uts';
 import {
   curIdx,
-  onTabPageShow,
-  onTabShow,
   resolveTabIndexByKey,
+  useTabPage,
   useTabPageShell
 } from '@/src/tabbar/index.uts';
 import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/layouts/navbar/utils/index.uts';
 import { useRouter } from '@/uni_modules/route-bestX/index.uts';
 
 import TabPageHost from '@/src/tabbar/components/TabPageHost.uvue';
+
+const {
+  route: indexRoute,
+  onLoad: onIndexLoad,
+  onShow: onIndexShow,
+  onHide: onIndexHide
+} = useTabPage();
 
 definePage((options) => {
   const { platform, appName: _appName } = options;
@@ -615,6 +621,21 @@ definePage((options) => {
       navigationStyle: 'custom' // 导航栏样式设为自定义（隐藏系统原生导航栏）
     }
   };
+});
+
+// 页面生命周期、入口深链、可见性桥接、模式判断与 Android 返回键统一由 TabBar hook 处理
+useTabPageShell('index');
+
+onIndexLoad(() => {
+  console.log('onIndexLoad', '首页挂载了👋', indexRoute.value.fullPath, indexRoute);
+});
+
+onIndexShow(() => {
+  console.log('onIndexShow', '首页显示了👀', indexRoute.value.fullPath);
+});
+
+onIndexHide(() => {
+  console.log('onIndexHide', '首页隐藏了👉');
 });
 
 const router = useRouter();
@@ -1129,47 +1150,22 @@ function openGithub(): void {
   // #endif
 }
 
-// 页面数据加载/刷新方法
-function refreshData(): void {
+// 监听 navbar 自定义下拉刷新事件（在 enablePullDownRefresh: true 且处于当前 Tab 时生效）
+onNavbarPullDownRefresh(() => {
+  // 所有已挂载 Tab 都会收到全局刷新事件，只处理当前激活的首页
+  if (curIdx.value != resolveTabIndexByKey('index')) {
+    return;
+  }
   console.log('首页刷新中...');
   setTimeout(() => {
-    // 门控检查：若刷新完成时用户已切到其他 Tab 则忽略
+    // 异步完成时再次门控：刷新期间若已切走则忽略结果
     if (curIdx.value != resolveTabIndexByKey('index')) {
       return;
     }
     console.log('首页刷新成功');
-    // 数据加载完毕后，手动停止下拉刷新动画状态
     stopNavbarPullDownRefresh();
   }, 1000);
-}
-
-// 监听 navbar 自定义下拉刷新事件（在 enablePullDownRefresh: true 且处于当前 Tab 时生效）
-onNavbarPullDownRefresh(() => {
-  if (curIdx.value == resolveTabIndexByKey('index')) {
-    refreshData();
-  }
 });
-
-// 监听 Tab 切换到当前首页（config.uts 中 type: 'index'）时触发
-onTabShow('index', () => {
-  console.log('onTabShow 首页 Tab 显示');
-}, true);
-
-// 监听首页 Tab 页面显示（切 Tab、从子页面返回、前台恢复都会触发）
-onTabPageShow('index', () => {
-  console.log('onTabPageShow 首页 Tab 显示');
-}, true);
-
-onMounted(() => {
-  console.log('首页 Tab 挂载了');
-});
-
-onUnmounted(() => {
-  console.log('首页 Tab 卸载了');
-});
-
-// 页面生命周期、入口深链、可见性桥接、模式判断与 Android 返回键统一由 TabBar hook 处理
-useTabPageShell('index');
 </script>
 
 <style scoped lang="scss"></style>

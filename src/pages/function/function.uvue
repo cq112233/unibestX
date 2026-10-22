@@ -88,9 +88,9 @@
 </template>
 
 <script setup lang="uts">
-import { curIdx, onTabPageShow, onTabShow, resolveTabIndexByKey, useTabPageShell } from '@/src/tabbar/index.uts';
+import { curIdx, resolveTabIndexByKey, useTabPage, useTabPageShell } from '@/src/tabbar/index.uts';
 import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/layouts/navbar/utils/index.uts';
-import { useRoute, useRouter } from '@/uni_modules/route-bestX/index.uts';
+import { useRouter } from '@/uni_modules/route-bestX/index.uts';
 
 definePage((options) => {
   const { platform, appName: _appName } = options;
@@ -113,9 +113,13 @@ definePage((options) => {
 });
 
 const router = useRouter();
-const route = useRoute();
 
-console.log(route, 'route');
+const {
+  route: functionRoute,
+  onLoad: onFunctionLoad,
+  onShow: onFunctionShow,
+  onHide: onFunctionHide
+} = useTabPage();
 
 onMounted(() => {
   setTimeout(() => {
@@ -263,41 +267,34 @@ function copyCleanDemoCommand(): void {
 }
 // =================== 【可选删除】功能演示 Demo 数据与跳转方法 结束 ===================
 
-// 页面数据加载/刷新方法
-function refreshData(): void {
+// 监听 navbar 自定义下拉刷新事件
+onNavbarPullDownRefresh(() => {
+  // 所有已挂载 Tab 都会收到全局刷新事件，只处理当前激活的功能页
+  if (curIdx.value != resolveTabIndexByKey('function')) {
+    return;
+  }
   console.log('功能页面刷新中...');
   setTimeout(() => {
+    // 异步完成时再次门控：刷新期间若已切走则忽略结果
     if (curIdx.value != resolveTabIndexByKey('function')) {
       return;
     }
     console.log('功能页面刷新成功');
     stopNavbarPullDownRefresh();
   }, 1000);
-}
-
-// 监听 navbar 自定义下拉刷新事件
-onNavbarPullDownRefresh(() => {
-  if (curIdx.value == resolveTabIndexByKey('function')) {
-    refreshData();
-  }
 });
 
-// 监听 Tab 切换到当前功能页（config.uts 中 type: 'function'）
-onTabShow('function', () => {
-  console.log('onTabShow 功能 Tab 显示');
-}, true);
-
-// 监听功能 Tab 页面显示
-onTabPageShow('function', () => {
-  console.log('onTabPageShow 功能 Tab 显示');
-}, true);
-
-onMounted(() => {
-  console.log('功能 Tab 挂载了');
+// 与普通页面一致的首次进入 / 显示 / 隐藏生命周期
+onFunctionLoad(() => {
+  console.log('onFunctionLoad', '功能 Tab 挂载了👋', functionRoute.value.fullPath);
 });
 
-onUnmounted(() => {
-  console.log('功能 Tab 卸载了');
+onFunctionShow(() => {
+  console.log('onFunctionShow', '功能 Tab 显示了👀', functionRoute.value.fullPath);
+});
+
+onFunctionHide(() => {
+  console.log('onFunctionHide', '功能 Tab 隐藏了👉');
 });
 
 // 页面文件同时可作为模式 4 的 Tab 子页使用：嵌套时由 useTabPage() 接管页面生命周期
