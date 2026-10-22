@@ -1,59 +1,59 @@
 <template>
   <view class="tab-views-container" style="position: relative; display: flex; flex-direction: column; flex: 1; height: 100%;">
     <!-- #ifdef APP-ANDROID -->
-    <TabContent :content-index="0" title="android" :enable-pull-down-refresh="true" :show-back="false" custom-page-class="init-page" custom-page-style="background-color: transparent;">
+    <TabContent v-if="isTabRendered(0)" :content-index="0" title="android" :enable-pull-down-refresh="true" :show-back="false" custom-page-class="init-page" custom-page-style="background-color: transparent;">
       <slot name="tabHost" />
     </TabContent>
     <!-- #endif -->
     <!-- #ifdef APP-HARMONY -->
-    <TabContent :content-index="0" title="harmony" :enable-pull-down-refresh="true" :show-back="false" custom-page-class="init-page" custom-page-style="background-color: transparent;">
+    <TabContent v-if="isTabRendered(0)" :content-index="0" title="harmony" :enable-pull-down-refresh="true" :show-back="false" custom-page-class="init-page" custom-page-style="background-color: transparent;">
       <slot name="tabHost" />
     </TabContent>
     <!-- #endif -->
     <!-- #ifdef APP-IOS -->
-    <TabContent :content-index="0" title="ios" :enable-pull-down-refresh="true" :show-back="false" custom-page-class="init-page" custom-page-style="background-color: transparent;">
+    <TabContent v-if="isTabRendered(0)" :content-index="0" title="ios" :enable-pull-down-refresh="true" :show-back="false" custom-page-class="init-page" custom-page-style="background-color: transparent;">
       <slot name="tabHost" />
     </TabContent>
     <!-- #endif -->
     <!-- #ifdef H5 -->
-    <TabContent :content-index="0" title="h5" :enable-pull-down-refresh="false" :show-back="false" custom-page-class="init-page" custom-page-style="background-color: transparent;">
+    <TabContent v-if="isTabRendered(0)" :content-index="0" title="h5" :enable-pull-down-refresh="false" :show-back="false" custom-page-class="init-page" custom-page-style="background-color: transparent;">
       <slot name="tabHost" />
     </TabContent>
     <!-- #endif -->
     <!-- #ifdef MP-360 || MP-BAIDU || MP-HARMONY || MP-JD || MP-KUAISHOU || MP-LARK || MP-QQ || MP-TOUTIAO || MP-XHS -->
-    <TabContent :content-index="0" title="tabbar.home" :enable-pull-down-refresh="true" :show-back="false" custom-page-class="init-page" custom-page-style="background-color: transparent;">
+    <TabContent v-if="isTabRendered(0)" :content-index="0" title="tabbar.home" :enable-pull-down-refresh="true" :show-back="false" custom-page-class="init-page" custom-page-style="background-color: transparent;">
       <slot name="tabHost" />
     </TabContent>
     <!-- #endif -->
     <!-- #ifdef MP-ALIPAY -->
-    <TabContent :content-index="0" title="alipay" :enable-pull-down-refresh="true" :show-back="false" custom-page-class="init-page" custom-page-style="background-color: transparent;">
+    <TabContent v-if="isTabRendered(0)" :content-index="0" title="alipay" :enable-pull-down-refresh="true" :show-back="false" custom-page-class="init-page" custom-page-style="background-color: transparent;">
       <slot name="tabHost" />
     </TabContent>
     <!-- #endif -->
     <!-- #ifdef MP-WEIXIN -->
-    <TabContent :content-index="0" title="weixin" :enable-pull-down-refresh="true" :show-back="false" custom-page-class="init-page" custom-page-style="background-color: transparent;">
+    <TabContent v-if="isTabRendered(0)" :content-index="0" title="weixin" :enable-pull-down-refresh="true" :show-back="false" custom-page-class="init-page" custom-page-style="background-color: transparent;">
       <slot name="tabHost" />
     </TabContent>
     <!-- #endif -->
-    <TabContent :content-index="1" title="tabbar.basic" :enable-pull-down-refresh="true" :show-back="false">
+    <TabContent v-if="isTabRendered(1)" :content-index="1" title="tabbar.basic" :enable-pull-down-refresh="true" :show-back="false">
       <BasicPage />
     </TabContent>
     <!-- #ifdef APP || MP-360 || MP-BAIDU || MP-HARMONY || MP-JD || MP-KUAISHOU || MP-LARK || MP-QQ || MP-TOUTIAO || MP-WEIXIN || MP-XHS -->
-    <TabContent :content-index="2" title="tabbar.function" :enable-pull-down-refresh="true" :show-back="false" custom-page-class="init-page" custom-page-style="background-color: transparent;">
+    <TabContent v-if="isTabRendered(2)" :content-index="2" title="tabbar.function" :enable-pull-down-refresh="true" :show-back="false" custom-page-class="init-page" custom-page-style="background-color: transparent;">
       <FunctionPage />
     </TabContent>
     <!-- #endif -->
     <!-- #ifdef H5 -->
-    <TabContent :content-index="2" title="😂" :enable-pull-down-refresh="true" :show-back="false" custom-page-class="init-page" custom-page-style="background-color: transparent;">
+    <TabContent v-if="isTabRendered(2)" :content-index="2" title="😂" :enable-pull-down-refresh="true" :show-back="false" custom-page-class="init-page" custom-page-style="background-color: transparent;">
       <FunctionPage />
     </TabContent>
     <!-- #endif -->
     <!-- #ifdef MP-ALIPAY -->
-    <TabContent :content-index="2" title="tabbar.function" :enable-pull-down-refresh="true" :show-back="false" custom-page-class="init-page" custom-page-style="background-color: transparent;">
+    <TabContent v-if="isTabRendered(2)" :content-index="2" title="tabbar.function" :enable-pull-down-refresh="true" :show-back="false" custom-page-class="init-page" custom-page-style="background-color: transparent;">
       <FunctionPage />
     </TabContent>
     <!-- #endif -->
-    <TabContent :content-index="3" title="tabbar.me" :enable-pull-down-refresh="true" :show-back="false">
+    <TabContent v-if="isTabRendered(3)" :content-index="3" title="tabbar.me" :enable-pull-down-refresh="true" :show-back="false">
       <MePage />
     </TabContent>
   </view>
@@ -64,6 +64,26 @@ import BasicPage from '@/src/pages/basic/basic.uvue';
 import FunctionPage from '@/src/pages/function/function.uvue';
 import MePage from '@/src/pages/me/me.uvue';
 import TabContent from './TabContent.uvue';
+import { reactive, watch } from 'vue';
+import { useTabbar } from '@/src/tabbar/index.uts';
+
+const { curIdx } = useTabbar();
+const renderedTabs: Array<boolean> = reactive([false, false, false, false]);
+
+if (curIdx.value >= 0 && curIdx.value < renderedTabs.length) {
+  renderedTabs[curIdx.value] = true;
+}
+
+watch(curIdx, (nextIdx: number): void => {
+  if (nextIdx >= 0 && nextIdx < renderedTabs.length) {
+    renderedTabs[nextIdx] = true;
+  }
+});
+
+/** 首次激活后常驻保活；未访问过的 Tab 不创建页面组件 */
+function isTabRendered(index: number): boolean {
+  return renderedTabs[index] == true;
+}
 </script>
 
 <style lang="scss" scoped>

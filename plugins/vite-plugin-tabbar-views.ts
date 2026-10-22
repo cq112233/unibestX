@@ -288,7 +288,9 @@ export function generateTabViews(projectRoot: string, options: TabbarViewsOption
     const content = importName == null
       ? '      <slot name="tabHost" />'
       : `      <${importName} />`;
-    return `    <TabContent${attrs}>\n${content}\n    </TabContent>`;
+    // v-if 必须放在 TabContent 外层：微信小程序的 slot 子组件会在父模板阶段提前实例化，
+    // 仅靠 TabContent 内部的 v-if 无法阻止未激活页面的 setup / onMounted 执行。
+    return `    <TabContent v-if="isTabRendered(${index})"${attrs}>\n${content}\n    </TabContent>`;
   }
 
   const contentBlocks = viewsEntries
@@ -325,6 +327,26 @@ ${contentBlocks}
 <script setup lang="uts">
 ${importLines}
 import TabContent from './TabContent.uvue';
+import { reactive, watch } from 'vue';
+import { useTabbar } from '@/src/tabbar/index.uts';
+
+const { curIdx } = useTabbar();
+const renderedTabs: Array<boolean> = reactive([${viewsEntries.map(() => 'false').join(', ')}]);
+
+if (curIdx.value >= 0 && curIdx.value < renderedTabs.length) {
+  renderedTabs[curIdx.value] = true;
+}
+
+watch(curIdx, (nextIdx: number): void => {
+  if (nextIdx >= 0 && nextIdx < renderedTabs.length) {
+    renderedTabs[nextIdx] = true;
+  }
+});
+
+/** 首次激活后常驻保活；未访问过的 Tab 不创建页面组件 */
+function isTabRendered(index: number): boolean {
+  return renderedTabs[index] == true;
+}
 </script>
 
 <style lang="scss" scoped>
