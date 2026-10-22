@@ -5,7 +5,8 @@
  * 与 unibestX 业务实例 (http / secondaryHttp) 的连接。
  */
 
-import { http, secondaryHttp } from '@/src/http/instances/index.uts';
+import { http } from '@/src/http/instances/default.uts';
+import { secondaryHttp } from '@/src/http/instances/secondary.uts';
 import type { HttpClient, HttpRequestConfig } from '@/uni_modules/request-bestX/index.uts';
 
 /**
