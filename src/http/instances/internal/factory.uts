@@ -28,7 +28,6 @@ import {
   resolveErrorMessage
 } from '../../error/error.uts';
 import { ResultEnum, ShowMessage } from './enum.uts';
-import { tryRefreshToken } from './refresh.uts';
 import { getApiBaseUrl, getH5UseProxy, getUseMock } from '@/src/config/index.uts';
 import { resolveServiceBaseUrl } from './config.uts';
 
@@ -165,9 +164,9 @@ export function defaultBusinessAfterSuccess(
             }
 
             // 触发业务刷新令牌并重试
-            const doRefresh = activeOptions?.refreshToken != null
+            const doRefresh: Promise<boolean> = activeOptions?.refreshToken != null
               ? activeOptions!.refreshToken!()
-              : tryRefreshToken();
+              : Promise.resolve(false);
 
             return doRefresh.then((refreshOk: boolean): Promise<any> => {
               if (!refreshOk) {
@@ -329,7 +328,8 @@ export function buildApiInstanceOptions(
       if (customOptions?.refreshToken != null) {
         return customOptions.refreshToken!();
       }
-      return tryRefreshToken();
+      // 由具体业务实例注入刷新实现，避免 factory → refresh → api/auth → http 的循环依赖
+      return Promise.resolve(false);
     },
     onUnauthorized: () => {
       clearAuthSession();
