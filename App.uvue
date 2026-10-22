@@ -1,7 +1,5 @@
 <script setup lang="uts">
 import { checkDirectEntry } from '@/uni_modules/route-bestX/index.uts';
-import { fetchUserInfoApi } from '@/src/api/auth/auth.uts';
-import type { AuthUserInfo } from '@/src/api/auth/auth.uts';
 import { useI18nStore, useThemeStore, useTokenStore, useUserStore } from '@/src/store/index.uts';
 import type { IUserInfo } from '@/src/store/index.uts';
 import { initNativeMidButtonTap, setTabbarItem } from '@/src/tabbar/index.uts';
@@ -24,23 +22,24 @@ function refreshUserInfoIfNeeded(): void {
     userStore.clearUserInfo();
     return;
   }
-  fetchUserInfoApi().then((info: AuthUserInfo | null) => {
-    if (info != null) {
-      // 当前 /userInfo 接口不返回 permissions，缺失时保留登录后缓存的权限结果
-      const nextPermissions = info.permissions.length > 0
-        ? info.permissions
-        : userStore.state.userInfo.permissions;
-      userStore.setUserInfo({
-        userId: info.userId,
-        username: info.username,
-        nickname: info.nickname,
-        avatar: info.avatar,
-        permissions: nextPermissions
-      } as IUserInfo);
+  // 模拟接口延迟返回最新用户信息
+  setTimeout((): void => {
+    // 延迟期间若已退出登录，不再回写模拟数据
+    if (!tokenStore.hasValidLogin()) {
+      return;
     }
-  }, (_err: any) => {
-    // 静默失败，保留本地缓存；未授权场景已由 HTTP 拦截器清理
-  });
+    // 模拟接口未返回 permissions 的场景，保留登录后缓存的权限结果
+    const nextPermissions = userStore.state.userInfo.permissions.length > 0
+      ? userStore.state.userInfo.permissions
+      : ['report:read', 'report:edit'];
+    userStore.setUserInfo({
+      userId: 1001,
+      username: 'mock-user',
+      nickname: '模拟刷新用户',
+      avatar: '/static/logo.png',
+      permissions: nextPermissions
+    } as IUserInfo);
+  }, 500);
 }
 
 onLaunch(() => {
