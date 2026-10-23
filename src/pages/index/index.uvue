@@ -512,7 +512,7 @@
               </text>
               <view class="mt-[4px] px-[6px] py-[4px] rounded-[4px] bg-[#0f172a] flex flex-col">
                 <text class="text-[10px] text-[#c4b5fd]" style="font-family: monospace;">
-                  definePage({ debug: true, debugHome: true })
+                  definePage({ debug: false, debugHome: false })
                 </text>
               </view>
             </view>
@@ -589,7 +589,7 @@ definePage((options) => {
     customPageClass: 'init-page', // 页面根容器自定义类名（配合 layout 布局使用，支持配置全局样式类）
     customPageStyle: 'background-color: transparent;', // 页面根容器自定义行内样式（穿透任何样式隔离，全端绝对生效）
     name: 'index', // 路由名：useRoute().name 优先读取此值，未显式声明时默认读取路径最后一个单词（如 index）
-    debug: false, // 是否开启当前页面沙盒独立调试（设为 true 可单独调试此页；⚠️ 调试完成后改回 false）
+    debug: false, // 是否开启当前页面沙盒独立调试（设为 true 可单独调试此页；⚠️ 调试完成后改回 false）,🔔tabbar模式4下，支付宝小程序模式其他tabbar页面禁止使用,只有当前index页可以使用
     debugHome: false, // 沙盒调试模式下是否将当前页面指定为启动首页（全局仅允许 1 个页面设为 true，排在 pages[0]）
     type: 'home', // 页面类型标识（仅首页配置 'home'，标记当前页面为应用全局启动首页，自动排在 pages[0]）
     layout: 'navbar', // 页面通用布局模板（采用 navbar 布局接管顶部导航与下拉滚动容器）
