@@ -1,0 +1,48 @@
+import { reactive } from 'vue';
+import { defineStore } from 'pinia';
+import { DEFAULT_FONT_SCALE, normalizeFontScale } from '@/src/config/font/font.uts';
+
+/** 字体状态（类型镜像自唯一真源 `../types.uts`） */
+type IFontState = {
+  fontScale: number;
+};
+
+/**
+ * 全局字号缩放 Store（Vapor 分支：官方 Pinia）
+ *
+ * 只负责字号比例本身，不加载字体文件、不切换字体族。
+ */
+export const useFontStore = defineStore('font', () => {
+  const state = reactive<IFontState>({
+    fontScale: DEFAULT_FONT_SCALE
+  });
+
+  /**
+   * 应用启动时校正持久化恢复的比例，避免历史脏数据越界。
+   */
+  function initFontScale(): void {
+    state.fontScale = normalizeFontScale(state.fontScale);
+  }
+
+  /**
+   * 设置全局字号缩放比例。
+   * @param scale 缩放比例，内部会限制到 0.85 ~ 1.35
+   */
+  function setFontScale(scale: number): void {
+    state.fontScale = normalizeFontScale(scale);
+  }
+
+  /** 恢复默认字号比例 */
+  function resetFontScale(): void {
+    state.fontScale = DEFAULT_FONT_SCALE;
+  }
+
+  return {
+    state,
+    initFontScale,
+    setFontScale,
+    resetFontScale
+  };
+}, {
+  persist: true
+});

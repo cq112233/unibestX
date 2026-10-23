@@ -1,0 +1,104 @@
+import { defineStore, PiniaStoreBase } from '@/uni_modules/x-pinia-s';
+import { DEFAULT_FONT_SCALE, normalizeFontScale } from '@/src/config/font/font.uts';
+import type { IFontState } from '../types.uts';
+
+const defaultFontState: IFontState = {
+  fontScale: DEFAULT_FONT_SCALE
+};
+
+/** 读取 x-pinia-s 已持久化的字号比例 */
+function getStoredFontScale(): number | null {
+  try {
+    const raw = uni.getStorageSync('pinia:font');
+    if (raw != null) {
+      const rawStr = `${raw}`;
+      if (rawStr.length > 0 && rawStr != 'null' && rawStr != 'undefined') {
+        const parsed = JSON.parseObject(rawStr);
+        if (parsed != null) {
+          const data = (parsed.state != null ? parsed.state : parsed) as UTSJSONObject;
+          /* eslint-disable dot-notation -- UTSJSONObject 动态字段必须下标访问 */
+          if (data['fontScale'] != null) {
+            return data['fontScale'] as number;
+          }
+          /* eslint-enable dot-notation */
+        }
+      }
+    }
+  }
+  catch {
+    // 本地缓存损坏时回落到默认字号
+  }
+  return null;
+}
+
+/**
+ * 全局字号缩放 Store（VDOM 分支：x-pinia-s）
+ *
+ * 与 `./vapor/font.uts` 行为保持一致，不加载字体文件、不切换字体族。
+ */
+export class FontStore extends PiniaStoreBase {
+  state: IFontState = reactive<IFontState>({
+    fontScale: DEFAULT_FONT_SCALE
+  });
+
+  constructor() {
+    super();
+    this.bindState(this.state);
+    this.initFontScale();
+  }
+
+  /** 从持久化存储恢复并校正字号比例 */
+  initFontScale(): void {
+    const storedScale = getStoredFontScale();
+    if (storedScale != null) {
+      this.state.fontScale = normalizeFontScale(storedScale);
+      return;
+    }
+    this.state.fontScale = normalizeFontScale(this.state.fontScale);
+  }
+
+  /**
+   * 设置全局字号缩放比例。
+   * @param scale 缩放比例，内部会限制到 0.85 ~ 1.35
+   */
+  setFontScale(scale: number): void {
+    const nextScale = normalizeFontScale(scale);
+    this.state.fontScale = nextScale;
+    this.$patch({ fontScale: nextScale } as UTSJSONObject);
+    try {
+      uni.setStorageSync('pinia:font', JSON.stringify(this._serialize()));
+    }
+    catch {
+      // 存储失败不影响当前会话的字号调节
+    }
+  }
+
+  /** 恢复默认字号比例 */
+  resetFontScale(): void {
+    this.setFontScale(DEFAULT_FONT_SCALE);
+  }
+
+  /** 重置 Store 状态为初始默认值 */
+  override _doReset(): void {
+    this.state.fontScale = defaultFontState.fontScale;
+  }
+
+  /** 从本地缓存数据中反序列化还原字号比例 */
+  override _hydrate(data: UTSJSONObject): void {
+    const _data = (data.state != null ? data.state : data) as UTSJSONObject;
+    /* eslint-disable dot-notation -- UTSJSONObject 动态字段必须下标访问 */
+    if (_data['fontScale'] != null) {
+      this.state.fontScale = normalizeFontScale(_data['fontScale'] as number);
+    }
+    /* eslint-enable dot-notation */
+  }
+
+  /** 序列化字号比例用于持久化存储 */
+  override _serialize(): UTSJSONObject {
+    return {
+      fontScale: this.state.fontScale
+    } as UTSJSONObject;
+  }
+}
+
+export const useFontStore = defineStore<FontStore>('font', (): FontStore => new FontStore());

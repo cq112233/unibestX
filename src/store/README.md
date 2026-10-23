@@ -18,6 +18,7 @@ src/store/
 ├── vapor/                        # 官方 Pinia 分支（App 蒸汽模式 / H5 / Web / 小程序）
 │   ├── index.uts                 #   创建 pinia 实例 + 持久化插件（只默认导出 pinia）
 │   ├── app.uts                   #   useAppStore     底座上下文（state.mode）
+│   ├── font.uts                  #   useFontStore    全局字号缩放
 │   ├── i18n.uts                  #   useI18nStore    多语言
 │   ├── modal.uts                 #   useModalStore   组件实例注册表（无 state）
 │   ├── theme.uts                 #   useThemeStore   主题 / 外观
@@ -128,6 +129,7 @@ export * from './vdom/foo.uts';
 | Store | 状态 | 主要 API |
 | :--- | :--- | :--- |
 | `useAppStore` | `state.mode`（`'vapor'` / `'vdom'`） | 只读底座上下文，与业务解耦 |
+| `useFontStore` | `state.fontScale` | `setFontScale(scale)` / `resetFontScale()` / `initFontScale()` |
 | `useI18nStore` | `state.locale` | `setLocale(locale)` / `initLocale()` |
 | `useThemeStore` | `state.theme` / `themeMode` / `isDark` | `setTheme(color)` / `setThemeMode(mode)` / `initThemeMode()` / `refreshIsDark()` |
 | `useTokenStore` | 单 token + 双 token + 两个过期时间戳 | `setSingleToken` / `setDoubleToken` / `clearToken` / `getToken` / `isTokenValid` / `isRefreshTokenValid` / `hasLoginInfo` / `hasValidLogin` |
@@ -140,8 +142,22 @@ export * from './vdom/foo.uts';
 > 💡 `theme` / `i18n` store 是「换肤 / 切语言」的**唯一写入口**，细节见 [src/theme/README.md](../theme/README.md)
 > 与 [src/i18n/README.md](../i18n/README.md)。
 
----
+### 字号缩放 Store 用法
 
+```uts
+import { useFontStore } from '@/src/store/index.uts';
+
+const fontStore = useFontStore();
+
+fontStore.setFontScale(1.15);
+fontStore.resetFontScale();
+```
+
+- 缩放范围是 `0.85 ~ 1.35`，默认 `1`。
+- 缩放范围、默认值与归一化规则统一维护在 [font.uts](../config/font/font.uts)。
+- 只影响使用 `AppText` 渲染的文本；字体演示页的局部字体切换不写入全局 Store。
+- `App.uvue` 启动时调用 `initFontScale()` 校正持久化恢复的比例。
+>
 ## 双模式是怎么路由的
 
 [index.uts](index.uts) 的判据（两条互斥的条件编译分支）：
@@ -192,6 +208,7 @@ import pinia from './vdom/index.uts';
 | 页面 | 演示内容 |
 | :--- | :--- |
 | [src/sub/auth/login.uvue](../sub/auth/login.uvue) | token / user store 的登录、清除 |
+| [src/sub/fontBasicDemo](../sub/fontBasicDemo/fontBasicDemo.uvue) | AppText 与全局字号缩放 |
 | [src/sub/themeBasicDemo](../sub/themeBasicDemo/themeBasicDemo.uvue) | theme store 换肤与外观模式 |
 | [src/sub/langBasicDemo](../sub/langBasicDemo/langBasicDemo.uvue) | i18n store 切换语言 |
 | [src/sub/modalBasicDemo](../sub/modalBasicDemo/modalBasicDemo.uvue) | modal store 实例注册与跨层级调用 |

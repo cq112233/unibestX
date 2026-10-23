@@ -234,7 +234,14 @@ export default defineConfig({
         '**/components/**/*.*',
         '**/views/**/*.*',
         '**/common/**/*.*',
-        '**/modules/**/*.*'
+        '**/modules/**/*.*',
+        '**/font/**/*.*',
+        '**/fonts/**/*.*',
+        '**/img/**/*.*',
+        '**/imgs/**/*.*',
+        '**/image/**/*.*',
+        '**/images/**/*.*',
+        '**/assets/**/*.*'
       ],
 
       // 【输出文件路径】：生成并同步的 pages.json 相对路径，默认 'pages.json'
