@@ -92,9 +92,7 @@ import { curIdx, resolveTabIndexByKey, useTabPage, useTabPageShell } from '@/src
 import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/layouts/navbar/utils/index.uts';
 import { useRouter } from '@/uni_modules/route-bestX/index.uts';
 
-definePage((options) => {
-  const { platform, appName: _appName } = options;
-  const { isH5 } = platform;
+definePage(() => {
   return {
     customPageClass: 'init-page', // 页面根容器自定义类名（配合 layout 布局使用，支持配置全局样式类）
     customPageStyle: 'background-color: transparent;', // 页面根容器自定义行内样式（穿透任何样式隔离，全端绝对生效）
@@ -106,7 +104,7 @@ definePage((options) => {
     hideStatusBar: false, // 是否隐藏状态栏（true 为隐藏）
     hideNavbar: false, // 是否隐藏顶部导航栏（false 为正常显示）
     style: {
-      navigationBarTitleText: isH5 ? '😂' : 'tabbar.function',
+      navigationBarTitleText: 'tabbar.function',
       navigationStyle: 'custom'
     }
   };
