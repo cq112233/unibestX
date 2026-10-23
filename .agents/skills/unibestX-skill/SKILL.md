@@ -115,7 +115,7 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 
 **触发条件**：代码改完、准备交付。
 
-**处理逻辑**：逐条核对 A.2 的 50 条红线，以及所读分册末尾的自检清单；命中即改，改完重新自检。重点复核：`interface` / `undefined` / `===`、动态 `:style` 强转、`gap` 与 `space-*`、链式 `.catch()`、页面跳转是否走 `useRouter()`、新增页面是否已建接口层。
+**处理逻辑**：逐条核对 A.2 的 54 条红线，以及所读分册末尾的自检清单；命中即改，改完重新自检。重点复核：`interface` / `undefined` / `===`、UTS / TS / JS 循环依赖、动态 `:style` 强转、`gap` 与 `space-*`、链式 `.catch()`、页面跳转是否走 `useRouter()`、新增页面是否已建接口层。
 
 ### 5. 验证与交付
 
@@ -204,6 +204,7 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 
 - 严禁使用 `interface`，所有对象结构统一用 `type`（规避 `UTS110111163`）。
 - 严禁使用 `undefined`，空值统一 `null`；条件判断必须显式与 `null` / 空串比较。
+- **严禁 `.uts` / `.ts` / `.js` 模块形成直接或间接循环依赖**（`A → B → A`，包含 `import`、`import type`、`export *` 转发与条件编译分支）；模块依赖必须保持单向有向无环图（DAG），公共类型、常量与纯函数下沉到叶子文件，见分册 1.22。
 - 新增页面必须接入 `src/api/<module>/` 业务模块接口层，页面与组件里不得出现硬编码假数据。
 - 跨端差异先判定端与触发条件，再做条件编译或门面分流；不得按 TS / Vue 的通用经验臆断。
 - 涉及端专属原生全局符号（`window`、`wx`、`my`、`uni.onKeyboardHeightChange` 等）必须 `#ifdef` 物理隔离，普通 `if` 拦不住原生编译期的符号解析。
@@ -279,7 +280,7 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 | **对象字面量包含函数导出** | `export const env = { getApiBaseUrl }`（Kotlin 编译报 `Function invocation expected`） | 统一使用标准具名函数导出 `export function getApiBaseUrl()` |
 | **原生回调参数访问** | `(res as UTSJSONObject).tempFiles`（Kotlin 运行时崩溃 `ClassCastException`） | 直接利用原生类型推断访问 `res.tempFiles`，严禁将回调结果强转 `UTSJSONObject` |
 | **多层 `export *` 重导出（`error18 找不到名称` / 运行期 `NoSuchMethodError`）** | 子模块与门面对同一符号多次 `export *` 转发（Kotlin 端符号被改名为 `useXxxStore__1`） | 同一顶层符号只在一层门面中 `export *`；子模块严禁再整包重导出 |
-| **模块导入与循环引用（Kotlin 类加载死锁 / NPE）** | 底层模块互相引用 `index.uts` 聚合门面，或总入口反向 `export *` 导致循环引用闭环（运行期报 `Parameter specified as non-null is null` / `ExceptionInInitializerError` / `NoClassDefFoundError`） | 全局开发统一坚持**精准导入（Deep / Precise Import）**，直接引入具体实现文件（如 `@/src/config/env/env.uts`、`@/src/utils/systemInfo/index.uts`）；第三方模块则从**其公开入口**导入（如 `@/uni_modules/route-bestX/index.uts`），严禁穿透其内部实现文件，严禁底层互相穿透引用 `index.uts` 总入口，总入口严禁反向 `export *` 自环（详见 **1.22**） |
+| **任意 `.uts` / `.ts` / `.js` 循环依赖（Kotlin 类加载死锁 / NPE）** | 模块间 `A → B → A` 直接或间接循环；包括底层模块互相引用 `index.uts` 聚合门面、总入口反向 `export *` 自环，以及跨文件类型互相 `import type`（运行期报 `Parameter specified as non-null is null` / `ExceptionInInitializerError` / `NoClassDefFoundError`） | **一律禁止循环依赖，依赖图必须是单向 DAG**：公共类型 / 常量 / 纯函数下沉到零依赖叶子文件；全局开发坚持**精准导入（Deep / Precise Import）**，直接引入具体实现文件（如 `@/src/config/env/env.uts`、`@/src/utils/systemInfo/index.uts`）；第三方模块从其**公开入口**导入（如 `@/uni_modules/route-bestX/index.uts`），严禁穿透内部实现文件，总入口严禁反向 `export *` 自环（详见 **1.22**） |
 | **局部函数/变量与框架全局同名（撞车导致找不到或参数不匹配）** | 页面里写 `function stop()`（撞 `@vue/reactivity` 全局 `stop(runner)`） | 局部方法一律加业务前缀（如 `stopStream`）；且局部函数必须定义在调用点之前（Kotlin 声明不提升） |
 | **回调引用承载自身的变量（`error18 找不到名称`）** | `const timerId = setInterval(() => { clearInterval(timerId) })` | `let timerId: number = 0;` 先声明，再 `timerId = setInterval(...)` 赋值 |
 | **定时器句柄报 `TS2322 不能将类型“Timeout”分配给类型“number”`（⚠️ 这是 VSCode / Volar 诊断，不是 UTS 编译错误）** | `pollingTimer = setInterval(() => { ... }, ms)`（显式 `number` 标注 + 直接赋值；@types/node 经 `vite.config.ts` 把返回值判为 `Timeout`） | 调用点就地双层强转：`pollingTimer = (setInterval(() => { ... }, ms) as any) as number;`（单层 `as number` 报 TS2352；在 `.d.ts` 补全局声明无效；UTS 编译与 `pnpm typecheck` 都不报，只能看 `ts-plugin` 诊断，详见 **1.26**） |
@@ -377,4 +378,5 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 - [ ] **51. hook 状态不做纯转发**：`useQuery` / `useMutation` 解构出的 `isPending` / `isFetching` / `isError` 本身是 Ref；模板自动解包直接写变量名，script 内读值才用 `.value`；严禁写 `computed(() => isPending.value == true)` 这类无新增语义的包装，只有真实转换 / 组合才用 `computed`（见 4.3.4 / 10.4.2）
 - [ ] **52. 已有页面不得擅自合并或迁移**：新增页面与已有页面同属一个业务模块时，**必须先询问开发者是否放到同一业务模块目录**；存量页面默认保持原路径与 URL，未经明确同意禁止移动、重构目录层级或合并页面。页面 URL 是历史链接、分享地址、埋点和外部跳转的契约，结构整理不能让已有业务断链（见 5.2 / 5.10）
 - [ ] **53. 纯文本插槽必须由 `<text>` 承载**：组件接收一段纯文本时必须写 `<text><slot>默认文案</slot></text>`，严禁写裸 `<slot>默认文案</slot>` 接收父级文本；若插槽契约是接收任意节点，则保持 `<slot />`，由父级提供完整 `<text>` / `<view>`，禁止统一包进 `<text>`（见 4.7.7）
+- [ ] **54. 严禁 `.uts` / `.ts` / `.js` 循环依赖**：任何直接或间接的 `A → B → A` 都不允许，包含 `import`、`import type`、`export *` 转发及条件编译分支形成的依赖边；必须保持单向 DAG，公共类型 / 常量 / 纯函数下沉到零依赖叶子文件，禁止用「H5 能跑」作为放行依据（见 1.22）
 

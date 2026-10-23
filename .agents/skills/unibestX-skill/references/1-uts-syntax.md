@@ -732,7 +732,14 @@ export * from './vdom/user.uts';
 
 ---
 
-## 1.22 全局开发统一遵循「精准导入（Deep / Precise Import）」铁律，杜绝原生类静态初始化死锁与 NPE
+## 1.22 严禁 UTS / TS / JS 循环依赖：统一遵循「精准导入（Deep / Precise Import）」，杜绝原生类静态初始化死锁与 NPE
+
+- **适用范围**：项目内所有 `.uts` / `.ts` / `.js` 模块，包括 `src/`、`scripts/`、`vite.config.ts` 与进入编译链的插件文件。
+- **硬性判定**：只要依赖图中存在直接或间接闭环 `A → B → A`，即判定为循环依赖，**任何端能运行都不构成豁免**。
+  - `import` / `import type` 都算依赖边；UTS 的 `import type` 不会被擦成零运行期成本。
+  - `export *` / `export { ... } from` 重导出同样算依赖边，门面链套娃会放大成环风险。
+  - 条件编译只裁剪平台分支，不得用来「隐藏」同一文件里的循环引用。
+- **唯一正确结构**：模块依赖必须保持单向有向无环图（DAG）。公共类型、常量与纯函数下沉到零依赖叶子文件；实现模块只能从叶子文件向上依赖，禁止反向引用调用方。
 
 - **错误现象**（本项目实测，真机 Android VDOM 模式与原生 Class 加载阶段）：
 
@@ -748,14 +755,30 @@ export * from './vdom/user.uts';
   JVM 虚拟机为防止无限递归，会强行返回未完成初始化的类，导致类顶层的常量与实例为 `null`，传入 Kotlin 生成的 `@NotNull` 属性 setter 时直接抛出 `NullPointerException`，进而触发 `ExceptionInInitializerError` 导致整个应用崩溃。
 
 - **强制规范**：
-  1. **全局开发坚持精准导入（Deep Import）**：所有工具函数、状态与配置导入，一律精准引入具体的实现文件（如 `@/src/config/env/env.uts`、`@/src/utils/systemInfo/index.uts`、`@/src/i18n/utils/index.uts`），严禁跨底层模块引入 `index.uts` 聚合门面。
+  1. **零循环依赖**：`.uts` / `.ts` / `.js` 均禁止直接或间接循环引用；发现环时先抽公共叶子模块，再按依赖方向拆分，不能靠调整 import 顺序或条件编译绕过。
+  2. **全局开发坚持精准导入（Deep Import）**：所有工具函数、状态与配置导入，一律精准引入具体的实现文件（如 `@/src/config/env/env.uts`、`@/src/utils/systemInfo/index.uts`、`@/src/i18n/utils/index.uts`），严禁跨底层模块引入 `index.uts` 聚合门面。
      - **第三方 `uni_modules` 模块例外**：从该模块**公开入口**导入（如 `@/uni_modules/route-bestX/index.uts`），它内部的文件间引用由模块自己保证单向；**业务代码严禁穿透进 `core/` / `hooks/` 等内部文件**。
-  2. **总入口严禁反向导出形成自环**：主入口（如 `src/i18n/index.uts`）严禁再写 `export * from './utils/index.uts'`，彻底保持单向有向无环图（DAG）。
-  3. **分层原则**：
+  3. **总入口严禁反向导出形成自环**：主入口（如 `src/i18n/index.uts`）严禁再写 `export * from './utils/index.uts'`，彻底保持单向 DAG。
+  4. **分层原则**：
      - **业务页面/组件**（`src/pages/`、`src/sub/`）：优先使用业务封装好的对外接口；
      - **基础设施层核心库之间**（`config/`、`utils/`、`router/`、`store/`、`i18n/`）：**铁律**：严禁互相引用任何 `index.uts` 总入口，必须精准引入叶子文件。
 
 - **正反例**：
+
+  ```uts
+  // ❌ 错误：A 依赖 B，B 又反向依赖 A，形成闭环
+  // src/a.uts
+  import { readB } from './b.uts';
+  export function readA(): string { return readB(); }
+
+  // src/b.uts
+  import { readA } from './a.uts';
+  export function readB(): string { return readA(); }
+
+  // ✅ 正确：公共能力下沉到无依赖叶子文件，双方都只向下依赖
+  // src/shared/value.uts
+  export function readValue(): string { return 'ok'; }
+  ```
 
   ```uts
   // ❌ 错误：从聚合门面引入，连带拉起 privacy / platform 等全部子模块的静态初始化
