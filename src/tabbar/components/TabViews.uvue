@@ -38,16 +38,9 @@
     <TabContent v-if="isTabRendered(1)" :content-index="1" title="tabbar.basic" :enable-pull-down-refresh="true" :show-back="false">
       <BasicPage />
     </TabContent>
-    <!-- #ifdef H5 -->
-    <TabContent v-if="isTabRendered(2)" :content-index="2" title="😂" :enable-pull-down-refresh="true" :show-back="false" custom-page-class="init-page" custom-page-style="background-color: transparent;">
-      <FunctionPage />
-    </TabContent>
-    <!-- #endif -->
-    <!-- #ifdef APP-ANDROID || APP-IOS || APP-HARMONY || MP-WEIXIN || MP-ALIPAY || MP-BAIDU || MP-TOUTIAO || MP-QQ || MP-KUAISHOU || MP-LARK || MP-JD || MP-XHS || MP-360 || MP-HARMONY -->
     <TabContent v-if="isTabRendered(2)" :content-index="2" title="tabbar.function" :enable-pull-down-refresh="true" :show-back="false" custom-page-class="init-page" custom-page-style="background-color: transparent;">
       <FunctionPage />
     </TabContent>
-    <!-- #endif -->
     <TabContent v-if="isTabRendered(3)" :content-index="3" title="tabbar.me" :enable-pull-down-refresh="true" :show-back="false">
       <MePage />
     </TabContent>
