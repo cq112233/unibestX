@@ -10,11 +10,11 @@ hero:
     alt: unibestX Logo
   actions:
     - theme: brand
-      text: 快速上手
-      link: /guide/getting-started
+      text: 阅读文档
+      link: /guide/introduction
     - theme: alt
-      text: 官方文档
-      link: https://uniapp.dcloud.net.cn/uni-app-x/
+      text: 快速开始
+      link: /guide/getting-started
     - theme: alt
       text: 在线体验
       link: https://cq112233.github.io/unibestX/

@@ -1,4 +1,4 @@
-# 快速上手
+# 快速开始
 
 欢迎使用 `unibestX`，这是一个基于 uni-app X 的现代开发模板。本指南将帮助您快速在本地运行项目。
 
@@ -6,14 +6,12 @@
 
 在开始之前，请确保您的开发环境满足以下要求：
 
-* **Node.js**: `>= 22`
-* **包管理器**: `pnpm >= 7.30`
-* **IDE**: `HBuilderX >= 5.24`
+* **Node.js**: `>= 22.22.2`
+* **包管理器**: `pnpm >= 10.0.0`
+* **IDE**: `HBuilderX >= 5.26`
   > [!TIP] 建议
-  > 请使用 **HBuilderX 5.24 及以上版本**，全面支持 Android / iOS / 鸿蒙三端蒸汽（Vapor）模式。
+  > 请使用 **HBuilderX 5.26 及以上版本**，全面支持 Android / iOS / 鸿蒙三端蒸汽（Vapor）模式。
   > 旧版本可切换 VDOM 模式（`manifest.json` 中 `"vapor": false`）稳定运行。
-* **Vue Official**: `>= 2.1.10`
-* **TypeScript**: `>= 5.0`
 * **特定平台依赖**:
   * **Android**: JDK >= 17, Android SDK
   * **iOS**: Xcode (仅 macOS 支持)
@@ -60,7 +58,7 @@
 * **方式二：通过 `degit` 快速创建（无历史提交记录）**：
 
   ```bash
-  # 主分支（main，默认 VDOM 模式，全面兼通 VDOM & Vapor）
+  # 主分支（main，默认 Vapor 模式，全面兼通 VDOM & Vapor）
   npx degit cq112233/unibestX my-project
 
   # Rice UI 官方支持分支（强烈推荐，团队持续维护，支持 VDOM & Vapor 模式）
@@ -136,9 +134,6 @@ pnpm dev:mp-alipay
 ```bash
 # 打包构建 H5
 pnpm build:h5
-
-# 打包构建 微信小程序
-pnpm build:mp-weixin
 ```
 
 #### 🛠️ HBuilderX 发行打包
@@ -146,5 +141,5 @@ pnpm build:mp-weixin
 * **Android 平台**：选择 `发行 → 原生App-云打包` 或 `原生App-本地打包`。
 * **iOS 平台**：选择 `发行 → 原生App-云打包`（需 Apple 开发者证书）。
 * **鸿蒙平台**：选择 `发行 → 原生App-鸿蒙`。
-* **H5 平台**：选择 `发行 → 网站-H5手机版`，打包后的文件将生成在 `dist/build/h5` 目录下。
+* **H5 平台**：选择 `发行 → 网站-H5手机版`，打包后的文件将生成在 `unpackage/dist/build/web` 目录下。
 * **微信小程序**：选择 `发行 → 小程序-微信`，然后通过微信开发者工具上传代码。
