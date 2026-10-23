@@ -21,7 +21,12 @@
         class="rounded-[16px] p-[16px] mb-[16px] border-[1px] border-solid bg-[#ffffff] border-[#edf2f7]"
       >
         <view class="w-full h-[300px]">
-          <e-chart ref="echartRef" height="300px" class="w-full h-full" @ready="initEchart" />
+          <!-- #ifdef MP-WEIXIN -->
+          <MpEChart ref="echartRef" height="300px" class="w-full h-full" @ready="initEchart" />
+          <!-- #endif -->
+          <!-- #ifndef MP-WEIXIN -->
+          <EChart ref="echartRef" height="300px" class="w-full h-full" @ready="initEchart" />
+          <!-- #endif -->
         </view>
       </view>
 
@@ -83,6 +88,14 @@
 import { computed, ref, watch } from 'vue';
 import type { ComponentPublicInstance } from 'vue';
 import { systemInfo } from '@/src/utils/systemInfo/index.uts';
+
+// 微信小程序显式使用分包内组件，避免 easycom 把 uni_modules/e-chart 打进主包
+// #ifdef MP-WEIXIN
+import MpEChart from './components/e-chart/e-chart.uvue';
+// #endif
+// #ifndef MP-WEIXIN
+import EChart from '@/uni_modules/e-chart/components/e-chart/e-chart.uvue';
+// #endif
 
 definePage({
   debug: false,
