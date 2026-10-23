@@ -1,0 +1,92 @@
+<template>
+  <!-- 单根 text：父级 class 会自动合并到根节点，无需 custom-class -->
+  <text class="app-text" :style="textStyle"><slot /></text>
+</template>
+
+<script setup lang="uts">
+import { computed } from 'vue';
+import { useFontStore } from '@/src/store/index.uts';
+
+/** 字体排版预设 */
+type AppTextVariantStyle = {
+  fontSize: number;
+  fontWeight: string;
+  lineHeight: number;
+};
+
+/** 组件入参 */
+const props = defineProps({
+  /** 排版预设：title | subtitle | body | caption | label */
+  variant: {
+    type: String,
+    default: 'body'
+  },
+  /** 覆盖基础字号（px，传入后仍会乘全局缩放） */
+  size: {
+    type: Number,
+    default: 0
+  },
+  /** 覆盖字重，如 bold / 500；空串表示使用 variant 默认值 */
+  weight: {
+    type: String,
+    default: ''
+  },
+  /** 覆盖基础行高（px，传入后仍会乘全局缩放） */
+  lineHeight: {
+    type: Number,
+    default: 0
+  },
+  /** 可选文字颜色；不传时由 class 中的 text-[#...] 控制 */
+  color: {
+    type: String,
+    default: ''
+  }
+});
+
+/**
+ * 解析 variant 对应的基础排版值
+ * @param variant 排版预设名
+ * @returns 基础字号、字重与行高（未乘全局缩放）
+ */
+function resolveVariantStyle(variant: string): AppTextVariantStyle {
+  if (variant == 'title') {
+    return { fontSize: 20, fontWeight: 'bold', lineHeight: 28 };
+  }
+  if (variant == 'subtitle') {
+    return { fontSize: 16, fontWeight: 'bold', lineHeight: 24 };
+  }
+  if (variant == 'caption') {
+    return { fontSize: 12, fontWeight: 'normal', lineHeight: 18 };
+  }
+  if (variant == 'label') {
+    return { fontSize: 13, fontWeight: '500', lineHeight: 20 };
+  }
+  return { fontSize: 14, fontWeight: 'normal', lineHeight: 22 };
+}
+
+/** 全局字体 Store：字体族与缩放变化时，所有 AppText 自动重新计算 */
+const fontStore = useFontStore();
+
+/** 最终文本样式：字体族、字号、字重、行高统一走内联，保证原生端生效 */
+const textStyle = computed((): string => {
+  const variantStyle = resolveVariantStyle(props.variant);
+  const scale = fontStore.state.fontScale > 0 ? fontStore.state.fontScale : 1;
+  const baseSize = props.size > 0 ? props.size : variantStyle.fontSize;
+  const baseLineHeight = props.lineHeight > 0 ? props.lineHeight : variantStyle.lineHeight;
+  const fontSize = Math.round(baseSize * scale);
+  const lineHeight = Math.round(baseLineHeight * scale);
+  const fontWeight = props.weight != '' ? props.weight : variantStyle.fontWeight;
+
+  const styles: Array<string> = [];
+  styles.push(`font-family: ${fontStore.state.fontFamily};`);
+  styles.push(`font-size: ${fontSize}px;`);
+  styles.push(`font-weight: ${fontWeight};`);
+  styles.push(`line-height: ${lineHeight}px;`);
+  if (props.color != '') {
+    styles.push(`color: ${props.color};`);
+  }
+  return styles.join('');
+});
+</script>
+
+<style></style>

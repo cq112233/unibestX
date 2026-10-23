@@ -47,6 +47,42 @@ export type IAppState = {
 };
 
 // ==========================================
+// font store
+// ==========================================
+
+/**
+ * 全局字体状态
+ *
+ * status 取值：'idle' | 'loading' | 'loaded' | 'error'
+ */
+export type IFontState = {
+  /** 当前字体配置 id，对应 src/config/font/font.uts 的 fontOptions */
+  fontId: string;
+  /** 实际下发给文本的 font-family；App 原生端必须是单个 family 名 */
+  fontFamily: string;
+  /** 全局字号缩放比例，1 表示原始大小 */
+  fontScale: number;
+  /** 远程字体加载状态 */
+  status: string;
+};
+
+/**
+ * 可选字体配置
+ */
+export type IFontOption = {
+  /** 字体唯一标识 */
+  id: string;
+  /** 设置页展示名称 */
+  label: string;
+  /** 业务侧使用的 font-family；App 原生端只允许单个 family 名 */
+  family: string;
+  /** 字体注册名；本地 @font-face 字体也填此值，系统字体为空串 */
+  loadFamily: string;
+  /** 运行时字体文件地址；本地 @font-face 与系统字体为空串 */
+  source: string;
+};
+
+// ==========================================
 // token store
 // ==========================================
 

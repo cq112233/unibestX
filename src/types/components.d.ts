@@ -9,6 +9,7 @@ declare module '@vue/runtime-core' {
 
   export interface GlobalComponents {
     A1: typeof import('../components/A1/A1.uvue')['default'];
+    AppText: typeof import('../components/AppText/AppText.uvue')['default'];
     NavBar: typeof import('../components/NavBar/NavBar.uvue')['default'];
     TabbarMaskModal: typeof import('../components/TabbarMaskModal/TabbarMaskModal.uvue')['default'];
   }

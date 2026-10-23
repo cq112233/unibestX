@@ -36,6 +36,33 @@ function getClassValues(node) {
 /** 标准 CSS 英文单词命名颜色集合（uni-app X 原生端与 VDOM 平台建议统一替换为十六进制色值） */
 const CSS_NAMED_COLORS = new Set(Object.keys(colorNames));
 
+/**
+ * 读取 GlobalComponents 中声明的全局组件名。
+ *
+ * easycom / 全局注册组件由构建器自动注入，模板里不会出现 import 语句；
+ * auto-import-component 规则需要显式跳过这些名称，否则会产生「组件尚未导入」的误报。
+ */
+function collectGlobalComponentNames(projectRoot) {
+  const names = new Set();
+  const declarationFile = path.join(projectRoot, 'src/types/components.d.ts');
+  if (!fs.existsSync(declarationFile)) {
+    return names;
+  }
+
+  try {
+    const content = fs.readFileSync(declarationFile, 'utf-8');
+    const entryPattern = /^\s*([A-Za-z_$][\w$]*)\s*:\s*typeof\s+import\([^\n]+\)\['default'\];?/gm;
+    let match = entryPattern.exec(content);
+    while (match != null) {
+      names.add(match[1]);
+      match = entryPattern.exec(content);
+    }
+  }
+  catch {}
+
+  return names;
+}
+
 /** 将 CSS 英文单词命名颜色转换为标准十六进制色值（如 red -> #ff0000） */
 function getHexFromNamedColor(name) {
   if (!name) {
@@ -937,6 +964,10 @@ export const pluginUts = {
         ]);
 
         const projectRoot = process.cwd();
+        // 全局组件（含 easycom 自定义映射）不需要在页面里手动 import
+        for (const componentName of collectGlobalComponentNames(projectRoot)) {
+          defaultIgnore.add(componentName);
+        }
 
         function toPascalCase(str) {
           return str.replace(/(?:^|[-_])(\w)/g, (_, c) => c.toUpperCase());

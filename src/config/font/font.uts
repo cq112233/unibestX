@@ -1,0 +1,94 @@
+/**
+ * 全局字体配置
+ *
+ * 这里只放字体清单与纯函数。字体是否已加载、当前选择与缩放比例由 font Store 管理。
+ */
+
+import type { IFontOption } from '@/src/store/types.uts';
+import { isMp } from '@/src/config/env/platform.uts';
+
+/** 系统默认字体 id */
+export const DEFAULT_FONT_ID = 'system';
+/** 默认字号缩放比例 */
+export const DEFAULT_FONT_SCALE = 1;
+/** 最小字号缩放比例 */
+export const MIN_FONT_SCALE = 0.85;
+/** 最大字号缩放比例 */
+export const MAX_FONT_SCALE = 1.35;
+
+/** 系统默认字体族（全端均可安全回退） */
+export const DEFAULT_FONT_FAMILY = `'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', Arial, sans-serif`;
+
+/** 阿里妈妈刀隶体在 CSS / 原生字体注册中的唯一 family 名（App 端不支持候选字体列表） */
+export const ALIMAMA_FONT_FAMILY = 'AlimamaDaoLiTiTTF';
+
+/** 完整字体网络地址（小程序 loadFontFace 与远程字体演示使用，避免使用官方 14KB 子集） */
+export const ALIMAMA_FONT_REMOTE_URL = 'https://cdn.jsdelivr.net/npm/@fontpkg/alimama-dao-li-ti@1.0.5/AlimamaDaoLiTi.ttf';
+
+/** 小程序的 loadFontFace 仅支持网络字体；App / H5 使用 App.uvue 中内置的本地 @font-face */
+export const ALIMAMA_FONT_REMOTE_SOURCE = `url('${ALIMAMA_FONT_REMOTE_URL}')`;
+
+/** 系统默认字体 */
+export const systemFontOption: IFontOption = {
+  id: DEFAULT_FONT_ID,
+  label: '系统默认',
+  family: DEFAULT_FONT_FAMILY,
+  loadFamily: '',
+  source: ''
+};
+
+/**
+ * 内置字体清单
+ *
+ * App / H5 字体通过 App.uvue 的本地 @font-face 预注册，因此 source 为空、loadFamily 只作为
+ * 「本地字体已可用」的标记；小程序只能加载网络字体，仍由 loadFontFace 动态注册。
+ *
+ * App 原生端 font-family 只按单个 family 名匹配，family 字段禁止拼接兜底字体列表，
+ * 否则会匹配不到已注册字体并静默回退系统字体。
+ */
+export const fontOptions: Array<IFontOption> = [
+  systemFontOption,
+  {
+    id: 'alimama-daoli',
+    label: '阿里妈妈刀隶体',
+    family: ALIMAMA_FONT_FAMILY,
+    loadFamily: ALIMAMA_FONT_FAMILY,
+    source: isMp ? ALIMAMA_FONT_REMOTE_SOURCE : ''
+  }
+];
+
+/**
+ * 根据 id 获取字体配置
+ * @param id 字体唯一标识
+ * @returns 命中返回配置，未命中返回 null
+ */
+export function getFontOption(id: string): IFontOption | null {
+  for (let i = 0; i < fontOptions.length; i++) {
+    const item = fontOptions[i];
+    if (item.id == id) {
+      return item;
+    }
+  }
+  return null;
+}
+
+/** 获取系统默认字体配置 */
+export function getDefaultFontOption(): IFontOption {
+  return systemFontOption;
+}
+
+/**
+ * 归一化字号缩放比例，避免持久化脏数据把文字缩成 0 或无限放大
+ * @param scale 原始缩放比例
+ * @returns 限制在允许区间内的缩放比例
+ */
+export function normalizeFontScale(scale: number): number {
+  let next = scale;
+  if (next < MIN_FONT_SCALE) {
+    next = MIN_FONT_SCALE;
+  }
+  if (next > MAX_FONT_SCALE) {
+    next = MAX_FONT_SCALE;
+  }
+  return Math.round(next * 100) / 100;
+}

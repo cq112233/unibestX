@@ -57,7 +57,7 @@ fontStore.setFontScale(1.15);
 fontStore.resetFont();
 ```
 
-- 字体清单维护在 `src/config/font.uts`，新增字体只需追加配置。
+- 字体清单维护在 `src/config/font/font.uts`，新增字体只需追加配置。
 - 远程字体通过 `uni.loadFontFace` 注册；失败时保留系统字体兜底，不会阻塞页面。
 - 用户选择与字号比例会持久化；`App.uvue` 启动时调用 `initFont()` 重新注册远程字体。
 
