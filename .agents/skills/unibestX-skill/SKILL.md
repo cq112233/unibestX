@@ -1,6 +1,6 @@
 ---
 name: unibestX-skill
-description: Use when developing, compiling, refactoring, or troubleshooting uni-app X (.uvue / .uts / .ts) projects, handling UTS strict type constraints (UTS110111163, UTS110111119, UTS110111120, ClassCastException, error17 Any? slot props), Tailwind CSS styling and layout engine limitations, page skeleton conventions, or platform-specific cross-end issues across App (Android Kotlin, iOS Swift), HarmonyOS (ArkTS), Web, and Mini-Programs.
+description: Use when developing, compiling, refactoring, or troubleshooting uni-app X (.uvue / .uts / .ts) projects, handling UTS strict type constraints (UTS110111163, UTS110111119, UTS110111120, ClassCastException, error17 Any? slot props), Tailwind CSS styling and layout engine limitations, page skeleton conventions, visual direction and anti-template UI decisions, typography and palette systems, or platform-specific cross-end issues across App (Android Kotlin, iOS Swift), HarmonyOS (ArkTS), Web, and Mini-Programs.
 ---
 
 # unibestX-skill (uni-app X & UTS 规范、真实案例与代码生成指南)
@@ -9,11 +9,12 @@ description: Use when developing, compiling, refactoring, or troubleshooting uni
 
 - 让 AI / Agent 在 unibestX（uni-app X）项目里**写出能一次编译通过**的 `.uvue` / `.uts` / `.ts` / `.scss` 代码，不踩 UTS 名义强类型与原生渲染的坑。
 - 新增页面时**结构可照抄、接口归属同批交付**：骨架来自分册 4 / 5，接口按业务模块归入 `src/api/<module>/`（分册 6）。
+- 新建 / 重做界面时先建立**业务专属的视觉方向**：配色、排版、布局与唯一记忆点来自业务主体，不套通用 AI 模板（分册 11）。
 - 跨端行为可控：App（Kotlin）/ 鸿蒙（ArkTS）/ Web / 小程序的差异，先按分册 3 判定，再做条件编译或门面分流。
 - 排错以**根因 + 可复现证据**收尾，不靠猜测和「改改试试」。
 - 交付前必须过 A.2 红线清单与真实验证命令，**没有验证输出就不算完成**。
 
-> ⚠️ 本文件与 `references/` 下 10 个分册、下方 A.1 / A.2 同为强制约束；动手前先读「注意事项」与「A.2 代码生成红线清单」。
+> ⚠️ 本文件与 `references/` 下 11 个分册、下方 A.1 / A.2 同为强制约束；动手前先读「注意事项」与「A.2 代码生成红线清单」。
 
 ---
 
@@ -22,7 +23,7 @@ description: Use when developing, compiling, refactoring, or troubleshooting uni
 uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直接编译为原生代码（Android 编译为 Kotlin，iOS 插件编译为 Swift，鸿蒙插件编译为 ArkTS，Web / 小程序编译为 JS）。  
 与宽容的 TypeScript / JavaScript 不同，UTS 采用**名义强类型系统（Nominal Strong Typing）**与**原生渲染规范** —— 很多在 TS 里「只是警告」的写法，在 UTS 里是编译失败或真机崩溃。
 
-本 Skill 采用 **「1 个入口 + 10 个分册」** 结构：入口常驻任务目标、交互流程与 A.1 / A.2 速查；成体系的铁律、正反例与实测结论都在 `references/` 分册里，**命中即必须 Read**。
+本 Skill 采用 **「1 个入口 + 11 个分册」** 结构：入口常驻任务目标、交互流程与 A.1 / A.2 速查；成体系的铁律、正反例与实测结论都在 `references/` 分册里，**命中即必须 Read**。
 
 ---
 
@@ -68,6 +69,7 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 
 - 编写、重构或新增 `.uvue`、`.uts`、`.ts`、`.scss` 文件时
 - 规划或生成新页面结构、骨架布局与视口高度（`availableHeight`）时；新增页面与已有页面同属业务模块时，先确认是否聚合，不得擅自迁移存量页面
+- **新建页面、重做 UI、判断页面是否「像模板」，或需要确定配色 / 字体 / 布局 / 动效方向时**（分册 11）
 - **新增页面并接入 `src/api/<module>/` 业务模块接口层（接口函数 + 类型 + 数据集，按需拆 `types.uts`）时**、把页面里的假数据抽成接口函数时
 - 对接后端真实接口、写 `http` 请求 / 文件上传 / SSE 流式接口时
 - **使用 `src/http` 业务实例、`src/api` 接口层，或 `useQuery` / `useMutation` / `useQueryClient` 时**（分册 10）
@@ -95,7 +97,7 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 **处理逻辑**：
 
 - 用 Read 工具打开对应分册并**核对完整正反例与实测结论**，不得只凭入口里的一行结论就改代码。
-- 同时命中多个分册时全部 Read（典型：新增页面 = 分册 4 + 5 + 6 + 7 + 8；涉及 TabBar 加 9，涉及网络 / 异步 hooks 加 10）。
+- 同时命中多个分册时全部 Read（典型：新增页面 = 分册 11 + 4 + 5 + 6 + 7 + 8；涉及 TabBar 加 9，涉及网络 / 异步 hooks 加 10）。
 - 分册没有覆盖的新问题：以项目现有代码与实测为准，**不要套用 TS / Vue 的通用经验臆断**。
 
 ### 3. 实现
@@ -105,6 +107,7 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 **处理逻辑（强制）**：
 
 - **模板与案例优先**：页面结构照分册 4 的标杆案例、分册 4 的标准模板，不自创骨架。`components/`、`common/`、`modules/` 都按需创建，简单业务默认只写根页面，不为了拆分而创建目录。
+- **视觉方向先于组件堆叠**：新建或重做界面时，先按分册 11 写紧凑设计计划，明确业务主体、唯一任务、4–6 个颜色 Token、3–5 级排版层级与一个 signature，再选组件与样式。
 - **UTS 语法铁律**：`type` 不用 `interface`、空值用 `null` 不用 `undefined`、基础类型比较用 `==` / `!=`、条件必须显式布尔（见 A.2 第 1–4 条）。
 - **新增页面必须接入接口层**：同一次改动接入 `src/api/<module>/`，模块首次出现时建接口文件；类型被两个以上文件共用时才拆 `types.uts`，接口文件不设行数上限；页面目录下严禁数据集文件，页面与组件里严禁 `ref([...])` 硬编码假数据（分册 6）。
 - **Utils-First**：系统信息、环境变量、Toast、路由、通用算法先查 `@/src/utils/` 与 `uni_modules/` 六个生态库，不手写（分册 7）。
@@ -115,7 +118,7 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 
 **触发条件**：代码改完、准备交付。
 
-**处理逻辑**：逐条核对 A.2 的 54 条红线，以及所读分册末尾的自检清单；命中即改，改完重新自检。重点复核：`interface` / `undefined` / `===`、UTS / TS / JS 循环依赖、动态 `:style` 强转、`gap` 与 `space-*`、链式 `.catch()`、页面跳转是否走 `useRouter()`、新增页面是否已建接口层。
+**处理逻辑**：逐条核对 A.2 的 55 条红线，以及所读分册末尾的自检清单；命中即改，改完重新自检。重点复核：`interface` / `undefined` / `===`、UTS / TS / JS 循环依赖、动态 `:style` 强转、`gap` 与 `space-*`、链式 `.catch()`、页面跳转是否走 `useRouter()`、新增页面是否已建接口层、视觉方案是否只是通用模板。
 
 ### 5. 验证与交付
 
@@ -137,9 +140,10 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 
 ## 可选分支
 
-- **新增页面 / 组件**：分册 4（流程与模板）→ 5（层级与拆分）→ 6（接口层）→ 7（工具库）→ 8（路由）；涉及 TabBar 加 9，涉及网络 / 异步 hooks 加 10。
+- **新建页面 / 重做 UI**：分册 11（视觉方向与设计计划）→ 4（流程与模板）→ 5（层级与拆分）→ 6（接口层）→ 7（工具库）→ 8（路由）；涉及 TabBar 加 9，涉及网络 / 异步 hooks 加 10。
+- **新增组件**：分册 4（组件契约与模板）→ 5（组件提升边界）→ 11（组件视觉层级与文案）；涉及样式能力与跨端兼容加 2。
 - **编译 / 运行报错**：按报错码或现象定位分册 1（UTS 语法）或分册 3（跨端运行时）；先找根因，再改代码。
-- **样式 / 布局问题**：分册 2；先确认是哪个端、哪条引擎限制，再改。
+- **样式 / 布局问题**：先判断是「审美与视觉方向」还是「原生样式能否生效」：前者读分册 11 定方向，后者读分册 2 查 flex / 单位 / 文本宿主 / 边框 / 安全区等引擎限制。
 - **接口对接 / Mock 数据**：分册 6；涉及 `src/http` 实例、鉴权、错误归一或 Query hooks 时同时读分册 10；后端就绪只换函数体，签名冻结。
 - **TabBar 配置 / 模式 / 生命周期 / 底部避让**：分册 9；只改 `src/tabbar/config.uts`，业务优先使用 `useTabbar*` hooks。
 - **HTTP / 异步状态管理**：分册 10；页面 → `src/api` → `src/http`，读写分别用 `useQuery` / `useMutation`。
@@ -170,6 +174,7 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 | [references/8-router-spec.md](references/8-router-spec.md) | **8 路由导航与 `useRoute` 手册**（导入口径 · `RouteLocation` 全字段与类型 · 完整 demo · 10 类场景写法 · 14 条坑点 · `useRouter` 速查 · 10 条自检红线） | **页面 / 组件里要做任何跳转（push / replace / switchTab / back）、要读当前路由信息（path / query / meta / name）、准备写 `onLoad(options)` 取参数或手写 `getCurrentPages()` 时必读** |
 | [references/9-tabbar-spec.md](references/9-tabbar-spec.md) | **9 TabBar 业务导航手册**（配置真源 · 五种模式 · `useTabbar` / `useTabbarPage` / `useTabbarTheme` / `useTabbarMetrics` / `useTabbarI18n` 契约 · 角标 / 生命周期 / 安全区写法 · 12 条坑点 · 15 条自检红线） | **新增 / 删除 Tab、切换 `VITE_TABBAR_MODE`、调整 UI 形态、设置角标、监听 Tab 显示、处理底部遮挡与安全区时必读** |
 | [references/10-http-spec.md](references/10-http-spec.md) | **10 HTTP 网络层手册**（`src/http` 业务实例 · `src/api` 三层边界 · `useQuery` / `useMutation` / `useQueryClient` · 上传 / 下载 / 流式 · 401 / Token / 多域名 · 15 条坑点 · 18 条自检红线） | **新增 / 修改接口函数、接入真实后端、使用异步请求 hooks、处理鉴权 / 401 / 统一错误提示时必读** |
+| [references/11-frontend-design.md](references/11-frontend-design.md) | **11 前端设计美学手册**（业务主体 · 设计计划 · 颜色 Token · AppText 排版 · 结构语义 · 动效克制 · 反模板审美 · 文案与真实状态 · uni-app X 落地 · 设计自检） | **新建页面、重做 UI、页面「像模板」、需要确定配色 / 字体 / 布局 / 动效方向，或要把设计稿落到原生端时必读** |
 
 > 📌 **A.1 快速排查对照表**与 **A.2 代码生成红线清单** 因使用频率最高，常驻在本文件末尾，无需额外 Read。
 
@@ -227,7 +232,7 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 ### 示例 1：用户提出「新增一个订单列表页」
 
 - **用户**：帮我加一个订单列表页。
-- **助手**：判定为第 2 级任务 → Read 分册 4 / 5 / 6 / 8 → 照分册 4 模板建页面骨架（上固定 + 下滚动、`availableHeight`）→ 按业务模块接入 `src/api/order/order.uts`（类型与数据集内联） → 跳转走 `useRouter()` → 过 A.2 红线 → 跑编译验证后交付。
+- **助手**：判定为第 2 级任务 → Read 分册 11 / 4 / 5 / 6 / 8 → 先按分册 11 定业务视觉方向与设计计划 → 照分册 4 模板建页面骨架（上固定 + 下滚动、`availableHeight`）→ 按业务模块接入 `src/api/order/order.uts`（类型与数据集内联） → 跳转走 `useRouter()` → 过 A.2 红线 → 跑编译验证后交付。
 
 ### 示例 2：用户贴出编译报错
 
@@ -254,6 +259,11 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 - **用户**：帮我改一下 README 的错别字。
 - **助手**：未命中触发条件 → 不加载分册，直接改并轻量验证。
 
+### 示例 7：用户说「这个页面看起来很 AI、很模板」
+
+- **用户**：这个首页全是圆角卡片和渐变，看起来很模板，帮我改得有自己的气质。
+- **助手**：Read 分册 11 → 先确认业务主体、受众与页面唯一任务 → 写 4–6 色 Token、3–5 级排版与一个 signature 的设计计划 → 自我批判掉通用默认 → 按分册 2 检查原生端可落地性 → 再改页面并截图验收。
+
 ---
 
 ## A.1 快速排查与对照表 (Quick Reference Matrix)
@@ -272,6 +282,7 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 | **等宽字体显示 (`parse-css-font`)** | `class="font-mono"`（原生解析器缺 `font-size` 报错） | 内联 `style="font-family: monospace;"` |
 | **原生 `<button>` 布局限制** | `<button class="items-center justify-center">` | 用 `<view class="flex flex-row items-center justify-center">` 包裹 |
 | **`<view>` 设置文字颜色或字体类样式** | `<view class="text-[#333] text-[30px] font-bold">` | `<text class="text-[#333] text-[30px] font-bold">`（所有端统一：颜色与字体类样式都必须由 `<text>` 承载，`<view>` 不承载） |
+| **页面像 AI 通用模板** | 所有区块都是同款圆角卡片 + 阴影 + 渐变；无业务依据的 `01 / 02 / 03`；每个标题都加全大写 eyebrow | 先读分册 11 写设计计划：业务主体 / 受众 / 唯一任务 / 4–6 个具名十六进制 Token / 3–5 级排版 / 一个 signature；再按分册 2 落到原生端可执行的 flex 与文本规则 |
 | **Align-Items 属性限制** | `class="items-baseline"`（原生不支持 `baseline`） | `class="items-end"` 或 `class="items-center"` |
 | **原生端间距（gap 与 space）支持限制** | 原生 App 端依赖 `gap`、`gap-x-*`、`gap-y-*` 或 `space-x-*`、`space-y-*` | 严禁使用 `gap` 与 `space-*`；水平排列改用 `mr-*` / `ml-*`，垂直列表挂载 `mb-*` 或 `mt-*` |
 | **键盘高度全局监听与解绑平台限制** | App 端调用 `uni.onKeyboardHeightChange`（报错未定义 API / 拼写错误），或向 `uni.offKeyboardHeightChange` 传回调函数（类型不匹配），或事件参数标为 `UniInputKeyboardHeightChangeEventDetail`（抛 ClassCastException 崩溃） | App 端必须通过 `<input>`/`<textarea>` 监听 `@keyboardheightchange` 且参数标为 `UniInputKeyboardHeightChangeEvent`；全局 API 仅限微信小程序（`// #ifdef MP-WEIXIN`），且解绑时必须向 `off` 传入注册返回的 ID（`number`）（详见 **3.3**） |
@@ -379,4 +390,5 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 - [ ] **52. 已有页面不得擅自合并或迁移**：新增页面与已有页面同属一个业务模块时，**必须先询问开发者是否放到同一业务模块目录**；存量页面默认保持原路径与 URL，未经明确同意禁止移动、重构目录层级或合并页面。页面 URL 是历史链接、分享地址、埋点和外部跳转的契约，结构整理不能让已有业务断链（见 5.2 / 5.10）
 - [ ] **53. 纯文本插槽必须由 `<text>` 承载**：组件接收一段纯文本时必须写 `<text><slot>默认文案</slot></text>`，严禁写裸 `<slot>默认文案</slot>` 接收父级文本；若插槽契约是接收任意节点，则保持 `<slot />`，由父级提供完整 `<text>` / `<view>`，禁止统一包进 `<text>`（见 4.7.7）
 - [ ] **54. 严禁 `.uts` / `.ts` / `.js` 循环依赖**：任何直接或间接的 `A → B → A` 都不允许，包含 `import`、`import type`、`export *` 转发及条件编译分支形成的依赖边；必须保持单向 DAG，公共类型 / 常量 / 纯函数下沉到零依赖叶子文件，禁止用「H5 能跑」作为放行依据（见 1.22）
+- [ ] **55. 新建页面 / UI 重做严禁跳过设计判断直接堆模板**：必须先按分册 11 明确业务主体、受众、页面唯一任务、4–6 个颜色 Token、3–5 级排版与一个 signature；除非开发者明确指定视觉方向，否则不得用「所有区块同款圆角卡片 + 阴影 + 渐变 + 无意义编号 / eyebrow」替代业务视觉判断；页面还必须具备适用的空 / 错 / 加载 / 提交中状态与用户可理解的文案（见分册 11）
 
