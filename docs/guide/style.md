@@ -45,7 +45,7 @@ fontStore.resetFontScale();
 - 全局 Store 只缩放使用 `AppText` 渲染的文本，不切换字体族。
 - 原生 `<text>`、`uni-icons` 与第三方组件内部文本不会自动跟随。
 - 字号比例会持久化，`App.uvue` 启动时调用 `initFontScale()` 校正恢复值。
-- 自定义字体示例位于 `src/sub/fontBasicDemo/font/`，仅该演示页按需使用；微信端通过 `loadFontFace` 远程注册，App/H5 使用分包内本地字体。
+- 字体与字号配置统一位于 `src/config/font/font.uts`；字体文件位于 `src/sub/fontBasicDemo/font/`，仅该演示页按需使用。微信端通过 `loadFontFace` 远程注册，App/H5 使用分包内本地字体。
 
 ## 主题与暗黑模式
 

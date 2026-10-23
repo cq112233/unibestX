@@ -154,6 +154,7 @@ fontStore.resetFontScale();
 ```
 
 - 缩放范围是 `0.85 ~ 1.35`，默认 `1`。
+- 缩放范围、默认值与归一化规则统一维护在 [font.uts](../config/font/font.uts)。
 - 只影响使用 `AppText` 渲染的文本；字体演示页的局部字体切换不写入全局 Store。
 - `App.uvue` 启动时调用 `initFontScale()` 校正持久化恢复的比例。
 >
