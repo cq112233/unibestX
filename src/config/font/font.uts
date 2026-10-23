@@ -1,0 +1,45 @@
+/**
+ * 全局字体配置
+ *
+ * 集中维护字号缩放规则与字体标识。字体文件本身仍由各端按需加载。
+ */
+
+/** 默认字号缩放比例 */
+export const DEFAULT_FONT_SCALE = 1;
+
+/** 允许的最小字号缩放比例 */
+export const MIN_FONT_SCALE = 0.85;
+
+/** 允许的最大字号缩放比例 */
+export const MAX_FONT_SCALE = 1.35;
+
+/** 将字号缩放比例限制在安全区间内，并保留两位小数 */
+export function normalizeFontScale(scale: number): number {
+  let next = scale;
+  if (next < MIN_FONT_SCALE) {
+    next = MIN_FONT_SCALE;
+  }
+  if (next > MAX_FONT_SCALE) {
+    next = MAX_FONT_SCALE;
+  }
+  return Math.round(next * 100) / 100;
+}
+
+/** 系统默认字体 id */
+export const SYSTEM_FONT_ID = 'system';
+
+/** 阿里妈妈刀隶体 id */
+export const ALIMAMA_FONT_ID = 'alimama-daoli';
+
+/** 字体注册名：App/H5 本地字体与小程序远程字体共用 */
+export const ALIMAMA_FONT_FAMILY = 'AlimamaDaoLiTiTTF';
+
+/**
+ * 微信小程序 loadFontFace 只支持网络字体。
+ * App / H5 使用分包内的 AlimamaDaoLiTi.ttf，不请求远程资源。
+ */
+export const ALIMAMA_FONT_REMOTE_URL
+  = 'https://cdn.jsdelivr.net/npm/@fontpkg/alimama-dao-li-ti@1.0.5/AlimamaDaoLiTi.ttf';
+
+/** 小程序 loadFontFace 使用的字体地址 */
+export const ALIMAMA_FONT_REMOTE_SOURCE = `url('${ALIMAMA_FONT_REMOTE_URL}')`;

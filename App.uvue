@@ -1,7 +1,7 @@
 <script setup lang="uts">
 import { onAppShow } from '@dcloudio/uni-app';
 import { checkDirectEntry } from '@/uni_modules/route-bestX/index.uts';
-import { useI18nStore, useThemeStore, useTokenStore, useUserStore } from '@/src/store/index.uts';
+import { useFontStore, useI18nStore, useThemeStore, useTokenStore, useUserStore } from '@/src/store/index.uts';
 import type { IUserInfo } from '@/src/store/index.uts';
 import { initNativeMidButtonTap, setTabbarItem } from '@/src/tabbar/index.uts';
 import { applyThemeColor, themeColor } from '@/src/theme/index.uts';
@@ -56,6 +56,10 @@ onLaunch(() => {
   const i18nStore = useI18nStore();
   i18nStore.initLocale();
   setTabbarItem();
+
+  // 恢复并校正持久化的全局字号比例
+  const fontStore = useFontStore();
+  fontStore.initFontScale();
 
   // 注册原生 TabBar 中间按钮监听（仅在原生模式且配置了 midButton 时生效）
   initNativeMidButtonTap();
@@ -117,6 +121,14 @@ onUnhandledRejection((res) => {
 /* #endif */
 /* #ifndef MP-WEIXIN */
 @import './main.css';
+/* #endif */
+
+/* #ifdef APP || H5 || WEB */
+/* 品牌字体仅供字体演示页使用，文件位于分包，避免进入微信小程序主包 */
+@font-face {
+  font-family: AlimamaDaoLiTiTTF;
+  src: url('./src/sub/fontBasicDemo/font/AlimamaDaoLiTi.ttf');
+}
 /* #endif */
 
 /* 阿里 iconfont（uni_modules/ali-iconfont）目前本项目没用到 —— 没有页面渲染 AliIconfontIcon。

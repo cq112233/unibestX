@@ -18,6 +18,8 @@ const composer = uniHelper({
     // 忽略uni_modules目录
     'uni_modules/**',
     '**/uni_modules/**',
+    // ECharts 第三方适配层在微信端复制到分包，保持原厂源码不参与项目风格检查
+    'src/sub/echartsFunctionDemo/components/e-chart/**',
     // 忽略原生插件目录
     'nativeplugins/**',
     '**/nativeplugins/**',
@@ -131,6 +133,7 @@ configs.unshift({
   ignores: [
     'uni_modules/**',
     '**/uni_modules/**',
+    'src/sub/echartsFunctionDemo/components/e-chart/**',
     'nativeplugins/**',
     '**/nativeplugins/**',
     'dist/**',
@@ -275,6 +278,7 @@ configs.push({
   ignores: [
     'uni_modules/**',
     '**/uni_modules/**',
+    'src/sub/echartsFunctionDemo/components/e-chart/**',
     'unpackage/**',
     '**/unpackage/**'
   ],
