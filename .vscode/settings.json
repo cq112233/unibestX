@@ -201,47 +201,6 @@
   "[uts]": {
     "editor.defaultFormatter": "dbaeumer.vscode-eslint"
   },
-  "i18n-ally.localesPaths": [
-    "src/i18n/locales"
-  ],
-  "i18n-ally.pathMatcher": "{locale}.json",
-  "i18n-ally.keystyle": "nested",
-  "i18n-ally.sourceLanguage": "zh-CN",
-  "i18n-ally.displayLanguage": "zh-CN",
-  "i18n-ally.include": [
-    "src/**/*.uvue",
-    "src/**/*.uts",
-    "src/**/*.vue",
-    "src/**/*.ts",
-    "src/**/*.js"
-  ],
-  "i18n-ally.enabledFrameworks": [
-    "vue",
-    "vue-sfc"
-  ],
-  "i18n-ally.enabledParsers": [
-    "ts",
-    "js",
-    "json"
-  ],
-  "i18n-ally.parsers.extendFileExtensions": {
-    "uts": "ts",
-    "uvue": "vue"
-  },
-  // uni-app 的 %key% 页面标题语法不是 Vue i18n 默认的 t('key') 写法。
-  // 第一条识别 %key%，第二条识别 navigationBarTitleText 中直接写 key 的静态标题。
-  "i18n-ally.regex.usageMatchAppend": [
-    "%({key})%",
-    "navigationBarTitleText[^\\n]*?['\"]([A-Za-z_][A-Za-z0-9_-]*(?:\\.[A-Za-z0-9_-]+)+)['\"]"
-  ],
-  "i18n-ally.parsers.typescript.compilerOptions": {
-    "module": "commonjs",
-    "allowJs": true,
-    "target": "es2020",
-    "moduleResolution": "node",
-    "skipLibCheck": true,
-    "strict": false
-  },
   "[typescript]": {
     "editor.defaultFormatter": "dbaeumer.vscode-eslint"
   },
@@ -331,7 +290,6 @@
     "iconify",
     "dayuts",
     "irainna",
-    "echarts",
     "subpackages",
     "volar",
     "vueuse",

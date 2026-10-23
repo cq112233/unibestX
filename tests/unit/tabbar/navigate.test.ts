@@ -20,10 +20,10 @@ describe('switchTabbar', () => {
   it('updates the virtual tab state without a global navigation guard', () => {
     expect(isSinglePageTabbar).toBe(true);
 
-    switchTabbar('/src/pages/basic/basic?id=42');
+    switchTabbar('/src/pages/me/me?id=42');
 
     expect(curIdx.value).toBe(1);
-    expect(readTabPageQuery('/src/pages/basic/basic').get('id')).toBe('42');
+    expect(readTabPageQuery('/src/pages/me/me').get('id')).toBe('42');
   });
 
   it('restores the active virtual tab query after returning to the mode-4 host page', () => {
@@ -59,20 +59,20 @@ describe('switchTabbar', () => {
 
   it('passes source, target, query and trigger to the navigation guard', () => {
     setCurIdx(1);
-    setTabPageUrl('/src/pages/basic/basic?id=7');
+    setTabPageUrl('/src/pages/me/me?id=7');
     let captured: TabNavigationContext | null = null;
     registerTabNavigationGuard((context: TabNavigationContext, next: TabNavigationNext): void => {
       captured = context;
       next(false);
     });
 
-    switchTabbar('/src/pages/me/me?from=third-party&token=abc', 'tabClick');
+    switchTabbar('/src/pages/index/index?from=third-party&token=abc', 'tabClick');
 
     expect(captured).not.toBeNull();
-    expect(captured!.from).toBe('/src/pages/basic/basic?id=7');
-    expect(captured!.fromPath).toBe('/src/pages/basic/basic');
-    expect(captured!.to).toBe('/src/pages/me/me?from=third-party&token=abc');
-    expect(captured!.toPath).toBe('/src/pages/me/me');
+    expect(captured!.from).toBe('/src/pages/me/me?id=7');
+    expect(captured!.fromPath).toBe('/src/pages/me/me');
+    expect(captured!.to).toBe('/src/pages/index/index?from=third-party&token=abc');
+    expect(captured!.toPath).toBe('/src/pages/index/index');
     expect(captured!.query.get('from')).toBe('third-party');
     expect(captured!.query.get('token')).toBe('abc');
     expect(captured!.api).toBe('tabClick');
@@ -89,7 +89,7 @@ describe('switchTabbar', () => {
       }, 0);
     });
 
-    switchTabbar('/src/pages/basic/basic?id=42', 'router');
+    switchTabbar('/src/pages/me/me?id=42', 'router');
 
     expect(steps).toEqual(['before']);
     expect(curIdx.value).toBe(0);
@@ -97,6 +97,6 @@ describe('switchTabbar', () => {
       expect(curIdx.value).toBe(1);
     });
     expect(steps).toEqual(['before', 'after']);
-    expect(readTabPageQuery('/src/pages/basic/basic').get('id')).toBe('42');
+    expect(readTabPageQuery('/src/pages/me/me').get('id')).toBe('42');
   });
 });

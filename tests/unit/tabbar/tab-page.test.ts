@@ -18,39 +18,39 @@ describe('tabbar virtual page route', () => {
   });
 
   it('stores decoded query from a normal router url', () => {
-    setTabPageUrl('/src/pages/basic/basic?id=1&name=%E4%B8%AD%E6%96%87');
+    setTabPageUrl('/src/pages/me/me?id=1&name=%E4%B8%AD%E6%96%87');
 
-    const query = readTabPageQuery('/src/pages/basic/basic');
+    const query = readTabPageQuery('/src/pages/me/me');
     expect(query.get('id')).toBe('1');
     expect(query.get('name')).toBe('中文');
   });
 
   it('keeps the previous query when a tab is clicked without a query', () => {
-    setTabPageUrl('/src/pages/basic/basic?id=1');
-    setTabPageUrl('/src/pages/basic/basic');
+    setTabPageUrl('/src/pages/me/me?id=1');
+    setTabPageUrl('/src/pages/me/me');
 
-    expect(readTabPageQuery('/src/pages/basic/basic').get('id')).toBe('1');
+    expect(readTabPageQuery('/src/pages/me/me').get('id')).toBe('1');
   });
 
   it('activates a tab from host page deep link query', () => {
     const activated = activateTabPageFromHostQuery(
       new Map<string, string>([
-        ['tab', 'basic'],
+        ['tab', 'me'],
         ['id', '42']
       ])
     );
 
     expect(activated).toBe(true);
     expect(curIdx.value).toBe(1);
-    expect(readTabPageQuery('/src/pages/basic/basic').get('id')).toBe('42');
+    expect(readTabPageQuery('/src/pages/me/me').get('id')).toBe('42');
   });
 
   it('returns a copy so callers cannot mutate the route store', () => {
-    setTabPageUrl('/src/pages/basic/basic?id=1');
-    const query = readTabPageQuery('/src/pages/basic/basic');
+    setTabPageUrl('/src/pages/me/me?id=1');
+    const query = readTabPageQuery('/src/pages/me/me');
     query.set('id', 'changed');
 
-    expect(readTabPageQuery('/src/pages/basic/basic').get('id')).toBe('1');
+    expect(readTabPageQuery('/src/pages/me/me').get('id')).toBe('1');
   });
 
   it('runs the host-query pre-action before activating a virtual tab', () => {
@@ -62,7 +62,7 @@ describe('tabbar virtual page route', () => {
 
     const activated = activateTabPageFromHostQuery(
       new Map<string, string>([
-        ['tab', 'basic'],
+        ['tab', 'me'],
         ['from', 'third-party']
       ])
     );
@@ -72,15 +72,15 @@ describe('tabbar virtual page route', () => {
     expect(captured!.api).toBe('hostQuery');
     expect(captured!.query.get('from')).toBe('third-party');
     expect(curIdx.value).toBe(0);
-    expect(readTabPageQuery('/src/pages/basic/basic').has('from')).toBe(false);
+    expect(readTabPageQuery('/src/pages/me/me').has('from')).toBe(false);
   });
 
   it('syncs the H5 host url after switching a virtual tab', () => {
-    window.location.hash = '#/?tab=function&a=1';
-    setTabPageUrl('/src/pages/basic/basic?id=3333');
+    window.location.hash = '#/?tab=index&a=1';
+    setTabPageUrl('/src/pages/me/me?id=3333');
 
-    syncTabPageHostUrl('/src/pages/basic/basic');
+    syncTabPageHostUrl('/src/pages/me/me');
 
-    expect(window.location.hash).toBe('#/?tab=basic&id=3333');
+    expect(window.location.hash).toBe('#/?tab=me&id=3333');
   });
 });

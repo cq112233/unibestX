@@ -76,7 +76,7 @@
         <text
           class="text-[12px] leading-[22px] text-[#475569]"
         >
-          unibestX 是一个集成了多种工具与技术的 uni-appX 开发模板，由 cq112233 开发，基于 uni-appX + Vue3 + UTS + weapp-tailwindcss + VSCode 构建，完美兼容 vapor / vdom 双模式，模板具有代码提示、自动格式化、统一配置、代码片段等功能，并内置了 ECharts 图表、主题配置、暗黑模式、加密方式配置等常用功能与基本组件，让你开发 uni-appX 拥有极致的体验。
+          unibestX 是一个集成了多种工具与技术的 uni-appX 开发模板，由 cq112233 开发，基于 uni-appX + Vue3 + UTS + weapp-tailwindcss + VSCode 构建，完美兼容 vapor / vdom 双模式，模板具有代码提示、自动格式化、统一配置、代码片段等功能，并内置路由、请求、状态管理、TabBar 与工程化质量套件等基础能力，让你开发 uni-appX 拥有极致的体验。
         </text>
 
         <!-- 环境版本要求 -->
@@ -99,7 +99,7 @@
             <text class="text-[10px] text-[#64748b]">交互式一键创建</text>
           </view>
           <text class="text-[11px] text-[#64748b] leading-[18px] mb-[8px]">
-            支持交互式选择 UI 组件库（Rice UI / uview-ultra / 原生）、内置工具库（lime-shared / lime-use / lime-color / crypto-bestX）、按需功能裁剪与完整性自检：
+            支持交互式选择 UI 组件库（Rice UI / uview-ultra / 原生）、基础技术栈、按需功能裁剪与完整性自检：
           </text>
           <view
             class="px-[10px] py-[8px] rounded-[6px] bg-[#0f172a] flex flex-row items-center justify-between active:opacity-90"
@@ -374,11 +374,11 @@
         </view>
       </view>
 
-      <!-- 内置工具库（lime-shared / lime-use / lime-color / lime-dayuts / crypto-bestX） -->
+      <!-- 内置工具库 -->
       <view class="mt-[16px] mx-[16px]">
         <view class="flex flex-row items-center justify-between mb-[10px]">
           <text class="text-[14px] font-bold text-[#1e293b]">🧰 内置工具库</text>
-          <text class="text-[11px] text-[#94a3b8]">uni_modules · CLI 可选配</text>
+          <text class="text-[11px] text-[#94a3b8]">uni_modules · 按需扩展</text>
         </view>
 
         <view
@@ -578,13 +578,12 @@ import {
   useTabPageShell
 } from '@/src/tabbar/index.uts';
 import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/layouts/navbar/utils/index.uts';
-import { useRouter } from '@/uni_modules/route-bestX/index.uts';
 
 import TabPageHost from '@/src/tabbar/components/TabPageHost.uvue';
 
 definePage((options) => {
   const { platform, appName: _appName } = options;
-  const { isH5, isAppIOS, isAppAndroid, isAppHarmony, isMpAlipay, isMpWeixin } = platform;
+  const { isH5 } = platform;
   return {
     customPageClass: 'init-page', // 页面根容器自定义类名（配合 layout 布局使用，支持配置全局样式类）
     customPageStyle: 'background-color: transparent;', // 页面根容器自定义行内样式（穿透任何样式隔离，全端绝对生效）
@@ -598,19 +597,7 @@ definePage((options) => {
     hideNavbar: false, // 是否隐藏顶部导航栏（false 为正常显示）
     enablePullDownRefresh: !isH5, // 是否开启自定义下拉刷新（由 navbar 布局内的 scroll-view 驱动）
     style: {
-      navigationBarTitleText: isH5
-        ? 'h5'
-        : isAppIOS
-          ? 'ios'
-          : isAppAndroid
-            ? 'android'
-            : isAppHarmony
-              ? 'harmony'
-              : isMpAlipay
-                ? 'alipay'
-                : isMpWeixin
-                  ? 'weixin'
-                  : 'tabbar.home', // 页面与导航栏标题文本（支持 i18n 自动翻译）
+      navigationBarTitleText: '首页', // 页面与导航栏标题文本
       navigationStyle: 'custom' // 导航栏样式设为自定义（隐藏系统原生导航栏）
     }
   };
@@ -625,8 +612,6 @@ const {
   onShow: onIndexShow,
   onHide: onIndexHide
 } = useTabPage();
-
-const router = useRouter();
 
 // 监听 navbar 自定义下拉刷新事件（在 enablePullDownRefresh: true 且处于当前 Tab 时生效）
 onNavbarPullDownRefresh(() => {
@@ -747,15 +732,6 @@ const featureList: Array<FeatureItem> = [
     textColor: '#d97706'
   },
   {
-    id: 'permission',
-    title: '🔐 页面与按钮权限',
-    desc: '用户信息直出・入口与按钮按权限显示',
-    configPath: 'src/sub/permissionDemo',
-    bgColor: '#e11d480f',
-    borderColor: '#e11d4826',
-    textColor: '#be123c'
-  },
-  {
     id: 'route-hooks',
     title: '🧩 组合式路由 Hooks',
     desc: 'useRoute / useRouter 双 Hook',
@@ -801,24 +777,6 @@ const featureList: Array<FeatureItem> = [
     textColor: '#059669'
   },
   {
-    id: 'theme',
-    title: '🎨 主题与暗黑模式',
-    desc: '主色调换肤・跟随系统外观',
-    configPath: 'src/theme/index.uts',
-    bgColor: '#a855f70f',
-    borderColor: '#a855f726',
-    textColor: '#9333ea'
-  },
-  {
-    id: 'i18n',
-    title: '🌍 i18n 国际化',
-    desc: '中英多语言・即时动态切换',
-    configPath: 'src/i18n/index.uts',
-    bgColor: '#e11d480f',
-    borderColor: '#e11d4826',
-    textColor: '#e11d48'
-  },
-  {
     id: 'sandbox',
     title: '🧪 沙盒独立调试',
     desc: '单页秒级编译・极速开发',
@@ -830,7 +788,7 @@ const featureList: Array<FeatureItem> = [
   {
     id: 'ecosystem',
     title: '🛠️ 完善配套能力',
-    desc: '图表/分页/加密/UI组件',
+    desc: '分页/图标/日期工具',
     configPath: 'uni_modules 开箱即用',
     bgColor: '#14b8a60f',
     borderColor: '#14b8a626',
@@ -897,39 +855,6 @@ type ToolLibItem = {
 
 const toolLibList: Array<ToolLibItem> = [
   {
-    id: 'lime-shared',
-    title: '🧰 lime-shared',
-    tag: '工具函数库',
-    desc: '零依赖的纯函数集合，覆盖浮点精度运算、序列生成与编号补齐、唯一标识、数组去重与切片分组、对象路径安全取值、命名转换、深比较，以及防抖与随机数。',
-    chips: ['浮点精度', '去重切片', '路径取值', '深比较', '防抖'],
-    configPath: 'uni_modules/lime-shared',
-    bgColor: '#0369a10f',
-    borderColor: '#0369a126',
-    textColor: '#0369a1'
-  },
-  {
-    id: 'lime-use',
-    title: '🧩 lime-use',
-    tag: '组合式函数',
-    desc: '基于 Vue3 组合式 API 的常用逻辑封装，内置倒计时、验证码计时、精准定时器与层级管理，可直接在业务页面中复用，无需重复造轮子。',
-    chips: ['useCountDown', 'useCodeTimer', 'useTimeout', 'useZIndex'],
-    configPath: 'uni_modules/lime-use',
-    bgColor: '#b453090f',
-    borderColor: '#b4530926',
-    textColor: '#b45309'
-  },
-  {
-    id: 'lime-color',
-    title: '🎨 lime-color',
-    tag: '颜色工具',
-    desc: '颜色格式互转、亮度与饱和度调整、配色方案生成与 Ant Design 主题色阶，可直接用于换肤、主题推导与图表配色等场景。',
-    chips: ['格式互转', '亮度调整', '配色方案', 'Ant 色阶'],
-    configPath: 'uni_modules/lime-color',
-    bgColor: '#db27770f',
-    borderColor: '#db277726',
-    textColor: '#db2777'
-  },
-  {
     id: 'lime-dayuts',
     title: '📅 lime-dayuts',
     tag: '日期时间库',
@@ -939,28 +864,6 @@ const toolLibList: Array<ToolLibItem> = [
     bgColor: '#4338ca0f',
     borderColor: '#4338ca26',
     textColor: '#4338ca'
-  },
-  {
-    id: 'bignumber-bestX',
-    title: '🧮 bignumber-bestX',
-    tag: '大数据运算',
-    desc: '任意精度十进制运算库，覆盖加减乘除、取模、幂与开方，支持 2~36 进制、九种舍入模式与千分位格式化，彻底解决 0.1 + 0.2 ≠ 0.3 的浮点误差。',
-    chips: ['任意精度', '四则运算', '幂与开方', '2~36 进制', '九种舍入', '千分位'],
-    configPath: 'uni_modules/bignumber-bestX',
-    bgColor: '#7c3aed0f',
-    borderColor: '#7c3aed26',
-    textColor: '#7c3aed'
-  },
-  {
-    id: 'crypto-bestX',
-    title: '🔐 crypto-bestX',
-    tag: '加密解密',
-    desc: '跨端加密解密套件，涵盖 Base64 编解码、MD5 与 SHA-256 摘要、HMAC 签名、AES / DES 对称加解密、RSA 非对称加解密与验签，以及 UUID 生成。',
-    chips: ['Base64', 'MD5 / SHA-256', 'HMAC', 'AES / DES', 'RSA 验签', 'UUID'],
-    configPath: 'uni_modules/crypto-bestX',
-    bgColor: '#15803d0f',
-    borderColor: '#15803d26',
-    textColor: '#15803d'
   }
 ];
 
@@ -1163,11 +1066,13 @@ function openGithub(): void {
   window.open(url, '_blank');
   // #endif
   // #ifndef WEB
-  router.push({
-    path: '/src/sub/webview/webview',
-    query: {
-      url,
-      title: 'unibestX'
+  uni.setClipboardData({
+    data: url,
+    success: () => {
+      uni.showToast({
+        title: '已复制开源地址',
+        icon: 'success'
+      });
     }
   });
   // #endif

@@ -20,7 +20,7 @@ src/tabbar/config.uts        ← 你改这里（唯一真源）
         │        └─ 从各 Tab 页面的 definePage 同步 title / hideNavbar / 下拉刷新等
         │
         └──► src/tabbar/core/*            （运行时：状态、切换、生命周期、尺寸）
-                 └─ 通过 src/tabbar/adapters/* 读取主题、i18n、navbar、系统与业务配置
+                 └─ 通过 src/tabbar/adapters/* 读取静态色板、文案、navbar、系统与业务配置
                     └─ 由 src/tabbar/index.uts 单层门面统一转发
 ```
 
@@ -52,8 +52,8 @@ src/tabbar/
 │   └── native.uts                #   隐藏原生 tabBar
 ├── adapters/                     # 业务桥接层（唯一允许依赖宿主业务的位置）
 │   ├── config.uts                #   注入 Tab 业务配置
-│   ├── theme.uts                 #   明暗主题色
-│   ├── i18n.uts                  #   Tab 文案国际化
+│   ├── theme.uts                 #   静态主题色板（配套 glassEffect）
+│   ├── i18n.uts                  #   Tab 文案桥接（当前为静态中文）
 │   ├── navbar.uts                #   navbar 显隐 / 下拉刷新桥接
 │   ├── tab-navigation.uts        #   Tab 切换前置处理入口（第三方接入 / 数据预取）
 │   ├── platform.uts              #   H5 / 支付宝小程序等平台判断
@@ -101,7 +101,7 @@ src/tabbar/
    ```uts
    {
      tabType: 'me',                              // ⭐ 业务标识，见下文
-     text: 'tabbar.me',                          // 文案（走 i18n key，或直接写中文）
+     text: '我的',                               // 文案（当前直接写中文）
      pagePath: 'src/pages/me/me',                // 不带前导 /
      iconType: 'icon',                           // 'icon' = uni-icons 字体图标；'image' = 本地图片
      icon: 'person',
@@ -380,18 +380,18 @@ onUnload((): void => {
 });
 
 /** 普通页面写法跳转到另一个 Tab，并带上该 Tab 自己的 query */
-function openBasic(): void {
+function openMe(): void {
   router.push({
-    path: '/src/pages/basic/basic',
+    path: '/src/pages/me/me',
     query: { id: 1 }
   });
 }
 ```
 
 - 在模板里直接写 `{{ route.path }}` / `{{ route.query.get('id') }}`；在 `<script>` 中读取 `route.value`。
-- 该 hook 用于 Tab 页面 `.uvue`：普通 Tab 页面（如 `src/pages/basic/basic.uvue`）的下标由外层 `TabContent` 注入；模式 4 宿主首页则自动按自身路由匹配 Tab，无需额外传参。非 Tab 的普通页面调用时会自动回退到原生 `onLoad / onShow / onHide`，因此也可统一使用这套页面生命周期写法。
-- 页面入口深链使用 `?tab=basic&id=1`：`tab` 支持 `tabType` 或完整 `pagePath`，其余参数写入目标 Tab 的虚拟 query。
-- H5 下切换 Tab 会同步浏览器地址栏为 `?tab=basic&id=1`，刷新页面仍会恢复当前 Tab 及其 query；App / 小程序没有浏览器地址栏，不受影响。
+- 该 hook 用于 Tab 页面 `.uvue`：普通 Tab 页面（如 `src/pages/me/me.uvue`）的下标由外层 `TabContent` 注入；模式 4 宿主首页则自动按自身路由匹配 Tab，无需额外传参。非 Tab 的普通页面调用时会自动回退到原生 `onLoad / onShow / onHide`，因此也可统一使用这套页面生命周期写法。
+- 页面入口深链使用 `?tab=me&id=1`：`tab` 支持 `tabType` 或完整 `pagePath`，其余参数写入目标 Tab 的虚拟 query。
+- H5 下切换 Tab 会同步浏览器地址栏为 `?tab=me&id=1`，刷新页面仍会恢复当前 Tab 及其 query；App / 小程序没有浏览器地址栏，不受影响。
 - 模式 4 的 Tab 切换和入口深链不触发 `router.beforeEach`，但会在写入虚拟状态前执行 Tab 导航前置钩子。钩子可读取来源 Tab、目标 Tab、query 与触发方式，并支持异步完成第三方接入、参数换取或数据预取；从 Tab 进入普通页面时，全局守卫看到的 `from` 仍是真实宿主页 `/src/pages/index/index`。
 - 模式 4 仍是“页面语义仿真”：系统级独立 URL、独立页面栈、原生分享地址和页面级原生路由转场仍不存在；需要这些能力时只能使用真实多页面模式。当前方案解决的问题是**业务开发写法**与**生命周期 / 参数读取**，不是伪造系统页面栈。
 
@@ -428,14 +428,14 @@ Tab 页面 `.uvue` 会同时承担「真实路由页面」与「模式 4 Tab 子
 
 - 被 `TabContent` 嵌套时：跳过页面级 `onShow` / `onHide`，交给 `useTabPage()` 派发；
 - 作为模式 0-3 的真实页面运行时：同步 Tab 下标、通知页面可见性，并安装 Android 返回键处理；
-- 作为模式 4 的宿主页运行时：自动承接 `?tab=basic&id=1` 入口深链、通知页面可见性并安装 Android 返回键处理，不按宿主路由重置当前 Tab；
+- 作为模式 4 的宿主页运行时：自动承接 `?tab=me&id=1` 入口深链、通知页面可见性并安装 Android 返回键处理，不按宿主路由重置当前 Tab；
 - 支付宝小程序中同时隐藏原生「返回首页」按钮。
 
 ```uts
 import { useTabPageShell } from '@/src/tabbar/index.uts';
 
 // 普通 Tab 页面：放在 <script setup> 顶层，参数与 config.uts 中的 tabType 一致
-useTabPageShell('basic');
+useTabPageShell('me');
 
 // 模式 4 宿主页：同样只调用这一处，入口深链与生命周期都由 hook 处理
 useTabPageShell('index');
@@ -488,20 +488,20 @@ const {
 - 在 `.uts` 脚本中读取响应式尺寸要写 `safeAreaBottom.value`。
 - 页面底部避让优先使用 `<TabbarPlaceholder>`，不要自己重复手算高度。
 
-### 7. `useTabbarI18n()`：文案国际化与原生同步
+### 7. `useTabbarI18n()`：静态文案桥接与原生同步
 
 ```uts
 import { useTabbarI18n } from '@/src/tabbar/index.uts';
 
 const { formatTabbarText, setTabbarItem } = useTabbarI18n();
 
-/** 将多语言 key 转成当前语言文案 */
-const homeText = formatTabbarText('tabbar.home');
+/** 读取 Tab 文案（当前直接返回静态中文） */
+const homeText = formatTabbarText('首页');
 ```
 
 | 返回字段 | 说明 |
 | :--- | :--- |
-| `formatTabbarText(text)` | 将多语言 key 转成当前语言文案 |
+| `formatTabbarText(text)` | 读取静态 Tab 文案 |
 | `setTabbarItem()` | 将当前语言文案同步到系统原生 TabBar，通常由 `App.uvue` 调用 |
 
 ### 8. 按场景选择 Hook

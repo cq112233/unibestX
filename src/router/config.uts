@@ -54,9 +54,7 @@ export const DEFAULT_HOME_PAGE: string = '/src/pages/index/index';
  * - 白名单模式下（isNeedLoginMode = true）：作为【免登录白名单】，名单内的页面直接放行免登，名单外的页面未登录时全部拦截并跳转登录页；
  * - 黑名单模式下（isNeedLoginMode = false）：作为【需登录黑名单】，名单内的页面必须登录才能访问，名单外的页面直接放行。
  */
-export const EXCLUDE_LOGIN_PATH_LIST: string[] = [
-  '/src/sub/routerParamsBasicDemo/routerParamsBasicDemo'
-];
+export const EXCLUDE_LOGIN_PATH_LIST: string[] = [];
 
 /**
  * 语义化别名（方便按开发心智直观引用，与 EXCLUDE_LOGIN_PATH_LIST 共享同一份数组）

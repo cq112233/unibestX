@@ -206,21 +206,6 @@ if (typeof (JSON as any).parseObject !== 'function') {
   };
 }
 
-// Mock i18n 避免 lime-i18n 原生 UTS 宏在 Vitest 纯 JS 模拟环境中执行报错
-const mockI18n = {
-  global: {
-    locale: { value: 'zh-Hans' },
-    t: (key: string) => key
-  }
-};
-vi.mock('@/src/i18n', () => ({
-  default: mockI18n,
-  i18n: mockI18n,
-  t: (key: string) => key,
-  getLocale: () => 'zh-Hans',
-  setLocale: vi.fn()
-}));
-
 // Mock uni-app 的组件级页面生命周期：真源要在组件实例上下文里注册，单测里没有实例。
 // useRoute() 每次调用都会注册 onPageShow（页面重新显示时回读路由），故必须打桩。
 vi.mock('@dcloudio/uni-app', () => ({

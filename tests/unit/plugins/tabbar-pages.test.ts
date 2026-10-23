@@ -38,9 +38,6 @@ describe('mode 4 tabbar pages', () => {
     process.env.VITE_TABBAR_MODE = '4';
     const state = createTabbarState([
       { path: 'src/pages/index/index', type: 'home' },
-      { path: 'src/pages/ai/ai' },
-      { path: 'src/pages/basic/basic' },
-      { path: 'src/pages/function/function' },
       { path: 'src/pages/me/me' }
     ]);
 
@@ -49,13 +46,8 @@ describe('mode 4 tabbar pages', () => {
       isProduction: true
     });
 
-    expect(state.output.pages.map(page => page.path)).toEqual([
-      'src/pages/index/index',
-      'src/pages/ai/ai'
-    ]);
+    expect(state.output.pages.map(page => page.path)).toEqual(['src/pages/index/index']);
     expect(state.virtualPages.map(page => page.path)).toEqual([
-      'src/pages/basic/basic',
-      'src/pages/function/function',
       'src/pages/me/me'
     ]);
     expect(state.flags.strictMainPages).toBe(true);
@@ -65,15 +57,12 @@ describe('mode 4 tabbar pages', () => {
     const existing = JSON.stringify({
       pages: [
         { path: 'src/pages/index/index' },
-        { path: 'src/pages/basic/basic' },
-        { path: 'src/pages/me/me' },
-        { path: 'src/pages/ai/ai' }
+        { path: 'src/pages/me/me' }
       ]
     });
     const output = {
       pages: [
-        { path: 'src/pages/index/index' },
-        { path: 'src/pages/ai/ai' }
+        { path: 'src/pages/index/index' }
       ]
     };
 
@@ -81,8 +70,6 @@ describe('mode 4 tabbar pages', () => {
     const paths = JSON5.parse(merged).pages.map((page: TestPage) => page.path);
 
     expect(paths).toContain('src/pages/index/index');
-    expect(paths).toContain('src/pages/ai/ai');
-    expect(paths).not.toContain('src/pages/basic/basic');
     expect(paths).not.toContain('src/pages/me/me');
   });
 
@@ -90,8 +77,6 @@ describe('mode 4 tabbar pages', () => {
     process.env.VITE_TABBAR_MODE = '1';
     const state = createTabbarState([
       { path: 'src/pages/index/index', type: 'home' },
-      { path: 'src/pages/basic/basic' },
-      { path: 'src/pages/function/function' },
       { path: 'src/pages/me/me' }
     ]);
 
@@ -103,8 +88,6 @@ describe('mode 4 tabbar pages', () => {
     expect(state.flags.strictMainPages).toBe(false);
     expect(state.output.pages.map(page => page.path)).toEqual([
       'src/pages/index/index',
-      'src/pages/basic/basic',
-      'src/pages/function/function',
       'src/pages/me/me'
     ]);
 
@@ -116,8 +99,6 @@ describe('mode 4 tabbar pages', () => {
     const merged = mergePagesJson(existing, state.output as any, 'H5', false, [], process.cwd(), false);
     const paths = JSON5.parse(merged).pages.map((page: TestPage) => page.path);
 
-    expect(paths).toContain('src/pages/basic/basic');
-    expect(paths).toContain('src/pages/function/function');
     expect(paths).toContain('src/pages/me/me');
   });
 });

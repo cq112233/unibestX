@@ -1,10 +1,9 @@
 /**
  * 全局系统配置中心
- * 统一收敛所有环境变量 (import.meta.env)、运行环境、隐私协议配置与系统级基础配置
+ * 统一收敛所有环境变量 (import.meta.env)、运行环境与系统级基础配置
  *
  * ⚠️ platform.uts 与 env.uts 各自是「只有一层转发」的叶子：本文件是它们唯一的出口门面，
  *    两个文件之间不互相 `export *`（多层转发会让 Kotlin 端符号被改名，见铁律 1.12 / 红线 15）。
  */
 export * from './env/env.uts';
 export * from './env/platform.uts';
-export * from './privacy/privacy.uts';

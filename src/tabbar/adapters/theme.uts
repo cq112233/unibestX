@@ -1,27 +1,42 @@
 import { computed } from 'vue';
-import { useThemeStore } from '@/src/store/index.uts';
-import { getThemeTokens, themeColor } from '@/src/theme/index.uts';
-import type { ThemeTokens } from '@/src/theme/index.uts';
+
+export type ThemeTokens = {
+  bgContent: string;
+  navBg: string;
+  navText: string;
+  tabBg: string;
+  tabBorder: string;
+  tabColor: string;
+  tabSelected: string;
+};
+
+const defaultTokens: ThemeTokens = {
+  bgContent: '#ffffff',
+  navBg: '#ffffff',
+  navText: '#000000',
+  tabBg: '#ffffff',
+  tabBorder: 'rgba(0, 0, 0, 0.1)',
+  tabColor: '#94a3b8',
+  tabSelected: '#10b981'
+};
 
 /**
- * 当前是否为深色模式（响应式，由业务主题层提供）
+ * 当前是否为深色模式（极简模式固定为 false）
  */
 export const isDark = computed<boolean>((): boolean => {
-  return useThemeStore().state.isDark;
+  return false;
 });
 
 /**
- * TabBar 主题样式令牌（响应式自适应深浅色模式）
- * （当 CLI 裁剪掉 theme 模块时，只需替换本文件为静态固定颜色，TabBar 内部 UI 无需做任何修改）
+ * TabBar 主题样式令牌（极简模式静态固定色板）
  */
 export const themeTokens = computed((): ThemeTokens => {
-  return getThemeTokens(isDark.value);
+  return defaultTokens;
 });
 
 /**
- * TabBar 当前激活的高亮主题色（优先取 store 中的持久化主题色，保底取全局 themeColor）
+ * TabBar 当前激活的高亮主题色（极简模式静态固定色值）
  */
 export const activeThemeColor = computed<string>((): string => {
-  const storeTheme = useThemeStore().state.theme;
-  return storeTheme.length > 0 ? storeTheme : themeColor.value;
+  return '#10b981';
 });

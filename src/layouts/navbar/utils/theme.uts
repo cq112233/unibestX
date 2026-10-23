@@ -1,18 +1,34 @@
 import { computed } from 'vue';
-import { useThemeStore } from '@/src/store/index.uts';
-import { getThemeTokens } from '@/src/theme/index.uts';
-import type { ThemeTokens } from '@/src/theme/index.uts';
+
+export type ThemeTokens = {
+  bgContent: string;
+  navBg: string;
+  navText: string;
+  tabBg: string;
+  tabBorder: string;
+  tabColor: string;
+  tabSelected: string;
+};
+
+const defaultTokens: ThemeTokens = {
+  bgContent: '#ffffff',
+  navBg: '#ffffff',
+  navText: '#000000',
+  tabBg: '#ffffff',
+  tabBorder: 'rgba(0, 0, 0, 0.1)',
+  tabColor: '#94a3b8',
+  tabSelected: '#10b981'
+};
 
 /**
- * 布局主题设计令牌（自适应深浅色模式）
- * （当 CLI 裁剪掉 theme 模块时，只需将本文件替换为静态默认颜色，布局内部 UI 无需做任何修改）
+ * 布局主题设计令牌（极简静态色板）
  */
 export const navbarThemeTokens = computed((): ThemeTokens => {
-  return getThemeTokens(useThemeStore().state.isDark);
+  return defaultTokens;
 });
 
 /**
- * 下拉刷新背景底色（自适应深浅色）
+ * 下拉刷新背景底色
  */
 export const refresherBackground = computed<string>((): string => {
   return navbarThemeTokens.value.bgContent;

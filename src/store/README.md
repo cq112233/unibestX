@@ -18,9 +18,7 @@ src/store/
 ├── vapor/                        # 官方 Pinia 分支（App 蒸汽模式 / H5 / Web / 小程序）
 │   ├── index.uts                 #   创建 pinia 实例 + 持久化插件（只默认导出 pinia）
 │   ├── app.uts                   #   useAppStore     底座上下文（state.mode）
-│   ├── i18n.uts                  #   useI18nStore    多语言
 │   ├── modal.uts                 #   useModalStore   组件实例注册表（无 state）
-│   ├── theme.uts                 #   useThemeStore   主题 / 外观
 │   ├── token.uts                 #   useTokenStore   登录令牌
 │   └── user.uts                  #   useUserStore    用户信息
 └── vdom/                         # x-pinia-s 分支（未开蒸汽的 App 原生端）
@@ -128,17 +126,12 @@ export * from './vdom/foo.uts';
 | Store | 状态 | 主要 API |
 | :--- | :--- | :--- |
 | `useAppStore` | `state.mode`（`'vapor'` / `'vdom'`） | 只读底座上下文，与业务解耦 |
-| `useI18nStore` | `state.locale` | `setLocale(locale)` / `initLocale()` |
-| `useThemeStore` | `state.theme` / `themeMode` / `isDark` | `setTheme(color)` / `setThemeMode(mode)` / `initThemeMode()` / `refreshIsDark()` |
 | `useTokenStore` | 单 token + 双 token + 两个过期时间戳 | `setSingleToken` / `setDoubleToken` / `clearToken` / `getToken` / `isTokenValid` / `isRefreshTokenValid` / `hasLoginInfo` / `hasValidLogin` |
 | `useUserStore` | `state.userInfo` | `setUserInfo` / `setAvatar` / `clearUserInfo` |
 | `useModalStore` | **无 state**（模块级 `Map` 存组件实例） | `setInstance(key, inst)` / `getInstance(key)` / `deleteInstance(key)` |
 
 > 💡 `useModalStore` 刻意不持有 state：组件实例被响应式代理后 `$callMethod` 会失真，且实例不可序列化。
 > 它只负责「按名字存取实例」，弹窗语义留在调用方（见 [modal.uts](vapor/modal.uts) 注释）。
->
-> 💡 `theme` / `i18n` store 是「换肤 / 切语言」的**唯一写入口**，细节见 [src/theme/README.md](../theme/README.md)
-> 与 [src/i18n/README.md](../i18n/README.md)。
 
 ---
 
@@ -166,7 +159,7 @@ import pinia from './vdom/index.uts';
 
 ## 类型为什么内联镜像
 
-[vapor/](vapor/) 下的文件在 TS 侧**不能** `import type { IThemeState } from '../types.uts'` —— `.uts` 在 TS 里只有通配 `any` 声明（见 [src/types/uts-shim.d.ts](../types/uts-shim.d.ts)），具名类型导入会被当作命名空间报 `TS2709`。因此：
+[vapor/](vapor/) 下的文件在 TS 侧**不能**直接 `import type { IUserInfo } from '../types.uts'` —— `.uts` 在 TS 里只有通配 `any` 声明（见 [src/types/uts-shim.d.ts](../types/uts-shim.d.ts)），具名类型导入会被当作命名空间报 `TS2709`。因此：
 
 - **vapor 分支**：内联镜像一份 `type`，注释里标明「真源见 `../types.uts`」；
 - **vdom 分支**：正常 `import type`（走 UTS 链路，无此问题）；
@@ -192,6 +185,3 @@ import pinia from './vdom/index.uts';
 | 页面 | 演示内容 |
 | :--- | :--- |
 | [src/sub/auth/login.uvue](../sub/auth/login.uvue) | token / user store 的登录、清除 |
-| [src/sub/themeBasicDemo](../sub/themeBasicDemo/themeBasicDemo.uvue) | theme store 换肤与外观模式 |
-| [src/sub/langBasicDemo](../sub/langBasicDemo/langBasicDemo.uvue) | i18n store 切换语言 |
-| [src/sub/modalBasicDemo](../sub/modalBasicDemo/modalBasicDemo.uvue) | modal store 实例注册与跨层级调用 |

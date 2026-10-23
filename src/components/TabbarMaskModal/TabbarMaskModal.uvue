@@ -169,7 +169,6 @@
 
 <script setup lang="uts">
 import { computed, ref } from 'vue';
-import { useThemeStore } from '@/src/store/index.uts';
 import type { IModalPayload } from '@/src/store/index.uts';
 
 const props = defineProps({
@@ -250,8 +249,7 @@ const displayTitle = computed((): string => {
   return payloadTitle.value.length > 0 ? payloadTitle.value : props.title;
 });
 
-const themeStore = useThemeStore();
-const isDark = computed((): boolean => themeStore.state.isDark);
+const isDark = computed((): boolean => false);
 
 function handleClose(): void {
   // 命令式那条路径必须在这里收口：否则点遮罩 / ✕ / 底部按钮只会 emit 事件，

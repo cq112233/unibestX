@@ -162,7 +162,7 @@ function openDetail(): void {
 /** 命名路由：params 自动转为 query */
 function openByName(): void {
   router.push({
-    name: 'routerParamsBasicDemo',
+    name: 'me',
     params: { id: 1002, from: 'name-route' }
   });
 }
@@ -352,8 +352,8 @@ import {
 
 setMaintenanceMode(true);
 setMaintenanceWhiteList([
-  '/src/sub/maintenance/maintenance',
-  '/src/sub/privacy/privacy'
+  '/src/pages/index/index',
+  '/src/sub/auth/login'
 ]);
 ```
 

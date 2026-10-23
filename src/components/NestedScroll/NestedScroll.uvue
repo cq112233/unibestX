@@ -147,7 +147,6 @@
 
 <script setup lang="uts">
 import { computed, nextTick, onMounted, ref, useSlots, watch } from 'vue';
-import { useThemeStore } from '@/src/store/index.uts';
 
 const props = defineProps({
   /** 是否开启下拉刷新 */
@@ -318,8 +317,7 @@ const refresherDefaultStyle = computed((): string => {
   return hasRefresherSlot.value ? 'none' : 'black';
 });
 
-const themeStore = useThemeStore();
-const isDark = computed((): boolean => themeStore.state.isDark);
+const isDark = computed((): boolean => false);
 
 const innerRefreshing = ref<boolean>(props.refreshing);
 const scrollTop = ref<number>(0);
