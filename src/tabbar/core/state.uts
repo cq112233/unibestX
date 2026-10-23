@@ -3,6 +3,7 @@ import type { CustomTabBarItem, CustomTabBarItemBadge, TabBarConfig } from './ty
 import { customTabbarConfig } from '../adapters/config.uts';
 import { cleanPath, getCurrentPath, isSamePath } from './path.uts';
 import { registerFullTabbarListGetter, resolveTabIndex, resolveTabIndexByKey } from './tab-key.uts';
+import { isSinglePageTabbar } from './strategy.uts';
 
 /** 组合 list 与 midButton 供自定义 TabBar 渲染（自动将 midButton 插入居中位置，核心状态） */
 function buildFullTabbarList(config: TabBarConfig): CustomTabBarItem[] {
@@ -133,8 +134,16 @@ export function setCurIdxByPath(path: string): void {
   }
 }
 
-/** 根据当前页面路径自动同步索引 */
+/**
+ * 根据当前页面路径自动同步索引。
+ *
+ * 模式 4 的页面栈顶始终是宿主页（如首页），不能据此推断当前激活的是哪个 Tab；
+ * 若继续同步，会把入口深链或懒加载 Tab 的 curIdx 错误重置回宿主页对应的下标。
+ */
 export function syncCurIdxByCurrentPage(): void {
+  if (isSinglePageTabbar) {
+    return;
+  }
   const currentPath = getCurrentPath();
   if (currentPath.length == 0) {
     return;

@@ -6,7 +6,7 @@
 >
 > **与其它分册的分工**：页面与组件的代码怎么写看**分册 4**；接口函数内部怎么写看**分册 6**；`http` / Query hooks 怎么用看**分册 10**。本分册只回答：**文件放哪、谁能取数、数据怎么流**。
 >
-> **30 秒速记**：TabBar 页是独立单页，根组件在 `views/`；非 TabBar 多页面可建议按业务模块聚合，但**已有页面不得擅自迁移、合并或改 URL**；`components/`、`common/`、`modules/` 全部按需创建，简单业务默认只写根页面；`modules/` 仅用于有独立状态或取数职责的复杂业务区块；只有根组件和模块组件能发请求；`modules/` 下不设 `common`；超过 2 个页面复用才提升到 `src/components/`；API 按业务模块聚合。
+> **30 秒速记**：TabBar 页与普通页一样，由 `src/pages/<page>/<page>.uvue` 直接承担根组件职责，**没有 `views/`**；非 TabBar 多页面可建议按业务模块聚合，但**已有页面不得擅自迁移、合并或改 URL**；`components/`、`common/`、`modules/` 全部按需创建，简单业务默认只写根页面；`modules/` 仅用于有独立状态或取数职责的复杂业务区块；只有根组件和模块组件能发请求；`modules/` 下不设 `common`；超过 2 个页面复用才提升到 `src/components/`；API 按业务模块聚合。
 
 ---
 
@@ -19,10 +19,10 @@
           └── 纯展示视图
 ```
 
-但 **TabBar 页面是例外**：它本身就是独立单页，不参与“同一业务模块多页面聚合”。
+其中 **TabBar 页面采用单页形态**：它不参与“同一业务模块多页面聚合”，目录与根组件写法仍和非 TabBar 页面一致。
 
 ```text
-TabBar 页面        = 单页结构，根组件在 views/<Page>View.uvue
+TabBar 页面        = 单页结构，根组件为 src/pages/<page>/<page>.uvue
 非 TabBar 单页     = 直接放在 src/sub/<page>/
 非 TabBar 多页面   = 聚合到 src/sub/<business-module>/<page>/
 API                = 始终按业务模块聚合到 src/api/<business-module>/
@@ -40,18 +40,14 @@ TabBar 页面是单页业务，不建 `src/sub/<module>/` 式页面分组。
 
 ```text
 src/pages/home/
-├── home.uvue                    # 薄壳：definePage + Tab 联动 + 生命周期
-└── views/
-    └── HomeView.uvue            # 根组件：页面内容 + 接口
+└── home.uvue                    # 根组件：definePage + Tab 语义 + 页面内容 + 接口
 ```
 
 页面较大、确实需要拆视图时：
 
 ```text
 src/pages/order/
-├── order.uvue                    # 薄壳：definePage + Tab 联动 + 生命周期
-├── views/
-│   └── OrderView.uvue            # 根组件：页面结构 + 多模块共享接口
+├── order.uvue                    # 根组件：页面结构 + Tab 语义 + 多模块共享接口
 ├── components/                   # 根组件直属视图，纯展示
 │   ├── OrderHeader.uvue
 │   └── OrderFilter.uvue
@@ -78,11 +74,13 @@ src/pages/order/
 
 规则：
 
-1. `order.uvue` 只做薄壳，**不发 HTTP**。
-2. `views/OrderView.uvue` 是真正的页面根组件。
-3. `modules/<block>/` 是页面内业务区块，不是独立页面，也不是业务模块目录。
-4. `modules/` 下**不允许出现 `common/`**。
-5. `components/`、`common/`、`modules/` 都是按需创建，不能为了结构完整提前建空目录。
+1. `order.uvue` 就是页面根组件，**可以发 HTTP**，不再拆入口薄壳。
+2. TabBar 页不存在 `views/` 目录，也不生成 `views/<Page>View.uvue`。
+3. 模式 4 的 Tab 页面用 `useTabPageShell(tabType)` 兼容“真实页面 / Tab 子页”双身份，用 `useTabPage()` 获取页面生命周期与虚拟路由。
+4. 只有宿主首页使用 `TabPageHost` 承载全部 Tab；普通 Tab 页面不挂载 `TabPageHost` / `Tabbar`。
+5. `modules/<block>/` 是页面内业务区块，不是独立页面，也不是业务模块目录。
+6. `modules/` 下**不允许出现 `common/`**。
+7. `components/`、`common/`、`modules/` 都是按需创建，不能为了结构完整提前建空目录。
 
 ### 2. 非 TabBar 单页
 
@@ -144,7 +142,7 @@ src/sub/order/
 
 | 页面形态 | 页面目录 | 根组件 | 是否有 `views/` |
 | :--- | :--- | :--- | :--- |
-| TabBar 页面 | `src/pages/<page>/` | `views/<Page>View.uvue` | ✅ |
+| TabBar 页面 | `src/pages/<page>/` | `<page>.uvue` | ❌ |
 | 非 TabBar 单页 | `src/sub/<page>/` | `<page>.uvue` | ❌ |
 | 非 TabBar 多页面 | `src/sub/<module>/<page>/` | `<page>.uvue` | ❌ |
 
@@ -156,8 +154,7 @@ src/sub/order/
 
 ```text
 <page>/
-├── <page>.uvue                  # 普通页根组件
-├── views/<Page>View.uvue        # TabBar 页根组件（仅 TabBar 页）
+├── <page>.uvue                  # 页面根组件（普通页与 TabBar 页相同）
 ├── components/                  # 可选：根组件直属视图，纯展示
 ├── common/                      # 可选：页面级通用视图，纯展示
 └── modules/                     # 可选：复杂业务区块
@@ -435,8 +432,11 @@ import type { OrderItem } from '@/src/api/order/types.uts';
 
 | 问题 | 答案 |
 | :--- | :--- |
-| TabBar 页面怎么放？ | `src/pages/<page>/`，根组件在 `views/<Page>View.uvue` |
-| TabBar 入口做什么？ | 只做 `definePage`、Tab 联动和生命周期，不发 HTTP |
+| TabBar 页面怎么放？ | `src/pages/<page>/<page>.uvue` 直接作为根组件 |
+| TabBar 页面有 `views/` 吗？ | 没有；与普通页一致，不拆入口薄壳 |
+| TabBar 页面能发 HTTP 吗？ | 可以；它就是页面根组件 |
+| TabBar 页面怎么接页面语义？ | 用 `useTabPageShell(tabType)` + `useTabPage()` |
+| 模式 4 的宿主容器放哪？ | 只在宿主首页使用 `TabPageHost`；普通 Tab 页不挂载 |
 | 非 TabBar 单页怎么放？ | `src/sub/<page>/<page>.uvue` |
 | 同一业务模块多个非 TabBar 页面怎么放？ | `src/sub/<module>/<page>/<page>.uvue` |
 | 新增页面与已有页面同属一个业务模块怎么办？ | 先询问是否聚合；已有页面默认原位保留，未经确认不得移动或改 URL |
@@ -460,8 +460,8 @@ import type { OrderItem } from '@/src/api/order/types.uts';
 
 ## 5.10 自检红线清单
 
-- [ ] **1. 页面形态判定**：TabBar 页有 `views/`，非 TabBar 页没有。
-- [ ] **2. TabBar 薄壳**：入口 `.uvue` 不发 HTTP，根组件在 `views/<Page>View.uvue`。
+- [ ] **1. 页面形态判定**：TabBar 页与普通页都由 `<page>.uvue` 承担根组件，均没有 `views/`。
+- [ ] **2. TabBar 根组件**：`src/pages/<page>/<page>.uvue` 可直接发 HTTP，并用 `useTabPageShell(tabType)` + `useTabPage()` 接入 TabBar 页面语义。
 - [ ] **3. 业务模块聚合**：新增页面可按 `src/sub/<module>/` 聚合，但已有页面未经开发者确认不得迁移或合并。
 - [ ] **4. 页面内结构**：只使用 `components / common / modules` 这些约定位置；三者均按需创建，简单页可以只有根组件。
 - [ ] **5. 模块目录**：`modules/` 下只有业务区块，不存在 `common/`。

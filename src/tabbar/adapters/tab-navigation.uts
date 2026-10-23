@@ -1,0 +1,31 @@
+import type { TabNavigationContext, TabNavigationNext } from '../core/tab-navigation.uts';
+import { registerTabNavigationGuard } from '../core/tab-navigation.uts';
+
+/**
+ * 模式 4 Tab 切换前置处理入口。
+ *
+ * 可读取：
+ * - `context.from` / `context.fromPath`：来源 Tab 的完整 URL / path
+ * - `context.to` / `context.toPath`：目标 Tab 的完整 URL / path
+ * - `context.query`：目标 query（已解码）
+ * - `context.api`：tabClick / router / hostQuery / switchTabbar
+ *
+ * 前置操作完成后必须调用 `next(true)` 放行或 `next(false)` 取消；支持异步调用。
+ */
+export function setupTabNavigationGuard(): void {
+  registerTabNavigationGuard((context: TabNavigationContext, next: TabNavigationNext): void => {
+    console.log(context, 'context');
+    // 按来源执行第三方接入、参数换取、埋点、数据预取等前置操作。
+    //
+    // 示例（伪代码）：
+    // if (context.api == 'hostQuery' && context.query.get('from') == 'third-party') {
+    //   fetchThirdPartySession(context.query).then((_res: any): void => {
+    //     next(true);
+    //   }, (_err: any): void => {
+    //     next(false);
+    //   });
+    //   return;
+    // }
+    next(true);
+  });
+}

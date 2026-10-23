@@ -57,6 +57,7 @@ function runGuardsPipeline(to: RouteTarget, from: RouteTarget, next: NextFunctio
 export function setupRouteGuards(router: Router): void {
   // 1. 注册全局前置守卫（责任链流水线）
   router.beforeEach((to: RouteTarget, from: RouteTarget, next: NextFunction, api?: string): any | null => {
+    console.log('[Router beforeEach] 路由跳转:', to.path, 'from:', from.path, 'api:', api);
     runGuardsPipeline(to, from, next, api);
     return null;
   });

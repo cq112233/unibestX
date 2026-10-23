@@ -4,6 +4,25 @@ import process from 'node:process';
 import JSON5 from 'json5';
 import { loadPlatformPagesJson } from './pages-json-util';
 
+/** 读取 VITE_TABBAR_MODE；优先环境变量，其次项目根目录 .env */
+function getTabbarMode(projectRoot: string): string {
+  if (process.env.VITE_TABBAR_MODE != null && process.env.VITE_TABBAR_MODE !== '') {
+    return process.env.VITE_TABBAR_MODE.trim();
+  }
+  try {
+    const envPath = path.resolve(projectRoot, '.env');
+    if (fs.existsSync(envPath)) {
+      const content = fs.readFileSync(envPath, 'utf-8');
+      const match = content.match(/^VITE_TABBAR_MODE\s*=\s*['"]?([^'"\r\n]+)['"]?/m);
+      if (match != null && match[1] != null) {
+        return match[1].trim();
+      }
+    }
+  }
+  catch {}
+  return '1';
+}
+
 /**
  * 驼峰转连字符 helper
  */
@@ -147,6 +166,11 @@ export function uniLayoutsPlugin(options: UniLayoutsOptions = {}) {
   } | null = null;
   let lastPagesJsonMTime = 0;
 
+  /** 模式 4 下由 TabViews 直接 import 的页面（这些页面已被宿主布局包裹，不能再套 navbar） */
+  let cachedEmbeddedTabPages: Set<string> | null = null;
+  let lastTabViewsMTime = 0;
+  let tabbarMode = '1';
+
   // 辅助函数：去除 JSON 注释并解析
   function loadPagesJson() {
     const pageLayouts = new Map<string, { layout?: string | boolean; params: Record<string, any> }>();
@@ -237,6 +261,34 @@ export function uniLayoutsPlugin(options: UniLayoutsOptions = {}) {
     return cachedPagesData;
   }
 
+  /** 解析生成的 TabViews.uvue，返回其中直接导入的页面路径集合 */
+  function getEmbeddedTabPages(): Set<string> {
+    const tabViewsPath = path.resolve(projectRoot, 'src/tabbar/components/TabViews.uvue');
+    if (!fs.existsSync(tabViewsPath)) {
+      return new Set();
+    }
+    try {
+      const stat = fs.statSync(tabViewsPath);
+      if (cachedEmbeddedTabPages != null && stat.mtimeMs == lastTabViewsMTime) {
+        return cachedEmbeddedTabPages;
+      }
+      const content = fs.readFileSync(tabViewsPath, 'utf-8');
+      const pages = new Set<string>();
+      const importRegex = /import\s+\w+\s+from\s+['"]@\/(src\/[^'"]+\.(?:uvue|vue))['"]/g;
+      let match = importRegex.exec(content);
+      while (match != null) {
+        pages.add(match[1].replace(/\.(uvue|vue)$/, ''));
+        match = importRegex.exec(content);
+      }
+      cachedEmbeddedTabPages = pages;
+      lastTabViewsMTime = stat.mtimeMs;
+      return pages;
+    }
+    catch {
+      return new Set();
+    }
+  }
+
   type ResolvedLayout = {
     fileName: string;
     importPath: string;
@@ -289,6 +341,7 @@ export function uniLayoutsPlugin(options: UniLayoutsOptions = {}) {
       projectRoot = config.root || process.cwd();
       layoutDir = path.resolve(projectRoot, layoutDirName);
       pagesJsonPath = path.resolve(projectRoot, 'pages.json');
+      tabbarMode = getTabbarMode(projectRoot);
     },
     buildStart() {
     },
@@ -370,6 +423,15 @@ export function uniLayoutsPlugin(options: UniLayoutsOptions = {}) {
 
       // 3. 移去代码中的 <route> 标签块
       let cleanCode = code.replace(routeRegex, '');
+
+      // 模式 4：TabViews 直接复用的页面只作为组件渲染，布局已由宿主页提供。
+      // 若继续按 pages.json 注册页处理，会再包一层 navbar，出现双导航栏。
+      if (tabbarMode == '4' && getEmbeddedTabPages().has(cleanRelativeId)) {
+        return {
+          code: cleanCode,
+          map: null
+        };
+      }
 
       // 4. 从 pages.json 中获取 layout，如果 route 块和 definePage 中未指定的话
       const pageConfig = pageLayouts.get(cleanRelativeId);

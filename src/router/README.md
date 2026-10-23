@@ -1,6 +1,6 @@
 # src/router 业务路由层（基于 route-bestX）
 
-本项目路由系统**基于 [`route-bestX`](../../uni_modules/route-bestX/readme.md) 模块开发**，不是自研路由引擎。`src/router` 负责在模块能力之上组装业务守卫、登录鉴权、TabBar 桥接和页面路由表。
+本项目路由系统**基于 [`route-bestX`](../../uni_modules/route-bestX/readme.md) 模块开发**，不是自研路由引擎。`src/router` 负责在模块能力之上组装业务守卫、登录鉴权和页面路由表。
 
 - **底层路由引擎**：[`@/uni_modules/route-bestX`](../../uni_modules/route-bestX/readme.md)（纯 UTS、对标 Vue Router 4、页面快照隔离、全平台导航拦截）
 - **业务路由层**：`src/router/`（初始化单例、注册守卫、维护登录策略、转发 Hooks）
@@ -15,7 +15,7 @@
 | 能力 | 所在位置 | 说明 |
 | :--- | :--- | :--- |
 | 路由引擎 | `uni_modules/route-bestX/` | `createRouter`、`useRouter`、`useRoute`、守卫、拦截器、URL 工具 |
-| 业务门面 | `src/router/index.uts` | 创建全局 `router` 单例，注册 TabBar 桥接与业务守卫 |
+| 业务门面 | `src/router/index.uts` | 创建全局 `router` 单例并注册业务守卫 |
 | 全局守卫 | `src/router/guards/` | 维护公告守卫、登录守卫及责任链编排 |
 | 业务配置 | `src/router/config.uts` | 登录页、注册页、首页、登录策略与黑白名单 |
 | 页面路由表 | `virtual:uni-pages-route-table` | 构建期按 `definePage` / `pages.json` 生成；导出 `PAGES_ROUTE_TABLE_JSON` / `PAGES_ROUTE_TABLE`（路径 map 的字符串与对象）以及 `PAGES_ROUTE_TABLE_LIST_JSON` / `PAGES_ROUTE_TABLE_LIST`（数组的字符串与对象） |
@@ -40,7 +40,7 @@ import { getCurrentPath, isSamePath } from '@/uni_modules/route-bestX/index.uts'
 
 ```text
 src/router/
-├── index.uts                     # 路由入口：初始化单例、注册 TabBar 桥接与业务守卫
+├── index.uts                     # 路由入口：初始化单例并注册业务守卫
 ├── config.uts                    # 登录页、注册页、首页、登录策略与黑白名单
 ├── guards/
 │   ├── index.uts                 # 守卫责任链：维护守卫 -> 登录守卫 -> 放行
@@ -254,6 +254,41 @@ function runGuardsPipeline(
 | `next('/src/sub/auth/login')` | 中断原导航并改跳登录页 |
 | `next({ path: '/src/sub/auth/login', query: { redirect: to.fullPath }, replace: true })` | 改跳并替换当前页面，避免返回后再次被拦截 |
 
+#### 模式 4：虚拟 Tab 切换的前置钩子
+
+模式 4 的 Tab 切换发生在宿主页内部，不会调用 `uni.switchTab` 等系统导航 API，也不会触发 route-bestX 的全局 `beforeEach` / `afterEach`。需要前置处理时，使用 Tab 级导航钩子，而不是把虚拟切换重新桥接回全局路由。
+
+默认入口在 `src/tabbar/adapters/tab-navigation.uts`，`src/router/index.uts` 只负责调用 `setupTabNavigationGuard()` 安装。业务也可以通过 `registerTabNavigationGuard()` 注册自己的前置处理：
+
+```uts
+import type { TabNavigationContext, TabNavigationNext } from '@/src/tabbar/index.uts';
+import { registerTabNavigationGuard } from '@/src/tabbar/index.uts';
+
+registerTabNavigationGuard((context: TabNavigationContext, next: TabNavigationNext): void => {
+  // 第三方入口：先换取会话 / 预取数据，再放行
+  if (context.api == 'hostQuery' && context.query.get('from') == 'third-party') {
+    exchangeThirdPartySession(context.query).then((_res: any): void => {
+      next(true);
+    }, (_err: any): void => {
+      next(false);
+    });
+    return;
+  }
+  next(true);
+});
+```
+
+| 上下文字段 | 说明 |
+| :--- | :--- |
+| `from` / `fromPath` | 来源虚拟 Tab 的完整 URL / path；用于判断从哪个 Tab 发起的切换 |
+| `to` / `toPath` | 目标虚拟 Tab 的完整 URL / path |
+| `query` | 目标 URL 的 query，值已解码；第三方来源参数也从这里读取 |
+| `api` | 触发来源：`tabClick` / `router` / `hostQuery` / `switchTabbar` |
+
+`next(true)` 后才会写入 `curIdx` / 虚拟 query / H5 地址栏；`next(false)` 保持原状。前置操作支持异步，但必须且只能完成一次。新的 Tab 切换开始后，上一次未完成的异步结果会被忽略。
+
+Tab → 普通页面（例如「我的 → 登录」）仍会走正常全局守卫，此时 `from` 是真实宿主页 `/src/pages/index/index`，不是虚拟 Tab 路径。
+
 新增业务守卫时：
 
 1. 在 `src/router/guards/` 新建 `guardXxx.uts`，导出接收 `RouteGuardContext` 的纯函数。
@@ -350,7 +385,7 @@ onShow((options?) => {
 });
 ```
 
-### 6. TabBar 桥接
+### 6. TabBar 分流
 
 `src/router/index.uts` 将 route-bestX 与项目自定义 TabBar 连接起来：
 

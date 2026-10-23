@@ -33,6 +33,7 @@ Skills 位于 `.agents/skills/` 目录，目前**只保留 `unibestX-skill` 一�
 - **核心工具库优先（Utils-First）**：获取系统尺寸与高度优先使用 `@/src/utils/systemInfo`，环境变量与接口域名优先使用 `@/src/utils/env`，开发中所需的基础通用方法优先使用 `@/src/utils/...`（详见分册 7）。
 - **必须遵守 `.agents/rules/` 下的项目规则**（按触发方式分层加载）：`base-lines.md`（Always On，最高底线）、`api-standard.md` / `page-standard.md` / `router-standard.md`（Glob，写对应文件时自动加载）、`naming-standard.md` / `commit-rule.md`（Model Decision，按需加载）。规则文件只写「对错判定」，**用法、类型、模板与正反例一律查 `unibestX-skill` 分册**，命中场景必须加载对应分册。
 - **一律禁止使用 `interface`**：在本项目中定义任何对象结构、状态、参数或返回值类型时，**一律禁止使用 `interface`**，**必须全部统一使用 `type`（类型别名）**，避免触发 UTS 底层对对象字面量赋值的 `UTS110111163` 编译错误。
+- **AI 代码零新增 warning**：仓库存量 ESLint / Stylelint warning 默认忽略；AI 新建或修改的代码**不得新增任何 warning，也不得扩大原文件的 warning 数量**。交付前必须运行作用于改动文件的 ESLint / Stylelint 校验；禁止用大范围 `eslint-disable` / `stylelint-disable` 掩盖问题，确属框架误报时只能在命中行或单文件做精确豁免并注明原因。
 
 ## 第三方依赖目录读取约束
 

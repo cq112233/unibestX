@@ -12,7 +12,7 @@
 
 ---
 
-## 4.0 先记住这 10 条
+## 4.0 先记住这 11 条
 
 1. 简单业务默认只写根页面，`components/` 可选，`modules/` 可选，**不要为了拆而拆**。
 2. `modules/` 下没有 `common/`。
@@ -24,6 +24,7 @@
 8. `enablePullDownRefresh` 默认 `false`；只有明确需要页面下拉刷新才写 `true`，并闭环停止刷新。
 9. Query / Mutation 解构出的状态本身是 Ref：模板直接写 `listPending`，不写 `listPending.value`；script 内读值才写 `.value`。
 10. 不为纯转发创建 `computed`。只有字段转换、组合、过滤、排序等真实派生才用 `computed`。
+11. TabBar 页和普通页都是 `<page>.uvue` 根组件，**没有 `views/` 文件夹**；TabBar 页只是额外接入 TabBar 页面语义。
 
 ---
 
@@ -33,8 +34,7 @@
 
 ```text
 <page>/
-├── <page>.uvue                  # 非 TabBar 页根组件；TabBar 页这里是薄壳
-├── views/<Page>View.uvue        # 仅 TabBar 页：真正的页面根组件
+├── <page>.uvue                  # 页面根组件；TabBar 页也是页面根组件，不再拆 views/
 ├── components/                  # 可选：根组件直属纯展示视图
 ├── common/                      # 可选：页面内多处复用的纯展示视图
 └── modules/                     # 可选：复杂页面的独立业务区块
@@ -69,7 +69,7 @@
 | `modules/<block>/components/` | ❌ | 纯展示，Props / Emits |
 | `src/components/` | ❌ | 跨页面公共纯展示组件 |
 
-TabBar 入口薄壳只做 `definePage`、Tab 联动和生命周期，不发 HTTP；请求放在 `views/<Page>View.uvue`。
+TabBar 页面同样由 `<page>.uvue` 承担页面根组件职责，可以直接发 HTTP。模式 4 下它还会被 `TabViews.uvue` 复用为 Tab 子组件，因此需要页面语义时使用 `useTabPage()`，需要同时兼容真实页面与 Tab 子页双身份时使用 `useTabPageShell(tabType)`。
 
 ---
 
@@ -140,21 +140,40 @@ onNavbarReachBottom((): void => {
 });
 ```
 
-### 4.2.4 TabBar 页薄壳
+### 4.2.4 TabBar 页
+
+TabBar 页与普通页的目录、模板和取数职责相同：页面 `.uvue` 本身就是业务根组件，模式 4 会由 `TabViews.uvue` 直接复用它，不存在“入口薄壳 + `views/<Page>View.uvue`”的第二层结构。
+
+| 对比项 | 普通页面 | TabBar 页面 |
+| :--- | :--- | :--- |
+| 根组件 | `<page>.uvue` | `<page>.uvue` |
+| `views/` 文件夹 | 无 | **无** |
+| 是否可发 HTTP | 可以 | 可以 |
+| 页面生命周期 | 原生 `onLoad` / `onShow` / `onHide` | `useTabPage()` 派发 |
+| 双身份适配 | 不需要 | 调用 `useTabPageShell(tabType)` |
+| 宿主容器 | 不需要 | 仅模式 4 宿主首页使用 `TabPageHost` |
+
+普通 TabBar 页的标准结构（参考当前项目 `src/pages/index/index.uvue` 的接入方式）：
 
 ```html
 <!-- src/pages/basic/basic.uvue -->
 <template>
-  <BasicView />
+  <view class="flex flex-col p-[16px]">
+    <!-- 页面内容直接写在这里 -->
+  </view>
 </template>
 
 <script setup lang="uts">
-import BasicView from './views/BasicView.uvue';
 import {
-  notifyPageHide,
-  notifyPageShow,
-  setCurIdxByKey
+  curIdx,
+  resolveTabIndexByKey,
+  useTabPage,
+  useTabPageShell
 } from '@/src/tabbar/index.uts';
+import {
+  onNavbarPullDownRefresh,
+  stopNavbarPullDownRefresh
+} from '@/src/layouts/navbar/utils/index.uts';
 
 definePage({
   name: 'basic',
@@ -166,23 +185,133 @@ definePage({
   hideNavbar: false,
   enablePullDownRefresh: false,
   style: {
-    navigationBarTitleText: '基础',
+    navigationBarTitleText: 'tabbar.basic',
     navigationStyle: 'custom'
   }
 });
 
+// 同一个页面文件既可作为真实路由页，也可作为模式 4 的 Tab 子页
+useTabPageShell('basic');
+
+const {
+  route,
+  onLoad,
+  onShow,
+  onHide
+} = useTabPage();
+
+onLoad((): void => {
+  console.log('basic load', route.value.fullPath);
+});
+
 onShow((): void => {
-  setCurIdxByKey('basic');
-  notifyPageShow();
+  // 首次进入、切回当前 Tab、从子页返回、App 回前台
 });
 
 onHide((): void => {
-  notifyPageHide();
+  // 切走当前 Tab、进入子页、App 切后台
+});
+
+// 只有 enablePullDownRefresh: true 时才注册
+onNavbarPullDownRefresh((): void => {
+  if (curIdx.value != resolveTabIndexByKey('basic')) {
+    return;
+  }
+  // 请求结束后必须收起刷新动画
+  stopNavbarPullDownRefresh();
 });
 </script>
 ```
 
-TabBar 是独立单页，没有“业务模块式”的多页分组；页面内容放在 `views/<Page>View.uvue`。
+TabBar 页的关键规则：
+
+- `definePage.name` 必须与 `config.uts` 中该 Tab 的 `tabType` 一致；默认用 `tabType` 作为页面名。
+- 所有 TabBar 页都写 `showBack: false`；`enablePullDownRefresh` 仍默认 `false`，明确需要时才写 `true`。
+- 页面文件同时兼容真实页面与模式 4 Tab 子页时，调用 `useTabPageShell(tabType)`。
+- 页面生命周期、虚拟路由参数统一从 `useTabPage()` 获取，不再从 `@dcloudio/uni-app` 引入原生 `onShow` / `onHide` / `onLoad`。
+- `useTabPage().route` 是当前 Tab 的虚拟路由；`useRoute()` 仍可用于普通非 TabBar 页面。
+- 模式 4 的 Tab 页没有自己的 `views/`；业务组件仍按需放在页面内的 `components/` 或 `modules/`。
+- 普通 TabBar 页只渲染自己的业务根节点；`TabPageHost` 与 `Tabbar` 均由宿主首页统一提供。
+
+#### 模式 4 宿主首页
+
+承载全部 Tab 的宿主首页额外用 `TabPageHost` 包住业务内容，避免 `index.uvue → TabViews → index.uvue` 循环引用：
+
+```html
+<!-- src/pages/index/index.uvue -->
+<template>
+  <TabPageHost>
+    <view class="flex flex-col w-full">
+      <!-- 首页业务内容 -->
+    </view>
+  </TabPageHost>
+</template>
+
+<script setup lang="uts">
+import TabPageHost from '@/src/tabbar/components/TabPageHost.uvue';
+import {
+  curIdx,
+  resolveTabIndexByKey,
+  useTabPage,
+  useTabPageShell
+} from '@/src/tabbar/index.uts';
+import {
+  onNavbarPullDownRefresh,
+  stopNavbarPullDownRefresh
+} from '@/src/layouts/navbar/utils/index.uts';
+
+definePage({
+  name: 'index',
+  debug: false,
+  debugHome: false,
+  type: 'home',
+  layout: 'navbar',
+  showBack: false,
+  hideStatusBar: false,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
+  style: {
+    navigationBarTitleText: 'tabbar.home',
+    navigationStyle: 'custom'
+  }
+});
+
+useTabPageShell('index');
+
+const {
+  route,
+  onLoad,
+  onShow,
+  onHide
+} = useTabPage();
+
+onLoad((): void => {
+  console.log('index load', route.value.fullPath);
+});
+
+onShow((): void => {
+  // 宿主页重新显示
+});
+
+onHide((): void => {
+  stopNavbarPullDownRefresh();
+});
+
+onNavbarPullDownRefresh((): void => {
+  if (curIdx.value != resolveTabIndexByKey('index')) {
+    return;
+  }
+  stopNavbarPullDownRefresh();
+});
+</script>
+```
+
+- 只有宿主首页写 `type: 'home'`，其他 TabBar 页不写。
+- 宿主页只包裹一次 `TabPageHost`；普通 Tab 页不要再包它，也不要再挂载 `Tabbar`。
+- `TabPageHost` 负责模式 4 的 `TabViews + Tabbar` 挂载，其他模式直接透传宿主内容。
+- `definePage` 需要按平台动态生成标题时，可写成 `definePage((options) => { ... return {...}; })`；静态标题优先使用标准对象写法。
+
+> `enablePullDownRefresh` 在上面的宿主示例中固定为 `false`。首页若确实需要下拉刷新，改为 `true` 并保留 `onNavbarPullDownRefresh` 与 `stopNavbarPullDownRefresh()` 闭环。
 
 ---
 
@@ -225,6 +354,13 @@ definePage({
 | `style.navigationStyle` | 每页必须写 `'custom'` |
 | `type: 'home'` | 只用于首页，不放进通用模板 |
 | `customPageClass` / `customPageStyle` | 只有布局确需自定义根容器时才写 |
+
+TabBar 页额外遵循：
+
+- `name` 使用 `config.uts` 中该 Tab 的 `tabType`。
+- `showBack` 固定为 `false`。
+- 模式 4 下 `enablePullDownRefresh` 由页面实际能力决定；需要下拉刷新时开启并完成停止闭环。
+- 宿主首页额外写 `type: 'home'`；其他 TabBar 页不写。
 
 ### 4.3.3 下拉刷新闭环
 
@@ -872,6 +1008,39 @@ function calcTotal(list: Array<OrderItem>): number {
 }
 ```
 
+### 4.7.7 纯文本插槽必须由 `<text>` 承载
+
+组件契约是“接收一段纯文本”时，必须在组件侧提供 `<text>` 作为文本宿主，默认文案放在 `<slot>` 内部：
+
+```html
+<!-- ❌ 错误：父级传入的裸文本没有 <text> 宿主 -->
+<slot>11</slot>
+
+<!-- ✅ 正确：纯文本插槽由 <text> 承载 -->
+<text class="text-[14px] text-[#1e293b]"><slot>11</slot></text>
+```
+
+调用方直接传入文本：
+
+```html
+<MyText>11</MyText>
+```
+
+注意：
+
+- 纯文本插槽应成对使用 `<text>` 与 `<slot>`，不要在同一个 `<text>` 中混写固定前缀和插槽，如 `<text>前缀<slot /></text>`。这会违反 `<text>` 只能包含一个文本节点的限制。
+- 需要固定文案与插槽内容混排时，使用兄弟 `<text>`，并由外层 `<view>` 承载：
+
+```html
+<view class="flex flex-row">
+  <text>前缀</text>
+  <text><slot /></text>
+</view>
+```
+
+- 如果插槽设计为接收任意节点，例如完整 `<text>` 或 `<view>`，组件侧保持 `<slot />`，由调用方自行提供节点，不要把节点插槽统一包进 `<text>`。
+- 具名插槽同样按内容类型判断：纯文本具名插槽由 `<text>` 承载，任意节点具名插槽保持裸 `<slot name="xxx" />`。
+
 ---
 
 ## 4.8 数据来源与 API 接入
@@ -1001,6 +1170,7 @@ pnpm typecheck
 | 23 | 为 `listPending` / `listFetching` / `listError` 包 `computed` | 模板直接使用 Ref |
 | 24 | 列表写 `initialData: []` 还期待首屏 loading | 需要 loading 就不要设置 `initialData` |
 | 25 | 组件直接修改 props | 抛出 Emits，由父级修改 |
+| 26 | 纯文本插槽直接写 `<slot>11</slot>` | 用 `<text><slot>11</slot></text>` 承载纯文本；任意节点插槽保持 `<slot />` |
 
 ---
 
@@ -1053,4 +1223,5 @@ pnpm typecheck
 - [ ] Props 使用运行时对象，一个业务对象一个 prop；Emits 使用类型字面量。
 - [ ] 组件没有直接修改 props。
 - [ ] 变量有一行说明注释，方法有 JSDoc，Query / Mutation 使用普通注释。
+- [ ] 纯文本插槽由 `<text>` 承载；任意节点插槽保持 `<slot />`，没有被误包进 `<text>`。
 - [ ] 已运行 `git diff --check` 与 `pnpm typecheck`；原生相关另做真机验证。

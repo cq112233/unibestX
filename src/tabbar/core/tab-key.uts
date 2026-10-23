@@ -79,6 +79,29 @@ export function resolveTabIndexByKey(key: string): number {
 }
 
 /**
+ * 将 Tab 页面路径转换为入口深链使用的 Tab 标识。
+ *
+ * 优先返回 config.uts 中的 `tabType`（如 `basic`），中间鼓包等未配置 tabType 的项
+ * 回退为完整 pagePath，保证 H5 地址栏刷新后仍能通过 `?tab=` 恢复当前 Tab。
+ *
+ * @param path Tab 页面路径，带不带前导斜杠均可
+ * @returns 可写入 `?tab=` 的标识；未命中任何 Tab 时返回空串
+ */
+export function resolveTabKeyByPath(path: string): string {
+  const index: number = resolveTabIndexByKey(path);
+  if (index < 0) {
+    return '';
+  }
+  const list = getSourceList();
+  if (index >= list.length) {
+    return '';
+  }
+  const item = list[index];
+  const key: string = item.tabType ?? '';
+  return key.length > 0 ? key : item.pagePath;
+}
+
+/**
  * 将订阅 API 的入参统一解析为「curIdx 数字下标」
  *
  * - number：直接返回（负数视为非法，返回 -1）

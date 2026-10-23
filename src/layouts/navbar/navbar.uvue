@@ -8,7 +8,7 @@
       :is-navbar-visible="isNavbarVisible"
       :hide-status-bar="!isStatusBarVisible"
       :title="displayTitle"
-      :show-back="showBack"
+      :show-back="effectiveShowBack"
       :title-color="navTitleColor"
       :bg-color="navBgColor"
       :fixed="false"
@@ -304,6 +304,32 @@ function onResetStatusBarVisible(): void {
 /** 动态控制导航栏显隐（优先级高于配置项，null 表示采取默认配置） */
 const dynamicHideNavbar = ref<boolean | null>(null);
 
+/** 动态控制左侧返回按钮（优先级高于页面配置，null 表示采用默认配置） */
+const dynamicShowBack = ref<boolean | null>(null);
+
+/** 计算返回按钮最终是否显示 */
+const effectiveShowBack = computed((): boolean => {
+  if (dynamicShowBack.value != null) {
+    return dynamicShowBack.value;
+  }
+  return props.showBack;
+});
+
+/**
+ * 响应全局 setShowBack 事件：设置返回按钮是否显示
+ * @param show 是否显示（true 为显示，false 为隐藏）
+ */
+function onSetShowBack(show: any): void {
+  if (typeof show == 'boolean') {
+    dynamicShowBack.value = show as boolean;
+  }
+}
+
+/** 响应全局 resetShowBack 事件：重置返回按钮为页面默认配置 */
+function onResetShowBack(): void {
+  dynamicShowBack.value = null;
+}
+
 /**
  * 计算导航栏是否可见
  * 1. 优先读取动态设置 dynamicHideNavbar
@@ -345,6 +371,31 @@ function onSetHideNavbar(hide: any): void {
  */
 function onResetNavbarVisible(): void {
   dynamicHideNavbar.value = null;
+}
+
+/**
+ * 模式 4 宿主 Navbar 专用的 TabBar 状态同步。
+ * 普通页面 Navbar 不接收这些事件，避免后台 Tab 在 HMR 或保活期间污染子页面。
+ */
+function onTabbarSetHideNavbar(hide: any): void {
+  if (!isSinglePageTabbar || props.type != 'home' || typeof hide != 'boolean') {
+    return;
+  }
+  dynamicHideNavbar.value = hide as boolean;
+}
+
+function onTabbarSetShowBack(show: any): void {
+  if (!isSinglePageTabbar || props.type != 'home' || typeof show != 'boolean') {
+    return;
+  }
+  dynamicShowBack.value = show as boolean;
+}
+
+function onTabbarSetHideStatusBar(hide: any): void {
+  if (!isSinglePageTabbar || props.type != 'home' || typeof hide != 'boolean') {
+    return;
+  }
+  dynamicHideStatusBar.value = hide as boolean;
 }
 
 /** 下拉刷新状态控制：true 表示刷新中（展示 Loading），false 表示已复位收起 */
@@ -496,9 +547,14 @@ uni.$on('resetNavbarTitle', onResetNavbarTitle);
 uni.$on('setNavbarVisible', onSetNavbarVisible);
 uni.$on('setHideNavbar', onSetHideNavbar);
 uni.$on('resetNavbarVisible', onResetNavbarVisible);
+uni.$on('setShowBack', onSetShowBack);
+uni.$on('resetShowBack', onResetShowBack);
 uni.$on('setStatusBarVisible', onSetStatusBarVisible);
 uni.$on('setHideStatusBar', onSetHideStatusBar);
 uni.$on('resetStatusBarVisible', onResetStatusBarVisible);
+uni.$on('tabbarSetHideNavbar', onTabbarSetHideNavbar);
+uni.$on('tabbarSetShowBack', onTabbarSetShowBack);
+uni.$on('tabbarSetHideStatusBar', onTabbarSetHideStatusBar);
 
 // 卸载时移除全局事件监听，避免内存泄漏
 onUnmounted(() => {
@@ -508,9 +564,14 @@ onUnmounted(() => {
   uni.$off('setNavbarVisible', onSetNavbarVisible);
   uni.$off('setHideNavbar', onSetHideNavbar);
   uni.$off('resetNavbarVisible', onResetNavbarVisible);
+  uni.$off('setShowBack', onSetShowBack);
+  uni.$off('resetShowBack', onResetShowBack);
   uni.$off('setStatusBarVisible', onSetStatusBarVisible);
   uni.$off('setHideStatusBar', onSetHideStatusBar);
   uni.$off('resetStatusBarVisible', onResetStatusBarVisible);
+  uni.$off('tabbarSetHideNavbar', onTabbarSetHideNavbar);
+  uni.$off('tabbarSetShowBack', onTabbarSetShowBack);
+  uni.$off('tabbarSetHideStatusBar', onTabbarSetHideStatusBar);
 });
 
 /**
@@ -678,6 +739,7 @@ onPageShow((): void => {
 
 onPageHide((): void => {
   pageActive.value = false;
+  isTriggered.value = false;
 });
 
 // #ifdef H5
@@ -689,8 +751,16 @@ onActivated((): void => {
 
 onDeactivated((): void => {
   pageActive.value = false;
+  isTriggered.value = false;
 });
 // #endif
+
+// 单页 TabBar 切换时，若当前正在下拉刷新，自动复位刷新状态，避免切走后一直转圈
+watch(curIdx, (_newIdx: number): void => {
+  if (isTriggered.value) {
+    isTriggered.value = false;
+  }
+});
 
 // 标题变化（含语言切换、单页 TabBar 切换、动态 setNavbarTitle）时同步页面标题
 watch(displayTitle, (newTitle: string): void => {

@@ -1,11 +1,44 @@
 import { curIdx, setCurIdx, setCurIdxByPath, tabbarList } from './state.uts';
+import { readTabPageFullPath, setTabPageUrl, syncTabPageHostUrl } from './tab-page.uts';
 import { isNativeTabbar, isSinglePageTabbar, selectedTabbarStrategy, TABBAR_STRATEGY_MAP } from './strategy.uts';
 import { customTabbarConfig } from '../adapters/config.uts';
 import { useRouter } from '@/uni_modules/route-bestX/index.uts';
+import { runTabNavigationGuard } from './tab-navigation.uts';
 
 /** 中间鼓包 tabbarItem 点击事件（核心导航行为） */
 function handleClickBulge(url: string = '/src/pages/ai/ai'): void {
   useRouter().push(url);
+}
+
+/** 读取当前虚拟 Tab 的完整 URL，作为下一次切换的来源。 */
+function readCurrentTabFullPath(): string {
+  const index = curIdx.value;
+  if (index < 0 || index >= tabbarList.length) {
+    return '';
+  }
+  return readTabPageFullPath(tabbarList[index].pagePath);
+}
+
+/**
+ * 模式 4 的 Tab 切换前置钩子入口。
+ *
+ * 同步或异步完成前置操作后调用 next(true) 才会真正切换；next(false) 保持当前 Tab。
+ * 非模式 4 继续走原生 Tab 切换，不受该钩子影响。
+ *
+ * @param url 目标 Tab 页面地址
+ * @param api 触发来源：tabClick / router / hostQuery / switchTabbar
+ */
+export function switchTabbar(url: string, api: string = 'switchTabbar'): void {
+  if (!isSinglePageTabbar) {
+    performSwitchTabbar(url);
+    return;
+  }
+  const fromUrl = readCurrentTabFullPath();
+  runTabNavigationGuard(fromUrl, url, api, (allowed: boolean): void => {
+    if (allowed) {
+      performSwitchTabbar(url);
+    }
+  });
 }
 
 /**
@@ -14,12 +47,19 @@ function handleClickBulge(url: string = '/src/pages/ai/ai'): void {
  * - 模式 0 / 模式 3 (无原生配置)：调用 uni.redirectTo
  * 内部自动同步激活索引
  * @param url 目标 tabbar 页面地址，**必须带前导斜杠**且已在 pages.json 的 tabBar 中声明；
- *            单一 tabbar（单页仿真）模式下该参数被忽略——固定回首页而不跳转；
+ *            单一 tabbar（单页仿真）模式下用于定位虚拟 Tab，并同步该 Tab 的 query；
  *            沙盒调试时目标页未编译，会退化为 toast 提示而非崩溃
  */
-export function switchTabbar(url: string): void {
+function performSwitchTabbar(url: string): void {
+  // 模式 4 没有真实页面切换：把路由 URL 中的 query 写入目标 Tab 的虚拟路由，
+  // 这样 useTabPage() 里的 route.query 仍与普通页面 push({ query }) 的行为一致。
+  if (isSinglePageTabbar) {
+    setTabPageUrl(url);
+  }
   setCurIdxByPath(url);
   if (isSinglePageTabbar) {
+    // H5 下同步宿主页地址栏（?tab=basic&id=1），保证刷新后仍停留在当前 Tab
+    syncTabPageHostUrl(url);
     try {
       const pages = getCurrentPages();
       if (pages.length > 0) {
@@ -33,9 +73,16 @@ export function switchTabbar(url: string): void {
     catch { }
     uni.redirectTo({
       url: '/src/pages/index/index',
+      success: (_res: any) => {
+        // redirectTo 会覆盖 H5 地址栏；宿主页加载完成后重新写回当前虚拟 Tab（?tab=xxx）
+        syncTabPageHostUrl(url);
+      },
       fail: (_err: any) => {
         uni.reLaunch({
-          url: '/src/pages/index/index'
+          url: '/src/pages/index/index',
+          success: (_res: any) => {
+            syncTabPageHostUrl(url);
+          }
         });
       }
     });
@@ -104,7 +151,8 @@ export function handleTabbarClick(index: number): void {
     return;
   }
   if (isSinglePageTabbar) {
-    setCurIdx(index);
+    // 模式 4 点击与 switchTabbar() 共用同一条带守卫的虚拟导航链路
+    switchTabbar(list[index].pagePath, 'tabClick');
     return;
   }
   if (list[index].isBulge) {

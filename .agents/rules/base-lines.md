@@ -34,6 +34,13 @@ description: unibestX 最高底线 —— 任何代码都不能违反的框架�
 - **未经开发者明确指示，不执行 `git commit` / `git push`**。
 - **严禁擅自修改 `unibestX-skill`**（`SKILL.md` 与 `references/`），有异议只在回复中提建议。
 
+## 5. AI 代码零新增 warning
+
+- **存量 warning 不清理**：仓库已有的 ESLint / Stylelint warning 默认忽略，禁止以「顺手清理」为由扩大改动范围。
+- **新增 warning 必须为 0**：AI 新建或修改的代码不得产生任何 warning，也不得让原文件的 warning 数量增加。
+- **交付前必须校验**：对本次改动文件运行 ESLint，对含样式的改动文件运行 Stylelint；发现新增 warning 必须修到 0 才能交付。
+- **禁止掩盖**：不得用大范围 `eslint-disable` / `stylelint-disable` 压掉 warning；确属框架误报时，只允许在命中行或单文件做精确豁免，并注明原因。
+
 ---
 
 > 📖 **本文件只是底线开关，不含用法。**
