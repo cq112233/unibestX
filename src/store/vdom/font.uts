@@ -1,223 +1,105 @@
 import { defineStore, PiniaStoreBase } from '@/uni_modules/x-pinia-s';
 import {
-  DEFAULT_FONT_FAMILY,
-  DEFAULT_FONT_ID,
   DEFAULT_FONT_SCALE,
-  getFontOption,
   normalizeFontScale
-} from '@/src/config/font/font.uts';
+} from '@/src/config/fontScale.uts';
 import type { IFontState } from '../types.uts';
 
 const defaultFontState: IFontState = {
-  fontId: DEFAULT_FONT_ID,
-  fontFamily: DEFAULT_FONT_FAMILY,
-  fontScale: DEFAULT_FONT_SCALE,
-  status: 'idle'
+  fontScale: DEFAULT_FONT_SCALE
 };
 
+/** 读取 x-pinia-s 已持久化的字号比例 */
+function getStoredFontScale(): number | null {
+  try {
+    const raw = uni.getStorageSync('pinia:font');
+    if (raw != null) {
+      const rawStr = `${raw}`;
+      if (rawStr.length > 0 && rawStr != 'null' && rawStr != 'undefined') {
+        const parsed = JSON.parseObject(rawStr);
+        if (parsed != null) {
+          const data = (parsed.state != null ? parsed.state : parsed) as UTSJSONObject;
+          /* eslint-disable dot-notation -- UTSJSONObject 动态字段必须下标访问 */
+          if (data['fontScale'] != null) {
+            return data['fontScale'] as number;
+          }
+          /* eslint-enable dot-notation */
+        }
+      }
+    }
+  }
+  catch {
+    // 本地缓存损坏时回落到默认字号
+  }
+  return null;
+}
+
 /**
- * 全局字体 Store（VDOM 分支：x-pinia-s）
+ * 全局字号缩放 Store（VDOM 分支：x-pinia-s）
  *
- * 与 `./vapor/font.uts` 行为保持一致，差别只在实现形态（class + x-pinia-s）。
+ * 与 `./vapor/font.uts` 行为保持一致，不加载字体文件、不切换字体族。
  */
 export class FontStore extends PiniaStoreBase {
   state: IFontState = reactive<IFontState>({
-    fontId: DEFAULT_FONT_ID,
-    fontFamily: DEFAULT_FONT_FAMILY,
-    fontScale: DEFAULT_FONT_SCALE,
-    status: 'idle'
+    fontScale: DEFAULT_FONT_SCALE
   });
-
-  private _fontInited: boolean = false;
-  // 字体切换存在异步下载，用序号丢弃过期的加载结果，避免旧字体的回调覆盖新选择
-  private _loadSeq: number = 0;
 
   constructor() {
     super();
     this.bindState(this.state);
+    this.initFontScale();
+  }
+
+  /** 从持久化存储恢复并校正字号比例 */
+  initFontScale(): void {
+    const storedScale = getStoredFontScale();
+    if (storedScale != null) {
+      this.state.fontScale = normalizeFontScale(storedScale);
+      return;
+    }
+    this.state.fontScale = normalizeFontScale(this.state.fontScale);
   }
 
   /**
-   * 注册远程字体
-   * @param family uni.loadFontFace 使用的字体名称
-   * @param source 字体文件地址
-   * @returns 注册成功返回 true；失败返回 false，由调用方保留系统兜底
-   */
-  private loadRemoteFont(family: string, source: string): Promise<boolean> {
-    return new Promise<boolean>((resolve) => {
-      uni.loadFontFace({
-        global: true,
-        family,
-        source,
-        success: () => {
-          resolve(true);
-        },
-        fail: (_err: any) => {
-          resolve(false);
-        }
-      });
-    });
-  }
-
-  /**
-   * 切换全局字体
-   * @param fontId 字体 id，对应 src/config/font/font.uts 的 fontOptions
-   * @returns 切换完成返回 true；id 不存在或远程字体加载失败返回 false
-   */
-  setFont(fontId: string): Promise<boolean> {
-    const option = getFontOption(fontId);
-    if (option == null) {
-      return Promise.resolve(false);
-    }
-
-    const previousFontId = this.state.fontId;
-    const previousFontFamily = this.state.fontFamily;
-    const currentSeq = this._loadSeq + 1;
-    this._loadSeq = currentSeq;
-    this.state.fontId = option.id;
-
-    if (option.source == '') {
-      this.state.fontFamily = option.family;
-      this.state.status = option.id == DEFAULT_FONT_ID ? 'idle' : 'loaded';
-      return Promise.resolve(true);
-    }
-    if (option.loadFamily == '') {
-      this.state.fontId = previousFontId;
-      this.state.fontFamily = previousFontFamily;
-      this.state.status = 'error';
-      return Promise.resolve(false);
-    }
-
-    this.state.status = 'loading';
-    return this.loadRemoteFont(option.loadFamily, option.source).then((ok: boolean): boolean => {
-      if (currentSeq == this._loadSeq) {
-        if (ok) {
-          // 注册成功后再切 font-family，确保 AppText 重算并真正用上远程字体
-          this.state.fontFamily = option.family;
-          this.state.status = 'loaded';
-        }
-        else {
-          this.state.fontId = previousFontId;
-          this.state.fontFamily = previousFontFamily;
-          this.state.status = 'error';
-        }
-      }
-      return ok;
-    }, (_err: any): boolean => {
-      if (currentSeq == this._loadSeq) {
-        this.state.fontId = previousFontId;
-        this.state.fontFamily = previousFontFamily;
-        this.state.status = 'error';
-      }
-      return false;
-    });
-  }
-
-  /**
-   * 设置全局字号缩放比例
-   * @param scale 缩放比例，内部会限制到安全区间
+   * 设置全局字号缩放比例。
+   * @param scale 缩放比例，内部会限制到 0.85 ~ 1.35
    */
   setFontScale(scale: number): void {
-    this.state.fontScale = normalizeFontScale(scale);
+    const nextScale = normalizeFontScale(scale);
+    this.state.fontScale = nextScale;
+    this.$patch({ fontScale: nextScale } as UTSJSONObject);
+    try {
+      uni.setStorageSync('pinia:font', JSON.stringify(this._serialize()));
+    }
+    catch {
+      // 存储失败不影响当前会话的字号调节
+    }
   }
 
-  /**
-   * 应用启动时恢复字体：持久化状态已由 x-pinia-s 插件还原，这里负责重新注册远程字体。
-   */
-  initFont(): void {
-    if (this._fontInited) {
-      return;
-    }
-    this._fontInited = true;
-
-    const option = getFontOption(this.state.fontId);
-    if (option == null) {
-      this.state.fontId = DEFAULT_FONT_ID;
-      this.state.fontFamily = DEFAULT_FONT_FAMILY;
-      this.state.status = 'idle';
-      return;
-    }
-
-    this.state.fontScale = normalizeFontScale(this.state.fontScale);
-    if (option.source == '') {
-      this.state.fontFamily = option.family;
-      this.state.status = option.id == DEFAULT_FONT_ID ? 'idle' : 'loaded';
-      return;
-    }
-    if (option.loadFamily == '') {
-      this.state.fontFamily = DEFAULT_FONT_FAMILY;
-      this.state.status = 'error';
-      return;
-    }
-
-    // 远程字体注册完成前先使用系统兜底，避免启动首屏使用未注册字体
-    this.state.fontFamily = DEFAULT_FONT_FAMILY;
-    const currentSeq = this._loadSeq + 1;
-    this._loadSeq = currentSeq;
-    this.state.status = 'loading';
-    this.loadRemoteFont(option.loadFamily, option.source).then((ok: boolean): void => {
-      if (currentSeq == this._loadSeq) {
-        if (ok) {
-          this.state.fontFamily = option.family;
-          this.state.status = 'loaded';
-        }
-        else {
-          this.state.status = 'error';
-        }
-      }
-    }, (_err: any): void => {
-      if (currentSeq == this._loadSeq) {
-        this.state.status = 'error';
-      }
-    });
-  }
-
-  /** 恢复系统默认字体与默认字号 */
-  resetFont(): void {
-    this._loadSeq = this._loadSeq + 1;
-    this.state.fontId = DEFAULT_FONT_ID;
-    this.state.fontFamily = DEFAULT_FONT_FAMILY;
-    this.state.fontScale = DEFAULT_FONT_SCALE;
-    this.state.status = 'idle';
+  /** 恢复默认字号比例 */
+  resetFontScale(): void {
+    this.setFontScale(DEFAULT_FONT_SCALE);
   }
 
   /** 重置 Store 状态为初始默认值 */
   override _doReset(): void {
-    this.state.fontId = defaultFontState.fontId;
-    this.state.fontFamily = defaultFontState.fontFamily;
     this.state.fontScale = defaultFontState.fontScale;
-    this.state.status = defaultFontState.status;
-    this._fontInited = false;
-    this._loadSeq = 0;
   }
 
-  /** 从本地缓存数据中反序列化还原字体配置 */
+  /** 从本地缓存数据中反序列化还原字号比例 */
   override _hydrate(data: UTSJSONObject): void {
     const _data = (data.state != null ? data.state : data) as UTSJSONObject;
-    // UTSJSONObject 的动态字段必须下标访问，点号在 Kotlin 端可能取不到值
-    /* eslint-disable dot-notation */
-    if (_data['fontId'] != null) {
-      const option = getFontOption(_data['fontId'] as string);
-      if (option != null) {
-        this.state.fontId = option.id;
-        this.state.fontFamily = option.family;
-      }
-    }
+    /* eslint-disable dot-notation -- UTSJSONObject 动态字段必须下标访问 */
     if (_data['fontScale'] != null) {
       this.state.fontScale = normalizeFontScale(_data['fontScale'] as number);
     }
     /* eslint-enable dot-notation */
-    // 字体注册不随 Storage 持久化，重启后必须由 initFont() 重新注册
-    this.state.status = 'idle';
   }
 
-  /** 序列化字体状态用于持久化存储 */
+  /** 序列化字号比例用于持久化存储 */
   override _serialize(): UTSJSONObject {
     return {
-      fontId: this.state.fontId,
-      fontFamily: this.state.fontFamily,
-      fontScale: this.state.fontScale,
-      status: this.state.status
+      fontScale: this.state.fontScale
     } as UTSJSONObject;
   }
 }

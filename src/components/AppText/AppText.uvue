@@ -36,6 +36,11 @@ const props = defineProps({
     type: Number,
     default: 0
   },
+  /** 覆盖字体族；空串表示沿用系统字体 */
+  fontFamily: {
+    type: String,
+    default: ''
+  },
   /** 可选文字颜色；不传时由 class 中的 text-[#...] 控制 */
   color: {
     type: String,
@@ -64,10 +69,10 @@ function resolveVariantStyle(variant: string): AppTextVariantStyle {
   return { fontSize: 14, fontWeight: 'normal', lineHeight: 22 };
 }
 
-/** 全局字体 Store：字体族与缩放变化时，所有 AppText 自动重新计算 */
+/** 全局字号 Store：比例变化时，所有 AppText 自动重新计算 */
 const fontStore = useFontStore();
 
-/** 最终文本样式：字体族、字号、字重、行高统一走内联，保证原生端生效 */
+/** 最终文本样式：字号与行高统一乘全局缩放比例 */
 const textStyle = computed((): string => {
   const variantStyle = resolveVariantStyle(props.variant);
   const scale = fontStore.state.fontScale > 0 ? fontStore.state.fontScale : 1;
@@ -78,10 +83,12 @@ const textStyle = computed((): string => {
   const fontWeight = props.weight != '' ? props.weight : variantStyle.fontWeight;
 
   const styles: Array<string> = [];
-  styles.push(`font-family: ${fontStore.state.fontFamily};`);
   styles.push(`font-size: ${fontSize}px;`);
   styles.push(`font-weight: ${fontWeight};`);
   styles.push(`line-height: ${lineHeight}px;`);
+  if (props.fontFamily != '') {
+    styles.push(`font-family: ${props.fontFamily};`);
+  }
   if (props.color != '') {
     styles.push(`color: ${props.color};`);
   }

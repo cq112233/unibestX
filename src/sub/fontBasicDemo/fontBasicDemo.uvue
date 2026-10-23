@@ -1,86 +1,91 @@
 <template>
-  <view class="flex flex-col flex-1 bg-[#f8fafc]">
-    <scroll-view direction="vertical" class="flex-1 flex flex-col p-[16px]">
-      <view class="rounded-[14px] p-[18px] mb-[12px] border-[1px] border-solid border-[#dbeafe] bg-[#ffffff]">
-        <AppText variant="title" class="text-[#0f172a] mb-[6px]">
-          字体与排版
-        </AppText>
-        <AppText variant="caption" class="text-[#64748b]">
-          切换字体或字号，下方所有 AppText 会实时更新。
-        </AppText>
+  <view class="flex flex-col flex-1 bg-[#f8fafc] p-[16px]">
+    <scroll-view direction="vertical" class="flex-1 flex flex-col">
+      <view class="rounded-[16px] p-[16px] mb-[12px] bg-[#ffffff] border-[1px] border-solid border-[#e2e8f0]">
+        <text class="text-[15px] font-bold text-[#1e293b] mb-[6px]">字体与字号</text>
+        <text class="text-[12px] leading-[18px] text-[#64748b]">
+          字体文件位于当前分包；微信端使用远程注册，App/H5 使用本地字体。字号缩放全局生效。
+        </text>
       </view>
 
-      <view class="rounded-[14px] p-[18px] border-[1px] border-solid border-[#e2e8f0] bg-[#ffffff]">
-        <AppText variant="subtitle" class="text-[#1e293b] mb-[10px]">
-          预览
-        </AppText>
-
-        <view class="p-[14px] mb-[18px] rounded-[10px] bg-[#f8fafc] border-[1px] border-solid border-[#e2e8f0]">
-          <AppText variant="title" class="text-[#0f172a] mb-[6px]">
-            订单详情
-          </AppText>
-          <AppText variant="body" class="text-[#334155] mb-[6px]">
-            今天 14:30 已送达，共 3 件商品。
-          </AppText>
-          <AppText variant="caption" class="text-[#64748b]">
-            AppText 会自动继承全局字体与字号缩放。
-          </AppText>
+      <view class="rounded-[16px] p-[16px] mb-[12px] bg-[#ffffff] border-[1px] border-solid border-[#e2e8f0]">
+        <view class="flex flex-row items-center justify-between mb-[10px]">
+          <text class="text-[12px] font-bold text-[#475569]">字体</text>
+          <text class="text-[12px] text-[#64748b]">{{ fontStatusLabel }}</text>
         </view>
-
-        <AppText variant="label" class="text-[#475569] mb-[8px]">
-          字体
-        </AppText>
-        <view class="flex-row flex-wrap mb-[16px]">
+        <view class="flex flex-row">
           <view
             v-for="item in fontOptions"
             :key="item.id"
-            class="px-[12px] py-[7px] mr-[8px] mb-[8px] rounded-[7px] border-[1px] border-solid"
-            :class="fontStore.state.fontId == item.id ? 'bg-[#eff6ff] border-[#3b82f6]' : 'bg-[#ffffff] border-[#cbd5e1]'"
-            @click="selectFont(item.id)"
+            class="flex-1 h-[36px] rounded-[8px] mr-[6px] flex flex-row items-center justify-center"
+            :class="selectedFontId == item.id ? 'bg-[#2563eb]' : 'bg-[#eff6ff]'"
+            @click="changeFont(item.id)"
           >
-            <AppText
-              variant="label"
-              :class="fontStore.state.fontId == item.id ? 'text-[#1d4ed8]' : 'text-[#475569]'"
+            <text
+              class="text-[12px] font-bold"
+              :class="selectedFontId == item.id ? 'text-[#ffffff]' : 'text-[#2563eb]'"
             >
               {{ item.label }}
-            </AppText>
+            </text>
           </view>
         </view>
+      </view>
 
-        <AppText variant="label" class="text-[#475569] mb-[8px]">
-          字号
-        </AppText>
-        <view class="flex-row flex-wrap mb-[16px]">
+      <view class="rounded-[16px] p-[16px] mb-[12px] bg-[#ffffff] border-[1px] border-solid border-[#e2e8f0]">
+        <view class="flex flex-row items-center justify-between mb-[10px]">
+          <text class="text-[12px] font-bold text-[#475569]">当前比例</text>
+          <text class="text-[14px] font-bold text-[#2563eb]">{{ scalePercent }}%</text>
+        </view>
+        <view class="flex flex-row">
           <view
-            v-for="item in fontScaleOptions"
+            v-for="item in scaleOptions"
             :key="item.value"
-            class="px-[12px] py-[7px] mr-[8px] mb-[8px] rounded-[7px] border-[1px] border-solid"
-            :class="fontStore.state.fontScale == item.value ? 'bg-[#f0fdf4] border-[#22c55e]' : 'bg-[#ffffff] border-[#cbd5e1]'"
-            @click="selectFontScale(item.value)"
+            class="flex-1 h-[36px] rounded-[8px] mr-[6px] flex flex-row items-center justify-center"
+            :class="isCurrentScale(item.value) ? 'bg-[#2563eb]' : 'bg-[#eff6ff]'"
+            @click="changeScale(item.value)"
           >
-            <AppText
-              variant="label"
-              :class="fontStore.state.fontScale == item.value ? 'text-[#15803d]' : 'text-[#475569]'"
+            <text
+              class="text-[12px] font-bold"
+              :class="isCurrentScale(item.value) ? 'text-[#ffffff]' : 'text-[#2563eb]'"
             >
               {{ item.label }}
-            </AppText>
+            </text>
           </view>
         </view>
-
-        <view class="p-[10px] rounded-[8px] bg-[#eff6ff]">
-          <AppText variant="caption" class="text-[#1e40af]">
-            当前：{{ currentFontLabel }} · {{ currentScaleLabel }}
-          </AppText>
+        <view class="w-full h-[36px] mt-[10px] rounded-[8px] bg-[#f1f5f9] flex flex-row items-center justify-center" @click="resetScale">
+          <text class="text-[12px] font-bold text-[#475569]">恢复 100%</text>
         </view>
+      </view>
+
+      <view class="rounded-[16px] p-[16px] bg-[#ffffff] border-[1px] border-solid border-[#e2e8f0]">
+        <text class="text-[12px] font-bold text-[#94a3b8] mb-[12px]">实时预览</text>
+        <AppText variant="title" class="text-[#0f172a] mb-[8px]" :font-family="previewFontFamily">
+          订单详情
+        </AppText>
+        <AppText variant="subtitle" class="text-[#1e293b] mb-[6px]" :font-family="previewFontFamily">
+          配送进度
+        </AppText>
+        <AppText variant="body" class="text-[#334155] mb-[6px]" :font-family="previewFontFamily">
+          商品已到达配送站，预计今天 18:00 前送达。
+        </AppText>
+        <AppText variant="caption" class="text-[#64748b]" :font-family="previewFontFamily">
+          共 3 件商品 · 实付 ¥128.00
+        </AppText>
       </view>
     </scroll-view>
   </view>
 </template>
 
 <script setup lang="uts">
-import { computed } from 'vue';
-import { fontOptions } from '@/src/config/font/font.uts';
+import { computed, ref } from 'vue';
 import { useFontStore } from '@/src/store/index.uts';
+import AppText from '@/src/components/AppText/AppText.uvue';
+import {
+  ALIMAMA_FONT_FAMILY,
+  ALIMAMA_FONT_ID,
+  ALIMAMA_FONT_REMOTE_SOURCE,
+  SYSTEM_FONT_ID
+} from '@/src/sub/fontBasicDemo/font/config.uts';
 
 definePage({
   debug: false,
@@ -89,7 +94,7 @@ definePage({
   hideNavbar: false,
   enablePullDownRefresh: false,
   style: {
-    navigationBarTitleText: '字体演示',
+    navigationBarTitleText: '字体与字号',
     navigationStyle: 'custom'
   }
 });
@@ -99,48 +104,92 @@ type FontScaleOption = {
   value: number;
 };
 
-const fontStore = useFontStore();
+type FontOption = {
+  id: string;
+  label: string;
+};
 
-const fontScaleOptions: Array<FontScaleOption> = [
-  { label: '标准 100%', value: 1 },
-  { label: '大 115%', value: 1.15 },
-  { label: '特大 130%', value: 1.3 }
+const fontStore = useFontStore();
+const selectedFontId = ref<string>(SYSTEM_FONT_ID);
+const fontStatus = ref<string>('idle');
+const fontOptions: Array<FontOption> = [
+  { id: SYSTEM_FONT_ID, label: '系统默认' },
+  { id: ALIMAMA_FONT_ID, label: '阿里妈妈刀隶体' }
+];
+const scaleOptions: Array<FontScaleOption> = [
+  { label: '85%', value: 0.85 },
+  { label: '100%', value: 1 },
+  { label: '115%', value: 1.15 },
+  { label: '135%', value: 1.35 }
 ];
 
-const currentFontLabel = computed((): string => {
-  for (let i = 0; i < fontOptions.length; i++) {
-    if (fontOptions[i].id == fontStore.state.fontId) {
-      return fontOptions[i].label;
-    }
-  }
-  return '系统默认';
+const scalePercent = computed((): number => Math.round(fontStore.state.fontScale * 100));
+
+/** 只有字体注册成功后才把自定义字体下发给预览文本，失败时自动回退系统字体 */
+const previewFontFamily = computed((): string => {
+  return selectedFontId.value == ALIMAMA_FONT_ID ? ALIMAMA_FONT_FAMILY : '';
 });
 
-const currentScaleLabel = computed((): string => {
-  return `${Math.round(fontStore.state.fontScale * 100)}%`;
+const fontStatusLabel = computed((): string => {
+  if (fontStatus.value == 'loading') {
+    return '加载中…';
+  }
+  if (fontStatus.value == 'error') {
+    return '加载失败，已回退';
+  }
+  return selectedFontId.value == ALIMAMA_FONT_ID ? '已启用' : '系统字体';
 });
 
 /**
- * 切换全局字体
- * @param fontId 字体配置 id
+ * 切换演示页字体。
+ * 小程序只支持 loadFontFace 网络字体；App/H5 已由本地 @font-face 注册。
+ * @param fontId 字体 id
  */
-function selectFont(fontId: string): void {
-  fontStore.setFont(fontId).then((_ok: boolean): void => {}, (_err: any): void => {
-    uni.showToast({
-      title: '字体切换失败',
-      icon: 'none'
-    });
+function changeFont(fontId: string): void {
+  if (fontId == SYSTEM_FONT_ID) {
+    selectedFontId.value = SYSTEM_FONT_ID;
+    fontStatus.value = 'idle';
+    return;
+  }
+
+  // #ifdef MP
+  fontStatus.value = 'loading';
+  uni.loadFontFace({
+    global: true,
+    family: ALIMAMA_FONT_FAMILY,
+    source: ALIMAMA_FONT_REMOTE_SOURCE,
+    success() {
+      selectedFontId.value = ALIMAMA_FONT_ID;
+      fontStatus.value = 'loaded';
+    },
+    fail() {
+      selectedFontId.value = SYSTEM_FONT_ID;
+      fontStatus.value = 'error';
+      uni.showToast({
+        title: '字体加载失败',
+        icon: 'none'
+      });
+    }
   });
+  // #endif
+
+  // #ifndef MP
+  selectedFontId.value = ALIMAMA_FONT_ID;
+  fontStatus.value = 'loaded';
+  // #endif
 }
 
-/**
- * 切换全局字号缩放
- * @param scale 缩放比例
- */
-function selectFontScale(scale: number): void {
+function isCurrentScale(scale: number): boolean {
+  return Math.abs(fontStore.state.fontScale - scale) < 0.001;
+}
+
+function changeScale(scale: number): void {
   fontStore.setFontScale(scale);
+}
+
+function resetScale(): void {
+  fontStore.resetFontScale();
 }
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

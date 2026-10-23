@@ -57,6 +57,10 @@ onLaunch(() => {
   i18nStore.initLocale();
   setTabbarItem();
 
+  // 恢复并校正持久化的全局字号比例
+  const fontStore = useFontStore();
+  fontStore.initFontScale();
+
   // 注册原生 TabBar 中间按钮监听（仅在原生模式且配置了 midButton 时生效）
   initNativeMidButtonTap();
 
@@ -69,10 +73,6 @@ onLaunch(() => {
     return;
   }
   // #endif
-
-  // 隐私闸门放行后再恢复远程字体，避免未同意隐私协议时提前发起字体网络请求
-  const fontStore = useFontStore();
-  fontStore.initFont();
 
   // 权限属于用户信息的一部分，登录态恢复后静默拉取一次最新结果
   refreshUserInfoIfNeeded();
@@ -122,6 +122,14 @@ onUnhandledRejection((res) => {
 @import './main.css';
 /* #endif */
 
+/* #ifdef APP || H5 || WEB */
+/* 品牌字体仅供字体演示页使用，文件位于分包，避免进入微信小程序主包 */
+@font-face {
+  font-family: AlimamaDaoLiTiTTF;
+  src: url('./src/sub/fontBasicDemo/font/AlimamaDaoLiTi.ttf');
+}
+/* #endif */
+
 /* 阿里 iconfont（uni_modules/ali-iconfont）目前本项目没用到 —— 没有页面渲染 AliIconfontIcon。
    以后要用，只做一件事：在 onLaunch 里 import 并调用一次 setupIconfont()（无参）：
 
@@ -131,14 +139,6 @@ onUnhandledRejection((res) => {
    漏掉这一步，组件查不到码点，图标会静默渲染成空白（不报错）。
    字体声明不写在这里 —— 它跟着 AliIconfontIcon 组件走：组件的 style 块里，由插件脚本从阿里 CSS
    生成（换图标 / 换库改插件的 iconfont.config.mjs 后跑 `pnpm icons`）。 */
-
-/* #ifdef APP || H5 || WEB */
-/* 本地品牌字体：App 原生端按单个 family 名匹配，禁止在 font-family 中拼接兜底列表 */
-@font-face {
-  font-family: AlimamaDaoLiTiTTF;
-  src: url('/static/font/AlimamaDaoLiTi.ttf');
-}
-/* #endif */
 
 page {
   --test-color: #006241;
