@@ -135,6 +135,10 @@ export function resetNavbarTitle(): void {
 export const EVENT_SET_NAVBAR_VISIBLE: string = 'setNavbarVisible';
 export const EVENT_SET_HIDE_NAVBAR: string = 'setHideNavbar';
 export const EVENT_RESET_NAVBAR_VISIBLE: string = 'resetNavbarVisible';
+export const EVENT_SET_SHOW_BACK: string = 'setShowBack';
+export const EVENT_RESET_SHOW_BACK: string = 'resetShowBack';
+export const EVENT_TABBAR_SET_HIDE_NAVBAR: string = 'tabbarSetHideNavbar';
+export const EVENT_TABBAR_SET_SHOW_BACK: string = 'tabbarSetShowBack';
 
 /**
  * 动态控制 NavBar 布局导航栏的显示或隐藏
@@ -159,9 +163,25 @@ export function resetNavbarVisible(): void {
   uni.$emit(EVENT_RESET_NAVBAR_VISIBLE);
 }
 
+/**
+ * 动态控制 NavBar 左侧返回按钮是否显示
+ * @param show 是否显示返回按钮（true 显示，false 隐藏）
+ */
+export function setShowBack(show: boolean): void {
+  uni.$emit(EVENT_SET_SHOW_BACK, show);
+}
+
+/**
+ * 重置 NavBar 左侧返回按钮为页面初始配置
+ */
+export function resetShowBack(): void {
+  uni.$emit(EVENT_RESET_SHOW_BACK);
+}
+
 export const EVENT_SET_STATUS_BAR_VISIBLE: string = 'setStatusBarVisible';
 export const EVENT_SET_HIDE_STATUS_BAR: string = 'setHideStatusBar';
 export const EVENT_RESET_STATUS_BAR_VISIBLE: string = 'resetStatusBarVisible';
+export const EVENT_TABBAR_SET_HIDE_STATUS_BAR: string = 'tabbarSetHideStatusBar';
 
 /**
  * 动态控制是否隐藏状态栏占位高度
@@ -184,6 +204,29 @@ export function setStatusBarVisible(visible: boolean): void {
  */
 export function resetStatusBarVisible(): void {
   uni.$emit(EVENT_RESET_STATUS_BAR_VISIBLE);
+}
+
+/**
+ * 模式 4：仅同步单页 TabBar 宿主导航栏的显隐状态。
+ *
+ * 使用独立事件，避免后台保活 Tab 的导航栏配置污染普通子页面。
+ */
+export function setTabbarHideNavbar(hide: boolean): void {
+  uni.$emit(EVENT_TABBAR_SET_HIDE_NAVBAR, hide);
+}
+
+/**
+ * 模式 4：仅同步单页 TabBar 宿主导航栏的返回按钮状态。
+ */
+export function setTabbarShowBack(show: boolean): void {
+  uni.$emit(EVENT_TABBAR_SET_SHOW_BACK, show);
+}
+
+/**
+ * 模式 4：仅同步单页 TabBar 宿主导航栏的状态栏占位状态。
+ */
+export function setTabbarHideStatusBar(hide: boolean): void {
+  uni.$emit(EVENT_TABBAR_SET_HIDE_STATUS_BAR, hide);
 }
 
 export * from './i18n.uts';

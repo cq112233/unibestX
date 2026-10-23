@@ -17,7 +17,8 @@
 
 <script setup lang="uts">
 import Tabbar from '@/src/tabbar/tabbar.uvue';
-import { customTabbarEnable, isPageTabbar, selectedTabbarStrategy, syncCurIdxByCurrentPage } from '@/src/tabbar/index.uts';
+import { customTabbarEnable, isPageTabbar, isSinglePageTabbar, selectedTabbarStrategy, syncCurIdxByCurrentPage } from '@/src/tabbar/index.uts';
+import { getCurrentPath, isSamePath } from '@/src/tabbar/core/path.uts';
 import { useThemeStore } from '@/src/store/index.uts';
 import { applyNavbarTheme, getRootThemeStyle } from '@/src/theme/index.uts';
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
@@ -172,16 +173,45 @@ function onSetHideNavbar(hide: any) {
   }
 }
 
+/**
+ * 模式 4 宿主专用：仅宿主页根组件响应 TabBar 的显隐配置。
+ */
+function onTabbarSetHideStatusBar(hide: any): void {
+  if (!isSinglePageTabbar || typeof hide != 'boolean') {
+    return;
+  }
+  const currentPath = getCurrentPath();
+  if (currentPath.length == 0 || !isSamePath(currentPath, '/src/pages/index/index')) {
+    return;
+  }
+  doUpdateHeight(null, hide as boolean);
+}
+
+function onTabbarSetHideNavbar(hide: any): void {
+  if (!isSinglePageTabbar || typeof hide != 'boolean') {
+    return;
+  }
+  const currentPath = getCurrentPath();
+  if (currentPath.length == 0 || !isSamePath(currentPath, '/src/pages/index/index')) {
+    return;
+  }
+  doUpdateHeight(hide as boolean, null);
+}
+
 // 挂载时监听单页 TabBar 切换或全局发出的显隐变更事件
 onMounted(() => {
   uni.$on('setHideStatusBar', onSetHideStatusBar);
   uni.$on('setHideNavbar', onSetHideNavbar);
+  uni.$on('tabbarSetHideStatusBar', onTabbarSetHideStatusBar);
+  uni.$on('tabbarSetHideNavbar', onTabbarSetHideNavbar);
 });
 
 // 卸载时严格移除全局事件监听，彻底消除 IndexKt.emitter 持有页面导致的 Activity 内存泄漏
 onUnmounted(() => {
   uni.$off('setHideStatusBar', onSetHideStatusBar);
   uni.$off('setHideNavbar', onSetHideNavbar);
+  uni.$off('tabbarSetHideStatusBar', onTabbarSetHideStatusBar);
+  uni.$off('tabbarSetHideNavbar', onTabbarSetHideNavbar);
 });
 </script>
 

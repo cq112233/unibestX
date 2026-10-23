@@ -1,0 +1,43 @@
+<template>
+  <view
+    class="tab-page-host"
+    :class="{ 'tab-page-host--single': isSinglePageTabbar, 'flex-1': isSinglePageTabbar, 'h-full': isSinglePageTabbar }"
+    :style="isSinglePageTabbar ? 'display: flex; flex-direction: column; flex: 1; height: 100%;' : ''"
+  >
+    <!-- 模式 4：宿主页只提供业务内容，Tab 容器与底部导航由这里统一挂载 -->
+    <template v-if="isSinglePageTabbar">
+      <TabViews>
+        <template #tabHost>
+          <slot />
+        </template>
+      </TabViews>
+      <Tabbar />
+    </template>
+
+    <!-- 模式 0-3：宿主页本身就是真实路由页面，直接渲染业务内容 -->
+    <template v-else>
+      <slot />
+    </template>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { useTabbar } from '@/src/tabbar/index.uts';
+import TabViews from './TabViews.uvue';
+import Tabbar from '@/src/tabbar/tabbar.uvue';
+
+const { isSinglePageTabbar } = useTabbar();
+</script>
+
+<style scoped>
+.tab-page-host {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.tab-page-host--single {
+  flex: 1;
+  height: 100%;
+}
+</style>

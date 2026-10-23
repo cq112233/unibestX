@@ -1,0 +1,55 @@
+import { inject } from 'vue';
+import { onHide, onShow } from '@dcloudio/uni-app';
+import { useRoute } from '@/uni_modules/route-bestX/index.uts';
+import { useBackPressExit } from '@/src/hooks/useBackPressExit.uts';
+import { notifyPageHide, notifyPageShow } from '../core/lifecycle.uts';
+import { setCurIdxByKey } from '../core/state.uts';
+import { isSinglePageTabbar } from '../core/strategy.uts';
+import { activateTabPageFromHostQuery } from '../core/tab-page.uts';
+
+/**
+ * Tab 页面壳适配 hook（页面文件既可作为真实页面，也可被模式 4 的 TabContainer 嵌套）。
+ *
+ * - 真实页面（模式 0-3）：注册原生 onShow / onHide，同步 Tab 下标并处理 Android 返回键；
+ * - 模式 4 宿主页：承接入口深链、只桥接页面可见性，不按宿主路由重置当前 Tab；
+ * - 模式 4 子页：由外层 TabContent 注入 `tabPageIndex`，此时禁止注册页面级生命周期，
+ *   统一交给 `useTabPage()` 按“当前 Tab 是否激活”派发 onLoad / onShow / onHide。
+ *
+ * @param tabType config.uts 中该 Tab 的业务标识
+ * @returns 当前页面是否作为模式 4 的 Tab 子页被嵌套
+ */
+export function useTabPageShell(tabType: string): boolean {
+  const tabPageIndex = inject<number>('tabPageIndex', -1);
+  const isEmbeddedTabPage = tabPageIndex >= 0;
+  if (isEmbeddedTabPage) {
+    return true;
+  }
+
+  // 模式 4 宿主页没有每个 Tab 自己的系统路由，由这里统一承接入口深链：
+  // /src/pages/index/index?tab=basic&id=1 -> 激活 basic 并写入它的虚拟 query。
+  if (isSinglePageTabbar) {
+    const hostRoute = useRoute();
+    activateTabPageFromHostQuery(hostRoute.query);
+  }
+
+  onShow((): void => {
+    // #ifdef MP-ALIPAY
+    // 隐藏支付宝小程序左侧原生的“返回首页”按钮
+    if (typeof my != 'undefined' && typeof my.hideBackHome == 'function') {
+      my.hideBackHome();
+    }
+    // #endif
+    // 模式 4 的页面栈顶始终是宿主页，不能据此重置当前 Tab
+    if (!isSinglePageTabbar) {
+      setCurIdxByKey(tabType);
+    }
+    notifyPageShow();
+  });
+
+  onHide((): void => {
+    notifyPageHide();
+  });
+
+  useBackPressExit();
+  return false;
+}

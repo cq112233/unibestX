@@ -443,7 +443,7 @@ unibestX/
 │   ├── vite-plugin-uni-pages-route-table.ts # 提供 virtual:uni-pages-route-table 虚拟模块
 │   ├── pages-json-util.ts               #   pages.json 读写与平台分支工具
 │   ├── uni-layouts-plugin.ts            #   跨端 Layout 布局插件（default / empty / navbar）
-│   ├── vite-plugin-tabbar-views.ts      #   单页 TabBar 脚手架与视图自动生成
+│   ├── vite-plugin-tabbar-views.ts      #   单页 TabBar 调度组件自动生成（复用页面 .uvue）
 │   ├── root-plugin.ts                   #   自动包裹 src/AppRoot.uvue 全局根骨架
 │   ├── vite-plugin-clean-logger.ts      #   过滤编译期控制台噪音日志
 │   ├── vite-plugin-editor-version.ts    #   IDE / HBuilderX 版本提示
@@ -906,10 +906,10 @@ export default defineConfig({
   plugins: [
     // 单页 TabBar 基础脚手架与视图组件辅助生成插件
     tabbarViewsPlugin({
-      enabled: true,                       // 【总控开关】：默认 true
-      configFile: 'src/tabbar/config.uts', // 【TabBar 配置文件路径】
-      autoCreateViews: true,               // 【视图脚手架自动生成】：检测到缺失视图时自动按规范创建 views/*View.uvue
-      syncNavbarConfig: true               // 【导航栏状态自动同步】：自动感知各 Tab 页面 definePage 的 hideNavbar / hideStatusBar
+      enabled: true,                            // 【总控开关】：默认 true
+      configFile: 'src/tabbar/config.uts',      // 【TabBar 配置文件路径】
+      hostPage: 'src/pages/index/index',        // 【模式 4 宿主页】：通过 #tabHost slot 注入自身内容
+      syncNavbarConfig: true                    // 【导航栏状态自动同步】：自动感知各 Tab 页面 definePage 的 hideNavbar / hideStatusBar
     }),
     // ... 其他插件
   ]
@@ -918,31 +918,33 @@ export default defineConfig({
 
 #### 4. 自动化生成机制与开发工作流（`VITE_TABBAR_MODE=4`）
 
-当 `.env` 中设置 `VITE_TABBAR_MODE=4` 且插件开启时，开发者**只需要维护 [src/tabbar/config.uts](src/tabbar/config.uts) 一份配置文件**，所有底层的调度容器与视图组件全由插件自动生成与热同步：
+当 `.env` 中设置 `VITE_TABBAR_MODE=4` 且插件开启时，开发者**只需要维护 [src/tabbar/config.uts](src/tabbar/config.uts) 一份配置文件**，调度容器由插件自动生成与热同步；Tab 业务代码仍写在各自页面 `.uvue` 中，不再生成 `views/*View.uvue`：
 
 ```text
 src/tabbar/config.uts (唯一样本源)
          │
-         ├── 1. 自动生成调度容器 ──────> src/tabbar/components/TabViews.uvue
-         │
-         └── 2. 缺失视图时自动生成脚手架 ──> src/pages/*/views/*View.uvue
+         └── 自动生成调度容器 ──────> src/tabbar/components/TabViews.uvue
+                                               ├─ 普通 Tab → import src/pages/<tab>/<tab>.uvue
+                                               └─ 宿主页   → <slot name="tabHost" />
 ```
 
 **自动生成的文件与职责：**
 
 1. **调度总容器（`src/tabbar/components/TabViews.uvue`）**
-   - 插件解析 `config.uts` 的 `list` 与 `midButton`，自动完成导入语句；
-   - 自动生成 `<TabContent :content-index="...">` 块，并自动感知各 Tab 页面的 `definePage`，若配置了 `hideNavbar` 或 `hideStatusBar` 会自动注入同步属性。
-2. **业务子视图脚手架（`src/pages/<模块>/views/<模块>View.uvue`）**
-   - 当在 `config.uts` 中添加了一个新的 Tab 项（例如 `src/pages/order/order`），若该目录下尚未存在 `views/OrderView.uvue`，插件会自动生成一份符合规范的基础组件；
-   - 自动生成的组件预置了 UTS `defineOptions` 隔离、`onTabShow` 激活刷新钩子、`onNavbarPullDownRefresh` 自定义下拉刷新联动机制，开箱即用。
+   - 插件解析 `config.uts` 的 `list` 与 `midButton`，直接导入普通 Tab 的页面 `.uvue`；
+   - 宿主页不 import 自身，而是由 [TabPageHost.uvue](src/tabbar/components/TabPageHost.uvue) 把页面内容注入 `#tabHost` slot，避免循环引用；
+   - `uni-layouts-plugin` 与 `root-plugin` 会跳过这些被 `TabViews` 直接复用的页面：前者避免再包一层 navbar，后者避免再包一层 `AppRoot` 导致首次懒加载时把 `curIdx` 同步回首页；宿主首页仍由外层布局与根骨架提供唯一实例；
+   - 自动生成 `<TabContent :content-index="...">` 块，并自动感知各 Tab 页面的 `definePage`；`showBack` / `hideNavbar` / `hideStatusBar` 会注入同步属性，切换 Tab 时由 `TabContent` 动态同步到宿主页唯一的 navbar。
+2. **页面文件双身份**
+   - Tab 页面 `.uvue` 在模式 0-3 下是真实路由页面，在模式 4 下由 `TabViews` 直接作为子组件挂载，业务代码只维护一份；
+   - 需要模式 4 的路由参数与生命周期时调用 `useTabPage()`；需要自动兼容真实页面 / Tab 子页生命周期时调用 `useTabPageShell(tabType)`。
 
 **开发者新增 / 调整 Tab 的极简心智流程：**
 
 - **新增 Tab**
   1. 在 `src/tabbar/config.uts` 的 `list` 数组中添加一项（指定 `text`、`icon`、`pagePath` 等）；
-  2. 保存后，插件自动生成对应的 `views/*View.uvue` 脚手架，并自动更新 `TabViews.uvue`；
-  3. 直接在生成的 `views/*View.uvue` 中编写业务代码，无需手写任何路由容器与挂载代码。
+  2. 保存后，插件自动更新 `TabViews.uvue`，并直接引用 `pagePath` 对应的页面 `.uvue`；
+  3. 直接在页面文件中编写业务代码，无需手写任何路由容器与挂载代码。
 - **中间鼓包按钮（`midButton`）按需启停**
   - **启用鼓包**：解开 `midButton` 注释，插件自动按居中索引插入并挂载 `AiView`；
   - **禁用鼓包**：直接用 `//` 注释掉 `midButton`，插件自动清洗注释并从调度容器中剔除。
@@ -959,7 +961,7 @@ src/tabbar/config.uts (唯一样本源)
 - **`switchTabbar(url: string)`** — 全局统一 TabBar 跳转方法。单页面模式下直接切换索引，多页面模式下自动调度 `switchTab` 或 `redirectTo`（250ms 防连击锁在 `handleTabbarClick()` 里，点 tab 走它；直接调 `switchTabbar()` 不触发节流）
 - **`onTabShow(target, callback, immediate?)`** — 监听特定 Tab 项激活显示，完美解决单页面模式下子视图没有原生 `onShow` 的问题（可在切换回该 Tab 时触发数据重新请求与刷新）。`target` 推荐直接写 `config.uts` 中该项的 **`tabType` 业务标识**（如 `onTabShow('index', ...)`），不再依赖下标顺序；同时兼容数字下标 `0`、下标字符串 `'0'` 与 `pagePath`。标识无法解析时会在控制台告警，便于发现写错的 `tabType`
 - **`onTabPageShow(target, callback, immediate?)`** — 监听特定 Tab **页面显示**（要求「页面可见」且「当前激活 Tab 命中」），是 `onTabShow` 的超集 —— 除切换 Tab 外，还覆盖 `onTabShow` 够不到的「页面回来了」：从子页面 `navigateBack` 返回、App 从后台回到前台。它同时修掉 `onTabShow` 的一个时序坑：在子页面里调 `switchTabbar` 时 `curIdx` 立刻变化，`onTabShow` 会在容器页仍不可见时提前回调，而 `onTabPageShow` 会抑制这次并推迟到页面真正返回时再补发一次。`target` 写法与 `onTabShow` 完全一致
-- **`syncCurIdxByCurrentPage()`** — 自动从当前页面路由同步激活 Tab 项索引
+- **`syncCurIdxByCurrentPage()`** — 自动从当前页面路由同步激活 Tab 项索引；模式 4 下为空操作，避免宿主页路径把懒加载 Tab / 深链重置回首页
 - **`notifyPageShow()` / `notifyPageHide()`** — 页面可见性桥接。模式 4 已在容器页 `src/pages/index/index.uvue` 的 `onShow` / `onHide` 中内置；模式 0-3 若也要「从子页面返回时触发」，在对应 Tab 页面的 `onShow` / `onHide` 里各加一行即可（完全未桥接时 `onTabPageShow` 自动退化为 `onTabShow` 的语义，不会静默失效）
 - **`safeHideNativeTabBar()`** — 全端安全隐藏原生底板，并在 H5 平台注入动态样式清除视口多余空白
 - **`initNativeMidButtonTap()`** — 仅在原生模式且配置 `midButton` 时自动注册监听，无需在页面中硬编码

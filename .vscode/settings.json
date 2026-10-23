@@ -228,6 +228,12 @@
     "uts": "ts",
     "uvue": "vue"
   },
+  // uni-app 的 %key% 页面标题语法不是 Vue i18n 默认的 t('key') 写法。
+  // 第一条识别 %key%，第二条识别 navigationBarTitleText 中直接写 key 的静态标题。
+  "i18n-ally.regex.usageMatchAppend": [
+    "%({key})%",
+    "navigationBarTitleText[^\\n]*?['\"]([A-Za-z_][A-Za-z0-9_-]*(?:\\.[A-Za-z0-9_-]+)+)['\"]"
+  ],
   "i18n-ally.parsers.typescript.compilerOptions": {
     "module": "commonjs",
     "allowJs": true,

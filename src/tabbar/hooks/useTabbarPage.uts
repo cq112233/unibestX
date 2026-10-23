@@ -45,11 +45,11 @@ export function useTabbarPage(): UseTabbarPageResult {
     notifyPageHide: (): void => {
       notifyPageHide();
     },
-    onTabShow: (target: number | string, callback: () => void, immediate: boolean = false): void => {
-      onTabShow(target, callback, immediate);
+    onTabShow: (target: number | string, callback: () => void, immediate?: boolean): void => {
+      onTabShow(target, callback, immediate ?? false);
     },
-    onTabPageShow: (target: number | string, callback: () => void, immediate: boolean = false): void => {
-      onTabPageShow(target, callback, immediate);
+    onTabPageShow: (target: number | string, callback: () => void, immediate?: boolean): void => {
+      onTabPageShow(target, callback, immediate ?? false);
     },
     resolveTabIndexByKey: (key: string): number => resolveTabIndexByKey(key)
   };

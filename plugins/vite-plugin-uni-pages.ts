@@ -13,12 +13,13 @@ import * as ts from 'typescript';
 import type { Plugin } from 'vite';
 import { loadEnv } from 'vite';
 import { loadAllPlatformPageVariants } from './pages-json-util';
+import { setPagesMetaSnapshot } from './pages-meta-cache';
 
 /**
  * uni-pages 核心插件：扫描 src/pages 与 src/sub 下的 .uvue，解析页面内的
  * `<route>` / `definePage({...})` 声明，与 pages.config.json 合并，生成 pages.json。
  *
- * 本文件**自包含**：页面扫描、宏解析、.env 读取、落盘都在这里，不依赖任何 plugins/ 下的共享模块。
+ * 本文件**自包含**：页面扫描、宏解析、.env 读取、落盘都在这里；仅复用无副作用的解析工具与元数据快照缓存。
  *
  * ## 与三个卫星插件（sandbox / tabbar / route-table）的关系
  *
@@ -121,6 +122,8 @@ export type ResolvedUniPagesOptions = {
 export type PagesBuildFlags = {
   /** 沙盒裁剪已生效（原实现里的 `isSandboxMode && sandboxMainPages.length > 0`） */
   sandboxActive: boolean;
+  /** 主包页面是否严格以本阶段 output 为准（模式 4 用它移除不参与路由的 Tab 页面） */
+  strictMainPages: boolean;
   /** 本次 pass 结束后是否禁止回写 pages.config.json（沙盒生效时禁止） */
   skipConfigWriteback: boolean;
 };
@@ -157,6 +160,8 @@ export type PagesBuildState = {
 
   /** ★ 即将落盘的对象；stages 直接改它 */
   output: PagesJsonOutput;
+  /** 仅供路由表使用的虚拟页面：模式 4 的 Tab 页不写入 pages.json，但仍需保留 route.meta / name */
+  virtualPages: PageConfig[];
 
   flags: PagesBuildFlags;
   stats: PagesBuildStats;
@@ -1253,14 +1258,15 @@ export function mergePlatformItems<T extends object>(
   sandboxActive: boolean = false,
   extraPlatforms: string[] = [],
   rootDir: string = '',
-  projectRoot: string = process.cwd()
+  projectRoot: string = process.cwd(),
+  strictKeys: boolean = false
 ): MergedPlatformItems {
   const src = source || new CommentArray();
   currentPlatform = currentPlatform.toUpperCase();
 
   const lastPlatforms = extractLastPlatforms(src, currentPlatform);
   const itemsKeySet = new Set(items.map(item => (item as any)[uniqueKeyName]));
-  const allowedKeys = sandboxActive ? itemsKeySet : null;
+  const allowedKeys = sandboxActive || strictKeys ? itemsKeySet : null;
   const fullMacroKeys = new Set(
     items
       .filter(item => (Array.isArray((item as any)._variants) && (item as any)._variants.length > 0) || (item as any)._hasMeta === true)
@@ -1473,7 +1479,8 @@ export function mergePagesJson(
   currentPlatform: string,
   sandboxActive: boolean = false,
   extraPlatforms: string[] = [],
-  projectRoot: string = process.cwd()
+  projectRoot: string = process.cwd(),
+  strictMainPages: boolean = false
 ): string {
   let oldConfig: any = {};
   if (existingContent && existingContent.trim() !== '') {
@@ -1487,7 +1494,7 @@ export function mergePagesJson(
   }
 
   const oldPages = Array.isArray(oldConfig.pages) ? oldConfig.pages : undefined;
-  const mergedPagesRes = mergePlatformItems(oldPages, currentPlatform, output.pages, 'path', sandboxActive, extraPlatforms, '', projectRoot);
+  const mergedPagesRes = mergePlatformItems(oldPages, currentPlatform, output.pages, 'path', sandboxActive, extraPlatforms, '', projectRoot, strictMainPages);
   const mergedPages = mergedPagesRes.items;
 
   // 首页置顶
@@ -1558,7 +1565,8 @@ function writePagesJson(
   output: PagesJsonOutput,
   outputPath: string,
   currentPlatformStr: string = '',
-  sandboxActive: boolean = false
+  sandboxActive: boolean = false,
+  strictMainPages: boolean = false
 ): boolean {
   let existing = '';
   if (fs.existsSync(outputPath)) {
@@ -1570,7 +1578,7 @@ function writePagesJson(
   // unibestX 作为 uni-app X 项目，APP（Android/iOS/Harmony）是核心编译底座。
   // 必须将 APP 纳入基线覆盖集，确保无论当前单端跑的是 H5 还是小程序，生成的 pages.json 始终保证 App-Android/iOS 有页可用，杜绝原生拦截报错
   const extraPlatforms = ['APP'];
-  const mergedContent = mergePagesJson(existing, output, currentPlatform, sandboxActive, extraPlatforms, projectRoot);
+  const mergedContent = mergePagesJson(existing, output, currentPlatform, sandboxActive, extraPlatforms, projectRoot, strictMainPages);
 
   if (mergedContent !== existing) {
     fs.writeFileSync(outputPath, mergedContent, 'utf-8');
@@ -2064,8 +2072,10 @@ export async function buildPages(
     debugAnnotatedPages,
     debugHomeAnnotatedPages,
     output,
+    virtualPages: [],
     flags: {
       sandboxActive: false,
+      strictMainPages: false,
       skipConfigWriteback: false
     },
     stats: {
@@ -2114,7 +2124,13 @@ export function resolveCurrentPlatform(platformInput?: string): string {
 /** 把构建结果落盘：写 pages.json（内容不变则跳过）+ ws 全量刷新 + 回写 pages.config.json */
 export function commitPages(state: PagesBuildState, server: any = null): void {
   const currentPlatform = resolveCurrentPlatform(process.env.UNI_PLATFORM);
-  const changed = writePagesJson(state.output, state.outputPath, currentPlatform, state.flags.sandboxActive);
+  const changed = writePagesJson(
+    state.output,
+    state.outputPath,
+    currentPlatform,
+    state.flags.sandboxActive,
+    state.flags.strictMainPages
+  );
 
   if (changed) {
     if (state.flags.sandboxActive) {
@@ -2192,6 +2208,13 @@ export default function uniPagesPlugin(userOptions: UniPagesOptions = {}): Plugi
       // pages.config.json 语法错误且无缓存：保持现状，等用户修好
       return;
     }
+    // 在写盘前保存完整页面元数据：模式 4 会把非宿主 Tab 页从 pages.json 移除，
+    // TabViews 生成器仍需要这些页面的多平台 definePage 配置来同步 navbar 标题等字段。
+    setPagesMetaSnapshot({
+      platform: resolveCurrentPlatform(process.env.UNI_PLATFORM),
+      pages: state.finalPages,
+      subPackages: state.scannedSubPkgs
+    }, state.root);
     commitPages(state, server);
   }
 

@@ -1,3 +1,4 @@
+# [3.0.0](https://github.com/cq112233/unibestX/compare/v2.1.1...v3.0.0) (2026-10-22)
 # [2.0.0](https://github.com/cq112233/unibestX/compare/v1.1.4...v2.0.0) (2026-10-20)
 
 
