@@ -24,6 +24,43 @@
 </view>
 ```
 
+## 全局字体：AppText
+
+需要跟随全局字体与字号缩放变化的业务文案，统一使用 `AppText`。组件已通过 Easycom 注册，不需要手动 import：
+
+```html
+<view class="flex flex-col p-[16px]">
+  <AppText variant="title" class="text-[#1e293b] mb-[8px]">订单详情</AppText>
+  <AppText variant="body" class="text-[#64748b]">今天 14:30 已送达</AppText>
+  <AppText variant="caption" class="text-[#94a3b8] mt-[6px]">共 3 件商品</AppText>
+</view>
+```
+
+`AppText` 的职责边界：
+
+- `variant` 控制字号、字重与行高：`title` / `subtitle` / `body` / `caption` / `label`。
+- `class` 控制颜色、外边距、对齐与布局；**不要再写 `text-[14px]` 等字号类**，字号由组件统一接管。
+- 需要单次覆盖时可用 `size` / `weight` / `lineHeight` / `color`，但业务页面优先使用 `variant + class`。
+- 组件是单根 `<text>`，纯文本直接放进默认插槽；不要塞 `<view>` 或多个兄弟 `<text>`。
+- 图标字符、`uni-icons`、第三方组件内部文字**不要**替换成 `AppText`，避免全局字体族破坏图标字体。
+- 原生 `<button>`、`rich-text` 和第三方组件内部文字不会自动应用全局字体，需要逐步迁移或单独设置。
+
+字体与字号由 `useFontStore` 统一管理：
+
+```uts
+import { useFontStore } from '@/src/store/index.uts';
+
+const fontStore = useFontStore();
+
+fontStore.setFont('alimama-daoli');
+fontStore.setFontScale(1.15);
+fontStore.resetFont();
+```
+
+- 字体清单维护在 `src/config/font.uts`，新增字体只需追加配置。
+- 远程字体通过 `uni.loadFontFace` 注册；失败时保留系统字体兜底，不会阻塞页面。
+- 用户选择与字号比例会持久化；`App.uvue` 启动时调用 `initFont()` 重新注册远程字体。
+
 ## 主题与暗黑模式
 
 配色唯一真源是根目录 `theme.json`，运行时代理在 `src/theme/index.uts`。
