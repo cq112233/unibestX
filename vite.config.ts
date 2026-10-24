@@ -21,6 +21,7 @@ import uniPagesPlugin from './plugins/vite-plugin-uni-pages';
 import uniPagesSandboxPlugin from './plugins/vite-plugin-uni-pages-sandbox';
 import uniPagesTabbarPlugin from './plugins/vite-plugin-uni-pages-tabbar';
 import uniPagesRouteTablePlugin from './plugins/vite-plugin-uni-pages-route-table';
+import htmlToUniPlugin from './plugins/vite-plugin-html-to-uni';
 import { execSync } from 'node:child_process';
 import { viteMockServe } from 'vite-plugin-mock';
 import { viteVConsole } from 'vite-plugin-vconsole';
@@ -274,6 +275,7 @@ export default defineConfig({
     ...(!process.env.UNI_PLATFORM?.startsWith('mp-')
       ? [uniEasycomPlugin({ exclude: UNI_EASYCOM_EXCLUDE })]
       : []),
+    htmlToUniPlugin(),
     uniLayoutsPlugin({
       layoutDir: 'src/layouts',
       layout: 'default'

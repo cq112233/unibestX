@@ -1,0 +1,385 @@
+<template>
+  <view class="flex flex-col flex-1" :style="{ backgroundColor: pageBg }">
+    <scroll-view direction="vertical" class="flex-1 flex flex-col p-[16px]">
+      <!-- 1. 功能说明头部卡片 -->
+      <view
+        class="w-full rounded-[16px] border-[1px] border-solid p-[16px] mb-[12px]"
+        :style="{ backgroundColor: cardBg, borderColor: cardBorder }"
+      >
+        <view class="flex flex-row items-center mb-[10px]">
+          <view class="w-[4px] h-[16px] rounded-[2px] mr-[8px]" :style="{ backgroundColor: activeThemeColor }" />
+          <text class="text-[15px] font-bold" :style="{ color: textMain }">HTML 标签转原生组件演示</text>
+        </view>
+        <text class="text-[12px] leading-[18px]" :style="{ color: textSub }">
+          基于 Vite 构建插件 vite-plugin-html-to-uni，在编译阶段自动将常规 Web HTML 标签转换为 uni-app X 原生组件（如 div 转 view，b/i/em/del/u 转带样式的 text，img 转 image）。既保留了 Web 编写习惯，又完全符合 App 原生渲染引擎的严格规范。
+        </text>
+      </view>
+
+      <!-- 2. 常用文本修饰标签（包含 index.uvue 迁移演示） -->
+      <view
+        class="w-full rounded-[16px] border-[1px] border-solid p-[16px] mb-[12px]"
+        :style="{ backgroundColor: cardBg, borderColor: cardBorder }"
+      >
+        <view class="flex flex-row items-center mb-[12px]">
+          <view class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#3b82f6]" />
+          <text class="text-[14px] font-bold" :style="{ color: textMain }">1. 文本修饰标签（自动转 text）</text>
+        </view>
+
+        <view class="flex flex-col">
+          <!-- b 标签 + 主题色动态绑定 -->
+          <view class="p-[12px] rounded-[10px] mb-[10px]" :style="{ backgroundColor: innerBg }">
+            <text class="text-[11px] text-[#94a3b8] mb-[6px]">&lt;b :style="{ color: activeThemeColor }"&gt; → 加粗 + 主题色</text>
+            <b :style="{ color: activeThemeColor }">
+              加粗主题文本（随主题色与暗黑模式即时变色）
+            </b>
+          </view>
+
+          <!-- b 标签 + 暗黑类名 -->
+          <view class="p-[12px] rounded-[10px] mb-[10px]" :style="{ backgroundColor: innerBg }">
+            <text class="text-[11px] text-[#94a3b8] mb-[6px]">&lt;b class="text-slate-800 dark:text-slate-100"&gt; → 加粗 + 暗黑适配</text>
+            <b class="text-slate-800 dark:text-slate-100">
+              深浅自适应加粗文本（明亮深色自动切换）
+            </b>
+          </view>
+
+          <!-- strong 标签 -->
+          <view class="p-[12px] rounded-[10px] mb-[10px]" :style="{ backgroundColor: innerBg }">
+            <text class="text-[11px] text-[#94a3b8] mb-[6px]">&lt;strong&gt; → 语义强调加粗 (font-bold)</text>
+            <strong :style="{ color: textMain }">
+              强语义重要提示（自动注入 font-bold 加粗样式）
+            </strong>
+          </view>
+
+          <!-- i 标签 -->
+          <view class="p-[12px] rounded-[10px] mb-[10px]" :style="{ backgroundColor: innerBg }">
+            <text class="text-[11px] text-[#94a3b8] mb-[6px]">&lt;i&gt; → 斜体文本 (italic)</text>
+            <i>
+              The quick brown fox jumps over the lazy dog (常用斜体文本)
+            </i>
+          </view>
+
+          <!-- em 标签 -->
+          <view class="p-[12px] rounded-[10px] mb-[10px]" :style="{ backgroundColor: innerBg }">
+            <text class="text-[11px] text-[#94a3b8] mb-[6px]">&lt;em&gt; → 强调斜体文本 (italic)</text>
+            <em>
+              强调斜体提示：编译期自动转为原生 text 文本组件
+            </em>
+          </view>
+
+          <!-- del 标签 -->
+          <view class="p-[12px] rounded-[10px] mb-[10px]" :style="{ backgroundColor: innerBg }">
+            <text class="text-[11px] text-[#94a3b8] mb-[6px]">&lt;del&gt; → 删除线文本 (line-through)</text>
+            <del>
+              原价 ¥999.00（删除线已失效价格）
+            </del>
+          </view>
+
+          <!-- s 标签 -->
+          <view class="p-[12px] rounded-[10px] mb-[10px]" :style="{ backgroundColor: innerBg }">
+            <text class="text-[11px] text-[#94a3b8] mb-[6px]">&lt;s&gt; → 中划线文本 (line-through)</text>
+            <s>
+              原价 ¥999.00
+            </s>
+          </view>
+
+          <!-- u 标签 -->
+          <view class="p-[12px] rounded-[10px] mb-[10px]" :style="{ backgroundColor: innerBg }">
+            <text class="text-[11px] text-[#94a3b8] mb-[6px]">&lt;u&gt; → 下划线文本 (underline)</text>
+            <u>
+              带下划线的链接提示文本
+            </u>
+          </view>
+
+          <!-- span 标签 -->
+          <view class="p-[12px] rounded-[10px]" :style="{ backgroundColor: innerBg }">
+            <text class="text-[11px] text-[#94a3b8] mb-[6px]">&lt;span&gt; → 行内普通文本</text>
+            <span :style="{ color: textMain }">
+              普通行内文本 span
+            </span>
+          </view>
+        </view>
+      </view>
+
+      <!-- 3. 结构布局容器标签 -->
+      <view
+        class="w-full rounded-[16px] border-[1px] border-solid p-[16px] mb-[12px]"
+        :style="{ backgroundColor: cardBg, borderColor: cardBorder }"
+      >
+        <view class="flex flex-row items-center mb-[12px]">
+          <view class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#8b5cf6]" />
+          <text class="text-[14px] font-bold" :style="{ color: textMain }">2. 布局容器标签（自动转 view）</text>
+        </view>
+
+        <view class="flex flex-col">
+          <!-- div 块级 -->
+          <view class="p-[12px] rounded-[10px] mb-[10px]" :style="{ backgroundColor: innerBg }">
+            <text class="text-[11px] text-[#94a3b8] mb-[6px]">&lt;div&gt; 块级容器</text>
+            <div>
+              <text class="text-[13px]" :style="{ color: textMain }">div 标准块级容器，自动转换为跨端原生 view 组件</text>
+            </div>
+          </view>
+
+          <!-- p 段落 -->
+          <view class="p-[12px] rounded-[10px] mb-[10px]" :style="{ backgroundColor: innerBg }">
+            <text class="text-[11px] text-[#94a3b8] mb-[6px]">&lt;p&gt; 段落容器</text>
+            <p>
+              <text class="text-[13px] leading-[18px]" :style="{ color: textMain }">这是一个通过 &lt;p&gt; 编写的段落容器，编译后转为 &lt;view&gt; 原生组件。</text>
+            </p>
+          </view>
+
+          <!-- section / article -->
+          <view class="p-[12px] rounded-[10px] mb-[10px]" :style="{ backgroundColor: innerBg }">
+            <text class="text-[11px] text-[#94a3b8] mb-[6px]">&lt;section&gt; 与 &lt;article&gt; 语义区块</text>
+            <section class="flex flex-col">
+              <article class="p-[8px] rounded-[6px] bg-[#3b82f6]/10 mb-[6px]">
+                <text class="text-[12px] text-[#3b82f6]">article 内部文章模块</text>
+              </article>
+              <nav class="p-[8px] rounded-[6px] bg-[#10b981]/10">
+                <text class="text-[12px] text-[#10b981]">nav 语义导航条容器</text>
+              </nav>
+            </section>
+          </view>
+
+          <!-- ul 与 li -->
+          <view class="p-[12px] rounded-[10px] mb-[10px]" :style="{ backgroundColor: innerBg }">
+            <text class="text-[11px] text-[#94a3b8] mb-[6px]">&lt;ul&gt; 与 &lt;li&gt; 无序列表容器</text>
+            <ul class="flex flex-col">
+              <li class="flex flex-row items-center mb-[4px]">
+                <text class="text-[12px] text-[#3b82f6] mr-[6px]">●</text>
+                <text class="text-[12px]" :style="{ color: textMain }">列表项 1：ul / li 转原生 view</text>
+              </li>
+              <li class="flex flex-row items-center">
+                <text class="text-[12px] text-[#3b82f6] mr-[6px]">●</text>
+                <text class="text-[12px]" :style="{ color: textMain }">列表项 2：不产生任何原生平台编译错误</text>
+              </li>
+            </ul>
+          </view>
+
+          <!-- ol 与 li -->
+          <view class="p-[12px] rounded-[10px] mb-[10px]" :style="{ backgroundColor: innerBg }">
+            <text class="text-[11px] text-[#94a3b8] mb-[6px]">&lt;ol&gt; 与 &lt;li&gt; 有序列表容器</text>
+            <ol class="flex flex-col">
+              <li class="flex flex-row items-center mb-[4px]">
+                <text class="text-[12px] text-[#3b82f6] mr-[6px] font-bold">1.</text>
+                <text class="text-[12px]" :style="{ color: textMain }">有序列表项 1：ol 转原生 view</text>
+              </li>
+              <li class="flex flex-row items-center">
+                <text class="text-[12px] text-[#3b82f6] mr-[6px] font-bold">2.</text>
+                <text class="text-[12px]" :style="{ color: textMain }">有序列表项 2：保持结构清晰语义完整</text>
+              </li>
+            </ol>
+          </view>
+        </view>
+      </view>
+
+      <!-- 4. 媒体图片标签 -->
+      <view
+        class="w-full rounded-[16px] border-[1px] border-solid p-[16px] mb-[12px]"
+        :style="{ backgroundColor: cardBg, borderColor: cardBorder }"
+      >
+        <view class="flex flex-row items-center mb-[12px]">
+          <view class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#ec4899]" />
+          <text class="text-[14px] font-bold" :style="{ color: textMain }">3. 媒体标签（自动转 image）</text>
+        </view>
+
+        <view class="p-[12px] rounded-[10px]" :style="{ backgroundColor: innerBg }">
+          <text class="text-[11px] text-[#94a3b8] mb-[8px]">&lt;img src="/static/logo.png" /&gt; → 转换为 &lt;image&gt;</text>
+          <view class="flex flex-row items-center">
+            <img class="w-[50px] h-[50px] rounded-[10px]" src="/static/logo.png" />
+            <view class="flex flex-col ml-[12px]">
+              <text class="text-[13px] font-bold" :style="{ color: textMain }">Logo 预览</text>
+              <text class="text-[11px] text-[#94a3b8] mt-[2px]">使用 Web 标准 img 语法渲染</text>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 5. 实时主题色与外观模式调试 -->
+      <view
+        class="w-full rounded-[16px] border-[1px] border-solid p-[16px] mb-[12px]"
+        :style="{ backgroundColor: cardBg, borderColor: cardBorder }"
+      >
+        <view class="flex flex-row items-center mb-[10px]">
+          <view class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#10b981]" />
+          <text class="text-[14px] font-bold" :style="{ color: textMain }">4. 动态主题与暗黑联动测试</text>
+        </view>
+
+        <!-- 颜色参数展示 -->
+        <view class="p-[12px] rounded-[10px] mb-[12px]" :style="{ backgroundColor: innerBg }">
+          <view class="flex flex-row items-center justify-between mb-[6px]">
+            <text class="text-[12px]" :style="{ color: textSub }">基础主色 (themeColor)</text>
+            <text class="text-[12px] font-bold" :style="{ color: textMain, fontFamily: 'monospace' }">{{ currentTheme }}</text>
+          </view>
+          <view class="flex flex-row items-center justify-between mb-[6px]">
+            <text class="text-[12px]" :style="{ color: textSub }">深色主色 (darkThemeColor)</text>
+            <text class="text-[12px] font-bold" :style="{ color: textMain, fontFamily: 'monospace' }">{{ darkThemeColor }}</text>
+          </view>
+          <view class="flex flex-row items-center justify-between">
+            <text class="text-[12px]" :style="{ color: textSub }">生效激活色 (activeThemeColor)</text>
+            <text class="text-[12px] font-bold" :style="{ color: activeThemeColor, fontFamily: 'monospace' }">{{ activeThemeColor }}</text>
+          </view>
+        </view>
+
+        <!-- 切换外观模式 -->
+        <view class="flex flex-row items-center justify-between mb-[14px]">
+          <text class="text-[13px]" :style="{ color: textMain }">外观模式</text>
+          <view class="flex flex-row rounded-[8px] overflow-hidden border-[1px] border-solid" :style="{ borderColor: cardBorder }">
+            <view
+              v-for="(item, index) in modeOptions"
+              :key="index"
+              class="px-[12px] py-[6px]"
+              :style="{ backgroundColor: currentMode == item.value ? activeThemeColor : (isDark ? '#0f172a' : 'transparent') }"
+              @click="toggleMode(item.value)"
+            >
+              <text class="text-[12px]" :style="{ color: currentMode == item.value ? '#ffffff' : textSub }">{{ item.label }}</text>
+            </view>
+          </view>
+        </view>
+
+        <!-- 切换预设色 -->
+        <view class="flex flex-col">
+          <text class="text-[13px] mb-[8px]" :style="{ color: textMain }">切换主题色</text>
+          <view class="flex flex-row justify-between py-[4px]">
+            <view
+              v-for="(color, index) in THEME_COLOR_PRESETS"
+              :key="index"
+              class="w-[36px] h-[36px] rounded-[18px] items-center justify-center"
+              :style="{
+                backgroundColor: color,
+                borderWidth: currentTheme == color ? '3px' : '0px',
+                borderStyle: 'solid',
+                borderColor: isDark ? '#ffffff' : '#1e293b'
+              }"
+              @click="selectTheme(color)"
+            >
+              <text v-if="currentTheme == color" class="text-[14px] font-bold text-[#ffffff]">✓</text>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 6. 标签映射对照速查表 -->
+      <view
+        class="w-full rounded-[16px] border-[1px] border-solid p-[16px] mb-[12px]"
+        :style="{ backgroundColor: cardBg, borderColor: cardBorder }"
+      >
+        <view class="flex flex-row items-center mb-[12px]">
+          <view class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#f59e0b]" />
+          <text class="text-[14px] font-bold" :style="{ color: textMain }">5. 支持转换的标签映射速查表</text>
+        </view>
+
+        <view class="flex flex-col">
+          <view
+            v-for="(row, index) in tagMappingList"
+            :key="index"
+            class="p-[10px] rounded-[8px] flex flex-row items-center justify-between mb-[8px]"
+            :style="{ backgroundColor: innerBg }"
+          >
+            <view class="flex flex-row items-center">
+              <text class="text-[12px] font-bold text-[#3b82f6] mr-[8px]" :style="{ fontFamily: 'monospace' }">{{ row.source }}</text>
+              <text class="text-[11px] text-[#94a3b8]">转为</text>
+              <text class="text-[12px] font-bold ml-[8px]" :style="{ color: textMain, fontFamily: 'monospace' }">{{ row.target }}</text>
+            </view>
+            <text class="text-[11px]" :style="{ color: textSub }">{{ row.desc }}</text>
+          </view>
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { computed } from 'vue';
+import { useThemeStore } from '@/src/store/index.uts';
+import { activeThemeColor, darkThemeColor, THEME_COLOR_PRESETS, themeColor } from '@/src/theme/index.uts';
+
+definePage({
+  debug: false,
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
+  style: {
+    navigationBarTitleText: 'HTML 标签转换与主题演示',
+    navigationStyle: 'custom'
+  }
+});
+
+type ModeOption = {
+  label: string;
+  value: string;
+};
+
+type TagMappingItem = {
+  source: string;
+  target: string;
+  desc: string;
+};
+
+const modeOptions: Array<ModeOption> = [
+  { label: '浅色', value: 'light' },
+  { label: '深色', value: 'dark' },
+  { label: '跟随系统', value: 'auto' }
+];
+
+const tagMappingList: Array<TagMappingItem> = [
+  { source: '<b / strong>', target: '<text class="font-bold">', desc: '文本加粗' },
+  { source: '<i / em>', target: '<text class="italic">', desc: '文本斜体' },
+  { source: '<del / s>', target: '<text class="line-through">', desc: '删除线' },
+  { source: '<u>', target: '<text class="underline">', desc: '下划线' },
+  { source: '<span>', target: '<text>', desc: '行内纯文本' },
+  { source: '<div / p>', target: '<view>', desc: '块级/段落容器' },
+  { source: '<section / article / main>', target: '<view>', desc: '结构布局容器' },
+  { source: '<nav / header / footer>', target: '<view>', desc: '语义区域容器' },
+  { source: '<ul / ol / li>', target: '<view>', desc: '无序/有序列表容器' },
+  { source: '<img>', target: '<image>', desc: '媒体图片' }
+];
+
+const themeStore = useThemeStore();
+
+const isDark = computed((): boolean => {
+  return themeStore.state.isDark;
+});
+
+const currentMode = computed((): string => {
+  return themeStore.state.themeMode;
+});
+
+const currentTheme = computed((): string => {
+  return themeColor.value;
+});
+
+const pageBg = computed((): string => {
+  return isDark.value ? '#0b1120' : '#f8fafc';
+});
+
+const cardBg = computed((): string => {
+  return isDark.value ? '#1e293b' : '#ffffff';
+});
+
+const innerBg = computed((): string => {
+  return isDark.value ? '#0f172a' : '#f1f5f9';
+});
+
+const cardBorder = computed((): string => {
+  return isDark.value ? '#334155' : '#e2e8f0';
+});
+
+const textMain = computed((): string => {
+  return isDark.value ? '#f1f5f9' : '#0f172a';
+});
+
+const textSub = computed((): string => {
+  return isDark.value ? '#94a3b8' : '#64748b';
+});
+
+function toggleMode(mode: string): void {
+  themeStore.setThemeMode(mode);
+}
+
+function selectTheme(color: string): void {
+  themeStore.setTheme(color);
+}
+</script>
+
+<style scoped></style>
