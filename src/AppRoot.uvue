@@ -73,6 +73,11 @@ const themeStyle = computed((): UTSJSONObject => {
 // 控制当前页面是否需要显示底部导航栏
 const isCurrentPageTabbar = ref(false);
 
+// 是否展示自定义 TabBar（收敛为单值计算属性以符合跨端模板规范）
+const showTabbar = computed((): boolean => {
+  return customTabbarEnable && isCurrentPageTabbar.value;
+});
+
 // 组件挂载时：同步 H5 / 小程序原生导航栏主题与路由状态
 onMounted(() => {
   applyNavbarTheme(themeStore.state.isDark);
@@ -204,7 +209,7 @@ onUnmounted(() => {
       <slot></slot>
     </scroll-view>
     <!-- 自定义 TabBar：根据 config.uts 中的 type 配置切换形态（胶囊或标准底座） -->
-    <Tabbar v-if="customTabbarEnable && isCurrentPageTabbar" />
+    <Tabbar v-if="showTabbar" />
   </view>
 </template>
 
