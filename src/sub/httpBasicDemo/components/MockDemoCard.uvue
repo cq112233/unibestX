@@ -1,115 +1,3 @@
-<template>
-  <!-- ============ 5. 本地 Mock 拦截（vite-plugin-mock + useQuery / useMutation） ============ -->
-  <view
-    class="rounded-[16px] p-[20px] my-[16px] border-[1px] border-solid border-[#edf2f7] bg-[#ffffff]"
-  >
-    <!-- 标题区域 -->
-    <view class="flex flex-row items-center mb-[12px]">
-      <view class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#f43f5e]" />
-      <text class="text-[16px] font-bold text-[#2d3748]">本地 Mock 拦截</text>
-      <view class="ml-[8px] px-[6px] py-[2px] rounded-[4px] bg-[#fdf2f8] border-[1px] border-solid border-[#fbcfe8]">
-        <text class="text-[10px] font-bold text-[#db2777]">vite-plugin-mock</text>
-      </view>
-    </view>
-    <text class="text-[12px] text-[#64748b] leading-[19px] mb-[12px]">
-      以 pnpm dev:mock 启动后，下面两个相对路径请求会被 Vite 中间件直接拦截、秒回挡板数据，完全不需要后端。列表走 useQuery 手动触发，登录走 useMutation 状态机。
-    </text>
-
-    <!-- 提示条 -->
-    <view class="flex-row items-center bg-[#fdf2f8] p-[8px] rounded-[6px] mb-[12px] border-[1px] border-solid border-[#fce7f3]">
-      <text class="text-[11px] text-[#be123c] leading-[16px] flex-1">
-        💡 普通 dev 模式下这两个请求会打到 VITE_SERVER_BASEURL 指向的真实开发服务器；联调 Mock 请运行 pnpm dev:mock（VITE_USE_MOCK=true + VITE_H5_USE_PROXY=true）。路由定义见 mock/foo.ts 与 mock/auth.ts。
-      </text>
-    </view>
-
-    <!-- 1. useQuery：Mock 列表 (GET /api/foo) -->
-    <view class="rounded-[10px] p-[12px] mb-[12px] border-[1px] border-solid border-[#e2e8f0] bg-[#f8fafc]">
-      <view class="flex-row items-center justify-between mb-[8px]">
-        <text class="text-[13px] font-bold text-[#334155]">1. Mock 列表（useQuery）</text>
-        <view class="px-[6px] py-[2px] rounded-[4px]" :class="listStatusBgClass">
-          <text class="text-[10px] font-medium" :class="listStatusTextClass">{{ listStatusText }}</text>
-        </view>
-      </view>
-      <text v-if="listSummary != ''" class="text-[12px] text-[#475569] leading-[18px] mb-[8px]">{{ listSummary }}</text>
-      <view
-        class="rounded-[8px] h-[38px] w-full flex flex-row items-center justify-center bg-[#ec4899]"
-        @click="requestMockList"
-      >
-        <text class="text-[#ffffff] text-[13px] font-medium">{{ listQuery.isFetching.value ? '拦截中…' : '请求 Mock 列表（GET /api/foo）' }}</text>
-      </view>
-    </view>
-
-    <!-- 2. useMutation：Mock 登录 (POST /api/auth/login) -->
-    <view class="rounded-[10px] p-[12px] border-[1px] border-solid border-[#e2e8f0] bg-[#f8fafc]">
-      <view class="flex-row items-center justify-between mb-[8px]">
-        <text class="text-[13px] font-bold text-[#334155]">2. Mock 登录（useMutation）</text>
-        <view class="px-[6px] py-[2px] rounded-[4px]" :class="loginStatusBgClass">
-          <text class="text-[10px] font-medium" :class="loginStatusTextClass">{{ loginStatusText }}</text>
-        </view>
-      </view>
-
-      <view class="flex-row items-center mb-[8px]">
-        <input
-          v-model="mockUsername"
-          placeholder="用户名（admin）"
-          class="h-[36px] flex-1 mr-[8px] bg-white rounded-[6px] px-[10px] border-[1px] border-solid border-[#cbd5e1] text-[12px] text-[#334155]"
-        />
-        <input
-          v-model="mockPassword"
-          placeholder="密码（123456 / admin）"
-          class="h-[36px] flex-1 bg-white rounded-[6px] px-[10px] border-[1px] border-solid border-[#cbd5e1] text-[12px] text-[#334155]"
-        />
-      </view>
-
-      <view
-        class="rounded-[8px] h-[38px] w-full flex flex-row items-center justify-center bg-[#6366f1] mb-[8px]"
-        @click="submitMockLogin"
-      >
-        <text class="text-[#ffffff] text-[13px] font-medium">{{ loginMutation.isPending.value ? '登录中…' : 'Mock 登录（POST /api/auth/login）' }}</text>
-      </view>
-
-      <view v-if="loginSummary != ''" class="rounded-[8px] bg-[#ffffff] p-[10px] border-[1px] border-solid border-[#e2e8f0]">
-        <text class="text-[11px] text-[#334155] leading-[18px]">{{ loginSummary }}</text>
-      </view>
-    </view>
-
-    <!-- 3. OpenAPI 契约接口：留样记录菜品明细 (POST /gateway/foodSampleReport/dishDetail) -->
-    <view class="rounded-[10px] p-[12px] mt-[12px] border-[1px] border-solid border-[#e2e8f0] bg-[#f8fafc]">
-      <view class="flex-row items-center justify-between mb-[8px]">
-        <text class="text-[13px] font-bold text-[#334155]">3. OpenAPI 生成接口 Mock</text>
-        <view class="px-[6px] py-[2px] rounded-[4px]" :class="dishStatusBgClass">
-          <text class="text-[10px] font-medium" :class="dishStatusTextClass">{{ dishStatusText }}</text>
-        </view>
-      </view>
-
-      <view class="mb-[8px]">
-        <text class="text-[11px] text-[#64748b] leading-[17px]">
-          调用由 OpenAPI 规范自动生成的 foodSampleReportDishDetailUsingPost() 强类型接口，走本地契约挡板 Mock 拦截。
-        </text>
-      </view>
-
-      <view
-        class="rounded-[8px] h-[38px] w-full flex flex-row items-center justify-center bg-[#0284c7] mb-[8px]"
-        @click="requestDishDetail"
-      >
-        <text class="text-[#ffffff] text-[13px] font-medium">{{ isDishLoading ? '请求中…' : '请求留样明细（POST /gateway/foodSampleReport/dishDetail）' }}</text>
-      </view>
-
-      <view v-if="dishSummary != ''" class="rounded-[8px] bg-[#ffffff] p-[10px] border-[1px] border-solid border-[#e2e8f0]">
-        <text class="text-[11px] text-[#0369a1] leading-[18px]">{{ dishSummary }}</text>
-      </view>
-    </view>
-
-    <!-- 失败兜底：拦截未命中 / 真实服务器报错都在这里提示 -->
-    <view
-      v-if="hasMockError"
-      class="mt-[10px] bg-[#fff5f5] rounded-[8px] p-[10px] border-[1px] border-solid border-[#fecaca]"
-    >
-      <text class="text-[12px] text-[#ef4444] leading-[18px]">{{ mockErrorText }}</text>
-    </view>
-  </view>
-</template>
-
 <script setup lang="uts">
 import { computed, ref } from 'vue';
 import { fetchMockFooListApi, fetchMockLoginApi } from '@/src/api/example.uts';
@@ -406,3 +294,115 @@ function requestDishDetail(): void {
   );
 }
 </script>
+
+<template>
+  <!-- ============ 5. 本地 Mock 拦截（vite-plugin-mock + useQuery / useMutation） ============ -->
+  <view
+    class="rounded-[16px] p-[20px] my-[16px] border-[1px] border-solid border-[#edf2f7] bg-[#ffffff]"
+  >
+    <!-- 标题区域 -->
+    <view class="flex flex-row items-center mb-[12px]">
+      <view class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#f43f5e]" />
+      <text class="text-[16px] font-bold text-[#2d3748]">本地 Mock 拦截</text>
+      <view class="ml-[8px] px-[6px] py-[2px] rounded-[4px] bg-[#fdf2f8] border-[1px] border-solid border-[#fbcfe8]">
+        <text class="text-[10px] font-bold text-[#db2777]">vite-plugin-mock</text>
+      </view>
+    </view>
+    <text class="text-[12px] text-[#64748b] leading-[19px] mb-[12px]">
+      以 pnpm dev:mock 启动后，下面两个相对路径请求会被 Vite 中间件直接拦截、秒回挡板数据，完全不需要后端。列表走 useQuery 手动触发，登录走 useMutation 状态机。
+    </text>
+
+    <!-- 提示条 -->
+    <view class="flex-row items-center bg-[#fdf2f8] p-[8px] rounded-[6px] mb-[12px] border-[1px] border-solid border-[#fce7f3]">
+      <text class="text-[11px] text-[#be123c] leading-[16px] flex-1">
+        💡 普通 dev 模式下这两个请求会打到 VITE_SERVER_BASEURL 指向的真实开发服务器；联调 Mock 请运行 pnpm dev:mock（VITE_USE_MOCK=true + VITE_H5_USE_PROXY=true）。路由定义见 mock/foo.ts 与 mock/auth.ts。
+      </text>
+    </view>
+
+    <!-- 1. useQuery：Mock 列表 (GET /api/foo) -->
+    <view class="rounded-[10px] p-[12px] mb-[12px] border-[1px] border-solid border-[#e2e8f0] bg-[#f8fafc]">
+      <view class="flex-row items-center justify-between mb-[8px]">
+        <text class="text-[13px] font-bold text-[#334155]">1. Mock 列表（useQuery）</text>
+        <view class="px-[6px] py-[2px] rounded-[4px]" :class="listStatusBgClass">
+          <text class="text-[10px] font-medium" :class="listStatusTextClass">{{ listStatusText }}</text>
+        </view>
+      </view>
+      <text v-if="listSummary != ''" class="text-[12px] text-[#475569] leading-[18px] mb-[8px]">{{ listSummary }}</text>
+      <view
+        class="rounded-[8px] h-[38px] w-full flex flex-row items-center justify-center bg-[#ec4899]"
+        @click="requestMockList"
+      >
+        <text class="text-[#ffffff] text-[13px] font-medium">{{ listQuery.isFetching.value ? '拦截中…' : '请求 Mock 列表（GET /api/foo）' }}</text>
+      </view>
+    </view>
+
+    <!-- 2. useMutation：Mock 登录 (POST /api/auth/login) -->
+    <view class="rounded-[10px] p-[12px] border-[1px] border-solid border-[#e2e8f0] bg-[#f8fafc]">
+      <view class="flex-row items-center justify-between mb-[8px]">
+        <text class="text-[13px] font-bold text-[#334155]">2. Mock 登录（useMutation）</text>
+        <view class="px-[6px] py-[2px] rounded-[4px]" :class="loginStatusBgClass">
+          <text class="text-[10px] font-medium" :class="loginStatusTextClass">{{ loginStatusText }}</text>
+        </view>
+      </view>
+
+      <view class="flex-row items-center mb-[8px]">
+        <input
+          v-model="mockUsername"
+          placeholder="用户名（admin）"
+          class="h-[36px] flex-1 mr-[8px] bg-white rounded-[6px] px-[10px] border-[1px] border-solid border-[#cbd5e1] text-[12px] text-[#334155]"
+        />
+        <input
+          v-model="mockPassword"
+          placeholder="密码（123456 / admin）"
+          class="h-[36px] flex-1 bg-white rounded-[6px] px-[10px] border-[1px] border-solid border-[#cbd5e1] text-[12px] text-[#334155]"
+        />
+      </view>
+
+      <view
+        class="rounded-[8px] h-[38px] w-full flex flex-row items-center justify-center bg-[#6366f1] mb-[8px]"
+        @click="submitMockLogin"
+      >
+        <text class="text-[#ffffff] text-[13px] font-medium">{{ loginMutation.isPending.value ? '登录中…' : 'Mock 登录（POST /api/auth/login）' }}</text>
+      </view>
+
+      <view v-if="loginSummary != ''" class="rounded-[8px] bg-[#ffffff] p-[10px] border-[1px] border-solid border-[#e2e8f0]">
+        <text class="text-[11px] text-[#334155] leading-[18px]">{{ loginSummary }}</text>
+      </view>
+    </view>
+
+    <!-- 3. OpenAPI 契约接口：留样记录菜品明细 (POST /gateway/foodSampleReport/dishDetail) -->
+    <view class="rounded-[10px] p-[12px] mt-[12px] border-[1px] border-solid border-[#e2e8f0] bg-[#f8fafc]">
+      <view class="flex-row items-center justify-between mb-[8px]">
+        <text class="text-[13px] font-bold text-[#334155]">3. OpenAPI 生成接口 Mock</text>
+        <view class="px-[6px] py-[2px] rounded-[4px]" :class="dishStatusBgClass">
+          <text class="text-[10px] font-medium" :class="dishStatusTextClass">{{ dishStatusText }}</text>
+        </view>
+      </view>
+
+      <view class="mb-[8px]">
+        <text class="text-[11px] text-[#64748b] leading-[17px]">
+          调用由 OpenAPI 规范自动生成的 foodSampleReportDishDetailUsingPost() 强类型接口，走本地契约挡板 Mock 拦截。
+        </text>
+      </view>
+
+      <view
+        class="rounded-[8px] h-[38px] w-full flex flex-row items-center justify-center bg-[#0284c7] mb-[8px]"
+        @click="requestDishDetail"
+      >
+        <text class="text-[#ffffff] text-[13px] font-medium">{{ isDishLoading ? '请求中…' : '请求留样明细（POST /gateway/foodSampleReport/dishDetail）' }}</text>
+      </view>
+
+      <view v-if="dishSummary != ''" class="rounded-[8px] bg-[#ffffff] p-[10px] border-[1px] border-solid border-[#e2e8f0]">
+        <text class="text-[11px] text-[#0369a1] leading-[18px]">{{ dishSummary }}</text>
+      </view>
+    </view>
+
+    <!-- 失败兜底：拦截未命中 / 真实服务器报错都在这里提示 -->
+    <view
+      v-if="hasMockError"
+      class="mt-[10px] bg-[#fff5f5] rounded-[8px] p-[10px] border-[1px] border-solid border-[#fecaca]"
+    >
+      <text class="text-[12px] text-[#ef4444] leading-[18px]">{{ mockErrorText }}</text>
+    </view>
+  </view>
+</template>

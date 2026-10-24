@@ -1,30 +1,3 @@
-<template>
-  <TabPageHost>
-    <div class="flex flex-col w-full">
-      <!-- 1. 顶部 Header、环境信息卡片与简介 -->
-      <IndexHeader />
-
-      <!-- 2. 推荐 IDE 与开发环境 -->
-      <IdeSection />
-
-      <!-- 3. ⚡ 核心特性网格 -->
-      <FeatureGrid />
-
-      <!-- 4. 🧬 OpenAPI 接口生成与工程化套件 -->
-      <EngineeringSection />
-
-      <!-- 5. 🧰 内置与生态工具库 -->
-      <ToolLibSection />
-
-      <!-- 6. ⚡ 多端热重载与调试体验指南 -->
-      <DevWorkflowGuide />
-
-      <!-- 7. 底部提示 -->
-      <IndexFooter />
-    </div>
-  </TabPageHost>
-</template>
-
 <script setup lang="uts">
 import {
   curIdx,
@@ -122,5 +95,32 @@ onIndexHide(() => {
   console.log('onIndexHide', '首页隐藏了👉');
 });
 </script>
+
+<template>
+  <TabPageHost>
+    <div class="flex flex-col w-full">
+      <!-- 1. 顶部 Header、环境信息卡片与简介 -->
+      <IndexHeader />
+
+      <!-- 2. 推荐 IDE 与开发环境 -->
+      <IdeSection />
+
+      <!-- 3. ⚡ 核心特性网格 -->
+      <FeatureGrid />
+
+      <!-- 4. 🧬 OpenAPI 接口生成与工程化套件 -->
+      <EngineeringSection />
+
+      <!-- 5. 🧰 内置与生态工具库 -->
+      <ToolLibSection />
+
+      <!-- 6. ⚡ 多端热重载与调试体验指南 -->
+      <DevWorkflowGuide />
+
+      <!-- 7. 底部提示 -->
+      <IndexFooter />
+    </div>
+  </TabPageHost>
+</template>
 
 <style scoped lang="scss"></style>

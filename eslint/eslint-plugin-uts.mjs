@@ -1552,11 +1552,19 @@ export const pluginUts = {
             }
 
             // 4. 检查并清理 SFC 顶级块标签（<template>, <script>, <style> 等）前导多余缩进空格，强制顶格对齐
+            const templateBody = context.sourceCode.ast?.templateBody;
             const topTagPattern = /^([ \t]+)(<(?:template|script|style|\/template|\/script|\/style)[\s>])/gm;
             let topTagMatch = topTagPattern.exec(context.sourceCode.text);
             while (topTagMatch !== null) {
               const start = topTagMatch.index;
               const end = topTagMatch.index + topTagMatch[1].length;
+
+              // 处于顶级 <template> 内部的 <template #xxx> 或条件 template，属于组件插槽或子节点，绝非顶级块，跳过
+              if (templateBody && start > templateBody.range[0] && end < templateBody.range[1]) {
+                topTagMatch = topTagPattern.exec(context.sourceCode.text);
+                continue;
+              }
+
               const tagName = topTagMatch[2].replace(/[<>/]/g, '').trim().split(/\s+/)[0];
               const loc = {
                 start: context.sourceCode.getLocFromIndex(start),

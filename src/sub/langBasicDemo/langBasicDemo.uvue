@@ -1,3 +1,108 @@
+<script setup lang="uts">
+import { computed } from 'vue';
+import { $t, getI18nText, isI18nKeyLike, setNavigationBarTitle } from '@/src/i18n/utils/index.uts';
+import { useI18nStore } from '@/src/store/index.uts';
+import { setTabbarItem } from '@/src/tabbar/index.uts';
+import { toast } from '@/src/utils/toast/index.uts';
+
+definePage({
+  debug: false,
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
+  style: {
+    navigationBarTitleText: '国际化多语言',
+    navigationStyle: 'custom'
+  }
+});
+
+// =========================================================================
+// 【可选删除】以下内容仅供 i18n 多语言演示使用，接入真实业务时可整段删除。
+// =========================================================================
+
+type LanguageOption = {
+  label: string;
+  value: string;
+};
+
+const i18nStore = useI18nStore();
+
+// —— 卡片文案（自身也走 i18n，切换语言后整页同步刷新）——
+const langUsageTitle = computed((): string => $t('basic.langUsageTitle'));
+const langUsageDesc = computed((): string => $t('basic.langUsageDesc'));
+const langTitle = computed((): string => $t('basic.langTitle'));
+const langPreview = computed((): string => $t('basic.langPreview'));
+const langCurLocale = computed((): string => $t('basic.langCurLocale'));
+const langCardTrans = computed((): string => $t('basic.langCardTrans'));
+const langCardTransDesc = computed((): string => $t('basic.langCardTransDesc'));
+const langCardNamed = computed((): string => $t('basic.langCardNamed'));
+const langCardNamedDesc = computed((): string => $t('basic.langCardNamedDesc'));
+const langCardTextUtil = computed((): string => $t('basic.langCardTextUtil'));
+const langCardTextUtilDesc = computed((): string => $t('basic.langCardTextUtilDesc'));
+const langCardTitle = computed((): string => $t('basic.langCardTitle'));
+const langCardTitleDesc = computed((): string => $t('basic.langCardTitleDesc'));
+const langCardSwitch = computed((): string => $t('basic.langCardSwitch'));
+const langCardSwitchDesc = computed((): string => $t('basic.langCardSwitchDesc'));
+const langFallback = computed((): string => $t('basic.langFallback'));
+const langPlainText = computed((): string => $t('basic.langPlainText'));
+const langSetTitleBtn = computed((): string => $t('basic.langSetTitleBtn'));
+const langSetPreviewBtn = computed((): string => $t('basic.langSetPreviewBtn'));
+const langSwitchZh = computed((): string => $t('basic.langSwitchZh'));
+const langSwitchEn = computed((): string => $t('basic.langSwitchEn'));
+
+// —— 实时预览文案 ——
+const welcomeText = computed((): string => $t('message.welcome'));
+const helloText = computed((): string => $t('message.hello', { msg: 'hi' }));
+
+/** 当前语言（来自 store，切换后驱动全页响应式刷新） */
+const currentLocale = computed((): string => i18nStore.state.locale);
+
+const languageOptions: LanguageOption[] = [
+  { label: '简体中文', value: 'zh-CN' },
+  { label: 'English', value: 'en-US' }
+];
+
+// —— 1. $t 基础翻译演示 ——
+const tBasicWelcome = computed((): string => $t('message.welcome'));
+const tBasicTitle = computed((): string => $t('basic.langTitle'));
+const tBasicTabHome = computed((): string => $t('tabbar.home'));
+/** 故意取一个不存在的 key：$t 会原样返回 key 本身 */
+const tMissingKey = computed((): string => $t('demo.not.exist.key'));
+
+// —— 2. 具名插值演示 ——
+const tNamedHello = computed((): string => $t('message.hello', { msg: 'hi' }));
+
+// —— 3. getI18nText 与 key 形态判断演示 ——
+/** 形如 key：正常翻译 */
+const tTextByKey = computed((): string => getI18nText('basic.langPreview'));
+/** 显式 %key% 包装：强制走翻译 */
+const tTextByWrapped = computed((): string => getI18nText('%basic.langPreview%'));
+/** 中文原文：非 key 形态，原样返回（不查询、不产生缺失 key 噪音） */
+const tTextByPlain = computed((): string => getI18nText('语言设置'));
+const keyLikeTrue = computed((): string => isI18nKeyLike('tabbar.home') ? 'true' : 'false');
+const keyLikeFalse = computed((): string => isI18nKeyLike('语言设置') ? 'true' : 'false');
+
+// —— 4. 动态设置导航栏标题 ——
+function onSetTitleByLang(): void {
+  setNavigationBarTitle('basic.langTitle');
+  toast($t('basic.langTitle'));
+}
+
+function onSetTitleByPreview(): void {
+  setNavigationBarTitle('basic.langPreview');
+  toast($t('basic.langPreview'));
+}
+
+// —— 5. 切换语言（同步 TabBar 文案 + 持久化） ——
+function switchLanguage(lang: string): void {
+  i18nStore.setLocale(lang);
+  setTabbarItem();
+  toast($t('message.switch_success'));
+}
+// =================== 【可选删除】i18n 多语言演示 结束 ===================
+</script>
+
 <template>
   <view class="flex flex-col flex-1 bg-[#f8fafc]">
     <scroll-view direction="vertical" class="flex-1 flex flex-col p-[16px]">
@@ -199,110 +304,5 @@
     </scroll-view>
   </view>
 </template>
-
-<script setup lang="uts">
-import { computed } from 'vue';
-import { $t, getI18nText, isI18nKeyLike, setNavigationBarTitle } from '@/src/i18n/utils/index.uts';
-import { useI18nStore } from '@/src/store/index.uts';
-import { setTabbarItem } from '@/src/tabbar/index.uts';
-import { toast } from '@/src/utils/toast/index.uts';
-
-definePage({
-  debug: false,
-  layout: 'navbar',
-  showBack: true,
-  hideNavbar: false,
-  enablePullDownRefresh: false,
-  style: {
-    navigationBarTitleText: '国际化多语言',
-    navigationStyle: 'custom'
-  }
-});
-
-// =========================================================================
-// 【可选删除】以下内容仅供 i18n 多语言演示使用，接入真实业务时可整段删除。
-// =========================================================================
-
-type LanguageOption = {
-  label: string;
-  value: string;
-};
-
-const i18nStore = useI18nStore();
-
-// —— 卡片文案（自身也走 i18n，切换语言后整页同步刷新）——
-const langUsageTitle = computed((): string => $t('basic.langUsageTitle'));
-const langUsageDesc = computed((): string => $t('basic.langUsageDesc'));
-const langTitle = computed((): string => $t('basic.langTitle'));
-const langPreview = computed((): string => $t('basic.langPreview'));
-const langCurLocale = computed((): string => $t('basic.langCurLocale'));
-const langCardTrans = computed((): string => $t('basic.langCardTrans'));
-const langCardTransDesc = computed((): string => $t('basic.langCardTransDesc'));
-const langCardNamed = computed((): string => $t('basic.langCardNamed'));
-const langCardNamedDesc = computed((): string => $t('basic.langCardNamedDesc'));
-const langCardTextUtil = computed((): string => $t('basic.langCardTextUtil'));
-const langCardTextUtilDesc = computed((): string => $t('basic.langCardTextUtilDesc'));
-const langCardTitle = computed((): string => $t('basic.langCardTitle'));
-const langCardTitleDesc = computed((): string => $t('basic.langCardTitleDesc'));
-const langCardSwitch = computed((): string => $t('basic.langCardSwitch'));
-const langCardSwitchDesc = computed((): string => $t('basic.langCardSwitchDesc'));
-const langFallback = computed((): string => $t('basic.langFallback'));
-const langPlainText = computed((): string => $t('basic.langPlainText'));
-const langSetTitleBtn = computed((): string => $t('basic.langSetTitleBtn'));
-const langSetPreviewBtn = computed((): string => $t('basic.langSetPreviewBtn'));
-const langSwitchZh = computed((): string => $t('basic.langSwitchZh'));
-const langSwitchEn = computed((): string => $t('basic.langSwitchEn'));
-
-// —— 实时预览文案 ——
-const welcomeText = computed((): string => $t('message.welcome'));
-const helloText = computed((): string => $t('message.hello', { msg: 'hi' }));
-
-/** 当前语言（来自 store，切换后驱动全页响应式刷新） */
-const currentLocale = computed((): string => i18nStore.state.locale);
-
-const languageOptions: LanguageOption[] = [
-  { label: '简体中文', value: 'zh-CN' },
-  { label: 'English', value: 'en-US' }
-];
-
-// —— 1. $t 基础翻译演示 ——
-const tBasicWelcome = computed((): string => $t('message.welcome'));
-const tBasicTitle = computed((): string => $t('basic.langTitle'));
-const tBasicTabHome = computed((): string => $t('tabbar.home'));
-/** 故意取一个不存在的 key：$t 会原样返回 key 本身 */
-const tMissingKey = computed((): string => $t('demo.not.exist.key'));
-
-// —— 2. 具名插值演示 ——
-const tNamedHello = computed((): string => $t('message.hello', { msg: 'hi' }));
-
-// —— 3. getI18nText 与 key 形态判断演示 ——
-/** 形如 key：正常翻译 */
-const tTextByKey = computed((): string => getI18nText('basic.langPreview'));
-/** 显式 %key% 包装：强制走翻译 */
-const tTextByWrapped = computed((): string => getI18nText('%basic.langPreview%'));
-/** 中文原文：非 key 形态，原样返回（不查询、不产生缺失 key 噪音） */
-const tTextByPlain = computed((): string => getI18nText('语言设置'));
-const keyLikeTrue = computed((): string => isI18nKeyLike('tabbar.home') ? 'true' : 'false');
-const keyLikeFalse = computed((): string => isI18nKeyLike('语言设置') ? 'true' : 'false');
-
-// —— 4. 动态设置导航栏标题 ——
-function onSetTitleByLang(): void {
-  setNavigationBarTitle('basic.langTitle');
-  toast($t('basic.langTitle'));
-}
-
-function onSetTitleByPreview(): void {
-  setNavigationBarTitle('basic.langPreview');
-  toast($t('basic.langPreview'));
-}
-
-// —— 5. 切换语言（同步 TabBar 文案 + 持久化） ——
-function switchLanguage(lang: string): void {
-  i18nStore.setLocale(lang);
-  setTabbarItem();
-  toast($t('message.switch_success'));
-}
-// =================== 【可选删除】i18n 多语言演示 结束 ===================
-</script>
 
 <style scoped></style>

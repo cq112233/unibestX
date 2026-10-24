@@ -1,182 +1,3 @@
-<template>
-  <view class="flex flex-col flex-1 bg-[#f8fafc] p-[16px]">
-    <scroll-view direction="vertical" class="flex-1 flex flex-col">
-      <!-- 页面顶部描述卡片 -->
-      <view class="rounded-[16px] p-[20px] mb-[16px] border-[1px] border-solid bg-[#ffffff] border-[#edf2f7]">
-        <view class="flex flex-row items-center mb-[10px]">
-          <view class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#0957de]" />
-          <text class="text-[17px] font-bold text-[#1e293b]">XTF-Charts 原生跨端图表</text>
-        </view>
-        <text class="text-[13px] leading-[20px] text-[#64748b]">
-          基于 Canvas 2D 零依赖原生轻量图表组件，无需加载外部庞大 JS 库（体积缩减 90%+），全平台支持折线、柱状、环形饼图、雷达与仪表盘。
-        </text>
-      </view>
-
-      <!-- 图表类型切换选项卡 -->
-      <view class="rounded-[16px] p-[16px] mb-[16px] border-[1px] border-solid bg-[#ffffff] border-[#edf2f7]">
-        <text class="text-[12px] font-bold text-[#94a3b8] mb-[12px]">图表类型切换</text>
-        <view class="flex flex-row justify-between mb-[8px]">
-          <view
-            v-for="item in chartTypes.slice(0, 3)"
-            :key="item.key"
-            class="flex-1 mr-[8px] last:mr-0"
-          >
-            <view
-              class="w-full h-[38px] rounded-[8px] flex flex-row items-center justify-center"
-              :class="activeType === item.key ? 'bg-[#0957de]' : 'bg-[#f1f5f9]'"
-              @click="switchType(item.key)"
-            >
-              <text
-                class="text-[13px] font-bold"
-                :class="activeType === item.key ? 'text-[#ffffff]' : 'text-[#475569]'"
-              >
-                {{ item.name }}
-              </text>
-            </view>
-          </view>
-        </view>
-        <view class="flex flex-row justify-between">
-          <view
-            v-for="item in chartTypes.slice(3, 5)"
-            :key="item.key"
-            class="flex-1 mr-[8px] last:mr-0"
-          >
-            <view
-              class="w-full h-[38px] rounded-[8px] flex flex-row items-center justify-center"
-              :class="activeType === item.key ? 'bg-[#0957de]' : 'bg-[#f1f5f9]'"
-              @click="switchType(item.key)"
-            >
-              <text
-                class="text-[13px] font-bold"
-                :class="activeType === item.key ? 'text-[#ffffff]' : 'text-[#475569]'"
-              >
-                {{ item.name }}
-              </text>
-            </view>
-          </view>
-        </view>
-      </view>
-
-      <!-- 屏幕监听与自适应重绘状态栏 -->
-      <view class="rounded-[16px] p-[16px] mb-[16px] border-[1px] border-solid bg-[#ffffff] border-[#edf2f7]">
-        <view class="flex flex-row items-center justify-between mb-[10px]">
-          <view class="flex flex-row items-center">
-            <view class="w-[8px] h-[8px] rounded-[4px] mr-[8px]" :class="isLandscape ? 'bg-[#f59e0b]' : 'bg-[#10b981]'" />
-            <text class="text-[14px] font-bold text-[#1e293b]">屏幕自适应监听</text>
-          </view>
-          <!-- 屏幕方向标签 -->
-          <view class="px-[8px] py-[3px] rounded-[4px] flex flex-row items-center" :class="isLandscape ? 'bg-[#fef3c7]' : 'bg-[#ecfdf5]'">
-            <text class="text-[11px] font-bold" :class="isLandscape ? 'text-[#b45309]' : 'text-[#047857]'">
-              {{ orientationText }}
-            </text>
-          </view>
-        </view>
-
-        <view class="p-[10px] rounded-[8px] bg-[#f8fafc] border-[1px] border-solid border-[#f1f5f9] mb-[10px]">
-          <view class="flex flex-row items-center justify-between mb-[4px]">
-            <text class="text-[12px] text-[#64748b]">视口尺寸:</text>
-            <text class="text-[12px] font-bold text-[#334155]">{{ screenWidthVal }}px × {{ screenHeightVal }}px</text>
-          </view>
-          <view class="flex flex-row items-center justify-between">
-            <text class="text-[12px] text-[#64748b]">重绘状态:</text>
-            <text class="text-[12px] font-medium text-[#0957de]">{{ resizeInfo }}</text>
-          </view>
-        </view>
-
-        <view class="flex flex-row items-center justify-between">
-          <text class="text-[11px] text-[#94a3b8]">已响应变换: {{ resizeCount }} 次</text>
-          <view
-            class="px-[12px] py-[6px] rounded-[6px] bg-[#f1f5f9] active:opacity-80"
-            @click="triggerManualResize"
-          >
-            <text class="text-[12px] font-medium text-[#475569]">重新计算重绘</text>
-          </view>
-        </view>
-      </view>
-
-      <!-- 图表主渲染卡片 -->
-      <view class="rounded-[16px] p-[16px] mb-[16px] border-[1px] border-solid bg-[#ffffff] border-[#edf2f7]">
-        <view class="flex flex-row items-center justify-between mb-[14px]">
-          <view class="flex flex-row items-center">
-            <view class="w-[8px] h-[8px] rounded-[4px] mr-[8px] bg-[#10b981]" />
-            <text class="text-[15px] font-bold text-[#1e293b]">{{ currentTitle }}</text>
-          </view>
-          <view
-            class="px-[12px] py-[6px] rounded-[6px] bg-[#e0edff] active:opacity-80"
-            @click="randomizeData"
-          >
-            <text class="text-[12px] font-medium text-[#0957de]">随机更新数据</text>
-          </view>
-        </view>
-
-        <!-- XTF-Charts 组件 -->
-        <view class="w-full h-[280px]">
-          <XtfCharts
-            ref="chartRef"
-            canvas-id="xtf-charts-demo-canvas"
-            :option="currentOption"
-            height="280px"
-            @click="handleChartClick"
-          />
-        </view>
-
-        <!-- 交互反馈条 -->
-        <view class="mt-[12px] p-[10px] rounded-[8px] bg-[#f8fafc] border-[1px] border-solid border-[#f1f5f9] flex flex-row items-center">
-          <text class="text-[12px] text-[#64748b] mr-[6px]">交互触发:</text>
-          <text class="text-[12px] font-bold text-[#0957de]">{{ lastClickInfo }}</text>
-        </view>
-      </view>
-
-      <!-- 特性说明与架构优势卡片 -->
-      <view class="rounded-[16px] p-[18px] mb-[16px] border-[1px] border-solid bg-[#ffffff] border-[#edf2f7]">
-        <text class="text-[14px] font-bold text-[#1e293b] mb-[12px]">XTF-Charts 架构特性对比</text>
-
-        <view class="flex flex-col">
-          <view class="flex flex-row items-start mb-[10px]">
-            <view class="w-[6px] h-[6px] rounded-[3px] mt-[6px] mr-[8px] bg-[#0957de]" />
-            <view class="flex-1 flex flex-col">
-              <text class="text-[13px] font-bold text-[#334155]">轻量零依赖（直降 90% 包体积）</text>
-              <text class="text-[12px] text-[#64748b] leading-[18px]">
-                源码仅 ~110KB，无外部打包依赖；彻底避免 ECharts (1.44MB) 撑爆小程序 2MB 主包限制。
-              </text>
-            </view>
-          </view>
-
-          <view class="flex flex-row items-start mb-[10px]">
-            <view class="w-[6px] h-[6px] rounded-[3px] mt-[6px] mr-[8px] bg-[#10b981]" />
-            <view class="flex-1 flex flex-col">
-              <text class="text-[13px] font-bold text-[#334155]">Canvas 2D 原生渲染</text>
-              <text class="text-[12px] text-[#64748b] leading-[18px]">
-                基于跨端标准 Canvas 2D 上下文直接绘制，无需 WebView/renderjs 跨进程通讯，手势与帧率极其稳定。
-              </text>
-            </view>
-          </view>
-
-          <view class="flex flex-row items-start mb-[10px]">
-            <view class="w-[6px] h-[6px] rounded-[3px] mt-[6px] mr-[8px] bg-[#f59e0b]" />
-            <view class="flex-1 flex flex-col">
-              <text class="text-[13px] font-bold text-[#334155]">ECharts 风格声明式 API</text>
-              <text class="text-[12px] text-[#64748b] leading-[18px]">
-                兼容主流 option 配置体系（title, xAxis, yAxis, series, tooltip, legend），迁移与学习成本极低。
-              </text>
-            </view>
-          </view>
-
-          <view class="flex flex-row items-start">
-            <view class="w-[6px] h-[6px] rounded-[3px] mt-[6px] mr-[8px] bg-[#8b5cf6]" />
-            <view class="flex-1 flex flex-col">
-              <text class="text-[13px] font-bold text-[#334155]">全平台原生运行</text>
-              <text class="text-[12px] text-[#64748b] leading-[18px]">
-                完美适配 App-Android、App-iOS、App-HarmonyOS、Web 以及微信/支付宝各端小程序。
-              </text>
-            </view>
-          </view>
-        </view>
-      </view>
-    </scroll-view>
-  </view>
-</template>
-
 <script setup lang="uts">
 import type { ComponentPublicInstance } from 'vue';
 import { computed, onMounted, onUnmounted, ref } from 'vue';
@@ -540,3 +361,182 @@ onUnmounted(() => {
   // #endif
 });
 </script>
+
+<template>
+  <view class="flex flex-col flex-1 bg-[#f8fafc] p-[16px]">
+    <scroll-view direction="vertical" class="flex-1 flex flex-col">
+      <!-- 页面顶部描述卡片 -->
+      <view class="rounded-[16px] p-[20px] mb-[16px] border-[1px] border-solid bg-[#ffffff] border-[#edf2f7]">
+        <view class="flex flex-row items-center mb-[10px]">
+          <view class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#0957de]" />
+          <text class="text-[17px] font-bold text-[#1e293b]">XTF-Charts 原生跨端图表</text>
+        </view>
+        <text class="text-[13px] leading-[20px] text-[#64748b]">
+          基于 Canvas 2D 零依赖原生轻量图表组件，无需加载外部庞大 JS 库（体积缩减 90%+），全平台支持折线、柱状、环形饼图、雷达与仪表盘。
+        </text>
+      </view>
+
+      <!-- 图表类型切换选项卡 -->
+      <view class="rounded-[16px] p-[16px] mb-[16px] border-[1px] border-solid bg-[#ffffff] border-[#edf2f7]">
+        <text class="text-[12px] font-bold text-[#94a3b8] mb-[12px]">图表类型切换</text>
+        <view class="flex flex-row justify-between mb-[8px]">
+          <view
+            v-for="item in chartTypes.slice(0, 3)"
+            :key="item.key"
+            class="flex-1 mr-[8px] last:mr-0"
+          >
+            <view
+              class="w-full h-[38px] rounded-[8px] flex flex-row items-center justify-center"
+              :class="activeType === item.key ? 'bg-[#0957de]' : 'bg-[#f1f5f9]'"
+              @click="switchType(item.key)"
+            >
+              <text
+                class="text-[13px] font-bold"
+                :class="activeType === item.key ? 'text-[#ffffff]' : 'text-[#475569]'"
+              >
+                {{ item.name }}
+              </text>
+            </view>
+          </view>
+        </view>
+        <view class="flex flex-row justify-between">
+          <view
+            v-for="item in chartTypes.slice(3, 5)"
+            :key="item.key"
+            class="flex-1 mr-[8px] last:mr-0"
+          >
+            <view
+              class="w-full h-[38px] rounded-[8px] flex flex-row items-center justify-center"
+              :class="activeType === item.key ? 'bg-[#0957de]' : 'bg-[#f1f5f9]'"
+              @click="switchType(item.key)"
+            >
+              <text
+                class="text-[13px] font-bold"
+                :class="activeType === item.key ? 'text-[#ffffff]' : 'text-[#475569]'"
+              >
+                {{ item.name }}
+              </text>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 屏幕监听与自适应重绘状态栏 -->
+      <view class="rounded-[16px] p-[16px] mb-[16px] border-[1px] border-solid bg-[#ffffff] border-[#edf2f7]">
+        <view class="flex flex-row items-center justify-between mb-[10px]">
+          <view class="flex flex-row items-center">
+            <view class="w-[8px] h-[8px] rounded-[4px] mr-[8px]" :class="isLandscape ? 'bg-[#f59e0b]' : 'bg-[#10b981]'" />
+            <text class="text-[14px] font-bold text-[#1e293b]">屏幕自适应监听</text>
+          </view>
+          <!-- 屏幕方向标签 -->
+          <view class="px-[8px] py-[3px] rounded-[4px] flex flex-row items-center" :class="isLandscape ? 'bg-[#fef3c7]' : 'bg-[#ecfdf5]'">
+            <text class="text-[11px] font-bold" :class="isLandscape ? 'text-[#b45309]' : 'text-[#047857]'">
+              {{ orientationText }}
+            </text>
+          </view>
+        </view>
+
+        <view class="p-[10px] rounded-[8px] bg-[#f8fafc] border-[1px] border-solid border-[#f1f5f9] mb-[10px]">
+          <view class="flex flex-row items-center justify-between mb-[4px]">
+            <text class="text-[12px] text-[#64748b]">视口尺寸:</text>
+            <text class="text-[12px] font-bold text-[#334155]">{{ screenWidthVal }}px × {{ screenHeightVal }}px</text>
+          </view>
+          <view class="flex flex-row items-center justify-between">
+            <text class="text-[12px] text-[#64748b]">重绘状态:</text>
+            <text class="text-[12px] font-medium text-[#0957de]">{{ resizeInfo }}</text>
+          </view>
+        </view>
+
+        <view class="flex flex-row items-center justify-between">
+          <text class="text-[11px] text-[#94a3b8]">已响应变换: {{ resizeCount }} 次</text>
+          <view
+            class="px-[12px] py-[6px] rounded-[6px] bg-[#f1f5f9] active:opacity-80"
+            @click="triggerManualResize"
+          >
+            <text class="text-[12px] font-medium text-[#475569]">重新计算重绘</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 图表主渲染卡片 -->
+      <view class="rounded-[16px] p-[16px] mb-[16px] border-[1px] border-solid bg-[#ffffff] border-[#edf2f7]">
+        <view class="flex flex-row items-center justify-between mb-[14px]">
+          <view class="flex flex-row items-center">
+            <view class="w-[8px] h-[8px] rounded-[4px] mr-[8px] bg-[#10b981]" />
+            <text class="text-[15px] font-bold text-[#1e293b]">{{ currentTitle }}</text>
+          </view>
+          <view
+            class="px-[12px] py-[6px] rounded-[6px] bg-[#e0edff] active:opacity-80"
+            @click="randomizeData"
+          >
+            <text class="text-[12px] font-medium text-[#0957de]">随机更新数据</text>
+          </view>
+        </view>
+
+        <!-- XTF-Charts 组件 -->
+        <view class="w-full h-[280px]">
+          <XtfCharts
+            ref="chartRef"
+            canvas-id="xtf-charts-demo-canvas"
+            :option="currentOption"
+            height="280px"
+            @click="handleChartClick"
+          />
+        </view>
+
+        <!-- 交互反馈条 -->
+        <view class="mt-[12px] p-[10px] rounded-[8px] bg-[#f8fafc] border-[1px] border-solid border-[#f1f5f9] flex flex-row items-center">
+          <text class="text-[12px] text-[#64748b] mr-[6px]">交互触发:</text>
+          <text class="text-[12px] font-bold text-[#0957de]">{{ lastClickInfo }}</text>
+        </view>
+      </view>
+
+      <!-- 特性说明与架构优势卡片 -->
+      <view class="rounded-[16px] p-[18px] mb-[16px] border-[1px] border-solid bg-[#ffffff] border-[#edf2f7]">
+        <text class="text-[14px] font-bold text-[#1e293b] mb-[12px]">XTF-Charts 架构特性对比</text>
+
+        <view class="flex flex-col">
+          <view class="flex flex-row items-start mb-[10px]">
+            <view class="w-[6px] h-[6px] rounded-[3px] mt-[6px] mr-[8px] bg-[#0957de]" />
+            <view class="flex-1 flex flex-col">
+              <text class="text-[13px] font-bold text-[#334155]">轻量零依赖（直降 90% 包体积）</text>
+              <text class="text-[12px] text-[#64748b] leading-[18px]">
+                源码仅 ~110KB，无外部打包依赖；彻底避免 ECharts (1.44MB) 撑爆小程序 2MB 主包限制。
+              </text>
+            </view>
+          </view>
+
+          <view class="flex flex-row items-start mb-[10px]">
+            <view class="w-[6px] h-[6px] rounded-[3px] mt-[6px] mr-[8px] bg-[#10b981]" />
+            <view class="flex-1 flex flex-col">
+              <text class="text-[13px] font-bold text-[#334155]">Canvas 2D 原生渲染</text>
+              <text class="text-[12px] text-[#64748b] leading-[18px]">
+                基于跨端标准 Canvas 2D 上下文直接绘制，无需 WebView/renderjs 跨进程通讯，手势与帧率极其稳定。
+              </text>
+            </view>
+          </view>
+
+          <view class="flex flex-row items-start mb-[10px]">
+            <view class="w-[6px] h-[6px] rounded-[3px] mt-[6px] mr-[8px] bg-[#f59e0b]" />
+            <view class="flex-1 flex flex-col">
+              <text class="text-[13px] font-bold text-[#334155]">ECharts 风格声明式 API</text>
+              <text class="text-[12px] text-[#64748b] leading-[18px]">
+                兼容主流 option 配置体系（title, xAxis, yAxis, series, tooltip, legend），迁移与学习成本极低。
+              </text>
+            </view>
+          </view>
+
+          <view class="flex flex-row items-start">
+            <view class="w-[6px] h-[6px] rounded-[3px] mt-[6px] mr-[8px] bg-[#8b5cf6]" />
+            <view class="flex-1 flex flex-col">
+              <text class="text-[13px] font-bold text-[#334155]">全平台原生运行</text>
+              <text class="text-[12px] text-[#64748b] leading-[18px]">
+                完美适配 App-Android、App-iOS、App-HarmonyOS、Web 以及微信/支付宝各端小程序。
+              </text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+</template>

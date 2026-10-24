@@ -1,81 +1,3 @@
-<template>
-  <view class="flex flex-col flex-1 bg-[#f8fafc] p-[16px]">
-    <scroll-view direction="vertical" class="flex-1 flex flex-col">
-      <view class="rounded-[16px] p-[16px] mb-[12px] bg-[#ffffff] border-[1px] border-solid border-[#e2e8f0]">
-        <text class="text-[15px] font-bold text-[#1e293b] mb-[6px]">字体与字号</text>
-        <text class="text-[12px] leading-[18px] text-[#64748b]">
-          字体文件位于当前分包；微信端使用远程注册，App/H5 使用本地字体。字号缩放全局生效。
-        </text>
-      </view>
-
-      <view class="rounded-[16px] p-[16px] mb-[12px] bg-[#ffffff] border-[1px] border-solid border-[#e2e8f0]">
-        <view class="flex flex-row items-center justify-between mb-[10px]">
-          <text class="text-[12px] font-bold text-[#475569]">字体</text>
-          <text class="text-[12px] text-[#64748b]">{{ fontStatusLabel }}</text>
-        </view>
-        <view class="flex flex-row">
-          <view
-            v-for="item in fontOptions"
-            :key="item.id"
-            class="flex-1 h-[36px] rounded-[8px] mr-[6px] flex flex-row items-center justify-center"
-            :class="selectedFontId == item.id ? 'bg-[#2563eb]' : 'bg-[#eff6ff]'"
-            @click="changeFont(item.id)"
-          >
-            <text
-              class="text-[12px] font-bold"
-              :class="selectedFontId == item.id ? 'text-[#ffffff]' : 'text-[#2563eb]'"
-            >
-              {{ item.label }}
-            </text>
-          </view>
-        </view>
-      </view>
-
-      <view class="rounded-[16px] p-[16px] mb-[12px] bg-[#ffffff] border-[1px] border-solid border-[#e2e8f0]">
-        <view class="flex flex-row items-center justify-between mb-[10px]">
-          <text class="text-[12px] font-bold text-[#475569]">当前比例</text>
-          <text class="text-[14px] font-bold text-[#2563eb]">{{ scalePercent }}%</text>
-        </view>
-        <view class="flex flex-row">
-          <view
-            v-for="item in scaleOptions"
-            :key="item.value"
-            class="flex-1 h-[36px] rounded-[8px] mr-[6px] flex flex-row items-center justify-center"
-            :class="isCurrentScale(item.value) ? 'bg-[#2563eb]' : 'bg-[#eff6ff]'"
-            @click="changeScale(item.value)"
-          >
-            <text
-              class="text-[12px] font-bold"
-              :class="isCurrentScale(item.value) ? 'text-[#ffffff]' : 'text-[#2563eb]'"
-            >
-              {{ item.label }}
-            </text>
-          </view>
-        </view>
-        <view class="w-full h-[36px] mt-[10px] rounded-[8px] bg-[#f1f5f9] flex flex-row items-center justify-center" @click="resetScale">
-          <text class="text-[12px] font-bold text-[#475569]">恢复 100%</text>
-        </view>
-      </view>
-
-      <view class="rounded-[16px] p-[16px] bg-[#ffffff] border-[1px] border-solid border-[#e2e8f0]">
-        <text class="text-[12px] font-bold text-[#94a3b8] mb-[12px]">实时预览</text>
-        <AppText variant="title" class="text-[#0f172a] mb-[8px]" :font-family="previewFontFamily">
-          订单详情
-        </AppText>
-        <AppText variant="subtitle" class="text-[#1e293b] mb-[6px]" :font-family="previewFontFamily">
-          配送进度
-        </AppText>
-        <AppText variant="body" class="text-[#334155] mb-[6px]" :font-family="previewFontFamily">
-          商品已到达配送站，预计今天 18:00 前送达。
-        </AppText>
-        <AppText variant="caption" class="text-[#64748b]" :font-family="previewFontFamily">
-          共 3 件商品 · 实付 ¥128.00
-        </AppText>
-      </view>
-    </scroll-view>
-  </view>
-</template>
-
 <script setup lang="uts">
 import { computed, ref } from 'vue';
 import { useFontStore } from '@/src/store/index.uts';
@@ -191,6 +113,84 @@ function resetScale(): void {
   fontStore.resetFontScale();
 }
 </script>
+
+<template>
+  <view class="flex flex-col flex-1 bg-[#f8fafc] p-[16px]">
+    <scroll-view direction="vertical" class="flex-1 flex flex-col">
+      <view class="rounded-[16px] p-[16px] mb-[12px] bg-[#ffffff] border-[1px] border-solid border-[#e2e8f0]">
+        <text class="text-[15px] font-bold text-[#1e293b] mb-[6px]">字体与字号</text>
+        <text class="text-[12px] leading-[18px] text-[#64748b]">
+          字体文件位于当前分包；微信端使用远程注册，App/H5 使用本地字体。字号缩放全局生效。
+        </text>
+      </view>
+
+      <view class="rounded-[16px] p-[16px] mb-[12px] bg-[#ffffff] border-[1px] border-solid border-[#e2e8f0]">
+        <view class="flex flex-row items-center justify-between mb-[10px]">
+          <text class="text-[12px] font-bold text-[#475569]">字体</text>
+          <text class="text-[12px] text-[#64748b]">{{ fontStatusLabel }}</text>
+        </view>
+        <view class="flex flex-row">
+          <view
+            v-for="item in fontOptions"
+            :key="item.id"
+            class="flex-1 h-[36px] rounded-[8px] mr-[6px] flex flex-row items-center justify-center"
+            :class="selectedFontId == item.id ? 'bg-[#2563eb]' : 'bg-[#eff6ff]'"
+            @click="changeFont(item.id)"
+          >
+            <text
+              class="text-[12px] font-bold"
+              :class="selectedFontId == item.id ? 'text-[#ffffff]' : 'text-[#2563eb]'"
+            >
+              {{ item.label }}
+            </text>
+          </view>
+        </view>
+      </view>
+
+      <view class="rounded-[16px] p-[16px] mb-[12px] bg-[#ffffff] border-[1px] border-solid border-[#e2e8f0]">
+        <view class="flex flex-row items-center justify-between mb-[10px]">
+          <text class="text-[12px] font-bold text-[#475569]">当前比例</text>
+          <text class="text-[14px] font-bold text-[#2563eb]">{{ scalePercent }}%</text>
+        </view>
+        <view class="flex flex-row">
+          <view
+            v-for="item in scaleOptions"
+            :key="item.value"
+            class="flex-1 h-[36px] rounded-[8px] mr-[6px] flex flex-row items-center justify-center"
+            :class="isCurrentScale(item.value) ? 'bg-[#2563eb]' : 'bg-[#eff6ff]'"
+            @click="changeScale(item.value)"
+          >
+            <text
+              class="text-[12px] font-bold"
+              :class="isCurrentScale(item.value) ? 'text-[#ffffff]' : 'text-[#2563eb]'"
+            >
+              {{ item.label }}
+            </text>
+          </view>
+        </view>
+        <view class="w-full h-[36px] mt-[10px] rounded-[8px] bg-[#f1f5f9] flex flex-row items-center justify-center" @click="resetScale">
+          <text class="text-[12px] font-bold text-[#475569]">恢复 100%</text>
+        </view>
+      </view>
+
+      <view class="rounded-[16px] p-[16px] bg-[#ffffff] border-[1px] border-solid border-[#e2e8f0]">
+        <text class="text-[12px] font-bold text-[#94a3b8] mb-[12px]">实时预览</text>
+        <AppText variant="title" class="text-[#0f172a] mb-[8px]" :font-family="previewFontFamily">
+          订单详情
+        </AppText>
+        <AppText variant="subtitle" class="text-[#1e293b] mb-[6px]" :font-family="previewFontFamily">
+          配送进度
+        </AppText>
+        <AppText variant="body" class="text-[#334155] mb-[6px]" :font-family="previewFontFamily">
+          商品已到达配送站，预计今天 18:00 前送达。
+        </AppText>
+        <AppText variant="caption" class="text-[#64748b]" :font-family="previewFontFamily">
+          共 3 件商品 · 实付 ¥128.00
+        </AppText>
+      </view>
+    </scroll-view>
+  </view>
+</template>
 
 <style scoped>
 /* #ifdef APP-ANDROID */

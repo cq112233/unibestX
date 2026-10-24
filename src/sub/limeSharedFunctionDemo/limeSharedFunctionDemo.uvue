@@ -1,3 +1,176 @@
+<script setup lang="uts">
+import { computed, ref } from 'vue';
+import { addUnit } from '@/uni_modules/lime-shared/addUnit';
+import { camelCase } from '@/uni_modules/lime-shared/camelCase';
+import { capitalize } from '@/uni_modules/lime-shared/capitalize';
+import { chunk } from '@/uni_modules/lime-shared/chunk';
+import { clamp } from '@/uni_modules/lime-shared/clamp';
+import { cloneDeep } from '@/uni_modules/lime-shared/cloneDeep';
+import { debounce } from '@/uni_modules/lime-shared/debounce';
+import { fillZero } from '@/uni_modules/lime-shared/fillZero';
+import { floatAdd } from '@/uni_modules/lime-shared/floatAdd';
+import { floatDiv } from '@/uni_modules/lime-shared/floatDiv';
+import { floatMul } from '@/uni_modules/lime-shared/floatMul';
+import { floatSub } from '@/uni_modules/lime-shared/floatSub';
+import { get } from '@/uni_modules/lime-shared/get';
+import { guid } from '@/uni_modules/lime-shared/guid';
+import { isEqual } from '@/uni_modules/lime-shared/isEqual';
+import { kebabCase } from '@/uni_modules/lime-shared/kebabCase';
+import { random } from '@/uni_modules/lime-shared/random';
+import { range } from '@/uni_modules/lime-shared/range';
+import { shuffle } from '@/uni_modules/lime-shared/shuffle';
+import { uniq } from '@/uni_modules/lime-shared/uniq';
+import { uniqid } from '@/uni_modules/lime-shared/uniqid';
+
+definePage({
+  debug: false,
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
+  style: {
+    navigationBarTitleText: 'lime-shared 工具函数',
+    navigationStyle: 'custom'
+  }
+});
+
+// =========================================================================
+// 【可选删除】以下内容仅供 lime-shared 演示使用，接入真实业务时可整段删除。
+// 演示数据属于「页面结构级只读常量」（随页面固化、不由后端下发），故内联在本文件。
+// =========================================================================
+/** 待运算的两个小数，用于演示 floatAdd / floatSub / floatMul / floatDiv */
+const rawFloatA: number = 0.1;
+const rawFloatB: number = 0.2;
+
+// —— 第 1 张卡：浮点精度运算（原生相加与四种精度运算对照）
+const nativeFloatSum: number = rawFloatA + rawFloatB;
+const floatAddText: string = floatAdd(rawFloatA, rawFloatB).toString();
+const floatSubText: string = floatSub(rawFloatA, rawFloatB).toString();
+const floatMulText: string = floatMul(rawFloatA, rawFloatB).toString();
+const floatDivText: string = floatDiv(rawFloatA, rawFloatB).toString();
+
+// —— 第 2 张卡：序列生成与编号补齐
+const rangeText: string = JSON.stringify(range(1, 6));
+const rangeRightText: string = JSON.stringify(range(1, 10, 2, true));
+const fillZeroText: string = fillZero(7, 4);
+const fillZeroDefaultText: string = fillZero(7);
+
+// —— 第 3 张卡：唯一标识生成（可重新生成，因此用响应式变量）
+const guidText = ref<string>('');
+const guidDefaultText = ref<string>('');
+const uniqidText = ref<string>('');
+
+// —— 第 4 张卡：数值约束与单位补全
+const clampedHighText: string = clamp(138, 0, 100).toString();
+const clampedLowText: string = clamp(-5, 0, 10).toString();
+const clampedInRangeText: string = clamp(12, 0, 100).toString();
+const addUnitNumberText: string = addUnit(120) ?? '';
+const addUnitStringText: string = addUnit('50%') ?? '';
+const addUnitAlreadyUnitText: string = addUnit('300px') ?? '';
+
+// —— 第 5 张卡：数组去重与切片分组
+const rawNumbers: Array<number> = [1, 2, 2, 3, 4, 4, 5, 6, 7, 8];
+const uniqNumbers: Array<number> = uniq<number>(rawNumbers);
+const rawNumbersText: string = JSON.stringify(rawNumbers);
+const uniqNumbersText: string = JSON.stringify(uniqNumbers);
+const chunkNumbersText: string = JSON.stringify(chunk<number>(uniqNumbers, 3));
+
+// —— 第 6 张卡：数组随机与拷贝隔离
+/** shuffle 是原地打乱，故每次先复制一份再打乱，避免改动上面的 uniqNumbers */
+const shuffledNumbersText = ref<string>(JSON.stringify(uniqNumbers));
+/** 待拷贝的原始对象：只演示顶层字段隔离，故用扁平结构 */
+const rawUserObj: UTSJSONObject = { name: 'unibestX', age: 25 };
+const rawUserAge = ref<number>(get(rawUserObj, 'age', 0) as number);
+const clonedUserObj = ref<UTSJSONObject>(cloneDeep<UTSJSONObject>(rawUserObj));
+const clonedUserAge = ref<number>(get(clonedUserObj.value, 'age', 0) as number);
+
+// —— 第 7 张卡：对象路径安全取值
+const profileObj: UTSJSONObject = {
+  user: {
+    info: {
+      name: 'UniAppX Developer',
+      age: 25
+    }
+  }
+};
+const getNameText: string = get(profileObj, 'user.info.name', '未找到') as string;
+const getFallbackText: string = get(profileObj, 'user.invalid.path', '兜底值：路径不存在') as string;
+
+// —— 第 8 张卡：文本命名转换（输入即算，故用 computed）
+const inputText = ref<string>('hello_world unibestx-demo');
+const camelCaseText = computed((): string => {
+  return camelCase(inputText.value);
+});
+const pascalCaseText = computed((): string => {
+  return camelCase(inputText.value, true);
+});
+const kebabCaseText = computed((): string => {
+  return kebabCase(inputText.value);
+});
+const capitalizeText = computed((): string => {
+  return capitalize(inputText.value);
+});
+
+/** 把布尔结果转成中文文案，避免在模板里写三元表达式（必须定义在调用点之前） */
+function equalText(flag: boolean): string {
+  if (flag) {
+    return '相等';
+  }
+  return '不相等';
+}
+
+// —— 第 9 张卡：深比较
+const equalObjA: UTSJSONObject = { name: 'unibestX', version: 1 };
+const equalObjB: UTSJSONObject = { name: 'unibestX', version: 1 };
+const equalObjC: UTSJSONObject = { name: 'unibestX', version: 2 };
+const isEqualSameText: string = equalText(isEqual(equalObjA, equalObjB));
+const isEqualDiffText: string = equalText(isEqual(equalObjA, equalObjC));
+const isEqualNullText: string = equalText(isEqual(null, null));
+
+// —— 第 10 张卡：防抖与随机数
+const debouncedCount = ref<number>(0);
+const randomValue = ref<number>(random(1, 100));
+
+/** 重新生成 guid 与 uniqid，用于观察唯一标识随每次调用变化 */
+function onRefreshIdentity(): void {
+  guidText.value = guid(16);
+  guidDefaultText.value = guid();
+  uniqidText.value = uniqid('lime');
+}
+
+/** 打乱数组（复制一份再交给 shuffle，避免原地改动源数组） */
+function onShuffleNumbers(): void {
+  shuffledNumbersText.value = JSON.stringify(shuffle<number>(uniqNumbers.slice()));
+}
+
+/** 修改深拷贝副本的 age，用于验证副本与原对象互不影响 */
+function onMutateClonedUser(): void {
+  const nextAge: number = (get(clonedUserObj.value, 'age', 0) as number) + 1;
+  /* eslint-disable dot-notation */
+  clonedUserObj.value['age'] = nextAge;
+  /* eslint-enable dot-notation */
+  clonedUserAge.value = nextAge;
+}
+
+/** 防抖计数：连续点击只在停止 400ms 后累加一次 */
+const debouncedIncrement = debounce<number>((step: number): void => {
+  debouncedCount.value = debouncedCount.value + step;
+}, 400);
+
+function onDebounceClick(): void {
+  debouncedIncrement(1);
+}
+
+/** 重新生成随机数 */
+function onRefreshRandom(): void {
+  randomValue.value = random(1, 100);
+}
+
+/** 首次进入页面即生成一组唯一标识 */
+onRefreshIdentity();
+// =================== 【可选删除】lime-shared 工具函数演示 结束 ===================
+</script>
+
 <template>
   <view class="flex flex-col items-center flex-1 px-[16px] pt-[12px] pb-[24px]">
     <scroll-view direction="vertical" class="w-full flex flex-col flex-1" :style="{ maxWidth: '560px' }">
@@ -280,178 +453,5 @@
     </scroll-view>
   </view>
 </template>
-
-<script setup lang="uts">
-import { computed, ref } from 'vue';
-import { addUnit } from '@/uni_modules/lime-shared/addUnit';
-import { camelCase } from '@/uni_modules/lime-shared/camelCase';
-import { capitalize } from '@/uni_modules/lime-shared/capitalize';
-import { chunk } from '@/uni_modules/lime-shared/chunk';
-import { clamp } from '@/uni_modules/lime-shared/clamp';
-import { cloneDeep } from '@/uni_modules/lime-shared/cloneDeep';
-import { debounce } from '@/uni_modules/lime-shared/debounce';
-import { fillZero } from '@/uni_modules/lime-shared/fillZero';
-import { floatAdd } from '@/uni_modules/lime-shared/floatAdd';
-import { floatDiv } from '@/uni_modules/lime-shared/floatDiv';
-import { floatMul } from '@/uni_modules/lime-shared/floatMul';
-import { floatSub } from '@/uni_modules/lime-shared/floatSub';
-import { get } from '@/uni_modules/lime-shared/get';
-import { guid } from '@/uni_modules/lime-shared/guid';
-import { isEqual } from '@/uni_modules/lime-shared/isEqual';
-import { kebabCase } from '@/uni_modules/lime-shared/kebabCase';
-import { random } from '@/uni_modules/lime-shared/random';
-import { range } from '@/uni_modules/lime-shared/range';
-import { shuffle } from '@/uni_modules/lime-shared/shuffle';
-import { uniq } from '@/uni_modules/lime-shared/uniq';
-import { uniqid } from '@/uni_modules/lime-shared/uniqid';
-
-definePage({
-  debug: false,
-  layout: 'navbar',
-  showBack: true,
-  hideNavbar: false,
-  enablePullDownRefresh: false,
-  style: {
-    navigationBarTitleText: 'lime-shared 工具函数',
-    navigationStyle: 'custom'
-  }
-});
-
-// =========================================================================
-// 【可选删除】以下内容仅供 lime-shared 演示使用，接入真实业务时可整段删除。
-// 演示数据属于「页面结构级只读常量」（随页面固化、不由后端下发），故内联在本文件。
-// =========================================================================
-/** 待运算的两个小数，用于演示 floatAdd / floatSub / floatMul / floatDiv */
-const rawFloatA: number = 0.1;
-const rawFloatB: number = 0.2;
-
-// —— 第 1 张卡：浮点精度运算（原生相加与四种精度运算对照）
-const nativeFloatSum: number = rawFloatA + rawFloatB;
-const floatAddText: string = floatAdd(rawFloatA, rawFloatB).toString();
-const floatSubText: string = floatSub(rawFloatA, rawFloatB).toString();
-const floatMulText: string = floatMul(rawFloatA, rawFloatB).toString();
-const floatDivText: string = floatDiv(rawFloatA, rawFloatB).toString();
-
-// —— 第 2 张卡：序列生成与编号补齐
-const rangeText: string = JSON.stringify(range(1, 6));
-const rangeRightText: string = JSON.stringify(range(1, 10, 2, true));
-const fillZeroText: string = fillZero(7, 4);
-const fillZeroDefaultText: string = fillZero(7);
-
-// —— 第 3 张卡：唯一标识生成（可重新生成，因此用响应式变量）
-const guidText = ref<string>('');
-const guidDefaultText = ref<string>('');
-const uniqidText = ref<string>('');
-
-// —— 第 4 张卡：数值约束与单位补全
-const clampedHighText: string = clamp(138, 0, 100).toString();
-const clampedLowText: string = clamp(-5, 0, 10).toString();
-const clampedInRangeText: string = clamp(12, 0, 100).toString();
-const addUnitNumberText: string = addUnit(120) ?? '';
-const addUnitStringText: string = addUnit('50%') ?? '';
-const addUnitAlreadyUnitText: string = addUnit('300px') ?? '';
-
-// —— 第 5 张卡：数组去重与切片分组
-const rawNumbers: Array<number> = [1, 2, 2, 3, 4, 4, 5, 6, 7, 8];
-const uniqNumbers: Array<number> = uniq<number>(rawNumbers);
-const rawNumbersText: string = JSON.stringify(rawNumbers);
-const uniqNumbersText: string = JSON.stringify(uniqNumbers);
-const chunkNumbersText: string = JSON.stringify(chunk<number>(uniqNumbers, 3));
-
-// —— 第 6 张卡：数组随机与拷贝隔离
-/** shuffle 是原地打乱，故每次先复制一份再打乱，避免改动上面的 uniqNumbers */
-const shuffledNumbersText = ref<string>(JSON.stringify(uniqNumbers));
-/** 待拷贝的原始对象：只演示顶层字段隔离，故用扁平结构 */
-const rawUserObj: UTSJSONObject = { name: 'unibestX', age: 25 };
-const rawUserAge = ref<number>(get(rawUserObj, 'age', 0) as number);
-const clonedUserObj = ref<UTSJSONObject>(cloneDeep<UTSJSONObject>(rawUserObj));
-const clonedUserAge = ref<number>(get(clonedUserObj.value, 'age', 0) as number);
-
-// —— 第 7 张卡：对象路径安全取值
-const profileObj: UTSJSONObject = {
-  user: {
-    info: {
-      name: 'UniAppX Developer',
-      age: 25
-    }
-  }
-};
-const getNameText: string = get(profileObj, 'user.info.name', '未找到') as string;
-const getFallbackText: string = get(profileObj, 'user.invalid.path', '兜底值：路径不存在') as string;
-
-// —— 第 8 张卡：文本命名转换（输入即算，故用 computed）
-const inputText = ref<string>('hello_world unibestx-demo');
-const camelCaseText = computed((): string => {
-  return camelCase(inputText.value);
-});
-const pascalCaseText = computed((): string => {
-  return camelCase(inputText.value, true);
-});
-const kebabCaseText = computed((): string => {
-  return kebabCase(inputText.value);
-});
-const capitalizeText = computed((): string => {
-  return capitalize(inputText.value);
-});
-
-/** 把布尔结果转成中文文案，避免在模板里写三元表达式（必须定义在调用点之前） */
-function equalText(flag: boolean): string {
-  if (flag) {
-    return '相等';
-  }
-  return '不相等';
-}
-
-// —— 第 9 张卡：深比较
-const equalObjA: UTSJSONObject = { name: 'unibestX', version: 1 };
-const equalObjB: UTSJSONObject = { name: 'unibestX', version: 1 };
-const equalObjC: UTSJSONObject = { name: 'unibestX', version: 2 };
-const isEqualSameText: string = equalText(isEqual(equalObjA, equalObjB));
-const isEqualDiffText: string = equalText(isEqual(equalObjA, equalObjC));
-const isEqualNullText: string = equalText(isEqual(null, null));
-
-// —— 第 10 张卡：防抖与随机数
-const debouncedCount = ref<number>(0);
-const randomValue = ref<number>(random(1, 100));
-
-/** 重新生成 guid 与 uniqid，用于观察唯一标识随每次调用变化 */
-function onRefreshIdentity(): void {
-  guidText.value = guid(16);
-  guidDefaultText.value = guid();
-  uniqidText.value = uniqid('lime');
-}
-
-/** 打乱数组（复制一份再交给 shuffle，避免原地改动源数组） */
-function onShuffleNumbers(): void {
-  shuffledNumbersText.value = JSON.stringify(shuffle<number>(uniqNumbers.slice()));
-}
-
-/** 修改深拷贝副本的 age，用于验证副本与原对象互不影响 */
-function onMutateClonedUser(): void {
-  const nextAge: number = (get(clonedUserObj.value, 'age', 0) as number) + 1;
-  /* eslint-disable dot-notation */
-  clonedUserObj.value['age'] = nextAge;
-  /* eslint-enable dot-notation */
-  clonedUserAge.value = nextAge;
-}
-
-/** 防抖计数：连续点击只在停止 400ms 后累加一次 */
-const debouncedIncrement = debounce<number>((step: number): void => {
-  debouncedCount.value = debouncedCount.value + step;
-}, 400);
-
-function onDebounceClick(): void {
-  debouncedIncrement(1);
-}
-
-/** 重新生成随机数 */
-function onRefreshRandom(): void {
-  randomValue.value = random(1, 100);
-}
-
-/** 首次进入页面即生成一组唯一标识 */
-onRefreshIdentity();
-// =================== 【可选删除】lime-shared 工具函数演示 结束 ===================
-</script>
 
 <style scoped></style>

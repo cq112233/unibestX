@@ -1,3 +1,54 @@
+<script setup lang="uts">
+import { onMounted, onUnmounted, ref } from 'vue';
+import type { ComponentPublicInstance } from 'vue';
+import { useModalStore } from '@/src/store/index.uts';
+import TabbarMaskModal from '@/src/components/TabbarMaskModal/TabbarMaskModal.uvue';
+import SwiperModalTrigger from './components/SwiperModalTrigger.uvue';
+
+definePage({
+  debug: false,
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
+  style: {
+    navigationBarTitleText: '全屏遮罩弹窗',
+    navigationStyle: 'custom'
+  }
+});
+
+const modalStore = useModalStore();
+const MODAL_KEY: string = 'tabbarMaskModal';
+const storeModalRef = ref<ComponentPublicInstance | null>(null);
+
+const showModal = ref(false);
+const showModalInSwiper = ref(false);
+
+function openModal(): void {
+  showModal.value = true;
+}
+
+function closeModal(): void {
+  showModal.value = false;
+}
+
+function openModalInSwiper(): void {
+  showModalInSwiper.value = true;
+}
+
+function closeModalInSwiper(): void {
+  showModalInSwiper.value = false;
+}
+
+onMounted((): void => {
+  modalStore.setInstance(MODAL_KEY, storeModalRef.value);
+});
+
+onUnmounted((): void => {
+  modalStore.deleteInstance(MODAL_KEY);
+});
+</script>
+
 <template>
   <view class="flex flex-col flex-1 bg-[#f8fafc]">
     <scroll-view class="flex-1" direction="vertical">
@@ -140,57 +191,6 @@
     </scroll-view>
   </view>
 </template>
-
-<script setup lang="uts">
-import { onMounted, onUnmounted, ref } from 'vue';
-import type { ComponentPublicInstance } from 'vue';
-import { useModalStore } from '@/src/store/index.uts';
-import TabbarMaskModal from '@/src/components/TabbarMaskModal/TabbarMaskModal.uvue';
-import SwiperModalTrigger from './components/SwiperModalTrigger.uvue';
-
-definePage({
-  debug: false,
-  layout: 'navbar',
-  showBack: true,
-  hideNavbar: false,
-  enablePullDownRefresh: false,
-  style: {
-    navigationBarTitleText: '全屏遮罩弹窗',
-    navigationStyle: 'custom'
-  }
-});
-
-const modalStore = useModalStore();
-const MODAL_KEY: string = 'tabbarMaskModal';
-const storeModalRef = ref<ComponentPublicInstance | null>(null);
-
-const showModal = ref(false);
-const showModalInSwiper = ref(false);
-
-function openModal(): void {
-  showModal.value = true;
-}
-
-function closeModal(): void {
-  showModal.value = false;
-}
-
-function openModalInSwiper(): void {
-  showModalInSwiper.value = true;
-}
-
-function closeModalInSwiper(): void {
-  showModalInSwiper.value = false;
-}
-
-onMounted((): void => {
-  modalStore.setInstance(MODAL_KEY, storeModalRef.value);
-});
-
-onUnmounted((): void => {
-  modalStore.deleteInstance(MODAL_KEY);
-});
-</script>
 
 <style scoped>
 </style>
