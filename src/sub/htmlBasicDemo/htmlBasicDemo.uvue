@@ -22,10 +22,18 @@
       >
         <view class="flex flex-row items-center mb-[12px]">
           <view class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#3b82f6]" />
-          <text class="text-[14px] font-bold" :style="{ color: textMain }">1. 文本修饰标签（自动转 text）</text>
+          <text class="text-[14px] font-bold" :style="{ color: textMain }">1. 常用核心标签（div / b / i / em / del 等）</text>
         </view>
 
         <view class="flex flex-col">
+          <!-- div 标签（最常用块级容器） -->
+          <view class="p-[12px] rounded-[10px] mb-[10px]" :style="{ backgroundColor: innerBg }">
+            <text class="text-[11px] text-[#94a3b8] mb-[6px]">&lt;div&gt; → 块级容器（自动转 view）</text>
+            <div class="p-[10px] rounded-[6px] bg-[#3b82f6]/10">
+              <text class="text-[13px] text-[#2563eb]">div 标准块级容器，编译期无损转为原生 view 组件</text>
+            </div>
+          </view>
+
           <!-- b 标签 + 主题色动态绑定 -->
           <view class="p-[12px] rounded-[10px] mb-[10px]" :style="{ backgroundColor: innerBg }">
             <text class="text-[11px] text-[#94a3b8] mb-[6px]">&lt;b :style="{ color: activeThemeColor }"&gt; → 加粗 + 主题色</text>
@@ -78,7 +86,7 @@
           <view class="p-[12px] rounded-[10px] mb-[10px]" :style="{ backgroundColor: innerBg }">
             <text class="text-[11px] text-[#94a3b8] mb-[6px]">&lt;s&gt; → 中划线文本 (line-through)</text>
             <s>
-              原价 ¥999.00
+              早鸟特惠：¥299.00（限时名额已售罄）
             </s>
           </view>
 
