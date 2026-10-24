@@ -1,0 +1,157 @@
+<template>
+  <div class="flex flex-col w-full">
+    <image class="w-[90px] h-[90px] mx-auto mt-[16px] rounded-[18px]" src="/static/logo.png" />
+    <span class="text-[24px] font-semibold mx-auto mt-[8px] text-[#d14328]">
+      {{ systemInfo?.appTitle ?? '' }}
+    </span>
+    <span class="text-center text-[15px] font-medium mt-[4px] text-[#475569]">
+      最好用的 uni-appX 开发模板。
+    </span>
+
+    <!-- 运行环境状态卡片 -->
+    <div
+      class="mx-[16px] mt-[14px] px-[6px] py-[10px] rounded-[12px] border-[1px] border-solid border-[#e2e8f0] bg-[#ffffff] flex flex-row items-center justify-between"
+    >
+      <div class="flex-1 items-center justify-center">
+        <span class="text-[10px] text-[#94a3b8] mb-[2px]">编译平台</span>
+        <span class="text-[12px] font-bold text-[#4f46e5]">{{ systemInfo?.platformName ?? '' }}</span>
+      </div>
+      <div class="w-[1px] h-[18px] bg-[#e2e8f0]"></div>
+      <div class="flex-1 items-center justify-center">
+        <span class="text-[10px] text-[#94a3b8] mb-[2px]">当前环境</span>
+        <span
+          class="text-[12px] font-bold"
+          :style="{ color: (systemInfo?.env == 'test' ? '#d97706' : (systemInfo?.env == 'production' ? '#dc2626' : '#059669')) }"
+        >
+          {{ systemInfo?.envName ?? '' }}
+        </span>
+      </div>
+      <div class="w-[1px] h-[18px] bg-[#e2e8f0]"></div>
+      <div class="flex-1 items-center justify-center">
+        <span class="text-[10px] text-[#94a3b8] mb-[2px]">渲染模式</span>
+        <span class="text-[12px] font-bold text-[#059669]">
+          {{ systemInfo?.isVapor == true ? 'Vapor' : 'VDOM' }}
+        </span>
+      </div>
+      <div class="w-[1px] h-[18px] bg-[#e2e8f0]"></div>
+      <div class="flex-1 items-center justify-center">
+        <span class="text-[10px] text-[#94a3b8] mb-[2px]">模板版本</span>
+        <span class="text-[12px] font-bold text-[#d97706]">v{{ systemInfo?.templateVersion ?? '' }}</span>
+      </div>
+      <div class="w-[1px] h-[18px] bg-[#e2e8f0]"></div>
+      <div class="flex-1 items-center justify-center">
+        <span class="text-[10px] text-[#94a3b8] mb-[2px]">编译引擎</span>
+        <span class="text-[12px] font-bold text-[#334155]">
+          {{ systemInfo?.compilerVersion ?? '' }}
+        </span>
+      </div>
+    </div>
+
+    <!-- 模板介绍文案卡片 -->
+    <div
+      class="mt-[14px] mx-[16px] p-[14px] rounded-[12px] border-[1px] border-solid bg-[#f8fafc] border-[#e2e8f0]"
+    >
+      <div class="flex flex-row items-center justify-between mb-[8px]">
+        <div class="flex flex-row items-center">
+          <span class="text-[13px] font-bold text-[#1e293b]">📖 模板简介</span>
+          <span
+            class="text-[10px] font-medium px-[6px] py-[2px] rounded-[4px] ml-[6px] text-[#4f46e5] bg-[#6366f114]"
+          >
+            作者: cq112233
+          </span>
+        </div>
+        <div
+          class="flex flex-row items-center px-[8px] py-[2px] rounded-[4px] bg-[#10b98114] active:opacity-80"
+          @click="openGithub"
+        >
+          <span class="text-[10px] font-medium text-[#059669] mr-[2px]">
+            官方开源
+          </span>
+          <span class="text-[10px] font-bold text-[#059669]">
+            ↗
+          </span>
+        </div>
+      </div>
+      <span
+        class="text-[12px] leading-[22px] text-[#475569]"
+      >
+        unibestX 是一个集成了多种工具与技术的 uni-appX 开发模板，由 cq112233 开发，基于 uni-appX + Vue3 + UTS + weapp-tailwindcss + VSCode 构建，完美兼容 vapor / vdom 双模式，模板具有代码提示、自动格式化、统一配置、代码片段等功能，并内置了 ECharts 图表、主题配置、暗黑模式、加密方式配置等常用功能与基本组件，让你开发 uni-appX 拥有极致的体验。
+      </span>
+
+      <!-- 环境版本要求 -->
+      <div
+        class="mt-[10px] px-[10px] py-[7px] rounded-[6px] flex flex-row items-center bg-[#f59e0b14]"
+      >
+        <span class="text-[12px] mr-[6px]">⚠️</span>
+        <span class="text-[11px] leading-[17px] flex-1 text-[#b45309]">
+          环境要求：HBuilderX 版本必须 5.26 及以上（支付宝小程序需 5.31 及以上）
+        </span>
+      </div>
+
+      <!-- 官方 CLI 脚手架快捷创建 -->
+      <div class="mt-[12px] p-[10px] rounded-[8px] bg-[#ffffff] border-[1px] border-solid border-[#e2e8f0]">
+        <div class="flex flex-row items-center justify-between mb-[6px]">
+          <div class="flex flex-row items-center">
+            <span class="text-[12px] font-bold text-[#1e293b] mr-[6px]">🚀 create-unibestx</span>
+            <span class="text-[10px] font-medium text-[#4f46e5] bg-[#6366f114] px-[5px] py-[1px] rounded-[4px]">CLI 脚手架</span>
+          </div>
+          <span class="text-[10px] text-[#64748b]">交互式一键创建</span>
+        </div>
+        <span class="text-[11px] text-[#64748b] leading-[18px] mb-[8px]">
+          支持交互式选择 UI 组件库（Rice UI / uview-ultra / 原生）、内置工具库（lime-shared / lime-use / lime-color / crypto-bestX）、按需功能裁剪与完整性自检：
+        </span>
+        <div
+          class="px-[10px] py-[8px] rounded-[6px] bg-[#0f172a] flex flex-row items-center justify-between active:opacity-90"
+          @click="copyCliCommand"
+        >
+          <span class="text-[11px] text-[#38bdf8] flex-1" style="font-family: monospace;">
+            pnpm create unibestx my-app
+          </span>
+          <span class="text-[10px] text-[#94a3b8] ml-[8px]">
+            点击复制
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup lang="uts">
+import { computed } from 'vue';
+import { useRouter } from '@/uni_modules/route-bestX/index.uts';
+import { systemInfo as systemInfoRef } from '@/src/utils/systemInfo/index.uts';
+import type { SystemInfoType } from '@/src/utils/systemInfo/index.uts';
+
+const router = useRouter();
+const systemInfo = computed<SystemInfoType | null>((): SystemInfoType | null => systemInfoRef.value);
+
+function copyCliCommand(): void {
+  uni.setClipboardData({
+    data: 'pnpm create unibestx my-app',
+    success: () => {
+      uni.showToast({
+        title: '已复制 CLI 命令',
+        icon: 'success'
+      });
+    }
+  });
+}
+
+function openGithub(): void {
+  const url = 'https://github.com/cq112233/unibestX';
+  // #ifdef WEB
+  window.open(url, '_blank');
+  // #endif
+  // #ifndef WEB
+  router.push({
+    path: '/src/sub/webview/webview',
+    query: {
+      url,
+      title: 'unibestX'
+    }
+  });
+  // #endif
+}
+</script>
+
+<style scoped></style>

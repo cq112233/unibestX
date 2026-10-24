@@ -1,0 +1,306 @@
+<template>
+  <div class="mt-[16px] mx-[16px]">
+    <div class="flex flex-row items-center justify-between mb-[10px]">
+      <span class="text-[14px] font-bold text-[#1e293b]">🧬 接口生成与工程化套件</span>
+      <span class="text-[11px] text-[#94a3b8]">自动化生成 · 质量门禁</span>
+    </div>
+
+    <!-- 卡片一：OpenAPI / Apifox 强类型接口生成 -->
+    <div class="p-[14px] mb-[10px] rounded-[12px] border-[1px] border-solid bg-[#f0fdf4] border-[#bbf7d0] flex flex-col">
+      <div class="flex flex-row items-center justify-between mb-[6px]">
+        <div class="flex flex-row items-center">
+          <span class="text-[13px] font-bold text-[#166534]">📡 OpenAPI 接口客户端自动生成</span>
+          <span class="text-[10px] font-medium px-[6px] py-[1px] rounded-[4px] ml-[6px] text-[#15803d] bg-[#dcfce7]">
+            openapi-ts-request
+          </span>
+        </div>
+      </div>
+      <span class="text-[11px] leading-[18px] text-[#14532d] mb-[8px]">
+        一键拉取 Apifox / Swagger / OpenAPI 接口规范，自动生成符合 UTS 强类型规范的 API 客户端与数据模型（严格使用 type 别名，杜绝 interface 编译报错，深度复用 HTTP 客户端拦截器与 Token 鉴权）：
+      </span>
+
+      <!-- 特色亮点 chips -->
+      <div class="flex flex-row flex-wrap mb-[8px]">
+        <span
+          v-for="chip in openApiChips"
+          :key="chip"
+          class="text-[10px] px-[6px] py-[1px] mr-[6px] mb-[6px] rounded-[4px] text-[#166534] bg-[#ffffff] border-[1px] border-solid border-[#bbf7d0]"
+        >
+          {{ chip }}
+        </span>
+      </div>
+
+      <!-- 快捷命令 -->
+      <div
+        class="px-[10px] py-[8px] rounded-[6px] bg-[#0f172a] flex flex-row items-center justify-between active:opacity-90"
+        @click="copyApiGenCommand"
+      >
+        <span class="text-[11px] text-[#4ade80] flex-1" style="font-family: monospace;">
+          pnpm api:gen
+        </span>
+        <span class="text-[10px] text-[#94a3b8] ml-[8px]">
+          点击复制命令
+        </span>
+      </div>
+    </div>
+
+    <!-- 卡片二：Husky + ESLint + Prettier + Stylelint 工程化规范 -->
+    <div class="p-[14px] rounded-[12px] border-[1px] border-solid bg-[#fdf2f8] border-[#fbcfe8] flex flex-col">
+      <div class="flex flex-row items-center justify-between mb-[6px]">
+        <div class="flex flex-row items-center">
+          <span class="text-[13px] font-bold text-[#9d174d]">🛡️ 现代工程化规范与质量门禁</span>
+          <span class="text-[10px] font-medium px-[6px] py-[1px] rounded-[4px] ml-[6px] text-[#be185d] bg-[#fce7f3]">
+            代码质量保障
+          </span>
+        </div>
+      </div>
+      <span class="text-[11px] leading-[18px] text-[#831843] mb-[8px]">
+        深度整合 Git 提交拦截与全流程语法校验，在代码提交和合并前自动拦截低级语法错误与 uni-app X 跨端兼容隐患：
+      </span>
+
+      <!-- 工具列表 -->
+      <div v-for="tool in engineeringList" :key="tool.id" class="flex flex-row items-start mb-[6px]">
+        <span class="text-[11px] mr-[6px] mt-[1px]">{{ tool.icon }}</span>
+        <div class="flex-1 flex flex-col">
+          <div class="flex flex-row items-center">
+            <span class="text-[11px] font-bold text-[#1e293b] mr-[6px]">{{ tool.name }}</span>
+            <span class="text-[10px] text-[#94a3b8]" style="font-family: monospace;">{{ tool.sub }}</span>
+          </div>
+          <span class="text-[10px] leading-[15px] text-[#64748b] mt-[1px]">{{ tool.desc }}</span>
+        </div>
+      </div>
+
+      <!-- 快捷校验命令 -->
+      <div
+        class="mt-[6px] px-[10px] py-[8px] rounded-[6px] bg-[#0f172a] flex flex-row items-center justify-between active:opacity-90"
+        @click="copyLintCommand"
+      >
+        <span class="text-[11px] text-[#f472b6] flex-1" style="font-family: monospace;">
+          pnpm lint:all
+        </span>
+        <span class="text-[10px] text-[#94a3b8] ml-[8px]">
+          点击复制校验命令
+        </span>
+      </div>
+    </div>
+
+    <!-- 卡片三：脚手架全方位体检与包体积门禁 -->
+    <div class="p-[14px] mt-[10px] rounded-[12px] border-[1px] border-solid bg-[#eff6ff] border-[#bfdbfe] flex flex-col">
+      <div class="flex flex-row items-center justify-between mb-[6px]">
+        <div class="flex flex-row items-center">
+          <span class="text-[13px] font-bold text-[#1e40af]">🩺 全方位健康体检与包体积门禁</span>
+          <span class="text-[10px] font-medium px-[6px] py-[1px] rounded-[4px] ml-[6px] text-[#1d4ed8] bg-[#dbeafe]">
+            质量保障与发布把关
+          </span>
+        </div>
+      </div>
+      <span class="text-[11px] leading-[18px] text-[#1e3a8a] mb-[8px]">
+        一键自动化体检关键配置文件、未用依赖、测试覆盖、大图优化；实时核算微信小程序主包 ≤ 2MB 预算，超标阻断发布并精准定位大体积文件：
+      </span>
+
+      <!-- 快捷命令组 -->
+      <div class="flex flex-col">
+        <div
+          class="px-[10px] py-[8px] mb-[6px] rounded-[6px] bg-[#0f172a] flex flex-row items-center justify-between active:opacity-90"
+          @click="copyHealthCommand"
+        >
+          <span class="text-[11px] text-[#38bdf8] flex-1" style="font-family: monospace;">
+            pnpm health / health:quick
+          </span>
+          <span class="text-[10px] text-[#94a3b8] ml-[8px]">
+            点击复制体检命令
+          </span>
+        </div>
+        <div
+          class="px-[10px] py-[8px] rounded-[6px] bg-[#0f172a] flex flex-row items-center justify-between active:opacity-90"
+          @click="copySizeCheckCommand"
+        >
+          <span class="text-[11px] text-[#fbbf24] flex-1" style="font-family: monospace;">
+            pnpm size:check
+          </span>
+          <span class="text-[10px] text-[#94a3b8] ml-[8px]">
+            点击复制包体积检查
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 卡片四：自动化交互式发版与 H5 Docker 部署 -->
+    <div class="p-[14px] mt-[10px] rounded-[12px] border-[1px] border-solid bg-[#faf5ff] border-[#e9d5ff] flex flex-col">
+      <div class="flex flex-row items-center justify-between mb-[6px]">
+        <div class="flex flex-row items-center">
+          <span class="text-[13px] font-bold text-[#6b21a8]">🚀 自动化发版与 H5 Docker 容器化</span>
+          <span class="text-[10px] font-medium px-[6px] py-[1px] rounded-[4px] ml-[6px] text-[#7e22ce] bg-[#f3e8ff]">
+            DevOps 自动化交付
+          </span>
+        </div>
+      </div>
+      <span class="text-[11px] leading-[18px] text-[#581c87] mb-[8px]">
+        集成 Bumpp 语义化发版与标准 Changelog 生成；内置轻量 Nginx Alpine（~25MB）H5 生产/测试双环境 Docker 容器与接口反向代理：
+      </span>
+
+      <!-- 快捷命令组 -->
+      <div class="flex flex-col">
+        <div
+          class="px-[10px] py-[8px] mb-[6px] rounded-[6px] bg-[#0f172a] flex flex-row items-center justify-between active:opacity-90"
+          @click="copyReleaseCommand"
+        >
+          <span class="text-[11px] text-[#c084fc] flex-1" style="font-family: monospace;">
+            pnpm release
+          </span>
+          <span class="text-[10px] text-[#94a3b8] ml-[8px]">
+            点击复制发版命令
+          </span>
+        </div>
+        <div
+          class="px-[10px] py-[8px] rounded-[6px] bg-[#0f172a] flex flex-row items-center justify-between active:opacity-90"
+          @click="copyDockerCommand"
+        >
+          <span class="text-[11px] text-[#38bdf8] flex-1" style="font-family: monospace;">
+            pnpm docker:build:prod
+          </span>
+          <span class="text-[10px] text-[#94a3b8] ml-[8px]">
+            点击复制 Docker 部署命令
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup lang="uts">
+type EngineeringItem = {
+  id: string;
+  name: string;
+  sub: string;
+  desc: string;
+  icon: string;
+};
+
+const openApiChips: Array<string> = [
+  'Apifox 规范直连',
+  '智能示例逆向推导',
+  '全UTS强类型输出',
+  '禁止 interface 严格转 type',
+  '.env.local 敏感凭证隔离'
+];
+
+const engineeringList: Array<EngineeringItem> = [
+  {
+    id: 'husky',
+    name: 'Husky & lint-staged',
+    sub: '.husky/ · lint-staged',
+    desc: 'Git commit 前自动执行轻量增量校验，拦截非规范代码入库',
+    icon: '🐶'
+  },
+  {
+    id: 'eslint',
+    name: 'ESLint & UTS 专属规则',
+    sub: 'eslint.config.mjs',
+    desc: '内置 uni-app X 专属规则插件，严禁 interface、禁止 view 文字颜色等',
+    icon: '🔍'
+  },
+  {
+    id: 'prettier',
+    name: 'Prettier & 统一排版',
+    sub: '.prettierrc · 保存即格式化',
+    desc: '全项目统一引号、缩进与标点风格，与 ESLint 无缝协同保持 0 冲突',
+    icon: '✨'
+  },
+  {
+    id: 'stylelint',
+    name: 'Stylelint 样式规范',
+    sub: 'stylelint.config.mjs',
+    desc: '深度适配 SCSS、uni-app 特有单位（rpx/upx）与原生组件选择器',
+    icon: '📏'
+  },
+  {
+    id: 'commitlint',
+    name: 'Commitlint 提交信息校验',
+    sub: '.commitlintrc.cjs · commit-msg',
+    desc: '强制规范 Git Commit 格式（feat/fix/docs/refactor/types 等）',
+    icon: '📝'
+  },
+  {
+    id: 'cspell',
+    name: 'CSpell 单词拼写检查',
+    sub: 'cspell.json · 专有词典',
+    desc: '检测代码与文档中的英文拼写错误，内置 uni-app X 专有词汇白名单',
+    icon: '🔤'
+  }
+];
+
+function copyApiGenCommand(): void {
+  uni.setClipboardData({
+    data: 'pnpm api:gen',
+    success: () => {
+      uni.showToast({
+        title: '已复制 api:gen 命令',
+        icon: 'success'
+      });
+    }
+  });
+}
+
+function copyLintCommand(): void {
+  uni.setClipboardData({
+    data: 'pnpm lint:all',
+    success: () => {
+      uni.showToast({
+        title: '已复制 lint:all 命令',
+        icon: 'success'
+      });
+    }
+  });
+}
+
+function copyHealthCommand(): void {
+  uni.setClipboardData({
+    data: 'pnpm health',
+    success: () => {
+      uni.showToast({
+        title: '已复制 health 命令',
+        icon: 'success'
+      });
+    }
+  });
+}
+
+function copySizeCheckCommand(): void {
+  uni.setClipboardData({
+    data: 'pnpm size:check',
+    success: () => {
+      uni.showToast({
+        title: '已复制 size:check 命令',
+        icon: 'success'
+      });
+    }
+  });
+}
+
+function copyReleaseCommand(): void {
+  uni.setClipboardData({
+    data: 'pnpm release',
+    success: () => {
+      uni.showToast({
+        title: '已复制 release 命令',
+        icon: 'success'
+      });
+    }
+  });
+}
+
+function copyDockerCommand(): void {
+  uni.setClipboardData({
+    data: 'pnpm docker:build:prod',
+    success: () => {
+      uni.showToast({
+        title: '已复制 docker:build:prod',
+        icon: 'success'
+      });
+    }
+  });
+}
+</script>
+
+<style scoped></style>
