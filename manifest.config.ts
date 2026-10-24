@@ -70,7 +70,8 @@ export default defineManifestConfig({
       minified: true
     },
     usingComponents: true,
-    mergeVirtualHostAttributes: true
+    mergeVirtualHostAttributes: true,
+    lazyCodeLoading: 'requiredComponents'
   },
 
   // 4. 支付宝小程序平台配置（可在支付宝开放平台获取，或通过 VITE_ALIPAY_APPID 覆盖）
