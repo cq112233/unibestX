@@ -1,97 +1,3 @@
-<template>
-  <!-- ============ 2. 文件上传 ============ -->
-  <view
-    class="rounded-[16px] p-[20px] my-[16px] border-[1px] border-solid border-[#edf2f7] bg-[#ffffff]"
-  >
-    <!-- 标题区域 -->
-    <view class="flex flex-row items-center mb-[16px]">
-      <view
-        class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#3182ce]"
-      />
-      <text class="text-[16px] font-bold text-[#2d3748]">文件上传（uploadFooFileApi → http.upload）</text>
-    </view>
-    <view class="mb-[16px]">
-      <view class="flex-row items-center mb-[10px]">
-        <view class="w-[32px] h-[32px] rounded-[8px] bg-[#fff7ed] border-[1px] border-solid border-[#fdba74] items-center justify-center mr-[10px]">
-          <text class="text-[12px] font-bold text-[#c2410c]">UP</text>
-        </view>
-        <view class="flex-1">
-          <text class="text-[14px] font-bold text-[#1e293b]">文件上传</text>
-          <text class="text-[11px] text-[#64748b] mt-[2px]">{{ uploadPath }}</text>
-        </view>
-      </view>
-
-      <view class="flex-row items-center bg-[#fff7ed] p-[8px] rounded-[6px] mb-[10px] border-[1px] border-solid border-[#ffedd5]">
-        <text class="text-[11px] text-[#c2410c] leading-[16px] flex-1">
-          💡 默认使用免费临时图床 tmpfiles.org（免注册、无需 Key，文件公开且保留 48 小时）；在 .env 配置 VITE_UPLOAD_BASEURL / VITE_UPLOAD_PATH 后会自动改打你自己的 OSS
-        </text>
-      </view>
-
-      <view class="rounded-[8px] bg-[#f8fafc] border-[1px] border-solid border-[#cbd5e1] overflow-hidden">
-        <view class="h-[3px] bg-[#f97316]" />
-        <view class="p-[12px]">
-          <view class="flex-row items-center justify-between mb-[8px]">
-            <text class="text-[11px] text-[#64748b]">上传结果（useMutation）</text>
-            <view class="px-[6px] py-[2px] rounded-[4px]" :class="uploadStatusBgClass">
-              <text class="text-[10px] font-medium" :class="uploadStatusTextClass">{{ uploadStatusText }}</text>
-            </view>
-          </view>
-          <text v-if="uploadLoading" class="text-[12px] text-[#c2410c]">正在上传...</text>
-          <text v-else-if="hasUploadError" class="text-[12px] text-[#dc2626]">{{ uploadErrorText }}</text>
-          <view v-else-if="hasUploadResult">
-            <!-- 上：图片居中预览（支持点击放大） -->
-            <view
-              class="items-center justify-center py-[10px] rounded-[8px] border-[1px] border-solid bg-[#ffffff] border-[#e2e8f0]"
-            >
-              <image
-                :src="uploadResultText"
-                class="w-[120px] h-[120px] rounded-[8px]"
-                mode="aspectFill"
-                @click="previewUploadedImage"
-              />
-              <text class="text-[10px] text-[#94a3b8] mt-[6px]">点击查看大图</text>
-            </view>
-
-            <!-- 下：OSS 链接美化展示卡片（支持一键复制） -->
-            <view
-              class="mt-[10px] p-[10px] rounded-[8px] border-[1px] border-solid bg-[#f8fafc] border-[#e2e8f0]"
-            >
-              <view class="flex-row items-center justify-between mb-[6px]">
-                <view class="flex-row items-center">
-                  <view class="w-[3px] h-[12px] bg-[#f97316] rounded-[2px] mr-[6px]" />
-                  <text class="text-[11px] font-bold text-[#475569]">OSS 链接地址</text>
-                </view>
-                <view
-                  class="px-[8px] py-[3px] rounded-[4px] bg-[#ea580c] flex-row items-center"
-                  @click="copyUploadUrl"
-                >
-                  <text class="text-[10px] text-[#ffffff] font-medium">复制链接</text>
-                </view>
-              </view>
-              <text
-                class="oss-url-text text-[11px] leading-[18px] text-[#334155]"
-                :selectable="true"
-              >
-                {{ uploadResultText }}
-              </text>
-            </view>
-          </view>
-          <text v-else class="text-[12px] text-[#94a3b8]">未选择文件</text>
-        </view>
-      </view>
-
-      <view class="mt-[10px]">
-        <view
-          class="bg-[#f97316] rounded-[8px] h-[42px] w-full flex flex-row items-center justify-center"
-          @click="chooseAndUpload"
-        >
-          <text class="text-[#ffffff] text-[14px]">{{ uploadLoading ? '上传中...' : '选择图片并上传' }}</text>
-        </view>
-      </view>
-    </view>
-  </view>
-</template>
-
 <script setup lang="uts">
 import { computed, ref } from 'vue';
 import { FOO_UPLOAD_PATH, uploadFooFileApi } from '@/src/api/example.uts';
@@ -255,6 +161,100 @@ function previewUploadedImage(): void {
   });
 }
 </script>
+
+<template>
+  <!-- ============ 2. 文件上传 ============ -->
+  <view
+    class="rounded-[16px] p-[20px] my-[16px] border-[1px] border-solid border-[#edf2f7] bg-[#ffffff]"
+  >
+    <!-- 标题区域 -->
+    <view class="flex flex-row items-center mb-[16px]">
+      <view
+        class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#3182ce]"
+      />
+      <text class="text-[16px] font-bold text-[#2d3748]">文件上传（uploadFooFileApi → http.upload）</text>
+    </view>
+    <view class="mb-[16px]">
+      <view class="flex-row items-center mb-[10px]">
+        <view class="w-[32px] h-[32px] rounded-[8px] bg-[#fff7ed] border-[1px] border-solid border-[#fdba74] items-center justify-center mr-[10px]">
+          <text class="text-[12px] font-bold text-[#c2410c]">UP</text>
+        </view>
+        <view class="flex-1">
+          <text class="text-[14px] font-bold text-[#1e293b]">文件上传</text>
+          <text class="text-[11px] text-[#64748b] mt-[2px]">{{ uploadPath }}</text>
+        </view>
+      </view>
+
+      <view class="flex-row items-center bg-[#fff7ed] p-[8px] rounded-[6px] mb-[10px] border-[1px] border-solid border-[#ffedd5]">
+        <text class="text-[11px] text-[#c2410c] leading-[16px] flex-1">
+          💡 默认使用免费临时图床 tmpfiles.org（免注册、无需 Key，文件公开且保留 48 小时）；在 .env 配置 VITE_UPLOAD_BASEURL / VITE_UPLOAD_PATH 后会自动改打你自己的 OSS
+        </text>
+      </view>
+
+      <view class="rounded-[8px] bg-[#f8fafc] border-[1px] border-solid border-[#cbd5e1] overflow-hidden">
+        <view class="h-[3px] bg-[#f97316]" />
+        <view class="p-[12px]">
+          <view class="flex-row items-center justify-between mb-[8px]">
+            <text class="text-[11px] text-[#64748b]">上传结果（useMutation）</text>
+            <view class="px-[6px] py-[2px] rounded-[4px]" :class="uploadStatusBgClass">
+              <text class="text-[10px] font-medium" :class="uploadStatusTextClass">{{ uploadStatusText }}</text>
+            </view>
+          </view>
+          <text v-if="uploadLoading" class="text-[12px] text-[#c2410c]">正在上传...</text>
+          <text v-else-if="hasUploadError" class="text-[12px] text-[#dc2626]">{{ uploadErrorText }}</text>
+          <view v-else-if="hasUploadResult">
+            <!-- 上：图片居中预览（支持点击放大） -->
+            <view
+              class="items-center justify-center py-[10px] rounded-[8px] border-[1px] border-solid bg-[#ffffff] border-[#e2e8f0]"
+            >
+              <image
+                :src="uploadResultText"
+                class="w-[120px] h-[120px] rounded-[8px]"
+                mode="aspectFill"
+                @click="previewUploadedImage"
+              />
+              <text class="text-[10px] text-[#94a3b8] mt-[6px]">点击查看大图</text>
+            </view>
+
+            <!-- 下：OSS 链接美化展示卡片（支持一键复制） -->
+            <view
+              class="mt-[10px] p-[10px] rounded-[8px] border-[1px] border-solid bg-[#f8fafc] border-[#e2e8f0]"
+            >
+              <view class="flex-row items-center justify-between mb-[6px]">
+                <view class="flex-row items-center">
+                  <view class="w-[3px] h-[12px] bg-[#f97316] rounded-[2px] mr-[6px]" />
+                  <text class="text-[11px] font-bold text-[#475569]">OSS 链接地址</text>
+                </view>
+                <view
+                  class="px-[8px] py-[3px] rounded-[4px] bg-[#ea580c] flex-row items-center"
+                  @click="copyUploadUrl"
+                >
+                  <text class="text-[10px] text-[#ffffff] font-medium">复制链接</text>
+                </view>
+              </view>
+              <text
+                class="oss-url-text text-[11px] leading-[18px] text-[#334155]"
+                :selectable="true"
+              >
+                {{ uploadResultText }}
+              </text>
+            </view>
+          </view>
+          <text v-else class="text-[12px] text-[#94a3b8]">未选择文件</text>
+        </view>
+      </view>
+
+      <view class="mt-[10px]">
+        <view
+          class="bg-[#f97316] rounded-[8px] h-[42px] w-full flex flex-row items-center justify-center"
+          @click="chooseAndUpload"
+        >
+          <text class="text-[#ffffff] text-[14px]">{{ uploadLoading ? '上传中...' : '选择图片并上传' }}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
 
 <style scoped>
 /* #ifdef H5 || MP-WEIXIN */

@@ -230,6 +230,9 @@ export default defineConfig({
       // 【分包扫描目录】：分包根目录数组，不能是主包目录的子目录，默认 []
       subPackages: ['src/sub'],
 
+      // 【分包切分模式】：'subdirs'（默认推荐，将 subPackages 下每一个一级子目录自动作为独立分包，彻底避免小程序单包 2MB 限制）| 'root'（将整个目录作为单一分包）
+      subPackageMode: 'subdirs',
+
       // 【排除扫描规则】：Glob 匹配规则数组，匹配到的文件/目录不会被当作页面路由扫描
       exclude: [
         '**/components/**/*.*',

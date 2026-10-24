@@ -1,20 +1,3 @@
-<template>
-  <!-- 应用全局骨架与皮肤容器，通过 CSS 变量绑定响应式主题色 / 暗黑模式 -->
-  <view
-    class="root-container"
-    style="display: flex; flex-direction: column;flex: 1;"
-    :class="themeStore.state.isDark ? 'dark' : ''"
-    :style="themeStyle"
-  >
-    <!-- 页面内容滚动容器 -->
-    <scroll-view direction="vertical" class="root-scroll-view" style="flex: 1;">
-      <slot></slot>
-    </scroll-view>
-    <!-- 自定义 TabBar：根据 config.uts 中的 type 配置切换形态（胶囊或标准底座） -->
-    <Tabbar v-if="customTabbarEnable && isCurrentPageTabbar" />
-  </view>
-</template>
-
 <script setup lang="uts">
 import Tabbar from '@/src/tabbar/tabbar.uvue';
 import { customTabbarEnable, isPageTabbar, isSinglePageTabbar, selectedTabbarStrategy, syncCurIdxByCurrentPage } from '@/src/tabbar/index.uts';
@@ -89,6 +72,11 @@ const themeStyle = computed((): UTSJSONObject => {
 
 // 控制当前页面是否需要显示底部导航栏
 const isCurrentPageTabbar = ref(false);
+
+// 是否展示自定义 TabBar（收敛为单值计算属性以符合跨端模板规范）
+const showTabbar = computed((): boolean => {
+  return customTabbarEnable && isCurrentPageTabbar.value;
+});
 
 // 组件挂载时：同步 H5 / 小程序原生导航栏主题与路由状态
 onMounted(() => {
@@ -214,6 +202,23 @@ onUnmounted(() => {
   uni.$off('tabbarSetHideNavbar', onTabbarSetHideNavbar);
 });
 </script>
+
+<template>
+  <!-- 应用全局骨架与皮肤容器，通过 CSS 变量绑定响应式主题色 / 暗黑模式 -->
+  <view
+    class="root-container"
+    style="display: flex; flex-direction: column;flex: 1;"
+    :class="themeStore.state.isDark ? 'dark' : ''"
+    :style="themeStyle"
+  >
+    <!-- 页面内容滚动容器 -->
+    <scroll-view direction="vertical" class="root-scroll-view" style="flex: 1;">
+      <slot></slot>
+    </scroll-view>
+    <!-- 自定义 TabBar：根据 config.uts 中的 type 配置切换形态（胶囊或标准底座） -->
+    <Tabbar v-if="showTabbar" />
+  </view>
+</template>
 
 <style lang="scss" scoped>
 .root-container {

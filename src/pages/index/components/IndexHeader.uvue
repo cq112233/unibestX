@@ -1,3 +1,41 @@
+<script setup lang="uts">
+import { computed } from 'vue';
+import { useRouter } from '@/uni_modules/route-bestX/index.uts';
+import { systemInfo as systemInfoRef } from '@/src/utils/systemInfo/index.uts';
+import type { SystemInfoType } from '@/src/utils/systemInfo/index.uts';
+
+const router = useRouter();
+const systemInfo = computed<SystemInfoType | null>((): SystemInfoType | null => systemInfoRef.value);
+
+function copyCliCommand(): void {
+  uni.setClipboardData({
+    data: 'pnpm create unibestx my-app',
+    success: () => {
+      uni.showToast({
+        title: '已复制 CLI 命令',
+        icon: 'success'
+      });
+    }
+  });
+}
+
+function openGithub(): void {
+  const url = 'https://github.com/cq112233/unibestX';
+  // #ifdef WEB
+  window.open(url, '_blank');
+  // #endif
+  // #ifndef WEB
+  router.push({
+    path: '/src/sub/webview/webview',
+    query: {
+      url,
+      title: 'unibestX'
+    }
+  });
+  // #endif
+}
+</script>
+
 <template>
   <div class="flex flex-col w-full">
     <image class="w-[90px] h-[90px] mx-auto mt-[16px] rounded-[18px]" src="/static/logo.png" />
@@ -115,43 +153,5 @@
     </div>
   </div>
 </template>
-
-<script setup lang="uts">
-import { computed } from 'vue';
-import { useRouter } from '@/uni_modules/route-bestX/index.uts';
-import { systemInfo as systemInfoRef } from '@/src/utils/systemInfo/index.uts';
-import type { SystemInfoType } from '@/src/utils/systemInfo/index.uts';
-
-const router = useRouter();
-const systemInfo = computed<SystemInfoType | null>((): SystemInfoType | null => systemInfoRef.value);
-
-function copyCliCommand(): void {
-  uni.setClipboardData({
-    data: 'pnpm create unibestx my-app',
-    success: () => {
-      uni.showToast({
-        title: '已复制 CLI 命令',
-        icon: 'success'
-      });
-    }
-  });
-}
-
-function openGithub(): void {
-  const url = 'https://github.com/cq112233/unibestX';
-  // #ifdef WEB
-  window.open(url, '_blank');
-  // #endif
-  // #ifndef WEB
-  router.push({
-    path: '/src/sub/webview/webview',
-    query: {
-      url,
-      title: 'unibestX'
-    }
-  });
-  // #endif
-}
-</script>
 
 <style scoped></style>

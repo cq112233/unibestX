@@ -1,3 +1,102 @@
+<script setup lang="uts">
+import { computed, ref } from 'vue';
+import { generate, tinyColor } from '@/uni_modules/lime-color';
+import type { TinyColor } from '@/uni_modules/lime-color';
+
+definePage({
+  debug: false,
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
+  style: {
+    navigationBarTitleText: 'lime-color 颜色工具',
+    navigationStyle: 'custom'
+  }
+});
+
+// =========================================================================
+// 【可选删除】以下内容仅供 lime-color 演示使用，接入真实业务时可整段删除。
+// 演示参数属于「页面结构级只读常量」（随页面固化、不由后端下发），故内联在本文件。
+// =========================================================================
+/** 可切换的基色，用于观察各方法随基色变化的效果 */
+const BASE_COLORS: Array<string> = ['#3b82f6', '#ef4444', '#10b981', '#a855f7'];
+/** 混色演示的另一个颜色（与白色对半混） */
+const MIX_TARGET: string = '#ffffff';
+/** 半透明叠加演示的两个背景色 */
+const LIGHT_BACKGROUND: string = '#ffffff';
+const DARK_BACKGROUND: string = '#0f172a';
+
+const baseColors: Array<string> = BASE_COLORS;
+const baseColor = ref<string>('#3b82f6');
+
+// —— 基色实例：换一次基色，下面所有转换与操作结果都重新计算
+const baseColorInstance = computed((): TinyColor => tinyColor(baseColor.value));
+const halfAlphaColor = computed((): TinyColor => tinyColor(baseColor.value).setAlpha(0.4));
+
+/** 把颜色数组拼成一行便于读的 hex 文本 */
+function toHexLine(colors: Array<string>): string {
+  return colors.join(' ');
+}
+
+/** TinyColor 数组统一转成 hex 字符串数组，模板只渲染字符串 */
+function toHexList(list: Array<TinyColor>): Array<string> {
+  return list.map((item: TinyColor): string => item.toHexString());
+}
+
+// —— 第 1 张卡：格式转换
+const baseHexString = computed((): string => baseColorInstance.value.toHexString());
+const baseHex8String = computed((): string => baseColorInstance.value.toHex8String());
+const baseRgbString = computed((): string => baseColorInstance.value.toRgbString());
+const basePercentageRgbString = computed((): string => baseColorInstance.value.toPercentageRgbString());
+const baseHslString = computed((): string => baseColorInstance.value.toHslString());
+const baseHsvString = computed((): string => baseColorInstance.value.toHsvString());
+const baseHsbString = computed((): string => baseColorInstance.value.toHsbString());
+const baseNameText = computed((): string => baseColorInstance.value.toName() ?? '（无对应颜色名）');
+
+// —— 第 2 张卡：颜色修改
+const lightenHex = computed((): string => baseColorInstance.value.lighten(20).toHexString());
+const darkenHex = computed((): string => baseColorInstance.value.darken(20).toHexString());
+const brightenHex = computed((): string => baseColorInstance.value.brighten(20).toHexString());
+const saturateHex = computed((): string => baseColorInstance.value.saturate(20).toHexString());
+const desaturateHex = computed((): string => baseColorInstance.value.desaturate(20).toHexString());
+const spinHex = computed((): string => baseColorInstance.value.spin(180).toHexString());
+const greyscaleHex = computed((): string => baseColorInstance.value.greyscale().toHexString());
+const mixWhiteHex = computed((): string => baseColorInstance.value.mix(MIX_TARGET, 50).toHexString());
+
+// —— 第 3 张卡：亮度判断与半透明叠加
+const brightnessText = computed((): string => Math.round(baseColorInstance.value.getBrightness()).toString());
+const luminanceText = computed((): string => (Math.round(baseColorInstance.value.getLuminance() * 1000) / 1000).toString());
+const darkLightText = computed((): string => baseColorInstance.value.isDark() ? '深色' : '浅色');
+const monochromeText = computed((): string => baseColorInstance.value.isMonochrome() ? '是' : '否');
+const alphaText = computed((): string => halfAlphaColor.value.getAlpha().toString());
+const halfAlphaRgb = computed((): string => halfAlphaColor.value.toRgbString());
+const onLightBackgroundHex = computed((): string => halfAlphaColor.value.onBackground(LIGHT_BACKGROUND).toHexString());
+const onDarkBackgroundHex = computed((): string => halfAlphaColor.value.onBackground(DARK_BACKGROUND).toHexString());
+
+// —— 第 4 张卡：配色方案
+const complementColors = computed((): Array<string> => [baseColorInstance.value.complement().toHexString()]);
+const complementText = computed((): string => toHexLine(complementColors.value));
+const triadColors = computed((): Array<string> => toHexList(baseColorInstance.value.triad()));
+const triadText = computed((): string => toHexLine(triadColors.value));
+const tetradColors = computed((): Array<string> => toHexList(baseColorInstance.value.tetrad()));
+const tetradText = computed((): string => toHexLine(tetradColors.value));
+const analogousColors = computed((): Array<string> => toHexList(baseColorInstance.value.analogous(6)));
+const analogousText = computed((): string => toHexLine(analogousColors.value));
+const monochromaticColors = computed((): Array<string> => toHexList(baseColorInstance.value.monochromatic(6)));
+const monochromaticText = computed((): string => toHexLine(monochromaticColors.value));
+
+// —— 第 5 张卡：主题色阶
+const defaultThemeColors = computed((): Array<string> => generate(baseColor.value));
+const darkThemeColors = computed((): Array<string> => generate(baseColor.value, { theme: 'dark' }));
+
+/** 切换基色：只改这一个 ref，全部结果随之刷新 */
+function onSelectBaseColor(color: string): void {
+  baseColor.value = color;
+}
+// =================== 【可选删除】lime-color 颜色工具演示 结束 ===================
+</script>
+
 <template>
   <view class="flex flex-col items-center flex-1 px-[16px] pt-[12px] pb-[24px]">
     <scroll-view direction="vertical" class="w-full flex flex-col flex-1" :style="{ maxWidth: '560px' }">
@@ -218,104 +317,5 @@
     </scroll-view>
   </view>
 </template>
-
-<script setup lang="uts">
-import { computed, ref } from 'vue';
-import { generate, tinyColor } from '@/uni_modules/lime-color';
-import type { TinyColor } from '@/uni_modules/lime-color';
-
-definePage({
-  debug: false,
-  layout: 'navbar',
-  showBack: true,
-  hideNavbar: false,
-  enablePullDownRefresh: false,
-  style: {
-    navigationBarTitleText: 'lime-color 颜色工具',
-    navigationStyle: 'custom'
-  }
-});
-
-// =========================================================================
-// 【可选删除】以下内容仅供 lime-color 演示使用，接入真实业务时可整段删除。
-// 演示参数属于「页面结构级只读常量」（随页面固化、不由后端下发），故内联在本文件。
-// =========================================================================
-/** 可切换的基色，用于观察各方法随基色变化的效果 */
-const BASE_COLORS: Array<string> = ['#3b82f6', '#ef4444', '#10b981', '#a855f7'];
-/** 混色演示的另一个颜色（与白色对半混） */
-const MIX_TARGET: string = '#ffffff';
-/** 半透明叠加演示的两个背景色 */
-const LIGHT_BACKGROUND: string = '#ffffff';
-const DARK_BACKGROUND: string = '#0f172a';
-
-const baseColors: Array<string> = BASE_COLORS;
-const baseColor = ref<string>('#3b82f6');
-
-// —— 基色实例：换一次基色，下面所有转换与操作结果都重新计算
-const baseColorInstance = computed((): TinyColor => tinyColor(baseColor.value));
-const halfAlphaColor = computed((): TinyColor => tinyColor(baseColor.value).setAlpha(0.4));
-
-/** 把颜色数组拼成一行便于读的 hex 文本 */
-function toHexLine(colors: Array<string>): string {
-  return colors.join(' ');
-}
-
-/** TinyColor 数组统一转成 hex 字符串数组，模板只渲染字符串 */
-function toHexList(list: Array<TinyColor>): Array<string> {
-  return list.map((item: TinyColor): string => item.toHexString());
-}
-
-// —— 第 1 张卡：格式转换
-const baseHexString = computed((): string => baseColorInstance.value.toHexString());
-const baseHex8String = computed((): string => baseColorInstance.value.toHex8String());
-const baseRgbString = computed((): string => baseColorInstance.value.toRgbString());
-const basePercentageRgbString = computed((): string => baseColorInstance.value.toPercentageRgbString());
-const baseHslString = computed((): string => baseColorInstance.value.toHslString());
-const baseHsvString = computed((): string => baseColorInstance.value.toHsvString());
-const baseHsbString = computed((): string => baseColorInstance.value.toHsbString());
-const baseNameText = computed((): string => baseColorInstance.value.toName() ?? '（无对应颜色名）');
-
-// —— 第 2 张卡：颜色修改
-const lightenHex = computed((): string => baseColorInstance.value.lighten(20).toHexString());
-const darkenHex = computed((): string => baseColorInstance.value.darken(20).toHexString());
-const brightenHex = computed((): string => baseColorInstance.value.brighten(20).toHexString());
-const saturateHex = computed((): string => baseColorInstance.value.saturate(20).toHexString());
-const desaturateHex = computed((): string => baseColorInstance.value.desaturate(20).toHexString());
-const spinHex = computed((): string => baseColorInstance.value.spin(180).toHexString());
-const greyscaleHex = computed((): string => baseColorInstance.value.greyscale().toHexString());
-const mixWhiteHex = computed((): string => baseColorInstance.value.mix(MIX_TARGET, 50).toHexString());
-
-// —— 第 3 张卡：亮度判断与半透明叠加
-const brightnessText = computed((): string => Math.round(baseColorInstance.value.getBrightness()).toString());
-const luminanceText = computed((): string => (Math.round(baseColorInstance.value.getLuminance() * 1000) / 1000).toString());
-const darkLightText = computed((): string => baseColorInstance.value.isDark() ? '深色' : '浅色');
-const monochromeText = computed((): string => baseColorInstance.value.isMonochrome() ? '是' : '否');
-const alphaText = computed((): string => halfAlphaColor.value.getAlpha().toString());
-const halfAlphaRgb = computed((): string => halfAlphaColor.value.toRgbString());
-const onLightBackgroundHex = computed((): string => halfAlphaColor.value.onBackground(LIGHT_BACKGROUND).toHexString());
-const onDarkBackgroundHex = computed((): string => halfAlphaColor.value.onBackground(DARK_BACKGROUND).toHexString());
-
-// —— 第 4 张卡：配色方案
-const complementColors = computed((): Array<string> => [baseColorInstance.value.complement().toHexString()]);
-const complementText = computed((): string => toHexLine(complementColors.value));
-const triadColors = computed((): Array<string> => toHexList(baseColorInstance.value.triad()));
-const triadText = computed((): string => toHexLine(triadColors.value));
-const tetradColors = computed((): Array<string> => toHexList(baseColorInstance.value.tetrad()));
-const tetradText = computed((): string => toHexLine(tetradColors.value));
-const analogousColors = computed((): Array<string> => toHexList(baseColorInstance.value.analogous(6)));
-const analogousText = computed((): string => toHexLine(analogousColors.value));
-const monochromaticColors = computed((): Array<string> => toHexList(baseColorInstance.value.monochromatic(6)));
-const monochromaticText = computed((): string => toHexLine(monochromaticColors.value));
-
-// —— 第 5 张卡：主题色阶
-const defaultThemeColors = computed((): Array<string> => generate(baseColor.value));
-const darkThemeColors = computed((): Array<string> => generate(baseColor.value, { theme: 'dark' }));
-
-/** 切换基色：只改这一个 ref，全部结果随之刷新 */
-function onSelectBaseColor(color: string): void {
-  baseColor.value = color;
-}
-// =================== 【可选删除】lime-color 颜色工具演示 结束 ===================
-</script>
 
 <style scoped></style>

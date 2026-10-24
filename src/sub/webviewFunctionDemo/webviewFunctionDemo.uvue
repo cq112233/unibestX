@@ -1,14 +1,3 @@
-<template>
-  <view class="flex flex-col flex-1" :style="{ height: `${availableHeight}px` }">
-    <web-view
-      class="flex-1 w-full h-full"
-      style="flex: 1;"
-      :src="targetUrl"
-      @message="onWebviewMessage"
-    />
-  </view>
-</template>
-
 <script setup lang="uts">
 /* eslint-disable dot-notation */
 import { ref } from 'vue';
@@ -64,5 +53,16 @@ function onWebviewMessage(event: UniWebViewMessageEvent): void {
   }
 }
 </script>
+
+<template>
+  <view class="flex flex-col flex-1" :style="{ height: `${availableHeight}px` }">
+    <web-view
+      class="flex-1 w-full h-full"
+      style="flex: 1;"
+      :src="targetUrl"
+      @message="onWebviewMessage"
+    />
+  </view>
+</template>
 
 <style scoped></style>

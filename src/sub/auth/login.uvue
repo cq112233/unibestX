@@ -1,17 +1,3 @@
-<template>
-  <view class="flex-1 p-[30px] items-center justify-center">
-    <view class="mb-[30px]">
-      <text class="text-[20px] font-bold text-[#1e293b]">登录页</text>
-    </view>
-    <view
-      class="w-[200px] h-[44px] rounded-[8px] bg-[#3b82f6] flex flex-row items-center justify-center"
-      @click="doLogin"
-    >
-      <text class="text-[#ffffff] text-[14px] font-bold">点击登录</text>
-    </view>
-  </view>
-</template>
-
 <script setup lang="uts">
 import type { IDoubleTokenRes, IUserInfo } from '@/src/store/index.uts';
 import { useTokenStore, useUserStore } from '@/src/store/index.uts';
@@ -131,3 +117,17 @@ function doLogin() {
   onLoginSuccess(mockRes);
 }
 </script>
+
+<template>
+  <view class="flex-1 p-[30px] items-center justify-center">
+    <view class="mb-[30px]">
+      <text class="text-[20px] font-bold text-[#1e293b]">登录页</text>
+    </view>
+    <view
+      class="w-[200px] h-[44px] rounded-[8px] bg-[#3b82f6] flex flex-row items-center justify-center"
+      @click="doLogin"
+    >
+      <text class="text-[#ffffff] text-[14px] font-bold">点击登录</text>
+    </view>
+  </view>
+</template>

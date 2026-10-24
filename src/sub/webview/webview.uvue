@@ -1,14 +1,3 @@
-<template>
-  <view class="flex flex-col flex-1">
-    <web-view
-      class="flex-1 w-full h-full"
-      style="flex: 1;"
-      :src="targetUrl"
-      @message="onWebviewMessage"
-    />
-  </view>
-</template>
-
 <script setup lang="uts">
 import { ref } from 'vue';
 import { useRouter } from '@/uni_modules/route-bestX/index.uts';
@@ -65,5 +54,16 @@ function onWebviewMessage(event: UniWebViewMessageEvent): void {
   }
 }
 </script>
+
+<template>
+  <view class="flex flex-col flex-1">
+    <web-view
+      class="flex-1 w-full h-full"
+      style="flex: 1;"
+      :src="targetUrl"
+      @message="onWebviewMessage"
+    />
+  </view>
+</template>
 
 <style scoped></style>

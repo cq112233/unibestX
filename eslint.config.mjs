@@ -106,9 +106,9 @@ const composer = uniHelper({
       skipRegExps: true,
       skipHTMLTextContents: true
     }],
-    // vue SFC 调换顺序改这里
+    // vue SFC 顶级标签顺序：<script> -> <template> -> <style>，保存自动格式化会按此顺序调整
     'vue/block-order': ['error', {
-      order: [['script', 'template'], 'style']
+      order: ['script', 'template', 'style']
     }]
   },
   formatters: {

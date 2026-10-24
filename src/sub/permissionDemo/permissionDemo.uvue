@@ -1,3 +1,59 @@
+<script setup lang="uts">
+import { computed } from 'vue';
+import type { IUserInfo } from '@/src/store/index.uts';
+import { useUserStore } from '@/src/store/index.uts';
+import { getPermissions, hasPermission } from '@/src/utils/permission/index.uts';
+import { toastSuccess } from '@/src/utils/toast/index.uts';
+
+definePage({
+  name: 'permissionDemo',
+  layout: 'navbar',
+  showBack: true,
+  hideStatusBar: false,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
+  style: {
+    navigationBarTitleText: '页面与按钮权限',
+    navigationStyle: 'custom'
+  }
+});
+
+type PermissionPreset = {
+  key: string;
+  label: string;
+  permissions: Array<string>;
+};
+
+const userStore = useUserStore();
+const presetList: Array<PermissionPreset> = [
+  { key: 'read', label: '只读', permissions: ['report:read'] },
+  { key: 'edit', label: '可编辑', permissions: ['report:read', 'report:edit'] },
+  { key: 'admin', label: '管理员', permissions: ['*'] }
+];
+
+const permissionText = computed((): string => {
+  const permissions = getPermissions();
+  return permissions.length > 0 ? permissions.join(' / ') : '无';
+});
+const canViewReport = computed((): boolean => hasPermission('report:read'));
+const canEditReport = computed((): boolean => hasPermission('report:edit'));
+const canDeleteReport = computed((): boolean => hasPermission('report:delete'));
+const canManageSystem = computed((): boolean => hasPermission('system:manage'));
+
+/** 演示切换用户信息里的权限结果 */
+function applyPreset(preset: PermissionPreset): void {
+  const info = userStore.state.userInfo;
+  userStore.setUserInfo({
+    userId: info.userId,
+    username: info.username,
+    nickname: info.nickname,
+    avatar: info.avatar,
+    permissions: preset.permissions
+  } as IUserInfo);
+  toastSuccess(`已切换为${preset.label}`);
+}
+</script>
+
 <template>
   <view class="flex flex-col flex-1 bg-[#f8fafc]">
     <scroll-view direction="vertical" class="flex-1 flex flex-col p-[16px] pb-safe">
@@ -60,59 +116,3 @@
     </scroll-view>
   </view>
 </template>
-
-<script setup lang="uts">
-import { computed } from 'vue';
-import type { IUserInfo } from '@/src/store/index.uts';
-import { useUserStore } from '@/src/store/index.uts';
-import { getPermissions, hasPermission } from '@/src/utils/permission/index.uts';
-import { toastSuccess } from '@/src/utils/toast/index.uts';
-
-definePage({
-  name: 'permissionDemo',
-  layout: 'navbar',
-  showBack: true,
-  hideStatusBar: false,
-  hideNavbar: false,
-  enablePullDownRefresh: false,
-  style: {
-    navigationBarTitleText: '页面与按钮权限',
-    navigationStyle: 'custom'
-  }
-});
-
-type PermissionPreset = {
-  key: string;
-  label: string;
-  permissions: Array<string>;
-};
-
-const userStore = useUserStore();
-const presetList: Array<PermissionPreset> = [
-  { key: 'read', label: '只读', permissions: ['report:read'] },
-  { key: 'edit', label: '可编辑', permissions: ['report:read', 'report:edit'] },
-  { key: 'admin', label: '管理员', permissions: ['*'] }
-];
-
-const permissionText = computed((): string => {
-  const permissions = getPermissions();
-  return permissions.length > 0 ? permissions.join(' / ') : '无';
-});
-const canViewReport = computed((): boolean => hasPermission('report:read'));
-const canEditReport = computed((): boolean => hasPermission('report:edit'));
-const canDeleteReport = computed((): boolean => hasPermission('report:delete'));
-const canManageSystem = computed((): boolean => hasPermission('system:manage'));
-
-/** 演示切换用户信息里的权限结果 */
-function applyPreset(preset: PermissionPreset): void {
-  const info = userStore.state.userInfo;
-  userStore.setUserInfo({
-    userId: info.userId,
-    username: info.username,
-    nickname: info.nickname,
-    avatar: info.avatar,
-    permissions: preset.permissions
-  } as IUserInfo);
-  toastSuccess(`已切换为${preset.label}`);
-}
-</script>
