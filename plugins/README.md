@@ -36,6 +36,7 @@
 | **`vite-plugin-clean-logger.ts`** | `cleanLoggerPlugin()` | **控制台日志净化**：拦截并过滤 Vite / DCloud 编译期的 warning 告警、无意义栈帧与代码片段 | **完全独立** | 无任何外部依赖，即插即拔 |
 | **`vite-plugin-editor-version.ts`** | `editorVersionPlugin()` | **编辑器版本对齐检测**：构建前检查本机 HBuilderX 编译器与 `@dcloudio/*` 依赖版本是否一致并给出提示 | **完全独立** | 仅依赖 `scripts/sync-hbuilderx.mjs --preflight`，只提示不阻断 |
 | **`vite-plugin-h5-optimize-deps.ts`** | `h5OptimizeDepsPlugin()` | **H5 依赖预构建优化**：将核心大依赖（Pinia 等）纳入 esbuild 预构建，加速 H5 冷启动并规避 504 错误 | **完全独立** | 仅在 H5 / Web 开发模式生效，无其他插件依赖 |
+| **`vite-plugin-html-to-uni.ts`** | `htmlToUniPlugin()` | **HTML 标签编译期转 uni 原生组件**：在 `pre` 阶段将 `<template>` 内的 `div`/`b`/`span`/`p`/`img` 等自动转为 `view`/`text`/`image` | **完全独立** | 无任何外部依赖，即插即拔 |
 
 ---
 
@@ -83,6 +84,25 @@ graph TD
   2. 从 `pages.json` 读取该页面的自定义参数（如 `showBack`、`hideNavbar`），通过 props 透传给根组件；
   3. 模式 4 下跳过 `TabViews.uvue` 直接复用的 Tab 页面，避免宿主内的 Tab 子页再次挂载 `AppRoot` 并触发重复同步；
   4. ⚠️ **注意**：如果当前工程没有创建 `src/AppRoot.uvue`，且不需要全局根组件包裹功能，请在 `vite.config.ts` 中将 `uniRootX` 注释掉。
+
+---
+
+### 3.3 HTML 标签转 uni 原生组件插件 (`vite-plugin-html-to-uni.ts`)
+
+为了降低 Web 开发者的心智转换成本，并在写页面时保留常用的 HTML 语义化标签习惯，该插件在 Vite `enforce: 'pre'` 阶段拦截并自动转译 `<template>` 内的 HTML 标签：
+
+- **结构与容器标签**：`div`、`p`、`section`、`article`、`aside`、`main`、`header`、`footer`、`nav`、`ul`、`ol`、`li` 自动转换为原生 `<view>`。
+- **文本修饰标签**：
+  - `<b>`、`<strong>` → `<text class="font-bold">`（加粗文本）
+  - `<i>`、`<em>` → `<text class="italic">`（斜体文本）
+  - `<s>`、`<del>` → `<text class="line-through">`（中划线/删除线）
+  - `<u>` → `<text class="underline">`（下划线文本）
+  - `<span>` → `<text>`（行内文本）
+- **媒体组件**：`<img>` → `<image>`
+- **特性保证**：
+  - **智能 Class 合并**：开发者已有 class（如 `class="text-red-500"`）与自动注入的默认类（如 `font-bold`）智能去重合并；
+  - **暗黑与动态样式穿透**：原生保留 `:style`、`dark:*` 类名及属性；
+  - **精准隔离**：仅在最外层 `<template>` 内做 AST/正则安全替换，不误伤 `<script>` 与 `<style>`。
 
 ---
 

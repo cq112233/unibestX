@@ -1,5 +1,8 @@
 import { nextTick, ref } from 'vue';
 import themeJson from '@/theme.json';
+import { computeDarkTheme, generateDarkPalette } from './generate.uts';
+
+export { computeDarkTheme, generateDarkPalette };
 
 /**
  * 外观模式类型：'auto'（跟随系统） | 'light'（浅色） | 'dark'（深色）
@@ -76,6 +79,12 @@ export function getDefaultThemeMode(): ThemeMode {
  * 迁入主题域后 store 不再反向依赖 tabbar。
  */
 export const themeColor = ref(getDefaultTheme());
+
+/** 当前主题对应的暗黑模式主题色（响应式，由 Ant Design 算法生成） */
+export const darkThemeColor = ref(computeDarkTheme(getDefaultTheme()));
+
+/** 当前生效的主题主色（响应式：深色模式下取 darkThemeColor，浅色模式下取 themeColor） */
+export const activeThemeColor = ref(getDefaultTheme());
 
 /**
  * 获取当前系统 / 宿主主题

@@ -1,8 +1,11 @@
 import { reactive, watch } from 'vue';
 import { defineStore } from 'pinia';
 import {
+  activeThemeColor,
   applyThemeColor,
   applyThemeMode,
+  computeDarkTheme,
+  darkThemeColor,
   getDefaultTheme,
   getDefaultThemeMode,
   getSystemTheme,
@@ -19,23 +22,38 @@ type IThemeState = {
   theme: string;
   themeMode: string; // 'auto'（跟随系统）| 'light' | 'dark'
   isDark: boolean;
+  darkTheme: string;
+  activeTheme: string;
 };
 
 export const useThemeStore = defineStore('theme', () => {
   const defaultMode = getDefaultThemeMode();
+  const defaultTheme = getDefaultTheme();
+  const defaultDarkTheme = computeDarkTheme(defaultTheme);
+  const defaultIsDark = isDarkMode(defaultMode);
 
   // 1. 响应式状态（由 pinia-plugin-persistedstate 自动从 Storage 恢复与持久化）
   const state = reactive<IThemeState>({
-    theme: getDefaultTheme(),
+    theme: defaultTheme,
     themeMode: defaultMode,
-    isDark: isDarkMode(defaultMode)
+    isDark: defaultIsDark,
+    darkTheme: defaultDarkTheme,
+    activeTheme: defaultIsDark ? defaultDarkTheme : defaultTheme
   });
 
   let _themeModeInited = false;
 
+  function syncActiveTheme(): void {
+    state.darkTheme = computeDarkTheme(state.theme);
+    state.activeTheme = state.isDark ? state.darkTheme : state.theme;
+    darkThemeColor.value = state.darkTheme;
+    activeThemeColor.value = state.activeTheme;
+  }
+
   // 2. 初始化全局样式与主题色
   themeColor.value = state.theme;
-  applyThemeColor(state.theme);
+  syncActiveTheme();
+  applyThemeColor(state.activeTheme);
   applyThemeMode(state.themeMode, state.isDark);
 
   // 3. 监听 state.theme 变化，自动更新 themeColor ref 与 H5/原生 CSS 变量
@@ -43,7 +61,8 @@ export const useThemeStore = defineStore('theme', () => {
     () => state.theme,
     (newTheme: string) => {
       themeColor.value = newTheme;
-      applyThemeColor(newTheme);
+      syncActiveTheme();
+      applyThemeColor(state.activeTheme);
     }
   );
 
@@ -51,6 +70,8 @@ export const useThemeStore = defineStore('theme', () => {
   watch(
     () => [state.themeMode, state.isDark] as const,
     ([newMode, newIsDark]) => {
+      syncActiveTheme();
+      applyThemeColor(state.activeTheme);
       applyThemeMode(newMode, newIsDark);
     }
   );
@@ -69,6 +90,8 @@ export const useThemeStore = defineStore('theme', () => {
     else {
       state.isDark = getSystemTheme() == 'dark';
     }
+    syncActiveTheme();
+    applyThemeColor(state.activeTheme);
     applyThemeMode(mode, state.isDark);
   }
 
@@ -79,7 +102,8 @@ export const useThemeStore = defineStore('theme', () => {
   function setTheme(theme: string): void {
     state.theme = theme;
     themeColor.value = theme;
-    applyThemeColor(theme);
+    syncActiveTheme();
+    applyThemeColor(state.activeTheme);
   }
 
   /**
@@ -105,11 +129,13 @@ export const useThemeStore = defineStore('theme', () => {
       uni.onAppThemeChange((res: AppThemeChangeResult) => {
         if (state.themeMode != 'auto') {
           state.isDark = res.appTheme == 'dark';
+          syncActiveTheme();
         }
       });
       uni.onOsThemeChange((res: OsThemeChangeResult) => {
         if (state.themeMode == 'auto') {
           state.isDark = res.osTheme == 'dark';
+          syncActiveTheme();
         }
       });
       // #endif
