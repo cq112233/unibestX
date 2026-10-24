@@ -1425,7 +1425,9 @@ export const pluginUts = {
         messages: {
           noBlankInTag: '标签内部（标签名与属性、属性与属性之间）禁止多余空行',
           noBlankAfterComment: 'HTML 注释与紧随其后的标签之间不应有多余空行',
-          cleanAttr: '{{attrName}} 属性值应保持单行整洁，禁止在引号内部包含多余换行、连续空行或首尾空格'
+          cleanAttr: '{{attrName}} 属性值应保持单行整洁，禁止在引号内部包含多余换行、连续空行或首尾空格',
+          noIndentTopLevelTag: '顶级块标签 <{{tag}}> 必须顶格书写，禁止多余缩进',
+          cleanStyleIndent: '<style> 样式块内部缩进不规范，已自动统一为 2 空格标准嵌套缩进'
         }
       },
       create(context) {
@@ -1547,6 +1549,81 @@ export const pluginUts = {
                   }
                 });
               }
+            }
+
+            // 4. 检查并清理 SFC 顶级块标签（<template>, <script>, <style> 等）前导多余缩进空格，强制顶格对齐
+            const topTagPattern = /^([ \t]+)(<(?:template|script|style|\/template|\/script|\/style)[\s>])/gm;
+            let topTagMatch = topTagPattern.exec(context.sourceCode.text);
+            while (topTagMatch !== null) {
+              const start = topTagMatch.index;
+              const end = topTagMatch.index + topTagMatch[1].length;
+              const tagName = topTagMatch[2].replace(/[<>/]/g, '').trim().split(/\s+/)[0];
+              const loc = {
+                start: context.sourceCode.getLocFromIndex(start),
+                end: context.sourceCode.getLocFromIndex(end)
+              };
+              context.report({
+                loc,
+                messageId: 'noIndentTopLevelTag',
+                data: { tag: tagName },
+                fix(fixer) {
+                  return fixer.removeRange([start, end]);
+                }
+              });
+              topTagMatch = topTagPattern.exec(context.sourceCode.text);
+            }
+
+            // 5. 检查并清理 <style> 块内部代码的缩进与换行，确保 2 空格嵌套缩进与顶格规范
+            function cleanStyleIndentation(rawCss) {
+              const lines = rawCss.split(/\r?\n/);
+              let depth = 0;
+              const cleaned = lines.map((line) => {
+                const trimmed = line.trim();
+                if (!trimmed) {
+                  return '';
+                }
+
+                let currentDepth = depth;
+                if (trimmed.startsWith('}')) {
+                  currentDepth = Math.max(0, depth - 1);
+                }
+
+                const formatted = '  '.repeat(currentDepth) + trimmed;
+                const opens = (trimmed.match(/\{/g) || []).length;
+                const closes = (trimmed.match(/\}/g) || []).length;
+                depth = Math.max(0, depth + opens - closes);
+
+                return formatted;
+              });
+
+              return `\n${cleaned.join('\n').trim()}\n`;
+            }
+
+            const styleRegex = /<style(?:\s[^>]*)?>([\s\S]*?)<\/style>/gi;
+            let styleMatch = styleRegex.exec(context.sourceCode.text);
+            while (styleMatch !== null) {
+              const fullMatch = styleMatch[0];
+              const styleContent = styleMatch[1];
+              if (styleContent.trim().length > 0) {
+                const cleanedContent = cleanStyleIndentation(styleContent);
+                if (cleanedContent !== styleContent) {
+                  const openTag = fullMatch.slice(0, fullMatch.indexOf('>') + 1);
+                  const contentStart = styleMatch.index + openTag.length;
+                  const contentEnd = styleMatch.index + fullMatch.length - 8;
+                  const loc = {
+                    start: context.sourceCode.getLocFromIndex(contentStart),
+                    end: context.sourceCode.getLocFromIndex(contentEnd)
+                  };
+                  context.report({
+                    loc,
+                    messageId: 'cleanStyleIndent',
+                    fix(fixer) {
+                      return fixer.replaceTextRange([contentStart, contentEnd], cleanedContent);
+                    }
+                  });
+                }
+              }
+              styleMatch = styleRegex.exec(context.sourceCode.text);
             }
           }
         });
