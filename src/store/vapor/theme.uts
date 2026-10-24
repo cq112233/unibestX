@@ -53,7 +53,7 @@ export const useThemeStore = defineStore('theme', () => {
   // 2. 初始化全局样式与主题色
   themeColor.value = state.theme;
   syncActiveTheme();
-  applyThemeColor(state.theme);
+  applyThemeColor(state.activeTheme);
   applyThemeMode(state.themeMode, state.isDark);
 
   // 3. 监听 state.theme 变化，自动更新 themeColor ref 与 H5/原生 CSS 变量
@@ -62,7 +62,7 @@ export const useThemeStore = defineStore('theme', () => {
     (newTheme: string) => {
       themeColor.value = newTheme;
       syncActiveTheme();
-      applyThemeColor(newTheme);
+      applyThemeColor(state.activeTheme);
     }
   );
 
@@ -71,6 +71,7 @@ export const useThemeStore = defineStore('theme', () => {
     () => [state.themeMode, state.isDark] as const,
     ([newMode, newIsDark]) => {
       syncActiveTheme();
+      applyThemeColor(state.activeTheme);
       applyThemeMode(newMode, newIsDark);
     }
   );
@@ -90,6 +91,7 @@ export const useThemeStore = defineStore('theme', () => {
       state.isDark = getSystemTheme() == 'dark';
     }
     syncActiveTheme();
+    applyThemeColor(state.activeTheme);
     applyThemeMode(mode, state.isDark);
   }
 
@@ -101,7 +103,7 @@ export const useThemeStore = defineStore('theme', () => {
     state.theme = theme;
     themeColor.value = theme;
     syncActiveTheme();
-    applyThemeColor(theme);
+    applyThemeColor(state.activeTheme);
   }
 
   /**

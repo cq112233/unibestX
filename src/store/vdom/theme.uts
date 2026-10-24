@@ -87,7 +87,7 @@ export class ThemeStore extends PiniaStoreBase {
     themeColor.value = this.state.theme;
     darkThemeColor.value = this.state.darkTheme;
     activeThemeColor.value = this.state.activeTheme;
-    applyThemeColor(this.state.theme);
+    applyThemeColor(this.state.activeTheme);
     applyThemeMode(this.state.themeMode, this.state.isDark);
   }
 
@@ -111,7 +111,7 @@ export class ThemeStore extends PiniaStoreBase {
     themeColor.value = defaultThemeState.theme;
     darkThemeColor.value = defaultThemeState.darkTheme;
     activeThemeColor.value = defaultThemeState.activeTheme;
-    applyThemeColor(defaultThemeState.theme);
+    applyThemeColor(defaultThemeState.activeTheme);
     applyThemeMode(defaultThemeState.themeMode, defaultThemeState.isDark);
   }
 
@@ -164,7 +164,7 @@ export class ThemeStore extends PiniaStoreBase {
     themeColor.value = theme;
     darkThemeColor.value = this.state.darkTheme;
     activeThemeColor.value = this.state.activeTheme;
-    applyThemeColor(theme);
+    applyThemeColor(this.state.activeTheme);
     this.$patch({
       theme,
       darkTheme: this.state.darkTheme,
@@ -190,6 +190,7 @@ export class ThemeStore extends PiniaStoreBase {
           this.state.isDark = res.appTheme == 'dark';
           this.syncActiveTheme();
           activeThemeColor.value = this.state.activeTheme;
+          applyThemeColor(this.state.activeTheme);
         }
       });
       uni.onOsThemeChange((res: OsThemeChangeResult) => {
@@ -197,6 +198,7 @@ export class ThemeStore extends PiniaStoreBase {
           this.state.isDark = res.osTheme == 'dark';
           this.syncActiveTheme();
           activeThemeColor.value = this.state.activeTheme;
+          applyThemeColor(this.state.activeTheme);
         }
       });
       // #endif
@@ -262,6 +264,7 @@ export class ThemeStore extends PiniaStoreBase {
     }
     this.syncActiveTheme();
     activeThemeColor.value = this.state.activeTheme;
+    applyThemeColor(this.state.activeTheme);
     applyThemeMode(mode, this.state.isDark);
   }
 }
