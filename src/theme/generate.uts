@@ -1,0 +1,277 @@
+/**
+ * Ant Design 官方深色主题算法（自包含纯 UTS 实现）
+ * 用于为任意主题主色生成高对比度、防眩光的深色模式色阶，零依赖外部模块。
+ */
+
+type RGB = {
+  r: number;
+  g: number;
+  b: number;
+};
+
+type HSV = {
+  h: number;
+  s: number;
+  v: number;
+};
+
+type DarkColorMapItem = {
+  index: number;
+  opacity: number;
+};
+
+const hueStep = 2; // 色相阶梯
+const saturationStep = 0.16; // 饱和度阶梯（浅色）
+const saturationStep2 = 0.05; // 饱和度阶梯（深色）
+const brightnessStep1 = 0.05; // 亮度阶梯（浅色）
+const brightnessStep2 = 0.15; // 亮度阶梯（深色）
+const lightColorCount = 5;
+const darkColorCount = 4;
+
+// Ant Design 深色主题颜色映射关系表
+const darkColorMap: DarkColorMapItem[] = [
+  { index: 7, opacity: 0.15 },
+  { index: 6, opacity: 0.25 },
+  { index: 5, opacity: 0.3 },
+  { index: 5, opacity: 0.45 },
+  { index: 5, opacity: 0.65 },
+  { index: 5, opacity: 0.85 },
+  { index: 4, opacity: 0.9 },
+  { index: 3, opacity: 0.95 },
+  { index: 2, opacity: 0.97 },
+  { index: 1, opacity: 0.98 }
+];
+
+/**
+ * 解析十六进制色为 RGB
+ */
+function hexToRgb(hex: string): RGB {
+  let c = hex.trim().replace(/^#/, '');
+  if (c.length == 3) {
+    c = c.charAt(0) + c.charAt(0) + c.charAt(1) + c.charAt(1) + c.charAt(2) + c.charAt(2);
+  }
+  const num = parseInt(c, 16);
+  if (isNaN(num)) {
+    return { r: 55, g: 194, b: 188 };
+  }
+  return {
+    r: (num >> 16) & 255,
+    g: (num >> 8) & 255,
+    b: num & 255
+  };
+}
+
+/**
+ * RGB 转十六进制字符串
+ */
+function rgbToHex(r: number, g: number, b: number): string {
+  const pad = (n: number): string => {
+    const clamped = Math.max(0, Math.min(255, Math.round(n)));
+    const s = clamped.toString(16);
+    return s.length == 1 ? `0${s}` : s;
+  };
+  return `#${pad(r)}${pad(g)}${pad(b)}`;
+}
+
+/**
+ * RGB 转 HSV
+ */
+function rgbToHsv(r: number, g: number, b: number): HSV {
+  const _r = r / 255;
+  const _g = g / 255;
+  const _b = b / 255;
+  const max = Math.max(_r, _g, _b);
+  const min = Math.min(_r, _g, _b);
+  const d = max - min;
+  let h = 0;
+  const v = max;
+  const s = max == 0 ? 0 : d / max;
+
+  if (max != min) {
+    if (max == _r) {
+      h = (_g - _b) / d + (_g < _b ? 6 : 0);
+    }
+    else if (max == _g) {
+      h = (_b - _r) / d + 2;
+    }
+    else {
+      h = (_r - _g) / d + 4;
+    }
+    h = h / 6;
+  }
+
+  return { h: h * 360, s, v };
+}
+
+/**
+ * HSV 转 RGB
+ */
+function hsvToRgb(h: number, s: number, v: number): RGB {
+  const normalizedH = (h % 360 + 360) % 360;
+  const _h = normalizedH / 60;
+  const i = Math.floor(_h);
+  const f = _h - i;
+  const p = v * (1 - s);
+  const q = v * (1 - f * s);
+  const t = v * (1 - (1 - f) * s);
+  let r = 0;
+  let g = 0;
+  let b = 0;
+
+  switch (i % 6) {
+    case 0:
+      r = v;
+      g = t;
+      b = p;
+      break;
+    case 1:
+      r = q;
+      g = v;
+      b = p;
+      break;
+    case 2:
+      r = p;
+      g = v;
+      b = t;
+      break;
+    case 3:
+      r = p;
+      g = q;
+      b = v;
+      break;
+    case 4:
+      r = t;
+      g = p;
+      b = v;
+      break;
+    default:
+      r = v;
+      g = p;
+      b = q;
+      break;
+  }
+
+  return {
+    r: r * 255,
+    g: g * 255,
+    b: b * 255
+  };
+}
+
+/**
+ * 混色
+ */
+function mix(rgb1: RGB, rgb2: RGB, amount: number): RGB {
+  const p = amount / 100;
+  return {
+    r: (rgb2.r - rgb1.r) * p + rgb1.r,
+    g: (rgb2.g - rgb1.g) * p + rgb1.g,
+    b: (rgb2.b - rgb1.b) * p + rgb1.b
+  };
+}
+
+function getHue(hsv: HSV, i: number, light: boolean): number {
+  let hue: number;
+  const rounded = Math.round(hsv.h);
+  if (rounded >= 60 && rounded <= 240) {
+    hue = light ? rounded - hueStep * i : rounded + hueStep * i;
+  }
+  else {
+    hue = light ? rounded + hueStep * i : rounded - hueStep * i;
+  }
+  if (hue < 0) {
+    hue += 360;
+  }
+  else if (hue >= 360) {
+    hue -= 360;
+  }
+  return hue;
+}
+
+function getSaturation(hsv: HSV, i: number, light: boolean): number {
+  if (hsv.h == 0 && hsv.s == 0) {
+    return hsv.s;
+  }
+  let s: number;
+  if (light) {
+    s = hsv.s - saturationStep * i;
+  }
+  else if (i == darkColorCount) {
+    s = hsv.s + saturationStep;
+  }
+  else {
+    s = hsv.s + saturationStep2 * i;
+  }
+  if (s > 1) {
+    s = 1;
+  }
+  if (light && i == lightColorCount && s > 0.1) {
+    s = 0.1;
+  }
+  if (s < 0.06) {
+    s = 0.06;
+  }
+  return s;
+}
+
+function getValue(hsv: HSV, i: number, light: boolean): number {
+  let v = light ? hsv.v + brightnessStep1 * i : hsv.v - brightnessStep2 * i;
+  if (v > 1) {
+    v = 1;
+  }
+  if (v < 0) {
+    v = 0;
+  }
+  return v;
+}
+
+/**
+ * 基于 Ant Design 官方算法生成深色模式主题色阶（10 档）
+ * @param color 原始十六进制颜色（如 '#37c2bc'）
+ * @param backgroundColor 暗黑背景基准色，默认 '#141414'
+ * @returns 10 档深色色阶列表
+ */
+export function generateDarkPalette(color: string, backgroundColor: string = '#141414'): string[] {
+  const pColor = hexToRgb(color);
+  const patterns: RGB[] = [];
+
+  for (let i = lightColorCount; i > 0; i -= 1) {
+    const hsv = rgbToHsv(pColor.r, pColor.g, pColor.b);
+    patterns.push(hsvToRgb(getHue(hsv, i, true), getSaturation(hsv, i, true), getValue(hsv, i, true)));
+  }
+
+  patterns.push(pColor);
+
+  for (let i = 1; i <= darkColorCount; i += 1) {
+    const hsv = rgbToHsv(pColor.r, pColor.g, pColor.b);
+    patterns.push(hsvToRgb(getHue(hsv, i, false), getSaturation(hsv, i, false), getValue(hsv, i, false)));
+  }
+
+  const bgRgb = hexToRgb(backgroundColor);
+  const darkPalette: string[] = [];
+  for (let i = 0; i < darkColorMap.length; i++) {
+    const item = darkColorMap[i];
+    const mixed = mix(bgRgb, patterns[item.index], item.opacity * 100);
+    darkPalette.push(rgbToHex(mixed.r, mixed.g, mixed.b));
+  }
+
+  return darkPalette;
+}
+
+/**
+ * 计算给定主题主色在暗黑模式下的对应主色（取色阶第 6 档，索引为 5）
+ * @param color 原始主题主色
+ * @returns 适合暗黑背景的主题主色
+ */
+export function computeDarkTheme(color: string): string {
+  try {
+    const list = generateDarkPalette(color);
+    if (list.length > 5) {
+      return list[5];
+    }
+  }
+  catch {
+    // ignore
+  }
+  return color;
+}
