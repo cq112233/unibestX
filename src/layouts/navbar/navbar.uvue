@@ -13,12 +13,12 @@
       :bg-color="navBgColor"
       :fixed="false"
       :placeholder="false"
-      :border="border"
+      :border="isBorderVisible"
     />
 
     <!-- 单页 TabBar 容器模式（模式 4 且为主页）：由内部 TabViews/TabContent 独立承载滚动与下拉刷新，避免外层嵌套 scroll-view 导致手势冲突、TabBar 跟随下移与双重下拉刷新 -->
     <view
-      v-if="isTabbarPage && isSinglePageHome"
+      v-if="isTabbarHomeContainer"
       class="navbar-tab-container"
       style="position: relative;flex: 1;"
     >
@@ -651,13 +651,20 @@ const isSinglePageHome = computed((): boolean => {
 });
 
 /**
+ * 是否作为单页 TabBar 首页容器渲染（收敛复合条件，杜绝模板中双重逻辑与引起小程序 AST 警告）
+ */
+const isTabbarHomeContainer = computed((): boolean => {
+  return isTabbarPage.value && isSinglePageHome.value;
+});
+
+/**
  * 决定是否使用 NavBar 内部自定义下拉刷新：
  * 若原生已开启下拉（style.enablePullDownRefresh），原生优先并关闭内部下拉；
  * 若处于单页 TabBar 首页模式（由内部 TabViews/TabContent 独立驱动下拉刷新），外层关闭下拉刷新，杜绝双重刷新圈与 TabBar 掉落；
  * 仅在原生未开启时才使用自定义下拉
  */
 const useCustomRefresher = computed((): boolean => {
-  if (isNativePullDown.value || (isSinglePageHome.value && isTabbarPage.value)) {
+  if (isNativePullDown.value || isTabbarHomeContainer.value) {
     return false;
   }
   return props.enablePullDownRefresh;
@@ -816,6 +823,13 @@ const isCustomNav = computed((): boolean => {
   else {
     return false;
   }
+});
+
+/**
+ * 导航栏底部是否显示 1px 细分割线
+ */
+const isBorderVisible = computed((): boolean => {
+  return props.border;
 });
 
 defineExpose({

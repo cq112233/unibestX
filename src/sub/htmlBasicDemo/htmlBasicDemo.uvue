@@ -27,8 +27,9 @@
 
         <view class="flex flex-col">
           <!-- div 标签（最常用块级容器） -->
+          <!-- div 块级 -->
           <view class="p-[12px] rounded-[10px] mb-[10px]" :style="{ backgroundColor: innerBg }">
-            <text class="text-[11px] text-[#94a3b8] mb-[6px]">&lt;div&gt; → 块级容器（自动转 view）</text>
+            <text class="text-[11px] text-[#94a3b8] mb-[6px]">{{ '<div>' }} → 块级容器（自动转 view）</text>
             <div class="p-[10px] rounded-[6px] bg-[#3b82f6]/10">
               <text class="text-[13px] text-[#2563eb]">div 标准块级容器，编译期无损转为原生 view 组件</text>
             </div>
@@ -36,71 +37,71 @@
 
           <!-- b 标签 + 主题色动态绑定 -->
           <view class="p-[12px] rounded-[10px] mb-[10px]" :style="{ backgroundColor: innerBg }">
-            <text class="text-[11px] text-[#94a3b8] mb-[6px]">&lt;b :style="{ color: activeThemeColor }"&gt; → 加粗 + 主题色</text>
-            <b :style="{ color: activeThemeColor }">
+            <text class="text-[11px] text-[#94a3b8] mb-[6px]">{{ '<b class="font-bold" :style="{ color: activeThemeColor }">' }} → 加粗 + 主题色</text>
+            <b class="font-bold" :style="{ color: activeThemeColor }">
               加粗主题文本（随主题色与暗黑模式即时变色）
             </b>
           </view>
 
           <!-- b 标签 + 暗黑类名 -->
           <view class="p-[12px] rounded-[10px] mb-[10px]" :style="{ backgroundColor: innerBg }">
-            <text class="text-[11px] text-[#94a3b8] mb-[6px]">&lt;b class="text-slate-800 dark:text-slate-100"&gt; → 加粗 + 暗黑适配</text>
-            <b class="text-slate-800 dark:text-slate-100">
+            <text class="text-[11px] text-[#94a3b8] mb-[6px]">{{ '<b class="font-bold text-slate-800 dark:text-slate-100">' }} → 加粗 + 暗黑适配</text>
+            <b class="font-bold text-slate-800 dark:text-slate-100">
               深浅自适应加粗文本（明亮深色自动切换）
             </b>
           </view>
 
           <!-- strong 标签 -->
           <view class="p-[12px] rounded-[10px] mb-[10px]" :style="{ backgroundColor: innerBg }">
-            <text class="text-[11px] text-[#94a3b8] mb-[6px]">&lt;strong&gt; → 语义强调加粗 (font-bold)</text>
-            <strong :style="{ color: textMain }">
-              强语义重要提示（自动注入 font-bold 加粗样式）
+            <text class="text-[11px] text-[#94a3b8] mb-[6px]">{{ '<strong class="font-bold">' }} → 语义强调加粗 (font-bold)</text>
+            <strong class="font-bold" :style="{ color: textMain }">
+              强语义重要提示（通过 class="font-bold" 控制样式）
             </strong>
           </view>
 
           <!-- i 标签 -->
           <view class="p-[12px] rounded-[10px] mb-[10px]" :style="{ backgroundColor: innerBg }">
-            <text class="text-[11px] text-[#94a3b8] mb-[6px]">&lt;i&gt; → 斜体文本 (italic)</text>
-            <i>
+            <text class="text-[11px] text-[#94a3b8] mb-[6px]">{{ '<i class="italic">' }} → 斜体文本 (italic)</text>
+            <i class="italic">
               The quick brown fox jumps over the lazy dog (常用斜体文本)
             </i>
           </view>
 
           <!-- em 标签 -->
           <view class="p-[12px] rounded-[10px] mb-[10px]" :style="{ backgroundColor: innerBg }">
-            <text class="text-[11px] text-[#94a3b8] mb-[6px]">&lt;em&gt; → 强调斜体文本 (italic)</text>
-            <em>
+            <text class="text-[11px] text-[#94a3b8] mb-[6px]">{{ '<em class="italic">' }} → 强调斜体文本 (italic)</text>
+            <em class="italic">
               强调斜体提示：编译期自动转为原生 text 文本组件
             </em>
           </view>
 
           <!-- del 标签 -->
           <view class="p-[12px] rounded-[10px] mb-[10px]" :style="{ backgroundColor: innerBg }">
-            <text class="text-[11px] text-[#94a3b8] mb-[6px]">&lt;del&gt; → 删除线文本 (line-through)</text>
-            <del>
+            <text class="text-[11px] text-[#94a3b8] mb-[6px]">{{ '<del class="line-through">' }} → 删除线文本 (line-through)</text>
+            <del class="line-through">
               原价 ¥999.00（删除线已失效价格）
             </del>
           </view>
 
           <!-- s 标签 -->
           <view class="p-[12px] rounded-[10px] mb-[10px]" :style="{ backgroundColor: innerBg }">
-            <text class="text-[11px] text-[#94a3b8] mb-[6px]">&lt;s&gt; → 中划线文本 (line-through)</text>
-            <s>
+            <text class="text-[11px] text-[#94a3b8] mb-[6px]">{{ '<s class="line-through">' }} → 中划线文本 (line-through)</text>
+            <s class="line-through">
               早鸟特惠：¥299.00（限时名额已售罄）
             </s>
           </view>
 
           <!-- u 标签 -->
           <view class="p-[12px] rounded-[10px] mb-[10px]" :style="{ backgroundColor: innerBg }">
-            <text class="text-[11px] text-[#94a3b8] mb-[6px]">&lt;u&gt; → 下划线文本 (underline)</text>
-            <u>
+            <text class="text-[11px] text-[#94a3b8] mb-[6px]">{{ '<u class="underline">' }} → 下划线文本 (underline)</text>
+            <u class="underline">
               带下划线的链接提示文本
             </u>
           </view>
 
           <!-- span 标签 -->
           <view class="p-[12px] rounded-[10px]" :style="{ backgroundColor: innerBg }">
-            <text class="text-[11px] text-[#94a3b8] mb-[6px]">&lt;span&gt; → 行内普通文本</text>
+            <text class="text-[11px] text-[#94a3b8] mb-[6px]">{{ '<span>' }} → 行内普通文本</text>
             <span :style="{ color: textMain }">
               普通行内文本 span
             </span>
@@ -121,7 +122,7 @@
         <view class="flex flex-col">
           <!-- div 块级 -->
           <view class="p-[12px] rounded-[10px] mb-[10px]" :style="{ backgroundColor: innerBg }">
-            <text class="text-[11px] text-[#94a3b8] mb-[6px]">&lt;div&gt; 块级容器</text>
+            <text class="text-[11px] text-[#94a3b8] mb-[6px]">{{ '<div>' }} 块级容器</text>
             <div>
               <text class="text-[13px]" :style="{ color: textMain }">div 标准块级容器，自动转换为跨端原生 view 组件</text>
             </div>
@@ -129,15 +130,15 @@
 
           <!-- p 段落 -->
           <view class="p-[12px] rounded-[10px] mb-[10px]" :style="{ backgroundColor: innerBg }">
-            <text class="text-[11px] text-[#94a3b8] mb-[6px]">&lt;p&gt; 段落容器</text>
+            <text class="text-[11px] text-[#94a3b8] mb-[6px]">{{ '<p>' }} 段落容器</text>
             <p>
-              <text class="text-[13px] leading-[18px]" :style="{ color: textMain }">这是一个通过 &lt;p&gt; 编写的段落容器，编译后转为 &lt;view&gt; 原生组件。</text>
+              <text class="text-[13px] leading-[18px]" :style="{ color: textMain }">这是一个通过 {{ '<p>' }} 编写的段落容器，编译后转为 {{ '<view>' }} 原生组件。</text>
             </p>
           </view>
 
           <!-- section / article -->
           <view class="p-[12px] rounded-[10px] mb-[10px]" :style="{ backgroundColor: innerBg }">
-            <text class="text-[11px] text-[#94a3b8] mb-[6px]">&lt;section&gt; 与 &lt;article&gt; 语义区块</text>
+            <text class="text-[11px] text-[#94a3b8] mb-[6px]">{{ '<section>' }} 与 {{ '<article>' }} 语义区块</text>
             <section class="flex flex-col">
               <article class="p-[8px] rounded-[6px] bg-[#3b82f6]/10 mb-[6px]">
                 <text class="text-[12px] text-[#3b82f6]">article 内部文章模块</text>
@@ -150,7 +151,7 @@
 
           <!-- ul 与 li -->
           <view class="p-[12px] rounded-[10px] mb-[10px]" :style="{ backgroundColor: innerBg }">
-            <text class="text-[11px] text-[#94a3b8] mb-[6px]">&lt;ul&gt; 与 &lt;li&gt; 无序列表容器</text>
+            <text class="text-[11px] text-[#94a3b8] mb-[6px]">{{ '<ul>' }} 与 {{ '<li>' }} 无序列表容器</text>
             <ul class="flex flex-col">
               <li class="flex flex-row items-center mb-[4px]">
                 <text class="text-[12px] text-[#3b82f6] mr-[6px]">●</text>
@@ -165,7 +166,7 @@
 
           <!-- ol 与 li -->
           <view class="p-[12px] rounded-[10px] mb-[10px]" :style="{ backgroundColor: innerBg }">
-            <text class="text-[11px] text-[#94a3b8] mb-[6px]">&lt;ol&gt; 与 &lt;li&gt; 有序列表容器</text>
+            <text class="text-[11px] text-[#94a3b8] mb-[6px]">{{ '<ol>' }} 与 {{ '<li>' }} 有序列表容器</text>
             <ol class="flex flex-col">
               <li class="flex flex-row items-center mb-[4px]">
                 <text class="text-[12px] text-[#3b82f6] mr-[6px] font-bold">1.</text>
@@ -191,7 +192,7 @@
         </view>
 
         <view class="p-[12px] rounded-[10px]" :style="{ backgroundColor: innerBg }">
-          <text class="text-[11px] text-[#94a3b8] mb-[8px]">&lt;img src="/static/logo.png" /&gt; → 转换为 &lt;image&gt;</text>
+          <text class="text-[11px] text-[#94a3b8] mb-[8px]">{{ '<img src="/static/logo.png" />' }} → 转换为 {{ '<image>' }}</text>
           <view class="flex flex-row items-center">
             <img class="w-[50px] h-[50px] rounded-[10px]" src="/static/logo.png" />
             <view class="flex flex-col ml-[12px]">
