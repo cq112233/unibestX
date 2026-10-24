@@ -1,32 +1,3 @@
-<template>
-  <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
-    <view class="p-[16px]">
-      <view class="demo-block">
-        <text class="demo-label">基础用法</text>
-        <up-upload
-          :file-list="fileList1"
-          name="1"
-          multiple
-          :max-count="3"
-          @after-read="afterRead"
-          @delete="deletePic"
-        ></up-upload>
-      </view>
-      <view class="demo-block mt-[12px]">
-        <text class="demo-label">自定义上传按钮</text>
-        <up-upload
-          :file-list="fileList2"
-          name="2"
-          multiple
-          :max-count="3"
-        >
-          <up-button type="success" text="选择文件" icon="plus" size="mini"></up-button>
-        </up-upload>
-      </view>
-    </view>
-  </view>
-</template>
-
 <script setup lang="uts">
 import { ref } from 'vue';
 
@@ -80,6 +51,35 @@ function deletePic(event: UTSJSONObject) {
   fileList1.value.splice(event.getNumber('index') as number, 1);
 }
 </script>
+
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
+    <view class="p-[16px]">
+      <view class="demo-block">
+        <text class="demo-label">基础用法</text>
+        <up-upload
+          :file-list="fileList1"
+          name="1"
+          multiple
+          :max-count="3"
+          @after-read="afterRead"
+          @delete="deletePic"
+        ></up-upload>
+      </view>
+      <view class="demo-block mt-[12px]">
+        <text class="demo-label">自定义上传按钮</text>
+        <up-upload
+          :file-list="fileList2"
+          name="2"
+          multiple
+          :max-count="3"
+        >
+          <up-button type="success" text="选择文件" icon="plus" size="mini"></up-button>
+        </up-upload>
+      </view>
+    </view>
+  </view>
+</template>
 
 <style lang="scss" scoped>
 .demo-block {

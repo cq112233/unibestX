@@ -1,3 +1,24 @@
+<script setup lang="uts">
+import { ref } from 'vue';
+
+definePage({
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
+  style: {
+    navigationBarTitleText: 'up-search 搜索',
+    navigationStyle: 'custom'
+  }
+});
+
+const searchValue1 = ref('');
+const searchValue2 = ref('');
+const searchValue3 = ref('');
+const searchValue4 = ref('');
+const searchValue5 = ref('');
+</script>
+
 <template>
   <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
     <view class="p-[16px]">
@@ -28,27 +49,6 @@
     </view>
   </view>
 </template>
-
-<script setup lang="uts">
-import { ref } from 'vue';
-
-definePage({
-  layout: 'navbar',
-  showBack: true,
-  hideNavbar: false,
-  enablePullDownRefresh: false,
-  style: {
-    navigationBarTitleText: 'up-search 搜索',
-    navigationStyle: 'custom'
-  }
-});
-
-const searchValue1 = ref('');
-const searchValue2 = ref('');
-const searchValue3 = ref('');
-const searchValue4 = ref('');
-const searchValue5 = ref('');
-</script>
 
 <style lang="scss" scoped>
 .demo-block {

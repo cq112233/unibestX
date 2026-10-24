@@ -1,3 +1,22 @@
+<script setup lang="uts">
+import { computed } from 'vue';
+import { useThemeStore } from '@/src/store/index.uts';
+
+definePage({
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
+  style: {
+    navigationBarTitleText: 'up-title 标题',
+    navigationStyle: 'custom'
+  }
+});
+
+const themeStore = useThemeStore();
+const themeColor = computed<string>((): string => themeStore.state.theme);
+</script>
+
 <template>
   <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
     <view class="p-[16px]">
@@ -67,25 +86,6 @@
     </view>
   </view>
 </template>
-
-<script setup lang="uts">
-import { computed } from 'vue';
-import { useThemeStore } from '@/src/store/index.uts';
-
-definePage({
-  layout: 'navbar',
-  showBack: true,
-  hideNavbar: false,
-  enablePullDownRefresh: false,
-  style: {
-    navigationBarTitleText: 'up-title 标题',
-    navigationStyle: 'custom'
-  }
-});
-
-const themeStore = useThemeStore();
-const themeColor = computed<string>((): string => themeStore.state.theme);
-</script>
 
 <style lang="scss" scoped>
 .demo-block {

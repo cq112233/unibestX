@@ -1,3 +1,24 @@
+<script setup lang="uts">
+import { ref } from 'vue';
+
+definePage({
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
+  style: {
+    navigationBarTitleText: 'up-coupon 优惠券',
+    navigationStyle: 'custom'
+  }
+});
+
+const eventLog = ref<string>('点击优惠券查看事件');
+
+function onClick() {
+  eventLog.value = 'click => 点击了优惠券';
+}
+</script>
+
 <template>
   <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
     <view class="p-[16px]">
@@ -120,27 +141,6 @@
     </view>
   </view>
 </template>
-
-<script setup lang="uts">
-import { ref } from 'vue';
-
-definePage({
-  layout: 'navbar',
-  showBack: true,
-  hideNavbar: false,
-  enablePullDownRefresh: false,
-  style: {
-    navigationBarTitleText: 'up-coupon 优惠券',
-    navigationStyle: 'custom'
-  }
-});
-
-const eventLog = ref<string>('点击优惠券查看事件');
-
-function onClick() {
-  eventLog.value = 'click => 点击了优惠券';
-}
-</script>
 
 <style lang="scss" scoped>
 .demo-block {

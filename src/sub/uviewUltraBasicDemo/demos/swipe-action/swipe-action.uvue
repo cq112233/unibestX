@@ -1,30 +1,3 @@
-<template>
-  <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
-    <view class="p-[16px]">
-      <view class="demo-block">
-        <text class="demo-label">基础用法</text>
-        <up-swipe-action>
-          <up-swipe-action-item :options="options1">
-            <view class="p-[15px] bg-[#fff] rounded-[5px]">
-              <text>操作选项</text>
-            </view>
-          </up-swipe-action-item>
-        </up-swipe-action>
-      </view>
-      <view class="demo-block mt-[12px]">
-        <text class="demo-label">多按钮</text>
-        <up-swipe-action>
-          <up-swipe-action-item :options="options2">
-            <view class="p-[15px] bg-[#fff] rounded-[5px]">
-              <text>多按钮操作</text>
-            </view>
-          </up-swipe-action-item>
-        </up-swipe-action>
-      </view>
-    </view>
-  </view>
-</template>
-
 <script setup lang="uts">
 import { ref } from 'vue';
 
@@ -63,6 +36,33 @@ const options2 = ref<UTSJSONObject[]>([
   } as UTSJSONObject
 ]);
 </script>
+
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
+    <view class="p-[16px]">
+      <view class="demo-block">
+        <text class="demo-label">基础用法</text>
+        <up-swipe-action>
+          <up-swipe-action-item :options="options1">
+            <view class="p-[15px] bg-[#fff] rounded-[5px]">
+              <text>操作选项</text>
+            </view>
+          </up-swipe-action-item>
+        </up-swipe-action>
+      </view>
+      <view class="demo-block mt-[12px]">
+        <text class="demo-label">多按钮</text>
+        <up-swipe-action>
+          <up-swipe-action-item :options="options2">
+            <view class="p-[15px] bg-[#fff] rounded-[5px]">
+              <text>多按钮操作</text>
+            </view>
+          </up-swipe-action-item>
+        </up-swipe-action>
+      </view>
+    </view>
+  </view>
+</template>
 
 <style lang="scss" scoped>
 .demo-block {

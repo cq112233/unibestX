@@ -1,3 +1,28 @@
+<script setup lang="uts">
+import { ref } from 'vue';
+
+definePage({
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
+  style: {
+    navigationBarTitleText: 'up-tooltip 长按提示',
+    navigationStyle: 'custom'
+  }
+});
+
+const tooltipButtons = ref(['编辑', '删除'] as string[]);
+const multiButtons = ref(['转发', '收藏', '删除'] as string[]);
+
+function handleBtnClick(index: number) {
+  uni.showToast({
+    title: `点击了第 ${index} 个按钮`,
+    icon: 'none'
+  });
+}
+</script>
+
 <template>
   <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
     <view class="p-[16px]">
@@ -62,31 +87,6 @@
     </view>
   </view>
 </template>
-
-<script setup lang="uts">
-import { ref } from 'vue';
-
-definePage({
-  layout: 'navbar',
-  showBack: true,
-  hideNavbar: false,
-  enablePullDownRefresh: false,
-  style: {
-    navigationBarTitleText: 'up-tooltip 长按提示',
-    navigationStyle: 'custom'
-  }
-});
-
-const tooltipButtons = ref(['编辑', '删除'] as string[]);
-const multiButtons = ref(['转发', '收藏', '删除'] as string[]);
-
-function handleBtnClick(index: number) {
-  uni.showToast({
-    title: `点击了第 ${index} 个按钮`,
-    icon: 'none'
-  });
-}
-</script>
 
 <style lang="scss" scoped>
 .demo-block {

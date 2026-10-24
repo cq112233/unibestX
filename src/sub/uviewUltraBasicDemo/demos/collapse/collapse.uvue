@@ -1,3 +1,20 @@
+<script setup lang="uts">
+import { ref } from 'vue';
+
+definePage({
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
+  style: {
+    navigationBarTitleText: 'up-collapse 折叠面板',
+    navigationStyle: 'custom'
+  }
+});
+
+const collapseValue = ref('1');
+</script>
+
 <template>
   <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
     <view class="p-[16px]">
@@ -23,23 +40,6 @@
     </view>
   </view>
 </template>
-
-<script setup lang="uts">
-import { ref } from 'vue';
-
-definePage({
-  layout: 'navbar',
-  showBack: true,
-  hideNavbar: false,
-  enablePullDownRefresh: false,
-  style: {
-    navigationBarTitleText: 'up-collapse 折叠面板',
-    navigationStyle: 'custom'
-  }
-});
-
-const collapseValue = ref('1');
-</script>
 
 <style lang="scss" scoped>
 .demo-block {

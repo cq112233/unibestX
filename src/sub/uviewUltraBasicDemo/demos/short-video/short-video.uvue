@@ -1,37 +1,3 @@
-<template>
-  <view class="page" :style="{ height: `${windowHeight}px` }">
-    <view class="video-wrap">
-      <up-short-video
-        ref="shortVideoRef"
-        :video-list="videoList"
-        :current-tab="0"
-        :current-video="0"
-        @tab-change="onTabChange"
-        @video-change="onVideoChange"
-        @like="onLike"
-        @comment="onComment"
-        @share="onShare"
-        @collect="onCollect"
-        @progress-change="onProgressChange"
-        @go-next="onGoNext"
-      ></up-short-video>
-    </view>
-
-    <up-button
-      text="返回"
-      type="primary"
-      size="small"
-      color="rgba(0, 0, 0, 0.4)"
-      class="back-btn"
-      @click="onBack"
-    ></up-button>
-
-    <view class="log-bar">
-      <text class="log-text">{{ eventLog }}</text>
-    </view>
-  </view>
-</template>
-
 <script setup lang="uts">
 import { ref } from 'vue';
 
@@ -162,6 +128,40 @@ function onBack() {
   uni.navigateBack();
 }
 </script>
+
+<template>
+  <view class="page" :style="{ height: `${windowHeight}px` }">
+    <view class="video-wrap">
+      <up-short-video
+        ref="shortVideoRef"
+        :video-list="videoList"
+        :current-tab="0"
+        :current-video="0"
+        @tab-change="onTabChange"
+        @video-change="onVideoChange"
+        @like="onLike"
+        @comment="onComment"
+        @share="onShare"
+        @collect="onCollect"
+        @progress-change="onProgressChange"
+        @go-next="onGoNext"
+      ></up-short-video>
+    </view>
+
+    <up-button
+      text="返回"
+      type="primary"
+      size="small"
+      color="rgba(0, 0, 0, 0.4)"
+      class="back-btn"
+      @click="onBack"
+    ></up-button>
+
+    <view class="log-bar">
+      <text class="log-text">{{ eventLog }}</text>
+    </view>
+  </view>
+</template>
 
 <style lang="scss" scoped>
 .page {

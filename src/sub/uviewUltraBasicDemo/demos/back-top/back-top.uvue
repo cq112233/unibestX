@@ -1,3 +1,32 @@
+<script setup lang="uts">
+import { ref } from 'vue';
+
+definePage({
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
+  style: {
+    navigationBarTitleText: 'Back Top 返回顶部',
+    navigationStyle: 'custom'
+  }
+});
+
+const currentScrollTop = ref(0);
+const scrollTop = ref(0);
+const windowHeight = ref(uni.getWindowInfo().windowHeight);
+
+function handleScroll(e: UniScrollEvent) {
+  currentScrollTop.value = e.detail.scrollTop;
+  scrollTop.value = e.detail.scrollTop;
+}
+
+function scrollToTop() {
+  scrollTop.value = 0;
+  currentScrollTop.value = 0;
+}
+</script>
+
 <template>
   <view class="page-container bg-[#f8fafc] flex flex-col" :style="{ height: `${windowHeight}px` }">
     <scroll-view
@@ -39,35 +68,6 @@
     ></up-back-top>
   </view>
 </template>
-
-<script setup lang="uts">
-import { ref } from 'vue';
-
-definePage({
-  layout: 'navbar',
-  showBack: true,
-  hideNavbar: false,
-  enablePullDownRefresh: false,
-  style: {
-    navigationBarTitleText: 'Back Top 返回顶部',
-    navigationStyle: 'custom'
-  }
-});
-
-const currentScrollTop = ref(0);
-const scrollTop = ref(0);
-const windowHeight = ref(uni.getWindowInfo().windowHeight);
-
-function handleScroll(e: UniScrollEvent) {
-  currentScrollTop.value = e.detail.scrollTop;
-  scrollTop.value = e.detail.scrollTop;
-}
-
-function scrollToTop() {
-  scrollTop.value = 0;
-  currentScrollTop.value = 0;
-}
-</script>
 
 <style scoped>
 .page-container {

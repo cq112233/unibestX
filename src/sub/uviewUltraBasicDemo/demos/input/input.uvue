@@ -1,18 +1,3 @@
-<template>
-  <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
-    <view class="p-[16px]">
-      <view class="demo-block">
-        <text class="demo-label">基础用法</text>
-        <up-input v-model="inputValue" placeholder="请输入内容" border="surround" clearable></up-input>
-      </view>
-      <view class="demo-block mt-[12px]">
-        <text class="demo-label">带前后台图标</text>
-        <up-input placeholder="请输入搜索内容" prefix-icon="search" suffix-icon="scan"></up-input>
-      </view>
-    </view>
-  </view>
-</template>
-
 <script setup lang="uts">
 import { ref } from 'vue';
 
@@ -29,6 +14,21 @@ definePage({
 
 const inputValue = ref('');
 </script>
+
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
+    <view class="p-[16px]">
+      <view class="demo-block">
+        <text class="demo-label">基础用法</text>
+        <up-input v-model="inputValue" placeholder="请输入内容" border="surround" clearable></up-input>
+      </view>
+      <view class="demo-block mt-[12px]">
+        <text class="demo-label">带前后台图标</text>
+        <up-input placeholder="请输入搜索内容" prefix-icon="search" suffix-icon="scan"></up-input>
+      </view>
+    </view>
+  </view>
+</template>
 
 <style lang="scss" scoped>
 .demo-block {

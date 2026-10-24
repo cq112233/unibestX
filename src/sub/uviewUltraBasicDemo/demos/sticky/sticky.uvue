@@ -1,3 +1,31 @@
+<script setup lang="uts">
+import { computed, ref } from 'vue';
+import { safeAreaInsets, systemInfo } from '@/src/utils/systemInfo';
+
+definePage({
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
+  style: {
+    navigationBarTitleText: 'Sticky 吸顶',
+    navigationStyle: 'custom'
+  }
+});
+
+const scrollTop = ref(0);
+const windowHeight = ref(uni.getWindowInfo().windowHeight);
+
+const navHeight = computed((): number => {
+  const top = safeAreaInsets.value?.top ?? systemInfo.value?.statusBarHeight ?? 0;
+  return top + 44;
+});
+
+function handleScroll(e: UniScrollEvent) {
+  scrollTop.value = e.detail.scrollTop;
+}
+</script>
+
 <template>
   <view class="page-container bg-[#f8fafc]" :style="{ height: `${windowHeight}px` }">
     <scroll-view
@@ -36,34 +64,6 @@
     </scroll-view>
   </view>
 </template>
-
-<script setup lang="uts">
-import { computed, ref } from 'vue';
-import { safeAreaInsets, systemInfo } from '@/src/utils/systemInfo';
-
-definePage({
-  layout: 'navbar',
-  showBack: true,
-  hideNavbar: false,
-  enablePullDownRefresh: false,
-  style: {
-    navigationBarTitleText: 'Sticky 吸顶',
-    navigationStyle: 'custom'
-  }
-});
-
-const scrollTop = ref(0);
-const windowHeight = ref(uni.getWindowInfo().windowHeight);
-
-const navHeight = computed((): number => {
-  const top = safeAreaInsets.value?.top ?? systemInfo.value?.statusBarHeight ?? 0;
-  return top + 44;
-});
-
-function handleScroll(e: UniScrollEvent) {
-  scrollTop.value = e.detail.scrollTop;
-}
-</script>
 
 <style scoped>
 .page-container {

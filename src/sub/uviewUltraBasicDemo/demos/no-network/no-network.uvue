@@ -1,15 +1,3 @@
-<template>
-  <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
-    <view class="p-[16px]">
-      <view class="demo-block">
-        <text class="demo-label">无网络提示</text>
-        <text class="text-[12px] text-[#909399]">引入该组件即自动监听网络状态，断网时全屏展示遮罩提示。</text>
-      </view>
-    </view>
-    <up-no-network></up-no-network>
-  </view>
-</template>
-
 <script setup lang="uts">
 definePage({
   layout: 'navbar',
@@ -22,6 +10,18 @@ definePage({
   }
 });
 </script>
+
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
+    <view class="p-[16px]">
+      <view class="demo-block">
+        <text class="demo-label">无网络提示</text>
+        <text class="text-[12px] text-[#909399]">引入该组件即自动监听网络状态，断网时全屏展示遮罩提示。</text>
+      </view>
+    </view>
+    <up-no-network></up-no-network>
+  </view>
+</template>
 
 <style lang="scss" scoped>
 .demo-block {

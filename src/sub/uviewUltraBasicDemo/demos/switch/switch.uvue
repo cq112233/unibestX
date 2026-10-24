@@ -1,3 +1,24 @@
+<script setup lang="uts">
+import { ref } from 'vue';
+
+definePage({
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
+  style: {
+    navigationBarTitleText: 'up-switch 开关',
+    navigationStyle: 'custom'
+  }
+});
+
+const switchValue1 = ref(true);
+const switchValue2 = ref(true);
+const switchValue3 = ref(true);
+const switchValue4 = ref(true);
+const switchValue5 = ref(true);
+</script>
+
 <template>
   <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
     <view class="p-[16px]">
@@ -40,27 +61,6 @@
     </view>
   </view>
 </template>
-
-<script setup lang="uts">
-import { ref } from 'vue';
-
-definePage({
-  layout: 'navbar',
-  showBack: true,
-  hideNavbar: false,
-  enablePullDownRefresh: false,
-  style: {
-    navigationBarTitleText: 'up-switch 开关',
-    navigationStyle: 'custom'
-  }
-});
-
-const switchValue1 = ref(true);
-const switchValue2 = ref(true);
-const switchValue3 = ref(true);
-const switchValue4 = ref(true);
-const switchValue5 = ref(true);
-</script>
 
 <style lang="scss" scoped>
 .demo-block {

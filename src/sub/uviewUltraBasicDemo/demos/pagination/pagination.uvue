@@ -1,20 +1,3 @@
-<template>
-  <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
-    <view class="p-[16px]">
-      <view class="demo-block">
-        <text class="demo-label">up-pagination</text>
-        <up-pagination
-          :current-page="paginationCurrentPage"
-          :page-size="paginationPageSize"
-          :total="paginationTotal"
-          layout="prev, pager, next, total"
-          @current-change="onPaginationCurrentChange"
-        ></up-pagination>
-      </view>
-    </view>
-  </view>
-</template>
-
 <script setup lang="uts">
 import { ref } from 'vue';
 
@@ -37,6 +20,23 @@ function onPaginationCurrentChange(page: number): void {
   paginationCurrentPage.value = page;
 }
 </script>
+
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
+    <view class="p-[16px]">
+      <view class="demo-block">
+        <text class="demo-label">up-pagination</text>
+        <up-pagination
+          :current-page="paginationCurrentPage"
+          :page-size="paginationPageSize"
+          :total="paginationTotal"
+          layout="prev, pager, next, total"
+          @current-change="onPaginationCurrentChange"
+        ></up-pagination>
+      </view>
+    </view>
+  </view>
+</template>
 
 <style lang="scss" scoped>
 .demo-block {

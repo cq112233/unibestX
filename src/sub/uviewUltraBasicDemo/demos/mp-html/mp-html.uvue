@@ -1,49 +1,3 @@
-<template>
-  <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
-    <view class="p-[16px]">
-      <!-- 1. 基础文本与标题 -->
-      <view class="demo-block">
-        <text class="demo-label">基础文本与排版</text>
-        <view class="content-box">
-          <mp-html :content="content1" />
-        </view>
-      </view>
-
-      <!-- 2. 表格解析 -->
-      <view class="demo-block mt-[12px]">
-        <text class="demo-label">HTML 表格解析 (Table)</text>
-        <view class="content-box">
-          <mp-html :content="contentTable" />
-        </view>
-      </view>
-
-      <!-- 3. 有序/无序列表 -->
-      <view class="demo-block mt-[12px]">
-        <text class="demo-label">列表解析 (List)</text>
-        <view class="content-box">
-          <mp-html :content="contentList" />
-        </view>
-      </view>
-
-      <!-- 4. 代码块 -->
-      <view class="demo-block mt-[12px]">
-        <text class="demo-label">代码块解析 (Code)</text>
-        <view class="content-box">
-          <mp-html :content="contentCode" />
-        </view>
-      </view>
-
-      <!-- 5. 链接与图片 -->
-      <view class="demo-block mt-[12px]">
-        <text class="demo-label">超链接与图片展示</text>
-        <view class="content-box">
-          <mp-html :content="contentMedia" />
-        </view>
-      </view>
-    </view>
-  </view>
-</template>
-
 <script setup lang="uts">
 import { ref } from 'vue';
 
@@ -112,6 +66,52 @@ const contentMedia = ref(`
   <img src="/static/logo.png" style="width: 120px; height: 120px;" />
 `);
 </script>
+
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
+    <view class="p-[16px]">
+      <!-- 1. 基础文本与标题 -->
+      <view class="demo-block">
+        <text class="demo-label">基础文本与排版</text>
+        <view class="content-box">
+          <mp-html :content="content1" />
+        </view>
+      </view>
+
+      <!-- 2. 表格解析 -->
+      <view class="demo-block mt-[12px]">
+        <text class="demo-label">HTML 表格解析 (Table)</text>
+        <view class="content-box">
+          <mp-html :content="contentTable" />
+        </view>
+      </view>
+
+      <!-- 3. 有序/无序列表 -->
+      <view class="demo-block mt-[12px]">
+        <text class="demo-label">列表解析 (List)</text>
+        <view class="content-box">
+          <mp-html :content="contentList" />
+        </view>
+      </view>
+
+      <!-- 4. 代码块 -->
+      <view class="demo-block mt-[12px]">
+        <text class="demo-label">代码块解析 (Code)</text>
+        <view class="content-box">
+          <mp-html :content="contentCode" />
+        </view>
+      </view>
+
+      <!-- 5. 链接与图片 -->
+      <view class="demo-block mt-[12px]">
+        <text class="demo-label">超链接与图片展示</text>
+        <view class="content-box">
+          <mp-html :content="contentMedia" />
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
 
 <style lang="scss" scoped>
 .demo-block {

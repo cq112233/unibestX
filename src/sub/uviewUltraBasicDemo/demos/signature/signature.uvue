@@ -1,3 +1,55 @@
+<script setup lang="uts">
+import { ref } from 'vue';
+
+definePage({
+  debug: false,
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
+  style: {
+    navigationBarTitleText: 'up-signature 签名',
+    navigationStyle: 'custom'
+  }
+});
+
+const bgColor = ref<string>('#ffffff');
+
+const sigRef1 = ref(null as ComponentPublicInstance | null);
+const sigRef2 = ref(null as ComponentPublicInstance | null);
+const exportPath = ref<string>('');
+const eventLog = ref<string>('绘制完成后点击工具栏对勾导出，confirm 事件返回图片路径');
+
+function onConfirm(path: string) {
+  exportPath.value = path;
+  eventLog.value = `confirm => ${path}`;
+}
+
+function onError(msg: any | null) {
+  const text = msg == null ? 'unknown' : msg.toString();
+  eventLog.value = `error => ${text}`;
+}
+
+function onClear() {
+  eventLog.value = 'clear => 已清空';
+}
+
+function clearSig2() {
+  const sig = sigRef2.value;
+  if (sig != null) {
+    sig.$callMethod('clearCanvas');
+    eventLog.value = 'clear => 第二块签名已清空';
+  }
+}
+
+function exportSig2() {
+  const sig = sigRef2.value;
+  if (sig != null) {
+    sig.$callMethod('exportSignature');
+  }
+}
+</script>
+
 <template>
   <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
     <view class="p-[16px]">
@@ -63,58 +115,6 @@
     </view>
   </view>
 </template>
-
-<script setup lang="uts">
-import { ref } from 'vue';
-
-definePage({
-  debug: false,
-  layout: 'navbar',
-  showBack: true,
-  hideNavbar: false,
-  enablePullDownRefresh: false,
-  style: {
-    navigationBarTitleText: 'up-signature 签名',
-    navigationStyle: 'custom'
-  }
-});
-
-const bgColor = ref<string>('#ffffff');
-
-const sigRef1 = ref(null as ComponentPublicInstance | null);
-const sigRef2 = ref(null as ComponentPublicInstance | null);
-const exportPath = ref<string>('');
-const eventLog = ref<string>('绘制完成后点击工具栏对勾导出，confirm 事件返回图片路径');
-
-function onConfirm(path: string) {
-  exportPath.value = path;
-  eventLog.value = `confirm => ${path}`;
-}
-
-function onError(msg: any | null) {
-  const text = msg == null ? 'unknown' : msg.toString();
-  eventLog.value = `error => ${text}`;
-}
-
-function onClear() {
-  eventLog.value = 'clear => 已清空';
-}
-
-function clearSig2() {
-  const sig = sigRef2.value;
-  if (sig != null) {
-    sig.$callMethod('clearCanvas');
-    eventLog.value = 'clear => 第二块签名已清空';
-  }
-}
-
-function exportSig2() {
-  const sig = sigRef2.value;
-  if (sig != null) {
-    sig.$callMethod('exportSignature');
-  }
-}
-</script>
 
 <style lang="scss" scoped>
 .demo-block {

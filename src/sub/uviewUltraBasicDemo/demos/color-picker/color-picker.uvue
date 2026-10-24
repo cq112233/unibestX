@@ -1,3 +1,47 @@
+<script setup lang="uts">
+import { ref } from 'vue';
+
+definePage({
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
+  style: {
+    navigationBarTitleText: 'up-color-picker 颜色选择',
+    navigationStyle: 'custom'
+  }
+});
+
+const color1 = ref<string>('#ff0000');
+const color2 = ref<string>('#2979ff');
+const color3 = ref<string>('#19be6b');
+const gradientColor = ref<string>('linear-gradient(to right, #ff0000, #0000ff)');
+const customColors = ref<Array<string>>([
+  '#2979ff',
+  '#fa3534',
+  '#19be6b',
+  '#ff9900',
+  '#ff00ff',
+  '#00ffff'
+] as Array<string>);
+
+const apiLog = ref<string>('');
+
+const colorPickerRef = ref(null as ComponentPublicInstance | null);
+
+function onOpenPicker() {
+  const picker = colorPickerRef.value;
+  if (picker != null) {
+    picker.$callMethod('open');
+    apiLog.value = '已调用 open()';
+  }
+}
+
+function onConfirm(color: string) {
+  apiLog.value = `confirm => ${color}`;
+}
+</script>
+
 <template>
   <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
     <view class="p-[16px]">
@@ -49,50 +93,6 @@
     </view>
   </view>
 </template>
-
-<script setup lang="uts">
-import { ref } from 'vue';
-
-definePage({
-  layout: 'navbar',
-  showBack: true,
-  hideNavbar: false,
-  enablePullDownRefresh: false,
-  style: {
-    navigationBarTitleText: 'up-color-picker 颜色选择',
-    navigationStyle: 'custom'
-  }
-});
-
-const color1 = ref<string>('#ff0000');
-const color2 = ref<string>('#2979ff');
-const color3 = ref<string>('#19be6b');
-const gradientColor = ref<string>('linear-gradient(to right, #ff0000, #0000ff)');
-const customColors = ref<Array<string>>([
-  '#2979ff',
-  '#fa3534',
-  '#19be6b',
-  '#ff9900',
-  '#ff00ff',
-  '#00ffff'
-] as Array<string>);
-
-const apiLog = ref<string>('');
-
-const colorPickerRef = ref(null as ComponentPublicInstance | null);
-
-function onOpenPicker() {
-  const picker = colorPickerRef.value;
-  if (picker != null) {
-    picker.$callMethod('open');
-    apiLog.value = '已调用 open()';
-  }
-}
-
-function onConfirm(color: string) {
-  apiLog.value = `confirm => ${color}`;
-}
-</script>
 
 <style lang="scss" scoped>
 .demo-block {

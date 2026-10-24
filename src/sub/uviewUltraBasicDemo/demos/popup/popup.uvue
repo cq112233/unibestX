@@ -1,3 +1,127 @@
+<script setup lang="uts">
+import { ref } from 'vue';
+
+type PopupPagingItem = {
+  id: number;
+  title: string;
+  desc: string;
+  tag: string;
+  time: string;
+};
+definePage({
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
+  debug: false,
+  style: {
+    navigationBarTitleText: 'up-popup 弹出层',
+    navigationStyle: 'custom'
+  }
+});
+// ---------------- 基础方向弹窗（每个方向独立状态） ----------------
+const basicTopShow = ref(false);
+function openTopBasic() {
+  basicTopShow.value = true;
+}
+const basicBottomShow = ref(false);
+function openBottomBasic() {
+  basicBottomShow.value = true;
+}
+const basicCenterShow = ref(false);
+function openCenterBasic() {
+  basicCenterShow.value = true;
+}
+const basicLeftShow = ref(false);
+function openLeftBasic() {
+  basicLeftShow.value = true;
+}
+const basicRightShow = ref(false);
+function openRightBasic() {
+  basicRightShow.value = true;
+}
+// ---------------- 手势弹窗（每个方向独立状态） ----------------
+const gestureTopShow = ref(false);
+function openTopGesture() {
+  gestureTopShow.value = true;
+}
+const gestureBottomShow = ref(false);
+function openBottomGesture() {
+  gestureBottomShow.value = true;
+}
+const gestureLeftShow = ref(false);
+function openLeftGesture() {
+  gestureLeftShow.value = true;
+}
+const gestureRightShow = ref(false);
+function openRightGesture() {
+  gestureRightShow.value = true;
+}
+// ---------------- 阈值、列表弹窗 ----------------
+const showBasicPopup = ref<boolean>(false);
+const showHighThresholdPopup = ref<boolean>(false);
+const showListPopup = ref<boolean>(false);
+const tabList: string[] = ['全部', '热点', '精选', '公告'];
+const currentTab = ref<number>(0);
+const pagingRef = ref<ComponentPublicInstance | null>(null);
+const pagingList = ref<PopupPagingItem[]>([] as PopupPagingItem[]);
+function onUpdatePagingList(val: any[]) {
+  pagingList.value = val as PopupPagingItem[];
+}
+function onTabChange(index: number) {
+  if (currentTab.value == index)
+    return;
+  currentTab.value = index;
+  if (pagingRef.value != null) {
+    pagingRef.value!.$callMethod('reload');
+  }
+}
+function reloadPaging() {
+  if (pagingRef.value != null) {
+    pagingRef.value!.$callMethod('reload');
+  }
+}
+function clearPaging() {
+  pagingList.value = [] as PopupPagingItem[];
+  if (pagingRef.value != null) {
+    pagingRef.value!.$callMethod('clear');
+  }
+}
+function onQueryPaging(pageNo: number, pageSize: number) {
+  const activeTab = tabList[currentTab.value];
+  setTimeout(() => {
+    if (activeTab == '热点') {
+      if (pagingRef.value != null) {
+        pagingRef.value!.$callMethod('complete', [] as PopupPagingItem[]);
+      }
+      return;
+    }
+    const list = [] as PopupPagingItem[];
+    const start = (pageNo - 1) * pageSize;
+    const maxItems = activeTab == '公告' ? 8 : 20;
+    for (let i = 0; i < pageSize; i++) {
+      const id = start + i + 1;
+      if (id > maxItems)
+        break;
+      let tag = activeTab;
+      if (activeTab == '全部') {
+        tag = (id % 3 == 0) ? '公告' : (id % 2 == 0 ? '热点' : '精选');
+      }
+      list.push({
+        id,
+        title: `[${tag}] 资讯条目 #${id}`,
+        desc: `当前分类：${tag}，由 z-paging-x 驱动分页，支持平滑滚动与触底加载。`,
+        tag,
+        time: `${id * 2}分钟前`
+      } as PopupPagingItem);
+    }
+    if (pagingRef.value != null) {
+      pagingRef.value!.$callMethod('complete', list);
+    }
+  }, 350);
+}
+</script>
+
 <template>
   <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
     <view class="p-[16px]">
@@ -352,130 +476,6 @@
     </up-popup>
   </view>
 </template>
-
-<script setup lang="uts">
-import { ref } from 'vue';
-
-type PopupPagingItem = {
-  id: number;
-  title: string;
-  desc: string;
-  tag: string;
-  time: string;
-};
-definePage({
-  layout: 'navbar',
-  showBack: true,
-  hideNavbar: false,
-  enablePullDownRefresh: false,
-  debug: false,
-  style: {
-    navigationBarTitleText: 'up-popup 弹出层',
-    navigationStyle: 'custom'
-  }
-});
-// ---------------- 基础方向弹窗（每个方向独立状态） ----------------
-const basicTopShow = ref(false);
-function openTopBasic() {
-  basicTopShow.value = true;
-}
-const basicBottomShow = ref(false);
-function openBottomBasic() {
-  basicBottomShow.value = true;
-}
-const basicCenterShow = ref(false);
-function openCenterBasic() {
-  basicCenterShow.value = true;
-}
-const basicLeftShow = ref(false);
-function openLeftBasic() {
-  basicLeftShow.value = true;
-}
-const basicRightShow = ref(false);
-function openRightBasic() {
-  basicRightShow.value = true;
-}
-// ---------------- 手势弹窗（每个方向独立状态） ----------------
-const gestureTopShow = ref(false);
-function openTopGesture() {
-  gestureTopShow.value = true;
-}
-const gestureBottomShow = ref(false);
-function openBottomGesture() {
-  gestureBottomShow.value = true;
-}
-const gestureLeftShow = ref(false);
-function openLeftGesture() {
-  gestureLeftShow.value = true;
-}
-const gestureRightShow = ref(false);
-function openRightGesture() {
-  gestureRightShow.value = true;
-}
-// ---------------- 阈值、列表弹窗 ----------------
-const showBasicPopup = ref<boolean>(false);
-const showHighThresholdPopup = ref<boolean>(false);
-const showListPopup = ref<boolean>(false);
-const tabList: string[] = ['全部', '热点', '精选', '公告'];
-const currentTab = ref<number>(0);
-const pagingRef = ref<ComponentPublicInstance | null>(null);
-const pagingList = ref<PopupPagingItem[]>([] as PopupPagingItem[]);
-function onUpdatePagingList(val: any[]) {
-  pagingList.value = val as PopupPagingItem[];
-}
-function onTabChange(index: number) {
-  if (currentTab.value == index)
-    return;
-  currentTab.value = index;
-  if (pagingRef.value != null) {
-    pagingRef.value!.$callMethod('reload');
-  }
-}
-function reloadPaging() {
-  if (pagingRef.value != null) {
-    pagingRef.value!.$callMethod('reload');
-  }
-}
-function clearPaging() {
-  pagingList.value = [] as PopupPagingItem[];
-  if (pagingRef.value != null) {
-    pagingRef.value!.$callMethod('clear');
-  }
-}
-function onQueryPaging(pageNo: number, pageSize: number) {
-  const activeTab = tabList[currentTab.value];
-  setTimeout(() => {
-    if (activeTab == '热点') {
-      if (pagingRef.value != null) {
-        pagingRef.value!.$callMethod('complete', [] as PopupPagingItem[]);
-      }
-      return;
-    }
-    const list = [] as PopupPagingItem[];
-    const start = (pageNo - 1) * pageSize;
-    const maxItems = activeTab == '公告' ? 8 : 20;
-    for (let i = 0; i < pageSize; i++) {
-      const id = start + i + 1;
-      if (id > maxItems)
-        break;
-      let tag = activeTab;
-      if (activeTab == '全部') {
-        tag = (id % 3 == 0) ? '公告' : (id % 2 == 0 ? '热点' : '精选');
-      }
-      list.push({
-        id,
-        title: `[${tag}] 资讯条目 #${id}`,
-        desc: `当前分类：${tag}，由 z-paging-x 驱动分页，支持平滑滚动与触底加载。`,
-        tag,
-        time: `${id * 2}分钟前`
-      } as PopupPagingItem);
-    }
-    if (pagingRef.value != null) {
-      pagingRef.value!.$callMethod('complete', list);
-    }
-  }, 350);
-}
-</script>
 
 <style lang="scss" scoped>
 .demo-block {

@@ -1,3 +1,24 @@
+<script setup lang="uts">
+import { ref } from 'vue';
+
+definePage({
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
+  style: {
+    navigationBarTitleText: 'Swiper 轮播图',
+    navigationStyle: 'custom'
+  }
+});
+
+const swiperList = ref([
+  { image: '/static/logo.png', title: 'uview-ultra 组件演示' },
+  { image: '/static/logo.png', title: '高品质 UI 组件库' },
+  { image: '/static/logo.png', title: '多端适配 · 开箱即用' }
+] as UTSJSONObject[]);
+</script>
+
 <template>
   <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
     <view class="p-[16px]">
@@ -33,27 +54,6 @@
     </view>
   </view>
 </template>
-
-<script setup lang="uts">
-import { ref } from 'vue';
-
-definePage({
-  layout: 'navbar',
-  showBack: true,
-  hideNavbar: false,
-  enablePullDownRefresh: false,
-  style: {
-    navigationBarTitleText: 'Swiper 轮播图',
-    navigationStyle: 'custom'
-  }
-});
-
-const swiperList = ref([
-  { image: '/static/logo.png', title: 'uview-ultra 组件演示' },
-  { image: '/static/logo.png', title: '高品质 UI 组件库' },
-  { image: '/static/logo.png', title: '多端适配 · 开箱即用' }
-] as UTSJSONObject[]);
-</script>
 
 <style lang="scss" scoped>
 .demo-block {

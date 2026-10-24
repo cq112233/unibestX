@@ -1,3 +1,38 @@
+<script setup lang="uts">
+import { ref } from 'vue';
+
+definePage({
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
+  style: {
+    navigationBarTitleText: 'up-action-sheet 动作面板',
+    navigationStyle: 'custom'
+  }
+});
+
+const actionSheetShow = ref(false);
+const actionSheetShow2 = ref(false);
+const actionSheetShow3 = ref(false);
+const actionList = ref([
+  { name: '拍照' },
+  { name: '从相册选择' }
+]);
+const actionListComplex = ref([
+  { name: '着色选项', color: '#ffaa33' },
+  { name: '禁用选项', disabled: true },
+  { name: '带副标题选项', subname: '我是副标题' }
+]);
+
+function onActionSelect(e: UTSJSONObject) {
+  console.log('action select', e);
+  actionSheetShow.value = false;
+  actionSheetShow2.value = false;
+  actionSheetShow3.value = false;
+}
+</script>
+
 <template>
   <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
     <view class="p-[16px]">
@@ -46,41 +81,6 @@
     ></up-action-sheet>
   </view>
 </template>
-
-<script setup lang="uts">
-import { ref } from 'vue';
-
-definePage({
-  layout: 'navbar',
-  showBack: true,
-  hideNavbar: false,
-  enablePullDownRefresh: false,
-  style: {
-    navigationBarTitleText: 'up-action-sheet 动作面板',
-    navigationStyle: 'custom'
-  }
-});
-
-const actionSheetShow = ref(false);
-const actionSheetShow2 = ref(false);
-const actionSheetShow3 = ref(false);
-const actionList = ref([
-  { name: '拍照' },
-  { name: '从相册选择' }
-]);
-const actionListComplex = ref([
-  { name: '着色选项', color: '#ffaa33' },
-  { name: '禁用选项', disabled: true },
-  { name: '带副标题选项', subname: '我是副标题' }
-]);
-
-function onActionSelect(e: UTSJSONObject) {
-  console.log('action select', e);
-  actionSheetShow.value = false;
-  actionSheetShow2.value = false;
-  actionSheetShow3.value = false;
-}
-</script>
 
 <style lang="scss" scoped>
 .demo-block {

@@ -1,102 +1,3 @@
-<template>
-  <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
-    <view class="p-[16px]">
-      <!-- 1. 基础用法 -->
-      <view class="demo-block">
-        <up-title class="demo-title">
-          <text class="demo-title-text">基础用法（点击节点展开/收起）</text>
-        </up-title>
-        <up-tree :data="treeData"></up-tree>
-      </view>
-
-      <!-- 2. 默认展开全部 -->
-      <view class="demo-block mt-[12px]">
-        <up-title class="demo-title">
-          <text class="demo-title-text">默认展开全部</text>
-        </up-title>
-        <up-tree :data="treeData" default-expand-all></up-tree>
-      </view>
-
-      <!-- 3. 默认展开指定节点 + 高亮当前 -->
-      <view class="demo-block mt-[12px]">
-        <up-title class="demo-title">
-          <text class="demo-title-text">默认展开指定节点 + 高亮当前节点</text>
-        </up-title>
-        <up-tree
-          :data="treeData"
-          :default-expanded-keys="[1, 11]"
-          :current-node-key="12"
-          highlight-current
-        ></up-tree>
-      </view>
-
-      <!-- 4. 复选框（父子级联） -->
-      <view class="demo-block mt-[12px]">
-        <up-title class="demo-title">
-          <text class="demo-title-text">复选框（父子级联勾选）</text>
-        </up-title>
-        <up-tree :data="treeData" show-checkbox></up-tree>
-      </view>
-
-      <!-- 5. 复选框（父子独立） -->
-      <view class="demo-block mt-[12px]">
-        <up-title class="demo-title">
-          <text class="demo-title-text">复选框（父子独立 checkStrictly）</text>
-        </up-title>
-        <up-tree :data="treeData" show-checkbox check-strictly></up-tree>
-      </view>
-
-      <!-- 6. 手风琴模式 -->
-      <view class="demo-block mt-[12px]">
-        <up-title class="demo-title">
-          <text class="demo-title-text">手风琴模式（同时只展开一个）</text>
-        </up-title>
-        <up-tree :data="treeData" accordion></up-tree>
-      </view>
-
-      <!-- 7. 自定义字段 -->
-      <view class="demo-block mt-[12px]">
-        <up-title class="demo-title">
-          <text class="demo-title-text">自定义字段（label/children/nodeKey/disabled）</text>
-        </up-title>
-        <up-tree :data="customData" :props="customTreeProps"></up-tree>
-      </view>
-
-      <!-- 8. 事件监听 -->
-      <view class="demo-block mt-[12px]">
-        <up-title class="demo-title">
-          <text class="demo-title-text">事件监听</text>
-        </up-title>
-        <up-tree
-          :data="treeData"
-          show-checkbox
-          @node-click="onNodeClick"
-          @node-expand="onNodeExpand"
-          @node-collapse="onNodeCollapse"
-          @check-change="onCheckChange"
-        ></up-tree>
-        <view class="log-box mt-[10px]">
-          <text class="log-text">{{ eventLog }}</text>
-        </view>
-      </view>
-
-      <!-- 9. ref 实例方法 -->
-      <view class="demo-block mt-[12px]">
-        <up-title class="demo-title">
-          <text class="demo-title-text">ref 实例方法</text>
-        </up-title>
-        <up-tree ref="treeRef" :data="treeData" show-checkbox default-expand-all></up-tree>
-        <view class="btn-row mt-[10px]">
-          <up-button text="setCheckedKeys" type="primary" size="small" class="demo-btn" @click="onSetCheckedKeys"></up-button>
-          <up-button text="getCheckedKeys" type="primary" size="small" class="demo-btn" @click="onGetCheckedKeys"></up-button>
-          <up-button text="setCurrentKey" type="primary" size="small" class="demo-btn" @click="onSetCurrentKey"></up-button>
-        </view>
-        <text class="log-text mt-[10px]">{{ apiLog }}</text>
-      </view>
-    </view>
-  </view>
-</template>
-
 <script setup lang="uts">
 import { ref } from 'vue';
 
@@ -207,6 +108,105 @@ function onSetCurrentKey() {
   }
 }
 </script>
+
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
+    <view class="p-[16px]">
+      <!-- 1. 基础用法 -->
+      <view class="demo-block">
+        <up-title class="demo-title">
+          <text class="demo-title-text">基础用法（点击节点展开/收起）</text>
+        </up-title>
+        <up-tree :data="treeData"></up-tree>
+      </view>
+
+      <!-- 2. 默认展开全部 -->
+      <view class="demo-block mt-[12px]">
+        <up-title class="demo-title">
+          <text class="demo-title-text">默认展开全部</text>
+        </up-title>
+        <up-tree :data="treeData" default-expand-all></up-tree>
+      </view>
+
+      <!-- 3. 默认展开指定节点 + 高亮当前 -->
+      <view class="demo-block mt-[12px]">
+        <up-title class="demo-title">
+          <text class="demo-title-text">默认展开指定节点 + 高亮当前节点</text>
+        </up-title>
+        <up-tree
+          :data="treeData"
+          :default-expanded-keys="[1, 11]"
+          :current-node-key="12"
+          highlight-current
+        ></up-tree>
+      </view>
+
+      <!-- 4. 复选框（父子级联） -->
+      <view class="demo-block mt-[12px]">
+        <up-title class="demo-title">
+          <text class="demo-title-text">复选框（父子级联勾选）</text>
+        </up-title>
+        <up-tree :data="treeData" show-checkbox></up-tree>
+      </view>
+
+      <!-- 5. 复选框（父子独立） -->
+      <view class="demo-block mt-[12px]">
+        <up-title class="demo-title">
+          <text class="demo-title-text">复选框（父子独立 checkStrictly）</text>
+        </up-title>
+        <up-tree :data="treeData" show-checkbox check-strictly></up-tree>
+      </view>
+
+      <!-- 6. 手风琴模式 -->
+      <view class="demo-block mt-[12px]">
+        <up-title class="demo-title">
+          <text class="demo-title-text">手风琴模式（同时只展开一个）</text>
+        </up-title>
+        <up-tree :data="treeData" accordion></up-tree>
+      </view>
+
+      <!-- 7. 自定义字段 -->
+      <view class="demo-block mt-[12px]">
+        <up-title class="demo-title">
+          <text class="demo-title-text">自定义字段（label/children/nodeKey/disabled）</text>
+        </up-title>
+        <up-tree :data="customData" :props="customTreeProps"></up-tree>
+      </view>
+
+      <!-- 8. 事件监听 -->
+      <view class="demo-block mt-[12px]">
+        <up-title class="demo-title">
+          <text class="demo-title-text">事件监听</text>
+        </up-title>
+        <up-tree
+          :data="treeData"
+          show-checkbox
+          @node-click="onNodeClick"
+          @node-expand="onNodeExpand"
+          @node-collapse="onNodeCollapse"
+          @check-change="onCheckChange"
+        ></up-tree>
+        <view class="log-box mt-[10px]">
+          <text class="log-text">{{ eventLog }}</text>
+        </view>
+      </view>
+
+      <!-- 9. ref 实例方法 -->
+      <view class="demo-block mt-[12px]">
+        <up-title class="demo-title">
+          <text class="demo-title-text">ref 实例方法</text>
+        </up-title>
+        <up-tree ref="treeRef" :data="treeData" show-checkbox default-expand-all></up-tree>
+        <view class="btn-row mt-[10px]">
+          <up-button text="setCheckedKeys" type="primary" size="small" class="demo-btn" @click="onSetCheckedKeys"></up-button>
+          <up-button text="getCheckedKeys" type="primary" size="small" class="demo-btn" @click="onGetCheckedKeys"></up-button>
+          <up-button text="setCurrentKey" type="primary" size="small" class="demo-btn" @click="onSetCurrentKey"></up-button>
+        </view>
+        <text class="log-text mt-[10px]">{{ apiLog }}</text>
+      </view>
+    </view>
+  </view>
+</template>
 
 <style lang="scss" scoped>
 .demo-block {

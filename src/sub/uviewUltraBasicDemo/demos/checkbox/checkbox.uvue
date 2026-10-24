@@ -1,3 +1,27 @@
+<script setup lang="uts">
+import { ref } from 'vue';
+
+definePage({
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
+  style: {
+    navigationBarTitleText: 'up-checkbox 复选框',
+    navigationStyle: 'custom'
+  }
+});
+
+const checkboxValue1 = ref(['apple'] as string[]);
+const checkboxValue2 = ref(['apple'] as string[]);
+const checkboxValue3 = ref(['circle'] as string[]);
+const checkboxValue4 = ref([] as string[]);
+
+function checkboxChange(n: string[]) {
+  console.log('checkbox change', n);
+}
+</script>
+
 <template>
   <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
     <view class="p-[16px]">
@@ -34,30 +58,6 @@
     </view>
   </view>
 </template>
-
-<script setup lang="uts">
-import { ref } from 'vue';
-
-definePage({
-  layout: 'navbar',
-  showBack: true,
-  hideNavbar: false,
-  enablePullDownRefresh: false,
-  style: {
-    navigationBarTitleText: 'up-checkbox 复选框',
-    navigationStyle: 'custom'
-  }
-});
-
-const checkboxValue1 = ref(['apple'] as string[]);
-const checkboxValue2 = ref(['apple'] as string[]);
-const checkboxValue3 = ref(['circle'] as string[]);
-const checkboxValue4 = ref([] as string[]);
-
-function checkboxChange(n: string[]) {
-  console.log('checkbox change', n);
-}
-</script>
 
 <style lang="scss" scoped>
 .demo-block {

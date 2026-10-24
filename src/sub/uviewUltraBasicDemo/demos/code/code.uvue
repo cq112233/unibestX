@@ -1,17 +1,3 @@
-<template>
-  <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
-    <view class="p-[16px]">
-      <view class="demo-block">
-        <text class="demo-label">基础用法</text>
-        <view class="flex-row items-center justify-between mt-[10px]">
-          <up-code ref="uCodeRef" seconds="60" @change="codeChange"></up-code>
-          <up-button :text="tips" type="primary" size="small" @click="getCode"></up-button>
-        </view>
-      </view>
-    </view>
-  </view>
-</template>
-
 <script setup lang="uts">
 import { ref } from 'vue';
 
@@ -51,6 +37,20 @@ function getCode() {
   }
 }
 </script>
+
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
+    <view class="p-[16px]">
+      <view class="demo-block">
+        <text class="demo-label">基础用法</text>
+        <view class="flex-row items-center justify-between mt-[10px]">
+          <up-code ref="uCodeRef" seconds="60" @change="codeChange"></up-code>
+          <up-button :text="tips" type="primary" size="small" @click="getCode"></up-button>
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
 
 <style lang="scss" scoped>
 .demo-block {

@@ -1,3 +1,92 @@
+<script setup lang="uts">
+import { ref } from 'vue';
+
+definePage({
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
+  style: {
+    navigationBarTitleText: 'up-dragsort 拖拽排序',
+    navigationStyle: 'custom'
+  }
+});
+
+const plainList = ref<UTSJSONObject[]>([
+  { id: 1, label: '普通列表项 1' },
+  { id: 2, label: '普通列表项 2' },
+  { id: 3, label: '普通列表项 3' },
+  { id: 4, label: '普通列表项 4' },
+  { id: 5, label: '普通列表项 5' }
+] as UTSJSONObject[]);
+
+const leftHandleList = ref<UTSJSONObject[]>([
+  { id: 1, label: '左侧手柄项 1' },
+  { id: 2, label: '左侧手柄项 2' },
+  { id: 3, label: '左侧手柄项 3' },
+  { id: 4, label: '左侧手柄项 4' }
+] as UTSJSONObject[]);
+
+const verticalList = ref<UTSJSONObject[]>([
+  { id: 1, label: '列表项 1' },
+  { id: 2, label: '列表项 2' },
+  { id: 3, label: '列表项 3' },
+  { id: 4, label: '列表项 4' },
+  { id: 5, label: '列表项 5' }
+] as UTSJSONObject[]);
+
+const horizontalList = ref<UTSJSONObject[]>([
+  { id: 1, label: '卡片 1' },
+  { id: 2, label: '卡片 2' },
+  { id: 3, label: '卡片 3' },
+  { id: 4, label: '卡片 4' }
+] as UTSJSONObject[]);
+
+const gridList = ref<UTSJSONObject[]>([
+  { id: 1, label: '应用 1' },
+  { id: 2, label: '应用 2' },
+  { id: 3, label: '应用 3' },
+  { id: 4, label: '应用 4' },
+  { id: 5, label: '应用 5' },
+  { id: 6, label: '应用 6' },
+  { id: 7, label: '应用 7' },
+  { id: 8, label: '应用 8' }
+] as UTSJSONObject[]);
+
+const disabledList = ref<UTSJSONObject[]>([
+  { id: 1, label: '普通项 1' },
+  { id: 2, label: '锁定项（不可拖动）', draggable: false },
+  { id: 3, label: '普通项 2' },
+  { id: 4, label: '普通项 3' },
+  { id: 5, label: '锁定项（不可拖动）', draggable: false },
+  { id: 6, label: '普通项 4' }
+] as UTSJSONObject[]);
+
+const eventLog = ref<string>('拖拽完成后，drag-end 会返回最新列表顺序');
+
+function getLabel(item: UTSJSONObject): string {
+  const label = item.label;
+  return label == null ? '' : label.toString();
+}
+
+function getItemDisabled(item: UTSJSONObject): boolean {
+  const draggableValue = item.draggable;
+  return draggableValue != null && draggableValue.toString() == 'false';
+}
+
+function getOrder(list: UTSJSONObject[]): string {
+  const labels = [] as string[];
+  for (let i = 0; i < list.length; i++) {
+    labels.push(getLabel(list[i]));
+  }
+  return labels.join(' → ');
+}
+
+function onDragEnd(list: UTSJSONObject[]) {
+  eventLog.value = `drag-end => ${getOrder(list)}`;
+}
+</script>
+
 <template>
   <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
     <view class="p-[16px]">
@@ -161,95 +250,6 @@
     </view>
   </view>
 </template>
-
-<script setup lang="uts">
-import { ref } from 'vue';
-
-definePage({
-  layout: 'navbar',
-  showBack: true,
-  hideNavbar: false,
-  enablePullDownRefresh: false,
-  style: {
-    navigationBarTitleText: 'up-dragsort 拖拽排序',
-    navigationStyle: 'custom'
-  }
-});
-
-const plainList = ref<UTSJSONObject[]>([
-  { id: 1, label: '普通列表项 1' },
-  { id: 2, label: '普通列表项 2' },
-  { id: 3, label: '普通列表项 3' },
-  { id: 4, label: '普通列表项 4' },
-  { id: 5, label: '普通列表项 5' }
-] as UTSJSONObject[]);
-
-const leftHandleList = ref<UTSJSONObject[]>([
-  { id: 1, label: '左侧手柄项 1' },
-  { id: 2, label: '左侧手柄项 2' },
-  { id: 3, label: '左侧手柄项 3' },
-  { id: 4, label: '左侧手柄项 4' }
-] as UTSJSONObject[]);
-
-const verticalList = ref<UTSJSONObject[]>([
-  { id: 1, label: '列表项 1' },
-  { id: 2, label: '列表项 2' },
-  { id: 3, label: '列表项 3' },
-  { id: 4, label: '列表项 4' },
-  { id: 5, label: '列表项 5' }
-] as UTSJSONObject[]);
-
-const horizontalList = ref<UTSJSONObject[]>([
-  { id: 1, label: '卡片 1' },
-  { id: 2, label: '卡片 2' },
-  { id: 3, label: '卡片 3' },
-  { id: 4, label: '卡片 4' }
-] as UTSJSONObject[]);
-
-const gridList = ref<UTSJSONObject[]>([
-  { id: 1, label: '应用 1' },
-  { id: 2, label: '应用 2' },
-  { id: 3, label: '应用 3' },
-  { id: 4, label: '应用 4' },
-  { id: 5, label: '应用 5' },
-  { id: 6, label: '应用 6' },
-  { id: 7, label: '应用 7' },
-  { id: 8, label: '应用 8' }
-] as UTSJSONObject[]);
-
-const disabledList = ref<UTSJSONObject[]>([
-  { id: 1, label: '普通项 1' },
-  { id: 2, label: '锁定项（不可拖动）', draggable: false },
-  { id: 3, label: '普通项 2' },
-  { id: 4, label: '普通项 3' },
-  { id: 5, label: '锁定项（不可拖动）', draggable: false },
-  { id: 6, label: '普通项 4' }
-] as UTSJSONObject[]);
-
-const eventLog = ref<string>('拖拽完成后，drag-end 会返回最新列表顺序');
-
-function getLabel(item: UTSJSONObject): string {
-  const label = item.label;
-  return label == null ? '' : label.toString();
-}
-
-function getItemDisabled(item: UTSJSONObject): boolean {
-  const draggableValue = item.draggable;
-  return draggableValue != null && draggableValue.toString() == 'false';
-}
-
-function getOrder(list: UTSJSONObject[]): string {
-  const labels = [] as string[];
-  for (let i = 0; i < list.length; i++) {
-    labels.push(getLabel(list[i]));
-  }
-  return labels.join(' → ');
-}
-
-function onDragEnd(list: UTSJSONObject[]) {
-  eventLog.value = `drag-end => ${getOrder(list)}`;
-}
-</script>
 
 <style lang="scss" scoped>
 .demo-block {

@@ -1,120 +1,3 @@
-<template>
-  <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
-    <view class="p-[16px]">
-      <!-- 1. 基础用法 -->
-      <view class="demo-block">
-        <up-title class="demo-title">
-          <text class="demo-title-text">基础用法（省市区）</text>
-        </up-title>
-        <up-button type="primary" text="选择地区" @click="openArea"></up-button>
-        <view class="demo-result">
-          <text class="demo-result-label">已选：</text>
-          <text class="demo-result-value">{{ getValueText(areaValue) }}</text>
-        </view>
-        <up-cascader
-          v-model:show="showArea"
-          v-model="areaValue"
-          :data="areaData"
-          @change="onAreaChange"
-          @confirm="onAreaConfirm"
-        ></up-cascader>
-      </view>
-
-      <!-- 2. 设置默认值 -->
-      <view class="demo-block mt-[12px]">
-        <up-title class="demo-title">
-          <text class="demo-title-text">设置默认值（v-model 默认选中「数码 → 电脑」）</text>
-        </up-title>
-        <up-button type="primary" text="选择商品分类" @click="openCategory"></up-button>
-        <view class="demo-result">
-          <text class="demo-result-label">已选：</text>
-          <text class="demo-result-value">{{ getValueText(categoryValue) }}</text>
-        </view>
-        <up-cascader
-          v-model:show="showCategory"
-          v-model="categoryValue"
-          :data="categoryData"
-          @confirm="onCategoryConfirm"
-        ></up-cascader>
-      </view>
-
-      <!-- 3. 自定义字段名 -->
-      <view class="demo-block mt-[12px]">
-        <up-title class="demo-title">
-          <text class="demo-title-text">自定义字段名（value-key / label-key / children-key）</text>
-        </up-title>
-        <up-button type="primary" text="选择组织架构" @click="openOrg"></up-button>
-        <view class="demo-result">
-          <text class="demo-result-label">已选：</text>
-          <text class="demo-result-value">{{ getValueText(orgValue) }}</text>
-        </view>
-        <up-cascader
-          v-model:show="showOrg"
-          v-model="orgValue"
-          :data="orgData"
-          value-key="id"
-          label-key="name"
-          children-key="childs"
-          @confirm="onOrgConfirm"
-        ></up-cascader>
-      </view>
-
-      <!-- 4. 垂直头部 + 单列 -->
-      <view class="demo-block mt-[12px]">
-        <up-title class="demo-title">
-          <text class="demo-title-text">垂直头部 + 单列（headerDirection="column"、optionsCols=1）</text>
-        </up-title>
-        <up-button type="primary" text="选择商品分类" @click="openColumn"></up-button>
-        <view class="demo-result">
-          <text class="demo-result-label">已选：</text>
-          <text class="demo-result-value">{{ getValueText(columnValue) }}</text>
-        </view>
-        <up-cascader
-          v-model:show="showColumn"
-          v-model="columnValue"
-          :data="categoryData"
-          header-direction="column"
-          :options-cols="1"
-          @confirm="onColumnConfirm"
-        ></up-cascader>
-      </view>
-
-      <!-- 5. 自动关闭 -->
-      <view class="demo-block mt-[12px]">
-        <up-title class="demo-title">
-          <text class="demo-title-text">自动关闭（auto-close 选中最后一级立即关闭并触发 confirm）</text>
-        </up-title>
-        <up-button type="primary" text="选择地区" @click="openAuto"></up-button>
-        <view class="demo-result">
-          <text class="demo-result-label">已选：</text>
-          <text class="demo-result-value">{{ getValueText(autoValue) }}</text>
-        </view>
-        <up-cascader
-          v-model:show="showAuto"
-          v-model="autoValue"
-          :data="areaData"
-          :auto-close="true"
-          @confirm="onAutoConfirm"
-        ></up-cascader>
-      </view>
-
-      <!-- 6. 说明 -->
-      <view class="demo-block mt-[12px]">
-        <up-title class="demo-title">
-          <text class="demo-title-text">说明</text>
-        </up-title>
-        <text class="demo-text">
-          up-cascader 支持无限级联，可通过 data 配置级联数据、v-model 绑定选中值、v-model:show 控制显示隐藏；value-key / label-key / children-key 可自定义数据字段名；headerDirection="column" 配合 optionsCols=1 适合长文案选项；auto-close 可在选中最后一级时自动关闭并触发 confirm；change / confirm / cancel 事件回调均返回选中值数组。
-        </text>
-      </view>
-
-      <view class="log-box mt-[10px]">
-        <text class="log-text">{{ eventLog }}</text>
-      </view>
-    </view>
-  </view>
-</template>
-
 <script setup lang="uts">
 import { ref } from 'vue';
 
@@ -316,6 +199,123 @@ function onAutoConfirm(value: Array<any>): void {
   eventLog.value = `自动关闭 confirm => ${getValueText(value)}`;
 }
 </script>
+
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
+    <view class="p-[16px]">
+      <!-- 1. 基础用法 -->
+      <view class="demo-block">
+        <up-title class="demo-title">
+          <text class="demo-title-text">基础用法（省市区）</text>
+        </up-title>
+        <up-button type="primary" text="选择地区" @click="openArea"></up-button>
+        <view class="demo-result">
+          <text class="demo-result-label">已选：</text>
+          <text class="demo-result-value">{{ getValueText(areaValue) }}</text>
+        </view>
+        <up-cascader
+          v-model:show="showArea"
+          v-model="areaValue"
+          :data="areaData"
+          @change="onAreaChange"
+          @confirm="onAreaConfirm"
+        ></up-cascader>
+      </view>
+
+      <!-- 2. 设置默认值 -->
+      <view class="demo-block mt-[12px]">
+        <up-title class="demo-title">
+          <text class="demo-title-text">设置默认值（v-model 默认选中「数码 → 电脑」）</text>
+        </up-title>
+        <up-button type="primary" text="选择商品分类" @click="openCategory"></up-button>
+        <view class="demo-result">
+          <text class="demo-result-label">已选：</text>
+          <text class="demo-result-value">{{ getValueText(categoryValue) }}</text>
+        </view>
+        <up-cascader
+          v-model:show="showCategory"
+          v-model="categoryValue"
+          :data="categoryData"
+          @confirm="onCategoryConfirm"
+        ></up-cascader>
+      </view>
+
+      <!-- 3. 自定义字段名 -->
+      <view class="demo-block mt-[12px]">
+        <up-title class="demo-title">
+          <text class="demo-title-text">自定义字段名（value-key / label-key / children-key）</text>
+        </up-title>
+        <up-button type="primary" text="选择组织架构" @click="openOrg"></up-button>
+        <view class="demo-result">
+          <text class="demo-result-label">已选：</text>
+          <text class="demo-result-value">{{ getValueText(orgValue) }}</text>
+        </view>
+        <up-cascader
+          v-model:show="showOrg"
+          v-model="orgValue"
+          :data="orgData"
+          value-key="id"
+          label-key="name"
+          children-key="childs"
+          @confirm="onOrgConfirm"
+        ></up-cascader>
+      </view>
+
+      <!-- 4. 垂直头部 + 单列 -->
+      <view class="demo-block mt-[12px]">
+        <up-title class="demo-title">
+          <text class="demo-title-text">垂直头部 + 单列（headerDirection="column"、optionsCols=1）</text>
+        </up-title>
+        <up-button type="primary" text="选择商品分类" @click="openColumn"></up-button>
+        <view class="demo-result">
+          <text class="demo-result-label">已选：</text>
+          <text class="demo-result-value">{{ getValueText(columnValue) }}</text>
+        </view>
+        <up-cascader
+          v-model:show="showColumn"
+          v-model="columnValue"
+          :data="categoryData"
+          header-direction="column"
+          :options-cols="1"
+          @confirm="onColumnConfirm"
+        ></up-cascader>
+      </view>
+
+      <!-- 5. 自动关闭 -->
+      <view class="demo-block mt-[12px]">
+        <up-title class="demo-title">
+          <text class="demo-title-text">自动关闭（auto-close 选中最后一级立即关闭并触发 confirm）</text>
+        </up-title>
+        <up-button type="primary" text="选择地区" @click="openAuto"></up-button>
+        <view class="demo-result">
+          <text class="demo-result-label">已选：</text>
+          <text class="demo-result-value">{{ getValueText(autoValue) }}</text>
+        </view>
+        <up-cascader
+          v-model:show="showAuto"
+          v-model="autoValue"
+          :data="areaData"
+          :auto-close="true"
+          @confirm="onAutoConfirm"
+        ></up-cascader>
+      </view>
+
+      <!-- 6. 说明 -->
+      <view class="demo-block mt-[12px]">
+        <up-title class="demo-title">
+          <text class="demo-title-text">说明</text>
+        </up-title>
+        <text class="demo-text">
+          up-cascader 支持无限级联，可通过 data 配置级联数据、v-model 绑定选中值、v-model:show 控制显示隐藏；value-key / label-key / children-key 可自定义数据字段名；headerDirection="column" 配合 optionsCols=1 适合长文案选项；auto-close 可在选中最后一级时自动关闭并触发 confirm；change / confirm / cancel 事件回调均返回选中值数组。
+        </text>
+      </view>
+
+      <view class="log-box mt-[10px]">
+        <text class="log-text">{{ eventLog }}</text>
+      </view>
+    </view>
+  </view>
+</template>
 
 <style lang="scss" scoped>
 .demo-block {

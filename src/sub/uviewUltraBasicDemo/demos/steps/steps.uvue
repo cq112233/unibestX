@@ -1,3 +1,24 @@
+<script setup lang="uts">
+import { ref } from 'vue';
+
+definePage({
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
+  style: {
+    navigationBarTitleText: 'Steps 步骤条',
+    navigationStyle: 'custom'
+  }
+});
+
+const currentStep = ref<number>(1);
+
+function nextStep(): void {
+  currentStep.value = (currentStep.value + 1) % 4;
+}
+</script>
+
 <template>
   <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
     <view class="p-[16px]">
@@ -44,27 +65,6 @@
     </view>
   </view>
 </template>
-
-<script setup lang="uts">
-import { ref } from 'vue';
-
-definePage({
-  layout: 'navbar',
-  showBack: true,
-  hideNavbar: false,
-  enablePullDownRefresh: false,
-  style: {
-    navigationBarTitleText: 'Steps 步骤条',
-    navigationStyle: 'custom'
-  }
-});
-
-const currentStep = ref<number>(1);
-
-function nextStep(): void {
-  currentStep.value = (currentStep.value + 1) % 4;
-}
-</script>
 
 <style lang="scss" scoped>
 .demo-block {

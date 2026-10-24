@@ -1,3 +1,46 @@
+<script setup lang="uts">
+import { ref } from 'vue';
+
+definePage({
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
+  style: {
+    navigationBarTitleText: 'up-barcode 条形码',
+    navigationStyle: 'custom'
+  }
+});
+
+const barcodeValue = ref<string>('123456789012');
+const eventLog = ref<string>('');
+
+const barcodeRef = ref(null as ComponentPublicInstance | null);
+
+function onRendered(event: UTSJSONObject) {
+  const format = event.format;
+  eventLog.value = `rendered => format: ${format == null ? '' : format.toString()}`;
+}
+
+function onError(event: UTSJSONObject) {
+  const message = event.message;
+  eventLog.value = `error => ${message == null ? '' : message.toString()}`;
+}
+
+function onRegenerate() {
+  const barcode = barcodeRef.value;
+  if (barcode != null) {
+    barcode.$callMethod('generateBarcode');
+    eventLog.value = '已调用 generateBarcode()';
+  }
+}
+
+function onChangeValue() {
+  barcodeValue.value = barcodeValue.value == '123456789012' ? '987654321098' : '123456789012';
+  eventLog.value = `value 已改为 ${barcodeValue.value}`;
+}
+</script>
+
 <template>
   <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
     <view class="p-[16px]">
@@ -73,49 +116,6 @@
     </view>
   </view>
 </template>
-
-<script setup lang="uts">
-import { ref } from 'vue';
-
-definePage({
-  layout: 'navbar',
-  showBack: true,
-  hideNavbar: false,
-  enablePullDownRefresh: false,
-  style: {
-    navigationBarTitleText: 'up-barcode 条形码',
-    navigationStyle: 'custom'
-  }
-});
-
-const barcodeValue = ref<string>('123456789012');
-const eventLog = ref<string>('');
-
-const barcodeRef = ref(null as ComponentPublicInstance | null);
-
-function onRendered(event: UTSJSONObject) {
-  const format = event.format;
-  eventLog.value = `rendered => format: ${format == null ? '' : format.toString()}`;
-}
-
-function onError(event: UTSJSONObject) {
-  const message = event.message;
-  eventLog.value = `error => ${message == null ? '' : message.toString()}`;
-}
-
-function onRegenerate() {
-  const barcode = barcodeRef.value;
-  if (barcode != null) {
-    barcode.$callMethod('generateBarcode');
-    eventLog.value = '已调用 generateBarcode()';
-  }
-}
-
-function onChangeValue() {
-  barcodeValue.value = barcodeValue.value == '123456789012' ? '987654321098' : '123456789012';
-  eventLog.value = `value 已改为 ${barcodeValue.value}`;
-}
-</script>
 
 <style lang="scss" scoped>
 .demo-block {

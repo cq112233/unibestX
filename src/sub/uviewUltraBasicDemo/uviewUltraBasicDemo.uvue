@@ -1,3 +1,29 @@
+<script setup lang="uts">
+import { computed } from 'vue';
+import { useThemeStore } from '@/src/store/index.uts';
+
+definePage({
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
+  style: {
+    navigationBarTitleText: 'uview-ultra 示例',
+    navigationStyle: 'custom'
+  }
+});
+
+const themeStore = useThemeStore();
+const themeColor = computed<string>((): string => themeStore.state.theme);
+const demoCount: number = 86;
+
+function goToDemo(page: string): void {
+  uni.navigateTo({
+    url: `/src/sub/uviewUltraBasicDemo/demos/${page}/${page}`
+  });
+}
+</script>
+
 <template>
   <view class="page-container bg-[#f8fafc] pb-[50px]">
     <!-- 顶部 Banner -->
@@ -484,32 +510,6 @@
     </view>
   </view>
 </template>
-
-<script setup lang="uts">
-import { computed } from 'vue';
-import { useThemeStore } from '@/src/store/index.uts';
-
-definePage({
-  layout: 'navbar',
-  showBack: true,
-  hideNavbar: false,
-  enablePullDownRefresh: false,
-  style: {
-    navigationBarTitleText: 'uview-ultra 示例',
-    navigationStyle: 'custom'
-  }
-});
-
-const themeStore = useThemeStore();
-const themeColor = computed<string>((): string => themeStore.state.theme);
-const demoCount: number = 86;
-
-function goToDemo(page: string): void {
-  uni.navigateTo({
-    url: `/src/sub/uviewUltraBasicDemo/demos/${page}/${page}`
-  });
-}
-</script>
 
 <style scoped>
 .demo-group-card {

@@ -1,34 +1,3 @@
-<template>
-  <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
-    <view class="p-[16px]">
-      <view class="demo-block">
-        <text class="demo-label">基础单列</text>
-        <view class="flex-row items-center">
-          <up-button type="primary" text="单列选择" size="mini" @click="showPicker1"></up-button>
-        </view>
-      </view>
-
-      <view class="demo-block mt-[12px]">
-        <text class="demo-label">多列选择</text>
-        <view class="flex-row items-center">
-          <up-button type="success" text="多列选择" size="mini" @click="showPicker2"></up-button>
-        </view>
-      </view>
-
-      <view class="demo-block mt-[12px]">
-        <text class="demo-label">加载状态</text>
-        <view class="flex-row items-center">
-          <up-button type="warning" text="加载中选择" size="mini" @click="showPicker3"></up-button>
-        </view>
-      </view>
-    </view>
-
-    <up-picker :show="pickerShow1" :columns="columns1" @confirm="onConfirm1" @cancel="pickerShow1 = false"></up-picker>
-    <up-picker :show="pickerShow2" :columns="columns2" @confirm="onConfirm2" @cancel="pickerShow2 = false"></up-picker>
-    <up-picker :show="pickerShow3" :columns="columns1" :loading="true" @confirm="onConfirm3" @cancel="pickerShow3 = false"></up-picker>
-  </view>
-</template>
-
 <script setup lang="uts">
 import { ref } from 'vue';
 
@@ -78,6 +47,37 @@ function onConfirm3(e: UTSJSONObject) {
   pickerShow3.value = false;
 }
 </script>
+
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
+    <view class="p-[16px]">
+      <view class="demo-block">
+        <text class="demo-label">基础单列</text>
+        <view class="flex-row items-center">
+          <up-button type="primary" text="单列选择" size="mini" @click="showPicker1"></up-button>
+        </view>
+      </view>
+
+      <view class="demo-block mt-[12px]">
+        <text class="demo-label">多列选择</text>
+        <view class="flex-row items-center">
+          <up-button type="success" text="多列选择" size="mini" @click="showPicker2"></up-button>
+        </view>
+      </view>
+
+      <view class="demo-block mt-[12px]">
+        <text class="demo-label">加载状态</text>
+        <view class="flex-row items-center">
+          <up-button type="warning" text="加载中选择" size="mini" @click="showPicker3"></up-button>
+        </view>
+      </view>
+    </view>
+
+    <up-picker :show="pickerShow1" :columns="columns1" @confirm="onConfirm1" @cancel="pickerShow1 = false"></up-picker>
+    <up-picker :show="pickerShow2" :columns="columns2" @confirm="onConfirm2" @cancel="pickerShow2 = false"></up-picker>
+    <up-picker :show="pickerShow3" :columns="columns1" :loading="true" @confirm="onConfirm3" @cancel="pickerShow3 = false"></up-picker>
+  </view>
+</template>
 
 <style lang="scss" scoped>
 .demo-block {

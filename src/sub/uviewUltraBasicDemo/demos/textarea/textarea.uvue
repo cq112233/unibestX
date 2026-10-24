@@ -1,3 +1,23 @@
+<script setup lang="uts">
+import { ref } from 'vue';
+
+definePage({
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
+  style: {
+    navigationBarTitleText: 'up-textarea 多行文本',
+    navigationStyle: 'custom'
+  }
+});
+
+const textValue1 = ref('');
+const textValue2 = ref('');
+const textValue3 = ref('');
+const textValue4 = ref('');
+</script>
+
 <template>
   <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
     <view class="p-[16px]">
@@ -23,26 +43,6 @@
     </view>
   </view>
 </template>
-
-<script setup lang="uts">
-import { ref } from 'vue';
-
-definePage({
-  layout: 'navbar',
-  showBack: true,
-  hideNavbar: false,
-  enablePullDownRefresh: false,
-  style: {
-    navigationBarTitleText: 'up-textarea 多行文本',
-    navigationStyle: 'custom'
-  }
-});
-
-const textValue1 = ref('');
-const textValue2 = ref('');
-const textValue3 = ref('');
-const textValue4 = ref('');
-</script>
 
 <style lang="scss" scoped>
 .demo-block {

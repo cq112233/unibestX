@@ -1,14 +1,3 @@
-<template>
-  <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
-    <view class="p-[16px]">
-      <view class="demo-block">
-        <text class="demo-label">基础用法</text>
-        <up-line-progress :percentage="50" active-color="#2979ff"></up-line-progress>
-      </view>
-    </view>
-  </view>
-</template>
-
 <script setup lang="uts">
 definePage({
   layout: 'navbar',
@@ -21,6 +10,17 @@ definePage({
   }
 });
 </script>
+
+<template>
+  <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
+    <view class="p-[16px]">
+      <view class="demo-block">
+        <text class="demo-label">基础用法</text>
+        <up-line-progress :percentage="50" active-color="#2979ff"></up-line-progress>
+      </view>
+    </view>
+  </view>
+</template>
 
 <style lang="scss" scoped>
 .demo-block {

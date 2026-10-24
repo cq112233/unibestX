@@ -1,3 +1,16 @@
+<script setup lang="uts">
+definePage({
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
+  style: {
+    navigationBarTitleText: 'CircleProgress 圆形进度条',
+    navigationStyle: 'custom'
+  }
+});
+</script>
+
 <template>
   <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
     <view class="p-[16px]">
@@ -20,19 +33,6 @@
     </view>
   </view>
 </template>
-
-<script setup lang="uts">
-definePage({
-  layout: 'navbar',
-  showBack: true,
-  hideNavbar: false,
-  enablePullDownRefresh: false,
-  style: {
-    navigationBarTitleText: 'CircleProgress 圆形进度条',
-    navigationStyle: 'custom'
-  }
-});
-</script>
 
 <style lang="scss" scoped>
 .demo-block {

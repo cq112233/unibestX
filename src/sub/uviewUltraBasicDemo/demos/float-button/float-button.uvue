@@ -1,14 +1,66 @@
+<script setup lang="uts">
+import { ref } from 'vue';
+
+definePage({
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
+  style: {
+    navigationBarTitleText: 'up-float-button 悬浮按钮',
+    navigationStyle: 'custom'
+  }
+});
+
+const basicClickCount = ref(0);
+const eventLog = ref<string>('点击任意悬浮按钮，事件会打印在这里');
+
+// 菜单项：name 为图标名，未指定的 backgroundColor / color 会退回组件自身的同名属性
+const menuList = ref<UTSJSONObject[]>([
+  { name: 'star-fill', backgroundColor: '#ff9900', color: '#ffffff' },
+  { name: 'chat-fill', backgroundColor: '#3c9cff', color: '#ffffff' },
+  { name: 'share-fill', backgroundColor: '#19be6b', color: '#ffffff' }
+] as UTSJSONObject[]);
+
+function log(message: string): void {
+  eventLog.value = message;
+}
+
+function onBasicClick(): void {
+  basicClickCount.value = basicClickCount.value + 1;
+  log(`click => 基础按钮被点击，第 ${basicClickCount.value} 次`);
+}
+
+function onMenuClick(): void {
+  log('click => 菜单按钮展开 / 收起');
+}
+
+function onCustomClick(): void {
+  log('click => 自定义样式按钮被点击');
+}
+
+function onDragButtonClick(): void {
+  log('click => 可拖动按钮被点击（拖动不会触发这一条）');
+}
+
+function onItemClick(item: UTSJSONObject): void {
+  const index = item.index != null ? parseInt(item.index!.toString()) : 0;
+  const name = item.name != null ? item.name!.toString() : '';
+  log(`item-click => index=${index} name=${name}`);
+}
+</script>
+
 <template>
   <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
     <view class="p-[16px]">
       <view class="demo-block">
         <text class="demo-label">组件说明</text>
         <text class="demo-text">up-float-button 通过 position: fixed 固定在屏幕上。页面右侧常驻了 4 个不同配置的悬浮按钮：</text>
-        <view class="mt-[8px] flex flex-col gap-[6px]">
+        <view class="mt-[8px] flex flex-col">
           <text class="demo-text text-[#475569]">⚫ 【深灰·置顶】右上角 top:120px ➔ 基础点击</text>
-          <text class="demo-text text-[#f59e0b]">🟠 【橙色·图钉】右上偏下 top:200px ➔ 可随意拖拽</text>
-          <text class="demo-text text-[#2979ff] font-bold">🔵 【蓝色·加号】右下角 bottom:100px ➔ 菜单模式（点此展开菜单！）</text>
-          <text class="demo-text text-[#19be6b]">🟢 【绿色·编辑】右下底部 bottom:25px ➔ 自定义大尺寸</text>
+          <text class="demo-text text-[#f59e0b] mt-[6px]">🟠 【橙色·图钉】右上偏下 top:200px ➔ 可随意拖拽</text>
+          <text class="demo-text text-[#2979ff] font-bold mt-[6px]">🔵 【蓝色·加号】右下角 bottom:100px ➔ 菜单模式（点此展开菜单！）</text>
+          <text class="demo-text text-[#19be6b] mt-[6px]">🟢 【绿色·编辑】右下底部 bottom:25px ➔ 自定义大尺寸</text>
         </view>
       </view>
 
@@ -90,58 +142,6 @@
     </up-float-button>
   </view>
 </template>
-
-<script setup lang="uts">
-import { ref } from 'vue';
-
-definePage({
-  layout: 'navbar',
-  showBack: true,
-  hideNavbar: false,
-  enablePullDownRefresh: false,
-  style: {
-    navigationBarTitleText: 'up-float-button 悬浮按钮',
-    navigationStyle: 'custom'
-  }
-});
-
-const basicClickCount = ref(0);
-const eventLog = ref<string>('点击任意悬浮按钮，事件会打印在这里');
-
-// 菜单项：name 为图标名，未指定的 backgroundColor / color 会退回组件自身的同名属性
-const menuList = ref<UTSJSONObject[]>([
-  { name: 'star-fill', backgroundColor: '#ff9900', color: '#ffffff' },
-  { name: 'chat-fill', backgroundColor: '#3c9cff', color: '#ffffff' },
-  { name: 'share-fill', backgroundColor: '#19be6b', color: '#ffffff' }
-] as UTSJSONObject[]);
-
-function log(message: string): void {
-  eventLog.value = message;
-}
-
-function onBasicClick(): void {
-  basicClickCount.value = basicClickCount.value + 1;
-  log(`click => 基础按钮被点击，第 ${basicClickCount.value} 次`);
-}
-
-function onMenuClick(): void {
-  log('click => 菜单按钮展开 / 收起');
-}
-
-function onCustomClick(): void {
-  log('click => 自定义样式按钮被点击');
-}
-
-function onDragButtonClick(): void {
-  log('click => 可拖动按钮被点击（拖动不会触发这一条）');
-}
-
-function onItemClick(item: UTSJSONObject): void {
-  const index = item.index != null ? parseInt(item.index!.toString()) : 0;
-  const name = item.name != null ? item.name!.toString() : '';
-  log(`item-click => index=${index} name=${name}`);
-}
-</script>
 
 <style lang="scss" scoped>
 .demo-block {

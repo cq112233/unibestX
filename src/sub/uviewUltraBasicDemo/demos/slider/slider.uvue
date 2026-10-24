@@ -1,3 +1,23 @@
+<script setup lang="uts">
+import { ref } from 'vue';
+
+definePage({
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
+  style: {
+    navigationBarTitleText: 'up-slider 滑块',
+    navigationStyle: 'custom'
+  }
+});
+
+const sliderValue1 = ref(30);
+const sliderValue2 = ref(50);
+const sliderValue3 = ref(40);
+const sliderValue4 = ref(60);
+</script>
+
 <template>
   <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
     <view class="p-[16px]">
@@ -23,26 +43,6 @@
     </view>
   </view>
 </template>
-
-<script setup lang="uts">
-import { ref } from 'vue';
-
-definePage({
-  layout: 'navbar',
-  showBack: true,
-  hideNavbar: false,
-  enablePullDownRefresh: false,
-  style: {
-    navigationBarTitleText: 'up-slider 滑块',
-    navigationStyle: 'custom'
-  }
-});
-
-const sliderValue1 = ref(30);
-const sliderValue2 = ref(50);
-const sliderValue3 = ref(40);
-const sliderValue4 = ref(60);
-</script>
 
 <style lang="scss" scoped>
 .demo-block {

@@ -1,20 +1,3 @@
-<template>
-  <view class="page-container bg-[#f8fafc]" :style="{ height: `${windowHeight}px` }">
-    <view class="flex-1 relative" style="flex: 1;">
-      <up-index-list style="flex: 1" :index-list="indexList">
-        <template v-for="(item, index) in itemArr" :key="index">
-          <up-index-item>
-            <up-index-anchor :text="indexList[index]"></up-index-anchor>
-            <view v-for="(cell, cellIndex) in item" :key="cellIndex" class="list-cell">
-              <text class="list-item-text">{{ cell }}</text>
-            </view>
-          </up-index-item>
-        </template>
-      </up-index-list>
-    </view>
-  </view>
-</template>
-
 <script setup lang="uts">
 import { ref } from 'vue';
 
@@ -54,6 +37,23 @@ const itemArr = ref([
 
 const windowHeight = ref(uni.getWindowInfo().windowHeight);
 </script>
+
+<template>
+  <view class="page-container bg-[#f8fafc]" :style="{ height: `${windowHeight}px` }">
+    <view class="flex-1 relative" style="flex: 1;">
+      <up-index-list style="flex: 1" :index-list="indexList">
+        <template v-for="(item, index) in itemArr" :key="index">
+          <up-index-item>
+            <up-index-anchor :text="indexList[index]"></up-index-anchor>
+            <view v-for="(cell, cellIndex) in item" :key="cellIndex" class="list-cell">
+              <text class="list-item-text">{{ cell }}</text>
+            </view>
+          </up-index-item>
+        </template>
+      </up-index-list>
+    </view>
+  </view>
+</template>
 
 <style scoped>
 .page-container {

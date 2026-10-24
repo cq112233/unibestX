@@ -1,3 +1,125 @@
+<script setup lang="uts">
+/* eslint-disable dot-notation */
+import { ref } from 'vue';
+
+definePage({
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
+  style: {
+    navigationBarTitleText: 'up-datetime-picker 时间选择',
+    navigationStyle: 'custom'
+  }
+});
+
+const dtShow1 = ref<boolean>(false);
+const dtShow2 = ref<boolean>(false);
+const dtShow3 = ref<boolean>(false);
+const dtShow4 = ref<boolean>(false);
+const dtShowMinMaxDate = ref<boolean>(false);
+const dtShowMinMaxTime = ref<boolean>(false);
+const dtShowStart = ref<boolean>(false);
+const dtShowEnd = ref<boolean>(false);
+
+const dtValue1 = ref<number>(Date.parse('2026-08-10 08:30:00'));
+const dtValue2 = ref<number>(Date.parse('2026-08-10 00:00:00'));
+const dtValue3 = ref<number>(Date.parse('2026-08-10 00:00:00'));
+const dtValue4 = ref<string>('08:30');
+
+// 最大最小日期限制 (2026-08-01 ~ 2026-08-31)
+const limitMinDate = Date.parse('2026-08-01 00:00:00');
+const limitMaxDate = Date.parse('2026-08-31 00:00:00');
+const dtValueMinMaxDate = ref<number>(Date.parse('2026-08-10 00:00:00'));
+const dtValueMinMaxTime = ref<string>('09:30');
+
+// 开始与结束时间联动 (结束时间不得早于开始时间)
+const dtValueStart = ref<number>(Date.parse('2026-08-10 00:00:00'));
+const dtValueEnd = ref<number>(Date.parse('2026-08-20 00:00:00'));
+
+function formatDate(timestamp: number): string {
+  const d = new Date(timestamp);
+  const year = d.getFullYear();
+  const month = (d.getMonth() + 1 < 10 ? '0' : '') + (d.getMonth() + 1);
+  const date = (d.getDate() < 10 ? '0' : '') + d.getDate();
+  const hours = (d.getHours() < 10 ? '0' : '') + d.getHours();
+  const minutes = (d.getMinutes() < 10 ? '0' : '') + d.getMinutes();
+  return `${year}-${month}-${date} ${hours}:${minutes}`;
+}
+
+function formatDateOnly(timestamp: number): string {
+  const d = new Date(timestamp);
+  const year = d.getFullYear();
+  const month = (d.getMonth() + 1 < 10 ? '0' : '') + (d.getMonth() + 1);
+  const date = (d.getDate() < 10 ? '0' : '') + d.getDate();
+  return `${year}-${month}-${date}`;
+}
+
+function formatYearMonth(timestamp: number): string {
+  const d = new Date(timestamp);
+  const year = d.getFullYear();
+  const month = (d.getMonth() + 1 < 10 ? '0' : '') + (d.getMonth() + 1);
+  return `${year}-${month}`;
+}
+
+function onConfirm1(e: UTSJSONObject) {
+  const val = e['value'];
+  if (val != null) {
+    dtValue1.value = val as number;
+  }
+  dtShow1.value = false;
+}
+function onConfirm2(e: UTSJSONObject) {
+  const val = e['value'];
+  if (val != null) {
+    dtValue2.value = val as number;
+  }
+  dtShow2.value = false;
+}
+function onConfirm3(e: UTSJSONObject) {
+  const val = e['value'];
+  if (val != null) {
+    dtValue3.value = val as number;
+  }
+  dtShow3.value = false;
+}
+function onConfirm4(e: UTSJSONObject) {
+  const val = e['value'];
+  if (val != null) {
+    dtValue4.value = val.toString();
+  }
+  dtShow4.value = false;
+}
+function onConfirmMinMaxDate(e: UTSJSONObject) {
+  const val = e['value'];
+  if (val != null) {
+    dtValueMinMaxDate.value = val as number;
+  }
+  dtShowMinMaxDate.value = false;
+}
+function onConfirmMinMaxTime(e: UTSJSONObject) {
+  const val = e['value'];
+  if (val != null) {
+    dtValueMinMaxTime.value = val.toString();
+  }
+  dtShowMinMaxTime.value = false;
+}
+function onConfirmStart(e: UTSJSONObject) {
+  const val = e['value'];
+  if (val != null) {
+    dtValueStart.value = val as number;
+  }
+  dtShowStart.value = false;
+}
+function onConfirmEnd(e: UTSJSONObject) {
+  const val = e['value'];
+  if (val != null) {
+    dtValueEnd.value = val as number;
+  }
+  dtShowEnd.value = false;
+}
+</script>
+
 <template>
   <view class="page-container bg-[#f8fafc] min-h-screen pb-[30px]">
     <view class="p-[16px]">
@@ -121,128 +243,6 @@
     ></up-datetime-picker>
   </view>
 </template>
-
-<script setup lang="uts">
-/* eslint-disable dot-notation */
-import { ref } from 'vue';
-
-definePage({
-  layout: 'navbar',
-  showBack: true,
-  hideNavbar: false,
-  enablePullDownRefresh: false,
-  style: {
-    navigationBarTitleText: 'up-datetime-picker 时间选择',
-    navigationStyle: 'custom'
-  }
-});
-
-const dtShow1 = ref<boolean>(false);
-const dtShow2 = ref<boolean>(false);
-const dtShow3 = ref<boolean>(false);
-const dtShow4 = ref<boolean>(false);
-const dtShowMinMaxDate = ref<boolean>(false);
-const dtShowMinMaxTime = ref<boolean>(false);
-const dtShowStart = ref<boolean>(false);
-const dtShowEnd = ref<boolean>(false);
-
-const dtValue1 = ref<number>(Date.parse('2026-08-10 08:30:00'));
-const dtValue2 = ref<number>(Date.parse('2026-08-10 00:00:00'));
-const dtValue3 = ref<number>(Date.parse('2026-08-10 00:00:00'));
-const dtValue4 = ref<string>('08:30');
-
-// 最大最小日期限制 (2026-08-01 ~ 2026-08-31)
-const limitMinDate = Date.parse('2026-08-01 00:00:00');
-const limitMaxDate = Date.parse('2026-08-31 00:00:00');
-const dtValueMinMaxDate = ref<number>(Date.parse('2026-08-10 00:00:00'));
-const dtValueMinMaxTime = ref<string>('09:30');
-
-// 开始与结束时间联动 (结束时间不得早于开始时间)
-const dtValueStart = ref<number>(Date.parse('2026-08-10 00:00:00'));
-const dtValueEnd = ref<number>(Date.parse('2026-08-20 00:00:00'));
-
-function formatDate(timestamp: number): string {
-  const d = new Date(timestamp);
-  const year = d.getFullYear();
-  const month = (d.getMonth() + 1 < 10 ? '0' : '') + (d.getMonth() + 1);
-  const date = (d.getDate() < 10 ? '0' : '') + d.getDate();
-  const hours = (d.getHours() < 10 ? '0' : '') + d.getHours();
-  const minutes = (d.getMinutes() < 10 ? '0' : '') + d.getMinutes();
-  return `${year}-${month}-${date} ${hours}:${minutes}`;
-}
-
-function formatDateOnly(timestamp: number): string {
-  const d = new Date(timestamp);
-  const year = d.getFullYear();
-  const month = (d.getMonth() + 1 < 10 ? '0' : '') + (d.getMonth() + 1);
-  const date = (d.getDate() < 10 ? '0' : '') + d.getDate();
-  return `${year}-${month}-${date}`;
-}
-
-function formatYearMonth(timestamp: number): string {
-  const d = new Date(timestamp);
-  const year = d.getFullYear();
-  const month = (d.getMonth() + 1 < 10 ? '0' : '') + (d.getMonth() + 1);
-  return `${year}-${month}`;
-}
-
-function onConfirm1(e: UTSJSONObject) {
-  const val = e['value'];
-  if (val != null) {
-    dtValue1.value = val as number;
-  }
-  dtShow1.value = false;
-}
-function onConfirm2(e: UTSJSONObject) {
-  const val = e['value'];
-  if (val != null) {
-    dtValue2.value = val as number;
-  }
-  dtShow2.value = false;
-}
-function onConfirm3(e: UTSJSONObject) {
-  const val = e['value'];
-  if (val != null) {
-    dtValue3.value = val as number;
-  }
-  dtShow3.value = false;
-}
-function onConfirm4(e: UTSJSONObject) {
-  const val = e['value'];
-  if (val != null) {
-    dtValue4.value = val.toString();
-  }
-  dtShow4.value = false;
-}
-function onConfirmMinMaxDate(e: UTSJSONObject) {
-  const val = e['value'];
-  if (val != null) {
-    dtValueMinMaxDate.value = val as number;
-  }
-  dtShowMinMaxDate.value = false;
-}
-function onConfirmMinMaxTime(e: UTSJSONObject) {
-  const val = e['value'];
-  if (val != null) {
-    dtValueMinMaxTime.value = val.toString();
-  }
-  dtShowMinMaxTime.value = false;
-}
-function onConfirmStart(e: UTSJSONObject) {
-  const val = e['value'];
-  if (val != null) {
-    dtValueStart.value = val as number;
-  }
-  dtShowStart.value = false;
-}
-function onConfirmEnd(e: UTSJSONObject) {
-  const val = e['value'];
-  if (val != null) {
-    dtValueEnd.value = val as number;
-  }
-  dtShowEnd.value = false;
-}
-</script>
 
 <style lang="scss" scoped>
 .demo-block {
