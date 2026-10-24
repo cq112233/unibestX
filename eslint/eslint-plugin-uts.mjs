@@ -1637,6 +1637,311 @@ export const pluginUts = {
           }
         };
       }
+    },
+
+    /** 16. UVUE 模板中严禁直接裸写 prop 名称（规避鸿蒙 ArkTS 作用域解析失败与同名方法冲突） */
+    'uvue-template-no-naked-prop': {
+      meta: {
+        type: 'problem',
+        docs: {
+          description: 'UVUE 模板中严禁直接裸写 prop 名称，鸿蒙 ArkTS 编译时作用域解析失败，必须使用 props.xxx 或收敛为 computed 计算属性'
+        },
+        fixable: 'code',
+        messages: {
+          noNakedProp: '[ArkTS跨端铁律] template 模板中严禁直接裸写 prop 名称 "{{name}}"，鸿蒙端编译时会导致作用域解析失败，请改用 "props.{{name}}" 或收敛为 computed 计算属性'
+        }
+      },
+      create(context) {
+        if (!context.sourceCode.parserServices?.defineTemplateBodyVisitor) {
+          return {};
+        }
+
+        const filename = context.filename || context.getFilename?.() || '';
+        if (!filename.endsWith('.vue') && !filename.endsWith('.uvue')) {
+          return {};
+        }
+
+        const ast = context.sourceCode.ast;
+        if (!ast || !ast.body) {
+          return {};
+        }
+
+        // 1. 提取 defineProps 声明的所有 prop 名称
+        const propNames = new Set();
+        function checkCallExpr(callExpr) {
+          if (!callExpr || callExpr.type !== 'CallExpression')
+            return;
+          const callee = callExpr.callee;
+          if (!callee || callee.type !== 'Identifier' || callee.name !== 'defineProps')
+            return;
+
+          const firstArg = callExpr.arguments?.[0];
+          if (firstArg && firstArg.type === 'ObjectExpression') {
+            for (const prop of firstArg.properties || []) {
+              if (prop.type === 'Property') {
+                if (prop.key?.type === 'Identifier') {
+                  propNames.add(prop.key.name);
+                }
+                else if (prop.key?.type === 'Literal' && typeof prop.key.value === 'string') {
+                  propNames.add(prop.key.value);
+                }
+              }
+            }
+          }
+
+          const typeParams = callExpr.typeParameters || callExpr.typeArguments;
+          if (typeParams && typeParams.params?.[0]?.type === 'TSTypeLiteral') {
+            for (const member of typeParams.params[0].members || []) {
+              if (member.type === 'TSPropertySignature' && member.key?.type === 'Identifier') {
+                propNames.add(member.key.name);
+              }
+            }
+          }
+        }
+
+        for (const stmt of ast.body) {
+          if (stmt.type === 'VariableDeclaration') {
+            for (const decl of stmt.declarations || []) {
+              if (decl.init) {
+                checkCallExpr(decl.init);
+              }
+            }
+          }
+          else if (stmt.type === 'ExpressionStatement') {
+            checkCallExpr(stmt.expression);
+          }
+        }
+
+        if (propNames.size === 0) {
+          return {};
+        }
+
+        // 2. 收集 script setup 中已声明的局部标识符（若开发者已声明 const foo = computed(...)，则 foo 不属于裸 prop）
+        const localDeclaredNames = new Set();
+        for (const stmt of ast.body) {
+          if (stmt.type === 'ImportDeclaration') {
+            for (const spec of stmt.specifiers || []) {
+              if (spec.local?.name)
+                localDeclaredNames.add(spec.local.name);
+            }
+          }
+          else if (stmt.type === 'VariableDeclaration') {
+            for (const decl of stmt.declarations || []) {
+              if (decl.id?.type === 'Identifier') {
+                if (decl.init?.type === 'CallExpression' && decl.init.callee?.name === 'defineProps') {
+                  continue;
+                }
+                localDeclaredNames.add(decl.id.name);
+              }
+              else if (decl.id?.type === 'ObjectPattern') {
+                for (const p of decl.id.properties || []) {
+                  if (p.value?.type === 'Identifier') {
+                    localDeclaredNames.add(p.value.name);
+                  }
+                }
+              }
+            }
+          }
+          else if (stmt.type === 'FunctionDeclaration' && stmt.id?.name) {
+            localDeclaredNames.add(stmt.id.name);
+          }
+          else if (stmt.type === 'ClassDeclaration' && stmt.id?.name) {
+            localDeclaredNames.add(stmt.id.name);
+          }
+          else if (stmt.type === 'TSEnumDeclaration' && stmt.id?.name) {
+            localDeclaredNames.add(stmt.id.name);
+          }
+        }
+
+        // 待检查的裸写 prop 候选：属于 prop 但在 script setup 中未声明同名局部变量
+        const nakedPropNames = new Set([...propNames].filter(name => !localDeclaredNames.has(name)));
+        if (nakedPropNames.size === 0) {
+          return {};
+        }
+
+        // 辅助函数：检查标识符是否在模板局部作用域（v-for / v-slot / 局部形参）中被声明
+        function isShadowedInTemplate(node, name) {
+          let curr = node.parent;
+          while (curr) {
+            if (curr.type === 'VElement') {
+              for (const attr of curr.startTag?.attributes || []) {
+                if (attr.directive) {
+                  const dirName = attr.key?.name?.name || attr.key?.name;
+                  if (dirName === 'for') {
+                    const expr = attr.value?.expression;
+                    if (expr && expr.type === 'VForExpression' && expr.left) {
+                      if (checkPatternContainsName(expr.left, name)) {
+                        return true;
+                      }
+                    }
+                  }
+                  else if (dirName === 'slot') {
+                    const expr = attr.value?.expression;
+                    if (expr && expr.type === 'VSlotScopeExpression' && expr.params) {
+                      for (const param of expr.params) {
+                        if (checkPatternContainsName(param, name)) {
+                          return true;
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            if ((curr.type === 'ArrowFunctionExpression' || curr.type === 'FunctionExpression') && curr.params) {
+              for (const param of curr.params) {
+                if (checkPatternContainsName(param, name)) {
+                  return true;
+                }
+              }
+            }
+            curr = curr.parent;
+          }
+          return false;
+        }
+
+        function checkPatternContainsName(patternNode, name) {
+          if (!patternNode)
+            return false;
+          if (patternNode.type === 'Identifier' && patternNode.name === name)
+            return true;
+          if (patternNode.type === 'ArrayPattern') {
+            for (const elem of patternNode.elements || []) {
+              if (checkPatternContainsName(elem, name))
+                return true;
+            }
+          }
+          if (patternNode.type === 'ObjectPattern') {
+            for (const prop of patternNode.properties || []) {
+              if (prop.value && checkPatternContainsName(prop.value, name))
+                return true;
+            }
+          }
+          return false;
+        }
+
+        return context.sourceCode.parserServices.defineTemplateBodyVisitor({
+          Identifier(node) {
+            if (!nakedPropNames.has(node.name)) {
+              return;
+            }
+            const parent = node.parent;
+            if (!parent)
+              return;
+
+            // 1. 排除作为非计算属性访问：如 props.border, item.border 中的 border
+            if (parent.type === 'MemberExpression' && parent.property === node && !parent.computed) {
+              return;
+            }
+
+            // 2. 排除作为对象的静态 key：如 { border: ... } 中的 key
+            if (parent.type === 'Property' && parent.key === node && !parent.computed && !parent.shorthand) {
+              return;
+            }
+
+            // 3. 排除声明类形参
+            if ((parent.type === 'ArrowFunctionExpression' || parent.type === 'FunctionExpression' || parent.type === 'FunctionDeclaration') && parent.params?.includes(node)) {
+              return;
+            }
+
+            // 4. 检查是否在 template 局部作用域（v-for / v-slot / 箭头函数参数）中被声明
+            if (isShadowedInTemplate(node, node.name)) {
+              return;
+            }
+
+            context.report({
+              node,
+              messageId: 'noNakedProp',
+              data: {
+                name: node.name
+              },
+              fix(fixer) {
+                if (parent.type === 'Property' && parent.shorthand) {
+                  return fixer.replaceText(node, `${node.name}: props.${node.name}`);
+                }
+                return fixer.replaceText(node, `props.${node.name}`);
+              }
+            });
+          }
+        });
+      }
+    },
+
+    /** 17. UVUE 模板条件指令中避免复合逻辑运算（建议收敛为单值计算属性） */
+    'uvue-template-simple-condition': {
+      meta: {
+        type: 'suggestion',
+        docs: {
+          description: '模板条件指令（v-if / v-else-if / v-show）中避免使用复合逻辑与/或表达式，在多端编译器与插件下易引发解析警告，建议收敛为单值 computed 计算属性'
+        },
+        messages: {
+          noComplexCondition: '[跨端模板规范] 条件指令 v-{{dir}} 中严禁使用复合逻辑与/或表达式 ("{{expr}}")，在微信小程序或多端编译器下易产生解析警告，建议直接简化为单值计算属性'
+        }
+      },
+      create(context) {
+        if (!context.sourceCode.parserServices?.defineTemplateBodyVisitor) {
+          return {};
+        }
+
+        const filename = context.filename || context.getFilename?.() || '';
+        if (!filename.endsWith('.vue') && !filename.endsWith('.uvue')) {
+          return {};
+        }
+
+        function findLogicalExpression(astNode) {
+          if (!astNode || typeof astNode !== 'object')
+            return null;
+          if (astNode.type === 'LogicalExpression' && (astNode.operator === '&&' || astNode.operator === '||')) {
+            return astNode;
+          }
+          for (const key of Object.keys(astNode)) {
+            if (key === 'parent')
+              continue;
+            const child = astNode[key];
+            if (Array.isArray(child)) {
+              for (const item of child) {
+                const found = findLogicalExpression(item);
+                if (found)
+                  return found;
+              }
+            }
+            else if (child && typeof child === 'object' && typeof child.type === 'string') {
+              const found = findLogicalExpression(child);
+              if (found)
+                return found;
+            }
+          }
+          return null;
+        }
+
+        return context.sourceCode.parserServices.defineTemplateBodyVisitor({
+          VAttribute(node) {
+            if (!node.directive || !node.key)
+              return;
+            const dirName = node.key.name?.name || node.key.name;
+            if (dirName !== 'if' && dirName !== 'else-if' && dirName !== 'show') {
+              return;
+            }
+
+            const expr = node.value?.expression;
+            if (!expr)
+              return;
+
+            const logicalNode = findLogicalExpression(expr);
+            if (logicalNode) {
+              const rawExpr = context.sourceCode.getText(expr).trim();
+              context.report({
+                node: logicalNode,
+                messageId: 'noComplexCondition',
+                data: {
+                  dir: dirName,
+                  expr: rawExpr
+                }
+              });
+            }
+          }
+        });
+      }
     }
   }
 };
