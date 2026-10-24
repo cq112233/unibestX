@@ -260,7 +260,7 @@ const bottom = computed(() => {
       <!-- 各 Tab 交互格位 -->
       <view
         v-for="(item, index) in tabbarList"
-        :key="item.pagePath.length > 0 ? item.pagePath : `${item.text}_${index}`"
+        :key="index"
         class="capsule-item-slot"
         @click="onTabClick(index)"
       >

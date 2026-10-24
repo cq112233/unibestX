@@ -129,14 +129,6 @@ onUnhandledRejection((res) => {
 @import './main.css';
 /* #endif */
 
-/* #ifdef APP || H5 || WEB */
-/* 品牌字体仅供字体演示页使用，文件位于分包，避免进入微信小程序主包 */
-@font-face {
-  font-family: AlimamaDaoLiTiTTF;
-  src: url('./src/sub/fontBasicDemo/font/AlimamaDaoLiTi.ttf');
-}
-/* #endif */
-
 /* 阿里 iconfont（uni_modules/ali-iconfont）目前本项目没用到 —— 没有页面渲染 AliIconfontIcon。
    以后要用，只做一件事：在 onLaunch 里 import 并调用一次 setupIconfont()（无参）：
 

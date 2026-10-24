@@ -319,7 +319,11 @@ configs.push({
     // 启用 UVUE/Vue 模板静态 class 属性与标签内部多余换行、连续空行与首尾空格自动收敛清理
     'uts/uvue-clean-template-whitespace': 'error',
     // 禁止在 definePage 宏内引用外部声明的变量或函数（避免编译期执行宏报 ReferenceError）
-    'uts/define-page-no-outer-variables': 'error'
+    'uts/define-page-no-outer-variables': 'error',
+    // 严禁在模板中直接裸写 prop 名称（规避鸿蒙 ArkTS 作用域解析失败与同名方法冲突）
+    'uts/uvue-template-no-naked-prop': 'error',
+    // 模板条件指令（v-if / v-else-if / v-show）中避免使用复合逻辑与/或表达式（建议收敛为单值计算属性）
+    'uts/uvue-template-simple-condition': 'warn'
   }
 });
 

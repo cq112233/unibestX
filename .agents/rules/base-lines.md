@@ -23,19 +23,25 @@ description: unibestX 最高底线 —— 任何代码都不能违反的框架�
 - **基础类型比较只用 `==` / `!=`**，不用 `===`。
 - **`as` 后面不写泛型实例化别名**（`as PageResult<Item>` ✅，`as FooPageResult` ❌，运行期 `ReferenceError`）。
 
-## 3. 内置体系优先
+## 3. 模板与样式底线
+
+- **严禁模板裸写 prop**：`<template>` 中禁止直接裸写 prop 属性名（如 `:border="border"`），必须使用 `props.xxx` 或收敛为 `computed` 变量（鸿蒙 ArkTS 无法自动解构 prop 且易与内置属性冲突导致编译报错）。
+- **条件指令单值化**：`v-if` / `v-else-if` / `v-show` 禁止包含 `&&` / `||` 复合逻辑表达式（如 `v-if="a && b"`），必须在 `<script setup>` 中收敛为单值 `computed` 计算属性（规避多端 AST 与小程序编译器语法告警）。
+- **CSS 条件编译禁逻辑运算符**：CSS/SCSS 样式块中的条件编译严禁写 `||` / `&&`（只支持单平台宏如 `/* #ifdef APP-ANDROID */`，多条件不支持或会导致样式被重复注入引发对象序列化异常）。
+
+## 4. 内置体系优先
 
 - **不脱离 unibestX 内置能力**：系统信息、环境变量、Toast、路由、接口请求、通用算法，一律先用项目封装或 `uni_modules/` 生态库，不手写等价实现。
 - **导入一律别名**：`@/src/...`、`@/uni_modules/...`，不相对穿透；保留 `.uts` 后缀；第三方模块只从其**公开入口**导入，不穿透内部文件。
 - **禁止循环依赖**：`.uts` / `.ts` / `.js` 依赖必须保持单向 DAG，禁止直接或间接 `A → B → A`；`import`、`import type`、`export *` 与条件编译分支形成的依赖边一律计入。公共类型 / 常量 / 纯函数下沉到零依赖叶子文件（判定与正反例见 Skill 分册 1.22）。
 
-## 4. 交付
+## 5. 交付
 
 - **声称「完成 / 已修复」前必须实际运行验证并给出输出**；未验证就如实说明。
 - **未经开发者明确指示，不执行 `git commit` / `git push`**。
 - **严禁擅自修改 `unibestX-skill`**（`SKILL.md` 与 `references/`），有异议只在回复中提建议。
 
-## 5. AI 代码零新增 warning
+## 6. AI 代码零新增 warning
 
 - **存量 warning 不清理**：仓库已有的 ESLint / Stylelint warning 默认忽略，禁止以「顺手清理」为由扩大改动范围。
 - **新增 warning 必须为 0**：AI 新建或修改的代码不得产生任何 warning，也不得让原文件的 warning 数量增加。
@@ -46,6 +52,7 @@ description: unibestX 最高底线 —— 任何代码都不能违反的框架�
 
 > 📖 **本文件只是底线开关，不含用法。**
 > 需要类型定义、完整模板、正反例、踩坑结论时，用 Read 打开 `.agents/skills/unibestX-skill/SKILL.md` 定位分册，再读对应分册：
+>
 > - UTS 语法与类型 → 分册 1
 > - 样式与布局 → 分册 2
 > - 跨端运行时与真机报错 → 分册 3

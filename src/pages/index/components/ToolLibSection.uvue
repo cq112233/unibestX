@@ -1,0 +1,131 @@
+<template>
+  <div class="mt-[16px] mx-[16px]">
+    <div class="flex flex-row items-center justify-between mb-[10px]">
+      <span class="text-[14px] font-bold text-[#1e293b]">🧰 内置工具库</span>
+      <span class="text-[11px] text-[#94a3b8]">uni_modules · CLI 可选配</span>
+    </div>
+
+    <div
+      v-for="item in toolLibList"
+      :key="item.id"
+      class="p-[12px] mb-[10px] rounded-[10px] border-[1px] border-solid flex flex-col"
+      :style="{ backgroundColor: item.bgColor, borderColor: item.borderColor }"
+    >
+      <div class="flex flex-row items-center mb-[6px]">
+        <div
+          class="w-[3px] h-[14px] rounded-[2px] mr-[6px]"
+          :style="{ backgroundColor: item.textColor }"
+        ></div>
+        <span class="text-[13px] font-bold mr-[6px]" :style="{ color: item.textColor }">
+          {{ item.title }}
+        </span>
+        <span class="text-[10px] font-medium px-[5px] py-[1px] rounded-[4px] text-[#64748b] bg-[#ffffff]">
+          {{ item.tag }}
+        </span>
+      </div>
+
+      <span class="text-[11px] leading-[16px] text-[#64748b] mb-[8px]">
+        {{ item.desc }}
+      </span>
+
+      <div class="flex flex-row flex-wrap">
+        <span
+          v-for="chip in item.chips"
+          :key="chip"
+          class="text-[10px] px-[6px] py-[1px] mr-[6px] mb-[6px] rounded-[4px] text-[#475569] bg-[#ffffff]"
+        >
+          {{ chip }}
+        </span>
+      </div>
+
+      <span class="text-[10px] text-[#94a3b8]" style="font-family: monospace;">
+        {{ item.configPath }}
+      </span>
+    </div>
+  </div>
+</template>
+
+<script setup lang="uts">
+type ToolLibItem = {
+  id: string;
+  title: string;
+  tag: string;
+  desc: string;
+  chips: Array<string>;
+  configPath: string;
+  bgColor: string;
+  borderColor: string;
+  textColor: string;
+};
+
+const toolLibList: Array<ToolLibItem> = [
+  {
+    id: 'lime-shared',
+    title: '🧰 lime-shared',
+    tag: '工具函数库',
+    desc: '零依赖的纯函数集合，覆盖浮点精度运算、序列生成与编号补齐、唯一标识、数组去重与切片分组、对象路径安全取值、命名转换、深比较，以及防抖与随机数。',
+    chips: ['浮点精度', '去重切片', '路径取值', '深比较', '防抖'],
+    configPath: 'uni_modules/lime-shared',
+    bgColor: '#0369a10f',
+    borderColor: '#0369a126',
+    textColor: '#0369a1'
+  },
+  {
+    id: 'lime-use',
+    title: '🧩 lime-use',
+    tag: '组合式函数',
+    desc: '基于 Vue3 组合式 API 的常用逻辑封装，内置倒计时、验证码计时、精准定时器与层级管理，可直接在业务页面中复用，无需重复造轮子。',
+    chips: ['useCountDown', 'useCodeTimer', 'useTimeout', 'useZIndex'],
+    configPath: 'uni_modules/lime-use',
+    bgColor: '#b453090f',
+    borderColor: '#b4530926',
+    textColor: '#b45309'
+  },
+  {
+    id: 'lime-color',
+    title: '🎨 lime-color',
+    tag: '颜色工具',
+    desc: '颜色格式互转、亮度与饱和度调整、配色方案生成与 Ant Design 主题色阶，可直接用于换肤、主题推导与图表配色等场景。',
+    chips: ['格式互转', '亮度调整', '配色方案', 'Ant 色阶'],
+    configPath: 'uni_modules/lime-color',
+    bgColor: '#db27770f',
+    borderColor: '#db277726',
+    textColor: '#db2777'
+  },
+  {
+    id: 'lime-dayuts',
+    title: '📅 lime-dayuts',
+    tag: '日期时间库',
+    desc: 'dayjs 的 UTS 移植版，几乎保持一致的调用风格，覆盖日期解析、格式化与取值赋值、加减与起止（startOf / endOf）、时间差计算与比较查询，并内置中英双语 locale。',
+    chips: ['解析/格式化', '加减与起止', 'diff 时间差', '比较查询', '中英 locale'],
+    configPath: 'uni_modules/lime-dayuts',
+    bgColor: '#4338ca0f',
+    borderColor: '#4338ca26',
+    textColor: '#4338ca'
+  },
+  {
+    id: 'bignumber-bestX',
+    title: '🧮 bignumber-bestX',
+    tag: '大数据运算',
+    desc: '任意精度十进制运算库，覆盖加减乘除、取模、幂与开方，支持 2~36 进制、九种舍入模式与千分位格式化，彻底解决 0.1 + 0.2 ≠ 0.3 的浮点误差。',
+    chips: ['任意精度', '四则运算', '幂与开方', '2~36 进制', '九种舍入', '千分位'],
+    configPath: 'uni_modules/bignumber-bestX',
+    bgColor: '#7c3aed0f',
+    borderColor: '#7c3aed26',
+    textColor: '#7c3aed'
+  },
+  {
+    id: 'crypto-bestX',
+    title: '🔐 crypto-bestX',
+    tag: '加密解密',
+    desc: '跨端加密解密套件，涵盖 Base64 编解码、MD5 与 SHA-256 摘要、HMAC 签名、AES / DES 对称加解密、RSA 非对称加解密与验签，以及 UUID 生成。',
+    chips: ['Base64', 'MD5 / SHA-256', 'HMAC', 'AES / DES', 'RSA 验签', 'UUID'],
+    configPath: 'uni_modules/crypto-bestX',
+    bgColor: '#15803d0f',
+    borderColor: '#15803d26',
+    textColor: '#15803d'
+  }
+];
+</script>
+
+<style scoped></style>
