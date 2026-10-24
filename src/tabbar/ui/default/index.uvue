@@ -140,7 +140,7 @@ function onTabClick(index: number) {
       <view class="tabbar-inner" :style="{ height: `${TABBAR_HEIGHT}px` }">
         <view
           v-for="(item, index) in tabbarList"
-          :key="item.pagePath.length > 0 ? item.pagePath : `${item.text}_${index}`"
+          :key="index"
           class="tabbar-item"
           :style="{ height: `${TABBAR_HEIGHT}px` }"
           @click="onTabClick(index)"

@@ -1,0 +1,136 @@
+<template>
+  <div
+    class="mt-[14px] mx-[16px] p-[14px] rounded-[14px] border-[1px] border-solid bg-[#ffffff] border-[#e2e8f0] flex flex-col"
+  >
+    <div class="flex flex-row items-center justify-between mb-[12px]">
+      <div class="flex flex-row items-center">
+        <span class="text-[14px] mr-[6px]">⚡</span>
+        <span class="text-[13px] font-bold text-[#1e293b]">多端热重载与调试体验指南</span>
+      </div>
+      <div class="px-[6px] py-[2px] rounded-[4px] bg-[#6366f114]">
+        <span class="text-[10px] font-bold text-[#4f46e5]">推荐工作流</span>
+      </div>
+    </div>
+
+    <!-- 各端表现清单 -->
+    <div class="flex flex-col bg-[#f8fafc] rounded-[10px] p-[10px] border-[1px] border-solid border-[#e2e8f0]">
+      <!-- H5 -->
+      <div class="flex flex-row items-start mb-[8px]">
+        <div class="px-[6px] py-[1px] rounded-[4px] bg-[#dcfce7] mr-[8px] mt-[1px]">
+          <span class="text-[10px] font-bold text-[#15803d]">H5 (最优)</span>
+        </div>
+        <span class="text-[11px] leading-[16px] text-[#334155] flex-1">
+          差量更新不重载，热更新稳定停留在当前页，页面布局与组件调试首选推荐。
+        </span>
+      </div>
+
+      <!-- iOS -->
+      <div class="flex flex-row items-start mb-[8px]">
+        <div class="px-[6px] py-[1px] rounded-[4px] bg-[#e0f2fe] mr-[8px] mt-[1px]">
+          <span class="text-[10px] font-bold text-[#0369a1]">iOS</span>
+        </div>
+        <span class="text-[11px] leading-[16px] text-[#334155] flex-1">
+          差量更新无感替换，热更新平滑保留在当前调试页面。
+        </span>
+      </div>
+
+      <!-- Android -->
+      <div class="flex flex-row items-start mb-[8px]">
+        <div class="px-[6px] py-[1px] rounded-[4px] bg-[#e0f2fe] mr-[8px] mt-[1px]">
+          <span class="text-[10px] font-bold text-[#0369a1]">Android</span>
+        </div>
+        <span class="text-[11px] leading-[16px] text-[#334155] flex-1">
+          差量更新会热重构重启基座，热重载保持在当前停留页。
+        </span>
+      </div>
+
+      <!-- 小程序 -->
+      <div class="flex flex-row items-start mb-[8px]">
+        <div class="px-[6px] py-[1px] rounded-[4px] bg-[#fef3c7] mr-[8px] mt-[1px]">
+          <span class="text-[10px] font-bold text-[#b45309]">小程序</span>
+        </div>
+        <span class="text-[11px] leading-[16px] text-[#334155] flex-1">
+          受宿主开发者工具限制，代码保存后均会整包重载回到首页。
+        </span>
+      </div>
+
+      <!-- 鸿蒙 -->
+      <div class="flex flex-row items-start">
+        <div class="px-[6px] py-[1px] rounded-[4px] bg-[#fef3c7] mr-[8px] mt-[1px]">
+          <span class="text-[10px] font-bold text-[#b45309]">鸿蒙</span>
+        </div>
+        <span class="text-[11px] leading-[16px] text-[#334155] flex-1">
+          原生运行时差量编译后会重启基座，调试状态重置回到首页。
+        </span>
+      </div>
+    </div>
+
+    <!-- 沙盒独立调试（页面过多时的提速手段） -->
+    <div class="mt-[10px] p-[10px] rounded-[10px] bg-[#f5f3ff] border-[1px] border-solid border-[#ddd6fe]">
+      <div class="flex flex-row items-center mb-[8px]">
+        <span class="text-[12px] mr-[6px]">🧪</span>
+        <span class="text-[12px] font-bold text-[#5b21b6]">页面太多？开启沙盒调试</span>
+        <div class="px-[6px] py-[1px] rounded-[4px] bg-[#7c3aed14] ml-[6px]">
+          <span class="text-[10px] font-bold text-[#6d28d9]">只编译目标页</span>
+        </div>
+      </div>
+
+      <span class="text-[11px] leading-[17px] text-[#4c1d95]">
+        页面与分包变多以后，每次热更新都要全量编译。沙盒模式把编译范围锁定到单个页面或某个模块，冷启动直达目标页，秒级完成编译，也不易被其他页面的报错打断。
+      </span>
+
+      <!-- 方式一：页面内代码标记 -->
+      <div class="flex flex-row items-start mt-[8px]">
+        <div class="px-[5px] py-[1px] rounded-[4px] bg-[#ede9fe] mr-[6px] mt-[1px]">
+          <span class="text-[10px] font-bold text-[#6d28d9]">方式一</span>
+        </div>
+        <div class="flex-1 flex flex-col">
+          <span class="text-[11px] leading-[16px] text-[#334155]">
+            在目标页面内声明代码标记，调试单页最省事
+          </span>
+          <div class="mt-[4px] px-[6px] py-[4px] rounded-[4px] bg-[#0f172a] flex flex-col">
+            <span class="text-[10px] text-[#c4b5fd]" style="font-family: monospace;">
+              definePage({ debug: false, debugHome: false })
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 方式二：.env 环境变量 -->
+      <div class="flex flex-row items-start mt-[8px]">
+        <div class="px-[5px] py-[1px] rounded-[4px] bg-[#ede9fe] mr-[6px] mt-[1px]">
+          <span class="text-[10px] font-bold text-[#6d28d9]">方式二</span>
+        </div>
+        <div class="flex-1 flex flex-col">
+          <span class="text-[11px] leading-[16px] text-[#334155]">
+            改用 .env 环境变量，支持多页与通配，优先级高于代码标记
+          </span>
+          <div class="mt-[4px] px-[6px] py-[4px] rounded-[4px] bg-[#0f172a] flex flex-col">
+            <span class="text-[10px] text-[#c4b5fd] mb-[2px]" style="font-family: monospace;">
+              VITE_DEV_SANDBOX=true
+            </span>
+            <span class="text-[10px] text-[#c4b5fd]" style="font-family: monospace;">
+              VITE_DEV_SANDBOX_PAGES=src/sub/auth/*
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <span class="text-[10px] leading-[15px] mt-[8px] text-[#7c3aed]">
+        多个页面用逗号分隔（首个为启动首页），也可用 src/sub/auth/* 通配整个模块；调试完把 debug 改回 false 即恢复全量，正式打包会自动熔断沙盒。
+      </span>
+    </div>
+
+    <!-- 底部建议 -->
+    <div class="mt-[10px] p-[8px] rounded-[8px] bg-[#eff6ff] border-[1px] border-solid border-[#bfdbfe] flex flex-row items-start">
+      <span class="text-[12px] mr-[4px]">💡</span>
+      <span class="text-[11px] leading-[17px] text-[#1d4ed8] flex-1">
+        建议：业务开发优先使用 H5（pnpm dev:h5）调样式与逻辑；页面或分包较多时开启沙盒调试，只编译当前目标页；在 VITE_TABBAR_MODE=4 模式下除 H5 均会重置到首页。功能稳定后再切真机或小程序做多端兼容验收。
+      </span>
+    </div>
+  </div>
+</template>
+
+<script setup lang="uts"></script>
+
+<style scoped></style>

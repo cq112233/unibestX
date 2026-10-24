@@ -86,6 +86,7 @@ import {
   ALIMAMA_FONT_REMOTE_SOURCE,
   SYSTEM_FONT_ID
 } from '@/src/config/font/font.uts';
+import { isAppHarmony, isMp } from '@/src/config/env/platform.uts';
 
 definePage({
   debug: false,
@@ -152,31 +153,30 @@ function changeFont(fontId: string): void {
     return;
   }
 
-  // #ifdef MP
-  fontStatus.value = 'loading';
-  uni.loadFontFace({
-    global: true,
-    family: ALIMAMA_FONT_FAMILY,
-    source: ALIMAMA_FONT_REMOTE_SOURCE,
-    success() {
-      selectedFontId.value = ALIMAMA_FONT_ID;
-      fontStatus.value = 'loaded';
-    },
-    fail() {
-      selectedFontId.value = SYSTEM_FONT_ID;
-      fontStatus.value = 'error';
-      uni.showToast({
-        title: '字体加载失败',
-        icon: 'none'
-      });
-    }
-  });
-  // #endif
+  if (isMp || isAppHarmony) {
+    fontStatus.value = 'loading';
+    uni.loadFontFace({
+      global: true,
+      family: ALIMAMA_FONT_FAMILY,
+      source: ALIMAMA_FONT_REMOTE_SOURCE,
+      success() {
+        selectedFontId.value = ALIMAMA_FONT_ID;
+        fontStatus.value = 'loaded';
+      },
+      fail() {
+        selectedFontId.value = SYSTEM_FONT_ID;
+        fontStatus.value = 'error';
+        uni.showToast({
+          title: '字体加载失败',
+          icon: 'none'
+        });
+      }
+    });
+    return;
+  }
 
-  // #ifndef MP
   selectedFontId.value = ALIMAMA_FONT_ID;
   fontStatus.value = 'loaded';
-  // #endif
 }
 
 function isCurrentScale(scale: number): boolean {
@@ -192,4 +192,25 @@ function resetScale(): void {
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+/* #ifdef APP-ANDROID */
+@font-face {
+  font-family: AlimamaDaoLiTiTTF;
+  src: url('./font/AlimamaDaoLiTi.ttf');
+}
+/* #endif */
+
+/* #ifdef APP-IOS */
+@font-face {
+  font-family: AlimamaDaoLiTiTTF;
+  src: url('./font/AlimamaDaoLiTi.ttf');
+}
+/* #endif */
+
+/* #ifdef H5 */
+@font-face {
+  font-family: AlimamaDaoLiTiTTF;
+  src: url('./font/AlimamaDaoLiTi.ttf');
+}
+/* #endif */
+</style>
