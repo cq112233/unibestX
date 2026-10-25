@@ -36,9 +36,11 @@ Skills 位于 `.agents/skills/` 目录，目前**只保留 `unibestX-skill` 一�
 - **一律禁止使用 `interface`**：在本项目中定义任何对象结构、状态、参数或返回值类型时，**一律禁止使用 `interface`**，**必须全部统一使用 `type`（类型别名）**，避免触发 UTS 底层对对象字面量赋值的 `UTS110111163` 编译错误。
 - **AI 代码零新增 warning**：仓库存量 ESLint / Stylelint warning 默认忽略；AI 新建或修改的代码**不得新增任何 warning，也不得扩大原文件的 warning 数量**。交付前必须运行作用于改动文件的 ESLint / Stylelint 校验；禁止用大范围 `eslint-disable` / `stylelint-disable` 掩盖问题，确属框架误报时只能在命中行或单文件做精确豁免并注明原因。
 
-## 第三方依赖目录读取约束
+## Token 极致控制与文件读取铁律（Vibe Coding 防膨胀）
 
 - **默认禁止搜索 / 批量读取 `uni_modules/`、`node_modules/`、`unpackage/`、`dist/`**：这些目录合计上千万行、数百万 token，一旦被读入上下文会在后续每一轮请求中重复发送，是 token 消耗的主要来源。
 - **`uni_modules/` 例外用法**：确需查看某个组件实现（如 `up-calendar`、`uni-layouts`）时，**按精确路径读取单个文件**（例如 `uni_modules/uview-ultra/components/up-calendar/up-calendar.uvue`），严禁对整个目录做 `rg`、`grep`、`find` 后全量读取。
-- **优先查阅 `unibestX-skill` 分册**获取组件用法，而不是翻 `uni_modules` 源码。
+- **严禁全量 Dump 超过 200 行的大文件（强制精准切片）**：对 `pages.json`、`navbar.uvue`、`eslint-plugin-uts.mjs` 等大文件，**一律禁止不传行号全量读取**！必须使用 `StartLine` 与 `EndLine` 参数切片查看目标代码块（单次切片建议 50~100 行），节约 80% 单次 Token 消耗。
+- **定位即收敛**：通过 `grep_search` 得到命中行号后，仅切片读取目标行上下 30 行，禁止顺手将整个千行文件全盘塞进上下文。
+- **契约类型下沉为「零依赖叶子文件（Leaf Types）」**：跨两个以上文件共用的业务数据结构与接口契约，一律下沉到只包含 `type` 的独立 `types.uts` 文件中；AI 查阅类型时**仅读取该纯类型文件**（通常仅 20~50 行），严禁顺带读取包含数百行复杂模板与业务实现的宿主组件。
 - 搜索一律用 `rg`（会遵守根目录 `.ignore`），禁止 `grep -r` 直扫仓库根目录。

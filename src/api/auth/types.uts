@@ -1,0 +1,37 @@
+/**
+ * 认证与用户信息数据契约（零依赖叶子类型）
+ * 遵循规范：一律使用 type，严禁 interface
+ */
+
+export type LoginQuery = {
+  username: string;
+  password: string;
+};
+
+export type AuthUserInfo = {
+  userId: number;
+  username: string;
+  nickname: string;
+  avatar: string;
+  permissions: Array<string>;
+};
+
+export type LoginResult = {
+  token: string;
+  expiresIn: number;
+  /** 双 token 模式：用于 401 时静默换取新 accessToken */
+  refreshToken: string;
+  refreshExpiresIn: number;
+  userInfo: AuthUserInfo;
+};
+
+export type RefreshTokenQuery = {
+  refreshToken: string;
+};
+
+export type RefreshTokenResult = {
+  accessToken: string;
+  accessExpiresIn: number;
+  refreshToken: string;
+  refreshExpiresIn: number;
+};
