@@ -211,14 +211,30 @@ const bottom = computed(() => {
   // 12px 是悬浮胶囊底座和底部内容的间距
   return `${props.bottomOffset + safeAreaBottom.value - 12}`;
 });
+
+/** 判断是否是小红点角标 */
+function isDotBadge(badge: any | null): boolean {
+  if (badge == null) {
+    return false;
+  }
+  return `${badge}` == 'dot';
+}
+
+/** 判断是否是数字/文本角标 */
+function isTextBadge(badge: any | null): boolean {
+  if (badge == null) {
+    return false;
+  }
+  return `${badge}` != 'dot';
+}
 </script>
 
 <template>
   <view class="custom-capsule-wrapper">
     <!-- 底部占位块：防止页面底部内容被悬浮 Tab 栏遮挡 -->
     <view
-      v-if="showPlaceholder" class="custom-capsule-placeholder"
-      :style="{ height: `${height + bottomOffset * 2 + safeAreaBottom}px` }"
+      v-if="props.showPlaceholder" class="custom-capsule-placeholder"
+      :style="{ height: `${props.height + props.bottomOffset * 2 + safeAreaBottom}px` }"
     />
 
     <!-- 悬浮胶囊底座主容器 -->
@@ -231,7 +247,7 @@ const bottom = computed(() => {
       }"
       :style="{
         bottom: `${bottom}px`,
-        height: `${height}px`,
+        height: `${props.height}px`,
         backgroundColor: tabBgColor,
         borderColor: tabBorderColor
       }"
@@ -251,6 +267,7 @@ const bottom = computed(() => {
       <view class="capsule-slider-track">
         <view
           class="capsule-slider"
+          :class="{ 'capsule-slider-animated': isSinglePageTabbar }"
           :style="sliderStyle"
         >
           <view class="capsule-slider-pill" :style="{ backgroundColor: activeItemBgColor, opacity: activeItemBgOpacity }" />
@@ -277,9 +294,9 @@ const bottom = computed(() => {
             <image v-else :src="getItemIconPath(index)" class="capsule-icon-image" />
 
             <!-- 小红点角标 -->
-            <view v-if="item.badge != null && `${item.badge}` == 'dot'" class="capsule-badge-dot" />
+            <view v-if="isDotBadge(item.badge)" class="capsule-badge-dot" />
             <!-- 文本数字角标 -->
-            <view v-else-if="item.badge != null && `${item.badge}` != 'dot'" class="capsule-badge-text">
+            <view v-else-if="isTextBadge(item.badge)" class="capsule-badge-text">
               <text class="capsule-badge-label">{{ item.badge }}</text>
             </view>
           </view>
@@ -299,7 +316,7 @@ const bottom = computed(() => {
 <style>
 .custom-capsule-wrapper {
   /* 作为内部 absolute 胶囊的定位基准：本容器位于内容流末尾（flex 剩余空间之外），
-     其底边即页面可用区域底边，胶囊据此贴底悬浮 */
+  其底边即页面可用区域底边，胶囊据此贴底悬浮 */
   position: relative;
   width: 100%;
   overflow: visible;
@@ -313,7 +330,7 @@ const bottom = computed(() => {
 /* 悬浮胶囊主底座 */
 .custom-capsule-container {
   /* 相对 .custom-capsule-wrapper 定位；垂直位置由模板绑定的 bottom（含安全区）决定，
-     此处不可再写 top，否则 top 胜出会把胶囊顶出可视区 */
+  此处不可再写 top，否则 top 胜出会把胶囊顶出可视区 */
   position: absolute;
   right: 16px;
   left: 16px;
@@ -374,12 +391,16 @@ const bottom = computed(() => {
   pointer-events: none;
 }
 
-/* 滑块单元：全端 150ms 平滑过渡（对齐 rice-subsection 动画时长） */
+/* 滑块单元基础结构（非模式 4 直接瞬间定位无动画，避免跨页面路由切换时发生滑块漂移动画） */
 .capsule-slider {
   justify-content: center;
   align-items: center;
   width: 25%;
   height: 100%;
+}
+
+/* 仅在模式 4 单页面容器模式下启用 150ms 平滑滑动动画 */
+.capsule-slider-animated {
   transition-property: transform;
   transition-duration: 150ms;
 }

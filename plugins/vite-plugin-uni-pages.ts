@@ -12,7 +12,7 @@ import {
 import * as ts from 'typescript';
 import type { Plugin } from 'vite';
 import { loadEnv } from 'vite';
-import { loadAllPlatformPageVariants } from './pages-json-util';
+import { loadAllPlatformPageVariants, loadPlatformPagesJson } from './pages-json-util';
 import { setPagesMetaSnapshot } from './pages-meta-cache';
 
 /**
@@ -212,8 +212,8 @@ const DEFAULT_CONFIG_FILE = 'pages.config.json';
 /** 文件变更后等待多久再重新生成（合并一次保存引发的多次事件） */
 const DEBOUNCE_MS = 80;
 
-/** 模式 2 下原生 tabBar 会被自定义组件接管，先把宿主 tabbar 隐藏掉，避免切换瞬间闪烁 */
-const HIDE_NATIVE_TABBAR_STYLE = '<style id="uni-tabbar-hide-zero-flash">uni-tabbar, uni-tabbar *, .uni-tabbar, .uni-tabbar *, .uni-tabbar-bottom, .uni-tabbar-bottom *, .uni-tabbar__icon, .uni-tabbar__label { display: none !important; visibility: hidden !important; height: 0 !important; min-height: 0 !important; max-height: 0 !important; opacity: 0 !important; pointer-events: none !important; position: absolute !important; bottom: -9999px !important; }</style>';
+/** 模式 2 下原生 tabBar 会被自定义组件接管，静态消除宿主 tabbar 及 50px 窗口底边距与过渡加载菊花，实现全链路零闪烁 */
+const HIDE_NATIVE_TABBAR_STYLE = '<style id="uni-tabbar-hide-zero-flash">uni-tabbar, uni-tabbar *, .uni-tabbar, .uni-tabbar *, .uni-tabbar-bottom, .uni-tabbar-bottom *, .uni-tabbar__icon, .uni-tabbar__label, .uni-async-loading, .uni-loading { display: none !important; visibility: hidden !important; height: 0 !important; min-height: 0 !important; max-height: 0 !important; opacity: 0 !important; pointer-events: none !important; position: absolute !important; bottom: -9999px !important; } :root { --window-bottom: 0px !important; } uni-page-wrapper { height: 100% !important; } uni-page-body { padding-bottom: 0px !important; }</style>';
 
 /** 默认排除目录（components / views 不当页面扫描） */
 const DEFAULT_EXCLUDES: string[] = ['**/components/**/*.*', '**/views/**/*.*'];
@@ -2502,7 +2502,23 @@ export default function uniPagesPlugin(userOptions: UniPagesOptions = {}): Plugi
     transformIndexHtml(html: string) {
       const mode = getTabbarMode(projectRoot);
       if (mode === '2' || mode === 'CUSTOM_TABBAR_WITH_NATIVE' || mode === 'CUSTOM_TABBAR') {
-        return html.replace('</head>', `${HIDE_NATIVE_TABBAR_STYLE}\n</head>`);
+        let preloadScripts = '';
+        try {
+          const pagesJsonData = loadPlatformPagesJson(path.resolve(projectRoot, 'pages.json'));
+          const tabList = (pagesJsonData.tabBar && Array.isArray(pagesJsonData.tabBar.list)) ? pagesJsonData.tabBar.list : [];
+          const tabImports = tabList
+            .map((item: any) => item.pagePath || '')
+            .filter((p: string) => p.length > 0 && !p.includes('pages/index/index'))
+            .map((p: string) => {
+              const norm = p.startsWith('/') ? p : `/${p}`;
+              return `import('${norm}.uvue').catch(() => {});`;
+            });
+          if (tabImports.length > 0) {
+            preloadScripts = `<script type="module">\n// 动态预加载所有 TabBar 页面组件，消除首次切换 Tab 时的异步模块加载空白\nsetTimeout(() => {\n  ${tabImports.join('\n  ')}\n}, 50);\n</script>`;
+          }
+        }
+        catch {}
+        return html.replace('</head>', `${HIDE_NATIVE_TABBAR_STYLE}\n${preloadScripts}\n</head>`);
       }
       return html;
     }

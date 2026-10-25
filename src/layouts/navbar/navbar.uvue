@@ -146,6 +146,11 @@ const props = defineProps({
   layoutStyle: {
     type: String,
     default: ''
+  },
+  /** 当前页面是否为 TabBar 页面（由 uni-layouts-plugin 编译期注入，首帧生效） */
+  isTabbar: {
+    type: Boolean,
+    default: false
   }
 });
 
@@ -549,7 +554,7 @@ const isNativePullDown = computed((): boolean => {
  * 判断当前是否为 TabBar 页面
  */
 const isTabbarPage = computed((): boolean => {
-  if (props.type == 'home') {
+  if (props.isTabbar || props.type == 'home') {
     return true;
   }
   try {

@@ -52,6 +52,11 @@ const props = defineProps({
   pageStyle: {
     type: Object,
     default: () => ({})
+  },
+  /** 当前页面是否是 TabBar 页面（编译期由 rootPlugin 注入，首帧即刻生效消除闪烁） */
+  isTabbar: {
+    type: Boolean,
+    default: false
   }
 });
 
@@ -70,8 +75,8 @@ const themeStyle = computed((): UTSJSONObject => {
   return getRootThemeStyle(themeStore.state.theme, themeStore.state.isDark);
 });
 
-// 控制当前页面是否需要显示底部导航栏
-const isCurrentPageTabbar = ref(false);
+// 控制当前页面是否需要显示底部导航栏（首帧即刻生效，杜绝延迟到 onMounted 造成的空白跳动闪烁）
+const isCurrentPageTabbar = ref(props.isTabbar);
 
 // 是否展示自定义 TabBar（收敛为单值计算属性以符合跨端模板规范）
 const showTabbar = computed((): boolean => {
