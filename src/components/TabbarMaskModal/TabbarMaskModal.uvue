@@ -1,172 +1,3 @@
-<template>
-  <!-- 全屏遮罩弹窗组件 (具备穿透/覆盖底部 TabBar 能力的基础通用组件) -->
-  <!-- 微信小程序端：使用 root-portal 提升至 page 根节点以穿透 TabBar -->
-  <!-- #ifdef MP -->
-  <root-portal v-if="isShown">
-    <view class="tabbar-modal-mask-root" :style="{ zIndex }">
-      <!-- 暗色遮罩背景（点击空白处触发关闭） -->
-      <view class="tabbar-modal-backdrop" @click="handleMaskClick" />
-
-      <!-- 居中卡片本体 -->
-      <view
-        class="tabbar-modal-card"
-        :class="{ 'tabbar-modal-card--dark': isDark }"
-        :style="{ width }"
-      >
-        <!-- 头部插槽 / 默认标题栏 -->
-        <slot name="header">
-          <view
-            v-if="title.length > 0 || showClose"
-            class="tabbar-modal-header"
-          >
-            <view class="tabbar-modal-title-wrap">
-              <text v-if="icon.length > 0" class="tabbar-modal-icon">{{ icon }}</text>
-              <text
-                class="tabbar-modal-title-text"
-                :class="{ 'tabbar-modal-title-text--dark': isDark }"
-              >
-                {{ displayTitle }}
-              </text>
-            </view>
-            <view v-if="showClose" class="tabbar-modal-close-btn" @click="handleClose">
-              <text class="tabbar-modal-close-text">✕</text>
-            </view>
-          </view>
-        </slot>
-
-        <!-- 命令式传入的数据回执（ref 桥「传数据」的落点）；未传时不渲染 -->
-        <view v-if="payloadMessage.length > 0" class="tabbar-modal-payload-wrap">
-          <text
-            class="tabbar-modal-payload-msg"
-            :class="{ 'tabbar-modal-payload-msg--dark': isDark }"
-          >
-            {{ payloadMessage }}
-          </text>
-          <text class="tabbar-modal-payload-source">来自：{{ payloadSource }}</text>
-        </view>
-
-        <!-- 默认内容插槽（未传自定义 slot 时展示默认全屏覆盖解析卡片） -->
-        <slot>
-          <text
-            class="tabbar-modal-desc-text"
-            :class="{ 'tabbar-modal-desc-text--dark': isDark }"
-          >
-            在模式 0、2、3、4（尤其默认推荐的模式 4）下，暗色遮罩已将全屏及底部 TabBar 完全覆盖！
-          </text>
-
-          <!-- 关键原理解析卡片 -->
-          <view
-            class="tabbar-modal-tip-card"
-            :class="{ 'tabbar-modal-tip-card--dark': isDark }"
-          >
-            <text class="tabbar-modal-tip-text-green">
-              ✓ 全屏覆盖：模式 0/2/3/4 全端完美覆盖全屏（z-index: {{ zIndex }} &gt; 999）
-            </text>
-            <text class="tabbar-modal-tip-text-indigo">
-              ✓ 原生底座差异：模式 1 原生 TabBar 仅 H5 可遮挡，App/小程序为系统层级
-            </text>
-            <text class="tabbar-modal-tip-text-amber">
-              ✓ 微信环境适配：小程序端使用 root-portal 提升至 Page 根节点
-            </text>
-          </view>
-        </slot>
-
-        <!-- 底部插槽 / 默认操作按钮 -->
-        <slot name="footer">
-          <view class="tabbar-modal-confirm-btn" @click="handleClose">
-            <text class="tabbar-modal-confirm-text">{{ confirmText }}</text>
-          </view>
-        </slot>
-      </view>
-    </view>
-  </root-portal>
-  <!-- #endif -->
-
-  <!-- 非微信小程序端（App、H5 等）：无需 root-portal，直接由 position: fixed 覆盖 -->
-  <!-- #ifndef MP -->
-  <view
-    v-if="isShown"
-    class="tabbar-modal-mask-root"
-    :style="{ zIndex }"
-  >
-    <!-- 暗色遮罩背景（点击空白处触发关闭） -->
-    <view class="tabbar-modal-backdrop" @click="handleMaskClick" />
-
-    <!-- 居中卡片本体 -->
-    <view
-      class="tabbar-modal-card"
-      :class="{ 'tabbar-modal-card--dark': isDark }"
-      :style="{ width }"
-    >
-      <!-- 头部插槽 / 默认标题栏 -->
-      <slot name="header">
-        <view
-          v-if="title.length > 0 || showClose"
-          class="tabbar-modal-header"
-        >
-          <view class="tabbar-modal-title-wrap">
-            <text v-if="icon.length > 0" class="tabbar-modal-icon">{{ icon }}</text>
-            <text
-              class="tabbar-modal-title-text"
-              :class="{ 'tabbar-modal-title-text--dark': isDark }"
-            >
-              {{ displayTitle }}
-            </text>
-          </view>
-          <view v-if="showClose" class="tabbar-modal-close-btn" @click="handleClose">
-            <text class="tabbar-modal-close-text">✕</text>
-          </view>
-        </view>
-      </slot>
-
-      <!-- 命令式传入的数据回执（ref 桥「传数据」的落点）；未传时不渲染 -->
-      <view v-if="payloadMessage.length > 0" class="tabbar-modal-payload-wrap">
-        <text
-          class="tabbar-modal-payload-msg"
-          :class="{ 'tabbar-modal-payload-msg--dark': isDark }"
-        >
-          {{ payloadMessage }}
-        </text>
-        <text class="tabbar-modal-payload-source">来自：{{ payloadSource }}</text>
-      </view>
-
-      <!-- 默认内容插槽（未传自定义 slot 时展示默认全屏覆盖解析卡片） -->
-      <slot>
-        <text
-          class="tabbar-modal-desc-text"
-          :class="{ 'tabbar-modal-desc-text--dark': isDark }"
-        >
-          在模式 0、2、3、4（尤其默认推荐的模式 4）下，暗色遮罩已将全屏及底部 TabBar 完全覆盖！
-        </text>
-
-        <!-- 关键原理解析卡片 -->
-        <view
-          class="tabbar-modal-tip-card"
-          :class="{ 'tabbar-modal-tip-card--dark': isDark }"
-        >
-          <text class="tabbar-modal-tip-text-green">
-            ✓ 全屏覆盖：模式 0/2/3/4 全端完美覆盖全屏（z-index: {{ zIndex }} &gt; 999）
-          </text>
-          <text class="tabbar-modal-tip-text-indigo">
-            ✓ 原生底座差异：模式 1 原生 TabBar 仅 H5 可遮挡，App/小程序为系统层级
-          </text>
-          <text class="tabbar-modal-tip-text-amber">
-            ✓ 微信环境适配：小程序端使用 root-portal 提升至 Page 根节点
-          </text>
-        </view>
-      </slot>
-
-      <!-- 底部插槽 / 默认操作按钮 -->
-      <slot name="footer">
-        <view class="tabbar-modal-confirm-btn" @click="handleClose">
-          <text class="tabbar-modal-confirm-text">{{ confirmText }}</text>
-        </view>
-      </slot>
-    </view>
-  </view>
-  <!-- #endif -->
-</template>
-
 <script setup lang="uts">
 import { computed, ref } from 'vue';
 import { useThemeStore } from '@/src/store/index.uts';
@@ -320,6 +151,175 @@ defineExpose({
   getLastAction
 });
 </script>
+
+<template>
+  <!-- 全屏遮罩弹窗组件 (具备穿透/覆盖底部 TabBar 能力的基础通用组件) -->
+  <!-- 微信小程序端：使用 root-portal 提升至 page 根节点以穿透 TabBar -->
+  <!-- #ifdef MP -->
+  <root-portal v-if="isShown">
+    <view class="tabbar-modal-mask-root" :style="{ zIndex: props.zIndex }">
+      <!-- 暗色遮罩背景（点击空白处触发关闭） -->
+      <view class="tabbar-modal-backdrop" @click="handleMaskClick" />
+
+      <!-- 居中卡片本体 -->
+      <view
+        class="tabbar-modal-card"
+        :class="{ 'tabbar-modal-card--dark': isDark }"
+        :style="{ width: props.width }"
+      >
+        <!-- 头部插槽 / 默认标题栏 -->
+        <slot name="header">
+          <view
+            v-if="props.title.length > 0 || props.showClose"
+            class="tabbar-modal-header"
+          >
+            <view class="tabbar-modal-title-wrap">
+              <text v-if="props.icon.length > 0" class="tabbar-modal-icon">{{ props.icon }}</text>
+              <text
+                class="tabbar-modal-title-text"
+                :class="{ 'tabbar-modal-title-text--dark': isDark }"
+              >
+                {{ displayTitle }}
+              </text>
+            </view>
+            <view v-if="props.showClose" class="tabbar-modal-close-btn" @click="handleClose">
+              <text class="tabbar-modal-close-text">✕</text>
+            </view>
+          </view>
+        </slot>
+
+        <!-- 命令式传入的数据回执（ref 桥「传数据」的落点）；未传时不渲染 -->
+        <view v-if="payloadMessage.length > 0" class="tabbar-modal-payload-wrap">
+          <text
+            class="tabbar-modal-payload-msg"
+            :class="{ 'tabbar-modal-payload-msg--dark': isDark }"
+          >
+            {{ payloadMessage }}
+          </text>
+          <text class="tabbar-modal-payload-source">来自：{{ payloadSource }}</text>
+        </view>
+
+        <!-- 默认内容插槽（未传自定义 slot 时展示默认全屏覆盖解析卡片） -->
+        <slot>
+          <text
+            class="tabbar-modal-desc-text"
+            :class="{ 'tabbar-modal-desc-text--dark': isDark }"
+          >
+            在模式 0、2、3、4（尤其默认推荐的模式 4）下，暗色遮罩已将全屏及底部 TabBar 完全覆盖！
+          </text>
+
+          <!-- 关键原理解析卡片 -->
+          <view
+            class="tabbar-modal-tip-card"
+            :class="{ 'tabbar-modal-tip-card--dark': isDark }"
+          >
+            <text class="tabbar-modal-tip-text-green">
+              ✓ 全屏覆盖：模式 0/2/3/4 全端完美覆盖全屏（z-index: {{ props.zIndex }} &gt; 999）
+            </text>
+            <text class="tabbar-modal-tip-text-indigo">
+              ✓ 原生底座差异：模式 1 原生 TabBar 仅 H5 可遮挡，App/小程序为系统层级
+            </text>
+            <text class="tabbar-modal-tip-text-amber">
+              ✓ 微信环境适配：小程序端使用 root-portal 提升至 Page 根节点
+            </text>
+          </view>
+        </slot>
+
+        <!-- 底部插槽 / 默认操作按钮 -->
+        <slot name="footer">
+          <view class="tabbar-modal-confirm-btn" @click="handleClose">
+            <text class="tabbar-modal-confirm-text">{{ props.confirmText }}</text>
+          </view>
+        </slot>
+      </view>
+    </view>
+  </root-portal>
+  <!-- #endif -->
+
+  <!-- 非微信小程序端（App、H5 等）：无需 root-portal，直接由 position: fixed 覆盖 -->
+  <!-- #ifndef MP -->
+  <view
+    v-if="isShown"
+    class="tabbar-modal-mask-root"
+    :style="{ zIndex: props.zIndex }"
+  >
+    <!-- 暗色遮罩背景（点击空白处触发关闭） -->
+    <view class="tabbar-modal-backdrop" @click="handleMaskClick" />
+
+    <!-- 居中卡片本体 -->
+    <view
+      class="tabbar-modal-card"
+      :class="{ 'tabbar-modal-card--dark': isDark }"
+      :style="{ width: props.width }"
+    >
+      <!-- 头部插槽 / 默认标题栏 -->
+      <slot name="header">
+        <view
+          v-if="props.title.length > 0 || props.showClose"
+          class="tabbar-modal-header"
+        >
+          <view class="tabbar-modal-title-wrap">
+            <text v-if="props.icon.length > 0" class="tabbar-modal-icon">{{ props.icon }}</text>
+            <text
+              class="tabbar-modal-title-text"
+              :class="{ 'tabbar-modal-title-text--dark': isDark }"
+            >
+              {{ displayTitle }}
+            </text>
+          </view>
+          <view v-if="props.showClose" class="tabbar-modal-close-btn" @click="handleClose">
+            <text class="tabbar-modal-close-text">✕</text>
+          </view>
+        </view>
+      </slot>
+
+      <!-- 命令式传入的数据回执（ref 桥「传数据」的落点）；未传时不渲染 -->
+      <view v-if="payloadMessage.length > 0" class="tabbar-modal-payload-wrap">
+        <text
+          class="tabbar-modal-payload-msg"
+          :class="{ 'tabbar-modal-payload-msg--dark': isDark }"
+        >
+          {{ payloadMessage }}
+        </text>
+        <text class="tabbar-modal-payload-source">来自：{{ payloadSource }}</text>
+      </view>
+
+      <!-- 默认内容插槽（未传自定义 slot 时展示默认全屏覆盖解析卡片） -->
+      <slot>
+        <text
+          class="tabbar-modal-desc-text"
+          :class="{ 'tabbar-modal-desc-text--dark': isDark }"
+        >
+          在模式 0、2、3、4（尤其默认推荐的模式 4）下，暗色遮罩已将全屏及底部 TabBar 完全覆盖！
+        </text>
+
+        <!-- 关键原理解析卡片 -->
+        <view
+          class="tabbar-modal-tip-card"
+          :class="{ 'tabbar-modal-tip-card--dark': isDark }"
+        >
+          <text class="tabbar-modal-tip-text-green">
+            ✓ 全屏覆盖：模式 0/2/3/4 全端完美覆盖全屏（z-index: {{ props.zIndex }} &gt; 999）
+          </text>
+          <text class="tabbar-modal-tip-text-indigo">
+            ✓ 原生底座差异：模式 1 原生 TabBar 仅 H5 可遮挡，App/小程序为系统层级
+          </text>
+          <text class="tabbar-modal-tip-text-amber">
+            ✓ 微信环境适配：小程序端使用 root-portal 提升至 Page 根节点
+          </text>
+        </view>
+      </slot>
+
+      <!-- 底部插槽 / 默认操作按钮 -->
+      <slot name="footer">
+        <view class="tabbar-modal-confirm-btn" @click="handleClose">
+          <text class="tabbar-modal-confirm-text">{{ props.confirmText }}</text>
+        </view>
+      </slot>
+    </view>
+  </view>
+  <!-- #endif -->
+</template>
 
 <style lang="scss" scoped>
 .tabbar-modal-mask-root {

@@ -27,7 +27,7 @@ description: unibestX 最高底线 —— 任何代码都不能违反的框架�
 
 - **禁手写 HTML 标签与禁文本嵌套**：虽项目配置了 HTML 编译转换插件，但**未经开发者明确要求，一律严禁手写 `div`、`span`、`i`、`em`、`b` 等 HTML 标签**，必须直接使用 uni 原生 `<view>` 与 `<text>`；所有行内文本标签一律转为 `<text>`，且**严禁 `<text>` 嵌套 `<text>`**（原生渲染引擎报错或排版异常）。复合多色/不同字重文本必须使用 `<view class="flex flex-row flex-wrap">` 平铺并列兄弟 `<text>` 节点。
 - **严禁模板裸写 prop**：`<template>` 中禁止直接裸写 prop 属性名（如 `:border="border"`），必须使用 `props.xxx` 或收敛为 `computed` 变量（鸿蒙 ArkTS 无法自动解构 prop 且易与内置属性冲突导致编译报错）。
-- **条件指令单值化**：`v-if` / `v-else-if` / `v-show` 禁止包含 `&&` / `||` 复合逻辑表达式（如 `v-if="a && b"`），必须在 `<script setup>` 中收敛为单值 `computed` 计算属性（规避多端 AST 与小程序编译器语法告警）。
+- **条件指令单值化**：`v-if` / `v-else-if` / `v-show` 禁止包含 `&&` / `||` 复合逻辑表达式（如 `v-if="a && b"`），必须在 `<script setup>` 中收敛为单值 `computed` 计算属性（规避鸿蒙 ArkTS 编译器解析报错及小程序语法告警）。
 - **CSS 条件编译禁逻辑运算符**：CSS/SCSS 样式块中的条件编译严禁写 `||` / `&&`（只支持单平台宏如 `/* #ifdef APP-ANDROID */`，多条件不支持或会导致样式被重复注入引发对象序列化异常）。
 
 ## 4. 内置体系优先

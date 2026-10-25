@@ -21,17 +21,28 @@ definePage((options) => {
   const { platform, appName: _appName } = options;
   const { isH5, isAppIOS, isAppAndroid, isAppHarmony, isMpAlipay, isMpWeixin } = platform;
   return {
+    // --- 1. 页面标识与基础路由 ---
+    name: 'index', // 路由名：useRoute().name 优先读取此值，未显式声明时默认读取路径最后一个单词（如 index）
+    type: 'home', // 页面类型标识（仅首页配置 'home'，标记当前页面为应用全局启动首页，自动排在 pages.json 第 1 位）
+    needLogin: false, // 登录拦截标记：配置为 true 时，路由守卫拦截未登录访问并重定向至登录页,⚠️ 要重启
+
+    // --- 2. 本地沙盒独立调试 ---
+    debug: false, // 是否开启当前页面沙盒独立调试（设为 true 可单独编译此页；⚠️ 调试完成后改回 false）
+    debugHome: false, // 沙盒调试模式下是否将当前页面指定为启动首页（全局仅允许 1 个页面设为 true，排在 pages[0]）
+
+    // --- 3. 布局与容器外观 ---
+    layout: 'navbar', // 页面通用布局模板（'navbar' | 'default' | 'empty' | false | string）
     customPageClass: 'init-page', // 页面根容器自定义类名（配合 layout 布局使用，支持配置全局样式类）
     customPageStyle: 'background-color: transparent;', // 页面根容器自定义行内样式（穿透任何样式隔离，全端绝对生效）
-    name: 'index', // 路由名：useRoute().name 优先读取此值，未显式声明时默认读取路径最后一个单词（如 index）
-    debug: false, // 是否开启当前页面沙盒独立调试（设为 true 可单独调试此页；⚠️ 调试完成后改回 false）,🔔tabbar模式4下，支付宝小程序模式其他tabbar页面禁止使用,只有当前index页可以使用
-    debugHome: false, // 沙盒调试模式下是否将当前页面指定为启动首页（全局仅允许 1 个页面设为 true，排在 pages[0]）
-    type: 'home', // 页面类型标识（仅首页配置 'home'，标记当前页面为应用全局启动首页，自动排在 pages[0]）
-    layout: 'navbar', // 页面通用布局模板（采用 navbar 布局接管顶部导航与下拉滚动容器）
+
+    // --- 4. 导航栏与交互控制（配合 navbar 布局） ---
     showBack: false, // 导航栏左侧是否显示返回箭头（TabBar 首页无需返回按钮）
-    hideStatusBar: false, // 是否隐藏状态栏（true 为隐藏）
+    hideStatusBar: false, // 是否隐藏手机顶部系统状态栏占位（true 为隐藏占位）
     hideNavbar: false, // 是否隐藏顶部导航栏（false 为正常显示）
+    showNavbar: true, // 是否显示顶部导航栏（hideNavbar 的反向语义配置项）
     enablePullDownRefresh: !isH5, // 是否开启自定义下拉刷新（由 navbar 布局内的 scroll-view 驱动）
+
+    // --- 5. 窗口原生底层表现配置（写入 pages.json 中的 style） ---
     style: {
       navigationBarTitleText: isH5
         ? 'h5'
@@ -46,7 +57,8 @@ definePage((options) => {
                 : isMpWeixin
                   ? 'weixin'
                   : 'tabbar.home', // 页面与导航栏标题文本（支持 i18n 自动翻译）
-      navigationStyle: 'custom' // 导航栏样式设为自定义（隐藏系统原生导航栏）
+      navigationStyle: 'custom', // 导航栏样式设为自定义（隐藏系统原生固定导航栏，每页必须配置）
+      navigationBarBackgroundColor: '#059669' // 原生导航栏背景颜色
     }
   };
 });
@@ -79,6 +91,7 @@ onNavbarPullDownRefresh(() => {
 });
 
 // 与普通页面一致的首次进入 / 显示 / 隐藏生命周期
+// onMounted
 onIndexLoad(() => {
   // 💡 模式4的映射关系中，/index.uvue 映射到的实际页面路由是/tab/index，这是因为tabbar/index.uts中定义了映射关系
   // 💡 模式4 useRoute 获取的还是index的
@@ -87,10 +100,12 @@ onIndexLoad(() => {
   console.log('onIndexLoad', '首页挂载了👋');
 });
 
+// onPageShow
 onIndexShow(() => {
   console.log('onIndexShow', '首页显示了👀');
 });
 
+// onPageHide
 onIndexHide(() => {
   stopNavbarPullDownRefresh();
   console.log('onIndexHide', '首页隐藏了👉');

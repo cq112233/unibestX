@@ -1,5 +1,6 @@
 /**
  * 业务路由配置中心（黑白名单策略与页面路径）
+ * 默认黑名单策略 (默认无需登录，只在特定页面拦截)
  */
 
 export type LoginStrategyMap = {
@@ -50,16 +51,29 @@ export const LOGIN_PAGE_LIST: string[] = [LOGIN_PAGE, REGISTER_PAGE];
 export const DEFAULT_HOME_PAGE: string = '/src/pages/index/index';
 
 /**
- * 策略页面名单列表：
- * - 白名单模式下（isNeedLoginMode = true）：作为【免登录白名单】，名单内的页面直接放行免登，名单外的页面未登录时全部拦截并跳转登录页；
- * - 黑名单模式下（isNeedLoginMode = false）：作为【需登录黑名单】，名单内的页面必须登录才能访问，名单外的页面直接放行。
+ * 需登录黑名单列表（在黑名单模式 isNeedLoginMode = false 下生效）：
+ * - 默认所有页面均直接放行；
+ * - 仅在名单内的页面必须登录才能访问，未登录访问将被拦截并跳转登录页。
  */
-export const EXCLUDE_LOGIN_PATH_LIST: string[] = [
-  '/src/sub/routerParamsBasicDemo/routerParamsBasicDemo'
+export const NEED_LOGIN_BLACK_LIST: string[] = [
+  '/src/pages/index/index'
 ];
 
 /**
- * 语义化别名（方便按开发心智直观引用，与 EXCLUDE_LOGIN_PATH_LIST 共享同一份数组）
+ * 免登录白名单列表（在白名单模式 isNeedLoginMode = true 下生效）：
+ * - 默认所有页面均强制登录；
+ * - 仅在名单内的公开页面直接放行，免登录即可访问。
  */
-export const BLACK_LIST: string[] = EXCLUDE_LOGIN_PATH_LIST;
-export const WHITE_LIST: string[] = EXCLUDE_LOGIN_PATH_LIST;
+export const NO_NEED_LOGIN_WHITE_LIST: string[] = [
+  '/src/pages/index/index'
+];
+
+/**
+ * 语义化别名与向下兼容导出
+ */
+export const BLACK_LIST: string[] = NEED_LOGIN_BLACK_LIST;
+export const WHITE_LIST: string[] = NO_NEED_LOGIN_WHITE_LIST;
+/**
+ * @deprecated 建议优先使用语义明确的 NEED_LOGIN_BLACK_LIST 或 NO_NEED_LOGIN_WHITE_LIST
+ */
+export const EXCLUDE_LOGIN_PATH_LIST: string[] = NEED_LOGIN_BLACK_LIST;
