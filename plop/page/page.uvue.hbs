@@ -1,0 +1,80 @@
+<template>
+  <view class="flex flex-col flex-1 bg-[#f8fafc]">
+    <!-- 顶部标题或卡片 -->
+    <view class="w-full px-[16px] pt-[12px] pb-[8px]">
+      <view class="w-full bg-[#ffffff] border-[1px] border-solid border-[#e2e8f0] rounded-[8px] p-[16px]">
+        <text class="text-[16px] font-bold text-[#1e293b]">{{ title }}</text>
+        <text class="text-[12px] leading-[18px] text-[#64748b] mt-[4px]">
+          {{ description }}
+        </text>
+      </view>
+    </view>
+
+    <!-- 纵向滚动内容区域（非分页长列表） -->
+    <scroll-view direction="vertical" class="flex-1 flex flex-col px-[16px]">
+      <view class="flex flex-col pb-[24px]">
+        <!-- 业务卡片项插槽或内容 -->
+        <view class="w-full bg-[#ffffff] border-[1px] border-solid border-[#e2e8f0] rounded-[8px] p-[14px] mt-[10px]">
+          <text class="text-[14px] text-[#334155]">内容区域</text>
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+</template>
+
+<script setup lang="uts">
+import { ref } from 'vue';
+import { useRoute, useRouter } from '@/uni_modules/route-bestX/index.uts';
+{{#if needApi}}
+import { fetch{{ pascalCase name }}ListApi } from '@/src/api/{{ module }}/{{ camelCase name }}.uts';
+import type { {{ pascalCase name }}Item } from '@/src/api/{{ module }}/{{ camelCase name }}.uts';
+{{/if}}
+
+/**
+ * 页面契约配置（按 unibestX 分册 4 规范显式声明所有基础项）
+ */
+definePage({
+  name: '{{ camelCase name }}',
+  debug: false,
+  debugHome: false,
+  layout: 'navbar',
+  showBack: true,
+  hideStatusBar: false,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
+  style: {
+    navigationBarTitleText: '{{ title }}',
+    navigationStyle: 'custom'
+  }
+});
+
+/** 当前路由快照 */
+const route = useRoute();
+/** 路由控制器 */
+const router = useRouter();
+
+{{#if needApi}}
+/** 列表数据 */
+const list = ref<Array<{{ pascalCase name }}Item>>([]);
+/** 加载状态 */
+const loading = ref<boolean>(false);
+
+/** 加载数据 */
+function loadData(): void {
+  loading.value = true;
+  fetch{{ pascalCase name }}ListApi(1, 20)
+    .then((res) => {
+      list.value = res.list;
+    })
+    .finally(() => {
+      loading.value = false;
+    });
+}
+
+loadData();
+{{/if}}
+</script>
+
+<style scoped>
+/* 遵循原生样式限制：优先使用原子类，严禁使用 gap / space-* */
+</style>

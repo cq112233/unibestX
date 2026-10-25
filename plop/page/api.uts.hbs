@@ -1,0 +1,62 @@
+import { http } from '@/src/http/index.uts';
+
+/**
+ * {{ title }} 数据实体契约（一律使用 type，禁止 interface）
+ */
+export type {{ pascalCase name }}Item = {
+  id: string;
+  title: string;
+  description: string;
+  createTime: string;
+};
+
+/**
+ * 分页容器契约
+ */
+export type {{ pascalCase name }}PageResult = {
+  list: Array<{{ pascalCase name }}Item>;
+  total: number;
+  hasMore: boolean;
+};
+
+/**
+ * 获取 {{ title }} 列表接口
+ * @param pageNo 当前页码
+ * @param pageSize 每页条数
+ * @param keyword 搜索关键字
+ */
+export function fetch{{ pascalCase name }}ListApi(
+  pageNo: number = 1,
+  pageSize: number = 10,
+  keyword: string = ''
+): Promise<{{ pascalCase name }}PageResult> {
+  // 后端就绪前先提供标准 Mock 结构，就绪后直接换函数体为 http.get
+  const mockList: Array<{{ pascalCase name }}Item> = [
+    {
+      id: '1',
+      title: '示例项目 1',
+      description: '这是一个自动生成的示例项',
+      createTime: '2026-10-25 10:00:00'
+    },
+    {
+      id: '2',
+      title: '示例项目 2',
+      description: '这是一个自动生成的示例项',
+      createTime: '2026-10-25 11:00:00'
+    }
+  ];
+
+  return Promise.resolve({
+    list: mockList,
+    total: mockList.length,
+    hasMore: false
+  } as {{ pascalCase name }}PageResult);
+
+  /* 真实接口调用先例：
+  return http.get<{{ pascalCase name }}PageResult>('/api/{{ module }}/{{ camelCase name }}/list', {
+    pageNo,
+    pageSize,
+    keyword
+  });
+  */
+}
