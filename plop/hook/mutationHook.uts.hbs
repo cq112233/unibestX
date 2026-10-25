@@ -1,0 +1,40 @@
+import { computed } from 'vue';
+import { useMutation, useQueryClient } from '@/uni_modules/request-bestX/index.uts';
+import type { MutationOptions } from '@/uni_modules/request-bestX/index.uts';
+
+/**
+ * {{ description }} 入参契约（一律使用 type，禁止 interface）
+ */
+export type {{ pascalCase entityName }}Input = {
+  title: string;
+};
+
+/**
+ * {{ description }} Hook（遵循 Mutation 词根语义化，基于 useMutation 写入与缓存失效联动）
+ */
+export function {{ hookName }}() {
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation<boolean, {{ pascalCase entityName }}Input>({
+    mutationFn: (input: {{ pascalCase entityName }}Input): Promise<boolean> => {
+      // TODO: 替换为实际业务 API 函数，如 create{{ pascalCase entityName }}Api(input)
+      console.log('执行 {{ hookName }} 变更提交:', input);
+      return Promise.resolve(true);
+    },
+    onSuccess: () => {
+      // 写入成功后，自动失效关联的查询缓存前缀，触发列表自动重拉
+      queryClient.invalidateQueries(['{{ camelCase entityName }}', 'list']);
+    }
+  } as MutationOptions<boolean, {{ pascalCase entityName }}Input>);
+
+  return {
+    isPending: computed<boolean>((): boolean => mutation.isPending.value),
+    isSuccess: computed<boolean>((): boolean => mutation.isSuccess.value),
+    mutate: (input: {{ pascalCase entityName }}Input): void => {
+      mutation.mutate(input);
+    },
+    mutateAsync: (input: {{ pascalCase entityName }}Input): Promise<boolean> => {
+      return mutation.mutateAsync(input);
+    }
+  };
+}

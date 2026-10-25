@@ -1,24 +1,9 @@
 <template>
-  <view class="flex flex-col flex-1 bg-[#f8fafc]">
-    <!-- 顶部标题或卡片 -->
-    <view class="w-full px-[16px] pt-[12px] pb-[8px]">
-      <view class="w-full bg-[#ffffff] border-[1px] border-solid border-[#e2e8f0] rounded-[8px] p-[16px]">
-        <text class="text-[16px] font-bold text-[#1e293b]">{{ title }}</text>
-        <text class="text-[12px] leading-[18px] text-[#64748b] mt-[4px]">
-          {{ description }}
-        </text>
-      </view>
+  <view class="flex flex-col flex-1">
+    <!-- 业务内容区域 -->
+    <view class="flex flex-col items-center justify-center py-[48px]">
+      <text class="text-[14px] text-[#94a3b8]">内容区域</text>
     </view>
-
-    <!-- 纵向滚动内容区域（非分页长列表） -->
-    <scroll-view direction="vertical" class="flex-1 flex flex-col px-[16px]">
-      <view class="flex flex-col pb-[24px]">
-        <!-- 业务卡片项插槽或内容 -->
-        <view class="w-full bg-[#ffffff] border-[1px] border-solid border-[#e2e8f0] rounded-[8px] p-[14px] mt-[10px]">
-          <text class="text-[14px] text-[#334155]">内容区域</text>
-        </view>
-      </view>
-    </scroll-view>
   </view>
 </template>
 
@@ -26,8 +11,10 @@
 import { ref } from 'vue';
 import { useRoute, useRouter } from '@/uni_modules/route-bestX/index.uts';
 {{#if needApi}}
+import { useQuery } from '@/uni_modules/request-bestX/index.uts';
+import type { QueryFunctionContext, QueryOptions } from '@/uni_modules/request-bestX/index.uts';
 import { fetch{{ pascalCase name }}ListApi } from '@/src/api/{{ module }}/{{ camelCase name }}.uts';
-import type { {{ pascalCase name }}Item } from '@/src/api/{{ module }}/{{ camelCase name }}.uts';
+import type { {{ pascalCase name }}PageResult } from '@/src/api/{{ module }}/{{ camelCase name }}.uts';
 {{/if}}
 
 /**
@@ -54,24 +41,22 @@ const route = useRoute();
 const router = useRouter();
 
 {{#if needApi}}
-/** 列表数据 */
-const list = ref<Array<{{ pascalCase name }}Item>>([]);
-/** 加载状态 */
-const loading = ref<boolean>(false);
+/** 当前分页查询参数 */
+const pageNo = ref<number>(1);
+const pageSize = ref<number>(10);
+const keyword = ref<string>('');
 
-/** 加载数据 */
-function loadData(): void {
-  loading.value = true;
-  fetch{{ pascalCase name }}ListApi(1, 20)
-    .then((res) => {
-      list.value = res.list;
-    })
-    .finally(() => {
-      loading.value = false;
-    });
-}
-
-loadData();
+/**
+ * 基于 useQuery 的响应式异步查询（自动维护 loading / error / 缓存与重试）
+ */
+const query = useQuery<{{ pascalCase name }}PageResult>({
+  queryKey: ['{{ camelCase module }}', '{{ camelCase name }}', 'list', pageNo, pageSize, keyword],
+  queryFn: (_ctx: QueryFunctionContext): Promise<{{ pascalCase name }}PageResult> => {
+    return fetch{{ pascalCase name }}ListApi(pageNo.value, pageSize.value, keyword.value);
+  },
+  staleTime: 30000,
+  retry: 1
+} as QueryOptions<{{ pascalCase name }}PageResult>);
 {{/if}}
 </script>
 

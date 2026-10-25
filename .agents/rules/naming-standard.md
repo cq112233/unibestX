@@ -26,7 +26,9 @@ description: 命名规范 —— 写新文件 / 新符号、或需要校验命�
 | 类型 / 接口契约 | PascalCase，**必须 `type`** | `OrderItem`、`PageResult<T>` |
 | 函数（普通） | camelCase，动词开头 | `formatAmount`、`loadPage` |
 | 接口函数 | `fetchXxxListApi` / `fetchXxxDetailApi` / `createXxxApi` / `updateXxxApi` / `deleteXxxApi` | `fetchOrderListApi` |
-| composable | `use` + PascalCase | `useThemeStore`、`useBackPressExit` |
+| composable（API 查询 Hook） | `use<Entity>Query`（必须以 `Query` 结尾） | `useOrderListQuery`、`useUserDetailQuery` |
+| composable（API 变更 Hook） | `use<Action><Entity>Mutation`（必须以 `Mutation` 结尾） | `useCreateOrderMutation`、`useLoginMutation` |
+| composable（普通前端 Hook） | `use` + 纯动作/能力（**严禁**包含 Query/Mutation 词根） | `useCountdown`、`useBackPressExit`、`useFormValidator` |
 | 常量 | UPPER_SNAKE | `PAGE_SIZE`、`LOCAL_ORDER_LIST` |
 | 布尔变量 | `is` / `has` / `can` / `should` 开头 | `isLoading`、`hasMore` |
 | 事件处理 | `on` + 名词 + 动作 | `onSelectTab`、`onOpenDetail` |
