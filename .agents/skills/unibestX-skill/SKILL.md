@@ -106,6 +106,7 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 
 **处理逻辑（强制）**：
 
+- **脚手架优先（极低 Token 消耗）**：新建页面、组件或 Hook 时，优先推荐使用内置脚手架命令 `pnpm plop page` / `pnpm plop component` / `pnpm plop hook` 秒级生成标准骨架，杜绝语法错误并大幅降低 Token 消耗。
 - **模板与案例优先**：页面结构照分册 4 的标杆案例、分册 4 的标准模板，不自创骨架。统一使用 `components/`，不设 `common/`；`components/` 与 `modules/` 均按需创建，简单业务默认只写根页面，不为了拆分而创建目录。
 - **视觉方向先于组件堆叠**：新建或重做界面时，先按分册 11 写紧凑设计计划，明确业务主体、唯一任务、4–6 个颜色 Token、3–5 级排版层级与一个 signature，再选组件与样式。
 - **UTS 语法铁律**：`type` 不用 `interface`、空值用 `null` 不用 `undefined`、基础类型比较用 `==` / `!=`、条件必须显式布尔（见 A.2 第 1–4 条）。

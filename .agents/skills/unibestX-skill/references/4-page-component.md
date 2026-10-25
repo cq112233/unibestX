@@ -25,6 +25,16 @@
 9. Query / Mutation 解构出的状态本身是 Ref：模板直接写 `listPending`，不写 `listPending.value`；script 内读值才写 `.value`。
 10. TabBar 页和普通页都是 `<page>.uvue` 根组件，**没有 `views/` 文件夹**；TabBar 页只是额外接入 TabBar 页面语义。
 
+### 4.0.1 脚手架极速生成（低 Token 模式）
+
+> 💡 **AI 与开发者必读**：新建页面、组件或 Hook 时，**强烈推荐优先运行项目内置的 Plop 脚手架命令**。无需从零手写长篇骨架模板，既保证 100% 符合 UTS 与分册规范，又能节省 70% 以上的 Token 消耗：
+
+| 命令 | 适用场景 | 自动生成物与特性 |
+| :--- | :--- | :--- |
+| `pnpm plop page` | 新建分包业务页 / 主包页 | 自动创建 `src/sub/<module>/<page>/<page>.uvue` + 同步创建 `src/api/<module>/<page>.uts` 接口契约，内置 `useQuery` 数据流与 `definePage` 契约 |
+| `pnpm plop component` | 新建展示组件 | 自动扫描现有页面或模块列表，精准落位到对应的 `components/` 目录，内置 Props / Emits 强类型签名 |
+| `pnpm plop hook` | 新建业务 Hook | 严格遵循词根语义化：自动生成 `use<Entity>Query`（读接口+useQuery）、`use<Action>Mutation`（写接口+useMutation）或纯前端普通 Hook |
+
 ---
 
 ## 4.1 页面与组件职责
