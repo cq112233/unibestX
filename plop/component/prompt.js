@@ -29,10 +29,13 @@ export default {
     {
       type: 'input',
       name: 'name',
-      message: '请输入组件名称（PascalCase，如 OrderCard 或 UserBadge）：',
+      message: '请输入组件英文名称（PascalCase，如 OrderCard 或 UserBadge）：',
       validate: (value) => {
         if (!value || !value.trim()) {
           return '组件名称不能为空！';
+        }
+        if (!/^[a-z][a-z0-9]*$/i.test(value.trim())) {
+          return '组件名称必须是英文字母开头的标识符（如 OrderCard，不可使用中文）！';
         }
         return true;
       }

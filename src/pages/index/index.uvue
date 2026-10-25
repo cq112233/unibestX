@@ -9,6 +9,7 @@ import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/layout
 
 import TabPageHost from '@/src/tabbar/components/TabPageHost.uvue';
 import IndexHeader from './components/IndexHeader.uvue';
+import AiSkillSection from './components/AiSkillSection.uvue';
 import IdeSection from './components/IdeSection.uvue';
 import FeatureGrid from './components/FeatureGrid.uvue';
 import EngineeringSection from './components/EngineeringSection.uvue';
@@ -102,7 +103,10 @@ onIndexHide(() => {
       <!-- 1. 顶部 Header、环境信息卡片与简介 -->
       <IndexHeader />
 
-      <!-- 2. 推荐 IDE 与开发环境 -->
+      <!-- 2. 🤖 内置 unibestX-skill（AI 极速开发与 Token 节流引擎） -->
+      <AiSkillSection />
+
+      <!-- 3. 推荐 IDE 与开发环境 -->
       <IdeSection />
 
       <!-- 3. ⚡ 核心特性网格 -->

@@ -1,0 +1,96 @@
+<script setup lang="uts">
+type SkillPillarItem = {
+  id: string;
+  icon: string;
+  title: string;
+  badge: string;
+  desc: string;
+};
+
+const agentList: Array<string> = ['Claude Code', 'Antigravity', 'Cursor', 'Trae', 'VSCode Copilot'];
+
+const pillarList: Array<SkillPillarItem> = [
+  {
+    id: 'compile',
+    icon: '⚡',
+    title: '一次编译通过',
+    badge: '55 条红线护航',
+    desc: '深度攻克 UTS 名义强类型（禁 interface）、Kotlin 编译解析、运行时 ClassCastException 与循环依赖死锁等，彻底消除 AI 盲写报错'
+  },
+  {
+    id: 'token',
+    icon: '📉',
+    title: '极致削减 Token',
+    badge: '节省 70%+ 消耗',
+    desc: '「1 个轻量入口 + 11 专项分册」懒加载治理，封锁庞大依赖目录防误扫；结合 plop 模板增量生成，免除 AI 重复默写样板代码'
+  },
+  {
+    id: 'spec',
+    icon: '📐',
+    title: '业务架构规范直出',
+    badge: '结构接口同交付',
+    desc: '自动遵循 definePage 全配置、页面上固定下滚动骨架、src/api 业务模块强类型契约与 UI 美学规范，架构严谨统一'
+  }
+];
+</script>
+
+<template>
+  <div class="mt-[16px] mx-[16px]">
+    <div class="flex flex-row items-center justify-between mb-[10px]">
+      <div class="flex flex-row items-center">
+        <span class="text-[14px] font-bold text-[#1e293b]">🤖 内置 unibestX-skill</span>
+        <span class="text-[10px] font-medium px-[6px] py-[1px] ml-[6px] rounded-[4px] text-[#0284c7] bg-[#0284c714]">
+          AI 极速开发 · Token 节流
+        </span>
+      </div>
+      <span class="text-[11px] text-[#94a3b8]">跨 Agent 通用规范</span>
+    </div>
+
+    <div class="p-[14px] rounded-[12px] border-[1px] border-solid bg-[#f8fafc] border-[#e2e8f0]">
+      <span class="text-[12px] leading-[22px] text-[#475569]">
+        专为大模型与 AI Agent 定制开发的专属技能知识库。核心宗旨是让 AI 在 uni-app X 项目中
+        <span class="font-bold text-[#0f172a]">写出能一次编译通过的原生代码</span>，并从架构层面
+        <span class="font-bold text-[#0284c7]">最大化降低上下文 Token 消耗</span>，杜绝循环调试与盲猜试错。
+      </span>
+
+      <!-- 兼容的主流 Agent 列表 -->
+      <div class="flex flex-row flex-wrap mt-[8px]">
+        <span
+          v-for="agent in agentList"
+          :key="agent"
+          class="text-[10px] font-medium px-[6px] py-[1px] mr-[6px] mb-[6px] rounded-[4px] text-[#4338ca] bg-[#6366f114]"
+        >
+          {{ agent }}
+        </span>
+      </div>
+
+      <!-- 三大核心支柱 -->
+      <div v-for="item in pillarList" :key="item.id" class="flex flex-row mt-[12px]">
+        <span class="text-[14px] mr-[8px]">{{ item.icon }}</span>
+        <div class="flex-1 flex flex-col">
+          <div class="flex flex-row items-center">
+            <span class="text-[12px] font-bold text-[#1e293b]">
+              {{ item.title }}
+            </span>
+            <span class="text-[9px] font-medium px-[5px] py-[1px] ml-[6px] rounded-[3px] text-[#059669] bg-[#10b98114]">
+              {{ item.badge }}
+            </span>
+          </div>
+          <span class="text-[11px] leading-[17px] mt-[2px] text-[#64748b]">
+            {{ item.desc }}
+          </span>
+        </div>
+      </div>
+
+      <!-- 配置文件提示 -->
+      <div class="mt-[12px] pt-[10px] border-t-[1px] border-solid border-[#e2e8f0] flex flex-row items-center justify-between">
+        <span class="text-[10px] text-[#94a3b8]" style="font-family: monospace;">
+          .agents/skills/unibestX-skill/ · plopfile.js
+        </span>
+        <span class="text-[10px] text-[#64748b]">单物理源 · 多端软链同步</span>
+      </div>
+    </div>
+  </div>
+</template>
+
+<style scoped></style>

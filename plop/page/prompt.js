@@ -18,11 +18,14 @@ export default {
     {
       type: 'input',
       name: 'module',
-      message: '请输入业务模块名（如 order、user、goods）：',
+      message: '请输入业务模块名（英文标识符，如 order、user、goods）：',
       when: answers => answers.location === 'subModule',
       validate: (value) => {
         if (!value || !value.trim()) {
           return '模块名不能为空！';
+        }
+        if (!/^[a-z][\w-]*$/i.test(value.trim())) {
+          return '模块名必须是英文字母开头的英文标识符（不可使用中文或特殊字符）！';
         }
         return true;
       }
@@ -30,10 +33,13 @@ export default {
     {
       type: 'input',
       name: 'name',
-      message: '请输入页面名称（camelCase 或 kebab-case，如 orderList 或 detail）：',
+      message: '请输入页面英文名（英文 camelCase/kebab-case，如 orderList、detail）：',
       validate: (value) => {
         if (!value || !value.trim()) {
           return '页面名称不能为空！';
+        }
+        if (!/^[a-z][\w-]*$/i.test(value.trim())) {
+          return '页面名称必须是英文字母开头的英文标识符（uni-app 编译器不支持中文路径，中文请在下一步标题中输入）！';
         }
         return true;
       }
@@ -41,7 +47,7 @@ export default {
     {
       type: 'input',
       name: 'title',
-      message: '请输入页面中文标题（用于导航栏与 definePage）：',
+      message: '请输入页面中文标题（用于导航栏展示与 definePage 标题）：',
       default: answers => answers.name
     },
     {
@@ -60,7 +66,8 @@ export default {
   actions: (data) => {
     const actions = [];
     let pagePath = '';
-    const moduleName = data.module ? data.module : data.name;
+    // 确保 module 变量有有效值供模板使用
+    data.module = data.module ? data.module : data.name;
 
     // 确定页面生成路径
     if (data.location === 'subModule') {
@@ -84,7 +91,7 @@ export default {
     if (data.needApi) {
       actions.push({
         type: 'add',
-        path: `src/api/${moduleName}/{{ camelCase name }}.uts`,
+        path: 'src/api/{{ camelCase module }}/{{ camelCase name }}.uts',
         templateFile: 'plop/page/api.uts.hbs',
         abortOnFail: false
       });
