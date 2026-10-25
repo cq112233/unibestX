@@ -61,3 +61,6 @@ description: unibestX 最高底线 —— 任何代码都不能违反的框架�
 > - 接口层写法（`http` / `useQuery` / mock） → 分册 6
 > - 工具库与生态库速查 → 分册 7
 > - 路由 `useRoute` / `useRouter` 手册 → 分册 8
+> - TabBar 业务导航手册 → 分册 9
+> - HTTP 网络层与异步状态 → 分册 10
+> - 前端设计美学手册 → 分册 11
