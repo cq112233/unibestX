@@ -3,134 +3,158 @@
     "scope": "vue,uvue",
     "prefix": "v3",
     "body": [
-      "<script lang=\"uts\" setup>",
+      "<script setup lang=\"uts\">",
       "definePage({",
-      "  customPageClass: '.root-page', // 页面根容器自定义类名（配合 layout 布局使用，支持配置全局样式类）",
-      "  customPageStyle: 'background-color: transparent;', // 页面根容器自定义行内样式（穿透任何样式隔离，全端绝对生效）",
-      "  debug: false, // 是否开启当前页面沙盒独立调试（设为 true 可单独调试此页；⚠️ 调试完成后改回 false）",
-      "  debugHome: false, // 沙盒调试模式下是否将当前页面指定为启动首页（全局仅允许 1 个页面设为 true，排在 pages[0]）",
-      "  layout: 'navbar', // 页面通用布局模板（采用 navbar 布局接管顶部导航与下拉滚动容器）",
-      "  showBack: true, // 导航栏左侧是否显示返回箭头（TabBar 首页无需返回按钮）",
-      "  hideNavbar: false, // 是否隐藏顶部导航栏（false 为正常显示）",
-      "  enablePullDownRefresh: false, // 是否开启自定义下拉刷新（由 navbar 布局内的 scroll-view 驱动）",
+      "  name: '$1',",
+      "  debug: false,",
+      "  debugHome: false,",
+      "  layout: 'navbar',",
+      "  showBack: true,",
+      "  hideStatusBar: false,",
+      "  hideNavbar: false,",
+      "  enablePullDownRefresh: false,",
       "  style: {",
-      "    navigationBarBackgroundColor: '#ffffff', // 导航栏背景颜色（十六进制颜色值）",
-      "    navigationBarTitleText: '$1', // 页面与导航栏标题文本",
-      "    navigationStyle: 'custom' // 导航栏样式设为自定义（隐藏系统原生导航栏）",
+      "    navigationBarTitleText: '$2',",
+      "    navigationStyle: 'custom'",
       "  }",
-      "})",
+      "});",
       "</script>",
       "",
       "<template>",
       "  <view class=\"flex flex-col flex-1\">",
-      "    <text>$2</text>",
+      "    <text class=\"text-[14px] text-[#334155]\">$3</text>",
       "  </view>",
       "</template>",
       "",
-      "<style lang=\"scss\" scoped>",
+      "<style scoped>",
       "</style>",
       ""
     ],
-    "description": "uni-app X 页面 SFC（含完整 navbar 布局 definePage / template / 样式隔离 2.0 scoped）"
+    "description": "uni-app X 标准业务页面 SFC（严格契合 ESLint vue/block-order 与 definePage 规范）"
   },
   "Print uni-app X Component SFC": {
     "scope": "vue,uvue",
     "prefix": "v3c",
     "body": [
-      "<script lang=\"uts\" setup>",
-      "defineOptions({",
-      "  name: '$1',",
-      "  styleIsolation: 'isolated', // 表示隔离，不受外部影响",
-      "})",
+      "<script setup lang=\"uts\">",
+      "const props = defineProps({",
+      "  title: {",
+      "    type: String,",
+      "    required: true",
+      "  }",
+      "});",
+      "",
+      "const emit = defineEmits<{",
+      "  (e: 'click'): void;",
+      "}>();",
       "</script>",
       "",
       "<template>",
-      "  <view class=\"\">",
-      "    <text>$2</text>",
+      "  <view class=\"flex flex-col bg-[#ffffff] border-[1px] border-solid border-[#e2e8f0] rounded-[8px] p-[14px]\" @click=\"emit('click')\">",
+      "    <text class=\"text-[14px] font-semibold text-[#1e293b]\">{{ props.title }}</text>",
       "  </view>",
       "</template>",
       "",
-      "<style lang=\"scss\" scoped>",
+      "<style scoped>",
       "</style>",
       ""
     ],
-    "description": "uni-app X 组件 SFC（含 defineOptions / styleIsolation: isolated / scoped 样式）"
+    "description": "uni-app X 标准纯展示组件 SFC（严格契合 UTS 强类型 Props/Emits 与 ESLint block-order）"
   },
   "Print uni-app X Script (Page)": {
     "scope": "vue,uvue",
     "prefix": "sc",
     "body": [
-      "<script lang=\"uts\" setup>",
+      "<script setup lang=\"uts\">",
       "definePage({",
+      "  name: '$1',",
+      "  debug: false,",
+      "  debugHome: false,",
+      "  layout: 'navbar',",
+      "  showBack: true,",
+      "  hideStatusBar: false,",
+      "  hideNavbar: false,",
+      "  enablePullDownRefresh: false,",
       "  style: {",
-      "    navigationBarTitleText: '$1',",
-      "  },",
-      "})",
+      "    navigationBarTitleText: '$2',",
+      "    navigationStyle: 'custom'",
+      "  }",
+      "});",
       "</script>",
       ""
     ],
-    "description": "uni-app X 页面 script 块（含 definePage）"
+    "description": "uni-app X 页面 script 块（全量规范 definePage 契约）"
   },
   "Print uni-app X Script (Component)": {
     "scope": "vue,uvue",
     "prefix": "scc",
     "body": [
-      "<script lang=\"uts\" setup>",
-      "defineOptions({",
-      "  name: '$1',",
-      "  styleIsolation: 'isolated', // 表示隔离，不受外部影响",
-      "})",
+      "<script setup lang=\"uts\">",
+      "const props = defineProps({",
+      "  $1: {",
+      "    type: String,",
+      "    default: ''",
+      "  }",
+      "});",
       "</script>",
       ""
     ],
-    "description": "uni-app X 组件 script 块（含 defineOptions / styleIsolation: isolated）"
+    "description": "uni-app X 组件 script 块（含 UTS 强类型 defineProps）"
   },
   "Print uni-app X Template": {
     "scope": "vue,uvue",
     "prefix": "te",
     "body": [
       "<template>",
-      "  <view class=\"\">",
-      "    <text>$1</text>",
+      "  <view class=\"flex flex-col\">",
+      "    <text class=\"text-[14px] text-[#334155]\">$1</text>",
       "  </view>",
       "</template>",
       ""
     ],
-    "description": "uni-app X 模板块（规范包含 text 标签）"
+    "description": "uni-app X 模板块（规范包含 text 标签与原子类）"
   },
   "Print uni-app X Style": {
     "scope": "vue,uvue",
     "prefix": "st",
     "body": [
-      "<style lang=\"scss\" scoped>",
-      "//$1",
+      "<style scoped>",
       "</style>",
       ""
     ],
-    "description": "uni-app X 样式块（样式隔离 2.0 scoped）"
+    "description": "uni-app X 样式块（默认 scoped，优先原子类）"
   },
   "Vue Macro definePage": {
     "scope": "vue,uvue,typescript,javascript",
     "prefix": ["definePage", "defpage"],
     "body": [
       "definePage({",
+      "  name: '$1',",
+      "  debug: false,",
+      "  debugHome: false,",
+      "  layout: 'navbar',",
+      "  showBack: true,",
+      "  hideStatusBar: false,",
+      "  hideNavbar: false,",
+      "  enablePullDownRefresh: false,",
       "  style: {",
-      "    navigationBarTitleText: '$1',",
-      "  },",
-      "})"
+      "    navigationBarTitleText: '$2',",
+      "    navigationStyle: 'custom'",
+      "  }",
+      "});"
     ],
-    "description": "uni-app X 页面配置宏：definePage"
+    "description": "uni-app X 页面配置宏：完整契约 definePage"
   },
   "Vue Macro defineProps": {
     "scope": "vue,uvue,typescript,javascript",
     "prefix": ["defineProps", "defprops"],
     "body": [
-      "defineProps({",
+      "const props = defineProps({",
       "  $1: {",
       "    type: ${2:String},",
-      "    default: ${3:'$4'},",
-      "  },",
-      "})"
+      "    default: ${3:''}",
+      "  }",
+      "});"
     ],
     "description": "Vue 3 / UTS 宏：defineProps"
   },
@@ -138,9 +162,11 @@
     "scope": "vue,uvue,typescript,javascript",
     "prefix": ["defineEmits", "defemits"],
     "body": [
-      "const emit = defineEmits(['$1'])"
+      "const emit = defineEmits<{",
+      "  (e: '$1'): void;",
+      "}>();"
     ],
-    "description": "Vue 3 / UTS 宏：defineEmits"
+    "description": "Vue 3 / UTS 强类型宏：defineEmits"
   },
   "Vue Macro defineExpose": {
     "scope": "vue,uvue,typescript,javascript",

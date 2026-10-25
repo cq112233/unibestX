@@ -28,7 +28,12 @@ export function {{ hookName }}() {
   const pageSize = ref<number>(10);
   const keyword = ref<string>('');
 
-  const query = useQuery<{{ pascalCase entityName }}PageResult>({
+  const {
+    data,
+    isPending,
+    isError,
+    refetch
+  } = useQuery<{{ pascalCase entityName }}PageResult>({
     queryKey: ['{{ camelCase entityName }}', 'list', pageNo, pageSize, keyword],
     queryFn: (_ctx: QueryFunctionContext): Promise<{{ pascalCase entityName }}PageResult> => {
       // TODO: 替换为实际业务 API 函数，如 fetch{{ pascalCase entityName }}ListApi(pageNo.value, pageSize.value, keyword.value)
@@ -41,13 +46,12 @@ export function {{ hookName }}() {
         total: mockList.length,
         hasMore: false
       } as {{ pascalCase entityName }}PageResult);
-    },
-    staleTime: 30000,
-    retry: 1
+    }
   } as QueryOptions<{{ pascalCase entityName }}PageResult>);
 
-  const list = computed<Array<{{ pascalCase entityName }}Item>>(() : Array<{{ pascalCase entityName }}Item> => {
-    return query.data.value?.list ?? ([] as Array<{{ pascalCase entityName }}Item>);
+  const list = computed<Array<{{ pascalCase entityName }}Item>>((): Array<{{ pascalCase entityName }}Item> => {
+    const res = data.value;
+    return res != null ? res.list : ([] as Array<{{ pascalCase entityName }}Item>);
   });
 
   function search(kw: string): void {
@@ -65,12 +69,10 @@ export function {{ hookName }}() {
     pageSize,
     keyword,
     list,
-    loading: computed<boolean>((): boolean => query.isPending.value),
-    isError: computed<boolean>((): boolean => query.isError.value),
+    loading: isPending,
+    isError,
     search,
     reset,
-    refetch: (): void => {
-      query.refetch();
-    }
+    refetch
   };
 }

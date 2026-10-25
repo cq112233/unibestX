@@ -288,6 +288,7 @@ uni-app X 采用 UTS (uni type script) 语言与原生渲染引擎，跨端直�
 - [ ] **10. 严禁 `.uts` / `.ts` / `.js` 循环依赖**：依赖图必须是单向 DAG，严禁底包反向 import 或多层重导出，彻底杜绝 Android 类初始化死锁（详见分册 1.22）。
 - [ ] **11. 页面跳转走 `useRouter()`，取路由走 `useRoute()`**：严禁原生 `uni.navigateTo`，严禁 `onLoad((options) => ...)`（详见分册 8）。
 - [ ] **12. 新增页面必须接入 `src/api/<module>/` 业务模块接口层**：页面与组件内严禁 `ref([...])` 硬编码假数据（详见分册 6）。
+- [ ] **13. 严禁裸写 HTML 标签与禁止文本嵌套**：虽配置了转换插件，但未经开发者明确要求严禁手写 `div`、`span`、`i`、`em`、`b` 等，一律使用 uni 原生 `<view>` 与 `<text>`；所有行内标签一律转为 `<text>` 且**严禁 `<text>` 内部嵌套 `<text>`**，多色/不同字重文本必须用 `<view class="flex flex-row flex-wrap">` 平铺并列兄弟 `<text>` 节点（详见分册 2.4）。
 
 ---
 

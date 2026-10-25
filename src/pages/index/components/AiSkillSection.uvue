@@ -47,11 +47,14 @@ const pillarList: Array<SkillPillarItem> = [
     </div>
 
     <div class="p-[14px] rounded-[12px] border-[1px] border-solid bg-[#f8fafc] border-[#e2e8f0]">
-      <span class="text-[12px] leading-[22px] text-[#475569]">
-        专为大模型与 AI Agent 定制开发的专属技能知识库。核心宗旨是让 AI 在 uni-app X 项目中
-        <span class="font-bold text-[#0f172a]">写出能一次编译通过的原生代码</span>，并从架构层面
-        <span class="font-bold text-[#0284c7]">最大化降低上下文 Token 消耗</span>，杜绝循环调试与盲猜试错。
-      </span>
+      <!-- 简介文案：平级 span 并列，严禁 span 嵌套 span -->
+      <div class="flex flex-row flex-wrap">
+        <span class="text-[12px] leading-[22px] text-[#475569]">专为大模型与 AI Agent 定制开发，核心宗旨是让 AI 在 uni-app X 项目中</span>
+        <span class="text-[12px] leading-[22px] font-bold text-[#0f172a]">写出能一次编译通过的原生代码</span>
+        <span class="text-[12px] leading-[22px] text-[#475569]">，并从架构层面</span>
+        <span class="text-[12px] leading-[22px] font-bold text-[#0284c7]">最大化降低上下文 Token 消耗</span>
+        <span class="text-[12px] leading-[22px] text-[#475569]">，杜绝循环调试与盲猜试错。</span>
+      </div>
 
       <!-- 兼容的主流 Agent 列表 -->
       <div class="flex flex-row flex-wrap mt-[8px]">
@@ -84,7 +87,7 @@ const pillarList: Array<SkillPillarItem> = [
 
       <!-- 配置文件提示 -->
       <div class="mt-[12px] pt-[10px] border-t-[1px] border-solid border-[#e2e8f0] flex flex-row items-center justify-between">
-        <span class="text-[10px] text-[#94a3b8]" style="font-family: monospace;">
+        <span class="text-[10px] text-[#94a3b8]">
           .agents/skills/unibestX-skill/ · plopfile.js
         </span>
         <span class="text-[10px] text-[#64748b]">单物理源 · 多端软链同步</span>
