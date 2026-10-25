@@ -1,37 +1,37 @@
 <template>
   <view class="tab-views-container" style="position: relative; display: flex; flex-direction: column; flex: 1; height: 100%;">
     <!-- #ifdef H5 -->
-    <TabContent v-if="isTabRendered(0)" :content-index="0" title="h5" :enable-pull-down-refresh="false" :show-back="false" custom-page-class="init-page" custom-page-style="background-color: transparent;">
+    <TabContent v-if="isTabRendered(0)" :content-index="0" title="h5" :enable-pull-down-refresh="false" :show-back="true" custom-page-class="init-page" custom-page-style="background-color: transparent;">
       <slot name="tabHost" />
     </TabContent>
     <!-- #endif -->
     <!-- #ifdef APP-ANDROID -->
-    <TabContent v-if="isTabRendered(0)" :content-index="0" title="android" :enable-pull-down-refresh="true" :show-back="false" custom-page-class="init-page" custom-page-style="background-color: transparent;">
+    <TabContent v-if="isTabRendered(0)" :content-index="0" title="android" :enable-pull-down-refresh="true" :show-back="true" custom-page-class="init-page" custom-page-style="background-color: transparent;">
       <slot name="tabHost" />
     </TabContent>
     <!-- #endif -->
     <!-- #ifdef APP-IOS -->
-    <TabContent v-if="isTabRendered(0)" :content-index="0" title="ios" :enable-pull-down-refresh="true" :show-back="false" custom-page-class="init-page" custom-page-style="background-color: transparent;">
+    <TabContent v-if="isTabRendered(0)" :content-index="0" title="ios" :enable-pull-down-refresh="true" :show-back="true" custom-page-class="init-page" custom-page-style="background-color: transparent;">
       <slot name="tabHost" />
     </TabContent>
     <!-- #endif -->
     <!-- #ifdef APP-HARMONY -->
-    <TabContent v-if="isTabRendered(0)" :content-index="0" title="harmony" :enable-pull-down-refresh="true" :show-back="false" custom-page-class="init-page" custom-page-style="background-color: transparent;">
+    <TabContent v-if="isTabRendered(0)" :content-index="0" title="harmony" :enable-pull-down-refresh="true" :show-back="true" custom-page-class="init-page" custom-page-style="background-color: transparent;">
       <slot name="tabHost" />
     </TabContent>
     <!-- #endif -->
     <!-- #ifdef MP-WEIXIN -->
-    <TabContent v-if="isTabRendered(0)" :content-index="0" title="weixin" :enable-pull-down-refresh="true" :show-back="false" custom-page-class="init-page" custom-page-style="background-color: transparent;">
+    <TabContent v-if="isTabRendered(0)" :content-index="0" title="weixin" :enable-pull-down-refresh="true" :show-back="true" custom-page-class="init-page" custom-page-style="background-color: transparent;">
       <slot name="tabHost" />
     </TabContent>
     <!-- #endif -->
     <!-- #ifdef MP-ALIPAY -->
-    <TabContent v-if="isTabRendered(0)" :content-index="0" title="alipay" :enable-pull-down-refresh="true" :show-back="false" custom-page-class="init-page" custom-page-style="background-color: transparent;">
+    <TabContent v-if="isTabRendered(0)" :content-index="0" title="alipay" :enable-pull-down-refresh="true" :show-back="true" custom-page-class="init-page" custom-page-style="background-color: transparent;">
       <slot name="tabHost" />
     </TabContent>
     <!-- #endif -->
     <!-- #ifdef MP-BAIDU || MP-TOUTIAO || MP-QQ || MP-KUAISHOU || MP-LARK || MP-JD || MP-XHS || MP-360 || MP-HARMONY -->
-    <TabContent v-if="isTabRendered(0)" :content-index="0" title="tabbar.home" :enable-pull-down-refresh="true" :show-back="false" custom-page-class="init-page" custom-page-style="background-color: transparent;">
+    <TabContent v-if="isTabRendered(0)" :content-index="0" title="tabbar.home" :enable-pull-down-refresh="true" :show-back="true" custom-page-class="init-page" custom-page-style="background-color: transparent;">
       <slot name="tabHost" />
     </TabContent>
     <!-- #endif -->

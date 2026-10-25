@@ -1,93 +1,3 @@
-<template>
-  <!-- NavBar 页面通用布局根容器 -->
-  <view :class="rootClass" :style="rootStyle">
-    <!-- 顶部固定自定义导航栏：位于页面内容上方，不随下拉刷新位移 -->
-    <NavBar
-      v-if="isCustomNav"
-      :page-style-obj="pageStyleObj"
-      :is-navbar-visible="isNavbarVisible"
-      :hide-status-bar="!isStatusBarVisible"
-      :title="displayTitle"
-      :show-back="effectiveShowBack"
-      :title-color="navTitleColor"
-      :bg-color="navBgColor"
-      :fixed="false"
-      :placeholder="false"
-      :border="isBorderVisible"
-    />
-
-    <!-- 单页 TabBar 容器模式（模式 4 且为主页）：由内部 TabViews/TabContent 独立承载滚动与下拉刷新，避免外层嵌套 scroll-view 导致手势冲突、TabBar 跟随下移与双重下拉刷新 -->
-    <view
-      v-if="isTabbarHomeContainer"
-      class="navbar-tab-container"
-      style="position: relative;flex: 1;"
-    >
-      <slot />
-    </view>
-
-    <!-- 当开启自定义下拉刷新时（原生未开启且当前布局开启） -->
-    <!-- 1. 支付宝小程序专享：手势下拉刷新（解决支付宝小程序无原生 refresher 问题） -->
-    <scroll-view
-      v-else-if="isAlipayCustomRefresher"
-      :direction="pageScrollDirection"
-      class="navbar-scroll-view"
-      :lower-threshold="50"
-      @scroll="handleScroll"
-      @scrolltolower="handleScrollToLower"
-      @touchstart="handleAlipayTouchStart"
-      @touchmove="handleAlipayTouchMove"
-      @touchend="handleAlipayTouchEnd"
-      @touchcancel="handleAlipayTouchEnd"
-    >
-      <!-- 微信小程序同款：三个小圆点手势下拉刷新 Header -->
-      <view
-        class="alipay-pull-header"
-        :style="alipayHeaderStyle"
-      >
-        <view class="wechat-pull-dots" :class="{ 'wechat-pull-dots--active': isTriggered }">
-          <view class="wechat-pull-dot wechat-pull-dot--1"></view>
-          <view class="wechat-pull-dot wechat-pull-dot--2"></view>
-          <view class="wechat-pull-dot wechat-pull-dot--3"></view>
-        </view>
-      </view>
-      <slot />
-      <TabbarPlaceholder :is-tabbar-page="isTabbarPage" />
-    </scroll-view>
-
-    <!-- 2. 原生全端（Android VDOM / iOS / Web / 微信小程序）：原生极速流畅滚动，彻底剥离 touch 事件 -->
-    <scroll-view
-      v-else-if="useCustomRefresher"
-      :direction="pageScrollDirection"
-      class="navbar-scroll-view"
-      :refresher-enabled="isRefresherEnabled"
-      :refresher-triggered="isTriggered"
-      :refresher-background="refresherBackground"
-      :lower-threshold="50"
-      @refresherrefresh="handleRefresherRefresh"
-      @refresherrestore="handleRefresherRestore"
-      @refresherabort="handleRefresherRestore"
-      @scroll="handleScroll"
-      @scrolltolower="handleScrollToLower"
-    >
-      <slot />
-      <TabbarPlaceholder :is-tabbar-page="isTabbarPage" />
-    </scroll-view>
-
-    <!-- 未开启自定义下拉刷新时（包含开启原生下拉刷新时）：渲染普通滚动容器 -->
-    <scroll-view
-      v-else
-      class="navbar-scroll-view"
-      :direction="pageScrollDirection"
-      :lower-threshold="50"
-      @scroll="handleScroll"
-      @scrolltolower="handleScrollToLower"
-    >
-      <slot />
-      <TabbarPlaceholder :is-tabbar-page="isTabbarPage" />
-    </scroll-view>
-  </view>
-</template>
-
 <script setup lang="uts">
 import { computed, onActivated, onDeactivated, onMounted, watch } from 'vue';
 import NavBar from '@/src/components/NavBar/NavBar.uvue';
@@ -123,6 +33,36 @@ const props = defineProps({
   },
   /** 导航栏备用背景色（读取自 page.bgColor） */
   bgColor: {
+    type: String,
+    default: ''
+  },
+  /** 状态栏独立背景颜色（推荐规范命名：navigationStatusBarBackgroundColor） */
+  navigationStatusBarBackgroundColor: {
+    type: String,
+    default: ''
+  },
+  /** 兼容别名：状态栏独立背景颜色 */
+  statusBarBgColor: {
+    type: String,
+    default: ''
+  },
+  /** 导航栏内容区独立背景颜色（推荐规范命名：navigationContentBackgroundColor） */
+  navigationContentBackgroundColor: {
+    type: String,
+    default: ''
+  },
+  /** 兼容别名：内容区独立背景颜色 */
+  contentBgColor: {
+    type: String,
+    default: ''
+  },
+  /** 返回按钮图标独立颜色（推荐规范命名：navigationBackIconColor） */
+  navigationBackIconColor: {
+    type: String,
+    default: ''
+  },
+  /** 兼容别名：返回按钮图标颜色 */
+  backIconColor: {
     type: String,
     default: ''
   },
@@ -799,6 +739,42 @@ const navBgColor = computed((): string => {
 });
 
 /**
+ * 计算最终生效的状态栏独立背景色
+ */
+const navStatusBarBgColor = computed((): string => {
+  const navStatusBarFromStyle = (pageStyleObj.value.navigationStatusBarBackgroundColor as string | null) ?? '';
+  if (navStatusBarFromStyle.length > 0) {
+    return navStatusBarFromStyle;
+  }
+  const bgFromStyle = (pageStyleObj.value.statusBarBgColor as string | null) ?? '';
+  if (bgFromStyle.length > 0) {
+    return bgFromStyle;
+  }
+  if (props.navigationStatusBarBackgroundColor.length > 0) {
+    return props.navigationStatusBarBackgroundColor;
+  }
+  return props.statusBarBgColor;
+});
+
+/**
+ * 计算最终生效的导航栏内容区独立背景色
+ */
+const navContentBgColor = computed((): string => {
+  const navContentFromStyle = (pageStyleObj.value.navigationContentBackgroundColor as string | null) ?? '';
+  if (navContentFromStyle.length > 0) {
+    return navContentFromStyle;
+  }
+  const bgFromStyle = (pageStyleObj.value.contentBgColor as string | null) ?? '';
+  if (bgFromStyle.length > 0) {
+    return bgFromStyle;
+  }
+  if (props.navigationContentBackgroundColor.length > 0) {
+    return props.navigationContentBackgroundColor;
+  }
+  return props.contentBgColor;
+});
+
+/**
  * 计算最终生效的导航栏文字/图标颜色
  */
 const navTitleColor = computed((): string => {
@@ -810,6 +786,24 @@ const navTitleColor = computed((): string => {
     return props.navigationBarTextStyle;
   }
   return props.titleColor;
+});
+
+/**
+ * 计算最终生效的返回按钮图标颜色
+ */
+const navBackIconColor = computed((): string => {
+  const iconColorFromStyle = (pageStyleObj.value.navigationBackIconColor as string | null) ?? '';
+  if (iconColorFromStyle.length > 0) {
+    return iconColorFromStyle;
+  }
+  const shortColorFromStyle = (pageStyleObj.value.backIconColor as string | null) ?? '';
+  if (shortColorFromStyle.length > 0) {
+    return shortColorFromStyle;
+  }
+  if (props.navigationBackIconColor.length > 0) {
+    return props.navigationBackIconColor;
+  }
+  return props.backIconColor;
 });
 
 /**
@@ -843,6 +837,99 @@ defineExpose({
   setTitle: setNavbarTitle
 });
 </script>
+
+<template>
+  <!-- NavBar 页面通用布局根容器 -->
+  <view :class="rootClass" :style="rootStyle">
+    <!-- 顶部固定自定义导航栏：位于页面内容上方，不随下拉刷新位移 -->
+    <NavBar
+      v-if="isCustomNav"
+      :page-style-obj="pageStyleObj"
+      :is-navbar-visible="isNavbarVisible"
+      :hide-status-bar="!isStatusBarVisible"
+      :title="displayTitle"
+      :show-back="effectiveShowBack"
+      :title-color="navTitleColor"
+      :bg-color="navBgColor"
+      :navigation-status-bar-background-color="navStatusBarBgColor"
+      :navigation-content-background-color="navContentBgColor"
+      :navigation-back-icon-color="navBackIconColor"
+      :fixed="false"
+      :placeholder="false"
+      :border="isBorderVisible"
+    />
+
+    <!-- 单页 TabBar 容器模式（模式 4 且为主页）：由内部 TabViews/TabContent 独立承载滚动与下拉刷新，避免外层嵌套 scroll-view 导致手势冲突、TabBar 跟随下移与双重下拉刷新 -->
+    <view
+      v-if="isTabbarHomeContainer"
+      class="navbar-tab-container"
+      style="position: relative;flex: 1;"
+    >
+      <slot />
+    </view>
+
+    <!-- 当开启自定义下拉刷新时（原生未开启且当前布局开启） -->
+    <!-- 1. 支付宝小程序专享：手势下拉刷新（解决支付宝小程序无原生 refresher 问题） -->
+    <scroll-view
+      v-else-if="isAlipayCustomRefresher"
+      :direction="pageScrollDirection"
+      class="navbar-scroll-view"
+      :lower-threshold="50"
+      @scroll="handleScroll"
+      @scrolltolower="handleScrollToLower"
+      @touchstart="handleAlipayTouchStart"
+      @touchmove="handleAlipayTouchMove"
+      @touchend="handleAlipayTouchEnd"
+      @touchcancel="handleAlipayTouchEnd"
+    >
+      <!-- 微信小程序同款：三个小圆点手势下拉刷新 Header -->
+      <view
+        class="alipay-pull-header"
+        :style="alipayHeaderStyle"
+      >
+        <view class="wechat-pull-dots" :class="{ 'wechat-pull-dots--active': isTriggered }">
+          <view class="wechat-pull-dot wechat-pull-dot--1"></view>
+          <view class="wechat-pull-dot wechat-pull-dot--2"></view>
+          <view class="wechat-pull-dot wechat-pull-dot--3"></view>
+        </view>
+      </view>
+      <slot />
+      <TabbarPlaceholder :is-tabbar-page="isTabbarPage" />
+    </scroll-view>
+
+    <!-- 2. 原生全端（Android VDOM / iOS / Web / 微信小程序）：原生极速流畅滚动，彻底剥离 touch 事件 -->
+    <scroll-view
+      v-else-if="useCustomRefresher"
+      :direction="pageScrollDirection"
+      class="navbar-scroll-view"
+      :refresher-enabled="isRefresherEnabled"
+      :refresher-triggered="isTriggered"
+      :refresher-background="refresherBackground"
+      :lower-threshold="50"
+      @refresherrefresh="handleRefresherRefresh"
+      @refresherrestore="handleRefresherRestore"
+      @refresherabort="handleRefresherRestore"
+      @scroll="handleScroll"
+      @scrolltolower="handleScrollToLower"
+    >
+      <slot />
+      <TabbarPlaceholder :is-tabbar-page="isTabbarPage" />
+    </scroll-view>
+
+    <!-- 未开启自定义下拉刷新时（包含开启原生下拉刷新时）：渲染普通滚动容器 -->
+    <scroll-view
+      v-else
+      class="navbar-scroll-view"
+      :direction="pageScrollDirection"
+      :lower-threshold="50"
+      @scroll="handleScroll"
+      @scrolltolower="handleScrollToLower"
+    >
+      <slot />
+      <TabbarPlaceholder :is-tabbar-page="isTabbarPage" />
+    </scroll-view>
+  </view>
+</template>
 
 <style lang="scss" scoped>
 .navbar-layout {

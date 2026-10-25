@@ -17,6 +17,7 @@ import ToolLibSection from './components/ToolLibSection.uvue';
 import DevWorkflowGuide from './components/DevWorkflowGuide.uvue';
 import IndexFooter from './components/IndexFooter.uvue';
 
+// 👇 这段基本可以满足随意搭配，满足基本的业务需求啦！
 definePage((options) => {
   const { platform, appName: _appName } = options;
   const { isH5, isAppIOS, isAppAndroid, isAppHarmony, isMpAlipay, isMpWeixin } = platform;
@@ -36,7 +37,7 @@ definePage((options) => {
     customPageStyle: 'background-color: transparent;', // 页面根容器自定义行内样式（穿透任何样式隔离，全端绝对生效）
 
     // --- 4. 导航栏与交互控制（配合 navbar 布局） ---
-    showBack: false, // 导航栏左侧是否显示返回箭头（TabBar 首页无需返回按钮）
+    showBack: true, // 导航栏左侧是否显示返回箭头（TabBar 首页无需返回按钮）
     hideStatusBar: false, // 是否隐藏手机顶部系统状态栏占位（true 为隐藏占位）
     hideNavbar: false, // 是否隐藏顶部导航栏（false 为正常显示）
     showNavbar: true, // 是否显示顶部导航栏（hideNavbar 的反向语义配置项）
@@ -58,7 +59,11 @@ definePage((options) => {
                   ? 'weixin'
                   : 'tabbar.home', // 页面与导航栏标题文本（支持 i18n 自动翻译）
       navigationStyle: 'custom', // 导航栏样式设为自定义（隐藏系统原生固定导航栏，每页必须配置）
-      navigationBarBackgroundColor: '#059669' // 原生导航栏背景颜色
+      navigationBarBackgroundColor: '#ffffff', // 原生导航栏背景颜色
+      navigationStatusBarBackgroundColor: 'transparent', // 状态栏区域背景色（如设为透明）
+      navigationContentBackgroundColor: 'transparent', // 内容区域背景色（如深绿色）
+      navigationBarTextStyle: 'black', // 标题文字颜色
+      navigationBackIconColor: '#000000' // 返回按钮图标独立颜色（如浅蓝色）
     }
   };
 });
