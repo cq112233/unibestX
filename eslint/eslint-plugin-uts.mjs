@@ -1552,11 +1552,19 @@ export const pluginUts = {
             }
 
             // 4. 检查并清理 SFC 顶级块标签（<template>, <script>, <style> 等）前导多余缩进空格，强制顶格对齐
+            const templateBody = context.sourceCode.ast?.templateBody;
             const topTagPattern = /^([ \t]+)(<(?:template|script|style|\/template|\/script|\/style)[\s>])/gm;
             let topTagMatch = topTagPattern.exec(context.sourceCode.text);
             while (topTagMatch !== null) {
               const start = topTagMatch.index;
               const end = topTagMatch.index + topTagMatch[1].length;
+
+              // 处于顶级 <template> 内部的 <template #xxx> 或条件 template，属于组件插槽或子节点，绝非顶级块，跳过
+              if (templateBody && start > templateBody.range[0] && end < templateBody.range[1]) {
+                topTagMatch = topTagPattern.exec(context.sourceCode.text);
+                continue;
+              }
+
               const tagName = topTagMatch[2].replace(/[<>/]/g, '').trim().split(/\s+/)[0];
               const loc = {
                 start: context.sourceCode.getLocFromIndex(start),
@@ -1944,15 +1952,15 @@ export const pluginUts = {
       }
     },
 
-    /** 17. UVUE 模板条件指令中避免复合逻辑运算（建议收敛为单值计算属性） */
+    /** 17. UVUE 模板条件指令中避免复合逻辑运算（必须收敛为单值计算属性以兼容鸿蒙 ArkTS） */
     'uvue-template-simple-condition': {
       meta: {
         type: 'suggestion',
         docs: {
-          description: '模板条件指令（v-if / v-else-if / v-show）中避免使用复合逻辑与/或表达式，在多端编译器与插件下易引发解析警告，建议收敛为单值 computed 计算属性'
+          description: '模板条件指令（v-if / v-else-if / v-show）中严禁使用复合逻辑与/或表达式，在鸿蒙 ArkTS 编译器下会导致 AST 解析与编译报错，必须收敛为单值 computed 计算属性'
         },
         messages: {
-          noComplexCondition: '[跨端模板规范] 条件指令 v-{{dir}} 中严禁使用复合逻辑与/或表达式 ("{{expr}}")，在微信小程序或多端编译器下易产生解析警告，建议直接简化为单值计算属性'
+          noComplexCondition: '[鸿蒙模板规范] 条件指令 v-{{dir}} 中严禁使用复合逻辑与/或表达式 ("{{expr}}")，在鸿蒙（ArkTS）编译器下会导致解析编译失败，必须收敛为单值计算属性 (computed)'
         }
       },
       create(context) {

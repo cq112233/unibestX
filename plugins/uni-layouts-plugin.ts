@@ -182,6 +182,9 @@ export function uniLayoutsPlugin(options: UniLayoutsOptions = {}) {
 
     try {
       const data = loadPlatformPagesJson(pagesJsonPath) as PagesJson;
+      const rawData = data as any;
+      const tabList = (rawData.tabBar && Array.isArray(rawData.tabBar.list)) ? rawData.tabBar.list : [];
+      const tabPaths = new Set(tabList.map((item: any) => (item.pagePath || '').replace(/\\/g, '/').replace(/^\//, '')));
 
       // 1. 解析主包页面
       if (Array.isArray(data.pages)) {
@@ -205,6 +208,10 @@ export function uniLayoutsPlugin(options: UniLayoutsOptions = {}) {
               params[key] = page[key];
             }
           });
+
+          if (tabPaths.has(normPath)) {
+            params.isTabbar = true;
+          }
 
           pageLayouts.set(normPath, { layout, params });
         });

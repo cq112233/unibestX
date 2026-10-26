@@ -12,7 +12,7 @@ import {
 import * as ts from 'typescript';
 import type { Plugin } from 'vite';
 import { loadEnv } from 'vite';
-import { loadAllPlatformPageVariants } from './pages-json-util';
+import { loadAllPlatformPageVariants, loadPlatformPagesJson } from './pages-json-util';
 import { setPagesMetaSnapshot } from './pages-meta-cache';
 
 /**
@@ -93,6 +93,13 @@ export type UniPagesOptions = {
   dir?: string;
   /** 分包扫描目录列表，如 ['src/sub']，不能是主包 dir 的子目录 */
   subPackages?: string[];
+  /**
+   * 分包生成策略模式：
+   * - 'subdirs'（默认推荐）：将 subPackages 里的每个目录下的每一个一级子目录自动作为独立分包（例如 root: "src/sub/auth"），彻底避免微信等小程序单个分包超 2MB 限制
+   * - 'root'：把 subPackages 里的每个目录整体作为一个单一大分包（例如 root: "src/sub"）
+   * @default 'subdirs'
+   */
+  subPackageMode?: 'root' | 'subdirs';
   /** 排除的 glob 模式，默认会排除 components 与 views 目录 */
   exclude?: string[];
   /** 输出的 pages.json 路径，默认项目根目录 */
@@ -112,6 +119,7 @@ export type ResolvedUniPagesOptions = {
   enabled: boolean;
   dir: string;
   subPackages: string[];
+  subPackageMode: 'root' | 'subdirs';
   exclude: string[];
   outFile: string;
   configFile: string;
@@ -204,8 +212,8 @@ const DEFAULT_CONFIG_FILE = 'pages.config.json';
 /** 文件变更后等待多久再重新生成（合并一次保存引发的多次事件） */
 const DEBOUNCE_MS = 80;
 
-/** 模式 2 下原生 tabBar 会被自定义组件接管，先把宿主 tabbar 隐藏掉，避免切换瞬间闪烁 */
-const HIDE_NATIVE_TABBAR_STYLE = '<style id="uni-tabbar-hide-zero-flash">uni-tabbar, uni-tabbar *, .uni-tabbar, .uni-tabbar *, .uni-tabbar-bottom, .uni-tabbar-bottom *, .uni-tabbar__icon, .uni-tabbar__label { display: none !important; visibility: hidden !important; height: 0 !important; min-height: 0 !important; max-height: 0 !important; opacity: 0 !important; pointer-events: none !important; position: absolute !important; bottom: -9999px !important; }</style>';
+/** 模式 2 下原生 tabBar 会被自定义组件接管，静态消除宿主 tabbar 及 50px 窗口底边距与过渡加载菊花，实现全链路零闪烁 */
+const HIDE_NATIVE_TABBAR_STYLE = '<style id="uni-tabbar-hide-zero-flash">uni-tabbar, uni-tabbar *, .uni-tabbar, .uni-tabbar *, .uni-tabbar-bottom, .uni-tabbar-bottom *, .uni-tabbar__icon, .uni-tabbar__label, .uni-async-loading, .uni-loading { display: none !important; visibility: hidden !important; height: 0 !important; min-height: 0 !important; max-height: 0 !important; opacity: 0 !important; pointer-events: none !important; position: absolute !important; bottom: -9999px !important; } :root { --window-bottom: 0px !important; } uni-page-wrapper { height: 100% !important; } uni-page-body { padding-bottom: 0px !important; }</style>';
 
 /** 默认排除目录（components / views 不当页面扫描） */
 const DEFAULT_EXCLUDES: string[] = ['**/components/**/*.*', '**/views/**/*.*'];
@@ -215,6 +223,7 @@ export function resolveOptions(userOptions: UniPagesOptions = {}): ResolvedUniPa
     enabled: userOptions.enabled ?? true,
     dir: userOptions.dir ?? DEFAULT_DIR,
     subPackages: userOptions.subPackages ?? [],
+    subPackageMode: userOptions.subPackageMode ?? 'subdirs',
     exclude: userOptions.exclude ?? [],
     outFile: userOptions.outFile ?? DEFAULT_OUT_FILE,
     configFile: userOptions.configFile ?? DEFAULT_CONFIG_FILE,
@@ -1537,9 +1546,18 @@ export function mergePagesJson(
         newSubMap.delete(existingSub.root);
       }
       else if (!sandboxActive) {
-        const absSubDir = path.resolve(projectRoot, existingSub.root);
-        if (fs.existsSync(absSubDir)) {
-          mergedSubs.push(existingSub);
+        const isObsoleteParent = output.subPackages.some(sp => sp.root.startsWith(`${existingSub.root}/`));
+        // 如果该旧分包属于受管分包目录（如以 'src/sub/' 为前缀），且本次扫描已无有效页面，则绝不作为外部手写分包保留
+        const isManagedChild = output.subPackages.some((sp) => {
+          const slashIdx = sp.root.lastIndexOf('/');
+          const parentDir = slashIdx > 0 ? sp.root.slice(0, slashIdx) : '';
+          return parentDir !== '' && existingSub.root.startsWith(`${parentDir}/`);
+        });
+        if (!isObsoleteParent && !isManagedChild) {
+          const absSubDir = path.resolve(projectRoot, existingSub.root);
+          if (fs.existsSync(absSubDir)) {
+            mergedSubs.push(existingSub);
+          }
         }
       }
     }
@@ -1618,7 +1636,8 @@ function writeBackConfig(
   configPath: string,
   finalPages: PageConfig[],
   scannedSubPkgs: SubPackageConfig[],
-  outputPath?: string
+  outputPath?: string,
+  options?: ResolvedUniPagesOptions
 ): boolean {
   if (!fs.existsSync(configPath)) {
     return false;
@@ -1686,6 +1705,26 @@ function writeBackConfig(
 
   // 2) 同步分包（新增、修改、剔除已删除）
   currentConfig.subPackages ??= [];
+
+  const managedSubPrefixes = (options?.subPackages ?? []).map(p => `${p.replace(/\\/g, '/').replace(/\/+$/, '')}/`);
+
+  // 剔除已被拆分为子分包的旧父级分包（如旧的 root: "src/sub"）以及受管目录下在磁盘上已删除的分包
+  currentConfig.subPackages = currentConfig.subPackages.filter((cp) => {
+    const cpNorm = cp.root.replace(/\\/g, '/');
+    const isObsoleteParent = scannedSubPkgs.some(sp => sp.root.startsWith(`${cp.root}/`));
+    if (isObsoleteParent) {
+      configUpdated = true;
+      return false;
+    }
+    const isManaged = (options?.subPackages ?? []).includes(cpNorm) || managedSubPrefixes.some(prefix => cpNorm.startsWith(prefix));
+    if (isManaged && !scannedSubPkgs.some(sp => sp.root === cp.root)) {
+      // 受管目录下的分包在磁盘上已无任何页面或已被删除
+      configUpdated = true;
+      return false;
+    }
+    return true;
+  });
+
   for (let s = 0; s < scannedSubPkgs.length; s++) {
     const spkg = scannedSubPkgs[s];
     const targetSub = currentConfig.subPackages.find(cp => cp.root === spkg.root);
@@ -1723,6 +1762,9 @@ function writeBackConfig(
       }
     }
   }
+
+  // 保持分包按 root 排序稳定
+  currentConfig.subPackages.sort((a, b) => a.root.localeCompare(b.root));
 
   if (configUpdated) {
     let newConfigJson = '';
@@ -1823,6 +1865,18 @@ export async function buildPages(
           }
         });
       }
+      if (Array.isArray(existingData.subPackages)) {
+        existingData.subPackages.forEach((pkg: any) => {
+          if (Array.isArray(pkg.pages)) {
+            pkg.pages.forEach((p: PageConfig) => {
+              if (p.path) {
+                const full = `${pkg.root}/${p.path}`.replace(/\\/g, '/').replace(/^\//, '');
+                existingPagesMap.set(full, p);
+              }
+            });
+          }
+        });
+      }
     }
     catch {}
   }
@@ -1881,6 +1935,26 @@ export async function buildPages(
   const configSubPkgs = baseConfig.subPackages ?? [];
   const scannedSubPkgs: SubPackageConfig[] = [];
 
+  // 建立 baseConfig 全路径映射，方便无论旧版大分包还是新版子目录分包，都能精准匹配继承 manual 属性
+  const baseConfigFullPathMap = new Map<string, PageConfig>();
+  for (const pkg of configSubPkgs) {
+    if (Array.isArray(pkg.pages)) {
+      for (const p of pkg.pages) {
+        if (p.path) {
+          const fullPath = `${pkg.root}/${p.path}`.replace(/\\/g, '/').replace(/^\//, '');
+          baseConfigFullPathMap.set(fullPath, p);
+        }
+      }
+    }
+  }
+
+  type SubPackageEntry = {
+    rootDir: string;
+    absDir: string;
+  };
+
+  const subEntries: SubPackageEntry[] = [];
+
   for (let s = 0; s < options.subPackages.length; s++) {
     const subDir = options.subPackages[s];
     const absSubDir = path.resolve(root, subDir);
@@ -1888,7 +1962,47 @@ export async function buildPages(
       continue;
     }
 
-    const subFiles = scanUvueFiles(absSubDir, options.exclude, root);
+    if (options.subPackageMode === 'root') {
+      subEntries.push({ rootDir: subDir, absDir: absSubDir });
+    }
+    else {
+      // subdirs 模式：扫描 absSubDir 下的一级子目录
+      const items = fs.readdirSync(absSubDir, { withFileTypes: true });
+      let hasDirectPages = false;
+
+      // 排序以保证生成稳定
+      items.sort((a, b) => a.name.localeCompare(b.name));
+
+      for (const item of items) {
+        if (item.isDirectory()) {
+          // 排除常见的非页面组件/资源目录
+          if (['components', 'views', 'common', 'modules', 'assets', 'static', 'font', 'fonts', 'img', 'imgs', 'image', 'images'].includes(item.name)) {
+            continue;
+          }
+          const childAbs = path.join(absSubDir, item.name);
+          subEntries.push({
+            rootDir: `${subDir}/${item.name}`.replace(/\\/g, '/'),
+            absDir: childAbs
+          });
+        }
+        else if (item.isFile() && item.name.endsWith('.uvue')) {
+          hasDirectPages = true;
+        }
+      }
+
+      // 如果 subDir 根目录下直接有 .uvue 页面，也保留 subDir 自身作为独立分包
+      if (hasDirectPages || subEntries.length === 0) {
+        subEntries.push({ rootDir: subDir, absDir: absSubDir });
+      }
+    }
+  }
+
+  for (let e = 0; e < subEntries.length; e++) {
+    const entry = subEntries[e];
+    const subFiles = scanUvueFiles(entry.absDir, options.exclude, root);
+    if (subFiles.length === 0) {
+      continue;
+    }
     subFiles.sort();
 
     const subResults = await Promise.all(
@@ -1904,8 +2018,8 @@ export async function buildPages(
       if ((meta as any)?._skipPage === true) {
         continue;
       }
-      const relPath = path.relative(absSubDir, subFile).replace(/\\/g, '/').replace(/\.uvue$/, '');
-      const fullSubPath = `${subDir}/${relPath}`;
+      const relPath = path.relative(entry.absDir, subFile).replace(/\\/g, '/').replace(/\.uvue$/, '');
+      const fullSubPath = `${entry.rootDir}/${relPath}`.replace(/\\/g, '/').replace(/^\//, '');
 
       const page: PageConfig & { _hasMeta?: boolean } = { path: relPath };
       if (meta != null) {
@@ -1924,8 +2038,7 @@ export async function buildPages(
         }
       }
       else if (raw.includes('definePage(') || raw.includes('<route')) {
-        const fullRel = `${subDir}/${relPath}`;
-        const old = existingPagesMap.get(fullRel);
+        const old = existingPagesMap.get(fullSubPath);
         if (old != null) {
           Object.assign(page, old);
           page._hasMeta = true;
@@ -1934,19 +2047,15 @@ export async function buildPages(
       subPages.push(page);
     }
 
-    // 与 baseConfig 中同名 root 的分包合并（以磁盘实际存在的文件为准，自动剔除已删除的页面）
-    const existing = configSubPkgs.find(p => p.root === subDir);
-    const existingMap = new Map<string, PageConfig>();
-    if (existing != null && Array.isArray(existing.pages)) {
-      for (let k = 0; k < existing.pages.length; k++) {
-        existingMap.set(existing.pages[k].path, existing.pages[k]);
-      }
+    if (subPages.length === 0) {
+      continue;
     }
 
     const mergedPages: PageConfig[] = [];
     for (let k = 0; k < subPages.length; k++) {
       const sp = subPages[k];
-      const manual = existingMap.get(sp.path);
+      const fullSubPath = `${entry.rootDir}/${sp.path}`.replace(/\\/g, '/').replace(/^\//, '');
+      const manual = baseConfigFullPathMap.get(fullSubPath);
       if (sp._hasMeta) {
         mergedPages.push(sp);
       }
@@ -1961,13 +2070,17 @@ export async function buildPages(
       }
     }
 
-    scannedSubPkgs.push({ root: subDir, pages: mergedPages });
+    scannedSubPkgs.push({ root: entry.rootDir, pages: mergedPages });
   }
 
-  // 将 baseConfig 中未扫描的分包原样保留
+  // 将 baseConfig 中未扫描且不属于受管目录的外部手写分包（如 uni_modules 第三方分包）原样保留
+  const managedSubPrefixes = options.subPackages.map(p => `${p.replace(/\\/g, '/').replace(/\/+$/, '')}/`);
   for (let i = 0; i < configSubPkgs.length; i++) {
     const cp = configSubPkgs[i];
-    if (!scannedSubPkgs.some(sp => sp.root === cp.root)) {
+    const cpNorm = cp.root.replace(/\\/g, '/');
+    const isParentOfScanned = scannedSubPkgs.some(sp => sp.root.startsWith(`${cp.root}/`));
+    const isManaged = options.subPackages.includes(cpNorm) || managedSubPrefixes.some(prefix => cpNorm.startsWith(prefix));
+    if (!isParentOfScanned && !isManaged && !scannedSubPkgs.some(sp => sp.root === cp.root)) {
       scannedSubPkgs.push(cp);
     }
   }
@@ -2163,7 +2276,7 @@ export function commitPages(state: PagesBuildState, server: any = null): void {
 
   // 回写 pages.config.json：沙盒生效或基座语法错误时绝不回写
   if (!state.flags.skipConfigWriteback && state.baseConfigParseOk) {
-    if (writeBackConfig(state.configPath, state.finalPages, state.scannedSubPkgs, state.outputPath)) {
+    if (writeBackConfig(state.configPath, state.finalPages, state.scannedSubPkgs, state.outputPath, state.options)) {
       console.log(`[uni-pages] Automatically synced changes into ${state.options.configFile}`);
     }
   }
@@ -2389,7 +2502,23 @@ export default function uniPagesPlugin(userOptions: UniPagesOptions = {}): Plugi
     transformIndexHtml(html: string) {
       const mode = getTabbarMode(projectRoot);
       if (mode === '2' || mode === 'CUSTOM_TABBAR_WITH_NATIVE' || mode === 'CUSTOM_TABBAR') {
-        return html.replace('</head>', `${HIDE_NATIVE_TABBAR_STYLE}\n</head>`);
+        let preloadScripts = '';
+        try {
+          const pagesJsonData = loadPlatformPagesJson(path.resolve(projectRoot, 'pages.json'));
+          const tabList = (pagesJsonData.tabBar && Array.isArray(pagesJsonData.tabBar.list)) ? pagesJsonData.tabBar.list : [];
+          const tabImports = tabList
+            .map((item: any) => item.pagePath || '')
+            .filter((p: string) => p.length > 0 && !p.includes('pages/index/index'))
+            .map((p: string) => {
+              const norm = p.startsWith('/') ? p : `/${p}`;
+              return `import('${norm}.uvue').catch(() => {});`;
+            });
+          if (tabImports.length > 0) {
+            preloadScripts = `<script type="module">\n// 动态预加载所有 TabBar 页面组件，消除首次切换 Tab 时的异步模块加载空白\nsetTimeout(() => {\n  ${tabImports.join('\n  ')}\n}, 50);\n</script>`;
+          }
+        }
+        catch {}
+        return html.replace('</head>', `${HIDE_NATIVE_TABBAR_STYLE}\n${preloadScripts}\n</head>`);
       }
       return html;
     }

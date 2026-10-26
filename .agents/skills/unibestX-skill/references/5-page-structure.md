@@ -6,7 +6,7 @@
 >
 > **与其它分册的分工**：页面与组件的代码怎么写看**分册 4**；接口函数内部怎么写看**分册 6**；`http` / Query hooks 怎么用看**分册 10**。本分册只回答：**文件放哪、谁能取数、数据怎么流**。
 >
-> **30 秒速记**：TabBar 页与普通页一样，由 `src/pages/<page>/<page>.uvue` 直接承担根组件职责，**没有 `views/`**；非 TabBar 多页面可建议按业务模块聚合，但**已有页面不得擅自迁移、合并或改 URL**；`components/`、`common/`、`modules/` 全部按需创建，简单业务默认只写根页面；`modules/` 仅用于有独立状态或取数职责的复杂业务区块；只有根组件和模块组件能发请求；`modules/` 下不设 `common`；超过 2 个页面复用才提升到 `src/components/`；API 按业务模块聚合。
+> **30 秒速记**：TabBar 页与普通页一样，由 `src/pages/<page>/<page>.uvue` 直接承担根组件职责，**没有 `views/`，统一使用 `components/`，不设 `common/`**；非 TabBar 多页面按业务模块聚合；`components/` 与 `modules/` 全部按需创建，简单业务默认只写根页面；`modules/` 仅用于有独立状态或取数职责的复杂业务区块；只有根组件和模块组件能发请求；超过 2 个页面复用才提升到 `src/components/`；API 按业务模块聚合。
 
 ---
 
@@ -48,10 +48,9 @@ src/pages/home/
 ```text
 src/pages/order/
 ├── order.uvue                    # 根组件：页面结构 + Tab 语义 + 多模块共享接口
-├── components/                   # 根组件直属视图，纯展示
-│   ├── OrderHeader.uvue
-│   └── OrderFilter.uvue
-└── common/                       # 可选：页面级通用视图，纯展示
+└── components/                   # 根组件直属纯展示视图（统一收拢，不设模糊的 common/）
+    ├── OrderHeader.uvue
+    ├── OrderFilter.uvue
     ├── StatusTag.uvue
     └── SectionTitle.uvue
 ```
@@ -79,8 +78,8 @@ src/pages/order/
 3. 模式 4 的 Tab 页面用 `useTabPageShell(tabType)` 兼容“真实页面 / Tab 子页”双身份，用 `useTabPage()` 获取页面生命周期与虚拟路由。
 4. 只有宿主首页使用 `TabPageHost` 承载全部 Tab；普通 Tab 页面不挂载 `TabPageHost` / `Tabbar`。
 5. `modules/<block>/` 是页面内业务区块，不是独立页面，也不是业务模块目录。
-6. `modules/` 下**不允许出现 `common/`**。
-7. `components/`、`common/`、`modules/` 都是按需创建，不能为了结构完整提前建空目录。
+6. **统一使用 `components/`，全项目不设 `common/`**（避免心智混淆）。
+7. `components/`、`modules/` 都是按需创建，不能为了结构完整提前建空目录。
 
 ### 2. 非 TabBar 单页
 
@@ -155,8 +154,7 @@ src/sub/order/
 ```text
 <page>/
 ├── <page>.uvue                  # 页面根组件（普通页与 TabBar 页相同）
-├── components/                  # 可选：根组件直属视图，纯展示
-├── common/                      # 可选：页面级通用视图，纯展示
+├── components/                  # 可选：页面直属视图，纯展示（不设歧义的 common/）
 └── modules/                     # 可选：复杂业务区块
     └── <block>/
         ├── <Block>Module.uvue   # 模块组件，可发本模块请求
@@ -181,21 +179,15 @@ src/sub/order/
 
 ### 2. 目录职责
 
-禁止：
-
-```text
-modules/common/                  # ❌ modules 下没有 common
-common/<Block>Module.uvue        # ❌ common 不能承载业务模块
-```
+> 统一规约：全项目只使用 `components/` 承载纯展示组件，**禁止新建 `common/`**，避免组件归属产生心智分歧。
 
 | 位置 | 职责 | 能否发 HTTP | 能否持有业务状态 |
 | :--- | :--- | :--- | :--- |
 | 页面根组件 | 页面结构、分区、跳转、单业务块取数、多区块共享接口 | ✅ | ✅ 页面数据 + 结构级状态 |
-| `components/` | 可选：根组件直属视图，承接确有拆分价值的纯 UI | ❌ | ❌ |
-| `common/` | 可选：当前页面内多处复用的纯展示视图 | ❌ | ❌ |
+| `components/` | 可选：页面直属纯展示视图，Props / Emits | ❌ | ❌ |
 | `modules/<block>/<Block>Module.uvue` | 本区块接口、loading、分页、筛选 | ✅ 仅本区块接口 | ✅ 本区块数据 |
-| `modules/<block>/components/` | 模块直属视图 | ❌ | ❌ |
-| `src/components/` | 跨页面公共视图 | ❌ | ❌ |
+| `modules/<block>/components/` | 模块直属视图，纯展示 | ❌ | ❌ |
+| `src/components/` | 跨页面公共视图（3 个以上页面共用） | ❌ | ❌ |
 
 ---
 
@@ -285,11 +277,11 @@ src/sub/order/detail/detail.uvue
 
 | 使用范围 | 位置 |
 | :--- | :--- |
-| 根组件专属视图 | 页面 `components/`（按需） |
-| 当前页面多个视图共用 | 页面 `common/`（可选） |
-| 页面内某个业务区块专属 | `modules/<block>/components/` |
+| 页面级专属视图 | 页面 `components/`（按需） |
+| 同业务模块多页面共用 | 模块 `src/sub/<module>/components/`（按需） |
+| 页面内某个业务区块专属 | `modules/<block>/components/`（仅复杂页面按需） |
 | 页面内业务区块容器 | `modules/<block>/<Block>Module.uvue` |
-| 超过 2 个页面共用 | `src/components/<Name>/<Name>.uvue` |
+| 超过 2 个页面跨业务共用 | `src/components/<Name>/<Name>.uvue` |
 
 ### 2. 超过 2 个页面才提升
 
@@ -318,7 +310,23 @@ src/sub/order/detail/detail.uvue
 - 模块专属弹窗放 `modules/<block>/components/`；
 - 弹窗不取数，只接收 Props、抛出 `@close` / `@save` 等事件。
 
-### 4. 单文件上限
+### 4. Hooks 业务组织与词根语义化规约
+
+当页面业务复杂时，推荐将数据与逻辑收敛到 `hooks/` 中。为了让开发者**看文件名一眼区分 API 数据 Hook 与普通 Hook**，严格遵循「词根语义化」命名标准：
+
+| Hook 类型 | 命名词根要求 | 内部职责 | 例子 |
+| :--- | :--- | :--- | :--- |
+| **API 查询 Hook** | 必须以 **`Query`** 结尾 | 内部包裹 `useQuery`，负责数据拉取、缓存与重试 | `useOrderListQuery.uts` / `useUserDetailQuery.uts` |
+| **API 变更 Hook** | 必须以 **`Mutation`** 结尾 | 内部包裹 `useMutation`，负责数据写入、更新与删除 | `useCreateOrderMutation.uts` / `useLoginMutation.uts` |
+| **普通前端 Hook** | 纯动作/能力，**严禁带** Query/Mutation | 纯前端逻辑，**不发网络请求**（倒计时、表单校验、按键监听） | `useCountdown.uts` / `useFormValidator.uts` / `useBackPressExit.uts` |
+
+落位规则：
+
+- **页面私有 Hook**：只有 1 个时推荐平铺在页面同级（如 `src/sub/order/list/useOrderListQuery.uts`）；多个时放入页面 `hooks/`；
+- **模块共享 Hook**：放在 `src/sub/<module>/hooks/`（同模块多页面共用）；
+- **全局通用 Hook**：放在 `src/hooks/`（跨业务全局通用）。
+
+### 5. 单文件上限
 
 - 页面 / 组件单文件不超过 **500 行**。
 - 超过 500 行时向下拆私有视图，或把纯逻辑抽到同目录 `.uts`。
@@ -443,11 +451,11 @@ import type { OrderItem } from '@/src/api/order/types.uts';
 | 简单页面要建哪些目录？ | 只建根页面，不预建空目录 |
 | 页面变大但只有一个业务块怎么办？ | 默认仍写根页面；确有可复用或可独立维护的 UI 时才用 `components/` |
 | 什么时候创建 `modules/`？ | 多个独立业务区块各自需要状态或取数时 |
-| 页面根组件直属视图放哪？ | `components/` |
-| 页面级通用视图放哪？ | `common/`（可选） |
+| 页面级专属视图放哪？ | 页面 `components/` |
+| 同业务模块多页面共享视图放哪？ | 模块 `src/sub/<module>/components/` |
 | 页面内业务区块放哪？ | `modules/<block>/<Block>Module.uvue` |
 | 模块直属视图放哪？ | `modules/<block>/components/` |
-| `modules/` 下有 `common` 吗？ | 没有 |
+| 全项目有 `common` 吗？ | 没有，统一用 `components/` 避免歧义 |
 | 谁能发 HTTP？ | 页面根组件、模块组件 |
 | 两个模块共用接口怎么办？ | 根组件请求一次，Props 下发 |
 | 组件何时提升到 `src/components/`？ | 超过 2 个页面使用，即第 3 个页面开始 |
@@ -463,10 +471,10 @@ import type { OrderItem } from '@/src/api/order/types.uts';
 - [ ] **1. 页面形态判定**：TabBar 页与普通页都由 `<page>.uvue` 承担根组件，均没有 `views/`。
 - [ ] **2. TabBar 根组件**：`src/pages/<page>/<page>.uvue` 可直接发 HTTP，并用 `useTabPageShell(tabType)` + `useTabPage()` 接入 TabBar 页面语义。
 - [ ] **3. 业务模块聚合**：新增页面可按 `src/sub/<module>/` 聚合，但已有页面未经开发者确认不得迁移或合并。
-- [ ] **4. 页面内结构**：只使用 `components / common / modules` 这些约定位置；三者均按需创建，简单页可以只有根组件。
-- [ ] **5. 模块目录**：`modules/` 下只有业务区块，不存在 `common/`。
+- [ ] **4. 页面内结构**：统一使用 `components / modules` 约定位置，不设 `common/`；按需创建，简单页可以只有根组件。
+- [ ] **5. 模块目录**：`modules/` 仅用于复杂页面的独立业务区块。
 - [ ] **6. 取数边界**：只有页面根组件与模块组件调用接口或使用请求 hooks。
-- [ ] **7. 纯展示边界**：`components/`、`common/`、模块 `components/`、`src/components/` 都不取数。
+- [ ] **7. 纯展示边界**：页面 `components/`、模块 `components/`、`src/components/` 都不取数。
 - [ ] **8. 共享接口上提**：两个及以上模块共用接口时，由根组件请求一次并 Props 下发。
 - [ ] **9. 模块数据自持**：使用 `modules/` 时，模块独有接口、loading、分页、筛选只由该模块维护；单业务块仍由根页面维护。
 - [ ] **10. 组件提升门槛**：超过 2 个页面使用才进入 `src/components/`。

@@ -36,6 +36,10 @@ export function safeHideNativeTabBar(): void {
  * 还原系统原生 TabBar 并清理 H5 注入的样式
  */
 export function safeRestoreNativeTabBar(): void {
+  // 自定义 TabBar 模式下（模式 2、3、4 等）严禁恢复显示原生 TabBar，杜绝切页卸载时原生底座反复闪现
+  if (needHideNativeTabbar) {
+    return;
+  }
   // #ifdef H5
   try {
     if (typeof document != 'undefined') {
@@ -48,14 +52,12 @@ export function safeRestoreNativeTabBar(): void {
   catch { }
   // #endif
   // #ifndef MP-WEIXIN
-  if (needHideNativeTabbar) {
-    try {
-      uni.showTabBar({
-        animation: false,
-        fail: (_err: any) => { }
-      });
-    }
-    catch { }
+  try {
+    uni.showTabBar({
+      animation: false,
+      fail: (_err: any) => { }
+    });
   }
+  catch { }
   // #endif
 }

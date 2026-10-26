@@ -1,3 +1,84 @@
+<script setup lang="uts">
+import { computed, onMounted, onUnmounted, ref } from 'vue';
+import { dayuts } from '@/uni_modules/lime-dayuts';
+import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/layouts/navbar/utils/index.uts';
+
+definePage({
+  debug: false,
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
+  style: {
+    navigationBarTitleText: '时间日期操作',
+    navigationStyle: 'custom'
+  }
+});
+
+// 实时时间状态
+const currentFullTime = ref('');
+let timerId: number = 0;
+
+// 偏移时间计算
+const offsetDays = ref(0);
+
+// 实时时钟更新
+function updateClock() {
+  currentFullTime.value = dayuts().format('YYYY-MM-DD HH:mm:ss.SSS dddd');
+}
+
+// 偏移量调节
+function adjustOffset(days: number) {
+  offsetDays.value += days;
+}
+
+// 计算属性：目标偏移时间
+const targetOffsetTime = computed((): string => {
+  return dayuts().add(offsetDays.value, 'day').format('YYYY-MM-DD HH:mm:ss');
+});
+
+// 计算属性：本月首日
+const startOfMonth = computed((): string => {
+  return dayuts().startOf('month').format('YYYY-MM-DD');
+});
+
+// 计算属性：本月尾日
+const endOfMonth = computed((): string => {
+  return dayuts().endOf('month').format('YYYY-MM-DD');
+});
+
+// 计算属性：是否为闰年
+const isLeapYear = computed((): boolean => {
+  return dayuts().isLeapYear();
+});
+
+// 计算属性：距离今年底的天数
+const daysToYearEnd = computed((): number => {
+  const endOfYear = dayuts().endOf('year');
+  const diffVal = endOfYear.diff(dayuts(), 'day');
+  return Math.ceil(diffVal);
+});
+
+onMounted(() => {
+  updateClock();
+  timerId = (setInterval((): void => {
+    updateClock();
+  }, 100) as any) as number;
+});
+
+onUnmounted(() => {
+  if (timerId != 0) {
+    clearInterval(timerId);
+  }
+});
+
+onNavbarPullDownRefresh(() => {
+  setTimeout(() => {
+    stopNavbarPullDownRefresh();
+  }, 800);
+});
+</script>
+
 <template>
   <view class="flex flex-col p-[16px] bg-[#f8fafc]">
     <view
@@ -84,86 +165,5 @@
     </view>
   </view>
 </template>
-
-<script setup lang="uts">
-import { computed, onMounted, onUnmounted, ref } from 'vue';
-import { dayuts } from '@/uni_modules/lime-dayuts';
-import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/layouts/navbar/utils/index.uts';
-
-definePage({
-  debug: false,
-  layout: 'navbar',
-  showBack: true,
-  hideNavbar: false,
-  enablePullDownRefresh: false,
-  style: {
-    navigationBarTitleText: '时间日期操作',
-    navigationStyle: 'custom'
-  }
-});
-
-// 实时时间状态
-const currentFullTime = ref('');
-let timerId: number = 0;
-
-// 偏移时间计算
-const offsetDays = ref(0);
-
-// 实时时钟更新
-function updateClock() {
-  currentFullTime.value = dayuts().format('YYYY-MM-DD HH:mm:ss.SSS dddd');
-}
-
-// 偏移量调节
-function adjustOffset(days: number) {
-  offsetDays.value += days;
-}
-
-// 计算属性：目标偏移时间
-const targetOffsetTime = computed((): string => {
-  return dayuts().add(offsetDays.value, 'day').format('YYYY-MM-DD HH:mm:ss');
-});
-
-// 计算属性：本月首日
-const startOfMonth = computed((): string => {
-  return dayuts().startOf('month').format('YYYY-MM-DD');
-});
-
-// 计算属性：本月尾日
-const endOfMonth = computed((): string => {
-  return dayuts().endOf('month').format('YYYY-MM-DD');
-});
-
-// 计算属性：是否为闰年
-const isLeapYear = computed((): boolean => {
-  return dayuts().isLeapYear();
-});
-
-// 计算属性：距离今年底的天数
-const daysToYearEnd = computed((): number => {
-  const endOfYear = dayuts().endOf('year');
-  const diffVal = endOfYear.diff(dayuts(), 'day');
-  return Math.ceil(diffVal);
-});
-
-onMounted(() => {
-  updateClock();
-  timerId = (setInterval((): void => {
-    updateClock();
-  }, 100) as any) as number;
-});
-
-onUnmounted(() => {
-  if (timerId != 0) {
-    clearInterval(timerId);
-  }
-});
-
-onNavbarPullDownRefresh(() => {
-  setTimeout(() => {
-    stopNavbarPullDownRefresh();
-  }, 800);
-});
-</script>
 
 <style scoped></style>

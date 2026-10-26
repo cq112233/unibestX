@@ -319,6 +319,30 @@ async function warmup() {
     }
     await sleep(150);
   }
+
+  // 动态读取 pages.json 中的 tabBar.list，自动预热所有 TabBar 页面模块，绝不硬编码
+  try {
+    const pagesJsonFile = path.join(ROOT, 'pages.json');
+    if (fs.existsSync(pagesJsonFile)) {
+      const content = fs.readFileSync(pagesJsonFile, 'utf-8');
+      const tabListMatch = content.match(/"tabBar"\s*:\s*\{[\s\S]*?"list"\s*:\s*\[([\s\S]*?)\]/);
+      if (tabListMatch && tabListMatch[1]) {
+        const pathMatches = tabListMatch[1].matchAll(/"pagePath"\s*:\s*"([^"]+)"/g);
+        for (const match of pathMatches) {
+          const rawPath = match[1].replace(/\\/g, '/').replace(/^\//, '');
+          if (rawPath.length > 0 && !rawPath.includes('pages/index/index')) {
+            try {
+              const res = await fetch(`${base}${rawPath}.uvue?import`, { headers: { 'user-agent': 'dev-warmup' } });
+              await res.text();
+            }
+            catch {}
+          }
+        }
+      }
+    }
+  }
+  catch {}
+
   console.log(`[dev-warmup] ✔ Web 端已预热（${WARMUP_HITS} 次${failed ? `，${failed} 次失败` : ''}，${Date.now() - t0}ms）`);
 }
 

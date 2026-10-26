@@ -1,126 +1,3 @@
-<template>
-  <!-- ============ 1. 真实请求（CRUD 增删改查） ============ -->
-  <view
-    class="rounded-[16px] p-[20px] my-[16px] border-[1px] border-solid border-[#edf2f7] bg-[#ffffff]"
-  >
-    <!-- 标题区域 -->
-    <view class="flex flex-row items-center mb-[16px]">
-      <view class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#06b6d4]" />
-      <text class="text-[16px] font-bold text-[#2d3748]">真实请求（CRUD 增删改查）</text>
-    </view>
-    <text class="text-[12px] text-[#64748b] leading-[19px] mb-[4px]">
-      由 src/api/example.uts 打 mockapi.io 的 /test 资源（地址写死在该文件的 FOO_BASE_URL）：列表与详情走 useQuery 自动加载与缓存，增删改走 useMutation 状态机，成功后自动重拉列表。五个动词都真实发出并落库持久化。
-    </text>
-
-    <!-- 2.1 表单区：新增与编辑共用一套输入框，crudEditingId > 0 即编辑态 -->
-    <view class="rounded-[10px] p-[12px] mt-[12px] border-[1px] border-solid border-[#e2e8f0]">
-      <view class="flex-row items-center justify-between mb-[8px]">
-        <text class="text-[13px] text-[#64748b]">{{ crudFormTitle }}</text>
-        <view class="px-[8px] py-[2px] rounded-[10px]" :class="crudFormModeBgClass">
-          <text class="text-[12px]" :class="crudFormModeTextClass">{{ crudFormModeText }}</text>
-        </view>
-      </view>
-      <input
-        v-model="crudName"
-        placeholder="name，例如 He was an expert"
-        class="h-[38px] bg-white rounded-[6px] px-[12px] border-[1px] border-solid border-[#cbd5e1] text-[13px] text-[#334155] mb-[8px]"
-      />
-      <input
-        v-model="crudDesc"
-        placeholder="desc，例如 一段正文……"
-        class="h-[38px] bg-white rounded-[6px] px-[12px] border-[1px] border-solid border-[#cbd5e1] text-[13px] text-[#334155] mb-[10px]"
-      />
-      <!-- 操作按钮：用 margin-right 代替 gap -->
-      <view class="flex-row">
-        <view :class="crudSubmitWrapClass">
-          <view
-            class="rounded-[8px] h-[42px] w-full flex flex-row items-center justify-center"
-            :class="crudSubmitBgClass"
-            @click="submitCrud"
-          >
-            <text class="text-[#ffffff] text-[14px]">{{ crudSubmitText }}</text>
-          </view>
-        </view>
-        <view v-if="crudEditing" class="flex-1">
-          <view
-            class="bg-[#94a3b8] rounded-[8px] h-[42px] w-full flex flex-row items-center justify-center"
-            @click="cancelCrudEdit"
-          >
-            <text class="text-[#ffffff] text-[14px]">取消编辑</text>
-          </view>
-        </view>
-      </view>
-    </view>
-
-    <!-- 2.2 数据列表：每行挂「详情 / 编辑 / 删除」三个操作 -->
-    <view class="mt-[12px]">
-      <!-- 窄屏（375）下标题 + 状态 + 条数 + 按钮一行放不下，会把「重置」挤没，故拆成两行 -->
-      <view class="flex-row items-center justify-between mb-[6px]">
-        <text class="text-[13px] text-[#64748b]">最近 2 条（useQuery · GET /test）</text>
-        <view class="px-[6px] py-[2px] rounded-[4px] ml-[8px]" :class="crudListStatusBgClass">
-          <text class="text-[10px] font-medium" :class="crudListStatusTextClass">{{ crudListStatusText }}</text>
-        </view>
-      </view>
-      <view class="flex-row items-center justify-between mb-[8px]">
-        <text class="text-[12px] text-[#94a3b8]">{{ crudListCountText }}</text>
-        <view class="px-[10px] py-[4px] rounded-[4px] bg-[#0ea5e9] flex-row items-center" @click="resetCrudDemo">
-          <text class="text-[11px] text-[#ffffff] font-medium">{{ crudLoading ? '加载中…' : '重置' }}</text>
-        </view>
-      </view>
-
-      <text v-if="crudList.length == 0" class="text-[12px] text-[#94a3b8]">暂无数据，可在上方表单新增一条</text>
-      <view
-        v-for="item in crudList"
-        :key="item.id"
-        class="flex-row items-center py-[10px] px-[10px] bg-[#f8fafc] rounded-[8px] mb-[8px]"
-      >
-        <view class="flex-1 mr-[8px]">
-          <view class="flex-row items-center">
-            <text class="text-[13px] font-bold text-[#334155]">{{ item.name }}</text>
-            <text class="text-[11px] text-[#94a3b8] ml-[6px]">#{{ item.id }}</text>
-            <text v-if="item.id == crudEditingId" class="text-[10px] text-[#0ea5e9] ml-[6px]">编辑中</text>
-          </view>
-          <text class="text-[11px] text-[#64748b] mt-[2px]">{{ crudDescPreview(item.desc) }}</text>
-        </view>
-        <view class="flex-row items-center">
-          <view class="px-[8px] py-[4px] rounded-[4px] bg-[#e0e7ff] mr-[6px]" @click="loadCrudDetail(item)">
-            <text class="text-[11px] text-[#4338ca]">详情</text>
-          </view>
-          <view class="px-[8px] py-[4px] rounded-[4px] bg-[#dbeafe] mr-[6px]" @click="startCrudEdit(item)">
-            <text class="text-[11px] text-[#1d4ed8]">编辑</text>
-          </view>
-          <view class="px-[8px] py-[4px] rounded-[4px] bg-[#fee2e2]" @click="removeCrud(item)">
-            <text class="text-[11px] text-[#b91c1c]">删除</text>
-          </view>
-        </view>
-      </view>
-    </view>
-
-    <!-- 2.3 详情结果面板（GET /test/:id） -->
-    <view
-      v-if="hasCrudDetail"
-      class="mt-[12px] rounded-[8px] bg-[#f8fafc] border-[1px] border-solid border-[#cbd5e1] overflow-hidden"
-    >
-      <view class="h-[3px] bg-[#6366f1]" />
-      <view class="p-[12px]">
-        <view class="flex-row items-center justify-between mb-[6px]">
-          <text class="text-[11px] text-[#64748b]">详情结果</text>
-          <text class="text-[10px] text-[#94a3b8]">GET /test/:id</text>
-        </view>
-        <text class="text-[12px] text-[#334155] leading-[20px]">{{ crudDetailText }}</text>
-      </view>
-    </view>
-
-    <!-- 2.4 失败兜底：http 拦截器已统一 toast，这里只留卡片内的一行提示 -->
-    <view
-      v-if="hasCrudError"
-      class="mt-[10px] bg-[#fff5f5] rounded-[8px] p-[10px] border-[1px] border-solid border-[#fecaca]"
-    >
-      <text class="text-[12px] text-[#ef4444]">{{ crudErrorText }}</text>
-    </view>
-  </view>
-</template>
-
 <script setup lang="uts">
 import { computed, ref } from 'vue';
 import { createFooApi, deleteFooApi, fetchFooByIdApi, fetchFooLatestApi, updateFooApi } from '@/src/api/example.uts';
@@ -484,3 +361,126 @@ function submitCrud(): void {
   }
 }
 </script>
+
+<template>
+  <!-- ============ 1. 真实请求（CRUD 增删改查） ============ -->
+  <view
+    class="rounded-[16px] p-[20px] my-[16px] border-[1px] border-solid border-[#edf2f7] bg-[#ffffff]"
+  >
+    <!-- 标题区域 -->
+    <view class="flex flex-row items-center mb-[16px]">
+      <view class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#06b6d4]" />
+      <text class="text-[16px] font-bold text-[#2d3748]">真实请求（CRUD 增删改查）</text>
+    </view>
+    <text class="text-[12px] text-[#64748b] leading-[19px] mb-[4px]">
+      由 src/api/example.uts 打 mockapi.io 的 /test 资源（地址写死在该文件的 FOO_BASE_URL）：列表与详情走 useQuery 自动加载与缓存，增删改走 useMutation 状态机，成功后自动重拉列表。五个动词都真实发出并落库持久化。
+    </text>
+
+    <!-- 2.1 表单区：新增与编辑共用一套输入框，crudEditingId > 0 即编辑态 -->
+    <view class="rounded-[10px] p-[12px] mt-[12px] border-[1px] border-solid border-[#e2e8f0]">
+      <view class="flex-row items-center justify-between mb-[8px]">
+        <text class="text-[13px] text-[#64748b]">{{ crudFormTitle }}</text>
+        <view class="px-[8px] py-[2px] rounded-[10px]" :class="crudFormModeBgClass">
+          <text class="text-[12px]" :class="crudFormModeTextClass">{{ crudFormModeText }}</text>
+        </view>
+      </view>
+      <input
+        v-model="crudName"
+        placeholder="name，例如 He was an expert"
+        class="h-[38px] bg-white rounded-[6px] px-[12px] border-[1px] border-solid border-[#cbd5e1] text-[13px] text-[#334155] mb-[8px]"
+      />
+      <input
+        v-model="crudDesc"
+        placeholder="desc，例如 一段正文……"
+        class="h-[38px] bg-white rounded-[6px] px-[12px] border-[1px] border-solid border-[#cbd5e1] text-[13px] text-[#334155] mb-[10px]"
+      />
+      <!-- 操作按钮：用 margin-right 代替 gap -->
+      <view class="flex-row">
+        <view :class="crudSubmitWrapClass">
+          <view
+            class="rounded-[8px] h-[42px] w-full flex flex-row items-center justify-center"
+            :class="crudSubmitBgClass"
+            @click="submitCrud"
+          >
+            <text class="text-[#ffffff] text-[14px]">{{ crudSubmitText }}</text>
+          </view>
+        </view>
+        <view v-if="crudEditing" class="flex-1">
+          <view
+            class="bg-[#94a3b8] rounded-[8px] h-[42px] w-full flex flex-row items-center justify-center"
+            @click="cancelCrudEdit"
+          >
+            <text class="text-[#ffffff] text-[14px]">取消编辑</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 2.2 数据列表：每行挂「详情 / 编辑 / 删除」三个操作 -->
+    <view class="mt-[12px]">
+      <!-- 窄屏（375）下标题 + 状态 + 条数 + 按钮一行放不下，会把「重置」挤没，故拆成两行 -->
+      <view class="flex-row items-center justify-between mb-[6px]">
+        <text class="text-[13px] text-[#64748b]">最近 2 条（useQuery · GET /test）</text>
+        <view class="px-[6px] py-[2px] rounded-[4px] ml-[8px]" :class="crudListStatusBgClass">
+          <text class="text-[10px] font-medium" :class="crudListStatusTextClass">{{ crudListStatusText }}</text>
+        </view>
+      </view>
+      <view class="flex-row items-center justify-between mb-[8px]">
+        <text class="text-[12px] text-[#94a3b8]">{{ crudListCountText }}</text>
+        <view class="px-[10px] py-[4px] rounded-[4px] bg-[#0ea5e9] flex-row items-center" @click="resetCrudDemo">
+          <text class="text-[11px] text-[#ffffff] font-medium">{{ crudLoading ? '加载中…' : '重置' }}</text>
+        </view>
+      </view>
+
+      <text v-if="crudList.length == 0" class="text-[12px] text-[#94a3b8]">暂无数据，可在上方表单新增一条</text>
+      <view
+        v-for="item in crudList"
+        :key="item.id"
+        class="flex-row items-center py-[10px] px-[10px] bg-[#f8fafc] rounded-[8px] mb-[8px]"
+      >
+        <view class="flex-1 mr-[8px]">
+          <view class="flex-row items-center">
+            <text class="text-[13px] font-bold text-[#334155]">{{ item.name }}</text>
+            <text class="text-[11px] text-[#94a3b8] ml-[6px]">#{{ item.id }}</text>
+            <text v-if="item.id == crudEditingId" class="text-[10px] text-[#0ea5e9] ml-[6px]">编辑中</text>
+          </view>
+          <text class="text-[11px] text-[#64748b] mt-[2px]">{{ crudDescPreview(item.desc) }}</text>
+        </view>
+        <view class="flex-row items-center">
+          <view class="px-[8px] py-[4px] rounded-[4px] bg-[#e0e7ff] mr-[6px]" @click="loadCrudDetail(item)">
+            <text class="text-[11px] text-[#4338ca]">详情</text>
+          </view>
+          <view class="px-[8px] py-[4px] rounded-[4px] bg-[#dbeafe] mr-[6px]" @click="startCrudEdit(item)">
+            <text class="text-[11px] text-[#1d4ed8]">编辑</text>
+          </view>
+          <view class="px-[8px] py-[4px] rounded-[4px] bg-[#fee2e2]" @click="removeCrud(item)">
+            <text class="text-[11px] text-[#b91c1c]">删除</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 2.3 详情结果面板（GET /test/:id） -->
+    <view
+      v-if="hasCrudDetail"
+      class="mt-[12px] rounded-[8px] bg-[#f8fafc] border-[1px] border-solid border-[#cbd5e1] overflow-hidden"
+    >
+      <view class="h-[3px] bg-[#6366f1]" />
+      <view class="p-[12px]">
+        <view class="flex-row items-center justify-between mb-[6px]">
+          <text class="text-[11px] text-[#64748b]">详情结果</text>
+          <text class="text-[10px] text-[#94a3b8]">GET /test/:id</text>
+        </view>
+        <text class="text-[12px] text-[#334155] leading-[20px]">{{ crudDetailText }}</text>
+      </view>
+    </view>
+
+    <!-- 2.4 失败兜底：http 拦截器已统一 toast，这里只留卡片内的一行提示 -->
+    <view
+      v-if="hasCrudError"
+      class="mt-[10px] bg-[#fff5f5] rounded-[8px] p-[10px] border-[1px] border-solid border-[#fecaca]"
+    >
+      <text class="text-[12px] text-[#ef4444]">{{ crudErrorText }}</text>
+    </view>
+  </view>
+</template>

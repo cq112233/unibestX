@@ -52,7 +52,8 @@ const ROOT_PROP_KEYS: string[] = [
   'enablePullDownRefresh',
   'customPageClass',
   'customPageStyle',
-  'style'
+  'style',
+  'isTabbar'
 ];
 
 /**
@@ -146,6 +147,8 @@ export function uniRootX(options: UniRootXOptions = {}): Plugin {
     }
     try {
       const data = loadPlatformPagesJson(pagesJsonPath);
+      const tabList = (data.tabBar && Array.isArray(data.tabBar.list)) ? data.tabBar.list : [];
+      const tabPaths = new Set(tabList.map((item: any) => (item.pagePath || '').replace(/\\/g, '/').replace(/^\//, '')));
 
       const collect = (page: any) => {
         if (page == null || typeof page.path !== 'string') {
@@ -158,6 +161,9 @@ export function uniRootX(options: UniRootXOptions = {}): Plugin {
             params[key] = page[key];
           }
         });
+        if (tabPaths.has(normPath)) {
+          params.isTabbar = true;
+        }
         paramsByPath.set(normPath, params);
       };
 

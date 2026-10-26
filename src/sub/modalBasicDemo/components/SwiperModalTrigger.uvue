@@ -14,51 +14,6 @@
   取数据 = `$callMethod('readPayloadSummary')` / `$callMethod('getLastAction')`。
   所以本组件自己拿局部 ref 存回执 —— 它不依赖任何全局响应式状态。
 -->
-<template>
-  <view class="absolute top-0 bottom-0 left-0 right-0 flex flex-col items-center justify-center px-[16px]">
-    <text class="text-[12px] mb-[6px] text-[#475569]">
-      swiper-item 1 · 触发器组件挂在这里
-    </text>
-
-    <view
-      class="px-[14px] h-[32px] rounded-[8px] bg-[#dc2626] flex flex-row items-center justify-center active:opacity-85"
-      @click="handleOpen"
-    >
-      <text class="text-[#ffffff] text-[12px] font-medium">传数据并打开弹窗</text>
-    </view>
-
-    <view
-      class="px-[14px] h-[32px] rounded-[8px] bg-[#0ea5e9] flex flex-row items-center justify-center mt-[8px] active:opacity-85"
-      @click="handleReadFromInstance"
-    >
-      <text class="text-[#ffffff] text-[12px] font-medium">取数据（走实例 ref）</text>
-    </view>
-
-    <view
-      class="px-[14px] h-[32px] rounded-[8px] bg-[#64748b] flex flex-row items-center justify-center mt-[8px] active:opacity-85"
-      @click="handleCloseByRef"
-    >
-      <text class="text-[#ffffff] text-[12px] font-medium">通过 ref 关闭弹窗</text>
-    </view>
-
-    <!-- 本组件自己的回执（局部 ref，数据是从实例 ref 读回来的） -->
-    <view class="mt-[10px] flex flex-col items-center">
-      <text class="text-[11px] leading-[18px] text-[#64748b]">
-        实例是否注册：{{ registered }}
-      </text>
-      <text class="text-[11px] leading-[18px] text-[#64748b]">
-        本次传进去的标题：{{ sentTitle.length > 0 ? sentTitle : '—' }}
-      </text>
-      <text v-if="refSummary.length > 0" class="text-[11px] leading-[18px] text-[#0ea5e9]">
-        ref 直读实例：{{ refSummary }}
-      </text>
-      <text v-if="refAction.length > 0" class="text-[11px] leading-[18px] text-[#059669]">
-        ref 读回的关闭动作：{{ refAction }}
-      </text>
-    </view>
-  </view>
-</template>
-
 <script setup lang="uts">
 import { ref } from 'vue';
 import { useModalStore } from '@/src/store/index.uts';
@@ -148,6 +103,51 @@ function handleCloseByRef(): void {
   refAction.value = 'closeModal（由 swiper 内部经 ref 调用）';
 }
 </script>
+
+<template>
+  <view class="absolute top-0 bottom-0 left-0 right-0 flex flex-col items-center justify-center px-[16px]">
+    <text class="text-[12px] mb-[6px] text-[#475569]">
+      swiper-item 1 · 触发器组件挂在这里
+    </text>
+
+    <view
+      class="px-[14px] h-[32px] rounded-[8px] bg-[#dc2626] flex flex-row items-center justify-center active:opacity-85"
+      @click="handleOpen"
+    >
+      <text class="text-[#ffffff] text-[12px] font-medium">传数据并打开弹窗</text>
+    </view>
+
+    <view
+      class="px-[14px] h-[32px] rounded-[8px] bg-[#0ea5e9] flex flex-row items-center justify-center mt-[8px] active:opacity-85"
+      @click="handleReadFromInstance"
+    >
+      <text class="text-[#ffffff] text-[12px] font-medium">取数据（走实例 ref）</text>
+    </view>
+
+    <view
+      class="px-[14px] h-[32px] rounded-[8px] bg-[#64748b] flex flex-row items-center justify-center mt-[8px] active:opacity-85"
+      @click="handleCloseByRef"
+    >
+      <text class="text-[#ffffff] text-[12px] font-medium">通过 ref 关闭弹窗</text>
+    </view>
+
+    <!-- 本组件自己的回执（局部 ref，数据是从实例 ref 读回来的） -->
+    <view class="mt-[10px] flex flex-col items-center">
+      <text class="text-[11px] leading-[18px] text-[#64748b]">
+        实例是否注册：{{ registered }}
+      </text>
+      <text class="text-[11px] leading-[18px] text-[#64748b]">
+        本次传进去的标题：{{ sentTitle.length > 0 ? sentTitle : '—' }}
+      </text>
+      <text v-if="refSummary.length > 0" class="text-[11px] leading-[18px] text-[#0ea5e9]">
+        ref 直读实例：{{ refSummary }}
+      </text>
+      <text v-if="refAction.length > 0" class="text-[11px] leading-[18px] text-[#059669]">
+        ref 读回的关闭动作：{{ refAction }}
+      </text>
+    </view>
+  </view>
+</template>
 
 <style scoped>
 </style>

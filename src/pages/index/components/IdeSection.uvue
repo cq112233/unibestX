@@ -1,3 +1,41 @@
+<script setup lang="uts">
+type IdeFeatureItem = {
+  id: string;
+  icon: string;
+  title: string;
+  desc: string;
+};
+
+const ideNameList: Array<string> = ['VSCode (推荐)', 'Trae', 'Cursor', 'Antigravity', 'HBuilder V (Alpha预览)'];
+
+const ideFeatureList: Array<IdeFeatureItem> = [
+  {
+    id: 'types',
+    icon: '🧠',
+    title: '类型提示与跳转定义',
+    desc: '内置 uts-volar-plugin 与 Volar 配置，.uts / .uvue 均支持补全、跳转定义与实时类型诊断'
+  },
+  {
+    id: 'format',
+    icon: '✨',
+    title: '保存自动格式化',
+    desc: 'ESLint + Stylelint 保存即自动修复，缩进、引号与样式写法全仓统一'
+  },
+  {
+    id: 'snippets',
+    icon: '⚡',
+    title: '代码片段一键生成',
+    desc: 'v3 / v3c 秒出页面与组件骨架，definePage、defineProps 等 30 个片段开箱可用'
+  },
+  {
+    id: 'extensions',
+    icon: '🔌',
+    title: '推荐扩展一键安装',
+    desc: '16 个推荐插件写入 extensions.json，打开项目即提示安装，环境一次配齐'
+  }
+];
+</script>
+
 <template>
   <div class="mt-[16px] mx-[16px]">
     <div class="flex flex-row items-center justify-between mb-[10px]">
@@ -56,43 +94,5 @@
     </div>
   </div>
 </template>
-
-<script setup lang="uts">
-type IdeFeatureItem = {
-  id: string;
-  icon: string;
-  title: string;
-  desc: string;
-};
-
-const ideNameList: Array<string> = ['VSCode (推荐)', 'Trae', 'Cursor', 'Antigravity', 'HBuilder V (Alpha预览)'];
-
-const ideFeatureList: Array<IdeFeatureItem> = [
-  {
-    id: 'types',
-    icon: '🧠',
-    title: '类型提示与跳转定义',
-    desc: '内置 uts-volar-plugin 与 Volar 配置，.uts / .uvue 均支持补全、跳转定义与实时类型诊断'
-  },
-  {
-    id: 'format',
-    icon: '✨',
-    title: '保存自动格式化',
-    desc: 'ESLint + Stylelint 保存即自动修复，缩进、引号与样式写法全仓统一'
-  },
-  {
-    id: 'snippets',
-    icon: '⚡',
-    title: '代码片段一键生成',
-    desc: 'v3 / v3c 秒出页面与组件骨架，definePage、defineProps 等 30 个片段开箱可用'
-  },
-  {
-    id: 'extensions',
-    icon: '🔌',
-    title: '推荐扩展一键安装',
-    desc: '16 个推荐插件写入 extensions.json，打开项目即提示安装，环境一次配齐'
-  }
-];
-</script>
 
 <style scoped></style>

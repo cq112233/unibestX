@@ -14,17 +14,28 @@
 
 ## 4.0 先记住这 11 条
 
-1. 简单业务默认只写根页面，`components/` 可选，`modules/` 可选，**不要为了拆而拆**。
-2. `modules/` 下没有 `common/`。
-3. 只有**页面根组件**和 **`modules/<block>/<Block>Module.uvue`** 可以发请求。
-4. `components/`、`common/`、`modules/<block>/components/`、`src/components/` 只做纯展示：接收 Props、抛出 Emits。
-5. 两个模块共用同一接口时，由页面根组件请求一次，再通过 Props 下发。
-6. 同一组件被**超过 2 个页面**使用，也就是从第 3 个页面开始，才提升到 `src/components/`。
-7. 每个页面都写 `name`、`debug: false`、`debugHome: false` 和 `navigationStyle: 'custom'`。
-8. `enablePullDownRefresh` 默认 `false`；只有明确需要页面下拉刷新才写 `true`，并闭环停止刷新。
-9. Query / Mutation 解构出的状态本身是 Ref：模板直接写 `listPending`，不写 `listPending.value`；script 内读值才写 `.value`。
-10. 不为纯转发创建 `computed`。只有字段转换、组合、过滤、排序等真实派生才用 `computed`。
+1. **顶级块顺序铁律**：统一按 `<script setup lang="uts">` $\rightarrow$ `<template>` $\rightarrow$ `<style scoped>` 排布（严格匹配项目 ESLint `vue/block-order` 规则，禁止 template 放最前）。
+2. 简单业务默认只写根页面，`components/` 可选，`modules/` 可选，**不要为了拆而拆**。
+3. **全项目统一使用 `components/`，不设模糊的 `common/` 目录**。
+4. 只有**页面根组件**和 **`modules/<block>/<Block>Module.uvue`** 可以发请求。
+5. 页面 `components/`、模块 `components/`、`src/components/` 只做纯展示：接收 Props、抛出 Emits。
+6. 两个模块共用同一接口时，由页面根组件请求一次，再通过 Props 下发。
+7. 同一组件被**超过 2 个页面**使用，也就是从第 3 个页面开始，才提升到 `src/components/`。
+8. 每个页面都写 `name`、`debug: false`、`debugHome: false` 和 `navigationStyle: 'custom'`。
+9. `enablePullDownRefresh` 默认 `false`；只有明确需要页面下拉刷新才写 `true`，并闭环停止刷新。
+10. Query / Mutation 解构出的状态本身是 Ref：模板直接写 `listPending`，不写 `listPending.value`；script 内读值才写 `.value`。
 11. TabBar 页和普通页都是 `<page>.uvue` 根组件，**没有 `views/` 文件夹**；TabBar 页只是额外接入 TabBar 页面语义。
+12. **禁止裸写 HTML 标签与禁止文本嵌套**：未经明确要求，严禁在模板中手写 `div`、`span`、`i`、`em`、`b` 等 HTML 标签，一律直接使用 uni 原生 `<view>` 与 `<text>`；所有行内文本标签一律转为 `<text>`，且**严禁嵌套**（一个 `<text>` 只能包含单个文本节点）。复合多色/不同字重文本使用 `<view class="flex flex-row flex-wrap">` 平铺并列兄弟 `<text>` 节点。
+
+### 4.0.1 脚手架极速生成（低 Token 模式）
+
+> 💡 **AI 与开发者必读**：新建页面、组件或 Hook 时，**强烈推荐优先运行项目内置的 Plop 脚手架命令**。无需从零手写长篇骨架模板，既保证 100% 符合 UTS 与分册规范，又能节省 70% 以上的 Token 消耗：
+
+| 命令 | 适用场景 | 自动生成物与特性 |
+| :--- | :--- | :--- |
+| `pnpm plop page` | 新建分包业务页 / 主包页 | 自动创建 `src/sub/<module>/<page>/<page>.uvue` + 同步创建 `src/api/<module>/<page>.uts` 接口契约，内置 `useQuery` 数据流与 `definePage` 契约 |
+| `pnpm plop component` | 新建展示组件 | 自动扫描现有页面或模块列表，精准落位到对应的 `components/` 目录，内置 Props / Emits 强类型签名 |
+| `pnpm plop hook` | 新建业务 Hook | 严格遵循词根语义化：自动生成 `use<Entity>Query`（读接口+useQuery）、`use<Action>Mutation`（写接口+useMutation）或纯前端普通 Hook |
 
 ---
 
@@ -35,15 +46,14 @@
 ```text
 <page>/
 ├── <page>.uvue                  # 页面根组件；TabBar 页也是页面根组件，不再拆 views/
-├── components/                  # 可选：根组件直属纯展示视图
-├── common/                      # 可选：页面内多处复用的纯展示视图
+├── components/                  # 可选：页面直属纯展示视图（不设 common/）
 └── modules/                     # 可选：复杂页面的独立业务区块
     └── <block>/
         ├── <Block>Module.uvue   # 模块组件：可发本模块请求
         └── components/          # 模块直属纯展示视图
 ```
 
-`components/`、`common/`、`modules/` 都是按需创建，不是页面脚手架。
+`components/`、`modules/` 都是按需创建，不是页面脚手架。
 
 ### 4.1.2 拆分顺序
 
@@ -64,9 +74,8 @@
 | :--- | :--- | :--- |
 | 页面根组件 | ✅ | 页面数据、单业务块请求、多个模块共享接口 |
 | `modules/<block>/<Block>Module.uvue` | ✅ 仅本模块接口 | 本模块 loading、分页、筛选、变更 |
-| `components/` | ❌ | 纯展示，Props / Emits |
-| `common/` | ❌ | 纯展示，Props / Emits |
-| `modules/<block>/components/` | ❌ | 纯展示，Props / Emits |
+| 页面 `components/` | ❌ | 纯展示，Props / Emits |
+| 模块 `components/` | ❌ | 纯展示，Props / Emits |
 | `src/components/` | ❌ | 跨页面公共纯展示组件 |
 
 TabBar 页面同样由 `<page>.uvue` 承担页面根组件职责，可以直接发 HTTP。模式 4 下它还会被 `TabViews.uvue` 复用为 Tab 子组件，因此需要页面语义时使用 `useTabPage()`，需要同时兼容真实页面与 Tab 子页双身份时使用 `useTabPageShell(tabType)`。
@@ -95,7 +104,7 @@ TabBar 页面同样由 `<page>.uvue` 承担页面根组件职责，可以直接�
 
 ```html
 <template>
-  <view class="flex flex-col flex-1 bg-[#f8fafc]">
+  <view class="flex flex-col flex-1">
     <view class="w-full px-[16px] pt-[12px] pb-[8px]">
       <text class="text-[16px] font-bold text-[#1e293b]">订单列表</text>
     </view>
@@ -157,12 +166,6 @@ TabBar 页与普通页的目录、模板和取数职责相同：页面 `.uvue` �
 
 ```html
 <!-- src/pages/basic/basic.uvue -->
-<template>
-  <view class="flex flex-col p-[16px]">
-    <!-- 页面内容直接写在这里 -->
-  </view>
-</template>
-
 <script setup lang="uts">
 import {
   curIdx,
@@ -221,6 +224,12 @@ onNavbarPullDownRefresh((): void => {
   stopNavbarPullDownRefresh();
 });
 </script>
+
+<template>
+  <view class="flex flex-col p-[16px]">
+    <!-- 页面内容直接写在这里 -->
+  </view>
+</template>
 ```
 
 TabBar 页的关键规则：
@@ -239,14 +248,6 @@ TabBar 页的关键规则：
 
 ```html
 <!-- src/pages/index/index.uvue -->
-<template>
-  <TabPageHost>
-    <view class="flex flex-col w-full">
-      <!-- 首页业务内容 -->
-    </view>
-  </TabPageHost>
-</template>
-
 <script setup lang="uts">
 import TabPageHost from '@/src/tabbar/components/TabPageHost.uvue';
 import {
@@ -304,6 +305,14 @@ onNavbarPullDownRefresh((): void => {
   stopNavbarPullDownRefresh();
 });
 </script>
+
+<template>
+  <TabPageHost>
+    <view class="flex flex-col w-full">
+      <!-- 首页业务内容 -->
+    </view>
+  </TabPageHost>
+</template>
 ```
 
 - 只有宿主首页写 `type: 'home'`，其他 TabBar 页不写。
@@ -418,100 +427,9 @@ definePage({
 
 > 接口函数本身放在 `src/api/order/list.uts`，页面只精准导入具体文件。
 
-### 4.4.1 模板
+### 4.4.1 脚本（`<script setup lang="uts">`）
 
 ```html
-<template>
-  <view class="flex flex-col flex-1 bg-[#f8fafc]">
-    <view class="w-full px-[16px] pt-[12px] pb-[8px]">
-      <view class="w-full bg-[#ffffff] border-[1px] border-solid border-[#e2e8f0] rounded-[8px] p-[16px]">
-        <text class="text-[16px] font-bold text-[#1e293b]">订单列表</text>
-        <text class="text-[12px] leading-[18px] text-[#64748b] mt-[4px]">
-          来源：{{ fromPage }} · 共 {{ listData != null ? listData.length : 0 }} 单
-        </text>
-        <input
-          v-model="keywordInput"
-          class="h-[36px] bg-[#f8fafc] rounded-[8px] px-[12px] mt-[10px] text-[13px] text-[#334155]"
-          placeholder="输入关键字后搜索"
-          @confirm="onSearch"
-        />
-        <view class="flex flex-row mt-[10px]">
-          <view
-            class="flex-1 h-[34px] rounded-[8px] bg-[#2563eb] items-center justify-center mr-[8px]"
-            @click="onSearch"
-          >
-            <text class="text-[13px] font-bold text-[#ffffff]">搜索</text>
-          </view>
-          <view
-            class="flex-1 h-[34px] rounded-[8px] bg-[#0d9488] items-center justify-center"
-            @click="onCreate"
-          >
-            <text class="text-[13px] font-bold text-[#ffffff]">
-              {{ creating ? '创建中…' : '新建订单' }}
-            </text>
-          </view>
-        </view>
-      </view>
-    </view>
-
-    <scroll-view direction="vertical" class="flex-1 flex flex-col">
-      <view v-if="listPending" class="flex flex-col items-center py-[48px]">
-        <text class="text-[13px] text-[#94a3b8]">正在加载…</text>
-      </view>
-
-      <view v-else-if="listError" class="flex flex-col items-center py-[48px]">
-        <text class="text-[13px] text-[#94a3b8]">{{ errorText }}</text>
-        <view
-          class="h-[32px] px-[16px] rounded-[16px] bg-[#2563eb] items-center justify-center mt-[12px]"
-          @click="onRetry"
-        >
-          <text class="text-[13px] text-[#ffffff]">重试</text>
-        </view>
-      </view>
-
-      <view
-        v-else-if="listData != null && listData.length == 0"
-        class="flex flex-col items-center py-[48px]"
-      >
-        <text class="text-[13px] text-[#94a3b8]">暂无订单</text>
-      </view>
-
-      <view v-else-if="listData != null" class="flex flex-col">
-        <view
-          v-for="item in listData"
-          :key="item.id"
-          class="flex flex-col bg-[#ffffff] border-[1px] border-solid border-[#e2e8f0] rounded-[8px] p-[14px] mx-[16px] mb-[10px]"
-          @click="onOpenDetail(item)"
-        >
-          <view class="flex flex-row items-center justify-between">
-            <text class="text-[14px] font-semibold text-[#1e293b]">{{ item.title }}</text>
-            <text class="text-[14px] font-bold text-[#2563eb]">¥{{ item.amount }}</text>
-          </view>
-          <view class="flex flex-row items-center justify-between mt-[6px]">
-            <text class="text-[12px] text-[#94a3b8]">{{ item.createdText }}</text>
-            <view
-              class="h-[26px] px-[10px] rounded-[13px] bg-[#fee2e2] items-center justify-center"
-              @click.stop="onDelete(item)"
-            >
-              <text class="text-[12px] text-[#b91c1c]">删除</text>
-            </view>
-          </view>
-        </view>
-      </view>
-
-      <view class="flex flex-col items-center py-[16px]">
-        <text class="text-[12px] text-[#94a3b8]">
-          {{ listFetching ? '同步中…' : '没有更多了' }}
-        </text>
-      </view>
-    </scroll-view>
-  </view>
-</template>
-```
-
-### 4.4.2 脚本
-
-```uts
 <script setup lang="uts">
 import { computed, ref } from 'vue';
 import { useRoute, useRouter } from '@/uni_modules/route-bestX/index.uts';
@@ -562,7 +480,7 @@ const keyword = ref<string>(route.query.get('keyword') ?? '');
 /** 搜索框输入值 */
 const keywordInput = ref<string>(route.query.get('keyword') ?? '');
 
-// 列表查询：解构 + 业务别名；keyword 放进 queryKey，变化后自动重查
+// 列表查询：解构 + 业务别名；keyword 放进 queryKey，变化后自动重查（默认走全局缓存与重试策略）
 const {
   data: listData,
   isPending: listPending,
@@ -651,8 +569,91 @@ function onOpenDetail(item: OrderItem): void {
   });
 }
 </script>
+```
 
-<style></style>
+### 4.4.2 模板与样式（`<template>` / `<style scoped>`）
+
+> 💡 **移动端 UI 原则**：页面主标题已由自定义导航栏 `navbar`（`navigationBarTitleText`）承载，**严禁在页面内容区顶部硬套重复的“标题+简介大白卡片”**，直接承载搜索栏、过滤条或业务主体内容。模板中直接使用解构出的状态名（如 `listPending`），无需 `.value`。
+
+```html
+<template>
+  <view class="flex flex-col flex-1">
+    <!-- 顶部操作条（直接承载搜索与新增操作，无冗余标题卡片） -->
+    <view class="w-full px-[16px] pt-[12px] pb-[8px] flex flex-row items-center">
+      <input
+        v-model="keywordInput"
+        class="flex-1 h-[36px] bg-[#ffffff] border-[1px] border-solid border-[#e2e8f0] rounded-[8px] px-[12px] text-[13px] text-[#334155]"
+        placeholder="输入关键字搜索"
+        @confirm="onSearch"
+      />
+      <view
+        class="h-[36px] px-[16px] rounded-[8px] bg-[#2563eb] items-center justify-center ml-[10px]"
+        @click="onCreate"
+      >
+        <text class="text-[13px] font-bold text-[#ffffff]">
+          {{ creating ? '创建中…' : '新增' }}
+        </text>
+      </view>
+    </view>
+
+    <!-- 滚动内容列表区 -->
+    <scroll-view direction="vertical" class="flex-1 flex flex-col">
+      <view v-if="listPending" class="flex flex-col items-center py-[48px]">
+        <text class="text-[13px] text-[#94a3b8]">正在加载…</text>
+      </view>
+
+      <view v-else-if="listError" class="flex flex-col items-center py-[48px]">
+        <text class="text-[13px] text-[#94a3b8]">{{ errorText }}</text>
+        <view
+          class="h-[32px] px-[16px] rounded-[16px] bg-[#2563eb] items-center justify-center mt-[12px]"
+          @click="onRetry"
+        >
+          <text class="text-[13px] text-[#ffffff]">重试</text>
+        </view>
+      </view>
+
+      <view
+        v-else-if="listData != null && listData.length == 0"
+        class="flex flex-col items-center py-[48px]"
+      >
+        <text class="text-[13px] text-[#94a3b8]">暂无订单</text>
+      </view>
+
+      <view v-else-if="listData != null" class="flex flex-col">
+        <view
+          v-for="item in listData"
+          :key="item.id"
+          class="flex flex-col bg-[#ffffff] border-[1px] border-solid border-[#e2e8f0] rounded-[8px] p-[14px] mx-[16px] mb-[10px]"
+          @click="onOpenDetail(item)"
+        >
+          <view class="flex flex-row items-center justify-between">
+            <text class="text-[14px] font-semibold text-[#1e293b]">{{ item.title }}</text>
+            <text class="text-[14px] font-bold text-[#2563eb]">¥{{ item.amount }}</text>
+          </view>
+          <view class="flex flex-row items-center justify-between mt-[6px]">
+            <text class="text-[12px] text-[#94a3b8]">{{ item.createdText }}</text>
+            <view
+              class="h-[26px] px-[10px] rounded-[13px] bg-[#fee2e2] items-center justify-center"
+              @click.stop="onDelete(item)"
+            >
+              <text class="text-[12px] text-[#b91c1c]">删除</text>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <view class="flex flex-col items-center py-[16px]">
+        <text class="text-[12px] text-[#94a3b8]">
+          {{ listFetching ? '同步中…' : '没有更多了' }}
+        </text>
+      </view>
+    </scroll-view>
+  </view>
+</template>
+
+<style scoped>
+/* 局部样式，优先使用原子类 */
+</style>
 ```
 
 ### 4.4.3 五段职责
@@ -838,19 +839,6 @@ import OrderFilter from './components/OrderFilter.uvue';
 ### 4.7.1 纯展示组件模板
 
 ```html
-<template>
-  <!-- 订单卡片：数据由父级传入，点击后抛 select -->
-  <view
-    class="flex flex-col bg-[#ffffff] border-[1px] border-solid border-[#e2e8f0] rounded-[8px] p-[14px]"
-    @click="onClick"
-  >
-    <text class="text-[14px] font-semibold text-[#1e293b]">{{ order.title }}</text>
-    <text v-if="showTime" class="text-[12px] text-[#94a3b8] mt-[4px]">
-      {{ order.createdText }}
-    </text>
-  </view>
-</template>
-
 <script setup lang="uts">
 import { computed } from 'vue';
 import type { OrderItem } from '@/src/api/order/types.uts';
@@ -883,7 +871,20 @@ function onClick(): void {
 }
 </script>
 
-<style></style>
+<template>
+  <!-- 订单卡片：数据由父级传入，点击后抛 select -->
+  <view
+    class="flex flex-col bg-[#ffffff] border-[1px] border-solid border-[#e2e8f0] rounded-[8px] p-[14px]"
+    @click="onClick"
+  >
+    <text class="text-[14px] font-semibold text-[#1e293b]">{{ order.title }}</text>
+    <text v-if="showTime" class="text-[12px] text-[#94a3b8] mt-[4px]">
+      {{ order.createdText }}
+    </text>
+  </view>
+</template>
+
+<style scoped></style>
 ```
 
 ### 4.7.2 Props

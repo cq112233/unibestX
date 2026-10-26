@@ -4,6 +4,7 @@ import { isNativeTabbar, isSinglePageTabbar, selectedTabbarStrategy, TABBAR_STRA
 import { customTabbarConfig } from '../adapters/config.uts';
 import { useRouter } from '@/uni_modules/route-bestX/index.uts';
 import { runTabNavigationGuard } from './tab-navigation.uts';
+import { safeHideNativeTabBar } from './native.uts';
 
 /** 中间鼓包 tabbarItem 点击事件（核心导航行为） */
 function handleClickBulge(url: string = '/src/pages/ai/ai'): void {
@@ -105,6 +106,7 @@ function performSwitchTabbar(url: string): void {
     });
   }
   else {
+    safeHideNativeTabBar();
     uni.switchTab({
       url,
       fail: (_err: any) => {

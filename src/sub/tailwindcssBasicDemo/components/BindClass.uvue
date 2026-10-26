@@ -1,3 +1,10 @@
+<script lang="uts" setup>
+const condition = ref(true);
+const extra = ref('text-[93.54rpx] bg-[#d2e252]');
+const flag = ref(true);
+const toggled = ref(true);
+</script>
+
 <template>
   <view class="border border-solid border-[#999] p-4">
     <view class="issue-822-component-child h-[200px] w-full bg-[#87add3]">
@@ -22,15 +29,8 @@
   </view>
 </template>
 
-<script lang="uts" setup>
-const condition = ref(true);
-const extra = ref('text-[93.54rpx] bg-[#d2e252]');
-const flag = ref(true);
-const toggled = ref(true);
-</script>
-
 <style scoped>
-	.issue-822-component-child {
+.issue-822-component-child {
   border: 2px solid #7c3aed;
 }
 </style>

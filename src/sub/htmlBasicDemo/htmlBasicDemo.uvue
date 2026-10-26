@@ -1,3 +1,97 @@
+<script setup lang="uts">
+import { computed } from 'vue';
+import { useThemeStore } from '@/src/store/index.uts';
+import { activeThemeColor, darkThemeColor, THEME_COLOR_PRESETS, themeColor } from '@/src/theme/index.uts';
+
+definePage({
+  debug: false,
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
+  style: {
+    navigationBarTitleText: 'HTML 标签转换与主题演示',
+    navigationStyle: 'custom'
+  }
+});
+
+type ModeOption = {
+  label: string;
+  value: string;
+};
+
+type TagMappingItem = {
+  source: string;
+  target: string;
+  desc: string;
+};
+
+const modeOptions: Array<ModeOption> = [
+  { label: '浅色', value: 'light' },
+  { label: '深色', value: 'dark' },
+  { label: '跟随系统', value: 'auto' }
+];
+
+const tagMappingList: Array<TagMappingItem> = [
+  { source: '<b / strong>', target: '<text class="font-bold">', desc: '文本加粗' },
+  { source: '<i / em>', target: '<text class="italic">', desc: '文本斜体' },
+  { source: '<del / s>', target: '<text class="line-through">', desc: '删除线' },
+  { source: '<u>', target: '<text class="underline">', desc: '下划线' },
+  { source: '<span>', target: '<text>', desc: '行内纯文本' },
+  { source: '<div / p>', target: '<view>', desc: '块级/段落容器' },
+  { source: '<section / article / main>', target: '<view>', desc: '结构布局容器' },
+  { source: '<nav / header / footer>', target: '<view>', desc: '语义区域容器' },
+  { source: '<ul / ol / li>', target: '<view>', desc: '无序/有序列表容器' },
+  { source: '<img>', target: '<image>', desc: '媒体图片' }
+];
+
+const themeStore = useThemeStore();
+
+const isDark = computed((): boolean => {
+  return themeStore.state.isDark;
+});
+
+const currentMode = computed((): string => {
+  return themeStore.state.themeMode;
+});
+
+const currentTheme = computed((): string => {
+  return themeColor.value;
+});
+
+const pageBg = computed((): string => {
+  return isDark.value ? '#0b1120' : '#f8fafc';
+});
+
+const cardBg = computed((): string => {
+  return isDark.value ? '#1e293b' : '#ffffff';
+});
+
+const innerBg = computed((): string => {
+  return isDark.value ? '#0f172a' : '#f1f5f9';
+});
+
+const cardBorder = computed((): string => {
+  return isDark.value ? '#334155' : '#e2e8f0';
+});
+
+const textMain = computed((): string => {
+  return isDark.value ? '#f1f5f9' : '#0f172a';
+});
+
+const textSub = computed((): string => {
+  return isDark.value ? '#94a3b8' : '#64748b';
+});
+
+function toggleMode(mode: string): void {
+  themeStore.setThemeMode(mode);
+}
+
+function selectTheme(color: string): void {
+  themeStore.setTheme(color);
+}
+</script>
+
 <template>
   <view class="flex flex-col flex-1" :style="{ backgroundColor: pageBg }">
     <scroll-view direction="vertical" class="flex-1 flex flex-col p-[16px]">
@@ -296,99 +390,5 @@
     </scroll-view>
   </view>
 </template>
-
-<script setup lang="uts">
-import { computed } from 'vue';
-import { useThemeStore } from '@/src/store/index.uts';
-import { activeThemeColor, darkThemeColor, THEME_COLOR_PRESETS, themeColor } from '@/src/theme/index.uts';
-
-definePage({
-  debug: false,
-  layout: 'navbar',
-  showBack: true,
-  hideNavbar: false,
-  enablePullDownRefresh: false,
-  style: {
-    navigationBarTitleText: 'HTML 标签转换与主题演示',
-    navigationStyle: 'custom'
-  }
-});
-
-type ModeOption = {
-  label: string;
-  value: string;
-};
-
-type TagMappingItem = {
-  source: string;
-  target: string;
-  desc: string;
-};
-
-const modeOptions: Array<ModeOption> = [
-  { label: '浅色', value: 'light' },
-  { label: '深色', value: 'dark' },
-  { label: '跟随系统', value: 'auto' }
-];
-
-const tagMappingList: Array<TagMappingItem> = [
-  { source: '<b / strong>', target: '<text class="font-bold">', desc: '文本加粗' },
-  { source: '<i / em>', target: '<text class="italic">', desc: '文本斜体' },
-  { source: '<del / s>', target: '<text class="line-through">', desc: '删除线' },
-  { source: '<u>', target: '<text class="underline">', desc: '下划线' },
-  { source: '<span>', target: '<text>', desc: '行内纯文本' },
-  { source: '<div / p>', target: '<view>', desc: '块级/段落容器' },
-  { source: '<section / article / main>', target: '<view>', desc: '结构布局容器' },
-  { source: '<nav / header / footer>', target: '<view>', desc: '语义区域容器' },
-  { source: '<ul / ol / li>', target: '<view>', desc: '无序/有序列表容器' },
-  { source: '<img>', target: '<image>', desc: '媒体图片' }
-];
-
-const themeStore = useThemeStore();
-
-const isDark = computed((): boolean => {
-  return themeStore.state.isDark;
-});
-
-const currentMode = computed((): string => {
-  return themeStore.state.themeMode;
-});
-
-const currentTheme = computed((): string => {
-  return themeColor.value;
-});
-
-const pageBg = computed((): string => {
-  return isDark.value ? '#0b1120' : '#f8fafc';
-});
-
-const cardBg = computed((): string => {
-  return isDark.value ? '#1e293b' : '#ffffff';
-});
-
-const innerBg = computed((): string => {
-  return isDark.value ? '#0f172a' : '#f1f5f9';
-});
-
-const cardBorder = computed((): string => {
-  return isDark.value ? '#334155' : '#e2e8f0';
-});
-
-const textMain = computed((): string => {
-  return isDark.value ? '#f1f5f9' : '#0f172a';
-});
-
-const textSub = computed((): string => {
-  return isDark.value ? '#94a3b8' : '#64748b';
-});
-
-function toggleMode(mode: string): void {
-  themeStore.setThemeMode(mode);
-}
-
-function selectTheme(color: string): void {
-  themeStore.setTheme(color);
-}
-</script>
 
 <style scoped></style>

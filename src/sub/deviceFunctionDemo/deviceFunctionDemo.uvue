@@ -1,341 +1,3 @@
-<template>
-  <view class="flex flex-col p-[16px] bg-[#f8fafc]">
-    <!-- 1. 通信与系统分享卡片 -->
-    <view class="mb-[16px]">
-      <view
-        class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid border-[#edf2f7] bg-[#ffffff]"
-      >
-        <!-- 标题区域 -->
-        <view class="flex flex-row items-center mb-[16px]">
-          <view
-            class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#3182ce]"
-          />
-          <text class="text-[16px] font-bold text-[#2d3748]">通信与系统分享</text>
-        </view>
-        <!-- 拨号 -->
-        <view class="rounded-[12px] p-[16px] mb-[16px] border-[1px] border-solid border-[#e2e8f0]">
-          <view class="flex flex-row items-center mb-[8px]">
-            <text class="text-[14px] font-bold text-[#1e293b]">拨打电话 (makePhoneCall)</text>
-          </view>
-          <text class="text-[12px] text-[#94a3b8] mb-[8px]">输入要拨打的电话号码</text>
-          <input
-            v-model="phoneNumber"
-            type="number"
-            placeholder="请输入电话号码"
-            class="h-[38px] bg-white rounded-[6px] px-[12px] border-[1px] border-solid border-[#cbd5e1] text-[14px] text-[#334155] mb-[12px]"
-          />
-          <view class="w-full h-[38px] rounded-[8px] bg-[#3b82f6] flex flex-row items-center justify-center" @click="handleMakePhoneCall">
-            <text class="text-[#ffffff] text-[14px] font-bold">一键拨打电话</text>
-          </view>
-        </view>
-
-        <!-- 系统分享 -->
-        <view class="rounded-[12px] p-[16px] border-[1px] border-solid border-[#e2e8f0]">
-          <view class="flex flex-row items-center mb-[8px]">
-            <text class="text-[14px] font-bold text-[#1e293b]">系统分享 (shareWithSystem)</text>
-          </view>
-          <text class="text-[12px] text-[#94a3b8] mb-[6px]">分享摘要内容</text>
-          <input
-            v-model="shareSummary"
-            placeholder="请输入分享摘要"
-            class="h-[38px] bg-white rounded-[6px] px-[12px] border-[1px] border-solid border-[#cbd5e1] text-[14px] text-[#334155] mb-[10px]"
-          />
-          <text class="text-[12px] text-[#94a3b8] mb-[6px]">分享链接 (URL)</text>
-          <input
-            v-model="shareHref"
-            placeholder="请输入分享网址"
-            class="h-[38px] bg-white rounded-[6px] px-[12px] border-[1px] border-solid border-[#cbd5e1] text-[14px] text-[#334155] mb-[12px]"
-          />
-          <view class="w-full h-[38px] rounded-[8px] bg-[#8b5cf6] flex flex-row items-center justify-center" @click="handleShareWithSystem">
-            <text class="text-[#ffffff] text-[14px] font-bold">调起系统分享面板</text>
-          </view>
-        </view>
-      </view>
-    </view>
-
-    <!-- 2. 文件与文档预览卡片 -->
-    <view class="mb-[16px]">
-      <view
-        class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid border-[#edf2f7] bg-[#ffffff]"
-      >
-        <!-- 标题区域 -->
-        <view class="flex flex-row items-center mb-[16px]">
-          <view
-            class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#3182ce]"
-          />
-          <text class="text-[16px] font-bold text-[#2d3748]">文件与文档预览</text>
-        </view>
-        <!-- 选文件 -->
-        <view class="rounded-[12px] p-[16px] mb-[16px] border-[1px] border-solid border-[#e2e8f0]">
-          <view class="flex flex-row items-center mb-[8px]">
-            <text class="text-[14px] font-bold text-[#1e293b]">本地选文件 (chooseFile)</text>
-          </view>
-          <text class="text-[12px] text-[#94a3b8] mb-[12px]">选择设备中的文档、压缩包或其他文件</text>
-
-          <view class="w-full h-[38px] rounded-[8px] bg-[#0ea5e9] flex flex-row items-center justify-center mb-[12px]" @click="handleChooseFile">
-            <text class="text-[#ffffff] text-[14px] font-bold">从手机/本地选择文件</text>
-          </view>
-
-          <!-- 选中文件详情展示 -->
-          <view class="rounded-[8px] p-[12px] bg-[#f8fafc] border-[1px] border-solid border-[#e2e8f0]">
-            <view class="flex flex-row items-center justify-between mb-[6px]">
-              <text class="text-[12px] text-[#64748b]">文件名：</text>
-              <text class="text-[12px] font-medium text-[#1e293b]">{{ selectedFileName != '' ? selectedFileName : '未选择' }}</text>
-            </view>
-            <view class="flex flex-row items-center justify-between mb-[6px]">
-              <text class="text-[12px] text-[#64748b]">大小：</text>
-              <text class="text-[12px] font-medium text-[#1e293b]">{{ selectedFileSizeText != '' ? selectedFileSizeText : '-' }}</text>
-            </view>
-            <view class="flex flex-col">
-              <text class="text-[12px] text-[#64748b] mb-[2px]">临时路径：</text>
-              <text class="text-[11px] text-[#94a3b8] leading-[16px]" style="font-family: monospace;">{{ selectedFilePath != '' ? selectedFilePath : '-' }}</text>
-            </view>
-          </view>
-        </view>
-
-        <!-- 打开文档 -->
-        <view class="rounded-[12px] p-[16px] border-[1px] border-solid border-[#e2e8f0]">
-          <view class="flex flex-row items-center mb-[8px]">
-            <text class="text-[14px] font-bold text-[#1e293b]">文档原生预览 (openDocument)</text>
-          </view>
-          <text class="text-[12px] text-[#94a3b8] mb-[12px]">使用系统内置阅读器打开 PDF、Word、Excel 等文档</text>
-
-          <!-- 打开已选文档按钮 -->
-          <view
-            class="w-full h-[38px] rounded-[8px] flex flex-row items-center justify-center mb-[10px]"
-            :class="selectedFilePath != '' ? 'bg-[#10b981]' : 'bg-[#cbd5e1]'"
-            @click="handleOpenSelectedDoc"
-          >
-            <text class="text-[#ffffff] text-[14px] font-bold">打开已选择的文件</text>
-          </view>
-
-          <!-- 下载并打开在线示例文档 -->
-          <view class="w-full h-[38px] rounded-[8px] bg-[#6366f1] flex flex-row items-center justify-center" @click="handleDownloadAndOpenSampleDoc">
-            <text class="text-[#ffffff] text-[14px] font-bold">下载并打开在线示例 PDF 文档</text>
-          </view>
-        </view>
-      </view>
-    </view>
-
-    <!-- 3. 系统缓存管理 (getFileSystemManager) 卡片 -->
-    <view class="mb-[16px]">
-      <view
-        class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid border-[#edf2f7] bg-[#ffffff]"
-      >
-        <!-- 标题区域 -->
-        <view class="flex flex-row items-center mb-[16px]">
-          <view
-            class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#3182ce]"
-          />
-          <text class="text-[16px] font-bold text-[#2d3748]">系统缓存管理 (FileSystemManager)</text>
-        </view>
-        <view class="rounded-[12px] p-[16px] border-[1px] border-solid border-[#e2e8f0] bg-[#ffffff]">
-          <!-- 头部总缓存大小徽标 -->
-          <view class="flex flex-row items-center justify-between mb-[10px]">
-            <view class="flex flex-col">
-              <text class="text-[14px] font-bold text-[#1e293b]">应用缓存与数据占用</text>
-              <text class="text-[11px] text-[#64748b] mt-[2px]">
-                文件 {{ fileCacheSizeText }} ＋ 存储 {{ storageSizeText }}
-              </text>
-            </view>
-            <view class="px-[8px] py-[4px] rounded-[6px] bg-[#ecfdf5] border-[1px] border-solid border-[#a7f3d0]">
-              <text class="text-[12px] font-bold text-[#059669]">
-                合计: {{ totalCacheSizeText }}
-              </text>
-            </view>
-          </view>
-
-          <text class="text-[12px] text-[#64748b] leading-[18px] mb-[12px]">
-            基于 uni.getFileSystemManager() 与 CACHE_PATH 读取、统计沙盒临时缓存并支持安全一键清理。
-          </text>
-
-          <!-- 缓存详情信息卡片 -->
-          <view class="rounded-[8px] p-[12px] bg-[#f8fafc] border-[1px] border-solid border-[#e2e8f0] mb-[12px]">
-            <view class="flex flex-row items-center justify-between mb-[6px]">
-              <view class="flex flex-row items-center">
-                <text class="text-[12px] text-[#64748b]">文件缓存大小：</text>
-                <text class="text-[10px] text-[#94a3b8]">(临时/下载文件)</text>
-              </view>
-              <text class="text-[12px] font-bold" :class="fileCacheBytes > 0 ? 'text-[#ef4444]' : 'text-[#10b981]'">{{ fileCacheSizeText }}</text>
-            </view>
-            <view class="flex flex-row items-center justify-between mb-[6px]">
-              <text class="text-[12px] text-[#64748b]">缓存文件数量：</text>
-              <text class="text-[12px] font-medium text-[#1e293b]">{{ cacheFileCount }} 个文件</text>
-            </view>
-            <view class="flex flex-row items-center justify-between mb-[6px]">
-              <view class="flex flex-row items-center">
-                <text class="text-[12px] text-[#64748b]">本地 Storage 占用：</text>
-                <text class="text-[10px] text-[#94a3b8]">(Token/Pinia/偏好)</text>
-              </view>
-              <text class="text-[12px] font-bold text-[#3b82f6]">{{ storageSizeText }}</text>
-            </view>
-            <view class="flex flex-col">
-              <text class="text-[12px] text-[#64748b] mb-[2px]">缓存路径 (CACHE_PATH)：</text>
-              <text class="text-[11px] text-[#94a3b8] leading-[16px]" style="font-family: monospace;">
-                {{ cacheDirPath }}
-              </text>
-            </view>
-          </view>
-          <!-- 操作按钮行：清晰区分文件缓存与 Storage 清理 -->
-          <view class="flex flex-row mb-[8px]">
-            <view
-              class="flex-1 h-[38px] rounded-[8px] bg-[#3b82f6] flex flex-row items-center justify-center mr-[6px]"
-              @click="calculateCacheSize(true)"
-            >
-              <text class="text-[#ffffff] text-[12px] font-bold">刷新统计</text>
-            </view>
-            <view
-              class="flex-1 h-[38px] rounded-[8px] bg-[#f97316] flex flex-row items-center justify-center mr-[6px]"
-              @click="handleClearFileCache"
-            >
-              <text class="text-[#ffffff] text-[12px] font-bold">清除文件缓存</text>
-            </view>
-            <view
-              class="flex-1 h-[38px] rounded-[8px] bg-[#8b5cf6] flex flex-row items-center justify-center"
-              @click="handleClearStorage"
-            >
-              <text class="text-[#ffffff] text-[12px] font-bold">清空 Storage</text>
-            </view>
-          </view>
-
-          <!-- 一键彻底清空全部 (文件 + Storage) -->
-          <view
-            class="w-full h-[38px] rounded-[8px] bg-[#ef4444] flex flex-row items-center justify-center mb-[8px]"
-            @click="handleClearAll"
-          >
-            <text class="text-[#ffffff] text-[13px] font-bold">一键清空全部缓存与数据 (彻底归零)</text>
-          </view>
-
-          <!-- 模拟写入测试缓存 -->
-          <view
-            class="w-full h-[36px] rounded-[8px] border-[1px] border-solid border-[#cbd5e1] bg-[#ffffff] flex flex-row items-center justify-center"
-            @click="handleGenerateTestCache"
-          >
-            <text class="text-[#475569] text-[12px] font-medium">+ 写入 500KB 测试缓存文件 (观察数据减少)</text>
-          </view>
-        </view>
-      </view>
-    </view>
-
-    <!-- 4. 键盘感知与高度避让卡片 -->
-    <view class="mb-[16px]">
-      <view
-        class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid border-[#edf2f7] bg-[#ffffff]"
-      >
-        <!-- 标题区域 -->
-        <view class="flex flex-row items-center mb-[16px]">
-          <view
-            class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#3182ce]"
-          />
-          <text class="text-[16px] font-bold text-[#2d3748]">键盘感知与避让</text>
-        </view>
-        <view
-          class="rounded-[12px] p-[16px] border-[1px] border-solid border-[#e2e8f0]"
-          :style="{ paddingBottom: `${keyboardHeight > 0 ? keyboardHeight + 8 : 16}px` }"
-        >
-          <view class="flex flex-row items-center justify-between mb-[8px]">
-            <text class="text-[14px] font-bold text-[#1e293b]">键盘高度动态避让</text>
-            <view class="px-[8px] py-[3px] rounded-[6px] bg-[#e0f2fe] flex flex-row items-center">
-              <text class="text-[12px] font-bold text-[#0284c7]">
-                高度: {{ keyboardHeight }} px
-              </text>
-            </view>
-          </view>
-          <text class="text-[12px] text-[#64748b] leading-[18px] mb-[12px]">
-            监听软键盘弹起高度变化，演练容器根据高度动态增加内边距防止遮挡内容。
-          </text>
-
-          <input
-            v-model="keyboardInputText"
-            placeholder="点击此输入框触发键盘弹起与避让"
-            :adjust-position="false"
-            class="h-[40px] bg-white rounded-[6px] px-[12px] border-[1px] border-solid border-[#cbd5e1] text-[14px] text-[#334155] mb-[12px]"
-            @keyboardheightchange="handleKeyboardHeightChange"
-          />
-
-          <view class="w-full h-[38px] rounded-[8px] bg-[#64748b] flex flex-row items-center justify-center" @click="handleHideKeyboard">
-            <text class="text-[#ffffff] text-[14px] font-bold">收起软键盘 (hideKeyboard)</text>
-          </view>
-        </view>
-      </view>
-    </view>
-
-    <!-- 4. 触感与震动工具卡片 -->
-    <view class="mb-[16px]">
-      <view
-        class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid border-[#edf2f7] bg-[#ffffff]"
-      >
-        <!-- 标题区域 -->
-        <view class="flex flex-row items-center mb-[16px]">
-          <view
-            class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#3182ce]"
-          />
-          <text class="text-[16px] font-bold text-[#2d3748]">触感与工具</text>
-        </view>
-        <!-- 剪贴板 -->
-        <view class="rounded-[12px] p-[16px] mb-[16px] border-[1px] border-solid border-[#e2e8f0]">
-          <text class="text-[12px] text-[#94a3b8] mb-[8px]">剪贴板测试文本</text>
-          <input
-            v-model="copyText"
-            placeholder="请输入要复制的文本"
-            class="h-[38px] bg-white rounded-[6px] px-[12px] border-[1px] border-solid border-[#cbd5e1] text-[14px] text-[#334155] mb-[12px]"
-          />
-          <view class="w-full h-[38px] rounded-[8px] bg-[#10b981] flex flex-row items-center justify-center" @click="handleCopy">
-            <text class="text-[#ffffff] text-[14px] font-bold">复制测试文本到剪贴板</text>
-          </view>
-        </view>
-
-        <!-- 震动反馈（短震 / 长震） -->
-        <view class="rounded-[12px] p-[16px] border-[1px] border-solid border-[#e2e8f0]">
-          <text class="text-[14px] font-bold text-[#1e293b] mb-[8px]">硬件震动反馈</text>
-          <text class="text-[12px] text-[#94a3b8] mb-[12px]">提供短震动与长震动两种物理触感梯度</text>
-          <view class="flex flex-row">
-            <view class="flex-1 mr-[8px]">
-              <view class="w-full h-[40px] rounded-[8px] bg-[#f59e0b] flex flex-row items-center justify-center" @click="triggerShortVibration">
-                <text class="text-[#ffffff] text-[13px] font-bold">短震动反馈</text>
-              </view>
-            </view>
-            <view class="flex-1">
-              <view class="w-full h-[40px] rounded-[8px] bg-[#ea580c] flex flex-row items-center justify-center" @click="triggerLongVibration">
-                <text class="text-[#ffffff] text-[13px] font-bold">长震动反馈</text>
-              </view>
-            </view>
-          </view>
-        </view>
-      </view>
-    </view>
-
-    <!-- 5. 相机与多媒体卡片 -->
-    <view
-      class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid border-[#edf2f7] bg-[#ffffff]"
-    >
-      <!-- 标题区域 -->
-      <view class="flex flex-row items-center mb-[16px]">
-        <view
-          class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#3182ce]"
-        />
-        <text class="text-[16px] font-bold text-[#2d3748]">相机与多媒体</text>
-      </view>
-      <view class="rounded-[12px] p-[16px] mb-[16px] border-[1px] border-solid border-[#e2e8f0] items-center justify-center">
-        <text v-if="photoUrl == ''" class="text-[14px] text-[#94a3b8]">未选择照片</text>
-        <image v-else :src="photoUrl" class="w-[150px] h-[150px] rounded-[8px]" mode="aspectFill" />
-      </view>
-      <view class="w-full h-[44px] rounded-[8px] bg-[#3b82f6] mb-[12px] flex flex-row items-center justify-center" @click="chooseImage">
-        <text class="text-[#ffffff] text-[14px] font-bold">拍摄/选择照片</text>
-      </view>
-
-      <!-- 扫码测试 -->
-      <view class="rounded-[12px] p-[16px] mb-[16px] border-[1px] border-solid border-[#e2e8f0]">
-        <text class="text-[12px] text-[#94a3b8] mb-[8px]">扫码结果</text>
-        <text class="text-[14px] font-bold text-[#334155]">{{ scanResult != '' ? scanResult : '暂无数据' }}</text>
-      </view>
-      <view class="w-full h-[44px] rounded-[8px] bg-[#10b981] flex flex-row items-center justify-center" @click="scanCode">
-        <text class="text-[#ffffff] text-[14px] font-bold">扫码测试</text>
-      </view>
-    </view>
-  </view>
-</template>
-
 <script setup lang="uts">
 import { onMounted, onUnmounted, ref } from 'vue';
 import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/layouts/navbar/utils/index.uts';
@@ -1039,5 +701,343 @@ onNavbarPullDownRefresh(() => {
   }, 800);
 });
 </script>
+
+<template>
+  <view class="flex flex-col p-[16px] bg-[#f8fafc]">
+    <!-- 1. 通信与系统分享卡片 -->
+    <view class="mb-[16px]">
+      <view
+        class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid border-[#edf2f7] bg-[#ffffff]"
+      >
+        <!-- 标题区域 -->
+        <view class="flex flex-row items-center mb-[16px]">
+          <view
+            class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#3182ce]"
+          />
+          <text class="text-[16px] font-bold text-[#2d3748]">通信与系统分享</text>
+        </view>
+        <!-- 拨号 -->
+        <view class="rounded-[12px] p-[16px] mb-[16px] border-[1px] border-solid border-[#e2e8f0]">
+          <view class="flex flex-row items-center mb-[8px]">
+            <text class="text-[14px] font-bold text-[#1e293b]">拨打电话 (makePhoneCall)</text>
+          </view>
+          <text class="text-[12px] text-[#94a3b8] mb-[8px]">输入要拨打的电话号码</text>
+          <input
+            v-model="phoneNumber"
+            type="number"
+            placeholder="请输入电话号码"
+            class="h-[38px] bg-white rounded-[6px] px-[12px] border-[1px] border-solid border-[#cbd5e1] text-[14px] text-[#334155] mb-[12px]"
+          />
+          <view class="w-full h-[38px] rounded-[8px] bg-[#3b82f6] flex flex-row items-center justify-center" @click="handleMakePhoneCall">
+            <text class="text-[#ffffff] text-[14px] font-bold">一键拨打电话</text>
+          </view>
+        </view>
+
+        <!-- 系统分享 -->
+        <view class="rounded-[12px] p-[16px] border-[1px] border-solid border-[#e2e8f0]">
+          <view class="flex flex-row items-center mb-[8px]">
+            <text class="text-[14px] font-bold text-[#1e293b]">系统分享 (shareWithSystem)</text>
+          </view>
+          <text class="text-[12px] text-[#94a3b8] mb-[6px]">分享摘要内容</text>
+          <input
+            v-model="shareSummary"
+            placeholder="请输入分享摘要"
+            class="h-[38px] bg-white rounded-[6px] px-[12px] border-[1px] border-solid border-[#cbd5e1] text-[14px] text-[#334155] mb-[10px]"
+          />
+          <text class="text-[12px] text-[#94a3b8] mb-[6px]">分享链接 (URL)</text>
+          <input
+            v-model="shareHref"
+            placeholder="请输入分享网址"
+            class="h-[38px] bg-white rounded-[6px] px-[12px] border-[1px] border-solid border-[#cbd5e1] text-[14px] text-[#334155] mb-[12px]"
+          />
+          <view class="w-full h-[38px] rounded-[8px] bg-[#8b5cf6] flex flex-row items-center justify-center" @click="handleShareWithSystem">
+            <text class="text-[#ffffff] text-[14px] font-bold">调起系统分享面板</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 2. 文件与文档预览卡片 -->
+    <view class="mb-[16px]">
+      <view
+        class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid border-[#edf2f7] bg-[#ffffff]"
+      >
+        <!-- 标题区域 -->
+        <view class="flex flex-row items-center mb-[16px]">
+          <view
+            class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#3182ce]"
+          />
+          <text class="text-[16px] font-bold text-[#2d3748]">文件与文档预览</text>
+        </view>
+        <!-- 选文件 -->
+        <view class="rounded-[12px] p-[16px] mb-[16px] border-[1px] border-solid border-[#e2e8f0]">
+          <view class="flex flex-row items-center mb-[8px]">
+            <text class="text-[14px] font-bold text-[#1e293b]">本地选文件 (chooseFile)</text>
+          </view>
+          <text class="text-[12px] text-[#94a3b8] mb-[12px]">选择设备中的文档、压缩包或其他文件</text>
+
+          <view class="w-full h-[38px] rounded-[8px] bg-[#0ea5e9] flex flex-row items-center justify-center mb-[12px]" @click="handleChooseFile">
+            <text class="text-[#ffffff] text-[14px] font-bold">从手机/本地选择文件</text>
+          </view>
+
+          <!-- 选中文件详情展示 -->
+          <view class="rounded-[8px] p-[12px] bg-[#f8fafc] border-[1px] border-solid border-[#e2e8f0]">
+            <view class="flex flex-row items-center justify-between mb-[6px]">
+              <text class="text-[12px] text-[#64748b]">文件名：</text>
+              <text class="text-[12px] font-medium text-[#1e293b]">{{ selectedFileName != '' ? selectedFileName : '未选择' }}</text>
+            </view>
+            <view class="flex flex-row items-center justify-between mb-[6px]">
+              <text class="text-[12px] text-[#64748b]">大小：</text>
+              <text class="text-[12px] font-medium text-[#1e293b]">{{ selectedFileSizeText != '' ? selectedFileSizeText : '-' }}</text>
+            </view>
+            <view class="flex flex-col">
+              <text class="text-[12px] text-[#64748b] mb-[2px]">临时路径：</text>
+              <text class="text-[11px] text-[#94a3b8] leading-[16px]" style="font-family: monospace;">{{ selectedFilePath != '' ? selectedFilePath : '-' }}</text>
+            </view>
+          </view>
+        </view>
+
+        <!-- 打开文档 -->
+        <view class="rounded-[12px] p-[16px] border-[1px] border-solid border-[#e2e8f0]">
+          <view class="flex flex-row items-center mb-[8px]">
+            <text class="text-[14px] font-bold text-[#1e293b]">文档原生预览 (openDocument)</text>
+          </view>
+          <text class="text-[12px] text-[#94a3b8] mb-[12px]">使用系统内置阅读器打开 PDF、Word、Excel 等文档</text>
+
+          <!-- 打开已选文档按钮 -->
+          <view
+            class="w-full h-[38px] rounded-[8px] flex flex-row items-center justify-center mb-[10px]"
+            :class="selectedFilePath != '' ? 'bg-[#10b981]' : 'bg-[#cbd5e1]'"
+            @click="handleOpenSelectedDoc"
+          >
+            <text class="text-[#ffffff] text-[14px] font-bold">打开已选择的文件</text>
+          </view>
+
+          <!-- 下载并打开在线示例文档 -->
+          <view class="w-full h-[38px] rounded-[8px] bg-[#6366f1] flex flex-row items-center justify-center" @click="handleDownloadAndOpenSampleDoc">
+            <text class="text-[#ffffff] text-[14px] font-bold">下载并打开在线示例 PDF 文档</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 3. 系统缓存管理 (getFileSystemManager) 卡片 -->
+    <view class="mb-[16px]">
+      <view
+        class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid border-[#edf2f7] bg-[#ffffff]"
+      >
+        <!-- 标题区域 -->
+        <view class="flex flex-row items-center mb-[16px]">
+          <view
+            class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#3182ce]"
+          />
+          <text class="text-[16px] font-bold text-[#2d3748]">系统缓存管理 (FileSystemManager)</text>
+        </view>
+        <view class="rounded-[12px] p-[16px] border-[1px] border-solid border-[#e2e8f0] bg-[#ffffff]">
+          <!-- 头部总缓存大小徽标 -->
+          <view class="flex flex-row items-center justify-between mb-[10px]">
+            <view class="flex flex-col">
+              <text class="text-[14px] font-bold text-[#1e293b]">应用缓存与数据占用</text>
+              <text class="text-[11px] text-[#64748b] mt-[2px]">
+                文件 {{ fileCacheSizeText }} ＋ 存储 {{ storageSizeText }}
+              </text>
+            </view>
+            <view class="px-[8px] py-[4px] rounded-[6px] bg-[#ecfdf5] border-[1px] border-solid border-[#a7f3d0]">
+              <text class="text-[12px] font-bold text-[#059669]">
+                合计: {{ totalCacheSizeText }}
+              </text>
+            </view>
+          </view>
+
+          <text class="text-[12px] text-[#64748b] leading-[18px] mb-[12px]">
+            基于 uni.getFileSystemManager() 与 CACHE_PATH 读取、统计沙盒临时缓存并支持安全一键清理。
+          </text>
+
+          <!-- 缓存详情信息卡片 -->
+          <view class="rounded-[8px] p-[12px] bg-[#f8fafc] border-[1px] border-solid border-[#e2e8f0] mb-[12px]">
+            <view class="flex flex-row items-center justify-between mb-[6px]">
+              <view class="flex flex-row items-center">
+                <text class="text-[12px] text-[#64748b]">文件缓存大小：</text>
+                <text class="text-[10px] text-[#94a3b8]">(临时/下载文件)</text>
+              </view>
+              <text class="text-[12px] font-bold" :class="fileCacheBytes > 0 ? 'text-[#ef4444]' : 'text-[#10b981]'">{{ fileCacheSizeText }}</text>
+            </view>
+            <view class="flex flex-row items-center justify-between mb-[6px]">
+              <text class="text-[12px] text-[#64748b]">缓存文件数量：</text>
+              <text class="text-[12px] font-medium text-[#1e293b]">{{ cacheFileCount }} 个文件</text>
+            </view>
+            <view class="flex flex-row items-center justify-between mb-[6px]">
+              <view class="flex flex-row items-center">
+                <text class="text-[12px] text-[#64748b]">本地 Storage 占用：</text>
+                <text class="text-[10px] text-[#94a3b8]">(Token/Pinia/偏好)</text>
+              </view>
+              <text class="text-[12px] font-bold text-[#3b82f6]">{{ storageSizeText }}</text>
+            </view>
+            <view class="flex flex-col">
+              <text class="text-[12px] text-[#64748b] mb-[2px]">缓存路径 (CACHE_PATH)：</text>
+              <text class="text-[11px] text-[#94a3b8] leading-[16px]" style="font-family: monospace;">
+                {{ cacheDirPath }}
+              </text>
+            </view>
+          </view>
+          <!-- 操作按钮行：清晰区分文件缓存与 Storage 清理 -->
+          <view class="flex flex-row mb-[8px]">
+            <view
+              class="flex-1 h-[38px] rounded-[8px] bg-[#3b82f6] flex flex-row items-center justify-center mr-[6px]"
+              @click="calculateCacheSize(true)"
+            >
+              <text class="text-[#ffffff] text-[12px] font-bold">刷新统计</text>
+            </view>
+            <view
+              class="flex-1 h-[38px] rounded-[8px] bg-[#f97316] flex flex-row items-center justify-center mr-[6px]"
+              @click="handleClearFileCache"
+            >
+              <text class="text-[#ffffff] text-[12px] font-bold">清除文件缓存</text>
+            </view>
+            <view
+              class="flex-1 h-[38px] rounded-[8px] bg-[#8b5cf6] flex flex-row items-center justify-center"
+              @click="handleClearStorage"
+            >
+              <text class="text-[#ffffff] text-[12px] font-bold">清空 Storage</text>
+            </view>
+          </view>
+
+          <!-- 一键彻底清空全部 (文件 + Storage) -->
+          <view
+            class="w-full h-[38px] rounded-[8px] bg-[#ef4444] flex flex-row items-center justify-center mb-[8px]"
+            @click="handleClearAll"
+          >
+            <text class="text-[#ffffff] text-[13px] font-bold">一键清空全部缓存与数据 (彻底归零)</text>
+          </view>
+
+          <!-- 模拟写入测试缓存 -->
+          <view
+            class="w-full h-[36px] rounded-[8px] border-[1px] border-solid border-[#cbd5e1] bg-[#ffffff] flex flex-row items-center justify-center"
+            @click="handleGenerateTestCache"
+          >
+            <text class="text-[#475569] text-[12px] font-medium">+ 写入 500KB 测试缓存文件 (观察数据减少)</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 4. 键盘感知与高度避让卡片 -->
+    <view class="mb-[16px]">
+      <view
+        class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid border-[#edf2f7] bg-[#ffffff]"
+      >
+        <!-- 标题区域 -->
+        <view class="flex flex-row items-center mb-[16px]">
+          <view
+            class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#3182ce]"
+          />
+          <text class="text-[16px] font-bold text-[#2d3748]">键盘感知与避让</text>
+        </view>
+        <view
+          class="rounded-[12px] p-[16px] border-[1px] border-solid border-[#e2e8f0]"
+          :style="{ paddingBottom: `${keyboardHeight > 0 ? keyboardHeight + 8 : 16}px` }"
+        >
+          <view class="flex flex-row items-center justify-between mb-[8px]">
+            <text class="text-[14px] font-bold text-[#1e293b]">键盘高度动态避让</text>
+            <view class="px-[8px] py-[3px] rounded-[6px] bg-[#e0f2fe] flex flex-row items-center">
+              <text class="text-[12px] font-bold text-[#0284c7]">
+                高度: {{ keyboardHeight }} px
+              </text>
+            </view>
+          </view>
+          <text class="text-[12px] text-[#64748b] leading-[18px] mb-[12px]">
+            监听软键盘弹起高度变化，演练容器根据高度动态增加内边距防止遮挡内容。
+          </text>
+
+          <input
+            v-model="keyboardInputText"
+            placeholder="点击此输入框触发键盘弹起与避让"
+            :adjust-position="false"
+            class="h-[40px] bg-white rounded-[6px] px-[12px] border-[1px] border-solid border-[#cbd5e1] text-[14px] text-[#334155] mb-[12px]"
+            @keyboardheightchange="handleKeyboardHeightChange"
+          />
+
+          <view class="w-full h-[38px] rounded-[8px] bg-[#64748b] flex flex-row items-center justify-center" @click="handleHideKeyboard">
+            <text class="text-[#ffffff] text-[14px] font-bold">收起软键盘 (hideKeyboard)</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 4. 触感与震动工具卡片 -->
+    <view class="mb-[16px]">
+      <view
+        class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid border-[#edf2f7] bg-[#ffffff]"
+      >
+        <!-- 标题区域 -->
+        <view class="flex flex-row items-center mb-[16px]">
+          <view
+            class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#3182ce]"
+          />
+          <text class="text-[16px] font-bold text-[#2d3748]">触感与工具</text>
+        </view>
+        <!-- 剪贴板 -->
+        <view class="rounded-[12px] p-[16px] mb-[16px] border-[1px] border-solid border-[#e2e8f0]">
+          <text class="text-[12px] text-[#94a3b8] mb-[8px]">剪贴板测试文本</text>
+          <input
+            v-model="copyText"
+            placeholder="请输入要复制的文本"
+            class="h-[38px] bg-white rounded-[6px] px-[12px] border-[1px] border-solid border-[#cbd5e1] text-[14px] text-[#334155] mb-[12px]"
+          />
+          <view class="w-full h-[38px] rounded-[8px] bg-[#10b981] flex flex-row items-center justify-center" @click="handleCopy">
+            <text class="text-[#ffffff] text-[14px] font-bold">复制测试文本到剪贴板</text>
+          </view>
+        </view>
+
+        <!-- 震动反馈（短震 / 长震） -->
+        <view class="rounded-[12px] p-[16px] border-[1px] border-solid border-[#e2e8f0]">
+          <text class="text-[14px] font-bold text-[#1e293b] mb-[8px]">硬件震动反馈</text>
+          <text class="text-[12px] text-[#94a3b8] mb-[12px]">提供短震动与长震动两种物理触感梯度</text>
+          <view class="flex flex-row">
+            <view class="flex-1 mr-[8px]">
+              <view class="w-full h-[40px] rounded-[8px] bg-[#f59e0b] flex flex-row items-center justify-center" @click="triggerShortVibration">
+                <text class="text-[#ffffff] text-[13px] font-bold">短震动反馈</text>
+              </view>
+            </view>
+            <view class="flex-1">
+              <view class="w-full h-[40px] rounded-[8px] bg-[#ea580c] flex flex-row items-center justify-center" @click="triggerLongVibration">
+                <text class="text-[#ffffff] text-[13px] font-bold">长震动反馈</text>
+              </view>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 5. 相机与多媒体卡片 -->
+    <view
+      class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid border-[#edf2f7] bg-[#ffffff]"
+    >
+      <!-- 标题区域 -->
+      <view class="flex flex-row items-center mb-[16px]">
+        <view
+          class="w-[4px] h-[16px] rounded-[2px] mr-[8px] bg-[#3182ce]"
+        />
+        <text class="text-[16px] font-bold text-[#2d3748]">相机与多媒体</text>
+      </view>
+      <view class="rounded-[12px] p-[16px] mb-[16px] border-[1px] border-solid border-[#e2e8f0] items-center justify-center">
+        <text v-if="photoUrl == ''" class="text-[14px] text-[#94a3b8]">未选择照片</text>
+        <image v-else :src="photoUrl" class="w-[150px] h-[150px] rounded-[8px]" mode="aspectFill" />
+      </view>
+      <view class="w-full h-[44px] rounded-[8px] bg-[#3b82f6] mb-[12px] flex flex-row items-center justify-center" @click="chooseImage">
+        <text class="text-[#ffffff] text-[14px] font-bold">拍摄/选择照片</text>
+      </view>
+
+      <!-- 扫码测试 -->
+      <view class="rounded-[12px] p-[16px] mb-[16px] border-[1px] border-solid border-[#e2e8f0]">
+        <text class="text-[12px] text-[#94a3b8] mb-[8px]">扫码结果</text>
+        <text class="text-[14px] font-bold text-[#334155]">{{ scanResult != '' ? scanResult : '暂无数据' }}</text>
+      </view>
+      <view class="w-full h-[44px] rounded-[8px] bg-[#10b981] flex flex-row items-center justify-center" @click="scanCode">
+        <text class="text-[#ffffff] text-[14px] font-bold">扫码测试</text>
+      </view>
+    </view>
+  </view>
+</template>
 
 <style scoped></style>

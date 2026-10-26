@@ -1,3 +1,58 @@
+<script setup lang="uts">
+import { ref } from 'vue';
+import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/layouts/navbar/utils/index.uts';
+import CrudDemoCard from '@/src/sub/httpBasicDemo/components/CrudDemoCard.uvue';
+import UploadDemoCard from '@/src/sub/httpBasicDemo/components/UploadDemoCard.uvue';
+import DownloadDemoCard from '@/src/sub/httpBasicDemo/components/DownloadDemoCard.uvue';
+import MockDemoCard from '@/src/sub/httpBasicDemo/components/MockDemoCard.uvue';
+
+definePage({
+  debug: false,
+  layout: 'navbar',
+  showBack: true,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
+  style: {
+    navigationBarTitleText: 'HTTP 请求 Demo',
+    navigationStyle: 'custom'
+  }
+});
+
+const reachBottomCount = ref<number>(0);
+
+/**
+ * 顶部能力标签：本页演示到的 request-bestX 能力
+ *
+ * 只做静态展示，所以用普通常量（不需要 ref）；UTS 里数组元素类型要显式标注。
+ */
+const apiTags: Array<string> = [
+  'useQuery',
+  'useMutation',
+  'http.get',
+  'http.post / put / delete',
+  'http.upload',
+  'http.downloadFile',
+  'vite-plugin-mock'
+];
+
+function handleScroll(e: UniScrollEvent): void {
+  const top = Math.ceil(e.detail.scrollTop);
+  if (top < 0) {
+    console.log('scrollTop:', top);
+  }
+}
+
+function handleScrollToLower(): void {
+  reachBottomCount.value++;
+}
+
+onNavbarPullDownRefresh(() => {
+  setTimeout(() => {
+    stopNavbarPullDownRefresh();
+  }, 600);
+});
+</script>
+
 <template>
   <!-- 页面根容器：view + flex flex-col flex-1（flex-1 撑满开发高度） -->
   <view class="flex flex-col items-center flex-1 px-[12px] pt-[8px]">
@@ -54,58 +109,3 @@
     </scroll-view>
   </view>
 </template>
-
-<script setup lang="uts">
-import { ref } from 'vue';
-import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/layouts/navbar/utils/index.uts';
-import CrudDemoCard from '@/src/sub/httpBasicDemo/components/CrudDemoCard.uvue';
-import UploadDemoCard from '@/src/sub/httpBasicDemo/components/UploadDemoCard.uvue';
-import DownloadDemoCard from '@/src/sub/httpBasicDemo/components/DownloadDemoCard.uvue';
-import MockDemoCard from '@/src/sub/httpBasicDemo/components/MockDemoCard.uvue';
-
-definePage({
-  debug: false,
-  layout: 'navbar',
-  showBack: true,
-  hideNavbar: false,
-  enablePullDownRefresh: false,
-  style: {
-    navigationBarTitleText: 'HTTP 请求 Demo',
-    navigationStyle: 'custom'
-  }
-});
-
-const reachBottomCount = ref<number>(0);
-
-/**
- * 顶部能力标签：本页演示到的 request-bestX 能力
- *
- * 只做静态展示，所以用普通常量（不需要 ref）；UTS 里数组元素类型要显式标注。
- */
-const apiTags: Array<string> = [
-  'useQuery',
-  'useMutation',
-  'http.get',
-  'http.post / put / delete',
-  'http.upload',
-  'http.downloadFile',
-  'vite-plugin-mock'
-];
-
-function handleScroll(e: UniScrollEvent): void {
-  const top = Math.ceil(e.detail.scrollTop);
-  if (top < 0) {
-    console.log('scrollTop:', top);
-  }
-}
-
-function handleScrollToLower(): void {
-  reachBottomCount.value++;
-}
-
-onNavbarPullDownRefresh(() => {
-  setTimeout(() => {
-    stopNavbarPullDownRefresh();
-  }, 600);
-});
-</script>
