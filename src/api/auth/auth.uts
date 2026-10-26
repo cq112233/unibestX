@@ -1,43 +1,15 @@
 import { http } from '@/src/http/instances/default.uts';
 import type { HttpRequestConfig } from '@/uni_modules/request-bestX/index.uts';
+import type {
+  AuthUserInfo,
+  LoginQuery,
+  LoginResult,
+  RefreshTokenQuery,
+  RefreshTokenResult
+} from './types.uts';
 
-// ==========================================
-// 1. 类型定义（遵循规范：一律使用 type，严禁 interface）
-// ==========================================
-
-export type LoginQuery = {
-  username: string;
-  password: string;
-};
-
-export type AuthUserInfo = {
-  userId: number;
-  username: string;
-  nickname: string;
-  avatar: string;
-  permissions: Array<string>;
-};
-
-export type LoginResult = {
-  token: string;
-  expiresIn: number;
-  /** 双 token 模式：用于 401 时静默换取新 accessToken */
-  refreshToken: string;
-  refreshExpiresIn: number;
-  userInfo: AuthUserInfo;
-};
-
-export type RefreshTokenQuery = {
-  refreshToken: string;
-};
-
-export type RefreshTokenResult = {
-  accessToken: string;
-  accessExpiresIn: number;
-  refreshToken: string;
-  refreshExpiresIn: number;
-};
-
+// 导出零依赖契约类型（保持 100% 向后兼容）
+export * from './types.uts';
 // ==========================================
 // 2. 本地模拟数据集
 // ==========================================

@@ -40,7 +40,7 @@ import { useRoute, useRouter } from '@/src/router/index.uts';
 | 全局路由状态：`routeState`、`previousRouteState`、`setRouteMeta`、`removeRouteMeta`、`getRouteMeta`、`setRoutes` | 同上 |
 | 拦截器 / 直链检查：`installRouteInterceptor`、`checkDirectEntry` | 同上 |
 | 导航类型：`RouteLocation`、`RouteLocationRaw`、`RouteTarget`、`RouterError` | 同上（用 `import type`） |
-| 业务登录页 / 黑白名单配置：`LOGIN_PAGE`、`REGISTER_PAGE`、`EXCLUDE_LOGIN_PATH_LIST`、`LOGIN_STRATEGY`、`isNeedLoginMode`、`DEFAULT_HOME_PAGE` | `@/src/router/config.uts` |
+| 业务登录页 / 黑白名单配置：`LOGIN_PAGE`、`REGISTER_PAGE`、`NEED_LOGIN_BLACK_LIST`、`NO_NEED_LOGIN_WHITE_LIST`、`LOGIN_STRATEGY`、`isNeedLoginMode`、`DEFAULT_HOME_PAGE` | `@/src/router/config.uts` |
 | 业务守卫规则链 | `@/src/router/guards/index.uts`（单条规则在 `guards/guardLogin.uts` 等） |
 | 手动跳登录页（401 / 业务主动） | `@/src/utils/auth/toLoginPage.uts`（内置 1s 节流，防重复跳登录页） |
 
@@ -754,7 +754,7 @@ const url = router.resolve({ path: '/src/sub/detail/detail', query: { id: 1 } })
 | 只想拼出 url 看一眼 | `useRouter().resolve({ path, query })` |
 | 401 / 主动送登录页 | `toLoginPage()`（`@/src/utils/auth/toLoginPage.uts`，内置 1s 节流） |
 | 非组件环境取当前页 | `getCurrentPath()` / `getCurrentRoute()` / `getCurrentPageOptions()` |
-| 改「哪些页面要登录」 | `src/router/config.uts` 的 `EXCLUDE_LOGIN_PATH_LIST` + `LOGIN_STRATEGY` |
+| 改「哪些页面要登录」 | 页面级 `definePage({ needLogin })` 拥有最高优先级；全局由 `src/router/config.uts` 的 `NEED_LOGIN_BLACK_LIST` / `NO_NEED_LOGIN_WHITE_LIST` + `LOGIN_STRATEGY` 控制 |
 | 加一条新路由规则 | 在 `src/router/guards/` 新建 `guardXxx.uts`，接入 `guards/index.uts` 的流水线 |
 
 ---

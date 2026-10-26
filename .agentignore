@@ -1,0 +1,40 @@
+# ==============================================================================
+# AI Agent / Vibe Coding / Cursor 全局忽略清单
+# 彻底杜绝盲目全量扫描与百万级 Token 灾难膨胀
+# ==============================================================================
+
+# 第三方依赖与组件库（上千万行，禁止全文搜索与全量读取）
+node_modules/
+uni_modules/
+
+# 打包构建与原生编译产物
+unpackage/
+dist/
+build/
+.temp/
+temp/
+tmp/
+.cache/
+
+# IDE 与开发工具临时目录
+.hbuilder/
+.hbuilderx/
+.idea/
+.vscode/.history/
+.DS_Store
+
+# 缓存与分析报告
+.eslintcache
+.stylelintcache
+stats.html
+*.log
+*.tsbuildinfo
+
+# 自动生成临时适配产物
+src/components/_layouts/
+docs/.vitepress/dist/
+docs/.vitepress/cache/
+scripts/router-guard-test/.build/
+
+# 本地敏感环境
+*.local

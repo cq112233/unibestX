@@ -1,35 +1,61 @@
 import type { GuardResult, RouteGuardContext } from '@/uni_modules/route-bestX/index.uts';
+import { getRouteMeta } from '@/uni_modules/route-bestX/index.uts';
 import { useTokenStore } from '@/src/store/index.uts';
 import {
   DEFAULT_HOME_PAGE,
-  EXCLUDE_LOGIN_PATH_LIST,
   isNeedLoginMode,
   LOGIN_PAGE,
-  LOGIN_PAGE_LIST
+  LOGIN_PAGE_LIST,
+  NEED_LOGIN_BLACK_LIST,
+  NO_NEED_LOGIN_WHITE_LIST
 } from '../config.uts';
 
 /**
- * 判断路径是否符合策略名单 (EXCLUDE_LOGIN_PATH_LIST)
- * @param path 页面路径，自动兼容前导斜杠
+ * 规范化路由路径（统一补齐前导斜杠）
  */
-export function judgeIsExcludePath(path: string): boolean {
-  let normalizedPath = path;
-  if (normalizedPath.startsWith('src/')) {
-    normalizedPath = `/${normalizedPath}`;
+function normalizePath(path: string): string {
+  if (path.startsWith('src/')) {
+    return `/${path}`;
   }
-  return EXCLUDE_LOGIN_PATH_LIST.includes(normalizedPath);
+  return path;
 }
 
 /**
- * 登录拦截规则（纯函数）：裁决本次导航是否放行（登录态 × 黑白名单策略）
+ * 判断路径是否在需登录黑名单中 (NEED_LOGIN_BLACK_LIST)
+ */
+export function judgeIsBlackListed(path: string): boolean {
+  return NEED_LOGIN_BLACK_LIST.includes(normalizePath(path));
+}
+
+/**
+ * 判断路径是否在免登录白名单中 (NO_NEED_LOGIN_WHITE_LIST)
+ */
+export function judgeIsWhiteListed(path: string): boolean {
+  return NO_NEED_LOGIN_WHITE_LIST.includes(normalizePath(path));
+}
+
+/**
+ * @deprecated 兼容历史调用，默认执行黑名单路径判断
+ */
+export function judgeIsExcludePath(path: string): boolean {
+  return judgeIsBlackListed(path);
+}
+
+/**
+ * 登录拦截规则（纯函数）：裁决本次导航是否放行（登录态 × 黑白名单策略 × definePage.needLogin）
  *
- * 裁决矩阵：
+ * 裁决优先级与矩阵：
  * 1. 已登录：
  *    - 目标为认证页面（登录/注册等）-> 重定向回 redirect 参数或首页 (DEFAULT_HOME_PAGE)
  *    - 目标为其他业务页面 -> 直接放行
  * 2. 未登录：
- *    - 白名单策略 (isNeedLoginMode = true)：仅名单内页面与认证页面放行，其余全拦
- *    - 黑名单策略 (isNeedLoginMode = false)：仅名单内页面拦截，其余全部放行
+ *    - 2.0 认证相关页面自身（登录/注册等）始终放行，防止重定向死循环
+ *    - 2.1 页面级 definePage.needLogin 拥有最高裁决权：
+ *          显式 true -> 强制拦截跳转登录
+ *          显式 false -> 免登录直接放行
+ *    - 2.2 页面未声明 needLogin 时，回退执行全局模式：
+ *          白名单模式 (isNeedLoginMode = true)：仅在 NO_NEED_LOGIN_WHITE_LIST 内的页面放行，其余全拦
+ *          黑名单模式 (isNeedLoginMode = false)：仅在 NEED_LOGIN_BLACK_LIST 内的页面拦截，其余全放行
  */
 export function guardLogin(ctx: RouteGuardContext): GuardResult {
   const { to, next } = ctx;
@@ -52,16 +78,35 @@ export function guardLogin(ctx: RouteGuardContext): GuardResult {
   // 2. 未登录
   const loginUrl = `${LOGIN_PAGE}?redirect=${encodeURIComponent(to.fullPath)}`;
 
-  // 2.1 白名单策略：默认全拦，仅名单内页面与登录/注册页面本身放行
+  // 2.0 登录认证相关页面自身（登录/注册等）始终放行，防止重定向死循环
+  if (LOGIN_PAGE_LIST.includes(path) || path == LOGIN_PAGE) {
+    return next();
+  }
+
+  // 2.1 检查页面是否显式声明了 needLogin（最高优先级：来自 definePage 或 pages.config.json）
+  const meta = getRouteMeta(path);
+  const pageNeedLogin = meta != null ? meta.getBoolean('needLogin') : null;
+
+  if (pageNeedLogin != null) {
+    // 显式声明 needLogin: true -> 强行拦截并跳转登录
+    if (pageNeedLogin == true) {
+      return next(loginUrl);
+    }
+    // 显式声明 needLogin: false -> 免登录放行（无论全局是黑名单还是白名单模式）
+    return next();
+  }
+
+  // 2.2 页面未声明 needLogin 时，回退执行全局黑白名单策略
+  // 白名单策略（isNeedLoginMode = true）：默认全拦，仅名单内免登页面放行
   if (isNeedLoginMode) {
-    if (judgeIsExcludePath(path) || LOGIN_PAGE_LIST.includes(path)) {
+    if (judgeIsWhiteListed(path)) {
       return next();
     }
     return next(loginUrl);
   }
 
-  // 2.2 黑名单策略（默认）：默认放行，仅名单内页面需要登录
-  if (judgeIsExcludePath(path)) {
+  // 黑名单策略（默认）：默认放行，仅在名单内页面拦截
+  if (judgeIsBlackListed(path)) {
     return next(loginUrl);
   }
 

@@ -75,22 +75,28 @@
 - **字体类补充**：`text-[30px]`（字号）、`font-bold`（字重）、`leading-[20px]`（行高）、`tracking-wide`（字间距）、`italic` / `underline` 等字体相关类名，**所有端都必须写在 `<text>` 上**，不能挂在 `<view>`。
 - **Lint 拦截**：`<view>` 上的颜色类名由 `uvue-no-view-text-color` 拦截，字体类样式由 `uvue-no-view-font-style` 拦截。
 
-## 2.4 `<text>` 元素只能包含单个文本节点
+## 2.4 文本标签规范与禁止嵌套铁律
 
-- **铁律**：uni-app X 原生渲染引擎要求**一个 `<text>` 元素内部只能包含一个纯文本节点**。严禁在 `<text>` 内混合「裸文本 + 嵌套 `<text>` + 裸文本」，否则编译报错：`A <text> element can only contain one text node`。
-- **正确做法**：内联多色/高亮文本排版，使用外层 `flex flex-row flex-wrap` 容器包裹多个同级的兄弟 `<text>`：
+- **禁止手写 HTML 标签**：虽然项目中配置了 HTML 转 uni 的兼容插件，但**除非开发者自己明确要求，否则严禁手写 HTML 标签（`div`、`span`、`i`、`em`、`b` 等）**，必须直接使用 uni 原生 `<view>` 与 `<text>`。
+- **行内标签一律转 `<text>` 且禁止嵌套**：`span`、`i`、`em`、`b` 等行内元素一律对应为 `<text>`，并且**严禁在 `<text>` 内嵌套 `<text>`（也严禁 `span` 嵌套 `span`）**。uni-app X 原生渲染引擎要求**一个 `<text>` 元素内部只能包含单个纯文本节点**，混合嵌套会导致原生端报错：`A <text> element can only contain one text node` 或产生换行错乱与样式失效。
+- **正确做法**：需要行内多色混排、加粗重点、中英文混搭排版时，外层使用 `<view class="flex flex-row flex-wrap items-center">` 包裹多个同级的兄弟 `<text>` 节点：
 
   ```html
-  <!-- ❌ 错误 -->
+  <!-- ❌ 错误：span 嵌套 span，或 text 内部混排嵌套 text -->
   <text class="text-[13px] text-[#475569]">
     根容器 <text class="text-[#1d4ed8]">view</text> 撑满高度
   </text>
 
-  <!-- ✅ 正确：兄弟 text 节点组合 -->
+  <!-- ❌ 错误：手写 HTML 标签 -->
+  <div class="flex flex-row">
+    <span>专为大模型定制，<span class="font-bold">一次编译通过</span></span>
+  </div>
+
+  <!-- ✅ 正确：外层 view + 平级兄弟 text 节点组合 -->
   <view class="flex flex-row flex-wrap items-center">
-    <text class="text-[13px] text-[#475569]">根容器 </text>
-    <text class="text-[13px] text-[#1d4ed8]">view</text>
-    <text class="text-[13px] text-[#475569]"> 撑满高度</text>
+    <text class="text-[13px] text-[#475569]">专为大模型定制，</text>
+    <text class="text-[13px] font-bold text-[#0f172a]">一次编译通过</text>
+    <text class="text-[13px] text-[#475569]">，杜绝试错</text>
   </view>
   ```
 

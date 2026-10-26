@@ -1,0 +1,49 @@
+<script setup lang="uts">
+/**
+ * 组件入参定义（符合 UTS 强类型与运行时 Props 校验规范）
+ */
+const props = defineProps({
+  /** 标题文本 */
+  title: {
+    type: String,
+    required: true
+  },
+  /** 副标题说明 */
+  subtitle: {
+    type: String,
+    default: ''
+  }
+});
+
+/**
+ * 组件事件派发定义
+ */
+const emit = defineEmits<{
+  (e: 'click'): void;
+}>();
+
+/**
+ * 卡片点击事件响应
+ */
+function onClick(): void {
+  emit('click');
+}
+</script>
+
+<template>
+  <!-- {{ description }}：纯展示组件，数据由父级通过 Props 下发，交互向外抛出 Emits -->
+  <view
+    class="flex flex-col bg-[#ffffff] border-[1px] border-solid border-[#e2e8f0] rounded-[8px] p-[14px]"
+    @click="onClick"
+  >
+    <text class="text-[14px] font-semibold text-[#1e293b]">{{ title }}</text>
+    <text v-if="subtitle != null && subtitle != ''" class="text-[12px] text-[#64748b] mt-[4px]">
+      {{ subtitle }}
+    </text>
+    <slot />
+  </view>
+</template>
+
+<style scoped>
+/* 严格遵循原生渲染规则：严禁使用 gap / space-*，文本颜色由 text 承载 */
+</style>

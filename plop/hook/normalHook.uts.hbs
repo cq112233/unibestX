@@ -1,0 +1,26 @@
+import { computed, ref } from 'vue';
+
+/**
+ * {{ description }} Hook（纯前端逻辑，不调用网络接口，严禁包含 Query/Mutation 词根）
+ */
+export function {{ hookName }}() {
+  const count = ref<number>(0);
+  const isActive = ref<boolean>(false);
+
+  function increment(): void {
+    count.value = count.value + 1;
+  }
+
+  function reset(): void {
+    count.value = 0;
+    isActive.value = false;
+  }
+
+  return {
+    count,
+    isActive,
+    displayCount: computed<string>((): string => `${count.value} 项`),
+    increment,
+    reset
+  };
+}

@@ -1,67 +1,3 @@
-<template>
-  <view v-if="isNavbarVisible" class="navbar-wrapper">
-    <!-- 导航栏外层容器 -->
-    <view
-      class="navbar-bar"
-      :class="{ 'navbar-bar--fixed': fixed }"
-      :style="{
-        backgroundColor: effectiveBgColor,
-        borderBottomWidth: (border && isNavbarVisible) ? '1px' : '0px',
-        borderBottomStyle: (border && isNavbarVisible) ? 'solid' : 'none',
-        borderBottomColor: (border && isNavbarVisible) ? effectiveBorderColor : 'transparent'
-      }"
-    >
-      <!-- 安全区域：状态栏占位高度 -->
-      <view v-if="!hideStatusBar" class="navbar-status-bar" :style="{ height: `${statusBarHeight}px` }">
-        <slot name="statusBar"></slot>
-      </view>
-
-      <!-- 导航栏内容区 -->
-      <view class="navbar-content" :style="{ height: `${NAVBAR_CONTENT_HEIGHT}px` }">
-        <!-- 左侧返回按钮区域（支付宝小程序不渲染，使用原生返回栏） -->
-        <view v-if="!isMpAlipay" class="navbar-left">
-          <slot name="left">
-            <view v-if="showBack" class="navbar-back-btn" @click="handleBack">
-              <view class="navbar-back-icon">
-                <!-- #ifdef H5 -->
-                <svg width="26" height="26" viewBox="0 0 32 32">
-                  <path
-                    d="M21.781 7.844l-9.063 8.594 9.063 8.594q0.25 0.25 0.25 0.609t-0.25 0.578q-0.25 0.25-0.578 0.25t-0.578-0.25l-9.625-9.125q-0.156-0.125-0.203-0.297t-0.047-0.359q0-0.156 0.047-0.328t0.203-0.297l9.625-9.125q0.25-0.25 0.578-0.25t0.578 0.25q0.25 0.219 0.25 0.578t-0.25 0.578z"
-                    :fill="effectiveTitleColor"
-                  />
-                </svg>
-                <!-- #endif -->
-                <!-- #ifndef H5 -->
-                <uni-icons type="left" size="24" :color="effectiveTitleColor" />
-                <!-- #endif -->
-              </view>
-            </view>
-          </slot>
-        </view>
-
-        <!-- 中间标题区域 -->
-        <view class="navbar-mid">
-          <slot name="mid">
-            <slot>
-              <!-- 支付宝小程序不显示标题，使用原生返回栏 -->
-              <text v-if="title.length > 0 && !isMpAlipay " class="navbar-title" :style="{ color: effectiveTitleColor }">{{ title }}</text>
-            </slot>
-          </slot>
-        </view>
-
-        <!-- 右侧操作栏区域 -->
-        <view class="navbar-right">
-          <slot name="right"></slot>
-        </view>
-      </view>
-    </view>
-
-    <!-- 占位垫高块：当固定在顶部时防内容遮挡 -->
-    <view v-if="fixed && placeholder" class="navbar-placeholder" :style="{ height: `${(hideStatusBar ? 0 : statusBarHeight) + (isNavbarVisible ? NAVBAR_CONTENT_HEIGHT : 0)}px` }"></view>
-  </view>
-  <view v-else-if="!hideStatusBar" class="navbar-status-bar" :style="{ height: `${statusBarHeight}px` }"></view>
-</template>
-
 <script setup lang="uts">
 import { computed } from 'vue';
 import { isMpAlipay } from '@/src/config/env/platform.uts';
@@ -82,6 +18,36 @@ const props = defineProps({
     default: ''
   },
   bgColor: {
+    type: String,
+    default: ''
+  },
+  /** 状态栏区域独立背景颜色（推荐规范命名：navigationStatusBarBackgroundColor） */
+  navigationStatusBarBackgroundColor: {
+    type: String,
+    default: ''
+  },
+  /** 兼容别名：状态栏背景颜色 */
+  statusBarBgColor: {
+    type: String,
+    default: ''
+  },
+  /** 导航栏内容区域独立背景颜色（推荐规范命名：navigationContentBackgroundColor） */
+  navigationContentBackgroundColor: {
+    type: String,
+    default: ''
+  },
+  /** 兼容别名：内容区背景颜色 */
+  contentBgColor: {
+    type: String,
+    default: ''
+  },
+  /** 返回按钮图标独立颜色（推荐规范命名：navigationBackIconColor） */
+  navigationBackIconColor: {
+    type: String,
+    default: ''
+  },
+  /** 兼容别名：返回按钮图标颜色 */
+  backIconColor: {
     type: String,
     default: ''
   },
@@ -122,14 +88,59 @@ const themeTokens = computed((): ThemeTokens => {
   return getThemeTokens(useThemeStore().state.isDark);
 });
 
-// 实际生效的导航栏背景色：显式传 bgColor 时优先，否则跟随主题
+// 实际生效的导航栏全局背景色：显式传 bgColor 时优先，否则跟随主题
 const effectiveBgColor = computed((): string => {
   return props.bgColor != '' ? props.bgColor : themeTokens.value.navBg;
 });
 
-// 实际生效的标题 / 返回箭头颜色：显式传 titleColor 时优先，否则跟随主题
+// 实际生效的状态栏背景色：规范命名 navigationStatusBarBackgroundColor 优先，兼容 statusBarBgColor
+const effectiveStatusBarBgColor = computed((): string => {
+  if (props.navigationStatusBarBackgroundColor != '') {
+    return props.navigationStatusBarBackgroundColor;
+  }
+  if (props.statusBarBgColor != '') {
+    return props.statusBarBgColor;
+  }
+  return '';
+});
+
+// 实际生效的内容区背景色：规范命名 navigationContentBackgroundColor 优先，兼容 contentBgColor
+const effectiveContentBgColor = computed((): string => {
+  if (props.navigationContentBackgroundColor != '') {
+    return props.navigationContentBackgroundColor;
+  }
+  if (props.contentBgColor != '') {
+    return props.contentBgColor;
+  }
+  return '';
+});
+
+// 实际生效的导航栏外层容器背景色：若单独指定了状态栏或内容区背景且未显式指定全局 bgColor，则外层透明，由内部各自独立着色
+const effectiveBarBgColor = computed((): string => {
+  const hasCustomPart = props.navigationStatusBarBackgroundColor != ''
+    || props.statusBarBgColor != ''
+    || props.navigationContentBackgroundColor != ''
+    || props.contentBgColor != '';
+  if (props.bgColor == '' && hasCustomPart) {
+    return 'transparent';
+  }
+  return effectiveBgColor.value;
+});
+
+// 实际生效的标题颜色：显式传 titleColor 时优先，否则跟随主题
 const effectiveTitleColor = computed((): string => {
   return props.titleColor != '' ? props.titleColor : themeTokens.value.navText;
+});
+
+// 实际生效的返回箭头颜色：优先使用 navigationBackIconColor 或 backIconColor，未设置时跟随标题/主题颜色
+const effectiveBackIconColor = computed((): string => {
+  if (props.navigationBackIconColor != '') {
+    return props.navigationBackIconColor;
+  }
+  if (props.backIconColor != '') {
+    return props.backIconColor;
+  }
+  return effectiveTitleColor.value;
 });
 
 // 实际生效的底边框颜色：跟随暗黑模式自适应
@@ -152,6 +163,16 @@ const statusBarHeight = computed<number>((): number => {
 
 const router = useRouter();
 
+/** 标题是否可见（单值计算属性，鸿蒙模板规范） */
+const isTitleVisible = computed((): boolean => {
+  return props.title.length > 0 && !isMpAlipay;
+});
+
+/** 占位垫高块是否可见 */
+const isPlaceholderVisible = computed((): boolean => {
+  return props.fixed && props.placeholder;
+});
+
 // 处理返回事件
 function handleBack() {
   if (!props.showBack) {
@@ -166,6 +187,83 @@ function handleBack() {
   }
 }
 </script>
+
+<template>
+  <view v-if="props.isNavbarVisible" class="navbar-wrapper">
+    <!-- 导航栏外层容器 -->
+    <view
+      class="navbar-bar"
+      :class="{ 'navbar-bar--fixed': props.fixed }"
+      :style="{
+        backgroundColor: effectiveBarBgColor,
+        borderBottomWidth: (props.border && props.isNavbarVisible) ? '1px' : '0px',
+        borderBottomStyle: (props.border && props.isNavbarVisible) ? 'solid' : 'none',
+        borderBottomColor: (props.border && props.isNavbarVisible) ? effectiveBorderColor : 'transparent'
+      }"
+    >
+      <!-- 安全区域：状态栏占位高度 -->
+      <view
+        v-if="!props.hideStatusBar"
+        class="navbar-status-bar"
+        :style="{
+          height: `${statusBarHeight}px`,
+          backgroundColor: effectiveStatusBarBgColor != '' ? effectiveStatusBarBgColor : 'transparent'
+        }"
+      >
+        <slot name="statusBar"></slot>
+      </view>
+
+      <!-- 导航栏内容区 -->
+      <view
+        class="navbar-content"
+        :style="{
+          height: `${NAVBAR_CONTENT_HEIGHT}px`,
+          backgroundColor: effectiveContentBgColor != '' ? effectiveContentBgColor : 'transparent'
+        }"
+      >
+        <!-- 左侧返回按钮区域（支付宝小程序不渲染，使用原生返回栏） -->
+        <view v-if="!isMpAlipay" class="navbar-left">
+          <slot name="left">
+            <view v-if="props.showBack" class="navbar-back-btn" @click="handleBack">
+              <view class="navbar-back-icon">
+                <!-- #ifdef H5 -->
+                <svg width="26" height="26" viewBox="0 0 32 32">
+                  <path
+                    d="M21.781 7.844l-9.063 8.594 9.063 8.594q0.25 0.25 0.25 0.609t-0.25 0.578q-0.25 0.25-0.578 0.25t-0.578-0.25l-9.625-9.125q-0.156-0.125-0.203-0.297t-0.047-0.359q0-0.156 0.047-0.328t0.203-0.297l9.625-9.125q0.25-0.25 0.578-0.25t0.578 0.25q0.25 0.219 0.25 0.578t-0.25 0.578z"
+                    :fill="effectiveBackIconColor"
+                  />
+                </svg>
+                <!-- #endif -->
+                <!-- #ifndef H5 -->
+                <uni-icons type="left" size="24" :color="effectiveBackIconColor" />
+                <!-- #endif -->
+              </view>
+            </view>
+          </slot>
+        </view>
+
+        <!-- 中间标题区域 -->
+        <view class="navbar-mid">
+          <slot name="mid">
+            <slot>
+              <!-- 支付宝小程序不显示标题，使用原生返回栏 -->
+              <text v-if="isTitleVisible" class="navbar-title" :style="{ color: effectiveTitleColor }">{{ props.title }}</text>
+            </slot>
+          </slot>
+        </view>
+
+        <!-- 右侧操作栏区域 -->
+        <view class="navbar-right">
+          <slot name="right"></slot>
+        </view>
+      </view>
+    </view>
+
+    <!-- 占位垫高块：当固定在顶部时防内容遮挡 -->
+    <view v-if="isPlaceholderVisible" class="navbar-placeholder" :style="{ height: `${(props.hideStatusBar ? 0 : statusBarHeight) + (props.isNavbarVisible ? NAVBAR_CONTENT_HEIGHT : 0)}px` }"></view>
+  </view>
+  <view v-else-if="!props.hideStatusBar" class="navbar-status-bar" :style="{ height: `${statusBarHeight}px` }"></view>
+</template>
 
 <style lang="scss" scoped>
 .navbar-wrapper {

@@ -1,0 +1,73 @@
+<script setup lang="uts">
+import { ref } from 'vue';
+{{#if needApi}}
+import { useQuery } from '@/uni_modules/request-bestX/index.uts';
+import type { QueryFunctionContext, QueryOptions } from '@/uni_modules/request-bestX/index.uts';
+import { fetch{{ pascalCase name }}ListApi } from '@/src/api/{{ module }}/{{ camelCase name }}.uts';
+import type { {{ pascalCase name }}PageResult } from '@/src/api/{{ module }}/{{ camelCase name }}.uts';
+{{/if}}
+
+/**
+ * 页面契约配置（按 unibestX 分册 4 规范显式声明所有基础项）
+ */
+definePage({
+  name: '{{ camelCase name }}',
+  debug: false,
+  debugHome: false,
+  layout: 'navbar',
+  showBack: true,
+  hideStatusBar: false,
+  hideNavbar: false,
+  enablePullDownRefresh: false,
+  style: {
+    navigationBarTitleText: '{{ title }}',
+    navigationStyle: 'custom'
+  }
+});
+
+{{#if needApi}}
+/** 当前分页查询参数 */
+const pageNo = ref<number>(1);
+const pageSize = ref<number>(10);
+const keyword = ref<string>('');
+
+/**
+ * 基于 useQuery 的响应式异步查询（自动维护 loading / error / 缓存与重试）
+ * 解构 + 业务别名，状态本身是 Ref，模板中直接访问无需 .value
+ */
+const {
+  data: {{ camelCase name }}Data,
+  isPending: {{ camelCase name }}Pending,
+  isError: {{ camelCase name }}Error,
+  refetch: refetch{{ pascalCase name }}
+} = useQuery<{{ pascalCase name }}PageResult>({
+  queryKey: ['{{ camelCase module }}', '{{ camelCase name }}', 'list', pageNo, pageSize, keyword],
+  queryFn: (_ctx: QueryFunctionContext): Promise<{{ pascalCase name }}PageResult> => {
+    return fetch{{ pascalCase name }}ListApi(pageNo.value, pageSize.value, keyword.value);
+  }
+} as QueryOptions<{{ pascalCase name }}PageResult>);
+{{/if}}
+</script>
+
+<template>
+  <view class="flex flex-col flex-1">
+    <!-- 业务内容区域 -->
+    <view class="flex flex-col items-center justify-center py-[48px]">
+      {{#if needApi}}
+      <text v-if="{{ camelCase name }}Pending" class="text-[14px] text-[#94a3b8]">加载中...</text>
+      <text v-else-if="{{ camelCase name }}Error" class="text-[14px] text-[#ef4444]" @click="refetch{{ pascalCase name }}">
+        加载失败，点击重试
+      </text>
+      <text v-else class="text-[14px] text-[#334155]">
+        {{ title }}共 \{{ {{ camelCase name }}Data != null ? {{ camelCase name }}Data.total : 0 \}} 条记录
+      </text>
+      {{else}}
+      <text class="text-[14px] text-[#94a3b8]">{{ title }}内容区域</text>
+      {{/if}}
+    </view>
+  </view>
+</template>
+
+<style scoped>
+/* 遵循原生样式限制：优先使用原子类，严禁使用 gap / space-* */
+</style>
