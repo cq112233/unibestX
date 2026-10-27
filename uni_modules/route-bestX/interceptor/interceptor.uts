@@ -4,8 +4,11 @@ import type { RouteTarget } from '../guard/types.uts';
 import { ROUTER_ERROR_CODE, createRouterError } from '../core/router-error.uts';
 import {
   applyTargetRouteFromUrl,
+  getDefaultRouteName,
+  getRouteMeta,
   installRouteStateListener,
   previousRouteState,
+  readMetaString,
   routeState,
   setBeforeSyncRouteHook,
   syncRouteState
@@ -308,7 +311,10 @@ function resolveFromRouteTarget(): RouteTarget {
     return {
       path: routeState.path,
       query: routeState.query,
-      fullPath: routeState.fullPath
+      fullPath: routeState.fullPath,
+      params: routeState.params,
+      meta: routeState.meta,
+      name: routeState.name
     } as RouteTarget;
   }
   const pages = getCurrentPages();
@@ -337,18 +343,25 @@ function resolveFromRouteTarget(): RouteTarget {
       }
       const queryStr = joinQueryString(query);
       const fullPath = queryStr != '' ? `${path}?${queryStr}` : path;
+      const meta = getRouteMeta(path);
+      let routeName: string | null = null;
+      if (meta != null) {
+        routeName = readMetaString(meta, 'name');
+      }
+      if (routeName == null || routeName == '') {
+        routeName = getDefaultRouteName(path);
+      }
       return {
         path,
         query,
-        fullPath
+        fullPath,
+        params: new Map<string, string>(),
+        meta,
+        name: routeName
       } as RouteTarget;
     }
   }
-  return {
-    path: '',
-    query: new Map<string, string>(),
-    fullPath: ''
-  } as RouteTarget;
+  return createEmptyRouteTarget();
 }
 
 /** 最近一次正在发起的导航目标与来源（用于 afterEach / onError 钩子传参） */
@@ -381,12 +394,24 @@ function doIntercept(url: string, api: string, fromOverride: RouteTarget | null 
     fullPath += `?${queryStr}`;
   }
 
+  const meta = getRouteMeta(urlObj.path);
+  let routeName: string | null = null;
+  if (meta != null) {
+    routeName = readMetaString(meta, 'name');
+  }
+  if (routeName == null || routeName == '') {
+    routeName = getDefaultRouteName(urlObj.path);
+  }
+
   // 对象字面量按仓库既有先例写成「类型化变量 + as」（如 tabbar 的 buildFullTabbarList）：
   // 嵌套字面量直传给 type 字段没有先例，Kotlin 侧推断不可靠，这里显式落到具体类型上
   const target: RouteTarget = {
     path: urlObj.path,
     query: urlObj.query,
-    fullPath
+    fullPath,
+    params: new Map<string, string>(),
+    meta,
+    name: routeName
   } as RouteTarget;
 
   // 获取当前来源页面路由（from）：若显式传入（如支付宝原生返回补丁），优先采用；否则由全局状态解析
@@ -401,7 +426,10 @@ function doIntercept(url: string, api: string, fromOverride: RouteTarget | null 
       fromTarget = {
         path: previousRouteState.path,
         query: previousRouteState.query,
-        fullPath: previousRouteState.fullPath
+        fullPath: previousRouteState.fullPath,
+        params: previousRouteState.params,
+        meta: previousRouteState.meta,
+        name: previousRouteState.name
       } as RouteTarget;
     }
   }
