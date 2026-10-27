@@ -3,6 +3,7 @@ import { onHide as onPageHide, onLoad as onPageLoad, onShow as onPageShow } from
 import { getCurrentPath } from '@/uni_modules/route-bestX/index.uts';
 import { isPageVisible, pageShowTimes } from '../core/lifecycle.uts';
 import { curIdx } from '../core/state.uts';
+import { isSinglePageTabbar } from '../core/strategy.uts';
 import { resolveTabIndexByKey } from '../core/tab-key.uts';
 
 /** Tab 页面生命周期回调 */
@@ -146,8 +147,8 @@ export function useTabPage(): UseTabPageResult {
     }
   };
 
-  // 普通页面（非 Tab 页面）直接使用原生页面生命周期，保证同一套调用方式在普通页面同样生效
-  if (pageIndex < 0) {
+  // 非模式 4（独立页面实体）或普通子页面：直接绑定原生页面生命周期，避免受跨页面全局状态干扰
+  if (!isSinglePageTabbar || pageIndex < 0) {
     onPageLoad((): void => {
       if (!hasLoaded) {
         hasLoaded = true;
@@ -166,6 +167,40 @@ export function useTabPage(): UseTabPageResult {
         runCallbacks(hideCallbacks);
       }
     });
+    onUnmounted((): void => {
+      if (hasShown) {
+        hasShown = false;
+        runCallbacks(hideCallbacks);
+      }
+      runCallbacks(unloadCallbacks);
+      loadCallbacks.length = 0;
+      showCallbacks.length = 0;
+      hideCallbacks.length = 0;
+      unloadCallbacks.length = 0;
+    });
+
+    return {
+      onLoad: (callback: TabPageLifecycleCallback): void => {
+        if (!loadCallbacks.includes(callback)) {
+          loadCallbacks.push(callback);
+        }
+      },
+      onShow: (callback: TabPageLifecycleCallback): void => {
+        if (!showCallbacks.includes(callback)) {
+          showCallbacks.push(callback);
+        }
+      },
+      onHide: (callback: TabPageLifecycleCallback): void => {
+        if (!hideCallbacks.includes(callback)) {
+          hideCallbacks.push(callback);
+        }
+      },
+      onUnload: (callback: TabPageLifecycleCallback): void => {
+        if (!unloadCallbacks.includes(callback)) {
+          unloadCallbacks.push(callback);
+        }
+      }
+    };
   }
 
   const stopActiveWatch = watch(isActive, (_value: boolean): void => {

@@ -43,11 +43,15 @@ export function useTabPageShell(tabType: string): boolean {
     if (!isSinglePageTabbar) {
       setCurIdxByKey(tabType);
     }
-    notifyPageShow();
+    else {
+      notifyPageShow();
+    }
   });
 
   onHide((): void => {
-    notifyPageHide();
+    if (isSinglePageTabbar) {
+      notifyPageHide();
+    }
   });
 
   useBackPressExit();
