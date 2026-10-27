@@ -4,6 +4,7 @@ import type { RouteTarget } from '../guard/types.uts';
 import { ROUTER_ERROR_CODE, createRouterError } from '../core/router-error.uts';
 import {
   applyTargetRouteFromUrl,
+  getDefaultHomePage,
   getDefaultRouteName,
   getRouteMeta,
   installRouteStateListener,
@@ -190,6 +191,11 @@ function resolveAbsoluteUrl(url: string): string {
   // 确保最终 path 也是以 '/' 开头的绝对路径形式
   if (path.startsWith('src/')) {
     path = `/${path}`;
+  }
+
+  // 根路径 '/' 或空路径统一动态解析为应用默认首页路径
+  if (path == '/' || path == '') {
+    path = getDefaultHomePage();
   }
 
   // query 串原样保留（不做编解码，避免二次转义）
@@ -576,6 +582,21 @@ export const switchTabInterceptor: Interceptor = {
 let lastHandledNavigateBackTarget: string = '';
 /** 最近一次由 navigateBack 拦截/守卫处理放行的时间戳 */
 let lastHandledNavigateBackTime: number = 0;
+/** 静默回退计数（针对自定义 TabBar 内部出栈销毁上层页面等内部流程） */
+let silentBackCount: number = 0;
+/** 是否有静默回退等待对应的 popstate 消费 */
+let isSilentBackPending: boolean = false;
+
+/**
+ * 标记接下来的 navigateBack 为内部回退（如模式 4 切换 TabBar 时销毁上层子页面出栈），
+ * 跳过拦截器与 popstate 监听校验，不覆盖当前已设置的虚拟目标路由
+ * @param count 回退次数（默认 1）
+ */
+export function markSilentNavigateBack(count: number = 1): void {
+  silentBackCount = count;
+  isSilentBackPending = true;
+  lastHandledNavigateBackTime = Date.now();
+}
 
 /**
  * 重置 navigateBack 防重复记录（供单测等环境复位）
@@ -583,6 +604,8 @@ let lastHandledNavigateBackTime: number = 0;
 export function resetLastHandledNavigateBackTarget(): void {
   lastHandledNavigateBackTarget = '';
   lastHandledNavigateBackTime = 0;
+  silentBackCount = 0;
+  isSilentBackPending = false;
 }
 
 /**
@@ -591,6 +614,12 @@ export function resetLastHandledNavigateBackTarget(): void {
  */
 export const navigateBackInterceptor: Interceptor = {
   invoke(options: any): boolean {
+    if (silentBackCount > 0) {
+      silentBackCount--;
+      isSilentBackPending = true;
+      lastHandledNavigateBackTime = Date.now();
+      return true;
+    }
     const pages = getCurrentPages();
     let delta = 1;
     if (options != null) {
@@ -693,6 +722,13 @@ export const chooseLocationInterceptor: Interceptor = {
 function installH5PopstateListener(): void {
   if (typeof window != 'undefined') {
     window.addEventListener('popstate', () => {
+      // 若刚发生了内部静默回退，直接消费并跳过，防止污染全局虚拟路由与重复触发守卫
+      if (isSilentBackPending && (Date.now() - lastHandledNavigateBackTime) < 2000) {
+        isSilentBackPending = false;
+        return;
+      }
+      isSilentBackPending = false;
+
       let h5Url = '';
       const hash = window.location.hash;
       if (hash.startsWith('#/')) {
@@ -702,10 +738,12 @@ function installH5PopstateListener(): void {
         h5Url = window.location.pathname + window.location.search;
       }
       if (h5Url != '' && h5Url != '/') {
-        const targetPath = cleanPath(h5Url);
-        // 防抖去重：如果最近 500ms 内已被 navigateBackInterceptor 处理过，跳过重复校验
-        if (isSamePath(lastHandledNavigateBackTarget, targetPath) && (Date.now() - lastHandledNavigateBackTime) < 500) {
-          lastHandledNavigateBackTarget = '';
+        let targetPath = cleanPath(h5Url);
+        if (targetPath == '/' || targetPath == '') {
+          targetPath = getDefaultHomePage();
+        }
+        // 防抖去重：如果最近 1000ms 内已被 navigateBackInterceptor 处理过，跳过重复校验
+        if (isSamePath(lastHandledNavigateBackTarget, targetPath) && (Date.now() - lastHandledNavigateBackTime) < 1000) {
           return;
         }
         lastHandledNavigateBackTarget = targetPath;
@@ -844,7 +882,11 @@ export function checkAndInterceptPageShow(targetPath: string = ''): boolean {
   }
 
   const stackLen = getPageStackLength();
-  const isBackByStack = routeState.pages.length > 0 && stackLen > 0 && stackLen < routeState.pages.length;
+  // 首屏单页面不可能发生出栈返回行为，直接放行
+  if (stackLen <= 1) {
+    return true;
+  }
+  const isBackByStack = routeState.pages.length > 0 && stackLen < routeState.pages.length;
 
   // 2. 若当前栈顶页面与当前记录的 routeState 相同：
   // 必须明确检测到页面栈出栈减少（isBackByStack）才判定为同路径手势返回；
@@ -988,7 +1030,7 @@ export function checkDirectEntry(options: any | null = null) {
       }
     }
     if (targetPath == '') {
-      targetPath = '/src/pages/index/index';
+      targetPath = getDefaultHomePage();
     }
   }
 

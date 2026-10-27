@@ -345,6 +345,43 @@ function ensurePageConfigTable(): Map<string, UTSJSONObject> {
 }
 
 /**
+ * 动态获取应用默认首页路径（优先从物理页面栈底获取，其次从 pages.json 路由表首项提取）
+ * 避免在插件底层硬编码特定工程的首页路径
+ *
+ * @returns 规范化后的默认首页绝对路径（如 /src/pages/index/index 或 /pages/index/index）
+ */
+export function getDefaultHomePage(): string {
+  // 1. 优先从物理页面栈底获取（应用已挂载时的真实首页）
+  try {
+    const pages = getCurrentPages();
+    if (pages.length > 0) {
+      const pageRoute = pages[0].route ?? '';
+      if (pageRoute != '') {
+        return cleanPath(pageRoute);
+      }
+    }
+  }
+  catch { }
+
+  // 2. 其次从 pages.json 静态配置表中获取首个页面（uni-app 规范第一项为首页）
+  const table = ensurePageConfigTable();
+  if (table.size > 0) {
+    let firstPath: string | null = null;
+    table.forEach((_val: UTSJSONObject, key: string): void => {
+      if (firstPath == null) {
+        firstPath = key;
+      }
+    });
+    if (firstPath != null) {
+      return cleanPath(firstPath!);
+    }
+  }
+
+  // 3. 兜底官方约定默认首页路径
+  return '/pages/index/index';
+}
+
+/**
  * 读取某个页面在 pages.json 里的配置项（页面 definePage 声明的字段）
  *
  * @param path 页面路径

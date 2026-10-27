@@ -2,7 +2,13 @@ import { curIdx, setCurIdx, setCurIdxByPath, tabbarList } from './state.uts';
 import { readTabPageFullPath, setTabPageUrl, syncTabPageHostUrl } from './tab-page.uts';
 import { isNativeTabbar, isSinglePageTabbar, selectedTabbarStrategy, TABBAR_STRATEGY_MAP } from './strategy.uts';
 import { customTabbarConfig } from '../adapters/config.uts';
-import { applyRouteFromUrl, useRouter } from '@/uni_modules/route-bestX/index.uts';
+import {
+  applyRouteFromUrl,
+  isSamePath,
+  markSilentNavigateBack,
+  routeState,
+  useRouter
+} from '@/uni_modules/route-bestX/index.uts';
 import { runTabNavigationGuard } from './tab-navigation.uts';
 import { safeHideNativeTabBar } from './native.uts';
 
@@ -11,8 +17,22 @@ function handleClickBulge(url: string = '/src/pages/ai/ai'): void {
   useRouter().push(url);
 }
 
-/** 读取当前虚拟 Tab 的完整 URL，作为下一次切换的来源。 */
+/** 读取当前页面或虚拟 Tab 的完整 URL，作为下一次切换的来源。 */
 function readCurrentTabFullPath(): string {
+  try {
+    const pages = getCurrentPages();
+    if (pages.length > 0) {
+      const topRoute = pages[pages.length - 1].route ?? '';
+      if (topRoute != '' && !isSamePath(topRoute, '/pages/index/index')) {
+        if (routeState.fullPath != '' && !isSamePath(routeState.path, '/pages/index/index')) {
+          return routeState.fullPath;
+        }
+        return topRoute.startsWith('/') ? topRoute : `/${topRoute}`;
+      }
+    }
+  }
+  catch { }
+
   const index = curIdx.value;
   if (index < 0 || index >= tabbarList.length) {
     return '';
@@ -87,6 +107,7 @@ function performSwitchTabbar(url: string): void {
           // 宿主页已在页面栈中：通过 navigateBack 退回已有宿主页，销毁上层子页面，
           // 彻底防止 redirectTo 导致宿主页重复堆叠、子组件生命周期回调成倍累加！
           const delta = pages.length - 1 - hostIndex;
+          markSilentNavigateBack(1);
           uni.navigateBack({
             delta,
             success: () => {

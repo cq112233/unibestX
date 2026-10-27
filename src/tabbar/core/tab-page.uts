@@ -1,6 +1,6 @@
 import { ref } from 'vue';
 import type { Ref } from 'vue';
-import { cleanPath, parseUrlToObj } from '@/uni_modules/route-bestX/index.uts';
+import { applyRouteFromUrl, cleanPath, parseUrlToObj } from '@/uni_modules/route-bestX/index.uts';
 import { curIdx, setCurIdx, tabbarList } from './state.uts';
 import { resolveTabIndexByKey, resolveTabKeyByPath } from './tab-key.uts';
 import { runTabNavigationGuard } from './tab-navigation.uts';
@@ -170,6 +170,7 @@ export function activateTabPageFromHostQuery(query: Map<string, string>): boolea
     }
     setTabPageQuery(targetPath, pageQuery);
     setCurIdx(index);
+    applyRouteFromUrl(targetUrl);
   });
 
   // 同步钩子返回最终结果；异步钩子返回 true 表示已命中并开始执行前置操作。
