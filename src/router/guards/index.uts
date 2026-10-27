@@ -80,9 +80,26 @@ export function setupRouteGuards(router: Router): void {
   });
 
   // 2. 注册全局后置钩子（页面跳转完成、数据统计与埋点上报）
-  router.afterEach((_to: RouteTarget, _from: RouteTarget, _failure?: any | null) => {
-    if (_failure != null) {
-      console.warn('[Router afterEach] 导航中断/异常:', _failure);
+  router.afterEach((to: RouteTarget, from: RouteTarget, failure?: any | null) => {
+    // #ifdef H5 || WEB
+    console.log(
+      `%c[Router afterEach]%c 路由跳转 %c to: %c${to.fullPath != '' ? to.fullPath : to.path} %c from: %c${from.fullPath != '' ? from.fullPath : from.path} %c`,
+      'background: #2563eb; color: #ffffff; padding: 2px 6px; border-radius: 3px; font-weight: bold;',
+      'color: #2563eb; font-weight: bold;',
+      'color: #64748b; font-weight: bold;',
+      'color: #10b981; font-weight: bold;',
+      'color: #64748b; font-weight: bold;',
+      'color: #ea580c; font-weight: bold;',
+      'color: #64748b; font-weight: bold;'
+    );
+    // #endif
+    // #ifndef H5 || WEB
+    console.log(
+      `\x1B[34m[Router beforeEach]\x1B[0m 路由跳转 to: \x1B[32m${to.fullPath != '' ? to.fullPath : to.path}\x1B[0m from: \x1B[33m${from.fullPath != '' ? from.fullPath : from.path}\x1B[0m`
+    );
+    // #endif
+    if (failure != null) {
+      console.warn('[Router afterEach] 导航中断/异常:', failure);
       return;
     }
   });

@@ -21,6 +21,7 @@ import uniPagesPlugin from './plugins/vite-plugin-uni-pages';
 import uniPagesSandboxPlugin from './plugins/vite-plugin-uni-pages-sandbox';
 import uniPagesTabbarPlugin from './plugins/vite-plugin-uni-pages-tabbar';
 import uniPagesRouteTablePlugin from './plugins/vite-plugin-uni-pages-route-table';
+import alipayCustomTabbarPlugin from './plugins/vite-plugin-alipay-tabbar';
 import htmlToUniPlugin from './plugins/vite-plugin-html-to-uni';
 import { execSync } from 'node:child_process';
 import { viteMockServe } from 'vite-plugin-mock';
@@ -272,6 +273,7 @@ export default defineConfig({
     uniPagesSandboxPlugin(), // 沙盒独立调试模式（VITE_DEV_SANDBOX / definePage({ debug })）
     uniPagesTabbarPlugin(), // TabBar 策略（VITE_TABBAR_MODE 0–4）
     uniPagesRouteTablePlugin(), // 提供 virtual:uni-pages-route-table 虚拟模块（页面路由表数据源）
+    alipayCustomTabbarPlugin(), // 支付宝小程序自定义 TabBar 补丁（消除原生底座闪烁）
     // 手动补充 easycom 插件（限制非小程序端生效，含 App 与 Web）
     // 该插件内部名为 uni:app-easycom，负责在 App 蒸汽模式与 Web 端把模板里的 easycom 标签转成静态 import；
     // 小程序端（mp-*）由官方编译器基于 usingComponents 原生处理，挂载该插件会导致组件被转为未知动态组件并报错 resolveDynamicComponent。

@@ -1,6 +1,6 @@
 import { curIdx, setCurIdx, setCurIdxByPath, tabbarList } from './state.uts';
 import { readTabPageFullPath, setTabPageUrl, syncTabPageHostUrl } from './tab-page.uts';
-import { isNativeTabbar, isSinglePageTabbar, selectedTabbarStrategy, TABBAR_STRATEGY_MAP } from './strategy.uts';
+import { isNativeTabbar, isSinglePageTabbar, needHideNativeTabbar, selectedTabbarStrategy, TABBAR_STRATEGY_MAP } from './strategy.uts';
 import { customTabbarConfig } from '../adapters/config.uts';
 import {
   applyRouteFromUrl,
@@ -144,7 +144,9 @@ function performSwitchTabbar(url: string): void {
     });
   }
   else {
-    safeHideNativeTabBar();
+    if (needHideNativeTabbar) {
+      safeHideNativeTabBar();
+    }
     uni.switchTab({
       url: normalizedUrl,
       fail: (_err: any) => {

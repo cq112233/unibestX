@@ -30,7 +30,7 @@
  */
 import { cleanPath, resolveUrl } from '../utils/utils.uts';
 import type { RouteLocationRaw } from '../utils/utils.uts';
-import { ensureRouteReady, routeState, setRoutes } from '../core/route-state.uts';
+import { ensureRouteReady, routeState, setDefaultHomePage, setRoutes } from '../core/route-state.uts';
 import type { RouteLocation, RouteRecordRaw } from '../core/route-types.uts';
 import { registerAfterEach, registerBeforeEach, registerOnError } from '../guard/index.uts';
 import type { NavigationErrorHandler, NavigationGuard, NavigationHookAfter } from '../guard/types.uts';
@@ -57,6 +57,8 @@ function shouldIntercept(to: string | RouteLocationRaw | null, intercept: boolea
  * 路由器创建配置项契约
  */
 export type RouterOptions = {
+  /** 默认首页路径（可选显式配置，如 /src/pages/index/index） */
+  homePage?: string | null;
   /** 路由表列表配置（对标 vue-router 的 routes） */
   routes?: RouteRecordRaw[] | null;
   /** TabBar 页面路径列表，如 ['/src/pages/index/index', ...] */
@@ -291,6 +293,9 @@ export function createRouter(options: RouterOptions | null = null): Router {
   ensureRouteReady();
 
   if (options != null) {
+    if (options.homePage != null && options.homePage != '') {
+      setDefaultHomePage(options.homePage!);
+    }
     if (options.routes != null && options.routes!.length > 0) {
       setRoutes(options.routes!);
     }

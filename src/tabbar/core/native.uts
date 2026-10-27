@@ -1,9 +1,28 @@
 import { needHideNativeTabbar } from './strategy.uts';
 
+// #ifdef H5
+// 若非模式2（无需隐藏原生TabBar），自动清理任何可能残留的隐藏原生样式
+try {
+  if (typeof document != 'undefined' && !needHideNativeTabbar) {
+    const existingStyle = document.getElementById('hide-native-tabbar-style');
+    if (existingStyle != null) {
+      existingStyle.remove();
+    }
+  }
+}
+catch { }
+// #endif
+
 /**
  * 隐藏系统原生 TabBar 并按 5.26+ 的 H5 布局注入适配样式（核心平台行为）
  */
 export function safeHideNativeTabBar(): void {
+  // 仅在模式2（带原生底板的自定义模式）且系统存在原生 TabBar 时才需调用 hideTabBar
+  // 模式1为原生 TabBar，严禁隐藏原生 TabBar！
+  // 模式4与模式3下 pages.json 无原生 tabBar 节点，也无需注入隐藏样式
+  if (!needHideNativeTabbar) {
+    return;
+  }
   // #ifdef H5
   try {
     if (typeof document != 'undefined' && document.getElementById('hide-native-tabbar-style') == null) {
@@ -16,19 +35,23 @@ export function safeHideNativeTabBar(): void {
   catch { }
   // #endif
   // #ifndef MP-WEIXIN
-  // 仅在模式2（带原生底板的自定义模式）且系统存在原生 TabBar 时才需调用 hideTabBar
-  // 模式4（单页保活容器，当前默认）与模式3下 pages.json 无原生 tabBar 节点，避免调用触发 tabBar is not exist
-  if (needHideNativeTabbar) {
-    try {
-      uni.hideTabBar({
+  try {
+    uni.hideTabBar({
+      animation: false,
+      fail: (_err: any) => {
+        // 原生 tabBar 不存在时（如非 Tab 页面）属于预期内正常防御状态，静默捕获不输出报警日志
+      }
+    });
+    // #ifdef MP-ALIPAY
+    if (typeof my != 'undefined' && typeof my.hideTabBar == 'function') {
+      my.hideTabBar({
         animation: false,
-        fail: (_err: any) => {
-          // 原生 tabBar 不存在时（如非 Tab 页面）属于预期内正常防御状态，静默捕获不输出报警日志
-        }
+        fail: (_err: any) => { }
       });
     }
-    catch { }
+    // #endif
   }
+  catch { }
   // #endif
 }
 
