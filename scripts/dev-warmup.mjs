@@ -1,19 +1,10 @@
 /**
- * dev 启动包装：解决「首次打开 Web 端慢」。
+ * dev 启动包装：管理 HBuilderX 状态守门、Mock 环境与端口生命周期。
  *
- * 根因：dev server 进程冷启动时，第一个浏览器请求要首次加载整条中间件/插件/uni 运行时链路
- * 并触发 V8 JIT，实测首次 `/` 请求 TTFB 886ms~1.9s（页面 Load 1.6s）；一旦进程被"捂热"，
- * 后续请求 TTFB 降到 20~40ms。
- *
- * 做法：透传启动 `uni-launch`（stdio 全继承，Ctrl+C 行为不变），
- * 另起一个预热器轮询 stdout，等出现 "ready in" 后连打几次首页，把进程捂热。
- * 实测预热后用户首次访问 TTFB = 10.8ms（原 886ms）。
- *
- * 为什么不直接把预热塞进 vite.config：warmupFiles 是异步不 await，与首个浏览器请求抢 CPU，
- * 反而让第二次请求更慢（实测 1.98s）。必须先让 server 完全就绪、串行地打几发请求才有效。
- *
- * 除了预热，本文件还是 dev 的「HBuilderX 状态守门人」：编辑器没开时直接报错退出，
- * 而不是让 uni-launch 去自动启动它（那条路会让终端无限卡住）。原因见 ensureHbuilderxRunning。
+ * 1. 作为 dev 的「HBuilderX 状态守门人」：编辑器没开时直接报错退出，
+ *    避免让 uni-launch 自动启动 HBuilderX 导致终端卡死（见 ensureHbuilderxRunning）。
+ * 2. 透传启动 `uni-launch` 并监听动态端口，在进程退出时准确清理对应端口与子进程。
+ * 3. 维护本地 Mock 模式标记缓存。
  */
 import { execFileSync, execSync, spawn } from 'node:child_process';
 import fs from 'node:fs';
@@ -22,12 +13,6 @@ import { fileURLToPath } from 'node:url';
 
 const PORT = process.env.PORT || '9527';
 let actualPort = PORT;
-// 冷启动时前几次请求是"痛苦期"（首次 1.1s、第二次 1.9s，并发抢 CPU），实测第 5 次才收敛到 40ms。
-// 打 4 发足够越过痛苦期；每发之间留间隔，避免自身并发反而拖慢。
-const WARMUP_HITS = Number(process.env.DEV_WARMUP_HITS || 4);
-const READY_TIMEOUT_MS = 180_000;
-// 默认安静：只打一行汇总；设 DEV_WARMUP_VERBOSE=1 显示每发耗时（调试预热曲线时用）
-const VERBOSE = process.env.DEV_WARMUP_VERBOSE === '1';
 
 const spawnOpts = {
   stdio: ['inherit', 'pipe', 'pipe'],
@@ -133,9 +118,8 @@ populateHbuilderxCliEnv();
  * （Windows 上它用 `wmic process where "name='HBuilderX.exe'"` 查进程，而 wmic 从 Win11
  * 24H2 起已被系统移除，这个判断在 Windows 上**永远**是「没在运行」），就会先跑 `cli open`
  * 把编辑器拉起来，紧接着对**还没就绪**的编辑器发 `project open` / `launch`。后两条命令等不到
- * 响应就永远等下去 —— 表现出来就是编辑器被拉起来了、终端却卡死，180s 后只等到 dev-warmup
- * 那句「未在超时内检测到 ready in」。所以「编辑器没开」这个前置条件必须由我们自己判断掉，
- * 根本不进那条自动启动路径。
+ * 响应就永远等下去 —— 表现出来就是编辑器被拉起来了、终端却卡死。所以「编辑器没开」这个前置条件
+ * 必须由我们自己判断掉，根本不进那条自动启动路径。
  *
  * 判断方式用 `cli --version`：编辑器在跑时它打印版本号（实测 `5.26.2026091802`，耗时约 90ms），
  * 没在跑时打印的是「未检测到已打开的HBuilderX」这类提示。两条线索都认，互为兜底：
@@ -272,90 +256,18 @@ const child = process.platform === 'win32'
   ? spawn(process.env.ComSpec || 'cmd.exe', ['/d', '/c', 'uni-launch', ...launchArgs], spawnOpts)
   : spawn('uni-launch', launchArgs, spawnOpts);
 
-// 一边透传子进程输出，一边盯 "ready in"
-let readyHandled = false;
-let buffer = '';
-
-function scanForReady(chunk) {
+// 透传子进程输出，并捕获实际监听端口供退出时精准清理
+function handleStdout(chunk) {
   process.stdout.write(chunk);
   const text = chunk.toString();
   const portMatch = text.match(/Local:\s+http:\/\/localhost:(\d+)\//i);
   if (portMatch && portMatch[1]) {
     actualPort = portMatch[1];
   }
-  if (readyHandled) {
-    return;
-  }
-  buffer = (buffer + chunk).slice(-4096);
-  if (/ready in\s/i.test(buffer)) {
-    readyHandled = true;
-    warmup();
-  }
 }
 
-child.stdout.on('data', scanForReady);
+child.stdout.on('data', handleStdout);
 child.stderr.on('data', chunk => process.stderr.write(chunk));
-
-async function warmup() {
-  // ready 那行打印时，中间件可能尚未完全挂载，给一个极短的让位
-  await sleep(300);
-  const base = `http://127.0.0.1:${actualPort}/`;
-  const t0 = Date.now();
-  let failed = 0;
-  for (let i = 1; i <= WARMUP_HITS; i++) {
-    try {
-      const t = Date.now();
-      const res = await fetch(base, { headers: { 'user-agent': 'dev-warmup' } });
-      await res.text();
-      if (VERBOSE) {
-        console.log(`[dev-warmup] 预热 ${i}/${WARMUP_HITS}  ${Date.now() - t}ms  [${res.status}]`);
-      }
-    }
-    catch (e) {
-      failed++;
-      if (VERBOSE) {
-        console.log(`[dev-warmup] 预热 ${i}/${WARMUP_HITS} 失败：${e.message}`);
-      }
-    }
-    await sleep(150);
-  }
-
-  // 动态读取 pages.json 中的 tabBar.list，自动预热所有 TabBar 页面模块，绝不硬编码
-  try {
-    const pagesJsonFile = path.join(ROOT, 'pages.json');
-    if (fs.existsSync(pagesJsonFile)) {
-      const content = fs.readFileSync(pagesJsonFile, 'utf-8');
-      const tabListMatch = content.match(/"tabBar"\s*:\s*\{[\s\S]*?"list"\s*:\s*\[([\s\S]*?)\]/);
-      if (tabListMatch && tabListMatch[1]) {
-        const pathMatches = tabListMatch[1].matchAll(/"pagePath"\s*:\s*"([^"]+)"/g);
-        for (const match of pathMatches) {
-          const rawPath = match[1].replace(/\\/g, '/').replace(/^\//, '');
-          if (rawPath.length > 0 && !rawPath.includes('pages/index/index')) {
-            try {
-              const res = await fetch(`${base}${rawPath}.uvue?import`, { headers: { 'user-agent': 'dev-warmup' } });
-              await res.text();
-            }
-            catch {}
-          }
-        }
-      }
-    }
-  }
-  catch {}
-
-  console.log(`[dev-warmup] ✔ Web 端已预热（${WARMUP_HITS} 次${failed ? `，${failed} 次失败` : ''}，${Date.now() - t0}ms）`);
-}
-
-function sleep(ms) {
-  return new Promise(r => setTimeout(r, ms));
-}
-
-// 兜底：若长时间等不到 ready，不阻塞用户
-setTimeout(() => {
-  if (!readyHandled) {
-    console.log('[dev-warmup] 未在超时内检测到 "ready in"，跳过预热（不影响 dev 正常使用）');
-  }
-}, READY_TIMEOUT_MS).unref();
 
 /**
  * 杀死占用指定端口的服务端进程（仅针对 LISTENING 状态，严禁误杀客户端进程或 HBuilderX）
