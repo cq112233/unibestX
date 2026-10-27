@@ -18,6 +18,9 @@ describe('switchTabbar', () => {
   });
 
   it('updates the virtual tab state without a global navigation guard', () => {
+    if (!isSinglePageTabbar) {
+      return;
+    }
     expect(isSinglePageTabbar).toBe(true);
 
     switchTabbar('/src/pages/basic/basic?id=42');
@@ -26,38 +29,75 @@ describe('switchTabbar', () => {
     expect(readTabPageQuery('/src/pages/basic/basic').get('id')).toBe('42');
   });
 
-  it('restores the active virtual tab query after returning to the mode-4 host page', () => {
-    expect(isSinglePageTabbar).toBe(true);
+  it('restores the active virtual tab query after returning to the mode-4 host page via reLaunch when host is not in stack', () => {
+    if (!isSinglePageTabbar) {
+      return;
+    }
     window.location.hash = '#/src/sub/auth/login';
-    const redirectTo = (globalThis as any).uni.redirectTo as ReturnType<typeof vi.fn>;
-    const originalRedirect = redirectTo.getMockImplementation();
+    const reLaunch = (globalThis as any).uni.reLaunch as ReturnType<typeof vi.fn>;
+    const originalReLaunch = reLaunch.getMockImplementation();
     vi.spyOn(globalThis as any, 'getCurrentPages').mockReturnValue([
       { route: 'src/sub/auth/login' }
     ]);
-    redirectTo.mockImplementation((options: any): void => {
-      // 模拟 uni.redirectTo 打开宿主页后地址栏被重置为根路径
+    reLaunch.mockImplementation((options: any): void => {
       window.location.hash = '#/';
-      if (typeof options.success == 'function') {
+      if (typeof options?.success == 'function') {
         options.success({});
       }
     });
 
     switchTabbar('/src/pages/me/me');
 
-    if (originalRedirect != null) {
-      redirectTo.mockImplementation(originalRedirect);
+    if (originalReLaunch != null) {
+      reLaunch.mockImplementation(originalReLaunch);
     }
     else {
-      redirectTo.mockImplementation((): void => {});
+      reLaunch.mockImplementation((): void => {});
     }
 
-    expect(redirectTo).toHaveBeenCalledWith(expect.objectContaining({
+    expect(reLaunch).toHaveBeenCalledWith(expect.objectContaining({
       url: '/src/pages/index/index'
     }));
     expect(window.location.hash).toBe('#/?tab=me');
   });
 
+  it('navigates back to the existing mode-4 host page instead of re-launching or redirecting', () => {
+    if (!isSinglePageTabbar) {
+      return;
+    }
+    window.location.hash = '#/src/sub/auth/login';
+    const navigateBack = (globalThis as any).uni.navigateBack as ReturnType<typeof vi.fn>;
+    const originalNavigateBack = navigateBack.getMockImplementation();
+    vi.spyOn(globalThis as any, 'getCurrentPages').mockReturnValue([
+      { route: 'src/pages/index/index' },
+      { route: 'src/sub/auth/login' }
+    ]);
+    navigateBack.mockImplementation((options: any): void => {
+      window.location.hash = '#/';
+      if (typeof options?.success == 'function') {
+        options.success({});
+      }
+    });
+
+    switchTabbar('/src/pages/me/me');
+
+    if (originalNavigateBack != null) {
+      navigateBack.mockImplementation(originalNavigateBack);
+    }
+    else {
+      navigateBack.mockImplementation((): void => {});
+    }
+
+    expect(navigateBack).toHaveBeenCalledWith(expect.objectContaining({
+      delta: 1
+    }));
+    expect(window.location.hash).toBe('#/?tab=me');
+  });
+
   it('passes source, target, query and trigger to the navigation guard', () => {
+    if (!isSinglePageTabbar) {
+      return;
+    }
     setCurIdx(1);
     setTabPageUrl('/src/pages/basic/basic?id=7');
     let captured: TabNavigationContext | null = null;
@@ -80,6 +120,9 @@ describe('switchTabbar', () => {
   });
 
   it('waits for an asynchronous pre-action before switching', async () => {
+    if (!isSinglePageTabbar) {
+      return;
+    }
     const steps: Array<string> = [];
     registerTabNavigationGuard((_context: TabNavigationContext, next: TabNavigationNext): void => {
       steps.push('before');

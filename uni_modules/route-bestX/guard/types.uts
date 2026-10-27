@@ -9,7 +9,7 @@
  */
 
 /**
- * 一次导航的目标路由
+ * 一次导航的目标路由（对标 vue-router 的 RouteLocationNormalized）
  */
 export type RouteTarget = {
   /** 规范化后的绝对路径（带前导 `/`，不含 query），如 `/src/pages/me/me` */
@@ -22,6 +22,12 @@ export type RouteTarget = {
    * `encodeURIComponent()` 整体编码一次（见 ./guardLogin.uts 里拼 loginUrl 那行）
    */
   fullPath: string;
+  /** 路由元信息（来自 definePage / pages.config.json），对标 vue-router 的 to.meta */
+  meta: UTSJSONObject | null;
+  /** 路由名称，对标 vue-router 的 to.name */
+  name: string | null;
+  /** 动态路由参数（uni-app X 恒为空 Map，对标 vue-router 的 to.params） */
+  params: Map<string, string>;
 };
 
 /** 构造空的 RouteTarget（用于首屏 / 无来源页面时的 from 兜底） */
@@ -29,7 +35,10 @@ export function createEmptyRouteTarget(): RouteTarget {
   return {
     path: '',
     query: new Map<string, string>(),
-    fullPath: ''
+    fullPath: '',
+    meta: null,
+    name: null,
+    params: new Map<string, string>()
   } as RouteTarget;
 }
 
