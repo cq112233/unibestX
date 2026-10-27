@@ -55,11 +55,15 @@ export type { TabbarHandler } from './interceptor/interceptor.uts';
 
 // 4. 路由状态与核心算法
 export {
+  applyRouteFromUrl,
+  clearRouteQuery,
   ensureRouteReady,
   getRouteMeta,
+  getSavedRouteQuery,
   previousRouteState,
   removeRouteMeta,
   routeState,
+  saveRouteQuery,
   setPageMetaJson,
   setRouteMeta,
   setRoutes,
@@ -72,6 +76,7 @@ export { createEmptyRoute } from './core/route-types.uts';
 // 5. 工具库
 export type { RouteLocationRaw, UrlObj } from './utils/utils.uts';
 export {
+  canonicalPath,
   cleanPath,
   decodeQueryValue,
   decodeSafe,

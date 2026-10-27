@@ -2,7 +2,7 @@ import { curIdx, setCurIdx, setCurIdxByPath, tabbarList } from './state.uts';
 import { readTabPageFullPath, setTabPageUrl, syncTabPageHostUrl } from './tab-page.uts';
 import { isNativeTabbar, isSinglePageTabbar, selectedTabbarStrategy, TABBAR_STRATEGY_MAP } from './strategy.uts';
 import { customTabbarConfig } from '../adapters/config.uts';
-import { useRouter } from '@/uni_modules/route-bestX/index.uts';
+import { applyRouteFromUrl, useRouter } from '@/uni_modules/route-bestX/index.uts';
 import { runTabNavigationGuard } from './tab-navigation.uts';
 import { safeHideNativeTabBar } from './native.uts';
 
@@ -57,6 +57,7 @@ function performSwitchTabbar(url: string): void {
   // 这样 useTabPage() 里的 route.query 仍与普通页面 push({ query }) 的行为一致。
   if (isSinglePageTabbar) {
     setTabPageUrl(normalizedUrl);
+    applyRouteFromUrl(normalizedUrl);
   }
   setCurIdxByPath(normalizedUrl);
   if (isSinglePageTabbar) {

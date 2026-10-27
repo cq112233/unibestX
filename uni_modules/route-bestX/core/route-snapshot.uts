@@ -3,6 +3,7 @@
  * 核心隔离引擎：实现上一页不提前翻、同页带参重进不污染
  */
 import { reactive } from 'vue';
+import { isSamePath } from '../utils/utils.uts';
 import { createEmptyRoute } from './route-types.uts';
 import type { RouteLocation } from './route-types.uts';
 
@@ -52,7 +53,7 @@ export function publishRoute(globalRoute: RouteLocation, path: string, includeCl
       copyRoute(snapshot.route, globalRoute);
       return;
     }
-    if (includeClaimed && snapshot.visible && snapshot.path == path) {
+    if (includeClaimed && snapshot.visible && isSamePath(snapshot.path, path)) {
       copyRoute(snapshot.route, globalRoute);
     }
   });
@@ -105,7 +106,7 @@ export function showRouteSnapshot(id: number, globalRoute: RouteLocation): void 
     return;
   }
   snapshot.visible = true;
-  if (globalPath == snapshot.path) {
+  if (isSamePath(globalPath, snapshot.path)) {
     copyRoute(snapshot.route, globalRoute);
   }
 }

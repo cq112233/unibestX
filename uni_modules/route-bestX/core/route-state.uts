@@ -71,12 +71,14 @@ export function setPageMetaJson(jsonStr: string): void {
   pageConfigTable = null;
 }
 import {
+  canonicalPath,
   cleanPath,
   decodeQueryValue,
   getCurrentPageOptions,
   getCurrentPath,
   getPageStackLength,
   getQueryString,
+  isSamePath,
   parseUrlToObj,
   queryValueToString,
   setNameToPathResolver
@@ -412,6 +414,58 @@ export function getRouteMeta(path: string): UTSJSONObject | null {
 }
 
 // ==========================================
+// 统一路由参数持久化管理（Query Store）
+// ==========================================
+
+/** 全局统一页面路由参数持久化映射表：Canonical Path -> Query Map */
+const routeQueryStore: Map<string, Map<string, string>> = new Map<string, Map<string, string>>();
+
+/**
+ * 统一存入目标页面的 query（导航发起方、拦截器调用）
+ *
+ * @param path 页面路径（自动通过 canonicalPath 规范化为统一 Key）
+ * @param query 查询参数 Map
+ */
+export function saveRouteQuery(path: string, query: Map<string, string>): void {
+  const key = canonicalPath(path);
+  if (key == '') {
+    return;
+  }
+  const copy = new Map<string, string>();
+  query.forEach((v: string, k: string): void => {
+    copy.set(k, v);
+  });
+  routeQueryStore.set(key, copy);
+}
+
+/**
+ * 统一读取目标页面的暂存 query
+ *
+ * @param path 页面路径
+ * @returns 暂存的 query Map，查不到返回 null
+ */
+export function getSavedRouteQuery(path: string): Map<string, string> | null {
+  const key = canonicalPath(path);
+  if (key == '') {
+    return null;
+  }
+  const cached = routeQueryStore.get(key);
+  return cached != null ? cached : null;
+}
+
+/**
+ * 统一清除目标页面的 query 暂存
+ *
+ * @param path 页面路径
+ */
+export function clearRouteQuery(path: string): void {
+  const key = canonicalPath(path);
+  if (key != '') {
+    routeQueryStore.delete(key);
+  }
+}
+
+// ==========================================
 // 状态写入（唯一收敛点）
 // ==========================================
 
@@ -449,8 +503,19 @@ function commitRoute(path: string, query: Map<string, string>, fullPath: string,
   if (normalizedPath == '') {
     return;
   }
+  let finalQuery = query;
+  let finalFullPath = fullPath;
+  if (finalQuery.size > 0) {
+    saveRouteQuery(normalizedPath, finalQuery);
+  } else {
+    const saved = getSavedRouteQuery(normalizedPath);
+    if (saved != null && saved.size > 0) {
+      finalQuery = saved;
+      finalFullPath = buildFullPath(normalizedPath, saved);
+    }
+  }
   // 在全局 routeState 被改写前，若原路径非空且与新路径不同，暂存为上一个路由快照
-  if (routeState.path != '' && routeState.path != normalizedPath) {
+  if (routeState.path != '' && !isSamePath(routeState.path, normalizedPath)) {
     previousRouteState.path = routeState.path;
     previousRouteState.fullPath = routeState.fullPath;
     const prevQuery = new Map<string, string>();
@@ -461,15 +526,15 @@ function commitRoute(path: string, query: Map<string, string>, fullPath: string,
   }
   else if (routeState.path == '' && previousRouteState.path == '') {
     const cur = getCurrentPath();
-    if (cur != '' && cur != normalizedPath) {
+    if (cur != '' && !isSamePath(cur, normalizedPath)) {
       previousRouteState.path = cur;
       previousRouteState.fullPath = cur;
     }
   }
   const meta = getRouteMeta(normalizedPath);
   routeState.path = normalizedPath;
-  routeState.fullPath = fullPath;
-  routeState.query = query;
+  routeState.fullPath = finalFullPath;
+  routeState.query = finalQuery;
   routeState.meta = meta;
   let routeName: string | null = null;
   if (meta != null) {
@@ -619,7 +684,7 @@ export function syncRouteState(): void {
   const stackLen = getPageStackLength();
   const isBack = routeState.pages.length > 0 && stackLen > 0 && stackLen < routeState.pages.length;
   // 仅在非出栈返回、且同路径、且本次参数为空时跳过（避免新页初载 options 延迟冲掉发起方写入的 query）
-  if (!isBack && currentPath == routeState.path && query.size == 0) {
+  if (!isBack && isSamePath(currentPath, routeState.path) && query.size == 0) {
     return;
   }
   commitRoute(currentPath, query, buildFullPath(currentPath, query), true);

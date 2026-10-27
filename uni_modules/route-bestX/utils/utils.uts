@@ -186,6 +186,21 @@ export function cleanPath(path: string): string {
 }
 
 /**
+ * 路径 Key 标准化（去除 /src/ 前缀，统一规范为 /pages/... 或 /sub/... 格式）
+ * 专供 Map Key、存储索引等精确比对使用
+ *
+ * @param path 原始路径或 URL
+ * @returns 标准化后的绝对路径
+ */
+export function canonicalPath(path: string): string {
+  const p = cleanPath(path);
+  if (p.startsWith('/src/')) {
+    return p.substring(4);
+  }
+  return p;
+}
+
+/**
  * 比较两个页面路径是否指向同一页面
  * 自动去除 query 参数与前导斜杠，支持完整匹配与结尾路由匹配
  * 例如：
