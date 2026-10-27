@@ -213,7 +213,9 @@ export function useTabPage(): UseTabPageResult {
 
   /** 注册首次进入回调；若注册时页面已经可见则立即执行 */
   const registerLoad = (callback: TabPageLifecycleCallback): void => {
-    loadCallbacks.push(callback);
+    if (!loadCallbacks.includes(callback)) {
+      loadCallbacks.push(callback);
+    }
     if (!hasLoaded && isCurrentTabVisible()) {
       hasLoaded = true;
       callback();
@@ -222,7 +224,9 @@ export function useTabPage(): UseTabPageResult {
 
   /** 注册页面显示回调；若注册时页面已经可见则立即执行 */
   const registerShow = (callback: TabPageLifecycleCallback): void => {
-    showCallbacks.push(callback);
+    if (!showCallbacks.includes(callback)) {
+      showCallbacks.push(callback);
+    }
     if (!hasShown && isCurrentTabVisible()) {
       hasShown = true;
       callback();
@@ -231,17 +235,21 @@ export function useTabPage(): UseTabPageResult {
 
   /** 注册页面隐藏回调；切走 Tab、进入子页或 App 切后台时执行 */
   const registerHide = (callback: TabPageLifecycleCallback): void => {
-    hideCallbacks.push(callback);
+    if (!hideCallbacks.includes(callback)) {
+      hideCallbacks.push(callback);
+    }
   };
 
   /** 注册视图卸载回调 */
   const registerUnload = (callback: TabPageLifecycleCallback): void => {
-    unloadCallbacks.push(callback);
+    if (!unloadCallbacks.includes(callback)) {
+      unloadCallbacks.push(callback);
+    }
   };
 
   // 普通页面（非 Tab 页面）直接使用原生页面生命周期，保证同一套调用方式在普通页面同样生效
   if (pageIndex < 0) {
-    onPageLoad((_options: UTSJSONObject | null): void => {
+    onPageLoad((): void => {
       if (!hasLoaded) {
         hasLoaded = true;
         runCallbacks(loadCallbacks);
@@ -276,6 +284,10 @@ export function useTabPage(): UseTabPageResult {
       runCallbacks(hideCallbacks);
     }
     runCallbacks(unloadCallbacks);
+    loadCallbacks.length = 0;
+    showCallbacks.length = 0;
+    hideCallbacks.length = 0;
+    unloadCallbacks.length = 0;
   });
 
   return {

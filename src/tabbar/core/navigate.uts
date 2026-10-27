@@ -52,12 +52,13 @@ export function switchTabbar(url: string, api: string = 'switchTabbar'): void {
  *            沙盒调试时目标页未编译，会退化为 toast 提示而非崩溃
  */
 function performSwitchTabbar(url: string): void {
+  const normalizedUrl = url.startsWith('/') ? url : `/${url}`;
   // 模式 4 没有真实页面切换：把路由 URL 中的 query 写入目标 Tab 的虚拟路由，
   // 这样 useTabPage() 里的 route.query 仍与普通页面 push({ query }) 的行为一致。
   if (isSinglePageTabbar) {
-    setTabPageUrl(url);
+    setTabPageUrl(normalizedUrl);
   }
-  setCurIdxByPath(url);
+  setCurIdxByPath(normalizedUrl);
   if (isSinglePageTabbar) {
     // H5 下同步宿主页地址栏（?tab=basic&id=1），保证刷新后仍停留在当前 Tab
     syncTabPageHostUrl(url);
@@ -69,32 +70,47 @@ function performSwitchTabbar(url: string): void {
         if (normalizedRoute == '/pages/index/index' || normalizedRoute == '/src/pages/index/index') {
           return;
         }
+
+        // 检查页面栈中是否已有宿主首页（如从首页通过 router.push 压栈进入登录页等子页面）
+        let hostIndex = -1;
+        for (let i = 0; i < pages.length; i++) {
+          const r = pages[i].route as string;
+          const nr = r.startsWith('/') ? r : `/${r}`;
+          if (nr == '/pages/index/index' || nr == '/src/pages/index/index') {
+            hostIndex = i;
+            break;
+          }
+        }
+
+        if (hostIndex >= 0) {
+          // 宿主页已在页面栈中：通过 navigateBack 退回已有宿主页，销毁上层子页面，
+          // 彻底防止 redirectTo 导致宿主页重复堆叠、子组件生命周期回调成倍累加！
+          const delta = pages.length - 1 - hostIndex;
+          uni.navigateBack({
+            delta,
+            success: () => {
+              syncTabPageHostUrl(url);
+            }
+          });
+          return;
+        }
       }
     }
     catch { }
-    uni.redirectTo({
+    uni.reLaunch({
       url: '/src/pages/index/index',
       success: (_res: any) => {
-        // redirectTo 会覆盖 H5 地址栏；宿主页加载完成后重新写回当前虚拟 Tab（?tab=xxx）
         syncTabPageHostUrl(url);
-      },
-      fail: (_err: any) => {
-        uni.reLaunch({
-          url: '/src/pages/index/index',
-          success: (_res: any) => {
-            syncTabPageHostUrl(url);
-          }
-        });
       }
     });
     return;
   }
   if (selectedTabbarStrategy == TABBAR_STRATEGY_MAP.CUSTOM_TABBAR_WITHOUT_NATIVE || selectedTabbarStrategy == TABBAR_STRATEGY_MAP.NO_TABBAR) {
     uni.redirectTo({
-      url,
+      url: normalizedUrl,
       fail: (_err: any) => {
         uni.navigateTo({
-          url,
+          url: normalizedUrl,
           fail: () => {
             uni.showToast({
               title: '沙盒调试中：目标页面未编译',
@@ -108,10 +124,10 @@ function performSwitchTabbar(url: string): void {
   else {
     safeHideNativeTabBar();
     uni.switchTab({
-      url,
+      url: normalizedUrl,
       fail: (_err: any) => {
         uni.redirectTo({
-          url,
+          url: normalizedUrl,
           fail: () => {
             uni.showToast({
               title: '沙盒调试中：目标页面未编译',

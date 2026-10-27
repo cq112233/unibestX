@@ -1,7 +1,7 @@
 <script setup lang="uts">
 import { curIdx, resolveTabIndexByKey, useTabPage, useTabPageShell } from '@/src/tabbar/index.uts';
 import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/layouts/navbar/utils/index.uts';
-import { useRouter } from '@/uni_modules/route-bestX/index.uts';
+import { useRoute, useRouter } from '@/uni_modules/route-bestX/index.uts';
 
 definePage({
   debug: false,
@@ -27,6 +27,7 @@ const {
 } = useTabPage();
 
 const router = useRouter();
+const route = useRoute();
 
 // 监听 navbar 自定义下拉刷新事件
 onNavbarPullDownRefresh(() => {
@@ -193,6 +194,8 @@ function copyCleanDemoCommand(): void {
 
 <template>
   <view class="flex-col p-[16px]">
+    {{ route.fullPath }}
+    {{ basicRoute.fullPath }}
     <!-- 顶部开发指引提示（正式业务可直接移除） -->
     <view class="rounded-[12px] p-[12px] mb-[16px] bg-[#eff6ff] border-[1px] border-solid border-[#bfdbfe] flex flex-row items-start">
       <text class="text-[14px] mr-[6px]">💡</text>

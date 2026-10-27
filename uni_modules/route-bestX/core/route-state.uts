@@ -376,7 +376,7 @@ export function getPageConfig(path: string): UTSJSONObject | null {
  * @param key 要读的字段名，如 `name`
  * @returns 字段的字符串值；字段不存在或转换后为空串时返回 null
  */
-function readMetaString(meta: UTSJSONObject, key: string): string | null {
+export function readMetaString(meta: UTSJSONObject, key: string): string | null {
   const value = meta[key];
   if (value == null) {
     return null;
