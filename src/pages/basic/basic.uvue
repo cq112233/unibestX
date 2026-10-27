@@ -20,7 +20,6 @@ definePage({
 useTabPageShell('basic');
 
 const {
-  route: basicRoute,
   onLoad: onBasicLoad,
   onShow: onBasicShow,
   onHide: onBasicHide
@@ -51,7 +50,6 @@ onBasicLoad(() => {
   // 💡 模式4的映射关系中，/basic.uvue 映射到的实际页面路由是/tab/index，这是因为tabbar/index.uts中定义了映射关系
   // 💡 模式4 useRoute 获取的还是index的
   // 🔔 模式4，tabbar切换时，不会走beforeEach，因为是index，是根容器, 如需拦截请自行处理src/tabbar/adapters/tab-navigation.uts，一般业务用不动，无需修改
-  console.log('基础页面路径', basicRoute.value.fullPath);
   console.log('onBasicLoad', '基础 Tab 挂载了👋');
 });
 
@@ -167,7 +165,13 @@ const demoList: Array<BasicDemoItem> = [
 ];
 
 function navigateToDemo(url: string): void {
-  router.push(url);
+  router.push({
+    path: url,
+    query: {
+      a: '1',
+      b: '2'
+    }
+  });
 }
 
 // 复制一键清除 Demo 命令
@@ -188,7 +192,6 @@ function copyCleanDemoCommand(): void {
 <template>
   <view class="flex-col p-[16px]">
     {{ route.fullPath }}
-    {{ basicRoute.fullPath }}
     <!-- 顶部开发指引提示（正式业务可直接移除） -->
     <view class="rounded-[12px] p-[12px] mb-[16px] bg-[#eff6ff] border-[1px] border-solid border-[#bfdbfe] flex flex-row items-start">
       <text class="text-[14px] mr-[6px]">💡</text>

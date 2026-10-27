@@ -4,7 +4,9 @@ import type { ComponentPublicInstance } from 'vue';
 import { useModalStore } from '@/src/store/index.uts';
 import TabbarMaskModal from '@/src/components/TabbarMaskModal/TabbarMaskModal.uvue';
 import SwiperModalTrigger from './components/SwiperModalTrigger.uvue';
+import { useRoute } from '@/src/router/index.uts';
 
+const route = useRoute();
 definePage({
   debug: false,
   layout: 'navbar',
@@ -51,6 +53,7 @@ onUnmounted((): void => {
 
 <template>
   <view class="flex flex-col flex-1 bg-[#f8fafc]">
+    {{ route.fullPath }}
     <scroll-view class="flex-1" direction="vertical">
       <view
         class="rounded-[16px] p-[20px] m-[16px] border-[1px] border-solid border-[#edf2f7] bg-[#ffffff]"
