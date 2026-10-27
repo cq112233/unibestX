@@ -12,34 +12,78 @@ import type { Plugin } from 'vite';
  * 2. 本插件在构建与热重载时，自动向 mp-alipay 产物目录下的 app.json 注入 tabBar.customize: true，
  *    并生成 0 高度隐藏的原生 customize-tab-bar 占位组件，使支付宝内核彻底关闭原生底座渲染，实现零闪烁。
  */
+function isCustomTabbarMode(projectRoot: string): boolean {
+  let mode = process.env.VITE_TABBAR_MODE;
+  if (mode == null || mode === '') {
+    try {
+      const envPath = path.resolve(projectRoot, '.env');
+      if (fs.existsSync(envPath)) {
+        const content = fs.readFileSync(envPath, 'utf-8');
+        const match = content.match(/^VITE_TABBAR_MODE\s*=\s*['"]?([^'"\r\n]+)['"]?/m);
+        if (match != null && match[1] != null) {
+          mode = match[1].trim();
+        }
+      }
+    }
+    catch {}
+  }
+  const modeStr = (mode ?? '1').trim();
+  return modeStr === '2' || modeStr === 'CUSTOM_TABBAR' || modeStr === 'CUSTOM_TABBAR_WITH_NATIVE';
+}
+
 export default function alipayCustomTabbarPlugin(): Plugin {
   let projectRoot = '';
   let watcherInitialized = false;
 
   function patchAlipayDir(outputDir: string) {
+    const isCustom = isCustomTabbarMode(projectRoot);
     const appJsonPath = path.join(outputDir, 'app.json');
-    if (fs.existsSync(appJsonPath)) {
-      try {
-        const raw = fs.readFileSync(appJsonPath, 'utf-8');
-        const json = JSON.parse(raw);
-        if (json.tabBar && json.tabBar.customize !== true) {
-          json.tabBar.customize = true;
-          fs.writeFileSync(appJsonPath, JSON.stringify(json, null, 2), 'utf-8');
-        }
-      }
-      catch {}
-    }
-
     const customTabBarDir = path.join(outputDir, 'customize-tab-bar');
-    if (!fs.existsSync(customTabBarDir)) {
-      try {
-        fs.mkdirSync(customTabBarDir, { recursive: true });
-        fs.writeFileSync(path.join(customTabBarDir, 'index.json'), '{\n  "component": true\n}\n', 'utf-8');
-        fs.writeFileSync(path.join(customTabBarDir, 'index.axml'), '<view style="display:none;"></view>\n', 'utf-8');
-        fs.writeFileSync(path.join(customTabBarDir, 'index.js'), 'Component({\n  data: {},\n  methods: {}\n});\n', 'utf-8');
-        fs.writeFileSync(path.join(customTabBarDir, 'index.acss'), '/* empty */\n', 'utf-8');
+
+    if (isCustom) {
+      if (fs.existsSync(appJsonPath)) {
+        try {
+          const raw = fs.readFileSync(appJsonPath, 'utf-8');
+          const json = JSON.parse(raw);
+          if (json.tabBar && json.tabBar.customize !== true) {
+            json.tabBar.customize = true;
+            fs.writeFileSync(appJsonPath, JSON.stringify(json, null, 2), 'utf-8');
+          }
+        }
+        catch {}
       }
-      catch {}
+
+      if (!fs.existsSync(customTabBarDir)) {
+        try {
+          fs.mkdirSync(customTabBarDir, { recursive: true });
+          fs.writeFileSync(path.join(customTabBarDir, 'index.json'), '{\n  "component": true\n}\n', 'utf-8');
+          fs.writeFileSync(path.join(customTabBarDir, 'index.axml'), '<view style="display:none;"></view>\n', 'utf-8');
+          fs.writeFileSync(path.join(customTabBarDir, 'index.js'), 'Component({\n  data: {},\n  methods: {}\n});\n', 'utf-8');
+          fs.writeFileSync(path.join(customTabBarDir, 'index.acss'), '/* empty */\n', 'utf-8');
+        }
+        catch {}
+      }
+    }
+    else {
+      // 模式 1（原生模式）等非模式 2 场景：必须清理 customize 标记与 customize-tab-bar 目录，使原生 TabBar 正常展现
+      if (fs.existsSync(appJsonPath)) {
+        try {
+          const raw = fs.readFileSync(appJsonPath, 'utf-8');
+          const json = JSON.parse(raw);
+          if (json.tabBar && json.tabBar.customize !== undefined) {
+            delete json.tabBar.customize;
+            fs.writeFileSync(appJsonPath, JSON.stringify(json, null, 2), 'utf-8');
+          }
+        }
+        catch {}
+      }
+
+      if (fs.existsSync(customTabBarDir)) {
+        try {
+          fs.rmSync(customTabBarDir, { recursive: true, force: true });
+        }
+        catch {}
+      }
     }
   }
 

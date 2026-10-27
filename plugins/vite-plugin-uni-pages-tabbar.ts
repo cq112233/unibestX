@@ -346,6 +346,7 @@ function runTabBar(state: PagesBuildState): void {
     }
     else {
       delete output.tabBar.custom;
+      delete output.tabBar.customize;
       if (parsedConfig.list.length > 0 && (output.tabBar.list == null || output.tabBar.list.length === 0)) {
         output.tabBar.list = parsedConfig.list;
       }

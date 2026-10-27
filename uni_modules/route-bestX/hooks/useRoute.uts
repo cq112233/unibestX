@@ -24,6 +24,7 @@ import { onPageHide, onPageShow } from '@dcloudio/uni-app';
 import { getCurrentInstance, onUnmounted } from 'vue';
 import type { RouteLocation } from '../core/route-types.uts';
 import { ensureRouteReady, routeState, syncRouteState } from '../core/route-state.uts';
+import { getCurrentPath, isSamePath } from '../utils/utils.uts';
 import {
   closeRouteSnapshot,
   hideRouteSnapshot,
@@ -47,6 +48,12 @@ import {
  */
 export function useRoute(): RouteLocation {
   ensureRouteReady();
+
+  // 若当前物理页面栈顶已明确是新页面（如小程序原生切 Tab），先回读物理栈顶同步
+  const currentPath = getCurrentPath();
+  if (currentPath != '' && !isSamePath(currentPath, routeState.path)) {
+    syncRouteState();
+  }
 
   // 本调用点自己的快照：创建即定值（新页 setup 时全局里已是它的目标路由，首帧就准）
   const snapshotId = openRouteSnapshot(routeState);

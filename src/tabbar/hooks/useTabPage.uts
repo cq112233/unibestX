@@ -1,6 +1,6 @@
 import { computed, inject, onUnmounted, watch } from 'vue';
 import { onHide as onPageHide, onLoad as onPageLoad, onShow as onPageShow } from '@dcloudio/uni-app';
-import { getCurrentPath } from '@/uni_modules/route-bestX/index.uts';
+import { getCurrentPath, isSamePath, routeState, syncRouteState } from '@/uni_modules/route-bestX/index.uts';
 import { isPageVisible, pageShowTimes } from '../core/lifecycle.uts';
 import { curIdx } from '../core/state.uts';
 import { isSinglePageTabbar } from '../core/strategy.uts';
@@ -149,6 +149,10 @@ export function useTabPage(): UseTabPageResult {
 
   // 非模式 4（独立页面实体）或普通子页面：直接绑定原生页面生命周期，避免受跨页面全局状态干扰
   if (!isSinglePageTabbar || pageIndex < 0) {
+    const currentPath = getCurrentPath();
+    if (currentPath != '' && !isSamePath(currentPath, routeState.path)) {
+      syncRouteState();
+    }
     onPageLoad((): void => {
       if (!hasLoaded) {
         hasLoaded = true;
@@ -156,6 +160,7 @@ export function useTabPage(): UseTabPageResult {
       }
     });
     onPageShow((): void => {
+      syncRouteState();
       if (!hasShown) {
         hasShown = true;
         runCallbacks(showCallbacks);

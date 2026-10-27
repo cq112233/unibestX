@@ -1,6 +1,6 @@
 import { inject } from 'vue';
-import { onHide, onShow } from '@dcloudio/uni-app';
-import { useRoute } from '@/uni_modules/route-bestX/index.uts';
+import { onHide, onShow, onTabItemTap } from '@dcloudio/uni-app';
+import { interceptNativeTabSwitch, useRoute } from '@/uni_modules/route-bestX/index.uts';
 import { useBackPressExit } from '@/src/hooks/useBackPressExit.uts';
 import { notifyPageHide, notifyPageShow } from '../core/lifecycle.uts';
 import { setCurIdxByKey } from '../core/state.uts';
@@ -47,6 +47,15 @@ export function useTabPageShell(tabType: string): boolean {
       notifyPageShow();
     }
   });
+
+  // #ifdef MP-ALIPAY
+  // 支付宝开发者工具没有 my.createRouteObserver（uni.onAppRoute 不触发），
+  // 且原生 Tab 切换时 onShow 的页面栈可能尚未更新；
+  // onTabItemTap 直接给出目标 pagePath，用它补上 beforeEach 的兜底入口。
+  onTabItemTap((options): void => {
+    interceptNativeTabSwitch(options.pagePath);
+  });
+  // #endif
 
   onHide((): void => {
     if (isSinglePageTabbar) {

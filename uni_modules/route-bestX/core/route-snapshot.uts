@@ -96,10 +96,10 @@ export function showRouteSnapshot(id: number, globalRoute: RouteLocation): void 
     return;
   }
   const globalPath = globalRoute.path;
+  if (globalPath == '') {
+    return;
+  }
   if (snapshot.path == '') {
-    if (globalPath == '') {
-      return;
-    }
     snapshot.path = globalPath;
     snapshot.visible = true;
     copyRoute(snapshot.route, globalRoute);

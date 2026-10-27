@@ -34,7 +34,7 @@ import { ensureRouteReady, routeState, setDefaultHomePage, setRoutes } from '../
 import type { RouteLocation, RouteRecordRaw } from '../core/route-types.uts';
 import { registerAfterEach, registerBeforeEach, registerOnError } from '../guard/index.uts';
 import type { NavigationErrorHandler, NavigationGuard, NavigationHookAfter } from '../guard/types.uts';
-import { getTabbarHandler, installRouteInterceptor, registerTabbarHandler, setBypassInterceptorOnce } from '../interceptor/interceptor.uts';
+import { allowNavigation, getTabbarHandler, installRouteInterceptor, registerTabbarHandler, setBypassInterceptorOnce } from '../interceptor/interceptor.uts';
 import type { TabbarHandler } from '../interceptor/interceptor.uts';
 
 /**
@@ -163,7 +163,13 @@ export class Router {
     if (url == '') {
       return null;
     }
-    if (!shouldIntercept(to, intercept)) {
+    if (shouldIntercept(to, intercept)) {
+      const allowed = allowNavigation(url, 'switchTab');
+      if (!allowed) {
+        return null;
+      }
+    }
+    else {
       setBypassInterceptorOnce(true);
     }
     const handler = getTabbarHandler();
