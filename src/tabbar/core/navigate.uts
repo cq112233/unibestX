@@ -7,6 +7,7 @@ import {
   isSamePath,
   markSilentNavigateBack,
   routeState,
+  setBypassInterceptorOnce,
   useRouter
 } from '@/uni_modules/route-bestX/index.uts';
 import { runTabNavigationGuard } from './tab-navigation.uts';
@@ -51,13 +52,13 @@ function readCurrentTabFullPath(): string {
  */
 export function switchTabbar(url: string, api: string = 'switchTabbar'): void {
   if (!isSinglePageTabbar) {
-    performSwitchTabbar(url);
+    performSwitchTabbar(url, api);
     return;
   }
   const fromUrl = readCurrentTabFullPath();
   runTabNavigationGuard(fromUrl, url, api, (allowed: boolean): void => {
     if (allowed) {
-      performSwitchTabbar(url);
+      performSwitchTabbar(url, api);
     }
   });
 }
@@ -71,7 +72,7 @@ export function switchTabbar(url: string, api: string = 'switchTabbar'): void {
  *            单一 tabbar（单页仿真）模式下用于定位虚拟 Tab，并同步该 Tab 的 query；
  *            沙盒调试时目标页未编译，会退化为 toast 提示而非崩溃
  */
-function performSwitchTabbar(url: string): void {
+function performSwitchTabbar(url: string, api: string = 'switchTabbar'): void {
   const normalizedUrl = url.startsWith('/') ? url : `/${url}`;
   // 模式 4 没有真实页面切换：把路由 URL 中的 query 写入目标 Tab 的虚拟路由，
   // 这样 useTabPage() 里的 route.query 仍与普通页面 push({ query }) 的行为一致。
@@ -128,6 +129,12 @@ function performSwitchTabbar(url: string): void {
     return;
   }
   if (selectedTabbarStrategy == TABBAR_STRATEGY_MAP.CUSTOM_TABBAR_WITHOUT_NATIVE || selectedTabbarStrategy == TABBAR_STRATEGY_MAP.NO_TABBAR) {
+    // 模式 0 通过 router 进入时，Router.switchTab() 已执行过本次守卫；
+    // redirectTo 的底层拦截器只需放行，避免同一次导航重复触发 beforeEach。
+    // 模式 3 暂不改变既有行为。
+    if (api == 'router' && selectedTabbarStrategy == TABBAR_STRATEGY_MAP.NO_TABBAR) {
+      setBypassInterceptorOnce(true);
+    }
     uni.redirectTo({
       url: normalizedUrl,
       fail: (_err: any) => {
