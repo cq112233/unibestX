@@ -1,3 +1,44 @@
+## [3.0.1](https://github.com/cq112233/unibestX/compare/v3.0.0...v3.0.1) (2026-10-28)
+
+
+### Bug Fixes
+
+* 修复tabbar ([d135ee5](https://github.com/cq112233/unibestX/commit/d135ee549dea522229279d84a8fd4fb9f25c516c))
+* 修复tabbar ([d38275f](https://github.com/cq112233/unibestX/commit/d38275fba3b95e80b1647e41e3367ad8baec887f))
+* 修复tabbar ([8c1b5dc](https://github.com/cq112233/unibestX/commit/8c1b5dc01532e26baa2a76d17a68e30a076ffb84))
+* 修复微信小程序发布不显示的问题 ([3d7ef2b](https://github.com/cq112233/unibestX/commit/3d7ef2b2bc671408b8b78a27f792e80080f97214))
+* 修复现在我的页面，进入登录页面，登录后，返回我的，在退出，在登录，返回我的页面 onShow多次触发 ([bcbba61](https://github.com/cq112233/unibestX/commit/bcbba614c0df89031560804dde832e52d7bf43ed))
+* 去除预热逻辑 ([118da19](https://github.com/cq112233/unibestX/commit/118da190a0db2bd9680206bd8d183421be718983))
+* 去除预热逻辑 ([ec2ac76](https://github.com/cq112233/unibestX/commit/ec2ac769c3528ae514b901583ba7179e3e05c124))
+* 去除预热逻辑 ([edb9bfa](https://github.com/cq112233/unibestX/commit/edb9bfa24d7fe616c5c91a35a3829529d5e2e8af))
+* 去除预热逻辑 ([669c230](https://github.com/cq112233/unibestX/commit/669c2307ea7e31e4850a6a023c073a6d846f9da4))
+
+
+### Features
+
+* 字体功能更新 ([53f6e4d](https://github.com/cq112233/unibestX/commit/53f6e4d3704c6ebcac6a1682f6db99b988269164))
+* 字体功能更新 ([19007b1](https://github.com/cq112233/unibestX/commit/19007b14d35973dab23fff0dd37ecd8899853fd6))
+* 字体功能更新 ([f724c7f](https://github.com/cq112233/unibestX/commit/f724c7ff0bf43f590ad89992fa7af8ee9066af6b))
+* 字体功能更新 ([b78d083](https://github.com/cq112233/unibestX/commit/b78d083509f6e84e3fc6bcb45cb069bee98ea2fb))
+* 新增html标签转换成uni标签 ([e590435](https://github.com/cq112233/unibestX/commit/e590435b1f78946944ec334d2adcc86905d19b14))
+* 新增html标签转换成uni标签 ([d584905](https://github.com/cq112233/unibestX/commit/d5849052da2b6864b1debacd60afb8c2dab21c64))
+* 新增html标签转换成uni标签 ([564f50f](https://github.com/cq112233/unibestX/commit/564f50ff025d9bb17eddc7d4c8b3f6b89127bf77))
+* 新增plop生成页面和组件，api，作用尽量减少输出token ([e941801](https://github.com/cq112233/unibestX/commit/e9418015a7dc2bfb201a58130c987a48088078be))
+* 新增plop生成页面和组件，api，作用尽量减少输出token ([f80a968](https://github.com/cq112233/unibestX/commit/f80a968b4041ed7a4ee0eaae617b83c51bfa07c2))
+* 新增plop生成页面和组件，api，作用尽量减少输出token ([7ecb836](https://github.com/cq112233/unibestX/commit/7ecb836634deb1a74f39ac3bc904eabadd802f4d))
+* 新增plop生成页面和组件，api，作用尽量减少输出token ([8608794](https://github.com/cq112233/unibestX/commit/86087940fd98622da4754743dd223e048b2efbc4))
+* 新增plop生成页面和组件，api，作用尽量减少输出token ([8cff587](https://github.com/cq112233/unibestX/commit/8cff5875166340a45a429f300affedf24e3d81aa))
+* 更新 ([2dd07a7](https://github.com/cq112233/unibestX/commit/2dd07a70807989b76c3666619eb8fc1907693b1b))
+* 更新 ([c063059](https://github.com/cq112233/unibestX/commit/c063059a3cbed6de3ca706a30977f5006a4dfc1c))
+* 更新 ([03b7227](https://github.com/cq112233/unibestX/commit/03b72275ddfa37e4f9388274d19a18c48fc21f87))
+* 更新 ([355b508](https://github.com/cq112233/unibestX/commit/355b508dff841ba5687e084913b6c428a5d2e64c))
+* 更新 ([bd62ebf](https://github.com/cq112233/unibestX/commit/bd62ebfc70f05adde8a912f857a3fd4b0301a3f6))
+* 更新 ([f81b8b4](https://github.com/cq112233/unibestX/commit/f81b8b4c961acc5107cf0f251298941e9f6e9d36))
+* 更新skill ([34c0f07](https://github.com/cq112233/unibestX/commit/34c0f07ad60919fa390796fb63c6259422e4fd94))
+* 自动分包 ([b5613d8](https://github.com/cq112233/unibestX/commit/b5613d80efa174de058036488ad1c928972d33e0))
+* 自动分包 ([d009882](https://github.com/cq112233/unibestX/commit/d009882af7dcab9a2cc29d90a93481683151e987))
+* 自动分包 ([2d3a001](https://github.com/cq112233/unibestX/commit/2d3a00140b4242c535724d48b3786338059a7f67))
+* 自动分包 ([2c8fc9b](https://github.com/cq112233/unibestX/commit/2c8fc9b320bc69386eacc05233ff568e7cb30535))
 # [3.0.0](https://github.com/cq112233/unibestX/compare/v2.1.1...v3.0.0) (2026-10-22)
 # [2.0.0](https://github.com/cq112233/unibestX/compare/v1.1.4...v2.0.0) (2026-10-20)
 
