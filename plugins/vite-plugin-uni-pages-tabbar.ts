@@ -312,7 +312,7 @@ function runTabBar(state: PagesBuildState): void {
       const tabbarMode = getTabbarMode(projectRoot);
       const isCustom = tabbarMode !== '1' && tabbarMode !== 'NATIVE_TABBAR';
       output.tabBar = {
-        ...(isCustom ? { custom: true } : {}),
+        ...(isCustom ? { custom: true, customize: true } : {}),
         color: parsedConfig.color,
         selectedColor: parsedConfig.selectedColor,
         backgroundColor: parsedConfig.backgroundColor,
@@ -346,6 +346,7 @@ function runTabBar(state: PagesBuildState): void {
     }
     else {
       delete output.tabBar.custom;
+      delete output.tabBar.customize;
       if (parsedConfig.list.length > 0 && (output.tabBar.list == null || output.tabBar.list.length === 0)) {
         output.tabBar.list = parsedConfig.list;
       }
@@ -356,11 +357,12 @@ function runTabBar(state: PagesBuildState): void {
     }
   }
   else if (tabbarMode === '2' || tabbarMode === 'CUSTOM_TABBAR_WITH_NATIVE' || tabbarMode === 'CUSTOM_TABBAR') {
-    // 模式2（带原生配置的自定义 TabBar）：生成包含 custom: true 的 pages.json tabBar 配置，通过 switchTab 跳转
+    // 模式2（带原生配置的自定义 TabBar）：生成包含 custom: true 与 customize: true 的 pages.json tabBar 配置，通过 switchTab 跳转
     const parsedConfig = parseCustomTabbarConfig(projectRoot);
     if (output.tabBar == null) {
       output.tabBar = {
         custom: true,
+        customize: true,
         color: parsedConfig.color,
         selectedColor: parsedConfig.selectedColor,
         backgroundColor: parsedConfig.backgroundColor,
@@ -371,6 +373,7 @@ function runTabBar(state: PagesBuildState): void {
     }
     else {
       output.tabBar.custom = true;
+      output.tabBar.customize = true;
       if (parsedConfig.list.length > 0 && (output.tabBar.list == null || output.tabBar.list.length === 0)) {
         output.tabBar.list = parsedConfig.list;
       }

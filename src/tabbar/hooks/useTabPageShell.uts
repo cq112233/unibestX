@@ -1,6 +1,13 @@
 import { inject } from 'vue';
+// #ifdef VUE3-VAPOR || MP-ALIPAY
+// eslint-disable-next-line import/no-duplicates -- 条件编译互斥分支：Vapor / 支付宝保留 onTabItemTap
+import { onHide, onShow, onTabItemTap } from '@dcloudio/uni-app';
+// #endif
+// #ifndef VUE3-VAPOR || MP-ALIPAY
+// eslint-disable-next-line import/no-duplicates -- 条件编译互斥分支：预处理后只会保留上方或本条其中之一
 import { onHide, onShow } from '@dcloudio/uni-app';
-import { useRoute } from '@/uni_modules/route-bestX/index.uts';
+// #endif
+import { interceptNativeTabSwitch, useRoute } from '@/uni_modules/route-bestX/index.uts';
 import { useBackPressExit } from '@/src/hooks/useBackPressExit.uts';
 import { notifyPageHide, notifyPageShow } from '../core/lifecycle.uts';
 import { setCurIdxByKey } from '../core/state.uts';
@@ -43,13 +50,31 @@ export function useTabPageShell(tabType: string): boolean {
     if (!isSinglePageTabbar) {
       setCurIdxByKey(tabType);
     }
-    notifyPageShow();
+    else {
+      notifyPageShow();
+    }
   });
+
+  // #ifdef MP-ALIPAY
+  // 支付宝开发者工具没有 my.createRouteObserver（uni.onAppRoute 不触发），
+  // 且原生 Tab 切换时 onShow 的页面栈可能尚未更新；
+  // onTabItemTap 直接给出目标 pagePath，用它补上 beforeEach 的兜底入口。
+  onTabItemTap((options): void => {
+    interceptNativeTabSwitch(options.pagePath);
+  });
+
+  // #endif
 
   onHide((): void => {
-    notifyPageHide();
+    if (isSinglePageTabbar) {
+      notifyPageHide();
+    }
   });
 
+  // 支付宝原生返回由 main.uts 的全局 onBackPress 统一补跑路由守卫；
+  // 这里再注册 App 专属的「再按一次退出」会在部分端产生重复页面级监听。
+  // #ifndef MP-ALIPAY
   useBackPressExit();
+  // #endif
   return false;
 }

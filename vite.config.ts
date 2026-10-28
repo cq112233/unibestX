@@ -23,6 +23,7 @@ import uniPagesPlugin from './plugins/vite-plugin-uni-pages';
 import uniPagesSandboxPlugin from './plugins/vite-plugin-uni-pages-sandbox';
 import uniPagesTabbarPlugin from './plugins/vite-plugin-uni-pages-tabbar';
 import uniPagesRouteTablePlugin from './plugins/vite-plugin-uni-pages-route-table';
+import alipayCustomTabbarPlugin from './plugins/vite-plugin-alipay-tabbar';
 import htmlToUniPlugin from './plugins/vite-plugin-html-to-uni';
 import { execSync } from 'node:child_process';
 import { viteMockServe } from 'vite-plugin-mock';
@@ -274,6 +275,7 @@ export default defineConfig({
     uniPagesSandboxPlugin(), // 沙盒独立调试模式（VITE_DEV_SANDBOX / definePage({ debug })）
     uniPagesTabbarPlugin(), // TabBar 策略（VITE_TABBAR_MODE 0–4）
     uniPagesRouteTablePlugin(), // 提供 virtual:uni-pages-route-table 虚拟模块（页面路由表数据源）
+    alipayCustomTabbarPlugin(), // 支付宝小程序自定义 TabBar 补丁（消除原生底座闪烁）
     // HBuilderX 发行小程序时，模板编译器与 Vite 主流程来自两套 @dcloudio 运行时；
     // 这里把 easycom 注册表补到 HBuilderX 实际使用的 uni-cli-shared 实例，
     // 避免 uni_modules 组件在发行产物中丢失 usingComponents。

@@ -1,25 +1,93 @@
 /**
  * 路由位置对象（RouteLocation）的定义与空值构造
- * 纯叶子文件：零外部依赖
+ * 字段由内部 ref 驱动：Android VDOM 的 reactive() 不支持普通 UTS class，
+ * 直接包裹类实例不会建立依赖，模板与 computed 只能读到首次渲染时的缓存值。
  */
-export type RouteLocation = {
+import { ref } from 'vue';
+import type { Ref } from 'vue';
+
+export class RouteLocation {
+  private _path: Ref<string> = ref('');
+  private _fullPath: Ref<string> = ref('');
+  private _query: Ref<Map<string, string>> = ref(new Map<string, string>());
+  private _params: Ref<Map<string, string>> = ref(new Map<string, string>());
+  private _meta: Ref<UTSJSONObject | null> = ref(null);
+  private _name: Ref<string | null> = ref(null);
+  private _page: Ref<any | null> = ref(null);
+  private _pages: Ref<UniPage[]> = ref([]);
+
   /** 规范化路径（带前导 `/`，不含 query），如 `/src/pages/index/index` */
-  path: string;
+  get path(): string {
+    return this._path.value;
+  }
+
+  set path(value: string) {
+    this._path.value = value;
+  }
+
   /** 完整路径（path + 原始 query 串），如 `/src/pages/index/index?tab=2` */
-  fullPath: string;
+  get fullPath(): string {
+    return this._fullPath.value;
+  }
+
+  set fullPath(value: string) {
+    this._fullPath.value = value;
+  }
+
   /** 查询参数（键值均为 string，值已 URL 解码） */
-  query: Map<string, string>;
+  get query(): Map<string, string> {
+    return this._query.value;
+  }
+
+  set query(value: Map<string, string>) {
+    this._query.value = value;
+  }
+
   /** 恒为空 Map：uni-app X 无动态路由段，仅为与 vue-router 形态保持一致 */
-  params: Map<string, string>;
+  get params(): Map<string, string> {
+    return this._params.value;
+  }
+
+  set params(value: Map<string, string>) {
+    this._params.value = value;
+  }
+
   /** 路由元信息：由 setRouteMeta() 注册提供，未注册为 null */
-  meta: UTSJSONObject | null;
+  get meta(): UTSJSONObject | null {
+    return this._meta.value;
+  }
+
+  set meta(value: UTSJSONObject | null) {
+    this._meta.value = value;
+  }
+
   /** 路由名：未声明为 null */
-  name: string | null;
+  get name(): string | null {
+    return this._name.value;
+  }
+
+  set name(value: string | null) {
+    this._name.value = value;
+  }
+
   /** 当前栈顶页面实例（UniPage，栈空时为 null） */
-  page: any | null;
+  get page(): any | null {
+    return this._page.value;
+  }
+
+  set page(value: any | null) {
+    this._page.value = value;
+  }
+
   /** 当前页面栈实例数组（等价于 getCurrentPages()） */
-  pages: UniPage[];
-};
+  get pages(): UniPage[] {
+    return this._pages.value;
+  }
+
+  set pages(value: UniPage[]) {
+    this._pages.value = value;
+  }
+}
 
 /**
  * 构造一个空路由（保持与 RouteLocation 同构）
@@ -32,16 +100,10 @@ export function createEmptyRoute(): RouteLocation {
   catch {
     initialPages = [] as UniPage[];
   }
-  return {
-    path: '',
-    fullPath: '',
-    query: new Map<string, string>(),
-    params: new Map<string, string>(),
-    meta: null,
-    name: null,
-    page: initialPages.length > 0 ? initialPages[initialPages.length - 1] : null,
-    pages: initialPages
-  } as RouteLocation;
+  const route = new RouteLocation();
+  route.page = initialPages.length > 0 ? initialPages[initialPages.length - 1] : null;
+  route.pages = initialPages;
+  return route;
 }
 
 /**

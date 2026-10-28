@@ -4,12 +4,43 @@ import pinia from './src/store/index.uts'; // 导入 Pinia 状态管理实例（
 import i18n from './src/i18n/index.uts'; // 导入 i18n 国际化配置实例
 import router from '@/src/router/index.uts'; // 导入业务路由系统实例
 import ultraUI from '@/uni_modules/uview-ultra/index.uts'; // 导入 uview-ultra 跨端 UI 组件库
+import { interceptNativeBack } from '@/uni_modules/route-bestX/index.uts';
+
 /**
  * 创建应用实例的入口函数
  */
 export function createApp() {
   // 创建 Vue 应用程序实例，传入根组件 App
   const app = createSSRApp(App);
+
+  // 支付宝原生导航栏返回 / 手势返回不会经过 uni.navigateBack 拦截器；
+  // onBackPress 是页面级生命周期，用全局 mixin 挂到每个页面实例上补跑守卫。
+  // 仅支付宝端启用，其它端继续沿用各自的既有返回链路。
+  // #ifdef MP-ALIPAY
+  app.mixin({
+    onBackPress(): boolean {
+      interceptNativeBack();
+      return false;
+    }
+  });
+  // #endif
+
+  // Android VDOM 的系统返回键 / 手势返回同样绕过 uni.navigateBack 拦截器。
+  // 在原生出栈前补跑守卫：有上一页才处理（根页继续交给「再按一次退出」），
+  // 守卫拦截时返回 true 吞掉本次返回，避免页面已经退出后才执行 beforeEach。
+  // #ifdef APP-ANDROID && !VUE3-VAPOR
+  app.mixin({
+    onBackPress(options: OnBackPressOptions): boolean {
+      if (options.from != 'backbutton') {
+        return false;
+      }
+      if (getCurrentPages().length <= 1) {
+        return false;
+      }
+      return !interceptNativeBack();
+    }
+  });
+  // #endif
 
   // 注册路由系统插件（插件内部已自动挂载 $router 与 $route 到 app.config.globalProperties）
   app.use(router);

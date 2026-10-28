@@ -1,3 +1,11 @@
+# [4.0.0](https://github.com/cq112233/unibestX/compare/v4.0.1...v4.0.0) (2026-10-28)
+
+
+### Bug Fixes
+
+* 支付宝小程序模式一，tabbar不显示的问题 ([7683ad8](https://github.com/cq112233/unibestX/commit/7683ad821d6beef02a7f12bf0165b3f0330d669a))
+* 支付宝小程序模式一，tabbar不显示的问题 ([29712b8](https://github.com/cq112233/unibestX/commit/29712b85d9e2a1346e1f9a0c4a1c173b02d28463))
+## [4.0.1](https://github.com/cq112233/unibestX/compare/v4.0.0...v4.0.1) (2026-10-28)
 ## [3.0.1](https://github.com/cq112233/unibestX/compare/v3.0.0...v3.0.1) (2026-10-28)
 
 

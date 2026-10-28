@@ -1,10 +1,11 @@
 <script setup lang="uts">
-import { onAppShow } from '@dcloudio/uni-app';
+import { onAppHide, onAppShow } from '@dcloudio/uni-app';
 import { checkDirectEntry } from '@/uni_modules/route-bestX/index.uts';
 import { useFontStore, useI18nStore, useThemeStore, useTokenStore, useUserStore } from '@/src/store/index.uts';
 import type { IUserInfo } from '@/src/store/index.uts';
 import { initNativeMidButtonTap, setTabbarItem } from '@/src/tabbar/index.uts';
 import { applyThemeColor, themeColor } from '@/src/theme/index.uts';
+import { setNavbarRuntimeActive } from '@/src/layouts/navbar/utils/index.uts';
 import { reportError } from '@/src/utils/report/index.uts';
 import { loadFont } from '@/uni_modules/uview-ultra/index.uts';
 // 隐私闸门仅 App 端启用，导入同步条件编译，避免其它端留下未使用导入
@@ -97,7 +98,12 @@ onLaunch(() => {
 });
 
 onAppShow((options: any | null): void => {
+  setNavbarRuntimeActive(true);
   checkDirectEntry(options);
+});
+
+onAppHide((): void => {
+  setNavbarRuntimeActive(false);
 });
 
 // 全局错误监听：仅可在 App.uvue 中生效

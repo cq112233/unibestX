@@ -23,7 +23,6 @@ definePage({
 useTabPageShell('me');
 
 const {
-  route: meRoute,
   onLoad: onMeLoad,
   onShow: onMeShow,
   onHide: onMeHide
@@ -53,7 +52,6 @@ onMeLoad(() => {
   // 💡 模式4的映射关系中，/me.uvue 映射到的实际页面路由是/tab/index，这是因为tabbar/index.uts中定义了映射关系
   // 💡 模式4 useRoute 获取的还是index的
   // 🔔 模式4，tabbar切换时，不会走beforeEach，因为是index，是根容器, 如需拦截请自行处理src/tabbar/adapters/tab-navigation.uts，一般业务用不动，无需修改
-  console.log('我的页面路径', meRoute.value.fullPath);
   console.log('onMeLoad', '我的 Tab 挂载了👋');
 });
 
@@ -94,10 +92,10 @@ const userInfoJson = computed((): string => {
 
 // 登录
 function handleLogin(): void {
-  // 模式 4 的真实页面栈只有宿主首页，登录成功后必须依靠 redirect 恢复来源虚拟 Tab。
+  // 模式 4 的真实页面栈只有宿主首页，登录成功后依靠 redirect 恢复来源 Tab。
   router.push({
     path: LOGIN_PAGE,
-    query: { redirect: meRoute.value.fullPath != '' ? meRoute.value.fullPath : ME_PAGE_PATH }
+    query: { redirect: ME_PAGE_PATH }
   });
 }
 

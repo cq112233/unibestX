@@ -3,9 +3,12 @@ import { createEmptyRouteTarget } from '../guard/types.uts';
 import type { RouteTarget } from '../guard/types.uts';
 import { ROUTER_ERROR_CODE, createRouterError } from '../core/router-error.uts';
 import {
+  applyRouteFromUrl,
   applyTargetRouteFromUrl,
+  getDefaultHomePage,
   getDefaultRouteName,
   getRouteMeta,
+  getSavedRouteQuery,
   installRouteStateListener,
   previousRouteState,
   readMetaString,
@@ -103,15 +106,21 @@ export function isBypassInterceptorOnce(): boolean {
  * @param url 导航 url
  * @param api 触发本次跳转的 uni API 名，透传给守卫
  */
-function allowNavigation(url: string, api: string): boolean {
+export function allowNavigation(url: string, api: string): boolean {
+  const resolvedUrl = resolveNavigationUrl(url, api);
   if (bypassInterceptorOnce) {
     bypassInterceptorOnce = false;
-    markTargetRoute(url);
+    markTargetRoute(resolvedUrl);
     return true;
   }
-  const allowed = doIntercept(url, api);
+  if (api == 'switchTab') {
+    const cleanTarget = cleanPath(url);
+    lastHandledSwitchTabTarget = cleanTarget;
+    lastHandledSwitchTabTime = Date.now();
+  }
+  const allowed = doIntercept(resolvedUrl, api);
   if (allowed) {
-    markTargetRoute(url);
+    markTargetRoute(resolvedUrl);
   }
   return allowed;
 }
@@ -192,6 +201,11 @@ function resolveAbsoluteUrl(url: string): string {
     path = `/${path}`;
   }
 
+  // 根路径 '/' 或空路径统一动态解析为应用默认首页路径
+  if (path == '/' || path == '') {
+    path = getDefaultHomePage();
+  }
+
   // query 串原样保留（不做编解码，避免二次转义）
   const queryStr = getQueryString(url);
   if (queryStr == '') {
@@ -213,6 +227,8 @@ function resolveAbsoluteUrl(url: string): string {
 export type TabbarHandler = {
   isTabbar: (url: string) => boolean;
   switchTab: (url: string) => void;
+  /** 返回导航的目标修正：模式 4 物理栈只能回到宿主页，需要由 TabBar 还原当前虚拟 Tab */
+  resolveBackTarget?: ((url: string) => string) | null;
 };
 
 let customTabbarHandler: TabbarHandler | null = null;
@@ -229,6 +245,28 @@ export function registerTabbarHandler(handler: TabbarHandler | null): void {
  */
 export function getTabbarHandler(): TabbarHandler | null {
   return customTabbarHandler;
+}
+
+/**
+ * 修正导航目标 URL
+ *
+ * 仅在 navigateBack 时询问 TabBar 处理器：模式 4 的页面栈从子页返回时，
+ * 物理上一页永远是宿主首页，不能直接作为守卫的 to；由处理器按当前虚拟 Tab 还原。
+ */
+function resolveNavigationUrl(url: string, api: string): string {
+  const resolvedUrl = resolveAbsoluteUrl(url);
+  if (api != 'navigateBack' || customTabbarHandler == null) {
+    return resolvedUrl;
+  }
+  const resolveBackTarget = customTabbarHandler!.resolveBackTarget;
+  if (resolveBackTarget == null) {
+    return resolvedUrl;
+  }
+  const tabbarTarget = resolveBackTarget!(resolvedUrl);
+  if (tabbarTarget == '' || tabbarTarget == resolvedUrl) {
+    return resolvedUrl;
+  }
+  return resolveAbsoluteUrl(tabbarTarget);
 }
 
 let redirectDepth: number = 0;
@@ -383,12 +421,21 @@ function doIntercept(url: string, api: string, fromOverride: RouteTarget | null 
   if (url == null || url == '') {
     return true;
   }
-  const resolvedUrl = resolveAbsoluteUrl(url);
+  const resolvedUrl = resolveNavigationUrl(url, api);
   const urlObj = parseUrlToObj(resolvedUrl);
+  let targetQuery = urlObj.query;
+  // 小程序 switchTab 不支持 query，Tab 页的 page.options 会为空。
+  // 返回 Tab 页时回填最近一次保存的 query，保证 beforeEach 的 to 仍带完整参数。
+  if (api == 'navigateBack' && targetQuery.size == 0) {
+    const savedQuery = getSavedRouteQuery(urlObj.path);
+    if (savedQuery != null && savedQuery.size > 0) {
+      targetQuery = savedQuery;
+    }
+  }
 
   // fullPath 由 path + 解码后的 query 重拼（而不是直接用 resolvedUrl）：保持「解码态」口径，
   // 守卫拿它去 encodeURIComponent 时正好只编码一次
-  const queryStr = joinQueryString(urlObj.query);
+  const queryStr = joinQueryString(targetQuery);
   let fullPath = urlObj.path;
   if (queryStr != '') {
     fullPath += `?${queryStr}`;
@@ -407,7 +454,7 @@ function doIntercept(url: string, api: string, fromOverride: RouteTarget | null 
   // 嵌套字面量直传给 type 字段没有先例，Kotlin 侧推断不可靠，这里显式落到具体类型上
   const target: RouteTarget = {
     path: urlObj.path,
-    query: urlObj.query,
+    query: targetQuery,
     fullPath,
     params: new Map<string, string>(),
     meta,
@@ -543,6 +590,234 @@ export const reLaunchInterceptor: Interceptor = {
   }
 };
 
+/** 最近一次由 switchTab 拦截/守卫处理放行的目标 url（用于防重复校验） */
+let lastHandledSwitchTabTarget: string = '';
+/** 最近一次由 switchTab 拦截/守卫处理放行的时间戳 */
+let lastHandledSwitchTabTime: number = 0;
+
+/** 原生 TabBar 切换的统一守卫入口（onBeforeAppRoute / onAppRoute / onTabItemTap 共用） */
+function runNativeTabSwitchGuard(targetPath: string): boolean {
+  const target = cleanPath(targetPath);
+  if (target == '') {
+    return true;
+  }
+
+  // 防抖去重：onAppRoute / switchTab 拦截器 / 页面 onShow 兜底可能已在 500ms 内处理过
+  if (isSamePath(lastHandledSwitchTabTarget, target) && (Date.now() - lastHandledSwitchTabTime) < 500) {
+    return true;
+  }
+
+  let fromTarget: RouteTarget | null = null;
+  if (routeState.path != '' && !isSamePath(routeState.path, target)) {
+    fromTarget = {
+      path: routeState.path,
+      query: routeState.query,
+      fullPath: routeState.fullPath,
+      params: routeState.params,
+      meta: routeState.meta,
+      name: routeState.name
+    } as RouteTarget;
+  }
+  else if (previousRouteState.path != '' && !isSamePath(previousRouteState.path, target)) {
+    fromTarget = {
+      path: previousRouteState.path,
+      query: previousRouteState.query,
+      fullPath: previousRouteState.fullPath,
+      params: previousRouteState.params,
+      meta: previousRouteState.meta,
+      name: previousRouteState.name
+    } as RouteTarget;
+  }
+
+  lastHandledSwitchTabTarget = target;
+  lastHandledSwitchTabTime = Date.now();
+
+  return doIntercept(target, 'switchTab', fromTarget);
+}
+
+/**
+ * 原生 TabBar 点击兜底拦截（供页面 onTabItemTap 调用）
+ *
+ * 支付宝小程序开发者工具不提供 my.createRouteObserver，`uni.onAppRoute` 在该环境不会触发；
+ * 页面 onShow 阶段页面栈也可能尚未切到目标 Tab，无法靠 syncRouteState 对比出切换。
+ * `onTabItemTap` 会直接给出被点击 Tab 的 pagePath，是不依赖路由事件的最可靠信号。
+ *
+ * @param targetPath 被点击 Tab 的页面路径（onTabItemTap options.pagePath）
+ * @returns 守卫是否放行；被拦截时改跳由守卫链路统一派发
+ */
+export function interceptNativeTabSwitch(targetPath: string): boolean {
+  const target = cleanPath(targetPath);
+  const allowed = runNativeTabSwitchGuard(target);
+  if (allowed) {
+    // 开发者工具里没有 onAppRoute 兜底刷新，守卫放行后主动落地目标路由
+    if (target != '') {
+      applyRouteFromUrl(target);
+    }
+  }
+  return allowed;
+}
+
+/**
+ * 记录 `onBackPress` 已补跑守卫的返回目标
+ *
+ * 支付宝真机会在 `onBackPress` 之后继续触发 `onAppRoute` / 页面 `onShow`，
+ * 这两条链路共用同一个守卫入口；仅靠 500ms 时间窗在真机转场较慢时会漏掉，
+ * 因此用目标路径做一次性消费标记，确保同一次原生返回只执行一次守卫。
+ */
+let nativeBackGuardHandledTarget: string = '';
+let nativeBackGuardHandledTime: number = 0;
+const NATIVE_BACK_GUARD_DEDUPE_WINDOW: number = 2000;
+
+/**
+ * 清理原生返回的待消费标记
+ */
+function clearNativeBackGuardHandled(): void {
+  nativeBackGuardHandledTarget = '';
+  nativeBackGuardHandledTime = 0;
+}
+
+/**
+ * 消费原生返回的待处理标记
+ *
+ * @param targetPath 路由完成事件 / 页面显示兜底检测到的目标路径
+ * @returns 本次事件是否已由 onBackPress 提前处理；true 时调用方应直接跳过
+ */
+function consumeNativeBackGuardHandled(targetPath: string): boolean {
+  if (nativeBackGuardHandledTarget == '') {
+    return false;
+  }
+  const target = cleanPath(targetPath);
+  if (target == '') {
+    return false;
+  }
+  if (!isSamePath(nativeBackGuardHandledTarget, target)) {
+    clearNativeBackGuardHandled();
+    return false;
+  }
+  if ((Date.now() - nativeBackGuardHandledTime) > NATIVE_BACK_GUARD_DEDUPE_WINDOW) {
+    clearNativeBackGuardHandled();
+    return false;
+  }
+  return true;
+}
+
+/**
+ * 原生返回拦截入口（供支付宝等不触发 navigateBack 拦截器的端调用）
+ *
+ * 支付宝小程序点击原生导航栏返回 / 手势返回时由宿主直接出栈，既不经过
+ * `uni.navigateBack` 拦截器，开发者工具也不提供 `my.createRouteObserver`。
+ * 页面级 `onBackPress` 是当前唯一稳定的前置信号，返回目标则从页面栈的上一页取得。
+ *
+ * 注意：支付宝运行时不消费页面 `onBackPress` 的返回值，因此本函数只负责执行守卫；
+ * 守卫拦截并改跳后，调用方仍需自行阻止原生出栈（见页面壳）。
+ *
+ * @param targetPath 返回目标路径；为空时自动取页面栈上一页
+ * @returns 守卫是否放行；被拦截时改跳由守卫链路统一派发
+ */
+export function interceptNativeBack(targetPath: string = ''): boolean {
+  let targetUrl = cleanPath(targetPath);
+  let fromPath = '';
+  let targetQuery = '';
+  try {
+    const pages = getCurrentPages();
+    if (pages.length > 0) {
+      const topIndex = pages.length - 1;
+      const topPage = pages[topIndex];
+      const topPath = cleanPath(topPage.route ?? '');
+      fromPath = cleanPath(routeState.path != '' ? routeState.path : topPath);
+
+      if (targetUrl == '') {
+        if (pages.length >= 2 && routeState.path != '' && !isSamePath(topPath, routeState.path)) {
+          // 宿主已先出栈：栈顶就是返回目标，routeState 仍是刚离开的页面
+          targetUrl = topPath;
+        }
+        else if (pages.length >= 2) {
+          // 宿主尚未出栈：上一页就是返回目标
+          targetUrl = cleanPath(pages[topIndex - 1].route ?? '');
+        }
+        else {
+          targetUrl = topPath;
+        }
+      }
+
+      let targetPage: UniPage | null = null;
+      if (isSamePath(cleanPath(targetUrl), topPath)) {
+        targetPage = topPage;
+      }
+      else if (topIndex >= 1) {
+        targetPage = pages[topIndex - 1];
+      }
+      const options: UTSJSONObject | null = targetPage != null ? (targetPage.options ?? null) : null;
+      if (options != null) {
+        const keys = UTSJSONObject.keys(options);
+        const pairs: string[] = [];
+        for (let i = 0; i < keys.length; i++) {
+          const key = keys[i];
+          const value = options[key];
+          if (value != null) {
+            pairs.push(`${key}=${encodeURIComponent(`${value}`)}`);
+          }
+        }
+        targetQuery = pairs.join('&');
+      }
+    }
+  }
+  catch { }
+
+  if (targetUrl == '') {
+    return true;
+  }
+
+  const targetFullPath = targetQuery != '' ? `${targetUrl}?${targetQuery}` : targetUrl;
+  const target = cleanPath(targetUrl);
+
+  // 防抖去重：onBackPress / onAppRoute / 页面 onShow 兜底可能已在 500ms 内处理过
+  if (isSamePath(lastHandledNavigateBackTarget, target) && (Date.now() - lastHandledNavigateBackTime) < 500) {
+    return true;
+  }
+  lastHandledNavigateBackTarget = target;
+  lastHandledNavigateBackTime = Date.now();
+
+  let fromTarget: RouteTarget | null = null;
+  if (routeState.path != '' && !isSamePath(routeState.path, target)) {
+    fromTarget = {
+      path: routeState.path,
+      query: routeState.query,
+      fullPath: routeState.fullPath,
+      params: routeState.params,
+      meta: routeState.meta,
+      name: routeState.name
+    } as RouteTarget;
+  }
+  else if (fromPath != '' && !isSamePath(fromPath, target)) {
+    fromTarget = {
+      path: fromPath,
+      query: new Map<string, string>(),
+      fullPath: fromPath,
+      params: new Map<string, string>(),
+      meta: getRouteMeta(fromPath),
+      name: getDefaultRouteName(fromPath)
+    } as RouteTarget;
+  }
+  else if (previousRouteState.path != '' && !isSamePath(previousRouteState.path, target)) {
+    fromTarget = {
+      path: previousRouteState.path,
+      query: previousRouteState.query,
+      fullPath: previousRouteState.fullPath,
+      params: previousRouteState.params,
+      meta: previousRouteState.meta,
+      name: previousRouteState.name
+    } as RouteTarget;
+  }
+
+  const allowed = doIntercept(targetFullPath, 'navigateBack', fromTarget);
+  if (allowed) {
+    nativeBackGuardHandledTarget = target;
+    nativeBackGuardHandledTime = Date.now();
+  }
+  return allowed;
+}
+
 export const switchTabInterceptor: Interceptor = {
   invoke(options: any): boolean {
     let url = '';
@@ -556,7 +831,34 @@ export const switchTabInterceptor: Interceptor = {
       url = (urlObj.url != null) ? (urlObj.url as string) : '';
       // #endif
     }
-    return allowNavigation(url, 'switchTab');
+    const cleanTarget = cleanPath(url);
+    let allowed = true;
+    if (isSamePath(lastHandledSwitchTabTarget, cleanTarget) && (Date.now() - lastHandledSwitchTabTime) < 500) {
+      allowed = true;
+    }
+    else {
+      lastHandledSwitchTabTarget = cleanTarget;
+      lastHandledSwitchTabTime = Date.now();
+      allowed = allowNavigation(url, 'switchTab');
+    }
+    if (!allowed) {
+      return false;
+    }
+    // 微信小程序/原生 switchTab 不支持 queryString，守卫放行后清理 options.url 上的 query，
+    // 杜绝微信开发者工具报警「wx.switchTab: url 不支持 queryString」。
+    // H5 保留原始 URL，uni-h5 协议层会自行截断 query，随后由 TabBar 导航层补回地址栏。
+    // #ifndef H5 || WEB
+    if (options != null && url.includes('?')) {
+      const cleanUrl = url.split('?')[0];
+      // #ifdef APP
+      (options as SwitchTabOptions).url = cleanUrl;
+      // #endif
+      // #ifndef APP
+      (options as UTSJSONObject)['url'] = cleanUrl;
+      // #endif
+    }
+    // #endif
+    return true;
   },
   fail(err: any): void {
     syncRouteStateDeferred();
@@ -576,6 +878,24 @@ export const switchTabInterceptor: Interceptor = {
 let lastHandledNavigateBackTarget: string = '';
 /** 最近一次由 navigateBack 拦截/守卫处理放行的时间戳 */
 let lastHandledNavigateBackTime: number = 0;
+/** 根页返回放行时间；用于放行系统退出时静默吞掉随后的底层 navigateBack 失败 */
+let rootBackExitPendingTime: number = 0;
+const ROOT_BACK_EXIT_WINDOW: number = 2000;
+/** 静默回退计数（针对自定义 TabBar 内部出栈销毁上层页面等内部流程） */
+let silentBackCount: number = 0;
+/** 是否有静默回退等待对应的 popstate 消费 */
+let isSilentBackPending: boolean = false;
+
+/**
+ * 标记接下来的 navigateBack 为内部回退（如模式 4 切换 TabBar 时销毁上层子页面出栈），
+ * 跳过拦截器与 popstate 监听校验，不覆盖当前已设置的虚拟目标路由
+ * @param count 回退次数（默认 1）
+ */
+export function markSilentNavigateBack(count: number = 1): void {
+  silentBackCount = count;
+  isSilentBackPending = true;
+  lastHandledNavigateBackTime = Date.now();
+}
 
 /**
  * 重置 navigateBack 防重复记录（供单测等环境复位）
@@ -583,6 +903,10 @@ let lastHandledNavigateBackTime: number = 0;
 export function resetLastHandledNavigateBackTarget(): void {
   lastHandledNavigateBackTarget = '';
   lastHandledNavigateBackTime = 0;
+  rootBackExitPendingTime = 0;
+  silentBackCount = 0;
+  isSilentBackPending = false;
+  clearNativeBackGuardHandled();
 }
 
 /**
@@ -591,6 +915,12 @@ export function resetLastHandledNavigateBackTarget(): void {
  */
 export const navigateBackInterceptor: Interceptor = {
   invoke(options: any): boolean {
+    if (silentBackCount > 0) {
+      silentBackCount--;
+      isSilentBackPending = true;
+      lastHandledNavigateBackTime = Date.now();
+      return true;
+    }
     const pages = getCurrentPages();
     let delta = 1;
     if (options != null) {
@@ -616,7 +946,13 @@ export const navigateBackInterceptor: Interceptor = {
       // #endif
     }
     const targetIdx = pages.length - 1 - delta;
-    if (targetIdx < 0 && pages.length > 0) {
+    if (targetIdx < 0) {
+      // 根页返回属于「退出应用」而不是路由回退：必须放行给宿主处理。
+      // 不抛 201，并记录时间窗，供 fail 阶段静默吞掉宿主退出时的 202。
+      if (pages.length <= 1) {
+        rootBackExitPendingTime = Date.now();
+        return true;
+      }
       const err = createRouterError(
         ROUTER_ERROR_CODE.BACK_STACK_DEPTH_INVALID as number,
         null,
@@ -625,7 +961,9 @@ export const navigateBackInterceptor: Interceptor = {
       );
       runOnErrorHandlers(err, null, resolveFromRouteTarget());
       runAfterEachHooks(createEmptyRouteTarget(), resolveFromRouteTarget(), err);
+      return false;
     }
+    rootBackExitPendingTime = 0;
     if (targetIdx >= 0 && targetIdx < pages.length) {
       const targetPage = pages[targetIdx];
       const targetRoute = targetPage.route ?? '';
@@ -663,6 +1001,10 @@ export const navigateBackInterceptor: Interceptor = {
     return true;
   },
   fail(err: any): void {
+    if (rootBackExitPendingTime > 0 && (Date.now() - rootBackExitPendingTime) <= ROOT_BACK_EXIT_WINDOW) {
+      rootBackExitPendingTime = 0;
+      return;
+    }
     syncRouteStateDeferred();
     const routerErr = createRouterError(
       ROUTER_ERROR_CODE.NAVIGATE_BACK_FAILED as number,
@@ -693,6 +1035,13 @@ export const chooseLocationInterceptor: Interceptor = {
 function installH5PopstateListener(): void {
   if (typeof window != 'undefined') {
     window.addEventListener('popstate', () => {
+      // 若刚发生了内部静默回退，直接消费并跳过，防止污染全局虚拟路由与重复触发守卫
+      if (isSilentBackPending && (Date.now() - lastHandledNavigateBackTime) < 2000) {
+        isSilentBackPending = false;
+        return;
+      }
+      isSilentBackPending = false;
+
       let h5Url = '';
       const hash = window.location.hash;
       if (hash.startsWith('#/')) {
@@ -702,10 +1051,12 @@ function installH5PopstateListener(): void {
         h5Url = window.location.pathname + window.location.search;
       }
       if (h5Url != '' && h5Url != '/') {
-        const targetPath = cleanPath(h5Url);
-        // 防抖去重：如果最近 500ms 内已被 navigateBackInterceptor 处理过，跳过重复校验
-        if (isSamePath(lastHandledNavigateBackTarget, targetPath) && (Date.now() - lastHandledNavigateBackTime) < 500) {
-          lastHandledNavigateBackTarget = '';
+        let targetPath = cleanPath(h5Url);
+        if (targetPath == '/' || targetPath == '') {
+          targetPath = getDefaultHomePage();
+        }
+        // 防抖去重：如果最近 1000ms 内已被 navigateBackInterceptor 处理过，跳过重复校验
+        if (isSamePath(lastHandledNavigateBackTarget, targetPath) && (Date.now() - lastHandledNavigateBackTime) < 1000) {
           return;
         }
         lastHandledNavigateBackTarget = targetPath;
@@ -734,6 +1085,16 @@ function installH5PopstateListener(): void {
  */
 function installMpNavigateBackListener(): void {
   uni.onAppRoute((event: AppRouteEvent): void => {
+    // 监听小程序原生底栏点击切换 TabBar（直接由宿主 Native 切换，不走 uni.switchTab API）
+    if (event.openType == 'switchTab') {
+      const rawPath = event.path;
+      if (rawPath == '') {
+        return;
+      }
+      runNativeTabSwitchGuard(rawPath);
+      return;
+    }
+
     const isOpenTypeBack = event.openType == 'navigateBack' || event.openType == 'pageBack'
       || (event.openType != 'navigateTo' && event.openType != 'redirectTo' && event.openType != 'reLaunch' && event.openType != 'switchTab' && event.openType != 'appLaunch');
     if (isOpenTypeBack) {
@@ -768,6 +1129,11 @@ function installMpNavigateBackListener(): void {
 
       const targetPath = cleanPath(rawPath);
 
+      // onBackPress 已在支付宝真机提前补跑守卫时，路由完成事件只消费标记，不再重复执行
+      if (consumeNativeBackGuardHandled(targetPath)) {
+        return;
+      }
+
       // 防抖去重：如果最近 500ms 内已被 navigateBackInterceptor（如微信点击左上角返回）校验放行过，跳过重复校验
       if (isSamePath(lastHandledNavigateBackTarget, targetPath) && (Date.now() - lastHandledNavigateBackTime) < 500) {
         return;
@@ -784,19 +1150,44 @@ function installMpNavigateBackListener(): void {
         fromTarget = {
           path: routeState.path,
           query: routeState.query,
-          fullPath: routeState.fullPath
+          fullPath: routeState.fullPath,
+          params: routeState.params,
+          meta: routeState.meta,
+          name: routeState.name
         } as RouteTarget;
       }
       else if (previousRouteState.path != '' && previousRouteState.path != targetPath) {
         fromTarget = {
           path: previousRouteState.path,
           query: previousRouteState.query,
-          fullPath: previousRouteState.fullPath
+          fullPath: previousRouteState.fullPath,
+          params: previousRouteState.params,
+          meta: previousRouteState.meta,
+          name: previousRouteState.name
         } as RouteTarget;
       }
 
       doIntercept(url, 'navigateBack', fromTarget);
     }
+  });
+}
+
+/**
+ * 监听小程序原生 TabBar 切换的路由前置事件
+ *
+ * 微信端官方时序为 `onBeforeAppRoute → onLoad / onShow → onAppRoute`；
+ * 只有挂在 onBeforeAppRoute 上，守卫才能真正早于目标页生命周期执行。
+ * 与 onAppRoute / onTabItemTap 共用去重，避免同一次切换重复跑守卫。
+ */
+function installMpBeforeAppRouteListener(): void {
+  uni.onBeforeAppRoute((event: BeforeAppRouteEvent): void => {
+    if (event.openType != 'switchTab') {
+      return;
+    }
+    if (event.path == '') {
+      return;
+    }
+    runNativeTabSwitchGuard(event.path);
   });
 }
 // #endif
@@ -823,6 +1214,11 @@ export function checkAndInterceptPageShow(targetPath: string = ''): boolean {
     return true;
   }
 
+  // 支付宝真机在 onBackPress 之后还会走页面 onShow 兜底，同一目标已由原生返回入口处理则直接放行
+  if (consumeNativeBackGuardHandled(currentPath)) {
+    return true;
+  }
+
   // 构建目标页面完整 URL（包含 query）
   const optObj = getCurrentPageOptions();
   let toUrl = currentPath;
@@ -843,8 +1239,39 @@ export function checkAndInterceptPageShow(targetPath: string = ''): boolean {
     }
   }
 
+  // 2. 原生底栏 TabBar 切换检测（专为解决支付宝小程序等端原生底栏切换不走 API 且不触发 onAppRoute 的问题）
+  const isTargetTabbar = customTabbarHandler != null ? customTabbarHandler!.isTabbar(currentPath) : false;
+  if (isTargetTabbar && !isSamePath(routeState.path, currentPath)) {
+    // 防抖去重：如果最近 500ms 内已被代码调用 switchTab 或拦截器处理过，跳过
+    if (isSamePath(lastHandledSwitchTabTarget, currentPath) && (Date.now() - lastHandledSwitchTabTime) < 500) {
+      return true;
+    }
+    lastHandledSwitchTabTarget = currentPath;
+    lastHandledSwitchTabTime = Date.now();
+
+    const fromTarget: RouteTarget = {
+      path: routeState.path,
+      query: routeState.query,
+      fullPath: routeState.fullPath,
+      params: routeState.params,
+      meta: routeState.meta,
+      name: routeState.name
+    } as RouteTarget;
+
+    const allowed = doIntercept(toUrl, 'switchTab', fromTarget);
+    if (!allowed) {
+      return false;
+    }
+    return true;
+  }
+
+  // 3. 原生手势出栈返回检测（navigateBack）
   const stackLen = getPageStackLength();
-  const isBackByStack = routeState.pages.length > 0 && stackLen > 0 && stackLen < routeState.pages.length;
+  // 首屏单页面不可能发生出栈返回行为，直接放行
+  if (stackLen <= 1) {
+    return true;
+  }
+  const isBackByStack = routeState.pages.length > 0 && stackLen < routeState.pages.length;
 
   // 2. 若当前栈顶页面与当前记录的 routeState 相同：
   // 必须明确检测到页面栈出栈减少（isBackByStack）才判定为同路径手势返回；
@@ -866,7 +1293,10 @@ export function checkAndInterceptPageShow(targetPath: string = ''): boolean {
   const fromTarget: RouteTarget = {
     path: routeState.path,
     query: routeState.query,
-    fullPath: routeState.fullPath
+    fullPath: routeState.fullPath,
+    params: routeState.params,
+    meta: routeState.meta,
+    name: routeState.name
   } as RouteTarget;
 
   // 执行路由守卫拦截
@@ -896,6 +1326,7 @@ export function installRouteInterceptor(): void {
   });
   // #ifdef MP-WEIXIN || MP-ALIPAY
   // 必须优先于 routeState 监听器注册：确保小程序返回时在 routeState 被冲刷前捕获准确的 from 来源页
+  installMpBeforeAppRouteListener();
   installMpNavigateBackListener();
   // #endif
   // 路由状态监听在本处（main.uts 创建应用时）安装：必须早于任何页面 setup，
@@ -988,7 +1419,7 @@ export function checkDirectEntry(options: any | null = null) {
       }
     }
     if (targetPath == '') {
-      targetPath = '/src/pages/index/index';
+      targetPath = getDefaultHomePage();
     }
   }
 

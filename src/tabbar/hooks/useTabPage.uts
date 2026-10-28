@@ -1,36 +1,16 @@
 import { computed, inject, onUnmounted, watch } from 'vue';
-import type { ComputedRef, Ref } from 'vue';
 import { onHide as onPageHide, onLoad as onPageLoad, onShow as onPageShow } from '@dcloudio/uni-app';
-import type { RouteLocation } from '@/uni_modules/route-bestX/index.uts';
-import { getCurrentPath, getRouteMeta } from '@/uni_modules/route-bestX/index.uts';
+import { getCurrentPath, isSamePath, routeState, syncRouteState } from '@/uni_modules/route-bestX/index.uts';
 import { isPageVisible, pageShowTimes } from '../core/lifecycle.uts';
-import { curIdx, tabbarList } from '../core/state.uts';
+import { curIdx } from '../core/state.uts';
+import { isSinglePageTabbar } from '../core/strategy.uts';
 import { resolveTabIndexByKey } from '../core/tab-key.uts';
-import {
-  readTabPageFullPath,
-  readTabPageQuery,
-  tabPageQueryRevision
-} from '../core/tab-page.uts';
 
 /** Tab 页面生命周期回调 */
 export type TabPageLifecycleCallback = () => void;
 
-/** 单页 TabBar 的页面语义适配结果 */
+/** 单页 TabBar 的页面生命周期适配结果 */
 export type UseTabPageResult = {
-  /** 当前 Tab 自己的虚拟路由（path / fullPath / query / meta / name） */
-  route: ComputedRef<RouteLocation>;
-  /** 当前 Tab 页面路径，等价于普通页面的 useRoute().path */
-  path: ComputedRef<string>;
-  /** 当前 Tab 页面 query，值为解码态 */
-  query: ComputedRef<Map<string, string>>;
-  /** 当前 Tab 页面名称 */
-  name: ComputedRef<string | null>;
-  /** 当前 Tab 页面元信息 */
-  meta: ComputedRef<UTSJSONObject | null>;
-  /** 当前 Tab 是否处于激活状态 */
-  isActive: ComputedRef<boolean>;
-  /** 宿主页面是否可见（App 切后台、进入子页面时为 false） */
-  isPageVisible: Ref<boolean>;
   /** 首次进入该 Tab 时执行一次，等价页面 onLoad */
   onLoad: (callback: TabPageLifecycleCallback) => void;
   /** 每次切回该 Tab / 从子页返回 / App 回前台时执行，等价页面 onShow */
@@ -41,122 +21,42 @@ export type UseTabPageResult = {
   onUnload: (callback: TabPageLifecycleCallback) => void;
 };
 
-/** 读取当前页面栈；仅用于给虚拟 RouteLocation 补齐同构字段 */
-function readCurrentPages(): Array<UniPage> {
-  try {
-    return getCurrentPages();
-  }
-  catch {
-    return [] as Array<UniPage>;
-  }
-}
-
-/** 从页面路径取路由名兜底值 */
-function readFallbackRouteName(path: string): string | null {
-  if (path.length == 0) {
-    return null;
-  }
-  const parts = path.split('/');
-  const last = parts[parts.length - 1];
-  return last.length > 0 ? last : null;
-}
-
-/** 从页面元信息里取显式声明的路由名 */
-function readRouteName(meta: UTSJSONObject | null, path: string): string | null {
-  if (meta != null) {
-    // UTSJSONObject 来自 JSON.parseObject 时不能保证实例方法可用，按项目约定走下标读取。
-    // eslint-disable-next-line dot-notation
-    const rawName = meta['name'];
-    if (rawName != null) {
-      const name = `${rawName}`;
-      if (name.length > 0) {
-        return name;
-      }
-    }
-  }
-  return readFallbackRouteName(path);
-}
-
-/** 构造与 route-bestX 的 RouteLocation 同构的虚拟路由对象 */
-function buildTabPageLocation(path: string, query: Map<string, string>, fullPath: string): RouteLocation {
-  const meta = getRouteMeta(path);
-  const pages = readCurrentPages();
-  const page = pages.length > 0 ? pages[pages.length - 1] : null;
-  return {
-    path,
-    fullPath,
-    query,
-    params: new Map<string, string>(),
-    meta,
-    name: readRouteName(meta, path),
-    page,
-    pages
-  } as RouteLocation;
-}
-
 /**
- * 单页 TabBar（模式 4）的页面语义适配 hook。
+ * 单页 TabBar（模式 4）的页面生命周期适配 hook。
  *
- * 在 Tab 页面 `.uvue`（如 `src/pages/basic/basic.uvue`）中调用后，可以获得与普通页面一致的：
- * - `route.path / route.query / route.meta / route.name`
+ * 在 Tab 页面 `.uvue`（如 `src/pages/basic/basic.uvue`）中调用后，接管并派发页面生命周期：
  * - `onLoad / onShow / onHide / onUnload`
  *
- * Tab 切换仍由单页容器完成，因此同时保留零闪烁与页面状态常驻。
- * 跳转继续使用 `useRouter()`，命中 TabBar 路径时现有路由桥接会自动切 Tab 并同步 query。
+ * Tab 切换由单页容器完成，保留零闪烁与页面状态常驻。
  *
  * @example
  * ```uts
  * const {
- *   route,
  *   onLoad,
  *   onShow,
  *   onHide
  * } = useTabPage();
  *
  * onLoad((): void => {
- *   const id = route.value.query.get('id') ?? '';
+ *   console.log('Tab 首次进入');
  * });
  *
  * onShow((): void => {
- *   // 切回当前 Tab、从子页面返回、App 回前台
+ *   console.log('切回当前 Tab、从子页面返回或 App 回前台');
  * });
  * ```
  */
 export function useTabPage(): UseTabPageResult {
   // TabContent 在插槽外层注入当前 Tab 在完整 tabbarList 中的下标。
-  // 这样业务视图不需要手写 tabType / pagePath，也不会因 midButton 插位而错位。
   const injectedPageIndex = inject<number>('tabPageIndex', -1);
-  // 模式 4 宿主页不经过 TabContent 插槽，拿不到 tabPageIndex；
-  // 此时按宿主页面自己的路由匹配 Tab，保证首页的页面生命周期语义与普通 Tab 一致。
+  // 模式 4 宿主页不经过 TabContent 插槽，按宿主页面路由匹配 Tab 下标。
   const pageIndex = injectedPageIndex >= 0
     ? injectedPageIndex
     : resolveTabIndexByKey(getCurrentPath());
 
-  const path = computed<string>((): string => {
-    if (pageIndex >= 0 && pageIndex < tabbarList.length) {
-      return tabbarList[pageIndex].pagePath;
-    }
-    return getCurrentPath();
-  });
   const isActive = computed<boolean>((): boolean => {
     // 未命中 Tab 时说明当前是普通页面，页面本身始终处于激活状态
     return pageIndex < 0 || curIdx.value == pageIndex;
-  });
-  const query = computed<Map<string, string>>((): Map<string, string> => {
-    return readTabPageQuery(path.value, tabPageQueryRevision.value);
-  });
-  const meta = computed<UTSJSONObject | null>((): UTSJSONObject | null => {
-    return getRouteMeta(path.value);
-  });
-  const name = computed<string | null>((): string | null => {
-    return readRouteName(meta.value, path.value);
-  });
-  const route = computed<RouteLocation>((): RouteLocation => {
-    return buildTabPageLocation(
-      path.value,
-      query.value,
-      readTabPageFullPath(path.value, tabPageQueryRevision.value)
-    );
   });
 
   /** onLoad 已执行的标记：每个 Tab 视图实例只执行一次 */
@@ -247,15 +147,23 @@ export function useTabPage(): UseTabPageResult {
     }
   };
 
-  // 普通页面（非 Tab 页面）直接使用原生页面生命周期，保证同一套调用方式在普通页面同样生效
-  if (pageIndex < 0) {
-    onPageLoad((): void => {
+  // 非模式 4（独立页面实体）或普通子页面：直接绑定原生页面生命周期，避免受跨页面全局状态干扰
+  if (!isSinglePageTabbar || pageIndex < 0) {
+    // #ifndef APP-ANDROID && !VUE3-VAPOR
+    // Android VDOM 新页 setup 时页面栈仍滞后在上一页，此时回读会覆盖导航发起方写入的目标路由。
+    const currentPath = getCurrentPath();
+    if (currentPath != '' && !isSamePath(currentPath, routeState.path)) {
+      syncRouteState();
+    }
+    // #endif
+    onPageLoad((_options: UTSJSONObject): void => {
       if (!hasLoaded) {
         hasLoaded = true;
         runCallbacks(loadCallbacks);
       }
     });
     onPageShow((): void => {
+      syncRouteState();
       if (!hasShown) {
         hasShown = true;
         runCallbacks(showCallbacks);
@@ -267,6 +175,40 @@ export function useTabPage(): UseTabPageResult {
         runCallbacks(hideCallbacks);
       }
     });
+    onUnmounted((): void => {
+      if (hasShown) {
+        hasShown = false;
+        runCallbacks(hideCallbacks);
+      }
+      runCallbacks(unloadCallbacks);
+      loadCallbacks.length = 0;
+      showCallbacks.length = 0;
+      hideCallbacks.length = 0;
+      unloadCallbacks.length = 0;
+    });
+
+    return {
+      onLoad: (callback: TabPageLifecycleCallback): void => {
+        if (!loadCallbacks.includes(callback)) {
+          loadCallbacks.push(callback);
+        }
+      },
+      onShow: (callback: TabPageLifecycleCallback): void => {
+        if (!showCallbacks.includes(callback)) {
+          showCallbacks.push(callback);
+        }
+      },
+      onHide: (callback: TabPageLifecycleCallback): void => {
+        if (!hideCallbacks.includes(callback)) {
+          hideCallbacks.push(callback);
+        }
+      },
+      onUnload: (callback: TabPageLifecycleCallback): void => {
+        if (!unloadCallbacks.includes(callback)) {
+          unloadCallbacks.push(callback);
+        }
+      }
+    };
   }
 
   const stopActiveWatch = watch(isActive, (_value: boolean): void => {
@@ -291,13 +233,6 @@ export function useTabPage(): UseTabPageResult {
   });
 
   return {
-    route,
-    path,
-    query,
-    name,
-    meta,
-    isActive,
-    isPageVisible,
     onLoad: (callback: TabPageLifecycleCallback): void => {
       registerLoad(callback);
     },

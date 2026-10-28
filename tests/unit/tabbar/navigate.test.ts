@@ -4,7 +4,8 @@ import { readTabPageQuery, resetTabPageQueries, setTabPageUrl } from '@/src/tabb
 import { switchTabbar } from '@/src/tabbar/core/navigate.uts';
 import type { TabNavigationContext, TabNavigationNext } from '@/src/tabbar/core/tab-navigation.uts';
 import { registerTabNavigationGuard } from '@/src/tabbar/core/tab-navigation.uts';
-import { isSinglePageTabbar } from '@/src/tabbar/core/strategy.uts';
+import { isSinglePageTabbar, selectedTabbarStrategy, TABBAR_STRATEGY_MAP } from '@/src/tabbar/core/strategy.uts';
+import { applyRouteFromUrl, routeState } from '@/uni_modules/route-bestX/index.uts';
 
 describe('switchTabbar', () => {
   beforeEach(() => {
@@ -15,6 +16,7 @@ describe('switchTabbar', () => {
   afterEach(() => {
     registerTabNavigationGuard(null);
     vi.restoreAllMocks();
+    vi.unstubAllGlobals();
   });
 
   it('updates the virtual tab state without a global navigation guard', () => {
@@ -132,7 +134,7 @@ describe('switchTabbar', () => {
       }, 0);
     });
 
-    switchTabbar('/src/pages/basic/basic?id=42', 'router');
+    switchTabbar('/src/pages/basic/basic?id=42', 'tabClick');
 
     expect(steps).toEqual(['before']);
     expect(curIdx.value).toBe(0);
@@ -141,5 +143,74 @@ describe('switchTabbar', () => {
     });
     expect(steps).toEqual(['before', 'after']);
     expect(readTabPageQuery('/src/pages/basic/basic').get('id')).toBe('42');
+  });
+
+  it('restores the switchTab query in the H5 address bar after navigation succeeds', () => {
+    const usesNativeTabSwitch = selectedTabbarStrategy == TABBAR_STRATEGY_MAP.NATIVE_TABBAR
+      || selectedTabbarStrategy == TABBAR_STRATEGY_MAP.CUSTOM_TABBAR_WITH_NATIVE;
+    if (!usesNativeTabSwitch) {
+      return;
+    }
+    const switchTab = (globalThis as any).uni.switchTab as ReturnType<typeof vi.fn>;
+    const originalSwitchTab = switchTab.getMockImplementation();
+    window.location.hash = '#/src/pages/index/index';
+    switchTab.mockImplementation((options: any): void => {
+      window.location.hash = '#/src/pages/basic/basic';
+      if (typeof options?.success == 'function') {
+        options.success({});
+      }
+    });
+
+    switchTabbar('/src/pages/basic/basic?a=3');
+
+    if (originalSwitchTab != null) {
+      switchTab.mockImplementation(originalSwitchTab);
+    }
+    else {
+      switchTab.mockImplementation((): void => {});
+    }
+
+    expect(window.location.hash).toBe('#/src/pages/basic/basic?a=3');
+  });
+
+  it('syncs the switchTab query into the H5 Vue Router history after navigation succeeds', () => {
+    const usesNativeTabSwitch = selectedTabbarStrategy == TABBAR_STRATEGY_MAP.NATIVE_TABBAR
+      || selectedTabbarStrategy == TABBAR_STRATEGY_MAP.CUSTOM_TABBAR_WITH_NATIVE;
+    if (!usesNativeTabSwitch) {
+      return;
+    }
+    const replace = vi.fn((url: string): Promise<void> => {
+      window.location.hash = `#${url}`;
+      return Promise.resolve();
+    });
+    vi.stubGlobal('getApp', (): any => ({
+      vm: {
+        $router: { replace }
+      }
+    }));
+    const switchTab = (globalThis as any).uni.switchTab as ReturnType<typeof vi.fn>;
+    const originalSwitchTab = switchTab.getMockImplementation();
+    window.location.hash = '#/src/pages/index/index';
+    switchTab.mockImplementation((options: any): void => {
+      window.location.hash = '#/src/pages/basic/basic';
+      applyRouteFromUrl('/src/pages/basic/basic?a=2&ax=1');
+      if (typeof options?.success == 'function') {
+        options.success({});
+      }
+    });
+
+    switchTabbar('/src/pages/basic/basic?a=3');
+
+    if (originalSwitchTab != null) {
+      switchTab.mockImplementation(originalSwitchTab);
+    }
+    else {
+      switchTab.mockImplementation((): void => {});
+    }
+
+    expect(replace).toHaveBeenCalledWith('/src/pages/basic/basic?a=3');
+    expect(window.location.hash).toBe('#/src/pages/basic/basic?a=3');
+    expect(routeState.fullPath).toBe('/src/pages/basic/basic?a=3');
+    expect(routeState.query.get('ax') ?? null).toBeNull();
   });
 });
