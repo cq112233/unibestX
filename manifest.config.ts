@@ -48,7 +48,7 @@ export default defineManifestConfig({
   'uni-app-x': {
     'styleIsolationVersion': '2',
     'vapor-default-script-lang': 'uts',
-    'vapor': false,
+    'vapor': true,
     'vapor-render-target': 'bytecode'
   },
   'uniStatistics': {
