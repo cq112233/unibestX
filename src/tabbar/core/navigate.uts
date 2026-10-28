@@ -107,13 +107,42 @@ function restoreSwitchTabQueryOnH5(url: string): void {
   }
   const path = url.slice(0, queryIndex);
   const query = url.slice(queryIndex);
+  // switchTab 成功时，同路径旧 Tab 的 onPageShow 可能已用缓存的旧 options
+  // 覆盖了 routeState 与 useRoute 快照；这里按地址栏真实目标再落盘一次。
+  applyRouteFromUrl(url);
   const nextUrl = window.location.hash.startsWith('#/')
     ? `#${path}${query}`
     : `${window.location.pathname}${query}`;
+  const replaceHistoryUrl: () => void = (): void => {
+    try {
+      window.history.replaceState(window.history.state, '', nextUrl);
+    }
+    catch { }
+  };
   try {
-    window.history.replaceState(window.history.state, '', nextUrl);
+    const app: any = getApp();
+    const appVm: any = app.vm;
+    if (appVm == null) {
+      replaceHistoryUrl();
+      return;
+    }
+    const vueRouter: any = appVm.$router;
+    if (vueRouter == null || typeof vueRouter.replace != 'function') {
+      replaceHistoryUrl();
+      return;
+    }
+    // 同时更新 Vue Router 的内部历史；否则进入二级页返回时，
+    // popstate 会按旧的无参路径还原，地址栏 query 再次丢失。
+    vueRouter.replace(url).then(
+      (): void => {},
+      (_err: any): void => {
+        replaceHistoryUrl();
+      }
+    );
   }
-  catch { }
+  catch {
+    replaceHistoryUrl();
+  }
 }
 // #endif
 
