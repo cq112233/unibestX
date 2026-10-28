@@ -24,6 +24,7 @@ import { onPageHide, onPageShow } from '@dcloudio/uni-app';
 import { getCurrentInstance, onUnmounted } from 'vue';
 import type { RouteLocation } from '../core/route-types.uts';
 import { ensureRouteReady, routeState, syncRouteState } from '../core/route-state.uts';
+import { getCurrentPath, isSamePath } from '../utils/utils.uts';
 import {
   closeRouteSnapshot,
   hideRouteSnapshot,
@@ -47,6 +48,16 @@ import {
  */
 export function useRoute(): RouteLocation {
   ensureRouteReady();
+
+  // 若当前物理页面栈顶已明确是新页面（如小程序原生切 Tab），先回读物理栈顶同步
+  // #ifndef APP-ANDROID && !VUE3-VAPOR
+  // Android VDOM 的新页 setup 阶段页面栈仍滞后在上一页，此时回读会覆盖拦截器已写入的目标路由；
+  // Vapor 模式无此问题，保持原有同步逻辑不变。
+  const currentPath = getCurrentPath();
+  if (currentPath != '' && !isSamePath(currentPath, routeState.path)) {
+    syncRouteState();
+  }
+  // #endif
 
   // 本调用点自己的快照：创建即定值（新页 setup 时全局里已是它的目标路由，首帧就准）
   const snapshotId = openRouteSnapshot(routeState);

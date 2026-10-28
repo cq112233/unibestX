@@ -59,8 +59,6 @@
  * URL 编码态 —— 故**所有入口统一过 `decodeQueryValue()`**（见 utils.uts），
  * 页面侧拿到 `route.query.get('name')` 即是可直接展示的中文。
  */
-import { reactive } from 'vue';
-
 let pageMetaJsonString: string = '';
 
 /**
@@ -71,12 +69,14 @@ export function setPageMetaJson(jsonStr: string): void {
   pageConfigTable = null;
 }
 import {
+  canonicalPath,
   cleanPath,
   decodeQueryValue,
   getCurrentPageOptions,
   getCurrentPath,
   getPageStackLength,
   getQueryString,
+  isSamePath,
   parseUrlToObj,
   queryValueToString,
   setNameToPathResolver
@@ -94,13 +94,16 @@ import type { RouteTarget } from '../guard/types.uts';
  * ⚠️ 只读：外部**不要**直接赋值/改字段，那会让状态与真实页面栈脱节；
  *    请通过 `router.push()` 等导航方法或 `syncRouteState()` 驱动它更新。
  */
-export const routeState: RouteLocation = reactive(createEmptyRoute());
+export const routeState: RouteLocation = createEmptyRoute();
 
 /** 记录上一个已生效的稳定路由快照（用于在返回或目标页已冲刷状态时取到真正的离开页） */
 export const previousRouteState: RouteTarget = {
   path: '',
   query: new Map<string, string>(),
-  fullPath: ''
+  fullPath: '',
+  params: new Map<string, string>(),
+  meta: null,
+  name: null
 } as RouteTarget;
 
 // ==========================================
@@ -343,6 +346,53 @@ function ensurePageConfigTable(): Map<string, UTSJSONObject> {
 }
 
 /**
+ * 动态获取应用默认首页路径（优先从物理页面栈底获取，其次从 pages.json 路由表首项提取）
+ * 避免在插件底层硬编码特定工程的首页路径
+ *
+ * @returns 规范化后的默认首页绝对路径（如 /src/pages/index/index 或 /pages/index/index）
+ */
+let cachedDefaultHomePage: string = '';
+
+/**
+ * 显式设置应用默认首页路径
+ *
+ * @param path 默认首页绝对路径，如 '/src/pages/index/index'
+ */
+export function setDefaultHomePage(path: string): void {
+  cachedDefaultHomePage = cleanPath(path);
+}
+
+/**
+ * 动态获取应用默认首页路径（优先从 pages.json 路由表首项提取，支持显式设置覆盖）
+ * 避免在插件底层硬编码特定工程的首页路径
+ *
+ * @returns 规范化后的默认首页绝对路径（如 /src/pages/index/index 或 /pages/index/index）
+ */
+export function getDefaultHomePage(): string {
+  if (cachedDefaultHomePage != '') {
+    return cachedDefaultHomePage;
+  }
+
+  // 1. 优先从 pages.json 静态配置表中获取首个页面（uni-app 规范第一项为首页）
+  const table = ensurePageConfigTable();
+  if (table.size > 0) {
+    let firstPath: string | null = null;
+    table.forEach((_val: UTSJSONObject, key: string): void => {
+      if (firstPath == null) {
+        firstPath = key;
+      }
+    });
+    if (firstPath != null) {
+      cachedDefaultHomePage = cleanPath(firstPath!);
+      return cachedDefaultHomePage;
+    }
+  }
+
+  // 2. 兜底官方约定默认首页路径
+  return '/src/pages/index/index';
+}
+
+/**
  * 读取某个页面在 pages.json 里的配置项（页面 definePage 声明的字段）
  *
  * @param path 页面路径
@@ -412,6 +462,58 @@ export function getRouteMeta(path: string): UTSJSONObject | null {
 }
 
 // ==========================================
+// 统一路由参数持久化管理（Query Store）
+// ==========================================
+
+/** 全局统一页面路由参数持久化映射表：Canonical Path -> Query Map */
+const routeQueryStore: Map<string, Map<string, string>> = new Map<string, Map<string, string>>();
+
+/**
+ * 统一存入目标页面的 query（导航发起方、拦截器调用）
+ *
+ * @param path 页面路径（自动通过 canonicalPath 规范化为统一 Key）
+ * @param query 查询参数 Map
+ */
+export function saveRouteQuery(path: string, query: Map<string, string>): void {
+  const key = canonicalPath(path);
+  if (key == '') {
+    return;
+  }
+  const copy = new Map<string, string>();
+  query.forEach((v: string, k: string): void => {
+    copy.set(k, v);
+  });
+  routeQueryStore.set(key, copy);
+}
+
+/**
+ * 统一读取目标页面的暂存 query
+ *
+ * @param path 页面路径
+ * @returns 暂存的 query Map，查不到返回 null
+ */
+export function getSavedRouteQuery(path: string): Map<string, string> | null {
+  const key = canonicalPath(path);
+  if (key == '') {
+    return null;
+  }
+  const cached = routeQueryStore.get(key);
+  return cached != null ? cached : null;
+}
+
+/**
+ * 统一清除目标页面的 query 暂存
+ *
+ * @param path 页面路径
+ */
+export function clearRouteQuery(path: string): void {
+  const key = canonicalPath(path);
+  if (key != '') {
+    routeQueryStore.delete(key);
+  }
+}
+
+// ==========================================
 // 状态写入（唯一收敛点）
 // ==========================================
 
@@ -449,8 +551,19 @@ function commitRoute(path: string, query: Map<string, string>, fullPath: string,
   if (normalizedPath == '') {
     return;
   }
+  let finalQuery = query;
+  let finalFullPath = fullPath;
+  if (finalQuery.size > 0) {
+    saveRouteQuery(normalizedPath, finalQuery);
+  } else {
+    const saved = getSavedRouteQuery(normalizedPath);
+    if (saved != null && saved.size > 0) {
+      finalQuery = saved;
+      finalFullPath = buildFullPath(normalizedPath, saved);
+    }
+  }
   // 在全局 routeState 被改写前，若原路径非空且与新路径不同，暂存为上一个路由快照
-  if (routeState.path != '' && routeState.path != normalizedPath) {
+  if (routeState.path != '' && !isSamePath(routeState.path, normalizedPath)) {
     previousRouteState.path = routeState.path;
     previousRouteState.fullPath = routeState.fullPath;
     const prevQuery = new Map<string, string>();
@@ -461,15 +574,15 @@ function commitRoute(path: string, query: Map<string, string>, fullPath: string,
   }
   else if (routeState.path == '' && previousRouteState.path == '') {
     const cur = getCurrentPath();
-    if (cur != '' && cur != normalizedPath) {
+    if (cur != '' && !isSamePath(cur, normalizedPath)) {
       previousRouteState.path = cur;
       previousRouteState.fullPath = cur;
     }
   }
   const meta = getRouteMeta(normalizedPath);
   routeState.path = normalizedPath;
-  routeState.fullPath = fullPath;
-  routeState.query = query;
+  routeState.fullPath = finalFullPath;
+  routeState.query = finalQuery;
   routeState.meta = meta;
   let routeName: string | null = null;
   if (meta != null) {
@@ -618,8 +731,10 @@ export function syncRouteState(): void {
   const query = queryMapFromObject(getCurrentPageOptions());
   const stackLen = getPageStackLength();
   const isBack = routeState.pages.length > 0 && stackLen > 0 && stackLen < routeState.pages.length;
-  // 仅在非出栈返回、且同路径、且本次参数为空时跳过（避免新页初载 options 延迟冲掉发起方写入的 query）
-  if (!isBack && currentPath == routeState.path && query.size == 0) {
+  // 同路径且非出栈时，页面实例并未被替换，`options` 可能仍是上次加载的缓存。
+  // 例如原生 TabBar 模式复用 Tab 页面时，switchTab 不携带新 query，options 会停留在旧值；
+  // 此时必须保留导航发起方刚写入的目标 query，避免被迟滞的页面缓存覆盖。
+  if (!isBack && isSamePath(currentPath, routeState.path)) {
     return;
   }
   commitRoute(currentPath, query, buildFullPath(currentPath, query), true);

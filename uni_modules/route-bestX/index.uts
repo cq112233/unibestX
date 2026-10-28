@@ -42,11 +42,15 @@ export {
   checkDirectEntry,
   chooseLocationInterceptor,
   installRouteInterceptor,
+  interceptNativeBack,
+  interceptNativeTabSwitch,
   isBypassInterceptorOnce,
+  markSilentNavigateBack,
   navigateBackInterceptor,
   navigateToInterceptor,
   redirectToInterceptor,
   registerTabbarHandler,
+  resetLastHandledNavigateBackTarget,
   reLaunchInterceptor,
   setBypassInterceptorOnce,
   switchTabInterceptor
@@ -55,11 +59,18 @@ export type { TabbarHandler } from './interceptor/interceptor.uts';
 
 // 4. 路由状态与核心算法
 export {
+  applyRouteFromUrl,
+  clearRouteQuery,
   ensureRouteReady,
+  getDefaultHomePage,
+  setDefaultHomePage,
   getRouteMeta,
+  getSavedRouteQuery,
   previousRouteState,
   removeRouteMeta,
   routeState,
+  saveRouteQuery,
+  setBeforeSyncRouteHook,
   setPageMetaJson,
   setRouteMeta,
   setRoutes,
@@ -72,6 +83,7 @@ export { createEmptyRoute } from './core/route-types.uts';
 // 5. 工具库
 export type { RouteLocationRaw, UrlObj } from './utils/utils.uts';
 export {
+  canonicalPath,
   cleanPath,
   decodeQueryValue,
   decodeSafe,

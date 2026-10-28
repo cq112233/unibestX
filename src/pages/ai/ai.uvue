@@ -17,7 +17,6 @@ useTabPageShell('ai');
 
 // AI 当前是普通页面：useTabPage() 会自动回退到原生页面生命周期；后续若加入 TabBar 配置则自动使用 Tab 语义
 const {
-  route: aiRoute,
   onLoad: onAiLoad,
   onShow: onAiShow,
   onHide: onAiHide
@@ -113,7 +112,7 @@ function sendMessage() {
 }
 
 onAiLoad(() => {
-  console.log('onAiLoad', 'AI 页面挂载了👋', aiRoute.value.fullPath);
+  console.log('onAiLoad', 'AI 页面挂载了👋');
   // 初始问候语
   messages.value.push({
     id: 'welcome',
@@ -124,7 +123,7 @@ onAiLoad(() => {
 });
 
 onAiShow(() => {
-  console.log('onAiShow', 'AI 页面显示了👀', aiRoute.value.fullPath);
+  console.log('onAiShow', 'AI 页面显示了👀');
 });
 
 onAiHide(() => {

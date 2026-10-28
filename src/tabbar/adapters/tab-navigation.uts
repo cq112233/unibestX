@@ -1,31 +1,124 @@
 import type { TabNavigationContext, TabNavigationNext } from '../core/tab-navigation.uts';
 import { registerTabNavigationGuard } from '../core/tab-navigation.uts';
+import { curIdx } from '../core/state.uts';
+import { isSinglePageTabbar } from '../core/strategy.uts';
+import {
+  getRouteMeta,
+  isBypassInterceptorOnce,
+  isSamePath,
+  parseUrlToObj,
+  routeState,
+  runAfterEachHooks,
+  runRouterGuard,
+  setBeforeSyncRouteHook,
+  setBypassInterceptorOnce,
+  useRouter
+} from '@/uni_modules/route-bestX/index.uts';
+import type { RouteTarget } from '@/uni_modules/route-bestX/index.uts';
 
 /**
- * 模式 4 Tab 切换前置处理入口。
+ * 将 URL 转换为 RouteTarget
+ */
+function toRouteTarget(url: string): RouteTarget {
+  const urlObj = parseUrlToObj(url);
+  const meta = getRouteMeta(urlObj.path);
+  let routeName: string | null = null;
+  if (meta != null) {
+    const key = 'name';
+    const nameVal = meta[key];
+    if (nameVal != null) {
+      routeName = `${nameVal}`;
+    }
+  }
+  return {
+    path: urlObj.path,
+    query: urlObj.query,
+    fullPath: url,
+    params: new Map<string, string>(),
+    meta,
+    name: routeName
+  } as RouteTarget;
+}
+
+/**
+ * 模式 4 Tab 切换前置处理入口：桥接全局路由守卫 (route-bestX)
  *
- * 可读取：
- * - `context.from` / `context.fromPath`：来源 Tab 的完整 URL / path
- * - `context.to` / `context.toPath`：目标 Tab 的完整 URL / path
- * - `context.query`：目标 query（已解码）
- * - `context.api`：tabClick / router / hostQuery / switchTabbar
- *
- * 前置操作完成后必须调用 `next(true)` 放行或 `next(false)` 取消；支持异步调用。
+ * 在模式 4（单页保活仿真）下，底栏点击及虚拟 Tab 切换均会触发此钩子，
+ * 内部桥接执行 route-bestX 的 runRouterGuard 守卫流水线，保证登录鉴权、
+ * 系统维护与 beforeEach / afterEach 钩子完整生效。
  */
 export function setupTabNavigationGuard(): void {
+  // 模式 4 下保护虚拟 Tab 路由：当物理页面栈停留在宿主页，且当前激活了某个虚拟子 Tab 时，
+  // 禁止由 syncRouteState 回读物理栈顶（/pages/index/index）粗暴覆盖当前活跃的 Tab 路由状态
+  setBeforeSyncRouteHook((currentPath: string): boolean => {
+    if (isSinglePageTabbar) {
+      try {
+        const pages = getCurrentPages();
+        if (pages.length > 0) {
+          const topRoute = pages[pages.length - 1].route ?? '';
+          if (isSamePath(topRoute, currentPath)) {
+            if (curIdx.value > 0) {
+              return false;
+            }
+          }
+        }
+      }
+      catch { }
+    }
+    return true;
+  });
+
   registerTabNavigationGuard((context: TabNavigationContext, next: TabNavigationNext): void => {
-    // console.log(context, 'context');
-    // 按来源执行第三方接入、参数换取、埋点、数据预取等前置操作。
-    //
-    // 示例（伪代码）：
-    // if (context.api == 'hostQuery' && context.query.get('from') == 'third-party') {
-    //   fetchThirdPartySession(context.query).then((_res: any): void => {
-    //     next(true);
-    //   }, (_err: any): void => {
-    //     next(false);
-    //   });
-    //   return;
-    // }
-    next(true);
+    // 检查是否指令式跳过拦截
+    if (isBypassInterceptorOnce()) {
+      setBypassInterceptorOnce(false);
+      next(true);
+      return;
+    }
+
+    // 宿主入口参数同步 (hostQuery) 或同 Tab 切换，属于内部状态同步，不重复触发全局路由守卫
+    if (context.api == 'hostQuery' || isSamePath(context.fromPath, context.toPath)) {
+      next(true);
+      return;
+    }
+
+    // 构造目标与来源 RouteTarget
+    const target = toRouteTarget(context.to);
+    let fromTarget: RouteTarget;
+    if (context.from.length > 0) {
+      fromTarget = toRouteTarget(context.from);
+    }
+    else {
+      fromTarget = {
+        path: routeState.path,
+        query: routeState.query,
+        fullPath: routeState.fullPath,
+        params: routeState.params,
+        meta: routeState.meta,
+        name: routeState.name
+      } as RouteTarget;
+    }
+
+    // 执行全局路由守卫流水线
+    const decision = runRouterGuard(target, fromTarget, context.api);
+
+    if (decision.pass) {
+      runAfterEachHooks(target, fromTarget, null);
+      next(true);
+      return;
+    }
+
+    // 守卫未放行：中断本次 Tab 切换
+    next(false);
+
+    // 若守卫给出了重定向目标（如跳转登录页），执行路由跳转
+    if (decision.redirect != null && decision.redirect != '') {
+      if (decision.replace == true) {
+        useRouter().replace(decision.redirect!);
+      }
+      else {
+        useRouter().push(decision.redirect!);
+      }
+    }
   });
 }

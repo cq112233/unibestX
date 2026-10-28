@@ -30,11 +30,11 @@
  */
 import { cleanPath, resolveUrl } from '../utils/utils.uts';
 import type { RouteLocationRaw } from '../utils/utils.uts';
-import { ensureRouteReady, routeState, setRoutes } from '../core/route-state.uts';
+import { ensureRouteReady, routeState, setDefaultHomePage, setRoutes } from '../core/route-state.uts';
 import type { RouteLocation, RouteRecordRaw } from '../core/route-types.uts';
 import { registerAfterEach, registerBeforeEach, registerOnError } from '../guard/index.uts';
 import type { NavigationErrorHandler, NavigationGuard, NavigationHookAfter } from '../guard/types.uts';
-import { getTabbarHandler, installRouteInterceptor, registerTabbarHandler, setBypassInterceptorOnce } from '../interceptor/interceptor.uts';
+import { allowNavigation, getTabbarHandler, installRouteInterceptor, registerTabbarHandler, setBypassInterceptorOnce } from '../interceptor/interceptor.uts';
 import type { TabbarHandler } from '../interceptor/interceptor.uts';
 
 /**
@@ -57,6 +57,8 @@ function shouldIntercept(to: string | RouteLocationRaw | null, intercept: boolea
  * 路由器创建配置项契约
  */
 export type RouterOptions = {
+  /** 默认首页路径（可选显式配置，如 /src/pages/index/index） */
+  homePage?: string | null;
   /** 路由表列表配置（对标 vue-router 的 routes） */
   routes?: RouteRecordRaw[] | null;
   /** TabBar 页面路径列表，如 ['/src/pages/index/index', ...] */
@@ -65,6 +67,8 @@ export type RouterOptions = {
   isTabbar?: ((url: string) => boolean) | null;
   /** TabBar 页面跳转动作（如 switchTabbar，未提供时默认走 uni.switchTab 兜底） */
   switchTab?: ((url: string) => void) | null;
+  /** 返回导航目标修正（模式 4 下把宿主页还原为当前虚拟 Tab） */
+  resolveBackTarget?: ((url: string) => string) | null;
   /** 完整 TabBar 处理器对象契约 */
   tabbar?: TabbarHandler | null;
 };
@@ -161,7 +165,13 @@ export class Router {
     if (url == '') {
       return null;
     }
-    if (!shouldIntercept(to, intercept)) {
+    if (shouldIntercept(to, intercept)) {
+      const allowed = allowNavigation(url, 'switchTab');
+      if (!allowed) {
+        return null;
+      }
+    }
+    else {
       setBypassInterceptorOnce(true);
     }
     const handler = getTabbarHandler();
@@ -291,6 +301,9 @@ export function createRouter(options: RouterOptions | null = null): Router {
   ensureRouteReady();
 
   if (options != null) {
+    if (options.homePage != null && options.homePage != '') {
+      setDefaultHomePage(options.homePage!);
+    }
     if (options.routes != null && options.routes!.length > 0) {
       setRoutes(options.routes!);
     }
@@ -323,6 +336,7 @@ export function createRouter(options: RouterOptions | null = null): Router {
       };
 
       const customSwitchTab = options.switchTab;
+      const customResolveBackTarget = options.resolveBackTarget;
       const switchTabFn = (url: string): void => {
         if (customSwitchTab != null) {
           customSwitchTab(url);
@@ -333,7 +347,8 @@ export function createRouter(options: RouterOptions | null = null): Router {
 
       registerTabbarHandler({
         isTabbar: isTabbarFn,
-        switchTab: switchTabFn
+        switchTab: switchTabFn,
+        resolveBackTarget: customResolveBackTarget
       } as TabbarHandler);
     }
   }
