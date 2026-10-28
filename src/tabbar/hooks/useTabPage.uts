@@ -149,11 +149,14 @@ export function useTabPage(): UseTabPageResult {
 
   // 非模式 4（独立页面实体）或普通子页面：直接绑定原生页面生命周期，避免受跨页面全局状态干扰
   if (!isSinglePageTabbar || pageIndex < 0) {
+    // #ifndef APP-ANDROID && !VUE3-VAPOR
+    // Android VDOM 新页 setup 时页面栈仍滞后在上一页，此时回读会覆盖导航发起方写入的目标路由。
     const currentPath = getCurrentPath();
     if (currentPath != '' && !isSamePath(currentPath, routeState.path)) {
       syncRouteState();
     }
-    onPageLoad((): void => {
+    // #endif
+    onPageLoad((_options: UTSJSONObject): void => {
       if (!hasLoaded) {
         hasLoaded = true;
         runCallbacks(loadCallbacks);

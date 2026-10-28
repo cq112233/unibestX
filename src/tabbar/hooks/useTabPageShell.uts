@@ -1,5 +1,12 @@
 import { inject } from 'vue';
+// #ifdef VUE3-VAPOR || MP-ALIPAY
+// eslint-disable-next-line import/no-duplicates -- 条件编译互斥分支：Vapor / 支付宝保留 onTabItemTap
 import { onHide, onShow, onTabItemTap } from '@dcloudio/uni-app';
+// #endif
+// #ifndef VUE3-VAPOR || MP-ALIPAY
+// eslint-disable-next-line import/no-duplicates -- 条件编译互斥分支：预处理后只会保留上方或本条其中之一
+import { onHide, onShow } from '@dcloudio/uni-app';
+// #endif
 import { interceptNativeTabSwitch, useRoute } from '@/uni_modules/route-bestX/index.uts';
 import { useBackPressExit } from '@/src/hooks/useBackPressExit.uts';
 import { notifyPageHide, notifyPageShow } from '../core/lifecycle.uts';

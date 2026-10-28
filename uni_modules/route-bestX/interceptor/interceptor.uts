@@ -1150,14 +1150,20 @@ function installMpNavigateBackListener(): void {
         fromTarget = {
           path: routeState.path,
           query: routeState.query,
-          fullPath: routeState.fullPath
+          fullPath: routeState.fullPath,
+          params: routeState.params,
+          meta: routeState.meta,
+          name: routeState.name
         } as RouteTarget;
       }
       else if (previousRouteState.path != '' && previousRouteState.path != targetPath) {
         fromTarget = {
           path: previousRouteState.path,
           query: previousRouteState.query,
-          fullPath: previousRouteState.fullPath
+          fullPath: previousRouteState.fullPath,
+          params: previousRouteState.params,
+          meta: previousRouteState.meta,
+          name: previousRouteState.name
         } as RouteTarget;
       }
 
@@ -1287,7 +1293,10 @@ export function checkAndInterceptPageShow(targetPath: string = ''): boolean {
   const fromTarget: RouteTarget = {
     path: routeState.path,
     query: routeState.query,
-    fullPath: routeState.fullPath
+    fullPath: routeState.fullPath,
+    params: routeState.params,
+    meta: routeState.meta,
+    name: routeState.name
   } as RouteTarget;
 
   // 执行路由守卫拦截

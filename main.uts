@@ -24,6 +24,23 @@ export function createApp() {
   });
   // #endif
 
+  // Android VDOM 的系统返回键 / 手势返回同样绕过 uni.navigateBack 拦截器。
+  // 在原生出栈前补跑守卫：有上一页才处理（根页继续交给「再按一次退出」），
+  // 守卫拦截时返回 true 吞掉本次返回，避免页面已经退出后才执行 beforeEach。
+  // #ifdef APP-ANDROID && !VUE3-VAPOR
+  app.mixin({
+    onBackPress(options: OnBackPressOptions): boolean {
+      if (options.from != 'backbutton') {
+        return false;
+      }
+      if (getCurrentPages().length <= 1) {
+        return false;
+      }
+      return !interceptNativeBack();
+    }
+  });
+  // #endif
+
   // 注册路由系统插件（插件内部已自动挂载 $router 与 $route 到 app.config.globalProperties）
   app.use(router);
 

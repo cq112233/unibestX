@@ -2,7 +2,6 @@
  * 每个调用点各自的路由快照（useRoute() 返回的就是它）
  * 核心隔离引擎：实现上一页不提前翻、同页带参重进不污染
  */
-import { reactive } from 'vue';
 import { isSamePath } from '../utils/utils.uts';
 import { createEmptyRoute } from './route-types.uts';
 import type { RouteLocation } from './route-types.uts';
@@ -65,7 +64,7 @@ export function publishRoute(globalRoute: RouteLocation, path: string, includeCl
 export function openRouteSnapshot(globalRoute: RouteLocation): number {
   snapshotSeq += 1;
   const id = snapshotSeq;
-  const route = reactive(createEmptyRoute());
+  const route = createEmptyRoute();
   copyRoute(route, globalRoute);
   const snapshot: RouteSnapshot = {
     route,

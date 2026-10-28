@@ -59,8 +59,6 @@
  * URL 编码态 —— 故**所有入口统一过 `decodeQueryValue()`**（见 utils.uts），
  * 页面侧拿到 `route.query.get('name')` 即是可直接展示的中文。
  */
-import { reactive } from 'vue';
-
 let pageMetaJsonString: string = '';
 
 /**
@@ -96,13 +94,16 @@ import type { RouteTarget } from '../guard/types.uts';
  * ⚠️ 只读：外部**不要**直接赋值/改字段，那会让状态与真实页面栈脱节；
  *    请通过 `router.push()` 等导航方法或 `syncRouteState()` 驱动它更新。
  */
-export const routeState: RouteLocation = reactive(createEmptyRoute());
+export const routeState: RouteLocation = createEmptyRoute();
 
 /** 记录上一个已生效的稳定路由快照（用于在返回或目标页已冲刷状态时取到真正的离开页） */
 export const previousRouteState: RouteTarget = {
   path: '',
   query: new Map<string, string>(),
-  fullPath: ''
+  fullPath: '',
+  params: new Map<string, string>(),
+  meta: null,
+  name: null
 } as RouteTarget;
 
 // ==========================================
@@ -730,8 +731,10 @@ export function syncRouteState(): void {
   const query = queryMapFromObject(getCurrentPageOptions());
   const stackLen = getPageStackLength();
   const isBack = routeState.pages.length > 0 && stackLen > 0 && stackLen < routeState.pages.length;
-  // 仅在非出栈返回、且同路径、且本次参数为空时跳过（避免新页初载 options 延迟冲掉发起方写入的 query）
-  if (!isBack && isSamePath(currentPath, routeState.path) && query.size == 0) {
+  // 同路径且非出栈时，页面实例并未被替换，`options` 可能仍是上次加载的缓存。
+  // 例如原生 TabBar 模式复用 Tab 页面时，switchTab 不携带新 query，options 会停留在旧值；
+  // 此时必须保留导航发起方刚写入的目标 query，避免被迟滞的页面缓存覆盖。
+  if (!isBack && isSamePath(currentPath, routeState.path)) {
     return;
   }
   commitRoute(currentPath, query, buildFullPath(currentPath, query), true);
