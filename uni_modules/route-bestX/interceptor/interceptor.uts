@@ -835,7 +835,9 @@ export const switchTabInterceptor: Interceptor = {
       return false;
     }
     // 微信小程序/原生 switchTab 不支持 queryString，守卫放行后清理 options.url 上的 query，
-    // 杜绝微信开发者工具报警「wx.switchTab: url 不支持 queryString」
+    // 杜绝微信开发者工具报警「wx.switchTab: url 不支持 queryString」。
+    // H5 保留原始 URL，uni-h5 协议层会自行截断 query，随后由 TabBar 导航层补回地址栏。
+    // #ifndef H5 || WEB
     if (options != null && url.includes('?')) {
       const cleanUrl = url.split('?')[0];
       // #ifdef APP
@@ -845,6 +847,7 @@ export const switchTabInterceptor: Interceptor = {
       (options as UTSJSONObject)['url'] = cleanUrl;
       // #endif
     }
+    // #endif
     return true;
   },
   fail(err: any): void {
