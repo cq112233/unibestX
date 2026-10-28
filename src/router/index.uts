@@ -8,7 +8,7 @@ import {
   createRouter,
   setPageMetaJson
 } from '@/uni_modules/route-bestX/index.uts';
-import { isPageTabbar, setupTabNavigationGuard, switchTabbar } from '@/src/tabbar/index.uts';
+import { isPageTabbar, resolveTabbarBackTarget, setupTabNavigationGuard, switchTabbar } from '@/src/tabbar/index.uts';
 import { DEFAULT_HOME_PAGE } from './config.uts';
 import { setupRouteGuards } from './guards/index.uts';
 // 通过插件uni-pages-route-table自动获取页面路由表,依赖插件vite-plugin-uni-pages，如果不使用vite-plugin-uni-pages，不能根据PLATFORM做页面归一
@@ -28,7 +28,8 @@ export const router = createRouter({
   isTabbar: (url: string): boolean => isPageTabbar(url),
   switchTab: (url: string): void => {
     switchTabbar(url, 'router');
-  }
+  },
+  resolveBackTarget: (url: string): string => resolveTabbarBackTarget(url)
 });
 
 // 2. 自动注册业务全局守卫与生命周期钩子

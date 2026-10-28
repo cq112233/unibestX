@@ -132,7 +132,7 @@ describe('switchTabbar', () => {
       }, 0);
     });
 
-    switchTabbar('/src/pages/basic/basic?id=42', 'router');
+    switchTabbar('/src/pages/basic/basic?id=42', 'tabClick');
 
     expect(steps).toEqual(['before']);
     expect(curIdx.value).toBe(0);

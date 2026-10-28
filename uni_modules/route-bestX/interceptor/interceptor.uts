@@ -106,9 +106,10 @@ export function isBypassInterceptorOnce(): boolean {
  * @param api 触发本次跳转的 uni API 名，透传给守卫
  */
 export function allowNavigation(url: string, api: string): boolean {
+  const resolvedUrl = resolveNavigationUrl(url, api);
   if (bypassInterceptorOnce) {
     bypassInterceptorOnce = false;
-    markTargetRoute(url);
+    markTargetRoute(resolvedUrl);
     return true;
   }
   if (api == 'switchTab') {
@@ -116,9 +117,9 @@ export function allowNavigation(url: string, api: string): boolean {
     lastHandledSwitchTabTarget = cleanTarget;
     lastHandledSwitchTabTime = Date.now();
   }
-  const allowed = doIntercept(url, api);
+  const allowed = doIntercept(resolvedUrl, api);
   if (allowed) {
-    markTargetRoute(url);
+    markTargetRoute(resolvedUrl);
   }
   return allowed;
 }
@@ -225,6 +226,8 @@ function resolveAbsoluteUrl(url: string): string {
 export type TabbarHandler = {
   isTabbar: (url: string) => boolean;
   switchTab: (url: string) => void;
+  /** 返回导航的目标修正：模式 4 物理栈只能回到宿主页，需要由 TabBar 还原当前虚拟 Tab */
+  resolveBackTarget?: ((url: string) => string) | null;
 };
 
 let customTabbarHandler: TabbarHandler | null = null;
@@ -241,6 +244,28 @@ export function registerTabbarHandler(handler: TabbarHandler | null): void {
  */
 export function getTabbarHandler(): TabbarHandler | null {
   return customTabbarHandler;
+}
+
+/**
+ * 修正导航目标 URL
+ *
+ * 仅在 navigateBack 时询问 TabBar 处理器：模式 4 的页面栈从子页返回时，
+ * 物理上一页永远是宿主首页，不能直接作为守卫的 to；由处理器按当前虚拟 Tab 还原。
+ */
+function resolveNavigationUrl(url: string, api: string): string {
+  const resolvedUrl = resolveAbsoluteUrl(url);
+  if (api != 'navigateBack' || customTabbarHandler == null) {
+    return resolvedUrl;
+  }
+  const resolveBackTarget = customTabbarHandler!.resolveBackTarget;
+  if (resolveBackTarget == null) {
+    return resolvedUrl;
+  }
+  const tabbarTarget = resolveBackTarget!(resolvedUrl);
+  if (tabbarTarget == '' || tabbarTarget == resolvedUrl) {
+    return resolvedUrl;
+  }
+  return resolveAbsoluteUrl(tabbarTarget);
 }
 
 let redirectDepth: number = 0;
@@ -395,7 +420,7 @@ function doIntercept(url: string, api: string, fromOverride: RouteTarget | null 
   if (url == null || url == '') {
     return true;
   }
-  const resolvedUrl = resolveAbsoluteUrl(url);
+  const resolvedUrl = resolveNavigationUrl(url, api);
   const urlObj = parseUrlToObj(resolvedUrl);
 
   // fullPath 由 path + 解码后的 query 重拼（而不是直接用 resolvedUrl）：保持「解码态」口径，
@@ -840,6 +865,9 @@ export const switchTabInterceptor: Interceptor = {
 let lastHandledNavigateBackTarget: string = '';
 /** 最近一次由 navigateBack 拦截/守卫处理放行的时间戳 */
 let lastHandledNavigateBackTime: number = 0;
+/** 根页返回放行时间；用于放行系统退出时静默吞掉随后的底层 navigateBack 失败 */
+let rootBackExitPendingTime: number = 0;
+const ROOT_BACK_EXIT_WINDOW: number = 2000;
 /** 静默回退计数（针对自定义 TabBar 内部出栈销毁上层页面等内部流程） */
 let silentBackCount: number = 0;
 /** 是否有静默回退等待对应的 popstate 消费 */
@@ -862,6 +890,7 @@ export function markSilentNavigateBack(count: number = 1): void {
 export function resetLastHandledNavigateBackTarget(): void {
   lastHandledNavigateBackTarget = '';
   lastHandledNavigateBackTime = 0;
+  rootBackExitPendingTime = 0;
   silentBackCount = 0;
   isSilentBackPending = false;
   clearNativeBackGuardHandled();
@@ -904,7 +933,13 @@ export const navigateBackInterceptor: Interceptor = {
       // #endif
     }
     const targetIdx = pages.length - 1 - delta;
-    if (targetIdx < 0 && pages.length > 0) {
+    if (targetIdx < 0) {
+      // 根页返回属于「退出应用」而不是路由回退：必须放行给宿主处理。
+      // 不抛 201，并记录时间窗，供 fail 阶段静默吞掉宿主退出时的 202。
+      if (pages.length <= 1) {
+        rootBackExitPendingTime = Date.now();
+        return true;
+      }
       const err = createRouterError(
         ROUTER_ERROR_CODE.BACK_STACK_DEPTH_INVALID as number,
         null,
@@ -913,7 +948,9 @@ export const navigateBackInterceptor: Interceptor = {
       );
       runOnErrorHandlers(err, null, resolveFromRouteTarget());
       runAfterEachHooks(createEmptyRouteTarget(), resolveFromRouteTarget(), err);
+      return false;
     }
+    rootBackExitPendingTime = 0;
     if (targetIdx >= 0 && targetIdx < pages.length) {
       const targetPage = pages[targetIdx];
       const targetRoute = targetPage.route ?? '';
@@ -951,6 +988,10 @@ export const navigateBackInterceptor: Interceptor = {
     return true;
   },
   fail(err: any): void {
+    if (rootBackExitPendingTime > 0 && (Date.now() - rootBackExitPendingTime) <= ROOT_BACK_EXIT_WINDOW) {
+      rootBackExitPendingTime = 0;
+      return;
+    }
     syncRouteStateDeferred();
     const routerErr = createRouterError(
       ROUTER_ERROR_CODE.NAVIGATE_BACK_FAILED as number,

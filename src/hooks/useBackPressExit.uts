@@ -15,6 +15,7 @@
 
 import { onBackPress } from '@dcloudio/uni-app';
 import { isApp } from '@/src/config/env/platform.uts';
+import { setNavbarRuntimeActive } from '@/src/layouts/navbar/utils/index.uts';
 
 /**
  * 注册「双击返回键退出应用」的页面返回拦截
@@ -48,7 +49,8 @@ export function useBackPressExit(duration: number = 2000): void {
 
     // 时间窗内再次触发，退出应用
     exitApplication();
-    return false;
+    // 退出 API 已接管本次返回；再交回宿主默认返回会把应用移到后台而不是真正退出
+    return true;
   });
 }
 
@@ -58,6 +60,9 @@ export function useBackPressExit(duration: number = 2000): void {
  * 条件编译段内只做平台分支，禁止在注释里写带斜杠的预处理标记。
  */
 function exitApplication(): void {
+  // 必须在关闭 Activity 之前同步置为不可用：finishAffinity() 会立刻触发页面 onHide / 卸载，
+  // 此时 Tab 页若继续调用 uni.stopPullDownRefresh()，鸿蒙会先抛 querySelector 错误并中断退出流程。
+  setNavbarRuntimeActive(false);
   // #ifdef APP-ANDROID && !VUE3-VAPOR
   try {
     const activity = UTSAndroid.getUniActivity();

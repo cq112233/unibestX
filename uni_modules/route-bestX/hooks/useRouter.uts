@@ -67,6 +67,8 @@ export type RouterOptions = {
   isTabbar?: ((url: string) => boolean) | null;
   /** TabBar 页面跳转动作（如 switchTabbar，未提供时默认走 uni.switchTab 兜底） */
   switchTab?: ((url: string) => void) | null;
+  /** 返回导航目标修正（模式 4 下把宿主页还原为当前虚拟 Tab） */
+  resolveBackTarget?: ((url: string) => string) | null;
   /** 完整 TabBar 处理器对象契约 */
   tabbar?: TabbarHandler | null;
 };
@@ -334,6 +336,7 @@ export function createRouter(options: RouterOptions | null = null): Router {
       };
 
       const customSwitchTab = options.switchTab;
+      const customResolveBackTarget = options.resolveBackTarget;
       const switchTabFn = (url: string): void => {
         if (customSwitchTab != null) {
           customSwitchTab(url);
@@ -344,7 +347,8 @@ export function createRouter(options: RouterOptions | null = null): Router {
 
       registerTabbarHandler({
         isTabbar: isTabbarFn,
-        switchTab: switchTabFn
+        switchTab: switchTabFn,
+        resolveBackTarget: customResolveBackTarget
       } as TabbarHandler);
     }
   }

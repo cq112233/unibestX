@@ -1,4 +1,4 @@
-import { curIdx, setCurIdx, setCurIdxByPath, tabbarList } from './state.uts';
+import { curIdx, isPageTabbar, setCurIdx, setCurIdxByPath, tabbarList } from './state.uts';
 import { readTabPageFullPath, setTabPageUrl, syncTabPageHostUrl } from './tab-page.uts';
 import { isNativeTabbar, isSinglePageTabbar, needHideNativeTabbar, selectedTabbarStrategy, TABBAR_STRATEGY_MAP } from './strategy.uts';
 import { customTabbarConfig } from '../adapters/config.uts';
@@ -6,6 +6,7 @@ import {
   applyRouteFromUrl,
   isSamePath,
   markSilentNavigateBack,
+  parseUrlToObj,
   routeState,
   setBypassInterceptorOnce,
   useRouter
@@ -55,12 +56,40 @@ export function switchTabbar(url: string, api: string = 'switchTabbar'): void {
     performSwitchTabbar(url, api);
     return;
   }
+  // 模式 4 经 Router.switchTab() 进入时，路由层已用 api: switchTab 执行过守卫；
+  // 这里只落地虚拟 Tab，避免同一次导航再以 api: router 重复执行一次 beforeEach。
+  if (api == 'router') {
+    performSwitchTabbar(url, api);
+    return;
+  }
   const fromUrl = readCurrentTabFullPath();
   runTabNavigationGuard(fromUrl, url, api, (allowed: boolean): void => {
     if (allowed) {
       performSwitchTabbar(url, api);
     }
   });
+}
+
+/**
+ * 模式 4 返回目标修正。
+ *
+ * 从子页面返回时，物理页面栈的上一页只会是宿主页；若直接交给守卫，
+ * `to` 会错误地变成宿主首页。这里按当前激活索引还原成对应的虚拟 Tab 路径及 query。
+ * 非模式 4、或返回目标本就不是 TabBar 页面时，原样返回，不影响普通页面返回。
+ */
+export function resolveTabbarBackTarget(url: string): string {
+  if (!isSinglePageTabbar) {
+    return url;
+  }
+  const targetPath = parseUrlToObj(url).path;
+  if (!isPageTabbar(targetPath)) {
+    return url;
+  }
+  const index = curIdx.value;
+  if (index < 0 || index >= tabbarList.length) {
+    return url;
+  }
+  return readTabPageFullPath(tabbarList[index].pagePath);
 }
 
 /**
