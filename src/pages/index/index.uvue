@@ -16,7 +16,6 @@ import EngineeringSection from './components/EngineeringSection.uvue';
 import ToolLibSection from './components/ToolLibSection.uvue';
 import DevWorkflowGuide from './components/DevWorkflowGuide.uvue';
 import IndexFooter from './components/IndexFooter.uvue';
-import { router } from '@/src/router/index.uts';
 
 // 👇 这段基本可以满足随意搭配，满足基本的业务需求啦！
 // 💡 tabbar模式4的情况下,映射关系
@@ -121,45 +120,11 @@ onIndexHide(() => {
   stopNavbarPullDownRefresh();
   console.log('onIndexHide', '首页隐藏了👉');
 });
-
-function goBasic() {
-  router.push({
-    path: '/src/sub/modalBasicDemo/modalBasicDemo',
-    query: {
-      a: 1
-    }
-  });
-}
-function goBasic1() {
-  router.push({
-    path: '/src/pages/basic/basic',
-    query: {
-      a: 2
-    }
-  });
-}
-function goBasic2() {
-  router.push({
-    path: '/src/pages/basic/basic',
-    query: {
-      a: 3
-    }
-  });
-}
 </script>
 
 <template>
   <TabPageHost>
     <div class="flex flex-col w-full">
-      <button @click="goBasic">
-        去modalBasicDemo
-      </button>
-      <button @click="goBasic1">
-        去basic1
-      </button>
-      <button @click="goBasic2">
-        去basic1
-      </button>
       <!-- 1. 顶部 Header、环境信息卡片与简介 -->
       <IndexHeader />
 
