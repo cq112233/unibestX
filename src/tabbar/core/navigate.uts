@@ -92,11 +92,11 @@ export function resolveTabbarBackTarget(url: string): string {
   return readTabPageFullPath(tabbarList[index].pagePath);
 }
 
+// #ifdef H5 || WEB
 /**
  * H5 的 switchTab 协议会把 URL 截成 path（见 uni-h5 createNormalizeUrl），
  * 导航成功后在地址栏补回 query，避免 router.push({ path, query }) 的地址栏丢参。
  */
-// #ifdef H5 || WEB
 function restoreSwitchTabQueryOnH5(url: string): void {
   if (typeof window == 'undefined') {
     return;
@@ -210,11 +210,11 @@ function performSwitchTabbar(url: string, api: string = 'switchTabbar'): void {
     }
     uni.switchTab({
       url: normalizedUrl,
+      // #ifdef H5 || WEB
       success: (_res: any) => {
-        // #ifdef H5 || WEB
         restoreSwitchTabQueryOnH5(normalizedUrl);
-        // #endif
       },
+      // #endif
       fail: (_err: any) => {
         uni.redirectTo({
           url: normalizedUrl,
