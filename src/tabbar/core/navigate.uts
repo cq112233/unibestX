@@ -129,10 +129,10 @@ function performSwitchTabbar(url: string, api: string = 'switchTabbar'): void {
     return;
   }
   if (selectedTabbarStrategy == TABBAR_STRATEGY_MAP.CUSTOM_TABBAR_WITHOUT_NATIVE || selectedTabbarStrategy == TABBAR_STRATEGY_MAP.NO_TABBAR) {
-    // 模式 0 通过 router 进入时，Router.switchTab() 已执行过本次守卫；
+    // 模式 0/3 通过 router 进入时，Router.switchTab() 已执行过本次守卫；
     // redirectTo 的底层拦截器只需放行，避免同一次导航重复触发 beforeEach。
-    // 模式 3 暂不改变既有行为。
-    if (api == 'router' && selectedTabbarStrategy == TABBAR_STRATEGY_MAP.NO_TABBAR) {
+    // 仅限定 router 来源，TabBar 点击等入口仍由 redirectTo 拦截器正常执行守卫。
+    if (api == 'router') {
       setBypassInterceptorOnce(true);
     }
     uni.redirectTo({

@@ -622,6 +622,167 @@ export function interceptNativeTabSwitch(targetPath: string): boolean {
   return allowed;
 }
 
+/**
+ * 记录 `onBackPress` 已补跑守卫的返回目标
+ *
+ * 支付宝真机会在 `onBackPress` 之后继续触发 `onAppRoute` / 页面 `onShow`，
+ * 这两条链路共用同一个守卫入口；仅靠 500ms 时间窗在真机转场较慢时会漏掉，
+ * 因此用目标路径做一次性消费标记，确保同一次原生返回只执行一次守卫。
+ */
+let nativeBackGuardHandledTarget: string = '';
+let nativeBackGuardHandledTime: number = 0;
+const NATIVE_BACK_GUARD_DEDUPE_WINDOW: number = 2000;
+
+/**
+ * 清理原生返回的待消费标记
+ */
+function clearNativeBackGuardHandled(): void {
+  nativeBackGuardHandledTarget = '';
+  nativeBackGuardHandledTime = 0;
+}
+
+/**
+ * 消费原生返回的待处理标记
+ *
+ * @param targetPath 路由完成事件 / 页面显示兜底检测到的目标路径
+ * @returns 本次事件是否已由 onBackPress 提前处理；true 时调用方应直接跳过
+ */
+function consumeNativeBackGuardHandled(targetPath: string): boolean {
+  if (nativeBackGuardHandledTarget == '') {
+    return false;
+  }
+  const target = cleanPath(targetPath);
+  if (target == '') {
+    return false;
+  }
+  if (!isSamePath(nativeBackGuardHandledTarget, target)) {
+    clearNativeBackGuardHandled();
+    return false;
+  }
+  if ((Date.now() - nativeBackGuardHandledTime) > NATIVE_BACK_GUARD_DEDUPE_WINDOW) {
+    clearNativeBackGuardHandled();
+    return false;
+  }
+  return true;
+}
+
+/**
+ * 原生返回拦截入口（供支付宝等不触发 navigateBack 拦截器的端调用）
+ *
+ * 支付宝小程序点击原生导航栏返回 / 手势返回时由宿主直接出栈，既不经过
+ * `uni.navigateBack` 拦截器，开发者工具也不提供 `my.createRouteObserver`。
+ * 页面级 `onBackPress` 是当前唯一稳定的前置信号，返回目标则从页面栈的上一页取得。
+ *
+ * 注意：支付宝运行时不消费页面 `onBackPress` 的返回值，因此本函数只负责执行守卫；
+ * 守卫拦截并改跳后，调用方仍需自行阻止原生出栈（见页面壳）。
+ *
+ * @param targetPath 返回目标路径；为空时自动取页面栈上一页
+ * @returns 守卫是否放行；被拦截时改跳由守卫链路统一派发
+ */
+export function interceptNativeBack(targetPath: string = ''): boolean {
+  let targetUrl = cleanPath(targetPath);
+  let fromPath = '';
+  let targetQuery = '';
+  try {
+    const pages = getCurrentPages();
+    if (pages.length > 0) {
+      const topIndex = pages.length - 1;
+      const topPage = pages[topIndex];
+      const topPath = cleanPath(topPage.route ?? '');
+      fromPath = cleanPath(routeState.path != '' ? routeState.path : topPath);
+
+      if (targetUrl == '') {
+        if (pages.length >= 2 && routeState.path != '' && !isSamePath(topPath, routeState.path)) {
+          // 宿主已先出栈：栈顶就是返回目标，routeState 仍是刚离开的页面
+          targetUrl = topPath;
+        }
+        else if (pages.length >= 2) {
+          // 宿主尚未出栈：上一页就是返回目标
+          targetUrl = cleanPath(pages[topIndex - 1].route ?? '');
+        }
+        else {
+          targetUrl = topPath;
+        }
+      }
+
+      let targetPage: UniPage | null = null;
+      if (isSamePath(cleanPath(targetUrl), topPath)) {
+        targetPage = topPage;
+      }
+      else if (topIndex >= 1) {
+        targetPage = pages[topIndex - 1];
+      }
+      const options: UTSJSONObject | null = targetPage != null ? (targetPage.options ?? null) : null;
+      if (options != null) {
+        const keys = UTSJSONObject.keys(options);
+        const pairs: string[] = [];
+        for (let i = 0; i < keys.length; i++) {
+          const key = keys[i];
+          const value = options[key];
+          if (value != null) {
+            pairs.push(`${key}=${encodeURIComponent(`${value}`)}`);
+          }
+        }
+        targetQuery = pairs.join('&');
+      }
+    }
+  }
+  catch { }
+
+  if (targetUrl == '') {
+    return true;
+  }
+
+  const targetFullPath = targetQuery != '' ? `${targetUrl}?${targetQuery}` : targetUrl;
+  const target = cleanPath(targetUrl);
+
+  // 防抖去重：onBackPress / onAppRoute / 页面 onShow 兜底可能已在 500ms 内处理过
+  if (isSamePath(lastHandledNavigateBackTarget, target) && (Date.now() - lastHandledNavigateBackTime) < 500) {
+    return true;
+  }
+  lastHandledNavigateBackTarget = target;
+  lastHandledNavigateBackTime = Date.now();
+
+  let fromTarget: RouteTarget | null = null;
+  if (routeState.path != '' && !isSamePath(routeState.path, target)) {
+    fromTarget = {
+      path: routeState.path,
+      query: routeState.query,
+      fullPath: routeState.fullPath,
+      params: routeState.params,
+      meta: routeState.meta,
+      name: routeState.name
+    } as RouteTarget;
+  }
+  else if (fromPath != '' && !isSamePath(fromPath, target)) {
+    fromTarget = {
+      path: fromPath,
+      query: new Map<string, string>(),
+      fullPath: fromPath,
+      params: new Map<string, string>(),
+      meta: getRouteMeta(fromPath),
+      name: getDefaultRouteName(fromPath)
+    } as RouteTarget;
+  }
+  else if (previousRouteState.path != '' && !isSamePath(previousRouteState.path, target)) {
+    fromTarget = {
+      path: previousRouteState.path,
+      query: previousRouteState.query,
+      fullPath: previousRouteState.fullPath,
+      params: previousRouteState.params,
+      meta: previousRouteState.meta,
+      name: previousRouteState.name
+    } as RouteTarget;
+  }
+
+  const allowed = doIntercept(targetFullPath, 'navigateBack', fromTarget);
+  if (allowed) {
+    nativeBackGuardHandledTarget = target;
+    nativeBackGuardHandledTime = Date.now();
+  }
+  return allowed;
+}
+
 export const switchTabInterceptor: Interceptor = {
   invoke(options: any): boolean {
     let url = '';
@@ -703,6 +864,7 @@ export function resetLastHandledNavigateBackTarget(): void {
   lastHandledNavigateBackTime = 0;
   silentBackCount = 0;
   isSilentBackPending = false;
+  clearNativeBackGuardHandled();
 }
 
 /**
@@ -913,6 +1075,11 @@ function installMpNavigateBackListener(): void {
 
       const targetPath = cleanPath(rawPath);
 
+      // onBackPress 已在支付宝真机提前补跑守卫时，路由完成事件只消费标记，不再重复执行
+      if (consumeNativeBackGuardHandled(targetPath)) {
+        return;
+      }
+
       // 防抖去重：如果最近 500ms 内已被 navigateBackInterceptor（如微信点击左上角返回）校验放行过，跳过重复校验
       if (isSamePath(lastHandledNavigateBackTarget, targetPath) && (Date.now() - lastHandledNavigateBackTime) < 500) {
         return;
@@ -984,6 +1151,11 @@ export function checkAndInterceptPageShow(targetPath: string = ''): boolean {
 
   // 1. 若全局路由状态尚未建立（冷启动），由 checkDirectEntry 负责，此处跳过
   if (routeState.path == '') {
+    return true;
+  }
+
+  // 支付宝真机在 onBackPress 之后还会走页面 onShow 兜底，同一目标已由原生返回入口处理则直接放行
+  if (consumeNativeBackGuardHandled(currentPath)) {
     return true;
   }
 

@@ -55,6 +55,7 @@ export function useTabPageShell(tabType: string): boolean {
   onTabItemTap((options): void => {
     interceptNativeTabSwitch(options.pagePath);
   });
+
   // #endif
 
   onHide((): void => {
@@ -63,6 +64,10 @@ export function useTabPageShell(tabType: string): boolean {
     }
   });
 
+  // 支付宝原生返回由 main.uts 的全局 onBackPress 统一补跑路由守卫；
+  // 这里再注册 App 专属的「再按一次退出」会在部分端产生重复页面级监听。
+  // #ifndef MP-ALIPAY
   useBackPressExit();
+  // #endif
   return false;
 }
