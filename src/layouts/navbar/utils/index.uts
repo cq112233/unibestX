@@ -81,6 +81,14 @@ export function onNavbarReachBottom(callback: () => void): void {
 export const EVENT_PULL_DOWN_REFRESH: string = 'onPagePullDownRefresh';
 export const EVENT_STOP_PULL_DOWN_REFRESH: string = 'stopPagePullDownRefresh';
 
+/** 应用是否仍处于可安全调用页面级 UI API 的状态；App 退到后台或退出时置为 false */
+let navbarRuntimeActive: boolean = true;
+
+/** 同步应用前后台状态，供下拉刷新等页面级 API 做销毁期保护 */
+export function setNavbarRuntimeActive(active: boolean): void {
+  navbarRuntimeActive = active;
+}
+
 /**
  * 监听 NavBar 布局下拉刷新事件
  * @param callback 下拉刷新回调，无参；数据加载结束后**必须自行调用 `stopNavbarPullDownRefresh()`**，
@@ -100,6 +108,11 @@ export function onNavbarPullDownRefresh(callback: () => void): void {
  */
 export function stopNavbarPullDownRefresh(): void {
   uni.$emit(EVENT_STOP_PULL_DOWN_REFRESH);
+  // App 退出 / 进入后台时 UI 上下文可能已释放，继续调用会在鸿蒙端触发
+  // `querySelector of undefined`，此处只清理业务状态，不再调用页面级 UI API。
+  if (!navbarRuntimeActive) {
+    return;
+  }
   uni.stopPullDownRefresh();
 }
 

@@ -1,8 +1,16 @@
-import { curIdx, setCurIdx, setCurIdxByPath, tabbarList } from './state.uts';
+import { curIdx, isPageTabbar, setCurIdx, setCurIdxByPath, tabbarList } from './state.uts';
 import { readTabPageFullPath, setTabPageUrl, syncTabPageHostUrl } from './tab-page.uts';
-import { isNativeTabbar, isSinglePageTabbar, selectedTabbarStrategy, TABBAR_STRATEGY_MAP } from './strategy.uts';
+import { isNativeTabbar, isSinglePageTabbar, needHideNativeTabbar, selectedTabbarStrategy, TABBAR_STRATEGY_MAP } from './strategy.uts';
 import { customTabbarConfig } from '../adapters/config.uts';
-import { useRouter } from '@/uni_modules/route-bestX/index.uts';
+import {
+  applyRouteFromUrl,
+  isSamePath,
+  markSilentNavigateBack,
+  parseUrlToObj,
+  routeState,
+  setBypassInterceptorOnce,
+  useRouter
+} from '@/uni_modules/route-bestX/index.uts';
 import { runTabNavigationGuard } from './tab-navigation.uts';
 import { safeHideNativeTabBar } from './native.uts';
 
@@ -11,8 +19,22 @@ function handleClickBulge(url: string = '/src/pages/ai/ai'): void {
   useRouter().push(url);
 }
 
-/** 读取当前虚拟 Tab 的完整 URL，作为下一次切换的来源。 */
+/** 读取当前页面或虚拟 Tab 的完整 URL，作为下一次切换的来源。 */
 function readCurrentTabFullPath(): string {
+  try {
+    const pages = getCurrentPages();
+    if (pages.length > 0) {
+      const topRoute = pages[pages.length - 1].route ?? '';
+      if (topRoute != '' && !isSamePath(topRoute, '/pages/index/index')) {
+        if (routeState.fullPath != '' && !isSamePath(routeState.path, '/pages/index/index')) {
+          return routeState.fullPath;
+        }
+        return topRoute.startsWith('/') ? topRoute : `/${topRoute}`;
+      }
+    }
+  }
+  catch { }
+
   const index = curIdx.value;
   if (index < 0 || index >= tabbarList.length) {
     return '';
@@ -31,16 +53,98 @@ function readCurrentTabFullPath(): string {
  */
 export function switchTabbar(url: string, api: string = 'switchTabbar'): void {
   if (!isSinglePageTabbar) {
-    performSwitchTabbar(url);
+    performSwitchTabbar(url, api);
+    return;
+  }
+  // 模式 4 经 Router.switchTab() 进入时，路由层已用 api: switchTab 执行过守卫；
+  // 这里只落地虚拟 Tab，避免同一次导航再以 api: router 重复执行一次 beforeEach。
+  if (api == 'router') {
+    performSwitchTabbar(url, api);
     return;
   }
   const fromUrl = readCurrentTabFullPath();
   runTabNavigationGuard(fromUrl, url, api, (allowed: boolean): void => {
     if (allowed) {
-      performSwitchTabbar(url);
+      performSwitchTabbar(url, api);
     }
   });
 }
+
+/**
+ * 模式 4 返回目标修正。
+ *
+ * 从子页面返回时，物理页面栈的上一页只会是宿主页；若直接交给守卫，
+ * `to` 会错误地变成宿主首页。这里按当前激活索引还原成对应的虚拟 Tab 路径及 query。
+ * 非模式 4、或返回目标本就不是 TabBar 页面时，原样返回，不影响普通页面返回。
+ */
+export function resolveTabbarBackTarget(url: string): string {
+  if (!isSinglePageTabbar) {
+    return url;
+  }
+  const targetPath = parseUrlToObj(url).path;
+  if (!isPageTabbar(targetPath)) {
+    return url;
+  }
+  const index = curIdx.value;
+  if (index < 0 || index >= tabbarList.length) {
+    return url;
+  }
+  return readTabPageFullPath(tabbarList[index].pagePath);
+}
+
+// #ifdef H5 || WEB
+/**
+ * H5 的 switchTab 协议会把 URL 截成 path（见 uni-h5 createNormalizeUrl），
+ * 导航成功后在地址栏补回 query，避免 router.push({ path, query }) 的地址栏丢参。
+ */
+function restoreSwitchTabQueryOnH5(url: string): void {
+  if (typeof window == 'undefined') {
+    return;
+  }
+  const queryIndex = url.indexOf('?');
+  if (queryIndex < 0) {
+    return;
+  }
+  const path = url.slice(0, queryIndex);
+  const query = url.slice(queryIndex);
+  // switchTab 成功时，同路径旧 Tab 的 onPageShow 可能已用缓存的旧 options
+  // 覆盖了 routeState 与 useRoute 快照；这里按地址栏真实目标再落盘一次。
+  applyRouteFromUrl(url);
+  const nextUrl = window.location.hash.startsWith('#/')
+    ? `#${path}${query}`
+    : `${window.location.pathname}${query}`;
+  const replaceHistoryUrl: () => void = (): void => {
+    try {
+      window.history.replaceState(window.history.state, '', nextUrl);
+    }
+    catch { }
+  };
+  try {
+    const app: any = getApp();
+    const appVm: any = app.vm;
+    if (appVm == null) {
+      replaceHistoryUrl();
+      return;
+    }
+    const vueRouter: any = appVm.$router;
+    if (vueRouter == null || typeof vueRouter.replace != 'function') {
+      replaceHistoryUrl();
+      return;
+    }
+    // 同时更新 Vue Router 的内部历史；否则进入二级页返回时，
+    // popstate 会按旧的无参路径还原，地址栏 query 再次丢失。
+    vueRouter.replace(url).then(
+      (): void => {},
+      (_err: any): void => {
+        replaceHistoryUrl();
+      }
+    );
+  }
+  catch {
+    replaceHistoryUrl();
+  }
+}
+// #endif
 
 /**
  * 根据当前 TabBar 模式安全跳转到指定的 Tabbar 页面
@@ -51,12 +155,13 @@ export function switchTabbar(url: string, api: string = 'switchTabbar'): void {
  *            单一 tabbar（单页仿真）模式下用于定位虚拟 Tab，并同步该 Tab 的 query；
  *            沙盒调试时目标页未编译，会退化为 toast 提示而非崩溃
  */
-function performSwitchTabbar(url: string): void {
+function performSwitchTabbar(url: string, api: string = 'switchTabbar'): void {
   const normalizedUrl = url.startsWith('/') ? url : `/${url}`;
   // 模式 4 没有真实页面切换：把路由 URL 中的 query 写入目标 Tab 的虚拟路由，
   // 这样 useTabPage() 里的 route.query 仍与普通页面 push({ query }) 的行为一致。
   if (isSinglePageTabbar) {
     setTabPageUrl(normalizedUrl);
+    applyRouteFromUrl(normalizedUrl);
   }
   setCurIdxByPath(normalizedUrl);
   if (isSinglePageTabbar) {
@@ -86,6 +191,7 @@ function performSwitchTabbar(url: string): void {
           // 宿主页已在页面栈中：通过 navigateBack 退回已有宿主页，销毁上层子页面，
           // 彻底防止 redirectTo 导致宿主页重复堆叠、子组件生命周期回调成倍累加！
           const delta = pages.length - 1 - hostIndex;
+          markSilentNavigateBack(1);
           uni.navigateBack({
             delta,
             success: () => {
@@ -106,6 +212,12 @@ function performSwitchTabbar(url: string): void {
     return;
   }
   if (selectedTabbarStrategy == TABBAR_STRATEGY_MAP.CUSTOM_TABBAR_WITHOUT_NATIVE || selectedTabbarStrategy == TABBAR_STRATEGY_MAP.NO_TABBAR) {
+    // 模式 0/3 通过 router 进入时，Router.switchTab() 已执行过本次守卫；
+    // redirectTo 的底层拦截器只需放行，避免同一次导航重复触发 beforeEach。
+    // 仅限定 router 来源，TabBar 点击等入口仍由 redirectTo 拦截器正常执行守卫。
+    if (api == 'router') {
+      setBypassInterceptorOnce(true);
+    }
     uni.redirectTo({
       url: normalizedUrl,
       fail: (_err: any) => {
@@ -122,9 +234,16 @@ function performSwitchTabbar(url: string): void {
     });
   }
   else {
-    safeHideNativeTabBar();
+    if (needHideNativeTabbar) {
+      safeHideNativeTabBar();
+    }
     uni.switchTab({
       url: normalizedUrl,
+      // #ifdef H5 || WEB
+      success: (_res: any) => {
+        restoreSwitchTabQueryOnH5(normalizedUrl);
+      },
+      // #endif
       fail: (_err: any) => {
         uni.redirectTo({
           url: normalizedUrl,

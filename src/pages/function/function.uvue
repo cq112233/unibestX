@@ -26,7 +26,6 @@ definePage(() => {
 useTabPageShell('function');
 
 const {
-  route: functionRoute,
   onLoad: onFunctionLoad,
   onShow: onFunctionShow,
   onHide: onFunctionHide
@@ -56,7 +55,6 @@ onFunctionLoad(() => {
   // 💡 模式4的映射关系中，/function.uvue 映射到的实际页面路由是/tab/index，这是因为tabbar/index.uts中定义了映射关系
   // 💡 模式4 useRoute 获取的还是index的
   // 🔔 模式4，tabbar切换时，不会走beforeEach，因为是index，是根容器, 如需拦截请自行处理src/tabbar/adapters/tab-navigation.uts，一般业务用不动，无需修改
-  console.log('功能页面路径', functionRoute.value.fullPath);
   console.log('onFunctionLoad', '功能 Tab 挂载了👋');
 });
 
