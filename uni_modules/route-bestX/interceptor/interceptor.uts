@@ -8,6 +8,7 @@ import {
   getDefaultHomePage,
   getDefaultRouteName,
   getRouteMeta,
+  getSavedRouteQuery,
   installRouteStateListener,
   previousRouteState,
   readMetaString,
@@ -422,10 +423,19 @@ function doIntercept(url: string, api: string, fromOverride: RouteTarget | null 
   }
   const resolvedUrl = resolveNavigationUrl(url, api);
   const urlObj = parseUrlToObj(resolvedUrl);
+  let targetQuery = urlObj.query;
+  // 小程序 switchTab 不支持 query，Tab 页的 page.options 会为空。
+  // 返回 Tab 页时回填最近一次保存的 query，保证 beforeEach 的 to 仍带完整参数。
+  if (api == 'navigateBack' && targetQuery.size == 0) {
+    const savedQuery = getSavedRouteQuery(urlObj.path);
+    if (savedQuery != null && savedQuery.size > 0) {
+      targetQuery = savedQuery;
+    }
+  }
 
   // fullPath 由 path + 解码后的 query 重拼（而不是直接用 resolvedUrl）：保持「解码态」口径，
   // 守卫拿它去 encodeURIComponent 时正好只编码一次
-  const queryStr = joinQueryString(urlObj.query);
+  const queryStr = joinQueryString(targetQuery);
   let fullPath = urlObj.path;
   if (queryStr != '') {
     fullPath += `?${queryStr}`;
@@ -444,7 +454,7 @@ function doIntercept(url: string, api: string, fromOverride: RouteTarget | null 
   // 嵌套字面量直传给 type 字段没有先例，Kotlin 侧推断不可靠，这里显式落到具体类型上
   const target: RouteTarget = {
     path: urlObj.path,
-    query: urlObj.query,
+    query: targetQuery,
     fullPath,
     params: new Map<string, string>(),
     meta,

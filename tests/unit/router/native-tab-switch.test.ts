@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   applyRouteFromUrl,
   checkAndInterceptPageShow,
+  clearRouteQuery,
   createRouter,
   installRouteInterceptor,
   interceptNativeBack,
@@ -14,6 +15,7 @@ import {
   resetLastHandledNavigateBackTarget,
   resetRegisteredErrorHandlers,
   resetRegisteredGuards,
+  saveRouteQuery,
   setBypassInterceptorOnce
 } from '@/uni_modules/route-bestX/index.uts';
 import { resolveTabbarBackTarget, switchTabbar } from '@/src/tabbar/core/navigate.uts';
@@ -235,6 +237,28 @@ describe('interceptNativeTabSwitch', () => {
     expect(guard).toHaveBeenCalledTimes(1);
     expect(guard.mock.calls[0][0].path).toBe('/src/pages/basic/basic');
     expect(guard.mock.calls[0][3]).toBe('navigateBack');
+  });
+
+  it('restores the saved query when a mini-program tab page returns without options', () => {
+    const basicQuery = new Map<string, string>();
+    basicQuery.set('a', '3');
+    saveRouteQuery('/src/pages/basic/basic', basicQuery);
+    vi.spyOn(globalThis as any, 'getCurrentPages').mockReturnValue([
+      { route: 'src/pages/basic/basic', options: {} },
+      { route: 'src/sub/modalBasicDemo/modalBasicDemo', options: { a: '1', b: '2' } }
+    ]);
+    applyRouteFromUrl('/src/sub/modalBasicDemo/modalBasicDemo?a=1&b=2');
+    const guard = vi.fn((_to: any, _from: any, next: any): void => {
+      next();
+    });
+    registerBeforeEach(guard as any);
+
+    expect(navigateBackInterceptor.invoke({ delta: 1 })).toBe(true);
+
+    expect(guard.mock.calls[0][0].fullPath).toBe('/src/pages/basic/basic?a=3');
+    expect(guard.mock.calls[0][0].query.get('a')).toBe('3');
+    expect(guard.mock.calls[0][3]).toBe('navigateBack');
+    clearRouteQuery('/src/pages/basic/basic');
   });
 
   it('resolves native back from the current top page after Alipay already popped the stack', () => {
