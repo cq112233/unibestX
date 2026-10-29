@@ -1,9 +1,11 @@
 <script setup lang="uts">
+import { computed } from 'vue';
 import { curIdx, resolveTabIndexByKey, useTabPage, useTabPageShell } from '@/src/tabbar/index.uts';
 import { onNavbarPullDownRefresh, stopNavbarPullDownRefresh } from '@/src/layouts/navbar/utils/index.uts';
-import { useRouter } from '@/uni_modules/route-bestX/index.uts';
+import { useRoute, useRouter } from '@/uni_modules/route-bestX/index.uts';
 
 definePage({
+  name: 'basic', // 路由名：供 router.push({ name: 'basic', params }) 命中本页
   debug: false,
   layout: 'navbar',
   showBack: false,
@@ -26,6 +28,32 @@ const {
 } = useTabPage();
 
 const router = useRouter();
+
+/** 本页路由（响应式、只读）：从首页「路由跳转示例」带参数切进来时，query 在这里读到 */
+const route = useRoute();
+
+type RouteQueryRow = {
+  key: string;
+  value: string;
+};
+
+/** query 是 Map，模板里 v-for 前先摊成数组 */
+const routeQueryRows = computed((): RouteQueryRow[] => {
+  const rows: RouteQueryRow[] = [];
+  route.query.forEach((value: string, key: string): void => {
+    rows.push({ key, value } as RouteQueryRow);
+  });
+  return rows;
+});
+
+/** route.name 可能为 null，展示前先兜底 */
+const routeNameText = computed((): string => {
+  const name = route.name;
+  if (name == null) {
+    return 'null';
+  }
+  return name;
+});
 
 // 监听 navbar 自定义下拉刷新事件
 onNavbarPullDownRefresh(() => {
@@ -190,6 +218,36 @@ function copyCleanDemoCommand(): void {
 
 <template>
   <view class="flex-col p-[16px]">
+    <!-- 当前路由参数（useRoute）：由首页「路由跳转示例」带不同 query 切进来时实时刷新 -->
+    <view class="rounded-[12px] p-[12px] mb-[16px] bg-[#ffffff] border-[1px] border-solid border-[#e2e8f0]">
+      <view class="flex flex-row items-center justify-between mb-[8px]">
+        <text class="text-[13px] font-bold text-[#1e293b]">🧭 当前路由参数（useRoute）</text>
+        <text class="text-[10px] text-[#94a3b8]">切走再回来自动刷新</text>
+      </view>
+      <view class="flex flex-row items-start justify-between mb-[4px]">
+        <text class="text-[11px] text-[#64748b] mr-[10px]">route.path</text>
+        <text class="text-[11px] font-bold text-[#1e293b] flex-1 text-right" style="font-family: monospace;">{{ route.path }}</text>
+      </view>
+      <view class="flex flex-row items-center justify-between mb-[4px]">
+        <text class="text-[11px] text-[#64748b] mr-[10px]">route.name</text>
+        <text class="text-[11px] font-bold text-[#1e293b]">{{ routeNameText }}</text>
+      </view>
+      <view class="flex flex-row items-center justify-between">
+        <text class="text-[11px] text-[#64748b] mr-[10px]">route.query</text>
+        <text class="text-[11px] font-bold text-[#1e293b]">{{ routeQueryRows.length }} 项</text>
+      </view>
+      <view v-for="row in routeQueryRows" :key="row.key" class="flex flex-row items-center justify-between mt-[4px] pl-[8px]">
+        <text class="text-[11px] text-[#7c3aed] mr-[10px]" style="font-family: monospace;">{{ row.key }}</text>
+        <text class="text-[11px] font-bold text-[#1e293b] flex-1 text-right" style="font-family: monospace;">{{ row.value }}</text>
+      </view>
+      <text v-if="routeQueryRows.length == 0" class="text-[11px] leading-[16px] text-[#94a3b8] mt-[4px]">
+        本页暂无 query 参数：从首页「路由跳转示例」点按钮带参数进入，这里会实时显示。
+      </text>
+      <text class="text-[10px] leading-[16px] text-[#b45309] mt-[6px]">
+        🔔 官方 uni.switchTab 路径不能带参数：这里能读到 query，是本项目自定义 TabBar 路由层的兼容能力，一般业务页可直接使用；特殊场景请自行改用 store / 全局状态。
+      </text>
+    </view>
+
     <!-- 顶部开发指引提示（正式业务可直接移除） -->
     <view class="rounded-[12px] p-[12px] mb-[16px] bg-[#eff6ff] border-[1px] border-solid border-[#bfdbfe] flex flex-row items-start">
       <text class="text-[14px] mr-[6px]">💡</text>

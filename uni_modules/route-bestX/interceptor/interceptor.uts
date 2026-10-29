@@ -438,7 +438,7 @@ function resolveFromRouteTarget(): RouteTarget {
         path,
         query,
         fullPath,
-        params: new Map<string, string>(),
+        params: query,
         meta,
         name: routeName
       } as RouteTarget;
@@ -470,8 +470,8 @@ function doIntercept(url: string, api: string, fromOverride: RouteTarget | null 
   const urlObj = parseUrlToObj(resolvedUrl);
   let targetQuery = urlObj.query;
   // 小程序 switchTab 不支持 query，Tab 页的 page.options 会为空。
-  // 返回 Tab 页时回填最近一次保存的 query，保证 beforeEach 的 to 仍带完整参数。
-  if (api == 'navigateBack' && targetQuery.size == 0) {
+  // 仅在切 Tab 或返回 Tab 页时回填最近一次保存的 query，避免普通导航误用旧参数。
+  if ((api == 'switchTab' || api == 'navigateBack') && targetQuery.size == 0) {
     const savedQuery = getSavedRouteQuery(urlObj.path);
     if (savedQuery != null && savedQuery.size > 0) {
       targetQuery = savedQuery;
@@ -501,7 +501,7 @@ function doIntercept(url: string, api: string, fromOverride: RouteTarget | null 
     path: urlObj.path,
     query: targetQuery,
     fullPath,
-    params: new Map<string, string>(),
+    params: targetQuery,
     meta,
     name: routeName
   } as RouteTarget;
@@ -707,6 +707,44 @@ export function interceptNativeTabSwitch(targetPath: string): boolean {
 let nativeBackGuardHandledTarget: string = '';
 let nativeBackGuardHandledTime: number = 0;
 const NATIVE_BACK_GUARD_DEDUPE_WINDOW: number = 2000;
+
+/**
+ * navigateBack 拦截器刚刚产出的裁决。
+ *
+ * App 硬件返回通常先走 navigateBack 拦截器，再触发页面 onBackPress；
+ * onBackPress 必须复用这次裁决，否则会在路由状态已更新后二次计算，
+ * 把「返回上一页」误判成「前往已退出的页面」。
+ */
+let navigateBackInterceptorVerdict: boolean | null = null;
+let navigateBackInterceptorVerdictTime: number = 0;
+const NAVIGATE_BACK_INTERCEPTOR_DEDUPE_WINDOW: number = 100;
+
+/**
+ * 消费 navigateBack 拦截器刚产出的裁决
+ * @returns 最近一次拦截器裁决；没有可用裁决时返回 null
+ */
+export function consumeNavigateBackInterceptorVerdict(): boolean | null {
+  if (navigateBackInterceptorVerdict == null) {
+    return null;
+  }
+  if ((Date.now() - navigateBackInterceptorVerdictTime) > NAVIGATE_BACK_INTERCEPTOR_DEDUPE_WINDOW) {
+    navigateBackInterceptorVerdict = null;
+    navigateBackInterceptorVerdictTime = 0;
+    return null;
+  }
+  const verdict = navigateBackInterceptorVerdict;
+  navigateBackInterceptorVerdict = null;
+  navigateBackInterceptorVerdictTime = 0;
+  return verdict;
+}
+
+/**
+ * 记录 navigateBack 拦截器的裁决，供随后的 onBackPress 一次性消费
+ */
+function markNavigateBackInterceptorVerdict(allowed: boolean): void {
+  navigateBackInterceptorVerdict = allowed;
+  navigateBackInterceptorVerdictTime = Date.now();
+}
 
 /**
  * 清理原生返回的待消费标记
@@ -931,6 +969,8 @@ export function markSilentNavigateBack(count: number = 1): void {
  */
 export function resetLastHandledNavigateBackTarget(): void {
   navigateBackGuardVerdict = null;
+  navigateBackInterceptorVerdict = null;
+  navigateBackInterceptorVerdictTime = 0;
   lastSilentNavigateBackTime = 0;
   rootBackExitPendingTime = 0;
   silentBackCount = 0;
@@ -1029,10 +1069,12 @@ export const navigateBackInterceptor: Interceptor = {
         const targetKey = cleanPath(path);
         const cachedVerdict = readGuardVerdict(navigateBackGuardVerdict, targetKey, ROUTE_GUARD_DEDUPE_WINDOW);
         if (cachedVerdict != null) {
+          markNavigateBackInterceptorVerdict(cachedVerdict.allowed);
           return cachedVerdict.allowed;
         }
         const allowed = allowNavigation(url, 'navigateBack');
         navigateBackGuardVerdict = createGuardVerdict(targetKey, allowed);
+        markNavigateBackInterceptorVerdict(allowed);
         return allowed;
       }
     }
