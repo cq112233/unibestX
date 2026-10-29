@@ -43,7 +43,7 @@ export class RouteLocation {
     this._query.value = value;
   }
 
-  /** 恒为空 Map：uni-app X 无动态路由段，仅为与 vue-router 形态保持一致 */
+  /** 路由参数，与 query 同值（命名路由的 params 最终也会落到 query） */
   get params(): Map<string, string> {
     return this._params.value;
   }

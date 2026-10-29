@@ -86,6 +86,47 @@ function markTargetRoute(url: string): void {
 
 let bypassInterceptorOnce: boolean = false;
 
+/** 路由守卫去重窗口：同一目标在窗口内复用上一次裁决，避免重复执行守卫与改跳 */
+const ROUTE_GUARD_DEDUPE_WINDOW: number = 500;
+/** H5 popstate 与拦截器之间的去重窗口（浏览器历史事件存在额外延迟） */
+const H5_POPSTATE_DEDUPE_WINDOW: number = 1000;
+
+/** 一次路由守卫裁决的缓存记录 */
+type GuardVerdict = {
+  target: string;
+  allowed: boolean;
+  time: number;
+};
+
+let switchTabGuardVerdict: GuardVerdict | null = null;
+let navigateBackGuardVerdict: GuardVerdict | null = null;
+
+/**
+ * 读取窗口内同一目标的裁决结果
+ * @returns 命中时返回缓存裁决；未命中或已过期返回 null
+ */
+function readGuardVerdict(verdict: GuardVerdict | null, target: string, windowMs: number): GuardVerdict | null {
+  if (verdict == null) {
+    return null;
+  }
+  if (!isSamePath(verdict.target, target)) {
+    return null;
+  }
+  if ((Date.now() - verdict.time) >= windowMs) {
+    return null;
+  }
+  return verdict;
+}
+
+/** 构造一条守卫裁决缓存 */
+function createGuardVerdict(target: string, allowed: boolean): GuardVerdict {
+  return {
+    target: cleanPath(target),
+    allowed,
+    time: Date.now()
+  } as GuardVerdict;
+}
+
 /**
  * 设置是否跳过下一次路由拦截器（针对 router.push(url, false) 等指令式跳过场景）
  */
@@ -114,11 +155,15 @@ export function allowNavigation(url: string, api: string): boolean {
     return true;
   }
   if (api == 'switchTab') {
-    const cleanTarget = cleanPath(url);
-    lastHandledSwitchTabTarget = cleanTarget;
-    lastHandledSwitchTabTime = Date.now();
+    const cachedVerdict = readGuardVerdict(switchTabGuardVerdict, cleanPath(resolvedUrl), ROUTE_GUARD_DEDUPE_WINDOW);
+    if (cachedVerdict != null) {
+      return cachedVerdict.allowed;
+    }
   }
   const allowed = doIntercept(resolvedUrl, api);
+  if (api == 'switchTab') {
+    switchTabGuardVerdict = createGuardVerdict(resolvedUrl, allowed);
+  }
   if (allowed) {
     markTargetRoute(resolvedUrl);
   }
@@ -393,7 +438,7 @@ function resolveFromRouteTarget(): RouteTarget {
         path,
         query,
         fullPath,
-        params: new Map<string, string>(),
+        params: query,
         meta,
         name: routeName
       } as RouteTarget;
@@ -425,8 +470,8 @@ function doIntercept(url: string, api: string, fromOverride: RouteTarget | null 
   const urlObj = parseUrlToObj(resolvedUrl);
   let targetQuery = urlObj.query;
   // 小程序 switchTab 不支持 query，Tab 页的 page.options 会为空。
-  // 返回 Tab 页时回填最近一次保存的 query，保证 beforeEach 的 to 仍带完整参数。
-  if (api == 'navigateBack' && targetQuery.size == 0) {
+  // 仅在切 Tab 或返回 Tab 页时回填最近一次保存的 query，避免普通导航误用旧参数。
+  if ((api == 'switchTab' || api == 'navigateBack') && targetQuery.size == 0) {
     const savedQuery = getSavedRouteQuery(urlObj.path);
     if (savedQuery != null && savedQuery.size > 0) {
       targetQuery = savedQuery;
@@ -456,7 +501,7 @@ function doIntercept(url: string, api: string, fromOverride: RouteTarget | null 
     path: urlObj.path,
     query: targetQuery,
     fullPath,
-    params: new Map<string, string>(),
+    params: targetQuery,
     meta,
     name: routeName
   } as RouteTarget;
@@ -590,11 +635,6 @@ export const reLaunchInterceptor: Interceptor = {
   }
 };
 
-/** 最近一次由 switchTab 拦截/守卫处理放行的目标 url（用于防重复校验） */
-let lastHandledSwitchTabTarget: string = '';
-/** 最近一次由 switchTab 拦截/守卫处理放行的时间戳 */
-let lastHandledSwitchTabTime: number = 0;
-
 /** 原生 TabBar 切换的统一守卫入口（onBeforeAppRoute / onAppRoute / onTabItemTap 共用） */
 function runNativeTabSwitchGuard(targetPath: string): boolean {
   const target = cleanPath(targetPath);
@@ -602,9 +642,10 @@ function runNativeTabSwitchGuard(targetPath: string): boolean {
     return true;
   }
 
-  // 防抖去重：onAppRoute / switchTab 拦截器 / 页面 onShow 兜底可能已在 500ms 内处理过
-  if (isSamePath(lastHandledSwitchTabTarget, target) && (Date.now() - lastHandledSwitchTabTime) < 500) {
-    return true;
+  // 防抖去重：窗口内复用同一目标上一次裁决，拒绝结果不得被当成放行
+  const cachedVerdict = readGuardVerdict(switchTabGuardVerdict, target, ROUTE_GUARD_DEDUPE_WINDOW);
+  if (cachedVerdict != null) {
+    return cachedVerdict.allowed;
   }
 
   let fromTarget: RouteTarget | null = null;
@@ -629,10 +670,9 @@ function runNativeTabSwitchGuard(targetPath: string): boolean {
     } as RouteTarget;
   }
 
-  lastHandledSwitchTabTarget = target;
-  lastHandledSwitchTabTime = Date.now();
-
-  return doIntercept(target, 'switchTab', fromTarget);
+  const allowed = doIntercept(target, 'switchTab', fromTarget);
+  switchTabGuardVerdict = createGuardVerdict(target, allowed);
+  return allowed;
 }
 
 /**
@@ -667,6 +707,44 @@ export function interceptNativeTabSwitch(targetPath: string): boolean {
 let nativeBackGuardHandledTarget: string = '';
 let nativeBackGuardHandledTime: number = 0;
 const NATIVE_BACK_GUARD_DEDUPE_WINDOW: number = 2000;
+
+/**
+ * navigateBack 拦截器刚刚产出的裁决。
+ *
+ * App 硬件返回通常先走 navigateBack 拦截器，再触发页面 onBackPress；
+ * onBackPress 必须复用这次裁决，否则会在路由状态已更新后二次计算，
+ * 把「返回上一页」误判成「前往已退出的页面」。
+ */
+let navigateBackInterceptorVerdict: boolean | null = null;
+let navigateBackInterceptorVerdictTime: number = 0;
+const NAVIGATE_BACK_INTERCEPTOR_DEDUPE_WINDOW: number = 100;
+
+/**
+ * 消费 navigateBack 拦截器刚产出的裁决
+ * @returns 最近一次拦截器裁决；没有可用裁决时返回 null
+ */
+export function consumeNavigateBackInterceptorVerdict(): boolean | null {
+  if (navigateBackInterceptorVerdict == null) {
+    return null;
+  }
+  if ((Date.now() - navigateBackInterceptorVerdictTime) > NAVIGATE_BACK_INTERCEPTOR_DEDUPE_WINDOW) {
+    navigateBackInterceptorVerdict = null;
+    navigateBackInterceptorVerdictTime = 0;
+    return null;
+  }
+  const verdict = navigateBackInterceptorVerdict;
+  navigateBackInterceptorVerdict = null;
+  navigateBackInterceptorVerdictTime = 0;
+  return verdict;
+}
+
+/**
+ * 记录 navigateBack 拦截器的裁决，供随后的 onBackPress 一次性消费
+ */
+function markNavigateBackInterceptorVerdict(allowed: boolean): void {
+  navigateBackInterceptorVerdict = allowed;
+  navigateBackInterceptorVerdictTime = Date.now();
+}
 
 /**
  * 清理原生返回的待消费标记
@@ -771,12 +849,11 @@ export function interceptNativeBack(targetPath: string = ''): boolean {
   const targetFullPath = targetQuery != '' ? `${targetUrl}?${targetQuery}` : targetUrl;
   const target = cleanPath(targetUrl);
 
-  // 防抖去重：onBackPress / onAppRoute / 页面 onShow 兜底可能已在 500ms 内处理过
-  if (isSamePath(lastHandledNavigateBackTarget, target) && (Date.now() - lastHandledNavigateBackTime) < 500) {
-    return true;
+  // 防抖去重：窗口内复用同一目标上一次裁决，拒绝结果不得被当成放行
+  const cachedVerdict = readGuardVerdict(navigateBackGuardVerdict, target, ROUTE_GUARD_DEDUPE_WINDOW);
+  if (cachedVerdict != null) {
+    return cachedVerdict.allowed;
   }
-  lastHandledNavigateBackTarget = target;
-  lastHandledNavigateBackTime = Date.now();
 
   let fromTarget: RouteTarget | null = null;
   if (routeState.path != '' && !isSamePath(routeState.path, target)) {
@@ -811,6 +888,7 @@ export function interceptNativeBack(targetPath: string = ''): boolean {
   }
 
   const allowed = doIntercept(targetFullPath, 'navigateBack', fromTarget);
+  navigateBackGuardVerdict = createGuardVerdict(target, allowed);
   if (allowed) {
     nativeBackGuardHandledTarget = target;
     nativeBackGuardHandledTime = Date.now();
@@ -831,16 +909,7 @@ export const switchTabInterceptor: Interceptor = {
       url = (urlObj.url != null) ? (urlObj.url as string) : '';
       // #endif
     }
-    const cleanTarget = cleanPath(url);
-    let allowed = true;
-    if (isSamePath(lastHandledSwitchTabTarget, cleanTarget) && (Date.now() - lastHandledSwitchTabTime) < 500) {
-      allowed = true;
-    }
-    else {
-      lastHandledSwitchTabTarget = cleanTarget;
-      lastHandledSwitchTabTime = Date.now();
-      allowed = allowNavigation(url, 'switchTab');
-    }
+    const allowed = allowNavigation(url, 'switchTab');
     if (!allowed) {
       return false;
     }
@@ -874,10 +943,8 @@ export const switchTabInterceptor: Interceptor = {
   }
 };
 
-/** 最近一次由 navigateBack 拦截/守卫处理放行的目标 url（用于防重复校验） */
-let lastHandledNavigateBackTarget: string = '';
-/** 最近一次由 navigateBack 拦截/守卫处理放行的时间戳 */
-let lastHandledNavigateBackTime: number = 0;
+/** 最近一次内部静默回退的时间戳（供 popstate 消费，不参与守卫去重） */
+let lastSilentNavigateBackTime: number = 0;
 /** 根页返回放行时间；用于放行系统退出时静默吞掉随后的底层 navigateBack 失败 */
 let rootBackExitPendingTime: number = 0;
 const ROOT_BACK_EXIT_WINDOW: number = 2000;
@@ -894,19 +961,28 @@ let isSilentBackPending: boolean = false;
 export function markSilentNavigateBack(count: number = 1): void {
   silentBackCount = count;
   isSilentBackPending = true;
-  lastHandledNavigateBackTime = Date.now();
+  lastSilentNavigateBackTime = Date.now();
 }
 
 /**
  * 重置 navigateBack 防重复记录（供单测等环境复位）
  */
 export function resetLastHandledNavigateBackTarget(): void {
-  lastHandledNavigateBackTarget = '';
-  lastHandledNavigateBackTime = 0;
+  navigateBackGuardVerdict = null;
+  navigateBackInterceptorVerdict = null;
+  navigateBackInterceptorVerdictTime = 0;
+  lastSilentNavigateBackTime = 0;
   rootBackExitPendingTime = 0;
   silentBackCount = 0;
   isSilentBackPending = false;
   clearNativeBackGuardHandled();
+}
+
+/**
+ * 重置 switchTab 防重复裁决缓存（供单测等环境复位）
+ */
+export function resetLastHandledSwitchTabTarget(): void {
+  switchTabGuardVerdict = null;
 }
 
 /**
@@ -918,7 +994,7 @@ export const navigateBackInterceptor: Interceptor = {
     if (silentBackCount > 0) {
       silentBackCount--;
       isSilentBackPending = true;
-      lastHandledNavigateBackTime = Date.now();
+      lastSilentNavigateBackTime = Date.now();
       return true;
     }
     const pages = getCurrentPages();
@@ -990,11 +1066,15 @@ export const navigateBackInterceptor: Interceptor = {
           queryStr = pairs.join('&');
         }
         const url = queryStr != '' ? `${path}?${queryStr}` : path;
-        const allowed = allowNavigation(url, 'navigateBack');
-        if (allowed) {
-          lastHandledNavigateBackTarget = cleanPath(path);
-          lastHandledNavigateBackTime = Date.now();
+        const targetKey = cleanPath(path);
+        const cachedVerdict = readGuardVerdict(navigateBackGuardVerdict, targetKey, ROUTE_GUARD_DEDUPE_WINDOW);
+        if (cachedVerdict != null) {
+          markNavigateBackInterceptorVerdict(cachedVerdict.allowed);
+          return cachedVerdict.allowed;
         }
+        const allowed = allowNavigation(url, 'navigateBack');
+        navigateBackGuardVerdict = createGuardVerdict(targetKey, allowed);
+        markNavigateBackInterceptorVerdict(allowed);
         return allowed;
       }
     }
@@ -1036,7 +1116,7 @@ function installH5PopstateListener(): void {
   if (typeof window != 'undefined') {
     window.addEventListener('popstate', () => {
       // 若刚发生了内部静默回退，直接消费并跳过，防止污染全局虚拟路由与重复触发守卫
-      if (isSilentBackPending && (Date.now() - lastHandledNavigateBackTime) < 2000) {
+      if (isSilentBackPending && (Date.now() - lastSilentNavigateBackTime) < 2000) {
         isSilentBackPending = false;
         return;
       }
@@ -1055,14 +1135,14 @@ function installH5PopstateListener(): void {
         if (targetPath == '/' || targetPath == '') {
           targetPath = getDefaultHomePage();
         }
-        // 防抖去重：如果最近 1000ms 内已被 navigateBackInterceptor 处理过，跳过重复校验
-        if (isSamePath(lastHandledNavigateBackTarget, targetPath) && (Date.now() - lastHandledNavigateBackTime) < 1000) {
+        // 防抖去重：窗口内复用同一目标上一次裁决，拒绝结果也不得再次派发改跳
+        const cachedVerdict = readGuardVerdict(navigateBackGuardVerdict, targetPath, H5_POPSTATE_DEDUPE_WINDOW);
+        if (cachedVerdict != null) {
           return;
         }
-        lastHandledNavigateBackTarget = targetPath;
-        lastHandledNavigateBackTime = Date.now();
         // 同步执行守卫裁决并在放行时预写目标路由，确保后续挂载的目标页面 setup 中第一帧读到正确的新路由
-        allowNavigation(h5Url, 'popstate');
+        const allowed = allowNavigation(h5Url, 'popstate');
+        navigateBackGuardVerdict = createGuardVerdict(targetPath, allowed);
       }
     }, true);
   }
@@ -1081,7 +1161,7 @@ function installH5PopstateListener(): void {
  * 2. 支付宝小程序无论是点击导航栏还是手势返回，均由宿主 Native 出栈绕过 navigateBack 拦截器；
  * 3. 本监听必须先于 installRouteStateListener 注册，确保在 routeState 被 handleAppRoute 冲刷前
  *    先提取离开前的原始来源路由快照（fromTarget），避免出现 to 与 from 相同的时序覆盖 Bug；
- * 4. 配合 lastHandledNavigateBackTarget 防抖去重，防止微信等平台点击返回触发拦截器后又在 onAppRoute 重复执行守卫。
+ * 4. 配合 navigateBackGuardVerdict 防抖去重，防止微信等平台点击返回触发拦截器后又在 onAppRoute 重复执行守卫。
  */
 function installMpNavigateBackListener(): void {
   uni.onAppRoute((event: AppRouteEvent): void => {
@@ -1134,13 +1214,11 @@ function installMpNavigateBackListener(): void {
         return;
       }
 
-      // 防抖去重：如果最近 500ms 内已被 navigateBackInterceptor（如微信点击左上角返回）校验放行过，跳过重复校验
-      if (isSamePath(lastHandledNavigateBackTarget, targetPath) && (Date.now() - lastHandledNavigateBackTime) < 500) {
+      // 防抖去重：窗口内复用同一目标上一次裁决，拒绝结果也不得再次派发改跳
+      const cachedVerdict = readGuardVerdict(navigateBackGuardVerdict, targetPath, ROUTE_GUARD_DEDUPE_WINDOW);
+      if (cachedVerdict != null) {
         return;
       }
-
-      lastHandledNavigateBackTarget = targetPath;
-      lastHandledNavigateBackTime = Date.now();
 
       // 捕获返回前的真实来源路由快照：
       // 1. 若当前 routeState.path 尚未被覆盖（不等于 targetPath），则 routeState 依然是离开页；
@@ -1167,7 +1245,8 @@ function installMpNavigateBackListener(): void {
         } as RouteTarget;
       }
 
-      doIntercept(url, 'navigateBack', fromTarget);
+      const allowed = doIntercept(url, 'navigateBack', fromTarget);
+      navigateBackGuardVerdict = createGuardVerdict(targetPath, allowed);
     }
   });
 }
@@ -1242,12 +1321,11 @@ export function checkAndInterceptPageShow(targetPath: string = ''): boolean {
   // 2. 原生底栏 TabBar 切换检测（专为解决支付宝小程序等端原生底栏切换不走 API 且不触发 onAppRoute 的问题）
   const isTargetTabbar = customTabbarHandler != null ? customTabbarHandler!.isTabbar(currentPath) : false;
   if (isTargetTabbar && !isSamePath(routeState.path, currentPath)) {
-    // 防抖去重：如果最近 500ms 内已被代码调用 switchTab 或拦截器处理过，跳过
-    if (isSamePath(lastHandledSwitchTabTarget, currentPath) && (Date.now() - lastHandledSwitchTabTime) < 500) {
-      return true;
+    // 防抖去重：窗口内复用同一目标上一次裁决，拒绝结果不得被当成放行
+    const cachedVerdict = readGuardVerdict(switchTabGuardVerdict, currentPath, ROUTE_GUARD_DEDUPE_WINDOW);
+    if (cachedVerdict != null) {
+      return cachedVerdict.allowed;
     }
-    lastHandledSwitchTabTarget = currentPath;
-    lastHandledSwitchTabTime = Date.now();
 
     const fromTarget: RouteTarget = {
       path: routeState.path,
@@ -1259,6 +1337,7 @@ export function checkAndInterceptPageShow(targetPath: string = ''): boolean {
     } as RouteTarget;
 
     const allowed = doIntercept(toUrl, 'switchTab', fromTarget);
+    switchTabGuardVerdict = createGuardVerdict(currentPath, allowed);
     if (!allowed) {
       return false;
     }
@@ -1280,15 +1359,13 @@ export function checkAndInterceptPageShow(targetPath: string = ''): boolean {
     return true;
   }
 
-  // 3. 防抖去重：如果最近 500ms 内已被 navigateBackInterceptor 或 onAppRoute 处理过，跳过
-  if (isSamePath(lastHandledNavigateBackTarget, currentPath) && (Date.now() - lastHandledNavigateBackTime) < 500) {
-    return true;
+  // 3. 防抖去重：窗口内复用同一目标上一次裁决，拒绝结果不得被当成放行
+  const cachedVerdict = readGuardVerdict(navigateBackGuardVerdict, currentPath, ROUTE_GUARD_DEDUPE_WINDOW);
+  if (cachedVerdict != null) {
+    return cachedVerdict.allowed;
   }
 
   // 4. 此时检测到状态脱节：用户原先在 routeState.path，通过手势直接返回到了 currentPath
-  lastHandledNavigateBackTarget = currentPath;
-  lastHandledNavigateBackTime = Date.now();
-
   // 构建来源路由快照（用户刚刚离开的上一活跃页面）
   const fromTarget: RouteTarget = {
     path: routeState.path,
@@ -1301,6 +1378,7 @@ export function checkAndInterceptPageShow(targetPath: string = ''): boolean {
 
   // 执行路由守卫拦截
   const allowed = doIntercept(toUrl, 'navigateBack', fromTarget);
+  navigateBackGuardVerdict = createGuardVerdict(currentPath, allowed);
   if (!allowed) {
     return false;
   }
