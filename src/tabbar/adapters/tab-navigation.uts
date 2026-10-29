@@ -34,7 +34,7 @@ function toRouteTarget(url: string): RouteTarget {
     path: urlObj.path,
     query: urlObj.query,
     fullPath: url,
-    params: new Map<string, string>(),
+    params: urlObj.query,
     meta,
     name: routeName
   } as RouteTarget;

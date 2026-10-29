@@ -571,18 +571,39 @@ function commitRoute(path: string, query: Map<string, string>, fullPath: string,
       prevQuery.set(k, v);
     });
     previousRouteState.query = prevQuery;
+    const prevParams = new Map<string, string>();
+    routeState.params.forEach((v: string, k: string) => {
+      prevParams.set(k, v);
+    });
+    previousRouteState.params = prevParams;
+    previousRouteState.meta = routeState.meta;
+    previousRouteState.name = routeState.name;
   }
   else if (routeState.path == '' && previousRouteState.path == '') {
     const cur = getCurrentPath();
     if (cur != '' && !isSamePath(cur, normalizedPath)) {
+      const prevQuery = queryMapFromObject(getCurrentPageOptions());
+      const prevMeta = getRouteMeta(cur);
+      let prevName: string | null = null;
+      if (prevMeta != null) {
+        prevName = readMetaString(prevMeta, 'name');
+      }
+      if (prevName == null || prevName == '') {
+        prevName = getDefaultRouteName(cur);
+      }
       previousRouteState.path = cur;
-      previousRouteState.fullPath = cur;
+      previousRouteState.fullPath = buildFullPath(cur, prevQuery);
+      previousRouteState.query = prevQuery;
+      previousRouteState.params = prevQuery;
+      previousRouteState.meta = prevMeta;
+      previousRouteState.name = prevName;
     }
   }
   const meta = getRouteMeta(normalizedPath);
   routeState.path = normalizedPath;
   routeState.fullPath = finalFullPath;
   routeState.query = finalQuery;
+  routeState.params = finalQuery;
   routeState.meta = meta;
   let routeName: string | null = null;
   if (meta != null) {

@@ -58,6 +58,7 @@ export function setupRouteGuards(router: Router): void {
   // 1. 注册全局前置守卫（责任链流水线）
   router.beforeEach((to: RouteTarget, from: RouteTarget, next: NextFunction, api?: string): any | null => {
     // #ifdef H5 || WEB
+    console.log(to.meta, to.name, to.query, to.params);
     console.log(
       `%c[Router beforeEach]%c 路由跳转 %c to: %c${to.fullPath != '' ? to.fullPath : to.path} %c from: %c${from.fullPath != '' ? from.fullPath : from.path} %c api: %c${api != null ? api : ''}`,
       'background: #2563eb; color: #ffffff; padding: 2px 6px; border-radius: 3px; font-weight: bold;',
@@ -71,6 +72,7 @@ export function setupRouteGuards(router: Router): void {
     );
     // #endif
     // #ifndef H5 || WEB
+    console.log(to.meta, to.name, to.query, to.params);
     console.log(
       `\x1B[34m[Router beforeEach]\x1B[0m 路由跳转 to: \x1B[32m${to.fullPath != '' ? to.fullPath : to.path}\x1B[0m from: \x1B[33m${from.fullPath != '' ? from.fullPath : from.path}\x1B[0m api: \x1B[35m${api != null ? api : ''}\x1B[0m`
     );

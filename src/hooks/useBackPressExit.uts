@@ -31,6 +31,12 @@ export function useBackPressExit(duration: number = 2000): void {
       return false;
     }
 
+    // 非根页返回由全局路由返回守卫处理；这里只负责根页退出应用，
+    // 避免守卫放行后又被「再按一次退出」吞掉本次返回。
+    if (getCurrentPages().length > 1) {
+      return false;
+    }
+
     const now = Date.now();
     if (firstBackTime == 0 || now - firstBackTime > duration) {
       firstBackTime = now;

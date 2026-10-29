@@ -6,6 +6,10 @@ import { useThemeStore } from '@/src/store/index.uts';
 import { applyNavbarTheme, getRootThemeStyle } from '@/src/theme/index.uts';
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { updateAvailableHeight } from '@/src/utils/systemInfo/index.uts';
+// #ifdef VUE3-VAPOR
+import { onBackPress } from '@dcloudio/uni-app';
+import { consumeNavigateBackInterceptorVerdict, interceptNativeBack } from '@/uni_modules/route-bestX/index.uts';
+// #endif
 
 /**
  * 页面参数 Props：由 autoRootPlugin 编译时从 pages.json 提取（与 LayoutComponent 同一套、全量注入），
@@ -59,6 +63,24 @@ const props = defineProps({
     default: false
   }
 });
+
+// AppRoot 是 autoRootPlugin 注入到每个页面的统一根组件；Vapor 不支持 app.mixin，
+// 因此在这里注册页面级 onBackPress，在原生出栈前补跑路由返回守卫。
+// #ifdef VUE3-VAPOR
+onBackPress((options: OnBackPressOptions): boolean => {
+  const navigateBackVerdict = consumeNavigateBackInterceptorVerdict();
+  if (options.from != 'backbutton') {
+    return false;
+  }
+  if (getCurrentPages().length <= 1) {
+    return false;
+  }
+  if (navigateBackVerdict != null) {
+    return !navigateBackVerdict;
+  }
+  return !interceptNativeBack();
+});
+// #endif
 
 // 激活主题状态管理 Store
 const themeStore = useThemeStore();
