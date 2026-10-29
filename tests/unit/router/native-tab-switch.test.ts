@@ -13,10 +13,12 @@ import {
   registerOnError,
   registerTabbarHandler,
   resetLastHandledNavigateBackTarget,
+  resetLastHandledSwitchTabTarget,
   resetRegisteredErrorHandlers,
   resetRegisteredGuards,
   saveRouteQuery,
-  setBypassInterceptorOnce
+  setBypassInterceptorOnce,
+  switchTabInterceptor
 } from '@/uni_modules/route-bestX/index.uts';
 import { resolveTabbarBackTarget, switchTabbar } from '@/src/tabbar/core/navigate.uts';
 import { registerTabNavigationGuard } from '@/src/tabbar/core/tab-navigation.uts';
@@ -32,6 +34,7 @@ describe('interceptNativeTabSwitch', () => {
     resetRegisteredGuards();
     resetRegisteredErrorHandlers();
     resetLastHandledNavigateBackTarget();
+    resetLastHandledSwitchTabTarget();
     resetTabPageQueries();
     setCurIdx(0);
     vi.restoreAllMocks();
@@ -51,6 +54,22 @@ describe('interceptNativeTabSwitch', () => {
     expect(guard.mock.calls[0][0].path).toBe('/src/pages/basic/basic');
     expect(guard.mock.calls[0][1].path).toBe('/src/pages/index/index');
     expect(guard.mock.calls[0][3]).toBe('switchTab');
+  });
+
+  it('keeps rejecting the same TabBar target within the dedupe window', () => {
+    applyRouteFromUrl('/src/pages/index/index');
+    const guard = vi.fn((_to: any, _from: any, next: any): void => {
+      next('/src/sub/auth/login');
+    });
+    registerBeforeEach(guard as any);
+    const navigateTo = (globalThis as any).uni.navigateTo as ReturnType<typeof vi.fn>;
+    navigateTo.mockClear();
+
+    expect(interceptNativeTabSwitch('src/pages/basic/basic')).toBe(false);
+    expect(switchTabInterceptor.invoke({ url: 'src/pages/basic/basic' })).toBe(false);
+
+    expect(guard).toHaveBeenCalledTimes(1);
+    expect(navigateTo).toHaveBeenCalledTimes(1);
   });
 
   it('intercepts switchTab before the target page lifecycle starts', () => {
@@ -169,6 +188,46 @@ describe('interceptNativeTabSwitch', () => {
     expect(guard.mock.calls[0][0].path).toBe('/src/pages/index/index');
     expect(guard.mock.calls[0][1].path).toBe('/src/sub/routerBasicDemo/routerBasicDemo');
     expect(guard.mock.calls[0][3]).toBe('navigateBack');
+  });
+
+  it('keeps rejecting the same back target within the dedupe window', () => {
+    vi.spyOn(globalThis as any, 'getCurrentPages').mockReturnValue([
+      { route: 'src/pages/index/index', options: {} },
+      { route: 'src/sub/modalBasicDemo/modalBasicDemo', options: {} }
+    ]);
+    applyRouteFromUrl('/src/sub/modalBasicDemo/modalBasicDemo');
+    const guard = vi.fn((_to: any, _from: any, next: any): void => {
+      next('/src/sub/auth/login');
+    });
+    registerBeforeEach(guard as any);
+    const navigateTo = (globalThis as any).uni.navigateTo as ReturnType<typeof vi.fn>;
+    navigateTo.mockClear();
+
+    expect(navigateBackInterceptor.invoke({ delta: 1 })).toBe(false);
+    expect(interceptNativeBack()).toBe(false);
+
+    expect(guard).toHaveBeenCalledTimes(1);
+    expect(navigateTo).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not replay a rejected native back guard through the API interceptor', () => {
+    vi.spyOn(globalThis as any, 'getCurrentPages').mockReturnValue([
+      { route: 'src/pages/index/index', options: {} },
+      { route: 'src/sub/modalBasicDemo/modalBasicDemo', options: {} }
+    ]);
+    applyRouteFromUrl('/src/sub/modalBasicDemo/modalBasicDemo');
+    const guard = vi.fn((_to: any, _from: any, next: any): void => {
+      next('/src/sub/auth/login');
+    });
+    registerBeforeEach(guard as any);
+    const navigateTo = (globalThis as any).uni.navigateTo as ReturnType<typeof vi.fn>;
+    navigateTo.mockClear();
+
+    expect(interceptNativeBack()).toBe(false);
+    expect(navigateBackInterceptor.invoke({ delta: 1 })).toBe(false);
+
+    expect(guard).toHaveBeenCalledTimes(1);
+    expect(navigateTo).toHaveBeenCalledTimes(1);
   });
 
   it('restores the active mode-4 tab when native back targets the host page', () => {
