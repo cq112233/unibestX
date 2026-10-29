@@ -278,23 +278,27 @@ function cleanDemoViews(demoDirs, dryRun) {
 
     let content = original;
     const scriptBlock = locateScriptBlock(content);
-    const templateBlock = locateTemplateBlock(content);
+    const hasTemplateBlock = locateTemplateBlock(content) !== null;
 
-    if (!scriptBlock && !templateBlock) {
+    if (!scriptBlock && !hasTemplateBlock) {
       skipped.push({ filePath, referenced });
       continue;
     }
 
-    // 先删靠后的脚本区块，再删靠前的模板区块，避免前一次修改影响后一次下标
     if (scriptBlock) {
       content = content.slice(0, scriptBlock.start) + content.slice(scriptBlock.end);
     }
+
+    // script 区块通常位于 template 之前，删除后模板区块的下标会整体前移。
+    // 因此必须基于删除后的最新内容重新定位，否则会把模板从属性中间截断。
+    const templateBlock = locateTemplateBlock(content);
     if (templateBlock) {
       content = `${content.slice(0, templateBlock.start)}${TEMPLATE_PLACEHOLDER}\n${content.slice(templateBlock.end)}`;
     }
     content = stripUnusedDemoRouter(content);
-    // 收掉删块留下的多余空行
+    // 收掉删块留下的多余空行（含 </script> 前的空行，避免 vue/block-tag-newline 报错）
     content = content.replace(/\n{3,}/g, '\n\n');
+    content = content.replace(/\n{2,}([ \t]*<\/script>)/g, '\n$1');
 
     if (content !== original) {
       touched.push({ filePath, referenced, content });
