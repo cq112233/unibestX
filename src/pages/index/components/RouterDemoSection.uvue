@@ -1,0 +1,167 @@
+<script setup lang="uts">
+import { computed } from 'vue';
+import { useRoute, useRouter } from '@/uni_modules/route-bestX/index.uts';
+
+/** 目标页：与 src/tabbar/config.uts 里 basic 的 pagePath 一致（TabBar 页，push 会被自动纠正为 switchTab） */
+const BASIC_PAGE: string = '/src/pages/basic/basic';
+
+/** useRoute()：本页路由快照（响应式、只读）；query 是 Map，值恒为 string */
+const route = useRoute();
+/** useRouter()：导航器（跳转 / 返回）；底层仍是 uni 导航 API，全局守卫照常生效 */
+const router = useRouter();
+
+type QueryRow = {
+  key: string;
+  value: string;
+};
+
+/** query 是 Map，模板里 v-for 前先摊成数组 */
+const queryRows = computed((): QueryRow[] => {
+  const rows: QueryRow[] = [];
+  route.query.forEach((value: string, key: string): void => {
+    rows.push({ key, value } as QueryRow);
+  });
+  return rows;
+});
+
+/** route.name 可能为 null，展示前先兜底 */
+const routeNameText = computed((): string => {
+  const name = route.name;
+  if (name == null) {
+    return 'null';
+  }
+  return name;
+});
+
+// —— useRouter 演示：同一个目标页，三组不同参数
+/** 对象形态：数值 + 英文参数 */
+function pushBasicById(): void {
+  router.push({ path: BASIC_PAGE, query: { id: 1001, scene: 'id-only' } });
+}
+
+/** 对象形态：中文参数由路由层统一编码，目标页拿到的是解码态 */
+function pushBasicWithText(): void {
+  router.push({ path: BASIC_PAGE, query: { id: 1002, title: '路由参数', scene: 'object-query' } });
+}
+
+/** 字符串形态：query 串要自己拼，值里有中文 / 空格时请改用对象形态 */
+function pushBasicByRawUrl(): void {
+  router.push(`${BASIC_PAGE}?id=1003&scene=raw-url`);
+}
+
+/** 命名路由形态：name 按 basic.uvue 的 definePage({ name: 'basic' }) 匹配，params 自动并入 query */
+function pushBasicByName(): void {
+  router.push({ name: 'basic', params: { id: 1004, title: '命名路由', scene: 'name-params' } });
+}
+</script>
+
+<template>
+  <view class="mt-[16px] mx-[16px]">
+    <view class="flex flex-row items-center justify-between mb-[10px]">
+      <view class="flex flex-row items-center">
+        <text class="text-[14px] font-bold text-[#1e293b]">🧭 路由跳转示例</text>
+        <text class="text-[10px] font-medium px-[6px] py-[1px] ml-[6px] rounded-[4px] text-[#7c3aed] bg-[#7c3aed14]">
+          useRouter · useRoute
+        </text>
+      </view>
+      <text class="text-[11px] text-[#94a3b8]">route-bestX</text>
+    </view>
+
+    <view class="p-[14px] rounded-[12px] border-[1px] border-solid bg-[#f8fafc] border-[#e2e8f0]">
+      <!-- 代码片段 -->
+      <view class="rounded-[8px] bg-[#0f172a] p-[10px] flex flex-col">
+        <text class="text-[11px] leading-[18px] text-[#e2e8f0]" style="font-family: monospace;">import { useRoute, useRouter } from '@/uni_modules/route-bestX/index.uts';</text>
+        <text class="text-[11px] leading-[18px] text-[#38bdf8] mt-[2px]" style="font-family: monospace;">const route = useRoute();</text>
+        <text class="text-[11px] leading-[18px] text-[#38bdf8] mt-[2px]" style="font-family: monospace;">const router = useRouter();</text>
+      </view>
+
+      <!-- useRoute：当前页路由 -->
+      <view class="mt-[12px] flex flex-col">
+        <view class="flex flex-row items-center mb-[6px]">
+          <text class="text-[12px] font-bold text-[#1e293b]">useRoute() 读当前路由</text>
+          <text class="text-[10px] text-[#94a3b8] ml-[6px]">本页快照 · 切走再回来自动刷新</text>
+        </view>
+        <view class="flex flex-row items-start justify-between mb-[4px]">
+          <text class="text-[11px] text-[#64748b] mr-[10px]">route.path</text>
+          <text class="text-[11px] font-bold text-[#1e293b] flex-1 text-right" style="font-family: monospace;">{{ route.path }}</text>
+        </view>
+        <view class="flex flex-row items-center justify-between mb-[4px]">
+          <text class="text-[11px] text-[#64748b] mr-[10px]">route.name</text>
+          <text class="text-[11px] font-bold text-[#1e293b]">{{ routeNameText }}</text>
+        </view>
+        <view class="flex flex-row items-center justify-between">
+          <text class="text-[11px] text-[#64748b] mr-[10px]">route.query</text>
+          <text class="text-[11px] font-bold text-[#1e293b]">{{ queryRows.length }} 项</text>
+        </view>
+        <view v-for="row in queryRows" :key="row.key" class="flex flex-row items-center justify-between mt-[4px] pl-[8px]">
+          <text class="text-[11px] text-[#7c3aed]" style="font-family: monospace;">{{ row.key }}</text>
+          <text class="text-[11px] font-bold text-[#1e293b] flex-1 text-right" style="font-family: monospace;">{{ row.value }}</text>
+        </view>
+      </view>
+
+      <!-- useRouter：带不同参数跳到 basic -->
+      <view class="mt-[12px] flex flex-col">
+        <view class="flex flex-row items-center mb-[6px]">
+          <text class="text-[12px] font-bold text-[#1e293b]">useRouter() 带不同参数跳 basic</text>
+        </view>
+
+        <view class="p-[10px] rounded-[10px] bg-[#ffffff] border-[1px] border-solid border-[#e2e8f0] flex flex-row items-center mb-[8px]">
+          <view class="flex-1 flex flex-col mr-[8px]">
+            <text class="text-[11px] font-bold text-[#1e293b]" style="font-family: monospace;">query: { id: 1001, scene: 'id-only' }</text>
+            <text class="text-[10px] leading-[15px] text-[#94a3b8] mt-[2px]">对象形态 · 数值参数</text>
+          </view>
+          <view class="px-[12px] h-[30px] flex flex-row items-center justify-center rounded-[6px] bg-[#7c3aed] active:opacity-90" @click="pushBasicById">
+            <text class="text-[11px] font-bold text-[#ffffff]">跳转</text>
+          </view>
+        </view>
+
+        <view class="p-[10px] rounded-[10px] bg-[#ffffff] border-[1px] border-solid border-[#e2e8f0] flex flex-row items-center mb-[8px]">
+          <view class="flex-1 flex flex-col mr-[8px]">
+            <text class="text-[11px] font-bold text-[#1e293b]" style="font-family: monospace;">query: { id: 1002, title: '路由参数' }</text>
+            <text class="text-[10px] leading-[15px] text-[#94a3b8] mt-[2px]">对象形态 · 中文值由路由层编码，目标页拿到解码态</text>
+          </view>
+          <view class="px-[12px] h-[30px] flex flex-row items-center justify-center rounded-[6px] bg-[#7c3aed] active:opacity-90" @click="pushBasicWithText">
+            <text class="text-[11px] font-bold text-[#ffffff]">跳转</text>
+          </view>
+        </view>
+
+        <view class="p-[10px] rounded-[10px] bg-[#ffffff] border-[1px] border-solid border-[#e2e8f0] flex flex-row items-center mb-[8px]">
+          <view class="flex-1 flex flex-col mr-[8px]">
+            <text class="text-[11px] font-bold text-[#1e293b]" style="font-family: monospace;">push('/src/pages/basic/basic?id=1003&amp;scene=raw-url')</text>
+            <text class="text-[10px] leading-[15px] text-[#94a3b8] mt-[2px]">字符串形态 · query 串自己拼，含中文请改用对象形态</text>
+          </view>
+          <view class="px-[12px] h-[30px] flex flex-row items-center justify-center rounded-[6px] bg-[#334155] active:opacity-90" @click="pushBasicByRawUrl">
+            <text class="text-[11px] font-bold text-[#ffffff]">跳转</text>
+          </view>
+        </view>
+
+        <view class="p-[10px] rounded-[10px] bg-[#ffffff] border-[1px] border-solid border-[#e2e8f0] flex flex-row items-center">
+          <view class="flex-1 flex flex-col mr-[8px]">
+            <text class="text-[11px] font-bold text-[#1e293b]" style="font-family: monospace;">name: 'basic', params: { id: 1004 }</text>
+            <text class="text-[10px] leading-[15px] text-[#94a3b8] mt-[2px]">命名路由 · name 命中 definePage 声明，params 自动并入 query</text>
+          </view>
+          <view class="px-[12px] h-[30px] flex flex-row items-center justify-center rounded-[6px] bg-[#0d9488] active:opacity-90" @click="pushBasicByName">
+            <text class="text-[11px] font-bold text-[#ffffff]">跳转</text>
+          </view>
+        </view>
+
+        <text class="text-[10px] leading-[16px] text-[#94a3b8] mt-[8px]">
+          basic 是 TabBar 页：router.push 会被路由层自动纠正为 switchTab；跳过去后页面顶部「当前路由参数」卡片会显示收到的 query。
+        </text>
+
+        <!-- 官方约束提示：说清官方口径与本项目兼容的边界 -->
+        <view class="mt-[8px] p-[10px] rounded-[10px] bg-[#fffbeb] border-[1px] border-solid border-[#fef3c7] flex flex-row items-start">
+          <text class="text-[12px] mr-[6px]">🔔</text>
+          <view class="flex-1 flex flex-col">
+            <text class="text-[11px] font-bold text-[#b45309]">switchTab 官方不支持带参数</text>
+            <text class="text-[10px] leading-[16px] text-[#b45309] mt-[3px]">
+              uni.switchTab 的 url 官方明确「路径后不能带参数」，TabBar 页也不该用 navigateTo 传参。这里能读到 query，是本项目自定义 TabBar 路由层（switchTabbar + query 暂存）额外做的兼容，一般业务页按上面的写法直接传参即可；敏感数据、超大对象或需要跨多页共享的特殊场景请自行处理，改用 Pinia store / 全局状态。
+            </text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<style scoped></style>
