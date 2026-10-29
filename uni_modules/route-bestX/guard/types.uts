@@ -26,7 +26,7 @@ export type RouteTarget = {
   meta: UTSJSONObject | null;
   /** 路由名称，对标 vue-router 的 to.name */
   name: string | null;
-  /** 动态路由参数（uni-app X 恒为空 Map，对标 vue-router 的 to.params） */
+  /** 路由参数，与 query 同值（命名路由的 params 最终也会落到 query） */
   params: Map<string, string>;
 };
 
