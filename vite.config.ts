@@ -235,17 +235,14 @@ export default defineConfig({
       subPackageMode: 'subdirs',
 
       // 【排除扫描规则】：Glob 匹配规则数组，匹配到的文件/目录不会被当作页面路由扫描
+      // 只按「代码结构目录」排除。不要按资产目录名（font / img / image / images …）排除：
+      // 扫描本来就只收 .uvue，资产目录里不可能有页面，反而会误伤同名业务目录
+      // （如 src/sub/riceuiBasicDemo/demos/image/image.uvue 会被 `**/image/**/*.*` 连坐掉）。
       exclude: [
         '**/components/**/*.*',
         '**/views/**/*.*',
         '**/common/**/*.*',
         '**/modules/**/*.*',
-        '**/font/**/*.*',
-        '**/fonts/**/*.*',
-        '**/img/**/*.*',
-        '**/imgs/**/*.*',
-        '**/image/**/*.*',
-        '**/images/**/*.*',
         '**/assets/**/*.*'
       ],
 

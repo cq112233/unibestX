@@ -250,12 +250,16 @@ function matchGlob(filePath: string, pattern: string): boolean {
   if (pattern === '**/views/**/*.*' || pattern.includes('views')) {
     return filePath.includes('/views/') || filePath.startsWith('views/');
   }
+  // `**` 段先换成占位符，等单星 `*` 替换完再还原：否则后插入的 `.*` 里的星号
+  // 会被单星规则二次替换成 `.[^/]*`，导致 `**/modules/**/*.*` 这类模式永远匹配不上。
   const regexStr = pattern
     .replace(/[.+^${}()|[\]\\]/g, '\\$&')
-    .replace(/\*\*\/\*/g, '.*')
-    .replace(/\*\*/g, '.*')
+    .replace(/\*\*\//g, '__GLOBSTAR_DIR__') // `**/` → 任意层级目录（含零层）
+    .replace(/\*\*/g, '__GLOBSTAR__') // 末尾 `**` → 任意字符
     .replace(/\*/g, '[^/]*')
-    .replace(/\?/g, '.');
+    .replace(/\?/g, '.')
+    .replace(/__GLOBSTAR_DIR__/g, '(?:.*/)?')
+    .replace(/__GLOBSTAR__/g, '.*');
   return new RegExp(`^${regexStr}$`).test(filePath);
 }
 
