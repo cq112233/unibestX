@@ -62,6 +62,9 @@ export const needHideNativeTabbar: boolean = selectedTabbarStrategy == TABBAR_ST
 /** 当前配置的 TabBar UI 风格形态（如 'capsule' | 'default'，从 config.uts 中读取） */
 export const tabbarType: string = customTabbarConfig.type ?? 'default';
 
+/** 当前 TabBar 是否为悬浮胶囊形态（type: 'capsule'）——仅该形态允许隐藏底部垫高占位块 */
+export const isCapsuleTabbar: boolean = tabbarType == 'capsule';
+
 /** 是否启用了自定义 TabBar（模式 2 或 3 为 true）——根组件 App.ku.uvue 用它决定是否渲染 <Tabbar> */
 export const customTabbarEnable: boolean = selectedTabbarStrategy == TABBAR_STRATEGY_MAP.CUSTOM_TABBAR_WITH_NATIVE || selectedTabbarStrategy == TABBAR_STRATEGY_MAP.CUSTOM_TABBAR_WITHOUT_NATIVE;
 

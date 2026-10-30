@@ -899,7 +899,7 @@ defineExpose({
         </view>
       </view>
       <slot />
-      <TabbarPlaceholder :is-tabbar-page="isTabbarPage" />
+      <TabbarPlaceholder :is-tabbar-page="isTabbarPage" :tab-index="curIdx" />
     </scroll-view>
 
     <!-- 2. 原生全端（Android VDOM / iOS / Web / 微信小程序）：原生极速流畅滚动，彻底剥离 touch 事件 -->
@@ -918,7 +918,7 @@ defineExpose({
       @scrolltolower="handleScrollToLower"
     >
       <slot />
-      <TabbarPlaceholder :is-tabbar-page="isTabbarPage" />
+      <TabbarPlaceholder :is-tabbar-page="isTabbarPage" :tab-index="curIdx" />
     </scroll-view>
 
     <!-- 未开启自定义下拉刷新时（包含开启原生下拉刷新时）：渲染普通滚动容器 -->
@@ -931,7 +931,7 @@ defineExpose({
       @scrolltolower="handleScrollToLower"
     >
       <slot />
-      <TabbarPlaceholder :is-tabbar-page="isTabbarPage" />
+      <TabbarPlaceholder :is-tabbar-page="isTabbarPage" :tab-index="curIdx" />
     </scroll-view>
   </view>
 </template>

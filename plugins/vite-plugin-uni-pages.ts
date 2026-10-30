@@ -212,8 +212,14 @@ const DEFAULT_CONFIG_FILE = 'pages.config.json';
 /** 文件变更后等待多久再重新生成（合并一次保存引发的多次事件） */
 const DEBOUNCE_MS = 80;
 
-/** 模式 2 下原生 tabBar 会被自定义组件接管，静态消除宿主 tabbar 及 50px 窗口底边距与过渡加载菊花，实现全链路零闪烁 */
-const HIDE_NATIVE_TABBAR_STYLE = '<style id="uni-tabbar-hide-zero-flash">uni-tabbar, uni-tabbar *, .uni-tabbar, .uni-tabbar *, .uni-tabbar-bottom, .uni-tabbar-bottom *, .uni-tabbar__icon, .uni-tabbar__label, .uni-async-loading, .uni-loading { display: none !important; visibility: hidden !important; height: 0 !important; min-height: 0 !important; max-height: 0 !important; opacity: 0 !important; pointer-events: none !important; position: absolute !important; bottom: -9999px !important; } :root { --window-bottom: 0px !important; } uni-page-wrapper { height: 100% !important; } uni-page-body { padding-bottom: 0px !important; }</style>';
+/**
+ * 模式 2 下原生 tabBar 会被自定义组件接管，静态消除宿主 tabbar 及 50px 窗口底边距实现零闪烁。
+ *
+ * ⚠️ 这里只允许隐藏原生 tabbar 自身，绝不能连带隐藏 `.uni-async-loading` / `.uni-loading`：
+ * 前者是页面异步组件（路由级懒加载）的官方加载态，后者同时被 uni.showLoading 使用。
+ * 一旦隐藏，弱网首屏 / 切 Tab 会变成没有任何反馈的白屏，用户会以为页面进不去。
+ */
+const HIDE_NATIVE_TABBAR_STYLE = '<style id="uni-tabbar-hide-zero-flash">uni-tabbar, uni-tabbar *, .uni-tabbar, .uni-tabbar *, .uni-tabbar-bottom, .uni-tabbar-bottom *, .uni-tabbar__icon, .uni-tabbar__label { display: none !important; visibility: hidden !important; height: 0 !important; min-height: 0 !important; max-height: 0 !important; opacity: 0 !important; pointer-events: none !important; position: absolute !important; bottom: -9999px !important; } :root { --window-bottom: 0px !important; } uni-page-wrapper { height: 100% !important; } uni-page-body { padding-bottom: 0px !important; }</style>';
 
 /** 默认排除目录（components / views 不当页面扫描） */
 const DEFAULT_EXCLUDES: string[] = ['**/components/**/*.*', '**/views/**/*.*'];
@@ -2506,15 +2512,18 @@ export default function uniPagesPlugin(userOptions: UniPagesOptions = {}): Plugi
         try {
           const pagesJsonData = loadPlatformPagesJson(path.resolve(projectRoot, 'pages.json'));
           const tabList = (pagesJsonData.tabBar && Array.isArray(pagesJsonData.tabBar.list)) ? pagesJsonData.tabBar.list : [];
-          const tabImports = tabList
+          const tabPages = tabList
             .map((item: any) => item.pagePath || '')
             .filter((p: string) => p.length > 0 && !p.includes('pages/index/index'))
-            .map((p: string) => {
-              const norm = p.startsWith('/') ? p : `/${p}`;
-              return `import('${norm}.uvue').catch(() => {});`;
-            });
-          if (tabImports.length > 0) {
-            preloadScripts = `<script type="module">\n// 动态预加载所有 TabBar 页面组件，消除首次切换 Tab 时的异步模块加载空白\nsetTimeout(() => {\n  ${tabImports.join('\n  ')}\n}, 50);\n</script>`;
+            .map((p: string) => (p.startsWith('/') ? p : `/${p}`));
+          if (tabPages.length > 0) {
+            // ⚠️ 只能用 uni.preloadPage 触发预加载：
+            // 它走的是路由表里的 loader（编译后的 JS 产物）；
+            // 直接 import('/src/pages/x.uvue') 拿到的是 .uvue 源码，
+            // 响应头 Content-Type 为空，浏览器按 module 脚本严格校验后直接报
+            // "Failed to load module script ... MIME type of \"\""；
+            // 打包后该源码路径同样不存在，必须依赖路由 loader。
+            preloadScripts = `<script type="module">\n// 动态预加载所有 TabBar 页面组件，消除首次切换 Tab 时的异步模块加载空白\nconst tabPages = ${JSON.stringify(tabPages)};\nlet retries = 0;\nfunction runPreload() {\n  const uniApi = globalThis.uni;\n  if (uniApi == null || typeof uniApi.preloadPage !== 'function') {\n    if (retries++ < 100) setTimeout(runPreload, 50);\n    return;\n  }\n  tabPages.forEach((url) => {\n    uniApi.preloadPage({ url, fail: () => {} });\n  });\n}\nsetTimeout(runPreload, 50);\n</script>`;
           }
         }
         catch {}

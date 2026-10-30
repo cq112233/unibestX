@@ -7,84 +7,6 @@
   3. 负责当前激活 Tab 的顶部导航栏标题（多语言 $t 同步）与状态栏显隐联动；
   4. 实现全端保活机制（移出视口 + visibility），并解决微信小程序与原生端切 Tab 时下拉刷新卡死问题。
 -->
-<template>
-  <!-- 根视图容器：当该 Tab 首次被激活并完成初始渲染后常驻保活，非激活状态通过 transform 移出视口 -->
-  <view
-    v-if="hasRendered"
-    :style="customPageStyle"
-    class="tab-content-wrapper"
-    :class="[customPageClass, { 'tab-content-wrapper--active': isActive }]"
-  >
-    <!--
-      纵向滚动容器：各 Tab 独立拥有独立的滚动区域
-      :key="refresherKey" - 在刷新中途强行切走 Tab 时，通过改变 key 彻底重构组件，清除小程序/原生端卡死的转圈
-      :refresher-enabled - 是否开启自定义下拉刷新能力（保持稳定，严禁受 isActive 控制导致拔插头冻结）
-      :refresher-triggered - 下拉刷新动画状态（true 刷新中，false 已复位收起）
-      @refresherrefresh - 用户手势下拉达到阈值后触发的刷新事件
-      @refresherrestore - 下拉刷新控件动画彻底复位收起事件
-      @refresherabort - 手势异常中断或下拉未达阈值释放事件（鸿蒙/小程序兜底复位）
-      @scroll - 页面滚动监听，向上派发 onNavbarPageScroll 事件
-      @scrolltolower - 滚动触底监听，向上派发 onNavbarReachBottom 事件
-    -->
-    <!-- 1. 支付宝小程序专享：手势模拟下拉刷新（解决支付宝小程序无原生 refresher 问题） -->
-    <scroll-view
-      v-if="isMpAlipay"
-      :key="`alipay-${refresherKey}`"
-      direction="vertical"
-      class="tab-content-scroll"
-      style="flex: 1;"
-      :lower-threshold="50"
-      @scroll="handleScroll"
-      @scrolltolower="handleScrollToLower"
-      @touchstart="handleAlipayTouchStart"
-      @touchmove="handleAlipayTouchMove"
-      @touchend="handleAlipayTouchEnd"
-      @touchcancel="handleAlipayTouchEnd"
-    >
-      <!-- 微信小程序同款：三个小圆点手势下拉刷新 Header -->
-      <view
-        class="alipay-pull-header"
-        :style="alipayHeaderStyle"
-      >
-        <view class="wechat-pull-dots" :class="{ 'wechat-pull-dots--active': isTriggered }">
-          <view class="wechat-pull-dot wechat-pull-dot--1"></view>
-          <view class="wechat-pull-dot wechat-pull-dot--2"></view>
-          <view class="wechat-pull-dot wechat-pull-dot--3"></view>
-        </view>
-      </view>
-      <!-- 插槽：放置对应 Tab 的页面内容（宿主页为 #tabHost，普通 Tab 直接复用页面 .uvue） -->
-      <slot />
-
-      <!-- 底部 TabBar 统一占位垫高组件：根据 VITE_TABBAR_MODE、风格形态及安全区动态计算高度 -->
-      <TabbarPlaceholder />
-    </scroll-view>
-
-    <!-- 2. 原生全端（Android VDOM / iOS / Web / 微信小程序）：原生高性能极速滚动，无任何 touch 事件干扰 -->
-    <scroll-view
-      v-else
-      :key="`native-${refresherKey}`"
-      direction="vertical"
-      class="tab-content-scroll"
-      style="flex: 1;"
-      :refresher-enabled="isRefresherEnabled"
-      :refresher-triggered="isTriggered"
-      :refresher-background="themeTokens.bgContent"
-      :lower-threshold="50"
-      @refresherrefresh="handleRefresherRefresh"
-      @refresherrestore="handleRefresherRestore"
-      @refresherabort="handleRefresherRestore"
-      @scroll="handleScroll"
-      @scrolltolower="handleScrollToLower"
-    >
-      <!-- 插槽：放置对应 Tab 的页面内容（宿主页为 #tabHost，普通 Tab 直接复用页面 .uvue） -->
-      <slot />
-
-      <!-- 底部 TabBar 统一占位垫高组件：根据 VITE_TABBAR_MODE、风格形态及安全区动态计算高度 -->
-      <TabbarPlaceholder />
-    </scroll-view>
-  </view>
-</template>
-
 <script setup lang="uts">
 import { computed, onMounted, onUnmounted, provide, ref, watch } from 'vue';
 import { useTabbar, useTabbarI18n, useTabbarPage, useTabbarTheme } from '@/src/tabbar/index.uts';
@@ -159,6 +81,11 @@ const { isPageVisible } = useTabbarPage();
 // ==========================================
 /** 计算当前 Tab 是否正处于激活显示状态 */
 const isActive = computed<boolean>((): boolean => curIdx.value == props.contentIndex);
+
+/** 底部占位块所属的 Tab 下标（收敛为 computed，避免模板裸写 prop 在鸿蒙端作用域解析失败） */
+const placeholderTabIndex = computed<number>((): number => {
+  return props.contentIndex;
+});
 
 /** 当前 Tab 是否已挂载渲染（外层已做懒挂载，首次创建时直接渲染，避免多一帧空白） */
 const hasRendered = ref(isActive.value);
@@ -485,6 +412,84 @@ defineExpose({
   syncNavbarState
 });
 </script>
+
+<template>
+  <!-- 根视图容器：当该 Tab 首次被激活并完成初始渲染后常驻保活，非激活状态通过 transform 移出视口 -->
+  <view
+    v-if="hasRendered"
+    :style="props.customPageStyle"
+    class="tab-content-wrapper"
+    :class="[props.customPageClass, { 'tab-content-wrapper--active': isActive }]"
+  >
+    <!--
+      纵向滚动容器：各 Tab 独立拥有独立的滚动区域
+      :key="refresherKey" - 在刷新中途强行切走 Tab 时，通过改变 key 彻底重构组件，清除小程序/原生端卡死的转圈
+      :refresher-enabled - 是否开启自定义下拉刷新能力（保持稳定，严禁受 isActive 控制导致拔插头冻结）
+      :refresher-triggered - 下拉刷新动画状态（true 刷新中，false 已复位收起）
+      @refresherrefresh - 用户手势下拉达到阈值后触发的刷新事件
+      @refresherrestore - 下拉刷新控件动画彻底复位收起事件
+      @refresherabort - 手势异常中断或下拉未达阈值释放事件（鸿蒙/小程序兜底复位）
+      @scroll - 页面滚动监听，向上派发 onNavbarPageScroll 事件
+      @scrolltolower - 滚动触底监听，向上派发 onNavbarReachBottom 事件
+    -->
+    <!-- 1. 支付宝小程序专享：手势模拟下拉刷新（解决支付宝小程序无原生 refresher 问题） -->
+    <scroll-view
+      v-if="isMpAlipay"
+      :key="`alipay-${refresherKey}`"
+      direction="vertical"
+      class="tab-content-scroll"
+      style="flex: 1;"
+      :lower-threshold="50"
+      @scroll="handleScroll"
+      @scrolltolower="handleScrollToLower"
+      @touchstart="handleAlipayTouchStart"
+      @touchmove="handleAlipayTouchMove"
+      @touchend="handleAlipayTouchEnd"
+      @touchcancel="handleAlipayTouchEnd"
+    >
+      <!-- 微信小程序同款：三个小圆点手势下拉刷新 Header -->
+      <view
+        class="alipay-pull-header"
+        :style="alipayHeaderStyle"
+      >
+        <view class="wechat-pull-dots" :class="{ 'wechat-pull-dots--active': isTriggered }">
+          <view class="wechat-pull-dot wechat-pull-dot--1"></view>
+          <view class="wechat-pull-dot wechat-pull-dot--2"></view>
+          <view class="wechat-pull-dot wechat-pull-dot--3"></view>
+        </view>
+      </view>
+      <!-- 插槽：放置对应 Tab 的页面内容（宿主页为 #tabHost，普通 Tab 直接复用页面 .uvue） -->
+      <slot />
+
+      <!-- 底部 TabBar 统一占位垫高组件：根据 VITE_TABBAR_MODE、风格形态及安全区动态计算高度 -->
+      <TabbarPlaceholder :tab-index="placeholderTabIndex" />
+    </scroll-view>
+
+    <!-- 2. 原生全端（Android VDOM / iOS / Web / 微信小程序）：原生高性能极速滚动，无任何 touch 事件干扰 -->
+    <scroll-view
+      v-else
+      :key="`native-${refresherKey}`"
+      direction="vertical"
+      class="tab-content-scroll"
+      style="flex: 1;"
+      :refresher-enabled="isRefresherEnabled"
+      :refresher-triggered="isTriggered"
+      :refresher-background="themeTokens.bgContent"
+      :lower-threshold="50"
+      @refresherrefresh="handleRefresherRefresh"
+      @refresherrestore="handleRefresherRestore"
+      @refresherabort="handleRefresherRestore"
+      @scroll="handleScroll"
+      @scrolltolower="handleScrollToLower"
+    >
+      <!-- 插槽：放置对应 Tab 的页面内容（宿主页为 #tabHost，普通 Tab 直接复用页面 .uvue） -->
+      <slot />
+
+      <!-- 底部 TabBar 统一占位垫高组件：根据 VITE_TABBAR_MODE、风格形态及安全区动态计算高度 -->
+      <TabbarPlaceholder :tab-index="placeholderTabIndex" />
+    </scroll-view>
+  </view>
+</template>
 
 <style lang="scss" scoped>
 /* Tab 视图绝对定位铺满容器；非激活时只做合成层位移，避免 left 变化触发原生重新排版 */
