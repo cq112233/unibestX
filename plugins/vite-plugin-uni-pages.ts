@@ -2506,15 +2506,18 @@ export default function uniPagesPlugin(userOptions: UniPagesOptions = {}): Plugi
         try {
           const pagesJsonData = loadPlatformPagesJson(path.resolve(projectRoot, 'pages.json'));
           const tabList = (pagesJsonData.tabBar && Array.isArray(pagesJsonData.tabBar.list)) ? pagesJsonData.tabBar.list : [];
-          const tabImports = tabList
+          const tabPages = tabList
             .map((item: any) => item.pagePath || '')
             .filter((p: string) => p.length > 0 && !p.includes('pages/index/index'))
-            .map((p: string) => {
-              const norm = p.startsWith('/') ? p : `/${p}`;
-              return `import('${norm}.uvue').catch(() => {});`;
-            });
-          if (tabImports.length > 0) {
-            preloadScripts = `<script type="module">\n// 动态预加载所有 TabBar 页面组件，消除首次切换 Tab 时的异步模块加载空白\nsetTimeout(() => {\n  ${tabImports.join('\n  ')}\n}, 50);\n</script>`;
+            .map((p: string) => (p.startsWith('/') ? p : `/${p}`));
+          if (tabPages.length > 0) {
+            // ⚠️ 只能用 uni.preloadPage 触发预加载：
+            // 它走的是路由表里的 loader（编译后的 JS 产物）；
+            // 直接 import('/src/pages/x.uvue') 拿到的是 .uvue 源码，
+            // 响应头 Content-Type 为空，浏览器按 module 脚本严格校验后直接报
+            // "Failed to load module script ... MIME type of \"\""；
+            // 打包后该源码路径同样不存在，必须依赖路由 loader。
+            preloadScripts = `<script type="module">\n// 动态预加载所有 TabBar 页面组件，消除首次切换 Tab 时的异步模块加载空白\nconst tabPages = ${JSON.stringify(tabPages)};\nlet retries = 0;\nfunction runPreload() {\n  const uniApi = globalThis.uni;\n  if (uniApi == null || typeof uniApi.preloadPage !== 'function') {\n    if (retries++ < 100) setTimeout(runPreload, 50);\n    return;\n  }\n  tabPages.forEach((url) => {\n    uniApi.preloadPage({ url, fail: () => {} });\n  });\n}\nsetTimeout(runPreload, 50);\n</script>`;
           }
         }
         catch {}
