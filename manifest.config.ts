@@ -146,7 +146,8 @@ export default defineManifestConfig({
     router: {
       mode: 'hash',
       base: './'
-    }
+    },
+    darkmode: true
   },
 
   // 5. 鸿蒙（HarmonyOS）构建与证书签名配置（支持环境变量动态注入与本地默认证书）

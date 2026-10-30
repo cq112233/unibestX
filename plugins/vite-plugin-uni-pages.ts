@@ -212,8 +212,14 @@ const DEFAULT_CONFIG_FILE = 'pages.config.json';
 /** 文件变更后等待多久再重新生成（合并一次保存引发的多次事件） */
 const DEBOUNCE_MS = 80;
 
-/** 模式 2 下原生 tabBar 会被自定义组件接管，静态消除宿主 tabbar 及 50px 窗口底边距与过渡加载菊花，实现全链路零闪烁 */
-const HIDE_NATIVE_TABBAR_STYLE = '<style id="uni-tabbar-hide-zero-flash">uni-tabbar, uni-tabbar *, .uni-tabbar, .uni-tabbar *, .uni-tabbar-bottom, .uni-tabbar-bottom *, .uni-tabbar__icon, .uni-tabbar__label, .uni-async-loading, .uni-loading { display: none !important; visibility: hidden !important; height: 0 !important; min-height: 0 !important; max-height: 0 !important; opacity: 0 !important; pointer-events: none !important; position: absolute !important; bottom: -9999px !important; } :root { --window-bottom: 0px !important; } uni-page-wrapper { height: 100% !important; } uni-page-body { padding-bottom: 0px !important; }</style>';
+/**
+ * 模式 2 下原生 tabBar 会被自定义组件接管，静态消除宿主 tabbar 及 50px 窗口底边距实现零闪烁。
+ *
+ * ⚠️ 这里只允许隐藏原生 tabbar 自身，绝不能连带隐藏 `.uni-async-loading` / `.uni-loading`：
+ * 前者是页面异步组件（路由级懒加载）的官方加载态，后者同时被 uni.showLoading 使用。
+ * 一旦隐藏，弱网首屏 / 切 Tab 会变成没有任何反馈的白屏，用户会以为页面进不去。
+ */
+const HIDE_NATIVE_TABBAR_STYLE = '<style id="uni-tabbar-hide-zero-flash">uni-tabbar, uni-tabbar *, .uni-tabbar, .uni-tabbar *, .uni-tabbar-bottom, .uni-tabbar-bottom *, .uni-tabbar__icon, .uni-tabbar__label { display: none !important; visibility: hidden !important; height: 0 !important; min-height: 0 !important; max-height: 0 !important; opacity: 0 !important; pointer-events: none !important; position: absolute !important; bottom: -9999px !important; } :root { --window-bottom: 0px !important; } uni-page-wrapper { height: 100% !important; } uni-page-body { padding-bottom: 0px !important; }</style>';
 
 /** 默认排除目录（components / views 不当页面扫描） */
 const DEFAULT_EXCLUDES: string[] = ['**/components/**/*.*', '**/views/**/*.*'];
