@@ -5,6 +5,9 @@ import { useRoute, useRouter } from '@/uni_modules/route-bestX/index.uts';
 /** 目标页：与 src/tabbar/config.uts 里 basic 的 pagePath 一致（TabBar 页，push 会被自动纠正为 switchTab） */
 const BASIC_PAGE: string = '/src/pages/basic/basic';
 
+/** 目标页：分包页 src/sub/modalBasicDemo（普通页，push 走 navigateTo，可正常带参数） */
+const MODAL_DEMO_PAGE: string = '/src/sub/modalBasicDemo/modalBasicDemo';
+
 /** useRoute()：本页路由快照（响应式、只读）；query 是 Map，值恒为 string */
 const route = useRoute();
 /** useRouter()：导航器（跳转 / 返回）；底层仍是 uni 导航 API，全局守卫照常生效 */
@@ -52,6 +55,17 @@ function pushBasicByRawUrl(): void {
 /** 命名路由形态：name 按 basic.uvue 的 definePage({ name: 'basic' }) 匹配，params 自动并入 query */
 function pushBasicByName(): void {
   router.push({ name: 'basic', params: { id: 1004, title: '命名路由', scene: 'name-params' } });
+}
+
+// —— useRouter 演示：分包页（普通页），对照组 = 不带参数 / 带参数
+/** 不带参数：直接按 path 入栈 */
+function pushModalDemo(): void {
+  router.push(MODAL_DEMO_PAGE);
+}
+
+/** 带参数：普通页可正常带 query，目标页用 useRoute().query 读取 */
+function pushModalDemoWithQuery(): void {
+  router.push({ path: MODAL_DEMO_PAGE, query: { from: 'router-demo', title: '带参数进入' } });
 }
 </script>
 
@@ -159,6 +173,37 @@ function pushBasicByName(): void {
             </text>
           </view>
         </view>
+      </view>
+
+      <!-- useRouter：跳分包页 modalBasicDemo，对照组 = 不带参数 / 带参数 -->
+      <view class="mt-[12px] flex flex-col">
+        <view class="flex flex-row items-center mb-[6px]">
+          <text class="text-[12px] font-bold text-[#1e293b]">useRouter() 跳分包页 modalBasicDemo</text>
+        </view>
+
+        <view class="p-[10px] rounded-[10px] bg-[#ffffff] border-[1px] border-solid border-[#e2e8f0] flex flex-row items-center mb-[8px]">
+          <view class="flex-1 flex flex-col mr-[8px]">
+            <text class="text-[11px] font-bold text-[#1e293b]" style="font-family: monospace;">push('/src/sub/modalBasicDemo/modalBasicDemo')</text>
+            <text class="text-[10px] leading-[15px] text-[#94a3b8] mt-[2px]">不带参数 · 普通页走 navigateTo</text>
+          </view>
+          <view class="px-[12px] h-[30px] flex flex-row items-center justify-center rounded-[6px] bg-[#334155] active:opacity-90" @click="pushModalDemo">
+            <text class="text-[11px] font-bold text-[#ffffff]">跳转</text>
+          </view>
+        </view>
+
+        <view class="p-[10px] rounded-[10px] bg-[#ffffff] border-[1px] border-solid border-[#e2e8f0] flex flex-row items-center">
+          <view class="flex-1 flex flex-col mr-[8px]">
+            <text class="text-[11px] font-bold text-[#1e293b]" style="font-family: monospace;">query: { from: 'router-demo', title: '带参数进入' }</text>
+            <text class="text-[10px] leading-[15px] text-[#94a3b8] mt-[2px]">带参数 · 普通页可正常传 query，目标页用 useRoute().query 读</text>
+          </view>
+          <view class="px-[12px] h-[30px] flex flex-row items-center justify-center rounded-[6px] bg-[#0d9488] active:opacity-90" @click="pushModalDemoWithQuery">
+            <text class="text-[11px] font-bold text-[#ffffff]">跳转</text>
+          </view>
+        </view>
+
+        <text class="text-[10px] leading-[16px] text-[#94a3b8] mt-[8px]">
+          modalBasicDemo 是普通分包页（非 TabBar 页）：不带参数与带参数都能直接入栈，带参数时目标页顶部会显示解码后的 route.fullPath。
+        </text>
       </view>
     </view>
   </view>
